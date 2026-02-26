@@ -1,0 +1,74 @@
+{
+  "project": "vibex-frontend",
+  "goal": "react next.js 前端原型及交互契约生成项目",
+  "created": "2026-02-24T19:12:15.186574+00:00",
+  "updated": "2026-02-24T19:12:20.869226+00:00",
+  "status": "active",
+  "mode": "linear",
+  "workspace": "/root/.openclaw/workspace/vibex",
+  "pipeline": [
+    "analyst",
+    "architect",
+    "dev",
+    "tester",
+    "reviewer",
+    "coord"
+  ],
+  "currentStage": "analyst",
+  "stages": {
+    "analyst": {
+      "agent": "analyst",
+      "status": "in-progress",
+      "task": "分析需求：react next.js 前端原型及交互契约生成项目",
+      "startedAt": "2026-02-25T12:19:00.000000+00:00",
+      "completedAt": null,
+      "output": "",
+      "logs": ["2026-02-25T12:19:00 - Task activated by coord"]
+    },
+    "architect": {
+      "agent": "architect",
+      "status": "pending",
+      "task": "技术方案设计：基于需求分析，产出技术选型方案",
+      "startedAt": null,
+      "completedAt": null,
+      "output": "",
+      "logs": []
+    },
+    "dev": {
+      "agent": "dev",
+      "status": "pending",
+      "task": "TDD实现：搭建前端项目框架",
+      "startedAt": null,
+      "completedAt": null,
+      "output": "",
+      "logs": []
+    },
+    "tester": {
+      "agent": "tester",
+      "status": "pending",
+      "task": "测试验证：编写测试用例",
+      "startedAt": null,
+      "completedAt": null,
+      "output": "",
+      "logs": []
+    },
+    "reviewer": {
+      "agent": "reviewer",
+      "status": "pending",
+      "task": "代码审查：审查代码和测试",
+      "startedAt": null,
+      "completedAt": null,
+      "output": "",
+      "logs": []
+    },
+    "coord": {
+      "agent": "coord",
+      "status": "pending",
+      "task": "任务合并：协调各阶段工作",
+      "startedAt": null,
+      "completedAt": null,
+      "output": "",
+      "logs": []
+    }
+  }
+}

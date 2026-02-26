@@ -1,0 +1,312 @@
+{
+  "version": "1.0",
+  "domain": "VibeX落地页",
+  "flowNodes": "/tmp/vibex-landing-flow.json",
+  "pages": [
+    {
+      "id": "page_landing",
+      "name": "落地页",
+      "path": "/",
+      "layout": {
+        "type": "单栏",
+        "regions": {
+          "header": { "height": "64px", "fixed": true },
+          "hero": { "height": "calc(100vh - 64px)", "minHeight": "600px" },
+          "features": { "padding": "80px 0" },
+          "howItWorks": { "padding": "80px 0" },
+          "demo": { "padding": "80px 0" },
+          "socialProof": { "padding": "80px 0" },
+          "cta": { "padding": "100px 0" },
+          "footer": { "padding": "40px 0" }
+        }
+      },
+      "components": [
+        {
+          "component": "Header",
+          "position": { "region": "header", "order": 1 },
+          "props": {
+            "logo": "VibeX",
+            "nav": ["功能", "如何使用", "演示", "定价"],
+            "actions": ["登录", "立即体验"]
+          }
+        },
+        {
+          "component": "HeroSection",
+          "position": { "region": "hero", "order": 1 },
+          "props": {
+            "title": "AI 驱动的下一代低代码平台",
+            "subtitle": "用自然语言描述你的想法，AI 自动生成完整应用",
+            "ctaPrimary": "立即体验",
+            "ctaSecondary": "了解更多",
+            "animation": "flow-diagram"
+          }
+        },
+        {
+          "component": "FeaturesSection",
+          "position": { "region": "features", "order": 1 },
+          "props": {
+            "title": "核心能力",
+            "features": [
+              {
+                "icon": "robot",
+                "title": "AI 对话",
+                "description": "自然语言生成页面"
+              },
+              {
+                "icon": "flowchart",
+                "title": "流程图",
+                "description": "可视化业务逻辑"
+              },
+              {
+                "icon": "code",
+                "title": "低代码编辑器",
+                "description": "精细化调整"
+              }
+            ]
+          }
+        },
+        {
+          "component": "HowItWorksSection",
+          "position": { "region": "howItWorks", "order": 1 },
+          "props": {
+            "title": "如何使用",
+            "steps": [
+              { "number": 1, "title": "描述你的想法", "description": "用自然语言描述你想要的应用" },
+              { "number": 2, "title": "AI 生成原型", "description": "自动生成可交互的页面原型" },
+              { "number": 3, "title": "调整并发布", "description": "精细调整后一键部署" }
+            ]
+          }
+        },
+        {
+          "component": "DemoSection",
+          "position": { "region": "demo", "order": 1 },
+          "props": {
+            "title": "产品演示",
+            "videoUrl": "/demo/vibex-demo.mp4",
+            "poster": "/demo/poster.jpg"
+          }
+        },
+        {
+          "component": "SocialProofSection",
+          "position": { "region": "socialProof", "order": 1 },
+          "props": {
+            "title": "用户评价",
+            "testimonials": [
+              { "avatar": "/avatars/user1.jpg", "name": "张三", "role": "创业者", "content": "半天就完成了MVP开发！" },
+              { "avatar": "/avatars/user2.jpg", "name": "李四", "role": "产品经理", "content": "团队效率提升了3倍" }
+            ]
+          }
+        },
+        {
+          "component": "CTASection",
+          "position": { "region": "cta", "order": 1 },
+          "props": {
+            "title": "开始你的第一个 AI 项目",
+            "cta": "立即免费体验",
+            "note": "无需信用卡"
+          }
+        },
+        {
+          "component": "Footer",
+          "position": { "region": "footer", "order": 1 },
+          "props": {
+            "links": ["关于", "文档", "博客", "联系我们"],
+            "social": ["GitHub", "Twitter", "Discord"],
+            "copyright": "© 2026 VibeX"
+          }
+        }
+      ]
+    }
+  ],
+  "components": [
+    {
+      "component": {
+        "name": "Header",
+        "category": "layout",
+        "variants": [
+          {
+            "variant": "default",
+            "props": { "fixed": true, "transparent": false },
+            "style": {
+              "size": { "height": "64px" },
+              "colors": { "bg": "#ffffff", "text": "#333333" },
+              "border": { "bottom": "1px solid #f0f0f0" }
+            },
+            "interactions": {
+              "scroll": { "effect": "blur", "threshold": 50 }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "component": {
+        "name": "HeroSection",
+        "category": "display",
+        "variants": [
+          {
+            "variant": "default",
+            "props": { "centered": true },
+            "style": {
+              "colors": { "primary": "#1890ff", "text": "#333333", "subtext": "#666666" },
+              "typography": { "title": "48px/1.2", "subtitle": "20px/1.6" }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "component": {
+        "name": "Button",
+        "category": "basic",
+        "variants": [
+          {
+            "variant": "primary",
+            "props": { "type": "primary", "size": "large" },
+            "style": {
+              "size": { "height": "48px", "padding": "0 32px" },
+              "colors": { "primary": "#1890ff", "text": "#ffffff" },
+              "border": { "radius": "8px" }
+            },
+            "interactions": {
+              "hover": { "transform": "translateY(-2px)", "shadow": "0 4px 12px rgba(24,144,255,0.4)" },
+              "active": { "transform": "translateY(0)" },
+              "disabled": { "opacity": 0.5 }
+            },
+            "replaceable": true,
+            "alternatives": ["Ant Design Button", "Radix UI Button"]
+          },
+          {
+            "variant": "secondary",
+            "props": { "type": "default", "size": "large" },
+            "style": {
+              "size": { "height": "48px", "padding": "0 32px" },
+              "colors": { "primary": "transparent", "text": "#1890ff", "border": "#1890ff" },
+              "border": { "radius": "8px" }
+            },
+            "interactions": {
+              "hover": { "bg": "#f0f7ff" }
+            },
+            "replaceable": true,
+            "alternatives": []
+          }
+        ]
+      }
+    },
+    {
+      "component": {
+        "name": "FeatureCard",
+        "category": "display",
+        "variants": [
+          {
+            "variant": "default",
+            "props": { "hoverable": true },
+            "style": {
+              "size": { "width": "320px", "padding": "32px" },
+              "colors": { "bg": "#ffffff", "icon": "#1890ff" },
+              "border": { "radius": "12px", "shadow": "0 2px 8px rgba(0,0,0,0.08)" }
+            },
+            "interactions": {
+              "hover": { "transform": "translateY(-4px)", "shadow": "0 8px 24px rgba(0,0,0,0.12)" }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "component": {
+        "name": "Steps",
+        "category": "display",
+        "variants": [
+          {
+            "variant": "horizontal",
+            "props": { "layout": "horizontal", "centered": true },
+            "style": {
+              "colors": { "active": "#1890ff", "inactive": "#d9d9d9" },
+              "typography": { "title": "18px", "description": "14px" }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "component": {
+        "name": "DemoPlayer",
+        "category": "feedback",
+        "variants": [
+          {
+            "variant": "video",
+            "props": { "autoplay": false, "controls": true },
+            "style": {
+              "size": { "width": "100%", "maxWidth": "800px", "aspectRatio": "16/9" },
+              "border": { "radius": "12px" }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "component": {
+        "name": "TestimonialCard",
+        "category": "display",
+        "variants": [
+          {
+            "variant": "default",
+            "props": { "avatar": true },
+            "style": {
+              "size": { "width": "300px", "padding": "24px" },
+              "colors": { "bg": "#fafafa" },
+              "border": { "radius": "12px" }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "component": {
+        "name": "CTASection",
+        "category": "display",
+        "variants": [
+          {
+            "variant": "centered",
+            "props": { "centered": true },
+            "style": {
+              "colors": { "bg": "#f0f7ff", "text": "#333333" },
+              "typography": { "title": "36px" }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "component": {
+        "name": "Footer",
+        "category": "layout",
+        "variants": [
+          {
+            "variant": "default",
+            "props": { "centered": false },
+            "style": {
+              "colors": { "bg": "#ffffff", "text": "#666666", "link": "#1890ff" },
+              "border": { "top": "1px solid #f0f0f0" }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "dataInteractions": [
+    {
+      "component": "Button",
+      "action": "click",
+      "request": { "event": "cta_click", "label": "{{label}}" },
+      "response": { "action": "navigate", "target": "/signup" }
+    },
+    {
+      "component": "DemoPlayer",
+      "action": "play",
+      "request": { "event": "demo_play" },
+      "response": { "action": "track", "event": "demo_viewed" }
+    }
+  ]
+}

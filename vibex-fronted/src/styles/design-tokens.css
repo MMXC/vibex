@@ -1,0 +1,326 @@
+/**
+ * VibeX Design Tokens
+ * 未来风格设计系统 - 玻璃态 + 霓虹发光 + 赛博朋克
+ */
+
+/* ============================================
+   CSS 变量定义
+   ============================================ */
+
+/* ---------- 色彩系统 (Color System) ---------- */
+:root {
+  /* 主色调 - 赛博青 */
+  --color-primary: #00ffff;
+  --color-primary-hover: #00e5e5;
+  --color-primary-muted: rgba(0, 255, 255, 0.15);
+  --color-primary-glow: rgba(0, 255, 255, 0.5);
+
+  /* 辅助色 - 蓝紫渐变 */
+  --color-accent: #8b5cf6;
+  --color-accent-hover: #7c3aed;
+  --color-accent-muted: rgba(139, 92, 246, 0.15);
+  --color-accent-glow: rgba(139, 92, 246, 0.5);
+
+  /* 强调色 - 霓虹粉 */
+  --color-pink: #ff00ff;
+  --color-pink-glow: rgba(255, 0, 255, 0.5);
+
+  /* 强调色 - 霓虹绿 */
+  --color-green: #00ff88;
+  --color-green-glow: rgba(0, 255, 136, 0.5);
+
+  /* 基础色 - 深色背景 */
+  --color-bg-primary: #0a0a0f;
+  --color-bg-secondary: #12121a;
+  --color-bg-tertiary: #1a1a24;
+  --color-bg-elevated: #22222e;
+  --color-bg-glass: rgba(18, 18, 26, 0.7);
+
+  /* 文字颜色 */
+  --color-text-primary: #f0f0f5;
+  --color-text-secondary: #a0a0b0;
+  --color-text-muted: #606070;
+  --color-text-inverse: #0a0a0f;
+
+  /* 边框颜色 */
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-hover: rgba(255, 255, 255, 0.15);
+  --color-border-focus: var(--color-primary);
+
+  /* 状态色 */
+  --color-success: #00ff88;
+  --color-warning: #ffaa00;
+  --color-error: #ff4466;
+  --color-info: #00aaff;
+
+  /* 渐变定义 */
+  --gradient-primary: linear-gradient(135deg, #00ffff 0%, #8b5cf6 50%, #ff00ff 100%);
+  --gradient-bg: linear-gradient(180deg, #0a0a0f 0%, #12121a 50%, #1a1a24 100%);
+  --gradient-card: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%);
+  --gradient-glow: radial-gradient(ellipse at center, rgba(0,255,255,0.15) 0%, transparent 70%);
+}
+
+/* ---------- 字体系统 (Typography) ---------- */
+:root {
+  /* 字体族 */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+
+  /* 字号 */
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.875rem;   /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-3xl: 1.875rem;  /* 30px */
+  --text-4xl: 2.25rem;   /* 36px */
+  --text-5xl: 3rem;      /* 48px */
+
+  /* 字重 */
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* 行高 */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+}
+
+/* ---------- 间距系统 (Spacing) ---------- */
+:root {
+  --space-0: 0;
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+
+  /* 容器宽度 */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1536px;
+}
+
+/* ---------- 圆角系统 (Border Radius) ---------- */
+:root {
+  --radius-none: 0;
+  --radius-sm: 0.25rem;   /* 4px */
+  --radius-md: 0.5rem;    /* 8px */
+  --radius-lg: 0.75rem;   /* 12px */
+  --radius-xl: 1rem;      /* 16px */
+  --radius-2xl: 1.5rem;   /* 24px */
+  --radius-full: 9999px;
+}
+
+/* ---------- 阴影系统 (Shadows) ---------- */
+:root {
+  /* 霓虹发光效果 */
+  --shadow-glow-cyan: 0 0 20px rgba(0, 255, 255, 0.3), 0 0 40px rgba(0, 255, 255, 0.1);
+  --shadow-glow-purple: 0 0 20px rgba(139, 92, 246, 0.3), 0 0 40px rgba(139, 92, 246, 0.1);
+  --shadow-glow-pink: 0 0 20px rgba(255, 0, 255, 0.3), 0 0 40px rgba(255, 0, 255, 0.1);
+  --shadow-glow-green: 0 0 20px rgba(0, 255, 136, 0.3), 0 0 40px rgba(0, 255, 136, 0.1);
+
+  /* 卡片阴影 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
+
+  /* 玻璃态阴影 */
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* ---------- 动效时间 (Animation Timing) ---------- */
+:root {
+  /* 常用动效曲线 */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* 动效时长 */
+  --duration-instant: 0ms;
+  --duration-fast: 100ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  --duration-slower: 500ms;
+  --duration-slowest: 800ms;
+}
+
+/* ---------- 层级系统 (Z-Index) ---------- */
+:root {
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal: 300;
+  --z-popover: 400;
+  --z-tooltip: 500;
+  --z-toast: 600;
+}
+
+/* ============================================
+   全局样式重置
+   ============================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* 选中文本样式 */
+::selection {
+  background: var(--color-primary-muted);
+  color: var(--color-primary);
+}
+
+/* ============================================
+   玻璃态工具类
+   ============================================ */
+.glass {
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+}
+
+.glass-hover:hover {
+  background: rgba(18, 18, 26, 0.85);
+  border-color: var(--color-border-hover);
+}
+
+/* ============================================
+   霓虹发光工具类
+   ============================================ */
+.glow-cyan {
+  box-shadow: var(--shadow-glow-cyan);
+}
+
+.glow-purple {
+  box-shadow: var(--shadow-glow-purple);
+}
+
+.glow-pink {
+  box-shadow: var(--shadow-glow-pink);
+}
+
+.glow-green {
+  box-shadow: var(--shadow-glow-green);
+}
+
+/* ============================================
+   渐变背景工具类
+   ============================================ */
+.bg-gradient {
+  background: var(--gradient-bg);
+}
+
+.bg-gradient-card {
+  background: var(--gradient-card);
+}
+
+.bg-gradient-glow {
+  background: var(--gradient-glow);
+}
+
+/* ============================================
+   文字渐变工具类
+   ============================================ */
+.text-gradient {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================
+   焦点状态
+   ============================================ */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   链接样式
+   ============================================ */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--duration-normal) var(--ease-out-expo);
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+  text-shadow: 0 0 8px var(--color-primary-glow);
+}
+
+/* ============================================
+   按钮重置
+   ============================================ */
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* ============================================
+   输入框重置
+   ============================================ */
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  outline: none;
+}

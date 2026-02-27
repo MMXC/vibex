@@ -1,153 +1,129 @@
 'use client'
 
 import Link from 'next/link'
+import styles from './landing.module.css'
 
 export default function Landing() {
   return (
-    <div style={{ minHeight: '100vh' }}>
+    <div className={styles.page}>
+      {/* 背景特效 */}
+      <div className={styles.bgEffect}>
+        <div className={styles.gridOverlay} />
+        <div className={styles.glowOrb1} />
+        <div className={styles.glowOrb2} />
+      </div>
+
       {/* Navigation */}
-      <nav style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '16px 48px',
-        borderBottom: '1px solid #e5e5e5',
-        position: 'sticky',
-        top: 0,
-        backgroundColor: 'white',
-        zIndex: 100,
-      }}>
-        <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#0070f3' }}>
-          VibeX
+      <nav className={styles.navbar}>
+        <div className={styles.logo}>
+          <span className={styles.logoIcon}>◈</span>
+          <span className={styles.logoText}>VibeX</span>
         </div>
-        <div style={{ display: 'flex', gap: '32px', alignItems: 'center' }}>
-          <Link href="#features" style={{ color: '#666', textDecoration: 'none' }}>功能</Link>
-          <Link href="#pricing" style={{ color: '#666', textDecoration: 'none' }}>价格</Link>
-          <Link href="/auth" style={{
-            padding: '8px 20px',
-            backgroundColor: '#0070f3',
-            color: 'white',
-            borderRadius: '6px',
-            textDecoration: 'none',
-          }}>
+        <div className={styles.navLinks}>
+          <Link href="#features" className={styles.navLink}>功能</Link>
+          <Link href="#pricing" className={styles.navLink}>价格</Link>
+          <Link href="/auth" className={styles.ctaButton}>
             开始使用
           </Link>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section style={{
-        padding: '120px 48px',
-        textAlign: 'center',
-        background: 'linear-gradient(180deg, #f8f9fa 0%, white 100%)',
-      }}>
-        <h1 style={{
-          fontSize: '56px',
-          fontWeight: '800',
-          marginBottom: '24px',
-          lineHeight: '1.2',
-        }}>
-          用 AI 轻松构建<br />你的 Web 应用
-        </h1>
-        <p style={{
-          fontSize: '20px',
-          color: '#666',
-          marginBottom: '40px',
-          maxWidth: '600px',
-          margin: '0 auto 40px',
-        }}>
-          VibeX 是一个 AI 驱动的应用构建平台，通过自然语言描述即可生成完整的 Web 应用界面和功能。
-        </p>
-        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-          <Link href="/auth" style={{
-            padding: '16px 32px',
-            backgroundColor: '#0070f3',
-            color: 'white',
-            borderRadius: '8px',
-            textDecoration: 'none',
-            fontSize: '18px',
-            fontWeight: '600',
-          }}>
-            免费开始
-          </Link>
-          <Link href="/chat" style={{
-            padding: '16px 32px',
-            backgroundColor: 'white',
-            color: '#333',
-            border: '1px solid #e5e5e5',
-            borderRadius: '8px',
-            textDecoration: 'none',
-            fontSize: '18px',
-          }}>
-            查看演示
-          </Link>
+      <section className={styles.hero}>
+        <div className={styles.heroContent}>
+          <div className={styles.badge}>
+            <span className={styles.badgeDot} />
+            AI 驱动的应用构建平台
+          </div>
+          <h1 className={styles.title}>
+            用 AI 轻松构建
+            <br />
+            <span className={styles.titleGradient}>你的 Web 应用</span>
+          </h1>
+          <p className={styles.subtitle}>
+            VibeX 是一个 AI 驱动的应用构建平台，通过自然语言描述即可生成完整的 Web 应用界面和功能。
+          </p>
+          <div className={styles.heroCta}>
+            <Link href="/auth" className={styles.primaryButton}>
+              <span>免费开始</span>
+              <span className={styles.buttonGlow} />
+            </Link>
+            <Link href="/chat" className={styles.secondaryButton}>
+              查看演示
+            </Link>
+          </div>
+        </div>
+        
+        {/* 装饰性代码块 */}
+        <div className={styles.codePreview}>
+          <div className={styles.codeHeader}>
+            <span className={styles.codeDot} />
+            <span className={styles.codeDot} />
+            <span className={styles.codeDot} />
+          </div>
+          <pre className={styles.codeContent}>
+{`> 创建一个项目管理仪表盘
+> 包含任务列表和进度图表
+> 主题：赛博朋克风格
+
+✨ 正在生成...
+✓ 完成！`}
+          </pre>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" style={{ padding: '80px 48px', maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '40px', textAlign: 'center', marginBottom: '48px' }}>
-          强大功能
+      <section id="features" className={styles.features}>
+        <h2 className={styles.sectionTitle}>
+          <span className={styles.titleGradient}>强大功能</span>
         </h2>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '32px',
-        }}>
+        <div className={styles.featureGrid}>
           {[
-            { title: 'AI 对话生成', desc: '用自然语言描述需求，AI 自动生成完整页面' },
-            { title: '可视化编辑', desc: '拖拽式流程图编辑器，所见即所得' },
-            { title: '一键导出', desc: '支持导出 React、Vue 等多种代码' },
+            { 
+              icon: '🤖', 
+              title: 'AI 对话生成', 
+              desc: '用自然语言描述需求，AI 自动生成完整页面',
+              glow: 'cyan'
+            },
+            { 
+              icon: '✏️', 
+              title: '可视化编辑', 
+              desc: '拖拽式流程图编辑器，所见即所得',
+              glow: 'purple'
+            },
+            { 
+              icon: '📦', 
+              title: '一键导出', 
+              desc: '支持导出 React、Vue 等多种代码',
+              glow: 'pink'
+            },
           ].map((feature, i) => (
-            <div key={i} style={{
-              padding: '32px',
-              border: '1px solid #e5e5e5',
-              borderRadius: '12px',
-              textAlign: 'center',
-            }}>
-              <div style={{ fontSize: '32px', marginBottom: '16px' }}>
-                {i === 0 ? '🤖' : i === 1 ? '✏️' : '📦'}
-              </div>
-              <h3 style={{ fontSize: '20px', marginBottom: '12px' }}>{feature.title}</h3>
-              <p style={{ color: '#666' }}>{feature.desc}</p>
+            <div key={i} className={`${styles.featureCard} ${styles[`glow${feature.glow}`]}`}>
+              <div className={styles.featureIcon}>{feature.icon}</div>
+              <h3 className={styles.featureTitle}>{feature.title}</h3>
+              <p className={styles.featureDesc}>{feature.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* CTA Section */}
-      <section style={{
-        padding: '80px 48px',
-        backgroundColor: '#0070f3',
-        color: 'white',
-        textAlign: 'center',
-      }}>
-        <h2 style={{ fontSize: '36px', marginBottom: '16px' }}>
-          准备好开始了吗？
-        </h2>
-        <p style={{ fontSize: '18px', marginBottom: '32px', opacity: 0.9 }}>
-          免费注册，立即体验 AI 构建应用的乐趣
-        </p>
-        <Link href="/auth" style={{
-          padding: '16px 40px',
-          backgroundColor: 'white',
-          color: '#0070f3',
-          borderRadius: '8px',
-          textDecoration: 'none',
-          fontSize: '18px',
-          fontWeight: '600',
-        }}>
-          立即免费注册
-        </Link>
+      <section className={styles.cta}>
+        <div className={styles.ctaContent}>
+          <h2 className={styles.ctaTitle}>
+            准备好开始了吗？
+          </h2>
+          <p className={styles.ctaSubtitle}>
+            免费注册，立即体验 AI 构建应用的乐趣
+          </p>
+          <Link href="/auth" className={styles.ctaButtonLarge}>
+            立即免费注册
+          </Link>
+        </div>
       </section>
 
       {/* Footer */}
-      <footer style={{
-        padding: '32px 48px',
-        borderTop: '1px solid #e5e5e5',
-        textAlign: 'center',
-        color: '#999',
-      }}>
+      <footer className={styles.footer}>
         <p>© 2026 VibeX. All rights reserved.</p>
       </footer>
     </div>

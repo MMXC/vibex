@@ -1,0 +1,133 @@
+/* Card Component Styles */
+.card {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: all var(--duration-normal) var(--ease-out-expo);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Variants */
+.default {
+  background: var(--color-bg-secondary);
+}
+
+.glass {
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.neon {
+  background: var(--gradient-card);
+  border-color: var(--color-border-hover);
+}
+
+/* Padding */
+.padding-none {
+  padding: 0;
+}
+
+.padding-sm {
+  padding: var(--space-3);
+}
+
+.padding-md {
+  padding: var(--space-5);
+}
+
+.padding-lg {
+  padding: var(--space-8);
+}
+
+/* Hover Effects */
+.hoverable {
+  cursor: pointer;
+}
+
+.hoverable:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-border-hover);
+}
+
+.hoverable:active {
+  transform: translateY(-2px);
+}
+
+/* Glow Colors */
+.glow-cyan:hover {
+  box-shadow: var(--shadow-glow-cyan);
+  border-color: var(--color-primary);
+}
+
+.glow-purple:hover {
+  box-shadow: var(--shadow-glow-purple);
+  border-color: var(--color-accent);
+}
+
+.glow-pink:hover {
+  box-shadow: var(--shadow-glow-pink);
+  border-color: var(--color-pink);
+}
+
+.glow-green:hover {
+  box-shadow: var(--shadow-glow-green);
+  border-color: var(--color-green);
+}
+
+/* Card Parts */
+.header {
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-4);
+}
+
+.content {
+  flex: 1;
+}
+
+.footer {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  margin-top: var(--space-4);
+}
+
+/* Card with gradient border effect */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-out-expo);
+}
+
+.hoverable:hover::before {
+  opacity: 1;
+}
+
+/* Scanline effect for neon cards */
+.neon::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.03),
+    transparent
+  );
+  transition: left var(--duration-slowest) var(--ease-out-expo);
+  pointer-events: none;
+}
+
+.neon:hover::after {
+  left: 100%;
+}

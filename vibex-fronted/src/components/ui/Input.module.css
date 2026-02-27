@@ -1,0 +1,162 @@
+/* Input Component Styles */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-secondary);
+}
+
+.inputWrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  border-radius: var(--radius-md);
+  transition: all var(--duration-normal) var(--ease-out-expo);
+}
+
+/* Variants */
+.default {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.default:hover {
+  border-color: var(--color-border-hover);
+}
+
+.default:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-muted);
+}
+
+.filled {
+  background: var(--color-bg-tertiary);
+  border: 1px solid transparent;
+}
+
+.filled:hover {
+  background: var(--color-bg-elevated);
+}
+
+.filled:focus-within {
+  border-color: var(--color-primary);
+  background: var(--color-bg-secondary);
+}
+
+.glass {
+  background: var(--color-bg-glass);
+  border: 1px solid var(--color-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.glass:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--color-border-hover);
+}
+
+.glass:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-muted), var(--shadow-glow-cyan);
+}
+
+/* Error State */
+.error {
+  border-color: var(--color-error) !important;
+}
+
+.error:focus-within {
+  box-shadow: 0 0 0 3px rgba(255, 68, 102, 0.15) !important;
+}
+
+.error .input {
+  color: var(--color-error);
+}
+
+/* Input Element */
+.input {
+  width: 100%;
+  height: 44px;
+  padding: 0 var(--space-4);
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Icons */
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  transition: color var(--duration-normal) var(--ease-out-expo);
+}
+
+.iconLeft {
+  margin-left: var(--space-3);
+}
+
+.iconRight {
+  margin-right: var(--space-3);
+}
+
+.inputWrapper:focus-within .icon {
+  color: var(--color-primary);
+}
+
+.error .icon {
+  color: var(--color-error);
+}
+
+/* Error Icon */
+.errorIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-error);
+  margin-right: var(--space-3);
+}
+
+/* Message */
+.message {
+  font-size: var(--text-sm);
+}
+
+.hintMessage {
+  color: var(--color-text-muted);
+}
+
+.errorMessage {
+  color: var(--color-error);
+}
+
+/* Glow effect for focus */
+.default:focus-within,
+.glass:focus-within {
+  animation: inputGlow 2s ease-in-out infinite;
+}
+
+@keyframes inputGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 3px var(--color-primary-muted);
+  }
+  50% {
+    box-shadow: 0 0 0 4px var(--color-primary-muted), 0 0 20px var(--color-primary-muted);
+  }
+}

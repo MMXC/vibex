@@ -11,8 +11,7 @@ export default function Auth() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle auth logic
-    console.log({ email, password, name })
+    // Handle auth logic - 安全：不记录敏感信息
   }
 
   return (

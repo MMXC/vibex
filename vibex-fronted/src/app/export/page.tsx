@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import styles from './export.module.css'
 
 // 导出格式选项
 const exportFormats = [
@@ -29,7 +30,6 @@ export default function Export() {
     setIsExporting(true)
     setExportProgress(0)
     
-    // 模拟导出过程
     const interval = setInterval(() => {
       setExportProgress(prev => {
         if (prev >= 100) {
@@ -47,76 +47,54 @@ export default function Export() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+    <div className={styles.page}>
+      {/* 背景特效 */}
+      <div className={styles.bgEffect}>
+        <div className={styles.gridOverlay} />
+        <div className={styles.glowOrb1} />
+        <div className={styles.glowOrb2} />
+      </div>
+
       {/* 顶部导航 */}
-      <nav style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '16px 32px',
-        backgroundColor: 'white',
-        borderBottom: '1px solid #e2e8f0',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-          <Link href="/" style={{ fontSize: '24px', fontWeight: 'bold', color: '#0070f3', textDecoration: 'none' }}>
-            VibeX
-          </Link>
-          <div style={{ display: 'flex', gap: '24px' }}>
-            <Link href="/dashboard" style={{ color: '#64748b', textDecoration: 'none' }}>控制台</Link>
-            <Link href="/editor" style={{ color: '#64748b', textDecoration: 'none' }}>编辑器</Link>
-            <Link href="/export" style={{ color: '#0070f3', fontWeight: 500, textDecoration: 'none' }}>导出</Link>
-          </div>
+      <nav className={styles.navbar}>
+        <div className={styles.logo}>
+          <span className={styles.logoIcon}>◈</span>
+          <span className={styles.logoText}>VibeX</span>
+        </div>
+        <div className={styles.navLinks}>
+          <Link href="/dashboard" className={styles.navLink}>控制台</Link>
+          <Link href="/editor" className={styles.navLink}>编辑器</Link>
+          <Link href="/export" className={`${styles.navLink} ${styles.navLinkActive}`}>导出</Link>
         </div>
       </nav>
 
-      <main style={{ padding: '32px', maxWidth: '1000px', margin: '0 auto' }}>
+      <main className={styles.main}>
         {/* 页面标题 */}
-        <div style={{ marginBottom: '32px' }}>
-          <h1 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '8px' }}>
-            导出项目
+        <div className={styles.pageHeader}>
+          <h1 className={styles.title}>
+            导出
+            <span className={styles.titleGradient}>项目</span>
           </h1>
-          <p style={{ color: '#64748b' }}>
+          <p className={styles.subtitle}>
             将您的项目导出为可部署的代码
           </p>
         </div>
 
         {/* 导出格式选择 */}
-        <div style={{ marginBottom: '32px' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '16px' }}>
-            选择导出格式
-          </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+        <div>
+          <h2 className={styles.sectionTitle}>选择导出格式</h2>
+          <div className={styles.formatGrid}>
             {exportFormats.map(format => (
               <div
                 key={format.id}
                 onClick={() => setSelectedFormat(format.id)}
-                style={{
-                  padding: '24px',
-                  backgroundColor: selectedFormat === format.id ? '#eff6ff' : 'white',
-                  border: selectedFormat === format.id ? '2px solid #0070f3' : '2px solid #e2e8f0',
-                  borderRadius: '12px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                }}
+                className={`${styles.formatCard} ${selectedFormat === format.id ? styles.formatCardSelected : ''}`}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '12px' }}>
-                  <span style={{ fontSize: '32px' }}>{format.icon}</span>
-                  <div>
-                    <div style={{ fontSize: '16px', fontWeight: 600 }}>{format.name}</div>
-                    <div style={{ fontSize: '13px', color: '#64748b', marginTop: '2px' }}>
-                      {format.description}
-                    </div>
-                  </div>
-                </div>
+                <div className={styles.formatIcon}>{format.icon}</div>
+                <div className={styles.formatName}>{format.name}</div>
+                <div className={styles.formatDesc}>{format.description}</div>
                 {selectedFormat === format.id && (
-                  <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '8px',
-                    color: '#0070f3',
-                    fontSize: '13px',
-                    fontWeight: 500,
-                  }}>
+                  <div className={styles.selectedBadge}>
                     ✓ 已选择
                   </div>
                 )}
@@ -126,38 +104,22 @@ export default function Export() {
         </div>
 
         {/* 导出选项 */}
-        <div style={{ marginBottom: '32px' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '16px' }}>
-            导出选项
-          </h2>
-          <div style={{ 
-            padding: '24px', 
-            backgroundColor: 'white', 
-            borderRadius: '12px', 
-            border: '1px solid #e2e8f0',
-          }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+        <div>
+          <h2 className={styles.sectionTitle}>导出选项</h2>
+          <div className={styles.optionsCard}>
+            <div className={styles.optionsGrid}>
               {exportOptions.map(option => (
                 <label
                   key={option.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    cursor: 'pointer',
-                    padding: '12px',
-                    backgroundColor: options[option.id] ? '#f0fdf4' : '#f8fafc',
-                    borderRadius: '8px',
-                    border: options[option.id] ? '1px solid #bbf7d0' : '1px solid #e2e8f0',
-                  }}
+                  className={`${styles.optionItem} ${options[option.id] ? styles.optionItemEnabled : ''}`}
                 >
                   <input
                     type="checkbox"
                     checked={options[option.id]}
                     onChange={() => toggleOption(option.id)}
-                    style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                    className={styles.checkbox}
                   />
-                  <span style={{ fontSize: '14px', fontWeight: 500 }}>{option.name}</span>
+                  <span className={styles.optionLabel}>{option.name}</span>
                 </label>
               ))}
             </div>
@@ -165,90 +127,51 @@ export default function Export() {
         </div>
 
         {/* 导出预览 */}
-        <div style={{ marginBottom: '32px' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '16px' }}>
-            导出内容预览
-          </h2>
-          <div style={{ 
-            padding: '24px', 
-            backgroundColor: '#1e293b', 
-            borderRadius: '12px',
-            fontFamily: 'monospace',
-            fontSize: '13px',
-            color: '#e2e8f0',
-          }}>
-            <div style={{ marginBottom: '8px', color: '#94a3b8' }}>📁 my-vibex-project/</div>
-            <div style={{ marginLeft: '24px', marginBottom: '8px' }}>📄 package.json</div>
-            <div style={{ marginLeft: '24px', marginBottom: '8px' }}>📄 next.config.js</div>
-            <div style={{ marginLeft: '24px', marginBottom: '8px' }}>📄 tsconfig.json</div>
-            <div style={{ marginLeft: '24px', marginBottom: '8px' }}>📁 src/</div>
-            <div style={{ marginLeft: '48px', marginBottom: '8px' }}>📁 app/</div>
-            <div style={{ marginLeft: '72px', marginBottom: '8px' }}>📄 page.tsx</div>
-            <div style={{ marginLeft: '72px', marginBottom: '8px' }}>📄 layout.tsx</div>
-            <div style={{ marginLeft: '72px', marginBottom: '8px' }}>📄 globals.css</div>
-            <div style={{ marginLeft: '48px', marginBottom: '8px' }}>📁 components/</div>
-            <div style={{ marginLeft: '72px', marginBottom: '8px' }}>📁 ui/</div>
-            <div style={{ marginLeft: '48px', marginBottom: '8px' }}>📁 public/</div>
-            <div style={{ marginLeft: '24px' }}>📁 ...</div>
+        <div>
+          <h2 className={styles.sectionTitle}>导出内容预览</h2>
+          <div className={styles.previewCard}>
+            <div className={styles.previewFolder}>📁 my-vibex-project/</div>
+            <div className={`${styles.previewFile} ${styles.previewIndent1}`}>📄 package.json</div>
+            <div className={`${styles.previewFile} ${styles.previewIndent1}`}>📄 next.config.js</div>
+            <div className={`${styles.previewFile} ${styles.previewIndent1}`}>📄 tsconfig.json</div>
+            <div className={`${styles.previewFile} ${styles.previewIndent1}`}>📁 src/</div>
+            <div className={`${styles.previewFile} ${styles.previewIndent2}`}>📁 app/</div>
+            <div className={`${styles.previewFile} ${styles.previewIndent3}`}>📄 page.tsx</div>
+            <div className={`${styles.previewFile} ${styles.previewIndent3}`}>📄 layout.tsx</div>
+            <div className={`${styles.previewFile} ${styles.previewIndent3}`}>📄 globals.css</div>
+            <div className={`${styles.previewFile} ${styles.previewIndent2}`}>📁 components/</div>
+            <div className={`${styles.previewFile} ${styles.previewIndent3}`}>📁 ui/</div>
+            <div className={`${styles.previewFile} ${styles.previewIndent2}`}>📁 public/</div>
+            <div className={`${styles.previewFile} ${styles.previewIndent1}`}>📁 ...</div>
           </div>
         </div>
 
         {/* 导出按钮和进度 */}
-        <div style={{ 
-          padding: '24px', 
-          backgroundColor: 'white', 
-          borderRadius: '12px', 
-          border: '1px solid #e2e8f0',
-        }}>
+        <div className={styles.actionCard}>
           {isExporting ? (
-            <div>
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                marginBottom: '12px',
-                fontSize: '14px',
-              }}>
+            <div className={styles.progressContainer}>
+              <div className={styles.progressHeader}>
                 <span>正在导出...</span>
                 <span>{exportProgress}%</span>
               </div>
-              <div style={{
-                height: '8px',
-                backgroundColor: '#e2e8f0',
-                borderRadius: '4px',
-                overflow: 'hidden',
-              }}>
-                <div style={{
-                  height: '100%',
-                  width: `${exportProgress}%`,
-                  backgroundColor: '#0070f3',
-                  borderRadius: '4px',
-                  transition: 'width 0.3s',
-                }}></div>
+              <div className={styles.progressBar}>
+                <div 
+                  className={styles.progressFill}
+                  style={{ width: `${exportProgress}%` }}
+                />
               </div>
             </div>
           ) : (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <div style={{ fontSize: '14px', fontWeight: 500, marginBottom: '4px' }}>
+            <div className={styles.actionRow}>
+              <div className={styles.actionInfo}>
+                <div className={styles.actionTitle}>
                   准备导出 {exportFormats.find(f => f.id === selectedFormat)?.name} 项目
                 </div>
-                <div style={{ fontSize: '13px', color: '#64748b' }}>
-                  导出后可以本地运行或部署到 Vercel、Netlify 等平台
+                <div className={styles.actionDesc}>
+                  导出后可以本地运行或部署到 Vercel、Cloudflare 等平台
                 </div>
               </div>
-              <button
-                onClick={handleExport}
-                style={{
-                  padding: '14px 32px',
-                  backgroundColor: '#0070f3',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontWeight: 500,
-                }}
-              >
+              <button onClick={handleExport} className={styles.exportButton}>
                 🚀 开始导出
               </button>
             </div>
@@ -256,28 +179,20 @@ export default function Export() {
         </div>
 
         {/* 部署说明 */}
-        <div style={{ 
-          marginTop: '24px', 
-          padding: '20px', 
-          backgroundColor: '#f0f9ff', 
-          borderRadius: '12px',
-          border: '1px solid #bae6fd',
-        }}>
-          <div style={{ fontSize: '14px', fontWeight: 600, color: '#0369a1', marginBottom: '12px' }}>
-            📤 部署指南
-          </div>
-          <div style={{ fontSize: '13px', color: '#075985', lineHeight: '1.8' }}>
-            <p style={{ marginBottom: '8px' }}>
-              <strong>1. 本地运行：</strong><br/>
-              <code style={{ backgroundColor: '#e0f2fe', padding: '2px 6px', borderRadius: '4px' }}>npm install && npm run dev</code>
+        <div className={styles.guideCard}>
+          <div className={styles.guideTitle}>📤 部署指南</div>
+          <div className={styles.guideContent}>
+            <p className={styles.guideStep}>
+              <span className={styles.guideStepTitle}>1. 本地运行：</span><br/>
+              <code className={styles.code}>npm install && npm run dev</code>
             </p>
-            <p style={{ marginBottom: '8px' }}>
-              <strong>2. 构建生产版本：</strong><br/>
-              <code style={{ backgroundColor: '#e0f2fe', padding: '2px 6px', borderRadius: '4px' }}>npm run build</code>
+            <p className={styles.guideStep}>
+              <span className={styles.guideStepTitle}>2. 构建生产版本：</span><br/>
+              <code className={styles.code}>npm run build</code>
             </p>
-            <p>
-              <strong>3. 部署到 Vercel：</strong><br/>
-              推送代码到 GitHub，导入 Vercel 即可自动部署
+            <p className={styles.guideStep}>
+              <span className={styles.guideStepTitle}>3. 部署到 Cloudflare：</span><br/>
+              推送代码到 GitHub，导入 Cloudflare Pages 即可自动部署
             </p>
           </div>
         </div>

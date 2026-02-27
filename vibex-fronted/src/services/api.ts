@@ -1,22 +1,62 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 
-// 类型定义
+// ==================== 类型定义 ====================
+
+// 用户
 export interface User {
   id: string;
   name: string;
   email: string;
-  avatar?: string;
-}
-
-export interface Project {
-  id: string;
-  name: string;
-  userId: string;
-  description?: string;
+  avatar?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
 
+export interface UserUpdate {
+  name?: string;
+  avatar?: string | null;
+}
+
+// 认证
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  name: string;
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  user: User;
+}
+
+// 项目
+export interface Project {
+  id: string;
+  name: string;
+  userId: string;
+  description?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  pages?: Page[];
+}
+
+export interface ProjectCreate {
+  name: string;
+  description?: string;
+  userId: string;
+}
+
+export interface ProjectUpdate {
+  name?: string;
+  description?: string | null;
+}
+
+// 消息
 export interface Message {
   id: string;
   role: 'user' | 'assistant' | 'system';
@@ -25,17 +65,89 @@ export interface Message {
   createdAt?: string;
 }
 
+export interface MessageCreate {
+  content: string;
+  projectId: string;
+  role?: 'user' | 'assistant' | 'system';
+}
+
+// 流程图
 export interface FlowData {
   id: string;
   nodes: any[];
   edges: any[];
   projectId: string;
-  name?: string;
+  name?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
 
-// API 服务类
+export interface FlowDataUpdate {
+  nodes?: any[];
+  edges?: any[];
+  name?: string | null;
+}
+
+// Agent
+export interface Agent {
+  id: string;
+  name: string;
+  prompt: string;
+  model?: string;
+  temperature?: number;
+  userId: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AgentCreate {
+  name: string;
+  prompt: string;
+  model?: string;
+  temperature?: number;
+  userId: string;
+}
+
+export interface AgentUpdate {
+  name?: string;
+  prompt?: string;
+  model?: string;
+  temperature?: number;
+}
+
+// 页面
+export interface Page {
+  id: string;
+  name: string;
+  content?: string | null;
+  projectId: string;
+  createdAt?: string;
+  updatedAt?: string;
+  project?: Project;
+}
+
+export interface PageCreate {
+  name: string;
+  content?: string | null;
+  projectId: string;
+}
+
+export interface PageUpdate {
+  name?: string;
+  content?: string | null;
+}
+
+// 通用响应
+export interface SuccessResponse {
+  success: boolean;
+}
+
+export interface ApiError {
+  error: string;
+}
+
+// ==================== API 服务类 ====================
+
 export class ApiService {
   private client: AxiosInstance;
   private static readonly MAX_RETRIES = 3;
@@ -75,10 +187,44 @@ export class ApiService {
               localStorage.removeItem('auth_token');
             }
           }
-          return Promise.reject(error);
+          return Promise.reject(this.transformError(error));
         }
       );
     }
+  }
+
+  // 转换错误为用户友好的消息
+  private transformError(error: AxiosError | Error): Error {
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
+      let message = '操作失败，请稍后重试';
+
+      switch (status) {
+        case 400:
+          message = error.response?.data?.error || '请求参数错误';
+          break;
+        case 401:
+          message = '登录已过期，请重新登录';
+          break;
+        case 403:
+          message = '没有权限执行此操作';
+          break;
+        case 404:
+          message = '请求的资源不存在';
+          break;
+        case 409:
+          message = '该邮箱已被注册';
+          break;
+        case 500:
+          message = '服务器错误，请稍后重试';
+          break;
+        default:
+          message = error.response?.data?.error || '网络错误，请检查网络连接';
+      }
+
+      return new Error(message);
+    }
+    return error;
   }
 
   // 错误重试机制
@@ -104,7 +250,7 @@ export class ApiService {
   }
 
   private isRetryableError(error: unknown): boolean {
-    if (error instanceof AxiosError) {
+    if (axios.isAxiosError(error)) {
       // 网络错误或服务器错误可重试
       return !error.response || error.response.status >= 500;
     }
@@ -139,17 +285,61 @@ export class ApiService {
     localStorage.setItem(this.getCacheKey(key), JSON.stringify(data));
   }
 
-  // ==================== 用户数据 ====================
-  
-  async saveUser(user: Partial<User>): Promise<User> {
+  private clearCache(key: string): void {
+    if (typeof localStorage === 'undefined') return;
+    localStorage.removeItem(this.getCacheKey(key));
+  }
+
+  // ==================== 认证 ====================
+
+  /**
+   * 用户登录
+   */
+  async login(credentials: LoginRequest): Promise<AuthResponse> {
     return this.withRetry(async () => {
-      const response = await this.client.put(`/users/${user.id}`, user);
+      const response = await this.client.post<AuthResponse>('/auth/login', credentials);
+      // 保存 token
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('auth_token', response.data.token);
+      }
       return response.data;
     });
   }
 
+  /**
+   * 用户注册
+   */
+  async register(data: RegisterRequest): Promise<AuthResponse> {
+    return this.withRetry(async () => {
+      const response = await this.client.post<AuthResponse>('/auth/register', data);
+      // 保存 token
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('auth_token', response.data.token);
+      }
+      return response.data;
+    });
+  }
+
+  /**
+   * 用户登出
+   */
+  async logout(): Promise<SuccessResponse> {
+    return this.withRetry(async () => {
+      const response = await this.client.post<SuccessResponse>('/auth/logout');
+      // 清除 token
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('auth_token');
+      }
+      return response.data;
+    });
+  }
+
+  // ==================== 用户 ====================
+
+  /**
+   * 获取用户信息
+   */
   async getUser(userId: string): Promise<User> {
-    // 尝试从缓存获取
     const cacheKey = `user_${userId}`;
     const cached = this.getFromCache<User>(cacheKey);
     
@@ -158,21 +348,28 @@ export class ApiService {
     }
 
     return this.withRetry(async () => {
-      const response = await this.client.get(`/users/${userId}`);
-      this.setToCache(cacheKey, response.data);
-      return response.data;
+      const response = await this.client.get<{ user: User }>(`/users/${userId}`);
+      this.setToCache(cacheKey, response.data.user);
+      return response.data.user;
     });
   }
 
-  // ==================== 项目数据 ====================
-
-  async saveProject(project: Partial<Project>): Promise<Project> {
+  /**
+   * 更新用户信息
+   */
+  async updateUser(userId: string, data: UserUpdate): Promise<User> {
     return this.withRetry(async () => {
-      const response = await this.client.put(`/projects/${project.id}`, project);
-      return response.data;
+      const response = await this.client.put<{ user: User }>(`/users/${userId}`, data);
+      this.clearCache(`user_${userId}`);
+      return response.data.user;
     });
   }
 
+  // ==================== 项目 ====================
+
+  /**
+   * 获取项目列表
+   */
   async getProjects(userId: string): Promise<Project[]> {
     const cacheKey = `projects_${userId}`;
     const cached = this.getFromCache<Project[]>(cacheKey);
@@ -182,35 +379,68 @@ export class ApiService {
     }
 
     return this.withRetry(async () => {
-      const response = await this.client.get(`/projects`, { params: { userId } });
-      this.setToCache(cacheKey, response.data);
-      return response.data;
+      const response = await this.client.get<{ projects: Project[] }>('/projects', { params: { userId } });
+      this.setToCache(cacheKey, response.data.projects);
+      return response.data.projects;
     });
   }
 
+  /**
+   * 创建项目
+   */
+  async createProject(project: ProjectCreate): Promise<Project> {
+    return this.withRetry(async () => {
+      const response = await this.client.post<{ project: Project }>('/projects', project);
+      // 清除项目列表缓存
+      this.clearCache(`projects_${project.userId}`);
+      return response.data.project;
+    });
+  }
+
+  /**
+   * 获取单个项目
+   */
   async getProject(projectId: string): Promise<Project> {
+    const cacheKey = `project_${projectId}`;
+    const cached = this.getFromCache<Project>(cacheKey);
+    
+    if (!this.isOnline() && cached) {
+      return cached;
+    }
+
     return this.withRetry(async () => {
-      const response = await this.client.get(`/projects/${projectId}`);
+      const response = await this.client.get<{ project: Project }>(`/projects/${projectId}`);
+      this.setToCache(cacheKey, response.data.project);
+      return response.data.project;
+    });
+  }
+
+  /**
+   * 更新项目
+   */
+  async updateProject(projectId: string, data: ProjectUpdate): Promise<Project> {
+    return this.withRetry(async () => {
+      const response = await this.client.put<{ project: Project }>(`/projects/${projectId}`, data);
+      this.clearCache(`project_${projectId}`);
+      return response.data.project;
+    });
+  }
+
+  /**
+   * 删除项目
+   */
+  async deleteProject(projectId: string): Promise<SuccessResponse> {
+    return this.withRetry(async () => {
+      const response = await this.client.delete<SuccessResponse>(`/projects/${projectId}`);
       return response.data;
     });
   }
 
-  async deleteProject(projectId: string): Promise<{ success: boolean }> {
-    return this.withRetry(async () => {
-      const response = await this.client.delete(`/projects/${projectId}`);
-      return response.data;
-    });
-  }
+  // ==================== 消息 ====================
 
-  // ==================== 对话历史 ====================
-
-  async saveMessage(message: Partial<Message>): Promise<Message> {
-    return this.withRetry(async () => {
-      const response = await this.client.post(`/messages`, message);
-      return response.data;
-    });
-  }
-
+  /**
+   * 获取消息列表
+   */
   async getMessages(projectId: string): Promise<Message[]> {
     const cacheKey = `messages_${projectId}`;
     const cached = this.getFromCache<Message[]>(cacheKey);
@@ -220,28 +450,39 @@ export class ApiService {
     }
 
     return this.withRetry(async () => {
-      const response = await this.client.get(`/messages`, { params: { projectId } });
+      const response = await this.client.get<Message[]>('/messages', { params: { projectId } });
       this.setToCache(cacheKey, response.data);
       return response.data;
     });
   }
 
-  async deleteMessage(messageId: string): Promise<{ success: boolean }> {
+  /**
+   * 创建消息
+   */
+  async createMessage(message: MessageCreate): Promise<Message> {
     return this.withRetry(async () => {
-      const response = await this.client.delete(`/messages/${messageId}`);
+      const response = await this.client.post<Message>('/messages', message);
+      // 清除消息缓存
+      this.clearCache(`messages_${message.projectId}`);
       return response.data;
     });
   }
 
-  // ==================== 流程图数据 ====================
-
-  async saveFlow(flow: Partial<FlowData>): Promise<FlowData> {
+  /**
+   * 删除消息
+   */
+  async deleteMessage(messageId: string): Promise<SuccessResponse> {
     return this.withRetry(async () => {
-      const response = await this.client.put(`/flows/${flow.id}`, flow);
+      const response = await this.client.delete<SuccessResponse>(`/messages/${messageId}`);
       return response.data;
     });
   }
 
+  // ==================== 流程图 ====================
+
+  /**
+   * 获取流程图
+   */
   async getFlow(flowId: string): Promise<FlowData> {
     const cacheKey = `flow_${flowId}`;
     const cached = this.getFromCache<FlowData>(cacheKey);
@@ -251,15 +492,173 @@ export class ApiService {
     }
 
     return this.withRetry(async () => {
-      const response = await this.client.get(`/flows/${flowId}`);
+      const response = await this.client.get<FlowData>(`/flows/${flowId}`);
       this.setToCache(cacheKey, response.data);
       return response.data;
     });
   }
 
-  async deleteFlow(flowId: string): Promise<{ success: boolean }> {
+  /**
+   * 更新流程图
+   */
+  async updateFlow(flowId: string, data: FlowDataUpdate): Promise<FlowData> {
     return this.withRetry(async () => {
-      const response = await this.client.delete(`/flows/${flowId}`);
+      const response = await this.client.put<FlowData>(`/flows/${flowId}`, data);
+      this.clearCache(`flow_${flowId}`);
+      return response.data;
+    });
+  }
+
+  /**
+   * 删除流程图
+   */
+  async deleteFlow(flowId: string): Promise<SuccessResponse> {
+    return this.withRetry(async () => {
+      const response = await this.client.delete<SuccessResponse>(`/flows/${flowId}`);
+      return response.data;
+    });
+  }
+
+  // ==================== Agent ====================
+
+  /**
+   * 获取 Agent 列表
+   */
+  async getAgents(userId?: string): Promise<Agent[]> {
+    const cacheKey = `agents_${userId || 'all'}`;
+    const cached = this.getFromCache<Agent[]>(cacheKey);
+    
+    if (!this.isOnline() && cached) {
+      return cached;
+    }
+
+    return this.withRetry(async () => {
+      const response = await this.client.get<{ agents: Agent[] }>('/agents', { params: { userId } });
+      this.setToCache(cacheKey, response.data.agents);
+      return response.data.agents;
+    });
+  }
+
+  /**
+   * 创建 Agent
+   */
+  async createAgent(agent: AgentCreate): Promise<Agent> {
+    return this.withRetry(async () => {
+      const response = await this.client.post<{ agent: Agent }>('/agents', agent);
+      // 清除缓存
+      this.clearCache(`agents_${agent.userId}`);
+      return response.data.agent;
+    });
+  }
+
+  /**
+   * 获取单个 Agent
+   */
+  async getAgent(agentId: string): Promise<Agent> {
+    const cacheKey = `agent_${agentId}`;
+    const cached = this.getFromCache<Agent>(cacheKey);
+    
+    if (!this.isOnline() && cached) {
+      return cached;
+    }
+
+    return this.withRetry(async () => {
+      const response = await this.client.get<{ agent: Agent }>(`/agents/${agentId}`);
+      this.setToCache(cacheKey, response.data.agent);
+      return response.data.agent;
+    });
+  }
+
+  /**
+   * 更新 Agent
+   */
+  async updateAgent(agentId: string, data: AgentUpdate): Promise<Agent> {
+    return this.withRetry(async () => {
+      const response = await this.client.put<{ agent: Agent }>(`/agents/${agentId}`, data);
+      this.clearCache(`agent_${agentId}`);
+      return response.data.agent;
+    });
+  }
+
+  /**
+   * 删除 Agent
+   */
+  async deleteAgent(agentId: string): Promise<SuccessResponse> {
+    return this.withRetry(async () => {
+      const response = await this.client.delete<SuccessResponse>(`/agents/${agentId}`);
+      return response.data;
+    });
+  }
+
+  // ==================== 页面 ====================
+
+  /**
+   * 获取页面列表
+   */
+  async getPages(projectId?: string): Promise<Page[]> {
+    const cacheKey = `pages_${projectId || 'all'}`;
+    const cached = this.getFromCache<Page[]>(cacheKey);
+    
+    if (!this.isOnline() && cached) {
+      return cached;
+    }
+
+    return this.withRetry(async () => {
+      const response = await this.client.get<{ pages: Page[] }>('/pages', { params: { projectId } });
+      this.setToCache(cacheKey, response.data.pages);
+      return response.data.pages;
+    });
+  }
+
+  /**
+   * 创建页面
+   */
+  async createPage(page: PageCreate): Promise<Page> {
+    return this.withRetry(async () => {
+      const response = await this.client.post<{ page: Page }>('/pages', page);
+      // 清除缓存
+      if (page.projectId) {
+        this.clearCache(`pages_${page.projectId}`);
+      }
+      return response.data.page;
+    });
+  }
+
+  /**
+   * 获取单个页面
+   */
+  async getPage(pageId: string): Promise<Page> {
+    const cacheKey = `page_${pageId}`;
+    const cached = this.getFromCache<Page>(cacheKey);
+    
+    if (!this.isOnline() && cached) {
+      return cached;
+    }
+
+    return this.withRetry(async () => {
+      const response = await this.client.get<{ page: Page }>(`/pages/${pageId}`);
+      this.setToCache(cacheKey, response.data.page);
+      return response.data.page;
+    });
+  }
+
+  /**
+   * 更新页面
+   */
+  async updatePage(pageId: string, data: PageUpdate): Promise<Page> {
+    return this.withRetry(async () => {
+      const response = await this.client.put<{ page: Page }>(`/pages/${pageId}`, data);
+      this.clearCache(`page_${pageId}`);
+      return response.data.page;
+    });
+  }
+
+  /**
+   * 删除页面
+   */
+  async deletePage(pageId: string): Promise<SuccessResponse> {
+    return this.withRetry(async () => {
+      const response = await this.client.delete<SuccessResponse>(`/pages/${pageId}`);
       return response.data;
     });
   }

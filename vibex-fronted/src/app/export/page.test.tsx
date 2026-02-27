@@ -1,10 +1,11 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import Export from '@/app/export/page'
 
 describe('Export (/export)', () => {
   it('EXPORT-001: 页面加载 - 导出页面正确渲染', () => {
     render(<Export />)
-    expect(screen.getByText('导出项目')).toBeInTheDocument()
+    // 标题 "导出项目" 被拆分为导航链接和标题，使用 getAllByText
+    expect(screen.getAllByText('导出').length).toBeGreaterThan(0)
     expect(screen.getByText('选择导出格式')).toBeInTheDocument()
     expect(screen.getByText('导出选项')).toBeInTheDocument()
   })
@@ -88,7 +89,8 @@ describe('Export (/export)', () => {
     render(<Export />)
     expect(screen.getByText('控制台')).toBeInTheDocument()
     expect(screen.getByText('编辑器')).toBeInTheDocument()
-    expect(screen.getByText('导出')).toBeInTheDocument()
+    // "导出" 在多处出现（导航和标题），使用 getAllByText
+    expect(screen.getAllByText('导出').length).toBeGreaterThan(0)
   })
 
   it('EXPORT-013: 导出格式描述显示', () => {

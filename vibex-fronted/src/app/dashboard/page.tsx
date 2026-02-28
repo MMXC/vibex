@@ -1,48 +1,81 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import styles from './dashboard.module.css'
-
-interface Project {
-  id: string
-  name: string
-  description: string
-  updatedAt: string
-  status: 'active' | 'draft' | 'archived'
-}
-
-const mockProjects: Project[] = [
-  {
-    id: '1',
-    name: 'VibeX Playground',
-    description: 'AI Agent Flow Builder',
-    updatedAt: '2026-02-25',
-    status: 'active',
-  },
-  {
-    id: '2',
-    name: '数据分析仪表盘',
-    description: '企业级数据可视化平台',
-    updatedAt: '2026-02-24',
-    status: 'active',
-  },
-  {
-    id: '3',
-    name: '电商后台系统',
-    description: '完整的电商管理后台',
-    updatedAt: '2026-02-20',
-    status: 'draft',
-  },
-  {
-    id: '4',
-    name: '客户关系管理',
-    description: 'CRM 系统原型',
-    updatedAt: '2026-02-15',
-    status: 'archived',
-  },
-]
+import { apiService, Project } from '@/services/api'
 
 export default function Dashboard() {
+  const router = useRouter()
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [userId, setUserId] = useState<string | null>(null)
+
+  useEffect(() => {
+    // 检查登录状态
+    const token = localStorage.getItem('auth_token')
+    const storedUserId = localStorage.getItem('user_id')
+    
+    if (!token) {
+      router.push('/auth')
+      return
+    }
+    
+    setUserId(storedUserId)
+    
+    // 加载项目列表
+    const fetchProjects = async () => {
+      if (!storedUserId) {
+        setLoading(false)
+        return
+      }
+      
+      try {
+        const data = await apiService.getProjects(storedUserId)
+        setProjects(data)
+      } catch (err: any) {
+        setError(err.message || '加载项目失败')
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    fetchProjects()
+  }, [router])
+
+  const handleLogout = async () => {
+    try {
+      await apiService.logout()
+    } catch (e) {
+      // 忽略登出错误
+    }
+    localStorage.removeItem('auth_token')
+    localStorage.removeItem('user_id')
+    router.push('/auth')
+  }
+
+  if (loading) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.bgEffect}>
+          <div className={styles.gridOverlay} />
+          <div className={styles.glowOrb} />
+        </div>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          height: '100vh',
+          color: '#fff'
+        }}>
+          加载中...
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={styles.page}>
       {/* 背景特效 */}
@@ -78,10 +111,10 @@ export default function Dashboard() {
         </nav>
 
         <div className={styles.sidebarFooter}>
-          <Link href="/user-settings" className={styles.userItem}>
+          <button onClick={handleLogout} className={styles.userItem} style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left' }}>
             <div className={styles.avatar}>U</div>
-            <span>用户</span>
-          </Link>
+            <span>登出</span>
+          </button>
         </div>
       </aside>
 
@@ -98,13 +131,27 @@ export default function Dashboard() {
           </button>
         </header>
 
+        {error && (
+          <div style={{
+            padding: '12px',
+            marginBottom: '20px',
+            backgroundColor: '#fee2e2',
+            border: '1px solid #fecaca',
+            borderRadius: '8px',
+            color: '#dc2626',
+            fontSize: '14px',
+          }}>
+            {error}
+          </div>
+        )}
+
         {/* 统计卡片 */}
         <section className={styles.stats}>
           {[
-            { label: '项目总数', value: '12', icon: '◈', color: 'cyan' },
-            { label: '活跃项目', value: '8', icon: '◉', color: 'green' },
-            { label: '导出次数', value: '24', icon: '↗', color: 'purple' },
-            { label: 'API 调用', value: '1.2k', icon: '⚡', color: 'pink' },
+            { label: '项目总数', value: projects.length.toString(), icon: '◈', color: 'cyan' },
+            { label: '活跃项目', value: projects.length.toString(), icon: '◉', color: 'green' },
+            { label: '导出次数', value: '0', icon: '↗', color: 'purple' },
+            { label: 'API 调用', value: '0', icon: '⚡', color: 'pink' },
           ].map((stat, i) => (
             <div key={i} className={`${styles.statCard} ${styles[`stat${stat.color}`]}`}>
               <span className={styles.statIcon}>{stat.icon}</span>
@@ -120,32 +167,26 @@ export default function Dashboard() {
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>项目列表</h2>
-            <div className={styles.filterTabs}>
-              <button className={`${styles.filterTab} ${styles.active}`}>全部</button>
-              <button className={styles.filterTab}>活跃</button>
-              <button className={styles.filterTab}>草稿</button>
-              <button className={styles.filterTab}>归档</button>
-            </div>
           </div>
 
           <div className={styles.projectGrid}>
-            {mockProjects.map((project) => (
+            {projects.map((project) => (
               <Link
                 key={project.id}
                 href="/chat"
-                className={`${styles.projectCard} ${styles[`status${project.status}`]}`}
+                className={`${styles.projectCard} ${styles.active}`}
               >
                 <div className={styles.projectHeader}>
                   <h3 className={styles.projectName}>{project.name}</h3>
-                  <span className={`${styles.statusBadge} ${styles[project.status]}`}>
-                    {project.status === 'active' ? '活跃' : project.status === 'draft' ? '草稿' : '归档'}
+                  <span className={`${styles.statusBadge} ${styles.active}`}>
+                    活跃
                   </span>
                 </div>
-                <p className={styles.projectDesc}>{project.description}</p>
+                <p className={styles.projectDesc}>{project.description || '暂无描述'}</p>
                 <div className={styles.projectFooter}>
                   <span className={styles.projectDate}>
                     <span className={styles.dateIcon}>◷</span>
-                    更新于 {project.updatedAt}
+                    更新于 {project.updatedAt ? new Date(project.updatedAt).toLocaleDateString() : '-'}
                   </span>
                   <div className={styles.projectActions}>
                     <button className={styles.actionBtn} title="编辑">✎</button>

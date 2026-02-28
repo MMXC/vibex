@@ -1,17 +1,37 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { apiService } from '@/services/api'
 
 export default function Auth() {
+  const router = useRouter()
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle auth logic - 安全：不记录敏感信息
+    setError('')
+    setLoading(true)
+
+    try {
+      if (isLogin) {
+        await apiService.login({ email, password })
+      } else {
+        await apiService.register({ name, email, password })
+      }
+      // 登录成功后跳转到 Dashboard
+      router.push('/dashboard')
+    } catch (err: any) {
+      setError(err.message || '操作失败，请稍后重试')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -39,6 +59,20 @@ export default function Auth() {
           </p>
         </div>
 
+        {error && (
+          <div style={{
+            padding: '12px',
+            marginBottom: '20px',
+            backgroundColor: '#fee2e2',
+            border: '1px solid #fecaca',
+            borderRadius: '8px',
+            color: '#dc2626',
+            fontSize: '14px',
+          }}>
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit}>
           {!isLogin && (
             <div style={{ marginBottom: '20px' }}>
@@ -50,6 +84,7 @@ export default function Auth() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="输入用户名"
+                required={!isLogin}
                 style={{
                   width: '100%',
                   padding: '12px',
@@ -70,6 +105,7 @@ export default function Auth() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@example.com"
+              required
               style={{
                 width: '100%',
                 padding: '12px',
@@ -89,6 +125,7 @@ export default function Auth() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
+              required
               style={{
                 width: '100%',
                 padding: '12px',
@@ -101,19 +138,20 @@ export default function Auth() {
 
           <button
             type="submit"
+            disabled={loading}
             style={{
               width: '100%',
               padding: '14px',
-              backgroundColor: '#0070f3',
+              backgroundColor: loading ? '#93c5fd' : '#0070f3',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
               fontSize: '16px',
               fontWeight: '600',
-              cursor: 'pointer',
+              cursor: loading ? 'not-allowed' : 'pointer',
             }}
           >
-            {isLogin ? '登录' : '注册'}
+            {loading ? '处理中...' : (isLogin ? '登录' : '注册')}
           </button>
         </form>
 
@@ -122,7 +160,7 @@ export default function Auth() {
             <>
               还没有账号？{' '}
               <button
-                onClick={() => setIsLogin(false)}
+                onClick={() => { setIsLogin(false); setError('') }}
                 style={{
                   background: 'none',
                   border: 'none',
@@ -138,7 +176,7 @@ export default function Auth() {
             <>
               已有账号？{' '}
               <button
-                onClick={() => setIsLogin(true)}
+                onClick={() => { setIsLogin(true); setError('') }}
                 style={{
                   background: 'none',
                   border: 'none',

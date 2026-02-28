@@ -1,33 +1,26 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import styles from './chat.module.css'
-
-interface Message {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-  timestamp: Date
-}
-
-interface Agent {
-  id: string
-  name: string
-  icon: string
-}
-
-const agents: Agent[] = [
-  { id: 'general', name: 'General Agent', icon: '◈' },
-  { id: 'coder', name: 'Coder Agent', icon: '⌘' },
-  { id: 'designer', name: 'Designer Agent', icon: '◫' },
-]
+import { apiService, Message } from '@/services/api'
 
 export default function Chat() {
+  const router = useRouter()
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
-  const [selectedAgent, setSelectedAgent] = useState('general')
   const [isSending, setIsSending] = useState(false)
+  const [error, setError] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
+
+  // 检查登录状态
+  useEffect(() => {
+    const token = localStorage.getItem('auth_token')
+    if (!token) {
+      router.push('/auth')
+    }
+  }, [router])
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -40,31 +33,95 @@ export default function Chat() {
   const handleSend = async () => {
     if (!input.trim()) return
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: input,
-      timestamp: new Date(),
+    const userId = localStorage.getItem('user_id')
+    if (!userId) {
+      setError('请先登录')
+      return
     }
 
+    const userMessage: Message = {
+      id: `temp-${Date.now()}`,
+      role: 'user',
+      content: input,
+      projectId: '',
+      createdAt: new Date().toISOString(),
+    }
+
+    // 添加用户消息到列表
     setMessages((prev) => [...prev, userMessage])
     setInput('')
     setIsSending(true)
+    setError('')
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: `收到消息: ${userMessage.content}. 这是 AI 的回复 (${agents.find(a => a.id === selectedAgent)?.name})`,
-        timestamp: new Date(),
+    // 创建 AI 消息的占位
+    const aiMessageId = `ai-${Date.now()}`
+    setMessages((prev) => [...prev, {
+      id: aiMessageId,
+      role: 'assistant',
+      content: '',
+      projectId: '',
+      createdAt: new Date().toISOString(),
+    }])
+
+    // 创建 SSE 连接
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vibex.top'
+    const eventSource = new EventSource(`${apiBaseUrl}/chat/stream?message=${encodeURIComponent(input)}&userId=${encodeURIComponent(userId)}`)
+
+    let fullContent = ''
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data)
+        
+        if (data.content) {
+          fullContent += data.content
+          setMessages((prev) => 
+            prev.map((msg) => 
+              msg.id === aiMessageId 
+                ? { ...msg, content: fullContent }
+                : msg
+            )
+          )
+        }
+        
+        if (data.done) {
+          eventSource.close()
+          setIsSending(false)
+        }
+      } catch (e) {
+        // 处理非 JSON 数据（如纯文本）
+        if (event.data) {
+          fullContent += event.data
+          setMessages((prev) => 
+            prev.map((msg) => 
+              msg.id === aiMessageId 
+                ? { ...msg, content: fullContent }
+                : msg
+            )
+          )
+        }
       }
-      setMessages((prev) => [...prev, aiMessage])
-      setIsSending(false)
-    }, 1500)
-  }
+    }
 
-  const currentAgent = agents.find(a => a.id === selectedAgent)
+    eventSource.onerror = () => {
+      eventSource.close()
+      setIsSending(false)
+      
+      // 如果没有收到任何内容，显示错误
+      if (!fullContent) {
+        setError('连接失败，请稍后重试')
+        setMessages((prev) => prev.filter(msg => msg.id !== aiMessageId))
+      }
+    }
+
+    // 超时处理
+    setTimeout(() => {
+      if (eventSource.readyState === EventSource.OPEN) {
+        eventSource.close()
+        setIsSending(false)
+      }
+    }, 60000)
+  }
 
   return (
     <div className={styles.page}>
@@ -80,21 +137,23 @@ export default function Chat() {
         </div>
         
         <div className={styles.agentList}>
-          {agents.map((agent) => (
-            <button
-              key={agent.id}
-              className={`${styles.agentItem} ${selectedAgent === agent.id ? styles.active : ''}`}
-              onClick={() => setSelectedAgent(agent.id)}
-            >
-              <span className={styles.agentIcon}>{agent.icon}</span>
-              <span className={styles.agentName}>{agent.name}</span>
-              {selectedAgent === agent.id && <span className={styles.activeIndicator} />}
-            </button>
-          ))}
+          <button
+            className={`${styles.agentItem} ${styles.active}`}
+          >
+            <span className={styles.agentIcon}>◈</span>
+            <span className={styles.agentName}>General Agent</span>
+            <span className={styles.activeIndicator} />
+          </button>
         </div>
 
         <div className={styles.sidebarFooter}>
-          <button className={styles.newChatBtn}>
+          <button 
+            className={styles.newChatBtn}
+            onClick={() => {
+              setMessages([])
+              setError('')
+            }}
+          >
             <span>+</span>
             <span>新建对话</span>
           </button>
@@ -106,11 +165,11 @@ export default function Chat() {
         {/* Header */}
         <header className={styles.header}>
           <div className={styles.headerInfo}>
-            <span className={styles.headerIcon}>{currentAgent?.icon}</span>
+            <span className={styles.headerIcon}>◈</span>
             <div>
               <h1 className={styles.headerTitle}>AI 对话</h1>
               <p className={styles.headerSubtitle}>
-                当前 Agent: <span className={styles.agentTag}>{currentAgent?.name}</span>
+                当前 Agent: <span className={styles.agentTag}>General Agent</span>
               </p>
             </div>
           </div>
@@ -119,6 +178,21 @@ export default function Chat() {
             <button className={styles.headerBtn} title="更多">⋯</button>
           </div>
         </header>
+
+        {/* Error Message */}
+        {error && (
+          <div style={{
+            padding: '12px',
+            margin: '0 20px',
+            backgroundColor: '#fee2e2',
+            border: '1px solid #fecaca',
+            borderRadius: '8px',
+            color: '#dc2626',
+            fontSize: '14px',
+          }}>
+            {error}
+          </div>
+        )}
 
         {/* Messages */}
         <div className={styles.messages}>
@@ -135,21 +209,21 @@ export default function Chat() {
               className={`${styles.message} ${msg.role === 'user' ? styles.userMessage : styles.assistantMessage}`}
             >
               <div className={styles.messageAvatar}>
-                {msg.role === 'user' ? 'U' : currentAgent?.icon}
+                {msg.role === 'user' ? 'U' : '◈'}
               </div>
               <div className={styles.messageContent}>
                 <div className={styles.messageBubble}>
                   {msg.content}
                 </div>
                 <span className={styles.messageTime}>
-                  {msg.timestamp.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
+                  {msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) : ''}
                 </span>
               </div>
             </div>
           ))}
           {isSending && (
             <div className={`${styles.message} ${styles.assistantMessage}`}>
-              <div className={styles.messageAvatar}>{currentAgent?.icon}</div>
+              <div className={styles.messageAvatar}>◈</div>
               <div className={styles.messageContent}>
                 <div className={styles.typingIndicator}>
                   <span></span>
@@ -172,6 +246,7 @@ export default function Chat() {
               onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
               placeholder="描述你想要创建的内容..."
               className={styles.input}
+              disabled={isSending}
             />
             <button 
               className={styles.sendButton}

@@ -297,12 +297,15 @@ export class ApiService {
    */
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     return this.withRetry(async () => {
-      const response = await this.client.post<AuthResponse>('/auth/login', credentials);
-      // 保存 token
+      const response = await this.client.post<any>('/auth/login', credentials);
+      // 响应适配：提取 response.data.data
+      const data = response.data.data || response.data;
+      // 保存 token 和用户信息
       if (typeof window !== 'undefined') {
-        localStorage.setItem('auth_token', response.data.token);
+        localStorage.setItem('auth_token', data.token);
+        localStorage.setItem('user_id', data.user.id);
       }
-      return response.data;
+      return data;
     });
   }
 
@@ -311,12 +314,15 @@ export class ApiService {
    */
   async register(data: RegisterRequest): Promise<AuthResponse> {
     return this.withRetry(async () => {
-      const response = await this.client.post<AuthResponse>('/auth/register', data);
-      // 保存 token
+      const response = await this.client.post<any>('/auth/register', data);
+      // 响应适配：提取 response.data.data
+      const result = response.data.data || response.data;
+      // 保存 token 和用户信息
       if (typeof window !== 'undefined') {
-        localStorage.setItem('auth_token', response.data.token);
+        localStorage.setItem('auth_token', result.token);
+        localStorage.setItem('user_id', result.user.id);
       }
-      return response.data;
+      return result;
     });
   }
 
@@ -450,9 +456,11 @@ export class ApiService {
     }
 
     return this.withRetry(async () => {
-      const response = await this.client.get<Message[]>('/messages', { params: { projectId } });
-      this.setToCache(cacheKey, response.data);
-      return response.data;
+      const response = await this.client.get<any>('/messages', { params: { projectId } });
+      // 响应适配：提取 response.data.messages
+      const messages = response.data.messages || response.data;
+      this.setToCache(cacheKey, messages);
+      return messages;
     });
   }
 

@@ -38,3 +38,17 @@ export function getAuthUser(request: Request): JWTPayload | null {
   const token = authHeader.substring(7);
   return verifyToken(token);
 }
+
+// Hono compatible auth helper
+export function getAuthUserFromHeader(authHeader: string | null): JWTPayload | null {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null;
+  }
+  const token = authHeader.substring(7);
+  return verifyToken(token);
+}
+
+export function getAuthUserFromHono(c: any): JWTPayload | null {
+  const authHeader = c.req.header('Authorization');
+  return getAuthUserFromHeader(authHeader);
+}

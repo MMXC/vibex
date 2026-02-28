@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { hashPassword, generateToken } from '@/lib/auth';
+import { getEnv } from '@/lib/env';
 
 const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
+    const env = getEnv();
+    const jwtSecret = env.JWT_SECRET;
     const body = await request.json();
     const { email, password, name } = body;
 
@@ -49,7 +52,7 @@ export async function POST(request: NextRequest) {
     const token = generateToken({
       userId: user.id,
       email: user.email,
-    });
+    }, jwtSecret);
 
     return NextResponse.json(
       {

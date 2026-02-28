@@ -1,5 +1,7 @@
 import { hashPassword, verifyPassword, generateToken, verifyToken } from '../lib/auth';
 
+const TEST_SECRET = 'test-secret-key-for-testing';
+
 describe('Auth Utilities', () => {
   describe('hashPassword', () => {
     it('should hash a password', async () => {
@@ -41,7 +43,7 @@ describe('Auth Utilities', () => {
   describe('generateToken', () => {
     it('should generate a JWT token', () => {
       const payload = { userId: 'user123', email: 'test@example.com' };
-      const token = generateToken(payload);
+      const token = generateToken(payload, TEST_SECRET);
       
       expect(token).toBeDefined();
       expect(typeof token).toBe('string');
@@ -52,9 +54,9 @@ describe('Auth Utilities', () => {
   describe('verifyToken', () => {
     it('should verify valid token', () => {
       const payload = { userId: 'user123', email: 'test@example.com' };
-      const token = generateToken(payload);
+      const token = generateToken(payload, TEST_SECRET);
       
-      const verified = verifyToken(token);
+      const verified = verifyToken(token, TEST_SECRET);
       
       expect(verified).toBeDefined();
       expect(verified?.userId).toBe('user123');
@@ -62,17 +64,17 @@ describe('Auth Utilities', () => {
     });
     
     it('should return null for invalid token', () => {
-      const verified = verifyToken('invalid-token');
+      const verified = verifyToken('invalid-token', TEST_SECRET);
       
       expect(verified).toBeNull();
     });
     
     it('should return null for tampered token', () => {
       const payload = { userId: 'user123', email: 'test@example.com' };
-      const token = generateToken(payload);
+      const token = generateToken(payload, TEST_SECRET);
       const tamperedToken = token.slice(0, -5) + 'xxxxx';
       
-      const verified = verifyToken(tamperedToken);
+      const verified = verifyToken(tamperedToken, TEST_SECRET);
       
       expect(verified).toBeNull();
     });

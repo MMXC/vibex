@@ -27,6 +27,7 @@ interface D1Result<T = unknown> {
 // Environment bindings
 interface Env {
   DB: D1Database;
+  ENVIRONMENT?: string;
   JWT_SECRET: string;
   MINIMAX_API_KEY: string;
   MINIMAX_API_BASE?: string;

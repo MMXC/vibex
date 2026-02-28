@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
+import { getEnv } from '@/lib/env';
 
 export async function POST(request: NextRequest) {
   try {
-    const user = getAuthUser(request);
+    const env = getEnv();
+    const user = getAuthUser(request, env.JWT_SECRET);
     
     if (!user) {
       return NextResponse.json(

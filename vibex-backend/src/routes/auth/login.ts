@@ -28,6 +28,14 @@ login.post('/', async (c) => {
     }
 
     const env = c.env;
+    const jwtSecret = env.JWT_SECRET;
+
+    if (!jwtSecret) {
+      return c.json(
+        { success: false, error: 'Server configuration error', code: 'INTERNAL_ERROR' },
+        500
+      );
+    }
 
     // Find user using D1
     const user = await queryOne<UserRow>(
@@ -54,7 +62,7 @@ login.post('/', async (c) => {
     const token = generateToken({
       userId: user.id,
       email: user.email,
-    });
+    }, jwtSecret);
 
     return c.json({
       success: true,

@@ -18,6 +18,14 @@ register.post('/', async (c) => {
     }
 
     const env = c.env;
+    const jwtSecret = env.JWT_SECRET;
+
+    if (!jwtSecret) {
+      return c.json(
+        { success: false, error: 'Server configuration error', code: 'INTERNAL_ERROR' },
+        500
+      );
+    }
 
     // Check if user already exists using D1
     const existingUser = await queryOne<{ id: string }>(
@@ -49,7 +57,7 @@ register.post('/', async (c) => {
     const token = generateToken({
       userId: userId,
       email: email,
-    });
+    }, jwtSecret);
 
     return c.json(
       {

@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getAuthUser } from '@/lib/auth';
+import { getEnv } from '@/lib/env';
 
 const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   try {
-    const auth = getAuthUser(request);
+    const env = getEnv();
+    const auth = getAuthUser(request, env.JWT_SECRET);
     if (!auth) {
       return NextResponse.json(
         { success: false, error: 'Not authenticated', code: 'UNAUTHORIZED' },
@@ -65,7 +67,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const auth = getAuthUser(request);
+    const env = getEnv();
+    const auth = getAuthUser(request, env.JWT_SECRET);
     if (!auth) {
       return NextResponse.json(
         { success: false, error: 'Not authenticated', code: 'UNAUTHORIZED' },

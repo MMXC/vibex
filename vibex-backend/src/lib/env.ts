@@ -2,7 +2,7 @@
 
 export interface CloudflareEnv {
   DB: D1Database;
-  ENVIRONMENT: string;
+  ENVIRONMENT?: string;
   JWT_SECRET: string;
   MINIMAX_API_KEY: string;
   MINIMAX_API_BASE?: string;
@@ -41,5 +41,8 @@ export function getLocalEnv(): CloudflareEnv {
     MINIMAX_MODEL: process.env.MINIMAX_MODEL || 'abab6.5s-chat',
   };
 }
+
+// Alias for getLocalEnv - for backward compatibility
+export const getEnv = getLocalEnv;
 
 export type { D1Database, D1PreparedStatement, D1Result };

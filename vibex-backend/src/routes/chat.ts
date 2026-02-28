@@ -1,30 +1,29 @@
 import { Hono } from 'hono';
+import { CloudflareEnv } from '../lib/env';
 
-const chat = new Hono();
+const chat = new Hono<{ Bindings: CloudflareEnv }>();
 
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
 }
 
-// MiniMax API configuration
-const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY || '';
-const MINIMAX_API_BASE = process.env.MINIMAX_API_BASE || 'https://api.minimax.chat/v1';
-const MINIMAX_MODEL = process.env.MINIMAX_MODEL || 'abab6.5s-chat';
-
 async function* streamFromMiniMax(
+  apiKey: string,
+  apiBase: string,
+  model: string,
   messages: ChatMessage[],
   conversationId: string
 ): AsyncGenerator<string> {
-  const url = `${MINIMAX_API_BASE}/text/chatcompletion_v2`;
+  const url = `${apiBase}/text/chatcompletion_v2`;
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${MINIMAX_API_KEY}`,
+    Authorization: `Bearer ${apiKey}`,
   };
 
   const body = JSON.stringify({
-    model: MINIMAX_MODEL,
+    model: model,
     messages: messages,
     stream: true,
     temperature: 0.7,
@@ -50,7 +49,6 @@ async function* streamFromMiniMax(
 
     const decoder = new TextDecoder();
     const reader = response.body.getReader();
-
     let buffer = '';
 
     try {
@@ -103,6 +101,15 @@ chat.get('/', (c) => {
 // POST /api/chat - Stream chat
 chat.post('/', async (c) => {
   try {
+    const env = c.env;
+    const apiKey = env.MINIMAX_API_KEY;
+    const apiBase = env.MINIMAX_API_BASE || 'https://api.minimax.chat/v1';
+    const model = env.MINIMAX_MODEL || 'abab6.5s-chat';
+
+    if (!apiKey) {
+      return c.json({ error: 'MINIMAX_API_KEY is not configured' }, 500);
+    }
+
     const body = await c.req.json();
     const { message, conversationId } = body;
 
@@ -110,29 +117,22 @@ chat.post('/', async (c) => {
       return c.json({ error: 'Message is required' }, 400);
     }
 
-    // Build messages for API
     const messages: ChatMessage[] = [{ role: 'user', content: message }];
-
-    // Create a new conversation ID if not provided
     const convId = conversationId || `conv_${Date.now()}`;
 
-    // Create a readable stream for SSE
     const stream = new ReadableStream({
       async start(controller) {
         const encoder = new TextEncoder();
 
         try {
-          // Send conversation ID first
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({ conversationId: convId })}\n\n`)
           );
 
-          // Stream from MiniMax
-          for await (const chunk of streamFromMiniMax(messages, convId)) {
+          for await (const chunk of streamFromMiniMax(apiKey, apiBase, model, messages, convId)) {
             controller.enqueue(encoder.encode(chunk));
           }
 
-          // Send done signal
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ done: true })}\n\n`));
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Unknown error';

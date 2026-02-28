@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { serve } from '@hono/node-server';
-import { getEnv } from './lib/env';
+import { CloudflareEnv, getLocalEnv } from './lib/env';
 import projects from './routes/projects';
 import pages from './routes/pages';
 import agents from './routes/agents';
@@ -11,11 +11,8 @@ import users from './routes/users';
 import messages from './routes/messages';
 import flows from './routes/flows';
 
-// 获取环境变量
-const env = getEnv();
-
-// 创建 Hono 应用，绑定环境变量类型
-const app = new Hono<{ Bindings: typeof env }>();
+// 创建 Hono 应用，绑定 Cloudflare 环境变量类型
+const app = new Hono<{ Bindings: CloudflareEnv }>();
 
 // CORS 配置 - 支持前端跨域访问
 app.use('*', cors({
@@ -51,8 +48,15 @@ if (process.env.NODE_ENV !== 'production') {
   const port = parseInt(process.env.PORT || '3000');
   console.log(`Server running on http://localhost:${port}`);
   
+  // 本地开发时，注入本地环境变量到 globalThis
+  const localEnv = getLocalEnv();
+  (globalThis as any).__VIBEX_LOCAL_ENV__ = localEnv;
+  
   serve({
-    fetch: app.fetch,
+    fetch: (request) => {
+      // 为本地开发模拟 Cloudflare 的 env 注入
+      return app.fetch(request, localEnv);
+    },
     port,
   });
 }

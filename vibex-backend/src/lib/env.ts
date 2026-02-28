@@ -2,6 +2,7 @@
 
 export interface CloudflareEnv {
   DB: D1Database;
+  ENVIRONMENT: string;
   JWT_SECRET: string;
   MINIMAX_API_KEY: string;
   MINIMAX_API_BASE?: string;
@@ -29,31 +30,15 @@ interface D1Result<T = unknown> {
   };
 }
 
-// Get environment variables - works in both Cloudflare Workers and local development
-export function getEnv(): CloudflareEnv {
-  // For Cloudflare Workers, variables are in globalThis.env
-  const cfEnv = (globalThis as any).env;
-  
-  if (cfEnv?.DB) {
-    return cfEnv as CloudflareEnv;
-  }
-
-  // For local development, read from process.env
-  const jwtSecret = process.env.JWT_SECRET;
-  if (!jwtSecret) {
-    console.error('❌ FATAL: JWT_SECRET environment variable is not set!');
-    console.error('   Please set JWT_SECRET before starting the server.');
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('JWT_SECRET environment variable is required');
-    }
-  }
-  
+// For local development only - provides fallback env
+export function getLocalEnv(): CloudflareEnv {
   return {
     DB: {} as D1Database,
-    JWT_SECRET: jwtSecret,
+    ENVIRONMENT: 'development',
+    JWT_SECRET: process.env.JWT_SECRET || 'vibex-dev-secret',
     MINIMAX_API_KEY: process.env.MINIMAX_API_KEY || '',
-    MINIMAX_API_BASE: process.env.MINIMAX_API_BASE,
-    MINIMAX_MODEL: process.env.MINIMAX_MODEL,
+    MINIMAX_API_BASE: process.env.MINIMAX_API_BASE || 'https://api.minimax.chat/v1',
+    MINIMAX_MODEL: process.env.MINIMAX_MODEL || 'abab6.5s-chat',
   };
 }
 

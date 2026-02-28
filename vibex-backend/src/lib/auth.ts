@@ -1,18 +1,8 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { CloudflareEnv } from './env';
 
-// JWT 配置 - 生产环境强制要求环境变量，测试/开发环境使用默认值
-const JWT_SECRET = process.env.JWT_SECRET || (
-  process.env.NODE_ENV === 'production' 
-    ? undefined 
-    : 'vibex-dev-secret-key-not-for-production'
-);
 const JWT_EXPIRES_IN = '7d';
-
-// 启动时验证 JWT_SECRET 已配置
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is required in production');
-}
 
 export interface JWTPayload {
   userId: string;
@@ -27,38 +17,44 @@ export async function verifyPassword(password: string, hashedPassword: string): 
   return bcrypt.compare(password, hashedPassword);
 }
 
-export function generateToken(payload: JWTPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+export function generateToken(payload: JWTPayload, jwtSecret: string): string {
+  if (!jwtSecret) {
+    throw new Error('JWT_SECRET environment variable is required');
+  }
+  return jwt.sign(payload, jwtSecret, { expiresIn: JWT_EXPIRES_IN });
 }
 
-export function verifyToken(token: string): JWTPayload | null {
+export function verifyToken(token: string, jwtSecret: string): JWTPayload | null {
+  if (!jwtSecret) {
+    return null;
+  }
   try {
-    return jwt.verify(token, JWT_SECRET) as JWTPayload;
+    return jwt.verify(token, jwtSecret) as JWTPayload;
   } catch {
     return null;
   }
 }
 
-export function getAuthUser(request: Request): JWTPayload | null {
+export function getAuthUser(request: Request, jwtSecret: string): JWTPayload | null {
   const authHeader = request.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return null;
   }
   
   const token = authHeader.substring(7);
-  return verifyToken(token);
+  return verifyToken(token, jwtSecret);
 }
 
 // Hono compatible auth helper
-export function getAuthUserFromHeader(authHeader: string | null): JWTPayload | null {
+export function getAuthUserFromHeader(authHeader: string | null, jwtSecret: string): JWTPayload | null {
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return null;
   }
   const token = authHeader.substring(7);
-  return verifyToken(token);
+  return verifyToken(token, jwtSecret);
 }
 
-export function getAuthUserFromHono(c: any): JWTPayload | null {
+export function getAuthUserFromHono(c: { env: CloudflareEnv; req: { header: (name: string) => string | undefined } }): JWTPayload | null {
   const authHeader = c.req.header('Authorization');
-  return getAuthUserFromHeader(authHeader);
+  return getAuthUserFromHeader(authHeader || null, c.env.JWT_SECRET);
 }

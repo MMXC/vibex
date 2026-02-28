@@ -25,3 +25,29 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: jest.fn(),
   })),
 })
+
+// Mock Next.js navigation
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    back: jest.fn(),
+    forward: jest.fn(),
+    prefetch: jest.fn(),
+    refresh: jest.fn(),
+  }),
+  usePathname: () => '/test',
+  useSearchParams: () => new URLSearchParams(),
+  Router: {
+    events: null,
+  },
+}))
+
+// Mock localStorage
+const localStorageMock = {
+  getItem: jest.fn(() => null),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+  clear: jest.fn(),
+}
+Object.defineProperty(window, 'localStorage', { value: localStorageMock })

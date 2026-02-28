@@ -59,7 +59,7 @@ pageId.put('/', async (c) => {
     if (updates.length > 0) {
       updates.push('updatedAt = ?');
       values.push(now);
-      values.push(id);
+      values.push(id!);
 
       await executeDB(
         env,

@@ -96,7 +96,7 @@ users.put('/:userId', async (c) => {
     if (updates.length > 0) {
       updates.push('updatedAt = ?');
       values.push(now);
-      values.push(userId);
+      values.push(userId!);
 
       await executeDB(
         c.env,

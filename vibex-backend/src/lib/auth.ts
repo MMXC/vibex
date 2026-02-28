@@ -1,8 +1,18 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'vibex-secret-key-change-in-production';
+// JWT 配置 - 生产环境强制要求环境变量，测试/开发环境使用默认值
+const JWT_SECRET = process.env.JWT_SECRET || (
+  process.env.NODE_ENV === 'production' 
+    ? undefined 
+    : 'vibex-dev-secret-key-not-for-production'
+);
 const JWT_EXPIRES_IN = '7d';
+
+// 启动时验证 JWT_SECRET 已配置
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required in production');
+}
 
 export interface JWTPayload {
   userId: string;

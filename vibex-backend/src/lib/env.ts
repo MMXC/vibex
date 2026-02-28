@@ -39,9 +39,18 @@ export function getEnv(): CloudflareEnv {
   }
 
   // For local development, read from process.env
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    console.error('❌ FATAL: JWT_SECRET environment variable is not set!');
+    console.error('   Please set JWT_SECRET before starting the server.');
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('JWT_SECRET environment variable is required');
+    }
+  }
+  
   return {
     DB: {} as D1Database,
-    JWT_SECRET: process.env.JWT_SECRET || 'vibex-secret-key-change-in-production',
+    JWT_SECRET: jwtSecret,
     MINIMAX_API_KEY: process.env.MINIMAX_API_KEY || '',
     MINIMAX_API_BASE: process.env.MINIMAX_API_BASE,
     MINIMAX_MODEL: process.env.MINIMAX_MODEL,

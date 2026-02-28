@@ -1,0 +1,301 @@
+/* 移动端导航样式 */
+
+/* 基础导航 */
+.nav {
+  position: relative;
+  z-index: 100;
+}
+
+.nav.fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+/* 头部 */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--bg-primary, #fff);
+  border-bottom: 1px solid var(--border, #e5e5e5);
+}
+
+.brand {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+}
+
+/* 汉堡按钮 */
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  gap: 5px;
+}
+
+.hamburgerLine {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--text-primary, #1a1a1a);
+  border-radius: 2px;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+.hamburger.open .hamburgerLine:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.hamburger.open .hamburgerLine:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.open .hamburgerLine:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* 菜单面板 */
+.menuPanel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 280px;
+  max-width: 85vw;
+  background: var(--bg-primary, #fff);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+  padding-top: 60px;
+}
+
+.menuPanel.open {
+  transform: translateX(0);
+}
+
+/* 菜单列表 */
+.menuList {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+}
+
+.menuList.submenu {
+  padding-left: 16px;
+}
+
+/* 菜单项 */
+.menuItem {
+  border-bottom: 1px solid var(--border-light, #f0f0f0);
+}
+
+.menuItem:last-child {
+  border-bottom: none;
+}
+
+/* 菜单链接 */
+.menuLink {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 14px 20px;
+  font-size: 15px;
+  color: var(--text-primary, #1a1a1a);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s;
+}
+
+.menuLink:hover {
+  background: var(--bg-secondary, #f5f5f5);
+}
+
+.menuLink:active {
+  background: var(--bg-tertiary, #eee);
+}
+
+.menuIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+  font-size: 18px;
+}
+
+.menuLabel {
+  flex: 1;
+}
+
+.chevron {
+  font-size: 12px;
+  color: var(--text-tertiary, #999);
+  transition: transform 0.2s;
+}
+
+.chevron.open {
+  transform: rotate(90deg);
+}
+
+/* 子菜单 */
+.submenuContent {
+  background: var(--bg-secondary, #f9f9f9);
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 遮罩层 */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 桌面端导航栏 */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--bg-primary, #fff);
+  border-bottom: 1px solid var(--border, #e5e5e5);
+}
+
+.navbarContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 60px;
+}
+
+.navbarNav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 暗色模式 */
+@media (prefers-color-scheme: dark) {
+  .header {
+    background: #1a1a1a;
+    border-color: #2a2a2a;
+  }
+  
+  .hamburgerLine {
+    background: #e5e5e5;
+  }
+  
+  .menuPanel {
+    background: #1a1a1a;
+  }
+  
+  .menuItem {
+    border-color: #2a2a2a;
+  }
+  
+  .menuLink {
+    color: #e5e5e5;
+  }
+  
+  .menuLink:hover {
+    background: #262626;
+  }
+  
+  .submenuContent {
+    background: #222;
+  }
+  
+  .navbar {
+    background: #1a1a1a;
+    border-color: #2a2a2a;
+  }
+}
+
+/* 桌面端隐藏汉堡菜单 */
+@media (min-width: 768px) {
+  .hamburger {
+    display: none;
+  }
+  
+  .menuPanel {
+    position: static;
+    transform: none;
+    width: auto;
+    max-width: none;
+    box-shadow: none;
+    padding-top: 0;
+    background: transparent;
+  }
+  
+  .menuList {
+    display: flex;
+    gap: 4px;
+    padding: 0;
+  }
+  
+  .menuItem {
+    border: none;
+  }
+  
+  .menuLink {
+    padding: 8px 16px;
+    border-radius: 8px;
+  }
+  
+  .overlay {
+    display: none;
+  }
+}
+
+/* 移动端隐藏桌面导航 */
+@media (max-width: 767px) {
+  .navbar {
+    display: none;
+  }
+}
+
+/* 安全区域支持 */
+@supports (padding: env(safe-area-inset-top)) {
+  .header {
+    padding-top: calc(12px + env(safe-area-inset-top));
+  }
+  
+  .menuPanel {
+    padding-top: calc(60px + env(safe-area-inset-top));
+  }
+}

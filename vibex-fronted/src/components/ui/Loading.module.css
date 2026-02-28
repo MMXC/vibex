@@ -1,0 +1,267 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* 尺寸 */
+.small {
+  font-size: 12px;
+}
+
+.medium {
+  font-size: 14px;
+}
+
+.large {
+  font-size: 16px;
+}
+
+.text {
+  color: var(--text-secondary, #666);
+}
+
+/* Spinner */
+.spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinnerRing {
+  border: 3px solid var(--loading-border, #e0e0e0);
+  border-top-color: var(--loading-primary, #3b82f6);
+  border-radius: 50%;
+}
+
+.small .spinnerRing {
+  width: 16px;
+  height: 16px;
+}
+
+.medium .spinnerRing {
+  width: 32px;
+  height: 32px;
+}
+
+.large .spinnerRing {
+  width: 48px;
+  height: 48px;
+  border-width: 4px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinnerRing {
+  animation: spin 0.8s linear infinite;
+}
+
+/* Dots */
+.dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background: var(--loading-primary, #3b82f6);
+  border-radius: 50%;
+}
+
+.small .dot {
+  width: 6px;
+  height: 6px;
+}
+
+.large .dot {
+  width: 10px;
+  height: 10px;
+}
+
+.dot:nth-child(1) {
+  animation: dot-pulse 1.4s ease-in-out 0s infinite;
+}
+
+.dot:nth-child(2) {
+  animation: dot-pulse 1.4s ease-in-out 0.2s infinite;
+}
+
+.dot:nth-child(3) {
+  animation: dot-pulse 1.4s ease-in-out 0.4s infinite;
+}
+
+@keyframes dot-pulse {
+  0%, 80%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Pulse */
+.pulse {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pulseCore {
+  width: 12px;
+  height: 12px;
+  background: var(--loading-primary, #3b82f6);
+  border-radius: 50%;
+}
+
+.small .pulseCore {
+  width: 8px;
+  height: 8px;
+}
+
+.large .pulseCore {
+  width: 16px;
+  height: 16px;
+}
+
+.pulseRing {
+  position: absolute;
+  border: 2px solid var(--loading-primary, #3b82f6);
+  border-radius: 50%;
+}
+
+.small .pulseRing {
+  width: 16px;
+  height: 16px;
+}
+
+.medium .pulseRing {
+  width: 24px;
+  height: 24px;
+}
+
+.large .pulseRing {
+  width: 36px;
+  height: 36px;
+}
+
+.pulseRing {
+  animation: pulse-expand 1.5s ease-out infinite;
+}
+
+@keyframes pulse-expand {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* 全屏和叠加层 */
+.fullScreen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary, #ffffff);
+  z-index: 9999;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  z-index: 10;
+}
+
+/* 进度条 */
+.progressContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progressBar {
+  height: 6px;
+  background: var(--progress-bg, #e0e0e0);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--loading-primary, #3b82f6);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+@keyframes progress-indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.progressText {
+  font-size: 12px;
+  color: var(--text-secondary, #666);
+  text-align: center;
+}
+
+/* 暗色模式 */
+@media (prefers-color-scheme: dark) {
+  .text {
+    color: #999;
+  }
+  
+  .spinnerRing {
+    border-color: #333;
+    border-top-color: #3b82f6;
+  }
+  
+  .dot,
+  .pulseCore,
+  .pulseRing {
+    background: #3b82f6;
+    border-color: #3b82f6;
+  }
+  
+  .fullScreen {
+    background: #0a0a0a;
+  }
+  
+  .overlay {
+    background: rgba(0, 0, 0, 0.8);
+  }
+  
+  .progressBar {
+    background: #2a2a2a;
+  }
+  
+  .progressText {
+    color: #999;
+  }
+}

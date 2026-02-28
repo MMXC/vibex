@@ -1,0 +1,154 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: 24px;
+}
+
+.card {
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  padding: 32px;
+  background: var(--bg-primary, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+}
+
+.icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0 0 8px;
+}
+
+.message {
+  font-size: 14px;
+  color: var(--text-secondary, #666);
+  margin: 0 0 24px;
+  line-height: 1.6;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.button {
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+  background: var(--primary, #3b82f6);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.button:hover {
+  background: var(--primary-hover, #2563eb);
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+.buttonSecondary {
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary, #1a1a1a);
+  background: var(--bg-secondary, #f5f5f5);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.buttonSecondary:hover {
+  background: var(--bg-tertiary, #eeeeee);
+}
+
+.details {
+  margin-top: 24px;
+  text-align: left;
+}
+
+.details summary {
+  font-size: 13px;
+  color: var(--text-secondary, #666);
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.errorStack {
+  font-size: 12px;
+  font-family: monospace;
+  background: var(--bg-code, #f5f5f5);
+  padding: 12px;
+  border-radius: 6px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: var(--text-error, #dc2626);
+}
+
+/* 暗色模式 */
+@media (prefers-color-scheme: dark) {
+  .card {
+    background: var(--bg-dark, #1a1a1a);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  }
+  
+  .title {
+    color: var(--text-dark, #e0e0e0);
+  }
+  
+  .message {
+    color: var(--text-secondary-dark, #999);
+  }
+  
+  .buttonSecondary {
+    background: #2a2a2a;
+    border-color: #3a3a3a;
+    color: #e0e0e0;
+  }
+  
+  .buttonSecondary:hover {
+    background: #333;
+  }
+  
+  .errorStack {
+    background: #0a0a0a;
+    color: #f87171;
+  }
+}
+
+/* 移动端适配 */
+@media (max-width: 480px) {
+  .container {
+    padding: 16px;
+  }
+  
+  .card {
+    padding: 24px 16px;
+  }
+  
+  .actions {
+    flex-direction: column;
+  }
+  
+  .button,
+  .buttonSecondary {
+    width: 100%;
+  }
+}

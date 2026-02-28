@@ -1,0 +1,250 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+/* 示例区域 */
+.examples {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.examplesLabel {
+  font-size: 13px;
+  color: var(--text-secondary, #666);
+  font-weight: 500;
+}
+
+.examplesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.exampleButton {
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text-primary, #333);
+  background: var(--bg-secondary, #f5f5f5);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.exampleButton:hover {
+  background: var(--primary-light, #e8f0fe);
+  border-color: var(--primary, #3b82f6);
+  color: var(--primary, #3b82f6);
+}
+
+/* 输入区域 */
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid var(--border, #e0e0e0);
+  border-radius: 12px;
+  background: var(--bg-primary, #fff);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+}
+
+.inputWrapper:focus-within {
+  border-color: var(--primary, #3b82f6);
+  box-shadow: 0 0 0 3px var(--primary-alpha, rgba(59, 130, 246, 0.1));
+}
+
+.inputWrapper.dragOver {
+  border-color: var(--primary, #3b82f6);
+  background: var(--primary-light, #f0f7ff);
+  border-style: dashed;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 16px;
+  font-size: 15px;
+  font-family: inherit;
+  line-height: 1.6;
+  color: var(--text-primary, #1a1a1a);
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+}
+
+.textarea::placeholder {
+  color: var(--text-placeholder, #999);
+}
+
+/* 工具栏 */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--bg-secondary, #f9f9f9);
+  border-top: 1px solid var(--border-light, #f0f0f0);
+}
+
+.toolbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.toolbarRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 上传按钮 */
+.uploadButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  font-size: 13px;
+  color: var(--text-secondary, #666);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.uploadButton:hover {
+  color: var(--primary, #3b82f6);
+}
+
+/* 提示文字 */
+.hint {
+  font-size: 12px;
+  color: var(--text-tertiary, #999);
+}
+
+/* 跳过按钮 */
+.skipButton {
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--text-secondary, #666);
+  background: transparent;
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.skipButton:hover {
+  background: var(--bg-secondary, #f5f5f5);
+}
+
+/* 提交按钮 */
+.submitButton {
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background: var(--primary, #3b82f6);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: var(--primary-hover, #2563eb);
+  transform: translateY(-1px);
+}
+
+.submitButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 暗色模式 */
+@media (prefers-color-scheme: dark) {
+  .examplesLabel {
+    color: #999;
+  }
+  
+  .exampleButton {
+    background: #2a2a2a;
+    border-color: #3a3a3a;
+    color: #e0e0e0;
+  }
+  
+  .exampleButton:hover {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+  }
+  
+  .inputWrapper {
+    background: #1a1a1a;
+    border-color: #3a3a3a;
+  }
+  
+  .textarea {
+    color: #e0e0e0;
+  }
+  
+  .toolbar {
+    background: #222;
+    border-color: #2a2a2a;
+  }
+  
+  .hint {
+    color: #777;
+  }
+  
+  .skipButton {
+    background: transparent;
+    border-color: #3a3a3a;
+    color: #999;
+  }
+}
+
+/* 移动端适配 */
+@media (max-width: 640px) {
+  .examplesList {
+    flex-direction: column;
+  }
+  
+  .exampleButton {
+    max-width: 100%;
+  }
+  
+  .toolbar {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .toolbarLeft,
+  .toolbarRight {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .textarea {
+    min-height: 100px;
+  }
+}

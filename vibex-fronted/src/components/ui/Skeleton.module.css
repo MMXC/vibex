@@ -1,0 +1,90 @@
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-base, #e0e0e0) 0%,
+    var(--skeleton-highlight, #f0f0f0) 50%,
+    var(--skeleton-base, #e0e0e0) 100%
+  );
+  background-size: 200% 100%;
+}
+
+.animate {
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.circle {
+  border-radius: 50%;
+}
+
+.rect {
+  border-radius: 8px;
+}
+
+.text {
+  border-radius: 4px;
+  height: 16px;
+}
+
+.textContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border, #e0e0e0);
+}
+
+.cardContent {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.listItemContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* 暗色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      #2a2a2a 0%,
+      #3a3a3a 50%,
+      #2a2a2a 100%
+    );
+    background-size: 200% 100%;
+  }
+  
+  .card {
+    border-color: #3a3a3a;
+  }
+}

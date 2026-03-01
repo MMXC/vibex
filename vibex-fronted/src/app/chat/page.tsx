@@ -64,7 +64,7 @@ export default function Chat() {
     }])
 
     // 创建 SSE 连接
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vibex.top'
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vibex.top/api'
     const eventSource = new EventSource(`${apiBaseUrl}/chat/stream?message=${encodeURIComponent(input)}&userId=${encodeURIComponent(userId)}`)
 
     let fullContent = ''

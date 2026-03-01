@@ -153,7 +153,7 @@ export class ApiService {
   private static readonly MAX_RETRIES = 3;
   private static readonly RETRY_DELAY = 1000;
 
-  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_BASE_URL || '/api') {
+  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vibex.top/api') {
     this.client = axios.create({
       baseURL,
       timeout: 10000,

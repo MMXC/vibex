@@ -12,6 +12,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [userId, setUserId] = useState<string | null>(null)
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
 
   useEffect(() => {
     // 检查登录状态
@@ -45,6 +46,15 @@ export default function Dashboard() {
     fetchProjects()
   }, [router])
 
+  // 点击外部关闭下拉菜单
+  useEffect(() => {
+    const handleClickOutside = () => setOpenMenuId(null)
+    if (openMenuId) {
+      document.addEventListener('click', handleClickOutside)
+      return () => document.removeEventListener('click', handleClickOutside)
+    }
+  }, [openMenuId])
+
   const handleLogout = async () => {
     try {
       await apiService.logout()
@@ -54,6 +64,23 @@ export default function Dashboard() {
     localStorage.removeItem('auth_token')
     localStorage.removeItem('user_id')
     router.push('/auth')
+  }
+
+  // 创建新项目
+  const handleCreateProject = async () => {
+    if (!userId) return
+    
+    try {
+      const newProject = await apiService.createProject({
+        name: '新项目',
+        description: '',
+        userId,
+      })
+      // 跳转到编辑器
+      router.push(`/editor?projectId=${newProject.id}`)
+    } catch (err: any) {
+      setError(err.message || '创建项目失败')
+    }
   }
 
   if (loading) {
@@ -125,7 +152,7 @@ export default function Dashboard() {
             <h1 className={styles.title}>我的项目</h1>
             <p className={styles.subtitle}>管理你的 AI 应用项目</p>
           </div>
-          <button className={styles.createButton}>
+          <button className={styles.createButton} onClick={handleCreateProject}>
             <span>+</span>
             <span>创建新项目</span>
           </button>
@@ -173,7 +200,7 @@ export default function Dashboard() {
             {projects.map((project) => (
               <Link
                 key={project.id}
-                href="/chat"
+                href={`/editor?projectId=${project.id}`}
                 className={`${styles.projectCard} ${styles.active}`}
               >
                 <div className={styles.projectHeader}>
@@ -188,9 +215,87 @@ export default function Dashboard() {
                     <span className={styles.dateIcon}>◷</span>
                     更新于 {project.updatedAt ? new Date(project.updatedAt).toLocaleDateString() : '-'}
                   </span>
-                  <div className={styles.projectActions}>
-                    <button className={styles.actionBtn} title="编辑">✎</button>
-                    <button className={styles.actionBtn} title="更多">⋯</button>
+                  <div className={styles.projectActions} style={{ position: 'relative' }}>
+                    <button 
+                      className={styles.actionBtn} 
+                      title="编辑"
+                      onClick={(e) => { 
+                        e.preventDefault(); 
+                        router.push(`/project-settings?id=${project.id}`); 
+                      }}
+                    >
+                      ✎
+                    </button>
+                    <button 
+                      className={styles.actionBtn} 
+                      title="更多"
+                      onClick={(e) => { 
+                        e.preventDefault();
+                        setOpenMenuId(openMenuId === project.id ? null : project.id);
+                      }}
+                    >
+                      ⋯
+                    </button>
+                    {openMenuId === project.id && (
+                      <div style={{
+                        position: 'absolute',
+                        right: '0',
+                        top: '100%',
+                        background: '#1e1e2e',
+                        border: '1px solid #3b3b5c',
+                        borderRadius: '8px',
+                        padding: '8px 0',
+                        minWidth: '120px',
+                        zIndex: 100,
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                      }}>
+                        <button
+                          style={{
+                            display: 'block',
+                            width: '100%',
+                            padding: '8px 16px',
+                            background: 'none',
+                            border: 'none',
+                            color: '#fff',
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                          }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setOpenMenuId(null);
+                            // 导出功能
+                            alert('导出功能开发中');
+                          }}
+                        >
+                          📤 导出
+                        </button>
+                        <button
+                          style={{
+                            display: 'block',
+                            width: '100%',
+                            padding: '8px 16px',
+                            background: 'none',
+                            border: 'none',
+                            color: '#ff6b6b',
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                          }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setOpenMenuId(null);
+                            if (confirm('确定删除该项目吗？')) {
+                              apiService.deleteProject(project.id).then(() => {
+                                setProjects(projects.filter(p => p.id !== project.id));
+                              });
+                            }
+                          }}
+                        >
+                          🗑️ 删除
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className={styles.cardGlow} />
@@ -198,7 +303,7 @@ export default function Dashboard() {
             ))}
             
             {/* 创建新项目卡片 */}
-            <div className={styles.newProjectCard}>
+            <div className={styles.newProjectCard} onClick={handleCreateProject} style={{ cursor: 'pointer' }}>
               <span className={styles.plusIcon}>+</span>
               <span className={styles.newProjectText}>创建新项目</span>
             </div>

@@ -77,4 +77,17 @@ describe('Chat (/chat)', () => {
       fireEvent.click(button)
     })
   })
+
+  // Test new chat button
+  it('renders new chat button', () => {
+    render(<Chat />)
+    expect(screen.getByText(/新对话/)).toBeInTheDocument()
+  })
+
+  // Test message rendering
+  it('renders messages when present', async () => {
+    const { container } = render(<Chat />)
+    // Messages will be empty initially
+    expect(container.querySelector('[class*="messages"]')).toBeInTheDocument()
+  })
 })

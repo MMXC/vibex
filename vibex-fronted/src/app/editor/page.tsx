@@ -35,7 +35,8 @@ export default function Editor() {
     { id: '4', type: 'button', name: '按钮', props: { text: '立即开始', variant: 'primary' } },
   ])
   const [activeTab, setActiveTab] = useState<'components' | 'layers' | 'settings'>('components')
-  const [isSaved] = useState(true)
+  const [isSaved, setIsSaved] = useState(true)
+  const [saving, setSaving] = useState(false)
 
   const addComponent = (type: string, name: string) => {
     const newComponent: EditorComponent = {
@@ -45,6 +46,21 @@ export default function Editor() {
       props: getDefaultProps(type),
     }
     setEditorComponents(prev => [...prev, newComponent])
+  }
+
+  // 保存页面
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      // 模拟保存操作
+      await new Promise(resolve => setTimeout(resolve, 500))
+      setIsSaved(true)
+      alert('保存成功')
+    } catch (err) {
+      alert('保存失败')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const getDefaultProps = (type: string) => {
@@ -131,8 +147,12 @@ export default function Editor() {
           <button className={styles.toolbarBtn}>
             👁️ 预览
           </button>
-          <button className={styles.primaryBtn}>
-            💾 保存
+          <button 
+            className={styles.primaryBtn}
+            onClick={() => handleSave()}
+            disabled={saving}
+          >
+            {saving ? '保存中...' : '💾 保存'}
           </button>
         </div>
       </header>

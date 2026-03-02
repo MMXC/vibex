@@ -191,3 +191,18 @@ model Component {
   @@index([projectId])
   @@index([name])
 }
+
+// Project Settings - stores project configurations and user preferences
+model ProjectSettings {
+  id        String   @id @default(cuid())
+  projectId String
+  key       String
+  value     String
+  userId    String?  // null for project-level settings, user ID for user preferences
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([projectId, key, userId])
+  @@index([projectId])
+  @@index([userId])
+}

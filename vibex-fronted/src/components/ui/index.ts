@@ -36,3 +36,5 @@ export { default as Pagination, type PaginationProps } from './Pagination';
 export { default as Field, FormFieldContext, useField, type FieldProps, type FieldRenderProps, type ValidationRule } from './Field';
 export { Form, Field as FormField, FormField as FormFieldWrapper, FormActions, useForm, useFormContext, type FormProps, type FormFieldProps, type FormActionsProps } from './Form';
 export { default as DomainRelationGraph, type DomainRelationGraphProps, type DomainEntity, type EntityRelation } from './DomainRelationGraph';
+export { default as FlowEditor, type FlowEditorProps, type FlowNode, type FlowEdge, flowUtils } from './FlowEditor';
+export { default as FlowPropertiesPanel, type FlowPropertiesPanelProps } from './FlowPropertiesPanel';

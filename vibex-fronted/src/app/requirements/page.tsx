@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import styles from './requirements.module.css'
 import { apiService, Requirement, RequirementStatus } from '@/services/api'
 
-// 模拟需求数据（后端 API 未实现时使用）
+// 模拟需求数据（API 调用失败时的后备）
 const mockRequirements: Requirement[] = [
   {
     id: 'req-1',
@@ -50,14 +50,43 @@ const statusMap: Record<RequirementStatus, { label: string; color: string }> = {
   failed: { label: '失败', color: '#ef4444' },
 }
 
+// 加载状态类型
+type LoadingState = 'idle' | 'loading' | 'success' | 'error'
+
 export default function Requirements() {
   const router = useRouter()
   const [requirements, setRequirements] = useState<Requirement[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loadingState, setLoadingState] = useState<LoadingState>('idle')
   const [error, setError] = useState('')
   const [userId, setUserId] = useState<string | null>(null)
   const [filter, setFilter] = useState<RequirementStatus | 'all'>('all')
+  const [retryCount, setRetryCount] = useState(0)
 
+  // 获取需求列表的函数
+  const fetchRequirements = useCallback(async (uid: string) => {
+    setLoadingState('loading')
+    setError('')
+    
+    try {
+      // 调用 API 获取需求列表
+      const data = await apiService.getRequirements(uid)
+      setRequirements(data || [])
+      setLoadingState('success')
+    } catch (err: any) {
+      console.error('获取需求列表失败:', err)
+      setError(err.message || '获取需求列表失败')
+      
+      // 如果有重试次数限制，可以使用模拟数据作为后备
+      if (retryCount < 2) {
+        setRequirements(mockRequirements)
+        setLoadingState('success')
+      } else {
+        setLoadingState('error')
+      }
+    }
+  }, [retryCount])
+
+  // 初始化加载
   useEffect(() => {
     // 检查登录状态
     const token = localStorage.getItem('auth_token')
@@ -71,31 +100,25 @@ export default function Requirements() {
     setUserId(storedUserId)
     
     // 加载需求列表
-    const fetchRequirements = async () => {
-      if (!storedUserId) {
-        setLoading(false)
-        return
-      }
-      
-      try {
-        // 尝试调用 API（后端未实现时使用模拟数据）
-        // const data = await apiService.getRequirements(storedUserId)
-        // setRequirements(data)
-        
-        // 使用模拟数据
-        setTimeout(() => {
-          setRequirements(mockRequirements)
-          setLoading(false)
-        }, 500)
-      } catch (err: any) {
-        // 使用模拟数据作为后备
-        setRequirements(mockRequirements)
-        setLoading(false)
-      }
+    if (storedUserId) {
+      fetchRequirements(storedUserId)
+    } else {
+      setLoadingState('loading')
+      // 模拟加载延迟后显示空状态
+      setTimeout(() => {
+        setRequirements([])
+        setLoadingState('success')
+      }, 500)
     }
-    
-    fetchRequirements()
-  }, [router])
+  }, [router, fetchRequirements])
+
+  // 重试函数
+  const handleRetry = () => {
+    setRetryCount(prev => prev + 1)
+    if (userId) {
+      fetchRequirements(userId)
+    }
+  }
 
   // 根据筛选条件过滤需求
   const filteredRequirements = filter === 'all' 
@@ -106,29 +129,46 @@ export default function Requirements() {
     if (!confirm('确定删除这个需求吗？')) return
     
     try {
-      // 调用 API 删除需求（后端未实现）
-      // await apiService.deleteRequirement(id)
+      if (userId) {
+        await apiService.deleteRequirement(id, userId)
+      }
       setRequirements(requirements.filter(r => r.id !== id))
     } catch (err: any) {
       setError(err.message || '删除失败')
     }
   }
 
-  if (loading) {
+  // 加载中状态
+  if (loadingState === 'loading' || loadingState === 'idle') {
     return (
       <div className={styles.page}>
         <div className={styles.bgEffect}>
           <div className={styles.gridOverlay} />
           <div className={styles.glowOrb} />
         </div>
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          height: '100vh',
-          color: '#fff'
-        }}>
-          加载中...
+        <div className={styles.loadingContainer}>
+          <div className={styles.loadingSpinner}></div>
+          <p className={styles.loadingText}>正在加载需求列表...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // 错误状态
+  if (loadingState === 'error' && requirements.length === 0) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.bgEffect}>
+          <div className={styles.gridOverlay} />
+          <div className={styles.glowOrb} />
+        </div>
+        <div className={styles.errorContainer}>
+          <span className={styles.errorIcon}>⚠️</span>
+          <h2 className={styles.errorTitle}>加载失败</h2>
+          <p className={styles.errorMessage}>{error || '无法连接到服务器'}</p>
+          <button className={styles.retryButton} onClick={handleRetry}>
+            重试
+          </button>
         </div>
       </div>
     )

@@ -780,6 +780,16 @@ export class ApiService {
   }
 
   /**
+   * AI 生成流程图
+   */
+  async generateFlow(description: string): Promise<FlowData> {
+    return this.withRetry(async () => {
+      const response = await this.client.post<FlowData>('/flows/generate', { description });
+      return response.data;
+    });
+  }
+
+  /**
    * 删除流程图
    */
   async deleteFlow(flowId: string): Promise<SuccessResponse> {
@@ -947,9 +957,9 @@ export class ApiService {
     }
 
     return this.withRetry(async () => {
-      const response = await this.client.get<{ domains: DomainEntity[] }>(`/requirements/${requirementId}/domains`);
-      this.setToCache(cacheKey, response.data.domains);
-      return response.data.domains;
+      const response = await this.client.get<{ domainEntities: DomainEntity[] }>(`/domain-entities?requirementId=${requirementId}`);
+      this.setToCache(cacheKey, response.data.domainEntities);
+      return response.data.domainEntities;
     });
   }
 

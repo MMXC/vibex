@@ -696,3 +696,430 @@
     font-size: 12px;
   }
 }
+
+/* ==================== React Flow 图谱样式 ==================== */
+
+.graphWrapper {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 140px);
+  position: relative;
+}
+
+/* 工具栏 */
+.toolbar {
+  display: flex;
+  gap: 12px;
+  padding: 12px 20px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.toolbarBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-out-expo);
+}
+
+.toolbarBtn:hover {
+  background: var(--color-primary-muted);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.toolbarBtn.saveBtn {
+  margin-left: auto;
+  background: var(--color-primary-muted);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.toolbarBtn.hasChanges {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Flow 容器 */
+.flowContainer {
+  flex: 1;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* React Flow 自定义样式 */
+.flowContainer :global(.react-flow) {
+  background: var(--color-bg-secondary);
+}
+
+.flowContainer :global(.react-flow__node) {
+  cursor: pointer;
+}
+
+.flowContainer :global(.react-flow__controls) {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+}
+
+.flowContainer :global(.react-flow__controls-button) {
+  background: var(--color-bg-tertiary);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+  fill: var(--color-text-primary);
+}
+
+.flowContainer :global(.react-flow__controls-button:hover) {
+  background: var(--color-primary-muted);
+}
+
+.flowContainer :global(.react-flow__minimap) {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.flowContainer :global(.react-flow__background pattern) {
+  stroke: var(--color-border);
+}
+
+/* 自定义节点 */
+.flowNode {
+  min-width: 180px;
+  max-width: 220px;
+  background: var(--color-bg-secondary);
+  border: 2px solid #3f3f46;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all var(--duration-normal) var(--ease-out-expo);
+}
+
+.flowNode:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.nodeHeader {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.nodeType {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.nodeContent {
+  padding: 12px;
+}
+
+.nodeName {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
+}
+
+.nodeDesc {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.nodeAttrs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.nodeAttr {
+  font-size: 10px;
+  padding: 2px 6px;
+  background: var(--color-bg-tertiary);
+  border-radius: 4px;
+  color: var(--color-text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.nodeAttrMore {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  padding: 2px 4px;
+}
+
+/* 节点连接手柄 */
+.nodeHandle {
+  width: 10px !important;
+  height: 10px !important;
+  background: var(--color-primary) !important;
+  border: 2px solid var(--color-bg-secondary) !important;
+}
+
+/* 详情面板 */
+.entityDetail {
+  position: absolute;
+  top: 80px;
+  right: 20px;
+  width: 320px;
+  max-height: calc(100% - 100px);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+  overflow-y: auto;
+  box-shadow: var(--shadow-xl);
+  z-index: 10;
+}
+
+.detailHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.detailHeader h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.detailActions {
+  display: flex;
+  gap: 8px;
+}
+
+.entityDetail p {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-bottom: 16px;
+}
+
+.entityDetail h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 12px;
+}
+
+.attrTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.attrTable th,
+.attrTable td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.attrTable th {
+  color: var(--color-text-muted);
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.attrTable code {
+  font-size: 12px;
+  padding: 2px 6px;
+  background: var(--color-bg-tertiary);
+  border-radius: 4px;
+  color: var(--color-primary);
+}
+
+.closeBtn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+  font-size: 18px;
+  cursor: pointer;
+  transition: all var(--duration-normal);
+}
+
+.closeBtn:hover {
+  background: var(--color-error);
+  border-color: var(--color-error);
+  color: white;
+}
+
+.deleteBtn {
+  padding: 4px 12px;
+  background: transparent;
+  border: 1px solid var(--color-error);
+  border-radius: 6px;
+  color: var(--color-error);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all var(--duration-normal);
+}
+
+.deleteBtn:hover {
+  background: var(--color-error);
+  color: white;
+}
+
+/* 对话框 */
+.dialogOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+}
+
+.dialog {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 24px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: var(--shadow-xl);
+}
+
+.dialog h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 20px;
+}
+
+.formGroup {
+  margin-bottom: 16px;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: 6px;
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  transition: border-color var(--duration-normal);
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.formGroup textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.dialogActions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.cancelBtn {
+  padding: 10px 20px;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all var(--duration-normal);
+}
+
+.cancelBtn:hover {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border-hover);
+}
+
+.confirmBtn {
+  padding: 10px 20px;
+  background: var(--color-primary);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--duration-normal);
+}
+
+.confirmBtn:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.confirmBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 关系列表样式增强 */
+.relationEndpoints {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.relationArrow {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.arrowLine {
+  flex: 1;
+  height: 2px;
+  background: currentColor;
+  opacity: 0.3;
+}

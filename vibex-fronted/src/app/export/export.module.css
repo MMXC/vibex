@@ -168,6 +168,40 @@
   border-radius: 2px;
 }
 
+/* 标签页切换 */
+.tabContainer {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+  padding: 4px;
+  background: var(--color-bg-secondary);
+  border-radius: 12px;
+  width: fit-content;
+}
+
+.tab {
+  padding: 12px 24px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.tab:hover {
+  color: var(--color-text-primary);
+  background: var(--color-bg-hover);
+}
+
+.tabActive {
+  background: var(--gradient-primary);
+  color: var(--color-bg-primary);
+  box-shadow: 0 4px 12px rgba(0, 255, 255, 0.3);
+}
+
 /* 格式选择网格 */
 .formatGrid {
   display: grid;

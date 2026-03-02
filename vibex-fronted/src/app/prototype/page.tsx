@@ -6,126 +6,6 @@ import Link from 'next/link'
 import styles from './prototype.module.css'
 import { apiService, PrototypeSnapshot, UIPage, UIComponent, Project } from '@/services/api'
 
-// 模拟原型页面数据
-const mockPrototypePages: UIPage[] = [
-  {
-    id: 'page-1',
-    name: '首页',
-    route: '/',
-    components: [
-      { id: 'comp-1-1', type: 'navigation', props: { title: '我的应用', items: ['首页', '产品', '关于', '联系'] } },
-      { id: 'comp-1-2', type: 'container', props: { className: 'hero' }, children: [
-        { id: 'comp-1-2-1', type: 'text', props: { text: '欢迎使用 AI 原型', className: 'hero-title', variant: 'h1' } },
-        { id: 'comp-1-2-2', type: 'text', props: { text: '快速构建你的应用原型', className: 'hero-subtitle', variant: 'p' } },
-        { id: 'comp-1-2-3', type: 'button', props: { text: '立即开始', variant: 'primary', size: 'large' } },
-      ]},
-      { id: 'comp-1-3', type: 'container', props: { className: 'features' }, children: [
-        { id: 'comp-1-3-1', type: 'card', props: { title: '智能分析', description: 'AI 驱动的需求分析', icon: 'chart' } },
-        { id: 'comp-1-3-2', type: 'card', props: { title: '快速原型', description: '一键生成界面原型', icon: 'lightning' } },
-        { id: 'comp-1-3-3', type: 'card', props: { title: '团队协作', description: '实时同步与反馈', icon: 'users' } },
-      ]},
-    ],
-    layout: { type: 'single' },
-  },
-  {
-    id: 'page-2',
-    name: '产品列表',
-    route: '/products',
-    components: [
-      { id: 'comp-2-1', type: 'navigation', props: { title: '我的应用', items: ['首页', '产品', '关于', '联系'] } },
-      { id: 'comp-2-2', type: 'container', props: { className: 'page-header' }, children: [
-        { id: 'comp-2-2-1', type: 'text', props: { text: '产品列表', variant: 'h1' } },
-        { id: 'comp-2-2-2', type: 'input', props: { placeholder: '搜索产品...', type: 'search' } },
-      ]},
-      { id: 'comp-2-3', type: 'list', props: { type: 'grid', columns: 3 }, children: [
-        { id: 'comp-2-3-1', type: 'card', props: { title: '产品 A', description: '这是产品描述', price: '¥99' } },
-        { id: 'comp-2-3-2', type: 'card', props: { title: '产品 B', description: '这是产品描述', price: '¥199' } },
-        { id: 'comp-2-3-3', type: 'card', props: { title: '产品 C', description: '这是产品描述', price: '¥299' } },
-        { id: 'comp-2-3-4', type: 'card', props: { title: '产品 D', description: '这是产品描述', price: '¥399' } },
-        { id: 'comp-2-3-5', type: 'card', props: { title: '产品 E', description: '这是产品描述', price: '¥499' } },
-        { id: 'comp-2-3-6', type: 'card', props: { title: '产品 F', description: '这是产品描述', price: '¥599' } },
-      ]},
-    ],
-    layout: { type: 'single' },
-  },
-  {
-    id: 'page-3',
-    name: '用户管理',
-    route: '/users',
-    components: [
-      { id: 'comp-3-1', type: 'navigation', props: { title: '管理后台', items: ['仪表盘', '用户', '设置'] } },
-      { id: 'comp-3-2', type: 'container', props: { className: 'page-header' }, children: [
-        { id: 'comp-3-2-1', type: 'text', props: { text: '用户管理', variant: 'h1' } },
-        { id: 'comp-3-2-2', type: 'button', props: { text: '+ 添加用户', variant: 'primary', size: 'small' } },
-      ]},
-      { id: 'comp-3-3', type: 'table', props: { 
-        columns: ['ID', '用户名', '邮箱', '角色', '状态', '操作'],
-        rows: [
-          ['001', '张三', 'zhangsan@example.com', '管理员', '活跃', '编辑 | 删除'],
-          ['002', '李四', 'lisi@example.com', '用户', '活跃', '编辑 | 删除'],
-          ['003', '王五', 'wangwu@example.com', '用户', '停用', '编辑 | 删除'],
-        ]
-      }},
-    ],
-    layout: { type: 'sidebar' },
-  },
-  {
-    id: 'page-4',
-    name: '订单详情',
-    route: '/orders/:id',
-    components: [
-      { id: 'comp-4-1', type: 'navigation', props: { title: '订单系统', items: ['订单列表', '订单详情', '统计'] } },
-      { id: 'comp-4-2', type: 'container', props: { className: 'order-detail' }, children: [
-        { id: 'comp-4-2-1', type: 'text', props: { text: '订单 #12345', variant: 'h2' } },
-        { id: 'comp-4-2-2', type: 'container', props: { className: 'order-info' }, children: [
-          { id: 'comp-4-2-2-1', type: 'text', props: { text: '客户: 张三', variant: 'p' } },
-          { id: 'comp-4-2-2-2', type: 'text', props: { text: '日期: 2024-01-15', variant: 'p' } },
-          { id: 'comp-4-2-2-3', type: 'text', props: { text: '状态: 处理中', variant: 'p' } },
-        ]},
-        { id: 'comp-4-2-3', type: 'table', props: {
-          columns: ['商品', '数量', '单价', '小计'],
-          rows: [
-            ['产品 A', '2', '¥99', '¥198'],
-            ['产品 B', '1', '¥199', '¥199'],
-          ]
-        }},
-      ]},
-    ],
-    layout: { type: 'single' },
-  },
-  {
-    id: 'page-5',
-    name: '设置',
-    route: '/settings',
-    components: [
-      { id: 'comp-5-1', type: 'navigation', props: { title: '设置', items: ['个人资料', '安全', '通知', '关于'] } },
-      { id: 'comp-5-2', type: 'form', props: { title: '个人资料设置' }, children: [
-        { id: 'comp-5-2-1', type: 'input', props: { label: '用户名', placeholder: '输入用户名', value: '张三' } },
-        { id: 'comp-5-2-2', type: 'input', props: { label: '邮箱', placeholder: '输入邮箱', value: 'zhangsan@example.com', type: 'email' } },
-        { id: 'comp-5-2-3', type: 'input', props: { label: '电话', placeholder: '输入电话', value: '138-1234-5678', type: 'tel' } },
-        { id: 'comp-5-2-4', type: 'button', props: { text: '保存更改', variant: 'primary' } },
-      ]},
-    ],
-    layout: { type: 'single' },
-  },
-  {
-    id: 'page-6',
-    name: '数据统计',
-    route: '/analytics',
-    components: [
-      { id: 'comp-6-1', type: 'navigation', props: { title: '数据分析', items: ['概览', '趋势', '报告'] } },
-      { id: 'comp-6-2', type: 'container', props: { className: 'stats-grid' }, children: [
-        { id: 'comp-6-2-1', type: 'card', props: { title: '总用户', value: '12,345', trend: '+12%', icon: 'users' } },
-        { id: 'comp-6-2-2', type: 'card', props: { title: '活跃用户', value: '3,456', trend: '+5%', icon: 'activity' } },
-        { id: 'comp-6-2-3', type: 'card', props: { title: '订单数', value: '789', trend: '+23%', icon: 'shopping-cart' } },
-        { id: 'comp-6-2-4', type: 'card', props: { title: '收入', value: '¥123,456', trend: '+18%', icon: 'dollar' } },
-      ]},
-      { id: 'comp-6-3', type: 'chart', props: { type: 'line', title: '用户增长趋势' } },
-    ],
-    layout: { type: 'single' },
-  },
-]
-
 // 设备配置
 const devices = [
   { id: 'desktop', name: '桌面端', width: '100%', icon: '🖥️', description: '响应式布局' },
@@ -202,17 +82,17 @@ export default function PrototypePreview() {
               setPages(content.pages || [])
             }
           } else {
-            // 使用模拟数据
-            setPages(mockPrototypePages)
+            // 无快照数据
+            setPages([])
           }
         } else {
-          // 使用模拟数据
-          setPages(mockPrototypePages)
+          // 无项目数据
+          setPages([])
         }
       } catch (err: any) {
         console.error('Load error:', err)
-        // 使用模拟数据作为后备
-        setPages(mockPrototypePages)
+        // 错误时使用空数据
+        setPages([])
       } finally {
         setLoading(false)
       }

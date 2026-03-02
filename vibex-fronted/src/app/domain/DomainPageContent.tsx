@@ -1,81 +1,314 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useCallback, useEffect, useState, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import styles from './domain.module.css'
-import { apiService, DomainEntity, EntityRelation, Project } from '@/services/api'
+import { apiService, DomainEntity, EntityRelation, Project, EntityType } from '@/services/api'
+import ReactFlow, {
+  Node,
+  Edge,
+  Controls,
+  Background,
+  MiniMap,
+  useNodesState,
+  useEdgesState,
+  addEdge,
+  Connection,
+  NodeTypes,
+  Handle,
+  Position,
+  MarkerType,
+  NodeChange,
+  EdgeChange,
+  applyNodeChanges,
+  applyEdgeChanges,
+} from 'reactflow'
+import 'reactflow/dist/style.css'
 
-// 模拟领域数据（实际项目中会从 API 获取）
-const mockDomains: DomainEntity[] = [
-  {
-    id: '1',
-    requirementId: '1',
-    name: 'User',
-    type: 'user',
-    description: '系统用户实体',
-    attributes: [
-      { name: 'id', type: 'string', required: true, description: '用户唯一标识' },
-      { name: 'username', type: 'string', required: true, description: '用户名' },
-      { name: 'email', type: 'string', required: true, description: '邮箱地址' },
-      { name: 'password', type: 'string', required: true, description: '密码哈希' },
-      { name: 'createdAt', type: 'datetime', required: true, description: '创建时间' },
-    ],
-    position: { x: 100, y: 100 },
-  },
-  {
-    id: '2',
-    requirementId: '1',
-    name: 'Product',
-    type: 'business',
-    description: '产品实体',
-    attributes: [
-      { name: 'id', type: 'string', required: true, description: '产品唯一标识' },
-      { name: 'name', type: 'string', required: true, description: '产品名称' },
-      { name: 'price', type: 'number', required: true, description: '产品价格' },
-      { name: 'description', type: 'string', required: false, description: '产品描述' },
-    ],
-    position: { x: 400, y: 100 },
-  },
-  {
-    id: '3',
-    requirementId: '1',
-    name: 'Order',
-    type: 'business',
-    description: '订单实体',
-    attributes: [
-      { name: 'id', type: 'string', required: true, description: '订单唯一标识' },
-      { name: 'userId', type: 'string', required: true, description: '用户ID' },
-      { name: 'productId', type: 'string', required: true, description: '产品ID' },
-      { name: 'quantity', type: 'number', required: true, description: '数量' },
-      { name: 'totalPrice', type: 'number', required: true, description: '总价' },
-    ],
-    position: { x: 250, y: 300 },
-  },
-]
-
-const mockRelations: EntityRelation[] = [
-  { id: '1', fromEntityId: '3', toEntityId: '1', relationType: 'association', description: '下单用户' },
-  { id: '2', fromEntityId: '3', toEntityId: '2', relationType: 'association', description: '包含产品' },
-]
-
+// 领域类型样式映射
 const entityTypeStyles: Record<string, { color: string; label: string }> = {
   user: { color: '#3b82f6', label: '用户' },
   business: { color: '#10b981', label: '业务' },
   system: { color: '#f59e0b', label: '系统' },
   data: { color: '#8b5cf6', label: '数据' },
+  external: { color: '#ec4899', label: '外部' },
+  abstract: { color: '#6366f1', label: '抽象' },
 }
 
-const relationTypeStyles: Record<string, { color: string; label: string }> = {
-  inheritance: { color: '#8b5cf6', label: '继承' },
+const relationTypeStyles: Record<string, { color: string; label: string; strokeDasharray?: string }> = {
+  inheritance: { color: '#8b5cf6', label: '继承', strokeDasharray: '5 5' },
   composition: { color: '#00ff88', label: '组合' },
   aggregation: { color: '#00d4ff', label: '聚合' },
   association: { color: '#ffa500', label: '关联' },
-  dependency: { color: '#ff6b6b', label: '依赖' },
-  realization: { color: '#ff69b4', label: '实现' },
+  dependency: { color: '#ff6b6b', label: '依赖', strokeDasharray: '5 5' },
+  realization: { color: '#ff69b4', label: '实现', strokeDasharray: '5 5' },
 }
 
-export default function DomainPageContent() {
+type TabType = 'graph' | 'list'
+
+// 自定义节点组件
+function EntityNode({ data }: { data: { entity: DomainEntity; selected: boolean; onSelect: (e: any) => void } }) {
+  const { entity, selected, onSelect } = data
+  const typeStyle = entityTypeStyles[entity.type] || { color: '#666', label: entity.type }
+  
+  return (
+    <div 
+      className={styles.flowNode}
+      style={{ 
+        borderColor: selected ? typeStyle.color : '#3f3f46',
+        boxShadow: selected ? `0 0 20px ${typeStyle.color}40` : 'none'
+      }}
+      onClick={onSelect}
+    >
+      <Handle type="target" position={Position.Left} className={styles.nodeHandle} />
+      <div className={styles.nodeHeader} style={{ backgroundColor: `${typeStyle.color}20` }}>
+        <span className={styles.nodeType} style={{ color: typeStyle.color }}>
+          {typeStyle.label}
+        </span>
+      </div>
+      <div className={styles.nodeContent}>
+        <div className={styles.nodeName}>{entity.name}</div>
+        <div className={styles.nodeDesc}>{entity.description || '暂无描述'}</div>
+        <div className={styles.nodeAttrs}>
+          {entity.attributes.slice(0, 2).map(attr => (
+            <span key={attr.name} className={styles.nodeAttr}>
+              {attr.name}
+            </span>
+          ))}
+          {entity.attributes.length > 2 && (
+            <span className={styles.nodeAttrMore}>+{entity.attributes.length - 2}</span>
+          )}
+        </div>
+      </div>
+      <Handle type="source" position={Position.Right} className={styles.nodeHandle} />
+    </div>
+  )
+}
+
+const nodeTypes: NodeTypes = {
+  entity: EntityNode,
+}
+
+// 工具栏组件
+function Toolbar({ 
+  onAddEntity, 
+  onAddRelation, 
+  onSave,
+  hasChanges 
+}: { 
+  onAddEntity: () => void
+  onAddRelation: () => void
+  onSave: () => void
+  hasChanges: boolean 
+}) {
+  return (
+    <div className={styles.toolbar}>
+      <button onClick={onAddEntity} className={styles.toolbarBtn}>
+        <span>+</span> 添加实体
+      </button>
+      <button onClick={onAddRelation} className={styles.toolbarBtn}>
+        <span>↔</span> 添加关系
+      </button>
+      <button 
+        onClick={onSave} 
+        className={`${styles.toolbarBtn} ${styles.saveBtn} ${hasChanges ? styles.hasChanges : ''}`}
+      >
+        <span>💾</span> 保存
+      </button>
+    </div>
+  )
+}
+
+// 添加实体对话框
+function AddEntityDialog({ 
+  onClose, 
+  onSave 
+}: { 
+  onClose: () => void
+  onSave: (entity: Partial<DomainEntity>) => void 
+}) {
+  const [name, setName] = useState('')
+  const [type, setType] = useState<EntityType>('business')
+  const [description, setDescription] = useState('')
+
+  return (
+    <div className={styles.dialogOverlay} onClick={onClose}>
+      <div className={styles.dialog} onClick={e => e.stopPropagation()}>
+        <h3>添加实体</h3>
+        <div className={styles.formGroup}>
+          <label>名称</label>
+          <input 
+            type="text" 
+            value={name}
+            onChange={e => setName(e.target.value)}
+            placeholder="输入实体名称"
+          />
+        </div>
+        <div className={styles.formGroup}>
+          <label>类型</label>
+          <select value={type} onChange={e => setType(e.target.value as EntityType)}>
+            <option value="user">用户</option>
+            <option value="business">业务</option>
+            <option value="system">系统</option>
+            <option value="data">数据</option>
+            <option value="external">外部</option>
+            <option value="abstract">抽象</option>
+          </select>
+        </div>
+        <div className={styles.formGroup}>
+          <label>描述</label>
+          <textarea 
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            placeholder="输入实体描述"
+          />
+        </div>
+        <div className={styles.dialogActions}>
+          <button onClick={onClose} className={styles.cancelBtn}>取消</button>
+          <button 
+            onClick={() => onSave({ name, type, description, attributes: [] })}
+            className={styles.confirmBtn}
+            disabled={!name.trim()}
+          >
+            添加
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// 添加关系对话框
+function AddRelationDialog({ 
+  entities,
+  onClose, 
+  onSave 
+}: { 
+  entities: DomainEntity[]
+  onClose: () => void
+  onSave: (relation: Partial<EntityRelation>) => void 
+}) {
+  const [fromId, setFromId] = useState('')
+  const [toId, setToId] = useState('')
+  const [relationType, setRelationType] = useState('association')
+  const [description, setDescription] = useState('')
+
+  return (
+    <div className={styles.dialogOverlay} onClick={onClose}>
+      <div className={styles.dialog} onClick={e => e.stopPropagation()}>
+        <h3>添加关系</h3>
+        <div className={styles.formGroup}>
+          <label>源实体</label>
+          <select value={fromId} onChange={e => setFromId(e.target.value)}>
+            <option value="">选择源实体</option>
+            {entities.map(e => (
+              <option key={e.id} value={e.id}>{e.name}</option>
+            ))}
+          </select>
+        </div>
+        <div className={styles.formGroup}>
+          <label>目标实体</label>
+          <select value={toId} onChange={e => setToId(e.target.value)}>
+            <option value="">选择目标实体</option>
+            {entities.map(e => (
+              <option key={e.id} value={e.id}>{e.name}</option>
+            ))}
+          </select>
+        </div>
+        <div className={styles.formGroup}>
+          <label>关系类型</label>
+          <select value={relationType} onChange={e => setRelationType(e.target.value)}>
+            <option value="inheritance">继承</option>
+            <option value="composition">组合</option>
+            <option value="aggregation">聚合</option>
+            <option value="association">关联</option>
+            <option value="dependency">依赖</option>
+            <option value="realization">实现</option>
+          </select>
+        </div>
+        <div className={styles.formGroup}>
+          <label>描述</label>
+          <input 
+            type="text" 
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            placeholder="输入关系描述"
+          />
+        </div>
+        <div className={styles.dialogActions}>
+          <button onClick={onClose} className={styles.cancelBtn}>取消</button>
+          <button 
+            onClick={() => onSave({ fromEntityId: fromId, toEntityId: toId, relationType, description })}
+            className={styles.confirmBtn}
+            disabled={!fromId || !toId}
+          >
+            添加
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Flow 图表组件
+function DomainFlow({
+  entities,
+  relations,
+  onEntitySelect,
+  selectedEntityId,
+  onNodesChange,
+  onEdgesChange,
+  nodes,
+  edges,
+  onConnect,
+}: {
+  entities: DomainEntity[]
+  relations: EntityRelation[]
+  onEntitySelect: (entity: DomainEntity) => void
+  selectedEntityId: string | null
+  onNodesChange: (changes: NodeChange[]) => void
+  onEdgesChange: (changes: EdgeChange[]) => void
+  nodes: Node[]
+  edges: Edge[]
+  onConnect: (connection: Connection) => void
+}) {
+  const defaultEdgeOptions = {
+    type: 'smoothstep',
+    style: { strokeWidth: 2 },
+    markerEnd: { type: MarkerType.ArrowClosed } as any,
+  }
+
+  return (
+    <div className={styles.flowContainer}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        nodeTypes={nodeTypes}
+        defaultEdgeOptions={defaultEdgeOptions}
+        fitView
+        fitViewOptions={{ padding: 0.2 }}
+        minZoom={0.1}
+        maxZoom={2}
+      >
+        <Controls className={styles.flowControls} />
+        <MiniMap 
+          className={styles.flowMinimap}
+          nodeColor={(node) => {
+            const entity = node.data?.entity as DomainEntity
+            return entity ? (entityTypeStyles[entity.type]?.color || '#666') : '#666'
+          }}
+        />
+        <Background color="#3f3f46" gap={20} size={1} />
+      </ReactFlow>
+    </div>
+  )
+}
+
+function DomainPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const projectId = searchParams.get('projectId')
@@ -85,9 +318,102 @@ export default function DomainPageContent() {
   const [relations, setRelations] = useState<EntityRelation[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [tab, setTab] = useState<TabType>('graph')
   const [selectedEntity, setSelectedEntity] = useState<DomainEntity | null>(null)
   const [filterType, setFilterType] = useState<string>('all')
+  const [hasChanges, setHasChanges] = useState(false)
+  
+  // React Flow 状态
+  const [nodes, setNodes, onNodesChange] = useNodesState([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState([])
+  
+  // 对话框状态
+  const [showAddEntity, setShowAddEntity] = useState(false)
+  const [showAddRelation, setShowAddRelation] = useState(false)
+
+  // 转换实体为 React Flow 节点
+  const convertToNodes = useCallback((entities: DomainEntity[]): Node[] => {
+    return entities.map((entity, index) => {
+      const typeStyle = entityTypeStyles[entity.type] || { color: '#666', label: entity.type }
+      // 使用存储的位置或自动计算
+      const position = entity.position || {
+        x: 100 + (index % 4) * 280,
+        y: 100 + Math.floor(index / 4) * 200
+      }
+      
+      return {
+        id: entity.id,
+        type: 'entity',
+        position,
+        data: { 
+          entity, 
+          selected: selectedEntity?.id === entity.id,
+          onSelect: (e: any) => {
+            e.stopPropagation()
+            setSelectedEntity(entity)
+          }
+        },
+        draggable: true,
+      }
+    })
+  }, [selectedEntity])
+
+  // 转换关系为 React Flow 边
+  const convertToEdges = useCallback((rels: EntityRelation[], ents: DomainEntity[]): Edge[] => {
+    const entityMap = new Map(ents.map(e => [e.id, e]))
+    
+    return rels.map(relation => {
+      const relStyle = relationTypeStyles[relation.relationType] || { color: '#666', label: relation.relationType }
+      
+      return {
+        id: relation.id,
+        source: relation.fromEntityId,
+        target: relation.toEntityId,
+        label: relation.description || relStyle.label,
+        type: 'smoothstep',
+        style: { 
+          stroke: relStyle.color,
+          strokeWidth: 2,
+          strokeDasharray: relStyle.strokeDasharray || undefined,
+        },
+        labelStyle: { fill: relStyle.color, fontWeight: 500 },
+        labelBgStyle: { fill: '#1e1e2e', fillOpacity: 0.9 },
+        markerEnd: { 
+          type: MarkerType.ArrowClosed,
+          color: relStyle.color,
+        },
+        data: { relation },
+      }
+    })
+  }, [])
+
+  // 当数据加载或更改时更新节点和边
+  useEffect(() => {
+    if (domains.length > 0) {
+      const newNodes = convertToNodes(domains)
+      setNodes(newNodes)
+    }
+  }, [domains, convertToNodes, setNodes])
+
+  useEffect(() => {
+    if (domains.length > 0) {
+      const newEdges = convertToEdges(relations, domains)
+      setEdges(newEdges)
+    }
+  }, [relations, domains, convertToEdges, setEdges])
+
+  // 当选中实体更改时更新节点
+  useEffect(() => {
+    setNodes((nds) => 
+      nds.map((node) => ({
+        ...node,
+        data: {
+          ...node.data,
+          selected: node.data.entity?.id === selectedEntity?.id,
+        },
+      }))
+    )
+  }, [selectedEntity, setNodes])
 
   useEffect(() => {
     const token = localStorage.getItem('auth_token')
@@ -101,10 +427,15 @@ export default function DomainPageContent() {
         if (projectId) {
           const projectData = await apiService.getProject(projectId)
           setProject(projectData)
+          
+          // 从 API 获取领域数据
+          const [domainData, relationData] = await Promise.all([
+            apiService.getDomainEntities(projectId),
+            apiService.getEntityRelations(projectId)
+          ])
+          setDomains(domainData)
+          setRelations(relationData)
         }
-        
-        setDomains(mockDomains)
-        setRelations(mockRelations)
       } catch (err: any) {
         setError(err.message || '加载数据失败')
       } finally {
@@ -115,15 +446,130 @@ export default function DomainPageContent() {
     fetchData()
   }, [projectId, router])
 
+  // 处理连接（添加新关系）
+  const onConnect = useCallback((connection: Connection) => {
+    if (connection.source && connection.target) {
+      const newRelation: EntityRelation = {
+        id: `rel_${Date.now()}`,
+        fromEntityId: connection.source,
+        toEntityId: connection.target,
+        relationType: 'association',
+        description: '',
+      }
+      setRelations(prev => [...prev, newRelation])
+      setHasChanges(true)
+    }
+  }, [])
+
+  // 处理节点位置变化
+  const handleNodesChange = useCallback((changes: NodeChange[]) => {
+    onNodesChange(changes)
+    
+    // 保存位置变化
+    changes.forEach(change => {
+      if (change.type === 'position' && change.position && change.dragging === false && change.id) {
+        const newPosition = { x: change.position.x, y: change.position.y }
+        setDomains(prev => prev.map(entity => 
+          entity.id === change.id 
+            ? { ...entity, position: newPosition }
+            : entity
+        ))
+        setHasChanges(true)
+      }
+    })
+  }, [onNodesChange])
+
+  // 添加实体
+  const handleAddEntity = useCallback(async (entityData: Partial<DomainEntity>) => {
+    if (!projectId) return
+    
+    const newEntity: DomainEntity = {
+      id: `entity_${Date.now()}`,
+      requirementId: projectId,
+      name: entityData.name || '',
+      type: entityData.type || 'business',
+      description: entityData.description || '',
+      attributes: entityData.attributes || [],
+      position: { x: 100 + Math.random() * 400, y: 100 + Math.random() * 300 },
+    }
+    
+    setDomains(prev => [...prev, newEntity])
+    setHasChanges(true)
+    setShowAddEntity(false)
+  }, [projectId])
+
+  // 添加关系
+  const handleAddRelation = useCallback((relationData: Partial<EntityRelation>) => {
+    if (!relationData.fromEntityId || !relationData.toEntityId) return
+    
+    const newRelation: EntityRelation = {
+      id: `relation_${Date.now()}`,
+      fromEntityId: relationData.fromEntityId,
+      toEntityId: relationData.toEntityId,
+      relationType: relationData.relationType || 'association',
+      description: relationData.description || '',
+    }
+    
+    setRelations(prev => [...prev, newRelation])
+    setHasChanges(true)
+    setShowAddRelation(false)
+  }, [])
+
+  // 保存更改
+  const handleSave = useCallback(async () => {
+    try {
+      // 保存实体位置和更新
+      for (const entity of domains) {
+        await apiService.updateDomainEntity(entity.id, {
+          name: entity.name,
+          type: entity.type,
+          description: entity.description,
+          attributes: entity.attributes,
+          position: entity.position,
+        })
+      }
+      
+      // 保存关系
+      for (const relation of relations) {
+        if (relation.id.startsWith('relation_')) {
+          await apiService.createEntityRelation(relation, projectId || undefined)
+        } else {
+          await apiService.updateEntityRelation(relation.id, {
+            fromEntityId: relation.fromEntityId,
+            toEntityId: relation.toEntityId,
+            relationType: relation.relationType,
+            description: relation.description,
+          }, projectId || undefined)
+        }
+      }
+      
+      setHasChanges(false)
+      alert('保存成功！')
+    } catch (err: any) {
+      console.error('保存失败:', err)
+      alert('保存失败: ' + err.message)
+    }
+  }, [domains, relations, projectId])
+
+  // 删除实体
+  const handleDeleteEntity = useCallback((entityId: string) => {
+    setDomains(prev => prev.filter(e => e.id !== entityId))
+    setRelations(prev => prev.filter(r => r.fromEntityId !== entityId && r.toEntityId !== entityId))
+    if (selectedEntity?.id === entityId) {
+      setSelectedEntity(null)
+    }
+    setHasChanges(true)
+  }, [selectedEntity])
+
+  // 删除关系
+  const handleDeleteRelation = useCallback((relationId: string) => {
+    setRelations(prev => prev.filter(r => r.id !== relationId))
+    setHasChanges(true)
+  }, [])
+
   const filteredDomains = filterType === 'all' 
     ? domains 
     : domains.filter(d => d.type === filterType)
-
-  const getRelationLabel = (relation: EntityRelation) => {
-    const source = domains.find(d => d.id === relation.fromEntityId)
-    const target = domains.find(d => d.id === relation.toEntityId)
-    return `${source?.name} → ${target?.name} (${relation.relationType})`
-  }
 
   if (loading) {
     return (
@@ -149,6 +595,11 @@ export default function DomainPageContent() {
 
   return (
     <div className={styles.container}>
+      <div className={styles.bgEffect}>
+        <div className={styles.gridOverlay} />
+        <div className={styles.glowOrb} />
+      </div>
+
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <h1>领域模型</h1>
@@ -165,17 +616,19 @@ export default function DomainPageContent() {
             <option value="business">业务</option>
             <option value="system">系统</option>
             <option value="data">数据</option>
+            <option value="external">外部</option>
+            <option value="abstract">抽象</option>
           </select>
           <div className={styles.viewToggle}>
             <button 
-              className={`${styles.viewBtn} ${viewMode === 'grid' ? styles.active : ''}`}
-              onClick={() => setViewMode('grid')}
+              className={`${styles.viewBtn} ${tab === 'graph' ? styles.active : ''}`}
+              onClick={() => setTab('graph')}
             >
-              网格
+              图谱
             </button>
             <button 
-              className={`${styles.viewBtn} ${viewMode === 'list' ? styles.active : ''}`}
-              onClick={() => setViewMode('list')}
+              className={`${styles.viewBtn} ${tab === 'list' ? styles.active : ''}`}
+              onClick={() => setTab('list')}
             >
               列表
             </button>
@@ -186,86 +639,165 @@ export default function DomainPageContent() {
         </div>
       </header>
 
-      <main className={styles.main}>
-        <div className={styles.entityList}>
-          <h2>实体列表 ({filteredDomains.length})</h2>
-          {filteredDomains.map(entity => (
-            <div 
-              key={entity.id}
-              className={`${styles.entityCard} ${selectedEntity?.id === entity.id ? styles.selected : ''}`}
-              onClick={() => setSelectedEntity(entity)}
-            >
-              <div className={styles.entityHeader}>
-                <span 
-                  className={styles.entityType}
-                  style={{ backgroundColor: entityTypeStyles[entity.type]?.color || '#666' }}
-                >
-                  {entityTypeStyles[entity.type]?.label || entity.type}
-                </span>
-                <h3>{entity.name}</h3>
+      {tab === 'graph' ? (
+        <div className={styles.graphWrapper}>
+          <Toolbar 
+            onAddEntity={() => setShowAddEntity(true)}
+            onAddRelation={() => setShowAddRelation(true)}
+            onSave={handleSave}
+            hasChanges={hasChanges}
+          />
+          <DomainFlow
+            entities={domains}
+            relations={relations}
+            onEntitySelect={setSelectedEntity}
+            selectedEntityId={selectedEntity?.id || null}
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={handleNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+          />
+          
+          {/* 实体详情面板 */}
+          {selectedEntity && (
+            <div className={styles.entityDetail}>
+              <div className={styles.detailHeader}>
+                <h2>{selectedEntity.name}</h2>
+                <div className={styles.detailActions}>
+                  <button 
+                    onClick={() => handleDeleteEntity(selectedEntity.id)}
+                    className={styles.deleteBtn}
+                  >
+                    删除
+                  </button>
+                  <button onClick={() => setSelectedEntity(null)} className={styles.closeBtn}>×</button>
+                </div>
               </div>
-              <p className={styles.entityDesc}>{entity.description}</p>
-              <div className={styles.entityAttrs}>
-                {entity.attributes.slice(0, 3).map(attr => (
-                  <span key={attr.name} className={styles.attrTag}>
-                    {attr.name}
-                    {attr.required && <span className={styles.required}>*</span>}
-                  </span>
-                ))}
-                {entity.attributes.length > 3 && (
-                  <span className={styles.moreAttrs}>+{entity.attributes.length - 3}</span>
-                )}
-              </div>
+              <p>{selectedEntity.description}</p>
+              <h3>属性</h3>
+              <table className={styles.attrTable}>
+                <thead>
+                  <tr>
+                    <th>名称</th>
+                    <th>类型</th>
+                    <th>必填</th>
+                    <th>描述</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedEntity.attributes.map(attr => (
+                    <tr key={attr.name}>
+                      <td>{attr.name}</td>
+                      <td><code>{attr.type}</code></td>
+                      <td>{attr.required ? '是' : '否'}</td>
+                      <td>{attr.description}</td>
+                    </tr>
+                  ))}
+                  {selectedEntity.attributes.length === 0 && (
+                    <tr>
+                      <td colSpan={4} style={{ textAlign: 'center', color: '#666' }}>
+                        暂无属性
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
-          ))}
+          )}
         </div>
-
-        <div className={styles.relationList}>
-          <h2>关系列表 ({relations.length})</h2>
-          {relations.map(relation => (
-            <div key={relation.id} className={styles.relationCard}>
-              <span 
-                className={styles.relationType}
-                style={{ backgroundColor: relationTypeStyles[relation.relationType]?.color || '#666' }}
+      ) : (
+        <main className={styles.main}>
+          <div className={styles.entityList}>
+            <h2>实体列表 ({filteredDomains.length})</h2>
+            {filteredDomains.map(entity => (
+              <div 
+                key={entity.id}
+                className={`${styles.entityCard} ${selectedEntity?.id === entity.id ? styles.selected : ''}`}
+                onClick={() => setSelectedEntity(entity)}
               >
-                {relationTypeStyles[relation.relationType]?.label || relation.relationType}
-              </span>
-              <span className={styles.relationLabel}>{relation.description}</span>
-            </div>
-          ))}
-        </div>
-      </main>
-
-      {selectedEntity && (
-        <div className={styles.entityDetail}>
-          <div className={styles.detailHeader}>
-            <h2>{selectedEntity.name}</h2>
-            <button onClick={() => setSelectedEntity(null)} className={styles.closeBtn}>×</button>
+                <div className={styles.entityHeader}>
+                  <span 
+                    className={styles.entityType}
+                    style={{ backgroundColor: entityTypeStyles[entity.type]?.color || '#666' }}
+                  >
+                    {entityTypeStyles[entity.type]?.label || entity.type}
+                  </span>
+                  <h3>{entity.name}</h3>
+                </div>
+                <p className={styles.entityDesc}>{entity.description}</p>
+                <div className={styles.entityAttrs}>
+                  {entity.attributes.slice(0, 3).map(attr => (
+                    <span key={attr.name} className={styles.attrTag}>
+                      {attr.name}
+                      {attr.required && <span className={styles.required}>*</span>}
+                    </span>
+                  ))}
+                  {entity.attributes.length > 3 && (
+                    <span className={styles.moreAttrs}>+{entity.attributes.length - 3}</span>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
-          <p>{selectedEntity.description}</p>
-          <h3>属性</h3>
-          <table className={styles.attrTable}>
-            <thead>
-              <tr>
-                <th>名称</th>
-                <th>类型</th>
-                <th>必填</th>
-                <th>描述</th>
-              </tr>
-            </thead>
-            <tbody>
-              {selectedEntity.attributes.map(attr => (
-                <tr key={attr.name}>
-                  <td>{attr.name}</td>
-                  <td><code>{attr.type}</code></td>
-                  <td>{attr.required ? '是' : '否'}</td>
-                  <td>{attr.description}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+
+          <div className={styles.relationList}>
+            <h2>关系列表 ({relations.length})</h2>
+            {relations.map(relation => {
+              const fromEntity = domains.find(d => d.id === relation.fromEntityId)
+              const toEntity = domains.find(d => d.id === relation.toEntityId)
+              const relStyle = relationTypeStyles[relation.relationType] || { color: '#666', label: relation.relationType }
+              
+              return (
+                <div key={relation.id} className={styles.relationCard}>
+                  <div className={styles.relationEndpoints}>
+                    <span className={styles.relationEntity}>{fromEntity?.name || relation.fromEntityId}</span>
+                    <span className={styles.relationArrow} style={{ color: relStyle.color }}>
+                      <span className={styles.arrowLine}></span>
+                      <span className={styles.arrowLabel}>{relStyle.label}</span>
+                      <span className={styles.arrowLine}></span>
+                    </span>
+                    <span className={styles.relationEntity}>{toEntity?.name || relation.toEntityId}</span>
+                    <button 
+                      onClick={() => handleDeleteRelation(relation.id)}
+                      className={styles.deleteBtn}
+                      style={{ marginLeft: 'auto' }}
+                    >
+                      删除
+                    </button>
+                  </div>
+                  {relation.description && (
+                    <p className={styles.relationDesc}>{relation.description}</p>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </main>
+      )}
+
+      {/* 对话框 */}
+      {showAddEntity && (
+        <AddEntityDialog
+          onClose={() => setShowAddEntity(false)}
+          onSave={handleAddEntity}
+        />
+      )}
+      {showAddRelation && (
+        <AddRelationDialog
+          entities={domains}
+          onClose={() => setShowAddRelation(false)}
+          onSave={handleAddRelation}
+        />
       )}
     </div>
+  )
+}
+
+export default function DomainPage() {
+  return (
+    <Suspense fallback={<div className={styles.loading}>Loading...</div>}>
+      <DomainPageContent />
+    </Suspense>
   )
 }

@@ -442,6 +442,10 @@
   gap: 8px;
   opacity: 0;
   transition: opacity var(--duration-normal) var(--ease-out-expo);
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
 }
 
 .projectCard:hover .projectActions {

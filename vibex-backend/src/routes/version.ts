@@ -7,7 +7,7 @@ const app = new Hono()
 app.use('/*', cors())
 
 // Version endpoint
-app.get('/api/version', (c) => {
+app.get('/', (c) => {
   const version = process.env.VERSION || process.env.npm_package_version || '1.0.0'
   const commit = process.env.COMMIT_HASH || 'unknown'
   const timestamp = new Date().toISOString()

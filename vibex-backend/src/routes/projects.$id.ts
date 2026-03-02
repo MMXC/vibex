@@ -9,6 +9,7 @@ interface ProjectRow {
   name: string;
   description: string | null;
   userId: string;
+  deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -33,6 +34,75 @@ projectId.get('/', async (c) => {
   } catch (error) {
     console.error('Error fetching project:', error);
     return c.json({ error: 'Failed to fetch project' }, 500);
+  }
+});
+
+// PATCH /api/projects/:id/soft-delete - Soft delete (move to trash)
+projectId.patch('/soft-delete', async (c) => {
+  try {
+    const id = c.req.param('id');
+    const env = c.env;
+
+    const now = new Date().toISOString();
+
+    await executeDB(
+      env,
+      'UPDATE Project SET deletedAt = ?, updatedAt = ? WHERE id = ?',
+      [now, now, id]
+    );
+
+    const project = await queryOne<ProjectRow>(
+      env,
+      'SELECT * FROM Project WHERE id = ?',
+      [id]
+    );
+
+    return c.json({ project });
+  } catch (error) {
+    console.error('Error soft-deleting project:', error);
+    return c.json({ error: 'Failed to soft-delete project' }, 500);
+  }
+});
+
+// PATCH /api/projects/:id/restore - Restore from trash
+projectId.patch('/restore', async (c) => {
+  try {
+    const id = c.req.param('id');
+    const env = c.env;
+
+    const now = new Date().toISOString();
+
+    await executeDB(
+      env,
+      'UPDATE Project SET deletedAt = NULL, updatedAt = ? WHERE id = ?',
+      [now, id]
+    );
+
+    const project = await queryOne<ProjectRow>(
+      env,
+      'SELECT * FROM Project WHERE id = ?',
+      [id]
+    );
+
+    return c.json({ project });
+  } catch (error) {
+    console.error('Error restoring project:', error);
+    return c.json({ error: 'Failed to restore project' }, 500);
+  }
+});
+
+// DELETE /api/projects/:id/permanent - Permanently delete
+projectId.delete('/permanent', async (c) => {
+  try {
+    const id = c.req.param('id');
+    const env = c.env;
+
+    await executeDB(env, 'DELETE FROM Project WHERE id = ?', [id]);
+
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Error permanently deleting project:', error);
+    return c.json({ error: 'Failed to permanently delete project' }, 500);
   }
 });
 
@@ -82,13 +152,23 @@ projectId.put('/', async (c) => {
   }
 });
 
-// DELETE /api/projects/:id - Delete project
+// DELETE /api/projects/:id - Delete project (soft delete by default)
 projectId.delete('/', async (c) => {
   try {
     const id = c.req.param('id');
+    const permanent = c.req.query('permanent') === 'true';
     const env = c.env;
 
-    await executeDB(env, 'DELETE FROM Project WHERE id = ?', [id]);
+    if (permanent) {
+      await executeDB(env, 'DELETE FROM Project WHERE id = ?', [id]);
+    } else {
+      const now = new Date().toISOString();
+      await executeDB(
+        env,
+        'UPDATE Project SET deletedAt = ?, updatedAt = ? WHERE id = ?',
+        [now, now, id]
+      );
+    }
 
     return c.json({ success: true });
   } catch (error) {

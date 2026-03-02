@@ -8,21 +8,22 @@ interface ProjectRow {
   name: string;
   description: string | null;
   userId: string;
+  deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
-// GET /api/projects - List all projects (or filter by userId)
+// GET /api/projects - List active projects (exclude soft-deleted)
 projects.get('/', async (c) => {
   try {
     const userId = c.req.query('userId');
     const env = c.env;
 
-    let sql = 'SELECT * FROM Project';
+    let sql = 'SELECT * FROM Project WHERE deletedAt IS NULL';
     const params: string[] = [];
 
     if (userId) {
-      sql += ' WHERE userId = ?';
+      sql += ' AND userId = ?';
       params.push(userId);
     }
     sql += ' ORDER BY createdAt DESC';
@@ -33,6 +34,30 @@ projects.get('/', async (c) => {
   } catch (error) {
     console.error('Error fetching projects:', error);
     return c.json({ error: 'Failed to fetch projects' }, 500);
+  }
+});
+
+// GET /api/projects/trash - Get soft-deleted projects (recycle bin)
+projects.get('/trash', async (c) => {
+  try {
+    const userId = c.req.query('userId');
+    const env = c.env;
+
+    let sql = 'SELECT * FROM Project WHERE deletedAt IS NOT NULL';
+    const params: string[] = [];
+
+    if (userId) {
+      sql += ' AND userId = ?';
+      params.push(userId);
+    }
+    sql += ' ORDER BY deletedAt DESC';
+
+    const projectsList = await queryDB<ProjectRow>(env, sql, params);
+
+    return c.json({ projects: projectsList });
+  } catch (error) {
+    console.error('Error fetching trash:', error);
+    return c.json({ error: 'Failed to fetch trash' }, 500);
   }
 });
 

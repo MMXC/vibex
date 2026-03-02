@@ -3,6 +3,7 @@ import { cors } from 'hono/cors';
 import { serve } from '@hono/node-server';
 import { CloudflareEnv, getLocalEnv } from './lib/env';
 import projects from './routes/projects';
+import projectId from './routes/projects.$id';
 import pages from './routes/pages';
 import agents from './routes/agents';
 import chat from './routes/chat';
@@ -55,6 +56,7 @@ app.get('/', (c) => {
 
 // API Routes
 app.route('/api/projects', projects);
+app.route('/api/projects/:id', projectId);
 app.route('/api/pages', pages);
 app.route('/api/agents', agents);
 app.route('/api/chat', chat);

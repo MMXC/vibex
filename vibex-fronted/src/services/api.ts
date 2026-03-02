@@ -42,6 +42,7 @@ export interface Project {
   description?: string | null;
   createdAt?: string;
   updatedAt?: string;
+  deletedAt?: string | null;
   pages?: Page[];
 }
 
@@ -649,6 +650,56 @@ export class ApiService {
   async deleteProject(projectId: string): Promise<SuccessResponse> {
     return this.withRetry(async () => {
       const response = await this.client.delete<SuccessResponse>(`/projects/${projectId}`);
+      return response.data;
+    });
+  }
+
+  /**
+   * 软删除项目（移到回收站）
+   */
+  async softDeleteProject(projectId: string): Promise<Project> {
+    return this.withRetry(async () => {
+      const response = await this.client.patch<{ project: Project }>(`/projects/${projectId}/soft-delete`, {});
+      return response.data.project;
+    });
+  }
+
+  /**
+   * 恢复已删除的项目
+   */
+  async restoreProject(projectId: string): Promise<Project> {
+    return this.withRetry(async () => {
+      const response = await this.client.patch<{ project: Project }>(`/projects/${projectId}/restore`, {});
+      return response.data.project;
+    });
+  }
+
+  /**
+   * 永久删除项目
+   */
+  async permanentDeleteProject(projectId: string): Promise<SuccessResponse> {
+    return this.withRetry(async () => {
+      const response = await this.client.delete<SuccessResponse>(`/projects/${projectId}/permanent`);
+      return response.data;
+    });
+  }
+
+  /**
+   * 获取回收站中的项目
+   */
+  async getDeletedProjects(): Promise<Project[]> {
+    return this.withRetry(async () => {
+      const response = await this.client.get<{ projects: Project[] }>('/projects/deleted');
+      return response.data.projects;
+    });
+  }
+
+  /**
+   * 清空回收站
+   */
+  async clearDeletedProjects(): Promise<SuccessResponse> {
+    return this.withRetry(async () => {
+      const response = await this.client.delete<SuccessResponse>('/projects/deleted-all');
       return response.data;
     });
   }

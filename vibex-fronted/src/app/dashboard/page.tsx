@@ -9,13 +9,38 @@ import { apiService, Project } from '@/services/api'
 export default function Dashboard() {
   const router = useRouter()
   const [projects, setProjects] = useState<Project[]>([])
+  const [deletedProjects, setDeletedProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [userId, setUserId] = useState<string | null>(null)
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const [showTrash, setShowTrash] = useState(false)
+  const [draggingId, setDraggingId] = useState<string | null>(null)
+
+  // 加载项目列表
+  const fetchProjects = async (userId: string) => {
+    try {
+      const data = await apiService.getProjects(userId)
+      // 过滤未删除的项目
+      setProjects(data.filter(p => !p.deletedAt))
+    } catch (err: any) {
+      setError(err.message || '加载项目失败')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 加载回收站项目
+  const fetchDeletedProjects = async () => {
+    try {
+      const data = await apiService.getDeletedProjects()
+      setDeletedProjects(data)
+    } catch (err: any) {
+      console.error('加载回收站失败:', err)
+    }
+  }
 
   useEffect(() => {
-    // 检查登录状态
     const token = localStorage.getItem('auth_token')
     const storedUserId = localStorage.getItem('user_id')
     
@@ -25,26 +50,75 @@ export default function Dashboard() {
     }
     
     setUserId(storedUserId)
-    
-    // 加载项目列表
-    const fetchProjects = async () => {
-      if (!storedUserId) {
-        setLoading(false)
-        return
-      }
-      
-      try {
-        const data = await apiService.getProjects(storedUserId)
-        setProjects(data)
-      } catch (err: any) {
-        setError(err.message || '加载项目失败')
-      } finally {
-        setLoading(false)
-      }
+    if (storedUserId) {
+      fetchProjects(storedUserId)
+    } else {
+      setLoading(false)
     }
-    
-    fetchProjects()
   }, [router])
+
+  // 拖拽处理
+  const handleDragStart = (e: React.DragEvent, projectId: string) => {
+    setDraggingId(projectId)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  const handleDragEnd = () => {
+    setDraggingId(null)
+  }
+
+  // 拖拽到垃圾桶删除
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault()
+    if (!draggingId) return
+    
+    try {
+      await apiService.softDeleteProject(draggingId)
+      // 从列表移除
+      setProjects(projects.filter(p => p.id !== draggingId))
+      // 刷新回收站
+      await fetchDeletedProjects()
+    } catch (err: any) {
+      setError(err.message || '删除失败')
+    }
+    setDraggingId(null)
+  }
+
+  // 恢复项目
+  const handleRestore = async (projectId: string) => {
+    try {
+      await apiService.restoreProject(projectId)
+      // 刷新列表
+      if (userId) fetchProjects(userId)
+      await fetchDeletedProjects()
+    } catch (err: any) {
+      setError(err.message || '恢复失败')
+    }
+  }
+
+  // 永久删除
+  const handlePermanentDelete = async (projectId: string) => {
+    if (!confirm('确定要永久删除此项目吗？此操作不可恢复！')) return
+    
+    try {
+      await apiService.permanentDeleteProject(projectId)
+      await fetchDeletedProjects()
+    } catch (err: any) {
+      setError(err.message || '删除失败')
+    }
+  }
+
+  // 清空回收站
+  const handleClearAll = async () => {
+    if (!confirm('确定要清空回收站吗？所有项目将被永久删除！')) return
+    
+    try {
+      await apiService.clearDeletedProjects()
+      setDeletedProjects([])
+    } catch (err: any) {
+      setError(err.message || '清空失败')
+    }
+  }
 
   // 点击外部关闭下拉菜单
   useEffect(() => {
@@ -310,6 +384,71 @@ export default function Dashboard() {
           </div>
         </section>
       </main>
+
+      {/* 垃圾桶图标 */}
+      <button 
+        className={styles.trashButton}
+        onClick={() => { setShowTrash(!showTrash); if (!showTrash) fetchDeletedProjects(); }}
+        title="回收站"
+      >
+        🗑️
+        {deletedProjects.length > 0 && (
+          <span className={styles.trashBadge}>{deletedProjects.length}</span>
+        )}
+      </button>
+
+      {/* 回收站弹窗 */}
+      {showTrash && (
+        <div className={styles.trashPopup}>
+          <div className={styles.trashHeader}>
+            <h3>回收站</h3>
+            {deletedProjects.length > 0 && (
+              <button className={styles.clearAllBtn} onClick={handleClearAll}>
+                清空
+              </button>
+            )}
+          </div>
+          <div className={styles.trashList}>
+            {deletedProjects.length === 0 ? (
+              <p className={styles.emptyTrash}>回收站为空</p>
+            ) : (
+              deletedProjects.map(project => (
+                <div key={project.id} className={styles.trashItem}>
+                  <div className={styles.trashItemInfo}>
+                    <span className={styles.trashItemName}>{project.name}</span>
+                    <span className={styles.trashItemDate}>
+                      删除于 {project.deletedAt ? new Date(project.deletedAt).toLocaleDateString() : '-'}
+                    </span>
+                  </div>
+                  <div className={styles.trashItemActions}>
+                    <button 
+                      className={styles.restoreBtn}
+                      onClick={() => handleRestore(project.id)}
+                    >
+                      恢复
+                    </button>
+                    <button 
+                      className={styles.deleteBtn}
+                      onClick={() => handlePermanentDelete(project.id)}
+                    >
+                      删除
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 垃圾桶拖放区域 */}
+      <div 
+        className={`${styles.trashDropZone} ${draggingId ? styles.active : ''}`}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={handleDrop}
+      >
+        {draggingId && <span>拖放到此处删除</span>}
+      </div>
     </div>
   )
 }

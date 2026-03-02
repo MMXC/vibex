@@ -33,6 +33,8 @@ model Project {
   pages    Page[]
   messages Message[]
   flows    FlowData[]
+  requirements Requirement[]
+  prototypeSnapshots PrototypeSnapshot[]
 }
 
 model Page {
@@ -89,4 +91,102 @@ model FlowData {
   updatedAt DateTime @updatedAt
 
   project Project @relation(fields: [projectId], references: [id])
+}
+
+// AI Prototype Builder Models
+
+model Requirement {
+  id          String   @id @default(cuid())
+  projectId   String
+  rawInput    String   // 原始需求文本
+  parsedData  String?  // JSON: 结构化解析结果
+  status      String   @default("draft") // draft, analyzing, clarified, confirmed
+  priority    String   @default("medium") // low, medium, high, critical
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  project     Project  @relation(fields: [projectId], references: [id])
+  entities    DomainEntity[]
+}
+
+model DomainEntity {
+  id            String   @id @default(cuid())
+  requirementId String
+  name          String
+  type          String   // person, place, object, concept, event
+  description   String?
+  properties    String?  // JSON: 属性列表
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  requirement   Requirement @relation(fields: [requirementId], references: [id])
+  relationsFrom EntityRelation[] @relation("EntityRelationFrom")
+  relationsTo   EntityRelation[] @relation("EntityRelationTo")
+}
+
+model EntityRelation {
+  id          String   @id @default(cuid())
+  fromEntityId String
+  toEntityId   String
+  relationType String   // owns, uses, contains, depends-on, etc.
+  description  String?
+  createdAt    DateTime @default(now())
+  
+  fromEntity   DomainEntity @relation("EntityRelationFrom", fields: [fromEntityId], references: [id])
+  toEntity     DomainEntity @relation("EntityRelationTo", fields: [toEntityId], references: [id])
+}
+
+model PrototypeSnapshot {
+  id          String   @id @default(cuid())
+  projectId   String
+  version     Int      @default(1)
+  name        String?
+  description String?
+  content     String   // JSON: 界面快照数据
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  project     Project  @relation(fields: [projectId], references: [id])
+}
+
+// Prototype Collaboration - Manages collaborators on prototype projects
+
+model PrototypeCollaboration {
+  id          String   @id @default(cuid())
+  projectId   String
+  userId      String
+  userName    String?
+  userEmail   String?
+  role        String   @default("viewer") // owner, editor, viewer
+  status      String   @default("active") // active, pending, revoked
+  invitedBy   String?
+  invitedAt   DateTime?
+  joinedAt    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([projectId, userId]) // One collaboration per user per project
+  @@index([projectId])
+  @@index([userId])
+}
+
+// Component Library - Stores UI component definitions
+model Component {
+  id            String   @id @default(cuid())
+  name          String
+  category      String   // layout, basic, display, feedback, etc.
+  description   String?
+  props         String   @default("{}")  // JSON: default props
+  variants      String   @default("[]")  // JSON: array of variants
+  style         String   @default("{}")  // JSON: default style
+  interactions  String   @default("{}")  // JSON: interaction config
+  replaceable   Boolean  @default(false) // can be replaced by alternatives
+  alternatives  String   @default("[]")  // JSON: alternative component names
+  projectId     String?  // optional project association for custom components
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([category])
+  @@index([projectId])
+  @@index([name])
 }

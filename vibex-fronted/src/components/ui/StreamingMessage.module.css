@@ -1,0 +1,36 @@
+.container {
+  display: inline-block;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.content {
+  line-height: 1.6;
+  color: #e0e0e0;
+}
+
+.cursor {
+  display: inline-block;
+  margin-left: 2px;
+  font-weight: bold;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+}
+
+.cursor.visible {
+  opacity: 1;
+}
+
+/* Streaming animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.cursor {
+  animation: pulse 1s ease-in-out infinite;
+}

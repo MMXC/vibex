@@ -63,12 +63,15 @@ export interface Message {
   content: string;
   projectId: string;
   createdAt?: string;
+  quotedMessageId?: string;
+  quotedContent?: string;
 }
 
 export interface MessageCreate {
   content: string;
   projectId: string;
   role?: 'user' | 'assistant' | 'system';
+  quotedMessageId?: string;
 }
 
 // 流程图
@@ -144,6 +147,214 @@ export interface SuccessResponse {
 
 export interface ApiError {
   error: string;
+}
+
+// ==================== AI 原型设计工具类型 ====================
+
+// 需求
+export interface Requirement {
+  id: string;
+  userId: string;
+  content: string;
+  templateId?: string | null;
+  status: RequirementStatus;
+  analysisResult?: AnalysisResult | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type RequirementStatus = 'draft' | 'analyzing' | 'clarifying' | 'completed' | 'failed';
+
+export interface RequirementCreate {
+  content: string;
+  templateId?: string;
+  userId: string;
+}
+
+export interface RequirementUpdate {
+  content?: string;
+  templateId?: string;
+  status?: RequirementStatus;
+}
+
+// 需求分析结果
+export interface AnalysisResult {
+  requirementId: string;
+  domains: DomainEntity[];
+  relations: EntityRelation[];
+  uiSchema?: UISchema;
+  confidence: number;
+  analyzedAt: string;
+}
+
+// 领域实体
+export interface DomainEntity {
+  id: string;
+  requirementId: string;
+  name: string;
+  type: EntityType;
+  description?: string;
+  attributes: EntityAttribute[];
+  position?: { x: number; y: number };
+  createdAt?: string;
+}
+
+export type EntityType = 'user' | 'system' | 'business' | 'data' | 'external' | 'abstract';
+
+export interface EntityAttribute {
+  name: string;
+  type: string;
+  required: boolean;
+  description?: string;
+}
+
+// 实体关系
+export interface EntityRelation {
+  id: string;
+  fromEntityId: string;
+  toEntityId: string;
+  relationType: string;
+  description?: string;
+  createdAt?: string;
+}
+
+export type RelationType = 'inheritance' | 'composition' | 'aggregation' | 'association' | 'dependency' | 'realization';
+
+// UI Schema
+export interface UISchema {
+  version: string;
+  pages: UIPage[];
+  theme?: UITheme;
+}
+
+export interface UIPage {
+  id: string;
+  name: string;
+  route: string;
+  components: UIComponent[];
+  layout?: UILayout;
+}
+
+export interface UIComponent {
+  id: string;
+  type: ComponentType;
+  props: Record<string, any>;
+  children?: UIComponent[];
+}
+
+export type ComponentType = 'form' | 'table' | 'list' | 'card' | 'navigation' | 'chart' | 'media' | 'layout' | 'input' | 'button' | 'text' | 'image' | 'container';
+
+export interface UILayout {
+  type: 'single' | 'split' | 'grid' | 'sidebar';
+  sections?: UISection[];
+}
+
+export interface UISection {
+  id: string;
+  components: string[]; // component ids
+  ratio?: number;
+}
+
+// UI Theme
+export interface UITheme {
+  colors: ThemeColors;
+  typography: ThemeTypography;
+  spacing: ThemeSpacing;
+  responsive: ThemeResponsive;
+}
+
+export interface ThemeColors {
+  primary: string;
+  secondary: string;
+  background: string;
+  surface: string;
+  text: string;
+  border: string;
+  [key: string]: string;
+}
+
+export interface ThemeTypography {
+  fontFamily: string;
+  fontSize: Record<string, string>;
+  fontWeight: Record<string, number>;
+  lineHeight: Record<string, number>;
+}
+
+export interface ThemeSpacing {
+  unit: number;
+  scale: number[];
+}
+
+export interface ThemeResponsive {
+  breakpoints: Record<string, number>;
+}
+
+// 原型快照
+export interface PrototypeSnapshot {
+  id: string;
+  projectId: string;
+  version: number;
+  name?: string;
+  description?: string;
+  content?: string; // JSON: 界面快照数据
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface PrototypeSnapshotCreate {
+  projectId: string;
+  version?: number;
+  name?: string;
+  description?: string;
+  content?: string;
+}
+
+// 反馈
+export interface Feedback {
+  id: string;
+  prototypeSnapshotId: string;
+  userId: string;
+  type: FeedbackType;
+  content: string;
+  position?: { x: number; y: number };
+  status: FeedbackStatus;
+  createdAt?: string;
+}
+
+export type FeedbackType = 'bug' | 'suggestion' | 'question' | 'praise';
+export type FeedbackStatus = 'open' | 'resolved' | 'dismissed';
+
+export interface FeedbackCreate {
+  prototypeSnapshotId: string;
+  type: FeedbackType;
+  content: string;
+  position?: { x: number; y: number };
+}
+
+// 澄清对话
+export interface Clarification {
+  id: string;
+  requirementId: string;
+  question: string;
+  answer?: string;
+  status: ClarificationStatus;
+  createdAt?: string;
+}
+
+export type ClarificationStatus = 'pending' | 'answered' | 'skipped';
+
+// 对话分支
+export interface ConversationBranch {
+  id: string;
+  parentMessageId: string;
+  branchName: string;
+  messages: Message[];
+  createdAt?: string;
+}
+
+export interface ConversationBranchCreate {
+  parentMessageId: string;
+  branchName: string;
 }
 
 // ==================== API 服务类 ====================
@@ -668,6 +879,406 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.delete<SuccessResponse>(`/pages/${pageId}`);
       return response.data;
+    });
+  }
+
+  // ==================== 领域实体 (DomainEntity) ====================
+
+  /**
+   * 获取需求的所有领域实体
+   */
+  async getDomainEntities(requirementId: string): Promise<DomainEntity[]> {
+    const cacheKey = `domain_entities_${requirementId}`;
+    const cached = this.getFromCache<DomainEntity[]>(cacheKey);
+    
+    if (!this.isOnline() && cached) {
+      return cached;
+    }
+
+    return this.withRetry(async () => {
+      const response = await this.client.get<{ domains: DomainEntity[] }>(`/requirements/${requirementId}/domains`);
+      this.setToCache(cacheKey, response.data.domains);
+      return response.data.domains;
+    });
+  }
+
+  /**
+   * 获取单个领域实体
+   */
+  async getDomainEntity(entityId: string): Promise<DomainEntity> {
+    const cacheKey = `domain_entity_${entityId}`;
+    const cached = this.getFromCache<DomainEntity>(cacheKey);
+    
+    if (!this.isOnline() && cached) {
+      return cached;
+    }
+
+    return this.withRetry(async () => {
+      const response = await this.client.get<{ domain: DomainEntity }>(`/domains/${entityId}`);
+      this.setToCache(cacheKey, response.data.domain);
+      return response.data.domain;
+    });
+  }
+
+  /**
+   * 创建领域实体
+   */
+  async createDomainEntity(entity: Omit<DomainEntity, 'id' | 'createdAt'>): Promise<DomainEntity> {
+    return this.withRetry(async () => {
+      const response = await this.client.post<{ domain: DomainEntity }>(`/requirements/${entity.requirementId}/domains`, entity);
+      // 清除缓存
+      this.clearCache(`domain_entities_${entity.requirementId}`);
+      return response.data.domain;
+    });
+  }
+
+  /**
+   * 更新领域实体
+   */
+  async updateDomainEntity(entityId: string, data: Partial<DomainEntity>): Promise<DomainEntity> {
+    return this.withRetry(async () => {
+      const response = await this.client.put<{ domain: DomainEntity }>(`/domains/${entityId}`, data);
+      // 清除相关缓存
+      if (data.requirementId) {
+        this.clearCache(`domain_entities_${data.requirementId}`);
+      }
+      return response.data.domain;
+    });
+  }
+
+  /**
+   * 删除领域实体
+   */
+  async deleteDomainEntity(entityId: string, requirementId: string): Promise<SuccessResponse> {
+    return this.withRetry(async () => {
+      const response = await this.client.delete<SuccessResponse>(`/domains/${entityId}`);
+      this.clearCache(`domain_entities_${requirementId}`);
+      return response.data;
+    });
+  }
+
+  // ==================== 实体关系 (EntityRelation) ====================
+
+  /**
+   * 获取需求的所有实体关系
+   */
+  async getEntityRelations(requirementId: string): Promise<EntityRelation[]> {
+    const cacheKey = `entity_relations_${requirementId}`;
+    const cached = this.getFromCache<EntityRelation[]>(cacheKey);
+    
+    if (!this.isOnline() && cached) {
+      return cached;
+    }
+
+    return this.withRetry(async () => {
+      const response = await this.client.get<{ entityRelations: EntityRelation[] }>(`/entity-relations?requirementId=${requirementId}`);
+      this.setToCache(cacheKey, response.data.entityRelations);
+      return response.data.entityRelations;
+    });
+  }
+
+  /**
+   * 获取单个实体关系
+   */
+  async getEntityRelation(relationId: string): Promise<EntityRelation> {
+    const cacheKey = `entity_relation_${relationId}`;
+    const cached = this.getFromCache<EntityRelation>(cacheKey);
+    
+    if (!this.isOnline() && cached) {
+      return cached;
+    }
+
+    return this.withRetry(async () => {
+      const response = await this.client.get<{ entityRelation: EntityRelation }>(`/entity-relations/${relationId}`);
+      this.setToCache(cacheKey, response.data.entityRelation);
+      return response.data.entityRelation;
+    });
+  }
+
+  /**
+   * 创建实体关系
+   * @param relation 实体关系数据
+   * @param requirementId 需求ID（用于清除缓存）
+   */
+  async createEntityRelation(relation: Omit<EntityRelation, 'id'>, requirementId?: string): Promise<EntityRelation> {
+    return this.withRetry(async () => {
+      const response = await this.client.post<{ entityRelation: EntityRelation }>(`/entity-relations`, relation);
+      // 清除缓存
+      if (requirementId) {
+        this.clearCache(`entity_relations_${requirementId}`);
+      }
+      return response.data.entityRelation;
+    });
+  }
+
+  /**
+   * 更新实体关系
+   * @param relationId 关系ID
+   * @param data 更新数据
+   * @param requirementId 需求ID（用于清除缓存）
+   */
+  async updateEntityRelation(relationId: string, data: Partial<EntityRelation>, requirementId?: string): Promise<EntityRelation> {
+    return this.withRetry(async () => {
+      const response = await this.client.put<{ entityRelation: EntityRelation }>(`/entity-relations/${relationId}`, data);
+      // 清除相关缓存
+      if (requirementId) {
+        this.clearCache(`entity_relations_${requirementId}`);
+      }
+      return response.data.entityRelation;
+    });
+  }
+
+  /**
+   * 删除实体关系
+   */
+  async deleteEntityRelation(relationId: string, requirementId: string): Promise<SuccessResponse> {
+    return this.withRetry(async () => {
+      const response = await this.client.delete<SuccessResponse>(`/entity-relations/${relationId}`);
+      this.clearCache(`entity_relations_${requirementId}`);
+      return response.data;
+    });
+  }
+
+  // ==================== 原型快照 (PrototypeSnapshot) ====================
+
+  /**
+   * 获取项目的所有原型快照
+   */
+  async getPrototypeSnapshots(projectId: string): Promise<PrototypeSnapshot[]> {
+    const cacheKey = `prototype_snapshots_${projectId}`;
+    const cached = this.getFromCache<PrototypeSnapshot[]>(cacheKey);
+    
+    if (!this.isOnline() && cached) {
+      return cached;
+    }
+
+    return this.withRetry(async () => {
+      const response = await this.client.get<{ prototypeSnapshots: PrototypeSnapshot[] }>(`/prototype-snapshots?projectId=${projectId}`);
+      this.setToCache(cacheKey, response.data.prototypeSnapshots);
+      return response.data.prototypeSnapshots;
+    });
+  }
+
+  /**
+   * 获取单个原型快照
+   */
+  async getPrototypeSnapshot(snapshotId: string): Promise<PrototypeSnapshot> {
+    const cacheKey = `prototype_snapshot_${snapshotId}`;
+    const cached = this.getFromCache<PrototypeSnapshot>(cacheKey);
+    
+    if (!this.isOnline() && cached) {
+      return cached;
+    }
+
+    return this.withRetry(async () => {
+      const response = await this.client.get<{ prototypeSnapshot: PrototypeSnapshot }>(`/prototype-snapshots/${snapshotId}`);
+      this.setToCache(cacheKey, response.data.prototypeSnapshot);
+      return response.data.prototypeSnapshot;
+    });
+  }
+
+  /**
+   * 创建原型快照
+   */
+  async createPrototypeSnapshot(snapshot: PrototypeSnapshotCreate): Promise<PrototypeSnapshot> {
+    return this.withRetry(async () => {
+      const response = await this.client.post<{ prototypeSnapshot: PrototypeSnapshot }>(`/prototype-snapshots`, snapshot);
+      // 清除缓存
+      this.clearCache(`prototype_snapshots_${snapshot.projectId}`);
+      return response.data.prototypeSnapshot;
+    });
+  }
+
+  /**
+   * 更新原型快照
+   */
+  async updatePrototypeSnapshot(snapshotId: string, data: Partial<PrototypeSnapshotCreate>): Promise<PrototypeSnapshot> {
+    return this.withRetry(async () => {
+      const response = await this.client.put<{ prototypeSnapshot: PrototypeSnapshot }>(`/prototype-snapshots/${snapshotId}`, data);
+      return response.data.prototypeSnapshot;
+    });
+  }
+
+  /**
+   * 删除原型快照
+   */
+  async deletePrototypeSnapshot(snapshotId: string, projectId: string): Promise<SuccessResponse> {
+    return this.withRetry(async () => {
+      const response = await this.client.delete<SuccessResponse>(`/prototype-snapshots/${snapshotId}`);
+      this.clearCache(`prototype_snapshots_${projectId}`);
+      return response.data;
+    });
+  }
+
+  // ==================== 需求 (Requirement) ====================
+
+  /**
+   * 获取用户的所有需求
+   */
+  async getRequirements(userId: string): Promise<Requirement[]> {
+    const cacheKey = `requirements_${userId}`;
+    const cached = this.getFromCache<Requirement[]>(cacheKey);
+    
+    if (!this.isOnline() && cached) {
+      return cached;
+    }
+
+    return this.withRetry(async () => {
+      const response = await this.client.get<{ requirements: Requirement[] }>('/requirements', { params: { userId } });
+      this.setToCache(cacheKey, response.data.requirements);
+      return response.data.requirements;
+    });
+  }
+
+  /**
+   * 创建需求
+   */
+  async createRequirement(requirement: RequirementCreate): Promise<Requirement> {
+    return this.withRetry(async () => {
+      const response = await this.client.post<{ requirement: Requirement }>('/requirements', requirement);
+      // 清除缓存
+      this.clearCache(`requirements_${requirement.userId}`);
+      return response.data.requirement;
+    });
+  }
+
+  /**
+   * 获取单个需求
+   */
+  async getRequirement(requirementId: string): Promise<Requirement> {
+    const cacheKey = `requirement_${requirementId}`;
+    const cached = this.getFromCache<Requirement>(cacheKey);
+    
+    if (!this.isOnline() && cached) {
+      return cached;
+    }
+
+    return this.withRetry(async () => {
+      const response = await this.client.get<{ requirement: Requirement }>(`/requirements/${requirementId}`);
+      this.setToCache(cacheKey, response.data.requirement);
+      return response.data.requirement;
+    });
+  }
+
+  /**
+   * 更新需求
+   * @param requirementId 需求ID
+   * @param data 更新数据
+   * @param userId 用户ID（用于清除列表缓存）
+   */
+  async updateRequirement(requirementId: string, data: RequirementUpdate, userId?: string): Promise<Requirement> {
+    return this.withRetry(async () => {
+      const response = await this.client.put<{ requirement: Requirement }>(`/requirements/${requirementId}`, data);
+      // 清除缓存
+      this.clearCache(`requirement_${requirementId}`);
+      // 如果提供了 userId，也清除列表缓存
+      if (userId) {
+        this.clearCache(`requirements_${userId}`);
+      }
+      return response.data.requirement;
+    });
+  }
+
+  /**
+   * 删除需求
+   */
+  async deleteRequirement(requirementId: string, userId: string): Promise<SuccessResponse> {
+    return this.withRetry(async () => {
+      const response = await this.client.delete<SuccessResponse>(`/requirements/${requirementId}`);
+      // 清除缓存
+      this.clearCache(`requirement_${requirementId}`);
+      this.clearCache(`requirements_${userId}`);
+      return response.data;
+    });
+  }
+
+  /**
+   * 分析需求 (触发 AI 分析)
+   */
+  async analyzeRequirement(requirementId: string): Promise<Requirement> {
+    return this.withRetry(async () => {
+      const response = await this.client.post<{ requirement: Requirement }>(`/requirements/${requirementId}/analyze`);
+      // 清除缓存
+      this.clearCache(`requirement_${requirementId}`);
+      return response.data.requirement;
+    });
+  }
+
+  /**
+   * 重新分析需求 (带额外上下文)
+   */
+  async reanalyzeRequirement(requirementId: string, context?: Record<string, any>): Promise<Requirement> {
+    return this.withRetry(async () => {
+      const response = await this.client.post<{ requirement: Requirement }>(`/requirements/${requirementId}/reanalyze`, context);
+      // 清除缓存
+      this.clearCache(`requirement_${requirementId}`);
+      return response.data.requirement;
+    });
+  }
+
+  // ==================== 澄清对话 (Clarification) ====================
+
+  /**
+   * 获取需求的澄清问题列表
+   */
+  async getClarifications(requirementId: string): Promise<Clarification[]> {
+    const cacheKey = `clarifications_${requirementId}`;
+    const cached = this.getFromCache<Clarification[]>(cacheKey);
+    
+    if (!this.isOnline() && cached) {
+      return cached;
+    }
+
+    return this.withRetry(async () => {
+      const response = await this.client.get<{ clarifications: Clarification[] }>(`/requirements/${requirementId}/clarifications`);
+      this.setToCache(cacheKey, response.data.clarifications);
+      return response.data.clarifications;
+    });
+  }
+
+  /**
+   * 回答澄清问题
+   */
+  async answerClarification(requirementId: string, clarificationId: string, answer: string): Promise<Clarification> {
+    return this.withRetry(async () => {
+      const response = await this.client.put<{ clarification: Clarification }>(`/clarifications/${clarificationId}`, { answer });
+      // 清除缓存
+      this.clearCache(`clarifications_${requirementId}`);
+      // 清除需求缓存，因为回答可能会改变需求状态
+      this.clearCache(`requirement_${requirementId}`);
+      return response.data.clarification;
+    });
+  }
+
+  /**
+   * 跳过澄清问题
+   */
+  async skipClarification(requirementId: string, clarificationId: string): Promise<Clarification> {
+    return this.withRetry(async () => {
+      const response = await this.client.put<{ clarification: Clarification }>(`/clarifications/${clarificationId}`, { status: 'skipped' });
+      // 清除缓存
+      this.clearCache(`clarifications_${requirementId}`);
+      return response.data.clarification;
+    });
+  }
+
+  // ==================== 需求分析结果 ====================
+
+  /**
+   * 获取需求的分析结果
+   */
+  async getAnalysisResult(requirementId: string): Promise<AnalysisResult | null> {
+    const cacheKey = `analysis_result_${requirementId}`;
+    const cached = this.getFromCache<AnalysisResult | null>(cacheKey);
+    
+    if (!this.isOnline() && cached) {
+      return cached;
+    }
+
+    return this.withRetry(async () => {
+      const response = await this.client.get<{ analysisResult: AnalysisResult }>(`/requirements/${requirementId}/analysis`);
+      this.setToCache(cacheKey, response.data.analysisResult);
+      return response.data.analysisResult;
     });
   }
 

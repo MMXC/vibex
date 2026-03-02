@@ -1,0 +1,316 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import styles from './requirements.module.css'
+import { apiService, Requirement, RequirementStatus } from '@/services/api'
+
+// 模拟需求数据（后端 API 未实现时使用）
+const mockRequirements: Requirement[] = [
+  {
+    id: 'req-1',
+    userId: 'user-1',
+    content: '开发一个在线教育平台，包含课程浏览、视频播放、作业提交等功能',
+    status: 'completed',
+    createdAt: '2024-01-15T10:00:00Z',
+    updatedAt: '2024-01-15T14:30:00Z',
+  },
+  {
+    id: 'req-2',
+    userId: 'user-1',
+    content: '创建一个企业内部员工管理系统，支持考勤、审批、通讯录等功能',
+    status: 'analyzing',
+    createdAt: '2024-01-16T09:00:00Z',
+    updatedAt: '2024-01-16T09:15:00Z',
+  },
+  {
+    id: 'req-3',
+    userId: 'user-1',
+    content: '设计一个智能客服系统，能够自动回答常见问题',
+    status: 'clarifying',
+    createdAt: '2024-01-17T11:00:00Z',
+    updatedAt: '2024-01-17T11:20:00Z',
+  },
+  {
+    id: 'req-4',
+    userId: 'user-1',
+    content: '搭建一个数据分析仪表盘，展示销售数据、用户增长等指标',
+    status: 'draft',
+    createdAt: '2024-01-18T15:00:00Z',
+    updatedAt: '2024-01-18T15:00:00Z',
+  },
+]
+
+const statusMap: Record<RequirementStatus, { label: string; color: string }> = {
+  draft: { label: '草稿', color: '#6b7280' },
+  analyzing: { label: '分析中', color: '#3b82f6' },
+  clarifying: { label: '待澄清', color: '#f59e0b' },
+  completed: { label: '已完成', color: '#10b981' },
+  failed: { label: '失败', color: '#ef4444' },
+}
+
+export default function Requirements() {
+  const router = useRouter()
+  const [requirements, setRequirements] = useState<Requirement[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [userId, setUserId] = useState<string | null>(null)
+  const [filter, setFilter] = useState<RequirementStatus | 'all'>('all')
+
+  useEffect(() => {
+    // 检查登录状态
+    const token = localStorage.getItem('auth_token')
+    const storedUserId = localStorage.getItem('user_id')
+    
+    if (!token) {
+      router.push('/auth')
+      return
+    }
+    
+    setUserId(storedUserId)
+    
+    // 加载需求列表
+    const fetchRequirements = async () => {
+      if (!storedUserId) {
+        setLoading(false)
+        return
+      }
+      
+      try {
+        // 尝试调用 API（后端未实现时使用模拟数据）
+        // const data = await apiService.getRequirements(storedUserId)
+        // setRequirements(data)
+        
+        // 使用模拟数据
+        setTimeout(() => {
+          setRequirements(mockRequirements)
+          setLoading(false)
+        }, 500)
+      } catch (err: any) {
+        // 使用模拟数据作为后备
+        setRequirements(mockRequirements)
+        setLoading(false)
+      }
+    }
+    
+    fetchRequirements()
+  }, [router])
+
+  // 根据筛选条件过滤需求
+  const filteredRequirements = filter === 'all' 
+    ? requirements 
+    : requirements.filter(r => r.status === filter)
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('确定删除这个需求吗？')) return
+    
+    try {
+      // 调用 API 删除需求（后端未实现）
+      // await apiService.deleteRequirement(id)
+      setRequirements(requirements.filter(r => r.id !== id))
+    } catch (err: any) {
+      setError(err.message || '删除失败')
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.bgEffect}>
+          <div className={styles.gridOverlay} />
+          <div className={styles.glowOrb} />
+        </div>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          height: '100vh',
+          color: '#fff'
+        }}>
+          加载中...
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.page}>
+      {/* 背景特效 */}
+      <div className={styles.bgEffect}>
+        <div className={styles.gridOverlay} />
+        <div className={styles.glowOrb} />
+      </div>
+
+      {/* 侧边栏 */}
+      <aside className={styles.sidebar}>
+        <div className={styles.sidebarLogo}>
+          <Link href="/dashboard" className={styles.logoLink}>
+            <span className={styles.logoIcon}>◈</span>
+            <span>VibeX</span>
+          </Link>
+        </div>
+        
+        <nav className={styles.sidebarNav}>
+          <Link href="/dashboard" className={styles.navItem}>
+            <span className={styles.navIcon}>⊞</span>
+            <span>项目</span>
+          </Link>
+          <Link href="/templates" className={styles.navItem}>
+            <span className={styles.navIcon}>◫</span>
+            <span>模板</span>
+          </Link>
+          <Link href="/requirements" className={`${styles.navItem} ${styles.active}`}>
+            <span className={styles.navIcon}>📋</span>
+            <span>需求</span>
+          </Link>
+          <Link href="/requirements/new" className={styles.navItem}>
+            <span className={styles.navIcon}>➕</span>
+            <span>新建</span>
+          </Link>
+        </nav>
+
+        <div className={styles.sidebarFooter}>
+          <Link href="/project-settings" className={styles.navItem}>
+            <span className={styles.navIcon}>⚙</span>
+            <span>设置</span>
+          </Link>
+        </div>
+      </aside>
+
+      {/* 主内容 */}
+      <main className={styles.main}>
+        <header className={styles.header}>
+          <div>
+            <h1 className={styles.title}>需求管理</h1>
+            <p className={styles.subtitle}>管理你的 AI 原型设计需求</p>
+          </div>
+          <Link href="/requirements/new" className={styles.createButton}>
+            <span>+</span>
+            <span>创建新需求</span>
+          </Link>
+        </header>
+
+        {error && (
+          <div className={styles.error}>
+            {error}
+          </div>
+        )}
+
+        {/* 统计卡片 */}
+        <section className={styles.stats}>
+          {[
+            { label: '需求总数', value: requirements.length.toString(), icon: '📋', color: 'cyan' },
+            { label: '分析中', value: requirements.filter(r => r.status === 'analyzing').length.toString(), icon: '🔄', color: 'blue' },
+            { label: '已完成', value: requirements.filter(r => r.status === 'completed').length.toString(), icon: '✅', color: 'green' },
+            { label: '待澄清', value: requirements.filter(r => r.status === 'clarifying').length.toString(), icon: '❓', color: 'orange' },
+          ].map((stat, i) => (
+            <div key={i} className={`${styles.statCard} ${styles[`stat${stat.color}`]}`}>
+              <span className={styles.statIcon}>{stat.icon}</span>
+              <div className={styles.statContent}>
+                <span className={styles.statValue}>{stat.value}</span>
+                <span className={styles.statLabel}>{stat.label}</span>
+              </div>
+            </div>
+          ))}
+        </section>
+
+        {/* 筛选 */}
+        <section className={styles.filterSection}>
+          <div className={styles.filterTabs}>
+            <button
+              className={`${styles.filterTab} ${filter === 'all' ? styles.active : ''}`}
+              onClick={() => setFilter('all')}
+            >
+              全部
+            </button>
+            {Object.entries(statusMap).map(([status, { label }]) => (
+              <button
+                key={status}
+                className={`${styles.filterTab} ${filter === status ? styles.active : ''}`}
+                onClick={() => setFilter(status as RequirementStatus)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* 需求列表 */}
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>
+              {filter === 'all' ? '所有需求' : statusMap[filter as RequirementStatus]?.label + '的需求'}
+            </h2>
+            <span className={styles.count}>{filteredRequirements.length} 项</span>
+          </div>
+
+          {filteredRequirements.length === 0 ? (
+            <div className={styles.empty}>
+              <span className={styles.emptyIcon}>📋</span>
+              <p>暂无需求</p>
+              <Link href="/requirements/new" className={styles.emptyBtn}>
+                创建第一个需求
+              </Link>
+            </div>
+          ) : (
+            <div className={styles.list}>
+              {filteredRequirements.map((req) => (
+                <div key={req.id} className={styles.card}>
+                  <div className={styles.cardHeader}>
+                    <div className={styles.cardId}>#{req.id.slice(-6)}</div>
+                    <span 
+                      className={styles.statusBadge}
+                      style={{ backgroundColor: statusMap[req.status]?.color + '20', color: statusMap[req.status]?.color }}
+                    >
+                      {statusMap[req.status]?.label}
+                    </span>
+                  </div>
+                  
+                  <div className={styles.cardContent}>
+                    <p className={styles.cardText}>{req.content}</p>
+                  </div>
+                  
+                  <div className={styles.cardFooter}>
+                    <div className={styles.cardMeta}>
+                      <span className={styles.cardDate}>
+                        创建于 {req.createdAt ? new Date(req.createdAt).toLocaleDateString() : '-'}
+                      </span>
+                      <span className={styles.cardDate}>
+                        更新于 {req.updatedAt ? new Date(req.updatedAt).toLocaleDateString() : '-'}
+                      </span>
+                    </div>
+                    
+                    <div className={styles.cardActions}>
+                      <Link 
+                        href={`/requirements/${req.id}`} 
+                        className={styles.actionBtn}
+                        title="查看详情"
+                      >
+                        查看
+                      </Link>
+                      <Link 
+                        href={`/domain?requirementId=${req.id}`}
+                        className={styles.actionBtn}
+                        title="领域模型"
+                      >
+                        领域模型
+                      </Link>
+                      <button 
+                        className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                        onClick={() => handleDelete(req.id)}
+                        title="删除"
+                      >
+                        删除
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </main>
+    </div>
+  )
+}

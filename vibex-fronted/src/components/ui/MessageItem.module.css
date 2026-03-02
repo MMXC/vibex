@@ -1,0 +1,134 @@
+.container {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  max-width: 85%;
+}
+
+.container.user {
+  background: linear-gradient(135deg, #0070f3 0%, #0050d3 100%);
+  color: #fff;
+  margin-left: auto;
+  border: 1px solid rgba(0, 112, 243, 0.3);
+}
+
+.container.assistant {
+  background: rgba(30, 30, 46, 0.8);
+  color: #e0e0e0;
+  margin-right: auto;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.container.system {
+  background: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+  margin: 16px auto;
+  text-align: center;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+/* 引用样式 */
+.quote {
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border-left: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.quoteLabel {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-right: 8px;
+}
+
+.quoteContent {
+  font-size: 13px;
+  opacity: 0.9;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 消息内容 */
+.content {
+  line-height: 1.5;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+/* 元信息 */
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.time {
+  font-size: 11px;
+}
+
+/* 操作按钮 */
+.actions {
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.container:hover .actions {
+  opacity: 1;
+}
+
+.actionBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 14px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.actionBtn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* 分享菜单 */
+.shareWrapper {
+  position: relative;
+}
+
+.shareMenu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: #1e1e2e;
+  border: 1px solid #3b3b5c;
+  border-radius: 8px;
+  padding: 8px 0;
+  min-width: 120px;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.shareOption {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.shareOption:hover {
+  background: rgba(255,255,255,0.1);
+}

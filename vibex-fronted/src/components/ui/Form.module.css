@@ -1,0 +1,231 @@
+/* Form Component Styles */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* Field */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.field.hasError .input,
+.field.hasError textarea,
+.field.hasError select {
+  border-color: var(--color-error);
+}
+
+.field.hasError .input:focus,
+.field.hasError textarea:focus,
+.field.hasError select:focus {
+  box-shadow: 0 0 0 3px rgba(255, 68, 102, 0.15);
+}
+
+/* Label */
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-secondary);
+}
+
+.required {
+  color: var(--color-error);
+  margin-left: 2px;
+}
+
+/* Field Content */
+.fieldContent {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Input */
+.input,
+textarea,
+select {
+  width: 100%;
+  height: 44px;
+  padding: 0 var(--space-4);
+  font-size: var(--text-base);
+  font-family: inherit;
+  color: var(--color-text-primary);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all var(--duration-normal) var(--ease-out-expo);
+}
+
+textarea {
+  height: auto;
+  min-height: 100px;
+  padding: var(--space-3) var(--space-4);
+  resize: vertical;
+}
+
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+.input:hover,
+textarea:hover,
+select:hover {
+  border-color: var(--color-border-hover);
+}
+
+.input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-muted);
+}
+
+.input::placeholder,
+textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.input:disabled,
+textarea:disabled,
+select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--color-bg-tertiary);
+}
+
+/* Error Input */
+.inputError {
+  border-color: var(--color-error);
+}
+
+.inputError:focus {
+  border-color: var(--color-error);
+}
+
+/* Hint */
+.hint {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.errorHint {
+  color: var(--color-error);
+}
+
+/* Checkbox */
+.checkboxWrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.checkboxWrapper input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+}
+
+.checkboxLabel {
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+/* Form Actions */
+.actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.submitButton,
+.resetButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 44px;
+  padding: 0 var(--space-6);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-out-expo);
+}
+
+.submitButton {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: none;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  box-shadow: var(--shadow-glow-cyan);
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.resetButton {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.resetButton:hover:not(:disabled) {
+  background: var(--color-bg-tertiary);
+  border-color: var(--color-border-hover);
+}
+
+.resetButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Spinner */
+.spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Glow effect for focus */
+.input:focus,
+textarea:focus,
+select:focus {
+  animation: formInputGlow 2s ease-in-out infinite;
+}
+
+@keyframes formInputGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 3px var(--color-primary-muted);
+  }
+  50% {
+    box-shadow: 0 0 0 4px var(--color-primary-muted), 0 0 20px var(--color-primary-muted);
+  }
+}

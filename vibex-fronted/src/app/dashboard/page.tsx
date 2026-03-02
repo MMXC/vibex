@@ -302,6 +302,30 @@ export default function Dashboard() {
                     </button>
                     <button 
                       className={styles.actionBtn} 
+                      title="导出"
+                      onClick={(e) => { 
+                        e.preventDefault();
+                        alert('导出功能开发中');
+                      }}
+                    >
+                      📤
+                    </button>
+                    <button 
+                      className={styles.actionBtn} 
+                      title="删除"
+                      onClick={(e) => { 
+                        e.preventDefault();
+                        if (confirm('确定删除该项目吗？')) {
+                          apiService.deleteProject(project.id).then(() => {
+                            setProjects(projects.filter(p => p.id !== project.id));
+                          });
+                        }
+                      }}
+                    >
+                      🗑️
+                    </button>
+                    <button 
+                      className={styles.actionBtn} 
                       title="更多"
                       onClick={(e) => { 
                         e.preventDefault();

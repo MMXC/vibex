@@ -66,21 +66,9 @@ export default function Dashboard() {
     router.push('/auth')
   }
 
-  // 创建新项目
-  const handleCreateProject = async () => {
-    if (!userId) return
-    
-    try {
-      const newProject = await apiService.createProject({
-        name: '新项目',
-        description: '',
-        userId,
-      })
-      // 跳转到编辑器
-      router.push(`/editor?projectId=${newProject.id}`)
-    } catch (err: any) {
-      setError(err.message || '创建项目失败')
-    }
+  // 创建新项目 - 跳转到需求输入页面
+  const handleCreateProject = () => {
+    router.push('/requirements/new')
   }
 
   if (loading) {
@@ -122,6 +110,18 @@ export default function Dashboard() {
           <Link href="/dashboard" className={`${styles.navItem} ${styles.active}`}>
             <span className={styles.navIcon}>⊞</span>
             <span>项目</span>
+          </Link>
+          <Link href="/requirements/new" className={styles.navItem}>
+            <span className={styles.navIcon}>🤖</span>
+            <span>AI 原型设计</span>
+          </Link>
+          <Link href="/domain" className={styles.navItem}>
+            <span className={styles.navIcon}>📊</span>
+            <span>领域模型</span>
+          </Link>
+          <Link href="/prototype" className={styles.navItem}>
+            <span className={styles.navIcon}>🎨</span>
+            <span>原型预览</span>
           </Link>
           <Link href="/templates" className={styles.navItem}>
             <span className={styles.navIcon}>◫</span>

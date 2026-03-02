@@ -28,6 +28,7 @@ import prototypeCollaborationId from './routes/prototype-collaboration.$id';
 import aiDesignChat from './routes/ai-design-chat';
 import aiUIGeneration from './routes/ai-ui-generation';
 import prototypeVersions from './routes/prototype-version';
+import version from './routes/version';
 import prototypeVersionId from './routes/prototype-version.$id';
 import componentManager from './routes/component-manager';
 import livePreview from './routes/live-preview';
@@ -82,6 +83,7 @@ app.route('/api/prototype-versions', prototypeVersionId);
 app.route('/api/components', componentManager);
 app.route('/api/live-preview', livePreview);
 app.route('/api/prototype-export', prototypeExport);
+app.route('/api/version', version);
 
 // 导出 for Cloudflare Workers
 export default app;

@@ -64,8 +64,8 @@ export default function NewRequirement() {
 
       console.log('Created requirement:', newRequirement)
       
-      // 跳转到需求详情页或领域模型页
-      router.push(`/requirements/${newRequirement.id}`)
+      // 跳转到领域模型页
+      router.push('/domain')
     } catch (err: any) {
       setError(err.message || '创建需求失败')
     } finally {

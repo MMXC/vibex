@@ -28,6 +28,7 @@ import requirementsAnalysis from './routes/requirements-analysis';
 import clarificationQuestions from './routes/clarification-questions';
 import componentGenerator from './routes/component-generator';
 import prototypeCollaboration from './routes/prototype-collaboration';
+import confirmationProjects from './routes/confirmation-projects';
 import prototypeCollaborationId from './routes/prototype-collaboration.$id';
 import collaboration from './routes/collaboration';
 import aiDesignChat from './routes/ai-design-chat';
@@ -100,6 +101,7 @@ app.route('/api/ui-generation', uiGeneration);
 app.route('/api/version', version);
 app.route('/api/requirements-export', requirementsExport);
 app.route('/api/projects/:id/settings', projectSettings);
+app.route('/api/confirmation-projects', confirmationProjects);
 
 // 导出 for Cloudflare Workers
 export default app;

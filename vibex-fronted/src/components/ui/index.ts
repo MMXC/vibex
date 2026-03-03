@@ -38,3 +38,8 @@ export { Form, Field as FormField, FormField as FormFieldWrapper, FormActions, u
 export { default as DomainRelationGraph, type DomainRelationGraphProps, type DomainEntity, type EntityRelation } from './DomainRelationGraph';
 export { default as FlowEditor, type FlowEditorProps, type FlowNode, type FlowEdge, flowUtils } from './FlowEditor';
 export { default as FlowPropertiesPanel, type FlowPropertiesPanelProps } from './FlowPropertiesPanel';
+export { default as BoundedContextGraph, type BoundedContextGraphProps, type BoundedContextNodeData } from './BoundedContextGraph';
+export { default as DomainModelGraph, type DomainModelGraphProps, type DomainProperty, type DomainModelNodeData } from './DomainModelGraph';
+export { default as BusinessFlowGraph, type BusinessFlowGraphProps, type FlowState, type FlowTransition } from './BusinessFlowGraph';
+export { default as MermaidCodeEditor, type MermaidCodeEditorProps } from './MermaidCodeEditor';
+export { default as AIChatPanel, type AIChatPanelProps, type ChatMessage } from './AIChatPanel';

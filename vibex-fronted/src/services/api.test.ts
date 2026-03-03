@@ -436,3 +436,476 @@ describe('ApiService - 离线处理', () => {
     }
   });
 });
+
+describe('ApiService - 需求管理', () => {
+  const mockBaseURL = 'https://api.vibex.example.com';
+  let api: ApiService;
+  let mockClient: any;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockClient = {
+      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      get: jest.fn(),
+      post: jest.fn(),
+      put: jest.fn(),
+      delete: jest.fn(),
+    };
+    (mockedAxios.create as jest.Mock).mockReturnValue(mockClient);
+    api = new ApiService(mockBaseURL);
+  });
+
+  it('应能获取需求列表', async () => {
+    const requirements = [{ id: 'req-1', content: 'Test requirement', userId: '1', status: 'draft' }];
+    mockClient.get.mockResolvedValue({ data: { requirements } });
+
+    const result = await api.getRequirements('1');
+    expect(result).toEqual(requirements);
+  });
+
+  it('应能创建需求', async () => {
+    const requirement = { id: 'req-1', content: 'Test', userId: '1', status: 'draft' };
+    mockClient.post.mockResolvedValue({ data: { requirement } });
+
+    const result = await api.createRequirement({ content: 'Test', userId: '1' });
+    expect(result).toEqual(requirement);
+  });
+
+  it('应能获取单个需求', async () => {
+    const requirement = { id: 'req-1', content: 'Test', userId: '1', status: 'draft' };
+    mockClient.get.mockResolvedValue({ data: { requirement } });
+
+    const result = await api.getRequirement('req-1');
+    expect(result).toEqual(requirement);
+  });
+
+  it('应能更新需求', async () => {
+    const requirement = { id: 'req-1', content: 'Updated', userId: '1', status: 'completed' };
+    mockClient.put.mockResolvedValue({ data: { requirement } });
+
+    const result = await api.updateRequirement('req-1', { status: 'completed' }, '1');
+    expect(result).toEqual(requirement);
+  });
+
+  it('应能删除需求', async () => {
+    mockClient.delete.mockResolvedValue({ data: { success: true } });
+
+    const result = await api.deleteRequirement('req-1', '1');
+    expect(result.success).toBe(true);
+  });
+
+  it('应能分析需求', async () => {
+    const requirement = { id: 'req-1', content: 'Test', userId: '1', status: 'analyzing' };
+    mockClient.post.mockResolvedValue({ data: { requirement } });
+
+    const result = await api.analyzeRequirement('req-1');
+    expect(result).toEqual(requirement);
+  });
+
+  it('应能重新分析需求', async () => {
+    const requirement = { id: 'req-1', content: 'Test', userId: '1', status: 'analyzing' };
+    mockClient.post.mockResolvedValue({ data: { requirement } });
+
+    const result = await api.reanalyzeRequirement('req-1', { context: 'extra' });
+    expect(result).toEqual(requirement);
+  });
+});
+
+describe('ApiService - 澄清对话', () => {
+  const mockBaseURL = 'https://api.vibex.example.com';
+  let api: ApiService;
+  let mockClient: any;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockClient = {
+      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      get: jest.fn(),
+      post: jest.fn(),
+      put: jest.fn(),
+      delete: jest.fn(),
+    };
+    (mockedAxios.create as jest.Mock).mockReturnValue(mockClient);
+    api = new ApiService(mockBaseURL);
+  });
+
+  it('应能获取澄清问题列表', async () => {
+    const clarifications = [{ id: 'clar-1', question: 'What is this?', requirementId: 'req-1', status: 'pending' }];
+    mockClient.get.mockResolvedValue({ data: { clarifications } });
+
+    const result = await api.getClarifications('req-1');
+    expect(result).toEqual(clarifications);
+  });
+
+  it('应能回答澄清问题', async () => {
+    const clarification = { id: 'clar-1', question: 'What is this?', answer: 'This is that', status: 'answered' };
+    mockClient.put.mockResolvedValue({ data: { clarification } });
+
+    const result = await api.answerClarification('req-1', 'clar-1', 'This is that');
+    expect(result).toEqual(clarification);
+  });
+
+  it('应能跳过澄清问题', async () => {
+    const clarification = { id: 'clar-1', question: 'What is this?', status: 'skipped' };
+    mockClient.put.mockResolvedValue({ data: { clarification } });
+
+    const result = await api.skipClarification('req-1', 'clar-1');
+    expect(result).toEqual(clarification);
+  });
+});
+
+describe('ApiService - 分析结果', () => {
+  const mockBaseURL = 'https://api.vibex.example.com';
+  let api: ApiService;
+  let mockClient: any;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockClient = {
+      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      get: jest.fn(),
+      post: jest.fn(),
+      put: jest.fn(),
+      delete: jest.fn(),
+    };
+    (mockedAxios.create as jest.Mock).mockReturnValue(mockClient);
+    api = new ApiService(mockBaseURL);
+  });
+
+  it('应能获取分析结果', async () => {
+    const analysisResult = { requirementId: 'req-1', domains: [], relations: [], confidence: 0.9, analyzedAt: '2024-01-01' };
+    mockClient.get.mockResolvedValue({ data: { analysisResult } });
+
+    const result = await api.getAnalysisResult('req-1');
+    expect(result).toEqual(analysisResult);
+  });
+});
+
+describe('ApiService - 领域实体', () => {
+  const mockBaseURL = 'https://api.vibex.example.com';
+  let api: ApiService;
+  let mockClient: any;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockClient = {
+      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      get: jest.fn(),
+      post: jest.fn(),
+      put: jest.fn(),
+      delete: jest.fn(),
+    };
+    (mockedAxios.create as jest.Mock).mockReturnValue(mockClient);
+    api = new ApiService(mockBaseURL);
+  });
+
+  it('应能获取领域实体列表', async () => {
+    const domainEntities = [{ id: 'de-1', name: 'User', type: 'entity', requirementId: 'req-1', attributes: [] }];
+    mockClient.get.mockResolvedValue({ data: { domainEntities } });
+
+    const result = await api.getDomainEntities('req-1');
+    expect(result).toEqual(domainEntities);
+  });
+
+  it('应能获取单个领域实体', async () => {
+    const domain = { id: 'de-1', name: 'User', type: 'entity', requirementId: 'req-1', attributes: [] };
+    mockClient.get.mockResolvedValue({ data: { domain } });
+
+    const result = await api.getDomainEntity('de-1');
+    expect(result).toEqual(domain);
+  });
+
+  it('应能创建领域实体', async () => {
+    const domain = { id: 'de-1', name: 'User', type: 'entity', requirementId: 'req-1', attributes: [] };
+    mockClient.post.mockResolvedValue({ data: { domain } });
+
+    const result = await api.createDomainEntity({ name: 'User', type: 'entity', requirementId: 'req-1', attributes: [] });
+    expect(result).toEqual(domain);
+  });
+
+  it('应能更新领域实体', async () => {
+    const domain = { id: 'de-1', name: 'Updated User', type: 'entity', requirementId: 'req-1', attributes: [] };
+    mockClient.put.mockResolvedValue({ data: { domain } });
+
+    const result = await api.updateDomainEntity('de-1', { name: 'Updated User' });
+    expect(result).toEqual(domain);
+  });
+
+  it('应能删除领域实体', async () => {
+    mockClient.delete.mockResolvedValue({ data: { success: true } });
+
+    const result = await api.deleteDomainEntity('de-1', 'req-1');
+    expect(result.success).toBe(true);
+  });
+});
+
+describe('ApiService - 实体关系', () => {
+  const mockBaseURL = 'https://api.vibex.example.com';
+  let api: ApiService;
+  let mockClient: any;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockClient = {
+      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      get: jest.fn(),
+      post: jest.fn(),
+      put: jest.fn(),
+      delete: jest.fn(),
+    };
+    (mockedAxios.create as jest.Mock).mockReturnValue(mockClient);
+    api = new ApiService(mockBaseURL);
+  });
+
+  it('应能获取实体关系列表', async () => {
+    const entityRelations = [{ id: 'er-1', sourceEntityId: 'de-1', targetEntityId: 'de-2', type: 'has_many', requirementId: 'req-1' }];
+    mockClient.get.mockResolvedValue({ data: { entityRelations } });
+
+    const result = await api.getEntityRelations('req-1');
+    expect(result).toEqual(entityRelations);
+  });
+
+  it('应能获取单个实体关系', async () => {
+    const entityRelation = { id: 'er-1', sourceEntityId: 'de-1', targetEntityId: 'de-2', type: 'has_many', requirementId: 'req-1' };
+    mockClient.get.mockResolvedValue({ data: { entityRelation } });
+
+    const result = await api.getEntityRelation('er-1');
+    expect(result).toEqual(entityRelation);
+  });
+
+  it('应能创建实体关系', async () => {
+    const entityRelation = { id: 'er-1', sourceEntityId: 'de-1', targetEntityId: 'de-2', type: 'has_many', requirementId: 'req-1' };
+    mockClient.post.mockResolvedValue({ data: { entityRelation } });
+
+    const result = await api.createEntityRelation({ sourceEntityId: 'de-1', targetEntityId: 'de-2', type: 'has_many', requirementId: 'req-1' }, 'req-1');
+    expect(result).toEqual(entityRelation);
+  });
+
+  it('应能更新实体关系', async () => {
+    const entityRelation = { id: 'er-1', sourceEntityId: 'de-1', targetEntityId: 'de-2', type: 'belongs_to', requirementId: 'req-1' };
+    mockClient.put.mockResolvedValue({ data: { entityRelation } });
+
+    const result = await api.updateEntityRelation('er-1', { type: 'belongs_to' }, 'req-1');
+    expect(result).toEqual(entityRelation);
+  });
+
+  it('应能删除实体关系', async () => {
+    mockClient.delete.mockResolvedValue({ data: { success: true } });
+
+    const result = await api.deleteEntityRelation('er-1', 'req-1');
+    expect(result.success).toBe(true);
+  });
+});
+
+describe('ApiService - 原型快照', () => {
+  const mockBaseURL = 'https://api.vibex.example.com';
+  let api: ApiService;
+  let mockClient: any;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockClient = {
+      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      get: jest.fn(),
+      post: jest.fn(),
+      put: jest.fn(),
+      delete: jest.fn(),
+    };
+    (mockedAxios.create as jest.Mock).mockReturnValue(mockClient);
+    api = new ApiService(mockBaseURL);
+  });
+
+  it('应能获取原型快照列表', async () => {
+    const prototypeSnapshots = [{ id: 'ps-1', projectId: 'proj-1', name: 'Snapshot 1', content: {} }];
+    mockClient.get.mockResolvedValue({ data: { prototypeSnapshots } });
+
+    const result = await api.getPrototypeSnapshots('proj-1');
+    expect(result).toEqual(prototypeSnapshots);
+  });
+
+  it('应能获取单个原型快照', async () => {
+    const prototypeSnapshot = { id: 'ps-1', projectId: 'proj-1', name: 'Snapshot 1', content: {} };
+    mockClient.get.mockResolvedValue({ data: { prototypeSnapshot } });
+
+    const result = await api.getPrototypeSnapshot('ps-1');
+    expect(result).toEqual(prototypeSnapshot);
+  });
+
+  it('应能创建原型快照', async () => {
+    const prototypeSnapshot = { id: 'ps-1', projectId: 'proj-1', name: 'Snapshot 1', content: {} };
+    mockClient.post.mockResolvedValue({ data: { prototypeSnapshot } });
+
+    const result = await api.createPrototypeSnapshot({ projectId: 'proj-1', name: 'Snapshot 1', content: {} });
+    expect(result).toEqual(prototypeSnapshot);
+  });
+
+  it('应能更新原型快照', async () => {
+    const prototypeSnapshot = { id: 'ps-1', projectId: 'proj-1', name: 'Updated Snapshot', content: {} };
+    mockClient.put.mockResolvedValue({ data: { prototypeSnapshot } });
+
+    const result = await api.updatePrototypeSnapshot('ps-1', { name: 'Updated Snapshot' });
+    expect(result).toEqual(prototypeSnapshot);
+  });
+
+  it('应能删除原型快照', async () => {
+    mockClient.delete.mockResolvedValue({ data: { success: true } });
+
+    const result = await api.deletePrototypeSnapshot('ps-1', 'proj-1');
+    expect(result.success).toBe(true);
+  });
+});
+
+describe('ApiService - 项目回收站', () => {
+  const mockBaseURL = 'https://api.vibex.example.com';
+  let api: ApiService;
+  let mockClient: any;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockClient = {
+      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      get: jest.fn(),
+      post: jest.fn(),
+      put: jest.fn(),
+      delete: jest.fn(),
+      patch: jest.fn(),
+    };
+    (mockedAxios.create as jest.Mock).mockReturnValue(mockClient);
+    api = new ApiService(mockBaseURL);
+  });
+
+  it('应能软删除项目', async () => {
+    const project = { id: 'proj-1', name: 'Project 1', userId: '1', deletedAt: new Date().toISOString() };
+    mockClient.patch.mockResolvedValue({ data: { project } });
+
+    const result = await api.softDeleteProject('proj-1');
+    expect(result).toEqual(project);
+  });
+
+  it('应能恢复项目', async () => {
+    const project = { id: 'proj-1', name: 'Project 1', userId: '1', deletedAt: null };
+    mockClient.patch.mockResolvedValue({ data: { project } });
+
+    const result = await api.restoreProject('proj-1');
+    expect(result).toEqual(project);
+  });
+
+  it('应能永久删除项目', async () => {
+    mockClient.delete.mockResolvedValue({ data: { success: true } });
+
+    const result = await api.permanentDeleteProject('proj-1');
+    expect(result.success).toBe(true);
+  });
+
+  it('应能获取回收站项目', async () => {
+    const projects = [{ id: 'proj-1', name: 'Deleted Project', userId: '1', deletedAt: new Date().toISOString() }];
+    mockClient.get.mockResolvedValue({ data: { projects } });
+
+    const result = await api.getDeletedProjects();
+    expect(result).toEqual(projects);
+  });
+
+  it('应能清空回收站', async () => {
+    mockClient.delete.mockResolvedValue({ data: { success: true } });
+
+    const result = await api.clearDeletedProjects();
+    expect(result.success).toBe(true);
+  });
+});
+
+describe('ApiService - 页面管理扩展', () => {
+  const mockBaseURL = 'https://api.vibex.example.com';
+  let api: ApiService;
+  let mockClient: any;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockClient = {
+      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      get: jest.fn(),
+      post: jest.fn(),
+      put: jest.fn(),
+      delete: jest.fn(),
+    };
+    (mockedAxios.create as jest.Mock).mockReturnValue(mockClient);
+    api = new ApiService(mockBaseURL);
+  });
+
+  it('应能获取单个页面', async () => {
+    const page = { id: 'page-1', name: 'Page 1', projectId: 'proj-1' };
+    mockClient.get.mockResolvedValue({ data: { page } });
+
+    const result = await api.getPage('page-1');
+    expect(result).toEqual(page);
+  });
+
+  it('应能更新页面', async () => {
+    const page = { id: 'page-1', name: 'Updated Page', projectId: 'proj-1' };
+    mockClient.put.mockResolvedValue({ data: { page } });
+
+    const result = await api.updatePage('page-1', { name: 'Updated Page' });
+    expect(result).toEqual(page);
+  });
+});
+
+describe('ApiService - Agent管理扩展', () => {
+  const mockBaseURL = 'https://api.vibex.example.com';
+  let api: ApiService;
+  let mockClient: any;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockClient = {
+      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      get: jest.fn(),
+      post: jest.fn(),
+      put: jest.fn(),
+      delete: jest.fn(),
+    };
+    (mockedAxios.create as jest.Mock).mockReturnValue(mockClient);
+    api = new ApiService(mockBaseURL);
+  });
+
+  it('应能获取单个Agent', async () => {
+    const agent = { id: 'agent-1', name: 'Agent 1', prompt: 'prompt', userId: '1' };
+    mockClient.get.mockResolvedValue({ data: { agent } });
+
+    const result = await api.getAgent('agent-1');
+    expect(result).toEqual(agent);
+  });
+
+  it('应能更新Agent', async () => {
+    const agent = { id: 'agent-1', name: 'Updated Agent', prompt: 'new prompt', userId: '1' };
+    mockClient.put.mockResolvedValue({ data: { agent } });
+
+    const result = await api.updateAgent('agent-1', { name: 'Updated Agent' });
+    expect(result).toEqual(agent);
+  });
+});
+
+describe('ApiService - 流程图扩展', () => {
+  const mockBaseURL = 'https://api.vibex.example.com';
+  let api: ApiService;
+  let mockClient: any;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockClient = {
+      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      get: jest.fn(),
+      post: jest.fn(),
+      put: jest.fn(),
+      delete: jest.fn(),
+    };
+    (mockedAxios.create as jest.Mock).mockReturnValue(mockClient);
+    api = new ApiService(mockBaseURL);
+  });
+
+  it('应能AI生成流程图', async () => {
+    const flowData = { id: 'flow-1', nodes: [], edges: [], projectId: 'proj-1' };
+    mockClient.post.mockResolvedValue({ data: flowData });
+
+    const result = await api.generateFlow('创建用户登录流程');
+    expect(result).toEqual(flowData);
+  });
+});

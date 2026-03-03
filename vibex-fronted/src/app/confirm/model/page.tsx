@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from '../confirm.module.css'
 import { useConfirmationStore } from '@/stores/confirmationStore'
+import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps'
 
 export default function ModelPage() {
   const router = useRouter()
@@ -16,6 +17,7 @@ export default function ModelPage() {
     setModelMermaidCode,
     goToNextStep,
     goToPreviousStep,
+    currentStep,
   } = useConfirmationStore()
 
   const [loading, setLoading] = useState(false)
@@ -109,32 +111,12 @@ ${models.filter(m => m.type === 'aggregate_root').map(ar => {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Step 2: 领域模型类图确认</h1>
+        <h1 className={styles.title}>Step 3: 领域模型类图确认</h1>
         <p className={styles.description}>
           基于您选择的限界上下文，AI 生成了领域模型类图。请确认。
         </p>
 
-        <div className={styles.steps}>
-          <div className={`${styles.step} ${styles.completed}`}>
-            <span className={styles.stepNumber}>✓</span>
-            <span className={styles.stepLabel}>需求输入</span>
-          </div>
-          <div className={styles.stepConnector} />
-          <div className={`${styles.step} ${styles.completed}`}>
-            <span className={styles.stepNumber}>✓</span>
-            <span className={styles.stepLabel}>限界上下文</span>
-          </div>
-          <div className={styles.stepConnector} />
-          <div className={`${styles.step} ${styles.active}`}>
-            <span className={styles.stepNumber}>3</span>
-            <span className={styles.stepLabel}>领域模型</span>
-          </div>
-          <div className={styles.stepConnector} />
-          <div className={styles.step}>
-            <span className={styles.stepNumber}>4</span>
-            <span className={styles.stepLabel}>业务流程</span>
-          </div>
-        </div>
+        <ConfirmationSteps currentStep={currentStep} className={styles.steps} />
 
         <div className={styles.diagramSection}>
           <h3 className={styles.sectionTitle}>领域模型类图</h3>

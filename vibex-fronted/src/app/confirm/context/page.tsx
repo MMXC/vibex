@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from '../confirm.module.css'
 import { useConfirmationStore } from '@/stores/confirmationStore'
+import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps'
 
 export default function ContextPage() {
   const router = useRouter()
@@ -17,59 +18,42 @@ export default function ContextPage() {
     setContextMermaidCode,
     goToNextStep,
     goToPreviousStep,
+    currentStep,
   } = useConfirmationStore()
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Mock data for demo
+  // Auto-generate mermaid code when bounded contexts change
   useEffect(() => {
-    if (boundedContexts.length === 0) {
-      // Generate mock bounded contexts based on requirement
-      setBoundedContexts([
-        {
-          id: 'ctx-1',
-          name: '用户管理',
-          description: '管理用户注册、登录、个人信息',
-          type: 'core',
-          relationships: []
-        },
-        {
-          id: 'ctx-2',
-          name: '课程管理',
-          description: '管理课程内容、章节、课时',
-          type: 'core',
-          relationships: []
-        },
-        {
-          id: 'ctx-3',
-          name: '订单管理',
-          description: '管理订单创建、支付、取消',
-          type: 'core',
-          relationships: []
-        },
-        {
-          id: 'ctx-4',
-          name: '支付',
-          description: '处理支付、退款',
-          type: 'supporting',
-          relationships: []
-        },
-      ])
-      setContextMermaidCode(`graph TD
-  UC[用户管理]:::core
-  CM[课程管理]:::core
-  OM[订单管理]:::core
-  PAY[支付]:::supporting
-  
-  OM --> PAY
-  CM --> UC
-  OM --> CM
-  
-  classDef core fill:#4ade80,stroke:#22c55e,color:#1a1a2e
-  classDef supporting fill:#60a5fa,stroke:#3b82f6,color:#1a1a2e`)
+    if (boundedContexts.length > 0 && !contextMermaidCode) {
+      const code = generateMermaidCode(boundedContexts)
+      setContextMermaidCode(code)
     }
-  }, [])
+  }, [boundedContexts, contextMermaidCode, setContextMermaidCode])
+
+  // Helper function to generate Mermaid code
+  function generateMermaidCode(contexts: typeof boundedContexts) {
+    const lines = ['graph TD']
+    
+    contexts.forEach(ctx => {
+      const nodeDef = ctx.type === 'core' 
+        ? `${ctx.id}[${ctx.name}]`
+        : ctx.type === 'supporting'
+          ? `${ctx.id}(${ctx.name})`
+          : `${ctx.id}{${ctx.name}}`
+      lines.push(`  ${nodeDef}`)
+    })
+    
+    lines.push('')
+    lines.push('  classDef core fill:#4ade80,stroke:#22c55e,color:#1a1a2e')
+    lines.push('  classDef supporting fill:#60a5fa,stroke:#3b82f6,color:#1a1a2e')
+    lines.push('')
+    lines.push('  class ' + contexts.filter(c => c.type === 'core').map(c => c.id).join(',') + ' core')
+    lines.push('  class ' + contexts.filter(c => c.type === 'supporting').map(c => c.id).join(',') + ' supporting')
+    
+    return lines.join('\n')
+  }
 
   const handleContextToggle = (id: string) => {
     if (selectedContextIds.includes(id)) {
@@ -105,32 +89,12 @@ export default function ContextPage() {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Step 1: 限界上下文图确认</h1>
+        <h1 className={styles.title}>Step 2: 限界上下文图确认</h1>
         <p className={styles.description}>
           基于您的需求，AI 生成了以下限界上下文。请选择您希望保留的核心上下文。
         </p>
 
-        <div className={styles.steps}>
-          <div className={`${styles.step} ${styles.completed}`}>
-            <span className={styles.stepNumber}>✓</span>
-            <span className={styles.stepLabel}>需求输入</span>
-          </div>
-          <div className={styles.stepConnector} />
-          <div className={`${styles.step} ${styles.active}`}>
-            <span className={styles.stepNumber}>2</span>
-            <span className={styles.stepLabel}>限界上下文</span>
-          </div>
-          <div className={styles.stepConnector} />
-          <div className={styles.step}>
-            <span className={styles.stepNumber}>3</span>
-            <span className={styles.stepLabel}>领域模型</span>
-          </div>
-          <div className={styles.stepConnector} />
-          <div className={styles.step}>
-            <span className={styles.stepNumber}>4</span>
-            <span className={styles.stepLabel}>业务流程</span>
-          </div>
-        </div>
+        <ConfirmationSteps currentStep={currentStep} className={styles.steps} />
 
         <div className={styles.diagramSection}>
           <h3 className={styles.sectionTitle}>限界上下文图</h3>

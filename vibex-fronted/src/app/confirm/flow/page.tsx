@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from '../confirm.module.css'
 import { useConfirmationStore } from '@/stores/confirmationStore'
+import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps'
 
 export default function FlowPage() {
   const router = useRouter()
@@ -16,6 +17,7 @@ export default function FlowPage() {
     setCreatedProjectId,
     goToNextStep,
     goToPreviousStep,
+    currentStep,
   } = useConfirmationStore()
 
   const [loading, setLoading] = useState(false)
@@ -84,32 +86,12 @@ export default function FlowPage() {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Step 3: 业务流程图确认</h1>
+        <h1 className={styles.title}>Step 4: 业务流程图确认</h1>
         <p className={styles.description}>
           基于领域模型，AI 生成了业务流程图。请确认后创建项目。
         </p>
 
-        <div className={styles.steps}>
-          <div className={`${styles.step} ${styles.completed}`}>
-            <span className={styles.stepNumber}>✓</span>
-            <span className={styles.stepLabel}>需求输入</span>
-          </div>
-          <div className={styles.stepConnector} />
-          <div className={`${styles.step} ${styles.completed}`}>
-            <span className={styles.stepNumber}>✓</span>
-            <span className={styles.stepLabel}>限界上下文</span>
-          </div>
-          <div className={styles.stepConnector} />
-          <div className={`${styles.step} ${styles.completed}`}>
-            <span className={styles.stepNumber}>✓</span>
-            <span className={styles.stepLabel}>领域模型</span>
-          </div>
-          <div className={styles.stepConnector} />
-          <div className={`${styles.step} ${styles.active}`}>
-            <span className={styles.stepNumber}>4</span>
-            <span className={styles.stepLabel}>业务流程</span>
-          </div>
-        </div>
+        <ConfirmationSteps currentStep={currentStep} className={styles.steps} />
 
         <div className={styles.diagramSection}>
           <h3 className={styles.sectionTitle}>业务流程图</h3>

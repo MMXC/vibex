@@ -1381,3 +1381,47 @@ export class ApiService {
 // 导出单例
 export const apiService = new ApiService();
 export default apiService;
+
+// ==================== DDD Bounded Context ====================
+
+export interface BoundedContext {
+  id: string
+  name: string
+  description: string
+  type: 'core' | 'supporting' | 'generic' | 'external'
+  relationships: any[]
+}
+
+export interface BoundedContextResponse {
+  success: boolean
+  boundedContexts: BoundedContext[]
+  mermaidCode?: string
+  error?: string
+}
+
+/**
+ * 生成限界上下文
+ */
+export async function generateBoundedContext(
+  requirementText: string,
+  projectId?: string
+): Promise<BoundedContextResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8787'
+  
+  const response = await fetch(`${baseUrl}/api/ddd/bounded-context`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      requirementText,
+      projectId,
+    }),
+  })
+  
+  if (!response.ok) {
+    throw new Error(`API error: ${response.status}`)
+  }
+  
+  return response.json()
+}

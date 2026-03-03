@@ -4,10 +4,19 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from './confirm.module.css'
 import { useConfirmationStore } from '@/stores/confirmationStore'
+import { generateBoundedContext } from '@/services/api'
+import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps'
 
 export default function ConfirmPage() {
   const router = useRouter()
-  const { requirementText, setRequirementText, goToNextStep } = useConfirmationStore()
+  const { 
+    requirementText, 
+    setRequirementText, 
+    setBoundedContexts,
+    setContextMermaidCode,
+    goToNextStep,
+    currentStep,
+  } = useConfirmationStore()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -21,11 +30,26 @@ export default function ConfirmPage() {
     setError('')
 
     try {
-      // TODO: Call AI API to generate bounded context
-      // For now, just navigate to next step
-      goToNextStep()
-      router.push('/confirm/context')
+      // Call AI API to generate bounded contexts
+      const response = await generateBoundedContext(requirementText)
+      
+      if (response.success && response.boundedContexts) {
+        // Store the generated bounded contexts
+        setBoundedContexts(response.boundedContexts)
+        
+        // Store the mermaid code if provided
+        if (response.mermaidCode) {
+          setContextMermaidCode(response.mermaidCode)
+        }
+        
+        // Navigate to the context page
+        goToNextStep()
+        router.push('/confirm/context')
+      } else {
+        throw new Error(response.error || '生成失败')
+      }
     } catch (err: any) {
+      console.error('Failed to generate bounded contexts:', err)
       setError(err.message || '生成失败，请重试')
     } finally {
       setLoading(false)
@@ -35,32 +59,12 @@ export default function ConfirmPage() {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>需求确认流程</h1>
+        <h1 className={styles.title}>{currentStep === 'input' ? 'Step 1: 需求输入' : '需求确认流程'}</h1>
         <p className={styles.description}>
           描述您的产品需求，AI 将协助您完成限界上下文图、领域模型和业务流程图的设计。
         </p>
 
-        <div className={styles.steps}>
-          <div className={`${styles.step} ${styles.active}`}>
-            <span className={styles.stepNumber}>1</span>
-            <span className={styles.stepLabel}>需求输入</span>
-          </div>
-          <div className={styles.stepConnector} />
-          <div className={styles.step}>
-            <span className={styles.stepNumber}>2</span>
-            <span className={styles.stepLabel}>限界上下文</span>
-          </div>
-          <div className={styles.stepConnector} />
-          <div className={styles.step}>
-            <span className={styles.stepNumber}>3</span>
-            <span className={styles.stepLabel}>领域模型</span>
-          </div>
-          <div className={styles.stepConnector} />
-          <div className={styles.step}>
-            <span className={styles.stepNumber}>4</span>
-            <span className={styles.stepLabel}>业务流程</span>
-          </div>
-        </div>
+        <ConfirmationSteps currentStep={currentStep} className={styles.steps} />
 
         <div className={styles.inputSection}>
           <label htmlFor="requirement" className={styles.label}>

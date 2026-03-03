@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useState, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import styles from './domain.module.css'
-import { apiService, DomainEntity, EntityRelation, Project, EntityType } from '@/services/api'
+import { apiService, DomainEntity, EntityRelation, Project, EntityType, generateBoundedContext, BoundedContext } from '@/services/api'
 import ReactFlow, {
   Node,
   Edge,
@@ -95,15 +95,29 @@ function Toolbar({
   onAddEntity, 
   onAddRelation, 
   onSave,
-  hasChanges 
+  onGenerate,
+  hasChanges,
+  hasRequirementText,
+  generating
 }: { 
   onAddEntity: () => void
   onAddRelation: () => void
   onSave: () => void
+  onGenerate: () => void
   hasChanges: boolean 
+  hasRequirementText: boolean
+  generating: boolean
 }) {
   return (
     <div className={styles.toolbar}>
+      <button 
+        onClick={onGenerate} 
+        className={styles.toolbarBtn}
+        disabled={!hasRequirementText || generating}
+        title={hasRequirementText ? '从需求生成限界上下文图' : '需要需求文本才能生成'}
+      >
+        <span>🤖</span> {generating ? '生成中...' : 'AI生成'}
+      </button>
       <button onClick={onAddEntity} className={styles.toolbarBtn}>
         <span>+</span> 添加实体
       </button>
@@ -312,11 +326,14 @@ function DomainPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const projectId = searchParams.get('projectId')
+  const requirementId = searchParams.get('requirementId')
   
   const [project, setProject] = useState<Project | null>(null)
+  const [requirementText, setRequirementText] = useState('')
   const [domains, setDomains] = useState<DomainEntity[]>([])
   const [relations, setRelations] = useState<EntityRelation[]>([])
   const [loading, setLoading] = useState(true)
+  const [generating, setGenerating] = useState(false)
   const [error, setError] = useState('')
   const [tab, setTab] = useState<TabType>('graph')
   const [selectedEntity, setSelectedEntity] = useState<DomainEntity | null>(null)
@@ -424,14 +441,30 @@ function DomainPageContent() {
 
     const fetchData = async () => {
       try {
-        if (projectId) {
-          const projectData = await apiService.getProject(projectId)
-          setProject(projectData)
+        // Use requirementId if available, otherwise use projectId for backward compatibility
+        const idToUse = requirementId || projectId
+        
+        if (idToUse) {
+          if (projectId) {
+            const projectData = await apiService.getProject(projectId)
+            setProject(projectData)
+          }
+          
+          // Fetch requirement text for generating bounded contexts
+          if (requirementId) {
+            try {
+              const reqData = await apiService.getRequirement(requirementId)
+              setRequirementText(reqData.content)
+            } catch (e) {
+              // Requirement might not exist, ignore
+              console.log('Could not fetch requirement:', e)
+            }
+          }
           
           // 从 API 获取领域数据
           const [domainData, relationData] = await Promise.all([
-            apiService.getDomainEntities(projectId),
-            apiService.getEntityRelations(projectId)
+            apiService.getDomainEntities(idToUse),
+            apiService.getEntityRelations(idToUse)
           ])
           setDomains(domainData)
           setRelations(relationData)
@@ -444,7 +477,7 @@ function DomainPageContent() {
     }
 
     fetchData()
-  }, [projectId, router])
+  }, [projectId, requirementId, router])
 
   // 处理连接（添加新关系）
   const onConnect = useCallback((connection: Connection) => {
@@ -481,11 +514,12 @@ function DomainPageContent() {
 
   // 添加实体
   const handleAddEntity = useCallback(async (entityData: Partial<DomainEntity>) => {
-    if (!projectId) return
+    const idToUse = requirementId || projectId
+    if (!idToUse) return
     
     const newEntity: DomainEntity = {
       id: `entity_${Date.now()}`,
-      requirementId: projectId,
+      requirementId: idToUse,
       name: entityData.name || '',
       type: entityData.type || 'business',
       description: entityData.description || '',
@@ -496,7 +530,7 @@ function DomainPageContent() {
     setDomains(prev => [...prev, newEntity])
     setHasChanges(true)
     setShowAddEntity(false)
-  }, [projectId])
+  }, [projectId, requirementId])
 
   // 添加关系
   const handleAddRelation = useCallback((relationData: Partial<EntityRelation>) => {
@@ -518,6 +552,7 @@ function DomainPageContent() {
   // 保存更改
   const handleSave = useCallback(async () => {
     try {
+      const idToUse = requirementId || projectId
       // 保存实体位置和更新
       for (const entity of domains) {
         await apiService.updateDomainEntity(entity.id, {
@@ -532,14 +567,14 @@ function DomainPageContent() {
       // 保存关系
       for (const relation of relations) {
         if (relation.id.startsWith('relation_')) {
-          await apiService.createEntityRelation(relation, projectId || undefined)
+          await apiService.createEntityRelation(relation, idToUse || undefined)
         } else {
           await apiService.updateEntityRelation(relation.id, {
             fromEntityId: relation.fromEntityId,
             toEntityId: relation.toEntityId,
             relationType: relation.relationType,
             description: relation.description,
-          }, projectId || undefined)
+          }, idToUse || undefined)
         }
       }
       
@@ -549,7 +584,46 @@ function DomainPageContent() {
       console.error('保存失败:', err)
       alert('保存失败: ' + err.message)
     }
-  }, [domains, relations, projectId])
+  }, [domains, relations, projectId, requirementId])
+
+  // 从需求生成限界上下文
+  const handleGenerate = useCallback(async () => {
+    if (!requirementText.trim()) {
+      alert('请先输入需求内容')
+      return
+    }
+
+    setGenerating(true)
+    try {
+      const response = await generateBoundedContext(requirementText, projectId || undefined)
+      
+      if (response.success && response.boundedContexts && response.boundedContexts.length > 0) {
+        // Convert bounded contexts to domain entities
+        const newEntities: DomainEntity[] = response.boundedContexts.map((ctx: BoundedContext, index: number) => ({
+          id: `entity_gen_${Date.now()}_${index}`,
+          requirementId: requirementId || projectId || '',
+          name: ctx.name,
+          type: ctx.type === 'core' ? 'business' as EntityType : 
+                ctx.type === 'supporting' ? 'system' as EntityType :
+                ctx.type === 'generic' ? 'abstract' as EntityType : 'external' as EntityType,
+          description: ctx.description,
+          attributes: [],
+          position: { x: 100 + (index % 3) * 300, y: 100 + Math.floor(index / 3) * 200 },
+        }))
+        
+        setDomains(newEntities)
+        setHasChanges(true)
+        alert(`成功生成 ${newEntities.length} 个限界上下文！`)
+      } else {
+        throw new Error(response.error || '生成失败')
+      }
+    } catch (err: any) {
+      console.error('生成失败:', err)
+      alert('生成失败: ' + err.message)
+    } finally {
+      setGenerating(false)
+    }
+  }, [requirementText, projectId, requirementId])
 
   // 删除实体
   const handleDeleteEntity = useCallback((entityId: string) => {
@@ -645,7 +719,10 @@ function DomainPageContent() {
             onAddEntity={() => setShowAddEntity(true)}
             onAddRelation={() => setShowAddRelation(true)}
             onSave={handleSave}
+            onGenerate={handleGenerate}
             hasChanges={hasChanges}
+            hasRequirementText={!!requirementText}
+            generating={generating}
           />
           <DomainFlow
             entities={domains}

@@ -42,6 +42,7 @@ import prototypeChat from './routes/prototype-chat';
 import uiGeneration from './routes/ui-generation';
 import requirementsExport from './routes/requirements-export';
 import projectSettings from './routes/project-settings';
+import ddd from './routes/ddd';
 
 // 创建 Hono 应用，绑定 Cloudflare 环境变量类型
 const app = new Hono<{ Bindings: CloudflareEnv }>();
@@ -102,6 +103,7 @@ app.route('/api/version', version);
 app.route('/api/requirements-export', requirementsExport);
 app.route('/api/projects/:id/settings', projectSettings);
 app.route('/api/confirmation-projects', confirmationProjects);
+app.route('/api/ddd', ddd);
 
 // 导出 for Cloudflare Workers
 export default app;

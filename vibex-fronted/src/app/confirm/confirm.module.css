@@ -417,3 +417,47 @@
   font-weight: 700;
   color: #4ade80;
 }
+
+/* ConfirmationSteps wrapper */
+.steps {
+  margin-bottom: 2rem;
+}
+
+.steps :global(.container) {
+  justify-content: center;
+}
+
+.steps :global(.indicator) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.steps :global(.step.in-progress .indicator),
+.steps :global(.step.completed .indicator) {
+  background: #4ade80;
+  border-color: #4ade80;
+  color: #1a1a2e;
+}
+
+.steps :global(.step.pending .indicator) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.steps :global(.title) {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.steps :global(.step.in-progress .title),
+.steps :global(.step.completed .title) {
+  color: #fff;
+}
+
+.steps :global(.connector) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.steps :global(.connector.completed) {
+  background: #4ade80;
+}

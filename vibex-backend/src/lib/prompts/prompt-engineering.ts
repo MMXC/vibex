@@ -438,7 +438,7 @@ Show your reasoning step by step.`;
  * @returns Composed prompt with system and user messages
  */
 export function composePrompt(config: PromptConfig): ComposedPrompt {
-  let systemMessage = config.systemMessage || '';
+  const systemMessage = config.systemMessage || '';
   let userMessage = config.userMessage || '';
   
   // Add chain-of-thought if enabled

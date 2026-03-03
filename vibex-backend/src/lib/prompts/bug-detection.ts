@@ -1280,7 +1280,7 @@ export function calculateBugDetectionSummary(result: BugDetectionResult): {
 export function generateBugMarkdownReport(result: BugDetectionResult): string {
   const { status, priorityBugs, mainCategories } = calculateBugDetectionSummary(result);
 
-  let report = `# Bug Detection Report
+  const report = `# Bug Detection Report
 
 ## Summary
 - **Total Bugs**: ${result.totalBugs}

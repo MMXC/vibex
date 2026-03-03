@@ -66,8 +66,8 @@ export default function NewRequirement() {
       
       // 跳转到领域模型页
       router.push('/domain')
-    } catch (err: any) {
-      setError(err.message || '创建需求失败')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '创建需求失败')
     } finally {
       setIsSubmitting(false)
     }

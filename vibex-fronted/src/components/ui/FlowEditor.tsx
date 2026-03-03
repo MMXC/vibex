@@ -25,6 +25,7 @@ import ReactFlow, {
   NodeChange,
   EdgeChange,
   Viewport,
+  FitViewOptions,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import styles from './FlowEditor.module.css'
@@ -43,7 +44,7 @@ export type FlowEditorProps = {
   onNodeClick?: (node: Node) => void
   onEdgeClick?: (edge: Edge) => void
   onNodesDragStop?: (node: Node) => void
-  onInit?: (instance: any) => void
+  onInit?: (instance: unknown) => void
   fitView?: boolean
   fitViewOptions?: { padding?: number; includeHiddenNodes?: boolean }
   minZoom?: number
@@ -168,14 +169,15 @@ function FlowEditorInner({
 
   // Initialize with fitView or default viewport
   const handleInit = useCallback(
-    (instance: any) => {
+    (instance: unknown) => {
+      const flowInstance = instance as any
       if (onInit) {
         onInit(instance)
       }
       if (defaultViewport) {
-        instance.setViewport(defaultViewport)
+        flowInstance.setViewport?.(defaultViewport)
       } else if (fitView) {
-        setTimeout(() => instance.fitView(fitViewOptions), 100)
+        setTimeout(() => flowInstance.fitView?.(fitViewOptions), 100)
       }
     },
     [onInit, defaultViewport, fitView, fitViewOptions]

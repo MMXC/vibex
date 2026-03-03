@@ -332,7 +332,7 @@ export async function transactionDB(
     
     return prisma.$transaction(async (tx) => {
       let totalChanges = 0;
-      let lastRowId: number | bigint = 0;
+      const lastRowId: number | bigint = 0;
       
       for (const op of operations) {
         const result = await tx.$executeRawUnsafe(op.sql, ...op.params);

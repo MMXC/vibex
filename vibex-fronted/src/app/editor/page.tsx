@@ -23,7 +23,7 @@ interface EditorComponent {
   id: string
   type: string
   name: string
-  props: Record<string, any>
+  props: Record<string, unknown>
 }
 
 export default function Editor() {
@@ -63,15 +63,15 @@ export default function Editor() {
     }
   }
 
-  const getDefaultProps = (type: string) => {
-    const defaults: Record<string, any> = {
+  const getDefaultProps = (type: string): Record<string, unknown> => {
+    const defaults: Record<string, unknown> = {
       text: { content: '新文本', level: 'body' },
       image: { src: '/placeholder.jpg', alt: '图片' },
       button: { text: '按钮', variant: 'primary' },
       input: { placeholder: '请输入...', label: '标签' },
       card: { title: '卡片标题', content: '卡片内容' },
     }
-    return defaults[type] || {}
+    return (defaults[type] || {}) as Record<string, unknown>
   }
 
   const deleteComponent = (id: string) => {
@@ -79,7 +79,7 @@ export default function Editor() {
     if (selectedComponent === id) setSelectedComponent(null)
   }
 
-  const updateComponentProps = (id: string, props: Record<string, any>) => {
+  const updateComponentProps = (id: string, props: Record<string, unknown>) => {
     setEditorComponents(prev => prev.map(c => 
       c.id === id ? { ...c, props: { ...c.props, ...props } } : c
     ))
@@ -92,33 +92,35 @@ export default function Editor() {
         const style = comp.props.level === 1 
           ? { fontSize: '32px', fontWeight: 'bold', background: 'linear-gradient(135deg, #00ffff 0%, #8b5cf6 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }
           : { color: '#a0a0b0' }
-        return <Tag style={style}>{comp.props.content}</Tag>
+        const textLevel = comp.props.level as string
+        return <Tag style={style}>{String(textLevel)}</Tag>
       case 'button':
         return (
           <button className={styles.previewButton}>
-            {comp.props.text}
+            {String(comp.props.text ?? '')}
           </button>
         )
       case 'card':
         return (
           <div className={styles.previewCard}>
-            <h3>{comp.props.title}</h3>
-            <p>{comp.props.content}</p>
+            <h3>{String(comp.props.title ?? '')}</h3>
+            <p>{String(comp.props.content ?? '')}</p>
           </div>
         )
       case 'navbar':
+        const navLinks = comp.props.links as string[] | undefined
         return (
           <nav className={styles.previewNav}>
-            <span className={styles.logo}>{comp.props.title}</span>
+            <span className={styles.logo}>{String(comp.props.title ?? '')}</span>
             <div className={styles.navLinks}>
-              {comp.props.links?.map((link: string, i: number) => (
+              {navLinks?.map((link: string, i: number) => (
                 <span key={i}>{link}</span>
               ))}
             </div>
           </nav>
         )
       default:
-        return <div className={styles.previewPlaceholder}>[{comp.name}]</div>
+        return <div className={styles.previewPlaceholder}>[{String(comp.name ?? '')}]</div>
     }
   }
 

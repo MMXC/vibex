@@ -37,10 +37,10 @@ const mockDeleteConversation = jest.fn()
 
 jest.mock('@/services/api', () => ({
   apiService: {
-    getMessages: (...args: any[]) => mockGetMessages(...args),
-    createMessage: (...args: any[]) => mockCreateMessage(...args),
-    getConversations: (...args: any[]) => mockGetConversations(...args),
-    deleteConversation: (...args: any[]) => mockDeleteConversation(...args),
+    getMessages: (...args: unknown[]) => mockGetMessages(...args),
+    createMessage: (...args: unknown[]) => mockCreateMessage(...args),
+    getConversations: (...args: unknown[]) => mockGetConversations(...args),
+    deleteConversation: (...args: unknown[]) => mockDeleteConversation(...args),
   },
 }))
 

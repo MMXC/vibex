@@ -196,7 +196,7 @@ aiDesignChat.post('/', async (c) => {
     const convId = conversationId || `design_${Date.now()}`;
     
     // Get existing conversation history or initialize
-    let conversationHistory = conversations.get(convId) || [];
+    const conversationHistory = conversations.get(convId) || [];
     
     // If this is a new conversation, add system prompt
     if (conversationHistory.length === 0) {

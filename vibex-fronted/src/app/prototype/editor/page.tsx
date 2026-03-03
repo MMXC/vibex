@@ -4,7 +4,7 @@ import React, { Suspense, useState, useCallback, useEffect, useRef, useMemo } fr
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import styles from './prototype.module.css'
-import { apiService, UIPage, PrototypeSnapshot } from '@/services/api'
+import { apiService, UIPage, PrototypeSnapshot, UIComponent } from '@/services/api'
 
 // 版本历史类型
 interface VersionHistory {
@@ -34,7 +34,7 @@ interface ChatMessage {
 // 组件状态类型
 interface ComponentState {
   [componentId: string]: {
-    [key: string]: any
+    [key: string]: unknown
   }
 }
 
@@ -62,11 +62,11 @@ function PreviewContent({ content }: { content: string }) {
       <div className={styles.comparePreview}>
         <div className={styles.comparePageName}>{page.name}</div>
         <div className={styles.compareComponentList}>
-          {page.components?.map((comp: any, idx: number) => (
+          {page.components?.map((comp: UIComponent, idx: number) => (
             <div key={comp.id || idx} className={styles.compareComponent}>
               <span className={styles.compareComponentType}>{comp.type}</span>
               <span className={styles.compareComponentProps}>
-                {comp.props?.text || comp.props?.title || comp.props?.label || '-'}
+                {String(comp.props?.text || comp.props?.title || comp.props?.label || '-')}
               </span>
             </div>
           ))}
@@ -93,10 +93,10 @@ function InteractiveRenderer({
   onStateChange,
   onComponentClick 
 }: { 
-  component: any
+  component: UIComponent
   componentState: ComponentState
-  onStateChange: (componentId: string, key: string, value: any) => void
-  onComponentClick: (component: any) => void
+  onStateChange: (componentId: string, key: string, value: unknown) => void
+  onComponentClick: (component: UIComponent) => void
 }) {
   const state = componentState[component.id] || {}
   const [hovered, setHovered] = useState(false)
@@ -136,6 +136,7 @@ function InteractiveRenderer({
   switch (component.type) {
     // 导航组件
     case 'navigation':
+      const navState = state as { theme?: { backgroundColor?: string }; activeItem?: number }
       return (
         <nav 
           key={component.id} 
@@ -144,7 +145,7 @@ function InteractiveRenderer({
             display: 'flex', 
             justifyContent: 'space-between', 
             padding: '12px 24px', 
-            backgroundColor: state.theme?.backgroundColor || '#1a1a2e', 
+            backgroundColor: (navState.theme as any)?.backgroundColor || '#1a1a2e', 
             borderBottom: '1px solid rgba(255,255,255,0.1)',
             minHeight: '48px',
             alignItems: 'center'
@@ -152,14 +153,14 @@ function InteractiveRenderer({
           onClick={() => onComponentClick(component)}
         >
           <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#00d4ff' }}>
-            {component.props?.title || 'Vibex App'}
+            {String(component.props?.title || 'Vibex App')}
           </div>
           <div style={{ display: 'flex', gap: '16px' }}>
-            {(component.props?.items || []).map((item: string, i: number) => (
+            {(component.props?.items as string[] || []).map((item: string, i: number) => (
               <span 
                 key={i} 
                 style={{ 
-                  color: state.activeItem === i ? '#00d4ff' : '#94a3b8', 
+                  color: navState.activeItem === i ? '#00d4ff' : '#94a3b8', 
                   fontSize: '14px',
                   cursor: 'pointer',
                   transition: 'color 0.2s',
@@ -167,7 +168,7 @@ function InteractiveRenderer({
                 onClick={(e) => {
                   e.stopPropagation()
                   onStateChange(component.id, 'activeItem', i)
-                  onComponentClick({ ...component, selectedItem: item })
+                  onComponentClick({ ...component, selectedItem: item } as UIComponent)
                 }}
               >
                 {item}
@@ -179,16 +180,17 @@ function InteractiveRenderer({
 
     // 文本组件
     case 'text':
-      const TextTag = component.props?.variant === 'h1' ? 'h1' : component.props?.variant === 'h2' ? 'h2' : 'p'
+      const textProps = component.props as { variant?: string; color?: string; margin?: string; padding?: string; text?: string }
+      const TextTag = textProps.variant === 'h1' ? 'h1' : textProps.variant === 'h2' ? 'h2' : 'p'
       const textStyles: React.CSSProperties = {
         ...baseStyle,
-        fontSize: component.props?.variant === 'h1' ? '32px' : component.props?.variant === 'h2' ? '24px' : '16px',
-        fontWeight: component.props?.variant === 'h1' || component.props?.variant === 'h2' ? 'bold' : 'normal',
-        color: component.props?.color || '#e2e8f0',
-        margin: component.props?.margin || '0',
-        padding: component.props?.padding || '0',
+        fontSize: textProps.variant === 'h1' ? '32px' : textProps.variant === 'h2' ? '24px' : '16px',
+        fontWeight: textProps.variant === 'h1' || textProps.variant === 'h2' ? 'bold' : 'normal',
+        color: textProps.color || '#e2e8f0',
+        margin: textProps.margin || '0',
+        padding: textProps.padding || '0',
       }
-      return <TextTag key={component.id} style={textStyles} onClick={() => onComponentClick(component)}>{component.props?.text}</TextTag>
+      return <TextTag key={component.id} style={textStyles} onClick={() => onComponentClick(component)}>{String(textProps.text || '')}</TextTag>
 
     // 按钮组件
     case 'button':
@@ -217,15 +219,17 @@ function InteractiveRenderer({
 
     // 输入框组件
     case 'input':
+      const inputProps = component.props as { label?: string; type?: string; placeholder?: string; showCount?: boolean; maxLength?: number }
+      const inputState = state as { value?: string }
       return (
         <div key={component.id} style={{ ...baseStyle, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {component.props?.label && (
-            <label style={{ color: '#94a3b8', fontSize: '14px' }}>{component.props.label}</label>
+          {inputProps.label && (
+            <label style={{ color: '#94a3b8', fontSize: '14px' }}>{inputProps.label}</label>
           )}
           <input
-            type={component.props?.type || 'text'}
-            placeholder={component.props?.placeholder || '请输入...'}
-            value={state.value || ''}
+            type={inputProps.type || 'text'}
+            placeholder={inputProps.placeholder || '请输入...'}
+            value={inputState.value || ''}
             onChange={handleInputChange}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
@@ -242,27 +246,29 @@ function InteractiveRenderer({
               boxSizing: 'border-box',
             }}
           />
-          {component.props?.showCount && state.value && (
-            <span style={{ color: '#64748b', fontSize: '12px' }}>{String(state.value).length} / {component.props?.maxLength || 100}</span>
+          {inputProps.showCount && inputState.value && (
+            <span style={{ color: '#64748b', fontSize: '12px' }}>{String(inputState.value).length} / {inputProps.maxLength || 100}</span>
           )}
         </div>
       )
 
     // 文本域组件
     case 'textarea':
+      const textareaProps = component.props as { label?: string; placeholder?: string; rows?: number }
+      const textareaState = state as { value?: string }
       return (
         <div key={component.id} style={{ ...baseStyle, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {component.props?.label && (
-            <label style={{ color: '#94a3b8', fontSize: '14px' }}>{component.props.label}</label>
+          {textareaProps.label && (
+            <label style={{ color: '#94a3b8', fontSize: '14px' }}>{textareaProps.label}</label>
           )}
           <textarea
-            placeholder={component.props?.placeholder || '请输入...'}
-            value={state.value || ''}
+            placeholder={textareaProps.placeholder || '请输入...'}
+            value={textareaState.value || ''}
             onChange={handleInputChange}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             onClick={() => onComponentClick(component)}
-            rows={component.props?.rows || 4}
+            rows={textareaProps.rows || 4}
             style={{
               padding: '10px 14px',
               borderRadius: '8px',
@@ -345,28 +351,29 @@ function InteractiveRenderer({
 
     // 列表组件
     case 'list':
+      const listProps = component.props as { items?: unknown[]; showArrow?: boolean }
       return (
         <div key={component.id} style={{ ...baseStyle }}>
-          {(component.props?.items || []).map((item: any, index: number) => (
+          {(listProps.items || []).map((item: unknown, index: number) => (
             <div 
               key={index}
               style={{
                 padding: '12px 16px',
-                borderBottom: index < (component.props?.items?.length || 0) - 1 ? '1px solid #334155' : 'none',
+                borderBottom: index < (listProps.items?.length || 0) - 1 ? '1px solid #334155' : 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 cursor: 'pointer',
                 transition: 'background-color 0.2s',
               }}
-              onClick={() => onComponentClick({ ...component, selectedItem: item, index })}
+              onClick={() => onComponentClick({ ...component, selectedItem: item, index } as UIComponent)}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1e293b')}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
             >
               <span style={{ color: '#e2e8f0', fontSize: '14px' }}>
-                {typeof item === 'string' ? item : item.label}
+                {typeof item === 'string' ? item : (item as { label?: string }).label}
               </span>
-              {component.props?.showArrow !== false && (
+              {listProps.showArrow !== false && (
                 <span style={{ color: '#64748b' }}>›</span>
               )}
             </div>
@@ -711,7 +718,7 @@ function EditorContent() {
   }, [projectId, selectedPage, versionList.length, loadVersionHistory])
 
   // 更新组件状态
-  const handleStateChange = useCallback((componentId: string, key: string, value: any) => {
+  const handleStateChange = useCallback((componentId: string, key: string, value: unknown) => {
     setComponentState(prev => ({
       ...prev,
       [componentId]: {
@@ -723,7 +730,7 @@ function EditorContent() {
   }, [])
 
   // 处理组件点击
-  const handleComponentClick = useCallback((component: any) => {
+  const handleComponentClick = useCallback((component: UIComponent) => {
     const timestamp = new Date().toLocaleTimeString('zh-CN')
     setLastInteraction(`[${timestamp}] ${component.type}: ${component.props?.text || component.props?.title || '点击事件'}`)
     setInteractionCount(prev => prev + 1)
@@ -1078,7 +1085,7 @@ function EditorContent() {
               <div className={styles.browserContent}>
                 {/* 实时预览区域 */}
                 <div className={styles.previewContainer}>
-                  {displayPage?.components?.map((comp: any) => (
+                  {displayPage?.components?.map((comp: UIComponent) => (
                     <InteractiveRenderer
                       key={comp.id}
                       component={comp}

@@ -72,9 +72,9 @@ export default function Requirements() {
       const data = await apiService.getRequirements(uid)
       setRequirements(data || [])
       setLoadingState('success')
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('获取需求列表失败:', err)
-      setError(err.message || '获取需求列表失败')
+      setError(err instanceof Error ? err.message : '获取需求列表失败')
       
       // 如果有重试次数限制，可以使用模拟数据作为后备
       if (retryCount < 2) {
@@ -133,8 +133,8 @@ export default function Requirements() {
         await apiService.deleteRequirement(id, userId)
       }
       setRequirements(requirements.filter(r => r.id !== id))
-    } catch (err: any) {
-      setError(err.message || '删除失败')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '删除失败')
     }
   }
 

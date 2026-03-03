@@ -89,7 +89,7 @@ export default function PrototypePreview() {
           // 无项目数据
           setPages([])
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Load error:', err)
         // 错误时使用空数据
         setPages([])

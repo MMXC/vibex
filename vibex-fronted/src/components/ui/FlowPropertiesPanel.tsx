@@ -68,8 +68,8 @@ function PropertyField({
   rows = 3,
 }: {
   label: string
-  value: any
-  onChange: (value: any) => void
+  value: unknown
+  onChange: (value: unknown) => void
   type?: 'text' | 'textarea' | 'select' | 'boolean' | 'number'
   options?: { value: string; label: string }[]
   rows?: number
@@ -186,7 +186,7 @@ export default function FlowPropertiesPanel({
 
   // Handle node data change
   const handleNodeDataChange = useCallback(
-    (key: string, value: any) => {
+    (key: string, value: unknown) => {
       if (selectedNode && onNodeChange) {
         onNodeChange(selectedNode.id, { [key]: value })
       }
@@ -196,7 +196,7 @@ export default function FlowPropertiesPanel({
 
   // Handle edge data change
   const handleEdgeDataChange = useCallback(
-    (key: string, value: any) => {
+    (key: string, value: unknown) => {
       if (selectedEdge && onEdgeChange) {
         onEdgeChange(selectedEdge.id, { [key]: value })
       }

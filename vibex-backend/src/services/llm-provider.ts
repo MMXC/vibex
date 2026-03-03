@@ -823,9 +823,9 @@ export class LLMProviderService {
     options: LLMRequestOptions,
     onChunk?: (chunk: LLMStreamChunk) => void
   ): Promise<Response> {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     const provider = this.selectProvider(options);
-    const model = options.model || provider.defaultModel;
 
     const stream = new ReadableStream({
       async start(controller) {

@@ -362,6 +362,7 @@ export class LLMService {
     });
 
     // Bind streamChat to preserve 'this' context
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const thisLLMService = this;
 
     return new Response(stream, {

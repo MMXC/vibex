@@ -48,7 +48,7 @@ const relationTypeStyles: Record<string, { color: string; label: string; strokeD
 type TabType = 'graph' | 'list'
 
 // 自定义节点组件
-function EntityNode({ data }: { data: { entity: DomainEntity; selected: boolean; onSelect: (e: any) => void } }) {
+function EntityNode({ data }: { data: { entity: DomainEntity; selected: boolean; onSelect: (e: unknown) => void } }) {
   const { entity, selected, onSelect } = data
   const typeStyle = entityTypeStyles[entity.type] || { color: '#666', label: entity.type }
   
@@ -290,7 +290,7 @@ function DomainFlow({
   const defaultEdgeOptions = {
     type: 'smoothstep',
     style: { strokeWidth: 2 },
-    markerEnd: { type: MarkerType.ArrowClosed } as any,
+    markerEnd: { type: MarkerType.ArrowClosed },
   }
 
   return (
@@ -365,8 +365,8 @@ function DomainPageContent() {
         data: { 
           entity, 
           selected: selectedEntity?.id === entity.id,
-          onSelect: (e: any) => {
-            e.stopPropagation()
+          onSelect: (e: unknown) => {
+            (e as React.MouseEvent).stopPropagation()
             setSelectedEntity(entity)
           }
         },
@@ -469,8 +469,8 @@ function DomainPageContent() {
           setDomains(domainData)
           setRelations(relationData)
         }
-      } catch (err: any) {
-        setError(err.message || '加载数据失败')
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : '加载数据失败')
       } finally {
         setLoading(false)
       }
@@ -580,9 +580,9 @@ function DomainPageContent() {
       
       setHasChanges(false)
       alert('保存成功！')
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('保存失败:', err)
-      alert('保存失败: ' + err.message)
+      alert('保存失败: ' + (err as Error).message)
     }
   }, [domains, relations, projectId, requirementId])
 
@@ -617,9 +617,9 @@ function DomainPageContent() {
       } else {
         throw new Error(response.error || '生成失败')
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('生成失败:', err)
-      alert('生成失败: ' + err.message)
+      alert('生成失败: ' + (err as Error).message)
     } finally {
       setGenerating(false)
     }

@@ -317,12 +317,12 @@ export function useBranchDialog() {
   const [isOpen, setIsOpen] = useState(false);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [activeBranchId, setActiveBranchId] = useState<string>('');
-  const [resolve, setResolve] = useState<((result: { action: string; data?: any }) => void) | null>(null);
+  const [resolve, setResolve] = useState<((result: { action: string; data?: unknown }) => void) | null>(null);
 
   const open = (options: {
     branches: Branch[];
     activeBranchId?: string;
-  }): Promise<{ action: string; data?: any }> => {
+  }): Promise<{ action: string; data?: unknown }> => {
     return new Promise((resolveFn) => {
       setBranches(options.branches);
       setActiveBranchId(options.activeBranchId || '');

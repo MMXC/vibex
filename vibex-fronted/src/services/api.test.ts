@@ -52,7 +52,7 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 describe('ApiService - 认证', () => {
   const mockBaseURL = 'https://api.vibex.example.com';
   let api: ApiService;
-  let mockClient: any;
+  let mockClient: unknown;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -105,7 +105,7 @@ describe('ApiService - 认证', () => {
 describe('ApiService - 用户数据', () => {
   const mockBaseURL = 'https://api.vibex.example.com';
   let api: ApiService;
-  let mockClient: any;
+  let mockClient: unknown;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -149,7 +149,7 @@ describe('ApiService - 用户数据', () => {
 describe('ApiService - 项目数据', () => {
   const mockBaseURL = 'https://api.vibex.example.com';
   let api: ApiService;
-  let mockClient: any;
+  let mockClient: unknown;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -209,7 +209,7 @@ describe('ApiService - 项目数据', () => {
 describe('ApiService - 对话历史', () => {
   const mockBaseURL = 'https://api.vibex.example.com';
   let api: ApiService;
-  let mockClient: any;
+  let mockClient: unknown;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -251,7 +251,7 @@ describe('ApiService - 对话历史', () => {
 describe('ApiService - 流程图数据', () => {
   const mockBaseURL = 'https://api.vibex.example.com';
   let api: ApiService;
-  let mockClient: any;
+  let mockClient: unknown;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -293,7 +293,7 @@ describe('ApiService - 流程图数据', () => {
 describe('ApiService - Agent 管理', () => {
   const mockBaseURL = 'https://api.vibex.example.com';
   let api: ApiService;
-  let mockClient: any;
+  let mockClient: unknown;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -335,7 +335,7 @@ describe('ApiService - Agent 管理', () => {
 describe('ApiService - 页面管理', () => {
   const mockBaseURL = 'https://api.vibex.example.com';
   let api: ApiService;
-  let mockClient: any;
+  let mockClient: unknown;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -377,7 +377,7 @@ describe('ApiService - 页面管理', () => {
 describe('ApiService - 错误重试机制', () => {
   const mockBaseURL = 'https://api.vibex.example.com';
   let api: ApiService;
-  let mockClient: any;
+  let mockClient: unknown;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -406,7 +406,7 @@ describe('ApiService - 错误重试机制', () => {
 describe('ApiService - 离线处理', () => {
   const mockBaseURL = 'https://api.vibex.example.com';
   let api: ApiService;
-  let mockClient: any;
+  let mockClient: unknown;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -440,7 +440,7 @@ describe('ApiService - 离线处理', () => {
 describe('ApiService - 需求管理', () => {
   const mockBaseURL = 'https://api.vibex.example.com';
   let api: ApiService;
-  let mockClient: any;
+  let mockClient: unknown;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -514,7 +514,7 @@ describe('ApiService - 需求管理', () => {
 describe('ApiService - 澄清对话', () => {
   const mockBaseURL = 'https://api.vibex.example.com';
   let api: ApiService;
-  let mockClient: any;
+  let mockClient: unknown;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -557,7 +557,7 @@ describe('ApiService - 澄清对话', () => {
 describe('ApiService - 分析结果', () => {
   const mockBaseURL = 'https://api.vibex.example.com';
   let api: ApiService;
-  let mockClient: any;
+  let mockClient: unknown;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -584,7 +584,7 @@ describe('ApiService - 分析结果', () => {
 describe('ApiService - 领域实体', () => {
   const mockBaseURL = 'https://api.vibex.example.com';
   let api: ApiService;
-  let mockClient: any;
+  let mockClient: unknown;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -642,7 +642,7 @@ describe('ApiService - 领域实体', () => {
 describe('ApiService - 实体关系', () => {
   const mockBaseURL = 'https://api.vibex.example.com';
   let api: ApiService;
-  let mockClient: any;
+  let mockClient: unknown;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -700,7 +700,7 @@ describe('ApiService - 实体关系', () => {
 describe('ApiService - 原型快照', () => {
   const mockBaseURL = 'https://api.vibex.example.com';
   let api: ApiService;
-  let mockClient: any;
+  let mockClient: unknown;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -758,7 +758,7 @@ describe('ApiService - 原型快照', () => {
 describe('ApiService - 项目回收站', () => {
   const mockBaseURL = 'https://api.vibex.example.com';
   let api: ApiService;
-  let mockClient: any;
+  let mockClient: unknown;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -816,7 +816,7 @@ describe('ApiService - 项目回收站', () => {
 describe('ApiService - 页面管理扩展', () => {
   const mockBaseURL = 'https://api.vibex.example.com';
   let api: ApiService;
-  let mockClient: any;
+  let mockClient: unknown;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -851,7 +851,7 @@ describe('ApiService - 页面管理扩展', () => {
 describe('ApiService - Agent管理扩展', () => {
   const mockBaseURL = 'https://api.vibex.example.com';
   let api: ApiService;
-  let mockClient: any;
+  let mockClient: unknown;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -886,7 +886,7 @@ describe('ApiService - Agent管理扩展', () => {
 describe('ApiService - 流程图扩展', () => {
   const mockBaseURL = 'https://api.vibex.example.com';
   let api: ApiService;
-  let mockClient: any;
+  let mockClient: unknown;
 
   beforeEach(() => {
     jest.clearAllMocks();

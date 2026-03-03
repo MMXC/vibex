@@ -1,4 +1,5 @@
-import axios, { AxiosInstance, AxiosError } from 'axios';
+import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import { Node, Edge } from 'reactflow';
 
 // ==================== 类型定义 ====================
 
@@ -78,8 +79,8 @@ export interface MessageCreate {
 // 流程图
 export interface FlowData {
   id: string;
-  nodes: any[];
-  edges: any[];
+  nodes: Node[];
+  edges: Edge[];
   projectId: string;
   name?: string | null;
   createdAt?: string;
@@ -87,8 +88,8 @@ export interface FlowData {
 }
 
 export interface FlowDataUpdate {
-  nodes?: any[];
-  edges?: any[];
+  nodes?: Node[];
+  edges?: Edge[];
   name?: string | null;
 }
 
@@ -238,7 +239,7 @@ export interface UIPage {
 
 export interface UIComponent {
   id: string;
-  type: ComponentType;
+  type: string;
   props: Record<string, any>;
   children?: UIComponent[];
 }
@@ -377,22 +378,23 @@ export class ApiService {
     // 请求拦截器 - 添加认证token
     if (this.client.interceptors?.request) {
       this.client.interceptors.request.use(
-        (config: any) => {
+        (config: InternalAxiosRequestConfig) => {
           const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
           if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+            (config.headers as any) = (config.headers as any) || {};
+            (config.headers as any).Authorization = `Bearer ${token}`;
           }
           return config;
         },
-        (error: any) => Promise.reject(error)
+        (error: AxiosError) => Promise.reject(error)
       );
     }
 
     // 响应拦截器 - 统一错误处理
     if (this.client.interceptors?.response) {
       this.client.interceptors.response.use(
-        (response: any) => response,
-        (error: any) => {
+        (response: AxiosResponse) => response,
+        (error: AxiosError) => {
           if (error.response?.status === 401) {
             // Token 过期，清除本地存储
             if (typeof window !== 'undefined') {
@@ -507,15 +509,15 @@ export class ApiService {
   /**
    * 用户登录
    */
-  async login(credentials: LoginRequest): Promise<AuthResponse> {
+  async login(credentials: LoginRequest): Promise<AuthResponse | { data: AuthResponse }> {
     return this.withRetry(async () => {
-      const response = await this.client.post<any>('/auth/login', credentials);
+      const response = await this.client.post<{ data: AuthResponse }>('/auth/login', credentials);
       // 响应适配：提取 response.data.data
       const data = response.data.data || response.data;
       // 保存 token 和用户信息
       if (typeof window !== 'undefined') {
-        localStorage.setItem('auth_token', data.token);
-        localStorage.setItem('user_id', data.user.id);
+        localStorage.setItem('auth_token', (data as AuthResponse).token);
+        localStorage.setItem('user_id', (data as AuthResponse).user.id);
       }
       return data;
     });
@@ -524,15 +526,15 @@ export class ApiService {
   /**
    * 用户注册
    */
-  async register(data: RegisterRequest): Promise<AuthResponse> {
+  async register(data: RegisterRequest): Promise<AuthResponse | { data: AuthResponse }> {
     return this.withRetry(async () => {
-      const response = await this.client.post<any>('/auth/register', data);
+      const response = await this.client.post<{ data: AuthResponse }>('/auth/register', data);
       // 响应适配：提取 response.data.data
       const result = response.data.data || response.data;
       // 保存 token 和用户信息
       if (typeof window !== 'undefined') {
-        localStorage.setItem('auth_token', result.token);
-        localStorage.setItem('user_id', result.user.id);
+        localStorage.setItem('auth_token', (result as AuthResponse).token);
+        localStorage.setItem('user_id', (result as AuthResponse).user.id);
       }
       return result;
     });
@@ -548,7 +550,7 @@ export class ApiService {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('auth_token');
       }
-      return response.data;
+      return (response.data as any);
     });
   }
 
@@ -568,7 +570,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.get<{ user: User }>(`/users/${userId}`);
       this.setToCache(cacheKey, response.data.user);
-      return response.data.user;
+      return (response.data as any).user;
     });
   }
 
@@ -579,7 +581,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.put<{ user: User }>(`/users/${userId}`, data);
       this.clearCache(`user_${userId}`);
-      return response.data.user;
+      return (response.data as any).user;
     });
   }
 
@@ -599,7 +601,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.get<{ projects: Project[] }>('/projects', { params: { userId } });
       this.setToCache(cacheKey, response.data.projects);
-      return response.data.projects;
+      return (response.data as any).projects;
     });
   }
 
@@ -611,7 +613,7 @@ export class ApiService {
       const response = await this.client.post<{ project: Project }>('/projects', project);
       // 清除项目列表缓存
       this.clearCache(`projects_${project.userId}`);
-      return response.data.project;
+      return (response.data as any).project;
     });
   }
 
@@ -629,7 +631,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.get<{ project: Project }>(`/projects/${projectId}`);
       this.setToCache(cacheKey, response.data.project);
-      return response.data.project;
+      return (response.data as any).project;
     });
   }
 
@@ -640,7 +642,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.put<{ project: Project }>(`/projects/${projectId}`, data);
       this.clearCache(`project_${projectId}`);
-      return response.data.project;
+      return (response.data as any).project;
     });
   }
 
@@ -650,7 +652,7 @@ export class ApiService {
   async deleteProject(projectId: string): Promise<SuccessResponse> {
     return this.withRetry(async () => {
       const response = await this.client.delete<SuccessResponse>(`/projects/${projectId}`);
-      return response.data;
+      return (response.data as any);
     });
   }
 
@@ -660,7 +662,7 @@ export class ApiService {
   async softDeleteProject(projectId: string): Promise<Project> {
     return this.withRetry(async () => {
       const response = await this.client.patch<{ project: Project }>(`/projects/${projectId}/soft-delete`, {});
-      return response.data.project;
+      return (response.data as any).project;
     });
   }
 
@@ -670,7 +672,7 @@ export class ApiService {
   async restoreProject(projectId: string): Promise<Project> {
     return this.withRetry(async () => {
       const response = await this.client.patch<{ project: Project }>(`/projects/${projectId}/restore`, {});
-      return response.data.project;
+      return (response.data as any).project;
     });
   }
 
@@ -680,7 +682,7 @@ export class ApiService {
   async permanentDeleteProject(projectId: string): Promise<SuccessResponse> {
     return this.withRetry(async () => {
       const response = await this.client.delete<SuccessResponse>(`/projects/${projectId}/permanent`);
-      return response.data;
+      return (response.data as any);
     });
   }
 
@@ -690,7 +692,7 @@ export class ApiService {
   async getDeletedProjects(): Promise<Project[]> {
     return this.withRetry(async () => {
       const response = await this.client.get<{ projects: Project[] }>('/projects/deleted');
-      return response.data.projects;
+      return (response.data as any).projects;
     });
   }
 
@@ -700,7 +702,7 @@ export class ApiService {
   async clearDeletedProjects(): Promise<SuccessResponse> {
     return this.withRetry(async () => {
       const response = await this.client.delete<SuccessResponse>('/projects/deleted-all');
-      return response.data;
+      return (response.data as any);
     });
   }
 
@@ -709,7 +711,7 @@ export class ApiService {
   /**
    * 获取消息列表
    */
-  async getMessages(projectId: string): Promise<Message[]> {
+  async getMessages(projectId: string): Promise<Message[] | { messages: Message[] }> {
     const cacheKey = `messages_${projectId}`;
     const cached = this.getFromCache<Message[]>(cacheKey);
     
@@ -718,11 +720,11 @@ export class ApiService {
     }
 
     return this.withRetry(async () => {
-      const response = await this.client.get<any>('/messages', { params: { projectId } });
+      const response = await this.client.get<{ messages: Message[] }>('/messages', { params: { projectId } });
       // 响应适配：提取 response.data.messages
-      const messages = response.data.messages || response.data;
-      this.setToCache(cacheKey, messages);
-      return messages;
+      const messages = response.data.messages || (response.data as any as Message[]);
+      this.setToCache(cacheKey, messages as Message[]);
+      return messages as Message[];
     });
   }
 
@@ -734,7 +736,7 @@ export class ApiService {
       const response = await this.client.post<Message>('/messages', message);
       // 清除消息缓存
       this.clearCache(`messages_${message.projectId}`);
-      return response.data;
+      return (response.data as any);
     });
   }
 
@@ -744,7 +746,7 @@ export class ApiService {
   async deleteMessage(messageId: string): Promise<SuccessResponse> {
     return this.withRetry(async () => {
       const response = await this.client.delete<SuccessResponse>(`/messages/${messageId}`);
-      return response.data;
+      return (response.data as any);
     });
   }
 
@@ -764,7 +766,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.get<FlowData>(`/flows/${flowId}`);
       this.setToCache(cacheKey, response.data);
-      return response.data;
+      return (response.data as any);
     });
   }
 
@@ -775,7 +777,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.put<FlowData>(`/flows/${flowId}`, data);
       this.clearCache(`flow_${flowId}`);
-      return response.data;
+      return (response.data as any);
     });
   }
 
@@ -785,7 +787,7 @@ export class ApiService {
   async generateFlow(description: string): Promise<FlowData> {
     return this.withRetry(async () => {
       const response = await this.client.post<FlowData>('/flows/generate', { description });
-      return response.data;
+      return (response.data as any);
     });
   }
 
@@ -795,7 +797,7 @@ export class ApiService {
   async deleteFlow(flowId: string): Promise<SuccessResponse> {
     return this.withRetry(async () => {
       const response = await this.client.delete<SuccessResponse>(`/flows/${flowId}`);
-      return response.data;
+      return (response.data as any);
     });
   }
 
@@ -815,7 +817,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.get<{ agents: Agent[] }>('/agents', { params: { userId } });
       this.setToCache(cacheKey, response.data.agents);
-      return response.data.agents;
+      return (response.data as any).agents;
     });
   }
 
@@ -827,7 +829,7 @@ export class ApiService {
       const response = await this.client.post<{ agent: Agent }>('/agents', agent);
       // 清除缓存
       this.clearCache(`agents_${agent.userId}`);
-      return response.data.agent;
+      return (response.data as any).agent;
     });
   }
 
@@ -845,7 +847,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.get<{ agent: Agent }>(`/agents/${agentId}`);
       this.setToCache(cacheKey, response.data.agent);
-      return response.data.agent;
+      return (response.data as any).agent;
     });
   }
 
@@ -856,7 +858,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.put<{ agent: Agent }>(`/agents/${agentId}`, data);
       this.clearCache(`agent_${agentId}`);
-      return response.data.agent;
+      return (response.data as any).agent;
     });
   }
 
@@ -866,7 +868,7 @@ export class ApiService {
   async deleteAgent(agentId: string): Promise<SuccessResponse> {
     return this.withRetry(async () => {
       const response = await this.client.delete<SuccessResponse>(`/agents/${agentId}`);
-      return response.data;
+      return (response.data as any);
     });
   }
 
@@ -886,7 +888,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.get<{ pages: Page[] }>('/pages', { params: { projectId } });
       this.setToCache(cacheKey, response.data.pages);
-      return response.data.pages;
+      return (response.data as any).pages;
     });
   }
 
@@ -900,7 +902,7 @@ export class ApiService {
       if (page.projectId) {
         this.clearCache(`pages_${page.projectId}`);
       }
-      return response.data.page;
+      return (response.data as any).page;
     });
   }
 
@@ -918,7 +920,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.get<{ page: Page }>(`/pages/${pageId}`);
       this.setToCache(cacheKey, response.data.page);
-      return response.data.page;
+      return (response.data as any).page;
     });
   }
 
@@ -929,7 +931,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.put<{ page: Page }>(`/pages/${pageId}`, data);
       this.clearCache(`page_${pageId}`);
-      return response.data.page;
+      return (response.data as any).page;
     });
   }
 
@@ -939,7 +941,7 @@ export class ApiService {
   async deletePage(pageId: string): Promise<SuccessResponse> {
     return this.withRetry(async () => {
       const response = await this.client.delete<SuccessResponse>(`/pages/${pageId}`);
-      return response.data;
+      return (response.data as any);
     });
   }
 
@@ -959,7 +961,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.get<{ domainEntities: DomainEntity[] }>(`/domain-entities?requirementId=${requirementId}`);
       this.setToCache(cacheKey, response.data.domainEntities);
-      return response.data.domainEntities;
+      return (response.data as any).domainEntities;
     });
   }
 
@@ -977,7 +979,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.get<{ domain: DomainEntity }>(`/domains/${entityId}`);
       this.setToCache(cacheKey, response.data.domain);
-      return response.data.domain;
+      return (response.data as any).domain;
     });
   }
 
@@ -989,7 +991,7 @@ export class ApiService {
       const response = await this.client.post<{ domain: DomainEntity }>(`/requirements/${entity.requirementId}/domains`, entity);
       // 清除缓存
       this.clearCache(`domain_entities_${entity.requirementId}`);
-      return response.data.domain;
+      return (response.data as any).domain;
     });
   }
 
@@ -1003,7 +1005,7 @@ export class ApiService {
       if (data.requirementId) {
         this.clearCache(`domain_entities_${data.requirementId}`);
       }
-      return response.data.domain;
+      return (response.data as any).domain;
     });
   }
 
@@ -1014,7 +1016,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.delete<SuccessResponse>(`/domains/${entityId}`);
       this.clearCache(`domain_entities_${requirementId}`);
-      return response.data;
+      return (response.data as any);
     });
   }
 
@@ -1034,7 +1036,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.get<{ entityRelations: EntityRelation[] }>(`/entity-relations?requirementId=${requirementId}`);
       this.setToCache(cacheKey, response.data.entityRelations);
-      return response.data.entityRelations;
+      return (response.data as any).entityRelations;
     });
   }
 
@@ -1052,7 +1054,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.get<{ entityRelation: EntityRelation }>(`/entity-relations/${relationId}`);
       this.setToCache(cacheKey, response.data.entityRelation);
-      return response.data.entityRelation;
+      return (response.data as any).entityRelation;
     });
   }
 
@@ -1068,7 +1070,7 @@ export class ApiService {
       if (requirementId) {
         this.clearCache(`entity_relations_${requirementId}`);
       }
-      return response.data.entityRelation;
+      return (response.data as any).entityRelation;
     });
   }
 
@@ -1085,7 +1087,7 @@ export class ApiService {
       if (requirementId) {
         this.clearCache(`entity_relations_${requirementId}`);
       }
-      return response.data.entityRelation;
+      return (response.data as any).entityRelation;
     });
   }
 
@@ -1096,7 +1098,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.delete<SuccessResponse>(`/entity-relations/${relationId}`);
       this.clearCache(`entity_relations_${requirementId}`);
-      return response.data;
+      return (response.data as any);
     });
   }
 
@@ -1116,7 +1118,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.get<{ prototypeSnapshots: PrototypeSnapshot[] }>(`/prototype-snapshots?projectId=${projectId}`);
       this.setToCache(cacheKey, response.data.prototypeSnapshots);
-      return response.data.prototypeSnapshots;
+      return (response.data as any).prototypeSnapshots;
     });
   }
 
@@ -1134,7 +1136,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.get<{ prototypeSnapshot: PrototypeSnapshot }>(`/prototype-snapshots/${snapshotId}`);
       this.setToCache(cacheKey, response.data.prototypeSnapshot);
-      return response.data.prototypeSnapshot;
+      return (response.data as any).prototypeSnapshot;
     });
   }
 
@@ -1146,7 +1148,7 @@ export class ApiService {
       const response = await this.client.post<{ prototypeSnapshot: PrototypeSnapshot }>(`/prototype-snapshots`, snapshot);
       // 清除缓存
       this.clearCache(`prototype_snapshots_${snapshot.projectId}`);
-      return response.data.prototypeSnapshot;
+      return (response.data as any).prototypeSnapshot;
     });
   }
 
@@ -1156,7 +1158,7 @@ export class ApiService {
   async updatePrototypeSnapshot(snapshotId: string, data: Partial<PrototypeSnapshotCreate>): Promise<PrototypeSnapshot> {
     return this.withRetry(async () => {
       const response = await this.client.put<{ prototypeSnapshot: PrototypeSnapshot }>(`/prototype-snapshots/${snapshotId}`, data);
-      return response.data.prototypeSnapshot;
+      return (response.data as any).prototypeSnapshot;
     });
   }
 
@@ -1167,7 +1169,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.delete<SuccessResponse>(`/prototype-snapshots/${snapshotId}`);
       this.clearCache(`prototype_snapshots_${projectId}`);
-      return response.data;
+      return (response.data as any);
     });
   }
 
@@ -1187,7 +1189,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.get<{ requirements: Requirement[] }>('/requirements', { params: { userId } });
       this.setToCache(cacheKey, response.data.requirements);
-      return response.data.requirements;
+      return (response.data as any).requirements;
     });
   }
 
@@ -1199,7 +1201,7 @@ export class ApiService {
       const response = await this.client.post<{ requirement: Requirement }>('/requirements', requirement);
       // 清除缓存
       this.clearCache(`requirements_${requirement.userId}`);
-      return response.data.requirement;
+      return (response.data as any).requirement;
     });
   }
 
@@ -1217,7 +1219,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.get<{ requirement: Requirement }>(`/requirements/${requirementId}`);
       this.setToCache(cacheKey, response.data.requirement);
-      return response.data.requirement;
+      return (response.data as any).requirement;
     });
   }
 
@@ -1236,7 +1238,7 @@ export class ApiService {
       if (userId) {
         this.clearCache(`requirements_${userId}`);
       }
-      return response.data.requirement;
+      return (response.data as any).requirement;
     });
   }
 
@@ -1249,7 +1251,7 @@ export class ApiService {
       // 清除缓存
       this.clearCache(`requirement_${requirementId}`);
       this.clearCache(`requirements_${userId}`);
-      return response.data;
+      return (response.data as any);
     });
   }
 
@@ -1261,7 +1263,7 @@ export class ApiService {
       const response = await this.client.post<{ requirement: Requirement }>(`/requirements/${requirementId}/analyze`);
       // 清除缓存
       this.clearCache(`requirement_${requirementId}`);
-      return response.data.requirement;
+      return (response.data as any).requirement;
     });
   }
 
@@ -1273,7 +1275,7 @@ export class ApiService {
       const response = await this.client.post<{ requirement: Requirement }>(`/requirements/${requirementId}/reanalyze`, context);
       // 清除缓存
       this.clearCache(`requirement_${requirementId}`);
-      return response.data.requirement;
+      return (response.data as any).requirement;
     });
   }
 
@@ -1293,7 +1295,7 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.get<{ clarifications: Clarification[] }>(`/requirements/${requirementId}/clarifications`);
       this.setToCache(cacheKey, response.data.clarifications);
-      return response.data.clarifications;
+      return (response.data as any).clarifications;
     });
   }
 
@@ -1307,7 +1309,7 @@ export class ApiService {
       this.clearCache(`clarifications_${requirementId}`);
       // 清除需求缓存，因为回答可能会改变需求状态
       this.clearCache(`requirement_${requirementId}`);
-      return response.data.clarification;
+      return (response.data as any).clarification;
     });
   }
 
@@ -1319,7 +1321,7 @@ export class ApiService {
       const response = await this.client.put<{ clarification: Clarification }>(`/clarifications/${clarificationId}`, { status: 'skipped' });
       // 清除缓存
       this.clearCache(`clarifications_${requirementId}`);
-      return response.data.clarification;
+      return (response.data as any).clarification;
     });
   }
 
@@ -1339,15 +1341,15 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.get<{ analysisResult: AnalysisResult }>(`/requirements/${requirementId}/analysis`);
       this.setToCache(cacheKey, response.data.analysisResult);
-      return response.data.analysisResult;
+      return (response.data as any).analysisResult;
     });
   }
 
   // ==================== 离线队列 ====================
 
-  private offlineQueue: Array<{ fn: () => Promise<any>; key: string }> = [];
+  private offlineQueue: Array<{ fn: () => Promise<unknown>; key: string }> = [];
 
-  async queueOfflineRequest(key: string, requestFn: () => Promise<any>): Promise<any> {
+  async queueOfflineRequest(key: string, requestFn: () => Promise<unknown>): Promise<unknown> {
     if (this.isOnline()) {
       return requestFn();
     }
@@ -1384,12 +1386,20 @@ export default apiService;
 
 // ==================== DDD Bounded Context ====================
 
+export interface ContextRelationship {
+  id: string
+  fromContextId: string
+  toContextId: string
+  type: 'upstream' | 'downstream' | 'symmetric'
+  description: string
+}
+
 export interface BoundedContext {
   id: string
   name: string
   description: string
   type: 'core' | 'supporting' | 'generic' | 'external'
-  relationships: any[]
+  relationships: ContextRelationship[]
 }
 
 export interface BoundedContextResponse {

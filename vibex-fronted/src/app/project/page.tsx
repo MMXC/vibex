@@ -72,8 +72,8 @@ function ProjectDetailContent() {
       try {
         const data = await apiService.getProject(projectId)
         setProject(data)
-      } catch (err: any) {
-        setError(err.message || '加载项目失败')
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : '加载项目失败')
       } finally {
         setLoading(false)
       }

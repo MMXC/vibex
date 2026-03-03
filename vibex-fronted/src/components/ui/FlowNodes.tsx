@@ -11,7 +11,7 @@ export interface FlowNodeData {
   status?: 'success' | 'error' | 'running' | 'pending'
   condition?: string
   branches?: { id: string; label: string }[]
-  [key: string]: any
+  [key: string]: unknown
 }
 
 /**
@@ -188,7 +188,7 @@ export function createFlowNode(
   type: FlowNodeType,
   position: { x: number; y: number },
   data: Partial<FlowNodeData> = {}
-): any {
+): { id: string; type: string; position: { x: number; y: number }; data: FlowNodeData } {
   const baseData: FlowNodeData = {
     label: data.label || `Node ${id}`,
     description: data.description,

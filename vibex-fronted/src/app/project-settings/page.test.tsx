@@ -15,11 +15,11 @@ jest.mock('next/navigation', () => ({
 
 jest.mock('@/services/api', () => ({
   apiService: {
-    updateProject: (...args: any[]) => mockUpdateProject(...args),
+    updateProject: (...args: unknown[]) => mockUpdateProject(...args),
   },
 }))
 
-jest.mock('next/dynamic', () => (component: any) => component)
+jest.mock('next/dynamic', () => (component: unknown) => component)
 
 describe('ProjectSettings (/project-settings)', () => {
   beforeEach(() => {

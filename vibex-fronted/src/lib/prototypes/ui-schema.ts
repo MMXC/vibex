@@ -144,7 +144,7 @@ export interface Animation {
 export interface ComponentInteraction {
   event: 'click' | 'hover' | 'focus' | 'blur' | 'input' | 'change' | 'submit' | 'keypress';
   action: 'navigate' | 'toggle' | 'submit' | 'scroll' | 'open' | 'close' | 'animate' | 'track';
-  params?: Record<string, unknown>;
+  params?: Record<string, any>;
   target?: string;
 }
 
@@ -229,7 +229,7 @@ export interface ComponentStyle {
  */
 export interface ComponentVariant {
   name: string;
-  props?: Record<string, unknown>;
+  props?: Record<string, any>;
   style?: ComponentStyle;
   interactions?: ComponentInteraction[];
 }
@@ -256,7 +256,7 @@ export interface UIComponent {
   id: string;
   type: ComponentType;
   name?: string;
-  props?: Record<string, unknown>;
+  props?: Record<string, any>;
   style?: ComponentStyle;
   children?: UIComponent[];
   interactions?: ComponentInteraction[];
@@ -386,7 +386,7 @@ function isNumber(value: unknown): value is number {
 /**
  * Check if value is an object (not null, not array)
  */
-function isObject(value: unknown): value is Record<string, unknown> {
+function isObject(value: unknown): value is Record<string, any> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
@@ -432,7 +432,7 @@ function validateTypography(value: unknown, path: string): ValidationError[] {
     return errors;
   }
   
-  const fontFamily = (value as Record<string, unknown>).fontFamily;
+  const fontFamily = (value as Record<string, any>).fontFamily;
   if (!isObject(fontFamily)) {
     errors.push({ path: `${path}.fontFamily`, message: 'fontFamily must be an object' });
   } else {
@@ -455,7 +455,7 @@ function validateSpacingScale(value: unknown, path: string): ValidationError[] {
     return errors;
   }
   
-  const spacing = value as Record<string, unknown>;
+  const spacing = value as Record<string, any>;
   
   if (!isNumber(spacing.unit) || spacing.unit <= 0) {
     errors.push({ path: `${path}.unit`, message: 'unit must be a positive number' });
@@ -483,7 +483,7 @@ function validateBreakpoint(value: unknown, path: string): ValidationError[] {
     return errors;
   }
   
-  const bp = value as Record<string, unknown>;
+  const bp = value as Record<string, any>;
   
   if (!isString(bp.name)) {
     errors.push({ path: `${path}.name`, message: 'name must be a string' });
@@ -522,7 +522,7 @@ function validateComponentInteraction(value: unknown, path: string): ValidationE
     return errors;
   }
   
-  const interaction = value as Record<string, unknown>;
+  const interaction = value as Record<string, any>;
   const validEvents = ['click', 'hover', 'focus', 'blur', 'input', 'change', 'submit', 'keypress'];
   const validActions = ['navigate', 'toggle', 'submit', 'scroll', 'open', 'close', 'animate', 'track'];
   
@@ -548,7 +548,7 @@ function validateUIComponentInternal(value: unknown, path: string): ValidationEr
     return errors;
   }
   
-  const component = value as Record<string, unknown>;
+  const component = value as Record<string, any>;
   
   if (!isString(component.id) || component.id.length === 0) {
     errors.push({ path: `${path}.id`, message: 'id is required and must be a non-empty string' });
@@ -588,7 +588,7 @@ function validateUISection(value: unknown, path: string): ValidationError[] {
     return errors;
   }
   
-  const section = value as Record<string, unknown>;
+  const section = value as Record<string, any>;
   
   if (!isString(section.id) || section.id.length === 0) {
     errors.push({ path: `${path}.id`, message: 'id is required and must be a non-empty string' });
@@ -612,7 +612,7 @@ function validateUIPageLayout(value: unknown, path: string): ValidationError[] {
     return errors;
   }
   
-  const layout = value as Record<string, unknown>;
+  const layout = value as Record<string, any>;
   const validLayoutTypes = ['single', 'split', 'grid', 'sidebar', 'masonry', 'stack'];
   
   if (!validLayoutTypes.includes(layout.type as string)) {
@@ -639,7 +639,7 @@ function validateUIPageInternal(value: unknown, path: string): ValidationError[]
     return errors;
   }
   
-  const page = value as Record<string, unknown>;
+  const page = value as Record<string, any>;
   
   if (!isString(page.id) || page.id.length === 0) {
     errors.push({ path: `${path}.id`, message: 'id is required and must be a non-empty string' });
@@ -679,7 +679,7 @@ function validateUIThemeInternal(value: unknown, path: string): ValidationError[
     return errors;
   }
   
-  const theme = value as Record<string, unknown>;
+  const theme = value as Record<string, any>;
   
   if (!isString(theme.version) || theme.version.length === 0) {
     errors.push({ path: `${path}.version`, message: 'version is required and must be a non-empty string' });
@@ -725,7 +725,7 @@ export function validateUISchema(schema: unknown): ValidationResult {
     };
   }
   
-  const s = schema as Record<string, unknown>;
+  const s = schema as Record<string, any>;
   
   if (!isString(s.version) || s.version.length === 0) {
     errors.push({ path: 'version', message: 'version is required and must be a non-empty string' });
@@ -746,7 +746,7 @@ export function validateUISchema(schema: unknown): ValidationResult {
       errors.push(...validateUIPageInternal(page, `pages[${index}]`));
     });
     
-    const pageIds = s.pages.map((p: unknown) => (p as Record<string, unknown>).id).filter((id): id is string => isString(id));
+    const pageIds = s.pages.map((p: unknown) => (p as Record<string, any>).id).filter((id): id is string => isString(id));
     const duplicates = pageIds.filter((id: string, i: number) => pageIds.indexOf(id) !== i);
     if (duplicates.length > 0) {
       const uniqueDuplicates = Array.from(new Set(duplicates));
@@ -913,7 +913,7 @@ export function createDefaultTheme(name: string = 'default'): UITheme {
  */
 export function createUIComponent(
   type: ComponentType,
-  props?: Record<string, unknown>,
+  props?: Record<string, any>,
   options?: {
     id?: string;
     name?: string;

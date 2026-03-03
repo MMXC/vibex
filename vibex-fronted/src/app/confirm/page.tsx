@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from './confirm.module.css'
-import { useConfirmationStore } from '@/stores/confirmationStore'
+import { useConfirmationStore, BoundedContext } from '@/stores/confirmationStore'
 import { generateBoundedContext } from '@/services/api'
 import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps'
 
@@ -48,9 +48,9 @@ export default function ConfirmPage() {
       } else {
         throw new Error(response.error || '生成失败')
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to generate bounded contexts:', err)
-      setError(err.message || '生成失败，请重试')
+      setError(err instanceof Error ? err.message : '生成失败，请重试')
     } finally {
       setLoading(false)
     }

@@ -54,8 +54,8 @@ const ProjectSettingsPage = () => {
         // 暂时使用默认值，项目详情需要后端支持
         setName('新项目')
         setDescription('')
-      } catch (err: any) {
-        setError(err.message || '加载项目失败')
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : '加载项目失败')
       }
     }
     
@@ -107,7 +107,7 @@ const ProjectSettingsPage = () => {
         ]
         
         setCollaborators(mockCollaborators)
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('加载协作者失败:', err)
       } finally {
         setCollaboratorsLoading(false)
@@ -134,8 +134,8 @@ const ProjectSettingsPage = () => {
       })
       alert('保存成功')
       router.push('/dashboard')
-    } catch (err: any) {
-      setError(err.message || '保存失败')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '保存失败')
     } finally {
       setLoading(false)
     }
@@ -180,8 +180,8 @@ const ProjectSettingsPage = () => {
       setInviteEmail('')
       setInviteRole('editor')
       alert('邀请已发送')
-    } catch (err: any) {
-      setError(err.message || '邀请失败')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '邀请失败')
     } finally {
       setInviting(false)
     }
@@ -197,8 +197,8 @@ const ProjectSettingsPage = () => {
       
       setCollaborators(collaborators.filter(c => c.id !== collaboratorId))
       alert('已移除协作者')
-    } catch (err: any) {
-      setError(err.message || '移除失败')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '移除失败')
     }
   }
 
@@ -214,8 +214,8 @@ const ProjectSettingsPage = () => {
         )
       )
       alert('权限已更新')
-    } catch (err: any) {
-      setError(err.message || '更新权限失败')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '更新权限失败')
     }
   }
 
@@ -229,8 +229,8 @@ const ProjectSettingsPage = () => {
       
       setCollaborators(collaborators.filter(c => c.id !== collaboratorId))
       alert('邀请已取消')
-    } catch (err: any) {
-      setError(err.message || '取消邀请失败')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '取消邀请失败')
     }
   }
 

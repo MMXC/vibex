@@ -7,7 +7,7 @@ export interface TableColumn<T> {
   width?: string;
   align?: 'left' | 'center' | 'right';
   sortable?: boolean;
-  render?: (value: any, record: T, index: number) => React.ReactNode;
+  render?: (value: unknown, record: T, index: number) => React.ReactNode;
 }
 
 export interface TableProps<T> {

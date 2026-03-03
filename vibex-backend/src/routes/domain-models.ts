@@ -292,8 +292,8 @@ Extract all relevant domain entities and their relationships. Think about the co
     const graph = buildGraphData(entities, relations);
 
     // Optionally save to database
-    let savedEntities: DomainEntityRow[] = [];
-    let savedRelations: EntityRelationRow[] = [];
+    const savedEntities: DomainEntityRow[] = [];
+    const savedRelations: EntityRelationRow[] = [];
 
     if (saveToDatabase && projectId) {
       const now = new Date().toISOString();

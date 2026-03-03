@@ -31,10 +31,10 @@ const mockLogout = jest.fn()
 
 jest.mock('@/services/api', () => ({
   apiService: {
-    getProjects: (...args: any[]) => mockGetProjects(...args),
-    createProject: (...args: any[]) => mockCreateProject(...args),
-    deleteProject: (...args: any[]) => mockDeleteProject(...args),
-    logout: (...args: any[]) => mockLogout(...args),
+    getProjects: (...args: unknown[]) => mockGetProjects(...args),
+    createProject: (...args: unknown[]) => mockCreateProject(...args),
+    deleteProject: (...args: unknown[]) => mockDeleteProject(...args),
+    logout: (...args: unknown[]) => mockLogout(...args),
   },
 }))
 

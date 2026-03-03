@@ -76,8 +76,8 @@ export default function FlowPage() {
       setCreatedProjectId(`project-${Date.now()}`)
       goToNextStep()
       router.push('/confirm/success')
-    } catch (err: any) {
-      setError(err.message || '创建失败，请重试')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '创建失败，请重试')
     } finally {
       setLoading(false)
     }

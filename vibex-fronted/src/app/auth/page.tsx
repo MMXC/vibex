@@ -27,8 +27,8 @@ export default function Auth() {
       }
       // 登录成功后跳转到 Dashboard
       router.push('/dashboard')
-    } catch (err: any) {
-      setError(err.message || '操作失败，请稍后重试')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '操作失败，请稍后重试')
     } finally {
       setLoading(false)
     }

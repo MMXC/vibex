@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from '../confirm.module.css'
 import { useConfirmationStore } from '@/stores/confirmationStore'
@@ -24,16 +24,8 @@ export default function ContextPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Auto-generate mermaid code when bounded contexts change
-  useEffect(() => {
-    if (boundedContexts.length > 0 && !contextMermaidCode) {
-      const code = generateMermaidCode(boundedContexts)
-      setContextMermaidCode(code)
-    }
-  }, [boundedContexts, contextMermaidCode, setContextMermaidCode])
-
   // Helper function to generate Mermaid code
-  function generateMermaidCode(contexts: typeof boundedContexts) {
+  const generateMermaidCode = useCallback((contexts: typeof boundedContexts) => {
     const lines = ['graph TD']
     
     contexts.forEach(ctx => {
@@ -53,7 +45,15 @@ export default function ContextPage() {
     lines.push('  class ' + contexts.filter(c => c.type === 'supporting').map(c => c.id).join(',') + ' supporting')
     
     return lines.join('\n')
-  }
+  }, [])
+
+  // Auto-generate mermaid code when bounded contexts change
+  useEffect(() => {
+    if (boundedContexts.length > 0 && !contextMermaidCode) {
+      const code = generateMermaidCode(boundedContexts)
+      setContextMermaidCode(code)
+    }
+  }, [boundedContexts, contextMermaidCode, setContextMermaidCode, generateMermaidCode])
 
   const handleContextToggle = (id: string) => {
     if (selectedContextIds.includes(id)) {

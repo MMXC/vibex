@@ -2,6 +2,13 @@
 
 import { Suspense, useState, useCallback, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
+import ReactFlow, {
+  NodeChange,
+  EdgeChange,
+  Connection,
+  applyNodeChanges,
+  applyEdgeChanges,
+} from 'reactflow'
 import FlowEditor, { FlowNode, FlowEdge } from '@/components/ui/FlowEditor'
 import FlowPropertiesPanel from '@/components/ui/FlowPropertiesPanel'
 import { apiService } from '@/services/api'
@@ -14,7 +21,7 @@ interface NodeTemplate {
   icon: string
   category: string
   color: string
-  defaultData: Record<string, any>
+  defaultData: Record<string, unknown>
 }
 
 const nodeTemplates: NodeTemplate[] = [
@@ -164,7 +171,7 @@ function FlowContent() {
   }, [flowId])
 
   // Handle node changes
-  const handleNodesChange = useCallback((changes: any[]) => {
+  const handleNodesChange = useCallback((changes: NodeChange[]) => {
     setNodes((nds) => {
       const newNodes = [...nds]
       changes.forEach((change) => {
@@ -185,7 +192,7 @@ function FlowContent() {
   }, [])
 
   // Handle edge changes
-  const handleEdgesChange = useCallback((changes: any[]) => {
+  const handleEdgesChange = useCallback((changes: EdgeChange[]) => {
     setEdges((eds) => {
       const newEdges = [...eds]
       changes.forEach((change) => {
@@ -201,13 +208,16 @@ function FlowContent() {
   }, [])
 
   // Handle connection
-  const handleConnect = useCallback((connection: any) => {
+  const handleConnect = useCallback((connection: Connection) => {
+    if (!connection.source || !connection.target) return
+    const source = connection.source as string
+    const target = connection.target as string
     setEdges((eds) => [
       ...eds,
       {
-        id: `e${connection.source}-${connection.target}`,
-        source: connection.source,
-        target: connection.target,
+        id: `e${source}-${target}`,
+        source,
+        target,
         animated: false,
         style: { stroke: '#6b7280', strokeWidth: 2 },
       },
@@ -234,7 +244,7 @@ function FlowContent() {
   }, [])
 
   // Update node data
-  const updateNodeData = useCallback((nodeId: string, data: Record<string, any>) => {
+  const updateNodeData = useCallback((nodeId: string, data: Record<string, unknown>) => {
     setNodes((nds) =>
       nds.map((n) =>
         n.id === nodeId ? { ...n, data: { ...n.data, ...data } } : n
@@ -246,7 +256,7 @@ function FlowContent() {
   }, [])
 
   // Update edge data
-  const updateEdgeData = useCallback((edgeId: string, data: Record<string, any>) => {
+  const updateEdgeData = useCallback((edgeId: string, data: Record<string, unknown>) => {
     setEdges((eds) =>
       eds.map((e) =>
         e.id === edgeId ? { ...e, ...data } : e
@@ -394,9 +404,9 @@ function FlowContent() {
       } else {
         setError('AI 生成的流程为空')
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('AI generation failed:', err)
-      setError(err.message || 'AI 生成失败，请稍后重试')
+      setError(err instanceof Error ? err.message : 'AI 生成失败，请稍后重试')
     } finally {
       setAiGenerating(false)
     }

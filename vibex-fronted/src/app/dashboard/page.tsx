@@ -23,8 +23,8 @@ export default function Dashboard() {
       const data = await apiService.getProjects(userId)
       // 过滤未删除的项目
       setProjects(data.filter(p => !p.deletedAt))
-    } catch (err: any) {
-      setError(err.message || '加载项目失败')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '加载项目失败')
     } finally {
       setLoading(false)
     }
@@ -35,7 +35,7 @@ export default function Dashboard() {
     try {
       const data = await apiService.getDeletedProjects()
       setDeletedProjects(data)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('加载回收站失败:', err)
     }
   }
@@ -78,8 +78,8 @@ export default function Dashboard() {
       setProjects(projects.filter(p => p.id !== draggingId))
       // 刷新回收站
       await fetchDeletedProjects()
-    } catch (err: any) {
-      setError(err.message || '删除失败')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '删除失败')
     }
     setDraggingId(null)
   }
@@ -91,8 +91,8 @@ export default function Dashboard() {
       // 刷新列表
       if (userId) fetchProjects(userId)
       await fetchDeletedProjects()
-    } catch (err: any) {
-      setError(err.message || '恢复失败')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '恢复失败')
     }
   }
 
@@ -103,8 +103,8 @@ export default function Dashboard() {
     try {
       await apiService.permanentDeleteProject(projectId)
       await fetchDeletedProjects()
-    } catch (err: any) {
-      setError(err.message || '删除失败')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '删除失败')
     }
   }
 
@@ -115,8 +115,8 @@ export default function Dashboard() {
     try {
       await apiService.clearDeletedProjects()
       setDeletedProjects([])
-    } catch (err: any) {
-      setError(err.message || '清空失败')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : '清空失败')
     }
   }
 

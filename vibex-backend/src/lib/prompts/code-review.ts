@@ -1032,7 +1032,7 @@ export function calculateReviewSummary(result: CodeReviewResult): {
 export function generateMarkdownReport(result: CodeReviewResult): string {
   const { status, mainIssues, priorityFixes } = calculateReviewSummary(result);
 
-  let report = `# Code Review Report
+  const report = `# Code Review Report
 
 ## Summary
 - **Overall Score**: ${result.overallScore}/100

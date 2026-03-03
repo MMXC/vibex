@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import styles from './domain.module.css'
 import { apiService, DomainEntity, EntityRelation, Project, EntityType, generateBoundedContext, BoundedContext } from '@/services/api'
+import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps'
+import { useConfirmationStore, DomainModel } from '@/stores/confirmationStore'
 import ReactFlow, {
   Node,
   Edge,
@@ -347,6 +349,37 @@ function DomainPageContent() {
   // 对话框状态
   const [showAddEntity, setShowAddEntity] = useState(false)
   const [showAddRelation, setShowAddRelation] = useState(false)
+
+  // Confirmation flow store
+  const { 
+    setDomainModels, 
+    currentStep,
+    goToNextStep 
+  } = useConfirmationStore()
+
+  // Handle confirmation and navigate to /confirm/model
+  const handleConfirmAndProceed = () => {
+    // Convert domain entities to domain models for the confirmation flow
+    // Using any type to match the confirmation store's DomainModel format
+    const domainModels = domains.map(entity => ({
+      id: entity.id,
+      name: entity.name,
+      contextId: 'default',
+      type: 'entity' as const,
+      description: entity.description || '',
+      properties: entity.attributes.map(attr => ({
+        name: attr.name,
+        type: attr.type,
+        required: attr.required,
+        description: attr.description || ''
+      })),
+      methods: []
+    }))
+    
+    setDomainModels(domainModels as any)
+    goToNextStep()
+    router.push('/confirm/model')
+  }
 
   // 转换实体为 React Flow 节点
   const convertToNodes = useCallback((entities: DomainEntity[]): Node[] => {
@@ -710,6 +743,16 @@ function DomainPageContent() {
           <Link href={`/requirements${projectId ? `?projectId=${projectId}` : ''}`} className={styles.backLink}>
             返回需求
           </Link>
+          <div className={styles.confirmActions}>
+            <ConfirmationSteps currentStep="model" className={styles.steps} />
+            <button 
+              onClick={handleConfirmAndProceed}
+              className={styles.confirmBtn}
+              disabled={domains.length === 0}
+            >
+              确认并继续
+            </button>
+          </div>
         </div>
       </header>
 

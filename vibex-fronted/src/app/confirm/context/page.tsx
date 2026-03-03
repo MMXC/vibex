@@ -55,6 +55,15 @@ export default function ContextPage() {
     }
   }, [boundedContexts, contextMermaidCode, setContextMermaidCode, generateMermaidCode])
 
+  // Empty state handling: redirect to /confirm if no bounded contexts
+  useEffect(() => {
+    if (boundedContexts.length === 0 && !loading) {
+      // Show alert and redirect
+      alert('请先输入需求描述，AI 将为您生成限界上下文图')
+      router.push('/confirm')
+    }
+  }, [boundedContexts, loading, router])
+
   const handleContextToggle = (id: string) => {
     if (selectedContextIds.includes(id)) {
       setSelectedContextIds(selectedContextIds.filter(i => i !== id))

@@ -142,7 +142,7 @@ export default function Dashboard() {
 
   // 创建新项目 - 跳转到需求输入页面
   const handleCreateProject = () => {
-    router.push('/requirements/new')
+    router.push('/confirm')
   }
 
   if (loading) {
@@ -185,7 +185,7 @@ export default function Dashboard() {
             <span className={styles.navIcon}>⊞</span>
             <span>项目</span>
           </Link>
-          <Link href="/requirements/new" className={styles.navItem}>
+          <Link href="/confirm" className={styles.navItem}>
             <span className={styles.navIcon}>🤖</span>
             <span>AI 原型设计</span>
           </Link>

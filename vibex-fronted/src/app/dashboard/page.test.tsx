@@ -320,7 +320,7 @@ describe('Dashboard (/dashboard)', () => {
   it('project cards are clickable links', async () => {
     render(<Dashboard />)
     await waitFor(() => {
-      const projectLinks = document.querySelectorAll('a[href^="/project/"]')
+      const projectLinks = document.querySelectorAll('a[href^="/project?id="]')
       expect(projectLinks.length).toBeGreaterThan(0)
     })
   })

@@ -274,7 +274,7 @@ export default function Dashboard() {
             {projects.map((project) => (
               <Link
                 key={project.id}
-                href={`/project/${project.id}`}
+                href={`/project?id=${project.id}`}
                 className={`${styles.projectCard} ${styles.active}`}
               >
                 <div className={styles.projectHeader}>

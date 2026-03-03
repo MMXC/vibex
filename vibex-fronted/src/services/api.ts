@@ -1435,3 +1435,61 @@ export async function generateBoundedContext(
   
   return response.json()
 }
+
+/**
+ * 生成领域模型
+ */
+export async function generateDomainModel(
+  boundedContexts: BoundedContext[],
+  requirementText: string,
+  projectId?: string
+): Promise<{ success: boolean; domainModels?: any[]; mermaidCode?: string; error?: string }> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vibex.top/api'
+  
+  const response = await fetch(`${baseUrl}/ddd/domain-model`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      boundedContexts,
+      requirementText,
+      projectId,
+    }),
+  })
+  
+  if (!response.ok) {
+    throw new Error(`API error: ${response.status}`)
+  }
+  
+  return response.json()
+}
+
+/**
+ * 生成业务流程
+ */
+export async function generateBusinessFlow(
+  domainModels: any[],
+  requirementText: string,
+  projectId?: string
+): Promise<{ success: boolean; businessFlow?: any; mermaidCode?: string; error?: string }> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vibex.top/api'
+  
+  const response = await fetch(`${baseUrl}/ddd/business-flow`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      domainModels,
+      requirementText,
+      projectId,
+    }),
+  })
+  
+  if (!response.ok) {
+    throw new Error(`API error: ${response.status}`)
+  }
+  
+  return response.json()
+}

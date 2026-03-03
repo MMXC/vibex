@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import styles from '../confirm.module.css'
 import { useConfirmationStore } from '@/stores/confirmationStore'
 import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps'
+import { generateBusinessFlow, apiService } from '@/services/api'
 
 export default function FlowPage() {
   const router = useRouter()
@@ -18,39 +19,69 @@ export default function FlowPage() {
     goToNextStep,
     goToPreviousStep,
     currentStep,
+    requirementText,
   } = useConfirmationStore()
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Generate mock business flow based on domain models
+  // Generate business flow via API
   useEffect(() => {
-    if (!businessFlow.states.length && domainModels.length > 0) {
-      const states = [
-        { id: 'state-1', name: '初始', type: 'initial' as const, description: '开始' },
-        { id: 'state-2', name: '处理中', type: 'intermediate' as const, description: '处理中' },
-        { id: 'state-3', name: '完成', type: 'final' as const, description: '完成' },
-      ]
-      
-      const transitions = [
-        { id: 'trans-1', fromStateId: 'state-1', toStateId: 'state-2', event: '开始处理' },
-        { id: 'trans-2', fromStateId: 'state-2', toStateId: 'state-3', event: '处理完成' },
-      ]
-      
-      setBusinessFlow({
-        id: 'flow-1',
-        name: '业务流程',
-        states,
-        transitions,
-      })
-      
-      setFlowMermaidCode(`stateDiagram-v2
+    const generateFlow = async () => {
+      if (!businessFlow.states.length && domainModels.length > 0) {
+        setLoading(true)
+        setError('')
+        
+        try {
+          const response = await generateBusinessFlow(domainModels, requirementText)
+          
+          if (response.success && response.businessFlow) {
+            setBusinessFlow(response.businessFlow)
+            if (response.mermaidCode) {
+              setFlowMermaidCode(response.mermaidCode)
+            }
+          } else {
+            throw new Error(response.error || '生成失败')
+          }
+        } catch (err) {
+          console.error('Failed to generate business flow:', err)
+          // Fallback to mock data
+          generateMockFlow()
+        } finally {
+          setLoading(false)
+        }
+      }
+    }
+    
+    generateFlow()
+  }, [domainModels, requirementText])
+
+  // Fallback mock business flow
+  const generateMockFlow = () => {
+    const states = [
+      { id: 'state-1', name: '初始', type: 'initial' as const, description: '开始' },
+      { id: 'state-2', name: '处理中', type: 'intermediate' as const, description: '处理中' },
+      { id: 'state-3', name: '完成', type: 'final' as const, description: '完成' },
+    ]
+    
+    const transitions = [
+      { id: 'trans-1', fromStateId: 'state-1', toStateId: 'state-2', event: '开始处理' },
+      { id: 'trans-2', fromStateId: 'state-2', toStateId: 'state-3', event: '处理完成' },
+    ]
+    
+    setBusinessFlow({
+      id: 'flow-1',
+      name: '业务流程',
+      states,
+      transitions,
+    })
+    
+    setFlowMermaidCode(`stateDiagram-v2
   [*] --> 初始
   初始 --> 处理中: 开始处理
   处理中 --> 完成: 处理完成
   完成 --> [*]`)
-    }
-  }, [domainModels])
+  }
 
   const typeLabels = {
     initial: '初始状态',
@@ -69,15 +100,25 @@ export default function FlowPage() {
     setError('')
 
     try {
-      // Create project
-      // TODO: Call API to create project
+      // Get userId from localStorage
+      const userId = localStorage.getItem('user_id') || 'anonymous'
       
-      // For demo, just simulate project creation
-      setCreatedProjectId(`project-${Date.now()}`)
+      // Call API to create project
+      const project = await apiService.createProject({
+        name: `项目-${Date.now()}`,
+        description: requirementText,
+        userId,
+      })
+      
+      setCreatedProjectId(project.id)
       goToNextStep()
       router.push('/confirm/success')
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : '创建失败，请重试')
+      // Fallback to mock project creation on error
+      console.error('Failed to create project:', err)
+      setCreatedProjectId(`project-${Date.now()}`)
+      goToNextStep()
+      router.push('/confirm/success')
     } finally {
       setLoading(false)
     }

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import styles from '../confirm.module.css'
 import { useConfirmationStore } from '@/stores/confirmationStore'
 import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps'
+import { generateDomainModel, BoundedContext } from '@/services/api'
 
 export default function ModelPage() {
   const router = useRouter()
@@ -18,78 +19,46 @@ export default function ModelPage() {
     goToNextStep,
     goToPreviousStep,
     currentStep,
+    requirementText,
   } = useConfirmationStore()
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Generate mock domain models based on selected contexts
+  // Generate domain models via API
   useEffect(() => {
-    if (domainModels.length === 0 && selectedContextIds.length > 0) {
-      const models: typeof domainModels = []
-      
-      selectedContextIds.forEach((ctxId, ctxIndex) => {
-        const ctx = boundedContexts.find(c => c.id === ctxId)
-        if (ctx) {
-          // Add aggregate root
-          models.push({
-            id: `${ctxId}-ar`,
-            name: `${ctx.name}聚合根`,
-            contextId: ctxId,
-            type: 'aggregate_root',
-            properties: [
-              { name: 'id', type: 'string', required: true, description: '唯一标识' },
-              { name: 'createdAt', type: 'datetime', required: true, description: '创建时间' },
-            ],
-            methods: ['create()', 'update()']
-          })
+    const generateModels = async () => {
+      if (selectedContextIds.length > 0 && domainModels.length === 0) {
+        setLoading(true)
+        setError('')
+        
+        try {
+          // Get selected bounded contexts
+          const selectedContexts = boundedContexts.filter(c => selectedContextIds.includes(c.id))
           
-          // Add entity
-          if (ctxIndex === 0) {
-            models.push({
-              id: `${ctxId}-entity-1`,
-              name: `${ctx.name}实体`,
-              contextId: ctxId,
-              type: 'entity',
-              properties: [
-                { name: 'id', type: 'string', required: true, description: '唯一标识' },
-              ],
-              methods: []
-            })
+          // Call API to generate domain models
+          const response = await generateDomainModel(selectedContexts, requirementText)
+          
+          if (response.success && response.domainModels) {
+            setDomainModels(response.domainModels)
+            if (response.mermaidCode) {
+              setModelMermaidCode(response.mermaidCode)
+            }
+          } else {
+            throw new Error(response.error || '生成失败')
           }
-          
-          // Add value object
-          models.push({
-            id: `${ctxId}-vo-1`,
-            name: `${ctx.name}值对象`,
-            contextId: ctxId,
-            type: 'value_object',
-            properties: [
-              { name: 'value', type: 'string', required: true, description: '值' },
-            ],
-            methods: []
-          })
+        } catch (err) {
+          console.error('Failed to generate domain models:', err)
+          // Show error to user - no mock fallback
+          setError(err instanceof Error ? err.message : '生成领域模型失败')
+        } finally {
+          setLoading(false)
         }
-      })
-      
-      setDomainModels(models)
-      
-      // Generate Mermaid code
-      const classDefs = models.map(m => {
-        const props = m.properties.map(p => `  ${p.name}: ${p.type}`).join('\n')
-        const methods = m.methods.map(m => `  +${m}()`).join('\n')
-        return `${m.name}{\n${props}\n${methods}\n}`
-      }).join('\n')
-      
-      setModelMermaidCode(`classDiagram
-${classDefs}
-
-${models.filter(m => m.type === 'aggregate_root').map(ar => {
-  const entities = models.filter(m => m.contextId === ar.contextId && m.type === 'entity')
-  return entities.map(e => `${ar.name} --> ${e.name}`).join('\n')
-}).join('\n')}`)
+      }
     }
-  }, [selectedContextIds])
+    
+    generateModels()
+  }, [selectedContextIds, boundedContexts, requirementText])
 
   const typeLabels = {
     aggregate_root: '聚合根',
@@ -115,6 +84,12 @@ ${models.filter(m => m.type === 'aggregate_root').map(ar => {
         <p className={styles.description}>
           基于您选择的限界上下文，AI 生成了领域模型类图。请确认。
         </p>
+
+        {error && (
+          <div className={styles.error}>
+            <p>⚠️ {error}</p>
+          </div>
+        )}
 
         <ConfirmationSteps currentStep={currentStep} className={styles.steps} />
 

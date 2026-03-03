@@ -1416,9 +1416,9 @@ export async function generateBoundedContext(
   requirementText: string,
   projectId?: string
 ): Promise<BoundedContextResponse> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8787'
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vibex.top/api'
   
-  const response = await fetch(`${baseUrl}/api/ddd/bounded-context`, {
+  const response = await fetch(`${baseUrl}/ddd/bounded-context`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

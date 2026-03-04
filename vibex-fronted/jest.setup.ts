@@ -1,5 +1,51 @@
 import '@testing-library/jest-dom'
 
+// Mock axios with proper AxiosError
+jest.mock('axios', () => {
+  class MockAxiosError extends Error {
+    code?: string;
+    response?: { status?: number };
+    isAxiosError: boolean = true;
+    config: any = {};
+    request: any = {};
+
+    constructor(message: string, code?: string, config?: any, response?: { status?: number }) {
+      super(message);
+      this.name = 'AxiosError';
+      this.code = code;
+      this.config = config;
+      this.response = response;
+    }
+  }
+  
+  return {
+    __esModule: true,
+    AxiosError: MockAxiosError,
+    default: {
+      create: jest.fn(() => ({
+        interceptors: {
+          request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+          response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        },
+        get: jest.fn(),
+        post: jest.fn(),
+        put: jest.fn(),
+        delete: jest.fn(),
+      })),
+    },
+    create: jest.fn(() => ({
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
+      get: jest.fn(),
+      post: jest.fn(),
+      put: jest.fn(),
+      delete: jest.fn(),
+    })),
+  };
+});
+
 // Mock window.scrollIntoView
 Object.defineProperty(window, 'scrollIntoView', {
   writable: true,

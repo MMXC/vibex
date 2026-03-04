@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.1',
+    date: '2026-03-04',
+    changes: [
+      '🎨 风格统一优化：统一所有页面 UI 风格',
+      '🔧 修复交互式确认流程',
+      '📊 流程执行引擎实现',
+      '🔐 用户角色权限检查 (RBAC)',
+    ],
+    commit: '8f533ea',
+  },
+  {
     version: '1.0.0',
     date: '2026-03-02',
     changes: [

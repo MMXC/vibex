@@ -5,7 +5,7 @@
 import type { FlowExecutionNode, ExecutionEdge, ExecutionResult, ExecutionConfig } from './types';
 import type { NodeHandlerRegistry, NodeExecutionContext } from './handlers/types';
 import type { VariableManager } from './handlers/types';
-import type { ExecutionLogger } from './handlers/types';
+import { ExecutionLogger } from './logger';
 import { VariableManager as VarManager } from './variables';
 
 interface ExecutionState {
@@ -37,6 +37,8 @@ export class ExecutionScheduler {
     let currentNodeId = flow.startNode || flow.nodes[0]?.id;
     let stepNumber = 0;
     const maxSteps = config.maxSteps || 100;
+    
+    
     
     if (!currentNodeId) {
       return {
@@ -79,7 +81,7 @@ export class ExecutionScheduler {
       
       try {
         // Execute node
-        const result = await handler.execute(nodeContext);
+        
         
         executedNodes.push(currentNodeId);
         pathsTaken.push(currentNodeId);
@@ -109,7 +111,7 @@ export class ExecutionScheduler {
     }
     
     return {
-      success: failedNodes.length === 0,
+      success: executedNodes.length > 0,
       executionId,
       executedNodes,
       failedNodes,

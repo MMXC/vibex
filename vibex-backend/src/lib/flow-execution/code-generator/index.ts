@@ -5,12 +5,16 @@
 import type { ExecutableFlow, FlowCodeGenOptions } from '../types';
 
 export class CodeGenerator {
-  private generators: Record<string, (flow: ExecutableFlow, options: FlowCodeGenOptions) => string> = {
-    typescript: this.generateTypeScript,
-    javascript: this.generateJavaScript,
-    python: this.generatePython,
-    java: this.generateJava,
-  };
+  private generators: Record<string, (flow: ExecutableFlow, options: FlowCodeGenOptions) => string>;
+  
+  constructor() {
+    this.generators = {
+      typescript: this.generateTypeScript.bind(this),
+      javascript: this.generateJavaScript.bind(this),
+      python: this.generatePython.bind(this),
+      java: this.generateJava.bind(this),
+    };
+  }
   
   generate(flow: ExecutableFlow, options: FlowCodeGenOptions): string {
     const generator = this.generators[options.language];
@@ -202,3 +206,5 @@ export class CodeGenerator {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 }
+
+export default CodeGenerator;

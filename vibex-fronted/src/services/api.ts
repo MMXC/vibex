@@ -548,6 +548,16 @@ export class ApiService {
   }
 
   /**
+   * 获取当前用户信息
+   */
+  async getCurrentUser(): Promise<User> {
+    return this.withRetry(async () => {
+      const response = await this.client.get<{ data: User }>('/auth/me');
+      return (response.data as any).data || response.data;
+    });
+  }
+
+  /**
    * 用户登出
    */
   async logout(): Promise<SuccessResponse> {

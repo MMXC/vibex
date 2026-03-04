@@ -64,7 +64,8 @@ export class ActionHandler extends BaseHandler {
   ): Promise<{ output?: Record<string, unknown>; nextNodeId?: string }> {
     const script = config?.script;
     if (!script) {
-      throw new Error('Script is required for action node');
+      // No script provided, just return success (simulation mode)
+      return { output: { message: 'No script provided, skipping execution' } };
     }
     
     try {

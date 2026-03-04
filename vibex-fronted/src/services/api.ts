@@ -9,9 +9,16 @@ export interface User {
   name: string;
   email: string;
   avatar?: string | null;
+  role?: UserRole;  // 全局角色
   createdAt?: string;
   updatedAt?: string;
 }
+
+// 全局角色类型
+export type UserRole = 'super_admin' | 'user' | 'guest';
+
+// 项目角色类型
+export type ProjectRole = 'owner' | 'admin' | 'editor' | 'viewer';
 
 export interface UserUpdate {
   name?: string;
@@ -683,6 +690,16 @@ export class ApiService {
     return this.withRetry(async () => {
       const response = await this.client.delete<SuccessResponse>(`/projects/${projectId}/permanent`);
       return (response.data as any);
+    });
+  }
+
+  /**
+   * 获取当前用户在项目中的角色
+   */
+  async getProjectRole(projectId: string): Promise<{ role: ProjectRole }> {
+    return this.withRetry(async () => {
+      const response = await this.client.get<{ role: ProjectRole }>(`/projects/${projectId}/role`);
+      return response.data;
     });
   }
 

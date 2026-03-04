@@ -10,6 +10,25 @@ jest.mock('next/navigation', () => ({
   useRouter: () => mockRouter
 }))
 
+// Mock usePermission hook - return admin permissions for tests
+jest.mock('@/hooks/usePermission', () => ({
+  usePermission: () => ({
+    globalRole: 'super_admin',
+    isAuthenticated: true,
+    isSuperAdmin: true,
+    isUser: true,
+    isGuest: false,
+    hasPermission: (permission: string) => true,
+    canAccess: (resource: string, permission: string) => true,
+    user: { userId: 'test-user', email: 'test@example.com', role: 'super_admin' },
+    refreshUser: jest.fn(),
+    getProjectRole: jest.fn(() => null),
+    hasProjectPermission: jest.fn(() => Promise.resolve(true)),
+    setProjectRole: jest.fn(),
+    clearProjectRole: jest.fn(),
+  }),
+}))
+
 // Mock localStorage
 const localStorageMock = (() => {
   let store: Record<string, string> = {}
@@ -44,6 +63,7 @@ describe('Dashboard (/dashboard)', () => {
     localStorageMock.clear()
     localStorageMock.setItem('auth_token', 'test-token')
     localStorageMock.setItem('user_id', 'test-user')
+    localStorageMock.setItem('user_role', 'admin')  // Set admin role for tests
     mockGetProjects.mockResolvedValue([
       { id: '1', name: 'Project 1', description: 'Description 1', updatedAt: new Date().toISOString() }
     ])

@@ -4,25 +4,33 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  background: var(--color-bg-primary);
+  background-image: 
+    radial-gradient(ellipse at top, rgba(0, 255, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
 }
 
 .card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
   border-radius: 16px;
   padding: 2.5rem;
   max-width: 800px;
   width: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 60px rgba(0, 255, 255, 0.05);
 }
 
 .title {
   font-size: 2rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--color-text-primary);
   margin-bottom: 0.5rem;
   text-align: center;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .description {
@@ -46,11 +54,11 @@
 }
 
 .step.active {
-  color: #4ade80;
+  color: var(--color-primary);
 }
 
 .step.completed {
-  color: #4ade80;
+  color: var(--color-primary);
 }
 
 .stepNumber {
@@ -63,16 +71,17 @@
   justify-content: center;
   font-weight: 600;
   font-size: 0.875rem;
+  color: var(--color-text-secondary);
 }
 
 .step.active .stepNumber {
-  background: #4ade80;
-  color: #1a1a2e;
+  background: var(--color-primary);
+  color: var(--color-bg-primary);
 }
 
 .step.completed .stepNumber {
-  background: #4ade80;
-  color: #1a1a2e;
+  background: var(--color-primary);
+  color: var(--color-bg-primary);
 }
 
 .stepLabel {
@@ -133,18 +142,19 @@
 .primaryButton {
   padding: 0.875rem 2rem;
   border-radius: 8px;
-  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
-  color: #1a1a2e;
+  background: linear-gradient(135deg, var(--color-primary) 0%, rgba(0, 255, 255, 0.8) 100%);
+  color: var(--color-bg-primary);
   font-weight: 600;
   font-size: 1rem;
   border: none;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
 }
 
 .primaryButton:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 255, 255, 0.5);
 }
 
 .primaryButton:disabled {

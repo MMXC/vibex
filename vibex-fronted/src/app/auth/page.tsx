@@ -25,7 +25,6 @@ export default function Auth() {
       } else {
         await apiService.register({ name, email, password })
       }
-      // 登录成功后跳转到 Dashboard
       router.push('/dashboard')
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : '操作失败，请稍后重试')
@@ -34,39 +33,101 @@ export default function Auth() {
     }
   }
 
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '14px 16px',
+    background: 'rgba(255, 255, 255, 0.03)',
+    border: '1px solid var(--color-border)',
+    borderRadius: '8px',
+    fontSize: '15px',
+    color: 'var(--color-text-primary)',
+    outline: 'none',
+    transition: 'all 0.2s ease',
+  }
+
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    marginBottom: '8px',
+    fontSize: '14px',
+    fontWeight: 500,
+    color: 'var(--color-text-secondary)',
+  }
+
+  const glassCardStyle: React.CSSProperties = {
+    width: '100%',
+    maxWidth: '420px',
+    padding: '40px',
+    background: 'var(--color-bg-glass)',
+    backdropFilter: 'blur(20px)',
+    border: '1px solid var(--color-border)',
+    borderRadius: '16px',
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 60px rgba(0, 255, 255, 0.05)',
+  }
+
   return (
     <div style={{
       minHeight: '100vh',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: '#f8f9fa',
+      background: 'var(--color-bg-primary)',
+      backgroundImage: `
+        radial-gradient(ellipse at top, rgba(0, 255, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at bottom right, rgba(139, 92, 246, 0.08) 0%, transparent 50%)
+      `,
+      position: 'relative',
+      overflow: 'hidden',
     }}>
+      {/* Grid overlay */}
       <div style={{
-        width: '100%',
-        maxWidth: '400px',
-        padding: '40px',
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
-      }}>
+        position: 'absolute',
+        inset: 0,
+        backgroundImage: `
+          linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px)
+        `,
+        backgroundSize: '40px 40px',
+        pointerEvents: 'none',
+      }} />
+      
+      {/* Glow effect */}
+      <div style={{
+        position: 'absolute',
+        top: '20%',
+        right: '10%',
+        width: '400px',
+        height: '400px',
+        background: 'radial-gradient(circle, rgba(0, 255, 255, 0.12) 0%, transparent 70%)',
+        filter: 'blur(80px)',
+        pointerEvents: 'none',
+      }} />
+      
+      <div style={glassCardStyle}>
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <h1 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '8px' }}>
+          <h1 style={{ 
+            fontSize: '28px', 
+            fontWeight: 700, 
+            marginBottom: '8px',
+            background: 'var(--gradient-primary)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}>
             {isLogin ? '欢迎回来' : '创建账号'}
           </h1>
-          <p style={{ color: '#666' }}>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: '15px' }}>
             {isLogin ? '登录你的 VibeX 账号' : '开始你的 AI 构建之旅'}
           </p>
         </div>
 
         {error && (
           <div style={{
-            padding: '12px',
+            padding: '14px',
             marginBottom: '20px',
-            backgroundColor: '#fee2e2',
-            border: '1px solid #fecaca',
+            background: 'rgba(255, 68, 102, 0.1)',
+            border: '1px solid rgba(255, 68, 102, 0.3)',
             borderRadius: '8px',
-            color: '#dc2626',
+            color: 'var(--color-error)',
             fontSize: '14px',
           }}>
             {error}
@@ -76,62 +137,62 @@ export default function Auth() {
         <form onSubmit={handleSubmit}>
           {!isLogin && (
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
-                用户名
-              </label>
+              <label style={labelStyle}>用户名</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="输入用户名"
                 required={!isLogin}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #e5e5e5',
-                  borderRadius: '8px',
-                  fontSize: '14px',
+                style={inputStyle}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--color-primary)'
+                  e.target.style.boxShadow = '0 0 0 3px rgba(0, 255, 255, 0.1)'
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'var(--color-border)'
+                  e.target.style.boxShadow = 'none'
                 }}
               />
             </div>
           )}
 
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
-              邮箱
-            </label>
+            <label style={labelStyle}>邮箱</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@example.com"
               required
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '1px solid #e5e5e5',
-                borderRadius: '8px',
-                fontSize: '14px',
+              style={inputStyle}
+              onFocus={(e) => {
+                e.target.style.borderColor = 'var(--color-primary)'
+                e.target.style.boxShadow = '0 0 0 3px rgba(0, 255, 255, 0.1)'
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'var(--color-border)'
+                e.target.style.boxShadow = 'none'
               }}
             />
           </div>
 
-          <div style={{ marginBottom: '24px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
-              密码
-            </label>
+          <div style={{ marginBottom: '28px' }}>
+            <label style={labelStyle}>密码</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '1px solid #e5e5e5',
-                borderRadius: '8px',
-                fontSize: '14px',
+              style={inputStyle}
+              onFocus={(e) => {
+                e.target.style.borderColor = 'var(--color-primary)'
+                e.target.style.boxShadow = '0 0 0 3px rgba(0, 255, 255, 0.1)'
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'var(--color-border)'
+                e.target.style.boxShadow = 'none'
               }}
             />
           </div>
@@ -142,20 +203,34 @@ export default function Auth() {
             style={{
               width: '100%',
               padding: '14px',
-              backgroundColor: loading ? '#93c5fd' : '#0070f3',
-              color: 'white',
+              background: loading 
+                ? 'rgba(0, 255, 255, 0.3)' 
+                : 'linear-gradient(135deg, var(--color-primary) 0%, rgba(0, 255, 255, 0.8) 100%)',
+              color: 'var(--color-bg-primary)',
               border: 'none',
               borderRadius: '8px',
               fontSize: '16px',
-              fontWeight: '600',
+              fontWeight: 600,
               cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s ease',
+              boxShadow: loading ? 'none' : '0 0 20px rgba(0, 255, 255, 0.3)',
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                e.currentTarget.style.transform = 'translateY(-1px)'
+                e.currentTarget.style.boxShadow = '0 0 30px rgba(0, 255, 255, 0.5)'
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 255, 255, 0.3)'
             }}
           >
             {loading ? '处理中...' : (isLogin ? '登录' : '注册')}
           </button>
         </form>
 
-        <div style={{ marginTop: '24px', textAlign: 'center', color: '#666' }}>
+        <div style={{ marginTop: '24px', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '14px' }}>
           {isLogin ? (
             <>
               还没有账号？{' '}
@@ -164,9 +239,16 @@ export default function Auth() {
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#0070f3',
+                  color: 'var(--color-primary)',
                   cursor: 'pointer',
-                  textDecoration: 'underline',
+                  fontWeight: 500,
+                  textDecoration: 'none',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.textDecoration = 'underline'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.textDecoration = 'none'
                 }}
               >
                 立即注册
@@ -180,9 +262,16 @@ export default function Auth() {
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#0070f3',
+                  color: 'var(--color-primary)',
                   cursor: 'pointer',
-                  textDecoration: 'underline',
+                  fontWeight: 500,
+                  textDecoration: 'none',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.textDecoration = 'underline'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.textDecoration = 'none'
                 }}
               >
                 立即登录
@@ -192,7 +281,21 @@ export default function Auth() {
         </div>
 
         <div style={{ marginTop: '32px', textAlign: 'center' }}>
-          <Link href="/landing" style={{ color: '#999', textDecoration: 'none', fontSize: '14px' }}>
+          <Link 
+            href="/landing" 
+            style={{ 
+              color: 'var(--color-text-muted)', 
+              textDecoration: 'none', 
+              fontSize: '14px',
+              transition: 'color 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--color-primary)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--color-text-muted)'
+            }}
+          >
             ← 返回首页
           </Link>
         </div>

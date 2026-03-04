@@ -1,10 +1,31 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import styles from './dashboard.module.css'
 import { apiService, Project } from '@/services/api'
+
+// RBAC 类型
+type UserRole = 'admin' | 'editor' | 'viewer';
+type Permission = 'read' | 'create' | 'update' | 'delete';
+const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
+  admin: ['read', 'create', 'update', 'delete'],
+  editor: ['read', 'create', 'update'],
+  viewer: ['read'],
+};
+
+// 简单 JWT 解码
+function parseJWT(token: string): { role?: UserRole } | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    const payload = parts[1];
+    const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    const json = decodeURIComponent(decoded.split('').map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+    return JSON.parse(json);
+  } catch { return null; }
+}
 
 export default function Dashboard() {
   const router = useRouter()
@@ -16,6 +37,19 @@ export default function Dashboard() {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [showTrash, setShowTrash] = useState(false)
   const [draggingId, setDraggingId] = useState<string | null>(null)
+
+  // 权限检查 - inline hook
+  const user = useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    const token = localStorage.getItem('auth_token');
+    if (!token) return null;
+    const storedRole = localStorage.getItem('user_role');
+    if (storedRole) return { role: storedRole as UserRole };
+    return parseJWT(token);
+  }, []);
+  const role: UserRole = user?.role || 'viewer';
+  const hasPermission = (perm: Permission) => ROLE_PERMISSIONS[role]?.includes(perm) ?? false;
+  const canAccess = (_resource: string, perm: Permission) => role === 'admin' || hasPermission(perm);
 
   // 加载项目列表
   const fetchProjects = async (userId: string) => {
@@ -226,10 +260,12 @@ export default function Dashboard() {
             <h1 className={styles.title}>我的项目</h1>
             <p className={styles.subtitle}>管理你的 AI 应用项目</p>
           </div>
-          <button className={styles.createButton} onClick={handleCreateProject}>
-            <span>+</span>
-            <span>创建新项目</span>
-          </button>
+          {hasPermission('create') && (
+            <button className={styles.createButton} onClick={handleCreateProject}>
+              <span>+</span>
+              <span>创建新项目</span>
+            </button>
+          )}
         </header>
 
         {error && (
@@ -290,16 +326,18 @@ export default function Dashboard() {
                     更新于 {project.updatedAt ? new Date(project.updatedAt).toLocaleDateString() : '-'}
                   </span>
                   <div className={styles.projectActions} style={{ position: 'relative' }}>
-                    <button 
-                      className={styles.actionBtn} 
-                      title="编辑"
-                      onClick={(e) => { 
-                        e.preventDefault(); 
-                        router.push(`/project-settings?id=${project.id}`); 
-                      }}
-                    >
-                      ✎
-                    </button>
+                    {hasPermission('update') && (
+                      <button 
+                        className={styles.actionBtn} 
+                        title="编辑"
+                        onClick={(e) => { 
+                          e.preventDefault(); 
+                          router.push(`/project-settings?id=${project.id}`); 
+                        }}
+                      >
+                        ✎
+                      </button>
+                    )}
                     <button 
                       className={styles.actionBtn} 
                       title="导出"
@@ -310,20 +348,22 @@ export default function Dashboard() {
                     >
                       📤
                     </button>
-                    <button 
-                      className={styles.actionBtn} 
-                      title="删除"
-                      onClick={(e) => { 
-                        e.preventDefault();
-                        if (confirm('确定删除该项目吗？')) {
-                          apiService.deleteProject(project.id).then(() => {
-                            setProjects(projects.filter(p => p.id !== project.id));
-                          });
-                        }
-                      }}
-                    >
-                      🗑️
-                    </button>
+                    {hasPermission('delete') && (
+                      <button 
+                        className={styles.actionBtn} 
+                        title="删除"
+                        onClick={(e) => { 
+                          e.preventDefault();
+                          if (confirm('确定删除该项目吗？')) {
+                            apiService.deleteProject(project.id).then(() => {
+                              setProjects(projects.filter(p => p.id !== project.id));
+                            });
+                          }
+                        }}
+                      >
+                        🗑️
+                      </button>
+                    )}
                     <button 
                       className={styles.actionBtn} 
                       title="更多"
@@ -400,26 +440,30 @@ export default function Dashboard() {
               </Link>
             ))}
             
-            {/* 创建新项目卡片 */}
-            <div className={styles.newProjectCard} onClick={handleCreateProject} style={{ cursor: 'pointer' }}>
-              <span className={styles.plusIcon}>+</span>
-              <span className={styles.newProjectText}>创建新项目</span>
-            </div>
+            {/* 创建新项目卡片 - 需要 create 权限 */}
+            {hasPermission('create') && (
+              <div className={styles.newProjectCard} onClick={handleCreateProject} style={{ cursor: 'pointer' }}>
+                <span className={styles.plusIcon}>+</span>
+                <span className={styles.newProjectText}>创建新项目</span>
+              </div>
+            )}
           </div>
         </section>
       </main>
 
-      {/* 垃圾桶图标 */}
-      <button 
-        className={styles.trashButton}
-        onClick={() => { setShowTrash(!showTrash); if (!showTrash) fetchDeletedProjects(); }}
-        title="回收站"
-      >
-        🗑️
-        {deletedProjects.length > 0 && (
-          <span className={styles.trashBadge}>{deletedProjects.length}</span>
-        )}
-      </button>
+      {/* 垃圾桶图标 - 需要 delete 权限 */}
+      {hasPermission('delete') && (
+        <button 
+          className={styles.trashButton}
+          onClick={() => { setShowTrash(!showTrash); if (!showTrash) fetchDeletedProjects(); }}
+          title="回收站"
+        >
+          🗑️
+          {deletedProjects.length > 0 && (
+            <span className={styles.trashBadge}>{deletedProjects.length}</span>
+          )}
+        </button>
+      )}
 
       {/* 回收站弹窗 */}
       {showTrash && (

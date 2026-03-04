@@ -34,7 +34,7 @@ export interface MermaidPreviewProps {
 mermaid.initialize({
   startOnLoad: false,
   theme: 'dark',
-  securityLevel: 'loose',
+  securityLevel: 'strict',
   themeVariables: {
     primaryColor: '#00ffff',
     primaryTextColor: '#f0f0f5',

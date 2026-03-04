@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.2',
+    date: '2026-03-05',
+    changes: [
+      '🔒 安全修复：Mermaid 组件 XSS 漏洞修复',
+      '🛡️ 将 securityLevel 从 loose 改为 strict',
+      '✅ 安全测试验证通过',
+    ],
+    commit: '25a8984',
+  },
+  {
     version: '1.0.1',
     date: '2026-03-04',
     changes: [

@@ -1,6 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
+import { useAuth } from '@/hooks/useAuth'
+import LoginDrawer from '@/components/ui/LoginDrawer'
 import styles from './landing.module.css'
 
 export default function Landing() {

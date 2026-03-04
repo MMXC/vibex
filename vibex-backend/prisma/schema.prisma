@@ -12,6 +12,7 @@ model User {
   email     String   @unique
   name      String?
   password  String
+  role      String   @default("viewer") // admin, editor, viewer
   avatar    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

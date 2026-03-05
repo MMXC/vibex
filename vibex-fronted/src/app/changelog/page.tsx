@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.10',
+    date: '2026-03-06',
+    changes: [
+      '🔐 敏感信息扫描：Gitleaks 规则配置',
+      '✅ 10+ 密钥类型检测：AWS/GitHub/Cloudflare/Slack/JWT',
+      '🔄 GitHub Actions secrets-scan 工作流',
+      '📋 .env.example 环境变量模板',
+    ],
+    commit: 'pending',
+  },
+  {
     version: '1.0.9',
     date: '2026-03-06',
     changes: [

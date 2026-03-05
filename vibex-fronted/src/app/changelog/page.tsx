@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.6',
+    date: '2026-03-05',
+    changes: [
+      '📸 E2E 截图功能修复：迁移到 Playwright',
+      '✅ 8 个页面截图生成成功',
+      '🔧 支持	headless 服务器环境',
+    ],
+    commit: '6b53b8f',
+  },
+  {
     version: '1.0.5',
     date: '2026-03-05',
     changes: [

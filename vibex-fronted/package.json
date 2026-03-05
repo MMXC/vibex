@@ -9,6 +9,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "pretest": "node scripts/pre-test-check.js",
+    "pretest-check": "node scripts/pre-test-check.js",
     "coverage:check": "node scripts/check-coverage.js",
     "coverage:history": "bash scripts/save-coverage-history.sh"
   },

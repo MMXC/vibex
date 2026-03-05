@@ -1,5 +1,9 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
+
+// Storage version for migration
+const STORAGE_VERSION = 1
+const STORAGE_KEY = 'confirmation-flow-storage'
 
 export type ConfirmationStep = 'input' | 'context' | 'model' | 'flow' | 'success'
 
@@ -293,7 +297,35 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
       reset: () => set(initialState),
     }),
     {
-      name: 'confirmation-flow-storage',
+      name: STORAGE_KEY,
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state: ConfirmationFlowState) => ({
+        // Persist only essential state for recovery
+        currentStep: state.currentStep,
+        stepHistory: state.stepHistory,
+        requirementText: state.requirementText,
+        boundedContexts: state.boundedContexts,
+        selectedContextIds: state.selectedContextIds,
+        contextMermaidCode: state.contextMermaidCode,
+        domainModels: state.domainModels,
+        modelMermaidCode: state.modelMermaidCode,
+        businessFlow: state.businessFlow,
+        flowMermaidCode: state.flowMermaidCode,
+        createdProjectId: state.createdProjectId,
+      }),
+      version: STORAGE_VERSION,
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          console.error('Failed to rehydrate confirmation store:', error)
+        }
+      },
+      migrate: (persistedState: unknown, oldVersion: number): ConfirmationFlowState => {
+        if (oldVersion < 1) {
+          // Version 1 migration: Add any new fields with defaults
+          console.log('Migrating confirmation store from version', oldVersion, 'to', STORAGE_VERSION)
+        }
+        return persistedState as ConfirmationFlowState
+      },
     }
   )
 )

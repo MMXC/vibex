@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.9',
+    date: '2026-03-06',
+    changes: [
+      '🔒 依赖漏洞扫描自动化：GitHub Actions + Dependabot',
+      '✅ 后端安全审计：0 漏洞',
+      '📦 hono 升级到 4.12.5，修复安全漏洞',
+      '🔄 每日自动扫描 + 高危漏洞阻断构建',
+    ],
+    commit: 'pending',
+  },
+  {
     version: '1.0.8',
     date: '2026-03-06',
     changes: [

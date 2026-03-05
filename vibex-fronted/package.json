@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "coverage:check": "node scripts/check-coverage.js",
+    "coverage:history": "bash scripts/save-coverage-history.sh"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
@@ -54,6 +57,35 @@
     },
     "fakeTimers": {
       "enableGlobally": false
+    },
+    "coverageReporters": ["text", "lcov", "json", "json-summary"],
+    "coverageThreshold": {
+      "global": {
+        "branches": 40,
+        "functions": 40,
+        "lines": 40,
+        "statements": 40
+      },
+      "./src/components/**/*.tsx": {
+        "branches": 40,
+        "functions": 40,
+        "lines": 40
+      },
+      "./src/lib/**/*.ts": {
+        "branches": 45,
+        "functions": 45,
+        "lines": 50
+      },
+      "./src/hooks/**/*.ts": {
+        "branches": 40,
+        "functions": 40,
+        "lines": 40
+      },
+      "./src/services/**/*.ts": {
+        "branches": 45,
+        "functions": 45,
+        "lines": 50
+      }
     }
   }
 }

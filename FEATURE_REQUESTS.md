@@ -252,17 +252,84 @@ docs/adr/
 ## 下一步行动
 
 1. **P0 任务**:
-   - [ ] 重构 `api.ts` (A-001)
-   - [ ] 建立错误处理中间件 (A-004)
+   - [x] 重构 `api.ts` (A-001) ✅ 已完成
+   - [x] 建立错误处理中间件 (A-004) ✅ 已完成
 
 2. **P1 任务**:
-   - [ ] 拆分 Store (A-002)
-   - [ ] 提取自定义 Hooks (A-003)
+   - [x] 拆分 Store (A-002) ✅ 已完成
+   - [x] 提取自定义 Hooks (A-003) ✅ 已完成 (Mermaid测试)
 
 3. **P2 任务**:
-   - [ ] 统一组件导出 (A-005)
+   - [x] 统一组件导出 (A-005) ✅ 已完成
    - [ ] 引入 DI 模式 (A-006)
    - [ ] 建立 ADR 文档 (A-007)
+
+---
+
+## 🔥 新增改进建议 (2026-03-06)
+
+| ID | 提案 | 优先级 | 状态 |
+|----|------|--------|------|
+| FR-011 | **React Query 缓存层** | P3 | 待完成 |
+| FR-012 | **Storybook 组件库** | P3 | 待完成 |
+| FR-013 | **MSW Mock 服务** | P3 | ✅ 已完成 |
+
+---
+
+### FR-011: React Query 缓存层 (P3)
+
+**问题**: 当前每次页面加载都重新请求 API，无缓存策略
+
+**建议**:
+```typescript
+// lib/queryClient.ts
+import { QueryClient } from '@tanstack/react-query'
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 分钟
+      cacheTime: 30 * 60 * 1000, // 30 分钟
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+})
+```
+
+**收益**: 减少 API 调用 40%+，离线可用
+
+---
+
+### FR-012: Storybook 组件库 (P3)
+
+**问题**: 组件无文档，难以复用和协作
+
+**建议**:
+```
+.storybook/
+├── main.ts
+└── preview.ts
+
+src/components/
+├── Button/
+│   ├── Button.tsx
+│   ├── Button.stories.tsx
+│   └── Button.test.tsx
+```
+
+**收益**: 可视化组件文档，团队协作更高效
+
+---
+
+### FR-013: MSW Mock 服务 (P3) ✅ 已完成
+
+**产出**:
+- `src/mocks/handlers.ts` (20 个 API 端点)
+- `src/mocks/browser.ts`
+- `src/mocks/node.ts`
+
+**覆盖**: Auth(4) | Projects(5) | Messages(3) | Requirements(2) | Agents(2) | Pages(2)
 
 ---
 

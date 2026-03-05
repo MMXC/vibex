@@ -11,6 +11,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import mermaid from 'mermaid';
+import { ErrorBoundary } from './ErrorBoundary';
 
 export type DiagramType = 'graph' | 'classDiagram' | 'stateDiagram' | 'flowchart';
 export type LayoutDirection = 'TB' | 'LR' | 'BT' | 'RL';
@@ -51,6 +52,52 @@ mermaid.initialize({
 });
 
 export function MermaidPreview({
+  code,
+  diagramType = 'graph',
+  layout = 'TB',
+  height = '400px',
+  className = '',
+  onError,
+}: MermaidPreviewProps) {
+  return (
+    <ErrorBoundary
+      fallback={
+        <div 
+          className={className}
+          style={{
+            height,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'var(--color-bg-secondary)',
+            borderRadius: '8px',
+            border: '1px solid var(--color-error)',
+            padding: '16px',
+            color: 'var(--color-text-secondary)',
+          }}
+        >
+          <div style={{ fontSize: '24px', marginBottom: '8px' }}>⚠️</div>
+          <div style={{ fontSize: '14px' }}>图表组件出现错误</div>
+          <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '8px' }}>
+            请尝试刷新页面或重新输入图表代码
+          </div>
+        </div>
+      }
+    >
+      <MermaidPreviewInner
+        code={code}
+        diagramType={diagramType}
+        layout={layout}
+        height={height}
+        className={className}
+        onError={onError}
+      />
+    </ErrorBoundary>
+  );
+}
+
+function MermaidPreviewInner({
   code,
   diagramType = 'graph',
   layout = 'TB',

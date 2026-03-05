@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.3',
+    date: '2026-03-05',
+    changes: [
+      '♻️ API 服务层重构：将 api.ts (1522行) 拆分为 16 个模块',
+      '📦 模块边界清晰，无循环依赖',
+      '✅ 测试覆盖率 78%，构建通过',
+    ],
+    commit: '1fc52af',
+  },
+  {
     version: '1.0.2',
     date: '2026-03-05',
     changes: [

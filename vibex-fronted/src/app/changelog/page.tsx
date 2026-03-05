@@ -26,7 +26,7 @@ const mockChangelog: ChangelogEntry[] = [
       '📦 hono 升级到 4.12.5，修复安全漏洞',
       '🔄 每日自动扫描 + 高危漏洞阻断构建',
     ],
-    commit: 'pending',
+    commit: 'dcd2bdb',
   },
   {
     version: '1.0.8',

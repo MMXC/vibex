@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.7',
+    date: '2026-03-05',
+    changes: [
+      '📊 测试覆盖率自动化：Jest 阈值配置 + 历史记录',
+      '📈 当前覆盖率 62.61% (> 40% 阈值)',
+      '⚠️ 退化检测：覆盖率下降 > 5% 阻止合并',
+    ],
+    commit: '0445e9e',
+  },
+  {
     version: '1.0.6',
     date: '2026-03-05',
     changes: [

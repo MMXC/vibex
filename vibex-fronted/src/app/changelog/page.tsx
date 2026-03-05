@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.5',
+    date: '2026-03-05',
+    changes: [
+      '🛡️ ErrorBoundary 双级部署：全局 + MermaidPreview',
+      '⚠️ 友好错误 UI：重试按钮 + 刷新页面',
+      '✅ 渲染错误不崩溃应用',
+    ],
+    commit: '99cbf9d',
+  },
+  {
     version: '1.0.4',
     date: '2026-03-05',
     changes: [

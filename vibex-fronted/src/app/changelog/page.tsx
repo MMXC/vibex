@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.8',
+    date: '2026-03-06',
+    changes: [
+      '🔐 登录页注册入口优化：切换按钮样式增强',
+      '🔗 SEO 优化：支持 ?mode=register/login URL 参数',
+      '✅ E2E 测试覆盖：24 个测试用例全部通过',
+      '📱 多视口测试：mobile/tablet/desktop 截图验收',
+    ],
+    commit: '291ac7d',
+  },
+  {
     version: '1.0.7',
     date: '2026-03-05',
     changes: [

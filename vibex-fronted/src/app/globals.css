@@ -8,6 +8,7 @@
 /* 引入设计系统 */
 @import '../styles/design-tokens.css';
 @import '../styles/animations.css';
+@import '../styles/utilities.css';
 
 /* 页面背景 */
 body {

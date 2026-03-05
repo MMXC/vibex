@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.4',
+    date: '2026-03-05',
+    changes: [
+      '🎨 CSS 工具类提取：创建 utilities.css (411行)',
+      '📦 200+ 工具类：布局/间距/排版/边框/背景等',
+      '✅ 命名规范统一，遵循 Tailwind CSS 风格',
+    ],
+    commit: 'baf2812',
+  },
+  {
     version: '1.0.3',
     date: '2026-03-05',
     changes: [

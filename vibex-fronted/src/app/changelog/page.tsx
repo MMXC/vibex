@@ -18,6 +18,20 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.13',
+    date: '2026-03-07',
+    changes: [
+      '🧭 导航系统重构：GlobalNav + ProjectNav + Breadcrumb',
+      '📡 API 变更追踪：OpenAPI 生成 + 变更检测 + 通知机制',
+      '✨ 代码质量自动化：Prettier + husky + lint-staged',
+      '🔒 安全修复：hono CVE 修复 + 安全审计工作流',
+      '🧹 Mock 清理：移除硬编码 mock 数据',
+      '📊 需求验证：关键词密度检测 + 实时评分',
+      '✅ E2E 测试：导航/认证/截图验证 20+ 测试',
+    ],
+    commit: 'ccf0a40',
+  },
+  {
     version: '1.0.12',
     date: '2026-03-06',
     changes: [

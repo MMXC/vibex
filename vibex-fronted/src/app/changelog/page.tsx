@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.12',
+    date: '2026-03-06',
+    changes: [
+      '🔍 静态导出兼容性检查：动态路由检测脚本',
+      '📊 识别 17 静态兼容 + 8 潜在问题路由',
+      '📝 ESLint 规则：no-static-export (待集成)',
+      '📋 文档指南：静态导出最佳实践',
+    ],
+    commit: 'pending',
+  },
+  {
     version: '1.0.11',
     date: '2026-03-06',
     changes: [

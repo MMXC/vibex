@@ -6,6 +6,7 @@ import styles from './confirm.module.css'
 import { useConfirmationStore, BoundedContext } from '@/stores/confirmationStore'
 import { generateBoundedContext } from '@/services/api'
 import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps'
+import { RequirementScore } from '@/components/ui/RequirementScore'
 
 export default function ConfirmPage() {
   const router = useRouter()
@@ -78,6 +79,9 @@ export default function ConfirmPage() {
             onChange={(e) => setRequirementText(e.target.value)}
             rows={8}
           />
+          
+          <RequirementScore value={requirementText} />
+          
           {error && <p className={styles.error}>{error}</p>}
         </div>
 

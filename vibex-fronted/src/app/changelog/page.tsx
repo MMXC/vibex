@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.11',
+    date: '2026-03-06',
+    changes: [
+      '✅ 需求录入前置校验：关键词密度检测 + 完整性评分',
+      '📊 5维度评分算法：长度/关键词/结构/清晰度/具体性',
+      '🎯 75+ 领域关键词库：domain/function/entity/action',
+      '💡 实时评分 UI + 建议提示',
+    ],
+    commit: 'pending',
+  },
+  {
     version: '1.0.10',
     date: '2026-03-06',
     changes: [

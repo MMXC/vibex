@@ -86,15 +86,27 @@ export function Table<T extends Record<string, any>>({
     styles[size],
     bordered && styles.bordered,
     className,
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   const renderSortIcon = (columnKey: string) => {
     if (sortColumn !== columnKey) {
       return (
         <span className={styles.sortIcon}>
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M3 5L6 2L9 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            <path d="M3 7L6 10L9 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            <path
+              d="M3 5L6 2L9 5"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+            <path
+              d="M3 7L6 10L9 7"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
           </svg>
         </span>
       );
@@ -104,11 +116,23 @@ export function Table<T extends Record<string, any>>({
       <span className={`${styles.sortIcon} ${styles.sortActive}`}>
         {sortDirection === 'asc' ? (
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M3 8L6 4L9 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="M3 8L6 4L9 8"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         ) : (
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M3 4L6 8L9 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="M3 4L6 8L9 4"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         )}
       </span>
@@ -161,7 +185,9 @@ export function Table<T extends Record<string, any>>({
                   styles.th,
                   column.sortable && styles.sortable,
                   column.align && styles[`align-${column.align}`],
-                ].filter(Boolean).join(' ')}
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
                 onClick={() => column.sortable && handleSort(column.key)}
               >
                 <span className={styles.thContent}>
@@ -188,7 +214,9 @@ export function Table<T extends Record<string, any>>({
                   striped && index % 2 === 1 && styles.striped,
                   hoverable && styles.hoverable,
                   onRowClick && styles.clickable,
-                ].filter(Boolean).join(' ')}
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
                 onClick={() => onRowClick?.(record, index)}
               >
                 {columns.map((column) => (
@@ -197,7 +225,9 @@ export function Table<T extends Record<string, any>>({
                     className={[
                       styles.td,
                       column.align && styles[`align-${column.align}`],
-                    ].filter(Boolean).join(' ')}
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
                   >
                     {column.render
                       ? column.render(record[column.key], record, index)

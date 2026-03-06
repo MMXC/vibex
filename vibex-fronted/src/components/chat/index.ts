@@ -16,4 +16,8 @@ export type {
   SearchFilters,
   SearchResult,
 } from './SearchFilter';
-export { useSearchFilter, searchInMessages, highlightSearchMatch } from './SearchFilter';
+export {
+  useSearchFilter,
+  searchInMessages,
+  highlightSearchMatch,
+} from './SearchFilter';

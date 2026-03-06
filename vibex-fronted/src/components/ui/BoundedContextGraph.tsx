@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { useCallback, useState, useMemo } from 'react'
+import { useCallback, useState, useMemo } from 'react';
 import ReactFlow, {
   Node,
   Edge,
@@ -14,13 +14,13 @@ import ReactFlow, {
   NodeTypes,
   BackgroundVariant,
   Panel,
-} from 'reactflow'
-import 'reactflow/dist/style.css'
+} from 'reactflow';
+import 'reactflow/dist/style.css';
 
 export interface BoundedContextNodeData {
-  label: string
-  description: string
-  type: 'core' | 'supporting' | 'generic' | 'external'
+  label: string;
+  description: string;
+  type: 'core' | 'supporting' | 'generic' | 'external';
 }
 
 const contextTypeStyles = {
@@ -28,11 +28,17 @@ const contextTypeStyles = {
   supporting: { background: '#60a5fa', border: '#3b82f6', label: '支撑' },
   generic: { background: '#a78bfa', border: '#8b5cf6', label: '通用' },
   external: { background: '#f87171', border: '#ef4444', label: '外部' },
-}
+};
 
-function ContextNode({ data, selected }: { data: BoundedContextNodeData; selected: boolean }) {
-  const style = contextTypeStyles[data.type] || contextTypeStyles.generic
-  
+function ContextNode({
+  data,
+  selected,
+}: {
+  data: BoundedContextNodeData;
+  selected: boolean;
+}) {
+  const style = contextTypeStyles[data.type] || contextTypeStyles.generic;
+
   return (
     <div
       style={{
@@ -42,7 +48,9 @@ function ContextNode({ data, selected }: { data: BoundedContextNodeData; selecte
         border: `2px solid ${selected ? '#fff' : style.border}`,
         color: '#1a1a2e',
         minWidth: '150px',
-        boxShadow: selected ? '0 0 0 2px #fff, 0 4px 12px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.2)',
+        boxShadow: selected
+          ? '0 0 0 2px #fff, 0 4px 12px rgba(0,0,0,0.3)'
+          : '0 2px 8px rgba(0,0,0,0.2)',
         transform: selected ? 'scale(1.05)' : 'scale(1)',
         transition: 'all 0.2s ease',
       }}
@@ -50,9 +58,7 @@ function ContextNode({ data, selected }: { data: BoundedContextNodeData; selecte
       <div style={{ fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>
         {data.label}
       </div>
-      <div style={{ fontSize: '12px', opacity: 0.8 }}>
-        {data.description}
-      </div>
+      <div style={{ fontSize: '12px', opacity: 0.8 }}>{data.description}</div>
       <div
         style={{
           position: 'absolute',
@@ -68,42 +74,46 @@ function ContextNode({ data, selected }: { data: BoundedContextNodeData; selecte
         {style.label}
       </div>
     </div>
-  )
+  );
 }
 
 const nodeTypes: NodeTypes = {
   context: ContextNode,
-}
+};
 
 export interface BoundedContextGraphProps {
   contexts: Array<{
-    id: string
-    name: string
-    description: string
-    type: 'core' | 'supporting' | 'generic' | 'external'
-  }>
+    id: string;
+    name: string;
+    description: string;
+    type: 'core' | 'supporting' | 'generic' | 'external';
+  }>;
   relationships: Array<{
-    id: string
-    fromContextId: string
-    toContextId: string
-    type: 'upstream' | 'downstream' | 'symmetric'
-    description: string
-  }>
-  onContextsChange?: (contexts: Array<{
-    id: string
-    name: string
-    description: string
-    type: 'core' | 'supporting' | 'generic' | 'external'
-    position: { x: number; y: number }
-  }>) => void
-  onRelationshipsChange?: (relationships: Array<{
-    id: string
-    fromContextId: string
-    toContextId: string
-    type: 'upstream' | 'downstream' | 'symmetric'
-    description: string
-  }>) => void
-  readOnly?: boolean
+    id: string;
+    fromContextId: string;
+    toContextId: string;
+    type: 'upstream' | 'downstream' | 'symmetric';
+    description: string;
+  }>;
+  onContextsChange?: (
+    contexts: Array<{
+      id: string;
+      name: string;
+      description: string;
+      type: 'core' | 'supporting' | 'generic' | 'external';
+      position: { x: number; y: number };
+    }>
+  ) => void;
+  onRelationshipsChange?: (
+    relationships: Array<{
+      id: string;
+      fromContextId: string;
+      toContextId: string;
+      type: 'upstream' | 'downstream' | 'symmetric';
+      description: string;
+    }>
+  ) => void;
+  readOnly?: boolean;
 }
 
 export default function BoundedContextGraph({
@@ -127,8 +137,8 @@ export default function BoundedContextGraph({
         description: ctx.description,
         type: ctx.type,
       },
-    }))
-  }, [contexts])
+    }));
+  }, [contexts]);
 
   // Convert relationships to edges
   const initialEdges: Edge[] = useMemo(() => {
@@ -142,46 +152,58 @@ export default function BoundedContextGraph({
       style: { stroke: '#60a5fa', strokeWidth: 2 },
       labelStyle: { fill: '#fff', fontSize: 12 },
       labelBgStyle: { fill: '#1e1e2e', fillOpacity: 0.8 },
-    }))
-  }, [relationships])
+    }));
+  }, [relationships]);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   const onConnect = useCallback(
     (params: Connection) => {
-      if (readOnly) return
-      setEdges((eds) => addEdge({ ...params, animated: true, style: { stroke: '#60a5fa' } }, eds))
+      if (readOnly) return;
+      setEdges((eds) =>
+        addEdge(
+          { ...params, animated: true, style: { stroke: '#60a5fa' } },
+          eds
+        )
+      );
     },
     [setEdges, readOnly]
-  )
+  );
 
   const onNodeDragStop = useCallback(
     (_event: React.MouseEvent, node: Node) => {
-      if (readOnly || !onContextsChange) return
+      if (readOnly || !onContextsChange) return;
       const updatedContexts = nodes.map((n) => ({
         id: n.id,
         name: n.data.label,
         description: n.data.description,
         type: n.data.type,
         position: n.position,
-      }))
-      onContextsChange(updatedContexts)
+      }));
+      onContextsChange(updatedContexts);
     },
     [nodes, onContextsChange, readOnly]
-  )
+  );
 
   // Update nodes when contexts change
   useMemo(() => {
-    setNodes(initialNodes)
-  }, [initialNodes, setNodes])
+    setNodes(initialNodes);
+  }, [initialNodes, setNodes]);
 
   useMemo(() => {
-    setEdges(initialEdges)
-  }, [initialEdges, setEdges])
+    setEdges(initialEdges);
+  }, [initialEdges, setEdges]);
 
   return (
-    <div style={{ width: '100%', height: '500px', borderRadius: '12px', overflow: 'hidden' }}>
+    <div
+      style={{
+        width: '100%',
+        height: '500px',
+        borderRadius: '12px',
+        overflow: 'hidden',
+      }}
+    >
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -194,13 +216,18 @@ export default function BoundedContextGraph({
         attributionPosition="bottom-left"
         proOptions={{ hideAttribution: true }}
       >
-        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="rgba(255,255,255,0.1)" />
+        <Background
+          variant={BackgroundVariant.Dots}
+          gap={20}
+          size={1}
+          color="rgba(255,255,255,0.1)"
+        />
         <Controls style={{ background: '#1e1e2e', borderRadius: '8px' }} />
         <MiniMap
           style={{ background: '#1e1e2e', borderRadius: '8px' }}
           nodeColor={(node) => {
-            const type = node.data?.type as keyof typeof contextTypeStyles
-            return contextTypeStyles[type]?.background || '#a78bfa'
+            const type = node.data?.type as keyof typeof contextTypeStyles;
+            return contextTypeStyles[type]?.background || '#a78bfa';
           }}
         />
         {contexts.length === 0 && (
@@ -212,5 +239,5 @@ export default function BoundedContextGraph({
         )}
       </ReactFlow>
     </div>
-  )
+  );
 }

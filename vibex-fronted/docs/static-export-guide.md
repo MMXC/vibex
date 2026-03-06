@@ -20,24 +20,24 @@ Error: Dynamic route 'project/[id]' cannot be exported as a static page
 
 These routes can be statically exported:
 
-| Route | Description |
-|-------|-------------|
-| `/` | Landing page |
-| `/landing` | Marketing landing |
-| `/templates` | Template gallery |
-| `/changelog` | Version history |
-| `/pagelist` | Page listing |
+| Route        | Description       |
+| ------------ | ----------------- |
+| `/`          | Landing page      |
+| `/landing`   | Marketing landing |
+| `/templates` | Template gallery  |
+| `/changelog` | Version history   |
+| `/pagelist`  | Page listing      |
 
 ### ⚠️ Dynamic Routes (NOT for static export)
 
 These routes require runtime data and will fail with static export:
 
-| Route | Pattern | Reason |
-|-------|---------|--------|
-| `/project/[id]` | `[id]` | Project ID from database |
-| `/requirements/new` | User input | Form submission |
-| `/confirm/*` | User flow | Dynamic state |
-| `/api/*` | API routes | Server-side only |
+| Route               | Pattern    | Reason                   |
+| ------------------- | ---------- | ------------------------ |
+| `/project/[id]`     | `[id]`     | Project ID from database |
+| `/requirements/new` | User input | Form submission          |
+| `/confirm/*`        | User flow  | Dynamic state            |
+| `/api/*`            | API routes | Server-side only         |
 
 ## Solutions
 
@@ -47,7 +47,7 @@ For routes that need runtime data, ensure they're not prerendered:
 
 ```typescript
 // app/project/[id]/page.tsx
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic';
 
 export default function ProjectPage({ params }) {
   // This will be rendered on-demand
@@ -68,7 +68,7 @@ Add the custom ESLint rule to catch issues early:
 
 ```javascript
 // eslint.config.mjs
-import noStaticExport from './eslint-rules/no-static-export.js'
+import noStaticExport from './eslint-rules/no-static-export.js';
 
 export default [
   {
@@ -76,7 +76,7 @@ export default [
       'no-static-export': 'error',
     },
   },
-]
+];
 ```
 
 ## CI Integration

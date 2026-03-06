@@ -90,7 +90,11 @@
 }
 
 .pageButton.active {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 100%
+  );
   color: var(--color-text-inverse);
   border-color: var(--color-primary);
   box-shadow: 0 0 10px var(--color-primary-glow);

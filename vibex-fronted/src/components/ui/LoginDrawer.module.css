@@ -111,7 +111,11 @@
 
 .submitBtn {
   padding: 14px;
-  background: linear-gradient(135deg, var(--color-primary, #00ffff) 0%, rgba(0, 255, 255, 0.8) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary, #00ffff) 0%,
+    rgba(0, 255, 255, 0.8) 100%
+  );
   color: #0a0a0f;
   border: none;
   border-radius: 8px;
@@ -154,11 +158,19 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideIn {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }

@@ -3,7 +3,13 @@
  */
 
 import { renderHook, act } from '@testing-library/react';
-import { AuthProvider, useAuth, useIsAuthenticated, useCurrentUser, User } from '../useAuth';
+import {
+  AuthProvider,
+  useAuth,
+  useIsAuthenticated,
+  useCurrentUser,
+  User,
+} from '../useAuth';
 
 // Mock apiService
 const mockLogin = jest.fn();
@@ -75,7 +81,10 @@ describe('useAuth', () => {
         await result.current.login('test@example.com', 'password');
       });
 
-      expect(localStorageMock.setItem).toHaveBeenCalledWith('auth_token', 'test-token');
+      expect(localStorageMock.setItem).toHaveBeenCalledWith(
+        'auth_token',
+        'test-token'
+      );
     });
   });
 
@@ -89,7 +98,11 @@ describe('useAuth', () => {
       });
 
       await act(async () => {
-        await result.current.register('Test User', 'test@example.com', 'password');
+        await result.current.register(
+          'Test User',
+          'test@example.com',
+          'password'
+        );
       });
 
       expect(mockRegister).toHaveBeenCalledWith({
@@ -134,7 +147,10 @@ describe('useAuth', () => {
     it('should call getCurrentUser when refreshing', async () => {
       mockLogin.mockResolvedValue({ token: 'test-token', user: mockUser });
       mockGetCurrentUser.mockResolvedValue(mockUser);
-      mockGetCurrentUser.mockResolvedValueOnce({ ...mockUser, name: 'Updated' });
+      mockGetCurrentUser.mockResolvedValueOnce({
+        ...mockUser,
+        name: 'Updated',
+      });
 
       const { result } = renderHook(() => useAuth(), {
         wrapper: AuthProvider,

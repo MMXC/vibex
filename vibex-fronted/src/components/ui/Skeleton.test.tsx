@@ -22,7 +22,9 @@ describe('Skeleton', () => {
 
     it('renders card content', () => {
       const { container } = render(<SkeletonCard />);
-      expect(container.querySelector('[class*="cardContent"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[class*="cardContent"]')
+      ).toBeInTheDocument();
     });
   });
 
@@ -41,7 +43,9 @@ describe('Skeleton', () => {
 
     it('renders list item content', () => {
       const { container } = render(<SkeletonList count={2} />);
-      expect(container.querySelector('[class*="listItemContent"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[class*="listItemContent"]')
+      ).toBeInTheDocument();
     });
   });
 });

@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react';
 import ReactFlow, {
   Node,
   Edge,
@@ -15,39 +15,45 @@ import ReactFlow, {
   BackgroundVariant,
   Panel,
   MarkerType,
-} from 'reactflow'
-import 'reactflow/dist/style.css'
+} from 'reactflow';
+import 'reactflow/dist/style.css';
 
 export interface FlowState {
-  id: string
-  name: string
-  type: 'initial' | 'intermediate' | 'final'
-  description?: string
+  id: string;
+  name: string;
+  type: 'initial' | 'intermediate' | 'final';
+  description?: string;
 }
 
 export interface FlowTransition {
-  id: string
-  fromStateId: string
-  toStateId: string
-  event: string
-  condition?: string
+  id: string;
+  fromStateId: string;
+  toStateId: string;
+  event: string;
+  condition?: string;
 }
 
 export interface BusinessFlowNodeData {
-  label: string
-  stateType: 'initial' | 'intermediate' | 'final'
-  description?: string
+  label: string;
+  stateType: 'initial' | 'intermediate' | 'final';
+  description?: string;
 }
 
 const stateTypeStyles = {
   initial: { background: '#4ade80', border: '#22c55e', label: '初始' },
   intermediate: { background: '#60a5fa', border: '#3b82f6', label: '中间' },
   final: { background: '#f472b6', border: '#ec4899', label: '最终' },
-}
+};
 
-function StateNode({ data, selected }: { data: BusinessFlowNodeData; selected: boolean }) {
-  const style = stateTypeStyles[data.stateType] || stateTypeStyles.intermediate
-  
+function StateNode({
+  data,
+  selected,
+}: {
+  data: BusinessFlowNodeData;
+  selected: boolean;
+}) {
+  const style = stateTypeStyles[data.stateType] || stateTypeStyles.intermediate;
+
   return (
     <div
       style={{
@@ -58,8 +64,8 @@ function StateNode({ data, selected }: { data: BusinessFlowNodeData; selected: b
         color: '#1a1a2e',
         minWidth: '120px',
         textAlign: 'center',
-        boxShadow: selected 
-          ? '0 0 0 3px #fff, 0 6px 20px rgba(0,0,0,0.4)' 
+        boxShadow: selected
+          ? '0 0 0 3px #fff, 0 6px 20px rgba(0,0,0,0.4)'
           : '0 4px 12px rgba(0,0,0,0.3)',
         transform: selected ? 'scale(1.1)' : 'scale(1)',
         transition: 'all 0.2s ease',
@@ -69,9 +75,7 @@ function StateNode({ data, selected }: { data: BusinessFlowNodeData; selected: b
         {data.label}
       </div>
       {data.description && (
-        <div style={{ fontSize: '11px', opacity: 0.8 }}>
-          {data.description}
-        </div>
+        <div style={{ fontSize: '11px', opacity: 0.8 }}>{data.description}</div>
       )}
       <div
         style={{
@@ -90,19 +94,19 @@ function StateNode({ data, selected }: { data: BusinessFlowNodeData; selected: b
         {style.label}
       </div>
     </div>
-  )
+  );
 }
 
 const nodeTypes: NodeTypes = {
   state: StateNode,
-}
+};
 
 export interface BusinessFlowGraphProps {
-  states: FlowState[]
-  transitions: FlowTransition[]
-  onStatesChange?: (states: FlowState[]) => void
-  onTransitionsChange?: (transitions: FlowTransition[]) => void
-  readOnly?: boolean
+  states: FlowState[];
+  transitions: FlowTransition[];
+  onStatesChange?: (states: FlowState[]) => void;
+  onTransitionsChange?: (transitions: FlowTransition[]) => void;
+  readOnly?: boolean;
 }
 
 export default function BusinessFlowGraph({
@@ -115,13 +119,13 @@ export default function BusinessFlowGraph({
   // Layout states in a horizontal or vertical flow
   const initialNodes: Node[] = useMemo(() => {
     // Group by flow position
-    const initialStates = states.filter(s => s.type === 'initial')
-    const intermediateStates = states.filter(s => s.type === 'intermediate')
-    const finalStates = states.filter(s => s.type === 'final')
-    
-    const nodes: Node[] = []
-    let yOffset = 0
-    
+    const initialStates = states.filter((s) => s.type === 'initial');
+    const intermediateStates = states.filter((s) => s.type === 'intermediate');
+    const finalStates = states.filter((s) => s.type === 'final');
+
+    const nodes: Node[] = [];
+    let yOffset = 0;
+
     // Initial states
     initialStates.forEach((state, idx) => {
       nodes.push({
@@ -133,10 +137,10 @@ export default function BusinessFlowGraph({
           stateType: state.type,
           description: state.description,
         },
-      })
-    })
-    yOffset += Math.max(initialStates.length, 1) * 120 + 50
-    
+      });
+    });
+    yOffset += Math.max(initialStates.length, 1) * 120 + 50;
+
     // Intermediate states
     intermediateStates.forEach((state, idx) => {
       nodes.push({
@@ -148,10 +152,10 @@ export default function BusinessFlowGraph({
           stateType: state.type,
           description: state.description,
         },
-      })
-    })
-    yOffset += Math.max(intermediateStates.length, 1) * 120 + 50
-    
+      });
+    });
+    yOffset += Math.max(intermediateStates.length, 1) * 120 + 50;
+
     // Final states
     finalStates.forEach((state, idx) => {
       nodes.push({
@@ -163,11 +167,11 @@ export default function BusinessFlowGraph({
           stateType: state.type,
           description: state.description,
         },
-      })
-    })
-    
-    return nodes
-  }, [states])
+      });
+    });
+
+    return nodes;
+  }, [states]);
 
   const initialEdges: Edge[] = useMemo(() => {
     return transitions.map((trans) => ({
@@ -184,37 +188,49 @@ export default function BusinessFlowGraph({
         type: MarkerType.ArrowClosed,
         color: '#a78bfa',
       },
-    }))
-  }, [transitions])
+    }));
+  }, [transitions]);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   const onConnect = useCallback(
     (params: Connection) => {
-      if (readOnly) return
-      setEdges((eds) => addEdge({ 
-        ...params, 
-        animated: true, 
-        style: { stroke: '#a78bfa', strokeWidth: 2 },
-        label: 'event',
-        markerEnd: { type: MarkerType.ArrowClosed, color: '#a78bfa' }
-      }, eds))
+      if (readOnly) return;
+      setEdges((eds) =>
+        addEdge(
+          {
+            ...params,
+            animated: true,
+            style: { stroke: '#a78bfa', strokeWidth: 2 },
+            label: 'event',
+            markerEnd: { type: MarkerType.ArrowClosed, color: '#a78bfa' },
+          },
+          eds
+        )
+      );
     },
     [setEdges, readOnly]
-  )
+  );
 
   // Update when data changes
   useMemo(() => {
-    setNodes(initialNodes)
-  }, [initialNodes, setNodes])
+    setNodes(initialNodes);
+  }, [initialNodes, setNodes]);
 
   useMemo(() => {
-    setEdges(initialEdges)
-  }, [initialEdges, setEdges])
+    setEdges(initialEdges);
+  }, [initialEdges, setEdges]);
 
   return (
-    <div style={{ width: '100%', height: '600px', borderRadius: '12px', overflow: 'hidden' }}>
+    <div
+      style={{
+        width: '100%',
+        height: '600px',
+        borderRadius: '12px',
+        overflow: 'hidden',
+      }}
+    >
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -226,13 +242,18 @@ export default function BusinessFlowGraph({
         attributionPosition="bottom-left"
         proOptions={{ hideAttribution: true }}
       >
-        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="rgba(255,255,255,0.1)" />
+        <Background
+          variant={BackgroundVariant.Dots}
+          gap={20}
+          size={1}
+          color="rgba(255,255,255,0.1)"
+        />
         <Controls style={{ background: '#1e1e2e', borderRadius: '8px' }} />
         <MiniMap
           style={{ background: '#1e1e2e', borderRadius: '8px' }}
           nodeColor={(node) => {
-            const type = node.data?.stateType as keyof typeof stateTypeStyles
-            return stateTypeStyles[type]?.background || '#60a5fa'
+            const type = node.data?.stateType as keyof typeof stateTypeStyles;
+            return stateTypeStyles[type]?.background || '#60a5fa';
           }}
         />
         {states.length === 0 && (
@@ -244,5 +265,5 @@ export default function BusinessFlowGraph({
         )}
       </ReactFlow>
     </div>
-  )
+  );
 }

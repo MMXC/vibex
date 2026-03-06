@@ -11,36 +11,35 @@ const REFERENCE_DIR = `${SCREENSHOT_DIR}/reference`;
 const DATE = new Date().toISOString().split('T')[0];
 
 test.describe('Visual Regression Tests', () => {
-  
   test('01-dashboard-visual', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`);
     await page.waitForTimeout(2000);
-    
+
     // Take screenshot
     const screenshotPath = `${SCREENSHOT_DIR}/visual/${DATE}/dashboard.png`;
     await page.screenshot({ path: screenshotPath, fullPage: true });
-    
+
     // Check if reference exists
     const fs = require('fs');
     const referencePath = `${REFERENCE_DIR}/dashboard.png`;
     const hasReference = fs.existsSync(referencePath);
-    
+
     if (hasReference) {
       // Compare with reference
       // For now, just verify screenshot was taken
       console.log('Dashboard screenshot taken for comparison');
     }
-    
+
     expect(fs.existsSync(screenshotPath)).toBe(true);
   });
 
   test('02-requirements-visual', async ({ page }) => {
     await page.goto(`${BASE_URL}/requirements`);
     await page.waitForTimeout(2000);
-    
+
     const screenshotPath = `${SCREENSHOT_DIR}/visual/${DATE}/requirements.png`;
     await page.screenshot({ path: screenshotPath, fullPage: true });
-    
+
     const fs = require('fs');
     expect(fs.existsSync(screenshotPath)).toBe(true);
   });
@@ -48,10 +47,10 @@ test.describe('Visual Regression Tests', () => {
   test('03-flow-visual', async ({ page }) => {
     await page.goto(`${BASE_URL}/flow`);
     await page.waitForTimeout(2000);
-    
+
     const screenshotPath = `${SCREENSHOT_DIR}/visual/${DATE}/flow.png`;
     await page.screenshot({ path: screenshotPath, fullPage: true });
-    
+
     const fs = require('fs');
     expect(fs.existsSync(screenshotPath)).toBe(true);
   });
@@ -59,10 +58,10 @@ test.describe('Visual Regression Tests', () => {
   test('04-landing-visual', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`);
     await page.waitForTimeout(2000);
-    
+
     const screenshotPath = `${SCREENSHOT_DIR}/visual/${DATE}/landing.png`;
     await page.screenshot({ path: screenshotPath, fullPage: true });
-    
+
     const fs = require('fs');
     expect(fs.existsSync(screenshotPath)).toBe(true);
   });
@@ -70,10 +69,10 @@ test.describe('Visual Regression Tests', () => {
   test('05-templates-visual', async ({ page }) => {
     await page.goto(`${BASE_URL}/templates`);
     await page.waitForTimeout(2000);
-    
+
     const screenshotPath = `${SCREENSHOT_DIR}/visual/${DATE}/templates.png`;
     await page.screenshot({ path: screenshotPath, fullPage: true });
-    
+
     const fs = require('fs');
     expect(fs.existsSync(screenshotPath)).toBe(true);
   });
@@ -81,31 +80,35 @@ test.describe('Visual Regression Tests', () => {
   test('06-auth-visual', async ({ page }) => {
     await page.goto(`${BASE_URL}/auth`);
     await page.waitForTimeout(2000);
-    
+
     const screenshotPath = `${SCREENSHOT_DIR}/visual/${DATE}/auth.png`;
     await page.screenshot({ path: screenshotPath, fullPage: true });
-    
+
     const fs = require('fs');
     expect(fs.existsSync(screenshotPath)).toBe(true);
   });
 
   test('07-utilities-css-no-regression', async ({ page }) => {
     // This test verifies utilities.css doesn't break any pages
-    
+
     await page.goto(`${BASE_URL}/dashboard`);
     await page.waitForTimeout(1000);
-    
+
     const screenshotPath = `${SCREENSHOT_DIR}/visual/${DATE}/dashboard-utilities.png`;
     await page.screenshot({ path: screenshotPath, fullPage: true });
-    
+
     // Check utilities.css is loaded
     const hasUtilities = await page.evaluate(() => {
-      const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
-      return links.some((link: any) => link.href && link.href.includes('utilities'));
+      const links = Array.from(
+        document.querySelectorAll('link[rel="stylesheet"]')
+      );
+      return links.some(
+        (link: any) => link.href && link.href.includes('utilities')
+      );
     });
-    
+
     console.log('Utilities CSS loaded:', hasUtilities);
-    
+
     const fs = require('fs');
     expect(fs.existsSync(screenshotPath)).toBe(true);
   });
@@ -113,10 +116,10 @@ test.describe('Visual Regression Tests', () => {
   test('08-project-settings-visual', async ({ page }) => {
     await page.goto(`${BASE_URL}/project-settings`);
     await page.waitForTimeout(2000);
-    
+
     const screenshotPath = `${SCREENSHOT_DIR}/visual/${DATE}/project-settings.png`;
     await page.screenshot({ path: screenshotPath, fullPage: true });
-    
+
     const fs = require('fs');
     expect(fs.existsSync(screenshotPath)).toBe(true);
   });

@@ -1,8 +1,8 @@
 /**
  * MermaidPreview Component - Mermaid 图表预览
- * 
+ *
  * 用于渲染 Mermaid 代码为可视化图表
- * 
+ *
  * Usage:
  * <MermaidPreview code={mermaidCode} diagramType="graph" />
  */
@@ -13,7 +13,11 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import mermaid from 'mermaid';
 import { ErrorBoundary } from './ErrorBoundary';
 
-export type DiagramType = 'graph' | 'classDiagram' | 'stateDiagram' | 'flowchart';
+export type DiagramType =
+  | 'graph'
+  | 'classDiagram'
+  | 'stateDiagram'
+  | 'flowchart';
 export type LayoutDirection = 'TB' | 'LR' | 'BT' | 'RL';
 
 export interface MermaidPreviewProps {
@@ -62,7 +66,7 @@ export function MermaidPreview({
   return (
     <ErrorBoundary
       fallback={
-        <div 
+        <div
           className={className}
           style={{
             height,
@@ -79,7 +83,13 @@ export function MermaidPreview({
         >
           <div style={{ fontSize: '24px', marginBottom: '8px' }}>⚠️</div>
           <div style={{ fontSize: '14px' }}>图表组件出现错误</div>
-          <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '8px' }}>
+          <div
+            style={{
+              fontSize: '12px',
+              color: 'var(--color-text-muted)',
+              marginTop: '8px',
+            }}
+          >
             请尝试刷新页面或重新输入图表代码
           </div>
         </div>
@@ -109,10 +119,13 @@ function MermaidPreviewInner({
   const [svg, setSvg] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // 生成唯一 ID
-  const id = useCallback(() => `mermaid-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`, []);
-  
+  const id = useCallback(
+    () => `mermaid-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+    []
+  );
+
   // 渲染图表
   const renderChart = useCallback(async () => {
     if (!code.trim()) {
@@ -120,10 +133,10 @@ function MermaidPreviewInner({
       setError('');
       return;
     }
-    
+
     setIsLoading(true);
     setError('');
-    
+
     try {
       // 添加布局方向指示
       let processedCode = code;
@@ -132,7 +145,7 @@ function MermaidPreviewInner({
           processedCode = `flowchart ${layout}\n${code.replace(/^(flowchart|graph)/i, '')}`;
         }
       }
-      
+
       const chartId = id();
       const { svg: renderedSvg } = await mermaid.render(chartId, processedCode);
       setSvg(renderedSvg);
@@ -146,20 +159,20 @@ function MermaidPreviewInner({
       setIsLoading(false);
     }
   }, [code, diagramType, layout, id, onError]);
-  
+
   // 当代码变化时重新渲染
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
       renderChart();
     }, 300);
-    
+
     return () => clearTimeout(debounceTimer);
   }, [renderChart]);
-  
+
   // 加载状态
   if (isLoading) {
     return (
-      <div 
+      <div
         className={className}
         style={{
           height,
@@ -171,36 +184,44 @@ function MermaidPreviewInner({
           border: '1px solid var(--color-border)',
         }}
       >
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          color: 'var(--color-text-secondary)',
-        }}>
-          <div style={{
-            width: '20px',
-            height: '20px',
-            border: '2px solid var(--color-border)',
-            borderTopColor: 'var(--color-primary)',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-          }} />
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            color: 'var(--color-text-secondary)',
+          }}
+        >
+          <div
+            style={{
+              width: '20px',
+              height: '20px',
+              border: '2px solid var(--color-border)',
+              borderTopColor: 'var(--color-primary)',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+            }}
+          />
           <span>渲染中...</span>
         </div>
         <style jsx>{`
           @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            from {
+              transform: rotate(0deg);
+            }
+            to {
+              transform: rotate(360deg);
+            }
           }
         `}</style>
       </div>
     );
   }
-  
+
   // 错误状态
   if (error) {
     return (
-      <div 
+      <div
         className={className}
         style={{
           height,
@@ -215,26 +236,34 @@ function MermaidPreviewInner({
         }}
       >
         <div style={{ fontSize: '24px', marginBottom: '8px' }}>⚠️</div>
-        <div style={{ color: 'var(--color-error)', fontSize: '14px', textAlign: 'center' }}>
+        <div
+          style={{
+            color: 'var(--color-error)',
+            fontSize: '14px',
+            textAlign: 'center',
+          }}
+        >
           图表渲染失败
         </div>
-        <div style={{ 
-          color: 'var(--color-text-muted)', 
-          fontSize: '12px', 
-          marginTop: '8px',
-          maxWidth: '100%',
-          overflow: 'auto',
-        }}>
+        <div
+          style={{
+            color: 'var(--color-text-muted)',
+            fontSize: '12px',
+            marginTop: '8px',
+            maxWidth: '100%',
+            overflow: 'auto',
+          }}
+        >
           {error}
         </div>
       </div>
     );
   }
-  
+
   // 空状态
   if (!svg && !error) {
     return (
-      <div 
+      <div
         className={className}
         style={{
           height,
@@ -252,10 +281,10 @@ function MermaidPreviewInner({
       </div>
     );
   }
-  
+
   // 正常渲染
   return (
-    <div 
+    <div
       ref={containerRef}
       className={className}
       style={{

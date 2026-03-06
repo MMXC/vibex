@@ -53,11 +53,11 @@ export function List({
 
   const handleItemClick = (item: ListItem, index: number) => {
     if (item.disabled) return;
-    
+
     if (selectable && onSelect) {
       onSelect(item.id);
     }
-    
+
     onItemClick?.(item, index);
   };
 
@@ -71,18 +71,16 @@ export function List({
           styles.listItem,
           item.disabled && styles.disabled,
           isItemSelected && styles.selected,
-        ].filter(Boolean).join(' ')}
+        ]
+          .filter(Boolean)
+          .join(' ')}
         onClick={() => handleItemClick(item, index)}
         role={selectable ? 'option' : 'listitem'}
         aria-selected={isItemSelected}
         aria-disabled={item.disabled}
       >
-        {item.icon && (
-          <div className={styles.listIcon}>
-            {item.icon}
-          </div>
-        )}
-        
+        {item.icon && <div className={styles.listIcon}>{item.icon}</div>}
+
         <div className={styles.listContent}>
           <span className={styles.listTitle}>{item.title}</span>
           {item.description && (
@@ -90,25 +88,14 @@ export function List({
           )}
         </div>
 
-        {item.meta && (
-          <div className={styles.listMeta}>
-            {item.meta}
-          </div>
-        )}
+        {item.meta && <div className={styles.listMeta}>{item.meta}</div>}
 
         {item.actions && (
-          <div className={styles.listActions}>
-            {item.actions}
-          </div>
+          <div className={styles.listActions}>{item.actions}</div>
         )}
 
         {item.children && item.children.length > 0 && (
-          <List
-            items={item.children}
-            variant={variant}
-            size={size}
-            nested
-          />
+          <List items={item.children} variant={variant} size={size} nested />
         )}
       </div>
     );
@@ -133,11 +120,7 @@ export function List({
   const renderEmptyState = () => {
     return (
       <div className={styles.empty}>
-        {emptyIcon && (
-          <div className={styles.emptyIcon}>
-            {emptyIcon}
-          </div>
-        )}
+        {emptyIcon && <div className={styles.emptyIcon}>{emptyIcon}</div>}
         <span className={styles.emptyText}>{emptyText}</span>
       </div>
     );
@@ -152,34 +135,23 @@ export function List({
     selectable && styles.selectable,
     nested && styles.nested,
     className,
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   if (loading) {
-    return (
-      <div className={containerClasses}>
-        {renderLoadingState()}
-      </div>
-    );
+    return <div className={containerClasses}>{renderLoadingState()}</div>;
   }
 
   if (items.length === 0) {
-    return (
-      <div className={containerClasses}>
-        {renderEmptyState()}
-      </div>
-    );
+    return <div className={containerClasses}>{renderEmptyState()}</div>;
   }
 
   return (
-    <div 
-      className={containerClasses}
-      role={selectable ? 'listbox' : 'list'}
-    >
-      {items.map((item, index) => (
-        renderItem 
-          ? renderItem(item, index)
-          : renderDefaultItem(item, index)
-      ))}
+    <div className={containerClasses} role={selectable ? 'listbox' : 'list'}>
+      {items.map((item, index) =>
+        renderItem ? renderItem(item, index) : renderDefaultItem(item, index)
+      )}
     </div>
   );
 }

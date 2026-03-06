@@ -70,9 +70,11 @@ export function Steps({
           >
             {/* 连接线 */}
             {index > 0 && (
-              <div className={`${styles.connector} ${index <= current ? styles.completed : ''}`} />
+              <div
+                className={`${styles.connector} ${index <= current ? styles.completed : ''}`}
+              />
             )}
-            
+
             {/* 步骤标识 */}
             <div className={styles.indicator}>
               {showNumber && status !== 'completed' && (
@@ -107,7 +109,11 @@ interface SimpleStepsProps {
   className?: string;
 }
 
-export function SimpleSteps({ steps, current = 0, className = '' }: SimpleStepsProps) {
+export function SimpleSteps({
+  steps,
+  current = 0,
+  className = '',
+}: SimpleStepsProps) {
   return (
     <Steps
       steps={steps.map((title) => ({ title }))}

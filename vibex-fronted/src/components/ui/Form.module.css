@@ -127,7 +127,7 @@ select:disabled {
   gap: var(--space-3);
 }
 
-.checkboxWrapper input[type="checkbox"] {
+.checkboxWrapper input[type='checkbox'] {
   width: 20px;
   height: 20px;
   padding: 0;
@@ -222,10 +222,13 @@ select:focus {
 }
 
 @keyframes formInputGlow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 3px var(--color-primary-muted);
   }
   50% {
-    box-shadow: 0 0 0 4px var(--color-primary-muted), 0 0 20px var(--color-primary-muted);
+    box-shadow:
+      0 0 0 4px var(--color-primary-muted),
+      0 0 20px var(--color-primary-muted);
   }
 }

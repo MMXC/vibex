@@ -16,20 +16,19 @@ async function takeScreenshot(page: any, name: string) {
 }
 
 test.describe('Confirmation Flow Progress Persistence', () => {
-  
   test('01-page-loads-correctly', async ({ page }) => {
     // Test that the confirm page loads without errors
     const response = await page.goto(`${BASE_URL}/confirm`);
-    
+
     // Page should respond (200 or 304)
     expect(response?.status()).toBeLessThan(400);
-    
+
     await takeScreenshot(page, 'page-loaded');
   });
 
   test('02-localStorage-available', async ({ page }) => {
     await page.goto(`${BASE_URL}/confirm`);
-    
+
     // Check localStorage is available
     const hasLocalStorage = await page.evaluate(() => {
       try {
@@ -38,21 +37,21 @@ test.describe('Confirmation Flow Progress Persistence', () => {
         return false;
       }
     });
-    
+
     expect(hasLocalStorage).toBe(true);
     await takeScreenshot(page, 'localstorage-available');
   });
 
   test('03-textarea-input-works', async ({ page }) => {
     await page.goto(`${BASE_URL}/confirm`);
-    
+
     // Find and fill the requirement textarea
     const textarea = page.locator('textarea#requirement');
     await expect(textarea).toBeVisible();
-    
+
     await textarea.fill('Test requirement for persistence check');
     await takeScreenshot(page, 'textarea-filled');
-    
+
     // Verify the value
     const value = await textarea.inputValue();
     expect(value).toBe('Test requirement for persistence check');
@@ -60,11 +59,11 @@ test.describe('Confirmation Flow Progress Persistence', () => {
 
   test('04-submit-button-visible', async ({ page }) => {
     await page.goto(`${BASE_URL}/confirm`);
-    
+
     // Find the submit button
     const button = page.locator('button:has-text("开始生成")');
     await expect(button).toBeVisible();
-    
+
     await takeScreenshot(page, 'button-visible');
   });
 });

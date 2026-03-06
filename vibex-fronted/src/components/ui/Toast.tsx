@@ -31,25 +31,29 @@ export function useToast() {
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const showToast = useCallback((message: string, type: ToastType = 'info', duration?: number) => {
-    const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const defaultDuration = type === 'success' ? 3000 : type === 'warning' ? 5000 : 0;
-    
-    const toast: Toast = {
-      id,
-      message,
-      type,
-      duration: duration ?? defaultDuration,
-    };
-    
-    setToasts((prev) => [...prev, toast]);
-    
-    if (toast.duration && toast.duration > 0) {
-      setTimeout(() => {
-        setToasts((prev) => prev.filter((t) => t.id !== id));
-      }, toast.duration);
-    }
-  }, []);
+  const showToast = useCallback(
+    (message: string, type: ToastType = 'info', duration?: number) => {
+      const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const defaultDuration =
+        type === 'success' ? 3000 : type === 'warning' ? 5000 : 0;
+
+      const toast: Toast = {
+        id,
+        message,
+        type,
+        duration: duration ?? defaultDuration,
+      };
+
+      setToasts((prev) => [...prev, toast]);
+
+      if (toast.duration && toast.duration > 0) {
+        setTimeout(() => {
+          setToasts((prev) => prev.filter((t) => t.id !== id));
+        }, toast.duration);
+      }
+    },
+    []
+  );
 
   const hideToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -63,7 +67,13 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-function ToastContainer({ toasts, onHide }: { toasts: Toast[]; onHide: (id: string) => void }) {
+function ToastContainer({
+  toasts,
+  onHide,
+}: {
+  toasts: Toast[];
+  onHide: (id: string) => void;
+}) {
   if (toasts.length === 0) return null;
 
   return (
@@ -75,7 +85,13 @@ function ToastContainer({ toasts, onHide }: { toasts: Toast[]; onHide: (id: stri
   );
 }
 
-function ToastItem({ toast, onHide }: { toast: Toast; onHide: (id: string) => void }) {
+function ToastItem({
+  toast,
+  onHide,
+}: {
+  toast: Toast;
+  onHide: (id: string) => void;
+}) {
   const icons: Record<ToastType, string> = {
     success: '✓',
     error: '✕',
@@ -87,8 +103,8 @@ function ToastItem({ toast, onHide }: { toast: Toast; onHide: (id: string) => vo
     <div className={`${styles.toast} ${styles[toast.type]}`} role="alert">
       <span className={styles.icon}>{icons[toast.type]}</span>
       <span className={styles.message}>{toast.message}</span>
-      <button 
-        className={styles.close} 
+      <button
+        className={styles.close}
         onClick={() => onHide(toast.id)}
         aria-label="关闭"
       >
@@ -107,7 +123,13 @@ export interface ToastProps {
   duration?: number;
 }
 
-export function Toast({ message, type = 'info', onClose, autoClose = true, duration = 5000 }: ToastProps) {
+export function Toast({
+  message,
+  type = 'info',
+  onClose,
+  autoClose = true,
+  duration = 5000,
+}: ToastProps) {
   const [visible, setVisible] = useState(true);
 
   useState(() => {

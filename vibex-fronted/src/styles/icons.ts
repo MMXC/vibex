@@ -10,7 +10,7 @@ export const icons = {
   menu: 'Menu',
   settings: 'Settings',
   user: 'User',
-  
+
   // 操作
   plus: 'Plus',
   edit: 'Edit',
@@ -20,7 +20,7 @@ export const icons = {
   upload: 'Upload',
   save: 'Save',
   share: 'Share',
-  
+
   // 箭头
   arrowUp: 'ArrowUp',
   arrowDown: 'ArrowDown',
@@ -30,7 +30,7 @@ export const icons = {
   chevronUp: 'ChevronUp',
   chevronLeft: 'ChevronLeft',
   chevronRight: 'ChevronRight',
-  
+
   // UI 状态
   check: 'Check',
   x: 'X',
@@ -40,7 +40,7 @@ export const icons = {
   helpCircle: 'HelpCircle',
   loader: 'Loader',
   loading: 'Loading',
-  
+
   // 内容
   eye: 'Eye',
   eyeOff: 'EyeOff',
@@ -52,7 +52,7 @@ export const icons = {
   clock: 'Clock',
   mapPin: 'MapPin',
   link: 'Link',
-  
+
   // 文件
   file: 'File',
   fileText: 'FileText',
@@ -60,14 +60,14 @@ export const icons = {
   image: 'Image',
   code: 'Code',
   command: 'Command',
-  
+
   // 社交
   github: 'Github',
   twitter: 'Twitter',
   facebook: 'Facebook',
   instagram: 'Instagram',
   linkedin: 'Linkedin',
-  
+
   // 其他
   moreVertical: 'MoreVertical',
   moreHorizontal: 'MoreHorizontal',

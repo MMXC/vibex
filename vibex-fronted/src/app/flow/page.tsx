@@ -1,79 +1,79 @@
-'use client'
+'use client';
 
-import { Suspense, useState, useCallback, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { Suspense, useState, useCallback, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import ReactFlow, {
   NodeChange,
   EdgeChange,
   Connection,
   applyNodeChanges,
   applyEdgeChanges,
-} from 'reactflow'
-import FlowEditor, { FlowNode, FlowEdge } from '@/components/ui/FlowEditor'
-import FlowPropertiesPanel from '@/components/ui/FlowPropertiesPanel'
-import { apiService } from '@/services/api'
-import styles from './flow.module.css'
+} from 'reactflow';
+import FlowEditor, { FlowNode, FlowEdge } from '@/components/ui/FlowEditor';
+import FlowPropertiesPanel from '@/components/ui/FlowPropertiesPanel';
+import { apiService } from '@/services/api';
+import styles from './flow.module.css';
 
 // Node templates for the library
 interface NodeTemplate {
-  type: string
-  label: string
-  icon: string
-  category: string
-  color: string
-  defaultData: Record<string, unknown>
+  type: string;
+  label: string;
+  icon: string;
+  category: string;
+  color: string;
+  defaultData: Record<string, unknown>;
 }
 
 const nodeTemplates: NodeTemplate[] = [
-  { 
-    type: 'input', 
-    label: '用户输入', 
-    icon: '📥', 
-    category: '输入节点', 
+  {
+    type: 'input',
+    label: '用户输入',
+    icon: '📥',
+    category: '输入节点',
     color: '#06b6d4',
-    defaultData: { label: '用户输入', description: '' }
+    defaultData: { label: '用户输入', description: '' },
   },
-  { 
-    type: 'llm', 
-    label: 'LLM 调用', 
-    icon: '🤖', 
-    category: '处理节点', 
+  {
+    type: 'llm',
+    label: 'LLM 调用',
+    icon: '🤖',
+    category: '处理节点',
     color: '#a855f7',
-    defaultData: { label: 'LLM 调用', model: 'gpt-4', prompt: '' }
+    defaultData: { label: 'LLM 调用', model: 'gpt-4', prompt: '' },
   },
-  { 
-    type: 'condition', 
-    label: '条件判断', 
-    icon: '🔀', 
-    category: '处理节点', 
+  {
+    type: 'condition',
+    label: '条件判断',
+    icon: '🔀',
+    category: '处理节点',
     color: '#eab308',
-    defaultData: { label: '条件判断', condition: '' }
+    defaultData: { label: '条件判断', condition: '' },
   },
-  { 
-    type: 'transform', 
-    label: '数据转换', 
-    icon: '⚡', 
-    category: '处理节点', 
+  {
+    type: 'transform',
+    label: '数据转换',
+    icon: '⚡',
+    category: '处理节点',
     color: '#ec4899',
-    defaultData: { label: '数据转换', transform: '' }
+    defaultData: { label: '数据转换', transform: '' },
   },
-  { 
-    type: 'output', 
-    label: '输出结果', 
-    icon: '📤', 
-    category: '输出节点', 
+  {
+    type: 'output',
+    label: '输出结果',
+    icon: '📤',
+    category: '输出节点',
     color: '#22c55e',
-    defaultData: { label: '输出结果', format: 'text' }
+    defaultData: { label: '输出结果', format: 'text' },
   },
-  { 
-    type: 'storage', 
-    label: '数据存储', 
-    icon: '💾', 
-    category: '输出节点', 
+  {
+    type: 'storage',
+    label: '数据存储',
+    icon: '💾',
+    category: '输出节点',
     color: '#3b82f6',
-    defaultData: { label: '数据存储', collection: '' }
+    defaultData: { label: '数据存储', collection: '' },
   },
-]
+];
 
 // Default initial nodes when no flow exists
 const defaultNodes: FlowNode[] = [
@@ -81,10 +81,10 @@ const defaultNodes: FlowNode[] = [
     id: '1',
     position: { x: 100, y: 150 },
     data: { label: '用户输入', description: '' },
-    style: { 
-      background: '#06b6d4', 
-      color: '#fff', 
-      border: '2px solid rgba(255,255,255,0.3)', 
+    style: {
+      background: '#06b6d4',
+      color: '#fff',
+      border: '2px solid rgba(255,255,255,0.3)',
       borderRadius: '8px',
       padding: '12px 20px',
     },
@@ -93,10 +93,10 @@ const defaultNodes: FlowNode[] = [
     id: '2',
     position: { x: 350, y: 150 },
     data: { label: 'LLM 调用', model: 'gpt-4' },
-    style: { 
-      background: '#a855f7', 
-      color: '#fff', 
-      border: '2px solid rgba(255,255,255,0.3)', 
+    style: {
+      background: '#a855f7',
+      color: '#fff',
+      border: '2px solid rgba(255,255,255,0.3)',
       borderRadius: '8px',
       padding: '12px 20px',
     },
@@ -105,113 +105,113 @@ const defaultNodes: FlowNode[] = [
     id: '3',
     position: { x: 600, y: 150 },
     data: { label: '输出结果', format: 'text' },
-    style: { 
-      background: '#22c55e', 
-      color: '#fff', 
-      border: '2px solid rgba(255,255,255,0.3)', 
+    style: {
+      background: '#22c55e',
+      color: '#fff',
+      border: '2px solid rgba(255,255,255,0.3)',
       borderRadius: '8px',
       padding: '12px 20px',
     },
   },
-]
+];
 
 const defaultEdges: FlowEdge[] = [
   { id: 'e1-2', source: '1', target: '2', animated: false },
   { id: 'e2-3', source: '2', target: '3', animated: false },
-]
+];
 
 function FlowContent() {
-  const searchParams = useSearchParams()
-  const flowId = searchParams.get('id')
-  
-  const [nodes, setNodes] = useState<FlowNode[]>(defaultNodes)
-  const [edges, setEdges] = useState<FlowEdge[]>(defaultEdges)
-  const [selectedNode, setSelectedNode] = useState<FlowNode | null>(null)
-  const [selectedEdge, setSelectedEdge] = useState<FlowEdge | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState('输入节点')
-  const [error, setError] = useState<string | null>(null)
-  
-  // AI Generation states
-  const [showAIGenerate, setShowAIGenerate] = useState(false)
-  const [aiDescription, setAiDescription] = useState('')
-  const [aiGenerating, setAiGenerating] = useState(false)
+  const searchParams = useSearchParams();
+  const flowId = searchParams.get('id');
 
-  const categories = ['输入节点', '处理节点', '输出节点']
+  const [nodes, setNodes] = useState<FlowNode[]>(defaultNodes);
+  const [edges, setEdges] = useState<FlowEdge[]>(defaultEdges);
+  const [selectedNode, setSelectedNode] = useState<FlowNode | null>(null);
+  const [selectedEdge, setSelectedEdge] = useState<FlowEdge | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('输入节点');
+  const [error, setError] = useState<string | null>(null);
+
+  // AI Generation states
+  const [showAIGenerate, setShowAIGenerate] = useState(false);
+  const [aiDescription, setAiDescription] = useState('');
+  const [aiGenerating, setAiGenerating] = useState(false);
+
+  const categories = ['输入节点', '处理节点', '输出节点'];
 
   // Load flow data
   useEffect(() => {
     async function loadFlow() {
       if (!flowId) {
         // No flow ID - use default
-        setLoading(false)
-        return
+        setLoading(false);
+        return;
       }
 
       try {
-        setLoading(true)
-        const flow = await apiService.getFlow(flowId)
-        
+        setLoading(true);
+        const flow = await apiService.getFlow(flowId);
+
         if (flow.nodes && flow.nodes.length > 0) {
-          setNodes(flow.nodes)
+          setNodes(flow.nodes);
         }
         if (flow.edges && flow.edges.length > 0) {
-          setEdges(flow.edges)
+          setEdges(flow.edges);
         }
       } catch (err) {
-        console.error('Failed to load flow:', err)
-        setError('加载流程图失败')
+        console.error('Failed to load flow:', err);
+        setError('加载流程图失败');
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 
-    loadFlow()
-  }, [flowId])
+    loadFlow();
+  }, [flowId]);
 
   // Handle node changes
   const handleNodesChange = useCallback((changes: NodeChange[]) => {
     setNodes((nds) => {
-      const newNodes = [...nds]
+      const newNodes = [...nds];
       changes.forEach((change) => {
         if (change.type === 'position' && change.position) {
-          const node = newNodes.find((n) => n.id === change.id)
+          const node = newNodes.find((n) => n.id === change.id);
           if (node) {
-            node.position = change.position
+            node.position = change.position;
           }
         } else if (change.type === 'remove') {
-          const index = newNodes.findIndex((n) => n.id === change.id)
+          const index = newNodes.findIndex((n) => n.id === change.id);
           if (index !== -1) {
-            newNodes.splice(index, 1)
+            newNodes.splice(index, 1);
           }
         }
-      })
-      return newNodes
-    })
-  }, [])
+      });
+      return newNodes;
+    });
+  }, []);
 
   // Handle edge changes
   const handleEdgesChange = useCallback((changes: EdgeChange[]) => {
     setEdges((eds) => {
-      const newEdges = [...eds]
+      const newEdges = [...eds];
       changes.forEach((change) => {
         if (change.type === 'remove') {
-          const index = newEdges.findIndex((e) => e.id === change.id)
+          const index = newEdges.findIndex((e) => e.id === change.id);
           if (index !== -1) {
-            newEdges.splice(index, 1)
+            newEdges.splice(index, 1);
           }
         }
-      })
-      return newEdges
-    })
-  }, [])
+      });
+      return newEdges;
+    });
+  }, []);
 
   // Handle connection
   const handleConnect = useCallback((connection: Connection) => {
-    if (!connection.source || !connection.target) return
-    const source = connection.source as string
-    const target = connection.target as string
+    if (!connection.source || !connection.target) return;
+    const source = connection.source as string;
+    const target = connection.target as string;
     setEdges((eds) => [
       ...eds,
       {
@@ -221,199 +221,208 @@ function FlowContent() {
         animated: false,
         style: { stroke: '#6b7280', strokeWidth: 2 },
       },
-    ])
-  }, [])
+    ]);
+  }, []);
 
   // Handle node click
   const handleNodeClick = useCallback((node: FlowNode) => {
-    setSelectedNode(node)
-    setSelectedEdge(null)
-  }, [])
+    setSelectedNode(node);
+    setSelectedEdge(null);
+  }, []);
 
   // Handle edge click
   const handleEdgeClick = useCallback((edge: FlowEdge) => {
-    setSelectedEdge(edge)
-    setSelectedNode(null)
-  }, [])
+    setSelectedEdge(edge);
+    setSelectedNode(null);
+  }, []);
 
   // Handle node drag stop - save position
   const handleNodesDragStop = useCallback((node: FlowNode) => {
-    setNodes((nds) =>
-      nds.map((n) => (n.id === node.id ? node : n))
-    )
-  }, [])
+    setNodes((nds) => nds.map((n) => (n.id === node.id ? node : n)));
+  }, []);
 
   // Update node data
-  const updateNodeData = useCallback((nodeId: string, data: Record<string, unknown>) => {
-    setNodes((nds) =>
-      nds.map((n) =>
-        n.id === nodeId ? { ...n, data: { ...n.data, ...data } } : n
-      )
-    )
-    setSelectedNode((prev) =>
-      prev?.id === nodeId ? { ...prev, data: { ...prev.data, ...data } } : prev
-    )
-  }, [])
+  const updateNodeData = useCallback(
+    (nodeId: string, data: Record<string, unknown>) => {
+      setNodes((nds) =>
+        nds.map((n) =>
+          n.id === nodeId ? { ...n, data: { ...n.data, ...data } } : n
+        )
+      );
+      setSelectedNode((prev) =>
+        prev?.id === nodeId
+          ? { ...prev, data: { ...prev.data, ...data } }
+          : prev
+      );
+    },
+    []
+  );
 
   // Update edge data
-  const updateEdgeData = useCallback((edgeId: string, data: Record<string, unknown>) => {
-    setEdges((eds) =>
-      eds.map((e) =>
-        e.id === edgeId ? { ...e, ...data } : e
-      )
-    )
-    setSelectedEdge((prev) =>
-      prev?.id === edgeId ? { ...prev, ...data } : prev
-    )
-  }, [])
+  const updateEdgeData = useCallback(
+    (edgeId: string, data: Record<string, unknown>) => {
+      setEdges((eds) =>
+        eds.map((e) => (e.id === edgeId ? { ...e, ...data } : e))
+      );
+      setSelectedEdge((prev) =>
+        prev?.id === edgeId ? { ...prev, ...data } : prev
+      );
+    },
+    []
+  );
 
   // Auto-layout function - arranges nodes in a hierarchical layout
   const handleAutoLayout = useCallback(() => {
-    if (nodes.length === 0) return
+    if (nodes.length === 0) return;
 
     // Build adjacency list for topological sorting
-    const inDegree: Record<string, number> = {}
-    const outEdges: Record<string, string[]> = {}
-    
-    nodes.forEach(node => {
-      inDegree[node.id] = 0
-      outEdges[node.id] = []
-    })
-    
-    edges.forEach(edge => {
+    const inDegree: Record<string, number> = {};
+    const outEdges: Record<string, string[]> = {};
+
+    nodes.forEach((node) => {
+      inDegree[node.id] = 0;
+      outEdges[node.id] = [];
+    });
+
+    edges.forEach((edge) => {
       if (inDegree[edge.target] !== undefined) {
-        inDegree[edge.target]++
+        inDegree[edge.target]++;
       }
       if (outEdges[edge.source]) {
-        outEdges[edge.source].push(edge.target)
+        outEdges[edge.source].push(edge.target);
       }
-    })
+    });
 
     // Find root nodes (no incoming edges)
-    const roots = nodes.filter(n => inDegree[n.id] === 0).map(n => n.id)
-    
+    const roots = nodes.filter((n) => inDegree[n.id] === 0).map((n) => n.id);
+
     // BFS to assign levels
-    const levels: Record<string, number> = {}
-    const queue = [...roots]
-    roots.forEach(id => levels[id] = 0)
-    
+    const levels: Record<string, number> = {};
+    const queue = [...roots];
+    roots.forEach((id) => (levels[id] = 0));
+
     while (queue.length > 0) {
-      const current = queue.shift()!
-      const currentLevel = levels[current]
-      
-      outEdges[current].forEach(target => {
+      const current = queue.shift()!;
+      const currentLevel = levels[current];
+
+      outEdges[current].forEach((target) => {
         if (levels[target] === undefined) {
-          levels[target] = currentLevel + 1
-          queue.push(target)
+          levels[target] = currentLevel + 1;
+          queue.push(target);
         } else {
-          levels[target] = Math.max(levels[target], currentLevel + 1)
+          levels[target] = Math.max(levels[target], currentLevel + 1);
         }
-      })
+      });
     }
 
     // Handle disconnected nodes
-    nodes.forEach(node => {
+    nodes.forEach((node) => {
       if (levels[node.id] === undefined) {
-        levels[node.id] = 0
+        levels[node.id] = 0;
       }
-    })
+    });
 
     // Group nodes by level
-    const levelGroups: Record<number, string[]> = {}
+    const levelGroups: Record<number, string[]> = {};
     Object.entries(levels).forEach(([nodeId, level]) => {
-      if (!levelGroups[level]) levelGroups[level] = []
-      levelGroups[level].push(nodeId)
-    })
+      if (!levelGroups[level]) levelGroups[level] = [];
+      levelGroups[level].push(nodeId);
+    });
 
     // Calculate new positions with animation
-    const horizontalSpacing = 250
-    const verticalSpacing = 120
-    const startX = 100
-    const startY = 150
+    const horizontalSpacing = 250;
+    const verticalSpacing = 120;
+    const startX = 100;
+    const startY = 150;
 
-    const newNodes = nodes.map(node => {
-      const level = levels[node.id]
-      const levelNodes = levelGroups[level]
-      const indexInLevel = levelNodes.indexOf(node.id)
-      const nodesInLevel = levelNodes.length
-      
-      const newX = startX + level * horizontalSpacing
-      const newY = startY + (indexInLevel - (nodesInLevel - 1) / 2) * verticalSpacing
+    const newNodes = nodes.map((node) => {
+      const level = levels[node.id];
+      const levelNodes = levelGroups[level];
+      const indexInLevel = levelNodes.indexOf(node.id);
+      const nodesInLevel = levelNodes.length;
+
+      const newX = startX + level * horizontalSpacing;
+      const newY =
+        startY + (indexInLevel - (nodesInLevel - 1) / 2) * verticalSpacing;
 
       return {
         ...node,
         position: { x: newX, y: newY },
         style: {
           ...node.style,
-          transition: 'all 0.5s ease-in-out'
-        }
-      }
-    })
+          transition: 'all 0.5s ease-in-out',
+        },
+      };
+    });
 
-    setNodes(newNodes)
+    setNodes(newNodes);
 
     // Clear transition after animation completes
     setTimeout(() => {
-      setNodes(nds => nds.map(n => ({
-        ...n,
-        style: {
-          ...n.style,
-          transition: undefined
-        }
-      })))
-    }, 500)
-  }, [nodes, edges])
+      setNodes((nds) =>
+        nds.map((n) => ({
+          ...n,
+          style: {
+            ...n.style,
+            transition: undefined,
+          },
+        }))
+      );
+    }, 500);
+  }, [nodes, edges]);
 
   // Save flow
   const handleSave = useCallback(async () => {
     if (!flowId) {
       // In a real app, create a new flow first
-      console.log('No flow ID - would create new flow')
-      return
+      console.log('No flow ID - would create new flow');
+      return;
     }
 
     try {
-      setSaving(true)
-      await apiService.updateFlow(flowId, { nodes, edges })
+      setSaving(true);
+      await apiService.updateFlow(flowId, { nodes, edges });
     } catch (err) {
-      console.error('Failed to save flow:', err)
-      setError('保存失败')
+      console.error('Failed to save flow:', err);
+      setError('保存失败');
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }, [flowId, nodes, edges])
+  }, [flowId, nodes, edges]);
 
   // AI Generate flow
   const handleAIGenerate = useCallback(async () => {
     if (!aiDescription.trim()) {
-      setError('请输入流程描述')
-      return
+      setError('请输入流程描述');
+      return;
     }
 
     try {
-      setAiGenerating(true)
-      setError(null)
-      
-      const result = await apiService.generateFlow(aiDescription)
-      
+      setAiGenerating(true);
+      setError(null);
+
+      const result = await apiService.generateFlow(aiDescription);
+
       if (result.nodes && result.nodes.length > 0) {
-        setNodes(result.nodes)
-        setEdges(result.edges || [])
-        setShowAIGenerate(false)
-        setAiDescription('')
+        setNodes(result.nodes);
+        setEdges(result.edges || []);
+        setShowAIGenerate(false);
+        setAiDescription('');
       } else {
-        setError('AI 生成的流程为空')
+        setError('AI 生成的流程为空');
       }
     } catch (err: unknown) {
-      console.error('AI generation failed:', err)
-      setError(err instanceof Error ? err.message : 'AI 生成失败，请稍后重试')
+      console.error('AI generation failed:', err);
+      setError(err instanceof Error ? err.message : 'AI 生成失败，请稍后重试');
     } finally {
-      setAiGenerating(false)
+      setAiGenerating(false);
     }
-  }, [aiDescription])
+  }, [aiDescription]);
 
   // Get filtered templates
-  const filteredTemplates = nodeTemplates.filter((t) => t.category === selectedCategory)
+  const filteredTemplates = nodeTemplates.filter(
+    (t) => t.category === selectedCategory
+  );
 
   if (loading) {
     return (
@@ -423,7 +432,7 @@ function FlowContent() {
           <p>加载中...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -444,16 +453,24 @@ function FlowContent() {
           {flowId && <span className={styles.flowId}>#{flowId}</span>}
         </div>
         <div className={styles.toolbarRight}>
-          <button className={styles.aiGenerateBtn} onClick={() => setShowAIGenerate(true)} title="AI 生成流程">
+          <button
+            className={styles.aiGenerateBtn}
+            onClick={() => setShowAIGenerate(true)}
+            title="AI 生成流程"
+          >
             ✨ AI 生成
           </button>
-          <button className={styles.toolbarBtn} onClick={handleAutoLayout} title="自动布局">
+          <button
+            className={styles.toolbarBtn}
+            onClick={handleAutoLayout}
+            title="自动布局"
+          >
             ⊞ 自动布局
           </button>
           <button className={styles.toolbarBtn}>⟲ 撤销</button>
           <button className={styles.toolbarBtn}>↩ 重做</button>
-          <button 
-            className={styles.primaryBtn} 
+          <button
+            className={styles.primaryBtn}
             onClick={handleSave}
             disabled={saving}
           >
@@ -472,12 +489,15 @@ function FlowContent() {
 
       {/* AI Generate Modal */}
       {showAIGenerate && (
-        <div className={styles.modalOverlay} onClick={() => !aiGenerating && setShowAIGenerate(false)}>
+        <div
+          className={styles.modalOverlay}
+          onClick={() => !aiGenerating && setShowAIGenerate(false)}
+        >
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h2>✨ AI 生成流程</h2>
-              <button 
-                className={styles.modalClose} 
+              <button
+                className={styles.modalClose}
                 onClick={() => !aiGenerating && setShowAIGenerate(false)}
                 disabled={aiGenerating}
               >
@@ -496,19 +516,17 @@ function FlowContent() {
                 disabled={aiGenerating}
                 rows={5}
               />
-              <div className={styles.aiHint}>
-                💡 描述越详细，生成结果越准确
-              </div>
+              <div className={styles.aiHint}>💡 描述越详细，生成结果越准确</div>
             </div>
             <div className={styles.modalFooter}>
-              <button 
+              <button
                 className={styles.cancelBtn}
                 onClick={() => setShowAIGenerate(false)}
                 disabled={aiGenerating}
               >
                 取消
               </button>
-              <button 
+              <button
                 className={styles.generateBtn}
                 onClick={handleAIGenerate}
                 disabled={aiGenerating || !aiDescription.trim()}
@@ -552,11 +570,14 @@ function FlowContent() {
                 key={template.type}
                 draggable
                 onDragStart={(e) => {
-                  e.dataTransfer.setData('application/reactflow', JSON.stringify({
-                    type: template.type,
-                    data: template.defaultData,
-                    color: template.color,
-                  }))
+                  e.dataTransfer.setData(
+                    'application/reactflow',
+                    JSON.stringify({
+                      type: template.type,
+                      data: template.defaultData,
+                      color: template.color,
+                    })
+                  );
                 }}
                 className={styles.nodeTemplate}
                 style={{ borderColor: template.color }}
@@ -595,20 +616,20 @@ function FlowContent() {
           onNodeChange={updateNodeData}
           onEdgeChange={updateEdgeData}
           onDeleteNode={(nodeId) => {
-            setNodes((nds) => nds.filter((n) => n.id !== nodeId))
+            setNodes((nds) => nds.filter((n) => n.id !== nodeId));
             setEdges((eds) =>
               eds.filter((e) => e.source !== nodeId && e.target !== nodeId)
-            )
-            setSelectedNode(null)
+            );
+            setSelectedNode(null);
           }}
           onDeleteEdge={(edgeId) => {
-            setEdges((eds) => eds.filter((e) => e.id !== edgeId))
-            setSelectedEdge(null)
+            setEdges((eds) => eds.filter((e) => e.id !== edgeId));
+            setSelectedEdge(null);
           }}
         />
       </div>
     </div>
-  )
+  );
 }
 
 // Loading fallback
@@ -620,7 +641,7 @@ function FlowLoading() {
         <p>加载中...</p>
       </div>
     </div>
-  )
+  );
 }
 
 // Main page component with Suspense boundary
@@ -629,5 +650,5 @@ export default function FlowPage() {
     <Suspense fallback={<FlowLoading />}>
       <FlowContent />
     </Suspense>
-  )
+  );
 }

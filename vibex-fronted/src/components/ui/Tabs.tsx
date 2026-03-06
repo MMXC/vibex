@@ -61,13 +61,14 @@ export function Tabs({
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // 确定当前激活的索引 (受控优先)
-  const currentIndex = controlledActiveIndex !== undefined 
-    ? controlledActiveIndex 
-    : uncontrolledIndex;
+  const currentIndex =
+    controlledActiveIndex !== undefined
+      ? controlledActiveIndex
+      : uncontrolledIndex;
 
   const handleTabClick = (index: number, disabled?: boolean) => {
     if (disabled) return;
-    
+
     if (controlledActiveIndex === undefined) {
       setUncontrolledIndex(index);
     }
@@ -93,11 +94,7 @@ export function Tabs({
   const renderTabContent = () => {
     const activeItem = items[currentIndex];
     if (!activeItem?.content) return null;
-    return (
-      <div className={styles.content}>
-        {activeItem.content}
-      </div>
-    );
+    return <div className={styles.content}>{activeItem.content}</div>;
   };
 
   return (
@@ -111,7 +108,9 @@ export function Tabs({
             return (
               <button
                 key={index}
-                ref={(el) => { tabRefs.current[index] = el; }}
+                ref={(el) => {
+                  tabRefs.current[index] = el;
+                }}
                 className={`${styles.tab} ${isActive ? styles.active : ''} ${isDisabled ? styles.disabled : ''}`}
                 onClick={() => handleTabClick(index, isDisabled)}
                 disabled={isDisabled}
@@ -122,7 +121,7 @@ export function Tabs({
                 {item.icon && <span className={styles.icon}>{item.icon}</span>}
                 <span className={styles.label}>{item.label}</span>
                 {closable && !isDisabled && (
-                  <span 
+                  <span
                     className={styles.close}
                     onClick={(e) => handleClose(e, index)}
                     role="button"
@@ -142,7 +141,7 @@ export function Tabs({
           })}
           {/* 指示器 */}
           {variant === 'line' && (
-            <div 
+            <div
               className={styles.indicator}
               style={{
                 left: `${indicatorStyle.left}px`,
@@ -152,9 +151,7 @@ export function Tabs({
           )}
         </div>
         {showActions && actions && (
-          <div className={styles.actions}>
-            {actions}
-          </div>
+          <div className={styles.actions}>{actions}</div>
         )}
       </div>
       {renderTabContent()}

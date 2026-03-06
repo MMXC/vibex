@@ -4,13 +4,15 @@ jest.mock('axios', () => {
     request: { use: jest.fn(() => ({ eject: jest.fn() })) },
     response: { use: jest.fn(() => ({ eject: jest.fn() })) },
   };
-  
+
   // 模拟 AxiosError 类
-  const mockAxiosError = jest.fn().mockImplementation(function mockAxiosError(message: string) {
+  const mockAxiosError = jest.fn().mockImplementation(function mockAxiosError(
+    message: string
+  ) {
     this.message = message;
     this.response = undefined;
   });
-  
+
   return {
     __esModule: true,
     default: {
@@ -35,16 +37,16 @@ jest.mock('axios', () => {
 });
 
 import axios from 'axios';
-import { 
-  ApiService, 
-  User, 
-  Project, 
-  Message, 
+import {
+  ApiService,
+  User,
+  Project,
+  Message,
   FlowData,
   LoginRequest,
   RegisterRequest,
   Agent,
-  Page
+  Page,
 } from './api';
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -57,7 +59,10 @@ describe('ApiService - 认证', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClient = {
-      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       get: jest.fn(),
       post: jest.fn(),
       put: jest.fn(),
@@ -69,8 +74,14 @@ describe('ApiService - 认证', () => {
 
   describe('用户登录', () => {
     it('应能登录用户', async () => {
-      const loginData: LoginRequest = { email: 'test@example.com', password: 'password123' };
-      const response = { token: 'jwt-token', user: { id: '1', name: 'Test', email: 'test@example.com' } };
+      const loginData: LoginRequest = {
+        email: 'test@example.com',
+        password: 'password123',
+      };
+      const response = {
+        token: 'jwt-token',
+        user: { id: '1', name: 'Test', email: 'test@example.com' },
+      };
       mockClient.post.mockResolvedValue({ data: response });
 
       const result = await api.login(loginData);
@@ -81,13 +92,23 @@ describe('ApiService - 认证', () => {
 
   describe('用户注册', () => {
     it('应能注册新用户', async () => {
-      const registerData: RegisterRequest = { name: 'Test', email: 'test@example.com', password: 'password123' };
-      const response = { token: 'jwt-token', user: { id: '1', name: 'Test', email: 'test@example.com' } };
+      const registerData: RegisterRequest = {
+        name: 'Test',
+        email: 'test@example.com',
+        password: 'password123',
+      };
+      const response = {
+        token: 'jwt-token',
+        user: { id: '1', name: 'Test', email: 'test@example.com' },
+      };
       mockClient.post.mockResolvedValue({ data: response });
 
       const result = await api.register(registerData);
       expect(result.token).toBe('jwt-token');
-      expect(mockClient.post).toHaveBeenCalledWith('/auth/register', registerData);
+      expect(mockClient.post).toHaveBeenCalledWith(
+        '/auth/register',
+        registerData
+      );
     });
   });
 
@@ -110,7 +131,10 @@ describe('ApiService - 用户数据', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClient = {
-      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       get: jest.fn(),
       post: jest.fn(),
       put: jest.fn(),
@@ -121,7 +145,11 @@ describe('ApiService - 用户数据', () => {
   });
 
   it('应能获取用户信息', async () => {
-    const userData: User = { id: '1', name: 'Test User', email: 'test@example.com' };
+    const userData: User = {
+      id: '1',
+      name: 'Test User',
+      email: 'test@example.com',
+    };
     mockClient.get.mockResolvedValue({ data: { user: userData } });
 
     const result = await api.getUser('1');
@@ -130,12 +158,18 @@ describe('ApiService - 用户数据', () => {
   });
 
   it('应能更新用户信息', async () => {
-    const userData: User = { id: '1', name: 'Updated User', email: 'test@example.com' };
+    const userData: User = {
+      id: '1',
+      name: 'Updated User',
+      email: 'test@example.com',
+    };
     mockClient.put.mockResolvedValue({ data: { user: userData } });
 
     const result = await api.updateUser('1', { name: 'Updated User' });
     expect(result).toEqual(userData);
-    expect(mockClient.put).toHaveBeenCalledWith('/users/1', { name: 'Updated User' });
+    expect(mockClient.put).toHaveBeenCalledWith('/users/1', {
+      name: 'Updated User',
+    });
   });
 
   it('应能处理用户获取失败', async () => {
@@ -154,7 +188,10 @@ describe('ApiService - 项目数据', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClient = {
-      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       get: jest.fn(),
       post: jest.fn(),
       put: jest.fn(),
@@ -175,7 +212,9 @@ describe('ApiService - 项目数据', () => {
   });
 
   it('应能获取项目列表', async () => {
-    const projects: Project[] = [{ id: 'proj-1', name: 'Project 1', userId: '1' }];
+    const projects: Project[] = [
+      { id: 'proj-1', name: 'Project 1', userId: '1' },
+    ];
     mockClient.get.mockResolvedValue({ data: { projects } });
 
     const result = await api.getProjects('1');
@@ -198,10 +237,16 @@ describe('ApiService - 项目数据', () => {
   });
 
   it('应能更新项目', async () => {
-    const project: Project = { id: 'proj-1', name: 'Updated Project', userId: '1' };
+    const project: Project = {
+      id: 'proj-1',
+      name: 'Updated Project',
+      userId: '1',
+    };
     mockClient.put.mockResolvedValue({ data: { project } });
 
-    const result = await api.updateProject('proj-1', { name: 'Updated Project' });
+    const result = await api.updateProject('proj-1', {
+      name: 'Updated Project',
+    });
     expect(result).toEqual(project);
   });
 });
@@ -214,7 +259,10 @@ describe('ApiService - 对话历史', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClient = {
-      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       get: jest.fn(),
       post: jest.fn(),
       put: jest.fn(),
@@ -225,15 +273,25 @@ describe('ApiService - 对话历史', () => {
   });
 
   it('应能保存对话消息', async () => {
-    const message: Message = { id: 'msg-1', role: 'user', content: 'Hello', projectId: 'proj-1' };
+    const message: Message = {
+      id: 'msg-1',
+      role: 'user',
+      content: 'Hello',
+      projectId: 'proj-1',
+    };
     mockClient.post.mockResolvedValue({ data: message });
 
-    const result = await api.createMessage({ content: 'Hello', projectId: 'proj-1' });
+    const result = await api.createMessage({
+      content: 'Hello',
+      projectId: 'proj-1',
+    });
     expect(result).toEqual(message);
   });
 
   it('应能获取对话历史', async () => {
-    const messages: Message[] = [{ id: 'msg-1', role: 'user', content: 'Hello', projectId: 'proj-1' }];
+    const messages: Message[] = [
+      { id: 'msg-1', role: 'user', content: 'Hello', projectId: 'proj-1' },
+    ];
     mockClient.get.mockResolvedValue({ data: messages });
 
     const result = await api.getMessages('proj-1');
@@ -256,7 +314,10 @@ describe('ApiService - 流程图数据', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClient = {
-      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       get: jest.fn(),
       post: jest.fn(),
       put: jest.fn(),
@@ -267,7 +328,12 @@ describe('ApiService - 流程图数据', () => {
   });
 
   it('应能保存流程图', async () => {
-    const flowData: FlowData = { id: 'flow-1', nodes: [], edges: [], projectId: 'proj-1' };
+    const flowData: FlowData = {
+      id: 'flow-1',
+      nodes: [],
+      edges: [],
+      projectId: 'proj-1',
+    };
     mockClient.put.mockResolvedValue({ data: flowData });
 
     const result = await api.updateFlow('flow-1', { nodes: [], edges: [] });
@@ -275,7 +341,12 @@ describe('ApiService - 流程图数据', () => {
   });
 
   it('应能加载流程图', async () => {
-    const flowData: FlowData = { id: 'flow-1', nodes: [], edges: [], projectId: 'proj-1' };
+    const flowData: FlowData = {
+      id: 'flow-1',
+      nodes: [],
+      edges: [],
+      projectId: 'proj-1',
+    };
     mockClient.get.mockResolvedValue({ data: flowData });
 
     const result = await api.getFlow('flow-1');
@@ -298,7 +369,10 @@ describe('ApiService - Agent 管理', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClient = {
-      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       get: jest.fn(),
       post: jest.fn(),
       put: jest.fn(),
@@ -309,7 +383,9 @@ describe('ApiService - Agent 管理', () => {
   });
 
   it('应能获取 Agent 列表', async () => {
-    const agents: Agent[] = [{ id: 'agent-1', name: 'Agent 1', prompt: 'prompt', userId: '1' }];
+    const agents: Agent[] = [
+      { id: 'agent-1', name: 'Agent 1', prompt: 'prompt', userId: '1' },
+    ];
     mockClient.get.mockResolvedValue({ data: { agents } });
 
     const result = await api.getAgents('1');
@@ -317,10 +393,19 @@ describe('ApiService - Agent 管理', () => {
   });
 
   it('应能创建 Agent', async () => {
-    const agent: Agent = { id: 'agent-1', name: 'Agent 1', prompt: 'prompt', userId: '1' };
+    const agent: Agent = {
+      id: 'agent-1',
+      name: 'Agent 1',
+      prompt: 'prompt',
+      userId: '1',
+    };
     mockClient.post.mockResolvedValue({ data: { agent } });
 
-    const result = await api.createAgent({ name: 'Agent 1', prompt: 'prompt', userId: '1' });
+    const result = await api.createAgent({
+      name: 'Agent 1',
+      prompt: 'prompt',
+      userId: '1',
+    });
     expect(result).toEqual(agent);
   });
 
@@ -340,7 +425,10 @@ describe('ApiService - 页面管理', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClient = {
-      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       get: jest.fn(),
       post: jest.fn(),
       put: jest.fn(),
@@ -351,7 +439,9 @@ describe('ApiService - 页面管理', () => {
   });
 
   it('应能获取页面列表', async () => {
-    const pages: Page[] = [{ id: 'page-1', name: 'Page 1', projectId: 'proj-1' }];
+    const pages: Page[] = [
+      { id: 'page-1', name: 'Page 1', projectId: 'proj-1' },
+    ];
     mockClient.get.mockResolvedValue({ data: { pages } });
 
     const result = await api.getPages('proj-1');
@@ -362,7 +452,10 @@ describe('ApiService - 页面管理', () => {
     const page: Page = { id: 'page-1', name: 'Page 1', projectId: 'proj-1' };
     mockClient.post.mockResolvedValue({ data: { page } });
 
-    const result = await api.createPage({ name: 'Page 1', projectId: 'proj-1' });
+    const result = await api.createPage({
+      name: 'Page 1',
+      projectId: 'proj-1',
+    });
     expect(result).toEqual(page);
   });
 
@@ -382,7 +475,10 @@ describe('ApiService - 错误重试机制', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClient = {
-      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       get: jest.fn(),
       post: jest.fn(),
       put: jest.fn(),
@@ -411,7 +507,10 @@ describe('ApiService - 离线处理', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClient = {
-      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       get: jest.fn(),
       post: jest.fn(),
       put: jest.fn(),
@@ -428,7 +527,7 @@ describe('ApiService - 离线处理', () => {
 
   it('queueOfflineRequest 应能加入队列', async () => {
     const mockRequestFn = jest.fn().mockResolvedValue({ success: true });
-    
+
     try {
       await api.queueOfflineRequest('test_key', mockRequestFn);
     } catch (e) {
@@ -445,7 +544,10 @@ describe('ApiService - 需求管理', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClient = {
-      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       get: jest.fn(),
       post: jest.fn(),
       put: jest.fn(),
@@ -456,7 +558,14 @@ describe('ApiService - 需求管理', () => {
   });
 
   it('应能获取需求列表', async () => {
-    const requirements = [{ id: 'req-1', content: 'Test requirement', userId: '1', status: 'draft' }];
+    const requirements = [
+      {
+        id: 'req-1',
+        content: 'Test requirement',
+        userId: '1',
+        status: 'draft',
+      },
+    ];
     mockClient.get.mockResolvedValue({ data: { requirements } });
 
     const result = await api.getRequirements('1');
@@ -464,15 +573,28 @@ describe('ApiService - 需求管理', () => {
   });
 
   it('应能创建需求', async () => {
-    const requirement = { id: 'req-1', content: 'Test', userId: '1', status: 'draft' };
+    const requirement = {
+      id: 'req-1',
+      content: 'Test',
+      userId: '1',
+      status: 'draft',
+    };
     mockClient.post.mockResolvedValue({ data: { requirement } });
 
-    const result = await api.createRequirement({ content: 'Test', userId: '1' });
+    const result = await api.createRequirement({
+      content: 'Test',
+      userId: '1',
+    });
     expect(result).toEqual(requirement);
   });
 
   it('应能获取单个需求', async () => {
-    const requirement = { id: 'req-1', content: 'Test', userId: '1', status: 'draft' };
+    const requirement = {
+      id: 'req-1',
+      content: 'Test',
+      userId: '1',
+      status: 'draft',
+    };
     mockClient.get.mockResolvedValue({ data: { requirement } });
 
     const result = await api.getRequirement('req-1');
@@ -480,10 +602,19 @@ describe('ApiService - 需求管理', () => {
   });
 
   it('应能更新需求', async () => {
-    const requirement = { id: 'req-1', content: 'Updated', userId: '1', status: 'completed' };
+    const requirement = {
+      id: 'req-1',
+      content: 'Updated',
+      userId: '1',
+      status: 'completed',
+    };
     mockClient.put.mockResolvedValue({ data: { requirement } });
 
-    const result = await api.updateRequirement('req-1', { status: 'completed' }, '1');
+    const result = await api.updateRequirement(
+      'req-1',
+      { status: 'completed' },
+      '1'
+    );
     expect(result).toEqual(requirement);
   });
 
@@ -495,7 +626,12 @@ describe('ApiService - 需求管理', () => {
   });
 
   it('应能分析需求', async () => {
-    const requirement = { id: 'req-1', content: 'Test', userId: '1', status: 'analyzing' };
+    const requirement = {
+      id: 'req-1',
+      content: 'Test',
+      userId: '1',
+      status: 'analyzing',
+    };
     mockClient.post.mockResolvedValue({ data: { requirement } });
 
     const result = await api.analyzeRequirement('req-1');
@@ -503,10 +639,17 @@ describe('ApiService - 需求管理', () => {
   });
 
   it('应能重新分析需求', async () => {
-    const requirement = { id: 'req-1', content: 'Test', userId: '1', status: 'analyzing' };
+    const requirement = {
+      id: 'req-1',
+      content: 'Test',
+      userId: '1',
+      status: 'analyzing',
+    };
     mockClient.post.mockResolvedValue({ data: { requirement } });
 
-    const result = await api.reanalyzeRequirement('req-1', { context: 'extra' });
+    const result = await api.reanalyzeRequirement('req-1', {
+      context: 'extra',
+    });
     expect(result).toEqual(requirement);
   });
 });
@@ -519,7 +662,10 @@ describe('ApiService - 澄清对话', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClient = {
-      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       get: jest.fn(),
       post: jest.fn(),
       put: jest.fn(),
@@ -530,7 +676,14 @@ describe('ApiService - 澄清对话', () => {
   });
 
   it('应能获取澄清问题列表', async () => {
-    const clarifications = [{ id: 'clar-1', question: 'What is this?', requirementId: 'req-1', status: 'pending' }];
+    const clarifications = [
+      {
+        id: 'clar-1',
+        question: 'What is this?',
+        requirementId: 'req-1',
+        status: 'pending',
+      },
+    ];
     mockClient.get.mockResolvedValue({ data: { clarifications } });
 
     const result = await api.getClarifications('req-1');
@@ -538,15 +691,28 @@ describe('ApiService - 澄清对话', () => {
   });
 
   it('应能回答澄清问题', async () => {
-    const clarification = { id: 'clar-1', question: 'What is this?', answer: 'This is that', status: 'answered' };
+    const clarification = {
+      id: 'clar-1',
+      question: 'What is this?',
+      answer: 'This is that',
+      status: 'answered',
+    };
     mockClient.put.mockResolvedValue({ data: { clarification } });
 
-    const result = await api.answerClarification('req-1', 'clar-1', 'This is that');
+    const result = await api.answerClarification(
+      'req-1',
+      'clar-1',
+      'This is that'
+    );
     expect(result).toEqual(clarification);
   });
 
   it('应能跳过澄清问题', async () => {
-    const clarification = { id: 'clar-1', question: 'What is this?', status: 'skipped' };
+    const clarification = {
+      id: 'clar-1',
+      question: 'What is this?',
+      status: 'skipped',
+    };
     mockClient.put.mockResolvedValue({ data: { clarification } });
 
     const result = await api.skipClarification('req-1', 'clar-1');
@@ -562,7 +728,10 @@ describe('ApiService - 分析结果', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClient = {
-      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       get: jest.fn(),
       post: jest.fn(),
       put: jest.fn(),
@@ -573,7 +742,13 @@ describe('ApiService - 分析结果', () => {
   });
 
   it('应能获取分析结果', async () => {
-    const analysisResult = { requirementId: 'req-1', domains: [], relations: [], confidence: 0.9, analyzedAt: '2024-01-01' };
+    const analysisResult = {
+      requirementId: 'req-1',
+      domains: [],
+      relations: [],
+      confidence: 0.9,
+      analyzedAt: '2024-01-01',
+    };
     mockClient.get.mockResolvedValue({ data: { analysisResult } });
 
     const result = await api.getAnalysisResult('req-1');
@@ -589,7 +764,10 @@ describe('ApiService - 领域实体', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClient = {
-      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       get: jest.fn(),
       post: jest.fn(),
       put: jest.fn(),
@@ -600,7 +778,15 @@ describe('ApiService - 领域实体', () => {
   });
 
   it('应能获取领域实体列表', async () => {
-    const domainEntities = [{ id: 'de-1', name: 'User', type: 'entity', requirementId: 'req-1', attributes: [] }];
+    const domainEntities = [
+      {
+        id: 'de-1',
+        name: 'User',
+        type: 'entity',
+        requirementId: 'req-1',
+        attributes: [],
+      },
+    ];
     mockClient.get.mockResolvedValue({ data: { domainEntities } });
 
     const result = await api.getDomainEntities('req-1');
@@ -608,7 +794,13 @@ describe('ApiService - 领域实体', () => {
   });
 
   it('应能获取单个领域实体', async () => {
-    const domain = { id: 'de-1', name: 'User', type: 'entity', requirementId: 'req-1', attributes: [] };
+    const domain = {
+      id: 'de-1',
+      name: 'User',
+      type: 'entity',
+      requirementId: 'req-1',
+      attributes: [],
+    };
     mockClient.get.mockResolvedValue({ data: { domain } });
 
     const result = await api.getDomainEntity('de-1');
@@ -616,18 +808,37 @@ describe('ApiService - 领域实体', () => {
   });
 
   it('应能创建领域实体', async () => {
-    const domain = { id: 'de-1', name: 'User', type: 'entity', requirementId: 'req-1', attributes: [] };
+    const domain = {
+      id: 'de-1',
+      name: 'User',
+      type: 'entity',
+      requirementId: 'req-1',
+      attributes: [],
+    };
     mockClient.post.mockResolvedValue({ data: { domain } });
 
-    const result = await api.createDomainEntity({ name: 'User', type: 'entity', requirementId: 'req-1', attributes: [] });
+    const result = await api.createDomainEntity({
+      name: 'User',
+      type: 'entity',
+      requirementId: 'req-1',
+      attributes: [],
+    });
     expect(result).toEqual(domain);
   });
 
   it('应能更新领域实体', async () => {
-    const domain = { id: 'de-1', name: 'Updated User', type: 'entity', requirementId: 'req-1', attributes: [] };
+    const domain = {
+      id: 'de-1',
+      name: 'Updated User',
+      type: 'entity',
+      requirementId: 'req-1',
+      attributes: [],
+    };
     mockClient.put.mockResolvedValue({ data: { domain } });
 
-    const result = await api.updateDomainEntity('de-1', { name: 'Updated User' });
+    const result = await api.updateDomainEntity('de-1', {
+      name: 'Updated User',
+    });
     expect(result).toEqual(domain);
   });
 
@@ -647,7 +858,10 @@ describe('ApiService - 实体关系', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClient = {
-      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       get: jest.fn(),
       post: jest.fn(),
       put: jest.fn(),
@@ -658,7 +872,15 @@ describe('ApiService - 实体关系', () => {
   });
 
   it('应能获取实体关系列表', async () => {
-    const entityRelations = [{ id: 'er-1', sourceEntityId: 'de-1', targetEntityId: 'de-2', type: 'has_many', requirementId: 'req-1' }];
+    const entityRelations = [
+      {
+        id: 'er-1',
+        sourceEntityId: 'de-1',
+        targetEntityId: 'de-2',
+        type: 'has_many',
+        requirementId: 'req-1',
+      },
+    ];
     mockClient.get.mockResolvedValue({ data: { entityRelations } });
 
     const result = await api.getEntityRelations('req-1');
@@ -666,7 +888,13 @@ describe('ApiService - 实体关系', () => {
   });
 
   it('应能获取单个实体关系', async () => {
-    const entityRelation = { id: 'er-1', sourceEntityId: 'de-1', targetEntityId: 'de-2', type: 'has_many', requirementId: 'req-1' };
+    const entityRelation = {
+      id: 'er-1',
+      sourceEntityId: 'de-1',
+      targetEntityId: 'de-2',
+      type: 'has_many',
+      requirementId: 'req-1',
+    };
     mockClient.get.mockResolvedValue({ data: { entityRelation } });
 
     const result = await api.getEntityRelation('er-1');
@@ -674,18 +902,42 @@ describe('ApiService - 实体关系', () => {
   });
 
   it('应能创建实体关系', async () => {
-    const entityRelation = { id: 'er-1', sourceEntityId: 'de-1', targetEntityId: 'de-2', type: 'has_many', requirementId: 'req-1' };
+    const entityRelation = {
+      id: 'er-1',
+      sourceEntityId: 'de-1',
+      targetEntityId: 'de-2',
+      type: 'has_many',
+      requirementId: 'req-1',
+    };
     mockClient.post.mockResolvedValue({ data: { entityRelation } });
 
-    const result = await api.createEntityRelation({ sourceEntityId: 'de-1', targetEntityId: 'de-2', type: 'has_many', requirementId: 'req-1' }, 'req-1');
+    const result = await api.createEntityRelation(
+      {
+        sourceEntityId: 'de-1',
+        targetEntityId: 'de-2',
+        type: 'has_many',
+        requirementId: 'req-1',
+      },
+      'req-1'
+    );
     expect(result).toEqual(entityRelation);
   });
 
   it('应能更新实体关系', async () => {
-    const entityRelation = { id: 'er-1', sourceEntityId: 'de-1', targetEntityId: 'de-2', type: 'belongs_to', requirementId: 'req-1' };
+    const entityRelation = {
+      id: 'er-1',
+      sourceEntityId: 'de-1',
+      targetEntityId: 'de-2',
+      type: 'belongs_to',
+      requirementId: 'req-1',
+    };
     mockClient.put.mockResolvedValue({ data: { entityRelation } });
 
-    const result = await api.updateEntityRelation('er-1', { type: 'belongs_to' }, 'req-1');
+    const result = await api.updateEntityRelation(
+      'er-1',
+      { type: 'belongs_to' },
+      'req-1'
+    );
     expect(result).toEqual(entityRelation);
   });
 
@@ -705,7 +957,10 @@ describe('ApiService - 原型快照', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClient = {
-      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       get: jest.fn(),
       post: jest.fn(),
       put: jest.fn(),
@@ -716,7 +971,9 @@ describe('ApiService - 原型快照', () => {
   });
 
   it('应能获取原型快照列表', async () => {
-    const prototypeSnapshots = [{ id: 'ps-1', projectId: 'proj-1', name: 'Snapshot 1', content: {} }];
+    const prototypeSnapshots = [
+      { id: 'ps-1', projectId: 'proj-1', name: 'Snapshot 1', content: {} },
+    ];
     mockClient.get.mockResolvedValue({ data: { prototypeSnapshots } });
 
     const result = await api.getPrototypeSnapshots('proj-1');
@@ -724,7 +981,12 @@ describe('ApiService - 原型快照', () => {
   });
 
   it('应能获取单个原型快照', async () => {
-    const prototypeSnapshot = { id: 'ps-1', projectId: 'proj-1', name: 'Snapshot 1', content: {} };
+    const prototypeSnapshot = {
+      id: 'ps-1',
+      projectId: 'proj-1',
+      name: 'Snapshot 1',
+      content: {},
+    };
     mockClient.get.mockResolvedValue({ data: { prototypeSnapshot } });
 
     const result = await api.getPrototypeSnapshot('ps-1');
@@ -732,18 +994,34 @@ describe('ApiService - 原型快照', () => {
   });
 
   it('应能创建原型快照', async () => {
-    const prototypeSnapshot = { id: 'ps-1', projectId: 'proj-1', name: 'Snapshot 1', content: {} };
+    const prototypeSnapshot = {
+      id: 'ps-1',
+      projectId: 'proj-1',
+      name: 'Snapshot 1',
+      content: {},
+    };
     mockClient.post.mockResolvedValue({ data: { prototypeSnapshot } });
 
-    const result = await api.createPrototypeSnapshot({ projectId: 'proj-1', name: 'Snapshot 1', content: {} });
+    const result = await api.createPrototypeSnapshot({
+      projectId: 'proj-1',
+      name: 'Snapshot 1',
+      content: {},
+    });
     expect(result).toEqual(prototypeSnapshot);
   });
 
   it('应能更新原型快照', async () => {
-    const prototypeSnapshot = { id: 'ps-1', projectId: 'proj-1', name: 'Updated Snapshot', content: {} };
+    const prototypeSnapshot = {
+      id: 'ps-1',
+      projectId: 'proj-1',
+      name: 'Updated Snapshot',
+      content: {},
+    };
     mockClient.put.mockResolvedValue({ data: { prototypeSnapshot } });
 
-    const result = await api.updatePrototypeSnapshot('ps-1', { name: 'Updated Snapshot' });
+    const result = await api.updatePrototypeSnapshot('ps-1', {
+      name: 'Updated Snapshot',
+    });
     expect(result).toEqual(prototypeSnapshot);
   });
 
@@ -763,7 +1041,10 @@ describe('ApiService - 项目回收站', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClient = {
-      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       get: jest.fn(),
       post: jest.fn(),
       put: jest.fn(),
@@ -775,7 +1056,12 @@ describe('ApiService - 项目回收站', () => {
   });
 
   it('应能软删除项目', async () => {
-    const project = { id: 'proj-1', name: 'Project 1', userId: '1', deletedAt: new Date().toISOString() };
+    const project = {
+      id: 'proj-1',
+      name: 'Project 1',
+      userId: '1',
+      deletedAt: new Date().toISOString(),
+    };
     mockClient.patch.mockResolvedValue({ data: { project } });
 
     const result = await api.softDeleteProject('proj-1');
@@ -783,7 +1069,12 @@ describe('ApiService - 项目回收站', () => {
   });
 
   it('应能恢复项目', async () => {
-    const project = { id: 'proj-1', name: 'Project 1', userId: '1', deletedAt: null };
+    const project = {
+      id: 'proj-1',
+      name: 'Project 1',
+      userId: '1',
+      deletedAt: null,
+    };
     mockClient.patch.mockResolvedValue({ data: { project } });
 
     const result = await api.restoreProject('proj-1');
@@ -798,7 +1089,14 @@ describe('ApiService - 项目回收站', () => {
   });
 
   it('应能获取回收站项目', async () => {
-    const projects = [{ id: 'proj-1', name: 'Deleted Project', userId: '1', deletedAt: new Date().toISOString() }];
+    const projects = [
+      {
+        id: 'proj-1',
+        name: 'Deleted Project',
+        userId: '1',
+        deletedAt: new Date().toISOString(),
+      },
+    ];
     mockClient.get.mockResolvedValue({ data: { projects } });
 
     const result = await api.getDeletedProjects();
@@ -821,7 +1119,10 @@ describe('ApiService - 页面管理扩展', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClient = {
-      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       get: jest.fn(),
       post: jest.fn(),
       put: jest.fn(),
@@ -856,7 +1157,10 @@ describe('ApiService - Agent管理扩展', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClient = {
-      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       get: jest.fn(),
       post: jest.fn(),
       put: jest.fn(),
@@ -867,7 +1171,12 @@ describe('ApiService - Agent管理扩展', () => {
   });
 
   it('应能获取单个Agent', async () => {
-    const agent = { id: 'agent-1', name: 'Agent 1', prompt: 'prompt', userId: '1' };
+    const agent = {
+      id: 'agent-1',
+      name: 'Agent 1',
+      prompt: 'prompt',
+      userId: '1',
+    };
     mockClient.get.mockResolvedValue({ data: { agent } });
 
     const result = await api.getAgent('agent-1');
@@ -875,7 +1184,12 @@ describe('ApiService - Agent管理扩展', () => {
   });
 
   it('应能更新Agent', async () => {
-    const agent = { id: 'agent-1', name: 'Updated Agent', prompt: 'new prompt', userId: '1' };
+    const agent = {
+      id: 'agent-1',
+      name: 'Updated Agent',
+      prompt: 'new prompt',
+      userId: '1',
+    };
     mockClient.put.mockResolvedValue({ data: { agent } });
 
     const result = await api.updateAgent('agent-1', { name: 'Updated Agent' });
@@ -891,7 +1205,10 @@ describe('ApiService - 流程图扩展', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockClient = {
-      interceptors: { request: { use: jest.fn(() => ({ eject: jest.fn() })) }, response: { use: jest.fn(() => ({ eject: jest.fn() })) } },
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       get: jest.fn(),
       post: jest.fn(),
       put: jest.fn(),
@@ -902,7 +1219,12 @@ describe('ApiService - 流程图扩展', () => {
   });
 
   it('应能AI生成流程图', async () => {
-    const flowData = { id: 'flow-1', nodes: [], edges: [], projectId: 'proj-1' };
+    const flowData = {
+      id: 'flow-1',
+      nodes: [],
+      edges: [],
+      projectId: 'proj-1',
+    };
     mockClient.post.mockResolvedValue({ data: flowData });
 
     const result = await api.generateFlow('创建用户登录流程');

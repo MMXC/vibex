@@ -25,13 +25,15 @@ class MessageApiImpl implements MessageApi {
   async getMessages(projectId: string): Promise<Message[]> {
     const cacheKey = getCacheKey('messages', projectId);
     const cached = cache.get<Message[]>(cacheKey);
-    
+
     if (!this.isOnline() && cached) {
       return cached;
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ messages: Message[] }>('/messages', { params: { projectId } });
+      return await httpClient.get<{ messages: Message[] }>('/messages', {
+        params: { projectId },
+      });
     });
     const messages: Message[] = (result as any).messages || result;
     cache.set(cacheKey, messages);

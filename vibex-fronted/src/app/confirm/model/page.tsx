@@ -1,14 +1,14 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import styles from '../confirm.module.css'
-import { useConfirmationStore } from '@/stores/confirmationStore'
-import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps'
-import { generateDomainModel, BoundedContext } from '@/services/api'
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import styles from '../confirm.module.css';
+import { useConfirmationStore } from '@/stores/confirmationStore';
+import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps';
+import { generateDomainModel, BoundedContext } from '@/services/api';
 
 export default function ModelPage() {
-  const router = useRouter()
+  const router = useRouter();
   const {
     selectedContextIds,
     boundedContexts,
@@ -20,62 +20,67 @@ export default function ModelPage() {
     goToPreviousStep,
     currentStep,
     requirementText,
-  } = useConfirmationStore()
+  } = useConfirmationStore();
 
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   // Generate domain models via API
   useEffect(() => {
     const generateModels = async () => {
       if (selectedContextIds.length > 0 && domainModels.length === 0) {
-        setLoading(true)
-        setError('')
-        
+        setLoading(true);
+        setError('');
+
         try {
           // Get selected bounded contexts
-          const selectedContexts = boundedContexts.filter(c => selectedContextIds.includes(c.id))
-          
+          const selectedContexts = boundedContexts.filter((c) =>
+            selectedContextIds.includes(c.id)
+          );
+
           // Call API to generate domain models
-          const response = await generateDomainModel(selectedContexts, requirementText)
-          
+          const response = await generateDomainModel(
+            selectedContexts,
+            requirementText
+          );
+
           if (response.success && response.domainModels) {
-            setDomainModels(response.domainModels)
+            setDomainModels(response.domainModels);
             if (response.mermaidCode) {
-              setModelMermaidCode(response.mermaidCode)
+              setModelMermaidCode(response.mermaidCode);
             }
           } else {
-            throw new Error(response.error || '生成失败')
+            throw new Error(response.error || '生成失败');
           }
         } catch (err) {
-          console.error('Failed to generate domain models:', err)
+          console.error('Failed to generate domain models:', err);
           // Show error to user - no mock fallback
-          setError(err instanceof Error ? err.message : '生成领域模型失败')
+          setError(err instanceof Error ? err.message : '生成领域模型失败');
         } finally {
-          setLoading(false)
+          setLoading(false);
         }
       }
-    }
-    
-    generateModels()
-  }, [selectedContextIds, boundedContexts, requirementText])
+    };
+
+    generateModels();
+  }, [selectedContextIds, boundedContexts, requirementText]);
 
   const typeLabels = {
     aggregate_root: '聚合根',
     entity: '实体',
     value_object: '值对象',
-  }
+  };
 
   const typeColors = {
     aggregate_root: '#4ade80',
     entity: '#60a5fa',
     value_object: '#a78bfa',
-  }
+  };
 
   const handleConfirm = () => {
-    goToNextStep()
-    router.push('/confirm/flow')
-  }
+    goToNextStep();
+    router.push('/confirm/flow');
+  };
 
   return (
     <div className={styles.container}>
@@ -119,7 +124,9 @@ export default function ModelPage() {
                     <div key={idx} className={styles.modelProp}>
                       <span className={styles.propName}>
                         {prop.name}
-                        {prop.required && <span className={styles.required}>*</span>}
+                        {prop.required && (
+                          <span className={styles.required}>*</span>
+                        )}
                       </span>
                       <span className={styles.propType}>{prop.type}</span>
                     </div>
@@ -134,8 +141,8 @@ export default function ModelPage() {
           <button
             className={styles.secondaryButton}
             onClick={() => {
-              goToPreviousStep()
-              router.push('/confirm/context')
+              goToPreviousStep();
+              router.push('/confirm/context');
             }}
           >
             返回上一步
@@ -150,5 +157,5 @@ export default function ModelPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -24,7 +24,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: 
+  background-image:
     linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 50px 50px;
@@ -36,7 +36,11 @@
   right: -100px;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(0, 255, 255, 0.12) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 255, 0.12) 0%,
+    transparent 70%
+  );
   border-radius: 50%;
   animation: float 20s ease-in-out infinite;
 }
@@ -47,14 +51,23 @@
   left: -100px;
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(139, 92, 246, 0.12) 0%,
+    transparent 70%
+  );
   border-radius: 50%;
   animation: float 25s ease-in-out infinite reverse;
 }
 
 @keyframes float {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(20px, 20px); }
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(20px, 20px);
+  }
 }
 
 /* 导航栏 */
@@ -250,7 +263,11 @@
 
 .formatCardSelected::before {
   opacity: 1;
-  background: linear-gradient(145deg, rgba(0, 255, 255, 0.05) 0%, transparent 100%);
+  background: linear-gradient(
+    145deg,
+    rgba(0, 255, 255, 0.05) 0%,
+    transparent 100%
+  );
 }
 
 .formatIcon {
@@ -350,9 +367,15 @@
   color: var(--color-text-muted);
 }
 
-.previewIndent1 { margin-left: 24px; }
-.previewIndent2 { margin-left: 48px; }
-.previewIndent3 { margin-left: 72px; }
+.previewIndent1 {
+  margin-left: 24px;
+}
+.previewIndent2 {
+  margin-left: 48px;
+}
+.previewIndent3 {
+  margin-left: 72px;
+}
 
 /* 导出操作区 */
 .actionCard {
@@ -429,7 +452,9 @@
 
 .exportButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 30px rgba(0, 255, 255, 0.4), 0 0 60px rgba(0, 255, 255, 0.2);
+  box-shadow:
+    0 0 30px rgba(0, 255, 255, 0.4),
+    0 0 60px rgba(0, 255, 255, 0.2);
 }
 
 /* 部署指南 */
@@ -480,25 +505,25 @@
   .navbar {
     padding: 12px 24px;
   }
-  
+
   .main {
     padding: 100px 24px 24px;
   }
-  
+
   .formatGrid {
     grid-template-columns: 1fr;
   }
-  
+
   .optionsGrid {
     grid-template-columns: 1fr;
   }
-  
+
   .actionRow {
     flex-direction: column;
     gap: 16px;
     text-align: center;
   }
-  
+
   .exportButton {
     width: 100%;
   }

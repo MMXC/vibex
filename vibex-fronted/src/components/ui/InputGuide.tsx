@@ -88,37 +88,43 @@ export function InputGuide({
   };
 
   // 文件处理
-  const handleFile = useCallback(async (file: File) => {
-    const validTypes = ['.txt', '.md', 'text/plain', 'text/markdown'];
-    const ext = '.' + file.name.split('.').pop()?.toLowerCase();
-    
-    if (!validTypes.includes(ext) && !validTypes.includes(file.type)) {
-      alert('仅支持 .txt 和 .md 文件');
-      return;
-    }
+  const handleFile = useCallback(
+    async (file: File) => {
+      const validTypes = ['.txt', '.md', 'text/plain', 'text/markdown'];
+      const ext = '.' + file.name.split('.').pop()?.toLowerCase();
 
-    try {
-      const content = await file.text();
-      onFileUpload?.(content, file.name);
-      setInputValue((prev) => prev + (prev ? '\n\n' : '') + content);
-      setShowExamples(false);
-    } catch (err) {
-      console.error('File read error:', err);
-    }
-  }, [onFileUpload]);
+      if (!validTypes.includes(ext) && !validTypes.includes(file.type)) {
+        alert('仅支持 .txt 和 .md 文件');
+        return;
+      }
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    
-    const files = Array.from(e.dataTransfer.files);
-    files.forEach(handleFile);
-  }, [handleFile]);
+      try {
+        const content = await file.text();
+        onFileUpload?.(content, file.name);
+        setInputValue((prev) => prev + (prev ? '\n\n' : '') + content);
+        setShowExamples(false);
+      } catch (err) {
+        console.error('File read error:', err);
+      }
+    },
+    [onFileUpload]
+  );
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragOver(false);
+
+      const files = Array.from(e.dataTransfer.files);
+      files.forEach(handleFile);
+    },
+    [handleFile]
+  );
 
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
     const items = Array.from(e.clipboardData.items);
-    const fileItem = items.find(item => item.type.startsWith('text/'));
-    
+    const fileItem = items.find((item) => item.type.startsWith('text/'));
+
     if (fileItem) {
       // 处理粘贴的文件
     }
@@ -146,9 +152,12 @@ export function InputGuide({
       )}
 
       {/* 输入区域 */}
-      <div 
+      <div
         className={`${styles.inputWrapper} ${isDragOver ? styles.dragOver : ''}`}
-        onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragOver(true);
+        }}
         onDragLeave={() => setIsDragOver(false)}
         onDrop={handleDrop}
       >
@@ -162,7 +171,7 @@ export function InputGuide({
           onPaste={handlePaste}
           rows={3}
         />
-        
+
         {/* 操作栏 */}
         <div className={styles.toolbar}>
           <div className={styles.toolbarLeft}>
@@ -172,7 +181,9 @@ export function InputGuide({
                 <input
                   type="file"
                   accept=".txt,.md"
-                  onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+                  onChange={(e) =>
+                    e.target.files?.[0] && handleFile(e.target.files[0])
+                  }
                   hidden
                 />
                 📎 上传文件
@@ -180,10 +191,10 @@ export function InputGuide({
             )}
             <span className={styles.hint}>Ctrl+Enter 提交</span>
           </div>
-          
+
           <div className={styles.toolbarRight}>
             {skippable && onSkip && (
-              <button 
+              <button
                 className={styles.skipButton}
                 onClick={onSkip}
                 type="button"

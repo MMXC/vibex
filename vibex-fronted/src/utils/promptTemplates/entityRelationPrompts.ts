@@ -4,13 +4,13 @@
  */
 
 // 关系类型定义
-export type RelationType = 
-  | 'inheritance'     // 继承/泛化
-  | 'composition'     // 组合
-  | 'aggregation'     // 聚合
-  | 'association'     // 关联
-  | 'dependency'      // 依赖
-  | 'realization';   // 实现
+export type RelationType =
+  | 'inheritance' // 继承/泛化
+  | 'composition' // 组合
+  | 'aggregation' // 聚合
+  | 'association' // 关联
+  | 'dependency' // 依赖
+  | 'realization'; // 实现
 
 export interface RelationPattern {
   type: RelationType;
@@ -102,17 +102,11 @@ export function generateRelationPrompt(params: {
   requirementContent: string;
 }): string {
   let prompt = ENTITY_RELATION_PROMPT_TEMPLATE;
-  
-  prompt = prompt.replace(
-    '{{entities}}',
-    params.entities.join(', ')
-  );
-  
-  prompt = prompt.replace(
-    '{{requirement_content}}',
-    params.requirementContent
-  );
-  
+
+  prompt = prompt.replace('{{entities}}', params.entities.join(', '));
+
+  prompt = prompt.replace('{{requirement_content}}', params.requirementContent);
+
   return prompt;
 }
 
@@ -228,6 +222,6 @@ export const EXAMPLE_RELATIONS = [
     targetEntity: '第三方支付',
     relationType: 'dependency' as RelationType,
     description: '支付功能依赖第三方服务',
-    confidence: 0.90,
+    confidence: 0.9,
   },
 ];

@@ -1,30 +1,30 @@
 // Jest setup file
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom';
 
 // Suppress act() warnings for async state updates
-const originalError = console.error
+const originalError = console.error;
 beforeAll(() => {
   console.error = (...args) => {
     if (
       typeof args[0] === 'string' &&
       args[0].includes('Warning: An update to')
     ) {
-      return
+      return;
     }
-    originalError.call(console, ...args)
-  }
-})
+    originalError.call(console, ...args);
+  };
+});
 
 afterAll(() => {
-  console.error = originalError
-})
+  console.error = originalError;
+});
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
   disconnect() {}
-}
+};
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
@@ -39,7 +39,7 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: () => {},
     dispatchEvent: () => false,
   }),
-})
+});
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
@@ -47,11 +47,11 @@ global.IntersectionObserver = class IntersectionObserver {
   observe() {}
   unobserve() {}
   disconnect() {}
-}
+};
 
 // Mock Element.scrollIntoView
 if (typeof Element !== 'undefined') {
-  Element.prototype.scrollIntoView = jest.fn()
+  Element.prototype.scrollIntoView = jest.fn();
 }
 
 // Mock Next.js router
@@ -68,15 +68,15 @@ jest.mock('next/navigation', () => ({
   usePathname: () => '/test',
   useParams: () => ({}),
   redirect: jest.fn(),
-}))
+}));
 
 // Mock next/image
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (props) => {
-    return <img {...props} />
+    return <img {...props} />;
   },
-}))
+}));
 
 // Mock next/link
-jest.mock('next/link', () => 'a')
+jest.mock('next/link', () => 'a');

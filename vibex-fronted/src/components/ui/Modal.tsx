@@ -69,11 +69,14 @@ export function Modal({
   zIndex = 1000,
 }: ModalProps) {
   // 处理 ESC 键关闭
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Escape' && open) {
-      onClose();
-    }
-  }, [open, onClose]);
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && open) {
+        onClose();
+      }
+    },
+    [open, onClose]
+  );
 
   useEffect(() => {
     if (open) {
@@ -171,9 +174,7 @@ export function Modal({
           )}
 
           {/* 内容 */}
-          {children && (
-            <div className={styles.body}>{children}</div>
-          )}
+          {children && <div className={styles.body}>{children}</div>}
 
           {/* 底部 */}
           {(footer || showCancel || showConfirm) && (

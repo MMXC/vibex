@@ -3,7 +3,7 @@
  */
 
 export { usePermission } from '@/hooks/usePermission';
-export { 
+export {
   checkGlobalRolePermission,
   checkProjectRolePermission,
   getGlobalRoleDisplayName,
@@ -20,4 +20,7 @@ export {
   type JWTPayloadWithRole,
 } from '@/hooks/usePermission';
 
-export { PermissionDenied, RequirePermission } from '@/components/PermissionDenied';
+export {
+  PermissionDenied,
+  RequirePermission,
+} from '@/components/PermissionDenied';

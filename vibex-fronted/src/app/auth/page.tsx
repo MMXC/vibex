@@ -1,48 +1,48 @@
-'use client'
+'use client';
 
-import { Suspense, useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
-import { apiService } from '@/services/api'
+import { Suspense, useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { apiService } from '@/services/api';
 
 function AuthForm() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const [isLogin, setIsLogin] = useState(true)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [name, setName] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   // Handle URL parameter to auto-switch form mode
   useEffect(() => {
-    const mode = searchParams.get('mode')
+    const mode = searchParams.get('mode');
     if (mode === 'register') {
-      setIsLogin(false)
+      setIsLogin(false);
     } else if (mode === 'login') {
-      setIsLogin(true)
+      setIsLogin(true);
     }
-  }, [searchParams])
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
     try {
       if (isLogin) {
-        await apiService.login({ email, password })
+        await apiService.login({ email, password });
       } else {
-        await apiService.register({ name, email, password })
+        await apiService.register({ name, email, password });
       }
-      router.push('/dashboard')
+      router.push('/dashboard');
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : '操作失败，请稍后重试')
+      setError(err instanceof Error ? err.message : '操作失败，请稍后重试');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
@@ -54,7 +54,7 @@ function AuthForm() {
     color: 'var(--color-text-primary)',
     outline: 'none',
     transition: 'all 0.2s ease',
-  }
+  };
 
   const labelStyle: React.CSSProperties = {
     display: 'block',
@@ -62,7 +62,7 @@ function AuthForm() {
     fontSize: '14px',
     fontWeight: 500,
     color: 'var(--color-text-secondary)',
-  }
+  };
 
   const glassCardStyle: React.CSSProperties = {
     width: '100%',
@@ -72,21 +72,24 @@ function AuthForm() {
     backdropFilter: 'blur(20px)',
     border: '1px solid var(--color-border)',
     borderRadius: '16px',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 60px rgba(0, 255, 255, 0.05)',
-  }
+    boxShadow:
+      '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 60px rgba(0, 255, 255, 0.05)',
+  };
 
   return (
     <div style={glassCardStyle}>
       <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-        <h1 style={{ 
-          fontSize: '28px', 
-          fontWeight: 700, 
-          marginBottom: '8px',
-          background: 'var(--gradient-primary)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
-        }}>
+        <h1
+          style={{
+            fontSize: '28px',
+            fontWeight: 700,
+            marginBottom: '8px',
+            background: 'var(--gradient-primary)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}
+        >
           {isLogin ? '欢迎回来' : '创建账号'}
         </h1>
         <p style={{ color: 'var(--color-text-secondary)', fontSize: '15px' }}>
@@ -95,15 +98,17 @@ function AuthForm() {
       </div>
 
       {error && (
-        <div style={{
-          padding: '14px',
-          marginBottom: '20px',
-          background: 'rgba(255, 68, 102, 0.1)',
-          border: '1px solid rgba(255, 68, 102, 0.3)',
-          borderRadius: '8px',
-          color: 'var(--color-error)',
-          fontSize: '14px',
-        }}>
+        <div
+          style={{
+            padding: '14px',
+            marginBottom: '20px',
+            background: 'rgba(255, 68, 102, 0.1)',
+            border: '1px solid rgba(255, 68, 102, 0.3)',
+            borderRadius: '8px',
+            color: 'var(--color-error)',
+            fontSize: '14px',
+          }}
+        >
           {error}
         </div>
       )}
@@ -120,12 +125,12 @@ function AuthForm() {
               required={!isLogin}
               style={inputStyle}
               onFocus={(e) => {
-                e.target.style.borderColor = 'var(--color-primary)'
-                e.target.style.boxShadow = '0 0 0 3px rgba(0, 255, 255, 0.1)'
+                e.target.style.borderColor = 'var(--color-primary)';
+                e.target.style.boxShadow = '0 0 0 3px rgba(0, 255, 255, 0.1)';
               }}
               onBlur={(e) => {
-                e.target.style.borderColor = 'var(--color-border)'
-                e.target.style.boxShadow = 'none'
+                e.target.style.borderColor = 'var(--color-border)';
+                e.target.style.boxShadow = 'none';
               }}
             />
           </div>
@@ -141,12 +146,12 @@ function AuthForm() {
             required
             style={inputStyle}
             onFocus={(e) => {
-              e.target.style.borderColor = 'var(--color-primary)'
-              e.target.style.boxShadow = '0 0 0 3px rgba(0, 255, 255, 0.1)'
+              e.target.style.borderColor = 'var(--color-primary)';
+              e.target.style.boxShadow = '0 0 0 3px rgba(0, 255, 255, 0.1)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = 'var(--color-border)'
-              e.target.style.boxShadow = 'none'
+              e.target.style.borderColor = 'var(--color-border)';
+              e.target.style.boxShadow = 'none';
             }}
           />
         </div>
@@ -161,12 +166,12 @@ function AuthForm() {
             required
             style={inputStyle}
             onFocus={(e) => {
-              e.target.style.borderColor = 'var(--color-primary)'
-              e.target.style.boxShadow = '0 0 0 3px rgba(0, 255, 255, 0.1)'
+              e.target.style.borderColor = 'var(--color-primary)';
+              e.target.style.boxShadow = '0 0 0 3px rgba(0, 255, 255, 0.1)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = 'var(--color-border)'
-              e.target.style.boxShadow = 'none'
+              e.target.style.borderColor = 'var(--color-border)';
+              e.target.style.boxShadow = 'none';
             }}
           />
         </div>
@@ -177,8 +182,8 @@ function AuthForm() {
           style={{
             width: '100%',
             padding: '14px',
-            background: loading 
-              ? 'rgba(0, 255, 255, 0.3)' 
+            background: loading
+              ? 'rgba(0, 255, 255, 0.3)'
               : 'linear-gradient(135deg, var(--color-primary) 0%, rgba(0, 255, 255, 0.8) 100%)',
             color: 'var(--color-bg-primary)',
             border: 'none',
@@ -191,25 +196,36 @@ function AuthForm() {
           }}
           onMouseEnter={(e) => {
             if (!loading) {
-              e.currentTarget.style.transform = 'translateY(-1px)'
-              e.currentTarget.style.boxShadow = '0 0 30px rgba(0, 255, 255, 0.5)'
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow =
+                '0 0 30px rgba(0, 255, 255, 0.5)';
             }
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)'
-            e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 255, 255, 0.3)'
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 255, 255, 0.3)';
           }}
         >
-          {loading ? '处理中...' : (isLogin ? '登录' : '注册')}
+          {loading ? '处理中...' : isLogin ? '登录' : '注册'}
         </button>
       </form>
 
-      <div style={{ marginTop: '24px', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '14px' }}>
+      <div
+        style={{
+          marginTop: '24px',
+          textAlign: 'center',
+          color: 'var(--color-text-secondary)',
+          fontSize: '14px',
+        }}
+      >
         {isLogin ? (
           <>
             还没有账号？{' '}
             <button
-              onClick={() => { setIsLogin(false); setError('') }}
+              onClick={() => {
+                setIsLogin(false);
+                setError('');
+              }}
               style={{
                 background: 'none',
                 border: 'none',
@@ -222,12 +238,12 @@ function AuthForm() {
                 transition: 'all 0.2s ease',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(0, 255, 255, 0.1)'
-                e.currentTarget.style.textDecoration = 'underline'
+                e.currentTarget.style.background = 'rgba(0, 255, 255, 0.1)';
+                e.currentTarget.style.textDecoration = 'underline';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'none'
-                e.currentTarget.style.textDecoration = 'none'
+                e.currentTarget.style.background = 'none';
+                e.currentTarget.style.textDecoration = 'none';
               }}
             >
               立即注册
@@ -237,7 +253,10 @@ function AuthForm() {
           <>
             已有账号？{' '}
             <button
-              onClick={() => { setIsLogin(true); setError('') }}
+              onClick={() => {
+                setIsLogin(true);
+                setError('');
+              }}
               style={{
                 background: 'none',
                 border: 'none',
@@ -250,12 +269,12 @@ function AuthForm() {
                 transition: 'all 0.2s ease',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(0, 255, 255, 0.1)'
-                e.currentTarget.style.textDecoration = 'underline'
+                e.currentTarget.style.background = 'rgba(0, 255, 255, 0.1)';
+                e.currentTarget.style.textDecoration = 'underline';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'none'
-                e.currentTarget.style.textDecoration = 'none'
+                e.currentTarget.style.background = 'none';
+                e.currentTarget.style.textDecoration = 'none';
               }}
             >
               立即登录
@@ -265,84 +284,95 @@ function AuthForm() {
       </div>
 
       <div style={{ marginTop: '32px', textAlign: 'center' }}>
-        <Link 
-          href="/landing" 
-          style={{ 
-            color: 'var(--color-text-muted)', 
-            textDecoration: 'none', 
+        <Link
+          href="/landing"
+          style={{
+            color: 'var(--color-text-muted)',
+            textDecoration: 'none',
             fontSize: '14px',
             transition: 'color 0.2s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = 'var(--color-primary)'
+            e.currentTarget.style.color = 'var(--color-primary)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = 'var(--color-text-muted)'
+            e.currentTarget.style.color = 'var(--color-text-muted)';
           }}
         >
           ← 返回首页
         </Link>
       </div>
     </div>
-  )
+  );
 }
 
 export default function Auth() {
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'var(--color-bg-primary)',
-      backgroundImage: `
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'var(--color-bg-primary)',
+        backgroundImage: `
         radial-gradient(ellipse at top, rgba(0, 255, 255, 0.08) 0%, transparent 50%),
         radial-gradient(ellipse at bottom right, rgba(139, 92, 246, 0.08) 0%, transparent 50%)
       `,
-      position: 'relative',
-      overflow: 'hidden',
-    }}>
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
       {/* Grid overlay */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        backgroundImage: `
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: `
           linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
           linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px)
         `,
-        backgroundSize: '40px 40px',
-        pointerEvents: 'none',
-      }} />
-      
+          backgroundSize: '40px 40px',
+          pointerEvents: 'none',
+        }}
+      />
+
       {/* Glow effect */}
-      <div style={{
-        position: 'absolute',
-        top: '20%',
-        right: '10%',
-        width: '400px',
-        height: '400px',
-        background: 'radial-gradient(circle, rgba(0, 255, 255, 0.12) 0%, transparent 70%)',
-        filter: 'blur(80px)',
-        pointerEvents: 'none',
-      }} />
-      
-      <Suspense fallback={
-        <div style={{
-          width: '100%',
-          maxWidth: '420px',
-          padding: '40px',
-          background: 'var(--color-bg-glass)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid var(--color-border)',
-          borderRadius: '16px',
-          textAlign: 'center',
-          color: 'var(--color-text-secondary)',
-        }}>
-          加载中...
-        </div>
-      }>
+      <div
+        style={{
+          position: 'absolute',
+          top: '20%',
+          right: '10%',
+          width: '400px',
+          height: '400px',
+          background:
+            'radial-gradient(circle, rgba(0, 255, 255, 0.12) 0%, transparent 70%)',
+          filter: 'blur(80px)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      <Suspense
+        fallback={
+          <div
+            style={{
+              width: '100%',
+              maxWidth: '420px',
+              padding: '40px',
+              background: 'var(--color-bg-glass)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid var(--color-border)',
+              borderRadius: '16px',
+              textAlign: 'center',
+              color: 'var(--color-text-secondary)',
+            }}
+          >
+            加载中...
+          </div>
+        }
+      >
         <AuthForm />
       </Suspense>
     </div>
-  )
+  );
 }

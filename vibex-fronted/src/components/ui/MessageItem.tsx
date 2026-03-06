@@ -66,7 +66,10 @@ export default function MessageItem({
   const formatTime = (dateStr?: string) => {
     if (!dateStr) return '';
     const date = new Date(dateStr);
-    return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString('zh-CN', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   };
 
   return (
@@ -85,26 +88,26 @@ export default function MessageItem({
       {/* 元信息 */}
       <div className={styles.meta}>
         <span className={styles.time}>{formatTime(createdAt)}</span>
-        
+
         {/* 操作按钮 */}
         <div className={styles.actions}>
-          <button 
-            className={styles.actionBtn} 
+          <button
+            className={styles.actionBtn}
             onClick={handleReply}
             title="回复"
           >
             ↩
           </button>
-          <button 
-            className={styles.actionBtn} 
+          <button
+            className={styles.actionBtn}
             onClick={handleCopy}
-            title={copied ? "已复制!" : "复制"}
+            title={copied ? '已复制!' : '复制'}
           >
-            {copied ? "✓" : "📋"}
+            {copied ? '✓' : '📋'}
           </button>
           <div className={styles.shareWrapper}>
-            <button 
-              className={styles.actionBtn} 
+            <button
+              className={styles.actionBtn}
               onClick={() => setShowShareMenu(!showShareMenu)}
               title="分享"
             >

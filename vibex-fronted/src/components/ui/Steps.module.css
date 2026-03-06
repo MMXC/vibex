@@ -148,20 +148,20 @@
     background: #2a2a2a;
     border-color: #3a3a3a;
   }
-  
+
   .title {
     color: #999;
   }
-  
+
   .step.in-progress .title,
   .step.completed .title {
     color: #e0e0e0;
   }
-  
+
   .connector {
     background: #3a3a3a;
   }
-  
+
   .description {
     color: #777;
   }
@@ -172,33 +172,33 @@
   .horizontal {
     flex-direction: column;
   }
-  
+
   .horizontal .connector {
     display: none;
   }
-  
+
   .step {
     flex-direction: row;
     align-items: center;
   }
-  
+
   .indicator {
     width: 32px;
     height: 32px;
   }
-  
+
   .number {
     font-size: 12px;
   }
-  
+
   .content {
     padding-top: 0;
   }
-  
+
   .title {
     font-size: 13px;
   }
-  
+
   .description {
     font-size: 11px;
   }

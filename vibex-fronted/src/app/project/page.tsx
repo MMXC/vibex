@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import { useEffect, useState, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
-import styles from './project.module.css'
-import { apiService, Project, DomainEntity } from '@/services/api'
+import { useEffect, useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import styles from './project.module.css';
+import { apiService, Project, DomainEntity } from '@/services/api';
 
 // 模拟数据
 const mockDomains: DomainEntity[] = [
@@ -15,9 +15,24 @@ const mockDomains: DomainEntity[] = [
     type: 'user',
     description: '系统用户实体',
     attributes: [
-      { name: 'id', type: 'string', required: true, description: '用户唯一标识' },
-      { name: 'username', type: 'string', required: true, description: '用户名' },
-      { name: 'email', type: 'string', required: true, description: '邮箱地址' },
+      {
+        name: 'id',
+        type: 'string',
+        required: true,
+        description: '用户唯一标识',
+      },
+      {
+        name: 'username',
+        type: 'string',
+        required: true,
+        description: '用户名',
+      },
+      {
+        name: 'email',
+        type: 'string',
+        required: true,
+        description: '邮箱地址',
+      },
     ],
     position: { x: 100, y: 100 },
   },
@@ -28,66 +43,78 @@ const mockDomains: DomainEntity[] = [
     type: 'business',
     description: '产品实体',
     attributes: [
-      { name: 'id', type: 'string', required: true, description: '产品唯一标识' },
+      {
+        name: 'id',
+        type: 'string',
+        required: true,
+        description: '产品唯一标识',
+      },
       { name: 'name', type: 'string', required: true, description: '产品名称' },
-      { name: 'price', type: 'number', required: true, description: '产品价格' },
+      {
+        name: 'price',
+        type: 'number',
+        required: true,
+        description: '产品价格',
+      },
     ],
     position: { x: 400, y: 100 },
   },
-]
+];
 
 const mockPrototypes = [
   { id: '1', name: '首页', pages: 3 },
   { id: '2', name: '产品详情页', pages: 5 },
   { id: '3', name: '购物车', pages: 2 },
-]
+];
 
-type TabType = 'domain' | 'prototype'
+type TabType = 'domain' | 'prototype';
 
 function ProjectDetailContent() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const projectId = searchParams.get('id')
-  
-  const [project, setProject] = useState<Project | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [activeTab, setActiveTab] = useState<TabType>('domain')
-  const [selectedDomain, setSelectedDomain] = useState<DomainEntity | null>(null)
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const projectId = searchParams.get('id');
+
+  const [project, setProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState<TabType>('domain');
+  const [selectedDomain, setSelectedDomain] = useState<DomainEntity | null>(
+    null
+  );
 
   useEffect(() => {
-    const token = localStorage.getItem('auth_token')
+    const token = localStorage.getItem('auth_token');
     if (!token) {
-      router.push('/auth')
-      return
+      router.push('/auth');
+      return;
     }
 
     const fetchProject = async () => {
       if (!projectId) {
-        setError('缺少项目 ID')
-        setLoading(false)
-        return
+        setError('缺少项目 ID');
+        setLoading(false);
+        return;
       }
-      
-      try {
-        const data = await apiService.getProject(projectId)
-        setProject(data)
-      } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : '加载项目失败')
-      } finally {
-        setLoading(false)
-      }
-    }
 
-    fetchProject()
-  }, [projectId, router])
+      try {
+        const data = await apiService.getProject(projectId);
+        setProject(data);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : '加载项目失败');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProject();
+  }, [projectId, router]);
 
   if (loading) {
     return (
       <div className={styles.container}>
         <div className={styles.loading}>加载中...</div>
       </div>
-    )
+    );
   }
 
   if (error || !project) {
@@ -95,7 +122,7 @@ function ProjectDetailContent() {
       <div className={styles.container}>
         <div className={styles.error}>{error || '项目不存在'}</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -109,19 +136,21 @@ function ProjectDetailContent() {
       {/* 侧边栏 */}
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
-          <Link href="/dashboard" className={styles.backLink}>← 返回</Link>
+          <Link href="/dashboard" className={styles.backLink}>
+            ← 返回
+          </Link>
           <h2 className={styles.projectTitle}>{project.name}</h2>
         </div>
-        
+
         <nav className={styles.sidebarNav}>
-          <button 
+          <button
             className={`${styles.navItem} ${activeTab === 'domain' ? styles.active : ''}`}
             onClick={() => setActiveTab('domain')}
           >
             <span className={styles.navIcon}>📊</span>
             <span>领域模型</span>
           </button>
-          <button 
+          <button
             className={`${styles.navItem} ${activeTab === 'prototype' ? styles.active : ''}`}
             onClick={() => setActiveTab('prototype')}
           >
@@ -135,8 +164,8 @@ function ProjectDetailContent() {
           {activeTab === 'domain' && (
             <div className={styles.tree}>
               <h3 className={styles.treeTitle}>实体列表</h3>
-              {mockDomains.map(domain => (
-                <div 
+              {mockDomains.map((domain) => (
+                <div
                   key={domain.id}
                   className={`${styles.treeItem} ${selectedDomain?.id === domain.id ? styles.selected : ''}`}
                   onClick={() => setSelectedDomain(domain)}
@@ -150,8 +179,8 @@ function ProjectDetailContent() {
           {activeTab === 'prototype' && (
             <div className={styles.tree}>
               <h3 className={styles.treeTitle}>原型页面</h3>
-              {mockPrototypes.map(proto => (
-                <Link 
+              {mockPrototypes.map((proto) => (
+                <Link
                   key={proto.id}
                   href={`/preview?id=${proto.id}`}
                   className={styles.treeItem}
@@ -170,13 +199,13 @@ function ProjectDetailContent() {
       <main className={styles.main}>
         {/* 标签页 */}
         <div className={styles.tabs}>
-          <button 
+          <button
             className={`${styles.tab} ${activeTab === 'domain' ? styles.active : ''}`}
             onClick={() => setActiveTab('domain')}
           >
             领域模型
           </button>
-          <button 
+          <button
             className={`${styles.tab} ${activeTab === 'prototype' ? styles.active : ''}`}
             onClick={() => setActiveTab('prototype')}
           >
@@ -204,10 +233,12 @@ function ProjectDetailContent() {
                       </tr>
                     </thead>
                     <tbody>
-                      {selectedDomain.attributes.map(attr => (
+                      {selectedDomain.attributes.map((attr) => (
                         <tr key={attr.name}>
                           <td>{attr.name}</td>
-                          <td><code>{attr.type}</code></td>
+                          <td>
+                            <code>{attr.type}</code>
+                          </td>
                           <td>{attr.required ? '是' : '否'}</td>
                           <td>{attr.description}</td>
                         </tr>
@@ -222,15 +253,17 @@ function ProjectDetailContent() {
             <div className={styles.prototypeView}>
               <h2>原型预览</h2>
               <div className={styles.prototypeList}>
-                {mockPrototypes.map(proto => (
-                  <Link 
+                {mockPrototypes.map((proto) => (
+                  <Link
                     key={proto.id}
                     href={`/preview?id=${proto.id}`}
                     className={styles.prototypeCard}
                   >
                     <span className={styles.prototypeIcon}>🎨</span>
                     <span className={styles.prototypeName}>{proto.name}</span>
-                    <span className={styles.prototypePages}>{proto.pages} 页</span>
+                    <span className={styles.prototypePages}>
+                      {proto.pages} 页
+                    </span>
                   </Link>
                 ))}
               </div>
@@ -239,7 +272,7 @@ function ProjectDetailContent() {
         </div>
       </main>
     </div>
-  )
+  );
 }
 
 export default function ProjectDetailPage() {
@@ -247,5 +280,5 @@ export default function ProjectDetailPage() {
     <Suspense fallback={<div className={styles.loading}>加载中...</div>}>
       <ProjectDetailContent />
     </Suspense>
-  )
+  );
 }

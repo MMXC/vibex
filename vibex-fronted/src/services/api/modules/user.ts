@@ -16,7 +16,7 @@ class UserApiImpl implements UserApi {
   async getUser(userId: string): Promise<User> {
     const cacheKey = getCacheKey('user', userId);
     const cached = cache.get<User>(cacheKey);
-    
+
     if (!this.isOnline() && cached) {
       return cached;
     }
@@ -31,7 +31,10 @@ class UserApiImpl implements UserApi {
 
   async updateUser(userId: string, data: UserUpdate): Promise<User> {
     return retry.execute(async () => {
-      const response = await httpClient.put<{ user: User }>(`/users/${userId}`, data);
+      const response = await httpClient.put<{ user: User }>(
+        `/users/${userId}`,
+        data
+      );
       const user: User = (response as any).user || response;
       cache.remove(getCacheKey('user', userId));
       return user;

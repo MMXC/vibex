@@ -1,23 +1,23 @@
-import { memo } from 'react'
-import { Handle, Position, NodeProps } from 'reactflow'
-import styles from './FlowNodes.module.css'
+import { memo } from 'react';
+import { Handle, Position, NodeProps } from 'reactflow';
+import styles from './FlowNodes.module.css';
 
 /**
  * Node data structure
  */
 export interface FlowNodeData {
-  label: string
-  description?: string
-  status?: 'success' | 'error' | 'running' | 'pending'
-  condition?: string
-  branches?: { id: string; label: string }[]
-  [key: string]: unknown
+  label: string;
+  description?: string;
+  status?: 'success' | 'error' | 'running' | 'pending';
+  condition?: string;
+  branches?: { id: string; label: string }[];
+  [key: string]: unknown;
 }
 
 /**
  * Node type definitions
  */
-export type FlowNodeType = 'start' | 'end' | 'process' | 'decision'
+export type FlowNodeType = 'start' | 'end' | 'process' | 'decision';
 
 /**
  * Start Node - Entry point of the flow
@@ -28,7 +28,9 @@ export const StartNode = memo(function StartNode({
   selected,
 }: NodeProps<FlowNodeData>) {
   return (
-    <div className={`${styles.node} ${styles.startNode} ${selected ? styles.selected : ''}`}>
+    <div
+      className={`${styles.node} ${styles.startNode} ${selected ? styles.selected : ''}`}
+    >
       <div className={styles.nodeHeader}>
         <span className={styles.nodeIcon}>▶</span>
         <span className={styles.nodeLabel}>{data.label}</span>
@@ -42,8 +44,8 @@ export const StartNode = memo(function StartNode({
         className={styles.handle}
       />
     </div>
-  )
-})
+  );
+});
 
 /**
  * End Node - Exit point of the flow
@@ -54,12 +56,10 @@ export const EndNode = memo(function EndNode({
   selected,
 }: NodeProps<FlowNodeData>) {
   return (
-    <div className={`${styles.node} ${styles.endNode} ${selected ? styles.selected : ''}`}>
-      <Handle
-        type="target"
-        position={Position.Top}
-        className={styles.handle}
-      />
+    <div
+      className={`${styles.node} ${styles.endNode} ${selected ? styles.selected : ''}`}
+    >
+      <Handle type="target" position={Position.Top} className={styles.handle} />
       <div className={styles.nodeHeader}>
         <span className={styles.nodeIcon}>■</span>
         <span className={styles.nodeLabel}>{data.label}</span>
@@ -73,8 +73,8 @@ export const EndNode = memo(function EndNode({
         </div>
       )}
     </div>
-  )
-})
+  );
+});
 
 /**
  * Process Node - Standard processing node
@@ -85,12 +85,10 @@ export const ProcessNode = memo(function ProcessNode({
   selected,
 }: NodeProps<FlowNodeData>) {
   return (
-    <div className={`${styles.node} ${styles.processNode} ${selected ? styles.selected : ''}`}>
-      <Handle
-        type="target"
-        position={Position.Top}
-        className={styles.handle}
-      />
+    <div
+      className={`${styles.node} ${styles.processNode} ${selected ? styles.selected : ''}`}
+    >
+      <Handle type="target" position={Position.Top} className={styles.handle} />
       <div className={styles.nodeHeader}>
         <span className={styles.nodeIcon}>⚙</span>
         <span className={styles.nodeLabel}>{data.label}</span>
@@ -104,8 +102,8 @@ export const ProcessNode = memo(function ProcessNode({
         className={styles.handle}
       />
     </div>
-  )
-})
+  );
+});
 
 /**
  * Decision Node - Branching node with multiple outputs
@@ -118,15 +116,13 @@ export const DecisionNode = memo(function DecisionNode({
   const branches = data.branches || [
     { id: 'yes', label: 'Yes' },
     { id: 'no', label: 'No' },
-  ]
+  ];
 
   return (
-    <div className={`${styles.node} ${styles.decisionNode} ${selected ? styles.selected : ''}`}>
-      <Handle
-        type="target"
-        position={Position.Top}
-        className={styles.handle}
-      />
+    <div
+      className={`${styles.node} ${styles.decisionNode} ${selected ? styles.selected : ''}`}
+    >
+      <Handle type="target" position={Position.Top} className={styles.handle} />
       <div className={styles.nodeHeader}>
         <span className={styles.nodeIcon}>◇</span>
         <span className={styles.nodeLabel}>{data.label}</span>
@@ -167,8 +163,8 @@ export const DecisionNode = memo(function DecisionNode({
         </div>
       )}
     </div>
-  )
-})
+  );
+});
 
 /**
  * Node type map for React Flow
@@ -178,7 +174,7 @@ export const nodeTypes: Record<FlowNodeType, any> = {
   end: EndNode,
   process: ProcessNode,
   decision: DecisionNode,
-}
+};
 
 /**
  * Create a flow node with specified type
@@ -188,32 +184,37 @@ export function createFlowNode(
   type: FlowNodeType,
   position: { x: number; y: number },
   data: Partial<FlowNodeData> = {}
-): { id: string; type: string; position: { x: number; y: number }; data: FlowNodeData } {
+): {
+  id: string;
+  type: string;
+  position: { x: number; y: number };
+  data: FlowNodeData;
+} {
   const baseData: FlowNodeData = {
     label: data.label || `Node ${id}`,
     description: data.description,
     status: data.status,
     condition: data.condition,
     branches: data.branches,
-  }
+  };
 
   return {
     id,
     type,
     position,
     data: baseData,
-  }
+  };
 }
 
 /**
  * Node type colors for styling
  */
 export const nodeTypeColors: Record<FlowNodeType, string> = {
-  start: '#22c55e',    // Green
-  end: '#ef4444',      // Red
-  process: '#3b82f6',  // Blue
+  start: '#22c55e', // Green
+  end: '#ef4444', // Red
+  process: '#3b82f6', // Blue
   decision: '#f59e0b', // Amber
-}
+};
 
 /**
  * Default node configurations
@@ -241,7 +242,7 @@ export const defaultNodeConfigs: Record<FlowNodeType, Partial<FlowNodeData>> = {
       { id: 'no', label: 'No' },
     ],
   },
-}
+};
 
 /**
  * Default export for FlowNodes module
@@ -255,4 +256,4 @@ export default {
   createFlowNode,
   nodeTypeColors,
   defaultNodeConfigs,
-}
+};

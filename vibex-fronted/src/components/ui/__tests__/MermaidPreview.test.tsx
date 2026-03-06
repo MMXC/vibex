@@ -70,7 +70,9 @@ describe('MermaidPreview', () => {
     });
 
     it('should render with flowchart type', async () => {
-      render(<MermaidPreview code="flowchart TD\nA --> B" diagramType="flowchart" />);
+      render(
+        <MermaidPreview code="flowchart TD\nA --> B" diagramType="flowchart" />
+      );
       await waitFor(() => {
         expect(mermaid.render).toHaveBeenCalled();
       });
@@ -97,10 +99,12 @@ describe('MermaidPreview', () => {
 
   describe('error handling', () => {
     it('should render error state when rendering fails', async () => {
-      (mermaid.render as jest.Mock).mockRejectedValueOnce(new Error('Invalid syntax'));
+      (mermaid.render as jest.Mock).mockRejectedValueOnce(
+        new Error('Invalid syntax')
+      );
 
       render(<MermaidPreview code="invalid code" onError={jest.fn()} />);
-      
+
       await waitFor(() => {
         expect(screen.getByText('图表渲染失败')).toBeInTheDocument();
       });
@@ -108,10 +112,12 @@ describe('MermaidPreview', () => {
 
     it('should call onError callback when error occurs', async () => {
       const onError = jest.fn();
-      (mermaid.render as jest.Mock).mockRejectedValueOnce(new Error('Test error'));
+      (mermaid.render as jest.Mock).mockRejectedValueOnce(
+        new Error('Test error')
+      );
 
       render(<MermaidPreview code="invalid" onError={onError} />);
-      
+
       await waitFor(() => {
         expect(onError).toHaveBeenCalled();
       });

@@ -15,7 +15,12 @@ export interface Requirement {
   updatedAt?: string;
 }
 
-export type RequirementStatus = 'draft' | 'analyzing' | 'clarifying' | 'completed' | 'failed';
+export type RequirementStatus =
+  | 'draft'
+  | 'analyzing'
+  | 'clarifying'
+  | 'completed'
+  | 'failed';
 
 export interface RequirementCreate {
   content: string;

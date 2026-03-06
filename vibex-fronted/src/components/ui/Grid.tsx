@@ -36,7 +36,9 @@ export interface GridProps {
   className?: string;
 }
 
-function getColumnsClass(columns: number | { [key: string]: number } | undefined): string {
+function getColumnsClass(
+  columns: number | { [key: string]: number } | undefined
+): string {
   if (!columns) return '';
   if (typeof columns === 'number') {
     return styles[`col${columns}`];
@@ -107,7 +109,9 @@ export function Grid({
       item.disabled && styles.disabled,
       isItemSelected && styles.selected,
       hoverable && styles.hoverable,
-    ].filter(Boolean).join(' ');
+    ]
+      .filter(Boolean)
+      .join(' ');
 
     return (
       <div
@@ -130,9 +134,15 @@ export function Grid({
         {[...Array(loadingCount)].map((_, index) => (
           <div key={index} className={`${styles.gridItem} ${styles.skeleton}`}>
             <div className={styles.skeletonContent}>
-              <div className={`${styles.skeletonLine} ${styles.skeletonTitle}`} />
-              <div className={`${styles.skeletonLine} ${styles.skeletonText}`} />
-              <div className={`${styles.skeletonLine} ${styles.skeletonTextShort}`} />
+              <div
+                className={`${styles.skeletonLine} ${styles.skeletonTitle}`}
+              />
+              <div
+                className={`${styles.skeletonLine} ${styles.skeletonText}`}
+              />
+              <div
+                className={`${styles.skeletonLine} ${styles.skeletonTextShort}`}
+              />
             </div>
           </div>
         ))}
@@ -143,11 +153,7 @@ export function Grid({
   const renderEmptyState = () => {
     return (
       <div className={styles.empty}>
-        {emptyIcon && (
-          <div className={styles.emptyIcon}>
-            {emptyIcon}
-          </div>
-        )}
+        {emptyIcon && <div className={styles.emptyIcon}>{emptyIcon}</div>}
         <span className={styles.emptyText}>{emptyText}</span>
       </div>
     );
@@ -157,12 +163,19 @@ export function Grid({
     ...(gap !== undefined && { gap }),
     ...(rowGap !== undefined && { rowGap }),
     ...(columnGap !== undefined && { columnGap }),
-    ...(autoFit && { gridTemplateColumns: `repeat(auto-fit, minmax(${minItemWidth}, 1fr))` }),
+    ...(autoFit && {
+      gridTemplateColumns: `repeat(auto-fit, minmax(${minItemWidth}, 1fr))`,
+    }),
     ...(maxItemWidth && !autoFit && { maxWidth: maxItemWidth as string }),
     alignItems: align === 'stretch' ? 'stretch' : align,
-    justifyContent: justify === 'between' ? 'space-between' : 
-                     justify === 'around' ? 'space-around' : 
-                     justify === 'evenly' ? 'space-evenly' : justify,
+    justifyContent:
+      justify === 'between'
+        ? 'space-between'
+        : justify === 'around'
+          ? 'space-around'
+          : justify === 'evenly'
+            ? 'space-evenly'
+            : justify,
   };
 
   const containerClasses = [
@@ -172,7 +185,9 @@ export function Grid({
     !autoFit && columns && getColumnsClass(columns),
     autoFit && styles.autoFit,
     className,
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   if (loading) {
     return (
@@ -192,11 +207,9 @@ export function Grid({
 
   return (
     <div className={containerClasses} style={gridStyle}>
-      {items.map((item, index) => (
-        renderItem
-          ? renderItem(item, index)
-          : renderDefaultItem(item, index)
-      ))}
+      {items.map((item, index) =>
+        renderItem ? renderItem(item, index) : renderDefaultItem(item, index)
+      )}
     </div>
   );
 }

@@ -1,8 +1,8 @@
 /**
  * StepGuard Component - 确认流程步骤守卫
- * 
+ *
  * 用于保护确认流程的各个步骤，确保用户按照正确顺序访问
- * 
+ *
  * Usage:
  * <StepGuard step="context" fallback={<Loading />}>
  *   <ContextPage />
@@ -13,7 +13,10 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useConfirmationState, ConfirmationStepKey } from '@/hooks/useConfirmationState';
+import {
+  useConfirmationState,
+  ConfirmationStepKey,
+} from '@/hooks/useConfirmationState';
 
 interface StepGuardProps {
   /** 要保护的步骤 */
@@ -39,12 +42,12 @@ export function StepGuard({
   const router = useRouter();
   const { isValid, redirectTo, message } = useConfirmationState(step);
   const [isReady, setIsReady] = useState(!immediateRedirect);
-  
+
   // 客户端挂载后开始验证
   useEffect(() => {
     setIsReady(true);
   }, []);
-  
+
   // 验证状态并处理重定向
   useEffect(() => {
     if (isReady && !isValid) {
@@ -52,26 +55,26 @@ export function StepGuard({
       const timer = setTimeout(() => {
         router.push(redirectTo);
       }, 1500);
-      
+
       return () => clearTimeout(timer);
     }
   }, [isReady, isValid, redirectTo, router]);
-  
+
   // 验证通过，显示内容
   if (isValid) {
     return <>{children}</>;
   }
-  
+
   // 使用自定义 fallback
   if (fallback) {
     return <>{fallback}</>;
   }
-  
+
   // 默认加载状态
   return (
-    <DefaultFallback 
-      message={message || '正在验证...'} 
-      isRedirecting={isReady && !isValid} 
+    <DefaultFallback
+      message={message || '正在验证...'}
+      isRedirecting={isReady && !isValid}
     />
   );
 }
@@ -79,37 +82,57 @@ export function StepGuard({
 /**
  * 默认的加载/重定向提示
  */
-function DefaultFallback({ message, isRedirecting }: { message: string; isRedirecting: boolean }) {
+function DefaultFallback({
+  message,
+  isRedirecting,
+}: {
+  message: string;
+  isRedirecting: boolean;
+}) {
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'var(--color-bg-primary)',
-      color: 'var(--color-text-primary)',
-    }}>
-      <div style={{
-        width: '48px',
-        height: '48px',
-        border: '3px solid var(--color-border)',
-        borderTopColor: 'var(--color-primary)',
-        borderRadius: '50%',
-        animation: 'spin 1s linear infinite',
-      }} />
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'var(--color-bg-primary)',
+        color: 'var(--color-text-primary)',
+      }}
+    >
+      <div
+        style={{
+          width: '48px',
+          height: '48px',
+          border: '3px solid var(--color-border)',
+          borderTopColor: 'var(--color-primary)',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite',
+        }}
+      />
       <p style={{ marginTop: '16px', color: 'var(--color-text-secondary)' }}>
         {message}
       </p>
       {isRedirecting && (
-        <p style={{ marginTop: '8px', fontSize: '14px', color: 'var(--color-text-muted)' }}>
+        <p
+          style={{
+            marginTop: '8px',
+            fontSize: '14px',
+            color: 'var(--color-text-muted)',
+          }}
+        >
           即将跳转到正确步骤...
         </p>
       )}
       <style jsx>{`
         @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
         }
       `}</style>
     </div>
@@ -118,7 +141,7 @@ function DefaultFallback({ message, isRedirecting }: { message: string; isRedire
 
 /**
  * 验证提示组件 - 显示在页面顶部
- * 
+ *
  * Usage:
  * <StepGuardAlert step="model" />
  */
@@ -130,11 +153,11 @@ interface StepGuardAlertProps {
 
 export function StepGuardAlert({ step, className }: StepGuardAlertProps) {
   const { isValid, message } = useConfirmationState(step);
-  
+
   if (isValid) return null;
-  
+
   return (
-    <div 
+    <div
       className={className}
       style={{
         padding: '12px 16px',

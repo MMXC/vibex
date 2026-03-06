@@ -5,35 +5,35 @@ import { ToastProvider, useToast } from './Toast';
 // Test component that uses useToast hook
 const TestComponent = () => {
   const { showToast, hideToast, toasts } = useToast();
-  
+
   return (
     <div>
-      <button 
-        onClick={() => showToast('Success message', 'success')} 
+      <button
+        onClick={() => showToast('Success message', 'success')}
         data-testid="success-btn"
       >
         Success
       </button>
-      <button 
-        onClick={() => showToast('Error message', 'error')} 
+      <button
+        onClick={() => showToast('Error message', 'error')}
         data-testid="error-btn"
       >
         Error
       </button>
-      <button 
-        onClick={() => showToast('Warning message', 'warning')} 
+      <button
+        onClick={() => showToast('Warning message', 'warning')}
         data-testid="warning-btn"
       >
         Warning
       </button>
-      <button 
-        onClick={() => showToast('Info message', 'info')} 
+      <button
+        onClick={() => showToast('Info message', 'info')}
         data-testid="info-btn"
       >
         Info
       </button>
-      <button 
-        onClick={() => showToast('Custom duration', 'info', 1000)} 
+      <button
+        onClick={() => showToast('Custom duration', 'info', 1000)}
         data-testid="custom-btn"
       >
         Custom
@@ -65,8 +65,12 @@ describe('Toast', () => {
 
   describe('useToast', () => {
     it('throws when used outside provider', () => {
-      const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
-      expect(() => render(<TestComponent />)).toThrow('useToast must be used within ToastProvider');
+      const consoleError = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      expect(() => render(<TestComponent />)).toThrow(
+        'useToast must be used within ToastProvider'
+      );
       consoleError.mockRestore();
     });
 
@@ -87,11 +91,11 @@ describe('Toast', () => {
           <TestComponent />
         </ToastProvider>
       );
-      
+
       await act(async () => {
         fireEvent.click(screen.getByTestId('success-btn'));
       });
-      
+
       expect(screen.getByText('Success message')).toBeInTheDocument();
     });
 
@@ -101,11 +105,11 @@ describe('Toast', () => {
           <TestComponent />
         </ToastProvider>
       );
-      
+
       await act(async () => {
         fireEvent.click(screen.getByTestId('error-btn'));
       });
-      
+
       expect(screen.getByText('Error message')).toBeInTheDocument();
     });
 
@@ -115,11 +119,11 @@ describe('Toast', () => {
           <TestComponent />
         </ToastProvider>
       );
-      
+
       await act(async () => {
         fireEvent.click(screen.getByTestId('warning-btn'));
       });
-      
+
       expect(screen.getByText('Warning message')).toBeInTheDocument();
     });
 
@@ -129,11 +133,11 @@ describe('Toast', () => {
           <TestComponent />
         </ToastProvider>
       );
-      
+
       await act(async () => {
         fireEvent.click(screen.getByTestId('info-btn'));
       });
-      
+
       expect(screen.getByText('Info message')).toBeInTheDocument();
     });
 
@@ -143,17 +147,17 @@ describe('Toast', () => {
           <TestComponent />
         </ToastProvider>
       );
-      
+
       await act(async () => {
         fireEvent.click(screen.getByTestId('success-btn'));
       });
-      
+
       expect(screen.getByText('Success message')).toBeInTheDocument();
-      
+
       await act(async () => {
         jest.advanceTimersByTime(3000);
       });
-      
+
       expect(screen.queryByText('Success message')).not.toBeInTheDocument();
     });
 
@@ -163,17 +167,17 @@ describe('Toast', () => {
           <TestComponent />
         </ToastProvider>
       );
-      
+
       await act(async () => {
         fireEvent.click(screen.getByTestId('custom-btn'));
       });
-      
+
       expect(screen.getByText('Custom duration')).toBeInTheDocument();
-      
+
       await act(async () => {
         jest.advanceTimersByTime(1000);
       });
-      
+
       expect(screen.queryByText('Custom duration')).not.toBeInTheDocument();
     });
 
@@ -183,13 +187,13 @@ describe('Toast', () => {
           <TestComponent />
         </ToastProvider>
       );
-      
+
       expect(screen.getByTestId('toast-count')).toHaveTextContent('0');
-      
+
       await act(async () => {
         fireEvent.click(screen.getByTestId('success-btn'));
       });
-      
+
       expect(screen.getByTestId('toast-count')).toHaveTextContent('1');
     });
   });

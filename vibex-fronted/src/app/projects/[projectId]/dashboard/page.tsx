@@ -1,10 +1,10 @@
-import { ProjectDashboardClient } from './ProjectDashboardClient'
+import { ProjectDashboardClient } from './ProjectDashboardClient';
 
 // Required for static export
 export function generateStaticParams() {
-  return []
+  return [];
 }
 
 export default function ProjectDashboard() {
-  return <ProjectDashboardClient />
+  return <ProjectDashboardClient />;
 }

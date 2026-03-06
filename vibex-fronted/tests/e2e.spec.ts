@@ -3,7 +3,6 @@ import { test, expect } from '@playwright/test';
 const BASE_URL = 'http://localhost:3000';
 
 test.describe('E2E Tests: vibex-e2e-user-flow', () => {
-  
   test('Home page should NOT show "Create Next App"', async ({ page }) => {
     await page.goto(`${BASE_URL}/`);
     const content = await page.content();

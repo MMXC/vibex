@@ -26,19 +26,19 @@ export function Spinner({
   textPosition = 'right',
 }: SpinnerProps) {
   const spinnerElement = (
-    <span 
+    <span
       className={`${styles.spinner} ${styles[size]} ${className}`}
       style={color ? { color } : undefined}
     >
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle 
-          cx="12" 
-          cy="12" 
-          r="10" 
-          stroke="currentColor" 
-          strokeWidth="3" 
-          strokeLinecap="round" 
-          strokeDasharray="31.4 31.4" 
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeDasharray="31.4 31.4"
         />
       </svg>
     </span>

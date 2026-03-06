@@ -4,15 +4,15 @@
  */
 
 // 澄清问题类型
-export type ClarificationCategory = 
-  | 'functional'      // 功能需求
-  | 'non_functional'  // 非功能需求
-  | 'business'        // 业务需求
-  | 'technical'       // 技术需求
-  | 'user'            // 用户相关
-  | 'data'            // 数据相关
-  | 'integration'     // 集成相关
-  | 'security'        // 安全相关;
+export type ClarificationCategory =
+  | 'functional' // 功能需求
+  | 'non_functional' // 非功能需求
+  | 'business' // 业务需求
+  | 'technical' // 技术需求
+  | 'user' // 用户相关
+  | 'data' // 数据相关
+  | 'integration' // 集成相关
+  | 'security'; // 安全相关;
 
 export interface ClarificationQuestion {
   id: string;
@@ -66,27 +66,27 @@ export function generateClarificationPrompt(params: {
   missingDomains?: string[];
 }): string {
   let prompt = CLARIFICATION_PROMPT_TEMPLATE;
-  
+
   prompt = prompt.replace(
     '{{requirement_content}}',
     params.requirementContent || '未提供'
   );
-  
+
   prompt = prompt.replace(
     '{{identified_entities}}',
     params.identifiedEntities?.join(', ') || '无'
   );
-  
+
   prompt = prompt.replace(
     '{{identified_features}}',
     params.identifiedFeatures?.join(', ') || '无'
   );
-  
+
   prompt = prompt.replace(
     '{{missing_domains}}',
     params.missingDomains?.join(', ') || '无'
   );
-  
+
   return prompt;
 }
 
@@ -130,7 +130,7 @@ export const CATEGORY_PROMPTS: Record<ClarificationCategory, string> = {
   security: `请澄清以下安全需求：
 - 认证和授权方式
 - 数据加密要求
-- 合规性要求（如 GDPR、等保）`
+- 合规性要求（如 GDPR、等保）`,
 };
 
 // 答案评估提示词

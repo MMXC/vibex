@@ -18,7 +18,9 @@
 
 .selected {
   border-color: #60a5fa;
-  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3), 0 6px 16px rgba(0, 0, 0, 0.4);
+  box-shadow:
+    0 0 0 2px rgba(96, 165, 250, 0.3),
+    0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
 /* Node type variations */
@@ -140,11 +142,11 @@
   transform: scale(1.2);
 }
 
-.handle[data-handleposittion="0"] {
+.handle[data-handleposittion='0'] {
   /* Target handles */
 }
 
-.handle[data-handleposittion="1"] {
+.handle[data-handleposittion='1'] {
   /* Source handles */
 }
 

@@ -1,15 +1,21 @@
 /**
  * useAuth Hook - 认证状态管理
- * 
+ *
  * 管理用户登录状态、Token、用户信息
- * 
+ *
  * Usage:
  * const { user, isAuthenticated, login, logout, isLoading } = useAuth()
  */
 
 'use client';
 
-import { useState, useEffect, useCallback, createContext, useContext } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  createContext,
+  useContext,
+} from 'react';
 import { apiService } from '@/services/api';
 
 // 用户类型
@@ -74,12 +80,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const response = await apiService.login({ email, password }) as unknown as { token?: string; user?: User };
-      
+      const response = (await apiService.login({
+        email,
+        password,
+      })) as unknown as { token?: string; user?: User };
+
       if (response.token) {
         localStorage.setItem('auth_token', response.token);
         setToken(response.token);
-        
+
         // 获取用户信息
         const userData = await apiService.getCurrentUser();
         setUser(userData);
@@ -90,23 +99,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // 注册
-  const register = useCallback(async (name: string, email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      const response = await apiService.register({ name, email, password }) as unknown as { token?: string; user?: User };
-      
-      if (response.token) {
-        localStorage.setItem('auth_token', response.token);
-        setToken(response.token);
-        
-        // 获取用户信息
-        const userData = await apiService.getCurrentUser();
-        setUser(userData);
+  const register = useCallback(
+    async (name: string, email: string, password: string) => {
+      setIsLoading(true);
+      try {
+        const response = (await apiService.register({
+          name,
+          email,
+          password,
+        })) as unknown as { token?: string; user?: User };
+
+        if (response.token) {
+          localStorage.setItem('auth_token', response.token);
+          setToken(response.token);
+
+          // 获取用户信息
+          const userData = await apiService.getCurrentUser();
+          setUser(userData);
+        }
+      } finally {
+        setIsLoading(false);
       }
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    []
+  );
 
   // 登出
   const logout = useCallback(async () => {
@@ -126,7 +142,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // 刷新用户信息
   const refreshUser = useCallback(async () => {
     if (!token) return;
-    
+
     try {
       const userData = await apiService.getCurrentUser();
       setUser(userData as User);
@@ -184,18 +200,18 @@ export function withAuth<P extends object>(
 ): React.ComponentType<P> {
   return function WithAuthComponent(props: P) {
     const { isAuthenticated, isLoading } = useAuth();
-    
+
     if (isLoading) {
       return <div>Loading...</div>;
     }
-    
+
     if (!isAuthenticated) {
       if (typeof window !== 'undefined') {
         window.location.href = '/auth';
       }
       return null;
     }
-    
+
     return <Component {...props} />;
   };
 }

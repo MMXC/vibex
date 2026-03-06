@@ -46,7 +46,9 @@ describe('Navigation', () => {
     });
 
     it('should render footer when provided', () => {
-      render(<Navigation items={mockItems} footer={<div>Footer Content</div>} />);
+      render(
+        <Navigation items={mockItems} footer={<div>Footer Content</div>} />
+      );
       expect(screen.getByText('Footer Content')).toBeInTheDocument();
     });
 
@@ -84,32 +86,32 @@ describe('Navigation', () => {
 
     it('should show dropdown on click', () => {
       render(<Navigation items={mockItemsWithDropdown} />);
-      
+
       fireEvent.click(screen.getByText('Menu'));
-      
+
       expect(screen.getByText('Sub1')).toBeInTheDocument();
       expect(screen.getByText('Sub2')).toBeInTheDocument();
     });
 
     it('should close dropdown on second click', () => {
       render(<Navigation items={mockItemsWithDropdown} />);
-      
+
       fireEvent.click(screen.getByText('Menu'));
       expect(screen.getByText('Sub1')).toBeInTheDocument();
-      
+
       fireEvent.click(screen.getByText('Menu'));
       expect(screen.queryByText('Sub1')).not.toBeInTheDocument();
     });
 
     it('should close dropdown when clicking outside', () => {
       render(<Navigation items={mockItemsWithDropdown} />);
-      
+
       fireEvent.click(screen.getByText('Menu'));
       expect(screen.getByText('Sub1')).toBeInTheDocument();
-      
+
       // Click outside
       fireEvent.mouseDown(document.body);
-      
+
       expect(screen.queryByText('Sub1')).not.toBeInTheDocument();
     });
   });
@@ -148,12 +150,10 @@ describe('Navigation', () => {
   describe('onClick handler', () => {
     it('should call onClick for item with onClick but no href', () => {
       const handleClick = jest.fn();
-      const items: NavItem[] = [
-        { label: 'Click Me', onClick: handleClick },
-      ];
+      const items: NavItem[] = [{ label: 'Click Me', onClick: handleClick }];
 
       render(<Navigation items={items} />);
-      
+
       // Get the button and click it
       const button = screen.getByText('Click Me').closest('button');
       if (button) {
@@ -183,10 +183,10 @@ describe('Navigation', () => {
   describe('accessibility', () => {
     it('should render without accessibility errors', () => {
       render(<Navigation items={mockItemsWithDropdown} />);
-      
+
       // Should render dropdown button
       expect(screen.getByText('Menu')).toBeInTheDocument();
-      
+
       // Should open dropdown
       fireEvent.click(screen.getByText('Menu'));
       expect(screen.getByText('Sub1')).toBeInTheDocument();

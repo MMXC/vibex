@@ -48,13 +48,10 @@ export class ErrorBoundary extends Component<Props, State> {
               应用程序遇到了意外错误。请尝试刷新页面或点击下方按钮重试。
             </p>
             <div className={styles.actions}>
-              <button 
-                className={styles.button} 
-                onClick={this.handleRetry}
-              >
+              <button className={styles.button} onClick={this.handleRetry}>
                 重试
               </button>
-              <button 
+              <button
                 className={styles.buttonSecondary}
                 onClick={() => window.location.reload()}
               >
@@ -96,7 +93,7 @@ export function withErrorBoundary<P extends object>(
 // 异步操作的错误处理 Hook
 export function useAsyncError() {
   const [, setError] = React.useState<Error | null>(null);
-  
+
   return React.useCallback((error: Error) => {
     setError(() => {
       throw error;

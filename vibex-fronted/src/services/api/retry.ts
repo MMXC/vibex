@@ -30,7 +30,10 @@ class RetryImpl implements RetryService {
     this.config = config;
   }
 
-  async execute<T>(fn: () => Promise<T>, config?: Partial<RetryConfig>): Promise<T> {
+  async execute<T>(
+    fn: () => Promise<T>,
+    config?: Partial<RetryConfig>
+  ): Promise<T> {
     const cfg = { ...this.config, ...config };
     let lastError: Error | null = null;
 
@@ -53,13 +56,16 @@ class RetryImpl implements RetryService {
 
   isRetryable(error: unknown): boolean {
     if (axios.isAxiosError(error)) {
-      return !error.response || this.config.retryableStatusCodes.includes(error.response.status);
+      return (
+        !error.response ||
+        this.config.retryableStatusCodes.includes(error.response.status)
+      );
     }
     return false;
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 

@@ -59,18 +59,18 @@ describe('MermaidEditor', () => {
     it('should call onChange when code changes', () => {
       const onChange = jest.fn();
       render(<MermaidEditor value="" onChange={onChange} />);
-      
+
       fireEvent.change(screen.getByTestId('code-editor'), {
         target: { value: 'graph TD\nA --> B' },
       });
-      
+
       expect(onChange).toHaveBeenCalledWith('graph TD\nA --> B');
     });
 
     it('should update value when prop changes', () => {
       const { rerender } = render(<MermaidEditor value="initial" />);
       expect(screen.getByTestId('code-editor')).toHaveValue('initial');
-      
+
       rerender(<MermaidEditor value="updated" />);
       expect(screen.getByTestId('code-editor')).toHaveValue('updated');
     });
@@ -84,10 +84,14 @@ describe('MermaidEditor', () => {
 
     it('should not call onChange in readOnly mode', () => {
       const onChange = jest.fn();
-      const { rerender } = render(<MermaidEditor value="" readOnly={true} onChange={onChange} />);
-      
+      const { rerender } = render(
+        <MermaidEditor value="" readOnly={true} onChange={onChange} />
+      );
+
       // In readOnly mode, onChange should still work through prop changes
-      rerender(<MermaidEditor value="new value" readOnly={true} onChange={onChange} />);
+      rerender(
+        <MermaidEditor value="new value" readOnly={true} onChange={onChange} />
+      );
       expect(screen.getByTestId('code-editor')).toHaveValue('new value');
     });
   });
@@ -151,10 +155,12 @@ describe('MermaidEditor', () => {
   describe('error handling', () => {
     it('should call onError when preview fails', async () => {
       const onError = jest.fn();
-      (mermaid.render as jest.Mock).mockRejectedValueOnce(new Error('Invalid syntax'));
-      
+      (mermaid.render as jest.Mock).mockRejectedValueOnce(
+        new Error('Invalid syntax')
+      );
+
       render(<MermaidEditor value="invalid" onError={onError} />);
-      
+
       await waitFor(() => {
         expect(onError).toHaveBeenCalled();
       });

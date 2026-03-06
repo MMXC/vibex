@@ -2,7 +2,7 @@
 /**
  * Pre-Test Check Script
  * Runs before tests to ensure code quality
- * 
+ *
  * Checks:
  * 1. TypeScript compilation
  * 2. ESLint
@@ -59,9 +59,13 @@ function runCommand(command, options = {}) {
 }
 
 async function main() {
-  console.log(`${colors.blue}========================================${colors.reset}`);
+  console.log(
+    `${colors.blue}========================================${colors.reset}`
+  );
   console.log(`${colors.blue}  VibeX Pre-Test Check${colors.reset}`);
-  console.log(`${colors.blue}========================================${colors.reset}`);
+  console.log(
+    `${colors.blue}========================================${colors.reset}`
+  );
 
   let allPassed = true;
   const checks = [];
@@ -109,6 +113,16 @@ async function main() {
     checks.push({ name: 'Dependencies', passed: true });
   }
 
+  // Clean up Next.js lock file before build
+  const lockFilePath = path.join(PROJECT_DIR, '.next/lock');
+  if (require('fs').existsSync(lockFilePath)) {
+    try {
+      require('fs').rmSync(lockFilePath, { recursive: true, force: true });
+    } catch (e) {
+      // Ignore errors
+    }
+  }
+
   // 5. Build Check
   logStep('5/5', 'Running build check...');
   if (runCommand('npm run build', { stdio: 'pipe' })) {
@@ -121,14 +135,18 @@ async function main() {
   }
 
   // Summary
-  console.log(`\n${colors.blue}========================================${colors.reset}`);
+  console.log(
+    `\n${colors.blue}========================================${colors.reset}`
+  );
   console.log(`${colors.blue}  Summary${colors.reset}`);
-  console.log(`${colors.blue}========================================${colors.reset}`);
+  console.log(
+    `${colors.blue}========================================${colors.reset}`
+  );
 
-  const passed = checks.filter(c => c.passed).length;
+  const passed = checks.filter((c) => c.passed).length;
   const total = checks.length;
 
-  checks.forEach(check => {
+  checks.forEach((check) => {
     if (check.passed) {
       logSuccess(`${check.name}`);
     } else {
@@ -147,7 +165,7 @@ async function main() {
   }
 }
 
-main().catch(error => {
+main().catch((error) => {
   logError(`Unexpected error: ${error.message}`);
   process.exit(1);
 });

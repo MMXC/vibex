@@ -24,7 +24,9 @@ export function Badge({
     styles[size],
     glow && styles.glow,
     className,
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <span className={classNames}>

@@ -18,7 +18,7 @@ export const colors = {
     800: '#1e40af',
     900: '#1e3a8a',
   },
-  
+
   // 中性色
   neutral: {
     50: '#fafafa',
@@ -32,7 +32,7 @@ export const colors = {
     800: '#262626',
     900: '#171717',
   },
-  
+
   // 功能色
   success: '#22c55e',
   warning: '#f59e0b',
@@ -67,7 +67,7 @@ export const typography = {
     sans: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     mono: '"JetBrains Mono", "Fira Code", monospace',
   },
-  
+
   fontSize: {
     xs: '12px',
     sm: '13px',
@@ -78,14 +78,14 @@ export const typography = {
     '3xl': '24px',
     '4xl': '30px',
   },
-  
+
   fontWeight: {
     normal: 400,
     medium: 500,
     semibold: 600,
     bold: 700,
   },
-  
+
   lineHeight: {
     tight: 1.25,
     normal: 1.5,
@@ -164,14 +164,14 @@ export const breakpoints = {
 // 导出 CSS 变量
 export function generateCSSVariables(isDark = false): Record<string, string> {
   const palette = isDark ? darkColors : colors;
-  
+
   return {
     // 颜色
     '--color-primary': palette.primary[500],
     '--color-primary-hover': palette.primary[600],
     '--color-primary-light': palette.primary[100],
     '--color-primary-alpha': 'rgba(59, 130, 246, 0.1)',
-    
+
     // 中性色
     '--color-text': isDark ? '#e5e5e5' : '#1a1a1a',
     '--color-text-secondary': isDark ? '#a3a3a3' : '#666666',
@@ -181,13 +181,13 @@ export function generateCSSVariables(isDark = false): Record<string, string> {
     '--color-bg-tertiary': isDark ? '#404040' : '#eeeeee',
     '--color-border': isDark ? '#404040' : '#e5e5e5',
     '--color-border-light': isDark ? '#262626' : '#f0f0f0',
-    
+
     // 功能色
     '--color-success': colors.success,
     '--color-warning': colors.warning,
     '--color-error': colors.error,
     '--color-info': colors.info,
-    
+
     // 圆角
     '--radius-sm': borderRadius.sm,
     '--radius-base': borderRadius.base,
@@ -195,14 +195,14 @@ export function generateCSSVariables(isDark = false): Record<string, string> {
     '--radius-lg': borderRadius.lg,
     '--radius-xl': borderRadius.xl,
     '--radius-full': borderRadius.full,
-    
+
     // 阴影
     '--shadow-sm': shadows.sm,
     '--shadow-base': shadows.base,
     '--shadow-md': shadows.md,
     '--shadow-lg': shadows.lg,
     '--shadow-xl': shadows.xl,
-    
+
     // 间距
     '--spacing-1': spacing[1],
     '--spacing-2': spacing[2],

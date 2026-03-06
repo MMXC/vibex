@@ -60,12 +60,12 @@ export function Loading({
 }
 
 // 带骨架屏的加载组件
-export function LoadingSkeleton({ 
-  loading, 
-  children, 
-  fallback 
-}: { 
-  loading: boolean; 
+export function LoadingSkeleton({
+  loading,
+  children,
+  fallback,
+}: {
+  loading: boolean;
   children: React.ReactNode;
   fallback?: React.ReactNode;
 }) {
@@ -85,21 +85,23 @@ interface ProgressLoadingProps {
   text?: string;
 }
 
-export function ProgressLoading({ 
-  progress, 
+export function ProgressLoading({
+  progress,
   indeterminate = false,
   text,
 }: ProgressLoadingProps) {
   const percentage = Math.min(100, Math.max(0, progress || 0));
-  
+
   return (
     <div className={styles.progressContainer}>
       <div className={styles.progressBar}>
-        <div 
+        <div
           className={styles.progressFill}
-          style={{ 
+          style={{
             width: indeterminate ? '100%' : `${percentage}%`,
-            animation: indeterminate ? 'progress-indeterminate 1.5s ease-in-out infinite' : undefined
+            animation: indeterminate
+              ? 'progress-indeterminate 1.5s ease-in-out infinite'
+              : undefined,
           }}
         />
       </div>

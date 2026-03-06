@@ -1,19 +1,19 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import styles from './changelog.module.css'
+import { useEffect, useState } from 'react';
+import styles from './changelog.module.css';
 
 interface ChangelogEntry {
-  version: string
-  date: string
-  changes: string[]
-  commit?: string
+  version: string;
+  date: string;
+  changes: string[];
+  commit?: string;
 }
 
 interface VersionInfo {
-  version: string
-  commit: string
-  timestamp: string
+  version: string;
+  commit: string;
+  timestamp: string;
 }
 
 const mockChangelog: ChangelogEntry[] = [
@@ -168,34 +168,33 @@ const mockChangelog: ChangelogEntry[] = [
   {
     version: '0.8.0',
     date: '2026-01-20',
-    changes: [
-      '🎨 初始版本发布',
-      '📋 基础页面模板',
-    ],
+    changes: ['🎨 初始版本发布', '📋 基础页面模板'],
   },
-]
+];
 
 export default function Changelog() {
-  const [versionInfo, setVersionInfo] = useState<VersionInfo | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [versionInfo, setVersionInfo] = useState<VersionInfo | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchVersion = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || ''}/api/version`)
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || ''}/api/version`
+        );
         if (response.ok) {
-          const data = await response.json()
-          setVersionInfo(data)
+          const data = await response.json();
+          setVersionInfo(data);
         }
       } catch (error) {
-        console.error('Failed to fetch version:', error)
+        console.error('Failed to fetch version:', error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchVersion()
-  }, [])
+    fetchVersion();
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -208,10 +207,12 @@ export default function Changelog() {
         <header className={styles.header}>
           <h1 className={styles.title}>更新日志</h1>
           <p className={styles.subtitle}>VibeX 产品迭代记录</p>
-          
+
           {versionInfo && (
             <div className={styles.versionInfo}>
-              <span className={styles.versionBadge}>v{versionInfo.version}</span>
+              <span className={styles.versionBadge}>
+                v{versionInfo.version}
+              </span>
               <span className={styles.commitHash}>{versionInfo.commit}</span>
             </div>
           )}
@@ -237,5 +238,5 @@ export default function Changelog() {
         </div>
       </main>
     </div>
-  )
+  );
 }

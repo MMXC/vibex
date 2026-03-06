@@ -24,7 +24,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: 
+  background-image:
     linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 20px 20px;
@@ -95,7 +95,11 @@
 
 .primaryBtn {
   padding: 8px 16px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 100%
+  );
   border: none;
   border-radius: 6px;
   color: var(--color-text-inverse);
@@ -350,7 +354,8 @@
 }
 
 @keyframes ringPulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.5;
     transform: scale(1);
   }
@@ -525,14 +530,15 @@
   .nodePanel {
     width: 200px;
   }
-  
+
   .propsPanel {
     width: 240px;
   }
 }
 
 @media (max-width: 768px) {
-  .nodePanel, .propsPanel {
+  .nodePanel,
+  .propsPanel {
     display: none;
   }
 }

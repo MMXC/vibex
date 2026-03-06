@@ -1,39 +1,39 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useNavigationStore } from '@/stores/navigationStore'
-import styles from './ProjectNav.module.css'
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useNavigationStore } from '@/stores/navigationStore';
+import styles from './ProjectNav.module.css';
 
 interface ProjectNavProps {
-  projectId?: string
-  projectName?: string
-  className?: string
+  projectId?: string;
+  projectName?: string;
+  className?: string;
 }
 
-export function ProjectNav({ projectId, projectName, className }: ProjectNavProps) {
-  const pathname = usePathname()
-  const { 
-    currentProject,
-    projectNavItems, 
-    currentProjectNav, 
-    setProjectNav,
-  } = useNavigationStore()
-  
+export function ProjectNav({
+  projectId,
+  projectName,
+  className,
+}: ProjectNavProps) {
+  const pathname = usePathname();
+  const { currentProject, projectNavItems, currentProjectNav, setProjectNav } =
+    useNavigationStore();
+
   // Use props if provided, otherwise use store
-  const effectiveProjectId = projectId || currentProject?.id
-  const effectiveProjectName = projectName || currentProject?.name
-  
+  const effectiveProjectId = projectId || currentProject?.id;
+  const effectiveProjectName = projectName || currentProject?.name;
+
   // If no project is selected and no props provided, don't render
   if (!effectiveProjectId) {
-    return null
+    return null;
   }
-  
+
   // Build href for each nav item based on project ID
-  const getNavHref = (item: typeof projectNavItems[0]) => {
-    return `/projects/${effectiveProjectId}${item.href || ''}`
-  }
-  
+  const getNavHref = (item: (typeof projectNavItems)[0]) => {
+    return `/projects/${effectiveProjectId}${item.href || ''}`;
+  };
+
   return (
     <aside className={`${styles.aside} ${className || ''}`}>
       {/* Project Info */}
@@ -45,14 +45,15 @@ export function ProjectNav({ projectId, projectName, className }: ProjectNavProp
           {currentProject?.role === 'viewer' && '查看者'}
         </span>
       </div>
-      
+
       {/* Navigation */}
       <nav className={styles.nav}>
         {projectNavItems.map((item) => {
-          const href = getNavHref(item)
-          const isActive = pathname === href || 
-            (item.id !== 'dashboard' && pathname?.startsWith(href))
-          
+          const href = getNavHref(item);
+          const isActive =
+            pathname === href ||
+            (item.id !== 'dashboard' && pathname?.startsWith(href));
+
           return (
             <Link
               key={item.id}
@@ -66,13 +67,13 @@ export function ProjectNav({ projectId, projectName, className }: ProjectNavProp
                 <span className={styles.badge}>{item.badge}</span>
               )}
             </Link>
-          )
+          );
         })}
       </nav>
-      
+
       {/* Bottom Actions */}
       <div className={styles.bottom}>
-        <Link 
+        <Link
           href={`/projects/${effectiveProjectId}/settings`}
           className={styles.settingsLink}
         >
@@ -81,7 +82,7 @@ export function ProjectNav({ projectId, projectName, className }: ProjectNavProp
         </Link>
       </div>
     </aside>
-  )
+  );
 }
 
 // Icon mapping
@@ -94,6 +95,6 @@ function getIcon(id: string): string {
     flow: '🔀',
     pages: '📄',
     settings: '⚙️',
-  }
-  return icons[id] || '•'
+  };
+  return icons[id] || '•';
 }

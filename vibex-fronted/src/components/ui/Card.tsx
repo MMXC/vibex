@@ -27,10 +27,16 @@ export function Card({
     hover && styles.hoverable,
     hover && styles[`glow-${glowColor}`],
     className,
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
-    <div className={classNames} onClick={onClick} role={onClick ? 'button' : undefined}>
+    <div
+      className={classNames}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+    >
       {children}
     </div>
   );

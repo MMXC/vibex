@@ -24,7 +24,7 @@ export function RecoveryDialog({
     if (isOpen) {
       const state = useConfirmationStore.getState();
       setStep(state.currentStep);
-      
+
       // Try to get last saved time from localStorage
       try {
         const stored = localStorage.getItem('confirmation-flow-storage');
@@ -56,7 +56,7 @@ export function RecoveryDialog({
       <div className={styles.dialog}>
         <div className={styles.icon}>💾</div>
         <h2 className={styles.title}>恢复之前进度？</h2>
-        
+
         {lastSaved && (
           <p className={styles.info}>
             检测到您之前保存的进度
@@ -64,32 +64,23 @@ export function RecoveryDialog({
             <span className={styles.time}>最后保存: {lastSaved}</span>
           </p>
         )}
-        
+
         {step && (
           <p className={styles.step}>
             上次停留在: <strong>{stepLabels[step] || step}</strong>
           </p>
         )}
-        
+
         <div className={styles.actions}>
-          <button 
-            className={styles.restoreButton}
-            onClick={onRestore}
-          >
+          <button className={styles.restoreButton} onClick={onRestore}>
             恢复进度
           </button>
-          <button 
-            className={styles.freshButton}
-            onClick={onStartFresh}
-          >
+          <button className={styles.freshButton} onClick={onStartFresh}>
             重新开始
           </button>
         </div>
-        
-        <button 
-          className={styles.closeButton}
-          onClick={onClose}
-        >
+
+        <button className={styles.closeButton} onClick={onClose}>
           取消
         </button>
       </div>
@@ -101,7 +92,7 @@ export function RecoveryDialog({
 export function useRecoveryDialog() {
   const [showRecovery, setShowRecovery] = useState(false);
   const [hasStoredState, setHasStoredState] = useState(false);
-  
+
   useEffect(() => {
     // Check if there's stored state
     try {
@@ -109,7 +100,10 @@ export function useRecoveryDialog() {
       if (stored) {
         const parsed = JSON.parse(stored);
         // Check if there's actual data to recover
-        if (parsed.state?.requirementText || parsed.state?.boundedContexts?.length > 0) {
+        if (
+          parsed.state?.requirementText ||
+          parsed.state?.boundedContexts?.length > 0
+        ) {
           setHasStoredState(true);
           setShowRecovery(true);
         }
@@ -118,12 +112,12 @@ export function useRecoveryDialog() {
       console.error('Failed to check stored state:', e);
     }
   }, []);
-  
+
   const handleRestore = () => {
     setShowRecovery(false);
     // State will be automatically rehydrated by Zustand persist
   };
-  
+
   const handleStartFresh = () => {
     // Clear stored state
     try {
@@ -134,7 +128,7 @@ export function useRecoveryDialog() {
     setShowRecovery(false);
     setHasStoredState(false);
   };
-  
+
   return {
     showRecovery,
     hasStoredState,

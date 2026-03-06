@@ -1,10 +1,10 @@
-import { ProjectPageClient } from './ProjectPageClient'
+import { ProjectPageClient } from './ProjectPageClient';
 
 // Required for static export
 export function generateStaticParams() {
-  return []
+  return [];
 }
 
 export default function ProjectPage() {
-  return <ProjectPageClient />
+  return <ProjectPageClient />;
 }

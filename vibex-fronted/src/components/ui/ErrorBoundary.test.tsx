@@ -1,6 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { ErrorBoundary, withErrorBoundary, useAsyncError } from './ErrorBoundary';
+import {
+  ErrorBoundary,
+  withErrorBoundary,
+  useAsyncError,
+} from './ErrorBoundary';
 
 // Test component that throws error
 const BuggyComponent = ({ shouldThrow = true }: { shouldThrow?: boolean }) => {
@@ -41,7 +45,9 @@ describe('ErrorBoundary', () => {
 
     it('renders custom fallback when provided', () => {
       render(
-        <ErrorBoundary fallback={<div data-testid="custom-fallback">Custom Error</div>}>
+        <ErrorBoundary
+          fallback={<div data-testid="custom-fallback">Custom Error</div>}
+        >
           <BuggyComponent />
         </ErrorBoundary>
       );

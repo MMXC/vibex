@@ -10,8 +10,12 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .dialog {
@@ -342,93 +346,93 @@
   .overlay {
     background: rgba(0, 0, 0, 0.7);
   }
-  
+
   .dialog {
     background: #1a1a1a;
   }
-  
+
   .header {
     border-color: #2a2a2a;
   }
-  
+
   .title {
     color: #e0e0e0;
   }
-  
+
   .closeBtn {
     color: #999;
   }
-  
+
   .closeBtn:hover {
     background: #2a2a2a;
     color: #e0e0e0;
   }
-  
+
   .tabs {
     background: #222;
     border-color: #2a2a2a;
   }
-  
+
   .tab {
     color: #999;
   }
-  
+
   .tab:hover {
     background: #2a2a2a;
     color: #e0e0e0;
   }
-  
+
   .description {
     color: #999;
   }
-  
+
   .label {
     color: #e0e0e0;
   }
-  
+
   .input,
   .select {
     background: #2a2a2a;
     color: #e0e0e0;
     border-color: #333;
   }
-  
+
   .input:focus,
   .select:focus {
     border-color: #3b82f6;
     background: #222;
   }
-  
+
   .select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   }
-  
+
   .branchItem {
     background: #2a2a2a;
   }
-  
+
   .branchItem:hover {
     background: rgba(59, 130, 246, 0.15);
     border-color: rgba(59, 130, 246, 0.3);
   }
-  
+
   .branchItem.active {
     background: rgba(59, 130, 246, 0.2);
     border-color: #3b82f6;
   }
-  
+
   .branchName {
     color: #e0e0e0;
   }
-  
+
   .messageCount {
     color: #999;
   }
-  
+
   .mergeArrow {
     color: #999;
   }
-  
+
   .hint {
     background: #2a2a2a;
     color: #999;
@@ -441,24 +445,24 @@
     width: 95%;
     max-height: 90vh;
   }
-  
+
   .header {
     padding: 16px 20px;
   }
-  
+
   .tabs {
     padding: 0 8px;
   }
-  
+
   .tab {
     padding: 12px 8px;
     font-size: 13px;
   }
-  
+
   .tabIcon {
     display: none;
   }
-  
+
   .content {
     padding: 20px;
   }

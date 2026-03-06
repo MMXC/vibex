@@ -42,18 +42,18 @@ describe('MermaidCodeEditor', () => {
     it('should call onChange when value changes', () => {
       const onChange = jest.fn();
       render(<MermaidCodeEditor value="" onChange={onChange} />);
-      
+
       fireEvent.change(screen.getByTestId('monaco-editor'), {
         target: { value: 'new code' },
       });
-      
+
       expect(onChange).toHaveBeenCalledWith('new code');
     });
 
     it('should update displayed value when prop changes', () => {
       const { rerender } = render(<MermaidCodeEditor value="initial" />);
       expect(screen.getByTestId('monaco-editor')).toHaveValue('initial');
-      
+
       rerender(<MermaidCodeEditor value="updated" />);
       expect(screen.getByTestId('monaco-editor')).toHaveValue('updated');
     });
@@ -69,7 +69,9 @@ describe('MermaidCodeEditor', () => {
       const onChange = jest.fn();
       // Note: In this simple mock, we test the component behavior
       // The actual readOnly behavior depends on Monaco editor implementation
-      render(<MermaidCodeEditor value="" readOnly={true} onChange={onChange} />);
+      render(
+        <MermaidCodeEditor value="" readOnly={true} onChange={onChange} />
+      );
       // Test passes as we just verify rendering works
       expect(screen.getByTestId('monaco-editor')).toBeInTheDocument();
     });
@@ -97,25 +99,29 @@ describe('MermaidCodeEditor', () => {
 
   describe('Mermaid code samples', () => {
     it('should render graph code', () => {
-      const code = 'graph TD\nA[Start] --> B{Decision}\nB -->|Yes| C[Process1]\nB -->|No| D[Process2]';
+      const code =
+        'graph TD\nA[Start] --> B{Decision}\nB -->|Yes| C[Process1]\nB -->|No| D[Process2]';
       render(<MermaidCodeEditor value={code} />);
       expect(screen.getByTestId('monaco-editor')).toHaveValue(code);
     });
 
     it('should render classDiagram code', () => {
-      const code = 'classDiagram\nclass Animal {\n+String name\n+int age\n+eat()\n+sleep()\n}';
+      const code =
+        'classDiagram\nclass Animal {\n+String name\n+int age\n+eat()\n+sleep()\n}';
       render(<MermaidCodeEditor value={code} />);
       expect(screen.getByTestId('monaco-editor')).toHaveValue(code);
     });
 
     it('should render stateDiagram code', () => {
-      const code = 'stateDiagram-v2\n[*] --> Idle\nIdle --> Processing: event1\nProcessing --> Complete: event2\nComplete --> [*]';
+      const code =
+        'stateDiagram-v2\n[*] --> Idle\nIdle --> Processing: event1\nProcessing --> Complete: event2\nComplete --> [*]';
       render(<MermaidCodeEditor value={code} />);
       expect(screen.getByTestId('monaco-editor')).toHaveValue(code);
     });
 
     it('should render flowchart code', () => {
-      const code = 'flowchart TD\nA[Start] --> B{Is it working?}\nB -->|Yes| C[Great!]\nB -->|No| D[Fix it]';
+      const code =
+        'flowchart TD\nA[Start] --> B{Is it working?}\nB -->|Yes| C[Great!]\nB -->|No| D[Fix it]';
       render(<MermaidCodeEditor value={code} />);
       expect(screen.getByTestId('monaco-editor')).toHaveValue(code);
     });

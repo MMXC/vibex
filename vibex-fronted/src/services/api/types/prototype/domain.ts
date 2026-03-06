@@ -11,7 +11,13 @@ export interface DomainEntity {
   createdAt?: string;
 }
 
-export type EntityType = 'user' | 'system' | 'business' | 'data' | 'external' | 'abstract';
+export type EntityType =
+  | 'user'
+  | 'system'
+  | 'business'
+  | 'data'
+  | 'external'
+  | 'abstract';
 
 export interface EntityAttribute {
   name: string;
@@ -30,7 +36,13 @@ export interface EntityRelation {
   createdAt?: string;
 }
 
-export type RelationType = 'inheritance' | 'composition' | 'aggregation' | 'association' | 'dependency' | 'realization';
+export type RelationType =
+  | 'inheritance'
+  | 'composition'
+  | 'aggregation'
+  | 'association'
+  | 'dependency'
+  | 'realization';
 
 // Bounded Context
 export interface ContextRelationship {

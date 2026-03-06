@@ -72,7 +72,7 @@ export function PrototypeExporter({
       const data = JSON.stringify(schema, null, 2);
       const blob = new Blob([data], { type: 'application/json' });
       downloadBlob(blob, generateFilename('json'));
-      
+
       const result: ExportResult = {
         format: 'json',
         filename: generateFilename('json'),
@@ -87,7 +87,7 @@ export function PrototypeExporter({
   const exportAsPng = async (): Promise<void> => {
     try {
       setIsExporting(true);
-      
+
       // Create a canvas element
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
@@ -289,7 +289,11 @@ export function PrototypeExporter({
         ctx.strokeRect(x, y, w, h);
         ctx.fillStyle = '#999999';
         ctx.font = '12px sans-serif';
-        ctx.fillText(String(compAny.placeholder || 'Input...'), x + 5, y + h / 2 + 4);
+        ctx.fillText(
+          String(compAny.placeholder || 'Input...'),
+          x + 5,
+          y + h / 2 + 4
+        );
         break;
 
       case 'image':
@@ -309,7 +313,11 @@ export function PrototypeExporter({
         ctx.fillRect(x, y, w, h);
         ctx.fillStyle = '#007bff';
         ctx.font = 'bold 12px sans-serif';
-        ctx.fillText(`[${String(compAny.type).toUpperCase()}]`, x + 5, y + h / 2 + 4);
+        ctx.fillText(
+          `[${String(compAny.type).toUpperCase()}]`,
+          x + 5,
+          y + h / 2 + 4
+        );
         break;
 
       default:
@@ -394,26 +402,42 @@ export function PrototypeExporter({
           <h1>🎨 VibeX Prototype Export</h1>
           <p class="version">Version: ${version}</p>
           <p class="version">Created: ${createdAt}</p>
-          ${theme ? `
+          ${
+            theme
+              ? `
             <div class="theme-info">
               Background: ${theme.colors?.background || '#ffffff'} |
               Primary: ${theme.colors?.primary || '#007bff'} |
               Secondary: ${theme.colors?.secondary || '#6c757d'}
             </div>
-          ` : ''}
+          `
+              : ''
+          }
         </div>
-        ${pages.length > 0 ? pages.map((page: UIPage) => `
+        ${
+          pages.length > 0
+            ? pages
+                .map(
+                  (page: UIPage) => `
           <div class="page">
             <div class="page-title">${page.name || 'Untitled Page'}</div>
             <div class="page-route">${page.route || '/'}</div>
-            ${((page as any).components as any[] || []).map((comp) => `
+            ${(((page as any).components as any[]) || [])
+              .map(
+                (comp) => `
               <div class="component">
                 <div class="component-type">${comp.type}</div>
                 <div class="component-content">${comp.content || comp.placeholder || comp.label || '(no content)'}</div>
               </div>
-            `).join('')}
+            `
+              )
+              .join('')}
           </div>
-        `).join('') : '<p style="color: #999;">No pages defined in this prototype.</p>'}
+        `
+                )
+                .join('')
+            : '<p style="color: #999;">No pages defined in this prototype.</p>'
+        }
       </body>
       </html>
     `;
@@ -473,7 +497,7 @@ export function PrototypeExporter({
         >
           {isExporting ? '导出中...' : '导出原型'}
         </Button>
-        
+
         {showMenu && (
           <div className={styles.dropdownMenu}>
             {EXPORT_FORMATS.map((format) => (
@@ -498,7 +522,11 @@ export function PrototypeExporter({
       >
         <div className={styles.modalContent}>
           <p>
-            确定要导出为 <strong>{EXPORT_FORMATS.find(f => f.value === selectedFormat)?.label}</strong> 格式吗？
+            确定要导出为{' '}
+            <strong>
+              {EXPORT_FORMATS.find((f) => f.value === selectedFormat)?.label}
+            </strong>{' '}
+            格式吗？
           </p>
           <p className={styles.fileInfo}>
             文件名: <code>{generateFilename(selectedFormat)}</code>

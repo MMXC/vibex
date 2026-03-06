@@ -38,7 +38,7 @@ export default function ConversationBranchSelector({
     <div className={styles.container}>
       <div className={styles.header}>
         <span className={styles.label}>对话分支</span>
-        <button 
+        <button
           className={styles.addBtn}
           onClick={() => setShowNewBranch(!showNewBranch)}
           title="新建分支"

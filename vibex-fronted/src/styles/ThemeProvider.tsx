@@ -1,6 +1,12 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from 'react';
 import { generateCSSVariables } from './tokens';
 
 type ThemeMode = 'light' | 'dark' | 'system';
@@ -27,25 +33,28 @@ interface ThemeProviderProps {
   defaultMode?: ThemeMode;
 }
 
-export function ThemeProvider({ children, defaultMode = 'system' }: ThemeProviderProps) {
+export function ThemeProvider({
+  children,
+  defaultMode = 'system',
+}: ThemeProviderProps) {
   const [mode, setMode] = useState<ThemeMode>(defaultMode);
   const [isDark, setIsDark] = useState(false);
 
   // 检测系统主题
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
+
     const updateTheme = () => {
       const dark = mode === 'dark' || (mode === 'system' && mediaQuery.matches);
       setIsDark(dark);
-      
+
       // 应用 CSS 变量
       const vars = generateCSSVariables(dark);
       const root = document.documentElement;
       Object.entries(vars).forEach(([key, value]) => {
         root.style.setProperty(key, value);
       });
-      
+
       // 设置 data-theme 属性
       root.setAttribute('data-theme', dark ? 'dark' : 'light');
     };
@@ -55,7 +64,7 @@ export function ThemeProvider({ children, defaultMode = 'system' }: ThemeProvide
     // 监听系统主题变化
     const handler = () => updateTheme();
     mediaQuery.addEventListener('change', handler);
-    
+
     return () => mediaQuery.removeEventListener('change', handler);
   }, [mode]);
 
@@ -64,11 +73,13 @@ export function ThemeProvider({ children, defaultMode = 'system' }: ThemeProvide
   };
 
   const toggleTheme = () => {
-    setMode(prev => prev === 'dark' ? 'light' : 'dark');
+    setMode((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
   return (
-    <ThemeContext.Provider value={{ mode, isDark, setMode: handleSetMode, toggleTheme }}>
+    <ThemeContext.Provider
+      value={{ mode, isDark, setMode: handleSetMode, toggleTheme }}
+    >
       {children}
     </ThemeContext.Provider>
   );

@@ -55,7 +55,9 @@ export default function StreamingMessage({
       <span className={styles.content}>
         {displayedContent}
         {isStreaming && (
-          <span className={`${styles.cursor} ${cursorVisible ? styles.visible : ''}`}>
+          <span
+            className={`${styles.cursor} ${cursorVisible ? styles.visible : ''}`}
+          >
             |
           </span>
         )}

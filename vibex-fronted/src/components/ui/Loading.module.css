@@ -99,7 +99,9 @@
 }
 
 @keyframes dot-pulse {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     opacity: 0.3;
     transform: scale(0.8);
   }
@@ -236,31 +238,31 @@
   .text {
     color: #999;
   }
-  
+
   .spinnerRing {
     border-color: #333;
     border-top-color: #3b82f6;
   }
-  
+
   .dot,
   .pulseCore,
   .pulseRing {
     background: #3b82f6;
     border-color: #3b82f6;
   }
-  
+
   .fullScreen {
     background: #0a0a0a;
   }
-  
+
   .overlay {
     background: rgba(0, 0, 0, 0.8);
   }
-  
+
   .progressBar {
     background: #2a2a2a;
   }
-  
+
   .progressText {
     color: #999;
   }

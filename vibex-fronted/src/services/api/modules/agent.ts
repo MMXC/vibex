@@ -27,13 +27,15 @@ class AgentApiImpl implements AgentApi {
   async getAgents(userId?: string): Promise<Agent[]> {
     const cacheKey = getCacheKey('agents', userId || 'all');
     const cached = cache.get<Agent[]>(cacheKey);
-    
+
     if (!this.isOnline() && cached) {
       return cached;
     }
 
     return retry.execute(async () => {
-      const response = await httpClient.get<{ agents: Agent[] }>('/agents', { params: { userId } });
+      const response = await httpClient.get<{ agents: Agent[] }>('/agents', {
+        params: { userId },
+      });
       const agents: Agent[] = (response as any).agents || response;
       cache.set(cacheKey, agents);
       return agents;
@@ -43,13 +45,15 @@ class AgentApiImpl implements AgentApi {
   async getAgent(agentId: string): Promise<Agent> {
     const cacheKey = getCacheKey('agent', agentId);
     const cached = cache.get<Agent>(cacheKey);
-    
+
     if (!this.isOnline() && cached) {
       return cached;
     }
 
     return retry.execute(async () => {
-      const response = await httpClient.get<{ agent: Agent }>(`/agents/${agentId}`);
+      const response = await httpClient.get<{ agent: Agent }>(
+        `/agents/${agentId}`
+      );
       const agent: Agent = (response as any).agent || response;
       cache.set(cacheKey, agent);
       return agent;
@@ -58,7 +62,10 @@ class AgentApiImpl implements AgentApi {
 
   async createAgent(agent: AgentCreate): Promise<Agent> {
     return retry.execute(async () => {
-      const response = await httpClient.post<{ agent: Agent }>('/agents', agent);
+      const response = await httpClient.post<{ agent: Agent }>(
+        '/agents',
+        agent
+      );
       const created: Agent = (response as any).agent || response;
       cache.remove(getCacheKey('agents', agent.userId));
       return created;
@@ -67,7 +74,10 @@ class AgentApiImpl implements AgentApi {
 
   async updateAgent(agentId: string, data: AgentUpdate): Promise<Agent> {
     return retry.execute(async () => {
-      const response = await httpClient.put<{ agent: Agent }>(`/agents/${agentId}`, data);
+      const response = await httpClient.put<{ agent: Agent }>(
+        `/agents/${agentId}`,
+        data
+      );
       const agent: Agent = (response as any).agent || response;
       cache.remove(getCacheKey('agent', agentId));
       return agent;
@@ -76,7 +86,9 @@ class AgentApiImpl implements AgentApi {
 
   async deleteAgent(agentId: string): Promise<SuccessResponse> {
     return retry.execute(async () => {
-      const response = await httpClient.delete<SuccessResponse>(`/agents/${agentId}`);
+      const response = await httpClient.delete<SuccessResponse>(
+        `/agents/${agentId}`
+      );
       return response;
     });
   }

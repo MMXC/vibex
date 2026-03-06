@@ -1,29 +1,26 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useNavigationStore, NavItem } from '@/stores/navigationStore'
-import styles from './GlobalNav.module.css'
+import { useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useNavigationStore, NavItem } from '@/stores/navigationStore';
+import styles from './GlobalNav.module.css';
 
 interface GlobalNavProps {
-  className?: string
+  className?: string;
 }
 
 export function GlobalNav({ className }: GlobalNavProps) {
-  const pathname = usePathname()
-  const { 
-    globalNavItems, 
-    currentGlobalNav, 
-    setGlobalNav,
-    toggleMobileMenu,
-  } = useNavigationStore()
-  
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
-  
+  const pathname = usePathname();
+  const { globalNavItems, currentGlobalNav, setGlobalNav, toggleMobileMenu } =
+    useNavigationStore();
+
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
   // Check if we're in a project context
-  const isInProject = pathname?.startsWith('/project') || pathname?.startsWith('/projects/')
-  
+  const isInProject =
+    pathname?.startsWith('/project') || pathname?.startsWith('/projects/');
+
   return (
     <header className={`${styles.header} ${className || ''}`}>
       <div className={styles.container}>
@@ -32,7 +29,7 @@ export function GlobalNav({ className }: GlobalNavProps) {
           <span className={styles.logoIcon}>◆</span>
           <span className={styles.logoText}>VibeX</span>
         </Link>
-        
+
         {/* Navigation Items */}
         <nav className={styles.nav}>
           {globalNavItems.map((item) => (
@@ -53,27 +50,27 @@ export function GlobalNav({ className }: GlobalNavProps) {
             </Link>
           ))}
         </nav>
-        
+
         {/* Right Section */}
         <div className={styles.right}>
           {/* Mobile Menu Toggle */}
-          <button 
+          <button
             className={styles.mobileToggle}
             onClick={toggleMobileMenu}
             aria-label="Toggle menu"
           >
             <span className={styles.hamburger}></span>
           </button>
-          
+
           {/* User Menu */}
           <div className={styles.userMenu}>
-            <button 
+            <button
               className={styles.userButton}
               onClick={() => setUserMenuOpen(!userMenuOpen)}
             >
               <span className={styles.avatar}>U</span>
             </button>
-            
+
             {userMenuOpen && (
               <div className={styles.dropdown}>
                 <Link href="/profile" className={styles.dropdownItem}>
@@ -83,14 +80,12 @@ export function GlobalNav({ className }: GlobalNavProps) {
                   设置
                 </Link>
                 <hr className={styles.divider} />
-                <button className={styles.dropdownItem}>
-                  退出登录
-                </button>
+                <button className={styles.dropdownItem}>退出登录</button>
               </div>
             )}
           </div>
         </div>
       </div>
     </header>
-  )
+  );
 }

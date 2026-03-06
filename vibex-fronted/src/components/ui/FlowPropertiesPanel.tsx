@@ -1,11 +1,14 @@
-'use client'
+'use client';
 
-import { useCallback, useMemo } from 'react'
-import { Node, Edge } from 'reactflow'
-import styles from './FlowPropertiesPanel.module.css'
+import { useCallback, useMemo } from 'react';
+import { Node, Edge } from 'reactflow';
+import styles from './FlowPropertiesPanel.module.css';
 
 // Node type labels in Chinese
-const NODE_TYPE_LABELS: Record<string, { label: string; icon: string; color: string }> = {
+const NODE_TYPE_LABELS: Record<
+  string,
+  { label: string; icon: string; color: string }
+> = {
   input: { label: '用户输入', icon: '📥', color: '#06b6d4' },
   llm: { label: 'LLM 调用', icon: '🤖', color: '#a855f7' },
   condition: { label: '条件判断', icon: '🔀', color: '#eab308' },
@@ -13,7 +16,7 @@ const NODE_TYPE_LABELS: Record<string, { label: string; icon: string; color: str
   output: { label: '输出结果', icon: '📤', color: '#22c55e' },
   storage: { label: '数据存储', icon: '💾', color: '#3b82f6' },
   default: { label: '节点', icon: '◉', color: '#6b7280' },
-}
+};
 
 // Property field labels
 const NODE_PROPERTY_LABELS: Record<string, string> = {
@@ -28,7 +31,7 @@ const NODE_PROPERTY_LABELS: Record<string, string> = {
   temperature: '温度',
   maxTokens: '最大 Token',
   systemPrompt: '系统提示',
-}
+};
 
 const EDGE_PROPERTY_LABELS: Record<string, string> = {
   label: '标签',
@@ -36,26 +39,26 @@ const EDGE_PROPERTY_LABELS: Record<string, string> = {
   targetHandle: '目标端口',
   type: '边类型',
   animated: '动画',
-}
+};
 
 export interface FlowPropertiesPanelProps {
   // Selected node
-  selectedNode?: Node | null
-  selectedEdge?: Edge | null
+  selectedNode?: Node | null;
+  selectedEdge?: Edge | null;
   // Update handlers
-  onNodeChange?: (nodeId: string, data: Record<string, any>) => void
-  onEdgeChange?: (edgeId: string, data: Record<string, any>) => void
+  onNodeChange?: (nodeId: string, data: Record<string, any>) => void;
+  onEdgeChange?: (edgeId: string, data: Record<string, any>) => void;
   // Delete handlers
-  onDeleteNode?: (nodeId: string) => void
-  onDeleteEdge?: (edgeId: string) => void
+  onDeleteNode?: (nodeId: string) => void;
+  onDeleteEdge?: (edgeId: string) => void;
   // ClassName for custom styling
-  className?: string
+  className?: string;
 }
 
 // Get node type info
 function getNodeTypeInfo(node: Node) {
-  const nodeType = node.data?.type || node.data?.label?.type || 'default'
-  return NODE_TYPE_LABELS[nodeType] || NODE_TYPE_LABELS.default
+  const nodeType = node.data?.type || node.data?.label?.type || 'default';
+  return NODE_TYPE_LABELS[nodeType] || NODE_TYPE_LABELS.default;
 }
 
 // Property field component
@@ -67,12 +70,12 @@ function PropertyField({
   options,
   rows = 3,
 }: {
-  label: string
-  value: unknown
-  onChange: (value: unknown) => void
-  type?: 'text' | 'textarea' | 'select' | 'boolean' | 'number'
-  options?: { value: string; label: string }[]
-  rows?: number
+  label: string;
+  value: unknown;
+  onChange: (value: unknown) => void;
+  type?: 'text' | 'textarea' | 'select' | 'boolean' | 'number';
+  options?: { value: string; label: string }[];
+  rows?: number;
 }) {
   if (type === 'boolean') {
     return (
@@ -88,7 +91,7 @@ function PropertyField({
           <span className={styles.toggleText}>{value ? '是' : '否'}</span>
         </label>
       </div>
-    )
+    );
   }
 
   if (type === 'select' && options) {
@@ -107,7 +110,7 @@ function PropertyField({
           ))}
         </select>
       </div>
-    )
+    );
   }
 
   if (type === 'textarea' || (typeof value === 'string' && value.length > 50)) {
@@ -121,7 +124,7 @@ function PropertyField({
           rows={rows}
         />
       </div>
-    )
+    );
   }
 
   if (type === 'number') {
@@ -135,7 +138,7 @@ function PropertyField({
           className={styles.propInput}
         />
       </div>
-    )
+    );
   }
 
   return (
@@ -148,14 +151,14 @@ function PropertyField({
         className={styles.propInput}
       />
     </div>
-  )
+  );
 }
 
 /**
  * FlowPropertiesPanel - 属性面板组件
- * 
+ *
  * 用于编辑流程图中选中的节点或边的属性
- * 
+ *
  * @example
  * ```tsx
  * <FlowPropertiesPanel
@@ -175,49 +178,49 @@ export default function FlowPropertiesPanel({
   className,
 }: FlowPropertiesPanelProps) {
   // Determine what's selected
-  const hasSelection = selectedNode || selectedEdge
-  const selectionType = selectedNode ? 'node' : selectedEdge ? 'edge' : null
+  const hasSelection = selectedNode || selectedEdge;
+  const selectionType = selectedNode ? 'node' : selectedEdge ? 'edge' : null;
 
   // Node type info
   const nodeTypeInfo = useMemo(() => {
-    if (!selectedNode) return null
-    return getNodeTypeInfo(selectedNode)
-  }, [selectedNode])
+    if (!selectedNode) return null;
+    return getNodeTypeInfo(selectedNode);
+  }, [selectedNode]);
 
   // Handle node data change
   const handleNodeDataChange = useCallback(
     (key: string, value: unknown) => {
       if (selectedNode && onNodeChange) {
-        onNodeChange(selectedNode.id, { [key]: value })
+        onNodeChange(selectedNode.id, { [key]: value });
       }
     },
     [selectedNode, onNodeChange]
-  )
+  );
 
   // Handle edge data change
   const handleEdgeDataChange = useCallback(
     (key: string, value: unknown) => {
       if (selectedEdge && onEdgeChange) {
-        onEdgeChange(selectedEdge.id, { [key]: value })
+        onEdgeChange(selectedEdge.id, { [key]: value });
       }
     },
     [selectedEdge, onEdgeChange]
-  )
+  );
 
   // Handle delete
   const handleDelete = useCallback(() => {
     if (selectedNode && onDeleteNode) {
-      onDeleteNode(selectedNode.id)
+      onDeleteNode(selectedNode.id);
     } else if (selectedEdge && onDeleteEdge) {
-      onDeleteEdge(selectedEdge.id)
+      onDeleteEdge(selectedEdge.id);
     }
-  }, [selectedNode, selectedEdge, onDeleteNode, onDeleteEdge])
+  }, [selectedNode, selectedEdge, onDeleteNode, onDeleteEdge]);
 
   // Render node properties
   const renderNodeProperties = () => {
-    if (!selectedNode) return null
+    if (!selectedNode) return null;
 
-    const nodeData = selectedNode.data || {}
+    const nodeData = selectedNode.data || {};
 
     return (
       <div className={styles.propsContent}>
@@ -274,21 +277,24 @@ export default function FlowPropertiesPanel({
           <span>删除节点</span>
         </button>
       </div>
-    )
-  }
+    );
+  };
 
   // Render edge properties
   const renderEdgeProperties = () => {
-    if (!selectedEdge) return null
+    if (!selectedEdge) return null;
 
-    const edgeData = selectedEdge
+    const edgeData = selectedEdge;
 
     return (
       <div className={styles.propsContent}>
         {/* Edge Type Header */}
         <div className={styles.propGroup}>
           <label className={styles.propLabel}>边类型</label>
-          <div className={styles.typeTag} style={{ borderColor: '#6b7280', color: '#6b7280' }}>
+          <div
+            className={styles.typeTag}
+            style={{ borderColor: '#6b7280', color: '#6b7280' }}
+          >
             <span>🔗</span>
             <span>{edgeData.type || '默认边'}</span>
           </div>
@@ -320,13 +326,17 @@ export default function FlowPropertiesPanel({
             {edgeData.sourceHandle && (
               <div className={styles.connectionItem}>
                 <span className={styles.connectionLabel}>源端口</span>
-                <span className={styles.connectionValue}>{edgeData.sourceHandle}</span>
+                <span className={styles.connectionValue}>
+                  {edgeData.sourceHandle}
+                </span>
               </div>
             )}
             {edgeData.targetHandle && (
               <div className={styles.connectionItem}>
                 <span className={styles.connectionLabel}>目标端口</span>
-                <span className={styles.connectionValue}>{edgeData.targetHandle}</span>
+                <span className={styles.connectionValue}>
+                  {edgeData.targetHandle}
+                </span>
               </div>
             )}
           </div>
@@ -367,8 +377,8 @@ export default function FlowPropertiesPanel({
           <span>删除边</span>
         </button>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <aside className={`${styles.panel} ${className || ''}`}>
@@ -395,5 +405,5 @@ export default function FlowPropertiesPanel({
         </div>
       )}
     </aside>
-  )
+  );
 }

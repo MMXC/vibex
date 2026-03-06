@@ -1,29 +1,29 @@
 // Input Store - manages requirement text input
 
-import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
-const STORAGE_KEY = 'confirmation-input'
+const STORAGE_KEY = 'confirmation-input';
 
 export interface InputState {
-  requirementText: string
+  requirementText: string;
 }
 
 export interface InputActions {
-  setRequirementText: (text: string) => void
+  setRequirementText: (text: string) => void;
 }
 
-export type InputStore = InputState & InputActions
+export type InputStore = InputState & InputActions;
 
 const initialState: InputState = {
   requirementText: '',
-}
+};
 
 export const useInputStore = create<InputStore>()(
   persist(
     (set) => ({
       ...initialState,
-      
+
       setRequirementText: (text) => set({ requirementText: text }),
     }),
     {
@@ -31,4 +31,4 @@ export const useInputStore = create<InputStore>()(
       storage: createJSONStorage(() => localStorage),
     }
   )
-)
+);

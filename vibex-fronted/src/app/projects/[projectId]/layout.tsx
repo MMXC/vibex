@@ -1,14 +1,14 @@
-import { ProjectLayoutClient } from './ProjectLayoutClient'
+import { ProjectLayoutClient } from './ProjectLayoutClient';
 
 // Required for static export
 export function generateStaticParams() {
-  return []
+  return [];
 }
 
 export default function ProjectLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  return <ProjectLayoutClient>{children}</ProjectLayoutClient>
+  return <ProjectLayoutClient>{children}</ProjectLayoutClient>;
 }

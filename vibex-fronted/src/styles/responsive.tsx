@@ -27,7 +27,9 @@ export function useIsMobile(): boolean {
 }
 
 export function useIsTablet(): boolean {
-  return useMediaQuery(`(min-width: ${breakpoints.md}px) and (max-width: ${breakpoints.lg - 1}px)`);
+  return useMediaQuery(
+    `(min-width: ${breakpoints.md}px) and (max-width: ${breakpoints.lg - 1}px)`
+  );
 }
 
 export function useIsDesktop(): boolean {
@@ -60,7 +62,7 @@ export function ResponsiveProvider({ children }: ResponsiveProviderProps) {
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
   const isDesktop = useIsDesktop();
-  
+
   // 确定当前断点
   const getBreakpoint = (): BreakpointKey => {
     if (isMobile) return 'sm';
@@ -74,12 +76,14 @@ export function ResponsiveProvider({ children }: ResponsiveProviderProps) {
   };
 
   return (
-    <ResponsiveContext.Provider value={{
-      isMobile,
-      isTablet,
-      isDesktop,
-      breakpoint: getBreakpoint(),
-    }}>
+    <ResponsiveContext.Provider
+      value={{
+        isMobile,
+        isTablet,
+        isDesktop,
+        breakpoint: getBreakpoint(),
+      }}
+    >
       {children}
     </ResponsiveContext.Provider>
   );
@@ -94,22 +98,23 @@ interface ShowProps {
 
 export function Show({ children, when, hideOn }: ShowProps) {
   const { isMobile, isTablet, isDesktop } = useResponsive();
-  
+
   // hideOn 逻辑
   if (hideOn) {
     if (hideOn === 'mobile' && isMobile) return null;
     if (hideOn === 'tablet' && isTablet) return null;
     if (hideOn === 'desktop' && isDesktop) return null;
   }
-  
+
   // when 逻辑
   if (when) {
     if (when === 'mobile' && !isMobile) return null;
     if (when === 'tablet' && !isTablet) return null;
     if (when === 'desktop' && !isDesktop) return null;
-    if (typeof when === 'string' && !breakpoints[when as BreakpointKey]) return null;
+    if (typeof when === 'string' && !breakpoints[when as BreakpointKey])
+      return null;
   }
-  
+
   return <>{children}</>;
 }
 
@@ -121,13 +126,13 @@ interface HideProps {
 
 export function Hide({ children, on }: HideProps) {
   const { isMobile, isTablet, isDesktop } = useResponsive();
-  
+
   if (!on) return <>{children}</>;
-  
+
   if (on === 'mobile' && isMobile) return null;
   if (on === 'tablet' && isTablet) return null;
   if (on === 'desktop' && isDesktop) return null;
-  
+
   return <>{children}</>;
 }
 
@@ -138,7 +143,11 @@ interface TouchTargetProps {
   className?: string;
 }
 
-export function TouchTarget({ children, size = 44, className = '' }: TouchTargetProps) {
+export function TouchTarget({
+  children,
+  size = 44,
+  className = '',
+}: TouchTargetProps) {
   const style: React.CSSProperties = {
     minWidth: `${size}px`,
     minHeight: `${size}px`,
@@ -146,7 +155,7 @@ export function TouchTarget({ children, size = 44, className = '' }: TouchTarget
     alignItems: 'center',
     justifyContent: 'center',
   };
-  
+
   return (
     <div className={className} style={style}>
       {children}
@@ -160,14 +169,23 @@ interface SafeAreaProps {
   edges?: ('top' | 'bottom' | 'left' | 'right')[];
 }
 
-export function SafeArea({ children, edges = ['top', 'bottom'] }: SafeAreaProps) {
+export function SafeArea({
+  children,
+  edges = ['top', 'bottom'],
+}: SafeAreaProps) {
   const style: React.CSSProperties = {
     paddingTop: edges.includes('top') ? 'env(safe-area-inset-top)' : undefined,
-    paddingBottom: edges.includes('bottom') ? 'env(safe-area-inset-bottom)' : undefined,
-    paddingLeft: edges.includes('left') ? 'env(safe-area-inset-left)' : undefined,
-    paddingRight: edges.includes('right') ? 'env(safe-area-inset-right)' : undefined,
+    paddingBottom: edges.includes('bottom')
+      ? 'env(safe-area-inset-bottom)'
+      : undefined,
+    paddingLeft: edges.includes('left')
+      ? 'env(safe-area-inset-left)'
+      : undefined,
+    paddingRight: edges.includes('right')
+      ? 'env(safe-area-inset-right)'
+      : undefined,
   };
-  
+
   return <div style={style}>{children}</div>;
 }
 
@@ -179,35 +197,41 @@ interface ResponsiveGridProps {
   className?: string;
 }
 
-export function ResponsiveGrid({ 
-  children, 
+export function ResponsiveGrid({
+  children,
   cols = 1,
   gap = 16,
-  className = '' 
+  className = '',
 }: ResponsiveGridProps) {
   const { isMobile, isTablet } = useResponsive();
-  
-  const gridCols = typeof cols === 'number' 
-    ? cols 
-    : isMobile 
-      ? cols.mobile 
-      : isTablet 
-        ? cols.tablet 
-        : cols.desktop;
-        
-  const gridGap = typeof gap === 'number'
-    ? gap
-    : isMobile
-      ? gap.mobile
-      : isTablet
-        ? gap.tablet
-        : gap.desktop;
-  
+
+  const gridCols =
+    typeof cols === 'number'
+      ? cols
+      : isMobile
+        ? cols.mobile
+        : isTablet
+          ? cols.tablet
+          : cols.desktop;
+
+  const gridGap =
+    typeof gap === 'number'
+      ? gap
+      : isMobile
+        ? gap.mobile
+        : isTablet
+          ? gap.tablet
+          : gap.desktop;
+
   const style: React.CSSProperties = {
     display: 'grid',
     gridTemplateColumns: `repeat(${gridCols}, 1fr)`,
     gap: `${gridGap}px`,
   };
-  
-  return <div className={className} style={style}>{children}</div>;
+
+  return (
+    <div className={className} style={style}>
+      {children}
+    </div>
+  );
 }

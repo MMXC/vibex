@@ -52,7 +52,7 @@ export function AvatarSelector({
 
   // 提取分类
   const categories = useMemo(() => {
-    const cats = new Set(avatars.map(a => a.category));
+    const cats = new Set(avatars.map((a) => a.category));
     return ['all', ...Array.from(cats)];
   }, [avatars]);
 
@@ -62,15 +62,16 @@ export function AvatarSelector({
 
     // 按分类过滤
     if (activeCategory !== 'all') {
-      result = result.filter(a => a.category === activeCategory);
+      result = result.filter((a) => a.category === activeCategory);
     }
 
     // 按搜索词过滤
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(a => 
-        a.name.toLowerCase().includes(query) ||
-        a.description?.toLowerCase().includes(query)
+      result = result.filter(
+        (a) =>
+          a.name.toLowerCase().includes(query) ||
+          a.description?.toLowerCase().includes(query)
       );
     }
 
@@ -83,33 +84,42 @@ export function AvatarSelector({
   }, [avatars, activeCategory, searchQuery]);
 
   // 搜索处理
-  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    onSearch?.(query);
-  }, [onSearch]);
+  const handleSearch = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const query = e.target.value;
+      setSearchQuery(query);
+      onSearch?.(query);
+    },
+    [onSearch]
+  );
 
   // 选择头像
-  const handleSelect = useCallback((avatarId: string) => {
-    if (multiple) {
-      const isSelected = selectedArray.includes(avatarId);
-      
-      if (isSelected) {
-        // 取消选择
-        onSelect?.(selectedArray.filter(id => id !== avatarId));
-      } else if (!maxSelect || selectedArray.length < maxSelect) {
-        // 新增选择
-        onSelect?.([...selectedArray, avatarId]);
+  const handleSelect = useCallback(
+    (avatarId: string) => {
+      if (multiple) {
+        const isSelected = selectedArray.includes(avatarId);
+
+        if (isSelected) {
+          // 取消选择
+          onSelect?.(selectedArray.filter((id) => id !== avatarId));
+        } else if (!maxSelect || selectedArray.length < maxSelect) {
+          // 新增选择
+          onSelect?.([...selectedArray, avatarId]);
+        }
+      } else {
+        onSelect?.(avatarId);
       }
-    } else {
-      onSelect?.(avatarId);
-    }
-  }, [multiple, selectedArray, maxSelect, onSelect]);
+    },
+    [multiple, selectedArray, maxSelect, onSelect]
+  );
 
   // 检查是否选中
-  const isSelected = useCallback((avatarId: string) => {
-    return selectedArray.includes(avatarId);
-  }, [selectedArray]);
+  const isSelected = useCallback(
+    (avatarId: string) => {
+      return selectedArray.includes(avatarId);
+    },
+    [selectedArray]
+  );
 
   return (
     <div className={`${styles.container} ${className}`}>
@@ -126,7 +136,7 @@ export function AvatarSelector({
 
       {/* 分类过滤 */}
       <div className={styles.categories}>
-        {categories.map(cat => (
+        {categories.map((cat) => (
           <button
             key={cat}
             className={`${styles.categoryButton} ${activeCategory === cat ? styles.active : ''}`}
@@ -140,7 +150,7 @@ export function AvatarSelector({
 
       {/* 头像网格 */}
       <div className={styles.avatarGrid}>
-        {filteredAvatars.map(avatar => (
+        {filteredAvatars.map((avatar) => (
           <div
             key={avatar.id}
             className={`${styles.avatarItem} ${isSelected(avatar.id) ? styles.selected : ''}`}
@@ -155,12 +165,13 @@ export function AvatarSelector({
             }}
           >
             <div className={styles.avatarImage}>
-              <img 
-                src={avatar.avatar} 
+              <img
+                src={avatar.avatar}
                 alt={avatar.name}
                 onError={(e) => {
                   // 回退到默认头像
-                  (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="35" r="20" fill="%23ccc"/><circle cx="50" cy="100" r="35" fill="%23ccc"/></svg>';
+                  (e.target as HTMLImageElement).src =
+                    'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="35" r="20" fill="%23ccc"/><circle cx="50" cy="100" r="35" fill="%23ccc"/></svg>';
                 }}
               />
               {avatar.recentlyUsed && (
@@ -216,10 +227,16 @@ export function AvatarSelectorModal({
 
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modal} onClick={e => e.stopPropagation()}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
           <h3 className={styles.modalTitle}>{title}</h3>
-          <button className={styles.closeButton} onClick={onClose} type="button">×</button>
+          <button
+            className={styles.closeButton}
+            onClick={onClose}
+            type="button"
+          >
+            ×
+          </button>
         </div>
         <AvatarSelector {...props} />
       </div>

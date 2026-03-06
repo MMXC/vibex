@@ -18,31 +18,37 @@ export interface AuthApi {
 class AuthApiImpl implements AuthApi {
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     const result = await retry.execute(async () => {
-      const response = await httpClient.post<{ data: AuthResponse }>('/auth/login', credentials);
+      const response = await httpClient.post<{ data: AuthResponse }>(
+        '/auth/login',
+        credentials
+      );
       return response;
     });
     const data: AuthResponse = (result as any).data || result;
-    
+
     if (typeof window !== 'undefined') {
       localStorage.setItem('auth_token', data.token);
       localStorage.setItem('user_id', data.user.id);
     }
-    
+
     return data;
   }
 
   async register(data: RegisterRequest): Promise<AuthResponse> {
     const result = await retry.execute(async () => {
-      const response = await httpClient.post<{ data: AuthResponse }>('/auth/register', data);
+      const response = await httpClient.post<{ data: AuthResponse }>(
+        '/auth/register',
+        data
+      );
       return response;
     });
     const authResult: AuthResponse = (result as any).data || result;
-    
+
     if (typeof window !== 'undefined') {
       localStorage.setItem('auth_token', authResult.token);
       localStorage.setItem('user_id', authResult.user.id);
     }
-    
+
     return authResult;
   }
 
@@ -59,11 +65,11 @@ class AuthApiImpl implements AuthApi {
       const response = await httpClient.post<SuccessResponse>('/auth/logout');
       return response;
     });
-    
+
     if (typeof window !== 'undefined') {
       localStorage.removeItem('auth_token');
     }
-    
+
     return result;
   }
 }

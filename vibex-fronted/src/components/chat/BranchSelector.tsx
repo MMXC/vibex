@@ -42,12 +42,15 @@ export function BranchSelector({
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const currentBranch = branches.find(b => b.id === activeBranchId);
+  const currentBranch = branches.find((b) => b.id === activeBranchId);
 
   // 点击外部关闭下拉菜单
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -75,7 +78,10 @@ export function BranchSelector({
     onOpenBranchDialog?.();
   };
 
-  if (branches.length === 0 || (branches.length === 1 && !branches[0].parentBranchId)) {
+  if (
+    branches.length === 0 ||
+    (branches.length === 1 && !branches[0].parentBranchId)
+  ) {
     // 只有一个分支且没有父分支时，不显示选择器
     return null;
   }
@@ -99,7 +105,9 @@ export function BranchSelector({
           {currentBranch?.name || '选择分支'}
         </span>
         {branches.length > 1 && (
-          <span className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ''}`}>
+          <span
+            className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ''}`}
+          >
             ▼
           </span>
         )}
@@ -126,7 +134,9 @@ export function BranchSelector({
                 aria-selected={branch.id === activeBranchId}
               >
                 <span className={styles.branchName}>{branch.name}</span>
-                <span className={styles.messageCount}>{branch.messageCount} 条</span>
+                <span className={styles.messageCount}>
+                  {branch.messageCount} 条
+                </span>
               </button>
             ))}
           </div>
@@ -158,7 +168,9 @@ export function useBranchSelector(
   initialActiveId?: string
 ) {
   const [branches, setBranches] = useState<Branch[]>(initialBranches);
-  const [activeBranchId, setActiveBranchId] = useState<string | undefined>(initialActiveId);
+  const [activeBranchId, setActiveBranchId] = useState<string | undefined>(
+    initialActiveId
+  );
 
   const handleSwitchBranch = (branchId: string) => {
     setActiveBranchId(branchId);
@@ -169,17 +181,19 @@ export function useBranchSelector(
   };
 
   const addBranch = (branch: Branch) => {
-    setBranches(prev => [...prev, branch]);
+    setBranches((prev) => [...prev, branch]);
   };
 
   const removeBranch = (branchId: string) => {
-    setBranches(prev => prev.filter(b => b.id !== branchId));
+    setBranches((prev) => prev.filter((b) => b.id !== branchId));
     if (activeBranchId === branchId) {
       setActiveBranchId(branches[0]?.id);
     }
   };
 
-  const BranchSelectorComponent = (props: Omit<BranchSelectorProps, 'branches' | 'activeBranchId'>) => (
+  const BranchSelectorComponent = (
+    props: Omit<BranchSelectorProps, 'branches' | 'activeBranchId'>
+  ) => (
     <BranchSelector
       branches={branches}
       activeBranchId={activeBranchId}

@@ -1,4 +1,9 @@
-import { Project, ProjectCreate, ProjectUpdate, ProjectRole } from '../types/project';
+import {
+  Project,
+  ProjectCreate,
+  ProjectUpdate,
+  ProjectRole,
+} from '../types/project';
 import { SuccessResponse } from '../types/common';
 import { httpClient } from '../client';
 import { retry } from '../retry';
@@ -33,13 +38,15 @@ class ProjectApiImpl implements ProjectApi {
   async getProjects(userId: string): Promise<Project[]> {
     const cacheKey = getCacheKey('projects', userId);
     const cached = cache.get<Project[]>(cacheKey);
-    
+
     if (!this.isOnline() && cached) {
       return cached;
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ projects: Project[] }>('/projects', { params: { userId } });
+      return await httpClient.get<{ projects: Project[] }>('/projects', {
+        params: { userId },
+      });
     });
     const projects: Project[] = (result as any).projects || result;
     cache.set(cacheKey, projects);
@@ -49,13 +56,15 @@ class ProjectApiImpl implements ProjectApi {
   async getProject(projectId: string): Promise<Project> {
     const cacheKey = getCacheKey('project', projectId);
     const cached = cache.get<Project>(cacheKey);
-    
+
     if (!this.isOnline() && cached) {
       return cached;
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ project: Project }>(`/projects/${projectId}`);
+      return await httpClient.get<{ project: Project }>(
+        `/projects/${projectId}`
+      );
     });
     const project: Project = (result as any).project || result;
     cache.set(cacheKey, project);
@@ -71,9 +80,15 @@ class ProjectApiImpl implements ProjectApi {
     return created;
   }
 
-  async updateProject(projectId: string, data: ProjectUpdate): Promise<Project> {
+  async updateProject(
+    projectId: string,
+    data: ProjectUpdate
+  ): Promise<Project> {
     const result = await retry.execute(async () => {
-      return await httpClient.put<{ project: Project }>(`/projects/${projectId}`, data);
+      return await httpClient.put<{ project: Project }>(
+        `/projects/${projectId}`,
+        data
+      );
     });
     const project: Project = (result as any).project || result;
     cache.remove(getCacheKey('project', projectId));
@@ -89,21 +104,29 @@ class ProjectApiImpl implements ProjectApi {
 
   async softDeleteProject(projectId: string): Promise<Project> {
     const result = await retry.execute(async () => {
-      return await httpClient.patch<{ project: Project }>(`/projects/${projectId}/soft-delete`, {});
+      return await httpClient.patch<{ project: Project }>(
+        `/projects/${projectId}/soft-delete`,
+        {}
+      );
     });
     return (result as any).project || result;
   }
 
   async restoreProject(projectId: string): Promise<Project> {
     const result = await retry.execute(async () => {
-      return await httpClient.patch<{ project: Project }>(`/projects/${projectId}/restore`, {});
+      return await httpClient.patch<{ project: Project }>(
+        `/projects/${projectId}/restore`,
+        {}
+      );
     });
     return (result as any).project || result;
   }
 
   async permanentDeleteProject(projectId: string): Promise<SuccessResponse> {
     const result = await retry.execute(async () => {
-      return await httpClient.delete<SuccessResponse>(`/projects/${projectId}/permanent`);
+      return await httpClient.delete<SuccessResponse>(
+        `/projects/${projectId}/permanent`
+      );
     });
     return result;
   }
@@ -124,7 +147,9 @@ class ProjectApiImpl implements ProjectApi {
 
   async getProjectRole(projectId: string): Promise<{ role: ProjectRole }> {
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ role: ProjectRole }>(`/projects/${projectId}/role`);
+      return await httpClient.get<{ role: ProjectRole }>(
+        `/projects/${projectId}/role`
+      );
     });
     return result;
   }

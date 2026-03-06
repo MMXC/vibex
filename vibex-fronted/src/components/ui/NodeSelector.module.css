@@ -21,7 +21,9 @@
   border: 1px solid var(--border, #e0e0e0);
   border-radius: 8px;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .searchInput:focus {
@@ -254,40 +256,40 @@
     border-color: #3a3a3a;
     color: #e0e0e0;
   }
-  
+
   .categoryButton {
     background: #2a2a2a;
     border-color: #3a3a3a;
     color: #999;
   }
-  
+
   .nodeItem {
     background: #1a1a1a;
     border-color: #2a2a2a;
   }
-  
+
   .nodeItem:hover,
   .nodeItem.selected {
     background: rgba(59, 130, 246, 0.1);
     border-color: #3b82f6;
   }
-  
+
   .nodeIcon {
     background: #2a2a2a;
   }
-  
+
   .nodeName {
     color: #e0e0e0;
   }
-  
+
   .modal {
     background: #1a1a1a;
   }
-  
+
   .modalHeader {
     border-color: #2a2a2a;
   }
-  
+
   .modalTitle {
     color: #e0e0e0;
   }
@@ -298,30 +300,30 @@
   .searchBar {
     flex-direction: column;
   }
-  
+
   .searchInput {
     width: 100%;
   }
-  
+
   .batchActions {
     width: 100%;
     justify-content: space-between;
   }
-  
+
   .batchButton {
     flex: 1;
   }
-  
+
   .categories {
     overflow-x: auto;
     flex-wrap: nowrap;
     padding-bottom: 8px;
   }
-  
+
   .categoryButton {
     flex-shrink: 0;
   }
-  
+
   .modal {
     max-height: 85vh;
   }

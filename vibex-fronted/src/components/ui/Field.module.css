@@ -97,11 +97,14 @@
 }
 
 @keyframes fieldInputGlow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 3px var(--color-primary-muted);
   }
   50% {
-    box-shadow: 0 0 0 4px var(--color-primary-muted), 0 0 20px var(--color-primary-muted);
+    box-shadow:
+      0 0 0 4px var(--color-primary-muted),
+      0 0 20px var(--color-primary-muted);
   }
 }
 
@@ -148,7 +151,7 @@
   gap: var(--space-3);
 }
 
-.field .checkboxWrapper input[type="checkbox"] {
+.field .checkboxWrapper input[type='checkbox'] {
   width: 20px;
   height: 20px;
   padding: 0;

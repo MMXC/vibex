@@ -106,27 +106,27 @@
     background: var(--toast-bg-dark, #2a2a2a);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   }
-  
+
   .message {
     color: var(--toast-text-dark, #e0e0e0);
   }
-  
+
   .close {
     color: var(--toast-text-dark, #999);
   }
-  
+
   .success {
     background: rgba(76, 175, 80, 0.15);
   }
-  
+
   .error {
     background: rgba(244, 67, 54, 0.15);
   }
-  
+
   .warning {
     background: rgba(255, 152, 0, 0.15);
   }
-  
+
   .info {
     background: rgba(33, 150, 243, 0.15);
   }
@@ -140,7 +140,7 @@
     left: 8px;
     max-width: none;
   }
-  
+
   .toast {
     font-size: 13px;
     padding: 10px 12px;

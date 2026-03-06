@@ -57,18 +57,20 @@ export function Pagination({
   const [uncontrolledCurrent, setUncontrolledCurrent] = React.useState(
     defaultCurrent <= totalPages ? defaultCurrent : 1
   );
-  const [uncontrolledPageSize, setUncontrolledPageSize] = React.useState(pageSize);
+  const [uncontrolledPageSize, setUncontrolledPageSize] =
+    React.useState(pageSize);
   const [jumpValue, setJumpValue] = React.useState('');
 
   // 受控优先
-  const current = controlledCurrent !== undefined 
-    ? controlledCurrent 
-    : uncontrolledCurrent;
-  const currentPageSize = pageSizeOptions.includes(pageSize) ? pageSize : uncontrolledPageSize;
+  const current =
+    controlledCurrent !== undefined ? controlledCurrent : uncontrolledCurrent;
+  const currentPageSize = pageSizeOptions.includes(pageSize)
+    ? pageSize
+    : uncontrolledPageSize;
 
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages || disabled) return;
-    
+
     if (controlledCurrent === undefined) {
       setUncontrolledCurrent(page);
     }
@@ -103,7 +105,7 @@ export function Pagination({
   const getPageNumbers = () => {
     const pages: (number | 'ellipsis')[] = [];
     const visible = Math.min(maxVisiblePages, totalPages);
-    
+
     if (totalPages <= visible + 2) {
       // 全部显示
       for (let i = 1; i <= totalPages; i++) {
@@ -112,11 +114,11 @@ export function Pagination({
     } else {
       // 总是显示第一页
       pages.push(1);
-      
+
       const half = Math.floor(visible / 2);
       let start = current - half;
       let end = current + half;
-      
+
       // 调整边界
       if (start <= 2) {
         start = 2;
@@ -126,32 +128,32 @@ export function Pagination({
         end = totalPages - 1;
         start = totalPages - visible;
       }
-      
+
       // 左侧省略号
       if (start > 2) {
         pages.push('ellipsis');
       }
-      
+
       // 中间页码
       for (let i = start; i <= end; i++) {
         pages.push(i);
       }
-      
+
       // 右侧省略号
       if (end < totalPages - 1) {
         pages.push('ellipsis');
       }
-      
+
       // 总是显示最后一页
       pages.push(totalPages);
     }
-    
+
     return pages;
   };
 
   const renderPageNumbers = () => {
     if (simple) return null;
-    
+
     return getPageNumbers().map((page, index) => {
       if (page === 'ellipsis') {
         return (
@@ -160,7 +162,7 @@ export function Pagination({
           </span>
         );
       }
-      
+
       const isActive = page === current;
       return (
         <button
@@ -235,7 +237,12 @@ export function Pagination({
           disabled={disabled || current <= 1}
           aria-label="上一页"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <path d="M15 18l-6-6 6-6" />
           </svg>
         </button>
@@ -248,7 +255,12 @@ export function Pagination({
           disabled={disabled || current >= totalPages}
           aria-label="下一页"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <path d="M9 18l6-6-6-6" />
           </svg>
         </button>
@@ -263,7 +275,7 @@ export function Pagination({
   return (
     <div className={`${styles.container} ${styles[variant]} ${className}`}>
       {renderTotal()}
-      
+
       <div className={styles.controls}>
         <button
           className={styles.navButton}
@@ -271,18 +283,28 @@ export function Pagination({
           disabled={disabled || current <= 1}
           aria-label="第一页"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <path d="M11 17l-5-5 5-5M18 17l-5-5 5-5" />
           </svg>
         </button>
-        
+
         <button
           className={styles.navButton}
           onClick={() => handlePageChange(current - 1)}
           disabled={disabled || current <= 1}
           aria-label="上一页"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <path d="M15 18l-6-6 6-6" />
           </svg>
         </button>
@@ -295,7 +317,12 @@ export function Pagination({
           disabled={disabled || current >= totalPages}
           aria-label="下一页"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <path d="M9 18l6-6-6-6" />
           </svg>
         </button>
@@ -306,7 +333,12 @@ export function Pagination({
           disabled={disabled || current >= totalPages}
           aria-label="最后一页"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <path d="M13 17l5-5-5-5M6 17l5-5-5-5" />
           </svg>
         </button>

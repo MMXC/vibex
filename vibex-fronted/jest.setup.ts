@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom';
 
 // Mock axios with proper AxiosError
 jest.mock('axios', () => {
@@ -9,7 +9,12 @@ jest.mock('axios', () => {
     config: any = {};
     request: any = {};
 
-    constructor(message: string, code?: string, config?: any, response?: { status?: number }) {
+    constructor(
+      message: string,
+      code?: string,
+      config?: any,
+      response?: { status?: number }
+    ) {
       super(message);
       this.name = 'AxiosError';
       this.code = code;
@@ -17,7 +22,7 @@ jest.mock('axios', () => {
       this.response = response;
     }
   }
-  
+
   return {
     __esModule: true,
     AxiosError: MockAxiosError,
@@ -50,17 +55,17 @@ jest.mock('axios', () => {
 Object.defineProperty(window, 'scrollIntoView', {
   writable: true,
   value: jest.fn(),
-})
+});
 
 // Mock Element.prototype.scrollIntoView
 if (typeof Element !== 'undefined') {
-  Element.prototype.scrollIntoView = jest.fn()
+  Element.prototype.scrollIntoView = jest.fn();
 }
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: jest.fn().mockImplementation(query => ({
+  value: jest.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -70,7 +75,7 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: jest.fn(),
     dispatchEvent: jest.fn(),
   })),
-})
+});
 
 // Mock Next.js navigation
 jest.mock('next/navigation', () => ({
@@ -87,7 +92,7 @@ jest.mock('next/navigation', () => ({
   Router: {
     events: null,
   },
-}))
+}));
 
 // Mock localStorage
 const localStorageMock = {
@@ -95,5 +100,5 @@ const localStorageMock = {
   setItem: jest.fn(),
   removeItem: jest.fn(),
   clear: jest.fn(),
-}
-Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+};
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });

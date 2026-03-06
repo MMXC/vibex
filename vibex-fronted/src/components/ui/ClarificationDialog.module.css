@@ -10,8 +10,12 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .dialog {
@@ -207,68 +211,68 @@
   .overlay {
     background: rgba(0, 0, 0, 0.7);
   }
-  
+
   .dialog {
     background: #1a1a1a;
   }
-  
+
   .progress {
     background: #222;
   }
-  
+
   .progressDot {
     background: #333;
   }
-  
+
   .title {
     color: #e0e0e0;
   }
-  
+
   .question {
     color: #e0e0e0;
   }
-  
+
   .content {
     background: #1a1a1a;
   }
-  
+
   .option {
     background: #2a2a2a;
     color: #e0e0e0;
   }
-  
+
   .option:hover {
     background: rgba(59, 130, 246, 0.15);
     border-color: rgba(59, 130, 246, 0.3);
   }
-  
+
   .option.selected {
     background: rgba(59, 130, 246, 0.2);
     color: #60a5fa;
   }
-  
+
   .textInput {
     background: #2a2a2a;
     color: #e0e0e0;
     border-color: #333;
   }
-  
+
   .textInput:focus {
     border-color: #3b82f6;
     background: #222;
   }
-  
+
   .actions {
     background: #222;
     border-color: #2a2a2a;
   }
-  
+
   .skipButton,
   .backButton {
     color: #999;
     border-color: #333;
   }
-  
+
   .skipButton:hover,
   .backButton:hover {
     background: #2a2a2a;
@@ -281,26 +285,26 @@
     width: 95%;
     border-radius: 12px;
   }
-  
+
   .progress {
     padding: 16px;
   }
-  
+
   .content {
     padding: 20px;
   }
-  
+
   .actions {
     flex-direction: column;
     gap: 12px;
     padding: 16px 20px;
   }
-  
+
   .leftActions,
   .rightActions {
     width: 100%;
   }
-  
+
   .skipButton,
   .backButton,
   .nextButton,

@@ -1,9 +1,9 @@
 /**
  * AI Client Service - Frontend AI Capabilities Interface
- * 
+ *
  * A client-side service that provides unified AI capabilities for the VibeX frontend.
  * Communicates with backend AI endpoints and supports streaming responses.
- * 
+ *
  * Features:
  * - Unified interface for all AI operations
  * - Streaming support for real-time responses
@@ -11,7 +11,7 @@
  * - Requirements analysis and entity extraction
  * - UI generation capabilities
  * - Error handling and retry logic
- * 
+ *
  * @module services/ai-client
  */
 
@@ -247,7 +247,9 @@ export class AIClient {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+        throw new Error(
+          errorData.error || `HTTP ${response.status}: ${response.statusText}`
+        );
       }
 
       return await response.json();
@@ -281,7 +283,7 @@ export class AIClient {
    * Delay utility
    */
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -318,20 +320,21 @@ export class AIClient {
     }
 
     try {
-      const result = await this.fetchWithRetry<{ content: string; conversationId?: string; usage?: TokenUsage }>(
-        `${this.config.baseURL}/chat`,
-        {
-          method: 'POST',
-          headers: this.buildHeaders(),
-          body: JSON.stringify({
-            message: request.message,
-            conversationId: request.conversationId,
-            history: request.history,
-            temperature: request.temperature,
-            maxTokens: request.maxTokens,
-          }),
-        }
-      );
+      const result = await this.fetchWithRetry<{
+        content: string;
+        conversationId?: string;
+        usage?: TokenUsage;
+      }>(`${this.config.baseURL}/chat`, {
+        method: 'POST',
+        headers: this.buildHeaders(),
+        body: JSON.stringify({
+          message: request.message,
+          conversationId: request.conversationId,
+          history: request.history,
+          temperature: request.temperature,
+          maxTokens: request.maxTokens,
+        }),
+      });
 
       return {
         success: true,
@@ -484,7 +487,10 @@ export class AIClient {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Requirements analysis failed',
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Requirements analysis failed',
       };
     }
   }
@@ -523,7 +529,10 @@ export class AIClient {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to generate questions',
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Failed to generate questions',
       };
     }
   }
@@ -564,7 +573,8 @@ export class AIClient {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Entity extraction failed',
+        error:
+          error instanceof Error ? error.message : 'Entity extraction failed',
       };
     }
   }
@@ -603,7 +613,8 @@ export class AIClient {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Relation analysis failed',
+        error:
+          error instanceof Error ? error.message : 'Relation analysis failed',
       };
     }
   }
@@ -677,17 +688,20 @@ export class AIClient {
     this.abortController = new AbortController();
 
     try {
-      const response = await fetch(`${this.config.baseURL}/ai/generate-ui/stream`, {
-        method: 'POST',
-        headers: this.buildHeaders(),
-        body: JSON.stringify({
-          description,
-          framework: options?.framework ?? 'react',
-          uiLibrary: options?.uiLibrary ?? 'tailwind',
-          platforms: options?.platforms ?? ['desktop', 'tablet', 'mobile'],
-        }),
-        signal: this.abortController.signal,
-      });
+      const response = await fetch(
+        `${this.config.baseURL}/ai/generate-ui/stream`,
+        {
+          method: 'POST',
+          headers: this.buildHeaders(),
+          body: JSON.stringify({
+            description,
+            framework: options?.framework ?? 'react',
+            uiLibrary: options?.uiLibrary ?? 'tailwind',
+            platforms: options?.platforms ?? ['desktop', 'tablet', 'mobile'],
+          }),
+          signal: this.abortController.signal,
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -743,7 +757,10 @@ export class AIClient {
 
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'UI generation stream failed',
+        error:
+          error instanceof Error
+            ? error.message
+            : 'UI generation stream failed',
       };
     } finally {
       this.abortController = null;
@@ -755,10 +772,7 @@ export class AIClient {
   /**
    * Summarize text
    */
-  async summarize(
-    text: string,
-    maxLength?: number
-  ): Promise<AIResult<string>> {
+  async summarize(text: string, maxLength?: number): Promise<AIResult<string>> {
     if (!this.isOnline()) {
       return {
         success: false,
@@ -907,7 +921,8 @@ export class AIClient {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'JSON generation failed',
+        error:
+          error instanceof Error ? error.message : 'JSON generation failed',
       };
     }
   }
@@ -930,15 +945,17 @@ export class AIClient {
   /**
    * Check AI service health
    */
-  async checkHealth(): Promise<AIResult<{ status: string; providers: string[] }>> {
+  async checkHealth(): Promise<
+    AIResult<{ status: string; providers: string[] }>
+  > {
     try {
-      const result = await this.fetchWithRetry<{ status: string; providers: string[] }>(
-        `${this.config.baseURL}/ai/health`,
-        {
-          method: 'GET',
-          headers: this.buildHeaders(),
-        }
-      );
+      const result = await this.fetchWithRetry<{
+        status: string;
+        providers: string[];
+      }>(`${this.config.baseURL}/ai/health`, {
+        method: 'GET',
+        headers: this.buildHeaders(),
+      });
 
       return {
         success: true,
@@ -1006,11 +1023,11 @@ export async function quickChat(
 ): Promise<string> {
   const client = getAIClient();
   const result = await client.chat({ message, history });
-  
+
   if (!result.success || !result.data) {
     throw new Error(result.error || 'Chat failed');
   }
-  
+
   return result.data.content;
 }
 
@@ -1022,11 +1039,11 @@ export async function quickAnalyzeRequirements(
 ): Promise<RequirementsAnalysisResult> {
   const client = getAIClient();
   const result = await client.analyzeRequirements(requirementText);
-  
+
   if (!result.success || !result.data) {
     throw new Error(result.error || 'Requirements analysis failed');
   }
-  
+
   return result.data;
 }
 
@@ -1038,11 +1055,11 @@ export async function quickExtractEntities(
 ): Promise<ExtractedEntity[]> {
   const client = getAIClient();
   const result = await client.extractEntities(text);
-  
+
   if (!result.success || !result.data) {
     throw new Error(result.error || 'Entity extraction failed');
   }
-  
+
   return result.data;
 }
 

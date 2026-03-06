@@ -1,4 +1,9 @@
-import { Requirement, RequirementCreate, RequirementUpdate, AnalysisResult } from '../types/prototype/requirement';
+import {
+  Requirement,
+  RequirementCreate,
+  RequirementUpdate,
+  AnalysisResult,
+} from '../types/prototype/requirement';
 import { SuccessResponse } from '../types/common';
 import { httpClient } from '../client';
 import { retry } from '../retry';
@@ -10,10 +15,20 @@ export interface RequirementApi {
   getRequirements(userId: string): Promise<Requirement[]>;
   getRequirement(requirementId: string): Promise<Requirement>;
   createRequirement(requirement: RequirementCreate): Promise<Requirement>;
-  updateRequirement(requirementId: string, data: RequirementUpdate, userId?: string): Promise<Requirement>;
-  deleteRequirement(requirementId: string, userId: string): Promise<SuccessResponse>;
+  updateRequirement(
+    requirementId: string,
+    data: RequirementUpdate,
+    userId?: string
+  ): Promise<Requirement>;
+  deleteRequirement(
+    requirementId: string,
+    userId: string
+  ): Promise<SuccessResponse>;
   analyzeRequirement(requirementId: string): Promise<Requirement>;
-  reanalyzeRequirement(requirementId: string, context?: Record<string, unknown>): Promise<Requirement>;
+  reanalyzeRequirement(
+    requirementId: string,
+    context?: Record<string, unknown>
+  ): Promise<Requirement>;
   getAnalysisResult(requirementId: string): Promise<AnalysisResult | null>;
 }
 
@@ -30,13 +45,16 @@ class RequirementApiImpl implements RequirementApi {
   async getRequirements(userId: string): Promise<Requirement[]> {
     const cacheKey = getCacheKey('requirements', userId);
     const cached = cache.get<Requirement[]>(cacheKey);
-    
+
     if (!this.isOnline() && cached) {
       return cached;
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ requirements: Requirement[] }>('/requirements', { params: { userId } });
+      return await httpClient.get<{ requirements: Requirement[] }>(
+        '/requirements',
+        { params: { userId } }
+      );
     });
     const requirements: Requirement[] = (result as any).requirements || result;
     cache.set(cacheKey, requirements);
@@ -46,31 +64,45 @@ class RequirementApiImpl implements RequirementApi {
   async getRequirement(requirementId: string): Promise<Requirement> {
     const cacheKey = getCacheKey('requirement', requirementId);
     const cached = cache.get<Requirement>(cacheKey);
-    
+
     if (!this.isOnline() && cached) {
       return cached;
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ requirement: Requirement }>(`/requirements/${requirementId}`);
+      return await httpClient.get<{ requirement: Requirement }>(
+        `/requirements/${requirementId}`
+      );
     });
     const requirement: Requirement = (result as any).requirement || result;
     cache.set(cacheKey, requirement);
     return requirement;
   }
 
-  async createRequirement(requirement: RequirementCreate): Promise<Requirement> {
+  async createRequirement(
+    requirement: RequirementCreate
+  ): Promise<Requirement> {
     const result = await retry.execute(async () => {
-      return await httpClient.post<{ requirement: Requirement }>('/requirements', requirement);
+      return await httpClient.post<{ requirement: Requirement }>(
+        '/requirements',
+        requirement
+      );
     });
     const created: Requirement = (result as any).requirement || result;
     cache.remove(getCacheKey('requirements', requirement.userId));
     return created;
   }
 
-  async updateRequirement(requirementId: string, data: RequirementUpdate, userId?: string): Promise<Requirement> {
+  async updateRequirement(
+    requirementId: string,
+    data: RequirementUpdate,
+    userId?: string
+  ): Promise<Requirement> {
     const result = await retry.execute(async () => {
-      return await httpClient.put<{ requirement: Requirement }>(`/requirements/${requirementId}`, data);
+      return await httpClient.put<{ requirement: Requirement }>(
+        `/requirements/${requirementId}`,
+        data
+      );
     });
     const requirement: Requirement = (result as any).requirement || result;
     cache.remove(getCacheKey('requirement', requirementId));
@@ -80,9 +112,14 @@ class RequirementApiImpl implements RequirementApi {
     return requirement;
   }
 
-  async deleteRequirement(requirementId: string, userId: string): Promise<SuccessResponse> {
+  async deleteRequirement(
+    requirementId: string,
+    userId: string
+  ): Promise<SuccessResponse> {
     const result = await retry.execute(async () => {
-      return await httpClient.delete<SuccessResponse>(`/requirements/${requirementId}`);
+      return await httpClient.delete<SuccessResponse>(
+        `/requirements/${requirementId}`
+      );
     });
     cache.remove(getCacheKey('requirement', requirementId));
     cache.remove(getCacheKey('requirements', userId));
@@ -91,34 +128,47 @@ class RequirementApiImpl implements RequirementApi {
 
   async analyzeRequirement(requirementId: string): Promise<Requirement> {
     const result = await retry.execute(async () => {
-      return await httpClient.post<{ requirement: Requirement }>(`/requirements/${requirementId}/analyze`);
+      return await httpClient.post<{ requirement: Requirement }>(
+        `/requirements/${requirementId}/analyze`
+      );
     });
     const requirement: Requirement = (result as any).requirement || result;
     cache.remove(getCacheKey('requirement', requirementId));
     return requirement;
   }
 
-  async reanalyzeRequirement(requirementId: string, context?: Record<string, unknown>): Promise<Requirement> {
+  async reanalyzeRequirement(
+    requirementId: string,
+    context?: Record<string, unknown>
+  ): Promise<Requirement> {
     const result = await retry.execute(async () => {
-      return await httpClient.post<{ requirement: Requirement }>(`/requirements/${requirementId}/reanalyze`, context);
+      return await httpClient.post<{ requirement: Requirement }>(
+        `/requirements/${requirementId}/reanalyze`,
+        context
+      );
     });
     const requirement: Requirement = (result as any).requirement || result;
     cache.remove(getCacheKey('requirement', requirementId));
     return requirement;
   }
 
-  async getAnalysisResult(requirementId: string): Promise<AnalysisResult | null> {
+  async getAnalysisResult(
+    requirementId: string
+  ): Promise<AnalysisResult | null> {
     const cacheKey = getCacheKey('analysis_result', requirementId);
     const cached = cache.get<AnalysisResult | null>(cacheKey);
-    
+
     if (!this.isOnline() && cached) {
       return cached;
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ analysisResult: AnalysisResult }>(`/requirements/${requirementId}/analysis`);
+      return await httpClient.get<{ analysisResult: AnalysisResult }>(
+        `/requirements/${requirementId}/analysis`
+      );
     });
-    const analysisResult: AnalysisResult = (result as any).analysisResult || result;
+    const analysisResult: AnalysisResult =
+      (result as any).analysisResult || result;
     cache.set(cacheKey, analysisResult);
     return analysisResult;
   }

@@ -23,7 +23,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: 
+  background-image:
     linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 50px 50px;
@@ -35,7 +35,11 @@
   right: -200px;
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(0, 255, 255, 0.15) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 255, 0.15) 0%,
+    transparent 70%
+  );
   border-radius: 50%;
   animation: float 20s ease-in-out infinite;
 }
@@ -46,13 +50,18 @@
   left: -200px;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(139, 92, 246, 0.15) 0%,
+    transparent 70%
+  );
   border-radius: 50%;
   animation: float 25s ease-in-out infinite reverse;
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translate(0, 0);
   }
   50% {
@@ -92,16 +101,23 @@
 }
 
 @keyframes pulseGlow {
-  0%, 100% {
+  0%,
+  100% {
     text-shadow: 0 0 10px var(--color-primary-glow);
   }
   50% {
-    text-shadow: 0 0 20px var(--color-primary-glow), 0 0 40px var(--color-primary-muted);
+    text-shadow:
+      0 0 20px var(--color-primary-glow),
+      0 0 40px var(--color-primary-muted);
   }
 }
 
 .logoText {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -127,7 +143,11 @@
 
 .ctaButton {
   padding: 8px 20px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 100%
+  );
   color: var(--color-text-inverse);
   border-radius: 8px;
   text-decoration: none;
@@ -178,8 +198,13 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .title {
@@ -191,7 +216,12 @@
 }
 
 .titleGradient {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 50%, var(--color-pink) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 50%,
+    var(--color-pink) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -212,7 +242,11 @@
 .primaryButton {
   position: relative;
   padding: 16px 32px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 100%
+  );
   color: var(--color-text-inverse);
   border-radius: 8px;
   text-decoration: none;
@@ -233,13 +267,23 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
   animation: buttonShine 3s ease-in-out infinite;
 }
 
 @keyframes buttonShine {
-  0% { left: -100%; }
-  50%, 100% { left: 100%; }
+  0% {
+    left: -100%;
+  }
+  50%,
+  100% {
+    left: 100%;
+  }
 }
 
 .secondaryButton {
@@ -284,9 +328,15 @@
   border-radius: 50%;
 }
 
-.codeDot:nth-child(1) { background: #ff5f57; }
-.codeDot:nth-child(2) { background: #febc2e; }
-.codeDot:nth-child(3) { background: #28c840; }
+.codeDot:nth-child(1) {
+  background: #ff5f57;
+}
+.codeDot:nth-child(2) {
+  background: #febc2e;
+}
+.codeDot:nth-child(3) {
+  background: #28c840;
+}
 
 .codeContent {
   padding: 24px;
@@ -334,7 +384,12 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-primary),
+    transparent
+  );
   opacity: 0;
   transition: opacity var(--duration-normal) var(--ease-out-expo);
 }
@@ -382,7 +437,11 @@
 /* CTA Section */
 .cta {
   padding: 120px 48px;
-  background: linear-gradient(180deg, transparent 0%, rgba(0, 255, 255, 0.05) 100%);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 255, 255, 0.05) 100%
+  );
   text-align: center;
 }
 
@@ -395,7 +454,11 @@
   font-size: 36px;
   font-weight: 700;
   margin-bottom: 16px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -410,7 +473,11 @@
 .ctaButtonLarge {
   display: inline-block;
   padding: 16px 48px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 100%
+  );
   color: var(--color-text-inverse);
   border-radius: 8px;
   text-decoration: none;

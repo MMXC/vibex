@@ -1,8 +1,8 @@
 /**
  * LoginDrawer - 登录抽屉组件
- * 
+ *
  * 从侧边滑入的登录/注册表单
- * 
+ *
  * Usage:
  * <LoginDrawer isOpen={show} onClose={() => setShow(false)} />
  */
@@ -28,7 +28,7 @@ export function LoginDrawer({ isOpen, onClose, onSuccess }: LoginDrawerProps) {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   // ESC key to close
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -48,16 +48,16 @@ export function LoginDrawer({ isOpen, onClose, onSuccess }: LoginDrawerProps) {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
+
     try {
       const { apiService } = await import('@/services/api');
-      
+
       if (isLogin) {
         await apiService.login({ email, password });
       } else {
         await apiService.register({ name, email, password });
       }
-      
+
       onSuccess?.();
       onClose();
     } catch (err: unknown) {
@@ -73,14 +73,16 @@ export function LoginDrawer({ isOpen, onClose, onSuccess }: LoginDrawerProps) {
     <>
       {/* Backdrop */}
       <div className={styles.backdrop} onClick={onClose} />
-      
+
       {/* Drawer */}
       <div className={styles.drawer}>
         <div className={styles.header}>
           <h2>{isLogin ? '登录' : '注册'}</h2>
-          <button className={styles.closeBtn} onClick={onClose}>×</button>
+          <button className={styles.closeBtn} onClick={onClose}>
+            ×
+          </button>
         </div>
-        
+
         <form onSubmit={handleSubmit} className={styles.form}>
           {!isLogin && (
             <div className={styles.field}>
@@ -94,7 +96,7 @@ export function LoginDrawer({ isOpen, onClose, onSuccess }: LoginDrawerProps) {
               />
             </div>
           )}
-          
+
           <div className={styles.field}>
             <label>邮箱</label>
             <input
@@ -105,7 +107,7 @@ export function LoginDrawer({ isOpen, onClose, onSuccess }: LoginDrawerProps) {
               required
             />
           </div>
-          
+
           <div className={styles.field}>
             <label>密码</label>
             <input
@@ -116,26 +118,36 @@ export function LoginDrawer({ isOpen, onClose, onSuccess }: LoginDrawerProps) {
               required
             />
           </div>
-          
+
           {error && <div className={styles.error}>{error}</div>}
-          
+
           <button type="submit" className={styles.submitBtn} disabled={loading}>
-            {loading ? '处理中...' : (isLogin ? '登录' : '注册')}
+            {loading ? '处理中...' : isLogin ? '登录' : '注册'}
           </button>
         </form>
-        
+
         <div className={styles.footer}>
           {isLogin ? (
             <>
               还没有账号？
-              <button onClick={() => { setIsLogin(false); setError(''); }}>
+              <button
+                onClick={() => {
+                  setIsLogin(false);
+                  setError('');
+                }}
+              >
                 立即注册
               </button>
             </>
           ) : (
             <>
               已有账号？
-              <button onClick={() => { setIsLogin(true); setError(''); }}>
+              <button
+                onClick={() => {
+                  setIsLogin(true);
+                  setError('');
+                }}
+              >
                 立即登录
               </button>
             </>

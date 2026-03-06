@@ -1,13 +1,13 @@
-'use client'
+'use client';
 
-import { useState, useEffect, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import styles from '../confirm.module.css'
-import { useConfirmationStore } from '@/stores/confirmationStore'
-import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps'
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import styles from '../confirm.module.css';
+import { useConfirmationStore } from '@/stores/confirmationStore';
+import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps';
 
 export default function ContextPage() {
-  const router = useRouter()
+  const router = useRouter();
   const {
     requirementText,
     boundedContexts,
@@ -19,81 +19,106 @@ export default function ContextPage() {
     goToNextStep,
     goToPreviousStep,
     currentStep,
-  } = useConfirmationStore()
+  } = useConfirmationStore();
 
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   // Helper function to generate Mermaid code
-  const generateMermaidCode = useCallback((contexts: typeof boundedContexts) => {
-    const lines = ['graph TD']
-    
-    contexts.forEach(ctx => {
-      const nodeDef = ctx.type === 'core' 
-        ? `${ctx.id}[${ctx.name}]`
-        : ctx.type === 'supporting'
-          ? `${ctx.id}(${ctx.name})`
-          : `${ctx.id}{${ctx.name}}`
-      lines.push(`  ${nodeDef}`)
-    })
-    
-    lines.push('')
-    lines.push('  classDef core fill:#4ade80,stroke:#22c55e,color:#1a1a2e')
-    lines.push('  classDef supporting fill:#60a5fa,stroke:#3b82f6,color:#1a1a2e')
-    lines.push('')
-    lines.push('  class ' + contexts.filter(c => c.type === 'core').map(c => c.id).join(',') + ' core')
-    lines.push('  class ' + contexts.filter(c => c.type === 'supporting').map(c => c.id).join(',') + ' supporting')
-    
-    return lines.join('\n')
-  }, [])
+  const generateMermaidCode = useCallback(
+    (contexts: typeof boundedContexts) => {
+      const lines = ['graph TD'];
+
+      contexts.forEach((ctx) => {
+        const nodeDef =
+          ctx.type === 'core'
+            ? `${ctx.id}[${ctx.name}]`
+            : ctx.type === 'supporting'
+              ? `${ctx.id}(${ctx.name})`
+              : `${ctx.id}{${ctx.name}}`;
+        lines.push(`  ${nodeDef}`);
+      });
+
+      lines.push('');
+      lines.push('  classDef core fill:#4ade80,stroke:#22c55e,color:#1a1a2e');
+      lines.push(
+        '  classDef supporting fill:#60a5fa,stroke:#3b82f6,color:#1a1a2e'
+      );
+      lines.push('');
+      lines.push(
+        '  class ' +
+          contexts
+            .filter((c) => c.type === 'core')
+            .map((c) => c.id)
+            .join(',') +
+          ' core'
+      );
+      lines.push(
+        '  class ' +
+          contexts
+            .filter((c) => c.type === 'supporting')
+            .map((c) => c.id)
+            .join(',') +
+          ' supporting'
+      );
+
+      return lines.join('\n');
+    },
+    []
+  );
 
   // Auto-generate mermaid code when bounded contexts change
   useEffect(() => {
     if (boundedContexts.length > 0 && !contextMermaidCode) {
-      const code = generateMermaidCode(boundedContexts)
-      setContextMermaidCode(code)
+      const code = generateMermaidCode(boundedContexts);
+      setContextMermaidCode(code);
     }
-  }, [boundedContexts, contextMermaidCode, setContextMermaidCode, generateMermaidCode])
+  }, [
+    boundedContexts,
+    contextMermaidCode,
+    setContextMermaidCode,
+    generateMermaidCode,
+  ]);
 
   // Empty state handling: redirect to /confirm if no bounded contexts
   useEffect(() => {
     if (boundedContexts.length === 0 && !loading) {
       // Show alert and redirect
-      alert('请先输入需求描述，AI 将为您生成限界上下文图')
-      router.push('/confirm')
+      alert('请先输入需求描述，AI 将为您生成限界上下文图');
+      router.push('/confirm');
     }
-  }, [boundedContexts, loading, router])
+  }, [boundedContexts, loading, router]);
 
   const handleContextToggle = (id: string) => {
     if (selectedContextIds.includes(id)) {
-      setSelectedContextIds(selectedContextIds.filter(i => i !== id))
+      setSelectedContextIds(selectedContextIds.filter((i) => i !== id));
     } else {
-      setSelectedContextIds([...selectedContextIds, id])
+      setSelectedContextIds([...selectedContextIds, id]);
     }
-  }
+  };
 
   const handleConfirm = () => {
     if (selectedContextIds.length === 0) {
-      setError('请至少选择一个核心上下文')
-      return
+      setError('请至少选择一个核心上下文');
+      return;
     }
-    goToNextStep()
-    router.push('/confirm/model')
-  }
+    goToNextStep();
+    router.push('/confirm/model');
+  };
 
   const typeLabels = {
     core: '核心上下文',
     supporting: '支撑上下文',
     generic: '通用上下文',
     external: '外部系统',
-  }
+  };
 
   const typeColors = {
     core: '#4ade80',
     supporting: '#60a5fa',
     generic: '#a78bfa',
     external: '#f87171',
-  }
+  };
 
   return (
     <div className={styles.container}>
@@ -146,8 +171,8 @@ export default function ContextPage() {
           <button
             className={styles.secondaryButton}
             onClick={() => {
-              goToPreviousStep()
-              router.push('/confirm')
+              goToPreviousStep();
+              router.push('/confirm');
             }}
           >
             返回修改
@@ -162,5 +187,5 @@ export default function ContextPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

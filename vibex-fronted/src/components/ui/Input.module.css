@@ -62,7 +62,9 @@
 
 .glass:focus-within {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-muted), var(--shadow-glow-cyan);
+  box-shadow:
+    0 0 0 3px var(--color-primary-muted),
+    var(--shadow-glow-cyan);
 }
 
 /* Error State */
@@ -153,10 +155,13 @@
 }
 
 @keyframes inputGlow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 3px var(--color-primary-muted);
   }
   50% {
-    box-shadow: 0 0 0 4px var(--color-primary-muted), 0 0 20px var(--color-primary-muted);
+    box-shadow:
+      0 0 0 4px var(--color-primary-muted),
+      0 0 20px var(--color-primary-muted);
   }
 }

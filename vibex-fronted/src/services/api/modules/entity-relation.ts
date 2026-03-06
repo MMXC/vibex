@@ -9,9 +9,19 @@ import { cache, getCacheKey } from '../cache';
 export interface EntityRelationApi {
   getEntityRelations(requirementId: string): Promise<EntityRelation[]>;
   getEntityRelation(relationId: string): Promise<EntityRelation>;
-  createEntityRelation(relation: Omit<EntityRelation, 'id'>, requirementId?: string): Promise<EntityRelation>;
-  updateEntityRelation(relationId: string, data: Partial<EntityRelation>, requirementId?: string): Promise<EntityRelation>;
-  deleteEntityRelation(relationId: string, requirementId: string): Promise<SuccessResponse>;
+  createEntityRelation(
+    relation: Omit<EntityRelation, 'id'>,
+    requirementId?: string
+  ): Promise<EntityRelation>;
+  updateEntityRelation(
+    relationId: string,
+    data: Partial<EntityRelation>,
+    requirementId?: string
+  ): Promise<EntityRelation>;
+  deleteEntityRelation(
+    relationId: string,
+    requirementId: string
+  ): Promise<SuccessResponse>;
 }
 
 // ==================== 实现 ====================
@@ -27,15 +37,18 @@ class EntityRelationApiImpl implements EntityRelationApi {
   async getEntityRelations(requirementId: string): Promise<EntityRelation[]> {
     const cacheKey = getCacheKey('entity_relations', requirementId);
     const cached = cache.get<EntityRelation[]>(cacheKey);
-    
+
     if (!this.isOnline() && cached) {
       return cached;
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ entityRelations: EntityRelation[] }>(`/entity-relations?requirementId=${requirementId}`);
+      return await httpClient.get<{ entityRelations: EntityRelation[] }>(
+        `/entity-relations?requirementId=${requirementId}`
+      );
     });
-    const relations: EntityRelation[] = (result as any).entityRelations || result;
+    const relations: EntityRelation[] =
+      (result as any).entityRelations || result;
     cache.set(cacheKey, relations);
     return relations;
   }
@@ -43,22 +56,30 @@ class EntityRelationApiImpl implements EntityRelationApi {
   async getEntityRelation(relationId: string): Promise<EntityRelation> {
     const cacheKey = getCacheKey('entity_relation', relationId);
     const cached = cache.get<EntityRelation>(cacheKey);
-    
+
     if (!this.isOnline() && cached) {
       return cached;
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ entityRelation: EntityRelation }>(`/entity-relations/${relationId}`);
+      return await httpClient.get<{ entityRelation: EntityRelation }>(
+        `/entity-relations/${relationId}`
+      );
     });
     const relation: EntityRelation = (result as any).entityRelation || result;
     cache.set(cacheKey, relation);
     return relation;
   }
 
-  async createEntityRelation(relation: Omit<EntityRelation, 'id'>, requirementId?: string): Promise<EntityRelation> {
+  async createEntityRelation(
+    relation: Omit<EntityRelation, 'id'>,
+    requirementId?: string
+  ): Promise<EntityRelation> {
     const result = await retry.execute(async () => {
-      return await httpClient.post<{ entityRelation: EntityRelation }>('/entity-relations', relation);
+      return await httpClient.post<{ entityRelation: EntityRelation }>(
+        '/entity-relations',
+        relation
+      );
     });
     const created: EntityRelation = (result as any).entityRelation || result;
     if (requirementId) {
@@ -67,9 +88,16 @@ class EntityRelationApiImpl implements EntityRelationApi {
     return created;
   }
 
-  async updateEntityRelation(relationId: string, data: Partial<EntityRelation>, requirementId?: string): Promise<EntityRelation> {
+  async updateEntityRelation(
+    relationId: string,
+    data: Partial<EntityRelation>,
+    requirementId?: string
+  ): Promise<EntityRelation> {
     const result = await retry.execute(async () => {
-      return await httpClient.put<{ entityRelation: EntityRelation }>(`/entity-relations/${relationId}`, data);
+      return await httpClient.put<{ entityRelation: EntityRelation }>(
+        `/entity-relations/${relationId}`,
+        data
+      );
     });
     const relation: EntityRelation = (result as any).entityRelation || result;
     if (requirementId) {
@@ -78,9 +106,14 @@ class EntityRelationApiImpl implements EntityRelationApi {
     return relation;
   }
 
-  async deleteEntityRelation(relationId: string, requirementId: string): Promise<SuccessResponse> {
+  async deleteEntityRelation(
+    relationId: string,
+    requirementId: string
+  ): Promise<SuccessResponse> {
     const result = await retry.execute(async () => {
-      return await httpClient.delete<SuccessResponse>(`/entity-relations/${relationId}`);
+      return await httpClient.delete<SuccessResponse>(
+        `/entity-relations/${relationId}`
+      );
     });
     cache.remove(getCacheKey('entity_relations', requirementId));
     return result;

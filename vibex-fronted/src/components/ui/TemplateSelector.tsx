@@ -25,19 +25,22 @@ export default function TemplateSelector({
   multiple = false,
 }: TemplateSelectorProps) {
   // Group templates by category
-  const categories = templates.reduce((acc, template) => {
-    const category = template.category || 'other';
-    if (!acc[category]) {
-      acc[category] = [];
-    }
-    acc[category].push(template);
-    return acc;
-  }, {} as Record<string, Template[]>);
+  const categories = templates.reduce(
+    (acc, template) => {
+      const category = template.category || 'other';
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(template);
+      return acc;
+    },
+    {} as Record<string, Template[]>
+  );
 
   return (
     <div className={styles.container}>
       {title && <h3 className={styles.title}>{title}</h3>}
-      
+
       <div className={styles.grid}>
         {templates.map((template) => (
           <div
@@ -56,7 +59,9 @@ export default function TemplateSelector({
               }
             }}
           >
-            {template.icon && <div className={styles.icon}>{template.icon}</div>}
+            {template.icon && (
+              <div className={styles.icon}>{template.icon}</div>
+            )}
             <div className={styles.name}>{template.name}</div>
             <div className={styles.description}>{template.description}</div>
             {selectedId === template.id && (

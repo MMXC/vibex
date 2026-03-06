@@ -1,4 +1,10 @@
-import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import axios, {
+  AxiosInstance,
+  AxiosError,
+  AxiosRequestConfig,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from 'axios';
 
 // ==================== 接口定义 ====================
 
@@ -12,7 +18,11 @@ export interface HttpClient {
   get<T>(url: string, config?: AxiosRequestConfig): Promise<T>;
   post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T>;
   put<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T>;
-  patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T>;
+  patch<T>(
+    url: string,
+    data?: unknown,
+    config?: AxiosRequestConfig
+  ): Promise<T>;
   delete<T>(url: string, config?: AxiosRequestConfig): Promise<T>;
 }
 
@@ -25,7 +35,10 @@ export function createHttpClient(config?: HttpClientConfig): HttpClient {
     return _httpClient;
   }
 
-  const baseURL = config?.baseURL || process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vibex.top/api';
+  const baseURL =
+    config?.baseURL ||
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    'https://api.vibex.top/api';
   const timeout = config?.timeout || 10000;
 
   const instance = axios.create({
@@ -38,7 +51,10 @@ export function createHttpClient(config?: HttpClientConfig): HttpClient {
   if (instance.interceptors?.request) {
     instance.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
-        const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+        const token =
+          typeof window !== 'undefined'
+            ? localStorage.getItem('auth_token')
+            : null;
         if (token) {
           (config.headers as any) = (config.headers as any) || {};
           (config.headers as any).Authorization = `Bearer ${token}`;
@@ -66,11 +82,16 @@ export function createHttpClient(config?: HttpClientConfig): HttpClient {
 
   _httpClient = {
     instance,
-    get: <T>(url: string, config?: AxiosRequestConfig) => instance.get<T>(url, config).then(r => r.data),
-    post: <T>(url: string, data?: unknown, config?: AxiosRequestConfig) => instance.post<T>(url, data, config).then(r => r.data),
-    put: <T>(url: string, data?: unknown, config?: AxiosRequestConfig) => instance.put<T>(url, data, config).then(r => r.data),
-    patch: <T>(url: string, data?: unknown, config?: AxiosRequestConfig) => instance.patch<T>(url, data, config).then(r => r.data),
-    delete: <T>(url: string, config?: AxiosRequestConfig) => instance.delete<T>(url, config).then(r => r.data),
+    get: <T>(url: string, config?: AxiosRequestConfig) =>
+      instance.get<T>(url, config).then((r) => r.data),
+    post: <T>(url: string, data?: unknown, config?: AxiosRequestConfig) =>
+      instance.post<T>(url, data, config).then((r) => r.data),
+    put: <T>(url: string, data?: unknown, config?: AxiosRequestConfig) =>
+      instance.put<T>(url, data, config).then((r) => r.data),
+    patch: <T>(url: string, data?: unknown, config?: AxiosRequestConfig) =>
+      instance.patch<T>(url, data, config).then((r) => r.data),
+    delete: <T>(url: string, config?: AxiosRequestConfig) =>
+      instance.delete<T>(url, config).then((r) => r.data),
   };
 
   return _httpClient;

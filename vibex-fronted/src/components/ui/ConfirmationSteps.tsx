@@ -19,16 +19,19 @@ const CONFIRMATION_STEPS: Step[] = [
 
 // Map ConfirmationStep to step index
 const STEP_INDEX_MAP: Record<ConfirmationStep, number> = {
-  'input': 0,
-  'context': 1,
-  'model': 2,
-  'flow': 3,
-  'success': 3, // Success is after flow
+  input: 0,
+  context: 1,
+  model: 2,
+  flow: 3,
+  success: 3, // Success is after flow
 };
 
-export function ConfirmationSteps({ currentStep, className = '' }: ConfirmationStepsProps) {
+export function ConfirmationSteps({
+  currentStep,
+  className = '',
+}: ConfirmationStepsProps) {
   const currentIndex = STEP_INDEX_MAP[currentStep];
-  
+
   return (
     <Steps
       steps={CONFIRMATION_STEPS}
@@ -40,9 +43,9 @@ export function ConfirmationSteps({ currentStep, className = '' }: ConfirmationS
 
 // Helper function to get step titles for pages
 export const CONFIRM_STEP_TITLES: Record<ConfirmationStep, string> = {
-  'input': 'Step 1: 需求输入',
-  'context': 'Step 2: 限界上下文图确认',
-  'model': 'Step 3: 领域模型类图确认',
-  'flow': 'Step 4: 业务流程图确认',
-  'success': '项目创建成功',
+  input: 'Step 1: 需求输入',
+  context: 'Step 2: 限界上下文图确认',
+  model: 'Step 3: 领域模型类图确认',
+  flow: 'Step 4: 业务流程图确认',
+  success: '项目创建成功',
 };

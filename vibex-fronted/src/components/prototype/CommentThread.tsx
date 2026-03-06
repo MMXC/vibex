@@ -52,7 +52,10 @@ export interface CommentThreadProps {
 }
 
 // 评论类型配置
-const COMMENT_TYPE_CONFIG: Record<CommentType, { label: string; emoji: string; color: string }> = {
+const COMMENT_TYPE_CONFIG: Record<
+  CommentType,
+  { label: string; emoji: string; color: string }
+> = {
   bug: { label: 'Bug', emoji: '🐛', color: '#dc3545' },
   suggestion: { label: '建议', emoji: '💡', color: '#ffc107' },
   question: { label: '问题', emoji: '❓', color: '#17a2b8' },
@@ -73,7 +76,7 @@ const formatTimeAgo = (dateString: string): string => {
   if (diffMins < 60) return `${diffMins}分钟前`;
   if (diffHours < 24) return `${diffHours}小时前`;
   if (diffDays < 7) return `${diffDays}天前`;
-  
+
   return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
 };
 
@@ -257,7 +260,9 @@ function CommentItem({
   };
 
   return (
-    <div className={`${styles.commentItem} ${depth > 0 ? styles.nestedComment : ''}`}>
+    <div
+      className={`${styles.commentItem} ${depth > 0 ? styles.nestedComment : ''}`}
+    >
       <div className={styles.commentHeader}>
         <Avatar
           src={comment.author?.avatar || undefined}
@@ -274,7 +279,10 @@ function CommentItem({
         </div>
         <span
           className={styles.typeBadge}
-          style={{ backgroundColor: typeConfig.color + '20', color: typeConfig.color }}
+          style={{
+            backgroundColor: typeConfig.color + '20',
+            color: typeConfig.color,
+          }}
         >
           {typeConfig.emoji} {typeConfig.label}
         </span>
@@ -335,11 +343,9 @@ function CommentItem({
             </>
           )}
           {(comment.replies?.length || 0) > 0 && (
-            <button
-              className={styles.actionBtn}
-              onClick={handleLoadReplies}
-            >
-              {showReplies ? '隐藏' : '查看'}回复 ({comment.replies?.length || replies.length})
+            <button className={styles.actionBtn} onClick={handleLoadReplies}>
+              {showReplies ? '隐藏' : '查看'}回复 (
+              {comment.replies?.length || replies.length})
             </button>
           )}
         </div>
@@ -403,30 +409,36 @@ export function CommentThread({
   const [selectedType, setSelectedType] = useState<CommentType>('suggestion');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [filter, setFilter] = useState<CommentType | 'all'>('all');
-  const [statusFilter, setStatusFilter] = useState<CommentStatus | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<CommentStatus | 'all'>(
+    'all'
+  );
   const [showTypeModal, setShowTypeModal] = useState(false);
 
   // 过滤评论
   const filteredComments = comments.filter((comment) => {
     const typeMatch = filter === 'all' || comment.type === filter;
-    const statusMatch = statusFilter === 'all' || comment.status === statusFilter;
+    const statusMatch =
+      statusFilter === 'all' || comment.status === statusFilter;
     // 只显示顶层评论
     return typeMatch && statusMatch && !comment.parentId;
   });
 
   // 统计
   const stats = {
-    total: comments.filter(c => !c.parentId).length,
-    open: comments.filter(c => !c.parentId && c.status === 'open').length,
-    resolved: comments.filter(c => !c.parentId && c.status === 'resolved').length,
-    bugs: comments.filter(c => !c.parentId && c.type === 'bug').length,
-    suggestions: comments.filter(c => !c.parentId && c.type === 'suggestion').length,
-    questions: comments.filter(c => !c.parentId && c.type === 'question').length,
+    total: comments.filter((c) => !c.parentId).length,
+    open: comments.filter((c) => !c.parentId && c.status === 'open').length,
+    resolved: comments.filter((c) => !c.parentId && c.status === 'resolved')
+      .length,
+    bugs: comments.filter((c) => !c.parentId && c.type === 'bug').length,
+    suggestions: comments.filter((c) => !c.parentId && c.type === 'suggestion')
+      .length,
+    questions: comments.filter((c) => !c.parentId && c.type === 'question')
+      .length,
   };
 
   const handleSubmitComment = async () => {
     if (!newComment.trim()) return;
-    
+
     setIsSubmitting(true);
     try {
       const commentData: CommentCreate = {
@@ -434,7 +446,7 @@ export function CommentThread({
         type: selectedType,
         prototypeSnapshotId: snapshotId,
       };
-      
+
       await onAddComment?.(commentData);
       setNewComment('');
     } catch (error) {
@@ -457,11 +469,11 @@ export function CommentThread({
   };
 
   const handleAddReply = async (parentId: string, content: string) => {
-    return await onReplyComment?.(parentId, content) as Comment;
+    return (await onReplyComment?.(parentId, content)) as Comment;
   };
 
   const handleLoadReplies = async (commentId: string) => {
-    return await onLoadReplies?.(commentId) || [];
+    return (await onLoadReplies?.(commentId)) || [];
   };
 
   return (
@@ -474,10 +486,16 @@ export function CommentThread({
             <span className={styles.statValue}>{stats.total}</span> 全部
           </span>
           <span className={styles.statItem}>
-            <span className={`${styles.statValue} ${styles.open}`}>{stats.open}</span> 待处理
+            <span className={`${styles.statValue} ${styles.open}`}>
+              {stats.open}
+            </span>{' '}
+            待处理
           </span>
           <span className={styles.statItem}>
-            <span className={`${styles.statValue} ${styles.resolved}`}>{stats.resolved}</span> 已解决
+            <span className={`${styles.statValue} ${styles.resolved}`}>
+              {stats.resolved}
+            </span>{' '}
+            已解决
           </span>
         </div>
       </div>
@@ -502,7 +520,9 @@ export function CommentThread({
           <select
             className={styles.filterSelect}
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as CommentStatus | 'all')}
+            onChange={(e) =>
+              setStatusFilter(e.target.value as CommentStatus | 'all')
+            }
           >
             <option value="all">全部</option>
             <option value="open">待处理</option>

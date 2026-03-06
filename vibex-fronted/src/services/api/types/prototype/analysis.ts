@@ -21,7 +21,20 @@ export interface UIComponent {
   children?: UIComponent[];
 }
 
-export type ComponentType = 'form' | 'table' | 'list' | 'card' | 'navigation' | 'chart' | 'media' | 'layout' | 'input' | 'button' | 'text' | 'image' | 'container';
+export type ComponentType =
+  | 'form'
+  | 'table'
+  | 'list'
+  | 'card'
+  | 'navigation'
+  | 'chart'
+  | 'media'
+  | 'layout'
+  | 'input'
+  | 'button'
+  | 'text'
+  | 'image'
+  | 'container';
 
 export interface UILayout {
   type: 'single' | 'split' | 'grid' | 'sidebar';

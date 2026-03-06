@@ -1,6 +1,12 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react';
 import styles from './SearchFilter.module.css';
 
 // ==================== 类型定义 ====================
@@ -112,7 +118,7 @@ function SearchFilterComponent(
     className = '',
     debounceMs = 300,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  maxPreviewResults = 5,
+    maxPreviewResults = 5,
   }: SearchFilterProps,
   ref: React.Ref<SearchFilterRef>
 ) {
@@ -122,7 +128,7 @@ function SearchFilterComponent(
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [isFocused, setIsFocused] = useState(false);
-  
+
   // Refs
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -130,36 +136,42 @@ function SearchFilterComponent(
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // 合并默认配置
-  const config = useMemo<SearchFilterConfig>(() => ({
-    dateRange: {
-      enabled: true,
-      options: DEFAULT_DATE_OPTIONS,
-      default: 'all',
-      ...filterConfig?.dateRange,
-    },
-    role: {
-      enabled: true,
-      options: DEFAULT_ROLE_OPTIONS,
-      default: 'all',
-      ...filterConfig?.role,
-    },
-    tags: {
-      enabled: false,
-      options: [],
-      ...filterConfig?.tags,
-    },
-  }), [filterConfig]);
+  const config = useMemo<SearchFilterConfig>(
+    () => ({
+      dateRange: {
+        enabled: true,
+        options: DEFAULT_DATE_OPTIONS,
+        default: 'all',
+        ...filterConfig?.dateRange,
+      },
+      role: {
+        enabled: true,
+        options: DEFAULT_ROLE_OPTIONS,
+        default: 'all',
+        ...filterConfig?.role,
+      },
+      tags: {
+        enabled: false,
+        options: [],
+        ...filterConfig?.tags,
+      },
+    }),
+    [filterConfig]
+  );
 
   // 防抖搜索
-  const debouncedSearch = useCallback((searchQuery: string, searchFilters: SearchFilters) => {
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
-    
-    debounceTimerRef.current = setTimeout(() => {
-      onSearch?.(searchQuery, searchFilters);
-    }, debounceMs);
-  }, [onSearch, debounceMs]);
+  const debouncedSearch = useCallback(
+    (searchQuery: string, searchFilters: SearchFilters) => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+
+      debounceTimerRef.current = setTimeout(() => {
+        onSearch?.(searchQuery, searchFilters);
+      }, debounceMs);
+    },
+    [onSearch, debounceMs]
+  );
 
   // 处理输入变化
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -169,7 +181,10 @@ function SearchFilterComponent(
   };
 
   // 处理过滤器变化
-  const handleFilterChange = (filterType: keyof SearchFilters, value: string | string[]) => {
+  const handleFilterChange = (
+    filterType: keyof SearchFilters,
+    value: string | string[]
+  ) => {
     const newFilters = { ...filters, [filterType]: value };
     setFilters(newFilters);
     debouncedSearch(query, newFilters);
@@ -179,7 +194,7 @@ function SearchFilterComponent(
   const handleTagToggle = (tagValue: string) => {
     const currentTags = filters.tags || [];
     const newTags = currentTags.includes(tagValue)
-      ? currentTags.filter(t => t !== tagValue)
+      ? currentTags.filter((t) => t !== tagValue)
       : [...currentTags, tagValue];
     handleFilterChange('tags', newTags);
   };
@@ -290,7 +305,13 @@ function SearchFilterComponent(
       {/* 搜索输入区 */}
       <div className={`${styles.searchBox} ${isFocused ? styles.focused : ''}`}>
         {/* 搜索图标 */}
-        <svg className={styles.searchIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          className={styles.searchIcon}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <circle cx="11" cy="11" r="8" />
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
@@ -318,7 +339,12 @@ function SearchFilterComponent(
             onClick={handleClear}
             aria-label="清除搜索"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
@@ -326,7 +352,9 @@ function SearchFilterComponent(
         )}
 
         {/* 过滤器按钮 */}
-        {(config.dateRange?.enabled || config.role?.enabled || config.tags?.enabled) && (
+        {(config.dateRange?.enabled ||
+          config.role?.enabled ||
+          config.tags?.enabled) && (
           <button
             type="button"
             className={`${styles.filterBtn} ${isFilterOpen ? styles.active : ''} ${hasActiveFilters ? styles.hasFilters : ''}`}
@@ -335,7 +363,12 @@ function SearchFilterComponent(
             aria-label="过滤选项"
             aria-expanded={isFilterOpen}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
             </svg>
             {activeFilterCount > 0 && (
@@ -354,17 +387,27 @@ function SearchFilterComponent(
               <button
                 type="button"
                 className={`${styles.filterHeader} ${activeFilter === 'date' ? styles.activeHeader : ''}`}
-                onClick={() => setActiveFilter(activeFilter === 'date' ? null : 'date')}
+                onClick={() =>
+                  setActiveFilter(activeFilter === 'date' ? null : 'date')
+                }
                 aria-expanded={activeFilter === 'date'}
               >
                 <span className={styles.filterIcon}>📅</span>
                 <span className={styles.filterTitle}>时间范围</span>
                 <span className={styles.filterValue}>
-                  {config.dateRange.options.find(o => o.value === (filters.dateRange || 'all'))?.label}
+                  {
+                    config.dateRange.options.find(
+                      (o) => o.value === (filters.dateRange || 'all')
+                    )?.label
+                  }
                 </span>
-                <span className={`${styles.chevron} ${activeFilter === 'date' ? styles.chevronOpen : ''}`}>▼</span>
+                <span
+                  className={`${styles.chevron} ${activeFilter === 'date' ? styles.chevronOpen : ''}`}
+                >
+                  ▼
+                </span>
               </button>
-              
+
               {activeFilter === 'date' && (
                 <div className={styles.filterOptions}>
                   {config.dateRange.options.map((option) => (
@@ -372,11 +415,15 @@ function SearchFilterComponent(
                       key={option.value}
                       type="button"
                       className={`${styles.optionBtn} ${(filters.dateRange || 'all') === option.value ? styles.selected : ''}`}
-                      onClick={() => handleFilterChange('dateRange', option.value)}
+                      onClick={() =>
+                        handleFilterChange('dateRange', option.value)
+                      }
                     >
                       <span className={styles.optionLabel}>{option.label}</span>
                       {option.count !== undefined && (
-                        <span className={styles.optionCount}>{option.count}</span>
+                        <span className={styles.optionCount}>
+                          {option.count}
+                        </span>
                       )}
                     </button>
                   ))}
@@ -391,17 +438,27 @@ function SearchFilterComponent(
               <button
                 type="button"
                 className={`${styles.filterHeader} ${activeFilter === 'role' ? styles.activeHeader : ''}`}
-                onClick={() => setActiveFilter(activeFilter === 'role' ? null : 'role')}
+                onClick={() =>
+                  setActiveFilter(activeFilter === 'role' ? null : 'role')
+                }
                 aria-expanded={activeFilter === 'role'}
               >
                 <span className={styles.filterIcon}>💬</span>
                 <span className={styles.filterTitle}>消息类型</span>
                 <span className={styles.filterValue}>
-                  {config.role.options.find(o => o.value === (filters.role || 'all'))?.label}
+                  {
+                    config.role.options.find(
+                      (o) => o.value === (filters.role || 'all')
+                    )?.label
+                  }
                 </span>
-                <span className={`${styles.chevron} ${activeFilter === 'role' ? styles.chevronOpen : ''}`}>▼</span>
+                <span
+                  className={`${styles.chevron} ${activeFilter === 'role' ? styles.chevronOpen : ''}`}
+                >
+                  ▼
+                </span>
               </button>
-              
+
               {activeFilter === 'role' && (
                 <div className={styles.filterOptions}>
                   {config.role.options.map((option) => (
@@ -413,7 +470,9 @@ function SearchFilterComponent(
                     >
                       <span className={styles.optionLabel}>{option.label}</span>
                       {option.count !== undefined && (
-                        <span className={styles.optionCount}>{option.count}</span>
+                        <span className={styles.optionCount}>
+                          {option.count}
+                        </span>
                       )}
                     </button>
                   ))}
@@ -428,7 +487,9 @@ function SearchFilterComponent(
               <button
                 type="button"
                 className={`${styles.filterHeader} ${activeFilter === 'tags' ? styles.activeHeader : ''}`}
-                onClick={() => setActiveFilter(activeFilter === 'tags' ? null : 'tags')}
+                onClick={() =>
+                  setActiveFilter(activeFilter === 'tags' ? null : 'tags')
+                }
                 aria-expanded={activeFilter === 'tags'}
               >
                 <span className={styles.filterIcon}>🏷️</span>
@@ -436,9 +497,13 @@ function SearchFilterComponent(
                 <span className={styles.filterValue}>
                   {filters.tags?.length || 0} 个已选
                 </span>
-                <span className={`${styles.chevron} ${activeFilter === 'tags' ? styles.chevronOpen : ''}`}>▼</span>
+                <span
+                  className={`${styles.chevron} ${activeFilter === 'tags' ? styles.chevronOpen : ''}`}
+                >
+                  ▼
+                </span>
               </button>
-              
+
               {activeFilter === 'tags' && (
                 <div className={styles.filterOptions}>
                   {config.tags.options.map((option) => (
@@ -450,14 +515,21 @@ function SearchFilterComponent(
                     >
                       <span className={styles.checkbox}>
                         {(filters.tags || []).includes(option.value) && (
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                          >
                             <polyline points="20 6 9 17 4 12" />
                           </svg>
                         )}
                       </span>
                       <span className={styles.optionLabel}>{option.label}</span>
                       {option.count !== undefined && (
-                        <span className={styles.optionCount}>{option.count}</span>
+                        <span className={styles.optionCount}>
+                          {option.count}
+                        </span>
                       )}
                     </button>
                   ))}
@@ -497,7 +569,9 @@ function SearchFilterComponent(
 }
 
 // 使用 forwardRef 导出
-const SearchFilter = React.forwardRef<SearchFilterRef, SearchFilterProps>(SearchFilterComponent);
+const SearchFilter = React.forwardRef<SearchFilterRef, SearchFilterProps>(
+  SearchFilterComponent
+);
 export { SearchFilter };
 
 // ==================== Hook ====================
@@ -513,16 +587,19 @@ export function useSearchFilter(
   const [filters, setFilters] = useState<SearchFilters>(initialFilters || {});
   const [isSearching, setIsSearching] = useState(false);
 
-  const handleSearch = useCallback((newQuery: string, newFilters: SearchFilters) => {
-    setQuery(newQuery);
-    setFilters(newFilters);
-    setIsSearching(true);
-    
-    onSearch?.(newQuery, newFilters);
-    
-    // 模拟搜索完成
-    setTimeout(() => setIsSearching(false), 300);
-  }, [onSearch]);
+  const handleSearch = useCallback(
+    (newQuery: string, newFilters: SearchFilters) => {
+      setQuery(newQuery);
+      setFilters(newFilters);
+      setIsSearching(true);
+
+      onSearch?.(newQuery, newFilters);
+
+      // 模拟搜索完成
+      setTimeout(() => setIsSearching(false), 300);
+    },
+    [onSearch]
+  );
 
   const clearSearch = useCallback(() => {
     setQuery('');
@@ -530,18 +607,24 @@ export function useSearchFilter(
     onSearch?.('', {});
   }, [onSearch]);
 
-  const updateFilter = useCallback((key: keyof SearchFilters, value: string | string[]) => {
-    const newFilters = { ...filters, [key]: value };
-    setFilters(newFilters);
-    onSearch?.(query, newFilters);
-  }, [query, filters, onSearch]);
+  const updateFilter = useCallback(
+    (key: keyof SearchFilters, value: string | string[]) => {
+      const newFilters = { ...filters, [key]: value };
+      setFilters(newFilters);
+      onSearch?.(query, newFilters);
+    },
+    [query, filters, onSearch]
+  );
 
-  const removeFilter = useCallback((key: keyof SearchFilters) => {
-    const newFilters = { ...filters };
-    delete newFilters[key];
-    setFilters(newFilters);
-    onSearch?.(query, newFilters);
-  }, [query, filters, onSearch]);
+  const removeFilter = useCallback(
+    (key: keyof SearchFilters) => {
+      const newFilters = { ...filters };
+      delete newFilters[key];
+      setFilters(newFilters);
+      onSearch?.(query, newFilters);
+    },
+    [query, filters, onSearch]
+  );
 
   return {
     query,
@@ -563,8 +646,11 @@ export function useSearchFilter(
  */
 export function highlightSearchMatch(text: string, query: string): string {
   if (!query.trim()) return text;
-  
-  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+
+  const regex = new RegExp(
+    `(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`,
+    'gi'
+  );
   return text.replace(regex, '<mark>$1</mark>');
 }
 
@@ -581,21 +667,25 @@ export function searchInMessages(
   // 文本搜索
   if (query.trim()) {
     const lowerQuery = query.toLowerCase();
-    results = results.filter(msg => 
+    results = results.filter((msg) =>
       msg.content.toLowerCase().includes(lowerQuery)
     );
   }
 
   // 角色过滤
   if (filters.role && filters.role !== 'all') {
-    results = results.filter(msg => msg.role === filters.role);
+    results = results.filter((msg) => msg.role === filters.role);
   }
 
   // 日期范围过滤
   if (filters.dateRange && filters.dateRange !== 'all') {
     const now = new Date();
-    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    
+    const startOfDay = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+
     let startDate: Date;
     switch (filters.dateRange) {
       case 'today':
@@ -613,13 +703,13 @@ export function searchInMessages(
       default:
         startDate = new Date(0);
     }
-    
-    results = results.filter(msg => new Date(msg.createdAt) >= startDate);
+
+    results = results.filter((msg) => new Date(msg.createdAt) >= startDate);
   }
 
   // 标签过滤 (需要消息支持标签)
   // if (filters.tags && filters.tags.length > 0) {
-  //   results = results.filter(msg => 
+  //   results = results.filter(msg =>
   //     filters.tags!.every(tag => msg.tags?.includes(tag))
   //   );
   // }

@@ -44,7 +44,10 @@ export function Dropdown({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
         setFocusedIndex(-1);
       }
@@ -56,7 +59,9 @@ export function Dropdown({
 
   useEffect(() => {
     if (isOpen && listRef.current && focusedIndex >= 0) {
-      const focusedElement = listRef.current.children[focusedIndex] as HTMLElement;
+      const focusedElement = listRef.current.children[
+        focusedIndex
+      ] as HTMLElement;
       if (focusedElement) {
         focusedElement.scrollIntoView({ block: 'nearest' });
       }
@@ -88,7 +93,9 @@ export function Dropdown({
           setIsOpen(true);
           setFocusedIndex(0);
         } else {
-          setFocusedIndex((prev) => (prev < enabledOptions.length - 1 ? prev + 1 : 0));
+          setFocusedIndex((prev) =>
+            prev < enabledOptions.length - 1 ? prev + 1 : 0
+          );
         }
         break;
       case 'ArrowUp':
@@ -97,7 +104,9 @@ export function Dropdown({
           setIsOpen(true);
           setFocusedIndex(enabledOptions.length - 1);
         } else {
-          setFocusedIndex((prev) => (prev > 0 ? prev - 1 : enabledOptions.length - 1));
+          setFocusedIndex((prev) =>
+            prev > 0 ? prev - 1 : enabledOptions.length - 1
+          );
         }
         break;
       case 'Escape':
@@ -141,7 +150,9 @@ export function Dropdown({
     disabled && styles.disabled,
     error && styles.error,
     className,
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div className={styles.wrapper}>
@@ -159,7 +170,11 @@ export function Dropdown({
           <span className={styles.value}>
             {selectedOption ? (
               <>
-                {selectedOption.icon && <span className={styles.optionIcon}>{selectedOption.icon}</span>}
+                {selectedOption.icon && (
+                  <span className={styles.optionIcon}>
+                    {selectedOption.icon}
+                  </span>
+                )}
                 {selectedOption.label}
               </>
             ) : (
@@ -168,21 +183,36 @@ export function Dropdown({
           </span>
           <span className={styles.controls}>
             {clearable && value && !disabled && (
-              <span className={styles.clear} onClick={handleClear} role="button" tabIndex={-1}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <span
+                className={styles.clear}
+                onClick={handleClear}
+                role="button"
+                tabIndex={-1}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <line x1="18" y1="6" x2="6" y2="18" />
                   <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
               </span>
             )}
             <span className={styles.arrow}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <polyline points="6 9 12 15 18 9" />
               </svg>
             </span>
           </span>
         </button>
-        
+
         {isOpen && (
           <ul
             ref={listRef}
@@ -203,18 +233,27 @@ export function Dropdown({
                     isSelected && styles.selected,
                     isFocused && styles.focused,
                     isDisabled && styles.optionDisabled,
-                  ].filter(Boolean).join(' ')}
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
                   role="option"
                   aria-selected={isSelected}
                   aria-disabled={isDisabled}
                   onClick={() => handleSelect(option)}
                   onMouseEnter={() => !isDisabled && setFocusedIndex(index)}
                 >
-                  {option.icon && <span className={styles.optionIcon}>{option.icon}</span>}
+                  {option.icon && (
+                    <span className={styles.optionIcon}>{option.icon}</span>
+                  )}
                   <span className={styles.optionLabel}>{option.label}</span>
                   {isSelected && (
                     <span className={styles.checkmark}>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
                     </span>

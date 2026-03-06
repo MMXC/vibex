@@ -66,7 +66,7 @@ export function BranchDialog({
 
   // 过滤掉自己和目标分支
   const getAvailableTargetBranches = (sourceId: string) => {
-    return branches.filter(b => b.id !== sourceId);
+    return branches.filter((b) => b.id !== sourceId);
   };
 
   const handleCreateBranch = () => {
@@ -114,7 +114,7 @@ export function BranchDialog({
 
   return (
     <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.dialog} onClick={e => e.stopPropagation()}>
+      <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
         {/* 标题栏 */}
         <div className={styles.header}>
           <h3 className={styles.title}>{title}</h3>
@@ -149,23 +149,25 @@ export function BranchDialog({
         </div>
 
         {/* 内容区域 */}
-        <div className={`${styles.content} ${isAnimating ? styles.animating : ''}`}>
+        <div
+          className={`${styles.content} ${isAnimating ? styles.animating : ''}`}
+        >
           {/* 创建分支 */}
           {activeTab === 'create' && (
             <div className={styles.tabContent}>
               <p className={styles.description}>
                 从现有分支创建一个新的对话分支，继续探索不同的对话方向。
               </p>
-              
+
               <div className={styles.formGroup}>
                 <label className={styles.label}>分支名称</label>
                 <input
                   type="text"
                   value={newBranchName}
-                  onChange={e => setNewBranchName(e.target.value)}
+                  onChange={(e) => setNewBranchName(e.target.value)}
                   placeholder="输入新分支名称..."
                   className={styles.input}
-                  onKeyDown={e => e.key === 'Enter' && handleCreateBranch()}
+                  onKeyDown={(e) => e.key === 'Enter' && handleCreateBranch()}
                   autoFocus
                 />
               </div>
@@ -174,11 +176,11 @@ export function BranchDialog({
                 <label className={styles.label}>基于分支 (可选)</label>
                 <select
                   value={selectedParentBranch}
-                  onChange={e => setSelectedParentBranch(e.target.value)}
+                  onChange={(e) => setSelectedParentBranch(e.target.value)}
                   className={styles.select}
                 >
                   <option value="">从主分支创建</option>
-                  {branches.map(branch => (
+                  {branches.map((branch) => (
                     <option key={branch.id} value={branch.id}>
                       {branch.name} ({branch.messageCount} 条消息)
                     </option>
@@ -202,14 +204,12 @@ export function BranchDialog({
               <p className={styles.description}>
                 切换到其他对话分支，查看不同的对话历史。
               </p>
-              
+
               <div className={styles.branchList}>
                 {branches.length === 0 ? (
-                  <div className={styles.emptyState}>
-                    暂无分支
-                  </div>
+                  <div className={styles.emptyState}>暂无分支</div>
                 ) : (
-                  branches.map(branch => (
+                  branches.map((branch) => (
                     <div
                       key={branch.id}
                       className={`${styles.branchItem} ${
@@ -228,15 +228,16 @@ export function BranchDialog({
                         <span className={styles.messageCount}>
                           {branch.messageCount} 条消息
                         </span>
-                        {branches.length > 1 && branch.id !== activeBranchId && (
-                          <button
-                            className={styles.deleteBtn}
-                            onClick={(e) => handleDeleteBranch(branch.id, e)}
-                            title="删除分支"
-                          >
-                            ×
-                          </button>
-                        )}
+                        {branches.length > 1 &&
+                          branch.id !== activeBranchId && (
+                            <button
+                              className={styles.deleteBtn}
+                              onClick={(e) => handleDeleteBranch(branch.id, e)}
+                              title="删除分支"
+                            >
+                              ×
+                            </button>
+                          )}
                       </div>
                     </div>
                   ))
@@ -251,20 +252,24 @@ export function BranchDialog({
               <p className={styles.description}>
                 将一个分支的消息合并到另一个分支中。
               </p>
-              
+
               <div className={styles.formGroup}>
                 <label className={styles.label}>源分支 (将被合并)</label>
                 <select
                   value={selectedSourceBranch}
-                  onChange={e => {
+                  onChange={(e) => {
                     setSelectedSourceBranch(e.target.value);
                     setSelectedTargetBranch('');
                   }}
                   className={styles.select}
                 >
                   <option value="">选择源分支...</option>
-                  {branches.map(branch => (
-                    <option key={branch.id} value={branch.id} disabled={branch.id === activeBranchId}>
+                  {branches.map((branch) => (
+                    <option
+                      key={branch.id}
+                      value={branch.id}
+                      disabled={branch.id === activeBranchId}
+                    >
                       {branch.name} ({branch.messageCount} 条消息)
                     </option>
                   ))}
@@ -280,16 +285,18 @@ export function BranchDialog({
                 <label className={styles.label}>目标分支</label>
                 <select
                   value={selectedTargetBranch}
-                  onChange={e => setSelectedTargetBranch(e.target.value)}
+                  onChange={(e) => setSelectedTargetBranch(e.target.value)}
                   className={styles.select}
                   disabled={!selectedSourceBranch}
                 >
                   <option value="">选择目标分支...</option>
-                  {getAvailableTargetBranches(selectedSourceBranch).map(branch => (
-                    <option key={branch.id} value={branch.id}>
-                      {branch.name} ({branch.messageCount} 条消息)
-                    </option>
-                  ))}
+                  {getAvailableTargetBranches(selectedSourceBranch).map(
+                    (branch) => (
+                      <option key={branch.id} value={branch.id}>
+                        {branch.name} ({branch.messageCount} 条消息)
+                      </option>
+                    )
+                  )}
                 </select>
               </div>
 
@@ -317,7 +324,9 @@ export function useBranchDialog() {
   const [isOpen, setIsOpen] = useState(false);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [activeBranchId, setActiveBranchId] = useState<string>('');
-  const [resolve, setResolve] = useState<((result: { action: string; data?: unknown }) => void) | null>(null);
+  const [resolve, setResolve] = useState<
+    ((result: { action: string; data?: unknown }) => void) | null
+  >(null);
 
   const open = (options: {
     branches: Branch[];
@@ -350,7 +359,10 @@ export function useBranchDialog() {
     resolve?.({ action: 'delete', data: { branchId } });
   };
 
-  const handleMergeBranch = (sourceBranchId: string, targetBranchId: string) => {
+  const handleMergeBranch = (
+    sourceBranchId: string,
+    targetBranchId: string
+  ) => {
     resolve?.({ action: 'merge', data: { sourceBranchId, targetBranchId } });
     setIsOpen(false);
   };

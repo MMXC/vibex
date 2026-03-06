@@ -7,7 +7,6 @@ import { test, expect } from '@playwright/test';
 const BASE_URL = 'http://localhost:3000';
 
 test.describe('E2E Tests: vibex-e2e-user-flow', () => {
-  
   // Test: Home page loads correctly
   test('T3.1.1: Landing page should show VibeX content', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`);
@@ -40,7 +39,9 @@ test.describe('E2E Tests: vibex-e2e-user-flow', () => {
   });
 
   // Test: Home page should NOT show "Create Next App"
-  test('F2.1.1: Home page should NOT show "Create Next App"', async ({ page }) => {
+  test('F2.1.1: Home page should NOT show "Create Next App"', async ({
+    page,
+  }) => {
     await page.goto(`${BASE_URL}/`);
     const content = await page.content();
     // Should NOT contain "Create Next App"
@@ -71,17 +72,24 @@ test.describe('E2E Tests: vibex-e2e-user-flow', () => {
 
   // Test: No JavaScript errors on critical pages
   test('All pages should load without JS errors', async ({ page }) => {
-    const pages = ['/', '/landing', '/auth', '/dashboard', '/chat', '/templates'];
+    const pages = [
+      '/',
+      '/landing',
+      '/auth',
+      '/dashboard',
+      '/chat',
+      '/templates',
+    ];
     const errors: string[] = [];
-    
-    page.on('pageerror', err => errors.push(err.message));
-    
+
+    page.on('pageerror', (err) => errors.push(err.message));
+
     for (const p of pages) {
       await page.goto(`${BASE_URL}${p}`);
       await page.waitForTimeout(500);
     }
-    
+
     // Should have no critical JS errors
-    expect(errors.filter(e => !e.includes('hydration'))).toHaveLength(0);
+    expect(errors.filter((e) => !e.includes('hydration'))).toHaveLength(0);
   });
 });

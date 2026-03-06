@@ -32,28 +32,19 @@ export function Alert({
   onClose,
   className = '',
 }: AlertProps) {
-  const classNames = [
-    styles.alert,
-    styles[variant],
-    styles[size],
-    className,
-  ].filter(Boolean).join(' ');
+  const classNames = [styles.alert, styles[variant], styles[size], className]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div className={classNames} role="alert">
-      <span className={styles.icon}>
-        {icon || defaultIcons[variant]}
-      </span>
+      <span className={styles.icon}>{icon || defaultIcons[variant]}</span>
       <div className={styles.content}>
         {title && <div className={styles.title}>{title}</div>}
         <div className={styles.message}>{children}</div>
       </div>
       {closable && (
-        <button
-          className={styles.close}
-          onClick={onClose}
-          aria-label="关闭"
-        >
+        <button className={styles.close} onClick={onClose} aria-label="关闭">
           ×
         </button>
       )}

@@ -1,4 +1,7 @@
-import { PrototypeSnapshot, PrototypeSnapshotCreate } from '../types/prototype/ui-schema';
+import {
+  PrototypeSnapshot,
+  PrototypeSnapshotCreate,
+} from '../types/prototype/ui-schema';
 import { SuccessResponse } from '../types/common';
 import { httpClient } from '../client';
 import { retry } from '../retry';
@@ -9,9 +12,17 @@ import { cache, getCacheKey } from '../cache';
 export interface PrototypeApi {
   getPrototypeSnapshots(projectId: string): Promise<PrototypeSnapshot[]>;
   getPrototypeSnapshot(snapshotId: string): Promise<PrototypeSnapshot>;
-  createPrototypeSnapshot(snapshot: PrototypeSnapshotCreate): Promise<PrototypeSnapshot>;
-  updatePrototypeSnapshot(snapshotId: string, data: Partial<PrototypeSnapshotCreate>): Promise<PrototypeSnapshot>;
-  deletePrototypeSnapshot(snapshotId: string, projectId: string): Promise<SuccessResponse>;
+  createPrototypeSnapshot(
+    snapshot: PrototypeSnapshotCreate
+  ): Promise<PrototypeSnapshot>;
+  updatePrototypeSnapshot(
+    snapshotId: string,
+    data: Partial<PrototypeSnapshotCreate>
+  ): Promise<PrototypeSnapshot>;
+  deletePrototypeSnapshot(
+    snapshotId: string,
+    projectId: string
+  ): Promise<SuccessResponse>;
 }
 
 // ==================== 实现 ====================
@@ -27,15 +38,18 @@ class PrototypeApiImpl implements PrototypeApi {
   async getPrototypeSnapshots(projectId: string): Promise<PrototypeSnapshot[]> {
     const cacheKey = getCacheKey('prototype_snapshots', projectId);
     const cached = cache.get<PrototypeSnapshot[]>(cacheKey);
-    
+
     if (!this.isOnline() && cached) {
       return cached;
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ prototypeSnapshots: PrototypeSnapshot[] }>(`/prototype-snapshots?projectId=${projectId}`);
+      return await httpClient.get<{ prototypeSnapshots: PrototypeSnapshot[] }>(
+        `/prototype-snapshots?projectId=${projectId}`
+      );
     });
-    const snapshots: PrototypeSnapshot[] = (result as any).prototypeSnapshots || result;
+    const snapshots: PrototypeSnapshot[] =
+      (result as any).prototypeSnapshots || result;
     cache.set(cacheKey, snapshots);
     return snapshots;
   }
@@ -43,38 +57,58 @@ class PrototypeApiImpl implements PrototypeApi {
   async getPrototypeSnapshot(snapshotId: string): Promise<PrototypeSnapshot> {
     const cacheKey = getCacheKey('prototype_snapshot', snapshotId);
     const cached = cache.get<PrototypeSnapshot>(cacheKey);
-    
+
     if (!this.isOnline() && cached) {
       return cached;
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ prototypeSnapshot: PrototypeSnapshot }>(`/prototype-snapshots/${snapshotId}`);
+      return await httpClient.get<{ prototypeSnapshot: PrototypeSnapshot }>(
+        `/prototype-snapshots/${snapshotId}`
+      );
     });
-    const snapshot: PrototypeSnapshot = (result as any).prototypeSnapshot || result;
+    const snapshot: PrototypeSnapshot =
+      (result as any).prototypeSnapshot || result;
     cache.set(cacheKey, snapshot);
     return snapshot;
   }
 
-  async createPrototypeSnapshot(snapshot: PrototypeSnapshotCreate): Promise<PrototypeSnapshot> {
+  async createPrototypeSnapshot(
+    snapshot: PrototypeSnapshotCreate
+  ): Promise<PrototypeSnapshot> {
     const result = await retry.execute(async () => {
-      return await httpClient.post<{ prototypeSnapshot: PrototypeSnapshot }>(`/prototype-snapshots`, snapshot);
+      return await httpClient.post<{ prototypeSnapshot: PrototypeSnapshot }>(
+        `/prototype-snapshots`,
+        snapshot
+      );
     });
-    const created: PrototypeSnapshot = (result as any).prototypeSnapshot || result;
+    const created: PrototypeSnapshot =
+      (result as any).prototypeSnapshot || result;
     cache.remove(getCacheKey('prototype_snapshots', snapshot.projectId));
     return created;
   }
 
-  async updatePrototypeSnapshot(snapshotId: string, data: Partial<PrototypeSnapshotCreate>): Promise<PrototypeSnapshot> {
+  async updatePrototypeSnapshot(
+    snapshotId: string,
+    data: Partial<PrototypeSnapshotCreate>
+  ): Promise<PrototypeSnapshot> {
     const result = await retry.execute(async () => {
-      return await httpClient.put<{ prototypeSnapshot: PrototypeSnapshot }>(`/prototype-snapshots/${snapshotId}`, data);
+      return await httpClient.put<{ prototypeSnapshot: PrototypeSnapshot }>(
+        `/prototype-snapshots/${snapshotId}`,
+        data
+      );
     });
     return (result as any).prototypeSnapshot || result;
   }
 
-  async deletePrototypeSnapshot(snapshotId: string, projectId: string): Promise<SuccessResponse> {
+  async deletePrototypeSnapshot(
+    snapshotId: string,
+    projectId: string
+  ): Promise<SuccessResponse> {
     const result = await retry.execute(async () => {
-      return await httpClient.delete<SuccessResponse>(`/prototype-snapshots/${snapshotId}`);
+      return await httpClient.delete<SuccessResponse>(
+        `/prototype-snapshots/${snapshotId}`
+      );
     });
     cache.remove(getCacheKey('prototype_snapshots', projectId));
     return result;

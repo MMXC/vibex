@@ -288,7 +288,12 @@
   width: 40px;
   height: 40px;
   border-radius: var(--radius-md);
-  background: linear-gradient(90deg, var(--color-bg-subtle) 25%, var(--color-bg-hover) 50%, var(--color-bg-subtle) 75%);
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-subtle) 25%,
+    var(--color-bg-hover) 50%,
+    var(--color-bg-subtle) 75%
+  );
   background-size: 200% 100%;
   animation: skeleton 1.5s ease-in-out infinite;
 }
@@ -303,7 +308,12 @@
 .skeletonLine {
   height: 12px;
   border-radius: var(--radius-sm);
-  background: linear-gradient(90deg, var(--color-bg-subtle) 25%, var(--color-bg-hover) 50%, var(--color-bg-subtle) 75%);
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-subtle) 25%,
+    var(--color-bg-hover) 50%,
+    var(--color-bg-subtle) 75%
+  );
   background-size: 200% 100%;
   animation: skeleton 1.5s ease-in-out infinite;
 }

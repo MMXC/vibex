@@ -66,7 +66,7 @@ export function Navigation({
         setActiveDropdown(null);
       }
     };
-    
+
     if (activeDropdown) {
       window.addEventListener('keydown', handleEsc);
     }
@@ -75,7 +75,7 @@ export function Navigation({
 
   const handleItemClick = (item: NavItem, index: number) => {
     if (item.disabled) return;
-    
+
     if (item.children) {
       setActiveDropdown(activeDropdown === item.label ? null : item.label);
     } else if (item.onClick) {
@@ -111,19 +111,23 @@ export function Navigation({
               className={`${styles.navLink} ${item.active ? styles.active : ''} ${item.disabled ? styles.disabled : ''}`}
               onClick={() => handleItemClick(item, index)}
               disabled={item.disabled}
-              aria-expanded={item.children ? activeDropdown === item.label : undefined}
+              aria-expanded={
+                item.children ? activeDropdown === item.label : undefined
+              }
               aria-haspopup={item.children ? 'true' : undefined}
             >
               {item.icon && <span className={styles.navIcon}>{item.icon}</span>}
               <span className={styles.navLabel}>{item.label}</span>
               {item.children && (
-                <span className={`${styles.chevron} ${activeDropdown === item.label ? styles.open : ''}`}>
+                <span
+                  className={`${styles.chevron} ${activeDropdown === item.label ? styles.open : ''}`}
+                >
                   ▾
                 </span>
               )}
             </button>
           )}
-          
+
           {item.children && activeDropdown === item.label && (
             <div className={styles.dropdownMenu}>
               {item.children.map((child, childIndex) => (
@@ -139,7 +143,9 @@ export function Navigation({
                     }
                   }}
                 >
-                  {child.icon && <span className={styles.dropdownIcon}>{child.icon}</span>}
+                  {child.icon && (
+                    <span className={styles.dropdownIcon}>{child.icon}</span>
+                  )}
                   <span className={styles.dropdownLabel}>{child.label}</span>
                 </a>
               ))}

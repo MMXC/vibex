@@ -41,7 +41,9 @@ export function Avatar({
     styles[shape],
     onClick && styles.clickable,
     className,
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   const handleImageError = () => {
     setImageError(true);
@@ -52,7 +54,11 @@ export function Avatar({
   };
 
   return (
-    <div className={classNames} onClick={onClick} role={onClick ? 'button' : undefined}>
+    <div
+      className={classNames}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+    >
       {showFallback ? (
         <span className={styles.fallback}>
           {fallback ? getInitials(fallback) : '?'}

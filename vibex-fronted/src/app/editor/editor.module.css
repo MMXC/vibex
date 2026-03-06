@@ -24,7 +24,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: 
+  background-image:
     linear-gradient(rgba(0, 255, 255, 0.02) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0, 255, 255, 0.02) 1px, transparent 1px);
   background-size: 20px 20px;
@@ -113,7 +113,11 @@
 
 .primaryBtn {
   padding: 8px 16px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 100%
+  );
   border: none;
   border-radius: 6px;
   color: var(--color-text-inverse);
@@ -394,7 +398,11 @@
 
 .previewButton {
   padding: 12px 24px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 100%
+  );
   border: none;
   border-radius: 8px;
   color: var(--color-text-inverse);
@@ -527,14 +535,15 @@
   .leftPanel {
     width: 220px;
   }
-  
+
   .rightPanel {
     width: 240px;
   }
 }
 
 @media (max-width: 768px) {
-  .leftPanel, .rightPanel {
+  .leftPanel,
+  .rightPanel {
     display: none;
   }
 }

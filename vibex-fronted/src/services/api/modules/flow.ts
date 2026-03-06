@@ -26,7 +26,7 @@ class FlowApiImpl implements FlowApi {
   async getFlow(flowId: string): Promise<FlowData> {
     const cacheKey = getCacheKey('flow', flowId);
     const cached = cache.get<FlowData>(cacheKey);
-    
+
     if (!this.isOnline() && cached) {
       return cached;
     }
@@ -48,7 +48,9 @@ class FlowApiImpl implements FlowApi {
 
   async generateFlow(description: string): Promise<FlowData> {
     const result = await retry.execute(async () => {
-      return await httpClient.post<FlowData>('/flows/generate', { description });
+      return await httpClient.post<FlowData>('/flows/generate', {
+        description,
+      });
     });
     return result;
   }

@@ -33,7 +33,7 @@ interface D1Result<T = unknown> {
 // For local development only - provides fallback env
 export function getLocalEnv(): CloudflareEnv {
   return {
-    DB: {} as D1Database,
+    DB: undefined as unknown as D1Database,
     ENVIRONMENT: 'development',
     JWT_SECRET: process.env.JWT_SECRET || 'vibex-dev-secret',
     MINIMAX_API_KEY: process.env.MINIMAX_API_KEY || '',

@@ -61,12 +61,12 @@ export const StreamingMessage = memo(function StreamingMessage({
           // 每次渲染添加多个字符以提高性能
           const chunkSize = Math.min(3, totalLength - currentIndex);
           const nextContent = content.substring(0, currentIndex + chunkSize);
-          
+
           setDisplayedContent(nextContent);
           onContentChange?.(nextContent);
-          
+
           currentIndex += chunkSize;
-          
+
           // 使用 setTimeout 而不是 requestAnimationFrame 以控制速度
           streamRef.current = window.setTimeout(stream, streamingSpeed);
         } else {
@@ -119,15 +119,12 @@ export const StreamingMessage = memo(function StreamingMessage({
         ${className}
       `}
     >
-      <div className={styles.avatar}>
-        {isUser ? 'U' : '◈'}
-      </div>
-      <div className={`${styles.content} ${isUser ? styles.userContent : styles.assistantContent}`}>
+      <div className={styles.avatar}>{isUser ? 'U' : '◈'}</div>
+      <div
+        className={`${styles.content} ${isUser ? styles.userContent : styles.assistantContent}`}
+      >
         <div className={styles.bubble}>
-          <StreamingText 
-            content={displayedContent} 
-            isStreaming={isTyping}
-          />
+          <StreamingText content={displayedContent} isStreaming={isTyping} />
         </div>
         {timestamp && (
           <span className={styles.time}>{formatTime(timestamp)}</span>
@@ -145,29 +142,34 @@ interface StreamingTextProps {
   isStreaming: boolean;
 }
 
-const StreamingText = memo(function StreamingText({ content, isStreaming }: StreamingTextProps) {
+const StreamingText = memo(function StreamingText({
+  content,
+  isStreaming,
+}: StreamingTextProps) {
   // 简单的 Markdown 渲染 - 处理换行和代码块
   const renderContent = (text: string) => {
     if (!text) return null;
 
     // 处理换行
     const lines = text.split('\n');
-    
+
     return lines.map((line, lineIndex) => {
       // 检测代码块
       if (line.startsWith('```')) {
         return <br key={lineIndex} />;
       }
-      
+
       // 处理行内代码
       const codeMatch = line.match(/`([^`]+)`/);
       if (codeMatch) {
         const parts = line.split(/`([^`]+)`/);
         return (
           <span key={lineIndex}>
-            {parts.map((part, i) => 
+            {parts.map((part, i) =>
               i % 2 === 1 ? (
-                <code key={i} className={styles.inlineCode}>{part}</code>
+                <code key={i} className={styles.inlineCode}>
+                  {part}
+                </code>
               ) : (
                 <span key={i}>{part}</span>
               )

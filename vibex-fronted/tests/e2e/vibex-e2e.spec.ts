@@ -2,7 +2,8 @@ import { test, expect } from '@playwright/test';
 
 // Configuration
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
-const SCREENSHOT_DIR = process.env.SCREENSHOT_DIR || 'tests/e2e/screenshots/daily';
+const SCREENSHOT_DIR =
+  process.env.SCREENSHOT_DIR || 'tests/e2e/screenshots/daily';
 const DATE = new Date().toISOString().split('T')[0];
 
 // Test accounts
@@ -30,7 +31,11 @@ test.describe('VibeX E2E Tests', () => {
 
   test('03-login-page', async ({ page }) => {
     await page.goto(`${BASE_URL}/auth`);
-    await expect(page.locator('input[type="email"], input[name="email"], input[type="text"]').first()).toBeVisible();
+    await expect(
+      page
+        .locator('input[type="email"], input[name="email"], input[type="text"]')
+        .first()
+    ).toBeVisible();
     await takeScreenshot(page, 'login-page');
   });
 

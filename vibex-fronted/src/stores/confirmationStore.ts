@@ -1,219 +1,230 @@
-import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 // Storage version for migration
-const STORAGE_VERSION = 1
-const STORAGE_KEY = 'confirmation-flow-storage'
+const STORAGE_VERSION = 1;
+const STORAGE_KEY = 'confirmation-flow-storage';
 
-export type ConfirmationStep = 'input' | 'context' | 'model' | 'flow' | 'success'
+export type ConfirmationStep =
+  | 'input'
+  | 'context'
+  | 'model'
+  | 'flow'
+  | 'success';
 
 // Snapshot type for undo/redo
 export interface ConfirmationSnapshot {
-  step: ConfirmationStep
-  requirementText: string
-  boundedContexts: BoundedContext[]
-  selectedContextIds: string[]
-  contextMermaidCode: string
-  domainModels: DomainModel[]
-  modelMermaidCode: string
-  businessFlow: BusinessFlow
-  flowMermaidCode: string
-  timestamp: number
+  step: ConfirmationStep;
+  requirementText: string;
+  boundedContexts: BoundedContext[];
+  selectedContextIds: string[];
+  contextMermaidCode: string;
+  domainModels: DomainModel[];
+  modelMermaidCode: string;
+  businessFlow: BusinessFlow;
+  flowMermaidCode: string;
+  timestamp: number;
 }
 
 export interface BoundedContext {
-  id: string
-  name: string
-  description: string
-  type: 'core' | 'supporting' | 'generic' | 'external'
-  relationships: ContextRelationship[]
+  id: string;
+  name: string;
+  description: string;
+  type: 'core' | 'supporting' | 'generic' | 'external';
+  relationships: ContextRelationship[];
 }
 
 export interface ContextRelationship {
-  id: string
-  fromContextId: string
-  toContextId: string
-  type: 'upstream' | 'downstream' | 'symmetric'
-  description: string
+  id: string;
+  fromContextId: string;
+  toContextId: string;
+  type: 'upstream' | 'downstream' | 'symmetric';
+  description: string;
 }
 
 export interface DomainModel {
-  id: string
-  name: string
-  contextId: string
-  type: 'aggregate_root' | 'entity' | 'value_object'
-  properties: DomainProperty[]
-  methods: string[]
+  id: string;
+  name: string;
+  contextId: string;
+  type: 'aggregate_root' | 'entity' | 'value_object';
+  properties: DomainProperty[];
+  methods: string[];
 }
 
 export interface DomainProperty {
-  name: string
-  type: string
-  required: boolean
-  description: string
+  name: string;
+  type: string;
+  required: boolean;
+  description: string;
 }
 
 export interface BusinessFlow {
-  id: string
-  name: string
-  states: FlowState[]
-  transitions: FlowTransition[]
+  id: string;
+  name: string;
+  states: FlowState[];
+  transitions: FlowTransition[];
 }
 
 export interface FlowState {
-  id: string
-  name: string
-  type: 'initial' | 'intermediate' | 'final'
-  description: string
+  id: string;
+  name: string;
+  type: 'initial' | 'intermediate' | 'final';
+  description: string;
 }
 
 export interface FlowTransition {
-  id: string
-  fromStateId: string
-  toStateId: string
-  event: string
-  condition?: string
+  id: string;
+  fromStateId: string;
+  toStateId: string;
+  event: string;
+  condition?: string;
 }
 
 export interface ConfirmationFlowState {
   // Current step
-  currentStep: ConfirmationStep
-  stepHistory: ConfirmationStep[]
-  
+  currentStep: ConfirmationStep;
+  stepHistory: ConfirmationStep[];
+
   // Step 1: Input
-  requirementText: string
-  
+  requirementText: string;
+
   // Step 2: Bounded Context
-  boundedContexts: BoundedContext[]
-  selectedContextIds: string[]
-  contextMermaidCode: string
-  
+  boundedContexts: BoundedContext[];
+  selectedContextIds: string[];
+  contextMermaidCode: string;
+
   // Step 3: Domain Model
-  domainModels: DomainModel[]
-  modelMermaidCode: string
-  
+  domainModels: DomainModel[];
+  modelMermaidCode: string;
+
   // Step 4: Business Flow
-  businessFlow: BusinessFlow
-  flowMermaidCode: string
-  
+  businessFlow: BusinessFlow;
+  flowMermaidCode: string;
+
   // Project created
-  createdProjectId: string | null
-  
+  createdProjectId: string | null;
+
   // History for undo/redo
-  history: ConfirmationSnapshot[]
-  historyIndex: number
-  
+  history: ConfirmationSnapshot[];
+  historyIndex: number;
+
   // Actions
-  setCurrentStep: (step: ConfirmationStep) => void
-  goToNextStep: () => void
-  goToPreviousStep: () => void
-  
-  setRequirementText: (text: string) => void
-  
-  setBoundedContexts: (contexts: BoundedContext[]) => void
-  setSelectedContextIds: (ids: string[]) => void
-  setContextMermaidCode: (code: string) => void
-  
-  setDomainModels: (models: DomainModel[]) => void
-  setModelMermaidCode: (code: string) => void
-  
-  setBusinessFlow: (flow: BusinessFlow) => void
-  setFlowMermaidCode: (code: string) => void
-  
-  setCreatedProjectId: (id: string) => void
-  
+  setCurrentStep: (step: ConfirmationStep) => void;
+  goToNextStep: () => void;
+  goToPreviousStep: () => void;
+
+  setRequirementText: (text: string) => void;
+
+  setBoundedContexts: (contexts: BoundedContext[]) => void;
+  setSelectedContextIds: (ids: string[]) => void;
+  setContextMermaidCode: (code: string) => void;
+
+  setDomainModels: (models: DomainModel[]) => void;
+  setModelMermaidCode: (code: string) => void;
+
+  setBusinessFlow: (flow: BusinessFlow) => void;
+  setFlowMermaidCode: (code: string) => void;
+
+  setCreatedProjectId: (id: string) => void;
+
   // Undo/Redo actions
-  saveSnapshot: () => void
-  undo: () => void
-  redo: () => void
-  canUndo: () => boolean
-  canRedo: () => boolean
-  
-  reset: () => void
+  saveSnapshot: () => void;
+  undo: () => void;
+  redo: () => void;
+  canUndo: () => boolean;
+  canRedo: () => boolean;
+
+  reset: () => void;
 }
 
 const initialState = {
   currentStep: 'input' as ConfirmationStep,
   stepHistory: [] as ConfirmationStep[],
-  
+
   requirementText: '',
-  
+
   boundedContexts: [],
   selectedContextIds: [],
   contextMermaidCode: '',
-  
+
   domainModels: [],
   modelMermaidCode: '',
-  
+
   businessFlow: {
     id: '',
     name: '',
     states: [],
-    transitions: []
+    transitions: [],
   },
   flowMermaidCode: '',
-  
+
   createdProjectId: null,
-  
+
   // History
   history: [] as ConfirmationSnapshot[],
   historyIndex: -1,
-}
+};
 
 export const useConfirmationStore = create<ConfirmationFlowState>()(
   persist(
     (set, get) => ({
       ...initialState,
-      
+
       setCurrentStep: (step) => {
-        const current = get().currentStep
-        set(state => ({
+        const current = get().currentStep;
+        set((state) => ({
           currentStep: step,
-          stepHistory: [...state.stepHistory, current]
-        }))
+          stepHistory: [...state.stepHistory, current],
+        }));
       },
-      
+
       goToNextStep: () => {
-        const { currentStep } = get()
-        const stepOrder: ConfirmationStep[] = ['input', 'context', 'model', 'flow', 'success']
-        const currentIndex = stepOrder.indexOf(currentStep)
+        const { currentStep } = get();
+        const stepOrder: ConfirmationStep[] = [
+          'input',
+          'context',
+          'model',
+          'flow',
+          'success',
+        ];
+        const currentIndex = stepOrder.indexOf(currentStep);
         if (currentIndex < stepOrder.length - 1) {
-          const nextStep = stepOrder[currentIndex + 1]
-          set(state => ({
+          const nextStep = stepOrder[currentIndex + 1];
+          set((state) => ({
             currentStep: nextStep,
-            stepHistory: [...state.stepHistory, currentStep]
-          }))
+            stepHistory: [...state.stepHistory, currentStep],
+          }));
         }
       },
-      
+
       goToPreviousStep: () => {
-        const { stepHistory } = get()
+        const { stepHistory } = get();
         if (stepHistory.length > 0) {
-          const previousStep = stepHistory[stepHistory.length - 1]
-          set(state => ({
+          const previousStep = stepHistory[stepHistory.length - 1];
+          set((state) => ({
             currentStep: previousStep,
-            stepHistory: stepHistory.slice(0, -1)
-          }))
+            stepHistory: stepHistory.slice(0, -1),
+          }));
         }
       },
-      
+
       setRequirementText: (text) => set({ requirementText: text }),
-      
+
       setBoundedContexts: (contexts) => set({ boundedContexts: contexts }),
       setSelectedContextIds: (ids) => set({ selectedContextIds: ids }),
       setContextMermaidCode: (code) => set({ contextMermaidCode: code }),
-      
+
       setDomainModels: (models) => set({ domainModels: models }),
       setModelMermaidCode: (code) => set({ modelMermaidCode: code }),
-      
+
       setBusinessFlow: (flow) => set({ businessFlow: flow }),
       setFlowMermaidCode: (code) => set({ flowMermaidCode: code }),
-      
+
       setCreatedProjectId: (id) => set({ createdProjectId: id }),
-      
+
       // Save current state to history
       saveSnapshot: () => {
-        const state = get()
+        const state = get();
         const snapshot: ConfirmationSnapshot = {
           step: state.currentStep,
           requirementText: state.requirementText,
@@ -225,28 +236,28 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
           businessFlow: state.businessFlow,
           flowMermaidCode: state.flowMermaidCode,
           timestamp: Date.now(),
-        }
-        
+        };
+
         // Remove any redo states
-        const newHistory = state.history.slice(0, state.historyIndex + 1)
-        newHistory.push(snapshot)
-        
+        const newHistory = state.history.slice(0, state.historyIndex + 1);
+        newHistory.push(snapshot);
+
         // Keep only last 50 snapshots
         if (newHistory.length > 50) {
-          newHistory.shift()
+          newHistory.shift();
         }
-        
+
         set({
           history: newHistory,
           historyIndex: newHistory.length - 1,
-        })
+        });
       },
-      
+
       // Undo to previous state
       undo: () => {
-        const { history, historyIndex } = get()
+        const { history, historyIndex } = get();
         if (historyIndex > 0) {
-          const prevSnapshot = history[historyIndex - 1]
+          const prevSnapshot = history[historyIndex - 1];
           set({
             currentStep: prevSnapshot.step,
             requirementText: prevSnapshot.requirementText,
@@ -258,15 +269,15 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
             businessFlow: prevSnapshot.businessFlow,
             flowMermaidCode: prevSnapshot.flowMermaidCode,
             historyIndex: historyIndex - 1,
-          })
+          });
         }
       },
-      
+
       // Redo to next state
       redo: () => {
-        const { history, historyIndex } = get()
+        const { history, historyIndex } = get();
         if (historyIndex < history.length - 1) {
-          const nextSnapshot = history[historyIndex + 1]
+          const nextSnapshot = history[historyIndex + 1];
           set({
             currentStep: nextSnapshot.step,
             requirementText: nextSnapshot.requirementText,
@@ -278,22 +289,22 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
             businessFlow: nextSnapshot.businessFlow,
             flowMermaidCode: nextSnapshot.flowMermaidCode,
             historyIndex: historyIndex + 1,
-          })
+          });
         }
       },
-      
+
       // Check if undo is available
       canUndo: () => {
-        const { historyIndex } = get()
-        return historyIndex > 0
+        const { historyIndex } = get();
+        return historyIndex > 0;
       },
-      
+
       // Check if redo is available
       canRedo: () => {
-        const { history, historyIndex } = get()
-        return historyIndex < history.length - 1
+        const { history, historyIndex } = get();
+        return historyIndex < history.length - 1;
       },
-      
+
       reset: () => set(initialState),
     }),
     {
@@ -316,16 +327,24 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
       version: STORAGE_VERSION,
       onRehydrateStorage: () => (state, error) => {
         if (error) {
-          console.error('Failed to rehydrate confirmation store:', error)
+          console.error('Failed to rehydrate confirmation store:', error);
         }
       },
-      migrate: (persistedState: unknown, oldVersion: number): ConfirmationFlowState => {
+      migrate: (
+        persistedState: unknown,
+        oldVersion: number
+      ): ConfirmationFlowState => {
         if (oldVersion < 1) {
           // Version 1 migration: Add any new fields with defaults
-          console.log('Migrating confirmation store from version', oldVersion, 'to', STORAGE_VERSION)
+          console.log(
+            'Migrating confirmation store from version',
+            oldVersion,
+            'to',
+            STORAGE_VERSION
+          );
         }
-        return persistedState as ConfirmationFlowState
+        return persistedState as ConfirmationFlowState;
       },
     }
   )
-)
+);

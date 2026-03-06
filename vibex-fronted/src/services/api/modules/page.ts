@@ -27,13 +27,15 @@ class PageApiImpl implements PageApi {
   async getPages(projectId?: string): Promise<Page[]> {
     const cacheKey = getCacheKey('pages', projectId || 'all');
     const cached = cache.get<Page[]>(cacheKey);
-    
+
     if (!this.isOnline() && cached) {
       return cached;
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ pages: Page[] }>('/pages', { params: { projectId } });
+      return await httpClient.get<{ pages: Page[] }>('/pages', {
+        params: { projectId },
+      });
     });
     const pages: Page[] = (result as any).pages || result;
     cache.set(cacheKey, pages);
@@ -43,7 +45,7 @@ class PageApiImpl implements PageApi {
   async getPage(pageId: string): Promise<Page> {
     const cacheKey = getCacheKey('page', pageId);
     const cached = cache.get<Page>(cacheKey);
-    
+
     if (!this.isOnline() && cached) {
       return cached;
     }

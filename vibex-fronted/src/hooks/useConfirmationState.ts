@@ -1,11 +1,11 @@
 /**
  * useConfirmationState Hook - 确认流程状态校验
- * 
+ *
  * 用于检查确认流程各步骤的前置数据是否存在
- * 
+ *
  * Usage:
  * const { isValid, redirectTo, message } = useConfirmationState('context')
- * 
+ *
  * if (!isValid) {
  *   router.push(redirectTo)
  * }
@@ -14,7 +14,10 @@
 'use client';
 
 import { useMemo } from 'react';
-import { useConfirmationStore, ConfirmationStep } from '@/stores/confirmationStore';
+import {
+  useConfirmationStore,
+  ConfirmationStep,
+} from '@/stores/confirmationStore';
 
 export type ConfirmationStepKey = 'context' | 'model' | 'flow';
 
@@ -59,22 +62,25 @@ export interface UseConfirmationStateReturn {
   };
 }
 
-export function useConfirmationState(step: ConfirmationStepKey): UseConfirmationStateReturn {
+export function useConfirmationState(
+  step: ConfirmationStepKey
+): UseConfirmationStateReturn {
   const store = useConfirmationStore();
-  
+
   return useMemo(() => {
-    const { requirementText, boundedContexts, domainModels, businessFlow } = store;
-    
+    const { requirementText, boundedContexts, domainModels, businessFlow } =
+      store;
+
     // 检查各项数据
     const hasRequirementText = !!requirementText?.trim();
     const hasBoundedContexts = boundedContexts?.length > 0;
     const hasDomainModels = domainModels?.length > 0;
     const hasBusinessFlow = !!businessFlow;
-    
+
     // 根据步骤检查前置条件
     let isValid = false;
     let message = '';
-    
+
     switch (step) {
       case 'context':
         isValid = hasRequirementText;
@@ -89,7 +95,7 @@ export function useConfirmationState(step: ConfirmationStepKey): UseConfirmation
         message = isValid ? '' : '请先完成领域模型确认';
         break;
     }
-    
+
     // 计算重定向路径
     let redirectTo = '/confirm';
     if (!isValid) {
@@ -98,7 +104,7 @@ export function useConfirmationState(step: ConfirmationStepKey): UseConfirmation
         redirectTo = `/confirm?step=${prevStep}`;
       }
     }
-    
+
     return {
       isValid,
       redirectTo,

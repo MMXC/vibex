@@ -16,9 +16,9 @@
 .gridOverlay {
   position: absolute;
   inset: 0;
-  background-image: 
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 50px 50px;
 }
 
@@ -28,7 +28,11 @@
   right: -200px;
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(99, 102, 241, 0.15) 0%,
+    transparent 70%
+  );
   border-radius: 50%;
 }
 
@@ -106,7 +110,7 @@
 
 .retryButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(99,102,241,0.3);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
 }
 
 /* 侧边栏 */
@@ -116,8 +120,8 @@
   top: 0;
   bottom: 0;
   width: 240px;
-  background: rgba(15,15,25,0.95);
-  border-right: 1px solid rgba(255,255,255,0.08);
+  background: rgba(15, 15, 25, 0.95);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
   z-index: 10;
@@ -126,7 +130,7 @@
 
 .sidebarLogo {
   padding: 24px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .logoLink {
@@ -170,12 +174,12 @@
 }
 
 .navItem:hover {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   color: #fff;
 }
 
 .navItem.active {
-  background: rgba(129,140,248,0.15);
+  background: rgba(129, 140, 248, 0.15);
   color: #818cf8;
 }
 
@@ -187,7 +191,7 @@
 
 .sidebarFooter {
   padding: 16px 12px;
-  border-top: 1px solid rgba(255,255,255,0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* 主内容区 */
@@ -236,15 +240,15 @@
 
 .createButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(99,102,241,0.3);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
 }
 
 /* 错误提示 */
 .error {
   padding: 14px 18px;
   margin-bottom: 20px;
-  background: rgba(239,68,68,0.1);
-  border: 1px solid rgba(239,68,68,0.3);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
   border-radius: 10px;
   color: #f87171;
   font-size: 14px;
@@ -259,8 +263,8 @@
 }
 
 .statCard {
-  background: rgba(30,30,46,0.8);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(30, 30, 46, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   padding: 20px;
   display: flex;
@@ -271,7 +275,7 @@
 
 .statCard:hover {
   transform: translateY(-2px);
-  border-color: rgba(255,255,255,0.15);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .statIcon {
@@ -294,10 +298,18 @@
   color: #6b7280;
 }
 
-.statcyan .statIcon { color: #22d3ee; }
-.statblue .statIcon { color: #60a5fa; }
-.statgreen .statIcon { color: #34d399; }
-.statorange .statIcon { color: #fb923c; }
+.statcyan .statIcon {
+  color: #22d3ee;
+}
+.statblue .statIcon {
+  color: #60a5fa;
+}
+.statgreen .statIcon {
+  color: #34d399;
+}
+.statorange .statIcon {
+  color: #fb923c;
+}
 
 /* 筛选 */
 .filterSection {
@@ -312,8 +324,8 @@
 
 .filterTab {
   padding: 8px 16px;
-  background: rgba(30,30,46,0.8);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(30, 30, 46, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   color: #9ca3af;
   font-size: 13px;
@@ -322,20 +334,20 @@
 }
 
 .filterTab:hover {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   color: #fff;
 }
 
 .filterTab.active {
-  background: rgba(129,140,248,0.2);
+  background: rgba(129, 140, 248, 0.2);
   border-color: #818cf8;
   color: #818cf8;
 }
 
 /* 列表区域 */
 .section {
-  background: rgba(30,30,46,0.5);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(30, 30, 46, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   padding: 24px;
 }
@@ -400,16 +412,16 @@
 }
 
 .card {
-  background: rgba(40,40,60,0.6);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(40, 40, 60, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
   padding: 20px;
   transition: all 0.2s;
 }
 
 .card:hover {
-  background: rgba(40,40,60,0.9);
-  border-color: rgba(255,255,255,0.12);
+  background: rgba(40, 40, 60, 0.9);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .cardHeader {
@@ -452,7 +464,7 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .cardMeta {
@@ -472,8 +484,8 @@
 
 .actionBtn {
   padding: 6px 14px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 6px;
   color: #e5e7eb;
   font-size: 13px;
@@ -483,13 +495,13 @@
 }
 
 .actionBtn:hover {
-  background: rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.15);
   color: #fff;
 }
 
 .deleteBtn:hover {
-  background: rgba(239,68,68,0.2);
-  border-color: rgba(239,68,68,0.3);
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.3);
   color: #f87171;
 }
 
@@ -504,37 +516,37 @@
   .sidebar {
     width: 70px;
   }
-  
+
   .sidebarLogo span:last-child,
   .navItem span:last-child {
     display: none;
   }
-  
+
   .navItem {
     justify-content: center;
     padding: 12px;
   }
-  
+
   .main {
     margin-left: 70px;
     padding: 20px;
   }
-  
+
   .header {
     flex-direction: column;
     gap: 16px;
   }
-  
+
   .stats {
     grid-template-columns: 1fr;
   }
-  
+
   .cardFooter {
     flex-direction: column;
     gap: 12px;
     align-items: flex-start;
   }
-  
+
   .cardActions {
     width: 100%;
     justify-content: flex-end;

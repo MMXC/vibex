@@ -38,7 +38,7 @@ describe('useConfirmationState', () => {
   describe('context step validation', () => {
     it('should return invalid when no requirement text', () => {
       const { result } = renderHook(() => useConfirmationState('context'));
-      
+
       expect(result.current.isValid).toBe(false);
       expect(result.current.message).toBe('请先输入需求描述');
       expect(result.current.checks.hasRequirementText).toBe(false);
@@ -46,9 +46,9 @@ describe('useConfirmationState', () => {
 
     it('should return valid when requirement text exists', () => {
       mockStore.requirementText = 'Test requirement';
-      
+
       const { result } = renderHook(() => useConfirmationState('context'));
-      
+
       expect(result.current.isValid).toBe(true);
       expect(result.current.message).toBe('');
       expect(result.current.checks.hasRequirementText).toBe(true);
@@ -56,7 +56,7 @@ describe('useConfirmationState', () => {
 
     it('should redirect to /confirm when invalid', () => {
       const { result } = renderHook(() => useConfirmationState('context'));
-      
+
       expect(result.current.redirectTo).toBe('/confirm');
     });
   });
@@ -64,7 +64,7 @@ describe('useConfirmationState', () => {
   describe('model step validation', () => {
     it('should return invalid when no bounded contexts', () => {
       const { result } = renderHook(() => useConfirmationState('model'));
-      
+
       expect(result.current.isValid).toBe(false);
       expect(result.current.message).toBe('请先完成限界上下文确认');
       expect(result.current.checks.hasBoundedContexts).toBe(false);
@@ -72,9 +72,9 @@ describe('useConfirmationState', () => {
 
     it('should return valid when bounded contexts exist', () => {
       mockStore.boundedContexts = [{ id: '1', name: 'Context 1' }];
-      
+
       const { result } = renderHook(() => useConfirmationState('model'));
-      
+
       expect(result.current.isValid).toBe(true);
       expect(result.current.message).toBe('');
       expect(result.current.checks.hasBoundedContexts).toBe(true);
@@ -82,7 +82,7 @@ describe('useConfirmationState', () => {
 
     it('should redirect to context step when invalid', () => {
       const { result } = renderHook(() => useConfirmationState('model'));
-      
+
       expect(result.current.redirectTo).toBe('/confirm?step=context');
     });
   });
@@ -90,7 +90,7 @@ describe('useConfirmationState', () => {
   describe('flow step validation', () => {
     it('should return invalid when no domain models', () => {
       const { result } = renderHook(() => useConfirmationState('flow'));
-      
+
       expect(result.current.isValid).toBe(false);
       expect(result.current.message).toBe('请先完成领域模型确认');
       expect(result.current.checks.hasDomainModels).toBe(false);
@@ -98,9 +98,9 @@ describe('useConfirmationState', () => {
 
     it('should return valid when domain models exist', () => {
       mockStore.domainModels = [{ id: '1', name: 'Model 1' }];
-      
+
       const { result } = renderHook(() => useConfirmationState('flow'));
-      
+
       expect(result.current.isValid).toBe(true);
       expect(result.current.message).toBe('');
       expect(result.current.checks.hasDomainModels).toBe(true);
@@ -108,7 +108,7 @@ describe('useConfirmationState', () => {
 
     it('should redirect to model step when invalid', () => {
       const { result } = renderHook(() => useConfirmationState('flow'));
-      
+
       expect(result.current.redirectTo).toBe('/confirm?step=model');
     });
   });
@@ -119,9 +119,9 @@ describe('useConfirmationState', () => {
       mockStore.boundedContexts = [{ id: '1' }];
       mockStore.domainModels = [{ id: '1' }];
       mockStore.businessFlow = { nodes: [] };
-      
+
       const { result } = renderHook(() => useConfirmationState('context'));
-      
+
       expect(result.current.checks.hasRequirementText).toBe(true);
       expect(result.current.checks.hasBoundedContexts).toBe(true);
       expect(result.current.checks.hasDomainModels).toBe(true);
@@ -132,18 +132,18 @@ describe('useConfirmationState', () => {
   describe('edge cases', () => {
     it('should handle whitespace-only requirement text as invalid', () => {
       mockStore.requirementText = '   ';
-      
+
       const { result } = renderHook(() => useConfirmationState('context'));
-      
+
       expect(result.current.isValid).toBe(false);
     });
 
     it('should handle empty arrays correctly', () => {
       mockStore.boundedContexts = [];
       mockStore.domainModels = [];
-      
+
       const { result } = renderHook(() => useConfirmationState('model'));
-      
+
       expect(result.current.checks.hasBoundedContexts).toBe(false);
     });
 
@@ -152,9 +152,9 @@ describe('useConfirmationState', () => {
       mockStore.boundedContexts = undefined as any;
       mockStore.domainModels = undefined as any;
       mockStore.businessFlow = undefined as any;
-      
+
       const { result } = renderHook(() => useConfirmationState('context'));
-      
+
       expect(result.current.checks.hasRequirementText).toBe(false);
     });
   });

@@ -1,14 +1,14 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import styles from '../confirm.module.css'
-import { useConfirmationStore } from '@/stores/confirmationStore'
-import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps'
-import { generateBusinessFlow, apiService } from '@/services/api'
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import styles from '../confirm.module.css';
+import { useConfirmationStore } from '@/stores/confirmationStore';
+import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps';
+import { generateBusinessFlow, apiService } from '@/services/api';
 
 export default function FlowPage() {
-  const router = useRouter()
+  const router = useRouter();
   const {
     domainModels,
     businessFlow,
@@ -20,109 +20,85 @@ export default function FlowPage() {
     goToPreviousStep,
     currentStep,
     requirementText,
-  } = useConfirmationStore()
+  } = useConfirmationStore();
 
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   // Generate business flow via API
   useEffect(() => {
     const generateFlow = async () => {
       if (!businessFlow.states.length && domainModels.length > 0) {
-        setLoading(true)
-        setError('')
-        
+        setLoading(true);
+        setError('');
+
         try {
-          const response = await generateBusinessFlow(domainModels, requirementText)
-          
+          const response = await generateBusinessFlow(
+            domainModels,
+            requirementText
+          );
+
           if (response.success && response.businessFlow) {
-            setBusinessFlow(response.businessFlow)
+            setBusinessFlow(response.businessFlow);
             if (response.mermaidCode) {
-              setFlowMermaidCode(response.mermaidCode)
+              setFlowMermaidCode(response.mermaidCode);
             }
           } else {
-            throw new Error(response.error || '生成失败')
+            throw new Error(response.error || '生成失败');
           }
         } catch (err) {
-          console.error('Failed to generate business flow:', err)
-          // Fallback to mock data
-          generateMockFlow()
+          console.error('Failed to generate business flow:', err);
+          // Throw error instead of using mock fallback - MSW should handle this
+          throw err;
         } finally {
-          setLoading(false)
+          setLoading(false);
         }
       }
-    }
-    
-    generateFlow()
-  }, [domainModels, requirementText])
+    };
 
-  // Fallback mock business flow
-  const generateMockFlow = () => {
-    const states = [
-      { id: 'state-1', name: '初始', type: 'initial' as const, description: '开始' },
-      { id: 'state-2', name: '处理中', type: 'intermediate' as const, description: '处理中' },
-      { id: 'state-3', name: '完成', type: 'final' as const, description: '完成' },
-    ]
-    
-    const transitions = [
-      { id: 'trans-1', fromStateId: 'state-1', toStateId: 'state-2', event: '开始处理' },
-      { id: 'trans-2', fromStateId: 'state-2', toStateId: 'state-3', event: '处理完成' },
-    ]
-    
-    setBusinessFlow({
-      id: 'flow-1',
-      name: '业务流程',
-      states,
-      transitions,
-    })
-    
-    setFlowMermaidCode(`stateDiagram-v2
-  [*] --> 初始
-  初始 --> 处理中: 开始处理
-  处理中 --> 完成: 处理完成
-  完成 --> [*]`)
-  }
+    generateFlow();
+  }, [domainModels, requirementText]);
 
   const typeLabels = {
     initial: '初始状态',
     intermediate: '中间状态',
     final: '最终状态',
-  }
+  };
 
   const typeColors = {
     initial: '#4ade80',
     intermediate: '#60a5fa',
     final: '#a78bfa',
-  }
+  };
 
   const handleConfirm = async () => {
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError('');
 
     try {
       // Get userId from localStorage
-      const userId = localStorage.getItem('user_id') || 'anonymous'
-      
+      const userId = localStorage.getItem('user_id') || 'anonymous';
+
       // Call API to create project
       const project = await apiService.createProject({
         name: `项目-${Date.now()}`,
         description: requirementText,
         userId,
-      })
-      
-      setCreatedProjectId(project.id)
-      goToNextStep()
-      router.push('/confirm/success')
+      });
+
+      setCreatedProjectId(project.id);
+      goToNextStep();
+      router.push('/confirm/success');
     } catch (err: unknown) {
       // Fallback to mock project creation on error
-      console.error('Failed to create project:', err)
-      setCreatedProjectId(`project-${Date.now()}`)
-      goToNextStep()
-      router.push('/confirm/success')
+      console.error('Failed to create project:', err);
+      setCreatedProjectId(`project-${Date.now()}`);
+      goToNextStep();
+      router.push('/confirm/success');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className={styles.container}>
@@ -163,9 +139,19 @@ export default function FlowPage() {
           <div className={styles.flowTransitions}>
             {businessFlow.transitions.map((trans) => (
               <div key={trans.id} className={styles.flowTransition}>
-                <span>{businessFlow.states.find(s => s.id === trans.fromStateId)?.name}</span>
+                <span>
+                  {
+                    businessFlow.states.find((s) => s.id === trans.fromStateId)
+                      ?.name
+                  }
+                </span>
                 <span className={styles.transitionArrow}>→</span>
-                <span>{businessFlow.states.find(s => s.id === trans.toStateId)?.name}</span>
+                <span>
+                  {
+                    businessFlow.states.find((s) => s.id === trans.toStateId)
+                      ?.name
+                  }
+                </span>
                 <span className={styles.transitionEvent}>{trans.event}</span>
               </div>
             ))}
@@ -178,8 +164,8 @@ export default function FlowPage() {
           <button
             className={styles.secondaryButton}
             onClick={() => {
-              goToPreviousStep()
-              router.push('/confirm/model')
+              goToPreviousStep();
+              router.push('/confirm/model');
             }}
           >
             返回上一步
@@ -194,5 +180,5 @@ export default function FlowPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

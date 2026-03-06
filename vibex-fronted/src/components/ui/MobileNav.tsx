@@ -61,7 +61,7 @@ export function MobileNav({
         setActiveSubmenu(null);
       }
     };
-    
+
     if (isOpen) {
       window.addEventListener('keydown', handleEsc);
     }
@@ -86,17 +86,21 @@ export function MobileNav({
           <button
             className={styles.menuLink}
             onClick={() => handleItemClick(item)}
-            aria-expanded={item.children ? activeSubmenu === item.label : undefined}
+            aria-expanded={
+              item.children ? activeSubmenu === item.label : undefined
+            }
           >
             {item.icon && <span className={styles.menuIcon}>{item.icon}</span>}
             <span className={styles.menuLabel}>{item.label}</span>
             {item.children && (
-              <span className={`${styles.chevron} ${activeSubmenu === item.label ? styles.open : ''}`}>
+              <span
+                className={`${styles.chevron} ${activeSubmenu === item.label ? styles.open : ''}`}
+              >
                 ▶
               </span>
             )}
           </button>
-          
+
           {item.children && activeSubmenu === item.label && (
             <div className={styles.submenuContent}>
               {renderMenuItems(item.children, level + 1)}
@@ -112,7 +116,7 @@ export function MobileNav({
       {/* 头部 */}
       <div className={styles.header}>
         {brand && <div className={styles.brand}>{brand}</div>}
-        
+
         {/* 汉堡按钮 */}
         <button
           className={`${styles.hamburger} ${isOpen ? styles.open : ''}`}
@@ -127,7 +131,7 @@ export function MobileNav({
       </div>
 
       {/* 菜单面板 */}
-      <div 
+      <div
         ref={menuRef}
         className={`${styles.menuPanel} ${isOpen ? styles.open : ''}`}
         role="menu"
@@ -136,7 +140,9 @@ export function MobileNav({
       </div>
 
       {/* 遮罩层 */}
-      {isOpen && <div className={styles.overlay} onClick={() => setIsOpen(false)} />}
+      {isOpen && (
+        <div className={styles.overlay} onClick={() => setIsOpen(false)} />
+      )}
     </nav>
   );
 }
@@ -149,9 +155,16 @@ interface NavbarProps {
   className?: string;
 }
 
-export function Navbar({ children, brand, fixed = true, className = '' }: NavbarProps) {
+export function Navbar({
+  children,
+  brand,
+  fixed = true,
+  className = '',
+}: NavbarProps) {
   return (
-    <header className={`${styles.navbar} ${fixed ? styles.fixed : ''} ${className}`}>
+    <header
+      className={`${styles.navbar} ${fixed ? styles.fixed : ''} ${className}`}
+    >
       <div className={styles.navbarContent}>
         {brand && <div className={styles.brand}>{brand}</div>}
         <nav className={styles.navbarNav}>{children}</nav>

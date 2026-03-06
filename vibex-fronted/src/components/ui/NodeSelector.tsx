@@ -44,7 +44,7 @@ export function NodeSelector({
 
   // 提取分类
   const categories = useMemo(() => {
-    const cats = new Set(nodes.map(n => n.category));
+    const cats = new Set(nodes.map((n) => n.category));
     return ['all', ...Array.from(cats)];
   }, [nodes]);
 
@@ -54,15 +54,16 @@ export function NodeSelector({
 
     // 按分类过滤
     if (activeCategory !== 'all') {
-      result = result.filter(n => n.category === activeCategory);
+      result = result.filter((n) => n.category === activeCategory);
     }
 
     // 按搜索词过滤
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(n => 
-        n.name.toLowerCase().includes(query) ||
-        n.description?.toLowerCase().includes(query)
+      result = result.filter(
+        (n) =>
+          n.name.toLowerCase().includes(query) ||
+          n.description?.toLowerCase().includes(query)
       );
     }
 
@@ -75,44 +76,50 @@ export function NodeSelector({
   }, [nodes, activeCategory, searchQuery]);
 
   // 搜索处理
-  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    onSearch?.(query);
-  }, [onSearch]);
+  const handleSearch = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const query = e.target.value;
+      setSearchQuery(query);
+      onSearch?.(query);
+    },
+    [onSearch]
+  );
 
   // 选择节点
-  const handleSelect = useCallback((nodeId: string) => {
-    if (multiple) {
-      const isSelected = selected.includes(nodeId);
-      
-      if (isSelected) {
-        // 取消选择
-        onSelect?.(selected.filter(id => id !== nodeId));
-      } else if (!maxSelect || selected.length < maxSelect) {
-        // 新增选择
-        if (maxSelect && selected.length === maxSelect - 1) {
-          setShowConfirm(true);
+  const handleSelect = useCallback(
+    (nodeId: string) => {
+      if (multiple) {
+        const isSelected = selected.includes(nodeId);
+
+        if (isSelected) {
+          // 取消选择
+          onSelect?.(selected.filter((id) => id !== nodeId));
+        } else if (!maxSelect || selected.length < maxSelect) {
+          // 新增选择
+          if (maxSelect && selected.length === maxSelect - 1) {
+            setShowConfirm(true);
+          }
+          onSelect?.([...selected, nodeId]);
         }
-        onSelect?.([...selected, nodeId]);
+      } else {
+        onSelect?.(nodeId);
       }
-    } else {
-      onSelect?.(nodeId);
-    }
-  }, [multiple, selected, maxSelect, onSelect]);
+    },
+    [multiple, selected, maxSelect, onSelect]
+  );
 
   // 全选
   const handleSelectAll = useCallback(() => {
     if (!multiple) return;
-    const allIds = filteredNodes.map(n => n.id);
+    const allIds = filteredNodes.map((n) => n.id);
     onSelect?.(allIds);
   }, [multiple, filteredNodes, onSelect]);
 
   // 反选
   const handleInvert = useCallback(() => {
     if (!multiple) return;
-    const allIds = filteredNodes.map(n => n.id);
-    const unselected = allIds.filter(id => !selected.includes(id));
+    const allIds = filteredNodes.map((n) => n.id);
+    const unselected = allIds.filter((id) => !selected.includes(id));
     onSelect?.(unselected);
   }, [multiple, filteredNodes, selected, onSelect]);
 
@@ -149,7 +156,7 @@ export function NodeSelector({
 
       {/* 分类过滤 */}
       <div className={styles.categories}>
-        {categories.map(cat => (
+        {categories.map((cat) => (
           <button
             key={cat}
             className={`${styles.categoryButton} ${activeCategory === cat ? styles.active : ''}`}
@@ -163,9 +170,9 @@ export function NodeSelector({
 
       {/* 节点列表 */}
       <div className={styles.nodeList}>
-        {filteredNodes.map(node => {
+        {filteredNodes.map((node) => {
           const isSelected = selected.includes(node.id);
-          
+
           return (
             <div
               key={node.id}
@@ -180,21 +187,19 @@ export function NodeSelector({
                 }
               }}
             >
-              <div className={styles.nodeIcon}>
-                {node.icon || '📦'}
-              </div>
+              <div className={styles.nodeIcon}>{node.icon || '📦'}</div>
               <div className={styles.nodeInfo}>
                 <div className={styles.nodeName}>
                   {node.name}
-                  {node.recentlyUsed && <span className={styles.recentBadge}>最近使用</span>}
+                  {node.recentlyUsed && (
+                    <span className={styles.recentBadge}>最近使用</span>
+                  )}
                 </div>
                 {node.description && (
                   <div className={styles.nodeDesc}>{node.description}</div>
                 )}
               </div>
-              <div className={styles.checkbox}>
-                {isSelected && '✓'}
-              </div>
+              <div className={styles.checkbox}>{isSelected && '✓'}</div>
             </div>
           );
         })}
@@ -228,10 +233,16 @@ export function NodeSelectorModal({
 
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modal} onClick={e => e.stopPropagation()}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
           <h3 className={styles.modalTitle}>{title}</h3>
-          <button className={styles.closeButton} onClick={onClose} type="button">×</button>
+          <button
+            className={styles.closeButton}
+            onClick={onClose}
+            type="button"
+          >
+            ×
+          </button>
         </div>
         <NodeSelector {...props} />
       </div>

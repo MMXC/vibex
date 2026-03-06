@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react';
 import ReactFlow, {
   Node,
   Edge,
@@ -15,32 +15,38 @@ import ReactFlow, {
   BackgroundVariant,
   Panel,
   MarkerType,
-} from 'reactflow'
-import 'reactflow/dist/style.css'
+} from 'reactflow';
+import 'reactflow/dist/style.css';
 
 export interface DomainProperty {
-  name: string
-  type: string
-  required: boolean
+  name: string;
+  type: string;
+  required: boolean;
 }
 
 export interface DomainModelNodeData {
-  label: string
-  type: 'aggregate_root' | 'entity' | 'value_object'
-  properties: DomainProperty[]
-  methods: string[]
+  label: string;
+  type: 'aggregate_root' | 'entity' | 'value_object';
+  properties: DomainProperty[];
+  methods: string[];
 }
 
 const typeStyles = {
   aggregate_root: { background: '#4ade80', border: '#22c55e', label: '聚合根' },
   entity: { background: '#60a5fa', border: '#3b82f6', label: '实体' },
   value_object: { background: '#a78bfa', border: '#8b5cf6', label: '值对象' },
-}
+};
 
-function DomainModelNode({ data, selected }: { data: DomainModelNodeData; selected: boolean }) {
-  const style = typeStyles[data.type] || typeStyles.entity
-  const hasMethods = data.methods && data.methods.length > 0
-  
+function DomainModelNode({
+  data,
+  selected,
+}: {
+  data: DomainModelNodeData;
+  selected: boolean;
+}) {
+  const style = typeStyles[data.type] || typeStyles.entity;
+  const hasMethods = data.methods && data.methods.length > 0;
+
   return (
     <div
       style={{
@@ -48,8 +54,8 @@ function DomainModelNode({ data, selected }: { data: DomainModelNodeData; select
         border: `2px solid ${selected ? '#fff' : style.border}`,
         borderRadius: '8px',
         minWidth: '180px',
-        boxShadow: selected 
-          ? '0 0 0 2px #fff, 0 4px 20px rgba(0,0,0,0.4)' 
+        boxShadow: selected
+          ? '0 0 0 2px #fff, 0 4px 20px rgba(0,0,0,0.4)'
           : '0 2px 10px rgba(0,0,0,0.3)',
         overflow: 'hidden',
       }}
@@ -79,9 +85,14 @@ function DomainModelNode({ data, selected }: { data: DomainModelNodeData; select
           {style.label}
         </span>
       </div>
-      
+
       {/* Properties */}
-      <div style={{ padding: '8px 12px', borderBottom: hasMethods ? '1px solid rgba(255,255,255,0.1)' : 'none' }}>
+      <div
+        style={{
+          padding: '8px 12px',
+          borderBottom: hasMethods ? '1px solid rgba(255,255,255,0.1)' : 'none',
+        }}
+      >
         {data.properties?.map((prop, idx) => (
           <div
             key={idx}
@@ -102,7 +113,7 @@ function DomainModelNode({ data, selected }: { data: DomainModelNodeData; select
           </div>
         ))}
       </div>
-      
+
       {/* Methods */}
       {hasMethods && (
         <div style={{ padding: '8px 12px' }}>
@@ -122,36 +133,38 @@ function DomainModelNode({ data, selected }: { data: DomainModelNodeData; select
         </div>
       )}
     </div>
-  )
+  );
 }
 
 const nodeTypes: NodeTypes = {
   domainModel: DomainModelNode,
-}
+};
 
 export interface DomainModelGraphProps {
   models: Array<{
-    id: string
-    name: string
-    type: 'aggregate_root' | 'entity' | 'value_object'
-    properties: DomainProperty[]
-    methods: string[]
-  }>
+    id: string;
+    name: string;
+    type: 'aggregate_root' | 'entity' | 'value_object';
+    properties: DomainProperty[];
+    methods: string[];
+  }>;
   relationships?: Array<{
-    id: string
-    fromModelId: string
-    toModelId: string
-    type: 'association' | 'aggregation' | 'composition' | 'inheritance'
-    label?: string
-  }>
-  onModelsChange?: (models: Array<{
-    id: string
-    name: string
-    type: 'aggregate_root' | 'entity' | 'value_object'
-    properties: DomainProperty[]
-    position: { x: number; y: number }
-  }>) => void
-  readOnly?: boolean
+    id: string;
+    fromModelId: string;
+    toModelId: string;
+    type: 'association' | 'aggregation' | 'composition' | 'inheritance';
+    label?: string;
+  }>;
+  onModelsChange?: (
+    models: Array<{
+      id: string;
+      name: string;
+      type: 'aggregate_root' | 'entity' | 'value_object';
+      properties: DomainProperty[];
+      position: { x: number; y: number };
+    }>
+  ) => void;
+  readOnly?: boolean;
 }
 
 export default function DomainModelGraph({
@@ -174,19 +187,20 @@ export default function DomainModelGraph({
         properties: model.properties || [],
         methods: model.methods || [],
       },
-    }))
-  }, [models])
+    }));
+  }, [models]);
 
   const relationshipStyles = {
     association: { stroke: '#60a5fa', label: '关联' },
     aggregation: { stroke: '#4ade80', label: '聚合' },
     composition: { stroke: '#a78bfa', label: '组合' },
     inheritance: { stroke: '#f59e0b', label: '继承' },
-  }
+  };
 
   const initialEdges: Edge[] = useMemo(() => {
     return relationships.map((rel) => {
-      const style = relationshipStyles[rel.type] || relationshipStyles.association
+      const style =
+        relationshipStyles[rel.type] || relationshipStyles.association;
       return {
         id: rel.id,
         source: rel.fromModelId,
@@ -201,47 +215,59 @@ export default function DomainModelGraph({
           type: MarkerType.ArrowClosed,
           color: style.stroke,
         },
-      }
-    })
-  }, [relationships])
+      };
+    });
+  }, [relationships]);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   const onConnect = useCallback(
     (params: Connection) => {
-      if (readOnly) return
-      setEdges((eds) => addEdge({ ...params, animated: true, style: { stroke: '#60a5fa' } }, eds))
+      if (readOnly) return;
+      setEdges((eds) =>
+        addEdge(
+          { ...params, animated: true, style: { stroke: '#60a5fa' } },
+          eds
+        )
+      );
     },
     [setEdges, readOnly]
-  )
+  );
 
   const onNodeDragStop = useCallback(
     (_event: React.MouseEvent, node: Node) => {
-      if (readOnly || !onModelsChange) return
+      if (readOnly || !onModelsChange) return;
       const updatedModels = nodes.map((n) => ({
         id: n.id,
         name: n.data.label,
         type: n.data.type,
         properties: n.data.properties || [],
         position: n.position,
-      }))
-      onModelsChange(updatedModels)
+      }));
+      onModelsChange(updatedModels);
     },
     [nodes, onModelsChange, readOnly]
-  )
+  );
 
   // Update nodes when models change
   useMemo(() => {
-    setNodes(initialNodes)
-  }, [initialNodes, setNodes])
+    setNodes(initialNodes);
+  }, [initialNodes, setNodes]);
 
   useMemo(() => {
-    setEdges(initialEdges)
-  }, [initialEdges, setEdges])
+    setEdges(initialEdges);
+  }, [initialEdges, setEdges]);
 
   return (
-    <div style={{ width: '100%', height: '600px', borderRadius: '12px', overflow: 'hidden' }}>
+    <div
+      style={{
+        width: '100%',
+        height: '600px',
+        borderRadius: '12px',
+        overflow: 'hidden',
+      }}
+    >
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -254,13 +280,18 @@ export default function DomainModelGraph({
         attributionPosition="bottom-left"
         proOptions={{ hideAttribution: true }}
       >
-        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="rgba(255,255,255,0.1)" />
+        <Background
+          variant={BackgroundVariant.Dots}
+          gap={20}
+          size={1}
+          color="rgba(255,255,255,0.1)"
+        />
         <Controls style={{ background: '#1e1e2e', borderRadius: '8px' }} />
         <MiniMap
           style={{ background: '#1e1e2e', borderRadius: '8px' }}
           nodeColor={(node) => {
-            const type = node.data?.type as keyof typeof typeStyles
-            return typeStyles[type]?.background || '#60a5fa'
+            const type = node.data?.type as keyof typeof typeStyles;
+            return typeStyles[type]?.background || '#60a5fa';
           }}
         />
         {models.length === 0 && (
@@ -272,5 +303,5 @@ export default function DomainModelGraph({
         )}
       </ReactFlow>
     </div>
-  )
+  );
 }

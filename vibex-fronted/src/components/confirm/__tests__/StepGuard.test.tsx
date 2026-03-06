@@ -16,12 +16,14 @@ jest.mock('next/navigation', () => ({
   })),
 }));
 
-const mockUseConfirmationState = useConfirmationState as jest.MockedFunction<typeof useConfirmationState>;
+const mockUseConfirmationState = useConfirmationState as jest.MockedFunction<
+  typeof useConfirmationState
+>;
 const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
 
 describe('StepGuard', () => {
   const mockPush = jest.fn();
-  
+
   beforeEach(() => {
     jest.clearAllMocks();
     mockPush.mockClear();
@@ -71,7 +73,10 @@ describe('StepGuard', () => {
 
     it('should render fallback when provided and step is invalid', () => {
       render(
-        <StepGuard step="context" fallback={<div data-testid="fallback">Fallback</div>}>
+        <StepGuard
+          step="context"
+          fallback={<div data-testid="fallback">Fallback</div>}
+        >
           <div data-testid="child">Child</div>
         </StepGuard>
       );

@@ -239,6 +239,26 @@ export default function Dashboard() {
             <span className={styles.navIcon}>↗</span>
             <span>导出</span>
           </Link>
+          <Link href="/requirements" className={styles.navItem}>
+            <span className={styles.navIcon}>📝</span>
+            <span>需求列表</span>
+          </Link>
+          <Link href="/flow" className={styles.navItem}>
+            <span className={styles.navIcon}>🔀</span>
+            <span>流程图</span>
+          </Link>
+          <Link href="/pagelist" className={styles.navItem}>
+            <span className={styles.navIcon}>📄</span>
+            <span>页面管理</span>
+          </Link>
+          <Link href="/changelog" className={styles.navItem}>
+            <span className={styles.navIcon}>📋</span>
+            <span>更新日志</span>
+          </Link>
+          <Link href="/user-settings" className={styles.navItem}>
+            <span className={styles.navIcon}>👤</span>
+            <span>用户设置</span>
+          </Link>
           <Link href="/project-settings" className={styles.navItem}>
             <span className={styles.navIcon}>⚙</span>
             <span>设置</span>

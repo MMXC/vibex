@@ -26,7 +26,7 @@ const mockChangelog: ChangelogEntry[] = [
       '🎯 75+ 领域关键词库：domain/function/entity/action',
       '💡 实时评分 UI + 建议提示',
     ],
-    commit: 'pending',
+    commit: 'cd3c075',
   },
   {
     version: '1.0.10',

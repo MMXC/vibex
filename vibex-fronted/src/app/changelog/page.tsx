@@ -26,7 +26,7 @@ const mockChangelog: ChangelogEntry[] = [
       '📝 ESLint 规则：no-static-export (待集成)',
       '📋 文档指南：静态导出最佳实践',
     ],
-    commit: 'pending',
+    commit: 'bed4c35',
   },
   {
     version: '1.0.11',

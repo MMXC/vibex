@@ -18,6 +18,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.14',
+    date: '2026-03-07',
+    changes: [
+      '📋 需求模板库：8 个行业/场景模板',
+      '🔍 模板选择器：分类筛选 + 搜索 + 预览',
+      '📊 使用统计：模板使用次数追踪',
+      '⭐ 用户评分：5 星评分系统',
+      '✅ 单元测试：TemplateStats 完整测试覆盖',
+    ],
+    commit: '981512d',
+  },
+  {
     version: '1.0.13',
     date: '2026-03-07',
     changes: [

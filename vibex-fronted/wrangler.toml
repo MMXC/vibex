@@ -1,5 +1,5 @@
 name = "vibex-frontend"
-pages_build_output_dir = "./out"
+pages_build_output_dir = ".opennext/cloudflare"
 
 # 环境变量配置
 [vars]

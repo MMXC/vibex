@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.15',
+    date: '2026-03-07',
+    changes: [
+      '🔧 Cloudflare 构建修复：静态导出配置',
+      '⚙️ wrangler.toml 多环境配置',
+      '✅ 构建验证：out/ 目录正确生成',
+    ],
+    commit: '8995612',
+  },
+  {
     version: '1.0.14',
     date: '2026-03-07',
     changes: [

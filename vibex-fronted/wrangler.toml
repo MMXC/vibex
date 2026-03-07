@@ -3,7 +3,7 @@ pages_build_output_dir = "./out"
 
 # 环境变量配置
 [vars]
-API_BASE_URL = "https://api.vibex.top"
+NEXT_PUBLIC_API_BASE_URL = "https://api.vibex.top/api"
 NEXT_PUBLIC_APP_URL = "https://dev.vibex.top"
 
 # 生产环境配置
@@ -11,7 +11,7 @@ NEXT_PUBLIC_APP_URL = "https://dev.vibex.top"
 name = "vibex-frontend-prod"
 
 [env.production.vars]
-API_BASE_URL = "https://api.vibex.top"
+NEXT_PUBLIC_API_BASE_URL = "https://api.vibex.top/api"
 NEXT_PUBLIC_APP_URL = "https://vibex.top"
 
 # 预览环境配置
@@ -19,5 +19,5 @@ NEXT_PUBLIC_APP_URL = "https://vibex.top"
 name = "vibex-frontend-preview"
 
 [env.preview.vars]
-API_BASE_URL = "https://api-dev.vibex.top"
+NEXT_PUBLIC_API_BASE_URL = "https://api-dev.vibex.top/api"
 NEXT_PUBLIC_APP_URL = "https://dev.vibex.top"

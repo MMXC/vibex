@@ -1,7 +1,8 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  // output: 'export', // Temporarily disabled for build testing
+  output: 'export',
+  distDir: 'out',
   images: {
     unoptimized: true,
   },

@@ -18,6 +18,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.18',
+    date: '2026-03-09',
+    changes: [
+      '📊 覆盖率监控系统：基线对比 + 阈值阻断 + 趋势追踪',
+      '🔔 Slack 告警集成：覆盖率下降自动通知',
+      '🏷️ 覆盖率徽章生成：SVG 动态徽章 + JSON 数据',
+      '⚙️ 统一配置：coverage.config.js 集中管理阈值',
+      '✅ GitHub Actions 工作流：PR 自动检查覆盖率',
+    ],
+    commit: 'eb9ea71',
+  },
+  {
     version: '1.0.17',
     date: '2026-03-08',
     changes: [

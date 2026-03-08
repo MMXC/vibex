@@ -12,6 +12,7 @@ import { useState, useCallback } from 'react';
 import { ErrorConfig, ErrorMiddlewareOptions, ApiErrorResponse } from '@/lib/error';
 import { defaultErrorMapper } from '@/lib/error/ErrorCodeMapper';
 import { defaultRetryHandler } from '@/lib/error/RetryHandler';
+import { useToast } from '@/components/ui/Toast';
 
 export interface UseApiCallOptions<TArgs extends unknown[], TData> {
   /** API 调用函数 */
@@ -224,6 +225,61 @@ function isAxiosError(err: unknown): err is {
     err !== null &&
     'isAxiosError' in err
   );
+}
+
+/**
+ * useApiCallWithToast - 带 Toast 提示的 API 调用 Hook
+ * 
+ * useApiCall 的封装，自动显示错误 Toast
+ * 
+ * @example
+ * ```typescript
+ * const { data, loading, error, execute } = useApiCallWithToast({
+ *   apiFn: () => fetchProjects(),
+ *   showToast: true
+ * });
+ * ```
+ */
+export function useApiCallWithToast<TArgs extends unknown[], TData>(
+  options: UseApiCallOptions<TArgs, TData>
+): UseApiCallReturn<TData> {
+  const { showToast: _, ...restOptions } = options;
+  const { showToast } = useToast();
+  
+  const apiCall = useApiCall<TArgs, TData>({
+    ...restOptions,
+    showToast: options.showToast ?? true,
+    onError: (error) => {
+      // 调用自定义 onError
+      options.onError?.(error);
+      
+      // 显示 Toast
+      if (options.showToast !== false) {
+        // 根据错误类型映射 toast variant
+        const toastType = mapErrorToToastType(error);
+        showToast(error.userMessage || '操作失败，请稍后重试', toastType);
+      }
+    },
+  });
+  
+  return apiCall;
+}
+
+// 错误类型到 Toast 类型的映射
+function mapErrorToToastType(error: ErrorConfig): 'success' | 'error' | 'warning' | 'info' {
+  switch (error.type) {
+    case 'network':
+    case 'server':
+    case 'unknown':
+      return 'error';
+    case 'client':
+    case 'business':
+      return 'warning';
+    case 'timeout':
+      return 'warning';
+    default:
+      return 'error';
+  }
 }
 
 export default useApiCall;

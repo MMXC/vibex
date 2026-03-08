@@ -1,0 +1,124 @@
+{
+  "name": "vibex-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "pretest": "node scripts/pre-test-check.js",
+    "pretest-check": "node scripts/pre-test-check.js",
+    "coverage:check": "node scripts/check-coverage.js",
+    "coverage:history": "bash scripts/save-coverage-history.sh",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.mjs,.cjs && prettier --check .",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "@types/mermaid": "^9.1.0",
+    "axios": "^1.13.5",
+    "html-to-image": "^1.11.13",
+    "mermaid": "^11.12.3",
+    "next": "16.1.6",
+    "next-intl": "^4.8.3",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "reactflow": "^11.11.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.0",
+    "@babel/preset-react": "^7.28.5",
+    "@babel/preset-typescript": "^7.28.5",
+    "@playwright/test": "^1.58.2",
+    "@storybook/addon-essentials": "^8.6.14",
+    "@storybook/addon-interactions": "^8.6.14",
+    "@storybook/blocks": "^8.6.14",
+    "@storybook/react": "^8.6.17",
+    "@storybook/react-vite": "^8.6.17",
+    "@storybook/test": "^8.6.15",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/resize-observer-browser": "^0.1.11",
+    "babel-jest": "^30.2.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "husky": "^9.1.7",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
+    "msw": "^2.12.10",
+    "playwright": "^1.58.2",
+    "prettier": "^3.8.1",
+    "storybook": "^8.6.17",
+    "typescript": "^5",
+    "vite": "^6.4.1",
+    "wrangler": "^4.69.0"
+  },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "./jest.setup.js"
+    ],
+    "testEnvironment": "jsdom",
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sass)$": "identity-obj-proxy",
+      "^@/(.*)$": "<rootDir>/src/$1"
+    },
+    "fakeTimers": {
+      "enableGlobally": false
+    },
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "tests/e2e",
+      "tests/basic.spec.ts",
+      "tests/e2e.spec.ts",
+      "/e2e/",
+      "/.next/",
+      "/coverage/",
+      "/storybook-static/"
+    ],
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "json",
+      "json-summary"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 40,
+        "functions": 40,
+        "lines": 40,
+        "statements": 40
+      },
+      "./src/components/**/*.tsx": {
+        "branches": 40,
+        "functions": 40,
+        "lines": 40
+      },
+      "./src/lib/**/*.ts": {
+        "branches": 45,
+        "functions": 45,
+        "lines": 50
+      },
+      "./src/hooks/**/*.ts": {
+        "branches": 40,
+        "functions": 40,
+        "lines": 40
+      },
+      "./src/services/**/*.ts": {
+        "branches": 45,
+        "functions": 45,
+        "lines": 50
+      }
+    }
+  }
+}

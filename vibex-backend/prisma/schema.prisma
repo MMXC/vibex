@@ -1,0 +1,209 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  role      String   @default("viewer") // admin, editor, viewer
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects    Project[]
+  agents      Agent[]
+  conversations Conversation[]
+}
+
+model Project {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  userId      String
+  deletedAt   DateTime? // Soft delete - trash bin support
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id])
+  pages    Page[]
+  messages Message[]
+  flows    FlowData[]
+  requirements Requirement[]
+  prototypeSnapshots PrototypeSnapshot[]
+}
+
+model Page {
+  id        String   @id @default(cuid())
+  name      String
+  content   String?  // JSON string for page content
+  projectId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id])
+}
+
+model Agent {
+  id          String   @id @default(cuid())
+  name        String
+  prompt      String
+  model       String   @default("abab6.5s-chat")
+  temperature Float    @default(0.7)
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  userId    String
+  messages  String   // JSON string of messages
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  role      String   // user, assistant, system
+  content   String
+  projectId String
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id])
+}
+
+model FlowData {
+  id        String   @id @default(cuid())
+  name      String?
+  nodes     String   // JSON string for React Flow nodes
+  edges     String   // JSON string for React Flow edges
+  projectId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id])
+}
+
+// AI Prototype Builder Models
+
+model Requirement {
+  id          String   @id @default(cuid())
+  projectId   String
+  rawInput    String   // 原始需求文本
+  parsedData  String?  // JSON: 结构化解析结果
+  status      String   @default("draft") // draft, analyzing, clarified, confirmed
+  priority    String   @default("medium") // low, medium, high, critical
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  project     Project  @relation(fields: [projectId], references: [id])
+  entities    DomainEntity[]
+}
+
+model DomainEntity {
+  id            String   @id @default(cuid())
+  requirementId String
+  name          String
+  type          String   // person, place, object, concept, event
+  description   String?
+  properties    String?  // JSON: 属性列表
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  requirement   Requirement @relation(fields: [requirementId], references: [id])
+  relationsFrom EntityRelation[] @relation("EntityRelationFrom")
+  relationsTo   EntityRelation[] @relation("EntityRelationTo")
+}
+
+model EntityRelation {
+  id          String   @id @default(cuid())
+  fromEntityId String
+  toEntityId   String
+  relationType String   // owns, uses, contains, depends-on, etc.
+  description  String?
+  createdAt    DateTime @default(now())
+  
+  fromEntity   DomainEntity @relation("EntityRelationFrom", fields: [fromEntityId], references: [id])
+  toEntity     DomainEntity @relation("EntityRelationTo", fields: [toEntityId], references: [id])
+}
+
+model PrototypeSnapshot {
+  id          String   @id @default(cuid())
+  projectId   String
+  version     Int      @default(1)
+  name        String?
+  description String?
+  content     String   // JSON: 界面快照数据
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  project     Project  @relation(fields: [projectId], references: [id])
+}
+
+// Prototype Collaboration - Manages collaborators on prototype projects
+
+model PrototypeCollaboration {
+  id          String   @id @default(cuid())
+  projectId   String
+  userId      String
+  userName    String?
+  userEmail   String?
+  role        String   @default("viewer") // owner, editor, viewer
+  status      String   @default("active") // active, pending, revoked
+  invitedBy   String?
+  invitedAt   DateTime?
+  joinedAt    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([projectId, userId]) // One collaboration per user per project
+  @@index([projectId])
+  @@index([userId])
+}
+
+// Component Library - Stores UI component definitions
+model Component {
+  id            String   @id @default(cuid())
+  name          String
+  category      String   // layout, basic, display, feedback, etc.
+  description   String?
+  props         String   @default("{}")  // JSON: default props
+  variants      String   @default("[]")  // JSON: array of variants
+  style         String   @default("{}")  // JSON: default style
+  interactions  String   @default("{}")  // JSON: interaction config
+  replaceable   Boolean  @default(false) // can be replaced by alternatives
+  alternatives  String   @default("[]")  // JSON: alternative component names
+  projectId     String?  // optional project association for custom components
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([category])
+  @@index([projectId])
+  @@index([name])
+}
+
+// Project Settings - stores project configurations and user preferences
+model ProjectSettings {
+  id        String   @id @default(cuid())
+  projectId String
+  key       String
+  value     String
+  userId    String?  // null for project-level settings, user ID for user preferences
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([projectId, key, userId])
+  @@index([projectId])
+  @@index([userId])
+}

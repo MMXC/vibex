@@ -1,0 +1,489 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: var(--color-bg-primary);
+  background-image:
+    radial-gradient(
+      ellipse at top,
+      rgba(0, 255, 255, 0.08) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at bottom right,
+      rgba(139, 92, 246, 0.08) 0%,
+      transparent 50%
+    );
+}
+
+.card {
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  padding: 2.5rem;
+  max-width: 800px;
+  width: 100%;
+  border: 1px solid var(--color-border);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 60px rgba(0, 255, 255, 0.05);
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+  text-align: center;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.description {
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.step.active {
+  color: var(--color-primary);
+}
+
+.step.completed {
+  color: var(--color-primary);
+}
+
+.stepNumber {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.step.active .stepNumber {
+  background: var(--color-primary);
+  color: var(--color-bg-primary);
+}
+
+.step.completed .stepNumber {
+  background: var(--color-primary);
+  color: var(--color-bg-primary);
+}
+
+.stepLabel {
+  font-size: 0.875rem;
+}
+
+.stepConnector {
+  width: 40px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 0 0.5rem;
+}
+
+.inputSection {
+  margin-bottom: 2rem;
+}
+
+.label {
+  display: block;
+  color: #fff;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+}
+
+.textarea {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-size: 1rem;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #4ade80;
+}
+
+.textarea::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.error {
+  color: #f87171;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.primaryButton {
+  padding: 0.875rem 2rem;
+  border-radius: 8px;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    rgba(0, 255, 255, 0.8) 100%
+  );
+  color: var(--color-bg-primary);
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.primaryButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 255, 255, 0.5);
+}
+
+.primaryButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.secondaryButton {
+  padding: 0.875rem 2rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.secondaryButton:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.secondaryButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Diagram Section */
+.diagramSection {
+  margin-bottom: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.mermaidPreview {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 1.5rem;
+  overflow-x: auto;
+}
+
+.mermaidCode {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.875rem;
+  color: #a5b4fc;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* Context List */
+.contextList {
+  margin-bottom: 2rem;
+}
+
+.contextGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.contextCard {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.contextCard:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.contextCard.selected {
+  border-color: #4ade80;
+  background: rgba(74, 222, 128, 0.1);
+}
+
+.contextHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.contextType {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  color: #1a1a2e;
+  font-weight: 600;
+}
+
+.contextName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 0.5rem;
+}
+
+.contextDesc {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+/* Model List */
+.modelList {
+  margin-bottom: 2rem;
+}
+
+.modelGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.modelCard {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.modelHeader {
+  margin-bottom: 0.75rem;
+}
+
+.modelType {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  color: #1a1a2e;
+  font-weight: 600;
+}
+
+.modelName {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 0.75rem;
+}
+
+.modelProps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.modelProp {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+}
+
+.propName {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.propName .required {
+  color: #f87171;
+  margin-left: 2px;
+}
+
+.propType {
+  color: #60a5fa;
+  font-family: monospace;
+}
+
+/* Flow List */
+.flowList {
+  margin-bottom: 2rem;
+}
+
+.flowStates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.flowState {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+}
+
+.stateType {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  color: #1a1a2e;
+  font-weight: 600;
+}
+
+.stateName {
+  color: #fff;
+  font-weight: 500;
+}
+
+.flowTransitions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.flowTransition {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  color: #fff;
+}
+
+.transitionArrow {
+  color: #4ade80;
+}
+
+.transitionEvent {
+  color: #60a5fa;
+  font-size: 0.875rem;
+  margin-left: auto;
+}
+
+/* Success */
+.successIcon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  color: #1a1a2e;
+  font-size: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.summary {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.summaryLabel {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.summaryValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #4ade80;
+}
+
+/* ConfirmationSteps wrapper */
+.steps {
+  margin-bottom: 2rem;
+}
+
+.steps :global(.container) {
+  justify-content: center;
+}
+
+.steps :global(.indicator) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.steps :global(.step.in-progress .indicator),
+.steps :global(.step.completed .indicator) {
+  background: #4ade80;
+  border-color: #4ade80;
+  color: #1a1a2e;
+}
+
+.steps :global(.step.pending .indicator) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.steps :global(.title) {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.steps :global(.step.in-progress .title),
+.steps :global(.step.completed .title) {
+  color: #fff;
+}
+
+.steps :global(.connector) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.steps :global(.connector.completed) {
+  background: #4ade80;
+}

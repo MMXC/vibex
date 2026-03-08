@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.19',
+    date: '2026-03-09',
+    changes: [
+      '🔐 登录页注册入口优化：字号放大 + 背景边框 + SVG 图标',
+      '📱 移动端触摸优化：最小高度 44px 触摸区域',
+      '✨ Hover 效果：背景色变化 + 微上移动画',
+      '🔀 表单切换：登录/注册表单无缝切换',
+    ],
+    commit: '6cad007',
+  },
+  {
     version: '1.0.18',
     date: '2026-03-09',
     changes: [

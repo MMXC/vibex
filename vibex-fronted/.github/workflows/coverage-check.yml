@@ -1,0 +1,48 @@
+name: Coverage Check
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run tests with coverage
+        run: npm test -- --coverage
+        
+      - name: Run coverage diff check
+        run: |
+          # Fetch baseline from main branch if exists
+          if git show main:coverage/baseline.json > /dev/null 2>&1; then
+            git fetch origin main:main
+            node scripts/coverage-diff.js --fetch
+          fi
+          
+          # Run coverage comparison
+          node scripts/coverage-diff.js
+        
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-reports
+          path: |
+            coverage/
+            !coverage/**/*.map
+          retention-days: 7

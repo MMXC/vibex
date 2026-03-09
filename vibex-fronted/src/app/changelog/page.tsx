@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.22',
+    date: '2026-03-09',
+    changes: [
+      '🔧 DDD API 端点修复：fetch → httpClient 迁移',
+      '🔐 自动 Authorization：请求拦截器自动添加 Bearer Token',
+      '🛡️ 统一错误处理：transformError 友好化错误消息',
+      '✅ 代码审查通过：安全性、性能、代码规范 100% 测试覆盖',
+    ],
+    commit: '90fcacd',
+  },
+  {
     version: '1.0.21',
     date: '2026-03-09',
     changes: [

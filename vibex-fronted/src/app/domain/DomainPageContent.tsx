@@ -10,9 +10,9 @@ import {
   EntityRelation,
   Project,
   EntityType,
-  generateBoundedContext,
   BoundedContext,
 } from '@/services/api';
+const { generateBoundedContext } = apiService;
 import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps';
 import { useConfirmationStore, DomainModel } from '@/stores/confirmationStore';
 import ReactFlow, {

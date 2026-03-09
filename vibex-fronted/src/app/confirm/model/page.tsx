@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import styles from '../confirm.module.css';
 import { useConfirmationStore } from '@/stores/confirmationStore';
 import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps';
-import { generateDomainModel, BoundedContext } from '@/services/api';
+import { apiService, BoundedContext } from '@/services/api';
+const { generateDomainModel } = apiService;
 
 export default function ModelPage() {
   const router = useRouter();

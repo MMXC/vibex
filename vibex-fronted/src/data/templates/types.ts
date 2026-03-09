@@ -1,121 +1,202 @@
 /**
- * VibeX Requirement Templates - Type Definitions
- * 
- * 模板数据结构类型定义
+ * Requirement Templates - Type Definitions
+ * 需求模板类型定义
  */
 
-/** 模板分类 */
 export type TemplateCategory = 
-  | 'ecommerce'    // 电商
-  | 'social'       // 社交
-  | 'saas'         // SaaS
-  | 'education'    // 教育
-  | 'content'      // 内容
-  | 'finance'      // 金融
-  | 'healthcare'   // 医疗
-  | 'logistics'    // 物流
-  | 'restaurant'   // 餐饮
-  | 'scenario';    // 通用场景
+  | 'saas'           // SaaS 产品
+  | 'ecommerce'      // 电商平台
+  | 'fintech'       // 金融科技
+  | 'healthcare'    // 医疗健康
+  | 'education'      // 在线教育
+  | 'social'         // 社交网络
+  | 'game'           // 游戏
+  | 'iot'            // 物联网
+  | 'enterprise'     // 企业服务
+  | 'mobile'         // 移动应用
+  | 'content'        // 内容平台
+  | 'logistics'      // 物流
+  | 'restaurant'    // 餐饮
+  | 'custom';        // 自定义
 
-/** 模板复杂度 */
-export type TemplateComplexity = 'simple' | 'medium' | 'complex';
+export type TemplateScene = 
+  | 'b2b'            // B2B
+  | 'b2c'            // B2C
+  | 'marketplace'    // 交易市场
+  | 'api';           // API 服务
 
-/** 实体类型 */
-export type EntityType = 'aggregate' | 'entity' | 'valueObject' | 'service';
+export type RequirementType = 
+  | 'epic'
+  | 'feature'
+  | 'story'
+  | 'task'
+  | 'bug';
 
-/** 功能优先级 */
-export type FeaturePriority = 'core' | 'important' | 'optional';
+export type Priority = 'P0' | 'P1' | 'P2' | 'P3';
 
-/** 模板实体 */
+export type Status = 
+  | 'draft'
+  | 'review'
+  | 'approved'
+  | 'in-progress'
+  | 'done'
+  | 'archived';
+
 export interface TemplateEntity {
-  name: string;           // 实体名称
-  type: EntityType;       // 实体类型
-  attributes: string[];   // 核心属性
-  description?: string;
-}
-
-/** 模板功能 */
-export interface TemplateFeature {
-  name: string;           // 功能名称
-  priority: FeaturePriority;
-  description: string;
-  entities: string[];     // 涉及的实体
-}
-
-/** 模板元数据 */
-export interface TemplateMetadata {
-  complexity: TemplateComplexity;
-  estimatedTime: string;  // 预估开发时间
-  techStack?: string[];   // 推荐技术栈
-  tags: string[];         // 搜索标签
-}
-
-/** 完整模板结构 */
-export interface RequirementTemplate {
-  id: string;
   name: string;
-  displayName: string;
-  category: TemplateCategory;
-  icon: string;           // emoji 图标
+  type: 'aggregate' | 'entity' | 'valueObject';
+  attributes: string[];
   description: string;
-  content: string;        // 模板需求文本（带占位符）
-  entities: TemplateEntity[];
-  features: TemplateFeature[];
-  metadata: TemplateMetadata;
-  
-  // 统计数据（Phase 3）
-  usageCount?: number;
-  rating?: number;
-  ratingCount?: number;
 }
 
-/** 模板分组（用于展示） */
-export interface TemplateGroup {
+export interface TemplateFeature {
+  name: string;
+  priority: 'core' | 'important' | 'normal';
+  description: string;
+  entities: string[];
+}
+
+export interface TemplateMetadata {
+  complexity: 'simple' | 'medium' | 'complex';
+  estimatedTime: string;
+  techStack: string[];
+  tags: string[];
+}
+
+export interface RequirementTemplate {
+  /** 唯一标识 */
+  id: string;
+  /** 模板名称 */
+  name: string;
+  /** 显示名称 */
+  displayName?: string;
+  /** 描述 */
+  description: string;
+  /** 行业分类 */
   category: TemplateCategory;
-  label: string;
-  templates: RequirementTemplate[];
+  /** 图标 */
+  icon?: string;
+  /** 场景 */
+  scenes: TemplateScene[];
+  /** 标签 */
+  tags: string[];
+  /** 需求内容文本 */
+  content?: string;
+  /** 领域实体 */
+  entities?: TemplateEntity[];
+  /** 功能列表 */
+  features?: TemplateFeature[];
+  /** 元数据 */
+  metadata?: TemplateMetadata;
+  /** 需求项列表 */
+  items?: RequirementTemplateItem[];
+  /** 创建时间 */
+  createdAt?: string;
+  /** 更新时间 */
+  updatedAt?: string;
 }
 
-/** 分类选项 */
-export interface CategoryOption {
-  value: TemplateCategory | 'all';
-  label: string;
-  count: number;
+export interface RequirementTemplateItem {
+  /** 唯一标识 */
+  id: string;
+  /** 所属模板 ID */
+  templateId: string;
+  /** 需求类型 */
+  type: RequirementType;
+  /** 标题 */
+  title: string;
+  /** 描述 */
+  description: string;
+  /** 优先级 */
+  priority: Priority;
+  /** 验收标准 */
+  acceptanceCriteria: string[];
+  /** 依赖项 */
+  dependencies: string[];
+  /** 技术备注 */
+  technicalNotes?: string;
+  /** 状态 */
+  status: Status;
 }
 
-/** TemplateSelector Props */
-export interface TemplateSelectorProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSelect: (template: RequirementTemplate) => void;
-  initialCategory?: TemplateCategory | 'all';
+export interface TemplateCategoryInfo {
+  id: TemplateCategory;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
 }
 
-/** TemplateCard Props */
+export interface TemplateSceneInfo {
+  id: TemplateScene;
+  name: string;
+  description: string;
+}
+
+// 行业分类配置
+export const TEMPLATE_CATEGORIES: TemplateCategoryInfo[] = [
+  { id: 'saas', name: 'SaaS 产品', description: '软件即服务产品', icon: '☁️', color: '#3B82F6' },
+  { id: 'ecommerce', name: '电商平台', description: '在线购物平台', icon: '🛒', color: '#10B981' },
+  { id: 'fintech', name: '金融科技', description: '金融服务应用', icon: '💰', color: '#F59E0B' },
+  { id: 'healthcare', name: '医疗健康', description: '健康医疗应用', icon: '🏥', color: '#EF4444' },
+  { id: 'education', name: '在线教育', description: '教育学习平台', icon: '📚', color: '#8B5CF6' },
+  { id: 'social', name: '社交网络', description: '社交媒体平台', icon: '👥', color: '#EC4899' },
+  { id: 'game', name: '游戏', description: '游戏应用', icon: '🎮', color: '#14B8A6' },
+  { id: 'iot', name: '物联网', description: 'IoT 设备管理', icon: '📡', color: '#6366F1' },
+  { id: 'enterprise', name: '企业服务', description: 'B2B 服务', icon: '🏢', color: '#64748B' },
+  { id: 'mobile', name: '移动应用', description: '移动端应用', icon: '📱', color: '#F97316' },
+  { id: 'content', name: '内容平台', description: '内容发布与管理', icon: '📝', color: '#06B6D4' },
+  { id: 'custom', name: '自定义', description: '自定义模板', icon: '⚙️', color: '#71717A' },
+];
+
+// 场景配置
+export const TEMPLATE_SCENES: TemplateSceneInfo[] = [
+  { id: 'b2b', name: 'B2B', description: '企业对企业业务' },
+  { id: 'b2c', name: 'B2C', description: '企业对消费者业务' },
+  { id: 'marketplace', name: '交易市场', description: '多边平台' },
+  { id: 'api', name: 'API 服务', description: 'API 接口服务' },
+];
+
+// 默认标签
+export const DEFAULT_TAGS = [
+  'user-auth',      // 用户认证
+  'payment',        // 支付
+  'notification',   // 通知
+  'analytics',      // 分析
+  'admin',         // 管理后台
+  'search',        // 搜索
+  'media',         // 媒体
+  'security',      // 安全
+  'performance',   // 性能
+  'i18n',         // 国际化
+];
+
+// 组件 Props 类型导出
 export interface TemplateCardProps {
   template: RequirementTemplate;
   selected?: boolean;
-  onClick: () => void;
+  onClick?: () => void;
   onPreview?: () => void;
 }
 
-/** TemplateDetail Props */
-export interface TemplateDetailProps {
-  template: RequirementTemplate;
-  onApply: () => void;
-  onClose: () => void;
+export interface TemplateCategoriesProps {
+  categories: { value: string; label: string; count: number }[];
+  selected: string;
+  onSelect: (value: string) => void;
 }
 
-/** TemplateSearch Props */
 export interface TemplateSearchProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
 }
 
-/** TemplateCategories Props */
-export interface TemplateCategoriesProps {
-  categories: CategoryOption[];
-  selected: TemplateCategory | 'all';
-  onSelect: (category: TemplateCategory | 'all') => void;
+export interface TemplateDetailProps {
+  template: RequirementTemplate;
+  onApply?: () => void;
+  onClose?: () => void;
 }
+
+// 兼容旧版本的类型别名
+export type TemplateGroup = RequirementTemplate;
+export type CategoryOption = TemplateCategoryInfo;

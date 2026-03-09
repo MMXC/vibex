@@ -1,120 +1,143 @@
-/**
- * TemplateSelector - 模板选择器主组件
- * 
- * 提供模板选择弹窗，支持搜索、分类筛选、模板预览和选择
- */
+'use client';
 
-import { useState, useMemo } from 'react';
-import { 
-  RequirementTemplate, 
-  TemplateCategory,
-  getTemplateGroups,
-  filterTemplates 
-} from '@/data/templates';
-import { TemplateCard } from './TemplateCard';
-import { TemplateDetail } from './TemplateDetail';
-import { TemplateSearch } from './TemplateSearch';
-import { TemplateCategories } from './TemplateCategories';
+import React, { useState, useEffect } from 'react';
+import { useTemplateStore } from '@/data/templates/store';
+import { TEMPLATE_CATEGORIES, TEMPLATE_SCENES } from '@/data/templates/types';
+import type { TemplateCategory, TemplateScene, RequirementTemplate } from '@/data/templates/types';
 import styles from './TemplateSelector.module.css';
 
-export interface TemplateSelectorProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSelect: (template: RequirementTemplate) => void;
-  initialCategory?: TemplateCategory | 'all';
+interface TemplateSelectorProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+  onSelect?: (template: RequirementTemplate) => void;
 }
 
-export function TemplateSelector({ 
-  isOpen, 
-  onClose, 
-  onSelect,
-  initialCategory = 'all'
-}: TemplateSelectorProps) {
-  const [selectedCategory, setSelectedCategory] = useState<TemplateCategory | 'all'>(initialCategory);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [previewTemplate, setPreviewTemplate] = useState<RequirementTemplate | null>(null);
-  
-  // 过滤模板 - 使用 useMemo 缓存，支持 < 100ms 搜索响应
-  const filteredTemplates = useMemo(() => {
-    return filterTemplates(selectedCategory, searchQuery);
-  }, [selectedCategory, searchQuery]);
-  
-  // 分类选项（带数量）
-  const categories = useMemo(() => {
-    const groups = getTemplateGroups();
-    const { templates } = require('@/data/templates');
-    const allCount = templates.length;
-    
-    return [
-      { value: 'all' as const, label: '全部', count: allCount },
-      ...groups.map((g: { category: TemplateCategory; label: string; templates: RequirementTemplate[] }) => ({
-        value: g.category,
-        label: g.label,
-        count: g.templates.length,
-      })),
-    ];
-  }, []);
-  
-  // 处理模板选择
-  const handleSelect = (template: RequirementTemplate) => {
-    onSelect(template);
-    onClose();
+export function TemplateSelector({ isOpen = true, onClose, onSelect }: TemplateSelectorProps) {
+  const {
+    templates,
+    currentTemplate,
+    selectedCategory,
+    selectedScene,
+    searchQuery,
+    loadTemplates,
+    setCurrentTemplate,
+    setSelectedCategory,
+    setSelectedScene,
+    setSearchQuery,
+    getFilteredTemplates,
+  } = useTemplateStore();
+
+  useEffect(() => {
+    loadTemplates();
+  }, [loadTemplates]);
+
+  const filteredTemplates = getFilteredTemplates();
+
+  const handleTemplateClick = (template: RequirementTemplate) => {
+    setCurrentTemplate(template.id);
+    onSelect?.(template);
   };
-  
+
+  const handleClose = () => {
+    onClose?.();
+  };
+
   if (!isOpen) return null;
-  
+
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={e => e.stopPropagation()} role="dialog" aria-modal="true">
-        <header className={styles.header}>
-          <h2 className={styles.title}>选择需求模板</h2>
-          <button 
-            className={styles.closeBtn} 
-            onClick={onClose}
-            aria-label="关闭"
+    <div className={styles.overlay} onClick={handleClose}>
+      <div className={styles.modal} onClick={e => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
+          <h2 className={styles.modalTitle}>选择需求模板</h2>
+          <button className={styles.closeButton} onClick={handleClose}>×</button>
+        </div>
+
+      {/* 搜索栏 */}
+      <div className={styles.searchBar}>
+        <input
+          type="text"
+          placeholder="搜索模板..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className={styles.searchInput}
+        />
+      </div>
+
+      {/* 筛选器 */}
+      <div className={styles.filters}>
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>行业:</label>
+          <select
+            value={selectedCategory || ''}
+            onChange={(e) => setSelectedCategory(e.target.value as TemplateCategory || null)}
+            className={styles.filterSelect}
           >
-            ×
-          </button>
-        </header>
-        
-        <div className={styles.toolbar}>
-          <TemplateSearch
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="搜索模板..."
-          />
-          <TemplateCategories
-            categories={categories}
-            selected={selectedCategory}
-            onSelect={setSelectedCategory}
-          />
+            <option value="">全部</option>
+            {TEMPLATE_CATEGORIES.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.icon} {cat.name}
+              </option>
+            ))}
+          </select>
         </div>
-        
-        <div className={styles.grid}>
-          {filteredTemplates.map(template => (
-            <TemplateCard
-              key={template.id}
-              template={template}
-              onClick={() => handleSelect(template)}
-              onPreview={() => setPreviewTemplate(template)}
-            />
-          ))}
-          
-          {filteredTemplates.length === 0 && (
-            <div className={styles.empty}>
-              未找到匹配的模板
-            </div>
-          )}
+
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>场景:</label>
+          <select
+            value={selectedScene || ''}
+            onChange={(e) => setSelectedScene(e.target.value as TemplateScene || null)}
+            className={styles.filterSelect}
+          >
+            <option value="">全部</option>
+            {TEMPLATE_SCENES.map((scene) => (
+              <option key={scene.id} value={scene.id}>
+                {scene.name}
+              </option>
+            ))}
+          </select>
         </div>
-        
-        {previewTemplate && (
-          <TemplateDetail
-            template={previewTemplate}
-            onApply={() => handleSelect(previewTemplate)}
-            onClose={() => setPreviewTemplate(null)}
-          />
+      </div>
+
+      {/* 模板列表 */}
+      <div className={styles.templateList}>
+        {filteredTemplates.length === 0 ? (
+          <div className={styles.empty}>没有找到匹配的模板</div>
+        ) : (
+          filteredTemplates.map((template) => {
+            const category = TEMPLATE_CATEGORIES.find(c => c.id === template.category);
+            return (
+              <div
+                key={template.id}
+                className={`${styles.templateCard} ${currentTemplate?.id === template.id ? styles.selected : ''}`}
+                onClick={() => handleTemplateClick(template)}
+              >
+                <div className={styles.templateHeader}>
+                  <span className={styles.categoryIcon}>{category?.icon || '📄'}</span>
+                  <h3 className={styles.templateName}>{template.name}</h3>
+                </div>
+                <p className={styles.templateDesc}>{template.description}</p>
+                <div className={styles.templateTags}>
+                  {template.tags.slice(0, 4).map((tag) => (
+                    <span key={tag} className={styles.tag}>{tag}</span>
+                  ))}
+                </div>
+              </div>
+            );
+          })
         )}
       </div>
+
+      {/* 已选模板详情 */}
+      {currentTemplate && (
+        <div className={styles.detailPanel}>
+          <h3 className={styles.detailTitle}>{currentTemplate.name}</h3>
+          <p className={styles.detailDesc}>{currentTemplate.description}</p>
+          <div className={styles.itemCount}>
+            包含 {currentTemplate.items?.length || 0} 个需求项
+          </div>
+        </div>
+      )}
+    </div>
     </div>
   );
 }

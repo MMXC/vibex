@@ -116,6 +116,30 @@
   margin-bottom: 0.75rem;
 }
 
+.labelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.templateButton {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #4ade80;
+  font-weight: 500;
+  font-size: 0.875rem;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.templateButton:hover {
+  background: rgba(74, 222, 128, 0.15);
+  border-color: #4ade80;
+}
+
 .textarea {
   width: 100%;
   padding: 1rem;

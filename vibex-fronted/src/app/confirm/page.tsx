@@ -7,9 +7,12 @@ import {
   useConfirmationStore,
   BoundedContext,
 } from '@/stores/confirmationStore';
-import { generateBoundedContext } from '@/services/api';
+import { apiService } from '@/services/api';
+const { generateBoundedContext } = apiService;
 import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps';
 import { RequirementScore } from '@/components/ui/RequirementScore';
+import { TemplateSelector } from '@/components/templates';
+import { RequirementTemplate } from '@/data/templates';
 
 export default function ConfirmPage() {
   const router = useRouter();
@@ -23,6 +26,14 @@ export default function ConfirmPage() {
   } = useConfirmationStore();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isTemplateOpen, setIsTemplateOpen] = useState(false);
+
+  const handleTemplateSelect = (template: RequirementTemplate) => {
+    // Use the template content or description
+    const text = template.content || template.description;
+    setRequirementText(text);
+    setIsTemplateOpen(false);
+  };
 
   const handleSubmit = async () => {
     if (!requirementText.trim()) {
@@ -74,9 +85,18 @@ export default function ConfirmPage() {
         <ConfirmationSteps currentStep={currentStep} className={styles.steps} />
 
         <div className={styles.inputSection}>
-          <label htmlFor="requirement" className={styles.label}>
-            请描述您的产品需求
-          </label>
+          <div className={styles.labelRow}>
+            <label htmlFor="requirement" className={styles.label}>
+              请描述您的产品需求
+            </label>
+            <button
+              type="button"
+              className={styles.templateButton}
+              onClick={() => setIsTemplateOpen(true)}
+            >
+              📋 使用模板
+            </button>
+          </div>
           <textarea
             id="requirement"
             className={styles.textarea}
@@ -100,6 +120,12 @@ export default function ConfirmPage() {
             {loading ? '生成中...' : '开始生成'}
           </button>
         </div>
+
+        <TemplateSelector
+          isOpen={isTemplateOpen}
+          onClose={() => setIsTemplateOpen(false)}
+          onSelect={handleTemplateSelect}
+        />
       </div>
     </div>
   );

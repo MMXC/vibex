@@ -3,7 +3,7 @@
 import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { apiService } from '@/services/api';
+import { authApi } from '@/services/api/modules/auth';
 
 function AuthForm() {
   const router = useRouter();
@@ -32,9 +32,9 @@ function AuthForm() {
 
     try {
       if (isLogin) {
-        await apiService.login({ email, password });
+        await authApi.login({ email, password });
       } else {
-        await apiService.register({ name, email, password });
+        await authApi.register({ name, email, password });
       }
       router.push('/dashboard');
     } catch (err: unknown) {
@@ -227,25 +227,36 @@ function AuthForm() {
                 setError('');
               }}
               style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--color-primary)',
+                background: 'var(--color-primary)',
+                border: '1px solid var(--color-primary)',
+                color: '#fff',
                 cursor: 'pointer',
                 fontWeight: 600,
+                fontSize: '16px',
                 textDecoration: 'none',
-                padding: '4px 12px',
-                borderRadius: '6px',
+                padding: '10px 20px',
+                borderRadius: '8px',
+                minHeight: '44px',
                 transition: 'all 0.2s ease',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(0, 255, 255, 0.1)';
-                e.currentTarget.style.textDecoration = 'underline';
+                e.currentTarget.style.background = 'var(--color-primary-hover, #0055cc)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'none';
-                e.currentTarget.style.textDecoration = 'none';
+                e.currentTarget.style.background = 'var(--color-primary)';
+                e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="8.5" cy="7" r="4"/>
+                <line x1="20" y1="8" x2="20" y2="14"/>
+                <line x1="23" y1="11" x2="17" y2="11"/>
+              </svg>
               立即注册
             </button>
           </>

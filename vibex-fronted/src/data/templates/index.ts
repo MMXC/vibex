@@ -44,11 +44,15 @@ export const categoryLabels: Record<TemplateCategory, string> = {
   saas: 'SaaS',
   education: '教育',
   content: '内容',
-  finance: '金融',
+  fintech: '金融',
   healthcare: '医疗',
   logistics: '物流',
   restaurant: '餐饮',
-  scenario: '通用场景',
+  game: '游戏',
+  iot: '物联网',
+  enterprise: '企业服务',
+  mobile: '移动应用',
+  custom: '自定义',
 };
 
 /** 按分类获取模板 */
@@ -63,14 +67,14 @@ export function searchTemplates(query: string): RequirementTemplate[] {
   const lowerQuery = query.toLowerCase();
   return templates.filter(t => 
     t.name.toLowerCase().includes(lowerQuery) ||
-    t.displayName.toLowerCase().includes(lowerQuery) ||
+    (t.displayName && t.displayName.toLowerCase().includes(lowerQuery)) ||
     t.description.toLowerCase().includes(lowerQuery) ||
-    t.metadata.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+    (t.metadata?.tags && t.metadata.tags.some(tag => tag.toLowerCase().includes(lowerQuery)))
   );
 }
 
 /** 获取模板分组（用于展示） */
-export function getTemplateGroups(): TemplateGroup[] {
+export function getTemplateGroups(): { category: TemplateCategory; label: string; templates: RequirementTemplate[] }[] {
   return Object.entries(categoryLabels)
     .map(([category, label]) => ({
       category: category as TemplateCategory,
@@ -81,12 +85,12 @@ export function getTemplateGroups(): TemplateGroup[] {
 }
 
 /** 获取分类选项（带数量） */
-export function getCategoryOptions(): CategoryOption[] {
+export function getCategoryOptions(): { value: string; label: string; count: number }[] {
   const groups = getTemplateGroups();
   const allCount = templates.length;
   
   return [
-    { value: 'all' as const, label: '全部', count: allCount },
+    { value: 'all', label: '全部', count: allCount },
     ...groups.map(g => ({
       value: g.category,
       label: g.label,
@@ -102,12 +106,13 @@ export function getTemplateById(id: string): RequirementTemplate | undefined {
 
 /** 获取行业模板 */
 export function getIndustryTemplates(): RequirementTemplate[] {
-  return templates.filter(t => t.category !== 'scenario');
+  const scenarioCategories: TemplateCategory[] = ['custom'];
+  return templates.filter(t => !scenarioCategories.includes(t.category));
 }
 
 /** 获取场景模板 */
 export function getScenarioTemplates(): RequirementTemplate[] {
-  return templates.filter(t => t.category === 'scenario');
+  return templates.filter(t => t.category === 'custom');
 }
 
 /** 过滤模板 */
@@ -125,9 +130,9 @@ export function filterTemplates(
     const lowerQuery = query.toLowerCase();
     result = result.filter(t =>
       t.name.toLowerCase().includes(lowerQuery) ||
-      t.displayName.toLowerCase().includes(lowerQuery) ||
+      (t.displayName && t.displayName.toLowerCase().includes(lowerQuery)) ||
       t.description.toLowerCase().includes(lowerQuery) ||
-      t.metadata.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+      (t.metadata?.tags && t.metadata.tags.some(tag => tag.toLowerCase().includes(lowerQuery)))
     );
   }
   

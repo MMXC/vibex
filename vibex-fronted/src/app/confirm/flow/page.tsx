@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import styles from '../confirm.module.css';
 import { useConfirmationStore } from '@/stores/confirmationStore';
 import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps';
-import { generateBusinessFlow, apiService } from '@/services/api';
+import { apiService } from '@/services/api';
+const { generateBusinessFlow } = apiService;
 
 export default function FlowPage() {
   const router = useRouter();

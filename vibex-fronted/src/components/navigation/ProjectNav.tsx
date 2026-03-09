@@ -31,7 +31,8 @@ export function ProjectNav({
 
   // Build href for each nav item based on project ID
   const getNavHref = (item: (typeof projectNavItems)[0]) => {
-    return `/projects/${effectiveProjectId}${item.href || ''}`;
+    // 使用查询参数格式: /path?projectId=xxx
+    return `${item.href || ''}?projectId=${effectiveProjectId}`;
   };
 
   return (
@@ -74,7 +75,7 @@ export function ProjectNav({
       {/* Bottom Actions */}
       <div className={styles.bottom}>
         <Link
-          href={`/projects/${effectiveProjectId}/settings`}
+          href={`/project-settings?projectId=${effectiveProjectId}`}
           className={styles.settingsLink}
         >
           <span className={styles.navIcon}>⚙️</span>

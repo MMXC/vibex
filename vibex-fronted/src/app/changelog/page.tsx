@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.21',
+    date: '2026-03-09',
+    changes: [
+      '🔀 路由简化完成：动态路由迁移到查询参数格式',
+      '📍 新增 /project 入口页：统一项目管理入口',
+      '↩️ 向后兼容：Cloudflare Pages _redirects 重定向规则',
+      '🧭 ProjectNav 链接更新：统一使用 ?projectId= 格式',
+    ],
+    commit: 'b2b74b8',
+  },
+  {
     version: '1.0.20',
     date: '2026-03-09',
     changes: [

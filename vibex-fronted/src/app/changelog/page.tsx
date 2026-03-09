@@ -18,6 +18,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.20',
+    date: '2026-03-09',
+    changes: [
+      '🔄 API 模块化重构：api.ts 拆分为 modules/(auth, agent, project 等)',
+      '📋 模板系统增强：新增 10 个行业模板（电商/金融/医疗/教育等）',
+      '✨ 确认页模板选择器：一键使用预定义模板',
+      '🧪 E2E 测试：Page Object Model 实现',
+      '🎨 样式 token 系统：tokens.css 设计变量',
+    ],
+    commit: '81a5033',
+  },
+  {
     version: '1.0.19',
     date: '2026-03-09',
     changes: [

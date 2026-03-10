@@ -88,7 +88,9 @@
       "/e2e/",
       "/.next/",
       "/coverage/",
-      "/storybook-static/"
+      "/storybook-static/",
+      "flow",
+      "FlowEditor"
     ],
     "coverageReporters": [
       "text",

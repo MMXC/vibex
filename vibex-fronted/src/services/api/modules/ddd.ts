@@ -40,11 +40,11 @@ class DddApiImpl implements DddApi {
     requirementText: string,
     projectId?: string
   ): Promise<BoundedContextResponse> {
-    const response = await httpClient.post<{ data: BoundedContextResponse }>(
+    const response = await httpClient.post<BoundedContextResponse>(
       '/ddd/bounded-context',
       { requirementText, projectId }
     );
-    return response.data;
+    return response;
   }
 
   async generateDomainModel(
@@ -57,13 +57,13 @@ class DddApiImpl implements DddApi {
     mermaidCode?: string;
     error?: string;
   }> {
-    const response = await httpClient.post<{ data: {
+    const response = await httpClient.post<{
       success: boolean;
       domainModels?: unknown[];
       mermaidCode?: string;
       error?: string;
-    } }>('/ddd/domain-model', { boundedContexts, requirementText, projectId });
-    return response.data;
+    }>('/ddd/domain-model', { boundedContexts, requirementText, projectId });
+    return response;
   }
 
   async generateBusinessFlow(
@@ -76,13 +76,13 @@ class DddApiImpl implements DddApi {
     mermaidCode?: string;
     error?: string;
   }> {
-    const response = await httpClient.post<{ data: {
+    const response = await httpClient.post<{
       success: boolean;
       businessFlow?: unknown;
       mermaidCode?: string;
       error?: string;
-    } }>('/ddd/business-flow', { domainModels, requirementText, projectId });
-    return response.data;
+    }>('/ddd/business-flow', { domainModels, requirementText, projectId });
+    return response;
   }
 }
 

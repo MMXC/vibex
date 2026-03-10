@@ -15,6 +15,9 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
+// Mock Element.scrollIntoView
+Element.prototype.scrollIntoView = jest.fn();
+
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
   useRouter: () => ({

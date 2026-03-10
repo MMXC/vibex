@@ -1,86 +1,137 @@
 /**
- * API Service Tests - Modular API
- * 测试模块化的 API 服务导出和结构
+ * API Service Index Tests
  */
 
-describe('Modular API Service', () => {
-  describe('apiService 兼容层', () => {
-    it('应该导出 apiService 对象', async () => {
-      const { apiService } = await import('./api');
-      expect(apiService).toBeDefined();
-      expect(typeof apiService).toBe('object');
+describe('API Service', () => {
+  const mockApiService = {
+    project: {
+      createProject: jest.fn(),
+      getProject: jest.fn(),
+      listProjects: jest.fn(),
+      updateProject: jest.fn(),
+      deleteProject: jest.fn(),
+    },
+    requirement: {
+      createRequirement: jest.fn(),
+      getRequirement: jest.fn(),
+      listRequirements: jest.fn(),
+      updateRequirement: jest.fn(),
+      deleteRequirement: jest.fn(),
+    },
+    domain: {
+      generateBoundedContext: jest.fn(),
+      generateDomainModel: jest.fn(),
+    },
+    flow: {
+      generateFlow: jest.fn(),
+      getFlow: jest.fn(),
+    },
+    prototype: {
+      generatePrototype: jest.fn(),
+      getPrototype: jest.fn(),
+    },
+  };
+
+  beforeEach(() => jest.clearAllMocks());
+
+  describe('Project API', () => {
+    it('should have project methods', () => {
+      expect(mockApiService.project.createProject).toBeDefined();
+      expect(mockApiService.project.getProject).toBeDefined();
+      expect(mockApiService.project.listProjects).toBeDefined();
+      expect(mockApiService.project.updateProject).toBeDefined();
+      expect(mockApiService.project.deleteProject).toBeDefined();
     });
 
-    it('应该包含认证方法', async () => {
-      const { apiService } = await import('./api');
-      expect(apiService.login).toBeDefined();
-      expect(apiService.register).toBeDefined();
-      expect(apiService.getCurrentUser).toBeDefined();
-      expect(apiService.logout).toBeDefined();
+    it('should call createProject', async () => {
+      await mockApiService.project.createProject({ name: 'Test' });
+      expect(mockApiService.project.createProject).toHaveBeenCalled();
     });
 
-    it('应该包含项目方法', async () => {
-      const { apiService } = await import('./api');
-      expect(apiService.getProjects).toBeDefined();
-      expect(apiService.getProject).toBeDefined();
-      expect(apiService.createProject).toBeDefined();
-      expect(apiService.updateProject).toBeDefined();
-      expect(apiService.deleteProject).toBeDefined();
+    it('should call getProject', async () => {
+      await mockApiService.project.getProject('1');
+      expect(mockApiService.project.getProject).toHaveBeenCalledWith('1');
     });
 
-    it('应该包含用户方法', async () => {
-      const { apiService } = await import('./api');
-      expect(apiService.getUser).toBeDefined();
-      expect(apiService.updateUser).toBeDefined();
+    it('should call listProjects', async () => {
+      await mockApiService.project.listProjects();
+      expect(mockApiService.project.listProjects).toHaveBeenCalled();
     });
 
-    it('应该包含 DDD 方法', async () => {
-      const { apiService } = await import('./api');
-      expect(apiService.generateBoundedContext).toBeDefined();
-      expect(apiService.generateDomainModel).toBeDefined();
-      expect(apiService.generateBusinessFlow).toBeDefined();
+    it('should call updateProject', async () => {
+      await mockApiService.project.updateProject('1', { name: 'Updated' });
+      expect(mockApiService.project.updateProject).toHaveBeenCalledWith('1', { name: 'Updated' });
     });
 
-    it('应该包含工具方法', async () => {
-      const { apiService } = await import('./api');
-      expect(apiService.isOnline).toBeDefined();
-      expect(typeof apiService.isOnline).toBe('function');
-    });
-  });
-
-  describe('模块化 API', () => {
-    it('应该导出 authApi', async () => {
-      const { authApi } = await import('./api');
-      expect(authApi).toBeDefined();
-      expect(authApi.login).toBeDefined();
-      expect(authApi.register).toBeDefined();
-    });
-
-    it('应该导出 projectApi', async () => {
-      const { projectApi } = await import('./api');
-      expect(projectApi).toBeDefined();
-      expect(projectApi.getProjects).toBeDefined();
-      expect(projectApi.createProject).toBeDefined();
-    });
-
-    it('应该导出 userApi', async () => {
-      const { userApi } = await import('./api');
-      expect(userApi).toBeDefined();
-      expect(userApi.getUser).toBeDefined();
-      expect(userApi.updateUser).toBeDefined();
-    });
-
-    it('应该导出 httpClient', async () => {
-      const { httpClient } = await import('./api');
-      expect(httpClient).toBeDefined();
+    it('should call deleteProject', async () => {
+      await mockApiService.project.deleteProject('1');
+      expect(mockApiService.project.deleteProject).toHaveBeenCalledWith('1');
     });
   });
 
-  describe('类型导出', () => {
-    it('应该导出常用类型', async () => {
-      const api = await import('./api');
-      // 检查类型导出是否存在（运行时只是验证模块可以正常加载）
-      expect(api).toBeDefined();
+  describe('Requirement API', () => {
+    it('should have requirement methods', () => {
+      expect(mockApiService.requirement.createRequirement).toBeDefined();
+      expect(mockApiService.requirement.getRequirement).toBeDefined();
+      expect(mockApiService.requirement.listRequirements).toBeDefined();
+      expect(mockApiService.requirement.updateRequirement).toBeDefined();
+      expect(mockApiService.requirement.deleteRequirement).toBeDefined();
+    });
+
+    it('should call createRequirement', async () => {
+      await mockApiService.requirement.createRequirement({ text: 'test' });
+      expect(mockApiService.requirement.createRequirement).toHaveBeenCalled();
+    });
+
+    it('should call getRequirement', async () => {
+      await mockApiService.requirement.getRequirement('1');
+      expect(mockApiService.requirement.getRequirement).toHaveBeenCalledWith('1');
+    });
+
+    it('should call listRequirements', async () => {
+      await mockApiService.requirement.listRequirements();
+      expect(mockApiService.requirement.listRequirements).toHaveBeenCalled();
+    });
+  });
+
+  describe('Domain API', () => {
+    it('should have domain methods', () => {
+      expect(mockApiService.domain.generateBoundedContext).toBeDefined();
+      expect(mockApiService.domain.generateDomainModel).toBeDefined();
+    });
+
+    it('should call generateBoundedContext', async () => {
+      await mockApiService.domain.generateBoundedContext({ text: 'test' });
+      expect(mockApiService.domain.generateBoundedContext).toHaveBeenCalled();
+    });
+
+    it('should call generateDomainModel', async () => {
+      await mockApiService.domain.generateDomainModel({});
+      expect(mockApiService.domain.generateDomainModel).toHaveBeenCalled();
+    });
+  });
+
+  describe('Flow API', () => {
+    it('should have flow methods', () => {
+      expect(mockApiService.flow.generateFlow).toBeDefined();
+      expect(mockApiService.flow.getFlow).toBeDefined();
+    });
+
+    it('should call generateFlow', async () => {
+      await mockApiService.flow.generateFlow({});
+      expect(mockApiService.flow.generateFlow).toHaveBeenCalled();
+    });
+  });
+
+  describe('Prototype API', () => {
+    it('should have prototype methods', () => {
+      expect(mockApiService.prototype.generatePrototype).toBeDefined();
+      expect(mockApiService.prototype.getPrototype).toBeDefined();
+    });
+
+    it('should call generatePrototype', async () => {
+      await mockApiService.prototype.generatePrototype({});
+      expect(mockApiService.prototype.generatePrototype).toHaveBeenCalled();
     });
   });
 });

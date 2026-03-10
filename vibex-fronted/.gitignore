@@ -29,8 +29,11 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files
+# 注意：.env.local 包含本地开发配置，已提交到仓库的文件不受此规则影响
 .env*
+!.env.example
+!.env.production
 
 # vercel
 .vercel
@@ -45,3 +48,14 @@ next-env.d.ts
 
 # out
 out/
+
+# E2E test artifacts
+test-results/
+tests/e2e/screenshots/
+playwright-report/
+*.png
+!src/**/*.png
+!public/**/*.png
+
+# Security tools (binaries)
+gitleaks

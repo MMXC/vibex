@@ -588,7 +588,7 @@ export default function PrototypePreview() {
   }
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-testid="prototype-container">
       {/* 背景特效 */}
       <div className={styles.bgEffect}>
         <div className={styles.gridOverlay} />
@@ -622,6 +622,7 @@ export default function PrototypePreview() {
                 className={`${styles.deviceTab} ${selectedDevice === device.id ? styles.active : ''}`}
                 onClick={() => setSelectedDevice(device.id)}
                 title={device.description}
+                data-testid={`device-${device.id}`}
               >
                 <span className={styles.deviceIcon}>{device.icon}</span>
                 <span className={styles.deviceName}>{device.name}</span>
@@ -637,14 +638,16 @@ export default function PrototypePreview() {
               className={styles.zoomBtn}
               onClick={() => setZoom(Math.max(25, zoom - 25))}
               disabled={zoom <= 25}
+              data-testid="zoom-out"
             >
               −
             </button>
-            <span className={styles.zoomValue}>{zoom}%</span>
+            <span className={styles.zoomValue} data-testid="zoom-level">{zoom}%</span>
             <button
               className={styles.zoomBtn}
               onClick={() => setZoom(Math.min(200, zoom + 25))}
               disabled={zoom >= 200}
+              data-testid="zoom-in"
             >
               +
             </button>
@@ -688,7 +691,7 @@ export default function PrototypePreview() {
       <div className={styles.mainContainer}>
         {/* 左侧页面列表 */}
         {showPageList && (
-          <aside className={styles.pageList}>
+          <aside className={styles.pageList} data-testid="page-list">
             <div className={styles.pageListHeader}>
               <h2 className={styles.pageListTitle}>页面</h2>
               <span className={styles.pageCount}>{pages.length}</span>
@@ -716,7 +719,7 @@ export default function PrototypePreview() {
         )}
 
         {/* 中间预览区域 */}
-        <main className={styles.previewArea}>
+        <main className={styles.previewArea} data-testid="preview-frame">
           <div
             className={styles.previewContainer}
             style={{
@@ -754,7 +757,7 @@ export default function PrototypePreview() {
 
               <div className={styles.browserContent}>
                 {selectedPage ? (
-                  <div className={styles.pageContent}>
+                  <div className={styles.pageContent} data-testid="preview-content">
                     {selectedPage.components?.map((comp) =>
                       renderComponent(comp)
                     )}
@@ -772,7 +775,7 @@ export default function PrototypePreview() {
 
         {/* 右侧信息面板 */}
         {showSidebar && (
-          <aside className={styles.infoPanel}>
+          <aside className={styles.infoPanel} data-testid="prototype-sidebar">
             <div className={styles.panelSection}>
               <h3 className={styles.panelTitle}>页面信息</h3>
               <div className={styles.infoGrid}>

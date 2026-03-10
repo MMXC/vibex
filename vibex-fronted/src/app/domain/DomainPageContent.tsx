@@ -135,6 +135,7 @@ function Toolbar({
   onAddRelation,
   onSave,
   onGenerate,
+  onOpenChat,
   hasChanges,
   hasRequirementText,
   generating,
@@ -143,6 +144,7 @@ function Toolbar({
   onAddRelation: () => void;
   onSave: () => void;
   onGenerate: () => void;
+  onOpenChat: () => void;
   hasChanges: boolean;
   hasRequirementText: boolean;
   generating: boolean;
@@ -158,6 +160,9 @@ function Toolbar({
         }
       >
         <span>🤖</span> {generating ? '生成中...' : 'AI生成'}
+      </button>
+      <button onClick={onOpenChat} className={styles.toolbarBtn}>
+        <span>💬</span> 对话修改
       </button>
       <button onClick={onAddEntity} className={styles.toolbarBtn}>
         <span>+</span> 添加实体
@@ -234,6 +239,183 @@ function AddEntityDialog({
             添加
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// 对话修改面板
+function ChatModifyPanel({
+  entities,
+  onAddEntity,
+  onDeleteEntity,
+  onUpdateEntity,
+  onClose,
+}: {
+  entities: DomainEntity[];
+  onAddEntity: (entity: Partial<DomainEntity>) => void;
+  onDeleteEntity: (entityId: string) => void;
+  onUpdateEntity: (entityId: string, data: Partial<DomainEntity>) => void;
+  onClose: () => void;
+}) {
+  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
+  const [processing, setProcessing] = useState(false);
+
+  const parseIntent = (text: string): { action: string; entityName?: string; params?: Record<string, unknown> } | null => {
+    const lowerText = text.toLowerCase();
+    
+    // 添加实体意图
+    if (lowerText.includes('添加') || lowerText.includes('创建') || lowerText.includes('新增')) {
+      const entityMatch = text.match(/(?:添加|创建|新增)\s*(?:一个\s*)?(?:名为\s*)?["']?([^"'\s，。]+)["']?\s*(?:实体)?/);
+      if (entityMatch) {
+        return { action: 'add', entityName: entityMatch[1] };
+      }
+      // 简单匹配：添加XXX
+      const simpleMatch = text.match(/添加\s*(\S+)/);
+      if (simpleMatch) {
+        return { action: 'add', entityName: simpleMatch[1] };
+      }
+    }
+    
+    // 删除实体意图
+    if (lowerText.includes('删除') || lowerText.includes('移除')) {
+      const entityMatch = text.match(/(?:删除|移除)\s*(?:名为\s*)?["']?([^"'\s，。]+)["']?\s*(?:实体)?/);
+      if (entityMatch) {
+        return { action: 'delete', entityName: entityMatch[1] };
+      }
+    }
+    
+    // 修改实体意图
+    if (lowerText.includes('修改') || lowerText.includes('更新') || lowerText.includes('编辑')) {
+      const entityMatch = text.match(/(?:修改|更新|编辑)\s*(?:名为\s*)?["']?([^"'\s，。]+)["']?\s*(?:实体)?/);
+      if (entityMatch) {
+        return { action: 'update', entityName: entityMatch[1] };
+      }
+    }
+    
+    return null;
+  };
+
+  const findEntityByName = (name: string): DomainEntity | undefined => {
+    return entities.find(e => e.name.toLowerCase() === name.toLowerCase() || e.name.includes(name));
+  };
+
+  const handleSubmit = async () => {
+    if (!input.trim() || processing) return;
+    
+    const userMessage = input.trim();
+    setInput('');
+    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    setProcessing(true);
+    
+    try {
+      const intent = parseIntent(userMessage);
+      
+      if (!intent) {
+        setMessages(prev => [...prev, { 
+          role: 'assistant', 
+          content: '抱歉，我无法理解您的指令。请尝试使用以下格式：\n• 添加 [实体名称] 实体\n• 删除 [实体名称] 实体\n• 修改 [实体名称] 实体' 
+        }]);
+        return;
+      }
+      
+      switch (intent.action) {
+        case 'add':
+          if (intent.entityName) {
+            onAddEntity({
+              name: intent.entityName,
+              type: 'business',
+              description: `通过对话创建的实体：${intent.entityName}`,
+              attributes: [],
+            });
+            setMessages(prev => [...prev, { 
+              role: 'assistant', 
+              content: `✅ 已成功添加实体"${intent.entityName}"` 
+            }]);
+          }
+          break;
+          
+        case 'delete':
+          if (intent.entityName) {
+            const entity = findEntityByName(intent.entityName);
+            if (entity) {
+              onDeleteEntity(entity.id);
+              setMessages(prev => [...prev, { 
+                role: 'assistant', 
+                content: `✅ 已成功删除实体"${intent.entityName}"` 
+              }]);
+            } else {
+              setMessages(prev => [...prev, { 
+                role: 'assistant', 
+                content: `❌ 未找到名为"${intent.entityName}"的实体` 
+              }]);
+            }
+          }
+          break;
+          
+        case 'update':
+          if (intent.entityName) {
+            const entity = findEntityByName(intent.entityName);
+            if (entity) {
+              onUpdateEntity(entity.id, { description: `${entity.description || ''} (已更新)` });
+              setMessages(prev => [...prev, { 
+                role: 'assistant', 
+                content: `✅ 已成功修改实体"${intent.entityName}"` 
+              }]);
+            } else {
+              setMessages(prev => [...prev, { 
+                role: 'assistant', 
+                content: `❌ 未找到名为"${intent.entityName}"的实体` 
+              }]);
+            }
+          }
+          break;
+      }
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  return (
+    <div className={styles.chatPanel} data-testid="chat-modify-panel">
+      <div className={styles.chatPanelHeader}>
+        <h3>💬 对话修改</h3>
+        <button onClick={onClose} className={styles.closeBtn}>×</button>
+      </div>
+      <div className={styles.chatMessages}>
+        <div className={styles.chatHint}>
+          您可以对我说：<br/>
+          • 添加用户实体<br/>
+          • 删除订单实体<br/>
+          • 修改商品实体
+        </div>
+        {messages.map((msg, idx) => (
+          <div 
+            key={idx} 
+            className={`${styles.chatMessage} ${styles[msg.role]}`}
+            data-testid={`chat-message-${idx}`}
+          >
+            {msg.content}
+          </div>
+        ))}
+      </div>
+      <div className={styles.chatInput}>
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+          placeholder="输入指令，如：添加用户实体"
+          data-testid="chat-input"
+        />
+        <button 
+          onClick={handleSubmit} 
+          disabled={processing || !input.trim()}
+          data-testid="chat-submit-btn"
+        >
+          发送
+        </button>
       </div>
     </div>
   );
@@ -405,6 +587,7 @@ function DomainPageContent() {
   );
   const [filterType, setFilterType] = useState<string>('all');
   const [hasChanges, setHasChanges] = useState(false);
+  const [collapsedEntities, setCollapsedEntities] = useState<Set<string>>(new Set());
 
   // React Flow 状态
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -413,6 +596,7 @@ function DomainPageContent() {
   // 对话框状态
   const [showAddEntity, setShowAddEntity] = useState(false);
   const [showAddRelation, setShowAddRelation] = useState(false);
+  const [showChatPanel, setShowChatPanel] = useState(false);
 
   // Confirmation flow store
   const { setDomainModels, currentStep, goToNextStep } = useConfirmationStore();
@@ -793,6 +977,19 @@ function DomainPageContent() {
     setHasChanges(true);
   }, []);
 
+  // 切换实体折叠状态
+  const toggleEntityCollapse = useCallback((entityId: string) => {
+    setCollapsedEntities((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(entityId)) {
+        newSet.delete(entityId);
+      } else {
+        newSet.add(entityId);
+      }
+      return newSet;
+    });
+  }, []);
+
   const filteredDomains =
     filterType === 'all'
       ? domains
@@ -888,6 +1085,7 @@ function DomainPageContent() {
             onAddRelation={() => setShowAddRelation(true)}
             onSave={handleSave}
             onGenerate={handleGenerate}
+            onOpenChat={() => setShowChatPanel(true)}
             hasChanges={hasChanges}
             hasRequirementText={!!requirementText}
             generating={generating}
@@ -982,23 +1180,38 @@ function DomainPageContent() {
                     {entityTypeStyles[entity.type]?.label || entity.type}
                   </span>
                   <h3>{entity.name}</h3>
-                </div>
-                <p className={styles.entityDesc}>{entity.description}</p>
-                <div className={styles.entityAttrs}>
-                  {entity.attributes.slice(0, 3).map((attr) => (
-                    <span key={attr.name} className={styles.attrTag}>
-                      {attr.name}
-                      {attr.required && (
-                        <span className={styles.required}>*</span>
-                      )}
-                    </span>
-                  ))}
-                  {entity.attributes.length > 3 && (
-                    <span className={styles.moreAttrs}>
-                      +{entity.attributes.length - 3}
-                    </span>
+                  {entity.attributes.length > 0 && (
+                    <button
+                      data-testid={`collapse-btn-${entity.id}`}
+                      className={styles.collapseBtn}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleEntityCollapse(entity.id);
+                      }}
+                    >
+                      {collapsedEntities.has(entity.id) ? '▼' : '▲'}
+                    </button>
                   )}
                 </div>
+                <p className={styles.entityDesc}>{entity.description}</p>
+                {/* 折叠区域：显示所有属性 */}
+                {entity.attributes.length > 0 && !collapsedEntities.has(entity.id) && (
+                  <div data-testid={`entity-attrs-${entity.id}`} className={styles.entityAttrs}>
+                    {entity.attributes.slice(0, 3).map((attr) => (
+                      <span key={attr.name} className={styles.attrTag}>
+                        {attr.name}
+                        {attr.required && (
+                          <span className={styles.required}>*</span>
+                        )}
+                      </span>
+                    ))}
+                    {entity.attributes.length > 3 && (
+                      <span className={styles.moreAttrs}>
+                        +{entity.attributes.length - 3}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -1068,6 +1281,18 @@ function DomainPageContent() {
           entities={domains}
           onClose={() => setShowAddRelation(false)}
           onSave={handleAddRelation}
+        />
+      )}
+      {showChatPanel && (
+        <ChatModifyPanel
+          entities={domains}
+          onAddEntity={handleAddEntity}
+          onDeleteEntity={handleDeleteEntity}
+          onUpdateEntity={(entityId, data) => {
+            setDomains(prev => prev.map(e => e.id === entityId ? { ...e, ...data } : e));
+            setHasChanges(true);
+          }}
+          onClose={() => setShowChatPanel(false)}
         />
       )}
     </div>

@@ -333,5 +333,347 @@ src/components/
 
 ---
 
+## 🏗️ 架构优化提案 (2026-03-09 更新)
+
+> 由 Architect Agent 基于代码审查和测试覆盖率分析
+> 日期: 2026-03-09
+
+### 当前状态评估
+
+| 指标 | 当前值 | 目标值 | 状态 |
+|------|--------|--------|------|
+| 测试覆盖率 (行) | 49.66% | 80% | 🔴 需改进 |
+| 测试覆盖率 (函数) | 40.07% | 80% | 🔴 需改进 |
+| 测试覆盖率 (分支) | 46.22% | 80% | 🔴 需改进 |
+| API 模块测试覆盖率 | 5-22% | 60% | 🔴 需改进 |
+| 错误处理覆盖率 | 96%+ | 95% | ✅ 达标 |
+
+### 新增架构提案
+
+| ID | 提案 | 优先级 | 预估工作量 | 收益 |
+|----|------|--------|-----------|------|
+| A-008 | **API 模块测试补全** | P0 | 2人日 | 覆盖率提升至 60%+ |
+| A-009 | **confirmationStore 进一步拆分** | P1 | 1人日 | 可维护性提升 |
+| A-010 | **性能监控架构** | P1 | 2人日 | 可观测性提升 |
+| A-011 | **WebSocket 重连策略优化** | P2 | 1人日 | 稳定性提升 |
+| A-012 | **ADR 文档体系建立** | P2 | 0.5人日 | 知识沉淀 |
+
+---
+
+### A-008: API 模块测试补全 (P0)
+
+**现状问题**:
+API 模块测试覆盖率极低，关键模块覆盖率：
+- `modules/agent.ts`: 5.55%
+- `modules/auth.ts`: 21.42%
+- `modules/clarification.ts`: 7.14%
+- `modules/project.ts`: 未测试
+- `client.ts`: 22.91%
+
+**建议测试策略**:
+```typescript
+// __tests__/services/api/modules/agent.test.ts
+describe('Agent API Module', () => {
+  beforeEach(() => {
+    mockAxios.reset()
+  })
+
+  test('getAgents - 返回 Agent 列表', async () => {
+    mockAxios.onGet('/api/agents').reply(200, {
+      agents: [{ id: '1', name: 'Test Agent' }]
+    })
+    
+    const result = await agentApi.getAgents()
+    expect(result.agents).toHaveLength(1)
+  })
+
+  test('createAgent - 创建成功', async () => {
+    const newAgent = { name: 'New', prompt: 'Test', model: 'gpt-4', temperature: 0.7 }
+    mockAxios.onPost('/api/agents').reply(201, { id: '2', ...newAgent })
+    
+    const result = await agentApi.createAgent(newAgent)
+    expect(result.name).toBe('New')
+  })
+
+  test('createAgent - 参数校验失败', async () => {
+    await expect(agentApi.createAgent({ name: '', prompt: '', model: '', temperature: 2 }))
+      .rejects.toThrow('Invalid temperature')
+  })
+})
+```
+
+**测试优先级**:
+1. `auth.ts` - 认证核心，最高优先级
+2. `project.ts` - 项目管理核心
+3. `agent.ts` - Agent 配置
+4. `client.ts` - HTTP 客户端
+
+**验收标准**:
+- 每个 API 模块覆盖率 > 60%
+- 关键路径 (登录/创建项目) 覆盖率 > 80%
+
+---
+
+### A-009: confirmationStore 进一步拆分 (P1)
+
+**现状问题**:
+`confirmationStore.ts` 仍有 350 行，包含多个步骤状态和 30+ actions。
+
+**建议架构**:
+```
+src/stores/confirmation/
+├── index.ts                    # 组合导出
+├── types.ts                    # 共享类型定义
+├── requirementStore.ts         # Step 1: 需求输入状态
+├── boundedContextStore.ts      # Step 2: 限界上下文状态
+├── domainModelStore.ts         # Step 3: 领域模型状态
+├── businessFlowStore.ts        # Step 4: 业务流程状态
+├── sessionStore.ts             # 会话管理 (历史/撤销)
+└── __tests__/
+    ├── requirementStore.test.ts
+    ├── boundedContextStore.test.ts
+    └── ...
+```
+
+**组合模式**:
+```typescript
+// stores/confirmation/index.ts
+import { createRequirementSlice } from './requirementStore'
+import { createBoundedContextSlice } from './boundedContextStore'
+import { createDomainModelSlice } from './domainModelStore'
+import { createBusinessFlowSlice } from './businessFlowStore'
+import { createSessionSlice } from './sessionStore'
+
+export const useConfirmationStore = create<ConfirmationState>()(
+  devtools(
+    persist(
+      (...a) => ({
+        ...createRequirementSlice(...a),
+        ...createBoundedContextSlice(...a),
+        ...createDomainModelSlice(...a),
+        ...createBusinessFlowSlice(...a),
+        ...createSessionSlice(...a),
+      }),
+      { name: 'confirmation-storage' }
+    )
+  )
+)
+```
+
+**收益**:
+- 每个 Slice < 100 行
+- 独立测试，覆盖率提升
+- 按需持久化
+
+---
+
+### A-010: 性能监控架构 (P1)
+
+**目标**: 建立前端性能监控体系，追踪关键指标。
+
+**建议架构**:
+```
+src/lib/monitoring/
+├── PerformanceMonitor.ts       # 性能监控核心
+├── metrics/
+│   ├── webVitals.ts            # Core Web Vitals
+│   ├── apiLatency.ts           # API 延迟追踪
+│   ├── renderTime.ts           # 渲染时间追踪
+│   └── errorTracking.ts        # 错误追踪
+├── reporters/
+│   ├── consoleReporter.ts      # 开发环境报告
+│   └── analyticsReporter.ts    # 生产环境上报
+└── __tests__/
+    └── PerformanceMonitor.test.ts
+```
+
+**核心实现**:
+```typescript
+// lib/monitoring/PerformanceMonitor.ts
+export class PerformanceMonitor {
+  private static instance: PerformanceMonitor
+  private metrics: Map<string, number[]> = new Map()
+
+  static getInstance() {
+    if (!this.instance) {
+      this.instance = new PerformanceMonitor()
+    }
+    return this.instance
+  }
+
+  // 追踪 API 延迟
+  trackApiLatency(endpoint: string, duration: number) {
+    const key = `api:${endpoint}`
+    this.recordMetric(key, duration)
+    
+    // P99 超过 2s 告警
+    if (this.getP99(key) > 2000) {
+      console.warn(`[Performance] API ${endpoint} P99 latency > 2s`)
+    }
+  }
+
+  // 追踪渲染时间
+  trackRenderTime(component: string, duration: number) {
+    this.recordMetric(`render:${component}`, duration)
+  }
+
+  // 获取 P99
+  getP99(key: string): number {
+    const values = this.metrics.get(key) || []
+    if (values.length === 0) return 0
+    const sorted = [...values].sort((a, b) => a - b)
+    return sorted[Math.floor(sorted.length * 0.99)]
+  }
+
+  private recordMetric(key: string, value: number) {
+    if (!this.metrics.has(key)) {
+      this.metrics.set(key, [])
+    }
+    this.metrics.get(key)!.push(value)
+    
+    // 保留最近 100 条记录
+    const arr = this.metrics.get(key)!
+    if (arr.length > 100) {
+      arr.shift()
+    }
+  }
+}
+```
+
+**关键指标**:
+| 指标 | 目标 | 告警阈值 |
+|------|------|---------|
+| LCP (Largest Contentful Paint) | < 2.5s | > 4s |
+| FID (First Input Delay) | < 100ms | > 300ms |
+| CLS (Cumulative Layout Shift) | < 0.1 | > 0.25 |
+| API P99 延迟 | < 1s | > 2s |
+| 首屏渲染 | < 1.5s | > 3s |
+
+---
+
+### A-011: WebSocket 重连策略优化 (P2)
+
+**现状问题**:
+WebSocket 断线后重连策略简单，可能导致连接风暴。
+
+**建议架构**:
+```typescript
+// lib/websocket/ReconnectionStrategy.ts
+export class ReconnectionStrategy {
+  private attemptCount = 0
+  private readonly maxAttempts = 5
+  private readonly baseDelay = 1000 // 1s
+  private readonly maxDelay = 30000 // 30s
+
+  getNextDelay(): number {
+    if (this.attemptCount >= this.maxAttempts) {
+      return -1 // 不再重试
+    }
+    
+    // 指数退避 + 随机抖动
+    const delay = Math.min(
+      this.baseDelay * Math.pow(2, this.attemptCount),
+      this.maxDelay
+    )
+    const jitter = delay * 0.2 * Math.random()
+    
+    this.attemptCount++
+    return delay + jitter
+  }
+
+  reset() {
+    this.attemptCount = 0
+  }
+}
+
+// 使用示例
+const ws = new WebSocket(url)
+const strategy = new ReconnectionStrategy()
+
+ws.onclose = () => {
+  const delay = strategy.getNextDelay()
+  if (delay > 0) {
+    setTimeout(() => reconnect(), delay)
+  } else {
+    console.error('WebSocket 重连失败，已达最大重试次数')
+  }
+}
+
+ws.onopen = () => {
+  strategy.reset()
+}
+```
+
+**验收标准**:
+- 断线后自动重连
+- 重连延迟指数增长
+- 最大重试 5 次
+- 连接恢复后重置计数
+
+---
+
+### A-012: ADR 文档体系建立 (P2)
+
+**目标**: 建立架构决策记录 (Architecture Decision Records) 体系。
+
+**建议目录结构**:
+```
+docs/adr/
+├── README.md                   # ADR 索引
+├── 0001-record-architecture-decisions.md
+├── 0002-use-zustand-for-state-management.md
+├── 0003-use-nextjs-app-router.md
+├── 0004-use-mermaid-for-diagrams.md
+├── 0005-use-reactflow-for-flow-editor.md
+├── 0006-api-service-modularization.md
+├── 0007-error-middleware-pattern.md
+├── 0008-websocket-collaboration.md
+└── template.md
+```
+
+**ADR 模板**:
+```markdown
+# ADR-NNNN: [决策标题]
+
+## 状态
+[提议 | 已接受 | 已废弃 | 已替代]
+
+## 背景
+[描述背景和问题]
+
+## 决策
+[描述决策内容]
+
+## 后果
+[描述决策的影响]
+
+## 替代方案
+[描述考虑过的其他方案]
+```
+
+**收益**:
+- 新成员快速了解架构决策
+- 避免重复讨论已决策问题
+- 知识沉淀和传承
+
+---
+
+## 下一步行动 (更新)
+
+1. **P0 任务**:
+   - [ ] API 模块测试补全 (A-008)
+
+2. **P1 任务**:
+   - [ ] confirmationStore 进一步拆分 (A-009)
+   - [ ] 性能监控架构 (A-010)
+
+3. **P2 任务**:
+   - [ ] WebSocket 重连策略优化 (A-011)
+   - [ ] ADR 文档体系建立 (A-012)
+
+---
+
 *Generated by: Analyst Agent + Architect Agent*
 *Date: 2026-03-04*
+*Updated by: Architect Agent*
+*Date: 2026-03-09*

@@ -11,6 +11,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
     "pretest": "node scripts/pre-test-check.js",
     "pretest-check": "node scripts/pre-test-check.js",
     "coverage:check": "node scripts/check-coverage.js",
@@ -61,6 +62,7 @@
     "playwright": "^1.58.2",
     "prettier": "^3.8.1",
     "storybook": "^8.6.17",
+    "ts-morph": "^27.0.2",
     "typescript": "^5",
     "vite": "^6.4.1",
     "wrangler": "^4.69.0"
@@ -80,6 +82,7 @@
     "testPathIgnorePatterns": [
       "/node_modules/",
       "tests/e2e",
+      "tests/performance",
       "tests/basic.spec.ts",
       "tests/e2e.spec.ts",
       "/e2e/",

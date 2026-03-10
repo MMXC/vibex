@@ -40,20 +40,11 @@ class DddApiImpl implements DddApi {
     requirementText: string,
     projectId?: string
   ): Promise<BoundedContextResponse> {
-    const baseUrl =
-      process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vibex.top/api';
-
-    const response = await fetch(`${baseUrl}/ddd/bounded-context`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ requirementText, projectId }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-
-    return response.json();
+    const response = await httpClient.post<{ data: BoundedContextResponse }>(
+      '/ddd/bounded-context',
+      { requirementText, projectId }
+    );
+    return response.data;
   }
 
   async generateDomainModel(
@@ -66,20 +57,13 @@ class DddApiImpl implements DddApi {
     mermaidCode?: string;
     error?: string;
   }> {
-    const baseUrl =
-      process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vibex.top/api';
-
-    const response = await fetch(`${baseUrl}/ddd/domain-model`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ boundedContexts, requirementText, projectId }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-
-    return response.json();
+    const response = await httpClient.post<{ data: {
+      success: boolean;
+      domainModels?: unknown[];
+      mermaidCode?: string;
+      error?: string;
+    } }>('/ddd/domain-model', { boundedContexts, requirementText, projectId });
+    return response.data;
   }
 
   async generateBusinessFlow(
@@ -92,20 +76,13 @@ class DddApiImpl implements DddApi {
     mermaidCode?: string;
     error?: string;
   }> {
-    const baseUrl =
-      process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vibex.top/api';
-
-    const response = await fetch(`${baseUrl}/ddd/business-flow`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ domainModels, requirementText, projectId }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-
-    return response.json();
+    const response = await httpClient.post<{ data: {
+      success: boolean;
+      businessFlow?: unknown;
+      mermaidCode?: string;
+      error?: string;
+    } }>('/ddd/business-flow', { domainModels, requirementText, projectId });
+    return response.data;
   }
 }
 

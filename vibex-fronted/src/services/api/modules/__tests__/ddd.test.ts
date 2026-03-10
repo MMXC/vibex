@@ -20,17 +20,17 @@ describe('DddApi', () => {
   });
 
   describe('generateBoundedContext', () => {
+    // Note: httpClient.post already extracts .data from axios response,
+    // so mock should return the inner data directly (not axios response format)
     const mockResponse = {
-      data: {
-        contexts: [
-          {
-            name: 'UserContext',
-            boundedContext: 'user',
-            description: 'User management',
-            entities: [],
-          },
-        ],
-      },
+      contexts: [
+        {
+          name: 'UserContext',
+          boundedContext: 'user',
+          description: 'User management',
+          entities: [],
+        },
+      ],
     };
 
     it('should call httpClient.post with correct params', async () => {
@@ -42,7 +42,7 @@ describe('DddApi', () => {
         '/ddd/bounded-context',
         { requirementText: 'build a user system', projectId: undefined }
       );
-      expect(result).toEqual(mockResponse.data);
+      expect(result).toEqual(mockResponse);
     });
 
     it('should pass projectId when provided', async () => {
@@ -54,7 +54,7 @@ describe('DddApi', () => {
         '/ddd/bounded-context',
         { requirementText: 'test', projectId: 'project-123' }
       );
-      expect(result).toEqual(mockResponse.data);
+      expect(result).toEqual(mockResponse);
     });
 
     it('should handle error response', async () => {
@@ -67,12 +67,11 @@ describe('DddApi', () => {
   });
 
   describe('generateDomainModel', () => {
+    // httpClient.post already extracts .data, so mock returns inner data directly
     const mockResponse = {
-      data: {
-        success: true,
-        domainModels: [{ name: 'User' }],
-        mermaidCode: 'graph TD',
-      },
+      success: true,
+      domainModels: [{ name: 'User' }],
+      mermaidCode: 'graph TD',
     };
 
     it('should call httpClient.post with boundedContexts', async () => {
@@ -89,7 +88,7 @@ describe('DddApi', () => {
         requirementText: 'create user model',
         projectId: undefined,
       });
-      expect(result).toEqual(mockResponse.data);
+      expect(result).toEqual(mockResponse);
     });
 
     it('should pass all params including projectId', async () => {
@@ -107,6 +106,7 @@ describe('DddApi', () => {
         requirementText: 'test',
         projectId: 'proj-456',
       });
+      expect(result).toEqual(mockResponse);
     });
 
     it('should handle error response', async () => {
@@ -119,12 +119,11 @@ describe('DddApi', () => {
   });
 
   describe('generateBusinessFlow', () => {
+    // httpClient.post already extracts .data, so mock returns inner data directly
     const mockResponse = {
-      data: {
-        success: true,
-        businessFlow: { steps: [] },
-        mermaidCode: 'graph LR',
-      },
+      success: true,
+      businessFlow: { steps: [] },
+      mermaidCode: 'graph LR',
     };
 
     it('should call httpClient.post with domainModels', async () => {
@@ -141,7 +140,7 @@ describe('DddApi', () => {
         requirementText: 'create flow',
         projectId: undefined,
       });
-      expect(result).toEqual(mockResponse.data);
+      expect(result).toEqual(mockResponse);
     });
 
     it('should pass projectId when provided', async () => {
@@ -159,6 +158,7 @@ describe('DddApi', () => {
         requirementText: 'test',
         projectId: 'proj-789',
       });
+      expect(result).toEqual(mockResponse);
     });
 
     it('should handle error response', async () => {

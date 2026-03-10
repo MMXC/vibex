@@ -17,8 +17,8 @@ const mockLogin = jest
   .fn()
   .mockResolvedValue({ token: 'test-token', user: { id: '1' } });
 const mockRegister = jest.fn().mockResolvedValue({ id: '1' });
-jest.mock('@/services/api', () => ({
-  apiService: {
+jest.mock('@/services/api/modules/auth', () => ({
+  authApi: {
     login: (...args: unknown[]) => mockLogin(...args),
     register: (...args: unknown[]) => mockRegister(...args),
   },

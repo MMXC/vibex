@@ -45,7 +45,7 @@ export default function ModelPage() {
             requirementText
           );
 
-          if (response.success && response.domainModels) {
+          if (response && response.success && response.domainModels) {
             setDomainModels(response.domainModels);
             if (response.mermaidCode) {
               setModelMermaidCode(response.mermaidCode);

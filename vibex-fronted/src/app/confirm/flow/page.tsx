@@ -39,7 +39,7 @@ export default function FlowPage() {
             requirementText
           );
 
-          if (response.success && response.businessFlow) {
+          if (response && response.success && response.businessFlow) {
             setBusinessFlow(response.businessFlow);
             if (response.mermaidCode) {
               setFlowMermaidCode(response.mermaidCode);

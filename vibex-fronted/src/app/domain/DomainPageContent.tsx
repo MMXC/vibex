@@ -913,6 +913,7 @@ function DomainPageContent() {
       );
 
       if (
+        response &&
         response.success &&
         response.boundedContexts &&
         response.boundedContexts.length > 0

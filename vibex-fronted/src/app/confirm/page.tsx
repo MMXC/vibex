@@ -48,7 +48,7 @@ export default function ConfirmPage() {
       // Call AI API to generate bounded contexts
       const response = await generateBoundedContext(requirementText);
 
-      if (response.success && response.boundedContexts) {
+      if (response && response.success && response.boundedContexts) {
         // Store the generated bounded contexts
         setBoundedContexts(response.boundedContexts);
 

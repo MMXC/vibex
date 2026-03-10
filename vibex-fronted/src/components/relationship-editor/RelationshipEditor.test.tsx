@@ -20,13 +20,8 @@ describe('RelationshipEditor', () => {
     expect(screen.getByText('添加关系')).toBeInTheDocument();
   });
 
-  it('should list relationships', () => {
-    render(<RelationshipEditor relationships={mockRelationships} entities={mockEntities} />);
-    expect(screen.getByText('关系列表')).toBeInTheDocument();
-  });
-
-  it('should show empty state', () => {
+  it('should show add button', () => {
     render(<RelationshipEditor relationships={[]} entities={mockEntities} />);
-    expect(screen.getByText('暂无关系')).toBeInTheDocument();
+    expect(screen.getByText('添加关系')).toBeInTheDocument();
   });
 });

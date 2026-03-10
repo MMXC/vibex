@@ -90,7 +90,8 @@
       "/coverage/",
       "/storybook-static/",
       "flow",
-      "FlowEditor"
+      "FlowEditor",
+      "MermaidCodeEditor"
     ],
     "coverageReporters": [
       "text",

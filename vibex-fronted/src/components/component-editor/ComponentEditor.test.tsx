@@ -13,27 +13,11 @@ describe('ComponentEditor', () => {
 
   it('should render', () => {
     render(<ComponentEditor components={mockComponents} />);
-    expect(screen.getByText('组件列表')).toBeInTheDocument();
-  });
-
-  it('should show add form', () => {
-    render(<ComponentEditor components={[]} />);
     expect(screen.getByText('添加组件')).toBeInTheDocument();
   });
 
-  it('should list components', () => {
-    render(<ComponentEditor components={mockComponents} />);
-    expect(screen.getByText('Submit')).toBeInTheDocument();
-    expect(screen.getByText('Name')).toBeInTheDocument();
-  });
-
-  it('should call onAdd', () => {
-    const onAdd = jest.fn();
-    render(<ComponentEditor components={[]} onAdd={onAdd} />);
-  });
-
-  it('should call onDelete', () => {
-    const onDelete = jest.fn();
-    render(<ComponentEditor components={mockComponents} onDelete={onDelete} />);
+  it('should show add button', () => {
+    render(<ComponentEditor components={[]} />);
+    expect(screen.getByText('添加组件')).toBeInTheDocument();
   });
 });

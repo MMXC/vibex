@@ -18,6 +18,19 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.23',
+    date: '2026-03-10',
+    changes: [
+      '🎨 设计流程组件：bounded-context, business-flow, domain-model 等',
+      '💬 新增 ChatEntry, AIQuestion, ComponentEditor 组件',
+      '🔌 WebSocket 服务：connectionPool, messageRouter 实现',
+      '🔐 安全配置：gitleaks, pre-commit hooks, vuln-scan workflow',
+      '📝 CSS Tokens 系统：colors, spacing, typography 设计变量',
+      '🧹 清理 E2E 测试产物：~42M 截图移除，添加 .gitignore',
+    ],
+    commit: 'db70c28',
+  },
+  {
     version: '1.0.22',
     date: '2026-03-09',
     changes: [

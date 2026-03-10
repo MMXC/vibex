@@ -7,7 +7,7 @@ describe('API Service', () => {
     project: {
       createProject: jest.fn(),
       getProject: jest.fn(),
-      listProjects: jest.fn(),
+      getProjects: jest.fn(),
       updateProject: jest.fn(),
       deleteProject: jest.fn(),
     },
@@ -38,7 +38,7 @@ describe('API Service', () => {
     it('should have project methods', () => {
       expect(mockApiService.project.createProject).toBeDefined();
       expect(mockApiService.project.getProject).toBeDefined();
-      expect(mockApiService.project.listProjects).toBeDefined();
+      expect(mockApiService.project.getProjects).toBeDefined();
       expect(mockApiService.project.updateProject).toBeDefined();
       expect(mockApiService.project.deleteProject).toBeDefined();
     });
@@ -53,9 +53,9 @@ describe('API Service', () => {
       expect(mockApiService.project.getProject).toHaveBeenCalledWith('1');
     });
 
-    it('should call listProjects', async () => {
-      await mockApiService.project.listProjects();
-      expect(mockApiService.project.listProjects).toHaveBeenCalled();
+    it('should call getProjects', async () => {
+      await mockApiService.project.getProjects();
+      expect(mockApiService.project.getProjects).toHaveBeenCalled();
     });
 
     it('should call updateProject', async () => {

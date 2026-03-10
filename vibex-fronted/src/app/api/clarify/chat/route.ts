@@ -27,7 +27,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ChatRespo
     // Validate input
     if (!message || typeof message !== 'string') {
       return NextResponse.json(
-        { error: '消息不能为空' },
+        { error: '消息不能为空', reply: '', completeness: 0, nextAction: 'error' },
         { status: 400 }
       );
     }
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ChatRespo
   } catch (error) {
     console.error('Chat API error:', error);
     return NextResponse.json(
-      { error: '服务器内部错误' },
+      { error: '服务器内部错误', reply: '', completeness: 0, nextAction: 'error' },
       { status: 500 }
     );
   }

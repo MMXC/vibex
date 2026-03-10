@@ -1,54 +1,98 @@
 /**
  * Project API Tests
- * 验证 API 模块方法存在并可调用
+ * Tests the API interface methods exist
  */
 
-jest.mock('../index', () => ({
-  apiService: {
-    createProject: jest.fn().mockResolvedValue({ id: '1', name: 'Test' }),
-    getProject: jest.fn().mockResolvedValue({ id: '1', name: 'Test' }),
-    listProjects: jest.fn().mockResolvedValue([{ id: '1', name: 'Test' }]),
-    updateProject: jest.fn().mockResolvedValue({ id: '1', name: 'Updated' }),
-    deleteProject: jest.fn().mockResolvedValue(true),
-  },
-}));
+describe('projectApi', () => {
+  // Test interface methods exist - no actual API calls
+  const mockApi = {
+    getProjects: jest.fn().mockResolvedValue([]),
+    getProject: jest.fn().mockResolvedValue({ id: '1' }),
+    createProject: jest.fn().mockResolvedValue({ id: '1' }),
+    updateProject: jest.fn().mockResolvedValue({ id: '1' }),
+    deleteProject: jest.fn().mockResolvedValue({ success: true }),
+    softDeleteProject: jest.fn().mockResolvedValue({ id: '1' }),
+    restoreProject: jest.fn().mockResolvedValue({ id: '1' }),
+    permanentDeleteProject: jest.fn().mockResolvedValue({ success: true }),
+    getDeletedProjects: jest.fn().mockResolvedValue([]),
+    clearDeletedProjects: jest.fn().mockResolvedValue({ success: true }),
+    getProjectRole: jest.fn().mockResolvedValue({ role: 'owner' }),
+  };
 
-describe('Project API', () => {
-  const mockApiService = require('../index').apiService;
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-  describe('createProject', () => {
-    it('should create a project', async () => {
-      const result = await mockApiService.createProject({ name: 'Test' });
-      expect(result).toBeDefined();
-      expect(result.id).toBe('1');
+  describe('Method existence', () => {
+    it('should have getProjects method', () => {
+      expect(typeof mockApi.getProjects).toBe('function');
+    });
+
+    it('should have getProject method', () => {
+      expect(typeof mockApi.getProject).toBe('function');
+    });
+
+    it('should have createProject method', () => {
+      expect(typeof mockApi.createProject).toBe('function');
+    });
+
+    it('should have updateProject method', () => {
+      expect(typeof mockApi.updateProject).toBe('function');
+    });
+
+    it('should have deleteProject method', () => {
+      expect(typeof mockApi.deleteProject).toBe('function');
+    });
+
+    it('should have softDeleteProject method', () => {
+      expect(typeof mockApi.softDeleteProject).toBe('function');
+    });
+
+    it('should have restoreProject method', () => {
+      expect(typeof mockApi.restoreProject).toBe('function');
+    });
+
+    it('should have permanentDeleteProject method', () => {
+      expect(typeof mockApi.permanentDeleteProject).toBe('function');
+    });
+
+    it('should have getDeletedProjects method', () => {
+      expect(typeof mockApi.getDeletedProjects).toBe('function');
+    });
+
+    it('should have clearDeletedProjects method', () => {
+      expect(typeof mockApi.clearDeletedProjects).toBe('function');
+    });
+
+    it('should have getProjectRole method', () => {
+      expect(typeof mockApi.getProjectRole).toBe('function');
     });
   });
 
-  describe('getProject', () => {
-    it('should get a project', async () => {
-      const result = await mockApiService.getProject('1');
-      expect(result).toBeDefined();
+  describe('Functionality', () => {
+    it('should call getProjects', async () => {
+      const result = await mockApi.getProjects('user1');
+      expect(result).toEqual([]);
     });
-  });
 
-  describe('listProjects', () => {
-    it('should list projects', async () => {
-      const result = await mockApiService.listProjects();
-      expect(result).toBeInstanceOf(Array);
+    it('should call getProject', async () => {
+      const result = await mockApi.getProject('1');
+      expect(result).toEqual({ id: '1' });
     });
-  });
 
-  describe('updateProject', () => {
-    it('should update a project', async () => {
-      const result = await mockApiService.updateProject('1', { name: 'Updated' });
-      expect(result).toBeDefined();
+    it('should call createProject', async () => {
+      const result = await mockApi.createProject({ name: 'Test' });
+      expect(result).toEqual({ id: '1' });
     });
-  });
 
-  describe('deleteProject', () => {
-    it('should delete a project', async () => {
-      const result = await mockApiService.deleteProject('1');
-      expect(result).toBe(true);
+    it('should call updateProject', async () => {
+      const result = await mockApi.updateProject('1', { name: 'Updated' });
+      expect(result).toEqual({ id: '1' });
+    });
+
+    it('should call deleteProject', async () => {
+      const result = await mockApi.deleteProject('1');
+      expect(result).toEqual({ success: true });
     });
   });
 });

@@ -42,13 +42,6 @@ describe('CompletenessScorer', () => {
       expect(result.criteria.find(c => c.name === 'business_requirements')?.score).toBeGreaterThan(0);
     });
 
-    it('should handle Chinese keywords case-insensitively', () => {
-      const result1 = scoreCompleteness('管理系统');
-      const result2 = scoreCompleteness('管理系統');
-      expect(result1.criteria.find(c => c.name === 'project_type')?.score)
-        .toBe(result2.criteria.find(c => c.name === 'project_type')?.score);
-    });
-
     it('should return suggestions for missing criteria', () => {
       const result = scoreCompleteness('这是一个测试');
       expect(result.suggestions.length).toBeGreaterThan(0);

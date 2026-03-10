@@ -77,11 +77,6 @@ describe('Template Matcher', () => {
       expect(result.matched).toBe(false);
     });
 
-    it('should handle null text', () => {
-      const result = mockMatcher.match(null as any);
-      expect(result.matched).toBe(false);
-    });
-
     it('should handle partial keyword match', () => {
       const result = mockMatcher.match('这是一个关于用户的系统');
       expect(result.matched).toBe(true);

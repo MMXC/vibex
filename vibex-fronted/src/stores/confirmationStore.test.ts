@@ -16,8 +16,8 @@ describe('Confirmation Store', () => {
 
   it('should set current step', () => {
     const { setCurrentStep } = useConfirmationStore.getState();
-    setCurrentStep('bounded-context');
-    expect(useConfirmationStore.getState().currentStep).toBe('bounded-context');
+    setCurrentStep('context');
+    expect(useConfirmationStore.getState().currentStep).toBe('context');
   });
 
   it('should set requirement text', () => {
@@ -26,69 +26,64 @@ describe('Confirmation Store', () => {
     expect(useConfirmationStore.getState().requirementText).toBe('Test');
   });
 
-  it('should add clarification round', () => {
-    const { addClarificationRound } = useConfirmationStore.getState();
-    addClarificationRound({
-      id: '1',
-      question: 'Test question?',
-      answer: 'Test answer',
-      timestamp: Date.now(),
-      isAccepted: false,
-    });
-    expect(useConfirmationStore.getState().clarificationRounds.length).toBe(1);
-  });
-
-  it('should add bounded context', () => {
-    const { addBoundedContext } = useConfirmationStore.getState();
-    addBoundedContext({
+  it('should set bounded contexts', () => {
+    const { setBoundedContexts } = useConfirmationStore.getState();
+    setBoundedContexts([{
       id: '1',
       name: 'Test',
       description: 'Test',
-    });
+      type: 'core' as const,
+      relationships: [],
+    }]);
     expect(useConfirmationStore.getState().boundedContexts.length).toBe(1);
   });
 
-  it('should add domain entity', () => {
-    const { addDomainEntity } = useConfirmationStore.getState();
-    addDomainEntity({
+  it('should set domain models', () => {
+    const { setDomainModels } = useConfirmationStore.getState();
+    setDomainModels([{
       id: '1',
       name: 'User',
-      type: 'aggregate',
-    });
-    expect(useConfirmationStore.getState().domainEntities.length).toBe(1);
+      contextId: '1',
+      type: 'aggregate_root' as const,
+      properties: [],
+      methods: [],
+    }]);
+    expect(useConfirmationStore.getState().domainModels.length).toBe(1);
   });
 
-  it('should add business flow', () => {
-    const { addBusinessFlow } = useConfirmationStore.getState();
-    addBusinessFlow({
+  it('should set business flow', () => {
+    const { setBusinessFlow } = useConfirmationStore.getState();
+    setBusinessFlow({
       id: '1',
       name: 'Flow',
-      steps: [],
+      states: [],
+      transitions: [],
     });
-    expect(useConfirmationStore.getState().businessFlows.length).toBe(1);
+    expect(useConfirmationStore.getState().businessFlow).toBeDefined();
   });
 
-  it('should add UI page', () => {
-    const { addUIPage } = useConfirmationStore.getState();
-    addUIPage({
-      id: '1',
-      name: 'Page',
-      route: '/',
-      components: [],
-    });
-    expect(useConfirmationStore.getState().uiPages.length).toBe(1);
+  it('should set context mermaid code', () => {
+    const { setContextMermaidCode } = useConfirmationStore.getState();
+    setContextMermaidCode('graph TD;');
+    expect(useConfirmationStore.getState().contextMermaidCode).toBe('graph TD;');
   });
 
-  it('should set domain model', () => {
-    const { setDomainModel } = useConfirmationStore.getState();
-    setDomainModel({ entities: [], relationships: [] } as any);
-    expect(useConfirmationStore.getState().domainModel).toBeDefined();
+  it('should set model mermaid code', () => {
+    const { setModelMermaidCode } = useConfirmationStore.getState();
+    setModelMermaidCode('classDiagram;');
+    expect(useConfirmationStore.getState().modelMermaidCode).toBe('classDiagram;');
   });
 
-  it('should set clarification accepted', () => {
-    const { setClarificationAccepted } = useConfirmationStore.getState();
-    setClarificationAccepted(true);
-    expect(useConfirmationStore.getState().isClarificationAccepted).toBe(true);
+  it('should set flow mermaid code', () => {
+    const { setFlowMermaidCode } = useConfirmationStore.getState();
+    setFlowMermaidCode('stateDiagram-v2;');
+    expect(useConfirmationStore.getState().flowMermaidCode).toBe('stateDiagram-v2;');
+  });
+
+  it('should set created project id', () => {
+    const { setCreatedProjectId } = useConfirmationStore.getState();
+    setCreatedProjectId('123');
+    expect(useConfirmationStore.getState().createdProjectId).toBe('123');
   });
 
   it('should reset state', () => {

@@ -27,7 +27,7 @@ describe('ProgressIndicator', () => {
 
   it('should handle empty steps', () => {
     render(<ProgressIndicator steps={[]} />);
-    expect(screen.getByText('0/0')).toBeInTheDocument();
+    expect(screen.getByText('已完成 0/0')).toBeInTheDocument();
   });
 
   it('should show labels when showLabels is true', () => {

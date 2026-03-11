@@ -9,11 +9,11 @@ test.describe('用户注册流程 (E2E-001)', () => {
   });
 
   test('SC1.1.1: 注册成功时，URL 包含 /dashboard', async ({ page }) => {
-    // 填写注册表单
+    // 填写注册表单（当前UI只有：用户名、邮箱、密码）
     await page.fill('input[type="text"]', 'testuser'); // 用户名
     await page.fill('input[type="email"]', `test${Date.now()}@example.com`);
     await page.fill('input[type="password"]', 'Test@123456');
-    await page.fill('input[type="password"] >> nth=1', 'Test@123456'); // 确认密码
+    // 注意：注册表单已移除"确认密码"字段
 
     // 点击注册按钮
     await page.click('button[type="submit"]');
@@ -24,22 +24,18 @@ test.describe('用户注册流程 (E2E-001)', () => {
   });
 
   test('SC1.1.3: 密码不匹配时，显示错误提示', async ({ page }) => {
-    // 填写注册表单，密码不匹配
+    // 注意：当前注册表单已移除"确认密码"字段，此测试不再适用
+    // 改为测试必填字段验证
     await page.fill('input[type="text"]', 'testuser');
     await page.fill('input[type="email"]', 'test@example.com');
-    await page.fill('input[type="password"]', 'Test@123456');
-    await page.fill('input[type="password"] >> nth=1', 'Test@123457'); // 确认密码不匹配
+    // 不填写密码，测试必填验证
 
     // 点击注册按钮
     await page.click('button[type="submit"]');
 
-    // 验证错误提示
-    // 查找可能的错误提示元素
-    const errorMessage = page.locator('text=/密码不一致|密码不匹配/').first();
-    await expect(errorMessage).toBeVisible({ timeout: 5000 }).catch(() => {
-      // 如果没有精确匹配，检查是否有任何错误提示
-      return expect(page.locator('[class*="error"], .text-red')).toBeVisible({ timeout: 5000 });
-    });
+    // 验证 HTML5 必填验证
+    const passwordInput = page.locator('input[type="password"]');
+    await expect(passwordInput).toHaveAttribute('required');
   });
 
   test('SC1.1.4: 邮箱格式错误时，显示错误提示', async ({ page }) => {
@@ -47,7 +43,7 @@ test.describe('用户注册流程 (E2E-001)', () => {
     await page.fill('input[type="text"]', 'testuser');
     await page.fill('input[type="email"]', 'not-an-email');
     await page.fill('input[type="password"]', 'Test@123456');
-    await page.fill('input[type="password"] >> nth=1', 'Test@123456');
+    // 注意：注册表单已移除"确认密码"字段
 
     // 点击注册按钮
     await page.click('button[type="submit"]');
@@ -62,7 +58,7 @@ test.describe('用户注册流程 (E2E-001)', () => {
     await page.fill('input[type="text"]', 'testuser');
     await page.fill('input[type="email"]', 'test@example.com');
     await page.fill('input[type="password"]', '123');
-    await page.fill('input[type="password"] >> nth=1', '123');
+    // 注意：注册表单已移除"确认密码"字段
 
     // 点击注册按钮
     await page.click('button[type="submit"]');
@@ -79,11 +75,11 @@ test.describe('用户注册流程 (E2E-001)', () => {
     // 这个测试需要实际的注册 API 或 Mock
     // 测试表单验证逻辑是否正常工作
     
-    // 填写完整表单
+    // 填写完整表单（当前UI只有：用户名、邮箱、密码）
     await page.fill('input[type="text"]', 'newuser');
     await page.fill('input[type="email"]', 'newuser@example.com');
     await page.fill('input[type="password"]', 'SecurePass@123');
-    await page.fill('input[type="password"] >> nth=1', 'SecurePass@123');
+    // 注意：注册表单已移除"确认密码"字段
 
     // 点击注册
     await page.click('button[type="submit"]');

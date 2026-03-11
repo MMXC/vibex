@@ -1,17 +1,36 @@
 #!/bin/sh
 
 # Vibex pre-commit hook
-# Run tests before commit
+# Security checks + tests before commit
 
-echo "Running pre-commit checks..."
+echo "🔒 Running pre-commit checks..."
 
-# Run tests
-npm test
+# 1. 敏感信息扫描 (如果 gitleaks 可用)
+if command -v gitleaks &> /dev/null; then
+  echo "Checking for sensitive data..."
+  gitleaks detect --staged --config .gitleaks.toml --no-git
+  if [ $? -ne 0 ]; then
+    echo "❌ Sensitive data detected! Please review and remove."
+    exit 1
+  fi
+else
+  echo "⚠️ gitleaks not installed locally. CI will check for sensitive data."
+fi
 
-# Check exit code
+# 2. 依赖漏洞检查
+echo "Checking dependencies..."
+npm audit --audit-level=high
 if [ $? -ne 0 ]; then
-  echo "Pre-commit checks failed!"
+  echo "❌ Vulnerabilities found!"
   exit 1
 fi
 
-echo "Pre-commit checks passed!"
+# 3. 运行测试
+echo "Running tests..."
+npm test
+if [ $? -ne 0 ]; then
+  echo "❌ Tests failed!"
+  exit 1
+fi
+
+echo "✅ All pre-commit checks passed!"

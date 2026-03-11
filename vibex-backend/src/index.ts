@@ -54,12 +54,20 @@ app.use('*', cors({
   allowHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// Health check
+// Health check endpoints
 app.get('/', (c) => {
   return c.json({
     status: 'ok',
     message: 'VibeX API is running on Cloudflare Workers (Hono)',
     timestamp: new Date().toISOString(),
+  });
+});
+
+app.get('/health', (c) => {
+  return c.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime?.() || 'N/A',
   });
 });
 

@@ -138,3 +138,111 @@ AUTH_SECRET=your-secret-key
 ## 许可证
 
 MIT
+
+## API 文档
+
+### 认证 API
+
+#### 登录
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password"
+}
+```
+
+#### 注册
+```http
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "name": "用户名",
+  "email": "user@example.com",
+  "password": "password"
+}
+```
+
+### 需求澄清 API
+
+#### 发送消息
+```http
+POST /api/clarify/chat
+Content-Type: application/json
+
+{
+  "message": "我想做一个电商平台",
+  "history": [
+    {"role": "user", "content": "我想做一个管理系统"},
+    {"role": "assistant", "content": "好的，请告诉我主要功能"}
+  ]
+}
+```
+
+#### 响应
+```json
+{
+  "reply": "明白了，这是一个电商平台...",
+  "quickReplies": ["用户管理系统", "电商平台", "博客系统"],
+  "completeness": 65,
+  "nextAction": "gather_more_info"
+}
+```
+
+### 项目 API
+
+#### 获取项目列表
+```http
+GET /api/projects
+Authorization: Bearer <token>
+```
+
+#### 创建项目
+```http
+POST /api/projects
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "name": "我的项目",
+  "description": "项目描述"
+}
+```
+
+## 测试结果
+
+- 单元测试: 933 passed
+- E2E 测试: 5+ test suites
+- 覆盖率: 64.11%
+
+## 环境变量
+
+| 变量 | 说明 | 默认值 |
+|------|------|---------|
+| NEXT_PUBLIC_API_URL | 后端 API 地址 | http://localhost:3001 |
+| AUTH_SECRET | JWT 密钥 | - |
+| DATABASE_URL | 数据库连接 | - |
+
+## 快速开始
+
+```bash
+# 1. 克隆项目
+git clone https://github.com/MMXC/vibex.git
+cd vibex/vibex-fronted
+
+# 2. 安装依赖
+npm install
+
+# 3. 配置环境变量
+cp .env.example .env.local
+
+# 4. 运行开发服务器
+npm run dev
+
+# 5. 运行测试
+npm test
+npm run test:e2e
+```

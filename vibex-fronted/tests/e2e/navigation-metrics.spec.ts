@@ -93,7 +93,7 @@ test.describe('导航性能指标', () => {
 
     // 等待页面稳定
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('networkidle');
 
     const cls = await page.evaluate(() => {
       return new Promise((resolve) => {

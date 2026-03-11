@@ -2,7 +2,7 @@
  * AI Question Tests
  */
 
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { AIQuestion } from '../ai-question/AIQuestion';
 
 describe('AIQuestion', () => {

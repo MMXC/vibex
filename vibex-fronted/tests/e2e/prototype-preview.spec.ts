@@ -16,7 +16,7 @@ async function login(page: any) {
       if (await errorMsg.isVisible()) {
         console.log(`网络错误，重试 ${i + 1}/${maxRetries}`);
         await page.reload();
-        await page.waitForTimeout(2000);
+        await page.waitForLoadState('networkidle');
         continue;
       }
 
@@ -34,7 +34,7 @@ async function login(page: any) {
     } catch (e) {
       console.log(`登录失败，重试 ${i + 1}/${maxRetries}`);
       if (i === maxRetries - 1) throw e;
-      await page.waitForTimeout(3000);
+      await page.waitForLoadState('networkidle');
     }
   }
   return false;
@@ -144,7 +144,7 @@ test.describe('原型预览 - 交互响应', () => {
       const count = await pageItems.count();
       if (count > 1) {
         await pageItems.nth(1).click();
-        await page.waitForTimeout(500);
+        await page.waitForLoadState('networkidle');
       }
     }
   });

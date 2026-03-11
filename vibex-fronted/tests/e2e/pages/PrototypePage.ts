@@ -68,7 +68,7 @@ export class PrototypePage {
       timeout: 10000
     }).catch(() => {
       // If no test id, just wait a bit
-      return this.page.waitForTimeout(2000);
+      return this.page.waitForLoadState('networkidle');
     });
   }
 
@@ -84,17 +84,17 @@ export class PrototypePage {
         await this.mobileButton.click();
         break;
     }
-    await this.page.waitForTimeout(500);
+    await this.page.waitForLoadState('networkidle');
   }
 
   async zoomIn(): Promise<void> {
     await this.zoomInButton.click();
-    await this.page.waitForTimeout(300);
+    await this.page.waitForLoadState('networkidle');
   }
 
   async zoomOut(): Promise<void> {
     await this.zoomOutButton.click();
-    await this.page.waitForTimeout(300);
+    await this.page.waitForLoadState('networkidle');
   }
 
   async getCurrentZoom(): Promise<number> {
@@ -105,7 +105,7 @@ export class PrototypePage {
   async selectPage(pageName: string): Promise<void> {
     const pageItem = this.pageList.locator(`[data-testid="page-item-${pageName}"]`);
     await pageItem.click();
-    await this.page.waitForTimeout(500);
+    await this.page.waitForLoadState('networkidle');
   }
 
   async getComponentCount(): Promise<number> {
@@ -116,7 +116,7 @@ export class PrototypePage {
   async clickComponent(componentName: string): Promise<void> {
     const component = this.componentList.locator(`[data-testid="component-${componentName}"]`);
     await component.click();
-    await this.page.waitForTimeout(300);
+    await this.page.waitForLoadState('networkidle');
   }
 
   async isPreviewVisible(): Promise<boolean> {

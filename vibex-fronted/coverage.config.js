@@ -7,10 +7,10 @@ module.exports = {
   // 覆盖率阈值配置
   thresholds: {
     global: {
-      branches: 40,
-      functions: 40,
-      lines: 40,
-      statements: 40,
+      branches: 70,
+      functions: 70,
+      lines: 70,
+      statements: 70,
     },
     // 按目录模块的阈值
     modules: {

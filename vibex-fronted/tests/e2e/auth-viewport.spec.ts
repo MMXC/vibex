@@ -31,7 +31,7 @@ for (const viewport of viewports) {
 
       // 点击切换到注册
       await page.click('button:has-text("立即注册")');
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle');
 
       // 截图：结果
       await page.screenshot({
@@ -51,7 +51,7 @@ for (const viewport of viewports) {
 
       // Hover
       await registerBtn.hover();
-      await page.waitForTimeout(300);
+      await page.waitForLoadState('networkidle');
 
       // 截图：Hover状态
       await page.screenshot({

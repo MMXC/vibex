@@ -25,7 +25,7 @@ function logStep(step: string, from: string, to: string, status: 'PASS' | 'FAIL'
 async function login(page: any) {
   await page.goto(`${BASE_URL}/auth`);
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState('networkidle');
   
   logStep('访问登录页', 'N/A', '/auth/', 'INFO');
   
@@ -36,7 +36,7 @@ async function login(page: any) {
   await passwordInput.fill(TEST_PASSWORD);
   
   await page.click('button[type="submit"]');
-  await page.waitForTimeout(3000);
+  await page.waitForLoadState('networkidle');
   
   const finalURL = page.url();
   if (finalURL.includes('/dashboard')) {
@@ -62,7 +62,7 @@ test.describe('VibeX 用户操作流程 E2E 测试', () => {
     // 2. 点击 "开始使用" 按钮
     const ctaButton = page.locator('a[href="/auth/"]').first();
     await ctaButton.click();
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     const urlAfterCta = page.url();
     logStep('点击"开始使用"', '/landing/', urlAfterCta, urlAfterCta.includes('/auth') ? 'PASS' : 'FAIL');
     
@@ -89,7 +89,7 @@ test.describe('VibeX 用户操作流程 E2E 测试', () => {
     const registerBtn = page.locator('button:has-text("立即注册")');
     if (await registerBtn.isVisible()) {
       await registerBtn.click();
-      await page.waitForTimeout(1000);
+      await page.waitForLoadState('networkidle');
       const registerTitle = await page.locator('h1').textContent();
       logStep('点击"立即注册"', '/auth/', `显示:${registerTitle}`, registerTitle?.includes('创建账号') ? 'PASS' : 'FAIL');
       await takeScreenshot(page, 'T2-02-auth-register-form');
@@ -99,7 +99,7 @@ test.describe('VibeX 用户操作流程 E2E 测试', () => {
     const loginBtn = page.locator('button:has-text("立即登录")');
     if (await loginBtn.isVisible()) {
       await loginBtn.click();
-      await page.waitForTimeout(1000);
+      await page.waitForLoadState('networkidle');
       const backToLogin = await page.locator('h1').textContent();
       logStep('点击"立即登录"', '/auth/', `显示:${backToLogin}`, backToLogin?.includes('欢迎回来') ? 'PASS' : 'FAIL');
     }
@@ -197,19 +197,19 @@ test.describe('VibeX 用户操作流程 E2E 测试', () => {
     
     // 1. 未登录直接访问 Dashboard
     await page.goto(`${BASE_URL}/dashboard/`);
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState('networkidle');
     const dashboardUrl = page.url();
     logStep('未登录访问Dashboard', 'N/A', dashboardUrl, dashboardUrl.includes('/auth') ? 'PASS' : 'FAIL');
     
     // 2. 未登录直接访问 Requirements
     await page.goto(`${BASE_URL}/requirements/`);
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState('networkidle');
     const requirementsUrl = page.url();
     logStep('未登录访问Requirements', 'N/A', requirementsUrl, requirementsUrl.includes('/auth') ? 'PASS' : 'FAIL');
     
     // 3. 未登录直接访问 Confirm
     await page.goto(`${BASE_URL}/confirm/`);
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState('networkidle');
     const confirmUrl = page.url();
     logStep('未登录访问Confirm', 'N/A', confirmUrl, confirmUrl.includes('/auth') ? 'PASS' : 'FAIL');
     
@@ -229,7 +229,7 @@ test.describe('VibeX 用户操作流程 E2E 测试', () => {
     
     if (await logoutBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
       await logoutBtn.click();
-      await page.waitForTimeout(2000);
+      await page.waitForLoadState('networkidle');
       const afterLogoutUrl = page.url();
       logStep('点击退出按钮', '/dashboard/', afterLogoutUrl, 'INFO');
       await takeScreenshot(page, 'T8-01-after-logout');
@@ -240,7 +240,7 @@ test.describe('VibeX 用户操作流程 E2E 测试', () => {
       const settingsLogoutBtn = page.locator('button:has-text("退出")');
       if (await settingsLogoutBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
         await settingsLogoutBtn.click();
-        await page.waitForTimeout(2000);
+        await page.waitForLoadState('networkidle');
         logStep('从设置页退出', '/user-settings/', page.url(), 'PASS');
       } else {
         logStep('退出按钮', 'N/A', '未找到', 'FAIL');

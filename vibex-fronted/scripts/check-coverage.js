@@ -19,7 +19,7 @@ const HISTORY_FILE = path.join(
   'coverage-history',
   'coverage-history.jsonl'
 );
-const THRESHOLD = 40; // 40%
+const THRESHOLD = 70; // 70% - PR 合并覆盖率门槛
 
 // 读取覆盖率报告
 function getCoverage() {
@@ -116,9 +116,18 @@ function main() {
   console.log(`Minimum: ${minCoverage}%`);
 
   if (minCoverage < THRESHOLD) {
-    console.log(`\n🔴 COVERAGE BELOW THRESHOLD!`);
-    console.log(`   Expected: >= ${THRESHOLD}%`);
-    console.log(`   Actual: ${minCoverage}%`);
+    console.log(`\n╔════════════════════════════════════════════════════════════╗`);
+    console.log(`║  🔴 COVERAGE GATE FAILED                                  ║`);
+    console.log(`╠════════════════════════════════════════════════════════════╣`);
+    console.log(`║  Required:  >= ${THRESHOLD}%                                        ║`);
+    console.log(`║  Current:    ${minCoverage.toFixed(2)}%                                          ║`);
+    console.log(`║  Gap:        ${(THRESHOLD - minCoverage).toFixed(2)}% to reach target                        ║`);
+    console.log(`╠════════════════════════════════════════════════════════════╣`);
+    console.log(`║  📋 Action Required:                                       ║`);
+    console.log(`║  1. Add tests for uncovered code paths                     ║`);
+    console.log(`║  2. Run: npm run test:coverage to see detailed report      ║`);
+    console.log(`║  3. Check: coverage/lcov-report/index.html for details     ║`);
+    console.log(`╚════════════════════════════════════════════════════════════╝`);
 
     // 检查退化
     const history = getHistory();

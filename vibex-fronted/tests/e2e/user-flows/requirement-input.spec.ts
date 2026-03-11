@@ -49,7 +49,7 @@ test.describe('需求录入完整流程 (E2E-003)', () => {
     await submitButton.click();
 
     // 等待分析完成（可能需要更长时间）
-    await page.waitForTimeout(5000);
+    await page.waitForLoadState('networkidle');
 
     // 检查是否有结果区域出现
     // 可能的元素：结果区域、限界上下文、领域模型等
@@ -79,7 +79,7 @@ test.describe('需求录入完整流程 (E2E-003)', () => {
     await submitButton.click();
 
     // 等待可能的导航或结果
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState('networkidle');
 
     // 检查页面状态
     const body = page.locator('body');

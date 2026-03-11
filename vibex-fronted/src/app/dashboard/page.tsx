@@ -3,8 +3,10 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useQueryClient } from '@tanstack/react-query';
 import styles from './dashboard.module.css';
 import { apiService, Project } from '@/services/api';
+import { useProjects, useDeletedProjects, queryKeys } from '@/hooks/queries';
 
 // RBAC 类型
 type UserRole = 'admin' | 'editor' | 'viewer';
@@ -36,14 +38,33 @@ function parseJWT(token: string): { role?: UserRole } | null {
 
 export default function Dashboard() {
   const router = useRouter();
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [deletedProjects, setDeletedProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const queryClient = useQueryClient();
   const [userId, setUserId] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [showTrash, setShowTrash] = useState(false);
   const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState('');
+
+  // 使用 React Query 获取项目列表
+  const { 
+    data: projects = [], 
+    isLoading: loading, 
+    error 
+  } = useProjects({ 
+    userId: userId || '',
+    options: {
+      // 过滤未删除的项目
+      select: (data) => data.filter((p) => !p.deletedAt),
+    }
+  });
+
+  // 使用 React Query 获取已删除项目
+  const {
+    data: deletedProjects = [],
+    refetch: refetchDeleted
+  } = useDeletedProjects({
+    enabled: showTrash
+  });
 
   // 权限检查 - inline hook
   const user = useMemo(() => {
@@ -60,29 +81,7 @@ export default function Dashboard() {
   const canAccess = (_resource: string, perm: Permission) =>
     role === 'admin' || hasPermission(perm);
 
-  // 加载项目列表
-  const fetchProjects = async (userId: string) => {
-    try {
-      const data = await apiService.getProjects(userId);
-      // 过滤未删除的项目
-      setProjects(data.filter((p) => !p.deletedAt));
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : '加载项目失败');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 加载回收站项目
-  const fetchDeletedProjects = async () => {
-    try {
-      const data = await apiService.getDeletedProjects();
-      setDeletedProjects(data);
-    } catch (err: unknown) {
-      console.error('加载回收站失败:', err);
-    }
-  };
-
+  // 初始化用户 ID
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
     const storedUserId = localStorage.getItem('user_id');
@@ -93,12 +92,10 @@ export default function Dashboard() {
     }
 
     setUserId(storedUserId);
-    if (storedUserId) {
-      fetchProjects(storedUserId);
-    } else {
-      setLoading(false);
-    }
   }, [router]);
+
+  // 错误状态
+  const errorMessage = error instanceof Error ? error.message : '';
 
   // 拖拽处理
   const handleDragStart = (e: React.DragEvent, projectId: string) => {
@@ -117,12 +114,11 @@ export default function Dashboard() {
 
     try {
       await apiService.softDeleteProject(draggingId);
-      // 从列表移除
-      setProjects(projects.filter((p) => p.id !== draggingId));
-      // 刷新回收站
-      await fetchDeletedProjects();
+      // 刷新项目列表和回收站
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects.deleted() });
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : '删除失败');
+      setActionError(err instanceof Error ? err.message : '删除失败');
     }
     setDraggingId(null);
   };
@@ -131,11 +127,11 @@ export default function Dashboard() {
   const handleRestore = async (projectId: string) => {
     try {
       await apiService.restoreProject(projectId);
-      // 刷新列表
-      if (userId) fetchProjects(userId);
-      await fetchDeletedProjects();
+      // 刷新项目列表和回收站
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects.deleted() });
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : '恢复失败');
+      setActionError(err instanceof Error ? err.message : '恢复失败');
     }
   };
 
@@ -145,9 +141,10 @@ export default function Dashboard() {
 
     try {
       await apiService.permanentDeleteProject(projectId);
-      await fetchDeletedProjects();
+      // 刷新回收站
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects.deleted() });
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : '删除失败');
+      setActionError(err instanceof Error ? err.message : '删除失败');
     }
   };
 
@@ -157,9 +154,10 @@ export default function Dashboard() {
 
     try {
       await apiService.clearDeletedProjects();
-      setDeletedProjects([]);
+      // 刷新回收站
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects.deleted() });
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : '清空失败');
+      setActionError(err instanceof Error ? err.message : '清空失败');
     }
   };
 
@@ -327,7 +325,7 @@ export default function Dashboard() {
               fontSize: '14px',
             }}
           >
-            {error}
+            {actionError}
           </div>
         )}
 
@@ -426,9 +424,7 @@ export default function Dashboard() {
                           e.preventDefault();
                           if (confirm('确定删除该项目吗？')) {
                             apiService.deleteProject(project.id).then(() => {
-                              setProjects(
-                                projects.filter((p) => p.id !== project.id)
-                              );
+                              queryClient.invalidateQueries({ queryKey: queryKeys.projects.lists() });
                             });
                           }
                         }}
@@ -501,9 +497,7 @@ export default function Dashboard() {
                             setOpenMenuId(null);
                             if (confirm('确定删除该项目吗？')) {
                               apiService.deleteProject(project.id).then(() => {
-                                setProjects(
-                                  projects.filter((p) => p.id !== project.id)
-                                );
+                                queryClient.invalidateQueries({ queryKey: queryKeys.projects.lists() });
                               });
                             }
                           }}
@@ -539,7 +533,7 @@ export default function Dashboard() {
           className={styles.trashButton}
           onClick={() => {
             setShowTrash(!showTrash);
-            if (!showTrash) fetchDeletedProjects();
+            if (!showTrash) refetchDeleted();
           }}
           title="回收站"
         >

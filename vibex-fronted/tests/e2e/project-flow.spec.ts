@@ -7,7 +7,7 @@ const TEST_PASSWORD = '12345678';
 async function login(page: any) {
   await page.goto(`${BASE_URL}/auth`);
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState('networkidle');
   
   const emailInput = page.locator('input[type="email"]').first();
   await emailInput.fill(TEST_EMAIL);
@@ -22,7 +22,7 @@ test.describe('VibeX 项目功能测试', () => {
   
   test('T1: Dashboard 应显示项目列表', async ({ page }) => {
     await login(page);
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState('networkidle');
     
     // 检查是否有项目卡片
     const projectCards = page.locator('[class*="card"], [class*="project"]');
@@ -39,7 +39,7 @@ test.describe('VibeX 项目功能测试', () => {
 
   test('T2: 点击项目卡片跳转到项目详情页', async ({ page }) => {
     await login(page);
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState('networkidle');
     
     // 尝试找到项目卡片并点击
     const firstProjectLink = page.locator('a[href*="/project/"]').first();
@@ -47,7 +47,7 @@ test.describe('VibeX 项目功能测试', () => {
     if (await firstProjectLink.isVisible({ timeout: 5000 }).catch(() => false)) {
       console.log('找到项目链接，点击...');
       await firstProjectLink.click();
-      await page.waitForTimeout(3000);
+      await page.waitForLoadState('networkidle');
       console.log(`跳转后URL: ${page.url()}`);
       await page.screenshot({ path: 'tests/e2e/screenshots/daily/2026-03-09/T-project-detail.png', fullPage: true });
     } else {
@@ -61,7 +61,7 @@ test.describe('VibeX 项目功能测试', () => {
     // 直接访问项目详情页
     await page.goto(`${BASE_URL}/project/cmmi3gt60ns5eb4ct`);
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState('networkidle');
     
     console.log(`项目详情页URL: ${page.url()}`);
     

@@ -16,7 +16,7 @@ test.describe('登录失败场景 (E2E-002)', () => {
     await page.click('button[type="submit"]');
 
     // 等待响应
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('networkidle');
 
     // 检查错误提示 - 可能显示"用户名或密码错误"或"登录失败"
     const errorMessage = page.locator('text=/用户名或密码错误|登录失败|错误/').first();
@@ -42,7 +42,7 @@ test.describe('登录失败场景 (E2E-002)', () => {
     await page.click('button[type="submit"]');
 
     // 等待响应
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('networkidle');
 
     // 检查错误提示
     const errorMessage = page.locator('text=/不存在|未找到|无效/').first();
@@ -87,7 +87,7 @@ test.describe('登录失败场景 (E2E-002)', () => {
     await page.click('button[type="submit"]');
 
     // 页面应该安全处理，不崩溃
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('networkidle');
     await expect(page.locator('body')).toBeVisible();
   });
 
@@ -100,7 +100,7 @@ test.describe('登录失败场景 (E2E-002)', () => {
     await page.click('button[type="submit"]');
 
     // 页面应该安全处理，脚本不应该执行
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('networkidle');
     
     // 检查没有 script 标签被执行
     const alerts: string[] = [];

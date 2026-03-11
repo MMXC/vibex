@@ -13,7 +13,7 @@ const DATE = new Date().toISOString().split('T')[0];
 test.describe('Visual Regression Tests', () => {
   test('01-dashboard-visual', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`);
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
 
     // Take screenshot
     const screenshotPath = `${SCREENSHOT_DIR}/visual/${DATE}/dashboard.png`;
@@ -35,7 +35,7 @@ test.describe('Visual Regression Tests', () => {
 
   test('02-requirements-visual', async ({ page }) => {
     await page.goto(`${BASE_URL}/requirements`);
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
 
     const screenshotPath = `${SCREENSHOT_DIR}/visual/${DATE}/requirements.png`;
     await page.screenshot({ path: screenshotPath, fullPage: true });
@@ -46,7 +46,7 @@ test.describe('Visual Regression Tests', () => {
 
   test('03-flow-visual', async ({ page }) => {
     await page.goto(`${BASE_URL}/flow`);
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
 
     const screenshotPath = `${SCREENSHOT_DIR}/visual/${DATE}/flow.png`;
     await page.screenshot({ path: screenshotPath, fullPage: true });
@@ -57,7 +57,7 @@ test.describe('Visual Regression Tests', () => {
 
   test('04-landing-visual', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`);
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
 
     const screenshotPath = `${SCREENSHOT_DIR}/visual/${DATE}/landing.png`;
     await page.screenshot({ path: screenshotPath, fullPage: true });
@@ -68,7 +68,7 @@ test.describe('Visual Regression Tests', () => {
 
   test('05-templates-visual', async ({ page }) => {
     await page.goto(`${BASE_URL}/templates`);
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
 
     const screenshotPath = `${SCREENSHOT_DIR}/visual/${DATE}/templates.png`;
     await page.screenshot({ path: screenshotPath, fullPage: true });
@@ -79,7 +79,7 @@ test.describe('Visual Regression Tests', () => {
 
   test('06-auth-visual', async ({ page }) => {
     await page.goto(`${BASE_URL}/auth`);
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
 
     const screenshotPath = `${SCREENSHOT_DIR}/visual/${DATE}/auth.png`;
     await page.screenshot({ path: screenshotPath, fullPage: true });
@@ -92,7 +92,7 @@ test.describe('Visual Regression Tests', () => {
     // This test verifies utilities.css doesn't break any pages
 
     await page.goto(`${BASE_URL}/dashboard`);
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('networkidle');
 
     const screenshotPath = `${SCREENSHOT_DIR}/visual/${DATE}/dashboard-utilities.png`;
     await page.screenshot({ path: screenshotPath, fullPage: true });
@@ -115,7 +115,7 @@ test.describe('Visual Regression Tests', () => {
 
   test('08-project-settings-visual', async ({ page }) => {
     await page.goto(`${BASE_URL}/project-settings`);
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
 
     const screenshotPath = `${SCREENSHOT_DIR}/visual/${DATE}/project-settings.png`;
     await page.screenshot({ path: screenshotPath, fullPage: true });

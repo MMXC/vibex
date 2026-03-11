@@ -21,7 +21,7 @@ async function takeScreenshot(page: any, name: string) {
 test.describe('Mermaid XSS Protection', () => {
   test('01-landing-page-loads', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`);
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('networkidle');
     await takeScreenshot(page, 'landing-page');
 
     const title = await page.title();
@@ -30,7 +30,7 @@ test.describe('Mermaid XSS Protection', () => {
 
   test('02-no-script-tags-on-landing', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`);
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('networkidle');
 
     // Check for script tags in the page
     const scriptCount = await page.evaluate(() => {
@@ -44,7 +44,7 @@ test.describe('Mermaid XSS Protection', () => {
 
   test('03-no-onerror attributes', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`);
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('networkidle');
 
     // Check for onerror attributes (XSS vector)
     const hasOnerror = await page.evaluate(() => {
@@ -57,7 +57,7 @@ test.describe('Mermaid XSS Protection', () => {
 
   test('04-no-onload attributes', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`);
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('networkidle');
 
     // Check for onload attributes
     const hasOnload = await page.evaluate(() => {
@@ -70,7 +70,7 @@ test.describe('Mermaid XSS Protection', () => {
 
   test('05-no-javascript-protocol', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`);
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('networkidle');
 
     // Check for javascript: protocol
     const hasJavascript = await page.evaluate(() => {
@@ -83,7 +83,7 @@ test.describe('Mermaid XSS Protection', () => {
 
   test('06-no-iframe-injection', async ({ page }) => {
     await page.goto(`${BASE_URL}/landing`);
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('networkidle');
 
     // Check for iframe injection
     const hasIframe = await page.evaluate(() => {
@@ -102,7 +102,7 @@ test.describe('Mermaid XSS Protection', () => {
   test('07-special-characters-escaped', async ({ page }) => {
     // Test that special characters in URL parameters are handled
     await page.goto(`${BASE_URL}/landing?test=<script>alert(1)</script>`);
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('networkidle');
 
     // The script tag should not execute
     const scriptExecuted = await page.evaluate(() => {

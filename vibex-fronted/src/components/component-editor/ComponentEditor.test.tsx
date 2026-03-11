@@ -20,4 +20,10 @@ describe('ComponentEditor', () => {
     render(<ComponentEditor components={[]} />);
     expect(screen.getByText('添加组件')).toBeInTheDocument();
   });
+
+  it('should display component list', () => {
+    render(<ComponentEditor components={mockComponents} />);
+    expect(screen.getByText('Submit')).toBeInTheDocument();
+    expect(screen.getByText('Name')).toBeInTheDocument();
+  });
 });

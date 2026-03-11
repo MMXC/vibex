@@ -1,14 +1,53 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 import LoginDrawer from '@/components/ui/LoginDrawer';
 import styles from './landing.module.css';
 
+// 检查是否已认证 (客户端专用)
+function useIsAuthenticated(): boolean {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('auth_token');
+    setIsAuthenticated(!!token);
+  }, []);
+
+  return isAuthenticated;
+}
+
 export default function Landing() {
+  const router = useRouter();
+  const isAuthenticated = useIsAuthenticated();
+  const [requirementText, setRequirementText] = useState('');
+  const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleGenerate = () => {
+    if (!isAuthenticated) {
+      setIsLoginDrawerOpen(true);
+      return;
+    }
+
+    if (!requirementText.trim()) {
+      return;
+    }
+
+    // 跳转到确认页面继续
+    setIsGenerating(true);
+    router.push('/confirm');
+  };
+
   return (
     <div className={styles.page}>
+      {/* 登录抽屉 */}
+      <LoginDrawer
+        isOpen={isLoginDrawerOpen}
+        onClose={() => setIsLoginDrawerOpen(false)}
+      />
+
       {/* 背景特效 */}
       <div className={styles.bgEffect}>
         <div className={styles.gridOverlay} />
@@ -62,21 +101,57 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* 装饰性代码块 */}
+        {/* 需求输入表单 */}
         <div className={styles.codePreview}>
           <div className={styles.codeHeader}>
             <span className={styles.codeDot} />
             <span className={styles.codeDot} />
             <span className={styles.codeDot} />
+            <span style={{ marginLeft: '12px', fontSize: '12px', color: '#888' }}>
+              快速生成
+            </span>
           </div>
-          <pre className={styles.codeContent}>
-            {`> 创建一个项目管理仪表盘
-> 包含任务列表和进度图表
-> 主题：赛博朋克风格
-
-✨ 正在生成...
-✓ 完成！`}
-          </pre>
+          <div style={{ padding: '16px' }}>
+            <textarea
+              style={{
+                width: '100%',
+                height: '120px',
+                background: 'rgba(0,0,0,0.3)',
+                border: '1px solid #333',
+                borderRadius: '8px',
+                padding: '12px',
+                color: '#fff',
+                fontSize: '14px',
+                resize: 'none',
+                fontFamily: 'inherit',
+              }}
+              placeholder="描述你想要的应用，例如：创建一个项目管理仪表盘，包含任务列表和进度图表..."
+              value={requirementText}
+              onChange={(e) => setRequirementText(e.target.value)}
+            />
+            <button
+              onClick={handleGenerate}
+              disabled={isGenerating || !requirementText.trim()}
+              style={{
+                width: '100%',
+                marginTop: '12px',
+                padding: '12px',
+                background: isGenerating
+                  ? '#666'
+                  : 'linear-gradient(135deg, #00d4ff 0%, #8b5cf6 100%)',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#fff',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: requirementText.trim() && !isGenerating ? 'pointer' : 'not-allowed',
+                opacity: requirementText.trim() && !isGenerating ? 1 : 0.6,
+                transition: 'all 0.2s',
+              }}
+            >
+              {isGenerating ? '生成中...' : '🚀 开始生成'}
+            </button>
+          </div>
         </div>
       </section>
 

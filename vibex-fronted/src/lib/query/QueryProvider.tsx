@@ -7,12 +7,15 @@
  * - gcTime: 10分钟 (垃圾回收时间)
  * - retry: 3次 (网络错误重试)
  * - refetchOnWindowFocus: true (窗口聚焦刷新)
+ * - persistQueryClient: 持久化到 localStorage
  */
 
 'use client';
 
 import { QueryCache, QueryClient, QueryClientProvider, MutationCache } from '@tanstack/react-query';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
+import { persistQueryClient } from '@tanstack/react-query-persist-client';
+import { createLocalStoragePersister } from './persistQueryClient';
 
 /**
  * 全局错误处理回调
@@ -29,6 +32,9 @@ const queryErrorHandler = (error: Error | null): void => {
 export interface QueryProviderProps {
   children: ReactNode;
 }
+
+// 创建持久化器
+const persister = createLocalStoragePersister();
 
 export function QueryProvider({ children }: QueryProviderProps) {
   const [queryClient] = useState(
@@ -66,6 +72,16 @@ export function QueryProvider({ children }: QueryProviderProps) {
         }),
       })
   );
+
+  // 初始化持久化
+  useEffect(() => {
+    // 异步初始化持久化，忽略错误
+    persistQueryClient({
+      queryClient,
+      persister,
+      maxAge: 24 * 60 * 60 * 1000, // 24 小时
+    });
+  }, [queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

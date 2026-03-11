@@ -1,0 +1,595 @@
+/* 三栏布局样式 - 首页重构 */
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #0a0a0f;
+  position: relative;
+}
+
+/* 背景特效 */
+.bgEffect {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.gridOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.glowOrb1 {
+  position: absolute;
+  top: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0, 255, 255, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.glowOrb2 {
+  position: absolute;
+  bottom: -200px;
+  left: -200px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+/* 顶部导航 */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  position: relative;
+  z-index: 10;
+  background: rgba(10, 10, 15, 0.8);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.logoIcon {
+  color: #00d4ff;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.navLink {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.navLink:hover {
+  color: #fff;
+}
+
+.ctaButton {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #00d4ff 0%, #8b5cf6 100%);
+  border-radius: 6px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 三栏布局容器 */
+.mainContainer {
+  display: flex;
+  flex: 1;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* 左侧流程指示器 - 15% */
+.sidebar {
+  width: 15%;
+  min-width: 180px;
+  padding: 24px 16px;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sidebarTitle {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.stepList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stepItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  transition: all 0.2s;
+}
+
+.stepItem.active {
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+.stepItem.completed {
+  opacity: 0.6;
+}
+
+.stepNumber {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.stepItem.active .stepNumber {
+  background: linear-gradient(135deg, #00d4ff 0%, #8b5cf6 100%);
+  color: #fff;
+}
+
+.stepItem.completed .stepNumber {
+  background: #10b981;
+  color: #fff;
+}
+
+.stepLabel {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.stepItem.active .stepLabel {
+  color: #fff;
+}
+
+/* 中间主体区域 - 60% */
+.content {
+  flex: 1;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+}
+
+.contentInner {
+  width: 100%;
+  max-width: 720px;
+}
+
+.pageTitle {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.pageSubtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+/* 需求输入区域 */
+.inputSection {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.inputLabel {
+  display: block;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 12px;
+}
+
+.textarea {
+  width: 100%;
+  height: 200px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 16px;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: rgba(0, 212, 255, 0.5);
+}
+
+.textarea::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* 操作按钮 */
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.primaryButton {
+  flex: 1;
+  max-width: 280px;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #00d4ff 0%, #8b5cf6 100%);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.primaryButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+}
+
+.primaryButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 示例需求区域 */
+.sampleSection {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sampleLabel {
+  display: block;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 8px;
+}
+
+.sampleList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sampleButton {
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sampleButton:hover {
+  background: rgba(0, 212, 255, 0.1);
+  border-color: rgba(0, 212, 255, 0.3);
+  color: #00d4ff;
+}
+
+.secondaryButton {
+  padding: 14px 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.secondaryButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* 右侧 AI 助手 - 25% */
+.aiPanel {
+  width: 25%;
+  min-width: 280px;
+  padding: 24px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.aiHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.aiAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.aiTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.aiSubtitle {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.aiMessages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.aiMessage {
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.aiMessage.user {
+  background: rgba(0, 212, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  align-self: flex-end;
+  max-width: 90%;
+}
+
+.aiMessage.assistant {
+  background: rgba(139, 92, 246, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.aiInput {
+  display: flex;
+  gap: 8px;
+}
+
+.aiInputField {
+  flex: 1;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+}
+
+.aiInputField:focus {
+  outline: none;
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.aiSendButton {
+  padding: 12px 16px;
+  background: #8b5cf6;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.aiSendButton:hover {
+  background: #7c3aed;
+}
+
+/* 快捷回复 */
+.quickReplies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.quickReplyButton {
+  padding: 6px 12px;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 16px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quickReplyButton:hover {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: #fff;
+}
+
+/* 响应式布局 - 桌面三栏/平板两栏/移动端单栏 */
+
+/* 平板两栏 (768px - 1024px): 隐藏侧边栏，内容和 AI 面板并排 */
+@media (max-width: 1024px) {
+  .sidebar {
+    display: none;
+  }
+  
+  .mainContainer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  
+  .content {
+    flex: 1;
+    padding: 24px 16px;
+  }
+  
+  .aiPanel {
+    width: 320px;
+    min-width: 280px;
+    flex-shrink: 0;
+  }
+}
+
+/* 移动端单栏 (< 768px): 所有内容垂直堆叠 */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 12px 16px;
+  }
+  
+  .logo {
+    font-size: 18px;
+  }
+  
+  .navLinks {
+    gap: 12px;
+  }
+  
+  .navLink {
+    display: none;
+  }
+  
+  .mainContainer {
+    flex-direction: column;
+    padding: 0;
+  }
+  
+  .content {
+    width: 100%;
+    padding: 16px;
+    order: 1;
+  }
+  
+  .aiPanel {
+    width: 100%;
+    min-width: unset;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    order: 2;
+    max-height: 400px;
+  }
+  
+  .contentInner {
+    max-width: 100%;
+  }
+  
+  .pageTitle {
+    font-size: 22px;
+  }
+  
+  .pageSubtitle {
+    font-size: 13px;
+    margin-bottom: 24px;
+  }
+  
+  .inputSection {
+    padding: 16px;
+  }
+  
+  .textarea {
+    height: 150px;
+  }
+  
+  .actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .primaryButton {
+    max-width: 100%;
+  }
+  
+  .sampleList {
+    flex-direction: column;
+  }
+  
+  .sampleButton {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* 更小屏幕优化 (< 480px) */
+@media (max-width: 480px) {
+  .pageTitle {
+    font-size: 20px;
+  }
+  
+  .aiPanel {
+    max-height: 350px;
+  }
+  
+  .aiMessages {
+    max-height: 200px;
+  }
+}

@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.24',
+    date: '2026-03-11',
+    changes: [
+      '🏠 首页重构：嵌入需求录入表单，营销内容完整',
+      '✨ 生成按钮：未登录触发 LoginDrawer，已登录跳转确认页',
+      '📱 响应式布局：桌面/平板/移动端适配',
+      '🎨 Hero/Features/CTA section 完整实现',
+    ],
+    commit: '77b0263',
+  },
+  {
     version: '1.0.23',
     date: '2026-03-10',
     changes: [

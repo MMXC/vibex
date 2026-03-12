@@ -995,3 +995,76 @@
   font-weight: 600;
   color: #fff;
 }
+
+/* ========== B3 差异化特性卡片 ========== */
+.featuresSection {
+  position: relative;
+  z-index: 5;
+  padding: 40px 24px;
+  background: linear-gradient(180deg, rgba(10, 10, 15, 0.8) 0%, rgba(10, 10, 15, 0.95) 100%);
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.featureCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.featureCard:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--feature-color, #00d4ff);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+}
+
+.featureIcon {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+
+.featureTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.featureDesc {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+}
+
+/* 响应式 - 平板端 */
+@media (max-width: 1024px) {
+  .featuresGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 响应式 - 移动端 */
+@media (max-width: 640px) {
+  .featuresSection {
+    padding: 24px 16px;
+  }
+  
+  .featuresGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .featureCard {
+    padding: 20px;
+  }
+}

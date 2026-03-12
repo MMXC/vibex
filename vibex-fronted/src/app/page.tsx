@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import LoginDrawer from '@/components/ui/LoginDrawer';
 import { ParticleBackground } from '@/components/particles/ParticleBackground';
 import { MermaidPreview } from '@/components/ui/MermaidPreview';
@@ -70,6 +71,38 @@ const QUICK_REPLIES = [
   '如何开始一个项目？',
   '支持哪些功能？',
   '什么是限界上下文？',
+];
+
+// 差异化特性卡片数据
+const FEATURE_CARDS = [
+  {
+    id: 1,
+    icon: '🎯',
+    title: '你主导',
+    description: 'AI 辅助分析，你决策每一步',
+    color: '#00d4ff',
+  },
+  {
+    id: 2,
+    icon: '📐',
+    title: 'DDD 建模',
+    description: '专业领域驱动设计方法论',
+    color: '#8b5cf6',
+  },
+  {
+    id: 3,
+    icon: '⚡',
+    title: '快速生成',
+    description: '从需求到代码一键完成',
+    color: '#10b981',
+  },
+  {
+    id: 4,
+    icon: '🔄',
+    title: '实时预览',
+    description: '边输入边看 AI 分析结果',
+    color: '#f59e0b',
+  },
 ];
 
 // 检查是否已认证
@@ -446,6 +479,27 @@ export default function HomePage() {
           </div>
         </div>
       </header>
+
+      {/* B3 差异化特性卡片 - Framer Motion 动画 */}
+      <section className={styles.featuresSection} id="features">
+        <div className={styles.featuresGrid}>
+          {FEATURE_CARDS.map((feature, index) => (
+            <motion.div
+              key={feature.id}
+              className={styles.featureCard}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1, duration: 0.5 }}
+              whileHover={{ scale: 1.02, y: -5 }}
+              style={{ '--feature-color': feature.color } as React.CSSProperties}
+            >
+              <div className={styles.featureIcon}>{feature.icon}</div>
+              <h3 className={styles.featureTitle}>{feature.title}</h3>
+              <p className={styles.featureDesc}>{feature.description}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
 
       {/* 三栏布局 */}
       <div className={styles.mainContainer}>

@@ -511,3 +511,63 @@
 .steps :global(.connector.completed) {
   background: #4ade80;
 }
+
+/* Two-column layout */
+.mainContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.leftColumn {
+  min-width: 0;
+}
+
+.rightColumn {
+  min-width: 0;
+}
+
+/* Preview Card */
+.previewCard {
+  background: #1e1e2e;
+  border-radius: 12px;
+  padding: 20px;
+  height: 100%;
+  min-height: 400px;
+}
+
+.previewTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #e5e7eb;
+  margin-bottom: 16px;
+}
+
+.previewPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.previewHint {
+  font-size: 13px;
+  margin-top: 8px;
+  color: #9ca3af;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+  
+  .previewCard {
+    min-height: 300px;
+  }
+}

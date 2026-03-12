@@ -24,15 +24,14 @@ export default function ConfirmPage() {
   // Enable auto-snapshot for version history
   useAutoSnapshot(true, 2000);
   
-  const {
-    requirementText,
-    setRequirementText,
-    setBoundedContexts,
-    setContextMermaidCode,
-    goToNextStep,
-    currentStep,
-    contextMermaidCode,
-  } = useConfirmationStore();
+  // Optimized: Use selectors for selective subscription
+  const requirementText = useConfirmationStore((state) => state.requirementText);
+  const setRequirementText = useConfirmationStore((state) => state.setRequirementText);
+  const setBoundedContexts = useConfirmationStore((state) => state.setBoundedContexts);
+  const setContextMermaidCode = useConfirmationStore((state) => state.setContextMermaidCode);
+  const goToNextStep = useConfirmationStore((state) => state.goToNextStep);
+  const currentStep = useConfirmationStore((state) => state.currentStep);
+  const contextMermaidCode = useConfirmationStore((state) => state.contextMermaidCode);
   
   // SSE 流式 Hook
   const {

@@ -8,7 +8,7 @@
  */
 
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist, createJSONStorage, devtools } from 'zustand/middleware';
 
 export interface User {
   id: string;
@@ -35,7 +35,8 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>()(
-  persist(
+  devtools(
+    persist(
     (set, get) => ({
       user: null,
       token: null,
@@ -148,6 +149,8 @@ export const useAuthStore = create<AuthState>()(
         isAuthenticated: state.isAuthenticated,
       }),
     }
+  ),
+  { name: 'AuthStore' }
   )
 );
 

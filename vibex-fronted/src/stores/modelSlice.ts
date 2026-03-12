@@ -4,7 +4,7 @@
  */
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, devtools } from 'zustand/middleware';
 
 // ==================== Types ====================
 
@@ -57,7 +57,8 @@ export interface ModelState {
 // ==================== Store ====================
 
 export const useModelStore = create<ModelState>()(
-  persist(
+  devtools(
+    persist(
     (set) => ({
       // Initial state
       domainModels: [],
@@ -127,6 +128,8 @@ export const useModelStore = create<ModelState>()(
         selectedModelIds: state.selectedModelIds,
       }),
     }
+  ),
+  { name: 'ModelSlice' }
   )
 );
 

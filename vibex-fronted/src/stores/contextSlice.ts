@@ -4,7 +4,7 @@
  */
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, devtools } from 'zustand/middleware';
 import { BoundedContext } from '@/services/api/types/prototype/domain';
 
 // ==================== Types ====================
@@ -49,7 +49,8 @@ export interface ContextState {
 // ==================== Store ====================
 
 export const useContextStore = create<ContextState>()(
-  persist(
+  devtools(
+    persist(
     (set, get) => ({
       // Initial state
       boundedContexts: [],
@@ -119,6 +120,8 @@ export const useContextStore = create<ContextState>()(
         selectedContextIds: state.selectedContextIds,
       }),
     }
+  ),
+  { name: 'ContextSlice' }
   )
 );
 

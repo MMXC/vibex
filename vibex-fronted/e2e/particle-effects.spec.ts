@@ -173,7 +173,7 @@ test.describe('Particle Effects', () => {
   test('T1.5: Particle library should be optimized (< 60KB)', async ({ page }) => {
     // Check the bundle size by evaluating loaded scripts
     const bundleInfo = await page.evaluate(() => {
-      const scripts = Array.from(document.querySelectorAll('script[src]'));
+      const scripts = Array.from(document.querySelectorAll('script[src]')) as HTMLScriptElement[];
       const particleScripts = scripts.filter(s => 
         s.src.includes('particle') || s.src.includes(' Particle')
       );

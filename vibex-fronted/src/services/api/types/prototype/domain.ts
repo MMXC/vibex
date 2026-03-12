@@ -58,6 +58,7 @@ export interface BoundedContext {
   name: string;
   description: string;
   type: 'core' | 'supporting' | 'generic' | 'external';
+  keyResponsibilities?: string[];
   relationships: ContextRelationship[];
 }
 

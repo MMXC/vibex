@@ -22,6 +22,7 @@ interface BoundedContext {
   name: string
   description: string
   type: 'core' | 'supporting' | 'generic' | 'external'
+  keyResponsibilities?: string[]
   relationships: ContextRelationship[]
 }
 
@@ -43,30 +44,58 @@ ddd.post('/bounded-context', async (c) => {
     // Create AI service
     const aiService = createAIService(env)
     
-    // Use AI service to generate bounded contexts
-    const prompt = `You are a Domain-Driven Design expert. Analyze the following requirement and identify bounded contexts.
+    // Use AI service to generate bounded contexts - optimized prompt with examples
+    const prompt = `You are a Domain-Driven Design expert with 15 years of experience in strategic design and bounded context identification.
 
-Requirement:
+Analyze the following requirement and identify bounded contexts using EventStorming and Context Mapping techniques.
+
+**Requirement:**
 ${requirementText}
 
-Please identify:
-1. Core domains (the main business capabilities)
-2. Supporting domains (support the core domains)
-3. Generic domains (utilities that could be off-the-shelf)
-4. External systems (outside the system boundary)
+**Analysis Process:**
+1. Identify key business capabilities and subdomains
+2. Determine core domain (competitive advantage), supporting domains, and generic domains
+3. Identify external systems that need integration
+4. Map relationships between contexts using Context Mapping patterns
 
+**Output Requirements:**
 For each bounded context, provide:
-- name: A concise name for the context
-- description: What this context is responsible for
+- name: Concise name (noun phrase, e.g., "Order Management")
+- description: 2-3 sentences explaining the responsibility and boundaries
 - type: core | supporting | generic | external
+- keyResponsibilities: Array of 3-5 key responsibilities
+- relationships: Array of relationships to OTHER contexts
 
-Return your response as a JSON array like:
-[
-  {"name": "User Management", "description": "Handles user registration, authentication, and profile management", "type": "core"},
-  {"name": "Payment", "description": "Processes payments and refunds", "type": "supporting"}
-]
+For each relationship, provide:
+- targetContextName: Name of the related context
+- type: upstream-downstream | partnership | shared-kernel | conformist | anticorruption-layer
+- description: 1 sentence explaining the collaboration
 
-Respond ONLY with the JSON array, no other text.`
+**Example Output:**
+{
+  "boundedContexts": [
+    {
+      "name": "Order Management",
+      "description": "Handles the complete order lifecycle from creation to fulfillment. Responsible for order validation, pricing calculation, and status management.",
+      "type": "core",
+      "keyResponsibilities": ["Order creation and validation", "Pricing calculation", "Order status tracking", "Fulfillment coordination"],
+      "relationships": [
+        {"targetContextName": "Inventory", "type": "upstream-downstream", "description": "Orders consume inventory availability from Inventory context"}
+      ]
+    },
+    {
+      "name": "Inventory",
+      "description": "Manages stock levels and availability across warehouses. Provides real-time inventory data to order processing.",
+      "type": "supporting",
+      "keyResponsibilities": ["Stock level management", "Availability checking", "Reorder alerts"],
+      "relationships": [
+        {"targetContextName": "Order Management", "type": "upstream-downstream", "description": "Provides inventory availability data downstream"}
+      ]
+    }
+  ]
+}
+
+Respond ONLY with the JSON object, no other text.`
 
     // Call AI for bounded context generation
     const result = await aiService.generateJSON<{ boundedContexts: any[] }>(
@@ -79,9 +108,25 @@ Respond ONLY with the JSON array, no other text.`
             properties: {
               name: { type: 'string' },
               description: { type: 'string' },
-              type: { type: 'string', enum: ['core', 'supporting', 'generic', 'external'] }
+              type: { type: 'string', enum: ['core', 'supporting', 'generic', 'external'] },
+              keyResponsibilities: {
+                type: 'array',
+                items: { type: 'string' }
+              },
+              relationships: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    targetContextName: { type: 'string' },
+                    type: { type: 'string', enum: ['upstream-downstream', 'partnership', 'shared-kernel', 'conformist', 'anticorruption-layer'] },
+                    description: { type: 'string' }
+                  },
+                  required: ['targetContextName', 'type']
+                }
+              }
             },
-            required: ['name', 'type']
+            required: ['name', 'type', 'description']
           }
         }
       }
@@ -92,13 +137,41 @@ Respond ONLY with the JSON array, no other text.`
     
     try {
       if (result.success && result.data && result.data.boundedContexts && Array.isArray(result.data.boundedContexts)) {
-        boundedContexts = result.data.boundedContexts.map((item: any, index: number) => ({
-          id: `ctx-${generateId()}-${index}`,
-          name: item.name,
-          description: item.description || '',
-          type: item.type as BoundedContext['type'],
-          relationships: []
-        }))
+        // First pass: create contexts without relationships
+        const contextMap = new Map<string, BoundedContext>()
+        
+        result.data.boundedContexts.forEach((item: any, index: number) => {
+          const ctx: BoundedContext = {
+            id: `ctx-${generateId()}-${index}`,
+            name: item.name,
+            description: item.description || '',
+            type: item.type as BoundedContext['type'],
+            keyResponsibilities: item.keyResponsibilities || [],
+            relationships: []
+          }
+          contextMap.set(item.name, ctx)
+          boundedContexts.push(ctx)
+        })
+        
+        // Second pass: resolve relationships
+        result.data.boundedContexts.forEach((item: any, index: number) => {
+          if (item.relationships && Array.isArray(item.relationships)) {
+            item.relationships.forEach((rel: any) => {
+              const targetCtx = contextMap.get(rel.targetContextName)
+              if (targetCtx) {
+                const fromCtx = boundedContexts[index]
+                fromCtx.relationships.push({
+                  id: `rel-${generateId()}`,
+                  fromContextId: fromCtx.id,
+                  toContextId: targetCtx.id,
+                  type: rel.type === 'upstream-downstream' ? 'upstream' : 
+                        rel.type === 'partnership' ? 'symmetric' : 'downstream',
+                  description: rel.description || ''
+                })
+              }
+            })
+          }
+        })
       }
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError)
@@ -112,6 +185,7 @@ Respond ONLY with the JSON array, no other text.`
           name: '主业务域',
           description: '从需求中提取的核心业务功能',
           type: 'core',
+          keyResponsibilities: ['核心业务处理'],
           relationships: []
         }
       ]
@@ -536,8 +610,23 @@ function generateMermaidCode(contexts: BoundedContext[]): string {
       ? `${ctx.id}[${ctx.name}]`
       : ctx.type === 'supporting'
         ? `${ctx.id}(${ctx.name})`
-        : `${ctx.id}{${ctx.name}}`
+        : ctx.type === 'generic'
+          ? `${ctx.id}[[${ctx.name}]]`
+          : `${ctx.id}{${ctx.name}}`
     lines.push(`  ${nodeDef}`)
+  })
+  
+  // Add relationship edges
+  lines.push('')
+  contexts.forEach(ctx => {
+    ctx.relationships?.forEach(rel => {
+      const targetCtx = contexts.find(c => c.id === rel.toContextId)
+      if (targetCtx) {
+        const edgeStyle = rel.type === 'upstream' ? '-->' : rel.type === 'symmetric' ? '<-->' : '-->'
+        const label = rel.description ? `: ${rel.description}` : ''
+        lines.push(`  ${ctx.id} ${edgeStyle} ${targetCtx.id}${label}`)
+      }
+    })
   })
   
   // Add class definitions

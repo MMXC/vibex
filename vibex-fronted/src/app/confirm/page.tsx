@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './confirm.module.css';
 import {
@@ -8,8 +8,10 @@ import {
   BoundedContext,
 } from '@/stores/confirmationStore';
 import { useAutoSnapshot } from '@/hooks/useAutoSnapshot';
+import { useDDDStream } from '@/hooks/useDDDStream';
 import { apiService } from '@/services/api';
 import { MermaidPreview } from '@/components/ui/MermaidPreview';
+import { ThinkingPanel } from '@/components/ui/ThinkingPanel';
 const { generateBoundedContext } = apiService;
 import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps';
 import { RequirementScore } from '@/components/ui/RequirementScore';
@@ -31,6 +33,19 @@ export default function ConfirmPage() {
     currentStep,
     contextMermaidCode,
   } = useConfirmationStore();
+  
+  // SSE 流式 Hook
+  const {
+    thinkingMessages,
+    contexts,
+    mermaidCode: streamMermaidCode,
+    status,
+    errorMessage,
+    generateContexts,
+    abort,
+    reset,
+  } = useDDDStream();
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isTemplateOpen, setIsTemplateOpen] = useState(false);
@@ -40,6 +55,52 @@ export default function ConfirmPage() {
     const text = template.content || template.description;
     setRequirementText(text);
     setIsTemplateOpen(false);
+  };
+
+  // 流式生成
+  const handleStreamGenerate = () => {
+    if (!requirementText.trim()) {
+      setError('请输入需求描述');
+      return;
+    }
+    setError('');
+    generateContexts(requirementText);
+  };
+
+  // 完成时同步到 store
+  useEffect(() => {
+    if (status === 'done' && contexts.length > 0) {
+      setBoundedContexts(contexts);
+      setContextMermaidCode(streamMermaidCode || '');
+    }
+  }, [status, contexts, streamMermaidCode, setBoundedContexts, setContextMermaidCode]);
+
+  // 使用默认值 (fallback 到传统 API)
+  const handleUseDefault = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await generateBoundedContext(requirementText);
+      if (response && response.success && response.boundedContexts) {
+        setBoundedContexts(response.boundedContexts);
+        setContextMermaidCode(response.mermaidCode || '');
+        goToNextStep();
+        router.push('/confirm/context');
+      } else {
+        throw new Error(response.error || '生成失败');
+      }
+    } catch (err: unknown) {
+      console.error('Failed to use default:', err);
+      setError(err instanceof Error ? err.message : '生成失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 继续下一步
+  const handleContinue = () => {
+    goToNextStep();
+    router.push('/confirm/context');
   };
 
   const handleSubmit = async () => {
@@ -139,37 +200,76 @@ export default function ConfirmPage() {
             </div>
 
             <div className={styles.actions}>
-              <button
-                className={styles.primaryButton}
-                onClick={handleSubmit}
-                disabled={loading}
-              >
-                {loading ? '生成中...' : '开始生成'}
-              </button>
+              {status === 'idle' && (
+                <button
+                  className={styles.primaryButton}
+                  onClick={handleStreamGenerate}
+                  disabled={!requirementText.trim()}
+                >
+                  开始生成
+                </button>
+              )}
+              
+              {status === 'thinking' && (
+                <button
+                  className={styles.secondaryButton}
+                  onClick={abort}
+                >
+                  停止
+                </button>
+              )}
+              
+              {status === 'done' && contexts.length > 0 && (
+                <button
+                  className={styles.primaryButton}
+                  onClick={handleContinue}
+                >
+                  继续下一步
+                </button>
+              )}
+              
+              {status === 'error' && (
+                <>
+                  <button
+                    className={styles.primaryButton}
+                    onClick={handleStreamGenerate}
+                  >
+                    重试
+                  </button>
+                  <button
+                    className={styles.secondaryButton}
+                    onClick={handleUseDefault}
+                  >
+                    使用默认值
+                  </button>
+                </>
+              )}
+              
+              {status === 'idle' && (
+                <button
+                  className={styles.secondaryButton}
+                  onClick={handleUseDefault}
+                  disabled={!requirementText.trim()}
+                >
+                  快速生成
+                </button>
+              )}
             </div>
           </div>
         </div>
 
-        {/* 右侧：预览区域 - F3.1 实时渲染 + F3.2 Mermaid 图 */}
+        {/* 右侧：AI 思考过程面板 */}
         <div className={styles.rightColumn}>
-          <div className={styles.previewCard}>
-            <h2 className={styles.previewTitle}>实时预览</h2>
-            {previewMermaidCode ? (
-              <div className={styles.mermaidPreview}>
-                <MermaidPreview 
-                  code={previewMermaidCode} 
-                  diagramType={currentStep === 'flow' ? 'flowchart' : 'graph'}
-                />
-              </div>
-            ) : (
-              <div className={styles.previewPlaceholder}>
-                <p>输入需求后，实时显示 Mermaid 图表预览</p>
-                <p className={styles.previewHint}>
-                  输入需求描述，AI 将自动生成限界上下文图
-                </p>
-              </div>
-            )}
-          </div>
+          <ThinkingPanel
+            thinkingMessages={thinkingMessages}
+            contexts={contexts}
+            mermaidCode={streamMermaidCode}
+            status={status}
+            errorMessage={errorMessage || error}
+            onAbort={abort}
+            onRetry={handleStreamGenerate}
+            onUseDefault={handleUseDefault}
+          />
         </div>
 
         <TemplateSelector

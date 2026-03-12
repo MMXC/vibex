@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import LoginDrawer from '@/components/ui/LoginDrawer';
 import { ParticleBackground } from '@/components/particles/ParticleBackground';
+import { MermaidPreview } from '@/components/ui/MermaidPreview';
 import styles from './homepage.module.css';
 
 // 五步流程
@@ -51,16 +52,74 @@ function useIsAuthenticated(): boolean {
   return isAuthenticated;
 }
 
+// 简单的 Mermaid 流程图生成器（基于关键词）
+function generatePreviewMermaid(text: string): string {
+  if (!text.trim()) return '';
+  
+  const lowerText = text.toLowerCase();
+  const nodes: string[] = [];
+  const edges: string[] = [];
+  
+  // 检测功能模块关键词
+  const moduleKeywords: Record<string, string[]> = {
+    '用户管理': ['用户', '登录', '注册', '认证', '权限', '角色'],
+    '订单管理': ['订单', '购买', '支付', '结算'],
+    '课程管理': ['课程', '教学', '学习', '视频', '章节'],
+    '项目管理': ['项目', '任务', '看板', '进度'],
+    '商品管理': ['商品', '库存', 'SKU', '类目'],
+    '支付系统': ['支付', '收款', '退款', '钱包'],
+    '消息通知': ['消息', '通知', '推送', '邮件', '短信'],
+    '数据分析': ['统计', '报表', '图表', '分析', '数据'],
+  };
+  
+  // 检测到的模块
+  const detectedModules: string[] = [];
+  for (const [module, keywords] of Object.entries(moduleKeywords)) {
+    if (keywords.some(kw => lowerText.includes(kw))) {
+      detectedModules.push(module);
+    }
+  }
+  
+  // 如果没有检测到模块，显示默认提示
+  if (detectedModules.length === 0) {
+    nodes.push('  start((开始))');
+    nodes.push('  input[输入需求]');
+    nodes.push('  ai[AI 分析]');
+    nodes.push('  output((输出设计))');
+    edges.push('  start --> input');
+    edges.push('  input --> ai');
+    edges.push('  ai --> output');
+  } else {
+    // 生成限界上下文图
+    nodes.push('  start((用户需求))');
+    edges.push('  start --> requirement[需求分析]');
+    
+    detectedModules.forEach((module, idx) => {
+      nodes.push(`  ctx${idx}[${module}]`);
+      edges.push(`  requirement --> ctx${idx}`);
+      
+      // 每个模块连接到最终输出
+      edges.push(`  ctx${idx} --> output${idx}[设计输出]`);
+    });
+  }
+  
+  return `flowchart TB\n${nodes.join('\n')}\n${edges.join('\n')}`;
+}
+
 export default function HomePage() {
   const router = useRouter();
   const isAuthenticated = useIsAuthenticated();
   const [requirementText, setRequirementText] = useState('');
+  const [activeTab, setActiveTab] = useState<'input' | 'preview'>('input');
   const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiMessage, setAiMessage] = useState('');
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([
     { role: 'assistant', content: '你好！我是 VibeX AI 助手。描述你的产品需求，我可以帮你生成完整的应用结构。' },
   ]);
+
+  // 实时生成预览 Mermaid 代码
+  const mermaidCode = useMemo(() => generatePreviewMermaid(requirementText), [requirementText]);
 
   const handleSampleClick = (desc: string) => {
     setRequirementText(desc);
@@ -211,54 +270,103 @@ export default function HomePage() {
           </div>
         </aside>
 
-        {/* 中间：需求输入 - 60% */}
+        {/* 中间：需求输入/预览 - 60% */}
         <main className={styles.content}>
           <div className={styles.contentInner}>
-            <h1 className={styles.pageTitle}>Step 1: 需求输入</h1>
-            <p className={styles.pageSubtitle}>
-              描述你的产品需求，AI 将协助你完成完整的设计
-            </p>
-
-            <div className={styles.inputSection}>
-              <label className={styles.inputLabel}>
-                描述你的产品需求
-              </label>
-              <textarea
-                className={styles.textarea}
-                placeholder="例如：开发一个在线教育平台，包含用户管理、课程管理、订单管理、支付等功能..."
-                value={requirementText}
-                onChange={(e) => setRequirementText(e.target.value)}
-              />
-
-              {/* 示例需求 */}
-              <div className={styles.sampleSection}>
-                <span className={styles.sampleLabel}>试试这些示例：</span>
-                <div className={styles.sampleList}>
-                  {SAMPLE_REQUIREMENTS.map((sample, idx) => (
-                    <button
-                      key={idx}
-                      className={styles.sampleButton}
-                      onClick={() => handleSampleClick(sample.desc)}
-                    >
-                      {sample.title}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className={styles.actions}>
-                <button
-                  className={styles.primaryButton}
-                  onClick={handleGenerate}
-                  disabled={isGenerating || !requirementText.trim()}
-                >
-                  {isGenerating ? '生成中...' : '🎯 开始设计'}
-                </button>
-                <button className={styles.secondaryButton}>
-                  📋 使用模板
-                </button>
-              </div>
+            {/* Tab 切换 */}
+            <div className={styles.tabContainer}>
+              <button
+                className={`${styles.tabButton} ${activeTab === 'input' ? styles.tabActive : ''}`}
+                onClick={() => setActiveTab('input')}
+              >
+                📝 需求输入
+              </button>
+              <button
+                className={`${styles.tabButton} ${activeTab === 'preview' ? styles.tabActive : ''}`}
+                onClick={() => setActiveTab('preview')}
+              >
+                👁️ 实时预览
+              </button>
             </div>
+
+            {activeTab === 'input' ? (
+              <>
+                <h1 className={styles.pageTitle}>Step 1: 需求输入</h1>
+                <p className={styles.pageSubtitle}>
+                  描述你的产品需求，AI 将协助你完成完整的设计
+                </p>
+
+                <div className={styles.inputSection}>
+                  <label className={styles.inputLabel}>
+                    描述你的产品需求
+                  </label>
+                  <textarea
+                    className={styles.textarea}
+                    placeholder="例如：开发一个在线教育平台，包含用户管理、课程管理、订单管理、支付等功能..."
+                    value={requirementText}
+                    onChange={(e) => setRequirementText(e.target.value)}
+                  />
+
+                  {/* 示例需求 */}
+                  <div className={styles.sampleSection}>
+                    <span className={styles.sampleLabel}>试试这些示例：</span>
+                    <div className={styles.sampleList}>
+                      {SAMPLE_REQUIREMENTS.map((sample, idx) => (
+                        <button
+                          key={idx}
+                          className={styles.sampleButton}
+                          onClick={() => handleSampleClick(sample.desc)}
+                        >
+                          {sample.title}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className={styles.actions}>
+                    <button
+                      className={styles.primaryButton}
+                      onClick={handleGenerate}
+                      disabled={isGenerating || !requirementText.trim()}
+                    >
+                      {isGenerating ? '生成中...' : '🎯 开始设计'}
+                    </button>
+                    <button className={styles.secondaryButton}>
+                      📋 使用模板
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <h1 className={styles.pageTitle}>实时预览</h1>
+                <p className={styles.pageSubtitle}>
+                  AI 正在分析你的需求，自动生成限界上下文设计
+                </p>
+
+                <div className={styles.previewSection}>
+                  {mermaidCode ? (
+                    <MermaidPreview 
+                      code={mermaidCode} 
+                      diagramType="flowchart"
+                      layout="TB"
+                      height="400px"
+                    />
+                  ) : (
+                    <div className={styles.previewEmpty}>
+                      <div className={styles.previewEmptyIcon}>🔍</div>
+                      <div className={styles.previewEmptyText}>
+                        输入需求后，这里将实时显示 AI 生成的设计预览
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles.previewHint}>
+                  <span>💡 提示：</span> 输入越详细，AI 生成的限界上下文越准确
+                </div>
+              </>
+            )}
           </div>
         </main>
 

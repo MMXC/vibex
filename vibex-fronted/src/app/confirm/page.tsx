@@ -78,6 +78,23 @@ export default function ConfirmPage() {
     }
   };
 
+  // F2.3: Get mermaid code based on current step for preview
+  const getPreviewMermaidCode = () => {
+    const state = useConfirmationStore.getState();
+    switch (currentStep) {
+      case 'context':
+        return state.contextMermaidCode;
+      case 'model':
+        return state.modelMermaidCode;
+      case 'flow':
+        return state.flowMermaidCode;
+      default:
+        return state.contextMermaidCode;
+    }
+  };
+
+  const previewMermaidCode = getPreviewMermaidCode();
+
   return (
     <div className={styles.container}>
       {/* 两栏布局：左边输入，右边预览 */}
@@ -137,11 +154,11 @@ export default function ConfirmPage() {
         <div className={styles.rightColumn}>
           <div className={styles.previewCard}>
             <h2 className={styles.previewTitle}>实时预览</h2>
-            {contextMermaidCode ? (
+            {previewMermaidCode ? (
               <div className={styles.mermaidPreview}>
                 <MermaidPreview 
-                  code={contextMermaidCode} 
-                  diagramType="graph"
+                  code={previewMermaidCode} 
+                  diagramType={currentStep === 'flow' ? 'flowchart' : 'graph'}
                 />
               </div>
             ) : (

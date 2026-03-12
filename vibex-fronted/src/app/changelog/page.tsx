@@ -18,6 +18,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.27',
+    date: '2026-03-12',
+    changes: [
+      '📋 版本历史功能：自动快照、版本预览、差异对比',
+      '🔄 Undo/Redo 支持：保存操作自动创建版本快照',
+      '📊 差异可视化：jsondiffpatch 集成，绿增红删高亮',
+      '📝 版本备注：用户可为版本添加/编辑备注',
+      '✅ 代码审查通过：测试修复，安全检查无问题',
+    ],
+    commit: 'd5abee8',
+  },
+  {
     version: '1.0.26',
     date: '2026-03-12',
     changes: [

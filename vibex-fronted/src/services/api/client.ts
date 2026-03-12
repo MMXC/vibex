@@ -5,6 +5,7 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios';
+import { API_CONFIG } from '@/lib/api-config';
 
 // ==================== 接口定义 ====================
 
@@ -36,9 +37,7 @@ export function createHttpClient(config?: HttpClientConfig): HttpClient {
   }
 
   const baseURL =
-    config?.baseURL ||
-    process.env.NEXT_PUBLIC_API_BASE_URL ||
-    'https://api.vibex.top/api';
+    config?.baseURL || API_CONFIG.baseURL;
   const timeout = config?.timeout || 10000;
 
   const instance = axios.create({

@@ -15,6 +15,8 @@
  * @module services/ai-client
  */
 
+import { API_CONFIG } from '@/lib/api-config';
+
 // ==================== Types ====================
 
 /**
@@ -186,7 +188,7 @@ export type StreamCallback = (chunk: StreamChunk) => void;
 // ==================== Default Configuration ====================
 
 const DEFAULT_CONFIG: Required<AIClientConfig> = {
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vibex.top/api',
+  baseURL: API_CONFIG.baseURL,
   timeout: 60000,
   maxRetries: 3,
   retryDelay: 1000,

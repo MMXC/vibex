@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './chat.module.css';
 import { apiService, Message } from '@/services/api';
+import { API_CONFIG } from '@/lib/api-config';
 
 export default function Chat() {
   const router = useRouter();
@@ -67,10 +68,8 @@ export default function Chat() {
     ]);
 
     // 创建 SSE 连接
-    const apiBaseUrl =
-      process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vibex.top/api';
     const eventSource = new EventSource(
-      `${apiBaseUrl}/chat/stream?message=${encodeURIComponent(input)}&userId=${encodeURIComponent(userId)}`
+      `${API_CONFIG.baseURL}/chat/stream?message=${encodeURIComponent(input)}&userId=${encodeURIComponent(userId)}`
     );
 
     let fullContent = '';

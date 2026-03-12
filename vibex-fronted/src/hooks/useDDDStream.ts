@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { BoundedContext } from '@/services/api/types/prototype/domain'
+import { getApiUrl } from '@/lib/api-config'
 
 // ==================== Types ====================
 
@@ -96,11 +97,8 @@ export function useDDDStream(): UseDDDStreamReturn {
     // Create AbortController for fetch
     abortControllerRef.current = new AbortController()
     
-    // Get API base URL from environment variable with fallback
-    const apiBaseURL = typeof window !== 'undefined' 
-      ? (process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vibex.top/api/v1')
-      : '';
-    const fullURL = apiBaseURL ? `${apiBaseURL}/ddd/bounded-context/stream` : '/api/ddd/bounded-context/stream';
+    // Get API URL using centralized config
+    const fullURL = getApiUrl('/ddd/bounded-context/stream');
     
     // Use fetch with ReadableStream for SSE
     const fetchSSE = async () => {

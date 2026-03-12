@@ -765,7 +765,8 @@ Respond ONLY with the JSON object, no other text.`
               const contextMap = new Map<string, BoundedContext>()
               
               // First pass: create contexts
-              result.data.boundedContexts.forEach((item: any, index: number) => {
+              for (let index = 0; index < result.data.boundedContexts.length; index++) {
+                const item = result.data.boundedContexts[index]
                 const ctx: BoundedContext = {
                   id: `ctx-${generateId()}-${index}`,
                   name: item.name,
@@ -781,7 +782,7 @@ Respond ONLY with the JSON object, no other text.`
                 send('context', ctx)
                 // Delay for animation effect
                 await new Promise(r => setTimeout(r, 150))
-              })
+              }
               
               // Second pass: resolve relationships
               result.data.boundedContexts.forEach((item: any, index: number) => {

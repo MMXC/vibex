@@ -644,4 +644,215 @@ function generateMermaidCode(contexts: BoundedContext[]): string {
   return lines.join('\n')
 }
 
+// ==================== SSE Streaming API ====================
+
+// SSE event helper
+function sendSSE(c: any, event: string, data: any) {
+  return c.text(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)
+}
+
+// POST /api/ddd/bounded-context/stream - SSE streaming version
+ddd.post('/bounded-context/stream', async (c) => {
+  try {
+    const env = c.env
+    const body = await c.req.json()
+    const { requirementText, projectId } = BoundedContextRequestSchema.parse(body)
+
+    // Create AI service
+    const aiService = createAIService(env)
+    
+    // Build the stream
+    const stream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder()
+        
+        const send = (event: string, data: any) => {
+          const chunk = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`
+          controller.enqueue(encoder.encode(chunk))
+        }
+        
+        try {
+          // F1.1: Thinking events - 推送思考步骤
+          send('thinking', { step: 'analyzing', message: '正在分析需求...' })
+          await new Promise(r => setTimeout(r, 150))
+          
+          send('thinking', { step: 'identifying-core', message: '识别核心领域...' })
+          await new Promise(r => setTimeout(r, 150))
+          
+          send('thinking', { step: 'calling-ai', message: '调用 AI 分析...' })
+          
+          // Use AI service to generate bounded contexts
+          const prompt = `You are a Domain-Driven Design expert with 15 years of experience in strategic design and bounded context identification.
+
+Analyze the following requirement and identify bounded contexts using EventStorming and Context Mapping techniques.
+
+**Requirement:**
+${requirementText}
+
+**Analysis Process:**
+1. Identify key business capabilities and subdomains
+2. Determine core domain (competitive advantage), supporting domains, and generic domains
+3. Identify external systems that need integration
+4. Map relationships between contexts using Context Mapping patterns
+
+**Output Requirements:**
+For each bounded context, provide:
+- name: Concise name (noun phrase, e.g., "Order Management")
+- description: 2-3 sentences explaining the responsibility and boundaries
+- type: core | supporting | generic | external
+- keyResponsibilities: Array of 3-5 key responsibilities
+- relationships: Array of relationships to OTHER contexts
+
+For each relationship, provide:
+- targetContextName: Name of the related context
+- type: upstream-downstream | partnership | shared-kernel | conformist | anticorruption-layer
+- description: 1 sentence explaining the collaboration
+
+**Example Output:**
+{
+  "boundedContexts": [
+    {
+      "name": "Order Management",
+      "description": "Handles the complete order lifecycle from creation to fulfillment.",
+      "type": "core",
+      "keyResponsibilities": ["Order creation", "Pricing calculation", "Status tracking"],
+      "relationships": [
+        {"targetContextName": "Inventory", "type": "upstream-downstream", "description": "Consumes inventory"}
+      ]
+    }
+  ]
+}
+
+Respond ONLY with the JSON object, no other text.`
+
+          // Call AI
+          const result = await aiService.generateJSON<{ boundedContexts: any[] }>(
+            prompt,
+            {
+              boundedContexts: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    name: { type: 'string' },
+                    description: { type: 'string' },
+                    type: { type: 'string', enum: ['core', 'supporting', 'generic', 'external'] },
+                    keyResponsibilities: { type: 'array', items: { type: 'string' } },
+                    relationships: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          targetContextName: { type: 'string' },
+                          type: { type: 'string', enum: ['upstream-downstream', 'partnership', 'shared-kernel', 'conformist', 'anticorruption-layer'] },
+                          description: { type: 'string' }
+                        },
+                        required: ['targetContextName', 'type']
+                      }
+                    }
+                  },
+                  required: ['name', 'type', 'description']
+                }
+              }
+            }
+          )
+
+          // Parse response
+          let boundedContexts: BoundedContext[] = []
+          
+          try {
+            if (result.success && result.data?.boundedContexts?.length > 0) {
+              const contextMap = new Map<string, BoundedContext>()
+              
+              // First pass: create contexts
+              result.data.boundedContexts.forEach((item: any, index: number) => {
+                const ctx: BoundedContext = {
+                  id: `ctx-${generateId()}-${index}`,
+                  name: item.name,
+                  description: item.description || '',
+                  type: item.type as BoundedContext['type'],
+                  keyResponsibilities: item.keyResponsibilities || [],
+                  relationships: []
+                }
+                contextMap.set(item.name, ctx)
+                boundedContexts.push(ctx)
+                
+                // F1.2: Context incremental push
+                send('context', ctx)
+                // Delay for animation effect
+                await new Promise(r => setTimeout(r, 150))
+              })
+              
+              // Second pass: resolve relationships
+              result.data.boundedContexts.forEach((item: any, index: number) => {
+                if (item.relationships?.length > 0) {
+                  item.relationships.forEach((rel: any) => {
+                    const targetCtx = contextMap.get(rel.targetContextName)
+                    if (targetCtx) {
+                      const fromCtx = boundedContexts[index]
+                      fromCtx.relationships.push({
+                        id: `rel-${generateId()}`,
+                        fromContextId: fromCtx.id,
+                        toContextId: targetCtx.id,
+                        type: rel.type === 'upstream-downstream' ? 'upstream' : 
+                              rel.type === 'partnership' ? 'symmetric' : 'downstream',
+                        description: rel.description || ''
+                      })
+                    }
+                  })
+                }
+              })
+            }
+          } catch (parseError) {
+            console.error('Failed to parse AI response:', parseError)
+          }
+
+          // Default fallback if no contexts
+          if (boundedContexts.length === 0) {
+            boundedContexts = [{
+              id: `ctx-${generateId()}`,
+              name: '主业务域',
+              description: '从需求中提取的核心业务功能',
+              type: 'core',
+              keyResponsibilities: ['核心业务处理'],
+              relationships: []
+            }]
+            send('context', boundedContexts[0])
+          }
+
+          // F1.3: Done event
+          send('done', {
+            boundedContexts,
+            mermaidCode: generateMermaidCode(boundedContexts)
+          })
+          
+        } catch (error) {
+          // F1.4: Error event
+          console.error('SSE stream error:', error)
+          send('error', {
+            message: error instanceof Error ? error.message : 'AI 分析失败，请重试'
+          })
+        }
+        
+        controller.close()
+      }
+    })
+
+    // Return SSE stream
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    })
+  } catch (error) {
+    console.error('Error setting up SSE stream:', error)
+    return c.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to setup stream'
+    }, 500)
+  }
+})
+
 export default ddd

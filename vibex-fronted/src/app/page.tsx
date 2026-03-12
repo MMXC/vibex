@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import LoginDrawer from '@/components/ui/LoginDrawer';
 import { ParticleBackground } from '@/components/particles/ParticleBackground';
 import { MermaidPreview } from '@/components/ui/MermaidPreview';
+import { dddApi, projectApi } from '@/services/api';
 import styles from './homepage.module.css';
 
 // 五步流程
@@ -16,6 +17,37 @@ const STEPS = [
   { id: 4, label: '业务流程' },
   { id: 5, label: '项目创建' },
 ];
+
+// 类型定义
+interface ContextRelationship {
+  id: string;
+  fromContextId: string;
+  toContextId: string;
+  type: 'upstream' | 'downstream' | 'symmetric';
+  description: string;
+}
+
+interface BoundedContext {
+  id: string;
+  name: string;
+  description: string;
+  type: 'core' | 'supporting' | 'generic' | 'external';
+  relationships: ContextRelationship[];
+}
+
+interface DomainModel {
+  id: string;
+  name: string;
+  contextId: string;
+  type: string;
+  properties: Array<{ name: string; type: string }>;
+}
+
+interface BusinessFlow {
+  id: string;
+  name: string;
+  mermaidCode?: string;
+}
 
 // 示例需求
 const SAMPLE_REQUIREMENTS = [
@@ -118,6 +150,16 @@ export default function HomePage() {
     { role: 'assistant', content: '你好！我是 VibeX AI 助手。描述你的产品需求，我可以帮你生成完整的应用结构。' },
   ]);
 
+  // 单页式流程状态
+  const [currentStep, setCurrentStep] = useState(1);
+  const [boundedContexts, setBoundedContexts] = useState<BoundedContext[]>([]);
+  const [contextMermaidCode, setContextMermaidCode] = useState('');
+  const [domainModels, setDomainModels] = useState<DomainModel[]>([]);
+  const [modelMermaidCode, setModelMermaidCode] = useState('');
+  const [businessFlow, setBusinessFlow] = useState<BusinessFlow | null>(null);
+  const [flowMermaidCode, setFlowMermaidCode] = useState('');
+  const [generationError, setGenerationError] = useState('');
+
   // 实时生成预览 Mermaid 代码
   const mermaidCode = useMemo(() => generatePreviewMermaid(requirementText), [requirementText]);
 
@@ -125,7 +167,7 @@ export default function HomePage() {
     setRequirementText(desc);
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!isAuthenticated) {
       setIsLoginDrawerOpen(true);
       return;
@@ -136,7 +178,164 @@ export default function HomePage() {
     }
 
     setIsGenerating(true);
-    router.push('/confirm');
+    setGenerationError('');
+
+    try {
+      // 调用 API 生成限界上下文
+      const response = await dddApi.generateBoundedContext(requirementText);
+
+      if (response && response.success && response.boundedContexts) {
+        // 保存限界上下文
+        setBoundedContexts(response.boundedContexts);
+        
+        // 保存 Mermaid 代码
+        if (response.mermaidCode) {
+          setContextMermaidCode(response.mermaidCode);
+        }
+
+        // 切换到步骤2（限界上下文）
+        setCurrentStep(2);
+        setActiveTab('preview');
+      } else {
+        throw new Error(response?.error || '生成失败');
+      }
+    } catch (err) {
+      console.error('生成限界上下文失败:', err);
+      setGenerationError(err instanceof Error ? err.message : '生成失败，请重试');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // 继续生成领域模型
+  const handleGenerateDomainModel = async () => {
+    if (boundedContexts.length === 0) return;
+
+    setIsGenerating(true);
+    setGenerationError('');
+
+    try {
+      const response = await dddApi.generateDomainModel(boundedContexts, requirementText);
+
+      if (response && response.success && response.domainModels) {
+        setDomainModels(response.domainModels as DomainModel[]);
+        
+        if (response.mermaidCode) {
+          setModelMermaidCode(response.mermaidCode);
+        }
+
+        // 切换到步骤3（领域模型）
+        setCurrentStep(3);
+        setActiveTab('preview');
+      } else {
+        throw new Error(response?.error || '生成失败');
+      }
+    } catch (err) {
+      console.error('生成领域模型失败:', err);
+      setGenerationError(err instanceof Error ? err.message : '生成失败，请重试');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // 继续生成业务流程
+  const handleGenerateBusinessFlow = async () => {
+    if (domainModels.length === 0) return;
+
+    setIsGenerating(true);
+    setGenerationError('');
+
+    try {
+      const response = await dddApi.generateBusinessFlow(domainModels, requirementText);
+
+      if (response && response.success) {
+        setBusinessFlow(response.businessFlow as BusinessFlow || null);
+        
+        if (response.mermaidCode) {
+          setFlowMermaidCode(response.mermaidCode);
+        }
+
+        // 切换到步骤4（业务流程）
+        setCurrentStep(4);
+        setActiveTab('preview');
+      } else {
+        throw new Error(response?.error || '生成失败');
+      }
+    } catch (err) {
+      console.error('生成业务流程失败:', err);
+      setGenerationError(err instanceof Error ? err.message : '生成失败，请重试');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // 判断步骤是否完成
+  const isStepCompleted = (stepId: number) => {
+    switch (stepId) {
+      case 1:
+        return requirementText.trim().length > 0;
+      case 2:
+        return boundedContexts.length > 0;
+      case 3:
+        return domainModels.length > 0;
+      case 4:
+        return businessFlow !== null;
+      case 5:
+        return false; // 项目创建完成
+      default:
+        return false;
+    }
+  };
+
+  // 判断步骤是否可点击
+  const isStepClickable = (stepId: number) => {
+    return stepId <= currentStep;
+  };
+
+  // 点击步骤切换
+  const handleStepClick = (stepId: number) => {
+    if (!isStepClickable(stepId)) return;
+    
+    setCurrentStep(stepId);
+    if (stepId > 1) {
+      setActiveTab('preview');
+    } else {
+      setActiveTab('input');
+    }
+  };
+
+  // 处理项目创建完成
+  const handleCreateProject = async () => {
+    if (!isAuthenticated) {
+      setIsLoginDrawerOpen(true);
+      return;
+    }
+
+    setIsGenerating(true);
+    setGenerationError('');
+
+    try {
+      // 调用项目创建 API
+      const projectName = requirementText.slice(0, 50) || '未命名项目';
+      const response = await projectApi.createProject({
+        name: projectName,
+        description: requirementText,
+        userId: 'current-user', // TODO: 获取当前用户 ID
+      });
+
+      if (response) {
+        // 切换到步骤5（项目创建）
+        setCurrentStep(5);
+        setActiveTab('preview');
+      } else {
+        throw new Error('创建项目失败');
+      }
+    } catch (err) {
+      console.error('创建项目失败:', err);
+      setGenerationError(err instanceof Error ? err.message : '创建项目失败，请重试');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleQuickReply = (reply: string) => {
@@ -255,17 +454,25 @@ export default function HomePage() {
           <div>
             <div className={styles.sidebarTitle}>设计流程</div>
             <div className={styles.stepList}>
-              {STEPS.map((step) => (
-                <div
-                  key={step.id}
-                  className={`${styles.stepItem} ${step.id === 1 ? styles.active : ''}`}
-                >
-                  <span className={styles.stepNumber}>
-                    {step.id === 1 ? '✓' : step.id}
-                  </span>
-                  <span className={styles.stepLabel}>{step.label}</span>
-                </div>
-              ))}
+              {STEPS.map((step) => {
+                const isActive = step.id === currentStep;
+                const isCompleted = isStepCompleted(step.id);
+                const isClickable = isStepClickable(step.id);
+                
+                return (
+                  <div
+                    key={step.id}
+                    className={`${styles.stepItem} ${isActive ? styles.active : ''} ${isCompleted ? styles.completed : ''}`}
+                    onClick={() => handleStepClick(step.id)}
+                    style={{ cursor: isClickable ? 'pointer' : 'not-allowed', opacity: isClickable ? 1 : 0.5 }}
+                  >
+                    <span className={styles.stepNumber}>
+                      {isCompleted ? '✓' : step.id}
+                    </span>
+                    <span className={styles.stepLabel}>{step.label}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </aside>
@@ -339,32 +546,238 @@ export default function HomePage() {
               </>
             ) : (
               <>
-                <h1 className={styles.pageTitle}>实时预览</h1>
-                <p className={styles.pageSubtitle}>
-                  AI 正在分析你的需求，自动生成限界上下文设计
-                </p>
+                {/* 根据当前步骤显示不同的预览内容 */}
+                {currentStep === 1 && (
+                  <>
+                    <h1 className={styles.pageTitle}>实时预览</h1>
+                    <p className={styles.pageSubtitle}>
+                      AI 正在分析你的需求，自动生成限界上下文设计
+                    </p>
 
-                <div className={styles.previewSection}>
-                  {mermaidCode ? (
-                    <MermaidPreview 
-                      code={mermaidCode} 
-                      diagramType="flowchart"
-                      layout="TB"
-                      height="400px"
-                    />
-                  ) : (
-                    <div className={styles.previewEmpty}>
-                      <div className={styles.previewEmptyIcon}>🔍</div>
-                      <div className={styles.previewEmptyText}>
-                        输入需求后，这里将实时显示 AI 生成的设计预览
+                    <div className={styles.previewSection}>
+                      {mermaidCode ? (
+                        <MermaidPreview 
+                          code={mermaidCode} 
+                          diagramType="flowchart"
+                          layout="TB"
+                          height="400px"
+                        />
+                      ) : (
+                        <div className={styles.previewEmpty}>
+                          <div className={styles.previewEmptyIcon}>🔍</div>
+                          <div className={styles.previewEmptyText}>
+                            输入需求后，这里将实时显示 AI 生成的设计预览
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className={styles.previewHint}>
+                      <span>💡 提示：</span> 输入越详细，AI 生成的限界上下文越准确
+                    </div>
+                  </>
+                )}
+
+                {currentStep === 2 && (
+                  <>
+                    <h1 className={styles.pageTitle}>Step 2: 限界上下文</h1>
+                    <p className={styles.pageSubtitle}>
+                      AI 已生成限界上下文设计，请预览确认
+                    </p>
+
+                    <div className={styles.previewSection}>
+                      {contextMermaidCode ? (
+                        <MermaidPreview 
+                          code={contextMermaidCode} 
+                          diagramType="flowchart"
+                          layout="TB"
+                          height="400px"
+                        />
+                      ) : boundedContexts.length > 0 ? (
+                        <div className={styles.resultList}>
+                          {boundedContexts.map((ctx) => (
+                            <div key={ctx.id} className={styles.resultItem}>
+                              <div className={styles.resultItemTitle}>
+                                <span className={styles.ctxType}>{ctx.type}</span>
+                                {ctx.name}
+                              </div>
+                              <div className={styles.resultItemDesc}>{ctx.description}</div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className={styles.previewEmpty}>
+                          <div className={styles.previewEmptyIcon}>⏳</div>
+                          <div className={styles.previewEmptyText}>
+                            正在生成限界上下文...
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className={styles.actions}>
+                      <button
+                        className={styles.primaryButton}
+                        onClick={handleGenerateDomainModel}
+                        disabled={isGenerating || boundedContexts.length === 0}
+                      >
+                        {isGenerating ? '生成中...' : '🚀 继续生成领域模型'}
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {currentStep === 3 && (
+                  <>
+                    <h1 className={styles.pageTitle}>Step 3: 领域模型</h1>
+                    <p className={styles.pageSubtitle}>
+                      AI 已生成领域模型，请预览确认
+                    </p>
+
+                    <div className={styles.previewSection}>
+                      {modelMermaidCode ? (
+                        <MermaidPreview 
+                          code={modelMermaidCode} 
+                          diagramType="classDiagram"
+                          layout="TB"
+                          height="400px"
+                        />
+                      ) : domainModels.length > 0 ? (
+                        <div className={styles.resultList}>
+                          {domainModels.map((model) => (
+                            <div key={model.id} className={styles.resultItem}>
+                              <div className={styles.resultItemTitle}>{model.name}</div>
+                              <div className={styles.resultItemDesc}>
+                                类型: {model.type}
+                                {model.properties.length > 0 && (
+                                  <div className={styles.properties}>
+                                    属性: {model.properties.map(p => p.name).join(', ')}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className={styles.previewEmpty}>
+                          <div className={styles.previewEmptyIcon}>⏳</div>
+                          <div className={styles.previewEmptyText}>
+                            正在生成领域模型...
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className={styles.actions}>
+                      <button
+                        className={styles.primaryButton}
+                        onClick={handleGenerateBusinessFlow}
+                        disabled={isGenerating || domainModels.length === 0}
+                      >
+                        {isGenerating ? '生成中...' : '🌊 继续生成业务流程'}
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {currentStep === 4 && (
+                  <>
+                    <h1 className={styles.pageTitle}>Step 4: 业务流程</h1>
+                    <p className={styles.pageSubtitle}>
+                      AI 已生成业务流程，请预览确认
+                    </p>
+
+                    <div className={styles.previewSection}>
+                      {flowMermaidCode ? (
+                        <MermaidPreview 
+                          code={flowMermaidCode} 
+                          diagramType="flowchart"
+                          layout="TB"
+                          height="400px"
+                        />
+                      ) : businessFlow ? (
+                        <div className={styles.resultList}>
+                          <div className={styles.resultItem}>
+                            <div className={styles.resultItemTitle}>{businessFlow.name}</div>
+                            {businessFlow.mermaidCode && (
+                              <div className={styles.mermaidCode}>
+                                <pre>{businessFlow.mermaidCode}</pre>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className={styles.previewEmpty}>
+                          <div className={styles.previewEmptyIcon}>⏳</div>
+                          <div className={styles.previewEmptyText}>
+                            正在生成业务流程...
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className={styles.actions}>
+                      <button
+                        className={styles.primaryButton}
+                        onClick={handleCreateProject}
+                        disabled={isGenerating || !businessFlow}
+                      >
+                        {isGenerating ? '创建中...' : '✨ 创建项目'}
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {currentStep === 5 && (
+                  <>
+                    <h1 className={styles.pageTitle}>Step 5: 项目创建</h1>
+                    <p className={styles.pageSubtitle}>
+                      恭喜！项目已创建成功
+                    </p>
+
+                    <div className={styles.previewSection}>
+                      <div className={styles.successCard}>
+                        <div className={styles.successIcon}>🎉</div>
+                        <div className={styles.successTitle}>项目创建成功！</div>
+                        <div className={styles.successDesc}>
+                          你的项目 "{requirementText.slice(0, 30)}..." 已成功创建
+                        </div>
+                        <div className={styles.projectSummary}>
+                          <div className={styles.summaryItem}>
+                            <span className={styles.summaryLabel}>限界上下文:</span>
+                            <span className={styles.summaryValue}>{boundedContexts.length} 个</span>
+                          </div>
+                          <div className={styles.summaryItem}>
+                            <span className={styles.summaryLabel}>领域模型:</span>
+                            <span className={styles.summaryValue}>{domainModels.length} 个</span>
+                          </div>
+                          <div className={styles.summaryItem}>
+                            <span className={styles.summaryLabel}>业务流程:</span>
+                            <span className={styles.summaryValue}>{businessFlow ? '已生成' : '-'}</span>
+                          </div>
+                        </div>
+                        <div className={styles.actions}>
+                          <Link href="/dashboard" className={styles.primaryButton}>
+                            查看项目
+                          </Link>
+                          <button 
+                            className={styles.secondaryButton}
+                            onClick={() => {
+                              setCurrentStep(1);
+                              setRequirementText('');
+                              setBoundedContexts([]);
+                              setDomainModels([]);
+                              setBusinessFlow(null);
+                              setActiveTab('input');
+                            }}
+                          >
+                            继续创建新项目
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  )}
-                </div>
-
-                <div className={styles.previewHint}>
-                  <span>💡 提示：</span> 输入越详细，AI 生成的限界上下文越准确
-                </div>
+                  </>
+                )}
               </>
             )}
           </div>

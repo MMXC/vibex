@@ -18,6 +18,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.28',
+    date: '2026-03-12',
+    changes: [
+      '🔧 DDD API 优化：限界上下文返回数据结构增强',
+      '📊 提示词优化：EventStorming + Context Mapping 技术集成',
+      '🔗 关系字段：支持 upstream-downstream/partnership 等 5 种关系类型',
+      '🎨 Mermaid 增强：节点关系连线可视化',
+      '✅ 代码审查通过：安全+性能+规范符合要求',
+    ],
+    commit: '8135046',
+  },
+  {
     version: '1.0.27',
     date: '2026-03-12',
     changes: [

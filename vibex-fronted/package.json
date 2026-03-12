@@ -12,6 +12,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
+    "test:notify": "node scripts/test-notify.js",
     "pretest": "node scripts/pre-test-check.js",
     "pretest-check": "node scripts/pre-test-check.js",
     "coverage:check": "node scripts/check-coverage.js",

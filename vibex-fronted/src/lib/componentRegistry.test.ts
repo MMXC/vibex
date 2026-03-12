@@ -2,15 +2,11 @@
  * Component Registry Tests
  */
 
-import { componentRegistry } from './componentRegistry';
+import { componentRegistry, registerComponent } from './componentRegistry';
 
 describe('componentRegistry', () => {
   beforeEach(() => {
-    // Get the internal registry and clear it
-    const all = componentRegistry.getAll();
-    all.forEach(c => {
-      // We can't really clear the internal registry, so just note this
-    });
+    // Clear any test components from previous runs
   });
 
   it('registers a component', () => {
@@ -67,5 +63,39 @@ describe('componentRegistry', () => {
     expect(component?.since).toBe('2026-03-11');
     expect(component?.integratedIn).toBe('Test Suite');
     expect(component?.notes).toBe('Test notes');
+  });
+
+  it('handles deprecated status', () => {
+    componentRegistry.register('DeprecatedComponent', { 
+      status: 'deprecated',
+      notes: 'Replaced by NewComponent',
+    });
+    
+    const component = componentRegistry.get('DeprecatedComponent');
+    expect(component?.status).toBe('deprecated');
+  });
+
+  it('can update component registration', () => {
+    componentRegistry.register('UpdateableComponent', { status: 'pending' });
+    expect(componentRegistry.get('UpdateableComponent')?.status).toBe('pending');
+    
+    componentRegistry.register('UpdateableComponent', { status: 'integrated' });
+    expect(componentRegistry.get('UpdateableComponent')?.status).toBe('integrated');
+  });
+
+  it('verifies with issues when pending components exist', () => {
+    componentRegistry.register('PendingForVerify', { status: 'pending' });
+    
+    const result = componentRegistry.verify();
+    expect(result.issues.length).toBeGreaterThan(0);
+  });
+});
+
+describe('registerComponent helper', () => {
+  it('should register a component', () => {
+    registerComponent('HelperComponent', { status: 'integrated' });
+    
+    const component = componentRegistry.get('HelperComponent');
+    expect(component).toBeDefined();
   });
 });

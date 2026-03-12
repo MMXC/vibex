@@ -154,15 +154,15 @@ describe('Confirmation Store - Extended', () => {
   });
 
   describe('history limit', () => {
-    it('keeps only last 50 snapshots', () => {
+    it('keeps only last 20 snapshots (PRD requirement)', () => {
       const { setRequirementText, saveSnapshot } = useConfirmationStore.getState();
       
-      for (let i = 0; i < 60; i++) {
+      for (let i = 0; i < 30; i++) {
         setRequirementText(`Text ${i}`);
         saveSnapshot();
       }
       
-      expect(useConfirmationStore.getState().history.length).toBe(50);
+      expect(useConfirmationStore.getState().history.length).toBe(20);
     });
   });
 

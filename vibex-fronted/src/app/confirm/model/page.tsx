@@ -4,12 +4,17 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '../confirm.module.css';
 import { useConfirmationStore } from '@/stores/confirmationStore';
+import { useAutoSnapshot } from '@/hooks/useAutoSnapshot';
 import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps';
 import { apiService, BoundedContext } from '@/services/api';
 const { generateDomainModel } = apiService;
 
 export default function ModelPage() {
   const router = useRouter();
+  
+  // Enable auto-snapshot for version history
+  useAutoSnapshot(true, 2000);
+  
   const {
     selectedContextIds,
     boundedContexts,

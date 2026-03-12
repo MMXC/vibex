@@ -1,7 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { SimpleSteps } from '@/components/ui/Steps';
+import { TemplateSelector } from '@/components/templates';
+import { useContextStore } from '@/stores/confirmation/contextStore';
+import { useModelStore } from '@/stores/confirmation/modelStore';
+import { useFlowStore } from '@/stores/confirmation/flowStore';
+import styles from './preview.module.css';
+
+// 4步设计流程
+const designSteps = ['需求输入', '限界上下文', '领域模型', '业务流程'];
 
 // 模拟预览页面数据
 const previewPages = [
@@ -25,9 +34,196 @@ export default function Preview() {
   const [device, setDevice] = useState('desktop');
   const [zoom, setZoom] = useState(100);
   const [showPageList, setShowPageList] = useState(true);
+  const [showTemplates, setShowTemplates] = useState(false);
+  const [requirementText, setRequirementText] = useState('');
+  const [mounted, setMounted] = useState(false);
+
+  // 避免 SSR 问题
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // 获取 Store 数据
+  const boundedContexts = useContextStore((s) => s.boundedContexts);
+  const domainModels = useModelStore((s) => s.domainModels);
+  const businessFlow = useFlowStore((s) => s.businessFlow);
+
+  // 根据数据确定当前步骤
+  const getCurrentStep = () => {
+    if (businessFlow.states.length > 0) return 3; // 业务流程
+    if (domainModels.length > 0) return 2; // 领域模型
+    if (boundedContexts.length > 0) return 1; // 限界上下文
+    return 0; // 需求输入
+  };
+
+  const currentStep = getCurrentStep();
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* 顶部说明区域 */}
+      <header
+        style={{
+          padding: '16px 24px',
+          backgroundColor: '#0a0a0f',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          textAlign: 'center',
+        }}
+      >
+        <h1
+          style={{
+            fontSize: '24px',
+            fontWeight: 600,
+            color: '#fff',
+            margin: 0,
+            background: 'linear-gradient(135deg, #00d4ff 0%, #8b5cf6 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}
+        >
+          用 AI 轻松构建你的 Web 应用
+        </h1>
+        <p
+          style={{
+            fontSize: '14px',
+            color: 'rgba(255, 255, 255, 0.5)',
+            margin: '8px 0 0',
+          }}
+        >
+          描述需求，AI 实时生成预览
+        </p>
+      </header>
+
+      {/* 步骤指示器 */}
+      <div
+        style={{
+          padding: '16px 24px',
+          backgroundColor: '#1a1a2e',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        }}
+      >
+        {mounted && (
+          <SimpleSteps
+            steps={designSteps}
+            current={currentStep}
+          />
+        )}
+      </div>
+
+      {/* 预览画布 */}
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          backgroundColor: '#0f0f1a',
+          overflow: 'hidden',
+        }}
+      >
+        {/* 上下文图/模型图/流程图显示区域 */}
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '24px',
+          }}
+        >
+          {currentStep === 0 && (
+            <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.5)' }}>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>🎯</div>
+              <p>输入需求后，AI 将实时生成预览</p>
+            </div>
+          )}
+
+          {currentStep >= 1 && boundedContexts.length > 0 && (
+            <div style={{ 
+              width: '100%', 
+              maxWidth: '800px',
+              background: 'rgba(255,255,255,0.03)',
+              borderRadius: '12px',
+              padding: '24px',
+              marginBottom: '16px',
+            }}>
+              <h3 style={{ color: '#fff', margin: '0 0 16px' }}>限界上下文</h3>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                {boundedContexts.map((ctx: any) => (
+                  <div
+                    key={ctx.id}
+                    style={{
+                      padding: '12px 16px',
+                      background: 'rgba(0,212,255,0.1)',
+                      border: '1px solid rgba(0,212,255,0.3)',
+                      borderRadius: '8px',
+                      color: '#fff',
+                    }}
+                  >
+                    {ctx.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentStep >= 2 && domainModels.length > 0 && (
+            <div style={{ 
+              width: '100%', 
+              maxWidth: '800px',
+              background: 'rgba(255,255,255,0.03)',
+              borderRadius: '12px',
+              padding: '24px',
+              marginBottom: '16px',
+            }}>
+              <h3 style={{ color: '#fff', margin: '0 0 16px' }}>领域模型</h3>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                {domainModels.map((model: any) => (
+                  <div
+                    key={model.id}
+                    style={{
+                      padding: '12px 16px',
+                      background: 'rgba(139,92,246,0.1)',
+                      border: '1px solid rgba(139,92,246,0.3)',
+                      borderRadius: '8px',
+                      color: '#fff',
+                    }}
+                  >
+                    {model.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentStep >= 3 && businessFlow.states.length > 0 && (
+            <div style={{ 
+              width: '100%', 
+              maxWidth: '800px',
+              background: 'rgba(255,255,255,0.03)',
+              borderRadius: '12px',
+              padding: '24px',
+            }}>
+              <h3 style={{ color: '#fff', margin: '0 0 16px' }}>业务流程</h3>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                {businessFlow.states.map((state: any) => (
+                  <div
+                    key={state.id}
+                    style={{
+                      padding: '12px 16px',
+                      background: 'rgba(16,185,129,0.1)',
+                      border: '1px solid rgba(16,185,129,0.3)',
+                      borderRadius: '8px',
+                      color: '#fff',
+                    }}
+                  >
+                    {state.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* 顶部工具栏 */}
       <div
         style={{
@@ -473,6 +669,101 @@ export default function Preview() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* 底部输入区域 - 需求输入框 + 生成按钮 */}
+      <div
+        style={{
+          padding: '16px 24px',
+          backgroundColor: '#1a1a2e',
+          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            gap: '12px',
+            maxWidth: '800px',
+            margin: '0 auto',
+          }}
+        >
+          <input
+            type="text"
+            placeholder="描述你的产品需求，例如：创建一个在线教育平台..."
+            value={requirementText}
+            onChange={(e) => setRequirementText(e.target.value)}
+            style={{
+              flex: 1,
+              padding: '12px 16px',
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '8px',
+              color: '#fff',
+              fontSize: '14px',
+              outline: 'none',
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = 'rgba(0, 212, 255, 0.5)';
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            }}
+          />
+          <button
+            onClick={() => setShowTemplates(!showTemplates)}
+            style={{
+              padding: '12px 16px',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              borderRadius: '8px',
+              color: '#fff',
+              fontSize: '14px',
+              cursor: 'pointer',
+            }}
+          >
+            📋 模板
+          </button>
+          <button
+            style={{
+              padding: '12px 24px',
+              backgroundColor: '#00d4ff',
+              border: 'none',
+              borderRadius: '8px',
+              color: '#000',
+              fontSize: '14px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            🎯 开始生成
+          </button>
+        </div>
+        
+        {/* 模板选择器 */}
+        {showTemplates && (
+          <div style={{ maxWidth: '800px', margin: '12px auto 0' }}>
+            <TemplateSelector
+              isOpen={showTemplates}
+              onClose={() => setShowTemplates(false)}
+              onSelect={(template) => {
+                setRequirementText(template.description || template.content || '');
+                setShowTemplates(false);
+              }}
+            />
+          </div>
+        )}
+        
+        <p
+          style={{
+            textAlign: 'center',
+            fontSize: '12px',
+            color: 'rgba(255, 255, 255, 0.4)',
+            margin: '8px 0 0',
+          }}
+        >
+          登录后可保存和导出项目
+        </p>
       </div>
     </div>
   );

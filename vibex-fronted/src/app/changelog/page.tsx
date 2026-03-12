@@ -18,6 +18,29 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.26',
+    date: '2026-03-12',
+    changes: [
+      '🔧 预览功能修复：登录状态实时检测 + Mermaid 图预览',
+      '🏗️ 三栏布局：步骤面板(15%) + 预览区(60%) + AI对话(25%)',
+      '🔐 AuthStore：Zustand + persist 实现状态持久化',
+      '🎨 MermaidRenderer：支持五步流程可视化渲染',
+      '✅ 代码审查通过：安全+性能+规范符合要求',
+    ],
+    commit: '1f09b2d',
+  },
+  {
+    version: '1.0.25',
+    date: '2026-03-12',
+    changes: [
+      '📚 架构文档同步：Schema 文档与 Prisma 一致 (14 模型验证通过)',
+      '📋 API 契约文档：OpenAPI 3.0 格式完整',
+      '✅ 文档可读性：结构清晰，Mermaid 图表丰富',
+      '📝 建议：建立 ADR 体系记录架构决策',
+    ],
+    commit: 'bd7470f',
+  },
+  {
     version: '1.0.24',
     date: '2026-03-11',
     changes: [
@@ -319,7 +342,7 @@ export default function Changelog() {
     const fetchVersion = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || ''}/api/version`
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || ''}/version`
         );
         if (response.ok) {
           const data = await response.json();

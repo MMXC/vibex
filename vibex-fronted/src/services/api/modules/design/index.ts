@@ -221,12 +221,12 @@ export interface DesignApi {
 
 class DesignApiImpl implements DesignApi {
   async askClarification(req: ClarificationRequest): Promise<ClarificationResponse> {
-    const response = await httpClient.post<ClarificationResponse>('/api/clarify/ask', req);
+    const response = await httpClient.post<ClarificationResponse>('/clarify/ask', req);
     return response;
   }
   
   async acceptClarification(sessionId: string, clarificationId: string): Promise<{ success: boolean }> {
-    const response = await httpClient.post<{ success: boolean }>('/api/clarify/accept', {
+    const response = await httpClient.post<{ success: boolean }>('/clarify/accept', {
       sessionId,
       clarificationId,
     });
@@ -234,54 +234,54 @@ class DesignApiImpl implements DesignApi {
   }
   
   async generateDomainModel(req: DomainModelRequest): Promise<DomainModelResponse> {
-    const response = await httpClient.post<DomainModelResponse>('/api/domain/generate', req);
+    const response = await httpClient.post<DomainModelResponse>('/domain/generate', req);
     return response;
   }
   
   async deriveEntities(req: EntityDerivationRequest): Promise<EntityDerivationResponse> {
-    const response = await httpClient.post<EntityDerivationResponse>('/api/domain/derive', req);
+    const response = await httpClient.post<EntityDerivationResponse>('/domain/derive', req);
     return response;
   }
   
   async generateBusinessFlow(req: BusinessFlowRequest): Promise<BusinessFlowResponse> {
-    const response = await httpClient.post<BusinessFlowResponse>('/api/flow/generate', req);
+    const response = await httpClient.post<BusinessFlowResponse>('/flow/generate', req);
     return response;
   }
   
   async generateUIPages(req: UIPageRequest): Promise<UIPageResponse> {
-    const response = await httpClient.post<UIPageResponse>('/api/pages/generate', req);
+    const response = await httpClient.post<UIPageResponse>('/pages/generate', req);
     return response;
   }
   
   async derivePages(req: PageDerivationRequest): Promise<PageDerivationResponse> {
-    const response = await httpClient.post<PageDerivationResponse>('/api/pages/derive', req);
+    const response = await httpClient.post<PageDerivationResponse>('/pages/derive', req);
     return response;
   }
   
   async generatePrototype(req: PrototypeGenerationRequest): Promise<PrototypeGenerationResponse> {
-    const response = await httpClient.post<PrototypeGenerationResponse>('/api/prototype/generate', req);
+    const response = await httpClient.post<PrototypeGenerationResponse>('/prototype/generate', req);
     return response;
   }
   
   async deriveFlows(req: FlowDerivationRequest): Promise<FlowDerivationResponse> {
-    const response = await httpClient.post<FlowDerivationResponse>('/api/flow/derive', req);
+    const response = await httpClient.post<FlowDerivationResponse>('/flow/derive', req);
     return response;
   }
   
   async createSession(projectId?: string): Promise<{ sessionId: string }> {
-    const response = await httpClient.post<{ sessionId: string }>('/api/design/session', {
+    const response = await httpClient.post<{ sessionId: string }>('/design/session', {
       projectId,
     });
     return response;
   }
   
   async getSession(sessionId: string): Promise<unknown> {
-    const response = await httpClient.get<{ data: unknown }>(`/api/design/session/${sessionId}`);
+    const response = await httpClient.get<{ data: unknown }>(`'/design/session/${sessionId}`);
     return response.data;
   }
   
   async deleteSession(sessionId: string): Promise<{ success: boolean }> {
-    const response = await httpClient.delete<{ success: boolean }>(`/api/design/session/${sessionId}`);
+    const response = await httpClient.delete<{ success: boolean }>(`'/design/session/${sessionId}`);
     return response;
   }
 }

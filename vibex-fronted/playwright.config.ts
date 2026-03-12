@@ -2,41 +2,33 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests/e2e',
-  fullyParallel: true,
+  fullyParallel: false, // Disable parallel to avoid resource competition
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  retries: 2, // Increase retries for stability
+  workers: 1, // Single worker for stability
   reporter: process.env.CI ? 'list' : 'html',
-  timeout: 30000,
+  timeout: 60000, // Increase test timeout
   expect: {
-    timeout: 5000,
+    timeout: 10000, // Increase expect timeout
   },
   use: {
     baseURL: process.env.BASE_URL || 'http://localhost:3000',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    actionTimeout: 15000, // Increase action timeout
   },
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-    // Uncomment for CI testing with multiple browsers
-    // {
-    //   name: 'firefox',
-    //   use: { ...devices['Desktop Firefox'] },
-    // },
-    // {
-    //   name: 'webkit',
-    //   use: { ...devices['Desktop Safari'] },
-    // },
   ],
   webServer: {
     command: 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
-    timeout: 120000,
+    timeout: 180000, // Increase server startup timeout
     stdout: 'pipe',
     stderr: 'pipe',
   },

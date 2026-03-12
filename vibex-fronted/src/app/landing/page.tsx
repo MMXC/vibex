@@ -18,8 +18,15 @@ function useIsAuthenticated(): boolean {
   return isAuthenticated;
 }
 
+// 强制刷新状态 hook
+function useForceUpdate() {
+  const [, setState] = useState(0);
+  return () => setState((n) => n + 1);
+}
+
 export default function Landing() {
   const router = useRouter();
+  const forceUpdate = useForceUpdate();
   const isAuthenticated = useIsAuthenticated();
   const [requirementText, setRequirementText] = useState('');
   const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
@@ -46,6 +53,7 @@ export default function Landing() {
       <LoginDrawer
         isOpen={isLoginDrawerOpen}
         onClose={() => setIsLoginDrawerOpen(false)}
+        onSuccess={forceUpdate}
       />
 
       {/* 背景特效 */}

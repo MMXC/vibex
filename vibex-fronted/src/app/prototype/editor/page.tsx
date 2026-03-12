@@ -948,7 +948,7 @@ function EditorContent() {
 
     // 调用 AI API 获取流式响应
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || ''}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: inputValue.trim() }),

@@ -7,6 +7,7 @@ import {
   useConfirmationStore,
   BoundedContext,
 } from '@/stores/confirmationStore';
+import { useAutoSnapshot } from '@/hooks/useAutoSnapshot';
 import { apiService } from '@/services/api';
 const { generateBoundedContext } = apiService;
 import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps';
@@ -16,6 +17,10 @@ import { RequirementTemplate } from '@/data/templates';
 
 export default function ConfirmPage() {
   const router = useRouter();
+  
+  // Enable auto-snapshot for version history
+  useAutoSnapshot(true, 2000);
+  
   const {
     requirementText,
     setRequirementText,

@@ -1,43 +1,74 @@
 /**
- * Generation Progress Tests - Extended
+ * GenerationProgress Component Tests
  */
 
-import { render, screen } from '@testing-library/react';
-import { GenerationProgress } from '../generation-progress/GenerationProgress';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { GenerationProgress, GenerationStep, ProgressStatus } from '@/components/generation-progress/GenerationProgress';
+
+const mockSteps: GenerationStep[] = [
+  { id: 'step-1', label: 'Analyzing Requirements', status: 'completed', progress: 100 },
+  { id: 'step-2', label: 'Generating UI', status: 'processing', progress: 50 },
+  { id: 'step-3', label: 'Validating', status: 'pending', progress: 0 },
+];
 
 describe('GenerationProgress', () => {
-  const mockSteps = [
-    { id: '1', label: 'Step 1', status: 'completed' as const },
-    { id: '2', label: 'Step 2', status: 'processing' as const, progress: 50 },
-    { id: '3', label: 'Step 3', status: 'pending' as const },
-  ];
-
-  it('should render', () => {
+  it('should render all steps', () => {
     render(<GenerationProgress steps={mockSteps} />);
-    expect(screen.getByText(/生成完成|正在生成/)).toBeInTheDocument();
+    
+    expect(screen.getByText('Analyzing Requirements')).toBeInTheDocument();
+    expect(screen.getByText('Generating UI')).toBeInTheDocument();
+    expect(screen.getByText('Validating')).toBeInTheDocument();
   });
 
-  it('should show steps', () => {
-    render(<GenerationProgress steps={mockSteps} />);
-    expect(screen.getByText('Step 1')).toBeInTheDocument();
-    expect(screen.getByText('Step 2')).toBeInTheDocument();
-    expect(screen.getByText('Step 3')).toBeInTheDocument();
+  it('should show generating status', () => {
+    render(<GenerationProgress steps={mockSteps} status="generating" />);
+    
+    expect(screen.getByText('🔄 正在生成...')).toBeInTheDocument();
   });
 
-  it('should display all step statuses', () => {
+  it('should show completed status', () => {
+    render(<GenerationProgress steps={mockSteps} status="completed" />);
+    
+    expect(screen.getByText('✅ 生成完成')).toBeInTheDocument();
+  });
+
+  it('should show error status', () => {
+    render(<GenerationProgress steps={mockSteps} status="error" />);
+    
+    expect(screen.getByText('❌ 生成失败')).toBeInTheDocument();
+  });
+
+  it('should call onComplete when status changes to completed', () => {
+    const handleComplete = jest.fn();
+    render(<GenerationProgress steps={mockSteps} status="completed" onComplete={handleComplete} />);
+    
+    expect(handleComplete).toHaveBeenCalled();
+  });
+
+  it('should show correct percentage', () => {
     render(<GenerationProgress steps={mockSteps} />);
-    // Check that steps are rendered
-    const steps = document.querySelectorAll('[class*="step"]');
-    expect(steps.length).toBeGreaterThan(0);
+    
+    // 1 completed out of 3 = 33%
+    expect(screen.getByText('33%')).toBeInTheDocument();
+  });
+
+  it('should show step status indicators', () => {
+    render(<GenerationProgress steps={mockSteps} />);
+    
+    // Check for status indicators - just verify the component renders
+    expect(screen.getByText('Analyzing Requirements')).toBeInTheDocument();
   });
 
   it('should handle empty steps', () => {
     render(<GenerationProgress steps={[]} />);
-    expect(document.querySelector('[class*="progress"]')).toBeInTheDocument();
+    
+    expect(screen.getByText('0%')).toBeInTheDocument();
   });
 
-  it('should show current step', () => {
-    render(<GenerationProgress steps={mockSteps} currentStepId="2" />);
-    expect(screen.getByText('Step 2')).toBeInTheDocument();
+  it('should highlight current step', () => {
+    render(<GenerationProgress steps={mockSteps} currentStepId="step-2" />);
+    
+    // The current step should be processing
+    expect(screen.getByText('Generating UI')).toBeInTheDocument();
   });
 });

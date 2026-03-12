@@ -3,7 +3,7 @@
  */
 
 import { renderHook, act } from '@testing-library/react';
-import useAnimatedDiagram from '../useAnimatedDiagram';
+import useAnimatedDiagram from './useAnimatedDiagram';
 
 describe('useAnimatedDiagram', () => {
   const initialItems = [

@@ -67,8 +67,8 @@ test.describe('注册/登录流程', () => {
   test('should navigate to landing page', async ({ page }) => {
     await page.goto(`${BASE_URL}/auth`);
 
-    // 点击返回首页
-    await page.click('a:has-text("← 返回首页")');
+    // 点击返回首页 - 使用更精确的选择器
+    await page.click('a[href="/landing"]');
 
     // 验证跳转
     await expect(page).toHaveURL(`${BASE_URL}/landing`);

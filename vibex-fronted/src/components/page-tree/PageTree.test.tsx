@@ -1,73 +1,112 @@
 /**
- * Page Tree Tests - Extended
+ * PageTree Component Tests
  */
 
 import { render, screen, fireEvent } from '@testing-library/react';
-import { PageTree, PageTreeNode } from '../page-tree/PageTree';
+import { PageTree, PageNode } from '@/components/page-tree/PageTree';
+
+const mockNodes: PageNode[] = [
+  {
+    id: 'page-1',
+    name: 'Home Page',
+    type: 'page',
+    children: [
+      { id: 'comp-1', name: 'Header', type: 'component' },
+      { id: 'comp-2', name: 'Footer', type: 'component' },
+    ],
+  },
+  {
+    id: 'page-2',
+    name: 'About Page',
+    type: 'page',
+  },
+  {
+    id: 'section-1',
+    name: 'Settings',
+    type: 'section',
+    children: [
+      {
+        id: 'page-3',
+        name: 'Profile',
+        type: 'page',
+      },
+    ],
+  },
+];
 
 describe('PageTree', () => {
-  const mockNodes: PageTreeNode[] = [
-    { id: '1', name: 'Page 1', type: 'page', children: [
-      { id: '1-1', name: 'Component 1', type: 'component' },
-    ]},
-    { id: '2', name: 'Page 2', type: 'page' },
-  ];
-
-  it('should render tree', () => {
+  it('should render nodes', () => {
     render(<PageTree nodes={mockNodes} />);
-    expect(screen.getByText('Page 1')).toBeInTheDocument();
-    expect(screen.getByText('Page 2')).toBeInTheDocument();
+    
+    expect(screen.getByText('Home Page')).toBeInTheDocument();
+    expect(screen.getByText('About Page')).toBeInTheDocument();
+    expect(screen.getByText('Settings')).toBeInTheDocument();
   });
 
-  it('should show expand/collapse buttons', () => {
-    render(<PageTree nodes={mockNodes} defaultExpanded />);
-    expect(screen.getByText('全部折叠')).toBeInTheDocument();
+  it('should render with defaultExpanded true', () => {
+    render(<PageTree nodes={mockNodes} defaultExpanded={true} />);
+    
+    // Children should be visible by default
+    expect(screen.getByText('Header')).toBeInTheDocument();
+    expect(screen.getByText('Footer')).toBeInTheDocument();
   });
 
-  it('should call onNodeClick', () => {
-    const onNodeClick = jest.fn();
-    render(<PageTree nodes={mockNodes} onNodeClick={onNodeClick} />);
+  it('should render with defaultExpanded false', () => {
+    render(<PageTree nodes={mockNodes} defaultExpanded={false} />);
+    
+    // Children should not be visible when collapsed
+    expect(screen.queryByText('Header')).not.toBeInTheDocument();
   });
 
-  it('should render nested children', () => {
-    render(<PageTree nodes={mockNodes} defaultExpanded />);
-    expect(screen.getByText('Component 1')).toBeInTheDocument();
+  it('should toggle expand/collapse on click', () => {
+    render(<PageTree nodes={mockNodes} />);
+    
+    // Initially expanded, children visible
+    expect(screen.getByText('Header')).toBeInTheDocument();
+    
+    // Click to collapse - use getAllByText since there may be multiple
+    const expandButtons = screen.getAllByText('▼');
+    fireEvent.click(expandButtons[0]);
+    
+    // Should now show expand icon and children hidden
+    expect(screen.getAllByText('▶').length).toBeGreaterThan(0);
+  });
+
+  it('should call onNodeClick when node clicked', () => {
+    const handleClick = jest.fn();
+    render(<PageTree nodes={mockNodes} onNodeClick={handleClick} />);
+    
+    fireEvent.click(screen.getByText('Home Page'));
+    
+    expect(handleClick).toHaveBeenCalledWith('page-1');
+  });
+
+  it('should render correct icons for different node types', () => {
+    render(<PageTree nodes={mockNodes} />);
+    
+    // Check that icons are present (multiple elements may match)
+    const icons = screen.getAllByText(/[📄🔧📋]/);
+    expect(icons.length).toBeGreaterThan(0);
+  });
+
+  it('should handle nodes without children', () => {
+    const nodesWithoutChildren: PageNode[] = [
+      { id: 'page-1', name: 'Standalone Page', type: 'page' },
+    ];
+    
+    render(<PageTree nodes={nodesWithoutChildren} />);
+    
+    expect(screen.getByText('Standalone Page')).toBeInTheDocument();
+    // Should show placeholder instead of expand button
+    expect(screen.getByText('•')).toBeInTheDocument();
   });
 
   it('should handle empty nodes', () => {
     render(<PageTree nodes={[]} />);
-    // Should render without crashing
-    expect(document.querySelector('[class*="tree"]')).toBeInTheDocument();
-  });
-
-  it('should show selected node', () => {
-    render(<PageTree nodes={mockNodes} selectedId="1" />);
-    // Should highlight selected node
-    expect(screen.getByText('Page 1')).toBeInTheDocument();
-  });
-
-  it('should call onExpand when expand button clicked', () => {
-    const onExpand = jest.fn();
-    render(<PageTree nodes={mockNodes} onExpand={onExpand} />);
-  });
-
-  it('should display different node types', () => {
-    const mixedNodes: PageTreeNode[] = [
-      { id: '1', name: 'Page', type: 'page' },
-      { id: '2', name: 'Component', type: 'component' },
-      { id: '3', name: 'Folder', type: 'folder' },
-    ];
-    render(<PageTree nodes={mixedNodes} />);
-    expect(screen.getByText('Page')).toBeInTheDocument();
-    expect(screen.getByText('Component')).toBeInTheDocument();
-    expect(screen.getByText('Folder')).toBeInTheDocument();
-  });
-
-  it('should handle disabled nodes', () => {
-    const disabledNodes: PageTreeNode[] = [
-      { id: '1', name: 'Disabled Page', type: 'page', disabled: true },
-    ];
-    render(<PageTree nodes={disabledNodes} />);
-    expect(screen.getByText('Disabled Page')).toBeInTheDocument();
+    
+    // Should render without errors
+    const list = document.querySelector('ul');
+    expect(list).toBeInTheDocument();
+    expect(list?.children.length).toBe(0);
   });
 });

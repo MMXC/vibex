@@ -1,0 +1,143 @@
+/**
+ * OnboardingModal - 用户引导弹窗组件
+ * 
+ * 支持 5 步引导，使用 Framer Motion 动画
+ */
+
+'use client';
+
+import { useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useOnboardingStore, ONBOARDING_STEPS } from '@/stores/onboarding';
+import { StepIndicator } from './StepIndicator';
+import styles from './OnboardingModal.module.css';
+
+export function OnboardingModal() {
+  const {
+    status,
+    currentStep,
+    completedSteps,
+    nextStep,
+    prevStep,
+    skip,
+    complete,
+  } = useOnboardingStore();
+
+  // 只在进行中时显示
+  const isOpen = status === 'in-progress';
+  const currentIndex = ONBOARDING_STEPS.findIndex((s) => s.id === currentStep);
+  const currentStepInfo = ONBOARDING_STEPS[currentIndex];
+  const canGoBack = currentIndex > 0;
+  const isLastStep = currentIndex === ONBOARDING_STEPS.length - 1;
+
+  // ESC 键关闭
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        skip();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, skip]);
+
+  const handleNext = useCallback(() => {
+    if (isLastStep) {
+      complete();
+    } else {
+      nextStep();
+    }
+  }, [isLastStep, nextStep, complete]);
+
+  const handleStepClick = useCallback(
+    (stepId: string) => {
+      const stepIndex = ONBOARDING_STEPS.findIndex((s) => s.id === stepId);
+      if (stepIndex < currentIndex) {
+        // 可以后退到已完成的步骤
+        useOnboardingStore.getState().goToStep(stepId as any);
+      }
+    },
+    [currentIndex]
+  );
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <div className={styles.overlay}>
+          <motion.div
+            className={styles.backdrop}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={skip}
+          />
+
+          <motion.div
+            className={styles.modal}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ type: 'spring', duration: 0.5 }}
+          >
+            {/* Header */}
+            <div className={styles.header}>
+              <div className={styles.badge}>新手指引</div>
+              <button className={styles.closeButton} onClick={skip}>
+                ✕
+              </button>
+            </div>
+
+            {/* Step Indicator */}
+            <StepIndicator
+              steps={ONBOARDING_STEPS}
+              currentStep={currentStep}
+              completedSteps={completedSteps}
+              onStepClick={handleStepClick}
+            />
+
+            {/* Step Content */}
+            <div className={styles.content}>
+              <motion.div
+                key={currentStep}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className={styles.stepContent}
+              >
+                <div className={styles.stepIcon}>{currentStepInfo?.icon}</div>
+                <h2 className={styles.stepTitle}>{currentStepInfo?.title}</h2>
+                <p className={styles.stepDescription}>
+                  {currentStepInfo?.description}
+                </p>
+                {currentStepInfo?.duration && (
+                  <span className={styles.stepDuration}>
+                    预计时长: {currentStepInfo.duration}
+                  </span>
+                )}
+              </motion.div>
+            </div>
+
+            {/* Actions */}
+            <div className={styles.actions}>
+              {canGoBack && (
+                <button className={styles.backBtn} onClick={prevStep}>
+                  上一步
+                </button>
+              )}
+              <button className={styles.skipBtn} onClick={skip}>
+                跳过
+              </button>
+              <button className={styles.nextBtn} onClick={handleNext}>
+                {isLastStep ? '完成' : '下一步'}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+export default OnboardingModal;

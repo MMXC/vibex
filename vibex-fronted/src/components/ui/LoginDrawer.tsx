@@ -52,10 +52,19 @@ export function LoginDrawer({ isOpen, onClose, onSuccess }: LoginDrawerProps) {
     try {
       const { apiService } = await import('@/services/api');
 
+      let token: string;
       if (isLogin) {
-        await apiService.login({ email, password });
+        const result = await apiService.login({ email, password });
+        token = result.token || result.access_token || (result as any).token;
       } else {
-        await apiService.register({ name, email, password });
+        const result = await apiService.register({ name, email, password });
+        token = result.token || result.access_token || (result as any).token;
+      }
+
+      // 保存 token 到 localStorage
+      if (token) {
+        localStorage.setItem('auth_token', token);
+        localStorage.setItem('user_id', email);
       }
 
       onSuccess?.();

@@ -5,7 +5,29 @@ import {
   fireEvent,
   act,
 } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Dashboard from '@/app/dashboard/page';
+
+// Create a query client for tests
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+
+// Custom render that includes QueryClientProvider
+function renderWithQueryClient(ui: React.ReactElement) {
+  const queryClient = createTestQueryClient();
+  return {
+    ...render(
+      <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
+    ),
+    queryClient,
+  };
+}
 
 // Mock router
 const mockRouter = {
@@ -58,18 +80,59 @@ const localStorageMock = (() => {
 
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
-// Mock api service
+// Mock api modules
 const mockGetProjects = jest.fn();
 const mockCreateProject = jest.fn();
 const mockDeleteProject = jest.fn();
 const mockLogout = jest.fn();
+const mockGetDeletedProjects = jest.fn();
 
-jest.mock('@/services/api', () => ({
-  apiService: {
+// Mock the API modules before the main api module imports them
+jest.mock('@/services/api/modules/project', () => ({
+  projectApi: {
     getProjects: (...args: unknown[]) => mockGetProjects(...args),
     createProject: (...args: unknown[]) => mockCreateProject(...args),
     deleteProject: (...args: unknown[]) => mockDeleteProject(...args),
+    softDeleteProject: jest.fn(),
+    restoreProject: jest.fn(),
+    permanentDeleteProject: jest.fn(),
+    getDeletedProjects: (...args: unknown[]) => mockGetDeletedProjects(...args),
+    clearDeletedProjects: jest.fn(),
+    getProjectRole: jest.fn(),
+    getProject: jest.fn(),
+    updateProject: jest.fn(),
+  },
+}));
+
+jest.mock('@/services/api/modules/auth', () => ({
+  authApi: {
     logout: (...args: unknown[]) => mockLogout(...args),
+    login: jest.fn(),
+    register: jest.fn(),
+    getCurrentUser: jest.fn(),
+  },
+}));
+
+// Mock the main api module to avoid binding issues
+jest.mock('@/services/api', () => ({
+  authApi: {
+    logout: (...args: unknown[]) => mockLogout(...args),
+    login: jest.fn(),
+    register: jest.fn(),
+    getCurrentUser: jest.fn(),
+  },
+  projectApi: {
+    getProjects: (...args: unknown[]) => mockGetProjects(...args),
+    createProject: (...args: unknown[]) => mockCreateProject(...args),
+    deleteProject: (...args: unknown[]) => mockDeleteProject(...args),
+    getDeletedProjects: (...args: unknown[]) => mockGetDeletedProjects(...args),
+  },
+  apiService: {
+    logout: (...args: unknown[]) => mockLogout(...args),
+    getProjects: (...args: unknown[]) => mockGetProjects(...args),
+    createProject: (...args: unknown[]) => mockCreateProject(...args),
+    deleteProject: (...args: unknown[]) => mockDeleteProject(...args),
+    getDeletedProjects: (...args: unknown[]) => mockGetDeletedProjects(...args),
   },
 }));
 
@@ -91,6 +154,7 @@ describe('Dashboard (/dashboard)', () => {
     mockCreateProject.mockResolvedValue({ id: 'new-project-id' });
     mockDeleteProject.mockResolvedValue({ success: true });
     mockLogout.mockResolvedValue({});
+    mockGetDeletedProjects.mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -98,54 +162,54 @@ describe('Dashboard (/dashboard)', () => {
   });
 
   it('renders page', () => {
-    const { container } = render(<Dashboard />);
+    const { container } = renderWithQueryClient(<Dashboard />);
     expect(container).toBeInTheDocument();
   });
 
   it('displays projects', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('Project 1')).toBeInTheDocument();
     });
   });
 
   it('displays project count in stats', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('项目总数')).toBeInTheDocument();
     });
   });
 
   it('displays section title', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('项目列表')).toBeInTheDocument();
     });
   });
 
   it('displays create project button', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getAllByText('创建新项目').length).toBeGreaterThan(0);
     });
   });
 
   it('displays project name', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('Project 1')).toBeInTheDocument();
     });
   });
 
   it('displays project description', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('Description 1')).toBeInTheDocument();
     });
   });
 
   it('displays project status badge', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('活跃')).toBeInTheDocument();
     });
@@ -153,7 +217,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test logout functionality
   it('handles logout click', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('登出')).toBeInTheDocument();
     });
@@ -167,7 +231,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test navigation links
   it('displays navigation items', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('项目')).toBeInTheDocument();
     });
@@ -175,7 +239,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test page title
   it('displays page title', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('我的项目')).toBeInTheDocument();
     });
@@ -183,7 +247,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test page subtitle
   it('displays page subtitle', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('管理你的 AI 应用项目')).toBeInTheDocument();
     });
@@ -191,7 +255,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test sidebar logo
   it('displays sidebar logo', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('VibeX')).toBeInTheDocument();
     });
@@ -199,7 +263,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test stats cards
   it('displays all stat cards', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('项目总数')).toBeInTheDocument();
       expect(screen.getByText('活跃项目')).toBeInTheDocument();
@@ -225,7 +289,7 @@ describe('Dashboard (/dashboard)', () => {
       },
     ]);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('Project 1')).toBeInTheDocument();
       expect(screen.getByText('Project 2')).toBeInTheDocument();
@@ -236,7 +300,7 @@ describe('Dashboard (/dashboard)', () => {
   it('handles create project error', async () => {
     mockCreateProject.mockRejectedValue(new Error('创建失败'));
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getAllByText('创建新项目').length).toBeGreaterThan(0);
     });
@@ -249,7 +313,7 @@ describe('Dashboard (/dashboard)', () => {
   it('handles getProjects error', async () => {
     mockGetProjects.mockRejectedValue(new Error('加载失败'));
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     // Should render without crashing
     const container = document.querySelector('div');
     expect(container).toBeInTheDocument();
@@ -257,7 +321,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test project card actions (edit button exists)
   it('has edit button on project card', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       const editButtons = document.querySelectorAll('button[title="编辑"]');
       expect(editButtons.length).toBeGreaterThan(0);
@@ -266,7 +330,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test project card actions (more button exists)
   it('has more button on project card', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       const moreButtons = document.querySelectorAll('button[title="更多"]');
       expect(moreButtons.length).toBeGreaterThan(0);
@@ -275,7 +339,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test create project card click
   it('has clickable new project card', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       // New project card exists
       const cards = screen.getAllByText('创建新项目');
@@ -285,7 +349,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test delete functionality exists
   it('has delete option in more menu', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       const moreButtons = document.querySelectorAll('button[title="更多"]');
       expect(moreButtons.length).toBeGreaterThan(0);
@@ -300,7 +364,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test trash button
   it('has trash button', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       const trashButton = document.querySelector(
         'button[class*="trashButton"]'
@@ -312,7 +376,7 @@ describe('Dashboard (/dashboard)', () => {
   // Test empty projects state
   it('handles empty projects list', async () => {
     mockGetProjects.mockResolvedValue([]);
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
 
     await waitFor(() => {
       // Use getAllByText since there are two elements with "创建新项目" (header button and new project card)
@@ -323,7 +387,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test navigation to project settings
   it('has project settings link', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('设置')).toBeInTheDocument();
     });
@@ -331,7 +395,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test AI prototype design link
   it('has AI prototype design link', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('AI 原型设计')).toBeInTheDocument();
     });
@@ -339,7 +403,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test domain model link
   it('has domain model link', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('领域模型')).toBeInTheDocument();
     });
@@ -347,7 +411,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test prototype preview link
   it('has prototype preview link', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('原型预览')).toBeInTheDocument();
     });
@@ -355,7 +419,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test templates link
   it('has templates link', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('模板')).toBeInTheDocument();
     });
@@ -363,7 +427,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test export link
   it('has export link', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('导出')).toBeInTheDocument();
     });
@@ -371,7 +435,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test project card click navigation
   it('project cards are clickable links', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       const projectLinks = document.querySelectorAll('a[href^="/project?id="]');
       expect(projectLinks.length).toBeGreaterThan(0);
@@ -381,7 +445,7 @@ describe('Dashboard (/dashboard)', () => {
   // Test error display
   it('displays error message on API failure', async () => {
     mockGetProjects.mockRejectedValue(new Error('加载项目失败'));
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
 
     await waitFor(() => {
       const container = document.querySelector('div');
@@ -391,7 +455,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test loading state
   it('shows loading state initially', () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     // Should render without crashing
     expect(document.querySelector('div')).toBeInTheDocument();
   });
@@ -403,7 +467,7 @@ describe('Dashboard (/dashboard)', () => {
       { id: '2', name: 'Project 2', description: 'Description 2' },
     ]);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('项目总数')).toBeInTheDocument();
     });
@@ -411,7 +475,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test export button on project card
   it('has export button on project card', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       const exportButtons = document.querySelectorAll('button[title="导出"]');
       expect(exportButtons.length).toBeGreaterThan(0);
@@ -420,7 +484,7 @@ describe('Dashboard (/dashboard)', () => {
 
   // Test delete button on project card
   it('has delete button on project card', async () => {
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       const deleteButtons = document.querySelectorAll('button[title="删除"]');
       expect(deleteButtons.length).toBeGreaterThan(0);
@@ -433,7 +497,7 @@ describe('Dashboard (/dashboard)', () => {
       { id: '1', name: 'Project 1', description: null },
     ]);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('暂无描述')).toBeInTheDocument();
     });
@@ -446,7 +510,7 @@ describe('Dashboard (/dashboard)', () => {
       { id: '1', name: 'Project 1', updatedAt: testDate },
     ]);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText(/更新于/)).toBeInTheDocument();
     });
@@ -458,7 +522,7 @@ describe('Dashboard (/dashboard)', () => {
       { id: '1', name: 'Project 1', updatedAt: null },
     ]);
 
-    render(<Dashboard />);
+    renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
       expect(screen.getByText('Project 1')).toBeInTheDocument();
     });

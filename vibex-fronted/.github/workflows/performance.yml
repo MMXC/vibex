@@ -1,0 +1,106 @@
+name: Performance Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lighthouse:
+    name: Lighthouse Performance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Run Lighthouse CI
+        run: npx lhci autorun --config ./lighthouserc.json
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+        id: lighthouse
+
+      - name: Upload Lighthouse reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/
+          retention-days: 30
+
+      - name: Add PR comment with results
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request' && always()
+        with:
+          script: |
+            const fs = require('fs');
+            const path = '.lighthouseci/lhr-*.json';
+            const files = require('glob').sync(path);
+            
+            if (files.length > 0) {
+              const latestReport = files.sort().pop();
+              const report = JSON.parse(fs.readFileSync(latestReport, 'utf8'));
+              
+              // Extract summary
+              const summary = report.lhci?.assertionResults || [];
+              const failed = summary.filter(a => a.actualValue && a.expectedValue && a.actualValue < a.expectedValue);
+              
+              const status = failed.length > 0 ? '⚠️ Performance Below Threshold' : '✅ Performance OK';
+              
+              const comment = `## 🚀 Lighthouse Performance Results
+
+**Status:** ${status}
+
+| Metric | Value | Threshold | Status |
+|--------|-------|-----------|--------|
+${summary.slice(0, 5).map(a => {
+  const value = a.actualValue || 'N/A';
+  const expected = a.expectedValue || 'N/A';
+  const pass = value === 'N/A' || parseFloat(value) >= parseFloat(expected);
+  return `| ${a.name || 'metric'} | ${value} | ${expected} | ${pass ? '✅' : '❌'} |`;
+}).join('\n')}
+
+${failed.length > 0 ? `⚠️ **${failed.length} performance metric(s) below threshold**` : '✅ All performance metrics passed'}`;
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
+
+      - name: Send Slack notification on failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          fields: repo,message,commit,author,action
+          author_name: Lighthouse CI
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_TITLE: "⚠️ Performance Test Failed"
+          SLACK_MESSAGE: "Performance tests failed for ${{ github.repository }} - ${{ github.ref }}"

@@ -24,6 +24,8 @@ export interface ConfirmationSnapshot {
   businessFlow: BusinessFlow;
   flowMermaidCode: string;
   timestamp: number;
+  /** Version note/description */
+  note?: string;
 }
 
 export interface BoundedContext {
@@ -133,6 +135,12 @@ export interface ConfirmationFlowState {
   redo: () => void;
   canUndo: () => boolean;
   canRedo: () => boolean;
+  jumpToSnapshot: (index: number) => void;
+  clearHistory: () => void;
+  /** Update note for a specific snapshot */
+  setSnapshotNote: (index: number, note: string) => void;
+  /** Get note for a specific snapshot */
+  getSnapshotNote: (index: number) => string | undefined;
 
   reset: () => void;
 }
@@ -242,8 +250,8 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
         const newHistory = state.history.slice(0, state.historyIndex + 1);
         newHistory.push(snapshot);
 
-        // Keep only last 50 snapshots
-        if (newHistory.length > 50) {
+        // Keep only last 20 snapshots (PRD requirement)
+        if (newHistory.length > 20) {
           newHistory.shift();
         }
 
@@ -303,6 +311,50 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
       canRedo: () => {
         const { history, historyIndex } = get();
         return historyIndex < history.length - 1;
+      },
+
+      // Jump to a specific snapshot index
+      jumpToSnapshot: (index: number) => {
+        const { history, currentStep, requirementText, boundedContexts, selectedContextIds, contextMermaidCode, domainModels, modelMermaidCode, businessFlow, flowMermaidCode, createdProjectId } = get();
+        
+        if (index < 0 || index >= history.length) return;
+        
+        const snapshot = history[index];
+        
+        set({
+          currentStep: snapshot.step,
+          requirementText: snapshot.requirementText,
+          boundedContexts: snapshot.boundedContexts,
+          selectedContextIds: snapshot.selectedContextIds,
+          contextMermaidCode: snapshot.contextMermaidCode,
+          domainModels: snapshot.domainModels,
+          modelMermaidCode: snapshot.modelMermaidCode,
+          businessFlow: snapshot.businessFlow,
+          flowMermaidCode: snapshot.flowMermaidCode,
+          historyIndex: index,
+        });
+      },
+
+      // Clear all history
+      clearHistory: () => {
+        set({ history: [], historyIndex: -1 });
+      },
+
+      // Update note for a specific snapshot
+      setSnapshotNote: (index: number, note: string) => {
+        const { history } = get();
+        if (index < 0 || index >= history.length) return;
+        
+        const newHistory = [...history];
+        newHistory[index] = { ...newHistory[index], note };
+        set({ history: newHistory });
+      },
+
+      // Get note for a specific snapshot
+      getSnapshotNote: (index: number) => {
+        const { history } = get();
+        if (index < 0 || index >= history.length) return undefined;
+        return history[index].note;
       },
 
       reset: () => set(initialState),

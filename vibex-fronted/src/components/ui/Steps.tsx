@@ -122,3 +122,5 @@ export function SimpleSteps({
     />
   );
 }
+
+export default Steps;

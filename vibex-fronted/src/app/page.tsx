@@ -128,6 +128,7 @@ export default function HomePage() {
       <LoginDrawer
         isOpen={isLoginDrawerOpen}
         onClose={() => setIsLoginDrawerOpen(false)}
+        onSuccess={() => window.location.reload()}
       />
 
       {/* 背景特效 */}
@@ -155,6 +156,34 @@ export default function HomePage() {
           </Link>
         </div>
       </nav>
+
+      {/* 顶部产品功能说明 */}
+      <header className={styles.hero}>
+        <div className={styles.heroContent}>
+          <div className={styles.badge}>
+            <span className={styles.badgeDot} />
+            AI 驱动的应用构建平台
+          </div>
+          <h1 className={styles.title}>
+            用 AI 轻松构建
+            <br />
+            <span className={styles.titleGradient}>你的 Web 应用</span>
+          </h1>
+          <p className={styles.subtitle}>
+            VibeX 是一个 AI 驱动的应用构建平台，通过自然语言描述即可生成完整的
+            Web 应用界面和功能。
+          </p>
+          <div className={styles.heroCta}>
+            <Link href="/auth" className={styles.primaryButton}>
+              <span>免费开始</span>
+              <span className={styles.buttonGlow} />
+            </Link>
+            <Link href="/preview" className={styles.secondaryButton}>
+              查看演示
+            </Link>
+          </div>
+        </div>
+      </header>
 
       {/* 三栏布局 */}
       <div className={styles.mainContainer}>

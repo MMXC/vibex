@@ -7,6 +7,8 @@ import { motion } from 'framer-motion';
 import LoginDrawer from '@/components/ui/LoginDrawer';
 import { ParticleBackground } from '@/components/particles/ParticleBackground';
 import { MermaidPreview } from '@/components/ui/MermaidPreview';
+import { ThinkingPanel } from '@/components/ui/ThinkingPanel';
+import { useDDDStream } from '@/hooks/useDDDStream';
 import { dddApi, projectApi } from '@/services/api';
 import styles from './homepage.module.css';
 
@@ -193,6 +195,27 @@ export default function HomePage() {
   const [flowMermaidCode, setFlowMermaidCode] = useState('');
   const [generationError, setGenerationError] = useState('');
 
+  // F2: useDDDStream Hook for AI thinking process visualization
+  const {
+    thinkingMessages,
+    contexts: streamContexts,
+    mermaidCode: streamMermaidCode,
+    status: streamStatus,
+    errorMessage: streamError,
+    generateContexts,
+    abort,
+    reset,
+  } = useDDDStream();
+
+  // F2.2: 同步 SSE 流结果到本地状态
+  useEffect(() => {
+    if (streamStatus === 'done' && streamContexts.length > 0) {
+      setBoundedContexts(streamContexts);
+      setContextMermaidCode(streamMermaidCode);
+      setCurrentStep(2);
+    }
+  }, [streamStatus, streamContexts, streamMermaidCode]);
+
   // 实时生成预览 Mermaid 代码
   const mermaidCode = useMemo(() => generatePreviewMermaid(requirementText), [requirementText]);
 
@@ -200,7 +223,23 @@ export default function HomePage() {
     setRequirementText(desc);
   };
 
-  const handleGenerate = async () => {
+  // F2.1: 使用 SSE 流式生成（优先）
+  const handleGenerate = () => {
+    if (!isAuthenticated) {
+      setIsLoginDrawerOpen(true);
+      return;
+    }
+
+    if (!requirementText.trim()) {
+      return;
+    }
+
+    // 触发 SSE 流式生成
+    generateContexts(requirementText);
+  };
+
+  // Fallback: 传统 API（当 SSE 失败时使用）
+  const handleGenerateLegacy = async () => {
     if (!isAuthenticated) {
       setIsLoginDrawerOpen(true);
       return;
@@ -837,50 +876,66 @@ export default function HomePage() {
           </div>
         </main>
 
-        {/* 右侧：AI 助手 - 25% */}
+        {/* 右侧：AI 助手 / ThinkingPanel - 25% */}
         <aside className={styles.aiPanel}>
-          <div className={styles.aiHeader}>
-            <div className={styles.aiAvatar}>🤖</div>
-            <div>
-              <div className={styles.aiTitle}>AI 设计助手</div>
-              <div className={styles.aiSubtitle}>随时为你解答</div>
-            </div>
-          </div>
-
-          <div className={styles.aiMessages}>
-            {messages.map((msg, idx) => (
-              <div key={idx} className={`${styles.aiMessage} ${styles[msg.role]}`}>
-                {msg.content}
-              </div>
-            ))}
-          </div>
-
-          {/* 快捷回复 */}
-          <div className={styles.quickReplies}>
-            {QUICK_REPLIES.map((reply, idx) => (
-              <button
-                key={idx}
-                className={styles.quickReplyButton}
-                onClick={() => handleQuickReply(reply)}
-              >
-                {reply}
-              </button>
-            ))}
-          </div>
-
-          <div className={styles.aiInput}>
-            <input
-              type="text"
-              className={styles.aiInputField}
-              placeholder="有问题尽管问我..."
-              value={aiMessage}
-              onChange={(e) => setAiMessage(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAiSend()}
+          {/* F2: Show ThinkingPanel when stream is active */}
+          {streamStatus !== 'idle' ? (
+            <ThinkingPanel
+              thinkingMessages={thinkingMessages}
+              contexts={streamContexts}
+              mermaidCode={streamMermaidCode}
+              status={streamStatus}
+              errorMessage={streamError}
+              onAbort={abort}
+              onRetry={() => generateContexts(requirementText)}
+              onUseDefault={handleGenerate}
             />
-            <button className={styles.aiSendButton} onClick={handleAiSend}>
-              ➤
-            </button>
-          </div>
+          ) : (
+            <>
+              <div className={styles.aiHeader}>
+                <div className={styles.aiAvatar}>🤖</div>
+                <div>
+                  <div className={styles.aiTitle}>AI 设计助手</div>
+                  <div className={styles.aiSubtitle}>随时为你解答</div>
+                </div>
+              </div>
+
+              <div className={styles.aiMessages}>
+                {messages.map((msg, idx) => (
+                  <div key={idx} className={`${styles.aiMessage} ${styles[msg.role]}`}>
+                    {msg.content}
+                  </div>
+                ))}
+              </div>
+
+              {/* 快捷回复 */}
+              <div className={styles.quickReplies}>
+                {QUICK_REPLIES.map((reply, idx) => (
+                  <button
+                    key={idx}
+                    className={styles.quickReplyButton}
+                    onClick={() => handleQuickReply(reply)}
+                  >
+                    {reply}
+                  </button>
+                ))}
+              </div>
+
+              <div className={styles.aiInput}>
+                <input
+                  type="text"
+                  className={styles.aiInputField}
+                  placeholder="有问题尽管问我..."
+                  value={aiMessage}
+                  onChange={(e) => setAiMessage(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAiSend()}
+                />
+                <button className={styles.aiSendButton} onClick={handleAiSend}>
+                  ➤
+                </button>
+              </div>
+            </>
+          )}
         </aside>
       </div>
     </div>

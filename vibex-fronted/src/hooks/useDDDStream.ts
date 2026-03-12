@@ -98,7 +98,7 @@ export function useDDDStream(): UseDDDStreamReturn {
     
     // Get API base URL from environment variable with fallback
     const apiBaseURL = typeof window !== 'undefined' 
-      ? (process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vibex.top/api')
+      ? (process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vibex.top/api/v1')
       : '';
     const fullURL = apiBaseURL ? `${apiBaseURL}/ddd/bounded-context/stream` : '/api/ddd/bounded-context/stream';
     

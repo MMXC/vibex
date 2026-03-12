@@ -4,7 +4,7 @@
  */
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, devtools } from 'zustand/middleware';
 
 // ==================== Types ====================
 
@@ -76,8 +76,9 @@ const DEFAULT_PROJECT_NAV: NavItem[] = [
 // ==================== Store ====================
 
 export const useNavigationStore = create<NavigationState>()(
-  persist(
-    (set) => ({
+  devtools(
+    persist(
+      (set) => ({
       // Initial state
       globalNavItems: DEFAULT_GLOBAL_NAV,
       currentGlobalNav: 'projects',
@@ -120,6 +121,8 @@ export const useNavigationStore = create<NavigationState>()(
         currentProjectNav: state.currentProjectNav,
       }),
     }
+  ),
+  { name: 'NavigationStore' }
   )
 );
 

@@ -96,10 +96,16 @@ export function useDDDStream(): UseDDDStreamReturn {
     // Create AbortController for fetch
     abortControllerRef.current = new AbortController()
     
+    // Get API base URL from environment variable with fallback
+    const apiBaseURL = typeof window !== 'undefined' 
+      ? (process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vibex.top/api')
+      : '';
+    const fullURL = apiBaseURL ? `${apiBaseURL}/ddd/bounded-context/stream` : '/api/ddd/bounded-context/stream';
+    
     // Use fetch with ReadableStream for SSE
     const fetchSSE = async () => {
       try {
-        const response = await fetch('/api/ddd/bounded-context/stream', {
+        const response = await fetch(fullURL, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

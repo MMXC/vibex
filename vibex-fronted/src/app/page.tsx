@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import LoginDrawer from '@/components/ui/LoginDrawer';
+import { ParticleBackground } from '@/components/particles/ParticleBackground';
 import styles from './homepage.module.css';
 
 // 五步流程
@@ -130,6 +131,9 @@ export default function HomePage() {
         onClose={() => setIsLoginDrawerOpen(false)}
         onSuccess={() => window.location.reload()}
       />
+
+      {/* 背景粒子特效 - galaxy preset */}
+      <ParticleBackground preset="galaxy" enabled={true} className={styles.particles} />
 
       {/* 背景特效 */}
       <div className={styles.bgEffect}>

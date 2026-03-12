@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '../confirm.module.css';
 import { useConfirmationStore } from '@/stores/confirmationStore';
+import { CelebrationEffect } from '@/components/effects/CelebrationEffect';
 
 export default function SuccessPage() {
   const router = useRouter();
@@ -44,6 +45,9 @@ export default function SuccessPage() {
 
   return (
     <div className={styles.container}>
+      {/* Celebration effect on success */}
+      <CelebrationEffect type="confetti" />
+      
       <div className={styles.card}>
         <div className={styles.successIcon}>✓</div>
         <h1 className={styles.title}>项目创建成功！</h1>

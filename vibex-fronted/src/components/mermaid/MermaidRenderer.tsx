@@ -4,12 +4,15 @@
  * 支持五步构建法的流程可视化
  * F1.1: useEffect 优化 - 依赖数组精确
  * F1.2: 缓存机制 - LRU 缓存
+ * F2.1: 预初始化 - 使用 MermaidInitializer 预加载
+ * F2.2: 初始化优化 - 检查预初始化状态
  */
 
 'use client';
 
 import { useEffect, useRef, useState, useMemo } from 'react';
 import mermaid from 'mermaid';
+import { getInitializedMermaid } from './MermaidInitializer';
 
 // ==================== F1.2: LRU Cache ====================
 

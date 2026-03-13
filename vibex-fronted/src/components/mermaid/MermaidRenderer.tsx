@@ -93,6 +93,10 @@ export function MermaidRenderer({ chart, title }: MermaidRendererProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [svg, setSvg] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // F3.1: 用于取消异步渲染
+  const cancelledRef = useRef(false);
   
   // F1.1: 精确依赖数组
   const cacheKey = useCacheKey(chart);
@@ -100,7 +104,31 @@ export function MermaidRenderer({ chart, title }: MermaidRendererProps) {
   // F1.2: 缓存检查
   const cachedSvg = mermaidCache.get(cacheKey);
 
+  // F3.2: 使用 requestIdleCallback 进行非阻塞渲染
+  const scheduleRender = useCallback((renderFn: () => Promise<void>) => {
+    // F3.2: 检查是否支持 requestIdleCallback
+    if (typeof requestIdleCallback !== 'undefined') {
+      const idleId = requestIdleCallback(() => {
+        if (!cancelledRef.current) {
+          renderFn();
+        }
+      }, { timeout: 100 });
+      return () => cancelIdleCallback(idleId);
+    } else {
+      // Fallback: 使用 setTimeout
+      const timeoutId = setTimeout(() => {
+        if (!cancelledRef.current) {
+          renderFn();
+        }
+      }, 0);
+      return () => clearTimeout(timeoutId);
+    }
+  }, []);
+
   useEffect(() => {
+    // F3.1: 重置取消标志
+    cancelledRef.current = false;
+    
     // F2.2: 使用异步初始化
     initializeMermaid();
 
@@ -116,9 +144,15 @@ export function MermaidRenderer({ chart, title }: MermaidRendererProps) {
         return;
       }
 
+      // F3.2: 显示加载状态
+      setIsLoading(true);
+      
       try {
         const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
         const { svg } = await mermaid.render(id, chart);
+        
+        // F3.1: 检查是否已取消
+        if (cancelledRef.current) return;
         
         // F1.2: 存入缓存
         mermaidCache.set(cacheKey, svg);
@@ -126,15 +160,29 @@ export function MermaidRenderer({ chart, title }: MermaidRendererProps) {
         setSvg(svg);
         setError('');
       } catch (err) {
+        // F3.1: 检查是否已取消
+        if (cancelledRef.current) return;
+        
         console.error('Mermaid render error:', err);
         setError('图表渲染失败');
         setSvg('');
+      } finally {
+        if (!cancelledRef.current) {
+          setIsLoading(false);
+        }
       }
     };
 
-    renderChart();
+    // F3.2: 非阻塞调度渲染
+    const cleanup = scheduleRender(renderChart);
+    
+    // F3.1: 清理函数 - 取消异步渲染
+    return () => {
+      cancelledRef.current = true;
+      cleanup?.();
+    };
     // F1.1: 精确依赖 - 只在 chart 变化时重新渲染
-  }, [chart, cacheKey, cachedSvg]);
+  }, [chart, cacheKey, cachedSvg, scheduleRender]);
 
   if (!chart.trim()) {
     return null;
@@ -159,9 +207,25 @@ export function MermaidRenderer({ chart, title }: MermaidRendererProps) {
           borderRadius: '8px',
           padding: '16px',
           overflow: 'auto',
+          minHeight: isLoading ? '100px' : undefined,
         }}
-        dangerouslySetInnerHTML={{ __html: svg }}
-      />
+      >
+        {/* F3.2: 加载状态指示 */}
+        {isLoading && (
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            color: 'rgba(255,255,255,0.6)',
+            fontSize: '14px',
+          }}>
+            渲染中...
+          </div>
+        )}
+        {!isLoading && svg && (
+          <div dangerouslySetInnerHTML={{ __html: svg }} />
+        )}
+      </div>
       {error && (
         <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '8px' }}>
           {error}

@@ -13,6 +13,8 @@ import {
 } from '@/services/api/diagnosis'
 
 export interface UseDiagnosisState {
+  // Original requirement text
+  originalText: string
   // Diagnosis state
   diagnosis: DiagnosisResult | null
   isAnalyzing: boolean
@@ -35,6 +37,7 @@ export interface UseDiagnosisActions {
 
 export function useDiagnosis(): UseDiagnosisState & UseDiagnosisActions {
   const [state, setState] = useState<UseDiagnosisState>({
+    originalText: '',
     diagnosis: null,
     isAnalyzing: false,
     analysisError: null,
@@ -47,6 +50,7 @@ export function useDiagnosis(): UseDiagnosisState & UseDiagnosisActions {
   const diagnose = useCallback(async (text: string, enableCache = true) => {
     setState(prev => ({
       ...prev,
+      originalText: text, // Store original text
       isAnalyzing: true,
       analysisError: null,
       diagnosis: null,
@@ -71,7 +75,7 @@ export function useDiagnosis(): UseDiagnosisState & UseDiagnosisActions {
   }, [])
 
   const optimize = useCallback(async () => {
-    if (!state.diagnosis) return
+    if (!state.diagnosis || !state.originalText) return
 
     setState(prev => ({
       ...prev,
@@ -80,10 +84,9 @@ export function useDiagnosis(): UseDiagnosisState & UseDiagnosisActions {
     }))
 
     try {
-      // This would need the original requirement text
-      // For now, we'll use a placeholder
+      // FIX: Pass original text instead of empty string
       const { optimizedText, diff } = await optimizeRequirement(
-        '', // Would pass original text
+        state.originalText,
         state.diagnosis
       )
       setState(prev => ({
@@ -99,16 +102,16 @@ export function useDiagnosis(): UseDiagnosisState & UseDiagnosisActions {
         optimizeError: error instanceof Error ? error.message : 'Optimization failed',
       }))
     }
-  }, [state.diagnosis])
+  }, [state.diagnosis, state.originalText])
 
   const applyOptimization = useCallback(() => {
-    // This would be handled by the component
+    // Apply optimization by updating the diagnosis with optimized text
     setState(prev => ({
       ...prev,
-      diagnosis: prev.diagnosis ? {
+      diagnosis: prev.diagnosis && prev.optimizedText ? {
         ...prev.diagnosis,
-        // Update the requirement text in the diagnosis
-      } : null,
+        requirementText: prev.optimizedText, // Update to optimized text
+      } : prev.diagnosis,
       optimizedText: null,
       diff: null,
     }))
@@ -124,6 +127,7 @@ export function useDiagnosis(): UseDiagnosisState & UseDiagnosisActions {
 
   const reset = useCallback(() => {
     setState({
+      originalText: '',
       diagnosis: null,
       isAnalyzing: false,
       analysisError: null,

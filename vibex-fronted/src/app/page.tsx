@@ -8,6 +8,7 @@ import LoginDrawer from '@/components/ui/LoginDrawer';
 import { ParticleBackground } from '@/components/particles/ParticleBackground';
 import { MermaidPreview } from '@/components/ui/MermaidPreview';
 import { ThinkingPanel } from '@/components/ui/ThinkingPanel';
+import DiagnosisPanel from '@/components/diagnosis/DiagnosisPanel';
 import { useDDDStream } from '@/hooks/useDDDStream';
 import { dddApi, projectApi } from '@/services/api';
 import styles from './homepage.module.css';
@@ -634,6 +635,17 @@ export default function HomePage() {
                     <button className={styles.secondaryButton}>
                       📋 使用模板
                     </button>
+                  </div>
+
+                  {/* 智能诊断功能 - F1.3 诊断 UI 集成 */}
+                  <div className={styles.diagnosisSection}>
+                    <DiagnosisPanel 
+                      onAnalyze={(text) => console.log('Diagnosed:', text)}
+                      onOptimize={(text) => {
+                        setRequirementText(text);
+                        console.log('Optimized and applied:', text);
+                      }}
+                    />
                   </div>
                 </div>
               </>

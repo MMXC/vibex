@@ -438,6 +438,14 @@
   display: flex;
   gap: 12px;
   justify-content: center;
+  margin-bottom: 2rem;
+}
+
+/* 智能诊断区域 */
+.diagnosisSection {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .primaryButton {

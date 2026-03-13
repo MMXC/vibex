@@ -174,14 +174,14 @@ export function useDDDStream(): UseDDDStreamReturn {
             }
           }
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         // Ignore abort errors
-        if (error.name === 'AbortError') {
+        if (error instanceof Error && error.name === 'AbortError') {
           return
         }
         
         console.error('SSE fetch error:', error)
-        setErrorMessage(error.message || 'Failed to connect')
+        setErrorMessage(error instanceof Error ? error.message : 'Failed to connect')
         setStatus('error')
       }
     }
@@ -237,7 +237,7 @@ export interface UseDomainModelStreamReturn {
   errorMessage: string | null
   
   // Actions
-  generateDomainModels: (requirementText: string, boundedContexts?: any[]) => void
+  generateDomainModels: (requirementText: string, boundedContexts?: BoundedContext[]) => void
   abort: () => void
   reset: () => void
 }
@@ -281,7 +281,7 @@ export function useDomainModelStream(): UseDomainModelStreamReturn {
   }, [cleanup])
   
   // Main function to generate domain models via SSE
-  const generateDomainModels = useCallback((requirementText: string, boundedContexts?: any[]) => {
+  const generateDomainModels = useCallback((requirementText: string, boundedContexts?: BoundedContext[]) => {
     // Reset state
     setThinkingMessages([])
     setDomainModels([])
@@ -366,14 +366,14 @@ export function useDomainModelStream(): UseDomainModelStreamReturn {
             }
           }
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         // Ignore abort errors
-        if (error.name === 'AbortError') {
+        if (error instanceof Error && error.name === 'AbortError') {
           return
         }
         
         console.error('SSE fetch error:', error)
-        setErrorMessage(error.message || 'Failed to connect')
+        setErrorMessage(error instanceof Error ? error.message : 'Failed to connect')
         setStatus('error')
       }
     }
@@ -529,10 +529,10 @@ export function useBusinessFlowStream(): UseBusinessFlowStreamReturn {
             }
           }
         }
-      } catch (error: any) {
-        if (error.name !== 'AbortError') {
+      } catch (error: unknown) {
+        if (!(error instanceof Error && error.name !== 'AbortError')) {
           console.error('SSE fetch error:', error)
-          setErrorMessage(error.message || 'Failed to connect')
+          setErrorMessage(error instanceof Error ? error.message : 'Failed to connect')
           setStatus('error')
         }
       }

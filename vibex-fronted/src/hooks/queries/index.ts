@@ -18,3 +18,6 @@ export * from './useFlows';
 
 // Domain Entity hooks
 export * from './useEntities';
+
+// DDD Analysis hooks
+export * from './useDDD';

@@ -121,6 +121,23 @@ export const queryKeys = {
     byProject: (projectId: string) => [...queryKeys.flows.all, projectId] as const,
     detail: (id: string) => [...queryKeys.flows.all, id] as const,
   },
+  // DDD Analysis
+  ddd: {
+    contexts: (requirement: string) => ['ddd', 'contexts', requirement] as const,
+    domainModels: (...contextIds: string[]) => ['ddd', 'domainModels', ...contextIds] as const,
+    businessFlow: (...modelIds: string[]) => ['ddd', 'businessFlow', ...modelIds] as const,
+  },
+  // User Preferences
+  preferences: {
+    all: ['preferences'] as const,
+    byUser: (userId: string) => ['preferences', userId] as const,
+  },
+  // Notifications
+  notifications: {
+    all: ['notifications'] as const,
+    unread: () => ['notifications', 'unread'] as const,
+    byUser: (userId: string) => ['notifications', 'user', userId] as const,
+  },
 };
 
 export default QueryProvider;

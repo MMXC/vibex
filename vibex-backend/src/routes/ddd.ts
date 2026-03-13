@@ -651,9 +651,9 @@ function generateMermaidCode(contexts: BoundedContext[]): string {
       const targetCtx = contexts.find(c => c.id === rel.toContextId)
       if (targetCtx) {
         const edgeStyle = rel.type === 'upstream' ? '-->' : rel.type === 'symmetric' ? '<-->' : '-->'
-        // Quote the label to handle spaces and special characters
-        const label = rel.description ? ` : "${rel.description}"` : ''
-        lines.push(`  ${ctx.id} ${edgeStyle} ${targetCtx.id}${label}`)
+        // Use -->|"label"| syntax for edge labels (handles special characters)
+        const label = rel.description ? `|"${rel.description}"|` : ''
+        lines.push(`  ${ctx.id} ${edgeStyle}${label} ${targetCtx.id}`)
       }
     })
   })

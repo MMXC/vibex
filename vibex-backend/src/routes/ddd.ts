@@ -397,6 +397,146 @@ Respond ONLY with the JSON object, no other text.`
   }
 })
 
+// Schema for domain-model stream request
+const DomainModelStreamRequestSchema = z.object({
+  requirementText: z.string().min(1),
+  boundedContexts: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    description: z.string(),
+    type: z.enum(['core', 'supporting', 'generic', 'external']),
+  })).optional(),
+  projectId: z.string().optional(),
+})
+
+// POST /api/ddd/domain-model/stream - SSE streaming version
+ddd.post('/domain-model/stream', async (c) => {
+  try {
+    const env = c.env
+    const body = await c.req.json()
+    const { requirementText, boundedContexts } = DomainModelStreamRequestSchema.parse(body)
+
+    // Create AI service
+    const aiService = createAIService(env)
+    
+    // Build the stream
+    const stream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder()
+        
+        const send = (event: string, data: any) => {
+          const chunk = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`
+          controller.enqueue(encoder.encode(chunk))
+        }
+        
+        try {
+          // Step 1: 分析上下文
+          send('thinking', { step: 'analyzing', message: '正在分析限界上下文...' })
+          await new Promise(r => setTimeout(r, 150))
+          
+          // Step 2: 构建提示词
+          send('thinking', { step: 'building-prompt', message: '正在构建提示词...' })
+          await new Promise(r => setTimeout(r, 150))
+          
+          // Step 3: 调用 AI
+          send('thinking', { step: 'calling-ai', message: '正在调用 AI 生成领域模型...' })
+          
+          // Build context info
+          const contextInfo = boundedContexts 
+            ? boundedContexts.map(ctx => `- ${ctx.name}: ${ctx.description}`).join('\n')
+            : '从需求中自动识别'
+          
+          const prompt = `You are a Domain-Driven Design expert with 15 years of experience in tactical modeling and entity design.
+
+Analyze the following requirement and bounded contexts to generate domain models.
+
+**Requirement:**
+${requirementText}
+
+**Bounded Contexts:**
+${contextInfo}
+
+**IMPORTANT: All output must be in Chinese (Simplified).**
+
+**Output Requirements (in Chinese):**
+{
+  "domainModels": [
+    {
+      "name": "用户",
+      "contextId": "用户管理",
+      "type": "aggregate_root",
+      "properties": [
+        {"name": "id", "type": "string", "required": true, "description": "用户唯一标识"}
+      ],
+      "methods": ["register", "login"]
+    }
+  ]
+}
+
+Respond ONLY with the JSON object.`
+
+          // Call AI
+          const result = await aiService.generateJSON<{ domainModels: any[] }>(
+            prompt,
+            { systemPrompt: 'You are a DDD expert. Output only valid JSON.' }
+          )
+          
+          if (!result.success || !result.data?.domainModels) {
+            throw new Error(result.error || 'Failed to generate domain models')
+          }
+          
+          // Step 4: 解析结果
+          send('thinking', { step: 'parsing', message: '正在解析结果...' })
+          await new Promise(r => setTimeout(r, 100))
+          
+          // Transform to domain models
+          const domainModels = result.data.domainModels.map((item: any, index: number) => ({
+            id: `dm-${generateId()}-${index}`,
+            name: item.name || `DomainModel${index}`,
+            contextId: item.contextId || 'default',
+            type: item.type || 'entity',
+            properties: (item.properties || []).map((prop: any) => ({
+              name: prop.name,
+              type: prop.type,
+              required: prop.required ?? true,
+              description: prop.description || ''
+            })),
+            methods: item.methods || []
+          }))
+          
+          // Send done event
+          send('done', { 
+            domainModels,
+            message: '领域模型生成完成'
+          })
+          
+        } catch (error) {
+          console.error('Stream error:', error)
+          send('error', { 
+            message: error instanceof Error ? error.message : 'Unknown error' 
+          })
+        }
+        
+        controller.close()
+      }
+    })
+    
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      }
+    })
+  } catch (error) {
+    console.error('Error setting up stream:', error)
+    return c.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to setup stream'
+    }, 500)
+  }
+})
+
 // Schema for business flow generation request
 const BusinessFlowRequestSchema = z.object({
   domainModels: z.array(z.object({

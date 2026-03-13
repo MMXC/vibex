@@ -3,7 +3,7 @@
  */
 
 import { renderHook, act, waitFor } from '@testing-library/react'
-import useDiagnosis from '../index'
+import useDiagnosis from './index'
 
 // Mock the API calls
 jest.mock('@/services/api/diagnosis', () => ({

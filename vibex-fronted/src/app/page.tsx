@@ -9,7 +9,7 @@ import { ParticleBackground } from '@/components/particles/ParticleBackground';
 import { MermaidPreview } from '@/components/ui/MermaidPreview';
 import { ThinkingPanel } from '@/components/ui/ThinkingPanel';
 import DiagnosisPanel from '@/components/diagnosis/DiagnosisPanel';
-import { useDDDStream } from '@/hooks/useDDDStream';
+import { useDDDStream, useDomainModelStream } from '@/hooks/useDDDStream';
 import { dddApi, projectApi } from '@/services/api';
 import styles from './homepage.module.css';
 
@@ -204,9 +204,20 @@ export default function HomePage() {
     status: streamStatus,
     errorMessage: streamError,
     generateContexts,
-    abort,
-    reset,
+    abort: abortContexts,
+    reset: resetContexts,
   } = useDDDStream();
+
+  // F3: useDomainModelStream Hook for domain model generation
+  const {
+    thinkingMessages: modelThinkingMessages,
+    domainModels: streamDomainModels,
+    status: modelStreamStatus,
+    errorMessage: modelStreamError,
+    generateDomainModels,
+    abort: abortModels,
+    reset: resetModels,
+  } = useDomainModelStream();
 
   // F2.2: 同步 SSE 流结果到本地状态
   useEffect(() => {
@@ -216,6 +227,15 @@ export default function HomePage() {
       setCurrentStep(2);
     }
   }, [streamStatus, streamContexts, streamMermaidCode]);
+
+  // F3.2: 同步领域模型流结果到本地状态
+  useEffect(() => {
+    if (modelStreamStatus === 'done' && streamDomainModels.length > 0) {
+      setDomainModels(streamDomainModels as DomainModel[]);
+      setCurrentStep(3);
+      setActiveTab('preview');
+    }
+  }, [modelStreamStatus, streamDomainModels]);
 
   // 实时生成预览 Mermaid 代码
   const mermaidCode = useMemo(() => generatePreviewMermaid(requirementText), [requirementText]);
@@ -280,35 +300,12 @@ export default function HomePage() {
     }
   };
 
-  // 继续生成领域模型
-  const handleGenerateDomainModel = async () => {
+  // 继续生成领域模型 - 使用流式 API
+  const handleGenerateDomainModel = () => {
     if (boundedContexts.length === 0) return;
 
-    setIsGenerating(true);
-    setGenerationError('');
-
-    try {
-      const response = await dddApi.generateDomainModel(boundedContexts, requirementText);
-
-      if (response && response.success && response.domainModels) {
-        setDomainModels(response.domainModels as DomainModel[]);
-        
-        if (response.mermaidCode) {
-          setModelMermaidCode(response.mermaidCode);
-        }
-
-        // 切换到步骤3（领域模型）
-        setCurrentStep(3);
-        setActiveTab('preview');
-      } else {
-        throw new Error(response?.error || '生成失败');
-      }
-    } catch (err) {
-      console.error('生成领域模型失败:', err);
-      setGenerationError(err instanceof Error ? err.message : '生成失败，请重试');
-    } finally {
-      setIsGenerating(false);
-    }
+    // F3: 使用流式 API
+    generateDomainModels(requirementText, boundedContexts);
   };
 
   // 继续生成业务流程
@@ -890,16 +887,16 @@ export default function HomePage() {
 
         {/* 右侧：AI 助手 / ThinkingPanel - 25% */}
         <aside className={styles.aiPanel}>
-          {/* F2: Show ThinkingPanel when stream is active */}
-          {streamStatus !== 'idle' ? (
+          {/* F2/F3: Show ThinkingPanel when stream is active */}
+          {streamStatus !== 'idle' || modelStreamStatus !== 'idle' ? (
             <ThinkingPanel
-              thinkingMessages={thinkingMessages}
-              contexts={streamContexts}
-              mermaidCode={streamMermaidCode}
-              status={streamStatus}
-              errorMessage={streamError}
-              onAbort={abort}
-              onRetry={() => generateContexts(requirementText)}
+              thinkingMessages={currentStep === 2 ? thinkingMessages : modelThinkingMessages}
+              contexts={currentStep === 2 ? streamContexts : undefined}
+              mermaidCode={currentStep === 2 ? streamMermaidCode : undefined}
+              status={currentStep === 2 ? streamStatus : modelStreamStatus}
+              errorMessage={currentStep === 2 ? streamError : modelStreamError}
+              onAbort={currentStep === 2 ? abortModels : abortContexts}
+              onRetry={currentStep === 2 ? () => generateContexts(requirementText) : () => generateDomainModels(requirementText, boundedContexts)}
               onUseDefault={handleGenerate}
             />
           ) : (

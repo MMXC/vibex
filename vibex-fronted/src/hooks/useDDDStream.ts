@@ -402,4 +402,159 @@ export function useDomainModelStream(): UseDomainModelStreamReturn {
   }
 }
 
+// ==================== Business Flow Stream ====================
+
+export type BusinessFlowStreamStatus = 'idle' | 'thinking' | 'done' | 'error'
+
+export interface BusinessFlow {
+  id: string
+  name: string
+  states: Array<{
+    id: string
+    name: string
+    type: 'initial' | 'intermediate' | 'final'
+    description: string
+  }>
+  transitions: Array<{
+    id: string
+    fromStateId: string
+    toStateId: string
+    event: string
+    condition?: string
+  }>
+}
+
+export interface UseBusinessFlowStreamReturn {
+  thinkingMessages: ThinkingStep[]
+  businessFlow: BusinessFlow | null
+  mermaidCode: string
+  status: BusinessFlowStreamStatus
+  errorMessage: string | null
+  generateBusinessFlow: (domainModels: any[], requirementText?: string) => void
+  abort: () => void
+  reset: () => void
+}
+
+export function useBusinessFlowStream(): UseBusinessFlowStreamReturn {
+  const [thinkingMessages, setThinkingMessages] = useState<ThinkingStep[]>([])
+  const [businessFlow, setBusinessFlow] = useState<BusinessFlow | null>(null)
+  const [mermaidCode, setMermaidCode] = useState('')
+  const [status, setStatus] = useState<BusinessFlowStreamStatus>('idle')
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  
+  const abortControllerRef = useRef<AbortController | null>(null)
+  
+  const cleanup = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+      abortControllerRef.current = null
+    }
+  }, [])
+  
+  const reset = useCallback(() => {
+    cleanup()
+    setThinkingMessages([])
+    setBusinessFlow(null)
+    setMermaidCode('')
+    setStatus('idle')
+    setErrorMessage(null)
+  }, [cleanup])
+  
+  const abort = useCallback(() => {
+    cleanup()
+    setStatus('idle')
+    setThinkingMessages([])
+    setBusinessFlow(null)
+  }, [cleanup])
+  
+  const generateBusinessFlow = useCallback((domainModels: any[], requirementText?: string) => {
+    setThinkingMessages([])
+    setBusinessFlow(null)
+    setMermaidCode('')
+    setErrorMessage(null)
+    setStatus('thinking')
+    
+    abortControllerRef.current = new AbortController()
+    
+    const fullURL = getApiUrl('/ddd/business-flow/stream');
+    
+    const fetchSSE = async () => {
+      try {
+        const response = await fetch(fullURL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ domainModels, requirementText }),
+          signal: abortControllerRef.current?.signal,
+        })
+        
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
+        if (!response.body) throw new Error('Response body is null')
+        
+        const reader = response.body.getReader()
+        const decoder = new TextDecoder()
+        let buffer = ''
+        
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          
+          buffer += decoder.decode(value, { stream: true })
+          const lines = buffer.split('\n')
+          buffer = lines.pop() || ''
+          
+          for (const line of lines) {
+            if (line.startsWith('event: ')) {
+              const eventType = line.slice(7)
+              const dataLineIdx = lines.indexOf(line) + 1
+              if (dataLineIdx < lines.length && lines[dataLineIdx].startsWith('data: ')) {
+                const data = lines[dataLineIdx].slice(6)
+                try {
+                  const parsedData = JSON.parse(data)
+                  switch (eventType) {
+                    case 'thinking':
+                      setThinkingMessages(prev => [...prev, parsedData])
+                      break
+                    case 'done':
+                      setBusinessFlow(parsedData.businessFlow)
+                      setMermaidCode(parsedData.mermaidCode || '')
+                      setStatus('done')
+                      break
+                    case 'error':
+                      setErrorMessage(parsedData.message || 'Unknown error')
+                      setStatus('error')
+                      break
+                  }
+                } catch (e) {}
+              }
+            }
+          }
+        }
+      } catch (error: any) {
+        if (error.name !== 'AbortError') {
+          console.error('SSE fetch error:', error)
+          setErrorMessage(error.message || 'Failed to connect')
+          setStatus('error')
+        }
+      }
+    }
+    
+    fetchSSE()
+  }, [])
+  
+  useEffect(() => {
+    return () => { cleanup() }
+  }, [cleanup])
+  
+  return {
+    thinkingMessages,
+    businessFlow,
+    mermaidCode,
+    status,
+    errorMessage,
+    generateBusinessFlow,
+    abort,
+    reset,
+  }
+}
+
 export default useDDDStream

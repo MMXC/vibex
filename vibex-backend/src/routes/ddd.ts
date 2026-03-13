@@ -728,6 +728,87 @@ Respond ONLY with the JSON object, no other text.`
   }
 })
 
+// POST /api/ddd/business-flow/stream - SSE streaming version
+ddd.post('/business-flow/stream', async (c) => {
+  try {
+    const env = c.env
+    const body = await c.req.json()
+    const { domainModels, requirementText } = body
+
+    const aiService = createAIService(env)
+    
+    const stream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder()
+        
+        const send = (event: string, data: any) => {
+          const chunk = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`
+          controller.enqueue(encoder.encode(chunk))
+        }
+        
+        try {
+          send('thinking', { step: 'analyzing', message: '正在分析领域模型...' })
+          await new Promise(r => setTimeout(r, 150))
+          
+          send('thinking', { step: 'building', message: '正在构建业务流程...' })
+          await new Promise(r => setTimeout(r, 150))
+          
+          send('thinking', { step: 'calling-ai', message: '正在调用 AI...' })
+          
+          const modelInfo = domainModels 
+            ? domainModels.map(m => `- ${m.name} (${m.type})`).join('\n')
+            : '无领域模型'
+          
+          const prompt = `You are a Business Flow expert. Generate a business flow in Chinese.
+
+Domain Models:
+${modelInfo}
+
+Output:
+{
+  "businessFlow": {
+    "name": "业务流程",
+    "states": [{"id": "s1", "name": "开始", "type": "initial", "description": "开始"}],
+    "transitions": [{"id": "t1", "fromStateId": "s1", "toStateId": "s2", "event": "开始"}]
+  }
+}`
+
+          const result = await aiService.generateJSON<{ businessFlow: any }>(prompt)
+          
+          if (!result.success || !result.data?.businessFlow) {
+            throw new Error('Failed to generate business flow')
+          }
+          
+          send('thinking', { step: 'parsing', message: '正在解析结果...' })
+          await new Promise(r => setTimeout(r, 100))
+          
+          send('done', { 
+            businessFlow: result.data.businessFlow,
+            mermaidCode: generateFlowMermaidCode(result.data.businessFlow),
+            message: '业务流程生成完成'
+          })
+          
+        } catch (error) {
+          console.error('Stream error:', error)
+          send('error', { message: error instanceof Error ? error.message : 'Unknown error' })
+        }
+        
+        controller.close()
+      }
+    })
+    
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      }
+    })
+  } catch (error) {
+    return c.json({ success: false, error: 'Failed to setup stream' }, 500)
+  }
+})
+
 // Helper function to generate Mermaid code for domain models
 function generateDomainModelMermaidCode(domainModels: DomainModel[], contexts: BoundedContext[]): string {
   const lines = ['classDiagram']

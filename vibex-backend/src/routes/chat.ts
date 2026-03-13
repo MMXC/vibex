@@ -1,5 +1,7 @@
 import { Hono } from 'hono';
 import { CloudflareEnv } from '../lib/env';
+import { getSessionManager } from '../services/context';
+import { StructuredContext, CompressionConfig } from '../services/context/types';
 
 const chat = new Hono<{ Bindings: CloudflareEnv }>();
 
@@ -157,5 +159,137 @@ chat.post('/', async (c) => {
     return c.json({ error: errorMessage }, 500);
   }
 });
+
+interface ChatWithContextRequest {
+  message: string
+  sessionId?: string
+  structuredContext?: StructuredContext
+  config?: Partial<CompressionConfig>
+}
+
+// POST /api/chat/with-context - 带上下文的流式聊天
+chat.post('/with-context', async (c) => {
+  try {
+    const env = c.env
+    const apiKey = env.MINIMAX_API_KEY
+    const apiBase = env.MINIMAX_API_BASE || 'https://api.minimax.chat/v1'
+    const model = env.MINIMAX_MODEL || 'abab6.5s-chat'
+
+    if (!apiKey) {
+      return c.json({ error: 'MINIMAX_API_KEY is not configured' }, 500)
+    }
+
+    const body = await c.req.json() as ChatWithContextRequest
+    const { message, sessionId, structuredContext, config } = body
+
+    if (!message) {
+      return c.json({ error: 'Message is required' }, 400)
+    }
+
+    // 使用或创建会话
+    const sessionIdFinal = sessionId || `ctx_${Date.now()}`
+    const sessionManager = getSessionManager(config)
+    const session = sessionManager.getOrCreate(sessionIdFinal)
+
+    // 设置结构化上下文
+    if (structuredContext) {
+      sessionManager.setStructuredContext(sessionIdFinal, structuredContext)
+    }
+
+    // 添加用户消息并检查压缩
+    const compressionResult = await sessionManager.addMessage(sessionIdFinal, {
+      role: 'user',
+      content: message,
+    })
+
+    // 获取用于 LLM 的上下文
+    const contextMessages = sessionManager.getContextForLLM(sessionIdFinal)
+
+    // 构建发送给 AI 的消息
+    const llmMessages: ChatMessage[] = [
+      ...contextMessages,
+      { role: 'user', content: message },
+    ]
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder()
+
+        try {
+          // 发送会话 ID 和压缩信息
+          controller.enqueue(
+            encoder.encode(
+              `data: ${JSON.stringify({ 
+                sessionId: sessionIdFinal,
+                compressed: compressionResult?.success ?? false,
+                compressionRatio: compressionResult?.compressionRatio,
+                tokenCount: session.tokenCount
+              })}\n\n`
+            )
+          )
+
+          // 流式调用 AI
+          for await (const chunk of streamFromMiniMax(
+            apiKey, 
+            apiBase, 
+            model, 
+            llmMessages, 
+            sessionIdFinal
+          )) {
+            controller.enqueue(encoder.encode(chunk))
+          }
+
+          // 发送完成信息
+          controller.enqueue(
+            encoder.encode(
+              `data: ${JSON.stringify({ 
+                done: true,
+                summary: compressionResult?.summary,
+                originalTokens: compressionResult?.originalTokenCount,
+                newTokens: compressionResult?.newTokenCount
+              })}\n\n`
+            )
+          )
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({ error: errorMessage })}\n\n`)
+          )
+        } finally {
+          controller.close()
+        }
+      },
+    })
+
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+      },
+    })
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    return c.json({ error: errorMessage }, 500)
+  }
+})
+
+// GET /api/chat/with-context/stats/:sessionId - 获取会话统计
+chat.get('/with-context/stats/:sessionId', async (c) => {
+  const sessionId = c.req.param('sessionId')
+  const sessionManager = getSessionManager()
+  const stats = sessionManager.getStats(sessionId)
+  
+  return c.json(stats)
+})
+
+// DELETE /api/chat/with-context/session/:sessionId - 删除会话
+chat.delete('/with-context/session/:sessionId', async (c) => {
+  const sessionId = c.req.param('sessionId')
+  const sessionManager = getSessionManager()
+  const destroyed = sessionManager.destroy(sessionId)
+  
+  return c.json({ success: destroyed })
+})
 
 export default chat;

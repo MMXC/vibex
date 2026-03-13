@@ -483,6 +483,36 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* GitHub 导入选项 */
+.importOptions {
+  margin-top: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.importSummary {
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  transition: background-color 0.2s;
+  list-style: none;
+}
+
+.importSummary::-webkit-details-marker {
+  display: none;
+}
+
+.importSummary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.importContent {
+  margin-top: 8px;
+}
+
 .sampleLabel {
   display: block;
   font-size: 12px;

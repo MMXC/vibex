@@ -383,7 +383,9 @@ export class LLMProviderService {
       body.stop = options.stop;
     }
 
-    if (options.responseFormat === 'json_object') {
+    // Note: Minimax does not support response_format: json_object
+    // Only add for OpenAI-compatible providers
+    if (options.responseFormat === 'json_object' && provider.type !== 'minimax') {
       body.response_format = { type: 'json_object' };
     }
 

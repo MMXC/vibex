@@ -446,19 +446,65 @@ export class AIService {
   }
 
   /**
-   * Parse JSON from LLM response with error handling
+   * Parse JSON from LLM response with enhanced error handling
+   * F1.1: Extracts JSON from markdown code blocks
+   * F1.2: Logs raw response for debugging
    */
-  private parseJSON<T>(content: string): T | null {
+  private parseJSON<T>(content: string, logRawResponse: boolean = true): T | null {
+    // F1.2: Log raw response first 500 characters for debugging
+    if (logRawResponse && content) {
+      console.log('[AI Service] Raw AI response (first 500 chars):', content.substring(0, 500));
+    }
+
     try {
-      // Try to extract JSON from the response
+      // F1.1: Try to extract JSON from markdown code blocks first
+      // Handle ```json ... ``` or ``` ... ```
+      const codeBlockMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (codeBlockMatch) {
+        const jsonStr = codeBlockMatch[1].trim();
+        try {
+          return JSON.parse(jsonStr) as T;
+        } catch {
+          // Fall through to try other methods
+        }
+      }
+
+      // Try to extract JSON from the response (original logic)
       const jsonMatch = content.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
       if (!jsonMatch) {
+        console.log('[AI Service] No JSON pattern found in response');
         return null;
       }
       return JSON.parse(jsonMatch[0]) as T;
-    } catch {
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      console.log('[AI Service] JSON parse error:', errorMsg);
       return null;
     }
+  }
+
+  /**
+   * Parse JSON with fallback retry mechanism
+   * F1.3: Retries once on failure
+   */
+  private parseJSONWithRetry<T>(content: string, maxRetries: number = 1): T | null {
+    let lastError: string = 'Unknown error';
+    
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      if (attempt > 0) {
+        console.log(`[AI Service] JSON parse retry attempt ${attempt}/${maxRetries}`);
+      }
+      
+      const result = this.parseJSON<T>(content, attempt === 0); // Only log on first attempt
+      if (result !== null) {
+        return result;
+      }
+      
+      lastError = 'Parse returned null';
+    }
+    
+    console.log('[AI Service] All parse attempts failed:', lastError);
+    return null;
   }
 
   // ==================== Chat Operations ====================
@@ -556,7 +602,8 @@ export class AIService {
           responseFormat: 'json_object',
         });
 
-        const result = this.parseJSON<RequirementsAnalysisResult>(response.content);
+        // F1.3: Use retry mechanism for JSON parsing
+        const result = this.parseJSONWithRetry<RequirementsAnalysisResult>(response.content);
         
         if (!result) {
           throw new Error('Failed to parse requirements analysis result');
@@ -591,7 +638,8 @@ export class AIService {
           responseFormat: 'json_object',
         });
 
-        const result = this.parseJSON<{ questions: ClarificationQuestion[] }>(response.content);
+        // F1.3: Use retry mechanism for JSON parsing
+        const result = this.parseJSONWithRetry<{ questions: ClarificationQuestion[] }>(response.content);
         
         if (!result || !Array.isArray(result.questions)) {
           throw new Error('Failed to parse clarification questions');
@@ -631,7 +679,8 @@ export class AIService {
           responseFormat: 'json_object',
         });
 
-        const result = this.parseJSON<ExtractedEntity[]>(response.content);
+        // F1.3: Use retry mechanism for JSON parsing
+        const result = this.parseJSONWithRetry<ExtractedEntity[]>(response.content);
         
         if (!result) {
           throw new Error('Failed to parse extracted entities');
@@ -669,7 +718,8 @@ export class AIService {
           responseFormat: 'json_object',
         });
 
-        const result = this.parseJSON<ExtractedRelation[]>(response.content);
+        // F1.3: Use retry mechanism for JSON parsing
+        const result = this.parseJSONWithRetry<ExtractedRelation[]>(response.content);
         
         if (!result) {
           throw new Error('Failed to parse extracted relations');
@@ -713,7 +763,8 @@ export class AIService {
           responseFormat: 'json_object',
         });
 
-        const result = this.parseJSON<UIGenerationResult>(response.content);
+        // F1.3: Use retry mechanism for JSON parsing
+        const result = this.parseJSONWithRetry<UIGenerationResult>(response.content);
         
         if (!result) {
           throw new Error('Failed to parse UI generation result');
@@ -831,9 +882,11 @@ export class AIService {
     return this.executeWithFallback(
       'generateJSON',
       async () => {
+        // Build system prompt that explicitly requests JSON
+        // Note: Minimax doesn't support response_format: json_object, so we rely on prompt
         const systemPrompt = schema
-          ? `You are a JSON generator. Generate valid JSON matching the following schema:\n\n${JSON.stringify(schema, null, 2)}`
-          : 'You are a JSON generator. Generate valid JSON.';
+          ? `You are a JSON generator. Generate valid JSON matching the following schema:\n\n${JSON.stringify(schema, null, 2)}\n\nIMPORTANT: Return ONLY the JSON object, no other text or explanation.`
+          : 'You are a JSON generator. Generate valid JSON. Return ONLY the JSON object, no other text or explanation.';
 
         const response = await this.llmProvider.chat({
           messages: [
@@ -842,12 +895,16 @@ export class AIService {
           ],
           temperature: options?.temperature ?? 0.3,
           maxTokens: options?.maxTokens ?? this.config.maxTokens,
+          // Note: responseFormat is handled in llm-provider.ts (skipped for Minimax)
           responseFormat: 'json_object',
         });
 
-        const result = this.parseJSON<T>(response.content);
+        // F1.3: Use retry mechanism for JSON parsing
+        const result = this.parseJSONWithRetry<T>(response.content);
         
         if (!result) {
+          console.log('[DEBUG] Failed to parse JSON. Raw response length:', response.content?.length)
+          console.log('[DEBUG] Raw response preview:', response.content?.substring(0, 500))
           throw new Error('Failed to parse JSON response');
         }
 

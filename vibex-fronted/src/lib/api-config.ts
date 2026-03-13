@@ -5,7 +5,7 @@
 
 export const API_CONFIG = {
   // Base URL - use environment variable or fallback
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vibex.top/api/v1',
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vibex.top/api',
   
   // API version
   version: 'v1',

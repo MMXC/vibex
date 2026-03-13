@@ -41,6 +41,15 @@ ddd.post('/bounded-context', async (c) => {
     const body = await c.req.json()
     const { requirementText, projectId } = BoundedContextRequestSchema.parse(body)
 
+    // Debug: Check if MINIMAX_API_KEY is available
+    const debugInfo = {
+      hasApiKey: !!env.MINIMAX_API_KEY,
+      apiKeyLength: env.MINIMAX_API_KEY?.length || 0,
+      apiBase: env.MINIMAX_API_BASE || 'default',
+      model: env.MINIMAX_MODEL || 'default',
+    }
+    console.log('[DEBUG] Env debug:', JSON.stringify(debugInfo))
+
     // Create AI service
     const aiService = createAIService(env)
     
@@ -132,8 +141,21 @@ Respond ONLY with the JSON object, no other text.`
       }
     )
 
+    // Debug: Log the AI result
+    console.log('[DEBUG] AI result success:', result.success)
+    console.log('[DEBUG] AI result error:', result.error)
+    console.log('[DEBUG] AI result data:', result.data ? JSON.stringify(result.data).substring(0, 200) : 'null')
+
     // Parse the AI response
     let boundedContexts: BoundedContext[] = []
+    
+    // Debug: Store raw AI response for troubleshooting
+    const aiDebugInfo = {
+      success: result.success,
+      error: result.error,
+      hasData: !!result.data,
+      dataKeys: result.data ? Object.keys(result.data) : []
+    }
     
     try {
       if (result.success && result.data && result.data.boundedContexts && Array.isArray(result.data.boundedContexts)) {
@@ -195,6 +217,11 @@ Respond ONLY with the JSON object, no other text.`
       success: true,
       boundedContexts,
       mermaidCode: generateMermaidCode(boundedContexts),
+      // Debug info (remove in production)
+      _debug: {
+        env: debugInfo,
+        aiResult: aiDebugInfo
+      }
     })
   } catch (error) {
     console.error('Error generating bounded contexts:', error)

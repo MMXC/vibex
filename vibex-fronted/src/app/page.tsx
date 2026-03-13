@@ -9,7 +9,8 @@ import { ParticleBackground } from '@/components/particles/ParticleBackground';
 import { MermaidPreview } from '@/components/ui/MermaidPreview';
 import { ThinkingPanel } from '@/components/ui/ThinkingPanel';
 import DiagnosisPanel from '@/components/diagnosis/DiagnosisPanel';
-import { useDDDStream, useDomainModelStream } from '@/hooks/useDDDStream';
+import { PageTreeDiagram } from '@/components/page-tree-diagram';
+import { useDDDStream, useDomainModelStream, useBusinessFlowStream } from '@/hooks/useDDDStream';
 import { dddApi, projectApi } from '@/services/api';
 import styles from './homepage.module.css';
 
@@ -219,6 +220,18 @@ export default function HomePage() {
     reset: resetModels,
   } = useDomainModelStream();
 
+  // F4: useBusinessFlowStream Hook for business flow streaming
+  const {
+    thinkingMessages: flowThinkingMessages,
+    businessFlow: streamBusinessFlow,
+    mermaidCode: streamFlowMermaidCode,
+    status: flowStreamStatus,
+    errorMessage: flowStreamError,
+    generateBusinessFlow: generateFlow,
+    abort: abortFlow,
+    reset: resetFlow,
+  } = useBusinessFlowStream();
+
   // F2.2: 同步 SSE 流结果到本地状态
   useEffect(() => {
     if (streamStatus === 'done' && streamContexts.length > 0) {
@@ -308,36 +321,25 @@ export default function HomePage() {
     generateDomainModels(requirementText, boundedContexts);
   };
 
-  // 继续生成业务流程
-  const handleGenerateBusinessFlow = async () => {
+  // 继续生成业务流程 - 使用流式 API
+  const handleGenerateBusinessFlow = () => {
     if (domainModels.length === 0) return;
 
-    setIsGenerating(true);
-    setGenerationError('');
-
-    try {
-      const response = await dddApi.generateBusinessFlow(domainModels, requirementText);
-
-      if (response && response.success) {
-        setBusinessFlow(response.businessFlow as BusinessFlow || null);
-        
-        if (response.mermaidCode) {
-          setFlowMermaidCode(response.mermaidCode);
-        }
-
-        // 切换到步骤4（业务流程）
-        setCurrentStep(4);
-        setActiveTab('preview');
-      } else {
-        throw new Error(response?.error || '生成失败');
-      }
-    } catch (err) {
-      console.error('生成业务流程失败:', err);
-      setGenerationError(err instanceof Error ? err.message : '生成失败，请重试');
-    } finally {
-      setIsGenerating(false);
-    }
+    // 使用流式 API
+    generateFlow(domainModels, requirementText);
+    setCurrentStep(4);
+    setActiveTab('preview');
   };
+
+  // F4.2: 同步业务流程流结果到本地状态
+  useEffect(() => {
+    if (flowStreamStatus === 'done' && streamBusinessFlow) {
+      setBusinessFlow(streamBusinessFlow as BusinessFlow);
+      if (streamFlowMermaidCode) {
+        setFlowMermaidCode(streamFlowMermaidCode);
+      }
+    }
+  }, [flowStreamStatus, streamBusinessFlow, streamFlowMermaidCode]);
 
   // 判断步骤是否完成
   const isStepCompleted = (stepId: number) => {
@@ -774,9 +776,9 @@ export default function HomePage() {
                       <button
                         className={styles.primaryButton}
                         onClick={handleGenerateBusinessFlow}
-                        disabled={isGenerating || domainModels.length === 0}
+                        disabled={flowStreamStatus !== 'idle' || domainModels.length === 0}
                       >
-                        {isGenerating ? '生成中...' : '🌊 继续生成业务流程'}
+                        {flowStreamStatus !== 'idle' ? '🌊 流式生成中...' : '🌊 继续生成业务流程'}
                       </button>
                     </div>
                   </>
@@ -816,6 +818,47 @@ export default function HomePage() {
                           </div>
                         </div>
                       )}
+                    </div>
+
+                    {/* 页面树结构展示 */}
+                    <div className={styles.previewSection}>
+                      <h3 className={styles.pageTitle} style={{ fontSize: '18px', marginBottom: '12px' }}>
+                        📄 页面树结构
+                      </h3>
+                      <div style={{ height: '300px', border: '1px solid #e0e0e0', borderRadius: '8px', overflow: 'hidden' }}>
+                        <PageTreeDiagram
+                          data={[
+                            {
+                              id: 'page-home',
+                              type: 'page',
+                              name: '首页',
+                              children: [
+                                {
+                                  id: 'section-hero',
+                                  type: 'section',
+                                  name: 'Hero 区域',
+                                  children: [
+                                    { id: 'comp-title', type: 'component', name: '标题组件' },
+                                    { id: 'comp-cta', type: 'component', name: 'CTA 按钮' },
+                                  ],
+                                },
+                                {
+                                  id: 'section-features',
+                                  type: 'section',
+                                  name: '功能展示',
+                                  children: [
+                                    { id: 'comp-card-1', type: 'component', name: '功能卡片 1' },
+                                    { id: 'comp-card-2', type: 'component', name: '功能卡片 2' },
+                                  ],
+                                },
+                              ],
+                            },
+                          ]}
+                          direction="TB"
+                          showControls
+                          showBackground
+                        />
+                      </div>
                     </div>
 
                     <div className={styles.actions}>

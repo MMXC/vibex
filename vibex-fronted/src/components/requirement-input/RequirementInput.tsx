@@ -1,137 +1,197 @@
 /**
- * Requirement Input Component
- * 需求输入框组件
+ * RequirementInput - 统一需求输入组件
+ * 整合主页需求输入框和诊断面板功能
  */
 
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback } from 'react';
+import { useDiagnosis } from '@/hooks/diagnosis';
 import styles from './RequirementInput.module.css';
 
-interface RequirementInputProps {
-  value?: string;
-  onChange?: (value: string) => void;
-  onSubmit?: (value: string) => void;
-  onClear?: () => void;
-  placeholder?: string;
-  maxLength?: number;
-  disabled?: boolean;
-  autoFocus?: boolean;
+export interface RequirementInputProps {
+  /** 初始值 */
+  initialValue?: string;
+  /** 值变更回调 */
+  onValueChange?: (value: string) => void;
+  /** 生成回调 */
+  onGenerate?: (value: string) => void;
+  /** 自定义类名 */
+  className?: string;
+  /** 禁用诊断功能 */
+  disableDiagnosis?: boolean;
+  /** 禁用优化功能 */
+  disableOptimization?: boolean;
 }
 
+/**
+ * RequirementInput 组件
+ * 统一的需求输入组件，支持：
+ * - 需求输入
+ * - AI 诊断分析
+ * - AI 优化建议
+ * - 开始生成
+ */
 export function RequirementInput({
-  value: controlledValue,
-  onChange,
-  onSubmit,
-  onClear,
-  placeholder = '输入你的需求...',
-  maxLength = 5000,
-  disabled = false,
-  autoFocus = false,
+  initialValue = '',
+  onValueChange,
+  onGenerate,
+  className,
+  disableDiagnosis = false,
+  disableOptimization = false,
 }: RequirementInputProps) {
-  const [internalValue, setInternalValue] = useState('');
-  const [isFocused, setIsFocused] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [text, setText] = useState(initialValue);
+  
+  const {
+    diagnosis,
+    isAnalyzing,
+    optimizedText,
+    isOptimizing,
+    diagnose: runDiagnosis,
+    optimize,
+    applyOptimization,
+    reset,
+  } = useDiagnosis();
 
-  // Controlled or uncontrolled
-  const value = controlledValue !== undefined ? controlledValue : internalValue;
-  const setValue = controlledValue !== undefined 
-    ? (v: string) => onChange?.(v)
-    : setInternalValue;
-
-  // Auto-resize textarea
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
-    }
-  }, [value]);
-
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
-    if (newValue.length <= maxLength) {
-      setValue(newValue);
+    setText(newValue);
+    onValueChange?.(newValue);
+  }, [onValueChange]);
+
+  const handleDiagnose = useCallback(async () => {
+    if (text.trim()) {
+      await runDiagnosis(text);
     }
-  }, [maxLength, setValue]);
+  }, [text, runDiagnosis]);
 
-  const handleClear = useCallback(() => {
-    setValue('');
-    onClear?.();
-    textareaRef.current?.focus();
-  }, [onClear, setValue]);
-
-  const handleSubmit = useCallback(() => {
-    const trimmed = value.trim();
-    if (trimmed && !disabled) {
-      onSubmit?.(trimmed);
+  const handleOptimize = useCallback(async () => {
+    if (text.trim()) {
+      await optimize();
     }
-  }, [value, disabled, onSubmit]);
+  }, [text, optimize]);
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit();
+  const handleApplyOptimization = useCallback(() => {
+    if (optimizedText) {
+      setText(optimizedText);
+      onValueChange?.(optimizedText);
+      applyOptimization();
     }
-  }, [handleSubmit]);
+  }, [optimizedText, applyOptimization, onValueChange]);
 
-  const charCount = value.length;
-  const isOverLimit = charCount > maxLength;
-  const canClear = value.length > 0;
-  const canSubmit = value.trim().length > 0 && !disabled;
+  const handleGenerate = useCallback(() => {
+    if (text.trim()) {
+      onGenerate?.(text);
+    }
+  }, [text, onGenerate]);
+
+  const handleReset = useCallback(() => {
+    setText('');
+    reset();
+    onValueChange?.('');
+  }, [reset, onValueChange]);
+
+  const isLoading = isAnalyzing || isOptimizing;
 
   return (
-    <div className={`${styles.container} ${isFocused ? styles.focused : ''} ${disabled ? styles.disabled : ''}`}>
+    <div className={`${styles.container} ${className || ''}`}>
       <textarea
-        ref={textareaRef}
-        className={`${styles.textarea} ${isOverLimit ? styles.overLimit : ''}`}
-        value={value}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        placeholder={placeholder}
-        disabled={disabled}
-        autoFocus={autoFocus}
-        rows={1}
-        aria-label="需求输入"
+        className={styles.textarea}
+        value={text}
+        onChange={handleTextChange}
+        placeholder="描述你的产品需求，例如：开发一个电商平台，支持商品管理、订单处理和用户系统..."
+        rows={6}
+        disabled={isLoading}
       />
-      
-      <div className={styles.footer}>
-        <span className={`${styles.counter} ${isOverLimit ? styles.counterError : ''}`}>
-          {charCount}/{maxLength}
-        </span>
-        
-        <div className={styles.actions}>
-          {canClear && (
-            <button
-              type="button"
-              className={styles.clearButton}
-              onClick={handleClear}
-              disabled={disabled}
-              aria-label="清空输入"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-          )}
-          
+
+      <div className={styles.actions}>
+        <button
+          className={styles.button}
+          onClick={handleGenerate}
+          disabled={!text.trim() || isLoading}
+        >
+          ✨ 开始生成
+        </button>
+
+        {!disableDiagnosis && (
           <button
-            type="button"
-            className={styles.submitButton}
-            onClick={handleSubmit}
-            disabled={!canSubmit}
-            aria-label="提交需求"
+            className={styles.buttonSecondary}
+            onClick={handleDiagnose}
+            disabled={!text.trim() || isLoading || isAnalyzing}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="22" y1="2" x2="11" y2="13" />
-              <polygon points="22 2 15 22 11 13 2 9 22 2" />
-            </svg>
-            <span>提交</span>
+            {isAnalyzing ? '🔄 分析中...' : '🔍 诊断'}
           </button>
-        </div>
+        )}
+
+        {!disableOptimization && (
+          <button
+            className={styles.buttonSecondary}
+            onClick={handleOptimize}
+            disabled={!text.trim() || isLoading || isOptimizing}
+          >
+            {isOptimizing ? '🔄 优化中...' : '⚡ 优化'}
+          </button>
+        )}
+
+        {text.trim() && (
+          <button
+            className={styles.buttonGhost}
+            onClick={handleReset}
+            disabled={isLoading}
+          >
+            清空
+          </button>
+        )}
       </div>
+
+      {diagnosis && !disableDiagnosis && (
+        <div className={styles.result}>
+          <div className={styles.resultHeader}>
+            <span className={styles.resultTitle}>📊 诊断结果</span>
+            <span className={styles.score}>
+              完整性: {diagnosis.completeness}/100
+            </span>
+          </div>
+          
+          {diagnosis.issues && diagnosis.issues.length > 0 && (
+            <ul className={styles.issues}>
+              {diagnosis.issues.map((issue, idx) => (
+                <li key={idx} className={styles.issue}>
+                  {issue}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {diagnosis.suggestions && diagnosis.suggestions.length > 0 && (
+            <div className={styles.suggestions}>
+              <span className={styles.suggestionsLabel}>💡 建议:</span>
+              {diagnosis.suggestions.map((suggestion, idx) => (
+                <span key={idx} className={styles.suggestion}>
+                  {suggestion}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {optimizedText && !disableOptimization && (
+        <div className={styles.optimized}>
+          <div className={styles.optimizedHeader}>
+            <span className={styles.resultTitle}>⚡ 优化建议</span>
+          </div>
+          <pre className={styles.optimizedText}>{optimizedText}</pre>
+          <div className={styles.optimizedActions}>
+            <button
+              className={styles.button}
+              onClick={handleApplyOptimization}
+            >
+              应用优化
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

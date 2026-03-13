@@ -116,6 +116,10 @@ export function ThinkingPanel({
   
   // F3.2: 打字机动画效果
   useEffect(() => {
+    // 防御性检查：确保 thinkingMessages 是数组
+    if (!thinkingMessages || !Array.isArray(thinkingMessages)) {
+      return
+    }
     if (thinkingMessages.length > displayedSteps.length) {
       const latestStep = thinkingMessages[thinkingMessages.length - 1]
       if (!displayedSteps.find(s => s.step === latestStep.step)) {
@@ -183,7 +187,7 @@ export function ThinkingPanel({
         )}
         
         {/* Context Cards */}
-        {contexts.length > 0 && (
+        {contexts && Array.isArray(contexts) && contexts.length > 0 && (
           <div className={styles.section}>
             <div className={styles.sectionTitle}>
               限界上下文 ({contexts.length})

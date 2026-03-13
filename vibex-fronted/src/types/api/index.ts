@@ -1,176 +1,127 @@
 /**
- * API Type Definitions
- * 统一 API 类型定义
+ * API 类型定义
+ * 手动维护的 API 类型，与自动生成类型配合使用
  */
 
-import { z } from 'zod';
+import type { components } from './api-generated';
 
-// ============ Auth Types ============
-export const LoginRequestSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-});
+// ==================== 类型导出 ====================
 
-export const RegisterRequestSchema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
-  password: z.string().min(6),
-});
+// 从自动生成的类型重新导出
+export type { paths, operations } from './api-generated';
 
-export const AuthResponseSchema = z.object({
-  user: z.object({
-    id: z.string(),
-    name: z.string(),
-    email: z.string(),
-    avatar: z.string().optional(),
-  }),
-  token: z.string(),
-});
+// 限界上下文类型
+export type BoundedContext = components['schemas']['BoundedContext'];
+export type BoundedContextResponse = components['schemas']['BoundedContextResponse'];
 
-export type LoginRequest = z.infer<typeof LoginRequestSchema>;
-export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;
-export type AuthResponse = z.infer<typeof AuthResponseSchema>;
+// 领域模型类型
+export type DomainModel = components['schemas']['DomainModel'];
+export type DomainModelResponse = components['schemas']['DomainModelResponse'];
 
-// ============ Project Types ============
-export const ProjectSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string().optional(),
-  status: z.enum(['draft', 'active', 'archived']),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
+// 业务流程类型
+export type BusinessFlow = components['schemas']['BusinessFlow'];
+export type BusinessFlowResponse = components['schemas']['BusinessFlowResponse'];
 
-export const CreateProjectRequestSchema = z.object({
-  name: z.string().min(1),
-  description: z.string().optional(),
-  templateId: z.string().optional(),
-});
+// ==================== 增强类型 ====================
 
-export type Project = z.infer<typeof ProjectSchema>;
-export type CreateProjectRequest = z.infer<typeof CreateProjectRequestSchema>;
+/**
+ * 限界上下文 + 领域模型
+ */
+export interface BoundedContextWithModels {
+  context: BoundedContext;
+  domainModels: DomainModel[];
+}
 
-// ============ Requirement Types ============
-export const RequirementSchema = z.object({
-  id: z.string(),
-  projectId: z.string(),
-  content: z.string(),
-  completeness: z.number().min(0).max(100),
-  status: z.enum(['pending', 'clarifying', 'confirmed']),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
+/**
+ * 完整 DDD 结果
+ */
+export interface DDDResult {
+  boundedContexts: BoundedContext[];
+  domainModels: DomainModel[];
+  businessFlow?: BusinessFlow;
+  mermaidCode?: string;
+}
 
-export const CreateRequirementRequestSchema = z.object({
-  projectId: z.string(),
-  content: z.string().min(1),
-});
+// ==================== 请求/响应类型 ====================
 
-export type Requirement = z.infer<typeof RequirementSchema>;
-export type CreateRequirementRequest = z.infer<typeof CreateRequirementRequestSchema>;
+/**
+ * 创建限界上下文请求
+ */
+export interface CreateContextRequest {
+  requirementText: string;
+  projectId?: string;
+}
 
-// ============ Domain Entity Types ============
-export const DomainEntitySchema = z.object({
-  id: z.string(),
-  projectId: z.string(),
-  name: z.string(),
-  type: z.enum(['entity', 'valueObject', 'aggregate', 'service']),
-  attributes: z.array(z.object({
-    name: z.string(),
-    type: z.string(),
-    required: z.boolean(),
-  })),
-  relations: z.array(z.object({
-    targetId: z.string(),
-    type: z.enum(['hasOne', 'hasMany', 'belongsTo']),
-    name: z.string(),
-  })),
-});
+/**
+ * 创建限界上下文响应
+ */
+export interface CreateContextResponse {
+  success: boolean;
+  contexts: BoundedContext[];
+  mermaidCode: string;
+  error?: string;
+}
 
-export type DomainEntity = z.infer<typeof DomainEntitySchema>;
+/**
+ * 创建领域模型请求
+ */
+export interface CreateDomainModelRequest {
+  requirementText: string;
+  boundedContexts: BoundedContext[];
+}
 
-// ============ Flow Types ============
-export const FlowNodeSchema = z.object({
-  id: z.string(),
-  type: z.enum(['start', 'end', 'task', 'condition', 'parallel']),
-  label: z.string(),
-  position: z.object({ x: z.number(), y: z.number() }),
-  config: z.record(z.string(), z.unknown()).optional(),
-});
+/**
+ * 创建领域模型响应
+ */
+export interface CreateDomainModelResponse {
+  success: boolean;
+  domainModels: DomainModel[];
+  mermaidCode?: string;
+  error?: string;
+}
 
-export const FlowEdgeSchema = z.object({
-  id: z.string(),
-  source: z.string(),
-  target: z.string(),
-  label: z.string().optional(),
-});
+/**
+ * 创建业务流程请求
+ */
+export interface CreateBusinessFlowRequest {
+  requirementText: string;
+  domainModels: DomainModel[];
+}
 
-export const FlowSchema = z.object({
-  id: z.string(),
-  projectId: z.string(),
-  name: z.string(),
-  nodes: z.array(FlowNodeSchema),
-  edges: z.array(FlowEdgeSchema),
-});
+/**
+ * 创建业务流程响应
+ */
+export interface CreateBusinessFlowResponse {
+  success: boolean;
+  businessFlow: BusinessFlow;
+  mermaidCode?: string;
+  error?: string;
+}
 
-export type FlowNode = z.infer<typeof FlowNodeSchema>;
-export type FlowEdge = z.infer<typeof FlowEdgeSchema>;
-export type Flow = z.infer<typeof FlowSchema>;
+// ==================== 流式类型 ====================
 
-// ============ Clarification Types ============
-export const ClarifyMessageSchema = z.object({
-  role: z.enum(['user', 'assistant', 'system']),
-  content: z.string(),
-});
+/**
+ * SSE 事件类型
+ */
+export type SSEEventType = 
+  | 'thinking'
+  | 'contexts'
+  | 'domainModels'
+  | 'businessFlow'
+  | 'done'
+  | 'error';
 
-export const ClarifyRequestSchema = z.object({
-  message: z.string(),
-  history: z.array(ClarifyMessageSchema).optional(),
-  projectId: z.string().optional(),
-});
+/**
+ * SSE 消息
+ */
+export interface SSEMessage {
+  type: SSEEventType;
+  data?: unknown;
+  error?: string;
+  timestamp: number;
+}
 
-export const ClarifyResponseSchema = z.object({
-  reply: z.string(),
-  quickReplies: z.array(z.string()).optional(),
-  completeness: z.number().min(0).max(100),
-  nextAction: z.enum(['gather_more_info', 'confirm_requirement', 'generate_model', 'done']),
-});
-
-export type ClarifyMessage = z.infer<typeof ClarifyMessageSchema>;
-export type ClarifyRequest = z.infer<typeof ClarifyRequestSchema>;
-export type ClarifyResponse = z.infer<typeof ClarifyResponseSchema>;
-
-// ============ API Response Types ============
-export const ApiErrorSchema = z.object({
-  code: z.string(),
-  message: z.string(),
-  details: z.record(z.string(), z.unknown()).optional(),
-});
-
-export const PaginatedResponseSchema = z.object({
-  data: z.array(z.unknown()),
-  total: z.number(),
-  page: z.number(),
-  pageSize: z.number(),
-  hasMore: z.boolean(),
-});
-
-export type ApiError = z.infer<typeof ApiErrorSchema>;
-export type PaginatedResponse<T> = {
-  data: T[];
-  total: number;
-  page: number;
-  pageSize: number;
-  hasMore: boolean;
-};
-
-// ============ Utility Types ============
-export type ApiResult<T> = 
-  | { success: true; data: T }
-  | { success: false; error: ApiError };
-
-export type ApiState<T> = 
-  | { status: 'idle' }
-  | { status: 'loading' }
-  | { status: 'success'; data: T }
-  | { status: 'error'; error: ApiError };
+/**
+ * 流式响应状态
+ */
+export type StreamStatus = 'idle' | 'streaming' | 'done' | 'error';

@@ -6,11 +6,13 @@
  * F1.2: 缓存机制 - LRU 缓存
  * F2.1: 预初始化 - 使用 MermaidInitializer 预加载
  * F2.2: 初始化优化 - 使用统一的初始化逻辑
+ * F3.1: 异步渲染 - cleanup 和 cancellation
+ * F3.2: 非阻塞渲染 - requestIdleCallback
  */
 
 'use client';
 
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import mermaid from 'mermaid';
 import { preInitialize } from './mermaidInit';
 

@@ -631,26 +631,28 @@ function generateFlowMermaidCode(flow: BusinessFlow): string {
 function generateMermaidCode(contexts: BoundedContext[]): string {
   const lines = ['graph TD']
   
-  // Add nodes
+  // Add nodes with proper label quoting
   contexts.forEach(ctx => {
+    // Use double quotes for labels to handle special characters
     const nodeDef = ctx.type === 'core' 
-      ? `${ctx.id}[${ctx.name}]`
+      ? `${ctx.id}["${ctx.name}"]`
       : ctx.type === 'supporting'
-        ? `${ctx.id}(${ctx.name})`
+        ? `${ctx.id}("${ctx.name}")`
         : ctx.type === 'generic'
-          ? `${ctx.id}[[${ctx.name}]]`
-          : `${ctx.id}{${ctx.name}}`
+          ? `${ctx.id}[["${ctx.name}"]]`
+          : `${ctx.id}{"${ctx.name}"}`
     lines.push(`  ${nodeDef}`)
   })
   
-  // Add relationship edges
+  // Add relationship edges with quoted labels
   lines.push('')
   contexts.forEach(ctx => {
     ctx.relationships?.forEach(rel => {
       const targetCtx = contexts.find(c => c.id === rel.toContextId)
       if (targetCtx) {
         const edgeStyle = rel.type === 'upstream' ? '-->' : rel.type === 'symmetric' ? '<-->' : '-->'
-        const label = rel.description ? `: ${rel.description}` : ''
+        // Quote the label to handle spaces and special characters
+        const label = rel.description ? ` : "${rel.description}"` : ''
         lines.push(`  ${ctx.id} ${edgeStyle} ${targetCtx.id}${label}`)
       }
     })
@@ -663,10 +665,15 @@ function generateMermaidCode(contexts: BoundedContext[]): string {
   lines.push('  classDef generic fill:#a78bfa,stroke:#8b5cf6,color:#1a1a2e')
   lines.push('  classDef external fill:#f87171,stroke:#ef4444,color:#1a1a2e')
   lines.push('')
-  lines.push('  class ' + contexts.filter(c => c.type === 'core').map(c => c.id).join(',') + ' core')
-  lines.push('  class ' + contexts.filter(c => c.type === 'supporting').map(c => c.id).join(',') + ' supporting')
-  lines.push('  class ' + contexts.filter(c => c.type === 'generic').map(c => c.id).join(',') + ' generic')
-  lines.push('  class ' + contexts.filter(c => c.type === 'external').map(c => c.id).join(',') + ' external')
+  const coreContexts = contexts.filter(c => c.type === 'core').map(c => c.id).join(',')
+  const supportingContexts = contexts.filter(c => c.type === 'supporting').map(c => c.id).join(',')
+  const genericContexts = contexts.filter(c => c.type === 'generic').map(c => c.id).join(',')
+  const externalContexts = contexts.filter(c => c.type === 'external').map(c => c.id).join(',')
+  
+  if (coreContexts) lines.push(`  class ${coreContexts} core`)
+  if (supportingContexts) lines.push(`  class ${supportingContexts} supporting`)
+  if (genericContexts) lines.push(`  class ${genericContexts} generic`)
+  if (externalContexts) lines.push(`  class ${externalContexts} external`)
   
   return lines.join('\n')
 }
@@ -708,7 +715,7 @@ ddd.post('/bounded-context/stream', async (c) => {
           
           send('thinking', { step: 'calling-ai', message: '调用 AI 分析...' })
           
-          // Use AI service to generate bounded contexts
+          // Use AI service to generate bounded contexts - 要求中文输出
           const prompt = `You are a Domain-Driven Design expert with 15 years of experience in strategic design and bounded context identification.
 
 Analyze the following requirement and identify bounded contexts using EventStorming and Context Mapping techniques.
@@ -716,41 +723,43 @@ Analyze the following requirement and identify bounded contexts using EventStorm
 **Requirement:**
 ${requirementText}
 
+**IMPORTANT: All output must be in Chinese (Simplified).**
+
 **Analysis Process:**
 1. Identify key business capabilities and subdomains
 2. Determine core domain (competitive advantage), supporting domains, and generic domains
 3. Identify external systems that need integration
 4. Map relationships between contexts using Context Mapping patterns
 
-**Output Requirements:**
+**Output Requirements (in Chinese):**
 For each bounded context, provide:
-- name: Concise name (noun phrase, e.g., "Order Management")
-- description: 2-3 sentences explaining the responsibility and boundaries
+- name: 简洁的中文名称 (如"订单管理")
+- description: 2-3句话说明职责和边界
 - type: core | supporting | generic | external
-- keyResponsibilities: Array of 3-5 key responsibilities
-- relationships: Array of relationships to OTHER contexts
+- keyResponsibilities: 3-5个关键职责的数组
+- relationships: 与其他上下文的关系数组
 
 For each relationship, provide:
-- targetContextName: Name of the related context
+- targetContextName: 相关上下文的中文名称
 - type: upstream-downstream | partnership | shared-kernel | conformist | anticorruption-layer
-- description: 1 sentence explaining the collaboration
+- description: 一句话说明协作关系
 
 **Example Output:**
 {
   "boundedContexts": [
     {
-      "name": "Order Management",
-      "description": "Handles the complete order lifecycle from creation to fulfillment.",
+      "name": "订单管理",
+      "description": "处理从创建到履行的完整订单生命周期。负责订单验证、定价计算和状态管理。",
       "type": "core",
-      "keyResponsibilities": ["Order creation", "Pricing calculation", "Status tracking"],
+      "keyResponsibilities": ["订单创建与验证", "定价计算", "订单状态跟踪", "履约协调"],
       "relationships": [
-        {"targetContextName": "Inventory", "type": "upstream-downstream", "description": "Consumes inventory"}
+        {"targetContextName": "库存管理", "type": "upstream-downstream", "description": "订单消耗库存可用性"}
       ]
     }
   ]
 }
 
-Respond ONLY with the JSON object, no other text.`
+Respond ONLY with the JSON object, no other text. All text content must be in Chinese.`
 
           // Call AI
           const result = await aiService.generateJSON<{ boundedContexts: any[] }>(

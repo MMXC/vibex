@@ -1,128 +1,156 @@
 /**
- * DiagnosisPanel Component
- * Main panel for displaying requirement diagnosis results
- * @module components/diagnosis/DiagnosisPanel
+ * DiagnosisPanel - 诊断面板组件
  */
 
-import React from 'react'
-import { DiagnosisResult } from '@/services/api/diagnosis'
-import ScoreDisplay from './ScoreDisplay'
-import RadarChart from './RadarChart'
-import SuggestionList from './SuggestionList'
+'use client';
+
+import { useState } from 'react';
+import { DiagnosisResult, DIMENSION_LABELS, DimensionName } from '@/services/diagnosis/types';
+import ScoreDisplay from './ScoreDisplay';
+import SuggestionList from './SuggestionList';
 
 interface DiagnosisPanelProps {
-  diagnosis: DiagnosisResult | null
-  isLoading?: boolean
-  error?: string | null
-  onAnalyze?: (text: string) => void
-  onOptimize?: () => void
+  onAnalyze?: (text: string) => void;
+  onOptimize?: (text: string) => void;
 }
 
-const DiagnosisPanel: React.FC<DiagnosisPanelProps> = ({
-  diagnosis,
-  isLoading = false,
-  error = null,
-  onAnalyze,
-  onOptimize,
-}) => {
-  if (isLoading) {
-    return (
-      <div className="diagnosis-panel diagnosis-panel--loading">
-        <div className="diagnosis-panel__spinner">
-          <div className="spinner"></div>
-          <p>正在分析需求...</p>
-        </div>
-      </div>
-    )
-  }
+export default function DiagnosisPanel({ onAnalyze, onOptimize }: DiagnosisPanelProps) {
+  const [requirementText, setRequirementText] = useState('');
+  const [result, setResult] = useState<DiagnosisResult | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isOptimizing, setIsOptimizing] = useState(false);
 
-  if (error) {
-    return (
-      <div className="diagnosis-panel diagnosis-panel--error">
-        <div className="diagnosis-panel__error">
-          <span className="error-icon">⚠️</span>
-          <p>{error}</p>
-          {onAnalyze && (
-            <button onClick={() => onAnalyze('')} className="btn-retry">
-              重试
-            </button>
-          )}
-        </div>
-      </div>
-    )
-  }
+  const handleAnalyze = async () => {
+    if (!requirementText.trim()) return;
+    
+    setIsAnalyzing(true);
+    try {
+      // 导入本地诊断
+      const { diagnoser } = await import('@/services/diagnosis');
+      const diagnosis = diagnoser.diagnose(requirementText);
+      setResult(diagnosis);
+      onAnalyze?.(requirementText);
+    } catch (error) {
+      console.error('Diagnosis failed:', error);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
-  if (!diagnosis) {
-    return (
-      <div className="diagnosis-panel diagnosis-panel--empty">
-        <div className="diagnosis-panel__empty">
-          <span className="empty-icon">📋</span>
-          <p>输入需求文本以获取诊断分析</p>
-        </div>
-      </div>
-    )
-  }
+  const handleOptimize = async () => {
+    if (!requirementText.trim()) return;
+    
+    setIsOptimizing(true);
+    try {
+      const { optimizer } = await import('@/services/diagnosis');
+      const optResult = await optimizer.optimize({ requirementText });
+      setRequirementText(optResult.improvedText);
+      // 更新诊断结果
+      const { diagnoser } = await import('@/services/diagnosis');
+      setResult(diagnoser.diagnose(optResult.improvedText));
+      onOptimize?.(optResult.improvedText);
+    } catch (error) {
+      console.error('Optimization failed:', error);
+    } finally {
+      setIsOptimizing(false);
+    }
+  };
 
   return (
     <div className="diagnosis-panel">
-      {/* Score Header */}
-      <div className="diagnosis-panel__header">
-        <ScoreDisplay
-          overallScore={diagnosis.overallScore}
-          grade={diagnosis.grade}
+      <h2>智能需求诊断</h2>
+      
+      <div className="input-section">
+        <textarea
+          value={requirementText}
+          onChange={(e) => setRequirementText(e.target.value)}
+          placeholder="请输入需求描述..."
+          rows={6}
         />
       </div>
 
-      {/* Radar Chart */}
-      <div className="diagnosis-panel__chart">
-        <RadarChart scores={diagnosis.scores} />
+      <div className="actions">
+        <button 
+          onClick={handleAnalyze}
+          disabled={isAnalyzing || !requirementText.trim()}
+          className="analyze-btn"
+        >
+          {isAnalyzing ? '分析中...' : '开始诊断'}
+        </button>
+        
+        <button 
+          onClick={handleOptimize}
+          disabled={isOptimizing || !requirementText.trim()}
+          className="optimize-btn"
+        >
+          {isOptimizing ? '优化中...' : '一键优化'}
+        </button>
       </div>
 
-      {/* Suggestions */}
-      <div className="diagnosis-panel__suggestions">
-        <SuggestionList
-          suggestions={diagnosis.suggestions}
-          missingInfo={diagnosis.missingInfo}
-          onOptimize={onOptimize}
-        />
-      </div>
-
-      {/* Identified Domains */}
-      {diagnosis.identifiedDomains.length > 0 && (
-        <div className="diagnosis-panel__domains">
-          <h4>已识别的业务领域</h4>
-          <div className="domain-tags">
-            {diagnosis.identifiedDomains.map((domain, idx) => (
-              <span key={idx} className="domain-tag">
-                {domain.name}
-                <span className="confidence">
-                  {Math.round(domain.confidence * 100)}%
-                </span>
-              </span>
-            ))}
-          </div>
+      {result && (
+        <div className="result-section">
+          <ScoreDisplay result={result} />
+          <SuggestionList suggestions={result.suggestions} />
         </div>
       )}
 
-      {/* Similar Cases */}
-      {diagnosis.similarCases.length > 0 && (
-        <div className="diagnosis-panel__cases">
-          <h4>相似案例</h4>
-          <div className="case-list">
-            {diagnosis.similarCases.map((c, idx) => (
-              <div key={idx} className="case-item">
-                <span className="case-name">{c.name}</span>
-                <span className="case-industry">{c.industry}</span>
-                <span className="case-similarity">
-                  相似度: {Math.round(c.similarity * 100)}%
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <style jsx>{`
+        .diagnosis-panel {
+          padding: 1rem;
+          border: 1px solid #e0e0e0;
+          border-radius: 8px;
+          background: white;
+        }
+
+        h2 {
+          margin: 0 0 1rem 0;
+          font-size: 1.25rem;
+        }
+
+        .input-section textarea {
+          width: 100%;
+          padding: 0.75rem;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 0.9rem;
+          resize: vertical;
+        }
+
+        .actions {
+          display: flex;
+          gap: 0.5rem;
+          margin: 1rem 0;
+        }
+
+        button {
+          padding: 0.5rem 1rem;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 0.9rem;
+        }
+
+        button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .analyze-btn {
+          background: #1976d2;
+          color: white;
+        }
+
+        .optimize-btn {
+          background: #4caf50;
+          color: white;
+        }
+
+        .result-section {
+          margin-top: 1.5rem;
+          padding-top: 1rem;
+          border-top: 1px solid #eee;
+        }
+      `}</style>
     </div>
-  )
+  );
 }
-
-export default DiagnosisPanel

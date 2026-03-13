@@ -1,80 +1,58 @@
 /**
- * SuggestionList Component
- * Displays improvement suggestions and missing info
- * @module components/diagnosis/SuggestionList
+ * SuggestionList - 建议列表组件
  */
 
-import React from 'react'
-import { Suggestion, MissingInfo } from '@/services/api/diagnosis'
-
 interface SuggestionListProps {
-  suggestions: Suggestion[]
-  missingInfo: MissingInfo[]
-  onOptimize?: () => void
+  suggestions: string[];
 }
 
-const SuggestionList: React.FC<SuggestionListProps> = ({
-  suggestions,
-  missingInfo,
-  onOptimize,
-}) => {
+export default function SuggestionList({ suggestions }: SuggestionListProps) {
+  if (suggestions.length === 0) {
+    return null;
+  }
+
   return (
     <div className="suggestion-list">
-      {/* Suggestions */}
-      {suggestions.length > 0 && (
-        <div className="suggestion-section">
-          <h4>改进建议</h4>
-          <ul className="suggestions">
-            {suggestions.map((suggestion, idx) => (
-              <li key={idx} className={`suggestion-item suggestion-item--${suggestion.type}`}>
-                <span className="suggestion-type">
-                  {suggestion.type === 'add' && '➕'}
-                  {suggestion.type === 'modify' && '✏️'}
-                  {suggestion.type === 'clarify' && '💡'}
-                </span>
-                <div className="suggestion-content">
-                  <span className="suggestion-target">{suggestion.target}</span>
-                  <p className="suggestion-description">{suggestion.description}</p>
-                  {suggestion.example && (
-                    <code className="suggestion-example">{suggestion.example}</code>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <h3>优化建议</h3>
+      <ul>
+        {suggestions.map((suggestion, index) => (
+          <li key={index}>
+            <span className="bullet">•</span>
+            {suggestion}
+          </li>
+        ))}
+      </ul>
 
-      {/* Missing Information */}
-      {missingInfo.length > 0 && (
-        <div className="missing-section">
-          <h4>缺失信息</h4>
-          <ul className="missing-list">
-            {missingInfo.map((missing, idx) => (
-              <li key={idx} className={`missing-item missing-item--${missing.importance}`}>
-                <span className="missing-domain">{missing.domain}</span>
-                <span className="missing-item-name">{missing.item}</span>
-                <span className={`missing-importance importance-${missing.importance}`}>
-                  {missing.importance === 'high' && '高'}
-                  {missing.importance === 'medium' && '中'}
-                  {missing.importance === 'low' && '低'}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <style jsx>{`
+        .suggestion-list {
+          padding: 1rem;
+          background: #fff8e1;
+          border-radius: 4px;
+          border-left: 4px solid #ffc107;
+        }
 
-      {/* Optimize Button */}
-      {onOptimize && (suggestions.length > 0 || missingInfo.length > 0) && (
-        <div className="optimize-action">
-          <button onClick={onOptimize} className="btn-optimize">
-            🚀 一键优化
-          </button>
-        </div>
-      )}
+        h3 {
+          margin: 0 0 0.75rem 0;
+          font-size: 1rem;
+          color: #f57c00;
+        }
+
+        ul {
+          margin: 0;
+          padding-left: 1.25rem;
+        }
+
+        li {
+          margin-bottom: 0.5rem;
+          font-size: 0.9rem;
+          line-height: 1.5;
+        }
+
+        .bullet {
+          color: #ffc107;
+          margin-right: 0.5rem;
+        }
+      `}</style>
     </div>
-  )
+  );
 }
-
-export default SuggestionList

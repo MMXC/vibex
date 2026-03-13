@@ -149,18 +149,21 @@ export function RequirementInput({
           <div className={styles.resultHeader}>
             <span className={styles.resultTitle}>📊 诊断结果</span>
             <span className={styles.score}>
-              完整性: {diagnosis.completeness}/100
+              综合评分: {diagnosis.overallScore}/100 ({diagnosis.grade})
             </span>
           </div>
           
-          {diagnosis.issues && diagnosis.issues.length > 0 && (
-            <ul className={styles.issues}>
-              {diagnosis.issues.map((issue, idx) => (
-                <li key={idx} className={styles.issue}>
-                  {issue}
-                </li>
-              ))}
-            </ul>
+          {diagnosis.missingInfo && diagnosis.missingInfo.length > 0 && (
+            <div className={styles.issuesSection}>
+              <span className={styles.issuesLabel}>⚠️ 缺失信息:</span>
+              <ul className={styles.issues}>
+                {diagnosis.missingInfo.map((info, idx) => (
+                  <li key={idx} className={styles.issue}>
+                    [{info.domain}] {info.item}: {info.suggestion}
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
 
           {diagnosis.suggestions && diagnosis.suggestions.length > 0 && (
@@ -168,7 +171,7 @@ export function RequirementInput({
               <span className={styles.suggestionsLabel}>💡 建议:</span>
               {diagnosis.suggestions.map((suggestion, idx) => (
                 <span key={idx} className={styles.suggestion}>
-                  {suggestion}
+                  {suggestion.description}
                 </span>
               ))}
             </div>

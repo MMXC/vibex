@@ -10,6 +10,7 @@ import { MermaidPreview } from '@/components/ui/MermaidPreview';
 import { ThinkingPanel } from '@/components/ui/ThinkingPanel';
 import DiagnosisPanel from '@/components/diagnosis/DiagnosisPanel';
 import { PageTreeDiagram } from '@/components/page-tree-diagram';
+import { RequirementInput } from '@/components/requirement-input';
 import { useDDDStream, useDomainModelStream, useBusinessFlowStream } from '@/hooks/useDDDStream';
 import { dddApi, projectApi } from '@/services/api';
 import styles from './homepage.module.css';
@@ -600,11 +601,12 @@ export default function HomePage() {
                   <label className={styles.inputLabel}>
                     描述你的产品需求
                   </label>
-                  <textarea
-                    className={styles.textarea}
-                    placeholder="例如：开发一个在线教育平台，包含用户管理、课程管理、订单管理、支付等功能..."
-                    value={requirementText}
-                    onChange={(e) => setRequirementText(e.target.value)}
+                  
+                  {/* 统一需求输入组件 - 集成诊断和优化功能 */}
+                  <RequirementInput
+                    initialValue={requirementText}
+                    onValueChange={setRequirementText}
+                    onGenerate={handleGenerate}
                   />
 
                   {/* 示例需求 */}
@@ -621,19 +623,6 @@ export default function HomePage() {
                         </button>
                       ))}
                     </div>
-                  </div>
-
-                  <div className={styles.actions}>
-                    <button
-                      className={styles.primaryButton}
-                      onClick={handleGenerate}
-                      disabled={isGenerating || !requirementText.trim()}
-                    >
-                      {isGenerating ? '生成中...' : '🎯 开始设计'}
-                    </button>
-                    <button className={styles.secondaryButton}>
-                      📋 使用模板
-                    </button>
                   </div>
 
                   {/* 智能诊断功能 - F1.3 诊断 UI 集成 */}

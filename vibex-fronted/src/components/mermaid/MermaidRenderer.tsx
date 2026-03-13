@@ -2,36 +2,116 @@
  * MermaidRenderer - Mermaid 流程图渲染组件
  * 
  * 支持五步构建法的流程可视化
+ * F1.1: useEffect 优化 - 依赖数组精确
+ * F1.2: 缓存机制 - LRU 缓存
  */
 
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import mermaid from 'mermaid';
+
+// ==================== F1.2: LRU Cache ====================
+
+class LRUCache<T> {
+  private cache: Map<string, T> = new Map();
+  private maxSize: number;
+
+  constructor(maxSize: number = 50) {
+    this.maxSize = maxSize;
+  }
+
+  get(key: string): T | undefined {
+    if (!this.cache.has(key)) return undefined;
+    
+    // Move to end (most recently used)
+    const value = this.cache.get(key);
+    this.cache.delete(key);
+    this.cache.set(key, value!);
+    return value;
+  }
+
+  set(key: string, value: T): void {
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    } else if (this.cache.size >= this.maxSize) {
+      // Delete oldest (first) item
+      const oldestKey = this.cache.keys().next().value;
+      this.cache.delete(oldestKey);
+    }
+    this.cache.set(key, value);
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+
+  size(): number {
+    return this.cache.size;
+  }
+}
+
+// Global cache instance
+const mermaidCache = new LRUCache<string>(50);
+
+// Initialize mermaid once
+let mermaidInitialized = false;
+const initializeMermaid = () => {
+  if (mermaidInitialized) return;
+  
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'dark',
+    securityLevel: 'loose',
+    flowchart: {
+      useMaxWidth: true,
+      htmlLabels: true,
+      curve: 'basis',
+    },
+  });
+  mermaidInitialized = true;
+};
 
 interface MermaidRendererProps {
   chart: string;
   title?: string;
 }
 
-// 初始化 mermaid
-mermaid.initialize({
-  startOnLoad: false,
-  theme: 'dark',
-  securityLevel: 'loose',
-  flowchart: {
-    useMaxWidth: true,
-    htmlLabels: true,
-    curve: 'basis',
-  },
-});
+// F1.1: useEffect 优化 - 使用 useMemo 计算缓存 key
+const useCacheKey = (chart: string) => {
+  return useMemo(() => {
+    // Simple hash for cache key
+    let hash = 0;
+    for (let i = 0; i < chart.length; i++) {
+      const char = chart.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return `mermaid-${hash}`;
+  }, [chart]);
+};
 
 export function MermaidRenderer({ chart, title }: MermaidRendererProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [svg, setSvg] = useState<string>('');
   const [error, setError] = useState<string>('');
+  
+  // F1.1: 精确依赖数组
+  const cacheKey = useCacheKey(chart);
+
+  // F1.2: 缓存检查
+  const cachedSvg = mermaidCache.get(cacheKey);
 
   useEffect(() => {
+    // Initialize mermaid once
+    initializeMermaid();
+
+    // F1.2: 缓存命中直接返回
+    if (cachedSvg) {
+      setSvg(cachedSvg);
+      return;
+    }
+
     const renderChart = async () => {
       if (!chart.trim()) {
         setSvg('');
@@ -41,6 +121,10 @@ export function MermaidRenderer({ chart, title }: MermaidRendererProps) {
       try {
         const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
         const { svg } = await mermaid.render(id, chart);
+        
+        // F1.2: 存入缓存
+        mermaidCache.set(cacheKey, svg);
+        
         setSvg(svg);
         setError('');
       } catch (err) {
@@ -51,7 +135,8 @@ export function MermaidRenderer({ chart, title }: MermaidRendererProps) {
     };
 
     renderChart();
-  }, [chart]);
+    // F1.1: 精确依赖 - 只在 chart 变化时重新渲染
+  }, [chart, cacheKey, cachedSvg]);
 
   if (!chart.trim()) {
     return null;

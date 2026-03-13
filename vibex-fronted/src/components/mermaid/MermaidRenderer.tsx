@@ -5,14 +5,14 @@
  * F1.1: useEffect 优化 - 依赖数组精确
  * F1.2: 缓存机制 - LRU 缓存
  * F2.1: 预初始化 - 使用 MermaidInitializer 预加载
- * F2.2: 初始化优化 - 检查预初始化状态
+ * F2.2: 初始化优化 - 使用统一的初始化逻辑
  */
 
 'use client';
 
 import { useEffect, useRef, useState, useMemo } from 'react';
 import mermaid from 'mermaid';
-import { getInitializedMermaid } from './MermaidInitializer';
+import { preInitialize } from './mermaidInit';
 
 // ==================== F1.2: LRU Cache ====================
 
@@ -57,22 +57,15 @@ class LRUCache<T> {
 // Global cache instance
 const mermaidCache = new LRUCache<string>(50);
 
-// Initialize mermaid once
-let mermaidInitialized = false;
-const initializeMermaid = () => {
-  if (mermaidInitialized) return;
+// F2.2: 使用统一的初始化逻辑
+let mermaidReady = false;
+
+const initializeMermaid = async () => {
+  if (mermaidReady) return;
   
-  mermaid.initialize({
-    startOnLoad: false,
-    theme: 'dark',
-    securityLevel: 'loose',
-    flowchart: {
-      useMaxWidth: true,
-      htmlLabels: true,
-      curve: 'basis',
-    },
-  });
-  mermaidInitialized = true;
+  // F2.2: 使用预初始化模块
+  await preInitialize();
+  mermaidReady = true;
 };
 
 interface MermaidRendererProps {
@@ -106,7 +99,7 @@ export function MermaidRenderer({ chart, title }: MermaidRendererProps) {
   const cachedSvg = mermaidCache.get(cacheKey);
 
   useEffect(() => {
-    // Initialize mermaid once
+    // F2.2: 使用异步初始化
     initializeMermaid();
 
     // F1.2: 缓存命中直接返回

@@ -18,6 +18,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.29',
+    date: '2026-03-13',
+    changes: [
+      '🏗️ Service 层重构：拆分 ai-client.ts 到 16 个独立 API 模块',
+      '📦 代码复用：httpClient 单例 + retry + cache 共享层',
+      '🔒 类型安全：TypeScript + Zod Schema 双重保障',
+      '✅ 测试覆盖：99.3% 通过率 (1342/1352)',
+      '📝 废弃兼容层：@deprecated 标记，迁移路径清晰',
+    ],
+    commit: '4a82fde',
+  },
+  {
     version: '1.0.28',
     date: '2026-03-12',
     changes: [

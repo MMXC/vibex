@@ -12,6 +12,7 @@ import DiagnosisPanel from '@/components/diagnosis/DiagnosisPanel';
 import { PageTreeDiagram } from '@/components/page-tree-diagram';
 import { RequirementInput } from '@/components/requirement-input';
 import { GitHubImport } from '@/components/github-import';
+import { FigmaImport } from '@/components/figma-import';
 import { useDDDStream, useDomainModelStream, useBusinessFlowStream } from '@/hooks/useDDDStream';
 import { dddApi, projectApi } from '@/services/api';
 import styles from './homepage.module.css';
@@ -617,6 +618,21 @@ export default function HomePage() {
                     </summary>
                     <div className={styles.importContent}>
                       <GitHubImport
+                        onImport={(text) => {
+                          setRequirementText(text);
+                          setCurrentStep(1);
+                        }}
+                      />
+                    </div>
+                  </details>
+
+                  {/* Figma 导入选项 */}
+                  <details className={styles.importOptions}>
+                    <summary className={styles.importSummary}>
+                      🎨 从 Figma 导入设计
+                    </summary>
+                    <div className={styles.importContent}>
+                      <FigmaImport
                         onImport={(text) => {
                           setRequirementText(text);
                           setCurrentStep(1);

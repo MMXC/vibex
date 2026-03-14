@@ -484,7 +484,7 @@ export default function HomePage() {
           <span>VibeX</span>
         </div>
         <div className={styles.navLinks}>
-          <Link href="/design" className={styles.navLink}>
+          <Link href="/confirm" className={styles.navLink}>
             设计
           </Link>
           <Link href="/templates" className={styles.navLink}>
@@ -598,7 +598,7 @@ export default function HomePage() {
 
             {activeTab === 'input' ? (
               <>
-                <h1 className={styles.pageTitle}>Step 1: 需求输入</h1>
+                <h1 className={styles.pageTitle}>需求分析工作台</h1>
                 <p className={styles.pageSubtitle}>
                   描述你的产品需求，AI 将协助你完成完整的设计
                 </p>
@@ -666,17 +666,6 @@ export default function HomePage() {
                       ))}
                     </div>
                   </div>
-
-                  {/* 智能诊断功能 - F1.3 诊断 UI 集成 */}
-                  <div className={styles.diagnosisSection}>
-                    <DiagnosisPanel 
-                      onAnalyze={(text) => console.log('Diagnosed:', text)}
-                      onOptimize={(text) => {
-                        setRequirementText(text);
-                        console.log('Optimized and applied:', text);
-                      }}
-                    />
-                  </div>
                 </div>
               </>
             ) : (
@@ -715,7 +704,7 @@ export default function HomePage() {
 
                 {currentStep === 2 && (
                   <>
-                    <h1 className={styles.pageTitle}>Step 2: 限界上下文</h1>
+                    <h1 className={styles.pageTitle}>限界上下文设计</h1>
                     <p className={styles.pageSubtitle}>
                       AI 已生成限界上下文设计，请预览确认
                     </p>
@@ -764,7 +753,7 @@ export default function HomePage() {
 
                 {currentStep === 3 && (
                   <>
-                    <h1 className={styles.pageTitle}>Step 3: 领域模型</h1>
+                    <h1 className={styles.pageTitle}>领域模型设计</h1>
                     <p className={styles.pageSubtitle}>
                       AI 已生成领域模型，请预览确认
                     </p>
@@ -817,7 +806,7 @@ export default function HomePage() {
 
                 {currentStep === 4 && (
                   <>
-                    <h1 className={styles.pageTitle}>Step 4: 业务流程</h1>
+                    <h1 className={styles.pageTitle}>业务流程设计</h1>
                     <p className={styles.pageSubtitle}>
                       AI 已生成业务流程，请预览确认
                     </p>
@@ -906,7 +895,7 @@ export default function HomePage() {
 
                 {currentStep === 5 && (
                   <>
-                    <h1 className={styles.pageTitle}>Step 5: 项目创建</h1>
+                    <h1 className={styles.pageTitle}>项目生成</h1>
                     <p className={styles.pageSubtitle}>
                       恭喜！项目已创建成功
                     </p>

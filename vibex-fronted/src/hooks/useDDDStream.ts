@@ -502,12 +502,14 @@ export function useBusinessFlowStream(): UseBusinessFlowStreamReturn {
           const lines = buffer.split('\n')
           buffer = lines.pop() || ''
           
-          for (const line of lines) {
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i]
             if (line.startsWith('event: ')) {
               const eventType = line.slice(7)
-              const dataLineIdx = lines.indexOf(line) + 1
-              if (dataLineIdx < lines.length && lines[dataLineIdx].startsWith('data: ')) {
-                const data = lines[dataLineIdx].slice(6)
+              // Check next line for data
+              const nextLine = lines[i + 1]
+              if (nextLine && nextLine.startsWith('data: ')) {
+                const data = nextLine.slice(6)
                 try {
                   const parsedData = JSON.parse(data)
                   switch (eventType) {
@@ -515,7 +517,7 @@ export function useBusinessFlowStream(): UseBusinessFlowStreamReturn {
                       setThinkingMessages(prev => [...prev, parsedData])
                       break
                     case 'done':
-                      setBusinessFlow(parsedData.businessFlow)
+                      setBusinessFlow(parsedData.businessFlow || null)
                       setMermaidCode(parsedData.mermaidCode || '')
                       setStatus('done')
                       break
@@ -524,7 +526,11 @@ export function useBusinessFlowStream(): UseBusinessFlowStreamReturn {
                       setStatus('error')
                       break
                   }
-                } catch (e) {}
+                } catch (e) {
+                  console.error('Failed to parse SSE data:', e)
+                }
+                // Skip the data line in next iteration
+                i++
               }
             }
           }

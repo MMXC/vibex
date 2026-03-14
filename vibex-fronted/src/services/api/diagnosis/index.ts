@@ -4,6 +4,7 @@
  */
 
 import axios from 'axios'
+import { API_CONFIG } from '@/lib/api-config'
 
 // Types
 export interface DiagnosisResult {
@@ -96,9 +97,9 @@ export interface OptimizeResponse {
   error?: string
 }
 
-// API Client
+// API Client - 使用统一的 API 配置
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_CONFIG.baseURL,
   timeout: 30000,
 })
 

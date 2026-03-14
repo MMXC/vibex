@@ -20,7 +20,18 @@ jobs:
           node-version: '22'
           cache: 'npm'
           
+      # F1.1: npm 缓存配置 - 使用 hashFiles 确保一致性
+      - name: Cache node_modules
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+          
       - name: Install dependencies
+        if: steps.cache-npm.outputs.cache-hit != 'true'
         run: npm ci
         
       - name: Run tests with coverage

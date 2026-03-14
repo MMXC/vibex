@@ -10,6 +10,7 @@ on:
     - cron: '0 6 * * *'
   workflow_dispatch:
 
+# 并行 Job 优化: E2E 4 分片并行执行 (F1.4)
 jobs:
   e2e-test:
     timeout-minutes: 60
@@ -29,7 +30,18 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      # F1.1: npm 缓存配置 - 使用 hashFiles 确保一致性
+      - name: Cache node_modules
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
       - name: Install dependencies
+        if: steps.cache-npm.outputs.cache-hit != 'true'
         run: npm ci
 
       - name: Build project
@@ -37,7 +49,18 @@ jobs:
         env:
           CI: true
 
+      # F1.3: Playwright 缓存 - 浏览器安装时间 <5s (缓存命中)
+      - name: Cache Playwright browsers
+        id: cache-playwright
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
       - name: Install Playwright browsers
+        if: steps.cache-playwright.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
 
       - name: Run E2E tests (shard ${{ matrix.shard }}/4)

@@ -30,8 +30,29 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
+      # F1.1: npm 缓存配置 - 使用 hashFiles 确保一致性
+      - name: Cache node_modules
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
       - name: Install dependencies
+        if: steps.cache-npm.outputs.cache-hit != 'true'
         run: npm ci
+
+      # F1.2: .next 缓存配置 - 增量构建生效，构建时间减少 >30%
+      - name: Cache .next build
+        id: cache-next
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/*.ts', '**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-
 
       - name: Build application
         run: npm run build

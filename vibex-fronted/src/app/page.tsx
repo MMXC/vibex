@@ -192,8 +192,27 @@ export default function HomePage() {
     { role: 'assistant', content: '你好！我是 VibeX AI 助手。描述你的产品需求，我可以帮你生成完整的应用结构。' },
   ]);
 
-  // F2: 节点勾选状态
-  const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set());
+  // F2: 节点勾选状态 - 支持 localStorage 持久化
+  const [selectedNodes, setSelectedNodes] = useState<Set<string>>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('vibex-selected-nodes');
+      if (saved) {
+        try {
+          return new Set(JSON.parse(saved));
+        } catch (e) {
+          console.error('Failed to parse saved nodes:', e);
+        }
+      }
+    }
+    return new Set();
+  });
+
+  // 持久化节点选择到 localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined' && selectedNodes.size > 0) {
+      localStorage.setItem('vibex-selected-nodes', JSON.stringify([...selectedNodes]));
+    }
+  }, [selectedNodes]);
 
   // 单页式流程状态
   const [currentStep, setCurrentStep] = useState(1);

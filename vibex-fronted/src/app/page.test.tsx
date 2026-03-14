@@ -127,7 +127,7 @@ describe('HomePage', () => {
   it('should show Step 1 title', () => {
     render(<HomePage />);
     
-    expect(screen.getByText('需求分析工作台')).toBeInTheDocument();
+    expect(screen.getByText(/Step 1: 需求输入/)).toBeInTheDocument();
   });
 
   it('should show page subtitle', () => {
@@ -169,8 +169,8 @@ describe('HomePage', () => {
   it('should render with Step 1 title and subtitle', () => {
     render(<HomePage />);
     
-    // Check for step title
-    expect(screen.getByText('需求分析工作台')).toBeInTheDocument();
+    // Check for step title - now shows step-based title
+    expect(screen.getByText(/Step 1: 需求输入/)).toBeInTheDocument();
     
     // Check for subtitle containing key text
     const subtitle = screen.getByText(/AI 将协助你完成完整的设计/);

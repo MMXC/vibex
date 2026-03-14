@@ -93,16 +93,19 @@ export function useDDDStream(): UseDDDStreamReturn {
     setMermaidCode('')
     setErrorMessage(null)
     setStatus('thinking')
+    console.log('[DEBUG SSE] Starting SSE request for requirement:', requirementText.slice(0, 50));
     
     // Create AbortController for fetch
     abortControllerRef.current = new AbortController()
     
     // Get API URL using centralized config
     const fullURL = getApiUrl('/ddd/bounded-context/stream');
+    console.log('[DEBUG SSE] API URL:', fullURL);
     
     // Use fetch with ReadableStream for SSE
     const fetchSSE = async () => {
       try {
+        console.log('[DEBUG SSE] Fetching SSE stream...');
         const response = await fetch(fullURL, {
           method: 'POST',
           headers: {
@@ -111,6 +114,8 @@ export function useDDDStream(): UseDDDStreamReturn {
           body: JSON.stringify({ requirementText }),
           signal: abortControllerRef.current?.signal,
         })
+        
+        console.log('[DEBUG SSE] Response status:', response.status, response.statusText);
         
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`)
@@ -160,11 +165,13 @@ export function useDDDStream(): UseDDDStreamReturn {
                       
                     case 'done':
                       // 防御性检查：确保数据存在
+                      console.log('[DEBUG SSE] done event received:', JSON.stringify(parsedData).slice(0, 200));
                       const contexts = Array.isArray(parsedData.boundedContexts) 
                         ? parsedData.boundedContexts 
                         : []
                       setContexts(contexts)
                       setMermaidCode(parsedData.mermaidCode || '')
+                      console.log('[DEBUG SSE] mermaidCode set to:', (parsedData.mermaidCode || '').slice(0, 100));
                       setStatus('done')
                       break
                       

@@ -31,8 +31,8 @@ describe('HomePage', () => {
     render(<HomePage />);
     
     expect(screen.getByText('VibeX')).toBeInTheDocument();
-    expect(screen.getByText('功能')).toBeInTheDocument();
-    expect(screen.getByText('价格')).toBeInTheDocument();
+    expect(screen.getByText('设计')).toBeInTheDocument();
+    expect(screen.getByText('模板')).toBeInTheDocument();
     expect(screen.getByText('开始使用')).toBeInTheDocument();
   });
 

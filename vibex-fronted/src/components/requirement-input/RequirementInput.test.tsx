@@ -7,24 +7,24 @@ import { RequirementInput } from '../requirement-input/RequirementInput';
 
 describe('RequirementInput', () => {
   it('should render', () => {
-    const onSubmit = jest.fn();
-    render(<RequirementInput onSubmit={onSubmit} />);
+    render(<RequirementInput />);
     expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 
-  it('should call onSubmit when submitting', () => {
-    const onSubmit = jest.fn();
-    render(<RequirementInput onSubmit={onSubmit} />);
+  it('should call onGenerate when generate button clicked', () => {
+    const onGenerate = jest.fn();
+    render(<RequirementInput onGenerate={onGenerate} />);
     fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Test requirement' } });
-    fireEvent.click(screen.getByText('提交'));
-    expect(onSubmit).toHaveBeenCalledWith('Test requirement');
+    fireEvent.click(screen.getByText(/开始生成/));
+    expect(onGenerate).toHaveBeenCalledWith('Test requirement');
   });
 
-  it('should handle empty input', () => {
-    const onSubmit = jest.fn();
-    render(<RequirementInput onSubmit={onSubmit} />);
-    fireEvent.click(screen.getByText('提交'));
-    expect(onSubmit).not.toHaveBeenCalled();
+  it('should not call onGenerate when input is empty', () => {
+    const onGenerate = jest.fn();
+    render(<RequirementInput onGenerate={onGenerate} />);
+    // Generate button should be disabled when input is empty
+    const generateButton = screen.getByText(/开始生成/);
+    expect(generateButton).toBeDisabled();
   });
 
   it('should clear input when clear button clicked', () => {
@@ -33,5 +33,13 @@ describe('RequirementInput', () => {
     fireEvent.change(input, { target: { value: 'Test' } });
     fireEvent.click(screen.getByRole('button', { name: /清空/i }));
     expect(input).toHaveValue('');
+  });
+
+  it('should call onValueChange when text changes', () => {
+    const onValueChange = jest.fn();
+    render(<RequirementInput onValueChange={onValueChange} />);
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: 'Test' } });
+    expect(onValueChange).toHaveBeenCalledWith('Test');
   });
 });

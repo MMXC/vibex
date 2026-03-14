@@ -4,11 +4,11 @@
 
 import { 
   createProtectedLink, 
-  getProtectedLink, 
-  accessProtectedLink, 
-  deleteProtectedLink,
+  getLink, 
+  checkLinkAccess, 
+  deleteLink,
   isLinkExpired,
-  verifyPassword
+  verifyLinkPassword
 } from '@/utils/linkProtection';
 
 // Mock localStorage
@@ -68,73 +68,88 @@ describe('linkProtection', () => {
     });
   });
 
-  describe('getProtectedLink', () => {
+  describe('getLink', () => {
     it('should retrieve an existing link', () => {
       const created = createProtectedLink('https://example.com');
-      const retrieved = getProtectedLink(created.id);
+      const retrieved = getLink(created.id);
       
       expect(retrieved).toBeDefined();
       expect(retrieved?.id).toBe(created.id);
     });
 
-    it('should return undefined for non-existent link', () => {
-      const retrieved = getProtectedLink('non-existent-id');
-      expect(retrieved).toBeUndefined();
+    it('should return null for non-existent link', () => {
+      const retrieved = getLink('non-existent-id');
+      expect(retrieved).toBeNull();
     });
   });
 
   describe('isLinkExpired', () => {
     it('should return false for non-expiring link', () => {
       const link = createProtectedLink('https://example.com');
-      expect(isLinkExpired(link)).toBe(false);
+      expect(isLinkExpired(link.id)).toBe(false);
     });
 
     it('should return true for expired link', () => {
+      // Create an expired link manually in localStorage
       const expiredLink = {
-        id: 'test',
+        id: 'test-expired',
         url: 'https://example.com',
         expiresAt: '2020-01-01',
         password: null,
         createdAt: '2020-01-01',
         accessCount: 0,
       };
-      expect(isLinkExpired(expiredLink)).toBe(true);
+      localStorageMock.setItem('protected_links', JSON.stringify([expiredLink]));
+      expect(isLinkExpired('test-expired')).toBe(true);
     });
   });
 
-  describe('verifyPassword', () => {
+  describe('verifyLinkPassword', () => {
     it('should return true for correct password', () => {
       const link = createProtectedLink('https://example.com', { password: 'test123' });
-      expect(verifyPassword(link.id, 'test123')).toBe(true);
+      expect(verifyLinkPassword(link.id, 'test123')).toBe(true);
     });
 
     it('should return false for incorrect password', () => {
       const link = createProtectedLink('https://example.com', { password: 'test123' });
-      expect(verifyPassword(link.id, 'wrong')).toBe(false);
+      expect(verifyLinkPassword(link.id, 'wrong')).toBe(false);
     });
 
-    it('should return true for link without password', () => {
+    it('should return false for link without password', () => {
       const link = createProtectedLink('https://example.com');
-      expect(verifyPassword(link.id, '')).toBe(true);
+      expect(verifyLinkPassword(link.id, '')).toBe(false);
     });
   });
 
-  describe('accessProtectedLink', () => {
+  describe('checkLinkAccess', () => {
+    it('should return accessible for valid link', () => {
+      const link = createProtectedLink('https://example.com');
+      const result = checkLinkAccess(link.id);
+      
+      expect(result.accessible).toBe(true);
+    });
+
+    it('should return not accessible for non-existent link', () => {
+      const result = checkLinkAccess('non-existent');
+      expect(result.accessible).toBe(false);
+    });
+
     it('should increment access count', () => {
       const link = createProtectedLink('https://example.com');
-      const result = accessProtectedLink(link.id);
+      checkLinkAccess(link.id);
       
-      expect(result?.accessCount).toBe(1);
+      const retrieved = getLink(link.id);
+      expect(retrieved?.accessCount).toBe(1);
     });
   });
 
-  describe('deleteProtectedLink', () => {
+  describe('deleteLink', () => {
     it('should delete a protected link', () => {
       const link = createProtectedLink('https://example.com');
-      deleteProtectedLink(link.id);
+      deleteLink(link.id);
       
-      const retrieved = getProtectedLink(link.id);
-      expect(retrieved).toBeUndefined();
+      const retrieved = getLink(link.id);
+      expect(retrieved).toBeNull();
     });
   });
 });

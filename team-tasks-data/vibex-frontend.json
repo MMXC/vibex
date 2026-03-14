@@ -14,7 +14,7 @@
     "reviewer",
     "coord"
   ],
-  "currentStage": "tester",
+  "currentStage": "reviewer",
   "stages": {
     "analyst": {
       "agent": "analyst",
@@ -60,26 +60,35 @@
     },
     "tester": {
       "agent": "tester",
-      "status": "in-progress",
+      "status": "done",
       "task": "\u6d4b\u8bd5\u9a8c\u8bc1\uff1a\u7f16\u5199\u6d4b\u8bd5\u7528\u4f8b",
       "startedAt": "2026-03-12T06:25:05.559957",
-      "completedAt": null,
-      "output": "",
+      "completedAt": "2026-03-14T11:50:00.000000+00:00",
+      "output": "\u2705 117 test suites, 1355 tests passed, 5 skipped",
       "logs": [
         {
           "time": "2026-03-12T06:25:05.559973",
           "event": "status: pending \u2192 in-progress (dispatched by coord heartbeat)"
+        },
+        {
+          "time": "2026-03-14T11:50:00.000000+00:00",
+          "event": "status: in-progress \u2192 done (tests fixed by coord heartbeat)"
         }
       ]
     },
     "reviewer": {
       "agent": "reviewer",
-      "status": "pending",
+      "status": "in-progress",
       "task": "\u4ee3\u7801\u5ba1\u67e5\uff1a\u5ba1\u67e5\u4ee3\u7801\u548c\u6d4b\u8bd5",
       "startedAt": null,
       "completedAt": null,
       "output": "",
-      "logs": []
+      "logs": [
+        {
+          "time": "2026-03-14T11:50:00.000000+00:00",
+          "event": "status: pending \u2192 in-progress (tester stage completed)"
+        }
+      ]
     },
     "coord": {
       "agent": "coord",

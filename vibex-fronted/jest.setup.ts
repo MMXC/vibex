@@ -94,13 +94,18 @@ jest.mock('next/navigation', () => ({
   },
 }));
 
-// Mock localStorage
-const localStorageMock = {
-  getItem: jest.fn(() => null),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
-};
+// Mock localStorage - 完整实现
+const localStorageMock = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: jest.fn((key: string) => store[key] || null),
+    setItem: jest.fn((key: string, value: string) => { store[key] = value; }),
+    removeItem: jest.fn((key: string) => { delete store[key]; }),
+    clear: jest.fn(() => { store = {}; }),
+    get length() { return Object.keys(store).length; },
+    key: jest.fn((i: number) => Object.keys(store)[i] || null),
+  };
+})();
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 // Mock react-resizable-panels for Jest

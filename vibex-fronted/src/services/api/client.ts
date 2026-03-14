@@ -6,6 +6,8 @@ import axios, {
   InternalAxiosRequestConfig,
 } from 'axios';
 import { API_CONFIG } from '@/lib/api-config';
+import { configureAxiosRetry } from '@/lib/api-retry';
+import { circuitBreakerManager } from '@/lib/circuit-breaker';
 
 // ==================== 接口定义 ====================
 
@@ -44,6 +46,19 @@ export function createHttpClient(config?: HttpClientConfig): HttpClient {
     baseURL,
     timeout,
     headers: { 'Content-Type': 'application/json' },
+  });
+
+  // 配置重试机制（异步，不阻塞初始化）
+  configureAxiosRetry(instance, {
+    retries: 3,
+    retryDelay: 1000,
+    maxRetryDelay: 10000,
+    exponentialBackoff: true,
+    onRetry: (retryCount, error, requestConfig) => {
+      console.warn(`[API Retry] Attempt ${retryCount} for ${requestConfig.url}: ${error.message}`);
+    },
+  }).catch((err) => {
+    console.error('[API Client] Failed to configure retry:', err);
   });
 
   // 请求拦截器 - 添加认证token
@@ -134,3 +149,24 @@ export function transformError(error: AxiosError | Error): Error {
 // ==================== 单例导出 ====================
 
 export const httpClient = createHttpClient();
+
+// ==================== 熔断器保护调用 ====================
+
+/**
+ * 使用熔断器保护的 API 调用
+ * 适用于关键 API 端点，防止级联故障
+ */
+export async function fetchWithCircuitBreaker<T>(
+  apiName: string,
+  fn: () => Promise<T>
+): Promise<T> {
+  try {
+    return await circuitBreakerManager.execute(apiName, fn);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Circuit breaker')) {
+      // 熔断状态，抛出友好提示
+      throw new Error('服务暂时不可用，请稍后重试');
+    }
+    throw error;
+  }
+}

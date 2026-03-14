@@ -26,7 +26,9 @@ describe('PreviewArea', () => {
 
   it('shows loading state', () => {
     render(<PreviewArea {...defaultProps} isLoading={true} />);
-    expect(screen.getByText('加载中...')).toBeInTheDocument();
+    // Use getAllByText since "加载中..." appears in multiple places
+    const loadingElements = screen.getAllByText('加载中...');
+    expect(loadingElements.length).toBeGreaterThan(0);
   });
 
   it('calls onRefresh when refresh button clicked', () => {
@@ -39,7 +41,10 @@ describe('PreviewArea', () => {
   it('disables refresh button when loading', () => {
     const onRefresh = jest.fn();
     render(<PreviewArea {...defaultProps} isLoading={true} onRefresh={onRefresh} />);
-    const button = screen.getByText('加载中...');
-    expect(button).toBeDisabled();
+    // Use getAllByText since "加载中..." appears in multiple places
+    const buttons = screen.getAllByText('加载中...');
+    // The button should be the first one or we can check the button specifically
+    const refreshButton = screen.getByRole('button', { name: '加载中...' });
+    expect(refreshButton).toBeDisabled();
   });
 });

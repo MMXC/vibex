@@ -3,12 +3,29 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   output: 'export',
   images: {
-    unoptimized: true,
+    loader: 'custom',
+    loaderFile: './src/lib/cf-image-loader.ts',
+    // 允许的图片域名
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'imagedelivery.net',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
+    // 最小/最大图片尺寸
+    minimumCacheTTL: 60 * 60 * 24 * 30, // 30 天
+    formats: ['image/avif', 'image/webp'],
   },
   trailingSlash: true,
   // 显式声明客户端可用的环境变量，防止意外暴露
   env: {
     NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
+    CLOUDFLARE_ACCOUNT_ID: process.env.CLOUDFLARE_ACCOUNT_ID,
   },
 };
 

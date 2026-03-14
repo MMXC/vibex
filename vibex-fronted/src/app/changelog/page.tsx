@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.31',
+    date: '2026-03-15',
+    changes: [
+      '🏠 首页组件集成：page.tsx 精简至 9 行（目标 <200）',
+      '📦 模块化重构：HomePage.tsx 封装全部业务逻辑',
+      '🔒 安全加固：DOMPurify SVG 消毒，XSS 防护到位',
+      '✅ 代码审查通过：安全+性能+规范符合要求',
+    ],
+    commit: 'fca44c4',
+  },
+  {
     version: '1.0.30',
     date: '2026-03-14',
     changes: [

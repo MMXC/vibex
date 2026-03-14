@@ -168,7 +168,7 @@ export interface DomainModelGraphProps {
 }
 
 export default function DomainModelGraph({
-  models,
+  models = [],
   relationships = [],
   onModelsChange,
   readOnly = false,

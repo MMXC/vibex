@@ -31,7 +31,7 @@ export interface DomainModelDiagramProps {
 }
 
 export function DomainModelDiagram({
-  entities,
+  entities = [],
   relationships = [],
   width = 800,
   height = 600,

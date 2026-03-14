@@ -13,6 +13,14 @@ ddd.use('/*', cors())
 const BoundedContextRequestSchema = z.object({
   requirementText: z.string().min(1),
   projectId: z.string().optional(),
+  planResult: z.object({
+    summary: z.string(),
+    entities: z.array(z.any()),
+    features: z.array(z.any()),
+    questions: z.array(z.any()),
+    suggestedContexts: z.array(z.any()),
+    confidence: z.number(),
+  }).optional(),
 })
 
 type BoundedContextRequest = z.infer<typeof BoundedContextRequestSchema>
@@ -39,7 +47,7 @@ ddd.post('/bounded-context', async (c) => {
   try {
     const env = c.env
     const body = await c.req.json()
-    const { requirementText, projectId } = BoundedContextRequestSchema.parse(body)
+    const { requirementText, projectId, planResult } = BoundedContextRequestSchema.parse(body)
 
     // Debug: Check if MINIMAX_API_KEY is available
     const debugInfo = {
@@ -53,8 +61,62 @@ ddd.post('/bounded-context', async (c) => {
     // Create AI service
     const aiService = createAIService(env)
     
-    // Use AI service to generate bounded contexts - optimized prompt with examples
-    const prompt = `You are a Domain-Driven Design expert with 15 years of experience in strategic design and bounded context identification.
+    // Build prompt based on whether we have plan result
+    let prompt: string
+    
+    if (planResult) {
+      // Use plan result to guide bounded context generation
+      prompt = `You are a Domain-Driven Design expert with 15 years of experience in strategic design and bounded context identification.
+
+Based on the following requirement analysis (from Plan mode), generate bounded contexts using EventStorming and Context Mapping techniques.
+
+**Original Requirement:**
+${requirementText}
+
+**Plan Analysis Result:**
+- Summary: ${planResult.summary}
+- Entities: ${planResult.entities.map((e: any) => e.name).join(', ')}
+- Features: ${planResult.features.map((f: any) => f.name).join(', ')}
+- Suggested Contexts: ${planResult.suggestedContexts.map((c: any) => c.name).join(', ')}
+- Confidence: ${planResult.confidence}%
+
+**Analysis Task:**
+1. Refine the suggested bounded contexts based on the plan analysis
+2. Use the identified entities to define context boundaries
+3. Map relationships between contexts using Context Mapping patterns
+
+**Output Requirements:**
+For each bounded context, provide:
+- name: Concise name (noun phrase, e.g., "Order Management")
+- description: 2-3 sentences explaining the responsibility and boundaries
+- type: core | supporting | generic | external
+- keyResponsibilities: Array of 3-5 key responsibilities
+- relationships: Array of relationships to OTHER contexts
+
+For each relationship, provide:
+- targetContextName: Name of the related context
+- type: upstream-downstream | partnership | shared-kernel | conformist | anticorruption-layer
+- description: 1 sentence explaining the collaboration
+
+**Example Output:**
+{
+  "boundedContexts": [
+    {
+      "name": "Order Management",
+      "description": "Handles the complete order lifecycle from creation to fulfillment.",
+      "type": "core",
+      "keyResponsibilities": ["Order creation", "Pricing calculation", "Status tracking"],
+      "relationships": [
+        {"targetContextName": "Inventory", "type": "upstream-downstream", "description": "Consumes inventory data"}
+      ]
+    }
+  ]
+}
+
+Respond ONLY with the JSON object, no other text.`
+    } else {
+      // Original prompt without plan result
+      prompt = `You are a Domain-Driven Design expert with 15 years of experience in strategic design and bounded context identification.
 
 Analyze the following requirement and identify bounded contexts using EventStorming and Context Mapping techniques.
 
@@ -105,6 +167,7 @@ For each relationship, provide:
 }
 
 Respond ONLY with the JSON object, no other text.`
+    }
 
     // Call AI for bounded context generation
     const result = await aiService.generateJSON<{ boundedContexts: any[] }>(
@@ -911,7 +974,7 @@ ddd.post('/bounded-context/stream', async (c) => {
   try {
     const env = c.env
     const body = await c.req.json()
-    const { requirementText, projectId } = BoundedContextRequestSchema.parse(body)
+    const { requirementText, projectId, planResult } = BoundedContextRequestSchema.parse(body)
 
     // Create AI service
     const aiService = createAIService(env)
@@ -931,13 +994,54 @@ ddd.post('/bounded-context/stream', async (c) => {
           send('thinking', { step: 'analyzing', message: '正在分析需求...' })
           await new Promise(r => setTimeout(r, 150))
           
-          send('thinking', { step: 'identifying-core', message: '识别核心领域...' })
+          if (planResult) {
+            send('thinking', { step: 'using-plan', message: '基于 Plan 分析结果生成上下文...' })
+          } else {
+            send('thinking', { step: 'identifying-core', message: '识别核心领域...' })
+          }
           await new Promise(r => setTimeout(r, 150))
           
           send('thinking', { step: 'calling-ai', message: '调用 AI 分析...' })
           
-          // Use AI service to generate bounded contexts - 要求中文输出
-          const prompt = `You are a Domain-Driven Design expert with 15 years of experience in strategic design and bounded context identification.
+          // Build prompt based on whether we have plan result
+          let prompt: string
+          
+          if (planResult) {
+            prompt = `You are a Domain-Driven Design expert with 15 years of experience in strategic design and bounded context identification.
+
+Based on the following requirement analysis (from Plan mode), generate bounded contexts using EventStorming and Context Mapping techniques.
+
+**Original Requirement:**
+${requirementText}
+
+**Plan Analysis Result:**
+- Summary: ${planResult.summary}
+- Entities: ${planResult.entities.map((e: any) => e.name).join(', ')}
+- Features: ${planResult.features.map((f: any) => f.name).join(', ')}
+- Suggested Contexts: ${planResult.suggestedContexts.map((c: any) => c.name).join(', ')}
+- Confidence: ${planResult.confidence}%
+
+**IMPORTANT: All output must be in Chinese (Simplified).**
+
+**Analysis Task:**
+1. Refine the suggested bounded contexts based on the plan analysis
+2. Use the identified entities to define context boundaries
+3. Map relationships between contexts using Context Mapping patterns
+
+**Output Requirements (in Chinese):**
+For each bounded context, provide:
+- name: 简洁的中文名称 (如"订单管理")
+- description: 2-3句话说明职责和边界
+- type: core | supporting | generic | external
+- keyResponsibilities: 3-5个关键职责的数组
+- relationships: 与其他上下文的关系数组
+
+For each relationship, provide:
+- targetContextName: 相关上下文的中文名称
+- type: upstream-downstream | partnership | shared-kernel | conformist | anticorruption-layer
+- description: 一句话说明协作关系`
+          } else {
+            prompt = `You are a Domain-Driven Design expert with 15 years of experience in strategic design and bounded context identification.
 
 Analyze the following requirement and identify bounded contexts using EventStorming and Context Mapping techniques.
 

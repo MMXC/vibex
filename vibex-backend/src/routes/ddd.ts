@@ -1187,8 +1187,8 @@ Respond ONLY with the JSON object, no other text. All text content must be in Ch
             boundedContexts,
             mermaidCode: generateMermaidCode(boundedContexts)
           })
-          
-        } catch (error) {
+        }
+      } catch (error) {
           // F1.4: Error event
           console.error('SSE stream error:', error)
           send('error', {

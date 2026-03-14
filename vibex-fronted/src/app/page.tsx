@@ -229,28 +229,19 @@ export default function HomePage() {
   const [panelSizes, setPanelSizes] = useState<number[]>([60, 40]);
 
   // F2: Maximize state - double-click header to fullscreen
-  const [maximizedPanel, setMaximizedPanel] = useState<string | null>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('vibex-maximized-panel');
-    }
-    return null;
-  });
+  // Initialize with null to avoid SSR hydration mismatch
+  const [maximizedPanel, setMaximizedPanel] = useState<string | null>(null);
 
   // F3: Minimize state - collapse panel to titlebar
-  const [minimizedPanel, setMinimizedPanel] = useState<string | null>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('vibex-minimized-panel');
-    }
-    return null;
-  });
+  // Initialize with null to avoid SSR hydration mismatch
+  const [minimizedPanel, setMinimizedPanel] = useState<string | null>(null);
 
   // F4: Float state - drag out as floating window
-  const [floatingPanel, setFloatingPanel] = useState<string | null>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('vibex-floating-panel');
-    }
-    return null;
-  });
+  // Initialize with null to avoid SSR hydration mismatch
+  const [floatingPanel, setFloatingPanel] = useState<string | null>(null);
+
+  // F4: Track completed step for step navigation
+  const [completedStep, setCompletedStep] = useState(1);
 
   // Load panel sizes from localStorage on client side only
   useEffect(() => {
@@ -264,6 +255,20 @@ export default function HomePage() {
       } catch (e) {
         // ignore parse error
       }
+    }
+
+    // F2/F3/F4: Load panel states from localStorage on client side
+    const savedMaximized = localStorage.getItem('vibex-maximized-panel');
+    if (savedMaximized) {
+      setMaximizedPanel(savedMaximized);
+    }
+    const savedMinimized = localStorage.getItem('vibex-minimized-panel');
+    if (savedMinimized) {
+      setMinimizedPanel(savedMinimized);
+    }
+    const savedFloating = localStorage.getItem('vibex-floating-panel');
+    if (savedFloating) {
+      setFloatingPanel(savedFloating);
     }
   }, []);
 
@@ -366,6 +371,7 @@ export default function HomePage() {
       setBoundedContexts(streamContexts);
       setContextMermaidCode(streamMermaidCode);
       setCurrentStep(2);
+      setCompletedStep(2);
     }
   }, [streamStatus, streamContexts, streamMermaidCode]);
 
@@ -374,6 +380,7 @@ export default function HomePage() {
     if (modelStreamStatus === 'done' && streamDomainModels.length > 0) {
       setDomainModels(streamDomainModels as DomainModel[]);
       setCurrentStep(3);
+      setCompletedStep(3);
     }
   }, [modelStreamStatus, streamDomainModels]);
 
@@ -484,16 +491,20 @@ export default function HomePage() {
     }
   };
 
-  // 判断步骤是否可点击
+  // 判断步骤是否可点击 - F4 修复: 允许在已完成步骤之间自由切换
   const isStepClickable = (stepId: number) => {
-    return stepId <= currentStep;
+    return stepId <= completedStep;
   };
 
-  // 点击步骤切换
+  // 点击步骤切换 - F4 修复: 只在前进时更新 completedStep
   const handleStepClick = (stepId: number) => {
     if (!isStepClickable(stepId)) return;
     
     setCurrentStep(stepId);
+    // 只有前进到更高步骤时才更新 completedStep，后退不更新
+    if (stepId > completedStep) {
+      setCompletedStep(stepId);
+    }
   };
 
   // 处理项目创建完成
@@ -726,8 +737,13 @@ export default function HomePage() {
           <div className={styles.contentInner}>
             {/* F1: 预览/录入分离布局 - 60% / 40% - 可拖拽调整 */}
             <PanelGroup orientation="horizontal" onLayoutChanged={handlePanelResize} className={styles.splitContainer}>
-              {/* 预览区域 - 60% */}
-              <Panel defaultSize={panelSizes[0]} minSize={30} maxSize={70} className={styles.previewArea}>
+              {/* 预览区域 - 60% - apply maximize/minimize */}
+              <Panel 
+                defaultSize={panelSizes[0]} 
+                minSize={minimizedPanel === 'preview' ? 0 : 30} 
+                maxSize={maximizedPanel === 'preview' ? 100 : 70} 
+                className={styles.previewArea}
+              >
                 <div className={styles.previewAreaHeader} onDoubleClick={() => handleDoubleClick('preview')}>
                   <span className={styles.previewAreaTitle}>👁️ 实时预览</span>
                   {selectedNodes.size > 0 && (
@@ -930,8 +946,13 @@ export default function HomePage() {
               {/* 拖拽分隔线 */}
               <PanelResizeHandle className={styles.resizeHandle} />
 
-              {/* 录入区域 - 40% */}
-              <Panel defaultSize={panelSizes[1]} minSize={30} maxSize={70} className={styles.inputArea}>
+              {/* 录入区域 - 40% - apply maximize/minimize */}
+              <Panel 
+                defaultSize={panelSizes[1]} 
+                minSize={minimizedPanel === 'input' ? 0 : 30} 
+                maxSize={maximizedPanel === 'input' ? 100 : 70} 
+                className={styles.inputArea}
+              >
                 <div className={styles.inputAreaHeader} onDoubleClick={() => handleDoubleClick('input')}>
                   <span className={styles.inputAreaTitle}>📝 需求录入</span>
                   {/* F2/F3: Max/Min buttons */}

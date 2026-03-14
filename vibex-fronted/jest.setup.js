@@ -87,6 +87,16 @@ jest.mock('reactflow', () => ({
   },
 }));
 
+// Mock react-resizable-panels
+jest.mock('react-resizable-panels', () => {
+  const React = require('react');
+  return {
+    Group: ({ children, ...props }) => React.createElement('div', { 'data-testid': 'panel-group' }, children),
+    Panel: ({ children, defaultSize, minSize, maxSize, ...props }) => React.createElement('div', { 'data-testid': 'panel' }, children),
+    Separator: ({ children, ...props }) => React.createElement('div', { 'data-testid': 'panel-resize-handle' }),
+  };
+});
+
 // Mock SSE (Server-Sent Events)
 global.EventSource = jest.fn().mockImplementation(() => ({
   addEventListener: jest.fn(),

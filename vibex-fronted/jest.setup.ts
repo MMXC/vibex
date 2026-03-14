@@ -107,9 +107,9 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 jest.mock('react-resizable-panels', () => {
   const React = require('react');
   return {
-    PanelGroup: (props: any) => React.createElement('div', { 'data-testid': 'panel-group', ...props }, props.children),
+    Group: (props: any) => React.createElement('div', { 'data-testid': 'panel-group', ...props }, props.children),
     Panel: (props: any) => React.createElement('div', { 'data-testid': 'panel', ...props }, props.children),
-    PanelResizeHandle: (props: any) => React.createElement('div', { 'data-testid': 'panel-resize-handle', ...props }),
+    Separator: (props: any) => React.createElement('div', { 'data-testid': 'panel-resize-handle', ...props }),
     ImperativePanelGroupHandle: {},
     ImperativePanelHandle: {},
   };

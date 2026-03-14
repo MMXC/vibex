@@ -773,7 +773,7 @@ export default function HomePage() {
                               <div className={styles.resultItemTitle}>{model.name}</div>
                               <div className={styles.resultItemDesc}>
                                 类型: {model.type}
-                                {model.properties.length > 0 && (
+                                {model.properties && model.properties.length > 0 && (
                                   <div className={styles.properties}>
                                     属性: {model.properties.map(p => p.name).join(', ')}
                                   </div>

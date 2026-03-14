@@ -18,6 +18,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.30',
+    date: '2026-03-14',
+    changes: [
+      '🏠 首页骨架屏重构：固定三栏布局 (15% + 60% + 25%)',
+      '🔧 移除重复诊断组件：DiagnosisPanel 移除，功能集成到 ActionBar',
+      '↔️ 拖拽调整：react-resizable-panels 实现预览/录入区域拖拽',
+      '💾 布局持久化：localStorage 保存面板大小和节点选择状态',
+      '✅ 代码审查通过：安全+性能+规范符合要求',
+    ],
+    commit: 'f500142',
+  },
+  {
     version: '1.0.29',
     date: '2026-03-13',
     changes: [

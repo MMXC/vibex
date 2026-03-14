@@ -137,13 +137,15 @@ export function useDDDStream(): UseDDDStreamReturn {
           const lines = buffer.split('\n')
           buffer = lines.pop() || '' // Keep incomplete line in buffer
           
-          for (const line of lines) {
+          // Iterate with index to correctly find next line
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i]
             if (line.startsWith('event: ')) {
               const eventType = line.slice(7)
-              // Find data line
-              const dataLineIdx = lines.indexOf(line) + 1
-              if (dataLineIdx < lines.length && lines[dataLineIdx].startsWith('data: ')) {
-                const data = lines[dataLineIdx].slice(6)
+              // Check next line for data
+              const nextLine = lines[i + 1]
+              if (nextLine && nextLine.startsWith('data: ')) {
+                const data = nextLine.slice(6)
                 try {
                   const parsedData = JSON.parse(data)
                   
@@ -157,7 +159,11 @@ export function useDDDStream(): UseDDDStreamReturn {
                       break
                       
                     case 'done':
-                      setContexts(parsedData.boundedContexts || [])
+                      // 防御性检查：确保数据存在
+                      const contexts = Array.isArray(parsedData.boundedContexts) 
+                        ? parsedData.boundedContexts 
+                        : []
+                      setContexts(contexts)
                       setMermaidCode(parsedData.mermaidCode || '')
                       setStatus('done')
                       break
@@ -170,6 +176,8 @@ export function useDDDStream(): UseDDDStreamReturn {
                 } catch (e) {
                   console.error('Failed to parse SSE data:', e)
                 }
+                // Skip the data line in next iteration
+                i++
               }
             }
           }
@@ -334,13 +342,15 @@ export function useDomainModelStream(): UseDomainModelStreamReturn {
           const lines = buffer.split('\n')
           buffer = lines.pop() || ''
           
-          for (const line of lines) {
+          // Iterate with index to correctly find next line
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i]
             if (line.startsWith('event: ')) {
               const eventType = line.slice(7)
-              // Find data line
-              const dataLineIdx = lines.indexOf(line) + 1
-              if (dataLineIdx < lines.length && lines[dataLineIdx].startsWith('data: ')) {
-                const data = lines[dataLineIdx].slice(6)
+              // Check next line for data
+              const nextLine = lines[i + 1]
+              if (nextLine && nextLine.startsWith('data: ')) {
+                const data = nextLine.slice(6)
                 try {
                   const parsedData = JSON.parse(data)
                   
@@ -350,7 +360,11 @@ export function useDomainModelStream(): UseDomainModelStreamReturn {
                       break
                       
                     case 'done':
-                      setDomainModels(parsedData.domainModels || [])
+                      // 防御性检查：确保 domainModels 存在且是数组
+                      const models = Array.isArray(parsedData.domainModels) 
+                        ? parsedData.domainModels 
+                        : []
+                      setDomainModels(models)
                       setStatus('done')
                       break
                       
@@ -362,6 +376,8 @@ export function useDomainModelStream(): UseDomainModelStreamReturn {
                 } catch (e) {
                   console.error('Failed to parse SSE data:', e)
                 }
+                // Skip the data line in next iteration
+                i++
               }
             }
           }

@@ -484,11 +484,11 @@ export default function HomePage() {
           <span>VibeX</span>
         </div>
         <div className={styles.navLinks}>
-          <Link href="#features" className={styles.navLink}>
-            功能
+          <Link href="/design" className={styles.navLink}>
+            设计
           </Link>
-          <Link href="#pricing" className={styles.navLink}>
-            价格
+          <Link href="/templates" className={styles.navLink}>
+            模板
           </Link>
           <Link href="/auth" className={styles.ctaButton}>
             开始使用
@@ -496,7 +496,7 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* 顶部产品功能说明 */}
+      {/* F1.1: 移除 Hero 区域 - 注释掉
       <header className={styles.hero}>
         <div className={styles.heroContent}>
           <div className={styles.badge}>
@@ -523,8 +523,9 @@ export default function HomePage() {
           </div>
         </div>
       </header>
+      */}
 
-      {/* B3 差异化特性卡片 - Framer Motion 动画 */}
+      {/* F1.2: 移除 Features 区域 - 注释掉
       <section className={styles.featuresSection} id="features">
         <div className={styles.featuresGrid}>
           {FEATURE_CARDS.map((feature, index) => (
@@ -544,6 +545,7 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+      */}
 
       {/* 三栏布局 */}
       <div className={styles.mainContainer}>

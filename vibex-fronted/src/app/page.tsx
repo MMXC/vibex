@@ -290,9 +290,17 @@ export default function HomePage() {
 
   // F3: Click to minimize panel to titlebar
   const handleMinimize = useCallback((panelId: string) => {
-    setMinimizedPanel(prev => prev === panelId ? null : panelId);
+    if (minimizedPanel === panelId) {
+      // 已最小化，恢复
+      setMinimizedPanel(null);
+      setPanelSizes([60, 40]);
+    } else {
+      // 最小化当前，另一个填充
+      setMinimizedPanel(panelId);
+      setPanelSizes(panelId === 'preview' ? [0, 100] : [100, 0]);
+    }
     setMaximizedPanel(null);
-  }, []);
+  }, [minimizedPanel]);
 
   // F4: Toggle float mode (simplified - just hide from layout)
   const handleFloat = useCallback((panelId: string) => {
@@ -367,7 +375,9 @@ export default function HomePage() {
 
   // F2.2: 同步 SSE 流结果到本地状态
   useEffect(() => {
+    console.log('[DEBUG] streamStatus:', streamStatus, 'streamContexts:', streamContexts.length, 'streamMermaidCode:', streamMermaidCode ? 'present' : 'EMPTY');
     if (streamStatus === 'done' && streamContexts.length > 0) {
+      console.log('[DEBUG] Setting contextMermaidCode:', streamMermaidCode.slice(0, 100));
       setBoundedContexts(streamContexts);
       setContextMermaidCode(streamMermaidCode);
       setCurrentStep(2);
@@ -746,6 +756,14 @@ export default function HomePage() {
               >
                 <div className={styles.previewAreaHeader} onDoubleClick={() => handleDoubleClick('preview')}>
                   <span className={styles.previewAreaTitle}>👁️ 实时预览</span>
+                  {/* 进度条 */}
+                  <div className={styles.progressContainer}>
+                    <div className={styles.progressBar} style={{ width: `${(currentStep / 5) * 100}%` }} />
+                    <span className={styles.progressText}>步骤 {currentStep}/5</span>
+                    {(streamStatus === 'thinking' || modelStreamStatus === 'thinking' || flowStreamStatus === 'thinking') && (
+                      <span className={styles.progressSpinner}>⏳</span>
+                    )}
+                  </div>
                   {selectedNodes.size > 0 && (
                     <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
                       已选 {selectedNodes.size} 项
@@ -955,6 +973,14 @@ export default function HomePage() {
               >
                 <div className={styles.inputAreaHeader} onDoubleClick={() => handleDoubleClick('input')}>
                   <span className={styles.inputAreaTitle}>📝 需求录入</span>
+                  {/* 进度条 */}
+                  <div className={styles.progressContainer}>
+                    <div className={styles.progressBar} style={{ width: `${(currentStep / 5) * 100}%` }} />
+                    <span className={styles.progressText}>步骤 {currentStep}/5</span>
+                    {(streamStatus === 'thinking' || modelStreamStatus === 'thinking' || flowStreamStatus === 'thinking') && (
+                      <span className={styles.progressSpinner}>⏳</span>
+                    )}
+                  </div>
                   {/* F2/F3: Max/Min buttons */}
                   <div className={styles.panelControls}>
                     <button 
@@ -1072,6 +1098,23 @@ export default function HomePage() {
                 </div>
               </Panel>
             </PanelGroup>
+            {/* 展开按钮 - 当面板最小化时显示 */}
+            {minimizedPanel === 'preview' && (
+              <button 
+                className={`${styles.expandBtn} ${styles.expandBtnLeft}`}
+                onClick={() => handleMinimize('preview')}
+              >
+                ◀ 展开预览
+              </button>
+            )}
+            {minimizedPanel === 'input' && (
+              <button 
+                className={`${styles.expandBtn} ${styles.expandBtnRight}`}
+                onClick={() => handleMinimize('input')}
+              >
+                展开输入 ▶
+              </button>
+            )}
           </div>
         </main>
 

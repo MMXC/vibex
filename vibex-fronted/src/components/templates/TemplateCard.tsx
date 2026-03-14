@@ -1,102 +1,101 @@
 /**
- * TemplateCard - 模板卡片组件
+ * Template Card
  * 
- * 显示单个模板的基本信息
+ * 模板卡片组件
  */
 
-import { RequirementTemplate, TemplateCardProps } from '@/data/templates';
-import { useTemplateStore } from '@/stores/templateStore';
-import styles from './TemplateSelector.module.css';
+import React from 'react';
+import type { Template } from '@/types/template';
+import styles from './TemplateCard.module.css';
 
-export function TemplateCard({ 
-  template, 
-  selected = false,
-  onClick, 
-  onPreview 
+export interface TemplateCardProps {
+  /** 模板数据 */
+  template: Template;
+  /** 选择回调 */
+  onSelect?: (template: Template) => void;
+  /** 是否选中 */
+  isSelected?: boolean;
+  /** 自定义类名 */
+  className?: string;
+}
+
+export function TemplateCard({
+  template,
+  onSelect,
+  isSelected = false,
+  className = '',
 }: TemplateCardProps) {
-  const { getTemplateStats } = useTemplateStore();
-  const stats = getTemplateStats(template.id);
-  
-  const complexityColors = {
-    simple: '#4CAF50',
-    medium: '#FF9800',
-    complex: '#F44336',
+  const handleClick = () => {
+    onSelect?.(template);
   };
-  
-  const complexityLabels = {
-    simple: '简单',
-    medium: '中等',
-    complex: '复杂',
+
+  // 获取难度标签样式
+  const getDifficultyClass = (difficulty: string) => {
+    switch (difficulty) {
+      case 'beginner':
+        return styles.difficultyBeginner;
+      case 'intermediate':
+        return styles.difficultyIntermediate;
+      case 'advanced':
+        return styles.difficultyAdvanced;
+      default:
+        return '';
+    }
   };
-  
+
   return (
-    <div 
-      className={`${styles.card} ${selected ? styles.cardSelected : ''}`}
-      onClick={onClick}
+    <div
+      className={`${styles.card} ${isSelected ? styles.selected : ''} ${className}`}
+      onClick={handleClick}
       role="button"
       tabIndex={0}
-      onKeyDown={e => e.key === 'Enter' && onClick()}
+      onKeyDown={(e) => e.key === 'Enter' && handleClick()}
     >
-      <div className={styles.cardHeader}>
-        <span className={styles.cardIcon}>{template.icon}</span>
-        <span 
-          className={styles.cardComplexity}
-          style={{ backgroundColor: complexityColors[template.metadata.complexity] }}
-        >
-          {complexityLabels[template.metadata.complexity]}
+      {/* 缩略图 */}
+      <div className={styles.thumbnail}>
+        {template.thumbnail ? (
+          <img src={template.thumbnail} alt={template.name} />
+        ) : (
+          <div className={styles.placeholder}>
+            <span>📄</span>
+          </div>
+        )}
+        
+        {/* 推荐标记 */}
+        {template.featured && (
+          <span className={styles.featured}>推荐</span>
+        )}
+        
+        {/* 价格标签 */}
+        <span className={`${styles.price} ${template.price === 'free' ? styles.free : styles.premium}`}>
+          {template.price === 'free' ? '免费' : '付费'}
         </span>
       </div>
-      
-      <h3 className={styles.cardTitle}>{template.displayName}</h3>
-      
-      <p className={styles.cardDesc}>
-        {template.description.length > 60 
-          ? template.description.slice(0, 60) + '...' 
-          : template.description}
-      </p>
-      
-      <div className={styles.cardTags}>
-        {template.metadata.tags.slice(0, 3).map(tag => (
-          <span key={tag} className={styles.cardTag}>
-            {tag}
+
+      {/* 内容 */}
+      <div className={styles.content}>
+        <h3 className={styles.name}>{template.name}</h3>
+        <p className={styles.description}>{template.description}</p>
+
+        {/* 标签 */}
+        <div className={styles.tags}>
+          {template.tags.slice(0, 3).map(tag => (
+            <span key={tag} className={styles.tag}>{tag}</span>
+          ))}
+        </div>
+
+        {/* 元信息 */}
+        <div className={styles.meta}>
+          <span className={styles.difficulty + ' ' + getDifficultyClass(template.difficulty)}>
+            {template.difficulty === 'beginner' ? '入门' : template.difficulty === 'intermediate' ? '进阶' : '高级'}
           </span>
-        ))}
-        {template.metadata.tags.length > 3 && (
-          <span className={styles.cardTagMore}>
-            +{template.metadata.tags.length - 3}
+          <span className={styles.downloads}>
+            📥 {template.downloads}
           </span>
-        )}
-      </div>
-      
-      {/* 统计信息 */}
-      <div className={styles.statsCompact}>
-        {stats.usageCount > 0 && (
-          <span className={styles.usageCount}>
-            👁 {stats.usageCount}
+          <span className={styles.rating}>
+            ⭐ {template.rating}
           </span>
-        )}
-        {stats.ratingCount > 0 && (
-          <span className={styles.ratingCompact}>
-            ⭐ {stats.avgRating.toFixed(1)}
-          </span>
-        )}
-      </div>
-      
-      <div className={styles.cardFooter}>
-        <span className={styles.cardMeta}>
-          {template.entities.length} 个实体 · {template.features.length} 个功能
-        </span>
-        {onPreview && (
-          <button 
-            className={styles.previewBtn}
-            onClick={e => {
-              e.stopPropagation();
-              onPreview();
-            }}
-          >
-            预览
-          </button>
-        )}
+        </div>
       </div>
     </div>
   );

@@ -14,6 +14,7 @@ import {
   type PackageJsonInfo,
   type DirectoryTreeNode,
 } from '@/services/github/github-import';
+import { OAuthConnectButton } from '@/components/oauth';
 import styles from './GitHubImport.module.css';
 
 interface GitHubImportProps {
@@ -91,24 +92,32 @@ export function GitHubImport({ onImport, className }: GitHubImportProps) {
       </div>
 
       {!repoInfo ? (
-        <div className={styles.inputSection}>
-          <input
-            type="text"
-            className={styles.input}
-            placeholder="https://github.com/owner/repo"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleImport()}
-            disabled={isLoading}
-          />
-          <button
-            className={styles.button}
-            onClick={handleImport}
-            disabled={isLoading || !url.trim()}
-          >
-            {isLoading ? '🔄 获取中...' : '🔍 获取'}
-          </button>
-        </div>
+        <>
+          <div className={styles.inputSection}>
+            <input
+              type="text"
+              className={styles.input}
+              placeholder="https://github.com/owner/repo"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleImport()}
+              disabled={isLoading}
+            />
+            <button
+              className={styles.button}
+              onClick={handleImport}
+              disabled={isLoading || !url.trim()}
+            >
+              {isLoading ? '🔄 获取中...' : '🔍 获取'}
+            </button>
+          </div>
+          
+          {/* OAuth 连接 */}
+          <div className={styles.oauthSection}>
+            <div className={styles.oauthLabel}>连接 GitHub 账户以访问私有仓库</div>
+            <OAuthConnectButton provider="github" />
+          </div>
+        </>
       ) : (
         <div className={styles.preview}>
           <div className={styles.repoHeader}>

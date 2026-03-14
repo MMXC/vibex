@@ -184,13 +184,16 @@ export default function HomePage() {
   const router = useRouter();
   const isAuthenticated = useIsAuthenticated();
   const [requirementText, setRequirementText] = useState('');
-  const [activeTab, setActiveTab] = useState<'input' | 'preview'>('input');
+  // F1.4: 移除 Tab 切换 - 使用固定分割布局
   const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiMessage, setAiMessage] = useState('');
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([
     { role: 'assistant', content: '你好！我是 VibeX AI 助手。描述你的产品需求，我可以帮你生成完整的应用结构。' },
   ]);
+
+  // F2: 节点勾选状态
+  const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set());
 
   // 单页式流程状态
   const [currentStep, setCurrentStep] = useState(1);
@@ -251,7 +254,6 @@ export default function HomePage() {
     if (modelStreamStatus === 'done' && streamDomainModels.length > 0) {
       setDomainModels(streamDomainModels as DomainModel[]);
       setCurrentStep(3);
-      setActiveTab('preview');
     }
   }, [modelStreamStatus, streamDomainModels]);
 
@@ -306,7 +308,6 @@ export default function HomePage() {
 
         // 切换到步骤2（限界上下文）
         setCurrentStep(2);
-        setActiveTab('preview');
       } else {
         throw new Error(response?.error || '生成失败');
       }
@@ -333,7 +334,6 @@ export default function HomePage() {
     // 使用流式 API
     generateFlow(domainModels, requirementText);
     setCurrentStep(4);
-    setActiveTab('preview');
   };
 
   // F4.2: 同步业务流程流结果到本地状态
@@ -374,11 +374,6 @@ export default function HomePage() {
     if (!isStepClickable(stepId)) return;
     
     setCurrentStep(stepId);
-    if (stepId > 1) {
-      setActiveTab('preview');
-    } else {
-      setActiveTab('input');
-    }
   };
 
   // 处理项目创建完成
@@ -403,7 +398,6 @@ export default function HomePage() {
       if (response) {
         // 切换到步骤5（项目创建）
         setCurrentStep(5);
-        setActiveTab('preview');
       } else {
         throw new Error('创建项目失败');
       }
@@ -440,6 +434,36 @@ export default function HomePage() {
       }, 500);
     }, 100);
   };
+
+  // F2: 节点勾选切换
+  const handleNodeToggle = useCallback((nodeId: string) => {
+    setSelectedNodes(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(nodeId)) {
+        newSet.delete(nodeId);
+      } else {
+        newSet.add(nodeId);
+      }
+      return newSet;
+    });
+  }, []);
+
+  // F2: 获取可勾选的节点列表
+  const getSelectableNodes = useCallback(() => {
+    const nodes: Array<{ id: string; name: string }> = [];
+    
+    // 从限界上下文添加节点
+    boundedContexts.forEach(ctx => {
+      nodes.push({ id: `ctx-${ctx.id}`, name: ctx.name });
+    });
+    
+    // 从领域模型添加节点
+    domainModels.forEach(model => {
+      nodes.push({ id: `model-${model.id}`, name: model.name });
+    });
+    
+    return nodes;
+  }, [boundedContexts, domainModels]);
 
   const handleAiSend = () => {
     if (!aiMessage.trim()) return;
@@ -580,111 +604,27 @@ export default function HomePage() {
         {/* 中间：需求输入/预览 - 60% */}
         <main className={styles.content}>
           <div className={styles.contentInner}>
-            {/* Tab 切换 */}
-            <div className={styles.tabContainer}>
-              <button
-                className={`${styles.tabButton} ${activeTab === 'input' ? styles.tabActive : ''}`}
-                onClick={() => setActiveTab('input')}
-              >
-                📝 需求输入
-              </button>
-              <button
-                className={`${styles.tabButton} ${activeTab === 'preview' ? styles.tabActive : ''}`}
-                onClick={() => setActiveTab('preview')}
-              >
-                👁️ 实时预览
-              </button>
-            </div>
-
-            {activeTab === 'input' ? (
-              <>
-                <h1 className={styles.pageTitle}>需求分析工作台</h1>
-                <p className={styles.pageSubtitle}>
-                  描述你的产品需求，AI 将协助你完成完整的设计
-                </p>
-
-                <div className={styles.inputSection}>
-                  <label className={styles.inputLabel}>
-                    描述你的产品需求
-                  </label>
-                  
-                  {/* 统一需求输入组件 - 集成诊断和优化功能 */}
-                  <RequirementInput
-                    initialValue={requirementText}
-                    onValueChange={setRequirementText}
-                    onGenerate={handleGenerate}
-                  />
-
-                  {/* GitHub 导入选项 */}
-                  <details className={styles.importOptions}>
-                    <summary className={styles.importSummary}>
-                      🐙 从 GitHub 导入项目
-                    </summary>
-                    <div className={styles.importContent}>
-                      <GitHubImport
-                        onImport={(text) => {
-                          setRequirementText(text);
-                          setCurrentStep(1);
-                        }}
-                      />
-                    </div>
-                  </details>
-
-                  {/* Figma 导入选项 */}
-                  <details className={styles.importOptions}>
-                    <summary className={styles.importSummary}>
-                      🎨 从 Figma 导入设计
-                    </summary>
-                    <div className={styles.importContent}>
-                      <FigmaImport
-                        onImport={(text) => {
-                          setRequirementText(text);
-                          setCurrentStep(1);
-                        }}
-                      />
-                    </div>
-                  </details>
-
-                  {/* Plan/Build 模式选择器 */}
-                  <PlanBuildButtons />
-
-                  {/* Plan 模式结果展示 */}
-                  {/* PlanResult 组件将根据模式状态显示 */}
-
-                  {/* 示例需求 */}
-                  <div className={styles.sampleSection}>
-                    <span className={styles.sampleLabel}>试试这些示例：</span>
-                    <div className={styles.sampleList}>
-                      {SAMPLE_REQUIREMENTS.map((sample, idx) => (
-                        <button
-                          key={idx}
-                          className={styles.sampleButton}
-                          onClick={() => handleSampleClick(sample.desc)}
-                        >
-                          {sample.title}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+            {/* F1: 预览/录入分离布局 - 60% / 40% */}
+            <div className={styles.splitContainer}>
+              {/* 预览区域 - 60% */}
+              <div className={styles.previewArea}>
+                <div className={styles.previewAreaHeader}>
+                  <span className={styles.previewAreaTitle}>👁️ 实时预览</span>
+                  {selectedNodes.size > 0 && (
+                    <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
+                      已选 {selectedNodes.size} 项
+                    </span>
+                  )}
                 </div>
-              </>
-            ) : (
-              <>
-                {/* 根据当前步骤显示不同的预览内容 */}
-                {currentStep === 1 && (
-                  <>
-                    <h1 className={styles.pageTitle}>实时预览</h1>
-                    <p className={styles.pageSubtitle}>
-                      AI 正在分析你的需求，自动生成限界上下文设计
-                    </p>
-
-                    <div className={styles.previewSection}>
+                <div className={styles.previewAreaContent}>
+                  {currentStep === 1 && (
+                    <>
                       {mermaidCode ? (
                         <MermaidPreview 
                           code={mermaidCode} 
                           diagramType="flowchart"
                           layout="TB"
-                          height="400px"
+                          height="100%"
                         />
                       ) : (
                         <div className={styles.previewEmpty}>
@@ -694,29 +634,41 @@ export default function HomePage() {
                           </div>
                         </div>
                       )}
-                    </div>
+                    </>
+                  )}
 
-                    <div className={styles.previewHint}>
-                      <span>💡 提示：</span> 输入越详细，AI 生成的限界上下文越准确
-                    </div>
-                  </>
-                )}
-
-                {currentStep === 2 && (
-                  <>
-                    <h1 className={styles.pageTitle}>限界上下文设计</h1>
-                    <p className={styles.pageSubtitle}>
-                      AI 已生成限界上下文设计，请预览确认
-                    </p>
-
-                    <div className={styles.previewSection}>
+                  {currentStep === 2 && (
+                    <>
                       {contextMermaidCode ? (
-                        <MermaidPreview 
-                          code={contextMermaidCode} 
-                          diagramType="flowchart"
-                          layout="TB"
-                          height="400px"
-                        />
+                        <>
+                          <MermaidPreview 
+                            code={contextMermaidCode} 
+                            diagramType="flowchart"
+                            layout="TB"
+                            height="60%"
+                          />
+                          {/* F2: 节点勾选 */}
+                          {boundedContexts.length > 0 && (
+                            <div className={styles.nodeSelection}>
+                              {boundedContexts.map(ctx => (
+                                <label
+                                  key={ctx.id}
+                                  className={`${styles.nodeCheckbox} ${selectedNodes.has(`ctx-${ctx.id}`) ? styles.checked : ''}`}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedNodes.has(`ctx-${ctx.id}`)}
+                                    onChange={() => handleNodeToggle(`ctx-${ctx.id}`)}
+                                  />
+                                  <span className={styles.nodeCheckboxIndicator}>
+                                    {selectedNodes.has(`ctx-${ctx.id}`) ? '✓' : ''}
+                                  </span>
+                                  {ctx.name}
+                                </label>
+                              ))}
+                            </div>
+                          )}
+                        </>
                       ) : boundedContexts.length > 0 ? (
                         <div className={styles.resultList}>
                           {boundedContexts.map((ctx) => (
@@ -737,35 +689,41 @@ export default function HomePage() {
                           </div>
                         </div>
                       )}
-                    </div>
+                    </>
+                  )}
 
-                    <div className={styles.actions}>
-                      <button
-                        className={styles.primaryButton}
-                        onClick={handleGenerateDomainModel}
-                        disabled={isGenerating || boundedContexts.length === 0}
-                      >
-                        {isGenerating ? '生成中...' : '🚀 继续生成领域模型'}
-                      </button>
-                    </div>
-                  </>
-                )}
-
-                {currentStep === 3 && (
-                  <>
-                    <h1 className={styles.pageTitle}>领域模型设计</h1>
-                    <p className={styles.pageSubtitle}>
-                      AI 已生成领域模型，请预览确认
-                    </p>
-
-                    <div className={styles.previewSection}>
+                  {currentStep === 3 && (
+                    <>
                       {modelMermaidCode ? (
-                        <MermaidPreview 
-                          code={modelMermaidCode} 
-                          diagramType="classDiagram"
-                          layout="TB"
-                          height="400px"
-                        />
+                        <>
+                          <MermaidPreview 
+                            code={modelMermaidCode} 
+                            diagramType="classDiagram"
+                            layout="TB"
+                            height="60%"
+                          />
+                          {/* F2: 节点勾选 */}
+                          {domainModels.length > 0 && (
+                            <div className={styles.nodeSelection}>
+                              {domainModels.map(model => (
+                                <label
+                                  key={model.id}
+                                  className={`${styles.nodeCheckbox} ${selectedNodes.has(`model-${model.id}`) ? styles.checked : ''}`}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedNodes.has(`model-${model.id}`)}
+                                    onChange={() => handleNodeToggle(`model-${model.id}`)}
+                                  />
+                                  <span className={styles.nodeCheckboxIndicator}>
+                                    {selectedNodes.has(`model-${model.id}`) ? '✓' : ''}
+                                  </span>
+                                  {model.name}
+                                </label>
+                              ))}
+                            </div>
+                          )}
+                        </>
                       ) : domainModels.length > 0 ? (
                         <div className={styles.resultList}>
                           {domainModels.map((model) => (
@@ -790,34 +748,17 @@ export default function HomePage() {
                           </div>
                         </div>
                       )}
-                    </div>
+                    </>
+                  )}
 
-                    <div className={styles.actions}>
-                      <button
-                        className={styles.primaryButton}
-                        onClick={handleGenerateBusinessFlow}
-                        disabled={flowStreamStatus !== 'idle' || domainModels.length === 0}
-                      >
-                        {flowStreamStatus !== 'idle' ? '🌊 流式生成中...' : '🌊 继续生成业务流程'}
-                      </button>
-                    </div>
-                  </>
-                )}
-
-                {currentStep === 4 && (
-                  <>
-                    <h1 className={styles.pageTitle}>业务流程设计</h1>
-                    <p className={styles.pageSubtitle}>
-                      AI 已生成业务流程，请预览确认
-                    </p>
-
-                    <div className={styles.previewSection}>
+                  {currentStep === 4 && (
+                    <>
                       {flowMermaidCode ? (
                         <MermaidPreview 
                           code={flowMermaidCode} 
                           diagramType="flowchart"
                           layout="TB"
-                          height="400px"
+                          height="100%"
                         />
                       ) : businessFlow ? (
                         <div className={styles.resultList}>
@@ -838,113 +779,140 @@ export default function HomePage() {
                           </div>
                         </div>
                       )}
-                    </div>
+                    </>
+                  )}
 
-                    {/* 页面树结构展示 */}
-                    <div className={styles.previewSection}>
-                      <h3 className={styles.pageTitle} style={{ fontSize: '18px', marginBottom: '12px' }}>
-                        📄 页面树结构
-                      </h3>
-                      <div style={{ height: '300px', border: '1px solid #e0e0e0', borderRadius: '8px', overflow: 'hidden' }}>
-                        <PageTreeDiagram
-                          data={[
-                            {
-                              id: 'page-home',
-                              type: 'page',
-                              name: '首页',
-                              children: [
-                                {
-                                  id: 'section-hero',
-                                  type: 'section',
-                                  name: 'Hero 区域',
-                                  children: [
-                                    { id: 'comp-title', type: 'component', name: '标题组件' },
-                                    { id: 'comp-cta', type: 'component', name: 'CTA 按钮' },
-                                  ],
-                                },
-                                {
-                                  id: 'section-features',
-                                  type: 'section',
-                                  name: '功能展示',
-                                  children: [
-                                    { id: 'comp-card-1', type: 'component', name: '功能卡片 1' },
-                                    { id: 'comp-card-2', type: 'component', name: '功能卡片 2' },
-                                  ],
-                                },
-                              ],
-                            },
-                          ]}
-                          direction="TB"
-                          showControls
-                          showBackground
+                  {currentStep === 5 && (
+                    <div className={styles.successCard}>
+                      <div className={styles.successIcon}>🎉</div>
+                      <div className={styles.successTitle}>项目创建成功！</div>
+                      <div className={styles.successDesc}>
+                        你的项目 "{requirementText.slice(0, 30)}..." 已成功创建
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* 录入区域 - 40% */}
+              <div className={styles.inputArea}>
+                <div className={styles.inputAreaHeader}>
+                  <span className={styles.inputAreaTitle}>📝 需求录入</span>
+                </div>
+                <div className={styles.inputAreaContent}>
+                  <h1 className={styles.pageTitle}>Step {currentStep}: {STEPS[currentStep - 1]?.label}</h1>
+                  <p className={styles.pageSubtitle}>
+                    描述你的产品需求，AI 将协助你完成完整的设计
+                  </p>
+
+                  <div className={styles.inputSection}>
+                    <label className={styles.inputLabel}>
+                      描述你的产品需求
+                    </label>
+                    
+                    {/* 统一需求输入组件 */}
+                    <RequirementInput
+                      initialValue={requirementText}
+                      onValueChange={setRequirementText}
+                      onGenerate={handleGenerate}
+                    />
+
+                    {/* GitHub 导入选项 */}
+                    <details className={styles.importOptions}>
+                      <summary className={styles.importSummary}>
+                        🐙 从 GitHub 导入项目
+                      </summary>
+                      <div className={styles.importContent}>
+                        <GitHubImport
+                          onImport={(text) => {
+                            setRequirementText(text);
+                            setCurrentStep(1);
+                          }}
                         />
                       </div>
-                    </div>
+                    </details>
 
-                    <div className={styles.actions}>
-                      <button
-                        className={styles.primaryButton}
-                        onClick={handleCreateProject}
-                        disabled={isGenerating || !businessFlow}
-                      >
-                        {isGenerating ? '创建中...' : '✨ 创建项目'}
-                      </button>
-                    </div>
-                  </>
-                )}
+                    {/* Figma 导入选项 */}
+                    <details className={styles.importOptions}>
+                      <summary className={styles.importSummary}>
+                        🎨 从 Figma 导入设计
+                      </summary>
+                      <div className={styles.importContent}>
+                        <FigmaImport
+                          onImport={(text) => {
+                            setRequirementText(text);
+                            setCurrentStep(1);
+                          }}
+                        />
+                      </div>
+                    </details>
 
-                {currentStep === 5 && (
-                  <>
-                    <h1 className={styles.pageTitle}>项目生成</h1>
-                    <p className={styles.pageSubtitle}>
-                      恭喜！项目已创建成功
-                    </p>
+                    {/* Plan/Build 模式选择器 */}
+                    <PlanBuildButtons />
 
-                    <div className={styles.previewSection}>
-                      <div className={styles.successCard}>
-                        <div className={styles.successIcon}>🎉</div>
-                        <div className={styles.successTitle}>项目创建成功！</div>
-                        <div className={styles.successDesc}>
-                          你的项目 "{requirementText.slice(0, 30)}..." 已成功创建
-                        </div>
-                        <div className={styles.projectSummary}>
-                          <div className={styles.summaryItem}>
-                            <span className={styles.summaryLabel}>限界上下文:</span>
-                            <span className={styles.summaryValue}>{boundedContexts.length} 个</span>
-                          </div>
-                          <div className={styles.summaryItem}>
-                            <span className={styles.summaryLabel}>领域模型:</span>
-                            <span className={styles.summaryValue}>{domainModels.length} 个</span>
-                          </div>
-                          <div className={styles.summaryItem}>
-                            <span className={styles.summaryLabel}>业务流程:</span>
-                            <span className={styles.summaryValue}>{businessFlow ? '已生成' : '-'}</span>
-                          </div>
-                        </div>
-                        <div className={styles.actions}>
-                          <Link href="/dashboard" className={styles.primaryButton}>
-                            查看项目
-                          </Link>
-                          <button 
-                            className={styles.secondaryButton}
-                            onClick={() => {
-                              setCurrentStep(1);
-                              setRequirementText('');
-                              setBoundedContexts([]);
-                              setDomainModels([]);
-                              setBusinessFlow(null);
-                              setActiveTab('input');
-                            }}
+                    {/* 示例需求 */}
+                    <div className={styles.sampleSection}>
+                      <span className={styles.sampleLabel}>试试这些示例：</span>
+                      <div className={styles.sampleList}>
+                        {SAMPLE_REQUIREMENTS.map((sample, idx) => (
+                          <button
+                            key={idx}
+                            className={styles.sampleButton}
+                            onClick={() => handleSampleClick(sample.desc)}
                           >
-                            继续创建新项目
+                            {sample.title}
                           </button>
-                        </div>
+                        ))}
                       </div>
                     </div>
-                  </>
-                )}
-              </>
-            )}
+
+                    {/* 诊断功能 */}
+                    <div className={styles.diagnosisSection}>
+                      <DiagnosisPanel 
+                        onAnalyze={(text) => console.log('Diagnosed:', text)}
+                        onOptimize={(text) => {
+                          setRequirementText(text);
+                          console.log('Optimized and applied:', text);
+                        }}
+                      />
+                    </div>
+
+                    {/* 继续按钮 */}
+                    {currentStep > 1 && currentStep < 5 && (
+                      <div className={styles.actions}>
+                        {currentStep === 2 && (
+                          <button
+                            className={styles.primaryButton}
+                            onClick={handleGenerateDomainModel}
+                            disabled={isGenerating || boundedContexts.length === 0}
+                          >
+                            {isGenerating ? '生成中...' : '🚀 继续生成领域模型'}
+                          </button>
+                        )}
+                        {currentStep === 3 && (
+                          <button
+                            className={styles.primaryButton}
+                            onClick={handleGenerateBusinessFlow}
+                            disabled={flowStreamStatus !== 'idle' || domainModels.length === 0}
+                          >
+                            {flowStreamStatus !== 'idle' ? '🌊 流式生成中...' : '🌊 继续生成业务流程'}
+                          </button>
+                        )}
+                        {currentStep === 4 && (
+                          <button
+                            className={styles.primaryButton}
+                            onClick={handleCreateProject}
+                            disabled={isGenerating || !businessFlow}
+                          >
+                            {isGenerating ? '创建中...' : '✨ 创建项目'}
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </main>
 

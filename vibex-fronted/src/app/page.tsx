@@ -225,22 +225,23 @@ export default function HomePage() {
   const [generationError, setGenerationError] = useState('');
 
   // F3: Panel sizes for draggable resizing (persist to localStorage)
-  const [panelSizes, setPanelSizes] = useState<number[]>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('vibex-panel-sizes');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length >= 2) {
-            return parsed;
-          }
-        } catch (e) {
-          // ignore parse error
+  // Initialize with default values to avoid hydration mismatch
+  const [panelSizes, setPanelSizes] = useState<number[]>([60, 40]);
+
+  // Load panel sizes from localStorage on client side only
+  useEffect(() => {
+    const saved = localStorage.getItem('vibex-panel-sizes');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length >= 2) {
+          setPanelSizes(parsed);
         }
+      } catch (e) {
+        // ignore parse error
       }
     }
-    return [60, 40]; // default: 60% preview, 40% input
-  });
+  }, []);
 
   // Save panel sizes to localStorage when they change
   const handlePanelResize = useCallback((layout: { [id: string]: number }) => {
@@ -248,9 +249,7 @@ export default function HomePage() {
     const sizes = Object.values(layout).map(v => Math.round(v));
     if (sizes.length >= 2) {
       setPanelSizes(sizes);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('vibex-panel-sizes', JSON.stringify(sizes));
-      }
+      localStorage.setItem('vibex-panel-sizes', JSON.stringify(sizes));
     }
   }, []);
 

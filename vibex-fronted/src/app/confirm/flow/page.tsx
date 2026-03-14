@@ -34,7 +34,7 @@ export default function FlowPage() {
   // Generate business flow via API
   useEffect(() => {
     const generateFlow = async () => {
-      if (!businessFlow.states.length && domainModels.length > 0) {
+      if (!businessFlow?.states?.length && domainModels?.length > 0) {
         setLoading(true);
         setError('');
 
@@ -126,7 +126,7 @@ export default function FlowPage() {
         <div className={styles.flowList}>
           <h3 className={styles.sectionTitle}>流程状态</h3>
           <div className={styles.flowStates}>
-            {businessFlow.states.map((state) => (
+            {(businessFlow?.states || []).map((state) => (
               <div key={state.id} className={styles.flowState}>
                 <span
                   className={styles.stateType}
@@ -143,18 +143,18 @@ export default function FlowPage() {
         <div className={styles.flowList}>
           <h3 className={styles.sectionTitle}>流程转换</h3>
           <div className={styles.flowTransitions}>
-            {businessFlow.transitions.map((trans) => (
+            {(businessFlow?.transitions || []).map((trans) => (
               <div key={trans.id} className={styles.flowTransition}>
                 <span>
                   {
-                    businessFlow.states.find((s) => s.id === trans.fromStateId)
+                    (businessFlow?.states || []).find((s) => s.id === trans.fromStateId)
                       ?.name
                   }
                 </span>
                 <span className={styles.transitionArrow}>→</span>
                 <span>
                   {
-                    businessFlow.states.find((s) => s.id === trans.toStateId)
+                    (businessFlow?.states || []).find((s) => s.id === trans.toStateId)
                       ?.name
                   }
                 </span>

@@ -69,7 +69,7 @@ export default function SuccessPage() {
           <div className={styles.summaryItem}>
             <span className={styles.summaryLabel}>业务流程状态</span>
             <span className={styles.summaryValue}>
-              {businessFlow.states.length} 个
+              {businessFlow?.states?.length || 0} 个
             </span>
           </div>
         </div>

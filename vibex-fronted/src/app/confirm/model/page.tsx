@@ -126,7 +126,7 @@ export default function ModelPage() {
                 </div>
                 <h4 className={styles.modelName}>{model.name}</h4>
                 <div className={styles.modelProps}>
-                  {model.properties.map((prop, idx) => (
+                  {(model.properties || []).map((prop, idx) => (
                     <div key={idx} className={styles.modelProp}>
                       <span className={styles.propName}>
                         {prop.name}

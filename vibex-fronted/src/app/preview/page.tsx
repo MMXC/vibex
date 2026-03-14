@@ -44,15 +44,15 @@ export default function Preview() {
   }, []);
 
   // 获取 Store 数据
-  const boundedContexts = useContextStore((s) => s.boundedContexts);
-  const domainModels = useModelStore((s) => s.domainModels);
-  const businessFlow = useFlowStore((s) => s.businessFlow);
+  const boundedContexts = useContextStore((s) => s.boundedContexts) || [];
+  const domainModels = useModelStore((s) => s.domainModels) || [];
+  const businessFlow = useFlowStore((s) => s.businessFlow) || { id: '', name: '', states: [], transitions: [] };
 
   // 根据数据确定当前步骤
   const getCurrentStep = () => {
-    if (businessFlow.states.length > 0) return 3; // 业务流程
-    if (domainModels.length > 0) return 2; // 领域模型
-    if (boundedContexts.length > 0) return 1; // 限界上下文
+    if (businessFlow?.states?.length > 0) return 3; // 业务流程
+    if (domainModels?.length > 0) return 2; // 领域模型
+    if (boundedContexts?.length > 0) return 1; // 限界上下文
     return 0; // 需求输入
   };
 
@@ -194,7 +194,7 @@ export default function Preview() {
             </div>
           )}
 
-          {currentStep >= 3 && businessFlow.states.length > 0 && (
+          {currentStep >= 3 && businessFlow?.states?.length > 0 && (
             <div style={{ 
               width: '100%', 
               maxWidth: '800px',
@@ -204,7 +204,7 @@ export default function Preview() {
             }}>
               <h3 style={{ color: '#fff', margin: '0 0 16px' }}>业务流程</h3>
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                {businessFlow.states.map((state: any) => (
+                {(businessFlow?.states || []).map((state: any) => (
                   <div
                     key={state.id}
                     style={{

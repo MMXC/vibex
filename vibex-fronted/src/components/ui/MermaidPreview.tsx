@@ -12,6 +12,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 // 移除静态导入: import mermaid from 'mermaid';
 import { ErrorBoundary } from './ErrorBoundary';
+import DOMPurify from 'dompurify';
 
 export type DiagramType =
   | 'graph'
@@ -301,7 +302,12 @@ function MermaidPreviewInner({
     );
   }
 
-  // 正常渲染
+  // 正常渲染 - 使用 DOMPurify 防止 XSS
+  const sanitizedSvg = DOMPurify.sanitize(svg, {
+    USE_PROFILES: { svg: true },
+    ADD_TAGS: ['foreignObject'],
+  });
+  
   return (
     <div
       ref={containerRef}
@@ -314,7 +320,7 @@ function MermaidPreviewInner({
         border: '1px solid var(--color-border)',
         padding: '16px',
       }}
-      dangerouslySetInnerHTML={{ __html: svg }}
+      dangerouslySetInnerHTML={{ __html: sanitizedSvg }}
     />
   );
 }

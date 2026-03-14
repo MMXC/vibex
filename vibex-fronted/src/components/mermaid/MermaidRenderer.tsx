@@ -15,6 +15,7 @@
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import mermaid from 'mermaid';
 import { preInitialize } from './mermaidInit';
+import DOMPurify from 'dompurify';
 
 // ==================== F1.2: LRU Cache ====================
 
@@ -157,7 +158,13 @@ export function MermaidRenderer({ chart, title }: MermaidRendererProps) {
         // F1.2: 存入缓存
         mermaidCache.set(cacheKey, svg);
         
-        setSvg(svg);
+        // 使用 DOMPurify 防止 XSS
+        const sanitizedSvg = DOMPurify.sanitize(svg, {
+          USE_PROFILES: { svg: true },
+          ADD_TAGS: ['foreignObject'],
+        });
+        
+        setSvg(sanitizedSvg);
         setError('');
       } catch (err) {
         // F3.1: 检查是否已取消

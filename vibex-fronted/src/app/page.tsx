@@ -14,6 +14,7 @@ import { RequirementInput } from '@/components/requirement-input';
 import { GitHubImport } from '@/components/github-import';
 import { FigmaImport } from '@/components/figma-import';
 import { PlanBuildButtons } from '@/components/plan-build';
+import { PlanResult } from '@/components/plan-result';
 import { useDDDStream, useDomainModelStream, useBusinessFlowStream } from '@/hooks/useDDDStream';
 import { dddApi, projectApi } from '@/services/api';
 import styles from './homepage.module.css';
@@ -644,6 +645,9 @@ export default function HomePage() {
 
                   {/* Plan/Build 模式选择器 */}
                   <PlanBuildButtons />
+
+                  {/* Plan 模式结果展示 */}
+                  {/* PlanResult 组件将根据模式状态显示 */}
 
                   {/* 示例需求 */}
                   <div className={styles.sampleSection}>

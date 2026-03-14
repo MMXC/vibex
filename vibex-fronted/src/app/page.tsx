@@ -4,11 +4,11 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from 'react-resizable-panels';
 import LoginDrawer from '@/components/ui/LoginDrawer';
 import { ParticleBackground } from '@/components/particles/ParticleBackground';
 import { MermaidPreview } from '@/components/ui/MermaidPreview';
 import { ThinkingPanel } from '@/components/ui/ThinkingPanel';
-import DiagnosisPanel from '@/components/diagnosis/DiagnosisPanel';
 import { PageTreeDiagram } from '@/components/page-tree-diagram';
 import { RequirementInput } from '@/components/requirement-input';
 import { GitHubImport } from '@/components/github-import';
@@ -223,6 +223,36 @@ export default function HomePage() {
   const [businessFlow, setBusinessFlow] = useState<BusinessFlow | null>(null);
   const [flowMermaidCode, setFlowMermaidCode] = useState('');
   const [generationError, setGenerationError] = useState('');
+
+  // F3: Panel sizes for draggable resizing (persist to localStorage)
+  const [panelSizes, setPanelSizes] = useState<number[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('vibex-panel-sizes');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length >= 2) {
+            return parsed;
+          }
+        } catch (e) {
+          // ignore parse error
+        }
+      }
+    }
+    return [60, 40]; // default: 60% preview, 40% input
+  });
+
+  // Save panel sizes to localStorage when they change
+  const handlePanelResize = useCallback((layout: { [id: string]: number }) => {
+    // Extract values from the layout object and convert to number array
+    const sizes = Object.values(layout).map(v => Math.round(v));
+    if (sizes.length >= 2) {
+      setPanelSizes(sizes);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('vibex-panel-sizes', JSON.stringify(sizes));
+      }
+    }
+  }, []);
 
   // F2: useDDDStream Hook for AI thinking process visualization
   const {
@@ -623,10 +653,10 @@ export default function HomePage() {
         {/* 中间：需求输入/预览 - 60% */}
         <main className={styles.content}>
           <div className={styles.contentInner}>
-            {/* F1: 预览/录入分离布局 - 60% / 40% */}
-            <div className={styles.splitContainer}>
+            {/* F1: 预览/录入分离布局 - 60% / 40% - 可拖拽调整 */}
+            <PanelGroup orientation="horizontal" onLayoutChanged={handlePanelResize} className={styles.splitContainer}>
               {/* 预览区域 - 60% */}
-              <div className={styles.previewArea}>
+              <Panel defaultSize={panelSizes[0]} minSize={30} maxSize={70} className={styles.previewArea}>
                 <div className={styles.previewAreaHeader}>
                   <span className={styles.previewAreaTitle}>👁️ 实时预览</span>
                   {selectedNodes.size > 0 && (
@@ -811,10 +841,13 @@ export default function HomePage() {
                     </div>
                   )}
                 </div>
-              </div>
+              </Panel>
+              
+              {/* 拖拽分隔线 */}
+              <PanelResizeHandle className={styles.resizeHandle} />
 
               {/* 录入区域 - 40% */}
-              <div className={styles.inputArea}>
+              <Panel defaultSize={panelSizes[1]} minSize={30} maxSize={70} className={styles.inputArea}>
                 <div className={styles.inputAreaHeader}>
                   <span className={styles.inputAreaTitle}>📝 需求录入</span>
                 </div>
@@ -885,17 +918,6 @@ export default function HomePage() {
                       </div>
                     </div>
 
-                    {/* 诊断功能 */}
-                    <div className={styles.diagnosisSection}>
-                      <DiagnosisPanel 
-                        onAnalyze={(text) => console.log('Diagnosed:', text)}
-                        onOptimize={(text) => {
-                          setRequirementText(text);
-                          console.log('Optimized and applied:', text);
-                        }}
-                      />
-                    </div>
-
                     {/* 继续按钮 */}
                     {currentStep > 1 && currentStep < 5 && (
                       <div className={styles.actions}>
@@ -930,8 +952,8 @@ export default function HomePage() {
                     )}
                   </div>
                 </div>
-              </div>
-            </div>
+              </Panel>
+            </PanelGroup>
           </div>
         </main>
 

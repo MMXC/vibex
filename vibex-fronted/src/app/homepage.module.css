@@ -1168,6 +1168,34 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  cursor: pointer;
+}
+
+/* F2/F3: Panel control buttons */
+.panelControls {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.panelBtn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.panelBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
 }
 
 .previewAreaTitle {

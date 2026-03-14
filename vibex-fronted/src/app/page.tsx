@@ -228,6 +228,30 @@ export default function HomePage() {
   // Initialize with default values to avoid hydration mismatch
   const [panelSizes, setPanelSizes] = useState<number[]>([60, 40]);
 
+  // F2: Maximize state - double-click header to fullscreen
+  const [maximizedPanel, setMaximizedPanel] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('vibex-maximized-panel');
+    }
+    return null;
+  });
+
+  // F3: Minimize state - collapse panel to titlebar
+  const [minimizedPanel, setMinimizedPanel] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('vibex-minimized-panel');
+    }
+    return null;
+  });
+
+  // F4: Float state - drag out as floating window
+  const [floatingPanel, setFloatingPanel] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('vibex-floating-panel');
+    }
+    return null;
+  });
+
   // Load panel sizes from localStorage on client side only
   useEffect(() => {
     const saved = localStorage.getItem('vibex-panel-sizes');
@@ -252,6 +276,54 @@ export default function HomePage() {
       localStorage.setItem('vibex-panel-sizes', JSON.stringify(sizes));
     }
   }, []);
+
+  // F2: Double-click to maximize panel
+  const handleDoubleClick = useCallback((panelId: string) => {
+    setMaximizedPanel(prev => prev === panelId ? null : panelId);
+    setMinimizedPanel(null);
+  }, []);
+
+  // F3: Click to minimize panel to titlebar
+  const handleMinimize = useCallback((panelId: string) => {
+    setMinimizedPanel(prev => prev === panelId ? null : panelId);
+    setMaximizedPanel(null);
+  }, []);
+
+  // F4: Toggle float mode (simplified - just hide from layout)
+  const handleFloat = useCallback((panelId: string) => {
+    setFloatingPanel(prev => prev === panelId ? null : panelId);
+  }, []);
+
+  // F5: Persist panel states to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (maximizedPanel) {
+        localStorage.setItem('vibex-maximized-panel', maximizedPanel);
+      } else {
+        localStorage.removeItem('vibex-maximized-panel');
+      }
+    }
+  }, [maximizedPanel]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (minimizedPanel) {
+        localStorage.setItem('vibex-minimized-panel', minimizedPanel);
+      } else {
+        localStorage.removeItem('vibex-minimized-panel');
+      }
+    }
+  }, [minimizedPanel]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (floatingPanel) {
+        localStorage.setItem('vibex-floating-panel', floatingPanel);
+      } else {
+        localStorage.removeItem('vibex-floating-panel');
+      }
+    }
+  }, [floatingPanel]);
 
   // F2: useDDDStream Hook for AI thinking process visualization
   const {
@@ -656,13 +728,26 @@ export default function HomePage() {
             <PanelGroup orientation="horizontal" onLayoutChanged={handlePanelResize} className={styles.splitContainer}>
               {/* 预览区域 - 60% */}
               <Panel defaultSize={panelSizes[0]} minSize={30} maxSize={70} className={styles.previewArea}>
-                <div className={styles.previewAreaHeader}>
+                <div className={styles.previewAreaHeader} onDoubleClick={() => handleDoubleClick('preview')}>
                   <span className={styles.previewAreaTitle}>👁️ 实时预览</span>
                   {selectedNodes.size > 0 && (
                     <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
                       已选 {selectedNodes.size} 项
                     </span>
                   )}
+                  {/* F2/F3: Max/Min buttons */}
+                  <div className={styles.panelControls}>
+                    <button 
+                      className={styles.panelBtn} 
+                      onClick={(e) => { e.stopPropagation(); handleMinimize('preview'); }}
+                      title="最小化"
+                    >—</button>
+                    <button 
+                      className={styles.panelBtn} 
+                      onClick={(e) => { e.stopPropagation(); handleDoubleClick('preview'); }}
+                      title="最大化 (双击)"
+                    >□</button>
+                  </div>
                 </div>
                 <div className={styles.previewAreaContent}>
                   {currentStep === 1 && (
@@ -847,8 +932,21 @@ export default function HomePage() {
 
               {/* 录入区域 - 40% */}
               <Panel defaultSize={panelSizes[1]} minSize={30} maxSize={70} className={styles.inputArea}>
-                <div className={styles.inputAreaHeader}>
+                <div className={styles.inputAreaHeader} onDoubleClick={() => handleDoubleClick('input')}>
                   <span className={styles.inputAreaTitle}>📝 需求录入</span>
+                  {/* F2/F3: Max/Min buttons */}
+                  <div className={styles.panelControls}>
+                    <button 
+                      className={styles.panelBtn} 
+                      onClick={(e) => { e.stopPropagation(); handleMinimize('input'); }}
+                      title="最小化"
+                    >—</button>
+                    <button 
+                      className={styles.panelBtn} 
+                      onClick={(e) => { e.stopPropagation(); handleDoubleClick('input'); }}
+                      title="最大化 (双击)"
+                    >□</button>
+                  </div>
                 </div>
                 <div className={styles.inputAreaContent}>
                   <h1 className={styles.pageTitle}>Step {currentStep}: {STEPS[currentStep - 1]?.label}</h1>

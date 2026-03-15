@@ -44,9 +44,7 @@ export function RequirementInput({
 
   // 同步外部 initialValue 变化（示例点击等场景）
   useEffect(() => {
-    if (initialValue !== text) {
-      setText(initialValue);
-    }
+    setText(initialValue);
   }, [initialValue]);
 
   const {

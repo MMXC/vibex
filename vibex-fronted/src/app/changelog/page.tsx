@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.34',
+    date: '2026-03-15',
+    changes: [
+      '📚 知识库系统：问题文档模板 + 分类索引 + 防范规则',
+      '🐛 Bug 迁移：7 个历史问题文档完整迁移',
+      '🔍 搜索脚本：支持关键词/分类/严重级别过滤',
+      '✅ F1-F6 全部通过：目录结构/模板/迁移/分类/索引/搜索',
+    ],
+    commit: 'b45b25f',
+  },
+  {
     version: '1.0.33',
     date: '2026-03-15',
     changes: [

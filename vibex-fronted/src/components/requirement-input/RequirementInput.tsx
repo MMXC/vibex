@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useDiagnosis } from '@/hooks/diagnosis';
 import styles from './RequirementInput.module.css';
 
@@ -41,7 +41,14 @@ export function RequirementInput({
   disableOptimization = false,
 }: RequirementInputProps) {
   const [text, setText] = useState(initialValue);
-  
+
+  // 同步外部 initialValue 变化（示例点击等场景）
+  useEffect(() => {
+    if (initialValue !== text) {
+      setText(initialValue);
+    }
+  }, [initialValue]);
+
   const {
     diagnosis,
     isAnalyzing,

@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.35',
+    date: '2026-03-15',
+    changes: [
+      '🎨 空状态 UI：domainModels 为空时显示友好提示',
+      '🔧 API 响应处理：null 值自动转换为空数组',
+      '✅ F1-F3 全部通过：空值保护 + 空状态 UI + API 响应',
+    ],
+    commit: '7052dc8',
+  },
+  {
     version: '1.0.34',
     date: '2026-03-15',
     changes: [

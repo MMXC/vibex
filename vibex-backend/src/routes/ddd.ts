@@ -570,6 +570,7 @@ Respond ONLY with the JSON object.`
           // Send done event
           send('done', { 
             domainModels,
+            mermaidCode: generateDomainModelMermaidCode(domainModels, boundedContexts ? boundedContexts.map(c => ({ ...c, relationships: [], description: c.description || '' })) : []),
             message: '领域模型生成完成'
           })
           

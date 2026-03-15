@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.32',
+    date: '2026-03-15',
+    changes: [
+      '🔗 导航修复：「我的项目」链接从 /projects 改为 /dashboard',
+      '✅ 路由一致性：与其他页面返回链接保持一致',
+      '🐛 修复登录后「我的项目」按钮 404 问题',
+    ],
+    commit: '0932a64',
+  },
+  {
     version: '1.0.31',
     date: '2026-03-15',
     changes: [

@@ -199,8 +199,8 @@ const DEFAULT_PROVIDERS: Record<string, Partial<ProviderConfig>> = {
   minimax: {
     type: 'minimax',
     apiBase: 'https://api.minimax.chat/v1',
-    defaultModel: 'abab6.5s-chat',
-    models: ['abab6.5s-chat', 'abab6.5g-chat', 'abab6.5t-chat'],
+    defaultModel: 'MiniMax-M2.5-highspeed',
+    models: ['abab6.5s-chat', 'abab6.5g-chat', 'abab6.5t-chat', 'MiniMax-M2.5-highspeed'],
     maxTokens: 8192,
     timeout: 60000,
     retryAttempts: 3,

@@ -8,13 +8,19 @@
 
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { OnboardingModal } from '@/components/onboarding/OnboardingModal';
+import { OnboardingProgressBar } from '@/components/onboarding/OnboardingProgressBar';
 
 export function OnboardingProvider() {
   // 初始化引导触发逻辑
   useOnboarding();
 
-  // 渲染引导弹窗
-  return <OnboardingModal />;
+  // 渲染顶部进度条
+  return (
+    <>
+      <OnboardingProgressBar />
+      <OnboardingModal />
+    </>
+  );
 }
 
 export default OnboardingProvider;

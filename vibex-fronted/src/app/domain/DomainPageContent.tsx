@@ -104,14 +104,14 @@ function EntityNode({
           {entity.description || '暂无描述'}
         </div>
         <div className={styles.nodeAttrs}>
-          {entity.attributes.slice(0, 2).map((attr) => (
+          {(entity.attributes || []).slice(0, 2).map((attr) => (
             <span key={attr.name} className={styles.nodeAttr}>
               {attr.name}
             </span>
           ))}
-          {entity.attributes.length > 2 && (
+          {(entity.attributes || []).length > 2 && (
             <span className={styles.nodeAttrMore}>
-              +{entity.attributes.length - 2}
+              +{(entity.attributes || []).length - 2}
             </span>
           )}
         </div>
@@ -611,7 +611,7 @@ function DomainPageContent() {
       contextId: 'default',
       type: 'entity' as const,
       description: entity.description || '',
-      properties: entity.attributes.map((attr) => ({
+      properties: (entity.attributes || []).map((attr) => ({
         name: attr.name,
         type: attr.type,
         required: attr.required,
@@ -1135,7 +1135,7 @@ function DomainPageContent() {
                   </tr>
                 </thead>
                 <tbody>
-                  {selectedEntity.attributes.map((attr) => (
+                  {(selectedEntity.attributes || []).map((attr) => (
                     <tr key={attr.name}>
                       <td>{attr.name}</td>
                       <td>
@@ -1145,7 +1145,7 @@ function DomainPageContent() {
                       <td>{attr.description}</td>
                     </tr>
                   ))}
-                  {selectedEntity.attributes.length === 0 && (
+                  {(selectedEntity.attributes || []).length === 0 && (
                     <tr>
                       <td
                         colSpan={4}
@@ -1181,7 +1181,7 @@ function DomainPageContent() {
                     {entityTypeStyles[entity.type]?.label || entity.type}
                   </span>
                   <h3>{entity.name}</h3>
-                  {entity.attributes.length > 0 && (
+                  {(entity.attributes || []).length > 0 && (
                     <button
                       data-testid={`collapse-btn-${entity.id}`}
                       className={styles.collapseBtn}
@@ -1196,9 +1196,9 @@ function DomainPageContent() {
                 </div>
                 <p className={styles.entityDesc}>{entity.description}</p>
                 {/* 折叠区域：显示所有属性 */}
-                {entity.attributes.length > 0 && !collapsedEntities.has(entity.id) && (
+                {(entity.attributes || []).length > 0 && !collapsedEntities.has(entity.id) && (
                   <div data-testid={`entity-attrs-${entity.id}`} className={styles.entityAttrs}>
-                    {entity.attributes.slice(0, 3).map((attr) => (
+                    {(entity.attributes || []).slice(0, 3).map((attr) => (
                       <span key={attr.name} className={styles.attrTag}>
                         {attr.name}
                         {attr.required && (
@@ -1206,9 +1206,9 @@ function DomainPageContent() {
                         )}
                       </span>
                     ))}
-                    {entity.attributes.length > 3 && (
+                    {(entity.attributes || []).length > 3 && (
                       <span className={styles.moreAttrs}>
-                        +{entity.attributes.length - 3}
+                        +{(entity.attributes || []).length - 3}
                       </span>
                     )}
                   </div>

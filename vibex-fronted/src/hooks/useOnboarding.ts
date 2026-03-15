@@ -2,6 +2,7 @@
  * useOnboarding Hook
  * 
  * 引导触发逻辑 - 负责自动触发引导、处理路由集成
+ * 集成首次访问检测 (F1.1, F1.2, F1.3)
  */
 
 'use client';
@@ -9,6 +10,7 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { useOnboardingStore } from '@/stores/onboarding/onboardingStore';
+import { useFirstVisitDetect } from './useFirstVisitDetect';
 
 const AUTO_TRIGGER_DELAY = 1500; // 1.5秒延迟触发
 
@@ -27,16 +29,42 @@ const EXCLUDED_ROUTES = [
   '/confirm/',
 ];
 
+/**
+ * 引导触发 Hook
+ * 
+ * 功能:
+ * - F1.1: 首次访问自动触发
+ * - F1.2: localStorage 记录访问状态 (通过 useFirstVisitDetect)
+ * - F1.3: 过期后可重新触发 (通过 useFirstVisitDetect)
+ */
 export function useOnboarding() {
   const pathname = usePathname();
   const { status, start } = useOnboardingStore();
   const hasAutoTriggered = useRef(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // 首次访问检测
+  const { 
+    isFirstVisit, 
+    isExpired, 
+    recordVisit,
+    isReady: isFirstVisitReady 
+  } = useFirstVisitDetect({
+    expirationMs: 7 * 24 * 60 * 60 * 1000, // 7 天过期
+    storageKey: 'vibex-first-visit',
+    autoTrigger: true,
+  });
 
   // 检查是否应该触发引导
   const shouldTriggerOnboarding = useCallback(() => {
     // 只对未开始的用户触发
     if (status !== 'not-started') {
+      return false;
+    }
+
+    // F1.1: 首次访问自动触发 - 只有首次访问或过期后才自动触发
+    // 如果不是首次访问且未过期，则不自动触发
+    if (!isFirstVisit && !isExpired) {
       return false;
     }
 
@@ -51,7 +79,7 @@ export function useOnboarding() {
     );
 
     return isInWhitelist && !isExcluded;
-  }, [status, pathname]);
+  }, [status, pathname, isFirstVisit, isExpired]);
 
   // 清理定时器
   const clearTriggerTimer = useCallback(() => {
@@ -76,14 +104,20 @@ export function useOnboarding() {
         // 再次检查状态，确保用户仍未开始引导
         const currentStatus = useOnboardingStore.getState().status;
         if (currentStatus === 'not-started') {
+          // F1.2: 记录访问状态
+          recordVisit();
+          // 启动引导
           start();
         }
       }, AUTO_TRIGGER_DELAY);
     }
-  }, [shouldTriggerOnboarding, start, clearTriggerTimer]);
+  }, [shouldTriggerOnboarding, start, clearTriggerTimer, recordVisit]);
 
   // 路由变化时重新检查
   useEffect(() => {
+    // 等待首次访问检测 ready
+    if (!isFirstVisitReady) return;
+    
     // 每次路由变化时重置触发标记，允许在新页面再次触发
     hasAutoTriggered.current = false;
     
@@ -93,18 +127,23 @@ export function useOnboarding() {
     return () => {
       clearTriggerTimer();
     };
-  }, [pathname, triggerOnboarding, clearTriggerTimer]);
+  }, [pathname, triggerOnboarding, clearTriggerTimer, isFirstVisitReady]);
 
-  // 手动触发引导（用于设置页手动开始）
+  // 手动触发引导（用于设置页手动开始）- F1.3: 过期后可重新触发
   const manuallyStartOnboarding = useCallback(() => {
     hasAutoTriggered.current = true;
     clearTriggerTimer();
+    // 手动触发时也记录访问状态
+    recordVisit();
     start();
-  }, [start, clearTriggerTimer]);
+  }, [start, clearTriggerTimer, recordVisit]);
 
   return {
     // 状态
     status,
+    // 首次访问状态（供 UI 使用）
+    isFirstVisit,
+    isExpired,
     // 手动触发
     manuallyStartOnboarding,
   };

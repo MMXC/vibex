@@ -140,6 +140,9 @@ export function ThinkingPanel({
   const currentStepIndex = displayedSteps.length > 0 
     ? Math.min(displayedSteps.length - 1, totalSteps - 1) 
     : -1
+  const progressPercent = currentStepIndex >= 0 
+    ? Math.round(((currentStepIndex + 1) / totalSteps) * 100) 
+    : 0
   
   return (
     <div className={styles.panel}>
@@ -148,27 +151,31 @@ export function ThinkingPanel({
         <div className={styles.panelTitle}>
           <span className={styles.panelIcon}>🧠</span>
           AI 思考过程
+          {status === 'done' && <span className={styles.doneBadge}>✓ 已完成</span>}
         </div>
         
         {/* Status Badge */}
-        {status !== 'idle' && (
+        {status !== 'idle' && status !== 'done' && (
           <button className={styles.abortButton} onClick={onAbort}>
             停止
           </button>
         )}
+        {status === 'done' && (
+          <span className={styles.completedBadge}>完成</span>
+        )}
       </div>
       
       {/* Progress Bar */}
-      {status === 'thinking' && (
+      {(status === 'thinking' || status === 'done') && (
         <div className={styles.progressContainer}>
           <div className={styles.progressBar}>
             <div 
-              className={styles.progressFill}
-              style={{ width: `${((currentStepIndex + 1) / totalSteps) * 100}%` }}
+              className={`${styles.progressFill} ${status === 'done' ? styles.progressFillDone : ''}`}
+              style={{ width: status === 'done' ? '100%' : `${progressPercent}%` }}
             />
           </div>
           <span className={styles.progressText}>
-            {currentStepIndex + 1}/{totalSteps}
+            {status === 'done' ? '✓ 100%' : `${progressPercent}%`}
           </span>
         </div>
       )}

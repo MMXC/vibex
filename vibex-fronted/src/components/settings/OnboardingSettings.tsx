@@ -2,6 +2,7 @@
  * OnboardingSettings - 引导设置组件
  * 
  * 允许用户在设置页管理引导流程：重置引导、查看状态
+ * 支持 F5.3: 设置页重新开始
  */
 
 'use client';
@@ -9,6 +10,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOnboardingStore, ONBOARDING_STEPS } from '@/stores/onboarding';
+import { useFirstVisitDetect } from '@/hooks/useFirstVisitDetect';
 import styles from './OnboardingSettings.module.css';
 
 export function OnboardingSettings() {
@@ -19,11 +21,30 @@ export function OnboardingSettings() {
     start,
     reset,
   } = useOnboardingStore();
+  
+  // F1.3 & F5.3: 重置首次访问状态
+  const { resetFirstVisit, isFirstVisit, isExpired } = useFirstVisitDetect({
+    expirationMs: 7 * 24 * 60 * 60 * 1000,
+    storageKey: 'vibex-first-visit',
+  });
 
   const [isExpanded, setIsExpanded] = useState(false);
 
   const currentIndex = ONBOARDING_STEPS.findIndex((s) => s.id === currentStep);
   const progress = completedSteps.length / ONBOARDING_STEPS.length * 100;
+
+  // F5.3: 重置引导并清除首次访问状态，允许重新触发
+  const handleReset = () => {
+    if (confirm('确定要重置引导吗？重置后可重新开始。')) {
+      reset();
+      resetFirstVisit();
+    }
+  };
+
+  // F1.3: 手动开始引导（即使不是首次访问也可以）
+  const handleStart = () => {
+    start();
+  };
 
   return (
     <div className={styles.container}>
@@ -40,7 +61,9 @@ export function OnboardingSettings() {
                 ? '已完成' 
                 : status === 'in-progress' 
                   ? `进行中 - 第 ${currentIndex + 1} 步`
-                  : '未开始'}
+                  : isFirstVisit || isExpired 
+                    ? '未开始（首次访问）'
+                    : '可重新开始'}
             </span>
           </div>
         </div>
@@ -101,7 +124,7 @@ export function OnboardingSettings() {
               {status === 'not-started' && (
                 <button
                   className={styles.startBtn}
-                  onClick={start}
+                  onClick={handleStart}
                 >
                   开始引导
                 </button>
@@ -110,11 +133,7 @@ export function OnboardingSettings() {
               {(status === 'completed' || status === 'in-progress' || status === 'skipped') && (
                 <button
                   className={styles.resetBtn}
-                  onClick={() => {
-                    if (confirm('确定要重置引导吗？')) {
-                      reset();
-                    }
-                  }}
+                  onClick={handleReset}
                 >
                   重置引导
                 </button>

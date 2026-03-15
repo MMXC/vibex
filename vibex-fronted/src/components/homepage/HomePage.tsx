@@ -22,6 +22,7 @@ import { FigmaImport } from '@/components/figma-import';
 import { PlanBuildButtons } from '@/components/plan-build';
 import { PlanResult } from '@/components/plan-result';
 import { Navbar, Sidebar } from '@/components/homepage';
+import { OnboardingProgressBar } from '@/components/onboarding/OnboardingProgressBar';
 import { useDDDStream, useDomainModelStream, useBusinessFlowStream } from '@/hooks/useDDDStream';
 import { useAuthStore } from '@/stores/authStore';
 import { dddApi, projectApi } from '@/services/api';
@@ -248,6 +249,9 @@ export default function HomePage() {
       
       {/* 顶部导航 */}
       <Navbar isAuthenticated={isAuthenticated} onLoginClick={() => setIsLoginDrawerOpen(true)} />
+
+      {/* 引导流程进度条 */}
+      <OnboardingProgressBar />
 
       {/* 主内容区 */}
       <div className={styles.mainContainer}>

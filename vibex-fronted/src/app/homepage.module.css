@@ -1358,3 +1358,39 @@
 .expandBtnRight {
   right: 10px;
 }
+
+/* 生成按钮样式 */
+.generateButton {
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #00d4ff, #8b5cf6);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.generateButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 212, 255, 0.4);
+}
+
+.generateButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #606070, #505060);
+}
+
+@media (max-width: 768px) {
+  .generateButton {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+}

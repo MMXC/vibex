@@ -125,7 +125,7 @@ export function RelationshipEditor({
           <p className={styles.empty}>暂无关系</p>
         ) : (
           <ul className={styles.relationshipList}>
-            {relationships.map((rel) => {
+            {(relationships ?? []).map((rel) => {
               const source = entities.find((e) => e.id === rel.sourceId);
               const target = entities.find((e) => e.id === rel.targetId);
 

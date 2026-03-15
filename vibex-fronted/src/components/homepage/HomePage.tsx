@@ -289,7 +289,7 @@ export default function HomePage() {
                         <MermaidPreview code={getCurrentMermaidCode()} diagramType="flowchart" layout="TB" height="60%" />
                         {currentStep === 2 && boundedContexts.length > 0 && (
                           <div className={styles.nodeSelection}>
-                            {boundedContexts.map(ctx => (
+                            {(boundedContexts ?? []).map(ctx => (
                               <label key={ctx.id} className={`${styles.nodeCheckbox} ${selectedNodes.has(`ctx-${ctx.id}`) ? styles.checked : ''}`}>
                                 <input type="checkbox" checked={selectedNodes.has(`ctx-${ctx.id}`)} onChange={() => handleNodeToggle(`ctx-${ctx.id}`)} />
                                 <span>{ctx.name}</span>

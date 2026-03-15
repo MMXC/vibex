@@ -92,7 +92,7 @@
     "ts-morph": "^27.0.2",
     "typescript": "^5",
     "vite": "^6.4.1",
-    "wrangler": "^4.69.0"
+    "wrangler": "^4.73.0"
   },
   "jest": {
     "setupFilesAfterEnv": [
@@ -191,5 +191,11 @@
         "lines": 0
       }
     }
+  },
+  "overrides": {
+    "undici": "^7.24.3"
+  },
+  "resolutions": {
+    "undici": "^7.24.3"
   }
 }

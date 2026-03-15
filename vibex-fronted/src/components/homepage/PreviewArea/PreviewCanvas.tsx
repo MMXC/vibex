@@ -70,7 +70,7 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
 
     return (
       <div className={styles.nodeSelection}>
-        {boundedContexts.map(ctx => (
+        {(boundedContexts ?? []).map(ctx => (
           <label
             key={ctx.id}
             className={`${styles.nodeCheckbox} ${selectedNodes.has(`ctx-${ctx.id}`) ? styles.checked : ''}`}

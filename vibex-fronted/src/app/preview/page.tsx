@@ -147,7 +147,7 @@ export default function Preview() {
             }}>
               <h3 style={{ color: '#fff', margin: '0 0 16px' }}>限界上下文</h3>
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                {boundedContexts.map((ctx: any) => (
+                {(boundedContexts ?? []).map((ctx: any) => (
                   <div
                     key={ctx.id}
                     style={{
@@ -176,7 +176,7 @@ export default function Preview() {
             }}>
               <h3 style={{ color: '#fff', margin: '0 0 16px' }}>领域模型</h3>
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                {domainModels.map((model: any) => (
+                {(domainModels ?? []).map((model: any) => (
                   <div
                     key={model.id}
                     style={{

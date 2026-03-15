@@ -158,7 +158,7 @@ export default function ModelPage() {
         <div className={styles.modelList}>
           <h3 className={styles.sectionTitle}>领域模型详情</h3>
           <div className={styles.modelGrid}>
-            {domainModels.map((model) => (
+            {(domainModels ?? []).map((model) => (
               <div key={model.id} className={styles.modelCard}>
                 <div className={styles.modelHeader}>
                   <span

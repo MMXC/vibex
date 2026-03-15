@@ -140,7 +140,7 @@ export default function ContextPage() {
         <div className={styles.contextList}>
           <h3 className={styles.sectionTitle}>选择核心上下文</h3>
           <div className={styles.contextGrid}>
-            {boundedContexts.map((ctx) => (
+            {(boundedContexts ?? []).map((ctx) => (
               <div
                 key={ctx.id}
                 className={`${styles.contextCard} ${selectedContextIds.includes(ctx.id) ? styles.selected : ''}`}

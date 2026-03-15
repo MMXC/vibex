@@ -35,7 +35,7 @@ export const Navbar: React.FC<NavbarComponentProps> = ({
             开始使用
           </button>
         ) : (
-          <Link href="/projects" className={styles.ctaButton}>
+          <Link href="/project" className={styles.ctaButton}>
             我的项目
           </Link>
         )}

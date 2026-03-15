@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
+    "@sentry/nextjs": "^10.43.0",
     "@tanstack/query-sync-storage-persister": "^5.90.24",
     "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-query-persist-client": "^5.90.24",
@@ -163,6 +164,31 @@
         "branches": 40,
         "functions": 40,
         "lines": 45
+      },
+      "./src/services/github/github-import.ts": {
+        "branches": 0,
+        "functions": 0,
+        "lines": 0
+      },
+      "./src/services/figma/figma-import.ts": {
+        "branches": 0,
+        "functions": 0,
+        "lines": 0
+      },
+      "./src/services/oauth/oauth.ts": {
+        "branches": 0,
+        "functions": 0,
+        "lines": 0
+      },
+      "./src/services/api/diagnosis/index.ts": {
+        "branches": 0,
+        "functions": 0,
+        "lines": 0
+      },
+      "./src/hooks/useDDDStream.ts": {
+        "branches": 0,
+        "functions": 0,
+        "lines": 0
       }
     }
   }

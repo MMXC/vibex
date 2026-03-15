@@ -6,6 +6,7 @@ import { ToastProvider } from '@/components/ui/Toast';
 import { QueryProvider } from '@/lib/query/QueryProvider';
 import { OnboardingProvider } from '@/components/onboarding/OnboardingProvider';
 import { MermaidInitializer } from '@/components/mermaid/MermaidInitializer';
+import { SentryInitializer } from '@/components/sentry/SentryInitializer';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -31,6 +32,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <MermaidInitializer />
+        <SentryInitializer />
         <ToastProvider>
           <QueryProvider>
             <ErrorBoundary>

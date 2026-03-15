@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.36',
+    date: '2026-03-16',
+    changes: [
+      '🐛 补充 entity.attributes.map() 空值保护',
+      '🛡️ 修复 handleConfirmAndProceed 函数中的潜在崩溃',
+      '✅ 审查通过：vibex-domain-model-render-fix-v2',
+    ],
+    commit: '6ef2205',
+  },
+  {
     version: '1.0.35',
     date: '2026-03-15',
     changes: [

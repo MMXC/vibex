@@ -248,6 +248,7 @@ export interface UseDomainModelStreamReturn {
   // State
   thinkingMessages: ThinkingStep[]
   domainModels: DomainModel[]
+  mermaidCode: string
   status: DomainModelStreamStatus
   errorMessage: string | null
   
@@ -264,6 +265,7 @@ export function useDomainModelStream(): UseDomainModelStreamReturn {
   // State
   const [thinkingMessages, setThinkingMessages] = useState<ThinkingStep[]>([])
   const [domainModels, setDomainModels] = useState<DomainModel[]>([])
+  const [mermaidCode, setMermaidCode] = useState('')
   const [status, setStatus] = useState<DomainModelStreamStatus>('idle')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   
@@ -283,6 +285,7 @@ export function useDomainModelStream(): UseDomainModelStreamReturn {
     cleanup()
     setThinkingMessages([])
     setDomainModels([])
+    setMermaidCode('')
     setStatus('idle')
     setErrorMessage(null)
   }, [cleanup])
@@ -293,6 +296,7 @@ export function useDomainModelStream(): UseDomainModelStreamReturn {
     setStatus('idle')
     setThinkingMessages([])
     setDomainModels([])
+    setMermaidCode('')
   }, [cleanup])
   
   // Main function to generate domain models via SSE
@@ -372,6 +376,7 @@ export function useDomainModelStream(): UseDomainModelStreamReturn {
                         ? parsedData.domainModels 
                         : []
                       setDomainModels(models)
+                      setMermaidCode(parsedData.mermaidCode || '')
                       setStatus('done')
                       break
                       
@@ -415,6 +420,7 @@ export function useDomainModelStream(): UseDomainModelStreamReturn {
     // State
     thinkingMessages,
     domainModels,
+    mermaidCode,
     status,
     errorMessage,
     

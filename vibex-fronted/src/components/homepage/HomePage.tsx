@@ -112,7 +112,6 @@ export default function HomePage() {
 
   const {
     thinkingMessages: modelThinkingMessages, domainModels: streamDomainModels,
-    mermaidCode: streamModelMermaidCode,
     status: modelStreamStatus, errorMessage: modelStreamError, generateDomainModels, abort: abortModels,
   } = useDomainModelStream();
 
@@ -141,11 +140,11 @@ export default function HomePage() {
   useEffect(() => {
     if (modelStreamStatus === 'done' && streamDomainModels.length > 0) {
       setDomainModels(streamDomainModels as DomainModel[]);
-      setModelMermaidCode(streamModelMermaidCode);
+      setModelMermaidCode(''); // TODO: Generate mermaid code
       setCurrentStep(3);
       setCompletedStep(3);
     }
-  }, [modelStreamStatus, streamDomainModels, streamModelMermaidCode]);
+  }, [modelStreamStatus, streamDomainModels]);
 
   useEffect(() => {
     if (flowStreamStatus === 'done' && streamBusinessFlow) {

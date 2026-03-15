@@ -5,12 +5,25 @@ import { useRouter } from 'next/navigation';
 import styles from '../confirm.module.css';
 import { useConfirmationStore } from '@/stores/confirmationStore';
 import { useAutoSnapshot } from '@/hooks/useAutoSnapshot';
+import { useModelPageGuard, safeFilterContexts } from '@/hooks/useModelPageGuard';
 import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps';
 import { apiService, BoundedContext } from '@/services/api';
 const { generateDomainModel } = apiService;
 
 export default function ModelPage() {
   const router = useRouter();
+  
+  // F1: 防御性检查 - 使用 useModelPageGuard
+  const { 
+    canProceed, 
+    checkAndProceed, 
+    redirectIfInvalid,
+    hasError,
+    errorMessage,
+    isLoading,
+    boundedContexts: safeBoundedContexts,
+    selectedContextIds: safeSelectedContextIds,
+  } = useModelPageGuard();
   
   // Enable auto-snapshot for version history
   useAutoSnapshot(true, 2000);
@@ -31,17 +44,28 @@ export default function ModelPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // F1: 防御性检查 - 在组件加载时检查数据有效性
+  useEffect(() => {
+    if (!isLoading && !checkAndProceed()) {
+      redirectIfInvalid();
+    }
+  }, [isLoading, checkAndProceed, redirectIfInvalid]);
+  
   // Generate domain models via API
   useEffect(() => {
     const generateModels = async () => {
-      if (selectedContextIds.length > 0 && domainModels.length === 0) {
+      // F2: 使用可选链和安全访问
+      const selectedIds = safeSelectedContextIds ?? [];
+      const contexts = safeBoundedContexts ?? [];
+      
+      if (selectedIds?.length > 0 && domainModels?.length === 0) {
         setLoading(true);
         setError('');
 
         try {
-          // Get selected bounded contexts
-          const selectedContexts = boundedContexts.filter((c) =>
-            selectedContextIds.includes(c.id)
+          // F2: 使用可选链操作符安全过滤
+          const selectedContexts = safeFilterContexts(contexts, (c: BoundedContext) =>
+            selectedIds.includes(c.id)
           );
 
           // Call API to generate domain models
@@ -69,7 +93,7 @@ export default function ModelPage() {
     };
 
     generateModels();
-  }, [selectedContextIds, boundedContexts, requirementText]);
+  }, [safeSelectedContextIds, safeBoundedContexts, requirementText, domainModels]);
 
   const typeLabels = {
     aggregate_root: '聚合根',
@@ -99,6 +123,26 @@ export default function ModelPage() {
         {error && (
           <div className={styles.error}>
             <p>⚠️ {error}</p>
+          </div>
+        )}
+
+        {/* F3: 加载状态提示 */}
+        {loading && (
+          <div className={styles.loading}>
+            <p>⏳ 正在生成领域模型...</p>
+          </div>
+        )}
+
+        {/* F1: 空数据时显示友好提示 */}
+        {!loading && !error && hasError && (
+          <div className={styles.emptyState}>
+            <p>⚠️ {errorMessage || '请先选择限界上下文'}</p>
+            <button 
+              className={styles.primaryButton}
+              onClick={() => router.push('/confirm/context')}
+            >
+              返回选择限界上下文
+            </button>
           </div>
         )}
 

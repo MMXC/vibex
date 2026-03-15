@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.33',
+    date: '2026-03-15',
+    changes: [
+      '🐛 修复领域模型页面 TypeError 崩溃问题',
+      '🛡️ 新增 useModelPageGuard 防御性检查 Hook',
+      '✅ 使用可选链操作符防止 undefined 访问',
+      '🔄 添加自动重定向到正确页面机制',
+    ],
+    commit: '285ed9f',
+  },
+  {
     version: '1.0.32',
     date: '2026-03-15',
     changes: [

@@ -74,8 +74,12 @@ export default function ModelPage() {
             requirementText
           );
 
-          if (response && response.success && response.domainModels) {
-            setDomainModels(response.domainModels);
+          // F3: API 响应处理 - 处理 domainModels = null 情况，视为空数组
+          const domainModels = response?.domainModels ?? null;
+          
+          if (response && response.success) {
+            // 即使 domainModels 为 null 也视为成功，设置为空数组
+            setDomainModels(Array.isArray(domainModels) ? domainModels : []);
             if (response.mermaidCode) {
               setModelMermaidCode(response.mermaidCode);
             }
@@ -133,10 +137,24 @@ export default function ModelPage() {
           </div>
         )}
 
-        {/* F1: 空数据时显示友好提示 */}
+        {/* F1: 错误状态 - Guard 检查失败 */}
         {!loading && !error && hasError && (
           <div className={styles.emptyState}>
             <p>⚠️ {errorMessage || '请先选择限界上下文'}</p>
+            <button 
+              className={styles.primaryButton}
+              onClick={() => router.push('/confirm/context')}
+            >
+              返回选择限界上下文
+            </button>
+          </div>
+        )}
+
+        {/* F2: 空状态 UI - domainModels 为空数组时显示友好提示 */}
+        {!loading && !error && !hasError && (domainModels ?? []).length === 0 && (
+          <div className={styles.emptyState}>
+            <p>暂无领域模型数据</p>
+            <p className={styles.emptyHint}>请确认已正确选择限界上下文，或返回上一步重新生成</p>
             <button 
               className={styles.primaryButton}
               onClick={() => router.push('/confirm/context')}

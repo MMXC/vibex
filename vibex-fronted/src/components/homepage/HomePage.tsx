@@ -23,6 +23,7 @@ import { PlanBuildButtons } from '@/components/plan-build';
 import { PlanResult } from '@/components/plan-result';
 import { Navbar, Sidebar } from '@/components/homepage';
 import { useDDDStream, useDomainModelStream, useBusinessFlowStream } from '@/hooks/useDDDStream';
+import { useAuthStore } from '@/stores/authStore';
 import { dddApi, projectApi } from '@/services/api';
 import styles from '@/app/homepage.module.css';
 
@@ -85,7 +86,7 @@ const FEATURE_CARDS = [
 
 export default function HomePage() {
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { isAuthenticated, checkAuth, syncFromStorage } = useAuthStore();
   const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
   const [requirementText, setRequirementText] = useState('');
   const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set());
@@ -118,6 +119,12 @@ export default function HomePage() {
     mermaidCode: streamFlowMermaidCode, status: flowStreamStatus, errorMessage: flowStreamError,
     generateBusinessFlow: generateFlow, abort: abortFlow,
   } = useBusinessFlowStream();
+
+  // 初始化时同步认证状态
+  useEffect(() => {
+    syncFromStorage();
+    checkAuth();
+  }, [syncFromStorage, checkAuth]);
 
   // 同步 SSE 结果
   useEffect(() => {

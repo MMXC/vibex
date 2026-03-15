@@ -11,6 +11,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './LoginDrawer.module.css';
+import { useAuthStore } from '@/stores/authStore';
 
 interface LoginDrawerProps {
   /** 是否显示 */
@@ -28,6 +29,7 @@ export function LoginDrawer({ isOpen, onClose, onSuccess }: LoginDrawerProps) {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const login = useAuthStore((state) => state.login);
 
   // ESC key to close
   useEffect(() => {
@@ -65,6 +67,9 @@ export function LoginDrawer({ isOpen, onClose, onSuccess }: LoginDrawerProps) {
       if (token) {
         localStorage.setItem('auth_token', token);
         localStorage.setItem('user_id', email);
+        
+        // 更新全局认证状态
+        login(token, { id: email, email });
       }
 
       onSuccess?.();

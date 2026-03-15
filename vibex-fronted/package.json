@@ -22,12 +22,7 @@
     "generate:types": "ts-node scripts/generate-types.ts",
     "prepare": "husky",
     "scan:vuln": "npm audit --audit-level=moderate",
-    "report:vuln": "npm audit --json > vulnerability-report.json",
-    "perf": "lhci autorun",
-    "perf:build": "npm run build && lhci autorun",
-    "perf:collect": "lhci collect",
-    "perf:assert": "lhci assert",
-    "perf:upload": "lhci upload"
+    "report:vuln": "npm audit --json > vulnerability-report.json"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
@@ -45,7 +40,7 @@
     "html-to-image": "^1.11.13",
     "jsondiffpatch": "^0.7.3",
     "mermaid": "^11.13.0",
-    "monaco-editor": "^0.55.1",
+    "monaco-editor": "^0.53.0",
     "next": "16.1.6",
     "next-intl": "^4.8.3",
     "react": "19.2.3",
@@ -60,7 +55,6 @@
     "@babel/preset-env": "^7.29.0",
     "@babel/preset-react": "^7.28.5",
     "@babel/preset-typescript": "^7.28.5",
-    "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.58.2",
     "@storybook/addon-essentials": "^8.6.14",
     "@storybook/addon-interactions": "^8.6.14",

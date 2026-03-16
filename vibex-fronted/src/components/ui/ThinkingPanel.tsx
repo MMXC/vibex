@@ -137,14 +137,16 @@ export function ThinkingPanel({
     }
   }, [status])
   
-  // Progress calculation
-  const totalSteps = 3 // analyzing, identifying-core, calling-ai
-  const currentStepIndex = displayedSteps.length > 0 
-    ? Math.min(displayedSteps.length - 1, totalSteps - 1) 
-    : -1
-  const progressPercent = currentStepIndex >= 0 
-    ? Math.round(((currentStepIndex + 1) / totalSteps) * 100) 
-    : 0
+  // Progress calculation - dynamic based on actual steps
+  // When done, always show 100%
+  const progressPercent = status === 'done' 
+    ? 100 
+    : displayedSteps.length > 0 
+      ? Math.min(Math.round((displayedSteps.length / Math.max(displayedSteps.length, 3)) * 100), 99)
+      : 0
+  
+  // Current step index for ThinkingSteps component
+  const currentStepIndex = displayedSteps.length > 0 ? displayedSteps.length - 1 : -1
   
   return (
     <div className={styles.panel}>

@@ -6,6 +6,7 @@ import styles from '../confirm.module.css';
 import { useConfirmationStore } from '@/stores/confirmationStore';
 import { useAutoSnapshot } from '@/hooks/useAutoSnapshot';
 import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps';
+import { MermaidPreview } from '@/components/ui/MermaidPreview';
 import { apiService } from '@/services/api';
 const { generateBusinessFlow } = apiService;
 
@@ -119,7 +120,9 @@ export default function FlowPage() {
         <div className={styles.diagramSection}>
           <h3 className={styles.sectionTitle}>业务流程图</h3>
           <div className={styles.mermaidPreview}>
-            <pre className={styles.mermaidCode}>{flowMermaidCode}</pre>
+            {flowMermaidCode && (
+              <MermaidPreview code={flowMermaidCode} diagramType="flowchart" />
+            )}
           </div>
         </div>
 

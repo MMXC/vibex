@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import styles from '../confirm.module.css';
 import { useConfirmationStore } from '@/stores/confirmationStore';
 import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps';
+import { MermaidPreview } from '@/components/ui/MermaidPreview';
 
 export default function ContextPage() {
   const router = useRouter();
@@ -133,7 +134,9 @@ export default function ContextPage() {
         <div className={styles.diagramSection}>
           <h3 className={styles.sectionTitle}>限界上下文图</h3>
           <div className={styles.mermaidPreview}>
-            <pre className={styles.mermaidCode}>{contextMermaidCode}</pre>
+            {contextMermaidCode && (
+              <MermaidPreview code={contextMermaidCode} diagramType="flowchart" />
+            )}
           </div>
         </div>
 

@@ -7,6 +7,7 @@ import { useConfirmationStore } from '@/stores/confirmationStore';
 import { useAutoSnapshot } from '@/hooks/useAutoSnapshot';
 import { useModelPageGuard, safeFilterContexts } from '@/hooks/useModelPageGuard';
 import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps';
+import { MermaidPreview } from '@/components/ui/MermaidPreview';
 import { apiService, BoundedContext } from '@/services/api';
 const { generateDomainModel } = apiService;
 
@@ -169,7 +170,9 @@ export default function ModelPage() {
         <div className={styles.diagramSection}>
           <h3 className={styles.sectionTitle}>领域模型类图</h3>
           <div className={styles.mermaidPreview}>
-            <pre className={styles.mermaidCode}>{modelMermaidCode}</pre>
+            {modelMermaidCode && (
+              <MermaidPreview code={modelMermaidCode} diagramType="classDiagram" />
+            )}
           </div>
         </div>
 

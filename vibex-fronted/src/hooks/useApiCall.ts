@@ -2,6 +2,7 @@
  * useApiCall - 统一 API 调用 Hook
  * 
  * 提供统一的 API 调用封装，支持：
+ * - React Query 集成 (useMutation)
  * - 自动重试机制（指数退避）
  * - 错误提示（Toast）
  * - 类型安全
@@ -9,6 +10,7 @@
  */
 
 import { useState, useCallback } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ErrorConfig, ErrorMiddlewareOptions, ApiErrorResponse } from '@/lib/error';
 import { defaultErrorMapper } from '@/lib/error/ErrorCodeMapper';
 import { defaultRetryHandler } from '@/lib/error/RetryHandler';
@@ -31,6 +33,10 @@ export interface UseApiCallOptions<TArgs extends unknown[], TData> {
   showToast?: boolean;
   /** 自定义错误映射 */
   customErrorMapper?: (error: unknown) => ErrorConfig | null;
+  /** 突变键（用于缓存管理） */
+  mutationKey?: unknown[];
+  /** 缓存失效查询键 */
+  invalidateQueries?: unknown[];
 }
 
 export interface UseApiCallReturn<TData> {
@@ -46,10 +52,17 @@ export interface UseApiCallReturn<TData> {
   reset: () => void;
   /** 直接设置数据（用于测试或手动更新） */
   setData: (data: TData) => void;
+  /** React Query mutation 状态 */
+  isPending: boolean;
+  isSuccess: boolean;
+  isError: boolean;
+  isLoading: boolean;
+  /** 重试执行 */
+  retry: () => void;
 }
 
 /**
- * 统一的 API 调用 Hook
+ * 统一的 API 调用 Hook (React Query 集成版)
  * 
  * @example
  * ```typescript
@@ -57,7 +70,9 @@ export interface UseApiCallReturn<TData> {
  *   apiFn: () => fetchProjects(),
  *   onSuccess: (data) => console.log('Success:', data),
  *   retryCount: 3,
- *   showToast: true
+ *   showToast: true,
+ *   mutationKey: ['projects'],
+ *   invalidateQueries: [['projects']]
  * });
  * 
  * // 在组件中调用
@@ -78,10 +93,15 @@ export function useApiCall<TArgs extends unknown[], TData>(
     retryDelay = 1000,
     showToast = true,
     customErrorMapper,
+    mutationKey,
+    invalidateQueries,
   } = options;
 
+  const queryClient = useQueryClient();
+  const { showToast: showToastFn } = useToast();
+  
+  // 内部状态 - 用于向后兼容
   const [data, setData] = useState<TData | null>(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<ErrorConfig | null>(null);
 
   // 将未知错误转换为 ErrorConfig
@@ -130,83 +150,102 @@ export function useApiCall<TArgs extends unknown[], TData>(
     [customErrorMapper]
   );
 
-  // 执行 API 调用
-  const execute = useCallback(
-    async (...args: TArgs): Promise<TData | null> => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        if (enableRetry) {
-          // 使用重试机制
-          const result = await defaultRetryHandler.execute<TData>(
-            async () => apiFn(...args),
-            {
-              maxRetries: retryCount,
-              baseDelay: retryDelay,
-              onRetry: (attempt, maxRetries) => {
-                console.log(`重试 ${attempt}/${maxRetries}`);
-              },
-            }
-          );
-          setData(result);
-          onSuccess?.(result);
-          return result;
-        } else {
-          // 直接调用
-          const result = await apiFn(...args);
-          setData(result);
-          onSuccess?.(result);
-          return result;
-        }
-      } catch (err) {
-        const errorConfig = transformError(err);
-        setError(errorConfig);
-
-        // 调用错误回调
-        onError?.(errorConfig);
-
-        // 显示错误日志（Toast 显示需要在使用 useApiCall 的组件中通过 onError 处理）
-        if (showToast && typeof window !== 'undefined') {
-          console.error('API Error:', errorConfig.userMessage);
-        }
-
-        return null;
-      } finally {
-        setLoading(false);
+  // 使用 React Query useMutation
+  const mutation = useMutation<TData, Error, TArgs[0] | undefined>({
+    mutationFn: async (vars) => {
+      // Convert single variable to args tuple
+      const args = vars !== undefined ? [vars] as TArgs : ([] as unknown as TArgs);
+      
+      if (enableRetry) {
+        // 使用重试机制
+        const result = await defaultRetryHandler.execute<TData>(
+          async () => apiFn(...args),
+          {
+            maxRetries: retryCount,
+            baseDelay: retryDelay,
+            onRetry: (attempt, maxRetries) => {
+              console.log(`重试 ${attempt}/${maxRetries}`);
+            },
+          }
+        );
+        return result;
+      } else {
+        // 直接调用
+        return apiFn(...args);
       }
     },
-    [
-      apiFn,
-      onSuccess,
-      onError,
-      retryCount,
-      enableRetry,
-      retryDelay,
-      showToast,
-      transformError,
-    ]
+    mutationKey: mutationKey ? [mutationKey] : undefined,
+    onSuccess: (data) => {
+      setData(data);
+      onSuccess?.(data);
+      
+      // 缓存失效
+      if (invalidateQueries) {
+        invalidateQueries.forEach((queryKey: unknown[]) => {
+          queryClient.invalidateQueries({ queryKey });
+        });
+      }
+    },
+    onError: (err: Error) => {
+      const errorConfig = transformError(err);
+      setError(errorConfig);
+      onError?.(errorConfig);
+
+      // 显示错误 Toast
+      if (showToast && typeof window !== 'undefined') {
+        console.error('API Error:', errorConfig.userMessage);
+        showToastFn(errorConfig.userMessage || '操作失败，请稍后重试', 'error');
+      }
+    },
+    retry: enableRetry ? retryCount : false,
+    retryDelay,
+  });
+
+  // 执行 API 调用 - 包装 mutation 的 mutate
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const execute = useCallback(
+    async (...args: any[]): Promise<TData | null> => {
+      try {
+        await mutation.mutateAsync(args[0]);
+        return mutation.data || null;
+      } catch (err) {
+        return null;
+      }
+    },
+    [mutation]
   );
 
   // 重置状态
   const reset = useCallback(() => {
     setData(null);
-    setLoading(false);
     setError(null);
-  }, []);
+    mutation.reset();
+  }, [mutation]);
 
   // 直接设置数据
   const setDataDirect = useCallback((newData: TData) => {
     setData(newData);
   }, []);
 
+  // 重试
+  const retry = useCallback(() => {
+    if (mutation.failureCount > 0) {
+      mutation.reset();
+    }
+  }, [mutation]);
+
   return {
-    data,
-    loading,
-    error,
+    data: mutation.data ?? data,
+    loading: mutation.isPending,
+    error: mutation.error ? transformError(mutation.error) : error,
     execute,
     reset,
     setData: setDataDirect,
+    isPending: mutation.isPending,
+    isSuccess: mutation.isSuccess,
+    isError: mutation.isError,
+    isLoading: mutation.isPending,
+    retry,
   };
 }
 

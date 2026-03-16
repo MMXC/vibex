@@ -136,8 +136,10 @@ export const useModelStore = create<ModelState>()(
 // ==================== Selectors ====================
 
 export const selectDomainModels = (state: ModelState) => state.domainModels;
-export const selectSelectedModels = (state: ModelState) => 
-  state.domainModels.filter(model => state.selectedModelIds.includes(model.id));
+export const selectSelectedModels = (state: ModelState) => {
+  const selectedIds = new Set(state.selectedModelIds);
+  return state.domainModels.filter(model => selectedIds.has(model.id));
+};
 export const selectAggregateRoots = (state: ModelState) => 
   state.domainModels.filter(model => model.type === 'aggregate_root');
 export const selectEntities = (state: ModelState) => 

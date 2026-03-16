@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.41',
+    date: '2026-03-17',
+    changes: [
+      '🎨 首页垂直分栏布局：PreviewArea 60% + InputArea 40%',
+      '📱 响应式设计：窄屏 (<992px) 自动垂直堆叠',
+      '🔧 MainContent 组件新增 layout prop 支持',
+      '✅ 测试通过：4 suites / 31 tests',
+    ],
+    commit: '686546c',
+  },
+  {
     version: '1.0.40',
     date: '2026-03-17',
     changes: [

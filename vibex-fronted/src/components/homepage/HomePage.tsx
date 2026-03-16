@@ -100,6 +100,9 @@ interface ActiveStreamData {
  * 获取当前活跃的 SSE 流数据
  * 基于实际 SSE 状态而非 currentStep 选择消息
  * 优先级: 限界上下文 > 领域模型 > 业务流程
+ * 
+ * 重要: 只有 'thinking' 状态才被认为是活跃的，'done' 状态不参与优先级竞争
+ * 这样当限界上下文完成后，领域模型的流才能正常显示
  */
 function getActiveStreamData(
   // 限界上下文数据
@@ -109,8 +112,8 @@ function getActiveStreamData(
   // 业务流程数据
   flowData: { messages: any[]; mermaid: string; status: string; error: string | null; abort: () => void }
 ): ActiveStreamData | null {
-  // 优先级 1: 限界上下文生成
-  if (contextData.status !== 'idle') {
+  // 优先级 1: 限界上下文生成（只有 thinking 状态才活跃）
+  if (contextData.status === 'thinking') {
     return {
       thinkingMessages: contextData.messages,
       contexts: contextData.contexts,
@@ -122,8 +125,8 @@ function getActiveStreamData(
     };
   }
 
-  // 优先级 2: 领域模型生成
-  if (modelData.status !== 'idle') {
+  // 优先级 2: 领域模型生成（只有 thinking 状态才活跃）
+  if (modelData.status === 'thinking') {
     return {
       thinkingMessages: modelData.messages,
       contexts: undefined,
@@ -135,8 +138,8 @@ function getActiveStreamData(
     };
   }
 
-  // 优先级 3: 业务流程生成
-  if (flowData.status !== 'idle') {
+  // 优先级 3: 业务流程生成（只有 thinking 状态才活跃）
+  if (flowData.status === 'thinking') {
     return {
       thinkingMessages: flowData.messages,
       contexts: undefined,
@@ -148,7 +151,8 @@ function getActiveStreamData(
     };
   }
 
-  // 所有状态为 idle
+  // 所有流都没有在 thinking，返回 null
+  // 这样 ThinkingPanel 会显示默认的 AI 助手状态
   return null;
 }
 

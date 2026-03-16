@@ -212,13 +212,17 @@ export function ThinkingPanel({
           </div>
         )}
         
-        {/* Mermaid Diagram - Domain Model */}
+        {/* Mermaid Diagram - 根据内容类型决定标题 */}
         {mermaidCode && (
           <div className={styles.section}>
             <div className={styles.sectionTitle}>
-              领域模型
+              {/* 如果有限界上下文，显示关系图；否则显示领域模型 */}
+              {contexts && contexts.length > 0 ? '限界上下文关系图' : '领域模型'}
             </div>
-            <MermaidPreview code={mermaidCode} diagramType="classDiagram" />
+            <MermaidPreview 
+              code={mermaidCode} 
+              diagramType={contexts && contexts.length > 0 ? 'flowchart' : 'classDiagram'} 
+            />
           </div>
         )}
         

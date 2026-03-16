@@ -539,13 +539,32 @@ ${contextInfo}
 Respond ONLY with the JSON object.`
 
           // Call AI
+          console.log('[Domain Model Stream] Starting AI call for domain model generation')
           const result = await aiService.generateJSON<{ domainModels: any[] }>(
             prompt,
             { systemPrompt: 'You are a DDD expert. Output only valid JSON.' }
           )
           
-          if (!result.success || !result.data?.domainModels) {
-            throw new Error(result.error || 'Failed to generate domain models')
+          // Enhanced error handling - Check for AI service failure
+          if (!result.success) {
+            console.error('[Domain Model Stream] AI service error:', result.error)
+            throw new Error(`AI 服务错误: ${result.error || '未知错误'}`)
+          }
+          
+          // Enhanced error handling - Check for missing or invalid data
+          if (!result.data) {
+            console.error('[Domain Model Stream] AI returned null data')
+            throw new Error('AI 返回数据为空，请稍后重试')
+          }
+          
+          if (!result.data.domainModels) {
+            console.error('[Domain Model Stream] AI response missing domainModels:', result.data)
+            throw new Error('AI 响应格式错误：缺少 domainModels 字段')
+          }
+          
+          if (!Array.isArray(result.data.domainModels)) {
+            console.error('[Domain Model Stream] domainModels is not an array:', typeof result.data.domainModels)
+            throw new Error('AI 响应格式错误：domainModels 应为数组')
           }
           
           // Step 4: 解析结果
@@ -575,13 +594,24 @@ Respond ONLY with the JSON object.`
           })
           
         } catch (error) {
-          console.error('Stream error:', error)
-          send('error', { 
-            message: error instanceof Error ? error.message : 'Unknown error' 
+          // Enhanced error handling with detailed logging
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+          console.error('[Domain Model Stream] Error occurred:', {
+            message: errorMessage,
+            stack: error instanceof Error ? error.stack : undefined,
+            timestamp: new Date().toISOString()
           })
+          
+          // Send error event to frontend
+          send('error', { 
+            message: errorMessage,
+            code: 'DOMAIN_MODEL_ERROR'
+          })
+        } finally {
+          // Ensure stream is always closed
+          console.log('[Domain Model Stream] Stream completed')
+          controller.close()
         }
-        
-        controller.close()
       }
     })
     

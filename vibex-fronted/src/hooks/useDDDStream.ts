@@ -271,12 +271,21 @@ export function useDomainModelStream(): UseDomainModelStreamReturn {
   
   // Refs
   const abortControllerRef = useRef<AbortController | null>(null)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  
+  // Timeout duration: 60 seconds
+  const TIMEOUT_DURATION = 60000
   
   // Cleanup function
   const cleanup = useCallback(() => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
       abortControllerRef.current = null
+    }
+    // Clear timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
     }
   }, [])
   
@@ -307,6 +316,18 @@ export function useDomainModelStream(): UseDomainModelStreamReturn {
     setMermaidCode('')
     setErrorMessage(null)
     setStatus('thinking')
+    
+    // Clear any existing timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
+    
+    // Set timeout - 60 seconds
+    timeoutRef.current = setTimeout(() => {
+      console.warn('[DomainModel Stream] Timeout: no response after 60 seconds')
+      setErrorMessage('请求超时，请稍后重试 (60s)')
+      setStatus('error')
+    }, TIMEOUT_DURATION)
     
     // Create AbortController for fetch
     abortControllerRef.current = new AbortController()
@@ -372,6 +393,11 @@ export function useDomainModelStream(): UseDomainModelStreamReturn {
                       break
                       
                     case 'done':
+                      // Clear timeout when done
+                      if (timeoutRef.current) {
+                        clearTimeout(timeoutRef.current)
+                        timeoutRef.current = null
+                      }
                       // 防御性检查：确保 domainModels 存在且是数组
                       const models = Array.isArray(parsedData.domainModels) 
                         ? parsedData.domainModels 
@@ -382,6 +408,11 @@ export function useDomainModelStream(): UseDomainModelStreamReturn {
                       break
                       
                     case 'error':
+                      // Clear timeout on error
+                      if (timeoutRef.current) {
+                        clearTimeout(timeoutRef.current)
+                        timeoutRef.current = null
+                      }
                       setErrorMessage(parsedData.message || 'Unknown error')
                       setStatus('error')
                       break

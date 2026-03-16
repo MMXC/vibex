@@ -2,6 +2,8 @@
 
 import { useCallback, useState } from 'react';
 import { useConfirmationStore } from '@/stores/confirmationStore';
+import { useAuthStore } from '@/stores/authStore';
+import { projectApi } from '@/services/api';
 import type { StepComponentProps } from './types';
 
 export function StepProjectCreate({ onNavigate, isActive }: StepComponentProps) {
@@ -12,8 +14,12 @@ export function StepProjectCreate({ onNavigate, isActive }: StepComponentProps) 
   const businessFlow = useConfirmationStore((s) => s.businessFlow);
   const createdProjectId = useConfirmationStore((s) => s.createdProjectId);
 
+  // Get user ID from auth store
+  const userId = useAuthStore((s) => s.user?.id || 'anonymous');
+
   // Local state
   const [isCreating, setIsCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Store actions
   const setCurrentStep = useConfirmationStore((s) => s.setCurrentStep);
@@ -22,20 +28,28 @@ export function StepProjectCreate({ onNavigate, isActive }: StepComponentProps) 
   // Handle project creation
   const handleCreateProject = useCallback(async () => {
     setIsCreating(true);
+    setError(null);
     
     try {
-      // Simulate project creation (replace with actual API call)
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Prepare project data from store
+      const projectData = {
+        name: requirementText.slice(0, 50) || 'Untitled Project',
+        description: requirementText,
+        userId,
+      };
+
+      // Call API to create project
+      const result = await projectApi.createProject(projectData);
       
       // Set created project ID
-      const projectId = `project-${Date.now()}`;
-      setCreatedProjectId(projectId);
-    } catch (error) {
-      console.error('Failed to create project:', error);
+      setCreatedProjectId(result.id);
+    } catch (err) {
+      console.error('Failed to create project:', err);
+      setError(err instanceof Error ? err.message : 'Failed to create project');
     } finally {
       setIsCreating(false);
     }
-  }, [setCreatedProjectId]);
+  }, [requirementText, userId, setCreatedProjectId]);
 
   // Handle navigation to previous step
   const handlePrevious = useCallback(() => {
@@ -98,10 +112,17 @@ export function StepProjectCreate({ onNavigate, isActive }: StepComponentProps) 
               </div>
             </div>
 
+            {error && (
+              <div className="error-message">
+                {error}
+              </div>
+            )}
+
             <div className="actions">
               <button 
                 className="btn-secondary"
                 onClick={handlePrevious}
+                disabled={isCreating}
               >
                 ← 上一步
               </button>

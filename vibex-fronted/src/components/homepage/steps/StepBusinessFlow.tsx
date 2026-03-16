@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react';
 import { useConfirmationStore } from '@/stores/confirmationStore';
+import { useBusinessFlowStream } from '@/hooks/useDDDStream';
 import { PreviewArea } from '../PreviewArea/PreviewArea';
 import { ThinkingPanel } from '../ThinkingPanel/ThinkingPanel';
 import type { StepComponentProps } from './types';
@@ -11,17 +12,44 @@ export function StepBusinessFlow({ onNavigate, isActive }: StepComponentProps) {
   const businessFlow = useConfirmationStore((s) => s.businessFlow);
   const flowMermaidCode = useConfirmationStore((s) => s.flowMermaidCode);
   const domainModels = useConfirmationStore((s) => s.domainModels);
+  const boundedContexts = useConfirmationStore((s) => s.boundedContexts);
+  const requirementText = useConfirmationStore((s) => s.requirementText);
 
   // Store actions
   const setCurrentStep = useConfirmationStore((s) => s.setCurrentStep);
+  const setBusinessFlow = useConfirmationStore((s) => s.setBusinessFlow);
+  const setFlowMermaidCode = useConfirmationStore((s) => s.setFlowMermaidCode);
+
+  // Business Flow Stream hook
+  const {
+    thinkingMessages,
+    businessFlow: generatedFlow,
+    mermaidCode,
+    status,
+    errorMessage,
+    generateBusinessFlow,
+    abort,
+  } = useBusinessFlowStream();
+
+  // Handle generate business flow
+  const handleGenerate = useCallback(() => {
+    if (domainModels.length > 0) {
+      generateBusinessFlow(domainModels, requirementText);
+    }
+  }, [domainModels, requirementText, generateBusinessFlow]);
 
   // Handle navigation to next step (Project Create)
   const handleNext = useCallback(() => {
-    if (businessFlow.states && businessFlow.states.length > 0) {
+    const flow = generatedFlow || businessFlow;
+    if (flow.states && flow.states.length > 0) {
+      setBusinessFlow(flow);
+      if (mermaidCode) {
+        setFlowMermaidCode(mermaidCode);
+      }
       setCurrentStep('success');
       onNavigate(5);
     }
-  }, [businessFlow, setCurrentStep, onNavigate]);
+  }, [generatedFlow, businessFlow, mermaidCode, setBusinessFlow, setFlowMermaidCode, setCurrentStep, onNavigate]);
 
   // Handle navigation to previous step
   const handlePrevious = useCallback(() => {
@@ -30,26 +58,38 @@ export function StepBusinessFlow({ onNavigate, isActive }: StepComponentProps) {
   }, [setCurrentStep, onNavigate]);
 
   // Check if we can proceed
-  const canProceed = businessFlow.states && businessFlow.states.length > 0;
+  const currentFlow = generatedFlow || businessFlow;
+  const canProceed = currentFlow.states && currentFlow.states.length > 0;
+
+  // Current flow to display
+  const displayFlow = generatedFlow || businessFlow;
+  const displayMermaid = mermaidCode || flowMermaidCode;
+
+  // Map status to thinking panel status
+  const panelStatus = status === 'thinking' ? 'thinking' 
+    : status === 'done' ? 'done' 
+    : status === 'error' ? 'error' 
+    : 'idle';
 
   return (
     <div className="step-business-flow">
       {/* Preview Section - Flow Diagram */}
       <div className="preview-section">
         <PreviewArea
-          content={flowMermaidCode}
-          isLoading={false}
+          content={displayMermaid}
+          isLoading={status === 'thinking'}
         />
       </div>
 
       {/* Thinking Section */}
       <div className="thinking-section">
         <ThinkingPanel
-          thinkingMessages={[]}
-          contexts={[]}
-          mermaidCode={flowMermaidCode}
-          status="idle"
-          errorMessage={null}
+          thinkingMessages={thinkingMessages}
+          contexts={boundedContexts}
+          mermaidCode={displayMermaid}
+          status={panelStatus}
+          errorMessage={errorMessage}
+          onAbort={abort}
         />
       </div>
 
@@ -62,18 +102,24 @@ export function StepBusinessFlow({ onNavigate, isActive }: StepComponentProps) {
           {!canProceed ? (
             <div className="empty-state">
               <p>暂无业务流程</p>
-              <p>请返回上一步生成业务流程</p>
+              <button 
+                className="btn-primary"
+                onClick={handleGenerate}
+                disabled={status === 'thinking' || domainModels.length === 0}
+              >
+                {status === 'thinking' ? '生成中...' : '生成业务流程'}
+              </button>
             </div>
           ) : (
             <div className="flow-details">
               <div className="flow-header">
-                <span className="flow-name">{businessFlow.name}</span>
+                <span className="flow-name">{displayFlow.name}</span>
               </div>
               
               <div className="states-section">
                 <h4>状态</h4>
                 <div className="states-list">
-                  {businessFlow.states?.map((state) => (
+                  {displayFlow.states?.map((state) => (
                     <div key={state.id} className={`state-item state-${state.type}`}>
                       <span className="state-name">{state.name}</span>
                       <span className="state-type">{state.type}</span>
@@ -83,40 +129,42 @@ export function StepBusinessFlow({ onNavigate, isActive }: StepComponentProps) {
                 </div>
               </div>
 
-              <div className="transitions-section">
-                <h4>转换</h4>
-                <div className="transitions-list">
-                  {businessFlow.transitions?.map((transition) => (
-                    <div key={transition.id} className="transition-item">
-                      <span className="from">{transition.fromStateId}</span>
-                      <span className="arrow">→</span>
-                      <span className="to">{transition.toStateId}</span>
-                      <span className="event">{transition.event}</span>
-                      {transition.condition && (
-                        <span className="condition">[{transition.condition}]</span>
-                      )}
-                    </div>
-                  ))}
+              {displayFlow.transitions && displayFlow.transitions.length > 0 && (
+                <div className="transitions-section">
+                  <h4>转换</h4>
+                  <div className="transitions-list">
+                    {displayFlow.transitions.map((transition) => (
+                      <div key={transition.id} className="transition-item">
+                        <span className="from">{transition.fromStateId}</span>
+                        <span className="arrow">→</span>
+                        <span className="to">{transition.toStateId}</span>
+                        <span className="event">{transition.event}</span>
+                        {transition.condition && (
+                          <span className="condition">[{transition.condition}]</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
+              )}
+
+              <div className="actions">
+                <button 
+                  className="btn-secondary"
+                  onClick={handlePrevious}
+                >
+                  ← 上一步
+                </button>
+                <button
+                  className="btn-primary"
+                  onClick={handleNext}
+                  disabled={!canProceed}
+                >
+                  创建项目 →
+                </button>
               </div>
             </div>
           )}
-
-          <div className="actions">
-            <button 
-              className="btn-secondary"
-              onClick={handlePrevious}
-            >
-              ← 上一步
-            </button>
-            <button
-              className="btn-primary"
-              onClick={handleNext}
-              disabled={!canProceed}
-            >
-              创建项目 →
-            </button>
-          </div>
         </div>
       </div>
     </div>

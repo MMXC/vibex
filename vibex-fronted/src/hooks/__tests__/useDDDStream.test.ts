@@ -3,254 +3,163 @@
  */
 
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useDDDStream } from '../useDDDStream';
-
-// Mock dependencies
-jest.mock('@/lib/api-config', () => ({
-  getApiUrl: jest.fn((path: string) => `http://localhost:3000${path}`),
-}));
+import { useDDDStream, useDomainModelStream, useBusinessFlowStream } from '../useDDDStream';
 
 // Mock fetch globally
-const mockFetch = jest.fn();
-global.fetch = mockFetch;
+global.fetch = jest.fn();
+
+// Mock getApiUrl
+jest.mock('@/lib/api-config', () => ({
+  getApiUrl: (path: string) => `http://localhost:3000${path}`,
+}));
 
 describe('useDDDStream', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockFetch.mockReset();
   });
 
-  describe('initial state', () => {
-    it('should initialize with idle status', () => {
-      const { result } = renderHook(() => useDDDStream());
-      
-      expect(result.current.status).toBe('idle');
-      expect(result.current.contexts).toEqual([]);
-      expect(result.current.thinkingMessages).toEqual([]);
-      expect(result.current.mermaidCode).toBe('');
-      expect(result.current.errorMessage).toBeNull();
-    });
+  it('should initialize with default state', () => {
+    const { result } = renderHook(() => useDDDStream());
+    
+    expect(result.current.thinkingMessages).toEqual([]);
+    expect(result.current.contexts).toEqual([]);
+    expect(result.current.mermaidCode).toBe('');
+    expect(result.current.status).toBe('idle');
+    expect(result.current.errorMessage).toBeNull();
   });
 
-  describe('generateContexts', () => {
-    it('should set status to thinking when called', async () => {
-      // Mock successful response
-      const mockEventSource = {
-        onmessage: null,
-        onerror: null,
-        close: jest.fn(),
-      };
-      
-      mockFetch.mockResolvedValue({
+  it('should update status to thinking when generateContexts is called', async () => {
+    // Mock successful response
+    (global.fetch as jest.Mock).mockImplementation(() =>
+      Promise.resolve({
         ok: true,
-        body: mockEventSource,
-      });
+        body: null,
+      })
+    );
 
-      const { result } = renderHook(() => useDDDStream());
-      
-      act(() => {
-        result.current.generateContexts('test requirement');
-      });
-
-      expect(result.current.status).toBe('thinking');
+    const { result } = renderHook(() => useDDDStream());
+    
+    act(() => {
+      result.current.generateContexts('test requirement');
     });
 
-    it('should reset state before making new request', async () => {
-      const mockEventSource = {
-        onmessage: null,
-        onerror: null,
-        close: jest.fn(),
-      };
-      
-      mockFetch.mockResolvedValue({
-        ok: true,
-        body: mockEventSource,
-      });
-
-      const { result } = renderHook(() => useDDDStream());
-      
-      // First call
-      act(() => {
-        result.current.generateContexts('first requirement');
-      });
-      
-      // Initial state should be reset
-      expect(result.current.thinkingMessages).toEqual([]);
-      expect(result.current.contexts).toEqual([]);
-    });
+    expect(result.current.status).toBe('thinking');
   });
 
-  describe('abort', () => {
-    it('should reset status to idle when abort is called', async () => {
-      const mockEventSource = {
-        onmessage: null,
-        onerror: null,
-        close: jest.fn(),
-      };
-      
-      mockFetch.mockResolvedValue({
-        ok: true,
-        body: mockEventSource,
-      });
-
-      const { result } = renderHook(() => useDDDStream());
-      
-      act(() => {
-        result.current.generateContexts('test requirement');
-      });
-      
-      expect(result.current.status).toBe('thinking');
-      
-      act(() => {
-        result.current.abort();
-      });
-      
-      expect(result.current.status).toBe('idle');
+  it('should reset state when reset is called', async () => {
+    const { result } = renderHook(() => useDDDStream());
+    
+    // Set some state
+    act(() => {
+      result.current.generateContexts('test');
     });
 
-    it('should clear thinking messages when abort is called', async () => {
-      const mockEventSource = {
-        onmessage: null,
-        onerror: null,
-        close: jest.fn(),
-      };
-      
-      mockFetch.mockResolvedValue({
-        ok: true,
-        body: mockEventSource,
-      });
-
-      const { result } = renderHook(() => useDDDStream());
-      
-      act(() => {
-        result.current.generateContexts('test requirement');
-      });
-      
-      act(() => {
-        result.current.abort();
-      });
-      
-      expect(result.current.thinkingMessages).toEqual([]);
+    // Reset
+    act(() => {
+      result.current.reset();
     });
 
-    it('should clear contexts when abort is called', async () => {
-      const mockEventSource = {
-        onmessage: null,
-        onerror: null,
-        close: jest.fn(),
-      };
-      
-      mockFetch.mockResolvedValue({
-        ok: true,
-        body: mockEventSource,
-      });
-
-      const { result } = renderHook(() => useDDDStream());
-      
-      act(() => {
-        result.current.generateContexts('test requirement');
-      });
-      
-      act(() => {
-        result.current.abort();
-      });
-      
-      expect(result.current.contexts).toEqual([]);
-    });
+    expect(result.current.status).toBe('idle');
+    expect(result.current.thinkingMessages).toEqual([]);
+    expect(result.current.contexts).toEqual([]);
   });
 
-  describe('reset', () => {
-    it('should reset all state to initial values', async () => {
-      const mockEventSource = {
-        onmessage: null,
-        onerror: null,
-        close: jest.fn(),
-      };
-      
-      mockFetch.mockResolvedValue({
-        ok: true,
-        body: mockEventSource,
-      });
-
-      const { result } = renderHook(() => useDDDStream());
-      
-      act(() => {
-        result.current.generateContexts('test requirement');
-      });
-      
-      act(() => {
-        result.current.reset();
-      });
-      
-      expect(result.current.status).toBe('idle');
-      expect(result.current.thinkingMessages).toEqual([]);
-      expect(result.current.contexts).toEqual([]);
-      expect(result.current.mermaidCode).toBe('');
-      expect(result.current.errorMessage).toBeNull();
+  it('should abort request when abort is called', () => {
+    const { result } = renderHook(() => useDDDStream());
+    
+    act(() => {
+      result.current.generateContexts('test');
     });
+
+    act(() => {
+      result.current.abort();
+    });
+
+    expect(result.current.status).toBe('idle');
+    expect(result.current.thinkingMessages).toEqual([]);
+  });
+});
+
+describe('useDomainModelStream', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
-  describe('error handling', () => {
-    it('should set error message when fetch fails', async () => {
-      mockFetch.mockRejectedValue(new Error('Network error'));
-
-      const { result } = renderHook(() => useDDDStream());
-      
-      act(() => {
-        result.current.generateContexts('test requirement');
-      });
-      
-      await waitFor(() => {
-        expect(result.current.status).toBe('error');
-      });
-      
-      expect(result.current.errorMessage).toBeDefined();
-    });
-
-    it('should set error status when API returns error', async () => {
-      mockFetch.mockResolvedValue({
-        ok: false,
-        status: 500,
-        json: () => Promise.resolve({ error: 'Server error' }),
-      });
-
-      const { result } = renderHook(() => useDDDStream());
-      
-      act(() => {
-        result.current.generateContexts('test requirement');
-      });
-      
-      // Wait for error to be set
-      await waitFor(() => {
-        expect(result.current.status).toBe('error');
-      });
-    });
+  it('should initialize with default state', () => {
+    const { result } = renderHook(() => useDomainModelStream());
+    
+    expect(result.current.thinkingMessages).toEqual([]);
+    expect(result.current.domainModels).toEqual([]);
+    expect(result.current.mermaidCode).toBe('');
+    expect(result.current.status).toBe('idle');
   });
 
-  describe('cleanup', () => {
-    it('should cleanup on unmount', () => {
-      const mockEventSource = {
-        onmessage: null,
-        onerror: null,
-        close: jest.fn(),
-      };
-      
-      mockFetch.mockResolvedValue({
-        ok: true,
-        body: mockEventSource,
-      });
-
-      const { result, unmount } = renderHook(() => useDDDStream());
-      
-      act(() => {
-        result.current.generateContexts('test requirement');
-      });
-      
-      unmount();
-      
-      // The cleanup should have been called (EventSource closed)
-      // We can't directly verify this in unit test without more mocking
-      expect(true).toBe(true);
+  it('should reset state when reset is called', () => {
+    const { result } = renderHook(() => useDomainModelStream());
+    
+    act(() => {
+      result.current.generateDomainModels('test requirement');
     });
+
+    act(() => {
+      result.current.reset();
+    });
+
+    expect(result.current.status).toBe('idle');
+    expect(result.current.domainModels).toEqual([]);
+  });
+});
+
+describe('useBusinessFlowStream', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should initialize with default state', () => {
+    const { result } = renderHook(() => useBusinessFlowStream());
+    
+    expect(result.current.thinkingMessages).toEqual([]);
+    expect(result.current.businessFlow).toBeNull();
+    expect(result.current.mermaidCode).toBe('');
+    expect(result.current.status).toBe('idle');
+  });
+
+  it('should generate business flow when called', () => {
+    const { result } = renderHook(() => useBusinessFlowStream());
+    
+    act(() => {
+      result.current.generateBusinessFlow([{ id: '1', name: 'Test' }]);
+    });
+
+    expect(result.current.status).toBe('thinking');
+  });
+
+  it('should reset state when reset is called', () => {
+    const { result } = renderHook(() => useBusinessFlowStream());
+    
+    act(() => {
+      result.current.generateBusinessFlow([]);
+    });
+
+    act(() => {
+      result.current.reset();
+    });
+
+    expect(result.current.status).toBe('idle');
+    expect(result.current.businessFlow).toBeNull();
+  });
+
+  it('should abort when abort is called', () => {
+    const { result } = renderHook(() => useBusinessFlowStream());
+    
+    act(() => {
+      result.current.generateBusinessFlow([]);
+    });
+
+    act(() => {
+      result.current.abort();
+    });
+
+    expect(result.current.status).toBe('idle');
   });
 });

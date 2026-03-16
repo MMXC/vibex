@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.38',
+    date: '2026-03-16',
+    changes: [
+      '🐛 修复领域模型生成后页面未切换问题',
+      '🔧 放宽 SSE 同步条件，支持空结果时同步 mermaidCode',
+      '📊 ThinkingPanel 进度条动态计算，修复 67% 卡住问题',
+      '⚠️ 补充 changelog：此前 3 个提交未更新日志',
+    ],
+    commit: '0ffd61b',
+  },
+  {
     version: '1.0.37',
     date: '2026-03-16',
     changes: [

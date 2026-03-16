@@ -3,7 +3,23 @@
  */
 
 import { renderHook, act } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useApiCall } from '@/hooks/useApiCall';
+import React from 'react';
+
+// Create a wrapper with QueryClientProvider
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: false },
+    mutations: { retry: false },
+  },
+});
+
+const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <QueryClientProvider client={queryClient}>
+    {children}
+  </QueryClientProvider>
+);
 
 // Mock the error modules
 jest.mock('@/lib/error/ErrorCodeMapper', () => ({
@@ -27,6 +43,9 @@ jest.mock('@/lib/error/RetryHandler', () => ({
 
 // Mock Toast
 jest.mock('@/components/ui/Toast', () => ({
+  useToast: () => ({
+    showToast: jest.fn(),
+  }),
   toast: {
     error: jest.fn(),
     success: jest.fn(),
@@ -44,7 +63,7 @@ describe('useApiCall', () => {
         useApiCall({
           apiFn: async () => 'test',
         })
-      );
+      , { wrapper: Wrapper });
 
       expect(result.current.data).toBeNull();
       expect(result.current.loading).toBe(false);
@@ -65,7 +84,7 @@ describe('useApiCall', () => {
           apiFn: mockApiFn,
           onSuccess,
         })
-      );
+      , { wrapper: Wrapper });
 
       await act(async () => {
         await result.current.execute();
@@ -86,7 +105,7 @@ describe('useApiCall', () => {
           onError,
           showToast: false,
         })
-      );
+      , { wrapper: Wrapper });
 
       await act(async () => {
         await result.current.execute();
@@ -104,7 +123,7 @@ describe('useApiCall', () => {
           apiFn: mockApiFn,
           showToast: false,
         })
-      );
+      , { wrapper: Wrapper });
 
       const returnValue = await act(async () => {
         return await result.current.execute();
@@ -122,7 +141,7 @@ describe('useApiCall', () => {
         useApiCall({
           apiFn: mockApiFn,
         })
-      );
+      , { wrapper: Wrapper });
 
       await act(async () => {
         await result.current.execute();
@@ -146,7 +165,7 @@ describe('useApiCall', () => {
         useApiCall({
           apiFn: async () => 'test',
         })
-      );
+      , { wrapper: Wrapper });
 
       act(() => {
         result.current.setData('manual data');
@@ -168,7 +187,7 @@ describe('useApiCall', () => {
           enableRetry: true,
           retryCount: 5,
         })
-      );
+      , { wrapper: Wrapper });
 
       await act(async () => {
         await result.current.execute();
@@ -187,7 +206,7 @@ describe('useApiCall', () => {
           apiFn: mockApiFn,
           enableRetry: false,
         })
-      );
+      , { wrapper: Wrapper });
 
       await act(async () => {
         await result.current.execute();

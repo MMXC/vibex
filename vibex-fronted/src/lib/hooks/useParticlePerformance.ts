@@ -26,6 +26,8 @@ export interface PerformanceConfig {
   pauseOffScreen?: boolean;
   /** Minimum device memory for full effects (in GB) */
   minMemoryGB?: number;
+  /** Respect prefers-reduced-motion (default: true) */
+  respectReducedMotion?: boolean;
 }
 
 const DEFAULT_CONFIG: Required<PerformanceConfig> = {
@@ -35,6 +37,7 @@ const DEFAULT_CONFIG: Required<PerformanceConfig> = {
   mobileReduction: 0.4,
   pauseOffScreen: true,
   minMemoryGB: 4,
+  respectReducedMotion: true,
 };
 
 /**
@@ -46,6 +49,7 @@ export function useParticlePerformance(config: PerformanceConfig = {}) {
   const [isMobile, setIsMobile] = useState(false);
   const [isLowEndDevice, setIsLowEndDevice] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [currentFPS, setCurrentFPS] = useState(options.targetFPS);
   
   const frameCountRef = useRef(0);
@@ -104,6 +108,36 @@ export function useParticlePerformance(config: PerformanceConfig = {}) {
     };
   }, [options.pauseOffScreen]);
 
+  // Detect prefers-reduced-motion
+  useEffect(() => {
+    if (!options.respectReducedMotion) return;
+    
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    
+    // Set initial value
+    setPrefersReducedMotion(mediaQuery.matches);
+    
+    const handleChange = (event: MediaQueryListEvent) => {
+      setPrefersReducedMotion(event.matches);
+    };
+    
+    // Listen for changes
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleChange);
+    } else {
+      // Deprecated but needed for older browsers
+      mediaQuery.addListener(handleChange);
+    }
+    
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', handleChange);
+      } else {
+        mediaQuery.removeListener(handleChange);
+      }
+    };
+  }, [options.respectReducedMotion]);
+
   // FPS monitoring
   useEffect(() => {
     let frameId: number;
@@ -154,12 +188,13 @@ export function useParticlePerformance(config: PerformanceConfig = {}) {
   }, [isMobile, isLowEndDevice, isVisible, options.mobileParticleLimit, options.mobileReduction]);
 
   // Should show particles
-  const shouldShowParticles = isVisible && currentFPS >= (options.targetFPS * 0.9);
+  const shouldShowParticles = isVisible && currentFPS >= (options.targetFPS * 0.9) && !prefersReducedMotion;
 
   return {
     isMobile,
     isLowEndDevice,
     isVisible,
+    prefersReducedMotion,
     currentFPS,
     particleLimit: getParticleLimit(),
     shouldShowParticles,

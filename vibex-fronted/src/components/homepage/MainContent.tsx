@@ -26,6 +26,8 @@ export interface MainContentProps {
   input?: React.ReactNode;
   /** Loading state */
   loading?: boolean;
+  /** Layout mode: 'horizontal' (default) or 'vertical' */
+  layout?: 'horizontal' | 'vertical';
 }
 
 const DEFAULT_STEPS: Step[] = [
@@ -44,25 +46,32 @@ export function MainContent({
   diagramType = 'graph',
   input,
   loading = false,
+  layout = 'horizontal',
 }: MainContentProps) {
   const completedSteps = steps
     .filter(s => s.id < currentStep)
     .map(s => s.id);
 
+  const containerClass = layout === 'vertical' 
+    ? styles.splitContainerVertical 
+    : styles.container;
+
   return (
-    <main className={styles.container}>
-      {/* Left Column: Step Navigation (15%) */}
-      <aside className={styles.sidebar}>
-        <StepNavigator
-          steps={steps}
-          currentStep={currentStep}
-          onStepClick={onStepClick}
-          completedSteps={completedSteps}
-        />
-      </aside>
+    <main className={containerClass}>
+      {layout === 'horizontal' && (
+        /* Left Column: Step Navigation (15%) */
+        <aside className={styles.sidebar}>
+          <StepNavigator
+            steps={steps}
+            currentStep={currentStep}
+            onStepClick={onStepClick}
+            completedSteps={completedSteps}
+          />
+        </aside>
+      )}
 
       {/* Center Column: Preview Panel (60%) */}
-      <section className={styles.preview}>
+      <section className={layout === 'vertical' ? styles.previewArea : styles.preview}>
         <div className={styles.previewHeader}>
           <h2>实时预览</h2>
           {loading && <span className={styles.loadingBadge}>加载中...</span>}
@@ -82,8 +91,8 @@ export function MainContent({
         </div>
       </section>
 
-      {/* Right Column: Input Panel (25%) */}
-      <aside className={styles.inputPanel}>
+      {/* Right Column: Input Panel (25% or 40%) */}
+      <aside className={layout === 'vertical' ? styles.inputArea : styles.inputPanel}>
         <div className={styles.inputHeader}>
           <h2>输入</h2>
         </div>

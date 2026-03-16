@@ -33,14 +33,15 @@ function StepIcon({ step, isActive, isCompleted }: { step: string; isActive: boo
 
 // ==================== Step Label ====================
 
-const stepLabels: Record<string, string> = {
+const STEP_LABELS: Record<string, string> = {
   'analyzing': '分析需求',
   'identifying-core': '识别核心领域',
   'calling-ai': '调用 AI 分析',
+  'using-plan': '基于 Plan 分析',
 }
 
 function getStepLabel(step: string): string {
-  return stepLabels[step] || step
+  return STEP_LABELS[step] || step
 }
 
 // ==================== ThinkingSteps ====================

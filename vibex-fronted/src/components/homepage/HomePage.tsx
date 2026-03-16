@@ -195,31 +195,40 @@ export default function HomePage() {
     checkAuth();
   }, [syncFromStorage, checkAuth]);
 
-  // 同步 SSE 结果
+  // 同步 SSE 结果 - 放宽条件：即使 contexts 为空也同步 mermaidCode
   useEffect(() => {
-    if (streamStatus === 'done' && streamContexts.length > 0) {
+    if (streamStatus === 'done') {
       setBoundedContexts(streamContexts);
       setContextMermaidCode(streamMermaidCode);
-      setCurrentStep(2);
-      setCompletedStep(2);
+      // 仅在有结果时推进步骤
+      if (streamContexts.length > 0 || streamMermaidCode) {
+        setCurrentStep(2);
+        setCompletedStep(2);
+      }
     }
   }, [streamStatus, streamContexts, streamMermaidCode]);
 
   useEffect(() => {
-    if (modelStreamStatus === 'done' && streamDomainModels.length > 0) {
+    if (modelStreamStatus === 'done') {
       setDomainModels(streamDomainModels as DomainModel[]);
       setModelMermaidCode(streamModelMermaidCode);
-      setCurrentStep(3);
-      setCompletedStep(3);
+      // 仅在有结果时推进步骤
+      if (streamDomainModels.length > 0 || streamModelMermaidCode) {
+        setCurrentStep(3);
+        setCompletedStep(3);
+      }
     }
   }, [modelStreamStatus, streamDomainModels, streamModelMermaidCode]);
 
   useEffect(() => {
-    if (flowStreamStatus === 'done' && streamBusinessFlow) {
+    if (flowStreamStatus === 'done') {
       setBusinessFlow(streamBusinessFlow as BusinessFlow);
       setFlowMermaidCode(streamFlowMermaidCode);
-      setCurrentStep(4);
-      setCompletedStep(4);
+      // 仅在有结果时推进步骤
+      if (streamBusinessFlow || streamFlowMermaidCode) {
+        setCurrentStep(4);
+        setCompletedStep(4);
+      }
     }
   }, [flowStreamStatus, streamBusinessFlow, streamFlowMermaidCode]);
 

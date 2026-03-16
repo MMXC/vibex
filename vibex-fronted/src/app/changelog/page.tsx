@@ -18,6 +18,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.40',
+    date: '2026-03-17',
+    changes: [
+      '♻️ 首页步骤组件模块化重构：HomePage.tsx 530行 → 71行',
+      '📦 新增 5 个独立步骤组件：StepRequirementInput/StepBoundedContext/StepDomainModel/StepBusinessFlow/StepProjectCreate',
+      '⚡ StepContainer 懒加载容器：React.lazy + Suspense 首屏优化',
+      '🎣 useHomePage Hook：业务逻辑抽离，代码结构清晰',
+      '✅ 测试通过：131 suites / 1487 tests',
+    ],
+    commit: '4150cb5',
+  },
+  {
     version: '1.0.39',
     date: '2026-03-16',
     changes: [

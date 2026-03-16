@@ -14,6 +14,7 @@ export type { CollapsibleChatProps } from './CollapsibleChat';
 
 // New modular components (Epic 2, 3, 4)
 export { default as HomePage } from './HomePage';
+export { StepContainer } from './StepContainer';
 export { Navbar } from './Navbar/Navbar';
 export { Sidebar } from './Sidebar/Sidebar';
 export { PreviewArea } from './PreviewArea/PreviewArea';

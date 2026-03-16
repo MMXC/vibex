@@ -356,26 +356,37 @@ export default function HomePage() {
                   <div className={styles.minimized}><span>预览</span><button onClick={() => setMinimizedPanel(null)}>展开</button></div>
                 ) : (
                   <>
-                    {getCurrentMermaidCode() ? (
-                      <>
-                        <MermaidPreview code={getCurrentMermaidCode()} diagramType="flowchart" layout="TB" height="60%" />
-                        {currentStep === 2 && boundedContexts.length > 0 && (
-                          <div className={styles.nodeSelection}>
-                            {(boundedContexts ?? []).map(ctx => (
-                              <label key={ctx.id} className={`${styles.nodeCheckbox} ${selectedNodes.has(`ctx-${ctx.id}`) ? styles.checked : ''}`}>
-                                <input type="checkbox" checked={selectedNodes.has(`ctx-${ctx.id}`)} onChange={() => handleNodeToggle(`ctx-${ctx.id}`)} />
-                                <span>{ctx.name}</span>
-                              </label>
-                            ))}
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <div className={styles.previewEmpty}>
-                        <div className={styles.previewEmptyIcon}>👁️</div>
-                        <div className={styles.previewEmptyText}>输入需求后，这里将实时显示 AI 生成的设计预览</div>
-                      </div>
-                    )}
+                    {(() => {
+                      // 统一使用 activeStream 获取 SSE 流式数据
+                      const activeStream = getActiveStreamData(
+                        { messages: thinkingMessages, contexts: streamContexts, mermaid: streamMermaidCode, status: streamStatus, error: streamError, abort: abortContexts },
+                        { messages: modelThinkingMessages, mermaid: streamModelMermaidCode, status: modelStreamStatus, error: modelStreamError, abort: abortModels },
+                        { messages: flowThinkingMessages, mermaid: streamFlowMermaidCode, status: flowStreamStatus, error: flowStreamError, abort: abortFlow }
+                      );
+                      // 优先使用 SSE 流式数据，回退到静态状态
+                      const previewMermaidCode = activeStream?.mermaidCode || getCurrentMermaidCode();
+                      
+                      return previewMermaidCode ? (
+                        <>
+                          <MermaidPreview code={previewMermaidCode} diagramType="flowchart" layout="TB" height="60%" />
+                          {currentStep === 2 && boundedContexts.length > 0 && (
+                            <div className={styles.nodeSelection}>
+                              {(boundedContexts ?? []).map(ctx => (
+                                <label key={ctx.id} className={`${styles.nodeCheckbox} ${selectedNodes.has(`ctx-${ctx.id}`) ? styles.checked : ''}`}>
+                                  <input type="checkbox" checked={selectedNodes.has(`ctx-${ctx.id}`)} onChange={() => handleNodeToggle(`ctx-${ctx.id}`)} />
+                                  <span>{ctx.name}</span>
+                                </label>
+                              ))}
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div className={styles.previewEmpty}>
+                          <div className={styles.previewEmptyIcon}>👁️</div>
+                          <div className={styles.previewEmptyText}>输入需求后，这里将实时显示 AI 生成的设计预览</div>
+                        </div>
+                      );
+                    })()}
                   </>
                 )}
               </div>

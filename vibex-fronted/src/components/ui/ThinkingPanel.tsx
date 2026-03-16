@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { DDDStreamStatus, ThinkingStep } from '@/hooks/useDDDStream'
 import { BoundedContext } from '@/services/api/types/prototype/domain'
+import { MermaidPreview } from './MermaidPreview'
 import styles from './ThinkingPanel.module.css'
 
 // ==================== Types ====================
@@ -106,6 +107,7 @@ function ContextCard({ context }: { context: BoundedContext }) {
 export function ThinkingPanel({
   thinkingMessages,
   contexts,
+  mermaidCode,
   status,
   errorMessage,
   onAbort,
@@ -204,6 +206,16 @@ export function ThinkingPanel({
                 <ContextCard key={ctx.id} context={ctx} />
               ))}
             </div>
+          </div>
+        )}
+        
+        {/* Mermaid Diagram - Domain Model */}
+        {mermaidCode && (
+          <div className={styles.section}>
+            <div className={styles.sectionTitle}>
+              领域模型
+            </div>
+            <MermaidPreview code={mermaidCode} diagramType="classDiagram" />
           </div>
         )}
         

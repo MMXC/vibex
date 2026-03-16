@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.37',
+    date: '2026-03-16',
+    changes: [
+      '🐛 修复领域模型生成时 Mermaid 实时渲染未切换展示',
+      '🎨 ThinkingPanel 添加 MermaidPreview 组件渲染领域模型图表',
+      '🔄 预览区统一使用 getActiveStreamData() SSE 流式数据',
+      '✅ 代码审查通过：无安全/性能问题，测试全部通过',
+    ],
+    commit: '0086335',
+  },
+  {
     version: '1.0.36',
     date: '2026-03-16',
     changes: [

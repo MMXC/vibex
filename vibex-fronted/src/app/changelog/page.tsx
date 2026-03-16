@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.39',
+    date: '2026-03-16',
+    changes: [
+      '🐛 领域模型解析超时检测：60 秒超时自动提示',
+      '🛡️ 后端错误处理增强：AI 服务错误检测 + 详细日志',
+      '⚠️ 补充文档：vibex-domain-model-parsing-stuck 分析与报告',
+    ],
+    commit: 'ae39f9c',
+  },
+  {
     version: '1.0.38',
     date: '2026-03-16',
     changes: [

@@ -31,6 +31,7 @@ import prototypeCollaboration from './routes/prototype-collaboration';
 import confirmationProjects from './routes/confirmation-projects';
 import prototypeCollaborationId from './routes/prototype-collaboration.$id';
 import collaboration from './routes/collaboration';
+import collaborationRealtime from './routes/collaboration-realtime';
 import aiDesignChat from './routes/ai-design-chat';
 import aiUIGeneration from './routes/ai-ui-generation';
 import prototypeVersions from './routes/prototype-versions';
@@ -45,6 +46,9 @@ import projectSettings from './routes/project-settings';
 import ddd from './routes/ddd';
 import diagnosis from './routes/diagnosis';
 import plan from './routes/plan';
+
+// API Gateway v1 路由
+import v1 from './routes/v1/gateway';
 
 // 创建 Hono 应用，绑定 Cloudflare 环境变量类型
 const app = new Hono<{ Bindings: CloudflareEnv }>();
@@ -101,6 +105,7 @@ app.route('/api/clarification-questions', clarificationQuestions);
 app.route('/api/prototype-collaboration', prototypeCollaboration);
 app.route('/api/prototype-collaboration', prototypeCollaborationId);
 app.route('/api/collaboration', collaboration);
+app.route('/api/collaboration-realtime', collaborationRealtime);
 app.route('/api/ai-design-chat', aiDesignChat);
 app.route('/api/ai-ui-generation', aiUIGeneration);
 app.route('/api/prototype-versions', prototypeVersions);
@@ -117,8 +122,14 @@ app.route('/api/ddd', ddd);
 app.route('/api/diagnosis', diagnosis);
 app.route('/api/plan', plan);
 
+// API Gateway v1 路由 (支持认证、限流、日志中间件)
+app.route('/v1', v1);
+
 // 导出 for Cloudflare Workers
 export default app;
+
+// 导出 Durable Object 类 (Cloudflare Workers 需要)
+export { CollaborationRoom } from './websocket/CollaborationRoom';
 
 // 仅在本地开发时启动服务器
 if (process.env.NODE_ENV !== 'production') {

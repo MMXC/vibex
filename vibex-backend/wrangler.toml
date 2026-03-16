@@ -23,3 +23,12 @@ ENVIRONMENT = "production"
 [[routes]]
 pattern = "api.vibex.top/*"
 zone_name = "vibex.top"
+
+# Durable Objects
+[[durable_objects.bindings]]
+name = "COLLABORATION_ROOM"
+class_name = "CollaborationRoom"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["CollaborationRoom"]

@@ -85,6 +85,73 @@ const FEATURE_CARDS = [
   { id: 3, icon: '🔄', title: '迭代优化', description: '可编辑可优化，所见即所得', color: '#00ff88' },
 ];
 
+// 类型定义 - ActiveStreamData
+interface ActiveStreamData {
+  thinkingMessages: any[];
+  contexts?: BoundedContext[];
+  mermaidCode: string;
+  status: 'idle' | 'thinking' | 'done' | 'error';
+  errorMessage: string | null;
+  onAbort: () => void;
+  onRetry: () => void;
+}
+
+/**
+ * 获取当前活跃的 SSE 流数据
+ * 基于实际 SSE 状态而非 currentStep 选择消息
+ * 优先级: 限界上下文 > 领域模型 > 业务流程
+ */
+function getActiveStreamData(
+  // 限界上下文数据
+  contextData: { messages: any[]; contexts: BoundedContext[]; mermaid: string; status: string; error: string | null; abort: () => void },
+  // 领域模型数据
+  modelData: { messages: any[]; mermaid: string; status: string; error: string | null; abort: () => void },
+  // 业务流程数据
+  flowData: { messages: any[]; mermaid: string; status: string; error: string | null; abort: () => void }
+): ActiveStreamData | null {
+  // 优先级 1: 限界上下文生成
+  if (contextData.status !== 'idle') {
+    return {
+      thinkingMessages: contextData.messages,
+      contexts: contextData.contexts,
+      mermaidCode: contextData.mermaid,
+      status: contextData.status as 'idle' | 'thinking' | 'done' | 'error',
+      errorMessage: contextData.error,
+      onAbort: contextData.abort,
+      onRetry: () => {}, // Will be set by component
+    };
+  }
+
+  // 优先级 2: 领域模型生成
+  if (modelData.status !== 'idle') {
+    return {
+      thinkingMessages: modelData.messages,
+      contexts: undefined,
+      mermaidCode: modelData.mermaid,
+      status: modelData.status as 'idle' | 'thinking' | 'done' | 'error',
+      errorMessage: modelData.error,
+      onAbort: modelData.abort,
+      onRetry: () => {},
+    };
+  }
+
+  // 优先级 3: 业务流程生成
+  if (flowData.status !== 'idle') {
+    return {
+      thinkingMessages: flowData.messages,
+      contexts: undefined,
+      mermaidCode: flowData.mermaid,
+      status: flowData.status as 'idle' | 'thinking' | 'done' | 'error',
+      errorMessage: flowData.error,
+      onAbort: flowData.abort,
+      onRetry: () => {},
+    };
+  }
+
+  // 所有状态为 idle
+  return null;
+}
+
 export default function HomePage() {
   const router = useRouter();
   const { isAuthenticated, checkAuth, syncFromStorage } = useAuthStore();
@@ -397,23 +464,39 @@ export default function HomePage() {
 
         {/* 右侧 AI Panel */}
         <aside className={styles.aiPanel}>
-          {streamStatus !== 'idle' || modelStreamStatus !== 'idle' || flowStreamStatus !== 'idle' ? (
-            <ThinkingPanel
-              thinkingMessages={currentStep === 2 ? thinkingMessages : currentStep === 3 ? modelThinkingMessages : flowThinkingMessages}
-              contexts={currentStep === 2 ? streamContexts : undefined}
-              mermaidCode={currentStep === 2 ? streamMermaidCode : currentStep === 3 ? modelMermaidCode : flowMermaidCode}
-              status={currentStep === 2 ? streamStatus : currentStep === 3 ? modelStreamStatus : flowStreamStatus}
-              errorMessage={currentStep === 2 ? streamError : currentStep === 3 ? modelStreamError : flowStreamError}
-              onAbort={currentStep === 2 ? abortContexts : currentStep === 3 ? abortModels : abortFlow}
-              onRetry={currentStep === 2 ? () => handleGenerate() : currentStep === 3 ? () => handleGenerateDomainModel() : () => handleGenerateBusinessFlow()}
-              onUseDefault={handleGenerate}
-            />
-          ) : (
-            <div className={styles.aiHeader}>
-              <div className={styles.aiAvatar}>🤖</div>
-              <div><div className={styles.aiTitle}>AI 设计助手</div><div className={styles.aiSubtitle}>随时为你解答</div></div>
-            </div>
-          )}
+          {(() => {
+            const activeStream = getActiveStreamData(
+              { messages: thinkingMessages, contexts: streamContexts, mermaid: streamMermaidCode, status: streamStatus, error: streamError, abort: abortContexts },
+              { messages: modelThinkingMessages, mermaid: streamModelMermaidCode, status: modelStreamStatus, error: modelStreamError, abort: abortModels },
+              { messages: flowThinkingMessages, mermaid: streamFlowMermaidCode, status: flowStreamStatus, error: flowStreamError, abort: abortFlow }
+            );
+
+            if (activeStream) {
+              return (
+                <ThinkingPanel
+                  thinkingMessages={activeStream.thinkingMessages}
+                  contexts={activeStream.contexts}
+                  mermaidCode={activeStream.mermaidCode}
+                  status={activeStream.status}
+                  errorMessage={activeStream.errorMessage}
+                  onAbort={activeStream.onAbort}
+                  onRetry={() => {
+                    if (streamStatus === 'error') handleGenerate();
+                    else if (modelStreamStatus === 'error') handleGenerateDomainModel();
+                    else if (flowStreamStatus === 'error') handleGenerateBusinessFlow();
+                  }}
+                  onUseDefault={handleGenerate}
+                />
+              );
+            }
+
+            return (
+              <div className={styles.aiHeader}>
+                <div className={styles.aiAvatar}>🤖</div>
+                <div><div className={styles.aiTitle}>AI 设计助手</div><div className={styles.aiSubtitle}>随时为你解答</div></div>
+              </div>
+            );
+          })()}
         </aside>
       </div>
 

@@ -81,23 +81,7 @@ export function useDDDStream(): UseDDDStreamReturn {
     }
   }, []);
   
-  // Reset state
-  const reset = useCallback(() => {
-    cleanup();
-    setThinkingMessages([]);
-    setContexts([]);
-    setMermaidCode('');
-    setErrorMessage(null);
-  }, [cleanup]);
-  
-  // Abort current request
-  const abort = useCallback(() => {
-    cleanup();
-    setThinkingMessages([]);
-    setContexts([]);
-  }, [cleanup]);
-  
-  // React Query mutation for SSE streaming
+  // React Query mutation for SSE streaming (defined before abort/reset to allow access to mutation.reset())
   const mutation = useMutation({
     mutationFn: async (requirementText: string) => {
       // Reset state
@@ -139,6 +123,24 @@ export function useDDDStream(): UseDDDStreamReturn {
   const generateContexts = useCallback((requirementText: string) => {
     mutation.mutate(requirementText);
   }, [mutation]);
+  
+  // Reset state
+  const reset = useCallback(() => {
+    mutation.reset();
+    cleanup();
+    setThinkingMessages([]);
+    setContexts([]);
+    setMermaidCode('');
+    setErrorMessage(null);
+  }, [mutation, cleanup]);
+  
+  // Abort current request
+  const abort = useCallback(() => {
+    mutation.reset();
+    cleanup();
+    setThinkingMessages([]);
+    setContexts([]);
+  }, [mutation, cleanup]);
   
   // Cleanup on unmount
   useEffect(() => {
@@ -211,21 +213,6 @@ export function useDomainModelStream(): UseDomainModelStreamReturn {
     }
   }, []);
   
-  const reset = useCallback(() => {
-    cleanup();
-    setThinkingMessages([]);
-    setDomainModels([]);
-    setMermaidCode('');
-    setErrorMessage(null);
-  }, [cleanup]);
-  
-  const abort = useCallback(() => {
-    cleanup();
-    setThinkingMessages([]);
-    setDomainModels([]);
-    setMermaidCode('');
-  }, [cleanup]);
-  
   const mutation = useMutation({
     mutationFn: async ({ requirementText, boundedContexts }: { requirementText: string; boundedContexts?: BoundedContext[] }) => {
       setThinkingMessages([]);
@@ -273,6 +260,23 @@ export function useDomainModelStream(): UseDomainModelStreamReturn {
       setErrorMessage(error.message);
     },
   });
+  
+  const reset = useCallback(() => {
+    mutation.reset();
+    cleanup();
+    setThinkingMessages([]);
+    setDomainModels([]);
+    setMermaidCode('');
+    setErrorMessage(null);
+  }, [mutation, cleanup]);
+  
+  const abort = useCallback(() => {
+    mutation.reset();
+    cleanup();
+    setThinkingMessages([]);
+    setDomainModels([]);
+    setMermaidCode('');
+  }, [mutation, cleanup]);
   
   const generateDomainModels = useCallback((requirementText: string, boundedContexts?: BoundedContext[]) => {
     mutation.mutate({ requirementText, boundedContexts });
@@ -341,20 +345,6 @@ export function useBusinessFlowStream(): UseBusinessFlowStreamReturn {
     }
   }, []);
   
-  const reset = useCallback(() => {
-    cleanup();
-    setThinkingMessages([]);
-    setBusinessFlow(null);
-    setMermaidCode('');
-    setErrorMessage(null);
-  }, [cleanup]);
-  
-  const abort = useCallback(() => {
-    cleanup();
-    setThinkingMessages([]);
-    setBusinessFlow(null);
-  }, [cleanup]);
-  
   const mutation = useMutation({
     mutationFn: async ({ domainModels, requirementText }: { domainModels: unknown[]; requirementText?: string }) => {
       setThinkingMessages([]);
@@ -387,6 +377,22 @@ export function useBusinessFlowStream(): UseBusinessFlowStreamReturn {
       setErrorMessage(error.message);
     },
   });
+  
+  const reset = useCallback(() => {
+    mutation.reset();
+    cleanup();
+    setThinkingMessages([]);
+    setBusinessFlow(null);
+    setMermaidCode('');
+    setErrorMessage(null);
+  }, [mutation, cleanup]);
+  
+  const abort = useCallback(() => {
+    mutation.reset();
+    cleanup();
+    setThinkingMessages([]);
+    setBusinessFlow(null);
+  }, [mutation, cleanup]);
   
   const generateBusinessFlow = useCallback((domainModels: unknown[], requirementText?: string) => {
     mutation.mutate({ domainModels, requirementText });

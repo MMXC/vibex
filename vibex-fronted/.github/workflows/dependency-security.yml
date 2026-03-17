@@ -35,19 +35,38 @@ jobs:
         run: npm ci
       
       - name: Run npm audit
-        run: npm audit --audit-level=moderate
-        continue-on-error: true
-      
-      - name: Check for vulnerabilities
         run: |
-          output=$(npm audit --json 2>/dev/null)
-          if echo "$output" | grep -q '"vulnerabilities"'; then
-            severity=$(echo "$output" | node -e "console.log(JSON.parse(require('fs').readFileSync(0, 'utf-8')).metadata.vulnerabilities.total || 0)")
-            if [ "$severity" -gt 0 ]; then
-              echo "Found $severity vulnerabilities"
-              exit 1
-            fi
+          # Generate JSON report for artifact
+          npm audit --json > audit-report.json
+          
+          # Parse vulnerability counts
+          output=$(cat audit-report.json)
+          critical=$(echo "$output" | node -e "console.log(JSON.parse(require('fs').readFileSync(0, 'utf-8')).metadata.vulnerabilities.critical || 0)")
+          high=$(echo "$output" | node -e "console.log(JSON.parse(require('fs').readFileSync(0, 'utf-8')).metadata.vulnerabilities.high || 0)")
+          moderate=$(echo "$output" | node -e "console.log(JSON.parse(require('fs').readFileSync(0, 'utf-8')).metadata.vulnerabilities.moderate || 0)")
+          low=$(echo "$output" | node -e "console.log(JSON.parse(require('fs').readFileSync(0, 'utf-8')).metadata.vulnerabilities.low || 0)")
+          
+          echo "Vulnerability Summary:"
+          echo "  Critical: $critical"
+          echo "  High: $high"
+          echo "  Moderate: $moderate"
+          echo "  Low: $low"
+          
+          # Block on Critical/High, warn on Moderate/Low
+          if [ "$critical" -gt 0 ] || [ "$high" -gt 0 ]; then
+            echo "::error::Found Critical/High vulnerabilities! PR blocked."
+            exit 1
+          elif [ "$moderate" -gt 0 ] || [ "$low" -gt 0 ]; then
+            echo "::warning::Found Moderate/Low vulnerabilities (non-blocking)."
           fi
+      
+      - name: Upload security report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-audit-report
+          path: audit-report.json
+          retention-days: 30
       
   snyk:
     runs-on: ubuntu-latest

@@ -3,6 +3,14 @@
 # Vibex pre-commit hook
 # Security checks + tests before commit
 
+# Check for --no-verify skip option
+if [ "$1" = "--no-verify" ]; then
+  echo "⚠️ Pre-commit checks skipped via --no-verify"
+  echo "⚠️ WARNING: You are bypassing security checks!"
+  echo "⚠️ Please ensure you understand the security implications."
+  exit 0
+fi
+
 echo "🔒 Running pre-commit checks..."
 
 # 1. 敏感信息扫描 (如果 gitleaks 可用)

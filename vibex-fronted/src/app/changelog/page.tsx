@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.42',
+    date: '2026-03-17',
+    changes: [
+      '🧪 测试覆盖率提升：新增 ThinkingPanel/api-config 测试',
+      '📝 useHomeGeneration 测试补充：callback 覆盖 + 状态转换',
+      '📊 当前覆盖率：Lines 64.63%, Branches 53.83%',
+    ],
+    commit: '58809a8',
+  },
+  {
     version: '1.0.41',
     date: '2026-03-17',
     changes: [

@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.44',
+    date: '2026-03-17',
+    changes: [
+      '🐛 修复首页 SSR 崩溃: ParticleBackground 动态导入',
+      '🛡️ useParticlePerformance hook SSR 保护',
+      '✅ 构建验证通过',
+    ],
+    commit: '20db4a4',
+  },
+  {
     version: '1.0.43',
     date: '2026-03-17',
     changes: [

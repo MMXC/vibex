@@ -1,16 +1,20 @@
 /**
- * HomePage - 主页容器组件 (极简版)
+ * HomePage - 主页容器组件 (垂直布局版)
  * 
- * 仅负责 UI 渲染，业务逻辑已抽取到 useHomePage hook
- * 目标: < 100 行
+ * 60% 预览区域 + 40% 录入区域
+ * 无 Tab 切换，固定展示
+ * 
+ * 业务逻辑已抽取到 useHomePage hook
  */
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import LoginDrawer from '@/components/ui/LoginDrawer';
 import { ParticleBackground } from '@/components/particles/ParticleBackground';
-import { Navbar, Sidebar, StepContainer } from '@/components/homepage';
+import { Navbar, MainContent, StepContainer } from '@/components/homepage';
 import { useHomePage } from './hooks';
+import { InputArea } from './InputArea/InputArea';
+import { PreviewArea } from './PreviewArea/PreviewArea';
 import styles from '@/app/homepage.module.css';
 import type { Step } from '@/types/homepage';
 
@@ -24,17 +28,46 @@ const STEPS: Step[] = [
 ];
 
 export default function HomePage() {
-  const { currentStep, completedStep, isAuthenticated, setCurrentStep } = useHomePage();
+  const { 
+    currentStep, 
+    completedStep, 
+    isAuthenticated, 
+    setCurrentStep,
+    requirementText,
+    setRequirementText,
+    boundedContexts,
+    contextMermaidCode,
+    domainModels,
+    modelMermaidCode,
+    businessFlow,
+    flowMermaidCode,
+    generateContexts,
+    isGenerating,
+  } = useHomePage();
+  
   const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
 
+  // Get current mermaid code based on step
+  const currentMermaidCode = useMemo(() => {
+    switch (currentStep) {
+      case 2: return contextMermaidCode;
+      case 3: return modelMermaidCode;
+      case 4: return flowMermaidCode;
+      default: return '';
+    }
+  }, [currentStep, contextMermaidCode, modelMermaidCode, flowMermaidCode]);
+
+  // Handle requirement submission
+  const handleRequirementSubmit = useCallback(() => {
+    if (requirementText.trim()) {
+      generateContexts(requirementText);
+    }
+  }, [requirementText, generateContexts]);
+
+  // Handle step change
   const handleStepClick = useCallback((step: number) => {
     setCurrentStep(step);
   }, [setCurrentStep]);
-
-  const isStepClickable = useCallback((step: number) => {
-    return step <= completedStep + 1;
-  }, [completedStep]);
 
   return (
     <div className={styles.container}>
@@ -42,24 +75,32 @@ export default function HomePage() {
       <Navbar 
         isAuthenticated={isAuthenticated}
         onLoginClick={() => setIsLoginDrawerOpen(true)}
-        onMenuToggle={() => setIsCollapsed(!isCollapsed)} 
+        onMenuToggle={() => {}} 
         onSettingsClick={() => setIsLoginDrawerOpen(true)} 
       />
       
-      <div className={styles.mainContent}>
-        <Sidebar 
-          steps={STEPS}
+      <div className={styles.mainContentVertical}>
+        {/* 预览区域 60% */}
+        <PreviewArea
           currentStep={currentStep}
-          completedStep={completedStep}
-          onStepClick={handleStepClick}
-          isStepClickable={isStepClickable}
-          isCollapsed={isCollapsed}
-          onCollapse={setIsCollapsed}
+          mermaidCode={currentMermaidCode}
+          boundedContexts={boundedContexts}
+          domainModels={domainModels}
+          businessFlow={businessFlow}
+          isGenerating={isGenerating}
         />
         
-        <main className={styles.content}>
-          <StepContainer />
-        </main>
+        {/* 录入区域 40% */}
+        <InputArea
+          currentStep={currentStep}
+          requirementText={requirementText}
+          onRequirementChange={setRequirementText}
+          onSubmit={handleRequirementSubmit}
+          isGenerating={isGenerating}
+          steps={STEPS}
+          completedStep={completedStep}
+          onStepClick={handleStepClick}
+        />
       </div>
 
       <LoginDrawer 

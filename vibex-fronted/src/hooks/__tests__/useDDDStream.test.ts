@@ -3,6 +3,8 @@
  */
 
 import { renderHook, act, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React from 'react';
 import { useDDDStream, useDomainModelStream, useBusinessFlowStream } from '../useDDDStream';
 
 // Mock fetch globally
@@ -13,13 +15,30 @@ jest.mock('@/lib/api-config', () => ({
   getApiUrl: (path: string) => `http://localhost:3000${path}`,
 }));
 
+// Create a wrapper with QueryClientProvider
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+  return function Wrapper({ children }: { children: React.ReactNode }) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        {children}
+      </QueryClientProvider>
+    );
+  };
+};
+
 describe('useDDDStream', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('should initialize with default state', () => {
-    const { result } = renderHook(() => useDDDStream());
+    const { result } = renderHook(() => useDDDStream(), { wrapper: createWrapper() });
     
     expect(result.current.thinkingMessages).toEqual([]);
     expect(result.current.contexts).toEqual([]);
@@ -37,7 +56,7 @@ describe('useDDDStream', () => {
       })
     );
 
-    const { result } = renderHook(() => useDDDStream());
+    const { result } = renderHook(() => useDDDStream(), { wrapper: createWrapper() });
     
     act(() => {
       result.current.generateContexts('test requirement');
@@ -47,7 +66,7 @@ describe('useDDDStream', () => {
   });
 
   it('should reset state when reset is called', async () => {
-    const { result } = renderHook(() => useDDDStream());
+    const { result } = renderHook(() => useDDDStream(), { wrapper: createWrapper() });
     
     // Set some state
     act(() => {
@@ -65,7 +84,7 @@ describe('useDDDStream', () => {
   });
 
   it('should abort request when abort is called', () => {
-    const { result } = renderHook(() => useDDDStream());
+    const { result } = renderHook(() => useDDDStream(), { wrapper: createWrapper() });
     
     act(() => {
       result.current.generateContexts('test');
@@ -86,7 +105,7 @@ describe('useDomainModelStream', () => {
   });
 
   it('should initialize with default state', () => {
-    const { result } = renderHook(() => useDomainModelStream());
+    const { result } = renderHook(() => useDomainModelStream(), { wrapper: createWrapper() });
     
     expect(result.current.thinkingMessages).toEqual([]);
     expect(result.current.domainModels).toEqual([]);
@@ -95,7 +114,7 @@ describe('useDomainModelStream', () => {
   });
 
   it('should reset state when reset is called', () => {
-    const { result } = renderHook(() => useDomainModelStream());
+    const { result } = renderHook(() => useDomainModelStream(), { wrapper: createWrapper() });
     
     act(() => {
       result.current.generateDomainModels('test requirement');
@@ -116,7 +135,7 @@ describe('useBusinessFlowStream', () => {
   });
 
   it('should initialize with default state', () => {
-    const { result } = renderHook(() => useBusinessFlowStream());
+    const { result } = renderHook(() => useBusinessFlowStream(), { wrapper: createWrapper() });
     
     expect(result.current.thinkingMessages).toEqual([]);
     expect(result.current.businessFlow).toBeNull();
@@ -125,7 +144,7 @@ describe('useBusinessFlowStream', () => {
   });
 
   it('should generate business flow when called', () => {
-    const { result } = renderHook(() => useBusinessFlowStream());
+    const { result } = renderHook(() => useBusinessFlowStream(), { wrapper: createWrapper() });
     
     act(() => {
       result.current.generateBusinessFlow([{ id: '1', name: 'Test' }]);
@@ -135,7 +154,7 @@ describe('useBusinessFlowStream', () => {
   });
 
   it('should reset state when reset is called', () => {
-    const { result } = renderHook(() => useBusinessFlowStream());
+    const { result } = renderHook(() => useBusinessFlowStream(), { wrapper: createWrapper() });
     
     act(() => {
       result.current.generateBusinessFlow([]);
@@ -150,7 +169,7 @@ describe('useBusinessFlowStream', () => {
   });
 
   it('should abort when abort is called', () => {
-    const { result } = renderHook(() => useBusinessFlowStream());
+    const { result } = renderHook(() => useBusinessFlowStream(), { wrapper: createWrapper() });
     
     act(() => {
       result.current.generateBusinessFlow([]);

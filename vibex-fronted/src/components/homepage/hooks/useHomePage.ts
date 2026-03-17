@@ -38,6 +38,9 @@ export interface UseHomePageReturn {
   flowStreamStatus: string;
   flowStreamError: string | null;
   
+  // Computed
+  isGenerating: boolean;
+  
   // Actions
   generateContexts: (text: string) => void;
   abortContexts: () => void;
@@ -180,6 +183,9 @@ export function useHomePage(): UseHomePageReturn {
     modelStreamError,
     flowStreamStatus,
     flowStreamError,
+    
+    // Computed
+    isGenerating: streamStatus === 'thinking' || modelStreamStatus === 'thinking' || flowStreamStatus === 'thinking',
     
     // Actions
     generateContexts,

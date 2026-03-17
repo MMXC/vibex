@@ -1394,3 +1394,56 @@
     font-size: 14px;
   }
 }
+
+/* ============================================
+   垂直布局 - 60% 预览 / 40% 录入
+   ============================================ */
+
+/* 主内容区域 - 垂直布局 */
+.mainContentVertical {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: calc(100vh - 64px);
+  overflow: hidden;
+  padding: 0;
+  gap: 0;
+}
+
+/* 预览区域 - 60% */
+.mainContentVertical .previewSection {
+  flex: 0 0 60%;
+  display: flex;
+  flex-direction: column;
+  background: rgba(10, 10, 15, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+/* 录入区域 - 40% */
+.mainContentVertical .inputSection {
+  flex: 0 0 40%;
+  display: flex;
+  flex-direction: column;
+  background: rgba(10, 10, 15, 0.98);
+  overflow: hidden;
+}
+
+/* 响应式调整 */
+@media (min-width: 1440px) {
+  .mainContentVertical .previewSection {
+    flex: 0 0 65%;
+  }
+  .mainContentVertical .inputSection {
+    flex: 0 0 35%;
+  }
+}
+
+@media (max-width: 1023px) {
+  .mainContentVertical .previewSection {
+    flex: 0 0 50%;
+  }
+  .mainContentVertical .inputSection {
+    flex: 0 0 50%;
+  }
+}

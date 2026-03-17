@@ -54,9 +54,10 @@ export default function HomePage() {
   
   const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
 
-  // Get current mermaid code based on step
+  // Get current mermaid code based on step (F1: show contextMermaidCode on Step 1)
   const currentMermaidCode = useMemo(() => {
     switch (currentStep) {
+      case 1: return contextMermaidCode;  // F1: Step 1 shows context diagram
       case 2: return contextMermaidCode;
       case 3: return modelMermaidCode;
       case 4: return flowMermaidCode;

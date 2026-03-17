@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-03-17T04:43:55Z",
+  "scans": [
+    {
+      "name": "npm-audit",
+      "status": "completed",
+      "details": {
+        "error": "no vulnerabilities or parse error"
+      },
+      "timestamp": "2026-03-17T04:43:55Z"
+    },
+    {
+      "name": "gitleaks",
+      "status": "completed",
+      "details": {
+        "findings": 0
+      },
+      "timestamp": "2026-03-17T04:44:08Z"
+    }
+  ],
+  "summary": {
+    "critical": 0,
+    "high": 0,
+    "secrets": 0,
+    "exitCode": 0
+  }
+}

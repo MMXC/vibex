@@ -15,6 +15,11 @@
 
 首页当前有一个统一的"🚀 开始生成"按钮，拆分为 4 个独立按钮，提供更细粒度的用户控制。
 
+> ⚠️ **小羊澄清 (2026-03-17 19:11)**:
+> - 页面结构分析是**新功能**
+> - 流程分析按钮**仅生成业务流程**（领域模型不要了）
+> - 保留原"开始生成"按钮作为快捷入口
+
 ### 1.2 目标
 
 | 指标 | 当前值 | 目标值 |
@@ -33,12 +38,13 @@
 
 ### F1: ActionButtons 组件创建
 
-**描述**: 创建独立的 ActionButtons 组件，包含 4 个拆分按钮【需页面集成】
+**描述**: 创建独立的 ActionButtons 组件，包含 4 个拆分按钮 + 保留原按钮【需页面集成】
 
 **验收标准**:
-- [ ] F1.1: 4 个按钮正确渲染 (expect(4 buttons rendered))
-- [ ] F1.2: 按钮放置在 InputArea 底部 (expect(buttons in InputArea footer))
-- [ ] F1.3: 按钮样式与现有设计一致 (expect(style matches existing))
+- [ ] F1.1: 4 个独立按钮正确渲染 (expect(4 buttons rendered))
+- [ ] F1.2: 保留原"开始生成"按钮作为快捷入口 (expect(original button preserved))
+- [ ] F1.3: 按钮放置在 InputArea 底部 (expect(buttons in InputArea footer))
+- [ ] F1.4: 按钮样式与现有设计一致 (expect(style matches existing))
 
 ### F2: 按钮状态控制
 
@@ -57,9 +63,10 @@
 
 **验收标准**:
 - [ ] F3.1: 点击上下文分析 → 调用 generateContexts() (expect(onGenerateContexts called))
-- [ ] F3.2: 点击流程分析 → 调用 generateDomainModels() + generateBusinessFlow() (expect(flow generation triggered))
-- [ ] F3.3: 点击页面结构 → 调用 analyzePageStructure() (expect(page analysis triggered))
+- [ ] F3.2: 点击流程分析 → 仅调用 generateBusinessFlow() (仅业务流程) (expect(only business flow generated))
+- [ ] F3.3: 点击页面结构 → 调用 analyzePageStructure() (新功能) (expect(page analysis triggered))
 - [ ] F3.4: 点击创建项目 → 调用 onCreateProject() (expect(project creation triggered))
+- [ ] F3.5: 点击原"开始生成" → 保留原有逻辑 (expect(original behavior preserved))
 
 ### F4: 状态管理扩展
 

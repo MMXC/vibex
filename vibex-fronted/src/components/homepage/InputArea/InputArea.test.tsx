@@ -26,10 +26,13 @@ describe('InputArea', () => {
     onGenerateDomainModel: jest.fn(),
     onGenerateBusinessFlow: jest.fn(),
     onCreateProject: jest.fn(),
+    onAnalyzePageStructure: jest.fn(),
     isGenerating: false,
     boundedContexts: [],
+    selectedContextIds: new Set<string>(),
     domainModels: [],
     businessFlow: null,
+    pageStructureAnalyzed: false,
   };
 
   beforeEach(() => {
@@ -70,23 +73,25 @@ describe('InputArea', () => {
   });
 
   it('calls onGenerate when generate button is clicked', () => {
-    const onGenerate = jest.fn();
-    render(<InputArea {...defaultProps} onGenerate={onGenerate} requirementText="Test requirement" />);
+    // At Step 1, button calls onGenerateFlow which maps to onGenerateBusinessFlow
+    const onGenerateBusinessFlow = jest.fn();
+    render(<InputArea {...defaultProps} onGenerateBusinessFlow={onGenerateBusinessFlow} requirementText="Test requirement" />);
     
-    const button = screen.getByText(/开始生成/);
+    // Button text changed to "开始分析" for better UX
+    const button = screen.getByText(/开始分析/);
     fireEvent.click(button);
-    expect(onGenerate).toHaveBeenCalled();
+    expect(onGenerateBusinessFlow).toHaveBeenCalled();
   });
 
   it('disables generate button when requirement is empty', () => {
     render(<InputArea {...defaultProps} />);
-    const button = screen.getByRole('button', { name: /开始生成/ });
+    const button = screen.getByRole('button', { name: /开始分析/ });
     expect(button).toBeDisabled();
   });
 
   it('enables generate button when requirement is provided', () => {
     render(<InputArea {...defaultProps} requirementText="Test requirement" />);
-    const button = screen.getByRole('button', { name: /开始生成/ });
+    const button = screen.getByRole('button', { name: /开始分析/ });
     expect(button).not.toBeDisabled();
   });
 

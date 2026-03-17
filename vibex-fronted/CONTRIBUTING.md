@@ -67,6 +67,58 @@ npm run report:vuln
 - Pre-commit hooks run locally before each commit
 - Gitleaks scans for secrets in CI
 
+## Security Review Process
+
+### Before Creating PR
+
+Before submitting a pull request, you must complete the following security checks:
+
+#### 1. Dependency Check
+
+```bash
+# Check for vulnerabilities
+npm audit
+
+# Or use the scan script
+npm run scan:vuln
+```
+
+**Requirement**: No Critical or High vulnerabilities.
+
+#### 2. Secret Detection
+
+```bash
+# Check for hardcoded secrets
+gitleaks detect --source .
+```
+
+**Requirement**: No secrets detected.
+
+#### 3. Code Security Review
+
+Review your code for common security issues:
+- Input validation
+- SQL injection prevention
+- XSS prevention
+- Proper authentication/authorization
+
+#### 4. Use Security Checklist
+
+A detailed security checklist is available at:
+[.openclaw/skills/reviewer/security-checklist.md](./.openclaw/skills/reviewer/security-checklist.md)
+
+### PR Template
+
+The project includes a pull request template with security review section. When creating a PR, fill in the security checks as instructed.
+
+### CI Security Gates
+
+All PRs must pass the following CI checks:
+- `dependency-security.yml` - npm audit
+- `gitleaks.yml` - secret detection
+
+If any check fails, the PR cannot be merged until issues are resolved.
+
 ## Code Style
 
 - Use ESLint configuration

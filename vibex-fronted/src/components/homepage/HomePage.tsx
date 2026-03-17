@@ -59,13 +59,19 @@ export default function HomePage() {
   const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
 
   // Get current mermaid code based on step (三步流程)
+  // 修复: Step 1 时优先显示 contextMermaidCode (限界上下文图)，若无则显示 flowMermaidCode
   const currentMermaidCode = useMemo(() => {
     switch (currentStep) {
-      case 1: return flowMermaidCode;  // Step 1: 业务流程图
-      case 2: return contextMermaidCode; // Step 2: UI组件树(复用mermaid)
-      default: return '';
+      case 1: 
+        // Step 1: 优先显示限界上下文图(如有)，否则显示业务流程图
+        return contextMermaidCode || flowMermaidCode || '';
+      case 2: 
+        // Step 2: 显示UI组件树(复用mermaid)
+        return contextMermaidCode || flowMermaidCode || '';
+      default: 
+        return '';
     }
-  }, [currentStep, flowMermaidCode, contextMermaidCode]);
+  }, [currentStep, contextMermaidCode, flowMermaidCode]);
 
   // Handle requirement submission
   const handleRequirementSubmit = useCallback(() => {

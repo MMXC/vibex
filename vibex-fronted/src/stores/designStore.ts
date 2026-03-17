@@ -82,6 +82,10 @@ interface DesignState {
   currentStep: DesignStep;
   stepHistory: DesignStep[];
   
+  // Hydration state
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
+  
   // Session info
   sessionId: string | null;
   projectId: string | null;
@@ -137,6 +141,11 @@ interface DesignState {
 const initialState = {
   currentStep: 'clarification' as DesignStep,
   stepHistory: [] as DesignStep[],
+  
+  // Hydration tracking
+  _hasHydrated: false,
+  setHasHydrated: (state: boolean) => {},
+  
   sessionId: null,
   projectId: null,
   userId: null,
@@ -269,6 +278,8 @@ export const useDesignStore = create<DesignState>()(
       // UI State
       setLoading: (loading) => set({ isLoading: loading }),
       setError: (error) => set({ error }),
+      
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
     }),
     {
       name: 'design-state',
@@ -283,6 +294,14 @@ export const useDesignStore = create<DesignState>()(
         businessFlows: state.businessFlows,
         uiPages: state.uiPages,
       }),
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          console.error('Failed to rehydrate design store:', error);
+        } else if (state) {
+          // Mark hydration as complete
+          state.setHasHydrated(true);
+        }
+      },
     }
   )
 );

@@ -87,6 +87,10 @@ export interface ConfirmationFlowState {
   currentStep: ConfirmationStep;
   stepHistory: ConfirmationStep[];
 
+  // Hydration state
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
+
   // Step 1: Input
   requirementText: string;
 
@@ -148,6 +152,10 @@ export interface ConfirmationFlowState {
 const initialState = {
   currentStep: 'input' as ConfirmationStep,
   stepHistory: [] as ConfirmationStep[],
+
+  // Hydration tracking
+  _hasHydrated: false,
+  setHasHydrated: (state: boolean) => {},
 
   requirementText: '',
 
@@ -358,6 +366,8 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
       },
 
       reset: () => set(initialState),
+
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
     }),
     {
       name: STORAGE_KEY,
@@ -380,6 +390,9 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
       onRehydrateStorage: () => (state, error) => {
         if (error) {
           console.error('Failed to rehydrate confirmation store:', error);
+        } else if (state) {
+          // Mark hydration as complete
+          state.setHasHydrated(true);
         }
       },
       migrate: (

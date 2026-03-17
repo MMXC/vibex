@@ -49,6 +49,11 @@ export default function HomePage() {
     businessFlow,
     flowMermaidCode,
     generateContexts,
+    generateDomainModels,
+    generateBusinessFlow,
+    analyzePageStructure,
+    selectedContextIds,
+    pageStructureAnalyzed,
     isGenerating,
   } = useHomePage();
   
@@ -117,7 +122,18 @@ export default function HomePage() {
               requirementText={requirementText}
               onRequirementChange={setRequirementText}
               onSubmit={handleRequirementSubmit}
+              onGenerate={handleRequirementSubmit}
+              onGenerateDomainModel={() => generateDomainModels(requirementText, boundedContexts)}
+              onGenerateBusinessFlow={() => generateBusinessFlow(domainModels)}
+              onCreateProject={() => {}}
+              onAnalyzePageStructure={analyzePageStructure}
               isGenerating={isGenerating}
+              boundedContexts={boundedContexts}
+              selectedContextIds={selectedContextIds}
+              businessFlow={businessFlow}
+              pageStructureAnalyzed={pageStructureAnalyzed}
+              currentStep={currentStep}
+              completedStep={completedStep}
             />
           </div>
         </div>

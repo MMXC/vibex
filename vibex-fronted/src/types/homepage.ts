@@ -65,6 +65,46 @@ export interface FlowStep {
   postconditions?: string[];
 }
 
+/** 页面结构 */
+export interface PageStructure {
+  id: string;
+  name: string;
+  pages: PageDefinition[];
+  routes: RouteDefinition[];
+}
+
+/** 页面定义 */
+export interface PageDefinition {
+  id: string;
+  name: string;
+  path: string;
+  components: string[];
+}
+
+/** 路由定义 */
+export interface RouteDefinition {
+  path: string;
+  pageId: string;
+  layout?: string;
+}
+
+/** 按钮类型 */
+export type ButtonType = 'context' | 'flow' | 'page' | 'project';
+
+/** 按钮状态 */
+export interface ButtonState {
+  enabled: boolean;
+  tooltip?: string;
+}
+
+/** 按钮状态映射 */
+export interface ButtonStates {
+  context: ButtonState;
+  flow: ButtonState;
+  page: ButtonState;
+  project: ButtonState;
+}
+
 /** 面板状态 */
 export type PanelState = 'normal' | 'maximized' | 'minimized';
 

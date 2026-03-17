@@ -8,7 +8,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { useDDDStream, useDomainModelStream, useBusinessFlowStream } from '@/hooks/useDDDStream';
 import type { BoundedContext } from '@/services/api/types/prototype/domain';
-import type { DomainModel, BusinessFlow } from '@/types/homepage';
+import type { DomainModel, BusinessFlow, PageStructure } from '@/types/homepage';
 
 export interface UseHomePageReturn {
   // Auth
@@ -37,6 +37,11 @@ export interface UseHomePageReturn {
   setSelectedModelIds: (ids: Set<string>) => void;
   toggleContextSelection: (id: string) => void;
   toggleModelSelection: (id: string) => void;
+  
+  // Page Structure State (F4: 页面结构分析)
+  pageStructure: PageStructure | null;
+  pageStructureAnalyzed: boolean;
+  analyzePageStructure: () => void;
   
   // DDD Stream
   streamStatus: string;
@@ -89,6 +94,10 @@ export function useHomePage(): UseHomePageReturn {
   // F2: Selection state for step data passing
   const [selectedContextIds, setSelectedContextIds] = useState<Set<string>>(new Set());
   const [selectedModelIds, setSelectedModelIds] = useState<Set<string>>(new Set());
+
+  // F4: Page Structure State
+  const [pageStructure, setPageStructure] = useState<PageStructure | null>(null);
+  const [pageStructureAnalyzed, setPageStructureAnalyzed] = useState(false);
 
   // F3: Error and retry state
   const [currentError, setCurrentError] = useState<string | null>(null);
@@ -207,6 +216,30 @@ export function useHomePage(): UseHomePageReturn {
     });
   }, []);
 
+  // F4: Analyze Page Structure function
+  const analyzePageStructure = useCallback(() => {
+    if (!businessFlow) return;
+    
+    // Mock 实现：创建基础页面结构
+    const mockPageStructure: PageStructure = {
+      id: `ps-${Date.now()}`,
+      name: 'Generated Pages',
+      pages: [
+        { id: 'page-1', name: 'Home', path: '/', components: ['Header', 'Hero', 'Footer'] },
+        { id: 'page-2', name: 'About', path: '/about', components: ['Header', 'Content', 'Footer'] },
+      ],
+      routes: [
+        { path: '/', pageId: 'page-1' },
+        { path: '/about', pageId: 'page-2' },
+      ],
+    };
+    
+    setPageStructure(mockPageStructure);
+    setPageStructureAnalyzed(true);
+    setCompletedStep(4);
+    setCurrentStep(5);
+  }, [businessFlow]);
+
   // Initialize auth
   useEffect(() => {
     syncFromStorage();
@@ -300,6 +333,11 @@ export function useHomePage(): UseHomePageReturn {
     setSelectedModelIds,
     toggleContextSelection,
     toggleModelSelection,
+    
+    // Page Structure State (F4)
+    pageStructure,
+    pageStructureAnalyzed,
+    analyzePageStructure,
     
     // Stream status
     streamStatus,

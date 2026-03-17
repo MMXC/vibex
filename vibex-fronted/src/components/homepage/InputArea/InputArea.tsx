@@ -8,7 +8,9 @@
 import React, { useCallback } from 'react';
 import { RequirementInput } from '@/components/requirement-input';
 import { PlanBuildButtons } from '@/components/plan-build';
-import type { Step, BoundedContext, DomainModel, BusinessFlow } from '@/types/homepage';
+import { ActionButtons } from './ActionButtons';
+import { useButtonStates } from '../hooks/useButtonStates';
+import type { Step, BoundedContext, DomainModel, BusinessFlow, ButtonType } from '@/types/homepage';
 import styles from './InputArea.module.css';
 
 // 旧版 Props (用于 Step 组件)
@@ -52,6 +54,12 @@ export interface VerticalInputProps {
   domainModels?: DomainModel[];
   /** 业务流程 */
   businessFlow?: BusinessFlow | null;
+  /** 选中的上下文 ID 集合 */
+  selectedContextIds?: Set<string>;
+  /** 页面结构是否已分析 */
+  pageStructureAnalyzed?: boolean;
+  /** 页面结构分析回调 */
+  onAnalyzePageStructure?: () => void;
 }
 
 // 合并类型
@@ -95,9 +103,21 @@ export const InputArea: React.FC<InputAreaAllProps> = ({
   boundedContexts = [],
   domainModels = [],
   businessFlow = null,
+  selectedContextIds = new Set(),
+  pageStructureAnalyzed = false,
+  onAnalyzePageStructure,
 }) => {
   // 检测是否使用新版布局
   const isNewLayout = currentStep !== undefined && onRequirementChange !== undefined;
+
+  // 使用 useButtonStates hook 计算按钮状态
+  const { buttonStates } = useButtonStates({
+    requirementText,
+    boundedContexts,
+    selectedContextIds,
+    businessFlow,
+    pageStructureAnalyzed,
+  });
 
   const currentStepData = steps.find(s => s.id === currentStep);
 
@@ -231,25 +251,17 @@ export const InputArea: React.FC<InputAreaAllProps> = ({
           </div>
         </div>
 
-        {/* 操作按钮 */}
+        {/* 操作按钮 - 使用拆分后的 ActionButtons */}
         <div className={styles.actions}>
-          <button
-            className={styles.generateButton}
-            onClick={onSubmit || onGenerate}
-            disabled={!canSubmit}
-          >
-            {isGenerating ? (
-              <>
-                <span className={styles.spinner}></span>
-                生成中...
-              </>
-            ) : (
-              <>
-                🚀 开始生成
-              </>
-            )}
-          </button>
-          
+          <ActionButtons
+            buttonStates={buttonStates}
+            onGenerateContexts={onGenerate || onSubmit || (() => {})}
+            onGenerateFlow={onGenerateBusinessFlow || (() => {})}
+            onAnalyzePageStructure={onAnalyzePageStructure || (() => {})}
+            onCreateProject={onCreateProject || (() => {})}
+            isGenerating={isGenerating}
+            currentGeneratingButton={undefined}
+          />
           <PlanBuildButtons />
         </div>
       </div>

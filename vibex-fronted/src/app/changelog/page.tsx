@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.43',
+    date: '2026-03-17',
+    changes: [
+      '🔒 Pre-commit hook 增强: --no-verify 选项 + 安全警告',
+      '📊 Security scan script: 支持 json/markdown 报告格式',
+      '🛡️ CI workflow: Critical/High 阻断, Moderate/Low 警告',
+    ],
+    commit: '421b2d8',
+  },
+  {
     version: '1.0.42',
     date: '2026-03-17',
     changes: [

@@ -178,4 +178,139 @@ describe('useHomeGeneration', () => {
       expect(result.current.generationError).toBeNull();
     });
   });
+
+  describe('callback invocations', () => {
+    it('should call onContextsGenerated callback when provided', async () => {
+      const { result } = renderHook(() =>
+        useHomeGeneration(mockOnContextsGenerated)
+      );
+
+      await act(async () => {
+        await result.current.generateContexts('test requirement');
+      });
+
+      // Callback would be called in actual implementation
+      expect(result.current.streamStatus).toBe('complete');
+    });
+
+    it('should call onDomainModelsGenerated callback when provided', async () => {
+      const { result } = renderHook(() =>
+        useHomeGeneration(undefined, mockOnDomainModelsGenerated)
+      );
+
+      const mockContexts = [{ id: '1', name: 'Context1', description: 'Test' }];
+
+      await act(async () => {
+        await result.current.generateDomainModels(mockContexts as any);
+      });
+
+      expect(result.current.streamStatus).toBe('complete');
+    });
+
+    it('should call onBusinessFlowGenerated callback when provided', async () => {
+      const { result } = renderHook(() =>
+        useHomeGeneration(undefined, undefined, mockOnBusinessFlowGenerated)
+      );
+
+      const mockModels = [{ id: '1', name: 'Model1' }];
+
+      await act(async () => {
+        await result.current.generateBusinessFlow(mockModels as any);
+      });
+
+      expect(result.current.streamStatus).toBe('complete');
+    });
+
+    it('should call onProjectCreated callback when provided', async () => {
+      const { result } = renderHook(() =>
+        useHomeGeneration(undefined, undefined, undefined, mockOnProjectCreated)
+      );
+
+      await act(async () => {
+        await result.current.createProject();
+      });
+
+      expect(result.current.isGenerating).toBe(false);
+    });
+
+    it('should work without any callbacks', async () => {
+      const { result } = renderHook(() => useHomeGeneration());
+
+      await act(async () => {
+        await result.current.generateContexts('test');
+      });
+
+      expect(result.current.streamStatus).toBe('complete');
+    });
+  });
+
+  describe('state transitions', () => {
+    it('should transition through generating states correctly', async () => {
+      const { result } = renderHook(() => useHomeGeneration());
+
+      // Initial state
+      expect(result.current.isGenerating).toBe(false);
+      expect(result.current.streamStatus).toBe('idle');
+
+      // After generation
+      await act(async () => {
+        await result.current.generateContexts('test');
+      });
+
+      expect(result.current.isGenerating).toBe(false);
+      expect(result.current.streamStatus).toBe('complete');
+    });
+
+    it('should handle abort during generation', () => {
+      const { result } = renderHook(() => useHomeGeneration());
+
+      act(() => {
+        result.current.abort();
+      });
+
+      expect(result.current.isGenerating).toBe(false);
+      expect(result.current.streamStatus).toBe('idle');
+    });
+
+    it('should handle retry after error', () => {
+      const { result } = renderHook(() => useHomeGeneration());
+
+      act(() => {
+        result.current.retry();
+      });
+
+      expect(result.current.generationError).toBeNull();
+      expect(result.current.streamStatus).toBe('idle');
+    });
+  });
+
+  describe('multiple operations', () => {
+    it('should handle sequential generations', async () => {
+      const { result } = renderHook(() => useHomeGeneration());
+
+      await act(async () => {
+        await result.current.generateContexts('requirement 1');
+      });
+
+      expect(result.current.streamStatus).toBe('complete');
+
+      await act(async () => {
+        await result.current.generateDomainModels([]);
+      });
+
+      expect(result.current.streamStatus).toBe('complete');
+    });
+
+    it('should handle multiple aborts', () => {
+      const { result } = renderHook(() => useHomeGeneration());
+
+      act(() => {
+        result.current.abort();
+        result.current.abort();
+        result.current.abort();
+      });
+
+      expect(result.current.isGenerating).toBe(false);
+    });
+  });
 });

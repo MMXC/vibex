@@ -67,7 +67,7 @@ export interface UseHomePageReturn {
   abortContexts: () => void;
   generateDomainModels: (text: string, contexts: BoundedContext[]) => void;
   abortModels: () => void;
-  generateBusinessFlow: (models: DomainModel[]) => void;
+  generateBusinessFlow: (models: DomainModel[], requirementText?: string) => void;
   abortFlow: () => void;
   setCurrentStep: (step: number) => void;
   setCompletedStep: (step: number) => void;
@@ -225,9 +225,10 @@ export function useHomePage(): UseHomePageReturn {
     rawGenerateDomainModels(text, contexts);
   }, [rawGenerateDomainModels]);
 
-  const generateBusinessFlow = useCallback((models: DomainModel[]) => {
+  // 三步流程: 支持直接使用requirementText生成业务流程图
+  const generateBusinessFlow = useCallback((models: DomainModel[], requirementText?: string) => {
     lastGenerationRef.current = { type: 'flow', params: models };
-    rawGenerateBusinessFlow(models);
+    rawGenerateBusinessFlow(models, requirementText);
   }, [rawGenerateBusinessFlow]);
 
   // F2: Toggle selection functions
@@ -255,7 +256,7 @@ export function useHomePage(): UseHomePageReturn {
     });
   }, []);
 
-  // F4: Analyze Page Structure function
+  // 三步流程: UI组件分析完成后的处理
   const analyzePageStructure = useCallback(() => {
     if (!businessFlow) return;
     
@@ -275,8 +276,9 @@ export function useHomePage(): UseHomePageReturn {
     
     setPageStructure(mockPageStructure);
     setPageStructureAnalyzed(true);
-    setCompletedStep(4);
-    setCurrentStep(5);
+    // 三步流程: Step 2完成后跳转到Step 3
+    setCompletedStep(2);
+    setCurrentStep(3);
   }, [businessFlow]);
 
   // Initialize auth
@@ -316,17 +318,17 @@ export function useHomePage(): UseHomePageReturn {
     }
   }, [modelStreamStatus, streamDomainModels, streamModelMermaidCode, selectedContextIds.size]);
 
-  // Sync SSE results - Business Flow (F1 & F2)
+  // Sync SSE results - Business Flow (三步流程: Step 1完成跳转到Step 2)
   useEffect(() => {
     if (flowStreamStatus === 'done') {
       setBusinessFlow(streamBusinessFlow as unknown as BusinessFlow);
       setFlowMermaidCode(streamFlowMermaidCode);
       if (streamBusinessFlow || streamFlowMermaidCode) {
-        // F1: Properly update completedStep and advance currentStep
-        setCompletedStep(3);
-        setCurrentStep(4);
+        // 三步流程: 业务流程完成后跳转到 Step 2 (UI组件分析)
+        setCompletedStep(1);
+        setCurrentStep(2);
       }
-      // F2: Auto-select all models if none selected
+      // Auto-select all models if none selected
       if (selectedModelIds.size === 0 && streamDomainModels.length > 0) {
         const allIds = new Set(streamDomainModels.map((_: unknown) => ( _ as { id: string }).id).filter(Boolean));
         setSelectedModelIds(allIds);

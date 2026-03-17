@@ -1,7 +1,7 @@
 /**
  * useButtonStates - 按钮状态管理 Hook
  * 
- * 根据前置条件计算各按钮的启用/禁用状态
+ * 根据前置条件计算各按钮的启用/禁用状态 (三步流程版本)
  */
 
 import { useMemo, useCallback } from 'react';
@@ -27,45 +27,44 @@ export interface UseButtonStatesReturn {
   getButtonState: (type: ButtonType) => ButtonState;
 }
 
+// 三步流程按钮状态初始化
 const DEFAULT_BUTTON_STATES: ButtonStates = {
   context: { enabled: false, tooltip: '请先输入需求描述' },
-  flow: { enabled: false, tooltip: '请先完成上下文分析并选择上下文' },
-  page: { enabled: false, tooltip: '请先完成流程分析' },
-  project: { enabled: false, tooltip: '请先完成页面结构分析' },
+  flow: { enabled: true, tooltip: '' },  // 三步流程Step1: 业务流程分析直接可用(有需求文本即可)
+  page: { enabled: false, tooltip: '请先完成业务流程分析' },
+  project: { enabled: false, tooltip: '请先完成UI组件分析' },
 };
 
 export function useButtonStates(params: UseButtonStatesParams): UseButtonStatesReturn {
   const { requirementText, boundedContexts, selectedContextIds, businessFlow, pageStructureAnalyzed } = params;
 
   const buttonStates = useMemo<ButtonStates>(() => {
-    // 上下文分析按钮：requirementText.trim().length > 0
-    const contextEnabled = requirementText.trim().length > 0;
+    // 三步流程按钮逻辑:
+    // Step 1 业务流程分析: requirementText.trim().length > 0
+    const flowEnabled = requirementText.trim().length > 0;
     
-    // 流程分析按钮：boundedContexts.length > 0 && selectedContextIds.size > 0
-    const flowEnabled = boundedContexts.length > 0 && selectedContextIds.size > 0;
-    
-    // 页面结构按钮：businessFlow !== null
+    // Step 2 UI组件分析: businessFlow !== null
     const pageEnabled = businessFlow !== null;
     
-    // 创建项目按钮：pageStructureAnalyzed === true
+    // Step 3 创建项目: pageStructureAnalyzed === true
     const projectEnabled = pageStructureAnalyzed;
 
     return {
       context: {
-        enabled: contextEnabled,
-        tooltip: contextEnabled ? undefined : '请先输入需求描述',
+        enabled: flowEnabled, // 复用flow状态
+        tooltip: flowEnabled ? undefined : '请先输入需求描述',
       },
       flow: {
         enabled: flowEnabled,
-        tooltip: flowEnabled ? undefined : '请先完成上下文分析并选择上下文',
+        tooltip: flowEnabled ? undefined : '请先输入需求描述',
       },
       page: {
         enabled: pageEnabled,
-        tooltip: pageEnabled ? undefined : '请先完成流程分析',
+        tooltip: pageEnabled ? undefined : '请先完成业务流程分析',
       },
       project: {
         enabled: projectEnabled,
-        tooltip: projectEnabled ? undefined : '请先完成页面结构分析',
+        tooltip: projectEnabled ? undefined : '请先完成UI组件分析',
       },
     };
   }, [requirementText, boundedContexts, selectedContextIds, businessFlow, pageStructureAnalyzed]);

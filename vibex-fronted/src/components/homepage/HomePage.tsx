@@ -25,13 +25,11 @@ const ParticleBackground = dynamic(
   { ssr: false }
 );
 
-// 五步流程常量
+// 三步流程常量 (二阶段重构)
 const STEPS: Step[] = [
-  { id: 1, label: '需求输入', description: '输入项目需求' },
-  { id: 2, label: '限界上下文', description: '分析限界上下文' },
-  { id: 3, label: '领域模型', description: '构建领域模型' },
-  { id: 4, label: '业务流程', description: '设计业务流程' },
-  { id: 5, label: '项目创建', description: '生成项目代码' },
+  { id: 1, label: '业务流程分析', description: '分析业务流程' },
+  { id: 2, label: 'UI组件分析', description: '生成UI组件树' },
+  { id: 3, label: '创建项目', description: '生成项目代码' },
 ];
 
 export default function HomePage() {
@@ -60,16 +58,14 @@ export default function HomePage() {
   
   const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
 
-  // Get current mermaid code based on step (F1: show contextMermaidCode on Step 1)
+  // Get current mermaid code based on step (三步流程)
   const currentMermaidCode = useMemo(() => {
     switch (currentStep) {
-      case 1: return contextMermaidCode;  // F1: Step 1 shows context diagram
-      case 2: return contextMermaidCode;
-      case 3: return modelMermaidCode;
-      case 4: return flowMermaidCode;
+      case 1: return flowMermaidCode;  // Step 1: 业务流程图
+      case 2: return contextMermaidCode; // Step 2: UI组件树(复用mermaid)
       default: return '';
     }
-  }, [currentStep, contextMermaidCode, modelMermaidCode, flowMermaidCode]);
+  }, [currentStep, flowMermaidCode, contextMermaidCode]);
 
   // Handle requirement submission
   const handleRequirementSubmit = useCallback(() => {
@@ -118,14 +114,15 @@ export default function HomePage() {
               isGenerating={isGenerating}
             />
             
-            {/* 录入区域 - 移除步骤相关props */}
+            {/* 录入区域 - 三步流程: Step1业务流程分析直接用requirementText生成 */}
             <InputArea
               requirementText={requirementText}
               onRequirementChange={setRequirementText}
               onSubmit={handleRequirementSubmit}
               onGenerate={handleRequirementSubmit}
               onGenerateDomainModel={() => generateDomainModels(requirementText, boundedContexts)}
-              onGenerateBusinessFlow={() => generateBusinessFlow(domainModels)}
+              // 三步流程: Step1业务流程分析直接使用requirementText
+              onGenerateBusinessFlow={() => generateBusinessFlow([], requirementText)}
               onCreateProject={() => {}}
               onAnalyzePageStructure={analyzePageStructure}
               isGenerating={isGenerating}

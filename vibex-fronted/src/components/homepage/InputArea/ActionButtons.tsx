@@ -33,13 +33,11 @@ export interface ActionButtonsProps {
   useDynamicButton?: boolean;
 }
 
-// F2: 根据步骤动态变化的按钮配置
+// 三步流程按钮配置 (二阶段重构)
 const DYNAMIC_BUTTON_CONFIG: Record<number, { label: string; icon: string }> = {
-  1: { label: '开始生成限界上下文', icon: '🔍' },
-  2: { label: '生成领域模型', icon: '🏗️' },
-  3: { label: '生成业务流程', icon: '📊' },
-  4: { label: '分析页面结构', icon: '📄' },
-  5: { label: '创建项目', icon: '🚀' },
+  1: { label: '业务流程分析', icon: '🔍' },
+  2: { label: 'UI组件分析', icon: '🏗️' },
+  3: { label: '创建项目', icon: '🚀' },
 };
 
 const STATIC_BUTTON_CONFIG: Array<{
@@ -66,25 +64,21 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   currentStep = 1,
   useDynamicButton = false,
 }) => {
-  // F2: 处理动态单按钮点击
+  // 三步流程动态按钮点击处理
   const handleDynamicClick = () => {
     if (isGenerating) return;
     
     switch (currentStep) {
       case 1:
-        onGenerateContexts();
+        // Step 1: 业务流程分析 -> 调用 generateBusinessFlow
+        onGenerateFlow();
         break;
       case 2:
-        // 步骤2调用 generateDomainModels (通过 onGenerateFlow 传递)
-        onGenerateFlow();
-        break;
-      case 3:
-        onGenerateFlow();
-        break;
-      case 4:
+        // Step 2: UI组件分析 -> 调用 analyzePageStructure
         onAnalyzePageStructure();
         break;
-      case 5:
+      case 3:
+        // Step 3: 创建项目
         onCreateProject();
         break;
     }
@@ -113,14 +107,12 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   if (useDynamicButton) {
     const config = DYNAMIC_BUTTON_CONFIG[currentStep];
     
-    // 根据步骤获取对应的按钮状态
+    // 根据步骤获取对应的按钮状态 (三步流程)
     const getStateForStep = (step: number): ButtonState => {
       switch (step) {
-        case 1: return buttonStates.context;
-        case 2: return buttonStates.flow; // generateDomainModels uses flow button state
-        case 3: return buttonStates.flow;
-        case 4: return buttonStates.page;
-        case 5: return buttonStates.project;
+        case 1: return buttonStates.flow; // 业务流程分析
+        case 2: return buttonStates.page;  // UI组件分析
+        case 3: return buttonStates.project; // 创建项目
         default: return { enabled: false, tooltip: '' };
       }
     };

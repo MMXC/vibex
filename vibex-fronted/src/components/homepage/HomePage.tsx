@@ -1,8 +1,7 @@
 /**
- * HomePage - 主页容器组件 (垂直布局版)
+ * HomePage - 主页容器组件 (三栏布局版)
  * 
- * 60% 预览区域 + 40% 录入区域
- * 无 Tab 切换，固定展示
+ * 15% 左侧步骤导航 | 60% 中间内容区 | 25% 右侧AI面板
  * 
  * 业务逻辑已抽取到 useHomePage hook
  */
@@ -11,10 +10,12 @@
 import { useState, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import LoginDrawer from '@/components/ui/LoginDrawer';
-import { Navbar, MainContent, StepContainer } from '@/components/homepage';
+import { Navbar, Sidebar, MainContent, StepContainer } from '@/components/homepage';
 import { useHomePage } from './hooks';
 import { InputArea } from './InputArea/InputArea';
 import { PreviewArea } from './PreviewArea/PreviewArea';
+import { AIPanel } from './AIPanel/AIPanel';
+import { ThinkingPanel } from './ThinkingPanel/ThinkingPanel';
 import styles from '@/app/homepage.module.css';
 import type { Step } from '@/types/homepage';
 
@@ -85,28 +86,51 @@ export default function HomePage() {
         onSettingsClick={() => setIsLoginDrawerOpen(true)} 
       />
       
-      <div className={styles.mainContentVertical}>
-        {/* 预览区域 60% */}
-        <PreviewArea
-          currentStep={currentStep}
-          mermaidCode={currentMermaidCode}
-          boundedContexts={boundedContexts}
-          domainModels={domainModels}
-          businessFlow={businessFlow}
-          isGenerating={isGenerating}
-        />
-        
-        {/* 录入区域 40% */}
-        <InputArea
-          currentStep={currentStep}
-          requirementText={requirementText}
-          onRequirementChange={setRequirementText}
-          onSubmit={handleRequirementSubmit}
-          isGenerating={isGenerating}
+      {/* 三栏布局容器 */}
+      <div className={styles.mainContainer}>
+        {/* 左侧栏 - 15%: 步骤导航 */}
+        <Sidebar
           steps={STEPS}
+          currentStep={currentStep}
           completedStep={completedStep}
           onStepClick={handleStepClick}
+          isStepClickable={(stepId) => stepId <= (completedStep || 0) + 1}
+          className={styles.sidebar}
         />
+        
+        {/* 中间栏 - 60%: 预览区域 + 录入区域 */}
+        <div className={styles.content}>
+          <div className={styles.mainContentVertical}>
+            {/* 预览区域 60% */}
+            <PreviewArea
+              currentStep={currentStep}
+              mermaidCode={currentMermaidCode}
+              boundedContexts={boundedContexts}
+              domainModels={domainModels}
+              businessFlow={businessFlow}
+              isGenerating={isGenerating}
+            />
+            
+            {/* 录入区域 - 移除步骤相关props */}
+            <InputArea
+              requirementText={requirementText}
+              onRequirementChange={setRequirementText}
+              onSubmit={handleRequirementSubmit}
+              isGenerating={isGenerating}
+            />
+          </div>
+        </div>
+        
+        {/* 右侧栏 - 25%: AI面板 */}
+        <div className={styles.aiPanel}>
+          <ThinkingPanel
+            thinkingMessages={[]}
+            contexts={boundedContexts}
+            mermaidCode={currentMermaidCode}
+            status={isGenerating ? 'thinking' : 'idle'}
+            errorMessage={null}
+          />
+        </div>
       </div>
 
       <LoginDrawer 

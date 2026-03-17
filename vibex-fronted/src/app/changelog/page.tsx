@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.45',
+    date: '2026-03-17',
+    changes: [
+      '🎨 首页三栏布局恢复: 15% Sidebar + 60% Content + 25% AIPanel',
+      '📋 步骤指示器移至左侧导航栏',
+      '🤖 AI 分析面板独立右侧显示',
+      '📱 响应式布局: 桌面三栏/平板两栏/移动端单栏',
+    ],
+    commit: 'fbdd9d0',
+  },
+  {
     version: '1.0.44',
     date: '2026-03-17',
     changes: [

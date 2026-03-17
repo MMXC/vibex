@@ -168,4 +168,8 @@ describe('useHomePanel', () => {
       expect(result.current.minimizedPanel).toBeNull();
     });
   });
+
+  describe('expandPanel', () => {
+    it.todo('expandPanel tests - to be implemented');
+  });
 });

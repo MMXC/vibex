@@ -46,6 +46,9 @@ const DEFAULT_CONFIG: Required<PerformanceConfig> = {
 export function useParticlePerformance(config: PerformanceConfig = {}) {
   const options = { ...DEFAULT_CONFIG, ...config };
   
+  // SSR check
+  const isBrowser = typeof window !== 'undefined';
+  
   const [isMobile, setIsMobile] = useState(false);
   const [isLowEndDevice, setIsLowEndDevice] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
@@ -53,12 +56,15 @@ export function useParticlePerformance(config: PerformanceConfig = {}) {
   const [currentFPS, setCurrentFPS] = useState(options.targetFPS);
   
   const frameCountRef = useRef(0);
-  const lastTimeRef = useRef(performance.now());
+  // Use 0 as fallback for SSR
+  const lastTimeRef = useRef(isBrowser ? performance.now() : 0);
   const animationFrameRef = useRef<number | undefined>(undefined);
   const isActiveRef = useRef(true);
 
   // Detect mobile device
   useEffect(() => {
+    if (!isBrowser) return;
+    
     const checkMobile = () => {
       const mobile = window.innerWidth < options.mobileBreakpoint;
       setIsMobile(mobile);
@@ -68,10 +74,12 @@ export function useParticlePerformance(config: PerformanceConfig = {}) {
     window.addEventListener('resize', checkMobile);
     
     return () => window.removeEventListener('resize', checkMobile);
-  }, [options.mobileBreakpoint]);
+  }, [options.mobileBreakpoint, isBrowser]);
 
   // Detect low-end device
   useEffect(() => {
+    if (!isBrowser) return;
+    
     const checkDevice = async () => {
       // Check device memory if available
       const memory = (navigator as { deviceMemory?: number }).deviceMemory;
@@ -89,11 +97,11 @@ export function useParticlePerformance(config: PerformanceConfig = {}) {
     };
     
     checkDevice();
-  }, [options.minMemoryGB]);
+  }, [options.minMemoryGB, isBrowser]);
 
   // Track visibility (pause when off-screen)
   useEffect(() => {
-    if (!options.pauseOffScreen) return;
+    if (!isBrowser || !options.pauseOffScreen) return;
     
     const handleVisibilityChange = () => {
       const visible = document.visibilityState === 'visible';
@@ -106,11 +114,11 @@ export function useParticlePerformance(config: PerformanceConfig = {}) {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [options.pauseOffScreen]);
+  }, [options.pauseOffScreen, isBrowser]);
 
   // Detect prefers-reduced-motion
   useEffect(() => {
-    if (!options.respectReducedMotion) return;
+    if (!isBrowser || !options.respectReducedMotion) return;
     
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     
@@ -136,10 +144,12 @@ export function useParticlePerformance(config: PerformanceConfig = {}) {
         mediaQuery.removeListener(handleChange);
       }
     };
-  }, [options.respectReducedMotion]);
+  }, [options.respectReducedMotion, isBrowser]);
 
   // FPS monitoring
   useEffect(() => {
+    if (!isBrowser) return;
+    
     let frameId: number;
     
     const measureFPS = () => {
@@ -166,7 +176,7 @@ export function useParticlePerformance(config: PerformanceConfig = {}) {
     return () => {
       cancelAnimationFrame(frameId);
     };
-  }, []);
+  }, [isBrowser]);
 
   // Calculate effective particle limit based on device/conditions
   const getParticleLimit = useCallback(() => {

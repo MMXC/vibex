@@ -4,7 +4,7 @@
 **产品经理**: PM Agent
 **日期**: 2026-03-17
 **版本**: 1.0
-**状态**: Draft
+**状态**: Done
 
 ---
 
@@ -64,40 +64,40 @@
 **描述**: 创建本地安全扫描脚本，支持一键检测依赖漏洞和硬编码密钥
 
 **验收标准**:
-- [ ] AC-F1.1: `scripts/security-scan.sh` 存在并可执行
-- [ ] AC-F1.2: 脚本支持 `--fix` 参数自动修复
-- [ ] AC-F1.3: 脚本支持 `--report` 参数生成 JSON 报告
-- [ ] AC-F1.4: Critical/High 漏洞返回非零退出码
-- [ ] AC-F1.5: 脚本包含 npm audit 和 gitleaks 检测
+- [ ] F1.1: `scripts/security-scan.sh` 存在并可执行 (expect(test -x scripts/security-scan.sh))
+- [ ] F1.2: 脚本支持 `--fix` 参数自动修复 (expect(script --help contains "--fix"))
+- [ ] F1.3: 脚本支持 `--report` 参数生成 JSON 报告 (expect(script --help contains "--report"))
+- [ ] F1.4: Critical/High 漏洞返回非零退出码 (expect(exitCode === 1 on critical vulnerability))
+- [ ] F1.5: 脚本包含 npm audit 和 gitleaks 检测 (expect(file contains "npm audit" && file contains "gitleaks"))
 
 ### F2: pre-commit hook 增强
 
 **描述**: 增强 `.husky/pre-commit` hook，阻止有安全问题的提交
 
 **验收标准**:
-- [ ] AC-F2.1: 检测到硬编码密钥时阻止提交
-- [ ] AC-F2.2: Critical 漏洞时阻止提交
-- [ ] AC-F2.3: 可通过 `--no-verify` 跳过（紧急情况）
-- [ ] AC-F2.4: 输出清晰的错误信息
+- [ ] F2.1: 检测到硬编码密钥时阻止提交 (expect(commit blocked on secret detect))
+- [ ] F2.2: Critical 漏洞时阻止提交 (expect(commit blocked on critical vulnerability))
+- [ ] F2.3: 可通过 `--no-verify` 跳过（紧急情况）(expect(allow --no-verify bypass))
+- [ ] F2.4: 输出清晰的错误信息 (expect(output contains "blocked"))
 
 ### F3: CI 阻塞配置修复
 
 **描述**: 修复 CI workflow 配置，Critical/High 漏洞阻塞 PR 合并
 
 **验收标准**:
-- [ ] AC-F3.1: 移除 `continue-on-error: true` (针对 critical/high)
-- [ ] AC-F3.2: Critical/High 漏洞阻塞 PR 合并
-- [ ] AC-F3.3: Moderate/Low 仅警告不阻塞
-- [ ] AC-F3.4: 生成扫描报告作为 artifact
+- [ ] F3.1: 移除 `continue-on-error: true` (expect(workflow not contains "continue-on-error: true"))
+- [ ] F3.2: Critical/High 漏洞阻塞 PR 合并 (expect(PR blocked on critical/high))
+- [ ] F3.3: Moderate/Low 仅警告不阻塞 (expect(warning only for moderate/low))
+- [ ] F3.4: 生成扫描报告作为 artifact (expect(artifact exists))
 
 ### F4: 安全报告汇总
 
 **描述**: 创建安全报告汇总脚本，统一输出漏洞信息
 
 **验收标准**:
-- [ ] AC-F4.1: 报告包含漏洞数量、严重级别、修复建议
-- [ ] AC-F4.2: 报告保存到 `security-reports/YYYY-MM-DD.md`
-- [ ] AC-F4.3: 支持 CI 和本地两种运行模式
+- [ ] F4.1: 报告包含漏洞数量、严重级别、修复建议 (expect(report contains "count" && "severity" && "fix"))
+- [ ] F4.2: 报告保存到 `security-reports/YYYY-MM-DD.md` (expect(file exists in security-reports/))
+- [ ] F4.3: 支持 CI 和本地两种运行模式 (expect(supports "ci" && "local" mode))
 
 ---
 

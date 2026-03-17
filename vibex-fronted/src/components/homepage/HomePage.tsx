@@ -9,14 +9,20 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import LoginDrawer from '@/components/ui/LoginDrawer';
-import { ParticleBackground } from '@/components/particles/ParticleBackground';
 import { Navbar, MainContent, StepContainer } from '@/components/homepage';
 import { useHomePage } from './hooks';
 import { InputArea } from './InputArea/InputArea';
 import { PreviewArea } from './PreviewArea/PreviewArea';
 import styles from '@/app/homepage.module.css';
 import type { Step } from '@/types/homepage';
+
+// Dynamic import for ParticleBackground (SSR: false to avoid window access on server)
+const ParticleBackground = dynamic(
+  () => import('@/components/particles/ParticleBackground'),
+  { ssr: false }
+);
 
 // 五步流程常量
 const STEPS: Step[] = [

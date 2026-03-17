@@ -191,7 +191,8 @@ if [ "$REPORT" = true ]; then
     # Generate filename with date
     DATE=$(date +%Y-%m-%d)
     if [ "$REPORT_FORMAT" = "markdown" ] || [ "$REPORT_FORMAT" = "md" ]; then
-      REPORT_FILE="$REPORT_DIR/security-report-$DATE.md"
+      # Default to vulnerability-report.md for markdown format
+      REPORT_FILE="$REPORT_DIR/vulnerability-report.md"
     else
       REPORT_FILE="$REPORT_DIR/security-report-$DATE.json"
     fi

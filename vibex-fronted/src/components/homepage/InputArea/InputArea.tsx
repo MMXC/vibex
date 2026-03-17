@@ -256,11 +256,13 @@ export const InputArea: React.FC<InputAreaAllProps> = ({
           <ActionButtons
             buttonStates={buttonStates}
             onGenerateContexts={onGenerate || onSubmit || (() => {})}
-            onGenerateFlow={onGenerateBusinessFlow || (() => {})}
+            onGenerateFlow={onGenerateDomainModel || onGenerateBusinessFlow || (() => {})}
             onAnalyzePageStructure={onAnalyzePageStructure || (() => {})}
             onCreateProject={onCreateProject || (() => {})}
             isGenerating={isGenerating}
             currentGeneratingButton={undefined}
+            currentStep={currentStep}
+            useDynamicButton={true}
           />
           <PlanBuildButtons />
         </div>

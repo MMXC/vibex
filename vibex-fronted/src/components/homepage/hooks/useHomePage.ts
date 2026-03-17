@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuthStore } from '@/stores/authStore';
-import { useDDDStream, useDomainModelStream, useBusinessFlowStream } from '@/hooks/useDDDStream';
+import { useDDDStream, useDomainModelStream, useBusinessFlowStream, ThinkingStep } from '@/hooks/useDDDStream';
 import type { BoundedContext } from '@/services/api/types/prototype/domain';
 import type { DomainModel, BusinessFlow, PageStructure } from '@/types/homepage';
 
@@ -50,6 +50,9 @@ export interface UseHomePageReturn {
   modelStreamError: string | null;
   flowStreamStatus: string;
   flowStreamError: string | null;
+  
+  // Thinking messages (F3: 渐进式思考过程)
+  thinkingMessages: ThinkingStep[];
   
   // Error & Retry (F3: 错误恢复机制)
   currentError: string | null;
@@ -99,6 +102,9 @@ export function useHomePage(): UseHomePageReturn {
   const [pageStructure, setPageStructure] = useState<PageStructure | null>(null);
   const [pageStructureAnalyzed, setPageStructureAnalyzed] = useState(false);
 
+  // F3: Thinking messages state (for progressive thinking display)
+  const [thinkingMessages, setThinkingMessages] = useState<ThinkingStep[]>([]);
+
   // F3: Error and retry state
   const [currentError, setCurrentError] = useState<string | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
@@ -111,7 +117,7 @@ export function useHomePage(): UseHomePageReturn {
 
   // SSE Hooks
   const {
-    thinkingMessages: _ctxMessages,
+    thinkingMessages: ctxMessages,
     contexts: streamContexts,
     mermaidCode: streamMermaidCode,
     status: streamStatus,
@@ -121,7 +127,7 @@ export function useHomePage(): UseHomePageReturn {
   } = useDDDStream();
 
   const {
-    thinkingMessages: _modelMessages,
+    thinkingMessages: modelMessages,
     domainModels: streamDomainModels,
     mermaidCode: streamModelMermaidCode,
     status: modelStreamStatus,
@@ -131,7 +137,7 @@ export function useHomePage(): UseHomePageReturn {
   } = useDomainModelStream();
 
   const {
-    thinkingMessages: _flowMessages,
+    thinkingMessages: flowMessages,
     businessFlow: streamBusinessFlow,
     mermaidCode: streamFlowMermaidCode,
     status: flowStreamStatus,
@@ -152,6 +158,39 @@ export function useHomePage(): UseHomePageReturn {
       setCurrentError(null);
     }
   }, [streamError, modelStreamError, flowStreamError]);
+
+  // F3: Sync thinking messages from SSE streams
+  useEffect(() => {
+    const allMessages: ThinkingStep[] = [];
+    
+    // Add context generation messages (step 1)
+    ctxMessages.forEach(msg => {
+      allMessages.push({
+        step: '1',
+        message: typeof msg === 'string' ? msg : (msg as ThinkingStep).message || '',
+      });
+    });
+    
+    // Add domain model generation messages (step 2)
+    modelMessages.forEach(msg => {
+      allMessages.push({
+        step: '2',
+        message: typeof msg === 'string' ? msg : (msg as ThinkingStep).message || '',
+      });
+    });
+    
+    // Add business flow generation messages (step 3)
+    flowMessages.forEach(msg => {
+      allMessages.push({
+        step: '3',
+        message: typeof msg === 'string' ? msg : (msg as ThinkingStep).message || '',
+      });
+    });
+    
+    if (allMessages.length > 0) {
+      setThinkingMessages(allMessages);
+    }
+  }, [ctxMessages, modelMessages, flowMessages]);
 
   // F3: Retry function
   const retryCurrentStep = useCallback(() => {
@@ -346,6 +385,9 @@ export function useHomePage(): UseHomePageReturn {
     modelStreamError,
     flowStreamStatus,
     flowStreamError,
+    
+    // Thinking messages (F3)
+    thinkingMessages,
     
     // Error & Retry (F3)
     currentError,

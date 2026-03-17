@@ -55,6 +55,7 @@ export default function HomePage() {
     selectedContextIds,
     pageStructureAnalyzed,
     isGenerating,
+    thinkingMessages,
   } = useHomePage();
   
   const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
@@ -141,7 +142,7 @@ export default function HomePage() {
         {/* 右侧栏 - 25%: AI面板 */}
         <div className={styles.aiPanel}>
           <ThinkingPanel
-            thinkingMessages={[]}
+            thinkingMessages={thinkingMessages}
             contexts={boundedContexts}
             mermaidCode={currentMermaidCode}
             status={isGenerating ? 'thinking' : 'idle'}

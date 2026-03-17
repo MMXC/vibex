@@ -80,13 +80,13 @@ describe('InputArea', () => {
 
   it('disables generate button when requirement is empty', () => {
     render(<InputArea {...defaultProps} />);
-    const button = screen.getByText(/开始生成/);
+    const button = screen.getByRole('button', { name: /开始生成/ });
     expect(button).toBeDisabled();
   });
 
   it('enables generate button when requirement is provided', () => {
     render(<InputArea {...defaultProps} requirementText="Test requirement" />);
-    const button = screen.getByText(/开始生成/);
+    const button = screen.getByRole('button', { name: /开始生成/ });
     expect(button).not.toBeDisabled();
   });
 

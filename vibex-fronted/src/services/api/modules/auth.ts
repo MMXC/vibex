@@ -27,8 +27,8 @@ class AuthApiImpl implements AuthApi {
     const data: AuthResponse = (result as any).data || result;
 
     if (typeof window !== 'undefined') {
-      localStorage.setItem('auth_token', data.token);
-      localStorage.setItem('user_id', data.user.id);
+      sessionStorage.setItem('auth_token', data.token);
+      sessionStorage.setItem('user_id', data.user.id);
     }
 
     return data;
@@ -45,8 +45,8 @@ class AuthApiImpl implements AuthApi {
     const authResult: AuthResponse = (result as any).data || result;
 
     if (typeof window !== 'undefined') {
-      localStorage.setItem('auth_token', authResult.token);
-      localStorage.setItem('user_id', authResult.user.id);
+      sessionStorage.setItem('auth_token', authResult.token);
+      sessionStorage.setItem('user_id', authResult.user.id);
     }
 
     return authResult;
@@ -67,7 +67,7 @@ class AuthApiImpl implements AuthApi {
     });
 
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_token');
+      sessionStorage.removeItem('auth_token'); sessionStorage.removeItem('user_id'); localStorage.removeItem('auth_token'); localStorage.removeItem('user_id');
     }
 
     return result;

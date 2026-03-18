@@ -22,7 +22,7 @@ describe('Epic 1: FlowContainer - 流程容器与步骤导航', () => {
   });
 
   it('should export FlowStep type', async () => {
-    const module = await import('./index');
+    const flowModule = await import('./index');
     // The index should export the necessary types
     expect(module).toBeDefined();
   });

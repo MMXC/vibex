@@ -38,6 +38,8 @@ const eslintConfig = defineConfig([
     'tsconfig*.json',
     // Env files
     '.env*',
+    // CSS Module files (parsed incorrectly by ESLint)
+    '**/*.module.css',
   ]),
   {
     rules: {

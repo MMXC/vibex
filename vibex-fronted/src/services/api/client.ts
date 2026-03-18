@@ -67,7 +67,7 @@ export function createHttpClient(config?: HttpClientConfig): HttpClient {
       (config: InternalAxiosRequestConfig) => {
         const token =
           typeof window !== 'undefined'
-            ? localStorage.getItem('auth_token')
+            ? sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token')
             : null;
         if (token) {
           (config.headers as any) = (config.headers as any) || {};
@@ -87,6 +87,7 @@ export function createHttpClient(config?: HttpClientConfig): HttpClient {
         if (error.response?.status === 401) {
           if (typeof window !== 'undefined') {
             localStorage.removeItem('auth_token');
+            sessionStorage.removeItem('auth_token');
           }
         }
         return Promise.reject(transformError(error));

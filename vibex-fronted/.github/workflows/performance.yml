@@ -37,8 +37,8 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
+          restore-keys: 
+            - ${{ runner.os }}-node-modules-
 
       - name: Install dependencies
         if: steps.cache-npm.outputs.cache-hit != 'true'
@@ -51,8 +51,8 @@ jobs:
         with:
           path: .next/cache
           key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/*.ts', '**/*.tsx') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-
+          restore-keys: 
+            - ${{ runner.os }}-nextjs-
 
       - name: Build application
         run: npm run build

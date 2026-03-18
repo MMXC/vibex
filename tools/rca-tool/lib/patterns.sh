@@ -14,25 +14,15 @@ readonly RCA_MAX_FILES="${RCA_MAX_FILES:-500}"
 
 # === 加载模式签名 ===
 load_signatures() {
-  local pattern_file="$1"
-  local -n name_out="${2:-_noname}"
-  local -n cat_out="${3:-_nocat}"
-  local -n sev_out="${4:-_nosev}"
-  local -n conf_out="${5:-_noconf}"
-  local -n fixes_out="${6:-_nofix}"
+  local pattern_file="${1:-}"
 
-  name_out=""
-  cat_out=""
-  sev_out=""
-  conf_out=""
-  fixes_out=""
+  [[ -z "$pattern_file" ]] && { echo ""; return 0; }
+  [[ ! -f "$pattern_file" ]] && { echo ""; return 0; }
+  [[ ! -r "$pattern_file" ]] && { echo ""; return 0; }
 
-  [[ ! -f "$pattern_file" ]] && return 0
-  [[ ! -r "$pattern_file" ]] && return 0
-
+  local all_sigs=""
   local in_fm=false
   local in_sigs=false
-  local all_sigs=""
 
   while IFS= read -r ln || [[ -n "$ln" ]]; do
     if [[ "$ln" == "---" ]] && ! $in_fm; then
@@ -46,58 +36,33 @@ load_signatures() {
     fi
     $in_fm || continue
 
-    case "$ln" in
-      name:*)
-        name_out="${ln#name: }"
-        name_out="${name_out#"${name_out%%[![:space:]]*}"}"
-        ;;
-      category:*)
-        cat_out="${ln#category: }"
-        cat_out="${cat_out#"${cat_out%%[![:space:]]*}"}"
-        ;;
-      severity:*)
-        sev_out="${ln#severity: }"
-        sev_out="${sev_out#"${sev_out%%[![:space:]]*}"}"
-        ;;
-      confidence:*)
-        conf_out="${ln#confidence: }"
-        conf_out="${conf_out#"${conf_out%%[![:space:]]*}"}"
-        ;;
-      fix_suggestions:*)
-        fixes_out="${ln#fix_suggestions: }"
-        fixes_out="${fixes_out#"${fixes_out%%[![:space:]]*}"}"
-        ;;
-      signatures:)
-        in_sigs=true
-        ;;
-    esac
+    [[ "$ln" == "signatures:" ]] && { in_sigs=true; continue; }
+    [[ "$ln" == fix_suggestions:* ]] && { in_sigs=false; continue; }
 
-    if $in_sigs; then
-      if [[ "$ln" =~ ^[[:space:]]*-[[:space:]]*pattern:[[:space:]]*\"(.*)\" ]]; then
-        local raw="${BASH_REMATCH[1]}"
-        # Convert regex shorthand to POSIX classes for bash/perl compatibility
-        local sig="$raw"
-        sig="${sig//\\s/[[:space:]]}"
-        sig="${sig//\\d/[0-9]}"
-        sig="${sig//\\w/[a-zA-Z0-9_]}"
-        # Also fix any remaining double-escaped sequences (for mixed files)
-        sig="${sig//\\\\s/[[:space:]]}"
-        sig="${sig//\\\\d/[0-9]}"
-        sig="${sig//\\\\w/[a-zA-Z0-9_]}"
-        all_sigs+="${sig}"$'\n'
-      elif [[ "$ln" =~ ^[[:space:]]*-[[:space:]]*pattern:[[:space:]]*'(.*)' ]]; then
-        local raw="${BASH_REMATCH[1]}"
-        local sig="$raw"
-        sig="${sig//\\s/[[:space:]]}"
-        sig="${sig//\\d/[0-9]}"
-        sig="${sig//\\w/[a-zA-Z0-9_]}"
-        sig="${sig//\\\\s/[[:space:]]}"
-        sig="${sig//\\\\d/[0-9]}"
-        sig="${sig//\\\\w/[a-zA-Z0-9_]}"
-        all_sigs+="${sig}"$'\n'
-      elif [[ ! "$ln" =~ ^[[:space:]] ]] && [[ -n "${ln// }" ]]; then
-        in_sigs=false
-      fi
+    $in_sigs || continue
+
+    if [[ "$ln" =~ ^[[:space:]]*-[[:space:]]*pattern:[[:space:]]*\"(.*)\" ]]; then
+      local raw="${BASH_REMATCH[1]}"
+      local sig="$raw"
+      sig="${sig//\\s/[[:space:]]}"
+      sig="${sig//\\d/[0-9]}"
+      sig="${sig//\\w/[a-zA-Z0-9_]}"
+      sig="${sig//\\\\s/[[:space:]]}"
+      sig="${sig//\\\\d/[0-9]}"
+      sig="${sig//\\\\w/[a-zA-Z0-9_]}"
+      all_sigs+="${sig}"$'\n'
+    elif [[ "$ln" =~ ^[[:space:]]*-[[:space:]]*pattern:[[:space:]]*'(.*)' ]]; then
+      local raw="${BASH_REMATCH[1]}"
+      local sig="$raw"
+      sig="${sig//\\s/[[:space:]]}"
+      sig="${sig//\\d/[0-9]}"
+      sig="${sig//\\w/[a-zA-Z0-9_]}"
+      sig="${sig//\\\\s/[[:space:]]}"
+      sig="${sig//\\\\d/[0-9]}"
+      sig="${sig//\\\\w/[a-zA-Z0-9_]}"
+      all_sigs+="${sig}"$'\n'
+    elif [[ ! "$ln" =~ ^[[:space:]] ]] && [[ -n "${ln// }" ]]; then
+      in_sigs=false
     fi
   done < "$pattern_file"
 

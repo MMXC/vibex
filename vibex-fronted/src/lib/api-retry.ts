@@ -83,8 +83,8 @@ export async function configureAxiosRetry(
   // 动态导入 axios-retry
   let axiosRetry: any;
   try {
-    const module = await import('axios-retry');
-    axiosRetry = module.default || module;
+    const axiosRetryModule = await import('axios-retry');
+    axiosRetry = axiosRetryModule.default || axiosRetryModule;
   } catch (err) {
     console.error('Failed to load axios-retry:', err);
     return;

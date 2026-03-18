@@ -1,0 +1,114 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary, #1e293b);
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-muted, #64748b);
+}
+
+.categories {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.category {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid var(--border-color, #e2e8f0);
+}
+
+.categoryTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary, #475569);
+  margin-bottom: 16px;
+}
+
+.componentGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.componentCard {
+  display: block;
+  cursor: pointer;
+}
+
+.componentCard input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.componentCard:hover .cardContent {
+  border-color: var(--primary-color, #3b82f6);
+  background: rgba(59, 130, 246, 0.02);
+}
+
+.componentCard input:checked + .cardContent {
+  border-color: var(--primary-color, #3b82f6);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.cardIcon {
+  font-size: 14px;
+  color: var(--primary-color, #3b82f6);
+}
+
+.cardName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #1e293b);
+}
+
+.cardDesc {
+  font-size: 12px;
+  color: var(--text-muted, #64748b);
+}
+
+.summary {
+  text-align: center;
+}
+
+.summaryCount {
+  font-size: 14px;
+  color: var(--text-muted, #64748b);
+  padding: 8px 16px;
+  background: var(--bg-secondary, #f1f5f9);
+  border-radius: 20px;
+}
+
+@media (max-width: 640px) {
+  .componentGrid {
+    grid-template-columns: 1fr;
+  }
+}

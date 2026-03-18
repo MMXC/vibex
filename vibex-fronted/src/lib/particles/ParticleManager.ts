@@ -98,8 +98,8 @@ export function useParticles(options: UseParticleOptions) {
     const initParticles = async () => {
       try {
         // Dynamic import for lazy loading - reduces initial bundle
-        const module = await import('tsparticles-slim');
-        const loadSlim = module.loadSlim as (options: object) => Promise<void>;
+        const particlesModule = await import('tsparticles-slim');
+        const loadSlim = particlesModule.loadSlim as (options: object) => Promise<void>;
         
         // Initialize
         await loadSlim({ id: 'init' });

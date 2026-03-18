@@ -57,7 +57,9 @@ class MockEventSource {
   url: string;
 
   constructor(url: string) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     this.url = url;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     mockEventSourceInstance = this;
   }
 

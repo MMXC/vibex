@@ -53,7 +53,7 @@ export function createInitialState(): DialogueState {
 export function reduce(state: DialogueState, event: DialogueEvent): DialogueState {
   const newPhase = transitions[state.phase](event);
   
-  let newState: DialogueState = {
+  const newState: DialogueState = {
     ...state,
     phase: newPhase,
   };

@@ -31,12 +31,12 @@ describe('QueryProvider', () => {
     });
 
     it('should provide QueryClient to children', () => {
-      let receivedClient: QueryClient | null = null;
+      const receivedClientRef = { current: null as QueryClient | null };
       
       function TestConsumer() {
         // Access the client from context
         const client = queryClient;
-        receivedClient = client;
+        receivedClientRef.current = client;
         return <div data-testid="client-received">Client Received</div>;
       }
       
@@ -46,8 +46,8 @@ describe('QueryProvider', () => {
         </QueryProvider>
       );
       
-      expect(receivedClient).not.toBeNull();
-      expect(receivedClient).toBeInstanceOf(QueryClient);
+      expect(receivedClientRef.current).not.toBeNull();
+      expect(receivedClientRef.current).toBeInstanceOf(QueryClient);
     });
 
     it('should have React Query integrated', () => {

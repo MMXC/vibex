@@ -1,7 +1,8 @@
 /**
- * HomePage - 主页容器组件 (三栏布局版)
+ * HomePage - 主页容器组件 (60/40 垂直布局版)
  * 
- * 15% 左侧步骤导航 | 60% 中间内容区 | 25% 右侧AI面板
+ * 预览区域 60% | 录入区域 40%
+ * 无 Tab 切换，直接展示
  * 
  * 业务逻辑已抽取到 useHomePage hook
  */
@@ -10,12 +11,10 @@
 import { useState, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import LoginDrawer from '@/components/ui/LoginDrawer';
-import { Navbar, Sidebar, MainContent, StepContainer } from '@/components/homepage';
+import { Navbar } from '@/components/homepage';
 import { useHomePage } from './hooks';
 import { InputArea } from './InputArea/InputArea';
 import { PreviewArea } from './PreviewArea/PreviewArea';
-import { AIPanel } from './AIPanel/AIPanel';
-import { ThinkingPanel } from './ThinkingPanel/ThinkingPanel';
 import styles from '@/app/homepage.module.css';
 import type { Step } from '@/types/homepage';
 
@@ -25,7 +24,7 @@ const ParticleBackground = dynamic(
   { ssr: false }
 );
 
-// 三步流程常量 (二阶段重构)
+// 三步流程常量
 const STEPS: Step[] = [
   { id: 1, label: '业务流程分析', description: '分析业务流程' },
   { id: 2, label: 'UI组件分析', description: '生成UI组件树' },
@@ -95,63 +94,36 @@ export default function HomePage() {
         onSettingsClick={() => setIsLoginDrawerOpen(true)} 
       />
       
-      {/* 三栏布局容器 */}
-      <div className={styles.mainContainer}>
-        {/* 左侧栏 - 15%: 步骤导航 */}
-        <Sidebar
-          steps={STEPS}
+      {/* 60/40 垂直布局容器 - Milestone 1 */}
+      <div className={styles.mainContentVertical}>
+        {/* 预览区域 - 60% - AC1 */}
+        <PreviewArea
           currentStep={currentStep}
-          completedStep={completedStep}
-          onStepClick={handleStepClick}
-          isStepClickable={(stepId) => stepId <= (completedStep || 0) + 1}
-          className={styles.sidebar}
+          mermaidCode={currentMermaidCode}
+          boundedContexts={boundedContexts}
+          domainModels={domainModels}
+          businessFlow={businessFlow}
+          isGenerating={isGenerating}
         />
         
-        {/* 中间栏 - 60%: 预览区域 + 录入区域 */}
-        <div className={styles.content}>
-          <div className={styles.mainContentVertical}>
-            {/* 预览区域 60% */}
-            <PreviewArea
-              currentStep={currentStep}
-              mermaidCode={currentMermaidCode}
-              boundedContexts={boundedContexts}
-              domainModels={domainModels}
-              businessFlow={businessFlow}
-              isGenerating={isGenerating}
-            />
-            
-            {/* 录入区域 - 三步流程: Step1业务流程分析直接用requirementText生成 */}
-            <InputArea
-              requirementText={requirementText}
-              onRequirementChange={setRequirementText}
-              onSubmit={handleRequirementSubmit}
-              onGenerate={handleRequirementSubmit}
-              onGenerateDomainModel={() => generateDomainModels(requirementText, boundedContexts)}
-              // 三步流程: Step1业务流程分析直接使用requirementText
-              onGenerateBusinessFlow={() => generateBusinessFlow([], requirementText)}
-              onCreateProject={() => {}}
-              onAnalyzePageStructure={analyzePageStructure}
-              isGenerating={isGenerating}
-              boundedContexts={boundedContexts}
-              selectedContextIds={selectedContextIds}
-              businessFlow={businessFlow}
-              pageStructureAnalyzed={pageStructureAnalyzed}
-              currentStep={currentStep}
-              completedStep={completedStep}
-            />
-          </div>
-        </div>
-        
-        {/* 右侧栏 - 25%: AI面板 */}
-        <div className={styles.aiPanel}>
-          <ThinkingPanel
-            thinkingMessages={thinkingMessages}
-            contexts={boundedContexts}
-            mermaidCode={currentMermaidCode}
-            status={isGenerating ? 'thinking' : 'idle'}
-            errorMessage={null}
-          />
-        </div>
+        {/* 录入区域 - 40% - AC2 & AC3: 无 Tab 切换 */}
+        <InputArea
+          requirementText={requirementText}
+          onRequirementChange={setRequirementText}
+          onSubmit={handleRequirementSubmit}
+          onGenerate={handleRequirementSubmit}
+          onGenerateDomainModel={() => generateDomainModels(requirementText, boundedContexts)}
+          onGenerateBusinessFlow={() => generateBusinessFlow([], requirementText)}
+          onCreateProject={() => {}}
+          onAnalyzePageStructure={analyzePageStructure}
+          isGenerating={isGenerating}
+          boundedContexts={boundedContexts}
+          selectedContextIds={selectedContextIds}
+          businessFlow={businessFlow}
+          pageStructureAnalyzed={pageStructureAnalyzed}
+          currentStep={currentStep}
+          completedStep={completedStep}
+        />
       </div>
 
       <LoginDrawer 

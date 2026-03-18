@@ -15,37 +15,37 @@ export interface StepComponentProps {
 /**
  * Step 1: Requirement Input
  */
-export interface StepRequirementInputProps extends StepComponentProps {
+export type StepRequirementInputProps = StepComponentProps & {
   // Data subscribed from store internally
-}
+};
 
 /**
  * Step 2: Bounded Context
  */
-export interface StepBoundedContextProps extends StepComponentProps {
+export type StepBoundedContextProps = StepComponentProps & {
   // Data subscribed from store internally
-}
+};
 
 /**
  * Step 3: Domain Model
  */
-export interface StepDomainModelProps extends StepComponentProps {
+export type StepDomainModelProps = StepComponentProps & {
   // Data subscribed from store internally
-}
+};
 
 /**
  * Step 4: Business Flow
  */
-export interface StepBusinessFlowProps extends StepComponentProps {
+export type StepBusinessFlowProps = StepComponentProps & {
   // Data subscribed from store internally
-}
+};
 
 /**
  * Step 5: Project Create
  */
-export interface StepProjectCreateProps extends StepComponentProps {
+export type StepProjectCreateProps = StepComponentProps & {
   // Data subscribed from store internally
-}
+};
 
 /**
  * Step number mapping (1-5)

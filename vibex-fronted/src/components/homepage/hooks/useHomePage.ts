@@ -95,8 +95,15 @@ export function useHomePage(): UseHomePageReturn {
   const [minimizedPanel, setMinimizedPanel] = useState<string | null>(null);
 
   // F2: Selection state for step data passing
-  const [selectedContextIds, setSelectedContextIds] = useState<Set<string>>(new Set());
-  const [selectedModelIds, setSelectedModelIds] = useState<Set<string>>(new Set());
+  // 修复: Hydration Mismatch - 使用 null 初始值 + useEffect 客户端初始化
+  const [selectedContextIds, setSelectedContextIds] = useState<Set<string> | null>(null);
+  const [selectedModelIds, setSelectedModelIds] = useState<Set<string> | null>(null);
+
+  // 客户端初始化: 延迟到 useEffect 中创建 Set 实例
+  useEffect(() => {
+    setSelectedContextIds(new Set());
+    setSelectedModelIds(new Set());
+  }, []);
 
   // F4: Page Structure State
   const [pageStructure, setPageStructure] = useState<PageStructure | null>(null);
@@ -201,18 +208,24 @@ export function useHomePage(): UseHomePageReturn {
     
     const { type, params } = lastGenerationRef.current;
     
-    try {
-      if (type === 'contexts' && typeof params === 'string') {
-        rawGenerateContexts(params);
-      } else if (type === 'models' && Array.isArray(params)) {
-        rawGenerateDomainModels(requirementText, params as BoundedContext[]);
-      } else if (type === 'flow' && Array.isArray(params)) {
-        rawGenerateBusinessFlow(params as DomainModel[]);
-      }
-    } finally {
+    if (type === 'contexts' && typeof params === 'string') {
+      rawGenerateContexts(params);
+    } else if (type === 'models' && Array.isArray(params)) {
+      rawGenerateDomainModels(requirementText, params as BoundedContext[]);
+    } else if (type === 'flow' && Array.isArray(params)) {
+      rawGenerateBusinessFlow(params as DomainModel[]);
+    }
+    // isRetrying will be reset when stream status changes
+  }, [requirementText, rawGenerateContexts, rawGenerateDomainModels, rawGenerateBusinessFlow]);
+  
+  // E-003: Reset isRetrying when stream completes or errors
+  useEffect(() => {
+    if (isRetrying && (streamStatus === 'done' || streamStatus === 'error' || 
+        modelStreamStatus === 'done' || modelStreamStatus === 'error' ||
+        flowStreamStatus === 'done' || flowStreamStatus === 'error')) {
       setIsRetrying(false);
     }
-  }, [requirementText, rawGenerateContexts, rawGenerateDomainModels, rawGenerateBusinessFlow]);
+  }, [isRetrying, streamStatus, modelStreamStatus, flowStreamStatus]);
 
   // F2: Wrapped generate functions that store params for retry
   const generateContexts = useCallback((text: string) => {
@@ -234,7 +247,8 @@ export function useHomePage(): UseHomePageReturn {
   // F2: Toggle selection functions
   const toggleContextSelection = useCallback((id: string) => {
     setSelectedContextIds(prev => {
-      const next = new Set(prev);
+      const current = prev ?? new Set();
+      const next = new Set(current);
       if (next.has(id)) {
         next.delete(id);
       } else {
@@ -246,7 +260,8 @@ export function useHomePage(): UseHomePageReturn {
 
   const toggleModelSelection = useCallback((id: string) => {
     setSelectedModelIds(prev => {
-      const next = new Set(prev);
+      const current = prev ?? new Set();
+      const next = new Set(current);
       if (next.has(id)) {
         next.delete(id);
       } else {
@@ -300,6 +315,34 @@ export function useHomePage(): UseHomePageReturn {
     }
   }, [streamStatus, streamContexts, streamMermaidCode]);
 
+  // E-001: Auto-trigger Step 2→3 (Domain Models generation)
+  useEffect(() => {
+    // When step 2 is completed and has contexts, auto-trigger step 3
+    if (
+      completedStep === 1 &&
+      currentStep === 2 &&
+      boundedContexts.length > 0 &&
+      domainModels.length === 0 &&
+      modelStreamStatus === 'idle'
+    ) {
+      generateDomainModels(requirementText, boundedContexts);
+    }
+  }, [completedStep, currentStep, boundedContexts, domainModels.length, modelStreamStatus, requirementText]);
+
+  // E-001: Auto-trigger Step 3→4 (Business Flow generation)
+  useEffect(() => {
+    // When step 3 is completed and has models, auto-trigger step 4
+    if (
+      completedStep === 2 &&
+      currentStep === 3 &&
+      domainModels.length > 0 &&
+      businessFlow === null &&
+      flowStreamStatus === 'idle'
+    ) {
+      generateBusinessFlow(domainModels, requirementText);
+    }
+  }, [completedStep, currentStep, domainModels, businessFlow, flowStreamStatus, requirementText]);
+
   // Sync SSE results - Domain Models (F1 & F2)
   useEffect(() => {
     if (modelStreamStatus === 'done') {
@@ -311,12 +354,12 @@ export function useHomePage(): UseHomePageReturn {
         setCurrentStep(3);
       }
       // F2: Auto-select all contexts if none selected
-      if (selectedContextIds.size === 0 && streamDomainModels.length > 0) {
+      if ((selectedContextIds?.size ?? 0) === 0 && streamDomainModels.length > 0) {
         const allIds = new Set(streamDomainModels.map((_: unknown) => ( _ as { id: string }).id).filter(Boolean));
         setSelectedContextIds(allIds);
       }
     }
-  }, [modelStreamStatus, streamDomainModels, streamModelMermaidCode, selectedContextIds.size]);
+  }, [modelStreamStatus, streamDomainModels, streamModelMermaidCode, selectedContextIds?.size]);
 
   // Sync SSE results - Business Flow (三步流程: Step 1完成跳转到Step 2)
   useEffect(() => {
@@ -329,12 +372,12 @@ export function useHomePage(): UseHomePageReturn {
         setCurrentStep(2);
       }
       // Auto-select all models if none selected
-      if (selectedModelIds.size === 0 && streamDomainModels.length > 0) {
+      if ((selectedModelIds?.size ?? 0) === 0 && streamDomainModels.length > 0) {
         const allIds = new Set(streamDomainModels.map((_: unknown) => ( _ as { id: string }).id).filter(Boolean));
         setSelectedModelIds(allIds);
       }
     }
-  }, [flowStreamStatus, streamBusinessFlow, streamFlowMermaidCode, selectedModelIds.size, streamDomainModels]);
+  }, [flowStreamStatus, streamBusinessFlow, streamFlowMermaidCode, selectedModelIds?.size, streamDomainModels]);
 
   // Persist panel sizes
   useEffect(() => {
@@ -367,9 +410,9 @@ export function useHomePage(): UseHomePageReturn {
     maximizedPanel,
     minimizedPanel,
     
-    // Selection state (F2)
-    selectedContextIds,
-    selectedModelIds,
+    // Selection state (F2) - 使用空值合并提供默认值
+    selectedContextIds: selectedContextIds ?? new Set<string>(),
+    selectedModelIds: selectedModelIds ?? new Set<string>(),
     setSelectedContextIds,
     setSelectedModelIds,
     toggleContextSelection,

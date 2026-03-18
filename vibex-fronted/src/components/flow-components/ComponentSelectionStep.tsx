@@ -8,7 +8,7 @@
 
 import { useState } from 'react';
 import { useMachine } from '@xstate/react';
-import { flowMachine } from '../flow-container/flowMachine';
+import { flowMachine, FlowEvent } from '../flow-container/flowMachine';
 import styles from './ComponentSelectionStep.module.css';
 
 const COMPONENT_CATEGORIES = [
@@ -63,7 +63,7 @@ export function ComponentSelectionStep() {
       : [...selectedComponents, id];
     
     setSelectedComponents(newSelected);
-    send({ type: 'TOGGLE_COMPONENT', id } as any);
+    send({ type: 'TOGGLE_COMPONENT', id } satisfies FlowEvent);
   };
 
   return (

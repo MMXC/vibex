@@ -84,7 +84,7 @@ const loadPersistedState = (): Partial<FlowContext> => {
   }
 };
 
-type FlowEvent = 
+export type FlowEvent = 
   | { type: 'SET_REQUIREMENTS'; requirements: string }
   | { type: 'SET_EXAMPLES'; examples: string[] }
   | { type: 'ADD_CONTEXT'; context: BoundedContext }

@@ -8,7 +8,7 @@
 
 import { useState, useEffect } from 'react';
 import { useMachine } from '@xstate/react';
-import { flowMachine, FlowNode } from '../flow-container/flowMachine';
+import { flowMachine, FlowNode, FlowEvent } from '../flow-container/flowMachine';
 import styles from './BusinessFlowStep.module.css';
 
 const NODE_TYPES = [
@@ -48,7 +48,7 @@ export function BusinessFlowStep() {
       connections: [],
     };
     setNodes([...nodes, newNode]);
-    send({ type: 'ADD_NODE', node: newNode } as any);
+    send({ type: 'ADD_NODE', node: newNode } satisfies FlowEvent);
     setSelectedNode(newNode.id);
   };
 
@@ -62,14 +62,14 @@ export function BusinessFlowStep() {
       connections: n.connections.filter(c => c !== nodeId),
     }));
     setNodes(updated);
-    send({ type: 'REMOVE_NODE', id: nodeId } as any);
+    send({ type: 'REMOVE_NODE', id: nodeId } satisfies FlowEvent);
     setSelectedNode(null);
   };
 
   const handleUpdateNodeLabel = (nodeId: string, label: string) => {
     const updated = nodes.map(n => n.id === nodeId ? { ...n, label } : n);
     setNodes(updated);
-    send({ type: 'UPDATE_NODE', node: updated.find(n => n.id === nodeId)! } as any);
+    send({ type: 'UPDATE_NODE', node: updated.find(n => n.id === nodeId)! } satisfies FlowEvent);
   };
 
   const handleRegenerate = async () => {
@@ -81,7 +81,7 @@ export function BusinessFlowStep() {
       id: `node-${Date.now()}-${n.id}`,
     }));
     setNodes(regeneratedNodes);
-    send({ type: 'SET_BUSINESS_FLOW', nodes: regeneratedNodes } as any);
+    send({ type: 'SET_BUSINESS_FLOW', nodes: regeneratedNodes } satisfies FlowEvent);
     setIsRegenerating(false);
   };
 

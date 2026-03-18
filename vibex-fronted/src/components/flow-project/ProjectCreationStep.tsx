@@ -8,7 +8,7 @@
 
 import { useState } from 'react';
 import { useMachine } from '@xstate/react';
-import { flowMachine } from '../flow-container/flowMachine';
+import { flowMachine, FlowEvent } from '../flow-container/flowMachine';
 import styles from './ProjectCreationStep.module.css';
 
 const TECH_STACKS = [
@@ -33,7 +33,7 @@ export function ProjectCreationStep() {
       ? selectedStack.filter(s => s !== id)
       : [...selectedStack, id];
     setSelectedStack(newStack);
-    send({ type: 'SET_PROJECT_META', meta: { techStack: newStack } } as any);
+    send({ type: 'SET_PROJECT_META', meta: { techStack: newStack } } satisfies FlowEvent);
   };
 
   const handleCreate = async () => {
@@ -57,7 +57,7 @@ export function ProjectCreationStep() {
     
     setIsCreating(false);
     setIsComplete(true);
-    send({ type: 'SAVE' } as any);
+    send({ type: 'SAVE' } satisfies FlowEvent);
   };
 
   if (isComplete) {

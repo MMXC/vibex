@@ -8,18 +8,18 @@
 
 import { ReactNode } from 'react';
 import { useMachine } from '@xstate/react';
-import { flowMachine, STEP_ORDER, STEP_LABELS, STEP_ICONS, FlowStep } from './flowMachine';
+import { flowMachine, STEP_ORDER, STEP_LABELS, STEP_ICONS, FlowStep, FlowEvent, FlowContext } from './flowMachine';
 import { FlowNavigator } from './FlowNavigator';
 import styles from './FlowContainer.module.css';
 
 export interface FlowContainerProps {
-  onComplete?: (context: Parameters<typeof flowMachine['resolveState']>[0]['context']) => void;
+  onComplete?: (context: FlowContext) => void;
   onStepChange?: (step: FlowStep) => void;
   children: (state: ReturnType<typeof useMachine<typeof flowMachine>>[0]) => ReactNode;
 }
 
 export function FlowContainer({ onComplete, onStepChange, children }: FlowContainerProps) {
-  const [state, send, actor] = useMachine(flowMachine);
+  const [state, send] = useMachine(flowMachine);
 
   const currentStep = state.value as FlowStep;
   const isCompleted = state.status === 'done';
@@ -52,14 +52,14 @@ export function FlowContainer({ onComplete, onStepChange, children }: FlowContai
       </div>
 
       <div className={styles.content}>
-        {children(state as any)}
+        {children(state)}
       </div>
 
       <FlowNavigator
         currentStep={currentStep}
-        onPrev={() => send({ type: 'GO_PREV' } as any)}
-        onNext={() => send({ type: 'GO_NEXT' } as any)}
-        onSave={() => send({ type: 'SAVE' } as any)}
+        onPrev={() => send({ type: 'GO_PREV' } satisfies FlowEvent)}
+        onNext={() => send({ type: 'GO_NEXT' } satisfies FlowEvent)}
+        onSave={() => send({ type: 'SAVE' } satisfies FlowEvent)}
         isFirst={currentStep === STEP_ORDER[0]}
         isLast={currentStep === STEP_ORDER[STEP_ORDER.length - 1]}
         isCompleted={isCompleted}

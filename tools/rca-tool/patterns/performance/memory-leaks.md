@@ -4,11 +4,11 @@ category: performance
 severity: high
 confidence: 70
 signatures:
-  - pattern: "setInterval\\s*\\([^)]+\\)\\s*;\\s*$"
+  - pattern: "setInterval\s*\([^)]+\)\s*;\s*$"
     description: "setInterval 可能缺少清理"
-  - pattern: "addEventListener\\s*\\([^)]+\\)\\s*(?!;.*removeEventListener)"
+  - pattern: "addEventListener\s*\([^)]+\)\s*(?!;.*removeEventListener)"
     description: "addEventListener 可能缺少对应的 removeEventListener"
-  - pattern: "window\\.addEventListener\\s*\\([^)]+\\)\\s*;\\s*(?!.*window\\.removeEventListener)"
+  - pattern: "window\.addEventListener\s*\([^)]+\)\s*;\s*(?!.*window\.removeEventListener)"
     description: "window 事件监听器缺少清理"
 fix_suggestions:
   - "在 useEffect cleanup 函数中清理定时器"

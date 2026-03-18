@@ -74,9 +74,27 @@ load_signatures() {
 
     if $in_sigs; then
       if [[ "$ln" =~ ^[[:space:]]*-[[:space:]]*pattern:[[:space:]]*\"(.*)\" ]]; then
-        all_sigs+="${BASH_REMATCH[1]}"$'\n'
+        local raw="${BASH_REMATCH[1]}"
+        # Convert regex shorthand to POSIX classes for bash/perl compatibility
+        local sig="$raw"
+        sig="${sig//\\s/[[:space:]]}"
+        sig="${sig//\\d/[0-9]}"
+        sig="${sig//\\w/[a-zA-Z0-9_]}"
+        # Also fix any remaining double-escaped sequences (for mixed files)
+        sig="${sig//\\\\s/[[:space:]]}"
+        sig="${sig//\\\\d/[0-9]}"
+        sig="${sig//\\\\w/[a-zA-Z0-9_]}"
+        all_sigs+="${sig}"$'\n'
       elif [[ "$ln" =~ ^[[:space:]]*-[[:space:]]*pattern:[[:space:]]*'(.*)' ]]; then
-        all_sigs+="${BASH_REMATCH[1]}"$'\n'
+        local raw="${BASH_REMATCH[1]}"
+        local sig="$raw"
+        sig="${sig//\\s/[[:space:]]}"
+        sig="${sig//\\d/[0-9]}"
+        sig="${sig//\\w/[a-zA-Z0-9_]}"
+        sig="${sig//\\\\s/[[:space:]]}"
+        sig="${sig//\\\\d/[0-9]}"
+        sig="${sig//\\\\w/[a-zA-Z0-9_]}"
+        all_sigs+="${sig}"$'\n'
       elif [[ ! "$ln" =~ ^[[:space:]] ]] && [[ -n "${ln// }" ]]; then
         in_sigs=false
       fi

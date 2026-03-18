@@ -4,11 +4,11 @@ category: state-management
 severity: high
 confidence: 80
 signatures:
-  - pattern: "setTimeout\\s*\\([^)]*\\b(count|value|data|item|state)\\b[^)]*\\)\\s*,"
+  - pattern: "setTimeout\s*\([^)]*\b(count|value|data|item|state)\b[^)]*\)\s*,"
     description: "setTimeout 中引用了外部状态变量"
-  - pattern: "setInterval\\s*\\([^)]*\\b(count|value|data)\\b[^)]*\\)\\s*,"
+  - pattern: "setInterval\s*\([^)]*\b(count|value|data)\b[^)]*\)\s*,"
     description: "setInterval 中引用了外部状态变量"
-  - pattern: "addEventListener\\s*\\([^,]+,\\s*\\(\\)\\s*=>\\s*{[^}]*\\bstate\\."
+  - pattern: "addEventListener\s*\([^,]+,\s*\(\)\s*=>\s*{[^}]*\bstate\."
     description: "事件监听器中引用了状态对象"
 fix_suggestions:
   - "使用 useRef 存储最新的值"

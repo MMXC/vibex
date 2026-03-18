@@ -4,11 +4,11 @@ category: ui-rendering
 severity: high
 confidence: 85
 signatures:
-  - pattern: "useEffect\\s*\\(\\s*\\(\\s*\\)\\s*=>\\s*\\{[^}]*(set[A-Z][a-zA-Z]+)\\([^)]+\\)[^}]*\\}\\s*,\\s*\\[\\s*\\]"
+  - pattern: "useEffect\s*\(\s*\(\s*\)\s*=>\s*\{[^}]*(set[A-Z][a-zA-Z]+)\([^)]+\)[^}]*\}\s*,\s*\[\s*\]"
     description: "useEffect 依赖数组为空但调用了状态更新函数"
-  - pattern: "useEffect\\s*\\(\\s*\\(\\s*\\)\\s*=>\\s*\\{[^}]*\\b(count|value|data|item|result|state)\\b[^}]*\\}\\s*,\\s*\\[\\s*\\]"
+  - pattern: "useEffect\s*\(\s*\(\s*\)\s*=>\s*\{[^}]*\b(count|value|data|item|result|state)\b[^}]*\}\s*,\s*\[\s*\]"
     description: "useEffect 依赖数组为空但引用了外部变量"
-  - pattern: "useEffect\\s*\\(\\s*\\(\\s*\\)\\s*=>\\s*\\{[^}]*(useState|useRef|useContext)\\b"
+  - pattern: "useEffect\s*\(\s*\(\s*\)\s*=>\s*\{[^}]*(useState|useRef|useContext)\b"
     description: "useEffect 内部使用了hook"
 fix_suggestions:
   - "将所有使用的外部变量加入依赖数组"

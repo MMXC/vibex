@@ -4,9 +4,9 @@ category: ui-rendering
 severity: high
 confidence: 80
 signatures:
-  - pattern: "useEffect\\s*\\([^)]*\\)\\s*{[^}]*(set[A-Z][a-zA-Z]+\\([^)]*\\)[^}]*}\\s*,\\s*\\[([^\\]]*)\\][^}]*\\1"
+  - pattern: "useEffect\s*\([^)]*\)\s*{[^}]*(set[A-Z][a-zA-Z]+\([^)]*\)[^}]*}\s*,\s*\[([^\]]*)\][^}]*\1"
     description: "useEffect 可能导致无限循环"
-  - pattern: "useEffect\\s*\\(\\s*\\(\\)\\s*=>\\s*{[^}]*(set[A-Z][a-zA-Z]+)\\([^;)]+\\)[^}]*}\\s*,\\s*\\[([^\\]]*\\1[^\\]]*)\\]"
+  - pattern: "useEffect\s*\(\s*\(\)\s*=>\s*{[^}]*(set[A-Z][a-zA-Z]+)\([^;)]+\)[^}]*}\s*,\s*\[([^\]]*\1[^\]]*)\]"
     description: "依赖数组中的值在 effect 中被设置"
 fix_suggestions:
   - "使用 useCallback 包装设置函数"

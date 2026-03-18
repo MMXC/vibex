@@ -4,9 +4,9 @@ category: api-integration
 severity: medium
 confidence: 75
 signatures:
-  - pattern: "while\\s*\\([^)]*retry[^)]*\\)"
+  - pattern: "while\s*\([^)]*retry[^)]*\)"
     description: "存在重试循环"
-  - pattern: "for\\s*\\([^)]*attempt[^)]*\\)\\s*{[^}]*fetch[^}]*}"
+  - pattern: "for\s*\([^)]*attempt[^)]*\)\s*{[^}]*fetch[^}]*}"
     description: "手动重试循环调用 API"
 fix_suggestions:
   - "使用指数退避算法实现重试"

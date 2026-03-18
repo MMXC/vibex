@@ -4,11 +4,11 @@ category: api-integration
 severity: high
 confidence: 90
 signatures:
-  - pattern: "fetch\\s*\\([^)]+\\)\\s*\\.(then|catch|finally)"
+  - pattern: "fetch\s*\([^)]+\)\s*\.(then|catch|finally)"
     description: "fetch 缺少 .catch 错误处理"
-  - pattern: "await\\s+fetch\\s*\\([^)]+\\)\\s*[^;]*;\\s*$"
+  - pattern: "await\s+fetch\s*\([^)]+\)\s*[^;]*;\s*$"
     description: "await fetch 后缺少 try-catch"
-  - pattern: "\\.then\\s*\\(\\s*res\\s*=>\\s*[^)]+\\)\\s*(?!\\.then|\\.catch)"
+  - pattern: "\.then\s*\(\s*res\s*=>\s*[^)]+\)\s*(?!\.then|\.catch)"
     description: "Promise chain 末尾缺少 .catch"
 fix_suggestions:
   - "添加 .catch(err => console.error(...)) 处理网络错误"

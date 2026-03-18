@@ -33,7 +33,7 @@ describe('Epic 2: InputArea - 需求录入', () => {
   it('should accept multiline text input', () => {
     render(<InputArea {...defaultProps} />);
     
-    const textarea = screen.getByPlaceholderText(/输入|requirement/i) as HTMLTextAreaElement;
+    const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
     expect(textarea).toBeInTheDocument();
     
     fireEvent.change(textarea, { 
@@ -52,7 +52,7 @@ describe('Epic 2: InputArea - 需求录入', () => {
 
   it('should call onRequirementChange when typing', () => {
     render(<InputArea {...defaultProps} />);
-    const textarea = screen.getByPlaceholderText(/输入|requirement/i);
+    const textarea = screen.getByRole('textbox');
     
     fireEvent.change(textarea, { target: { value: 'New requirement' } });
     
@@ -61,14 +61,16 @@ describe('Epic 2: InputArea - 需求录入', () => {
 
   it('should disable button when requirement is empty', () => {
     render(<InputArea {...defaultProps} requirementText="" />);
-    // Get first button (generate button)
-    const buttons = screen.getAllByRole('button');
+    // Get button within ActionButtons container (not PlanBuildButtons)
+    const actionButtonsContainer = document.querySelector('[class*="actionButtons"]');
+    const buttons = actionButtonsContainer ? actionButtonsContainer.querySelectorAll('button') : screen.getAllByRole('button');
     expect(buttons[0]).toBeDisabled();
   });
 
   it('should enable button when requirement has content', () => {
     render(<InputArea {...defaultProps} requirementText="Test requirement" />);
-    const buttons = screen.getAllByRole('button');
+    const actionButtonsContainer = document.querySelector('[class*="actionButtons"]');
+    const buttons = actionButtonsContainer ? actionButtonsContainer.querySelectorAll('button') : screen.getAllByRole('button');
     expect(buttons[0]).not.toBeDisabled();
   });
 });

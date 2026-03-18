@@ -78,10 +78,9 @@ test.describe('五步流程 E2E (Five-Step Flow)', () => {
 
     // These should either not be clickable or should not navigate when clicked without data
     if (await step4.count() > 0 && await step5.count() > 0) {
-      const step4Btn = step4.closest('button');
-      if (step4Btn && (await step4Btn.count()) > 0) {
+      const step4Btn = await step4.evaluateHandle((el) => el.closest('button'));
+      if (step4Btn && (await step4Btn.evaluate((btn) => (btn as HTMLElement).offsetWidth > 0))) {
         await step4Btn.click();
-        // Should either stay on current step or navigate to step 1
         await page.waitForTimeout(300);
       }
     }

@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.46',
+    date: '2026-03-19',
+    changes: [
+      '📝 提案格式验证器: proposal-validator.sh (E001-E005)',
+      '📚 片段库更新: 10+ snippets + 关键词索引',
+      '🔧 RCA CI: GitHub Actions workflow 集成',
+    ],
+    commit: '32f1fed',
+  },
+  {
     version: '1.0.45',
     date: '2026-03-17',
     changes: [

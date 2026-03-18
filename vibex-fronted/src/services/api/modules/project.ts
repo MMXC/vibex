@@ -8,6 +8,7 @@ import { SuccessResponse } from '../types/common';
 import { httpClient } from '../client';
 import { retry } from '../retry';
 import { cache, getCacheKey } from '../cache';
+import { unwrapList, unwrapItem } from '@/lib/api-unwrap';
 
 // ==================== 接口定义 ====================
 
@@ -48,7 +49,7 @@ class ProjectApiImpl implements ProjectApi {
         params: { userId },
       });
     });
-    const projects: Project[] = (result as any).projects || result;
+    const projects = unwrapList<Project>(result, 'projects');
     cache.set(cacheKey, projects);
     return projects;
   }
@@ -66,7 +67,7 @@ class ProjectApiImpl implements ProjectApi {
         `/projects/${projectId}`
       );
     });
-    const project: Project = (result as any).project || result;
+    const project = unwrapItem<Project>(result, 'project') as Project;
     cache.set(cacheKey, project);
     return project;
   }
@@ -75,7 +76,7 @@ class ProjectApiImpl implements ProjectApi {
     const result = await retry.execute(async () => {
       return await httpClient.post<{ project: Project }>('/projects', project);
     });
-    const created: Project = (result as any).project || result;
+    const created = unwrapItem<Project>(result, 'project') as Project;
     cache.remove(getCacheKey('projects', project.userId));
     return created;
   }
@@ -90,7 +91,7 @@ class ProjectApiImpl implements ProjectApi {
         data
       );
     });
-    const project: Project = (result as any).project || result;
+    const project = unwrapItem<Project>(result, 'project') as Project;
     cache.remove(getCacheKey('project', projectId));
     return project;
   }
@@ -109,7 +110,7 @@ class ProjectApiImpl implements ProjectApi {
         {}
       );
     });
-    return (result as any).project || result;
+    return unwrapItem<Project>(result, 'project') as Project;
   }
 
   async restoreProject(projectId: string): Promise<Project> {
@@ -119,7 +120,7 @@ class ProjectApiImpl implements ProjectApi {
         {}
       );
     });
-    return (result as any).project || result;
+    return unwrapItem<Project>(result, 'project') as Project;
   }
 
   async permanentDeleteProject(projectId: string): Promise<SuccessResponse> {
@@ -135,7 +136,7 @@ class ProjectApiImpl implements ProjectApi {
     const result = await retry.execute(async () => {
       return await httpClient.get<{ projects: Project[] }>('/projects/deleted');
     });
-    return (result as any).projects || result;
+    return unwrapList<Project>(result, 'projects');
   }
 
   async clearDeletedProjects(): Promise<SuccessResponse> {
@@ -151,7 +152,7 @@ class ProjectApiImpl implements ProjectApi {
         `/projects/${projectId}/role`
       );
     });
-    return result;
+    return unwrapItem<{ role: ProjectRole }>(result, 'role') as { role: ProjectRole };
   }
 }
 

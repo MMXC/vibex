@@ -31,7 +31,7 @@ describe('step-validation', () => {
     });
 
     it('should pass with whitespace-only requirement text with length >= 10', () => {
-      const result = validateStep1({ requirement: { text: '  需求描述  123' } });
+      const result = validateStep1({ requirement: { text: '  需求描述  12345' } });
       expect(result.valid).toBe(true);
     });
   });

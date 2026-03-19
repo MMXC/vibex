@@ -46,7 +46,8 @@ export function OnboardingProgressBar() {
     let remainingMinutes = 0;
     for (let i = currentIndex; i < totalSteps; i++) {
       const stepId = ONBOARDING_STEPS[i].id;
-      remainingMinutes += STEP_DURATIONS[stepId] || 2;
+      const duration = STEP_DURATIONS[stepId];
+      remainingMinutes += duration !== undefined ? duration : 2;
     }
     
     if (remainingMinutes <= 1) {
@@ -58,7 +59,7 @@ export function OnboardingProgressBar() {
       const mins = remainingMinutes % 60;
       return `约 ${hours} 小时 ${mins} 分钟`;
     }
-  }, [currentIndex, totalSteps]);
+  }, [currentIndex, totalSteps, STEP_DURATIONS, ONBOARDING_STEPS]);
 
   // 步骤文本
   const stepText = `第 ${currentIndex + 1} 步 / 共 ${totalSteps} 步`;

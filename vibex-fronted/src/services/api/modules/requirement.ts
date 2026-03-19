@@ -8,6 +8,7 @@ import { SuccessResponse } from '../types/common';
 import { httpClient } from '../client';
 import { retry } from '../retry';
 import { cache, getCacheKey } from '../cache';
+import { unwrapField, unwrapData } from '../unwrappers';
 
 // ==================== 接口定义 ====================
 
@@ -51,12 +52,12 @@ class RequirementApiImpl implements RequirementApi {
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ requirements: Requirement[] }>(
+      return await httpClient.get<Requirement[]>(
         '/requirements',
         { params: { userId } }
       );
     });
-    const requirements: Requirement[] = (result as any).requirements || result;
+    const requirements = unwrapField<Requirement[]>(result, 'requirements');
     cache.set(cacheKey, requirements);
     return requirements;
   }
@@ -70,11 +71,11 @@ class RequirementApiImpl implements RequirementApi {
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ requirement: Requirement }>(
+      return await httpClient.get<Requirement>(
         `/requirements/${requirementId}`
       );
     });
-    const requirement: Requirement = (result as any).requirement || result;
+    const requirement = unwrapField<Requirement>(result, 'requirement');
     cache.set(cacheKey, requirement);
     return requirement;
   }
@@ -83,12 +84,12 @@ class RequirementApiImpl implements RequirementApi {
     requirement: RequirementCreate
   ): Promise<Requirement> {
     const result = await retry.execute(async () => {
-      return await httpClient.post<{ requirement: Requirement }>(
+      return await httpClient.post<Requirement>(
         '/requirements',
         requirement
       );
     });
-    const created: Requirement = (result as any).requirement || result;
+    const created = unwrapField<Requirement>(result, 'requirement');
     cache.remove(getCacheKey('requirements', requirement.userId));
     return created;
   }
@@ -99,12 +100,12 @@ class RequirementApiImpl implements RequirementApi {
     userId?: string
   ): Promise<Requirement> {
     const result = await retry.execute(async () => {
-      return await httpClient.put<{ requirement: Requirement }>(
+      return await httpClient.put<Requirement>(
         `/requirements/${requirementId}`,
         data
       );
     });
-    const requirement: Requirement = (result as any).requirement || result;
+    const requirement = unwrapField<Requirement>(result, 'requirement');
     cache.remove(getCacheKey('requirement', requirementId));
     if (userId) {
       cache.remove(getCacheKey('requirements', userId));
@@ -128,11 +129,11 @@ class RequirementApiImpl implements RequirementApi {
 
   async analyzeRequirement(requirementId: string): Promise<Requirement> {
     const result = await retry.execute(async () => {
-      return await httpClient.post<{ requirement: Requirement }>(
+      return await httpClient.post<Requirement>(
         `/requirements/${requirementId}/analyze`
       );
     });
-    const requirement: Requirement = (result as any).requirement || result;
+    const requirement = unwrapField<Requirement>(result, 'requirement');
     cache.remove(getCacheKey('requirement', requirementId));
     return requirement;
   }
@@ -142,12 +143,12 @@ class RequirementApiImpl implements RequirementApi {
     context?: Record<string, unknown>
   ): Promise<Requirement> {
     const result = await retry.execute(async () => {
-      return await httpClient.post<{ requirement: Requirement }>(
+      return await httpClient.post<Requirement>(
         `/requirements/${requirementId}/reanalyze`,
         context
       );
     });
-    const requirement: Requirement = (result as any).requirement || result;
+    const requirement = unwrapField<Requirement>(result, 'requirement');
     cache.remove(getCacheKey('requirement', requirementId));
     return requirement;
   }
@@ -163,12 +164,11 @@ class RequirementApiImpl implements RequirementApi {
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ analysisResult: AnalysisResult }>(
+      return await httpClient.get<AnalysisResult>(
         `/requirements/${requirementId}/analysis`
       );
     });
-    const analysisResult: AnalysisResult =
-      (result as any).analysisResult || result;
+    const analysisResult = unwrapField<AnalysisResult>(result, 'analysisResult');
     cache.set(cacheKey, analysisResult);
     return analysisResult;
   }

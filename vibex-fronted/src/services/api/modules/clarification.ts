@@ -2,6 +2,7 @@ import { Clarification } from '../types/prototype/ui-schema';
 import { httpClient } from '../client';
 import { retry } from '../retry';
 import { cache, getCacheKey } from '../cache';
+import { unwrapField } from '../unwrappers';
 
 // ==================== 接口定义 ====================
 
@@ -37,13 +38,12 @@ class ClarificationApiImpl implements ClarificationApi {
     }
 
     const result = await retry.execute(async () => {
-      const response = await httpClient.get<{
-        clarifications: Clarification[];
-      }>(`/requirements/${requirementId}/clarifications`);
+      const response = await httpClient.get<Clarification[]>(
+        `/requirements/${requirementId}/clarifications`
+      );
       return response;
     });
-    const clarifications: Clarification[] =
-      (result as any).clarifications || result;
+    const clarifications = unwrapField<Clarification[]>(result, 'clarifications');
     cache.set(cacheKey, clarifications);
     return clarifications;
   }
@@ -54,14 +54,13 @@ class ClarificationApiImpl implements ClarificationApi {
     answer: string
   ): Promise<Clarification> {
     const result = await retry.execute(async () => {
-      const response = await httpClient.put<{ clarification: Clarification }>(
+      const response = await httpClient.put<Clarification>(
         `/clarifications/${clarificationId}`,
         { answer }
       );
       return response;
     });
-    const clarification: Clarification =
-      (result as any).clarification || result;
+    const clarification = unwrapField<Clarification>(result, 'clarification');
     cache.remove(getCacheKey('clarifications', requirementId));
     cache.remove(getCacheKey('requirement', requirementId));
     return clarification;
@@ -72,14 +71,13 @@ class ClarificationApiImpl implements ClarificationApi {
     clarificationId: string
   ): Promise<Clarification> {
     const result = await retry.execute(async () => {
-      const response = await httpClient.put<{ clarification: Clarification }>(
+      const response = await httpClient.put<Clarification>(
         `/clarifications/${clarificationId}`,
         { status: 'skipped' }
       );
       return response;
     });
-    const clarification: Clarification =
-      (result as any).clarification || result;
+    const clarification = unwrapField<Clarification>(result, 'clarification');
     cache.remove(getCacheKey('clarifications', requirementId));
     return clarification;
   }

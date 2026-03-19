@@ -8,7 +8,7 @@
 
 import { useState, useMemo } from 'react';
 import { useMachine } from '@xstate/react';
-import { flowMachine, BoundedContext } from '../flow-container/flowMachine';
+import { flowMachine, BoundedContext, FlowEvent } from '../flow-container/flowMachine';
 import styles from './BoundedContextStep.module.css';
 
 // AI-detected bounded context templates
@@ -31,7 +31,7 @@ export function BoundedContextStep() {
     : TEMPLATE_CONTEXTS.map((t, i) => ({ ...t, id: `ctx-${i}` }));
 
   const handleToggle = (id: string) => {
-    send({ type: 'TOGGLE_CONTEXT', id } as any);
+    send({ type: 'TOGGLE_CONTEXT', id } as FlowEvent);
   };
 
   const handleAddContext = () => {
@@ -45,13 +45,13 @@ export function BoundedContextStep() {
       selected: false,
     };
     
-    send({ type: 'ADD_CONTEXT', context: newContext } as any);
+    send({ type: 'ADD_CONTEXT', context: newContext } as FlowEvent);
     setNewContextName('');
     setNewContextDesc('');
   };
 
   const handleRemove = (id: string) => {
-    send({ type: 'REMOVE_CONTEXT', id } as any);
+    send({ type: 'REMOVE_CONTEXT', id } as FlowEvent);
   };
 
   // Dependency visualization

@@ -3,6 +3,7 @@ import { SuccessResponse } from '../types/common';
 import { httpClient } from '../client';
 import { retry } from '../retry';
 import { cache, getCacheKey } from '../cache';
+import { unwrapField } from '../unwrappers';
 
 // ==================== 接口定义 ====================
 
@@ -31,11 +32,11 @@ class MessageApiImpl implements MessageApi {
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ messages: Message[] }>('/messages', {
+      return await httpClient.get<Message[]>('/messages', {
         params: { projectId },
       });
     });
-    const messages: Message[] = (result as any).messages || result;
+    const messages = unwrapField<Message[]>(result, 'messages');
     cache.set(cacheKey, messages);
     return messages;
   }

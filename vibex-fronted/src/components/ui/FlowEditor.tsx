@@ -26,6 +26,7 @@ import ReactFlow, {
   EdgeChange,
   Viewport,
   FitViewOptions,
+  ReactFlowInstance,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import styles from './FlowEditor.module.css';
@@ -174,15 +175,14 @@ function FlowEditorInner({
 
   // Initialize with fitView or default viewport
   const handleInit = useCallback(
-    (instance: unknown) => {
-      const flowInstance = instance as any;
+    (instance: ReactFlowInstance) => {
       if (onInit) {
         onInit(instance);
       }
       if (defaultViewport) {
-        flowInstance.setViewport?.(defaultViewport);
+        instance.setViewport?.(defaultViewport);
       } else if (fitView) {
-        setTimeout(() => flowInstance.fitView?.(fitViewOptions), 100);
+        setTimeout(() => instance.fitView?.(fitViewOptions), 100);
       }
     },
     [onInit, defaultViewport, fitView, fitViewOptions]

@@ -3,6 +3,7 @@ import { SuccessResponse } from '../types/common';
 import { httpClient } from '../client';
 import { retry } from '../retry';
 import { cache, getCacheKey } from '../cache';
+import { unwrapField } from '../unwrappers';
 
 // ==================== 接口定义 ====================
 
@@ -33,11 +34,11 @@ class PageApiImpl implements PageApi {
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ pages: Page[] }>('/pages', {
+      return await httpClient.get<Page[]>('/pages', {
         params: { projectId },
       });
     });
-    const pages: Page[] = (result as any).pages || result;
+    const pages = unwrapField<Page[]>(result, 'pages');
     cache.set(cacheKey, pages);
     return pages;
   }
@@ -51,18 +52,18 @@ class PageApiImpl implements PageApi {
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ page: Page }>(`/pages/${pageId}`);
+      return await httpClient.get<Page>(`/pages/${pageId}`);
     });
-    const page: Page = (result as any).page || result;
+    const page = unwrapField<Page>(result, 'page');
     cache.set(cacheKey, page);
     return page;
   }
 
   async createPage(page: PageCreate): Promise<Page> {
     const result = await retry.execute(async () => {
-      return await httpClient.post<{ page: Page }>('/pages', page);
+      return await httpClient.post<Page>('/pages', page);
     });
-    const created: Page = (result as any).page || result;
+    const created = unwrapField<Page>(result, 'page');
     if (page.projectId) {
       cache.remove(getCacheKey('pages', page.projectId));
     }
@@ -71,9 +72,9 @@ class PageApiImpl implements PageApi {
 
   async updatePage(pageId: string, data: PageUpdate): Promise<Page> {
     const result = await retry.execute(async () => {
-      return await httpClient.put<{ page: Page }>(`/pages/${pageId}`, data);
+      return await httpClient.put<Page>(`/pages/${pageId}`, data);
     });
-    const page: Page = (result as any).page || result;
+    const page = unwrapField<Page>(result, 'page');
     cache.remove(getCacheKey('page', pageId));
     return page;
   }

@@ -3,6 +3,7 @@ import { SuccessResponse } from '../types/common';
 import { httpClient } from '../client';
 import { retry } from '../retry';
 import { cache, getCacheKey } from '../cache';
+import { unwrapField } from '../unwrappers';
 
 // ==================== 接口定义 ====================
 
@@ -43,12 +44,11 @@ class EntityRelationApiImpl implements EntityRelationApi {
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ entityRelations: EntityRelation[] }>(
+      return await httpClient.get<EntityRelation[]>(
         `/entity-relations?requirementId=${requirementId}`
       );
     });
-    const relations: EntityRelation[] =
-      (result as any).entityRelations || result;
+    const relations = unwrapField<EntityRelation[]>(result, 'entityRelations');
     cache.set(cacheKey, relations);
     return relations;
   }
@@ -62,11 +62,11 @@ class EntityRelationApiImpl implements EntityRelationApi {
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ entityRelation: EntityRelation }>(
+      return await httpClient.get<EntityRelation>(
         `/entity-relations/${relationId}`
       );
     });
-    const relation: EntityRelation = (result as any).entityRelation || result;
+    const relation = unwrapField<EntityRelation>(result, 'entityRelation');
     cache.set(cacheKey, relation);
     return relation;
   }
@@ -76,12 +76,12 @@ class EntityRelationApiImpl implements EntityRelationApi {
     requirementId?: string
   ): Promise<EntityRelation> {
     const result = await retry.execute(async () => {
-      return await httpClient.post<{ entityRelation: EntityRelation }>(
+      return await httpClient.post<EntityRelation>(
         '/entity-relations',
         relation
       );
     });
-    const created: EntityRelation = (result as any).entityRelation || result;
+    const created = unwrapField<EntityRelation>(result, 'entityRelation');
     if (requirementId) {
       cache.remove(getCacheKey('entity_relations', requirementId));
     }
@@ -94,12 +94,12 @@ class EntityRelationApiImpl implements EntityRelationApi {
     requirementId?: string
   ): Promise<EntityRelation> {
     const result = await retry.execute(async () => {
-      return await httpClient.put<{ entityRelation: EntityRelation }>(
+      return await httpClient.put<EntityRelation>(
         `/entity-relations/${relationId}`,
         data
       );
     });
-    const relation: EntityRelation = (result as any).entityRelation || result;
+    const relation = unwrapField<EntityRelation>(result, 'entityRelation');
     if (requirementId) {
       cache.remove(getCacheKey('entity_relations', requirementId));
     }

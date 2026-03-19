@@ -29,7 +29,7 @@ export function OnboardingProgressBar() {
     return null;
   }
 
-  const currentIndex = getStepIndex(currentStep as any);
+  const currentIndex = getStepIndex(currentStep);
   const totalSteps = ONBOARDING_STEPS.length;
   
   // 计算进度百分比

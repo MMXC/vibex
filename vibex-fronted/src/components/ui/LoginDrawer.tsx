@@ -12,6 +12,7 @@
 import { useState, useEffect } from 'react';
 import styles from './LoginDrawer.module.css';
 import { useAuthStore } from '@/stores/authStore';
+import { AuthResponse } from '@/services/api/types/auth';
 
 interface LoginDrawerProps {
   /** 是否显示 */
@@ -56,11 +57,11 @@ export function LoginDrawer({ isOpen, onClose, onSuccess }: LoginDrawerProps) {
 
       let token: string;
       if (isLogin) {
-        const result = await apiService.login({ email, password });
-        token = result.token || result.access_token || (result as any).token;
+        const result: AuthResponse = await apiService.login({ email, password });
+        token = result.token;
       } else {
-        const result = await apiService.register({ name, email, password });
-        token = result.token || result.access_token || (result as any).token;
+        const result: AuthResponse = await apiService.register({ name, email, password });
+        token = result.token;
       }
 
       // 保存 token 到 localStorage

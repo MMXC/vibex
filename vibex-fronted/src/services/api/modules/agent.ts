@@ -3,6 +3,7 @@ import { SuccessResponse } from '../types/common';
 import { httpClient } from '../client';
 import { retry } from '../retry';
 import { cache, getCacheKey } from '../cache';
+import { unwrapField } from '../unwrappers';
 
 // ==================== 接口定义 ====================
 
@@ -33,10 +34,10 @@ class AgentApiImpl implements AgentApi {
     }
 
     return retry.execute(async () => {
-      const response = await httpClient.get<{ agents: Agent[] }>('/agents', {
+      const response = await httpClient.get<Agent[]>('/agents', {
         params: { userId },
       });
-      const agents: Agent[] = (response as any).agents || response;
+      const agents = unwrapField<Agent[]>(response, 'agents');
       cache.set(cacheKey, agents);
       return agents;
     });
@@ -51,10 +52,8 @@ class AgentApiImpl implements AgentApi {
     }
 
     return retry.execute(async () => {
-      const response = await httpClient.get<{ agent: Agent }>(
-        `/agents/${agentId}`
-      );
-      const agent: Agent = (response as any).agent || response;
+      const response = await httpClient.get<Agent>(`/agents/${agentId}`);
+      const agent = unwrapField<Agent>(response, 'agent');
       cache.set(cacheKey, agent);
       return agent;
     });
@@ -62,11 +61,8 @@ class AgentApiImpl implements AgentApi {
 
   async createAgent(agent: AgentCreate): Promise<Agent> {
     return retry.execute(async () => {
-      const response = await httpClient.post<{ agent: Agent }>(
-        '/agents',
-        agent
-      );
-      const created: Agent = (response as any).agent || response;
+      const response = await httpClient.post<Agent>('/agents', agent);
+      const created = unwrapField<Agent>(response, 'agent');
       cache.remove(getCacheKey('agents', agent.userId));
       return created;
     });
@@ -74,11 +70,11 @@ class AgentApiImpl implements AgentApi {
 
   async updateAgent(agentId: string, data: AgentUpdate): Promise<Agent> {
     return retry.execute(async () => {
-      const response = await httpClient.put<{ agent: Agent }>(
+      const response = await httpClient.put<Agent>(
         `/agents/${agentId}`,
         data
       );
-      const agent: Agent = (response as any).agent || response;
+      const agent = unwrapField<Agent>(response, 'agent');
       cache.remove(getCacheKey('agent', agentId));
       return agent;
     });

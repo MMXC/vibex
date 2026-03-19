@@ -3,6 +3,7 @@ import { SuccessResponse } from '../types/common';
 import { httpClient } from '../client';
 import { retry } from '../retry';
 import { cache, getCacheKey } from '../cache';
+import { unwrapField } from '../unwrappers';
 
 // ==================== 接口定义 ====================
 
@@ -41,11 +42,11 @@ class DomainEntityApiImpl implements DomainEntityApi {
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ domainEntities: DomainEntity[] }>(
+      return await httpClient.get<DomainEntity[]>(
         `/domain-entities?requirementId=${requirementId}`
       );
     });
-    const entities: DomainEntity[] = (result as any).domainEntities || result;
+    const entities = unwrapField<DomainEntity[]>(result, 'domainEntities');
     cache.set(cacheKey, entities);
     return entities;
   }
@@ -59,11 +60,9 @@ class DomainEntityApiImpl implements DomainEntityApi {
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ domain: DomainEntity }>(
-        `/domains/${entityId}`
-      );
+      return await httpClient.get<DomainEntity>(`/domains/${entityId}`);
     });
-    const entity: DomainEntity = (result as any).domain || result;
+    const entity = unwrapField<DomainEntity>(result, 'domain');
     cache.set(cacheKey, entity);
     return entity;
   }
@@ -72,12 +71,12 @@ class DomainEntityApiImpl implements DomainEntityApi {
     entity: Omit<DomainEntity, 'id' | 'createdAt'>
   ): Promise<DomainEntity> {
     const result = await retry.execute(async () => {
-      return await httpClient.post<{ domain: DomainEntity }>(
+      return await httpClient.post<DomainEntity>(
         `/requirements/${entity.requirementId}/domains`,
         entity
       );
     });
-    const created: DomainEntity = (result as any).domain || result;
+    const created = unwrapField<DomainEntity>(result, 'domain');
     cache.remove(getCacheKey('domain_entities', entity.requirementId));
     return created;
   }
@@ -87,12 +86,12 @@ class DomainEntityApiImpl implements DomainEntityApi {
     data: Partial<DomainEntity>
   ): Promise<DomainEntity> {
     const result = await retry.execute(async () => {
-      return await httpClient.put<{ domain: DomainEntity }>(
+      return await httpClient.put<DomainEntity>(
         `/domains/${entityId}`,
         data
       );
     });
-    const entity: DomainEntity = (result as any).domain || result;
+    const entity = unwrapField<DomainEntity>(result, 'domain');
     if (data.requirementId) {
       cache.remove(getCacheKey('domain_entities', data.requirementId));
     }

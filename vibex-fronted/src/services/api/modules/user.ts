@@ -2,6 +2,7 @@ import { User, UserUpdate } from '../types/user';
 import { httpClient } from '../client';
 import { retry } from '../retry';
 import { cache, getCacheKey } from '../cache';
+import { unwrapField } from '../unwrappers';
 
 // ==================== 接口定义 ====================
 
@@ -22,8 +23,8 @@ class UserApiImpl implements UserApi {
     }
 
     return retry.execute(async () => {
-      const response = await httpClient.get<{ user: User }>(`/users/${userId}`);
-      const user: User = (response as any).user || response;
+      const response = await httpClient.get<User>(`/users/${userId}`);
+      const user = unwrapField<User>(response, 'user');
       cache.set(cacheKey, user);
       return user;
     });
@@ -31,11 +32,8 @@ class UserApiImpl implements UserApi {
 
   async updateUser(userId: string, data: UserUpdate): Promise<User> {
     return retry.execute(async () => {
-      const response = await httpClient.put<{ user: User }>(
-        `/users/${userId}`,
-        data
-      );
-      const user: User = (response as any).user || response;
+      const response = await httpClient.put<User>(`/users/${userId}`, data);
+      const user = unwrapField<User>(response, 'user');
       cache.remove(getCacheKey('user', userId));
       return user;
     });

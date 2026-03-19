@@ -6,6 +6,7 @@ import { SuccessResponse } from '../types/common';
 import { httpClient } from '../client';
 import { retry } from '../retry';
 import { cache, getCacheKey } from '../cache';
+import { unwrapField } from '../unwrappers';
 
 // ==================== 接口定义 ====================
 
@@ -44,12 +45,11 @@ class PrototypeApiImpl implements PrototypeApi {
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ prototypeSnapshots: PrototypeSnapshot[] }>(
+      return await httpClient.get<PrototypeSnapshot[]>(
         `/prototype-snapshots?projectId=${projectId}`
       );
     });
-    const snapshots: PrototypeSnapshot[] =
-      (result as any).prototypeSnapshots || result;
+    const snapshots = unwrapField<PrototypeSnapshot[]>(result, 'prototypeSnapshots');
     cache.set(cacheKey, snapshots);
     return snapshots;
   }
@@ -63,12 +63,11 @@ class PrototypeApiImpl implements PrototypeApi {
     }
 
     const result = await retry.execute(async () => {
-      return await httpClient.get<{ prototypeSnapshot: PrototypeSnapshot }>(
+      return await httpClient.get<PrototypeSnapshot>(
         `/prototype-snapshots/${snapshotId}`
       );
     });
-    const snapshot: PrototypeSnapshot =
-      (result as any).prototypeSnapshot || result;
+    const snapshot = unwrapField<PrototypeSnapshot>(result, 'prototypeSnapshot');
     cache.set(cacheKey, snapshot);
     return snapshot;
   }
@@ -77,13 +76,12 @@ class PrototypeApiImpl implements PrototypeApi {
     snapshot: PrototypeSnapshotCreate
   ): Promise<PrototypeSnapshot> {
     const result = await retry.execute(async () => {
-      return await httpClient.post<{ prototypeSnapshot: PrototypeSnapshot }>(
+      return await httpClient.post<PrototypeSnapshot>(
         `/prototype-snapshots`,
         snapshot
       );
     });
-    const created: PrototypeSnapshot =
-      (result as any).prototypeSnapshot || result;
+    const created = unwrapField<PrototypeSnapshot>(result, 'prototypeSnapshot');
     cache.remove(getCacheKey('prototype_snapshots', snapshot.projectId));
     return created;
   }
@@ -93,12 +91,12 @@ class PrototypeApiImpl implements PrototypeApi {
     data: Partial<PrototypeSnapshotCreate>
   ): Promise<PrototypeSnapshot> {
     const result = await retry.execute(async () => {
-      return await httpClient.put<{ prototypeSnapshot: PrototypeSnapshot }>(
+      return await httpClient.put<PrototypeSnapshot>(
         `/prototype-snapshots/${snapshotId}`,
         data
       );
     });
-    return (result as any).prototypeSnapshot || result;
+    return unwrapField<PrototypeSnapshot>(result, 'prototypeSnapshot');
   }
 
   async deletePrototypeSnapshot(

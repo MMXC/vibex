@@ -52,10 +52,10 @@ export function OnboardingModal() {
 
   const handleStepClick = useCallback(
     (stepId: string) => {
-      const stepIndex = ONBOARDING_STEPS.findIndex((s) => s.id === stepId);
-      if (stepIndex < currentIndex) {
+      const step = ONBOARDING_STEPS.find((s) => s.id === stepId);
+      if (step && ONBOARDING_STEPS.findIndex((s) => s.id === stepId) < currentIndex) {
         // 可以后退到已完成的步骤
-        useOnboardingStore.getState().goToStep(stepId as any);
+        useOnboardingStore.getState().goToStep(step.id);
       }
     },
     [currentIndex]

@@ -8,7 +8,7 @@
 
 import { useState, useEffect } from 'react';
 import { useMachine } from '@xstate/react';
-import { flowMachine } from '../flow-container/flowMachine';
+import { flowMachine, FlowEvent } from '../flow-container/flowMachine';
 import styles from './RequirementsStep.module.css';
 
 const EXAMPLE_PROMPTS = [
@@ -38,7 +38,7 @@ export function RequirementsStep() {
     setIsSubmitting(true);
     
     // Send to state machine
-    send({ type: 'SET_REQUIREMENTS', requirements } as any);
+    send({ type: 'SET_REQUIREMENTS', requirements } as FlowEvent);
     
     // Auto-analyze examples (mock AI suggestion)
     const detectedExamples = EXAMPLE_PROMPTS.filter(
@@ -46,16 +46,16 @@ export function RequirementsStep() {
     );
     
     if (detectedExamples.length > 0) {
-      send({ type: 'SET_EXAMPLES', examples: detectedExamples.slice(0, 3) } as any);
+      send({ type: 'SET_EXAMPLES', examples: detectedExamples.slice(0, 3) } as FlowEvent);
     }
     
     // Save to persistence
-    send({ type: 'SAVE' } as any);
+    send({ type: 'SAVE' } as FlowEvent);
     
     setIsSubmitting(false);
     
     // Auto-advance to next step
-    send({ type: 'GO_NEXT' } as any);
+    send({ type: 'GO_NEXT' } as FlowEvent);
   };
 
   return (

@@ -3,6 +3,7 @@ import { User } from '../types/user';
 import { SuccessResponse } from '../types/common';
 import { httpClient } from '../client';
 import { retry } from '../retry';
+import { unwrapData } from '../unwrappers';
 
 // ==================== 接口定义 ====================
 
@@ -18,13 +19,13 @@ export interface AuthApi {
 class AuthApiImpl implements AuthApi {
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     const result = await retry.execute(async () => {
-      const response = await httpClient.post<{ data: AuthResponse }>(
+      const response = await httpClient.post<AuthResponse>(
         '/auth/login',
         credentials
       );
       return response;
     });
-    const data: AuthResponse = (result as any).data || result;
+    const data = unwrapData<AuthResponse>(result);
 
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('auth_token', data.token);
@@ -36,13 +37,13 @@ class AuthApiImpl implements AuthApi {
 
   async register(data: RegisterRequest): Promise<AuthResponse> {
     const result = await retry.execute(async () => {
-      const response = await httpClient.post<{ data: AuthResponse }>(
+      const response = await httpClient.post<AuthResponse>(
         '/auth/register',
         data
       );
       return response;
     });
-    const authResult: AuthResponse = (result as any).data || result;
+    const authResult = unwrapData<AuthResponse>(result);
 
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('auth_token', authResult.token);
@@ -54,10 +55,10 @@ class AuthApiImpl implements AuthApi {
 
   async getCurrentUser(): Promise<User> {
     const result = await retry.execute(async () => {
-      const response = await httpClient.get<{ data: User }>('/auth/me');
+      const response = await httpClient.get<User>('/auth/me');
       return response;
     });
-    return (result as any).data || result;
+    return unwrapData<User>(result);
   }
 
   async logout(): Promise<SuccessResponse> {

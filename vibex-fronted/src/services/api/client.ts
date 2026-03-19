@@ -70,8 +70,10 @@ export function createHttpClient(config?: HttpClientConfig): HttpClient {
             ? sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token')
             : null;
         if (token) {
-          (config.headers as any) = (config.headers as any) || {};
-          (config.headers as any).Authorization = `Bearer ${token}`;
+          if (!config.headers) {
+            config.headers = {} as InternalAxiosRequestConfig['headers'];
+          }
+          config.headers['Authorization'] = `Bearer ${token}`;
         }
         return config;
       },

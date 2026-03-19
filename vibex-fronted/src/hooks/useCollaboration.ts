@@ -56,8 +56,7 @@ export function useCollaboration(options: UseCollaborationOptions = {}): UseColl
 
   // 初始化 MessageRouter
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    routerRef.current = new MessageRouter({} as any);
+    routerRef.current = new MessageRouter();
 
     // 订阅消息
     routerRef.current.subscribe('cursor', (msg) => onMessage?.(msg));
@@ -108,7 +107,7 @@ export function useCollaboration(options: UseCollaborationOptions = {}): UseColl
       ws.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data) as WebSocketMessage;
-          routerRef.current?.subscribe(message.type as any, () => {});
+          routerRef.current?.subscribe(message.type, () => {});
         } catch (e) {
           console.error('Failed to parse message:', e);
         }

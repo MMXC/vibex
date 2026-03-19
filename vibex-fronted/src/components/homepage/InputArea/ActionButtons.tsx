@@ -34,10 +34,9 @@ export interface ActionButtonsProps {
 }
 
 // 三步流程按钮配置 (二阶段重构)
-// 修复: 更直观的按钮文案
 const DYNAMIC_BUTTON_CONFIG: Record<number, { label: string; icon: string }> = {
-  1: { label: '开始分析', icon: '🔍' },  // 改为"开始分析"更直观
-  2: { label: '生成UI组件', icon: '🏗️' },
+  1: { label: '业务流程分析', icon: '🔍' },
+  2: { label: 'UI组件分析', icon: '🏗️' },
   3: { label: '创建项目', icon: '🚀' },
 };
 

@@ -4,12 +4,13 @@
  * 统一封装所有 API 错误信息
  */
 
-import { 
-  ErrorCode, 
-  ErrorMessage, 
+import {
+  ErrorCode,
+  ErrorMessage,
   mapHttpStatusToCode,
-  isRetryable 
+  isRetryable
 } from './ErrorCode';
+import type { AxiosError } from 'axios';
 
 /**
  * API 错误类
@@ -160,20 +161,20 @@ export class ApiError extends Error {
     
     if (error instanceof Error) {
       // 检查是否是 axios 错误
-      const axiosError = error as any;
+      const axiosError = error as AxiosError;
       if (axiosError.response) {
         // HTTP 响应错误
-        const { status, data } = axiosError.response;
-        const message = data?.error || data?.message || error.message;
+        const { status, data } = axiosError.response as { status: number; data: Record<string, unknown> };
+        const message = String(data?.error || data?.message || (error as Error).message);
         return ApiError.fromHttpStatus(status, message, data);
       }
       
-      if (axiosError.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+      if (axiosError.code === 'ECONNABORTED' || (error as Error).message.includes('timeout')) {
         return ApiError.timeout();
       }
       
       // 网络错误
-      return ApiError.networkError(error.message);
+      return ApiError.networkError((error as Error).message);
     }
     
     // 未知错误

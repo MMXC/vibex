@@ -40,6 +40,8 @@ export interface RenderableComponent {
   style?: Record<string, unknown>;
   type?: string;
   content?: string;
+  placeholder?: string;
+  label?: string;
 }
 
 const EXPORT_FORMATS: { value: ExportFormat; label: string; icon: string }[] = [

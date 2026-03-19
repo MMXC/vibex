@@ -70,7 +70,7 @@ export function PrototypePreview({
       >
         <div className={styles.componentContent}>
           <span className={styles.componentType}>{component.type}</span>
-          {component.props.label && (
+          {!!component.props.label && (
             <span className={styles.componentLabel}>{String(component.props.label)}</span>
           )}
         </div>

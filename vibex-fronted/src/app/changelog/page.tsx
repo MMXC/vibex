@@ -18,13 +18,21 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.50',
+    date: '2026-03-20',
+    changes: [
+      '🪝 OnboardingProgressBar Hooks 修复 F1.4: early return 移至所有 hooks 之后（Rules of Hooks 合规）',
+    ],
+    commit: '0353e33',
+  },
+  {
     version: '1.0.49',
     date: '2026-03-20',
     changes: [
       '🪝 OnboardingProgressBar Hooks 修复: 移除 as any 类型断言',
       '✅ exhaustive-deps 规则通过: STEP_DURATIONS/ONBOARDING_STEPS 加入依赖',
     ],
-    commit: 'latest',
+    commit: 'bc38b6d',
   },
   {
     version: '1.0.48',

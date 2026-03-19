@@ -81,7 +81,7 @@ export default function ModelPage() {
           
           if (response && response.success) {
             // 即使 domainModels 为 null 也视为成功，设置为空数组
-            setDomainModels(Array.isArray(domainModels) ? domainModels as DomainModel[] : []);
+            setDomainModels(Array.isArray(domainModels) ? domainModels as unknown as DomainModel[] : []);
             if (response.mermaidCode) {
               setModelMermaidCode(response.mermaidCode);
             }

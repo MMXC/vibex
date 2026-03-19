@@ -162,7 +162,7 @@ test.describe('Particle Effects', () => {
         particleState.visibility === 'hidden';
       
       // Also acceptable: particles have opacity < 1 (faded)
-      const isFaded = parseFloat(particleState.opacity) < 1;
+      const isFaded = particleState.opacity !== undefined && parseFloat(particleState.opacity) < 1;
       
       expect(isMinimized || isFaded).toBeTruthy();
     }

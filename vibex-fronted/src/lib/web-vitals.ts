@@ -115,7 +115,7 @@ function reportWebVitals(metric: WebVitalsMetric) {
     // 尝试发送到 Sentry
     try {
       // 方法1: 使用 navigator.sendBeacon (推荐, 不阻塞)
-      if (navigator.sendBeacon) {
+      if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
         // 注意: 实际项目中应该替换为真实的 Sentry DSN
         // navigator.sendBeacon('/api/vitals', JSON.stringify(data));
       }
@@ -322,7 +322,7 @@ export function getPerformanceSummary(): Record<string, { value: number; rating:
     // CLS
     const clsEntries = performance.getEntriesByType('layout-shift');
     let cls = 0;
-    clsEntries.forEach((entry: CLSEntry) => {
+    (clsEntries as CLSEntry[]).forEach((entry: CLSEntry) => {
       if (!entry.hadRecentInput) cls += entry.value;
     });
     summary.cls = { value: Math.round(cls * 1000) / 1000, rating: getRating('CLS', cls) };

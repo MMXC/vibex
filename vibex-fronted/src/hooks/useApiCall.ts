@@ -181,8 +181,8 @@ export function useApiCall<TArgs extends unknown[], TData>(
       
       // 缓存失效
       if (invalidateQueries) {
-        invalidateQueries.forEach((queryKey: unknown[]) => {
-          queryClient.invalidateQueries({ queryKey });
+        invalidateQueries.forEach((queryKey) => {
+          queryClient.invalidateQueries({ queryKey: queryKey as unknown[] });
         });
       }
     },

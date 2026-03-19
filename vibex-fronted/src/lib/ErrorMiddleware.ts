@@ -179,7 +179,7 @@ export function createErrorMiddleware(options: ErrorMiddlewareOptions = {}): {
 
     // 处理超时
     const controller = new AbortController();
-    let timeoutId: ReturnType<typeof setTimeout>;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     if (finalConfig.timeout) {
       timeoutId = setTimeout(() => controller.abort(), finalConfig.timeout);
     }

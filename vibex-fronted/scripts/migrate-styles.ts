@@ -100,7 +100,7 @@ function estimateConfidence(property: string, value: string): number {
  * 生成新样式值
  */
 function generateNewValue(property: string, oldValue: string): string | null {
-  const mapping = CONFIG.styleMappings[property];
+  const mapping = (CONFIG.styleMappings as Record<string, string | null>)[property];
   if (!mapping) return null;
 
   // 处理 spacing 类型的属性

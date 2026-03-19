@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { DomainModel } from '@/services/api/schemas';
 import { useRouter } from 'next/navigation';
 import styles from '../confirm.module.css';
-import { useConfirmationStore } from '@/stores/confirmationStore';
+import { useConfirmationStore, type DomainModel } from '@/stores/confirmationStore';
 import { useAutoSnapshot } from '@/hooks/useAutoSnapshot';
 import { useModelPageGuard, safeFilterContexts } from '@/hooks/useModelPageGuard';
 import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps';
@@ -80,8 +79,23 @@ export default function ModelPage() {
           const domainModels = response?.domainModels ?? null;
           
           if (response && response.success) {
-            // 即使 domainModels 为 null 也视为成功，设置为空数组
-            setDomainModels(Array.isArray(domainModels) ? domainModels as unknown as DomainModel[] : []);
+            // Transform API response to DomainModel type
+            const transformedModels: DomainModel[] = Array.isArray(domainModels)
+              ? domainModels.map((model: any) => ({
+                  id: String(model.id),
+                  name: String(model.name),
+                  contextId: selectedContexts[0]?.id || '',
+                  type: (model.type as DomainModel['type']) || 'entity',
+                  properties: (model.properties || []).map((attr: any) => ({
+                    name: String(attr.name),
+                    type: String(attr.type),
+                    required: attr.required ?? false,
+                    description: '',
+                  })),
+                  methods: [],
+                }))
+              : [];
+            setDomainModels(transformedModels);
             if (response.mermaidCode) {
               setModelMermaidCode(response.mermaidCode);
             }

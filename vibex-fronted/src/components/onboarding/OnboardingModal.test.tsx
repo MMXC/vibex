@@ -80,7 +80,7 @@ describe('OnboardingModal', () => {
   it('should call nextStep when next button clicked', () => {
     render(<OnboardingModal />);
     
-    const nextButton = screen.getByText('下一步');
+    const nextButton = screen.getByText(/下一步/);
     nextButton.click();
     
     expect(mockStore.nextStep).toHaveBeenCalled();
@@ -94,7 +94,7 @@ describe('OnboardingModal', () => {
 
     render(<OnboardingModal />);
     
-    expect(screen.getByText('上一步')).toBeInTheDocument();
+    expect(screen.getByText(/上一步/)).toBeInTheDocument();
   });
 
   it('should not show back button on first step', () => {

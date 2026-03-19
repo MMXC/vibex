@@ -10,7 +10,28 @@ import { useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOnboardingStore, ONBOARDING_STEPS } from '@/stores/onboarding';
 import { StepIndicator } from './StepIndicator';
+import {
+  WelcomeStep,
+  InputStep,
+  ClarifyStep,
+  ModelStep,
+  PreviewStep,
+} from './steps';
 import styles from './OnboardingModal.module.css';
+
+// Step component mapping
+const STEP_COMPONENTS: Record<string, React.ComponentType<{
+  onNext: () => void;
+  onPrev?: () => void;
+  onSkip: () => void;
+  isLastStep?: boolean;
+}>> = {
+  welcome: WelcomeStep,
+  input: InputStep,
+  clarify: ClarifyStep,
+  model: ModelStep,
+  prototype: PreviewStep,
+};
 
 export function OnboardingModal() {
   const {
@@ -96,42 +117,31 @@ export function OnboardingModal() {
               onStepClick={handleStepClick}
             />
 
-            {/* Step Content */}
+            {/* Step Content - render actual step component */}
             <div className={styles.content}>
-              <motion.div
-                key={currentStep}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className={styles.stepContent}
-              >
-                <div className={styles.stepIcon}>{currentStepInfo?.icon}</div>
-                <h2 className={styles.stepTitle}>{currentStepInfo?.title}</h2>
-                <p className={styles.stepDescription}>
-                  {currentStepInfo?.description}
-                </p>
-                {currentStepInfo?.duration && (
-                  <span className={styles.stepDuration}>
-                    预计时长: {currentStepInfo.duration}
-                  </span>
-                )}
-              </motion.div>
-            </div>
-
-            {/* Actions */}
-            <div className={styles.actions}>
-              {canGoBack && (
-                <button className={styles.backBtn} onClick={prevStep}>
-                  上一步
-                </button>
-              )}
-              <button className={styles.skipBtn} onClick={skip}>
-                跳过
-              </button>
-              <button className={styles.nextBtn} onClick={handleNext}>
-                {isLastStep ? '完成' : '下一步'}
-              </button>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentStep}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className={styles.stepContent}
+                >
+                  {(() => {
+                    const StepComponent = STEP_COMPONENTS[currentStep];
+                    if (!StepComponent) return null;
+                    return (
+                      <StepComponent
+                        onNext={handleNext}
+                        onPrev={canGoBack ? prevStep : undefined}
+                        onSkip={skip}
+                        isLastStep={isLastStep}
+                      />
+                    );
+                  })()}
+                </motion.div>
+              </AnimatePresence>
             </div>
           </motion.div>
         </div>

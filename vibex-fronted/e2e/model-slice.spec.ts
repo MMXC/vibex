@@ -226,7 +226,7 @@ describe('Model Slice (V1-V4)', () => {
       const { selectAggregateRoots } = require('@/stores/modelSlice');
       const result = selectAggregateRoots(useModelStore.getState());
       expect(result).toHaveLength(2);
-      expect(result.every(m => m.type === 'aggregate_root')).toBe(true);
+      expect(result.every((m: DomainModel) => m.type === 'aggregate_root')).toBe(true);
     });
 
     test('V2.4: selectEntities filters by type', () => {

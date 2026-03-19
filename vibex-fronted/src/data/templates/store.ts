@@ -49,15 +49,15 @@ interface TemplateStore {
 
 // 模板列表
 const ALL_TEMPLATES: RequirementTemplate[] = [
-  saasTemplate as RequirementTemplate,
-  ecommerceTemplate as RequirementTemplate,
-  fintechTemplate as RequirementTemplate,
-  healthcareTemplate as RequirementTemplate,
-  educationTemplate as RequirementTemplate,
-  socialTemplate as RequirementTemplate,
-  gameTemplate as RequirementTemplate,
-  iotTemplate as RequirementTemplate,
-  enterpriseTemplate as RequirementTemplate,
+  saasTemplate as unknown as RequirementTemplate,
+  ecommerceTemplate as unknown as RequirementTemplate,
+  fintechTemplate as unknown as RequirementTemplate,
+  healthcareTemplate as unknown as RequirementTemplate,
+  educationTemplate as unknown as RequirementTemplate,
+  socialTemplate as unknown as RequirementTemplate,
+  gameTemplate as unknown as RequirementTemplate,
+  iotTemplate as unknown as RequirementTemplate,
+  enterpriseTemplate as unknown as RequirementTemplate,
   mobileTemplate as RequirementTemplate,
 ];
 

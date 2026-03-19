@@ -170,12 +170,12 @@ export class RetryHandler {
    * 创建带取消的重试执行器
    */
   createCancellableExecutor(): {
-    execute: typeof this.execute;
+    execute: <T>(fn: () => Promise<T>) => Promise<RetryResult<T>>;
     cancel: () => void;
   } {
     let cancelled = false;
 
-    const execute: typeof this.execute = async <T>(fn: () => Promise<T>) => {
+    const execute = async <T>(fn: () => Promise<T>): Promise<RetryResult<T>> => {
       cancelled = false;
       return this.execute<T>(async () => {
         if (cancelled) {

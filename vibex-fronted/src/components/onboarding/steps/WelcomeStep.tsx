@@ -32,10 +32,11 @@ export function WelcomeStep({ onNext, onSkip }: StepContentProps) {
         className={styles.content}
       >
         <div className={styles.icon}>🎉</div>
-        <h2 className={styles.title}>欢迎使用 VibeX</h2>
+        <h2 className={styles.title}>欢迎使用</h2>
         <p className={styles.subtitle}>
           AI 驱动的协作式产品建模平台
         </p>
+        <p className={styles.duration}>预计时长: 1min</p>
 
         <div className={styles.features}>
           {features.map((feature, index) => (
@@ -60,7 +61,7 @@ export function WelcomeStep({ onNext, onSkip }: StepContentProps) {
             跳过介绍
           </button>
           <button className={styles.nextBtn} onClick={onNext}>
-            开始探索 →
+            下一步 →
           </button>
         </div>
       </motion.div>

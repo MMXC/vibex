@@ -110,7 +110,7 @@ export const useTemplateStore = create<TemplateState>()(
         // 记录使用
         get().recordUsage(template.id);
         // 返回模板内容
-        return template.content;
+        return template.content ?? '';
       },
       
       // 记录模板使用
@@ -207,9 +207,9 @@ function filterTemplates(
     const lowerQuery = query.toLowerCase();
     result = result.filter(t =>
       t.name.toLowerCase().includes(lowerQuery) ||
-      t.displayName.toLowerCase().includes(lowerQuery) ||
+      (t.displayName ?? '').toLowerCase().includes(lowerQuery) ||
       t.description.toLowerCase().includes(lowerQuery) ||
-      t.metadata.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+      (t.metadata?.tags ?? []).some((tag: string) => tag.toLowerCase().includes(lowerQuery))
     );
   }
   

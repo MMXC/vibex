@@ -67,7 +67,7 @@ export class LoginPage extends BasePage {
    * 获取错误信息
    */
   async getErrorMessage(): Promise<string> {
-    return this.errorMessage.textContent() || '';
+    return (await this.errorMessage.textContent()) || '';
   }
 
   /**

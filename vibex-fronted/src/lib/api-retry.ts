@@ -20,7 +20,7 @@ export interface RetryOptions {
   /** 重试条件函数 */
   retryCondition?: (error: AxiosError) => boolean;
   /** 重试回调 */
-  onRetry?: (retryCount: number, error: AxiosError, requestConfig: AxiosRequestConfig) => void;
+  onRetry?: ((retryCount: number, error: AxiosError, requestConfig: AxiosRequestConfig) => void) | undefined;
 }
 
 /**
@@ -131,7 +131,7 @@ export async function configureAxiosRetry(
 /**
  * 默认重试配置
  */
-export const DEFAULT_RETRY_OPTIONS: Required<RetryOptions> = {
+export const DEFAULT_RETRY_OPTIONS: RetryOptions = {
   retries: 3,
   retryDelay: 1000,
   maxRetryDelay: 10000,

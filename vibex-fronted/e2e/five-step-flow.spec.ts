@@ -80,7 +80,7 @@ test.describe('五步流程 E2E (Five-Step Flow)', () => {
     if (await step4.count() > 0 && await step5.count() > 0) {
       const step4Btn = await step4.evaluateHandle((el) => el.closest('button'));
       if (step4Btn && (await step4Btn.evaluate((btn) => (btn as HTMLElement).offsetWidth > 0))) {
-        await step4Btn.click();
+        await (await step4Btn.asElement())?.click();
         await page.waitForTimeout(300);
       }
     }

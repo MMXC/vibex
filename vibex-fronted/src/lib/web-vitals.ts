@@ -13,6 +13,31 @@
 
 import { captureMessage } from './sentry';
 
+// PerformanceObserver entry type definitions (not in standard DOM lib)
+interface LCPEntry extends PerformanceEntry {
+  renderTime: number;
+  loadTime: number;
+  size: number;
+  element?: Element;
+}
+
+interface CLSEntry extends PerformanceEntry {
+  value: number;
+  hadRecentInput: boolean;
+}
+
+interface FIDEntry extends PerformanceEntry {
+  processingStart: number;
+  processingEnd: number;
+  interactionId: number;
+}
+
+interface NavTimingEntry extends PerformanceEntry {
+  responseStart: number;
+  responseEnd: number;
+  domInteractive: number;
+}
+
 export interface WebVitalsMetric {
   id: string;
   name: string;
@@ -115,7 +140,7 @@ export function initWebVitals() {
     try {
       const lcpObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        const lastEntry = entries[entries.length - 1] as any;
+        const lastEntry = entries[entries.length - 1] as LCPEntry;
         
         if (lastEntry) {
           const metric: WebVitalsMetric = {
@@ -141,7 +166,7 @@ export function initWebVitals() {
     try {
       let clsValue = 0;
       const clsObserver = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries() as any) {
+        for (const entry of list.getEntries() as CLSEntry[]) {
           if (!entry.hadRecentInput) {
             clsValue += entry.value;
           }
@@ -169,7 +194,7 @@ export function initWebVitals() {
     try {
       const fidObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        const firstEntry = entries[0] as any;
+        const firstEntry = entries[0] as FIDEntry;
         
         if (firstEntry && firstEntry.processingStart) {
           const metric: WebVitalsMetric = {
@@ -195,7 +220,7 @@ export function initWebVitals() {
     try {
       let inpValue = 0;
       const inpObserver = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries() as any) {
+        for (const entry of list.getEntries() as FIDEntry[]) {
           if (entry.interactionId) {
             const value = entry.duration;
             if (value > inpValue) {
@@ -227,7 +252,7 @@ export function initWebVitals() {
   try {
     const fcpObserver = new PerformanceObserver((list) => {
       const entries = list.getEntries();
-      const fcpEntry = entries[0] as any;
+      const fcpEntry = entries[0] as PerformanceEntry;
       
       if (fcpEntry && fcpEntry.name === 'first-contentful-paint') {
         const metric: WebVitalsMetric = {
@@ -253,7 +278,7 @@ export function initWebVitals() {
   try {
     const navigationEntries = performance.getEntriesByType('navigation');
     if (navigationEntries.length > 0) {
-      const navEntry = navigationEntries[0] as any;
+      const navEntry = navigationEntries[0] as NavTimingEntry;
       const ttfb = navEntry.responseStart;
       
       if (ttfb > 0) {
@@ -289,14 +314,15 @@ export function getPerformanceSummary(): Record<string, { value: number; rating:
     // LCP
     const lcpEntries = performance.getEntriesByType('largest-contentful-paint');
     if (lcpEntries.length > 0) {
-      const lcp = (lcpEntries[lcpEntries.length - 1] as any).renderTime || (lcpEntries[lcpEntries.length - 1] as any).loadTime;
+      const lastLcp = lcpEntries[lcpEntries.length - 1] as LCPEntry;
+      const lcp = lastLcp.renderTime || lastLcp.loadTime;
       summary.lcp = { value: Math.round(lcp), rating: getRating('LCP', lcp) };
     }
     
     // CLS
     const clsEntries = performance.getEntriesByType('layout-shift');
     let cls = 0;
-    clsEntries.forEach((entry: any) => {
+    clsEntries.forEach((entry: CLSEntry) => {
       if (!entry.hadRecentInput) cls += entry.value;
     });
     summary.cls = { value: Math.round(cls * 1000) / 1000, rating: getRating('CLS', cls) };
@@ -304,7 +330,7 @@ export function getPerformanceSummary(): Record<string, { value: number; rating:
     // TTFB
     const navEntries = performance.getEntriesByType('navigation');
     if (navEntries.length > 0) {
-      const ttfb = (navEntries[0] as any).responseStart;
+      const ttfb = (navEntries[0] as NavTimingEntry).responseStart;
       if (ttfb > 0) {
         summary.ttfb = { value: ttfb, rating: getRating('TTFB', ttfb) };
       }

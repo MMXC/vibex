@@ -113,9 +113,8 @@ ${context?.code ? `\n相关代码:\n${context.code}` : ''}
   "safetyLevel": "safe|review|unsafe"
 }`;
 
-    // 调用 AI 服务 (这里使用模拟响应)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response = await (apiService as any).generateText?.(prompt);
+    // 调用 AI 服务
+    const response = await (apiService as { generateText?: (p: string) => Promise<string> }).generateText?.(prompt);
     
     if (response) {
       try {

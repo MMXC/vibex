@@ -18,6 +18,15 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.52',
+    date: '2026-03-20',
+    changes: [
+      '🔒 TypeScript strict 模式全面启用: tsc --noEmit 0 errors，源码 as any 已消除',
+      '✅ 153 test suites / 1751 tests 全部通过',
+    ],
+    commit: '7e35e84',
+  },
+  {
     version: '1.0.51',
     date: '2026-03-20',
     changes: [

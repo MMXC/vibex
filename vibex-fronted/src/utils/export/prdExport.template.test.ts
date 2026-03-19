@@ -6,10 +6,7 @@ import {
   exportPRDToMarkdown, 
   validatePRD, 
   createPRDFromTemplate,
-  downloadPRDAsMarkdown,
-  PRDData,
-  PRDSection,
-  ExportOptions
+  PRDData
 } from '@/utils/export/prdExport';
 
 describe('prdExport - Template Enhancement (E003)', () => {
@@ -186,7 +183,7 @@ describe('prdExport - Template Enhancement (E003)', () => {
       
       for (let i = 0; i < iterations; i++) {
         const prd = createPRDFromTemplate(`Project ${i}`, 'default');
-        const md = exportPRDToMarkdown(prd);
+        const _md = exportPRDToMarkdown(prd);
         validatePRD(prd);
       }
       
@@ -206,14 +203,14 @@ describe('prdExport - Template Enhancement (E003)', () => {
       for (let i = 0; i < iterations; i++) {
         try {
           const prd = createPRDFromTemplate(`Project ${i}`, 'default');
-          const md = exportPRDToMarkdown(prd);
+          const _md = exportPRDToMarkdown(prd);
           const validation = validatePRD(prd);
           
-          if (validation.valid && md.length > 0) {
+          if (validation.valid && _md.length > 0) {
             successCount++;
           }
-        } catch (e) {
-          // fail
+        } catch {
+          // fail silently for error rate calculation
         }
       }
       

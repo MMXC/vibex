@@ -18,6 +18,15 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.47',
+    date: '2026-03-19',
+    changes: [
+      '🛡️ 安全补丁: Next.js 16.1.6 → 16.2.0',
+      '✅ 修复 5 个高危 CVE (CSRF/DoS/HTTP smuggling)',
+    ],
+    commit: '91dc3d1',
+  },
+  {
     version: '1.0.46',
     date: '2026-03-19',
     changes: [

@@ -18,6 +18,15 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.51',
+    date: '2026-03-20',
+    changes: [
+      '🚀 Epic onboarding 上线: 5步引导流程 (Welcome→Input→Clarify→Model→Preview) + OnboardingProgressBar + Zustand状态管理',
+      '🔧 OnboardingModal 集成: steps组件接入 + DomainModel类型修复',
+    ],
+    commit: 'd6660b7',
+  },
+  {
     version: '1.0.50',
     date: '2026-03-20',
     changes: [

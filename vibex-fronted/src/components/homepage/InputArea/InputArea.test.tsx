@@ -85,22 +85,25 @@ describe('InputArea', () => {
       />
     );
     
-    // Button should exist and be clickable
-    const button = screen.getByText(/开始分析/);
-    expect(button).toBeInTheDocument();
+    // Button should exist and be clickable (action button has 'button' class)
+    const buttons = screen.getAllByRole('button', { name: /业务流程分析/ });
+    const actionButton = buttons.find(b => b.getAttribute('class')?.includes('button'));
+    expect(actionButton).toBeInTheDocument();
     // Note: Button click test is flaky due to useButtonStates hook complexity
   });
 
   it('disables generate button when requirement is empty', () => {
     render(<InputArea {...defaultProps} />);
-    const button = screen.getByRole('button', { name: /开始分析/ });
-    expect(button).toBeDisabled();
+    const buttons = screen.getAllByRole('button', { name: /业务流程分析/ });
+    const actionButton = buttons.find(b => b.getAttribute('class')?.includes('button'));
+    expect(actionButton).toBeDisabled();
   });
 
   it('enables generate button when requirement is provided', () => {
     render(<InputArea {...defaultProps} requirementText="Test requirement" />);
-    const button = screen.getByRole('button', { name: /开始分析/ });
-    expect(button).not.toBeDisabled();
+    const buttons = screen.getAllByRole('button', { name: /业务流程分析/ });
+    const actionButton = buttons.find(b => b.getAttribute('class')?.includes('button'));
+    expect(actionButton).not.toBeDisabled();
   });
 
   it('renders Plan and Build mode buttons', () => {

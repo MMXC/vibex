@@ -25,6 +25,23 @@ export interface ExportResult {
 
 export type ExportFormat = 'json' | 'png' | 'pdf';
 
+// Types for dynamic page/section/component rendering
+export interface RenderableSection {
+  position?: { x: number; y: number };
+  size?: { width: number; height: number };
+  style?: Record<string, unknown>;
+  title?: string;
+  components?: RenderableComponent[];
+}
+
+export interface RenderableComponent {
+  position?: { x: number; y: number };
+  size?: { width: number; height: number };
+  style?: Record<string, unknown>;
+  type?: string;
+  content?: string;
+}
+
 const EXPORT_FORMATS: { value: ExportFormat; label: string; icon: string }[] = [
   { value: 'json', label: 'JSON', icon: '{ }' },
   { value: 'png', label: 'PNG 图片', icon: '🖼️' },
@@ -204,9 +221,9 @@ export function PrototypeExporter({
     ctx.fillText(page.route || '', 20, 65);
 
     // Render sections if available (for backward compatibility)
-    const pageAny = page as any;
+    const pageAny = page as unknown as { sections?: RenderableSection[] };
     if (pageAny.sections) {
-      for (const section of pageAny.sections as any[]) {
+      for (const section of pageAny.sections) {
         renderSection(ctx, section, containerWidth, containerHeight);
       }
     }
@@ -214,37 +231,36 @@ export function PrototypeExporter({
 
   const renderSection = (
     ctx: CanvasRenderingContext2D,
-    section: Record<string, unknown>,
+    section: RenderableSection,
     containerWidth: number,
     containerHeight: number
   ): void => {
-    const sectionAny = section as any;
-    const x = (sectionAny.position?.x || 0) * containerWidth;
-    const y = (sectionAny.position?.y || 0) * containerHeight;
-    const w = (sectionAny.size?.width || 200) * containerWidth;
-    const h = (sectionAny.size?.height || 100) * containerHeight;
+    const x = (section.position?.x || 0) * containerWidth;
+    const y = (section.position?.y || 0) * containerHeight;
+    const w = (section.size?.width || 200) * containerWidth;
+    const h = (section.size?.height || 100) * containerHeight;
 
     // Draw section background
-    ctx.fillStyle = sectionAny.style?.background || '#f5f5f5';
+    ctx.fillStyle = (section.style?.background as string) || '#f5f5f5';
     ctx.fillRect(x, y, w, h);
 
     // Draw section border
-    if (sectionAny.style?.border) {
-      ctx.strokeStyle = sectionAny.style.border;
+    if (section.style?.border) {
+      ctx.strokeStyle = section.style.border as string;
       ctx.lineWidth = 1;
       ctx.strokeRect(x, y, w, h);
     }
 
     // Draw section title if exists
-    if (sectionAny.title) {
-      ctx.fillStyle = sectionAny.style?.color || '#333333';
+    if (section.title) {
+      ctx.fillStyle = (section.style?.color as string) || '#333333';
       ctx.font = 'bold 16px sans-serif';
-      ctx.fillText(String(sectionAny.title), x + 10, y + 25);
+      ctx.fillText(String(section.title), x + 10, y + 25);
     }
 
     // Render components within section
-    if (sectionAny.components) {
-      for (const component of sectionAny.components) {
+    if (section.components) {
+      for (const component of section.components) {
         renderComponent(ctx, component, x, y, w, h);
       }
     }
@@ -252,31 +268,30 @@ export function PrototypeExporter({
 
   const renderComponent = (
     ctx: CanvasRenderingContext2D,
-    component: Record<string, unknown>,
+    component: RenderableComponent,
     sectionX: number,
     sectionY: number,
     sectionW: number,
     sectionH: number
   ): void => {
-    const compAny = component as any;
-    const x = sectionX + (compAny.position?.x || 0) * sectionW;
-    const y = sectionY + (compAny.position?.y || 0) * sectionH;
-    const w = (compAny.size?.width || 100) * sectionW;
-    const h = (compAny.size?.height || 30) * sectionH;
+    const x = sectionX + (component.position?.x || 0) * sectionW;
+    const y = sectionY + (component.position?.y || 0) * sectionH;
+    const w = (component.size?.width || 100) * sectionW;
+    const h = (component.size?.height || 30) * sectionH;
 
-    switch (compAny.type) {
+    switch (component.type) {
       case 'text':
-        ctx.fillStyle = compAny.style?.color || '#333333';
-        ctx.font = `${compAny.style?.fontWeight || 'normal'} ${compAny.style?.fontSize || 14}px sans-serif`;
-        ctx.fillText(String(compAny.content || ''), x + 5, y + h / 2 + 5);
+        ctx.fillStyle = (component.style?.color as string) || '#333333';
+        ctx.font = `${component.style?.fontWeight || 'normal'} ${component.style?.fontSize || 14}px sans-serif`;
+        ctx.fillText(String(component.content || ''), x + 5, y + h / 2 + 5);
         break;
 
       case 'button':
-        ctx.fillStyle = compAny.style?.background || '#007bff';
+        ctx.fillStyle = (component.style?.background as string) || '#007bff';
         ctx.fillRect(x, y, w, h);
-        ctx.fillStyle = compAny.style?.color || '#ffffff';
+        ctx.fillStyle = (component.style?.color as string) || '#ffffff';
         ctx.font = '14px sans-serif';
-        const btnText = String(compAny.content || 'Button');
+        const btnText = String(component.content || 'Button');
         const btnTextWidth = ctx.measureText(btnText).width;
         ctx.fillText(btnText, x + (w - btnTextWidth) / 2, y + h / 2 + 5);
         break;
@@ -290,7 +305,7 @@ export function PrototypeExporter({
         ctx.fillStyle = '#999999';
         ctx.font = '12px sans-serif';
         ctx.fillText(
-          String(compAny.placeholder || 'Input...'),
+          String(component.placeholder || 'Input...'),
           x + 5,
           y + h / 2 + 4
         );
@@ -314,7 +329,7 @@ export function PrototypeExporter({
         ctx.fillStyle = '#007bff';
         ctx.font = 'bold 12px sans-serif';
         ctx.fillText(
-          `[${String(compAny.type).toUpperCase()}]`,
+          `[${String(component.type).toUpperCase()}]`,
           x + 5,
           y + h / 2 + 4
         );
@@ -422,7 +437,7 @@ export function PrototypeExporter({
           <div class="page">
             <div class="page-title">${page.name || 'Untitled Page'}</div>
             <div class="page-route">${page.route || '/'}</div>
-            ${(((page as any).components as any[]) || [])
+            ${(((page as unknown as { components?: RenderableComponent[] }).components) || [])
               .map(
                 (comp) => `
               <div class="component">

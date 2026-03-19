@@ -66,7 +66,7 @@ function ErrorFallback({ error }: { error?: Error }) {
           overflow: 'auto',
           fontSize: '12px',
         }}>
-          {error.message}
+          {error?.message ?? 'Unknown error'}
         </pre>
       )}
     </div>

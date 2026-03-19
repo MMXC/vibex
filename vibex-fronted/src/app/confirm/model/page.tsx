@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import type { DomainModel } from '@/services/api/schemas';
 import { useRouter } from 'next/navigation';
 import styles from '../confirm.module.css';
 import { useConfirmationStore } from '@/stores/confirmationStore';
@@ -80,7 +81,7 @@ export default function ModelPage() {
           
           if (response && response.success) {
             // 即使 domainModels 为 null 也视为成功，设置为空数组
-            setDomainModels(Array.isArray(domainModels) ? domainModels : []);
+            setDomainModels(Array.isArray(domainModels) ? domainModels as DomainModel[] : []);
             if (response.mermaidCode) {
               setModelMermaidCode(response.mermaidCode);
             }

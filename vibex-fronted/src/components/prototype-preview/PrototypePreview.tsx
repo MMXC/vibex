@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, type ReactNode } from 'react';
 import styles from './PrototypePreview.module.css';
 
 export interface PreviewComponent {
@@ -54,7 +54,7 @@ export function PrototypePreview({
     }));
   }, [interactive]);
 
-  const renderComponent = (component: PreviewComponent, index: number) => {
+  const renderComponent = (component: PreviewComponent, index: number): ReactNode => {
     const isHovered = hoveredId === component.id;
     const hasInteraction = interactions[component.id];
 

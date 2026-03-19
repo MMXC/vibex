@@ -33,8 +33,8 @@ export function TemplateDetail({
             <div>
               <h2 className={styles.detailTitle}>{template.displayName}</h2>
               <p className={styles.detailMeta}>
-                预估时间: {template.metadata.estimatedTime} · 
-                复杂度: {complexityLabels[template.metadata.complexity]}
+                预估时间: {template.metadata?.estimatedTime} · 
+                复杂度: {complexityLabels[template.metadata?.complexity ?? 'medium']}
               </p>
             </div>
           </div>
@@ -50,16 +50,16 @@ export function TemplateDetail({
           <section className={styles.detailSection}>
             <h3 className={styles.detailSectionTitle}>技术栈</h3>
             <div className={styles.techStack}>
-              {template.metadata.techStack?.map(tech => (
+              {template.metadata?.techStack?.map(tech => (
                 <span key={tech} className={styles.techBadge}>{tech}</span>
               ))}
             </div>
           </section>
           
           <section className={styles.detailSection}>
-            <h3 className={styles.detailSectionTitle}>实体模型 ({template.entities.length})</h3>
+            <h3 className={styles.detailSectionTitle}>实体模型 ({template.entities?.length})</h3>
             <div className={styles.entityList}>
-              {template.entities.map(entity => (
+              {template.entities?.map(entity => (
                 <div key={entity.name} className={styles.entityItem}>
                   <span className={styles.entityType}>{entity.type}</span>
                   <span className={styles.entityName}>{entity.name}</span>
@@ -73,12 +73,12 @@ export function TemplateDetail({
           </section>
           
           <section className={styles.detailSection}>
-            <h3 className={styles.detailSectionTitle}>功能列表 ({template.features.length})</h3>
+            <h3 className={styles.detailSectionTitle}>功能列表 ({template.features?.length})</h3>
             <div className={styles.featureList}>
-              {template.features.map(feature => (
+              {template.features?.map(feature => (
                 <div key={feature.name} className={styles.featureItem}>
-                  <span className={`${styles.featurePriority} ${styles[feature.priority]}`}>
-                    {priorityLabels[feature.priority]}
+                  <span className={`${styles.featurePriority} ${styles[feature.priority as keyof typeof styles] ?? ''}`}>
+                    {priorityLabels[feature.priority as keyof typeof priorityLabels] ?? '其他功能'}
                   </span>
                   <div className={styles.featureInfo}>
                     <span className={styles.featureName}>{feature.name}</span>
@@ -92,7 +92,7 @@ export function TemplateDetail({
           <section className={styles.detailSection}>
             <h3 className={styles.detailSectionTitle}>标签</h3>
             <div className={styles.tagList}>
-              {template.metadata.tags.map(tag => (
+              {template.metadata?.tags.map(tag => (
                 <span key={tag} className={styles.detailTag}>{tag}</span>
               ))}
             </div>

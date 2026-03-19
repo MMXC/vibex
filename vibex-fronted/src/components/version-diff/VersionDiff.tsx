@@ -66,7 +66,8 @@ export function VersionDiff({
   }
 
   const renderDiff = (delta: jsondiffpatch.Delta, depth = 0): React.ReactNode => {
-    const entries = Object.entries(delta);
+    if (!delta) return null;
+    const entries = Object.entries(delta as object);
     
     return entries.map(([key, value], index) => {
       // Skip internal jsondiffpatch keys

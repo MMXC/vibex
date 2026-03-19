@@ -46,7 +46,7 @@ export default function FlowPage() {
           );
 
           if (response && response.success && response.businessFlow) {
-            setBusinessFlow(response.businessFlow);
+            setBusinessFlow(response.businessFlow as Parameters<typeof setBusinessFlow>[0]);
             if (response.mermaidCode) {
               setFlowMermaidCode(response.mermaidCode);
             }

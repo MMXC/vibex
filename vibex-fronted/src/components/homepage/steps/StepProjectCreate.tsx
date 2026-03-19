@@ -1,12 +1,15 @@
 // Step 5: Project Create Component
 
 import { useCallback, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useConfirmationStore } from '@/stores/confirmationStore';
 import { useAuthStore } from '@/stores/authStore';
 import { projectApi } from '@/services/api';
 import type { StepComponentProps } from './types';
 
 export function StepProjectCreate({ onNavigate, isActive }: StepComponentProps) {
+  const router = useRouter();
+  
   // Subscribe to store state
   const requirementText = useConfirmationStore((s) => s.requirementText);
   const boundedContexts = useConfirmationStore((s) => s.boundedContexts);
@@ -73,7 +76,10 @@ export function StepProjectCreate({ onNavigate, isActive }: StepComponentProps) 
             <p className="project-id">项目 ID: {createdProjectId}</p>
             
             <div className="project-actions">
-              <button className="btn-primary">
+              <button 
+                className="btn-primary"
+                onClick={() => router.push(`/project?id=${createdProjectId}`)}
+              >
                 查看项目 →
               </button>
               <button 

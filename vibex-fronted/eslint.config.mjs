@@ -28,6 +28,9 @@ const eslintConfig = defineConfig([
     'docs/**',
     // GitHub
     '.github/**',
+    '**/*.yml',
+    '**/*.yaml',
+    '**/*.md',
     // Wrangler
     '.wrangler/**',
     // Tests

@@ -167,7 +167,7 @@ function InteractiveRenderer({
             justifyContent: 'space-between',
             padding: '12px 24px',
             backgroundColor:
-              (navState.theme as any)?.backgroundColor || '#1a1a2e',
+              navState.theme?.backgroundColor || '#1a1a2e',
             borderBottom: '1px solid rgba(255,255,255,0.1)',
             minHeight: '48px',
             alignItems: 'center',

@@ -18,7 +18,7 @@
     "coverage:check": "node scripts/check-coverage.js",
     "coverage:diff": "node scripts/coverage-diff.js",
     "coverage:history": "bash scripts/save-coverage-history.sh",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.mjs,.cjs && prettier --check .",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.mjs,.cjs --ignore-pattern '**/*.yml' --ignore-pattern '**/*.yaml' --ignore-pattern '.github/**' && prettier --check .",
     "generate:types": "ts-node scripts/generate-types.ts",
     "prepare": "husky",
     "scan:vuln": "npm audit --audit-level=moderate",

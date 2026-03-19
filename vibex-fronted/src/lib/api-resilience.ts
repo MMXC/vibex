@@ -5,7 +5,7 @@
  * 保护 API 调用，提升健壮性
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosError } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosError, AxiosResponse } from 'axios';
 import { configureAxiosRetry } from './api-retry';
 import { CircuitBreakerManager } from './circuit-breaker';
 import { API_CONFIG } from './api-config';
@@ -74,10 +74,10 @@ export function createResilientClient(config: ResilientClientConfig = {}): Axios
         
         try {
           // 执行带熔断的请求
-          const result = await breakerManager.execute(url, async () => {
+          const result = await breakerManager.execute<AxiosResponse>(url, async () => {
             throw error; // 让错误继续传播
           });
-          return result as any;
+          return result;
         } catch (breakerError) {
           // 熔断器打开，返回友好错误
           if (breakerError instanceof Error && breakerError.message.includes('Circuit breaker')) {

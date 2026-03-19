@@ -604,8 +604,7 @@ function DomainPageContent() {
   // Handle confirmation and navigate to /confirm/model
   const handleConfirmAndProceed = () => {
     // Convert domain entities to domain models for the confirmation flow
-    // Using any type to match the confirmation store's DomainModel format
-    const domainModels = domains.map((entity) => ({
+    const domainModels: DomainModel[] = domains.map((entity) => ({
       id: entity.id,
       name: entity.name,
       contextId: 'default',
@@ -620,7 +619,7 @@ function DomainPageContent() {
       methods: [],
     }));
 
-    setDomainModels(domainModels as any);
+    setDomainModels(domainModels);
     goToNextStep();
     router.push('/confirm/model');
   };

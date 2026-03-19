@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.48',
+    date: '2026-03-19',
+    changes: [
+      '🏠 首页重构: Epic1 业务流程分析 (Step 1)',
+      '🎨 首页重构: Epic2 UI组件分析 (Step 2)',
+      '🚀 首页重构: Epic3 创建项目 (Step 3)',
+      '✅ 三步流程上线: 去掉领域模型，直接业务流程→UI组件→创建项目',
+    ],
+    commit: 'latest',
+  },
+  {
     version: '1.0.47',
     date: '2026-03-19',
     changes: [

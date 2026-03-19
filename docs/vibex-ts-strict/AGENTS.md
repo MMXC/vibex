@@ -1,125 +1,164 @@
-# Agents: vibex-ts-strict
+# AGENTS.md - TypeScript Strict 模式迁移
 
-## 项目信息
-
-- **项目**: vibex-ts-strict
-- **目标**: 启用 TypeScript strict 模式，消除类型安全债务
-- **工作目录**: `/root/.openclaw/vibex/vibex-fronted`
-- **预计工期**: 22.5 小时
+**项目**: vibex-ts-strict  
+**版本**: 1.0  
+**日期**: 2026-03-19
 
 ---
 
-## 角色定义
+## 1. 开发命令
 
-### Dev
-- 领取 Epic 任务，实施类型修复
-- 更新 tsconfig.json 配置
-- 替换 `as any` 为具体类型
-- 配置 ESLint 类型规则
-- 配置 CI 类型检查 pipeline
-
-### PM
-- 跟踪 Epic 进度，维护验收标准
-- 协调阻塞问题
-- 审核 DoD 完成情况
-
-### Tester
-- 运行类型检查验证
-- 执行 `npx tsd` 类型测试
-- 验证 `as any` 数量 < 10
-- 确保测试覆盖率不下降
-
-### Reviewer
-- 代码 review（类型安全、一致性）
-- 更新 CHANGELOG.md
-- 合并前确认 CI 全绿
-
----
-
-## 构建 & 测试命令
-
-### 本地开发
+### 1.1 类型检查
 
 ```bash
-# 进入工作目录
+# 进入项目目录
 cd /root/.openclaw/vibex/vibex-fronted
 
-# 类型检查 (核心验证)
+# 运行 TypeScript 类型检查
 npm run type-check
 
-# 完整构建
-npm run build
-
-# ESLint 检查
-npm run lint
-
-# 类型测试 (tsd)
-npx tsd
-
-# 运行测试
-npm test
-
-# 完整验证 (CI 等效)
-npm run type-check && npm run lint -- --max-warnings=0 && npx tsd && npm test
+# 或直接运行 tsc
+npx tsc --noEmit
 ```
 
-### CI 命令
+### 1.2 严格模式检查
 
 ```bash
-npm ci
-npm run type-check
-npm run lint -- --max-warnings=0
-npx tsd
+# 运行严格模式检查
+npx tsc --strict --noEmit
+```
+
+### 1.3 构建
+
+```bash
+# 构建项目
+npm run build
+
+# 启动生产服务器
+npm run start
+```
+
+---
+
+## 2. 测试命令
+
+### 2.1 运行测试
+
+```bash
+# 运行所有测试
 npm test
+
+# 运行测试并监控
+npm run test:watch
+
+# 运行特定测试
+npm test -- src/types.test.ts
+```
+
+### 2.2 覆盖率
+
+```bash
+# 运行测试并生成覆盖率
+npm run test:coverage
+
+# 查看覆盖率报告
+open coverage/lcov-report/index.html
 ```
 
 ---
 
-## 任务状态
+## 3. 代码质量检查
 
-| Epic | 负责人 | 状态 | 备注 |
-|------|--------|------|------|
-| Epic 1: 配置启用 (P0) | Dev | pending | T1.1–T1.6 |
-| Epic 2: 类型断言清理 (P1) | Dev | pending | T2.1–T2.6 |
-| Epic 3: ESLint 类型规则 (P2) | Dev | pending | T3.1–T3.5 |
-| Epic 4: 类型测试覆盖 (P2) | Tester | pending | T4.1–T4.4 |
+### 3.1 Lint
+
+```bash
+# 运行 ESLint
+npm run lint
+
+# 自动修复
+npm run lint:fix
+```
+
+### 3.2 类型检查
+
+```bash
+# 检查 as any 使用
+grep -rn "as any" src/ --include="*.ts" --include="*.tsx" | wc -l
+
+# 检查 as unknown
+grep -rn "as unknown" src/ --include="*.ts" --include="*.tsx" | wc -l
+```
 
 ---
 
-## 协作规范
+## 4. CI/CD 命令
 
-1. **提交前**: 运行 `npm run type-check && npm run lint` 确认无 error/warning
-2. **PR 描述**: 包含修改的 Task ID 和验证命令输出
-3. **阻塞上报**: 遇到第三方库类型问题立即反馈 @PM/@Reviewer
-4. **进度更新**: 每个 Epic 完成后在 #vibex-dev 频道更新
+### 4.1 类型检查 CI
+
+```yaml
+# .github/workflows/type-check.yml
+name: Type Check
+on: [push, pull_request]
+jobs:
+  type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install
+      - run: npm run type-check
+```
+
+### 4.2 完整检查
+
+```bash
+# 运行所有检查
+npm run ci
+```
 
 ---
 
-## 消息模板
+## 5. 调试类型错误
 
-### 领取任务
-```
-📌 领取任务: vibex-ts-strict/<epic-name>
-👤 Agent: dev
-🎯 目标: <description>
-```
+### 5.1 常见错误修复
 
-### 进度更新
-```
-🔄 进度更新: vibex-ts-strict/<epic-name>
-📊 状态: <step>/<total>
-📝 说明: <detail>
-```
+```typescript
+// 错误: Parameter 'x' implicitly has an 'any' type
+// 修复: 添加类型注解
+function foo(x: string) { }
 
-### 任务完成
-```
-✅ 任务完成: vibex-ts-strict/<epic-name>
-🔍 验证: <verification result>
+// 错误: Object is possibly 'null'
+// 修复: 使用可选链或默认值
+const value = obj?.prop ?? 'default';
+
+// 错误: Cannot find name 'y'
+// 修复: 检查变量作用域
 ```
 
-### 问题阻塞
+### 5.2 类型工具
+
+```bash
+# 查看类型定义
+npx tsc --noEmit --pretty false 2>&1 | grep "types.ts"
+
+# 生成类型定义文件
+npx tsc --declaration --emitDeclarationOnly
 ```
-⚠️ 任务阻塞: vibex-ts-strict/<epic-name>
-🔒 原因: <reason>
-❓ 需要帮助: <question>
-```
+
+---
+
+## 6. 常用命令速查
+
+| 命令 | 用途 |
+|------|------|
+| `npm run type-check` | 运行类型检查 |
+| `npx tsc --strict` | 严格模式检查 |
+| `npm run lint` | 运行 lint |
+| `npm test` | 运行测试 |
+| `npm run build` | 构建项目 |
+
+---
+
+*AGENTS.md - 2026-03-19*

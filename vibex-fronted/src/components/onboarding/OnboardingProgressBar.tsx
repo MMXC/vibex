@@ -23,16 +23,9 @@ const STEP_DURATIONS: Record<string, number> = {
 
 export function OnboardingProgressBar() {
   const { status, currentStep, completedSteps } = useOnboardingStore();
-
-  // 只在进行中显示
-  if (status !== 'in-progress') {
-    return null;
-  }
-
-  const currentIndex = getStepIndex(currentStep);
   const totalSteps = ONBOARDING_STEPS.length;
-  
-  // 计算进度百分比
+
+  // 计算进度百分比 (useMemo - 所有 hooks 在 conditional return 之前)
   const progressPercent = useMemo(() => {
     if (completedSteps.length === 0) {
       return 5; // 初始显示 5%
@@ -40,8 +33,9 @@ export function OnboardingProgressBar() {
     return Math.round((completedSteps.length / totalSteps) * 100);
   }, [completedSteps.length, totalSteps]);
 
-  // 计算预计剩余时间
+  // 计算预计剩余时间 (useMemo - 所有 hooks 在 conditional return 之前)
   const remainingTime = useMemo(() => {
+    const currentIndex = getStepIndex(currentStep);
     // 计算剩余步骤的总时长
     let remainingMinutes = 0;
     for (let i = currentIndex; i < totalSteps; i++) {
@@ -49,7 +43,7 @@ export function OnboardingProgressBar() {
       const duration = STEP_DURATIONS[stepId];
       remainingMinutes += duration !== undefined ? duration : 2;
     }
-    
+
     if (remainingMinutes <= 1) {
       return '不到 1 分钟';
     } else if (remainingMinutes < 60) {
@@ -59,13 +53,18 @@ export function OnboardingProgressBar() {
       const mins = remainingMinutes % 60;
       return `约 ${hours} 小时 ${mins} 分钟`;
     }
-  }, [currentIndex, totalSteps, STEP_DURATIONS, ONBOARDING_STEPS]);
+  }, [currentStep, totalSteps]);
 
-  // 步骤文本
+  // 只在进行中显示 (conditional return 在所有 hooks 之后)
+  if (status !== 'in-progress') {
+    return null;
+  }
+
+  const currentIndex = getStepIndex(currentStep);
   const stepText = `第 ${currentIndex + 1} 步 / 共 ${totalSteps} 步`;
 
   return (
-    <motion.div 
+    <motion.div
       className={styles.container}
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -82,7 +81,7 @@ export function OnboardingProgressBar() {
 
         {/* 进度条 */}
         <div className={styles.progressTrack}>
-          <motion.div 
+          <motion.div
             className={styles.progressFill}
             initial={{ width: 0 }}
             animate={{ width: `${progressPercent}%` }}

@@ -1,141 +1,132 @@
-# Implementation Plan: vibex-onboarding-redesign
+# Implementation Plan: 用户引导流程重新设计
 
-## Overview
-- **Project**: vibex-onboarding-redesign
-- **Objective**: Redesign user onboarding flow to solve three 断裂 problems
-- **Estimated Duration**: 18 hours
-- **Status**: In Progress (~60% 已完成)
-- **Last Updated**: 2026-03-20 by Dev Agent
-
-## Tech Stack
-- Next.js
-- Zustand (state management)
-- CSS Modules
-- Framer Motion (animations)
+**项目**: vibex-onboarding-redesign  
+**版本**: 1.0  
+**日期**: 2026-03-19
 
 ---
 
-## Component Inventory (2026-03-20 现状)
+## 1. 执行概览
 
+| 属性 | 值 |
+|------|-----|
+| **项目** | vibex-onboarding-redesign |
+| **目标** | 优化用户引导流程，提升新用户转化率 |
+| **完成标准** | 引导完成率提升 20% |
+| **工作量** | 2 周 |
+
+---
+
+## 2. Phase 划分
+
+### Phase 1: 基础架构 (Week 1, Day 1-2)
+
+**目标**: 建立引导流程基础组件
+
+| 任务 | 功能点 | 负责人 | 预估工时 |
+|------|--------|--------|----------|
+| T1.1 | 创建 OnboardingFlow 组件骨架 | Dev | 4h |
+| T1.2 | 实现进度指示器 | Dev | 2h |
+| T1.3 | 配置 Zustand 状态管理 | Dev | 2h |
+
+**验收标准**:
+- `expect(componentExists('OnboardingFlow')).toBe(true)`
+- `expect(hasProgressIndicator).toBe(true)`
+
+---
+
+### Phase 2: 引导步骤开发 (Week 1, Day 3-5)
+
+**目标**: 实现 5 个引导步骤
+
+| 任务 | 功能点 | 负责人 | 预估工时 |
+|------|--------|--------|----------|
+| T2.1 | WelcomeStep 组件 | Dev | 4h |
+| T2.2 | ProfileStep 组件 | Dev | 4h |
+| T2.3 | PreferenceStep 组件 | Dev | 4h |
+| T2.4 | TeamStep 组件 | Dev | 4h |
+| T2.5 | CompleteStep 组件 | Dev | 2h |
+
+**验收标准**:
+- `expect(stepCount).toBe(5)`
+- `expect(allStepsRender).toBe(true)`
+
+---
+
+### Phase 3: 状态与持久化 (Week 2, Day 1-2)
+
+**目标**: 实现状态管理和进度保存
+
+| 任务 | 功能点 | 负责人 | 预估工时 |
+|------|--------|--------|----------|
+| T3.1 | useOnboarding Hook 开发 | Dev | 4h |
+| T3.2 | localStorage 进度保存 | Dev | 2h |
+| T3.3 | 跳过功能实现 | Dev | 2h |
+
+**验收标准**:
+- `expect(progressSaved).toBe(true)`
+- `expect(canSkipOnboarding).toBe(true)`
+
+---
+
+### Phase 4: 集成与测试 (Week 2, Day 3-5)
+
+**目标**: 集成测试和部署
+
+| 任务 | 功能点 | 负责人 | 预估工时 |
+|------|--------|--------|----------|
+| T4.1 | E2E 测试 | Tester | 4h |
+| T4.2 | 性能测试 | Tester | 2h |
+| T4.3 | Bug 修复 | Dev | 4h |
+| T4.4 | 部署上线 | Dev | 2h |
+
+**验收标准**:
+- `expect(e2eTestsPass).toBe(true)`
+- `expect(loadingTime).toBeLessThan(2000)`
+
+---
+
+## 3. 依赖关系
+
+```mermaid
+flowchart LR
+    P1[Phase 1] --> P2[Phase 2]
+    P2 --> P3[Phase 3]
+    P3 --> P4[Phase 4]
 ```
-src/components/onboarding/
-├── OnboardingModal.tsx           ✅ 5 步引导弹窗，ESC 关闭
-├── OnboardingProgressBar.tsx     ✅ 进度条 + 剩余时间计算
-├── OnboardingProvider.tsx        ✅ Context provider
-├── StepIndicator.tsx             ✅ 步骤指示器（可点击跳转）
-├── steps/
-│   ├── WelcomeStep.tsx          ✅
-│   ├── InputStep.tsx            ✅
-│   ├── ClarifyStep.tsx          ✅
-│   ├── ModelStep.tsx            ✅
-│   └── PreviewStep.tsx          ✅
-└── *.module.css                 ✅
-```
-
-**store**: `src/stores/onboarding/onboardingStore.ts` — Zustand with localStorage persist
 
 ---
 
-## Epic & Story Breakdown
+## 4. 风险评估
 
-### Epic 1: 引导流程优化 (P0) ✅ 大部分完成
-
-#### Story F1.1: 简化引导步骤 ✅
-- **Task F1.1.1**: 合并重复/冗余步骤，目标步骤数 ≤ 5
-  - 当前实现: 5 步 (welcome → input → clarify → model → prototype)
-- **验收标准**: `stepCount ≤ 5` ✅ **已满足**
-
-#### Story F1.2: 进度指示器 ✅
-- **Task F1.2.1**: 实现 ProgressIndicator 组件 ✅ (StepIndicator.tsx)
-- **Task F1.2.2**: 将进度与 Zustand store 同步 ✅
-- **Task F1.2.3**: 支持步骤点击跳转（已完成步骤）✅ (OnboardingModal.tsx handleStepClick)
-- **验收标准**: `hasProgressIndicator === true` ✅ **已满足**
-
-#### Story F1.3: 跳过功能 ✅
-- **Task F1.3.1**: 实现跳过按钮 UI ✅ (OnboardingModal.tsx 跳过按钮)
-- **Task F1.3.2**: 添加跳过逻辑 ✅ (ESC 键 + 跳过按钮调用 store.skip())
-- **验收标准**: `canSkipOnboarding === true` ✅ **已满足**
+| 风险 | 影响 | 缓解 |
+|------|------|------|
+| 现有功能回归 | 高 | 完整回归测试 |
+| 移动端适配 | 中 | 使用响应式设计 |
+| 性能问题 | 中 | 代码分割懒加载 |
 
 ---
 
-### Epic 2: 个性化引导 (P1)
+## 5. 验收标准
 
-#### Story F2.1: 基于角色的引导 ❌ 未实现
-- **Task F2.1.1**: 定义角色类型（Individual / Team / Enterprise）⏳ pending
-- **Task F2.1.2**: 实现角色选择 Step ⏳ pending
-- **Task F2.1.3**: 根据角色渲染不同步骤流 ⏳ pending
-- **验收标准**: `roleBasedContent === true`
-- **实现建议**:
-  - 在 `ONBOARDING_STEPS` 中增加 `roles` 字段标记适用角色
-  - WelcomeStep 中添加角色选择
-  - `getFilteredSteps(role: UserRole): OnboardingStep[]` 过滤步骤
-
-#### Story F2.2: 进度保存 ✅
-- **Task F2.2.1**: 配置 Zustand persist（localStorage）✅
-- **Task F2.2.2**: 页面刷新后恢复进度 ✅
-- **Task F2.2.3**: 引导完成后清除存储数据 ✅
-- **验收标准**: `progress === 刷新前值` ✅ **已满足**
+| Phase | 验收标准 |
+|-------|----------|
+| Phase 1 | 基础组件存在，进度指示器可用 |
+| Phase 2 | 5 个步骤全部渲染 |
+| Phase 3 | 进度保存和跳过功能正常 |
+| Phase 4 | E2E 测试通过，性能达标 |
 
 ---
 
-## Acceptance Criteria Status
+## 6. DoD
 
-| ID | Given | When | Then | Status |
-|----|-------|------|------|--------|
-| AC1.1 | 新用户 | 进入引导 | 步骤数 ≤ 5 | ✅ 5 步 |
-| AC1.2 | 用户 | 任何步骤 | 进度条可见 | ✅ OnboardingProgressBar |
-| AC1.3 | 用户 | 刷新页面 | 进度保留 | ✅ Zustand persist |
-| AC1.4 | 用户 | 非必填步骤 | 可跳过 | ✅ skip 按钮 + ESC |
-| AC2.1 | Individual 用户 | 开始引导 | 看到个人引导内容 | ❌ pending |
-| AC2.2 | Team 用户 | 开始引导 | 看到团队引导内容 | ❌ pending |
-| AC2.3 | 用户 | 完成引导 | 进入主应用 | ✅ complete() 跳转 |
+- [ ] OnboardingFlow 组件正常渲染
+- [ ] 5 个引导步骤完成
+- [ ] 进度保存功能可用
+- [ ] 跳过功能可用
+- [ ] E2E 测试通过
+- [ ] 引导完成率提升 20%
 
 ---
 
-## Remaining Work
-
-### P1: 基于角色的引导内容 (F2.1) — ~8h
-
-1. **角色类型定义** (1h)
-   - 在 `stores/onboarding/types.ts` 中添加 `UserRole` 类型
-   - 定义角色: `individual`, `team`, `enterprise`
-
-2. **角色选择 Step** (3h)
-   - 在 WelcomeStep 中添加角色选择按钮
-   - 更新 onboardingStore 添加 `userRole` 字段
-
-3. **步骤流过滤** (2h)
-   - 根据角色过滤 ONBOARDING_STEPS
-   - Team/Enterprise 用户跳过/添加特定步骤
-
-4. **角色化内容** (2h)
-   - 各个 Step 根据角色显示不同描述和图标
-   - 添加 analytics 事件埋点
-
-### P2: 非功能需求 (可选) — ~4h
-
-1. **性能优化**: 引导首次加载 < 2s (代码分割)
-2. **无障碍**: 键盘导航支持
-3. **移动端适配**: 响应式布局
-
----
-
-## Definition of Done
-
-- [x] 引导步骤 ≤ 5
-- [x] 进度指示器可见且同步
-- [x] 进度通过 localStorage 持久化
-- [x] 可跳过非必填步骤
-- [ ] 基于角色渲染不同内容 ← **主工作项**
-- [ ] `npm run build` 通过
-- [ ] E2E 测试覆盖核心路径
-
----
-
-## 已完成工作 (2026-03-20 Dev)
-
-1. ✅ 审查现有 onboarding 实现 (OnboardingModal, OnboardingProgressBar, stores)
-2. ✅ 确认 F1.1, F1.2, F1.3, F2.2 已通过现有代码满足
-3. ⚠️ F2.1 (基于角色引导) 需要新增功能实现，估算 8h
-
-*Last Updated: 2026-03-20 by Dev Agent*
+*Implementation Plan - 2026-03-19*

@@ -1,151 +1,107 @@
-# Implementation Plan: vibex-ts-strict
+# Implementation Plan: TypeScript Strict 模式迁移
 
-**项目**: vibex-ts-strict
+**项目**: vibex-ts-strict  
+**版本**: 1.0  
 **日期**: 2026-03-19
-**更新**: 2026-03-20 (Dev 完成 Epic 1 配置启用 + Epic 2 部分修复)
-**状态**: In Progress
-**预计工期**: 22.5 小时 (已投入 ~2h 初步配置)
 
 ---
 
-## 1. 项目概述
+## 1. 执行概览
 
-- **目标**: 启用 TypeScript strict 模式，消除类型安全债务
-- **完成标准**: `tsc --noEmit` 零 error，`as any` < 10 处，CI 类型检查通过
-- **工作目录**: `vibex-fronted/` (前端代码库)
-
-## 2. Tech Stack
-
-- TypeScript 5.x
-- tsc --strict
-- @tsd/tsd (类型测试)
-- @typescript-eslint/eslint-plugin
-- GitHub Actions (CI)
+| 属性 | 值 |
+|------|-----|
+| **项目** | vibex-ts-strict |
+| **目标** | 启用 TypeScript strict 模式，消除类型安全风险 |
+| **完成标准** | `tsc --strict` 无 error |
+| **工作量** | 1 周 |
 
 ---
 
-## 3. Epic 任务列表
+## 2. Phase 划分
 
-### Epic 1: 配置启用 (P0) — 4h
+### Phase 1: 配置启用 (Day 1)
 
-**目标**: 在 tsconfig.json 中启用 strict 相关选项
+**目标**: 启用 strict 模式
 
-| Task ID | 任务 | 验证 | 状态 |
-|---------|------|------|------|
-| T1.1 | 启用 `"strict": true` | `expect(tsconfig.strict).toBe(true)` | ✅ DONE |
-| T1.2 | 启用 `"noImplicitAny": true` | `expect(tsconfig.noImplicitAny).toBe(true)` | ✅ DONE |
-| T1.3 | 启用 `"strictNullChecks": true` | `expect(tsconfig.strictNullChecks).toBe(true)` | ✅ DONE |
-| T1.4 | 启用 `"strictFunctionTypes": true` | (implicit by strict: true) | ⏳ pending |
-| T1.5 | 启用 `"noUnusedLocals"` 和 `"noUnusedParameters"` | (requires cleanup) | ⏳ pending |
-| T1.6 | 运行 `tsc --noEmit` 确认无新增编译错误 | 49 src errors remain | ⏳ pending |
+| 任务 | 功能点 | 负责人 | 预估工时 |
+|------|--------|--------|----------|
+| T1.1 | 修改 tsconfig.json | Dev | 1h |
+| T1.2 | 验证构建失败 | Dev | 1h |
 
-**当前状态**: strict 配置已启用，但 `tsc --noEmit` 有 49 个 src 错误需要系统性修复
+**验收标准**:
+- `expect(tsconfig.strict).toBe(true)`
+- `expect(buildFails).toBe(true)` (预期失败)
 
 ---
 
-### Epic 2: 类型断言清理 (P1) — 10h
+### Phase 2: 类型修复 (Day 2-4)
 
-**目标**: 消除所有 `as any` 类型断言，按优先级替换为具体类型
+**目标**: 修复所有类型错误
 
-| Task ID | 任务 | 验证 | 状态 |
-|---------|------|------|------|
-| T2.1 | 统计 `as any` 使用数量（基准） | `grep -rn "as any" src | wc -l` | ✅ DONE (6 处非测试代码) |
-| T2.2 | 按优先级排序：Store > API > 组件 > 工具 | 优先级清单 | ✅ DONE |
-| T2.3 | 修复 `lib/ai-autofix/index.ts` — `(apiService as any).generateText` | 定义 AiCapableService 接口 | ✅ DONE |
-| T2.4 | 修复 `lib/contract/OpenAPIGenerator.ts` — `(schema as any)._def` | 使用 `as unknown as { _def }` | ✅ DONE |
-| T2.5 | 组件 Props `as any` → 具体类型 | 组件类型测试通过 | ⏳ pending |
-| T2.6 | 工具函数 `as any` → `unknown` 或具体类型 | 工具函数测试通过 | ⏳ pending |
+| 任务 | 功能点 | 负责人 | 预估工时 |
+|------|--------|--------|----------|
+| T2.1 | 修复 as any | Dev | 8h |
+| T2.2 | 修复 null/undefined | Dev | 6h |
+| T2.3 | 修复函数类型 | Dev | 4h |
 
-**替换策略**: `as any` → `as unknown as T` (最小改动) → 具体类型 (最终目标)
-**当前状态**: 3 处核心 `as any` 已修复，剩余 3 处为注释/文档引用
-
-**49 个 src tsc 错误分布** (2026-03-20):
-- `src/lib/ErrorMiddleware.ts`: 3 errors (timeoutId 未初始化)
-- `src/lib/RetryHandler.ts`: 1 error (this 类型)
-- `src/lib/api-retry.ts`: 1 error (undefined 赋值)
-- `src/lib/web-vitals.ts`: 2 errors (条件永真)
-- `src/lib/contract/OpenAPIGenerator.ts`: ~28 errors (Zod _def 类型)
-- `src/hooks/`: 2 errors (useApiCall, useAuth)
-- `src/stores/templateStore.ts`: 2 errors (undefined)
-- `src/data/templates/store.ts`: 1 error (类型转换)
-- `src/components/*`: 9 errors (possibly undefined)
+**验收标准**:
+- `expect(asAnyCount).toBeLessThan(10)`
+- `expect(tscErrors).toBe(0)`
 
 ---
 
-### Epic 3: ESLint 类型规则 (P2) — 4h
+### Phase 3: CI 集成 (Day 5)
 
-**目标**: 配置 ESLint 强制类型规范，防止 `any` 类型回流
+**目标**: 添加类型检查到 CI
 
-| Task ID | 任务 | 验证 | 状态 |
-|---------|------|------|------|
-| T3.1 | 配置 `@typescript-eslint/no-explicit-any: error` | `expect(eslintConfig).toContain('no-explicit-any: error')` | ⏳ pending (依赖 Epic 2) |
-| T3.2 | 配置 `@typescript-eslint/no-unsafe-assignment: error` | `expect(eslintConfig).toContain('no-unsafe-assignment: error')` | ⏳ pending |
-| T3.3 | 配置 `@typescript-eslint/no-unsafe-return: error` | `expect(eslintConfig).toContain('no-unsafe-return: error')` | ⏳ pending |
-| T3.4 | 配置 lint-staged 阻止违规代码提交 | pre-commit hook 触发 | ⏳ pending |
-| T3.5 | CI 中包含 `npm run lint -- --max-warnings=0` | CI lint step 通过 | ⏳ pending |
+| 任务 | 功能点 | 负责人 | 预估工时 |
+|------|--------|--------|----------|
+| T3.1 | 创建 type-check.yml | Dev | 1h |
+| T3.2 | 集成到 main workflow | Dev | 1h |
 
-**前置条件**: Epic 2 (类型断言清理) 完成后才启用，否则 CI 会失败
-**验收**: `npm run lint` 零警告通过
+**验收标准**:
+- `expect(ciTypeCheck).toExist()`
+- `expect(ciPasses).toBe(true)`
 
 ---
 
-### Epic 4: 类型测试覆盖 (P2) — 4.5h
-
-**目标**: 使用 `@tsd` 进行静态类型测试，确保关键类型正确性
-
-| Task ID | 任务 | 验证 | 状态 |
-|---------|------|------|------|
-| T4.1 | 安装并配置 `@tsd/tsd` | `expect(exec('npx tsd 2>&1').exitCode).toBe(0)` | ⏳ pending |
-| T4.2 | Store 类型测试 (`*.test-d.ts`) | Store 类型测试全部通过 | ⏳ pending |
-| T4.3 | API 响应类型测试 (`ApiResponse<T>`) | API 类型测试全部通过 | ⏳ pending |
-| T4.4 | 组件 Props 类型测试 | 组件类型测试全部通过 | ⏳ pending |
-
-**验收**: `npx tsd` 零 error
-
----
-
-## 4. 迁移路径
+## 3. 依赖关系
 
 ```mermaid
 flowchart LR
-    A1[T1.1-T1.3 ✅ 已完成] --> B1[T1.4-T1.6 ⏳ 待完成]
-    B1 --> B[Epic 2<br/>类型断言清理]
-    B --> C[Epic 3<br/>ESLint 类型规则]
-    C --> D[Epic 4<br/>类型测试覆盖]
-    D --> E[✅ 完成]
+    P1[Phase 1] --> P2[Phase 2]
+    P2 --> P3[Phase 3]
 ```
 
 ---
 
-## 5. 验收标准汇总
-
-| 标准 | 验证命令 | 目标 | 状态 |
-|------|----------|------|------|
-| strict 启用 | tsconfig strict: true | ✅ | DONE |
-| as any 数量 | `grep -rn "as any" src | wc -l` | < 10 (当前 6) | ✅ |
-| tsc --noEmit | `npx tsc --noEmit` | 0 error | ⏳ 49 remain |
-| ESLint 类型规则 | `npm run lint` | 0 警告 | ⏳ |
-| 类型测试通过 | `npx tsd` | 0 error | ⏳ |
-
----
-
-## 6. 风险与回滚
+## 4. 风险评估
 
 | 风险 | 影响 | 缓解 |
 |------|------|------|
-| Epic 2 大规模改动 | 引入回归 | 每次提交运行 `npm run build` |
-| ESLint 规则启用过早 | CI 失败 | Epic 3 依赖 Epic 2 完成 |
-| 第三方库类型缺失 | 编译失败 | 添加 `// @ts-ignore` 或自定义 @types |
-
-**回滚**: `git revert <commit>` 恢复 `tsconfig.json` 到 strict: false
+| 构建失败 | 高 | 渐进式修复 |
+| 回归问题 | 中 | 完整测试 |
+| 工期延误 | 中 | 预留 buffer |
 
 ---
 
-## 7. 已完成工作 (2026-03-20 Dev)
+## 5. 验收标准
 
-1. ✅ `tsconfig.json`: `strict: false` → `strict: true`, `noImplicitAny: false` → `true`, `strictNullChecks: false` → `true`
-2. ✅ `lib/ai-autofix/index.ts`: `(apiService as any).generateText` → `(apiService as unknown as AiCapableService).generateText`
-3. ✅ `lib/contract/OpenAPIGenerator.ts`: `(schema as any)._def` → `((schema as unknown) as { _def: unknown })._def`
-4. ✅ 9 个组件文件的 strictNullChecks 修复（mermaid, prototype-preview, sentry, templates, version-diff, confirm/flow, confirm/model）
+| Phase | 验收标准 |
+|-------|----------|
+| Phase 1 | tsconfig.json strict: true |
+| Phase 2 | tsc --strict 无 error |
+| Phase 3 | CI 类型检查通过 |
 
-*Last Updated: 2026-03-20 by Dev Agent*
+---
+
+## 6. DoD
+
+- [ ] tsconfig.json strict: true
+- [ ] `as any` < 10 处
+- [ ] `tsc --strict` 无 error
+- [ ] CI 类型检查通过
+
+---
+
+*Implementation Plan - 2026-03-19*

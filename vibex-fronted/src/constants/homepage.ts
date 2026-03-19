@@ -5,13 +5,11 @@
 
 import type { Step } from '@/types/homepage';
 
-/** 五步流程步骤定义 */
+/** 三步流程步骤定义 (vibex-homepage-flow-redesign epic4) */
 export const STEPS: Step[] = [
-  { id: 1, label: '需求输入', description: '输入项目需求描述' },
-  { id: 2, label: '限界上下文', description: '定义系统边界和核心领域' },
-  { id: 3, label: '领域模型', description: '设计实体和聚合根' },
-  { id: 4, label: '业务流程', description: '描述业务操作流程' },
-  { id: 5, label: '项目创建', description: '生成完整项目代码' },
+  { id: 1, label: '业务流程分析', description: '输入上下文，生成业务流程图' },
+  { id: 2, label: 'UI组件分析', description: '勾选流程节点，生成UI组件树' },
+  { id: 3, label: '创建项目', description: '选择组件，生成项目代码' },
 ];
 
 /** localStorage 键名 */
@@ -57,20 +55,16 @@ export const API_ENDPOINTS = {
   CREATE_PROJECT: '/api/project/create',
 } as const;
 
-/** 步骤对应的 API 端点 */
+/** 步骤对应的 API 端点 (三步流程) */
 export const STEP_API_MAP: Record<number, string> = {
-  1: API_ENDPOINTS.GENERATE_CONTEXTS,
-  2: API_ENDPOINTS.GENERATE_MODELS,
-  3: API_ENDPOINTS.GENERATE_FLOWS,
-  4: API_ENDPOINTS.CREATE_PROJECT,
-  5: API_ENDPOINTS.CREATE_PROJECT,
+  1: API_ENDPOINTS.GENERATE_CONTEXTS, // 业务流程分析（复用限界上下文API生成流程图）
+  2: API_ENDPOINTS.GENERATE_FLOWS,     // UI组件分析（复用业务流程API生成组件图）
+  3: API_ENDPOINTS.CREATE_PROJECT,      // 创建项目
 };
 
-/** 步骤完成所需的最小数据 */
+/** 步骤完成所需的最小数据 (三步流程) */
 export const STEP_REQUIREMENTS: Record<number, string[]> = {
-  1: ['requirementText'],
-  2: ['boundedContexts'],
-  3: ['domainModels'],
-  4: ['businessFlow'],
-  5: ['boundedContexts', 'domainModels', 'businessFlow'],
+  1: ['requirementText', 'boundedContexts'],
+  2: ['businessFlow'],
+  3: ['boundedContexts', 'domainModels', 'businessFlow'],
 };

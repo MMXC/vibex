@@ -4,15 +4,15 @@
  */
 
 export const colors = {
-  // 主色
-  primary: 'var(--color-primary, #3b82f6)',
+  // 主色 (FE-1.2.1)
+  primary: 'var(--color-primary, #3B82F6)',
   primaryHover: 'var(--color-primary-hover, #2563eb)',
   primaryActive: 'var(--color-primary-active, #1d4ed8)',
   primaryLight: 'var(--color-primary-light, #eff6ff)',
   primaryDark: 'var(--color-primary-dark, #1e40af)',
 
-  // 辅助色
-  secondary: 'var(--color-secondary, #6366f1)',
+  // 辅助色 (FE-1.2.1)
+  secondary: 'var(--color-secondary, #6366F1)',
   secondaryHover: 'var(--color-secondary-hover, #4f46e5)',
   secondaryLight: 'var(--color-secondary-light, #eef2ff)',
 
@@ -33,12 +33,14 @@ export const colors = {
   infoHover: 'var(--color-info-hover, #0284c7)',
   infoLight: 'var(--color-info-light, #e0f2fe)',
 
-  // 中性色 - 背景
+  // 中性色 - 背景 (FE-1.2.1)
+  bg: 'var(--color-bg, #0F172A)',
   bgPrimary: 'var(--color-bg-primary, #ffffff)',
   bgSecondary: 'var(--color-bg-secondary, #f9fafb)',
   bgTertiary: 'var(--color-bg-tertiary, #f3f4f6)',
   bgElevated: 'var(--color-bg-elevated, #ffffff)',
   bgOverlay: 'var(--color-bg-overlay, rgba(0, 0, 0, 0.5))',
+  surface: 'var(--color-surface, #1E293B)',
 
   // 中性色 - 边框
   border: 'var(--color-border, #e5e7eb)',
@@ -46,7 +48,9 @@ export const colors = {
   borderFocus: 'var(--color-border-focus, #3b82f6)',
   borderError: 'var(--color-border-error, #ef4444)',
 
-  // 中性色 - 文本
+  // 中性色 - 文本 (FE-1.2.1)
+  text: 'var(--color-text, #F8FAFC)',
+  textMuted: 'var(--color-text-muted, #94A3B8)',
   textPrimary: 'var(--color-text-primary, #111827)',
   textSecondary: 'var(--color-text-secondary, #6b7280)',
   textTertiary: 'var(--color-text-tertiary, #9ca3af)',

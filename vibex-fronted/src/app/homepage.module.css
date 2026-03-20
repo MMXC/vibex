@@ -3,9 +3,11 @@
 /* 主容器 - 支持侧边栏 + 主内容布局 */
 .container {
   min-height: 100vh;
+  max-width: 1440px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  background: #0a0a0f;
+  background: var(--color-bg-primary, #0a0a0f);
   position: relative;
   overflow: hidden;
 }

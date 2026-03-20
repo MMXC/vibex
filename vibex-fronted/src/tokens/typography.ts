@@ -104,6 +104,8 @@ export function getTypographyCSSVars(): Record<string, string | number> {
     '--font-family-mono': fontFamily.mono,
     '--font-family-display': fontFamily.display,
     '--font-family-body': fontFamily.body,
+    // FE-1.2.3: --font-sans alias
+    '--font-sans': fontFamily.sans,
 
     // 字体大小
     '--font-size-xs': fontSize.xs,

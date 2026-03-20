@@ -25,8 +25,9 @@ const mockChangelog: ChangelogEntry[] = [
       '🔧 Step 1 按钮修复: generateContexts 替代 generateFlow',
       '🔧 PreviewArea 订阅 confirmationStore.flowMermaidCode，解决首页预览不更新问题',
       '🔧 secure-storage 空 catch 添加 error logging',
+      '⚡ ESLint 性能优化: --cache + ignore tests/**，lint 耗时从 65s 降至 < 30s',
     ],
-    commit: '469bb207',
+    commit: '469bb207, 48153cb4, 67f5eb8d, 6ab10f04',
   },
   {
     version: '1.0.57',

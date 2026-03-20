@@ -18,10 +18,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.54',
+    date: '2026-03-20',
+    changes: [
+      '🔐 控制台日志脱敏: 后端 log-sanitizer 实现 + 前端 devLog 环境守卫',
+    ],
+    commit: '44758b7',
+  },
+  {
     version: '1.0.53',
     date: '2026-03-20',
     changes: [
-      '🔐 Auth E2E flaky fix: OAuth tests async 改造 + sessionStorage mock（jsdom Web Crypto 兼容）',
+      '🔧 Auth E2E flaky fix: Locator.closest()→evaluateHandle + OAuth tests async 改造 + sessionStorage mock',
       '🔒 P1 security: flatted 3.4.1→3.4.2 (Prototype Pollution + DoS CVE)',
       '🔐 OAuth tokens 升级为 AES-256-GCM 加密（Web Crypto API）',
       '🔐 Auth tokens 从 localStorage 迁移至 sessionStorage（防 XSS token 泄露）',
@@ -493,7 +501,7 @@ const mockChangelog: ChangelogEntry[] = [
       '🔄 GitHub Actions secrets-scan 工作流',
       '📋 .env.example 环境变量模板',
     ],
-    commit: 'pending',
+    commit: '44758b7',
   },
   {
     version: '1.0.9',

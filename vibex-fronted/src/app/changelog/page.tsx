@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.60',
+    date: '2026-03-21',
+    changes: [
+      '🔍 Epic 1-1-1 审查: CSS 变量规范修复 (max-width: 1440px, z-index 变量化)',
+      '🛡️ 代码规范: Navbar z-index 使用 --z-navbar CSS 变量',
+      '📐 布局: .container 添加 max-width: 1440px + margin: 0 auto',
+    ],
+    commit: '3fe9a177',
+  },
+  {
     version: '1.0.59',
     date: '2026-03-21',
     changes: [

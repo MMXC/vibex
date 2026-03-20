@@ -4,6 +4,11 @@
  * 性能目标: < 100ms 响应
  */
 
+/** Dev-only logger */
+const devLog = (...args: unknown[]) => {
+  if (process.env.NODE_ENV !== 'production') console.log(...args);
+};
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { 
@@ -153,7 +158,7 @@ export const useSmartRecommenderStore = create<RecommenderState>()(
         
         if (selected) {
           // 记录选择（可用于后续分析）
-          console.log('[SmartRecommender] Selected:', selected.template.name);
+          devLog('[SmartRecommender] Selected:', selected.template.name);
         }
         
         return selected || null;

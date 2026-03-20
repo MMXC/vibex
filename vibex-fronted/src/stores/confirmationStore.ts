@@ -1,4 +1,9 @@
 import { create } from 'zustand';
+
+/** Dev-only logger */
+const devLog = (...args: unknown[]) => {
+  if (process.env.NODE_ENV !== 'production') console.log(...args);
+};
 import { persist, createJSONStorage } from 'zustand/middleware';
 
 // Storage version for migration
@@ -401,7 +406,7 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
       ): ConfirmationFlowState => {
         if (oldVersion < 1) {
           // Version 1 migration: Add any new fields with defaults
-          console.log(
+          devLog(
             'Migrating confirmation store from version',
             oldVersion,
             'to',

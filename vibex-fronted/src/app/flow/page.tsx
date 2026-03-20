@@ -1,6 +1,11 @@
 'use client';
 
 import { Suspense, useState, useCallback, useEffect } from 'react';
+
+/** Dev-only logger */
+const devLog = (...args: unknown[]) => {
+  if (process.env.NODE_ENV !== 'production') console.log(...args);
+};
 import { useSearchParams } from 'next/navigation';
 import ReactFlow, {
   NodeChange,
@@ -375,7 +380,7 @@ function FlowContent() {
   const handleSave = useCallback(async () => {
     if (!flowId) {
       // In a real app, create a new flow first
-      console.log('No flow ID - would create new flow');
+      devLog('No flow ID - would create new flow');
       return;
     }
 

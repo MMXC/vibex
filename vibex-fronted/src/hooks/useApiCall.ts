@@ -16,6 +16,11 @@ import { defaultErrorMapper } from '@/lib/error/ErrorCodeMapper';
 import { defaultRetryHandler } from '@/lib/error/RetryHandler';
 import { useToast } from '@/components/ui/Toast';
 
+/** Dev-only logger */
+const devLog = (...args: unknown[]) => {
+  if (process.env.NODE_ENV !== 'production') console.log(...args);
+};
+
 export interface UseApiCallOptions<TArgs extends unknown[], TData> {
   /** API 调用函数 */
   apiFn: (...args: TArgs) => Promise<TData>;
@@ -164,7 +169,7 @@ export function useApiCall<TArgs extends unknown[], TData>(
             maxRetries: retryCount,
             baseDelay: retryDelay,
             onRetry: (attempt, maxRetries) => {
-              console.log(`重试 ${attempt}/${maxRetries}`);
+              devLog(`重试 ${attempt}/${maxRetries}`);
             },
           }
         );

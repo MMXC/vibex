@@ -7,6 +7,11 @@
  */
 
 import { useState, useCallback } from 'react';
+
+/** Dev-only logger */
+const devLog = (...args: unknown[]) => {
+  if (process.env.NODE_ENV !== 'production') console.log(...args);
+};
 import { TemplateGallery, TemplatePreview } from '@/components/templates';
 import type { Template } from '@/types/template';
 import styles from './templates.module.css';
@@ -31,7 +36,7 @@ export default function TemplatesPage() {
 
   // 处理模板应用
   const handleApply = useCallback((template: Template) => {
-    console.log('Applying template:', template.name);
+    devLog('Applying template:', template.name);
     alert(`已选择模板: ${template.name}\n点击"使用此模板"开始创建项目！`);
     setPreviewOpen(false);
     setSelectedTemplate(null);

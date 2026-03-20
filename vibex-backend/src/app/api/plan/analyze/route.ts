@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAIService } from '@/services/ai-service';
 import { getLocalEnv as getCloudflareEnv } from '@/lib/env';
 import { generateId } from '@/lib/db';
+import { devDebug, sanitize } from '@/lib/log-sanitizer';
 
 interface AnalyzeRequest {
   requirement: string;
@@ -96,7 +97,7 @@ export async function POST(request: NextRequest) {
       apiBase: env.MINIMAX_API_BASE || 'default',
       model: env.MINIMAX_MODEL || 'default',
     };
-    console.log('[DEBUG] Plan API - Env debug:', JSON.stringify(debugInfo));
+    devDebug('[DEBUG] Plan API - Env debug:', debugInfo);
 
     // Create AI service
     const aiService = createAIService(env);
@@ -232,10 +233,10 @@ Respond ONLY with the JSON object, no other text.`;
       }
     );
 
-    // Debug: Log the AI result
-    console.log('[DEBUG] Plan API - AI result success:', result.success);
-    console.log('[DEBUG] Plan API - AI result error:', result.error);
-    console.log('[DEBUG] Plan API - AI result data:', result.data ? JSON.stringify(result.data).substring(0, 200) : 'null');
+    // Debug: Log the AI result (sanitized)
+    devDebug('[DEBUG] Plan API - AI result success:', result.success);
+    devDebug('[DEBUG] Plan API - AI result error:', result.error);
+    devDebug('[DEBUG] Plan API - AI result data:', result.data ? JSON.stringify(sanitize(result.data)).substring(0, 200) : 'null');
 
     // Parse the AI response
     if (!result?.success || !result?.data) {

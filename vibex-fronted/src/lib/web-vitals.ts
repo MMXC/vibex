@@ -13,6 +13,11 @@
 
 import { captureMessage } from './sentry';
 
+/** Dev-only logger */
+const devLog = (...args: unknown[]) => {
+  if (process.env.NODE_ENV !== 'production') console.log(...args);
+};
+
 // PerformanceObserver entry type definitions (not in standard DOM lib)
 interface LCPEntry extends PerformanceEntry {
   renderTime: number;
@@ -87,7 +92,7 @@ function reportWebVitals(metric: WebVitalsMetric) {
   const { name, value, rating, delta, id } = metric;
   
   // 控制台输出
-  console.log(`[Web Vitals] ${name}:`, {
+  devLog(`[Web Vitals] ${name}:`, {
     value: Math.round(value),
     rating,
     delta: Math.round(delta),
@@ -299,7 +304,7 @@ export function initWebVitals() {
     console.warn('[Web Vitals] TTFB not supported');
   }
   
-  console.log('[Web Vitals] Initialized');
+  devLog('[Web Vitals] Initialized');
 }
 
 /**

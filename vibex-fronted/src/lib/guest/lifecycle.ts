@@ -3,6 +3,11 @@
  * 游客数据的过期、清理和生命周期管理
  */
 
+/** Dev-only logger */
+const devLog = (...args: unknown[]) => {
+  if (process.env.NODE_ENV !== 'production') console.log(...args);
+};
+
 import { 
   getGuestSession, 
   getGuestData, 
@@ -100,7 +105,7 @@ export function cleanupExpiredData(): number {
   }
   
   if (cleaned > 0) {
-    console.log(`[Lifecycle] Cleaned ${cleaned} expired items`);
+    devLog(`[Lifecycle] Cleaned ${cleaned} expired items`);
   }
   
   return cleaned;
@@ -111,7 +116,7 @@ export function cleanupExpiredData(): number {
  */
 export function startCleanupTask(): void {
   if (cleanupTimer) {
-    console.log('[Lifecycle] Cleanup task already running');
+    devLog('[Lifecycle] Cleanup task already running');
     return;
   }
   
@@ -119,7 +124,7 @@ export function startCleanupTask(): void {
     cleanupExpiredData();
   }, currentConfig.cleanupIntervalMs);
   
-  console.log('[Lifecycle] Cleanup task started');
+  devLog('[Lifecycle] Cleanup task started');
 }
 
 /**
@@ -129,7 +134,7 @@ export function stopCleanupTask(): void {
   if (cleanupTimer) {
     clearInterval(cleanupTimer);
     cleanupTimer = null;
-    console.log('[Lifecycle] Cleanup task stopped');
+    devLog('[Lifecycle] Cleanup task stopped');
   }
 }
 
@@ -143,7 +148,7 @@ export function initLifecycle(): void {
   // 启动定期清理
   startCleanupTask();
   
-  console.log('[Lifecycle] Initialized');
+  devLog('[Lifecycle] Initialized');
 }
 
 /**

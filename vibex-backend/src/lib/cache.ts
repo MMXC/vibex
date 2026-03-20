@@ -1,4 +1,5 @@
 import { Context, Next } from 'hono';
+import { devDebug } from './log-sanitizer';
 
 /**
  * Cache configuration options
@@ -648,7 +649,7 @@ export function startCacheCleanup(intervalMs: number = 60000) {
   cleanupInterval = setInterval(() => {
     const cleaned = store.cleanup();
     if (cleaned > 0 && process.env.NODE_ENV !== 'production') {
-      console.log(`Cache: Cleaned up ${cleaned} expired entries`);
+      devDebug(`Cache: Cleaned up ${cleaned} expired entries`);
     }
   }, intervalMs);
 

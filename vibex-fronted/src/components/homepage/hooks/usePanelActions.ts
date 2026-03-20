@@ -1,6 +1,11 @@
 import { useCallback, useState } from 'react';
 import type { AIMessage, PanelActions } from '../types';
 
+/** Dev-only logger */
+const devLog = (...args: unknown[]) => {
+  if (process.env.NODE_ENV !== 'production') console.log(...args);
+};
+
 export interface UsePanelActionsReturn extends PanelActions {
   messages: AIMessage[];
 }
@@ -17,15 +22,15 @@ export const usePanelActions = (): UsePanelActionsReturn => {
   }, []);
 
   const setCurrentStep = useCallback((step: number) => {
-    console.log('Set current step:', step);
+    devLog('Set current step:', step);
   }, []);
 
   const setPreviewContent = useCallback((content: string) => {
-    console.log('Set preview content:', content);
+    devLog('Set preview content:', content);
   }, []);
 
   const setInputValue = useCallback((value: string) => {
-    console.log('Set input value:', value);
+    devLog('Set input value:', value);
   }, []);
 
   const sendAIMessage = useCallback((content: string) => {

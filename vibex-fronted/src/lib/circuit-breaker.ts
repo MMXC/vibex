@@ -5,6 +5,11 @@
  * 当失败率超过阈值时打开熔断器，快速失败返回友好提示
  */
 
+/** Dev-only logger */
+const devLog = (...args: unknown[]) => {
+  if (process.env.NODE_ENV !== 'production') console.log(...args);
+};
+
 export type CircuitState = 'closed' | 'open' | 'half-open';
 
 export interface CircuitBreakerOptions {
@@ -190,12 +195,12 @@ export class CircuitBreaker {
         this.successCount = 0;
         this.halfOpenCalls = 0;
         this.onCircuitClose?.();
-        console.log(`[CircuitBreaker] CLOSED: ${this.name}`);
+        devLog(`[CircuitBreaker] CLOSED: ${this.name}`);
         break;
       case 'half-open':
         this.halfOpenCalls = 0;
         this.onCircuitHalfOpen?.();
-        console.warn(`[CircuitBreaker] HALF-OPEN: ${this.name}`);
+        devLog(`[CircuitBreaker] HALF-OPEN: ${this.name}`);
         break;
     }
   }

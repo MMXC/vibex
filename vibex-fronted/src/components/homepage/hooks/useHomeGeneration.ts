@@ -1,4 +1,9 @@
 import { useState, useCallback } from 'react';
+
+/** Dev-only logger to prevent sensitive data leaking in production */
+const devLog = (...args: unknown[]) => {
+  if (process.env.NODE_ENV !== 'production') console.log(...args);
+};
 import type { BoundedContext, DomainModel, BusinessFlow, HomeGeneration, StreamStatus } from '@/types/homepage';
 
 /**
@@ -34,7 +39,7 @@ export const useHomeGeneration = (
     try {
       // This would typically call the actual API
       // For now, we just set up the structure
-      console.log('Generating contexts for:', requirement);
+      devLog('Generating contexts for:', requirement);
       // onContextsGenerated?.(contexts);
       setStreamStatus('complete');
     } catch (error) {
@@ -53,7 +58,7 @@ export const useHomeGeneration = (
     setStreamStatus('streaming');
     
     try {
-      console.log('Generating domain models for:', contexts.length, 'contexts');
+      devLog('Generating domain models for:', contexts.length, 'contexts');
       // onDomainModelsGenerated?.(models);
       setStreamStatus('complete');
     } catch (error) {
@@ -72,7 +77,7 @@ export const useHomeGeneration = (
     setStreamStatus('streaming');
     
     try {
-      console.log('Generating business flow for:', models.length, 'models');
+      devLog('Generating business flow for:', models.length, 'models');
       // onBusinessFlowGenerated?.(flow);
       setStreamStatus('complete');
     } catch (error) {
@@ -90,7 +95,7 @@ export const useHomeGeneration = (
     setGenerationError(null);
     
     try {
-      console.log('Creating project...');
+      devLog('Creating project...');
       // onProjectCreated?.();
     } catch (error) {
       const err = error instanceof Error ? error : new Error('创建失败');
@@ -102,7 +107,7 @@ export const useHomeGeneration = (
   }, [onProjectCreated, onError]);
 
   const sendMessage = useCallback(async (message: string) => {
-    console.log('Sending message:', message);
+    devLog('Sending message:', message);
     // AI chat implementation would go here
   }, []);
 

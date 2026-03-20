@@ -3,6 +3,7 @@ import { cors } from 'hono/cors'
 import { z } from 'zod'
 import { generateId, Env } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
+import { devDebug, sanitize } from '@/lib/log-sanitizer'
 
 const plan = new Hono<{ Bindings: Env }>();
 
@@ -109,7 +110,7 @@ plan.post('/analyze', async (c) => {
       apiBase: env.MINIMAX_API_BASE || 'default',
       model: env.MINIMAX_MODEL || 'default',
     }
-    console.log('[DEBUG] Plan API - Env debug:', JSON.stringify(debugInfo))
+    devDebug('[DEBUG] Plan API - Env debug:', debugInfo)
 
     // Create AI service
     const aiService = createAIService(env)
@@ -245,10 +246,10 @@ Respond ONLY with the JSON object, no other text.`
       }
     )
 
-    // Debug: Log the AI result
-    console.log('[DEBUG] Plan API - AI result success:', result.success)
-    console.log('[DEBUG] Plan API - AI result error:', result.error)
-    console.log('[DEBUG] Plan API - AI result data:', result.data ? JSON.stringify(result.data).substring(0, 200) : 'null')
+    // Debug: Log the AI result (sanitized)
+    devDebug('[DEBUG] Plan API - AI result success:', result.success)
+    devDebug('[DEBUG] Plan API - AI result error:', result.error)
+    devDebug('[DEBUG] Plan API - AI result data:', result.data ? JSON.stringify(sanitize(result.data)).substring(0, 200) : 'null')
 
     // Parse the AI response
     if (!result.success || !result.data) {

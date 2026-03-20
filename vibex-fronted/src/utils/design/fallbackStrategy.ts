@@ -4,6 +4,11 @@
  * 性能目标: < 50ms
  */
 
+/** Dev-only logger */
+const devLog = (...args: unknown[]) => {
+  if (process.env.NODE_ENV !== 'production') console.log(...args);
+};
+
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { create } from 'zustand';
 
@@ -71,7 +76,7 @@ export const useOfflineStore = create<OfflineState>()(
         
         // 离线转在线时，尝试同步
         if (isOnline) {
-          console.log('[Fallback] Back online, ready to sync');
+          devLog('[Fallback] Back online, ready to sync');
         }
       },
 
@@ -193,7 +198,7 @@ export async function getRecommendationsWithFallback(
   const isOnline = canUseOnlineMode();
   
   if (!isOnline) {
-    console.log('[Fallback] Offline mode, using cached recommendations');
+    devLog('[Fallback] Offline mode, using cached recommendations');
     return {
       recommendations: getFallbackRecommendation(),
       isFallback: true,
@@ -206,7 +211,7 @@ export async function getRecommendationsWithFallback(
     
     // 如果结果为空，触发降级
     if (!result || !result.recommendations || result.recommendations.length === 0) {
-      console.log('[Fallback] Empty result, using fallback');
+      devLog('[Fallback] Empty result, using fallback');
       return {
         recommendations: getFallbackRecommendation(),
         isFallback: true,

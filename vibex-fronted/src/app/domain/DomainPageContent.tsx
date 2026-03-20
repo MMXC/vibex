@@ -1,6 +1,12 @@
 'use client';
 
+import { getAuthToken } from '@/lib/auth-token';
 import { Suspense, useCallback, useEffect, useState, useMemo } from 'react';
+
+/** Dev-only logger */
+const devLog = (...args: unknown[]) => {
+  if (process.env.NODE_ENV !== 'production') console.log(...args);
+};
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import styles from './domain.module.css';
@@ -721,7 +727,7 @@ function DomainPageContent() {
   }, [selectedEntity, setNodes]);
 
   useEffect(() => {
-    const token = localStorage.getItem('auth_token');
+    const token = getAuthToken();
     if (!token) {
       router.push('/auth');
       return;
@@ -745,7 +751,7 @@ function DomainPageContent() {
               setRequirementText(reqData.content);
             } catch (e) {
               // Requirement might not exist, ignore
-              console.log('Could not fetch requirement:', e);
+              devLog('Could not fetch requirement:', e);
             }
           }
 

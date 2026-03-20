@@ -16,6 +16,7 @@
  */
 
 import { CloudflareEnv } from '../lib/env';
+import { devDebug, sanitizeAndTruncate } from '../lib/log-sanitizer';
 import {
   LLMProviderService,
   createLLMProviderService,
@@ -451,9 +452,9 @@ export class AIService {
    * F1.2: Logs raw response for debugging
    */
   private parseJSON<T>(content: string, logRawResponse: boolean = true): T | null {
-    // F1.2: Log raw response first 500 characters for debugging
+    // F1.2: Log sanitized raw response for debugging (no sensitive data)
     if (logRawResponse && content) {
-      console.log('[AI Service] Raw AI response (first 500 chars):', content.substring(0, 500));
+      devDebug('[AI Service] Raw AI response (first 200 chars):', sanitizeAndTruncate(content, 200));
     }
 
     try {
@@ -472,13 +473,13 @@ export class AIService {
       // Try to extract JSON from the response (original logic)
       const jsonMatch = content.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
       if (!jsonMatch) {
-        console.log('[AI Service] No JSON pattern found in response');
+        devDebug('[AI Service] No JSON pattern found in response');
         return null;
       }
       return JSON.parse(jsonMatch[0]) as T;
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-      console.log('[AI Service] JSON parse error:', errorMsg);
+      devDebug('[AI Service] JSON parse error:', errorMsg);
       return null;
     }
   }
@@ -492,7 +493,7 @@ export class AIService {
     
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       if (attempt > 0) {
-        console.log(`[AI Service] JSON parse retry attempt ${attempt}/${maxRetries}`);
+        devDebug(`[AI Service] JSON parse retry attempt ${attempt}/${maxRetries}`);
       }
       
       const result = this.parseJSON<T>(content, attempt === 0); // Only log on first attempt
@@ -503,7 +504,7 @@ export class AIService {
       lastError = 'Parse returned null';
     }
     
-    console.log('[AI Service] All parse attempts failed:', lastError);
+    devDebug('[AI Service] All parse attempts failed:', lastError);
     return null;
   }
 
@@ -903,8 +904,8 @@ export class AIService {
         const result = this.parseJSONWithRetry<T>(response.content);
         
         if (!result) {
-          console.log('[DEBUG] Failed to parse JSON. Raw response length:', response.content?.length)
-          console.log('[DEBUG] Raw response preview:', response.content?.substring(0, 500))
+          devDebug('[DEBUG] Failed to parse JSON. Raw response length:', response.content?.length);
+          devDebug('[DEBUG] Raw response preview (sanitized):', sanitizeAndTruncate(response.content ?? '', 200));
           throw new Error('Failed to parse JSON response');
         }
 

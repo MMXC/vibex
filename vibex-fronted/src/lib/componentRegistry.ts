@@ -77,9 +77,10 @@ export const componentRegistry = {
   },
 
   /**
-   * 打印所有组件状态 (用于调试)
+   * 打印所有组件状态 (用于调试) - 仅开发环境
    */
   print(): void {
+    if (process.env.NODE_ENV === 'production') return;
     console.log('\n📦 Component Registry Status\n');
     console.log('=' .repeat(50));
     

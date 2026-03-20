@@ -24,9 +24,6 @@ export const Navbar: React.FC<NavbarComponentProps> = ({
         <span className={styles.logoText}>{title}</span>
       </div>
       <div className={styles.navLinks}>
-        <Link href="/confirm" className={styles.navLink}>
-          设计
-        </Link>
         <Link href="/templates" className={styles.navLink}>
           模板
         </Link>

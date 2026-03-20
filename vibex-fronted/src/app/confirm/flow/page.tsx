@@ -1,5 +1,11 @@
 'use client';
 
+/**
+ * @deprecated This page is deprecated since 2026-03-21.
+ * All functionality has been migrated to the homepage step flow at /.
+ * @see docs/vibex-page-structure-consolidation/IMPLEMENTATION_PLAN.md
+ */
+
 import { getAuthToken, getUserId } from '@/lib/auth-token';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';

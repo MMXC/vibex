@@ -1,3 +1,9 @@
+/**
+ * @deprecated This test file is deprecated since 2026-03-21.
+ * The requirements page has been deprecated in favor of the homepage flow.
+ * @see docs/vibex-page-structure-consolidation/IMPLEMENTATION_PLAN.md
+ */
+
 import {
   render,
   screen,

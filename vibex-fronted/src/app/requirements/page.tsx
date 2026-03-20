@@ -1,5 +1,18 @@
 'use client';
 
+/**
+ * @deprecated This page is deprecated since 2026-03-21.
+ * 
+ * This route is being deprecated as part of the page structure consolidation.
+ * All functionality has been migrated to the homepage step flow at /.
+ * 
+ * Note: Individual requirement pages at /requirements/new and /requirements/[id] may still be in use.
+ * Only this list page is deprecated.
+ * 
+ * @deprecated Use the homepage at / instead
+ * @see docs/vibex-page-structure-consolidation/IMPLEMENTATION_PLAN.md
+ */
+
 import { getAuthToken, getUserId } from '@/lib/auth-token';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';

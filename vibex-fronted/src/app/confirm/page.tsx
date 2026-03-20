@@ -1,5 +1,15 @@
 'use client';
 
+/**
+ * @deprecated This page is deprecated since 2026-03-21.
+ * 
+ * This route is being deprecated as part of the page structure consolidation.
+ * All functionality has been migrated to the homepage step flow at /.
+ * 
+ * @deprecated Use the homepage at / instead
+ * @see docs/vibex-page-structure-consolidation/IMPLEMENTATION_PLAN.md
+ */
+
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './confirm.module.css';

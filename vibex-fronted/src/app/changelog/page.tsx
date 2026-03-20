@@ -18,6 +18,15 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.57',
+    date: '2026-03-20',
+    changes: [
+      '🐛 修复 Mermaid 渲染回归: MermaidManager 单例 + LRU 缓存 (50条) + DOMPurify SVG 脱敏',
+      '🔧 MermaidPreview 错误分类: 语法错误 vs 渲染错误，e2e test TS 类型修复',
+    ],
+    commit: 'cf87c10a',
+  },
+  {
     version: '1.0.56',
     date: '2026-03-20',
     changes: [

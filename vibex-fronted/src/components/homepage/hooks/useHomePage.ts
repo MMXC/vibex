@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuthStore } from '@/stores/authStore';
+import { useConfirmationStore } from '@/stores/confirmationStore';
 import { useDDDStream, useDomainModelStream, useBusinessFlowStream, ThinkingStep } from '@/hooks/useDDDStream';
 import type { BoundedContext } from '@/services/api/types/prototype/domain';
 import type { DomainModel, BusinessFlow, PageStructure } from '@/types/homepage';
@@ -366,6 +367,13 @@ export function useHomePage(): UseHomePageReturn {
     if (flowStreamStatus === 'done') {
       setBusinessFlow(streamBusinessFlow as unknown as BusinessFlow);
       setFlowMermaidCode(streamFlowMermaidCode);
+      // F1.4: 同步到 confirmationStore（支持从 confirm 页面返回时预览区能读取）
+      if (streamFlowMermaidCode) {
+        useConfirmationStore.getState().setFlowMermaidCode(streamFlowMermaidCode);
+      }
+      if (streamBusinessFlow) {
+        useConfirmationStore.getState().setBusinessFlow(streamBusinessFlow as unknown as import('@/stores/confirmationStore').BusinessFlow);
+      }
       if (streamBusinessFlow || streamFlowMermaidCode) {
         // 三步流程: 业务流程完成后跳转到 Step 2 (UI组件分析)
         setCompletedStep(1);

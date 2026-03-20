@@ -5,9 +5,10 @@
  * 1. 旧版：content, isLoading (用于 step 组件)
  * 2. 新版：currentStep, mermaidCode 等 (用于垂直布局)
  */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { MermaidPreview } from '@/components/ui/MermaidPreview';
 import { NodeTreeSelector } from './NodeTreeSelector';
+import { useConfirmationStore } from '@/stores/confirmationStore';
 import styles from './PreviewArea.module.css';
 import type { BoundedContext, DomainModel, BusinessFlow } from '@/types/homepage';
 
@@ -62,6 +63,21 @@ export const PreviewArea: React.FC<PreviewAreaAllProps> = ({
 }) => {
   const [showNodeTree, setShowNodeTree] = useState(true);
   const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set());
+
+  // F1.1: 订阅 confirmationStore.flowMermaidCode（从 confirm 页面流程返回时数据在此）
+  const storeFlowMermaidCode = useConfirmationStore((s) => s.flowMermaidCode);
+
+  // F1.3: Debug 日志（定位问题时启用）
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      console.debug('[PreviewArea] Rerender:', {
+        currentStep,
+        storeFlowMermaidCode: storeFlowMermaidCode?.substring(0, 80),
+        propMermaidCode: mermaidCode?.substring(0, 80),
+        effectiveCode: (storeFlowMermaidCode || mermaidCode)?.substring(0, 80),
+      });
+    }
+  }, [currentStep, storeFlowMermaidCode, mermaidCode]);
 
   // 检测是否使用新版布局
   const isNewLayout = currentStep !== undefined;
@@ -157,9 +173,9 @@ export const PreviewArea: React.FC<PreviewAreaAllProps> = ({
               <div className={styles.spinner}></div>
               <p>AI 正在分析需求...</p>
             </div>
-          ) : mermaidCode ? (
+          ) : (storeFlowMermaidCode || mermaidCode) ? (
             <MermaidPreview 
-              code={mermaidCode} 
+              code={storeFlowMermaidCode || mermaidCode || ''} 
               diagramType="graph"
               height="100%"
             />

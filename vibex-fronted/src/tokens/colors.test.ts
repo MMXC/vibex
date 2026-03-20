@@ -22,6 +22,18 @@ describe('colors', () => {
     expect(colors.bgPrimary).toBeDefined();
   });
 
+  // FE-1.2.1: Story 1.2 spec tokens
+  it('should have Story 1.2 spec tokens defined', () => {
+    expect(colors.bg).toBeDefined();
+    expect(colors.bg).toContain('var(--color-bg');
+    expect(colors.surface).toBeDefined();
+    expect(colors.surface).toContain('var(--color-surface');
+    expect(colors.text).toBeDefined();
+    expect(colors.text).toContain('var(--color-text');
+    expect(colors.textMuted).toBeDefined();
+    expect(colors.textMuted).toContain('var(--color-text-muted');
+  });
+
   it('should use CSS variables', () => {
     expect(colors.primary).toContain('var(--');
   });

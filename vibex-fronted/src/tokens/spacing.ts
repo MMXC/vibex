@@ -168,6 +168,14 @@ export function getSpacingCSSVars(): Record<string, string | number> {
     '--spacing-12': spacing[12],
     '--spacing-16': spacing[16],
 
+    // FE-1.2.2: Story 1.2 spec-aligned spacing aliases
+    '--spacing-xs': '4px',
+    '--spacing-sm': '8px',
+    '--spacing-md': '16px',
+    '--spacing-lg': '24px',
+    '--spacing-xl': '32px',
+    '--spacing-2xl': '48px',
+
     // 容器
     '--container-sm': container.sm,
     '--container-md': container.md,

@@ -66,7 +66,7 @@ const DEFAULT_GLOBAL_NAV: NavItem[] = [
 const DEFAULT_PROJECT_NAV: NavItem[] = [
   { id: 'dashboard', label: 'Dashboard', href: '' },
   { id: 'chat', label: '对话', href: '/chat' },
-  { id: 'requirements', label: '需求', href: '/requirements' },
+  { id: 'homepage', label: '首页', href: '/' },
   { id: 'domain', label: '领域模型', href: '/domain' },
   { id: 'flow', label: '流程图', href: '/flow' },
   { id: 'pages', label: '页面', href: '/pages' },

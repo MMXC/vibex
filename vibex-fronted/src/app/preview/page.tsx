@@ -4,9 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { SimpleSteps } from '@/components/ui/Steps';
 import { TemplateSelector } from '@/components/templates';
-import { useContextStore } from '@/stores/confirmation/contextStore';
-import { useModelStore } from '@/stores/confirmation/modelStore';
-import { useFlowStore } from '@/stores/confirmation/flowStore';
+import { useConfirmationStore } from '@/stores/confirmationStore';
 import styles from './preview.module.css';
 
 // 4步设计流程
@@ -44,9 +42,9 @@ export default function Preview() {
   }, []);
 
   // 获取 Store 数据
-  const boundedContexts = useContextStore((s) => s.boundedContexts) || [];
-  const domainModels = useModelStore((s) => s.domainModels) || [];
-  const businessFlow = useFlowStore((s) => s.businessFlow) || { id: '', name: '', states: [], transitions: [] };
+  const boundedContexts = useConfirmationStore((s) => s.boundedContexts) || [];
+  const domainModels = useConfirmationStore((s) => s.domainModels) || [];
+  const businessFlow = useConfirmationStore((s) => s.businessFlow) || { id: '', name: '', states: [], transitions: [] };
 
   // 根据数据确定当前步骤
   const getCurrentStep = () => {

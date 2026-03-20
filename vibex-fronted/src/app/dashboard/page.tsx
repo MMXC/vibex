@@ -184,7 +184,7 @@ export default function Dashboard() {
 
   // 创建新项目 - 跳转到需求输入页面
   const handleCreateProject = () => {
-    router.push('/confirm');
+    router.push('/');
   };
 
   if (loading) {
@@ -252,7 +252,7 @@ export default function Dashboard() {
             <span className={styles.navIcon}>↗</span>
             <span>导出</span>
           </Link>
-          <Link href="/requirements" className={styles.navItem}>
+          <Link href="/" className={styles.navItem}>
             <span className={styles.navIcon}>📝</span>
             <span>需求列表</span>
           </Link>

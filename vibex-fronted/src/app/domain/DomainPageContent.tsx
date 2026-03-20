@@ -19,7 +19,7 @@ import {
   BoundedContext,
 } from '@/services/api';
 const { generateBoundedContext } = apiService;
-import { ConfirmationSteps } from '@/components/ui/ConfirmationSteps';
+
 import { useConfirmationStore, DomainModel } from '@/stores/confirmationStore';
 import ReactFlow, {
   Node,
@@ -627,7 +627,7 @@ function DomainPageContent() {
 
     setDomainModels(domainModels);
     goToNextStep();
-    router.push('/confirm/model');
+    router.push('/');
   };
 
   // 转换实体为 React Flow 节点
@@ -1066,13 +1066,13 @@ function DomainPageContent() {
             </button>
           </div>
           <Link
-            href={`/requirements${projectId ? `?projectId=${projectId}` : ''}`}
+            href={`/?${projectId ? `projectId=${projectId}` : ''}`}
             className={styles.backLink}
           >
-            返回需求
+            返回首页
           </Link>
           <div className={styles.confirmActions}>
-            <ConfirmationSteps currentStep="model" className={styles.steps} />
+            <div className={styles.steps}><span>步骤: 领域模型</span></div>
             <button
               onClick={handleConfirmAndProceed}
               className={styles.confirmBtn}

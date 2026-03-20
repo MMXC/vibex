@@ -45,7 +45,7 @@ export default function Landing() {
 
     // 跳转到确认页面继续
     setIsGenerating(true);
-    router.push('/confirm');
+    router.push('/');
   };
 
   return (

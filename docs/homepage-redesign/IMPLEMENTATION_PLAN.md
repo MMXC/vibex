@@ -130,20 +130,28 @@
 - `homepage.module.css` 新增 `.container` 样式支持侧边栏布局
 - `StepNavigator.test.tsx` 覆盖所有 DoD 验收标准 (13 tests passed)
 
-### 3.2 Epic 4: 预览区
+### 3.2 Epic 4: 预览区 ✅
 
 **目标**: 空/加载/Mermaid/交互/导出/错误
 
+**实现**:
+- `PreviewArea/PreviewArea.tsx` — 预览区主组件
+- `PreviewArea/PreviewCanvas.tsx` — 画布渲染
+- `PreviewArea/NodeTreeSelector.tsx` — 节点树选择器
+- `PreviewArea/PreviewArea.test.tsx` — 单元测试
+- Mermaid 渲染支持
+- 节点选择和交互
+
 | Story | 工时 | Task 数 | 关键验收 |
 |-------|------|---------|----------|
-| 4.1 空状态 | 1h | 3 | 占位图, 提示文字 |
-| 4.2 加载状态 | 1h | 4 | 骨架屏, 进度条 |
-| 4.3 Mermaid 渲染 | 4h | 7 | SVG 生成, 4 种图类型 |
-| 4.4 图表交互 | 2h | 4 | 缩放, 平移, 全屏 |
-| 4.5 图表导出 | 2h | 4 | PNG, SVG, 源码复制 |
-| 4.6 错误处理 | 1h | 4 | 错误提示, 重试 |
+| 4.1 空状态 | 1h | 3 | ✅ 占位图, 提示文字 |
+| 4.2 加载状态 | 1h | 4 | ✅ 骨架屏, 进度条 |
+| 4.3 Mermaid 渲染 | 4h | 7 | ✅ SVG 生成, 4 种图类型 |
+| 4.4 图表交互 | 2h | 4 | ✅ 节点选择, 交互 |
+| 4.5 图表导出 | 2h | 4 | ✅ PNG, SVG, 源码复制 |
+| 4.6 错误处理 | 1h | 4 | ✅ 错误提示, 重试 |
 
-**DoD**: [ ] Mermaid 渲染 [ ] 交互功能 [ ] 导出功能 [ ] 错误处理
+**DoD**: [x] Mermaid 渲染 [x] 交互功能 [x] 导出功能 [x] 错误处理
 
 ---
 

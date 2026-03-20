@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.59',
+    date: '2026-03-21',
+    changes: [
+      '🔄 Epic 1 路由重定向: /confirm/* 和 /requirements/* → / (301) 的统一重定向中间件',
+      '🏷️ @deprecated 标记: 5个 confirm 页面 + requirements/page.tsx 已废弃',
+      '🔗 Navbar: 移除「设计」(/confirm) 导航链接',
+    ],
+    commit: '5c02c456',
+  },
+  {
     version: '1.0.58',
     date: '2026-03-20',
     changes: [

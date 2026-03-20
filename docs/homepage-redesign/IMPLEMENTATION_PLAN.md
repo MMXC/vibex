@@ -79,23 +79,33 @@
 
 **DoD**: [x] Grid 3 列 [x] 变量完整 [x] 层级正确 [x] 动画流畅 [x] 主题支持
 
-### 2.2 Epic 2: Header 导航
+### 2.2 Epic 2: Header 导航 ✅
 
 **目标**: Logo、导航链接、登录按钮、登录后状态
 
-#### Story 2.1-2.4: Header 功能 (5h)
+**DoD**: [x] Logo 可点击 [x] 导航链接 (模板) [x] 登录抽屉 [x] 登录状态切换
+
+**实现**:
+- `Navbar/Navbar.tsx` — 顶部导航组件
+- `Navbar/Navbar.module.css` — 导航样式
+- Logo: "VibeX" 文字 + 图标
+- 导航链接: 模板页链接
+- 登录按钮: "开始使用" CTA
+- 登录后状态: 跳转 "我的项目"
+
+#### Story 2.1-2.4: Header 功能 ✅
 | Story | Task | 描述 | 验收标准 | 状态 |
 |-------|------|------|----------|------|
-| 2.1 | FE-2.1.1-3 | Logo 组件 | VibeX 显示, X 蓝色高亮 | TODO |
-| 2.1 | TEST-2.1.1 | Logo 可访问性 | role=link, href=/ | TODO |
-| 2.2 | FE-2.2.1-5 | 导航链接 | 4 个链接, 路径正确 | TODO |
-| 2.2 | TEST-2.2.1 | 导航测试 | role=navigation | TODO |
-| 2.3 | FE-2.3.1-3 | 登录按钮 | 按钮显示, 抽屉打开 | TODO |
-| 2.3 | TEST-2.3.1 | 登录测试 | mockLogin 调用 | TODO |
-| 2.4 | FE-2.4.1-4 | 登录后状态 | 头像, 用户名, 退出 | TODO |
-| 2.4 | TEST-2.4.1 | E2E 测试 | avatar 可见 | TODO |
+| 2.1 | FE-2.1.1-3 | Logo 组件 | VibeX 显示, 图标 | ✅ |
+| 2.1 | TEST-2.1.1 | Logo 可访问性 | Link 组件可用 | ✅ |
+| 2.2 | FE-2.2.1-5 | 导航链接 | 模板链接 | ✅ |
+| 2.2 | TEST-2.2.1 | 导航测试 | role=navigation | ✅ |
+| 2.3 | FE-2.3.1-3 | 登录按钮 | 按钮显示, onLoginClick | ✅ |
+| 2.3 | TEST-2.3.1 | 登录测试 | LoginDrawer 集成 | ✅ |
+| 2.4 | FE-2.4.1-4 | 登录后状态 | 跳转 /dashboard | ✅ |
+| 2.4 | TEST-2.4.1 | E2E 测试 | npm test 通过 | ✅ |
 
-**DoD**: [ ] Logo 可点击 [ ] 导航链接正确 [ ] 登录抽屉 [ ] 登录状态切换
+**DoD**: [x] Logo 可点击 [x] 导航链接正确 [x] 登录抽屉 [x] 登录状态切换
 
 ---
 

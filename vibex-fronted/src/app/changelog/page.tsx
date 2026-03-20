@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.58',
+    date: '2026-03-20',
+    changes: [
+      '🚀 DesignStepLayout + StepNavigator: 所有 /design/* 页面统一布局（bounded-context/domain-model/business-flow/ui-generation）',
+      '🔧 Step 1 按钮修复: generateContexts 替代 generateFlow',
+      '🔧 PreviewArea 订阅 confirmationStore.flowMermaidCode，解决首页预览不更新问题',
+      '🔧 secure-storage 空 catch 添加 error logging',
+    ],
+    commit: '469bb207',
+  },
+  {
     version: '1.0.57',
     date: '2026-03-20',
     changes: [

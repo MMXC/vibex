@@ -18,6 +18,14 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.56',
+    date: '2026-03-20',
+    changes: [
+      '🔧 修复 Cloudflare Pages 构建: uuid@13.0.0 显式声明（修复 build 失败），移除弃用 @types/uuid',
+    ],
+    commit: '0faf598',
+  },
+  {
     version: '1.0.55',
     date: '2026-03-20',
     changes: [

@@ -70,8 +70,9 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     
     switch (currentStep) {
       case 1:
-        // Step 1: 业务流程分析 -> 调用 generateBusinessFlow
-        onGenerateFlow();
+        // Step 1: 业务流程分析 -> 先生成上下文 (onGenerateContexts)
+        // 上下文生成完成后会自动触发后续步骤
+        onGenerateContexts();
         break;
       case 2:
         // Step 2: UI组件分析 -> 调用 analyzePageStructure

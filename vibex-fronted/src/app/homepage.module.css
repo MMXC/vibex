@@ -1,5 +1,15 @@
 /* 三栏布局样式 - 首页重构 */
 
+/* 主容器 - 支持侧边栏 + 主内容布局 */
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #0a0a0f;
+  position: relative;
+  overflow: hidden;
+}
+
 .page {
   min-height: 100vh;
   display: flex;

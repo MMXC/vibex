@@ -1,8 +1,8 @@
 /**
- * HomePage - 主页容器组件 (60/40 垂直布局版)
+ * HomePage - 主页容器组件 (左侧抽屉 + 60/40 垂直布局版)
  * 
- * 预览区域 60% | 录入区域 40%
- * 无 Tab 切换，直接展示
+ * Epic 3: 左侧抽屉 - 步骤列表、步骤切换、步骤状态
+ * 布局: [左侧抽屉] [预览区域 60% | 录入区域 40%]
  * 
  * 业务逻辑已抽取到 useHomePage hook
  */
@@ -11,7 +11,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import LoginDrawer from '@/components/ui/LoginDrawer';
-import { Navbar } from '@/components/homepage';
+import { Navbar, Sidebar } from '@/components/homepage';
 import { useHomePage } from './hooks';
 import { InputArea } from './InputArea/InputArea';
 import { PreviewArea } from './PreviewArea/PreviewArea';
@@ -24,11 +24,13 @@ const ParticleBackground = dynamic(
   { ssr: false }
 );
 
-// 三步流程常量
+// 五步流程常量 - Epic 3: 左侧抽屉
 const STEPS: Step[] = [
-  { id: 1, label: '业务流程分析', description: '分析业务流程' },
-  { id: 2, label: 'UI组件分析', description: '生成UI组件树' },
-  { id: 3, label: '创建项目', description: '生成项目代码' },
+  { id: 1, label: '需求输入', description: '描述您的需求' },
+  { id: 2, label: '限界上下文', description: '定义系统边界' },
+  { id: 3, label: '领域模型', description: '设计领域实体' },
+  { id: 4, label: '业务流程', description: '绘制业务流程' },
+  { id: 5, label: '项目创建', description: '生成项目代码' },
 ];
 
 export default function HomePage() {
@@ -94,36 +96,48 @@ export default function HomePage() {
         onSettingsClick={() => setIsLoginDrawerOpen(true)} 
       />
       
-      {/* 60/40 垂直布局容器 - Milestone 1 */}
-      <div className={styles.mainContentVertical}>
-        {/* 预览区域 - 60% - AC1 */}
-        <PreviewArea
-          currentStep={currentStep}
-          mermaidCode={currentMermaidCode}
-          boundedContexts={boundedContexts}
-          domainModels={domainModels}
-          businessFlow={businessFlow}
-          isGenerating={isGenerating}
-        />
-        
-        {/* 录入区域 - 40% - AC2 & AC3: 无 Tab 切换 */}
-        <InputArea
-          requirementText={requirementText}
-          onRequirementChange={setRequirementText}
-          onSubmit={handleRequirementSubmit}
-          onGenerate={handleRequirementSubmit}
-          onGenerateDomainModel={() => generateDomainModels(requirementText, boundedContexts)}
-          onGenerateBusinessFlow={() => generateBusinessFlow([], requirementText)}
-          onCreateProject={() => {}}
-          onAnalyzePageStructure={analyzePageStructure}
-          isGenerating={isGenerating}
-          boundedContexts={boundedContexts}
-          selectedContextIds={selectedContextIds}
-          businessFlow={businessFlow}
-          pageStructureAnalyzed={pageStructureAnalyzed}
+      {/* Epic 3: 左侧抽屉 + 60/40 垂直布局 */}
+      <div className={styles.splitContainer}>
+        {/* 左侧抽屉 - Epic 3: 步骤列表 */}
+        <Sidebar
+          steps={STEPS}
           currentStep={currentStep}
           completedStep={completedStep}
+          onStepClick={handleStepClick}
+          isStepClickable={(stepId) => stepId <= (completedStep + 1)}
         />
+        
+        {/* 右侧主内容 - 60/40 垂直布局 */}
+        <div className={styles.mainContentVertical}>
+          {/* 预览区域 - 60% - AC1 */}
+          <PreviewArea
+            currentStep={currentStep}
+            mermaidCode={currentMermaidCode}
+            boundedContexts={boundedContexts}
+            domainModels={domainModels}
+            businessFlow={businessFlow}
+            isGenerating={isGenerating}
+          />
+          
+          {/* 录入区域 - 40% - AC2 & AC3: 无 Tab 切换 */}
+          <InputArea
+            requirementText={requirementText}
+            onRequirementChange={setRequirementText}
+            onSubmit={handleRequirementSubmit}
+            onGenerate={handleRequirementSubmit}
+            onGenerateDomainModel={() => generateDomainModels(requirementText, boundedContexts)}
+            onGenerateBusinessFlow={() => generateBusinessFlow([], requirementText)}
+            onCreateProject={() => {}}
+            onAnalyzePageStructure={analyzePageStructure}
+            isGenerating={isGenerating}
+            boundedContexts={boundedContexts}
+            selectedContextIds={selectedContextIds}
+            businessFlow={businessFlow}
+            pageStructureAnalyzed={pageStructureAnalyzed}
+            currentStep={currentStep}
+            completedStep={completedStep}
+          />
+        </div>
       </div>
 
       <LoginDrawer 

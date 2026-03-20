@@ -18,6 +18,14 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.55',
+    date: '2026-03-20',
+    changes: [
+      '🔧 修复构建失败: zustand@4.5.7 显式声明为直接依赖（修复 npm ls extraneous warning）',
+    ],
+    commit: 'abda39f',
+  },
+  {
     version: '1.0.54',
     date: '2026-03-20',
     changes: [

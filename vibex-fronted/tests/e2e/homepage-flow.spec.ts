@@ -104,11 +104,12 @@ async function testHomepageFlow() {
     };
     
   } catch (error) {
-    console.error('❌ 测试失败:', error.message);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('❌ 测试失败:', errorMessage);
     await page.screenshot({ path: '/tmp/vibex-analysis-error.png', fullPage: true });
     return {
       success: false,
-      error: error.message,
+      error: errorMessage,
       screenshot: '/tmp/vibex-analysis-error.png'
     };
   } finally {

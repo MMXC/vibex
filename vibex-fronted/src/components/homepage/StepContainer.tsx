@@ -10,16 +10,18 @@ const StepComponents: Record<number, React.LazyExoticComponent<ComponentType<Ste
   1: lazy(() => import('./steps/StepRequirementInput')),
   2: lazy(() => import('./steps/StepBoundedContext')),
   3: lazy(() => import('./steps/StepDomainModel')),
-  4: lazy(() => import('./steps/StepBusinessFlow')),
-  5: lazy(() => import('./steps/StepProjectCreate')),
+  4: lazy(() => import('./steps/StepClarification')),
+  5: lazy(() => import('./steps/StepBusinessFlow')),
+  6: lazy(() => import('./steps/StepProjectCreate')),
 };
 
 const STEP_DEFAULT_MESSAGE: Record<number, string> = {
   1: '正在加载需求输入...',
   2: '正在加载限界上下文...',
   3: '正在加载领域模型...',
-  4: '正在加载业务流程...',
-  5: '正在加载项目创建...',
+  4: '正在加载需求澄清...',
+  5: '正在加载业务流程...',
+  6: '正在加载项目创建...',
 };
 
 export function StepContainer() {
@@ -35,12 +37,13 @@ export function StepContainer() {
     const store = useConfirmationStore.getState();
     
     // Map step number to ConfirmationStep
-    const stepMap: Record<number, 'input' | 'context' | 'model' | 'flow' | 'success'> = {
+    const stepMap: Record<number, 'input' | 'context' | 'model' | 'clarification' | 'flow' | 'success'> = {
       1: 'input',
       2: 'context',
       3: 'model',
-      4: 'flow',
-      5: 'success',
+      4: 'clarification',
+      5: 'flow',
+      6: 'success',
     };
     
     const confirmationStep = stepMap[targetStep] || 'input';

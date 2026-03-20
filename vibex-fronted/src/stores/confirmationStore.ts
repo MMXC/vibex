@@ -14,6 +14,7 @@ export type ConfirmationStep =
   | 'input'
   | 'context'
   | 'model'
+  | 'clarification'
   | 'flow'
   | 'success';
 
@@ -26,6 +27,7 @@ export interface ConfirmationSnapshot {
   contextMermaidCode: string;
   domainModels: DomainModel[];
   modelMermaidCode: string;
+  clarificationRounds: ClarificationRound[];
   businessFlow: BusinessFlow;
   flowMermaidCode: string;
   timestamp: number;
@@ -87,6 +89,17 @@ export interface FlowTransition {
   condition?: string;
 }
 
+/**
+ * Clarification Round - 需求澄清对话轮次
+ */
+export interface ClarificationRound {
+  id: string;
+  question: string;
+  answer: string;
+  timestamp: number;
+  isAccepted: boolean;
+}
+
 export interface ConfirmationFlowState {
   // Current step
   currentStep: ConfirmationStep;
@@ -112,6 +125,9 @@ export interface ConfirmationFlowState {
   businessFlow: BusinessFlow;
   flowMermaidCode: string;
 
+  // Step 4.5: Clarification (between model and flow)
+  clarificationRounds: ClarificationRound[];
+
   // Project created
   createdProjectId: string | null;
 
@@ -135,6 +151,11 @@ export interface ConfirmationFlowState {
 
   setBusinessFlow: (flow: BusinessFlow) => void;
   setFlowMermaidCode: (code: string) => void;
+
+  // Clarification actions
+  addClarificationRound: (round: ClarificationRound) => void;
+  acceptClarificationRound: (id: string) => void;
+  clearClarificationRounds: () => void;
 
   setCreatedProjectId: (id: string) => void;
 
@@ -179,6 +200,9 @@ const initialState = {
   },
   flowMermaidCode: '',
 
+  // Clarification
+  clarificationRounds: [],
+
   createdProjectId: null,
 
   // History
@@ -205,6 +229,7 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
           'input',
           'context',
           'model',
+          'clarification',
           'flow',
           'success',
         ];
@@ -241,6 +266,19 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
       setBusinessFlow: (flow) => set({ businessFlow: flow }),
       setFlowMermaidCode: (code) => set({ flowMermaidCode: code }),
 
+      // Clarification actions
+      addClarificationRound: (round) =>
+        set((state) => ({
+          clarificationRounds: [...state.clarificationRounds, round],
+        })),
+      acceptClarificationRound: (id) =>
+        set((state) => ({
+          clarificationRounds: state.clarificationRounds.map((r) =>
+            r.id === id ? { ...r, isAccepted: true } : r
+          ),
+        })),
+      clearClarificationRounds: () => set({ clarificationRounds: [] }),
+
       setCreatedProjectId: (id) => set({ createdProjectId: id }),
 
       // Save current state to history
@@ -254,6 +292,7 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
           contextMermaidCode: state.contextMermaidCode,
           domainModels: state.domainModels,
           modelMermaidCode: state.modelMermaidCode,
+          clarificationRounds: state.clarificationRounds,
           businessFlow: state.businessFlow,
           flowMermaidCode: state.flowMermaidCode,
           timestamp: Date.now(),
@@ -287,6 +326,7 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
             contextMermaidCode: prevSnapshot.contextMermaidCode,
             domainModels: prevSnapshot.domainModels,
             modelMermaidCode: prevSnapshot.modelMermaidCode,
+            clarificationRounds: prevSnapshot.clarificationRounds,
             businessFlow: prevSnapshot.businessFlow,
             flowMermaidCode: prevSnapshot.flowMermaidCode,
             historyIndex: historyIndex - 1,
@@ -307,6 +347,7 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
             contextMermaidCode: nextSnapshot.contextMermaidCode,
             domainModels: nextSnapshot.domainModels,
             modelMermaidCode: nextSnapshot.modelMermaidCode,
+            clarificationRounds: nextSnapshot.clarificationRounds,
             businessFlow: nextSnapshot.businessFlow,
             flowMermaidCode: nextSnapshot.flowMermaidCode,
             historyIndex: historyIndex + 1,

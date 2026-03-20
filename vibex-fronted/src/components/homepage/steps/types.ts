@@ -34,23 +34,30 @@ export type StepDomainModelProps = StepComponentProps & {
 };
 
 /**
- * Step 4: Business Flow
+ * Step 4: Clarification (AI 需求澄清)
+ */
+export type StepClarificationProps = StepComponentProps & {
+  // Data subscribed from store internally
+};
+
+/**
+ * Step 5: Business Flow
  */
 export type StepBusinessFlowProps = StepComponentProps & {
   // Data subscribed from store internally
 };
 
 /**
- * Step 5: Project Create
+ * Step 6: Project Create
  */
 export type StepProjectCreateProps = StepComponentProps & {
   // Data subscribed from store internally
 };
 
 /**
- * Step number mapping (1-5)
+ * Step number mapping (1-6)
  */
-export type StepNumber = 1 | 2 | 3 | 4 | 5;
+export type StepNumber = 1 | 2 | 3 | 4 | 5 | 6;
 
 /**
  * ConfirmationStep to StepNumber mapping
@@ -59,8 +66,9 @@ export const STEP_TO_NUMBER: Record<ConfirmationStep, StepNumber> = {
   input: 1,
   context: 2,
   model: 3,
-  flow: 4,
-  success: 5,
+  clarification: 4,
+  flow: 5,
+  success: 6,
 };
 
 /**
@@ -70,8 +78,9 @@ export const NUMBER_TO_STEP: Record<StepNumber, ConfirmationStep> = {
   1: 'input',
   2: 'context',
   3: 'model',
-  4: 'flow',
-  5: 'success',
+  4: 'clarification',
+  5: 'flow',
+  6: 'success',
 };
 
 /**
@@ -81,6 +90,7 @@ export const STEP_LABELS: Record<StepNumber, string> = {
   1: '需求输入',
   2: '限界上下文',
   3: '领域模型',
-  4: '业务流程',
-  5: '项目创建',
+  4: '需求澄清',
+  5: '业务流程',
+  6: '项目创建',
 };

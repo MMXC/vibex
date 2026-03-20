@@ -24,13 +24,14 @@ const ParticleBackground = dynamic(
   { ssr: false }
 );
 
-// 五步流程常量 - Epic 3: 左侧抽屉
+// 六步流程常量 - Epic 3: 左侧抽屉 + 需求澄清
 const STEPS: Step[] = [
   { id: 1, label: '需求输入', description: '描述您的需求' },
   { id: 2, label: '限界上下文', description: '定义系统边界' },
   { id: 3, label: '领域模型', description: '设计领域实体' },
-  { id: 4, label: '业务流程', description: '绘制业务流程' },
-  { id: 5, label: '项目创建', description: '生成项目代码' },
+  { id: 4, label: '需求澄清', description: 'AI 追问澄清' },
+  { id: 5, label: '业务流程', description: '绘制业务流程' },
+  { id: 6, label: '项目创建', description: '生成项目代码' },
 ];
 
 export default function HomePage() {

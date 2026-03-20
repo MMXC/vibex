@@ -32,7 +32,7 @@ export function OAuthConnectButton({
 
   // 检查连接状态
   const checkConnection = useCallback(async () => {
-    const connected = checkOAuthConnected(provider);
+    const connected = await checkOAuthConnected(provider);
     setIsConnected(connected);
     
     if (connected) {

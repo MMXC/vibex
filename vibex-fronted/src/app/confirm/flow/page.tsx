@@ -1,5 +1,6 @@
 'use client';
 
+import { getAuthToken, getUserId } from '@/lib/auth-token';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '../confirm.module.css';
@@ -84,7 +85,7 @@ export default function FlowPage() {
 
     try {
       // Get userId from localStorage
-      const userId = localStorage.getItem('user_id') || 'anonymous';
+      const userId = getUserId() || 'anonymous';
 
       // Call API to create project
       const project = await apiService.createProject({

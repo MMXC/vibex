@@ -1,5 +1,6 @@
 'use client';
 
+import { getAuthToken } from '@/lib/auth-token';
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -83,7 +84,7 @@ function ProjectDetailContent() {
   );
 
   useEffect(() => {
-    const token = localStorage.getItem('auth_token');
+    const token = getAuthToken();
     if (!token) {
       router.push('/auth');
       return;

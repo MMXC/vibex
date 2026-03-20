@@ -1,5 +1,6 @@
 'use client';
 
+import { getAuthToken, getUserId } from '@/lib/auth-token';
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -69,7 +70,7 @@ export default function Dashboard() {
   // 权限检查 - inline hook
   const user = useMemo(() => {
     if (typeof window === 'undefined') return null;
-    const token = localStorage.getItem('auth_token');
+    const token = getAuthToken();
     if (!token) return null;
     const storedRole = localStorage.getItem('user_role');
     if (storedRole) return { role: storedRole as UserRole };
@@ -83,8 +84,8 @@ export default function Dashboard() {
 
   // 初始化用户 ID
   useEffect(() => {
-    const token = localStorage.getItem('auth_token');
-    const storedUserId = localStorage.getItem('user_id');
+    const token = getAuthToken();
+    const storedUserId = getUserId();
 
     if (!token) {
       router.push('/auth');

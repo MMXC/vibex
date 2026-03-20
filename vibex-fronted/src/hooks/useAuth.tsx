@@ -56,7 +56,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // 初始化: 检查 localStorage 中的 token
   useEffect(() => {
     const initAuth = async () => {
-      const storedToken = localStorage.getItem('auth_token');
+      // 优先从 sessionStorage 读取（安全），fallback 到 localStorage（兼容旧数据迁移）
+      const storedToken = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
       if (storedToken) {
         setToken(storedToken);
         try {
@@ -66,6 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch (error) {
           console.error('Failed to fetch user:', error);
           // Token 失效，清除
+          sessionStorage.removeItem('auth_token');
           localStorage.removeItem('auth_token');
           setToken(null);
         }
@@ -86,7 +88,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       })) as unknown as { token?: string; user?: User };
 
       if (response.token) {
-        localStorage.setItem('auth_token', response.token);
+        // 安全：使用 sessionStorage 存储认证 token
+        sessionStorage.setItem('auth_token', response.token);
+        // 清除旧 localStorage 中的 token
+        localStorage.removeItem('auth_token');
         setToken(response.token);
 
         // 获取用户信息
@@ -110,7 +115,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         })) as unknown as { token?: string; user?: User };
 
         if (response.token) {
-          localStorage.setItem('auth_token', response.token);
+          // 安全：使用 sessionStorage 存储认证 token
+          sessionStorage.setItem('auth_token', response.token);
+          localStorage.removeItem('auth_token');
           setToken(response.token);
 
           // 获取用户信息
@@ -132,6 +139,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // 即使 API 调用失败也清除本地状态
       console.error('Logout API error:', error);
     } finally {
+      // 清除 sessionStorage（主存储）和 localStorage（兼容）
+      sessionStorage.removeItem('auth_token');
       localStorage.removeItem('auth_token');
       localStorage.removeItem('project_roles');
       setToken(null);

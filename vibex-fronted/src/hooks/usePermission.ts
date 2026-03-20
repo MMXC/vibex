@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { apiService } from '@/services/api';
+import { getAuthToken } from '@/lib/auth-token';
 
 export type GlobalRole = 'super_admin' | 'user' | 'guest';
 export type ProjectRole = 'owner' | 'admin' | 'editor' | 'viewer';
@@ -84,7 +85,7 @@ export function usePermission(): UsePermissionReturn {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const token = localStorage.getItem('auth_token');
+    const token = getAuthToken();
     setUser(token ? parseJWT(token) : null);
   }, []);
 

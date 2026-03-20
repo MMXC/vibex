@@ -52,8 +52,12 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
-        // Clear localStorage
+        // Clear sessionStorage (auth tokens should NOT persist across sessions)
         if (typeof window !== 'undefined') {
+          sessionStorage.removeItem('auth_token');
+          sessionStorage.removeItem('user_id');
+          sessionStorage.removeItem('user_role');
+          // Also clear any localStorage entries for backward compatibility
           localStorage.removeItem('auth_token');
           localStorage.removeItem('user_id');
           localStorage.removeItem('user_role');
@@ -62,12 +66,13 @@ export const useAuthStore = create<AuthState>()(
       },
 
       checkAuth: () => {
-        // 实时检测 localStorage 中的登录状态
+        // 实时检测 sessionStorage 中的登录状态（安全：不用 localStorage 存敏感 token）
         if (typeof window === 'undefined') {
           return false;
         }
 
-        const token = localStorage.getItem('auth_token');
+        // 优先从 sessionStorage 读取（安全），fallback 到 localStorage（兼容旧数据）
+        const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
         
         if (!token) {
           set({ isAuthenticated: false, user: null, token: null });
@@ -82,13 +87,19 @@ export const useAuthStore = create<AuthState>()(
             const now = Date.now() / 1000;
             
             if (decoded.exp && decoded.exp < now) {
-              // Token expired
+              // Token expired - clear from both storages
+              sessionStorage.removeItem('auth_token');
               localStorage.removeItem('auth_token');
               set({ isAuthenticated: false, user: null, token: null });
               return false;
             }
             
-            // Token valid
+            // Token valid - migrate to sessionStorage if from localStorage
+            if (localStorage.getItem('auth_token')) {
+              sessionStorage.setItem('auth_token', token);
+              localStorage.removeItem('auth_token');
+            }
+            
             const user: User = {
               id: decoded.userId || decoded.sub || '',
               email: decoded.email || '',
@@ -100,6 +111,7 @@ export const useAuthStore = create<AuthState>()(
           }
         } catch {
           // Invalid token
+          sessionStorage.removeItem('auth_token');
           localStorage.removeItem('auth_token');
           set({ isAuthenticated: false, user: null, token: null });
           return false;
@@ -111,12 +123,12 @@ export const useAuthStore = create<AuthState>()(
       },
 
       syncFromStorage: () => {
-        // 从 localStorage 同步状态（用于初始化）
+        // 从 sessionStorage 同步状态（安全），兼容 localStorage（迁移期）
         if (typeof window === 'undefined') return;
 
-        const token = localStorage.getItem('auth_token');
-        const userId = localStorage.getItem('user_id');
-        const userRole = localStorage.getItem('user_role');
+        const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+        const userId = sessionStorage.getItem('user_id') || localStorage.getItem('user_id');
+        const userRole = sessionStorage.getItem('user_role') || localStorage.getItem('user_role');
 
         if (token) {
           try {
@@ -129,6 +141,11 @@ export const useAuthStore = create<AuthState>()(
                 name: decoded.name,
                 role: userRole || decoded.role,
               };
+              // Migrate to sessionStorage
+              if (localStorage.getItem('auth_token')) {
+                sessionStorage.setItem('auth_token', token);
+                localStorage.removeItem('auth_token');
+              }
               set({ isAuthenticated: true, user, token, isLoading: false });
               return;
             }
@@ -142,7 +159,18 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'vibex-auth-storage',
-      storage: createJSONStorage(() => localStorage),
+      // 使用 sessionStorage 而非 localStorage，确保认证 token 不在持久化存储中明文保存
+      storage: createJSONStorage(() => {
+        if (typeof window === 'undefined') {
+          // SSR 环境下返回空存储
+          return {
+            getItem: () => null,
+            setItem: () => {},
+            removeItem: () => {},
+          };
+        }
+        return sessionStorage;
+      }),
       partialize: (state) => ({
         token: state.token,
         user: state.user,

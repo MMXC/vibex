@@ -1,5 +1,6 @@
 'use client';
 
+import { getAuthToken, getUserId } from '@/lib/auth-token';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './chat.module.css';
@@ -17,7 +18,7 @@ export default function Chat() {
 
   // 检查登录状态
   useEffect(() => {
-    const token = localStorage.getItem('auth_token');
+    const token = getAuthToken();
     if (!token) {
       router.push('/auth');
     }
@@ -34,7 +35,7 @@ export default function Chat() {
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    const userId = localStorage.getItem('user_id');
+    const userId = getUserId();
     if (!userId) {
       setError('请先登录');
       return;

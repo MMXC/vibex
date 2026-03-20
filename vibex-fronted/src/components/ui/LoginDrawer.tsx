@@ -64,10 +64,10 @@ export function LoginDrawer({ isOpen, onClose, onSuccess }: LoginDrawerProps) {
         token = result.token;
       }
 
-      // 保存 token 到 localStorage
+      // 保存 token 到 sessionStorage（安全：不在持久化存储中明文保存）
       if (token) {
-        localStorage.setItem('auth_token', token);
-        localStorage.setItem('user_id', email);
+        sessionStorage.setItem('auth_token', token);
+        sessionStorage.setItem('user_id', email);
         
         // 更新全局认证状态
         login(token, { id: email, email });

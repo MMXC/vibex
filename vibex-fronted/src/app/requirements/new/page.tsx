@@ -1,5 +1,6 @@
 'use client';
 
+import { getAuthToken, getUserId } from '@/lib/auth-token';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -21,8 +22,8 @@ export default function NewRequirement() {
 
   // 检查登录状态
   useEffect(() => {
-    const token = localStorage.getItem('auth_token');
-    const storedUserId = localStorage.getItem('user_id');
+    const token = getAuthToken();
+    const storedUserId = getUserId();
 
     if (!token) {
       router.push('/auth');

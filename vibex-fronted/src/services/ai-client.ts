@@ -16,6 +16,7 @@
  */
 
 import { API_CONFIG } from '@/lib/api-config';
+import { getAuthToken } from '@/lib/auth-token';
 
 // ==================== Types ====================
 
@@ -210,11 +211,10 @@ export class AIClient {
   // ==================== Private Methods ====================
 
   /**
-   * Get authentication token from localStorage
+   * Get authentication token - uses sessionStorage (secure) with localStorage fallback (migration)
    */
   private getAuthToken(): string | null {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('auth_token');
+    return getAuthToken();
   }
 
   /**

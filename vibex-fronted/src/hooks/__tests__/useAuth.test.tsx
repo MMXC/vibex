@@ -26,7 +26,8 @@ jest.mock('@/services/api', () => ({
   },
 }));
 
-// Mock localStorage
+// Mock localStorage and sessionStorage
+// Note: useAuth now uses sessionStorage (secure) as primary storage
 const localStorageMock = {
   getItem: jest.fn(),
   setItem: jest.fn(),
@@ -34,6 +35,14 @@ const localStorageMock = {
   clear: jest.fn(),
 };
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+
+const sessionStorageMock = {
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+  clear: jest.fn(),
+};
+Object.defineProperty(window, 'sessionStorage', { value: sessionStorageMock });
 
 describe('useAuth', () => {
   const mockUser: User = {
@@ -45,9 +54,16 @@ describe('useAuth', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Both localStorage and sessionStorage must return null initially
+    // to prevent initAuth from calling getCurrentUser unexpectedly
     localStorageMock.getItem.mockReturnValue(null);
     localStorageMock.setItem.mockReturnValue();
     localStorageMock.removeItem.mockReturnValue();
+    localStorageMock.clear.mockReturnValue();
+    sessionStorageMock.getItem.mockReturnValue(null);
+    sessionStorageMock.setItem.mockReturnValue();
+    sessionStorageMock.removeItem.mockReturnValue();
+    sessionStorageMock.clear.mockReturnValue();
   });
 
   describe('login', () => {
@@ -69,7 +85,7 @@ describe('useAuth', () => {
       });
     });
 
-    it('should store token on successful login', async () => {
+    it('should store token in sessionStorage on successful login', async () => {
       mockLogin.mockResolvedValue({ token: 'test-token', user: mockUser });
       mockGetCurrentUser.mockResolvedValue(mockUser);
 
@@ -81,7 +97,8 @@ describe('useAuth', () => {
         await result.current.login('test@example.com', 'password');
       });
 
-      expect(localStorageMock.setItem).toHaveBeenCalledWith(
+      // useAuth uses sessionStorage as primary secure storage
+      expect(sessionStorageMock.setItem).toHaveBeenCalledWith(
         'auth_token',
         'test-token'
       );
@@ -128,7 +145,7 @@ describe('useAuth', () => {
       expect(mockLogout).toHaveBeenCalled();
     });
 
-    it('should clear localStorage on logout', async () => {
+    it('should clear sessionStorage on logout', async () => {
       mockLogout.mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useAuth(), {
@@ -139,7 +156,8 @@ describe('useAuth', () => {
         await result.current.logout();
       });
 
-      expect(localStorageMock.removeItem).toHaveBeenCalledWith('auth_token');
+      // useAuth clears sessionStorage (primary) and localStorage (legacy compat)
+      expect(sessionStorageMock.removeItem).toHaveBeenCalledWith('auth_token');
     });
   });
 

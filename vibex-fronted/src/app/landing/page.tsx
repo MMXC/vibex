@@ -1,5 +1,6 @@
 'use client';
 
+import { getAuthToken } from '@/lib/auth-token';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -11,7 +12,7 @@ function useIsAuthenticated(): boolean {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('auth_token');
+    const token = getAuthToken();
     setIsAuthenticated(!!token);
   }, []);
 

@@ -45,7 +45,7 @@ importers:
         specifier: ^3.3.2
         version: 3.3.3
       flatted:
-        specifier: ^3.4.0
+        specifier: ^3.4.2
         version: 3.4.2
       framer-motion:
         specifier: ^12.35.2

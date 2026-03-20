@@ -143,12 +143,13 @@ export async function handleCallback(
  * 存储 OAuth Tokens
  */
 export async function storeTokens(provider: OAuthProvider, tokens: OAuthTokens): Promise<void> {
-  // 加密存储 access token
-  const encrypted = btoa(tokens.accessToken);
-  localStorage.setItem(`oauth_${provider}_token`, encrypted);
+  const { secureSet } = await import('@/lib/secure-storage');
+  
+  // 安全加密存储 access token
+  await secureSet(`oauth_${provider}_token`, tokens.accessToken);
   
   if (tokens.refreshToken) {
-    localStorage.setItem(`oauth_${provider}_refresh`, btoa(tokens.refreshToken));
+    await secureSet(`oauth_${provider}_refresh`, tokens.refreshToken);
   }
   
   if (tokens.expiresIn) {
@@ -159,7 +160,9 @@ export async function storeTokens(provider: OAuthProvider, tokens: OAuthTokens):
 /**
  * 获取存储的 OAuth Token
  */
-export function getStoredToken(provider: OAuthProvider): string | null {
+export async function getStoredToken(provider: OAuthProvider): Promise<string | null> {
+  const { secureGet } = await import('@/lib/secure-storage');
+  
   const encrypted = localStorage.getItem(`oauth_${provider}_token`);
   const expires = localStorage.getItem(`oauth_${provider}_expires`);
   
@@ -172,26 +175,23 @@ export function getStoredToken(provider: OAuthProvider): string | null {
     return null;
   }
   
-  try {
-    return atob(encrypted);
-  } catch {
-    return null;
-  }
+  return secureGet(`oauth_${provider}_token`);
 }
 
 /**
  * 刷新 Token
  */
 export async function refreshToken(provider: OAuthProvider): Promise<boolean> {
-  const refreshToken = localStorage.getItem(`oauth_${provider}_refresh`);
+  const { secureGet } = await import('@/lib/secure-storage');
+  const refreshTokenStr = await secureGet(`oauth_${provider}_refresh`);
   
-  if (!refreshToken) return false;
+  if (!refreshTokenStr) return false;
   
   try {
     const response = await fetch(getApiUrl(`/api/oauth/${provider}/refresh`), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken: atob(refreshToken) }),
+      body: JSON.stringify({ refreshToken: refreshTokenStr }),
     });
     
     if (!response.ok) return false;
@@ -208,7 +208,7 @@ export async function refreshToken(provider: OAuthProvider): Promise<boolean> {
  * 登出 OAuth
  */
 export async function logout(provider: OAuthProvider): Promise<void> {
-  const token = getStoredToken(provider);
+  const token = await getStoredToken(provider);
   
   if (token) {
     try {
@@ -233,15 +233,16 @@ export async function logout(provider: OAuthProvider): Promise<void> {
 /**
  * 检查是否已连接 OAuth
  */
-export function isConnected(provider: OAuthProvider): boolean {
-  return !!getStoredToken(provider);
+export async function isConnected(provider: OAuthProvider): Promise<boolean> {
+  const token = await getStoredToken(provider);
+  return !!token;
 }
 
 /**
  * 获取用户信息
  */
 export async function getUserInfo(provider: OAuthProvider): Promise<OAuthUserInfo> {
-  const token = getStoredToken(provider);
+  const token = await getStoredToken(provider);
   
   if (!token) {
     throw new Error('Not authenticated');

@@ -32,7 +32,6 @@
     "@tanstack/react-query-persist-client": "^5.90.24",
     "@types/dompurify": "^3.0.5",
     "@types/mermaid": "^9.1.0",
-    "@types/uuid": "^11.0.0",
     "@xstate/react": "^6.1.0",
     "axios": "^1.13.5",
     "axios-retry": "^4.5.0",
@@ -53,11 +52,9 @@
     "uuid": "^13.0.0",
     "xstate": "^5.28.0",
     "zod": "^4.3.6",
-    "uuid": "^13.0.0",
     "zustand": "4.5.7"
   },
   "devDependencies": {
-    "@types/uuid": "^11.0.0",
     "@babel/core": "^7.29.0",
     "@babel/preset-env": "^7.29.0",
     "@babel/preset-react": "^7.28.5",

@@ -3,6 +3,7 @@
 		"uuid": "^13.0.0"
 	},
 	"devDependencies": {
+		"@testing-library/user-event": "^14.6.1",
 		"@types/uuid": "^11.0.0"
 	}
 }

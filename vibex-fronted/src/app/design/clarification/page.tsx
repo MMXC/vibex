@@ -8,6 +8,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSmartRecommenderStore, Recommendation } from '@/stores/smartRecommenderStore';
 import { initOfflineListener } from '@/utils/design/fallbackStrategy';
+import { DesignStepLayout } from '@/components/design/DesignStepLayout';
 import { extractKeywords, KeywordExtractionResult } from '@/utils/design/keywordExtractor';
 
 export default function ClarificationPage() {
@@ -80,9 +81,9 @@ export default function ClarificationPage() {
   }, []);
 
   return (
+    <DesignStepLayout currentStep={1}>
     <div className="design-step">
       <h1>需求澄清</h1>
-      <p className="step-description">Step 1 of 5: Clarification</p>
 
       {/* 离线提示 */}
       {isOffline && (
@@ -322,5 +323,6 @@ export default function ClarificationPage() {
         }
       `}</style>
     </div>
+    </DesignStepLayout>
   );
 }

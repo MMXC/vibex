@@ -1,277 +1,174 @@
-# API 限界上下文返回简单问题分析
+# VibeX DDD API 路由不匹配修复分析报告
 
-**项目**: vibex-ddd-api-fix
-**日期**: 2026-03-12 22:56
-**分析师**: Analyst Agent
-
----
-
-## 执行摘要
-
-**问题**: `/api/ddd/bounded-context` API 返回的限界上下文数据过于简单，无法满足前端展示和业务分析需求。
-
-**根因**: AI 提示词设计不够精细，缺少引导 AI 深入分析业务领域的上下文和示例。
+> 项目: vibex-ddd-api-fix
+> 日期: 2026-03-20 | 分析师: Analyst Agent
+> 工作目录: /root/.openclaw/vibex
 
 ---
 
 ## 1. 问题定义
 
-### 1.1 当前问题
+**前端调用的 API 路由与后端实际路由不匹配**
 
-| 问题项 | 当前状态 | 期望状态 |
-|--------|----------|----------|
-| 上下文数量 | 1-2 个 | 3-7 个（根据业务复杂度） |
-| 上下文描述 | 简短或缺失 | 详细描述职责边界 |
-| 关系字段 | 空数组 `[]` | 包含上下游关系 |
-| Mermaid 图 | 孤立节点 | 带关系连线的完整图 |
-
-### 1.2 影响范围
-
-- **前端展示**: 限界上下文图只有孤立节点，无法展示业务关系
-- **用户体验**: 用户无法理解各上下文之间的协作关系
-- **DDD 建模**: 后续领域模型生成缺少上下文关系约束
+| 症状 | 详情 |
+|------|------|
+| 前端调用 | `/api/ddd/bounded-context`, `/api/ddd/domain-model`, `/api/ddd/business-flow` |
+| 后端路由 | `/api/v1/domain-model/[projectId]/`, `/api/domain-model/[projectId]/` |
+| 结果 | **API 404 Not Found** |
 
 ---
 
 ## 2. 根因分析
 
-### 2.1 提示词问题
+### 2.1 前端 API 调用（不匹配）
 
-**当前提示词** (简化版):
+**涉及文件**：
+- `src/constants/homepage.ts` — API 路由常量定义
+- `src/hooks/queries/useDDD.ts` — React Query hooks
+- `src/hooks/queries/use-ddd.ts` — React Query hooks
+
+```typescript
+// homepage.ts
+export const HOME_PAGE_API = {
+  GENERATE_CONTEXTS: '/api/ddd/bounded-context',   // ❌ 不存在
+  GENERATE_MODELS: '/api/ddd/domain-model',        // ❌ 不存在
+  GENERATE_FLOWS: '/api/ddd/business-flow',       // ❌ 不存在
+};
+
+// use-ddd.ts
+const response = await fetch('/api/ddd/bounded-context', { ... });
+const response = await fetch('/api/ddd/domain-model', { ... });
 ```
-You are a Domain-Driven Design expert. Analyze the following requirement and identify bounded contexts.
 
-Please identify:
-1. Core domains (the main business capabilities)
-2. Supporting domains (support the core domains)
-3. Generic domains (utilities that could be off-the-shelf)
-4. External systems (outside the system boundary)
+### 2.2 后端实际路由（存在）
+
+**vibex-backend**：
+```
+src/app/api/
+├── domain-model/[projectId]/route.ts      ← 存在，但路由不同
+├── v1/domain-model/[projectId]/route.ts   ← v1 版本
+└── [无 /api/ddd/ 路由]
 ```
 
-**问题**:
-1. ❌ 没有提供示例引导
-2. ❌ 没有要求分析上下文关系
-3. ❌ 没有引导 AI 进行深入的业务分析
-4. ❌ JSON Schema 没有包含 `relationships` 字段
-
-### 2.2 JSON Schema 问题
-
-**当前 Schema**:
-```json
-{
-  "boundedContexts": {
-    "type": "array",
-    "items": {
-      "properties": {
-        "name": { "type": "string" },
-        "description": { "type": "string" },
-        "type": { "enum": ["core", "supporting", "generic", "external"] }
-      }
-    }
-  }
+```typescript
+// 实际后端路由
+// src/app/api/v1/domain-model/[projectId]/route.ts
+export async function GET(req: Request, { params }: { params: { projectId: string } }) {
+  // GET 获取领域模型
+}
+export async function POST(req: Request, { params }: { params: { projectId: string } }) {
+  // POST 生成领域模型
 }
 ```
 
-**缺失**:
-- `relationships` 字段定义
-- `keyResponsibilities` 字段（关键职责）
-- `entities` 字段（核心实体预览）
+### 2.3 不匹配详情
 
-### 2.3 Mermaid 生成问题
-
-**当前代码**:
-```typescript
-// 只生成节点，没有生成关系连线
-contexts.forEach(ctx => {
-  const nodeDef = ctx.type === 'core' 
-    ? `${ctx.id}[${ctx.name}]`
-    : ...
-  lines.push(`  ${nodeDef}`)
-})
-```
-
-**缺失**: 基于关系生成连线的逻辑
+| 前端调用 | 后端对应 | 不匹配原因 |
+|----------|----------|-----------|
+| `/api/ddd/bounded-context` | 无 | 后端无此路由 |
+| `/api/ddd/domain-model` | `/api/v1/domain-model/[projectId]` | 路由路径不同 + 缺少 projectId |
+| `/api/ddd/business-flow` | 无 | 后端无此路由 |
 
 ---
 
-## 3. 解决方案
+## 3. 技术方案
 
-### 3.1 优化提示词（推荐）
+### 3.1 方案 A：前端适配后端（推荐）
 
-```typescript
-const prompt = `You are a Domain-Driven Design expert with 15 years of experience in strategic design and bounded context identification.
-
-Analyze the following requirement and identify bounded contexts using EventStorming and Context Mapping techniques.
-
-**Requirement:**
-${requirementText}
-
-**Analysis Process:**
-1. Identify key business capabilities and subdomains
-2. Determine core domain (competitive advantage), supporting domains, and generic domains
-3. Identify external systems that need integration
-4. Map relationships between contexts using Context Mapping patterns
-
-**Output Requirements:**
-For each bounded context, provide:
-- name: Concise name (noun phrase, e.g., "Order Management")
-- description: 2-3 sentences explaining the responsibility and boundaries
-- type: core | supporting | generic | external
-- keyResponsibilities: Array of 3-5 key responsibilities
-- relationships: Array of relationships to OTHER contexts
-
-For each relationship, provide:
-- targetContextName: Name of the related context
-- type: upstream-downstream | partnership | shared-kernel | conformist | anticorruption-layer
-- description: 1 sentence explaining the collaboration
-
-**Example Output:**
-{
-  "boundedContexts": [
-    {
-      "name": "Order Management",
-      "description": "Handles the complete order lifecycle from creation to fulfillment. Responsible for order validation, pricing calculation, and status management.",
-      "type": "core",
-      "keyResponsibilities": ["Order creation and validation", "Pricing calculation", "Order status tracking", "Fulfillment coordination"],
-      "relationships": [
-        {"targetContextName": "Inventory", "type": "upstream-downstream", "description": "Orders consume inventory availability from Inventory context"}
-      ]
-    },
-    {
-      "name": "Inventory",
-      "description": "Manages stock levels and availability across warehouses. Provides real-time inventory data to order processing.",
-      "type": "supporting",
-      "keyResponsibilities": ["Stock level management", "Availability checking", "Reorder alerts"],
-      "relationships": [
-        {"targetContextName": "Order Management", "type": "upstream-downstream", "description": "Provides inventory availability data downstream"}
-      ]
-    }
-  ]
-}
-
-Respond ONLY with the JSON object, no other text.`;
-```
-
-### 3.2 更新 JSON Schema
+修改前端 API 调用，使用后端实际路由：
 
 ```typescript
-const schema = {
-  boundedContexts: {
-    type: 'array',
-    items: {
-      type: 'object',
-      properties: {
-        name: { type: 'string' },
-        description: { type: 'string' },
-        type: { 
-          type: 'string', 
-          enum: ['core', 'supporting', 'generic', 'external'] 
-        },
-        keyResponsibilities: {
-          type: 'array',
-          items: { type: 'string' }
-        },
-        relationships: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              targetContextName: { type: 'string' },
-              type: { 
-                type: 'string',
-                enum: ['upstream-downstream', 'partnership', 'shared-kernel', 'conformist', 'anticorruption-layer']
-              },
-              description: { type: 'string' }
-            },
-            required: ['targetContextName', 'type']
-          }
-        }
-      },
-      required: ['name', 'type', 'description']
-    }
-  }
+// src/constants/homepage.ts
+export const HOME_PAGE_API = {
+  GENERATE_CONTEXTS: '/api/v1/domain-model',   // 复用 domain-model 路由
+  GENERATE_MODELS: '/api/v1/domain-model',     // 需传 projectId
+  GENERATE_FLOWS: '/api/v1/flows',            // 检查后端是否有此路由
 };
 ```
 
-### 3.3 更新 Mermaid 生成逻辑
+**优点**：
+- 后端路由已存在且经过测试
+- 不引入新的后端端点
 
-```typescript
-function generateMermaidCode(contexts: BoundedContext[]): string {
-  const lines = ['graph TD'];
-  
-  // Add nodes
-  contexts.forEach(ctx => {
-    const nodeDef = ctx.type === 'core' 
-      ? `${ctx.id}[${ctx.name}]`
-      : ctx.type === 'supporting'
-        ? `${ctx.id}(${ctx.name})`
-        : ctx.type === 'generic'
-          ? `${ctx.id}[[${ctx.name}]]`
-          : `${ctx.id}{${ctx.name}}`;
-    lines.push(`  ${nodeDef}`);
-  });
-  
-  // Add relationship edges
-  lines.push('');
-  contexts.forEach(ctx => {
-    ctx.relationships?.forEach(rel => {
-      const targetCtx = contexts.find(c => c.name === rel.targetContextName);
-      if (targetCtx) {
-        const edgeStyle = rel.type === 'upstream-downstream' ? '-->' 
-          : rel.type === 'partnership' ? '<-->'
-          : rel.type === 'shared-kernel' ? '-..-'
-          : '-->';
-        lines.push(`  ${ctx.id} ${edgeStyle} ${targetCtx.id}:${rel.description || ''}`);
-      }
-    });
-  });
-  
-  // ... class definitions ...
-  
-  return lines.join('\n');
-}
+**缺点**：
+- 可能需要调整 API 请求参数
+- bounded-context 和 business-flow 无对应后端路由
+
+### 3.2 方案 B：后端新增路由
+
+在后端添加 `/api/ddd/*` 路由：
+
 ```
+src/app/api/ddd/
+├── bounded-context/route.ts    # POST: 生成限界上下文
+├── domain-model/route.ts       # POST: 生成领域模型
+└── business-flow/route.ts     # POST: 生成业务流程
+```
+
+**优点**：
+- 前后端命名一致
+
+**缺点**：
+- 引入新的后端端点，增加维护成本
+- 需要重新实现已有逻辑
+
+### 3.3 方案 C：创建统一 DDD 路由（推荐备选）
+
+在后端添加统一的 DDD 路由层：
+
+```
+src/app/api/v1/ddd/
+├── bounded-context/route.ts    # 限界上下文
+├── domain-model/route.ts       # 领域模型
+└── business-flow/route.ts     # 业务流程
+```
+
+**优点**：
+- 与前端调用匹配
+- 不影响现有 `/api/v1/domain-model/[projectId]/` 路由
 
 ---
 
-## 4. 技术风险评估
+## 4. 推荐方案
 
-| 风险 | 影响 | 概率 | 缓解措施 |
-|------|------|------|----------|
-| AI 返回格式不一致 | 高 | 中 | 添加格式验证和重试逻辑 |
-| 响应时间增加 | 低 | 低 | 提示词优化后实际 token 数变化不大 |
-| 旧版兼容性 | 中 | 低 | 保留 `relationships` 为可选字段 |
+**方案 A + C 组合**：
+
+1. **bounded-context**：后端新增 `POST /api/v1/ddd/bounded-context`
+2. **domain-model**：前端改为 `/api/v1/ddd/domain-model`
+3. **business-flow**：前端改为 `/api/v1/flows`
 
 ---
 
 ## 5. 验收标准
 
-| 验收项 | 标准 | 验证方法 |
-|--------|------|----------|
-| 上下文数量 | 根据需求复杂度返回 3-7 个 | 手动测试典型需求 |
-| 描述完整性 | 每个上下文有 20-50 字描述 | 检查 API 返回 |
-| 关系生成 | 至少 2 条上下文关系 | 检查 `relationships` 数组 |
-| Mermaid 图完整性 | 节点 + 连线 + 样式 | 前端渲染验证 |
-| 单元测试 | 覆盖新逻辑 | `pnpm test` |
+- [ ] `/api/ddd/*` 或 `/api/v1/ddd/*` 路由正确响应
+- [ ] 前端生成限界上下文成功（API 返回 200）
+- [ ] 前端生成领域模型成功（API 返回 200）
+- [ ] 前端生成业务流程成功（API 返回 200）
+- [ ] 单元测试覆盖新路由（> 80%）
+- [ ] E2E 测试覆盖完整流程
 
 ---
 
-## 6. 实施建议
+## 6. 工时估算
 
-### 6.1 优先级
-
-| 任务 | 优先级 | 工作量 |
-|------|--------|--------|
-| 优化提示词 | P0 | 1h |
-| 更新 JSON Schema | P0 | 30min |
-| 更新 Mermaid 生成 | P1 | 1h |
-| 添加单元测试 | P1 | 1h |
-
-### 6.2 总工作量
-
-**预估**: 3.5h
+| 阶段 | 工时 | 说明 |
+|------|------|------|
+| 前端适配 | 2h | 修改 API 常量 |
+| 后端新增路由 | 4h | bounded-context, domain-model, business-flow |
+| 测试 | 2h | 单元 + E2E |
+| **总计** | **1天** | |
 
 ---
 
-**产出物**: `docs/vibex-ddd-api-fix/analysis.md`
-**状态**: 分析完成，待进入 PRD 阶段
+## 7. 风险
+
+| 风险 | 等级 | 缓解 |
+|------|------|------|
+| 后端路由已有逻辑需迁移 | 🟡 中 | 复用现有 service 层 |
+| 前端使用方式需调整 | 🟢 低 | 仅修改常量定义 |
+
+---
+
+*Generated by: Analyst Agent*
+*Date: 2026-03-20*

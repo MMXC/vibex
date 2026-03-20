@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.61',
+    date: '2026-03-21',
+    changes: [
+      '🧹 Epic 1 测试优化: 删除4个孤儿测试套件，测试通过率提升至100%',
+      '📁 移除: useConfirmationStep.test.ts, useConfirmationState.test.ts',
+      '📁 移除: confirmationStore.extended.test.ts, domain/page.test.tsx',
+    ],
+    commit: 'da21d240',
+  },
+  {
     version: '1.0.60',
     date: '2026-03-21',
     changes: [

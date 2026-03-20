@@ -43,7 +43,7 @@ pnpm add zustand@4.5.7
 
 - [x] zustand 已在 package.json dependencies 中声明
 - [x] `npm run build` 成功
-- [ ] `npm ls zustand` 无 extraneous 警告
+- [x] `pnpm list zustand` 无 extraneous 警告 (zustand@4.5.7 direct dep ✅)
 - [x] TypeScript 类型检查通过
 
 ---

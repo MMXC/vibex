@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Epic: 孤儿测试修复 (vibex-test-orphans-fix) (2026-03-21)
+
+#### Fixed
+- **test cleanup**: 删除4个孤儿测试套件，测试通过率提升至100%
+  - 删除 `useConfirmationStep.test.ts` (228行，源码不存在)
+  - 删除 `useConfirmationState.test.ts` (161行，源码不存在)
+  - 删除 `confirmationStore.extended.test.ts` (214行，扩展方法不存在)
+  - 删除 `domain/page.test.tsx` (152行，组件不存在)
+
+#### Testing
+- CSS Variables 测试覆盖率提升 (Story 1.2)
+
 ### Epic 1: 路由重定向架构 (2026-03-21)
 
 #### Added

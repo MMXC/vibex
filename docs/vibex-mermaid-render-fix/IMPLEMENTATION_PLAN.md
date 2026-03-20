@@ -170,9 +170,9 @@ npm run build
 ```
 
 **检查清单**:
-- [ ] npm run build 通过
-- [ ] 无 TypeScript 错误
-- [ ] 无 ESLint 警告
+- [x] npm run build 通过
+- [x] 无 TypeScript 错误
+- [x] 无 ESLint 警告
 
 ---
 

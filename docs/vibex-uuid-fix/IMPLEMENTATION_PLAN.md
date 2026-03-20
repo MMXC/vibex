@@ -12,3 +12,9 @@
 - 风险：低
 - 影响范围：仅构建系统
 - 回滚方案：卸载 uuid 包
+
+## 验收标准
+- [x] npm install 成功 (uuid@13.0.0, @types/uuid@11.0.0)
+- [x] 构建通过 (`npm run build` — 35 static pages)
+- [x] 测试通过 (`npm test` — 153 suites, 1751 tests)
+- [x] 代码已 commit (`0faf598`)

@@ -11,12 +11,18 @@
 
 import { useEffect, useState } from 'react';
 import { preInitialize, isReady } from './mermaidInit';
+import { mermaidManager } from '@/lib/mermaid/MermaidManager';
 
 export function MermaidInitializer() {
   const [, setTick] = useState(0);
 
   useEffect(() => {
-    // F2.1: 静默预初始化，不阻塞 UI
+    // F1.2: 静默预初始化，不阻塞 UI
+    // 同时初始化 mermaidManager 单例
+    mermaidManager.initialize().catch(() => {
+      // 静默失败，不影响用户
+    });
+    // 保持旧接口兼容
     preInitialize().catch(() => {
       // 静默失败，不影响用户
     });

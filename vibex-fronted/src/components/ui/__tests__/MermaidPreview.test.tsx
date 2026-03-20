@@ -106,7 +106,7 @@ describe('MermaidPreview', () => {
       render(<MermaidPreview code="invalid code" onError={jest.fn()} />);
 
       await waitFor(() => {
-        expect(screen.getByText('图表渲染失败')).toBeInTheDocument();
+        expect(screen.getByText('语法错误: Invalid syntax')).toBeInTheDocument();
       });
     });
 

@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.53',
+    date: '2026-03-20',
+    changes: [
+      '🔐 Auth E2E flaky fix: OAuth tests async 改造 + sessionStorage mock（jsdom Web Crypto 兼容）',
+      '🔒 P1 security: flatted 3.4.1→3.4.2 (Prototype Pollution + DoS CVE)',
+      '🔐 OAuth tokens 升级为 AES-256-GCM 加密（Web Crypto API）',
+      '🔐 Auth tokens 从 localStorage 迁移至 sessionStorage（防 XSS token 泄露）',
+    ],
+    commit: 'e2dd3ef',
+  },
+  {
     version: '1.0.52',
     date: '2026-03-20',
     changes: [

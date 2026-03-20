@@ -109,8 +109,11 @@ export async function decryptValue(encrypted: string): Promise<string> {
     );
 
     return new TextDecoder().decode(decrypted);
-  } catch {
+  } catch (err) {
     // Decryption failed - key mismatch or corrupted data
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('[SecureStorage] Decryption failed:', err);
+    }
     return '';
   }
 }
@@ -149,7 +152,10 @@ export async function secureGetObject<T = unknown>(key: string): Promise<T | nul
   if (!value) return null;
   try {
     return JSON.parse(value) as T;
-  } catch {
+  } catch (err) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('[SecureStorage] JSON parse failed:', err);
+    }
     return null;
   }
 }

@@ -22,8 +22,9 @@ const STEP_INDEX_MAP: Record<ConfirmationStep, number> = {
   input: 0,
   context: 1,
   model: 2,
-  flow: 3,
-  success: 3, // Success is after flow
+  clarification: 3,
+  flow: 4,
+  success: 5, // Success is after flow
 };
 
 export function ConfirmationSteps({
@@ -46,6 +47,7 @@ export const CONFIRM_STEP_TITLES: Record<ConfirmationStep, string> = {
   input: 'Step 1: 需求输入',
   context: 'Step 2: 限界上下文图确认',
   model: 'Step 3: 领域模型类图确认',
-  flow: 'Step 4: 业务流程图确认',
+  clarification: 'Step 4: 需求澄清',
+  flow: 'Step 5: 业务流程图确认',
   success: '项目创建成功',
 };

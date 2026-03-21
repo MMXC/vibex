@@ -8,7 +8,12 @@ import React, {
   ReactNode,
   useCallback,
 } from 'react';
-import type { ThemeState, ThemeAction, ThemeContextValue, ThemeMode } from '../types/theme';
+import type {
+  ThemeState,
+  ThemeAction,
+  ThemeContextValue,
+  ThemeMode,
+} from '../types/theme';
 import {
   getStoredTheme,
   setStoredTheme,
@@ -16,6 +21,10 @@ import {
   getSystemTheme,
   resolveTheme,
 } from '../services/themeStorage';
+import {
+  resolveMergedTheme,
+  type HomepageAPIResponse,
+} from '../services/homepageAPI';
 import { generateCSSVariables } from '../styles/tokens';
 
 // ── Reducer ──────────────────────────────────────────────────────────────────
@@ -24,18 +33,27 @@ function themeReducer(state: ThemeState, action: ThemeAction): ThemeState {
   switch (action.type) {
     case 'INIT': {
       const system = getSystemTheme();
-      const resolved = action.mode ? resolveTheme(action.mode, system) : 'light';
+      const resolved = action.mode
+        ? resolveTheme(action.mode, system)
+        : 'light';
       return { mode: action.mode ?? 'system', resolved };
     }
     case 'SET_MODE': {
       if (!action.mode) return state;
       const system = getSystemTheme();
-      return { mode: action.mode, resolved: resolveTheme(action.mode, system) };
+      return {
+        mode: action.mode,
+        resolved: resolveTheme(action.mode, system),
+      };
     }
     case 'TOGGLE': {
-      const next: ThemeMode = state.resolved === 'dark' ? 'light' : 'dark';
+      const next: ThemeMode =
+        state.resolved === 'dark' ? 'light' : 'dark';
       const system = getSystemTheme();
-      return { mode: next, resolved: resolveTheme(next, system) };
+      return {
+        mode: next,
+        resolved: resolveTheme(next, system),
+      };
     }
     case 'SET_RESOLVED':
       return { ...state, resolved: action.resolved ?? state.resolved };
@@ -64,14 +82,40 @@ function applyThemeVars(isDark: boolean): void {
 interface ThemeProviderProps {
   children: ReactNode;
   defaultMode?: ThemeMode;
+  /**
+   * Homepage API data for merge strategy.
+   * When provided, ThemeContext uses priority merge:
+   * localStorage > API userPreferences > API default > system > 'system'
+   */
+  homepageData?: HomepageAPIResponse | null;
 }
 
-export function ThemeProvider({ children, defaultMode = 'system' }: ThemeProviderProps) {
-  // Initialize from localStorage, fallback to default
-  const storedMode = getStoredTheme() ?? defaultMode;
+export function ThemeProvider({
+  children,
+  defaultMode = 'system',
+  homepageData,
+}: ThemeProviderProps) {
+  // Initialize using merge strategy if homepageData is available,
+  // otherwise fallback to localStorage → defaultMode
+  const resolvedMode = (() => {
+    const local = getStoredTheme();
+    const system = getSystemTheme();
+
+    if (homepageData !== undefined) {
+      return resolveMergedTheme({
+        local,
+        api: homepageData,
+        system,
+      });
+    }
+
+    // Legacy fallback: localStorage or default
+    return local ?? defaultMode;
+  })();
+
   const initialState: ThemeState = {
-    mode: storedMode,
-    resolved: resolveTheme(storedMode),
+    mode: resolvedMode,
+    resolved: resolveTheme(resolvedMode),
   };
 
   const [theme, dispatch] = useReducer(themeReducer, initialState);
@@ -86,7 +130,10 @@ export function ThemeProvider({ children, defaultMode = 'system' }: ThemeProvide
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     const handler = () => {
       if (theme.mode === 'system') {
-        dispatch({ type: 'SET_RESOLVED', resolved: mq.matches ? 'dark' : 'light' });
+        dispatch({
+          type: 'SET_RESOLVED',
+          resolved: mq.matches ? 'dark' : 'light',
+        });
       }
     };
     mq.addEventListener('change', handler);
@@ -102,14 +149,16 @@ export function ThemeProvider({ children, defaultMode = 'system' }: ThemeProvide
     setStoredTheme(mode);
   }, []);
 
-  // Persist mode to localStorage on change (but not on TOGGLE, let it derive from resolved)
+  // Persist mode to localStorage on change
   useEffect(() => {
     setStoredTheme(theme.mode);
   }, [theme.mode]);
 
   const value: ThemeContextValue = { theme, toggleTheme, setTheme };
 
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+  );
 }
 
 // ── Hook ─────────────────────────────────────────────────────────────────────

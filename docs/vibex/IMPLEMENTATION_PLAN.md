@@ -8,15 +8,15 @@
 
 ## 实施概览
 
-| Epic | 名称 | 工时 | 优先级 |
-|------|------|------|--------|
-| Epic 1 | 主题状态管理 | 2.5d | P1 |
-| Epic 2 | 主题持久化与同步 | 2.5d | P1 |
-| Epic 3 | API 数据绑定 | 3d | P1 |
+| Epic | 名称 | 工时 | 优先级 | 状态 |
+|------|------|------|--------|------|
+| Epic 1 | 主题状态管理 | 2.5d | P1 | ✅ |
+| Epic 2 | 主题持久化与同步 | 2.5d | P1 | ✅ |
+| Epic 3 | API 数据绑定 | 3d | P1 | ✅ |
 
 ---
 
-## Epic 1: 主题状态管理（2.5d）
+## Epic 1: 主题状态管理（2.5d）✅
 
 **目标**: 实现 ThemeContext + useTheme hook，支持主题切换
 
@@ -24,19 +24,19 @@
 
 | Story | 任务 | 工时 | Dev | Tester | 验收 |
 |-------|------|------|------|--------|------|
-| ST-1.1 | ThemeContext 实现 | 1d | `dev-epic1-themectx` | `tester-epic1-themectx` | `expect(ThemeContext).toBeDefined()` |
-| ST-1.2 | 主题切换逻辑 | 0.5d | (合并到 ST-1.1) | (合并到 ST-1.1) | `expect(toggleTheme).toBeDefined()` |
-| ST-1.3 | 类型定义 | 0.5d | (合并到 ST-1.1) | (合并到 ST-1.1) | `expect(Theme).toBeDefined()` |
+| ST-1.1 | ThemeContext 实现 | 1d | `dev-epic1-themectx` ✅ | `tester-epic1-themectx` | `expect(ThemeContext).toBeDefined()` |
+| ST-1.2 | 主题切换逻辑 | 0.5d | (合并到 ST-1.1) ✅ | (合并到 ST-1.1) | `expect(toggleTheme).toBeDefined()` |
+| ST-1.3 | 类型定义 | 0.5d | (合并到 ST-1.1) ✅ | (合并到 ST-1.1) | `expect(Theme).toBeDefined()` |
 
 **产出文件**:
-- `src/types/theme.ts`
-- `src/contexts/ThemeContext.tsx`
-- `src/hooks/useTheme.ts`
-- `src/hooks/useSystemTheme.ts`
+- `src/types/theme.ts` ✅
+- `src/contexts/ThemeContext.tsx` ✅
+- `src/hooks/useTheme.ts` ✅
+- `src/hooks/useSystemTheme.ts` ✅
 
 ---
 
-## Epic 2: 主题持久化与同步（2.5d）
+## Epic 2: 主题持久化与同步（2.5d）✅
 
 **目标**: localStorage 持久化 + OS 主题跟随
 
@@ -44,13 +44,13 @@
 
 | Story | 任务 | 工时 | Dev | Tester | 验收 |
 |-------|------|------|------|--------|------|
-| ST-2.1 | localStorage 持久化 | 1d | `dev-epic2-persistence` | `tester-epic2-persistence` | `expect(localStorage.getItem('vibex-theme')).toBeTruthy()` |
-| ST-2.2 | 多组件主题同步 | 0.5d | (合并到 ST-2.1) | (合并到 ST-2.1) | 集成测试验证 |
-| ST-2.3 | OS 主题跟随 | 1d | `useSystemTheme` 增强 | 模拟 `prefers-color-scheme` 变化 | 主题随 OS 自动切换 |
+| ST-2.1 | localStorage 持久化 | 1d | `dev-epic2-persistence` ✅ | `tester-epic2-persistence` | `expect(localStorage.getItem('vibex-theme')).toBeTruthy()` |
+| ST-2.2 | 多组件主题同步 | 0.5d | (合并到 ST-2.1) ✅ | (合并到 ST-2.1) | 集成测试验证 |
+| ST-2.3 | OS 主题跟随 | 1d | `useSystemTheme` 增强 ✅ | 模拟 `prefers-color-scheme` 变化 | 主题随 OS 自动切换 |
 
 **产出文件**:
-- `src/services/themeStorage.ts`
-- `src/hooks/useSystemTheme.ts`（增强）
+- `src/services/themeStorage.ts` ✅
+- `src/hooks/useSystemTheme.ts`（增强）✅
 
 ---
 
@@ -62,14 +62,17 @@
 
 | Story | 任务 | 工时 | Dev | Tester | 验收 |
 |-------|------|------|------|--------|------|
-| ST-3.1 | HomepageAPI 实现 | 1d | `dev-epic3-apibinding` | `tester-epic3-apibinding` | `expect(theme).toBe('light'\|'dark'\|'system')` |
-| ST-3.2 | 本地+API 合并逻辑 | 1.5d | (合并到 ST-3.1) | (合并到 ST-3.1) | 合并逻辑测试通过 |
-| ST-3.3 | 请求追踪日志 | 0.5d | (合并到 ST-3.1) | (合并到 ST-3.1) | DevTools 可见日志 |
+| ST-3.1 | HomepageAPI 实现 | 1d | `dev-epic3-apibinding` ✅ | `tester-epic3-apibinding` | `expect(theme).toBe('light'\|'dark'\|'system')` |
+| ST-3.2 | 本地+API 合并逻辑 | 1.5d | (合并到 ST-3.1) ✅ | (合并到 ST-3.1) | 合并逻辑测试通过 |
+| ST-3.3 | 请求追踪日志 | 0.5d | (合并到 ST-3.1) ✅ | (合并到 ST-3.1) | DevTools 可见日志 |
 
 **产出文件**:
-- `src/services/homepageAPI.ts`
-- `src/styles/theme-variables.css`
-- `src/components/ThemeWrapper.tsx`
+- `src/services/homepageAPI.ts` ✅
+- `src/services/homepageAPI.test.ts` ✅
+- `src/styles/theme-variables.css` ✅ (Epic1)
+- `src/components/ThemeWrapper/ThemeWrapper.tsx` ✅
+- `src/components/ThemeWrapper/ThemeWrapper.test.tsx` ✅
+- `src/components/__tests__/theme-binding.test.tsx` ✅
 
 ---
 

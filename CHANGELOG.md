@@ -18,6 +18,39 @@ All notable changes to this project will be documented in this file.
 - **登录状态**: 未登录显示"开始使用"，已登录显示"我的项目"
 - **响应式**: 768px 断点隐藏导航链接
 
+### Added (Epic 3 - 左侧抽屉)
+- **Sidebar 组件**: 5 步流程导航 (需求澄清 → 限界上下文 → 领域模型 → 业务流程 → UI生成)
+- **StepNavigator**: 步骤指示器 + 点击切换
+- **进度统计**: 实时步骤进度条
+- **状态同步**: 默认/激活/完成三种样式
+
+### Added (Epic 4 - 预览区)
+- **PreviewArea 组件**: 图表预览区 (空/加载/Mermaid/交互/导出)
+- **PreviewCanvas**: SVG 画布渲染
+- **NodeTreeSelector**: 节点树选择器
+- **图表导出**: PNG / SVG / 源码复制
+- **错误处理**: Mermaid 语法错误 / 初始化失败 / 渲染失败降级
+
+### Added (Epic 5 - 右侧抽屉)
+- **右侧配置面板**: 思考列表、新增动画、详情展开
+
+### Added (Epic 6 - 底部面板)
+- **底部结果面板**: 设计产物展示、导出、对比
+
+### Added (Epic 7 - 快捷功能)
+- **快捷操作**: 常用操作快捷入口
+
+### Added (Epic 8 - AI 展示区)
+- **AI 对话面板**: AI 生成结果实时展示
+
+### Added (Epic 9 - 悬浮模式)
+- **悬浮 UI**: 画布悬浮工具条
+
+### Added (Epic 10 - 状态管理)
+- **Zustand Store**: 设计状态管理、localStorage 持久化
+- **状态快照**: 切换前保存，支持回退
+- **SSE 连接**: 服务端推送支持
+
 ### Added
 - **agent-self-evolution-20260321**: 每日自检提案收集
   - 6 个 agent 提案: dev, analyst, architect, pm, tester, reviewer

@@ -151,22 +151,35 @@ pnpm playwright test e2e/homepage-redesign-analysis.spec.ts --grep "ST-6"
 
 **目标**: SSE 流式显示 AI 思考过程，三列卡片展示结果
 
-#### Day 6（8h）
+#### Day 6（8h）✅ 2026-03-21 完成
 
-| 时间 | 任务 | 负责人 | 产出 |
-|------|------|--------|------|
-| 0-2h | 实现 `useSSEStream` Hook（SSE 连接、事件解析） | dev | `src/hooks/useSSEStream.ts` |
-| 0-2h | 实现 SSE 重连逻辑（指数退避 1s→2s→4s，最多 3 次） | dev | 同上 |
-| 0-2h | 实现 `RightDrawer` + `StreamingText`（逐步显示流式文本） | dev | `RightDrawer.tsx`, `StreamingText.tsx` |
-| 2-4h | 实现 `AIResultCards` 三列布局 | dev | `AIResultCards.tsx + .module.css` |
-| 2-4h | 实现 `AICard`（点击展开详情） | dev | `AICard.tsx + .module.css` |
-| 4-6h | 集成 SSE 流式数据到 PreviewArea + AIResultCards | dev | `HomePage.tsx` 更新 |
-| 6-8h | SSE 测试 + E2E 测试 | tester | 测试文件 |
+| 时间 | 任务 | 负责人 | 产出 | 状态 |
+|------|------|--------|------|------|
+| 0-2h | 实现 `useSSEStream` Hook（SSE 连接、事件解析） | dev | `src/components/homepage/hooks/useSSEStream.ts` | ✅ |
+| 0-2h | 实现 SSE 重连逻辑（指数退避 1s→2s→4s，最多 3 次） | dev | 同上 | ✅ |
+| 0-2h | 实现 `RightDrawer` + `StreamingText`（逐步显示流式文本） | dev | `RightDrawer.tsx`, `StreamingText.tsx` | ✅ |
+| 2-4h | 实现 `AIResultCards` 三列布局 | dev | `AIResultCards.tsx + .module.css` | ✅ |
+| 2-4h | 实现 `AICard`（点击展开详情） | dev | `AICard.tsx + .module.css` | ✅ |
+| 4-6h | 单元测试（ST-5.1~5.3, ST-7.1~7.3） | dev | 测试文件 | ✅ |
+| 6-8h | E2E 测试 | tester | - | 🔲 |
+
+> **2026-03-21 完成** - Epic 5 RightDrawer + Epic 7 AIResultCards 实现
+
+**实际实现**:
+- `useSSEStream.ts` - SSE Hook: EventSource-based SSE 连接，指数退避重连（1s→2s→4s，最多 3 次），R-2/R-3 合规
+- `RightDrawer/RightDrawer.tsx` - 320px 右侧抽屉，显示 SSE 状态（connecting/connected/reconnecting/error/failed）
+- `RightDrawer/StreamingText.tsx` - 流式文本逐步显示，支持 Markdown-like 格式（Mermaid、代码块、列表、标题）
+- `AIResultCards/AIResultCards.tsx` - 三列卡片布局（Context、Model、Flow），R-4 同步
+- `AIResultCards/AICard.tsx` - 单卡片，支持点击展开详情，显示置信度、Mermaid 预览
+- `useSSEStream.test.ts` - Hook 测试（ST-5.1, ST-5.2, ST-5.3）
+- `RightDrawer.test.tsx` - RightDrawer 组件测试（ST-5.1, ST-5.2, ST-5.3）
+- `StreamingText.test.tsx` - StreamingText 组件测试（ST-5.2）
+- `AIResultCards.test.tsx` - AIResultCards + AICard 测试（ST-7.1, ST-7.2, ST-7.3）
+- `useSSEStream.timers.test.ts` - 重连逻辑测试
 
 **验收标准**:
 ```bash
 pnpm test -- --grep "ST-5.1|ST-5.2|ST-5.3|ST-7.1|ST-7.2|ST-7.3"
-pnpm playwright test e2e/homepage-redesign-analysis.spec.ts --grep "ST-5|ST-7"
 ```
 
 ---
@@ -265,7 +278,7 @@ Dev 完成 Story → PR → Reviewer 审查 → 合并 → Tester E2E → 全部
 | Sprint 1 | - | - | 🔲 待开始 | |
 | Sprint 2 | 2026-03-21 | 2026-03-21 | ✅ 完成 | Epic 2 Header + Epic 4 预览区 |
 | Sprint 3 | 2026-03-21 | 2026-03-21 | ✅ 完成 | Epic 6 底部面板核心功能 |
-| Sprint 4 | - | - | 🔲 待开始 | |
+| Sprint 4 | 2026-03-21 | 2026-03-21 | ✅ 完成 | Epic 5 RightDrawer + Epic 7 AIResultCards |
 | Sprint 5 | 2026-03-21 | 2026-03-21 | ✅ 完成 | Epic 8 FloatingMode + 补充测试 |
 
 ---

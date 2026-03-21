@@ -7,6 +7,7 @@ export const AIPanel: React.FC<AIPanelProps> = ({
   messages = [],
   onClose,
   onSendMessage,
+  newItemId,
 }) => {
   const [inputValue, setInputValue] = React.useState('');
 
@@ -34,16 +35,26 @@ export const AIPanel: React.FC<AIPanelProps> = ({
         {messages.length === 0 ? (
           <div className={styles.empty}>暂无消息</div>
         ) : (
-          messages.map((msg: AIMessage) => (
-            <div 
-              key={msg.id} 
-              className={`${styles.message} ${styles[msg.role]}`}
-            >
-              <div className={styles.messageContent}>
-                {msg.content}
+          messages.map((msg: AIMessage) => {
+            const isThinking = msg.id.startsWith('thinking-');
+            const isNew = newItemId === msg.id;
+            return (
+              <div 
+                key={msg.id} 
+                className={[
+                  styles.message,
+                  styles[msg.role],
+                  isThinking ? styles['thinking-item'] : '',
+                  isNew ? styles['new'] : '',
+                ].filter(Boolean).join(' ')}
+                data-thinking={isThinking ? 'true' : undefined}
+              >
+                <div className={styles.messageContent}>
+                  {msg.content}
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
       <div className={styles.inputArea}>

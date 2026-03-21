@@ -38,6 +38,8 @@ export interface AIPanelProps {
   messages?: AIMessage[];
   onClose?: () => void;
   onSendMessage?: (message: string) => void;
+  /** ID of the newest thinking item to apply pulse animation */
+  newItemId?: string;
 }
 
 export interface AIMessage {

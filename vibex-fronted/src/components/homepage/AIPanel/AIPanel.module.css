@@ -65,6 +65,22 @@
 
 .message.assistant {
   text-align: left;
+  border-left: 3px solid #3b82f6;
+  padding-left: 8px;
+}
+
+/* ST-1.3: 新项目脉冲动画 */
+.message.new {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
 }
 
 .messageContent {
@@ -125,4 +141,17 @@
 .sendButton:disabled {
   background-color: #9ca3af;
   cursor: not-allowed;
+}
+
+/* ST-1.3: 新项目脉冲动画 - 蓝色左边框 */
+.thinking-item.new {
+  animation: pulse 1.5s infinite;
+  border-left: 3px solid #3b82f6;
+  padding-left: 8px;
+  margin-left: -8px;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }

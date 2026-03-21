@@ -11,10 +11,11 @@
 import { useState, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import LoginDrawer from '@/components/ui/LoginDrawer';
-import { Navbar, Sidebar, StepNavigator } from '@/components/homepage';
+import { Navbar, Sidebar, StepNavigator, AIPanel } from '@/components/homepage';
 import { useHomePage } from './hooks';
 import { InputArea } from './InputArea/InputArea';
 import { PreviewArea } from './PreviewArea/PreviewArea';
+import type { AIMessage, ThinkingStep } from './types';
 import styles from '@/app/homepage.module.css';
 import type { Step } from '@/types/homepage';
 
@@ -92,6 +93,29 @@ export default function HomePage() {
     setCurrentStep(step);
   }, [setCurrentStep]);
 
+  // ST-1.2: thinkingMessages 适配器 - ThinkingStep[] → AIMessage[]
+  const adaptedMessages = useMemo<AIMessage[]>(() => {
+    return thinkingMessages.map((step, i) => ({
+      id: `thinking-${step.step}-${i}`,
+      role: 'assistant' as const,
+      content: step.message,
+    }));
+  }, [thinkingMessages]);
+
+  // ST-1.3: 新项目脉冲动画 - 标记最后一个 thinking item 为最新
+  const newThinkingItemId = useMemo(() => {
+    if (thinkingMessages.length === 0) return undefined;
+    const last = thinkingMessages[thinkingMessages.length - 1];
+    const lastIndex = thinkingMessages.length - 1;
+    return `thinking-${last.step}-${lastIndex}`;
+  }, [thinkingMessages]);
+
+  // ST-1.1: AIPanel 发送消息处理
+  const handleAIPanelSend = useCallback((message: string) => {
+    // TODO: 实现 AI 对话发送逻辑
+    console.log('AI message:', message);
+  }, []);
+
   return (
     <div className={styles.container}>
       <ParticleBackground />
@@ -126,25 +150,33 @@ export default function HomePage() {
         </main>
 
         {/* 右侧编辑区 - 25% */}
-        <aside className={styles.aiPanel}>
-          <InputArea
-            requirementText={requirementText}
-            onRequirementChange={setRequirementText}
-            onSubmit={handleRequirementSubmit}
-            onGenerate={handleRequirementSubmit}
-            onGenerateDomainModel={() => generateDomainModels(requirementText, boundedContexts)}
-            onGenerateBusinessFlow={() => generateBusinessFlow([], requirementText)}
-            onCreateProject={() => {}}
-            onAnalyzePageStructure={analyzePageStructure}
-            isGenerating={isGenerating}
-            boundedContexts={boundedContexts}
-            selectedContextIds={selectedContextIds}
-            businessFlow={businessFlow}
-            pageStructureAnalyzed={pageStructureAnalyzed}
-            currentStep={currentStep}
-            completedStep={completedStep}
-          />
-        </aside>
+        {/* ST-1.1: AIPanel 组件集成 (替换旧 aside) */}
+        <AIPanel
+          isOpen={true}
+          messages={adaptedMessages}
+          onClose={() => {}}
+          onSendMessage={handleAIPanelSend}
+          newItemId={newThinkingItemId}
+        />
+        
+        {/* 底部录入区 - InputArea */}
+        <InputArea
+          requirementText={requirementText}
+          onRequirementChange={setRequirementText}
+          onSubmit={handleRequirementSubmit}
+          onGenerate={handleRequirementSubmit}
+          onGenerateDomainModel={() => generateDomainModels(requirementText, boundedContexts)}
+          onGenerateBusinessFlow={() => generateBusinessFlow([], requirementText)}
+          onCreateProject={() => {}}
+          onAnalyzePageStructure={analyzePageStructure}
+          isGenerating={isGenerating}
+          boundedContexts={boundedContexts}
+          selectedContextIds={selectedContextIds}
+          businessFlow={businessFlow}
+          pageStructureAnalyzed={pageStructureAnalyzed}
+          currentStep={currentStep}
+          completedStep={completedStep}
+        />
       </div>
 
       <LoginDrawer

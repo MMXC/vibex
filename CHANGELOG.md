@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+- **Jest 配置**: 补充 jest.config.ts + mock 文件，明确 testPathIgnorePatterns 排除 e2e/performance 目录，防止 Playwright 测试被 Jest 误执行
+
 ### Added (Epic 1 - 布局框架)
 - **三栏布局**: Sidebar (15%) + PreviewArea (60%) + InputArea (25%) 实现
 - **CSS 变量系统**: tokens.css 完整定义 (颜色/间距/阴影/圆角/z-index)

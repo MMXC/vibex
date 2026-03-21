@@ -14,6 +14,7 @@ import {
 // ── Mock global fetch ────────────────────────────────────────────────────────
 
 const mockFetch = jest.fn();
+const originalFetch = global.fetch;
 
 beforeAll(() => {
   global.fetch = mockFetch;
@@ -22,6 +23,10 @@ beforeAll(() => {
 beforeEach(() => {
   jest.clearAllMocks();
   clearHomepageCache();
+});
+
+afterAll(() => {
+  global.fetch = originalFetch ?? (global.fetch as typeof global.fetch);
 });
 
 // ── resolveMergedTheme Tests ────────────────────────────────────────────────

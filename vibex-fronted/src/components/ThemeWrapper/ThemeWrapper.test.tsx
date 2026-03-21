@@ -11,6 +11,7 @@ import { clearHomepageCache } from '../../services/homepageAPI';
 
 // Mock fetch
 const mockFetch = jest.fn();
+const originalFetch = global.fetch;
 global.fetch = mockFetch;
 
 beforeEach(() => {
@@ -135,4 +136,8 @@ describe('ThemeWrapper', () => {
     });
     expect(screen.getByTestId('has-data')).toHaveTextContent('false');
   });
+});
+
+afterAll(() => {
+  global.fetch = originalFetch ?? (global.fetch as typeof global.fetch);
 });

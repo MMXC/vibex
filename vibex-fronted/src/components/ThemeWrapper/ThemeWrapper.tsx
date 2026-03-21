@@ -97,17 +97,23 @@ export function ThemeWrapper({
     setIsLoading(true);
   }, []);
 
+  // When homepageData is loading (null), do NOT render ThemeProvider.
+  // This prevents the legacy fallback path from running before API data is ready.
+  // ThemeProvider's initial state is determined once on mount, so we must
+  // defer its creation until homepageData is available.
+  if (homepageData === null) {
+    return (
+      <ThemeWrapperContext.Provider value={{ homepageData, isLoading, clearCache }}>
+        {children}
+      </ThemeWrapperContext.Provider>
+    );
+  }
+
   return (
     <ThemeWrapperContext.Provider value={{ homepageData, isLoading, clearCache }}>
-      {/* ThemeProvider only rendered after homepageData is resolved (not null).
-          This prevents FOUT by ensuring merge strategy is applied on first render. */}
-      {homepageData !== null ? (
-        <ThemeProvider homepageData={homepageData}>
-          {children}
-        </ThemeProvider>
-      ) : (
-        children
-      )}
+      <ThemeProvider homepageData={homepageData}>
+        {children}
+      </ThemeProvider>
     </ThemeWrapperContext.Provider>
   );
 }

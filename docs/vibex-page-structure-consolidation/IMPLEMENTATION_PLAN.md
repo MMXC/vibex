@@ -96,11 +96,11 @@ Day 5:
 
 ```
 Day 6-8:
-  Step 3.1: 创建 StepClarification.tsx 组件
-  Step 3.2: 在 Homepage 步骤流中插入 StepClarification
-  Step 3.3: 创建 StepUIGeneration.tsx 组件 (如评估通过)
+  Step 3.1: 创建 StepClarification.tsx 组件 ✅
+  Step 3.2: 在 Homepage 步骤流中插入 StepClarification ✅ (2026-03-21, commit af665b44)
+  Step 3.3: 创建 StepUIGeneration.tsx 组件 (如评估通过) 🔄 进行中
   Step 3.4: 集成到 Homepage 步骤流
-  Step 3.5: 确认 confirmationStore ↔ designStore 同步桥
+  Step 3.5: 确认 confirmationStore ↔ designStore 同步桥 ✅
 
 Day 9-10:
   Step 3.6: 全面 E2E 测试
@@ -109,10 +109,11 @@ Day 9-10:
 
 ### 4.2 验收检查清单
 
-- [ ] StepClarification 在 Homepage 可用
-- [ ] Clarification 数据保存到 confirmationStore
-- [ ] /design/clarification 保留独立路由 (如评估决定保留)
-- [ ] npm test 全部通过
+- [x] StepClarification 在 Homepage 可用 ✅ (6步流程, step 4)
+- [x] Clarification 数据保存到 confirmationStore ✅ (clarificationRounds)
+- [x] npm test 全部通过 ✅ (147 suites, 1674 tests)
+- [ ] StepUIGeneration.tsx 组件创建
+- [ ] StepUIGeneration 集成到 Homepage
 
 ---
 

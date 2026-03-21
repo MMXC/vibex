@@ -15,7 +15,7 @@ import { Navbar, Sidebar, StepNavigator, AIPanel } from '@/components/homepage';
 import { useHomePage } from './hooks';
 import { InputArea } from './InputArea/InputArea';
 import { PreviewArea } from './PreviewArea/PreviewArea';
-import type { AIMessage, ThinkingStep } from './types';
+import type { AIMessage } from './types';
 import styles from '@/app/homepage.module.css';
 import type { Step } from '@/types/homepage';
 
@@ -111,9 +111,8 @@ export default function HomePage() {
   }, [thinkingMessages]);
 
   // ST-1.1: AIPanel 发送消息处理
-  const handleAIPanelSend = useCallback((message: string) => {
-    // TODO: 实现 AI 对话发送逻辑
-    console.log('AI message:', message);
+  const handleAIPanelSend = useCallback((_message: string) => {
+    // TODO: 实现 AI 对话发送逻辑 (后续 Epic 集成)
   }, []);
 
   return (

@@ -33,16 +33,23 @@ gantt
 
 ## 2. 详细 Phase 分解
 
-### Phase 1: Epic 1 — 右侧AI思考列表集成
+### Phase 1: Epic 1 — 右侧AI思考列表集成 ✅
 
-| Story | 任务 | 工时 | Dev 产出 |
-|-------|------|------|----------|
-| ST-1.1 | AIPanel 组件适配（移除旧 aside，集成 AIPanel） | 1.5h | HomePage.tsx 修改 |
-| ST-1.2 | thinkingMessages 数据渲染（useMemo 适配器） | 1h | 适配器逻辑 |
-| ST-1.3 | 新项目脉冲动画 | 0.5h | AIPanel.module.css 修改 |
+| Story | 任务 | 工时 | Dev 产出 | 状态 |
+|-------|------|------|----------|------|
+| ST-1.1 | AIPanel 组件适配（移除旧 aside，集成 AIPanel） | 1.5h | HomePage.tsx 修改 | ✅ |
+| ST-1.2 | thinkingMessages 数据渲染（useMemo 适配器） | 1h | 适配器逻辑 | ✅ |
+| ST-1.3 | 新项目脉冲动画 | 0.5h | AIPanel.module.css 修改 | ✅ |
 
 **小计**: 3h  
 **依赖**: 无（从现有代码库出发）
+
+**Commit**: 8866799a
+
+**实现详情**:
+- HomePage.tsx: 导入 AIPanel 组件，替换旧 aside
+- 适配器: `thinkingMessages.map(step => ({ id: ..., role: 'assistant', content: step.message }))`
+- CSS: `.message.assistant` 蓝色边框 + `@keyframes pulse` 动画
 
 ---
 

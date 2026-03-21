@@ -62,7 +62,7 @@ describe('BottomPanelInputArea', () => {
       const textarea = screen.getByTestId('requirement-input');
       fireEvent.change(textarea, { target: { value: '测试内容' } });
 
-      expect(screen.getByTestId('char-count')).toHaveTextContent('5/5000');
+      expect(screen.getByTestId('char-count')).toHaveTextContent('4/5000');
     });
 
     it('字数超过 5000 时统计显示错误样式', () => {

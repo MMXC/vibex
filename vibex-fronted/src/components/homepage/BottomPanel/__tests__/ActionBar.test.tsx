@@ -141,7 +141,8 @@ describe('ActionBar', () => {
     it('创建项目按钮有 primary class', () => {
       render(<ActionBar {...defaultProps} />);
       const createBtn = screen.getByRole('button', { name: /创建项目/i });
-      expect(createBtn.closest('[data-testid="action-bar"]')?.querySelector(`.${createBtn.className}`)).toBeTruthy();
+      // CSS module class names are hashed; just verify it has 'primary' substring
+      expect(createBtn.className).toContain('primary');
     });
   });
 

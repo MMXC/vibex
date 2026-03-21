@@ -18,6 +18,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.62',
+    date: '2026-03-21',
+    changes: [
+      '🎨 Epic 1 布局框架: 三栏布局 (Sidebar + PreviewArea + InputArea)',
+      '📐 CSS 变量系统: tokens.css 完整实现 (颜色/间距/阴影/圆角/z-index)',
+      '🎭 背景特效: Grid overlay + Glow orb 动态效果',
+      '📱 响应式断点: 1200px / 900px 适配',
+      '🌙 暗色主题支持',
+    ],
+    commit: 'efb786d7',
+  },
+  {
     version: '1.0.61',
     date: '2026-03-21',
     changes: [

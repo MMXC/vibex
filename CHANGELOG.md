@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added (Epic 1 - 布局框架)
+- **三栏布局**: Sidebar (15%) + PreviewArea (60%) + InputArea (25%) 实现
+- **CSS 变量系统**: tokens.css 完整定义 (颜色/间距/阴影/圆角/z-index)
+- **背景特效**: Grid overlay + Cyan/Purple Glow orb 动态效果
+- **响应式断点**: 1200px (max-width: 1440px) / 900px (padding: 0 24px)
+- **暗色主题**: 完整暗色变量覆盖
+
 ### Added
 - **agent-self-evolution-20260321**: 每日自检提案收集
   - 6 个 agent 提案: dev, analyst, architect, pm, tester, reviewer

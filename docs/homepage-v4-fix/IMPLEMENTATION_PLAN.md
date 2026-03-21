@@ -1,6 +1,6 @@
 # 实施计划: homepage-v4-fix
 
-**状态**: 进行中  
+**状态**: Epic 1+2+3+4 完成 (2026-03-21)  
 **创建日期**: 2026-03-21  
 **预计总工期**: 10h  
 **执行顺序**: Epic 1 → Epic 2 → Epic 3 → Epic 4
@@ -53,7 +53,19 @@ gantt
 
 ---
 
-### Phase 2: Epic 2 — 底部面板组件
+### Phase 2: Epic 2 — 底部面板组件 ✅
+
+**小计**: 5h  
+**Commit**: 13d5c9c8
+
+**实现详情**:
+- BottomPanel 主容器 (380px 固定高度, grid-column: 1/-1)
+- CollapseHandle (30px, 收起/展开手柄)
+- BottomPanelInputArea (80px, 输入框+发送按钮)
+- ActionBar (50px, 7按钮工具栏)
+- AIDisplay (3列卡片: 智能诊断/应用优化/AI对话澄清)
+
+**验收**: npm test ✅ (147 suites, 1674 tests)
 
 | Story | 任务 | 工时 | Dev 产出 |
 |-------|------|------|----------|
@@ -69,7 +81,17 @@ gantt
 
 ---
 
-### Phase 3: Epic 3 — 布局与主题调整
+### Phase 3: Epic 3 — 布局与主题调整 ✅
+
+**小计**: 3h  
+**Commit**: 13d5c9c8
+
+**实现详情**:
+- homepage-v4.module.css (新建 Grid 布局文件)
+- homepage.module.css: 追加 Grid 变量和布局类
+- HomePage.tsx: Grid 结构 (page/header/leftDrawer/preview/rightDrawer/bottomPanel)
+
+**验收**: npm run build ✅ | npm test ✅
 
 | Story | 任务 | 工时 | Dev 产出 |
 |-------|------|------|----------|
@@ -82,7 +104,16 @@ gantt
 
 ---
 
-### Phase 4: Epic 4 — 视觉一致性验证
+### Phase 4: Epic 4 — 视觉一致性验证 ✅ (dev 完成)
+
+**Commit**: 13d5c9c8
+
+**Dev 交付**:
+- 所有组件已实现，npm run build ✅
+- 回归测试 npm test ✅ (147 suites, 1674 tests)
+- 旧布局 homepage.module.css 保持不变 (R-2 回滚保护)
+
+**Tester/Reviewer 待验证** (ST-4.1 ~ ST-4.5)
 
 | Story | 任务 | 工时 | 负责人 |
 |-------|------|------|--------|

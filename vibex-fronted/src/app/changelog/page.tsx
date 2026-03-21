@@ -18,6 +18,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.63',
+    date: '2026-03-21',
+    changes: [
+      '🌊 Epic 8 悬浮模式: FloatingMode 组件 + useFloatingMode Hook',
+      '📜 滚动触发: IntersectionObserver + scroll 事件，滚动超过50%收起底部面板',
+      '⏸️ 自动恢复: 停止滚动1s后自动恢复底部面板',
+      '🔒 右侧面板固定: 悬浮模式下AI面板 fixed 定位不遮挡核心内容',
+      '🧪 测试覆盖: Epic 1-8 单元测试补充 (Navbar/CollapseHandle/ActionBar/AIDisplay)',
+    ],
+    commit: '9eaf3126',
+  },
+  {
     version: '1.0.62',
     date: '2026-03-21',
     changes: [

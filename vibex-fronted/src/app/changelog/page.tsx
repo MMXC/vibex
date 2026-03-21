@@ -18,6 +18,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.64',
+    date: '2026-03-21',
+    changes: [
+      '🔧 Epic 9 状态管理: homePageStore Zustand + localStorage 持久化',
+      '💾 快照功能: saveSnapshot/restoreSnapshot (最多5个快照)',
+      '🔌 SSE 连接状态: sseConnected/sseConnecting 状态管理',
+      '📦 GridContainer 组件: 3栏响应式布局 (1400px/1200px/900px)',
+      '🔧 步骤数同步: 6步 + success 与 HomePage 对齐',
+    ],
+    commit: 'ec4e9e57',
+  },
+  {
     version: '1.0.63',
     date: '2026-03-21',
     changes: [

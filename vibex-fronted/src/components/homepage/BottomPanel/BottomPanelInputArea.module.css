@@ -1,25 +1,33 @@
+/**
+ * BottomPanelInputArea.module.css
+ * 规格: 80px 高度区域，textarea + send button + char-count
+ */
 .inputArea {
   height: 80px;
   display: flex;
   align-items: center;
-  padding: 0 15px;
-  gap: 10px;
+  padding: 8px 15px;
+  gap: 8px;
   background: #ffffff;
   border-bottom: 1px solid #e5e7eb;
   flex-shrink: 0;
+  position: relative;
 }
 
 .input {
   flex: 1;
-  height: 60px;
+  height: 64px;
   padding: 8px 12px;
+  padding-bottom: 24px; /* 为 char-count 留出空间 */
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   font-size: 14px;
+  font-family: inherit;
   resize: none;
   background: #f9fafb;
   color: #111827;
   transition: border-color 0.15s ease;
+  line-height: 1.5;
 }
 
 .input:focus {
@@ -30,6 +38,27 @@
 
 .input::placeholder {
   color: #9ca3af;
+}
+
+.input.overLimit {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.charCount {
+  position: absolute;
+  bottom: 12px;
+  right: 80px;
+  font-size: 11px;
+  color: #9ca3af;
+  pointer-events: none;
+  transition: color 0.15s ease;
+  z-index: 1;
+}
+
+.charCountError {
+  color: #ef4444;
+  font-weight: 600;
 }
 
 .sendBtn {
@@ -43,6 +72,9 @@
   color: #ffffff;
   flex-shrink: 0;
   transition: background 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sendBtn:hover:not(:disabled) {
@@ -51,5 +83,10 @@
 
 .sendBtn:disabled {
   opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sendBtn.loading {
+  opacity: 0.7;
   cursor: not-allowed;
 }

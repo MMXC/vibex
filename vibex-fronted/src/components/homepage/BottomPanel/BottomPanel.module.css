@@ -1,8 +1,15 @@
 /**
  * BottomPanel.module.css - 底部面板样式
- * 
+ *
  * 规格: 380px 固定高度
- * 子组件: CollapseHandle(30px) + InputArea(80px) + ActionBar(50px) + AIDisplay(flex:1)
+ * 子组件布局（从上到下）:
+ *   CollapseHandle: 30px
+ *   QuickAskButtons: 40px
+ *   AIDisplay: flex: 1 (自适应)
+ *   BottomPanelInputArea: 80px
+ *   ChatHistory: 40px collapsed
+ *   ActionBar: 50px
+ *   合计: 30+40+flex+80+40+50 = 240px + flex
  */
 
 .panel {

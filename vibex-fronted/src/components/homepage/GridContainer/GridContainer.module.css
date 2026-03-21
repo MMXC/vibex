@@ -1,0 +1,75 @@
+/**
+ * GridContainer Styles
+ * 
+ * Responsive grid layout:
+ * - 1400px+: 3-column (left: 240px, main: flex, right: 320px)
+ * - 1200px: 2-column (hide right panel)
+ * - 900px: Single column (hide left panel)
+ */
+
+.container {
+  display: grid;
+  grid-template-columns: 240px 1fr 320px;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "header header header"
+    "left main right"
+    "bottom bottom bottom";
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 100vh;
+  gap: 0;
+}
+
+/* Tablet: Hide right panel */
+@media (max-width: 1200px) {
+  .container {
+    grid-template-columns: 200px 1fr;
+    grid-template-areas:
+      "header header"
+      "left main"
+      "bottom bottom";
+  }
+
+  :global(.grid-right) {
+    display: none;
+  }
+}
+
+/* Mobile: Single column */
+@media (max-width: 900px) {
+  .container {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "main"
+      "bottom";
+  }
+
+  :global(.grid-left),
+  :global(.grid-right) {
+    display: none;
+  }
+}
+
+/* Grid area assignments */
+:global(.grid-header) {
+  grid-area: header;
+}
+
+:global(.grid-left) {
+  grid-area: left;
+}
+
+:global(.grid-main) {
+  grid-area: main;
+}
+
+:global(.grid-right) {
+  grid-area: right;
+}
+
+:global(.grid-bottom) {
+  grid-area: bottom;
+}

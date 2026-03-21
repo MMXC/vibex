@@ -97,21 +97,13 @@ export function ThemeWrapper({
     setIsLoading(true);
   }, []);
 
-  // When homepageData is loading (null), do NOT render ThemeProvider.
-  // This prevents the legacy fallback path from running before API data is ready.
-  // ThemeProvider's initial state is determined once on mount, so we must
-  // defer its creation until homepageData is available.
-  if (homepageData === null) {
-    return (
-      <ThemeWrapperContext.Provider value={{ homepageData, isLoading, clearCache }}>
-        {children}
-      </ThemeWrapperContext.Provider>
-    );
-  }
+  // Pass undefined when loading so ThemeProvider can detect async data arrival
+  // ThemeContext handles the update via useEffect when homepageData changes
+  const effectiveHomepageData = homepageData ?? undefined;
 
   return (
     <ThemeWrapperContext.Provider value={{ homepageData, isLoading, clearCache }}>
-      <ThemeProvider homepageData={homepageData}>
+      <ThemeProvider homepageData={effectiveHomepageData}>
         {children}
       </ThemeProvider>
     </ThemeWrapperContext.Provider>

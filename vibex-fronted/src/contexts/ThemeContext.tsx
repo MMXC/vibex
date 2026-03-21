@@ -5,6 +5,7 @@ import React, {
   useContext,
   useReducer,
   useEffect,
+  useRef,
   ReactNode,
   useCallback,
 } from 'react';
@@ -119,6 +120,21 @@ export function ThemeProvider({
   };
 
   const [theme, dispatch] = useReducer(themeReducer, initialState);
+
+  // Track if homepageData was undefined on initial render
+  const homepageDataWasUndefined = useRef(homepageData === undefined);
+
+  // When homepageData changes from undefined → defined, re-compute mode
+  // This handles the async fetch case where ThemeProvider mounts before data arrives
+  useEffect(() => {
+    if (homepageDataWasUndefined.current && homepageData !== undefined) {
+      const local = getStoredTheme();
+      const system = getSystemTheme();
+      const resolved = resolveMergedTheme({ local, api: homepageData, system });
+      dispatch({ type: 'SET_MODE', mode: resolved });
+      homepageDataWasUndefined.current = false;
+    }
+  }, [homepageData]);
 
   // Apply CSS vars whenever resolved theme changes
   useEffect(() => {

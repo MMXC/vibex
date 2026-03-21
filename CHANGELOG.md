@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- **agent-self-evolution-20260321**: 每日自检提案收集
+  - 6 个 agent 提案: dev, analyst, architect, pm, tester, reviewer
+  - PRD 和架构文档已创建
+  - 提案存储在 proposals/20260321/
+
+### Added (Epic 3)
 - **Story 1.2 CSS Variables**: 新增完整的设计令牌系统
   - 颜色变量: `--color-bg`, `--color-surface`, `--color-text`, `--color-text-muted` 等
   - 间距变量: `--spacing-xs`, `--spacing-sm`, `--spacing-md`, `--spacing-lg`, `--spacing-xl`, `--spacing-2xl`

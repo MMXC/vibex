@@ -63,10 +63,10 @@ export function ThemeWrapper({
   children,
   onApiDataLoaded,
 }: ThemeWrapperProps): React.ReactElement {
-  // Use undefined sentinel: undefined = loading, null = no data, object = data ready
-  const [homepageData, setHomepageData] = useState<
-    HomepageAPIResponse | null | undefined
-  >(undefined);
+  // Use null sentinel: null = loading/no data, object = data ready
+  const [homepageData, setHomepageData] = useState<HomepageAPIResponse | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -99,9 +99,9 @@ export function ThemeWrapper({
 
   return (
     <ThemeWrapperContext.Provider value={{ homepageData, isLoading, clearCache }}>
-      {/* ThemeProvider only rendered after homepageData is resolved (not undefined).
+      {/* ThemeProvider only rendered after homepageData is resolved (not null).
           This prevents FOUT by ensuring merge strategy is applied on first render. */}
-      {homepageData !== undefined ? (
+      {homepageData !== null ? (
         <ThemeProvider homepageData={homepageData}>
           {children}
         </ThemeProvider>

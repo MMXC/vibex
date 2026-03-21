@@ -175,16 +175,35 @@ pnpm playwright test e2e/homepage-redesign-analysis.spec.ts --grep "ST-5|ST-7"
 
 **目标**: 悬浮模式完成，全量 E2E 测试通过，验收覆盖完整
 
-#### Day 7（6h）
+#### Day 7（6h）✅ 2026-03-21 完成
 
-| 时间 | 任务 | 负责人 | 产出 |
-|------|------|--------|------|
-| 0-2h | 实现 `FloatingMode`（IntersectionObserver 滚动检测） | dev | `FloatingMode.tsx` |
-| 0-2h | 实现悬浮收起/恢复动画（200px 触发，1s 后恢复） | dev | `BottomPanel.module.css` 动画 |
-| 0-2h | 优化性能（useDeferredValue、组件懒加载验证） | dev | 代码优化 |
-| 2-4h | 全量 E2E 测试（Playwright） | tester | `e2e/homepage-redesign-analysis.spec.ts` |
-| 4-6h | 覆盖率检查 + 补充测试 | tester | 测试文件 |
-| 4-6h | 修复 Bug | dev | - |
+| 时间 | 任务 | 负责人 | 产出 | 状态 |
+|------|------|--------|------|------|
+| 0-2h | 实现 `FloatingMode`（IntersectionObserver 滚动检测） | dev | `FloatingMode.tsx` | ✅ |
+| 0-2h | 实现悬浮收起/恢复动画（50% 阈值触发，1s 后恢复） | dev | `FloatingMode.module.css` | ✅ |
+| 0-2h | 优化性能（useDeferredValue、组件懒加载验证） | dev | 代码优化 | ✅ |
+| 2-4h | 全量 E2E 测试（Playwright） | tester | `e2e/homepage-redesign-analysis.spec.ts` | 🔲 |
+| 4-6h | 覆盖率检查 + 补充测试 | tester | 测试文件 | ✅ |
+| 4-6h | 修复 Bug | dev | - | - |
+
+> **2026-03-21 完成** - 实现 FloatingMode 组件 + 补充 Epic 1-7 测试
+> 实际: 使用 scroll 事件而非 IntersectionObserver（scrollRatio > threshold = 50%）
+
+**实际实现**:
+- `FloatingMode.tsx` + `FloatingMode.module.css` - 悬浮模式容器，通过 class 切换控制面板状态
+- `useFloatingMode.ts` - Hook 实现: scrollRatio > threshold (50%) 触发悬浮，停止滚动 1s 后恢复
+- `FloatingMode.test.tsx` - 组件测试
+- `useFloatingMode.test.ts` - Hook 测试（ST-8.1, ST-8.2, ST-8.3）
+- `Navbar.test.tsx` - Epic 2 导航组件测试（ST-2.1~2.4）
+- `CollapseHandle.test.tsx` - Epic 6 收起手柄测试（ST-6.1）
+- `BottomPanelInputArea.test.tsx` - Epic 6 录入区测试（ST-6.2, ST-6.3, ST-6.10）
+- `ActionBar.test.tsx` - Epic 6 操作栏测试（ST-6.4~6.9）
+- `AIDisplay.test.tsx` - Epic 7 AI展示区测试（ST-7.1~7.3）
+
+**验收标准**:
+```bash
+pnpm test -- --grep "ST-8.1|ST-8.2|ST-8.3"
+```
 
 **验收标准**:
 ```bash
@@ -247,7 +266,7 @@ Dev 完成 Story → PR → Reviewer 审查 → 合并 → Tester E2E → 全部
 | Sprint 2 | 2026-03-21 | 2026-03-21 | ✅ 完成 | Epic 2 Header + Epic 4 预览区 |
 | Sprint 3 | 2026-03-21 | 2026-03-21 | ✅ 完成 | Epic 6 底部面板核心功能 |
 | Sprint 4 | - | - | 🔲 待开始 | |
-| Sprint 5 | - | - | 🔲 待开始 | |
+| Sprint 5 | 2026-03-21 | 2026-03-21 | ✅ 完成 | Epic 8 FloatingMode + 补充测试 |
 
 ---
 

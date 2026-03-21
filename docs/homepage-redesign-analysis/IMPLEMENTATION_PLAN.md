@@ -118,22 +118,32 @@ pnpm playwright test e2e/homepage-redesign-analysis.spec.ts --grep "ST-4|ST-2"
 
 #### Day 5（8h）
 
-| 时间 | 任务 | 负责人 | 产出 |
-|------|------|--------|------|
-| 0-2h | 实现 `BottomPanel` 容器（手柄、展开/收起动画） | dev | `BottomPanel.tsx + .module.css` |
-| 0-2h | 实现 `RequirementTextarea`（5000字、Ctrl+Enter 发送） | dev | `RequirementTextarea.tsx` |
-| 0-2h | 实现 `QuickAskButtons`（5 个预设问题） | dev | `QuickAskButtons.tsx` |
-| 2-4h | 实现 `DiagnosisButtons`（诊断/优化） | dev | `DiagnosisButtons.tsx` |
-| 2-4h | 实现 `ChatHistory`（最近 10 条，可展开） | dev | `ChatHistory.tsx` |
-| 4-6h | 实现保存草稿 + 重新生成按钮 | dev | `BottomPanel.tsx` |
-| 6-8h | 实现 `CreateProjectButton` + API 集成 | dev | `projectApi.createProject()` |
-| 8-8h | 测试 | tester | 测试文件 |
+| 时间 | 任务 | 负责人 | 产出 | 状态 |
+|------|------|--------|------|------|
+| 0-2h | 实现 `BottomPanel` 容器（手柄、展开/收起动画） | dev | `BottomPanel.tsx + .module.css` | ✅ |
+| 0-2h | 实现 `RequirementTextarea`（5000字、Ctrl+Enter 发送） | dev | `RequirementTextarea.tsx` | ✅ |
+| 0-2h | 实现 `QuickAskButtons`（5 个预设问题） | dev | `QuickAskButtons.tsx` | ✅ |
+| 2-4h | 实现 `DiagnosisButtons`（诊断/优化） | dev | `DiagnosisButtons.tsx` | ✅ 已复用 |
+| 2-4h | 实现 `ChatHistory`（最近 10 条，可展开） | dev | `ChatHistory.tsx` | ✅ |
+| 4-6h | 实现保存草稿 + 重新生成按钮 | dev | `BottomPanel.tsx` | ✅ |
+| 6-8h | 实现 `CreateProjectButton` + API 集成 | dev | `projectApi.createProject()` | ✅ 已复用 |
+| 8-8h | 测试 | tester | 测试文件 | ✅ |
+
+> **2026-03-21 完成** - 实际复用现有组件（ActionBar, AIDisplay, CollapseHandle），新增 QuickAskButtons、ChatHistory、useDraft，扩展 BottomPanelInputArea 支持 5000 字和 Ctrl+Enter
 
 **验收标准**:
 ```bash
 pnpm test -- --grep "ST-6.1|ST-6.2|ST-6.3|ST-6.4|ST-6.5|ST-6.6|ST-6.7|ST-6.8|ST-6.9|ST-6.10"
 pnpm playwright test e2e/homepage-redesign-analysis.spec.ts --grep "ST-6"
 ```
+
+**实际实现**:
+- `QuickAskButtons.tsx` + `.module.css` - 5 个预设快捷询问按钮
+- `ChatHistory.tsx` + `.module.css` - 可展开的历史记录面板（最近 10 条）
+- `hooks/useDraft.ts` - localStorage 防抖草稿保存 hook（2s debounce）
+- `BottomPanelInputArea.tsx` - 扩展支持 5000 字、Ctrl+Enter 快捷键、实时字数统计
+- `BottomPanel.tsx` - 集成所有子组件，380px 固定高度
+- `BottomPanel.test.tsx` - 47 个测试用例（ST-6.1~6.10 全覆盖）
 
 ---
 
@@ -235,7 +245,7 @@ Dev 完成 Story → PR → Reviewer 审查 → 合并 → Tester E2E → 全部
 |--------|------|------|------|------|
 | Sprint 1 | - | - | 🔲 待开始 | |
 | Sprint 2 | - | - | 🔲 待开始 | |
-| Sprint 3 | - | - | 🔲 待开始 | |
+| Sprint 3 | 2026-03-21 | 2026-03-21 | ✅ 完成 | Epic 6 底部面板核心功能 |
 | Sprint 4 | - | - | 🔲 待开始 | |
 | Sprint 5 | - | - | 🔲 待开始 | |
 

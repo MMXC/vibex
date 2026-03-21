@@ -1,5 +1,13 @@
 import type { Config } from 'jest';
 
+// Workaround: use Record<string, string> for moduleNameMapper to allow object syntax
+// while still supporting regex patterns via Jest's internal regex matching
+const moduleNameMapper = {
+  '^@/(.*)$': '<rootDir>/src/$1',
+  '^.+\\.module\\.css$': 'identity-obj-proxy',
+  '^.+\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+};
+
 const config: Config = {
   // Setup files - load jest-dom matchers and custom mocks
   setupFilesAfterEnv: [

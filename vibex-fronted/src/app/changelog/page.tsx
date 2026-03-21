@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.65',
+    date: '2026-03-22',
+    changes: [
+      '🎨 Epic 3 Grid 布局: 220px|1fr|260px 三栏 + 380px 底部面板',
+      '🖼️ 底部面板组件: BottomPanel + ActionBar + AIDisplay + ChatHistory',
+      '🎨 浅色主题变量: CSS Variables 隔离 (不修改 globals.css)',
+      '🧹 代码清理: 移除 HomePage.tsx 中未使用的 hook 变量',
+    ],
+    commit: '57f076af',
+  },
+  {
     version: '1.0.64',
     date: '2026-03-21',
     changes: [

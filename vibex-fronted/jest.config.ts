@@ -1,13 +1,5 @@
 import type { Config } from 'jest';
 
-// Workaround: use Record<string, string> for moduleNameMapper to allow object syntax
-// while still supporting regex patterns via Jest's internal regex matching
-const moduleNameMapper = {
-  '^@/(.*)$': '<rootDir>/src/$1',
-  '^.+\\.module\\.css$': 'identity-obj-proxy',
-  '^.+\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-};
-
 const config: Config = {
   // Setup files - load jest-dom matchers and custom mocks
   setupFilesAfterEnv: [
@@ -24,11 +16,13 @@ const config: Config = {
   },
 
   // Module alias mappings for cleaner imports
-  moduleNameMapper: {
+  // CSS patterns MUST come before @/ alias (first match wins)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  moduleNameMapper: ({
+    '\\.module\\.css$': 'identity-obj-proxy',
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^.+\\.module\\.css$': 'identity-obj-proxy',
-    '^.+\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-  },
+  } as any) as Config['moduleNameMapper'],
 
   // Fake timers configuration
   fakeTimers: {
@@ -38,20 +32,18 @@ const config: Config = {
   // CRITICAL: Exclude e2e and performance tests (use Playwright instead)
   testPathIgnorePatterns: [
     '/node_modules/',
-    '/tests/e2e/',      // Playwright e2e tests - not Jest
-    '/tests/performance/', // Performance tests - not Jest
-    '/tests/basic.spec.ts', // Standalone spec
-    '/tests/e2e.spec.ts',   // Standalone spec
+    '/tests/e2e/',
+    '/tests/performance/',
+    '/tests/basic.spec.ts',
+    '/tests/e2e.spec.ts',
     '/.next/',
     '/coverage/',
     '/storybook-static/',
     '/dist/',
     '/build/',
-    // Individual problematic files
     'FlowEditor',
     'MermaidCodeEditor',
     'flow/page.test',
-    // Legacy e2e directories
     '/e2e/',
   ],
 

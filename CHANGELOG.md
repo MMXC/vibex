@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Epic3 Fix] - 2026-03-22
+
+### Fixed
+- **ThemeWrapper timing bug**: useRef/useEffect 检测异步 homepageData 到达并重新计算 merge 策略
+- **ThemeContext**: 异步数据到达时重新计算 mode 而非使用 stale initialState
+
 ## [Unreleased]
 
 ### Fixed

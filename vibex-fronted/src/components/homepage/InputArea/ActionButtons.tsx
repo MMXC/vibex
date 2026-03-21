@@ -33,11 +33,14 @@ export interface ActionButtonsProps {
   useDynamicButton?: boolean;
 }
 
-// 三步流程按钮配置 (二阶段重构)
+// 六步流程按钮配置 (Epic 3: Design 步骤合并)
 const DYNAMIC_BUTTON_CONFIG: Record<number, { label: string; icon: string }> = {
   1: { label: '业务流程分析', icon: '🔍' },
   2: { label: 'UI组件分析', icon: '🏗️' },
-  3: { label: '创建项目', icon: '🚀' },
+  3: { label: '进入澄清', icon: '💬' },
+  4: { label: '生成流程', icon: '📊' },
+  5: { label: '生成 UI', icon: '🎨' },
+  6: { label: '创建项目', icon: '🚀' },
 };
 
 const STATIC_BUTTON_CONFIG: Array<{
@@ -64,22 +67,33 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   currentStep = 1,
   useDynamicButton = false,
 }) => {
-  // 三步流程动态按钮点击处理
+  // 六步流程动态按钮点击处理 (Epic 3: Design 步骤合并)
   const handleDynamicClick = () => {
     if (isGenerating) return;
     
     switch (currentStep) {
       case 1:
-        // Step 1: 业务流程分析 -> 先生成上下文 (onGenerateContexts)
-        // 上下文生成完成后会自动触发后续步骤
+        // Step 1: 业务流程分析 -> 生成上下文
         onGenerateContexts();
         break;
       case 2:
-        // Step 2: UI组件分析 -> 调用 analyzePageStructure
+        // Step 2: UI组件分析 -> 调用页面结构分析
         onAnalyzePageStructure();
         break;
       case 3:
-        // Step 3: 创建项目
+        // Step 3: 需求澄清 -> 进入澄清流程 (复用创建项目动作作为占位)
+        onCreateProject();
+        break;
+      case 4:
+        // Step 4: 生成业务流程
+        onGenerateFlow();
+        break;
+      case 5:
+        // Step 5: 生成 UI 设计
+        onAnalyzePageStructure();
+        break;
+      case 6:
+        // Step 6: 创建项目
         onCreateProject();
         break;
     }
@@ -108,12 +122,15 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   if (useDynamicButton) {
     const config = DYNAMIC_BUTTON_CONFIG[currentStep];
     
-    // 根据步骤获取对应的按钮状态 (三步流程)
+    // 根据步骤获取对应的按钮状态 (六步流程 Epic 3)
     const getStateForStep = (step: number): ButtonState => {
       switch (step) {
-        case 1: return buttonStates.flow; // 业务流程分析
-        case 2: return buttonStates.page;  // UI组件分析
-        case 3: return buttonStates.project; // 创建项目
+        case 1: return buttonStates.flow;      // 业务流程分析
+        case 2: return buttonStates.page;     // UI组件分析
+        case 3: return buttonStates.project;  // 进入澄清 (复用 project state)
+        case 4: return buttonStates.flow;     // 生成流程
+        case 5: return buttonStates.page;     // 生成 UI (复用 page state)
+        case 6: return buttonStates.project;  // 创建项目
         default: return { enabled: false, tooltip: '' };
       }
     };

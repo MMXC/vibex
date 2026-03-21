@@ -1,9 +1,9 @@
 /**
- * HomePage - 主页容器组件 (左侧抽屉 + 60/40 垂直布局版)
- * 
- * Epic 3: 左侧抽屉 - 步骤列表、步骤切换、步骤状态
- * 布局: [左侧抽屉] [预览区域 60% | 录入区域 40%]
- * 
+ * HomePage - 主页容器组件 (三栏布局版)
+ *
+ * PRD v2: 三栏布局 (15% 左侧导航 / 60% 中心预览 / 25% 右侧编辑)
+ * 5 步流程: 需求输入 → 限界上下文 → 领域模型 → 业务流程 → UI 生成
+ *
  * 业务逻辑已抽取到 useHomePage hook
  */
 'use client';
@@ -11,7 +11,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import LoginDrawer from '@/components/ui/LoginDrawer';
-import { Navbar, Sidebar } from '@/components/homepage';
+import { Navbar, Sidebar, StepNavigator } from '@/components/homepage';
 import { useHomePage } from './hooks';
 import { InputArea } from './InputArea/InputArea';
 import { PreviewArea } from './PreviewArea/PreviewArea';
@@ -24,21 +24,21 @@ const ParticleBackground = dynamic(
   { ssr: false }
 );
 
-// 六步流程常量 - Epic 3: 左侧抽屉 + 需求澄清
+// 六步流程常量 - PRD v2 + Epic 3: 需求输入 → 限界上下文 → 领域模型 → 需求澄清 → 业务流程 → UI 生成
 const STEPS: Step[] = [
   { id: 1, label: '需求输入', description: '描述您的需求' },
   { id: 2, label: '限界上下文', description: '定义系统边界' },
   { id: 3, label: '领域模型', description: '设计领域实体' },
-  { id: 4, label: '需求澄清', description: 'AI 追问澄清' },
+  { id: 4, label: '需求澄清', description: 'AI 追问和需求澄清' },
   { id: 5, label: '业务流程', description: '绘制业务流程' },
-  { id: 6, label: '项目创建', description: '生成项目代码' },
+  { id: 6, label: 'UI 生成', description: '生成 UI 设计' },
 ];
 
 export default function HomePage() {
-  const { 
-    currentStep, 
-    completedStep, 
-    isAuthenticated, 
+  const {
+    currentStep,
+    completedStep,
+    isAuthenticated,
     setCurrentStep,
     requirementText,
     setRequirementText,
@@ -57,23 +57,28 @@ export default function HomePage() {
     isGenerating,
     thinkingMessages,
   } = useHomePage();
-  
+
   const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
 
-  // Get current mermaid code based on step (三步流程)
-  // 修复: Step 1 时优先显示 contextMermaidCode (限界上下文图)，若无则显示 flowMermaidCode
+  // 根据当前步骤返回对应 Mermaid 代码 (PRD 6步流程 + Epic 3)
   const currentMermaidCode = useMemo(() => {
     switch (currentStep) {
-      case 1: 
-        // Step 1: 优先显示限界上下文图(如有)，否则显示业务流程图
+      case 1:
         return contextMermaidCode || flowMermaidCode || '';
-      case 2: 
-        // Step 2: 显示UI组件树(复用mermaid)
-        return contextMermaidCode || flowMermaidCode || '';
-      default: 
+      case 2:
+        return contextMermaidCode || '';
+      case 3:
+        return modelMermaidCode || '';
+      case 4:
+        return modelMermaidCode || ''; // 需求澄清 - 显示领域模型供讨论
+      case 5:
+        return flowMermaidCode || '';
+      case 6:
+        return flowMermaidCode || ''; // UI 生成 - 复用 flowMermaidCode 占位
+      default:
         return '';
     }
-  }, [currentStep, contextMermaidCode, flowMermaidCode]);
+  }, [currentStep, contextMermaidCode, modelMermaidCode, flowMermaidCode]);
 
   // Handle requirement submission
   const handleRequirementSubmit = useCallback(() => {
@@ -90,16 +95,16 @@ export default function HomePage() {
   return (
     <div className={styles.container}>
       <ParticleBackground />
-      <Navbar 
+      <Navbar
         isAuthenticated={isAuthenticated}
         onLoginClick={() => setIsLoginDrawerOpen(true)}
-        onMenuToggle={() => {}} 
-        onSettingsClick={() => setIsLoginDrawerOpen(true)} 
+        onMenuToggle={() => {}}
+        onSettingsClick={() => setIsLoginDrawerOpen(true)}
       />
-      
-      {/* Epic 3: 左侧抽屉 + 60/40 垂直布局 */}
-      <div className={styles.splitContainer}>
-        {/* 左侧抽屉 - Epic 3: 步骤列表 */}
+
+      {/* PRD v2: 三栏布局 */}
+      <div className={styles.mainContainer}>
+        {/* 左侧导航 - 15% */}
         <Sidebar
           steps={STEPS}
           currentStep={currentStep}
@@ -107,10 +112,9 @@ export default function HomePage() {
           onStepClick={handleStepClick}
           isStepClickable={(stepId) => stepId <= (completedStep + 1)}
         />
-        
-        {/* 右侧主内容 - 60/40 垂直布局 */}
-        <div className={styles.mainContentVertical}>
-          {/* 预览区域 - 60% - AC1 */}
+
+        {/* 中心预览区 - 60% */}
+        <main className={styles.content}>
           <PreviewArea
             currentStep={currentStep}
             mermaidCode={currentMermaidCode}
@@ -119,8 +123,10 @@ export default function HomePage() {
             businessFlow={businessFlow}
             isGenerating={isGenerating}
           />
-          
-          {/* 录入区域 - 40% - AC2 & AC3: 无 Tab 切换 */}
+        </main>
+
+        {/* 右侧编辑区 - 25% */}
+        <aside className={styles.aiPanel}>
           <InputArea
             requirementText={requirementText}
             onRequirementChange={setRequirementText}
@@ -138,12 +144,12 @@ export default function HomePage() {
             currentStep={currentStep}
             completedStep={completedStep}
           />
-        </div>
+        </aside>
       </div>
 
-      <LoginDrawer 
-        isOpen={isLoginDrawerOpen} 
-        onClose={() => setIsLoginDrawerOpen(false)} 
+      <LoginDrawer
+        isOpen={isLoginDrawerOpen}
+        onClose={() => setIsLoginDrawerOpen(false)}
       />
     </div>
   );

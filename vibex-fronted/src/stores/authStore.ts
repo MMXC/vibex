@@ -190,4 +190,16 @@ export const authActions = {
   syncFromStorage: useAuthStore.getState().syncFromStorage,
 };
 
+// PRD FR-5.1: 跨标签页同步 - 监听 localStorage auth_token 变化
+if (typeof window !== 'undefined') {
+  const handleAuthStorageChange = (e: StorageEvent) => {
+    if (e.key !== 'auth_token') return;
+    // localStorage auth_token 变化 → 同步 sessionStorage 状态
+    const { syncFromStorage } = useAuthStore.getState();
+    syncFromStorage();
+  };
+
+  window.addEventListener('storage', handleAuthStorageChange);
+}
+
 export default useAuthStore;

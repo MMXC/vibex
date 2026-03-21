@@ -14,6 +14,8 @@ export type { CollapsibleChatProps } from './CollapsibleChat';
 
 // New modular components (Epic 2, 3, 4)
 export { default as HomePage } from './HomePage';
+export { PreviewPanel } from './PreviewPanel/PreviewPanel';
+export type { PreviewPanelProps, MermaidCodes } from './PreviewPanel/PreviewPanel';
 export { StepContainer } from './StepContainer';
 export { Navbar } from './Navbar/Navbar';
 export { Sidebar } from './Sidebar/Sidebar';

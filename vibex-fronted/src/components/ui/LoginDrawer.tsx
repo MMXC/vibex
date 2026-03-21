@@ -65,10 +65,13 @@ export function LoginDrawer({ isOpen, onClose, onSuccess }: LoginDrawerProps) {
       }
 
       // 保存 token 到 sessionStorage（安全：不在持久化存储中明文保存）
+      // 同时写入 localStorage 用于跨标签页同步（storage 事件）
       if (token) {
         sessionStorage.setItem('auth_token', token);
         sessionStorage.setItem('user_id', email);
-        
+        localStorage.setItem('auth_token', token); // 跨标签页同步信号
+        localStorage.setItem('user_id', email);
+
         // 更新全局认证状态
         login(token, { id: email, email });
       }

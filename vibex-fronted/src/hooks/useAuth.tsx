@@ -78,6 +78,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initAuth();
   }, []);
 
+  // PRD FR-5.1: 跨标签页同步 - 监听 storage 事件
+  useEffect(() => {
+    const handleStorageChange = async (e: StorageEvent) => {
+      if (e.key !== 'auth_token') return;
+
+      const newToken = e.newValue;
+      if (newToken) {
+        // 另一个标签页登录了
+        setToken(newToken);
+        try {
+          const userData = await apiService.getCurrentUser();
+          setUser(userData as User);
+        } catch {
+          // Token 可能已失效，忽略
+        }
+      } else {
+        // 另一个标签页登出了
+        setToken(null);
+        setUser(null);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   // 登录
   const login = useCallback(async (email: string, password: string) => {
     setIsLoading(true);

@@ -95,3 +95,7 @@ export {
 
 // ==================== Onboarding Store ====================
 export { useOnboardingStore } from './onboarding/onboardingStore';
+
+// ==================== HomePage Store (Epic 9) ====================
+export { useHomePageStore, useCurrentStep, useCompletedSteps, useRequirementText, useSSEState } from './homePageStore';
+export type { HomePageStep, HomePageState, HomePageSnapshot, MermaidCodes } from './homePageStore';

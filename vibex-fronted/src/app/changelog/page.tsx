@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.66',
+    date: '2026-03-22',
+    changes: [
+      '🔗 Epic 3 API Binding: ThemeWrapper + homepageAPI 服务 (优先级合并策略)',
+      '🔗 API 数据获取: fetchHomepageData + 5分钟缓存 TTL + localStorage 优先级',
+      '🧪 主题合并策略测试: 17 个 homepageAPI 测试 + 7 个 ThemeWrapper 测试',
+    ],
+    commit: '0dec1c5c',
+  },
+  {
     version: '1.0.65',
     date: '2026-03-22',
     changes: [

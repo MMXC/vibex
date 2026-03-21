@@ -1,0 +1,17 @@
+/**
+ * BottomPanel.module.css - 底部面板样式
+ * 
+ * 规格: 380px 固定高度
+ * 子组件: CollapseHandle(30px) + InputArea(80px) + ActionBar(50px) + AIDisplay(flex:1)
+ */
+
+.panel {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  height: 380px;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-primary, #ffffff);
+  border-top: 1px solid var(--color-border, #e5e7eb);
+  overflow: hidden;
+}

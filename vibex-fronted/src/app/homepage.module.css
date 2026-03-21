@@ -1459,3 +1459,62 @@
     flex: 0 0 50%;
   }
 }
+
+/* ========== Epic 3: Grid 布局 (homepage-v4) ========== */
+/* ST-3.1 + ST-3.2: Grid 布局 + 浅色主题变量 */
+.page {
+  /* 浅色主题变量 */
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-primary-muted: #dbeafe;
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f9fafb;
+  --color-bg-tertiary: #f3f4f6;
+  --color-border: #e5e7eb;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: #9ca3af;
+
+  /* Grid 布局: Header(50px) | Content(1fr) | Bottom(380px) */
+  /* 列: 220px | 1fr | 260px */
+  display: grid;
+  grid-template-rows: 50px 1fr 380px;
+  grid-template-columns: 220px 1fr 260px;
+  min-height: 100vh;
+  background: var(--color-bg-secondary, #f9fafb);
+}
+
+.header {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+.leftDrawer {
+  grid-column: 1;
+  grid-row: 2;
+  background: var(--color-bg-secondary, #f9fafb);
+  border-right: 1px solid var(--color-border, #e5e7eb);
+  overflow-y: auto;
+}
+
+.preview {
+  grid-column: 2;
+  grid-row: 2;
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  overflow: hidden;
+}
+
+.rightDrawer {
+  grid-column: 3;
+  grid-row: 2;
+  background: var(--color-bg-primary, #ffffff);
+  border-left: 1px solid var(--color-border, #e5e7eb);
+  overflow-y: auto;
+}
+
+.bottomPanel {
+  grid-column: 1 / -1;
+  grid-row: 3;
+}
+
+/* ST-2.7: 底部面板 4 个子组件全部可见 — 已在 BottomPanel 组件内部管理 */

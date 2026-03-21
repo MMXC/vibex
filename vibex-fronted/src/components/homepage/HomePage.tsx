@@ -1,8 +1,8 @@
 /**
- * HomePage - 主页容器组件 (三栏布局版)
+ * HomePage - 主页容器组件 (Grid 布局版 - homepage-v4-fix)
  *
- * PRD v2: 三栏布局 (15% 左侧导航 / 60% 中心预览 / 25% 右侧编辑)
- * 5 步流程: 需求输入 → 限界上下文 → 领域模型 → 业务流程 → UI 生成
+ * Epic 2+3: Grid 三栏布局 (220px左侧 | 1fr中央 | 260px右侧) + 底部面板 (380px)
+ * 六步流程: 需求输入 → 限界上下文 → 领域模型 → 需求澄清 → 业务流程 → UI 生成
  *
  * 业务逻辑已抽取到 useHomePage hook
  */
@@ -11,10 +11,10 @@
 import { useState, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import LoginDrawer from '@/components/ui/LoginDrawer';
-import { Navbar, Sidebar, StepNavigator, AIPanel } from '@/components/homepage';
+import { Navbar, Sidebar, AIPanel } from '@/components/homepage';
 import { useHomePage } from './hooks';
-import { InputArea } from './InputArea/InputArea';
 import { PreviewArea } from './PreviewArea/PreviewArea';
+import { BottomPanel } from './BottomPanel/BottomPanel';
 import type { AIMessage } from './types';
 import styles from '@/app/homepage.module.css';
 import type { Step } from '@/types/homepage';
@@ -81,13 +81,6 @@ export default function HomePage() {
     }
   }, [currentStep, contextMermaidCode, modelMermaidCode, flowMermaidCode]);
 
-  // Handle requirement submission
-  const handleRequirementSubmit = useCallback(() => {
-    if (requirementText.trim()) {
-      generateContexts(requirementText);
-    }
-  }, [requirementText, generateContexts]);
-
   // Handle step change
   const handleStepClick = useCallback((step: number) => {
     setCurrentStep(step);
@@ -106,8 +99,7 @@ export default function HomePage() {
   const newThinkingItemId = useMemo(() => {
     if (thinkingMessages.length === 0) return undefined;
     const last = thinkingMessages[thinkingMessages.length - 1];
-    const lastIndex = thinkingMessages.length - 1;
-    return `thinking-${last.step}-${lastIndex}`;
+    return `thinking-${last.step}-${thinkingMessages.length - 1}`;
   }, [thinkingMessages]);
 
   // ST-1.1: AIPanel 发送消息处理
@@ -116,40 +108,42 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className={styles.container}>
+    <div className={styles.page}>
       <ParticleBackground />
+
+      {/* ST-3.3: Grid Header - 全宽 */}
       <Navbar
         isAuthenticated={isAuthenticated}
         onLoginClick={() => setIsLoginDrawerOpen(true)}
         onMenuToggle={() => {}}
-        onSettingsClick={() => setIsLoginDrawerOpen(true)}
+        onSettingsClick={() => {}}
+        className={styles.header}
       />
 
-      {/* PRD v2: 三栏布局 */}
-      <div className={styles.mainContainer}>
-        {/* 左侧导航 - 15% */}
-        <Sidebar
-          steps={STEPS}
+      {/* ST-3.3: 左侧抽屉 - 220px 宽 */}
+      <Sidebar
+        steps={STEPS}
+        currentStep={currentStep}
+        completedStep={completedStep}
+        onStepClick={handleStepClick}
+        isStepClickable={(stepId) => stepId <= (completedStep + 1)}
+        className={styles.leftDrawer}
+      />
+
+      {/* ST-3.3: 中心预览区 - 自适应宽度 */}
+      <main className={styles.preview}>
+        <PreviewArea
           currentStep={currentStep}
-          completedStep={completedStep}
-          onStepClick={handleStepClick}
-          isStepClickable={(stepId) => stepId <= (completedStep + 1)}
+          mermaidCode={currentMermaidCode}
+          boundedContexts={boundedContexts}
+          domainModels={domainModels}
+          businessFlow={businessFlow}
+          isGenerating={isGenerating}
         />
+      </main>
 
-        {/* 中心预览区 - 60% */}
-        <main className={styles.content}>
-          <PreviewArea
-            currentStep={currentStep}
-            mermaidCode={currentMermaidCode}
-            boundedContexts={boundedContexts}
-            domainModels={domainModels}
-            businessFlow={businessFlow}
-            isGenerating={isGenerating}
-          />
-        </main>
-
-        {/* 右侧编辑区 - 25% */}
-        {/* ST-1.1: AIPanel 组件集成 (替换旧 aside) */}
+      {/* ST-1.1 + ST-3.3: 右侧 AI 面板 - 260px 宽 */}
+      <div className={styles.rightDrawer}>
         <AIPanel
           isOpen={true}
           messages={adaptedMessages}
@@ -157,24 +151,20 @@ export default function HomePage() {
           onSendMessage={handleAIPanelSend}
           newItemId={newThinkingItemId}
         />
-        
-        {/* 底部录入区 - InputArea */}
-        <InputArea
-          requirementText={requirementText}
-          onRequirementChange={setRequirementText}
-          onSubmit={handleRequirementSubmit}
-          onGenerate={handleRequirementSubmit}
-          onGenerateDomainModel={() => generateDomainModels(requirementText, boundedContexts)}
-          onGenerateBusinessFlow={() => generateBusinessFlow([], requirementText)}
-          onCreateProject={() => {}}
-          onAnalyzePageStructure={analyzePageStructure}
+      </div>
+
+      {/* ST-2.7: 底部面板 - 380px 固定高度 */}
+      <div className={styles.bottomPanel}>
+        <BottomPanel
           isGenerating={isGenerating}
-          boundedContexts={boundedContexts}
-          selectedContextIds={selectedContextIds}
-          businessFlow={businessFlow}
-          pageStructureAnalyzed={pageStructureAnalyzed}
-          currentStep={currentStep}
-          completedStep={completedStep}
+          onAIAsk={() => {}}
+          onDiagnose={() => {}}
+          onOptimize={() => {}}
+          onHistory={() => {}}
+          onSave={() => {}}
+          onRegenerate={() => {}}
+          onCreateProject={() => {}}
+          onSendMessage={handleAIPanelSend}
         />
       </div>
 

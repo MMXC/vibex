@@ -26,8 +26,10 @@ const mockChangelog: ChangelogEntry[] = [
       '🎭 背景特效: Grid overlay + Glow orb 动态效果',
       '📱 响应式断点: 1200px / 900px 适配',
       '🌙 暗色主题支持',
+      '🔝 Epic 2 Header导航: Navbar 组件 (Logo + 导航链接 + 登录状态)',
+      '🧭 导航: /templates 链接、768px 响应式断点',
     ],
-    commit: 'efb786d7',
+    commit: 'efb786d7, 703617b9',
   },
   {
     version: '1.0.61',

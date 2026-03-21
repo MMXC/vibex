@@ -11,14 +11,20 @@ All notable changes to this project will be documented in this file.
 - **响应式断点**: 1200px (max-width: 1440px) / 900px (padding: 0 24px)
 - **暗色主题**: 完整暗色变量覆盖
 
+### Added (Epic 2 - Header 导航)
+- **Navbar 组件**: 顶部导航 (Logo + 导航链接 + CTA 按钮)
+- **Logo**: VibeX 文字 + ◈ 图标
+- **导航链接**: 模板页 /templates 链接
+- **登录状态**: 未登录显示"开始使用"，已登录显示"我的项目"
+- **响应式**: 768px 断点隐藏导航链接
+
 ### Added
 - **agent-self-evolution-20260321**: 每日自检提案收集
   - 6 个 agent 提案: dev, analyst, architect, pm, tester, reviewer
   - PRD 和架构文档已创建
   - 提案存储在 proposals/20260321/
 
-### Added (Epic 3)
-- **Story 1.2 CSS Variables**: 新增完整的设计令牌系统
+### Added (Story 1.2 CSS Variables) 新增完整的设计令牌系统
   - 颜色变量: `--color-bg`, `--color-surface`, `--color-text`, `--color-text-muted` 等
   - 间距变量: `--spacing-xs`, `--spacing-sm`, `--spacing-md`, `--spacing-lg`, `--spacing-xl`, `--spacing-2xl`
   - 字体变量: `--font-sans`, `--font-size-base` 等

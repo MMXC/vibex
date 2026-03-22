@@ -20,8 +20,8 @@
 - [ ] Update StepState route to use D1 instead of in-memory store
 
 ### Epic 3: BusinessDomainAPI
-- [ ] Extend SPEC-01 with CRUD persistence
-- [ ] Add domain->DB mapping
+- [x] Extend SPEC-01 with CRUD persistence ✅
+- [x] Add domain->DB mapping ✅
 
 ### Epic 4: FlowAPI
 - [x] Extend SPEC-02 with CRUD persistence ✅

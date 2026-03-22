@@ -97,6 +97,25 @@ Integrated with Task 2.1.
 
 ---
 
+## Epic 3: BusinessDomainAPI — D1 Persistence
+
+### Task 3.1: BusinessDomain CRUD DB Persistence ✅ (2026-03-23)
+**File**: `src/routes/business-domain.ts`
+**Status**: COMPLETE
+
+Replaced TODO placeholders with real D1/SQLite persistence:
+- **GET /api/business-domain**: Query `BusinessDomain` table by `projectId`; parse features/relationships from JSON; graceful empty array when D1 unavailable
+- **POST /api/business-domain/create**: INSERT domain row with JSON columns; features/relationships serialized via `JSON.stringify()`
+- **PUT /api/business-domain**: Dynamic UPDATE with `updatedAt`; features serialized as JSON string
+- **DELETE /api/business-domain**: DELETE from `BusinessDomain` table by id
+- **Added imports**: `queryDB`, `executeDB`, `queryOne` from `@/lib/db`
+- **Added**: `BusinessDomainRow` interface for DB row mapping
+- **Added**: `parseJson<T>()` helper for safe JSON parsing of features/relationships
+- **Note**: `domainType` column in DB (not `type`) — mapped correctly
+- Build: ✅ Compiled successfully | Tests: 436/436 passed
+
+---
+
 ## Epic 4: FlowAPI — D1 Persistence
 
 ### Task 4.1: Flow GET/PUT DB Persistence ✅ (2026-03-23)

@@ -31,3 +31,31 @@
   - Added parseJson<T>() helper for safe JSON parsing
   - Backend Tests: 436 tests passed
   - Commit: `19cc6742`
+
+- **Epic5-StepStateAPI**: D1 Persistence for Autosave
+  - StepState D1 Persistence: `src/routes/step-state.ts` (POST/GET/DELETE /api/step-state)
+  - Replaced in-memory stateStore with real D1/SQLite persistence
+  - Optimistic locking (409 on version conflict)
+  - ChangeLog entries with before/after JSON snapshots
+  - In-memory fallback when D1 unavailable (dev mode)
+  - Commit: `f5f46893`
+
+- **Epic6-ProjectAPI**: Project CRUD Operations
+  - Project CRUD: `src/routes/project-snapshot.ts`, `src/routes/projects.ts`
+  - GET /api/projects with snapshot (stepState, domains, flow, uiNodes, history)
+  - Project status, version, isTemplate, parentDraftId fields
+  - Commit: `f9639fe1`
+
+- **Epic7-UINodesAPI**: UI Node Generation & Persistence
+  - UINodes Route: `src/routes/ui-nodes.ts` (POST/GET/DELETE /api/ui-nodes)
+  - AI-driven UI structure generation with SSE streaming
+  - UINode model with hierarchical children support
+  - D1 persistence with JSON columns
+  - Commit: `462064a8`
+
+- **Epic8-TemplatesAPI**: Template Market & Listing
+  - Templates Route: `src/routes/templates.ts` (GET /api/templates)
+  - isPublic, usageCount, thumbnail columns on Project model
+  - SPEC-09 compliance for template listing and filtering
+  - Migration: `prisma/migrations/004_template_columns.sql`
+  - Commits: `c12f3de2`, `95336b1b`

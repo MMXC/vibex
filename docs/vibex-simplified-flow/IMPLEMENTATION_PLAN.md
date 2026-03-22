@@ -57,19 +57,40 @@ NEXT_PUBLIC_ENABLE_SIMPLIFIED_FLOW=false
 
 ## Phase 2: API Contracts (P0) — ~4h
 
-### Task 2.1: Backend — POST /ddd/business-domain
-**File**: `src/routes/ddd/business-domain.ts` (or similar)
+### Task 2.1: Backend — POST /api/business-domain/generate ✅ (2026-03-23 03:05)
+**File**: `src/routes/business-domain.ts`
 **Agent**: dev
+**Commit**: `a09ed896`
 
-Parallel generation of domains + flow. See architecture.md §3.
+Streaming SSE endpoint with Chinese output. See architecture.md §3.
 
-### Task 2.2: API verification
-**Command**:
-```bash
-curl -X POST https://api.vibex.top/ddd/business-domain \
-  -H "Content-Type: application/json" \
-  -d '{"requirement":"用户登录系统"}'
-# Verify: success=true, domains=[...], flow={nodes:[],edges:[]}
+```typescript
+// POST /api/business-domain/generate
+// SSE events: thinking, domain, done, error
+// Response: { success, domains[], message }
+```
+
+### Task 2.2: Backend — POST /api/flow/generate ✅ (2026-03-23 03:05)
+**File**: `src/routes/flow.ts`
+**Agent**: dev
+**Commit**: `a09ed896`
+
+Streaming SSE flow generation with Mermaid code.
+
+```typescript
+// POST /api/flow/generate
+// SSE events: thinking, node, edge, done, error
+// Response: { success, flow: { nodes[], edges[], mermaidCode } }
+```
+
+### Task 2.3: Route Registration ✅ (2026-03-23 03:05)
+**File**: `src/index.ts`
+**Agent**: dev
+**Commit**: `a09ed896`
+
+```typescript
+app.route('/api/business-domain', businessDomain);
+app.route('/api/flow', flow);
 ```
 
 ---
@@ -135,7 +156,8 @@ if (process.env.NEXT_PUBLIC_ENABLE_SIMPLIFIED_FLOW === 'true') {
 | 1.1 | termMap.ts + useTermTranslation.ts | ✅ Translation works (8f0de4b9) |
 | 1.2 | simplifiedFlowStore.ts | ✅ Store works (8f0de4b9) |
 | 1.3 | Feature Flag env var | ✅ Flag configurable (8f0de4b9) |
-| 2.1 | /ddd/business-domain backend | API returns valid |
+| 2.1 | /ddd/business-domain backend | ✅ API returns valid (a09ed896) |
+| 2.2 | /api/business-domain/generate + /api/flow/generate | ✅ Streaming SSE (a09ed896) |
 | 3.1 | Step 1 page + route | Page renders |
 | 3.2 | DomainCard | Domain display + check |
 | 3.3 | FlowChart | ReactFlow visualization |

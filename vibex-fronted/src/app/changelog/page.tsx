@@ -18,6 +18,14 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.76',
+    date: '2026-03-22',
+    changes: [
+      '🧩 Epic4-Integration: HomePage 集成 GridContainer + StepNavigator + homePageStore (commit b785d14d)',
+    ],
+    commit: 'b785d14d',
+  },
+  {
     version: '1.0.75',
     date: '2026-03-22',
     changes: [

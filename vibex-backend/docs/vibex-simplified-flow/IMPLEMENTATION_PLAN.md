@@ -97,6 +97,21 @@ Integrated with Task 2.1.
 
 ---
 
+## Epic 4: FlowAPI — D1 Persistence
+
+### Task 4.1: Flow GET/PUT DB Persistence ✅ (2026-03-23)
+**File**: `src/routes/flow.ts`
+**Status**: COMPLETE
+**Commit**: `f9639fe1`
+
+Replaced TODO placeholders with real D1/SQLite persistence:
+- **GET /api/flow**: Query `FlowData` table by `flowId` (id) or `projectId`; parse nodes/edges from JSON; graceful 503 when D1 unavailable
+- **PUT /api/flow**: Upsert `FlowData` row — UPDATE if exists, INSERT with projectId if new; update nodes/edges as JSON; update updatedAt timestamp
+- **Added imports**: `queryDB`, `queryOne`, `executeDB` from `@/lib/db`
+- Build: ✅ | Tests: 436/436 passed
+
+---
+
 ## Epic 5: D1 Persistence — StepState API (Autosave Core)
 
 ### Task 5.1: StepState D1 Persistence ✅ (2026-03-23)

@@ -24,8 +24,8 @@
 - [ ] Add domain->DB mapping
 
 ### Epic 4: FlowAPI
-- [ ] Extend SPEC-02 with CRUD persistence
-- [ ] Add flow->DB mapping
+- [x] Extend SPEC-02 with CRUD persistence ✅
+- [x] Add flow->DB mapping ✅
 
 ---
 

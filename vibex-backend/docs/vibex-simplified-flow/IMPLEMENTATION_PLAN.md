@@ -129,6 +129,20 @@ Replaced TODO placeholders with real D1/SQLite persistence:
 - **Added imports**: `queryDB`, `queryOne`, `executeDB` from `@/lib/db`
 - Build: ✅ | Tests: 436/436 passed
 
+### Task 4.2: Flow Generate + SPEC-02 Alignment ✅ (2026-03-23)
+**File**: `src/routes/flow.ts`
+**Status**: COMPLETE
+**Commit**: `3fd8f1c7`
+
+Enhanced `POST /api/flow/generate` to fully align with SPEC-02:
+- **Types aligned**: FlowNode `'task'` → `'process'`, added `checked`, `editable` fields; FlowEdge added `animated`, `checked`
+- **Generate→DB persist**: Saves flow to `FlowData` table on `done` event
+- **Domain context**: Fetches domain names from DB to enrich AI prompt
+- **SSE events**: Added `start` event with `domainCount`, enhanced `thinking` content
+- **Validation**: `domainIds` and `userId` required per SPEC-02; returns 400 on empty domainIds
+- **DELETE endpoint**: Added `DELETE /api/flow?id=` to delete flows
+- Build: ✅ | Tests: 436/436 passed
+
 ---
 
 ## Epic 5: D1 Persistence — StepState API (Autosave Core)
@@ -148,6 +162,40 @@ Replaced in-memory `stateStore` Map with real D1/SQLite persistence:
 
 ---
 
+## Epic 7: UINodesAPI — UI Node Generation & Persistence
+
+### Task 7.1: UI Nodes Route File ✅ (2026-03-23)
+**File**: `src/routes/ui-nodes.ts`
+**Status**: COMPLETE
+**Commit**: `f9639fe1`
+
+Implemented the SPEC-08 UI Nodes Generation API:
+
+- **POST /api/ui-nodes/generate**: SSE streaming UI node generation
+  - Validates projectId exists
+  - Calls AI service with comprehensive UI node prompt (node types: page, form, list, detail, header, footer, modal, navigation, card, button, input, table, chart, container)
+  - Recursively saves nodes to UINode table with hierarchical children IDs
+  - Streams each node incrementally via SSE events (`node`, `thinking`, `done`, `error`)
+  - Validates project existence before generation
+
+- **GET /api/ui-nodes**: Query UI nodes
+  - Query by `projectId` or `flowId` (flowNodeId)
+  - Returns hierarchical tree structure (root nodes + nested children)
+  - Uses `allChildIds` set to correctly identify true root nodes
+
+- **PUT /api/ui-nodes**: Update UI node
+  - Supports updating: name, nodeType, description, children, annotations, positionX, positionY, checked, priority, status
+  - Zod schema validation for request body
+
+- **DELETE /api/ui-nodes**: Delete UI node
+  - Query by `id` parameter
+
+- **Route Registration**: Added in `src/index.ts` via `app.route('/api/ui-nodes', uiNodes)`
+- **Build**: ✅ Compiled successfully (Next.js 16.1.6 Turbopack)
+- **Tests**: ✅ 436/436 passed (55 suites)
+
+---
+
 ## API Endpoints Summary
 
 | Method | Path | Description | Status |
@@ -157,13 +205,18 @@ Replaced in-memory `stateStore` Map with real D1/SQLite persistence:
 | POST | `/api/business-domain/create` | Create domain | ✅ DONE |
 | PUT | `/api/business-domain` | Update domain | ✅ DONE |
 | DELETE | `/api/business-domain` | Delete domain | ✅ DONE |
-| POST | `/api/flow/generate` | SSE streaming flow generation | ✅ DONE |
+| POST | `/api/flow/generate` | SSE streaming flow generation + DB persist | ✅ DONE |
 | GET | `/api/flow` | Get flow | ✅ DONE |
 | PUT | `/api/flow` | Update flow | ✅ DONE |
+| DELETE | `/api/flow` | Delete flow | ✅ DONE |
 | GET | `/api/projects?id=&include=snapshot` | Project snapshot | ✅ DONE |
 | POST | `/api/step-state` | Autosave step state | ✅ DONE |
 | GET | `/api/step-state` | Get step state | ✅ DONE |
 | DELETE | `/api/step-state` | Clear step state | ✅ DONE |
+| POST | `/api/ui-nodes/generate` | SSE streaming UI node generation | ✅ DONE |
+| GET | `/api/ui-nodes` | Query UI nodes by projectId/flowId | ✅ DONE |
+| PUT | `/api/ui-nodes` | Update UI node properties | ✅ DONE |
+| DELETE | `/api/ui-nodes` | Delete UI node | ✅ DONE |
 
 ---
 

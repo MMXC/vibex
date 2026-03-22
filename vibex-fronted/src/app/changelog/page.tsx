@@ -18,6 +18,15 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.72',
+    date: '2026-03-22',
+    changes: [
+      '🔧 epic3-knowledgebase-recovery-fakefix: 补充缺失文档 (AGENTS.md, IMPLEMENTATION_PLAN.md, specs)',
+      '🔧 homepage-reviewer-failed-fix: homePageStore Zustand 实现 (Epic 9 状态管理)',
+    ],
+    commit: 'a346abf3,e763ce01',
+  },
+  {
     version: '1.0.71',
     date: '2026-03-22',
     changes: [

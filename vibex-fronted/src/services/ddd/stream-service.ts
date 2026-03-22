@@ -65,12 +65,14 @@ export async function streamBoundedContexts(
   signal: AbortSignal
 ): Promise<{ boundedContexts: BoundedContext[]; mermaidCode: string }> {
   const fullURL = getApiUrl('/ddd/bounded-context/stream');
+  // ST-2.2: SSE timeout — 60s per request
+  const combinedSignal = AbortSignal.any([signal, AbortSignal.timeout(60000)]);
   
   const response = await fetch(fullURL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ requirementText }),
-    signal,
+    signal: combinedSignal,
   });
 
   if (!response.ok) {
@@ -167,12 +169,14 @@ export async function streamDomainModels(
   signal: AbortSignal
 ): Promise<{ domainModels: DomainModel[]; mermaidCode: string }> {
   const fullURL = getApiUrl('/ddd/domain-model/stream');
+  // ST-2.2: SSE timeout — 60s per request
+  const combinedSignal = AbortSignal.any([signal, AbortSignal.timeout(60000)]);
   
   const response = await fetch(fullURL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ requirementText, boundedContexts }),
-    signal,
+    signal: combinedSignal,
   });
 
   if (!response.ok) {
@@ -262,12 +266,14 @@ export async function streamBusinessFlow(
   signal: AbortSignal
 ): Promise<{ businessFlow: BusinessFlow | null; mermaidCode: string }> {
   const fullURL = getApiUrl('/ddd/business-flow/stream');
+  // ST-2.2: SSE timeout — 60s per request
+  const combinedSignal = AbortSignal.any([signal, AbortSignal.timeout(60000)]);
   
   const response = await fetch(fullURL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ domainModels, requirementText }),
-    signal,
+    signal: combinedSignal,
   });
 
   if (!response.ok) {

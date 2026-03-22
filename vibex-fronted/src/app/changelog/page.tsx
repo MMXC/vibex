@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.79',
+    date: '2026-03-23',
+    changes: [
+      '🚀 Epic1-SimplifiedFlow: DDD术语→业务语言翻译层 (30+ 术语映射)',
+      '🔧 SimplifiedFlowStore: Zustand 3步流程状态管理',
+      '🚩 Feature Flag: NEXT_PUBLIC_ENABLE_SIMPLIFIED_FLOW=false',
+    ],
+    commit: '8f0de4b9',
+  },
+  {
     version: '1.0.78',
     date: '2026-03-23',
     changes: [

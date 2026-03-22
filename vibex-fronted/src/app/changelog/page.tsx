@@ -18,6 +18,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.68',
+    date: '2026-03-22',
+    changes: [
+      '🎯 Epic 4 视觉一致性验证: homepage-v4-fix Grid 布局 + 底部面板',
+      '✅ 三栏布局: 220px|1fr|260px 宽度验证通过',
+      '✅ 左侧抽屉: #f9fafb 背景色验证通过',
+      '✅ 预览区: linear-gradient 渐变背景验证通过',
+      '✅ 回归测试: 6步流程 + SSE + PreviewArea 全部通过 (147 suites, 1674 tests)',
+    ],
+    commit: '13d5c9c8,57f076af',
+  },
+  {
     version: '1.0.67',
     date: '2026-03-22',
     changes: [

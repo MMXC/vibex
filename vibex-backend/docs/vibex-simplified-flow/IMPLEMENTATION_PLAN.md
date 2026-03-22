@@ -162,6 +162,42 @@ Replaced in-memory `stateStore` Map with real D1/SQLite persistence:
 
 ---
 
+## Epic 8: TemplatesAPI — Template Market & Listing
+
+### Task 8.1: Migration + Schema ✅ (2026-03-23)
+**File**: `prisma/migrations/004_template_columns.sql` + `prisma/schema.prisma`
+**Status**: COMPLETE
+**Commit**: `c12f3de2`
+
+Added columns to Project:
+- `isPublic` (Boolean, default false) — public template visibility
+- `usageCount` (Int, default 0) — clone count for popularity sorting
+- `thumbnail` (String, optional) — preview image URL
+
+### Task 8.2: Templates Route Fixed ✅ (2026-03-23)
+**File**: `src/routes/templates.ts`
+**Status**: COMPLETE
+**Commit**: `c12f3de2`
+
+Fixed GET /api/templates per SPEC-09:
+- Filter `isPublic = 1` only (was missing)
+- Add max limit 50 validation (returns 400)
+- Fix Flow → FlowData table reference in GET /:id
+- `isPublic` read from DB, thumbnail from DB
+- `FlowDataRow` type added
+
+### Task 8.3: Templates Tests ✅ (2026-03-23)
+**File**: `src/routes/__tests__/templates.test.ts`
+**Status**: COMPLETE
+**Commit**: `c12f3de2`
+
+23 tests covering:
+- GET /api/templates: pagination, filtering, sorting, validation, 500 error
+- GET /api/templates/:id: details, 404, FlowData, error handling
+- POST /api/templates: create, validation, 404
+
+---
+
 ## Epic 7: UINodesAPI — UI Node Generation & Persistence
 
 ### Task 7.1: UI Nodes Route File ✅ (2026-03-23)
@@ -217,6 +253,9 @@ Implemented the SPEC-08 UI Nodes Generation API:
 | GET | `/api/ui-nodes` | Query UI nodes by projectId/flowId | ✅ DONE |
 | PUT | `/api/ui-nodes` | Update UI node properties | ✅ DONE |
 | DELETE | `/api/ui-nodes` | Delete UI node | ✅ DONE |
+| GET | `/api/templates` | List public templates (SPEC-09) | ✅ DONE |
+| GET | `/api/templates/:id` | Get template details | ✅ DONE |
+| POST | `/api/templates` | Create template from project | ✅ DONE |
 
 ---
 

@@ -18,6 +18,14 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.73',
+    date: '2026-03-22',
+    changes: [
+      '🔌 Epic2-SSEFix: SSE fetch 添加 60s timeout (AbortSignal.timeout + AbortSignal.any)',
+    ],
+    commit: '7867d936',
+  },
+  {
     version: '1.0.72',
     date: '2026-03-22',
     changes: [

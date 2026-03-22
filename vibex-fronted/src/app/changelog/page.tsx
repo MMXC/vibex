@@ -18,6 +18,14 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.70',
+    date: '2026-03-22',
+    changes: [
+      '💓 Epic4-AnalystHeartbeat: analyst 心跳增强 (主动扫描 + cooldown 防重复)',
+    ],
+    commit: '8304660f',
+  },
+  {
     version: '1.0.69',
     date: '2026-03-22',
     changes: [

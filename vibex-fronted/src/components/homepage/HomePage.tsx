@@ -58,6 +58,7 @@ export default function HomePage() {
     handleSave,
     handleHistory,
     handleCreateProject,
+    handleRegenerate,
   } = useHomePage();
 
   // Epic4: Integrate homePageStore for completed steps (convert string step IDs to numbers)
@@ -173,7 +174,7 @@ export default function HomePage() {
             onOptimize={handleOptimize}
             onHistory={handleHistory}
             onSave={handleSave}
-            onRegenerate={() => {}}
+            onRegenerate={handleRegenerate}
             onCreateProject={handleCreateProject}
             onSendMessage={handleAIPanelSend}
             chatHistory={chatHistory}

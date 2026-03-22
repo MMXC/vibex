@@ -73,6 +73,7 @@ export interface UseHomePageReturn {
   handleOptimize: () => Promise<void>;
   handleSave: () => void;
   handleHistory: (messageId?: string) => void;
+  handleRegenerate: () => void;
   handleCreateProject: () => Promise<void>;
   abortContexts: () => void;
   generateDomainModels: (text: string, contexts: BoundedContext[]) => void;
@@ -345,6 +346,34 @@ export function useHomePage(): UseHomePageReturn {
   }, [chatHistory]);
 
   // ST-1.1: BottomPanel handlers — createProject
+  // Epic1: handleRegenerate — re-triggers last generation based on current step
+  const handleRegenerate = useCallback(() => {
+    // Re-trigger generation for the current step
+    switch (currentStep) {
+      case 1:
+        if (requirementText.trim()) {
+          generateContexts(requirementText);
+        }
+        break;
+      case 2:
+        if (boundedContexts.length > 0 && requirementText.trim()) {
+          generateDomainModels(requirementText, boundedContexts);
+        }
+        break;
+      case 3:
+        if (domainModels.length > 0) {
+          generateBusinessFlow(domainModels, requirementText);
+        }
+        break;
+      case 4:
+        // Step 4 — component diagram, re-trigger flow generation
+        if (domainModels.length > 0) {
+          generateBusinessFlow(domainModels, requirementText);
+        }
+        break;
+    }
+  }, [currentStep, requirementText, boundedContexts, domainModels, generateContexts, generateDomainModels, generateBusinessFlow]);
+
   const handleCreateProject = useCallback(async () => {
     try {
       const userId = useAuthStore.getState().user?.id ?? 'anonymous';
@@ -550,6 +579,7 @@ export function useHomePage(): UseHomePageReturn {
     handleOptimize,
     handleSave,
     handleHistory,
+    handleRegenerate,
     handleCreateProject,
     abortContexts,
     generateDomainModels,

@@ -18,6 +18,15 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.69',
+    date: '2026-03-22',
+    changes: [
+      '📋 Epic1-TestQualityChecklist: 新增测试质量检查清单 (Global State/Mock/Async/Quality Criteria)',
+      '🛠️ Epic2-LogAnalysis: log_analysis.py 工具集 + task_manager 扩展 (13 pytest 通过)',
+    ],
+    commit: 'a92d0d68,b0954855',
+  },
+  {
     version: '1.0.68',
     date: '2026-03-22',
     changes: [

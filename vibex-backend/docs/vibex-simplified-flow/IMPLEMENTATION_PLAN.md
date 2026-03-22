@@ -97,6 +97,23 @@ Integrated with Task 2.1.
 
 ---
 
+## Epic 5: D1 Persistence — StepState API (Autosave Core)
+
+### Task 5.1: StepState D1 Persistence ✅ (2026-03-23)
+**File**: `src/routes/step-state.ts`
+**Status**: COMPLETE
+**Commit**: `f5f46893`
+
+Replaced in-memory `stateStore` Map with real D1/SQLite persistence:
+- **POST /api/step-state**: INSERT new StepState row or UPDATE existing; optimistic locking (409 on version conflict); INSERT ChangeLog entry
+- **GET /api/step-state**: Query StepState row, parse JSON columns, return last 50 ChangeLog entries
+- **DELETE /api/step-state**: DELETE from StepState + related ChangeLog entries
+- **Fallback**: In-memory store when D1 unavailable (dev mode)
+- **ChangeLog**: Records step field changes with before/after JSON snapshots
+- Build: ✅ | Tests: 436/436 passed
+
+---
+
 ## API Endpoints Summary
 
 | Method | Path | Description | Status |

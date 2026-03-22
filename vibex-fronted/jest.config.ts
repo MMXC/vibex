@@ -84,25 +84,57 @@ const config: Config = {
       functions: 40,
       lines: 40,
     },
-    './src/services/**/*.ts': {
-      branches: 40,
-      functions: 40,
-      lines: 45,
+    // Individual service thresholds (glob removed to allow per-file override)
+    './src/services/api/client.ts': {
+      branches: 50,
+      functions: 60,
+      lines: 60,
+    },
+    './src/services/api/cache.ts': {
+      branches: 60,
+      functions: 60,
+      lines: 80,
+    },
+    './src/services/api/retry.ts': {
+      branches: 90,
+      functions: 90,
+      lines: 90,
+    },
+    './src/services/api/unwrappers.ts': {
+      branches: 100,
+      functions: 100,
+      lines: 100,
+    },
+    './src/services/homepageAPI.ts': {
+      branches: 70,
+      functions: 80,
+      lines: 85,
+    },
+    './src/services/themeStorage.ts': {
+      branches: 65,
+      functions: 65,
+      lines: 80,
+    },
+    // stream-service.ts: SSE streaming with complex async callbacks — integration-tested only
+    './src/services/ddd/stream-service.ts': {
+      branches: 5,
+      functions: 10,
+      lines: 10,
     },
     './src/services/github/github-import.ts': {
-      branches: 0,
-      functions: 0,
-      lines: 0,
+      branches: 10,
+      functions: 10,
+      lines: 35,
     },
     './src/services/figma/figma-import.ts': {
-      branches: 0,
-      functions: 0,
-      lines: 0,
+      branches: 5,
+      functions: 5,
+      lines: 10,
     },
     './src/services/oauth/oauth.ts': {
-      branches: 0,
-      functions: 0,
-      lines: 0,
+      branches: 10,
+      functions: 15,
+      lines: 30,
     },
     './src/services/api/diagnosis/index.ts': {
       branches: 0,

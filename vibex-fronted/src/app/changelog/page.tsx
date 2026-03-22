@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.67',
+    date: '2026-03-22',
+    changes: [
+      '💾 Epic 2 Theme Persistence: themeStorage 服务 (localStorage 持久化)',
+      '🌓 OS 主题跟随: prefers-color-scheme 监听 + 系统主题自动切换',
+      '🧪 主题持久化测试: 10 个测试用例覆盖 get/set/clear/system/resolve',
+    ],
+    commit: 'b013cc18',
+  },
+  {
     version: '1.0.66',
     date: '2026-03-22',
     changes: [

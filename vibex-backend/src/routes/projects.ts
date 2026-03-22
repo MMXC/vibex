@@ -13,12 +13,27 @@ interface ProjectRow {
   updatedAt: string;
 }
 
-// GET /api/projects - List active projects (exclude soft-deleted)
+// GET /api/projects - List active projects OR get project snapshot
 projects.get('/', async (c) => {
   try {
     const userId = c.req.query('userId');
+    const include = c.req.query('include');
+    const projectId = c.req.query('id');
+    const version = c.req.query('version');
     const env = c.env;
 
+    // Snapshot mode: GET /api/projects?id=&include=snapshot
+    if (include === 'snapshot' && projectId) {
+      const { getProjectSnapshot } = await import('./project-snapshot');
+      const result = await getProjectSnapshot(env, projectId, version ? parseInt(version) : undefined);
+      if (!result.success) {
+        const status = result.code === 'NOT_FOUND' ? 404 : result.code === 'FORBIDDEN' ? 403 : 500;
+        return c.json({ success: false, error: result.error, code: result.code }, status);
+      }
+      return c.json({ success: true, data: result.data });
+    }
+
+    // List mode: GET /api/projects or GET /api/projects?userId=
     let sql = 'SELECT * FROM Project WHERE deletedAt IS NULL';
     const params: string[] = [];
 

@@ -46,6 +46,7 @@ import projectSettings from './routes/project-settings';
 import ddd from './routes/ddd';
 import businessDomain from './routes/business-domain';
 import flow from './routes/flow';
+import stepState from './routes/step-state';
 import diagnosis from './routes/diagnosis';
 import plan from './routes/plan';
 
@@ -123,6 +124,7 @@ app.route('/api/confirmation-projects', confirmationProjects);
 app.route('/api/ddd', ddd);
 app.route('/api/business-domain', businessDomain);
 app.route('/api/flow', flow);
+app.route('/api/step-state', stepState);
 app.route('/api/diagnosis', diagnosis);
 app.route('/api/plan', plan);
 

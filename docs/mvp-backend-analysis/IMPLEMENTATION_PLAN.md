@@ -44,26 +44,26 @@ Status: ✅ Verified — `/api/v1/homepage` returns 404 (endpoint not created in
 
 ### Task 2.1: Verify clarification CRUD
 ```bash
-curl https://api.vibex.top/requirements/test-id/clarifications -w "%{http_code}"
-curl -X PUT https://api.vibex.top/clarifications/c1 \
+curl https://api.vibex.top/api/clarification-questions/:requirementId -w "%{http_code}"
+curl -X PUT https://api.vibex.top/api/clarification-questions/:requirementId/answers/:questionId \
   -H "Content-Type: application/json" -d '{"answer":"yes"}' -w "%{http_code}"
 ```
 
-✅ **DONE** — Created new endpoints:
-- `src/app/api/requirements/[requirementId]/clarifications/route.ts` — GET clarifications
-- `src/app/api/clarifications/[clarificationId]/route.ts` — PUT update clarification
-- `src/app/api/clarify/chat/route.ts` — POST chat-style clarification
-Note: Existing `clarification-questions` route fails due to D1 `Requirement` table not created.
+⚠️ **BLOCKED** — Root cause: D1 database missing `Requirement` table.
+- Deployed route: `/api/clarification-questions` (in `src/routes/clarification-questions.ts`)
+- Route depends on `Requirement` table — not defined in any D1 migration
+- `GET /api/requirements` returns empty; `POST /api/requirements` returns 500
+- Plan previously marked DONE, but Next.js routes in `src/app/api/` were never deployed to Cloudflare Worker
+
+**Fix needed**: Create `Requirement` table in D1 (see Phase report for options)
 
 ### Task 2.2: Complete SSE event types
 - Ensure all 7 event types fire in correct order
 - Verify `done` event contains `projectId`
 
-✅ **DONE** — Created `src/app/api/v1/analyze/stream/route.ts`:
-- GET `/api/v1/analyze/stream?requirement=...`
-- Emits: thinking → step_context → step_model → step_flow → step_components → done (or error)
-- 7 event types: thinking, step_context, step_model, step_flow, step_components, done, error
-- done event includes projectId
+⚠️ **BLOCKED** — SSE route in `src/app/api/v1/analyze/stream/route.ts` not deployed.
+- Cloudflare Worker uses `src/routes/plan.ts` for analysis endpoints
+- Need to verify if SSE logic exists in deployed routes or needs implementation
 
 ---
 

@@ -15,68 +15,33 @@
 
 ## Epic 4: Task Manager Agent Validation
 
-### Task 4.1: Add agent validation
+### Task 4.1: Add agent validation ✅ DONE
 **File**: `skills/team-tasks/scripts/task_manager.py`
 
 ```python
-# In do_claim(), after finding the task:
-assigned_agent = task.get('agent', '')
-if assigned_agent and assigned_agent != agent:
-    print(f"❌ Cannot claim: task assigned to '{assigned_agent}', you are '{agent}'")
-    sys.exit(1)
-```
-
-### Task 4.2: Add --force flag
-```python
-def do_claim(project: str, stage: str, agent: str = None, force: bool = False):
-    # ...
-    if assigned_agent and assigned_agent != agent and not force:
-        print(f"❌ Cannot claim: task assigned to '{assigned_agent}'")
+# In cmd_claim(), after finding the task:
+assigned_agent = stage.get("agent", "")
+claiming_agent = getattr(args, "agent", None) or stage_id.split("-")[0]
+if assigned_agent and assigned_agent != claiming_agent:
+    if getattr(args, "force", False):
+        print(f"⚠️ Force claiming '{stage_id}' ...")
+    else:
+        print(f"❌ Cannot claim '{stage_id}': task assigned to '{assigned_agent}', you are '{claiming_agent}'")
         sys.exit(1)
-    elif force:
-        print(f"⚠️ Force claiming task assigned to '{assigned_agent}'")
 ```
 
-### Task 4.3: Document claim rules
-**File**: `docs/task-claim-rules.md`
-
-```markdown
-# Task Claim Rules
-
-## Normal Agent
-- Can only claim tasks where `agent` field matches your agent name
-- Claim attempt for wrong agent → error message
-
-## Coord Agent
-- Can use `--force` to claim any task
-- Coord is responsible for re-assignment
-
-## Example
-```bash
-# Correct agent
-python3 task_manager.py claim my-project design-architecture --agent architect
-# ✅ Claimed: design-architecture
-
-# Wrong agent
-python3 task_manager.py claim my-project design-architecture --agent dev
-# ❌ Cannot claim: task assigned to 'architect', you are 'dev'
-```
+### Task 4.2: Add --force flag ✅ DONE
+```python
+p.add_argument("--force", "-f", action="store_true", help="Force claim even if agent mismatch (coord only)")
 ```
 
-### Task 4.4: Test
-```bash
-# Test wrong agent → error
-python3 task_manager.py claim vibex-proposals-20260322 dev-epic3 --agent analyst
-# Expected: ❌ Cannot claim: task assigned to 'dev'
+### Task 4.3: Document claim rules ✅ DONE
+**File**: `docs/task-claim-rules.md` — covers normal agent rules, coord override, usage examples, backwards compatibility.
 
-# Test correct agent → success
-python3 task_manager.py claim vibex-proposals-20260322 dev-epic3 --agent dev
-# Expected: ✅ Claimed: dev-epic3
-
-# Test force → success
-python3 task_manager.py claim vibex-proposals-20260322 dev-epic3 --agent coord --force
-# Expected: ⚠️ Force claiming... ✅
-```
+### Task 4.4: Test ✅ DONE
+- Wrong agent → `❌ Cannot claim 'test-pending': task assigned to 'dev', you are 'analyst'` ✅
+- Correct agent → `✅ Claimed: test-pending` ✅
+- Force flag → `⚠️ Force claiming... ✅ Claimed: test-pending` ✅
 
 ---
 

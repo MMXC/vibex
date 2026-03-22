@@ -325,7 +325,7 @@ export interface HomeGeneration {
   generateContexts: (requirement: string) => Promise<void>;
   generateDomainModels: (contexts: BoundedContext[]) => Promise<void>;
   generateBusinessFlow: (models: DomainModel[]) => Promise<void>;
-  createProject: () => Promise<void>;
+  createProject: (projectName: string, projectDescription: string) => Promise<void>;
   sendMessage: (message: string) => Promise<void>;
 
   // 控制

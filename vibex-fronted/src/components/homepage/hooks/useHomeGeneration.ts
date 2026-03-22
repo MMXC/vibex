@@ -4,6 +4,10 @@ import { useState, useCallback } from 'react';
 const devLog = (...args: unknown[]) => {
   if (process.env.NODE_ENV !== 'production') console.log(...args);
 };
+
+import { dddApi, projectApi } from '@/services/api';
+import { useAuthStore } from '@/stores/authStore';
+import type { BoundedContextResponse } from '@/types/api';
 import type { BoundedContext, DomainModel, BusinessFlow, HomeGeneration, StreamStatus } from '@/types/homepage';
 
 /**
@@ -35,12 +39,18 @@ export const useHomeGeneration = (
     setIsGenerating(true);
     setGenerationError(null);
     setStreamStatus('streaming');
-    
+
     try {
-      // This would typically call the actual API
-      // For now, we just set up the structure
       devLog('Generating contexts for:', requirement);
-      // onContextsGenerated?.(contexts);
+      const response: BoundedContextResponse = await dddApi.generateBoundedContext(requirement);
+      const contexts: BoundedContext[] = response.boundedContexts.map((ctx) => ({
+        id: ctx.id,
+        name: ctx.name,
+        description: ctx.description || '',
+        type: 'core' as const,
+        relationships: [],
+      }));
+      onContextsGenerated?.(contexts);
       setStreamStatus('complete');
     } catch (error) {
       const err = error instanceof Error ? error : new Error('生成失败');
@@ -90,13 +100,19 @@ export const useHomeGeneration = (
     }
   }, [onBusinessFlowGenerated, onError]);
 
-  const createProject = useCallback(async () => {
+  const createProject = useCallback(async (projectName: string, projectDescription: string) => {
     setIsGenerating(true);
     setGenerationError(null);
-    
+
     try {
-      devLog('Creating project...');
-      // onProjectCreated?.();
+      const userId = useAuthStore.getState().user?.id ?? 'anonymous';
+      devLog('Creating project:', projectName);
+      await projectApi.createProject({
+        name: projectName,
+        description: projectDescription,
+        userId,
+      });
+      onProjectCreated?.();
     } catch (error) {
       const err = error instanceof Error ? error : new Error('创建失败');
       setGenerationError(err);

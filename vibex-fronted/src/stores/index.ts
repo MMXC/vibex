@@ -99,3 +99,27 @@ export { useOnboardingStore } from './onboarding/onboardingStore';
 // ==================== HomePage Store (Epic 9) ====================
 export { useHomePageStore, useCurrentStep, useCompletedSteps, useRequirementText, useSSEState } from './homePageStore';
 export type { HomePageStep, HomePageState, HomePageSnapshot, MermaidCodes } from './homePageStore';
+
+// ==================== Simplified Flow Store (Epic 1) ====================
+export { useSimplifiedFlowStore } from './simplifiedFlowStore';
+export type {
+  SimplifiedStep,
+  BusinessDomain,
+  Feature,
+  FlowNode,
+  FlowEdge,
+  FlowData,
+  Clarification,
+  SelectedComponent,
+  SimplifiedFlowState
+} from './simplifiedFlowStore';
+export {
+  selectSimplifiedStep,
+  selectDomains,
+  selectSelectedDomainIds,
+  selectFlow,
+  selectClarifications,
+  selectComponents,
+  selectIsGenerating,
+  selectError
+} from './simplifiedFlowStore';

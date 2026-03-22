@@ -18,6 +18,14 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.71',
+    date: '2026-03-22',
+    changes: [
+      '📚 Epic3-KnowledgeBase: 知识库结构 (4 patterns + 3 templates + index)',
+    ],
+    commit: '7f4fb7bc',
+  },
+  {
     version: '1.0.70',
     date: '2026-03-22',
     changes: [

@@ -18,6 +18,14 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.77',
+    date: '2026-03-22',
+    changes: [
+      '🔄 Epic1-ActionBar: handleRegenerate 回调接入 (根据当前步骤重新生成)',
+    ],
+    commit: 'c3ab2b19',
+  },
+  {
     version: '1.0.76',
     date: '2026-03-22',
     changes: [

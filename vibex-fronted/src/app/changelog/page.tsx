@@ -18,6 +18,14 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.78',
+    date: '2026-03-23',
+    changes: [
+      '🎨 Epic1-P0-DesignSystem: EmptyState 组件 (4 variants) + design-tokens.css 扩展 (focus-ring, letter-spacing) + lucide-react 集成',
+    ],
+    commit: '7bd8bc95',
+  },
+  {
     version: '1.0.77',
     date: '2026-03-22',
     changes: [

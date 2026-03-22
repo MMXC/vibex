@@ -40,6 +40,7 @@
 		"framer-motion": "^12.35.2",
 		"html-to-image": "^1.11.13",
 		"jsondiffpatch": "^0.7.3",
+		"lucide-react": "^0.577.0",
 		"mermaid": "^11.13.0",
 		"monaco-editor": "^0.53.0",
 		"next": "16.2.0",

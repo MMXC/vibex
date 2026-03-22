@@ -14,6 +14,11 @@ export {
 export { Input, type InputProps } from './Input';
 export { Badge, type BadgeProps } from './Badge';
 export { Skeleton, SkeletonCard, SkeletonList } from './Skeleton';
+export {
+  EmptyState,
+  type EmptyStateProps,
+  type EmptyStateVariant,
+} from './EmptyState';
 export { Toast, ToastProvider, useToast, type ToastProps } from './Toast';
 export {
   ErrorBoundary,

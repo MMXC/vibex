@@ -8,7 +8,7 @@
  */
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import LoginDrawer from '@/components/ui/LoginDrawer';
 import { Navbar, Sidebar, AIPanel } from '@/components/homepage';
@@ -49,9 +49,20 @@ export default function HomePage() {
     flowMermaidCode,
     isGenerating,
     thinkingMessages,
+    requirementText,
+    setRequirementText,
+    generateContexts,
+    chatHistory,
+    handleDiagnose,
+    handleOptimize,
+    handleSave,
+    handleHistory,
+    handleCreateProject,
   } = useHomePage();
 
   const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAIPanelOpen, setIsAIPanelOpen] = useState(true);
 
   // 根据当前步骤返回对应 Mermaid 代码 (PRD 6步流程 + Epic 3)
   const currentMermaidCode = useMemo(() => {
@@ -94,10 +105,12 @@ export default function HomePage() {
     return `thinking-${last.step}-${thinkingMessages.length - 1}`;
   }, [thinkingMessages]);
 
-  // ST-1.1: AIPanel 发送消息处理
-  const handleAIPanelSend = useCallback((_message: string) => {
-    // TODO: 实现 AI 对话发送逻辑 (后续 Epic 集成)
-  }, []);
+  // ST-1.1: AIPanel 发送消息处理 → 调用 generateContexts pipeline
+  const handleAIPanelSend = useCallback((message: string) => {
+    if (!message.trim()) return;
+    setRequirementText(message);
+    generateContexts(message);
+  }, [setRequirementText, generateContexts]);
 
   return (
     <div className={styles.page}>
@@ -107,7 +120,7 @@ export default function HomePage() {
       <Navbar
         isAuthenticated={isAuthenticated}
         onLoginClick={() => setIsLoginDrawerOpen(true)}
-        onMenuToggle={() => {}}
+        onMenuToggle={() => setIsMenuOpen(v => !v)}
         onSettingsClick={() => {}}
         className={styles.header}
       />
@@ -137,9 +150,9 @@ export default function HomePage() {
       {/* ST-1.1 + ST-3.3: 右侧 AI 面板 - 260px 宽 */}
       <div className={styles.rightDrawer}>
         <AIPanel
-          isOpen={true}
+          isOpen={isAIPanelOpen}
           messages={adaptedMessages}
-          onClose={() => {}}
+          onClose={() => setIsAIPanelOpen(false)}
           onSendMessage={handleAIPanelSend}
           newItemId={newThinkingItemId}
         />
@@ -149,14 +162,17 @@ export default function HomePage() {
       <div className={styles.bottomPanel}>
         <BottomPanel
           isGenerating={isGenerating}
-          onAIAsk={() => {}}
-          onDiagnose={() => {}}
-          onOptimize={() => {}}
-          onHistory={() => {}}
-          onSave={() => {}}
+          onAIAsk={(msg) => {
+            if (msg) handleAIPanelSend(msg);
+          }}
+          onDiagnose={handleDiagnose}
+          onOptimize={handleOptimize}
+          onHistory={handleHistory}
+          onSave={handleSave}
           onRegenerate={() => {}}
-          onCreateProject={() => {}}
+          onCreateProject={handleCreateProject}
           onSendMessage={handleAIPanelSend}
+          chatHistory={chatHistory}
         />
       </div>
 

@@ -10,6 +10,9 @@ import { useConfirmationStore } from '@/stores/confirmationStore';
 import { useDDDStream, useDomainModelStream, useBusinessFlowStream, ThinkingStep } from '@/hooks/useDDDStream';
 import type { BoundedContext } from '@/services/api/types/prototype/domain';
 import type { DomainModel, BusinessFlow, PageStructure } from '@/types/homepage';
+import { ChatMessage } from '../BottomPanel/ChatHistory/ChatHistory';
+import { analyzeRequirement, optimizeRequirement } from '@/services/api/diagnosis';
+import { projectApi } from '@/services/api';
 
 export interface UseHomePageReturn {
   // Auth
@@ -18,6 +21,7 @@ export interface UseHomePageReturn {
   // State
   requirementText: string;
   setRequirementText: (text: string) => void;
+  chatHistory: ChatMessage[];
   currentStep: number;
   completedStep: number;
   boundedContexts: BoundedContext[];
@@ -65,6 +69,11 @@ export interface UseHomePageReturn {
   
   // Actions
   generateContexts: (text: string) => void;
+  handleDiagnose: () => Promise<void>;
+  handleOptimize: () => Promise<void>;
+  handleSave: () => void;
+  handleHistory: (messageId?: string) => void;
+  handleCreateProject: () => Promise<void>;
   abortContexts: () => void;
   generateDomainModels: (text: string, contexts: BoundedContext[]) => void;
   abortModels: () => void;
@@ -109,6 +118,9 @@ export function useHomePage(): UseHomePageReturn {
   // F4: Page Structure State
   const [pageStructure, setPageStructure] = useState<PageStructure | null>(null);
   const [pageStructureAnalyzed, setPageStructureAnalyzed] = useState(false);
+
+  // F6: Chat history state
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
 
   // F3: Thinking messages state (for progressive thinking display)
   const [thinkingMessages, setThinkingMessages] = useState<ThinkingStep[]>([]);
@@ -272,6 +284,87 @@ export function useHomePage(): UseHomePageReturn {
     });
   }, []);
 
+  // ST-1.1: BottomPanel handlers — diagnose
+  const handleDiagnose = useCallback(async () => {
+    if (!requirementText.trim()) return;
+    try {
+      const result = await analyzeRequirement(requirementText);
+      // Add to chat history
+      const msg: ChatMessage = {
+        id: `diag-${Date.now()}`,
+        role: 'assistant',
+        content: `诊断得分: ${result.overallScore}/100 (${result.grade})\n\n${result.suggestions.map(s => `• ${s.description}`).join('\n')}`,
+        timestamp: Date.now(),
+      };
+      setChatHistory(prev => [...prev, msg]);
+    } catch (err) {
+      console.error('[useHomePage] handleDiagnose failed:', err);
+    }
+  }, [requirementText]);
+
+  // ST-1.1: BottomPanel handlers — optimize
+  const handleOptimize = useCallback(async () => {
+    if (!requirementText.trim()) return;
+    try {
+      const diagnosis = await analyzeRequirement(requirementText);
+      const { optimizedText } = await optimizeRequirement(requirementText, diagnosis);
+      const msg: ChatMessage = {
+        id: `opt-${Date.now()}`,
+        role: 'assistant',
+        content: `优化后需求:\n\n${optimizedText}`,
+        timestamp: Date.now(),
+      };
+      setChatHistory(prev => [...prev, msg]);
+      setRequirementText(optimizedText);
+    } catch (err) {
+      console.error('[useHomePage] handleOptimize failed:', err);
+    }
+  }, [requirementText]);
+
+  // ST-1.1: BottomPanel handlers — save
+  const handleSave = useCallback(() => {
+    if (!requirementText.trim()) return;
+    localStorage.setItem('vibex-saved-requirement', requirementText);
+    const msg: ChatMessage = {
+      id: `save-${Date.now()}`,
+      role: 'assistant',
+      content: '✅ 需求已保存到本地',
+      timestamp: Date.now(),
+    };
+    setChatHistory(prev => [...prev, msg]);
+  }, [requirementText]);
+
+  // ST-1.1: BottomPanel handlers — history
+  const handleHistory = useCallback((messageId?: string) => {
+    if (messageId) {
+      const msg = chatHistory.find(m => m.id === messageId);
+      if (msg) {
+        setRequirementText(msg.content);
+      }
+    }
+  }, [chatHistory]);
+
+  // ST-1.1: BottomPanel handlers — createProject
+  const handleCreateProject = useCallback(async () => {
+    try {
+      const userId = useAuthStore.getState().user?.id ?? 'anonymous';
+      const project = await projectApi.createProject({
+        name: requirementText.slice(0, 50) || 'New Project',
+        description: requirementText,
+        userId,
+      });
+      const msg: ChatMessage = {
+        id: `proj-${Date.now()}`,
+        role: 'assistant',
+        content: `✅ 项目已创建: ${project.name}`,
+        timestamp: Date.now(),
+      };
+      setChatHistory(prev => [...prev, msg]);
+    } catch (err) {
+      console.error('[useHomePage] handleCreateProject failed:', err);
+    }
+  }, [requirementText]);
+
   // 三步流程: UI组件分析完成后的处理
   const analyzePageStructure = useCallback(() => {
     if (!businessFlow) return;
@@ -405,6 +498,7 @@ export function useHomePage(): UseHomePageReturn {
     // State
     requirementText,
     setRequirementText,
+    chatHistory,
     currentStep,
     completedStep,
     boundedContexts,
@@ -452,6 +546,11 @@ export function useHomePage(): UseHomePageReturn {
     
     // Actions
     generateContexts,
+    handleDiagnose,
+    handleOptimize,
+    handleSave,
+    handleHistory,
+    handleCreateProject,
     abortContexts,
     generateDomainModels,
     abortModels,

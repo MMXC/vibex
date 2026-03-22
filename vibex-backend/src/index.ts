@@ -131,7 +131,8 @@ app.route('/api/templates', templates);
 app.route('/api/ui-nodes', uiNodes);
 app.route('/api/diagnosis', diagnosis);
 app.route('/api/plan', plan);
-app.route('/api/ui-nodes', uiNodes); (支持认证、限流、日志中间件)
+
+// API Gateway v1 路由 (支持认证、限流、日志中间件)
 app.route('/v1', v1);
 
 // 导出 for Cloudflare Workers

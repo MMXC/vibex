@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.80',
+    date: '2026-03-23',
+    changes: [
+      '⚡ Epic4-FlowAPI: 业务流程流式生成端点 (SSE) + CRUD API',
+      '🤖 AI流程生成: 基于领域上下文智能生成 ReactFlow 格式流程图',
+      '💾 D1持久化: FlowData 表 + 完整 CRUD 操作',
+    ],
+    commit: '3fd8f1c7',
+  },
+  {
     version: '1.0.79',
     date: '2026-03-23',
     changes: [

@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { z } from 'zod'
-import { generateId, Env } from '@/lib/db'
+import { generateId, queryDB, executeDB, queryOne, Env } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
 import { devDebug, sanitize } from '@/lib/log-sanitizer'
 
@@ -19,6 +19,18 @@ const GenerateRequestSchema = z.object({
 })
 
 // ==================== Types ====================
+
+interface BusinessDomainRow {
+  id: string
+  projectId: string
+  name: string
+  description: string | null
+  domainType: string
+  features: string
+  relationships: string
+  createdAt: number
+  updatedAt: number
+}
 
 interface BusinessDomainEntity {
   id: string
@@ -224,15 +236,34 @@ Respond ONLY with the JSON object. All text must be in Simplified Chinese.`
 
 businessDomain.get('/', async (c) => {
   try {
+    const env = c.env
     const projectId = c.req.query('projectId')
 
-    // TODO: In production, query from DB
-    // For now, return empty array (frontend handles state via store)
-    return c.json({
-      success: true,
-      domains: [],
-      message: projectId ? `Domains for project ${projectId}` : 'No projectId provided',
-    })
+    if (!projectId) {
+      return c.json({ success: false, error: 'projectId is required' }, 400)
+    }
+
+    if (!env?.DB) {
+      return c.json({ success: true, domains: [], message: 'D1 not available, returning empty' })
+    }
+
+    const rows = await queryDB<BusinessDomainRow>(env,
+      `SELECT id, projectId, name, description, domainType, features, relationships, createdAt, updatedAt FROM BusinessDomain WHERE projectId = ? ORDER BY createdAt DESC`,
+      [projectId]
+    )
+
+    const domains: BusinessDomainEntity[] = rows.map(row => ({
+      id: row.id,
+      name: row.name,
+      description: row.description || '',
+      type: row.domainType as BusinessDomainEntity['type'],
+      features: parseJson(row.features, []),
+      relationships: parseJson(row.relationships, []),
+      createdAt: typeof row.createdAt === 'number' ? row.createdAt : new Date(row.createdAt as unknown as string).getTime(),
+      updatedAt: typeof row.updatedAt === 'number' ? row.updatedAt : new Date(row.updatedAt as unknown as string).getTime(),
+    }))
+
+    return c.json({ success: true, domains })
   } catch (error) {
     return c.json({
       success: false,
@@ -254,27 +285,41 @@ const CreateDomainSchema = z.object({
 
 businessDomain.post('/create', async (c) => {
   try {
+    const env = c.env
     const body = await c.req.json()
     const { name, description, type, projectId } = CreateDomainSchema.parse(body)
 
-    const domain: BusinessDomainEntity = {
-      id: `bd-${generateId()}`,
-      name,
-      description: description || '',
-      type: type || 'supporting',
-      features: [],
-      relationships: [],
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
+    if (!projectId) {
+      return c.json({ success: false, error: 'projectId is required' }, 400)
     }
 
-    // TODO: Save to DB
-    console.log('[BusinessDomain] Created domain:', domain.name, 'projectId:', projectId)
+    const id = `bd-${generateId()}`
+    const now = Date.now()
+    const domainType = type || 'supporting'
+    const features = '[]'
+    const relationships = '[]'
 
-    return c.json({
-      success: true,
-      domain,
-    })
+    if (env?.DB) {
+      await executeDB(env,
+        `INSERT INTO BusinessDomain (id, projectId, name, description, domainType, features, relationships, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [id, projectId, name, description || null, domainType, features, relationships, now, now]
+      )
+    } else {
+      console.log('[BusinessDomain] D1 not available, skipping DB insert for domain:', name)
+    }
+
+    const domain: BusinessDomainEntity = {
+      id,
+      name,
+      description: description || '',
+      type: domainType as BusinessDomainEntity['type'],
+      features: [],
+      relationships: [],
+      createdAt: now,
+      updatedAt: now,
+    }
+
+    return c.json({ success: true, domain })
   } catch (error) {
     return c.json({
       success: false,
@@ -301,15 +346,59 @@ const UpdateDomainSchema = z.object({
 
 businessDomain.put('/', async (c) => {
   try {
+    const env = c.env
     const body = await c.req.json()
     const { id, name, description, type, features } = UpdateDomainSchema.parse(body)
 
-    // TODO: Update in DB
-    console.log('[BusinessDomain] Updated domain:', id)
-
-    const updatedDomain: Partial<BusinessDomainEntity> = {
-      updatedAt: Date.now(),
+    if (!id) {
+      return c.json({ success: false, error: 'id is required' }, 400)
     }
+
+    // Build dynamic update
+    const sets: string[] = []
+    const params: unknown[] = []
+
+    if (name !== undefined) {
+      sets.push('name = ?')
+      params.push(name)
+    }
+    if (description !== undefined) {
+      sets.push('description = ?')
+      params.push(description)
+    }
+    if (type !== undefined) {
+      sets.push('domainType = ?')
+      params.push(type)
+    }
+    if (features !== undefined) {
+      sets.push('features = ?')
+      params.push(JSON.stringify(features.map((f, i) => ({
+        id: f.id || `feat-${generateId()}-${i}`,
+        name: f.name,
+        description: f.description || '',
+        isCore: f.isCore ?? false,
+      }))))
+    }
+
+    if (sets.length === 0) {
+      return c.json({ success: false, error: 'No fields to update' }, 400)
+    }
+
+    const now = Date.now()
+    sets.push('updatedAt = ?')
+    params.push(now)
+    params.push(id)
+
+    if (env?.DB) {
+      await executeDB(env,
+        `UPDATE BusinessDomain SET ${sets.join(', ')} WHERE id = ?`,
+        params
+      )
+    } else {
+      console.log('[BusinessDomain] D1 not available, skipping DB update for domain:', id)
+    }
+
+    const updatedDomain: Partial<BusinessDomainEntity> = { updatedAt: now }
     if (name !== undefined) updatedDomain.name = name
     if (description !== undefined) updatedDomain.description = description
     if (type !== undefined) updatedDomain.type = type
@@ -322,10 +411,7 @@ businessDomain.put('/', async (c) => {
       }))
     }
 
-    return c.json({
-      success: true,
-      domain: { id, ...updatedDomain },
-    })
+    return c.json({ success: true, domain: { id, ...updatedDomain } })
   } catch (error) {
     return c.json({
       success: false,
@@ -339,18 +425,19 @@ businessDomain.put('/', async (c) => {
 
 businessDomain.delete('/', async (c) => {
   try {
+    const env = c.env
     const id = c.req.query('id')
     if (!id) {
       return c.json({ success: false, error: 'id is required' }, 400)
     }
 
-    // TODO: Delete from DB
-    console.log('[BusinessDomain] Deleted domain:', id)
+    if (env?.DB) {
+      await executeDB(env, `DELETE FROM BusinessDomain WHERE id = ?`, [id])
+    } else {
+      console.log('[BusinessDomain] D1 not available, skipping DB delete for domain:', id)
+    }
 
-    return c.json({
-      success: true,
-      message: `Domain ${id} deleted`,
-    })
+    return c.json({ success: true, message: `Domain ${id} deleted` })
   } catch (error) {
     return c.json({
       success: false,
@@ -363,6 +450,15 @@ businessDomain.delete('/', async (c) => {
 
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+function parseJson<T>(value: string | null | undefined, fallback: T): T {
+  if (!value) return fallback
+  try {
+    return JSON.parse(value) as T
+  } catch {
+    return fallback
+  }
 }
 
 function mapRelationshipType(type: string): Relationship['type'] {

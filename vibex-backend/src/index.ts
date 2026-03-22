@@ -47,6 +47,8 @@ import ddd from './routes/ddd';
 import businessDomain from './routes/business-domain';
 import flow from './routes/flow';
 import stepState from './routes/step-state';
+import templates from './routes/templates';
+import uiNodes from './routes/ui-nodes';
 import diagnosis from './routes/diagnosis';
 import plan from './routes/plan';
 
@@ -125,10 +127,11 @@ app.route('/api/ddd', ddd);
 app.route('/api/business-domain', businessDomain);
 app.route('/api/flow', flow);
 app.route('/api/step-state', stepState);
+app.route('/api/templates', templates);
+app.route('/api/ui-nodes', uiNodes);
 app.route('/api/diagnosis', diagnosis);
 app.route('/api/plan', plan);
-
-// API Gateway v1 路由 (支持认证、限流、日志中间件)
+app.route('/api/ui-nodes', uiNodes); (支持认证、限流、日志中间件)
 app.route('/v1', v1);
 
 // 导出 for Cloudflare Workers

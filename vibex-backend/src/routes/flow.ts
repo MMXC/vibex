@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { z } from 'zod'
-import { generateId, Env } from '@/lib/db'
+import { generateId, Env, queryDB, queryOne, executeDB } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
 
 const flow = new Hono<{ Bindings: Env }>();
@@ -258,14 +258,80 @@ Respond ONLY with the JSON object. All text must be in Simplified Chinese.`
 
 flow.get('/', async (c) => {
   try {
+    const env = c.env
     const flowId = c.req.query('flowId') || c.req.query('id')
     const projectId = c.req.query('projectId')
 
-    // TODO: In production, query from DB
+    if (!env?.DB) {
+      return c.json({
+        success: false,
+        error: 'Database not available',
+      }, 503)
+    }
+
+    if (!flowId && !projectId) {
+      return c.json({
+        success: false,
+        error: 'flowId or projectId is required',
+      }, 400)
+    }
+
+    interface FlowDataRow {
+      id: string
+      name: string | null
+      nodes: string
+      edges: string
+      projectId: string
+      createdAt: string
+      updatedAt: string
+    }
+
+    let row: FlowDataRow | null = null
+
+    if (flowId) {
+      row = await queryOne<FlowDataRow>(env, 'SELECT * FROM FlowData WHERE id = ?', [flowId])
+    } else if (projectId) {
+      row = await queryOne<FlowDataRow>(
+        env,
+        'SELECT * FROM FlowData WHERE projectId = ? ORDER BY updatedAt DESC LIMIT 1',
+        [projectId]
+      )
+    }
+
+    if (!row) {
+      return c.json({
+        success: true,
+        flow: null,
+        message: flowId ? `Flow ${flowId} not found` : `No flow found for project ${projectId}`,
+      })
+    }
+
+    let nodes: FlowNode[] = []
+    let edges: FlowEdge[] = []
+
+    try {
+      nodes = JSON.parse(row.nodes)
+    } catch {
+      nodes = []
+    }
+
+    try {
+      edges = JSON.parse(row.edges)
+    } catch {
+      edges = []
+    }
+
     return c.json({
       success: true,
-      flow: null,
-      message: flowId ? `Flow ${flowId}` : projectId ? `Flow for project ${projectId}` : 'No ID provided',
+      flow: {
+        id: row.id,
+        name: row.name,
+        projectId: row.projectId,
+        nodes,
+        edges,
+        createdAt: new Date(row.createdAt).getTime(),
+        updatedAt: new Date(row.updatedAt).getTime(),
+      },
     })
   } catch (error) {
     return c.json({
@@ -298,19 +364,49 @@ const UpdateFlowSchema = z.object({
 
 flow.put('/', async (c) => {
   try {
+    const env = c.env
     const body = await c.req.json()
     const { id, nodes, edges } = UpdateFlowSchema.parse(body)
 
-    // TODO: Update in DB
-    console.log('[Flow] Updated flow:', id)
+    if (!env?.DB) {
+      return c.json({
+        success: false,
+        error: 'Database not available',
+      }, 503)
+    }
+
+    // Check if flow exists
+    const existing = await queryOne<{ id: string }>(env, 'SELECT id FROM FlowData WHERE id = ?', [id])
+
+    const now = new Date().toISOString()
+    const nodesJson = JSON.stringify(nodes || [])
+    const edgesJson = JSON.stringify(edges || [])
+
+    if (existing) {
+      // Update existing flow
+      await executeDB(
+        env,
+        'UPDATE FlowData SET nodes = ?, edges = ?, updatedAt = ? WHERE id = ?',
+        [nodesJson, edgesJson, now, id]
+      )
+    } else {
+      // Insert new flow (requires projectId from request body)
+      const projectId = (body as { projectId?: string }).projectId || 'default'
+      await executeDB(
+        env,
+        'INSERT INTO FlowData (id, projectId, nodes, edges, updatedAt) VALUES (?, ?, ?, ?, ?)',
+        [id, projectId, nodesJson, edgesJson, now]
+      )
+    }
 
     return c.json({
       success: true,
       flow: {
         id,
+        projectId: (body as { projectId?: string }).projectId,
         nodes: nodes || [],
         edges: edges || [],
-        updatedAt: Date.now(),
+        updatedAt: new Date(now).getTime(),
       },
     })
   } catch (error) {

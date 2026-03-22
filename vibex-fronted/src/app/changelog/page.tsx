@@ -18,6 +18,14 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.74',
+    date: '2026-03-22',
+    changes: [
+      '🎛️ Epic1-EventBinding: BottomPanel 7个回调全部接入 useHomePage handlers',
+    ],
+    commit: '53d51e27',
+  },
+  {
     version: '1.0.73',
     date: '2026-03-22',
     changes: [

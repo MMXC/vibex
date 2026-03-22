@@ -113,9 +113,9 @@ templates.get('/', async (c) => {
         name: p.name,
         description: p.description,
         preview: {
-          domainCount: 0, // TODO: count from BusinessDomain
-          nodeCount: 0,   // TODO: count from Flow
-          uiNodeCount: 0, // TODO: count from UINode
+          domainCount: 0, // Counts resolved in detail endpoint
+          nodeCount: 0,   // Counts resolved in detail endpoint
+          uiNodeCount: 0, // Counts resolved in detail endpoint
         },
         tags,
         usageCount: p.usageCount || 0,

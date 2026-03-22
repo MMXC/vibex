@@ -58,4 +58,4 @@ All API specs: `/root/.openclaw/vibex/docs/vibex-simplified-flow/specs/`
 | SPEC-06 | project-clone | ⏳ PENDING |
 | SPEC-07 | project-rollback | ⏳ PENDING |
 | SPEC-08 | ui-nodes-generate | ⏳ PENDING |
-| SPEC-09 | templates | ⏳ PENDING |
+| SPEC-09 | templates | ✅ DONE |

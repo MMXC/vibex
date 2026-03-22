@@ -31,6 +31,9 @@ model Project {
   status      String    @default("draft") // draft|active|converted|archived
   version     Int       @default(1)      // Optimistic locking
   isTemplate  Boolean   @default(false)
+  isPublic    Boolean   @default(false)
+  usageCount  Int       @default(0)
+  thumbnail   String?
   parentDraftId String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

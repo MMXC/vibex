@@ -46,12 +46,24 @@ interface ProjectRow {
   status: string
   version: number
   isTemplate: number
+  isPublic: number
+  usageCount: number
+  thumbnail: string | null
   parentDraftId: string | null
   deletedAt: string | null
   createdAt: string
   updatedAt: string
   tags?: string
-  usageCount?: number
+}
+
+interface FlowDataRow {
+  id: string
+  name: string | null
+  nodes: string
+  edges: string
+  projectId: string
+  createdAt: string
+  updatedAt: string
 }
 
 // ==================== GET /api/templates ====================
@@ -63,12 +75,20 @@ templates.get('/', async (c) => {
     const category = c.req.query('category')
     const tag = c.req.query('tag')
     const page = Math.max(1, parseInt(c.req.query('page') || '1'))
-    const limit = Math.min(50, Math.max(1, parseInt(c.req.query('limit') || '20')))
+    const rawLimit = parseInt(c.req.query('limit') || '20')
+    if (rawLimit > 50) {
+      return c.json({
+        success: false,
+        error: 'Limit must be at most 50',
+        code: 'VALIDATION_ERROR',
+      }, 400)
+    }
+    const limit = Math.max(1, rawLimit)
     const sort = c.req.query('sort') || 'popular'
     const offset = (page - 1) * limit
 
-    // Build query
-    let whereClause = 'deletedAt IS NULL AND isTemplate = 1'
+    // Build query - only public templates
+    let whereClause = 'deletedAt IS NULL AND isTemplate = 1 AND isPublic = 1'
     const params: unknown[] = []
 
     if (category) {
@@ -113,9 +133,10 @@ templates.get('/', async (c) => {
         name: p.name,
         description: p.description,
         preview: {
-          domainCount: 0, // Counts resolved in detail endpoint
-          nodeCount: 0,   // Counts resolved in detail endpoint
-          uiNodeCount: 0, // Counts resolved in detail endpoint
+          domainCount: 0,
+          nodeCount: 0,
+          uiNodeCount: 0,
+          thumbnail: p.thumbnail || undefined,
         },
         tags,
         usageCount: p.usageCount || 0,
@@ -123,7 +144,7 @@ templates.get('/', async (c) => {
           name: p.userId,
         },
         createdAt: p.createdAt,
-        isPublic: false,
+        isPublic: Boolean(p.isPublic),
       }
     })
 
@@ -158,7 +179,7 @@ templates.get('/:id', async (c) => {
 
     // Get project as template
     const project = await queryOne<ProjectRow>(env,
-      'SELECT * FROM Project WHERE id = ? AND isTemplate = 1 AND deletedAt IS NULL',
+      'SELECT * FROM Project WHERE id = ? AND isTemplate = 1 AND isPublic = 1 AND deletedAt IS NULL',
       [id]
     )
 
@@ -173,7 +194,7 @@ templates.get('/:id', async (c) => {
     // Get related data
     const [domains, flow, uiNodes] = await Promise.all([
       queryDB(env, 'SELECT * FROM BusinessDomain WHERE projectId = ?', [id]),
-      queryOne(env, 'SELECT * FROM Flow WHERE projectId = ?', [id]),
+      queryOne<FlowDataRow>(env, 'SELECT * FROM FlowData WHERE projectId = ?', [id]),
       queryDB(env, 'SELECT * FROM UINode WHERE projectId = ?', [id]),
     ])
 
@@ -183,6 +204,10 @@ templates.get('/:id', async (c) => {
     } catch {
       tags = project.tags ? [project.tags] : []
     }
+
+    const flowNodes = flow ? ((): number => {
+      try { return JSON.parse(flow.nodes).length } catch { return 0 }
+    })() : 0
 
     return c.json({
       success: true,
@@ -201,11 +226,20 @@ templates.get('/:id', async (c) => {
         updatedAt: project.updatedAt,
         preview: {
           domainCount: domains.length,
-          nodeCount: flow ? (JSON.parse(flow.nodes as unknown as string || '[]')).length : 0,
+          nodeCount: flowNodes,
           uiNodeCount: uiNodes.length,
+          thumbnail: project.thumbnail || undefined,
         },
         domains,
-        flow,
+        flow: flow ? {
+          id: flow.id,
+          name: flow.name,
+          nodes: flow.nodes,
+          edges: flow.edges,
+          projectId: flow.projectId,
+          createdAt: flow.createdAt,
+          updatedAt: flow.updatedAt,
+        } : null,
         uiNodes,
       },
     })
@@ -251,9 +285,10 @@ templates.post('/', async (c) => {
 
     // Update project as template
     const tagsJson = tags ? JSON.stringify(tags) : project.tags
+    const publicFlag = isPublic ? 1 : 0
     await executeDB(env,
-      `UPDATE Project SET isTemplate = 1, status = 'draft', updatedAt = ? WHERE id = ?`,
-      [new Date().toISOString(), projectId]
+      `UPDATE Project SET isTemplate = 1, isPublic = ?, updatedAt = ? WHERE id = ?`,
+      [publicFlag, new Date().toISOString(), projectId]
     )
 
     return c.json({
@@ -263,7 +298,7 @@ templates.post('/', async (c) => {
         name: name || project.name,
         description: description || project.description,
         tags: tags || [],
-        isPublic: isPublic || false,
+        isPublic: Boolean(isPublic),
         usageCount: 0,
         createdAt: project.createdAt,
         message: 'Template created successfully',

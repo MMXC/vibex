@@ -11,10 +11,13 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import LoginDrawer from '@/components/ui/LoginDrawer';
-import { Navbar, Sidebar, AIPanel } from '@/components/homepage';
+import { Navbar, AIPanel } from '@/components/homepage';
 import { useHomePage } from './hooks';
 import { PreviewArea } from './PreviewArea/PreviewArea';
 import { BottomPanel } from './BottomPanel/BottomPanel';
+import { GridContainer } from './GridContainer';
+import { StepNavigator } from './StepNavigator';
+import { useHomePageStore } from '@/stores/homePageStore';
 import type { AIMessage } from './types';
 import styles from '@/app/homepage.module.css';
 import type { Step } from '@/types/homepage';
@@ -25,20 +28,17 @@ const ParticleBackground = dynamic(
   { ssr: false }
 );
 
-// 六步流程常量 - PRD v2 + Epic 3: 需求输入 → 限界上下文 → 领域模型 → 需求澄清 → 业务流程 → UI 生成
+// 四步流程常量 (Epic 3: 需求录入 → 需求澄清 → 业务流程 → 组件图)
 const STEPS: Step[] = [
-  { id: 1, label: '需求输入', description: '描述您的需求' },
-  { id: 2, label: '限界上下文', description: '定义系统边界' },
-  { id: 3, label: '领域模型', description: '设计领域实体' },
-  { id: 4, label: '需求澄清', description: 'AI 追问和需求澄清' },
-  { id: 5, label: '业务流程', description: '绘制业务流程' },
-  { id: 6, label: 'UI 生成', description: '生成 UI 设计' },
+  { id: 1, label: '需求录入', description: '描述您的需求' },
+  { id: 2, label: '需求澄清', description: 'AI 追问澄清' },
+  { id: 3, label: '业务流程', description: '绘制业务流程' },
+  { id: 4, label: '组件图', description: '生成组件关系图' },
 ];
 
 export default function HomePage() {
   const {
     currentStep,
-    completedStep,
     isAuthenticated,
     setCurrentStep,
     boundedContexts,
@@ -60,25 +60,27 @@ export default function HomePage() {
     handleCreateProject,
   } = useHomePage();
 
+  // Epic4: Integrate homePageStore for completed steps (convert string step IDs to numbers)
+  const { completedSteps: completedStepStrings } = useHomePageStore();
+  const completedSteps = completedStepStrings
+    .map(s => parseInt(s.replace('step', ''), 10))
+    .filter(n => !isNaN(n));
+
   const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAIPanelOpen, setIsAIPanelOpen] = useState(true);
 
-  // 根据当前步骤返回对应 Mermaid 代码 (PRD 6步流程 + Epic 3)
+  // 根据当前步骤返回对应 Mermaid 代码 (Epic 3: 4步流程)
   const currentMermaidCode = useMemo(() => {
     switch (currentStep) {
       case 1:
         return contextMermaidCode || flowMermaidCode || '';
       case 2:
-        return contextMermaidCode || '';
-      case 3:
-        return modelMermaidCode || '';
-      case 4:
         return modelMermaidCode || ''; // 需求澄清 - 显示领域模型供讨论
-      case 5:
+      case 3:
         return flowMermaidCode || '';
-      case 6:
-        return flowMermaidCode || ''; // UI 生成 - 复用 flowMermaidCode 占位
+      case 4:
+        return flowMermaidCode || ''; // 组件图 - 复用 flowMermaidCode 占位
       default:
         return '';
     }
@@ -116,65 +118,69 @@ export default function HomePage() {
     <div className={styles.page}>
       <ParticleBackground />
 
-      {/* ST-3.3: Grid Header - 全宽 */}
-      <Navbar
-        isAuthenticated={isAuthenticated}
-        onLoginClick={() => setIsLoginDrawerOpen(true)}
-        onMenuToggle={() => setIsMenuOpen(v => !v)}
-        onSettingsClick={() => {}}
-        className={styles.header}
-      />
+      {/* Epic4: GridContainer for responsive layout */}
+      <GridContainer data-testid="homepage-grid">
 
-      {/* ST-3.3: 左侧抽屉 - 220px 宽 */}
-      <Sidebar
-        steps={STEPS}
-        currentStep={currentStep}
-        completedStep={completedStep}
-        onStepClick={handleStepClick}
-        isStepClickable={(stepId) => stepId <= (completedStep + 1)}
-        className={styles.leftDrawer}
-      />
+        {/* ST-3.3: Grid Header - 全宽 */}
+        <Navbar
+          isAuthenticated={isAuthenticated}
+          onLoginClick={() => setIsLoginDrawerOpen(true)}
+          onMenuToggle={() => setIsMenuOpen(v => !v)}
+          onSettingsClick={() => {}}
+          className={styles.header}
+        />
 
-      {/* ST-3.3: 中心预览区 - 自适应宽度 */}
-      <main className={styles.preview}>
-        <PreviewArea
+        {/* ST-3.3: 左侧抽屉 - StepNavigator (Epic4: GridContainer integration) */}
+        <StepNavigator
+          steps={STEPS}
           currentStep={currentStep}
-          mermaidCode={currentMermaidCode}
-          boundedContexts={boundedContexts}
-          domainModels={domainModels}
-          businessFlow={businessFlow}
-          isGenerating={isGenerating}
+          completedSteps={completedSteps}
+          onStepClick={handleStepClick}
+          className={styles.leftDrawer}
         />
-      </main>
 
-      {/* ST-1.1 + ST-3.3: 右侧 AI 面板 - 260px 宽 */}
-      <div className={styles.rightDrawer}>
-        <AIPanel
-          isOpen={isAIPanelOpen}
-          messages={adaptedMessages}
-          onClose={() => setIsAIPanelOpen(false)}
-          onSendMessage={handleAIPanelSend}
-          newItemId={newThinkingItemId}
-        />
-      </div>
+        {/* ST-3.3: 中心预览区 - 自适应宽度 */}
+        <main className={styles.preview}>
+          <PreviewArea
+            currentStep={currentStep}
+            mermaidCode={currentMermaidCode}
+            boundedContexts={boundedContexts}
+            domainModels={domainModels}
+            businessFlow={businessFlow}
+            isGenerating={isGenerating}
+          />
+        </main>
 
-      {/* ST-2.7: 底部面板 - 380px 固定高度 */}
-      <div className={styles.bottomPanel}>
-        <BottomPanel
-          isGenerating={isGenerating}
-          onAIAsk={(msg) => {
-            if (msg) handleAIPanelSend(msg);
-          }}
-          onDiagnose={handleDiagnose}
-          onOptimize={handleOptimize}
-          onHistory={handleHistory}
-          onSave={handleSave}
-          onRegenerate={() => {}}
-          onCreateProject={handleCreateProject}
-          onSendMessage={handleAIPanelSend}
-          chatHistory={chatHistory}
-        />
-      </div>
+        {/* ST-1.1 + ST-3.3: 右侧 AI 面板 - 260px 宽 */}
+        <div className={styles.rightDrawer}>
+          <AIPanel
+            isOpen={isAIPanelOpen}
+            messages={adaptedMessages}
+            onClose={() => setIsAIPanelOpen(false)}
+            onSendMessage={handleAIPanelSend}
+            newItemId={newThinkingItemId}
+          />
+        </div>
+
+        {/* ST-2.7: 底部面板 - 380px 固定高度 */}
+        <div className={styles.bottomPanel}>
+          <BottomPanel
+            isGenerating={isGenerating}
+            onAIAsk={(msg) => {
+              if (msg) handleAIPanelSend(msg);
+            }}
+            onDiagnose={handleDiagnose}
+            onOptimize={handleOptimize}
+            onHistory={handleHistory}
+            onSave={handleSave}
+            onRegenerate={() => {}}
+            onCreateProject={handleCreateProject}
+            onSendMessage={handleAIPanelSend}
+            chatHistory={chatHistory}
+          />
+        </div>
+
+      </GridContainer>
 
       <LoginDrawer
         isOpen={isLoginDrawerOpen}

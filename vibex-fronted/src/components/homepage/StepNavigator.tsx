@@ -21,6 +21,7 @@ export interface StepNavigatorProps {
   onStepClick?: (stepId: number) => void;
   completedSteps?: number[];
   disabled?: boolean;
+  className?: string;
 }
 
 export function StepNavigator({
@@ -29,6 +30,7 @@ export function StepNavigator({
   onStepClick,
   completedSteps = [],
   disabled = false,
+  className,
 }: StepNavigatorProps) {
   const getStepStatus = (stepId: number) => {
     if (completedSteps.includes(stepId)) return 'completed';
@@ -38,7 +40,7 @@ export function StepNavigator({
   };
 
   return (
-    <nav className={styles.container} aria-label="流程步骤">
+    <nav className={`${styles.container} ${className ?? ''}`} aria-label="流程步骤">
       <ol className={styles.stepList}>
         {steps.map((step, index) => {
           const status = getStepStatus(step.id);

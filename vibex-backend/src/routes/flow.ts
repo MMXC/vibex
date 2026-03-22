@@ -9,32 +9,34 @@ const flow = new Hono<{ Bindings: Env }>();
 // Enable CORS
 flow.use('/*', cors())
 
-// ==================== Types ====================
+// ==================== Types (aligned with SPEC-02) ====================
 
 interface FlowNode {
   id: string
-  domainId: string
   name: string
-  type: 'start' | 'end' | 'task' | 'decision' | 'subprocess'
+  type: 'start' | 'end' | 'process' | 'decision' | 'subprocess'
+  domainId?: string
   position: { x: number; y: number }
   description?: string
+  checked: boolean
+  editable: boolean
 }
 
 interface FlowEdge {
   id: string
   source: string
   target: string
-  type: 'default' | 'success' | 'error'
   label?: string
+  animated: boolean
+  checked: boolean
 }
 
 interface FlowData {
   id: string
-  projectId?: string
-  domainIds: string[]
+  name?: string
   nodes: FlowNode[]
   edges: FlowEdge[]
-  mermaidCode?: string
+  projectId: string
   createdAt: number
   updatedAt: number
 }
@@ -43,28 +45,58 @@ interface FlowData {
 
 const GenerateFlowRequestSchema = z.object({
   requirement: z.string().min(1),
-  domainIds: z.array(z.string()).optional(),
-  domainNames: z.array(z.string()).optional(),
+  domainIds: z.array(z.string()).min(1, 'domainIds required'),
   projectId: z.string().optional(),
-  userId: z.string().optional(),
+  userId: z.string().min(1, 'userId required'),
+  language: z.enum(['zh', 'en']).optional().default('zh'),
+  flowType: z.enum(['core_only', 'core_with_supporting', 'full']).optional().default('core_only'),
 })
 
 // ==================== POST /api/flow/generate ====================
-// Streaming SSE endpoint - generates business flow from domains
+// Streaming SSE endpoint - generates business flow from domains (SPEC-02)
 
 flow.post('/generate', async (c) => {
   try {
     const env = c.env
     const body = await c.req.json()
-    const { requirement, domainIds, domainNames } = GenerateFlowRequestSchema.parse(body)
+    const parseResult = GenerateFlowRequestSchema.safeParse(body)
+
+    if (!parseResult.success) {
+      return c.json({
+        success: false,
+        error: parseResult.error.errors[0].message,
+        code: 'VALIDATION_ERROR',
+      }, 400)
+    }
+
+    const { requirement, domainIds, projectId, userId, flowType } = parseResult.data
 
     // Create AI service
     const aiService = createAIService(env)
 
-    // Build domain context
-    const domainContext = domainNames && domainNames.length > 0
-      ? `参考以下业务领域:\n${domainNames.map((name, i) => `- ${name}`).join('\n')}`
-      : '从需求中自动识别业务领域'
+    // Fetch domain names from DB for context
+    let domainContext = '从需求中自动识别业务领域'
+    let domainNames: string[] = []
+    let domainIdSet = new Set(domainIds)
+
+    if (env?.DB && domainIds.length > 0) {
+      try {
+        const placeholders = domainIds.map(() => '?').join(',')
+        const rows = await queryDB<{ id: string; name: string; domainType: string }>(
+          env,
+          `SELECT id, name, domainType FROM BusinessDomain WHERE id IN (${placeholders})`,
+          domainIds
+        )
+        if (rows.length > 0) {
+          domainNames = rows.map(r => r.name)
+          domainContext = `参考以下业务领域:\n${rows.map(r => `- ${r.name}（${r.domainType}）`).join('\n')}`
+        }
+      } catch (err) {
+        console.warn('[Flow Generate] Failed to fetch domains for context:', err)
+      }
+    }
+
+    const startTime = Date.now()
 
     // Build the SSE stream
     const stream = new ReadableStream({
@@ -77,63 +109,60 @@ flow.post('/generate', async (c) => {
         }
 
         try {
-          // Step 1: Thinking - analyzing requirement
-          send('thinking', { step: 'analyzing', message: '正在分析业务流程...' })
+          // Step 1: Start event with domain count
+          send('start', {
+            type: 'start',
+            domainCount: domainNames.length,
+            requirement,
+            timestamp: new Date().toISOString(),
+          })
           await sleep(150)
 
-          send('thinking', { step: 'identifying-steps', message: '正在识别流程步骤...' })
+          send('thinking', {
+            type: 'thinking',
+            content: domainNames.length > 0
+              ? `根据已分析的核心域：${domainNames.join('、')}，构建业务流程...`
+              : '正在分析业务流程...',
+          })
           await sleep(150)
 
-          send('thinking', { step: 'calling-ai', message: '正在调用 AI 生成业务流程...' })
+          send('thinking', {
+            type: 'thinking',
+            content: '正在调用 AI 生成业务流程...',
+          })
 
-          // Build the AI prompt
-          const prompt = `You are a business process expert. Based on the following requirement and domains, create a business flow diagram.
+          // Build the AI prompt - aligned with SPEC-02
+          const prompt = `你是一个业务流程建模专家。
 
-**Requirement:**
-${requirement}
-
-**Domains:**
+业务领域（已分析）:
 ${domainContext}
 
-**IMPORTANT: Output ALL text in Simplified Chinese.**
+用户原始需求:
+${requirement}
 
-**Output Requirements:**
-Generate a JSON object with a "flow" object containing:
-- nodes: array of flow nodes, each with:
-  - name: 节点名称（如"提交订单"、"审核订单"、"支付成功"）
-  - type: start（开始）| end（结束）| task（任务）| decision（判断）| subprocess（子流程）
-  - domainId: 对应的领域名称
-  - description: 节点描述（可选）
-- edges: array of connections between nodes, each with:
-  - source: 源节点名称
-  - target: 目标节点名称
-  - type: default（默认）| success（成功）| error（失败）
-  - label: 连接线标签（可选，如"是"/"否"）
+请基于以上业务领域，生成业务流程图。
 
-**Example Output:**
+要求：
+1. 每个领域生成对应的流程节点
+2. 节点类型: start（开始）, end（结束）, process（处理）, decision（判断）, subprocess（子流程）
+3. 用边连接节点，表示流程走向
+4. 在边上标注条件或结果
+5. 节点名称使用业务语言（如"处理订单"而非"OrderService.process"）
+
+输出格式（JSON）:
 {
-  "flow": {
-    "nodes": [
-      {"name": "开始", "type": "start", "domainId": "订单管理", "description": "用户发起订订"},
-      {"name": "填写订单", "type": "task", "domainId": "订单管理", "description": "用户填写订单信息"},
-      {"name": "是否有效", "type": "decision", "domainId": "订单管理", "description": "校验订单有效性"},
-      {"name": "支付", "type": "task", "domainId": "支付", "description": "用户完成支付"},
-      {"name": "完成", "type": "end", "domainId": "订单管理", "description": "订单创建成功"}
-    ],
-    "edges": [
-      {"source": "开始", "target": "填写订单", "type": "default"},
-      {"source": "填写订单", "target": "是否有效", "type": "default"},
-      {"source": "是否有效", "target": "支付", "type": "success", "label": "是"},
-      {"source": "是否有效", "target": "填写订单", "type": "error", "label": "否"},
-      {"source": "支付", "target": "完成", "type": "success"}
-    ]
-  }
+  "nodes": [
+    { "name": "节点名称", "type": "start|process|decision|end", "description": "节点描述" }
+  ],
+  "edges": [
+    { "source": "源节点名称", "target": "目标节点名称", "label": "条件/结果" }
+  ]
 }
 
-Respond ONLY with the JSON object. All text must be in Simplified Chinese.`
+请直接输出 JSON。所有文本使用简体中文。`
 
           // Call AI service
-          const result = await aiService.generateJSON<{ flow: any }>(
+          const result = await aiService.generateJSON<{ nodes: any[]; edges: any[] }>(
             prompt,
             {
               systemPrompt: '你是一位业务流程专家。只输出有效的JSON对象，所有文本使用简体中文。'
@@ -145,49 +174,62 @@ Respond ONLY with the JSON object. All text must be in Simplified Chinese.`
             throw new Error(`AI 服务错误: ${result.error || '未知错误'}`)
           }
 
-          if (!result.data.flow) {
-            throw new Error('AI 响应格式错误：缺少 flow 字段')
+          if (!result.data.nodes || !Array.isArray(result.data.nodes)) {
+            throw new Error('AI 响应格式错误：缺少 nodes 字段')
           }
 
           // Step 2: Parse and stream nodes
-          send('thinking', { step: 'parsing', message: '正在解析流程节点...' })
+          send('thinking', {
+            type: 'thinking',
+            content: '正在解析流程节点...',
+          })
           await sleep(100)
 
-          const flowData = result.data.flow
+          const flowData = result.data
           const nodeMap = new Map<string, string>() // name -> id mapping
           const nodes: FlowNode[] = []
           const edges: FlowEdge[] = []
 
           // Create nodes
           let yPos = 0
-          for (let index = 0; index < (flowData.nodes || []).length; index++) {
+          const nodeCount = flowData.nodes?.length || 0
+          for (let index = 0; index < nodeCount; index++) {
             const node = flowData.nodes[index]
             const nodeId = `node-${generateId()}-${index}`
             nodeMap.set(node.name, nodeId)
 
+            // Map 'task' to 'process' for SPEC-02 compatibility
+            const nodeType = node.type === 'task' ? 'process' : (node.type || 'process')
+
             nodes.push({
               id: nodeId,
-              domainId: node.domainId || '',
               name: node.name,
-              type: node.type || 'task',
+              type: nodeType as FlowNode['type'],
+              domainId: node.domainId || '',
               position: {
                 x: 250,
                 y: yPos,
               },
               description: node.description,
+              checked: false,
+              editable: true,
             })
 
             // Stream each node incrementally
-            send('node', nodes[nodes.length - 1])
+            send('node', { type: 'node', node: nodes[nodes.length - 1], domainId: node.domainId || '' })
             await sleep(200)
             yPos += 100
           }
 
           // Create edges (second pass)
-          send('thinking', { step: 'mapping-edges', message: '正在连接流程...' })
+          send('thinking', {
+            type: 'thinking',
+            content: '正在连接流程...',
+          })
           await sleep(100)
 
-          for (let index = 0; index < (flowData.edges || []).length; index++) {
+          const edgeCount = flowData.edges?.length || 0
+          for (let index = 0; index < edgeCount; index++) {
             const edge = flowData.edges[index]
             const sourceId = nodeMap.get(edge.source)
             const targetId = nodeMap.get(edge.target)
@@ -197,12 +239,16 @@ Respond ONLY with the JSON object. All text must be in Simplified Chinese.`
                 id: `edge-${generateId()}-${index}`,
                 source: sourceId,
                 target: targetId,
-                type: edge.type || 'default',
-                label: edge.label,
+                label: edge.label || '',
+                animated: false,
+                checked: false,
               })
 
               // Stream each edge incrementally
-              send('edge', edges[edges.length - 1])
+              send('edge', {
+                type: 'edge',
+                edge: edges[edges.length - 1],
+              })
               await sleep(150)
             }
           }
@@ -210,27 +256,48 @@ Respond ONLY with the JSON object. All text must be in Simplified Chinese.`
           // Generate Mermaid code
           const mermaidCode = generateFlowMermaid(nodes, edges)
 
-          // Step 3: Done
+          // Step 3: Save flow to DB
+          const flowId = `flow-${generateId()}`
+          const flowProjectId = projectId || 'default'
+          const now = Date.now()
+          const generationTime = Date.now() - startTime
+
+          if (env?.DB) {
+            try {
+              await executeDB(
+                env,
+                `INSERT INTO FlowData (id, name, nodes, edges, projectId, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                [flowId, '业务流程图', JSON.stringify(nodes), JSON.stringify(edges), flowProjectId, now, now]
+              )
+            } catch (dbErr) {
+              console.warn('[Flow Generate] Failed to save flow to DB:', dbErr)
+            }
+          }
+
+          // Step 4: Done
           send('done', {
+            type: 'done',
             flow: {
-              id: `flow-${generateId()}`,
-              projectId: undefined,
-              domainIds: domainIds || [],
+              id: flowId,
+              name: '业务流程图',
+              projectId: flowProjectId,
               nodes,
               edges,
               mermaidCode,
-              createdAt: Date.now(),
-              updatedAt: Date.now(),
+              createdAt: now,
+              updatedAt: now,
             },
-            message: `成功生成 ${nodes.length} 个流程节点`,
+            generationTime,
+            savedAt: new Date(now).toISOString(),
           })
 
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : '未知错误'
           console.error('[Flow Generate] Error:', errorMessage)
           send('error', {
-            message: errorMessage,
-            code: 'FLOW_GENERATE_ERROR',
+            type: 'error',
+            error: errorMessage,
+            code: 'GENERATION_ERROR',
           })
         }
 
@@ -345,20 +412,24 @@ flow.get('/', async (c) => {
 
 const UpdateFlowSchema = z.object({
   id: z.string(),
+  name: z.string().optional(),
   nodes: z.array(z.object({
     id: z.string().optional(),
     name: z.string(),
-    type: z.enum(['start', 'end', 'task', 'decision', 'subprocess']),
+    type: z.enum(['start', 'end', 'process', 'decision', 'subprocess']),
     domainId: z.string().optional(),
     position: z.object({ x: z.number(), y: z.number() }).optional(),
     description: z.string().optional(),
+    checked: z.boolean().optional(),
+    editable: z.boolean().optional(),
   })).optional(),
   edges: z.array(z.object({
     id: z.string().optional(),
     source: z.string(),
     target: z.string(),
-    type: z.enum(['default', 'success', 'error']).optional(),
     label: z.string().optional(),
+    animated: z.boolean().optional(),
+    checked: z.boolean().optional(),
   })).optional(),
 })
 
@@ -366,7 +437,7 @@ flow.put('/', async (c) => {
   try {
     const env = c.env
     const body = await c.req.json()
-    const { id, nodes, edges } = UpdateFlowSchema.parse(body)
+    const { id, name, nodes, edges } = UpdateFlowSchema.parse(body)
 
     if (!env?.DB) {
       return c.json({
@@ -384,18 +455,27 @@ flow.put('/', async (c) => {
 
     if (existing) {
       // Update existing flow
+      const sets = ['nodes = ?', 'edges = ?', 'updatedAt = ?']
+      const params: unknown[] = [nodesJson, edgesJson, now]
+
+      if (name !== undefined) {
+        sets.unshift('name = ?')
+        params.unshift(name)
+      }
+
+      params.push(id)
       await executeDB(
         env,
-        'UPDATE FlowData SET nodes = ?, edges = ?, updatedAt = ? WHERE id = ?',
-        [nodesJson, edgesJson, now, id]
+        `UPDATE FlowData SET ${sets.join(', ')} WHERE id = ?`,
+        params
       )
     } else {
       // Insert new flow (requires projectId from request body)
       const projectId = (body as { projectId?: string }).projectId || 'default'
       await executeDB(
         env,
-        'INSERT INTO FlowData (id, projectId, nodes, edges, updatedAt) VALUES (?, ?, ?, ?, ?)',
-        [id, projectId, nodesJson, edgesJson, now]
+        `INSERT INTO FlowData (id, name, nodes, edges, projectId, updatedAt) VALUES (?, ?, ?, ?, ?, ?)`,
+        [id, name || '业务流程图', nodesJson, edgesJson, projectId, now]
       )
     }
 
@@ -403,6 +483,7 @@ flow.put('/', async (c) => {
       success: true,
       flow: {
         id,
+        name,
         projectId: (body as { projectId?: string }).projectId,
         nodes: nodes || [],
         edges: edges || [],
@@ -413,6 +494,51 @@ flow.put('/', async (c) => {
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to update flow',
+    }, 500)
+  }
+})
+
+// ==================== DELETE /api/flow ====================
+
+flow.delete('/', async (c) => {
+  try {
+    const env = c.env
+    const flowId = c.req.query('id') || c.req.query('flowId')
+
+    if (!flowId) {
+      return c.json({
+        success: false,
+        error: 'flowId is required',
+      }, 400)
+    }
+
+    if (!env?.DB) {
+      return c.json({
+        success: false,
+        error: 'Database not available',
+      }, 503)
+    }
+
+    const existing = await queryOne<{ id: string }>(env, 'SELECT id FROM FlowData WHERE id = ?', [flowId])
+
+    if (!existing) {
+      return c.json({
+        success: false,
+        error: `Flow ${flowId} not found`,
+        code: 'NOT_FOUND',
+      }, 404)
+    }
+
+    await executeDB(env, 'DELETE FROM FlowData WHERE id = ?', [flowId])
+
+    return c.json({
+      success: true,
+      message: `Flow ${flowId} deleted`,
+    })
+  } catch (error) {
+    return c.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to delete flow',
     }, 500)
   }
 })
@@ -438,7 +564,7 @@ function generateFlowMermaid(nodes: FlowNode[], edges: FlowEdge[]): string {
 
   // Add edges
   edges.forEach(edge => {
-    const arrow = edge.type === 'error' ? '-->' : '-->'
+    const arrow = edge.animated ? '-.->' : '-->'
     const label = edge.label ? `|${edge.label}|` : ''
     lines.push(`  ${edge.source} ${arrow}${label} ${edge.target}`)
   })

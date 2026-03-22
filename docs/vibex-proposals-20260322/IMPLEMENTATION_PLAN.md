@@ -64,28 +64,26 @@ Populate with 4 patterns + 3 templates (see architecture.md §Epic3)
 
 ## Phase 2: Epic2 (Day 2)
 
-### Task 2.1: Implement log_analysis.py
+### Task 2.1: Implement log_analysis.py ✅
 **Agent**: dev
 **Output**: `/root/.openclaw/skills/team-tasks/scripts/log_analysis.py`
+**Status**: DONE (2026-03-22) - commit 701f5a4b
+- `append_to_memory(project, task_id, summary, key_finding, workspace)` - 幂等追加到 MEMORY.md
+- `clean_cooldown(file, ttl_seconds)` - 清理过期 cooldown 条目（支持 ISO 和 Unix 时间戳）
+- CLI: `python log_analysis.py append ...` 和 `clean-cooldown ...`
 
-```python
-# 核心函数
-def append_to_memory(project: str, task_id: str, summary: str, key_finding: str = "") -> None:
-    ...
-
-def clean_cooldown(file: str, ttl_seconds: int = 86400) -> None:
-    ...
-```
-
-### Task 2.2: Extend task_manager.py
+### Task 2.2: Extend task_manager.py ✅
 **Agent**: dev
+**Status**: DONE (2026-03-22) - commit 701f5a4b
 **Commands**: 
 - `task_manager.py log-analysis <project> <task> --summary "..." --key-finding "..."`
 - `task_manager.py update <project> <task> <status> --log-analysis`
+- `task_manager.py clean-cooldown [--file FILE] [--ttl-seconds SECONDS]`
 
-### Task 2.3: Tests for log_analysis
-**Agent**: tester
-**Verify**: `pytest test_log_analysis.py -v`
+### Task 2.3: Tests for log_analysis ✅
+**Agent**: dev (自测)
+**Status**: DONE (2026-03-22)
+**Verify**: `pytest test_log_analysis.py -v` → **13 passed**
 
 ---
 
@@ -117,8 +115,9 @@ Add functions:
 | 1.1 | test-quality-checklist.md | docs/test-quality-checklist.md | P1 | ✅ DONE |
 | 1.2 | 模板集成 | skills/*/SKILL.md 更新 | P1 | ✅ DONE |
 | 1.3 | 知识库结构 | docs/knowledge/ 目录 | P1 |
-| 2.1 | log_analysis.py | scripts/log_analysis.py | P2 |
-| 2.2 | task_manager.py 扩展 | CLI 新命令 | P2 |
+| 2.1 | log_analysis.py | scripts/log_analysis.py | P2 | ✅ DONE |
+| 2.2 | task_manager.py 扩展 | CLI 新命令 | P2 | ✅ DONE |
+| 2.3 | Tests for log_analysis | test_log_analysis.py | P2 | ✅ DONE |
 | 3.1 | analyst-heartbeat 增强 | 扫描函数 | P3 |
 | 3.2 | cooldown.json | 初始化文件 | P3 |
 

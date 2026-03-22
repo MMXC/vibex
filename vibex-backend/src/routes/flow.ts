@@ -64,7 +64,7 @@ flow.post('/generate', async (c) => {
     if (!parseResult.success) {
       return c.json({
         success: false,
-        error: parseResult.error.errors[0].message,
+        error: parseResult.error.issues[0].message,
         code: 'VALIDATION_ERROR',
       }, 400)
     }

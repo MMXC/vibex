@@ -149,8 +149,8 @@ stepState.post('/', async (c) => {
       const step2Json = step2 !== undefined ? JSON.stringify(step2) : null
       const step3Json = step3 !== undefined ? JSON.stringify(step3) : null
 
-      const step1Field = currentStep === 1 ? 'step1' : currentStep === 2 ? 'step2' : 'step3'
-      const beforeJson = existing ? (existing as Record<string, unknown>)[step1Field] as string | null : null
+      const step1Field: 'step1' | 'step2' | 'step3' = currentStep === 1 ? 'step1' : currentStep === 2 ? 'step2' : 'step3'
+      const beforeJson = existing ? (existing as unknown as Record<string, unknown>)[step1Field] as string | null : null
       const afterJson = currentStep === 1 ? step1Json : currentStep === 2 ? step2Json : step3Json
 
       if (existing) {
@@ -272,7 +272,7 @@ stepState.post('/', async (c) => {
         source: 'user',
         action: 'update',
         field: fieldKey,
-        before: stored ? { [fieldKey]: stored.state[currentStep as keyof StepState] } : null,
+        before: stored ? { [fieldKey]: stored.state[fieldKey as keyof StepState] } : null,
         after: { [fieldKey]: currentStep === 1 ? step1 : currentStep === 2 ? step2 : step3 },
       }
 
@@ -292,7 +292,7 @@ stepState.post('/', async (c) => {
         success: false,
         error: 'Validation error',
         code: 'VALIDATION_ERROR',
-        details: error.errors,
+        details: error.issues,
       }, 400)
     }
     console.error('Error saving step state:', error)

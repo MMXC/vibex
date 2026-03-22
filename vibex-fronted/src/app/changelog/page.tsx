@@ -18,6 +18,14 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.75',
+    date: '2026-03-22',
+    changes: [
+      '🧭 Epic3-StepNavigator: HomePageStep 从7步减少到4步 (需求录入/澄清/业务流程/组件图)',
+    ],
+    commit: '40bc979c',
+  },
+  {
     version: '1.0.74',
     date: '2026-03-22',
     changes: [

@@ -7,6 +7,10 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - **ThemeWrapper timing bug**: useRef/useEffect 检测异步 homepageData 到达并重新计算 merge 策略
 - **ThemeContext**: 异步数据到达时重新计算 mode 而非使用 stale initialState
+- **KnowledgeBase 虚假完成修复**: 创建真实 docs/knowledge/ 结构
+  - 4 个 Pattern: test-isolation, async-state-race, api-version-drift, config-drift
+  - 3 个 Template: problem-analysis, competitive-analysis, solution-evaluation
+  - 索引文档 _index.md
 
 ## [Unreleased]
 

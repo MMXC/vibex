@@ -28,15 +28,23 @@ model Project {
   description String?
   userId      String
   deletedAt   DateTime? // Soft delete - trash bin support
+  status      String    @default("draft") // draft|active|converted|archived
+  version     Int       @default(1)      // Optimistic locking
+  isTemplate  Boolean   @default(false)
+  parentDraftId String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  user     User      @relation(fields: [userId], references: [id])
-  pages    Page[]
-  messages Message[]
-  flows    FlowData[]
-  requirements Requirement[]
+  user           User      @relation(fields: [userId], references: [id])
+  pages          Page[]
+  messages       Message[]
+  flows          FlowData[]
+  requirements   Requirement[]
   prototypeSnapshots PrototypeSnapshot[]
+  stepState      StepState?
+  changeLogs     ChangeLog[]
+  businessDomains BusinessDomain[]
+  uiNodes        UINode[]
 }
 
 model Page {
@@ -109,6 +117,20 @@ model Requirement {
   
   project     Project  @relation(fields: [projectId], references: [id])
   entities    DomainEntity[]
+  clarifications ClarificationQuestion[]
+}
+
+model ClarificationQuestion {
+  id            String    @id @default(cuid())
+  requirementId String
+  question      String
+  answer        String?
+  status        String    @default("pending") // pending, answered, skipped
+  priority      String    @default("medium")   // low, medium, high
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  requirement   Requirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
 }
 
 model DomainEntity {
@@ -202,8 +224,84 @@ model ProjectSettings {
   userId    String?  // null for project-level settings, user ID for user preferences
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   @@unique([projectId, key, userId])
   @@index([projectId])
   @@index([userId])
+}
+
+// ==================== Simplified Flow Models ====================
+
+// Step State - stores current step and step data for simplified flow
+model StepState {
+  id             String   @id @default(cuid())
+  projectId      String   @unique
+  currentStep    Int      @default(1) // 1|2|3
+  version        Int      @default(1)
+  step1Data      String?  // JSON: Step1Data
+  step2Data      String?  // JSON: Step2Data
+  step3Data      String?  // JSON: Step3Data
+  lastModifiedBy String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// Change Log - tracks all changes for history/rollback
+model ChangeLog {
+  id        String   @id @default(cuid())
+  projectId String
+  version   Int
+  source    String   // user|ai|system|rollback
+  action    String   // create|update|delete|rollback|merge
+  field     String
+  before    String?  // JSON
+  after     String?  // JSON
+  userId    String?
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, version])
+}
+
+// Business Domain - stores domain info for simplified flow
+model BusinessDomain {
+  id          String   @id @default(cuid())
+  projectId   String
+  name        String
+  description String?
+  domainType  String   @default("supporting") // core|supporting|generic|external
+  features    String   @default("[]") // JSON: Feature[]
+  relationships String @default("[]") // JSON: DomainRelationship[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+// UI Node - stores UI node tree for simplified flow
+model UINode {
+  id                String   @id @default(cuid())
+  projectId         String
+  name              String
+  nodeType          String   // page|form|list|detail|header|footer|modal|navigation|card
+  description       String?
+  linkedFlowNodeId  String?
+  children          String   @default("[]") // JSON: UINode[]
+  annotations       String   @default("[]") // JSON: UINodeAnnotation[]
+  positionX         Float?
+  positionY         Float?
+  checked           Boolean  @default(false)
+  priority          String   @default("medium") // low|medium|high
+  status            String   @default("pending") // pending|generated|failed
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
 }

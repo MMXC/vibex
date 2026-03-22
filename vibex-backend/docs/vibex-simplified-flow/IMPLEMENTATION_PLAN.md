@@ -59,55 +59,41 @@ Registered routes:
 
 ## Epic 2: DataStructure — Database Schema
 
-### Task 2.1: Prisma Schema Extension (PENDING)
+### Task 2.1: Prisma Schema Extension ✅ (2026-03-23)
 **File**: `prisma/schema.prisma`
-**Status**: PENDING
+**Commit**: `pending`
+**Status**: COMPLETE
 
-Need to add:
-```prisma
-model StepState {
-  id          String   @id @default(cuid())
-  projectId   String   @unique
-  currentStep Int
-  version     Int      @default(1)
-  step1Data   String?  // JSON
-  step2Data   String?  // JSON
-  step3Data   String?  // JSON
-  lastModifiedBy String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
+Added models:
+- `StepState` - step state with JSON data for each step
+- `ChangeLog` - change history with versioning
+- `BusinessDomain` - domain storage with features/relationships
+- `UINode` - UI node tree storage
 
-model ChangeLog {
-  id        String   @id @default(cuid())
-  projectId String
-  version   Int
-  source    String   // user|ai|system|rollback
-  action    String   // create|update|delete|rollback|merge
-  field     String
-  before    String?  // JSON
-  after     String?  // JSON
-  userId    String?
-  createdAt DateTime @default(now())
-  
-  @@index([projectId, version])
-}
-```
+Extended Project model:
+- `status` (draft|active|converted|archived)
+- `version` (optimistic locking)
+- `isTemplate`
+- `parentDraftId`
 
-### Task 2.2: D1 Migration (PENDING)
+Relations: Project → StepState (1:1), ChangeLog (1:N), BusinessDomain (1:N), UINode (1:N)
+
+### Task 2.2: D1 Migration ✅ (2026-03-23)
 **File**: `prisma/migrations/003_step_state_tables.sql`
-**Status**: PENDING
+**Status**: COMPLETE
 
-### Task 2.3: Extend Project Model (PENDING)
+SQLite D1-compatible migration with:
+- StepState table with unique projectId
+- ChangeLog table with composite index
+- BusinessDomain table with projectId index
+- UINode table with projectId index
+- Foreign key constraints with CASCADE delete
+
+### Task 2.3: Extend Project Model ✅ (2026-03-23)
 **File**: `prisma/schema.prisma`
+**Status**: COMPLETE
 
-Add to Project model:
-```prisma
-status        String   @default("draft")  // draft|active|converted|archived
-version       Int      @default(1)
-isTemplate    Boolean  @default(false)
-parentDraftId String?
-```
+Integrated with Task 2.1.
 
 ---
 

@@ -17,6 +17,8 @@ Add missing tokens (see architecture.md §4.1):
 - Radius (6px/12px)
 - Global `:focus-visible`
 
+✅ **DONE** — commit `7bd8bc95`: Added `--color-focus-ring`, `--color-interactive`, neutral bg aliases, `--letter-spacing-*` tokens.
+
 ### Task 1.2: Create EmptyState component
 **File**: `src/components/ui/EmptyState.tsx`
 **Agent**: dev
@@ -28,11 +30,15 @@ export function EmptyState({ icon, title, description, action }) { ... }
 
 Export from `src/components/ui/index.ts`
 
+✅ **DONE** — commit `7bd8bc95`: Created EmptyState.tsx + EmptyState.module.css + EmptyState.test.tsx with icon/title/description/action/variant props. Exported from index.ts.
+
 ### Task 1.3: Verify Skeleton.tsx
 **File**: `src/components/ui/Skeleton.tsx`
 **Agent**: dev
 
 Run existing tests, verify works for Dashboard loading states.
+
+✅ **DONE** — Skeleton tests pass (7 tests).
 
 ### Task 1.4: Add lucide-react
 **File**: `package.json`
@@ -42,6 +48,8 @@ Run existing tests, verify works for Dashboard loading states.
 cd /root/.openclaw/vibex/vibex-fronted
 npm install lucide-react
 ```
+
+✅ **DONE** — commit `7bd8bc95`: lucide-react installed, used by EmptyState component.
 
 ---
 

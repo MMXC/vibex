@@ -89,18 +89,19 @@ Populate with 4 patterns + 3 templates (see architecture.md §Epic3)
 
 ## Phase 3: Epic4 (Day 3)
 
-### Task 3.1: Enhance analyst-heartbeat.sh
+### Task 3.1: Enhance analyst-heartbeat.sh ✅
 **Agent**: dev
 **Output**: `/root/.openclaw/scripts/heartbeats/analyst-heartbeat.sh` (修改版)
-
-Add functions:
+**Status**: DONE (2026-03-22)
 - `scan_for_new_issues()` — 扫描 docs/*test-fix* 无分析的目录
-- `is_cooled()` — 检查 cooldown.json
+- `is_cooled()` — 检查 cooldown.json（24h TTL）
 - `set_cooldown()` — 写入 cooldown.json
+- 扫描在心跳 Step0 执行，在 team-tasks 领取前运行
 
-### Task 3.2: Create cooldown.json
+### Task 3.2: Create cooldown.json ✅
 **Agent**: dev
 **Output**: `/root/.openclaw/workspace-analyst/cooldown.json` (初始化为空对象 `{}`)
+**Status**: DONE (2026-03-22)
 
 ### Task 3.3: Verify active scanning
 **Agent**: analyst
@@ -118,8 +119,8 @@ Add functions:
 | 2.1 | log_analysis.py | scripts/log_analysis.py | P2 | ✅ DONE |
 | 2.2 | task_manager.py 扩展 | CLI 新命令 | P2 | ✅ DONE |
 | 2.3 | Tests for log_analysis | test_log_analysis.py | P2 | ✅ DONE |
-| 3.1 | analyst-heartbeat 增强 | 扫描函数 | P3 |
-| 3.2 | cooldown.json | 初始化文件 | P3 |
+| 3.1 | analyst-heartbeat 增强 | 扫描函数 | P3 | ✅ DONE |
+| 3.2 | cooldown.json | 初始化文件 | P3 | ✅ DONE |
 
 ---
 

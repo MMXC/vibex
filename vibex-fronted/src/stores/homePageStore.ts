@@ -10,8 +10,8 @@ const devLog = (...args: unknown[]) => {
   if (process.env.NODE_ENV !== 'production') console.log('[homePageStore]', ...args);
 };
 
-// Step type - aligns with PRD 6-step flow
-export type HomePageStep = 'step1' | 'step2' | 'step3' | 'step4' | 'step5' | 'step6' | 'success';
+// Step type - 4-step homepage flow (Epic 3)
+export type HomePageStep = 'step1' | 'step2' | 'step3' | 'step4';
 
 // Mermaid codes for each step
 export interface MermaidCodes {
@@ -104,8 +104,8 @@ const initialState = {
   setHasHydrated: (state: boolean) => {},
 };
 
-// Step order for navigation
-const STEP_ORDER: HomePageStep[] = ['step1', 'step2', 'step3', 'step4', 'step5', 'step6', 'success'];
+// Step order for navigation - 4 steps (Epic 3)
+const STEP_ORDER: HomePageStep[] = ['step1', 'step2', 'step3', 'step4'];
 
 export const useHomePageStore = create<HomePageState>()(
   persist(

@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Epic: ThemeWrapper Timing Bug Fix (homepage-theme-wrapper-timing-fix) (2026-03-22)
+
+#### Fixed
+- **ThemeWrapper timing bug**: 修复页面加载时主题合并策略在初始渲染不生效的问题
+  - ThemeContext 使用 useRef 检测异步 homepageData 到达 (undefined → defined)
+  - 使用 useEffect 监听变化并调用 resolveMergedTheme 重新计算 mode
+  - ThemeWrapper 始终渲染 ThemeProvider（加载时传递 undefined），使 useTheme() 在加载期间可用
+- **test cleanup**: 添加 afterAll 清理 global.fetch 防止测试污染
+
+#### Testing
+- 修复后 30 个测试全部通过: 6/6 theme-binding, 7/7 ThemeWrapper, 17/17 homepageAPI
+
 ### Epic: 孤儿测试修复 (vibex-test-orphans-fix) (2026-03-21)
 
 #### Fixed

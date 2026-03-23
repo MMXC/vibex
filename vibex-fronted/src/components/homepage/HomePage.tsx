@@ -15,7 +15,6 @@ import { Navbar, AIPanel } from '@/components/homepage';
 import { useHomePage } from './hooks';
 import { PreviewArea } from './PreviewArea/PreviewArea';
 import { BottomPanel } from './BottomPanel/BottomPanel';
-import { GridContainer } from './GridContainer';
 import { StepNavigator } from './StepNavigator';
 import { useHomePageStore } from '@/stores/homePageStore';
 import type { AIMessage } from './types';
@@ -119,69 +118,64 @@ export default function HomePage() {
     <div className={styles.page}>
       <ParticleBackground />
 
-      {/* Epic4: GridContainer for responsive layout */}
-      <GridContainer data-testid="homepage-grid">
+      {/* ST-3.3: Grid Header - 全宽 */}
+      <Navbar
+        isAuthenticated={isAuthenticated}
+        onLoginClick={() => setIsLoginDrawerOpen(true)}
+        onMenuToggle={() => setIsMenuOpen(v => !v)}
+        onSettingsClick={() => {}}
+        className={styles.header}
+      />
 
-        {/* ST-3.3: Grid Header - 全宽 */}
-        <Navbar
-          isAuthenticated={isAuthenticated}
-          onLoginClick={() => setIsLoginDrawerOpen(true)}
-          onMenuToggle={() => setIsMenuOpen(v => !v)}
-          onSettingsClick={() => {}}
-          className={styles.header}
-        />
+      {/* ST-3.3: 左侧抽屉 - StepNavigator */}
+      <StepNavigator
+        steps={STEPS}
+        currentStep={currentStep}
+        completedSteps={completedSteps}
+        onStepClick={handleStepClick}
+        className={styles.leftDrawer}
+      />
 
-        {/* ST-3.3: 左侧抽屉 - StepNavigator (Epic4: GridContainer integration) */}
-        <StepNavigator
-          steps={STEPS}
+      {/* ST-3.3: 中心预览区 - 自适应宽度 */}
+      <main className={styles.preview}>
+        <PreviewArea
           currentStep={currentStep}
-          completedSteps={completedSteps}
-          onStepClick={handleStepClick}
-          className={styles.leftDrawer}
+          mermaidCode={currentMermaidCode}
+          boundedContexts={boundedContexts}
+          domainModels={domainModels}
+          businessFlow={businessFlow}
+          isGenerating={isGenerating}
         />
+      </main>
 
-        {/* ST-3.3: 中心预览区 - 自适应宽度 */}
-        <main className={styles.preview}>
-          <PreviewArea
-            currentStep={currentStep}
-            mermaidCode={currentMermaidCode}
-            boundedContexts={boundedContexts}
-            domainModels={domainModels}
-            businessFlow={businessFlow}
-            isGenerating={isGenerating}
-          />
-        </main>
+      {/* ST-1.1 + ST-3.3: 右侧 AI 面板 - 260px 宽 */}
+      <div className={styles.rightDrawer}>
+        <AIPanel
+          isOpen={isAIPanelOpen}
+          messages={adaptedMessages}
+          onClose={() => setIsAIPanelOpen(false)}
+          onSendMessage={handleAIPanelSend}
+          newItemId={newThinkingItemId}
+        />
+      </div>
 
-        {/* ST-1.1 + ST-3.3: 右侧 AI 面板 - 260px 宽 */}
-        <div className={styles.rightDrawer}>
-          <AIPanel
-            isOpen={isAIPanelOpen}
-            messages={adaptedMessages}
-            onClose={() => setIsAIPanelOpen(false)}
-            onSendMessage={handleAIPanelSend}
-            newItemId={newThinkingItemId}
-          />
-        </div>
-
-        {/* ST-2.7: 底部面板 - 380px 固定高度 */}
-        <div className={styles.bottomPanel}>
-          <BottomPanel
-            isGenerating={isGenerating}
-            onAIAsk={(msg) => {
-              if (msg) handleAIPanelSend(msg);
-            }}
-            onDiagnose={handleDiagnose}
-            onOptimize={handleOptimize}
-            onHistory={handleHistory}
-            onSave={handleSave}
-            onRegenerate={handleRegenerate}
-            onCreateProject={handleCreateProject}
-            onSendMessage={handleAIPanelSend}
-            chatHistory={chatHistory}
-          />
-        </div>
-
-      </GridContainer>
+      {/* ST-2.7: 底部面板 - 380px 固定高度 */}
+      <div className={styles.bottomPanel}>
+        <BottomPanel
+          isGenerating={isGenerating}
+          onAIAsk={(msg) => {
+            if (msg) handleAIPanelSend(msg);
+          }}
+          onDiagnose={handleDiagnose}
+          onOptimize={handleOptimize}
+          onHistory={handleHistory}
+          onSave={handleSave}
+          onRegenerate={handleRegenerate}
+          onCreateProject={handleCreateProject}
+          onSendMessage={handleAIPanelSend}
+          chatHistory={chatHistory}
+        />
+      </div>
 
       <LoginDrawer
         isOpen={isLoginDrawerOpen}

@@ -13,10 +13,14 @@
 }
 
 .page {
+  /* ST-3.3: Grid 布局 - 直接在 page 上建立 grid，不依赖中间 wrapper */
+  display: grid;
+  /* 列: 220px(左侧) | 1fr(中央) | 260px(右侧) */
+  grid-template-columns: 220px 1fr 260px;
+  /* 行: 50px(顶栏) | 1fr(主体) | 380px(底部) */
+  grid-template-rows: 50px 1fr 380px;
+  width: 100%;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: #0a0a0f;
   position: relative;
 }
 

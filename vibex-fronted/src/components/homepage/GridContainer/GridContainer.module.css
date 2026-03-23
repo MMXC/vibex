@@ -1,34 +1,6 @@
 /**
  * GridContainer Styles
- * 
- * Responsive grid layout:
- * - 1400px+: 3-column (left: 240px, main: flex, right: 320px)
- * - 1200px: 2-column (hide right panel)
- * - 900px: Single column (hide left panel)
+ *
+ * Grid layout and positioning is defined in src/app/homepage.module.css
+ * (.page for container, .header/.leftDrawer/.preview/.rightDrawer/.bottomPanel for children)
  */
-
-.container {
-  display: grid;
-  /* ST-3.3: 列: 220px | 1fr | 260px; 行: 50px | 1fr | 380px */
-  grid-template-columns: 220px 1fr 260px;
-  grid-template-rows: 50px 1fr 380px;
-  width: 100%;
-  min-height: 100vh;
-  gap: 0;
-}
-
-/* Tablet: hide right panel */
-@media (max-width: 1200px) {
-  .container {
-    grid-template-columns: 200px 1fr;
-    grid-template-rows: 50px 1fr 300px;
-  }
-}
-
-/* Mobile: single column */
-@media (max-width: 900px) {
-  .container {
-    grid-template-columns: 1fr;
-    grid-template-rows: 50px auto 200px 280px;
-  }
-}

@@ -3,19 +3,63 @@
  *
  * Renders a card with:
  * - Title (editable)
- * - Checkbox tree of children
+ * - Checkbox tree of children (lazy-loaded via IntersectionObserver)
  * - Collapse/expand button
  * - Status indicator
+ *
+ * Performance: Non-visible cards show a placeholder until scrolled into view.
  */
 
 'use client';
 
-import React, { memo, useState, useCallback } from 'react';
+import React, { memo, useState, useCallback, useRef, useEffect } from 'react';
 import type { NodeProps } from 'reactflow';
 import type { CardTreeNodeData, CardTreeChild } from '@/types/visualization';
 import styles from './CardTreeNode.module.css';
 
 export type CardTreeNodeProps = NodeProps<CardTreeNodeData>;
+
+// ==================== IntersectionObserver Hook ====================
+
+/**
+ * useIntersectionObserver — tracks whether element is visible in viewport
+ *
+ * Used for lazy loading card content: only render full checkbox tree
+ * when the card is scrolled into view.
+ */
+function useIntersectionObserver(threshold = 0.1): [React.RefObject<HTMLDivElement | null>, boolean] {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    // In SSR or unsupported environments, show content immediately
+    if (typeof IntersectionObserver === 'undefined') {
+      setIsVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          // Once visible, stop observing (no need to keep watching)
+          observer.unobserve(el);
+        }
+      },
+      { threshold }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return [ref, isVisible];
+}
+
+// ==================== CheckboxItem ====================
 
 interface CheckboxItemProps {
   item: CardTreeChild;
@@ -79,11 +123,13 @@ function CheckboxItem({ item, depth, onToggle }: CheckboxItemProps) {
 }
 
 /**
- * CardTreeNode — ReactFlow node component
+ * CardTreeNode — ReactFlow node component with lazy loading
  *
  * Displays a single card in the card tree:
  * - Header with title, status badge, expand/collapse toggle
- * - Checkbox tree of child actions
+ * - Checkbox tree of child actions (lazy-loaded via IntersectionObserver)
+ *
+ * Non-visible cards show a skeleton placeholder for performance.
  */
 export const CardTreeNode = memo(function CardTreeNode({
   data,
@@ -92,6 +138,7 @@ export const CardTreeNode = memo(function CardTreeNode({
   const isExpanded = data.isExpanded !== false; // default to expanded
   const hasChildren = data.children.length > 0;
   const uncheckedCount = data.children.filter((c) => !c.checked).length;
+  const [containerRef, isVisible] = useIntersectionObserver(0.1);
 
   const handleCheckboxToggle = useCallback((childId: string, checked: boolean) => {
     // Parent handles state via onCheckboxToggle callback
@@ -115,10 +162,12 @@ export const CardTreeNode = memo(function CardTreeNode({
 
   return (
     <div
+      ref={containerRef}
       className={`${styles.card} ${selected ? styles.selected : ''}`}
       data-testid="cardtree-node"
+      data-visible={isVisible}
     >
-      {/* Card Header */}
+      {/* Card Header — always visible */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           {data.icon && <span className={styles.icon}>{data.icon}</span>}
@@ -148,10 +197,18 @@ export const CardTreeNode = memo(function CardTreeNode({
         </div>
       </div>
 
-      {/* Card Body — Checkbox Tree */}
+      {/* Card Body — lazy loaded based on visibility */}
       {hasChildren ? (
         <div className={styles.body} data-testid="node-body">
-          {isExpanded ? (
+          {!isVisible ? (
+            /* Skeleton placeholder for non-visible cards */
+            <div className={styles.lazyPlaceholder} data-testid="lazy-placeholder">
+              <div className={styles.lazyBar} style={{ width: '60%' }} />
+              <div className={styles.lazyBar} style={{ width: '80%' }} />
+              <div className={styles.lazyBar} style={{ width: '40%' }} />
+            </div>
+          ) : isExpanded ? (
+            /* Full content when visible */
             data.children.map((item) => (
               <CheckboxItem
                 key={item.id}
@@ -161,6 +218,7 @@ export const CardTreeNode = memo(function CardTreeNode({
               />
             ))
           ) : (
+            /* Collapsed hint when visible but collapsed */
             <div className={styles.collapsedHint} data-testid="collapsed-hint">
               {uncheckedCount > 0
                 ? `${uncheckedCount} 项待完成`

@@ -214,8 +214,7 @@ export function VisualizationPlatform({
 
             {currentType === 'mermaid' && mermaidCode && (
               <LazyMermaidRenderer
-                code={mermaidCode}
-                type="flow"
+                data={{ type: 'mermaid', raw: mermaidCode }}
               />
             )}
 

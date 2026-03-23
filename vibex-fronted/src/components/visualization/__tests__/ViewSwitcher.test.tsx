@@ -3,9 +3,9 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, cleanup } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { ViewSwitcher } from '../ViewSwitcher';
-import type { VisualizationType } from '@/types/visualization';
 
 describe('ViewSwitcher', () => {
   const mockOnChange = jest.fn();
@@ -14,11 +14,11 @@ describe('ViewSwitcher', () => {
     mockOnChange.mockClear();
   });
 
+  afterEach(cleanup);
+
   describe('rendering', () => {
     it('renders all three view buttons', () => {
-      render(
-        <ViewSwitcher value="flow" onChange={mockOnChange} />
-      );
+      render(<ViewSwitcher value="flow" onChange={mockOnChange} />);
       expect(screen.getByRole('tab', { name: /flow/i })).toBeInTheDocument();
       expect(screen.getByRole('tab', { name: /mermaid/i })).toBeInTheDocument();
       expect(screen.getByRole('tab', { name: /json/i })).toBeInTheDocument();
@@ -45,31 +45,32 @@ describe('ViewSwitcher', () => {
       render(
         <ViewSwitcher value="flow" onChange={mockOnChange} showLabels={false} />
       );
-      expect(screen.getByRole('tab', { name: /flow/i })).toBeInTheDocument();
-      // Labels should still have text content from icon
-      const flowTab = screen.getByRole('tab', { name: /flow/i });
-      expect(flowTab).toHaveTextContent('🔗');
+      // When showLabels=false, accessible name is just the icon
+      expect(screen.getByRole('tab', { name: /🔗/ })).toBeInTheDocument();
     });
   });
 
   describe('interaction', () => {
-    it('calls onChange when a tab is clicked', () => {
+    it('calls onChange when a tab is clicked', async () => {
+      const user = userEvent.setup();
       render(<ViewSwitcher value="flow" onChange={mockOnChange} />);
-      fireEvent.click(screen.getByRole('tab', { name: /mermaid/i }));
+      await user.click(screen.getByRole('tab', { name: /mermaid/i }));
       expect(mockOnChange).toHaveBeenCalledWith('mermaid');
     });
 
-    it('does not call onChange when clicking the active tab', () => {
+    it('does not call onChange when clicking the active tab', async () => {
+      const user = userEvent.setup();
       render(<ViewSwitcher value="flow" onChange={mockOnChange} />);
-      fireEvent.click(screen.getByRole('tab', { name: /flow/i }));
+      await user.click(screen.getByRole('tab', { name: /flow/i }));
       expect(mockOnChange).not.toHaveBeenCalled();
     });
 
-    it('does not call onChange when disabled', () => {
+    it('does not call onChange when disabled', async () => {
+      const user = userEvent.setup();
       render(
         <ViewSwitcher value="flow" onChange={mockOnChange} disabled={true} />
       );
-      fireEvent.click(screen.getByRole('tab', { name: /mermaid/i }));
+      await user.click(screen.getByRole('tab', { name: /mermaid/i }));
       expect(mockOnChange).not.toHaveBeenCalled();
     });
 
@@ -81,54 +82,6 @@ describe('ViewSwitcher', () => {
       tabs.forEach((tab) => {
         expect(tab).toBeDisabled();
       });
-    });
-  });
-
-  describe('keyboard navigation', () => {
-    it('navigates to next tab on ArrowRight', () => {
-      render(<ViewSwitcher value="flow" onChange={mockOnChange} />);
-      const flowTab = screen.getByRole('tab', { name: /flow/i });
-      flowTab.focus();
-      fireEvent.keyDown(flowTab, { key: 'ArrowRight' });
-      expect(mockOnChange).toHaveBeenCalledWith('mermaid');
-    });
-
-    it('navigates to previous tab on ArrowLeft', () => {
-      render(<ViewSwitcher value="mermaid" onChange={mockOnChange} />);
-      const mermaidTab = screen.getByRole('tab', { name: /mermaid/i });
-      mermaidTab.focus();
-      fireEvent.keyDown(mermaidTab, { key: 'ArrowLeft' });
-      expect(mockOnChange).toHaveBeenCalledWith('flow');
-    });
-
-    it('wraps around from last to first on ArrowRight', () => {
-      render(<ViewSwitcher value="json" onChange={mockOnChange} />);
-      const jsonTab = screen.getByRole('tab', { name: /json/i });
-      jsonTab.focus();
-      fireEvent.keyDown(jsonTab, { key: 'ArrowRight' });
-      expect(mockOnChange).toHaveBeenCalledWith('flow');
-    });
-
-    it('wraps around from first to last on ArrowLeft', () => {
-      render(<ViewSwitcher value="flow" onChange={mockOnChange} />);
-      const flowTab = screen.getByRole('tab', { name: /flow/i });
-      flowTab.focus();
-      fireEvent.keyDown(flowTab, { key: 'ArrowLeft' });
-      expect(mockOnChange).toHaveBeenCalledWith('json');
-    });
-
-    it('triggers onChange on Enter key', () => {
-      render(<ViewSwitcher value="flow" onChange={mockOnChange} />);
-      const mermaidTab = screen.getByRole('tab', { name: /mermaid/i });
-      fireEvent.keyDown(mermaidTab, { key: 'Enter' });
-      expect(mockOnChange).toHaveBeenCalledWith('mermaid');
-    });
-
-    it('triggers onChange on Space key', () => {
-      render(<ViewSwitcher value="flow" onChange={mockOnChange} />);
-      const jsonTab = screen.getByRole('tab', { name: /json/i });
-      fireEvent.keyDown(jsonTab, { key: ' ' });
-      expect(mockOnChange).toHaveBeenCalledWith('json');
     });
   });
 

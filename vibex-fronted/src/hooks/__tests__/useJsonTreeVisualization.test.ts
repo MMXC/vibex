@@ -97,7 +97,8 @@ describe('useJsonTreeVisualization', () => {
       );
 
       expect(result.current.isReady).toBe(true);
-      expect(result.current.totalCount).toBe(4); // root + 3 items
+      // root + 3 items (objects) + 3 'id' properties = 7 nodes
+      expect(result.current.totalCount).toBe(7);
     });
 
     it('should parse deep nested object', () => {
@@ -200,8 +201,9 @@ describe('useJsonTreeVisualization', () => {
         result.current.expandAll();
       });
 
-      // All expandable nodes should be in expandedIds
-      expect(result.current.expandedIds.size).toBe(result.current.totalCount);
+      // Only expandable nodes (nodes with children) should be in expandedIds
+      // NESTED_OBJECT has expandable nodes: root, user, profile, tags = 4
+      expect(result.current.expandedIds.size).toBe(4);
     });
 
     it('should collapse all nodes', () => {
@@ -213,7 +215,7 @@ describe('useJsonTreeVisualization', () => {
       act(() => {
         result.current.expandAll();
       });
-      expect(result.current.expandedIds.size).toBe(result.current.totalCount);
+      expect(result.current.expandedIds.size).toBe(4);
 
       // Then collapse all
       act(() => {

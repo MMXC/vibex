@@ -4,7 +4,14 @@
 
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { JsonTreeRenderer } from '../JsonTreeRenderer';
+import { JsonTreeRenderer } from '../JsonTreeRenderer/JsonTreeRenderer';
+
+// Mock ResizeObserver
+global.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
 
 describe('JsonTreeRenderer', () => {
   const sampleJson = {

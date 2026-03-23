@@ -91,8 +91,9 @@ function parseJsonToTree(
   if ((type === 'object' || type === 'array') && depth < maxDepth) {
     const entries: [string, unknown][] = type === 'array' ? (value as unknown[]).map((v, i) => [String(i), v]) : Object.entries(value as object);
     node.children = entries.map((entry, index) => {
-      const [childKey, childValue] =
-        type === 'array' ? [String(index), entry] : [entry[0], entry[1]];
+      const [childKey, childValue] = type === 'array'
+        ? [String(index), entry[1]]
+        : [entry[0], entry[1]];
       return parseJsonToTree(childKey, childValue, depth + 1, nodePath, maxDepth);
     });
     node.isLeaf = false;
@@ -149,7 +150,9 @@ function flattenTree(
 /**
  * Check if a node or any descendant matches a search query
  */
-function hasMatchingDescendant(node: JsonTreeNode, query: string): boolean {
+function hasMatchingDescendant(node: JsonTreeNode, query: string, visited = new Set<string>()): boolean {
+  if (!node || visited.has(node.id)) return false;
+  visited.add(node.id);
   if (node.key.toLowerCase().includes(query)) return true;
   if (
     node.isLeaf &&
@@ -158,7 +161,7 @@ function hasMatchingDescendant(node: JsonTreeNode, query: string): boolean {
     return true;
   if (node.children) {
     return node.children.some((child) =>
-      hasMatchingDescendant(child, query)
+      hasMatchingDescendant(child, query, visited)
     );
   }
   return false;
@@ -167,12 +170,13 @@ function hasMatchingDescendant(node: JsonTreeNode, query: string): boolean {
 /**
  * Count total nodes in tree
  */
-function countNodes(node: JsonTreeNode | null): number {
-  if (!node) return 0;
+function countNodes(node: JsonTreeNode | null, visited = new Set<string>()): number {
+  if (!node || visited.has(node.id)) return 0;
+  visited.add(node.id);
   let count = 1;
   if (node.children) {
     for (const child of node.children) {
-      count += countNodes(child);
+      count += countNodes(child, visited);
     }
   }
   return count;
@@ -204,13 +208,14 @@ function getNodePath(
 /**
  * Get all expandable node IDs for expandAll
  */
-function getAllExpandableIds(node: JsonTreeNode | null): string[] {
-  if (!node) return [];
+function getAllExpandableIds(node: JsonTreeNode | null, visited = new Set<string>()): string[] {
+  if (!node || visited.has(node.id)) return [];
+  visited.add(node.id);
   const ids: string[] = [];
   if (node.children && node.children.length > 0) {
     ids.push(node.id);
     for (const child of node.children) {
-      ids.push(...getAllExpandableIds(child));
+      ids.push(...getAllExpandableIds(child, visited));
     }
   }
   return ids;

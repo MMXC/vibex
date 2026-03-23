@@ -109,10 +109,10 @@ def extract_keywords(text: str) -> set[str]:
         bigram = chinese_chars[i] + chinese_chars[i + 1]
         keywords.add(bigram)
     
-    # 4-5. 过滤停用词和长度 < 3 的词
+    # 4-5. 过滤停用词和长度 < 2 的词（保留中文bigram和英文短词）
     keywords = {
         w for w in keywords
-        if w not in STOPWORDS and len(w) >= 3
+        if w not in STOPWORDS and len(w) >= 2
     }
     
     return keywords

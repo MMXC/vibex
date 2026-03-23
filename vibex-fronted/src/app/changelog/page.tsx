@@ -18,6 +18,15 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.84',
+    date: '2026-03-24',
+    changes: [
+      '🔧 dedup: 修复关键词提取 len>=3 过度过滤中文 bigram 问题',
+      '📝 dedup tests: 修正 test_basic_chinese/test_short_word_filter 断言',
+    ],
+    commit: 'fix-dedup-keyword',
+  },
+  {
     version: '1.0.83',
     date: '2026-03-24',
     changes: [

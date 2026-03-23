@@ -32,13 +32,13 @@ class TestExtractKeywords:
     """F1: 关键词提取测试"""
     
     def test_basic_chinese(self):
-        """测试中文分词（len >= 3 过滤所有2字符 bigrams）"""
+        """测试中文分词（len >= 2 保留中文bigram）"""
         kw = extract_keywords("建立提案重复检测机制")
-        # With len >= 3, all 2-char bigrams are filtered → empty result
+        # With len >= 2, bigrams like "提案", "重复" are kept
         assert isinstance(kw, set)
         kw2 = extract_keywords("API接口开发测试项目")
         assert "api" in kw2  # English 3+ chars passes
-        assert "test" in kw2  # English 4 chars passes
+        assert "测试" in kw2  # Chinese bigram preserved with len >= 2
     
     def test_chinese_stopwords_filter(self):
         """测试中文停用词过滤"""
@@ -57,13 +57,12 @@ class TestExtractKeywords:
         assert "fox" in kw
     
     def test_short_word_filter(self):
-        """测试短词过滤（长度 < 3）"""
-        kw = extract_keywords("ab cd ef xyz")
-        assert "a" not in kw
-        assert "ab" not in kw  # len=2, filtered
-        assert "cd" not in kw  # len=2, filtered
-        assert "ef" not in kw  # len=2, filtered
-        assert "xyz" in kw     # len=3, passes
+        """测试短词过滤（长度 < 2）"""
+        kw = extract_keywords("a ab abc xyz")
+        assert "a" not in kw   # len=1, filtered
+        assert "ab" in kw       # len=2, kept (min=2)
+        assert "abc" in kw      # len=3, passes
+        assert "xyz" in kw      # len=3, passes
     
     def test_case_insensitive(self):
         """测试大小写不敏感"""
@@ -84,10 +83,10 @@ class TestExtractKeywords:
         assert kw == set()
     
     def test_mixed_chinese_english(self):
-        """测试中英混合（英文3+chars通过，中文bigrams被len>=3过滤）"""
+        """测试中英混合（英文3+chars通过，中文bigrams被len>=2保留）"""
         kw = extract_keywords("API接口开发")
-        assert "api" in kw  # English: 3+ chars
-        # Chinese bigrams (2 chars) are filtered by len >= 3
+        assert "api" in kw   # English: 3+ chars
+        assert "接口" in kw  # Chinese bigram preserved with len >= 2
 
 
 class TestSimilarityScore:

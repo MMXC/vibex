@@ -4,10 +4,12 @@
  * 支持两种模式：
  * 1. 旧版：content, isLoading (用于 step 组件)
  * 2. 新版：currentStep, mermaidCode 等 (用于垂直布局)
+ * 3. CardTree 模式：NEXT_PUBLIC_USE_CARD_TREE=true 时显示卡片树
  */
 import React, { useState, useMemo, useEffect } from 'react';
 import { MermaidPreview } from '@/components/ui/MermaidPreview';
 import { NodeTreeSelector } from './NodeTreeSelector';
+import { CardTreeView, IS_CARD_TREE_ENABLED } from '@/components/homepage/CardTree/CardTreeView';
 import { useConfirmationStore } from '@/stores/confirmationStore';
 import styles from './PreviewArea.module.css';
 import type { BoundedContext, DomainModel, BusinessFlow } from '@/types/homepage';
@@ -35,6 +37,10 @@ export interface VerticalPreviewProps {
   isGenerating?: boolean;
   /** 步骤配置 */
   steps?: Array<{ id: number; label: string; description: string }>;
+  /** 强制使用 CardTree 视图 (Feature Flag) */
+  useCardTree?: boolean;
+  /** 项目 ID (用于 CardTree 数据获取) */
+  projectId?: string | null;
 }
 
 // 合并类型
@@ -60,6 +66,8 @@ export const PreviewArea: React.FC<PreviewAreaAllProps> = ({
   businessFlow = null,
   isGenerating = false,
   steps = DEFAULT_STEPS,
+  useCardTree: useCardTreeProp,
+  projectId,
 }) => {
   const [showNodeTree, setShowNodeTree] = useState(true);
   const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set());
@@ -81,6 +89,9 @@ export const PreviewArea: React.FC<PreviewAreaAllProps> = ({
 
   // 检测是否使用新版布局
   const isNewLayout = currentStep !== undefined;
+
+  // Epic2: CardTree Feature Flag - 支持 props 覆盖和环境变量
+  const useCardTree = useCardTreeProp ?? IS_CARD_TREE_ENABLED;
 
   // 从 boundedContexts 生成节点数据
   const nodes = useMemo(() => {
@@ -166,31 +177,42 @@ export const PreviewArea: React.FC<PreviewAreaAllProps> = ({
 
       {/* 主内容区 */}
       <div className={styles.content}>
-        {/* Mermaid 图表区域 */}
-        <div className={styles.diagramContainer}>
-          {effectiveLoading ? (
-            <div className={styles.loading}>
-              <div className={styles.spinner}></div>
-              <p>AI 正在分析需求...</p>
-            </div>
-          ) : (storeFlowMermaidCode || mermaidCode) ? (
-            <MermaidPreview 
-              code={storeFlowMermaidCode || mermaidCode || ''} 
-              diagramType="graph"
-              height="100%"
+        {/* Epic2: CardTree 视图 - Feature Flag 启用时显示 */}
+        {useCardTree ? (
+          <div className={styles.diagramContainer}>
+            <CardTreeView
+              projectId={projectId}
+              className={styles.cardTreeFull}
+              data-testid="preview-cardtree"
             />
-          ) : (
-            <div className={styles.placeholder}>
-              <div className={styles.placeholderContent}>
-                <span className={styles.placeholderIcon}>🎯</span>
-                <p>输入需求后，这里将显示 DDD 分析结果</p>
-                <p className={styles.placeholderHint}>
-                  限界上下文 → 领域模型 → 业务流程
-                </p>
+          </div>
+        ) : (
+          /* Mermaid 图表区域 */
+          <div className={styles.diagramContainer}>
+            {effectiveLoading ? (
+              <div className={styles.loading}>
+                <div className={styles.spinner}></div>
+                <p>AI 正在分析需求...</p>
               </div>
-            </div>
-          )}
-        </div>
+            ) : (storeFlowMermaidCode || mermaidCode) ? (
+              <MermaidPreview 
+                code={storeFlowMermaidCode || mermaidCode || ''} 
+                diagramType="graph"
+                height="100%"
+              />
+            ) : (
+              <div className={styles.placeholder}>
+                <div className={styles.placeholderContent}>
+                  <span className={styles.placeholderIcon}>🎯</span>
+                  <p>输入需求后，这里将显示 DDD 分析结果</p>
+                  <p className={styles.placeholderHint}>
+                    限界上下文 → 领域模型 → 业务流程
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* 节点树选择器 - 仅在有上下文时显示 */}
         {showNodeTree && nodes.length > 0 && (

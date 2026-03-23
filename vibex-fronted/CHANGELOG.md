@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Epic: vibex-reactflow-visualization Epic1-6 Review (vibex-reactflow-visualization) (2026-03-23)
+
+#### Review Approved (✅ PASSED)
+- **Epic1 (Types + Zustand Store)**: Unified type system with VisualizationType discriminated union, Zustand persist store — architecture clean, no security issues
+- **Epic2 (FlowRenderer)**: ReactFlow-based flow visualization with node/edge CRUD, auto-layout — performance and accessibility solid
+- **Epic3 (MermaidRenderer, DOMPurify)**: Mermaid diagram rendering with XSS mitigation via DOMPurify — CONDITIONAL PASS (DOMPurify config needs review for SSR)
+- **Epic4 (JsonTreeRenderer)**: JSON tree with virtualization for large datasets — PASSED, excellent performance
+- **Epic5 (ViewSwitcher)**: Tab-based multi-view switching with excellent accessibility — PASSED, ARIA compliant
+- **Epic6 (Performance Optimization)**: useCallback全覆盖、懒加载+Suspense、LRU缓存、Bundle代码分割 — all optimizations in place
+
+#### Review Reports
+- `docs/review-reports/20260323/review-vibex-reactflow-epic1.md`
+- `docs/review-reports/20260323/review-vibex-reactflow-epic2.md`
+- `docs/review-reports/20260323/review-vibex-reactflow-epic3.md` (CONDITIONAL)
+- `docs/review-reports/20260323/review-vibex-reactflow-epic4.md`
+- `docs/review-reports/20260323/review-vibex-reactflow-epic5.md`
+- `docs/review-reports/20260323/review-vibex-reactflow-epic6.md`
+
 ### Epic: Proposal Collection Parser & Validator (reviewer-epic2-proposalcollection-fix) (2026-03-23)
 
 #### Added

@@ -6,6 +6,7 @@ import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import HomePage from '../app/page';
+import { ToastProvider } from '@/components/ui/Toast';
 
 // Create a wrapper with QueryClientProvider
 const createWrapper = () => {
@@ -17,9 +18,11 @@ const createWrapper = () => {
   });
   return function Wrapper({ children }: { children: React.ReactNode }) {
     return (
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
+      <ToastProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </ToastProvider>
     );
   };
 };

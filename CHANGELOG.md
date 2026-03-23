@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+### Added (ReactFlow Visualization - Epic1-6) — 2026-03-23
+- **统一类型系统**: VisualizationType discriminated union (flow/mermaid/json)
+- **Zustand Store**: visualizationStore 统一管理三种视图状态 + persist
+- **FlowRenderer**: ReactFlow 流程图组件，支持 minimap/节点点击/store 同步
+- **MermaidRenderer**: Mermaid 图表组件，DOMPurify XSS 防护
+- **JsonTreeRenderer**: 虚拟化 JSON 树（1000+ 节点），ResizeObserver 动态高度
+- **ViewSwitcher**: Tab 切换三视图，ARIA accessibility + 键盘导航
+- **性能调优**: useCallback hooks 全覆盖 + Suspense 懒加载 + LRU 缓存
+
+### Added (taskmanager SyntaxWarning 修复) — 2026-03-23
+- **SyntaxWarning 修复**: % 格式化替换为 f-strings，编译零警告
+- **测试覆盖**: pytest 13/13 全绿
+
+
 ## [Epic3 Fix] - 2026-03-22
 
 ### Fixed

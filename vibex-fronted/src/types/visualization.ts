@@ -12,7 +12,7 @@ import type { Node, Edge } from 'reactflow';
 // ==================== Visualization Type System ====================
 
 /** Supported visualization modes */
-export type VisualizationType = 'flow' | 'mermaid' | 'json';
+export type VisualizationType = 'flow' | 'mermaid' | 'json' | 'cardtree';
 
 /** Visualization data — generic wrapper */
 export interface VisualizationData<T = unknown> {
@@ -65,6 +65,51 @@ export interface MermaidNodeInfo {
   raw?: string;
 }
 
+// ==================== Card Tree Visualization Types ====================
+
+/** CardTree child item (checkbox row) */
+export interface CardTreeChild {
+  id: string;
+  label: string;
+  checked: boolean;
+  description?: string;
+  /** Action triggered on click */
+  action?: string;
+  /** Children (nested sub-items) */
+  children?: CardTreeChild[];
+  /** Whether children are expanded */
+  isExpanded?: boolean;
+}
+
+/** CardTree node data */
+export interface CardTreeNodeData {
+  /** Card title (e.g., "业务流程分析") */
+  title: string;
+  /** Optional description */
+  description?: string;
+  /** Card status */
+  status: 'pending' | 'in-progress' | 'done' | 'error';
+  /** Child items with checkbox state */
+  children: CardTreeChild[];
+  /** Whether all children are expanded */
+  isExpanded?: boolean;
+  /** Icon/emoji */
+  icon?: string;
+  /** Timestamp of last update */
+  updatedAt?: string;
+}
+
+/** CardTree visualization data */
+export interface CardTreeVisualizationData extends VisualizationData<CardTreeVisualizationRaw> {
+  type: 'cardtree';
+}
+
+export interface CardTreeVisualizationRaw {
+  nodes: CardTreeNodeData[];
+  projectId?: string;
+  name?: string;
+}
+
 // ==================== JSON Tree Visualization Types ====================
 
 /** JSON tree node for virtualized rendering */
@@ -96,7 +141,8 @@ export interface JsonTreeVisualizationRaw {
 export type AnyVisualizationData =
   | FlowVisualizationData
   | MermaidVisualizationData
-  | JsonTreeVisualizationData;
+  | JsonTreeVisualizationData
+  | CardTreeVisualizationData;
 
 // ==================== useVisualization Options ====================
 

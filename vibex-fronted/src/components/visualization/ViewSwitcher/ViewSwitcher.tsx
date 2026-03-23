@@ -32,9 +32,14 @@ const VIEW_CONFIG: Record<
     icon: '🌳',
     description: 'JSON 树视图',
   },
+  cardtree: {
+    label: 'Card',
+    icon: '📋',
+    description: '卡片树视图',
+  },
 };
 
-const VIEW_ORDER: VisualizationType[] = ['flow', 'mermaid', 'json'];
+const VIEW_ORDER: VisualizationType[] = ['cardtree', 'flow', 'mermaid', 'json'];
 
 // ==================== Props ====================
 

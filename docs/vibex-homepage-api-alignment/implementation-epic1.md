@@ -37,8 +37,8 @@
 - selectedNodeId、options 同步
 
 ## 验收标准
-- [ ] CardTreeNode 自定义节点渲染
-- [ ] React Query hook 带 mock 降级
-- [ ] Feature Flag 控制
-- [ ] npm test 通过
-- [ ] 代码 commit
+- [x] CardTreeNode 自定义节点渲染 (12 tests pass)
+- [x] React Query hook 带 mock 降级 (useProjectTree.ts)
+- [x] Feature Flag 控制 (NEXT_PUBLIC_USE_CARD_TREE)
+- [x] npm test 通过 (16 tests: CardTreeNode 12 + useProjectTree 4)
+- [x] 代码 commit (f48f6653)

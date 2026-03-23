@@ -69,9 +69,6 @@ export default function HomePage() {
   const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAIPanelOpen, setIsAIPanelOpen] = useState(true);
-  const [isLeftDrawerCollapsed, setIsLeftDrawerCollapsed] = useState(false);
-  const [isRightDrawerCollapsed, setIsRightDrawerCollapsed] = useState(false);
-  const [isBottomPanelCollapsed, setIsBottomPanelCollapsed] = useState(false);
 
   // 根据当前步骤返回对应 Mermaid 代码 (Epic 3: 4步流程)
   const currentMermaidCode = useMemo(() => {
@@ -131,17 +128,13 @@ export default function HomePage() {
       />
 
       {/* ST-3.3: 左侧抽屉 - StepNavigator */}
-      <div
-        className={`${styles.leftDrawer} ${isLeftDrawerCollapsed ? styles.collapsed : ''}`}
-        style={{ width: isLeftDrawerCollapsed ? 0 : undefined }}
-      >
-        <StepNavigator
-          steps={STEPS}
-          currentStep={currentStep}
-          completedSteps={completedSteps}
-          onStepClick={handleStepClick}
-        />
-      </div>
+      <StepNavigator
+        steps={STEPS}
+        currentStep={currentStep}
+        completedSteps={completedSteps}
+        onStepClick={handleStepClick}
+        className={styles.leftDrawer}
+      />
 
       {/* ST-3.3: 中心预览区 - 自适应宽度 */}
       <main className={styles.preview}>
@@ -156,21 +149,18 @@ export default function HomePage() {
       </main>
 
       {/* ST-1.1 + ST-3.3: 右侧 AI 面板 - 260px 宽 */}
-      <div className={`${styles.rightDrawer} ${isRightDrawerCollapsed ? styles.collapsed : ''}`}>
+      <div className={styles.rightDrawer}>
         <AIPanel
           isOpen={isAIPanelOpen}
           messages={adaptedMessages}
-          onClose={() => {
-            setIsAIPanelOpen(false);
-            setIsRightDrawerCollapsed(true);
-          }}
+          onClose={() => setIsAIPanelOpen(false)}
           onSendMessage={handleAIPanelSend}
           newItemId={newThinkingItemId}
         />
       </div>
 
       {/* ST-2.7: 底部面板 - 380px 固定高度 */}
-      <div className={`${styles.bottomPanel} ${isBottomPanelCollapsed ? styles.collapsed : ''}`}>
+      <div className={styles.bottomPanel}>
         <BottomPanel
           isGenerating={isGenerating}
           onAIAsk={(msg) => {
@@ -184,7 +174,6 @@ export default function HomePage() {
           onCreateProject={handleCreateProject}
           onSendMessage={handleAIPanelSend}
           chatHistory={chatHistory}
-          onCollapseToggle={(collapsed) => setIsBottomPanelCollapsed(collapsed)}
         />
       </div>
 

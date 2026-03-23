@@ -1482,9 +1482,8 @@
   /* Grid 布局: Header(50px) | Content(1fr) | Bottom(380px) */
   /* 列: 220px | 1fr | 260px */
   display: grid;
-  /* 使用 CSS 变量支持动态收起 */
-  grid-template-rows: var(--bottom-height, 380px);
-  grid-template-columns: var(--left-width, 220px) 1fr var(--right-width, 260px);
+  grid-template-rows: 50px 1fr 380px;
+  grid-template-columns: 220px 1fr 260px;
   min-height: 100vh;
   background: var(--color-bg-secondary, #f9fafb);
 }
@@ -1500,14 +1499,6 @@
   background: var(--color-bg-secondary, #f9fafb);
   border-right: 1px solid var(--color-border, #e5e7eb);
   overflow-y: auto;
-  transition: width 0.3s ease, opacity 0.3s ease;
-}
-
-.leftDrawer.collapsed {
-  width: 0 !important;
-  visibility: hidden;
-  overflow: hidden;
-  border-right: none;
 }
 
 .preview {
@@ -1523,26 +1514,11 @@
   background: var(--color-bg-primary, #ffffff);
   border-left: 1px solid var(--color-border, #e5e7eb);
   overflow-y: auto;
-  transition: width 0.3s ease, opacity 0.3s ease;
-}
-
-.rightDrawer.collapsed {
-  width: 0 !important;
-  visibility: hidden;
-  overflow: hidden;
-  border-left: none;
 }
 
 .bottomPanel {
   grid-column: 1 / -1;
   grid-row: 3;
-  transition: height 0.3s ease;
-}
-
-.bottomPanel.collapsed {
-  height: 0 !important;
-  visibility: hidden;
-  overflow: hidden;
 }
 
 /* ST-2.7: 底部面板 4 个子组件全部可见 — 已在 BottomPanel 组件内部管理 */

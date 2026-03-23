@@ -42,43 +42,57 @@ interface FlowDataResponse {
 
 async function fetchFlowData(projectId: string): Promise<CardTreeVisualizationRaw> {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
-  const res = await fetch(`${baseUrl}/api/flow-data?projectId=${projectId}`);
-  if (!res.ok) throw new Error(`Failed to fetch flow data: ${res.status}`);
-  const data: FlowDataResponse = await res.json();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10_000);
+  try {
+    const res = await fetch(`${baseUrl}/api/flow-data?projectId=${projectId}`, {
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    if (!res.ok) throw new Error(`Failed to fetch flow data: ${res.status}`);
+    const data: FlowDataResponse = await res.json();
 
-  // Parse FlowData into CardTree format
-  if (data.flowData) {
-    interface FlowNode {
-      title?: string;
-      label?: string;
-      id?: string;
-      description?: string;
-      status?: CardTreeVisualizationRaw['nodes'][number]['status'];
-      icon?: string;
-      children?: Array<{ id?: string; label?: string; checked?: boolean; description?: string; action?: string }>;
-    }
-    const rawNodes = JSON.parse(data.flowData.nodes) as FlowNode[];
-    return {
-      nodes: rawNodes.map((n) => ({
-        title: String(n.title || n.label || n.id || 'Untitled'),
-        description: n.description,
-        status: n.status || 'pending',
-        icon: n.icon,
-        children: (n.children || []).map((c) => ({
-          id: String(c.id || ''),
-          label: String(c.label || ''),
-          checked: Boolean(c.checked),
-          description: c.description,
-          action: c.action,
+    // Parse FlowData into CardTree format
+    if (data.flowData) {
+      interface FlowNode {
+        title?: string;
+        label?: string;
+        id?: string;
+        description?: string;
+        status?: CardTreeVisualizationRaw['nodes'][number]['status'];
+        icon?: string;
+        children?: Array<{ id?: string; label?: string; checked?: boolean; description?: string; action?: string }>;
+      }
+      const rawNodes = JSON.parse(data.flowData.nodes) as FlowNode[];
+      return {
+        nodes: rawNodes.map((n) => ({
+          title: String(n.title || n.label || n.id || 'Untitled'),
+          description: n.description,
+          status: n.status || 'pending',
+          icon: n.icon,
+          children: (n.children || []).map((c) => ({
+            id: String(c.id || ''),
+            label: String(c.label || ''),
+            checked: Boolean(c.checked),
+            description: c.description,
+            action: c.action,
+          })),
+          updatedAt: data.flowData!.updatedAt,
         })),
-        updatedAt: data.flowData!.updatedAt,
-      })),
-      projectId: data.flowData.projectId,
-      name: data.flowData.name,
-    };
-  }
+        projectId: data.flowData.projectId,
+        name: data.flowData.name,
+      };
+    }
 
-  return { nodes: [] };
+    return { nodes: [] };
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new Error('请求超时（10秒）');
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 // ==================== Mock Data ====================

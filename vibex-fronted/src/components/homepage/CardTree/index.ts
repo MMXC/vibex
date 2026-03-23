@@ -15,3 +15,6 @@ export { CardTreeSkeleton } from './CardTreeSkeleton';
 export type { CardTreeSkeletonProps } from './CardTreeSkeleton';
 
 export { FeatureFlagToggle } from './FeatureFlagToggle';
+
+export { CardTreeError } from './CardTreeError';
+export type { CardTreeErrorProps } from './CardTreeError';

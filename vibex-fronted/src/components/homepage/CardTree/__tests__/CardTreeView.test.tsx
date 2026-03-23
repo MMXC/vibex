@@ -159,6 +159,21 @@ describe('CardTreeView', () => {
       fireEvent.click(retryBtn);
       expect(refetch).toHaveBeenCalled();
     });
+
+    it('should show timeout message when request times out (> 10s)', () => {
+      const { useProjectTree } = jest.requireMock('@/hooks/useProjectTree') as { useProjectTree: jest.Mock };
+      useProjectTree.mockReturnValue({
+        data: null,
+        isLoading: false,
+        error: new Error('请求超时（10秒）'),
+        isMockData: false,
+        refetch: jest.fn(),
+      });
+
+      render(<CardTreeView forceEnabled />);
+      expect(screen.queryByTestId('cardtree-error')).toBeTruthy();
+      expect(screen.getByText(/请求超时/i)).toBeInTheDocument();
+    });
   });
 
   describe('Empty State', () => {

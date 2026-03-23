@@ -13,6 +13,7 @@ import React, { useCallback, useState } from 'react';
 import { CardTreeRenderer } from '@/components/visualization/CardTreeRenderer/CardTreeRenderer';
 import { useProjectTree } from '@/hooks/useProjectTree';
 import { CardTreeSkeleton } from './CardTreeSkeleton';
+import { CardTreeError } from './CardTreeError';
 import type { CardTreeVisualizationRaw } from '@/types/visualization';
 import styles from './CardTree.module.css';
 
@@ -36,30 +37,6 @@ export interface CardTreeViewProps {
   /** Custom class name */
   className?: string;
   'data-testid'?: string;
-}
-
-// ==================== Error View ====================
-
-interface ErrorViewProps {
-  message: string;
-  onRetry: () => void;
-}
-
-function CardTreeError({ message, onRetry }: ErrorViewProps) {
-  return (
-    <div className={styles.error} data-testid="cardtree-error">
-      <span className={styles.errorIcon}>⚠️</span>
-      <p className={styles.errorText}>{message}</p>
-      <button
-        type="button"
-        onClick={onRetry}
-        className={styles.retryButton}
-        data-testid="retry-button"
-      >
-        重试
-      </button>
-    </div>
-  );
 }
 
 // ==================== Main Component ====================

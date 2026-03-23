@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Epic: vibex-homepage-api-alignment Epic3-5 Review (2026-03-23)
+- **Epic3 (首页集成)**: ✅ PASSED
+  - `CardTreeView` — 集成到首页 PreviewArea，Feature Flag 控制
+  - `CardTreeSkeleton` — 骨架屏组件
+  - `FeatureFlagToggle` — Feature Flag 切换组件
+  - 30 tests passed (CardTreeView + CardTreeSkeleton + FeatureFlagToggle)
+  - Commit: `8c3f52da`
+- **Epic4 (错误处理与降级)**: ✅ PASSED
+  - `CardTreeError` — 错误边界组件，timeout 检测
+  - `useCardTreeError` hook — 错误状态管理
+  - Commit: `e574195c`
+- **Epic5 (性能优化)**: ✅ PASSED
+  - `IntersectionObserver` — 懒加载渲染
+  - `useCardTreeVisibility` hook — 可见性检测
+  - Commit: `3a11dc4a`
+
 ### Epic: vibex-homepage-api-alignment Epic1 Review (2026-03-23)
 - **Epic1 (数据层)**: ⚠️ CONDITIONAL PASS
   - `useProjectTree()` — React Query hook，mock data fallback，Feature Flag 控制 ✅

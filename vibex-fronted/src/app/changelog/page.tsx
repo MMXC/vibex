@@ -18,6 +18,15 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.85',
+    date: '2026-03-24',
+    changes: [
+      '✅ homepage-cardtree-debug/Epic3: UI 交互验证测试通过 (10/10)',
+      '🔧 PreviewArea: 修复 ESLint unused-vars 警告 (prefix _domainModels/_businessFlow)',
+    ],
+    commit: '6369538e',
+  },
+  {
     version: '1.0.84',
     date: '2026-03-24',
     changes: [

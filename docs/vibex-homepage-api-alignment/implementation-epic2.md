@@ -37,9 +37,9 @@
 4. **测试切换** — 验证两种视图都能正常工作
 
 ## 验收标准
-- [ ] Feature Flag off → 显示原有 MermaidPreview
-- [ ] Feature Flag on → 显示 CardTreeView
-- [ ] CardTreeView 正确渲染 useProjectTree 数据
-- [ ] 展开/折叠交互正常
-- [ ] npm test 通过
-- [ ] 代码 commit
+- [x] Feature Flag off → 显示原有 MermaidPreview
+- [x] Feature Flag on → 显示 CardTreeView
+- [x] CardTreeView 正确渲染 useProjectTree 数据
+- [x] 展开/折叠交互正常
+- [x] npm test 通过 (66 tests pass)
+- [x] 代码 commit (7322707c)

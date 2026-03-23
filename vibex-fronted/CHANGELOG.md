@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Epic: Proposal Collection Parser & Validator (reviewer-epic2-proposalcollection-fix) (2026-03-23)
+
+#### Added
+- **proposals/parser.ts**: TypeScript proposal markdown parser
+  - Parse agent proposal files from `/root/.openclaw/proposals/<date>/` and `/root/.openclaw/vibex/proposals/<date>/`
+  - Extract structured fields: id, title, description, improvement, benefit, effort, priority, tags
+  - Handle multiple proposal block formats including "提案 <id>" headers
+- **proposals/validator.ts**: TypeScript proposal validator
+  - Validate required fields (title, description, priority)
+  - Priority whitelist: P0/P1/P2/P3
+  - Effort validation with warnings for unusual values
+  - Title length checks (5-200 chars), description min length (10 chars)
+  - Structured error objects with field, message, proposalId, severity
+- **proposals/parser.test.ts**: 15 tests covering parseProposalsFile, listProposals, edge cases
+- **proposals/validator.test.ts**: 19 tests covering all validation rules, error severity, mixed proposals
+
+#### Rejected (reviewer)
+- **Python scripts rejected**: `scripts/proposal_parser.py` and `scripts/proposal_validator.py` not suitable for Next.js frontend (cannot import Python from TypeScript)
+- **Root cause**: Python implementation lacked unit tests and couldn't be used by API routes
+
+#### Testing
+- 34 new tests passing, all 179 suites (2137 tests) continue to pass
+- Build verified: `next build` passes with no TypeScript errors
+
 ### Epic: ThemeWrapper Timing Bug Fix (homepage-theme-wrapper-timing-fix) (2026-03-22)
 
 #### Fixed

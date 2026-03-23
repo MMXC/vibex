@@ -16,7 +16,7 @@
  */
 
 import { readFileSync, existsSync } from 'fs';
-import { join, resolve, dirname } from 'path';
+import { join } from 'path';
 
 export const PROPOSALS_DIR = '/root/.openclaw/proposals';
 export const VIBEX_PROPOSALS_DIR = '/root/.openclaw/vibex/proposals';
@@ -85,7 +85,7 @@ function parseProposalBlock(block: string, agent: string, date: string): Proposa
   if (block.length < 10) return null;
 
   const idMatch = PROPOSAL_ID_RE.exec(block);
-  let proposalId = idMatch?.[1]?.trim() ?? '1';
+  const proposalId = idMatch?.[1]?.trim() ?? '1';
   let title = idMatch?.[2]?.trim() ?? '';
 
   if (!title) {

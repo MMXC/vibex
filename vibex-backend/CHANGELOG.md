@@ -32,6 +32,14 @@
   - Backend Tests: 436 tests passed
   - Commit: `19cc6742`
 
+- **Epic4-FlowAPI**: Flow Generation & Persistence
+  - Flow Route: `src/routes/flow.ts` (POST /api/flow/generate, SSE streaming)
+  - FlowData CRUD: `src/routes/flow-data.ts` (GET/POST/PUT/DELETE /api/flow-data)
+  - FlowNode/FlowEdge types aligned with SPEC-02 ('task'→'process', add checked/editable/animated)
+  - POST /api/flow/generate: fetch domains for context, save flow to DB on done
+  - D1 persistence for flow nodes/edges via FlowData table
+  - Commits: `3fd8f1c7`, `a1575bf7`
+
 - **Epic5-StepStateAPI**: D1 Persistence for Autosave
   - StepState D1 Persistence: `src/routes/step-state.ts` (POST/GET/DELETE /api/step-state)
   - Replaced in-memory stateStore with real D1/SQLite persistence

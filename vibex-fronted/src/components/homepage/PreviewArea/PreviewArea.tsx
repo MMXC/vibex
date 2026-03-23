@@ -182,6 +182,7 @@ export const PreviewArea: React.FC<PreviewAreaAllProps> = ({
           <div className={styles.diagramContainer}>
             <CardTreeView
               projectId={projectId}
+              boundedContexts={boundedContexts}
               className={styles.cardTreeFull}
               data-testid="preview-cardtree"
             />
@@ -214,8 +215,8 @@ export const PreviewArea: React.FC<PreviewAreaAllProps> = ({
           </div>
         )}
 
-        {/* 节点树选择器 - 仅在有上下文时显示 */}
-        {showNodeTree && nodes.length > 0 && (
+        {/* 节点树选择器 - 仅在有上下文且非CardTree模式时显示 */}
+        {!useCardTree && showNodeTree && nodes.length > 0 && (
           <NodeTreeSelector
             nodes={nodes}
             selectedIds={selectedNodes}

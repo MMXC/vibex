@@ -14,6 +14,7 @@ import { useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useVisualizationStore } from '@/stores/visualizationStore';
 import type { CardTreeVisualizationRaw } from '@/types/visualization';
+import type { BoundedContext } from '@/types/homepage';
 
 // ==================== Feature Flag ====================
 
@@ -153,6 +154,58 @@ const MOCK_DATA: CardTreeVisualizationRaw = {
   name: '示例项目',
 };
 
+// ==================== Local Data Converter ====================
+
+/** Icon map for bounded context types */
+const CONTEXT_TYPE_ICONS: Record<string, string> = {
+  core: '🟣',
+  supporting: '🔵',
+  generic: '⚪',
+  external: '🌐',
+};
+
+/**
+ * Convert BoundedContext[] to CardTreeVisualizationRaw
+ *
+ * Epic 2: 本地数据模式 - 首页已有 boundedContexts 数据直接转换为 CardTree 格式
+ */
+export function boundedContextsToCardTree(
+  contexts: BoundedContext[],
+  projectId?: string
+): CardTreeVisualizationRaw {
+  if (!contexts || contexts.length === 0) {
+    return { nodes: [], projectId, name: '项目分析' };
+  }
+
+  const nodes: CardTreeVisualizationRaw['nodes'] = contexts.map((ctx) => {
+    // Determine status based on context type (core=in-progress, others=pending)
+    const status = ctx.type === 'core' ? 'in-progress' : 'pending';
+
+    // Convert relationships to children
+    const children = ctx.relationships?.map((rel) => ({
+      id: rel.id,
+      label: `${rel.type === 'upstream' ? '⬆️' : rel.type === 'downstream' ? '⬇️' : '↔️'} ${rel.description || '关联'}`,
+      checked: false,
+      description: `→ ${rel.toContextId}`,
+    })) ?? [];
+
+    return {
+      title: ctx.name,
+      description: ctx.description,
+      status: status as CardTreeVisualizationRaw['nodes'][number]['status'],
+      icon: CONTEXT_TYPE_ICONS[ctx.type] ?? '📁',
+      children,
+      updatedAt: new Date().toISOString(),
+    };
+  });
+
+  return {
+    nodes,
+    projectId,
+    name: 'DDD 分析结果',
+  };
+}
+
 // ==================== Hook ====================
 
 export interface UseProjectTreeOptions {
@@ -162,6 +215,10 @@ export interface UseProjectTreeOptions {
   useMockOnError?: boolean;
   /** Skip fetching (e.g., feature flag off) */
   skip?: boolean;
+  /** Local data mode: use boundedContexts directly instead of API (Epic 2) */
+  localData?: {
+    boundedContexts: BoundedContext[];
+  };
 }
 
 export interface UseProjectTreeReturn {
@@ -190,6 +247,7 @@ export function useProjectTree({
   projectId,
   useMockOnError = true,
   skip = !FEATURE_FLAG,
+  localData,
 }: UseProjectTreeOptions): UseProjectTreeReturn {
   const { setVisualizationData } = useVisualizationStore();
 
@@ -202,16 +260,22 @@ export function useProjectTree({
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
   });
 
-  // Determine effective data (use mock on error if enabled)
+  // Determine effective data (local data mode takes priority)
   const effectiveData = useMemo(() => {
+    // Epic 2: Local data mode — use boundedContexts directly
+    if (localData?.boundedContexts) {
+      return boundedContextsToCardTree(localData.boundedContexts, projectId ?? undefined);
+    }
     if (query.data) return query.data;
     if (query.isError && useMockOnError) return MOCK_DATA;
     if (skip) return MOCK_DATA; // Feature flag off → show mock
+    if (!projectId) return MOCK_DATA; // No project yet → show demo data
     return null;
-  }, [query.data, query.isError, query.isLoading, useMockOnError, skip]);
+  }, [localData, query.data, query.isError, query.isLoading, useMockOnError, skip, projectId]);
 
   const isMockData = Boolean(
-    (query.isError && useMockOnError) || (skip && !query.data)
+    !localData?.boundedContexts &&
+    ((query.isError && useMockOnError) || (skip && !query.data))
   );
 
   // Sync to visualizationStore

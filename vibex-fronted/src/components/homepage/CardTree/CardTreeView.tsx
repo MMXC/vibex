@@ -15,6 +15,7 @@ import { useProjectTree } from '@/hooks/useProjectTree';
 import { CardTreeSkeleton } from './CardTreeSkeleton';
 import { CardTreeError } from './CardTreeError';
 import type { CardTreeVisualizationRaw } from '@/types/visualization';
+import type { BoundedContext } from '@/types/homepage';
 import styles from './CardTree.module.css';
 
 // ==================== Feature Flag ====================
@@ -30,6 +31,8 @@ export interface CardTreeViewProps {
   projectId?: string | null;
   /** Override feature flag (for testing/debug) */
   forceEnabled?: boolean;
+  /** Bounded contexts for local data mode (Epic 2) */
+  boundedContexts?: BoundedContext[];
   /** Callback: node clicked */
   onCardClick?: (cardId: string) => void;
   /** Callback: checkbox toggled */
@@ -50,6 +53,7 @@ export interface CardTreeViewProps {
 export function CardTreeView({
   projectId = null,
   forceEnabled,
+  boundedContexts,
   onCardClick,
   onCheckboxToggle,
   className,
@@ -62,13 +66,17 @@ export function CardTreeView({
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   // Fetch data from useProjectTree
+  // Epic 2: Pass localData when boundedContexts available
   const {
     data,
     isLoading,
     error,
     isMockData,
     refetch,
-  } = useProjectTree({ projectId });
+  } = useProjectTree({
+    projectId,
+    localData: boundedContexts ? { boundedContexts } : undefined,
+  });
 
   // Toggle expand/collapse for a node
   const handleToggleExpand = useCallback((nodeId: string) => {

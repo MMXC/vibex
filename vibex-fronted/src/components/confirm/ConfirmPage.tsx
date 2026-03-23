@@ -134,7 +134,7 @@ export default function ConfirmPage({ className }: ConfirmPageProps) {
             需求描述
           </label>
           <textarea
-            id="requirement-input"
+            id="requirement"
             data-testid="requirement-input"
             value={localText}
             onChange={handleChange}

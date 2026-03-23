@@ -42,6 +42,8 @@ export interface BottomPanelProps {
   clarificationRounds?: number;
   /** 聊天历史记录（最近10条） */
   chatHistory?: ChatMessage[];
+  /** 收起/展开回调（通知父组件） */
+  onCollapseToggle?: (collapsed: boolean) => void;
   /** 草稿恢复回调 */
   onDraftRestored?: (text: string) => void;
 }
@@ -61,6 +63,7 @@ export function BottomPanel({
   clarificationRounds = 0,
   chatHistory = [],
   onDraftRestored,
+  onCollapseToggle,
 }: BottomPanelProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -201,8 +204,12 @@ export function BottomPanel({
   }, [saveDraft, showToast, onHistory]);
 
   const handleToggle = useCallback(() => {
-    setIsCollapsed((v) => !v);
-  }, []);
+    setIsCollapsed((v) => {
+      const next = !v;
+      onCollapseToggle?.(next);
+      return next;
+    });
+  }, [onCollapseToggle]);
 
   // ST-6.7: 草稿自动保存（防抖 2s）
   const handleInputChange = useCallback(

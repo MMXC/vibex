@@ -7,7 +7,9 @@
 
 ---
 
-## 📋 结论: ✅ **PASSED**
+## 📋 结论: ⚠️ **CONDITIONAL PASS**
+
+> 核心功能通过，发现 2 个中等问题需在后续 Epic 修复
 
 ---
 
@@ -15,11 +17,55 @@
 
 | AC | 要求 | 验证结果 |
 |----|------|---------|
-| AC-1 | `useProjectTree()` 返回数据 | ✅ `data` 字段返回 `CardTreeVisualizationRaw`，mock data fallback 完善 |
-| AC-2 | CardTree 渲染 | ✅ `data-testid="cardtree-node"` 存在，`CardTreeRenderer` 组件正常 |
-| AC-3 | 子卡片折叠态 | ✅ 空 children 渲染"暂无子操作"，`CheckboxItem` 递归展开/折叠 |
-| AC-4 | API 错误处理 | ✅ `query.isError` 时使用 mock data fallback（`useMockOnError`） |
-| AC-5 | Feature Flag off | ✅ `FEATURE_FLAG = process.env.NEXT_PUBLIC_USE_CARD_TREE === 'true'`，skip 时返回 mock |
+| AC-1 | `useProjectTree()` 返回 mockData | ✅ MOCK_DATA shape 正确，符合 CardTreeVisualizationRaw |
+| AC-3 | 空 children 渲染"暂无子操作" | ✅ CardTreeNode.tsx:137 正确渲染 |
+| AC-5 | Feature Flag off → mockData | ✅ IS_CARD_TREE_ENABLED 正确导出，skip 时返回 MOCK_DATA |
+| TypeScript 类型安全 | ✅ 无 `as any`，类型完整 |
+| 安全性 | ✅ 无 XSS/硬编码/注入 |
+| React 模式 | ✅ memo/useCallback 正确使用 |
+| React Query | ✅ retry=1, staleTime=30s |
+
+---
+
+## ⚠️ ISSUE 1 — AC-2: testid 不匹配（中等）
+
+| 项目 | 值 |
+|------|------|
+| **PRD 期望** | `data-testid='card-tree'` |
+| **实际代码** | `cardtree-node` / `cardtree-renderer` / `cardtree-empty` |
+| **影响** | Epic3 页面级集成测试会失败 |
+| **文件** | CardTreeNode.tsx:121, CardTreeRenderer.tsx:188,197 |
+| **建议** | 改代码统一使用 `card-tree` 前缀（Epic3 或后续修复） |
+
+---
+
+## ⚠️ ISSUE 2 — AC-4: 无"加载失败"UI（中等）
+
+| 项目 | 值 |
+|------|------|
+| **PRD 期望** | API 错误 → 显示"加载失败" |
+| **实际代码** | hook 暴露 `error`，但 CardTreeRenderer 无 error state UI |
+| **影响** | 用户无法感知 API 失败 |
+| **建议** | CardTreeRenderer 增加 error 分支渲染（Epic4 范围） |
+
+---
+
+## 🐛 BUG — useMemo stale dependency（低）
+
+```ts
+// useProjectTree.ts:197
+}, [query.data, query.isError, query.isLoading, useMockOnError, skip]);
+//                                ^^^^^^^^^^^^^^
+// query.isLoading 在 useMemo 函数体内未使用，造成不必要重新计算
+```
+
+---
+
+## ℹ️ AC-5 GridLayout 回退（Epic3 范围）
+
+- PRD: Feature Flag off → GridLayout 回退
+- 实际情况: Epic1 数据层只返回 mockData，无独立 GridLayout 组件
+- 判定: Epic3 首页集成范围，非 Epic1 数据层职责
 
 ---
 

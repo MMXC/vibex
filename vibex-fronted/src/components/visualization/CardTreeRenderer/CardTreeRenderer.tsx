@@ -44,6 +44,10 @@ export interface CardTreeRendererProps {
   showBackground?: boolean;
   /** Override: readonly mode */
   readonly?: boolean;
+  /** Controlled expanded node IDs */
+  expandedIds?: Set<string>;
+  /** Toggle node expanded state */
+  onToggleExpand?: (nodeId: string) => void;
   /** Callback: card checkbox toggled */
   onCheckboxToggle?: (cardId: string, childId: string, checked: boolean) => void;
   /** Callback: card clicked */
@@ -60,16 +64,20 @@ const nodeTypes = {
   cardTreeNode: CardTreeNode,
 };
 
-// ==================== Layout Engine ====================
+// ==================== Layout Engine (Vertical) ====================
 
-const CARD_WIDTH = 280;
-const CARD_MARGIN_X = 60;
+const CARD_HEIGHT = 200;
+const CARD_MARGIN_Y = 60;
+const CENTER_X = 400; // Center nodes horizontally in the viewport
 
 /**
  * Convert CardTreeVisualizationRaw into ReactFlow nodes + edges
- * with automatic vertical layout
+ * with automatic VERTICAL layout (cards stacked top-to-bottom)
  */
-function buildFlowGraph(data: CardTreeVisualizationRaw | null): {
+function buildFlowGraph(
+  data: CardTreeVisualizationRaw | null,
+  expandedIds?: Set<string>
+): {
   nodes: Node[];
   edges: Edge[];
 } {
@@ -81,10 +89,13 @@ function buildFlowGraph(data: CardTreeVisualizationRaw | null): {
     id: card.title,
     type: 'cardTreeNode',
     position: {
-      x: index * (CARD_WIDTH + CARD_MARGIN_X),
-      y: 0,
+      x: CENTER_X,
+      y: index * (CARD_HEIGHT + CARD_MARGIN_Y),
     },
-    data: card,
+    data: {
+      ...card,
+      isExpanded: expandedIds ? expandedIds.has(card.title) : card.isExpanded !== false,
+    },
     sourcePosition: Position.Bottom,
     targetPosition: Position.Top,
   }));
@@ -122,38 +133,48 @@ function toggleChildInData(
   });
 }
 
-// ==================== Public Component ====================
+// ==================== Internal Renderer (needs ReactFlow context) ====================
 
-/**
- * CardTreeRenderer — Visualizes cards in a vertical tree layout
- */
-export function CardTreeRenderer({
+interface InternalRendererProps extends Omit<CardTreeRendererProps, 'className'> {
+  className?: string;
+}
+
+function InternalRenderer({
   data,
   showMinimap = true,
   fitView = true,
   showControls = true,
   showBackground = true,
   readonly = false,
+  expandedIds,
+  onToggleExpand,
   onCheckboxToggle,
   onCardClick,
   onInit,
   className,
-}: CardTreeRendererProps) {
-  // Build flow graph from data
+}: InternalRendererProps) {
   const { nodes: initialNodes, edges: initialEdges } = useMemo(
-    () => buildFlowGraph(data ?? null),
-    [data]
+    () => buildFlowGraph(data ?? null, expandedIds),
+    [data, expandedIds]
   );
 
-  const [nodes, setNodes] = useNodesState(initialNodes);
-  const [edges, setEdges] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   // Sync data changes
   React.useEffect(() => {
-    const { nodes: newNodes, edges: newEdges } = buildFlowGraph(data ?? null);
+    const { nodes: newNodes, edges: newEdges } = buildFlowGraph(data ?? null, expandedIds);
     setNodes(newNodes);
     setEdges(newEdges);
-  }, [data, setNodes, setEdges]);
+  }, [data, expandedIds, setNodes, setEdges]);
+
+  // Handle expand/collapse toggle
+  const handleToggleExpand = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      onToggleExpand?.(node.id);
+    },
+    [onToggleExpand]
+  );
 
   // Handle checkbox toggle
   const handleCheckboxToggle = useCallback(
@@ -174,18 +195,22 @@ export function CardTreeRenderer({
     [setNodes, onCheckboxToggle]
   );
 
-  // Handle node click
+  // Handle node click (for expand/collapse)
   const handleNodeClick = useCallback(
-    (_event: React.MouseEvent, node: Node) => {
+    (event: React.MouseEvent, node: Node) => {
+      onToggleExpand?.(node.id);
       onCardClick?.(node.id);
     },
-    [onCardClick]
+    [onToggleExpand, onCardClick]
   );
 
   // Empty state
   if (!data || !data.nodes || data.nodes.length === 0) {
     return (
-      <div className={`${styles.empty} ${className || ''}`} data-testid="cardtree-empty">
+      <div
+        className={`${styles.empty} ${className ? ` ${className}` : ''}`}
+        data-testid="cardtree-empty"
+      >
         <span className={styles.emptyIcon}>📋</span>
         <p className={styles.emptyText}>暂无卡片数据</p>
         <p className={styles.emptySubtext}>开始分析需求后会自动生成卡片</p>
@@ -194,11 +219,16 @@ export function CardTreeRenderer({
   }
 
   return (
-    <div className={`${styles.container} ${className || ''}`} data-testid="cardtree-renderer">
+    <div
+      className={`${styles.container} ${className ? ` ${className}` : ''}`}
+      data-testid="cardtree-renderer"
+    >
       <ReactFlow
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
+        onNodesChange={readonly ? undefined : onNodesChange}
+        onEdgesChange={readonly ? undefined : onEdgesChange}
         fitView={fitView}
         fitViewOptions={{ padding: 0.3 }}
         minZoom={0.1}
@@ -207,6 +237,7 @@ export function CardTreeRenderer({
         nodesConnectable={!readonly}
         elementsSelectable={!readonly}
         onNodeClick={handleNodeClick}
+        onNodeDoubleClick={handleToggleExpand}
         onInit={onInit}
       >
         {showControls && <Controls className={styles.controls} />}
@@ -216,5 +247,19 @@ export function CardTreeRenderer({
         )}
       </ReactFlow>
     </div>
+  );
+}
+
+// ==================== Public Component ====================
+
+/**
+ * CardTreeRenderer — Visualizes cards in a vertical tree layout
+ * Wrapped in ReactFlowProvider to provide ReactFlow context
+ */
+export function CardTreeRenderer(props: CardTreeRendererProps) {
+  return (
+    <ReactFlowProvider>
+      <InternalRenderer {...props} />
+    </ReactFlowProvider>
   );
 }

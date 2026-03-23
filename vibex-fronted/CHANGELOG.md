@@ -5,13 +5,14 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Epic: vibex-homepage-api-alignment Epic1 Review (2026-03-23)
-- **Epic1 (数据层)**: ✅ PASSED
-  - `useProjectTree()` — React Query hook，mock data fallback，Feature Flag 控制
-  - `CardTreeNode` — ReactFlow custom node，递归 CheckboxItem，展开/折叠
-  - `CardTreeRenderer` — 垂直树状布局，ReactFlow 集成
-  - AC-1~5 全部验证通过，16/16 tests，TypeScript 0 errors
+- **Epic1 (数据层)**: ⚠️ CONDITIONAL PASS
+  - `useProjectTree()` — React Query hook，mock data fallback，Feature Flag 控制 ✅
+  - `CardTreeNode` — ReactFlow custom node，递归 CheckboxItem，展开/折叠 ✅
+  - `CardTreeRenderer` — 垂直树状布局，ReactFlow 集成 ✅
+  - AC-1 ✅ AC-3 ✅ AC-5 ✅ TypeScript ✅ Security ✅
+  - ⚠️ AC-2: testid `card-tree` ≠ 实际 `cardtree-*`（Epic3 需对齐）
+  - ⚠️ AC-4: CardTreeRenderer 缺少 error UI（Epic4 需补充）
   - 审查报告: `docs/review-reports/20260323/review-vibex-homepage-api-alignment-epic1.md`
-  - 1 warning: 未使用参数（`handleChildExpand` 的 `id`）
 
 ### Epic: vibex-reactflow-visualization Epic1-6 Review (vibex-reactflow-visualization) (2026-03-23)
 

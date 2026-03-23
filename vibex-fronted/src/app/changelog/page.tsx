@@ -18,6 +18,19 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.82',
+    date: '2026-03-23',
+    changes: [
+      '🔧 Epic1-RoutePageFix: 新增 /confirm 页面（静态导出兼容）',
+      '🗑️  删除 middleware.ts（与 output:export 不兼容）',
+      '💾 Epic2-StatePersistence: confirmationStore partialize 包含 createdProjectId',
+      '🔧 textarea id="requirement" 修复 + 持久化测试 4/4 通过',
+      '✅ Epic3-E2EVerification: Playwright 配置验证完成',
+      '🏗️  Epic4-BuildDeploy: npm build 成功，所有路由静态导出',
+    ],
+    commit: 'fa00d20d',
+  },
+  {
     version: '1.0.80',
     date: '2026-03-23',
     changes: [

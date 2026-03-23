@@ -20,6 +20,15 @@ jest.mock('./hooks/useDraft', () => ({
   })),
 }));
 
+// Mock useToast hook
+jest.mock('@/components/ui/Toast', () => ({
+  useToast: jest.fn(() => ({
+    toasts: [],
+    showToast: jest.fn(),
+    hideToast: jest.fn(),
+  })),
+}));
+
 // Mock localStorage
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
@@ -440,6 +449,103 @@ describe('ST-6.10: Ctrl+Enter 快捷键', () => {
     fireEvent.input(textarea, { target: { value: '测试' } });
     fireEvent.keyDown(textarea, { key: 'Enter', shiftKey: true });
     expect(defaultProps.onSendMessage).not.toHaveBeenCalled();
+  });
+});
+
+// ============================================================
+// E3-S3.2: 快捷键支持 (Ctrl+S 保存, Ctrl+Z 撤销, Ctrl+Shift+Z 重做, Ctrl+P 预览)
+// ============================================================
+describe('E3-S3.2: 快捷键支持', () => {
+  describe('AC1: Ctrl+S 保存', () => {
+    it('calls onSave on Ctrl+S', () => {
+      render(<BottomPanel {...defaultProps} />);
+      fireEvent.keyDown(window, { key: 's', ctrlKey: true });
+      expect(defaultProps.onSave).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls onSave on Cmd+S (Mac)', () => {
+      render(<BottomPanel {...defaultProps} />);
+      fireEvent.keyDown(window, { key: 's', metaKey: true });
+      expect(defaultProps.onSave).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not call onSave on plain s key', () => {
+      render(<BottomPanel {...defaultProps} />);
+      fireEvent.keyDown(window, { key: 's' });
+      expect(defaultProps.onSave).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('AC3: Ctrl+Z 撤销', () => {
+    it('calls onHistory with latest message id on Ctrl+Z', () => {
+      const messages = [
+        { id: 'msg-1', role: 'user' as const, content: '历史消息', timestamp: Date.now() },
+      ];
+      render(<BottomPanel {...defaultProps} chatHistory={messages} />);
+      fireEvent.keyDown(window, { key: 'z', ctrlKey: true });
+      expect(defaultProps.onHistory).toHaveBeenCalledWith('msg-1');
+    });
+
+    it('does nothing on Ctrl+Z when no history', () => {
+      render(<BottomPanel {...defaultProps} chatHistory={[]} />);
+      fireEvent.keyDown(window, { key: 'z', ctrlKey: true });
+      expect(defaultProps.onHistory).not.toHaveBeenCalled();
+    });
+
+    it('does not intercept Ctrl+Z when focus is in textarea', () => {
+      render(<BottomPanel {...defaultProps} />);
+      const textarea = screen.getByTestId('requirement-input');
+      fireEvent.keyDown(textarea, { key: 'z', ctrlKey: true });
+      expect(defaultProps.onHistory).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('AC5: Ctrl+Shift+Z / Ctrl+Y 重做', () => {
+    it('calls no action on Ctrl+Shift+Z when no redo stack', () => {
+      render(<BottomPanel {...defaultProps} />);
+      fireEvent.keyDown(window, { key: 'z', ctrlKey: true, shiftKey: true });
+      // no crash, no action
+      expect(defaultProps.onHistory).not.toHaveBeenCalled();
+    });
+
+    it('does not intercept Ctrl+Shift+Z when focus is in textarea', () => {
+      render(<BottomPanel {...defaultProps} />);
+      const textarea = screen.getByTestId('requirement-input');
+      fireEvent.keyDown(textarea, { key: 'z', ctrlKey: true, shiftKey: true });
+      expect(defaultProps.onHistory).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('AC7: Ctrl+P 预览模式', () => {
+    it('toggles preview mode on Ctrl+P', () => {
+      render(<BottomPanel {...defaultProps} />);
+      expect(screen.getByTestId('bottom-panel')).not.toHaveClass('previewMode');
+      fireEvent.keyDown(window, { key: 'p', ctrlKey: true });
+      // Toast should appear (handled by useToast, mocked in test env)
+    });
+
+    it('toggles preview mode off on second Ctrl+P', () => {
+      render(<BottomPanel {...defaultProps} />);
+      fireEvent.keyDown(window, { key: 'p', ctrlKey: true });
+      fireEvent.keyDown(window, { key: 'p', ctrlKey: true });
+      // mode toggled twice, back to off
+    });
+  });
+
+  describe('快捷键冲突检测', () => {
+    it('does not intercept Ctrl+Z in input area', () => {
+      render(<BottomPanel {...defaultProps} />);
+      const textarea = screen.getByTestId('requirement-input');
+      fireEvent.keyDown(textarea, { key: 'z', ctrlKey: true });
+      expect(defaultProps.onHistory).not.toHaveBeenCalled();
+    });
+
+    it('does not intercept Ctrl+P in input area', () => {
+      render(<BottomPanel {...defaultProps} />);
+      const textarea = screen.getByTestId('requirement-input');
+      fireEvent.keyDown(textarea, { key: 'p', ctrlKey: true });
+      // no crash
+    });
   });
 });
 

@@ -2,8 +2,9 @@
  * BottomPanel - 底部面板主容器
  * 规格: 380px 固定高度，内部5个子组件
  * Epic 6: 需求录入、AI交互、项目创建
+ * E3-S3.2: 快捷键支持 (Ctrl+S 保存, Ctrl+Z 撤销, Ctrl+Shift+Z 重做, Ctrl+P 预览)
  */
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { CollapseHandle } from './CollapseHandle';
 import { BottomPanelInputArea } from './BottomPanelInputArea';
 import { ActionBar } from './ActionBar';
@@ -11,6 +12,7 @@ import { AIDisplay } from './AIDisplay';
 import { QuickAskButtons } from './QuickAskButtons/QuickAskButtons';
 import { ChatHistory, type ChatMessage } from './ChatHistory/ChatHistory';
 import { useDraft } from './hooks/useDraft';
+import { useToast } from '@/components/ui/Toast';
 import styles from './BottomPanel.module.css';
 
 export interface BottomPanelProps {
@@ -23,7 +25,7 @@ export interface BottomPanelProps {
   /** 优化回调 */
   onOptimize?: () => void;
   /** 历史记录回调 */
-  onHistory?: () => void;
+  onHistory?: (messageId?: string) => void;
   /** 保存回调 */
   onSave?: () => void;
   /** 重新生成回调 */
@@ -62,7 +64,14 @@ export function BottomPanel({
 }: BottomPanelProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  // E3-S3.2: 撤销/重做栈（用于 Ctrl+Z / Ctrl+Shift+Z）
+  const [undoStack, setUndoStack] = useState<string[]>([]);
+  const [redoStack, setRedoStack] = useState<string[]>([]);
   const { restoreDraft, saveDraft, clearDraft } = useDraft();
+  const { showToast } = useToast();
+  // 记录 inputValue 是否已入栈（避免重复入栈）
+  const lastPushedRef = useRef<string>('');
 
   // 组件挂载时恢复草稿
   useEffect(() => {
@@ -70,9 +79,126 @@ export function BottomPanel({
     if (draft) {
       setInputValue(draft);
       onDraftRestored?.(draft);
+      lastPushedRef.current = draft;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // 用于在 useEffect 中访问最新回调（避免循环依赖）
+  const saveCallbackRef = useRef<(() => void) | null>(null);
+  const inputValueRef = useRef(inputValue);
+  const chatHistoryRef = useRef(chatHistory);
+  inputValueRef.current = inputValue;
+  chatHistoryRef.current = chatHistory;
+
+  // E3-S3.2: 快捷键绑定 (Ctrl+S 保存, Ctrl+Z 撤销, Ctrl+Shift+Z 重做, Ctrl+P 预览)
+  // 注意: 此 useEffect 必须在 handleManualSave 定义之后
+  useEffect(() => {
+    let ignoreNextInput = false;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // 忽略在 input/textarea 中的快捷键（让浏览器默认行为生效）
+      const target = e.target as HTMLElement;
+      const isInputArea =
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'INPUT' ||
+        target.isContentEditable;
+
+      // Ctrl+S: 保存
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        saveCallbackRef.current?.();
+        return;
+      }
+
+      // Ctrl+P: 预览模式切换
+      if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+        e.preventDefault();
+        setIsPreviewMode((prev) => {
+          const next = !prev;
+          showToast(next ? '预览模式已开启' : '预览模式已关闭', 'info');
+          return next;
+        });
+        return;
+      }
+
+      // Ctrl+Z: 撤销（恢复上一条历史消息到输入框）
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') {
+        if (isInputArea) return; // 在输入区让浏览器处理
+        e.preventDefault();
+        const currentHistory = chatHistoryRef.current;
+        if (currentHistory.length === 0) {
+          showToast('无可撤销', 'warning');
+          return;
+        }
+        const currentValue = inputValueRef.current;
+        // 将当前输入框内容入 redo 栈
+        if (currentValue && currentValue !== lastPushedRef.current) {
+          setRedoStack((prev) => [currentValue, ...prev]);
+        }
+        // 取出最近一条历史消息
+        const lastMsg = currentHistory[currentHistory.length - 1];
+        if (lastMsg) {
+          setInputValue(lastMsg.content);
+          saveDraft(lastMsg.content);
+          lastPushedRef.current = lastMsg.content;
+          onHistory?.(lastMsg.id);
+          showToast('已撤销', 'success');
+          // 标记接下来由 onHistory 触发的 setInputValue 忽略
+          ignoreNextInput = true;
+        }
+        return;
+      }
+
+      // Ctrl+Shift+Z 或 Ctrl+Y: 重做
+      if (
+        ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') ||
+        ((e.ctrlKey || e.metaKey) && e.key === 'y')
+      ) {
+        if (isInputArea) return;
+        e.preventDefault();
+        setRedoStack((prev) => {
+          if (prev.length === 0) {
+            showToast('无可重做', 'warning');
+            return prev;
+          }
+          const [next, ...rest] = prev;
+          const currentValue = inputValueRef.current;
+          // 将当前内容入 undo 栈
+          if (currentValue) {
+            setUndoStack((undoPrev) => [...undoPrev, currentValue]);
+          }
+          setInputValue(next);
+          saveDraft(next);
+          lastPushedRef.current = next;
+          showToast('已重做', 'success');
+          return rest;
+        });
+        return;
+      }
+    };
+
+    const handleInput = (e: Event) => {
+      if (ignoreNextInput) {
+        ignoreNextInput = false;
+        return;
+      }
+      // 用户在新输入时清空 redo 栈
+      const newVal = (e.target as HTMLTextAreaElement).value;
+      if (newVal !== lastPushedRef.current) {
+        setRedoStack([]);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    const textarea = document.querySelector('[data-testid="requirement-input"]') as HTMLTextAreaElement | null;
+    textarea?.addEventListener('input', handleInput);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      textarea?.removeEventListener('input', handleInput);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [saveDraft, showToast, onHistory]);
 
   const handleToggle = useCallback(() => {
     setIsCollapsed((v) => !v);
@@ -112,17 +238,25 @@ export function BottomPanel({
     onSave?.();
   }, [inputValue, saveDraft, onSave]);
 
-  // 历史记录展开项点击
+  // 同步 handleManualSave 到 ref（供 useEffect 使用）
+  saveCallbackRef.current = handleManualSave;
+
+  // 历史记录展开项点击 (E3-S3.2: 入栈管理)
   const handleHistoryExpand = useCallback(
     (messageId: string) => {
       const msg = chatHistory.find((m) => m.id === messageId);
       if (msg) {
+        // 当前内容入 redo，清空 redo 栈（用户选择历史 = 放弃当前编辑）
+        if (inputValue) {
+          setRedoStack([]);
+        }
         setInputValue(msg.content);
         saveDraft(msg.content);
+        lastPushedRef.current = msg.content;
         onHistory?.();
       }
     },
-    [chatHistory, saveDraft, onHistory]
+    [chatHistory, inputValue, saveDraft, onHistory]
   );
 
   if (isCollapsed) {
@@ -131,8 +265,9 @@ export function BottomPanel({
 
   return (
     <div
-      className={styles.panel}
+      className={`${styles.panel} ${isPreviewMode ? styles.previewMode : ''}`}
       data-testid="bottom-panel"
+      aria-label={isPreviewMode ? '预览模式' : undefined}
     >
       {/* ST-6.1: 收起/展开手柄 30px */}
       <CollapseHandle isCollapsed={isCollapsed} onToggle={handleToggle} />

@@ -47,6 +47,10 @@ export interface UseHomePageReturn {
   pageStructure: PageStructure | null;
   pageStructureAnalyzed: boolean;
   analyzePageStructure: () => void;
+
+  // CardTree: project ID for data fetching
+  createdProjectId: string | null;
+  setCreatedProjectId: (id: string | null) => void;
   
   // DDD Stream
   streamStatus: string;
@@ -118,6 +122,9 @@ export function useHomePage(): UseHomePageReturn {
 
   // F4: Page Structure State
   const [pageStructure, setPageStructure] = useState<PageStructure | null>(null);
+
+  // CardTree: project ID for data fetching
+  const [createdProjectId, setCreatedProjectId] = useState<string | null>(null);
   const [pageStructureAnalyzed, setPageStructureAnalyzed] = useState(false);
 
   // F6: Chat history state
@@ -382,6 +389,7 @@ export function useHomePage(): UseHomePageReturn {
         description: requirementText,
         userId,
       });
+      setCreatedProjectId(project.id);
       const msg: ChatMessage = {
         id: `proj-${Date.now()}`,
         role: 'assistant',
@@ -553,6 +561,10 @@ export function useHomePage(): UseHomePageReturn {
     pageStructure,
     pageStructureAnalyzed,
     analyzePageStructure,
+
+    // CardTree: project ID
+    createdProjectId,
+    setCreatedProjectId,
     
     // Stream status
     streamStatus,

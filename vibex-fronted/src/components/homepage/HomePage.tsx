@@ -14,6 +14,7 @@ import LoginDrawer from '@/components/ui/LoginDrawer';
 import { Navbar, AIPanel } from '@/components/homepage';
 import { useHomePage } from './hooks';
 import { PreviewArea } from './PreviewArea/PreviewArea';
+import { IS_CARD_TREE_ENABLED } from './CardTree/CardTreeView';
 import { BottomPanel } from './BottomPanel/BottomPanel';
 import { StepNavigator } from './StepNavigator';
 import { useHomePageStore } from '@/stores/homePageStore';
@@ -58,6 +59,7 @@ export default function HomePage() {
     handleHistory,
     handleCreateProject,
     handleRegenerate,
+    createdProjectId,
   } = useHomePage();
 
   // Epic4: Integrate homePageStore for completed steps (convert string step IDs to numbers)
@@ -145,6 +147,8 @@ export default function HomePage() {
           domainModels={domainModels}
           businessFlow={businessFlow}
           isGenerating={isGenerating}
+          useCardTree={IS_CARD_TREE_ENABLED}
+          projectId={createdProjectId}
         />
       </main>
 

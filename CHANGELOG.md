@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+### Added (homepage-cardtree-debug Epic1) — 2026-03-24
+- **数据传递修复**: HomePage → PreviewArea → CardTreeView 传递 useCardTree + projectId
+- **useHomePage 增强**: 新增 createdProjectId state，handleCreateProject 后自动设置
+- **Epic1 测试**: 6 个验收测试全部通过，200 suites / 2367 tests 整体通过
+
 ### Added (ReactFlow Visualization - Epic1-6) — 2026-03-23
 - **统一类型系统**: VisualizationType discriminated union (flow/mermaid/json)
 - **Zustand Store**: visualizationStore 统一管理三种视图状态 + persist

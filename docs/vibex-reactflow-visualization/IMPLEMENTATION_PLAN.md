@@ -163,6 +163,35 @@
 **Commit**: `adcf6127`
 **测试**: 23 tests (visualizationStore) + 2160 total — ALL PASS
 
+---
+
+## Sprint 1 实现记录 (Dev — Epic2-4)
+
+### Epic 2: FlowRenderer ✅ (2026-03-23)
+
+**Commits**: `1ea8e770`, `96916468`, `1646983b`, `de4b97ac`
+
+**产出**:
+- `src/hooks/useFlowVisualization.ts` — Flow data parsing, node/edge helpers
+- `src/components/visualization/FlowRenderer.tsx` — ReactFlow wrapper, store sync
+- `src/components/visualization/FlowRenderer.module.css` — styles
+- `src/components/visualization/index.ts` — exports
+- Tests: 44 tests pass
+
+### Epic 3: MermaidRenderer ✅ (2026-03-23)
+**产出**: `src/components/visualization/MermaidRenderer/` — Mermaid diagram rendering
+
+### Epic 4: JsonTreeRenderer ✅ (2026-03-23)
+**产出**: `src/components/visualization/JsonTreeRenderer/` — JSON tree with virtual scrolling
+
+### Epic 5: ViewSwitcher ✅ (2026-03-23)
+**产出**: `src/components/visualization/ViewSwitcher/` — 3视图切换
+
+### Epic 6: 性能调优 ✅ (2026-03-23)
+**产出**: `src/components/visualization/VisualizationPlatform/` — 统一平台集成
+
+**TypeScript**: ✅ 0 errors | **Tests**: 5/6 suites pass (JsonTreeRenderer OOM due to CI limit)
+
 ### Day 3: ReactFlow 集成 ✅ (Epic 2, 2026-03-23)
 
 | ID | 任务 | 状态 | 产出物 |

@@ -268,23 +268,23 @@ def load_existing_projects(workspace: Optional[str] = None) -> list[dict]:
         项目列表
     """
     if workspace is None:
-        # 默认路径: skills/team-tasks/projects/
-        base_dir = pathlib.Path(__file__).parent.parent / "projects"
+        # 默认路径: team-tasks 数据目录（clawd 配置路径）
+        base_dir = pathlib.Path("/home/ubuntu/clawd/data/team-tasks")
     else:
         base_dir = pathlib.Path(workspace)
     
     projects = []
     
     # 遍历所有项目 JSON 文件
-    for proj_file in base_dir.glob("*/tasks/*.json"):
+    for proj_file in base_dir.glob("*.json"):
         try:
             with open(proj_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
             
-            # 提取项目信息
-            if "name" in data and "goal" in data:
+            # 提取项目信息（team-tasks JSON 使用 "project" 而非 "name"）
+            if "project" in data:
                 projects.append({
-                    "name": data.get("name", ""),
+                    "name": data.get("project", ""),
                     "goal": data.get("goal", ""),
                     "status": data.get("status", "active"),
                     "created": data.get("created", ""),

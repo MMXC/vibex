@@ -29,10 +29,10 @@ export interface VerticalPreviewProps {
   mermaidCode?: string;
   /** 限界上下文 */
   boundedContexts?: BoundedContext[];
-  /** 领域模型 */
-  domainModels?: DomainModel[];
-  /** 业务流程 */
-  businessFlow?: BusinessFlow | null;
+  /** 领域模型 (TODO: integrate with CardTree) */
+  _domainModels?: DomainModel[];
+  /** 业务流程 (TODO: integrate with CardTree) */
+  _businessFlow?: BusinessFlow | null;
   /** 是否正在生成 */
   isGenerating?: boolean;
   /** 步骤配置 */
@@ -62,8 +62,8 @@ export const PreviewArea: React.FC<PreviewAreaAllProps> = ({
   currentStep,
   mermaidCode,
   boundedContexts = [],
-  domainModels = [],
-  businessFlow = null,
+  _domainModels = [],
+  _businessFlow = null,
   isGenerating = false,
   steps = DEFAULT_STEPS,
   useCardTree: useCardTreeProp,

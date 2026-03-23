@@ -7,6 +7,16 @@ import { render, screen } from '@testing-library/react';
 import { FlowRenderer } from '../FlowRenderer';
 import type { FlowVisualizationRaw } from '@/types/visualization';
 
+// Mock reactflow to provide BackgroundVariant
+jest.mock('reactflow', () => ({
+  ...jest.requireActual('reactflow'),
+  BackgroundVariant: {
+    Lines: 'lines',
+    Dots: 'dots',
+    Cross: 'cross',
+  },
+}));
+
 // Mock FlowEditor to avoid ReactFlow rendering in tests
 jest.mock('@/components/ui/FlowEditor', () => ({
   __esModule: true,

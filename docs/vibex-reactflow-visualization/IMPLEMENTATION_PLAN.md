@@ -162,3 +162,20 @@
 
 **Commit**: `adcf6127`
 **测试**: 23 tests (visualizationStore) + 2160 total — ALL PASS
+
+### Day 3: ReactFlow 集成 ✅ (Epic 2, 2026-03-23)
+
+| ID | 任务 | 状态 | 产出物 |
+|----|------|------|--------|
+| T1.8 | `FlowRenderer` 组件 | ✅ DONE | `src/components/visualization/FlowRenderer.tsx` |
+| T1.9 | `useFlowVisualizationWithStore` Hook | ✅ DONE | `src/hooks/useFlowVisualization.ts` |
+| T1.10 | 节点/边渲染 + 缩放/拖拽 | ✅ DONE | FlowEditor integration |
+| T1.11 | 状态同步到 store | ✅ DONE | setOption('selectedNodeId') on click |
+| T1.12 | `FlowRenderer.test.tsx` | ✅ DONE | 10 tests, all passing |
+| T1.13 | `index.ts` FlowRendererProps export | ✅ DONE | `src/components/visualization/index.ts` |
+
+**Commit**: `feat(reactflow): Epic2-FlowRenderer integration`
+**测试**: 21 tests (FlowRenderer + useFlowVisualization) — ALL PASS
+**验证**: `npm test -- --testPathPatterns="FlowRenderer|useFlowVisualization" --watchAll=false` — 21 passed
+
+

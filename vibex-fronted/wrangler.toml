@@ -5,6 +5,7 @@ pages_build_output_dir = "./out"
 [vars]
 NEXT_PUBLIC_API_BASE_URL = "https://api.vibex.top/api"
 NEXT_PUBLIC_APP_URL = "https://dev.vibex.top"
+NEXT_PUBLIC_USE_CARD_TREE = "true"
 
 # 生产环境配置
 [env.production]
@@ -21,3 +22,4 @@ name = "vibex-frontend-preview"
 [env.preview.vars]
 NEXT_PUBLIC_API_BASE_URL = "https://api-dev.vibex.top/api"
 NEXT_PUBLIC_APP_URL = "https://dev.vibex.top"
+NEXT_PUBLIC_USE_CARD_TREE = "true"

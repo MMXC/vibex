@@ -2,7 +2,7 @@
 
 **Agent**: reviewer
 **Heartbeat**: cron:490b4aae-f97a-4479-a806-fbd11dc53651
-**Time**: 17:44 (Asia/Shanghai)
+**Time**: 20:56 (Asia/Shanghai)
 
 ---
 
@@ -10,41 +10,55 @@
 
 | 扫描项 | 结果 |
 |--------|------|
-| Team-tasks reviewer tasks | 12 待处理 |
-| taskmanager-syntaxwarning-fix | ✅ Epic1 review 完成 |
-| vibex-homepage-api-alignment | ⏳ 等待上游 |
+| Team-tasks (local) | 0 unblocked tasks |
+| vibex-homepage-api-alignment | ⏳ 8 reviewer stages pending (team-tasks on Ubuntu host) |
+| taskmanager-syntaxwarning-fix | ✅ Epic1 done, push done |
 
 ---
 
-## 已完成任务
+## vibex-homepage-api-alignment 当前状态
 
-### taskmanager-syntaxwarning-fix/reviewer-epic1-转义序列修复
+| Epic | Dev | Tester | Reviewer |
+|------|------|--------|----------|
+| Epic1 | ✅ done | ✅ done | ✅ PASSED (CONDITIONAL PASS) |
+| Epic2 | ✅ done (8c3f52da) | ✅ done | ⏳ pending |
+| Epic3 | 🔄 in-progress | ⬜ pending | ⬜ blocked |
+| Epic4 | 🔄 in-progress | ⬜ pending | ⬜ blocked |
+| Epic5 | 🔄 in-progress | ⬜ pending | ⬜ blocked |
 
-| 检查项 | 结果 |
-|--------|------|
-| 审查结论 | ✅ PASSED |
-| SyntaxWarning 修复 | ✅ `grep -cF` 替代 `grep -c` |
-| pytest 测试 | ✅ 13/13 passed |
-| CHANGELOG.md | ✅ 已创建并 push |
-| Git commit | `eae7e691` (已 push origin/main) |
-
-**建议**: CHANGELOG.md 建议增加 version/date 字段遵循 Keep a Changelog 规范
-
----
-
-## 待处理任务
-
-| 项目 | 任务数 |
-|------|--------|
-| taskmanager-syntaxwarning-fix | 1 (push Epic1) |
-| vibex-homepage-api-alignment | 10 (Epic1-5 + push, 等待 dev) |
+**Git commits (recent)**:
+- `8c3f52da` feat(vibex-homepage-api-alignment): Epic2 - CardTree integration with Feature Flag
+- `4cbd9e07` docs: mark Epic2 tasks complete
 
 ---
 
-## 提案收集状态
+## ⚠️ 系统阻塞问题
 
-| Agent | 状态 |
-|-------|------|
-| All 6 agents | ✅ 已提交今日提案 |
+**阻塞**: 无法访问 Ubuntu 主机上的 team-tasks JSON (`/home/ubuntu/clawd/data/team-tasks/`)
 
-**结论**: 系统正常，无阻塞问题。vibex-homepage-api-alignment 等待 dev 上游完成。HEARTBEAT_OK
+- 原因: SSH 连接到 Ubuntu host 失败（网络/Permission 问题）
+- 影响: 无法 claim vibex-homepage-api-alignment 的 8 个 reviewer 任务
+- 状态: 心跳脚本找到任务但 claim 失败（code 1）
+
+**当前可执行动作**: 无 — 等待 Ubuntu host 恢复连接，或 team-tasks 数据迁移到本地
+
+---
+
+## Epic2 待审查说明
+
+Epic2 completion report 已在 `proposals/20260323_165500/epic2-completion.md`:
+- ✅ Feature Flag 切换逻辑
+- ✅ CardTreeRenderer 垂直布局
+- ✅ TypeScript 严格模式 (0 errors)
+- ✅ 60 tests passing
+- ✅ 不破坏现有 GridLayout
+
+待 reviewer 上游解锁后，可直接领取 vibex-homepage-api-alignment/reviewer-epic2-卡片树布局
+
+---
+
+## Conclusion
+
+⚠️ 系统部分阻塞 — team-tasks 数据在 Ubuntu host，无法 claim 新任务。现有 reviewer 任务均被 Epic3-5 上游 dev 阻塞。Epic2 reviewer 待领取。等待 host 连接恢复。
+
+HEARTBEAT_OK (with blocker)

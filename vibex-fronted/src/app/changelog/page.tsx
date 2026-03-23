@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.83',
+    date: '2026-03-24',
+    changes: [
+      '🌳 Epic2-LocalDataMode: boundedContexts → CardTree 本地数据转换（DDD 限界上下文直接渲染）',
+      '🪝 useProjectTree: 新增 localData 参数支持离线模式',
+      '🧩 CardTreeView: 支持 boundedContexts prop 直接传入',
+      '🔗 PreviewArea: Epic2 Feature Flag 集成完成',
+    ],
+    commit: 'e0107885',
+  },
+  {
     version: '1.0.82',
     date: '2026-03-23',
     changes: [

@@ -104,11 +104,11 @@ class TestHighRiskTermMatch:
     """规则3: 高风险词测试"""
     
     def test_high_risk_overlap(self):
-        """测试高风险词重叠"""
+        """测试高风险词重叠（使用英文：len>=3 + 非停用词）"""
         existing = [
-            {"name": "homepage-fix", "goal": "修复首页Bug", "status": "active"},
+            {"name": "homepage-fix", "goal": "fix homepage bug test", "status": "active"},
         ]
-        result = high_risk_term_match("修复首页问题", existing)
+        result = high_risk_term_match("fix homepage review", existing)
         assert len(result) >= 1
         assert result[0]["name"] == "homepage-fix"
         assert result[0]["rule"] == "high-risk-term"

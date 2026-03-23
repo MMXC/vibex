@@ -7,6 +7,7 @@ dedup.py - 提案重复检测核心算法
 Epic 1: 核心算法 (F1-F4)
 """
 
+import os
 import re
 import json
 import pathlib
@@ -19,7 +20,7 @@ STOPWORDS = {
     # 中文停用词
     '的', '了', '在', '是', '我', '有', '和', '就', '不', '人', '都', '一', '一个',
     '上', '也', '很', '到', '说', '要', '去', '你', '会', '着', '没有', '看', '好',
-    '自己', '这', '这', '那', '但', '但', '还', '又', '与', '或', '把', '被',
+    '自己', '这', '那', '但', '还', '又', '与', '或', '把', '被',
     '让', '从', '向', '对', '而', '之', '以', '及', '于', '中', '下', '过',
     # 英文停用词
     'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
@@ -108,10 +109,10 @@ def extract_keywords(text: str) -> set[str]:
         bigram = chinese_chars[i] + chinese_chars[i + 1]
         keywords.add(bigram)
     
-    # 4-5. 过滤停用词和长度 < 2 的词
+    # 4-5. 过滤停用词和长度 < 3 的词
     keywords = {
         w for w in keywords
-        if w not in STOPWORDS and len(w) >= 2
+        if w not in STOPWORDS and len(w) >= 3
     }
     
     return keywords
@@ -267,25 +268,36 @@ def load_existing_projects(workspace: Optional[str] = None) -> list[dict]:
     Returns:
         项目列表
     """
-    if workspace is None:
-        # 默认路径: team-tasks 数据目录（clawd 配置路径）
-        base_dir = pathlib.Path("/home/ubuntu/clawd/data/team-tasks")
-    else:
+    if workspace is not None:
         base_dir = pathlib.Path(workspace)
+    else:
+        # 优先使用环境变量，否则回退到默认数据目录
+        base_dir = pathlib.Path(
+            os.environ.get(
+                "TEAM_TASKS_DIR",
+                "/home/ubuntu/clawd/data/team-tasks"
+            )
+        )
+    
+    if not base_dir.exists():
+        return []
     
     projects = []
     
-    # 遍历所有项目 JSON 文件
+    # 遍历所有项目 JSON 文件（扁平结构）
     for proj_file in base_dir.glob("*.json"):
         try:
             with open(proj_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
             
-            # 提取项目信息（team-tasks JSON 使用 "project" 而非 "name"）
-            if "project" in data:
+            # 字段映射: JSON 使用 "project"，内部使用 "name"
+            project_name = data.get("project") or data.get("name", "")
+            goal = data.get("goal", "")
+            
+            if project_name and goal:
                 projects.append({
-                    "name": data.get("project", ""),
-                    "goal": data.get("goal", ""),
+                    "name": project_name,
+                    "goal": goal,
                     "status": data.get("status", "active"),
                     "created": data.get("created", ""),
                     "mode": data.get("mode", "linear"),

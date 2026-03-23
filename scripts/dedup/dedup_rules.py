@@ -57,7 +57,7 @@ def exact_name_match(new_name: str, existing: list[dict]) -> list[dict]:
     return [
         {**p, "rule": "exact-name", "severity": "high"}
         for p in existing
-        if p.get("name") == new_name and p.get("status") == "active"
+        if (p.get("name") or p.get("project")) == new_name and p.get("status") == "active"
     ]
 
 
@@ -121,7 +121,7 @@ def prefix_date_match(
         if p.get("status") != "active":
             continue
         
-        if not p.get("name", "").startswith(prefix):
+        if not (p.get("name") or p.get("project", "")).startswith(prefix):
             continue
         
         # 检查日期
@@ -171,7 +171,7 @@ def high_risk_term_match(new_goal: str, existing: list[dict]) -> list[dict]:
         if p.get("status") != "active":
             continue
         
-        existing_keywords = extract_keywords(p.get("goal", ""))
+        existing_keywords = extract_keywords(p.get("goal") or p.get("description", ""))
         overlap = new_keywords & existing_keywords
         
         # 关键词重叠 >= 2
@@ -285,7 +285,7 @@ def check_with_rules(
         for r in results:
             if r.get("severity") == "high":
                 msg += f"   - {r['name']} [{r.get('rule', '')}]\n"
-                if r.get('goal'):
+                if r.get('goal') or r.get('description'):
                     msg += f"     目标: {r['goal'][:50]}...\n"
     
     if medium_count > 0:

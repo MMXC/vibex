@@ -480,7 +480,7 @@ ddd.post('/domain-model/stream', async (c) => {
     const body = await c.req.json()
     const { requirementText, boundedContexts } = DomainModelStreamRequestSchema.parse(body)
 
-    // Create AI service
+    // Create AI service with extended timeout for complex requests
     const aiService = createAIService(env)
     
     // Build the stream
@@ -496,60 +496,79 @@ ddd.post('/domain-model/stream', async (c) => {
         try {
           // Step 1: 分析上下文
           send('thinking', { step: 'analyzing', message: '正在分析限界上下文...' })
-          await new Promise(r => setTimeout(r, 150))
+          await new Promise(r => setTimeout(r, 100))
           
           // Step 2: 构建提示词
           send('thinking', { step: 'building-prompt', message: '正在构建提示词...' })
-          await new Promise(r => setTimeout(r, 150))
+          await new Promise(r => setTimeout(r, 100))
           
           // Step 3: 调用 AI
           send('thinking', { step: 'calling-ai', message: '正在调用 AI 生成领域模型...' })
           
-          // Build context info
-          const contextInfo = boundedContexts 
-            ? boundedContexts.map(ctx => `- ${ctx.name}: ${ctx.description}`).join('\n')
+          // Build context info - simplified to avoid prompt bloat
+          const contextInfo = boundedContexts && boundedContexts.length > 0
+            ? boundedContexts.map(ctx => `- ${ctx.name} (${ctx.type})`).slice(0, 15).join('\n')
             : '从需求中自动识别'
+          const contextCount = boundedContexts?.length || 0
           
-          const prompt = `You are a Domain-Driven Design expert with 15 years of experience in tactical modeling and entity design.
+          const prompt = `你是DDD领域建模专家。请根据需求和限界上下文生成领域模型。
 
-Analyze the following requirement and bounded contexts to generate domain models.
+需求: ${requirementText}
 
-**Requirement:**
-${requirementText}
-
-**Bounded Contexts:**
+限界上下文 (${contextCount}个):
 ${contextInfo}
 
-**IMPORTANT: All output must be in Chinese (Simplified).**
-
-**Output Requirements (in Chinese):**
+输出格式（仅JSON）:
 {
   "domainModels": [
     {
-      "name": "用户",
-      "contextId": "用户管理",
-      "type": "aggregate_root",
+      "name": "领域模型名称",
+      "contextId": "对应的限界上下文名称",
+      "type": "aggregate_root|entity|value_object|domain_service|repository",
       "properties": [
-        {"name": "id", "type": "string", "required": true, "description": "用户唯一标识"}
+        {"name": "属性名", "type": "类型", "required": true, "description": "描述"}
       ],
-      "methods": ["register", "login"]
+      "methods": ["方法1", "方法2"]
     }
   ]
 }
 
-Respond ONLY with the JSON object.`
+只输出JSON，不要其他内容。`
 
-          // Call AI
+          // Call AI with extended timeout for complex requests
           console.log('[Domain Model Stream] Starting AI call for domain model generation')
           const result = await aiService.generateJSON<{ domainModels: any[] }>(
             prompt,
-            { systemPrompt: 'You are a DDD expert. Output only valid JSON.' }
+            { 
+              systemPrompt: 'You are a DDD expert. Output only valid JSON. Keep the response concise.',
+              timeout: 120000, // 120s timeout for complex domain model generation
+              maxTokens: 8192,
+            }
           )
           
           // Enhanced error handling - Check for AI service failure
+          // Fallback: generate domain models from bounded contexts when AI fails
           if (!result.success) {
-            console.error('[Domain Model Stream] AI service error:', result.error)
-            throw new Error(`AI 服务错误: ${result.error || '未知错误'}`)
+            console.error('[Domain Model Stream] AI service error, using fallback:', result.error)
+            const fallbackModels = boundedContexts.map((ctx, index) => ({
+              id: `dm-${generateId()}-${index}`,
+              name: ctx.name,
+              contextId: ctx.id,
+              type: 'aggregate_root' as const,
+              properties: [
+                { name: 'id', type: 'string', required: true, description: `${ctx.name}唯一标识` },
+              ],
+              methods: ['create', 'update', 'delete', 'findById']
+            }))
+            send('thinking', { step: 'fallback', message: 'AI解析失败，使用备用方案...' })
+            await new Promise(r => setTimeout(r, 100))
+            send('done', {
+              domainModels: fallbackModels,
+              mermaidCode: generateDomainModelMermaidCode(fallbackModels, boundedContexts),
+              message: '领域模型生成完成（备用方案）'
+            })
+            controller.close()
+            return
           }
           
           // Enhanced error handling - Check for missing or invalid data

@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Epic: homepage-cardtree-debug Epic4 Review (2026-03-24)
+- **Epic4 (TypeScript修复)**: ✅ PASSED
+  - `_domainModels` prop 修复 (HomePage → PreviewArea)
+  - `_businessFlow` prop 修复
+  - TypeScript 0 errors, build ✅
+  - Commit: `8f620359`
+
 ### Epic: vibex-homepage-api-alignment Epic3-5 Review (2026-03-23)
 - **Epic3 (首页集成)**: ✅ PASSED
   - `CardTreeView` — 集成到首页 PreviewArea，Feature Flag 控制

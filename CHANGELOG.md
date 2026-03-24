@@ -2,8 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-### Added (vibex-proposals-summary Epic1: Toolchain Fixes) — 2026-03-24
-- **task_manager.py**: `_input_with_timeout()` SIGALRM 超时封装，防止心跳脚本卡死
+### Added (vibex-epic1-toolchain-20260324 Epic1: Toolchain Fixes) — 2026-03-24
+- **scripts/timeout.py**: 新增通用 `@timeout(seconds)` SIGALRM 超时装饰器
+- **task_manager.py**: `cmd_list`/`cmd_claim` 添加 `@timeout(5)` 装饰器，防止挂起
+- **task_manager.py**: 新增 `health` 命令，健康检查 list + load_project 耗时
 - **page.test.tsx**: 已通过 203 suites / 2388 tests ✅（无需修改）
 - **dedup service**: 新增 `services/dedup/index.ts`，去重检测机制核心服务
 - **MessageContext data model**: `docs/data-model.md` 定义数据结构

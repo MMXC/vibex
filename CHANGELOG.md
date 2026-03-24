@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### Added (vibex-proposals-summary Epic1: Toolchain Fixes) — 2026-03-24
+- **task_manager.py**: `_input_with_timeout()` SIGALRM 超时封装，防止心跳脚本卡死
+- **page.test.tsx**: 已通过 203 suites / 2388 tests ✅（无需修改）
+- **dedup service**: 新增 `services/dedup/index.ts`，去重检测机制核心服务
+- **MessageContext data model**: `docs/data-model.md` 定义数据结构
+- **coord-heartbeat.sh**: PROJECTS_DIR 路径修复（独立 PR）
+
 ### Added (homepage-cardtree-debug Epic1) — 2026-03-24
 - **数据传递修复**: HomePage → PreviewArea → CardTreeView 传递 useCardTree + projectId
 - **useHomePage 增强**: 新增 createdProjectId state，handleCreateProject 后自动设置
@@ -32,6 +39,8 @@ All notable changes to this project will be documented in this file.
   - 索引文档 _index.md
 
 ## [Unreleased]
+
+## [1.x.x] - 2026-03-24
 
 ### Fixed
 - **Jest 配置**: 补充 jest.config.ts + mock 文件，明确 testPathIgnorePatterns 排除 e2e/performance 目录，防止 Playwright 测试被 Jest 误执行

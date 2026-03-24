@@ -99,8 +99,9 @@ async function main() {
     logSuccess('ESLint: OK');
     checks.push({ name: 'ESLint', passed: true });
   } else {
-    logWarning('ESLint: Issues found (non-blocking)');
-    checks.push({ name: 'ESLint', passed: true });
+    logError('ESLint: Issues found');
+    checks.push({ name: 'ESLint', passed: false });
+    allPassed = false;
   }
 
   // 4. Dependencies Check

@@ -27,6 +27,15 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '6369538e',
   },
   {
+    version: '1.0.85',
+    date: '2026-03-24',
+    changes: [
+      '📦 packages/types: 新增共享类型包（Step, BoundedContext, DedupResult, TeamTaskProject）',
+      '🔍 dedup: 生产环境验证通过（91 个 team-tasks 项目）',
+    ],
+    commit: 'df84a3a9',
+  },
+  {
     version: '1.0.84',
     date: '2026-03-24',
     changes: [

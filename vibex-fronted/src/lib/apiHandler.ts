@@ -43,7 +43,7 @@ function handleApiError(err: unknown, options: ApiHandlerOptions): ErrorConfig {
   // 如果映射失败，使用默认错误
   const finalConfig = errorConfig || {
     code: 'E9999',
-    type: 'unknown' as const,
+    type: 'UNKNOWN' as const,
     severity: 'high' as const,
     message: err instanceof Error ? err.message : '未知错误',
     userMessage: options.customErrorMessage || '操作失败',

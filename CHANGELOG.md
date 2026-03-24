@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+### Added (vibex-epic3-architecture-20260324 Epic3 P2-2: Error Type Unify) — 2026-03-25
+- **ErrorType 枚举统一**: 改为 UPPERCASE 格式 (`NETWORK_ERROR | TIMEOUT | PARSE_ERROR | UNKNOWN`)
+- **useErrorHandler hook**: 新增统一错误处理 Hook（重试 + 状态管理 + 用户提示）
+- **lib/error/* 重构**: ErrorClassifier、ErrorCodeMapper、ErrorMiddleware、RetryHandler 统一模块
+- **测试套件**: ErrorClassifier / ErrorCodeMapper / ErrorMiddleware 共 120 tests 全部通过
+
 ### Added (vibex-epic1-toolchain-20260324 Epic1: Toolchain Fixes) — 2026-03-24
 - **scripts/timeout.py**: 新增通用 `@timeout(seconds)` SIGALRM 超时装饰器
 - **task_manager.py**: `cmd_list`/`cmd_claim` 添加 `@timeout(5)` 装饰器，防止挂起

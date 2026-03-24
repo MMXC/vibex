@@ -1,6 +1,10 @@
 import type { Config } from 'jest';
 
 const config: Config = {
+  // Limit workers to avoid OOM on memory-heavy test suites (e.g. CardTreeView)
+  maxWorkers: 2,
+  workerIdleMemoryLimit: '512MB',
+
   // Setup files - load jest-dom matchers and custom mocks
   setupFilesAfterEnv: [
     '<rootDir>/jest.setup.ts',

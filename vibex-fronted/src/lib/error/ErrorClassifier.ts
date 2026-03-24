@@ -4,7 +4,7 @@
  */
 
 import { AxiosError } from 'axios';
-import { ErrorType, ErrorSeverity, ErrorConfig, ApiErrorResponse } from './types';
+import { ErrorType, ErrorSeverity, ApiErrorResponse } from './types';
 
 export class ErrorClassifier {
   /**
@@ -126,7 +126,7 @@ export class ErrorClassifier {
    * 判断错误类型
    * 返回: NETWORK_ERROR | TIMEOUT | PARSE_ERROR | UNKNOWN
    */
-  static determineType(error: unknown, response?: ApiErrorResponse): ErrorType {
+  static determineType(error: unknown, _response?: ApiErrorResponse): ErrorType {
     if (this.isParseError(error)) {
       return 'PARSE_ERROR';
     }

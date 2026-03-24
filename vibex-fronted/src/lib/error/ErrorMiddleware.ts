@@ -5,7 +5,7 @@
 
 import { AxiosError, AxiosResponse } from 'axios';
 import { ErrorClassifier } from './ErrorClassifier';
-import { ErrorCodeMapper, defaultErrorMapper } from './ErrorCodeMapper';
+import { ErrorCodeMapper } from './ErrorCodeMapper';
 import { RetryHandler, DEFAULT_RETRY_OPTIONS } from './RetryHandler';
 import {
   ErrorConfig,

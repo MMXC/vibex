@@ -101,7 +101,7 @@ export class ErrorCodeMapper {
   /**
    * 获取默认错误配置
    */
-  private getDefaultConfig(error: unknown, status?: number): ErrorConfig {
+  private getDefaultConfig(error: unknown, _status?: number): ErrorConfig {
     // 根据错误类型返回默认配置
     if (error instanceof AxiosError) {
       const message = error.response?.data?.error || error.message;

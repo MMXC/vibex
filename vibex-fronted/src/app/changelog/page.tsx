@@ -18,20 +18,21 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
-    version: '1.0.85',
+    version: '1.0.86',
     date: '2026-03-24',
     changes: [
-      '✅ homepage-cardtree-debug/Epic3: UI 交互验证测试通过 (10/10)',
-      '🔧 PreviewArea: 修复 ESLint unused-vars 警告 (prefix _domainModels/_businessFlow)',
+      '🔧 proposals-summary/Epic3: ErrorBoundary 去重完成，10/10 测试通过',
+      '✅ ui/ErrorBoundary: 合并 resetKeys + reset()，删除 error-boundary/ 重复目录',
     ],
-    commit: '6369538e',
+    commit: 'dd93f4e5',
   },
   {
     version: '1.0.85',
     date: '2026-03-24',
     changes: [
-      '📦 packages/types: 新增共享类型包（Step, BoundedContext, DedupResult, TeamTaskProject）',
-      '🔍 dedup: 生产环境验证通过（91 个 team-tasks 项目）',
+      '📦 proposals-summary/Epic2: packages/types 共享类型包（Step, DedupResult, TeamTaskProject）',
+      '🔍 proposals-summary/Epic2: dedup 生产验证（91 个 team-tasks 项目）',
+      '✅ homepage-cardtree-debug/Epic3: UI 交互验证测试通过 (10/10)',
     ],
     commit: 'df84a3a9',
   },

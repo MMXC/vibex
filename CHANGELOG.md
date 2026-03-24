@@ -5,9 +5,12 @@ All notable changes to this project will be documented in this file.
 ### Fixed (fix-epic1-topic-tracking Epic1: create_thread_and_save Silent Failure) — 2026-03-25
 - **移除静默失败**: `create_thread_and_save` 失败时不再返回 exit 0
 - **告警消息**: 失败时输出 `⚠️ 话题创建失败` + stderr 详情
+- **降级机制**: `_degrade_to_normal_message()` 失败时降级为普通消息
 - **dev-heartbeat.sh**: 显式处理 `create_thread_and_save` 失败，不阻塞心跳
 - **analyst-heartbeat.sh**: 移除 `|| true`，显式处理失败
-- 文件: `scripts/heartbeats/common.sh`, `scripts/heartbeats/dev-heartbeat.sh`, `scripts/heartbeats/analyst-heartbeat.sh`
+- **测试**: `test-topic-tracking.sh` 7 场景 10 测试用例全部通过
+- **审查**: ✅ PASSED — `docs/review-reports/20260325/review-fix-epic1-topic-tracking-epic1.md`
+- 文件: `scripts/heartbeats/common.sh`, `scripts/heartbeats/dev-heartbeat.sh`, `scripts/heartbeats/analyst-heartbeat.sh`, `scripts/heartbeats/test-topic-tracking.sh`
 
 ### Added (vibex-epic2-frontend-20260324 P1-6: API Error Tests) — 2026-03-25
 - **api-error-integration.test.ts**: 33 tests 覆盖 E1.1~E4.2（HTTP状态码拦截、错误响应解析、网络/超时错误捕获、错误码映射、Toast集成）

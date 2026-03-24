@@ -3,24 +3,25 @@
 import React, { Component, ReactNode } from 'react';
 import styles from './ErrorBoundary.module.css';
 
-interface Props {
+export interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode;
   onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
+  resetKeys?: unknown[];
 }
 
-interface State {
+export interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
 }
 
-export class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
   }
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
 
@@ -28,6 +29,21 @@ export class ErrorBoundary extends Component<Props, State> {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
     this.props.onError?.(error, errorInfo);
   }
+
+  componentDidUpdate(prevProps: ErrorBoundaryProps): void {
+    if (this.state.hasError && this.props.resetKeys) {
+      const hasResetKeyChanged = this.props.resetKeys.some(
+        (key, index) => key !== prevProps.resetKeys?.[index]
+      );
+      if (hasResetKeyChanged) {
+        this.reset();
+      }
+    }
+  }
+
+  reset = (): void => {
+    this.setState({ hasError: false, error: null });
+  };
 
   handleRetry = () => {
     this.setState({ hasError: false, error: null });
@@ -79,7 +95,7 @@ export class ErrorBoundary extends Component<Props, State> {
 // 简单的错误边界 HOC
 export function withErrorBoundary<P extends object>(
   WrappedComponent: React.ComponentType<P>,
-  errorBoundaryProps?: Omit<Props, 'children'>
+  errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>
 ) {
   return function WithErrorBoundary(props: P) {
     return (

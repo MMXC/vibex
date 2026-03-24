@@ -145,3 +145,36 @@ it('should display process steps', ...) {
 **遗留项**: 测试名与断言不完全匹配，建议 P2 优先级修复，不阻塞开发流程。
 
 **下一步**: 如需全量测试验证，建议运行 `npm test` 确认整体通过率。
+
+---
+
+## 8. 更新 (2026-03-24)
+
+### 新发现：E2E 测试失败
+
+**验证时间**: 2026-03-24 10:00
+
+| 测试文件 | 状态 | 失败数 | 可能原因 |
+|----------|------|--------|----------|
+| step-switch.spec.ts | ⚠️ | 2 | 步骤数量变化 (5→3) |
+| user-flow.spec.ts | ⚠️ | 3 | 认证/URL 变化 |
+
+### 根因分析
+
+1. **step-switch 失败**: simplified-flow 从 5 步简化为 3 步，测试期望的步骤数量不匹配
+2. **user-flow 失败**: 认证流程和 URL 路由变化
+
+### 建议修复
+
+```typescript
+// step-switch.spec.ts - 更新步骤数量断言
+test('T2.3.1: Step navigation should be visible', async ({ page }) => {
+  // 从 expect(stepCount).toBeGreaterThanOrEqual(2) 改为
+  // 验证当前实际的步骤数量
+  const steps = page.locator('[class*="stepItem"]');
+  const stepCount = await steps.count();
+  expect(stepCount).toBeGreaterThanOrEqual(3); // 3 步流程
+});
+```
+
+**工时估计**: 2-3 小时

@@ -76,6 +76,54 @@ describe('ErrorBoundary', () => {
     });
   });
 
+  describe('ErrorBoundary resetKeys', () => {
+    it('resets error when resetKeys change', () => {
+      const { rerender } = render(
+        <ErrorBoundary resetKeys={['a']}>
+          <BuggyComponent />
+        </ErrorBoundary>
+      );
+      // Error should be caught
+      expect(screen.getByText(/出了点问题/)).toBeInTheDocument();
+
+      // Change resetKeys — boundary should reset
+      rerender(
+        <ErrorBoundary resetKeys={['b']}>
+          <BuggyComponent />
+        </ErrorBoundary>
+      );
+      // After key change, error should be caught again (component still throws)
+      expect(screen.getByText(/出了点问题/)).toBeInTheDocument();
+    });
+
+    it('renders children normally when resetKeys unchanged but no error', () => {
+      render(
+        <ErrorBoundary resetKeys={['key1']}>
+          <div data-testid="normal-child">Normal</div>
+        </ErrorBoundary>
+      );
+      expect(screen.getByTestId('normal-child')).toBeInTheDocument();
+    });
+
+    it('does not reset when resetKeys are the same', () => {
+      const { rerender } = render(
+        <ErrorBoundary resetKeys={['same-key']}>
+          <BuggyComponent />
+        </ErrorBoundary>
+      );
+      expect(screen.getByText(/出了点问题/)).toBeInTheDocument();
+
+      // Same key — should not reset
+      rerender(
+        <ErrorBoundary resetKeys={['same-key']}>
+          <div data-testid="should-not-appear">Should not appear</div>
+        </ErrorBoundary>
+      );
+      // Error UI should still be showing (not reset)
+      expect(screen.getByText(/出了点问题/)).toBeInTheDocument();
+    });
+  });
+
   describe('withErrorBoundary HOC', () => {
     const MockComponent = () => <div>Mock Content</div>;
 

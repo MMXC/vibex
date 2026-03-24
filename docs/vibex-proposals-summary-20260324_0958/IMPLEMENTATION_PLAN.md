@@ -154,3 +154,39 @@
 | 3 | React Query 覆盖率 | 持续 | dev |
 | 3 | E2E 纳入 CI | 2h | dev |
 | **合计** | | **~7d** | |
+
+---
+
+## Epic 2: Frontend Quality — 完成记录
+
+**Epic 2 执行时间**: 2026-03-24
+
+### ✅ Task 2.1: proposal-dedup 生产验证
+- **状态**: ✅ 完成
+- **验证**: dedup 脚本在 91 个 team-tasks 项目上运行无报错
+- **结果**: 完成的 team-tasks 项目正确跳过（status=completed）
+- **Commit**: dedup.py 修复已在 Epic1 中完成 (eab94ede)
+
+### ✅ Task 2.2: 共享类型包初始化
+- **状态**: ✅ 完成
+- **产出**: `packages/types/src/index.ts` (2629 bytes, 0 TypeScript errors)
+- **导出类型**: Step, BoundedContext, ContextRelationship, CardTreeNode, DedupResult, TeamTaskProject
+- **验证**: `tsc --project packages/types/tsconfig.json --noEmit` ✅
+
+### ✅ Task 2.3: heartbeat 幽灵任务修复
+- **状态**: ✅ 完成
+- **coord-heartbeat.sh**: PROJECTS_DIR → /home/ubuntu/clawd/data/team-tasks, 扫描格式 → flat JSON
+- **coord-heartbeat-v8.sh**: 已使用正确路径 /home/ubuntu/clawd/data/team-tasks
+- **验证**: 32 个活跃项目正确检测
+
+### ⏳ Task 3.2: E2E 纳入 CI
+- **状态**: 待实施（需要 Playwright 环境配置）
+- **Note**: 需要 Docker 容器化测试环境
+
+### ⏳ Task 3.1: React Query 覆盖率提升
+- **状态**: 待实施（持续改进）
+
+### Epic 2 总结
+- 核心任务: 3/3 完成
+- 测试验证: 203 suites, 2388 tests pass ✅
+- 类型检查: 0 errors ✅

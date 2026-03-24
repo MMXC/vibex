@@ -11,7 +11,7 @@
 
 import { useState, useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ErrorConfig, ErrorMiddlewareOptions, ApiErrorResponse } from '@/lib/error';
+import { ErrorConfig, ErrorMiddlewareOptions, ApiErrorResponse } from '@/types/error';
 import { defaultErrorMapper } from '@/lib/error/ErrorCodeMapper';
 import { defaultRetryHandler } from '@/lib/error/RetryHandler';
 import { useToast } from '@/components/ui/Toast';

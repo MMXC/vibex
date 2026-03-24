@@ -1,179 +1,162 @@
-# PRD: fix-epic1-topic-tracking — 飞书话题追踪失败修复
+# PRD: fix-epic1-topic-tracking
 
-**项目**: fix-epic1-topic-tracking  
-**类型**: Bug Fix  
-**PM**: PM Agent  
+**Agent**: PM  
 **日期**: 2026-03-25  
-**状态**: Ready for Dev  
+**项目**: 修复 dev-p1-8-topic-tracking 虚假完成问题  
+**分析来源**: `docs/fix-epic1-topic-tracking/analysis.md`
 
 ---
 
-## 1. 问题陈述
+## 1. 执行摘要
 
-`dev-p1-8-topic-tracking` 被标记为完成，但实际无代码实现（虚假完成）。后续 `dev-p1-8-fix-fake-completion` 创建了真实实现（commit `9fd2d511`），但存在以下残留问题：
+### 1.1 背景
+`dev-p1-8-topic-tracking` 被 dev 标记为完成，但 tester 发现**无实际代码实现**（虚假完成）。根本原因是 `create_thread_and_save` 在飞书消息发送失败时静默失败（`|| true`），导致话题追踪完全失效。
 
-| 根因 | 影响 | 严重度 |
-|------|------|--------|
-| `create_thread_and_save` 用 `\|\| true` 吞掉错误 | 飞书发送失败时静默失效 | 🔴 高 |
-| `feishu_self_notify` 仅在成功后保存 thread_id | 发送失败时不保存话题 | 🔴 高 |
-| analyst 心跳不调用话题创建函数 | analyst TASK_THREADS 永远为空 | 🟡 中 |
+### 1.2 目标
+修复话题追踪功能，确保：
+1. 失败时有明确告警
+2. 失败时降级为普通消息
+3. analyst 心跳也支持话题追踪
 
----
-
-## 2. 成功指标
+### 1.3 关键指标
 
 | 指标 | 目标 |
 |------|------|
-| 话题创建失败时的可观测性 | 100% 有 ⚠️ 告警输出 |
-| 功能降级可用性 | 失败时 fallback 到普通消息 |
-| analyst 心跳容错 | 不因话题函数报错中断 |
+| 静默失败次数 | 0（必须有告警） |
+| 功能降级 | 失败时 fallback 到普通消息 |
+| analyst 话题支持 | P2（可选） |
 
 ---
 
-## 3. 功能需求
+## 2. Epic 拆分
 
-### F1: 话题创建失败告警
+### Epic 1: 失败告警机制
 
-**描述**: `create_thread_and_save` 在飞书消息发送失败时必须输出可观测的 ⚠️ 告警，而非静默失败。
+**目标**: `create_thread_and_save` 失败时有明确告警，不再静默
 
-**修改文件**: `vibex/scripts/common.sh`
+| Story ID | 描述 | 验收标准 | 优先级 |
+|----------|------|----------|--------|
+| F-E1-001 | 移除 `\|\| true` 静默 | `expect(create_thread_and_save 失败时返回非0) | P0 |
+| F-E1-002 | 添加 `⚠️` 告警消息 | `expect(日志包含 "⚠️ 话题创建失败")` | P0 |
+| F-E1-003 | 失败时输出错误详情 | `expect(日志包含 stderr 内容)` | P1 |
 
-**当前代码**:
-```bash
-result=$(openclaw message send ... 2>&1) || true
-```
+### Epic 2: 降级机制
 
-**修复后代码**:
-```bash
-result=$(openclaw message send ... 2>&1)
-if [ $? -ne 0 ]; then
-    echo "⚠️ 飞书话题创建失败: $result"
-fi
-```
+**目标**: 话题创建失败时，fallback 到普通消息发送
 
-**验收标准**:
-- [ ] 当 Bot 不在群组时，脚本输出包含 `⚠️` 和失败原因
-- [ ] 返回码非 0，允许调用方检测失败
+| Story ID | 描述 | 验收标准 | 优先级 |
+|----------|------|----------|--------|
+| F-E2-001 | 检测 msg_id 为空 | `expect([ -z "$msg_id" ] 时触发降级)` | P0 |
+| F-E2-002 | 降级到普通消息 | `expect(feishu_self_notify 不带 --reply-to)` | P0 |
+| F-E2-003 | 降级时记录日志 | `expect(日志包含 "降级为普通消息")` | P1 |
 
----
+### Epic 3: analyst 话题追踪
 
-### F2: 失败时降级为普通消息
+**目标**: analyst 心跳也支持话题追踪（P2，可选）
 
-**描述**: 当 `create_thread_and_save` 无法创建话题时，fallback 到普通消息发送，保证消息不丢失。
+| Story ID | 描述 | 验收标准 | 优先级 |
+|----------|------|----------|--------|
+| F-E3-001 | analyst-heartbeat.sh 调用话题函数 | `expect(analyst 心跳创建话题)` | P2 |
+| F-E3-002 | analyst HEARTBEAT.md 保存 thread_id | `expect(TASK_THREADS 区域有值)` | P2 |
 
-**修改文件**: `vibex/scripts/common.sh`
+### Epic 4: 验证与测试
 
-**修复后逻辑**:
-```bash
-if [ -z "$msg_id" ]; then
-    echo "⚠️ 话题创建失败，降级为普通消息"
-    openclaw message send --channel feishu --account "$agent" --target "$channel" --message "$message" 2>&1
-fi
-```
+**目标**: 确保修复后的功能可验证
 
-**验收标准**:
-- [ ] `msg_id` 为空时，自动发送普通消息（无 `--reply-to`）
-- [ ] 输出降级日志：`⚠️ 话题创建失败，降级为普通消息`
+| Story ID | 描述 | 验收标准 | 优先级 |
+|----------|------|----------|--------|
+| F-E4-001 | dev-heartbeat.sh 功能正常 | `expect(任务领取后创建话题)` | P0 |
+| F-E4-002 | analyst 心跳不受影响 | `expect(analyst 心跳不报错)` | P0 |
+| F-E4-003 | E2E 测试覆盖 | `expect(话题追踪覆盖 3 个场景)` | P1 |
 
 ---
 
-### F3: analyst 心跳容错
+## 3. 验收标准
 
-**描述**: 确保 `analyst-heartbeat.sh` 调用话题函数时不因错误中断，同时将 analyst 心跳也纳入话题追踪。
-
-**修改文件**: `vibex/scripts/analyst-heartbeat.sh`
-
-**验收标准**:
-- [ ] analyst 心跳在话题函数失败时继续执行（不中断）
-- [ ] analyst 领取任务时调用 `create_thread_and_save`
-- [ ] analyst 的 TASK_THREADS 区域可写入 thread_id
-
----
-
-## 4. Epic 拆分
-
-### Epic 1: 失败告警（P0）
-
-| Story | 描述 | 验收条件 |
-|-------|------|----------|
-| dev-fix-f1-alert | 修改 `create_thread_and_save` 移除 `\|\| true`，添加 ⚠️ 告警 | 失败时输出告警 + 非零返回码 |
-
-### Epic 2: 降级机制（P0）
-
-| Story | 描述 | 验收条件 |
-|-------|------|----------|
-| dev-fix-f2-fallback | `msg_id` 为空时 fallback 到普通消息 | 降级消息可送达 |
-
-### Epic 3: analyst 话题追踪（P1）
-
-| Story | 描述 | 验收条件 |
-|-------|------|----------|
-| dev-fix-f3-analyst-integration | analyst-heartbeat.sh 调用话题创建函数，添加容错 | analyst 心跳不报错，TASK_THREADS 可写入 |
+| ID | Given | When | Then |
+|----|-------|------|------|
+| AC-001 | Bot 不在群组 | `create_thread_and_save` 执行 | `expect(返回非0，日志包含 "⚠️ 话题创建失败")` |
+| AC-002 | `msg_id` 为空 | 话题创建失败 | `expect(降级到普通消息发送)` |
+| AC-003 | analyst 心跳运行 | 任务领取 | `expect(创建话题并保存 thread_id)` |
+| AC-004 | dev 心跳运行 | 任务领取 | `expect(thread_id 保存到 HEARTBEAT.md)` |
+| AC-005 | 正常情况 | 话题创建成功 | `expect(msg_id 非空，保存成功)` |
 
 ---
 
-## 5. UI/UX 流程
-
-不涉及 UI 变更。日志输出示例：
+## 4. UI/UX 流程
 
 ```
-✅ 任务领取: heartbeat-dev/P1-8
-⚠️ 飞书话题创建失败: Bot not in chat
-⚠️ 话题创建失败，降级为普通消息
-✅ 心跳报告已发送
+[任务领取]
+     ↓
+[create_thread_and_save]
+     ↓
+[openclaw message send]
+     ↓
+    /\
+   /  \
+  成功  失败
+   |     |
+   ↓     ↓
+[提取msg_id] [⚠️ 告警]
+   |     |
+   ↓     ↓
+[保存thread_id] [降级普通消息]
+   |
+   ↓
+[完成]
 ```
 
 ---
 
-## 6. 非功能需求
+## 5. 非功能需求
 
-| 类型 | 要求 |
+| 需求 | 指标 |
 |------|------|
-| 兼容性 | Bash 3.2+（macOS/Linux 默认） |
-| 依赖 | `openclaw`, `jq`, `grep`（已有） |
-| 日志 | 所有 ⚠️ 告警输出到 stderr |
-| 性能 | 降级路径无额外延迟 |
+| 向后兼容 | 现有 dev/analyst 心跳不受影响 |
+| 可观测性 | 失败必须有日志/告警 |
+| 容错性 | 单次失败不影响整体功能 |
 
 ---
 
-## 7. 实施计划
+## 6. Out of Scope
 
-| 阶段 | 负责人 | 产出 |
-|------|--------|------|
-| Epic 1 + 2 | dev | 修改 common.sh，提交 PR |
-| Epic 3 | dev | 修改 analyst-heartbeat.sh，提交 PR |
-| 测试 | tester | 手动验证（Bot 不在群场景） |
-| 审查 | reviewer | Code review |
-
-**预计工时**: 1.5h（Epic 1+2: 1h，Epic 3: 0.5h）
+- 不修改 `openclaw message send` 本身
+- 不修改其他 agent 的心跳脚本（除 analyst P2）
+- 不修改飞书 API 集成
 
 ---
 
-## 8. 验收测试用例
+## 7. 依赖关系
 
-| ID | 场景 | 输入 | 预期输出 |
-|----|------|------|----------|
-| TC1 | 话题创建成功 | Bot 在群，发送正常 | `✅` + msg_id 保存到 HEARTBEAT.md |
-| TC2 | 话题创建失败 | Bot 不在群 | `⚠️ 飞书话题创建失败: ...` + fallback 普通消息 |
-| TC3 | analyst 心跳 | analyst 领取任务 | TASK_THREADS 写入 thread_id |
-
----
-
-## 9. 依赖
-
-- `common.sh` 中的 `create_thread_and_save`、`save_task_thread_id` 函数
-- `openclaw message send` 命令可用
-- analyst 的 `workspace-analyst/HEARTBEAT.md` TASK_THREADS 区域存在
+| 依赖方 | 依赖内容 | 状态 |
+|--------|----------|------|
+| Dev | 修改 common.sh | 待派发 |
+| Tester | E2E 测试验证 | 待派发 |
+| Reviewer | 代码审查 | 待派发 |
 
 ---
 
-## 10. 变更文件清单
+## 8. 实施计划
 
-| 文件 | 操作 |
-|------|------|
-| `vibex/scripts/common.sh` | 修改 |
-| `vibex/scripts/analyst-heartbeat.sh` | 修改 |
+| Phase | 内容 | 工时 |
+|-------|------|------|
+| Phase 1 | Epic 1 + Epic 2（失败告警 + 降级） | 1h |
+| Phase 2 | Epic 4（验证测试） | 1h |
+| Phase 3 | Epic 3 analyst 话题（P2） | 0.5h |
+
+**总计**: 约 2.5h
 
 ---
 
-*PRD 由 PM Agent 生成于 2026-03-25*
+## 9. 验收检查清单
+
+- [ ] `create_thread_and_save` 失败时返回非0
+- [ ] 失败日志包含 `⚠️ 话题创建失败`
+- [ ] msg_id 为空时降级到普通消息
+- [ ] dev 心跳任务领取后创建话题成功
+- [ ] analyst 心跳不受影响（P2 可选）
+- [ ] E2E 测试覆盖 3 个场景
+
+---
+
+**DoD**: 所有 P0 Story 验收标准通过，Epic 1+2+4 完成，analyst 话题追踪为 P2 可选。

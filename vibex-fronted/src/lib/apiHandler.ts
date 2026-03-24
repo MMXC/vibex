@@ -4,7 +4,7 @@
  * 提供简化的 API 调用包装器，用于替换 try-catch 模式
  */
 
-import { ErrorConfig } from '@/lib/error';
+import { ErrorConfig } from '@/types/error';
 import { defaultErrorMapper } from '@/lib/error/ErrorCodeMapper';
 
 /**

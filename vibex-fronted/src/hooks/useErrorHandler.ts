@@ -19,7 +19,7 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
-import { ErrorType, ErrorConfig } from '@/lib/error';
+import { ErrorType, ErrorConfig } from '@/types/error';
 
 // ==================== Types ====================
 

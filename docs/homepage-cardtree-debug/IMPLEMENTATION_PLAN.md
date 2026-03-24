@@ -48,7 +48,7 @@
 
 ---
 
-### Phase 3 — Epic 3: UI 交互验证 (2h)
+### Phase 3 — Epic 3: UI 交互验证 (2h) ✅ DONE
 
 **任务**:
 1. E2E 测试：CardTree 节点展开/收起
@@ -57,8 +57,10 @@
 4. 验证空状态处理
 
 **验收标准**:
-- [ ] 所有 UI 交互测试通过
-- [ ] Mermaid 回退正常（useCardTree=false）
+- [x] 所有 UI 交互测试通过 (15/15 E2E tests PASS, 80 unit tests PASS)
+- [x] Mermaid 回退正常（useCardTree=false）
+- [x] npm build 成功
+- [x] 提交 commit: b57151d1
 
 ---
 

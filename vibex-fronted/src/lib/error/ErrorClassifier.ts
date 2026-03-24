@@ -1,6 +1,6 @@
 /**
  * ErrorClassifier - 错误分类器
- * 根据错误特征分类为 network/business/server/client/timeout
+ * 根据错误特征分类为: NETWORK_ERROR | TIMEOUT | PARSE_ERROR | UNKNOWN
  */
 
 import { AxiosError } from 'axios';
@@ -73,29 +73,18 @@ export class ErrorClassifier {
   }
 
   /**
-   * 判断是否为业务错误
-   * 业务错误通常是 200 但 success=false 或有特定的错误码
+   * 判断是否为解析错误
    */
-  static isBusinessError(error: unknown, response?: ApiErrorResponse): boolean {
-    // 优先检查响应体中的业务错误标识
-    if (response) {
-      // 检查是否有 error 字段（后端约定的错误格式）
-      if (response.error !== undefined) {
-        return true;
-      }
-      // 检查是否有业务错误码
-      if (response.code && response.code.startsWith('B')) {
-        return true;
-      }
+  static isParseError(error: unknown): boolean {
+    if (error instanceof SyntaxError) return true;
+    if (error instanceof TypeError) {
+      const msg = error.message.toLowerCase();
+      return msg.includes('json') || msg.includes('parse') || msg.includes('undefined is not an object');
     }
-    
-    // 通过 AxiosError 判断
-    if (error instanceof AxiosError) {
-      const status = error.response?.status;
-      // 4xx 客户端错误通常也是业务错误的一种
-      return status !== undefined && status >= 400 && status < 500;
+    if (error instanceof Error) {
+      const msg = error.message.toLowerCase();
+      return msg.includes('json') || msg.includes('unexpected token') || msg.includes('parse error');
     }
-    
     return false;
   }
 
@@ -107,52 +96,55 @@ export class ErrorClassifier {
     if (this.isNetworkError(error)) {
       return true;
     }
-    
+
     // 超时可重试
     if (this.isTimeoutError(error)) {
       return true;
     }
-    
+
     // 5xx 服务端错误可重试
     if (this.isServerError(error)) {
       return true;
     }
-    
+
+    // 解析错误不可重试（数据格式问题）
+    if (this.isParseError(error)) {
+      return false;
+    }
+
     // 429 Too Many Requests 可重试
     if (error instanceof AxiosError) {
       if (error.response?.status === 429) {
         return true;
       }
     }
-    
+
     return false;
   }
 
   /**
    * 判断错误类型
+   * 返回: NETWORK_ERROR | TIMEOUT | PARSE_ERROR | UNKNOWN
    */
   static determineType(error: unknown, response?: ApiErrorResponse): ErrorType {
+    if (this.isParseError(error)) {
+      return 'PARSE_ERROR';
+    }
+
     if (this.isNetworkError(error)) {
-      return 'network';
+      return 'NETWORK_ERROR';
     }
-    
+
     if (this.isTimeoutError(error)) {
-      return 'timeout';
+      return 'TIMEOUT';
     }
-    
-    if (this.isBusinessError(error, response)) {
-      return 'business';
+
+    // 其他错误类型 (4xx 客户端, 5xx 服务端, 业务错误等) 归为 UNKNOWN
+    if (this.isServerError(error) || this.isClientError(error)) {
+      return 'UNKNOWN';
     }
-    
-    if (this.isServerError(error)) {
-      return 'server';
-    }
-    
-    if (this.isClientError(error)) {
-      return 'client';
-    }
-    
-    return 'unknown';
+
+    return 'UNKNOWN';
   }
 
   /**
@@ -160,19 +152,20 @@ export class ErrorClassifier {
    */
   static determineSeverity(type: ErrorType, status?: number): ErrorSeverity {
     switch (type) {
-      case 'network':
+      case 'NETWORK_ERROR':
         return 'high';
-      case 'timeout':
+      case 'TIMEOUT':
         return 'medium';
-      case 'server':
-        return 'critical';
-      case 'client':
+      case 'PARSE_ERROR':
+        return 'high';
+      case 'UNKNOWN':
         if (status === 401 || status === 403) {
           return 'high';
         }
-        return 'medium';
-      case 'business':
-        return 'medium';
+        if (status !== undefined && status >= 500) {
+          return 'critical';
+        }
+        return status === undefined ? 'low' : 'medium';
       default:
         return 'low';
     }

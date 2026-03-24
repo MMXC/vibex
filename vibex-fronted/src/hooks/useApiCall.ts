@@ -312,14 +312,10 @@ export function useApiCallWithToast<TArgs extends unknown[], TData>(
 // 错误类型到 Toast 类型的映射
 function mapErrorToToastType(error: ErrorConfig): 'success' | 'error' | 'warning' | 'info' {
   switch (error.type) {
-    case 'network':
-    case 'server':
-    case 'unknown':
+    case 'NETWORK_ERROR':
+    case 'UNKNOWN':
       return 'error';
-    case 'client':
-    case 'business':
-      return 'warning';
-    case 'timeout':
+    case 'TIMEOUT':
       return 'warning';
     default:
       return 'error';

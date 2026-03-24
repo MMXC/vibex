@@ -134,7 +134,7 @@ export function useApiCall<TArgs extends unknown[], TData>(
         // 其他错误
         return {
           code: 'E9999',
-          type: 'unknown',
+          type: 'UNKNOWN',
           severity: 'high',
           message: err.message,
           userMessage: '操作失败，请稍后重试',
@@ -145,7 +145,7 @@ export function useApiCall<TArgs extends unknown[], TData>(
       // 默认未知错误
       return {
         code: 'E9999',
-        type: 'unknown',
+        type: 'UNKNOWN',
         severity: 'high',
         message: '未知错误',
         userMessage: '操作失败，请稍后重试',

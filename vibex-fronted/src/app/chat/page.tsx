@@ -135,7 +135,7 @@ export default function Chat() {
       {/* Agent Sidebar */}
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
-          <h2 className={styles.sidebarTitle}>AI Agents</h2>
+          <h1 className={styles.sidebarTitle}>AI Agents</h1>
         </div>
 
         <div className={styles.agentList}>
@@ -167,7 +167,7 @@ export default function Chat() {
           <div className={styles.headerInfo}>
             <span className={styles.headerIcon}>◈</span>
             <div>
-              <h1 className={styles.headerTitle}>AI 对话</h1>
+              <h2 className={styles.headerTitle}>AI 对话</h2>
               <p className={styles.headerSubtitle}>
                 当前 Agent:{' '}
                 <span className={styles.agentTag}>General Agent</span>
@@ -175,10 +175,10 @@ export default function Chat() {
             </div>
           </div>
           <div className={styles.headerActions}>
-            <button className={styles.headerBtn} title="设置">
+            <button className={styles.headerBtn} title="设置" aria-label="设置">
               ⚙
             </button>
-            <button className={styles.headerBtn} title="更多">
+            <button className={styles.headerBtn} title="更多" aria-label="更多">
               ⋯
             </button>
           </div>
@@ -266,6 +266,7 @@ export default function Chat() {
               className={styles.sendButton}
               onClick={handleSend}
               disabled={isSending || !input.trim()}
+              aria-label="发送消息"
             >
               <svg
                 viewBox="0 0 24 24"

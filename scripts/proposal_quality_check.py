@@ -37,7 +37,7 @@ class ProposalChecker:
             re.MULTILINE,
         ),
         "Agent": re.compile(
-            r"(?:^\*\*Agent\*\*\s*[:：]\s*|^\*\*作者\*\*\s*[:：]\s*)(\w+)",
+            r"(?:^\*\*Agent\*\*\s*[:：]\s*|^\*\*作者\*\*\s*[:：]\s*|^\*\*汇总人\*\*\s*[:：]\s*)(\w+)",
             re.MULTILINE,
         ),
     }
@@ -96,9 +96,9 @@ class ProposalChecker:
             self.content,
             re.MULTILINE,
         )
-        # 格式2: standalone "P0:" headers
+        # 格式2: standalone "P0:" 或 "P0-1:" headers
         standalone_headers = re.findall(
-            r"^\s*(P\d+)[:：]\s*([^\n]+?)\s*$",
+            r"^\s*(P\d+(?:-\d+)?)[:：]\s*([^\n]+?)\s*$",
             self.content,
             re.MULTILINE,
         )

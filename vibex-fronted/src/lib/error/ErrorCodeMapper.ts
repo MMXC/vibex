@@ -110,7 +110,7 @@ export class ErrorCodeMapper {
         // 无响应 = 网络错误
         return {
           code: 'E1001',
-          type: 'network',
+          type: 'NETWORK_ERROR',
           severity: 'high',
           message: message || '网络连接失败',
           userMessage: '网络连接失败，请检查网络',
@@ -123,7 +123,7 @@ export class ErrorCodeMapper {
       if (statusCode >= 500) {
         return {
           code: `E${statusCode}`,
-          type: 'server',
+          type: 'UNKNOWN',
           severity: 'critical',
           message: message || '服务端错误',
           userMessage: '服务异常，请稍后重试',
@@ -134,7 +134,7 @@ export class ErrorCodeMapper {
       if (statusCode === 401) {
         return {
           code: 'E1004',
-          type: 'client',
+          type: 'UNKNOWN',
           severity: 'high',
           message: message || '未授权',
           userMessage: '登录已过期，请重新登录',
@@ -145,7 +145,7 @@ export class ErrorCodeMapper {
       if (statusCode === 403) {
         return {
           code: 'E1005',
-          type: 'client',
+          type: 'UNKNOWN',
           severity: 'high',
           message: message || '禁止访问',
           userMessage: '无权限执行此操作',
@@ -156,7 +156,7 @@ export class ErrorCodeMapper {
       if (statusCode === 404) {
         return {
           code: 'E1006',
-          type: 'client',
+          type: 'UNKNOWN',
           severity: 'medium',
           message: message || '资源不存在',
           userMessage: '请求的资源不存在',
@@ -166,7 +166,7 @@ export class ErrorCodeMapper {
       
       return {
         code: `E${statusCode}`,
-        type: 'client',
+        type: 'UNKNOWN',
         severity: 'medium',
         message: message || '请求错误',
         userMessage: message || '请求失败，请检查输入',
@@ -181,7 +181,7 @@ export class ErrorCodeMapper {
       if (message.includes('timeout')) {
         return {
           code: 'E1002',
-          type: 'timeout',
+          type: 'TIMEOUT',
           severity: 'medium',
           message: error.message,
           userMessage: '请求超时，请稍后重试',
@@ -192,7 +192,7 @@ export class ErrorCodeMapper {
       if (message.includes('network') || message.includes('fetch')) {
         return {
           code: 'E1001',
-          type: 'network',
+          type: 'NETWORK_ERROR',
           severity: 'high',
           message: error.message,
           userMessage: '网络连接失败，请检查网络',
@@ -204,7 +204,7 @@ export class ErrorCodeMapper {
     // 未知错误
     return {
       code: 'E9999',
-      type: 'unknown',
+      type: 'UNKNOWN',
       severity: 'low',
       message: '未知错误',
       userMessage: '发生未知错误，请稍后重试',

@@ -12,6 +12,7 @@
 import React, { useCallback, useState } from 'react';
 import { CardTreeRenderer } from '@/components/visualization/CardTreeRenderer/CardTreeRenderer';
 import { useProjectTree } from '@/hooks/useProjectTree';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { CardTreeSkeleton } from './CardTreeSkeleton';
 import { CardTreeError } from './CardTreeError';
 import type { CardTreeVisualizationRaw } from '@/types/visualization';
@@ -70,13 +71,42 @@ export function CardTreeView({
   const {
     data,
     isLoading,
-    error,
+    error: fetchError,
     isMockData,
     refetch,
   } = useProjectTree({
     projectId,
     localData: boundedContexts ? { boundedContexts } : undefined,
   });
+
+  // Unified error handling via useErrorHandler
+  const {
+    error: unifiedError,
+    userMessage: errorUserMessage,
+    isRetryable,
+    retry,
+    handleError,
+    clearError,
+  } = useErrorHandler({
+    onError: (err) => {
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('[CardTree] Error:', err);
+      }
+    },
+  });
+
+  // Sync useProjectTree error into useErrorHandler
+  React.useEffect(() => {
+    if (fetchError) {
+      handleError(fetchError);
+    } else {
+      clearError();
+    }
+  }, [fetchError, handleError, clearError]);
+
+  // Use unified error user message or raw fetch error message
+  const displayError = errorUserMessage ?? (fetchError?.message ?? null);
+  const canRetry = isRetryable || (fetchError != null);
 
   // Toggle expand/collapse for a node
   const handleToggleExpand = useCallback((nodeId: string) => {
@@ -115,11 +145,11 @@ export function CardTreeView({
   }
 
   // Error state
-  if (error) {
+  if (displayError) {
     return (
       <CardTreeError
-        message={error.message || '加载失败，请重试'}
-        onRetry={refetch}
+        message={displayError}
+        onRetry={canRetry ? () => retry(refetch) : refetch}
       />
     );
   }

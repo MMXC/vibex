@@ -254,7 +254,7 @@ git diff origin/main --stat
 
 ## Sprint 3 — 持续改进（3d+）
 
-### P2-2: 错误处理统一
+### P2-2: 错误处理统一 ✅ DONE
 **执行者**: dev  
 **工时**: 2d
 

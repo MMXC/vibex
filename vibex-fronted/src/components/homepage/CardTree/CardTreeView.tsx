@@ -15,7 +15,6 @@ import { useProjectTree } from '@/hooks/useProjectTree';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { CardTreeSkeleton } from './CardTreeSkeleton';
 import { CardTreeError } from './CardTreeError';
-import type { CardTreeVisualizationRaw } from '@/types/visualization';
 import type { BoundedContext } from '@/types/homepage';
 import styles from './CardTree.module.css';
 
@@ -81,7 +80,6 @@ export function CardTreeView({
 
   // Unified error handling via useErrorHandler
   const {
-    error: unifiedError,
     userMessage: errorUserMessage,
     isRetryable,
     retry,

@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - **测试套件**: ErrorClassifier / ErrorCodeMapper / ErrorMiddleware 共 120 tests 全部通过
 
 ### Added (vibex-epic1-toolchain-20260324 Epic1: Toolchain Fixes) — 2026-03-24
+- **scripts/dedup/dedup_production_verify.py**: 新增生产环境 dedup 批量验证脚本，102 项目 × 10 提案，误判率 0%
 - **scripts/timeout.py**: 新增通用 `@timeout(seconds)` SIGALRM 超时装饰器
 - **task_manager.py**: `cmd_list`/`cmd_claim` 添加 `@timeout(5)` 装饰器，防止挂起
 - **task_manager.py**: 新增 `health` 命令，健康检查 list + load_project 耗时

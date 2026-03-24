@@ -459,3 +459,7 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
     }
   )
 );
+
+// ===== Batch 1: Types split - Re-export from confirmationTypes =====
+// This enables gradual migration while maintaining backward compatibility
+export * from './confirmationTypes';

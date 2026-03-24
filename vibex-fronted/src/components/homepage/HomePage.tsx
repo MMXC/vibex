@@ -144,8 +144,8 @@ export default function HomePage() {
           currentStep={currentStep}
           mermaidCode={currentMermaidCode}
           boundedContexts={boundedContexts}
-          domainModels={domainModels}
-          businessFlow={businessFlow}
+          _domainModels={domainModels}
+          _businessFlow={businessFlow}
           isGenerating={isGenerating}
           useCardTree={IS_CARD_TREE_ENABLED}
           projectId={createdProjectId}

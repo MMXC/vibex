@@ -1,40 +1,46 @@
-# Epic2-Frontend: E2E CI 集成 — 实现方案
+# Epic2-Frontend: 实现方案
 
 **项目**: vibex-epic2-frontend-20260324
-**任务**: dev-p1-5-e2e-ci
+**Epic**: P1-5 E2E CI + P1-6 API Error Tests
 **创建时间**: 2026-03-25
 
 ---
 
-## 背景
+## P1-5: E2E CI 集成
 
-E2E 测试已存在于 `vibex-fronted/tests/e2e/`，GitHub Actions workflow `e2e-tests.yml` 已配置但存在以下问题：
+### 问题
 1. `continue-on-error: true` 掩盖真实失败
 2. 未显式指定 `playwright.ci.config.ts`
-3. CI 配置可能需要内存优化
 
-## 修复内容
+### 修复
+- `e2e-tests.yml`: 移除 `continue-on-error: true`，显式指定 `--config=playwright.ci.config.ts`
+- notify job: `if: always()` → `if: failure()`
 
-### 1. e2e-tests.yml — 修复 CI 适配
+---
 
-**问题**: `continue-on-error: true` 导致测试失败时 CI 仍显示 green
-**修复**: 移除 `continue-on-error`，仅在 flaky tests 使用条件跳过
+## P1-6: API 错误测试开发
 
-### 2. playwright.ci.config.ts — 内存优化
+### 产出
+- `vibex-fronted/src/services/api/__tests__/api-error-integration.test.ts` — 33 tests
 
-已在 `playwright.ci.config.ts` 中配置：
-- `--no-sandbox` / `--disable-setuid-sandbox`（Chromium CI args）
-- workers: `undefined`（自动选择 CPU 核心数）
-- retries: 3（CI 稳定性）
-- `--shard` 分片支持
+### 测试覆盖
 
-### 3. Changelog 更新
+| 测试组 | 测试数 | 内容 |
+|--------|--------|------|
+| E1.1 HTTP状态码拦截 | 7 | 400/401/403/404/409/500/200 |
+| E1.2 错误响应解析 | 3 | data.error/嵌套/默认消息 |
+| E1.3 网络错误捕获 | 5 | Failed to fetch/DNS/ECONNREFUSED/CORS/普通Error |
+| E1.4 超时错误处理 | 3 | timeout检测/可重试/正常响应 |
+| E2.1 认证错误映射 | 4 | AUTH_001/AUTH_002/401/未知 |
+| E2.2 业务错误映射 | 3 | PROJECT_001/002/未知 |
+| E2.3 验证错误映射 | 2 | VALIDATION_001/字段级 |
+| E2.4 服务端错误映射 | 4 | API_001/002/003/5xx |
+| E4 Toast集成 | 2 | 错误消息来源/登录提示 |
 
-记录 E2E CI 集成为 Epic2-P1-5 完成项。
+### 已知限制
+- `ErrorClassifier.isNetworkError` 不检测 "getaddrinfo ENOTFOUND" / "connect ECONNREFUSED"（缺少关键字匹配）
+- `ErrorClassifier.classify` 依赖 `axios.isAxiosError`（需要 axios mock 支持）
 
-## 验收标准
-
-- [ ] `continue-on-error: true` 已移除
-- [ ] E2E 测试使用 `playwright.ci.config.ts`
-- [ ] Changelog 已更新
-- [ ] `git status --porcelain` 无未提交文件
+### 验收标准
+- [x] 33 tests pass
+- [x] changelog 已更新

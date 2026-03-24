@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+### Added (vibex-epic2-frontend-20260324 P1-6: API Error Tests) — 2026-03-25
+- **api-error-integration.test.ts**: 33 tests 覆盖 E1.1~E4.2（HTTP状态码拦截、错误响应解析、网络/超时错误捕获、错误码映射、Toast集成）
+- 测试文件: `vibex-fronted/src/services/api/__tests__/api-error-integration.test.ts`
+
 ### Added (vibex-epic2-frontend-20260324 P1-5: E2E CI Integration) — 2026-03-25
 - **e2e-tests.yml 修复**: 移除 `continue-on-error: true`（掩盖真实失败）
 - **playwright.ci.config.ts**: 显式指定 CI 配置文件，Chromium sandbox flags，`--shard` 分片支持

@@ -195,7 +195,7 @@ describe('HTTP Client', () => {
     it('should transform 409 error (email already exists)', () => {
       (axios.isAxiosError as jest.Mock).mockReturnValue(true);
       const error = {
-        response: { status: 409, data: { error: 'Email exists' } },
+        response: { status: 409, data: { error: '该邮箱已被注册' } },
       };
 
       const result = transformError(error as any);

@@ -135,7 +135,7 @@ export function transformError(error: AxiosError | Error): Error {
         message = '请求的资源不存在';
         break;
       case 409:
-        message = '该邮箱已被注册';
+        message = (error.response?.data?.error as string) || '该邮箱已被注册';
         break;
       case 500:
         message = '服务器错误，请稍后重试';

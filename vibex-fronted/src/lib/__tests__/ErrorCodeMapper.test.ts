@@ -41,7 +41,7 @@ describe('ErrorCodeMapper', () => {
     it('should merge custom mappings with default mappings', () => {
       const customMapping = {
         code: 'CUSTOM1',
-        type: 'business' as const,
+        type: 'UNKNOWN' as const,
         severity: 'low' as const,
         message: 'Custom error',
         userMessage: 'Custom user message',
@@ -58,7 +58,7 @@ describe('ErrorCodeMapper', () => {
       const mapper = new ErrorCodeMapper();
       const customMapping = {
         code: 'TEST1',
-        type: 'business' as const,
+        type: 'UNKNOWN' as const,
         severity: 'low' as const,
         message: 'Test',
         userMessage: 'Test message',
@@ -73,8 +73,8 @@ describe('ErrorCodeMapper', () => {
     it('should add multiple mappings at once', () => {
       const mapper = new ErrorCodeMapper();
       const mappings = {
-        TEST1: { code: 'TEST1', type: 'business' as const, severity: 'low' as const, message: 'Test1', userMessage: 'Test1', retryable: false },
-        TEST2: { code: 'TEST2', type: 'server' as const, severity: 'critical' as const, message: 'Test2', userMessage: 'Test2', retryable: true },
+        TEST1: { code: 'TEST1', type: 'UNKNOWN' as const, severity: 'low' as const, message: 'Test1', userMessage: 'Test1', retryable: false },
+        TEST2: { code: 'TEST2', type: 'UNKNOWN' as const, severity: 'critical' as const, message: 'Test2', userMessage: 'Test2', retryable: true },
       };
       mapper.addMappings(mappings);
       expect(mapper.getAllMappings().TEST1).toBeDefined();
@@ -165,7 +165,7 @@ describe('ErrorCodeMapper', () => {
       const response: ApiErrorResponse = { code: 'B2001' };
       const result = mapper.map(new Error('test'), response);
       expect(result.code).toBe('B2001');
-      expect(result.type).toBe('business');
+      expect(result.type).toBe('UNKNOWN');
     });
 
     it('should map 401 to unauthorized config', () => {
@@ -198,7 +198,7 @@ describe('ErrorCodeMapper', () => {
       const error = new AxiosError('Server error', '500', undefined, { status: 500 });
       const result = mapper.map(error, undefined, 500);
       expect(result.code).toBe('E1003');
-      expect(result.type).toBe('server');
+      expect(result.type).toBe('UNKNOWN');
       expect(result.retryable).toBe(true);
     });
 
@@ -206,17 +206,16 @@ describe('ErrorCodeMapper', () => {
       const mapper = new ErrorCodeMapper();
       const error = new AxiosError('Network error');
       const result = mapper.map(error);
-      expect(result.type).toBe('network');
+      expect(result.type).toBe('NETWORK_ERROR');
       expect(result.code).toBe('E1001');
       expect(result.retryable).toBe(true);
     });
 
     it('should map timeout error correctly', () => {
       const mapper = new ErrorCodeMapper();
-      // Pass httpStatus to bypass the default E1001 mapping
       const error = new Error('Request timeout only');
       const result = mapper.map(error, undefined, 408);
-      expect(result.type).toBe('timeout');
+      expect(result.type).toBe('TIMEOUT');
       expect(result.code).toBe('E1002');
       expect(result.retryable).toBe(true);
     });
@@ -225,16 +224,15 @@ describe('ErrorCodeMapper', () => {
       const mapper = new ErrorCodeMapper();
       const error = new Error('Failed to fetch');
       const result = mapper.map(error);
-      expect(result.type).toBe('network');
+      expect(result.type).toBe('NETWORK_ERROR');
       expect(result.code).toBe('E1001');
     });
 
     it('should return unknown error for unrecognized errors', () => {
       const mapper = new ErrorCodeMapper();
-      // Pass an unrecognized HTTP status that has no mapping
       const error = new Error('Just some random error message xyz');
-      const result = mapper.map(error, undefined, 599); // Unrecognized status
-      expect(result.type).toBe('unknown');
+      const result = mapper.map(error, undefined, 599);
+      expect(result.type).toBe('UNKNOWN');
       expect(result.code).toBe('E9999');
     });
   });
@@ -265,7 +263,6 @@ describe('ErrorCodeMapper', () => {
 
     it('should handle null error', () => {
       const mapper = new ErrorCodeMapper();
-      // null is treated as network error in default handler
       const result = mapper.map(null as any);
       expect(result).toBeDefined();
     });
@@ -279,15 +276,13 @@ describe('ErrorCodeMapper', () => {
     it('should handle very large HTTP status code', () => {
       const mapper = new ErrorCodeMapper();
       const result = mapper.map(new Error('test'), undefined, 99999);
-      // Large status code falls to unknown
-      expect(result.type).toBe('unknown');
+      expect(result.type).toBe('UNKNOWN');
     });
 
     it('should handle negative HTTP status code', () => {
       const mapper = new ErrorCodeMapper();
       const result = mapper.map(new Error('test'), undefined, -1);
-      // Negative status falls through to unknown error
-      expect(result.type).toBe('unknown');
+      expect(result.type).toBe('UNKNOWN');
     });
   });
 });

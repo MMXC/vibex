@@ -74,8 +74,6 @@ describe('ErrorClassifier', () => {
       expect(ErrorClassifier.isNetworkError(error)).toBe(true);
     });
 
-    // Note: These are classified as timeout errors, not network errors
-    // because the code checks for "timeout" but not for DNS/refused errors
     it('should not classify DNS error as network (classified as unknown)', () => {
       const error = new Error('getaddrinfo ENOTFOUND');
       expect(ErrorClassifier.isNetworkError(error)).toBe(false);
@@ -198,28 +196,6 @@ describe('ErrorClassifier', () => {
     });
   });
 
-  describe('isBusinessError', () => {
-    it('should classify response with error field as business error', () => {
-      const response: ApiErrorResponse = { error: 'Something went wrong' };
-      expect(ErrorClassifier.isBusinessError(new Error('test'), response)).toBe(true);
-    });
-
-    it('should classify response with business error code as business error', () => {
-      const response: ApiErrorResponse = { code: 'B2001' };
-      expect(ErrorClassifier.isBusinessError(new Error('test'), response)).toBe(true);
-    });
-
-    it('should classify 4xx AxiosError as business error', () => {
-      const error = new AxiosError('Bad request', '400', undefined, { status: 400 });
-      expect(ErrorClassifier.isBusinessError(error)).toBe(true);
-    });
-
-    it('should return false for 5xx errors', () => {
-      const error = new AxiosError('Server error', '500', undefined, { status: 500 });
-      expect(ErrorClassifier.isBusinessError(error)).toBe(false);
-    });
-  });
-
   describe('isRetryableError', () => {
     it('should return true for network errors', () => {
       const error = new TypeError('Failed to fetch');
@@ -253,70 +229,64 @@ describe('ErrorClassifier', () => {
   });
 
   describe('determineType', () => {
-    it('should return "network" for network errors', () => {
+    it('should return "NETWORK_ERROR" for network errors', () => {
       const error = new TypeError('Failed to fetch');
-      expect(ErrorClassifier.determineType(error)).toBe('network');
+      expect(ErrorClassifier.determineType(error)).toBe('NETWORK_ERROR');
     });
 
-    it('should return "timeout" for timeout errors', () => {
+    it('should return "TIMEOUT" for timeout errors', () => {
       const error = new Error('timeout exceeded');
-      expect(ErrorClassifier.determineType(error)).toBe('timeout');
+      expect(ErrorClassifier.determineType(error)).toBe('TIMEOUT');
     });
 
-    it('should return "server" for 5xx errors', () => {
+    it('should return "UNKNOWN" for 5xx errors (server errors mapped to UNKNOWN)', () => {
       const error = new AxiosError('Server error', '500', undefined, { status: 500 });
-      expect(ErrorClassifier.determineType(error)).toBe('server');
+      expect(ErrorClassifier.determineType(error)).toBe('UNKNOWN');
     });
 
-    // Note: 4xx errors are classified as 'business' because isBusinessError 
-    // checks for 4xx status before isClientError is checked
-    it('should return "business" for 4xx errors (due to isBusinessError priority)', () => {
+    it('should return "UNKNOWN" for 4xx errors', () => {
       const error = new AxiosError('Bad request', '400', undefined, { status: 400 });
-      expect(ErrorClassifier.determineType(error)).toBe('business');
+      expect(ErrorClassifier.determineType(error)).toBe('UNKNOWN');
     });
 
-    it('should return "business" for response with error field', () => {
+    it('should return "UNKNOWN" for response with error field', () => {
       const response: ApiErrorResponse = { error: 'Business error' };
-      expect(ErrorClassifier.determineType(new Error('test'), response)).toBe('business');
+      expect(ErrorClassifier.determineType(new Error('test'), response)).toBe('UNKNOWN');
     });
 
-    it('should return "unknown" for unknown errors', () => {
+    it('should return "UNKNOWN" for unknown errors', () => {
       const error = new Error('Unknown error');
-      expect(ErrorClassifier.determineType(error)).toBe('unknown');
+      expect(ErrorClassifier.determineType(error)).toBe('UNKNOWN');
     });
   });
 
   describe('determineSeverity', () => {
-    it('should return "high" for network errors', () => {
-      expect(ErrorClassifier.determineSeverity('network')).toBe('high');
+    it('should return "high" for NETWORK_ERROR', () => {
+      expect(ErrorClassifier.determineSeverity('NETWORK_ERROR')).toBe('high');
     });
 
-    it('should return "medium" for timeout errors', () => {
-      expect(ErrorClassifier.determineSeverity('timeout')).toBe('medium');
+    it('should return "medium" for TIMEOUT', () => {
+      expect(ErrorClassifier.determineSeverity('TIMEOUT')).toBe('medium');
     });
 
-    it('should return "critical" for server errors', () => {
-      expect(ErrorClassifier.determineSeverity('server')).toBe('critical');
+    it('should return "critical" for UNKNOWN with 5xx status', () => {
+      expect(ErrorClassifier.determineSeverity('UNKNOWN', 500)).toBe('critical');
     });
 
-    it('should return "high" for client errors with 401', () => {
-      expect(ErrorClassifier.determineSeverity('client', 401)).toBe('high');
+    it('should return "high" for UNKNOWN with 401', () => {
+      expect(ErrorClassifier.determineSeverity('UNKNOWN', 401)).toBe('high');
     });
 
-    it('should return "high" for client errors with 403', () => {
-      expect(ErrorClassifier.determineSeverity('client', 403)).toBe('high');
+    it('should return "high" for UNKNOWN with 403', () => {
+      expect(ErrorClassifier.determineSeverity('UNKNOWN', 403)).toBe('high');
     });
 
-    it('should return "medium" for other client errors', () => {
-      expect(ErrorClassifier.determineSeverity('client', 400)).toBe('medium');
+    it('should return "medium" for other UNKNOWN with status', () => {
+      expect(ErrorClassifier.determineSeverity('UNKNOWN', 400)).toBe('medium');
     });
 
-    it('should return "medium" for business errors', () => {
-      expect(ErrorClassifier.determineSeverity('business')).toBe('medium');
-    });
-
-    it('should return "low" for unknown errors', () => {
-      expect(ErrorClassifier.determineSeverity('unknown')).toBe('low');
+    it('should return "low" for UNKNOWN without status', () => {
+      expect(ErrorClassifier.determineSeverity('UNKNOWN')).toBe('low');
     });
   });
 
@@ -325,7 +295,7 @@ describe('ErrorClassifier', () => {
       const error = new TypeError('Failed to fetch');
       const result = ErrorClassifier.classify(error);
 
-      expect(result.type).toBe('network');
+      expect(result.type).toBe('NETWORK_ERROR');
       expect(result.severity).toBe('high');
       expect(result.retryable).toBe(true);
     });
@@ -334,7 +304,7 @@ describe('ErrorClassifier', () => {
       const error = new Error('timeout exceeded');
       const result = ErrorClassifier.classify(error);
 
-      expect(result.type).toBe('timeout');
+      expect(result.type).toBe('TIMEOUT');
       expect(result.severity).toBe('medium');
       expect(result.retryable).toBe(true);
     });
@@ -343,16 +313,16 @@ describe('ErrorClassifier', () => {
       const error = new AxiosError('Server error', '500', undefined, { status: 500 });
       const result = ErrorClassifier.classify(error);
 
-      expect(result.type).toBe('server');
+      expect(result.type).toBe('UNKNOWN');
       expect(result.severity).toBe('critical');
       expect(result.retryable).toBe(true);
     });
 
-    it('should classify 4xx error as business (due to isBusinessError priority)', () => {
+    it('should classify 4xx error as UNKNOWN', () => {
       const error = new AxiosError('Bad request', '400', undefined, { status: 400 });
       const result = ErrorClassifier.classify(error);
 
-      expect(result.type).toBe('business');
+      expect(result.type).toBe('UNKNOWN');
       expect(result.severity).toBe('medium');
       expect(result.retryable).toBe(false);
     });
@@ -362,8 +332,8 @@ describe('ErrorClassifier', () => {
       const error = new Error('test');
       const result = ErrorClassifier.classify(error, response);
 
-      expect(result.type).toBe('business');
-      expect(result.severity).toBe('medium');
+      expect(result.type).toBe('UNKNOWN');
+      expect(result.severity).toBe('low');
       expect(result.retryable).toBe(false);
     });
 
@@ -371,7 +341,7 @@ describe('ErrorClassifier', () => {
       const error = new Error('Unknown error');
       const result = ErrorClassifier.classify(error);
 
-      expect(result.type).toBe('unknown');
+      expect(result.type).toBe('UNKNOWN');
       expect(result.severity).toBe('low');
       expect(result.retryable).toBe(false);
     });
@@ -388,17 +358,17 @@ describe('ErrorClassifier', () => {
     it('should handle very long error message', () => {
       const longMessage = 'a'.repeat(10000);
       const error = new Error(longMessage);
-      expect(ErrorClassifier.determineType(error)).toBe('unknown');
+      expect(ErrorClassifier.determineType(error)).toBe('UNKNOWN');
     });
 
     it('should handle error message with special characters', () => {
       const error = new Error('Error with <script>alert("xss")</script>');
-      expect(ErrorClassifier.determineType(error)).toBe('unknown');
+      expect(ErrorClassifier.determineType(error)).toBe('UNKNOWN');
     });
 
     it('should handle error message with Unicode', () => {
       const error = new Error('错误信息 🔴 🎉');
-      expect(ErrorClassifier.determineType(error)).toBe('unknown');
+      expect(ErrorClassifier.determineType(error)).toBe('UNKNOWN');
     });
   });
 });

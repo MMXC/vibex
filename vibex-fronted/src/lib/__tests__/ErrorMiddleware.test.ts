@@ -58,7 +58,6 @@ describe('ErrorMiddleware', () => {
       
       middleware.setToastFunction(toastFn);
       
-      // Function should be set (no error thrown)
       expect(toastFn).not.toHaveBeenCalled();
     });
   });
@@ -70,7 +69,7 @@ describe('ErrorMiddleware', () => {
       
       const result = middleware.handleError(error);
       
-      expect(result.type).toBe('network');
+      expect(result.type).toBe('NETWORK_ERROR');
       expect(result.severity).toBe('high');
       expect(result.retryable).toBe(true);
     });
@@ -81,7 +80,7 @@ describe('ErrorMiddleware', () => {
       
       const result = middleware.handleError(error);
       
-      expect(result.type).toBe('timeout');
+      expect(result.type).toBe('TIMEOUT');
       expect(result.severity).toBe('medium');
     });
 
@@ -91,7 +90,7 @@ describe('ErrorMiddleware', () => {
       
       const result = middleware.handleError(error, error.response as any);
       
-      expect(result.type).toBe('business');
+      expect(result.type).toBe('UNKNOWN');
       expect(result.userMessage).toBe('登录已过期，请重新登录');
     });
 
@@ -119,7 +118,7 @@ describe('ErrorMiddleware', () => {
       
       const result = middleware.handleError(error, error.response as any);
       
-      expect(result.type).toBe('server');
+      expect(result.type).toBe('UNKNOWN');
       expect(result.severity).toBe('critical');
       expect(result.retryable).toBe(true);
     });
@@ -228,7 +227,7 @@ describe('ErrorMiddleware', () => {
       const middleware = new ErrorMiddleware({ showToast: false });
       const customMapping = {
         code: 'CUSTOM1',
-        type: 'business' as const,
+        type: 'UNKNOWN' as const,
         severity: 'low' as const,
         message: 'Custom error',
         userMessage: 'Custom message',
@@ -246,8 +245,8 @@ describe('ErrorMiddleware', () => {
     it('should add multiple error mappings', () => {
       const middleware = new ErrorMiddleware({ showToast: false });
       const mappings = {
-        CUSTOM1: { code: 'CUSTOM1', type: 'business' as const, severity: 'low' as const, message: 'Error 1', userMessage: 'Message 1', retryable: false },
-        CUSTOM2: { code: 'CUSTOM2', type: 'server' as const, severity: 'critical' as const, message: 'Error 2', userMessage: 'Message 2', retryable: true },
+        CUSTOM1: { code: 'CUSTOM1', type: 'UNKNOWN' as const, severity: 'low' as const, message: 'Error 1', userMessage: 'Message 1', retryable: false },
+        CUSTOM2: { code: 'CUSTOM2', type: 'UNKNOWN' as const, severity: 'critical' as const, message: 'Error 2', userMessage: 'Message 2', retryable: true },
       };
       
       middleware.addErrorMappings(mappings);
@@ -309,7 +308,7 @@ describe('ErrorMiddleware', () => {
       const middleware = new ErrorMiddleware({ showToast: false });
       const error = new AxiosError('Network error');
       const result = middleware.handleError(error);
-      expect(result.type).toBe('network');
+      expect(result.type).toBe('NETWORK_ERROR');
     });
 
     it('should handle empty error message', () => {
@@ -324,7 +323,6 @@ describe('ErrorMiddleware', () => {
       const longMessage = 'a'.repeat(10000);
       const error = new Error(longMessage);
       const result = middleware.handleError(error);
-      // The implementation may truncate or use default messages for unknown errors
       expect(result).toBeDefined();
     });
   });

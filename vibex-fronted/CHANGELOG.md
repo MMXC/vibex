@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Epic3: confirmationStore 拆分 (vibex-epic3-architecture-20260324 P1-4 Batch1)
+- **confirmationTypes.ts**: 新建类型定义文件，从 confirmationStore.ts 拆分
+- **confirmationStore.ts**: 添加 re-export 保持向后兼容
+- 11 tests ✅, TypeScript ✅, build ✅
+- Commit: `f3100ba3`
+- 后续 Batch 2/3 将拆分 store 逻辑
+
 ### Epic2: ErrorBoundary 去重 (vibex-epic2-frontend-20260324 P1-1)
 - **ui/ErrorBoundary.tsx**: 新增 `resetKeys` prop + `reset()` 方法，合并 error-boundary/ 功能
 - **ui/ErrorBoundary.test.tsx**: 新增 3 个 resetKeys 单元测试

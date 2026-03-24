@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Epic2: ErrorBoundary 去重 (vibex-epic2-frontend-20260324 P1-1)
+- **ui/ErrorBoundary.tsx**: 新增 `resetKeys` prop + `reset()` 方法，合并 error-boundary/ 功能
+- **ui/ErrorBoundary.test.tsx**: 新增 3 个 resetKeys 单元测试
+- **components/error-boundary/**: 已废弃目录删除，统一使用 `ui/ErrorBoundary`
+- TypeScript 0 errors, 10 tests ✅, build ✅
+- Commit: `d692076f`
+
 ### Epic: homepage-cardtree-debug Epic4 Review (2026-03-24)
 - **Epic4 (TypeScript修复)**: ✅ PASSED
   - `_domainModels` prop 修复 (HomePage → PreviewArea)

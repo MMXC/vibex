@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Epic3: P3-1-shared-types 共享类型包 (vibex-epic3-architecture-20260324)
+- **packages/types/**: 新建共享类型包 (api.ts, store.ts, events.ts)
+- **src/types/error.ts**: 统一错误类型定义 (ErrorType, ErrorConfig 等)
+- **向后兼容**: @/lib/error 导入仍然有效
+- 78 Error tests ✅, TypeScript 0 errors ✅
+- Commits: `4830792d`, `03e410ce`
+
 ### Epic2: CardTree 测试审查 (vibex-epic2-frontend-20260324 P1-3)
 - **CardTreeSkeleton**: 5/5 tests ✅
 - **CardTreeError**: 8/8 tests ✅  

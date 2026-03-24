@@ -66,10 +66,9 @@ jobs:
       - name: Run E2E tests (shard ${{ matrix.shard }}/4)
         run: |
           npx playwright test \
+            --config=playwright.ci.config.ts \
             --shard=${{ matrix.shard }}/4 \
-            --reporter=list \
-            --trace=on
-        continue-on-error: true
+            --reporter=list
         id: test
 
       - name: Upload test results
@@ -95,7 +94,7 @@ jobs:
   notify:
     needs: e2e-test
     runs-on: ubuntu-latest
-    if: always()
+    if: failure()
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4

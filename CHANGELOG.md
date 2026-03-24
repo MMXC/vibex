@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+### Added (vibex-epic2-frontend-20260324 P1-5: E2E CI Integration) — 2026-03-25
+- **e2e-tests.yml 修复**: 移除 `continue-on-error: true`（掩盖真实失败）
+- **playwright.ci.config.ts**: 显式指定 CI 配置文件，Chromium sandbox flags，`--shard` 分片支持
+- **内存优化**: CI 使用 `workers: undefined`（自动选择 CPU 核心数），retries: 3
+
 ### Added (vibex-epic3-architecture-20260324 Epic3 P2-2: Error Type Unify) — 2026-03-25
 - **ErrorType 枚举统一**: 改为 UPPERCASE 格式 (`NETWORK_ERROR | TIMEOUT | PARSE_ERROR | UNKNOWN`)
 - **useErrorHandler hook**: 新增统一错误处理 Hook（重试 + 状态管理 + 用户提示）

@@ -23,8 +23,9 @@ const mockChangelog: ChangelogEntry[] = [
     changes: [
       '🔧 proposals-summary/Epic3: ErrorBoundary 去重完成，10/10 测试通过',
       '✅ ui/ErrorBoundary: 合并 resetKeys + reset()，删除 error-boundary/ 重复目录',
+      '✅ page.test.tsx: 添加 ToastProvider wrapper 修复 useToast 报错',
     ],
-    commit: 'dd93f4e5',
+    commit: 'c322d2be',
   },
   {
     version: '1.0.85',

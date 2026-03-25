@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Epic1: 后端三树生成 API (vibex-backend-integration-20260325)
+- **⚠️ CONDITIONAL PASS** — API 响应字段与前端类型不匹配
+  - `sessionId` → `generationId` 字段名不一致
+  - Components: `api` 对象 vs `apis` 数组类型不匹配
+  - Prisma: `ctxType` vs 前端 `type` 字段名不匹配
+  - 3 个 ESLint warnings (unused vars)
+  - Prisma schema ✅, TypeScript ✅, Security ✅
+
 ### Epic3: P3-1-shared-types 共享类型包 (vibex-epic3-architecture-20260324)
 - **packages/types/**: 新建共享类型包 (api.ts, store.ts, events.ts)
 - **src/types/error.ts**: 统一错误类型定义 (ErrorType, ErrorConfig 等)

@@ -58,8 +58,8 @@
 **文件变更**:
 ```
 + components/canvas/BoundedContextTree.tsx
-+ components/canvas/BusinessFlowTree.tsx
-+ components/canvas/ComponentTree.tsx
++ components/canvas/BusinessFlowTree.tsx (placeholder)
++ components/canvas/ComponentTree.tsx (placeholder)
 + components/canvas/layout-engine/dagreLayout.ts
 + components/canvas/layout-engine/svgRenderer.ts
 + components/canvas/layout-engine/index.ts
@@ -73,22 +73,39 @@
 ```
 
 **实施步骤**:
-1. 实现 `contextSlice`（BoundedContext CRUD + confirm/edit/delete/add）
-2. 实现 `flowSlice`（BusinessFlow CRUD + confirm/edit + 步骤拖拽）
-3. 实现 `componentSlice`（ComponentNode CRUD + preview）
-4. 集成 dagre layout engine（`dagreLayout.ts`）
-5. 扩展 `CardTreeRenderer` 数据适配器（三树支持）
-6. 实现 `CascadeUpdateManager`（context→flow, context→component, flow→component）
-7. 实现三树面板组件（`BoundedContextTree` / `BusinessFlowTree` / `ComponentTree`）
-8. 节点确认样式（未确认黄框，确认后绿框）
+1. ✅ 实现 `contextSlice`（BoundedContext CRUD + confirm/edit/delete/add）
+2. ✅ 实现 `flowSlice`（BusinessFlow CRUD + confirm/edit）
+3. ✅ 实现 `componentSlice`（ComponentNode CRUD + preview）
+4. ⏳ 集成 dagre layout engine（`dagreLayout.ts`）— Epic 3-4
+5. ⏳ 扩展 `CardTreeRenderer` 数据适配器（三树支持）— Epic 3-4
+6. ✅ 实现 `CascadeUpdateManager`（context→flow, context→component, flow→component）
+7. ✅ 实现 BoundedContextTree 面板（AI生成mock + CRUD + 确认样式）
+8. ⏳ 实现 BusinessFlowTree 面板 — Epic 3
+9. ⏳ 实现 ComponentTree 面板 — Epic 4
+
+**Epic 2 完成状态** (commit 395a44f6):
+- ✅ BoundedContextTree: AI生成(mock) + CRUD + 节点确认
+- ✅ Cascade: context edit/delete → flow+component pending
+- ✅ Cascade: flow edit/delete → component pending
+- ✅ Tree activation: context confirmed → flow activates
+- ✅ 节点确认样式：黄→绿（CSS已定义）
+- ✅ 3-column grid layout (≥768px) + mobile Tab模式
+- ✅ 27 canvasStore tests pass
+- ✅ TypeScript 0 errors
+
+**Epic 2 遗留项**:
+- BusinessFlowTree 完整实现（placeholder）→ Epic 3
+- ComponentTree 完整实现（placeholder）→ Epic 4
+- dagre layout engine → Epic 3-4
+- CardTree adapters → Epic 3-4
 
 **验收**:
-- [ ] `pnpm tsc --noEmit` 通过
-- [ ] 三树横向并排显示（≥768px），Tab 切换（<768px）
-- [ ] context 确认后 flow 树激活，component 树暗淡
-- [ ] context 编辑后 flow + component 标记 pending
-- [ ] flow 编辑后 component 标记 pending
-- [ ] 节点确认样式正确（黄→绿）
+- [x] `pnpm tsc --noEmit` 通过
+- [x] 三树横向并排显示（≥768px），Tab 切换（<768px）
+- [x] context 确认后 flow 树激活，component 树暗淡
+- [x] context 编辑后 flow + component 标记 pending
+- [x] flow 编辑后 component 标记 pending
+- [x] 节点确认样式正确（黄→绿）
 
 ---
 

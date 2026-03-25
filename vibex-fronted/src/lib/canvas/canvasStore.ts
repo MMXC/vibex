@@ -240,7 +240,7 @@ export const useCanvasStore = create<CanvasStore>()(
               status: 'pending',
               children: [],
             };
-            set((s) => ({ contextNodes: [...s.contextNodes, newNode] }));
+            set((s) => ({ contextNodes: [...s.contextNodes, { ...newNode }] }));
           },
 
           editContextNode: (nodeId, data) => {
@@ -263,6 +263,7 @@ export const useCanvasStore = create<CanvasStore>()(
                 n.nodeId === nodeId ? { ...n, confirmed: true, status: 'confirmed' as const } : n
               ),
             }));
+            // Cascade: context confirmed → downstream trees may activate
             get().recomputeActiveTree();
           },
 
@@ -372,22 +373,18 @@ export const useCanvasStore = create<CanvasStore>()(
 
           // === Cascade Actions ===
           cascadeContextChange: (_nodeId) => {
-            cascade.markDownstreamPending('context');
-            const updated = cascade.markDownstreamPending('context');
-            // Apply the cascade to store
+            // Apply cascade to store: context change → mark flow + component pending
             set((s) => ({
               flowNodes: markAllPending(s.flowNodes),
               componentNodes: markAllPending(s.componentNodes),
             }));
-            void updated; // suppress unused warning
           },
 
           cascadeFlowChange: (_nodeId) => {
-            const result = cascade.markDownstreamPending('flow');
+            // Apply cascade to store: flow change → mark component pending
             set((s) => ({
               componentNodes: markAllPending(s.componentNodes),
             }));
-            void result; // suppress unused warning
           },
 
           // === Tree Activation Logic ===

@@ -582,3 +582,297 @@
     font-size: var(--text-xs);
   }
 }
+
+/* ============================================
+   BoundedContextTree
+   ============================================ */
+
+.boundedContextTree {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100%;
+}
+
+.contextTreeControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0 0.5rem;
+}
+
+.contextNodeList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+/* Node Card */
+.nodeCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.375rem;
+}
+
+.nodeTypeBadge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #fff;
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.confirmedBadge {
+  font-size: 0.875rem;
+  color: var(--color-success);
+  font-weight: 700;
+}
+
+.nodeCardTitle {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.nodeCardDesc {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.nodeCardActions {
+  display: flex;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.confirmButton {
+  padding: 0.25rem 0.625rem;
+  background: var(--color-success);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: background 0.15s ease;
+}
+
+.confirmButton:hover {
+  background: #22c55e;
+}
+
+.confirmButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.editButton {
+  padding: 0.25rem 0.625rem;
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.editButton:hover {
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary);
+}
+
+.editButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.deleteButton {
+  padding: 0.25rem 0.625rem;
+  background: transparent;
+  color: var(--color-error);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: border-color 0.15s ease;
+}
+
+.deleteButton:hover {
+  border-color: var(--color-error);
+}
+
+.deleteButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Edit form */
+.nodeEditForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.nodeEditInput {
+  padding: 0.375rem 0.5rem;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text-primary);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.nodeEditInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-muted);
+}
+
+.nodeEditTextarea {
+  padding: 0.375rem 0.5rem;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text-primary);
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.nodeEditTextarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-muted);
+}
+
+.nodeEditActions {
+  display: flex;
+  gap: 0.375rem;
+}
+
+/* Add Node Form */
+.addNodeFormWrapper {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.addNodeForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.addNodeFormRow {
+  display: flex;
+  gap: 0.375rem;
+  align-items: center;
+}
+
+.typeSelect {
+  padding: 0.375rem 0.5rem;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text-primary);
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.typeSelect:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.cancelButton {
+  padding: 0.25rem 0.625rem;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  align-self: flex-start;
+}
+
+.cancelButton:hover {
+  color: var(--color-text-secondary);
+  border-color: var(--color-border-hover);
+}
+
+.cancelButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Empty state */
+.contextTreeEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 2rem;
+  opacity: 0.2;
+}
+
+.emptyText {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.emptySubtext {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin: 0;
+  max-width: 240px;
+  line-height: 1.5;
+}
+
+.contextTreeHint {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+  margin: 0;
+  padding: 0.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+/* Button loading state */
+.buttonLoading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

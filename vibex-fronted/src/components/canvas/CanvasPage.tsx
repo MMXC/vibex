@@ -17,6 +17,7 @@ import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { areAllConfirmed } from '@/lib/canvas/cascade';
 import { PhaseProgressBar } from './PhaseProgressBar';
 import { TreePanel } from './TreePanel';
+import { BoundedContextTree } from './BoundedContextTree';
 import type { Phase, TreeType, TreeNode } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
 
@@ -189,7 +190,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 isActive={contextActive}
                 onToggleCollapse={toggleContextPanel}
               >
-                <PlaceholderTree tree="context" title="限界上下文" />
+                <BoundedContextTree />
               </TreePanel>
             )}
             {activeTab === 'flow' && (
@@ -229,7 +230,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
               isActive={contextActive}
               onToggleCollapse={toggleContextPanel}
             >
-              <PlaceholderTree tree="context" title="限界上下文" />
+              <BoundedContextTree />
             </TreePanel>
 
             <TreePanel

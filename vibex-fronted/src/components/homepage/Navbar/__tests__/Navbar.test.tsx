@@ -42,7 +42,8 @@ describe('Navbar', () => {
 
     it('显示 Logo 图标', () => {
       render(<Navbar isAuthenticated={false} onLoginClick={jest.fn()} />);
-      expect(screen.getByText('◈')).toBeInTheDocument();
+      // Logo 图标在 logoIcon span 中，Canvas 链接中的 ◈ 在不同 span
+      expect(screen.getByText('◈', { selector: '.logoIcon' })).toBeInTheDocument();
     });
 
     it('Logo 可自定义标题', () => {

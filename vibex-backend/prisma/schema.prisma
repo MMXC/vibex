@@ -346,3 +346,61 @@ model CanvasPage {
 
   @@index([canvasProjectId])
 }
+
+// CanvasBoundedContext — 限界上下文树节点
+model CanvasBoundedContext {
+  id          String   @id @default(cuid())
+  projectId   String
+  name        String
+  description String   @default("")
+  ctxType     String   @default("core")
+  confirmed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([projectId])
+}
+
+// CanvasFlow — 业务流程节点
+model CanvasFlow {
+  id        String   @id @default(cuid())
+  projectId String
+  ctxId     String
+  name      String
+  confirmed Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  steps     CanvasFlowStep[]
+
+  @@index([projectId])
+}
+
+// CanvasFlowStep — 流程步骤
+model CanvasFlowStep {
+  id          String   @id @default(cuid())
+  flowId     String
+  name        String
+  actor       String   @default("用户")
+  description String   @default("")
+  stepOrder  Int      @default(0)
+  confirmed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  canvasFlow CanvasFlow @relation(fields: [flowId], references: [id], onDelete: Cascade)
+
+  @@index([flowId])
+}
+
+// CanvasComponent — 组件节点
+model CanvasComponent {
+  id          String   @id @default(cuid())
+  projectId   String
+  flowId      String
+  name        String
+  compType    String   @default("page")
+  confirmed   Boolean  @default(false)
+  apiMethod   String   @default("GET")
+  apiPath     String   @default("/api/")
+  createdAt   DateTime @default(now())
+
+  @@index([projectId])
+}

@@ -183,6 +183,57 @@ export interface StatusOutput {
 }
 
 // =============================================================================
+// Canvas Generate API Types (Epic 1)
+// =============================================================================
+
+export interface GenerateContextsOutput {
+  success: boolean;
+  contexts: Array<{
+    id: string;
+    name: string;
+    description: string;
+    type: 'core' | 'supporting' | 'generic' | 'external';
+  }>;
+  sessionId: string;
+  confidence: number;
+  error?: string;
+}
+
+export interface GenerateFlowsOutput {
+  success: boolean;
+  flows: Array<{
+    name: string;
+    contextId: string;
+    description?: string;
+    steps: Array<{
+      name: string;
+      actor: string;
+      description: string;
+      order: number;
+    }>;
+  }>;
+  confidence: number;
+  error?: string;
+}
+
+export interface GenerateComponentsOutput {
+  success: boolean;
+  components: Array<{
+    name: string;
+    flowId: string;
+    type: ComponentType;
+    description?: string;
+    api?: {
+      method: 'GET' | 'POST';
+      path: string;
+      params: string[];
+    };
+  }>;
+  confidence: number;
+  error?: string;
+}
+
+// =============================================================================
 // Tree Node (unified, for renderer)
 // =============================================================================
 

@@ -14,6 +14,10 @@ import type {
   GenerateInput,
   GenerateOutput,
   StatusOutput,
+  GenerateContextsOutput,
+  GenerateFlowsOutput,
+  GenerateComponentsOutput,
+  BoundedContextNode,
 } from '../types';
 
 const API_BASE = '/api/canvas';
@@ -88,6 +92,75 @@ export const canvasApi = {
 
     // Return blob for download
     return res.blob();
+  },
+
+  // === Epic 1: Canvas Generate APIs ===
+
+  /**
+   * 生成限界上下文树
+   * POST /api/canvas/generate-contexts
+   */
+  generateContexts: async (data: {
+    requirementText: string;
+    projectId?: string;
+  }): Promise<GenerateContextsOutput> => {
+    const res = await fetch(`${API_BASE}/generate-contexts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+      throw new Error(err.error ?? `生成上下文失败: ${res.status}`);
+    }
+
+    return res.json() as Promise<GenerateContextsOutput>;
+  },
+
+  /**
+   * 生成业务流程树
+   * POST /api/canvas/generate-flows
+   */
+  generateFlows: async (data: {
+    contexts: Array<{ id: string; name: string; description: string; type: string }>;
+    sessionId: string;
+  }): Promise<GenerateFlowsOutput> => {
+    const res = await fetch(`${API_BASE}/generate-flows`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+      throw new Error(err.error ?? `生成流程失败: ${res.status}`);
+    }
+
+    return res.json() as Promise<GenerateFlowsOutput>;
+  },
+
+  /**
+   * 生成组件树
+   * POST /api/canvas/generate-components
+   */
+  generateComponents: async (data: {
+    contexts: Array<{ id: string; name: string; description: string; type: string }>;
+    flows: Array<{ name: string; contextId: string; steps: Array<{ name: string; actor: string }> }>;
+    sessionId: string;
+  }): Promise<GenerateComponentsOutput> => {
+    const res = await fetch(`${API_BASE}/generate-components`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+      throw new Error(err.error ?? `生成组件失败: ${res.status}`);
+    }
+
+    return res.json() as Promise<GenerateComponentsOutput>;
   },
 };
 

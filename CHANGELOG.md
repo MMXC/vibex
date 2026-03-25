@@ -19,6 +19,12 @@ All notable changes to this project will be documented in this file.
 - **前端解析器**: `pendingEventType` 状态机替代 `indexOf`，更健壮
 - 审查: `docs/review-reports/20260326/review-vibex-canvas-api-fix-epic2.md` — ✅ PASSED
 
+### Added (vibex-three-trees-enhancement-20260326 Epic2: 流程分支循环可视化) — 2026-03-26
+- **GatewayNode.tsx**: 菱形网关节点（XOR/OR 分支选择）
+- **LoopEdge.tsx**: 循环边（虚线箭头，标识回退路径）
+- **types.ts**: 新增 FlowGateway/GatewayNodeData/LoopEdgeData 类型
+- 审查: `docs/review-reports/20260326/review-vibex-three-trees-enhancement-epic2.md` — ✅ PASSED
+
 ### Added (vibex-three-trees-enhancement-20260326 Epic1: 上下文关系推理) — 2026-03-26
 - **inferRelationships.ts**: 领域关系推算引擎，关键词→类型映射（dependency/aggregate/calls）
 - **RelationshipEdge.tsx**: 自定义 ReactFlow 边（三类样式：实线/粗线/虚线）

@@ -114,6 +114,19 @@
 - dagre layout engine → Epic 5-6
 - CardTree adapters → Epic 5-6
 
+**Epic 5 完成状态** (commit TBD):
+- ✅ canvasApi.ts: createProject/generate/getStatus/exportZip + startPolling/stopPolling
+- ✅ PrototypeQueuePanel: 队列状态显示(queued/generating/done/error)、进度条、单页重生成、清空
+- ✅ ProjectBar: 三树全确认后解锁「创建项目」按钮，触发生成并推进到 prototype phase
+- ✅ CanvasPage: 原型阶段集成队列面板
+- ✅ Queue slice tests: 39 tests pass
+- ✅ TypeScript 0 errors
+- ✅ Build ✅
+
+**Epic 5 遗留项**:
+- API 后端集成（当前为 stub，static export 模式）→ Epic 6
+- 真实 Zip 导出 → Epic 6
+
 **验收**:
 - [x] `pnpm tsc --noEmit` 通过
 - [x] 三树横向并排显示（≥768px），Tab 切换（<768px）

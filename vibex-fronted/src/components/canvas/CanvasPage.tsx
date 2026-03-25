@@ -2,8 +2,8 @@
  * CanvasPage — 画布主容器组件
  * 三树并行画布，三列横向布局，响应式 Tab 切换
  *
- * Epic 1 实现：S1.1 (三列布局) + S1.2 (阶段进度条) + S1.3 (树面板折叠)
- * + S1.4 (激活/暗淡联动) + S1.5 (节点确认样式)
+ * Epic 1 实现: S1.1 (三列布局) + S1.2 (阶段进度条) + S1.3 (树面板折叠)
+ * Epic 5 实现: S5.4 (创建项目按钮) + S5.5 (原型队列)
  *
  * 遵守 AGENTS.md 规范：
  * - 组件接收 slice 相关 props，不直接访问多个 canvasStore slice
@@ -12,7 +12,7 @@
  */
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { areAllConfirmed } from '@/lib/canvas/cascade';
 import { PhaseProgressBar } from './PhaseProgressBar';
@@ -20,6 +20,8 @@ import { TreePanel } from './TreePanel';
 import { BoundedContextTree } from './BoundedContextTree';
 import { ComponentTree } from './ComponentTree';
 import { BusinessFlowTree } from './BusinessFlowTree';
+import { ProjectBar } from './ProjectBar';
+import { PrototypeQueuePanel } from './PrototypeQueuePanel';
 import type { Phase, TreeType, TreeNode } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
 
@@ -29,7 +31,7 @@ interface CanvasPageProps {
 }
 
 export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
-  // === Store Selectors (individual selectors to avoid full re-render) ===
+  // === Store Selectors ===
   const phase = useCanvasStore((s) => s.phase);
   const activeTree = useCanvasStore((s) => s.activeTree);
   const contextNodes = useCanvasStore((s) => s.contextNodes);
@@ -42,20 +44,20 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const toggleContextPanel = useCanvasStore((s) => s.toggleContextPanel);
   const toggleFlowPanel = useCanvasStore((s) => s.toggleFlowPanel);
   const toggleComponentPanel = useCanvasStore((s) => s.toggleComponentPanel);
-  // Placeholders for Epic 2-4 node interactions
-  const _confirmContextNode = useCanvasStore((s) => s.confirmContextNode);
-  const _confirmFlowNode = useCanvasStore((s) => s.confirmFlowNode);
-  const _confirmComponentNode = useCanvasStore((s) => s.confirmComponentNode);
-  const _editContextNode = useCanvasStore((s) => s.editContextNode);
-  const _editFlowNode = useCanvasStore((s) => s.editFlowNode);
-  const _editComponentNode = useCanvasStore((s) => s.editComponentNode);
 
-  // === Compute tree activation states ===
-  const contextActive = activeTree === 'context' || activeTree === null;
-  const flowActive = activeTree === 'flow';
-  const componentActive = activeTree === 'component';
+  // === UI State ===
+  const [activeTab, setActiveTab] = useState<TreeType>('context');
+  const [projectName, setProjectName] = useState('我的项目');
+  const [queuePanelExpanded, setQueuePanelExpanded] = useState(true);
 
-  // === Transform nodes to unified TreeNode for TreePanel ===
+  // === Compute confirmation states ===
+  const contextReady = areAllConfirmed(contextNodes);
+  const flowReady = areAllConfirmed(flowNodes);
+  const componentReady = areAllConfirmed(componentNodes);
+  const allTreesConfirmed = contextReady && flowReady && componentReady
+    && contextNodes.length > 0 && flowNodes.length > 0 && componentNodes.length > 0;
+
+  // === Transform nodes to unified TreeNode ===
   const contextTreeNodes: TreeNode[] = useMemo(
     () =>
       contextNodes.map((n) => ({
@@ -101,11 +103,8 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     [componentNodes]
   );
 
-  // === Tab state for mobile ===
-  const [activeTab, setActiveTab] = React.useState<TreeType>('context');
-
+  // === Phase click handler ===
   const handlePhaseClick = (p: Phase) => {
-    // Only allow clicking to phases that have data or are before current
     const phaseOrder: Phase[] = ['input', 'context', 'flow', 'component', 'prototype'];
     const currentIdx = phaseOrder.indexOf(phase);
     const targetIdx = phaseOrder.indexOf(p);
@@ -114,10 +113,79 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     }
   };
 
-  // === Determine if context tree is ready for flow activation ===
-  const contextReady = areAllConfirmed(contextNodes);
-  const flowReady = areAllConfirmed(flowNodes);
+  // === Phase label ===
+  const phaseLabel =
+    phase === 'input'
+      ? '📝 需求录入'
+      : phase === 'context'
+        ? `◇ 限界上下文 (${contextNodes.length} 节点${contextReady ? ' ✅' : ''})`
+        : phase === 'flow'
+          ? `→ 业务流程 (${flowNodes.length} 节点${flowReady ? ' ✅' : ''})`
+          : phase === 'component'
+            ? `▣ 组件树 (${componentNodes.length} 节点${componentReady ? ' ✅' : ''})`
+            : '🚀 原型生成';
 
+  const phaseHint =
+    phase === 'context' && !contextReady
+      ? '确认所有上下文节点后解锁流程树'
+      : phase === 'flow' && !flowReady
+        ? '确认所有流程节点后解锁组件树'
+        : phase === 'component'
+          ? allTreesConfirmed
+            ? '✅ 所有树已确认！可以创建项目'
+            : '确认所有组件后创建项目'
+          : '';
+
+  // === Tab content for mobile ===
+  const renderTabContent = (tab: TreeType, _treeNodes: TreeNode[], _isActive: boolean) => {
+    switch (tab) {
+      case 'context':
+        return (
+          <TreePanel
+            tree="context"
+            title="限界上下文树"
+            nodes={contextTreeNodes}
+            collapsed={contextPanelCollapsed}
+            isActive={contextActive}
+            onToggleCollapse={toggleContextPanel}
+          >
+            <BoundedContextTree />
+          </TreePanel>
+        );
+      case 'flow':
+        return (
+          <TreePanel
+            tree="flow"
+            title="业务流程树"
+            nodes={flowTreeNodes}
+            collapsed={flowPanelCollapsed}
+            isActive={flowActive}
+            onToggleCollapse={toggleFlowPanel}
+          >
+            <BusinessFlowTree isActive={flowActive || activeTree === null} />
+          </TreePanel>
+        );
+      case 'component':
+        return (
+          <TreePanel
+            tree="component"
+            title="组件树"
+            nodes={componentTreeNodes}
+            collapsed={componentPanelCollapsed}
+            isActive={componentActive}
+            onToggleCollapse={toggleComponentPanel}
+          >
+            <ComponentTree />
+          </TreePanel>
+        );
+    }
+  };
+
+  const contextActive = activeTree === 'context' || activeTree === null;
+  const flowActive = activeTree === 'flow';
+  const componentActive = activeTree === 'component';
+
+  // === Render ===
   return (
     <div className={styles.canvasContainer}>
       {/* Phase Progress Bar */}
@@ -125,53 +193,62 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         <PhaseProgressBar currentPhase={phase} onPhaseClick={handlePhaseClick} />
       </div>
 
+      {/* Project Bar — Epic 5: Create Project button */}
+      {phase !== 'input' && (
+        <div className={styles.projectBarWrapper}>
+          <ProjectBar
+            projectName={projectName}
+            onProjectNameChange={setProjectName}
+          />
+        </div>
+      )}
+
       {/* Phase Label */}
       <div className={styles.phaseLabelBar}>
-        <span className={styles.phaseCurrentLabel}>
-          {phase === 'input'
-            ? '📝 需求录入'
-            : phase === 'context'
-              ? `◇ 限界上下文 (${contextNodes.length} 节点${contextReady ? ' ✅' : ''})`
-              : phase === 'flow'
-                ? `→ 业务流程 (${flowNodes.length} 节点${flowReady ? ' ✅' : ''})`
-                : phase === 'component'
-                  ? `▣ 组件树 (${componentNodes.length} 节点)`
-                  : '🚀 原型生成'}
-        </span>
-        {phase !== 'input' && (
-          <span className={styles.phaseHint}>
-            {phase === 'context' && !contextReady
-              ? '确认所有上下文节点后解锁流程树'
-              : phase === 'flow' && !flowReady
-                ? '确认所有流程节点后解锁组件树'
-                : phase === 'component'
-                  ? '确认所有组件后创建项目'
-                  : ''}
-          </span>
+        <span className={styles.phaseCurrentLabel}>{phaseLabel}</span>
+        {phase !== 'input' && phaseHint && (
+          <span className={styles.phaseHint}>{phaseHint}</span>
         )}
       </div>
 
-      {/* Tree Panels — Desktop: 3-column grid, Mobile: Tab + single panel */}
-      {useTabMode ? (
-        /* Mobile: Tab navigation */
-        <div className={styles.canvasMobile}>
-          <div className={styles.tabBar} role="tablist">
-            {(['context', 'flow', 'component'] as TreeType[]).map((t) => (
-              <button
-                key={t}
-                role="tab"
-                aria-selected={activeTab === t}
-                className={`${styles.tabButton} ${
-                  activeTab === t ? styles.tabButtonActive : ''
-                }`}
-                onClick={() => setActiveTab(t)}
-              >
-                {t === 'context' ? '◇ 上下文' : t === 'flow' ? '→ 流程' : '▣ 组件'}
-              </button>
-            ))}
-          </div>
-          <div className={styles.tabContent} role="tabpanel">
-            {activeTab === 'context' && (
+      {/* === PROTOTYPE PHASE: Queue Panel === */}
+      {phase === 'prototype' ? (
+        <div className={styles.prototypePhase}>
+          <PrototypeQueuePanel
+            expanded={queuePanelExpanded}
+            onToggleExpand={() => setQueuePanelExpanded((v) => !v)}
+          />
+        </div>
+      ) : (
+        /* === TREE PHASES === */
+        <>
+          {useTabMode ? (
+            <div className={styles.canvasMobile}>
+              <div className={styles.tabBar} role="tablist">
+                {(['context', 'flow', 'component'] as TreeType[]).map((t) => (
+                  <button
+                    key={t}
+                    role="tab"
+                    aria-selected={activeTab === t}
+                    className={`${styles.tabButton} ${
+                      activeTab === t ? styles.tabButtonActive : ''
+                    }`}
+                    onClick={() => setActiveTab(t)}
+                  >
+                    {t === 'context' ? '◇ 上下文' : t === 'flow' ? '→ 流程' : '▣ 组件'}
+                  </button>
+                ))}
+              </div>
+              <div className={styles.tabContent} role="tabpanel">
+                {renderTabContent(
+                  activeTab,
+                  activeTab === 'context' ? contextTreeNodes : activeTab === 'flow' ? flowTreeNodes : componentTreeNodes,
+                  activeTab === 'context' ? contextActive : activeTab === 'flow' ? flowActive : componentActive
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className={styles.treePanelsGrid}>
               <TreePanel
                 tree="context"
                 title="限界上下文树"
@@ -182,8 +259,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
               >
                 <BoundedContextTree />
               </TreePanel>
-            )}
-            {activeTab === 'flow' && (
+
               <TreePanel
                 tree="flow"
                 title="业务流程树"
@@ -194,8 +270,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
               >
                 <BusinessFlowTree isActive={flowActive || activeTree === null} />
               </TreePanel>
-            )}
-            {activeTab === 'component' && (
+
               <TreePanel
                 tree="component"
                 title="组件树"
@@ -206,45 +281,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
               >
                 <ComponentTree />
               </TreePanel>
-            )}
-          </div>
-        </div>
-      ) : (
-        /* Desktop: 3-column grid */
-          <div className={styles.treePanelsGrid}>
-            <TreePanel
-              tree="context"
-              title="限界上下文树"
-              nodes={contextTreeNodes}
-              collapsed={contextPanelCollapsed}
-              isActive={contextActive}
-              onToggleCollapse={toggleContextPanel}
-            >
-              <BoundedContextTree />
-            </TreePanel>
-
-            <TreePanel
-              tree="flow"
-              title="业务流程树"
-              nodes={flowTreeNodes}
-              collapsed={flowPanelCollapsed}
-              isActive={flowActive}
-              onToggleCollapse={toggleFlowPanel}
-            >
-              <BusinessFlowTree isActive={flowActive || activeTree === null} />
-            </TreePanel>
-
-            <TreePanel
-              tree="component"
-              title="组件树"
-              nodes={componentTreeNodes}
-              collapsed={componentPanelCollapsed}
-              isActive={componentActive}
-              onToggleCollapse={toggleComponentPanel}
-            >
-              <ComponentTree />
-            </TreePanel>
-          </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Input Phase: Requirement Input Area */}

@@ -8,6 +8,7 @@
  * - Flow slice CRUD
  * - Cascade context → flow+component pending
  * - Cascade flow → component pending
+ * - Epic 5: Queue slice (projectId, polling, prototypeQueue CRUD)
  * - Tree activation recompute
  */
 import { useCanvasStore, markAllPending } from './canvasStore';
@@ -564,3 +565,47 @@ describe('markAllPending', () => {
     expect(result[1].confirmed).toBe(false);
   });
 });
+
+  // Epic 5: Queue Slice Tests
+  describe('Epic 5: Queue Slice', () => {
+    it('should set and clear projectId', () => {
+      const { setProjectId } = useCanvasStore.getState();
+      setProjectId('proj_test_123');
+      expect(useCanvasStore.getState().projectId).toBe('proj_test_123');
+      setProjectId(null);
+      expect(useCanvasStore.getState().projectId).toBeNull();
+    });
+
+    it('should track polling state', () => {
+      const { setIsPolling } = useCanvasStore.getState();
+      expect(useCanvasStore.getState().isPolling).toBe(false);
+      setIsPolling(true);
+      expect(useCanvasStore.getState().isPolling).toBe(true);
+    });
+
+    it('should update queue item progress and status', () => {
+      const { addToQueue, updateQueueItem } = useCanvasStore.getState();
+      addToQueue([
+        { pageId: 'pg1', componentId: 'c1', name: 'Page1', status: 'queued', progress: 0, retryCount: 0 },
+        { pageId: 'pg2', componentId: 'c2', name: 'Page2', status: 'queued', progress: 0, retryCount: 0 },
+      ]);
+      updateQueueItem('pg1', { status: 'generating', progress: 25 });
+      updateQueueItem('pg2', { status: 'done', progress: 100 });
+
+      const queue = useCanvasStore.getState().prototypeQueue;
+      expect(queue.find(p => p.pageId === 'pg1')?.status).toBe('generating');
+      expect(queue.find(p => p.pageId === 'pg1')?.progress).toBe(25);
+      expect(queue.find(p => p.pageId === 'pg2')?.status).toBe('done');
+    });
+
+    it('should increment retry count on retry', () => {
+      const { addToQueue, updateQueueItem, clearQueue } = useCanvasStore.getState();
+      clearQueue();
+      addToQueue([
+        { pageId: 'pg_err', componentId: 'c1', name: 'PageErr', status: 'error', progress: 0, retryCount: 0 },
+      ]);
+      updateQueueItem('pg_err', { retryCount: 1, status: 'queued' });
+      updateQueueItem('pg_err', { retryCount: 2, status: 'queued' });
+      expect(useCanvasStore.getState().prototypeQueue[0].retryCount).toBe(2);
+    });
+  });

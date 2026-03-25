@@ -90,121 +90,125 @@ v1.use('*', rateLimit({
 // 认证路由 - 登录、注册等公开接口
 v1.route('/auth', auth);
 
+// SSE 流式分析端点 - 公开，无需认证 (挂载到 /analyze/stream)
+v1.route('/analyze/stream', analyzeStream);
+
 // ==================== 受保护路由 (需要认证) ====================
 
-// 应用认证中间件到所有其他路由
-v1.use('*', authMiddleware);
+// 所有需要认证的路由挂载到一个子 app，再统一加中间件
+const protected_ = new Hono<{ Bindings: CloudflareEnv }>();
+protected_.use('*', authMiddleware);
 
 // 项目管理
-v1.route('/projects', projects);
-v1.route('/projects/:id', projectId);
+protected_.route('/projects', projects);
+protected_.route('/projects/:id', projectId);
 
 // 页面管理
-v1.route('/pages', pages);
-v1.route('/pages/:id/components', pageIdComponents);
+protected_.route('/pages', pages);
+protected_.route('/pages/:id/components', pageIdComponents);
 
 // Agent 管理
-v1.route('/agents', agents);
+protected_.route('/agents', agents);
 
 // AI 对话
-v1.route('/chat', chat);
+protected_.route('/chat', chat);
 
 // 用户管理
-v1.route('/users', users);
+protected_.route('/users', users);
 
 // 消息
-v1.route('/messages', messages);
+protected_.route('/messages', messages);
 
 // 流程
-v1.route('/flows', flows);
-v1.route('/flow-data', flowData);
+protected_.route('/flows', flows);
+protected_.route('/flow-data', flowData);
 
 // 需求
-v1.route('/requirements', requirements);
-v1.route('/requirements', requirementId);
+protected_.route('/requirements', requirements);
+protected_.route('/requirements', requirementId);
 
 // 原型快照
-v1.route('/prototype-snapshots', prototypeSnapshots);
-v1.route('/prototype-snapshots', prototypeSnapshotId);
+protected_.route('/prototype-snapshots', prototypeSnapshots);
+protected_.route('/prototype-snapshots', prototypeSnapshotId);
 
 // 领域实体
-v1.route('/domain-entities', domainEntities);
-v1.route('/domain-entities', domainEntityId);
+protected_.route('/domain-entities', domainEntities);
+protected_.route('/domain-entities', domainEntityId);
 
 // 领域模型
-v1.route('/domain-models', domainModels);
+protected_.route('/domain-models', domainModels);
 
 // 实体关系
-v1.route('/entity-relations', entityRelations);
-v1.route('/entity-relations', entityRelationId);
+protected_.route('/entity-relations', entityRelations);
+protected_.route('/entity-relations', entityRelationId);
 
 // 分支
-v1.route('/branches', branches);
-v1.route('/branches', branchId);
+protected_.route('/branches', branches);
+protected_.route('/branches', branchId);
 
 // 需求分析
-v1.route('/requirements-analysis', requirementsAnalysis);
+protected_.route('/requirements-analysis', requirementsAnalysis);
 
 // 澄清问题
-v1.route('/clarification-questions', clarificationQuestions);
+protected_.route('/clarification-questions', clarificationQuestions);
 
 // 组件生成器
-v1.route('/component-generator', componentGenerator);
+protected_.route('/component-generator', componentGenerator);
 
 // 原型协作
-v1.route('/prototype-collaboration', prototypeCollaboration);
-v1.route('/prototype-collaboration', prototypeCollaborationId);
+protected_.route('/prototype-collaboration', prototypeCollaboration);
+protected_.route('/prototype-collaboration', prototypeCollaborationId);
 
 // 协作
-v1.route('/collaboration', collaboration);
+protected_.route('/collaboration', collaboration);
 
 // AI 设计聊天
-v1.route('/ai-design-chat', aiDesignChat);
+protected_.route('/ai-design-chat', aiDesignChat);
 
 // AI UI 生成
-v1.route('/ai-ui-generation', aiUIGeneration);
+protected_.route('/ai-ui-generation', aiUIGeneration);
 
 // 原型版本
-v1.route('/prototype-versions', prototypeVersions);
+protected_.route('/prototype-versions', prototypeVersions);
 
 // 组件管理
-v1.route('/components', componentManager);
+protected_.route('/components', componentManager);
 
 // 实时预览
-v1.route('/live-preview', livePreview);
+protected_.route('/live-preview', livePreview);
 
 // 原型导出
-v1.route('/prototype-export', prototypeExport);
+protected_.route('/prototype-export', prototypeExport);
 
 // 原型聊天
-v1.route('/prototype/chat', prototypeChat);
+protected_.route('/prototype/chat', prototypeChat);
 
 // UI 生成
-v1.route('/ui-generation', uiGeneration);
+protected_.route('/ui-generation', uiGeneration);
 
 // 需求导出
-v1.route('/requirements-export', requirementsExport);
+protected_.route('/requirements-export', requirementsExport);
 
 // 版本
-v1.route('/version', version);
+protected_.route('/version', version);
 
 // 项目设置
-v1.route('/projects/:id/settings', projectSettings);
+protected_.route('/projects/:id/settings', projectSettings);
 
 // 确认项目
-v1.route('/confirmation-projects', confirmationProjects);
+protected_.route('/confirmation-projects', confirmationProjects);
 
 // DDD
-v1.route('/ddd', ddd);
+protected_.route('/ddd', ddd);
 
 // 诊断
-v1.route('/diagnosis', diagnosis);
-
-// SSE 流式分析 (analyze/stream 必须放在 plan 前面，避免路由冲突)
-v1.route('/analyze', analyzeStream);
+protected_.route('/diagnosis', diagnosis);
 
 // 计划
-v1.route('/plan', plan);
+protected_.route('/plan', plan);
+
+// 将受保护的路由挂载到 v1 主路由
+v1.route('/', protected_);
 
 // ==================== 错误处理 ====================
 

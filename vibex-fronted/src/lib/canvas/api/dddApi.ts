@@ -131,6 +131,7 @@ export async function analyzeRequirement(
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
+    let pendingEventType: string | null = null;
 
     while (true) {
       const { done, value } = await reader.read();
@@ -142,26 +143,23 @@ export async function analyzeRequirement(
       const lines = buffer.split('\n');
       buffer = lines.pop() ?? '';
 
-      for (const rawLine of lines) {
-        const line = rawLine.trim();
-        if (!line) continue;
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
 
-        // Parse SSE line: "event: <type>" or "data: <json>"
-        if (line.startsWith('event: ')) {
-          const eventType = line.slice(7).trim();
-          // Find next data line in the same batch
-          const dataLineIdx = lines.indexOf(rawLine) + 1;
-          if (dataLineIdx < lines.length) {
-            const dataLine = lines[dataLineIdx];
-            if (dataLine.startsWith('data: ')) {
-              try {
-                const rawData = dataLine.slice(6).trim();
-                const data = JSON.parse(rawData);
-                dispatchEvent(eventType as SSEEvent['type'], data, callbacks);
-              } catch {
-                // Ignore parse errors for individual events
-              }
-            }
+        if (trimmed.startsWith('event: ')) {
+          // Remember the event type for the next data line
+          pendingEventType = trimmed.slice(7).trim();
+        } else if (trimmed.startsWith('data: ') && pendingEventType !== null) {
+          // We have both event type and data — dispatch
+          try {
+            const rawData = trimmed.slice(6).trim();
+            const data = JSON.parse(rawData);
+            dispatchEvent(pendingEventType as SSEEvent['type'], data, callbacks);
+          } catch {
+            // Ignore parse errors for individual events
+          } finally {
+            pendingEventType = null;
           }
         }
       }

@@ -12,8 +12,8 @@
  */
 
 import { Hono } from 'hono';
-import { CloudflareEnv, getLocalEnv } from '../../lib/env';
-import { devDebug } from '../../lib/log-sanitizer';
+import { CloudflareEnv, getLocalEnv } from '../../../lib/env';
+import { devDebug } from '../../../lib/log-sanitizer';
 
 const stream_ = new Hono<{ Bindings: CloudflareEnv }>();
 
@@ -41,7 +41,7 @@ stream_.get('/', async (c) => {
         devDebug('[SSE Stream] Starting analysis for requirement:', requirement.substring(0, 100));
 
         // Dynamically import to avoid circular deps
-        const { createAIService } = await import('../../services/ai-service');
+        const { createAIService } = await import('../../../services/ai-service');
         const aiService = createAIService(env);
 
         // 1. Emit thinking events

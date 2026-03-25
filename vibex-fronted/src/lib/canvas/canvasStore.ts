@@ -520,13 +520,11 @@ export const useCanvasStore = create<CanvasStore>()(
               onStepComponents: (content: string) => {
                 setAiThinking(true, content);
               },
-              onDone: (_projectId: string, summary: string) => {
+              onDone: () => {
                 setAiThinking(false, null);
-                console.log('[canvasStore] analyzeRequirement done:', summary);
               },
-              onError: (message: string) => {
+              onError: () => {
                 setAiThinking(false, null);
-                console.error('[canvasStore] analyzeRequirement error:', message);
               },
             }).catch((err: unknown) => {
               setAiThinking(false, null);

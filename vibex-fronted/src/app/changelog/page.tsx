@@ -18,6 +18,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.87',
+    date: '2026-03-26',
+    changes: [
+      '🧪 three-trees-enhancement/Epic4: 回归测试完成 - 42 tests PASS (Epic1-3 全面覆盖)',
+      '✅ Epic1: inferRelationships 推算引擎测试通过 (6 tests)',
+      '✅ Epic2: Epic2LocalDataMode 本地数据模式测试通过 (5 tests)',
+      '✅ Epic3: ComponentTree 交互测试通过 + Epic3Integration (23 tests)',
+      '✅ npm audit: 0 vulnerabilities | ESLint: 0 errors',
+    ],
+    commit: '8f249ed7',
+  },
+  {
     version: '1.0.86',
     date: '2026-03-24',
     changes: [

@@ -12,7 +12,7 @@ import { createAIService } from '@/services/ai-service';
 import { getLocalEnv as getCloudflareEnv } from '@/lib/env';
 import { generateId } from '@/lib/db';
 import type { BoundedContext } from '@/services/context/types';
-import type { BusinessFlow } from '@/services/context/types';
+
 
 interface FlowStep {
   name: string;
@@ -140,7 +140,7 @@ export async function POST(
 
     // Truncate to max 20 components
     const rawComponents = result.data.slice(0, 20);
-    const truncated = result.data.length > 20;
+    
 
     const components: ComponentResponse[] = rawComponents.map((comp) => ({
       id: generateId(),

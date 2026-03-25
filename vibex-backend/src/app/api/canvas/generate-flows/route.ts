@@ -75,9 +75,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateF
       );
     }
 
-    const { contexts, sessionId: _sessionId } = body as {
+    const { contexts } = body as {
       contexts: BoundedContext[];
-      sessionId?: string;
     };
 
     const env = getCloudflareEnv();

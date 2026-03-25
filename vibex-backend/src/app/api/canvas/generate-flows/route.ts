@@ -28,6 +28,8 @@ interface FlowStepResponse {
   actor: string;
   description?: string;
   order: number;
+  confirmed: boolean;
+  status: string;
 }
 
 interface GenerateFlowsOutput {
@@ -120,6 +122,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateF
         actor: step.actor || '用户',
         description: step.description || '',
         order: typeof step.order === 'number' ? step.order : idx,
+        confirmed: false,
+        status: 'pending',
       })),
       confidence: flow.confidence ?? 0.7,
     }));

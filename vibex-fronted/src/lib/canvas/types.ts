@@ -194,7 +194,7 @@ export interface GenerateContextsOutput {
     description: string;
     type: 'core' | 'supporting' | 'generic' | 'external';
   }>;
-  sessionId: string;
+  generationId: string;
   confidence: number;
   error?: string;
 }
@@ -206,10 +206,13 @@ export interface GenerateFlowsOutput {
     contextId: string;
     description?: string;
     steps: Array<{
+      stepId: string;
       name: string;
       actor: string;
-      description: string;
+      description?: string;
       order: number;
+      confirmed: boolean;
+      status: string;
     }>;
   }>;
   confidence: number;
@@ -219,8 +222,10 @@ export interface GenerateFlowsOutput {
 export interface GenerateComponentsOutput {
   success: boolean;
   components: Array<{
+    id?: string;
     name: string;
     flowId: string;
+    contextId?: string;
     type: ComponentType;
     description?: string;
     api?: {
@@ -229,6 +234,8 @@ export interface GenerateComponentsOutput {
       params: string[];
     };
   }>;
+  generationId: string;
+  totalCount?: number;
   confidence: number;
   error?: string;
 }

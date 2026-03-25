@@ -34,6 +34,18 @@ interface ComponentApi {
   params: string[];
 }
 
+/** Raw AI response - may contain apis[] from LLM */
+interface ComponentAIResponse {
+  id?: string;
+  name: string;
+  flowId: string;
+  contextId?: string;
+  type?: string;
+  description?: string;
+  apis?: ComponentApi[];
+  confidence?: number;
+}
+
 interface ComponentResponse {
   id: string;
   name: string;
@@ -41,7 +53,7 @@ interface ComponentResponse {
   contextId: string;
   type: 'page' | 'form' | 'list' | 'detail' | 'modal';
   description?: string;
-  apis: ComponentApi[];
+  api?: ComponentApi;
   confidence: number;
 }
 
@@ -116,7 +128,7 @@ export async function POST(
       .replace('{flows}', flowSummary)
       .replace('{contexts}', contextSummary);
 
-    const result = await aiService.generateJSON<ComponentResponse[]>(prompt, undefined, {
+    const result = await aiService.generateJSON<ComponentAIResponse[]>(prompt, undefined, {
       temperature: 0.3,
       maxTokens: 4096,
     });
@@ -139,7 +151,7 @@ export async function POST(
     const validTypes = ['page', 'form', 'list', 'detail', 'modal'] as const;
 
     // Truncate to max 20 components
-    const rawComponents = result.data.slice(0, 20);
+    const rawComponents: ComponentAIResponse[] = result.data.slice(0, 20);
     
 
     const components: ComponentResponse[] = rawComponents.map((comp) => ({
@@ -151,13 +163,15 @@ export async function POST(
         ? (comp.type as typeof validTypes[number])
         : ('page' as const),
       description: comp.description || '',
-      apis: comp.apis
-        ? comp.apis.map((a) => ({
-            method: (a.method as 'GET' | 'POST') || 'GET',
-            path: a.path || '/api/',
-            params: a.params || [],
-          }))
-        : [{ method: 'GET' as const, path: '/api/', params: [] }],
+      api: comp.apis?.[0]
+        ? {
+            method: (['GET', 'POST'].includes(comp.apis[0].method)
+              ? comp.apis[0].method
+              : 'GET') as 'GET' | 'POST',
+            path: comp.apis[0].path || '/api/',
+            params: comp.apis[0].params || [],
+          }
+        : undefined,
       confidence: comp.confidence ?? 0.7,
     }));
 

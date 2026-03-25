@@ -10,6 +10,14 @@ All notable changes to this project will be documented in this file.
 - **Phase 推进**: allConfirmed → prototype，解锁 Epic5-6
 - 审查: `docs/review-reports/20260325/review-vibex-canvas-redesign-20260325-epic4.md` — ✅ PASSED (44 tests)
 
+### Added (vibex-canvas-redesign-20260325 Epic6: 后端 API + 导出) — 2026-03-25
+- **CanvasProject/CanvasPage**: Prisma 模型新增
+- **POST /api/canvas/project**: 创建画布项目（3树数据持久化）
+- **POST /api/canvas/generate**: 触发生成（MiniMax API，mock fallback）
+- **GET /api/canvas/status**: 查询生成进度
+- **GET /api/canvas/export**: 导出 tar.gz（Node stream，无外部依赖）
+- 审查: `docs/review-reports/20260325/review-vibex-canvas-redesign-20260325-epic6.md` — ✅ PASSED (459 tests)
+
 ### Added (vibex-canvas-redesign-20260325 Epic5: 原型生成队列) — 2026-03-25
 - **canvasApi.ts**: createProject/generate/getStatus/exportZip + polling manager
 - **ProjectBar.tsx**: 三树全确认后解锁「创建项目」按钮

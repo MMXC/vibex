@@ -6,7 +6,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createGzip } from 'zlib';
-import { Readable, Transform } from 'stream';
+import { Readable } from 'stream';
 import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';

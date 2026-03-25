@@ -18,10 +18,10 @@ const MINIMAX_MODEL = process.env.MINIMAX_MODEL || 'abab6.5s-chat';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { projectId, pageIds, mode = 'parallel' } = body as {
+    const { projectId, pageIds } = body as {
       projectId: string;
       pageIds: string[];
-      mode: 'parallel' | 'sequential';
+      mode?: 'parallel' | 'sequential';
     };
 
     if (!projectId || !pageIds || pageIds.length === 0) {

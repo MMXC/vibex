@@ -10,8 +10,9 @@
  */
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { RelationshipConnector } from './edges/RelationshipConnector';
 import type { BoundedContextNode, BoundedContextDraft } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
 
@@ -277,6 +278,7 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
 
   const [generating, setGenerating] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const handleGenerate = useCallback(async () => {
     if (generating) return;
@@ -321,7 +323,7 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
   const hasNodes = contextNodes.length > 0;
 
   return (
-    <div className={styles.boundedContextTree} aria-label="限界上下文树">
+    <div className={styles.boundedContextTree} aria-label="限界上下文树" ref={containerRef}>
       {/* Generation Controls */}
       <div className={styles.contextTreeControls}>
         <button
@@ -372,16 +374,20 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
       {/* Node List */}
       <div className={styles.contextNodeList} role="list" aria-label="限界上下文节点列表">
         {hasNodes ? (
-          contextNodes.map((node) => (
-            <ContextCard
-              key={node.nodeId}
-              node={node}
-              onConfirm={confirmContextNode}
-              onEdit={editContextNode}
-              onDelete={deleteContextNode}
-              readonly={readonly}
-            />
-          ))
+          <>
+            {/* SVG Relationship Connector Overlay */}
+            <RelationshipConnector nodes={contextNodes} containerRef={containerRef} />
+            {contextNodes.map((node) => (
+              <ContextCard
+                key={node.nodeId}
+                node={node}
+                onConfirm={confirmContextNode}
+                onEdit={editContextNode}
+                onDelete={deleteContextNode}
+                readonly={readonly}
+              />
+            ))}
+          </>
         ) : (
           <div className={styles.contextTreeEmpty}>
             <span className={styles.emptyIcon}>◇</span>

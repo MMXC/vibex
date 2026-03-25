@@ -22,6 +22,7 @@ import ReactFlow, {
   MarkerType,
   BackgroundVariant,
   Position,
+  EdgeTypes,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { CardTreeNode } from '../CardTreeNode/CardTreeNode';
@@ -34,6 +35,10 @@ export type { CardTreeNodeData };
 export interface CardTreeRendererProps {
   /** CardTree data to render */
   data: CardTreeVisualizationRaw | null | undefined;
+  /** Extra edges to overlay (e.g., relationship edges) — Epic 1 */
+  extraEdges?: Edge[];
+  /** Custom edge types registry — Epic 1 */
+  edgeTypes?: EdgeTypes;
   /** Override: show minimap */
   showMinimap?: boolean;
   /** Override: fit view on load */
@@ -72,11 +77,14 @@ const CENTER_X = 400; // Center nodes horizontally in the viewport
 
 /**
  * Convert CardTreeVisualizationRaw into ReactFlow nodes + edges
- * with automatic VERTICAL layout (cards stacked top-to-bottom)
+ * with automatic VERTICAL layout (cards stacked top-to-bottom).
+ * Extra edges (e.g., relationship edges) are appended after the
+ * default sequence edges — Epic 1.
  */
 function buildFlowGraph(
   data: CardTreeVisualizationRaw | null,
-  expandedIds?: Set<string>
+  expandedIds?: Set<string>,
+  extraEdges: Edge[] = []
 ): {
   nodes: Node[];
   edges: Edge[];
@@ -113,6 +121,11 @@ function buildFlowGraph(
     });
   }
 
+  // Append relationship / extra edges — Epic 1
+  if (extraEdges.length > 0) {
+    edges.push(...extraEdges);
+  }
+
   return { nodes, edges };
 }
 
@@ -141,6 +154,8 @@ interface InternalRendererProps extends Omit<CardTreeRendererProps, 'className'>
 
 function InternalRenderer({
   data,
+  extraEdges = [],
+  edgeTypes,
   showMinimap = true,
   fitView = true,
   showControls = true,
@@ -154,8 +169,8 @@ function InternalRenderer({
   className,
 }: InternalRendererProps) {
   const { nodes: initialNodes, edges: initialEdges } = useMemo(
-    () => buildFlowGraph(data ?? null, expandedIds),
-    [data, expandedIds]
+    () => buildFlowGraph(data ?? null, expandedIds, extraEdges),
+    [data, expandedIds, extraEdges]
   );
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -163,10 +178,10 @@ function InternalRenderer({
 
   // Sync data changes
   React.useEffect(() => {
-    const { nodes: newNodes, edges: newEdges } = buildFlowGraph(data ?? null, expandedIds);
+    const { nodes: newNodes, edges: newEdges } = buildFlowGraph(data ?? null, expandedIds, extraEdges);
     setNodes(newNodes);
     setEdges(newEdges);
-  }, [data, expandedIds, setNodes, setEdges]);
+  }, [data, expandedIds, extraEdges, setNodes, setEdges]);
 
   // Handle expand/collapse toggle
   const handleToggleExpand = useCallback(
@@ -227,6 +242,7 @@ function InternalRenderer({
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         onNodesChange={readonly ? undefined : onNodesChange}
         onEdgesChange={readonly ? undefined : onEdgesChange}
         fitView={fitView}

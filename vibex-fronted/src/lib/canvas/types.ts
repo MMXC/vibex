@@ -20,6 +20,17 @@ export type NodeStatus = 'pending' | 'generating' | 'confirmed' | 'error';
 // Bounded Context
 // =============================================================================
 
+/**
+ * Context Relationship (Epic 1: 三树增强 - 领域关系)
+ * Represents a directed relationship between two bounded contexts.
+ */
+export interface ContextRelationship {
+  sourceId?: string;
+  targetId: string;
+  type: 'dependency' | 'aggregate' | 'calls';
+  label?: string;
+}
+
 export interface BoundedContextNode {
   nodeId: string;
   name: string;
@@ -29,6 +40,16 @@ export interface BoundedContextNode {
   status: NodeStatus;
   parentId?: string;
   children: string[];
+  /** Inferred relationships to other bounded contexts (Epic 1) */
+  relationships?: ContextRelationship[];
+}
+
+/** Inferred relationship between two context nodes */
+export interface InferredRelationship {
+  sourceId: string;
+  targetId: string;
+  type: ContextRelationship['type'];
+  label?: string;
 }
 
 export interface BoundedContextDraft {

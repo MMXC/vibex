@@ -2606,3 +2606,26 @@
   color: var(--color-text-secondary);
   font-size: var(--text-xs);
 }
+
+/* =============================================================================
+   Epic 1: Relationship Connector SVG
+   ============================================================================= */
+
+.relationshipSvg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.relationshipEdge {
+  pointer-events: none;
+}
+
+.relationshipLabel {
+  font-family: var(--font-sans, system-ui);
+  font-size: 10px;
+  pointer-events: none;
+  user-select: none;
+}

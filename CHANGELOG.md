@@ -10,6 +10,14 @@ All notable changes to this project will be documented in this file.
 - **Phase 推进**: allConfirmed → prototype，解锁 Epic5-6
 - 审查: `docs/review-reports/20260325/review-vibex-canvas-redesign-20260325-epic4.md` — ✅ PASSED (44 tests)
 
+### Added (vibex-canvas-redesign-20260325 Epic5: 原型生成队列) — 2026-03-25
+- **canvasApi.ts**: createProject/generate/getStatus/exportZip + polling manager
+- **ProjectBar.tsx**: 三树全确认后解锁「创建项目」按钮
+- **PrototypeQueuePanel.tsx**: 队列状态显示/进度条/单页重生成/清空
+- **Queue slice**: prototypeQueue state + 4 actions (add/update/remove/clear)
+- **轮询**: 5s interval 自动停止，`encodeURIComponent` 正确处理 URL
+- 审查: `docs/review-reports/20260325/review-vibex-canvas-redesign-20260325-epic5.md` — ✅ PASSED (48 tests)
+
 ### Added (vibex-canvas-redesign-20260325 Epic3: BusinessFlowTree) — 2026-03-25
 - **BusinessFlowTree 组件**: 业务流程树垂直列表，每节点卡片展示
 - **Step 操作**: 添加/编辑/删除/重排业务流程步骤

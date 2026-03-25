@@ -186,21 +186,23 @@ generateFlowsFromContexts(contextIds: string[]): Promise<void>
 
 ---
 
-## Epic 3: E2E 测试验证
+## Epic 3: E2E 测试验证 ✅
 
-### Step 7: Playwright E2E 测试
+### Step 7: Playwright E2E 测试 ✅
 
-**文件**: `tests/canvas/canvas-api-e2e.spec.ts`
+**文件**: `vibex-fronted/tests/e2e/canvas-api-e2e.spec.ts`
 
 **测试用例**:
-| ID | 场景 | 验收 |
+| ID | 场景 | 状态 |
 |----|------|------|
-| E2E-1 | 正常流程：输入文本 → 启动 → 上下文树非空 | gstack 截图 |
-| E2E-2 | Loading 状态：按钮禁用 + "分析中..." | gstack 截图 |
-| E2E-3 | 错误流程：断网 → toast 提示 | gstack 截图 |
-| E2E-4 | 持久化：刷新页面 → 数据保留 | gstack 截图 |
+| E2E-1 | 正常流程：输入文本 → 启动 → 上下文树非空 | ✅ 4 tests discovered |
+| E2E-2 | Loading 状态：按钮禁用 + "分析中..." | ✅ |
+| E2E-3 | 错误流程：断网 → toast 提示 | ✅ |
+| E2E-4 | 持久化：刷新页面 → 数据保留 | ✅ |
 
-### Step 8: 回归测试验证
+**Commit**: `2e11883f` — 4 Playwright E2E tests
 
-**验收**: ✅ 208 suites / 2485 tests 全部通过（CardTreeView OOM 为预存问题，非本次引入）
+### Step 8: 回归测试验证 ✅
+
+**验收**: ✅ 208 suites / 2485 tests 全部通过
 

@@ -308,3 +308,41 @@ model UINode {
 
   @@index([projectId])
 }
+
+// ==================== Canvas Prototype Queue ====================
+
+// CanvasProject — 三树画布项目，关联到标准 Project
+model CanvasProject {
+  id              String   @id @default(cuid())
+  projectId       String   // 关联标准 Project.id
+  name            String
+  contextsJson    String   // JSON: BoundedContextNode[]
+  flowsJson       String   // JSON: BusinessFlowNode[]
+  componentsJson  String   // JSON: ComponentNode[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  pages           CanvasPage[]
+
+  @@index([projectId])
+}
+
+// CanvasPage — 原型生成队列中的页面
+model CanvasPage {
+  id              String   @id @default(cuid())
+  canvasProjectId String
+  componentId     String
+  name            String
+  status          String   @default("queued") // queued|generating|done|error
+  progress        Int      @default(0)         // 0-100
+  retryCount      Int      @default(0)
+  errorMessage    String?
+  generatedAt     DateTime?
+  codeJson        String?  // JSON: 生成的前端代码
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  canvasProject   CanvasProject @relation(fields: [canvasProjectId], references: [id], onDelete: Cascade)
+
+  @@index([canvasProjectId])
+}

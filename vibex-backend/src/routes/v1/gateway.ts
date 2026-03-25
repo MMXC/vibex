@@ -15,6 +15,7 @@ import { authMiddleware } from '../../lib/auth';
 import { rateLimit } from '../../lib/rateLimit';
 import { logger } from '../../lib/logger';
 import { errorHandler, notFoundHandler } from '../../lib/errorHandler';
+import analyzeStream from './analyze/stream';
 
 // 导入所有 API 路由
 import projects from '../projects';
@@ -198,6 +199,9 @@ v1.route('/ddd', ddd);
 
 // 诊断
 v1.route('/diagnosis', diagnosis);
+
+// SSE 流式分析 (analyze/stream 必须放在 plan 前面，避免路由冲突)
+v1.route('/analyze', analyzeStream);
 
 // 计划
 v1.route('/plan', plan);

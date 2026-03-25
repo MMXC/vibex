@@ -12,7 +12,7 @@
  */
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { areAllConfirmed } from '@/lib/canvas/cascade';
 import { PhaseProgressBar } from './PhaseProgressBar';
@@ -49,6 +49,13 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const [activeTab, setActiveTab] = useState<TreeType>('context');
   const [projectName, setProjectName] = useState('我的项目');
   const [queuePanelExpanded, setQueuePanelExpanded] = useState(true);
+  const [requirementInput, setRequirementInput] = useState('');
+
+  // === AI Thinking State (Epic 1) ===
+  const aiThinking = useCanvasStore((s) => s.aiThinking);
+  const aiThinkingMessage = useCanvasStore((s) => s.aiThinkingMessage);
+  const generateContexts = useCanvasStore((s) => s.generateContextsFromRequirement);
+  const setRequirementText = useCanvasStore((s) => s.setRequirementText);
 
   // === Compute confirmation states ===
   const contextReady = areAllConfirmed(contextNodes);
@@ -296,14 +303,23 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
               placeholder="例如：我想做一个在线预约医生系统，患者可以预约、问诊、查看病历..."
               rows={6}
               aria-label="需求描述"
+              value={requirementInput}
+              onChange={(e) => setRequirementInput(e.target.value)}
+              disabled={aiThinking}
             />
             <div className={styles.inputPhaseActions}>
               <button
                 type="button"
                 className={styles.primaryButton}
-                onClick={() => setPhase('context')}
+                onClick={() => {
+                  if (requirementInput.trim()) {
+                    setRequirementText(requirementInput);
+                    generateContexts(requirementInput);
+                  }
+                }}
+                disabled={!requirementInput.trim() || aiThinking}
               >
-                启动画布 →
+                {aiThinking ? '分析中...' : '启动画布 →'}
               </button>
               <button
                 type="button"
@@ -313,6 +329,16 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 导入示例
               </button>
             </div>
+
+            {/* AI Thinking Hint (Epic 1) */}
+            {aiThinking && (
+              <div className={styles.aiThinkingHint} role="status" aria-live="polite">
+                <span className={styles.aiSpinner} aria-hidden="true" />
+                <span className={styles.aiThinkingMessage}>
+                  {aiThinkingMessage ?? '正在分析需求...'}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       )}

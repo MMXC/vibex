@@ -1,73 +1,150 @@
-# Implementation Plan: VibeX 画布启动 API 对接
+# VibeX Canvas API 对接 — 实施计划
 
 **项目**: vibex-canvas-api-fix-20260326
-**版本**: 1.0
 **日期**: 2026-03-26
+**角色**: architect
 
 ---
 
-## 1. PR 批次划分
+## 概述
 
-### PR #1: DDD API 客户端 + Store Action（Epic 1）
-**范围**: `src/lib/canvas/api/dddApi.ts` + `src/lib/canvas/canvasStore.ts`
-**工时**: ~2h
-**验证**: gstack 截图
+修复 Canvas 启动画布未对接后端 API 的问题。采用 SSE 方案调用 `/api/ddd/bounded-context/stream` 和 `/api/ddd/business-flow/stream`，实现实时生成上下文树和流程树。
 
-**改动文件**:
-- `src/lib/canvas/api/dddApi.ts` — 新建，SSE 客户端
-- `src/lib/canvas/canvasStore.ts` — 新增 `generateContextsFromRequirement` action
-- `src/lib/canvas/types.ts` — 新增 SSEEvent 类型（可选）
-
-**测试覆盖**:
-- `__tests__/dddApi.test.ts` — fetch mock, timeout, error
-- `__tests__/canvasStore.test.ts` — generateContextsFromRequirement action
-
-### PR #2: CanvasPage 集成（Epic 2）
-**范围**: `src/components/canvas/CanvasPage.tsx`
-**工时**: ~1.5h
-**验证**: gstack `/browse /canvas` + `/qa-only`
-
-**改动文件**:
-- `src/components/canvas/CanvasPage.tsx` — 启动按钮改为异步调用
-- `src/components/canvas/CanvasPage.module.css` — 新增 loading/ai-thinking 样式
-
-**测试覆盖**:
-- 手动 gstack 截图：启动前 → loading → 结果
-- Playwright E2E：V1-V3
-
-### PR #3: E2E 测试（Epic 3）
-**范围**: `__tests__/e2e/canvas-start.spec.ts`
-**工时**: ~1.5h
-**验证**: Playwright CI
+**约束**:
+- SSE 流式响应，复用现有后端端点
+- store action 统一处理 SSE，组件只负责 UI
+- loading/error 状态完整，不静默失败
+- gstack 验证：截图 + 报告作为验收证据
 
 ---
 
-## 2. 改动详情
+## 实施步骤
 
-### 新建文件
+### Step 1: DDD API 客户端封装
 
-| 文件 | 描述 |
+**文件**: `src/lib/canvas/api/dddApi.ts`（新建）
+
+```
+$ mkdir -p src/lib/canvas/api
+$ touch src/lib/canvas/api/dddApi.ts
+$ touch src/lib/canvas/api/dddApi.test.ts
+```
+
+**实现内容**:
+1. `generateContextsSSE(text, callbacks)` — SSE 调用上下文生成
+   - `callbacks.onThinking(step, message)`
+   - `callbacks.onContext(context: BoundedContext)`
+   - `callbacks.onDone(summary)`
+   - `callbacks.onError(error)`
+2. `generateFlowsSSE(contextIds, callbacks)` — SSE 调用流程生成
+3. `AbortController` 10s 超时控制
+4. fetch 错误封装
+
+**验收**:
+- [ ] `pnpm tsc --noEmit` 通过
+- [ ] 单元测试覆盖 event parsing（thinking/context/done）
+- [ ] 超时测试（AbortController 触发）
+
+---
+
+### Step 2: canvasStore SSE action
+
+**文件**: `src/lib/canvas/canvasStore.ts`（新建或扩展现有）
+
+**新增 actions**:
+```typescript
+generateContextsFromRequirement(text: string): Promise<void>
+generateFlowsFromContexts(contextIds: string[]): Promise<void>
+```
+
+**SSE → store 映射**:
+- SSE `thinking` → `setState({ aiThinking: true, aiThinkingMessage: message })`
+- SSE `context` → `setState({ contextNodes: [...nodes, context] })`
+- SSE `done` → `setState({ aiThinking: false, phase: 'context' })`
+- SSE `error` → `setState({ aiThinking: false })` + toast
+
+**验收**:
+- [ ] `pnpm tsc --noEmit` 通过
+- [ ] store action 单元测试（mock SSE events）
+
+---
+
+### Step 3: CanvasPage 按钮集成
+
+**文件**: `src/components/canvas/CanvasPage.tsx`
+
+**修改内容**:
+1. 启动按钮 `onClick` → 调用 `canvasStore.generateContextsFromRequirement()`
+2. 按钮 disabled 状态绑定 `aiThinking`
+3. 按钮文字：`aiThinking ? '分析中...' : '启动画布'`
+4. 面板显示 AI thinking 提示
+
+**验收**:
+- [ ] `pnpm tsc --noEmit` 通过
+- [ ] gstack 验证：点击按钮 → 显示"分析中..." → 上下文树出现节点
+
+---
+
+### Step 4: 错误处理
+
+**文件**: `src/lib/canvas/api/dddApi.ts` + `src/components/canvas/CanvasPage.tsx`
+
+**Error scenarios**:
+| 场景 | 处理 |
 |------|------|
-| `src/lib/canvas/api/dddApi.ts` | SSE 客户端封装 |
+| 网络错误 | toast.error('网络错误，请检查连接')，按钮恢复 |
+| API 超时（10s） | toast.error('请求超时，请重试')，按钮恢复 |
+| API 400/500 | toast.error(err.message)，按钮恢复 |
+| SSE 解析失败 | toast.error('数据解析失败')，按钮恢复 |
 
-### 改动文件
-
-| 文件 | 改动类型 | 改动量 |
-|------|---------|--------|
-| `src/lib/canvas/canvasStore.ts` | 新增 action | ~30 行 |
-| `src/components/canvas/CanvasPage.tsx` | 按钮 onClick | ~10 行 |
-| `src/components/canvas/CanvasPage.module.css` | 新增样式 | ~15 行 |
+**验收**:
+- [ ] gstack 断网测试：显示 toast，无崩溃
+- [ ] gstack 超时测试（mock SSE delay > 10s）：显示超时 toast
 
 ---
 
-## 3. 风险与回滚
+## 文件变更清单
 
-| 风险 | 缓解 | 回滚 |
+```
+新增:
++ src/lib/canvas/
++ src/lib/canvas/api/
++ src/lib/canvas/api/dddApi.ts
++ src/lib/canvas/api/dddApi.test.ts
++ src/lib/canvas/canvasStore.ts
++ src/lib/canvas/canvasStore.test.ts
+
+修改:
+~ src/components/canvas/CanvasPage.tsx
+~ src/components/canvas/PhaseProgressBar.tsx（可选）
+~ src/components/canvas/TreePanel.tsx（thinking 状态显示）
+```
+
+---
+
+## 测试计划
+
+| 层级 | 工具 | 覆盖率目标 | 负责人 |
+|------|------|-----------|--------|
+| DDD API 客户端 | Jest | > 90% | Dev |
+| canvasStore actions | Jest | > 85% | Dev |
+| CanvasPage 集成 | Playwright (gstack) | E2E 手动截图 | Dev + Tester |
+
+**gstack 验收用例**:
+1. 点击"启动画布" → 按钮变为"分析中..." → 上下文树出现节点
+2. 断网 → toast 提示 → 按钮恢复可点击
+3. 刷新页面 → 上下文树状态保留（localStorage）
+
+---
+
+## 风险缓解
+
+| 风险 | 等级 | 缓解 |
 |------|------|------|
-| SSE 连接失败导致画布空白 | 10s timeout + error toast | Revert PR #1 |
-| loading 状态导致按钮假死 | AbortController 确保清理 | Revert PR #2 |
-| 破坏现有 ProjectBar 流程 | 回归测试覆盖 | Revert PR #2 |
+| SSE 重连 | 低 | AbortController 每次新建，失败后按钮恢复让用户重试 |
+| 后端 SSE 端点不可用 | 中 | PRD 阶段已 gstack 验证端点可用 |
+| 流式事件解析错误 | 低 | try-catch 包裹，每条消息独立解析 |
 
 ---
 
-*实施计划完成时间: 2026-03-26 00:10 UTC+8*
+*Architect — VibeX Canvas API Fix | 2026-03-26*

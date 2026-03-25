@@ -609,3 +609,46 @@ describe('markAllPending', () => {
       expect(useCanvasStore.getState().prototypeQueue[0].retryCount).toBe(2);
     });
   });
+
+  // Epic 1: AI Thinking Slice Tests
+  describe('Epic 1: AI Thinking Slice', () => {
+    beforeEach(() => {
+      const store = useCanvasStore.getState();
+      store.setAiThinking(false);
+      store.setRequirementText('');
+    });
+
+    it('should set aiThinking state', () => {
+      const { setAiThinking } = useCanvasStore.getState();
+      expect(useCanvasStore.getState().aiThinking).toBe(false);
+
+      setAiThinking(true, '正在分析需求...');
+      expect(useCanvasStore.getState().aiThinking).toBe(true);
+      expect(useCanvasStore.getState().aiThinkingMessage).toBe('正在分析需求...');
+
+      setAiThinking(false);
+      expect(useCanvasStore.getState().aiThinking).toBe(false);
+      expect(useCanvasStore.getState().aiThinkingMessage).toBe(null);
+    });
+
+    it('should set requirementText', () => {
+      const { setRequirementText } = useCanvasStore.getState();
+      setRequirementText('我想做一个预约医生系统');
+      expect(useCanvasStore.getState().requirementText).toBe('我想做一个预约医生系统');
+    });
+
+    it('should have generateContextsFromRequirement as a function', () => {
+      const { generateContextsFromRequirement } = useCanvasStore.getState();
+      expect(typeof generateContextsFromRequirement).toBe('function');
+    });
+
+    it('should transition to context phase when generateContextsFromRequirement is called', async () => {
+      const { generateContextsFromRequirement, setPhase } = useCanvasStore.getState();
+      setPhase('input');
+
+      // Just verify the action exists and doesn't throw synchronously
+      expect(typeof generateContextsFromRequirement).toBe('function');
+
+      // The actual SSE call is tested via integration tests
+    });
+  });

@@ -111,6 +111,11 @@ interface CanvasStore {
   prototypeQueue: PrototypePage[];
   isPolling: boolean;
 
+  // === AI Thinking Slice (Epic 1) ===
+  aiThinking: boolean;
+  aiThinkingMessage: string | null;
+  requirementText: string;
+
   // === Phase Actions ===
   setPhase: (phase: Phase) => void;
   advancePhase: () => void;
@@ -160,6 +165,11 @@ interface CanvasStore {
   setIsPolling: (polling: boolean) => void;
   clearQueue: () => void;
 
+  // === AI Thinking Actions (Epic 1) ===
+  setAiThinking: (thinking: boolean, message?: string | null) => void;
+  setRequirementText: (text: string) => void;
+  generateContextsFromRequirement: (text: string) => Promise<void>;
+
   // === Cascade Actions ===
   cascadeContextChange: (nodeId: string) => void;
   cascadeFlowChange: (nodeId: string) => void;
@@ -207,6 +217,11 @@ export const useCanvasStore = create<CanvasStore>()(
           projectId: null,
           prototypeQueue: [],
           isPolling: false,
+
+          // === AI Thinking Slice (Epic 1) ===
+          aiThinking: false,
+          aiThinkingMessage: null,
+          requirementText: '',
 
           // === Phase Actions ===
           setPhase: (phase) => {
@@ -464,6 +479,61 @@ export const useCanvasStore = create<CanvasStore>()(
             set((s) => ({ prototypeQueue: s.prototypeQueue.filter((p) => p.pageId !== pageId) })),
 
           clearQueue: () => set({ prototypeQueue: [], projectId: null }),
+
+          // === AI Thinking Actions (Epic 1) ===
+          setAiThinking: (thinking, message = null) => set({ aiThinking: thinking, aiThinkingMessage: message }),
+
+          setRequirementText: (text) => set({ requirementText: text }),
+
+          generateContextsFromRequirement: async (text: string) => {
+            const { setAiThinking, setRequirementText, setPhase, addContextNode } = get();
+
+            // Reset state
+            setAiThinking(true, '正在连接...');
+            setRequirementText(text);
+            setPhase('context');
+
+            // Import dynamically to avoid circular deps
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const { analyzeRequirement } = require('./api/dddApi') as typeof import('./api/dddApi');
+
+            analyzeRequirement(text, {
+              timeoutMs: 30000,
+              onThinking: (content: string) => {
+                setAiThinking(true, content);
+              },
+              onStepContext: (content: string, _mermaidCode: string | undefined, confidence: number | undefined) => {
+                setAiThinking(true, content);
+                if (confidence !== undefined && confidence > 0.5) {
+                  addContextNode({
+                    name: 'AI 分析上下文',
+                    description: content,
+                    type: 'core',
+                  });
+                }
+              },
+              onStepModel: (content: string) => {
+                setAiThinking(true, content);
+              },
+              onStepFlow: (content: string) => {
+                setAiThinking(true, content);
+              },
+              onStepComponents: (content: string) => {
+                setAiThinking(true, content);
+              },
+              onDone: (_projectId: string, summary: string) => {
+                setAiThinking(false, null);
+                console.log('[canvasStore] analyzeRequirement done:', summary);
+              },
+              onError: (message: string) => {
+                setAiThinking(false, null);
+                console.error('[canvasStore] analyzeRequirement error:', message);
+              },
+            }).catch((err: unknown) => {
+              setAiThinking(false, null);
+              console.error('[canvasStore] generateContextsFromRequirement error:', err);
+            });
+          },
 
           // === Cascade Actions ===
           cascadeContextChange: (_nodeId) => {

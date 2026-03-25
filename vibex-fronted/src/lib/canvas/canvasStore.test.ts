@@ -411,6 +411,144 @@ describe('canvasStore', () => {
       expect(useCanvasStore.getState().componentNodes[0].confirmed).toBe(false);
     });
   });
+
+  describe('Epic 3: Flow Step Actions', () => {
+    it('should confirm a step', () => {
+      const { addFlowNode, confirmStep } = useCanvasStore.getState();
+      addFlowNode({
+        name: 'Test Flow',
+        contextId: 'c1',
+        steps: [{ name: 'Step 1', actor: 'User', order: 0 }],
+      });
+      const flowId = useCanvasStore.getState().flowNodes[0].nodeId;
+      const stepId = useCanvasStore.getState().flowNodes[0].steps[0].stepId;
+
+      confirmStep(flowId, stepId);
+      const step = useCanvasStore.getState().flowNodes[0].steps[0];
+      expect(step.confirmed).toBe(true);
+      expect(step.status).toBe('confirmed');
+    });
+
+    it('should edit a step', () => {
+      const { addFlowNode, editStep } = useCanvasStore.getState();
+      addFlowNode({
+        name: 'Test Flow',
+        contextId: 'c1',
+        steps: [{ name: 'Step 1', actor: 'User', order: 0 }],
+      });
+      const flowId = useCanvasStore.getState().flowNodes[0].nodeId;
+      const stepId = useCanvasStore.getState().flowNodes[0].steps[0].stepId;
+
+      editStep(flowId, stepId, { name: 'Updated Step', actor: 'System' });
+      const step = useCanvasStore.getState().flowNodes[0].steps[0];
+      expect(step.name).toBe('Updated Step');
+      expect(step.actor).toBe('System');
+      expect(step.status).toBe('pending');
+    });
+
+    it('should delete a step', () => {
+      const { addFlowNode, deleteStep } = useCanvasStore.getState();
+      addFlowNode({
+        name: 'Test Flow',
+        contextId: 'c1',
+        steps: [
+          { name: 'Step 1', actor: 'User', order: 0 },
+          { name: 'Step 2', actor: 'User', order: 1 },
+        ],
+      });
+      const flowId = useCanvasStore.getState().flowNodes[0].nodeId;
+      const stepId = useCanvasStore.getState().flowNodes[0].steps[0].stepId;
+
+      deleteStep(flowId, stepId);
+      expect(useCanvasStore.getState().flowNodes[0].steps.length).toBe(1);
+      expect(useCanvasStore.getState().flowNodes[0].steps[0].name).toBe('Step 2');
+    });
+
+    it('should reorder steps', () => {
+      const { addFlowNode, reorderSteps } = useCanvasStore.getState();
+      addFlowNode({
+        name: 'Test Flow',
+        contextId: 'c1',
+        steps: [
+          { name: 'Step A', actor: 'User', order: 0 },
+          { name: 'Step B', actor: 'User', order: 1 },
+          { name: 'Step C', actor: 'User', order: 2 },
+        ],
+      });
+      const flowId = useCanvasStore.getState().flowNodes[0].nodeId;
+
+      // Move Step A from index 0 to index 2 (insert before C)
+      // splice(toIndex, 0, moved) = insert before element at toIndex
+      // [A,B,C] → remove A → [B,C] → insert A before C at index 2 → [B,A,C]
+      reorderSteps(flowId, 0, 2);
+      const steps = useCanvasStore.getState().flowNodes[0].steps;
+      expect(steps[0].name).toBe('Step B');
+      expect(steps[1].name).toBe('Step A');
+      expect(steps[2].name).toBe('Step C');
+      // Orders should be sequential
+      expect(steps[0].order).toBe(0);
+      expect(steps[1].order).toBe(1);
+      expect(steps[2].order).toBe(2);
+    });
+
+    it('should mark flow pending after step reorder', () => {
+      const { addFlowNode, reorderSteps } = useCanvasStore.getState();
+      addFlowNode({
+        name: 'Test Flow',
+        contextId: 'c1',
+        steps: [{ name: 'Step 1', actor: 'User', order: 0 }],
+      });
+      const flowId = useCanvasStore.getState().flowNodes[0].nodeId;
+
+      reorderSteps(flowId, 0, 1);
+      expect(useCanvasStore.getState().flowNodes[0].status).toBe('pending');
+    });
+  });
+
+  describe('Epic 3: Auto-generation', () => {
+    it('should auto-generate flows for all contexts', () => {
+      const { autoGenerateFlows } = useCanvasStore.getState();
+      autoGenerateFlows([
+        { nodeId: 'ctx-1', name: '患者管理', description: '', type: 'core' as const, confirmed: true, status: 'confirmed' as const, children: [] },
+        { nodeId: 'ctx-2', name: '预约挂号', description: '', type: 'core' as const, confirmed: true, status: 'confirmed' as const, children: [] },
+      ]);
+
+      const flows = useCanvasStore.getState().flowNodes;
+      expect(flows.length).toBe(2);
+      expect(flows[0].name).toBe('患者管理业务流程');
+      expect(flows[0].steps.length).toBe(3); // 3 default steps
+      expect(flows[0].steps[0].name).toBe('需求收集');
+      expect(flows[1].name).toBe('预约挂号业务流程');
+    });
+
+    it('should auto-generate flows when last context confirmed', () => {
+      const { addContextNode, confirmContextNode, setPhase } = useCanvasStore.getState();
+      setPhase('context');
+
+      addContextNode({ name: 'C1', description: '', type: 'core' });
+      const ctxId = useCanvasStore.getState().contextNodes[0].nodeId;
+      confirmContextNode(ctxId);
+
+      const flows = useCanvasStore.getState().flowNodes;
+      expect(flows.length).toBe(1);
+      expect(flows[0].contextId).toBe(ctxId);
+    });
+
+    it('should not auto-generate if flows already exist', () => {
+      const { addFlowNode, addContextNode, confirmContextNode, setPhase } = useCanvasStore.getState();
+      setPhase('context');
+
+      // Pre-existing flow
+      addFlowNode({ name: 'Pre-existing', contextId: 'c1', steps: [] });
+
+      addContextNode({ name: 'C1', description: '', type: 'core' });
+      const ctxId = useCanvasStore.getState().contextNodes[0].nodeId;
+      confirmContextNode(ctxId);
+
+      // Should NOT add another flow
+      expect(useCanvasStore.getState().flowNodes.length).toBe(1);
+    });
+  });
 });
 
 describe('markAllPending', () => {

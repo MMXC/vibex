@@ -4,3 +4,5 @@
 export { CanvasPage } from './CanvasPage';
 export { PhaseProgressBar } from './PhaseProgressBar';
 export { TreePanel } from './TreePanel';
+export { BoundedContextTree } from './BoundedContextTree';
+export { BusinessFlowTree } from './BusinessFlowTree';

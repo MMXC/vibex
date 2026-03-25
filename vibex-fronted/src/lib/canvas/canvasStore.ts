@@ -18,7 +18,7 @@ import type {
   PrototypePage,
   BoundedContextDraft,
   BusinessFlowDraft,
-
+  FlowStep,
   CascadeUpstream,
   CascadeResult,
 } from './types';
@@ -136,6 +136,13 @@ interface CanvasStore {
   deleteFlowNode: (nodeId: string) => void;
   confirmFlowNode: (nodeId: string) => void;
   setFlowDraft: (draft: Partial<BusinessFlowNode> | null) => void;
+  // === Step Actions (Epic 3) ===
+  confirmStep: (flowNodeId: string, stepId: string) => void;
+  editStep: (flowNodeId: string, stepId: string, data: Partial<FlowStep>) => void;
+  deleteStep: (flowNodeId: string, stepId: string) => void;
+  reorderSteps: (flowNodeId: string, fromIndex: number, toIndex: number) => void;
+  // === Auto-generation (Epic 3) ===
+  autoGenerateFlows: (contexts: BoundedContextNode[]) => void;
 
   // === Component Slice Actions ===
   setComponentNodes: (nodes: ComponentNode[]) => void;
@@ -258,13 +265,17 @@ export const useCanvasStore = create<CanvasStore>()(
           },
 
           confirmContextNode: (nodeId) => {
-            set((s) => ({
-              contextNodes: s.contextNodes.map((n) =>
-                n.nodeId === nodeId ? { ...n, confirmed: true, status: 'confirmed' as const } : n
-              ),
-            }));
+            const newContextNodes = get().contextNodes.map((n) =>
+              n.nodeId === nodeId ? { ...n, confirmed: true, status: 'confirmed' as const } : n
+            );
+            set({ contextNodes: newContextNodes });
             // Cascade: context confirmed → downstream trees may activate
             get().recomputeActiveTree();
+            // Epic 3 S3.1: auto-generate flow tree when ALL contexts confirmed
+            const allConfirmed = cascade.areAllConfirmed(newContextNodes);
+            if (allConfirmed && newContextNodes.length > 0 && get().flowNodes.length === 0) {
+              get().autoGenerateFlows(newContextNodes);
+            }
           },
 
           setContextDraft: (draft) => set({ contextDraft: draft }),
@@ -315,6 +326,89 @@ export const useCanvasStore = create<CanvasStore>()(
           },
 
           setFlowDraft: (draft) => set({ flowDraft: draft }),
+
+          // === Step Actions (Epic 3) ===
+          confirmStep: (flowNodeId, stepId) => {
+            set((s) => ({
+              flowNodes: s.flowNodes.map((n) =>
+                n.nodeId === flowNodeId
+                  ? {
+                      ...n,
+                      steps: n.steps.map((st) =>
+                        st.stepId === stepId
+                          ? { ...st, confirmed: true, status: 'confirmed' as const }
+                          : st
+                      ),
+                    }
+                  : n
+              ),
+            }));
+          },
+
+          editStep: (flowNodeId, stepId, data) => {
+            set((s) => ({
+              flowNodes: s.flowNodes.map((n) =>
+                n.nodeId === flowNodeId
+                  ? {
+                      ...n,
+                      status: 'pending' as const,
+                      steps: n.steps.map((st) =>
+                        st.stepId === stepId ? { ...st, ...data, status: 'pending' as const } : st
+                      ),
+                    }
+                  : n
+              ),
+            }));
+            get().cascadeFlowChange(flowNodeId);
+          },
+
+          deleteStep: (flowNodeId, stepId) => {
+            set((s) => ({
+              flowNodes: s.flowNodes.map((n) =>
+                n.nodeId === flowNodeId
+                  ? { ...n, steps: n.steps.filter((st) => st.stepId !== stepId) }
+                  : n
+              ),
+            }));
+          },
+
+          reorderSteps: (flowNodeId, fromIndex, toIndex) => {
+            set((s) => ({
+              flowNodes: s.flowNodes.map((n) => {
+                if (n.nodeId !== flowNodeId) return n;
+                const steps = [...n.steps];
+                const [moved] = steps.splice(fromIndex, 1);
+                // Insert before toIndex (splice inserts AT the index, so use toIndex - 1
+                // so that moved ends up in the position where toIndex currently is)
+                const insertAt = fromIndex < toIndex ? toIndex - 1 : toIndex;
+                steps.splice(insertAt, 0, moved);
+                return {
+                  ...n,
+                  steps: steps.map((st, i) => ({ ...st, order: i })),
+                  status: 'pending' as const,
+                };
+              }),
+            }));
+            get().cascadeFlowChange(flowNodeId);
+          },
+
+          // === Auto-generation (Epic 3 S3.1) ===
+          autoGenerateFlows: (contexts) => {
+            const flows: BusinessFlowNode[] = contexts.map((ctx) => ({
+              nodeId: generateId(),
+              contextId: ctx.nodeId,
+              name: `${ctx.name}业务流程`,
+              steps: [
+                { stepId: generateId(), name: '需求收集', actor: '用户', description: `收集${ctx.name}相关需求`, order: 0, confirmed: false, status: 'pending' },
+                { stepId: generateId(), name: '数据处理', actor: '系统', description: `处理${ctx.name}核心数据`, order: 1, confirmed: false, status: 'pending' },
+                { stepId: generateId(), name: '结果输出', actor: '系统', description: `输出${ctx.name}处理结果`, order: 2, confirmed: false, status: 'pending' },
+              ],
+              confirmed: false,
+              status: 'pending',
+              children: [],
+            }));
+            set({ flowNodes: flows });
+          },
 
           // === Component Slice Actions ===
           setComponentNodes: (nodes) => set({ componentNodes: nodes }),

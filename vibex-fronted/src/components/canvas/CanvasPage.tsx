@@ -23,18 +23,6 @@ import { BusinessFlowTree } from './BusinessFlowTree';
 import type { Phase, TreeType, TreeNode } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
 
-// Placeholder tree components — will be implemented in Epic 2-4
-function PlaceholderTree({ tree, title }: { tree: TreeType; title: string }) {
-  return (
-    <div className={styles.placeholderTree}>
-      <span className={styles.placeholderIcon}>
-        {tree === 'context' ? '◇' : tree === 'flow' ? '→' : '▣'}
-      </span>
-      <p>{title}将在 Epic 2-4 实现</p>
-    </div>
-  );
-}
-
 interface CanvasPageProps {
   /** 是否使用 Tab 模式（< 768px） */
   useTabMode?: boolean;

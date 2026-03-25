@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+### Fixed (vibex-canvas-api-fix-20260326 Epic2: SSE 路由修复) — 2026-03-26
+- **根因修复**: Cloudflare Workers 部署 Hono 而非 Next.js，/v1/analyze/stream 404
+- **Hono 迁移**: SSE 端点从 Next.js route.ts 迁移到 `src/routes/v1/analyze/stream.ts`
+- **路由修正**: `/api/v1` mount + `/analyze` 路由在 protected_ 前注册
+- **认证移除**: `/v1/analyze/stream` 设为公开路由（无需认证）
+- **前端解析器**: `pendingEventType` 状态机替代 `indexOf`，更健壮
+- 审查: `docs/review-reports/20260326/review-vibex-canvas-api-fix-epic2.md` — ✅ PASSED
+
 ### Added (vibex-canvas-api-fix-20260326 Epic1: SSE DDD API 集成) — 2026-03-26
 - **dddApi.ts**: SSE 客户端，`analyzeRequirement` 支持 thinking/step_context/step_model/step_flow/step_components/done/error 事件
 - **generateContextsFromRequirement**: Store action，调用 SSE 并更新 contextNodes

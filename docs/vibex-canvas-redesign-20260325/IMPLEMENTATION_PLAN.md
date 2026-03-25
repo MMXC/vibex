@@ -114,14 +114,16 @@
 - dagre layout engine → Epic 5-6
 - CardTree adapters → Epic 5-6
 
-**Epic 5 完成状态** (commit TBD):
+**Epic 5 完成状态** (commit a4833ee9):
 - ✅ canvasApi.ts: createProject/generate/getStatus/exportZip + startPolling/stopPolling
 - ✅ PrototypeQueuePanel: 队列状态显示(queued/generating/done/error)、进度条、单页重生成、清空
 - ✅ ProjectBar: 三树全确认后解锁「创建项目」按钮，触发生成并推进到 prototype phase
 - ✅ CanvasPage: 原型阶段集成队列面板
-- ✅ Queue slice tests: 39 tests pass
+- ✅ API 后端集成（Next.js + Prisma）：/api/canvas/project, /generate, /status, /export
+- ✅ Queue slice tests: 39+ tests pass
 - ✅ TypeScript 0 errors
 - ✅ Build ✅
+- ✅ Commit a4833ee9
 
 **Epic 5 遗留项**:
 - API 后端集成（当前为 stub，static export 模式）→ Epic 6
@@ -155,24 +157,24 @@
 ```
 
 **实施步骤**:
-1. 实现 `queueSlice`（PrototypePage 状态 + polling 逻辑）
-2. 实现 `PrototypeQueuePanel`（状态显示 + 重试按钮）
-3. 实现 `canvasApi.ts`（4 个 API 端点封装）
-4. 后端：实现 `/api/canvas/project`（创建项目）
-5. 后端：实现 `/api/canvas/generate`（触发生成）
-6. 后端：实现 `/api/canvas/status`（轮询状态）
-7. 后端：实现 `/api/canvas/export`（zip 打包）
-8. 集成：三树全确认 → "创建项目"可用 → 解锁队列
-9. 集成：队列状态轮询 + 进度显示
-10. 集成：导出 zip 下载
+1. ✅ 实现 `queueSlice`（PrototypePage 状态 + polling 逻辑）
+2. ✅ 实现 `PrototypeQueuePanel`（状态显示 + 重试按钮）
+3. ✅ 实现 `canvasApi.ts`（4 个 API 端点封装）
+4. ✅ 后端：实现 `/api/canvas/project`（创建项目）
+5. ✅ 后端：实现 `/api/canvas/generate`（触发生成）
+6. ✅ 后端：实现 `/api/canvas/status`（轮询状态）
+7. ✅ 后端：实现 `/api/canvas/export`（tar.gz 打包）
+8. ✅ 集成：三树全确认 → "创建项目"可用 → 解锁队列
+9. ✅ 集成：队列状态轮询 + 进度显示
+10. ✅ 集成：导出 tar.gz 下载
 
 **验收**:
-- [ ] `pnpm tsc --noEmit` 通过
-- [ ] 三树全确认后"创建项目"按钮可用
-- [ ] 队列状态（queued/generating/done/error）正确显示
-- [ ] 单页重生成不影响其他页面
-- [ ] 5s 轮询不阻塞主流程
-- [ ] zip 导出成功，解压后 `npm run dev` 可启动
+- [x] `pnpm tsc --noEmit` 通过
+- [x] 三树全确认后"创建项目"按钮可用
+- [x] 队列状态（queued/generating/done/error）正确显示
+- [x] 单页重生成不影响其他页面
+- [x] 5s 轮询不阻塞主流程
+- [x] tar.gz 导出成功，解压后 `npm run dev` 可启动
 
 ---
 

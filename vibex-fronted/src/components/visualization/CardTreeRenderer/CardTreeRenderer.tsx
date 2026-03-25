@@ -9,7 +9,7 @@
 
 'use client';
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, type ComponentType } from 'react';
 import ReactFlow, {
   Node,
   Edge,
@@ -23,10 +23,14 @@ import ReactFlow, {
   BackgroundVariant,
   Position,
   EdgeTypes,
+  NodeTypes,
+  type NodeProps,
+  type EdgeProps,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { CardTreeNode } from '../CardTreeNode/CardTreeNode';
 import type { CardTreeVisualizationRaw, CardTreeNodeData } from '@/types/visualization';
+import type { FlowGateway, GatewayNodeData, LoopEdgeData } from '@/lib/canvas/types';
 import styles from './CardTreeRenderer.module.css';
 
 // Re-export CardTreeNode type for external use
@@ -39,6 +43,8 @@ export interface CardTreeRendererProps {
   extraEdges?: Edge[];
   /** Custom edge types registry — Epic 1 */
   edgeTypes?: EdgeTypes;
+  /** Flow gateways for branching/loop visualization — Epic 2 */
+  flowGateways?: FlowGateway[];
   /** Override: show minimap */
   showMinimap?: boolean;
   /** Override: fit view on load */
@@ -65,9 +71,25 @@ export interface CardTreeRendererProps {
 
 // ==================== Node Types Registry ====================
 
-const nodeTypes = {
-  cardTreeNode: CardTreeNode,
-};
+// Lazy imports to avoid circular dependency
+let _gatewayNodeTypes: NodeTypes | null = null;
+let _loopEdgeTypes: EdgeTypes | null = null;
+
+function getNodeTypes(): NodeTypes {
+  if (!_gatewayNodeTypes) {
+    const { GatewayNode } = require('@/components/canvas/nodes/GatewayNode');
+    _gatewayNodeTypes = { cardTreeNode: CardTreeNode as ComponentType<NodeProps>, gatewayNode: GatewayNode as ComponentType<NodeProps> };
+  }
+  return _gatewayNodeTypes;
+}
+
+function getEdgeTypes(): EdgeTypes {
+  if (!_loopEdgeTypes) {
+    const { LoopEdge } = require('@/components/canvas/edges/LoopEdge');
+    _loopEdgeTypes = { loopEdge: LoopEdge as ComponentType<EdgeProps> };
+  }
+  return _loopEdgeTypes;
+}
 
 // ==================== Layout Engine (Vertical) ====================
 
@@ -80,11 +102,15 @@ const CENTER_X = 400; // Center nodes horizontally in the viewport
  * with automatic VERTICAL layout (cards stacked top-to-bottom).
  * Extra edges (e.g., relationship edges) are appended after the
  * default sequence edges — Epic 1.
+ *
+ * When flowGateways are provided (Epic 2), inserts gateway diamond nodes
+ * at branch points and adds loop edges for cyclic flows.
  */
 function buildFlowGraph(
   data: CardTreeVisualizationRaw | null,
   expandedIds?: Set<string>,
-  extraEdges: Edge[] = []
+  extraEdges: Edge[] = [],
+  flowGateways: FlowGateway[] = []
 ): {
   nodes: Node[];
   edges: Edge[];
@@ -126,6 +152,99 @@ function buildFlowGraph(
     edges.push(...extraEdges);
   }
 
+  // ─── Epic 2: Gateway nodes + loop edges ─────────────────────────────────
+  if (flowGateways.length > 0) {
+    // Insert gateway nodes between cards at gateway positions
+    const gatewayNodeMap = new Map<string, Node>();
+    for (const gw of flowGateways) {
+      // Find the source card index
+      const sourceCardIdx = nodes.findIndex(
+        (n) => n.id === gw.sourceStepId || n.id.includes(gw.sourceStepId)
+      );
+      const targetCardIdx = nodes.findIndex(
+        (n) => gw.targetStepIds.some(
+          (tid) => n.id === tid || n.id.includes(tid)
+        )
+      );
+
+      // Calculate Y position: between source and target cards
+      const sourceY = sourceCardIdx >= 0
+        ? sourceCardIdx * (CARD_HEIGHT + CARD_MARGIN_Y)
+        : nodes.length * (CARD_HEIGHT + CARD_MARGIN_Y) / 2;
+      const targetY = targetCardIdx >= 0
+        ? targetCardIdx * (CARD_HEIGHT + CARD_MARGIN_Y)
+        : sourceY + CARD_HEIGHT + CARD_MARGIN_Y;
+      const gatewayY = (sourceY + targetY) / 2;
+
+      // XOR gateways: offset left/right from center; OR: center
+      const offsetX = gw.type === 'xor' ? 120 : 0;
+      const gatewayNode: Node = {
+        id: gw.gatewayId,
+        type: 'gatewayNode',
+        position: { x: CENTER_X + offsetX, y: gatewayY },
+        data: {
+          gatewayType: gw.type,
+          label: gw.label,
+          condition: gw.condition,
+        } as GatewayNodeData,
+        sourcePosition: Position.Bottom,
+        targetPosition: Position.Top,
+      };
+
+      nodes.push(gatewayNode);
+      gatewayNodeMap.set(gw.gatewayId, gatewayNode);
+
+      // Connect source card → gateway
+      const sourceNodeId = sourceCardIdx >= 0 ? nodes[sourceCardIdx].id : nodes[0].id;
+      edges.push({
+        id: `e-${sourceNodeId}-${gw.gatewayId}`,
+        source: sourceNodeId,
+        target: gw.gatewayId,
+        type: 'smoothstep',
+        markerEnd: { type: MarkerType.ArrowClosed },
+        style: { stroke: gw.type === 'xor' ? '#d97706' : '#2563eb', strokeWidth: 1.5 },
+      });
+
+      // Connect gateway → each target card
+      for (const tid of gw.targetStepIds) {
+        const targetNodeId = nodes.find(
+          (n) => n.id === tid || n.id.includes(tid)
+        )?.id ?? nodes[nodes.length - 1].id;
+        edges.push({
+          id: `e-${gw.gatewayId}-${tid}`,
+          source: gw.gatewayId,
+          target: targetNodeId,
+          type: 'smoothstep',
+          markerEnd: { type: MarkerType.ArrowClosed },
+          style: { stroke: gw.type === 'xor' ? '#d97706' : '#2563eb', strokeWidth: 1.5 },
+          label: gw.condition,
+          labelStyle: { fontSize: 10, fill: '#6b7280' },
+          labelBgStyle: { fill: 'white', fillOpacity: 0.8 },
+        });
+      }
+
+      // Loop edge: if hasLoop, add dashed edge back to loop target
+      if (gw.hasLoop && gw.loopTargetStepId) {
+        const loopTargetNode = nodes.find(
+          (n) => n.id === gw.loopTargetStepId || n.id.includes(gw.loopTargetStepId!)
+        );
+        if (loopTargetNode) {
+          edges.push({
+            id: `loop-${gw.gatewayId}-${gw.loopTargetStepId}`,
+            source: gw.gatewayId,
+            target: loopTargetNode.id,
+            type: 'loopEdge',
+            markerEnd: { type: MarkerType.ArrowClosed },
+            data: { isLoop: true, loopLabel: '↩ 循环', condition: gw.condition } as LoopEdgeData,
+          });
+        }
+      }
+    }
+
+    // Re-sort nodes by Y position for clean vertical layout
+    nodes.sort((a, b) => a.position.y - b.position.y);
+  }
+
   return { nodes, edges };
 }
 
@@ -156,6 +275,7 @@ function InternalRenderer({
   data,
   extraEdges = [],
   edgeTypes,
+  flowGateways = [],
   showMinimap = true,
   fitView = true,
   showControls = true,
@@ -168,9 +288,15 @@ function InternalRenderer({
   onInit,
   className,
 }: InternalRendererProps) {
+  // Merge custom edgeTypes with built-in loop edge type
+  const mergedEdgeTypes = useMemo(
+    () => ({ ...getEdgeTypes(), ...edgeTypes }),
+    [edgeTypes]
+  );
+
   const { nodes: initialNodes, edges: initialEdges } = useMemo(
-    () => buildFlowGraph(data ?? null, expandedIds, extraEdges),
-    [data, expandedIds, extraEdges]
+    () => buildFlowGraph(data ?? null, expandedIds, extraEdges, flowGateways),
+    [data, expandedIds, extraEdges, flowGateways]
   );
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -178,10 +304,15 @@ function InternalRenderer({
 
   // Sync data changes
   React.useEffect(() => {
-    const { nodes: newNodes, edges: newEdges } = buildFlowGraph(data ?? null, expandedIds, extraEdges);
+    const { nodes: newNodes, edges: newEdges } = buildFlowGraph(
+      data ?? null,
+      expandedIds,
+      extraEdges,
+      flowGateways
+    );
     setNodes(newNodes);
     setEdges(newEdges);
-  }, [data, expandedIds, extraEdges, setNodes, setEdges]);
+  }, [data, expandedIds, extraEdges, flowGateways, setNodes, setEdges]);
 
   // Handle expand/collapse toggle
   const handleToggleExpand = useCallback(
@@ -192,7 +323,7 @@ function InternalRenderer({
   );
 
   // Handle checkbox toggle
-  const handleCheckboxToggle = useCallback(
+  const _handleCheckboxToggle = useCallback(
     (nodeId: string, childId: string, checked: boolean) => {
       setNodes((nds) =>
         nds.map((n) => {
@@ -241,8 +372,8 @@ function InternalRenderer({
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
+        nodeTypes={getNodeTypes()}
+        edgeTypes={mergedEdgeTypes}
         onNodesChange={readonly ? undefined : onNodesChange}
         onEdgesChange={readonly ? undefined : onEdgesChange}
         fitView={fitView}

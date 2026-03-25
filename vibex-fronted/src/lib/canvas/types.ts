@@ -270,6 +270,50 @@ export interface TreeNode {
 }
 
 // =============================================================================
+// Flow Gateway (Epic 2: 流程树分支与循环增强)
+// =============================================================================
+
+/** Gateway type for branching flows */
+export type GatewayType = 'xor' | 'or';
+
+/** Flow gateway node — represents a branch point in the business flow */
+export interface FlowGateway {
+  /** Unique gateway ID */
+  gatewayId: string;
+  /** Gateway type */
+  type: GatewayType;
+  /** Human-readable label shown inside the diamond */
+  label?: string;
+  /** Condition expression for XOR (e.g., "user.role === 'admin'") */
+  condition?: string;
+  /** Source step ID where this gateway branches from */
+  sourceStepId: string;
+  /** Target step IDs (branches from this gateway) */
+  targetStepIds: string[];
+  /** Whether this gateway has a loop-back path */
+  hasLoop?: boolean;
+  /** Step ID that this loop points back to */
+  loopTargetStepId?: string;
+}
+
+/** ReactFlow node data for gateway nodes */
+export interface GatewayNodeData {
+  gatewayType: GatewayType;
+  label?: string;
+  condition?: string;
+  /** Visual size */
+  width?: number;
+  height?: number;
+}
+
+/** ReactFlow edge data for loop edges */
+export interface LoopEdgeData {
+  isLoop: true;
+  loopLabel?: string;
+  condition?: string;
+}
+
+// =============================================================================
 // Cascade
 // =============================================================================
 

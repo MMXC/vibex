@@ -27,6 +27,8 @@ export interface ContextTreeFlowProps {
   showRelationships?: boolean;
   /** Callback when a relationship edge is clicked */
   onRelationshipClick?: (sourceId: string, targetId: string, type: ContextRelationship['type']) => void;
+  /** @deprecated Use onRelationshipClick */
+  _onRelationshipClick?: (sourceId: string, targetId: string, type: ContextRelationship['type']) => void;
   /** Additional CardTreeRenderer props */
   cardTreeProps?: {
     showMinimap?: boolean;

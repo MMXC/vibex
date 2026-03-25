@@ -10,7 +10,7 @@
 
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useVisualizationStore } from '@/stores/visualizationStore';
 import type { CardTreeVisualizationRaw } from '@/types/visualization';
@@ -278,14 +278,19 @@ export function useProjectTree({
     ((query.isError && useMockOnError) || (skip && !query.data))
   );
 
-  // Sync to visualizationStore
+  // Guard: only sync when data actually changes (break circular dependency)
+  const lastSyncRef = useRef<string | null>(null);
   useEffect(() => {
-    if (effectiveData) {
-      setVisualizationData({
-        type: 'cardtree',
-        raw: effectiveData,
-        parsedAt: new Date().toISOString(),
-      });
+    const dataKey = effectiveData ? JSON.stringify(effectiveData) : null;
+    if (dataKey !== lastSyncRef.current) {
+      lastSyncRef.current = dataKey;
+      if (effectiveData) {
+        setVisualizationData({
+          type: 'cardtree',
+          raw: effectiveData,
+          parsedAt: new Date().toISOString(),
+        });
+      }
     }
   }, [effectiveData, setVisualizationData]);
 

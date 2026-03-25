@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+### Added (vibex-canvas-redesign-20260325 Epic2: BoundedContextTree) — 2026-03-25
+- **BoundedContextTree 组件**: 垂直列表布局，节点卡片展示（pending 黄/confirmed 绿/error 红）
+- **AI 生成**: Mock AI 生成 3-6 个限界上下文节点
+- **CRUD 操作**: 添加/编辑/删除/确认上下文节点，连接 canvasStore
+- **节点确认**: 点击确认后节点变绿，触发 flow tree activation
+- **级联删除**: 删除上下文节点时，flow + component 节点自动 pending
+- **TreePanel 集成**: `TreePanel.tsx` 添加 BoundedContextTree 渲染
+- **测试**: 27 tests pass (`canvasStore.test.ts` flow cascade + activation)
+- **审查**: ✅ PASSED — `docs/review-reports/20260325/review-vibex-canvas-redesign-20260325-epic2.md`
+- Commit: `453c3895`
+
 ### Added (vibex-canvas-redesign-20260325 Epic1: Canvas Infrastructure) — 2026-03-25
 - **Canvas 基础设施**: 新路由 `/canvas`，三树面板（Phase/Context/Flow）并行展示
 - **组件**: `CanvasPage.tsx`, `PhaseProgressBar.tsx`, `TreePanel.tsx`

@@ -42,7 +42,7 @@
 | Next.js Route Handlers | App Router | 复用现有 API 路由约定 |
 | TypeScript | 5.x | 与前端类型共享 |
 | Prisma | 5.x | 已有 CanvasProject 模型 |
-| MiniMax API | abab6.5s-chat | 复用现有 `services/ai-service.ts` |
+| MiniMax API | MiniMax2.5-highspeed（已配置）| 复用现有 services/ai-service.ts |
 | Zustand | latest | 现有前端状态管理 |
 
 ---
@@ -127,6 +127,7 @@ interface GenerateContextsOutput {
   contexts: BoundedContext[];
   confidence: number;       // 0-1，生成置信度
   sessionId: string;        // 用于后续请求关联
+  totalPages?: number;      // 分页：总页数
   error?: string;           // 失败时返回友好错误
 }
 ```
@@ -157,6 +158,8 @@ interface BoundedContext {
 interface GenerateFlowsInput {
   contexts: BoundedContext[];  // 用户确认后的上下文
   sessionId: string;
+  page?: number;               // 分页：页码，默认 1
+  pageSize?: number;           // 分页：每页数量，默认按领域分页（一域一页）
 }
 ```
 
@@ -165,6 +168,7 @@ interface GenerateFlowsInput {
 interface GenerateFlowsOutput {
   flows: BusinessFlow[];
   confidence: number;
+  totalPages?: number;      // 分页：总页数
   error?: string;
 }
 ```
@@ -485,13 +489,29 @@ test('完整三树生成流程', async ({ page }) => {
 
 ---
 
-## 10. Open Questions（待确认）
+## 10. Open Questions（已确认）
 
-| # | 问题 | 优先级 | 状态 |
-|---|------|--------|------|
-| 1 | AI 模型选择：MiniMax abab6.5s-chat 是否满足？ | P0 | 🔴 待确认 |
-| 2 | 节点数量上限：单次最多生成多少个？是否需要分页？ | P1 | 🟡 待确认 |
-| 3 | 生成失败策略：降级为空树还是报错重试？ | P0 | 🔴 待确认 |
+> 确认人: Alex Yu | 确认时间: 2026-03-25 21:00
+
+| # | 问题 | 决策 | 优先级 | 状态 |
+|---|------|------|--------|------|
+| 1 | AI 模型选择 | 使用 MiniMax2.5-highspeed（已配置） | P0 | ✅ 已确认 |
+| 2 | 生成失败策略 | 提示出错重试，3次失败后记录日志、标记待人工处理 | P0 | ✅ 已确认 |
+| 3 | 节点数量上限/分页策略 | 多域时每个用户勾选的域一个流程图确认；组件按流程图一一对应；上下文单图确认，后续流程/组件按领域分页 | P1 | ✅ 已确认（Alex） |
+
+### 详细说明
+
+**OQ-2 生成失败策略（已确认）**:
+- 单次生成失败 → 提示用户错误信息，提供重试按钮
+- 重试次数上限: 3 次
+- 3 次均失败 → 记录 error log（nodeId, context, timestamp, error message），前端标记该节点为  状态，UI 显示"需人工处理"标识
+- 不会降级为空树（避免静默失败）
+
+**OQ-3 分页策略（已确认，Alex 决策）**:
+- 限界上下文: 每个用户勾选的域 → 单独一张图确认（单域单图）
+- 业务流程: 按领域/上下文分页，每个流程图对应一个上下文
+- 组件树: 按流程图一一对应，每个流程节点对应一个组件树页面
+- API 设计支持分页参数: `page`, `pageSize`
 | 4 | 中间状态是否持久化到 Prisma CanvasProject？ | P2 | 🟢 可延期 |
 
 ---

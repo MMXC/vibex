@@ -94,7 +94,15 @@
 - ✅ TypeScript 0 errors
 
 **Epic 2 遗留项**:
-- BusinessFlowTree 完整实现（placeholder）→ Epic 3
+- BusinessFlowTree 完整实现（placeholder）→ Epic 3 ✅ (commit d76a0fae)
+**Epic 3 完成状态** (commit d76a0fae):
+- ✅ BusinessFlowTree: flow cards with steps, CRUD, confirm/edit/delete/reorder
+- ✅ autoGenerateFlows: trigger on all-contexts-confirmed
+- ✅ FlowStep actions: confirm, edit, delete, reorder (fix splice bug)
+- ✅ 44 canvasStore tests pass
+- ✅ TypeScript 0 errors
+
+**Epic 4 待完成**:
 - ComponentTree 完整实现（placeholder）→ Epic 4
 - dagre layout engine → Epic 3-4
 - CardTree adapters → Epic 3-4

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+### Added (vibex-canvas-redesign-20260325 Epic3: BusinessFlowTree) — 2026-03-25
+- **BusinessFlowTree 组件**: 业务流程树垂直列表，每节点卡片展示
+- **Step 操作**: 添加/编辑/删除/重排业务流程步骤
+- **自动生成**: 确认所有上下文后自动生成业务流程
+- **Step 重排**: 拖拽调整顺序，重排后 flow + component 自动 pending
+- **TreePanel 集成**: `TreePanel.tsx` 添加 BusinessFlowTree 渲染
+- **测试**: 35 tests pass (canvasStore.test.ts Epic3 scenarios)
+- **审查**: ✅ PASSED
+- Commit: `d76a0fae`
+
 ### Added (vibex-canvas-redesign-20260325 Epic2: BoundedContextTree) — 2026-03-25
 - **BoundedContextTree 组件**: 垂直列表布局，节点卡片展示（pending 黄/confirmed 绿/error 红）
 - **AI 生成**: Mock AI 生成 3-6 个限界上下文节点

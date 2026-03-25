@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+### Added (vibex-canvas-redesign-20260325 Epic1: Canvas Infrastructure) — 2026-03-25
+- **Canvas 基础设施**: 新路由 `/canvas`，三树面板（Phase/Context/Flow）并行展示
+- **组件**: `CanvasPage.tsx`, `PhaseProgressBar.tsx`, `TreePanel.tsx`
+- **状态管理**: Zustand `canvasStore.ts` (phase/context/flow/component/queue slices)
+- **级联更新**: `CascadeUpdateManager` 处理状态依赖
+- **类型定义**: `lib/canvas/types.ts` 完整类型
+- **Landing Page**: 首页添加 Canvas Banner 引导
+- **测试**: 34 tests pass (`canvasStore.test.ts`, `CascadeUpdateManager.test.ts`)
+- **审查**: ✅ PASSED — `docs/review-reports/20260325/review-vibex-canvas-redesign-20260325-epic1.md`
+- Commit: `57c09045`
+
 ### Fixed (fix-epic1-topic-tracking Epic1: create_thread_and_save Silent Failure) — 2026-03-25
 - **移除静默失败**: `create_thread_and_save` 失败时不再返回 exit 0
 - **告警消息**: 失败时输出 `⚠️ 话题创建失败` + stderr 详情

@@ -1,7 +1,7 @@
 # Dev Agent 每日自检 — 2026-03-25
 
 **Agent**: dev
-**日期**: 2026-03-25 09:10 (Asia/Shanghai)
+**日期**: 2026-03-25 09:31 (Asia/Shanghai) — 已更新
 **项目**: agent-self-evolution-20260325
 
 ---
@@ -94,3 +94,32 @@
 - **提交规范**: ✅ feat/fix/docs 前缀
 - **主动清理**: ✅ 幽灵任务修复 + CI 配置修复
 - **待办**: CardTree 单元测试、Epic3 合入、ESLint 优化
+
+---
+
+## 5. 更新 (09:31)
+
+### 最新提交
+| Commit | 描述 | 状态 |
+|--------|------|------|
+| `1d8d5b25` | fix(Epic3): sync ErrorClassifier/CodeMapper/Middleware tests to UPPERCASE enum (120 tests) | ✅ |
+| `9aecf834` | fix(pretest): return exit 1 when ESLint fails | ✅ |
+| `9fd2d511` | fix(heartbeat): P1-8 话题追踪集成 + P1-2 JSON 存在性检查 | ✅ |
+| `03e410ce` | feat(Epic3-P3-1): 统一错误类型到 src/types/error.ts | ✅ |
+| `8ab1f1f5` | feat(Epic1-2): 话题追踪静默失败修复 + 降级机制 | ✅ |
+| `d58b2dac` | fix(heartbeat): test-topic-tracking.sh (10/10 tests) | ✅ |
+| `d436a5e2` | feat: P1-6 API error tests (33 tests) | ✅ |
+
+### 今日完成统计
+| 指标 | 数值 |
+|------|------|
+| Commits | 7 |
+| 测试套件 | 120 Error tests + 33 API tests |
+| 修复驳回 | 3 (p1-2 phantom, p1-8 fake completion, test-sync-fix) |
+
+### Analyst 发现的问题 - Dev 响应
+| 问题 | 响应 |
+|------|------|
+| 任务预验证不足（重复领取）| ✅ 已修复 — get_agent_tasks 添加状态过滤 |
+| E2E vs Jest 区分不足 | ✅ E2E 已接入 CI (`npx playwright test --project=chromium`) |
+| ESLint 18 unused vars | ⚠️ 待处理 — 需清理 |

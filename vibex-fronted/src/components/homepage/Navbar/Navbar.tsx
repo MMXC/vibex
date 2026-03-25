@@ -5,7 +5,7 @@ import type { NavbarComponentProps } from '@/types/homepage';
 
 /**
  * Navbar - 顶部导航组件
- * 
+ *
  * 功能：
  * - Logo 展示
  * - 导航链接 (设计、模板)
@@ -26,6 +26,9 @@ export const Navbar: React.FC<NavbarComponentProps> = ({
       <div className={styles.navLinks}>
         <Link href="/templates" className={styles.navLink}>
           模板
+        </Link>
+        <Link href="/canvas" className={styles.canvasLink}>
+          <span>◈</span> 新画布
         </Link>
         {!isAuthenticated ? (
           <button className={styles.ctaButton} onClick={onLoginClick}>

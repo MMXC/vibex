@@ -10,6 +10,7 @@
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import LoginDrawer from '@/components/ui/LoginDrawer';
 import { Navbar, AIPanel } from '@/components/homepage';
 import { useHomePage } from './hooks';
@@ -65,8 +66,8 @@ export default function HomePage() {
   // Epic4: Integrate homePageStore for completed steps (convert string step IDs to numbers)
   const { completedSteps: completedStepStrings } = useHomePageStore();
   const completedSteps = completedStepStrings
-    .map(s => parseInt(s.replace('step', ''), 10))
-    .filter(n => !isNaN(n));
+    .map((s) => parseInt(s.replace('step', ''), 10))
+    .filter((n) => !isNaN(n));
 
   const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -89,9 +90,12 @@ export default function HomePage() {
   }, [currentStep, contextMermaidCode, modelMermaidCode, flowMermaidCode]);
 
   // Handle step change
-  const handleStepClick = useCallback((step: number) => {
-    setCurrentStep(step);
-  }, [setCurrentStep]);
+  const handleStepClick = useCallback(
+    (step: number) => {
+      setCurrentStep(step);
+    },
+    [setCurrentStep]
+  );
 
   // ST-1.2: thinkingMessages 适配器 - ThinkingStep[] → AIMessage[]
   const adaptedMessages = useMemo<AIMessage[]>(() => {
@@ -110,21 +114,33 @@ export default function HomePage() {
   }, [thinkingMessages]);
 
   // ST-1.1: AIPanel 发送消息处理 → 调用 generateContexts pipeline
-  const handleAIPanelSend = useCallback((message: string) => {
-    if (!message.trim()) return;
-    setRequirementText(message);
-    generateContexts(message);
-  }, [setRequirementText, generateContexts]);
+  const handleAIPanelSend = useCallback(
+    (message: string) => {
+      if (!message.trim()) return;
+      setRequirementText(message);
+      generateContexts(message);
+    },
+    [setRequirementText, generateContexts]
+  );
 
   return (
     <div className={styles.page}>
       <ParticleBackground />
 
+      {/* Epic1 Canvas 引导 Banner */}
+      <Link href="/canvas" className={styles.canvasBanner} prefetch={false}>
+        <span className={styles.canvasBannerIcon}>◈</span>
+        <span className={styles.canvasBannerText}>
+          全新三树画布上线 — 试试看
+        </span>
+        <span className={styles.canvasBannerArrow}>→</span>
+      </Link>
+
       {/* ST-3.3: Grid Header - 全宽 */}
       <Navbar
         isAuthenticated={isAuthenticated}
         onLoginClick={() => setIsLoginDrawerOpen(true)}
-        onMenuToggle={() => setIsMenuOpen(v => !v)}
+        onMenuToggle={() => setIsMenuOpen((v) => !v)}
         onSettingsClick={() => {}}
         className={styles.header}
       />

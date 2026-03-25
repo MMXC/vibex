@@ -95,6 +95,7 @@ interface ComponentCardProps {
 function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly }: ComponentCardProps) {
   const [editing, setEditing] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const [editState, setEditState] = useState({
     name: node.name,
     description: node.props?.['description'] as string || '',
@@ -114,6 +115,23 @@ function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly }: Componen
     setEditState({ name: node.name, description: node.props?.['description'] as string || '', type: node.type });
     setEditing(false);
   }, [node]);
+
+  // F3.2: Click to jump — open previewUrl or construct file path
+  const handleNodeClick = useCallback(() => {
+    if (readonly) return;
+    let targetUrl: string | undefined;
+    if (node.previewUrl) {
+      targetUrl = node.previewUrl;
+    } else if (node.api?.path) {
+      // Construct editor deep link from API path
+      // e.g., /api/users -> vscode://file/{cwd}/src/app/users/page.tsx
+      const apiPath = node.api.path.replace(/^\//, '').replace(/\//g, '-');
+      targetUrl = `vscode://file/root/.openclaw/vibex/vibex-fronted/src/app/${apiPath}`;
+    }
+    if (targetUrl) {
+      window.open(targetUrl, '_blank', 'noopener,noreferrer');
+    }
+  }, [readonly, node.previewUrl, node.api]);
 
   const statusClass =
     node.status === 'confirmed'
@@ -135,12 +153,20 @@ function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly }: Componen
             ? '#10b981'
             : '#ef4444';
 
+  // F3.4: Subtree count for collapsed nodes
+  const childCount = node.children?.length ?? 0;
+  const hasChildren = childCount > 0;
+
   return (
     <div
-      className={`${styles.nodeCard} ${statusClass}`}
+      className={`${styles.nodeCard} ${statusClass} ${hovered ? styles.hovered : ''}`}
       data-node-id={node.nodeId}
       data-status={node.status}
       data-type={node.type}
+      data-testid={`component-node-${node.nodeId}`}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={handleNodeClick}
     >
       {editing ? (
         /* Edit mode */
@@ -186,12 +212,25 @@ function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly }: Componen
               onClick={() => setExpanded((e) => !e)}
               aria-expanded={expanded}
               aria-label={expanded ? '收起' : '展开'}
+              data-testid={`expand-toggle-${node.nodeId}`}
             >
-              {expanded ? '▲' : '▼'}
+              {expanded ? '▲' : `▼${hasChildren ? ` (${childCount})` : ''}`}
             </button>
           </div>
 
-          <h4 className={styles.nodeCardTitle}>{node.name}</h4>
+          <h4
+            className={styles.nodeCardTitle}
+            style={{ cursor: node.previewUrl || node.api?.path ? 'pointer' : 'default' }}
+            title={
+              node.previewUrl
+                ? `跳转到 ${node.previewUrl}`
+                : node.api?.path
+                  ? `跳转到组件代码 (${node.api.path})`
+                  : undefined
+            }
+          >
+            {node.name}
+          </h4>
 
           {expanded && (
             <div className={styles.componentDetails}>

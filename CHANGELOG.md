@@ -19,6 +19,13 @@ All notable changes to this project will be documented in this file.
 - **前端解析器**: `pendingEventType` 状态机替代 `indexOf`，更健壮
 - 审查: `docs/review-reports/20260326/review-vibex-canvas-api-fix-epic2.md` — ✅ PASSED
 
+### Added (vibex-three-trees-enhancement-20260326 Epic3: 组件树交互) — 2026-03-26
+- **F3.1**: `data-testid` 支持（节点 + 展开按钮）
+- **F3.2**: 点击跳转（previewUrl → vscode deep link）
+- **F3.3**: Hover 高亮状态（`hovered` class）
+- **F3.4**: 子树计数 badge（展开按钮显示 `▼(n)`）
+- 审查: `docs/review-reports/20260326/review-vibex-three-trees-enhancement-epic3.md` — ✅ PASSED
+
 ### Added (vibex-three-trees-enhancement-20260326 Epic2: 流程分支循环可视化) — 2026-03-26
 - **GatewayNode.tsx**: 菱形网关节点（XOR/OR 分支选择）
 - **LoopEdge.tsx**: 循环边（虚线箭头，标识回退路径）

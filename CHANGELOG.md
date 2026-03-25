@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+### Fixed (vibex-canvas-api-fix-20260326 Epic3: API URL 统一修复 + gstack 验证) — 2026-03-26
+- **根因**: `dddApi.ts` 和 `canvasApi.ts` 使用硬编码相对路径如 `/api/v1/analyze/stream`，解析到前端域名而非后端
+- **修复**: 使用 `getApiUrl()` 统一管理 API 地址，读取 `NEXT_PUBLIC_API_BASE_URL`
+- **baseURL 默认值**: `https://api.vibex.top/api`（fallback 机制）
+- **受影响端点**: `/v1/analyze/stream`, `/canvas/project`, `/canvas/generate` 等 7 个 API 调用
+- **gstack 验证**: API 成功调用 `api.vibex.top/api/v1/analyze/stream` → 200，上下文节点正常生成
+- **审查**: ✅ PASSED — `docs/review-reports/20260326/review-vibex-canvas-api-fix-epic3.md`
+- Commit: `b5ef1d69`
+
 ### Fixed (vibex-canvas-api-fix-20260326 Epic2: SSE 路由修复) — 2026-03-26
 - **根因修复**: Cloudflare Workers 部署 Hono 而非 Next.js，/v1/analyze/stream 404
 - **Hono 迁移**: SSE 端点从 Next.js route.ts 迁移到 `src/routes/v1/analyze/stream.ts`

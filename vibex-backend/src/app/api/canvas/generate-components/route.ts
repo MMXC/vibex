@@ -10,6 +10,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAIService } from '@/services/ai-service';
 import { getLocalEnv as getCloudflareEnv } from '@/lib/env';
+import { generateId } from '@/lib/db';
 import type { BoundedContext } from '@/services/context/types';
 import type { BusinessFlow } from '@/services/context/types';
 
@@ -34,16 +35,21 @@ interface ComponentApi {
 }
 
 interface ComponentResponse {
+  id: string;
   name: string;
   flowId: string;
+  contextId: string;
   type: 'page' | 'form' | 'list' | 'detail' | 'modal';
   description?: string;
-  api?: ComponentApi;
+  apis: ComponentApi[];
+  confidence: number;
 }
 
 interface GenerateComponentsOutput {
   success: boolean;
   components: ComponentResponse[];
+  generationId: string;
+  totalCount: number;
   confidence: number;
   error?: string;
 }
@@ -59,13 +65,13 @@ const USER_PROMPT = `根据以下业务流程，生成 UI 组件列表。
 要求：
 - 每个流程对应一个或多个页面组件
 - 组件类型: page(页面)/form(表单)/list(列表)/detail(详情)/modal(弹窗)
-- 每个组件包含 name, flowId, type, api(method/path/params)
+- 每个组件包含 name, flowId, contextId, type, apis(method/path/params)
 - 页面组件通常是用户交互入口
 
 JSON 数组格式：
 [
-  {"name": "注册表单", "flowId": "对应流程ID", "type": "form", "api": {"method": "POST", "path": "/api/register", "params": ["username", "password"]}},
-  {"name": "用户列表页", "flowId": "对应流程ID", "type": "page", "api": {"method": "GET", "path": "/api/users", "params": []}}
+  {"name": "注册表单", "flowId": "对应流程ID", "contextId": "对应上下文ID", "type": "form", "apis": [{"method": "POST", "path": "/api/register", "params": ["username", "password"]}]},
+  {"name": "用户列表页", "flowId": "对应流程ID", "contextId": "对应上下文ID", "type": "page", "apis": [{"method": "GET", "path": "/api/users", "params": []}]}
 ]`;
 
 export const dynamic = 'force-dynamic';
@@ -78,7 +84,7 @@ export async function POST(
 
     if (!body || !Array.isArray(body.contexts) || !Array.isArray(body.flows)) {
       return NextResponse.json(
-        { success: false, components: [], confidence: 0, error: 'contexts 和 flows 不能为空' },
+        { success: false, components: [] as ComponentResponse[], generationId: '', totalCount: 0, confidence: 0, error: 'contexts 和 flows 不能为空' },
         { status: 400 }
       );
     }
@@ -119,7 +125,9 @@ export async function POST(
       return NextResponse.json(
         {
           success: false,
-          components: [],
+          components: [] as ComponentResponse[],
+          generationId: '',
+          totalCount: 0,
           confidence: 0,
           error: '未能生成有效的组件列表，请重试',
         },
@@ -127,15 +135,30 @@ export async function POST(
       );
     }
 
+    const generationId = generateId();
     const validTypes = ['page', 'form', 'list', 'detail', 'modal'] as const;
-    const components: ComponentResponse[] = result.data.map((comp) => ({
+
+    // Truncate to max 20 components
+    const rawComponents = result.data.slice(0, 20);
+    const truncated = result.data.length > 20;
+
+    const components: ComponentResponse[] = rawComponents.map((comp) => ({
+      id: generateId(),
       name: comp.name || '未命名组件',
       flowId: comp.flowId || flows[0]?.id || '',
+      contextId: contexts[0]?.id || '',
       type: validTypes.includes(comp.type as typeof validTypes[number])
         ? (comp.type as typeof validTypes[number])
         : ('page' as const),
       description: comp.description || '',
-      api: comp.api || { method: 'GET', path: '/api/', params: [] },
+      apis: comp.apis
+        ? comp.apis.map((a) => ({
+            method: (a.method as 'GET' | 'POST') || 'GET',
+            path: a.path || '/api/',
+            params: a.params || [],
+          }))
+        : [{ method: 'GET' as const, path: '/api/', params: [] }],
+      confidence: comp.confidence ?? 0.7,
     }));
 
     const confidence = result.usage
@@ -146,11 +169,11 @@ export async function POST(
       `[canvas/generate-components] Generated ${components.length} components for ${flows.length} flows`
     );
 
-    return NextResponse.json({ success: true, components, confidence });
+    return NextResponse.json({ success: true, components, generationId, totalCount: components.length, confidence });
   } catch (err) {
     console.error('[canvas/generate-components] Error:', err);
     return NextResponse.json(
-      { success: false, components: [], confidence: 0, error: '服务器内部错误，请稍后重试' },
+      { success: false, components: [] as ComponentResponse[], generationId: '', totalCount: 0, confidence: 0, error: '服务器内部错误，请稍后重试' },
       { status: 500 }
     );
   }

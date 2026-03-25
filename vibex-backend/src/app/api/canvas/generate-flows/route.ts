@@ -70,7 +70,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateF
 
     if (!body || !Array.isArray(body.contexts) || body.contexts.length === 0) {
       return NextResponse.json(
-        { success: false, flows: [], generationId: '', confidence: 0, error: 'contexts 不能为空' },
+        { success: false, flows: [] as BusinessFlowResponse[], generationId: '', confidence: 0, error: 'contexts 不能为空' },
         { status: 400 }
       );
     }
@@ -99,7 +99,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateF
       return NextResponse.json(
         {
           success: false,
-          flows: [],
+          flows: [] as BusinessFlowResponse[],
+          generationId: '',
           confidence: 0,
           error: '未能生成有效的业务流程，请重试',
         },
@@ -136,7 +137,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateF
   } catch (err) {
     console.error('[canvas/generate-flows] Error:', err);
     return NextResponse.json(
-      { success: false, flows: [], generationId: '', confidence: 0, error: '服务器内部错误，请稍后重试' },
+      { success: false, flows: [] as BusinessFlowResponse[], generationId: '', confidence: 0, error: '服务器内部错误，请稍后重试' },
       { status: 500 }
     );
   }

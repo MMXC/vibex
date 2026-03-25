@@ -53,7 +53,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateC
 
     if (!body || typeof body.requirementText !== 'string' || !body.requirementText.trim()) {
       return NextResponse.json(
-        { success: false, contexts: [], sessionId: '', confidence: 0, error: 'requirementText 不能为空' },
+        { success: false, contexts: [] as BoundedContextResponse[], generationId: '', confidence: 0, error: 'requirementText 不能为空' },
         { status: 400 }
       );
     }
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateC
 
     if (!result.data || !Array.isArray(result.data) || result.data.length === 0) {
       return NextResponse.json(
-        { success: false, contexts: [], generationId: sessionId, confidence: 0, error: '未能提取到有效的限界上下文，请重试或补充需求描述' },
+        { success: false, contexts: [] as BoundedContextResponse[], generationId: sessionId, confidence: 0, error: '未能提取到有效的限界上下文，请重试或补充需求描述' },
         { status: 200 }
       );
     }
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateC
         ? (ctx.type as typeof validTypes[number])
         : ('core' as const),
       ubiquitousLanguage: [],
-      confidence: result.confidence ?? 0.7,
+      confidence: 0.7,
     }));
 
     const confidence = result.usage
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateC
   } catch (err) {
     console.error('[canvas/generate-contexts] Error:', err);
     return NextResponse.json(
-      { success: false, contexts: [], generationId: '', confidence: 0, error: '服务器内部错误，请稍后重试' },
+      { success: false, contexts: [] as BoundedContextResponse[], generationId: '', confidence: 0, error: '服务器内部错误，请稍后重试' },
       { status: 500 }
     );
   }

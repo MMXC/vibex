@@ -134,6 +134,8 @@ app.route('/api/plan', plan);
 
 // API Gateway v1 路由 (支持认证、限流、日志中间件)
 app.route('/v1', v1);
+// 兼容 /api/v1 前缀 (Next.js routes use /api/v1/*)
+app.route('/api/v1', v1);
 
 // 导出 for Cloudflare Workers
 export default app;

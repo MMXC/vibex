@@ -8,6 +8,8 @@
  */
 'use client';
 
+import { getApiUrl } from '@/lib/api-config';
+
 // =============================================================================
 // Types
 // =============================================================================
@@ -111,7 +113,7 @@ export async function analyzeRequirement(
     : controller.signal;
 
   try {
-    const url = `/api/v1/analyze/stream?requirement=${encodeURIComponent(requirementText)}`;
+    const url = getApiUrl(`/v1/analyze/stream?requirement=${encodeURIComponent(requirementText)}`);
 
     const res = await fetch(url, {
       method: 'GET',

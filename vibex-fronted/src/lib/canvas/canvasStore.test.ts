@@ -344,6 +344,72 @@ describe('canvasStore', () => {
       setPhase('context');
       expect(useCanvasStore.getState().activeTree).toBe('context');
     });
+
+    it('should cascade delete to flow+component pending', () => {
+      const {
+        addContextNode,
+        deleteContextNode,
+      } = useCanvasStore.getState();
+
+      const flowNode: BusinessFlowNode = {
+        nodeId: 'flow-1',
+        contextId: 'ctx-1',
+        name: 'Order Flow',
+        steps: [],
+        confirmed: true,
+        status: 'confirmed',
+      };
+      const componentNode: ComponentNode = {
+        nodeId: 'comp-1',
+        flowId: 'flow-1',
+        name: 'Order Page',
+        type: 'page',
+        props: {},
+        api: { method: 'GET', path: '/api/orders', params: [] },
+        children: [],
+        confirmed: true,
+        status: 'confirmed',
+      };
+      useCanvasStore.setState({
+        flowNodes: [flowNode],
+        componentNodes: [componentNode],
+      });
+
+      addContextNode({ name: 'Test', description: '', type: 'core' });
+      const nodeId = useCanvasStore.getState().contextNodes[0].nodeId;
+      deleteContextNode(nodeId);
+
+      // Flow should be marked pending
+      expect(useCanvasStore.getState().flowNodes[0].status).toBe('pending');
+      // Component should be marked pending
+      expect(useCanvasStore.getState().componentNodes[0].status).toBe('pending');
+    });
+  });
+
+  describe('Flow Cascade', () => {
+    it('should cascade flow edit to component pending', () => {
+      const { addFlowNode, editFlowNode } = useCanvasStore.getState();
+
+      const componentNode: ComponentNode = {
+        nodeId: 'comp-1',
+        flowId: 'flow-1',
+        name: 'Order Page',
+        type: 'page',
+        props: {},
+        api: { method: 'GET', path: '/api/orders', params: [] },
+        children: [],
+        confirmed: true,
+        status: 'confirmed',
+      };
+      useCanvasStore.setState({ componentNodes: [componentNode] });
+
+      addFlowNode({ name: 'Checkout', contextId: 'ctx-1', steps: [] });
+      const flowId = useCanvasStore.getState().flowNodes[0].nodeId;
+      editFlowNode(flowId, { name: 'Updated Checkout Flow' });
+
+      expect(useCanvasStore.getState().componentNodes[0].status).toBe('pending');
+      expect(useCanvasStore.getState().componentNodes[0].confirmed).toBe(false);
+    });
   });
 });
 

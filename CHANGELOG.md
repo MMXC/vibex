@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### Added (vibex-canvas-api-fix-20260326 Epic1: SSE DDD API 集成) — 2026-03-26
+- **dddApi.ts**: SSE 客户端，`analyzeRequirement` 支持 thinking/step_context/step_model/step_flow/step_components/done/error 事件
+- **generateContextsFromRequirement**: Store action，调用 SSE 并更新 contextNodes
+- **AI Thinking UI**: 启动按钮 loading 状态 + 实时分析提示
+- **超时控制**: AbortController + 30s，外部 signal 合并
+- 审查: `docs/review-reports/20260326/review-vibex-canvas-api-fix-epic1.md` — ✅ PASSED (60 tests)
+
 ### Added (vibex-canvas-redesign-20260325 Epic4: ComponentTree) — 2026-03-25
 - **ComponentTree 组件**: 组件树垂直列表，节点展示 props + API method/path
 - **AI 生成**: Mock templates + shuffle，支持 2-6 个组件节点

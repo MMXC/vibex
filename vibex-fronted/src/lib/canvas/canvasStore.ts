@@ -494,7 +494,6 @@ export const useCanvasStore = create<CanvasStore>()(
             setPhase('context');
 
             // Import dynamically to avoid circular deps
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
             const { analyzeRequirement } = require('./api/dddApi') as typeof import('./api/dddApi');
 
             analyzeRequirement(text, {

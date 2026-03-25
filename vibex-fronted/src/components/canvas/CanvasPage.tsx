@@ -12,7 +12,7 @@
  */
 'use client';
 
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { areAllConfirmed } from '@/lib/canvas/cascade';
 import { PhaseProgressBar } from './PhaseProgressBar';

@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+### Added (vibex-canvas-redesign-20260325 Epic4: ComponentTree) — 2026-03-25
+- **ComponentTree 组件**: 组件树垂直列表，节点展示 props + API method/path
+- **AI 生成**: Mock templates + shuffle，支持 2-6 个组件节点
+- **CRUD**: 添加/编辑/删除/确认组件节点，展开详情
+- **级联**: flow 变更 → component 标记 pending（复用 cascade 机制）
+- **Phase 推进**: allConfirmed → prototype，解锁 Epic5-6
+- 审查: `docs/review-reports/20260325/review-vibex-canvas-redesign-20260325-epic4.md` — ✅ PASSED (44 tests)
+
 ### Added (vibex-canvas-redesign-20260325 Epic3: BusinessFlowTree) — 2026-03-25
 - **BusinessFlowTree 组件**: 业务流程树垂直列表，每节点卡片展示
 - **Step 操作**: 添加/编辑/删除/重排业务流程步骤

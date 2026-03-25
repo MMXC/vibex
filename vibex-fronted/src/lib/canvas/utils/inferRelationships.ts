@@ -127,7 +127,7 @@ const EDGE_STYLE_MAP: Record<ContextRelationship['type'], { stroke: string; stro
   calls: { stroke: '#f59e0b', strokeWidth: 1.5, strokeDasharray: '5,3' },
 };
 
-const EDGE_LABEL_MAP: Record<ContextRelationship['type'], string> = {
+const _EDGE_LABEL_MAP: Record<ContextRelationship['type'], string> = {
   dependency: '依赖',
   aggregate: '聚合',
   calls: '调用',

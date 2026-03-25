@@ -86,7 +86,7 @@ function contextsToCardTree(contexts: BoundedContextNode[]): CardTreeVisualizati
 export function ContextTreeFlow({
   contexts,
   showRelationships = true,
-  onRelationshipClick,
+  _onRelationshipClick,
   cardTreeProps,
 }: ContextTreeFlowProps) {
   // Convert contexts to CardTree visualization format

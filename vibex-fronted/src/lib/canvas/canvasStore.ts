@@ -146,7 +146,7 @@ interface CanvasStore {
 
   // === Component Slice Actions ===
   setComponentNodes: (nodes: ComponentNode[]) => void;
-  addComponentNode: (data: Omit<ComponentNode, 'nodeId' | 'status'>) => void;
+  addComponentNode: (data: Omit<ComponentNode, 'nodeId' | 'status' | 'confirmed' | 'children'>) => void;
   editComponentNode: (nodeId: string, data: Partial<ComponentNode>) => void;
   deleteComponentNode: (nodeId: string) => void;
   confirmComponentNode: (nodeId: string) => void;

@@ -18,6 +18,7 @@ import { areAllConfirmed } from '@/lib/canvas/cascade';
 import { PhaseProgressBar } from './PhaseProgressBar';
 import { TreePanel } from './TreePanel';
 import { BoundedContextTree } from './BoundedContextTree';
+import { ComponentTree } from './ComponentTree';
 import { BusinessFlowTree } from './BusinessFlowTree';
 import type { Phase, TreeType, TreeNode } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
@@ -215,7 +216,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 isActive={componentActive}
                 onToggleCollapse={toggleComponentPanel}
               >
-                <PlaceholderTree tree="component" title="组件树" />
+                <ComponentTree />
               </TreePanel>
             )}
           </div>
@@ -253,7 +254,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
               isActive={componentActive}
               onToggleCollapse={toggleComponentPanel}
             >
-              <PlaceholderTree tree="component" title="组件树" />
+              <ComponentTree />
             </TreePanel>
           </div>
       )}

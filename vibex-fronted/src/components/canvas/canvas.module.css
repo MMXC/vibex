@@ -1310,3 +1310,82 @@
   font-size: var(--text-sm);
 }
 
+
+/* ============================================
+   Component Tree
+   ============================================ */
+
+.componentTree {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem;
+}
+
+.componentNodeList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.componentDetails {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: var(--color-bg-base);
+  border-radius: 0.25rem;
+  font-size: var(--text-xs);
+}
+
+.componentProps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.propBadge {
+  padding: 0.125rem 0.375rem;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.componentApi {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: var(--text-xs);
+}
+
+.apiMethod {
+  padding: 0.125rem 0.375rem;
+  background: var(--color-info);
+  color: white;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  font-size: 10px;
+}
+
+.apiPath {
+  color: var(--color-text-secondary);
+  font-family: monospace;
+}
+
+.expandButton {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: var(--text-xs);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  margin-left: auto;
+  transition: color 0.2s, background 0.2s;
+}
+
+.expandButton:hover {
+  color: var(--color-text-primary);
+  background: var(--color-bg-elevated);
+}

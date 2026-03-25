@@ -81,7 +81,7 @@
 6. ✅ 实现 `CascadeUpdateManager`（context→flow, context→component, flow→component）
 7. ✅ 实现 BoundedContextTree 面板（AI生成mock + CRUD + 确认样式）
 8. ⏳ 实现 BusinessFlowTree 面板 — Epic 3
-9. ⏳ 实现 ComponentTree 面板 — Epic 4
+9. ✅ 实现 ComponentTree 面板 — Epic 4 ✅
 
 **Epic 2 完成状态** (commit 395a44f6):
 - ✅ BoundedContextTree: AI生成(mock) + CRUD + 节点确认
@@ -102,10 +102,17 @@
 - ✅ 44 canvasStore tests pass
 - ✅ TypeScript 0 errors
 
-**Epic 4 待完成**:
-- ComponentTree 完整实现（placeholder）→ Epic 4
-- dagre layout engine → Epic 3-4
-- CardTree adapters → Epic 3-4
+**Epic 4 完成状态** (commit TBD):
+- ✅ ComponentTree: AI生成(mock) + CRUD + 节点确认
+- ✅ 节点展开显示 props + API method/path
+- ✅ allConfirmed → 推进 phase 到 prototype
+- ✅ 节点样式：黄→绿（复用 nodeConfirmed/nodeUnconfirmed）
+- ✅ 44 canvasStore tests pass
+- ✅ TypeScript 0 errors
+
+**Epic 4 遗留项**:
+- dagre layout engine → Epic 5-6
+- CardTree adapters → Epic 5-6
 
 **验收**:
 - [x] `pnpm tsc --noEmit` 通过

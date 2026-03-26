@@ -1,5 +1,10 @@
 # Changelog
 
+### Added (vibex-bc-prompt-optimize-20260326 Epic5: 跨 API 一致性测试) — 2026-03-26
+- **Epic5**: Cross-API boundedContexts 一致性测试 (C1-C6)
+  - `bounded-contexts-consistency.test.ts`: 14 tests covering cross-API prompt consistency, deterministic filtering, forbidden suffix removal, core ratio validation, name length bounds, realistic mixed scenarios
+  - Review: `docs/review-reports/20260326/review-vibex-bc-prompt-optimize-20260326-epic5.md`
+
 ### Added (vibex-bc-prompt-optimize-20260326 Epic1: 统一 DDD Prompt 模板) — 2026-03-26
 - **Epic1**: 统一 Prompt 模块 + 过滤器 (S1.1-S1.3)
   - `bounded-contexts.ts`: `BOUNDED_CONTEXTS_PROMPT` 模板 + `buildBoundedContextsPrompt()`

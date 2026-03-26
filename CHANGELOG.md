@@ -1,5 +1,11 @@
 # Changelog
 
+### Fixed (vibex-bc-filter-fix-20260326 Epic1: 修复过度过滤) — 2026-03-26
+- **Epic1**: 移除 '管理' 从 forbiddenNames，maxNameLength 10→12
+  - `bounded-contexts-filter.ts`: 修复过度过滤问题（'患者管理' 不再被误杀）
+  - 69 tests pass (31 backend + 38 frontend)
+  - Review: `docs/review-reports/20260326/review-vibex-bc-filter-fix-epic1.md`
+
 ### Added (vibex-bc-prompt-fix Epic1: 跨 API boundedContexts 一致性测试) — 2026-03-26
 - **Epic1**: Cross-API boundedContexts 一致性测试 (C1-C5)
   - `bounded-contexts-consistency.test.ts`: 14 backend tests + 17 frontend tests = 31 total

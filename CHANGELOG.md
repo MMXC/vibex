@@ -1,5 +1,16 @@
 # Changelog
 
+### Added (vibex-canvas-expandable-20260327 E3: 卡片拖拽排序) — 2026-03-27
+- **E3**: DragState — 卡片拖拽排序状态管理
+  - `canvasStore.ts`: `draggedNodeId`/`dragOverNodeId`/`draggedPositions`/`isDragging` Zustand slice
+  - `startDrag()`/`endDrag()`/`setDragOver()`/`updateDraggedPosition()`/`clearDragPositions()`/`clearDragPosition()`
+  - `draggedPositions` 持久化到 localStorage（页面刷新不丢失）
+  - `CardTreeRenderer.tsx`: `onNodeDragStart`/`onNodeDrag`/`onNodeDragStop` 事件处理
+  - `HoverHotzone.tsx`: 拖拽时禁用面板展开热区（`isDragging` 保护）
+  - `CardTreeRenderer.module.css`: 拖拽态 CSS（`isDragging` / `user-select: none`）
+  - 51 canvas tests pass (dragState + canvasExpandState)
+  - Review: `docs/review-reports/20260327/review-vibex-canvas-expandable-20260327-epic-e3.md`
+
 ### Added (vibex-canvas-expandable-20260327 E2: 三栏双向展开状态) — 2026-03-27
 - **E2**: CanvasExpandState — 三栏双向展开状态管理
   - `canvasStore.ts`: `leftExpand`/`centerExpand`/`rightExpand` Zustand slice

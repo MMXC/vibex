@@ -48,7 +48,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
 
   // === Expand State Selectors (E2) ===
   const gridRef = useRef<HTMLDivElement>(null);
-  const getGridTemplate = useCanvasStore((s) => s.getGridTemplate);
+  const _getGridTemplate = useCanvasStore((s) => s.getGridTemplate);
   const leftExpand = useCanvasStore((s) => s.leftExpand);
   const centerExpand = useCanvasStore((s) => s.centerExpand);
   const rightExpand = useCanvasStore((s) => s.rightExpand);

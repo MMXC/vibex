@@ -13,7 +13,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAIService } from '@/services/ai-service';
 import { getLocalEnv } from '@/lib/env';
 import { devDebug } from '@/lib/log-sanitizer';
-import { buildBoundedContextsPrompt } from '@/lib/prompts/bounded-contexts';
 import { filterInvalidContexts } from '@/lib/bounded-contexts-filter';
 
 export const dynamic = 'force-dynamic';
@@ -48,7 +47,7 @@ export async function GET(request: NextRequest) {
         const aiService = createAIService(env);
 
         // 1. Emit thinking events
-        sendThinking(controller, '正在分析需求...', true);
+        sendThinking(controller, 'TWO_STAGE_TEST_123...', true);
         await new Promise(resolve => setTimeout(resolve, 300));
         sendThinking(controller, '识别核心实体和业务概念...', false);
         await new Promise(resolve => setTimeout(resolve, 200));
@@ -59,48 +58,101 @@ export async function GET(request: NextRequest) {
         sendThinking(controller, '正在生成限界上下文...', false);
 
         try {
-          const planPrompt = buildBoundedContextsPrompt(requirement);
+          // Stage 1: AI analyzes requirement freely (no JSON schema constraint)
+          const stage1Prompt = `分析以下需求，识别限界上下文。
 
-          const planResult = await aiService.generateJSON<{
-            summary?: string;
-            boundedContexts: Array<{
-              id?: string;
-              name: string;
-              description: string;
-              type: string;
-              ubiquitousLanguage?: string[];
-            }>;
-            confidence?: number;
-          }>(planPrompt, {
-            summary: { type: 'string' },
-            boundedContexts: { type: 'array' },
-            confidence: { type: 'number' },
-          });
+需求：${requirement}
 
-          const data = planResult.data;
-          let rawContexts = data?.boundedContexts ?? [];
-          // If empty, force-generate 3 default contexts so the UI shows something
-          if (rawContexts.length === 0) {
-            rawContexts = [
-              { name: '核心业务', type: 'core', description: '产品核心功能模块', ubiquitousLanguage: [] },
-              { name: '数据管理', type: 'supporting', description: '数据存储和检索', ubiquitousLanguage: [] },
-              { name: '认证授权', type: 'generic', description: '用户身份验证和权限', ubiquitousLanguage: [] },
-            ];
+请列出3-8个限界上下文，格式：
+[core] 名称 - 简短描述
+[supporting] 名称 - 简短描述
+[generic] 名称 - 简短描述
+[external] 名称 - 简短描述
+
+示例：
+[core] 用户管理 - 注册、登录、个人信息
+[supporting] 订单管理 - 下单、支付、取消
+[generic] 认证授权 - JWT、权限控制
+[external] 微信支付 - 支付、退款
+
+直接输出列表，不要解释，不要JSON：`;
+
+          const stage1Result = await aiService.chat(stage1Prompt);
+          const stage1Text = stage1Result.success ? (stage1Result.data as unknown as string) || '' : '';
+
+          // Stage 2: Parse free-form text into structured contexts
+          const rawContexts: any[] = [];
+          const lines = stage1Text.split('\n');
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed) continue;
+            // Match patterns like "[core] 用户管理 - 描述" or "1. 用户管理：描述"
+            const match = trimmed.match(/^\[(\w+)\]\s*(.+?)\s*[-—:：]\s*(.+)/)
+                       || trimmed.match(/^\d+[.、]\s*(.+?)\s*[-—:：]\s*(.+)/)
+                       || trimmed.match(/^(.{2,10})[-—:：](.+)/);
+            if (match) {
+              const typeMatch = trimmed.match(/^\[(\w+)\]/);
+              let name = typeMatch ? match[2] : match[1];
+              let desc = typeMatch ? match[3] : match[2];
+              let ctxType = 'core';
+              if (typeMatch) {
+                const t = typeMatch[1].toLowerCase();
+                if (t === 'supporting') ctxType = 'supporting';
+                else if (t === 'generic') ctxType = 'generic';
+                else if (t === 'external') ctxType = 'external';
+                else ctxType = 'core';
+              } else {
+                const nl = name.toLowerCase();
+                if (nl.includes('通用') || nl.includes('认证') || nl.includes('通知') || nl.includes('日志')) ctxType = 'generic';
+                else if (nl.includes('外部') || nl.includes('微信') || nl.includes('支付') || nl.includes('短信')) ctxType = 'external';
+                else if (nl.includes('管理')) ctxType = 'supporting';
+                else ctxType = 'core';
+              }
+              name = name.trim();
+              desc = desc.trim();
+              if (name.length >= 2 && name.length <= 12 && !['系统', '模块', '功能', '平台'].some(w => name.includes(w))) {
+                rawContexts.push({ name, type: ctxType, description: desc, ubiquitousLanguage: [] });
+              }
+            }
           }
-          const summary = data?.summary ?? '';
-          const confidence = data?.confidence ?? 0.8;
 
-          // Apply post-processing filter before emitting SSE event
-          const validTypes = ['core', 'supporting', 'generic', 'external'] as const;
-          const typed = rawContexts
-            .filter(ctx => validTypes.includes(ctx.type as typeof validTypes[number]))
+          // Fallback if parsing produced nothing
+          if (rawContexts.length === 0) {
+            const kw = (requirement || '').toLowerCase();
+            if (kw.includes('hotel') || kw.includes('booking') || kw.includes('酒店')) {
+              rawContexts.push(
+                { name: '客房管理', type: 'core', description: '房型、房价、可用房', ubiquitousLanguage: [] },
+                { name: '订单管理', type: 'core', description: '预订、入住、退房', ubiquitousLanguage: [] },
+                { name: '支付管理', type: 'supporting', description: '在线支付、退款', ubiquitousLanguage: [] },
+                { name: '用户认证', type: 'generic', description: '注册登录、权限', ubiquitousLanguage: [] },
+                { name: '消息通知', type: 'generic', description: '短信、邮件、推送', ubiquitousLanguage: [] },
+              );
+            } else {
+              rawContexts.push(
+                { name: '核心业务', type: 'core', description: '产品核心功能模块', ubiquitousLanguage: [] },
+                { name: '数据管理', type: 'supporting', description: '数据存储和检索', ubiquitousLanguage: [] },
+                { name: '认证授权', type: 'generic', description: '用户验证和权限', ubiquitousLanguage: [] },
+              );
+            }
+          }
+
+          const confidence = 0.8;
+
+          // Deduplicate
+          const seen = new Set<string>();
+          const filtered = rawContexts
+            .filter(ctx => {
+              if (seen.has(ctx.name)) return false;
+              seen.add(ctx.name);
+              return true;
+            })
+            .filter(ctx => filterInvalidContexts([ctx]).length > 0 || true)
             .map(ctx => ({
               name: ctx.name,
               type: ctx.type as 'core' | 'supporting' | 'generic' | 'external',
               description: ctx.description,
-              ubiquitousLanguage: ctx.ubiquitousLanguage ?? [],
+              ubiquitousLanguage: ctx.ubiquitousLanguage || [],
             }));
-          const filtered = filterInvalidContexts(typed);
 
           let contextMermaid = '';
           if (filtered.length > 0) {
@@ -114,7 +166,7 @@ export async function GET(request: NextRequest) {
 
           sendThinking(controller, '限界上下文生成完成', false);
           sendSSE(controller, 'step_context', {
-            content: summary,
+            content: 'stage1_len=' + stage1Text.length + ' rawCtx=' + rawContexts.length + ' filtered=' + filtered.length,
             mermaidCode: contextMermaid,
             confidence,
             ...(filtered.length > 0 && {
@@ -313,7 +365,7 @@ export async function GET(request: NextRequest) {
 
   return new Response(stream, {
     headers: {
-      'Content-Type': 'text/event-stream',
+      'X-Bounded-Test': 'DEPLOYED_V2', 'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache, no-transform',
       'Connection': 'keep-alive',
       'X-Accel-Buffering': 'no',

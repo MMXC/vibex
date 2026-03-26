@@ -886,7 +886,10 @@ export class AIService {
         // Build system prompt that explicitly requests JSON
         // Note: Minimax doesn't support response_format: json_object, so we rely on prompt
         const systemPrompt = schema
-          ? `You are a JSON generator. Generate valid JSON matching the following schema:\n\n${JSON.stringify(schema, null, 2)}\n\nIMPORTANT: Return ONLY the JSON object, no other text or explanation.`
+          ? `You are a DDD bounded contexts expert. Analyze the user's requirement and output valid JSON matching the exact schema provided. Do not add explanations, markdown code blocks, or any other text. Just output the raw JSON object.
+
+Schema:
+${JSON.stringify(schema, null, 2)}`
           : 'You are a JSON generator. Generate valid JSON. Return ONLY the JSON object, no other text or explanation.';
 
         const response = await this.llmProvider.chat({

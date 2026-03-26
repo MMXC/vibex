@@ -13,6 +13,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAIService } from '@/services/ai-service';
 import { getLocalEnv } from '@/lib/env';
 import { devDebug } from '@/lib/log-sanitizer';
+import { buildBoundedContextsPrompt } from '@/lib/prompts/bounded-contexts';
+import { filterInvalidContexts } from '@/lib/bounded-contexts-filter';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,35 +59,18 @@ export async function GET(request: NextRequest) {
         sendThinking(controller, '正在生成限界上下文...', false);
 
         try {
-          const planPrompt = `你是一个DDD专家。分析这个需求并只返回JSON:
-
-需求: ${requirement}
-
-只返回JSON:
-{
-  "summary": "2-3句话总结",
-  "boundedContexts": [
-    {
-      "id": "ctx1",
-      "name": "上下文名称",
-      "description": "这个限界上下文处理什么",
-      "type": "core",
-      "keyResponsibilities": ["职责1", "职责2"]
-    }
-  ],
-  "confidence": 0.85
-}`;
+          const planPrompt = buildBoundedContextsPrompt(requirement);
 
           const planResult = await aiService.generateJSON<{
-            summary: string;
+            summary?: string;
             boundedContexts: Array<{
-              id: string;
+              id?: string;
               name: string;
               description: string;
               type: string;
-              keyResponsibilities: string[];
+              ubiquitousLanguage?: string[];
             }>;
-            confidence: number;
+            confidence?: number;
           }>(planPrompt, {
             summary: { type: 'string' },
             boundedContexts: { type: 'array' },
@@ -93,13 +78,25 @@ export async function GET(request: NextRequest) {
           });
 
           const data = planResult.data;
-          const contexts = data?.boundedContexts ?? [];
+          const rawContexts = data?.boundedContexts ?? [];
           const summary = data?.summary ?? '';
           const confidence = data?.confidence ?? 0.8;
 
+          // Apply post-processing filter before emitting SSE event
+          const validTypes = ['core', 'supporting', 'generic', 'external'] as const;
+          const typed = rawContexts
+            .filter(ctx => validTypes.includes(ctx.type as typeof validTypes[number]))
+            .map(ctx => ({
+              name: ctx.name,
+              type: ctx.type as 'core' | 'supporting' | 'generic' | 'external',
+              description: ctx.description,
+              ubiquitousLanguage: ctx.ubiquitousLanguage ?? [],
+            }));
+          const filtered = filterInvalidContexts(typed);
+
           let contextMermaid = '';
-          if (contexts.length > 0) {
-            const lines = contexts.map((ctx: { name: string; description: string }, i: number) => {
+          if (filtered.length > 0) {
+            const lines = filtered.map((ctx: { name: string; description: string }, i: number) => {
               const char = String.fromCharCode(65 + i);
               const desc = ctx.description?.substring(0, 50) || '';
               return `    ${char}["${ctx.name}"]\n    ${char}["${desc}..."]`;
@@ -112,9 +109,9 @@ export async function GET(request: NextRequest) {
             content: summary,
             mermaidCode: contextMermaid,
             confidence,
-            ...(contexts.length > 0 && {
-              boundedContexts: contexts.map((c: { id: string; name: string; description: string; type: string }) => ({
-                id: c.id,
+            ...(filtered.length > 0 && {
+              boundedContexts: filtered.map((c: { id?: string; name: string; description: string; type: string }) => ({
+                id: c.id ?? `ctx_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
                 name: c.name,
                 description: c.description,
                 type: c.type,

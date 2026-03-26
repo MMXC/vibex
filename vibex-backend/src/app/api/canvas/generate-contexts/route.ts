@@ -2,7 +2,7 @@
  * POST /api/canvas/generate-contexts
  * 生成限界上下文树
  *
- * Epic 1: S1.1
+ * Epic 2: S2.1 — 使用统一 prompt 模块
  *
  * 输入: { requirementText: string, projectId?: string }
  * 输出: { success: boolean, contexts: BoundedContext[], sessionId: string, confidence: number }
@@ -11,6 +11,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAIService } from '@/services/ai-service';
 import { getLocalEnv as getCloudflareEnv } from '@/lib/env';
 import { generateId } from '@/lib/db';
+import { buildBoundedContextsPrompt } from '@/lib/prompts/bounded-contexts';
+import { filterInvalidContexts } from '@/lib/bounded-contexts-filter';
 
 interface BoundedContextResponse {
   id: string;
@@ -28,22 +30,6 @@ interface GenerateContextsOutput {
   confidence: number;
   error?: string;
 }
-
-const USER_PROMPT = `分析以下需求，提取限界上下文（Bounded Contexts）。
-
-需求：{requirementText}
-
-要求：
-- 每个上下文有明确的业务边界，不重叠
-- 类型: core(核心域)/supporting(支撑域)/generic(通用域)/external(外部系统)
-- 用 DDD 通用语言命名
-- 返回 JSON 数组，每个元素包含 name, description, type
-
-JSON 数组格式示例：
-[
-  {"name": "患者管理", "description": "管理患者注册、档案和认证", "type": "core"},
-  {"name": "预约管理", "description": "处理预约、排班和取消逻辑", "type": "core"}
-]`;
 
 export const dynamic = 'force-dynamic';
 
@@ -67,11 +53,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateC
     const aiService = createAIService(env);
     const sessionId = generateId();
 
-    const prompt = USER_PROMPT.replace('{requirementText}', requirementText);
+    const prompt = buildBoundedContextsPrompt(requirementText);
 
     const result = await aiService.generateJSON<BoundedContextResponse[]>(prompt, undefined, {
       temperature: 0.3,
-      maxTokens: 2048,
+      maxTokens: 3072,
     });
 
     if (!result.data || !Array.isArray(result.data) || result.data.length === 0) {
@@ -81,15 +67,19 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateC
       );
     }
 
+    // Apply post-processing filter before returning
+    const rawContexts = result.data.filter(ctx => typeof ctx.name === 'string');
+    const filtered = filterInvalidContexts(rawContexts);
+
     const validTypes = ['core', 'supporting', 'generic', 'external'] as const;
-    const contexts: BoundedContextResponse[] = result.data.map((ctx) => ({
+    const contexts: BoundedContextResponse[] = filtered.map((ctx) => ({
       id: generateId(),
       name: ctx.name || '未命名上下文',
       description: ctx.description || '',
       type: validTypes.includes(ctx.type as typeof validTypes[number])
         ? (ctx.type as typeof validTypes[number])
         : ('core' as const),
-      ubiquitousLanguage: [],
+      ubiquitousLanguage: ctx.ubiquitousLanguage ?? [],
       confidence: 0.7,
     }));
 

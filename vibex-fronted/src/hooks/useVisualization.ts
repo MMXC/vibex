@@ -38,9 +38,9 @@ export interface UseVisualizationReturn {
   /** Current state summary */
   state: {
     /** Flow nodes (only valid when currentType === 'flow') */
-    nodes?: import('reactflow').Node<FlowNodeData>[];
+    nodes?: import('@xyflow/react').Node<FlowNodeData>[];
     /** Flow edges (only valid when currentType === 'flow') */
-    edges?: import('reactflow').Edge<FlowEdgeData>[];
+    edges?: import('@xyflow/react').Edge<FlowEdgeData>[];
     /** Mermaid code (only valid when currentType === 'mermaid') */
     code?: string;
     /** JSON data (only valid when currentType === 'json') */
@@ -97,8 +97,8 @@ export function useVisualization(): UseVisualizationReturn {
     switch (currentType) {
       case 'flow': {
         const flowRaw = rawData as FlowVisualizationRaw | null;
-        const nodes = (flowRaw?.nodes ?? []) as import('reactflow').Node<FlowNodeData>[];
-        const edges = (flowRaw?.edges ?? []) as import('reactflow').Edge<FlowEdgeData>[];
+        const nodes = (flowRaw?.nodes ?? []) as import('@xyflow/react').Node<FlowNodeData>[];
+        const edges = (flowRaw?.edges ?? []) as import('@xyflow/react').Edge<FlowEdgeData>[];
         return { ...base, nodes, edges };
       }
       case 'mermaid': {

@@ -297,7 +297,7 @@ export interface FlowGateway {
 }
 
 /** ReactFlow node data for gateway nodes */
-export interface GatewayNodeData {
+export interface GatewayNodeData extends Record<string, unknown> {
   gatewayType: GatewayType;
   label?: string;
   condition?: string;
@@ -307,10 +307,16 @@ export interface GatewayNodeData {
 }
 
 /** ReactFlow edge data for loop edges */
-export interface LoopEdgeData {
+export interface LoopEdgeData extends Record<string, unknown> {
   isLoop: true;
   loopLabel?: string;
   condition?: string;
+}
+
+/** ReactFlow edge data for relationship edges */
+export interface RelationshipEdgeData extends Record<string, unknown> {
+  relationshipType: 'dependency' | 'aggregate' | 'calls';
+  label?: string;
 }
 
 // =============================================================================
@@ -323,3 +329,20 @@ export interface CascadeResult {
   flowNodesMarked: number;
   componentNodesMarked: number;
 }
+
+// =============================================================================
+// ReactFlow v12 Full Node/Edge Types
+// =============================================================================
+// In v12, NodeProps<T> expects T to be a full Node type, not just data.
+// We define the full types here for use in custom components.
+
+import type { Node, Edge } from '@xyflow/react';
+
+/** Full ReactFlow node type for GatewayNode */
+export type GatewayNode = Node<GatewayNodeData, 'gateway'>;
+
+/** Full ReactFlow edge type for LoopEdge */
+export type LoopEdge = Edge<LoopEdgeData, 'loop'>;
+
+/** Full ReactFlow edge type for RelationshipEdge */
+export type RelationshipEdge = Edge<RelationshipEdgeData, 'relationship'>;

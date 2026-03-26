@@ -596,8 +596,8 @@ function DomainPageContent() {
   const [collapsedEntities, setCollapsedEntities] = useState<Set<string>>(new Set());
 
   // React Flow 状态
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<any>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
   // 对话框状态
   const [showAddEntity, setShowAddEntity] = useState(false);
@@ -719,8 +719,8 @@ function DomainPageContent() {
       nds.map((node) => ({
         ...node,
         data: {
-          ...node.data,
-          selected: node.data.entity?.id === selectedEntity?.id,
+          ...(node.data as Record<string, unknown>),
+          selected: ((node.data as Record<string, unknown>).entity as { id?: string } | undefined)?.id === selectedEntity?.id,
         },
       }))
     );

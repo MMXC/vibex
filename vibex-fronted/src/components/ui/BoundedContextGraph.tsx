@@ -17,7 +17,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-export interface BoundedContextNodeData {
+export interface BoundedContextNodeData extends Record<string, unknown> {
   label: string;
   description: string;
   type: 'core' | 'supporting' | 'generic' | 'external';
@@ -124,7 +124,7 @@ export default function BoundedContextGraph({
   readOnly = false,
 }: BoundedContextGraphProps) {
   // Convert contexts to nodes
-  const initialNodes: Node[] = useMemo(() => {
+  const initialNodes: Node<BoundedContextNodeData>[] = useMemo(() => {
     return contexts.map((ctx, index) => ({
       id: ctx.id,
       type: 'context',

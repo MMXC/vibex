@@ -42,7 +42,7 @@ jest.mock('@/services/api', () => ({
 }));
 
 // Mock React Flow
-jest.mock('reactflow', () => ({
+jest.mock('@xyflow/react', () => ({
   ReactFlow: ({ children }: { children: React.ReactNode }) => <div data-testid="react-flow">{children}</div>,
   Controls: () => null,
   Background: () => null,

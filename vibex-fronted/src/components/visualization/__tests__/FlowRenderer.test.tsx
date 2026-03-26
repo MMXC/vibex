@@ -8,8 +8,8 @@ import { FlowRenderer } from '../FlowRenderer';
 import type { FlowVisualizationRaw } from '@/types/visualization';
 
 // Mock reactflow to provide BackgroundVariant
-jest.mock('reactflow', () => ({
-  ...jest.requireActual('reactflow'),
+jest.mock('@xyflow/react', () => ({
+  ...jest.requireActual('@xyflow/react'),
   BackgroundVariant: {
     Lines: 'lines',
     Dots: 'dots',

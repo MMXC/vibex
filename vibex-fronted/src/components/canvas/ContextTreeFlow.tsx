@@ -14,6 +14,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import type { EdgeTypes } from 'reactflow';
 import { CardTreeRenderer } from '@/components/visualization/CardTreeRenderer/CardTreeRenderer';
 import { RelationshipEdge } from '@/components/canvas/edges/RelationshipEdge';
 import { inferRelationships, relationshipsToEdges } from '@/lib/canvas/utils/inferRelationships';
@@ -108,9 +109,10 @@ export function ContextTreeFlow({
 
   // Register RelationshipEdge as custom edge type
   const edgeTypes = useMemo(
-    () => ({
-      relationshipEdge: RelationshipEdge,
-    }),
+    () =>
+      ({
+        relationshipEdge: RelationshipEdge,
+      }) as EdgeTypes,
     []
   );
 

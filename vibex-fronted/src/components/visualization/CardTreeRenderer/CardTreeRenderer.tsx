@@ -78,7 +78,7 @@ let _loopEdgeTypes: EdgeTypes | null = null;
 function getNodeTypes(): NodeTypes {
   if (!_gatewayNodeTypes) {
     const { GatewayNode } = require('@/components/canvas/nodes/GatewayNode');
-    _gatewayNodeTypes = { cardTreeNode: CardTreeNode as ComponentType<NodeProps>, gatewayNode: GatewayNode as ComponentType<NodeProps> };
+    _gatewayNodeTypes = { cardTreeNode: CardTreeNode as any, gatewayNode: GatewayNode as any };
   }
   return _gatewayNodeTypes;
 }
@@ -86,7 +86,7 @@ function getNodeTypes(): NodeTypes {
 function getEdgeTypes(): EdgeTypes {
   if (!_loopEdgeTypes) {
     const { LoopEdge } = require('@/components/canvas/edges/LoopEdge');
-    _loopEdgeTypes = { loopEdge: LoopEdge as ComponentType<EdgeProps> };
+    _loopEdgeTypes = { loopEdge: LoopEdge as any };
   }
   return _loopEdgeTypes;
 }

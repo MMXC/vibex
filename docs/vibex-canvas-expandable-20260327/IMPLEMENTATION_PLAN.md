@@ -81,6 +81,11 @@ expect(getGridTemplate(store.getState())).toBe('1.5fr 1.5fr 0fr');
 - 刷新页面后拖拽位置不丢失
 - 拖拽中展开/折叠面板不触发误操作
 
+### Epic E3 完成状态: ✅ 已完成 (2026-03-27 04:22 UTC+8)
+- 任务清单: 全部完成 ✅
+- 单元测试: 13 tests pass (`dragState.test.ts`)
+- commit: `3f5586b4`
+
 ---
 
 ## Epic E4: 虚线领域框

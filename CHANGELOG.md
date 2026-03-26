@@ -1,5 +1,15 @@
 # Changelog
 
+### Added (vibex-canvas-expandable-20260327 E2: 三栏双向展开状态) — 2026-03-27
+- **E2**: CanvasExpandState — 三栏双向展开状态管理
+  - `canvasStore.ts`: `leftExpand`/`centerExpand`/`rightExpand` Zustand slice
+  - `getGridTemplate()`: 动态计算 grid 列宽 (`D=1fr`, `X=1.5fr`)
+  - `togglePanel()`: 单击展开/收起，`resetExpand()`: 双击恢复默认
+  - `HoverHotzone.tsx`: 8px 热区组件，悬停显示展开箭头
+  - `canvas.module.css`: `grid-template-columns: var(--grid-left,1fr) var(--grid-center,1fr) var(--grid-right,1fr)` + 0.3s transition
+  - 44 canvasStore tests pass
+  - Review: `docs/review-reports/20260327/review-vibex-canvas-expandable-20260327-epic-e2.md`
+
 ### Changed (vibex-canvas-expandable-20260327 E1: ReactFlow v12 升级) — 2026-03-27
 - **E1**: ReactFlow v12 (`@xyflow/react`) 升级完成
   - `reactflow` → `@xyflow/react` 迁移（26 个文件）

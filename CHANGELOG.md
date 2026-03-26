@@ -1,5 +1,17 @@
 # Changelog
 
+### Added (vibex-step-context-fix-20260326: boundedContexts 多节点展示) — 2026-03-26
+- **Epic1**: 后端 SSE `step_context` 事件增加 `boundedContexts` 数组
+  - `route.ts`: 条件展开 boundedContexts（无数据时不发送字段）
+  - Review: `docs/review-reports/20260326/review-vibex-step-context-fix-epic1.md`
+- **Epic2**: 前端类型定义扩展 `StepContextEvent` + `onStepContext` 回调签名
+  - `dddApi.ts`: `BoundedContext` 接口 + 回调参数
+  - Review: `docs/review-reports/20260326/review-vibex-step-context-fix-epic2.md`
+- **Epic3**: 前端 Store 循环创建多节点（max 10）+ 名称截断（max 30）
+  - `canvasStore.ts`: `truncateName()` + `slice(0, 10)` 数量限制
+  - Review: `docs/review-reports/20260326/review-vibex-step-context-fix-epic3.md`
+
+
 ### Added (vibex-task-state-20260326 Epic1-4: task_state CLI + 乐观锁) — 2026-03-26
 - **Epic1**: `atomic_write_json()` + `save_project_with_lock()` + `load_project_with_rev()` (F1.1-F1.4)
   - tempfile.mkstemp + os.rename 原子写入，乐观锁 revision 比对 + 重试

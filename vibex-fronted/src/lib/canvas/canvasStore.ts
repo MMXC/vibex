@@ -508,11 +508,18 @@ export const useCanvasStore = create<CanvasStore>()(
                   const validTypes = ['core', 'supporting', 'generic', 'external'];
                   return validTypes.includes(type) ? type as BoundedContextNode['type'] : 'core';
                 };
-                // Loop through boundedContexts and add each one
+                const MAX_CONTEXT_NODES = 10;
+                const MAX_NAME_LENGTH = 30;
+                const truncateName = (name: string): string => {
+                  if (name.length <= MAX_NAME_LENGTH) return name;
+                  return name.substring(0, MAX_NAME_LENGTH - 3) + '...';
+                };
+                // Loop through boundedContexts and add each one (max 10)
                 if (boundedContexts && boundedContexts.length > 0) {
-                  boundedContexts.forEach((ctx) => {
+                  const nodesToAdd = boundedContexts.slice(0, MAX_CONTEXT_NODES);
+                  nodesToAdd.forEach((ctx) => {
                     addContextNode({
-                      name: ctx.name,
+                      name: truncateName(ctx.name),
                       description: ctx.description,
                       type: mapContextType(ctx.type),
                     });

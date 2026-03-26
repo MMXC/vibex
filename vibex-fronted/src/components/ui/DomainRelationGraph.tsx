@@ -16,7 +16,7 @@ import { ReactFlow,
   ReactFlowProvider,
 } from '@xyflow/react';
 import { toPng, toSvg } from 'html-to-image';
-import 'reactflow/dist/style.css';
+import '@xyflow/react/dist/style.css';
 import styles from './DomainRelationGraph.module.css';
 
 // Entity node types

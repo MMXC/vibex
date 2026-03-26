@@ -40,7 +40,7 @@ import { ReactFlow,
   applyNodeChanges,
   applyEdgeChanges,
 } from '@xyflow/react';
-import 'reactflow/dist/style.css';
+import '@xyflow/react/dist/style.css';
 
 // 领域类型样式映射
 const entityTypeStyles: Record<string, { color: string; label: string }> = {

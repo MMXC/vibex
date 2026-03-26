@@ -12,7 +12,7 @@
  */
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { areAllConfirmed } from '@/lib/canvas/cascade';
 import { PhaseProgressBar } from './PhaseProgressBar';
@@ -22,6 +22,7 @@ import { ComponentTree } from './ComponentTree';
 import { BusinessFlowTree } from './BusinessFlowTree';
 import { ProjectBar } from './ProjectBar';
 import { PrototypeQueuePanel } from './PrototypeQueuePanel';
+import { HoverHotzone } from './HoverHotzone';
 import type { Phase, TreeType, TreeNode } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
 
@@ -44,6 +45,22 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const toggleContextPanel = useCanvasStore((s) => s.toggleContextPanel);
   const toggleFlowPanel = useCanvasStore((s) => s.toggleFlowPanel);
   const toggleComponentPanel = useCanvasStore((s) => s.toggleComponentPanel);
+
+  // === Expand State Selectors (E2) ===
+  const gridRef = useRef<HTMLDivElement>(null);
+  const getGridTemplate = useCanvasStore((s) => s.getGridTemplate);
+  const leftExpand = useCanvasStore((s) => s.leftExpand);
+  const centerExpand = useCanvasStore((s) => s.centerExpand);
+  const rightExpand = useCanvasStore((s) => s.rightExpand);
+
+  // === Sync expand state to CSS variables ===
+  useEffect(() => {
+    if (!gridRef.current) return;
+    const grid = gridRef.current;
+    grid.style.setProperty('--grid-left', leftExpand === 'expand-right' ? '1.5fr' : leftExpand === 'expand-left' ? '0fr' : '1fr');
+    grid.style.setProperty('--grid-center', centerExpand === 'expand-left' ? '1.5fr' : centerExpand === 'expand-right' ? '0fr' : '1fr');
+    grid.style.setProperty('--grid-right', rightExpand === 'expand-left' ? '1.5fr' : rightExpand === 'expand-right' ? '0fr' : '1fr');
+  }, [leftExpand, centerExpand, rightExpand]);
 
   // === UI State ===
   const [activeTab, setActiveTab] = useState<TreeType>('context');
@@ -255,7 +272,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
               </div>
             </div>
           ) : (
-            <div className={styles.treePanelsGrid}>
+            <div ref={gridRef} className={styles.treePanelsGrid}>
               <TreePanel
                 tree="context"
                 title="限界上下文树"
@@ -264,7 +281,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 isActive={contextActive}
                 onToggleCollapse={toggleContextPanel}
               >
+                <HoverHotzone position="left-edge" panel="left" />
                 <BoundedContextTree />
+                <HoverHotzone position="right-edge" panel="left" />
               </TreePanel>
 
               <TreePanel
@@ -275,7 +294,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 isActive={flowActive}
                 onToggleCollapse={toggleFlowPanel}
               >
+                <HoverHotzone position="left-edge" panel="center" />
                 <BusinessFlowTree isActive={flowActive || activeTree === null} />
+                <HoverHotzone position="right-edge" panel="center" />
               </TreePanel>
 
               <TreePanel
@@ -286,7 +307,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 isActive={componentActive}
                 onToggleCollapse={toggleComponentPanel}
               >
+                <HoverHotzone position="left-edge" panel="right" />
                 <ComponentTree />
+                <HoverHotzone position="right-edge" panel="right" />
               </TreePanel>
             </div>
           )}

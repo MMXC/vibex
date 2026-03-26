@@ -27,7 +27,7 @@ import { ReactFlow,
   type NodeProps,
   type EdgeProps,
 } from '@xyflow/react';
-import 'reactflow/dist/style.css';
+import '@xyflow/react/dist/style.css';
 import { CardTreeNode } from '../CardTreeNode/CardTreeNode';
 import type { CardTreeVisualizationRaw, CardTreeNodeData } from '@/types/visualization';
 import type { FlowGateway, GatewayNodeData, LoopEdgeData } from '@/lib/canvas/types';

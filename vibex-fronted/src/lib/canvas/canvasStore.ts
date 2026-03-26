@@ -21,6 +21,7 @@ import type {
   FlowStep,
   CascadeUpstream,
   CascadeResult,
+  PanelExpandState,
 } from './types';
 
 // =============================================================================
@@ -93,6 +94,17 @@ interface CanvasStore {
   contextPanelCollapsed: boolean;
   flowPanelCollapsed: boolean;
   componentPanelCollapsed: boolean;
+
+  // === Expand Slice (E2) ===
+  leftExpand: PanelExpandState;
+  centerExpand: PanelExpandState;
+  rightExpand: PanelExpandState;
+  getGridTemplate: () => string;
+  setLeftExpand: (state: PanelExpandState) => void;
+  setCenterExpand: (state: PanelExpandState) => void;
+  setRightExpand: (state: PanelExpandState) => void;
+  togglePanel: (panel: 'left' | 'center' | 'right') => void;
+  resetExpand: () => void;
 
   // === Context Slice ===
   contextNodes: BoundedContextNode[];
@@ -248,6 +260,50 @@ export const useCanvasStore = create<CanvasStore>()(
             set((s) => ({ flowPanelCollapsed: !s.flowPanelCollapsed })),
           toggleComponentPanel: () =>
             set((s) => ({ componentPanelCollapsed: !s.componentPanelCollapsed })),
+
+          // === Expand Slice (E2) ===
+          leftExpand: 'default',
+          centerExpand: 'default',
+          rightExpand: 'default',
+
+          getGridTemplate: () => {
+            const { leftExpand, centerExpand, rightExpand } = get();
+            const D = 1; const X = 1.5; const C = 0;
+
+            const leftFr = leftExpand === 'expand-right' ? X : leftExpand === 'expand-left' ? C : D;
+            const centerFr = centerExpand === 'expand-left' ? X : centerExpand === 'expand-right' ? C : D;
+            const rightFr = rightExpand === 'expand-left' ? X : rightExpand === 'expand-right' ? C : D;
+
+            return `${leftFr}fr ${centerFr}fr ${rightFr}fr`;
+          },
+
+          setLeftExpand: (state) => set({ leftExpand: state }),
+          setCenterExpand: (state) => set({ centerExpand: state }),
+          setRightExpand: (state) => set({ rightExpand: state }),
+
+          togglePanel: (panel) => {
+            if (panel === 'left') {
+              const { leftExpand } = get();
+              const next = leftExpand === 'default' ? 'expand-right'
+                : leftExpand === 'expand-right' ? 'default'
+                : leftExpand;
+              set({ leftExpand: next as PanelExpandState });
+            } else if (panel === 'center') {
+              const { centerExpand } = get();
+              const next = centerExpand === 'default' ? 'expand-left'
+                : centerExpand === 'expand-left' ? 'default'
+                : centerExpand;
+              set({ centerExpand: next as PanelExpandState });
+            } else {
+              const { rightExpand } = get();
+              const next = rightExpand === 'default' ? 'expand-left'
+                : rightExpand === 'expand-left' ? 'default'
+                : rightExpand;
+              set({ rightExpand: next as PanelExpandState });
+            }
+          },
+
+          resetExpand: () => set({ leftExpand: 'default', centerExpand: 'default', rightExpand: 'default' }),
 
           // === Context Slice Actions ===
           setContextNodes: (nodes) => set({ contextNodes: nodes }),

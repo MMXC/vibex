@@ -74,7 +74,7 @@ jest.mock('axios', () => ({
 }));
 
 // Mock React Flow
-jest.mock('reactflow', () => ({
+jest.mock('@xyflow/react', () => ({
   ReactFlow: ({ children }) => children,
   Controls: () => null,
   Background: () => null,

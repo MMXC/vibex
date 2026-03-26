@@ -168,7 +168,43 @@ export interface QueueSlice {
   isPolling: boolean;
 }
 
-export type CanvasStore = CanvasSlice & ContextSlice & FlowSlice & ComponentSlice & QueueSlice;
+// =============================================================================
+// Canvas Expand State Slice (E2)
+// =============================================================================
+
+/**
+ * 三栏展开状态：
+ * - default: 等分
+ * - expand-left: 左侧栏扩展（收缩右侧）
+ * - expand-right: 右侧栏扩展（收缩左侧）
+ */
+export type PanelExpandState = 'default' | 'expand-left' | 'expand-right';
+
+/**
+ * Grid template 计算常量（fr 单位）
+ */
+export const EXPAND_GRID = {
+  DEFAULT_WIDTH: 1,
+  EXPANDED_WIDTH: 1.5,
+  COLLAPSED_WIDTH: 0,
+} as const;
+
+export interface ExpandSlice {
+  /** 三栏展开状态 */
+  leftExpand: PanelExpandState;
+  centerExpand: PanelExpandState;
+  rightExpand: PanelExpandState;
+  /** 计算当前 grid-template-columns 值 */
+  getGridTemplate: () => string;
+  /** Actions */
+  setLeftExpand: (state: PanelExpandState) => void;
+  setCenterExpand: (state: PanelExpandState) => void;
+  setRightExpand: (state: PanelExpandState) => void;
+  togglePanel: (panel: 'left' | 'center' | 'right') => void;
+  resetExpand: () => void;
+}
+
+export type CanvasStore = CanvasSlice & ContextSlice & FlowSlice & ComponentSlice & QueueSlice & ExpandSlice;
 
 // =============================================================================
 // API Types

@@ -16,7 +16,7 @@ import { ReactFlow,
   Panel,
   MarkerType,
 } from '@xyflow/react';
-import 'reactflow/dist/style.css';
+import '@xyflow/react/dist/style.css';
 
 export interface FlowState {
   id: string;

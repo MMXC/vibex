@@ -28,7 +28,7 @@ import { ReactFlow,
   FitViewOptions,
   ReactFlowInstance,
 } from '@xyflow/react';
-import 'reactflow/dist/style.css';
+import '@xyflow/react/dist/style.css';
 import styles from './FlowEditor.module.css';
 
 export type FlowNode = Node;

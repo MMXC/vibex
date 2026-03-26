@@ -15,7 +15,7 @@ import { ReactFlow,
   BackgroundVariant,
   Panel,
 } from '@xyflow/react';
-import 'reactflow/dist/style.css';
+import '@xyflow/react/dist/style.css';
 
 export interface BoundedContextNodeData extends Record<string, unknown> {
   label: string;

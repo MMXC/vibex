@@ -162,11 +162,12 @@
 
 .treePanelsGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: var(--grid-left, 1fr) var(--grid-center, 1fr) var(--grid-right, 1fr);
   gap: 0;
   flex: 1;
   overflow: hidden;
   min-height: 0;
+  transition: grid-template-columns 0.3s ease;
 }
 
 /* ============================================

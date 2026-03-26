@@ -22,6 +22,7 @@ import type {
   CascadeUpstream,
   CascadeResult,
   PanelExpandState,
+  BoundedGroup,
 } from './types';
 
 // =============================================================================
@@ -123,6 +124,24 @@ interface CanvasStore {
   clearDragPositions: () => void;
   /** Clear single node's dragged position */
   clearDragPosition: (nodeId: string) => void;
+
+  // === Bounded Group Slice (E4) ===
+  /** All bounded groups for the current tree */
+  boundedGroups: BoundedGroup[];
+  /** Add a new bounded group */
+  addBoundedGroup: (group: Omit<BoundedGroup, 'groupId'>) => void;
+  /** Remove a bounded group by id */
+  removeBoundedGroup: (groupId: string) => void;
+  /** Toggle visibility of a bounded group */
+  toggleBoundedGroupVisibility: (groupId: string) => void;
+  /** Update group label */
+  updateBoundedGroupLabel: (groupId: string, label: string) => void;
+  /** Assign a node to a group */
+  addNodeToGroup: (groupId: string, nodeId: string) => void;
+  /** Remove a node from a group */
+  removeNodeFromGroup: (groupId: string, nodeId: string) => void;
+  /** Clear all bounded groups */
+  clearBoundedGroups: () => void;
 
   // === Context Slice ===
   contextNodes: BoundedContextNode[];
@@ -678,6 +697,61 @@ export const useCanvasStore = create<CanvasStore>()(
             });
           },
 
+          // === Bounded Group Slice (E4) ===
+          boundedGroups: [],
+
+          addBoundedGroup: (groupData) => {
+            const newGroup: BoundedGroup = {
+              ...groupData,
+              groupId: generateId(),
+            };
+            set((s) => ({ boundedGroups: [...s.boundedGroups, newGroup] }));
+          },
+
+          removeBoundedGroup: (groupId) => {
+            set((s) => ({ boundedGroups: s.boundedGroups.filter((g) => g.groupId !== groupId) }));
+          },
+
+          toggleBoundedGroupVisibility: (groupId) => {
+            set((s) => ({
+              boundedGroups: s.boundedGroups.map((g) =>
+                g.groupId === groupId
+                  ? { ...g, visible: g.visible === undefined || g.visible === true ? false : true }
+                  : g
+              ),
+            }));
+          },
+
+          updateBoundedGroupLabel: (groupId, label) => {
+            set((s) => ({
+              boundedGroups: s.boundedGroups.map((g) =>
+                g.groupId === groupId ? { ...g, label } : g
+              ),
+            }));
+          },
+
+          addNodeToGroup: (groupId, nodeId) => {
+            set((s) => ({
+              boundedGroups: s.boundedGroups.map((g) =>
+                g.groupId === groupId && !g.nodeIds.includes(nodeId)
+                  ? { ...g, nodeIds: [...g.nodeIds, nodeId] }
+                  : g
+              ),
+            }));
+          },
+
+          removeNodeFromGroup: (groupId, nodeId) => {
+            set((s) => ({
+              boundedGroups: s.boundedGroups.map((g) =>
+                g.groupId === groupId
+                  ? { ...g, nodeIds: g.nodeIds.filter((id) => id !== nodeId) }
+                  : g
+              ),
+            }));
+          },
+
+          clearBoundedGroups: () => set({ boundedGroups: [] }),
+
           // === Tree Activation Logic ===
           recomputeActiveTree: () => {
             const { contextNodes, flowNodes, phase } = get();
@@ -731,6 +805,8 @@ export const useCanvasStore = create<CanvasStore>()(
           componentNodes: state.componentNodes,
           // E3: persist dragged positions so drag state survives page refresh
           draggedPositions: state.draggedPositions,
+          // E4: persist bounded groups
+          boundedGroups: state.boundedGroups,
         }),
       }
     ),

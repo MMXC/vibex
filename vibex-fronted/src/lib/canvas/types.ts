@@ -245,6 +245,54 @@ export interface DragSlice {
 }
 
 // =============================================================================
+// Bounded Group — SVG Dashed Rect (E4)
+// =============================================================================
+
+/** Tree type → default stroke color for the group border */
+export const BOUNDED_GROUP_COLORS: Record<TreeType, string> = {
+  context: '#f59e0b',    // amber for bounded contexts
+  flow: '#3b82f6',       // blue for business flows
+  component: '#10b981',  // green for components
+} as const;
+
+export const DEFAULT_GROUP_STROKE_DASHARRAY = '5 3';
+export const DEFAULT_GROUP_STROKE_WIDTH = 1.5;
+export const DEFAULT_GROUP_PADDING = 12; // px padding inside the rect
+
+/**
+ * A bounded group — SVG dashed rectangle that wraps a set of related nodes.
+ *
+ * In the VibeX DDD context, a group corresponds to a "bounded context".
+ * Multiple cards that belong to the same bounded context are visually grouped
+ * by a dashed rect, making the domain boundaries immediately visible.
+ */
+export interface BoundedGroup {
+  /** Unique group ID */
+  groupId: string;
+  /** Human-readable label shown in the top-right of the rect */
+  label: string;
+  /** Which tree this group belongs to */
+  treeType: TreeType;
+  /** IDs of the ReactFlow nodes that belong to this group */
+  nodeIds: string[];
+  /** CSS color for the dashed border. Defaults to tree-type color. */
+  color?: string;
+  /** Whether the group is currently visible */
+  visible?: boolean;
+}
+
+/** Computed bounding box for a group — derived from node positions + dimensions */
+export interface BoundedGroupBBox {
+  groupId: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  /** Nodes inside this bounding box */
+  nodeIds: string[];
+}
+
+// =============================================================================
 // API Types
 // =============================================================================
 

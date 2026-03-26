@@ -9,7 +9,7 @@
 
 'use client';
 
-import React, { useCallback, useMemo, type ComponentType } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { ReactFlow, 
   Node,
   Edge,
@@ -19,19 +19,19 @@ import { ReactFlow,
   ReactFlowProvider,
   useNodesState,
   useEdgesState,
+  useReactFlow,
   MarkerType,
   BackgroundVariant,
   Position,
   EdgeTypes,
   NodeTypes,
-  type NodeProps,
-  type EdgeProps,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { CardTreeNode } from '../CardTreeNode/CardTreeNode';
 import type { CardTreeVisualizationRaw, CardTreeNodeData } from '@/types/visualization';
 import type { FlowGateway, GatewayNodeData, LoopEdgeData } from '@/lib/canvas/types';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { BoundedGroupOverlay } from '@/components/canvas/groups/BoundedGroupOverlay';
 import styles from './CardTreeRenderer.module.css';
 
 // Re-export CardTreeNode type for external use
@@ -298,6 +298,23 @@ function InternalRenderer({
   const endDrag = useCanvasStore((s) => s.endDrag);
   const updateDraggedPosition = useCanvasStore((s) => s.updateDraggedPosition);
 
+  // E4: Track ReactFlow viewport for BoundedGroupOverlay positioning
+  const [viewport, setViewport] = React.useState({ x: 0, y: 0, zoom: 1 });
+
+  // E4: Extract viewport from ReactFlow instance on init
+  const handleInit = React.useCallback((rf: { getViewport?: () => { x: number; y: number; zoom: number } }) => {
+    if (typeof rf?.getViewport === 'function') {
+      const vp = rf.getViewport();
+      setViewport({ x: vp.x, y: vp.y, zoom: vp.zoom });
+    }
+    onInit?.();
+  }, [onInit]);
+
+  // E4: Track viewport on move
+  const handleMoveEnd = React.useCallback((_event: unknown, vp: { x: number; y: number; zoom: number }) => {
+    setViewport({ x: vp.x, y: vp.y, zoom: vp.zoom });
+  }, []);
+
   // Merge custom edgeTypes with built-in loop edge type
   const mergedEdgeTypes = useMemo(
     () => ({ ...getEdgeTypes(), ...edgeTypes }),
@@ -434,8 +451,15 @@ function InternalRenderer({
         onNodeDragStart={readonly ? undefined : handleNodeDragStart}
         onNodeDrag={readonly ? undefined : handleNodeDrag}
         onNodeDragStop={readonly ? undefined : handleNodeDragStop}
-        onInit={onInit}
+        onInit={handleInit}
+        onMoveEnd={handleMoveEnd}
       >
+        {/* E4: BoundedGroupOverlay — SVG dashed rects for domain groupings */}
+        <BoundedGroupOverlay
+          nodes={nodes}
+          pan={{ x: viewport.x, y: viewport.y }}
+          zoom={viewport.zoom}
+        />
         {showControls && <Controls className={styles.controls} />}
         {showMinimap && <MiniMap className={styles.minimap} />}
         {showBackground && (

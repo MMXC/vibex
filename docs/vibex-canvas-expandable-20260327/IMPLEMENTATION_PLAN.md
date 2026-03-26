@@ -37,14 +37,14 @@
 
 ### 任务清单
 
-- [ ] `src/lib/canvas/canvasStore.ts` 新增 `CanvasExpandState` 接口
-- [ ] 实现 `setLeftExpand`, `setCenterExpand`, `setRightExpand`, `togglePanel`
-- [ ] 实现 `computeGridTemplate()` 宽度计算
-- [ ] `canvas.module.css` 扩展 `.treePanelsGrid` 支持 CSS Variable 动态列
-- [ ] 悬停热区（8px）组件：`HoverHotzone.tsx`
-- [ ] 展开箭头图标 SVG
-- [ ] `CanvasPage.tsx` 集成热区和状态绑定
-- [ ] 单元测试：`canvasExpandState.test.ts`
+- [x] `src/lib/canvas/canvasStore.ts` 新增 `CanvasExpandState` 接口
+- [x] 实现 `setLeftExpand`, `setCenterExpand`, `setRightExpand`, `togglePanel`
+- [x] 实现 `computeGridTemplate()` 宽度计算
+- [x] `canvas.module.css` 扩展 `.treePanelsGrid` 支持 CSS Variable 动态列
+- [x] 悬停热区（8px）组件：`HoverHotzone.tsx`
+- [x] 展开箭头图标 SVG
+- [x] `CanvasPage.tsx` 集成热区和状态绑定
+- [x] 单元测试：`canvasExpandState.test.ts` (pass)
 
 ### 验收标准
 
@@ -66,14 +66,14 @@ expect(getGridTemplate(store.getState())).toBe('1.5fr 1.5fr 0fr');
 
 ### 任务清单
 
-- [ ] `CardTreeRenderer.tsx` 设置 `nodesDraggable={true}`
-- [ ] 新增 `DragState` slice（draggedNodeId, dragOverNodeId, draggedPositions）
-- [ ] `onNodesChange` 扩展，监听 `position` 变化同步到 DragState
-- [ ] localStorage 持久化：`draggedPositions` 扩展到 persist
-- [ ] 拖拽占位符样式（半透明卡片）
-- [ ] 拖拽时禁用面板展开（避免误触发）
-- [ ] 单元测试：`dragState.test.ts`
-- [ ] E2E 测试：卡片拖拽 → 位置保存 → 刷新页面验证
+- [x] `CardTreeRenderer.tsx` 设置 `nodesDraggable={true}`
+- [x] 新增 `DragState` slice（draggedNodeId, dragOverNodeId, draggedPositions）
+- [x] `onNodesChange` 扩展，监听 `position` 变化同步到 DragState
+- [x] localStorage 持久化：`draggedPositions` 扩展到 persist
+- [x] 拖拽占位符样式（半透明卡片）
+- [x] 拖拽时禁用面板展开（避免误触发）
+- [x] 单元测试：`dragState.test.ts` (51 tests pass)
+- [ ] E2E 测试：卡片拖拽 → 位置保存 → 刷新页面验证 (E5)
 
 ### 验收标准
 

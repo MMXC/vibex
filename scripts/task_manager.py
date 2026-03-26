@@ -14,6 +14,7 @@ Commands:
   claim     领取任务
   ready     获取可执行的任务
   list      列出所有项目
+  archive   将已完成项目移动到 projects/completed/ 目录
 """
 
 import argparse
@@ -82,7 +83,9 @@ else:
     append_to_memory = None
     clean_cooldown = None
 
-TASKS_DIR = os.environ.get("TEAM_TASKS_DIR", "/home/ubuntu/clawd/data/team-tasks")
+TEAM_TASKS_DIR_DEFAULT = "/root/.openclaw/workspace-coord/team-tasks"
+LEGACY_TASKS_DIR = "/home/ubuntu/clawd/data/team-tasks"
+TASKS_DIR = os.environ.get("TEAM_TASKS_DIR", TEAM_TASKS_DIR_DEFAULT)
 
 
 def _input_with_timeout(prompt: str = "", timeout: int = 10) -> str:
@@ -126,7 +129,20 @@ def now_iso():
 
 
 def task_file(project: str) -> str:
-    return os.path.join(TASKS_DIR, f"{project}.json")
+    # Check new projects/*/tasks.json layout in workspace-coord
+    new_path = os.path.join(TEAM_TASKS_DIR_DEFAULT, "projects", project, "tasks.json")
+    if os.path.exists(new_path):
+        return new_path
+    # Check legacy flat layout in workspace-coord
+    legacy_path = os.path.join(TEAM_TASKS_DIR_DEFAULT, f"{project}.json")
+    if os.path.exists(legacy_path):
+        return legacy_path
+    # Check legacy flat layout in legacy dir
+    legacy_legacy = os.path.join(LEGACY_TASKS_DIR, f"{project}.json")
+    if os.path.exists(legacy_legacy):
+        return legacy_legacy
+    # Default to workspace-coord flat path (will be created there)
+    return legacy_path
 
 
 def load_project(project: str) -> dict:
@@ -138,11 +154,117 @@ def load_project(project: str) -> dict:
         return json.load(f)
 
 
-def save_project(project: str, data: dict):
-    path = task_file(project)
+# =============================================================================
+# Epic 1: Concurrent-safe infrastructure (optimistic locking + atomic writes)
+# =============================================================================
+
+_REVISION_KEY = "_revision"
+
+
+def atomic_write_json(path: str, data: dict) -> None:
+    """Atomically write data to a JSON file using temp file + rename.
+
+    Guarantees that on any exception, the original file is untouched.
+    Uses os.rename for atomicity on POSIX systems.
+
+    Args:
+        path: Target JSON file path
+        data: Python object serializable to JSON
+    """
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    tmp_fd, tmp_path = __import__("tempfile").mkstemp(
+        prefix=".tmp_", suffix="_" + os.path.basename(path), dir=os.path.dirname(path)
+    )
+    try:
+        with os.fdopen(tmp_fd, "w") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        os.rename(tmp_path, path)
+    except Exception:
+        # Clean up temp file on failure — original file untouched
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise
+
+
+def load_project_with_rev(project: str) -> tuple[dict, int]:
+    """Load a project and return its data along with the current revision number.
+
+    Args:
+        project: Project name
+
+    Returns:
+        Tuple of (data dict, revision int). Revision is 0 if not set.
+
+    Raises:
+        SystemExit if project file does not exist.
+    """
+    path = task_file(project)
+    with open(path) as f:
+        data = json.load(f)
+    revision = data.get(_REVISION_KEY, 0)
+    return data, int(revision)
+
+
+def save_project_with_lock(project: str, data: dict, expected_rev: int, max_retries: int = 3) -> int:
+    """Save a project with optimistic locking.
+
+    Loads the current revision, verifies it matches expected_rev, then writes
+    atomically with an incremented revision. Retries automatically on mismatch.
+
+    Args:
+        project: Project name
+        data: Updated project data (must NOT include _revision — this function adds it)
+        expected_rev: Expected current revision (from load_project_with_rev)
+        max_retries: Max retry attempts on revision mismatch
+
+    Returns:
+        The new revision number after a successful save.
+
+    Raises:
+        RuntimeError: After max_retries failures due to concurrent modification.
+        SystemExit: If project file does not exist.
+    """
+    path = task_file(project)
+
+    for attempt in range(max_retries):
+        # Always reload current revision first — verify before write
+        try:
+            _, current_rev = load_project_with_rev(project)
+        except SystemExit:
+            raise RuntimeError(f"save_project_with_lock: project '{project}' not found")
+
+        if current_rev != expected_rev:
+            # Concurrent modification detected — update expected_rev and retry
+            expected_rev = current_rev
+            continue
+
+        # Safe to write: current_rev == expected_rev
+        new_rev = current_rev + 1
+        data_with_rev = dict(data)
+        data_with_rev[_REVISION_KEY] = new_rev
+        atomic_write_json(path, data_with_rev)
+        return new_rev
+
+    raise RuntimeError(
+        f"save_project_with_lock: max retries ({max_retries}) exceeded for '{project}' "
+        f"(expected_rev={expected_rev}) due to concurrent modifications"
+    )
+
+
+def save_project(project: str, data: dict):
+    # Save to new layout if the project already exists there, otherwise use task_file()
+    new_path = os.path.join(TEAM_TASKS_DIR_DEFAULT, "projects", project, "tasks.json")
+    if os.path.exists(new_path):
+        path = new_path
+    else:
+        path = task_file(project)
+    # F1.1 + F1.4: atomic write + backward compatibility (add revision if missing)
+    compat_data = dict(data)
+    if _REVISION_KEY not in compat_data:
+        compat_data[_REVISION_KEY] = 1
+    atomic_write_json(path, compat_data)
 
 
 def make_stage(agent_id: str, task: str = "", depends_on: list = None, 
@@ -331,7 +453,8 @@ def cmd_phase1(args):
 - 缺少验收标准 → 驳回补充
 """,
         depends_on=[],
-        constraints=[
+        constraints=["强制使用 gstack 技能（/browse /qa /qa-only /canary）验证问题真实性与修复效果",
+            
             "产出分析文档",
             "识别技术风险",
             "验收标准具体可测试",
@@ -373,7 +496,8 @@ def cmd_phase1(args):
 - 涉及页面但未标注【需页面集成】→ 驳回补充
 """,
         depends_on=["analyze-requirements"],
-        constraints=[
+        constraints=["强制使用 gstack 技能（/browse /qa /qa-only /canary）验证问题真实性与修复效果",
+            
             "每个功能有验收标准",
             "粒度细化到可写 expect() 断言",
             "DoD 明确",
@@ -420,7 +544,8 @@ def cmd_phase1(args):
 - 缺少 IMPLEMENTATION_PLAN.md 或 AGENTS.md → 驳回补充
 """,
         depends_on=["create-prd"],
-        constraints=[
+        constraints=["强制使用 gstack 技能（/browse /qa /qa-only /canary）验证问题真实性与修复效果",
+            
             "兼容现有架构",
             "接口文档完整",
             "评估性能影响",
@@ -603,6 +728,12 @@ def cmd_phase2(args):
 - 实施计划: {impl_plan}
 - 验收脚本: {agents_file}
 
+## 🛠️ 强制要求：使用 gstack 技能
+- 必须使用 `gstack browse`（`/browse`）完成代码修改后的功能验证
+- 禁止仅靠"感觉对"来判断功能正确性，必须实际打开页面操作验证
+- 审查前先用 `gstack screenshot` 截图确认 UI 状态
+- 每次 commit 前：执行 `gstack screenshot` + 断言关键元素可见
+
 ## 你的任务
 1. 读取 IMPLEMENTATION_PLAN.md，找到 Epic {epic} 对应的所有未完成任务
 2. 读取 AGENTS.md，了解运行和测试命令
@@ -637,6 +768,12 @@ def cmd_phase2(args):
 - 项目路径: {work_dir}
 - 验收脚本: {agents_file}
 
+## 🛠️ 强制要求：使用 gstack 技能
+- 必须使用 `gstack browse`（`/browse`）执行端到端功能验证
+- 禁止仅靠单元测试通过就判定功能正确，必须实际在浏览器中验证交互流程
+- 每个关键功能点至少执行一次完整用户操作路径
+- 验收前截图保存证据
+
 ## 你的任务
 1. 读取 AGENTS.md，执行测试命令
 2. 对照 IMPLEMENTATION_PLAN.md 确认测试覆盖
@@ -668,6 +805,11 @@ def cmd_phase2(args):
 
 ## 📁 工作目录
 - 项目路径: {work_dir}
+
+## 🛠️ 强制要求：使用 gstack 技能
+- 必须使用 `gstack browse`（`/browse`）验证代码改动后的实际效果
+- 禁止仅靠代码审查判断功能正确性，必须实际在浏览器中打开页面验证
+- 每次审查前截图记录当前 UI 状态，作为审查依据
 
 ## 你的任务
 1. 代码质量审查
@@ -701,6 +843,11 @@ def cmd_phase2(args):
 
 ## 📁 工作目录
 - 项目路径: {work_dir}
+
+## 🛠️ 强制要求：使用 gstack 技能
+- 必须使用 `gstack browse`（`/browse`）验证推送后的生产环境效果
+- 确认远程部署后的页面实际运行状态，禁止仅靠 git log 判断
+- 截图记录最终验证结果
 
 ## 你的任务
 1. 验证远程 commit 存在
@@ -738,6 +885,11 @@ def cmd_phase2(args):
 
 ## 📁 工作目录
 - 项目路径: {work_dir}
+
+## 🛠️ 强制要求：使用 gstack 技能
+- 必须使用 `gstack browse`（`/browse`）验证最终产出物
+- 确认所有 Epic 功能在浏览器中实际可用，禁止仅靠 git/npm 命令判断
+- 截图保存最终验收结果，作为项目完成报告的附件
 
 ## 🔴 虚假完成检查（必须执行）
 对于每个 Epic，必须验证以下产出物真实存在：
@@ -878,7 +1030,7 @@ def cmd_status(args):
         return
 
     mode = data.get("mode", "linear")
-    print(f"📋 Project: {data['project']}")
+    print(f"📋 Project: {data.get('project') or data.get('name', args.project)}")
     if data.get("goal"):
         print(f"🎯 Goal: {data['goal']}")
     print(f"📊 Status: {data['status']}  |  Mode: {mode}")
@@ -1068,6 +1220,48 @@ def cmd_update(args):
 
     stage = data["stages"][stage_id]
     old_status = stage["status"]
+
+    # ── gstack 验证 ──────────────────────────────────────────────
+    if new_status == "done" and not getattr(args, "skip_gstack_verify", False):
+        details = stage.get("details", {})
+        constraints = details.get("constraints", [])
+        result_text = getattr(args, "result", "") or ""
+        
+        # 检查约束是否要求 gstack
+        gstack_required = any(
+            "gstack" in str(c).lower() or "/browse" in str(c) or "/qa" in str(c) or "/canary" in str(c)
+            for c in constraints
+        )
+        
+        if gstack_required:
+            # 导入验证脚本
+            import subprocess
+            script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "verify_gstack_usage.py")
+            work_dir = details.get("workDir") or details.get("work_dir")
+            
+            cmd = ["python3", script_path]
+            if result_text:
+                cmd.append(result_text)
+            
+            try:
+                proc = subprocess.run(
+                    cmd + ([work_dir] if work_dir else []),
+                    capture_output=True, text=True, timeout=30
+                )
+                if proc.returncode != 0:
+                    print(f"", file=sys.stderr)
+                    print(f"🔴 GSTACK_VERIFICATION_FAILED", file=sys.stderr)
+                    print(f"   任务要求使用 gstack 技能，但未检测到使用证据", file=sys.stderr)
+                    print(f"   请在任务报告中包含:", file=sys.stderr)
+                    print(f"   - 截图文件路径", file=sys.stderr)
+                    print(f"   - browse snapshot 输出", file=sys.stderr)
+                    print(f"   - qa/canary 报告路径", file=sys.stderr)
+                    print(f"   - console 日志", file=sys.stderr)
+                    print(f"", file=sys.stderr)
+                    print(f"   如需跳过，请使用: --skip-gstack-verify", file=sys.stderr)
+                    sys.exit(1)
+            except Exception as e:
+                print(f"⚠️  gstack 验证脚本执行失败: {e}，跳过验证", file=sys.stderr)
     stage["status"] = new_status
 
     if new_status == "in-progress" and not stage.get("startedAt"):
@@ -1256,27 +1450,57 @@ def cmd_result(args):
 
 @timeout(5)
 def cmd_list(args):
-    """列出所有项目"""
+    """列出所有项目（同时扫描根目录和 projects/ 子目录）"""
     os.makedirs(TASKS_DIR, exist_ok=True)
-    files = [f for f in os.listdir(TASKS_DIR) if f.endswith(".json")]
-    if not files:
+    
+    # 扫描根目录 *.json
+    root_files = [f for f in os.listdir(TASKS_DIR) if f.endswith(".json")]
+    
+    # 扫描 projects/ 子目录
+    projects_dir = os.path.join(TASKS_DIR, "projects")
+    subdir_projects = []
+    if os.path.isdir(projects_dir):
+        for subdir in os.listdir(projects_dir):
+            tasks_json = os.path.join(projects_dir, subdir, "tasks.json")
+            if os.path.isfile(tasks_json):
+                subdir_projects.append((subdir, tasks_json))
+    
+    all_files = root_files
+    seen = set(f.replace(".json", "") for f in root_files)
+    for subdir, _ in subdir_projects:
+        if subdir not in seen:
+            all_files.append(f"{subdir}.json")  # marker for subdir project
+    
+    if not all_files:
         print("No projects found.")
         return
 
-    for f in sorted(files):
+    def print_project(name, data):
+        goal = data.get("goal", "")[:50]
+        status = data.get("status", "unknown")
+        mode = data.get("mode", "linear")
+        done = sum(1 for t in data.get("stages", {}).values()
+                   if t.get("status") in ("done", "skipped"))
+        total = len(data.get("stages", {}))
+        print(f"  {name} [{status}] ({done}/{total}) mode={mode} {goal}")
+
+    for f in sorted(all_files):
         name = f.replace(".json", "")
         try:
-            with open(os.path.join(TASKS_DIR, f)) as fh:
-                data = json.load(fh)
-            goal = data.get("goal", "")[:50]
-            status = data.get("status", "unknown")
-            mode = data.get("mode", "linear")
-            done = sum(1 for t in data.get("stages", {}).values()
-                       if t.get("status") in ("done", "skipped"))
-            total = len(data.get("stages", {}))
-            print(f"  {name} [{status}] ({done}/{total}) mode={mode} {goal}")
-        except Exception:
-            print(f"  {name} [error reading]")
+            # 优先从根目录读取
+            root_path = os.path.join(TASKS_DIR, f)
+            if os.path.isfile(root_path):
+                with open(root_path) as fh:
+                    data = json.load(fh)
+                print_project(name, data)
+            else:
+                # 回退到 projects/ 子目录
+                tasks_path = os.path.join(TASKS_DIR, "projects", name, "tasks.json")
+                with open(tasks_path) as fh:
+                    data = json.load(fh)
+                print_project(name, data)
+        except Exception as e:
+            print(f"  {name} [error reading: {e}]")
 
 
 # ── cmd_log_analysis ─────────────────────────────────────────────────────────
@@ -1297,6 +1521,67 @@ def cmd_log_analysis(args):
         workspace=workspace,
     )
     print(f"✅ log-analysis: {args.project}/{args.task_id} appended to MEMORY.md")
+
+
+def cmd_archive(args):
+    """Archive completed projects by moving them to a completed/ subdirectory"""
+    TEAM_TASKS_DIR = TEAM_TASKS_DIR_DEFAULT
+    PROJECTS_DIR = os.path.join(TEAM_TASKS_DIR, "projects")
+    COMPLETED_DIR = os.path.join(PROJECTS_DIR, "completed")
+
+    os.makedirs(COMPLETED_DIR, exist_ok=True)
+
+    if args.all:
+        # Archive all completed projects
+        archived = 0
+        for name in os.listdir(PROJECTS_DIR):
+            proj_dir = os.path.join(PROJECTS_DIR, name)
+            if not os.path.isdir(proj_dir):
+                continue
+            tasks_file = os.path.join(proj_dir, "tasks.json")
+            if not os.path.exists(tasks_file):
+                continue
+            try:
+                with open(tasks_file) as f:
+                    data = json.load(f)
+                if data.get("status") == "completed":
+                    dest = os.path.join(COMPLETED_DIR, name)
+                    if os.path.exists(dest):
+                        if not args.force:
+                            print(f"⏭️  skip {name}: already exists in completed/")
+                            continue
+                        import shutil
+                        shutil.rmtree(dest)
+                    os.rename(proj_dir, dest)
+                    print(f"✅ archived {name}")
+                    archived += 1
+            except (json.JSONDecodeError, OSError) as e:
+                print(f"⚠️  skip {name}: {e}")
+        print(f"📦 Archived {archived} project(s)")
+        return
+
+    # Archive single project
+    project = args.project
+    tasks_file = task_file(project)
+    if not os.path.exists(tasks_file):
+        print(f"Error: project '{project}' not found", file=sys.stderr)
+        sys.exit(1)
+    with open(tasks_file) as f:
+        data = json.load(f)
+    if data.get("status") != "completed":
+        print(f"Error: project '{project}' status is '{data.get('status')}', must be 'completed' to archive", file=sys.stderr)
+        sys.exit(1)
+
+    proj_dir = os.path.join(PROJECTS_DIR, project)
+    dest = os.path.join(COMPLETED_DIR, project)
+    if os.path.exists(dest) and not args.force:
+        print(f"Error: {dest} already exists (use --force to overwrite)", file=sys.stderr)
+        sys.exit(1)
+    if os.path.exists(dest):
+        import shutil
+        shutil.rmtree(dest)
+    os.rename(proj_dir, dest)
+    print(f"✅ archived {project} → {COMPLETED_DIR}/")
 
 
 def cmd_clean_cooldown(args):
@@ -1365,6 +1650,8 @@ def main():
     p.add_argument("stage", help="任务 ID")
     p.add_argument("status", help="状态: pending|in-progress|done|failed|skipped")
     p.add_argument("--log-analysis", "-l", help="Append summary to MEMORY.md on done")
+    p.add_argument("--result", "-r", help="任务产出摘要（用于 gstack 验证）")
+    p.add_argument("--skip-gstack-verify", action="store_true", help="跳过 gstack 验证（coord 专用）")
 
     # claim
     p = sub.add_parser("claim", help="领取任务")
@@ -1395,6 +1682,11 @@ def main():
     p.add_argument("--workspace", "-w", default="/root/.openclaw", help="工作区根路径")
 
     # clean-cooldown（清理 cooldown.json 中的过期条目）
+    p = sub.add_parser("archive", help="Archive completed projects to completed/ subdirectory")
+    p.add_argument("project", nargs="?", help="Project name to archive")
+    p.add_argument("--all", action="store_true", help="Archive all completed projects at once")
+    p.add_argument("--force", action="store_true", help="Overwrite if destination exists")
+
     p = sub.add_parser("clean-cooldown", help="Clean stale entries from cooldown.json")
     p.add_argument("--file", "-f", help="cooldown.json 路径")
     p.add_argument("--ttl-seconds", "-t", type=int, help="TTL 秒数（默认 86400）")
@@ -1425,6 +1717,7 @@ def main():
         "list": cmd_list,
         "result": cmd_result,
         "log-analysis": cmd_log_analysis,
+        "archive": cmd_archive,
         "clean-cooldown": cmd_clean_cooldown,
         "check-dup": cmd_check_dup,
         "health": cmd_health,

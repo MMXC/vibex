@@ -501,9 +501,24 @@ export const useCanvasStore = create<CanvasStore>()(
               onThinking: (content: string) => {
                 setAiThinking(true, content);
               },
-              onStepContext: (content: string, _mermaidCode: string | undefined, confidence: number | undefined) => {
+              onStepContext: (content: string, _mermaidCode: string | undefined, confidence: number | undefined, boundedContexts) => {
                 setAiThinking(true, content);
-                if (confidence !== undefined && confidence > 0.5) {
+                // Map backend type to valid BoundedContextNode type
+                const mapContextType = (type: string): BoundedContextNode['type'] => {
+                  const validTypes = ['core', 'supporting', 'generic', 'external'];
+                  return validTypes.includes(type) ? type as BoundedContextNode['type'] : 'core';
+                };
+                // Loop through boundedContexts and add each one
+                if (boundedContexts && boundedContexts.length > 0) {
+                  boundedContexts.forEach((ctx) => {
+                    addContextNode({
+                      name: ctx.name,
+                      description: ctx.description,
+                      type: mapContextType(ctx.type),
+                    });
+                  });
+                } else if (confidence !== undefined && confidence > 0.5) {
+                  // Fallback: single node if no boundedContexts
                   addContextNode({
                     name: 'AI 分析上下文',
                     description: content,

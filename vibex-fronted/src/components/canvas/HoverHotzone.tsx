@@ -8,7 +8,6 @@
 
 import React, { useState } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
-import type { PanelExpandState } from '@/lib/canvas/types';
 import styles from './hoverHotzone.module.css';
 
 interface HoverHotzoneProps {
@@ -47,6 +46,7 @@ export function HoverHotzone({ position, panel }: HoverHotzoneProps) {
 
   const togglePanel = useCanvasStore((s) => s.togglePanel);
   const resetExpand = useCanvasStore((s) => s.resetExpand);
+  const isDragging = useCanvasStore((s) => s.isDragging);
 
   const expandState = useCanvasStore((s) => {
     if (panel === 'left') return s.leftExpand;
@@ -66,6 +66,7 @@ export function HoverHotzone({ position, panel }: HoverHotzoneProps) {
   })();
 
   const handleClick = () => {
+    if (isDragging) return; // E3: disable expand during drag
     if (expandState !== 'default') {
       resetExpand();
     } else {
@@ -74,25 +75,28 @@ export function HoverHotzone({ position, panel }: HoverHotzoneProps) {
   };
 
   const handleDoubleClick = () => {
+    if (isDragging) return;
     resetExpand();
   };
 
-  const label =
-    expandState === 'default'
+  const label = isDragging
+    ? '拖拽中禁用'
+    : expandState === 'default'
       ? `展开 ${panel} 面板`
       : `收缩 ${panel} 面板`;
 
   return (
     <button
       type="button"
-      className={`${styles.hotzone} ${position === 'left-edge' ? styles.leftEdge : styles.rightEdge}`}
-      onMouseEnter={() => setHovered(true)}
+      className={`${styles.hotzone} ${position === 'left-edge' ? styles.leftEdge : styles.rightEdge} ${isDragging ? styles.hotzoneDisabled : ''}`}
+      onMouseEnter={() => !isDragging && setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
       aria-label={label}
       title={label}
-      tabIndex={0}
+      tabIndex={isDragging ? -1 : 0}
+      disabled={isDragging}
     >
       <div className={`${styles.indicator} ${hovered ? styles.indicatorVisible : ''}`}>
         <ExpandArrow direction={hovered && expandState !== 'default' ? 'contract' : arrowDirection} />

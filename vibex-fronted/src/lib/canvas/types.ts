@@ -204,7 +204,45 @@ export interface ExpandSlice {
   resetExpand: () => void;
 }
 
-export type CanvasStore = CanvasSlice & ContextSlice & FlowSlice & ComponentSlice & QueueSlice & ExpandSlice;
+export type CanvasStore = CanvasSlice & ContextSlice & FlowSlice & ComponentSlice & QueueSlice & ExpandSlice & DragSlice;
+
+// =============================================================================
+// Drag State (E3)
+// =============================================================================
+
+/** 节点拖拽位置 */
+export interface Position {
+  x: number;
+  y: number;
+}
+
+/** 拖拽状态切片 */
+export interface DragSlice {
+  /** 当前正在拖拽的节点 ID */
+  draggedNodeId: string | null;
+  /** 拖拽目标覆盖节点 ID */
+  dragOverNodeId: string | null;
+  /**
+   * 用户手动拖拽的节点位置映射
+   * key: nodeId, value: Position
+   * 优先级高于自动布局
+   */
+  draggedPositions: Record<string, Position>;
+  /** 是否正在拖拽中（禁用面板展开热区） */
+  isDragging: boolean;
+  /** 开始拖拽 */
+  startDrag: (nodeId: string) => void;
+  /** 结束拖拽并记录位置 */
+  endDrag: (nodeId: string, position: Position) => void;
+  /** 设置拖拽覆盖目标 */
+  setDragOver: (nodeId: string | null) => void;
+  /** 更新拖拽位置（实时同步） */
+  updateDraggedPosition: (nodeId: string, position: Position) => void;
+  /** 清除所有拖拽位置 */
+  clearDragPositions: () => void;
+  /** 清除单个节点拖拽位置 */
+  clearDragPosition: (nodeId: string) => void;
+}
 
 // =============================================================================
 // API Types

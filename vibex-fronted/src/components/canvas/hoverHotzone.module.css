@@ -67,3 +67,10 @@
   background: rgba(99, 102, 241, 0.15);
   border-color: var(--color-accent);
 }
+
+/* E3: Disabled during drag */
+.hotzoneDisabled {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.3;
+}

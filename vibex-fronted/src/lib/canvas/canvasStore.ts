@@ -106,6 +106,24 @@ interface CanvasStore {
   togglePanel: (panel: 'left' | 'center' | 'right') => void;
   resetExpand: () => void;
 
+  // === Drag Slice (E3) ===
+  draggedNodeId: string | null;
+  dragOverNodeId: string | null;
+  draggedPositions: Record<string, { x: number; y: number }>;
+  isDragging: boolean;
+  /** Begin dragging a node — sets draggedNodeId and isDragging */
+  startDrag: (nodeId: string) => void;
+  /** End dragging — saves position and clears drag state */
+  endDrag: (nodeId: string, position: { x: number; y: number }) => void;
+  /** Track which node we're dragging over (drop target) */
+  setDragOver: (nodeId: string | null) => void;
+  /** Live update position during drag */
+  updateDraggedPosition: (nodeId: string, position: { x: number; y: number }) => void;
+  /** Clear all drag state and positions */
+  clearDragPositions: () => void;
+  /** Clear single node's dragged position */
+  clearDragPosition: (nodeId: string) => void;
+
   // === Context Slice ===
   contextNodes: BoundedContextNode[];
   contextDraft: Partial<BoundedContextNode> | null;
@@ -626,6 +644,40 @@ export const useCanvasStore = create<CanvasStore>()(
             }));
           },
 
+          // === Drag Slice (E3) ===
+          draggedNodeId: null,
+          dragOverNodeId: null,
+          draggedPositions: {},
+          isDragging: false,
+
+          startDrag: (nodeId) => set({ draggedNodeId: nodeId, isDragging: true }),
+
+          endDrag: (nodeId, position) => {
+            set((s) => ({
+              draggedPositions: { ...s.draggedPositions, [nodeId]: position },
+              draggedNodeId: null,
+              isDragging: false,
+            }));
+          },
+
+          setDragOver: (nodeId) => set({ dragOverNodeId: nodeId }),
+
+          updateDraggedPosition: (nodeId, position) => {
+            set((s) => ({
+              draggedPositions: { ...s.draggedPositions, [nodeId]: position },
+            }));
+          },
+
+          clearDragPositions: () => set({ draggedPositions: {}, draggedNodeId: null, dragOverNodeId: null, isDragging: false }),
+
+          clearDragPosition: (nodeId) => {
+            set((s) => {
+              const next = { ...s.draggedPositions };
+              delete next[nodeId];
+              return { draggedPositions: next };
+            });
+          },
+
           // === Tree Activation Logic ===
           recomputeActiveTree: () => {
             const { contextNodes, flowNodes, phase } = get();
@@ -677,6 +729,8 @@ export const useCanvasStore = create<CanvasStore>()(
           contextNodes: state.contextNodes,
           flowNodes: state.flowNodes,
           componentNodes: state.componentNodes,
+          // E3: persist dragged positions so drag state survives page refresh
+          draggedPositions: state.draggedPositions,
         }),
       }
     ),

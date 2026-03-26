@@ -6,6 +6,35 @@
   min-height: 400px;
 }
 
+/* E3: Drag state — disable panel expand hotzones during drag */
+.isDragging {
+  user-select: none;
+}
+
+/* E3: Drag placeholder — semi-transparent node being dragged */
+:global(.react-flow__node) {
+  transition: opacity 0.15s ease;
+}
+
+:global(.react-flow__node[data-dragging="true"]) {
+  opacity: 0.5;
+  cursor: grabbing !important;
+}
+
+/* E3: Drag ghost cursor */
+:global(.react-flow__node:hover) {
+  cursor: grab;
+}
+
+/* Drag handle indicator on card */
+:global(.react-flow__node) {
+  cursor: grab;
+}
+
+:global(.react-flow__node:active) {
+  cursor: grabbing;
+}
+
 .empty {
   display: flex;
   flex-direction: column;

@@ -31,6 +31,7 @@ import '@xyflow/react/dist/style.css';
 import { CardTreeNode } from '../CardTreeNode/CardTreeNode';
 import type { CardTreeVisualizationRaw, CardTreeNodeData } from '@/types/visualization';
 import type { FlowGateway, GatewayNodeData, LoopEdgeData } from '@/lib/canvas/types';
+import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import styles from './CardTreeRenderer.module.css';
 
 // Re-export CardTreeNode type for external use
@@ -110,7 +111,9 @@ function buildFlowGraph(
   data: CardTreeVisualizationRaw | null,
   expandedIds?: Set<string>,
   extraEdges: Edge[] = [],
-  flowGateways: FlowGateway[] = []
+  flowGateways: FlowGateway[] = [],
+  /** E3: User-dragged positions override auto layout */
+  draggedPositions: Record<string, { x: number; y: number }> = {}
 ): {
   nodes: Node[];
   edges: Edge[];
@@ -122,7 +125,7 @@ function buildFlowGraph(
   const nodes: Node[] = data.nodes.map((card, index) => ({
     id: card.title,
     type: 'cardTreeNode',
-    position: {
+    position: draggedPositions[card.title] ?? {
       x: CENTER_X,
       y: index * (CARD_HEIGHT + CARD_MARGIN_Y),
     },
@@ -288,6 +291,13 @@ function InternalRenderer({
   onInit,
   className,
 }: InternalRendererProps) {
+  // E3: Drag state from canvasStore
+  const draggedPositions = useCanvasStore((s) => s.draggedPositions);
+  const draggedNodeId = useCanvasStore((s) => s.draggedNodeId);
+  const startDrag = useCanvasStore((s) => s.startDrag);
+  const endDrag = useCanvasStore((s) => s.endDrag);
+  const updateDraggedPosition = useCanvasStore((s) => s.updateDraggedPosition);
+
   // Merge custom edgeTypes with built-in loop edge type
   const mergedEdgeTypes = useMemo(
     () => ({ ...getEdgeTypes(), ...edgeTypes }),
@@ -295,24 +305,50 @@ function InternalRenderer({
   );
 
   const { nodes: initialNodes, edges: initialEdges } = useMemo(
-    () => buildFlowGraph(data ?? null, expandedIds, extraEdges, flowGateways),
-    [data, expandedIds, extraEdges, flowGateways]
+    () => buildFlowGraph(data ?? null, expandedIds, extraEdges, flowGateways, draggedPositions),
+    [data, expandedIds, extraEdges, flowGateways, draggedPositions]
   );
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
-  // Sync data changes
+  // E3: Sync data changes + dragged positions
   React.useEffect(() => {
     const { nodes: newNodes, edges: newEdges } = buildFlowGraph(
       data ?? null,
       expandedIds,
       extraEdges,
-      flowGateways
+      flowGateways,
+      draggedPositions
     );
     setNodes(newNodes);
     setEdges(newEdges);
-  }, [data, expandedIds, extraEdges, flowGateways, setNodes, setEdges]);
+  }, [data, expandedIds, extraEdges, flowGateways, draggedPositions, setNodes, setEdges]);
+
+  // E3: Drag event handlers
+  const handleNodeDragStart = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      if (readonly) return;
+      startDrag(node.id);
+    },
+    [readonly, startDrag]
+  );
+
+  const handleNodeDrag = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      if (readonly) return;
+      updateDraggedPosition(node.id, node.position);
+    },
+    [readonly, updateDraggedPosition]
+  );
+
+  const handleNodeDragStop = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      if (readonly) return;
+      endDrag(node.id, node.position);
+    },
+    [readonly, endDrag]
+  );
 
   // Handle expand/collapse toggle
   const handleToggleExpand = useCallback(
@@ -364,10 +400,20 @@ function InternalRenderer({
     );
   }
 
+  // E3: Add dragging class when actively dragging
+  const containerClassName = [
+    styles.container,
+    draggedNodeId ? styles.isDragging : '',
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <div
-      className={`${styles.container} ${className ? ` ${className}` : ''}`}
+      className={containerClassName}
       data-testid="cardtree-renderer"
+      data-dragging={!!draggedNodeId}
     >
       <ReactFlow
         nodes={nodes}
@@ -385,6 +431,9 @@ function InternalRenderer({
         elementsSelectable={!readonly}
         onNodeClick={handleNodeClick}
         onNodeDoubleClick={handleToggleExpand}
+        onNodeDragStart={readonly ? undefined : handleNodeDragStart}
+        onNodeDrag={readonly ? undefined : handleNodeDrag}
+        onNodeDragStop={readonly ? undefined : handleNodeDragStop}
         onInit={onInit}
       >
         {showControls && <Controls className={styles.controls} />}

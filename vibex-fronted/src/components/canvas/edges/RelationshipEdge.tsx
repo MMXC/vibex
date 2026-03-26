@@ -19,6 +19,7 @@
 import React, { useState, useCallback } from 'react';
 import { getBezierPath, EdgeLabelRenderer, BaseEdge, type EdgeProps, Position } from '@xyflow/react';
 import type { ContextRelationship } from '@/lib/canvas/types';
+import type { RelationshipEdgeFull } from '@/lib/canvas/types';
 import styles from './RelationshipEdge.module.css';
 
 export interface RelationshipEdgeData extends Record<string, unknown> {
@@ -27,7 +28,7 @@ export interface RelationshipEdgeData extends Record<string, unknown> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function RelationshipEdge(props: EdgeProps<any>) {
+export function RelationshipEdge(props: EdgeProps<RelationshipEdgeFull>) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, data, selected, markerEnd } = props as any as {
     id: string; sourceX: number; sourceY: number; targetX: number; targetY: number;

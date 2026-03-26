@@ -339,10 +339,10 @@ export interface CascadeResult {
 import type { Node, Edge } from '@xyflow/react';
 
 /** Full ReactFlow node type for GatewayNode */
-export type GatewayNode = Node<GatewayNodeData, 'gateway'>;
+export type GatewayNodeFull = Node<GatewayNodeData, 'gateway'>;
 
 /** Full ReactFlow edge type for LoopEdge */
-export type LoopEdge = Edge<LoopEdgeData, 'loop'>;
+export type LoopEdgeFull = Edge<LoopEdgeData, 'loop'>;
 
 /** Full ReactFlow edge type for RelationshipEdge */
-export type RelationshipEdge = Edge<RelationshipEdgeData, 'relationship'>;
+export type RelationshipEdgeFull = Edge<RelationshipEdgeData, 'relationship'>;

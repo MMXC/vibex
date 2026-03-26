@@ -99,6 +99,9 @@ export interface CardTreeNodeData extends Record<string, unknown> {
   updatedAt?: string;
 }
 
+/** Full ReactFlow node type for CardTreeNode */
+export type CardTreeNodeFull = Node<CardTreeNodeData, 'cardTreeNode'>;
+
 /** CardTree visualization data */
 export interface CardTreeVisualizationData extends VisualizationData<CardTreeVisualizationRaw> {
   type: 'cardtree';

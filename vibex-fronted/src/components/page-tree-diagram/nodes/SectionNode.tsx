@@ -4,7 +4,8 @@
  */
 
 import { memo } from 'react';
-import { Handle, Position, NodeProps } from '@xyflow/react';
+import { Handle, Position, type NodeProps } from '@xyflow/react';
+import type { Node } from '@xyflow/react';
 
 interface SectionNodeData extends Record<string, unknown> {
   label: string;
@@ -12,10 +13,11 @@ interface SectionNodeData extends Record<string, unknown> {
   nodeType: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function SectionNodeComponent(props: NodeProps<any>) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, selected } = props as any as { data: SectionNodeData; selected: boolean };
+type SectionNodeType = Node<SectionNodeData, 'section'>;
+
+function SectionNodeComponent(props: NodeProps<SectionNodeType>) {
+  const data = props.data as SectionNodeData;
+  const selected = props.selected;
   return (
     <div className="section-node" style={{
       padding: '6px 12px',

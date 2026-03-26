@@ -11,7 +11,7 @@
 
 import React, { memo } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
-import type { GatewayNodeData } from '@/lib/canvas/types';
+import type { GatewayNodeData, GatewayNodeFull } from '@/lib/canvas/types';
 import styles from './GatewayNode.module.css';
 
 const GATEWAY_SIZE = 60;
@@ -34,10 +34,10 @@ function GatewaySymbol({ type }: { type: GatewayNodeData['gatewayType'] }) {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function GatewayNodeComponent(props: NodeProps<any>) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, selected } = props as any as { data: GatewayNodeData; selected: boolean };
+function GatewayNodeComponent(props: NodeProps<GatewayNodeFull>) {
+  const data = props.data as GatewayNodeData;
+  const selected = props.selected;
+
   const gatewayType = data.gatewayType ?? 'xor';
   const label = data.label;
   const condition = data.condition;

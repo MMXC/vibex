@@ -3,41 +3,35 @@
  *
  * Epic 2: vibex-three-trees-enhancement
  * Visual: Dashed line with curved path + loop label
- * - stroke-dasharray: "6,3" (dashed)
- * - stroke: #ef4444 (red to indicate loop)
- * - label: "循环" or custom condition text
  */
 
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { memo, useState, useCallback } from 'react';
 import {
   getBezierPath,
   EdgeLabelRenderer,
   BaseEdge,
   type EdgeProps,
-  Position,
 } from '@xyflow/react';
 import type { LoopEdgeData } from '@/lib/canvas/types';
+import type { LoopEdgeFull } from '@/lib/canvas/types';
 import styles from './LoopEdge.module.css';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function LoopEdge(props: EdgeProps<any>) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, data, selected, markerEnd } = props as any as {
-    id: string; sourceX: number; sourceY: number; targetX: number; targetY: number;
-    sourcePosition: Position; targetPosition: Position;
-    data: LoopEdgeData; selected: boolean; markerEnd: string;
-  };
+export const LoopEdge = memo(function LoopEdgeComponent(props: EdgeProps<LoopEdgeFull>) {
+  const data = props.data as LoopEdgeData;
+  const selected = props.selected;
+  const markerEnd = props.markerEnd;
+
   const [hovered, setHovered] = useState(false);
 
   const [edgePath, labelX, labelY] = getBezierPath({
-    sourceX,
-    sourceY,
-    sourcePosition,
-    targetX,
-    targetY,
-    targetPosition,
+    sourceX: props.sourceX,
+    sourceY: props.sourceY,
+    sourcePosition: props.sourcePosition,
+    targetX: props.targetX,
+    targetY: props.targetY,
+    targetPosition: props.targetPosition,
   });
 
   const loopLabel = data?.loopLabel ?? '↩ 循环';
@@ -47,19 +41,17 @@ export function LoopEdge(props: EdgeProps<any>) {
   const handleClick = useCallback(
     (event: React.MouseEvent) => {
       event.stopPropagation();
-      console.debug('[LoopEdge] clicked:', id);
+      console.debug('[LoopEdge] clicked:', props.id);
     },
-    [id]
+    [props.id]
   );
 
-  // Curved path for loop back (go upward — source below target)
-  const isBackward = targetY < sourceY;
+  const isBackward = props.targetY < props.sourceY;
   const strokeColor = isBackward ? '#ef4444' : '#f97316';
   const strokeDasharray = '6,3';
 
   return (
     <>
-      {/* Invisible hit area for hover/click */}
       <path
         d={edgePath}
         fill="none"
@@ -70,22 +62,18 @@ export function LoopEdge(props: EdgeProps<any>) {
         onClick={handleClick}
         className={styles.hitArea}
       />
-
-      {/* Visible dashed loop edge */}
       <BaseEdge
-        id={id}
+        id={props.id}
         path={edgePath}
         markerEnd={markerEnd}
         style={{
-          stroke: isHighlighted ? strokeColor : strokeColor,
+          stroke: strokeColor,
           strokeWidth: isHighlighted ? 2.5 : 2,
           strokeDasharray,
           filter: isHighlighted ? `drop-shadow(0 0 4px ${strokeColor})` : undefined,
           transition: 'filter 0.2s ease, stroke-width 0.2s ease',
         }}
       />
-
-      {/* Loop label */}
       <EdgeLabelRenderer>
         <div
           className={styles.edgeLabel}
@@ -106,6 +94,6 @@ export function LoopEdge(props: EdgeProps<any>) {
       </EdgeLabelRenderer>
     </>
   );
-}
+});
 
 export default LoopEdge;

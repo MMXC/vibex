@@ -4,7 +4,8 @@
  */
 
 import { memo } from 'react';
-import { Handle, Position, NodeProps } from '@xyflow/react';
+import { Handle, Position, type NodeProps } from '@xyflow/react';
+import type { Node } from '@xyflow/react';
 
 interface ComponentNodeData extends Record<string, unknown> {
   label: string;
@@ -12,10 +13,11 @@ interface ComponentNodeData extends Record<string, unknown> {
   nodeType: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function ComponentNodeComponent(props: NodeProps<any>) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, selected } = props as any as { data: ComponentNodeData; selected: boolean };
+type ComponentNodeType = Node<ComponentNodeData, 'component'>;
+
+function ComponentNodeComponent(props: NodeProps<ComponentNodeType>) {
+  const data = props.data as ComponentNodeData;
+  const selected = props.selected;
   return (
     <div className="component-node" style={{
       padding: '8px 14px',

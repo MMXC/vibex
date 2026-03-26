@@ -4,7 +4,8 @@
  */
 
 import { memo } from 'react';
-import { Handle, Position, NodeProps } from '@xyflow/react';
+import { Handle, Position, type NodeProps } from '@xyflow/react';
+import type { Node } from '@xyflow/react';
 
 interface PageNodeData extends Record<string, unknown> {
   label: string;
@@ -12,8 +13,10 @@ interface PageNodeData extends Record<string, unknown> {
   nodeType: string;
 }
 
+type PageNodeType = Node<PageNodeData, 'page'>;
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function PageNodeComponent(props: NodeProps<any>) {
+function PageNodeComponent(props: NodeProps<PageNodeType>) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, selected } = props as any as { data: PageNodeData; selected: boolean };
   return (

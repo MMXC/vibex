@@ -112,18 +112,29 @@ expect(getGridTemplate(store.getState())).toBe('1.5fr 1.5fr 0fr');
 ## Epic E5: E2E 集成测试
 
 **目标**: 全链路验收，覆盖展开+拖拽+持久化
-**负责人**: Tester
+**负责人**: Dev | **测试**: Tester
 
 ### 任务清单
 
-- [ ] `e2e/canvas-expand.spec.ts`
-  - [ ] 三栏默认等分
-  - [ ] 点击左栏热区 → 左栏展开动画
-  - [ ] 点击右栏热区 → 右栏展开动画
-  - [ ] 双击热区 → 恢复默认
-  - [ ] 卡片拖拽 → 新位置保存
-  - [ ] 刷新页面 → 位置恢复
-  - [ ] 虚线领域框渲染
+- [x] `e2e/canvas-expand.spec.ts` (commit: `ef9b3de2`)
+  - [x] 三栏默认等分 (E5.1)
+  - [x] 悬停热区显示展开指示器 (E5.2)
+  - [x] 点击热区触发展开动画 (E5.3)
+  - [x] 双击热区恢复默认 (E5.4)
+  - [x] ReactFlow 画布可交互 (E5.5)
+  - [x] 拖拽后位置保存到 draggedPositions (E5.6)
+  - [x] 刷新页面后拖拽位置恢复 (E5.7)
+  - [x] 拖拽中禁用面板展开热区 (E5.8)
+  - [x] BoundedGroup 组件存在性 (E5.9)
+  - [x] BoundedGroup 虚线边框样式 (E5.10)
+  - [x] 页面加载无 JS 错误 (E5.11)
+  - [x] PhaseProgressBar 显示正确阶段 (E5.12)
+  - [x] 移动端 Tab 模式切换 (E5.13)
+
+### Epic E5 完成状态: 🚧 已创建 (2026-03-27 07:22 UTC+8)
+- `e2e/canvas-expand.spec.ts`: 13 E2E 测试用例 ✅
+- commit: `ef9b3de2`
+- 待 Tester 执行 `pnpm e2e` 验证
 
 ---
 

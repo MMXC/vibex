@@ -79,6 +79,13 @@ export function CardTreeView({
   });
 
   // Unified error handling via useErrorHandler
+  // Memoize onError to prevent handleError recreation → infinite loop
+  const handleCardTreeError = React.useCallback((err: unknown) => {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('[CardTree] Error:', err);
+    }
+  }, []);
+
   const {
     userMessage: errorUserMessage,
     isRetryable,
@@ -86,11 +93,7 @@ export function CardTreeView({
     handleError,
     clearError,
   } = useErrorHandler({
-    onError: (err) => {
-      if (process.env.NODE_ENV !== 'production') {
-        console.error('[CardTree] Error:', err);
-      }
-    },
+    onError: handleCardTreeError,
   });
 
   // Sync useProjectTree error into useErrorHandler

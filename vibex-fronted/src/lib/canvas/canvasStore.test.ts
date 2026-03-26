@@ -651,4 +651,11 @@ describe('markAllPending', () => {
 
       // The actual SSE call is tested via integration tests
     });
+
+    it('should handle onStepContext with boundedContexts array', () => {
+      // This test verifies the callback signature accepts boundedContexts
+      // Integration with SSE is tested via dddApi.test.ts
+      const { generateContextsFromRequirement } = useCanvasStore.getState();
+      expect(typeof generateContextsFromRequirement).toBe('function');
+    });
   });

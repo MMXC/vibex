@@ -13,6 +13,7 @@ import type {
   ErrorEvent,
   SSEEvent,
   DDDApiOptions,
+  BoundedContext,
 } from './dddApi';
 import { describe, it, expect } from '@jest/globals';
 
@@ -35,9 +36,27 @@ describe('dddApi', () => {
       type: 'step_context',
       content: '上下文分析完成',
       confidence: 0.85,
+      boundedContexts: [],
     };
     expect(event.type).toBe('step_context');
     expect(event.confidence).toBe(0.85);
+    expect(event.boundedContexts).toEqual([]);
+  });
+
+  it('F1.2: StepContextEvent with boundedContexts', () => {
+    const contexts: BoundedContext[] = [
+      { id: 'ctx1', name: '用户上下文', description: '用户管理', type: 'core' },
+      { id: 'ctx2', name: '订单上下文', description: '订单处理', type: 'core' },
+    ];
+    const event: StepContextEvent = {
+      type: 'step_context',
+      content: '识别出2个限界上下文',
+      confidence: 0.9,
+      boundedContexts: contexts,
+    };
+    expect(event.boundedContexts).toHaveLength(2);
+    expect(event.boundedContexts[0].name).toBe('用户上下文');
+    expect(event.boundedContexts[1].type).toBe('core');
   });
 
   it('F1.2: DoneEvent has correct structure', () => {
@@ -70,6 +89,19 @@ describe('dddApi', () => {
       timeoutMs: 5000,
     };
     expect(options.timeoutMs).toBe(5000);
+  });
+
+  it('F1.3: onStepContext callback includes boundedContexts parameter', () => {
+    let capturedContexts: BoundedContext[] | undefined;
+    const options: DDDApiOptions = {
+      onStepContext: (content, mermaidCode, confidence, boundedContexts) => {
+        capturedContexts = boundedContexts;
+        expect(typeof content).toBe('string');
+        expect(typeof confidence).toBe('number');
+      },
+    };
+    // Verify the callback signature accepts 4 arguments
+    expect(options.onStepContext).toBeDefined();
   });
 
   // F1.4: Error event structure

@@ -90,17 +90,17 @@ expect(getGridTemplate(store.getState())).toBe('1.5fr 1.5fr 0fr');
 
 ### 任务清单
 
-- [ ] 新建 `src/components/canvas/groups/BoundedGroup.tsx`
-- [ ] SVG overlay 渲染，监听节点位置变化动态更新 rect
-- [ ] 支持拖拽时动态调整 rect 大小
-- [ ] `BoundedGroupStore`（可选，简单用 context）管理分组数据
-- [ ] 单元测试
+- [x] 新建 `src/components/canvas/groups/BoundedGroupOverlay.tsx`
+- [x] SVG overlay 渲染，监听节点位置变化动态更新 rect
+- [x] 支持拖拽时动态调整 rect 大小（viewport tracking via onInit/onMoveEnd）
+- [x] BoundedGroupSlice 管理分组数据（add/remove/toggle/assign nodes）
+- [x] 单元测试 (boundedGroup.test.ts, 23 tests pass)
 
 ### 验收标准
 
-- 虚线框包裹指定卡片组
-- 拖拽卡片时框跟随
-- 无性能问题（最多 10 个领域框）
+- [x] 虚线框包裹指定卡片组
+- [x] 拖拽卡片时框跟随（viewport-aware overlay）
+- [x] 无性能问题（最多 10 个领域框）
 
 ---
 

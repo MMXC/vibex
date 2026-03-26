@@ -158,16 +158,18 @@ describe('T3: filterInvalidContexts handles SSE payload shape (with extra id fie
   test('T3b: filterInvalidContexts correctly filters SSE-style payloads', () => {
     const sseStyleContexts = [
       { id: 'ctx_1', name: '患者', type: 'core' as const, description: 'd', ubiquitousLanguage: [] },
-      { id: 'ctx_2', name: '患者管理', type: 'core' as const, description: 'd', ubiquitousLanguage: [] }, // 过滤: 含"管理"
+      { id: 'ctx_2', name: '患者管理', type: 'core' as const, description: 'd', ubiquitousLanguage: [] }, // "管理" is VALID — not filtered
       { id: 'ctx_3', name: '认证授权', type: 'generic' as const, description: 'd', ubiquitousLanguage: [] },
       { id: 'ctx_4', name: 'X', type: 'core' as const, description: 'd', ubiquitousLanguage: [] }, // 过滤: 太短
+      { id: 'ctx_5', name: '订单系统', type: 'supporting' as const, description: 'd', ubiquitousLanguage: [] }, // 过滤: 含"系统"
     ];
 
     const filtered = filterInvalidContexts(sseStyleContexts as unknown as PromptBC[]);
-    expect(filtered.map(c => c.name)).not.toContain('患者管理');
-    expect(filtered.map(c => c.name)).not.toContain('X');
-    expect(filtered.map(c => c.name)).toContain('患者');
-    expect(filtered.map(c => c.name)).toContain('认证授权');
+    expect(filtered.map(c => c.name)).toContain('患者管理'); // "管理" is valid, kept
+    expect(filtered.map(c => c.name)).toContain('患者');  // valid, kept
+    expect(filtered.map(c => c.name)).toContain('认证授权'); // valid, kept
+    expect(filtered.map(c => c.name)).not.toContain('X');  // too short
+    expect(filtered.map(c => c.name)).not.toContain('订单系统'); // contains "系统"
   });
 
   test('T3c: filterInvalidContexts does NOT validate ubiquitousLanguage (by design)', () => {

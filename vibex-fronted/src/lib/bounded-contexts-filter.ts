@@ -22,8 +22,8 @@ export interface FilterOptions {
 
 const DEFAULT_OPTIONS: Required<FilterOptions> = {
   minNameLength: 2,
-  maxNameLength: 10,
-  forbiddenNames: ['管理', '系统', '模块', '功能', '平台'],
+  maxNameLength: 12,
+  forbiddenNames: ['系统', '模块', '功能', '平台'],
   minCoreRatio: 0.4,
   maxCoreRatio: 0.7,
 };

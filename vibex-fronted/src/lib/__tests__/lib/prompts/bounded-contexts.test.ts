@@ -81,14 +81,10 @@ describe('isNameFiltered (filter module)', () => {
     expect(isNameFiltered('管理系统平台模块功能')).toBe(true);
   });
 
-  test('filters forbidden pattern "管理"', () => {
-    expect(isNameFiltered('患者管理')).toBe(true);
+  test('filters forbidden patterns (系统/模块/功能/平台) — "管理" is VALID DDD term', () => {
+    expect(isNameFiltered('订单系统')).toBe(true);   // contains "系统"
+    expect(isNameFiltered('患者管理')).toBe(false); // "管理" is NOT forbidden
     expect(isNameFiltered('患者')).toBe(false);
-  });
-
-  test('filters forbidden pattern "系统"', () => {
-    expect(isNameFiltered('订单系统')).toBe(true);
-    expect(isNameFiltered('订单')).toBe(false);
   });
 
   test('accepts valid Chinese context names', () => {
@@ -112,14 +108,16 @@ describe('filterInvalidContexts', () => {
     { name: '模块X', type: 'supporting', description: 'test', ubiquitousLanguage: [] },
   ];
 
-  test('filters out "管理" suffix by default', () => {
+  test('"管理" names are KEPT — "模块X" is filtered (contains "模块")', () => {
     const filtered = filterInvalidContexts(contexts);
-    expect(filtered.map(c => c.name)).not.toContain('患者管理');
-    expect(filtered.map(c => c.name)).not.toContain('问诊管理');
+    expect(filtered.map(c => c.name)).toContain('患者管理');  // "管理" is valid
+    expect(filtered.map(c => c.name)).toContain('问诊管理'); // "管理" is valid
+    expect(filtered.map(c => c.name)).not.toContain('模块X'); // contains "模块"
   });
 
-  test('keeps valid names', () => {
+  test('keeps valid names including DDD "管理" terms', () => {
     const filtered = filterInvalidContexts(contexts);
+    expect(filtered.map(c => c.name)).toContain('患者管理');
     expect(filtered.map(c => c.name)).toContain('患者');
     expect(filtered.map(c => c.name)).toContain('认证授权');
   });

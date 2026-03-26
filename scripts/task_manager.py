@@ -1281,13 +1281,8 @@ def cmd_update(args):
         check_dag_completion(data)
         data["updated"] = now_iso()
         # F3.1: use optimistic lock
-        try:
-            new_rev = save_project_with_lock(args.project, data, expected_rev=expected_rev)
-            print(f"✅ {stage_id}: {old_status} → {new_status} (rev {expected_rev} → {new_rev})")
-        except RuntimeError as e:
-            print(f"❌ Update failed (concurrent modification): {e}", file=sys.stderr)
-            sys.exit(1)
-            return
+        new_rev = save_project_with_lock(args.project, data, expected_rev=expected_rev)
+        print(f"✅ {stage_id}: {old_status} → {new_status} (rev {expected_rev} → {new_rev})")
 
         if new_status == "done":
             ready = compute_ready_tasks(data)
@@ -1307,12 +1302,8 @@ def cmd_update(args):
     else:
         data["updated"] = now_iso()
         # F3.1: use optimistic lock
-        try:
-            new_rev = save_project_with_lock(args.project, data, expected_rev=expected_rev)
-            print(f"✅ {stage_id}: {old_status} → {new_status} (rev {expected_rev} → {new_rev})")
-        except RuntimeError as e:
-            print(f"❌ Update failed (concurrent modification): {e}", file=sys.stderr)
-            sys.exit(1)
+        new_rev = save_project_with_lock(args.project, data, expected_rev=expected_rev)
+        print(f"✅ {stage_id}: {old_status} → {new_status} (rev {expected_rev} → {new_rev})")
 
 
 # ── cmd_claim ──────────────────────────────────────────────────────
@@ -1382,13 +1373,10 @@ def cmd_claim(args):
 
     data["updated"] = now_iso()
     # F3.2: use optimistic lock
-    try:
-        new_rev = save_project_with_lock(args.project, data, expected_rev=expected_rev)
-        print(f"✅ Claimed: {stage_id} (rev {expected_rev} → {new_rev})")
-    except RuntimeError as e:
-        print(f"❌ Claim failed (concurrent modification): {e}", file=sys.stderr)
-        sys.exit(1)
-        new_rev = None
+    new_rev = save_project_with_lock(args.project, data, expected_rev=expected_rev)
+
+    # 输出任务详情
+    print(f"✅ Claimed: {stage_id} (rev {expected_rev} → {new_rev})")
     print()
     print(f"## 项目目标")
     print(f"{data.get('goal', '')}")

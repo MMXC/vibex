@@ -1,22 +1,21 @@
 # Changelog
 
-## [Unreleased]
-
-## [v1.0.89] - 2026-03-26
-
-### Added
-- **vibex-task-state-20260326**: Epic3 — 重构与迁移
-  - `cmd_update` / `cmd_claim` 迁移到 `save_project_with_lock()` (乐观锁)
-  - `test_task_state_concurrency.py`: 新增 3 Epic3 tests (13 total)
-  - Review: `docs/review-reports/20260326/review-vibex-task-state-20260326-epic3.md`
-  - Fix: `cmd_update`/`cmd_claim` 并发异常捕获 (task_manager.py 3处)
-  - 25/25 tests pass (Epic1+2+3 回归全部通过)
-  - `task_state.py`: update/claim/status/lock 命令
-  - `atomic_write_json()` + `save_project_with_lock()` 保护所有写操作
-  - ANSI 颜色输出，表格对齐
-  - `test_task_state_cli.py`: 12/12 CLI tests pass
+### Added (vibex-task-state-20260326 Epic1-4: task_state CLI + 乐观锁) — 2026-03-26
+- **Epic1**: `atomic_write_json()` + `save_project_with_lock()` + `load_project_with_rev()` (F1.1-F1.4)
+  - tempfile.mkstemp + os.rename 原子写入，乐观锁 revision 比对 + 重试
+  - Review: `docs/review-reports/20260326/review-vibex-task-state-20260326-epic1.md`
+- **Epic2**: `task_state.py` CLI (update/claim/status/lock) (F2.1-F2.5)
+  - Fix: `cmd_update/claim/lock` 并发异常捕获 (RuntimeError → 友好错误)
   - Review: `docs/review-reports/20260326/review-vibex-task-state-20260326-epic2.md`
-  - Fix: `cmd_update/claim/lock` 并发异常捕获（RuntimeError → 友好错误消息）
+- **Epic3**: `task_manager.py` 重构 (cmd_update/cmd_claim 迁移到乐观锁) (F3.1-F3.3)
+  - Fix: `cmd_update`/`cmd_claim` 3处并发异常捕获
+  - Review: `docs/review-reports/20260326/review-vibex-task-state-20260326-epic3.md`
+- **Epic4**: 并发 + 原子测试 (F4.1-F4.4)
+  - `test_concurrent.py` (5 tests): 并发写入 revision 一致性
+  - `test_atomic.py` (7 tests): 崩溃恢复、Unicode、契约测试
+  - Review: `docs/review-reports/20260326/review-vibex-task-state-20260326-epic4.md`
+- **总计**: 37 task-state tests pass (Epic1-4 全部通过) 🎉
+
 
 All notable changes to this project will be documented in this file.
 
@@ -183,16 +182,7 @@ All notable changes to this project will be documented in this file.
   - 3 个 Template: problem-analysis, competitive-analysis, solution-evaluation
   - 索引文档 _index.md
 
-## [v1.0.88] - 2026-03-26
-
-### Added
-- **vibex-task-state-20260326**: Epic1 — task_state CLI + 乐观锁
-  - `atomic_write_json()`: tempfile.mkstemp + os.rename 原子写入 (F1.1)
-  - `load_project_with_rev()`: 返回 (data, revision) (F1.3)
-  - `save_project_with_lock()`: 乐观锁 revision 比对 + 重试 (F1.2)
-  - `save_project()`: 原子写入 + 旧文件兼容 (F1.4)
-  - Tests: 10/10 Epic1 tests pass
-  - Review: `docs/review-reports/20260326/review-vibex-task-state-20260326-epic1.md`
+## [Unreleased]
 
 ## [1.x.x] - 2026-03-24
 

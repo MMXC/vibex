@@ -1,5 +1,11 @@
 # Changelog
 
+### Added (vibex-bc-prompt-fix Epic1: 跨 API boundedContexts 一致性测试) — 2026-03-26
+- **Epic1**: Cross-API boundedContexts 一致性测试 (C1-C5)
+  - `bounded-contexts-consistency.test.ts`: 14 backend tests + 17 frontend tests = 31 total
+  - Coverage: prompt consistency, deterministic filtering, suffix removal, core ratio, length bounds
+  - Review: `docs/review-reports/20260326/review-vibex-bc-prompt-fix-epic1.md`
+
 ### Added (vibex-bc-prompt-optimize-20260326 Epic5: 跨 API 一致性测试) — 2026-03-26
 - **Epic5**: Cross-API boundedContexts 一致性测试 (C1-C6)
   - `bounded-contexts-consistency.test.ts`: 14 tests covering cross-API prompt consistency, deterministic filtering, forbidden suffix removal, core ratio validation, name length bounds, realistic mixed scenarios

@@ -23,6 +23,12 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+    // Canvas expand E2E — separate testDir
+    {
+      name: 'canvas-e2e',
+      testDir: './e2e',
+      use: { ...devices['Desktop Chrome'] },
+    },
   ],
   webServer: {
     command: 'npm run dev',

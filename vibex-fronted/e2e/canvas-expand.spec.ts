@@ -22,14 +22,15 @@ const CANVAS_URL = `${BASE_URL}/canvas`;
 // Helper: wait for canvas page to load
 async function gotoCanvas(page: import('@playwright/test').Page) {
   await page.goto(CANVAS_URL);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
-// Helper: clear canvas localStorage
+// Helper: clear canvas localStorage (navigate fresh, no reload needed)
 async function clearCanvasStorage(page: import('@playwright/test').Page) {
+  // Clear via context storage first, then navigate fresh
+  await page.context().clearCookies();
   await page.goto(CANVAS_URL);
-  await page.evaluate(() => localStorage.clear());
-  await page.reload();
+  await page.evaluate(() => localStorage.removeItem('vibex-canvas-state'));
 }
 
 test.describe('VibeX Canvas — Epic E5 E2E', () => {

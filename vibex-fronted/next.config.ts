@@ -1,6 +1,10 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // Fix Turbopack root detection for monorepo setup
+  turbopack: {
+    root: '/root/.openclaw/vibex/vibex-fronted',
+  },
   output: 'export',
   images: {
     loader: 'custom',

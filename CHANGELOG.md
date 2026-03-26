@@ -1,5 +1,12 @@
 # Changelog
 
+### Added (vibex-bc-prompt-optimize-20260326 Epic1: 统一 DDD Prompt 模板) — 2026-03-26
+- **Epic1**: 统一 Prompt 模块 + 过滤器 (S1.1-S1.3)
+  - `bounded-contexts.ts`: `BOUNDED_CONTEXTS_PROMPT` 模板 + `buildBoundedContextsPrompt()`
+  - `bounded-contexts-filter.ts`: `isNameFiltered` + `filterInvalidContexts` + `validateCoreRatio`
+  - 22 tests (T1-T5 + filter/ratio validation)
+  - Review: `docs/review-reports/20260326/review-vibex-bc-prompt-optimize-20260326-epic1.md`
+
 ### Added (vibex-step-context-fix-20260326: boundedContexts 多节点展示) — 2026-03-26
 - **Epic1**: 后端 SSE `step_context` 事件增加 `boundedContexts` 数组
   - `route.ts`: 条件展开 boundedContexts（无数据时不发送字段）

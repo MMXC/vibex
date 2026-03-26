@@ -85,8 +85,8 @@ describe('Epic5 C2: Deterministic filtering across both APIs', () => {
   });
 });
 
-describe('Epic5 C3: "管理" suffix removal consistency', () => {
-  test('"管理" suffix filtered by both APIs consistently', () => {
+describe('Epic5 C3: "管理" names now kept consistently (fixed from over-filtering)', () => {
+  test('"管理" names are KEPT by both APIs (not over-filtered)', () => {
     const raw: BoundedContext[] = [
       { name: '患者管理', type: 'core', description: '', ubiquitousLanguage: [] },
       { name: '订单管理', type: 'supporting', description: '', ubiquitousLanguage: [] },
@@ -96,12 +96,12 @@ describe('Epic5 C3: "管理" suffix removal consistency', () => {
 
     const filtered = filterInvalidContexts(raw);
 
-    // All "管理" names should be removed
-    expect(filtered.map(c => c.name)).not.toContain('患者管理');
-    expect(filtered.map(c => c.name)).not.toContain('订单管理');
-    expect(filtered.map(c => c.name)).not.toContain('问诊管理');
-    // Generic names without "管理" should remain
+    // "管理" names should be KEPT (they are valid DDD terms)
+    expect(filtered.map(c => c.name)).toContain('患者管理');
+    expect(filtered.map(c => c.name)).toContain('订单管理');
+    expect(filtered.map(c => c.name)).toContain('问诊管理');
     expect(filtered.map(c => c.name)).toContain('认证授权');
+    expect(filtered.length).toBe(4);
   });
 
   test('"系统/模块/功能/平台" also filtered consistently', () => {
@@ -172,13 +172,13 @@ describe('Epic5 C5: Name length bounds enforced consistently', () => {
 describe('Epic5: Realistic mixed scenario (simulating both API outputs)', () => {
   test('real LLM output from medical system filtered consistently', () => {
     // Simulates what both APIs would receive from the LLM
-    // Mix of core/supporting/generic/external, including "管理" names to filter
+    // "管理" names are now valid and kept; "系统" names are still filtered
     const rawLLMOutput: BoundedContext[] = [
       { name: '患者管理', type: 'core', description: '患者建档和认证', ubiquitousLanguage: ['患者', '建档'] },
       { name: '医生管理', type: 'core', description: '医生入驻和资质', ubiquitousLanguage: ['医生', '入驻'] },
-      { name: '问诊', type: 'core', description: '问诊和处方', ubiquitousLanguage: ['问诊', '处方'] },  // no "管理" → kept
-      { name: '预约', type: 'core', description: '预约和取消', ubiquitousLanguage: ['预约', '号源'] },  // no "管理" → kept
-      { name: '订单支付', type: 'supporting', description: '支付和退款', ubiquitousLanguage: ['订单', '支付'] },
+      { name: '问诊管理', type: 'core', description: '问诊和处方', ubiquitousLanguage: ['问诊', '处方'] },
+      { name: '预约管理', type: 'core', description: '预约和取消', ubiquitousLanguage: ['预约', '号源'] },
+      { name: '订单系统', type: 'supporting', description: '订单和支付', ubiquitousLanguage: ['订单', '支付'] }, // "系统" → filtered
       { name: '认证授权', type: 'generic', description: '登录和Token', ubiquitousLanguage: ['登录', 'JWT'] },
       { name: '微信支付', type: 'external', description: '对接微信支付', ubiquitousLanguage: [] },
     ];
@@ -190,15 +190,23 @@ describe('Epic5: Realistic mixed scenario (simulating both API outputs)', () => 
     // Results should be identical
     expect(api1Result).toEqual(api2Result);
 
-    // Verify no "管理" names remain
+    // Verify "系统" names are removed
     for (const ctx of api1Result) {
-      expect(ctx.name).not.toMatch(/管理$/);
+      expect(ctx.name).not.toMatch(/系统$/);
     }
 
-    // Verify acceptable count (过滤后应该是5个: 问诊/预约/订单支付/认证授权/微信支付)
-    expect(api1Result.length).toBe(5);
+    // Verify "管理" names are kept
+    const names = api1Result.map(c => c.name);
+    expect(names).toContain('患者管理');
+    expect(names).toContain('医生管理');
+    expect(names).toContain('问诊管理');
+    expect(names).toContain('预约管理');
+    expect(names).not.toContain('订单系统'); // has "系统"
 
-    // Verify core ratio is within bounds (2 core out of 5 = 40%)
+    // Filtered: 5 kept (4 管理 + 认证授权 + 微信支付), 1 removed (订单系统)
+    expect(api1Result.length).toBe(6);
+
+    // Verify core ratio is within bounds (4 core out of 6 = 67%)
     const ratio = validateCoreRatio(api1Result);
     expect(ratio.valid).toBe(true);
   });

@@ -14,7 +14,7 @@
 
 ### 任务清单
 
-- [ ] `pnpm add @xyflow/react@latest` 升级
+- [x] `pnpm add @xyflow/react@latest` 升级
 - [ ] 检查 `onNodesChange` API 变化（v11→v12 签名）
 - [ ] 检查 `nodeExtent`、`proOptions` 等属性兼容性
 - [ ] 全量跑现有测试：`pnpm test`

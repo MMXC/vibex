@@ -262,3 +262,98 @@ class TestBackwardCompatibility:
             # This is acceptable for first-write migration
         finally:
             tm.task_file = orig_task_file
+
+
+# =============================================================================
+# Epic 3: cmd_update and cmd_claim migration (F3.1, F3.2)
+# =============================================================================
+
+class TestCmdUpdateMigration:
+    def test_update_command_increments_revision(self, tmpdir):
+        """F3.1: cmd_update uses save_project_with_lock → revision increments."""
+
+        import task_manager as tm
+        import unittest.mock as umock
+
+        path = os.path.join(tmpdir, "project.json")
+        initial_data = {
+            "project": "test",
+            "status": "active",
+            "stages": {
+                "stage1": {"agent": "dev", "status": "pending"},
+            },
+            tm._REVISION_KEY: 0,
+        }
+        tm.atomic_write_json(path, initial_data)
+
+        args = type("Args", (), {
+            "project": "test", "stage": "stage1", "status": "in-progress",
+            "skip_gstack_verify": True, "log_analysis": None,
+        })()
+
+        with umock.patch.object(tm, "task_file", return_value=path):
+            tm.cmd_update(args)
+
+        with open(path) as f:
+            result = json.load(f)
+        assert result[tm._REVISION_KEY] == 1
+        assert result["stages"]["stage1"]["status"] == "in-progress"
+
+    def test_update_includes_gstack_check(self, tmpdir):
+        """F3.1: cmd_update preserves gstack check when status=done."""
+        import task_manager as tm
+        import unittest.mock as umock
+
+        path = os.path.join(tmpdir, "project.json")
+        data = {
+            "project": "test", "status": "active",
+            "stages": {
+                "stage1": {
+                    "agent": "dev",
+                    "status": "pending",
+                    "details": {
+                        "constraints": ["must use gstack"],
+                    },
+                },
+            },
+            tm._REVISION_KEY: 0,
+        }
+        tm.atomic_write_json(path, data)
+
+        args = type("Args", (), {
+            "project": "test", "stage": "stage1", "status": "done",
+            "skip_gstack_verify": False, "log_analysis": None,
+        })()
+
+        # subprocess is imported locally in cmd_update → patch where it's used
+        import subprocess
+        with umock.patch.object(tm, "task_file", return_value=path):
+            with umock.patch.object(subprocess, "run") as mock_run:
+                mock_run.return_value = type("r", (), {"returncode": 0})()
+                tm.cmd_update(args)
+                assert mock_run.called
+
+
+class TestCmdClaimMigration:
+    def test_claim_command_increments_revision(self, tmpdir):
+        """F3.2: cmd_claim uses save_project_with_lock → revision increments."""
+        import task_manager as tm
+        import unittest.mock as umock
+
+        path = os.path.join(tmpdir, "claim.json")
+        data = {"project": "test", "status": "active", "stages": {
+            "stage1": {"agent": "dev", "status": "pending"},
+        }, tm._REVISION_KEY: 3}
+        tm.atomic_write_json(path, data)
+
+        args = type("Args", (), {
+            "project": "test", "stage": "stage1", "agent": "dev", "force": False,
+        })()
+
+        with umock.patch.object(tm, "task_file", return_value=path):
+            tm.cmd_claim(args)
+
+        with open(path) as f:
+            result = json.load(f)
+        assert result[tm._REVISION_KEY] == 4
+        assert result["stages"]["stage1"]["status"] == "in-progress"

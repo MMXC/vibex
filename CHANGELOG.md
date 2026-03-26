@@ -5,7 +5,12 @@
 ## [v1.0.89] - 2026-03-26
 
 ### Added
-- **vibex-task-state-20260326**: Epic2 — task_state CLI
+- **vibex-task-state-20260326**: Epic3 — 重构与迁移
+  - `cmd_update` / `cmd_claim` 迁移到 `save_project_with_lock()` (乐观锁)
+  - `test_task_state_concurrency.py`: 新增 3 Epic3 tests (13 total)
+  - Review: `docs/review-reports/20260326/review-vibex-task-state-20260326-epic3.md`
+  - Fix: `cmd_update`/`cmd_claim` 并发异常捕获 (task_manager.py 3处)
+  - 25/25 tests pass (Epic1+2+3 回归全部通过)
   - `task_state.py`: update/claim/status/lock 命令
   - `atomic_write_json()` + `save_project_with_lock()` 保护所有写操作
   - ANSI 颜色输出，表格对齐

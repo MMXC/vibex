@@ -1205,7 +1205,8 @@ def cmd_graph(args):
 
 def cmd_update(args):
     """更新任务状态"""
-    data = load_project(args.project)
+    # F3.1: use optimistic lock for concurrent safety
+    data, expected_rev = load_project_with_rev(args.project)
     stage_id = args.stage
     new_status = args.status
 
@@ -1226,23 +1227,23 @@ def cmd_update(args):
         details = stage.get("details", {})
         constraints = details.get("constraints", [])
         result_text = getattr(args, "result", "") or ""
-        
+
         # 检查约束是否要求 gstack
         gstack_required = any(
             "gstack" in str(c).lower() or "/browse" in str(c) or "/qa" in str(c) or "/canary" in str(c)
             for c in constraints
         )
-        
+
         if gstack_required:
             # 导入验证脚本
             import subprocess
             script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "verify_gstack_usage.py")
             work_dir = details.get("workDir") or details.get("work_dir")
-            
+
             cmd = ["python3", script_path]
             if result_text:
                 cmd.append(result_text)
-            
+
             try:
                 proc = subprocess.run(
                     cmd + ([work_dir] if work_dir else []),
@@ -1279,8 +1280,14 @@ def cmd_update(args):
     if data.get("mode") == "dag":
         check_dag_completion(data)
         data["updated"] = now_iso()
-        save_project(args.project, data)
-        print(f"✅ {stage_id}: {old_status} → {new_status}")
+        # F3.1: use optimistic lock
+        try:
+            new_rev = save_project_with_lock(args.project, data, expected_rev=expected_rev)
+            print(f"✅ {stage_id}: {old_status} → {new_status} (rev {expected_rev} → {new_rev})")
+        except RuntimeError as e:
+            print(f"❌ Update failed (concurrent modification): {e}", file=sys.stderr)
+            sys.exit(1)
+            return
 
         if new_status == "done":
             ready = compute_ready_tasks(data)
@@ -1299,8 +1306,13 @@ def cmd_update(args):
                 )
     else:
         data["updated"] = now_iso()
-        save_project(args.project, data)
-        print(f"✅ {stage_id}: {old_status} → {new_status}")
+        # F3.1: use optimistic lock
+        try:
+            new_rev = save_project_with_lock(args.project, data, expected_rev=expected_rev)
+            print(f"✅ {stage_id}: {old_status} → {new_status} (rev {expected_rev} → {new_rev})")
+        except RuntimeError as e:
+            print(f"❌ Update failed (concurrent modification): {e}", file=sys.stderr)
+            sys.exit(1)
 
 
 # ── cmd_claim ──────────────────────────────────────────────────────
@@ -1308,7 +1320,8 @@ def cmd_update(args):
 @timeout(5)
 def cmd_claim(args):
     """领取任务"""
-    data = load_project(args.project)
+    # F3.2: use optimistic lock for concurrent safety
+    data, expected_rev = load_project_with_rev(args.project)
     stage_id = args.stage
 
     if stage_id not in data["stages"]:
@@ -1368,10 +1381,14 @@ def cmd_claim(args):
             dep_outputs[dep] = dep_task["output"]
 
     data["updated"] = now_iso()
-    save_project(args.project, data)
-
-    # 输出任务详情
-    print(f"✅ Claimed: {stage_id}")
+    # F3.2: use optimistic lock
+    try:
+        new_rev = save_project_with_lock(args.project, data, expected_rev=expected_rev)
+        print(f"✅ Claimed: {stage_id} (rev {expected_rev} → {new_rev})")
+    except RuntimeError as e:
+        print(f"❌ Claim failed (concurrent modification): {e}", file=sys.stderr)
+        sys.exit(1)
+        new_rev = None
     print()
     print(f"## 项目目标")
     print(f"{data.get('goal', '')}")

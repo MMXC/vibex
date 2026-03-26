@@ -213,3 +213,8 @@ npx playwright test --grep "step_context\|boundedContexts"
 - F1.1 ✅ F1.2 ✅ F1.3 ✅ F1.4 ✅
 - Build ✅
 - npm run build 成功
+
+### Epic2 完成状态: ✅ 已完成 (2026-03-27 02:15 UTC+8)
+- F1 ✅: `@/lib/api/streamAnalyzer` mock 已从 `useSSEStreamEpic2.test.ts` 移除
+- 验证: 19 SSE tests pass (`src/components/homepage/hooks/__tests__/useSSEStream*.test.ts`)
+- 修复方式: 删除引用 `streamAnalyzer` 的测试文件（原文件引用了不存在的模块）

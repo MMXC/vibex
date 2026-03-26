@@ -1,5 +1,15 @@
 # Changelog
 
+### Added (vibex-canvas-expandable-20260327 E4: 虚线领域框) — 2026-03-27
+- **E4**: BoundedGroup — DDD 限界上下文视觉分组
+  - `canvasStore.ts`: `boundedGroups` Zustand slice + `addBoundedGroup`/`removeBoundedGroup`/`toggleBoundedGroupVisibility`/`updateBoundedGroupLabel`/`addNodeToGroup`/`removeNodeFromGroup`/`clearBoundedGroups`
+  - `types.ts`: `BoundedGroup` / `BoundedGroupBBox` 类型 + `BOUNDED_GROUP_COLORS` / `computeGroupBBoxes`
+  - `BoundedGroupOverlay.tsx`: SVG 虚线矩形叠加层，`pointer-events: none`，视口感知
+  - `CardTreeRenderer.tsx`: 集成 `BoundedGroupOverlay`，视口跟踪
+  - `boundedGroup.test.ts`: 23 tests (full lifecycle + computeGroupBBoxes)
+  - 74 canvas tests pass (boundedGroup + dragState + canvasExpandState)
+  - Review: `docs/review-reports/20260327/review-vibex-canvas-expandable-20260327-epic-e4.md`
+
 ### Added (vibex-canvas-expandable-20260327 E3: 卡片拖拽排序) — 2026-03-27
 - **E3**: DragState — 卡片拖拽排序状态管理
   - `canvasStore.ts`: `draggedNodeId`/`dragOverNodeId`/`draggedPositions`/`isDragging` Zustand slice

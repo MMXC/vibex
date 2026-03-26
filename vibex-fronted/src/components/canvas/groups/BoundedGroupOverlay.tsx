@@ -88,8 +88,8 @@ interface BoundedGroupOverlayProps {
 
 function BoundedGroupOverlayComponent({
   nodes,
-  containerRef,
-  viewportTransform,
+  containerRef: _containerRef,
+  viewportTransform: _viewportTransform,
   zoom = 1,
   pan = { x: 0, y: 0 },
 }: BoundedGroupOverlayProps) {

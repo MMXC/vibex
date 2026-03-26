@@ -403,3 +403,23 @@ describe('两接口一致性', () => {
 4. **Epic 4+5 完成**: 全量测试通过后合并 PR
 
 **回滚命令**: `git revert HEAD` 或手动还原两处 route.ts
+
+---
+
+## Epic 2 完成状态: ✅ 已完成 (2026-03-26 19:35 UTC+8)
+- S2.1 ✅ USER_PROMPT 替换为 buildBoundedContextsPrompt()
+- S2.1 ✅ filterInvalidContexts 集成
+- S2.2 ✅ 集成测试 5/5 通过 (route.test.ts)
+- Build ✅ npm run build 通过
+
+## Epic 3 完成状态: ✅ 已完成 (2026-03-26 19:35 UTC+8)
+- S3.1 ✅ planPrompt 替换为 buildBoundedContextsPrompt()
+- S3.1 ✅ 类型验证 + filterInvalidContexts 集成
+- S3.2 ✅ SSE 集成测试 7/7 通过 (route.test.ts)
+- Build ✅ npm run build 通过
+
+## Epic 4 完成状态: ✅ 已完成 (2026-03-26 19:40 UTC+8)
+- S4.1 ✅ bounded-contexts-filter 单元测试 14/14 通过
+- 测试覆盖: isNameFiltered + filterInvalidContexts + validateCoreRatio
+
+## 剩余: Epic 5 (一致性测试) - 待 tester 执行

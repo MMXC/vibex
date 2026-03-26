@@ -21,11 +21,20 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 
 export type SSEStatus = 'idle' | 'connecting' | 'connected' | 'reconnecting' | 'error' | 'failed';
 
+export interface BoundedContext {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  keyResponsibilities?: string[];
+}
+
 export interface AIResult {
   type: 'context' | 'model' | 'flow' | 'components';
   content: string;
   mermaidCode: string;
   confidence: number;
+  boundedContexts?: BoundedContext[];
 }
 
 export interface SSEStreamCallbacks {
@@ -113,12 +122,13 @@ export function useSSEStream(callbacks: Partial<SSEStreamCallbacks> = {}): UseSS
     };
 
     handlers['step_context'] = (e: MessageEvent) => {
-      const data = parseSSEData(e.data) as { content?: string; mermaidCode?: string; confidence?: number };
+      const data = parseSSEData(e.data) as { content?: string; mermaidCode?: string; confidence?: number; boundedContexts?: BoundedContext[] };
       callbacks.onContext?.({
         type: 'context',
         content: data.content || '',
         mermaidCode: data.mermaidCode || '',
         confidence: data.confidence || 0.8,
+        boundedContexts: data.boundedContexts,
       });
     };
 

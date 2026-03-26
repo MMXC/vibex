@@ -111,6 +111,7 @@ stream_.get('/', async (c) => {
             content: summary,
             mermaidCode: contextMermaid,
             confidence,
+            boundedContexts: contexts,
           });
 
         } catch (err) {
@@ -119,6 +120,7 @@ stream_.get('/', async (c) => {
             content: 'Bounded context analysis completed',
             mermaidCode: '',
             confidence: 0.7,
+            boundedContexts: [],
           });
         }
 

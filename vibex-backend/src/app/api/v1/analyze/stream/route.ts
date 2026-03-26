@@ -112,6 +112,14 @@ export async function GET(request: NextRequest) {
             content: summary,
             mermaidCode: contextMermaid,
             confidence,
+            ...(contexts.length > 0 && {
+              boundedContexts: contexts.map((c: { id: string; name: string; description: string; type: string }) => ({
+                id: c.id,
+                name: c.name,
+                description: c.description,
+                type: c.type,
+              })),
+            }),
           });
 
         } catch (err) {
@@ -120,6 +128,7 @@ export async function GET(request: NextRequest) {
             content: 'Bounded context analysis completed',
             mermaidCode: '',
             confidence: 0.7,
+            boundedContexts: [],
           });
         }
 

@@ -20,11 +20,20 @@ export interface ThinkingEvent {
   delta: boolean;
 }
 
+export interface BoundedContext {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  keyResponsibilities?: string[];
+}
+
 export interface StepContextEvent {
   type: 'step_context';
   content: string;
   mermaidCode?: string;
   confidence: number;
+  boundedContexts: BoundedContext[];
 }
 
 export interface StepModelEvent {
@@ -71,7 +80,7 @@ export type SSEEvent =
 
 export interface DDDApiCallbacks {
   onThinking?: (content: string, delta: boolean) => void;
-  onStepContext?: (content: string, mermaidCode?: string, confidence?: number) => void;
+  onStepContext?: (content: string, mermaidCode?: string, confidence?: number, boundedContexts?: BoundedContext[]) => void;
   onStepModel?: (content: string, mermaidCode?: string, confidence?: number) => void;
   onStepFlow?: (content: string, mermaidCode?: string, confidence?: number) => void;
   onStepComponents?: (content: string, mermaidCode?: string, confidence?: number) => void;
@@ -192,7 +201,8 @@ function dispatchEvent(
       callbacks.onStepContext?.(
         String(data.content ?? ''),
         data.mermaidCode ? String(data.mermaidCode) : undefined,
-        data.confidence ? Number(data.confidence) : undefined
+        data.confidence ? Number(data.confidence) : undefined,
+        Array.isArray(data.boundedContexts) ? data.boundedContexts as BoundedContext[] : undefined
       );
       break;
 

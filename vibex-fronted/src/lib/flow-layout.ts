@@ -8,7 +8,7 @@
  * @module lib/flow-layout
  */
 
-import type { Node, Edge } from 'reactflow';
+import type { Node, Edge } from '@xyflow/react';
 
 /**
  * Layout direction

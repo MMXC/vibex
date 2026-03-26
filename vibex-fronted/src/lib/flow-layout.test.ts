@@ -3,7 +3,7 @@
  */
 
 import { autoLayout, LayoutDirection, LayoutOptions } from '@/lib/flow-layout';
-import type { Node, Edge } from 'reactflow';
+import type { Node, Edge } from '@xyflow/react';
 
 describe('flow-layout', () => {
   const mockNodes: Node[] = [

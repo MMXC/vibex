@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useMemo } from 'react';
-import type { Node, Edge } from 'reactflow';
+import type { Node, Edge } from '@xyflow/react';
 import styles from './FlowPropertiesPanel.module.css';
 
 // Node type labels in Chinese
@@ -57,7 +57,8 @@ export interface FlowPropertiesPanelProps {
 
 // Get node type info
 function getNodeTypeInfo(node: Node) {
-  const nodeType = node.data?.type || node.data?.label?.type || 'default';
+  const data = node.data as Record<string, unknown> | undefined;
+  const nodeType = (data?.type as string) || ((data?.label as Record<string, unknown>)?.type as string) || 'default';
   return NODE_TYPE_LABELS[nodeType] || NODE_TYPE_LABELS.default;
 }
 

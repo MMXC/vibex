@@ -21,7 +21,7 @@ import {
 const { generateBoundedContext } = apiService;
 
 import { useConfirmationStore, DomainModel } from '@/stores/confirmationStore';
-import ReactFlow, {
+import { ReactFlow, 
   Node,
   Edge,
   Controls,
@@ -39,7 +39,7 @@ import ReactFlow, {
   EdgeChange,
   applyNodeChanges,
   applyEdgeChanges,
-} from 'reactflow';
+} from '@xyflow/react';
 import 'reactflow/dist/style.css';
 
 // 领域类型样式映射

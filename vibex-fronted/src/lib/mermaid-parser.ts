@@ -1,4 +1,4 @@
-import { Node, Edge } from 'reactflow'
+import { Node, Edge } from '@xyflow/react'
 
 // Mermaid parser types (simplified)
 interface MermaidAST {

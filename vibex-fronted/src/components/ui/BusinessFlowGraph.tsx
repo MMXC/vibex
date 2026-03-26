@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
-import ReactFlow, {
+import { ReactFlow, 
   Node,
   Edge,
   Controls,
@@ -15,7 +15,7 @@ import ReactFlow, {
   BackgroundVariant,
   Panel,
   MarkerType,
-} from 'reactflow';
+} from '@xyflow/react';
 import 'reactflow/dist/style.css';
 
 export interface FlowState {
@@ -33,7 +33,7 @@ export interface FlowTransition {
   condition?: string;
 }
 
-export interface BusinessFlowNodeData {
+export interface BusinessFlowNodeData extends Record<string, unknown> {
   label: string;
   stateType: 'initial' | 'intermediate' | 'final';
   description?: string;

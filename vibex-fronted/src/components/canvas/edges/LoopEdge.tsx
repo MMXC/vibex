@@ -16,28 +16,19 @@ import {
   EdgeLabelRenderer,
   BaseEdge,
   type EdgeProps,
-} from 'reactflow';
+  Position,
+} from '@xyflow/react';
 import type { LoopEdgeData } from '@/lib/canvas/types';
 import styles from './LoopEdge.module.css';
 
-export type LoopEdgeProps = EdgeProps<LoopEdgeData>;
-
-/**
- * LoopEdge — renders a dashed loop-back edge between flow steps.
- * Used to indicate cycles/repetition in business process flows.
- */
-export function LoopEdge({
-  id,
-  sourceX,
-  sourceY,
-  targetX,
-  targetY,
-  sourcePosition,
-  targetPosition,
-  data,
-  selected,
-  markerEnd,
-}: LoopEdgeProps) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function LoopEdge(props: EdgeProps<any>) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, data, selected, markerEnd } = props as any as {
+    id: string; sourceX: number; sourceY: number; targetX: number; targetY: number;
+    sourcePosition: Position; targetPosition: Position;
+    data: LoopEdgeData; selected: boolean; markerEnd: string;
+  };
   const [hovered, setHovered] = useState(false);
 
   const [edgePath, labelX, labelY] = getBezierPath({

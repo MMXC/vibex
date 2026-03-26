@@ -8,7 +8,7 @@
 'use client';
 
 import { useCallback, useMemo } from 'react';
-import type { Node, Edge, NodeTypes, EdgeTypes } from 'reactflow';
+import type { Node, Edge, NodeTypes, EdgeTypes } from '@xyflow/react';
 import type { FlowVisualizationRaw, FlowNodeData, FlowEdgeData } from '@/types/visualization';
 import { useVisualizationStore } from '@/stores/visualizationStore';
 

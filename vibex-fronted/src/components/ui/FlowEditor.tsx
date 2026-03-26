@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState, useRef, ReactNode } from 'react';
-import ReactFlow, {
+import { ReactFlow, 
   Node,
   Edge,
   Controls,
@@ -27,7 +27,7 @@ import ReactFlow, {
   Viewport,
   FitViewOptions,
   ReactFlowInstance,
-} from 'reactflow';
+} from '@xyflow/react';
 import 'reactflow/dist/style.css';
 import styles from './FlowEditor.module.css';
 

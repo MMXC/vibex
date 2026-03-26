@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState, useRef } from 'react';
-import ReactFlow, {
+import { ReactFlow, 
   Node,
   Edge,
   Controls,
@@ -14,7 +14,7 @@ import ReactFlow, {
   BackgroundVariant,
   useReactFlow,
   ReactFlowProvider,
-} from 'reactflow';
+} from '@xyflow/react';
 import { toPng, toSvg } from 'html-to-image';
 import 'reactflow/dist/style.css';
 import styles from './DomainRelationGraph.module.css';

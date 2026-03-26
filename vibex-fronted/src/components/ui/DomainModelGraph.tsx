@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
-import ReactFlow, {
+import { ReactFlow, 
   Node,
   Edge,
   Controls,
@@ -15,7 +15,7 @@ import ReactFlow, {
   BackgroundVariant,
   Panel,
   MarkerType,
-} from 'reactflow';
+} from '@xyflow/react';
 import 'reactflow/dist/style.css';
 
 export interface DomainProperty {
@@ -24,7 +24,7 @@ export interface DomainProperty {
   required: boolean;
 }
 
-export interface DomainModelNodeData {
+export interface DomainModelNodeData extends Record<string, unknown> {
   label: string;
   type: 'aggregate_root' | 'entity' | 'value_object';
   properties: DomainProperty[];
@@ -238,13 +238,16 @@ export default function DomainModelGraph({
   const onNodeDragStop = useCallback(
     (_event: React.MouseEvent, node: Node) => {
       if (readOnly || !onModelsChange) return;
-      const updatedModels = nodes.map((n) => ({
-        id: n.id,
-        name: n.data.label,
-        type: n.data.type,
-        properties: n.data.properties || [],
-        position: n.position,
-      }));
+      const updatedModels = nodes.map((n) => {
+        const data = n.data as DomainModelNodeData;
+        return {
+          id: n.id,
+          name: data.label,
+          type: data.type,
+          properties: data.properties || [],
+          position: n.position,
+        };
+      });
       onModelsChange(updatedModels);
     },
     [nodes, onModelsChange, readOnly]

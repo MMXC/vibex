@@ -10,7 +10,7 @@
 'use client';
 
 import React, { useCallback, useMemo, type ComponentType } from 'react';
-import ReactFlow, {
+import { ReactFlow, 
   Node,
   Edge,
   Controls,
@@ -26,7 +26,7 @@ import ReactFlow, {
   NodeTypes,
   type NodeProps,
   type EdgeProps,
-} from 'reactflow';
+} from '@xyflow/react';
 import 'reactflow/dist/style.css';
 import { CardTreeNode } from '../CardTreeNode/CardTreeNode';
 import type { CardTreeVisualizationRaw, CardTreeNodeData } from '@/types/visualization';

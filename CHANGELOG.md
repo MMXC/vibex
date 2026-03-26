@@ -1,5 +1,13 @@
 # Changelog
 
+### Changed (vibex-canvas-expandable-20260327 E1: ReactFlow v12 升级) — 2026-03-27
+- **E1**: ReactFlow v12 (`@xyflow/react`) 升级完成
+  - `reactflow` → `@xyflow/react` 迁移（26 个文件）
+  - 自定义 Node/Edge 类型适配 v12 API
+  - `NodeProps<T>` / `EdgeProps<T>` 类型修复（`T extends Record<string, unknown>`）
+  - TypeScript 0 errors, 2541 tests pass
+  - `docs/gstack/vibex-canvas-expandable-20260327.md`
+
 ### Fixed (vibex-bc-filter-fix-20260326 Epic1: 修复过度过滤) — 2026-03-26
 - **Epic1**: 移除 '管理' 从 forbiddenNames，maxNameLength 10→12
   - `bounded-contexts-filter.ts`: 修复过度过滤问题（'患者管理' 不再被误杀）

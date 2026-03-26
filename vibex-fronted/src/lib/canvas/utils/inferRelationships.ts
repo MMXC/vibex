@@ -6,9 +6,9 @@
  *
  * Epic 1: vibex-three-trees-enhancement-20260326
  */
-import { MarkerType } from 'reactflow';
+import { MarkerType } from '@xyflow/react';
 import type { BoundedContextNode, ContextRelationship } from '@/lib/canvas/types';
-import type { Edge } from 'reactflow';
+import type { Edge } from '@xyflow/react';
 
 // Re-export for consumers
 export type { ContextRelationship } from '@/lib/canvas/types';

@@ -11,8 +11,8 @@ import React, { useCallback } from 'react';
 import FlowEditor from '@/components/ui/FlowEditor';
 import { useFlowVisualization, useFlowVisualizationWithStore } from '@/hooks/useFlowVisualization';
 import { useVisualizationStore } from '@/stores/visualizationStore';
-import type { Node, Edge, OnNodesChange, OnEdgesChange, OnConnect } from 'reactflow';
-import { BackgroundVariant } from 'reactflow';
+import type { Node, Edge, OnNodesChange, OnEdgesChange, OnConnect } from '@xyflow/react';
+import { BackgroundVariant } from '@xyflow/react';
 import type { FlowVisualizationRaw, FlowNodeData, FlowEdgeData } from '@/types/visualization';
 import styles from './FlowRenderer.module.css';
 

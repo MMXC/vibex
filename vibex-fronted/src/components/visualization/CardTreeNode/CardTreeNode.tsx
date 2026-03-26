@@ -13,11 +13,9 @@
 'use client';
 
 import React, { memo, useState, useCallback, useRef, useEffect } from 'react';
-import type { NodeProps } from 'reactflow';
+import type { NodeProps } from '@xyflow/react';
 import type { CardTreeNodeData, CardTreeChild } from '@/types/visualization';
 import styles from './CardTreeNode.module.css';
-
-export type CardTreeNodeProps = NodeProps<CardTreeNodeData>;
 
 // ==================== IntersectionObserver Hook ====================
 
@@ -131,13 +129,12 @@ function CheckboxItem({ item, depth, onToggle }: CheckboxItemProps) {
  *
  * Non-visible cards show a skeleton placeholder for performance.
  */
-export const CardTreeNode = memo(function CardTreeNode({
-  data,
-  selected,
-}: CardTreeNodeProps) {
+export const CardTreeNode = memo(function CardTreeNode(props: NodeProps<any>) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, selected } = props as any as { data: CardTreeNodeData; selected: boolean };
   const isExpanded = data.isExpanded !== false; // default to expanded
   const hasChildren = data.children.length > 0;
-  const uncheckedCount = data.children.filter((c) => !c.checked).length;
+  const uncheckedCount = data.children.filter((c: CardTreeChild) => !c.checked).length;
   const [containerRef, isVisible] = useIntersectionObserver(0.1);
 
   const handleCheckboxToggle = useCallback((childId: string, checked: boolean) => {

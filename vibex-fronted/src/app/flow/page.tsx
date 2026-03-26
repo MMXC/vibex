@@ -7,13 +7,13 @@ const devLog = (...args: unknown[]) => {
   if (process.env.NODE_ENV !== 'production') console.log(...args);
 };
 import { useSearchParams } from 'next/navigation';
-import ReactFlow, {
+import { ReactFlow, 
   NodeChange,
   EdgeChange,
   Connection,
   applyNodeChanges,
   applyEdgeChanges,
-} from 'reactflow';
+} from '@xyflow/react';
 import FlowEditor, { FlowNode, FlowEdge } from '@/components/ui/FlowEditor';
 import FlowPropertiesPanel from '@/components/ui/FlowPropertiesPanel';
 import { apiService } from '@/services/api';

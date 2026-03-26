@@ -4,17 +4,18 @@
  */
 
 import { memo } from 'react';
-import { Handle, Position, NodeProps } from 'reactflow';
+import { Handle, Position, NodeProps } from '@xyflow/react';
 
-interface SectionNodeData {
+interface SectionNodeData extends Record<string, unknown> {
   label: string;
   icon: string;
   nodeType: string;
 }
 
-function SectionNodeComponent({ data, selected }: NodeProps<SectionNodeData>) {
-  const { label, icon } = data;
-  
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function SectionNodeComponent(props: NodeProps<any>) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, selected } = props as any as { data: SectionNodeData; selected: boolean };
   return (
     <div className="section-node" style={{
       padding: '6px 12px',
@@ -27,8 +28,8 @@ function SectionNodeComponent({ data, selected }: NodeProps<SectionNodeData>) {
       transition: 'all 0.2s ease',
     }}>
       <Handle type="target" position={Position.Top} style={{ background: '#f57c00' }} />
-      <div style={{ fontSize: '12px', marginBottom: '2px' }}>{icon}</div>
-      <div style={{ fontSize: '10px', fontWeight: 500, color: '#e65100' }}>{label}</div>
+      <div style={{ fontSize: '12px', marginBottom: '2px' }}>{data.icon}</div>
+      <div style={{ fontSize: '10px', fontWeight: 500, color: '#e65100' }}>{data.label}</div>
       <Handle type="source" position={Position.Bottom} style={{ background: '#f57c00' }} />
     </div>
   );

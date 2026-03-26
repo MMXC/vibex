@@ -6,7 +6,7 @@
 'use client';
 
 import { useCallback, useMemo } from 'react';
-import ReactFlow, {
+import { ReactFlow, 
   Node,
   Edge,
   Controls,
@@ -16,7 +16,7 @@ import ReactFlow, {
   BackgroundVariant,
   NodeTypes,
   MarkerType,
-} from 'reactflow';
+} from '@xyflow/react';
 import 'reactflow/dist/style.css';
 
 import { PageNode } from './nodes/PageNode';

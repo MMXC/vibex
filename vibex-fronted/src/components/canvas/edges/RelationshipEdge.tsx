@@ -17,33 +17,23 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { getBezierPath, EdgeLabelRenderer, BaseEdge, type EdgeProps } from 'reactflow';
+import { getBezierPath, EdgeLabelRenderer, BaseEdge, type EdgeProps, Position } from '@xyflow/react';
 import type { ContextRelationship } from '@/lib/canvas/types';
 import styles from './RelationshipEdge.module.css';
 
-export interface RelationshipEdgeData {
+export interface RelationshipEdgeData extends Record<string, unknown> {
   relationshipType: ContextRelationship['type'];
   label?: string;
 }
 
-type RelationshipEdgeProps = EdgeProps<RelationshipEdgeData>;
-
-/**
- * RelationshipEdge — renders a styled edge between bounded context nodes.
- * Three visual styles based on relationshipType.
- */
-export function RelationshipEdge({
-  id,
-  sourceX,
-  sourceY,
-  targetX,
-  targetY,
-  sourcePosition,
-  targetPosition,
-  data,
-  selected,
-  markerEnd,
-}: RelationshipEdgeProps) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function RelationshipEdge(props: EdgeProps<any>) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, data, selected, markerEnd } = props as any as {
+    id: string; sourceX: number; sourceY: number; targetX: number; targetY: number;
+    sourcePosition: Position; targetPosition: Position;
+    data: RelationshipEdgeData; selected: boolean; markerEnd: string;
+  };
   const [hovered, setHovered] = useState(false);
 
   const [edgePath, labelX, labelY] = getBezierPath({
@@ -63,34 +53,15 @@ export function RelationshipEdge({
   const handleClick = useCallback(
     (event: React.MouseEvent) => {
       event.stopPropagation();
-      // Can be extended to open a relationship detail panel
       console.debug('[RelationshipEdge] clicked:', id, relType);
     },
     [id, relType]
   );
 
-  const typeConfig = {
-    dependency: {
-      stroke: '#666',
-      strokeWidth: 1,
-      dashArray: undefined,
-      markerColor: '#666',
-      label: '依赖',
-    },
-    aggregate: {
-      stroke: '#1976d2',
-      strokeWidth: 2.5,
-      dashArray: undefined,
-      markerColor: '#1976d2',
-      label: '聚合',
-    },
-    calls: {
-      stroke: '#888',
-      strokeWidth: 1.5,
-      dashArray: '5,3',
-      markerColor: '#888',
-      label: '调用',
-    },
+  const typeConfig: Record<string, { stroke: string; strokeWidth: number; dashArray?: string; markerColor: string; label: string }> = {
+    dependency: { stroke: '#666', strokeWidth: 1, dashArray: undefined, markerColor: '#666', label: '依赖' },
+    aggregate: { stroke: '#1976d2', strokeWidth: 2.5, dashArray: undefined, markerColor: '#1976d2', label: '聚合' },
+    calls: { stroke: '#888', strokeWidth: 1.5, dashArray: '5,3', markerColor: '#888', label: '调用' },
   };
 
   const config = typeConfig[relType] ?? typeConfig.dependency;
@@ -126,20 +97,8 @@ export function RelationshipEdge({
       {/* Hover tooltip */}
       {hovered && !selected && (
         <g transform={`translate(${labelX}, ${labelY - 12})`}>
-          <rect
-            x={-32}
-            y={-10}
-            width={64}
-            height={20}
-            rx={4}
-            className={styles.tooltipBg}
-          />
-          <text
-            x={0}
-            y={3}
-            textAnchor="middle"
-            className={styles.tooltipText}
-          >
+          <rect x={-32} y={-10} width={64} height={20} rx={4} className={styles.tooltipBg} />
+          <text x={0} y={3} textAnchor="middle" className={styles.tooltipText}>
             {config.label}
           </text>
         </g>
@@ -156,10 +115,7 @@ export function RelationshipEdge({
           >
             <span
               className={styles.edgeLabelBadge}
-              style={{
-                borderColor: config.stroke,
-                color: config.stroke,
-              }}
+              style={{ borderColor: config.stroke, color: config.stroke }}
             >
               {label}
             </span>

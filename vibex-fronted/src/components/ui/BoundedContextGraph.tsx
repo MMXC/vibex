@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState, useMemo } from 'react';
-import ReactFlow, {
+import { ReactFlow, 
   Node,
   Edge,
   Controls,
@@ -14,7 +14,7 @@ import ReactFlow, {
   NodeTypes,
   BackgroundVariant,
   Panel,
-} from 'reactflow';
+} from '@xyflow/react';
 import 'reactflow/dist/style.css';
 
 export interface BoundedContextNodeData extends Record<string, unknown> {

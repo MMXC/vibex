@@ -7,7 +7,7 @@
  * - 'json': JSON tree viewer (virtual scrolling)
  */
 
-import type { Node, Edge } from 'reactflow';
+import type { Node, Edge } from '@xyflow/react';
 
 // ==================== Visualization Type System ====================
 
@@ -24,14 +24,14 @@ export interface VisualizationData<T = unknown> {
 // ==================== Flow Visualization Types ====================
 
 /** Flow node data stored in ReactFlow */
-export interface FlowNodeData {
+export interface FlowNodeData extends Record<string, unknown> {
   label: string;
   description?: string;
   [key: string]: unknown;
 }
 
 /** Flow edge data stored in ReactFlow */
-export interface FlowEdgeData {
+export interface FlowEdgeData extends Record<string, unknown> {
   label?: string;
   animated?: boolean;
   checked?: boolean;
@@ -82,7 +82,7 @@ export interface CardTreeChild {
 }
 
 /** CardTree node data */
-export interface CardTreeNodeData {
+export interface CardTreeNodeData extends Record<string, unknown> {
   /** Card title (e.g., "业务流程分析") */
   title: string;
   /** Optional description */

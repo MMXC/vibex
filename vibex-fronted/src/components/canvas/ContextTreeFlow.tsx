@@ -14,7 +14,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import type { EdgeTypes } from 'reactflow';
+import type { EdgeTypes } from '@xyflow/react';
 import { CardTreeRenderer } from '@/components/visualization/CardTreeRenderer/CardTreeRenderer';
 import { RelationshipEdge } from '@/components/canvas/edges/RelationshipEdge';
 import { inferRelationships, relationshipsToEdges } from '@/lib/canvas/utils/inferRelationships';

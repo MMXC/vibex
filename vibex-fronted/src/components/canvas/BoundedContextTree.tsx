@@ -10,9 +10,10 @@
  */
 'use client';
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useMemo } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { RelationshipConnector } from './edges/RelationshipConnector';
+import { BoundedContextGroup } from './BoundedContextGroup';
 import type { BoundedContextNode, BoundedContextDraft } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
 
@@ -375,18 +376,31 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
       <div className={styles.contextNodeList} role="list" aria-label="限界上下文节点列表">
         {hasNodes ? (
           <>
-            {/* SVG Relationship Connector Overlay */}
-            <RelationshipConnector nodes={contextNodes} containerRef={containerRef} />
-            {contextNodes.map((node) => (
-              <ContextCard
-                key={node.nodeId}
-                node={node}
-                onConfirm={confirmContextNode}
-                onEdit={editContextNode}
-                onDelete={deleteContextNode}
-                readonly={readonly}
-              />
-            ))}
+            {/* Group nodes by domain type */}
+            {(['core', 'supporting', 'generic', 'external'] as const).map((type) => {
+              const groupNodes = contextNodes.filter((n) => n.type === type);
+              if (groupNodes.length === 0) return null;
+              return (
+                <BoundedContextGroup
+                  key={type}
+                  type={type}
+                  nodes={groupNodes}
+                  readonly={readonly}
+                  onConfirm={confirmContextNode}
+                  onEdit={editContextNode}
+                  onDelete={deleteContextNode}
+                  renderCard={(props) => (
+                    <ContextCard
+                      node={props.node}
+                      onConfirm={props.onConfirm}
+                      onEdit={props.onEdit}
+                      onDelete={props.onDelete}
+                      readonly={props.readonly}
+                    />
+                  )}
+                />
+              );
+            })}
           </>
         ) : (
           <div className={styles.contextTreeEmpty}>

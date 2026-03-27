@@ -294,6 +294,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed (vibex-canvas-flow-card-20260328 Epic1: FlowCard样式虚线+图标) — 2026-03-28
+- **Epic1**: FlowCard border 改为 dashed，FlowStep 添加 type 字段（normal/branch/loop）
+  - `BusinessFlowTree.tsx`: StepRow 显示步骤类型图标 🔀分支/🔁循环，`data-testid="flow-card"`, `data-testid="flow-step-icon"`
+  - `canvas.module.css`: `.flowCard` border `2px solid` → `2px dashed`，新增 `.flowStepIcon` 样式
+  - `types.ts`: `FlowStep.type?: 'normal' | 'branch' | 'loop'`
+  - Review: `docs/review-reports/20260328/review-vibex-canvas-flow-card-20260328-epic1.md`
+  - Verdict: ✅ PASSED (tsc 0 errors, build ✅, eslint 0 errors, 2655/2669 tests pass)
+
 ## [1.x.x] - 2026-03-24
 
 ### Fixed

@@ -331,4 +331,28 @@ stream_.get('/sse-test', async (c) => {
   });
 });
 
+// Quick AI test
+stream_.get("/ai-test", async (c) => {
+  const env = c.env as CloudflareEnv;
+  try {
+    const resp = await fetch("https://api.minimaxi.com/anthropic/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": env.ANTHROPIC_API_KEY || env.MINIMAX_API_KEY || "",
+        "anthropic-version": "2023-06-01"
+      },
+      body: JSON.stringify({
+        model: env.ANTHROPIC_MODEL || "MiniMax-M2.7-highspeed",
+        messages: [{role: "user", content: "say hi in 3 words"}],
+        max_tokens: 20
+      })
+    });
+    const text = await resp.text();
+    return c.json({ status: resp.status, body: JSON.parse(text) });
+  } catch(e) {
+    return c.json({ error: e.message, stack: e.stack });
+  }
+});
+
 export default stream_;

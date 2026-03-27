@@ -13,6 +13,15 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ComponentTree } from '../ComponentTree';
 import type { ComponentNode } from '@/lib/canvas/types';
 
+// Mock useToast hook
+jest.mock('@/components/ui/Toast', () => ({
+  useToast: jest.fn(() => ({
+    toasts: [],
+    showToast: jest.fn(),
+    hideToast: jest.fn(),
+  })),
+}));
+
 // Mock canvasStore
 jest.mock('@/lib/canvas/canvasStore', () => ({
   useCanvasStore: jest.fn((selector) => {

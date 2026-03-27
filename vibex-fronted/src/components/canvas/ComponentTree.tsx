@@ -118,24 +118,15 @@ function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly }: Componen
     setEditing(false);
   }, [node]);
 
-  // F3.2: Click to jump — open previewUrl or construct file path
+  // F3.2: Click to jump — open previewUrl or show toast if unavailable
   const handleNodeClick = useCallback(() => {
     if (readonly) return;
-    let targetUrl: string | undefined;
     if (node.previewUrl) {
-      targetUrl = node.previewUrl;
-    } else if (node.api?.path) {
-      // Construct editor deep link from API path
-      // e.g., /api/users -> vscode://file/{cwd}/src/app/users/page.tsx
-      const apiPath = node.api.path.replace(/^\//, '').replace(/\//g, '-');
-      targetUrl = `vscode://file/root/.openclaw/vibex/vibex-fronted/src/app/${apiPath}`;
-    }
-    if (targetUrl) {
-      window.open(targetUrl, '_blank', 'noopener,noreferrer');
+      window.open(node.previewUrl, '_blank', 'noopener,noreferrer');
     } else {
       toast.showToast('该组件暂无预览链接，请先配置 previewUrl', 'error');
     }
-  }, [readonly, node.previewUrl, node.api, toast]);
+  }, [readonly, node.previewUrl, toast]);
 
   const statusClass =
     node.status === 'confirmed'

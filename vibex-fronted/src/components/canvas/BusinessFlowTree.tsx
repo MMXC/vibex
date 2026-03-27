@@ -96,6 +96,17 @@ function StepRow({
       {/* Order number */}
       <span className={styles.stepOrder}>{index + 1}</span>
 
+      {/* Step type icon */}
+      {step.type && (
+        <span
+          className={styles.flowStepIcon}
+          data-testid="flow-step-icon"
+          title={step.type === 'branch' ? '分支步骤' : step.type === 'loop' ? '循环步骤' : '普通步骤'}
+        >
+          {step.type === 'branch' ? '🔀' : step.type === 'loop' ? '🔁' : ''}
+        </span>
+      )}
+
       {/* Step content */}
       {editing ? (
         <div className={styles.stepEditForm}>
@@ -247,7 +258,7 @@ function FlowCard({
         : styles.nodePending;
 
   return (
-    <div className={`${styles.flowCard} ${statusClass}`}>
+    <div className={`${styles.flowCard} ${statusClass}`} data-testid="flow-card">
       {/* Card header */}
       <div className={styles.flowCardHeader}>
         <button

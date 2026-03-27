@@ -70,6 +70,8 @@ export interface FlowStep {
   order: number;
   confirmed: boolean;
   status: NodeStatus;
+  /** 步骤类型：normal/branch/loop */
+  type?: 'normal' | 'branch' | 'loop';
 }
 
 export interface BusinessFlowNode {

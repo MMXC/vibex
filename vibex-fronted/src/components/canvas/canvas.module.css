@@ -964,7 +964,7 @@
 
 /* Flow Card */
 .flowCard {
-  border: 2px solid var(--color-border);
+  border: 2px dashed var(--color-border);
   border-radius: 8px;
   background: var(--color-bg-secondary);
   overflow: hidden;
@@ -1132,6 +1132,12 @@
   font-size: var(--text-xs);
   font-weight: 600;
   flex-shrink: 0;
+}
+
+.flowStepIcon {
+  font-size: 0.875rem;
+  flex-shrink: 0;
+  margin-right: 0.25rem;
 }
 
 .stepContent {

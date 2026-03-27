@@ -36,15 +36,9 @@ stream_.get('/', async (c) => {
   const stream = new ReadableStream({
     async start(controller) {
       const enc = new TextEncoder();
-      // Emit immediately (before any await) so client gets data right away
-      controller.enqueue(enc.encode('event: ping\ndata: {"msg":"stream started","ts":' + Date.now() + '}\n\n'));
       const env = c.env as CloudflareEnv;
 
       try {
-        // Emit thinking immediately
-        controller.enqueue(enc.encode('event: thinking\ndata: {"content":"正在分析需求...","delta":true}\n\n'));
-        await new Promise(r => setTimeout(r, 100));
-
         // Dynamically import to avoid circular deps
         const { createAIService } = await import('../../../services/ai-service');
         const aiService = createAIService(env);

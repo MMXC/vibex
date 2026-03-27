@@ -1,234 +1,309 @@
-# PRD: VibeX 画布到创建项目流程修复
+# PRD: VibeX 新画布到创建项目流程优化
 
-**Project**: vibex-canvas-analysis  
 **Agent**: PM  
 **Date**: 2026-03-27  
-**Status**: Draft → Ready for Architecture Review  
-**Workspace**: /root/.openclaw/vibex
+**Project**: vibex-canvas-analysis  
+**Based on**: `analysis.md` (analyze-requirements 产物)  
+**Status**: Draft → Ready for Architect Review
 
 ---
 
-## 1. 执行摘要
+## 1. 产品概述
 
-### 背景
-VibeX 新画布（/canvas）存在多个阻断性 UX 问题：用户无法通过"导入示例"体验完整流程，"创建项目"按钮始终禁用。这些问题导致用户无法完成从需求录入到项目创建的闭环。
+### 1.1 背景
+VibeX 新画布（`/canvas`）是用户从需求输入到项目创建的核心流程通道。当前流程存在**阻断性问题**：用户点击"导入示例"后，三树为空导致"创建项目"按钮永久禁用，使完整体验路径断裂。
 
-### 目标
-修复画布核心交互流程，确保示例数据可正常加载，"创建项目"按钮在数据就绪后可用，同时改善未登录引导和 onboarding 体验。
+### 1.2 目标
+修复阻断性问题（P0），优化交互体验（P1-P2），确保用户能顺畅完成"输入需求 → 三树生成 → 确认节点 → 创建项目"的完整闭环。
 
-### 成功指标
+### 1.3 范围
+- **包含**: `/canvas` 页面流程优化、首页"开始使用"引导优化
+- **不包含**: AI 生成逻辑修改、游客模式完整实现、DDD 数据模型变更
 
-| 指标 | 目标值 | 验证方式 |
-|------|--------|----------|
-| 导入示例后三树节点数 | ≥ 1 个/树 | gstack snapshot 计数 |
-| "创建项目"按钮状态 | enabled（示例数据加载后）| `is enabled` 断言 |
-| 未登录提示显示率 | 100%（点击开始使用时）| gstack dialog check |
-| Onboarding 遮挡修复率 | 100%（跳过 intro 后）| gstack click 验证 |
-| 步骤进度条引导覆盖率 | 100%（禁用步骤有 tooltip）| gstack hover check |
-| 三树确认状态可见性 | 显示 X/Y 已确认 | gstack text check |
+### 1.4 非功能目标
+- 页面加载性能: 首屏 < 2s
+- 示例数据加载: < 500ms
+- 无阻断性 console error
 
 ---
 
-## 2. 功能需求
+## 2. 功能 Epic 与 Story 拆分
 
-### Epic 1: 示例数据导入流程修复（P0）
-
-**目标**: 修复"导入示例"按钮不加载数据的根因，确保"创建项目"按钮在示例数据就绪后可用。
-
-#### F1.1 示例数据文件创建
-- **描述**: 创建本地 JSON 示例数据文件，预设三树节点（context/flow/component），所有节点预设 `confirmed=true`
-- **文件路径**: `public/data/sample-canvas.json`
-- **验收标准**:
-  - `expect(require('../public/data/sample-canvas.json')).toHaveProperty('contexts')`
-  - `expect(sample.contexts.length).toBeGreaterThan(0)`
-  - `expect(sample.flows.length).toBeGreaterThan(0)`
-  - `expect(sample.components.length).toBeGreaterThan(0)`
-- **DoD**: JSON 文件符合 `types.ts` 接口定义，所有节点 `confirmed=true`
-- **依赖**: 无
-- **页面集成**: 无
-
-#### F1.2 "导入示例"按钮逻辑修复
-- **描述**: 修改"导入示例"按钮 onClick，从只切换 phase 改为完整加载示例数据到 store
-- **文件**: `src/pages/CanvasPage.tsx`
-- **验收标准**:
-  - `expect(fireEvent.click(screen.getByText(/导入示例/))).toChangeTreeState()`
-  - `expect(getContextNodes().length).toBeGreaterThan(0)`
-  - `expect(getFlowNodes().length).toBeGreaterThan(0)`
-  - `expect(getComponentNodes().length).toBeGreaterThan(0)`
-- **DoD**: 点击后三树均有节点，且节点 `confirmed=true`
-- **依赖**: F1.1
-- **页面集成**: ✅ 【需页面集成】`/canvas` 页面
-
-#### F1.3 "创建项目"按钮状态联动
-- **描述**: 当三树节点数 > 0 且 `areAllConfirmed()` 返回 true 时，按钮变为 enabled
-- **文件**: `src/components/ProjectBar.tsx`
-- **验收标准**:
-  - `expect(sampleDataLoaded && allConfirmed).toBe(true) → button.disabled === false`
-  - `expect(sampleDataLoaded && !allConfirmed).toBe(true) → button.disabled === true`
-- **DoD**: 示例数据加载后按钮可用，禁用时显示原因 tooltip
-- **依赖**: F1.2
-- **页面集成**: ✅ 【需页面集成】ProjectBar 组件
+> **ID 格式**: `F-{EpicNum}.{StoryNum}`  
+> **示例**: `F-1.1` = Epic 1, Story 1  
+> **页面标注**: `[Homepage]` = 首页, `[Canvas]` = /canvas 画布页
 
 ---
 
-### Epic 2: 登录引导与 Onboarding 优化（P1）
+### Epic 1: 修复"导入示例"流程阻断 (P0)
 
-**目标**: 未登录用户点击"开始使用"时有明确提示，跳过 intro 后按钮可正常点击。
+> **目标**: 用户点击"导入示例"能正确加载示例数据到三树，"创建项目"按钮在数据就绪后可用
 
-#### F2.1 未登录拦截提示
-- **描述**: 未登录用户点击"开始使用"时，显示 toast 或 modal 提示"请先登录"
-- **文件**: `src/pages/IndexPage.tsx`
-- **验收标准**:
-  - `expect(unauthenticatedClick('开始使用')).toShowDialog(/登录|login/i)`
-  - `expect(page.url).not.toMatch(/\/canvas/)`
-- **DoD**: 提示文案明确，不自动跳转
-- **依赖**: 无
-- **页面集成**: ✅ 【需页面集成】首页
+#### F-1.1 创建示例数据文件
+**页面**: [Canvas]  
+**描述**: 创建本地 JSON 文件存储示例需求及对应的三树结构（context/flow/component nodes），预设 `confirmed=true`。
 
-#### F2.2 OnboardingProgressBar 遮挡修复
-- **描述**: 跳过 intro 后，确保 OnboardingProgressBar 不再拦截"开始使用"按钮的点击事件
-- **文件**: `src/components/OnboardingProgressBar.tsx`
-- **验收标准**:
-  - `expect(clickSkipIntro()).toEnableClick('开始使用')`
-  - `expect(fireEvent.click(getByText('开始使用'))).not.toThrow()`
-- **DoD**: 跳过 intro 后按钮点击无 JS 错误
-- **依赖**: 无
-- **页面集成**: ✅ 【需页面集成】首页
-
----
-
-### Epic 3: 步骤进度条引导增强（P2）
-
-**目标**: 禁用步骤显示前置条件 tooltip，首个可点击步骤有视觉引导。
-
-#### F3.1 禁用步骤前置条件提示
-- **描述**: 步骤 2-5 禁用时，悬停显示 tooltip 说明前置条件（如"请先完成需求录入"）
-- **文件**: `src/components/StepProgressBar.tsx`
-- **验收标准**:
-  - `expect(hoverDisabledStep(2)).toShowTooltip(/需求录入/)`
-  - `expect(hoverDisabledStep(3)).toShowTooltip(/需求澄清/)`
-- **DoD**: 每个禁用步骤的 tooltip 说明正确的顺序前置条件
-- **依赖**: 无
-- **页面集成**: ✅ 【需页面集成】StepProgressBar 组件
-
-#### F3.2 首个步骤视觉引导
-- **描述**: 首个可点击步骤（需求录入）有脉冲动画或高亮边框
-- **验收标准**:
-  - `expect(getByTestId('step-1')).toHaveClass(/pulse|highlight|active/)`
-- **DoD**: 视觉引导在页面加载后 1 秒内出现
-- **依赖**: 无
-- **页面集成**: ✅ 【需页面集成】StepProgressBar 组件
-
----
-
-### Epic 4: 三树状态可视性增强（P2）
-
-**目标**: 三树面板显示确认进度，"创建项目"按钮禁用原因明确。
-
-#### F4.1 三树确认进度显示
-- **描述**: 三树面板底部显示"X/Y 已确认"状态，让用户直观感知进度
-- **文件**: `src/components/TreePanel.tsx`
-- **验收标准**:
-  - `expect(getByText(/已确认 \d+\/\d+/)).toBeInTheDocument()`
-  - `expect(afterConfirmNode).toUpdateText(/已确认 \d+\/\d+/)`
-- **DoD**: 确认节点后，计数实时更新
-- **依赖**: 无
-- **页面集成**: ✅ 【需页面集成】TreePanel 组件
-
-#### F4.2 按钮禁用原因 tooltip
-- **描述**: "创建项目"按钮 disabled 时，悬停显示具体原因（哪个树为空 / 未确认节点数量）
-- **文件**: `src/components/ProjectBar.tsx`
-- **验收标准**:
-  - `expect(hoverDisabledButton()).toShowTitle(/业务流程.*空|未确认 \d+/)`
-  - `expect(tooltip).toMatch(/请先|未确认/)`
-- **DoD**: tooltip 显示具体缺失项，而非泛泛的"请先确认所有三树节点"
-- **依赖**: F1.3
-- **页面集成**: ✅ 【需页面集成】ProjectBar 组件
-
----
-
-## 3. UI/UX 流程
-
-```
-用户进入首页 (/)
-    │
-    ├─ [未登录] 点击"开始使用"
-    │       └─ → 显示 toast/modal "请先登录" (Epic 2)
-    │
-    ├─ [已登录] 点击"开始使用"
-    │       └─ → 跳转到 /canvas (Phase: input)
-    │
-    └─ [Onboarding 存在] 进度条遮挡
-            └─ [跳过 intro] → 按钮可点击 (Epic 2)
-
-用户进入画布页面 (/canvas)
-    │
-    ├─ [输入需求 + 生成] 正常流程
-    │
-    ├─ [点击"导入示例"] → 加载 sample-canvas.json → 三树显示数据
-    │       └─ [确认节点后] "创建项目"按钮 enabled
-    │
-    └─ [未导入示例] → 三树为空 → 按钮禁用 + tooltip 说明原因
-            └─ [导入后] → 按钮 enabled
-
-三树节点确认 → 进度显示 X/Y 已确认 → 按钮 enabled → 创建项目
+**验收标准**:
+```typescript
+// expect 示例数据结构完整
+expect(exampleData).toHaveProperty('requirement')
+expect(exampleData).toHaveProperty('contextNodes')
+expect(exampleData).toHaveProperty('flowNodes')
+expect(exampleData).toHaveProperty('componentNodes')
+expect(exampleData.contextNodes.length).toBeGreaterThan(0)
+expect(exampleData.flowNodes.length).toBeGreaterThan(0)
+expect(exampleData.componentNodes.length).toBeGreaterThan(0)
+expect(exampleData.contextNodes.every(n => n.confirmed === true)).toBe(true)
+expect(exampleData.flowNodes.every(n => n.confirmed === true)).toBe(true)
+expect(exampleData.componentNodes.every(n => n.confirmed === true)).toBe(true)
 ```
 
 ---
 
-## 4. Epic 优先级矩阵
+#### F-1.2 修复"导入示例"按钮逻辑
+**页面**: [Canvas] `CanvasPage.tsx`  
+**描述**: 修改"导入示例"按钮的 onClick，从只切换 phase 改为完整加载示例数据到 store。
 
-| Epic | 优先级 | 工作量 | 风险 | 决策 |
-|------|--------|--------|------|------|
-| Epic 1: 示例数据导入修复 | P0 | 中 | 低 | 立即执行 |
-| Epic 2: 登录引导与 Onboarding | P1 | 低 | 低 | 下个迭代 |
-| Epic 3: 步骤进度条引导 | P2 | 低 | 低 | 规划中 |
-| Epic 4: 三树状态可视性 | P2 | 低 | 低 | 规划中 |
+**验收标准**:
+```typescript
+// 点击导入示例后，三树均有节点
+await canvasPage.clickImportExample()
+await page.waitForSelector('[data-testid="context-tree"] .tree-node', { timeout: 3000 })
+const contextNodeCount = await canvasPage.getContextNodeCount()
+expect(contextNodeCount).toBeGreaterThan(0)
 
----
+const flowNodeCount = await canvasPage.getFlowNodeCount()
+expect(flowNodeCount).toBeGreaterThan(0)
 
-## 5. 非功能需求
+const componentNodeCount = await canvasPage.getComponentNodeCount()
+expect(componentNodeCount).toBeGreaterThan(0)
 
-| 类型 | 要求 |
-|------|------|
-| **兼容性** | 示例数据 JSON 与 `types.ts` 接口严格对齐 |
-| **可测试性** | 每个功能点有 Playwright/gstack 测试覆盖 |
-| **回归保护** | 现有正常流程（手动输入 + AI 生成）不受影响 |
-| **无障碍** | 按钮 disabled 状态需提供 aria-disabled 和 tooltip |
-| **性能** | 示例数据加载 < 100ms，不触发额外 AI 调用 |
-
----
-
-## 6. 验收标准总览
-
-### P0 — 必须交付
-- [ ] `expect(fireEvent.click(getByText('导入示例'))).toLoadNodes(contexts ≥ 1, flows ≥ 1, components ≥ 1)`
-- [ ] `expect(allConfirmed && nodesExist).toBe(true) → projectButton.disabled === false`
-- [ ] gstack snapshot 验证三树均有节点
-
-### P1 — 下个迭代
-- [ ] 未登录点击"开始使用"显示 toast/modal
-- [ ] 跳过 intro 后"开始使用"可正常点击
-
-### P2 — 规划中
-- [ ] 禁用步骤显示前置条件 tooltip
-- [ ] 三树面板显示"X/Y 已确认"计数
-- [ ] 按钮 disabled 时 tooltip 说明具体原因
+// 三树节点均已确认
+expect(await canvasPage.areAllContextNodesConfirmed()).toBe(true)
+expect(await canvasPage.areAllFlowNodesConfirmed()).toBe(true)
+expect(await canvasPage.areAllComponentNodesConfirmed()).toBe(true)
+```
 
 ---
 
-## 7. 依赖项
+#### F-1.3 "创建项目"按钮状态联动
+**页面**: [Canvas] `ProjectBar.tsx`  
+**描述**: 确保"创建项目"按钮在示例数据加载后变为 enabled。
 
-| 上游产物 | 状态 |
-|----------|------|
-| analysis.md | ✅ 已完成（6 issues: 2 P0, 2 P1, 2 P2） |
+**验收标准**:
+```typescript
+// 示例数据加载后，按钮 enabled
+await canvasPage.clickImportExample()
+await page.waitForTimeout(500)
+const createProjectBtn = await page.$('[data-testid="create-project-btn"]')
+expect(await createProjectBtn.isEnabled()).toBe(true)
 
-| 下游等待 | 状态 |
-|----------|------|
-| architecture.md | ⏳ 待 architect |
-| IMPLEMENTATION_PLAN.md | ⏳ 待 architect |
+// 无数据时，按钮 disabled
+const emptyBtn = await page.$('[data-testid="create-project-btn"]')
+expect(await emptyBtn.isDisabled()).toBe(true)
+```
 
 ---
 
-*本 PRD 由 PM Agent 基于 analyst 的 analysis.md 自动生成*
-*验收标准支持 expect() 断言格式，可直接用于 Playwright 测试*
+### Epic 2: 优化未登录用户引导 (P1)
+
+#### F-2.1 未登录"开始使用"拦截提示
+**页面**: [Homepage]  
+**描述**: 未登录用户点击"开始使用"时，显示 toast 提示"请先登录"，而非静默跳转。
+
+**验收标准**:
+```typescript
+// 未登录用户点击"开始使用"
+await homepage.clickStartButton()
+const toast = await page.waitForSelector('[data-testid="auth-toast"]', { timeout: 2000 })
+expect(toast).toBeVisible()
+expect(await toast.textContent()).toContain('请先登录')
+```
+
+---
+
+#### F-2.2 跳过 intro 后"开始使用"可点击
+**页面**: [Homepage]  
+**描述**: 修复 OnboardingProgressBar 遮挡问题，跳过 intro 后按钮可正常点击。
+
+**验收标准**:
+```typescript
+// 跳过 intro 后，按钮可点击（无 intercept 报错）
+await homepage.clickSkipIntro()
+await page.waitForTimeout(300)
+await homepage.clickStartButton()
+// 不应出现 "element intercepts pointer events" 错误
+```
+
+---
+
+### Epic 3: 优化步骤引导与状态感知 (P2)
+
+#### F-3.1 步骤进度条 tooltip 引导
+**页面**: [Canvas]  
+**描述**: 禁用步骤按钮显示 tooltip 说明前置条件。
+
+**验收标准**:
+```typescript
+// 需求录入未完成时，步骤2禁用且有tooltip
+const step2Btn = await page.$('[data-testid="step-2-btn"]')
+expect(await step2Btn.getAttribute('disabled')).not.toBeNull()
+expect(await step2Btn.getAttribute('title')).toMatch(/请先完成需求录入/)
+```
+
+---
+
+#### F-3.2 三树状态进度展示
+**页面**: [Canvas]  
+**描述**: 三树面板显示"X/Y 已确认"状态，让用户直观感知进度。
+
+**验收标准**:
+```typescript
+// 加载示例数据后，三树显示已确认数量
+await canvasPage.clickImportExample()
+const contextStatus = await page.textContent('[data-testid="context-tree-status"]')
+expect(contextStatus).toMatch(/\d+\/\d+ 已确认/)
+
+const flowStatus = await page.textContent('[data-testid="flow-tree-status"]')
+expect(flowStatus).toMatch(/\d+\/\d+ 已确认/)
+
+const componentStatus = await page.textContent('[data-testid="component-tree-status"]')
+expect(componentStatus).toMatch(/\d+\/\d+ 已确认/)
+```
+
+---
+
+#### F-3.3 "创建项目"按钮禁用原因说明
+**页面**: [Canvas] `ProjectBar.tsx`  
+**描述**: 按钮 disabled 时悬停显示具体原因（如"业务流程树为空，请先生成流程"）。
+
+**验收标准**:
+```typescript
+// 按钮 disabled 时悬停显示原因
+await page.$eval('[data-testid="create-project-btn"]', el => el.getAttribute('title'))
+// 期望: 包含"请先确认所有三树节点"或具体缺失项
+```
+
+---
+
+## 3. 优先级矩阵 (MoSCoW)
+
+| ID | 功能 | MoSCoW | 理由 |
+|----|------|--------|------|
+| F-1.1 | 创建示例数据文件 | **Must** | 修复 Q1 的数据基础 |
+| F-1.2 | 修复"导入示例"按钮逻辑 | **Must** | 修复 Q1 根因 |
+| F-1.3 | "创建项目"按钮状态联动 | **Must** | 修复 Q2 根因 |
+| F-2.1 | 未登录"开始使用"拦截提示 | **Should** | 修复 Q3 体验问题 |
+| F-2.2 | 跳过 intro 后可点击 | **Should** | 修复 Q4 偶发问题 |
+| F-3.1 | 步骤进度条 tooltip | **Could** | 改善引导体验 |
+| F-3.2 | 三树状态进度展示 | **Could** | 提升状态感知 |
+| F-3.3 | 按钮禁用原因说明 | **Could** | 减少用户困惑 |
+
+---
+
+## 4. 验收测试矩阵
+
+| 功能 ID | 验收标准 | 测试工具 | 预期结果 |
+|---------|----------|----------|----------|
+| F-1.1 | 示例数据结构完整，confirmed=true | 单元测试 | 6 个断言全部通过 |
+| F-1.2 | 导入示例后三树各有 ≥1 节点 | gstack browse | snapshot 有节点 |
+| F-1.3 | 示例数据加载后按钮 enabled | gstack browse | `is enabled` |
+| F-2.1 | 未登录点击显示 toast | gstack browse | toast 可见 |
+| F-2.2 | 跳过 intro 后可点击 | gstack browse | 无 intercept 报错 |
+| F-3.1 | 禁用步骤有 tooltip | gstack browse | title 属性非空 |
+| F-3.2 | 三树显示已确认数量 | gstack browse | 文本匹配正则 |
+| F-3.3 | 按钮 disabled 悬停有原因 | gstack browse | title 有内容 |
+
+---
+
+## 5. 页面集成标注
+
+| 页面 | 路由 | 涉及文件 | 修改类型 |
+|------|------|----------|----------|
+| 首页 | `/` | `HomePage.tsx` | F-2.1, F-2.2 |
+| 画布页 | `/canvas` | `CanvasPage.tsx` | F-1.2, F-3.1, F-3.2 |
+| 项目栏 | `/canvas` | `ProjectBar.tsx` | F-1.3, F-3.3 |
+| 状态栏 | `/canvas` | `TreeStatus.tsx` (新增) | F-3.2 |
+| 示例数据 | 共享 | `data/example-canvas.json` (新增) | F-1.1 |
+
+---
+
+## 6. 推荐实现方案
+
+### F-1.1 ~ F-1.3 (Epic 1): 方案 A — 示例数据文件 + 修复加载逻辑
+
+| 步骤 | 行动 | 工时 |
+|------|------|------|
+| 1 | 创建 `data/example-canvas.json`，包含完整的三树结构，节点预设 `confirmed: true` | 1h |
+| 2 | 修改 `CanvasPage.tsx` 的"导入示例"按钮，调用 store action 加载示例数据 | 2h |
+| 3 | 验证 `ProjectBar.tsx` 的 `areAllConfirmed` 检查在示例数据下通过 | 1h |
+| 4 | 使用 gstack browse 验收测试（snapshot + enabled check） | 1h |
+
+**预计工时**: ~5h
+
+### F-2.1 ~ F-2.2 (Epic 2): Toast 提示方案
+
+| 步骤 | 行动 | 工时 |
+|------|------|------|
+| 1 | 在 `HomePage.tsx` 添加登录状态检查，未登录点击显示 toast | 2h |
+| 2 | 验证 OnboardingProgressBar 遮挡问题修复 | 0.5h |
+| 3 | gstack browse 验收测试 | 0.5h |
+
+**预计工时**: ~3h
+
+### F-3.1 ~ F-3.3 (Epic 3): 渐进增强
+
+| 步骤 | 行动 | 工时 |
+|------|------|------|
+| 1 | 禁用步骤按钮添加 title 属性 | 1h |
+| 2 | 创建 `TreeStatus` 组件显示"X/Y 已确认" | 2h |
+| 3 | "创建项目"按钮 disabled 时设置 title | 1h |
+| 4 | gstack browse 验收测试 | 1h |
+
+**预计工时**: ~5h
+
+---
+
+## 7. 总工时估算
+
+| Epic | 功能 | 工时 |
+|------|------|------|
+| Epic 1 | 修复导入示例流程 | 5h |
+| Epic 2 | 优化未登录引导 | 3h |
+| Epic 3 | 优化步骤引导 | 5h |
+| **总计** | | **~13h** |
+
+---
+
+## 8. 风险与缓解
+
+| 风险 | 概率 | 影响 | 缓解措施 |
+|------|------|------|----------|
+| 示例数据与实际 types 不匹配 | 低 | 高 | 对齐 `types.ts` 接口定义后创建 JSON |
+| `areAllConfirmed` 逻辑变更影响验收 | 中 | 高 | 添加集成测试覆盖 |
+| 后续 AI 生成覆盖示例数据 | 低 | 中 | 示例模式使用独立 store branch |
+| 页面重构导致 data-testid 失效 | 中 | 中 | 使用稳定的选择器策略 |
+
+---
+
+## 9. 成功标准
+
+### 必须达成 (Must)
+- [ ] `F-1.2` 验收: 点击"导入示例"后三树各有 ≥1 节点
+- [ ] `F-1.3` 验收: 示例数据加载后"创建项目"按钮 enabled
+
+### 应该达成 (Should)
+- [ ] `F-2.1` 验收: 未登录用户看到 toast 提示
+- [ ] `F-2.2` 验收: 跳过 intro 后"开始使用"可点击
+
+### 可以达成 (Could)
+- [ ] `F-3.1` 验收: 禁用步骤有 tooltip
+- [ ] `F-3.2` 验收: 三树显示进度
+- [ ] `F-3.3` 验收: 按钮 disabled 有原因
+
+---
+
+## 10. 下一步
+
+> **传递条件**: PRD 审核通过后 → Architect 进行架构设计  
+> **产出物**: `architecture.md`（数据流图、组件改造计划、测试策略）

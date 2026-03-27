@@ -35,6 +35,7 @@ stream_.get('/', async (c) => {
 
   const stream = new ReadableStream({
     async start(controller) {
+      sendThinking(controller, "[START] Stream initiated", false);
       // Use Cloudflare runtime env (c.env), NOT getLocalEnv()
       const runtimeEnv = c.env as CloudflareEnv;
       const env = runtimeEnv;

@@ -35,10 +35,6 @@ stream_.get('/', async (c) => {
 
   const stream = new ReadableStream({
     async start(controller) {
-      if (!env.OPENAI_API_KEY) {
-        controller.close();
-        return;
-      }
       // Use Cloudflare runtime env (c.env), NOT getLocalEnv()
       const runtimeEnv = c.env as CloudflareEnv;
       const env = runtimeEnv;
@@ -300,7 +296,6 @@ stream_.get('/', async (c) => {
         sendSSE(controller, 'error', { message: errorMessage, code: 'STREAM_ERROR' });
       } finally {
         controller.close();
-      }
     },
   });
 

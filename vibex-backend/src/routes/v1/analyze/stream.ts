@@ -311,3 +311,14 @@ stream_.get('/', async (c) => {
 });
 
 export default stream_;
+
+// Debug endpoint to check env secrets
+stream_.get('/debug-env', async (c) => {
+  const env = c.env as CloudflareEnv;
+  return c.json({
+    hasOpenAI: !!env.OPENAI_API_KEY,
+    openAILen: env.OPENAI_API_KEY?.length || 0,
+    hasMinimax: !!env.MINIMAX_API_KEY,
+    hasJWT: !!env.JWT_SECRET,
+  });
+});

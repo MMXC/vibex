@@ -13,6 +13,7 @@
 
 import { Hono } from 'hono';
 import { CloudflareEnv, getLocalEnv } from '../../../lib/env';
+import { devDebug } from '../../../lib/log-sanitizer';
 
 const stream_ = new Hono<{ Bindings: CloudflareEnv }>();
 
@@ -34,11 +35,10 @@ stream_.get('/', async (c) => {
 
   const stream = new ReadableStream({
     async start(controller) {
-      // Use Cloudflare runtime env (c.env), NOT getLocalEnv()
-      const runtimeEnv = c.env as CloudflareEnv;
-      const env = runtimeEnv;
+      const env = c.env as CloudflareEnv;
 
       try {
+        devDebug('[SSE Stream] Starting analysis for requirement:', requirement.substring(0, 100));
 
         // Dynamically import to avoid circular deps
         const { createAIService } = await import('../../../services/ai-service');
@@ -115,6 +115,7 @@ stream_.get('/', async (c) => {
           });
 
         } catch (err) {
+          devDebug('[SSE Stream] step_context error:', err);
           sendSSE(controller, 'step_context', {
             content: 'Bounded context analysis completed',
             mermaidCode: '',
@@ -176,6 +177,7 @@ stream_.get('/', async (c) => {
           });
 
         } catch (err) {
+          devDebug('[SSE Stream] step_model error:', err);
           sendSSE(controller, 'step_model', {
             content: 'Domain model analysis completed',
             mermaidCode: '',
@@ -219,6 +221,7 @@ stream_.get('/', async (c) => {
           });
 
         } catch (err) {
+          devDebug('[SSE Stream] step_flow error:', err);
           sendSSE(controller, 'step_flow', {
             content: 'Business flow analysis completed',
             mermaidCode: '',
@@ -268,6 +271,7 @@ stream_.get('/', async (c) => {
           });
 
         } catch (err) {
+          devDebug('[SSE Stream] step_components error:', err);
           sendSSE(controller, 'step_components', {
             content: 'Component analysis completed',
             mermaidCode: '',
@@ -282,14 +286,16 @@ stream_.get('/', async (c) => {
           summary: 'Analysis complete',
         });
 
+        devDebug('[SSE Stream] Stream completed for project:', projectId);
 
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Stream processing failed';
+        devDebug('[SSE Stream] Error:', errorMessage);
         sendSSE(controller, 'error', { message: errorMessage, code: 'STREAM_ERROR' });
       } finally {
         controller.close();
       }
-    }
+    },
   });
 
   return new Response(stream, {
@@ -298,53 +304,8 @@ stream_.get('/', async (c) => {
       'Cache-Control': 'no-cache, no-transform',
       'Connection': 'keep-alive',
       'X-Accel-Buffering': 'no',
-    }
+    },
   });
-});
-
-
-// Simple SSE test endpoint
-stream_.get('/sse-test', async (c) => {
-  const stream = new ReadableStream({
-    start(controller) {
-      const encoder = new TextEncoder();
-      controller.enqueue(encoder.encode('event: thinking\ndata: {"content":"test1","delta":true}\n\n'));
-      setTimeout(() => {
-        controller.enqueue(encoder.encode('event: thinking\ndata: {"content":"test2","delta":false}\n\n'));
-        setTimeout(() => {
-          controller.close();
-      }
-        }, 500);
-      }, 500);
-    }
-  });
-  return new Response(stream, {
-    headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' }
-  });
-});
-
-// Quick AI test
-stream_.get("/ai-test", async (c) => {
-  const env = c.env as CloudflareEnv;
-  try {
-    const resp = await fetch("https://api.minimaxi.com/anthropic/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": env.ANTHROPIC_API_KEY || env.MINIMAX_API_KEY || "",
-        "anthropic-version": "2023-06-01"
-      },
-      body: JSON.stringify({
-        model: env.ANTHROPIC_MODEL || "MiniMax-M2.7-highspeed",
-        messages: [{role: "user", content: "say hi in 3 words"}],
-        max_tokens: 20
-      })
-    });
-    const text = await resp.text();
-    return c.json({ status: resp.status, body: JSON.parse(text) });
-  } catch(e) {
-    return c.json({ error: e.message, stack: e.stack });
-  }
 });
 
 export default stream_;

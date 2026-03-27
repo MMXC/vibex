@@ -1,3 +1,10 @@
+### Added (vibex-pre-existing-test-failures: CardTreeView & Navbar 测试修复) — 2026-03-28
+- **CardTreeView.tsx**: 修复 `displayError` 逻辑，`fetchError` 不存在时不显示错误
+- **CardTreeView.test.tsx**: 添加 `useErrorHandler` mock，修复错误状态测试（29 tests ✅）
+- **useErrorHandler.ts**: 添加中文错误消息识别（网络错误/超时）
+- **Navbar.test.tsx**: 修复 Zustand selector 模式 mock
+- Review: `docs/vibex-pre-existing-test-failures/review-cardtreeview-fix.md`
+
 ### Added (vibex-canvas-expand-dir-20260328 Epic1: 三栏展开方向修复) — 2026-03-28
 - **Epic1**: F1.1~F1.2 三栏展开方向独立控制
   - `HoverHotzone.tsx`: 新增 `centerExpandDirection` 属性，支持左/右热区独立控制展开方向

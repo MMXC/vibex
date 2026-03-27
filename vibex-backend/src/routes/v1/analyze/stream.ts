@@ -35,7 +35,9 @@ stream_.get('/', async (c) => {
 
   const stream = new ReadableStream({
     async start(controller) {
-      const env = getLocalEnv();
+      // Use Cloudflare runtime env (c.env), NOT getLocalEnv()
+      const runtimeEnv = c.env as CloudflareEnv;
+      const env = runtimeEnv;
 
       try {
         devDebug('[SSE Stream] Starting analysis for requirement:', requirement.substring(0, 100));

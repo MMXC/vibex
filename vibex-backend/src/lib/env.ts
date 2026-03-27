@@ -7,6 +7,7 @@ export interface CloudflareEnv {
   MINIMAX_API_KEY: string;
   MINIMAX_API_BASE?: string;
   MINIMAX_MODEL?: string;
+  OPENAI_API_KEY?: string;
 }
 
 // D1 types
@@ -39,6 +40,7 @@ export function getLocalEnv(): CloudflareEnv {
     MINIMAX_API_KEY: process.env.MINIMAX_API_KEY || '',
     MINIMAX_API_BASE: process.env.MINIMAX_API_BASE || 'https://api.minimax.chat/v1',
     MINIMAX_MODEL: process.env.MINIMAX_MODEL || 'abab6.5s-chat',
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY || undefined,
   };
 }
 

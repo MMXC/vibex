@@ -15,6 +15,8 @@ interface HoverHotzoneProps {
   position: 'left-edge' | 'right-edge';
   /** 所属面板: 'left' | 'center' | 'right' */
   panel: 'left' | 'center' | 'right';
+  /** 中间面板专用：指定展开方向 */
+  centerExpandDirection?: 'left' | 'right';
 }
 
 /** 展开箭头 SVG 图标 */
@@ -41,10 +43,11 @@ function ExpandArrow({ direction }: { direction: 'left' | 'right' | 'contract' }
   );
 }
 
-export function HoverHotzone({ position, panel }: HoverHotzoneProps) {
+export function HoverHotzone({ position, panel, centerExpandDirection }: HoverHotzoneProps) {
   const [hovered, setHovered] = useState(false);
 
   const togglePanel = useCanvasStore((s) => s.togglePanel);
+  const setCenterExpand = useCanvasStore((s) => s.setCenterExpand);
   const resetExpand = useCanvasStore((s) => s.resetExpand);
   const isDragging = useCanvasStore((s) => s.isDragging);
 
@@ -56,6 +59,14 @@ export function HoverHotzone({ position, panel }: HoverHotzoneProps) {
 
   /** 当前面板展开时，箭头方向 */
   const arrowDirection = (() => {
+    if (panel === 'center') {
+      // 中间面板：根据 centerExpandDirection 和当前状态决定箭头方向
+      if (centerExpandDirection === 'left') {
+        return expandState === 'expand-left' ? 'left' : 'right';
+      } else {
+        return expandState === 'expand-right' ? 'right' : 'left';
+      }
+    }
     if (position === 'left-edge') {
       // 左边缘：展开左面板时=右箭头(往右扩)，收缩时=左箭头
       return expandState === 'default' ? 'right' : expandState === 'expand-right' ? 'left' : 'right';
@@ -67,7 +78,17 @@ export function HoverHotzone({ position, panel }: HoverHotzoneProps) {
 
   const handleClick = () => {
     if (isDragging) return; // E3: disable expand during drag
-    if (expandState !== 'default') {
+    if (panel === 'center' && centerExpandDirection) {
+      // 中间面板：根据热区位置直接设置展开方向
+      const targetState = centerExpandDirection === 'left' ? 'expand-left' : 'expand-right';
+      if (expandState === targetState) {
+        // 已展开，取消展开
+        setCenterExpand('default');
+      } else {
+        // 展开到指定方向
+        setCenterExpand(targetState);
+      }
+    } else if (expandState !== 'default') {
       resetExpand();
     } else {
       togglePanel(panel);

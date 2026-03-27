@@ -333,9 +333,11 @@ export const useCanvasStore = create<CanvasStore>()(
               set({ leftExpand: next as PanelExpandState });
             } else if (panel === 'center') {
               const { centerExpand } = get();
+              // 循环: default → expand-left → expand-right → default
               const next = centerExpand === 'default' ? 'expand-left'
-                : centerExpand === 'expand-left' ? 'default'
-                : centerExpand;
+                : centerExpand === 'expand-left' ? 'expand-right'
+                : centerExpand === 'expand-right' ? 'default'
+                : 'default';
               set({ centerExpand: next as PanelExpandState });
             } else {
               const { rightExpand } = get();

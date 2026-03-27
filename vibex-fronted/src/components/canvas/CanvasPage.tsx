@@ -297,9 +297,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 isActive={flowActive}
                 onToggleCollapse={toggleFlowPanel}
               >
-                <HoverHotzone position="left-edge" panel="center" />
+                <HoverHotzone position="left-edge" panel="center" centerExpandDirection="left" />
                 <BusinessFlowTree isActive={flowActive || activeTree === null} />
-                <HoverHotzone position="right-edge" panel="center" />
+                <HoverHotzone position="right-edge" panel="center" centerExpandDirection="right" />
               </TreePanel>
 
               <TreePanel

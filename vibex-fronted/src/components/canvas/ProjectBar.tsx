@@ -131,6 +131,7 @@ export function ProjectBar({ projectName = '未命名项目', onProjectNameChang
         onClick={handleCreateProject}
         disabled={!allConfirmed || isCreating}
         aria-label="创建项目并开始生成原型"
+        data-testid="create-project-btn"
         title={
           !allConfirmed
             ? '请先确认所有三树节点'

@@ -45,6 +45,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const toggleContextPanel = useCanvasStore((s) => s.toggleContextPanel);
   const toggleFlowPanel = useCanvasStore((s) => s.toggleFlowPanel);
   const toggleComponentPanel = useCanvasStore((s) => s.toggleComponentPanel);
+  const loadExampleData = useCanvasStore((s) => s.loadExampleData);
 
   // === Expand State Selectors (E2) ===
   const gridRef = useRef<HTMLDivElement>(null);
@@ -347,7 +348,10 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
               <button
                 type="button"
                 className={styles.secondaryButton}
-                onClick={() => setPhase('context')}
+                onClick={loadExampleData}
+                aria-label="导入示例数据"
+                data-testid="import-example-btn"
+                title="加载示例画布数据到三树"
               >
                 导入示例
               </button>

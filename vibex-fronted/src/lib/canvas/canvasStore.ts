@@ -25,6 +25,8 @@ import type {
   BoundedGroup,
 } from './types';
 
+import exampleCanvasData from '@/data/example-canvas.json';
+
 // =============================================================================
 // Helpers
 // =============================================================================
@@ -197,6 +199,10 @@ interface CanvasStore {
   reorderSteps: (flowNodeId: string, fromIndex: number, toIndex: number) => void;
   // === Auto-generation (Epic 3) ===
   autoGenerateFlows: (contexts: BoundedContextNode[]) => void;
+
+  // === Example Data (F-1.2) ===
+  /** Load example canvas data — sets all three trees + advances phase to context */
+  loadExampleData: () => void;
 
   // === Component Slice Actions ===
   setComponentNodes: (nodes: ComponentNode[]) => void;
@@ -516,6 +522,22 @@ export const useCanvasStore = create<CanvasStore>()(
               children: [],
             }));
             set({ flowNodes: flows });
+          },
+
+          // === Example Data (F-1.2) ===
+          loadExampleData: () => {
+            const data = exampleCanvasData as {
+              contextNodes: BoundedContextNode[];
+              flowNodes: BusinessFlowNode[];
+              componentNodes: ComponentNode[];
+            };
+            set({
+              contextNodes: data.contextNodes,
+              flowNodes: data.flowNodes,
+              componentNodes: data.componentNodes,
+              phase: 'context',
+              activeTree: 'flow',
+            });
           },
 
           // === Component Slice Actions ===

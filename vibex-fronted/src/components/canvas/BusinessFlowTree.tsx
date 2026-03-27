@@ -381,7 +381,7 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
   }
 
   return (
-    <div className={styles.flowTreePanel}>
+    <div className={styles.flowTreePanel} data-testid="flow-tree">
       {/* Header with add button */}
       <div className={styles.treeHeader}>
         {canManualAdd && (

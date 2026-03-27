@@ -406,7 +406,7 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
   const hasNodes = componentNodes.length > 0;
 
   return (
-    <div className={styles.componentTree} aria-label="组件树">
+    <div className={styles.componentTree} aria-label="组件树" data-testid="component-tree">
       {/* Generation Controls */}
       <div className={styles.contextTreeControls}>
         <button

@@ -1,0 +1,258 @@
+{
+  "contextNodes": [
+    {
+      "nodeId": "ctx-user",
+      "name": "用户管理",
+      "description": "用户注册、登录、个人信息管理、权限控制",
+      "type": "core",
+      "confirmed": true,
+      "status": "confirmed",
+      "children": []
+    },
+    {
+      "nodeId": "ctx-order",
+      "name": "订单管理",
+      "description": "订单创建、支付、履约、取消退款全流程",
+      "type": "core",
+      "confirmed": true,
+      "status": "confirmed",
+      "children": []
+    },
+    {
+      "nodeId": "ctx-product",
+      "name": "商品管理",
+      "description": "商品发布、上下架、库存、价格策略",
+      "type": "core",
+      "confirmed": true,
+      "status": "confirmed",
+      "children": []
+    }
+  ],
+  "flowNodes": [
+    {
+      "nodeId": "flow-order-create",
+      "contextId": "ctx-order",
+      "name": "创建订单流程",
+      "steps": [
+        {
+          "stepId": "step-browse",
+          "name": "浏览商品",
+          "actor": "用户",
+          "description": "用户在商品列表页浏览并选择商品",
+          "order": 0,
+          "confirmed": true,
+          "status": "confirmed"
+        },
+        {
+          "stepId": "step-cart",
+          "name": "加入购物车",
+          "actor": "用户",
+          "description": "用户将选中商品加入购物车",
+          "order": 1,
+          "confirmed": true,
+          "status": "confirmed"
+        },
+        {
+          "stepId": "step-checkout",
+          "name": "结算",
+          "actor": "用户",
+          "description": "用户确认订单并选择支付方式",
+          "order": 2,
+          "confirmed": true,
+          "status": "confirmed"
+        }
+      ],
+      "confirmed": true,
+      "status": "confirmed",
+      "children": []
+    },
+    {
+      "nodeId": "flow-user-auth",
+      "contextId": "ctx-user",
+      "name": "用户认证流程",
+      "steps": [
+        {
+          "stepId": "step-login",
+          "name": "登录",
+          "actor": "用户",
+          "description": "用户输入账号密码完成登录",
+          "order": 0,
+          "confirmed": true,
+          "status": "confirmed"
+        },
+        {
+          "stepId": "step-verify",
+          "name": "身份验证",
+          "actor": "系统",
+          "description": "系统验证用户凭证并颁发 token",
+          "order": 1,
+          "confirmed": true,
+          "status": "confirmed"
+        },
+        {
+          "stepId": "step-session",
+          "name": "会话管理",
+          "actor": "系统",
+          "description": "创建并维护用户会话状态",
+          "order": 2,
+          "confirmed": true,
+          "status": "confirmed"
+        }
+      ],
+      "confirmed": true,
+      "status": "confirmed",
+      "children": []
+    },
+    {
+      "nodeId": "flow-product-crud",
+      "contextId": "ctx-product",
+      "name": "商品管理流程",
+      "steps": [
+        {
+          "stepId": "step-list",
+          "name": "查看商品列表",
+          "actor": "用户",
+          "description": "用户浏览商品列表页",
+          "order": 0,
+          "confirmed": true,
+          "status": "confirmed"
+        },
+        {
+          "stepId": "step-detail",
+          "name": "查看详情",
+          "actor": "用户",
+          "description": "用户点击商品查看详细信息",
+          "order": 1,
+          "confirmed": true,
+          "status": "confirmed"
+        },
+        {
+          "stepId": "step-publish",
+          "name": "发布商品",
+          "actor": "管理员",
+          "description": "管理员发布或下架商品",
+          "order": 2,
+          "confirmed": true,
+          "status": "confirmed"
+        }
+      ],
+      "confirmed": true,
+      "status": "confirmed",
+      "children": []
+    },
+    {
+      "nodeId": "flow-order-refund",
+      "contextId": "ctx-order",
+      "name": "订单退款流程",
+      "steps": [
+        {
+          "stepId": "step-refund-apply",
+          "name": "申请退款",
+          "actor": "用户",
+          "description": "用户提交退款申请",
+          "order": 0,
+          "confirmed": true,
+          "status": "confirmed"
+        },
+        {
+          "stepId": "step-refund-approve",
+          "name": "审核退款",
+          "actor": "客服",
+          "description": "客服审核退款申请",
+          "order": 1,
+          "confirmed": true,
+          "status": "confirmed"
+        },
+        {
+          "stepId": "step-refund-process",
+          "name": "处理退款",
+          "actor": "系统",
+          "description": "系统执行退款并更新订单状态",
+          "order": 2,
+          "confirmed": true,
+          "status": "confirmed"
+        }
+      ],
+      "confirmed": true,
+      "status": "confirmed",
+      "children": []
+    }
+  ],
+  "componentNodes": [
+    {
+      "nodeId": "comp-product-list",
+      "flowId": "flow-order-create",
+      "name": "商品列表页",
+      "type": "page",
+      "props": {},
+      "api": {
+        "method": "GET",
+        "path": "/api/products",
+        "params": ["page", "pageSize", "category"]
+      },
+      "children": [],
+      "confirmed": true,
+      "status": "confirmed"
+    },
+    {
+      "nodeId": "comp-cart",
+      "flowId": "flow-order-create",
+      "name": "购物车页",
+      "type": "page",
+      "props": {},
+      "api": {
+        "method": "GET",
+        "path": "/api/cart",
+        "params": []
+      },
+      "children": [],
+      "confirmed": true,
+      "status": "confirmed"
+    },
+    {
+      "nodeId": "comp-checkout",
+      "flowId": "flow-order-create",
+      "name": "结算页",
+      "type": "page",
+      "props": {},
+      "api": {
+        "method": "POST",
+        "path": "/api/orders",
+        "params": []
+      },
+      "children": [],
+      "confirmed": true,
+      "status": "confirmed"
+    },
+    {
+      "nodeId": "comp-login",
+      "flowId": "flow-user-auth",
+      "name": "登录页",
+      "type": "page",
+      "props": {},
+      "api": {
+        "method": "POST",
+        "path": "/api/auth/login",
+        "params": []
+      },
+      "children": [],
+      "confirmed": true,
+      "status": "confirmed"
+    },
+    {
+      "nodeId": "comp-product-detail",
+      "flowId": "flow-product-crud",
+      "name": "商品详情页",
+      "type": "detail",
+      "props": {},
+      "api": {
+        "method": "GET",
+        "path": "/api/products/:id",
+        "params": []
+      },
+      "children": [],
+      "confirmed": true,
+      "status": "confirmed"
+    }
+  ]
+}

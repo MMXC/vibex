@@ -323,7 +323,7 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
   const hasNodes = contextNodes.length > 0;
 
   return (
-    <div className={styles.boundedContextTree} aria-label="限界上下文树" ref={containerRef}>
+    <div className={styles.boundedContextTree} aria-label="限界上下文树" data-testid="context-tree" ref={containerRef}>
       {/* Generation Controls */}
       <div className={styles.contextTreeControls}>
         <button

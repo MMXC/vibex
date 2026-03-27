@@ -1,5 +1,15 @@
 # Changelog
 
+### Fixed (vibex-canvas-analysis Epic1: 导入示例流程修复) — 2026-03-27
+- **Epic1**: F-1 导入示例流程阻断修复
+  - `canvasStore.ts`: `loadExampleData` action 设置 contextNodes + flowNodes + componentNodes + phase + activeTree
+  - `example-canvas.json`: 扩展至 3 context + 4 flow + 5 component，全部 confirmed:true
+  - `CanvasPage.tsx`: 导入按钮绑定 `loadExampleData`，添加 `data-testid="import-example-btn"`
+  - `ProjectBar.tsx`: 创建按钮添加 `data-testid="create-project-btn"`
+  - 三树组件添加 `data-testid`: context-tree / flow-tree / component-tree
+  - 19 example tests + 172 canvas regression tests pass
+  - Review: `docs/review-reports/20260327/review-vibex-canvas-analysis-epic1.md`
+
 ### Added (vibex-canvas-expandable-20260327 E5: E2E 测试) — 2026-03-27
 - **E5**: Playwright E2E — 13 个端到端集成测试（展开 + 拖拽 + 领域框）
   - `canvas-expand.spec.ts`: E2/E3/E4/E5 四组测试

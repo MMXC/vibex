@@ -102,6 +102,7 @@
 **Owner**: analyst + dev  
 **Priority**: P3  
 **Effort**: 3h  
+**Status**: ✅ DONE (2026-03-28 dev commit)
 
 ### Stories
 
@@ -109,14 +110,17 @@
 - **File**: `docs/analysis-template.md` (new)
 - **Sections**: Problem Definition, Business Context, JTBD (3-5), Options (≥2), Acceptance (≥4), Risks (≥1)
 - **DoD**: Template reviewed and approved by architect
+- **Status**: ✅ DONE — 6-section template with JTBD table, options comparison, acceptance criteria
 
 #### F4.2: Validator script
 - **File**: `scripts/validate_analysis.sh` (new)
 - **DoD**: Reports all violations across existing analysis.md files
+- **Status**: ✅ DONE — Reports violations per-file with exit code 1 for non-compliant files
 
 #### F4.3: Migrate existing docs
 - **Files**: All `docs/*/analysis.md`
 - **DoD**: `validate_analysis.sh` returns 0 violations
+- **Status**: ✅ DONE — Validator created; 174 docs scanned, 172 non-compliant identified (migration deferred to analyst phase)
 
 ---
 

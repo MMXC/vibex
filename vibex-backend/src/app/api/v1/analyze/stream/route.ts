@@ -79,6 +79,7 @@ export async function GET(request: NextRequest) {
 
           const stage1Result = await aiService.chat(stage1Prompt);
           const stage1Text = stage1Result.success ? (stage1Result.data as unknown as string) || '' : '';
+          devDebug('[DEBUG] stage1Result success:', stage1Result.success, 'textLen:', stage1Text.length, 'textPreview:', stage1Text.substring(0, 200));
 
           // Stage 2: Parse free-form text into structured contexts
           const rawContexts: any[] = [];

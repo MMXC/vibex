@@ -14,6 +14,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { CheckboxIcon } from '@/components/common/CheckboxIcon';
 import type { BusinessFlowNode, FlowStep } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
 
@@ -178,8 +179,9 @@ function StepRow({
                   className={`${styles.stepActionBtn} ${styles.btnConfirmStep}`}
                   onClick={() => onConfirm(step.stepId)}
                   title="确认"
+                  aria-label="确认步骤"
                 >
-                  ✓
+                  <CheckboxIcon checked size="sm" aria-label="确认" />
                 </button>
               )}
             </div>
@@ -303,8 +305,9 @@ function FlowCard({
                 className={`${styles.btnIcon} ${styles.btnConfirm}`}
                 onClick={() => onConfirm(node.nodeId)}
                 title="确认流程"
+                aria-label="确认流程"
               >
-                ✓
+                <CheckboxIcon checked size="sm" aria-label="确认流程" />
               </button>
             )}
           </div>

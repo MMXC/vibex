@@ -14,6 +14,7 @@ import React, { useState, useCallback, useRef, useMemo } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { RelationshipConnector } from './edges/RelationshipConnector';
 import { BoundedContextGroup } from './BoundedContextGroup';
+import { CheckboxIcon } from '@/components/common/CheckboxIcon';
 import type { BoundedContextNode, BoundedContextDraft } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
 
@@ -159,7 +160,7 @@ function ContextCard({ node, onConfirm, onEdit, onDelete, readonly }: ContextCar
                     : '外部'}
             </div>
             {node.confirmed && (
-              <span className={styles.confirmedBadge} aria-label="已确认">✓</span>
+              <CheckboxIcon checked size="sm" aria-label="已确认" />
             )}
           </div>
           <h4 className={styles.nodeCardTitle}>{node.name}</h4>
@@ -173,7 +174,7 @@ function ContextCard({ node, onConfirm, onEdit, onDelete, readonly }: ContextCar
                   onClick={() => onConfirm(node.nodeId)}
                   aria-label={`确认 ${node.name}`}
                 >
-                  ✓ 确认
+                  确认
                 </button>
               )}
               <button

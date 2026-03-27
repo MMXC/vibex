@@ -35,6 +35,8 @@ stream_.get('/', async (c) => {
 
   const stream = new ReadableStream({
     async start(controller) {
+      const enc = new TextEncoder();
+      controller.enqueue(enc.encode('event: ping\ndata: {"ts":' + Date.now() + '}\n\n'));
       const env = c.env as CloudflareEnv;
 
       try {

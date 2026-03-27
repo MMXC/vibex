@@ -4,7 +4,8 @@ import './globals.css';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { ToastProvider } from '@/components/ui/Toast';
 import { QueryProvider } from '@/lib/query/QueryProvider';
-import { OnboardingProvider } from '@/components/onboarding/OnboardingProvider';
+// OnboardingProvider removed - 2026-03-27
+
 import { MermaidInitializer } from '@/components/mermaid/MermaidInitializer';
 import { SentryInitializer } from '@/components/sentry/SentryInitializer';
 
@@ -36,7 +37,6 @@ export default function RootLayout({
         <ToastProvider>
           <QueryProvider>
             <ErrorBoundary>
-              <OnboardingProvider />
               {children}
             </ErrorBoundary>
           </QueryProvider>

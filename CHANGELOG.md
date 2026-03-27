@@ -1,5 +1,13 @@
 # Changelog
 
+### Added (vibex-canvas-analysis Epic3: 步骤引导体验优化) — 2026-03-27
+- **Epic3**: F-3.1~F-3.3 步骤引导体验优化
+  - `PhaseProgressBar.tsx`: disabled 按钮添加 `title="{阶段名}：需先完成上一阶段"` + `data-testid="step-{phaseKey}"`
+  - `TreeStatus.tsx`: 新组件，显示三树节点数量，`✓` 标记全部 confirmed
+  - `canvas.module.css`: 新增 `.treeStatus` / `.treeStatusItem` / `.treeStatusConfirmed` / `.treeStatusDivider` 样式
+  - 13 treeStatus + PhaseProgressBar tests pass
+  - Review: `docs/review-reports/20260327/review-vibex-canvas-analysis-epic3.md`
+
 ### Fixed (vibex-canvas-analysis Epic2: 未登录引导优化) — 2026-03-27
 - **Epic2 + Epic2-P1**: F-2.1~F-2.2 未登录用户引导优化
   - `Navbar.tsx`: 新画布按钮添加 auth guard，未登录显示 toast + 打开登录抽屉

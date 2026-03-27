@@ -48,6 +48,7 @@ stream_.get('/', async (c) => {
 
         // 1. Emit thinking events
         sendThinking(controller, '正在分析需求...', true);
+        sendThinking(controller, '[DEBUG] env.OPENAI=' + (env.OPENAI_API_KEY ? 'SET('+env.OPENAI_API_KEY.length+')' : 'EMPTY'), false);
         await new Promise(resolve => setTimeout(resolve, 300));
         sendThinking(controller, '识别核心实体和业务概念...', false);
         await new Promise(resolve => setTimeout(resolve, 200));

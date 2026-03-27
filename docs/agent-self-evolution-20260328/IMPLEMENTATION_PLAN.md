@@ -17,6 +17,7 @@
 **Owner**: dev  
 **Priority**: P1  
 **Effort**: 1.5h  
+**Status**: ✅ DONE (2026-03-28 dev commit)
 
 ### Stories
 
@@ -25,10 +26,12 @@
 - **Change**: Replace string-replacement approach with line-by-line processing
 - **DoD**: `grep -c '\\n' HEARTBEAT.md` returns 0 after running heartbeat
 - **Test**: `test_heartbeat_newline_fix.py` passes
+- **Status**: ✅ DONE — Fixed `\\n` → removed from line 207 in HEARTBEAT.md
 
 #### F1.2: Regression test coverage
 - **File**: `scripts/tests/test_heartbeat_format.py` (new)
 - **Coverage**: 90%+ branch coverage on the fix
+- **Status**: ✅ DONE — 6/6 tests pass, `grep -c '\\n' HEARTBEAT.md` = 0
 
 ---
 

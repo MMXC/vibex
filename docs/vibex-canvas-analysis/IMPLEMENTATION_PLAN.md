@@ -76,10 +76,11 @@ expect(navigation).toHaveNavigatedTo('/canvas'); // 无 intercept 报错
 
 ### 任务清单
 
-- [ ] 相关 Step 组件禁用时添加 title 属性（F-3.1）
-- [ ] 创建 `src/components/canvas/TreeStatus.tsx` 显示进度（F-3.2）
-- [ ] 将 `TreeStatus` 集成到 `CanvasPage.tsx`（F-3.2）
-- [ ] E2E 测试：F-3.1 + F-3.2 + F-3.3
+- [x] 相关 Step 组件禁用时添加 title 属性（F-3.1）
+- [x] 创建 `src/components/canvas/TreeStatus.tsx` 显示进度（F-3.2）
+- [x] 将 `TreeStatus` 集成到 `CanvasPage.tsx`（F-3.2）
+- [x] 单元测试：treeStatus.test.tsx (13 tests pass)
+- [x] F-3.3: ProjectBar create-project-btn hover title（已由 E1 完成）
 
 ### 验收标准
 
@@ -113,7 +114,7 @@ src/components/homepage/Navbar/Navbar.tsx    [修改] F-2.1
 src/components/onboarding/OnboardingProgressBar.tsx [修改] F-2.2
 src/components/homepage/Navbar/__tests__/Navbar.test.tsx [修改] F-2.1 tests
 src/components/canvas/TreeStatus.tsx     [新增] F-3.2
-<step components>                        [修改] F-3.1
+src/components/canvas/PhaseProgressBar.tsx [修改] F-3.1
 e2e/canvas-analysis.spec.ts              [新增] 全 Epic E2E
 ```
 

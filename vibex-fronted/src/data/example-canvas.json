@@ -192,7 +192,8 @@
       },
       "children": [],
       "confirmed": true,
-      "status": "confirmed"
+      "status": "confirmed",
+      "previewUrl": "/preview?page=product-list"
     },
     {
       "nodeId": "comp-cart",
@@ -207,7 +208,8 @@
       },
       "children": [],
       "confirmed": true,
-      "status": "confirmed"
+      "status": "confirmed",
+      "previewUrl": "/preview?page=cart"
     },
     {
       "nodeId": "comp-checkout",
@@ -222,7 +224,8 @@
       },
       "children": [],
       "confirmed": true,
-      "status": "confirmed"
+      "status": "confirmed",
+      "previewUrl": "/preview?page=checkout"
     },
     {
       "nodeId": "comp-login",
@@ -237,7 +240,8 @@
       },
       "children": [],
       "confirmed": true,
-      "status": "confirmed"
+      "status": "confirmed",
+      "previewUrl": "/preview?page=login"
     },
     {
       "nodeId": "comp-product-detail",
@@ -252,7 +256,8 @@
       },
       "children": [],
       "confirmed": true,
-      "status": "confirmed"
+      "status": "confirmed",
+      "previewUrl": "/preview?page=product-detail"
     }
   ]
 }

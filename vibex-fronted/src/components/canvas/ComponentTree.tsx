@@ -13,6 +13,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useToast } from '@/components/ui/Toast';
 import type { ComponentNode } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
 
@@ -101,6 +102,7 @@ function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly }: Componen
     description: node.props?.['description'] as string || '',
     type: node.type,
   });
+  const toast = useToast();
 
   const handleSave = useCallback(() => {
     onEdit(node.nodeId, {
@@ -130,8 +132,10 @@ function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly }: Componen
     }
     if (targetUrl) {
       window.open(targetUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      toast.showToast('该组件暂无预览链接，请先配置 previewUrl', 'error');
     }
-  }, [readonly, node.previewUrl, node.api]);
+  }, [readonly, node.previewUrl, node.api, toast]);
 
   const statusClass =
     node.status === 'confirmed'

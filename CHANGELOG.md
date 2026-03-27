@@ -1,4 +1,37 @@
+### Added (vibex-canvas-bc-layout-20260328 Epic1: BC卡片布局虚线领域框分组) — 2026-03-28
+- **Epic1**: F1.1 BC卡片布局虚线领域框分组
+  - `BoundedContextGroup.tsx`: 新组件，按领域类型（核心/支撑/通用/外部）用虚线框分组，领域标签徽章和计数显示
+  - `BoundedContextTree.tsx`: 集成 BoundedContextGroup，支持 data-testid="bounded-context-group" / "domain-label"
+  - `BoundedContextCard.tsx`: 添加 data-testid 属性
+  - `boundedGroup.test.ts`: 23 个单元测试全部通过
+  - Review: `docs/review-reports/20260328/review-vibex-canvas-bc-layout-20260328-epic1.md`
+
+### Added (vibex-canvas-checkbox-20260328 Epic1: Checkbox图标CSS替换) — 2026-03-28
+- **Epic1**: F1.1 Checkbox图标CSS替换
+  - `CheckboxIcon.tsx`: 新组件，CSS-only checkbox（√× → 口），支持 SVG checkmark
+  - `CheckboxIcon.module.css`: 深色模式支持，CSS 变量
+  - `BoundedContextTree.tsx` / `BusinessFlowTree.tsx`: 替换 emoji checkbox 为 CheckboxIcon 组件
+  - 无障碍: role="checkbox", aria-checked, aria-disabled, aria-label 全部正确
+  - Review: `docs/review-reports/20260328/review-vibex-canvas-checkbox-20260328-epic1.md`
+
+### Added (vibex-canvas-expand-dir-20260328 Epic1: 三栏展开方向修复) — 2026-03-28
+- **Epic1**: F1.1 三栏展开方向修复
+  - `CanvasExpandPanel.tsx`: 左侧向右展开，右侧向左展开，中间双向展开
+  - `canvasExpandState.test.ts`: 19 个单元测试全部通过
+  - `canvasStore.test.ts`: 44 个综合测试全部通过
+  - Review: `docs/review-reports/20260328/review-vibex-canvas-expand-dir-20260328-epic1.md`
+
+
 # Changelog
+
+### Added (vibex-canvas-bc-layout-20260328 Epic1: BC卡片布局虚线领域框分组) — 2026-03-28
+- **Epic1**: F1.1 领域分组数据结构 + F1.2 领域分组渲染逻辑
+  - `BoundedContextGroup.tsx`: 新组件，按领域类型（core/supporting/generic/external）用虚线框分组
+  - `BoundedContextTree.tsx`: 按 `domainType` 分组渲染 contextNodes
+  - `canvas.module.css`: `.boundedContextGroup` / `.domainLabel` / `.domainCount` / `.groupedCards` 样式
+  - 响应式: 375px~1440px 支持，data-testid 标记
+  - TypeScript 0 errors, ESLint 0 errors (specific files)
+  - Review: `docs/review-reports/20260328/review-vibex-canvas-bc-layout-20260328-epic1.md`
 
 ### Fixed (vibex-canvas-import-nav-20260328 Epic1: 导入示例导航修复) — 2026-03-28
 - **Epic1**: F3.2 导入示例节点预览链接修复

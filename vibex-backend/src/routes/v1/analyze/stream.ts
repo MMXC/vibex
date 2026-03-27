@@ -320,29 +320,3 @@ stream_.get('/', async (c) => {
 // Version check - this file should be updated with each deploy
 const VERSION = "v5-OPENAI-CHECK-1774619607";
 export default stream_;
-
-// Debug endpoint to check env secrets
-stream_.get('/debug-env', async (c) => {
-  const env = c.env as CloudflareEnv;
-  return c.json({
-    hasOpenAI: !!env.OPENAI_API_KEY,
-    openAILen: env.OPENAI_API_KEY?.length || 0,
-    hasMinimax: !!env.MINIMAX_API_KEY,
-    hasJWT: !!env.JWT_SECRET,
-  });
-});
-
-// Network test endpoint
-stream_.get('/network-test', async (c) => {
-  try {
-    const resp = await fetch('https://api.minimaxi.com/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer test', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'MiniMax-M2.5', messages: [{role:'user',content:'hi'}], max_tokens: 5 })
-    });
-    const text = await resp.text();
-    return c.json({ status: resp.status, body: text.substring(0, 200) });
-  } catch(e) {
-    return c.json({ error: e.message, name: e.name });
-  }
-});

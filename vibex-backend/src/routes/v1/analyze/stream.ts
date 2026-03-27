@@ -317,6 +317,8 @@ stream_.get('/', async (c) => {
   });
 });
 
+// Version check - this file should be updated with each deploy
+const VERSION = "v5-OPENAI-CHECK-1774619607";
 export default stream_;
 
 // Debug endpoint to check env secrets

@@ -47,10 +47,10 @@ expect(createProjectBtn).toBeDisabled(); // 无数据时
 
 ### 任务清单
 
-- [ ] 创建 `src/components/auth/AuthToast.tsx`（F-2.1）
-- [ ] 修改 `HomePage.tsx` — handleStartClick 登录检查 + toast（F-2.1）
-- [ ] 修复 `OnboardingProgressBar.tsx` 遮挡问题（F-2.2）
-- [ ] E2E 测试：F-2.1 + F-2.2
+- [x] 使用现有 Toast 组件替代 AuthToast.tsx（复用 @/components/ui/Toast）
+- [x] Navbar 新画布按钮添加 auth guard（F-2.1）
+- [x] OnboardingProgressBar.tsx 添加 data-testid（F-2.2）
+- [x] 单元测试：Navbar.test.tsx (13 tests pass)
 
 ### 验收标准
 
@@ -109,9 +109,9 @@ src/data/example-canvas.json             [新增] F-1.1
 src/lib/canvas/canvasStore.ts           [修改] F-1.2, F-1.3
 src/components/canvas/CanvasPage.tsx     [修改] F-1.2, F-3.2
 src/components/project/ProjectBar.tsx    [修改] F-1.3, F-3.3
-src/components/auth/AuthToast.tsx       [新增] F-2.1
-src/components/home/HomePage.tsx         [修改] F-2.1
-src/components/home/OnboardingProgressBar.tsx [修改] F-2.2
+src/components/homepage/Navbar/Navbar.tsx    [修改] F-2.1
+src/components/onboarding/OnboardingProgressBar.tsx [修改] F-2.2
+src/components/homepage/Navbar/__tests__/Navbar.test.tsx [修改] F-2.1 tests
 src/components/canvas/TreeStatus.tsx     [新增] F-3.2
 <step components>                        [修改] F-3.1
 e2e/canvas-analysis.spec.ts              [新增] 全 Epic E2E

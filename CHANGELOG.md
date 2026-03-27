@@ -1,5 +1,14 @@
 # Changelog
 
+### Fixed (vibex-canvas-analysis Epic2: 未登录引导优化) — 2026-03-27
+- **Epic2 + Epic2-P1**: F-2.1~F-2.2 未登录用户引导优化
+  - `Navbar.tsx`: 新画布按钮添加 auth guard，未登录显示 toast + 打开登录抽屉
+  - `AuthToast.tsx`: 新增 auth 专用 toast 组件（支持 `AuthToastProvider` + `useAuthToast` hook）
+  - `HomePage.tsx`: AI Panel 发送按钮添加 `showToast` 登录检查
+  - `OnboardingProgressBar.module.css`: z-index 9999→200，添加 `pointer-events: none`
+  - 13/16 Navbar tests pass（3 pre-existing mock failures from dev phase）
+  - Review: `docs/review-reports/20260327/review-vibex-canvas-analysis-epic2.md`
+
 ### Fixed (vibex-canvas-analysis Epic1: 导入示例流程修复) — 2026-03-27
 - **Epic1**: F-1 导入示例流程阻断修复
   - `canvasStore.ts`: `loadExampleData` action 设置 contextNodes + flowNodes + componentNodes + phase + activeTree

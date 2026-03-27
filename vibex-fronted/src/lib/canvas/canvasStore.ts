@@ -807,6 +807,11 @@ export const useCanvasStore = create<CanvasStore>()(
           draggedPositions: state.draggedPositions,
           // E4: persist bounded groups
           boundedGroups: state.boundedGroups,
+          // E5: persist UI state for E2E and user convenience
+          phase: state.phase,
+          leftExpand: state.leftExpand,
+          centerExpand: state.centerExpand,
+          rightExpand: state.rightExpand,
         }),
       }
     ),

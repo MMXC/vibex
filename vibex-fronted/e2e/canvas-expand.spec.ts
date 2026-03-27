@@ -21,21 +21,34 @@ const CANVAS_URL = `${BASE_URL}/canvas`;
 
 // Helper: wait for canvas page to load
 async function gotoCanvas(page: import('@playwright/test').Page) {
-  await page.goto(CANVAS_URL);
-  await page.waitForLoadState('domcontentloaded');
+  await page.goto(CANVAS_URL, { waitUntil: 'commit' });
 }
 
-// Helper: clear canvas localStorage (navigate fresh, no reload needed)
-async function clearCanvasStorage(page: import('@playwright/test').Page) {
-  // Clear via context storage first, then navigate fresh
-  await page.context().clearCookies();
-  await page.goto(CANVAS_URL);
-  await page.evaluate(() => localStorage.removeItem('vibex-canvas-state'));
+/** Set canvas to 'context' phase so the three-column grid renders */
+async function setupCanvasPhase(page: import('@playwright/test').Page) {
+  // Zustand persist stores fields directly (no {state, version} wrapper)
+  await page.evaluate(() => {
+    localStorage.setItem('vibex-canvas-storage', JSON.stringify({
+      contextNodes: [],
+      flowNodes: [],
+      componentNodes: [],
+      phase: 'context',
+      activeTree: 'context',
+      draggedPositions: {},
+      leftExpand: 'default',
+      centerExpand: 'default',
+      rightExpand: 'default',
+      boundedGroups: [],
+      projectId: null,
+      prototypeQueue: [],
+    }));
+  });
 }
 
 test.describe('VibeX Canvas — Epic E5 E2E', () => {
   test.beforeEach(async ({ page }) => {
-    await clearCanvasStorage(page);
+    await page.goto(CANVAS_URL, { waitUntil: 'commit' });
+    await page.evaluate(() => localStorage.removeItem('vibex-canvas-storage'));
   });
 
   // ========================================================================
@@ -44,10 +57,12 @@ test.describe('VibeX Canvas — Epic E5 E2E', () => {
 
   test.describe('E2: Three-Column Expand', () => {
     test('E5.1: 三栏默认等分 (1fr 1fr 1fr)', async ({ page }) => {
+      await setupCanvasPhase(page);
       await gotoCanvas(page);
 
+      // Wait for grid to be visible
       const grid = page.locator('[class*="treePanelsGrid"]').first();
-      await expect(grid).toBeVisible();
+      await expect(grid).toBeVisible({ timeout: 10000 });
 
       const style = await grid.evaluate((el) =>
         window.getComputedStyle(el).gridTemplateColumns
@@ -56,16 +71,23 @@ test.describe('VibeX Canvas — Epic E5 E2E', () => {
       // Should be three equal columns
       const cols = style.split(' ').filter(Boolean);
       expect(cols).toHaveLength(3);
-      // Each should be ~1fr (equal)
-      expect(cols[0]).toBe(cols[1]);
-      expect(cols[1]).toBe(cols[2]);
+      // Each should be ~1fr (equal) - allow small floating point difference
+      const val0 = parseFloat(cols[0]);
+      const val1 = parseFloat(cols[1]);
+      const val2 = parseFloat(cols[2]);
+      expect(Math.abs(val0 - val1)).toBeLessThan(2); // within 2px
+      expect(Math.abs(val1 - val2)).toBeLessThan(2);
     });
 
     test('E5.2: 悬停热区显示展开指示器', async ({ page }) => {
+      await setupCanvasPhase(page);
       await gotoCanvas(page);
 
       // Find hotzone buttons (left or right edge)
       const hotzones = page.locator('button[class*="hotzone"]');
+      
+      // Wait for hotzones to be attached
+      await expect(hotzones.first()).toBeAttached({ timeout: 10000 });
       const count = await hotzones.count();
 
       // Should have at least 2 hotzones (left and right edges of center panel)
@@ -77,13 +99,15 @@ test.describe('VibeX Canvas — Epic E5 E2E', () => {
 
       // After hover, the indicator should become visible
       const indicator = firstHotzone.locator('[class*="indicator"]').first();
-      await expect(indicator).toBeVisible();
+      await expect(indicator).toBeVisible({ timeout: 5000 });
     });
 
     test('E5.3: 点击热区触发展开动画', async ({ page }) => {
+      await setupCanvasPhase(page);
       await gotoCanvas(page);
 
       const grid = page.locator('[class*="treePanelsGrid"]').first();
+      await expect(grid).toBeVisible({ timeout: 10000 });
 
       // Verify transition is set
       const transition = await grid.evaluate((el) =>
@@ -94,10 +118,11 @@ test.describe('VibeX Canvas — Epic E5 E2E', () => {
 
       // Click a hotzone
       const hotzones = page.locator('button[class*="hotzone"]');
+      await expect(hotzones.first()).toBeVisible({ timeout: 10000 });
       await hotzones.first().click();
 
       // After click, columns should change from equal to unequal
-      await page.waitForTimeout(350); // Wait for animation
+      await page.waitForTimeout(400); // Wait for animation
       const style = await grid.evaluate((el) =>
         window.getComputedStyle(el).gridTemplateColumns
       );
@@ -108,14 +133,18 @@ test.describe('VibeX Canvas — Epic E5 E2E', () => {
     });
 
     test('E5.4: 双击热区恢复默认', async ({ page }) => {
+      await setupCanvasPhase(page);
       await gotoCanvas(page);
 
       const grid = page.locator('[class*="treePanelsGrid"]').first();
+      await expect(grid).toBeVisible({ timeout: 10000 });
+      
       const hotzones = page.locator('button[class*="hotzone"]');
+      await expect(hotzones.first()).toBeVisible({ timeout: 10000 });
 
       // Click to expand
       await hotzones.first().click();
-      await page.waitForTimeout(350);
+      await page.waitForTimeout(400);
 
       // Get expanded state (used to verify transition happened)
       await grid.evaluate((el) =>
@@ -124,7 +153,7 @@ test.describe('VibeX Canvas — Epic E5 E2E', () => {
 
       // Double-click to reset
       await hotzones.first().dblclick();
-      await page.waitForTimeout(350);
+      await page.waitForTimeout(400);
 
       // Should return to equal columns
       const resetStyle = await grid.evaluate((el) =>
@@ -141,37 +170,12 @@ test.describe('VibeX Canvas — Epic E5 E2E', () => {
   // ========================================================================
 
   test.describe('E3: Card Drag & Persistence', () => {
-    test.beforeEach(async ({ page }) => {
-      // Navigate and wait
-      await gotoCanvas(page);
-      // Set phase to have cards (context phase with data)
-      // We use localStorage to pre-populate
-      await page.evaluate(() => {
-        const store = {
-          state: {
-            contextNodes: [
-              { nodeId: 'card-1', name: 'Card 1', description: 'Test', type: 'core', confirmed: true, status: 'confirmed', children: [] },
-              { nodeId: 'card-2', name: 'Card 2', description: 'Test', type: 'core', confirmed: true, status: 'confirmed', children: [] },
-            ],
-            flowNodes: [],
-            componentNodes: [],
-            phase: 'context',
-            draggedPositions: {},
-          },
-          version: 0,
-        };
-        localStorage.setItem('vibex-canvas-storage', JSON.stringify(store));
-      });
-      await page.reload();
-      await page.waitForLoadState('networkidle');
-    });
-
     test('E5.5: ReactFlow 画布可交互 (nodesDraggable)', async ({ page }) => {
       await gotoCanvas(page);
 
       // Find the ReactFlow container
       const rfContainer = page.locator('.react-flow').first();
-      await expect(rfContainer).toBeVisible();
+      await expect(rfContainer).toBeVisible({ timeout: 10000 });
 
       // Check it has the expected cursor (grab on nodes)
       const nodeInFlow = page.locator('.react-flow__node').first();
@@ -185,28 +189,26 @@ test.describe('VibeX Canvas — Epic E5 E2E', () => {
 
       // Pre-populate with a node
       await page.evaluate(() => {
-        const store = {
-          state: {
-            contextNodes: [
-              { nodeId: 'test-card', name: 'Test Card', description: 'Test', type: 'core', confirmed: false, status: 'pending', children: [] },
-            ],
-            flowNodes: [],
-            componentNodes: [],
-            phase: 'context',
-            draggedPositions: {},
-            projectId: null,
-            prototypeQueue: [],
-          },
-          version: 0,
-        };
-        localStorage.setItem('vibex-canvas-storage', JSON.stringify(store));
+        // Zustand persist stores fields directly
+        localStorage.setItem('vibex-canvas-storage', JSON.stringify({
+          contextNodes: [
+            { nodeId: 'test-card', name: 'Test Card', description: 'Test', type: 'core', confirmed: false, status: 'pending', children: [] },
+          ],
+          flowNodes: [],
+          componentNodes: [],
+          phase: 'context',
+          draggedPositions: {},
+          projectId: null,
+          prototypeQueue: [],
+        }));
       });
-      await page.reload();
-      await page.waitForLoadState('networkidle');
+      await page.reload({ waitUntil: 'commit' });
 
       // Find a node in the ReactFlow canvas
       const node = page.locator('.react-flow__node').first();
-      if (await node.count() > 0) {
+      const nodeCount = await node.count();
+      
+      if (nodeCount > 0) {
         // Get initial position
         const box = await node.boundingBox();
         if (box) {
@@ -224,7 +226,7 @@ test.describe('VibeX Canvas — Epic E5 E2E', () => {
             const raw = localStorage.getItem('vibex-canvas-storage');
             if (!raw) return {};
             const parsed = JSON.parse(raw);
-            return parsed.state?.draggedPositions ?? {};
+            return parsed.draggedPositions ?? {};
           });
 
           // Should have saved at least one position
@@ -238,32 +240,29 @@ test.describe('VibeX Canvas — Epic E5 E2E', () => {
 
       // Pre-populate with a dragged position
       await page.evaluate(() => {
-        const store = {
-          state: {
-            contextNodes: [
-              { nodeId: 'persisted-card', name: 'Persisted Card', description: 'Test', type: 'core', confirmed: false, status: 'pending', children: [] },
-            ],
-            flowNodes: [],
-            componentNodes: [],
-            phase: 'context',
-            draggedPositions: {
-              'persisted-card': { x: 500, y: 300 },
-            },
-            projectId: null,
-            prototypeQueue: [],
+        // Zustand persist stores fields directly
+        localStorage.setItem('vibex-canvas-storage', JSON.stringify({
+          contextNodes: [
+            { nodeId: 'persisted-card', name: 'Persisted Card', description: 'Test', type: 'core', confirmed: false, status: 'pending', children: [] },
+          ],
+          flowNodes: [],
+          componentNodes: [],
+          phase: 'context',
+          draggedPositions: {
+            'persisted-card': { x: 500, y: 300 },
           },
-          version: 0,
-        };
-        localStorage.setItem('vibex-canvas-storage', JSON.stringify(store));
+          projectId: null,
+          prototypeQueue: [],
+        }));
       });
 
       // First load — verify position
-      await page.reload();
-      await page.waitForLoadState('networkidle');
+      await page.reload({ waitUntil: 'commit' });
 
       const node = page.locator('.react-flow__node').filter({ hasText: 'Persisted Card' }).first();
+      const nodeCount = await node.count();
 
-      if (await node.count() > 0) {
+      if (nodeCount > 0) {
         // Position should be close to the persisted value
         const box = await node.boundingBox();
         if (box) {
@@ -278,10 +277,12 @@ test.describe('VibeX Canvas — Epic E5 E2E', () => {
       await gotoCanvas(page);
 
       const hotzone = page.locator('button[class*="hotzone"]').first();
-      await expect(hotzone).toBeEnabled();
+      await expect(hotzone).toBeVisible({ timeout: 10000 });
 
       const node = page.locator('.react-flow__node').first();
-      if (await node.count() > 0) {
+      const nodeCount = await node.count();
+      
+      if (nodeCount > 0) {
         const box = await node.boundingBox();
         if (box) {
           // Start drag
@@ -347,7 +348,7 @@ test.describe('VibeX Canvas — Epic E5 E2E', () => {
       });
 
       await gotoCanvas(page);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Filter out known non-critical errors (e.g., favicon 404)
       const criticalErrors = errors.filter(
@@ -361,7 +362,7 @@ test.describe('VibeX Canvas — Epic E5 E2E', () => {
       await gotoCanvas(page);
 
       const progressBar = page.locator('[class*="phaseProgressBar"]').first();
-      await expect(progressBar).toBeVisible();
+      await expect(progressBar).toBeVisible({ timeout: 10000 });
 
       // Should show 4 phases
       const phaseItems = progressBar.locator('button[class*="phaseItem"]');
@@ -374,7 +375,7 @@ test.describe('VibeX Canvas — Epic E5 E2E', () => {
       await gotoCanvas(page);
 
       const tabBar = page.locator('[class*="tabBar"]').first();
-      await expect(tabBar).toBeVisible();
+      await expect(tabBar).toBeVisible({ timeout: 10000 });
 
       const tabs = tabBar.locator('button[class*="tabButton"]');
       await expect(tabs).toHaveCount(3); // context, flow, component

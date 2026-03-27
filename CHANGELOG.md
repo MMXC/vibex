@@ -1,5 +1,13 @@
 # Changelog
 
+### Added (vibex-canvas-expandable-20260327 E5: E2E 测试) — 2026-03-27
+- **E5**: Playwright E2E — 13 个端到端集成测试（展开 + 拖拽 + 领域框）
+  - `canvas-expand.spec.ts`: E2/E3/E4/E5 四组测试
+  - 修复 localStorage 格式（Zustand persist 直接存储字段，无 `{state, version}` 包装）
+  - 修复 `phase` 不持久化问题（添加到 `partialize`）
+  - `setupCanvasPhase()` helper：预置 `phase: 'context'` 使三栏 grid 可渲染
+  - Review: `docs/review-reports/20260327/review-vibex-canvas-expandable-20260327-epic-e5.md`
+
 ### Added (vibex-canvas-expandable-20260327 E4: 虚线领域框) — 2026-03-27
 - **E4**: BoundedGroup — DDD 限界上下文视觉分组
   - `canvasStore.ts`: `boundedGroups` Zustand slice + `addBoundedGroup`/`removeBoundedGroup`/`toggleBoundedGroupVisibility`/`updateBoundedGroupLabel`/`addNodeToGroup`/`removeNodeFromGroup`/`clearBoundedGroups`

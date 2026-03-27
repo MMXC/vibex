@@ -35,6 +35,11 @@ stream_.get('/', async (c) => {
 
   const stream = new ReadableStream({
     async start(controller) {
+      if (!env.OPENAI_API_KEY) {
+        sendSSE(controller, 'error', { message: 'OPENAI_API_KEY is EMPTY!' });
+        controller.close();
+        return;
+      }
       // Use Cloudflare runtime env (c.env), NOT getLocalEnv()
       const runtimeEnv = c.env as CloudflareEnv;
       const env = runtimeEnv;

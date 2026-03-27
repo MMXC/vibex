@@ -16,6 +16,7 @@ import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { areAllConfirmed } from '@/lib/canvas/cascade';
 import { PhaseProgressBar } from './PhaseProgressBar';
+import { TreeStatus } from './TreeStatus';
 import { TreePanel } from './TreePanel';
 import { BoundedContextTree } from './BoundedContextTree';
 import { ComponentTree } from './ComponentTree';
@@ -216,6 +217,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
       {/* Phase Progress Bar */}
       <div className={styles.phaseProgressBarWrapper}>
         <PhaseProgressBar currentPhase={phase} onPhaseClick={handlePhaseClick} />
+        {phase !== 'input' && <TreeStatus />}
       </div>
 
       {/* Project Bar — Epic 5: Create Project button */}

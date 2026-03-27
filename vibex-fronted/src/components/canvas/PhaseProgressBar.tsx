@@ -52,6 +52,12 @@ export function PhaseProgressBar({ currentPhase, onPhaseClick }: PhaseProgressBa
               }`}
               onClick={isClickable ? () => onPhaseClick?.(phase.key) : undefined}
               disabled={!isClickable}
+              data-testid={`step-${phase.key}`}
+              title={
+                !isClickable
+                  ? `${phase.label}：需先完成上一阶段`
+                  : undefined
+              }
               aria-current={status === 'active' ? 'step' : undefined}
               aria-label={`阶段: ${phase.label}, 状态: ${
                 status === 'completed' ? '已完成' : status === 'active' ? '进行中' : '待激活'

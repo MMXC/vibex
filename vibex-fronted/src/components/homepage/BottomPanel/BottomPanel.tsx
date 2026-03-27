@@ -84,7 +84,7 @@ export function BottomPanel({
       onDraftRestored?.(draft);
       lastPushedRef.current = draft;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   // 用于在 useEffect 中访问最新回调（避免循环依赖）
@@ -200,7 +200,7 @@ export function BottomPanel({
       window.removeEventListener('keydown', handleKeyDown);
       textarea?.removeEventListener('input', handleInput);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [saveDraft, showToast, onHistory]);
 
   const handleToggle = useCallback(() => {

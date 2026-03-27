@@ -50,6 +50,7 @@ export const RelationshipConnector = memo(function RelationshipConnector({
     return () => observer.disconnect();
   }, [containerRef]);
 
+  /* eslint-disable react-hooks/refs -- 需要在 render 阶段查询 DOM 位置，推迟会导致布局抖动 */
   const nodePositions = React.useMemo(() => {
     const positions = new Map<string, DOMRect>();
     if (!containerRef.current) return positions;
@@ -58,11 +59,14 @@ export const RelationshipConnector = memo(function RelationshipConnector({
       if (el) positions.set(node.nodeId, el.getBoundingClientRect());
     }
     return positions;
+    /* eslint-enable react-hooks/refs */
   }, [nodes, containerSize, containerRef]);
 
   if (relationships.length === 0 || nodePositions.size === 0) return null;
 
+  /* eslint-disable react-hooks/refs -- 需要在 render 阶段获取容器位置以计算 SVG 偏移 */
   const containerRect = containerRef.current?.getBoundingClientRect() ?? { left: 0, top: 0 };
+  /* eslint-enable react-hooks/refs */
 
   return (
     <svg ref={svgRef} className={styles.relationshipSvg} width={containerSize.width} height={containerSize.height} aria-hidden="true">

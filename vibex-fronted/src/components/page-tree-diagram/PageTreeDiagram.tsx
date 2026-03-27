@@ -33,7 +33,7 @@ export interface PageTreeNode {
 }
 
 // 节点类型映射
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const nodeTypes: Record<string, any> = {
   page: PageNode,
   component: ComponentNode,

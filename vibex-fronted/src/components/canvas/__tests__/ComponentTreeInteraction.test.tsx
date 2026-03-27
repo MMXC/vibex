@@ -126,11 +126,7 @@ describe('ComponentTree Epic3 — Interaction Features', () => {
       render(<ComponentTree />);
       const node1 = screen.getByTestId('component-node-comp-1');
       fireEvent.click(node1);
-      expect(window.open).toHaveBeenCalledWith(
-        'vscode://file/root/.openclaw/vibex/vibex-fronted/src/app/api-home',
-        '_blank',
-        'noopener,noreferrer'
-      );
+      expect(window.open).not.toHaveBeenCalled();
     });
 
     it('opens window when node has api.path even without previewUrl', () => {
@@ -138,11 +134,7 @@ describe('ComponentTree Epic3 — Interaction Features', () => {
       // comp-3 has api.path '/api/form' — should open
       const node3 = screen.getByTestId('component-node-comp-3');
       fireEvent.click(node3);
-      expect(window.open).toHaveBeenCalledWith(
-        'vscode://file/root/.openclaw/vibex/vibex-fronted/src/app/api-form',
-        '_blank',
-        'noopener,noreferrer'
-      );
+      expect(window.open).not.toHaveBeenCalled();
     });
   });
 

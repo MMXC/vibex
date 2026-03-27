@@ -207,7 +207,7 @@ export function useApiCall<TArgs extends unknown[], TData>(
   });
 
   // 执行 API 调用 - 包装 mutation 的 mutate
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const execute = useCallback(
     async (...args: any[]): Promise<TData | null> => {
       try {

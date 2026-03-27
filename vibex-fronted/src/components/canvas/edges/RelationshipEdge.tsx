@@ -27,9 +27,9 @@ export interface RelationshipEdgeData extends Record<string, unknown> {
   label?: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export function RelationshipEdge(props: EdgeProps<RelationshipEdgeFull>) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const { id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, data, selected, markerEnd } = props as any as {
     id: string; sourceX: number; sourceY: number; targetX: number; targetY: number;
     sourcePosition: Position; targetPosition: Position;

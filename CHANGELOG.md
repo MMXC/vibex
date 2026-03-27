@@ -1,5 +1,14 @@
 # Changelog
 
+### Fixed (vibex-canvas-import-nav-20260328 Epic1: 导入示例导航修复) — 2026-03-28
+- **Epic1**: F3.2 导入示例节点预览链接修复
+  - `ComponentTree.tsx`: 节点点击改为检查 `previewUrl`，有则新标签页打开，无则 toast 提示
+  - 移除 `vscode://` deep link fallback 逻辑
+  - `example-canvas.json`: 组件添加 `previewUrl` 字段
+  - `cursor`/`title` 对齐为仅检查 `previewUrl`
+  - 185 canvas tests pass
+  - Review: `docs/review-reports/20260328/review-vibex-canvas-import-nav-20260328-epic1.md`
+
 ### Added (vibex-canvas-analysis Epic3: 步骤引导体验优化) — 2026-03-27
 - **Epic3**: F-3.1~F-3.3 步骤引导体验优化
   - `PhaseProgressBar.tsx`: disabled 按钮添加 `title="{阶段名}：需先完成上一阶段"` + `data-testid="step-{phaseKey}"`

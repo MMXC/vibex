@@ -433,7 +433,7 @@ export class OpenAPIGenerator {
    * 解析 Zod Schema
    */
   private parseZodSchema(schema: z.ZodType<unknown>): SchemaObject {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const def = (schema as unknown as { _def: any })._def;
     
     if (!def) {
@@ -516,7 +516,7 @@ export class OpenAPIGenerator {
           properties[key] = this.parseZodSchema(valueSchema);
           
           // 检查是否必需
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           const valueDef = (valueSchema as unknown as { _def: any })._def;
           if (!valueDef || valueDef.typeName !== 'ZodOptional') {
             required.push(key);

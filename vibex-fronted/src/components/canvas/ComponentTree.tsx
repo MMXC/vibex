@@ -215,13 +215,11 @@ function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly }: Componen
 
           <h4
             className={styles.nodeCardTitle}
-            style={{ cursor: node.previewUrl || node.api?.path ? 'pointer' : 'default' }}
+            style={{ cursor: node.previewUrl ? 'pointer' : 'default' }}
             title={
               node.previewUrl
                 ? `跳转到 ${node.previewUrl}`
-                : node.api?.path
-                  ? `跳转到组件代码 (${node.api.path})`
-                  : undefined
+                : undefined
             }
           >
             {node.name}

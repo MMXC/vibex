@@ -15,9 +15,9 @@ interface PageNodeData extends Record<string, unknown> {
 
 type PageNodeType = Node<PageNodeData, 'page'>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 function PageNodeComponent(props: NodeProps<PageNodeType>) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const { data, selected } = props as any as { data: PageNodeData; selected: boolean };
   return (
     <div className="page-node" style={{

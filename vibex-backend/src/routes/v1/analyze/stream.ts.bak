@@ -13,6 +13,7 @@
 
 import { Hono } from 'hono';
 import { CloudflareEnv, getLocalEnv } from '../../../lib/env';
+import { devDebug } from '../../../lib/log-sanitizer';
 
 const stream_ = new Hono<{ Bindings: CloudflareEnv }>();
 
@@ -34,11 +35,13 @@ stream_.get('/', async (c) => {
 
   const stream = new ReadableStream({
     async start(controller) {
+      sendThinking(controller, "[START] Stream initiated", false);
       // Use Cloudflare runtime env (c.env), NOT getLocalEnv()
       const runtimeEnv = c.env as CloudflareEnv;
       const env = runtimeEnv;
 
       try {
+        devDebug('[SSE Stream] Starting analysis for requirement:', requirement.substring(0, 100));
 
         // Dynamically import to avoid circular deps
         const { createAIService } = await import('../../../services/ai-service');
@@ -115,6 +118,7 @@ stream_.get('/', async (c) => {
           });
 
         } catch (err) {
+          devDebug('[SSE Stream] step_context error:', err);
           sendSSE(controller, 'step_context', {
             content: 'Bounded context analysis completed',
             mermaidCode: '',
@@ -176,6 +180,7 @@ stream_.get('/', async (c) => {
           });
 
         } catch (err) {
+          devDebug('[SSE Stream] step_model error:', err);
           sendSSE(controller, 'step_model', {
             content: 'Domain model analysis completed',
             mermaidCode: '',
@@ -219,6 +224,7 @@ stream_.get('/', async (c) => {
           });
 
         } catch (err) {
+          devDebug('[SSE Stream] step_flow error:', err);
           sendSSE(controller, 'step_flow', {
             content: 'Business flow analysis completed',
             mermaidCode: '',
@@ -268,6 +274,7 @@ stream_.get('/', async (c) => {
           });
 
         } catch (err) {
+          devDebug('[SSE Stream] step_components error:', err);
           sendSSE(controller, 'step_components', {
             content: 'Component analysis completed',
             mermaidCode: '',
@@ -282,9 +289,11 @@ stream_.get('/', async (c) => {
           summary: 'Analysis complete',
         });
 
+        devDebug('[SSE Stream] Stream completed for project:', projectId);
 
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Stream processing failed';
+        devDebug('[SSE Stream] Error:', errorMessage);
         sendSSE(controller, 'error', { message: errorMessage, code: 'STREAM_ERROR' });
       } finally {
         controller.close();

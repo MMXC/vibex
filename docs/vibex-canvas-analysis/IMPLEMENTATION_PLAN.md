@@ -13,15 +13,15 @@
 
 ### 任务清单
 
-- [ ] 创建 `src/data/example-canvas.json`（F-1.1）
-  - 三树结构完整（context/flow/component nodes）
-  - 所有节点 `confirmed: true`
-  - 对齐 `types.ts` 接口定义
-- [ ] 扩展 `canvasStore.ts` — `loadExampleData` action（F-1.2）
-- [ ] 修改 `CanvasPage.tsx` — ImportButton onClick 绑定（F-1.2）
-- [ ] 验证 `ProjectBar.tsx` — `areAllConfirmed` 在示例数据下通过（F-1.3）
-- [ ] `ProjectBar.tsx` — 按钮 disabled 时添加 title（F-1.3）
-- [ ] E2E 测试：F-1.2 + F-1.3
+- [x] 创建 `src/data/example-canvas.json`（F-1.1）
+  - [x] 三树结构完整（context/flow/component nodes）
+  - [x] 所有节点 `confirmed: true`
+  - [x] 对齐 `types.ts` 接口定义
+- [x] 扩展 `canvasStore.ts` — `loadExampleData` action（F-1.2）
+- [x] 修改 `CanvasPage.tsx` — ImportButton onClick 绑定（F-1.2）
+- [x] 验证 `ProjectBar.tsx` — `areAllConfirmed` 在示例数据下通过（F-1.3）
+- [x] `ProjectBar.tsx` — 按钮 disabled 时添加 title（F-1.3）
+- [x] 单元测试：`exampleData.test.ts` (19 tests pass)
 
 ### 验收标准
 

@@ -40,10 +40,13 @@ jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockRouterPush }),
 }));
 
-// Mock authStore
+// Mock authStore — handle Zustand selector pattern properly
 const mockAuthIsAuthenticated = jest.fn();
 jest.mock('@/stores/authStore', () => ({
-  useAuthStore: () => ({ isAuthenticated: mockAuthIsAuthenticated() }),
+  useAuthStore: (selector?: (state: { isAuthenticated: boolean }) => boolean) => {
+    const state = { isAuthenticated: mockAuthIsAuthenticated() };
+    return selector ? selector(state) : state;
+  },
 }));
 
 // Mock Toast

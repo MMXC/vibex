@@ -106,7 +106,7 @@ export function CardTreeView({
   }, [fetchError, handleError, clearError]);
 
   // Use unified error user message or raw fetch error message
-  const displayError = errorUserMessage ?? (fetchError?.message ?? null);
+  const displayError = fetchError ? (errorUserMessage ?? fetchError.message ?? null) : null;
   const canRetry = isRetryable || (fetchError != null);
 
   // Toggle expand/collapse for a node

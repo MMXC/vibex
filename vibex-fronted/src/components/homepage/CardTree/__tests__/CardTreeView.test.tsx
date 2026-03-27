@@ -11,6 +11,23 @@ jest.mock('@/hooks/useProjectTree', () => ({
   useProjectTree: jest.fn(),
 }));
 
+// Mock useErrorHandler — returns controlled error state for testing
+const mockErrorHandler = (errorMsg: string | null, onError?: (err: unknown) => void) => ({
+  error: errorMsg ? { code: 'E9999', type: 'UNKNOWN' as const, severity: 'low' as const, message: errorMsg, userMessage: errorMsg, retryable: false } : null,
+  rawError: errorMsg ? new Error(errorMsg) : null,
+  userMessage: errorMsg ?? '未知错误',
+  isRetryable: false,
+  retryCount: 0,
+  isRetrying: false,
+  handleError: onError ?? jest.fn(),
+  retry: jest.fn(),
+  clearError: jest.fn(),
+});
+
+jest.mock('@/hooks/useErrorHandler', () => ({
+  useErrorHandler: jest.fn(),
+}));
+
 // Mock CardTreeRenderer
 jest.mock('@/components/visualization/CardTreeRenderer/CardTreeRenderer', () => ({
   CardTreeRenderer: () => <div data-testid="mock-cardtree-renderer">MockRenderer</div>,
@@ -28,6 +45,26 @@ jest.mock('../CardTree.module.css', () => ({
   errorText: 'errorText',
   retryButton: 'retryButton',
   mockIndicator: 'mockIndicator',
+}));
+
+// Mock CardTreeSkeleton
+jest.mock('../CardTreeSkeleton', () => ({
+  CardTreeSkeleton: ({ 'data-testid': testId }: { 'data-testid'?: string }) => (
+    <div data-testid={testId || 'cardtree-skeleton'}>Skeleton</div>
+  ),
+}));
+
+// Mock CardTreeError
+jest.mock('../CardTreeError', () => ({
+  CardTreeError: ({ message, onRetry, 'data-testid': testId }: { message: string; onRetry?: () => void; 'data-testid'?: string }) => (
+    <div data-testid={testId || 'cardtree-error'} role="alert">
+      <span>⚠️</span>
+      <p data-testid="error-message">{message}</p>
+      {onRetry && (
+        <button data-testid="retry-button" onClick={onRetry}>重试</button>
+      )}
+    </div>
+  ),
 }));
 
 const MOCK_DATA = {
@@ -55,9 +92,18 @@ const MOCK_DATA = {
 describe('CardTreeView', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Reset mock implementation
+    // Provide safe default mock so initial render doesn't trigger useErrorHandler
     const { useProjectTree } = jest.requireMock('@/hooks/useProjectTree') as { useProjectTree: jest.Mock };
-    useProjectTree.mockReset();
+    useProjectTree.mockReturnValue({
+      data: MOCK_DATA,
+      isLoading: false,
+      error: null,
+      isMockData: false,
+      refetch: jest.fn(),
+    });
+    // Default: no error from useErrorHandler
+    const { useErrorHandler } = jest.requireMock('@/hooks/useErrorHandler') as { useErrorHandler: jest.Mock };
+    useErrorHandler.mockReturnValue(mockErrorHandler(null));
   });
 
   describe('Feature Flag', () => {
@@ -128,6 +174,7 @@ describe('CardTreeView', () => {
   describe('Error State', () => {
     it('should show error state when API fails', () => {
       const { useProjectTree } = jest.requireMock('@/hooks/useProjectTree') as { useProjectTree: jest.Mock };
+      const { useErrorHandler } = jest.requireMock('@/hooks/useErrorHandler') as { useErrorHandler: jest.Mock };
       useProjectTree.mockReturnValue({
         data: null,
         isLoading: false,
@@ -135,14 +182,16 @@ describe('CardTreeView', () => {
         isMockData: false,
         refetch: jest.fn(),
       });
+      useErrorHandler.mockReturnValue(mockErrorHandler('网络错误'));
 
       render(<CardTreeView forceEnabled />);
       expect(screen.queryByTestId('cardtree-error')).toBeTruthy();
-      expect(screen.getByText(/Network error/i)).toBeInTheDocument();
+      expect(screen.getByText(/网络错误/i)).toBeInTheDocument();
     });
 
     it('should show retry button in error state', () => {
       const { useProjectTree } = jest.requireMock('@/hooks/useProjectTree') as { useProjectTree: jest.Mock };
+      const { useErrorHandler } = jest.requireMock('@/hooks/useErrorHandler') as { useErrorHandler: jest.Mock };
       const refetch = jest.fn();
       useProjectTree.mockReturnValue({
         data: null,
@@ -150,6 +199,18 @@ describe('CardTreeView', () => {
         error: new Error('API Error'),
         isMockData: false,
         refetch,
+      });
+      // isRetryable=true → onRetry = () => retry(refetch), so retry must call its arg
+      useErrorHandler.mockReturnValue({
+        error: { code: 'E9999', type: 'NETWORK_ERROR' as const, severity: 'low' as const, message: '网络错误', userMessage: '网络错误', retryable: true },
+        rawError: new Error('API Error'),
+        userMessage: '网络错误',
+        isRetryable: true,
+        retryCount: 0,
+        isRetrying: false,
+        handleError: jest.fn(),
+        retry: (fn: () => void) => fn(),
+        clearError: jest.fn(),
       });
 
       render(<CardTreeView forceEnabled />);
@@ -162,6 +223,7 @@ describe('CardTreeView', () => {
 
     it('should show timeout message when request times out (> 10s)', () => {
       const { useProjectTree } = jest.requireMock('@/hooks/useProjectTree') as { useProjectTree: jest.Mock };
+      const { useErrorHandler } = jest.requireMock('@/hooks/useErrorHandler') as { useErrorHandler: jest.Mock };
       useProjectTree.mockReturnValue({
         data: null,
         isLoading: false,
@@ -169,6 +231,7 @@ describe('CardTreeView', () => {
         isMockData: false,
         refetch: jest.fn(),
       });
+      useErrorHandler.mockReturnValue(mockErrorHandler('请求超时'));
 
       render(<CardTreeView forceEnabled />);
       expect(screen.queryByTestId('cardtree-error')).toBeTruthy();

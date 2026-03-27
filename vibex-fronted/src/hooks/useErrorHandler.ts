@@ -102,10 +102,14 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}): UseErrorH
       const msg = err instanceof Error ? err.message : String(err);
       const isTimeout =
         err instanceof Error &&
-        (err.name === 'AbortError' || msg.includes('timeout') || msg.includes('Timeout'));
+        (err.name === 'AbortError' ||
+          msg.includes('timeout') || msg.includes('Timeout') ||
+          msg.includes('超时'));
       const isNetwork =
         err instanceof Error &&
-        (msg.includes('network') || msg.includes('fetch') || msg.includes('Failed to fetch'));
+        (msg.includes('network') || msg.includes('fetch') ||
+          msg.includes('Failed to fetch') ||
+          msg.includes('网络错误') || msg.includes('网络'));
       const type: ErrorType = isTimeout ? 'TIMEOUT' : isNetwork ? 'NETWORK_ERROR' : 'UNKNOWN';
       const strategy = ERROR_RECOVERY_STRATEGY[type];
       return {

@@ -1,3 +1,11 @@
+### Added (vibex-canvas-expand-dir-20260328 Epic1: 三栏展开方向修复) — 2026-03-28
+- **Epic1**: F1.1~F1.2 三栏展开方向独立控制
+  - `HoverHotzone.tsx`: 新增 `centerExpandDirection` 属性，支持左/右热区独立控制展开方向
+  - `CanvasPage.tsx`: 左热区 `centerExpandDirection="left"`，右热区 `centerExpandDirection="right"`
+  - `canvasStore.ts`: `togglePanel` center 循环逻辑改为 `default → expand-left → expand-right → default`
+  - 185 canvas tests pass
+  - Review: `docs/review-reports/20260328/review-vibex-canvas-expand-dir-20260328-epic1.md`
+
 ### Added (vibex-canvas-bc-layout-20260328 Epic1: BC卡片布局虚线领域框分组) — 2026-03-28
 - **Epic1**: F1.1 BC卡片布局虚线领域框分组
   - `BoundedContextGroup.tsx`: 新组件，按领域类型（核心/支撑/通用/外部）用虚线框分组，领域标签徽章和计数显示

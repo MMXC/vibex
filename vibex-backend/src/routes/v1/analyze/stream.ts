@@ -296,7 +296,8 @@ stream_.get('/', async (c) => {
         sendSSE(controller, 'error', { message: errorMessage, code: 'STREAM_ERROR' });
       } finally {
         controller.close();
-    },
+      }
+    }
   });
 
   return new Response(stream, {
@@ -305,7 +306,7 @@ stream_.get('/', async (c) => {
       'Cache-Control': 'no-cache, no-transform',
       'Connection': 'keep-alive',
       'X-Accel-Buffering': 'no',
-    },
+    }
   });
 });
 
@@ -320,6 +321,7 @@ stream_.get('/sse-test', async (c) => {
         controller.enqueue(encoder.encode('event: thinking\ndata: {"content":"test2","delta":false}\n\n'));
         setTimeout(() => {
           controller.close();
+      }
         }, 500);
       }, 500);
     }

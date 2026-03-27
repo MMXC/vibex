@@ -62,6 +62,7 @@ stream_.get('/', async (c) => {
 
         // 2. Step: Generate bounded contexts
         sendThinking(controller, '正在生成限界上下文...', false);
+      sendThinking(controller, "[DEBUG] AI calling with requirement: dGVzdDEyMw", false);
 
         try {
           const planPrompt = `你是一个DDD专家。分析这个需求并只返回JSON:

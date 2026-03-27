@@ -262,7 +262,7 @@ export class LLMProviderService {
 
     // Additional providers can be added via environment
     // OPENAI_API_KEY, ANTHROPIC_API_KEY, etc.
-    const openaiKey = process.env.OPENAI_API_KEY;
+    const openaiKey = this.env.OPENAI_API_KEY;
     if (openaiKey) {
       this.registerProvider({
         ...DEFAULT_PROVIDERS.openai,
@@ -272,7 +272,7 @@ export class LLMProviderService {
       } as ProviderConfig);
     }
 
-    const anthropicKey = process.env.ANTHROPIC_API_KEY;
+    const anthropicKey = this.env.ANTHROPIC_API_KEY;
     if (anthropicKey) {
       this.registerProvider({
         ...DEFAULT_PROVIDERS.anthropic,

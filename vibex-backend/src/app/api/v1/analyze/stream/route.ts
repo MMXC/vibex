@@ -26,7 +26,7 @@ function sendThinking(controller: ReadableStreamDefaultController, content: stri
   sendSSE(controller, 'thinking', { content, delta });
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest, env: CloudflareEnv, ctx: ExecutionContext) {
   const { searchParams } = new URL(request.url);
   const requirement = searchParams.get('requirement');
 
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
 
   const stream = new ReadableStream({
     async start(controller) {
-      const env = getLocalEnv();
+      // Use Cloudflare runtime env (not getLocalEnv which reads process.env)
 
       try {
         devDebug('[SSE Stream] Starting analysis for requirement:', requirement.substring(0, 100));
@@ -79,8 +79,6 @@ export async function GET(request: NextRequest) {
 
           const stage1Result = await aiService.chat(stage1Prompt);
           const stage1Text = stage1Result.success ? (stage1Result.data as unknown as string) || '' : '';
-          devDebug('[DEBUG] stage1Result success:', stage1Result.success, 'textLen:', stage1Text.length, 'textPreview:', stage1Text.substring(0, 200));
-          sendSSE(controller, 'debug_stage1', { text: stage1Text.substring(0, 500), success: stage1Result.success });
 
           // Stage 2: Parse free-form text into structured contexts
           const rawContexts: any[] = [];

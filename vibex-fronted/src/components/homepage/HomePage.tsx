@@ -12,6 +12,7 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import LoginDrawer from '@/components/ui/LoginDrawer';
+import { useToast } from '@/components/ui/Toast';
 import { Navbar, AIPanel } from '@/components/homepage';
 import { useHomePage } from './hooks';
 import { PreviewArea } from './PreviewArea/PreviewArea';
@@ -73,6 +74,9 @@ export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAIPanelOpen, setIsAIPanelOpen] = useState(true);
 
+  // F-2.1: Toast support for auth prompts
+  const { showToast } = useToast();
+
   // 根据当前步骤返回对应 Mermaid 代码 (Epic 3: 4步流程)
   const currentMermaidCode = useMemo(() => {
     switch (currentStep) {
@@ -113,14 +117,20 @@ export default function HomePage() {
     return `thinking-${last.step}-${thinkingMessages.length - 1}`;
   }, [thinkingMessages]);
 
-  // ST-1.1: AIPanel 发送消息处理 → 调用 generateContexts pipeline
+  // ST-1.1 + F-2.1: AIPanel 发送消息处理 → 登录检查 + 调用 generateContexts pipeline
   const handleAIPanelSend = useCallback(
     (message: string) => {
       if (!message.trim()) return;
+      // F-2.1: 未登录用户友好提示
+      if (!isAuthenticated) {
+        showToast('请先登录后再使用此功能', 'warning');
+        setIsLoginDrawerOpen(true);
+        return;
+      }
       setRequirementText(message);
       generateContexts(message);
     },
-    [setRequirementText, generateContexts]
+    [setRequirementText, generateContexts, isAuthenticated, showToast]
   );
 
   return (

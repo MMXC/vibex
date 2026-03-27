@@ -36,7 +36,6 @@ stream_.get('/', async (c) => {
   const stream = new ReadableStream({
     async start(controller) {
       if (!env.OPENAI_API_KEY) {
-        sendSSE(controller, 'error', { message: 'OPENAI_API_KEY is EMPTY!' });
         controller.close();
         return;
       }
@@ -53,7 +52,6 @@ stream_.get('/', async (c) => {
 
         // 1. Emit thinking events
         sendThinking(controller, '正在分析需求...', true);
-        sendThinking(controller, '[DEBUG] env.OPENAI=' + (env.OPENAI_API_KEY ? 'SET('+env.OPENAI_API_KEY.length+')' : 'EMPTY'), false);
         await new Promise(resolve => setTimeout(resolve, 300));
         sendThinking(controller, '识别核心实体和业务概念...', false);
         await new Promise(resolve => setTimeout(resolve, 200));
@@ -62,7 +60,6 @@ stream_.get('/', async (c) => {
 
         // 2. Step: Generate bounded contexts
         sendThinking(controller, '正在生成限界上下文...', false);
-      sendThinking(controller, "[DEBUG] AI calling with requirement: dGVzdDEyMw", false);
 
         try {
           const planPrompt = `你是一个DDD专家。分析这个需求并只返回JSON:
@@ -317,6 +314,24 @@ stream_.get('/', async (c) => {
   });
 });
 
-// Version check - this file should be updated with each deploy
-const VERSION = "v5-OPENAI-CHECK-1774619607";
+
+// Simple SSE test endpoint
+stream_.get('/sse-test', async (c) => {
+  const stream = new ReadableStream({
+    start(controller) {
+      const encoder = new TextEncoder();
+      controller.enqueue(encoder.encode('event: thinking\ndata: {"content":"test1","delta":true}\n\n'));
+      setTimeout(() => {
+        controller.enqueue(encoder.encode('event: thinking\ndata: {"content":"test2","delta":false}\n\n'));
+        setTimeout(() => {
+          controller.close();
+        }, 500);
+      }, 500);
+    }
+  });
+  return new Response(stream, {
+    headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' }
+  });
+});
+
 export default stream_;

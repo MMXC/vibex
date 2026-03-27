@@ -272,12 +272,15 @@ export class LLMProviderService {
       } as ProviderConfig);
     }
 
-    const anthropicKey = this.env.ANTHROPIC_API_KEY;
+    // Anthropic-compatible endpoint (MiniMax supports this)
+    const anthropicKey = this.env.ANTHROPIC_API_KEY || this.env.MINIMAX_API_KEY;
     if (anthropicKey) {
       this.registerProvider({
         ...DEFAULT_PROVIDERS.anthropic,
         type: 'anthropic',
         apiKey: anthropicKey,
+        apiBase: this.env.ANTHROPIC_API_BASE || DEFAULT_PROVIDERS.anthropic.apiBase!,
+        defaultModel: this.env.ANTHROPIC_MODEL || DEFAULT_PROVIDERS.anthropic.defaultModel!,
         enabled: true,
       } as ProviderConfig);
     }

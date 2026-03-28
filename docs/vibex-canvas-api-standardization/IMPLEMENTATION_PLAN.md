@@ -290,7 +290,7 @@ git push origin feature/canvas-api-standardization
 | 顺序 | 步骤 | 优先级 | 工时 | 依赖 |
 |------|------|--------|------|------|
 | 1 | Step 1.1 api-config 审查 | P0 | 0.25h | 无 |
-| 2 | Step 1.2 canvasApi 清理 | P0 | 0.25h | Step 1.1 |
+| 2 | Step 1.2 canvasApi 清理 | ✅ P0 | 0.25h | Step 1.1 |
 | 3 | Step 2.1 依赖扫描 | P0 | 0.25h | Step 1.2 |
 | 4 | Step 1.3 dddApi 迁移 | P1 | 0.25h | Step 1.2 |
 | 5 | Step 1.4 更新引用 | P1 | 0.25h | Step 1.3 |

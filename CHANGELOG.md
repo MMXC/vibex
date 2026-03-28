@@ -507,3 +507,12 @@ All notable changes to this project will be documented in this file.
 ## [Previous Changes]
 
 See git history for complete changelog.
+
+### Fixed (vibex-canvas-component-btn-20260328 Epic1: 「继续·组件树」按钮) — 2026-03-28
+- **Epic1**: 修复流程树画布「继续·组件树」按钮缺失问题
+  - `vibex-fronted/src/components/canvas/ComponentTreeCard.tsx`: 新增组件树卡片渲染组件，支持 CRUD + 确认操作 (commit `26b523c5`)
+  - `vibex-fronted/src/components/canvas/BusinessFlowTree.tsx`: 添加「继续·组件树」按钮，点击后调用 `fetchComponentTree` API 并更新 store (commits `f3692c1a`, `26b523c5`)
+  - `vibex-fronted/src/lib/canvas/api/canvasApi.ts`: `fetchComponentTree` 方法将 API 响应映射为 `ComponentNode[]`
+  - `vibex-backend/src/routes/canvas-generate-components.ts`: 新增 Hono 路由 `/api/canvas/generate-components` for Cloudflare Workers (commit `e2557e81`)
+  - `vibex-backend/src/index.ts`: 注册 Hono 路由
+  - 审查: `docs/review-reports/20260328/review-vibex-canvas-component-btn-20260328-epic1.md`

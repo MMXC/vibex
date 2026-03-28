@@ -17,6 +17,21 @@
   - 提交: `75070fed` (feat) + `403336cb` (fix)
   - Review: `docs/vibex-canvas-btn-rename-20260328/`
 
+### Fixed (vibex-canvas-flow-bugs-20260328 Epic5: 三栏展开按钮) — 2026-03-28
+- **Epic5 Bug5**: 修复 Canvas 三栏画布展开按钮缺失问题
+  - `vibex-fronted/src/components/canvas/CanvasPage.tsx`:
+    - 新增 `toggleLeft`/`toggleCenter`/`toggleRight` 回调，切换面板展开状态
+    - 左侧新增 `◀/▶` 展开/收起按钮（控制 leftExpand）
+    - 右侧新增 `▶/◀` 展开/收起按钮（控制 rightExpand）
+    - 中间面板 FlowPanel actions 新增 `⤵ 展开/⤴ 收起` 按钮（控制 centerExpand）
+    - 流程树面板 actions 包裹为 flex 容器，支持多按钮共存
+  - `vibex-fronted/src/components/canvas/canvas.module.css`:
+    - `.treePanelsGrid` 更新为 5 列网格布局（expand-left-btn | context | flow | component | expand-right-btn）
+    - 新增 `.expandCol` 展开按钮列样式
+    - 新增 `.expandToggleBtn` 按钮样式（含 hover/focus 状态）
+  - 提交: `5b89bfd3` (fix) + `fd7b0cf2` (merge)
+  - Review: `docs/vibex-canvas-flow-bugs-20260328/`
+
 ### Added (team-evolution-20260328 Epic1: Agent Self-Score 机制) — 2026-03-28
 - **Epic1 Phase1-SelfScore**: self-score-hook.sh — agent 端自动自我评分
   - `scripts/heartbeats/self-score-hook.sh`: 9维关键词评分，从 phase 文件结构推断各维度得分（格式/完整度/约束/耗时/可行性/可读/可理解/详细程度/正确性）

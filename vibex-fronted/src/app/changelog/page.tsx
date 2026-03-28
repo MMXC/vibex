@@ -961,8 +961,13 @@ export default function Changelog() {
   useEffect(() => {
     const fetchVersion = async () => {
       try {
+        const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+        const headers: Record<string, string> = {};
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL || ''}/version`
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || ''}/version`,
+          { headers }
         );
         if (response.ok) {
           const data = await response.json();

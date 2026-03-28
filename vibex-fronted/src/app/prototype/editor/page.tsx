@@ -947,14 +947,21 @@ function EditorContent() {
     setStreamingContent('');
 
     // 调用 AI API 获取流式响应
+    const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || ''}/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ message: inputValue.trim() }),
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('登录已过期，请重新登录');
+        }
         throw new Error('API request failed');
       }
 

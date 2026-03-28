@@ -1,3 +1,35 @@
+### Added (vibex-canvas-feature-gap Epic3: 画布增强编辑) — 2026-03-29
+- **Epic3**: 多选批量操作 + Sticky Notes 贴纸 + 节点关系连线
+  - **E3-F2** (`multiSelectSlice.ts`, `canvasStore.ts`): 多选 + 批量操作
+    - ReactFlow `selectionMode={SelectionMode.Partial}` 支持 Shift+点击多选
+    - 三树（context/flow/component）均支持多选
+    - 批量删除触发单次 Undo 历史记录
+    - `multiSelectSlice.ts`: 290 行测试覆盖
+  - **E3-F3** (`StickyNoteNode.tsx`): Sticky Notes 贴纸节点
+    - `StickyNoteNode` 自定义节点组件，支持拖拽定位
+    - 双击编辑文本、三种颜色切换
+    - 自动持久化到 canvasStore
+  - **E3-F13** (`relationshipsToTreeEdges.ts`): 节点关系连线扩展
+    - `FlowRelationship` / `ComponentRelationship` 类型定义
+    - 三种连线样式：实线（包含）、虚线（引用）、点线（依赖）
+    - BoundedContextTree 启用 RelationshipConnector 渲染领域关系
+    - Flow/Component 树均支持关系连线渲染
+  - **E3-F9** (`ExportMenu.tsx`): 多格式导出菜单
+    - 支持 PNG/SVG/JSON/Markdown 四种格式
+    - 支持导出范围选择（all/context/flow/component）
+    - 状态提示（info/success/error）
+  - **E3-F10** (`TemplateSelector.tsx`): 需求模板选择器
+    - 模板卡片列表 + 动态加载
+    - 点击应用自动填充三树数据并跳转 context 相位
+  - **E3-F11** (`VersionHistoryPanel.tsx`): 版本历史侧边栏
+    - 快照列表展示（trigger/label/节点计数）
+    - 创建快照 + 恢复快照功能
+    - Drawer 抽屉式设计，空白区域点击关闭
+  - **TypeScript**: 所有新文件类型检查通过，零错误
+  - **npm audit**: 2 个间接依赖漏洞（picomatch via micromatch，test tooling）
+  - 提交: `d54a2b28`
+  - 审查: ✅ PASSED (reviewer-epic3-export)
+
 ### Added (vibex-canvas-feature-gap Epic2: Navigation — 搜索与导航) — 2026-03-29
 - **Epic2**: Fuse.js 搜索、MiniMap 导航、快捷键
   - **E2-F5** (`useCanvasSearch.ts` + `SearchDialog.tsx`): Fuse.js 模糊搜索

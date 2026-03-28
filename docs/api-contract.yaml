@@ -3107,4 +3107,1562 @@ paths:
   /v1/projects/{projectId}:
     get:
       tags: [Deprecated]
-      summary
+      summary: 获取单个项目（v1 兼容，已废弃）
+      deprecated: true
+      operationId: getProjectV1
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: 成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  project:
+                    $ref: '#/components/schemas/Project'
+    put:
+      tags: [Deprecated]
+      summary: 更新项目（v1 兼容，已废弃）
+      deprecated: true
+      operationId: updateProjectV1
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectUpdate'
+      responses:
+        '200':
+          description: 更新成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  project:
+                    $ref: '#/components/schemas/Project'
+    delete:
+      tags: [Deprecated]
+      summary: 删除项目（v1 兼容，已废弃）
+      deprecated: true
+      operationId: deleteProjectV1
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: 删除成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /v1/messages:
+    get:
+      tags: [Deprecated]
+      summary: 获取消息列表（v1 兼容，已废弃）
+      deprecated: true
+      operationId: getMessagesV1
+      parameters:
+        - name: projectId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+    post:
+      tags: [Deprecated]
+      summary: 创建消息（v1 兼容，已废弃）
+      deprecated: true
+      operationId: createMessageV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageCreate'
+      responses:
+        '201':
+          description: 创建成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+
+  /v1/messages/{messageId}:
+    delete:
+      tags: [Deprecated]
+      summary: 删除消息（v1 兼容，已废弃）
+      deprecated: true
+      operationId: deleteMessageV1
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 删除成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /v1/agents:
+    get:
+      tags: [Deprecated]
+      summary: 获取 Agent 列表（v1 兼容，已废弃）
+      deprecated: true
+      operationId: getAgentsV1
+      responses:
+        '200':
+          description: 成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agents:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Agent'
+    post:
+      tags: [Deprecated]
+      summary: 创建 Agent（v1 兼容，已废弃）
+      deprecated: true
+      operationId: createAgentV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentCreate'
+      responses:
+        '201':
+          description: 创建成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent:
+                    $ref: '#/components/schemas/Agent'
+
+  /v1/agents/{agentId}:
+    get:
+      tags: [Deprecated]
+      summary: 获取单个 Agent（v1 兼容，已废弃）
+      deprecated: true
+      operationId: getAgentV1
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent:
+                    $ref: '#/components/schemas/Agent'
+    put:
+      tags: [Deprecated]
+      summary: 更新 Agent（v1 兼容，已废弃）
+      deprecated: true
+      operationId: updateAgentV1
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentUpdate'
+      responses:
+        '200':
+          description: 更新成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent:
+                    $ref: '#/components/schemas/Agent'
+    delete:
+      tags: [Deprecated]
+      summary: 删除 Agent（v1 兼容，已废弃）
+      deprecated: true
+      operationId: deleteAgentV1
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 删除成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /v1/pages:
+    get:
+      tags: [Deprecated]
+      summary: 获取页面列表（v1 兼容，已废弃）
+      deprecated: true
+      operationId: getPagesV1
+      responses:
+        '200':
+          description: 成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pages:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Page'
+    post:
+      tags: [Deprecated]
+      summary: 创建页面（v1 兼容，已废弃）
+      deprecated: true
+      operationId: createPageV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PageCreate'
+      responses:
+        '201':
+          description: 创建成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  page:
+                    $ref: '#/components/schemas/Page'
+
+  /v1/pages/{pageId}:
+    get:
+      tags: [Deprecated]
+      summary: 获取单个页面（v1 兼容，已废弃）
+      deprecated: true
+      operationId: getPageV1
+      parameters:
+        - name: pageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  page:
+                    $ref: '#/components/schemas/Page'
+    put:
+      tags: [Deprecated]
+      summary: 更新页面（v1 兼容，已废弃）
+      deprecated: true
+      operationId: updatePageV1
+      parameters:
+        - name: pageId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PageUpdate'
+      responses:
+        '200':
+          description: 更新成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  page:
+                    $ref: '#/components/schemas/Page'
+    delete:
+      tags: [Deprecated]
+      summary: 删除页面（v1 兼容，已废弃）
+      deprecated: true
+      operationId: deletePageV1
+      parameters:
+        - name: pageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 删除成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /v1/flows:
+    get:
+      tags: [Deprecated]
+      summary: 获取流程图列表（v1 兼容，已废弃）
+      deprecated: true
+      operationId: getFlowsV1
+      responses:
+        '200':
+          description: 成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flows:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FlowData'
+    post:
+      tags: [Deprecated]
+      summary: 创建流程图（v1 兼容，已废弃）
+      deprecated: true
+      operationId: createFlowV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                projectId:
+                  type: string
+      responses:
+        '201':
+          description: 创建成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowData'
+
+  /v1/flows/{flowId}:
+    get:
+      tags: [Deprecated]
+      summary: 获取单个流程图（v1 兼容，已废弃）
+      deprecated: true
+      operationId: getFlowV1
+      parameters:
+        - name: flowId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowData'
+    put:
+      tags: [Deprecated]
+      summary: 更新流程图（v1 兼容，已废弃）
+      deprecated: true
+      operationId: updateFlowV1
+      parameters:
+        - name: flowId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowDataUpdate'
+      responses:
+        '200':
+          description: 更新成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowData'
+    delete:
+      tags: [Deprecated]
+      summary: 删除流程图（v1 兼容，已废弃）
+      deprecated: true
+      operationId: deleteFlowV1
+      parameters:
+        - name: flowId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 删除成功（兼容模式）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /v1/chat:
+    post:
+      tags: [Deprecated]
+      summary: AI 对话（v1 兼容，已废弃）
+      deprecated: true
+      operationId: chatV1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message:
+                  type: string
+      responses:
+        '200':
+          description: 流式响应（兼容模式）
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
+# =============================================================================
+# COMPONENTS
+# =============================================================================
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: 用户 ID
+
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: 项目 ID
+
+  schemas:
+    # ===== 用户相关 =====
+    User:
+      type: object
+      required:
+        - id
+        - name
+        - email
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        avatar:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UserUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        avatar:
+          type: string
+          nullable: true
+
+    # ===== 认证相关 =====
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    RegisterRequest:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT 认证令牌
+        user:
+          $ref: '#/components/schemas/User'
+
+    # ===== 项目相关 =====
+    Project:
+      type: object
+      required:
+        - id
+        - name
+        - userId
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        userId:
+          type: string
+          format: uuid
+        description:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Page'
+
+    ProjectCreate:
+      type: object
+      required:
+        - name
+        - userId
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        userId:
+          type: string
+
+    ProjectUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+
+    ProjectRole:
+      type: string
+      enum: [owner, admin, editor, viewer]
+
+    # ===== 需求相关 =====
+    Requirement:
+      type: object
+      required:
+        - id
+        - projectId
+        - rawInput
+      properties:
+        id:
+          type: string
+          format: uuid
+        projectId:
+          type: string
+          format: uuid
+        rawInput:
+          type: string
+        parsedData:
+          type: string
+          nullable: true
+          description: JSON 格式的解析后数据
+        status:
+          type: string
+          enum: [draft, analyzing, analyzed, clarified, approved]
+          default: draft
+        priority:
+          type: string
+          enum: [low, medium, high, critical]
+          default: medium
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    RequirementCreate:
+      type: object
+      required:
+        - projectId
+        - rawInput
+      properties:
+        projectId:
+          type: string
+        rawInput:
+          type: string
+        status:
+          type: string
+          default: draft
+        priority:
+          type: string
+          default: medium
+
+    RequirementUpdate:
+      type: object
+      properties:
+        rawInput:
+          type: string
+        parsedData:
+          type: string
+        status:
+          type: string
+          enum: [draft, analyzing, analyzed, clarified, approved]
+        priority:
+          type: string
+          enum: [low, medium, high, critical]
+
+    AnalysisResult:
+      type: object
+      properties:
+        summary:
+          type: string
+        entities:
+          type: array
+          items:
+            type: object
+        features:
+          type: array
+          items:
+            type: object
+        questions:
+          type: array
+          items:
+            type: object
+        suggestedContexts:
+          type: array
+          items:
+            type: object
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+
+    # ===== 澄清问答相关 =====
+    Clarification:
+      type: object
+      required:
+        - id
+        - requirementId
+        - question
+      properties:
+        id:
+          type: string
+          format: uuid
+        requirementId:
+          type: string
+          format: uuid
+        question:
+          type: string
+        answer:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [pending, answered, skipped]
+          default: pending
+        topic:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ClarificationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        answer:
+          type: string
+        clarification:
+          type: object
+          properties:
+            id:
+              type: string
+            question:
+              type: string
+            answer:
+              type: string
+            timestamp:
+              type: integer
+            isAccepted:
+              type: boolean
+        error:
+          type: string
+
+    # ===== 域实体相关 =====
+    DomainEntity:
+      type: object
+      required:
+        - id
+        - name
+        - type
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+          enum: [aggregate, entity, value-object, domain-event]
+        description:
+          type: string
+          nullable: true
+        requirementId:
+          type: string
+          format: uuid
+          nullable: true
+        attributes:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              type:
+                type: string
+              required:
+                type: boolean
+        relationships:
+          type: array
+          items:
+            type: object
+            properties:
+              target:
+                type: string
+              type:
+                type: string
+              description:
+                type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    DomainEntityCreate:
+      type: object
+      required:
+        - name
+        - type
+        - requirementId
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [aggregate, entity, value-object, domain-event]
+        requirementId:
+          type: string
+        description:
+          type: string
+        attributes:
+          type: array
+          items:
+            type: object
+
+    DomainEntityUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [aggregate, entity, value-object, domain-event]
+        description:
+          type: string
+        attributes:
+          type: array
+          items:
+            type: object
+
+    # ===== 实体关系相关 =====
+    EntityRelation:
+      type: object
+      required:
+        - id
+        - sourceEntityId
+        - targetEntityId
+        - type
+      properties:
+        id:
+          type: string
+          format: uuid
+        sourceEntityId:
+          type: string
+        targetEntityId:
+          type: string
+        type:
+          type: string
+          enum: [association, aggregation, composition, inheritance]
+        description:
+          type: string
+          nullable: true
+        requirementId:
+          type: string
+          format: uuid
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    EntityRelationCreate:
+      type: object
+      required:
+        - sourceEntityId
+        - targetEntityId
+        - type
+      properties:
+        sourceEntityId:
+          type: string
+        targetEntityId:
+          type: string
+        type:
+          type: string
+          enum: [association, aggregation, composition, inheritance]
+        description:
+          type: string
+        requirementId:
+          type: string
+
+    EntityRelationUpdate:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [association, aggregation, composition, inheritance]
+        description:
+          type: string
+
+    # ===== DDD 相关 =====
+    BoundedContext:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [core, supporting, generic, external]
+        keyResponsibilities:
+          type: array
+          items:
+            type: string
+        relationships:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              fromContextId:
+                type: string
+              toContextId:
+                type: string
+              type:
+                type: string
+                enum: [upstream, downstream, symmetric]
+              description:
+                type: string
+
+    BoundedContextResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        contexts:
+          type: array
+          items:
+            $ref: '#/components/schemas/BoundedContext'
+        mermaidCode:
+          type: string
+        error:
+          type: string
+
+    DomainModelResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        domainModels:
+          type: array
+          items:
+            type: object
+        mermaidCode:
+          type: string
+        error:
+          type: string
+
+    BusinessFlowResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        businessFlows:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              steps:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    action:
+                      type: string
+                    actor:
+                      type: string
+                    result:
+                      type: string
+              mermaidCode:
+                type: string
+        error:
+          type: string
+
+    # ===== 设计流程相关 =====
+    EntityDerivationRequest:
+      type: object
+      required: [requirementText]
+      properties:
+        requirementText:
+          type: string
+        sessionId:
+          type: string
+
+    EntityDerivationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        entities:
+          type: array
+          items:
+            type: object
+        mermaidCode:
+          type: string
+        error:
+          type: string
+
+    DomainModelRequest:
+      type: object
+      required:
+        - sessionId
+        - boundedContexts
+        - requirementText
+      properties:
+        sessionId:
+          type: string
+        boundedContexts:
+          type: array
+          items:
+            type: object
+        requirementText:
+          type: string
+
+    BusinessFlowRequest:
+      type: object
+      required:
+        - sessionId
+        - domainModels
+        - requirementText
+      properties:
+        sessionId:
+          type: string
+        domainModels:
+          type: array
+          items:
+            type: object
+        requirementText:
+          type: string
+
+    FlowDerivationRequest:
+      type: object
+      required:
+        - domainEntities
+        - requirementText
+      properties:
+        domainEntities:
+          type: array
+          items:
+            type: object
+        requirementText:
+          type: string
+
+    FlowDerivationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        flows:
+          type: array
+          items:
+            type: object
+        error:
+          type: string
+
+    PageDerivationRequest:
+      type: object
+      required:
+        - businessFlowId
+        - domainEntities
+        - requirementText
+      properties:
+        businessFlowId:
+          type: string
+        domainEntities:
+          type: array
+          items:
+            type: object
+        requirementText:
+          type: string
+
+    PageDerivationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        pages:
+          type: array
+          items:
+            type: object
+        error:
+          type: string
+
+    UIPageRequest:
+      type: object
+      required:
+        - sessionId
+        - businessFlowId
+      properties:
+        sessionId:
+          type: string
+        businessFlowId:
+          type: string
+
+    UIPageResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        pages:
+          type: array
+          items:
+            type: object
+        error:
+          type: string
+
+    PrototypeGenerationRequest:
+      type: object
+      required:
+        - pages
+      properties:
+        pages:
+          type: array
+          items:
+            type: object
+        theme:
+          type: object
+
+    PrototypeGenerationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        prototype:
+          type: object
+        html:
+          type: string
+        error:
+          type: string
+
+    # ===== 流程图相关 =====
+    FlowData:
+      type: object
+      required:
+        - id
+        - nodes
+        - edges
+        - projectId
+      properties:
+        id:
+          type: string
+          format: uuid
+        nodes:
+          type: array
+          items:
+            type: object
+        edges:
+          type: array
+          items:
+            type: object
+        projectId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    FlowDataUpdate:
+      type: object
+      properties:
+        nodes:
+          type: array
+          items:
+            type: object
+        edges:
+          type: array
+          items:
+            type: object
+        name:
+          type: string
+          nullable: true
+
+    # ===== 原型快照相关 =====
+    PrototypeSnapshot:
+      type: object
+      required:
+        - id
+        - projectId
+        - content
+      properties:
+        id:
+          type: string
+          format: uuid
+        projectId:
+          type: string
+          format: uuid
+        version:
+          type: integer
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PrototypeSnapshotCreate:
+      type: object
+      required:
+        - projectId
+        - content
+      properties:
+        projectId:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        content:
+          type: string
+
+    PrototypeSnapshotUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        content:
+          type: string
+
+    # ===== Agent 相关 =====
+    Agent:
+      type: object
+      required:
+        - id
+        - name
+        - prompt
+        - userId
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        prompt:
+          type: string
+        model:
+          type: string
+          default: abab6.5s-chat
+        temperature:
+          type: number
+          minimum: 0
+          maximum: 1
+          default: 0.7
+        userId:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AgentCreate:
+      type: object
+      required:
+        - name
+        - prompt
+        - userId
+      properties:
+        name:
+          type: string
+        prompt:
+          type: string
+        model:
+          type: string
+          default: abab6.5s-chat
+        temperature:
+          type: number
+          default: 0.7
+        userId:
+          type: string
+
+    AgentUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        prompt:
+          type: string
+        model:
+          type: string
+        temperature:
+          type: number
+
+    # ===== 页面相关 =====
+    Page:
+      type: object
+      required:
+        - id
+        - name
+        - projectId
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        content:
+          type: string
+          nullable: true
+        projectId:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        project:
+          $ref: '#/components/schemas/Project'
+
+    PageCreate:
+      type: object
+      required:
+        - name
+        - projectId
+      properties:
+        name:
+          type: string
+        content:
+          type: string
+          nullable: true
+        projectId:
+          type: string
+
+    PageUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        content:
+          type: string
+          nullable: true
+
+    # ===== 消息相关 =====
+    Message:
+      type: object
+      required:
+        - id
+        - role
+        - content
+        - projectId
+      properties:
+        id:
+          type: string
+          format: uuid
+        role:
+          type: string
+          enum: [user, assistant, system]
+        content:
+          type: string
+        projectId:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+
+    MessageCreate:
+      type: object
+      required:
+        - content
+        - projectId
+      properties:
+        content:
+          type: string
+        projectId:
+          type: string
+        role:
+          type: string
+          enum: [user, assistant, system]
+          default: user
+
+    # ===== 计划分析相关 =====
+    PlanAnalyzeRequest:
+      type: object
+      required:
+        - requirement
+      properties:
+        requirement:
+          type: string
+        context:
+          type: object
+          properties:
+            projectId:
+              type: string
+            previousPlans:
+              type: array
+              items:
+                type: object
+
+    PlanAnalyzeResponse:
+      type: object
+      properties:
+        requirementAnalysis:
+          type: string
+        inferredFeatures:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+              priority:
+                type: string
+                enum: [high, medium, low]
+        suggestedContexts:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+              priority:
+                type: string
+                enum: [high, medium, low]
+        risks:
+          type: array
+          items:
+            type: string
+        complexity:
+          type: string
+          enum: [simple, medium, complex]
+        estimatedComplexityScore:
+          type: number
+
+    # ===== 诊断相关 =====
+    DiagnosisResult:
+      type: object
+      properties:
+        overallScore:
+          type: number
+        grade:
+          type: string
+          enum: [A, B, C, D]
+        scores:
+          type: object
+          properties:
+            completeness:
+              type: number
+            clarity:
+              type: number
+            consistency:
+              type: number
+            feasibility:
+              type: number
+        identifiedDomains:
+          type: array
+          items:
+            type: object
+        missingInfo:
+          type: array
+          items:
+            type: object
+        suggestions:
+          type: array
+          items:
+            type: object
+        similarCases:
+          type: array
+          items:
+            type: object
+
+    # ===== 通用响应 =====
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: 错误消息
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Unauthorized:
+      description: 未认证
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    InternalError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

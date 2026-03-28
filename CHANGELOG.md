@@ -1,3 +1,13 @@
+### Fixed (vibex-canvas-btn-rename-20260328 Epic1: 按钮文案「重新执行」) — 2026-03-28
+- **Epic1**: Canvas 页面按钮文案优化：「AI生成上下文」→「重新执行」
+  - `vibex-fronted/src/components/canvas/BoundedContextTree.tsx`:
+    - 按钮可见文本: `◈ AI 生成上下文` → `◈ 重新执行`
+    - 加载态文本: `◌ 生成中...` → `◌ 重新执行中...`
+    - aria-label: `AI 生成限界上下文` → `重新执行`
+    - 空状态提示: `点击「AI 生成上下文」...` → `点击「重新执行」...`
+  - 提交: `75070fed` (feat) + `403336cb` (fix)
+  - Review: `docs/vibex-canvas-btn-rename-20260328/`
+
 ### Added (team-evolution-20260328 Epic1: Agent Self-Score 机制) — 2026-03-28
 - **Epic1 Phase1-SelfScore**: self-score-hook.sh — agent 端自动自我评分
   - `scripts/heartbeats/self-score-hook.sh`: 9维关键词评分，从 phase 文件结构推断各维度得分（格式/完整度/约束/耗时/可行性/可读/可理解/详细程度/正确性）

@@ -1,3 +1,14 @@
+### Added (vibex-canvas-api-standardization Epic4: sessionId 链路验证) — 2026-03-29
+- **Epic4**: F4 — 两步设计流程 sessionId 链路验证
+  - **后端 Hono Router** (`src/routes/v1/canvas/index.ts`): `sessionId` Zod 必填验证正确（GenerateFlows/GenerateComponents schema）
+  - **后端 Next.js App Router** (`generate-flows` / `generate-components` route.ts): sessionId 在 body 类型中定义但未提取，属于死代码/冗余
+  - **前端** (`canvasStore.ts`): 使用 `projectId` 作为 `sessionId` 回退，未从 contexts 响应中捕获 generationId
+  - **SSE Stream** (`sse-stream-lib/index.ts`): 所有事件（thinking/step_context/step_model/step_flow/step_components/done）无 sessionId 字段，无法关联会话
+  - **额外发现**: Hono 与 Next.js App Router 重复实现，前端使用 Hono Router，Next.js App Router 版本未被调用
+  - tester 审查: 5/5 发现点全部核实 ✅ (docs/vibex-canvas-api-standardization/EPIC4_SESSIONID_VERIFY_TESTER.md)
+  - 提交: `d81d6311`
+  - 审查: ✅ PASSED (reviewer-epic4-sessionid-verify)
+
 ### Added (vibex-canvas-api-standardization Epic2: SSE端点整合) — 2026-03-29
 - **Epic2**: SSE端点整合 — Canvas API标准化
   - 后端: 创建 `/api/v1/canvas/stream` Canvas专属SSE端点 + `sse-stream-lib/index.ts` 共享SSE流构建逻辑

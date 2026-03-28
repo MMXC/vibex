@@ -74,6 +74,8 @@ describe('canvasStore', () => {
       requirementText: '',
       flowGenerating: false,
       flowGeneratingMessage: null,
+      // E2: also reset internal tracking
+      _prevActiveTree: null,
     });
   });
 
@@ -868,5 +870,146 @@ describe('markAllPending', () => {
       const updated = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.3 Color Flow C')!;
       expect(updated.steps[0].status).toBe('confirmed');
       // canvas.module.css uses var(--color-success) = #10b981 for nodeConfirmed
+    });
+  });
+
+  // E2-1: Canvas Three-Column Auto-Expand
+  describe('E2-1: Three-Column Auto-Expand', () => {
+    // Ensure _prevActiveTree is reset before each test (defensive: guard against beforeEach timing issues)
+    beforeEach(() => {
+      const s = useCanvasStore.getState();
+      console.log('[E2-1 beforeEach] _prevActiveTree BEFORE:', s._prevActiveTree);
+      useCanvasStore.setState({ _prevActiveTree: null });
+      const s2 = useCanvasStore.getState();
+      console.log('[E2-1 beforeEach] _prevActiveTree AFTER set:', s2._prevActiveTree);
+    });
+
+    // E2-1.1: recomputeActiveTree auto-expands center panel
+    it('should expand center panel when all context nodes confirmed (activeTree becomes flow)', () => {
+      const { addContextNode, confirmContextNode, setPhase } = useCanvasStore.getState();
+      // Check initial state
+      const init = useCanvasStore.getState();
+      console.log('[TEST] Initial:', 'phase:', init.phase, 'activeTree:', init.activeTree, '_prevActiveTree:', init._prevActiveTree, 'centerExpand:', init.centerExpand);
+      setPhase('context');
+      const afterPhase = useCanvasStore.getState();
+      console.log('[TEST] After setPhase:', 'activeTree:', afterPhase.activeTree, '_prevActiveTree:', afterPhase._prevActiveTree, 'centerExpand:', afterPhase.centerExpand);
+
+      addContextNode({ name: 'C1', description: '', type: 'core' });
+      addContextNode({ name: 'C2', description: '', type: 'core' });
+
+      // Confirm first node
+      const nodes = useCanvasStore.getState().contextNodes;
+      confirmContextNode(nodes[0].nodeId);
+      const after1 = useCanvasStore.getState();
+      console.log('[TEST] After confirm 1:', 'activeTree:', after1.activeTree, '_prevActiveTree:', after1._prevActiveTree, 'centerExpand:', after1.centerExpand);
+
+      // Confirm second node — all confirmed, activeTree becomes 'flow', center expands
+      confirmContextNode(nodes[1].nodeId);
+      const after2 = useCanvasStore.getState();
+      console.log('[TEST] After confirm 2:', 'activeTree:', after2.activeTree, '_prevActiveTree:', after2._prevActiveTree, 'centerExpand:', after2.centerExpand);
+      expect(after2.activeTree).toBe('flow');
+      expect(after2.centerExpand).toBe('expand-left');
+    });
+
+    it('should expand center panel when all flow nodes confirmed (activeTree becomes component)', () => {
+      const { addContextNode, confirmContextNode, confirmFlowNode, setPhase } = useCanvasStore.getState();
+      setPhase('context');
+
+      addContextNode({ name: 'C1', description: '', type: 'core' });
+      const ctxId = useCanvasStore.getState().contextNodes[0].nodeId;
+      confirmContextNode(ctxId);
+
+      // Manually add a flow node to avoid autoGenerateFlows API call
+      const { addFlowNode } = useCanvasStore.getState();
+      addFlowNode({ name: 'Flow A', contextId: ctxId, steps: [] });
+
+      // Move to flow phase
+      useCanvasStore.setState({ phase: 'flow' });
+
+      // Confirm flow node
+      const flowNodes = useCanvasStore.getState().flowNodes;
+      confirmFlowNode(flowNodes[0].nodeId);
+
+      // activeTree should be 'component', centerExpand stays 'expand-left'
+      expect(useCanvasStore.getState().activeTree).toBe('component');
+      expect(useCanvasStore.getState().centerExpand).toBe('expand-left');
+    });
+
+    it('should reset centerExpand to default when phase returns to input', () => {
+      const { addContextNode, confirmContextNode, setPhase } = useCanvasStore.getState();
+      setPhase('context');
+
+      addContextNode({ name: 'C1', description: '', type: 'core' });
+      const nodes = useCanvasStore.getState().contextNodes;
+      confirmContextNode(nodes[0].nodeId);
+
+      expect(useCanvasStore.getState().centerExpand).toBe('expand-left');
+
+      // Move back to input phase
+      setPhase('input');
+      expect(useCanvasStore.getState().centerExpand).toBe('default');
+    });
+
+    it('should reset centerExpand to default when phase becomes prototype', () => {
+      const { addContextNode, confirmContextNode, setPhase } = useCanvasStore.getState();
+      const init = useCanvasStore.getState();
+      console.log('[TEST4] Initial:', '_prevActiveTree:', init._prevActiveTree);
+      setPhase('context');
+      const afterPhase = useCanvasStore.getState();
+      console.log('[TEST4] After setPhase:', 'activeTree:', afterPhase.activeTree, '_prevActiveTree:', afterPhase._prevActiveTree);
+
+      addContextNode({ name: 'C1', description: '', type: 'core' });
+      const nodes = useCanvasStore.getState().contextNodes;
+      confirmContextNode(nodes[0].nodeId);
+      const afterConfirm = useCanvasStore.getState();
+      console.log('[TEST4] After confirm:', 'activeTree:', afterConfirm.activeTree, 'centerExpand:', afterConfirm.centerExpand, '_prevActiveTree:', afterConfirm._prevActiveTree);
+
+      expect(afterConfirm.centerExpand).toBe('expand-left');
+
+      // Advance to prototype
+      setPhase('prototype');
+      expect(useCanvasStore.getState().centerExpand).toBe('default');
+    });
+
+    // E2-1.3: Manual expand should not be overwritten by recomputeActiveTree
+    it('should NOT override manual leftExpand when recomputeActiveTree is called', () => {
+      const { addContextNode, confirmContextNode, setPhase, setLeftExpand } = useCanvasStore.getState();
+      setPhase('context');
+
+      // User manually expands left panel
+      setLeftExpand('expand-right');
+      expect(useCanvasStore.getState().leftExpand).toBe('expand-right');
+
+      addContextNode({ name: 'C1', description: '', type: 'core' });
+      const nodes = useCanvasStore.getState().contextNodes;
+      confirmContextNode(nodes[0].nodeId);
+
+      // activeTree changed but leftExpand should remain
+      expect(useCanvasStore.getState().activeTree).toBe('flow');
+      expect(useCanvasStore.getState().leftExpand).toBe('expand-right');
+      // centerExpand was auto-set to expand-left
+      expect(useCanvasStore.getState().centerExpand).toBe('expand-left');
+    });
+
+    it('should NOT override manual centerExpand when recomputeActiveTree is called with same newActiveTree', () => {
+      const { setCenterExpand, setPhase, addContextNode, confirmContextNode } = useCanvasStore.getState();
+      setPhase('context');
+
+      addContextNode({ name: 'C1', description: '', type: 'core' });
+      const nodes = useCanvasStore.getState().contextNodes;
+      confirmContextNode(nodes[0].nodeId);
+
+      // Now centerExpand is 'expand-left'
+      expect(useCanvasStore.getState().centerExpand).toBe('expand-left');
+
+      // User manually switches center to 'expand-right'
+      setCenterExpand('expand-right');
+      expect(useCanvasStore.getState().centerExpand).toBe('expand-right');
+
+      // Manually trigger recomputeActiveTree (same activeTree, no tree transition)
+      useCanvasStore.getState().recomputeActiveTree();
+
+      // centerExpand should NOT revert to 'expand-left'
+      expect(useCanvasStore.getState().centerExpand).toBe('expand-right');
     });
   });

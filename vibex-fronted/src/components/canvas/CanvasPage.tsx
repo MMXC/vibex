@@ -248,7 +248,10 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             : '确认所有组件后创建项目'
           : '';
 
-  // === Tab content for mobile ===
+  // === Tab content for mobile (E2-2: auto-expand active tab panel) ===
+  // In tab mode, the active tab's panel always expands to fill the screen.
+  // collapsed={false} overrides the shared desktop collapsed state, ensuring
+  // the selected tab is always fully visible in mobile layout.
   const renderTabContent = (tab: TreeType, _treeNodes: TreeNode[], _isActive: boolean) => {
     switch (tab) {
       case 'context':
@@ -257,7 +260,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             tree="context"
             title="限界上下文树"
             nodes={contextTreeNodes}
-            collapsed={contextPanelCollapsed}
+            collapsed={false} // E2-2: always expanded in tab mode
             isActive={contextActive}
             onToggleCollapse={toggleContextPanel}
             actions={
@@ -298,7 +301,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             tree="flow"
             title="业务流程树"
             nodes={flowTreeNodes}
-            collapsed={flowPanelCollapsed}
+            collapsed={false} // E2-2: always expanded in tab mode
             isActive={flowActive}
             onToggleCollapse={toggleFlowPanel}
             actions={
@@ -327,7 +330,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             tree="component"
             title="组件树"
             nodes={componentTreeNodes}
-            collapsed={componentPanelCollapsed}
+            collapsed={false} // E2-2: always expanded in tab mode
             isActive={componentActive}
             onToggleCollapse={toggleComponentPanel}
           >

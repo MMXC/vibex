@@ -21,6 +21,8 @@ import {
   closestCenter,
   KeyboardSensor,
   PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   type DragEndEvent,
@@ -33,6 +35,8 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { BusinessFlowNode, FlowStep, ComponentNode, BoundedContextNode } from '@/lib/canvas/types';
+import { SortableTreeItem } from './features/SortableTreeItem';
+import { getHistoryStore } from '@/lib/canvas/historySlice';
 import styles from './canvas.module.css';
 
 // =============================================================================
@@ -439,8 +443,43 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
   const autoGenerateFlows = useCanvasStore((s) => s.autoGenerateFlows);
   const flowGenerating = useCanvasStore((s) => s.flowGenerating);
   const setComponentNodes = useCanvasStore((s) => s.setComponentNodes);
+  const setFlowNodes = useCanvasStore((s) => s.setFlowNodes);
   const setPhase = useCanvasStore((s) => s.setPhase);
   const projectId = useCanvasStore((s) => s.projectId);
+
+  // === E2-F7: Flow card drag sensors ===
+  const flowSensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: { distance: 8 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 5 },
+    })
+  );
+
+  // E2-F7: Reorder flow cards on drag end
+  const handleFlowCardDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+
+      const oldIndex = flowNodes.findIndex((n) => n.nodeId === active.id);
+      const newIndex = flowNodes.findIndex((n) => n.nodeId === over.id);
+
+      if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) return;
+
+      // Record undo snapshot before reordering
+      const historyStore = getHistoryStore();
+      historyStore.recordSnapshot('flow', flowNodes);
+
+      // Reorder nodes
+      const newNodes = [...flowNodes];
+      const [moved] = newNodes.splice(oldIndex, 1);
+      newNodes.splice(newIndex, 0, moved);
+      setFlowNodes(newNodes);
+    },
+    [flowNodes, setFlowNodes]
+  );
 
   // === Local UI State ===
   // S1.3: 防重复提交锁
@@ -579,23 +618,40 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
           )}
         </div>
       ) : (
-        <div className={styles.flowList}>
-          {flowNodes.map((node) => (
-            <FlowCard
-              key={node.nodeId}
-              node={node}
-              readonly={readonly}
-              onEdit={editFlowNode}
-              onDelete={deleteFlowNode}
-              onConfirm={confirmFlowNode}
-              onAddStep={addStepToFlow}
-              onConfirmStep={confirmStep}
-              onEditStep={editStep}
-              onDeleteStep={deleteStep}
-              onReorderSteps={reorderSteps}
-            />
-          ))}
-        </div>
+        <DndContext
+          sensors={flowSensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleFlowCardDragEnd}
+        >
+          <SortableContext
+            items={flowNodes.map((n) => n.nodeId)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className={styles.flowList}>
+              {flowNodes.map((node) => (
+                <SortableTreeItem
+                  key={node.nodeId}
+                  options={{ id: node.nodeId, disabled: readonly }}
+                  treeType="flow"
+                  label={node.name}
+                >
+                  <FlowCard
+                    node={node}
+                    readonly={readonly}
+                    onEdit={editFlowNode}
+                    onDelete={deleteFlowNode}
+                    onConfirm={confirmFlowNode}
+                    onAddStep={addStepToFlow}
+                    onConfirmStep={confirmStep}
+                    onEditStep={editStep}
+                    onDeleteStep={deleteStep}
+                    onReorderSteps={reorderSteps}
+                  />
+                </SortableTreeItem>
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
       )}
     </div>
   );

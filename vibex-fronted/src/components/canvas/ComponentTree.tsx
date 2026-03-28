@@ -14,8 +14,23 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useMemo } from 'react';
+import {
+  DndContext,
+  type DragEndEvent,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  closestCenter,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { useToast } from '@/components/ui/Toast';
+import { SortableTreeItem } from './features/SortableTreeItem';
+import { getHistoryStore } from '@/lib/canvas/historySlice';
 import type { ComponentNode, BusinessFlowNode } from '@/lib/canvas/types';
 import { ComponentGroupOverlay } from './groups/ComponentGroupOverlay';
 import type { ComponentGroupBBox } from './groups/ComponentGroupOverlay';
@@ -529,6 +544,40 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
 
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // E2-F7: Drag sensors — mouse and touch support
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: { distance: 8 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 5 },
+    })
+  );
+
+  // E2-F7: Reorder component nodes on drag end
+  const handleComponentDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+
+      const oldIndex = componentNodes.findIndex((n) => n.nodeId === active.id);
+      const newIndex = componentNodes.findIndex((n) => n.nodeId === over.id);
+
+      if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) return;
+
+      // Record undo snapshot before reordering
+      const historyStore = getHistoryStore();
+      historyStore.recordSnapshot('component', componentNodes);
+
+      // Reorder nodes
+      const newNodes = [...componentNodes];
+      const [moved] = newNodes.splice(oldIndex, 1);
+      newNodes.splice(newIndex, 0, moved);
+      setComponentNodes(newNodes);
+    },
+    [componentNodes, setComponentNodes]
+  );
+
   const handleGenerate = useCallback(async () => {
     if (generating) return;
     setGenerating(true);
@@ -685,22 +734,40 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
                   </span>
                 </div>
 
-                {/* Grouped node cards */}
-                <div
-                  className={styles.componentGroupCards}
-                  data-component-group={group.groupId}
+                {/* E2-F7: DndContext for this group's draggable cards */}
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleComponentDragEnd}
                 >
-                  {group.nodes.map((node) => (
-                    <ComponentCard
-                      key={node.nodeId}
-                      node={node}
-                      onConfirm={confirmComponentNode}
-                      onEdit={editComponentNode}
-                      onDelete={deleteComponentNode}
-                      readonly={readonly}
-                    />
-                  ))}
-                </div>
+                  <SortableContext
+                    items={group.nodes.map((n) => n.nodeId)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {/* Grouped node cards */}
+                    <div
+                      className={styles.componentGroupCards}
+                      data-component-group={group.groupId}
+                    >
+                      {group.nodes.map((node) => (
+                        <SortableTreeItem
+                          key={node.nodeId}
+                          options={{ id: node.nodeId, disabled: readonly }}
+                          treeType="component"
+                          label={node.name}
+                        >
+                          <ComponentCard
+                            node={node}
+                            onConfirm={confirmComponentNode}
+                            onEdit={editComponentNode}
+                            onDelete={deleteComponentNode}
+                            readonly={readonly}
+                          />
+                        </SortableTreeItem>
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
               </div>
             ))}
           </>

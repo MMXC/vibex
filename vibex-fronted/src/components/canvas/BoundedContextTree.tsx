@@ -311,12 +311,16 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
   );
 
   const handleConfirmAll = useCallback(() => {
-    contextNodes.forEach((n) => {
-      if (!n.confirmed) confirmContextNode(n.nodeId);
+    // Collect all node IDs that need confirming before mutating store
+    const unconfirmedIds = contextNodes.filter((n) => !n.confirmed).map((n) => n.nodeId);
+
+    // Confirm each node (triggers autoGenerateFlows when last one is confirmed)
+    unconfirmedIds.forEach((nodeId) => {
+      confirmContextNode(nodeId);
     });
-    // Advance to next phase when all confirmed
-    const allConfirmed = contextNodes.every((n) => n.confirmed);
-    if (allConfirmed && contextNodes.length > 0) {
+
+    // Advance phase AFTER all confirmations complete (not inside forEach loop)
+    if (unconfirmedIds.length > 0) {
       advancePhase();
     }
   }, [contextNodes, confirmContextNode, advancePhase]);

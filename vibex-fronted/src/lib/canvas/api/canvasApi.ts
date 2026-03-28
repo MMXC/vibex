@@ -20,7 +20,7 @@ import type {
   BoundedContextNode,
 } from '../types';
 
-import { getApiUrl } from '@/lib/api-config';
+import { getApiUrl, API_CONFIG } from '@/lib/api-config';
 
 export const canvasApi = {
   /**
@@ -28,7 +28,7 @@ export const canvasApi = {
    * POST /api/canvas/project
    */
   createProject: async (data: CreateProjectInput): Promise<CreateProjectOutput> => {
-    const res = await fetch(getApiUrl('/canvas/project'), {
+    const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.project), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -47,7 +47,7 @@ export const canvasApi = {
    * POST /api/canvas/generate
    */
   generate: async (data: GenerateInput): Promise<GenerateOutput> => {
-    const res = await fetch(getApiUrl('/canvas/generate'), {
+    const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.generate), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -68,7 +68,7 @@ export const canvasApi = {
    * 轮询间隔: 5000ms (AGENTS.md ADR-003)
    */
   getStatus: async (projectId: string): Promise<StatusOutput> => {
-    const res = await fetch(getApiUrl(`/canvas/status?projectId=${encodeURIComponent(projectId)}`));
+    const res = await fetch(getApiUrl(`${API_CONFIG.endpoints.canvas.status}?projectId=${encodeURIComponent(projectId)}`));
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
@@ -83,7 +83,7 @@ export const canvasApi = {
    * GET /api/canvas/export?projectId=xxx
    */
   exportZip: async (projectId: string): Promise<Blob> => {
-    const res = await fetch(getApiUrl(`/canvas/export?projectId=${encodeURIComponent(projectId)}`));
+    const res = await fetch(getApiUrl(`${API_CONFIG.endpoints.canvas.export}?projectId=${encodeURIComponent(projectId)}`));
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
@@ -104,7 +104,7 @@ export const canvasApi = {
     requirementText: string;
     projectId?: string;
   }): Promise<GenerateContextsOutput> => {
-    const res = await fetch(getApiUrl('/canvas/generate-contexts'), {
+    const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.generateContexts), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -126,7 +126,7 @@ export const canvasApi = {
     contexts: Array<{ id: string; name: string; description: string; type: string }>;
     sessionId: string;
   }): Promise<GenerateFlowsOutput> => {
-    const res = await fetch(getApiUrl('/canvas/generate-flows'), {
+    const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.generateFlows), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -149,7 +149,7 @@ export const canvasApi = {
     flows: Array<{ name: string; contextId: string; steps: Array<{ name: string; actor: string }> }>;
     sessionId: string;
   }): Promise<GenerateComponentsOutput> => {
-    const res = await fetch(getApiUrl('/canvas/generate-components'), {
+    const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.generateComponents), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),

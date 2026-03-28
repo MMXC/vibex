@@ -16,6 +16,7 @@ import { rateLimit } from '../../lib/rateLimit';
 import { logger } from '../../lib/logger';
 import { errorHandler, notFoundHandler } from '../../lib/errorHandler';
 import analyzeStream from './analyze/stream';
+import canvas from './canvas';
 
 // 导入所有 API 路由
 import projects from '../projects';
@@ -197,6 +198,9 @@ protected_.route('/projects/:id/settings', projectSettings);
 
 // 确认项目
 protected_.route('/confirmation-projects', confirmationProjects);
+
+// Canvas 画布 API
+protected_.route('/canvas', canvas);
 
 // DDD
 protected_.route('/ddd', ddd);

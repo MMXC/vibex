@@ -13,10 +13,19 @@ export const API_CONFIG = {
   // Endpoints
   endpoints: {
     ddd: {
-      boundedContext: '/ddd/bounded-context',
-      boundedContextStream: '/ddd/bounded-context/stream',
-      domainModel: '/ddd/domain-model',
-      businessFlow: '/ddd/business-flow',
+      boundedContext: '/v1/ddd/bounded-context',
+      boundedContextStream: '/v1/ddd/bounded-context/stream',
+      domainModel: '/v1/ddd/domain-model',
+      businessFlow: '/v1/ddd/business-flow',
+    },
+    canvas: {
+      generateContexts: '/v1/canvas/generate-contexts',
+      generateFlows: '/v1/canvas/generate-flows',
+      generateComponents: '/v1/canvas/generate-components',
+      status: '/v1/canvas/status',
+      project: '/v1/canvas/project',
+      generate: '/v1/canvas/generate',
+      export: '/v1/canvas/export',
     },
     auth: {
       login: '/auth/login',

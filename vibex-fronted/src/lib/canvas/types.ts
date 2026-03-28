@@ -83,6 +83,16 @@ export interface BusinessFlowNode {
   status: NodeStatus;
   parentId?: string;
   children: string[];
+  /** E3-F13: Relationships to other flow nodes */
+  relationships?: FlowRelationship[];
+}
+
+/** E3-F13: Relationship between flow nodes */
+export interface FlowRelationship {
+  sourceId?: string;
+  targetId: string;
+  type: 'sequence' | 'parallel' | 'conditional';
+  label?: string;
 }
 
 export interface BusinessFlowDraft {
@@ -115,6 +125,16 @@ export interface ComponentNode {
   confirmed: boolean;
   status: NodeStatus;
   previewUrl?: string;
+  /** E3-F13: Relationships to other component nodes */
+  relationships?: ComponentRelationship[];
+}
+
+/** E3-F13: Relationship between component nodes */
+export interface ComponentRelationship {
+  sourceId?: string;
+  targetId: string;
+  type: 'calls' | 'includes' | 'references';
+  label?: string;
 }
 
 // =============================================================================
@@ -470,3 +490,53 @@ export type LoopEdgeFull = Edge<LoopEdgeData, 'loop'>;
 
 /** Full ReactFlow edge type for RelationshipEdge */
 export type RelationshipEdgeFull = Edge<RelationshipEdgeData, 'relationship'>;
+
+// =============================================================================
+// E4-F11: Version History — Canvas Snapshots
+// =============================================================================
+
+/** Canvas snapshot — a point-in-time capture of all three trees */
+export interface CanvasSnapshot {
+  snapshotId: string;
+  projectId: string | null;
+  /** Human-readable label for this snapshot */
+  label: string;
+  /** What triggered this snapshot */
+  trigger: 'manual' | 'ai_complete' | 'auto';
+  /** Snapshot creation timestamp (ISO string) */
+  createdAt: string;
+  /** Number of nodes in each tree at snapshot time */
+  contextCount: number;
+  flowCount: number;
+  componentCount: number;
+  /** Compact data — only stored if local-only mode */
+  contextNodes?: BoundedContextNode[];
+  flowNodes?: BusinessFlowNode[];
+  componentNodes?: ComponentNode[];
+}
+
+export interface CreateSnapshotInput {
+  projectId?: string | null;
+  label: string;
+  trigger: CanvasSnapshot['trigger'];
+  contextNodes: BoundedContextNode[];
+  flowNodes: BusinessFlowNode[];
+  componentNodes: ComponentNode[];
+}
+
+export interface CreateSnapshotOutput {
+  success: boolean;
+  snapshot: CanvasSnapshot;
+}
+
+export interface ListSnapshotsOutput {
+  success: boolean;
+  snapshots: CanvasSnapshot[];
+}
+
+export interface RestoreSnapshotOutput {
+  success: boolean;
+  contextNodes: BoundedContextNode[];
+  flowNodes: BusinessFlowNode[];
+  componentNodes: ComponentNode[];
+}

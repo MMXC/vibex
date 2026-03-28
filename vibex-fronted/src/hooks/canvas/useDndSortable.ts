@@ -14,8 +14,6 @@
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import type { UseSortableArguments } from '@dnd-kit/sortable';
-
 export interface UseDndSortableResult {
   /** Ref to attach to the sortable element */
   setNodeRef: ReturnType<typeof useSortable>['setNodeRef'];

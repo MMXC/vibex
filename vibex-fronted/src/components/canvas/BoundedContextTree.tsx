@@ -65,9 +65,13 @@ interface ContextCardProps {
   onEdit: (nodeId: string, data: Partial<BoundedContextNode>) => void;
   onDelete: (nodeId: string) => void;
   readonly?: boolean;
+  /** F3-F10: 多选状态 */
+  selected?: boolean;
+  /** F3-F10: 多选切换回调 */
+  onToggleSelect?: (nodeId: string) => void;
 }
 
-function ContextCard({ node, onConfirm, onEdit, onDelete, readonly }: ContextCardProps) {
+function ContextCard({ node, onConfirm, onEdit, onDelete, readonly, selected, onToggleSelect }: ContextCardProps) {
   const [editing, setEditing] = useState(false);
   const [editState, setEditState] = useState<NodeEditState>({
     nodeId: node.nodeId,
@@ -105,7 +109,7 @@ function ContextCard({ node, onConfirm, onEdit, onDelete, readonly }: ContextCar
 
   return (
     <div
-      className={`${styles.nodeCard} ${statusClass}`}
+      className={`${styles.nodeCard} ${statusClass} ${selected ? styles.nodeCardSelected : ''}`}
       data-node-id={node.nodeId}
       data-status={node.status}
       data-type={node.type}
@@ -149,6 +153,18 @@ function ContextCard({ node, onConfirm, onEdit, onDelete, readonly }: ContextCar
       ) : (
         /* View mode */
         <>
+          {/* F3-F10: Selection checkbox */}
+          {onToggleSelect && (
+            <div className={styles.selectionCheckbox} onClick={(e) => { e.stopPropagation(); onToggleSelect(node.nodeId); }}>
+              <input
+                type="checkbox"
+                checked={selected ?? false}
+                onChange={() => onToggleSelect(node.nodeId)}
+                aria-label={`选择 ${node.name}`}
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          )}
           <div className={styles.nodeCardHeader}>
             <div className={styles.nodeTypeBadge} style={{ background: typeColor }}>
               {node.type === 'core'
@@ -278,6 +294,16 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
   const setContextNodes = useCanvasStore((s) => s.setContextNodes);
   const advancePhase = useCanvasStore((s) => s.advancePhase);
 
+  // F3-F10: Multi-select state
+  const selectedNodeIds = useCanvasStore((s) => s.selectedNodeIds);
+  const toggleNodeSelect = useCanvasStore((s) => s.toggleNodeSelect);
+  const selectAllNodes = useCanvasStore((s) => s.selectAllNodes);
+  const clearNodeSelection = useCanvasStore((s) => s.clearNodeSelection);
+  const deleteSelectedNodes = useCanvasStore((s) => s.deleteSelectedNodes);
+
+  const selectedIds = new Set(selectedNodeIds.context);
+  const selectedCount = selectedIds.size;
+
   const [generating, setGenerating] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -361,6 +387,44 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
             + 手动新增
           </button>
         )}
+
+        {/* F3-F10: Multi-select controls */}
+        {hasNodes && (
+          <div className={styles.multiSelectControls}>
+            {selectedCount > 0 ? (
+              <>
+                <span className={styles.selectionCount}>{selectedCount} 已选</span>
+                <button
+                  type="button"
+                  className={styles.secondaryButton}
+                  onClick={() => clearNodeSelection('context')}
+                  aria-label="取消选择"
+                >
+                  取消选择
+                </button>
+                {!readonly && (
+                  <button
+                    type="button"
+                    className={styles.deleteButton}
+                    onClick={() => deleteSelectedNodes('context')}
+                    aria-label={`删除 ${selectedCount} 个选中节点`}
+                  >
+                    删除 ({selectedCount})
+                  </button>
+                )}
+              </>
+            ) : (
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                onClick={() => selectAllNodes('context')}
+                aria-label="全选"
+              >
+                全选
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Add Node Form */}
@@ -379,6 +443,11 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
 
       {/* Node List */}
       <div className={styles.contextNodeList} role="list" aria-label="限界上下文节点列表">
+        {/* E3-F13: SVG overlay for context relationships */}
+        <RelationshipConnector
+          nodes={contextNodes}
+          containerRef={containerRef as React.RefObject<HTMLElement | null>}
+        />
         {hasNodes ? (
           <>
             {/* Group nodes by domain type */}
@@ -401,6 +470,8 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
                       onEdit={props.onEdit}
                       onDelete={props.onDelete}
                       readonly={props.readonly}
+                      selected={selectedIds.has(props.node.nodeId)}
+                      onToggleSelect={(nodeId) => toggleNodeSelect('context', nodeId)}
                     />
                   )}
                 />

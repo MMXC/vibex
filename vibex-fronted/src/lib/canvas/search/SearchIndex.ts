@@ -63,7 +63,7 @@ const FUSE_OPTIONS: IFuseOptions<SearchNode> = {
 // Tree Type Labels
 // =============================================================================
 
-const TREE_TYPE_LABELS: Record<TreeType, string> = {
+const _TREE_TYPE_LABELS: Record<TreeType, string> = {
   context: '限界上下文',
   flow: '业务流程',
   component: '组件树',

@@ -241,6 +241,10 @@ interface FlowCardProps {
   onEditStep: (flowNodeId: string, stepId: string, data: Partial<FlowStep>) => void;
   onDeleteStep: (flowNodeId: string, stepId: string) => void;
   onReorderSteps: (flowNodeId: string, fromIndex: number, toIndex: number) => void;
+  /** F3-F10: Multi-select state */
+  selected?: boolean;
+  /** F3-F10: Multi-select toggle */
+  onToggleSelect?: (nodeId: string) => void;
 }
 
 function FlowCard({
@@ -254,6 +258,8 @@ function FlowCard({
   onEditStep,
   onDeleteStep,
   onReorderSteps,
+  selected,
+  onToggleSelect,
 }: FlowCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -308,9 +314,20 @@ function FlowCard({
         : styles.nodePending;
 
   return (
-    <div className={`${styles.flowCard} ${statusClass}`} data-testid="flow-card">
+    <div className={`${styles.flowCard} ${statusClass} ${selected ? styles.nodeCardSelected : ''}`} data-testid="flow-card">
       {/* Card header */}
       <div className={styles.flowCardHeader}>
+        {/* F3-F10: Selection checkbox */}
+        {onToggleSelect && (
+          <input
+            type="checkbox"
+            className={styles.flowCardCheckbox}
+            checked={selected ?? false}
+            onChange={() => onToggleSelect(node.nodeId)}
+            aria-label={`选择流程 ${node.name}`}
+            onClick={(e) => e.stopPropagation()}
+          />
+        )}
         <button
           className={styles.expandBtn}
           onClick={() => setExpanded((e) => !e)}
@@ -456,6 +473,16 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
       activationConstraint: { delay: 200, tolerance: 5 },
     })
   );
+
+  // === E3-F2: Multi-select state ===
+  const selectedNodeIds = useCanvasStore((s) => s.selectedNodeIds);
+  const toggleNodeSelect = useCanvasStore((s) => s.toggleNodeSelect);
+  const selectAllNodes = useCanvasStore((s) => s.selectAllNodes);
+  const clearNodeSelection = useCanvasStore((s) => s.clearNodeSelection);
+  const deleteSelectedNodes = useCanvasStore((s) => s.deleteSelectedNodes);
+
+  const selectedIds = new Set(selectedNodeIds.flow);
+  const selectedCount = selectedIds.size;
 
   // E2-F7: Reorder flow cards on drag end
   const handleFlowCardDragEnd = useCallback(
@@ -605,6 +632,44 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
             上下文已全部确认，流程树将自动生成
           </span>
         )}
+
+        {/* E3-F2: Multi-select controls */}
+        {flowNodes.length > 0 && (
+          <div className={styles.multiSelectControls}>
+            {selectedCount > 0 ? (
+              <>
+                <span className={styles.selectionCount}>{selectedCount} 已选</span>
+                <button
+                  type="button"
+                  className={styles.secondaryButton}
+                  onClick={() => clearNodeSelection('flow')}
+                  aria-label="取消选择"
+                >
+                  取消选择
+                </button>
+                {!readonly && (
+                  <button
+                    type="button"
+                    className={styles.deleteButton}
+                    onClick={() => deleteSelectedNodes('flow')}
+                    aria-label={`删除 ${selectedCount} 个选中节点`}
+                  >
+                    删除 ({selectedCount})
+                  </button>
+                )}
+              </>
+            ) : (
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                onClick={() => selectAllNodes('flow')}
+                aria-label="全选"
+              >
+                全选
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Flow list */}
@@ -646,6 +711,8 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
                     onEditStep={editStep}
                     onDeleteStep={deleteStep}
                     onReorderSteps={reorderSteps}
+                    selected={selectedIds.has(node.nodeId)}
+                    onToggleSelect={(nodeId) => toggleNodeSelect('flow', nodeId)}
                   />
                 </SortableTreeItem>
               ))}

@@ -16,6 +16,7 @@ import { areAllConfirmed } from '@/lib/canvas/cascade';
 import type { CreateProjectInput, PrototypePage } from '@/lib/canvas/types';
 import { getHistoryStore } from '@/lib/canvas/historySlice';
 import { UndoRedoButtons, ZoomControls } from './CanvasToolbar';
+import { ExportMenu } from './features/ExportMenu';
 import styles from './canvas.module.css';
 
 interface ProjectBarProps {
@@ -33,6 +34,8 @@ interface ProjectBarProps {
   onZoomOut?: () => void;
   /** E2-F14: 重置缩放回调 */
   onZoomReset?: () => void;
+  /** E4-F11: 打开版本历史回调 */
+  onOpenHistory?: () => void;
 }
 
 export function ProjectBar({
@@ -43,6 +46,7 @@ export function ProjectBar({
   onZoomIn,
   onZoomOut,
   onZoomReset,
+  onOpenHistory,
 }: ProjectBarProps) {
   const contextNodes = useCanvasStore((s) => s.contextNodes);
   const flowNodes = useCanvasStore((s) => s.flowNodes);
@@ -225,6 +229,26 @@ export function ProjectBar({
           onZoomOut={onZoomOut}
           onZoomReset={onZoomReset}
         />
+      )}
+
+      {/* E4-F9: Export Menu (PNG/SVG/JSON/Markdown) */}
+      <ExportMenu label="导出" />
+
+      {/* E4-F11: Version History button */}
+      {onOpenHistory && (
+        <button
+          type="button"
+          className={styles.searchButton}
+          onClick={onOpenHistory}
+          aria-label="版本历史"
+          title="版本历史（保存快照/恢复）"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <span>历史</span>
+        </button>
       )}
 
       {/* Create Project button */}

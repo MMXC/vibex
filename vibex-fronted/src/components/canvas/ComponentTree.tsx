@@ -234,13 +234,17 @@ interface ComponentCardProps {
   onEdit: (nodeId: string, data: Partial<ComponentNode>) => void;
   onDelete: (nodeId: string) => void;
   readonly?: boolean;
+  /** E3-F2: Multi-select state */
+  selected?: boolean;
+  /** E3-F2: Multi-select toggle */
+  onToggleSelect?: (nodeId: string) => void;
 }
 
 // =============================================================================
 // Component Card
 // =============================================================================
 
-function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly }: ComponentCardProps) {
+function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly, selected, onToggleSelect }: ComponentCardProps) {
   const [editing, setEditing] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -301,7 +305,7 @@ function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly }: Componen
 
   return (
     <div
-      className={`${styles.nodeCard} ${statusClass} ${hovered ? styles.hovered : ''}`}
+      className={`${styles.nodeCard} ${statusClass} ${hovered ? styles.hovered : ''} ${selected ? styles.nodeCardSelected : ''}`}
       data-node-id={node.nodeId}
       data-status={node.status}
       data-type={node.type}
@@ -341,6 +345,18 @@ function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly }: Componen
       ) : (
         /* View mode */
         <>
+          {/* E3-F2: Selection checkbox */}
+          {onToggleSelect && (
+            <div className={styles.selectionCheckbox} onClick={(e) => { e.stopPropagation(); onToggleSelect(node.nodeId); }}>
+              <input
+                type="checkbox"
+                checked={selected ?? false}
+                onChange={() => onToggleSelect(node.nodeId)}
+                aria-label={`选择 ${node.name}`}
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          )}
           <div className={styles.nodeCardHeader}>
             <div className={styles.nodeTypeBadge} style={{ background: typeColor }}>
               {node.type === 'page' ? '页面' : node.type === 'list' ? '列表' : node.type === 'form' ? '表单' : node.type === 'detail' ? '详情' : '弹窗'}
@@ -519,6 +535,16 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
   const flowNodes = useCanvasStore((s) => s.flowNodes);
   const setPhase = useCanvasStore((s) => s.setPhase);
 
+  // E3-F2: Multi-select state
+  const selectedNodeIds = useCanvasStore((s) => s.selectedNodeIds);
+  const toggleNodeSelect = useCanvasStore((s) => s.toggleNodeSelect);
+  const selectAllNodes = useCanvasStore((s) => s.selectAllNodes);
+  const clearNodeSelection = useCanvasStore((s) => s.clearNodeSelection);
+  const deleteSelectedNodes = useCanvasStore((s) => s.deleteSelectedNodes);
+
+  const selectedIds = new Set(selectedNodeIds.component);
+  const selectedCount = selectedIds.size;
+
   const [generating, setGenerating] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
 
@@ -662,6 +688,44 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
             + 手动新增
           </button>
         )}
+
+        {/* E3-F2: Multi-select controls */}
+        {hasNodes && (
+          <div className={styles.multiSelectControls}>
+            {selectedCount > 0 ? (
+              <>
+                <span className={styles.selectionCount}>{selectedCount} 已选</span>
+                <button
+                  type="button"
+                  className={styles.secondaryButton}
+                  onClick={() => clearNodeSelection('component')}
+                  aria-label="取消选择"
+                >
+                  取消选择
+                </button>
+                {!readonly && (
+                  <button
+                    type="button"
+                    className={styles.deleteButton}
+                    onClick={() => deleteSelectedNodes('component')}
+                    aria-label={`删除 ${selectedCount} 个选中节点`}
+                  >
+                    删除 ({selectedCount})
+                  </button>
+                )}
+              </>
+            ) : (
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                onClick={() => selectAllNodes('component')}
+                aria-label="全选"
+              >
+                全选
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Add Node Form */}
@@ -762,6 +826,8 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
                             onEdit={editComponentNode}
                             onDelete={deleteComponentNode}
                             readonly={readonly}
+                            selected={selectedIds.has(node.nodeId)}
+                            onToggleSelect={(nodeId) => toggleNodeSelect('component', nodeId)}
                           />
                         </SortableTreeItem>
                       ))}

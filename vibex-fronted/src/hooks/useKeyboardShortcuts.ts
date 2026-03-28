@@ -84,20 +84,23 @@ export function useKeyboardShortcuts({
       const isCtrl = e.ctrlKey;
       const isInputFocused = isInTextInput(e.target);
 
-      // === Undo: Ctrl+Z / Cmd+Z ===
+      // === Undo: Ctrl+Z / Cmd+Z (skip if input is focused) ===
       if ((isCtrl || isMeta) && !e.shiftKey && e.key.toLowerCase() === 'z') {
+        if (isInputFocused) return; // Skip if focus is on input
         e.preventDefault();
         undo();
         return;
       }
 
-      // === Redo: Ctrl+Shift+Z / Cmd+Shift+Z or Ctrl+Y / Cmd+Y ===
+      // === Redo: Ctrl+Shift+Z / Cmd+Shift+Z or Ctrl+Y / Cmd+Y (skip if input is focused) ===
       if ((isCtrl || isMeta) && e.shiftKey && e.key.toLowerCase() === 'z') {
+        if (isInputFocused) return; // Skip if focus is on input
         e.preventDefault();
         redo();
         return;
       }
       if ((isCtrl || isMeta) && e.key.toLowerCase() === 'y') {
+        if (isInputFocused) return; // Skip if focus is on input
         e.preventDefault();
         redo();
         return;

@@ -30,6 +30,9 @@ import { PrototypeQueuePanel } from './PrototypeQueuePanel';
 import { HoverHotzone } from './HoverHotzone';
 import { ShortcutHintPanel } from './features/ShortcutHintPanel';
 import { TreeStatus } from './TreeStatus';
+import { TemplateSelector } from './features/TemplateSelector';
+import { VersionHistoryPanel } from './features/VersionHistoryPanel';
+import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
 import type { Phase, TreeType, TreeNode } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
 
@@ -53,7 +56,8 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const toggleFlowPanel = useCanvasStore((s) => s.toggleFlowPanel);
   const toggleComponentPanel = useCanvasStore((s) => s.toggleComponentPanel);
   const loadExampleData = useCanvasStore((s) => s.loadExampleData);
-  const deleteContextNode = useCanvasStore((s) => s.deleteContextNode);
+  // E3-F2: Delete selected node(s) based on active tree (multi-select batch delete)
+  const deleteSelectedNodes = useCanvasStore((s) => s.deleteSelectedNodes);
   const autoGenerateFlows = useCanvasStore((s) => s.autoGenerateFlows);
   const flowGenerating = useCanvasStore((s) => s.flowGenerating);
   const flowGeneratingMessage = useCanvasStore((s) => s.flowGeneratingMessage);
@@ -99,6 +103,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const [queuePanelExpanded, setQueuePanelExpanded] = useState(true);
   const [requirementInput, setRequirementInput] = useState('');
   const [isShortcutPanelOpen, setIsShortcutPanelOpen] = useState(false);
+  const [isTemplateSelectorOpen, setIsTemplateSelectorOpen] = useState(false);
 
   // === E2-F10: Space+drag canvas panning ===
   const [isSpacePressed, setIsSpacePressed] = useState(false);
@@ -188,6 +193,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const openSearch = useCallback(() => setIsSearchOpen(true), []);
   const closeSearch = useCallback(() => setIsSearchOpen(false), []);
 
+  // === E4-F11: Version History ===
+  const versionHistory = useVersionHistory();
+
   // E2-F5: Search hook — merges all three trees
   const { query, setQuery, results, searchTimeMs } = useCanvasSearch(
     contextNodes,
@@ -265,15 +273,13 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     gridRef.current.style.setProperty('--canvas-zoom', String(zoomLevel));
   }, [zoomLevel]);
 
-  // E2-F10: Delete selected node (context tree primary)
+  // E3-F2: Delete selected node(s) based on active tree (multi-select batch delete)
+  // Delegates to the canvasStore which records a single undo snapshot for the batch
   const handleDeleteSelected = useCallback(() => {
-    // Find the first active context node that could be "selected" (e.g., first unconfirmed)
-    // For now, delete the first unconfirmed context node if any
-    const unconfirmed = contextNodes.filter((n) => !n.confirmed);
-    if (unconfirmed.length > 0) {
-      deleteContextNode(unconfirmed[0].nodeId);
-    }
-  }, [contextNodes, deleteContextNode]);
+    // Use activeTree if set, otherwise default to 'context'
+    const tree: TreeType = activeTree ?? 'context';
+    deleteSelectedNodes(tree);
+  }, [activeTree, deleteSelectedNodes]);
 
   // === Epic1 F1.2: Keyboard shortcuts for Undo/Redo ===
   const handleKeyboardUndo = useCallback((): boolean => {
@@ -612,6 +618,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             onZoomIn={handleZoomIn}
             onZoomOut={handleZoomOut}
             onZoomReset={handleZoomReset}
+            onOpenHistory={versionHistory.open}
           />
         </div>
       )}
@@ -829,6 +836,24 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 </span>
               </div>
             )}
+
+            {/* E4-F10: Template Selector */}
+            <div className={styles.templateActions}>
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                onClick={() => setIsTemplateSelectorOpen(true)}
+                aria-label="使用模板"
+                data-testid="open-template-selector-btn"
+                title="从模板库选择作为起点"
+              >
+                📋 使用模板
+              </button>
+            </div>
+            <TemplateSelector
+              open={isTemplateSelectorOpen}
+              onClose={() => setIsTemplateSelectorOpen(false)}
+            />
           </div>
         </div>
       )}
@@ -848,6 +873,12 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         onQueryChange={setQuery}
         searchTimeMs={searchTimeMs}
         onSelect={handleSearchSelect}
+      />
+
+      {/* E4-F11: Version History Panel */}
+      <VersionHistoryPanel
+        open={versionHistory.isOpen}
+        onClose={versionHistory.close}
       />
     </div>
   );

@@ -24,6 +24,8 @@ import { ReactFlow,
   Position,
   EdgeTypes,
   NodeTypes,
+  SelectionMode,
+  type NodeChange,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { CardTreeNode } from '../CardTreeNode/CardTreeNode';
@@ -67,6 +69,12 @@ export interface CardTreeRendererProps {
   onInit?: () => void;
   /** Custom class name */
   className?: string;
+  /** E3-F2: Enable multi-select mode */
+  multiSelect?: boolean;
+  /** E3-F2: Callback when selection changes — syncs with canvasStore */
+  onSelectionChange?: (selectedIds: string[]) => void;
+  /** E3-F2: Controlled selected node IDs */
+  selectedIds?: string[];
 }
 
 // ==================== Node Types Registry ====================
@@ -289,6 +297,9 @@ function InternalRenderer({
   onCardClick,
   onInit,
   className,
+  multiSelect = false,
+  onSelectionChange,
+  selectedIds,
 }: InternalRendererProps) {
   // E3: Drag state from canvasStore
   const draggedPositions = useCanvasStore((s) => s.draggedPositions);
@@ -366,6 +377,24 @@ function InternalRenderer({
     [readonly, endDrag]
   );
 
+  // E3-F2: Handle selection changes — sync with canvasStore
+  const handleSelectionChange = useCallback(
+    ({ nodes: selectedNodes }: { nodes: Node[] }) => {
+      const ids = selectedNodes.map((n) => n.id);
+      onSelectionChange?.(ids);
+    },
+    [onSelectionChange]
+  );
+
+  // E3-F2: Wrap onNodesChange to detect selection changes
+  const wrappedOnNodesChange = useCallback(
+    (changes: NodeChange[]) => {
+      onNodesChange(changes);
+      // Selection changes are handled by onSelectionChange on ReactFlow
+    },
+    [onNodesChange]
+  );
+
   // Handle expand/collapse toggle
   const handleToggleExpand = useCallback(
     (_event: React.MouseEvent, node: Node) => {
@@ -438,6 +467,7 @@ function InternalRenderer({
         edgeTypes={mergedEdgeTypes}
         onNodesChange={readonly ? undefined : onNodesChange}
         onEdgesChange={readonly ? undefined : onEdgesChange}
+        onSelectionChange={multiSelect && !readonly ? handleSelectionChange : undefined}
         fitView={fitView}
         fitViewOptions={{ padding: 0.3 }}
         minZoom={0.1}
@@ -445,6 +475,8 @@ function InternalRenderer({
         nodesDraggable={!readonly}
         nodesConnectable={!readonly}
         elementsSelectable={!readonly}
+        selectionMode={multiSelect ? SelectionMode.Partial : undefined}
+        multiSelectionKeyCode="Shift"
         onNodeClick={handleNodeClick}
         onNodeDoubleClick={handleToggleExpand}
         onNodeDragStart={readonly ? undefined : handleNodeDragStart}

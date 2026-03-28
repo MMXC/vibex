@@ -437,6 +437,7 @@
   margin-bottom: 0.5rem;
   cursor: pointer;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+  position: relative; /* For absolute-positioned selection checkbox */
 }
 
 .nodeCard:hover {
@@ -548,6 +549,16 @@
   display: flex;
   gap: 0.75rem;
   margin-top: 1rem;
+}
+
+/* E4-F10: Template actions row in input phase */
+.templateActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border, #2d2d44);
 }
 
 .primaryButton {
@@ -809,16 +820,54 @@
   font-weight: 500;
   cursor: pointer;
   font-family: var(--font-sans);
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .deleteButton:hover {
   border-color: var(--color-error);
+  background: rgba(239, 68, 68, 0.1);
 }
 
 .deleteButton:focus-visible {
   outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
+}
+
+/* F3-F10: Multi-select controls */
+.multiSelectControls {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+
+.selectionCount {
+  padding: 0.25rem 0.5rem;
+  background: rgba(124, 58, 237, 0.15);
+  border: 1px solid var(--color-primary);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.nodeCardSelected {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 1px var(--color-primary), 0 0 12px rgba(124, 58, 237, 0.2);
+}
+
+.selectionCheckbox {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 2;
+}
+
+.selectionCheckbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--color-primary);
 }
 
 /* E2-F8: Prototype preview button */
@@ -1089,6 +1138,16 @@
   background: var(--color-bg-secondary);
   overflow: hidden;
   transition: border-color 0.2s ease;
+  position: relative; /* For absolute-positioned selection checkbox */
+}
+
+.flowCardCheckbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+  margin-right: 4px;
+  flex-shrink: 0;
 }
 
 .flowCard.nodeConfirmed {

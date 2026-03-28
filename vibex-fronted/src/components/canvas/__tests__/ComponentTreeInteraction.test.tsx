@@ -34,6 +34,12 @@ jest.mock('@/lib/canvas/canvasStore', () => ({
       setComponentNodes: jest.fn(),
       flowNodes: [],
       setPhase: jest.fn(),
+      // F3-F10: Multi-select state (required by ComponentTree)
+      selectedNodeIds: { context: [], flow: [], component: [] },
+      toggleNodeSelect: jest.fn(),
+      selectAllNodes: jest.fn(),
+      clearNodeSelection: jest.fn(),
+      deleteSelectedNodes: jest.fn(),
     };
     return selector(state);
   }),

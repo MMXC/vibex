@@ -18,6 +18,10 @@ import type {
   GenerateFlowsOutput,
   GenerateComponentsOutput,
   BoundedContextNode,
+  CreateSnapshotInput,
+  CreateSnapshotOutput,
+  ListSnapshotsOutput,
+  RestoreSnapshotOutput,
 } from '../types';
 
 import { getApiUrl, API_CONFIG } from '@/lib/api-config';
@@ -198,6 +202,66 @@ export const canvasApi = {
       status: 'pending' as const,
       children: [],
     }));
+  },
+
+  // === E4-F11: Canvas Snapshots (Version History) ===
+
+  /**
+   * 创建画布快照 — 手动保存或 AI 生成完成时调用
+   * POST /api/v1/canvas/snapshots
+   */
+  createSnapshot: async (data: CreateSnapshotInput): Promise<CreateSnapshotOutput> => {
+    const headers = { 'Content-Type': 'application/json', ...getAuthHeaders() };
+    const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.snapshots), {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) handleResponseError(res, `创建快照失败: ${res.status}`);
+    return res.json() as Promise<CreateSnapshotOutput>;
+  },
+
+  /**
+   * 获取快照列表
+   * GET /api/v1/canvas/snapshots?projectId=xxx
+   */
+  listSnapshots: async (projectId?: string): Promise<ListSnapshotsOutput> => {
+    const headers = getAuthHeaders();
+    const url = projectId
+      ? `${getApiUrl(API_CONFIG.endpoints.canvas.snapshots)}?projectId=${encodeURIComponent(projectId)}`
+      : getApiUrl(API_CONFIG.endpoints.canvas.snapshots);
+    const res = await fetch(url, { headers });
+
+    if (!res.ok) handleResponseError(res, `获取快照列表失败: ${res.status}`);
+    return res.json() as Promise<ListSnapshotsOutput>;
+  },
+
+  /**
+   * 获取单个快照详情
+   * GET /api/v1/canvas/snapshots/:id
+   */
+  getSnapshot: async (snapshotId: string): Promise<{ success: boolean; snapshot: import('../types').CanvasSnapshot }> => {
+    const headers = getAuthHeaders();
+    const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.snapshot(snapshotId)), { headers });
+
+    if (!res.ok) handleResponseError(res, `获取快照失败: ${res.status}`);
+    return res.json();
+  },
+
+  /**
+   * 恢复到指定快照
+   * POST /api/v1/canvas/snapshots/:id/restore
+   */
+  restoreSnapshot: async (snapshotId: string): Promise<RestoreSnapshotOutput> => {
+    const headers = { 'Content-Type': 'application/json', ...getAuthHeaders() };
+    const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.restoreSnapshot(snapshotId)), {
+      method: 'POST',
+      headers,
+    });
+
+    if (!res.ok) handleResponseError(res, `恢复快照失败: ${res.status}`);
+    return res.json() as Promise<RestoreSnapshotOutput>;
   },
 };
 

@@ -159,6 +159,20 @@ interface CanvasStore {
   componentNodes: ComponentNode[];
   componentDraft: Partial<ComponentNode> | null;
 
+  // === Multi-Select Slice (F3-F10) ===
+  /** Selected node IDs per tree type */
+  selectedNodeIds: Record<TreeType, string[]>;
+  /** Toggle node selection (add/remove) */
+  toggleNodeSelect: (tree: TreeType, nodeId: string) => void;
+  /** Select a single node, clearing previous selection in same tree */
+  selectNode: (tree: TreeType, nodeId: string) => void;
+  /** Clear all selections in a tree */
+  clearNodeSelection: (tree: TreeType) => void;
+  /** Select all nodes in a tree */
+  selectAllNodes: (tree: TreeType) => void;
+  /** Delete all selected nodes in a tree (batch delete) */
+  deleteSelectedNodes: (tree: TreeType) => void;
+
   // === Queue Slice ===
   projectId: string | null;
   prototypeQueue: PrototypePage[];
@@ -280,6 +294,82 @@ export const useCanvasStore = create<CanvasStore>()(
           // === Component Slice ===
           componentNodes: [],
           componentDraft: null,
+
+          // === Multi-Select Slice (F3-F10) ===
+          selectedNodeIds: { context: [], flow: [], component: [] },
+
+          toggleNodeSelect: (tree, nodeId) => {
+            set((s) => {
+              const current = s.selectedNodeIds[tree];
+              const exists = current.includes(nodeId);
+              return {
+                selectedNodeIds: {
+                  ...s.selectedNodeIds,
+                  [tree]: exists
+                    ? current.filter((id) => id !== nodeId)
+                    : [...current, nodeId],
+                },
+              };
+            });
+          },
+
+          selectNode: (tree, nodeId) => {
+            set((s) => ({
+              selectedNodeIds: {
+                ...s.selectedNodeIds,
+                [tree]: [nodeId],
+              },
+            }));
+          },
+
+          clearNodeSelection: (tree) => {
+            set((s) => ({
+              selectedNodeIds: {
+                ...s.selectedNodeIds,
+                [tree]: [],
+              },
+            }));
+          },
+
+          selectAllNodes: (tree) => {
+            set((s) => {
+              const nodeIds = s[`${tree}Nodes`].map((n: BoundedContextNode | BusinessFlowNode | ComponentNode) => n.nodeId);
+              return {
+                selectedNodeIds: {
+                  ...s.selectedNodeIds,
+                  [tree]: nodeIds,
+                },
+              };
+            });
+          },
+
+          deleteSelectedNodes: (tree) => {
+            const { selectedNodeIds } = get();
+            const toDelete = new Set(selectedNodeIds[tree]);
+            if (toDelete.size === 0) return;
+
+            const deleteActions: Record<TreeType, (id: string) => void> = {
+              context: get().deleteContextNode,
+              flow: get().deleteFlowNode,
+              component: get().deleteComponentNode,
+            };
+
+            // Record undo snapshot before batch delete
+            const historyStore = getHistoryStore();
+            const nodes = get()[`${tree}Nodes`];
+            historyStore.recordSnapshot(tree, nodes);
+
+            // Delete each selected node
+            toDelete.forEach((id) => deleteActions[tree](id));
+
+            // Clear selection after delete
+            set((s) => ({
+              selectedNodeIds: {
+                ...s.selectedNodeIds,
+                [tree]: [],
+              },
+            }));
+          },
 
           // === Queue Slice ===
           projectId: null,

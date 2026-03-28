@@ -335,7 +335,7 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
           disabled={generating || readonly}
           aria-label="AI 生成限界上下文"
         >
-          {generating ? '◌ 生成中...' : '◈ AI 生成上下文'}
+          {generating ? '◌ 重新执行中...' : '◈ 重新执行'}
         </button>
         {allConfirmed && (
           <button
@@ -408,7 +408,7 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
             <span className={styles.emptyIcon}>◇</span>
             <p className={styles.emptyText}>暂无限界上下文</p>
             <p className={styles.emptySubtext}>
-              点击「AI 生成上下文」自动生成，或手动新增节点
+              点击「重新执行」自动生成，或手动新增节点
             </p>
           </div>
         )}

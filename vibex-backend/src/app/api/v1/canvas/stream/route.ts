@@ -1,14 +1,19 @@
 /**
- * Analyze Stream API - SSE Streaming Endpoint
- * GET /api/v1/analyze/stream?requirement=xxx
+ * Canvas Stream API - SSE Streaming Endpoint
+ * GET /api/v1/canvas/stream?requirement=xxx
  *
- * Streams a step-by-step requirement analysis via Server-Sent Events.
+ * Canvas-specific SSE streaming endpoint that uses the same SSE stream builder
+ * as /api/v1/analyze/stream (route consolidation, not new business logic).
+ *
+ * This endpoint is the Canvas module's dedicated SSE entry point,
+ * replacing direct calls to /api/v1/analyze/stream from Canvas frontend code.
+ *
  * Emits 7 event types in order:
  *   thinking → step_context → step_model → step_flow → step_components → done (or error)
  *
  * Business logic shared via lib/sse-stream-lib/index.ts
  *
- * @module app/api/v1/analyze/stream
+ * @module app/api/v1/canvas/stream
  */
 
 import { NextRequest, NextResponse } from 'next/server';

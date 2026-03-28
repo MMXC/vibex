@@ -99,7 +99,7 @@ describe('useSSEStream', () => {
       });
 
       expect(MockEventSource.instances.length).toBe(1);
-      expect(MockEventSource.instances[0].url).toContain('/api/v1/analyze/stream');
+      expect(MockEventSource.instances[0].url).toContain('/api/v1/canvas/stream');
       expect(MockEventSource.instances[0].url).toContain('Build%20an%20e-commerce%20system');
     });
 

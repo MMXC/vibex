@@ -688,9 +688,9 @@ export const useCanvasStore = create<CanvasStore>()(
             setPhase('context');
 
             // Import dynamically to avoid circular deps
-            const { analyzeRequirement } = require('./api/dddApi') as typeof import('./api/dddApi');
+            const { canvasSseAnalyze } = require('./api/canvasSseApi') as typeof import('./api/canvasSseApi');
 
-            analyzeRequirement(text, {
+            canvasSseAnalyze(text, {
               timeoutMs: 30000,
               onThinking: (content: string) => {
                 setAiThinking(true, content);

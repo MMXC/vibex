@@ -193,7 +193,7 @@ export function useSSEStream(callbacks: Partial<SSEStreamCallbacks> = {}): UseSS
     isConnectingRef.current = true;
     setSSEStatus('connecting');
 
-    const url = `/api/v1/analyze/stream?requirement=${encodeURIComponent(requirement)}`;
+    const url = `/api/v1/canvas/stream?requirement=${encodeURIComponent(requirement)}`;
 
     try {
       const eventSource = new EventSource(url);

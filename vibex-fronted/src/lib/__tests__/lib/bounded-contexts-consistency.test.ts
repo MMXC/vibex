@@ -14,7 +14,7 @@ import { isNameFiltered, filterInvalidContexts, validateCoreRatio } from '../../
 
 // Import all three BoundedContext types
 import type { BoundedContext as PromptBC } from '../../prompts/bounded-contexts';
-import type { BoundedContext as CanvasBC } from '../../canvas/api/dddApi';
+import type { BoundedContext as CanvasBC } from '../../canvas/api/canvasSseApi';
 import type { BoundedContext as DomainBC } from '@/services/api/types/prototype/domain';
 
 // =============================================================================
@@ -32,7 +32,7 @@ describe('T1: SSE step_context payload shape matches frontend BoundedContext (Ca
    *   boundedContexts: [{ id, name, description, type }]
    * }
    *
-   * Canvas dddApi.ts BoundedContext type: { id, name, description, type, keyResponsibilities? }
+   * Canvas canvasSseApi.ts BoundedContext type: { id, name, description, type, keyResponsibilities? }
    * → All SSE fields are covered. id is required in Canvas type but optional in SSE payload (backend generates it).
    */
   test('T1a: SSE payload fields are assignable to Canvas BoundedContext', () => {

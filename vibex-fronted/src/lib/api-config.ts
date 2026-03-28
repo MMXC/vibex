@@ -26,6 +26,7 @@ export const API_CONFIG = {
       project: '/v1/canvas/project',
       generate: '/v1/canvas/generate',
       export: '/v1/canvas/export',
+      stream: '/v1/canvas/stream',
     },
     auth: {
       login: '/auth/login',

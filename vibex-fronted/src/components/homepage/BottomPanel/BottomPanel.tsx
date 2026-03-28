@@ -91,8 +91,12 @@ export function BottomPanel({
   const saveCallbackRef = useRef<(() => void) | null>(null);
   const inputValueRef = useRef(inputValue);
   const chatHistoryRef = useRef(chatHistory);
-  inputValueRef.current = inputValue;
-  chatHistoryRef.current = chatHistory;
+
+  // E2-S3: 更新 refs（必须在 useEffect 中，不能在渲染期间）
+  useEffect(() => {
+    inputValueRef.current = inputValue;
+    chatHistoryRef.current = chatHistory;
+  }, [inputValue, chatHistory]);
 
   // E3-S3.2: 快捷键绑定 (Ctrl+S 保存, Ctrl+Z 撤销, Ctrl+Shift+Z 重做, Ctrl+P 预览)
   // 注意: 此 useEffect 必须在 handleManualSave 定义之后
@@ -245,8 +249,10 @@ export function BottomPanel({
     onSave?.();
   }, [inputValue, saveDraft, onSave]);
 
-  // 同步 handleManualSave 到 ref（供 useEffect 使用）
-  saveCallbackRef.current = handleManualSave;
+  // E2-S3: 同步 handleManualSave 到 ref（供 useEffect 使用）
+  useEffect(() => {
+    saveCallbackRef.current = handleManualSave;
+  }, [handleManualSave]);
 
   // 历史记录展开项点击 (E3-S3.2: 入栈管理)
   const handleHistoryExpand = useCallback(

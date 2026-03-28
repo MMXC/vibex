@@ -333,7 +333,7 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
           className={`${styles.primaryButton} ${generating ? styles.buttonLoading : ''}`}
           onClick={handleGenerate}
           disabled={generating || readonly}
-          aria-label="AI 生成限界上下文"
+          aria-label="重新执行"
         >
           {generating ? '◌ 重新执行中...' : '◈ 重新执行'}
         </button>

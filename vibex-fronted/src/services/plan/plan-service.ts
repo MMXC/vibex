@@ -5,6 +5,12 @@
 
 import { getApiUrl } from '@/lib/api-config';
 
+function getAuthHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+  const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export interface PlanFeature {
   name: string;
   description: string;
@@ -41,11 +47,15 @@ export async function analyzeRequirement(req: AnalyzeRequest): Promise<PlanResul
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      ...getAuthHeaders(),
     },
     body: JSON.stringify(req),
   });
 
   if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('登录已过期，请重新登录');
+    }
     const error = await response.json().catch(() => ({ message: 'Failed to analyze requirement' }));
     throw new Error(error.message || 'Failed to analyze requirement');
   }
@@ -61,11 +71,15 @@ export async function* streamAnalyzeRequirement(req: AnalyzeRequest): AsyncGener
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      ...getAuthHeaders(),
     },
     body: JSON.stringify(req),
   });
 
   if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('登录已过期，请重新登录');
+    }
     throw new Error('Failed to analyze requirement');
   }
 

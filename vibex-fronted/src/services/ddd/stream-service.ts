@@ -8,6 +8,25 @@
 import { getApiUrl } from '@/lib/api-config';
 import { BoundedContext } from '@/services/api/types/prototype/domain';
 
+// ==================== Auth helper ====================
+
+function getAuthHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+  const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+function handleResponseError(res: Response, defaultMsg: string): never {
+  if (res.status === 401) {
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_token');
+    }
+    throw new Error('登录已过期，请重新登录');
+  }
+  throw new Error(`${defaultMsg}: ${res.status}`);
+}
+
 // ==================== Types ====================
 
 export interface ThinkingStep {
@@ -70,14 +89,12 @@ export async function streamBoundedContexts(
   
   const response = await fetch(fullURL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify({ requirementText }),
     signal: combinedSignal,
   });
 
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-  }
+  if (!response.ok) handleResponseError(response, '生成限界上下文失败');
 
   if (!response.body) {
     throw new Error('Response body is null');
@@ -174,14 +191,12 @@ export async function streamDomainModels(
   
   const response = await fetch(fullURL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify({ requirementText, boundedContexts }),
     signal: combinedSignal,
   });
 
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-  }
+  if (!response.ok) handleResponseError(response, '生成领域模型失败');
 
   if (!response.body) {
     throw new Error('Response body is null');
@@ -271,14 +286,12 @@ export async function streamBusinessFlow(
   
   const response = await fetch(fullURL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify({ domainModels, requirementText }),
     signal: combinedSignal,
   });
 
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-  }
+  if (!response.ok) handleResponseError(response, '生成业务流程失败');
 
   if (!response.body) {
     throw new Error('Response body is null');

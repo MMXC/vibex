@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Epic1: 画布 Undo/Redo 核心编辑体验 (vibex-canvas-feature-gap-20260329)
+- **✅ PASS** — 三树独立历史栈，50步限制，Ctrl+Z/Ctrl+Shift+Z 快捷键
+- `src/lib/canvas/historySlice.ts`: 三树独立 HistoryStack（context/flow/component），MAX_HISTORY_LENGTH=50
+- `src/hooks/useCanvasHistory.ts`: 订阅 canvasStore 变更，recordSnapshot with 300ms 节流
+- `src/hooks/useKeyboardShortcuts.ts`: Ctrl+Z/Ctrl+Shift+Z/Ctrl+Y + 焦点隔离
+- `src/components/canvas/CanvasToolbar.tsx`: UndoRedoButtons 根据 historySlice 状态显示 disabled
+- `src/lib/canvas/__tests__/historySlice.test.ts`: 38 测试用例
+- `src/hooks/useKeyboardShortcuts.test.ts`: 9 测试用例
+- Commits: `d5f4f131`, `f61d80ee`
+
 ### Epic1: 后端三树生成 API (vibex-backend-integration-20260325)
 - **⚠️ CONDITIONAL PASS** — API 响应字段与前端类型不匹配
   - `sessionId` → `generationId` 字段名不一致

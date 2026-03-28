@@ -10,7 +10,6 @@ import { useCanvasExport } from '../useCanvasExport';
 // useCanvasExport calls useCanvasStore.getState() directly (not as a hook)
 jest.mock('@/lib/canvas/canvasStore', () => ({
   useCanvasStore: Object.assign(
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-pattern
     () => ({}),
     {
       getState: () => ({

@@ -309,59 +309,61 @@
 
 ---
 
-## 6. Epic 4 — 导出与持久化 🟡
+## 6. Epic 4 — 导出与持久化 🟡 ✅ **已完成**
 
 > **目标**: 导出/模板/版本历史，画布可用于生产工作流
+> **完成时间**: 2026-03-29
+> **提交 ID**: [待补充]
 
-### E4-F9: 多格式导出
+### E4-F9: 多格式导出 ✅
 **Feature ID**: `canvas-p2-f9-export` | **工时**: 8–12h | **依赖**: E0-F1
 
 **任务拆分**:
-1. 新建 `src/hooks/canvas/useCanvasExport.ts`
-2. 实现 `html-to-image` 导出（PNG/SVG）
-3. 实现 JSON 导出（完整画布数据）
-4. 实现 Markdown 导出（三树结构化描述）
-5. 在 `ProjectBar` 添加导出菜单按钮
-6. 支持导出范围选择（Context / Flow / Component / All）
+1. ✅ 新建 `src/hooks/canvas/useCanvasExport.ts`
+2. ✅ 实现 `html-to-image` 导出（PNG/SVG）
+3. ✅ 实现 JSON 导出（完整画布数据）
+4. ✅ 实现 Markdown 导出（三树结构化描述）
+5. ✅ 在 `ProjectBar` 添加导出菜单按钮
+6. ✅ 支持导出范围选择（Context / Flow / Component / All）
 
 **新增依赖**: 无（`html-to-image` 已安装）
 
 **验收标准**:
-- [ ] PNG/SVG/JSON/Markdown 格式均可导出
-- [ ] 导出图片清晰无截断
-- [ ] 导出菜单可选范围
+- [x] PNG/SVG/JSON/Markdown 格式均可导出
+- [x] 导出图片清晰无截断
+- [x] 导出菜单可选范围
 
 ---
 
-### E4-F10: 需求模板库
+### E4-F10: 需求模板库 ✅
 **Feature ID**: `canvas-p2-f10-templates` | **工时**: 6–8h | **依赖**: E0-F2
 
 **任务拆分**:
-1. 在 `/public/templates/` 创建模板 JSON 文件（`e-commerce.json`、`saas.json`、`social.json`）
-2. 新建 `src/lib/canvas/templateLoader.ts`
-3. 在 Phase 1 需求输入页添加「使用模板」按钮
-4. 选择后自动填充三树数据
+1. ✅ 在 `/public/templates/` 创建模板 JSON 文件（`e-commerce.json`、`saas.json`、`social.json`）
+2. ✅ 新建 `src/lib/canvas/templateLoader.ts`
+3. ✅ 在 Phase 1 需求输入页添加「使用模板」按钮
+4. ✅ 选择后自动填充三树数据
 
 **验收标准**:
-- [ ] 模板选择器显示模板卡片列表
-- [ ] 选择后三树自动填充对应数据
+- [x] 模板选择器显示模板卡片列表
+- [x] 选择后三树自动填充对应数据
 
 ---
 
-### E4-F11: 版本历史
+### E4-F11: 版本历史 ✅
 **Feature ID**: `canvas-p2-f11-version-history` | **工时**: 8–12h | **依赖**: E0-F2
 
 **任务拆分**:
-1. 在 `canvasApi.ts` 新增快照 API 方法（POST/GET snapshots, POST restore）
-2. 新建 `src/hooks/canvas/useVersionHistory.ts`
-3. 新建 `src/components/canvas/features/VersionHistoryPanel.tsx`（侧边抽屉）
-4. 实现快照触发时机：手动保存、AI 生成完成、重要操作
-5. 支持预览和回滚
+1. ✅ 在 `canvasApi.ts` 新增快照 API 方法（POST/GET snapshots, POST restore）
+2. ✅ 新建 `src/hooks/canvas/useVersionHistory.ts`
+3. ✅ 新建 `src/components/canvas/features/VersionHistoryPanel.tsx`（侧边抽屉）
+4. ✅ 实现快照触发时机：手动保存、AI 生成完成、重要操作
+5. ✅ 支持预览和回滚
 
 **验收标准**:
-- [ ] AI 生成后自动创建快照
-- [ ] 版本历史面板显示快照列表
-- [ ] 可恢复到任意历史快照
+- [x] AI 生成后自动创建快照
+- [x] 版本历史面板显示快照列表
+- [x] 可恢复到任意历史快照
 
 ---
 

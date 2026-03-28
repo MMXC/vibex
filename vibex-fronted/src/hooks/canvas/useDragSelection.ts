@@ -68,17 +68,10 @@ export function useDragSelection({
   const [selectionBox, setSelectionBox] = useState<Rect | null>(null);
   const [isSelecting, setIsSelecting] = useState(false);
 
-  /** Check if a point is inside the selection box */
-  const isPointInBox = useCallback(
-    (px: number, py: number, box: Rect): boolean => {
-      const minX = box.left;
-      const maxX = box.left + box.width;
-      const minY = box.top;
-      const maxY = box.top + box.height;
-      return px >= minX && px <= maxX && py >= minY && py <= maxY;
-    },
-    []
-  );
+  /** Check if a point is inside the selection box (reserved for future use) */
+  // const isPointInBox = (px: number, py: number, box: Rect) =>
+  //   px >= box.left && px <= box.left + box.width &&
+  //   py >= box.top && py <= box.top + box.height;
 
   /** Check if a node rect intersects with the selection box */
   const doesNodeIntersectBox = useCallback(

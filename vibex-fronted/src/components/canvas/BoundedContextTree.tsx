@@ -10,7 +10,7 @@
  */
 'use client';
 
-import React, { useState, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { RelationshipConnector } from './edges/RelationshipConnector';
 import { BoundedContextGroup } from './BoundedContextGroup';

@@ -1,3 +1,19 @@
+### Added (vibex-canvas-feature-gap Epic1: Undo/Redo — History Slice) — 2026-03-29
+- **Epic1 F1.5 (Undo/Redo)**: Canvas 历史记录撤销/重做功能
+  - **新增** `historySlice.ts`: 独立历史记录切片，独立于 ReactFlow，无冲突
+    - 三个独立历史栈（context/flow/component），互不干扰
+    - 每栈最多 50 步（`MAX_HISTORY_LENGTH = 50`）
+    - 深拷贝通过 `JSON.parse/stringify` 防止调用方突变
+    - 首次记录为初始化（设置 present，不 push past）
+    - 不持久化 UI 状态，仅持久化节点数组
+  - **新增** `historySlice.test.ts`: 38 个测试用例全覆盖
+    - 初始化、快照录制、三栈 undo/redo
+    - 50 步上限、三栈独立性、清空操作
+    - canUndo/canRedo、深拷贝完整性、持久化约束
+  - **修复**: `undo()` 调用 `redoStack` 而非 `undoStack` 的 bug
+  - 提交: `d5f4f131`
+  - 审查: ✅ PASSED (reviewer-epic1-undoredo)
+
 ### Added (vibex-canvas-component-group Epic E1: 组件树页面分组 + 通用组件独立分组) — 2026-03-29
 - **E1 + E2**: 组件树按页面归属用虚线框分组，通用组件独立置顶
   - **新增** `ComponentGroupOverlay.tsx`: SVG 虚线框叠加层组件

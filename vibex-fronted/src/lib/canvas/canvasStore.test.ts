@@ -45,6 +45,8 @@ describe('canvasStore', () => {
     } catch (_) { /* ignore if not available */ }
     // Fallback: clear localStorage and reset all state slices
     localStorage.removeItem('vibex-canvas-storage');
+    const before = useCanvasStore.getState();
+    console.log('[OUTER beforeEach] _prevActiveTree BEFORE:', before._prevActiveTree);
     useCanvasStore.setState({
       phase: 'input',
       activeTree: null,
@@ -77,6 +79,8 @@ describe('canvasStore', () => {
       // E2: also reset internal tracking
       _prevActiveTree: null,
     });
+    const after = useCanvasStore.getState();
+    console.log('[OUTER beforeEach] _prevActiveTree AFTER:', after._prevActiveTree);
   });
 
   describe('Phase Slice', () => {
@@ -951,15 +955,16 @@ describe('markAllPending', () => {
     });
 
     it('should reset centerExpand to default when phase becomes prototype', () => {
-      const { addContextNode, confirmContextNode, setPhase } = useCanvasStore.getState();
       const init = useCanvasStore.getState();
-      console.log('[TEST4] Initial:', '_prevActiveTree:', init._prevActiveTree);
+      console.log('[TEST4] START:', '_prevActiveTree:', init._prevActiveTree);
+      const { addContextNode, confirmContextNode, setPhase } = useCanvasStore.getState();
       setPhase('context');
       const afterPhase = useCanvasStore.getState();
       console.log('[TEST4] After setPhase:', 'activeTree:', afterPhase.activeTree, '_prevActiveTree:', afterPhase._prevActiveTree);
 
       addContextNode({ name: 'C1', description: '', type: 'core' });
       const nodes = useCanvasStore.getState().contextNodes;
+      console.log('[TEST4] nodes:', nodes.length, 'confirmed:', nodes.map(n => n.confirmed));
       confirmContextNode(nodes[0].nodeId);
       const afterConfirm = useCanvasStore.getState();
       console.log('[TEST4] After confirm:', 'activeTree:', afterConfirm.activeTree, 'centerExpand:', afterConfirm.centerExpand, '_prevActiveTree:', afterConfirm._prevActiveTree);

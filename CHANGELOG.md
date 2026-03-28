@@ -1,3 +1,10 @@
+### Fixed (vibex-canvas-component-group Epic3: Toast 自动消失) — 2026-03-29
+- **E3**: Toast error/info 类型自动消失修复
+  - `Toast.tsx` L43: `duration: 0` → `3000`（error + info 默认 3s 自动消失）
+  - `defaultDuration` 三元表达式：success=3000 / warning=5000 / error+info=3000
+  - 向后兼容：显式传入 `duration=0` 的 toast 不受影响
+  - 提交: `32dff839`
+
 ### Added (vibex-canvas-api-standardization Epic5: E2E 测试覆盖 F5.1~F5.5) — 2026-03-29
 - **Epic5**: F5 — Canvas 完整流程 E2E 测试覆盖
   - **F5.1**: 9 个 `/api/v1/canvas/*` 端点全覆盖测试

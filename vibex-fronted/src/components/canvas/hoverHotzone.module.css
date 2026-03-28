@@ -74,3 +74,20 @@
   pointer-events: none;
   opacity: 0.3;
 }
+
+/* E2-3: Visual highlight when adjacent panels are expanded */
+.hotzoneActive {
+  background: rgba(99, 102, 241, 0.12);
+  border-left: 1px solid rgba(99, 102, 241, 0.25);
+  border-right: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.rightEdge.hotzoneActive {
+  border-left: none;
+  border-right: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.leftEdge.hotzoneActive {
+  border-left: 1px solid rgba(99, 102, 241, 0.25);
+  border-right: none;
+}

@@ -57,6 +57,25 @@ export function HoverHotzone({ position, panel, centerExpandDirection }: HoverHo
     return s.rightExpand;
   });
 
+  // E2-3: Highlight hotzone when adjacent panels are expanded
+  const leftExpand = useCanvasStore((s) => s.leftExpand);
+  const rightExpand = useCanvasStore((s) => s.rightExpand);
+  const centerExpand = useCanvasStore((s) => s.centerExpand);
+
+  // Determine if this hotzone should be visually highlighted
+  // (adjacent panel is expanded, indicating content is available)
+  const isHighlighted = (() => {
+    if (position === 'left-edge') {
+      // Left edge: between left and center panels
+      // Highlight when center panel is expanded left OR left panel is collapsed
+      return centerExpand === 'expand-left' || leftExpand === 'default';
+    } else {
+      // Right edge: between center and right panels
+      // Highlight when center panel is expanded right OR right panel is collapsed
+      return centerExpand === 'expand-right' || rightExpand === 'default';
+    }
+  })();
+
   /** 当前面板展开时，箭头方向 */
   const arrowDirection = (() => {
     if (panel === 'center') {
@@ -109,7 +128,7 @@ export function HoverHotzone({ position, panel, centerExpandDirection }: HoverHo
   return (
     <button
       type="button"
-      className={`${styles.hotzone} ${position === 'left-edge' ? styles.leftEdge : styles.rightEdge} ${isDragging ? styles.hotzoneDisabled : ''}`}
+      className={`${styles.hotzone} ${position === 'left-edge' ? styles.leftEdge : styles.rightEdge} ${isDragging ? styles.hotzoneDisabled : ''} ${isHighlighted && !isDragging ? styles.hotzoneActive : ''}`}
       onMouseEnter={() => !isDragging && setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={handleClick}

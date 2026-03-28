@@ -129,6 +129,7 @@
 **Owner**: dev  
 **Priority**: P2  
 **Effort**: 3h  
+**Status**: ✅ DONE (2026-03-28 dev commit)
 
 ### Stories
 
@@ -136,15 +137,18 @@
 - **File**: `scripts/topological_sort.py` (new)
 - **Algorithm**: Kahn's algorithm
 - **DoD**: `test_topological_sort.py` passes (linear, parallel, cycle detection)
+- **Status**: ✅ DONE — 14 tests pass (empty, linear, parallel, complex DAG, cycle detection)
 
 #### F5.2: Integrate into heartbeat task scanning
-- **File**: `scripts/coord-heartbeat-v8.sh`
+- **File**: `scripts/coord-heartbeat-v8.sh` + `scripts/heartbeats/common.sh` + `scripts/heartbeats/dev-heartbeat.sh`
 - **Change**: Scan tasks in topological order, not alphabetical
 - **DoD**: `grep -E 'ready|in-progress' <(task_manager list)` respects dependency order
+- **Status**: ✅ DONE — `get_agent_tasks_topo()` in common.sh + `task_manager.py list --topo` integration
 
 #### F5.3: Cycle detection guard
 - **Change**: If cycle detected, log error and skip topological sort
 - **DoD**: Cycle in JSON → warning in heartbeat log, fallback to alphabetical
+- **Status**: ✅ DONE — `topological_sort()` returns None on cycle, fallback to alphabetical in task_manager.py list
 
 ---
 

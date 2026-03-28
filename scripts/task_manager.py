@@ -1456,6 +1456,28 @@ def cmd_result(args):
 @timeout(5)
 def cmd_list(args):
     """列出所有项目（同时扫描根目录和 projects/ 子目录）"""
+    # Import topological sort lazily to avoid hard dependency
+    topo_sort_available = False
+    _ts = None
+    try:
+        import importlib.util
+        spec = importlib.util.find_spec("topological_sort")
+        if spec is None:
+            import os as _os_mod
+            script_dir = _os_mod.path.dirname(_os_mod.path.abspath(__file__))
+            topo_path = _os_mod.path.join(script_dir, "topological_sort.py")
+            if _os_mod.path.exists(topo_path):
+                spec = importlib.util.spec_from_file_location("topological_sort", topo_path)
+                topo_module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(topo_module)
+                topo_sort_available = True
+                _ts = topo_module
+        else:
+            import topological_sort as _ts
+            topo_sort_available = True
+    except Exception:
+        _ts = None
+        topo_sort_available = False
     os.makedirs(TASKS_DIR, exist_ok=True)
     
     # 扫描根目录 *.json
@@ -1478,6 +1500,55 @@ def cmd_list(args):
     
     if not all_files:
         print("No projects found.")
+        return
+
+    # Topological sort mode: output tasks in dependency order
+    if getattr(args, "topo", False):
+        project_filter = getattr(args, "project", None)
+        if project_filter:
+            filtered = []
+            for f in all_files:
+                if f.replace(".json", "") == project_filter:
+                    filtered.append(f)
+            all_files = filtered if filtered else [f"{project_filter}.json"]
+
+        for f in sorted(all_files):
+            name = f.replace(".json", "")
+            if project_filter and name != project_filter:
+                continue
+            try:
+                root_path = os.path.join(TASKS_DIR, f)
+                if os.path.isfile(root_path):
+                    with open(root_path) as fh:
+                        data = json.load(fh)
+                else:
+                    tasks_path = os.path.join(TASKS_DIR, "projects", name, "tasks.json")
+                    with open(tasks_path) as fh:
+                        data = json.load(fh)
+
+                stages = data.get("stages", {})
+                if not stages:
+                    continue
+
+                if topo_sort_available and _ts is not None:
+                    sorted_ids = _ts.topological_sort(stages)
+                    if sorted_ids is None:
+                        print(f"# ⚠️ Cycle detected in {name}, falling back to alphabetical", file=sys.stderr)
+                        sorted_ids = sorted(stages.keys())
+                else:
+                    sorted_ids = sorted(stages.keys())
+
+                goal = data.get("goal", "")[:60]
+                print(f"# {name}: {goal}")
+                for tid in sorted_ids:
+                    task = stages[tid]
+                    status = task.get("status", "?")
+                    deps = task.get("dependsOn", [])
+                    dep_str = f" (deps: {', '.join(deps)})" if deps else ""
+                    print(f"  {name} {tid} [{status}]{dep_str}")
+                print()
+            except Exception as e:
+                print(f"# {name} [error: {e}]")
         return
 
     def print_project(name, data):
@@ -1670,7 +1741,9 @@ def main():
     p.add_argument("project", help="项目名称")
 
     # list
-    sub.add_parser("list", help="列出所有项目")
+    p = sub.add_parser("list", help="列出所有项目")
+    p.add_argument("--topo", action="store_true", help="按拓扑排序输出任务（适用于心跳扫描）")
+    p.add_argument("--project", "-p", help="仅显示指定项目的任务拓扑序")
 
     # result（设置任务产出物路径，供下游依赖引用）
     p = sub.add_parser("result", help="设置任务产出物路径")

@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.88',
+    date: '2026-03-29',
+    changes: [
+      '🖼️ vibex-canvas-feature-gap/Epic3-Export: 多格式导出功能 (PNG/SVG/JSON/Markdown)',
+      '✅ ExportMenu.tsx: 完整导出菜单组件（范围选择 + 4种格式）',
+      '✅ useCanvasExport.ts: html-to-image 集成 + 降级策略',
+      '✅ useCanvasExport: 12/12 tests pass | ESLint: 0 errors',
+    ],
+    commit: 'feature-gap-epic3',
+  },
+  {
     version: '1.0.87',
     date: '2026-03-26',
     changes: [

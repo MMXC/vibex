@@ -12,7 +12,8 @@
 import { useCallback, useRef } from 'react';
 import { toPng, toSvg } from 'html-to-image';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
-import type { BoundedContextNode, BusinessFlowNode, ComponentNode } from '@/lib/canvas/types';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { BoundedContextNode, BusinessFlowNode, ComponentNode } from '@/lib/canvas/types'; // types referenced in buildCanvasExportData JSDoc
 
 export type ExportFormat = 'png' | 'svg' | 'json' | 'markdown';
 export type ExportScope = 'context' | 'flow' | 'component' | 'all';

@@ -5,6 +5,12 @@
 
 import { getApiUrl } from '@/lib/api-config';
 
+function getAuthHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+  const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export interface GitHubRepoInfo {
   name: string;
   fullName: string;
@@ -72,9 +78,14 @@ export function parseGitHubUrl(url: string): { owner: string; repo: string } | n
  * 获取仓库信息
  */
 export async function fetchRepoInfo(owner: string, repo: string): Promise<GitHubRepoInfo> {
-  const response = await fetch(getApiUrl(`/api/github/repos/${owner}/${repo}`));
+  const response = await fetch(getApiUrl(`/api/github/repos/${owner}/${repo}`), {
+    headers: getAuthHeaders(),
+  });
   
   if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('登录已过期，请重新登录');
+    }
     const error = await response.json().catch(() => ({ message: 'Failed to fetch repository' }));
     throw new Error(error.message || 'Failed to fetch repository');
   }
@@ -87,9 +98,14 @@ export async function fetchRepoInfo(owner: string, repo: string): Promise<GitHub
  */
 export async function fetchReadme(owner: string, repo: string, branch?: string): Promise<string> {
   const params = branch ? `?ref=${branch}` : '';
-  const response = await fetch(getApiUrl(`/api/github/repos/${owner}/${repo}/readme${params}`));
+  const response = await fetch(getApiUrl(`/api/github/repos/${owner}/${repo}/readme${params}`), {
+    headers: getAuthHeaders(),
+  });
   
   if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('登录已过期，请重新登录');
+    }
     throw new Error('Failed to fetch README');
   }
   
@@ -104,7 +120,8 @@ export async function fetchReadme(owner: string, repo: string, branch?: string):
 export async function parsePackageJson(owner: string, repo: string, branch?: string): Promise<PackageJsonInfo | null> {
   try {
     const response = await fetch(
-      getApiUrl(`/api/github/repos/${owner}/${repo}/contents/package.json${branch ? `?ref=${branch}` : ''}`)
+      getApiUrl(`/api/github/repos/${owner}/${repo}/contents/package.json${branch ? `?ref=${branch}` : ''}`),
+      { headers: getAuthHeaders() }
     );
     
     if (!response.ok) {

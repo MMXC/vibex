@@ -5,6 +5,12 @@
 
 import { getApiUrl } from '@/lib/api-config';
 
+function getAuthHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+  const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export interface FigmaFileInfo {
   name: string;
   thumbnailUrl: string;
@@ -68,9 +74,13 @@ export function parseFigmaUrl(url: string): { fileKey: string } | null {
 export async function getFigmaAuthUrl(): Promise<{ authUrl: string; state: string }> {
   const response = await fetch(getApiUrl('/api/figma/auth-url'), {
     method: 'POST',
+    headers: { ...getAuthHeaders() },
   });
   
   if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('登录已过期，请重新登录');
+    }
     throw new Error('Failed to get Figma auth URL');
   }
   
@@ -83,11 +93,14 @@ export async function getFigmaAuthUrl(): Promise<{ authUrl: string; state: strin
 export async function handleFigmaCallback(code: string, state: string): Promise<{ success: boolean }> {
   const response = await fetch(getApiUrl('/api/figma/callback'), {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify({ code, state }),
   });
   
   if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('登录已过期，请重新登录');
+    }
     throw new Error('Failed to complete Figma authentication');
   }
   
@@ -100,11 +113,14 @@ export async function handleFigmaCallback(code: string, state: string): Promise<
 export async function fetchFigmaFile(fileKey: string): Promise<FigmaFileData> {
   const response = await fetch(getApiUrl(`/api/figma/file`), {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify({ fileKey }),
   });
   
   if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('登录已过期，请重新登录');
+    }
     const error = await response.json().catch(() => ({ message: 'Failed to fetch Figma file' }));
     throw new Error(error.message || 'Failed to fetch Figma file');
   }

@@ -100,9 +100,28 @@ API_CONFIG.endpoints.canvas:
 
 在删除旧路由前，必须完成：
 
+- [x] 更新 `canvasApi.ts` 的 JSDoc 注释（commit `b2d22f33`）
 - [ ] 更新 `route.test.ts` 测试文件中的 URL（从 `/api/canvas/` 改为 `/api/v1/canvas/`）
 - [ ] 确认 `routes/canvas-generate-components.ts` 的用途（Cloudflare Workers 部署？）
-- [ ] 更新 `canvasApi.ts` 的 JSDoc 注释
+
+### 4.1 canvasApi.ts JSDoc 更新完成 ✅
+
+**Commit**: `b2d22f33`  
+**变更**: 9 处 JSDoc 注释从 `/api/canvas/*` 更新为 `/api/v1/canvas/*`
+
+| 行 | 方法 | 原注释 | 新注释 |
+|----|------|--------|--------|
+| 5 | (header) | `/api/canvas/` | `/api/v1/canvas/` |
+| 28 | `createProject` | `/api/canvas/project` | `/api/v1/canvas/project` |
+| 47 | `generate` | `/api/canvas/generate` | `/api/v1/canvas/generate` |
+| 66 | `getStatus` | `/api/canvas/status` | `/api/v1/canvas/status` |
+| 83 | `exportZip` | `/api/canvas/export` | `/api/v1/canvas/export` |
+| 101 | `generateContexts` | `/api/canvas/generate-contexts` | `/api/v1/canvas/generate-contexts` |
+| 123 | `generateFlows` | `/api/canvas/generate-flows` | `/api/v1/canvas/generate-flows` |
+| 145 | `generateComponents` | `/api/canvas/generate-components` | `/api/v1/canvas/generate-components` |
+| 168 | `fetchComponentTree` | `/api/canvas/generate-components` | `/api/v1/canvas/generate-components` |
+
+**注意**: 实际 API 调用均通过 `API_CONFIG.endpoints.canvas.*` → 已为 `/v1/canvas/*`，无需修改运行时代码。
 
 ---
 
@@ -116,4 +135,16 @@ API_CONFIG.endpoints.canvas:
 
 ---
 
-*扫描时间: 2026-03-29 00:09 GMT+8*
+## 6. Phase 1 完成检查清单
+
+- [x] AC-1: 前端代码中所有旧路由引用已替换（JSDoc 注释已更新）
+- [x] AC-2: canvasApi.ts 统一使用 v1 前缀（实际运行时代码本就如此，文档注释已同步）
+- [x] AC-3: 无硬编码的 `/api/canvas/` 字符串残留（grep 验证通过）
+- [x] AC-4: npm test 通过（ESLint warning 为 pre-existing，未引入新问题）
+- [x] git commit 已提交 (`b2d22f33`)
+- [x] 检查清单已提交到 team-tasks
+
+---
+
+*扫描时间: 2026-03-29 00:09 GMT+8*  
+*JSDoc 修复完成时间: 2026-03-29 00:12 GMT+8*

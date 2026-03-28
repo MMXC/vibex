@@ -1,3 +1,18 @@
+### Added (vibex-canvas-component-group Epic E1: 组件树页面分组 + 通用组件独立分组) — 2026-03-29
+- **E1 + E2**: 组件树按页面归属用虚线框分组，通用组件独立置顶
+  - **新增** `ComponentGroupOverlay.tsx`: SVG 虚线框叠加层组件
+    - 使用 ResizeObserver 监听容器尺寸变化，防抖 100ms 更新 bbox
+    - `pointer-events: none` 不阻挡交互
+    - E1: 页面分组虚线框颜色 `#10b981`，stroke-dasharray `5 3`
+    - E2: 通用组件虚线框颜色 `#8b5cf6`，stroke-dasharray `2 2`
+  - **新增** `groupByFlowId()` 分组工具函数: 按 flowId 分组，通用组件置顶
+  - **新增** `inferIsCommon()` 推断函数: flowId 为 mock/manual/common/空 或 type=modal 视为通用
+  - **修改** `ComponentTree.tsx`: 按 flowId 分组渲染，添加 `data-component-group-wrapper` 属性
+  - **修改** `canvas.module.css`: `.componentGroup` / `.componentGroupLabel` 样式
+  - **修改** `jest.setup.ts`: 添加 ResizeObserver mock（jsdom 默认不存在）
+  - 提交: `4de7dbb0` + `c8b1332d` + `bac18ede`
+  - 审查: ✅ PASSED (reviewer-e1)
+
 ### Fixed (vibex-canvas-component-group Epic3: Toast 自动消失) — 2026-03-29
 - **E3**: Toast error/info 类型自动消失修复
   - `Toast.tsx` L43: `duration: 0` → `3000`（error + info 默认 3s 自动消失）

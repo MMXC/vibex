@@ -1,3 +1,13 @@
+### Added (vibex-canvas-three-column-20260328 Epic E2-3: 展开热区视觉增强) — 2026-03-28
+- **E2-3**: `HoverHotzone.tsx` 新增 `isHighlighted` 视觉高亮逻辑
+  - 当相邻面板展开时，热区添加 `.hotzoneActive` CSS 类，产生紫色半透明背景 + 边框高亮
+  - 左边缘: `centerExpand='expand-left'` 或 `leftExpand='default'` 时高亮
+  - 右边缘: `centerExpand='expand-right'` 或 `rightExpand='default'` 时高亮
+  - 拖拽中自动禁用高亮，避免视觉干扰
+  - `hoverHotzone.module.css` 新增 `.hotzoneActive` 样式（+17 行）
+  - 提交: `35e5e52c`
+  - 审查: ✅ PASSED (reviewer-e2-3)
+
 ### Added (vibex-canvas-three-column-20260328 Epic E2-2: 移动端展开入口) — 2026-03-28
 - **E2-2**: `CanvasPage.tsx` 移动端 Tab 模式面板自动展开
   - `renderTabContent()` 中三个面板 (context/flow/component) 的 `collapsed` 属性统一设为 `false`

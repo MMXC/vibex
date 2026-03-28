@@ -22,23 +22,41 @@ import type {
 
 import { getApiUrl, API_CONFIG } from '@/lib/api-config';
 
+// 获取认证 token
+function getAuthHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+  const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+// 检查 401 错误并提示
+function handleResponseError(res: Response, defaultMsg: string): never {
+  if (res.status === 401) {
+    // 401 时清除 token 并提示登录
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_token');
+    }
+    throw new Error('登录已过期，请重新登录');
+  }
+  const err = res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+  throw new Error((err as { error?: string }).error ?? defaultMsg);
+}
+
 export const canvasApi = {
   /**
    * 创建项目 — 将三树数据打包发送到后端
    * POST /api/v1/canvas/project
    */
   createProject: async (data: CreateProjectInput): Promise<CreateProjectOutput> => {
+    const headers = { 'Content-Type': 'application/json', ...getAuthHeaders() };
     const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.project), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(data),
     });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-      throw new Error(err.error ?? `创建项目失败: ${res.status}`);
-    }
-
+    if (!res.ok) handleResponseError(res, `创建项目失败: ${res.status}`);
     return res.json() as Promise<CreateProjectOutput>;
   },
 
@@ -47,17 +65,14 @@ export const canvasApi = {
    * POST /api/v1/canvas/generate
    */
   generate: async (data: GenerateInput): Promise<GenerateOutput> => {
+    const headers = { 'Content-Type': 'application/json', ...getAuthHeaders() };
     const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.generate), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(data),
     });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-      throw new Error(err.error ?? `生成失败: ${res.status}`);
-    }
-
+    if (!res.ok) handleResponseError(res, `生成失败: ${res.status}`);
     return res.json() as Promise<GenerateOutput>;
   },
 
@@ -68,13 +83,10 @@ export const canvasApi = {
    * 轮询间隔: 5000ms (AGENTS.md ADR-003)
    */
   getStatus: async (projectId: string): Promise<StatusOutput> => {
-    const res = await fetch(getApiUrl(`${API_CONFIG.endpoints.canvas.status}?projectId=${encodeURIComponent(projectId)}`));
+    const headers = getAuthHeaders();
+    const res = await fetch(getApiUrl(`${API_CONFIG.endpoints.canvas.status}?projectId=${encodeURIComponent(projectId)}`), { headers });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-      throw new Error(err.error ?? `查询状态失败: ${res.status}`);
-    }
-
+    if (!res.ok) handleResponseError(res, `查询状态失败: ${res.status}`);
     return res.json() as Promise<StatusOutput>;
   },
 
@@ -83,14 +95,10 @@ export const canvasApi = {
    * GET /api/v1/canvas/export?projectId=xxx
    */
   exportZip: async (projectId: string): Promise<Blob> => {
-    const res = await fetch(getApiUrl(`${API_CONFIG.endpoints.canvas.export}?projectId=${encodeURIComponent(projectId)}`));
+    const headers = getAuthHeaders();
+    const res = await fetch(getApiUrl(`${API_CONFIG.endpoints.canvas.export}?projectId=${encodeURIComponent(projectId)}`), { headers });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-      throw new Error(err.error ?? `导出失败: ${res.status}`);
-    }
-
-    // Return blob for download
+    if (!res.ok) handleResponseError(res, `导出失败: ${res.status}`);
     return res.blob();
   },
 
@@ -104,17 +112,14 @@ export const canvasApi = {
     requirementText: string;
     projectId?: string;
   }): Promise<GenerateContextsOutput> => {
+    const headers = { 'Content-Type': 'application/json', ...getAuthHeaders() };
     const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.generateContexts), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(data),
     });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-      throw new Error(err.error ?? `生成上下文失败: ${res.status}`);
-    }
-
+    if (!res.ok) handleResponseError(res, `生成上下文失败: ${res.status}`);
     return res.json() as Promise<GenerateContextsOutput>;
   },
 
@@ -126,17 +131,14 @@ export const canvasApi = {
     contexts: Array<{ id: string; name: string; description: string; type: string }>;
     sessionId: string;
   }): Promise<GenerateFlowsOutput> => {
+    const headers = { 'Content-Type': 'application/json', ...getAuthHeaders() };
     const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.generateFlows), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(data),
     });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-      throw new Error(err.error ?? `生成流程失败: ${res.status}`);
-    }
-
+    if (!res.ok) handleResponseError(res, `生成流程失败: ${res.status}`);
     return res.json() as Promise<GenerateFlowsOutput>;
   },
 
@@ -149,17 +151,14 @@ export const canvasApi = {
     flows: Array<{ name: string; contextId: string; steps: Array<{ name: string; actor: string }> }>;
     sessionId: string;
   }): Promise<GenerateComponentsOutput> => {
+    const headers = { 'Content-Type': 'application/json', ...getAuthHeaders() };
     const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.generateComponents), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(data),
     });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-      throw new Error(err.error ?? `生成组件失败: ${res.status}`);
-    }
-
+    if (!res.ok) handleResponseError(res, `生成组件失败: ${res.status}`);
     return res.json() as Promise<GenerateComponentsOutput>;
   },
 

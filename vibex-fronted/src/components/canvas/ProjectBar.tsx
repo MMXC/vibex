@@ -15,7 +15,7 @@ import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import { areAllConfirmed } from '@/lib/canvas/cascade';
 import type { CreateProjectInput, PrototypePage } from '@/lib/canvas/types';
 import { getHistoryStore } from '@/lib/canvas/historySlice';
-import { UndoRedoButtons } from './CanvasToolbar';
+import { UndoRedoButtons, ZoomControls } from './CanvasToolbar';
 import styles from './canvas.module.css';
 
 interface ProjectBarProps {
@@ -23,9 +23,27 @@ interface ProjectBarProps {
   projectName?: string;
   /** 项目名称变更回调 */
   onProjectNameChange?: (name: string) => void;
+  /** 打开搜索回调 */
+  onOpenSearch?: () => void;
+  /** E2-F14: 当前缩放级别 */
+  zoomLevel?: number;
+  /** E2-F14: 放大回调 */
+  onZoomIn?: () => void;
+  /** E2-F14: 缩小回调 */
+  onZoomOut?: () => void;
+  /** E2-F14: 重置缩放回调 */
+  onZoomReset?: () => void;
 }
 
-export function ProjectBar({ projectName = '未命名项目', onProjectNameChange }: ProjectBarProps) {
+export function ProjectBar({
+  projectName = '未命名项目',
+  onProjectNameChange,
+  onOpenSearch,
+  zoomLevel,
+  onZoomIn,
+  onZoomOut,
+  onZoomReset,
+}: ProjectBarProps) {
   const contextNodes = useCanvasStore((s) => s.contextNodes);
   const flowNodes = useCanvasStore((s) => s.flowNodes);
   const componentNodes = useCanvasStore((s) => s.componentNodes);
@@ -171,6 +189,43 @@ export function ProjectBar({ projectName = '未命名项目', onProjectNameChang
 
       {/* Epic1 F1.3: Undo/Redo buttons */}
       <UndoRedoButtons onUndo={handleUndo} onRedo={handleRedo} />
+
+      {/* E2-F5: Search button */}
+      {onOpenSearch && (
+        <button
+          type="button"
+          className={styles.searchButton}
+          onClick={onOpenSearch}
+          aria-label="搜索节点"
+          title="搜索节点（按 / 键）"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <span>搜索</span>
+        </button>
+      )}
+
+      {/* E2-F14: Zoom controls */}
+      {zoomLevel !== undefined && onZoomIn && onZoomOut && onZoomReset && (
+        <ZoomControls
+          zoomLevel={zoomLevel}
+          onZoomIn={onZoomIn}
+          onZoomOut={onZoomOut}
+          onZoomReset={onZoomReset}
+        />
+      )}
 
       {/* Create Project button */}
       <button

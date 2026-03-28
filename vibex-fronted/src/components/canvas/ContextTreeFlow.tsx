@@ -125,7 +125,7 @@ export function ContextTreeFlow({
       data={cardTreeData}
       extraEdges={relationshipEdges}
       edgeTypes={edgeTypes}
-      showMinimap={cardTreeProps?.showMinimap ?? false}
+      showMinimap={cardTreeProps?.showMinimap ?? true}
       fitView={cardTreeProps?.fitView ?? true}
       showControls={cardTreeProps?.showControls ?? true}
       showBackground={cardTreeProps?.showBackground ?? true}

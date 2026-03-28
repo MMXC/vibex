@@ -2,13 +2,15 @@
  * TreePanel — 可折叠树面板容器
  * 支持折叠/展开动画，显示节点摘要
  *
+ * Epic 2 E2-F12: 集成 MiniMap 导航
+ *
  * 遵守 AGENTS.md 规范：
  * - Props 接口有 JSDoc
  * - 组件不直接访问 canvasStore，按需接收 props
  */
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import type { TreeType, TreeNode } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
 
@@ -31,6 +33,8 @@ interface TreePanelProps {
   children?: React.ReactNode;
   /** 自定义操作按钮（渲染在面板头部下方） */
   actions?: React.ReactNode;
+  /** 点击 MiniMap 节点时滚动到对应节点 */
+  onNodeClick?: (nodeId: string) => void;
 }
 
 /** 树类型对应的颜色 */
@@ -47,6 +51,14 @@ const TREE_ICONS: Record<TreeType, string> = {
   component: '▣',
 };
 
+/** MiniMap 节点颜色映射 */
+const NODE_STATUS_COLORS: Record<string, string> = {
+  confirmed: '#22c55e',
+  pending: '#f59e0b',
+  generating: '#3b82f6',
+  error: '#ef4444',
+};
+
 export function TreePanel({
   tree,
   title,
@@ -57,8 +69,10 @@ export function TreePanel({
   onNodeConfirm,
   children,
   actions,
+  onNodeClick,
 }: TreePanelProps) {
   const [_isAnimating, setIsAnimating] = useState(false);
+  const panelBodyRef = useRef<HTMLDivElement>(null);
 
   const handleToggle = () => {
     setIsAnimating(true);
@@ -70,6 +84,19 @@ export function TreePanel({
   const activeClass = isActive ? styles.treePanelActive : styles.treePanelDimmed;
   const treeColor = TREE_COLORS[tree];
   const treeIcon = TREE_ICONS[tree];
+
+  // E2-F12: MiniMap — scroll node into view
+  const handleMinimapClick = useCallback(
+    (nodeId: string) => {
+      onNodeClick?.(nodeId);
+      // Find the DOM node for this node and scroll it into view
+      const container = panelBodyRef.current;
+      if (!container) return;
+      const nodeEl = container.querySelector<HTMLElement>(`[data-node-id="${nodeId}"]`);
+      nodeEl?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    },
+    [onNodeClick]
+  );
 
   return (
     <div
@@ -104,7 +131,7 @@ export function TreePanel({
 
       {/* Panel Body */}
       {!collapsed && (
-        <div className={styles.treePanelBody}>
+        <div className={styles.treePanelBody} ref={panelBodyRef}>
           {/* Summary when no nodes */}
           {nodes.length === 0 && (
             <div className={styles.treePanelEmpty}>
@@ -132,6 +159,15 @@ export function TreePanel({
               {/* Slot for add/edit actions */}
             </div>
           )}
+
+          {/* E2-F12: MiniMap — only show when there are nodes, hide on mobile */}
+          {nodes.length > 0 && (
+            <MiniMapWidget
+              nodes={nodes}
+              treeType={tree}
+              onNodeClick={handleMinimapClick}
+            />
+          )}
         </div>
       )}
 
@@ -148,6 +184,127 @@ export function TreePanel({
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+// =============================================================================
+// E2-F12: MiniMap Widget
+// =============================================================================
+
+interface MiniMapWidgetProps {
+  nodes: TreeNode[];
+  treeType: TreeType;
+  onNodeClick: (nodeId: string) => void;
+}
+
+/**
+ * MiniMap — 迷你导航地图
+ *
+ * 显示所有节点为彩色小点，点击可跳转到对应节点
+ * 移动端隐藏
+ */
+function MiniMapWidget({ nodes, treeType, onNodeClick }: MiniMapWidgetProps) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  if (isMobile) return null;
+
+  const treeColor = TREE_COLORS[treeType];
+  const MAX_VISIBLE_DOTS = 30;
+  const visibleNodes = nodes.slice(0, MAX_VISIBLE_DOTS);
+  const overCount = nodes.length - MAX_VISIBLE_DOTS;
+
+  // Layout dots in a grid
+  const COLS = 10;
+  const DOT_SIZE = 8;
+  const GAP = 3;
+  const PADDING = 8;
+  const rows = Math.ceil(visibleNodes.length / COLS);
+  const canvasWidth = COLS * (DOT_SIZE + GAP) + PADDING * 2;
+  const canvasHeight = rows * (DOT_SIZE + GAP) + PADDING * 2;
+
+  return (
+    <div
+      className={styles.minimapWidget}
+      title={`${nodes.length} 个节点，点击跳转`}
+      aria-label={`${treeType} 树 MiniMap，${nodes.length} 个节点`}
+    >
+      <div className={styles.minimapHeader}>
+        <span
+          className={styles.minimapTreeIcon}
+          style={{ color: treeColor }}
+          aria-hidden="true"
+        >
+          {TREE_ICONS[treeType]}
+        </span>
+        <span className={styles.minimapTitle}>导航地图</span>
+        <span className={styles.minimapCount}>{nodes.length}</span>
+      </div>
+
+      <div
+        className={styles.minimapCanvas}
+        style={{ width: canvasWidth, height: canvasHeight }}
+        role="list"
+        aria-label="MiniMap 节点列表"
+      >
+        {visibleNodes.map((node, idx) => {
+          const col = idx % COLS;
+          const row = Math.floor(idx / COLS);
+          const color = NODE_STATUS_COLORS[node.status] ?? NODE_STATUS_COLORS.pending;
+
+          return (
+            <button
+              key={node.id}
+              type="button"
+              role="listitem"
+              className={styles.minimapDot}
+              style={{
+                left: PADDING + col * (DOT_SIZE + GAP),
+                top: PADDING + row * (DOT_SIZE + GAP),
+                width: DOT_SIZE,
+                height: DOT_SIZE,
+                background: color,
+              }}
+              title={node.label}
+              aria-label={`跳转到 ${node.label}`}
+              onClick={() => onNodeClick(node.id)}
+            />
+          );
+        })}
+        {overCount > 0 && (
+          <span
+            className={styles.minimapOverCount}
+            style={{
+              left: PADDING,
+              top: PADDING + rows * (DOT_SIZE + GAP),
+            }}
+          >
+            +{overCount}
+          </span>
+        )}
+      </div>
+
+      <div className={styles.minimapLegend}>
+        <span className={styles.minimapLegendItem}>
+          <span className={styles.minimapLegendDot} style={{ background: NODE_STATUS_COLORS.confirmed }} />
+          已确认
+        </span>
+        <span className={styles.minimapLegendItem}>
+          <span className={styles.minimapLegendDot} style={{ background: NODE_STATUS_COLORS.pending }} />
+          待确认
+        </span>
+        <span className={styles.minimapLegendItem}>
+          <span className={styles.minimapLegendDot} style={{ background: NODE_STATUS_COLORS.error }} />
+          错误
+        </span>
+      </div>
     </div>
   );
 }

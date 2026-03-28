@@ -18,8 +18,9 @@ import { areAllConfirmed } from '@/lib/canvas/cascade';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import { getHistoryStore } from '@/lib/canvas/historySlice';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { SearchDialog } from './features/SearchDialog';
+import { useCanvasSearch } from '@/hooks/canvas/useCanvasSearch';
 import { PhaseProgressBar } from './PhaseProgressBar';
-import { TreeStatus } from './TreeStatus';
 import { TreePanel } from './TreePanel';
 import { BoundedContextTree } from './BoundedContextTree';
 import { ComponentTree } from './ComponentTree';
@@ -28,6 +29,7 @@ import { ProjectBar } from './ProjectBar';
 import { PrototypeQueuePanel } from './PrototypeQueuePanel';
 import { HoverHotzone } from './HoverHotzone';
 import { ShortcutHintPanel } from './features/ShortcutHintPanel';
+import { TreeStatus } from './TreeStatus';
 import type { Phase, TreeType, TreeNode } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
 
@@ -51,6 +53,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const toggleFlowPanel = useCanvasStore((s) => s.toggleFlowPanel);
   const toggleComponentPanel = useCanvasStore((s) => s.toggleComponentPanel);
   const loadExampleData = useCanvasStore((s) => s.loadExampleData);
+  const deleteContextNode = useCanvasStore((s) => s.deleteContextNode);
   const autoGenerateFlows = useCanvasStore((s) => s.autoGenerateFlows);
   const flowGenerating = useCanvasStore((s) => s.flowGenerating);
   const flowGeneratingMessage = useCanvasStore((s) => s.flowGeneratingMessage);
@@ -97,6 +100,139 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const [requirementInput, setRequirementInput] = useState('');
   const [isShortcutPanelOpen, setIsShortcutPanelOpen] = useState(false);
 
+  // === E2-F10: Space+drag canvas panning ===
+  const [isSpacePressed, setIsSpacePressed] = useState(false);
+  const [isPanning, setIsPanning] = useState(false);
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const lastMousePosRef = useRef<{ x: number; y: number } | null>(null);
+
+  // Track Space key for panning mode
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === ' ' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+        const target = e.target as HTMLElement;
+        const tagName = target.tagName;
+        if (tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT') return;
+        if (target.getAttribute('contenteditable') === 'true') return;
+        const role = target.getAttribute('role');
+        if (role === 'textbox' || role === 'searchbox' || role === 'combobox') return;
+        if (target.id === 'canvas-search-input') return;
+        e.preventDefault();
+        setIsSpacePressed(true);
+      }
+    }
+    function handleKeyUp(e: KeyboardEvent) {
+      if (e.key === ' ') {
+        e.preventDefault();
+        setIsSpacePressed(false);
+        setIsPanning(false);
+        lastMousePosRef.current = null;
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
+  // Apply pan offset to the grid
+  useEffect(() => {
+    if (!gridRef.current) return;
+    gridRef.current.style.setProperty('--canvas-pan-x', `${panOffset.x}px`);
+    gridRef.current.style.setProperty('--canvas-pan-y', `${panOffset.y}px`);
+  }, [panOffset]);
+
+  // Mouse drag for panning
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if (!isSpacePressed) return;
+      // Only pan when space is held and clicking on the canvas (not on buttons/inputs)
+      const target = e.target as HTMLElement;
+      const tagName = target.tagName;
+      if (tagName === 'BUTTON' || tagName === 'INPUT' || tagName === 'TEXTAREA') return;
+      e.preventDefault();
+      setIsPanning(true);
+      lastMousePosRef.current = { x: e.clientX, y: e.clientY };
+    },
+    [isSpacePressed]
+  );
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!isPanning || !lastMousePosRef.current) return;
+      const dx = e.clientX - lastMousePosRef.current.x;
+      const dy = e.clientY - lastMousePosRef.current.y;
+      lastMousePosRef.current = { x: e.clientX, y: e.clientY };
+      setPanOffset((prev) => ({ x: prev.x + dx, y: prev.y + dy }));
+    },
+    [isPanning]
+  );
+
+  const handleMouseUp = useCallback(() => {
+    if (isPanning) {
+      setIsPanning(false);
+      lastMousePosRef.current = null;
+    }
+  }, [isPanning]);
+
+  // Reset pan on zoom reset
+  const handleZoomReset = useCallback(() => {
+    setZoomLevel(1);
+    setPanOffset({ x: 0, y: 0 });
+  }, []);
+
+  // === E2-F5: Search State ===
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const openSearch = useCallback(() => setIsSearchOpen(true), []);
+  const closeSearch = useCallback(() => setIsSearchOpen(false), []);
+
+  // E2-F5: Search hook — merges all three trees
+  const { query, setQuery, results, searchTimeMs } = useCanvasSearch(
+    contextNodes,
+    flowNodes,
+    componentNodes
+  );
+
+  // E2-F5: Handle search result selection — scroll to node and highlight
+  const handleSearchSelect = useCallback(
+    (result: { id: string; treeType: TreeType }) => {
+      // Set active tree to the result's tree
+      useCanvasStore.getState().setActiveTree(result.treeType);
+      // Scroll node into view via minimap (handled by TreePanel's onNodeClick)
+      const nodeEl = document.querySelector<HTMLElement>(`[data-node-id="${result.id}"]`);
+      nodeEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Add pulse highlight class
+      nodeEl?.classList.add(styles.searchHighlightNode);
+      setTimeout(() => nodeEl?.classList.remove(styles.searchHighlightNode), 2000);
+    },
+    []
+  );
+
+  // E2-F12: Handle minimap node click — scroll to and highlight node
+  const handleMinimapNodeClick = useCallback(
+    (nodeId: string) => {
+      // Find which tree contains this node
+      const ctxNode = contextNodes.find((n) => n.nodeId === nodeId);
+      if (ctxNode) {
+        handleSearchSelect({ id: nodeId, treeType: 'context' });
+        return;
+      }
+      const flowNode = flowNodes.find((n) => n.nodeId === nodeId);
+      if (flowNode) {
+        handleSearchSelect({ id: nodeId, treeType: 'flow' });
+        return;
+      }
+      const compNode = componentNodes.find((n) => n.nodeId === nodeId);
+      if (compNode) {
+        handleSearchSelect({ id: nodeId, treeType: 'component' });
+        return;
+      }
+    },
+    [contextNodes, flowNodes, componentNodes, handleSearchSelect]
+  );
+
   // === AI Thinking State (Epic 1) ===
   const aiThinking = useCanvasStore((s) => s.aiThinking);
   const aiThinkingMessage = useCanvasStore((s) => s.aiThinkingMessage);
@@ -108,6 +244,36 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const [componentGenerating, setComponentGenerating] = useState(false);
   const projectId = useCanvasStore((s) => s.projectId);
   const setComponentNodes = useCanvasStore((s) => s.setComponentNodes);
+
+  // === E2-F14: Zoom State ===
+  const [zoomLevel, setZoomLevel] = useState(1); // 1 = 100%
+  const ZOOM_STEP = 0.1;
+  const MIN_ZOOM = 0.25;
+  const MAX_ZOOM = 2.0;
+
+  const handleZoomIn = useCallback(() => {
+    setZoomLevel((z) => Math.min(z + ZOOM_STEP, MAX_ZOOM));
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    setZoomLevel((z) => Math.max(z - ZOOM_STEP, MIN_ZOOM));
+  }, []);
+
+  // E2-F14: Apply zoom to canvas container via CSS variable
+  useEffect(() => {
+    if (!gridRef.current) return;
+    gridRef.current.style.setProperty('--canvas-zoom', String(zoomLevel));
+  }, [zoomLevel]);
+
+  // E2-F10: Delete selected node (context tree primary)
+  const handleDeleteSelected = useCallback(() => {
+    // Find the first active context node that could be "selected" (e.g., first unconfirmed)
+    // For now, delete the first unconfirmed context node if any
+    const unconfirmed = contextNodes.filter((n) => !n.confirmed);
+    if (unconfirmed.length > 0) {
+      deleteContextNode(unconfirmed[0].nodeId);
+    }
+  }, [contextNodes, deleteContextNode]);
 
   // === Epic1 F1.2: Keyboard shortcuts for Undo/Redo ===
   const handleKeyboardUndo = useCallback((): boolean => {
@@ -149,6 +315,11 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   useKeyboardShortcuts({
     undo: handleKeyboardUndo,
     redo: handleKeyboardRedo,
+    onOpenSearch: openSearch,
+    onZoomIn: handleZoomIn,
+    onZoomOut: handleZoomOut,
+    onZoomReset: handleZoomReset,
+    onDelete: handleDeleteSelected,
     enabled: phase !== 'input',
   });
 
@@ -337,6 +508,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             collapsed={false} // E2-2: always expanded in tab mode
             isActive={contextActive}
             onToggleCollapse={toggleContextPanel}
+            onNodeClick={handleMinimapNodeClick}
             actions={
               contextNodes.length > 0 ? (
                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
@@ -378,6 +550,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             collapsed={false} // E2-2: always expanded in tab mode
             isActive={flowActive}
             onToggleCollapse={toggleFlowPanel}
+            onNodeClick={handleMinimapNodeClick}
             actions={
               flowNodes.length > 0 ? (
                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
@@ -407,6 +580,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             collapsed={false} // E2-2: always expanded in tab mode
             isActive={componentActive}
             onToggleCollapse={toggleComponentPanel}
+            onNodeClick={handleMinimapNodeClick}
           >
             <ComponentTree />
           </TreePanel>
@@ -433,6 +607,11 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
           <ProjectBar
             projectName={projectName}
             onProjectNameChange={setProjectName}
+            onOpenSearch={openSearch}
+            zoomLevel={zoomLevel}
+            onZoomIn={handleZoomIn}
+            onZoomOut={handleZoomOut}
+            onZoomReset={handleZoomReset}
           />
         </div>
       )}
@@ -482,7 +661,14 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
               </div>
             </div>
           ) : (
-            <div ref={gridRef} className={styles.treePanelsGrid}>
+            <div
+              ref={gridRef}
+              className={styles.treePanelsGrid}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+            >
               {/* Bug5: Left expand toggle button */}
               <div className={styles.expandCol}>
                 <button
@@ -503,6 +689,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 collapsed={contextPanelCollapsed}
                 isActive={contextActive}
                 onToggleCollapse={toggleContextPanel}
+                onNodeClick={handleMinimapNodeClick}
                 actions={
                   contextNodes.length > 0 ? (
                     <button
@@ -530,6 +717,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 collapsed={flowPanelCollapsed}
                 isActive={flowActive}
                 onToggleCollapse={toggleFlowPanel}
+                onNodeClick={handleMinimapNodeClick}
                 actions={
                   <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
                     {flowNodes.length > 0 && (
@@ -568,6 +756,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 collapsed={componentPanelCollapsed}
                 isActive={componentActive}
                 onToggleCollapse={toggleComponentPanel}
+                onNodeClick={handleMinimapNodeClick}
               >
                 <HoverHotzone position="left-edge" panel="right" />
                 <ComponentTree />
@@ -648,6 +837,17 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
       <ShortcutHintPanel
         open={isShortcutPanelOpen}
         onClose={() => setIsShortcutPanelOpen(false)}
+      />
+
+      {/* Epic2 F2-F5: Search Dialog */}
+      <SearchDialog
+        open={isSearchOpen}
+        onClose={closeSearch}
+        results={results}
+        query={query}
+        onQueryChange={setQuery}
+        searchTimeMs={searchTimeMs}
+        onSelect={handleSearchSelect}
       />
     </div>
   );

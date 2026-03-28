@@ -389,6 +389,22 @@ function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly }: Componen
                   ✓ 确认
                 </button>
               )}
+              {/* E2-F8: Prototype preview — navigate to editor with componentId */}
+              <button
+                type="button"
+                className={styles.previewButton}
+                onClick={() => {
+                  const url = `/editor?componentId=${encodeURIComponent(node.nodeId)}`;
+                  window.location.href = url;
+                }}
+                aria-label={`预览 ${node.name} 原型`}
+                title={`预览原型 (跳转 /editor?componentId=${node.nodeId})`}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                  <polygon points="5 3 19 12 5 21 5 3" />
+                </svg>
+                预览
+              </button>
               <button
                 type="button"
                 className={styles.editButton}

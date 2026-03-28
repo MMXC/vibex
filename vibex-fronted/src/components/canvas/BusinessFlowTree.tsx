@@ -16,6 +16,22 @@ import React, { useState, useCallback } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import { CheckboxIcon } from '@/components/common/CheckboxIcon';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import type { BusinessFlowNode, FlowStep, ComponentNode, BoundedContextNode } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
 
@@ -31,32 +47,40 @@ interface BusinessFlowTreeProps {
 }
 
 // =============================================================================
-// Flow Step Row (Draggable)
+// Sortable Step Row (Draggable)
 // =============================================================================
 
-interface StepRowProps {
+interface SortableStepRowProps {
   step: FlowStep;
   index: number;
-  totalSteps: number;
+  totalSteps?: number;
   readonly?: boolean;
   onConfirm: (stepId: string) => void;
   onEdit: (stepId: string, data: Partial<FlowStep>) => void;
   onDelete: (stepId: string) => void;
-  onMoveUp: (index: number) => void;
-  onMoveDown: (index: number) => void;
 }
 
-function StepRow({
+function SortableStepRow({
   step,
   index,
-  totalSteps,
+  totalSteps: _totalSteps,
   readonly,
   onConfirm,
   onEdit,
   onDelete,
-  onMoveUp,
-  onMoveDown,
-}: StepRowProps) {
+}: SortableStepRowProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: step.stepId,
+    disabled: readonly,
+  });
+
   const [editing, setEditing] = useState(false);
   const [editState, setEditState] = useState({
     name: step.name,
@@ -86,10 +110,20 @@ function StepRow({
         : styles.nodePending;
 
   return (
-    <div className={`${styles.stepRow} ${statusClass}`}>
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+        zIndex: isDragging ? 1000 : 1,
+      }}
+      className={`${styles.stepRow} ${statusClass}`}
+      data-step-id={step.stepId}
+    >
       {/* Drag handle */}
       {!readonly && (
-        <div className={styles.stepDragHandle} title="拖拽排序">
+        <div className={styles.stepDragHandle} {...attributes} {...listeners} title="拖拽排序">
           ⋮⋮
         </div>
       )}
@@ -152,23 +186,6 @@ function StepRow({
 
           {!readonly && (
             <div className={styles.stepActions}>
-              {/* Reorder buttons */}
-              <button
-                className={styles.stepMoveBtn}
-                onClick={() => onMoveUp(index)}
-                disabled={index === 0}
-                title="上移"
-              >
-                ↑
-              </button>
-              <button
-                className={styles.stepMoveBtn}
-                onClick={() => onMoveDown(index)}
-                disabled={index === totalSteps - 1}
-                title="下移"
-              >
-                ↓
-              </button>
               {/* Edit */}
               <button
                 className={styles.stepActionBtn}
@@ -205,7 +222,7 @@ function StepRow({
 }
 
 // =============================================================================
-// Flow Node Card
+// Flow Node Card (with Sortable Steps)
 // =============================================================================
 
 interface FlowCardProps {
@@ -240,6 +257,31 @@ function FlowCard({
     name: node.name,
   });
 
+  // DnD sensors for step drag
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 5 }, // 5px threshold to prevent accidental drag
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+
+      const oldIndex = node.steps.findIndex((s) => s.stepId === active.id);
+      const newIndex = node.steps.findIndex((s) => s.stepId === over.id);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        onReorderSteps(node.nodeId, oldIndex, newIndex);
+      }
+    },
+    [node.steps, node.nodeId, onReorderSteps]
+  );
+
   const handleSave = useCallback(() => {
     onEdit(node.nodeId, { name: editState.name });
     setEditing(false);
@@ -252,6 +294,7 @@ function FlowCard({
 
   const confirmedSteps = node.steps.filter((s) => s.confirmed).length;
   const totalSteps = node.steps.length;
+  const stepIds = node.steps.map((s) => s.stepId);
 
   const statusClass =
     node.status === 'confirmed'
@@ -328,43 +371,49 @@ function FlowCard({
         )}
       </div>
 
-      {/* Steps list (expandable) */}
+      {/* Steps list (expandable, drag-to-sort) */}
       {expanded && (
-        <div className={styles.stepsList}>
-          {node.steps.length === 0 ? (
-            <div className={styles.emptySteps}>暂无步骤</div>
-          ) : (
-            node.steps.map((step, i) => (
-              <StepRow
-                key={step.stepId}
-                step={step}
-                index={i}
-                totalSteps={node.steps.length}
-                readonly={readonly}
-                onConfirm={(stepId) => onConfirmStep(node.nodeId, stepId)}
-                onEdit={(stepId, data) => onEditStep(node.nodeId, stepId, data)}
-                onDelete={(stepId) => onDeleteStep(node.nodeId, stepId)}
-                onMoveUp={(i) => onReorderSteps(node.nodeId, i, i - 1)}
-                onMoveDown={(i) => onReorderSteps(node.nodeId, i, i + 1)}
-              />
-            ))
-          )}
-          {/* S1.2: 添加步骤按钮 */}
-          {!readonly && (
-            <button
-              className={styles.btnAddStep}
-              onClick={() => {
-                const name = window.prompt('步骤名称：');
-                if (name && name.trim()) {
-                  onAddStep(node.nodeId, { name: name.trim(), actor: '待定', description: '' });
-                }
-              }}
-              title="添加步骤"
-            >
-              + 添加步骤
-            </button>
-          )}
-        </div>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <div className={styles.stepsList}>
+            {node.steps.length === 0 ? (
+              <div className={styles.emptySteps}>暂无步骤（拖拽下方按钮添加）</div>
+            ) : (
+              <SortableContext items={stepIds} strategy={verticalListSortingStrategy}>
+                {node.steps.map((step, i) => (
+                  <SortableStepRow
+                    key={step.stepId}
+                    step={step}
+                    index={i}
+                    totalSteps={node.steps.length}
+                    readonly={readonly}
+                    onConfirm={(stepId) => onConfirmStep(node.nodeId, stepId)}
+                    onEdit={(stepId, data) => onEditStep(node.nodeId, stepId, data)}
+                    onDelete={(stepId) => onDeleteStep(node.nodeId, stepId)}
+                  />
+                ))}
+              </SortableContext>
+            )}
+            {/* Add step button */}
+            {!readonly && (
+              <button
+                className={styles.btnAddStep}
+                onClick={() => {
+                  const name = window.prompt('步骤名称：');
+                  if (name && name.trim()) {
+                    onAddStep(node.nodeId, { name: name.trim(), actor: '待定', description: '' });
+                  }
+                }}
+                title="添加步骤"
+              >
+                + 添加步骤
+              </button>
+            )}
+          </div>
+        </DndContext>
       )}
     </div>
   );

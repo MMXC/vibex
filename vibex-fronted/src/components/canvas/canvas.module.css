@@ -169,6 +169,54 @@
   overflow: hidden;
   min-height: 0;
   transition: grid-template-columns 0.3s ease;
+  /* E2-F14: Canvas zoom via CSS variable */
+  transform: scale(var(--canvas-zoom, 1));
+  transform-origin: top center;
+  /* Prevent layout shift when zoomed */
+  width: calc(100% / var(--canvas-zoom, 1));
+  max-width: calc(100% / min(var(--canvas-zoom, 1), 1));
+}
+
+/* E2-F14: Zoom controls in ProjectBar */
+.zoomControls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.zoomBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.zoomBtn:hover {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  border-color: var(--color-accent);
+}
+
+.zoomBtn:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.zoomLabel {
+  min-width: 36px;
+  text-align: center;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono, monospace);
 }
 
 /* Bug5: Expand toggle button column */
@@ -769,6 +817,33 @@
 }
 
 .deleteButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* E2-F8: Prototype preview button */
+.previewButton {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.625rem;
+  background: var(--color-primary);
+  color: white;
+  border: 1px solid var(--color-primary);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: opacity 0.15s ease, border-color 0.15s ease;
+}
+
+.previewButton:hover {
+  opacity: 0.85;
+  border-color: var(--color-accent);
+}
+
+.previewButton:focus-visible {
   outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
@@ -3110,4 +3185,387 @@
   font-size: 0.75rem;
   color: var(--color-text-muted, #8b8b9e);
   text-align: center;
+}
+
+
+/* Search highlight pulse animation */
+.searchHighlightNode {
+  animation: searchHighlightPulse 2s ease-out;
+}
+
+@keyframes searchHighlightPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(88, 166, 255, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(88, 166, 255, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(88, 166, 255, 0);
+  }
+}
+
+
+/* ============================================================
+   E2-F5: Search Dialog
+   ============================================================ */
+
+.searchDialogOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10vh;
+  backdrop-filter: blur(4px);
+}
+
+.searchDialog {
+  width: 100%;
+  max-width: 560px;
+  background: var(--color-surface-elevated, #1e1e35);
+  border: 1px solid var(--color-border, #2d2d44);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  animation: searchDialogSlideIn 0.15s ease-out;
+}
+
+@keyframes searchDialogSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.searchInputWrapper {
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  border-bottom: 1px solid var(--color-border, #2d2d44);
+  gap: 0.5rem;
+}
+
+.searchIcon {
+  flex-shrink: 0;
+  color: var(--color-text-muted, #8b8b9e);
+}
+
+.searchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 1rem 0;
+  font-size: 1rem;
+  color: var(--color-text-primary, #e8e8f0);
+  caret-color: var(--color-primary, #7c3aed);
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-muted, #8b8b9e);
+}
+
+.searchClearBtn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--color-text-muted, #8b8b9e);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.searchClearBtn:hover {
+  background: var(--color-surface, #252540);
+  color: var(--color-text-primary, #e8e8f0);
+}
+
+.searchResults {
+  max-height: 360px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.searchEmpty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-text-muted, #8b8b9e);
+}
+
+.searchEmpty span {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.searchEmpty p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.searchResultItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--color-border, #2d2d44);
+  transition: background 0.1s ease;
+}
+
+.searchResultItem:last-child {
+  border-bottom: none;
+}
+
+.searchResultItem:hover,
+.searchResultItemSelected {
+  background: var(--color-surface, #252540);
+}
+
+.searchResultIcon {
+  flex-shrink: 0;
+  font-size: 1rem;
+  width: 1.5rem;
+  text-align: center;
+  color: var(--color-text-muted, #8b8b9e);
+}
+
+.searchResultContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.searchResultName {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-text-primary, #e8e8f0);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.searchHighlight {
+  background: rgba(251, 191, 36, 0.3);
+  color: #fbbf24;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+.searchResultConfirmed {
+  color: #22c55e;
+  font-size: 0.75rem;
+}
+
+.searchResultPath {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
+  flex-wrap: wrap;
+}
+
+.searchResultTreeType {
+  font-size: 0.75rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  background: var(--color-surface, #252540);
+  color: var(--color-text-muted, #8b8b9e);
+}
+
+.searchResultTreeType[data-tree-type="context"] {
+  color: #f59e0b;
+}
+
+.searchResultTreeType[data-tree-type="flow"] {
+  color: #3b82f6;
+}
+
+.searchResultTreeType[data-tree-type="component"] {
+  color: #22c55e;
+}
+
+.searchResultFullPath {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #8b8b9e);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.searchResultStatus {
+  flex-shrink: 0;
+  font-size: 0.875rem;
+}
+
+.searchResultStatus[data-status="error"] {
+  color: #ef4444;
+}
+
+.searchOverLimit {
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #8b8b9e);
+  text-align: center;
+  background: var(--color-surface, #252540);
+  border-top: 1px solid var(--color-border, #2d2d44);
+}
+
+.searchFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  border-top: 1px solid var(--color-border, #2d2d44);
+  background: var(--color-surface, #252540);
+}
+
+.searchHint {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #8b8b9e);
+}
+
+.searchHint kbd {
+  background: var(--color-surface-elevated, #1e1e35);
+  border: 1px solid var(--color-border, #2d2d44);
+  border-radius: 3px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.7rem;
+  font-family: inherit;
+  color: var(--color-text-secondary, #b0b0c0);
+}
+
+.searchTime {
+  font-size: 0.7rem;
+  color: var(--color-text-muted, #8b8b9e);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   E2-F12: MiniMap Widget
+   ============================================================ */
+
+.minimapWidget {
+  border-top: 1px solid var(--color-border, #2d2d44);
+  padding: 0.5rem;
+  background: var(--color-surface, #1a1a30);
+  margin-top: auto;
+}
+
+.minimapHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.7rem;
+  color: var(--color-text-muted, #8b8b9e);
+}
+
+.minimapTreeIcon {
+  font-size: 0.875rem;
+}
+
+.minimapTitle {
+  flex: 1;
+}
+
+.minimapCount {
+  font-variant-numeric: tabular-nums;
+  background: var(--color-surface-elevated, #252540);
+  border-radius: 10px;
+  padding: 0 0.4rem;
+  font-size: 0.65rem;
+}
+
+.minimapCanvas {
+  position: relative;
+  background: var(--color-surface-elevated, #1e1e35);
+  border: 1px solid var(--color-border, #2d2d44);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.minimapDot {
+  position: absolute;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+  padding: 0;
+  opacity: 0.85;
+}
+
+.minimapDot:hover {
+  transform: scale(1.4);
+  opacity: 1;
+  z-index: 1;
+}
+
+.minimapOverCount {
+  position: absolute;
+  font-size: 0.6rem;
+  color: var(--color-text-muted, #8b8b9e);
+}
+
+.minimapLegend {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.minimapLegendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.6rem;
+  color: var(--color-text-muted, #8b8b9e);
+}
+
+.minimapLegendDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   E2-F5: Search Button (ProjectBar)
+   ============================================================ */
+
+.searchButton {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  background: var(--color-surface-elevated, #252540);
+  border: 1px solid var(--color-border, #2d2d44);
+  border-radius: 6px;
+  color: var(--color-text-secondary, #b0b0c0);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.searchButton:hover {
+  background: var(--color-surface, #2d2d44);
+  color: var(--color-text-primary, #e8e8f0);
+  border-color: var(--color-primary, #7c3aed);
+}
+
+.searchButton:active {
+  transform: scale(0.97);
 }

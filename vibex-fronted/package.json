@@ -25,6 +25,9 @@
     "report:vuln": "npm audit --json > vulnerability-report.json"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@monaco-editor/react": "^4.7.0",
     "@sentry/nextjs": "^10.43.0",
     "@tanstack/query-sync-storage-persister": "^5.90.24",
@@ -39,6 +42,7 @@
     "dompurify": "^3.3.2",
     "flatted": "^3.4.2",
     "framer-motion": "^12.35.2",
+    "fuse.js": "^7.1.0",
     "html-to-image": "^1.11.13",
     "jsondiffpatch": "^0.7.3",
     "lucide-react": "^0.577.0",
@@ -50,6 +54,7 @@
     "react-dom": "19.2.3",
     "react-resizable-panels": "^4.7.2",
     "tsparticles-slim": "^2.12.0",
+    "use-debounce": "^10.1.0",
     "uuid": "^13.0.0",
     "xstate": "^5.28.0",
     "zod": "^4.3.6",

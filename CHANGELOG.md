@@ -1,3 +1,13 @@
+### Added (vibex-canvas-api-standardization Epic2: SSE端点整合) — 2026-03-29
+- **Epic2**: SSE端点整合 — Canvas API标准化
+  - 后端: 创建 `/api/v1/canvas/stream` Canvas专属SSE端点 + `sse-stream-lib/index.ts` 共享SSE流构建逻辑
+  - 重构 `/api/v1/analyze/stream` 使用共享SSE模块
+  - 前端: 创建 `canvasSseApi.ts`（从dddApi.ts迁移），`dddApi.ts` 保留re-export兼容包装
+  - `useSSEStream.ts` 改用 `/api/v1/canvas/stream` 端点，`canvasStore.ts` 使用 `canvasSseAnalyze` 替代 `analyzeRequirement`
+  - 测试: 前端39 tests pass (canvasSseApi + useSSEStream + dddApi)，后端7 tests pass (analyze/stream)
+  - 提交: `47c854bc` + `86c2e05a`
+  - 审查: ✅ PASSED (reviewer-epic2-sse-integration)
+
 ### Added (vibex-canvas-api-standardization Epic3: 删除旧路由 /api/canvas/*) — 2026-03-29
 - **Epic3**: 删除已废弃的旧路由目录及 Express/Hono 路由注册
   - 删除旧路由 `vibex-backend/src/app/api/canvas/`（7 个端点: export, generate-components, generate-contexts, generate-flows, generate, project, status）

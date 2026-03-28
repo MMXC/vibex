@@ -14,8 +14,9 @@
   - 新增 v1 路由目录 `vibex-backend/src/app/api/v1/canvas/`（7 个端点）
   - 前端 `canvasApi.ts` 所有调用统一走 `/v1/canvas/*` via `getApiUrl(API_CONFIG.endpoints.canvas.*)`
   - 依赖扫描: 前端运行时 ✅ 无旧路由调用，无外部系统依赖
-  - 遗留项（Epic2+）: 后端测试文件 `route.test.ts` URL 待更新；Hono/Express 路由待清理；JSDoc 注释待同步
-  - 提交: `642b649c` (docs) + `0948b37d` (feat)
+  - JSDoc 注释同步: `canvasApi.ts` 9 处注释从 `/api/canvas/` 更新为 `/api/v1/canvas/`（commit `b2d22f33`）
+  - 遗留项（Epic2+）: 后端测试文件 `route.test.ts` URL 待更新；Hono/Express 路由待清理
+  - 提交: `642b649c` (docs) + `0948b37d` (feat) + `b2d22f33` (JSDoc fix)
   - 审查: ✅ PASSED (reviewer-epic1-depscan)
 
 ### Added (vibex-canvas-three-column-20260328 Epic E2-3: 展开热区视觉增强) — 2026-03-28

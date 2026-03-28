@@ -1,3 +1,39 @@
+### Added (vibex-canvas-feature-gap Epic4: 多选交互 — 框选 + Ctrl/Cmd 多选) — 2026-03-29
+- **Epic4**: 多选交互能力补全（框选拖拽、Ctrl/Cmd+点击、批量操作）
+  - **E4-F4** (`useDragSelection.ts`): 框选（Drag-to-Select）Hook
+    - `useDragSelection`: 拖拽框选 Hook，在树面板容器内拖动选中多个节点
+    - `doesNodeIntersectBox`: 矩形碰撞检测，排除按钮/输入框/拖拽手柄等交互元素
+    - 最小拖拽阈值 3px，避免误触
+    - 支持 Escape 取消框选
+  - **E4-F4** (`useDragSelection.ts` → `useModifierKey`): Ctrl/Cmd 修饰键追踪
+    - `useModifierKey`: 追踪 Ctrl（Win/Linux）或 Cmd（Mac）是否按住
+    - ref 模式返回，无需放入 deps 数组
+    - window blur 时自动重置状态
+  - **E4-F2** (`BoundedContextTree.tsx`, `BusinessFlowTree.tsx`, `ComponentTree.tsx`): Ctrl/Cmd+Click 多选
+    - 树卡片均支持 Ctrl/Cmd+Click 切换选中状态
+    - `nodeCardSelected` 样式：紫色边框 + box-shadow 高亮
+    - 选中数量 badge + 批量删除按钮
+  - **E4-F2** (`canvasStore.ts` → `multiSelectSlice`): 多选状态管理
+    - `selectedNodeIds`: 三树独立的多选 ID 记录 `{ context: [], flow: [], component: [] }`
+    - `toggleNodeSelect` / `selectNode` / `clearNodeSelection` / `selectAllNodes`
+    - `deleteSelectedNodes`: 批量删除选中节点，单次 Undo 历史记录
+    - `multiSelectSlice.test.ts`: 覆盖选/反选/批量删除/清空/全选场景
+  - **E4-F2** (`useKeyboardShortcuts.ts`): 快捷键集成
+    - `Ctrl+A / Cmd+A`: 全选当前树节点
+    - `Escape`: 清除多选
+  - **E4-F2** (`canvas.module.css`): 多选样式
+    - `.multiSelectControls` / `.selectionCount` / `.nodeCardSelected`
+    - `.dragSelectionBox`: 框选虚线框 + 淡入动画
+    - `.selectionCheckbox`: 节点卡片左上角选择框
+  - **修复**: `useDragSelection.ts` 类型错误（HTMLElement.type → HTMLInputElement check）
+  - **修复**: `useVersionHistory.ts` 返回类型（createSnapshot/restoreSnapshot）
+  - **清理**: 删除调试临时测试文件（body-mock-test / import-test / mock-order-test / url-mock-test / simple-hook-test）
+  - **TypeScript**: 零错误
+  - **测试**: 316 canvas 测试全部通过（含新增 multiSelectSlice 覆盖）
+  - **npm audit**: 2 个间接依赖漏洞（picomatch/brace-expansion，test tooling，非安全关键）
+  - 提交: `450c88ec`
+  - 审查: ✅ PASSED (reviewer-epic4-multiselect)
+
 ### Added (vibex-canvas-feature-gap Epic3: 画布增强编辑) — 2026-03-29
 - **Epic3**: 多选批量操作 + Sticky Notes 贴纸 + 节点关系连线
   - **E3-F2** (`multiSelectSlice.ts`, `canvasStore.ts`): 多选 + 批量操作

@@ -1,3 +1,12 @@
+### Added (vibex-canvas-api-standardization Epic1: Canvas API 路由标准化 /api/v1/canvas) — 2026-03-29
+- **Epic1 F1 (API Route Standardization)**: Canvas API 路由从 `/api/canvas/*` 迁移到 `/api/v1/canvas/*`
+  - 新增 v1 路由目录 `vibex-backend/src/app/api/v1/canvas/`（7 个端点）
+  - 前端 `canvasApi.ts` 所有调用统一走 `/v1/canvas/*` via `getApiUrl(API_CONFIG.endpoints.canvas.*)`
+  - 依赖扫描: 前端运行时 ✅ 无旧路由调用，无外部系统依赖
+  - 遗留项（Epic2+）: 后端测试文件 `route.test.ts` URL 待更新；Hono/Express 路由待清理；JSDoc 注释待同步
+  - 提交: `642b649c` (docs) + `0948b37d` (feat)
+  - 审查: ✅ PASSED (reviewer-epic1-depscan)
+
 ### Added (vibex-canvas-three-column-20260328 Epic E2-3: 展开热区视觉增强) — 2026-03-28
 - **E2-3**: `HoverHotzone.tsx` 新增 `isHighlighted` 视觉高亮逻辑
   - 当相邻面板展开时，热区添加 `.hotzoneActive` CSS 类，产生紫色半透明背景 + 边框高亮

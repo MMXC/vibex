@@ -1,3 +1,9 @@
+### Added (vibex-doc-fix-20260328 Epic2: 废弃文档归档) — 2026-03-28
+- **Epic2**: 归档 886 个废弃文档到 `docs/archive/202603-stale/`
+  - 归档范围: 历史项目文档（homepage、domain-model、api-fixes、security、test-infra 等 10 个类别）
+  - 归档原则: 只移不删，保留文件名和时间戳，白名单豁免 agent-self-evolution-*、vibex-canvas-* 等活跃项目
+  - Review: `docs/vibex-doc-fix-20260328/review-epic2.md`
+
 ### Added (agent-self-evolution-20260328 Epic5: DAG Topological Sort) — 2026-03-28
 - **F5.1**: `scripts/topological_sort.py` — Kahn's algorithm实现，117行，14个测试全部通过
 - **F5.2**: `scripts/task_manager.py list --topo` — 按拓扑序输出任务

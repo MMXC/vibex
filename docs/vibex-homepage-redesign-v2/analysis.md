@@ -1,1 +1,0 @@
-/root/.openclaw/workspace-analyst/docs/output/homepage-redesign-v2-analysis.md

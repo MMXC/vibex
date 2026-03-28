@@ -1,3 +1,12 @@
+### Fixed (vibex-canvas-context-pass-20260328 Epic1: 流程树按钮携带用户编辑上下文) — 2026-03-28
+- **Epic1**: 修复「继续·流程树」按钮点击后未携带用户编辑确认的上下文树信息请求后端的问题
+  - `canvasStore.ts`: `autoGenerateFlows` 改为调用真实 `canvasApi.generateFlows` API，传入用户编辑后的 `contextNodes` 数据
+  - `canvasStore.ts`: 新增 `flowGenerating` / `flowGeneratingMessage` 状态，追踪生成中状态
+  - `CanvasPage.tsx`: Context TreePanel actions 增加「继续 → 流程树」按钮
+  - `BoundedContextTree.tsx`: 修复 `advancePhase` 在 forEach 循环内多次调用问题，确保 `autoGenerateFlows` 使用最新 store 状态后再推进阶段
+  - 提交: `464b74c7` (feat) + `7f150ae4` (fix) + `9ec60303` (fix test syntax)
+  - 审查: ✅ PASSED
+
 ### Added (vibex-canvas-flowtree-edit-20260328 Epic1: 流程树编辑增强) — 2026-03-28
 - **Epic1**: 流程树编辑功能增强
   - `addFlowNode` 支持 `contextId=''`（独立流程，无关联限界上下文）

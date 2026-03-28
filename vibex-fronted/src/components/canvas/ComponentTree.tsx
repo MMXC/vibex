@@ -1,6 +1,7 @@
 /**
  * ComponentTree — 组件树组件
  * Epic 4: F4.1 (AI生成) + F4.2 (预览) + F4.3 (编辑) + F4.4 (确认) + F4.6 (上游联动)
+ * Epic E1: 组件树页面分组 — 按 flowId 用虚线框分组展示
  *
  * 实现要点：
  * - 垂直列表布局，每个页面一个根节点卡片
@@ -8,14 +9,142 @@
  * - 节点状态：pending(黄框) / confirmed(绿框) / error(红框)
  * - CRUD 操作连接 canvasStore
  * - "AI生成"按钮调用 mock API 基于 flow 生成组件节点
+ * - E1: 按 flowId 分组，通用组件单独置顶，虚线框包裹
  */
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useMemo } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { useToast } from '@/components/ui/Toast';
-import type { ComponentNode } from '@/lib/canvas/types';
+import type { ComponentNode, BusinessFlowNode } from '@/lib/canvas/types';
+import { ComponentGroupOverlay } from './groups/ComponentGroupOverlay';
+import type { ComponentGroupBBox } from './groups/ComponentGroupOverlay';
 import styles from './canvas.module.css';
+
+// =============================================================================
+// E2: Common Component 工具函数
+// =============================================================================
+
+/** Common component flowId values that indicate a reusable/generic component */
+const COMMON_FLOW_IDS = new Set(['mock', 'manual', 'common', '__ungrouped__', '']);
+
+/**
+ * E2.1: 推断组件是否为通用组件
+ * 规则：flowId 为 mock/manual/common/空 或 类型为通用组件类型时视为通用组件
+ */
+function inferIsCommon(node: ComponentNode): boolean {
+  // flowId 为通用标识
+  if (COMMON_FLOW_IDS.has(node.flowId) || !node.flowId) {
+    return true;
+  }
+  // 类型为 modal 通常是通用组件
+  if (node.type === 'modal') {
+    return true;
+  }
+  return false;
+}
+
+/** Common component group label */
+const COMMON_GROUP_LABEL = '🔧 通用组件';
+
+/** Common component group color - distinct from regular components */
+const COMMON_GROUP_COLOR = '#8b5cf6'; // purple for common/reusable components
+
+// =============================================================================
+// E1: 分组工具函数 (已扩展支持 E2)
+// =============================================================================
+
+const GROUP_COLOR = '#10b981';
+
+interface ComponentGroup {
+  groupId: string;
+  label: string;
+  color: string;
+  nodes: ComponentNode[];
+  isCommon?: boolean;
+}
+
+/** 从 flowNodes 中查找页面名称，找不到时返回 "未知页面" */
+function getPageLabel(flowId: string, flowNodes: BusinessFlowNode[]): string {
+  if (!flowId || flowId === 'mock' || flowId === 'manual' || flowId === 'common') {
+    return '未知页面';
+  }
+  const found = flowNodes.find((f) => f.nodeId === flowId);
+  return found ? `📄 ${found.name}` : '未知页面';
+}
+
+/**
+ * E2.1: 按 flowId 对组件节点分组，通用组件单独置顶分组
+ * 规则：
+ * - isCommon=true 的组件归入通用组件组（置顶）
+ * - 其他组件按 flowId 分组
+ */
+function groupByFlowId(
+  nodes: ComponentNode[],
+  flowNodes: BusinessFlowNode[]
+): ComponentGroup[] {
+  // E2: Separate common components from page-specific components
+  const commonNodes: ComponentNode[] = [];
+  const pageNodes: ComponentNode[] = [];
+
+  for (const node of nodes) {
+    if (inferIsCommon(node)) {
+      commonNodes.push(node);
+    } else {
+      pageNodes.push(node);
+    }
+  }
+
+  // Build groups for page-specific components
+  const groups: Map<string, ComponentNode[]> = new Map();
+  for (const node of pageNodes) {
+    const key = node.flowId || '__ungrouped__';
+    if (!groups.has(key)) {
+      groups.set(key, []);
+    }
+    groups.get(key)!.push(node);
+  }
+
+  const result: ComponentGroup[] = [];
+
+  // E2: Add common components as first group (pinned to top)
+  if (commonNodes.length > 0) {
+    result.push({
+      groupId: '__common__',
+      label: COMMON_GROUP_LABEL,
+      color: COMMON_GROUP_COLOR,
+      nodes: commonNodes,
+      isCommon: true,
+    });
+  }
+
+  // Add page-specific groups
+  groups.forEach((groupNodes, flowId) => {
+    result.push({
+      groupId: flowId,
+      label: getPageLabel(flowId, flowNodes),
+      color: GROUP_COLOR,
+      nodes: groupNodes,
+      isCommon: false,
+    });
+  });
+
+  // Sort non-common groups: actual flow names first, then unknown pages
+  const nonCommonGroups = result.filter(g => !g.isCommon);
+  nonCommonGroups.sort((a, b) => {
+    const aUnknown = a.label === '未知页面';
+    const bUnknown = b.label === '未知页面';
+    if (aUnknown && !bUnknown) return 1;
+    if (!aUnknown && bUnknown) return -1;
+    return 0;
+  });
+
+  // E2: Common group is already first, so rebuild result
+  return [
+    ...result.filter(g => g.isCommon),
+    ...nonCommonGroups,
+  ];
+}
 
 // =============================================================================
 // Mock AI Component Generation
@@ -359,6 +488,28 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
   const [generating, setGenerating] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
 
+  // E1: Compute groups by flowId
+  const groups = useMemo(
+    () => groupByFlowId(componentNodes, flowNodes),
+    [componentNodes, flowNodes]
+  );
+
+  // E1: Compute SVG overlay bounding boxes (E2: include isCommon for styling)
+  const overlayGroups = useMemo<ComponentGroupBBox[]>(() => {
+    return groups.map((g) => ({
+      groupId: g.groupId,
+      label: g.label,
+      color: g.color,
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      isCommon: g.isCommon,
+    }));
+  }, [groups]);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const handleGenerate = useCallback(async () => {
     if (generating) return;
     setGenerating(true);
@@ -459,23 +610,81 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
         </div>
       )}
 
-      {/* Node List */}
+      {/* Node List — E1: Grouped by flowId */}
       <div
+        ref={containerRef}
         className={styles.componentNodeList}
         role="list"
         aria-label="组件节点列表"
+        style={{ position: 'relative' }}
       >
         {hasNodes ? (
-          componentNodes.map((node) => (
-            <ComponentCard
-              key={node.nodeId}
-              node={node}
-              onConfirm={confirmComponentNode}
-              onEdit={editComponentNode}
-              onDelete={deleteComponentNode}
-              readonly={readonly}
-            />
-          ))
+          <>
+            {/* E1: SVG dashed border overlay */}
+            {groups.length > 0 && (
+              <ComponentGroupOverlay
+                containerRef={containerRef}
+                groups={overlayGroups}
+                strokeColor={GROUP_COLOR}
+              />
+            )}
+
+            {/* E1: Render each group (E2: common group pinned to top) */}
+            {groups.map((group) => (
+              <div
+                key={group.groupId}
+                data-component-group-wrapper="true"
+                data-is-common={group.isCommon ? 'true' : 'false'}
+                className={styles.componentGroup}
+                role="group"
+                aria-label={group.label}
+                style={{
+                  borderColor: group.color,
+                  backgroundColor: `${group.color}08`,
+                }}
+              >
+                {/* Group label (E2: add data-is-common for styling) */}
+                <div
+                  className={styles.componentGroupLabel}
+                  data-group-label={group.label}
+                  data-is-common={group.isCommon ? 'true' : 'false'}
+                  style={{
+                    color: group.color,
+                    borderColor: group.color,
+                    backgroundColor: `${group.color}15`,
+                  }}
+                >
+                  {group.label}
+                  <span
+                    style={{
+                      marginLeft: '6px',
+                      opacity: 0.6,
+                      fontSize: '10px',
+                    }}
+                  >
+                    ({group.nodes.length})
+                  </span>
+                </div>
+
+                {/* Grouped node cards */}
+                <div
+                  className={styles.componentGroupCards}
+                  data-component-group={group.groupId}
+                >
+                  {group.nodes.map((node) => (
+                    <ComponentCard
+                      key={node.nodeId}
+                      node={node}
+                      onConfirm={confirmComponentNode}
+                      onEdit={editComponentNode}
+                      onDelete={deleteComponentNode}
+                      readonly={readonly}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </>
         ) : (
           <div className={styles.contextTreeEmpty}>
             <span className={styles.emptyIcon}>▣</span>

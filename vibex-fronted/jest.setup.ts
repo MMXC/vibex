@@ -119,3 +119,11 @@ jest.mock('react-resizable-panels', () => {
     ImperativePanelHandle: {},
   };
 });
+
+// Mock ResizeObserver (not available in jsdom by default — used by ComponentGroupOverlay)
+class MockResizeObserver {
+  observe = jest.fn();
+  unobserve = jest.fn();
+  disconnect = jest.fn();
+}
+(global as unknown as { ResizeObserver: typeof ResizeObserver }).ResizeObserver = MockResizeObserver;

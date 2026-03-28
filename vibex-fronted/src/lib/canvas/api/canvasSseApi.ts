@@ -1,14 +1,14 @@
 /**
  * canvasSseApi.ts — Canvas SSE AI Client
  *
- * 调用后端 SSE 流式 API `/api/v1/canvas/stream`
+ * 调用后端 SSE 流式 API，通过 api-config.ts 获取端点 `/api/v1/canvas/stream`
  * 实时接收 thinking / step_context / done / error 事件
  *
  * Canvas API 标准化 Epic 2 (vibex-canvas-api-standardization)
  */
 'use client';
 
-import { getApiUrl } from '@/lib/api-config';
+import { getApiUrl, API_CONFIG } from '@/lib/api-config';
 
 // =============================================================================
 // Types
@@ -122,7 +122,7 @@ export async function canvasSseAnalyze(
     : controller.signal;
 
   try {
-    const url = getApiUrl(`/v1/canvas/stream?requirement=${encodeURIComponent(requirementText)}`);
+    const url = getApiUrl(`${API_CONFIG.endpoints.canvas.stream}?requirement=${encodeURIComponent(requirementText)}`);
 
     const res = await fetch(url, {
       method: 'GET',

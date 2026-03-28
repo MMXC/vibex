@@ -18,6 +18,9 @@ ENVIRONMENT = "production"
 # - MINIMAX_API_KEY
 # - MINIMAX_API_BASE
 # - MINIMAX_MODEL
+# - DOUBAO_API_KEY
+# - DOUBAO_API_BASE (可选，默认 https://ark.cn-beijing.volces.com/api/coding/v3)
+# - DOUBAO_MODEL (可选，默认 Doubao-Seed-2.0-pro)
 
 # 自定义域名
 [[routes]]

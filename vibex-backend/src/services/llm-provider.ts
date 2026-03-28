@@ -23,7 +23,7 @@ import { CloudflareEnv } from '../lib/env';
 /**
  * Supported LLM providers
  */
-export type LLMProviderType = 'minimax' | 'openai' | 'anthropic' | 'custom';
+export type LLMProviderType = 'minimax' | 'openai' | 'anthropic' | 'doubao' | 'custom';
 
 /**
  * Message role types for LLM conversations
@@ -226,6 +226,16 @@ const DEFAULT_PROVIDERS: Record<string, Partial<ProviderConfig>> = {
     retryAttempts: 3,
     priority: 3,
   },
+  doubao: {
+    type: 'doubao',
+    apiBase: 'https://ark.cn-beijing.volces.com/api/coding/v3',
+    defaultModel: 'Doubao-Seed-2.0-pro',
+    models: ['Doubao-Seed-2.0-pro', 'Doubao-pro-32k'],
+    maxTokens: 8192,
+    timeout: 60000,
+    retryAttempts: 3,
+    priority: 4,
+  },
 };
 
 // ==================== LLM Provider Class ====================
@@ -281,6 +291,19 @@ export class LLMProviderService {
         apiKey: anthropicKey,
         apiBase: this.env.ANTHROPIC_API_BASE || DEFAULT_PROVIDERS.anthropic.apiBase!,
         defaultModel: this.env.ANTHROPIC_MODEL || DEFAULT_PROVIDERS.anthropic.defaultModel!,
+        enabled: true,
+      } as ProviderConfig);
+    }
+
+    // Doubao (火山方舟/Volcano Ark) — fallback model for coding tasks
+    const doubaoKey = this.env.DOUBAO_API_KEY;
+    if (doubaoKey) {
+      this.registerProvider({
+        ...DEFAULT_PROVIDERS.doubao,
+        type: 'doubao',
+        apiKey: doubaoKey,
+        apiBase: this.env.DOUBAO_API_BASE || DEFAULT_PROVIDERS.doubao.apiBase!,
+        defaultModel: this.env.DOUBAO_MODEL || DEFAULT_PROVIDERS.doubao.defaultModel!,
         enabled: true,
       } as ProviderConfig);
     }

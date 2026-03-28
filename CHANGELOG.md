@@ -1,3 +1,9 @@
+### Added (agent-self-evolution-20260328 Epic5: DAG Topological Sort) — 2026-03-28
+- **F5.1**: `scripts/topological_sort.py` — Kahn's algorithm实现，117行，14个测试全部通过
+- **F5.2**: `scripts/task_manager.py list --topo` — 按拓扑序输出任务
+- **F5.3**: 环检测保护 — 环检测时返回 None，回退到字母序
+- Review: `docs/agent-self-evolution-20260328/docs/review-epic5-topological-sort.md`
+
 ### Added (agent-self-evolution-20260328 Epic4: Analysis.md Template Standardization) — 2026-03-28
 - **F4.1**: `docs/analysis-template.md` — 标准 6 节分析文档模板
   - 问题定义、业务场景、JTBD 分析（3-5条）、技术方案对比（≥2）、验收标准（≥4）、风险识别

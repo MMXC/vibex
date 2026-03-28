@@ -1,3 +1,14 @@
+### Added (vibex-canvas-api-standardization Epic3: 删除旧路由 /api/canvas/*) — 2026-03-29
+- **Epic3**: 删除已废弃的旧路由目录及 Express/Hono 路由注册
+  - 删除旧路由 `vibex-backend/src/app/api/canvas/`（7 个端点: export, generate-components, generate-contexts, generate-flows, generate, project, status）
+  - 删除 Express/Hono 路由 `src/routes/canvas-generate-components.ts`
+  - 清理 `src/index.ts` 中的 canvasGenerateComponents 注册（导入和路由注册）
+  - 保留 v1 路由: `src/app/api/v1/canvas/*` 和 `src/routes/v1/canvas/index.ts`（正常运行）
+  - 前置: Epic1 tester 确认前端无旧路由运行时调用；canvasApi.ts JSDoc 已更新为 v1 路径
+  - 测试: 502 错误验证通过
+  - 提交: `51e87297`
+  - 审查: ✅ PASSED (reviewer-epic3-oldroute-delete)
+
 ### Added (vibex-canvas-api-standardization Epic1: Canvas API 路由标准化 /api/v1/canvas) — 2026-03-29
 - **Epic1 F1 (API Route Standardization)**: Canvas API 路由从 `/api/canvas/*` 迁移到 `/api/v1/canvas/*`
   - 新增 v1 路由目录 `vibex-backend/src/app/api/v1/canvas/`（7 个端点）

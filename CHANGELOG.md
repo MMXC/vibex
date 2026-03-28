@@ -1,3 +1,11 @@
+### Added (team-evolution-20260328 Epic1: Agent Self-Score 机制) — 2026-03-28
+- **Epic1 Phase1-SelfScore**: self-score-hook.sh — agent 端自动自我评分
+  - `scripts/heartbeats/self-score-hook.sh`: 9维关键词评分，从 phase 文件结构推断各维度得分（格式/完整度/约束/耗时/可行性/可读/可理解/详细程度/正确性）
+  - 6/6 agent HEARTBEAT.md task_done hook 已配置（analyst/pm/architect/dev/tester/reviewer）
+  - `docs/team-evolution-20260328/test-phase.md`: E2E 测试用 phase 文件
+  - `scores.tsv`: rater=self 记录正常写入，E2E 验证 7.9/10
+  - Review: `docs/team-evolution-20260328/`
+
 ### Added (vibex-doc-fix-20260328 Epic1: API Contract 重建) — 2026-03-28
 - **Epic1**: 重建 `docs/api-contract.yaml`（14 → 147 端点）
   - OpenAPI 3.0.3 规范，YAML 格式验证通过，0 敏感信息泄露

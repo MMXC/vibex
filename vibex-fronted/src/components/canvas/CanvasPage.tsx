@@ -47,6 +47,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const toggleFlowPanel = useCanvasStore((s) => s.toggleFlowPanel);
   const toggleComponentPanel = useCanvasStore((s) => s.toggleComponentPanel);
   const loadExampleData = useCanvasStore((s) => s.loadExampleData);
+  const autoGenerateFlows = useCanvasStore((s) => s.autoGenerateFlows);
+  const flowGenerating = useCanvasStore((s) => s.flowGenerating);
+  const flowGeneratingMessage = useCanvasStore((s) => s.flowGeneratingMessage);
 
   // === Expand State Selectors (E2) ===
   const gridRef = useRef<HTMLDivElement>(null);
@@ -75,6 +78,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const aiThinkingMessage = useCanvasStore((s) => s.aiThinkingMessage);
   const generateContexts = useCanvasStore((s) => s.generateContextsFromRequirement);
   const setRequirementText = useCanvasStore((s) => s.setRequirementText);
+  const requirementText = useCanvasStore((s) => s.requirementText);
 
   // === Compute confirmation states ===
   const contextReady = areAllConfirmed(contextNodes);
@@ -174,6 +178,34 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             collapsed={contextPanelCollapsed}
             isActive={contextActive}
             onToggleCollapse={toggleContextPanel}
+            actions={
+              contextNodes.length > 0 ? (
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    className={styles.secondaryButton}
+                    onClick={() => autoGenerateFlows(contextNodes)}
+                    disabled={flowGenerating}
+                    aria-label="生成流程树"
+                    title="基于已确认的限界上下文生成业务流程树"
+                  >
+                    {flowGenerating
+                      ? `◌ ${flowGeneratingMessage ?? '生成中...'}`
+                      : '→ 继续 → 流程树'}
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.secondaryButton}
+                    onClick={() => generateContexts(requirementText)}
+                    disabled={aiThinking || !requirementText.trim()}
+                    aria-label="重新生成限界上下文"
+                    title="使用当前需求文本重新生成上下文"
+                  >
+                    {aiThinking ? '◌ 重新生成中...' : '🔄 重新生成'}
+                  </button>
+                </div>
+              ) : undefined
+            }
           >
             <BoundedContextTree />
           </TreePanel>
@@ -283,6 +315,20 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 collapsed={contextPanelCollapsed}
                 isActive={contextActive}
                 onToggleCollapse={toggleContextPanel}
+                actions={
+                  contextNodes.length > 0 ? (
+                    <button
+                      type="button"
+                      className={styles.secondaryButton}
+                      onClick={() => generateContexts(requirementText)}
+                      disabled={aiThinking || !requirementText.trim()}
+                      aria-label="重新生成限界上下文"
+                      title="使用当前需求文本重新生成上下文"
+                    >
+                      {aiThinking ? '◌ 重新生成中...' : '🔄 重新生成'}
+                    </button>
+                  ) : undefined
+                }
               >
                 <HoverHotzone position="left-edge" panel="left" />
                 <BoundedContextTree />

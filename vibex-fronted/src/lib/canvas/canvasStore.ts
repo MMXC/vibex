@@ -26,6 +26,7 @@ import type {
 } from './types';
 
 import exampleCanvasData from '@/data/example-canvas.json';
+import { canvasApi } from './api/canvasApi';
 
 // =============================================================================
 // Helpers
@@ -167,6 +168,10 @@ interface CanvasStore {
   aiThinkingMessage: string | null;
   requirementText: string;
 
+  // === Flow Generation Slice ===
+  flowGenerating: boolean;
+  flowGeneratingMessage: string | null;
+
   // === Phase Actions ===
   setPhase: (phase: Phase) => void;
   advancePhase: () => void;
@@ -198,7 +203,7 @@ interface CanvasStore {
   deleteStep: (flowNodeId: string, stepId: string) => void;
   reorderSteps: (flowNodeId: string, fromIndex: number, toIndex: number) => void;
   // === Auto-generation (Epic 3) ===
-  autoGenerateFlows: (contexts: BoundedContextNode[]) => void;
+  autoGenerateFlows: (contexts: BoundedContextNode[]) => Promise<void>;
 
   // === Example Data (F-1.2) ===
   /** Load example canvas data — sets all three trees + advances phase to context */
@@ -224,6 +229,9 @@ interface CanvasStore {
   setAiThinking: (thinking: boolean, message?: string | null) => void;
   setRequirementText: (text: string) => void;
   generateContextsFromRequirement: (text: string) => Promise<void>;
+
+  // === Flow Generation Actions ===
+  setFlowGenerating: (generating: boolean, message?: string | null) => void;
 
   // === Cascade Actions ===
   cascadeContextChange: (nodeId: string) => void;
@@ -277,6 +285,10 @@ export const useCanvasStore = create<CanvasStore>()(
           aiThinking: false,
           aiThinkingMessage: null,
           requirementText: '',
+
+          // === Flow Generation Slice ===
+          flowGenerating: false,
+          flowGeneratingMessage: null,
 
           // === Phase Actions ===
           setPhase: (phase) => {
@@ -509,21 +521,57 @@ export const useCanvasStore = create<CanvasStore>()(
           },
 
           // === Auto-generation (Epic 3 S3.1) ===
-          autoGenerateFlows: (contexts) => {
-            const flows: BusinessFlowNode[] = contexts.map((ctx) => ({
-              nodeId: generateId(),
-              contextId: ctx.nodeId,
-              name: `${ctx.name}业务流程`,
-              steps: [
-                { stepId: generateId(), name: '需求收集', actor: '用户', description: `收集${ctx.name}相关需求`, order: 0, confirmed: false, status: 'pending' },
-                { stepId: generateId(), name: '数据处理', actor: '系统', description: `处理${ctx.name}核心数据`, order: 1, confirmed: false, status: 'pending' },
-                { stepId: generateId(), name: '结果输出', actor: '系统', description: `输出${ctx.name}处理结果`, order: 2, confirmed: false, status: 'pending' },
-              ],
-              confirmed: false,
-              status: 'pending',
-              children: [],
-            }));
-            set({ flowNodes: flows });
+          autoGenerateFlows: async (contexts) => {
+            const { setFlowGenerating, setPhase } = get();
+
+            setFlowGenerating(true, '正在生成流程树...');
+
+            try {
+              const { projectId } = get();
+              const sessionId = projectId ?? `session-${Date.now()}`;
+
+              // Map context nodes to API format (user-edited data)
+              const mappedContexts = contexts.map((ctx) => ({
+                id: ctx.nodeId,
+                name: ctx.name,
+                description: ctx.description ?? '',
+                type: ctx.type,
+              }));
+
+              const result = await canvasApi.generateFlows({
+                contexts: mappedContexts,
+                sessionId,
+              });
+
+              if (result.success && result.flows && result.flows.length > 0) {
+                const flows: BusinessFlowNode[] = result.flows.map((f) => ({
+                  nodeId: generateId(),
+                  contextId: f.contextId,
+                  name: f.name,
+                  steps: f.steps.map((step, idx) => ({
+                    stepId: generateId(),
+                    name: step.name,
+                    actor: step.actor,
+                    description: step.description,
+                    order: step.order ?? idx,
+                    confirmed: false,
+                    status: 'pending' as const,
+                  })),
+                  confirmed: false,
+                  status: 'pending' as const,
+                  children: [],
+                }));
+
+                set({ flowNodes: flows });
+                setPhase('flow');
+              } else {
+                console.error('[canvasStore] generateFlows: API returned no flows', result.error);
+              }
+            } catch (err) {
+              console.error('[canvasStore] autoGenerateFlows error:', err);
+            } finally {
+              setFlowGenerating(false, null);
+            }
           },
 
           // === Example Data (F-1.2) ===
@@ -599,6 +647,8 @@ export const useCanvasStore = create<CanvasStore>()(
 
           // === AI Thinking Actions (Epic 1) ===
           setAiThinking: (thinking, message = null) => set({ aiThinking: thinking, aiThinkingMessage: message }),
+
+          setFlowGenerating: (generating, message = null) => set({ flowGenerating: generating, flowGeneratingMessage: message }),
 
           setRequirementText: (text) => set({ requirementText: text }),
 

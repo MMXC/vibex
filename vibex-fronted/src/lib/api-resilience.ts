@@ -53,6 +53,17 @@ export function createResilientClient(config: ResilientClientConfig = {}): Axios
     headers: { 'Content-Type': 'application/json' },
   });
 
+  // 添加认证拦截器
+  instance.interceptors.request.use((config) => {
+    const token = typeof window !== 'undefined'
+      ? sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token')
+      : null;
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  });
+
   // 配置重试
   if (config.retry?.enabled !== false) {
     configureAxiosRetry(instance, {

@@ -97,11 +97,22 @@ export interface OptimizeResponse {
   error?: string
 }
 
-// API Client - 使用统一的 API 配置
+// API Client - 使用统一的 API 配置 + 认证拦截器
 const api = axios.create({
   baseURL: API_CONFIG.baseURL,
   timeout: 30000,
 })
+
+// 添加认证拦截器
+api.interceptors.request.use((config) => {
+  const token = typeof window !== 'undefined'
+    ? sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token')
+    : null;
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+});
 
 /**
  * Analyze requirement quality

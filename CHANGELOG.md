@@ -1,3 +1,11 @@
+### Added (vibex-doc-fix-20260328 Epic1: API Contract 重建) — 2026-03-28
+- **Epic1**: 重建 `docs/api-contract.yaml`（14 → 147 端点）
+  - OpenAPI 3.0.3 规范，YAML 格式验证通过，0 敏感信息泄露
+  - 端点: 147 个（BackendOnly 33 + Deprecated v1 28 + 业务 86）
+  - Tag 分组: 18 个（Auth/Projects/Requirements/DDD/Design/Flows/...）
+  - Schema: 55 个，含完整 Request/Response 类型
+  - Review: `docs/vibex-doc-fix-20260328/review-epic1.md`
+
 ### Added (vibex-doc-fix-20260328 Epic2: 废弃文档归档) — 2026-03-28
 - **Epic2**: 归档 886 个废弃文档到 `docs/archive/202603-stale/`
   - 归档范围: 历史项目文档（homepage、domain-model、api-fixes、security、test-infra 等 10 个类别）

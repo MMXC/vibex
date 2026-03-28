@@ -27,6 +27,7 @@ import type {
 
 import exampleCanvasData from '@/data/example-canvas.json';
 import { canvasApi } from './api/canvasApi';
+import { getHistoryStore } from './historySlice';
 
 // =============================================================================
 // Helpers
@@ -379,20 +380,30 @@ export const useCanvasStore = create<CanvasStore>()(
               status: 'pending',
               children: [],
             };
-            set((s) => ({ contextNodes: [...s.contextNodes, { ...newNode }] }));
+            set((s) => {
+              const newNodes = [...s.contextNodes, { ...newNode }];
+              getHistoryStore().recordSnapshot('context', newNodes);
+              return { contextNodes: newNodes };
+            });
           },
 
           editContextNode: (nodeId, data) => {
-            set((s) => ({
-              contextNodes: s.contextNodes.map((n) =>
+            set((s) => {
+              const newNodes = s.contextNodes.map((n) =>
                 n.nodeId === nodeId ? { ...n, ...data, status: 'pending' as const } : n
-              ),
-            }));
+              );
+              getHistoryStore().recordSnapshot('context', newNodes);
+              return { contextNodes: newNodes };
+            });
             get().cascadeContextChange(nodeId);
           },
 
           deleteContextNode: (nodeId) => {
-            set((s) => ({ contextNodes: s.contextNodes.filter((n) => n.nodeId !== nodeId) }));
+            set((s) => {
+              const newNodes = s.contextNodes.filter((n) => n.nodeId !== nodeId);
+              getHistoryStore().recordSnapshot('context', newNodes);
+              return { contextNodes: newNodes };
+            });
             get().cascadeContextChange(nodeId);
           },
 
@@ -401,6 +412,7 @@ export const useCanvasStore = create<CanvasStore>()(
               n.nodeId === nodeId ? { ...n, confirmed: true, status: 'confirmed' as const } : n
             );
             set({ contextNodes: newContextNodes });
+            getHistoryStore().recordSnapshot('context', newContextNodes);
             // Cascade: context confirmed → downstream trees may activate
             get().recomputeActiveTree();
             // Epic 3 S3.1: auto-generate flow tree when ALL contexts confirmed
@@ -431,29 +443,41 @@ export const useCanvasStore = create<CanvasStore>()(
               status: 'pending',
               children: [],
             };
-            set((s) => ({ flowNodes: [...s.flowNodes, newNode] }));
+            set((s) => {
+              const newNodes = [...s.flowNodes, newNode];
+              getHistoryStore().recordSnapshot('flow', newNodes);
+              return { flowNodes: newNodes };
+            });
           },
 
           editFlowNode: (nodeId, data) => {
-            set((s) => ({
-              flowNodes: s.flowNodes.map((n) =>
+            set((s) => {
+              const newNodes = s.flowNodes.map((n) =>
                 n.nodeId === nodeId ? { ...n, ...data, status: 'pending' as const } : n
-              ),
-            }));
+              );
+              getHistoryStore().recordSnapshot('flow', newNodes);
+              return { flowNodes: newNodes };
+            });
             get().cascadeFlowChange(nodeId);
           },
 
           deleteFlowNode: (nodeId) => {
-            set((s) => ({ flowNodes: s.flowNodes.filter((n) => n.nodeId !== nodeId) }));
+            set((s) => {
+              const newNodes = s.flowNodes.filter((n) => n.nodeId !== nodeId);
+              getHistoryStore().recordSnapshot('flow', newNodes);
+              return { flowNodes: newNodes };
+            });
             get().cascadeFlowChange(nodeId);
           },
 
           confirmFlowNode: (nodeId) => {
-            set((s) => ({
-              flowNodes: s.flowNodes.map((n) =>
+            set((s) => {
+              const newNodes = s.flowNodes.map((n) =>
                 n.nodeId === nodeId ? { ...n, confirmed: true, status: 'confirmed' as const } : n
-              ),
-            }));
+              );
+              getHistoryStore().recordSnapshot('flow', newNodes);
+              return { flowNodes: newNodes };
+            });
             get().recomputeActiveTree();
           },
 
@@ -461,8 +485,8 @@ export const useCanvasStore = create<CanvasStore>()(
 
           // === Step Actions (Epic 3) ===
           addStepToFlow: (flowNodeId, data) => {
-            set((s) => ({
-              flowNodes: s.flowNodes.map((n) => {
+            set((s) => {
+              const newNodes = s.flowNodes.map((n) => {
                 if (n.nodeId !== flowNodeId) return n;
                 const newStep: FlowStep = {
                   stepId: generateId(),
@@ -478,8 +502,10 @@ export const useCanvasStore = create<CanvasStore>()(
                   steps: [...n.steps, newStep],
                   status: 'pending' as const,
                 };
-              }),
-            }));
+              });
+              getHistoryStore().recordSnapshot('flow', newNodes);
+              return { flowNodes: newNodes };
+            });
           },
 
           confirmStep: (flowNodeId, stepId) => {
@@ -500,8 +526,8 @@ export const useCanvasStore = create<CanvasStore>()(
           },
 
           editStep: (flowNodeId, stepId, data) => {
-            set((s) => ({
-              flowNodes: s.flowNodes.map((n) =>
+            set((s) => {
+              const newNodes = s.flowNodes.map((n) =>
                 n.nodeId === flowNodeId
                   ? {
                       ...n,
@@ -511,29 +537,31 @@ export const useCanvasStore = create<CanvasStore>()(
                       ),
                     }
                   : n
-              ),
-            }));
+              );
+              getHistoryStore().recordSnapshot('flow', newNodes);
+              return { flowNodes: newNodes };
+            });
             get().cascadeFlowChange(flowNodeId);
           },
 
           deleteStep: (flowNodeId, stepId) => {
-            set((s) => ({
-              flowNodes: s.flowNodes.map((n) =>
+            set((s) => {
+              const newNodes = s.flowNodes.map((n) =>
                 n.nodeId === flowNodeId
                   ? { ...n, steps: n.steps.filter((st) => st.stepId !== stepId) }
                   : n
-              ),
-            }));
+              );
+              getHistoryStore().recordSnapshot('flow', newNodes);
+              return { flowNodes: newNodes };
+            });
           },
 
           reorderSteps: (flowNodeId, fromIndex, toIndex) => {
-            set((s) => ({
-              flowNodes: s.flowNodes.map((n) => {
+            set((s) => {
+              const newNodes = s.flowNodes.map((n) => {
                 if (n.nodeId !== flowNodeId) return n;
                 const steps = [...n.steps];
                 const [moved] = steps.splice(fromIndex, 1);
-                // Insert before toIndex (splice inserts AT the index, so use toIndex - 1
-                // so that moved ends up in the position where toIndex currently is)
                 const insertAt = fromIndex < toIndex ? toIndex - 1 : toIndex;
                 steps.splice(insertAt, 0, moved);
                 return {
@@ -541,8 +569,10 @@ export const useCanvasStore = create<CanvasStore>()(
                   steps: steps.map((st, i) => ({ ...st, order: i })),
                   status: 'pending' as const,
                 };
-              }),
-            }));
+              });
+              getHistoryStore().recordSnapshot('flow', newNodes);
+              return { flowNodes: newNodes };
+            });
             get().cascadeFlowChange(flowNodeId);
           },
 
@@ -615,6 +645,8 @@ export const useCanvasStore = create<CanvasStore>()(
               activeTree: 'flow',
               _prevActiveTree: s.activeTree,
             }));
+            // Initialize history for all three trees with example data
+            getHistoryStore().initAllHistories(data.contextNodes, data.flowNodes, data.componentNodes);
           },
 
           // === Component Slice Actions ===
@@ -628,27 +660,39 @@ export const useCanvasStore = create<CanvasStore>()(
               confirmed: false,
               children: [],
             };
-            set((s) => ({ componentNodes: [...s.componentNodes, newNode] }));
+            set((s) => {
+              const newNodes = [...s.componentNodes, newNode];
+              getHistoryStore().recordSnapshot('component', newNodes);
+              return { componentNodes: newNodes };
+            });
           },
 
           editComponentNode: (nodeId, data) => {
-            set((s) => ({
-              componentNodes: s.componentNodes.map((n) =>
+            set((s) => {
+              const newNodes = s.componentNodes.map((n) =>
                 n.nodeId === nodeId ? { ...n, ...data, status: 'pending' as const } : n
-              ),
-            }));
+              );
+              getHistoryStore().recordSnapshot('component', newNodes);
+              return { componentNodes: newNodes };
+            });
           },
 
           deleteComponentNode: (nodeId) => {
-            set((s) => ({ componentNodes: s.componentNodes.filter((n) => n.nodeId !== nodeId) }));
+            set((s) => {
+              const newNodes = s.componentNodes.filter((n) => n.nodeId !== nodeId);
+              getHistoryStore().recordSnapshot('component', newNodes);
+              return { componentNodes: newNodes };
+            });
           },
 
           confirmComponentNode: (nodeId) => {
-            set((s) => ({
-              componentNodes: s.componentNodes.map((n) =>
+            set((s) => {
+              const newNodes = s.componentNodes.map((n) =>
                 n.nodeId === nodeId ? { ...n, confirmed: true, status: 'confirmed' as const } : n
-              ),
-            }));
+              );
+              getHistoryStore().recordSnapshot('component', newNodes);
+              return { componentNodes: newNodes };
+            });
           },
 
           setComponentDraft: (draft) => set({ componentDraft: draft }),

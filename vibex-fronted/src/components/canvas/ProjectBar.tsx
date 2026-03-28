@@ -9,11 +9,13 @@
  */
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import { areAllConfirmed } from '@/lib/canvas/cascade';
 import type { CreateProjectInput, PrototypePage } from '@/lib/canvas/types';
+import { getHistoryStore } from '@/lib/canvas/historySlice';
+import { UndoRedoButtons } from './CanvasToolbar';
 import styles from './canvas.module.css';
 
 interface ProjectBarProps {
@@ -35,6 +37,49 @@ export function ProjectBar({ projectName = '未命名项目', onProjectNameChang
 
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+
+  // === Undo/Redo handlers (Epic1 F1.3) ===
+  const handleUndo = useCallback(() => {
+    const historyStore = getHistoryStore();
+    const canvasStore = useCanvasStore.getState();
+
+    // Priority: context > flow > component
+    if (historyStore.canUndo('context')) {
+      const prev = historyStore.undo('context');
+      if (prev) canvasStore.setContextNodes(prev as typeof canvasStore.contextNodes);
+      return;
+    }
+    if (historyStore.canUndo('flow')) {
+      const prev = historyStore.undo('flow');
+      if (prev) canvasStore.setFlowNodes(prev as typeof canvasStore.flowNodes);
+      return;
+    }
+    if (historyStore.canUndo('component')) {
+      const prev = historyStore.undo('component');
+      if (prev) canvasStore.setComponentNodes(prev as typeof canvasStore.componentNodes);
+    }
+  }, []);
+
+  const handleRedo = useCallback(() => {
+    const historyStore = getHistoryStore();
+    const canvasStore = useCanvasStore.getState();
+
+    // Priority: context > flow > component
+    if (historyStore.canRedo('context')) {
+      const next = historyStore.redo('context');
+      if (next) canvasStore.setContextNodes(next as typeof canvasStore.contextNodes);
+      return;
+    }
+    if (historyStore.canRedo('flow')) {
+      const next = historyStore.redo('flow');
+      if (next) canvasStore.setFlowNodes(next as typeof canvasStore.flowNodes);
+      return;
+    }
+    if (historyStore.canRedo('component')) {
+      const next = historyStore.redo('component');
+      if (next) canvasStore.setComponentNodes(next as typeof canvasStore.componentNodes);
+    }
+  }, []);
 
   const allConfirmed = areAllConfirmed(contextNodes) && areAllConfirmed(flowNodes) && areAllConfirmed(componentNodes)
     && contextNodes.length > 0 && flowNodes.length > 0 && componentNodes.length > 0;
@@ -123,6 +168,9 @@ export function ProjectBar({ projectName = '未命名项目', onProjectNameChang
           🚀 {doneCount}/{totalCount} 原型完成
         </span>
       )}
+
+      {/* Epic1 F1.3: Undo/Redo buttons */}
+      <UndoRedoButtons onUndo={handleUndo} onRedo={handleRedo} />
 
       {/* Create Project button */}
       <button

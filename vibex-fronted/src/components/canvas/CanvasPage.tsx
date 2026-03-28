@@ -16,6 +16,8 @@ import React, { useMemo, useState, useRef, useEffect, useCallback } from 'react'
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { areAllConfirmed } from '@/lib/canvas/cascade';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
+import { getHistoryStore } from '@/lib/canvas/historySlice';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { PhaseProgressBar } from './PhaseProgressBar';
 import { TreeStatus } from './TreeStatus';
 import { TreePanel } from './TreePanel';
@@ -25,6 +27,7 @@ import { BusinessFlowTree } from './BusinessFlowTree';
 import { ProjectBar } from './ProjectBar';
 import { PrototypeQueuePanel } from './PrototypeQueuePanel';
 import { HoverHotzone } from './HoverHotzone';
+import { ShortcutHintPanel } from './features/ShortcutHintPanel';
 import type { Phase, TreeType, TreeNode } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
 
@@ -92,6 +95,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const [projectName, setProjectName] = useState('我的项目');
   const [queuePanelExpanded, setQueuePanelExpanded] = useState(true);
   const [requirementInput, setRequirementInput] = useState('');
+  const [isShortcutPanelOpen, setIsShortcutPanelOpen] = useState(false);
 
   // === AI Thinking State (Epic 1) ===
   const aiThinking = useCanvasStore((s) => s.aiThinking);
@@ -104,6 +108,76 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const [componentGenerating, setComponentGenerating] = useState(false);
   const projectId = useCanvasStore((s) => s.projectId);
   const setComponentNodes = useCanvasStore((s) => s.setComponentNodes);
+
+  // === Epic1 F1.2: Keyboard shortcuts for Undo/Redo ===
+  const handleKeyboardUndo = useCallback((): boolean => {
+    const historyStore = getHistoryStore();
+    const canvasStore = useCanvasStore.getState();
+    if (historyStore.canUndo('context')) {
+      const prev = historyStore.undo('context');
+      if (prev) { canvasStore.setContextNodes(prev as typeof canvasStore.contextNodes); return true; }
+    }
+    if (historyStore.canUndo('flow')) {
+      const prev = historyStore.undo('flow');
+      if (prev) { canvasStore.setFlowNodes(prev as typeof canvasStore.flowNodes); return true; }
+    }
+    if (historyStore.canUndo('component')) {
+      const prev = historyStore.undo('component');
+      if (prev) { canvasStore.setComponentNodes(prev as typeof canvasStore.componentNodes); return true; }
+    }
+    return false;
+  }, []);
+
+  const handleKeyboardRedo = useCallback((): boolean => {
+    const historyStore = getHistoryStore();
+    const canvasStore = useCanvasStore.getState();
+    if (historyStore.canRedo('context')) {
+      const next = historyStore.redo('context');
+      if (next) { canvasStore.setContextNodes(next as typeof canvasStore.contextNodes); return true; }
+    }
+    if (historyStore.canRedo('flow')) {
+      const next = historyStore.redo('flow');
+      if (next) { canvasStore.setFlowNodes(next as typeof canvasStore.flowNodes); return true; }
+    }
+    if (historyStore.canRedo('component')) {
+      const next = historyStore.redo('component');
+      if (next) { canvasStore.setComponentNodes(next as typeof canvasStore.componentNodes); return true; }
+    }
+    return false;
+  }, []);
+
+  useKeyboardShortcuts({
+    undo: handleKeyboardUndo,
+    redo: handleKeyboardRedo,
+    enabled: phase !== 'input',
+  });
+
+  // === Epic1 F1.6: ? key toggles ShortcutHintPanel ===
+  const toggleShortcutPanel = useCallback(() => {
+    setIsShortcutPanelOpen((v) => !v);
+  }, []);
+
+  useEffect(() => {
+    function handler(e: KeyboardEvent) {
+      // Only trigger ? key when not in an input field
+      if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+        const target = e.target as HTMLElement;
+        const tagName = target.tagName;
+        if (tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT') return;
+        if (target.getAttribute('contenteditable') === 'true') return;
+        const role = target.getAttribute('role');
+        if (role === 'textbox' || role === 'searchbox' || role === 'combobox') return;
+        e.preventDefault();
+        toggleShortcutPanel();
+      }
+      // Esc closes the shortcut panel
+      if (e.key === 'Escape' && isShortcutPanelOpen) {
+        setIsShortcutPanelOpen(false);
+      }
+    }
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [toggleShortcutPanel, isShortcutPanelOpen]);
 
   // Bug4b: 继续 → 组件树 handler
   const handleContinueToComponents = useCallback(async () => {
@@ -569,6 +643,12 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
           </div>
         </div>
       )}
+
+      {/* Epic1 F1.6: ShortcutHintPanel */}
+      <ShortcutHintPanel
+        open={isShortcutPanelOpen}
+        onClose={() => setIsShortcutPanelOpen(false)}
+      />
     </div>
   );
 }

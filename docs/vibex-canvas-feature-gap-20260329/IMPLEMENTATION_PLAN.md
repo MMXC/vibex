@@ -1,437 +1,451 @@
-# VibeX 画布功能补全 — 实施计划
+# IMPLEMENTATION_PLAN.md — VibeX Canvas Feature Gap
 
-**项目**: vibex-canvas-feature-gap-20260329
-**日期**: 2026-03-29
-**作者**: architect agent
-**工作目录**: /root/.openclaw/vibex
-
----
-
-## 1. 概述
-
-基于 `analysis.md` 的功能差距分析，本计划覆盖 **5 个核心功能模块** 的实现，按优先级排序：
-
-| 优先级 | 功能模块 | 工时 | 价值 |
-|--------|---------|------|------|
-| P0 | Undo/Redo（历史管理） | 6-8h | 创作工具核心需求 |
-| P1 | 键盘快捷键 | 4-6h | 效率提升 |
-| P1 | 节点搜索 | 4-6h | 大型项目刚需 |
-| P1 | MiniMap 导航 | 2-3h | 画布导航 |
-| P2 | 导出图片/JSON | 4-6h | 用户分享需求 |
-
-**总工时**: 20-29h（约 4-5 人天）
-**推荐团队**: 1 dev，1 tester，1 reviewer
+> **项目**: vibex-canvas-feature-gap-20260329  
+> **版本**: v1.0.0  
+> **日期**: 2026-03-29  
+> **Owner**: architect agent  
+> **工作目录**: `/root/.openclaw/vibex/vibex-fronted`
 
 ---
 
-## 2. 阶段规划
+## 1. 总览
 
-### Phase 0: 基础设施（1h）— 并行准备
+| Epic | 名称 | 优先级 | 工时 | 周期 | 依赖 |
+|------|------|--------|------|------|------|
+| **E0** | 画布可用性基础 | 🔴 P0 | 12.5–18.5h | Week 1 | 无 |
+| **E1** | 核心编辑体验 | 🟠 P1 | 10–14h | Week 2 | E0 |
+| **E2** | 导航与定位 | 🟠 P1 | 9–12h | Week 2 | E0 |
+| **E3** | 画布增强编辑 | 🟡 P2 | 14–20h | Week 3 | E1 |
+| **E4** | 导出与持久化 | 🟡 P2 | 20–30h | Week 3–4 | E0 |
+| **E5** | 生态扩展（长期） | ⚪ P3 | 38–53h | Week 5+ | E4 |
 
-**目标**: 安装依赖，搭建基础架构
+**总体预估**: P0–P2 约 **66–95 小时**（约 2–3 周）  
+**MVP 优先交付**: E0 + E1（让画布可用且核心体验完善）
 
-**步骤**:
-1. 安装 `html-to-image`（替换 html2canvas）
-2. 安装 `fuse.js`
-3. 创建 `src/hooks/` 目录结构
-4. 创建 `src/lib/canvas/historySlice.ts` 空壳
-5. 配置 `vitest` / `testing-library` 测试环境
-6. 创建 E2E 测试基础 fixtures
+---
 
-**产出物**: 
-- `package.json` 更新
-- 目录结构就绪
-- 测试环境可用
+## 2. Epic 0 — 画布可用性基础 🔴
+
+> **目标**: 画布页上线 + 数据不丢 + 视觉统一
+
+### E0-F1: 画布生产部署
+**Feature ID**: `canvas-p0-f1-deploy` | **工时**: 0.5h | **依赖**: 无
+
+**任务拆分**:
+1. 检查 `next.config.js` 路由配置，确认 `/canvas`、`/flow`、`/editor` 无 404
+2. 检查 Vercel `vercel.json` 环境变量（`NEXT_PUBLIC_API_URL`）
+3. 执行 `pnpm build` + 部署到 Vercel
+4. 回归测试：首页画布预览 → 点击跳转 `/canvas` 全链路
 
 **验收标准**:
-- [ ] `pnpm add html-to-image fuse.js` 成功
-- [ ] `pnpm test --run` 通过现有测试
-- [ ] 新文件 `src/hooks/useCanvasHistory.ts` 存在（空壳）
+- [ ] `https://vibex.app/canvas` 返回 200 OK
+- [ ] 首页点击「打开画布」跳转正常，不丢失首页数据
 
 ---
 
-### Phase 1: Undo/Redo 历史管理（6-8h）
+### E0-F2: 数据持久化
+**Feature ID**: `canvas-p0-f2-persistence` | **工时**: 8–12h | **依赖**: E0-F1
 
-**目标**: 实现三树独立的撤销/重做功能
+**任务拆分**:
+1. 完善 `canvasStore.ts` persist middleware 的 `partialize` 配置（已部分存在）
+2. 新增 `recordAction()` 调用点：节点增删改、状态变更时触发
+3. 实现两层持久化（localStorage + API）Fallback 链
+4. 节点数量 > 500 时告警提示
+5. 冲突处理：加载时 localStorage 与 API 数据对比，以 API 为准
 
-**步骤**:
-
-#### Step 1.1: History Slice 实现（2h）
-```
-1. 创建 `src/lib/canvas/historySlice.ts`
-2. 实现 HistoryStack 类型和操作函数
-3. 实现 pushHistory / undo / redo / canUndo / canRedo
-4. 实现 max 50 步限制逻辑
-5. 单元测试（3 个核心函数）
-```
-
-#### Step 1.2: Store 集成（1h）
-```
-1. 在 `canvasStore.ts` 中引入 historySlice
-2. 使用 Zustand 的 `combine` 合并 slices
-3. 在 `addNode` / `updateNode` / `deleteNode` 后自动 pushHistory
-4. 在 `loadExampleData` 中自动 clearHistory
-5. 验证三树历史独立
-```
-
-#### Step 1.3: CanvasToolbar UI（1h）
-```
-1. 创建 `src/components/canvas/CanvasToolbar.tsx`
-2. 添加 Undo 按钮（< ChevronLeft）
-3. 添加 Redo 按钮（> ChevronRight）
-4. 按钮状态（disabled 时降低透明度）
-5. 添加 Zoom In / Zoom Out / FitView 按钮
-```
-
-#### Step 1.4: 快捷键集成（1h）
-```
-1. 在 useKeyboardShortcuts.ts 中添加 Cmd+Z / Cmd+Shift+Z
-2. 集成到 CanvasPage
-3. 测试快捷键与系统级快捷键不冲突
-```
-
-#### Step 1.5: 端到端测试（1-2h）
-```
-1. 添加 historySlice 单元测试
-2. 添加 E2E 测试：添加节点 → undo → redo
-3. 添加边界测试：空历史 undo / 满历史 push
-```
-
-**产出物**: 
-- `src/lib/canvas/historySlice.ts`
-- `src/components/canvas/CanvasToolbar.tsx`
-- `src/hooks/useKeyboardShortcuts.ts`
-- 测试文件
+**新增依赖**: 无（persist middleware 已存在）
 
 **验收标准**:
-- [ ] `Ctrl+Z` 回退最近一次节点操作
-- [ ] `Ctrl+Shift+Z` 重做
-- [ ] 三棵树历史独立（Context undo 不影响 Flow）
-- [ ] 按钮 disabled 状态正确
-- [ ] 50 步历史限制生效
-- [ ] `pnpm test --run` 通过
+- [ ] 刷新页面后节点、状态、关系连线完整保留
+- [ ] API 持久化节流 2s，不阻塞主线程
+- [ ] 离线时使用 localStorage，恢复网络后自动同步
 
 ---
 
-### Phase 2: 键盘快捷键（4-6h）
+### E0-F3: CardTreeNode 深色主题迁移
+**Feature ID**: `canvas-p0-f3-theme-consistency` | **工时**: 4–6h | **依赖**: 无
 
-**目标**: 实现完整的键盘快捷键系统
-
-**步骤**:
-
-#### Step 2.1: Keyboard Shortcuts Hook（2h）
-```
-1. 创建 `src/lib/canvas/keyboardShortcuts.ts`（快捷键定义常量）
-2. 创建 `src/hooks/useKeyboardShortcuts.ts`
-3. 实现快捷键注册与事件分发
-4. 实现输入框焦点检测逻辑
-5. 单元测试
-```
-
-#### Step 2.2: 快捷键提示面板（1h）
-```
-1. 创建 `src/components/canvas/ShortcutHintPanel.tsx`
-2. 按 `?` 显示/隐藏
-3. 展示所有可用快捷键
-4. 美化面板样式（与赛博朋克主题一致）
-```
-
-#### Step 2.3: 快捷键与业务逻辑绑定（1-2h）
-```
-1. `/` → 打开搜索对话框
-2. `S` → 保存到后端（调用 canvasApi）
-3. `N` → 在当前树添加新节点
-4. `+` / `-` / `0` → 缩放控制
-5. `Escape` → 关闭所有弹窗
-```
-
-#### Step 2.4: 测试与文档（1h）
-```
-1. E2E 测试：按 `/` → 搜索框打开 → 按 `Esc` → 关闭
-2. 更新 AGENTS.md 快捷键映射表
-```
-
-**产出物**: 
-- `src/lib/canvas/keyboardShortcuts.ts`
-- `src/hooks/useKeyboardShortcuts.ts`
-- `src/components/canvas/ShortcutHintPanel.tsx`
+**任务拆分**:
+1. 读取 `DESIGN.md v1.1` 节 6.5 迁移方案
+2. 修改 `CardTreeNode` 背景色为 `var(--color-canvas-bg)`
+3. 边框改为 `1px solid var(--color-border)`
+4. 检查所有子组件继承正确 CSS 变量
+5. 更新 Storybook/Chromatic 截图基线
 
 **验收标准**:
-- [ ] 所有 12 个快捷键绑定正确
-- [ ] 焦点在输入框时不触发画布快捷键（除了 `Esc`）
-- [ ] `?` 键切换快捷键面板显示
-- [ ] 快捷键面板样式与主题一致
+- [ ] 深色模式下 CardTreeNode 无白底组件
+- [ ] 视觉回归截图对比通过
 
 ---
 
-### Phase 3: 节点搜索（4-6h）
+## 3. Epic 1 — 核心编辑体验 🟠
 
-**目标**: 实现模糊搜索和节点导航
+> **目标**: 撤销/快捷键，让用户能高效操作画布
 
-**步骤**:
+### E1-F4: Undo/Redo ✅
+**Feature ID**: `canvas-p1-f4-undo-redo` | **工时**: 6–8h | **依赖**: E0-F2
 
-#### Step 3.1: 搜索引擎（1.5h）
-```
-1. 创建 `src/lib/canvas/searchEngine.ts`
-2. 封装 Fuse.js 初始化和搜索逻辑
-3. 配置模糊匹配阈值（0.3）
-4. 实现按树类型分类结果
-```
+**任务拆分**:
+1. ✅ 在 `canvasStore.ts` 新增 `historySlice`（三树独立历史栈）
+2. ✅ 实现 `recordSnapshot(treeType, label)` 方法（深度 max 50，无节流，CRUD 后直接记录）
+3. ✅ 在 `ProjectBar` 添加 `UndoRedoButtons` 组件
+4. ✅ 绑定 `Ctrl+Z` / `Ctrl+Shift+Z` 快捷键
+5. ✅ 验证 50 步限制（historySlice.test.ts 全面覆盖）
 
-#### Step 3.2: 搜索 Slice（0.5h）
-```
-1. 创建 `searchSlice.ts`（或作为 canvasStore 的一部分）
-2. 管理搜索状态：isOpen / query / results
-3. 实现 openSearch / closeSearch / setQuery / jumpToNode
-```
-
-#### Step 3.3: 搜索对话框 UI（1.5h）
-```
-1. 创建 `src/components/canvas/SearchDialog.tsx`
-2. 搜索输入框（自动聚焦）
-3. 搜索结果列表（Fuse.js 排序）
-4. 键盘导航（↑↓ 选择，Enter 跳转）
-5. 关闭按钮 + `Esc` 关闭
-```
-
-#### Step 3.4: 节点高亮动画（0.5h）
-```
-1. 在 CSS 中添加 `.node-highlight` 动画
-2. 在 TreePanel 中实现高亮逻辑
-3. 1.5s 后自动清除高亮
-```
-
-#### Step 3.5: 集成与测试（1h）
-```
-1. 在 CanvasToolbar 中添加搜索图标按钮
-2. 在 useKeyboardShortcuts 中绑定 `/`
-3. E2E 测试：搜索 → 选择结果 → 跳转 → 高亮
-4. 性能测试：500 节点搜索响应时间 < 200ms
-```
-
-**产出物**: 
-- `src/lib/canvas/searchEngine.ts`
-- `src/components/canvas/SearchDialog.tsx`
-- `src/hooks/useCanvasSearch.ts`
+**新增依赖**: 无
 
 **验收标准**:
-- [ ] 输入关键词实时过滤（防抖 150ms）
-- [ ] 匹配节点高亮显示
-- [ ] 回车跳转并聚焦节点
-- [ ] `Esc` 关闭搜索
-- [ ] 搜索 500 节点 < 200ms
+- [x] `Ctrl+Z` 回退最近一次节点操作
+- [x] `Ctrl+Shift+Z` 重做
+- [x] 无可撤销时按钮 disabled
+- [x] 三棵树历史独立
+- [x] 50 步深度限制，超出自动丢弃最旧记录
+
+**实现文件**:
+- `src/lib/canvas/historySlice.ts` — 独立 Zustand store，past/present/future 三栈
+- `src/components/canvas/CanvasToolbar.tsx` — UndoRedoButtons + CanvasToolbar
+- `src/components/canvas/ProjectBar.tsx` — handleUndo/handleRedo 集成
+- `src/components/canvas/CanvasPage.tsx` — useKeyboardShortcuts 集成
+- `e2e/canvas-undo-redo.spec.ts` — E2E 测试
+
+**测试覆盖**:
+- `src/lib/canvas/__tests__/historySlice.test.ts` — 50 步限制、三树独立、undo/redo 边界
+- `src/hooks/useKeyboardShortcuts.test.ts` — Ctrl+Z/Ctrl+Shift+Z/focus isolation
+- `e2e/canvas-undo-redo.spec.ts` — UI 集成测试
 
 ---
 
-### Phase 4: MiniMap 导航（2-3h）
+### E1-F6: 快捷键系统 ✅
+**Feature ID**: `canvas-p1-f6-shortcuts` | **工时**: 4–6h | **依赖**: E1-F4
 
-**目标**: 激活 ReactFlow 内置 MiniMap
+**任务拆分**:
+1. ✅ 新建 `src/hooks/canvas/useKeyboardShortcuts.ts`（原生实现，无 react-hotkeys-hook）
+2. ✅ 实现焦点隔离（输入框聚焦时跳过画布快捷键）
+3. ✅ 绑定快捷键映射：
+   - `Cmd+Z` / `Ctrl+Z` → Undo
+   - `Cmd+Shift+Z` / `Ctrl+Shift+Z` → Redo
+   - `Cmd+Y` / `Ctrl+Y` → Redo（Windows）
+   - `/` → 搜索（需等 E2）
+   - `?` → 快捷键提示面板
+4. ✅ 新建 `src/components/canvas/features/ShortcutHintPanel.tsx`
+5. ⚠️ `N` → 新建节点（待 E2-F5 搜索功能完成后实现）
+6. ⚠️ `Del` / `Backspace` → 删除选中节点（待 E3-F2 多选功能完成后实现）
 
-**步骤**:
-
-#### Step 4.1: CanvasMiniMap 组件（1.5h）
-```
-1. 创建 `src/components/canvas/CanvasMiniMap.tsx`
-2. 在每个 TreePanel 的 ReactFlow 中添加 <MiniMap>
-3. 配置节点颜色映射（紫色/绿色/黄色）
-4. 响应式隐藏（< 768px）
-5. 样式与深色主题一致
-```
-
-#### Step 4.2: 交互增强（0.5h）
-```
-1. MiniMap 点击跳转到对应节点区域
-2. MiniMap 缩略图实时更新
-3. 滚动画布时 MiniMap viewport 指示器同步
-```
-
-#### Step 4.3: 测试（0.5h）
-```
-1. 验证 MiniMap 在三种树中正确显示
-2. 验证响应式隐藏
-3. 截图留存
-```
-
-**产出物**: 
-- `src/components/canvas/CanvasMiniMap.tsx`
+**新增依赖**: 无（使用原生 `document.addEventListener`）
 
 **验收标准**:
-- [ ] 三树各自有独立的 MiniMap
-- [ ] MiniMap 显示节点缩略图
-- [ ] 点击 MiniMap 跳转对应区域
-- [ ] 移动时 MiniMap 实时更新
-- [ ] `< 768px` 隐藏 MiniMap
+- [x] 所有已实现快捷键正确绑定且执行对应功能
+- [x] 输入框聚焦时画布快捷键不触发
+- [x] `?` 键显示快捷键提示面板
+
+**实现文件**:
+- `src/hooks/useKeyboardShortcuts.ts` — 原生实现，焦点隔离
+- `src/components/canvas/features/ShortcutHintPanel.tsx` — 快捷键列表面板
+
+**测试覆盖**:
+- `src/hooks/useKeyboardShortcuts.test.ts` — 6 个测试用例（Ctrl+Z/Meta+Z/Ctrl+Shift+Z/焦点隔离/enabled flag）
 
 ---
 
-### Phase 5: 导出功能（4-6h）
+## 4. Epic 2 — 导航与定位 🟠
 
-**目标**: 实现 PNG/SVG/JSON 三种格式导出
+> **目标**: 搜索/MiniMap/Zoom，让大型项目可操作
 
-**步骤**:
+### E2-F5: 搜索与节点过滤
+**Feature ID**: `canvas-p1-f5-search` | **工时**: 3–4h | **依赖**: E0-F2
 
-#### Step 5.1: Export Hook（1.5h）
-```
-1. 创建 `src/hooks/useCanvasExport.ts`
-2. 封装 html-to-image 的 toPng / toSvg
-3. 实现 JSON 序列化导出
-4. 处理错误和 loading 状态
-```
+**任务拆分**:
+1. 新建 `src/hooks/canvas/useCanvasSearch.ts`（集成 fuse.js）
+2. 新建 `src/components/canvas/features/SearchDialog.tsx`（懒加载）
+3. 新建 `src/components/canvas/features/SearchResultList.tsx`（虚拟化）
+4. 在 `ProjectBar` 添加搜索图标按钮
+5. 绑定 `/` 快捷键触发搜索
+6. 搜索结果显示节点路径（Context → Flow → Component）
 
-#### Step 5.2: ExportMenu UI（1.5h）
-```
-1. 创建 `src/components/canvas/ExportMenu.tsx`
-2. 下拉菜单：PNG / SVG / JSON 三个选项
-3. 导出中显示 loading spinner
-4. 导出成功/失败 toast 提示
-```
-
-#### Step 5.3: 大画布处理（1h）
-```
-1. 检测画布尺寸 > 4096px
-2. 大画布时提示用户先 FitView
-3. 导出时临时重置缩放为 1x
-```
-
-#### Step 5.4: 测试与优化（1h）
-```
-1. 导出 PNG 截图验证
-2. 导出 SVG 验证（字体嵌入）
-3. 导出 JSON 验证（数据结构正确）
-4. 错误场景测试（导出失败提示）
-```
-
-**产出物**: 
-- `src/hooks/useCanvasExport.ts`
-- `src/components/canvas/ExportMenu.tsx`
+**新增依赖**: `fuse.js`, `@tanstack/react-virtual`
 
 **验收标准**:
-- [ ] PNG 导出图片质量清晰（2x pixelRatio）
-- [ ] SVG 导出字体正确（无乱码）
-- [ ] JSON 导出数据结构完整
-- [ ] 导出中 loading 状态正确
-- [ ] 大画布有 FitView 提示
+- [ ] 输入「order」返回 OrderForm、OrderService 等匹配结果
+- [ ] 点击结果跳转目标节点并高亮
+- [ ] `Esc` 关闭搜索，`↑↓` 切换结果
 
 ---
 
-## 3. 开发顺序
+### E2-F7: 节点拖拽排序
+**Feature ID**: `canvas-p1-f7-drag-sort` | **工时**: 6–8h | **依赖**: E1-F4
+
+**任务拆分**:
+1. 安装 `@dnd-kit/sortable` + `@dnd-kit/core`
+2. 新建 `src/hooks/canvas/useDndSortable.ts`
+3. 在三棵树节点中集成 `useSortable` hook
+4. `onDragEnd` 更新 store 中节点顺序，触发 `recordAction`
+5. 拖拽时显示 `DragOverlay`
+
+**新增依赖**: `@dnd-kit/sortable`, `@dnd-kit/core`
+
+**验收标准**:
+- [ ] 拖拽节点到新位置，释放后位置保留
+- [ ] 拖拽触发 Undo 历史记录
+- [ ] 拖拽后刷新页面顺序保持
+
+---
+
+### E2-F8: 原型预览连接
+**Feature ID**: `canvas-p1-f8-prototype-link` | **工时**: 4–6h | **依赖**: E0-F1
+
+**任务拆分**:
+1. 在 `ComponentTree` 节点添加「预览」图标按钮
+2. 实现路由跳转 `/editor?componentId={nodeId}`
+3. 确认 `/editor` 页面支持按 `componentId` 参数加载
+
+**验收标准**:
+- [ ] 点击预览图标跳转到 `/editor?componentId=xxx`
+- [ ] 无参数时 `/editor` 显示组件列表（兼容）
+
+---
+
+### E2-F12: MiniMap 导航
+**Feature ID**: `canvas-p2-f12-minimap` | **工时**: 2–3h | **依赖**: E0-F1
+
+**任务拆分**:
+1. 在 `CardTreeRenderer` 激活 `showMiniMap={true}`
+2. 在 FlowCanvas 三栏各自集成 `ReactFlowMiniMap` 组件
+3. 响应式隐藏（< 768px）
+4. `nodeColor` 根据节点类型着色
+
+**验收标准**:
+- [ ] 每个 TreePanel 底部显示对应 MiniMap
+- [ ] 点击 MiniMap 跳转视图中心
+- [ ] 移动端 MiniMap 隐藏
+
+---
+
+### E2-F14: 画布缩放控制
+**Feature ID**: `canvas-p2-f14-zoom` | **工时**: 3–4h | **依赖**: E0-F1
+
+**任务拆分**:
+1. 激活 ReactFlow `Controls` 组件（放大/缩小/适应屏幕）
+2. 添加鼠标滚轮缩放支持
+3. 缩放状态持久化到 store
+
+**验收标准**:
+- [ ] +/- 按钮缩放画布
+- [ ] Fit View 适应屏幕
+- [ ] 鼠标滚轮缩放
+
+---
+
+## 5. Epic 3 — 画布增强编辑 🟡
+
+> **目标**: 多选/贴纸/关系连线，让画布更丰富
+
+### E3-F2: 多选 + 批量操作
+**Feature ID**: `canvas-p2-f2-multi-select` | **工时**: 6–8h | **依赖**: E1-F4
+
+**任务拆分**:
+1. 配置 ReactFlow `selectionMode={SelectionMode.Partial}`（`@xyflow/react` 内置）
+2. 实现 Shift+点击多选
+3. 批量选中后支持批量移动/删除
+4. 多选状态同步到 store
+
+**验收标准**:
+- [ ] Shift+点击选中多个节点
+- [ ] 批量移动/删除操作正确
+- [ ] 批量操作触发单次 Undo 记录
+
+---
+
+### E3-F3: Sticky Notes 贴纸
+**Feature ID**: `canvas-p2-f3-sticky-notes` | **工时**: 4–6h | **依赖**: E0-F1
+
+**任务拆分**:
+1. 新建 `src/components/canvas/nodes/StickyNoteNode.tsx`
+2. 在 `nodeTypes` 中注册 `stickyNote` 类型
+3. 双击画布空白区域创建贴纸节点
+4. 支持拖拽定位和文本编辑
+
+**验收标准**:
+- [ ] 可创建、编辑、拖拽贴纸节点
+- [ ] 贴纸节点持久化到 store
+
+---
+
+### E3-F13: 节点关系连线扩展
+**Feature ID**: `canvas-p2-f13-relationship-lines` | **工时**: 6–10h | **依赖**: E0-F2
+
+**任务拆分**:
+1. 节点数据模型添加 `relationships` 字段
+2. 在 Flow 树和 Component 树复用 `RelationshipEdge` 组件
+3. 连线样式区分：实线（包含）、虚线（引用）、点线（依赖）
+4. 连线过多时提供聚类/优先级策略
+
+**验收标准**:
+- [ ] Flow 树节点显示关系连线
+- [ ] Component 树节点显示关系连线
+- [ ] 三种连线样式区分清晰
+
+---
+
+## 6. Epic 4 — 导出与持久化 🟡
+
+> **目标**: 导出/模板/版本历史，画布可用于生产工作流
+
+### E4-F9: 多格式导出
+**Feature ID**: `canvas-p2-f9-export` | **工时**: 8–12h | **依赖**: E0-F1
+
+**任务拆分**:
+1. 新建 `src/hooks/canvas/useCanvasExport.ts`
+2. 实现 `html-to-image` 导出（PNG/SVG）
+3. 实现 JSON 导出（完整画布数据）
+4. 实现 Markdown 导出（三树结构化描述）
+5. 在 `ProjectBar` 添加导出菜单按钮
+6. 支持导出范围选择（Context / Flow / Component / All）
+
+**新增依赖**: 无（`html-to-image` 已安装）
+
+**验收标准**:
+- [ ] PNG/SVG/JSON/Markdown 格式均可导出
+- [ ] 导出图片清晰无截断
+- [ ] 导出菜单可选范围
+
+---
+
+### E4-F10: 需求模板库
+**Feature ID**: `canvas-p2-f10-templates` | **工时**: 6–8h | **依赖**: E0-F2
+
+**任务拆分**:
+1. 在 `/public/templates/` 创建模板 JSON 文件（`e-commerce.json`、`saas.json`、`social.json`）
+2. 新建 `src/lib/canvas/templateLoader.ts`
+3. 在 Phase 1 需求输入页添加「使用模板」按钮
+4. 选择后自动填充三树数据
+
+**验收标准**:
+- [ ] 模板选择器显示模板卡片列表
+- [ ] 选择后三树自动填充对应数据
+
+---
+
+### E4-F11: 版本历史
+**Feature ID**: `canvas-p2-f11-version-history` | **工时**: 8–12h | **依赖**: E0-F2
+
+**任务拆分**:
+1. 在 `canvasApi.ts` 新增快照 API 方法（POST/GET snapshots, POST restore）
+2. 新建 `src/hooks/canvas/useVersionHistory.ts`
+3. 新建 `src/components/canvas/features/VersionHistoryPanel.tsx`（侧边抽屉）
+4. 实现快照触发时机：手动保存、AI 生成完成、重要操作
+5. 支持预览和回滚
+
+**验收标准**:
+- [ ] AI 生成后自动创建快照
+- [ ] 版本历史面板显示快照列表
+- [ ] 可恢复到任意历史快照
+
+---
+
+## 7. Epic 5 — 生态扩展（长期） ⚪
+
+> **目标**: 离线/设计系统/评论/AI 实时反馈
+
+### E5-F15: 离线模式
+**Feature ID**: `canvas-p3-f15-offline` | **工时**: 12–16h | **依赖**: E0-F2, E4-F11
+
+### E5-F16: 设计系统集成
+**Feature ID**: `canvas-p3-f16-design-system` | **工时**: 8–10h | **依赖**: E4-F11
+
+### E5-F17: 协作评论
+**Feature ID**: `canvas-p3-f17-comments` | **工时**: 8–12h | **依赖**: E0-F2
+
+### E5-F18: AI 实时反馈
+**Feature ID**: `canvas-p3-f18-ai-realtime` | **工时**: 10–15h | **依赖**: E0-F1
+
+---
+
+## 8. 实施顺序决策
+
+### 推荐顺序（遵循依赖）
 
 ```
-Phase 0（1h） ──────────────────────────────────────────┐
-    ↓                                                     ↓（Phase 0 完成后并行）
-Phase 1（6-8h）    Phase 2（4-6h）    Phase 3（4-6h）  Phase 4（2-3h）
-    ↓                 ↓                  ↓               ↓
-    └─────────────────┴──────────────────┴───────────────┘
-                              ↓
-                       Phase 5（4-6h）
-                              ↓
-                       集成测试 + 回归测试
-                              ↓
-                          验收上线
+Week 1
+├── E0-F1 (0.5h) → 部署画布页
+├── E0-F2 (8-12h) → 数据持久化
+└── E0-F3 (4-6h) → 深色主题迁移
+
+Week 2
+├── E1-F4 (6-8h) → Undo/Redo
+├── E1-F6 (4-6h) → 快捷键系统
+├── E2-F8 (4-6h) → 原型预览连接
+└── E2-F14 (3-4h) → Zoom 缩放
+
+Week 3
+├── E2-F5 (3-4h) → 搜索节点
+├── E2-F12 (2-3h) → MiniMap 导航
+├── E3-F2 (6-8h) → 多选批量
+├── E3-F3 (4-6h) → Sticky Notes
+└── E3-F13 (6-10h) → 关系连线扩展
+
+Week 4
+├── E4-F11 (8-12h) → 版本历史 ← (关键里程碑)
+├── E4-F9 (8-12h) → 多格式导出
+└── E2-F7 (6-8h) → 拖拽排序
+
+Week 5+
+├── E4-F10 (6-8h) → 模板库
+└── E5-P3 (38-53h) → 生态扩展（长期规划）
 ```
 
-**推荐排期**：
-- Day 1: Phase 0 + Phase 1（核心功能先行）
-- Day 2: Phase 2 + Phase 3（效率工具）
-- Day 3: Phase 4 + Phase 5（导航和导出）
-- Day 4: 集成测试 + 回归测试 + Bug 修复
+### 关键里程碑
 
----
-
-## 4. 测试计划
-
-### 4.1 单元测试文件
-
-| 文件 | 测试内容 |
-|------|---------|
-| `historySlice.test.ts` | pushHistory / undo / redo / 边界 |
-| `searchEngine.test.ts` | 模糊匹配 / 空查询 / 防抖 |
-| `useKeyboardShortcuts.test.ts` | 各快捷键触发 / 不触发 |
-| `useCanvasExport.test.ts` | PNG / SVG / JSON / 错误 |
-
-### 4.2 集成测试文件
-
-| 测试 | 描述 |
-|------|------|
-| `canvas-undo-redo.spec.ts` | 添加 → undo → redo 全流程 |
-| `canvas-search.spec.ts` | 搜索 → 选择 → 跳转 |
-| `canvas-shortcuts.spec.ts` | 快捷键按压验证 |
-| `canvas-export.spec.ts` | 三种格式导出 |
-| `canvas-minimap.spec.ts` | MiniMap 交互 |
-
-### 4.3 回归测试
-
-每次 PR 必须通过以下回归测试：
-- 现有 TreePanel 功能正常（三树 CRUD）
-- 三栏折叠展开正常
-- 阶段进度条正常
-- AI 生成节点正常
-- 级联状态更新正常
-
----
-
-## 5. 里程碑
-
-| 里程碑 | 完成条件 | 预计时间 |
+| 里程碑 | 触发条件 | 预计时间 |
 |--------|---------|---------|
-| **M1: Undo/Redo 可用** | Phase 1 验收标准全部通过 | Day 1 |
-| **M2: 快捷键+搜索可用** | Phase 2 + Phase 3 验收标准通过 | Day 2 |
-| **M3: 完整功能集** | Phase 4 + Phase 5 + 回归通过 | Day 3 |
-| **M4: 生产部署** | 所有测试通过，PR 合并 | Day 4 |
+| **M1: 画布可用** | E0 完成 | Week 1 结束 |
+| **M2: 核心体验** | E1 + E2-F14 + E2-F8 完成 | Week 2 结束 |
+| **M3: 导航完善** | E2-F5 + E2-F12 完成 | Week 3 结束 |
+| **M4: 生产就绪** | E3 + E4-F9 + E4-F11 完成 | Week 4 结束 |
 
 ---
 
-## 6. 风险与缓冲
+## 9. 测试计划
 
-| 风险 | 概率 | 影响 | 缓解 |
-|------|------|------|------|
-| ReactFlow v12 API 变更 | 低 | 中 | 锁定版本 + 先跑集成测试 |
-| html-to-image 中文乱码 | 中 | 低 | 提前验证，不行用 html2canvas 回退 |
-| 多选与拖拽交互冲突 | 中 | 中 | Phase 1 后先单独测试多选 |
-| 测试覆盖不足导致回归 | 中 | 高 | 每阶段必须包含测试 |
-| 历史栈内存占用 | 低 | 中 | 50 步限制 |
+### 单元测试
 
-**工时缓冲**: 每个 Phase 增加 20% 缓冲时间。
+| 功能 | 测试文件 | 覆盖目标 |
+|------|---------|---------|
+| History Slice | `src/__tests__/canvas/historySlice.test.ts` | undo/redo 边界、深度的 |
+| Search | `src/__tests__/canvas/search.test.ts` | fuse.js 匹配、空结果 |
+| Export | `src/__tests__/canvas/export.test.ts` | JSON 格式、PNG 生成 |
+| Cascade | `src/__tests__/canvas/cascade.test.ts` | 上游变更级联下游 |
 
----
+### E2E 测试（Playwright）
 
-## 7. 验收检查清单
+| 场景 | 测试文件 |
+|------|---------|
+| Undo/Redo 完整流程 | `e2e/canvas-undo-redo.spec.ts` |
+| 搜索节点并跳转 | `e2e/canvas-search.spec.ts` |
+| 导出多格式 | `e2e/canvas-export.spec.ts` |
+| 版本历史回滚 | `e2e/canvas-version-history.spec.ts` |
+| 快捷键触发 | `e2e/canvas-shortcuts.spec.ts` |
+| 画布部署回归 | `e2e/canvas-deploy-regression.spec.ts` |
 
-### 功能验收
+### 性能测试
 
-- [ ] Undo/Redo: 三树独立历史，50 步限制
-- [ ] 快捷键: 12 个快捷键全部工作，输入框内正确跳过
-- [ ] 搜索: 模糊匹配，150ms 防抖，500 节点 < 200ms
-- [ ] MiniMap: 三树独立，响应式隐藏，点击跳转
-- [ ] 导出: PNG / SVG / JSON 三格式，loading 状态，错误提示
-
-### 质量验收
-
-- [ ] 无 `any` 类型
-- [ ] 无 `console.log`
-- [ ] 所有新文件有 TypeScript 类型
-- [ ] 单元测试覆盖率 > 80%
-- [ ] 集成测试全部通过
-- [ ] Lighthouse performance score > 85
-
-### 文档验收
-
-- [ ] AGENTS.md 更新（快捷键表）
-- [ ] README.md 新增快捷键说明（如需要）
-- [ ] CHANGELOG.md 记录新功能
+| 指标 | 目标 | 测试文件 |
+|------|------|---------|
+| 500 节点搜索响应 | < 200ms | `playwright.perf.spec.ts` |
+| 1000 节点渲染帧率 | ≥ 30fps | `playwright.perf.spec.ts` |
+| 持久化写入时间 | < 50ms | 集成测试 |
 
 ---
 
-## 8. 后续规划（不在本次范围）
+## 10. 风险缓解
 
-| 功能 | 优先级 | 预估工时 | 说明 |
-|------|--------|---------|------|
-| 多选批量操作 | P2 | 6-8h | ReactFlow selectionMode |
-| Sticky Notes | P2 | 4-6h | 新节点类型 |
-| 版本历史（持久化） | P2 | 8-12h | 后端 API 支持 |
-| PDF 导出 | P2 | 6-8h | jsPDF + html-to-image |
-| 节点颜色标签 | P2 | 3-4h | 可视化增强 |
+| 风险 | 缓解策略 | 负责人 |
+|------|---------|-------|
+| ReactFlow 与 @dnd-kit 冲突 | 先做 E1-F4 和 E1-F6，E2-F7 单独 PR 验证 | dev |
+| 持久化 localStorage 配额 | 先测试 500 节点场景，触发阈值则切换纯 API | dev + tester |
+| 快捷键与浏览器冲突 | Mac/Windows 分开测试；建立冲突报告表 | tester |
+| API 快照存储成本 | 快照按项目 ID 分组，定期清理 30 天前旧快照 | dev |
 
 ---
 
-*本文档由 Architect Agent 生成 | 2026-03-29*
+*本文档由 architect agent 生成 | 2026-03-29*
+*PM 负责按里程碑跟踪进度并更新本计划*

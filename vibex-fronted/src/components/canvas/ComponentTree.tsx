@@ -411,6 +411,18 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
         >
           {generating ? '◌ 生成中...' : '◈ AI 生成组件'}
         </button>
+        {/* Bug4c: 重新生成组件树按钮 */}
+        {hasNodes && (
+          <button
+            type="button"
+            className={styles.secondaryButton}
+            onClick={handleGenerate}
+            disabled={generating || readonly}
+            title="基于流程树重新生成组件树"
+          >
+            {generating ? '◌ 重新生成中...' : '🔄 重新生成组件树'}
+          </button>
+        )}
         {allConfirmed && (
           <button
             type="button"

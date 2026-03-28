@@ -29,6 +29,8 @@ interface TreePanelProps {
   onNodeConfirm?: (nodeId: string) => void;
   /** 子组件：树渲染器 */
   children?: React.ReactNode;
+  /** 自定义操作按钮（渲染在面板头部下方） */
+  actions?: React.ReactNode;
 }
 
 /** 树类型对应的颜色 */
@@ -54,6 +56,7 @@ export function TreePanel({
   onToggleCollapse,
   onNodeConfirm,
   children,
+  actions,
 }: TreePanelProps) {
   const [_isAnimating, setIsAnimating] = useState(false);
 
@@ -116,6 +119,9 @@ export function TreePanel({
               </p>
             </div>
           )}
+
+          {/* Custom action buttons */}
+          {actions && <div className={styles.treePanelActions}>{actions}</div>}
 
           {/* Children rendered tree */}
           {nodes.length > 0 && children}

@@ -972,8 +972,8 @@
 }
 
 .flowCard.nodeConfirmed {
-  border-color: var(--color-green);
-  box-shadow: 0 0 0 1px var(--color-green);
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 1px var(--color-success);
 }
 
 .flowCard.nodeError {
@@ -1091,7 +1091,7 @@
 }
 
 .stepRow.nodeConfirmed {
-  border-color: var(--color-green);
+  border-color: var(--color-success);
   background: rgba(16, 185, 129, 0.05);
 }
 
@@ -1214,13 +1214,49 @@
 }
 
 .btnConfirmStep {
-  color: var(--color-green);
+  color: var(--color-success);
   border-color: rgba(16, 185, 129, 0.3);
 }
 
 .btnConfirmStep:hover {
   background: rgba(16, 185, 129, 0.1);
-  color: var(--color-green);
+  color: var(--color-success);
+}
+
+/* FlowCard action buttons */
+.btnIcon {
+  padding: 0.25rem 0.375rem;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  line-height: 1.4;
+  transition: background 0.15s ease, color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnIcon:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.btnIcon:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.btnConfirm {
+  color: var(--color-success);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.btnConfirm:hover {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
 }
 
 /* Step edit form */
@@ -1273,7 +1309,7 @@
 /* Shared button styles */
 .btnSave {
   padding: 0.25rem 0.625rem;
-  background: var(--color-green);
+  background: var(--color-success);
   color: white;
   border: none;
   border-radius: 4px;

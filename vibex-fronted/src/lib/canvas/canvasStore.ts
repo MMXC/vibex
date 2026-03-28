@@ -240,6 +240,9 @@ interface CanvasStore {
   // === Tree Activation Logic ===
   recomputeActiveTree: () => void;
 
+  // === Internal tracking (not exposed in public API) ===
+  _prevActiveTree: TreeType | null;
+
   // === Internal ===
   _cascade: CascadeUpdateManager;
 }
@@ -306,7 +309,7 @@ export const useCanvasStore = create<CanvasStore>()(
             }
           },
 
-          setActiveTree: (activeTree) => set({ activeTree }),
+          setActiveTree: (activeTree) => set((s) => ({ activeTree, _prevActiveTree: s.activeTree })),
 
           // === Panel Actions ===
           toggleContextPanel: () =>
@@ -581,13 +584,14 @@ export const useCanvasStore = create<CanvasStore>()(
               flowNodes: BusinessFlowNode[];
               componentNodes: ComponentNode[];
             };
-            set({
+            set((s) => ({
               contextNodes: data.contextNodes,
               flowNodes: data.flowNodes,
               componentNodes: data.componentNodes,
               phase: 'context',
               activeTree: 'flow',
-            });
+              _prevActiveTree: s.activeTree,
+            }));
           },
 
           // === Component Slice Actions ===
@@ -826,41 +830,49 @@ export const useCanvasStore = create<CanvasStore>()(
 
           clearBoundedGroups: () => set({ boundedGroups: [] }),
 
+          // === Internal tracking ===
+          _prevActiveTree: null as TreeType | null,
+
           // === Tree Activation Logic ===
           recomputeActiveTree: () => {
-            const { contextNodes, flowNodes, phase } = get();
+            const { contextNodes, flowNodes, phase, _prevActiveTree } = get();
+            let newActiveTree: TreeType | null = null;
 
             // Activation rules based on phase
             if (phase === 'input') {
-              set({ activeTree: null });
-              return;
-            }
-
-            if (phase === 'context') {
+              newActiveTree = null;
+            } else if (phase === 'context') {
               const allConfirmed = cascade.areAllConfirmed(contextNodes);
-              set({
-                activeTree: allConfirmed && contextNodes.length > 0 ? 'flow' : 'context',
-              });
-              return;
-            }
-
-            if (phase === 'flow') {
+              newActiveTree = allConfirmed && contextNodes.length > 0 ? 'flow' : 'context';
+            } else if (phase === 'flow') {
               const flowReady = cascade.areAllConfirmed(flowNodes);
               const contextReady = cascade.areAllConfirmed(contextNodes);
-              set({
-                activeTree: flowReady && flowNodes.length > 0 ? 'component' : 'flow',
-                phase: contextReady && flowReady && flowNodes.length > 0 ? 'component' : phase,
-              });
-              return;
+              newActiveTree = flowReady && flowNodes.length > 0 ? 'component' : 'flow';
+              if (contextReady && flowReady && flowNodes.length > 0) {
+                set({ activeTree: newActiveTree, _prevActiveTree: _prevActiveTree, phase: 'component' });
+                return;
+              }
+            } else if (phase === 'component') {
+              newActiveTree = 'component';
+            } else {
+              // prototype
+              newActiveTree = null;
             }
 
-            if (phase === 'component') {
-              set({ activeTree: 'component' });
-              return;
-            }
-
-            if (phase === 'prototype') {
-              set({ activeTree: null });
+            // E2-1: Auto-expand center panel based on activeTree transition
+            if (newActiveTree !== _prevActiveTree) {
+              if (newActiveTree === 'flow' || newActiveTree === 'component') {
+                set({ activeTree: newActiveTree, _prevActiveTree: newActiveTree });
+                get().setCenterExpand('expand-left');
+              } else if (newActiveTree === null) {
+                set({ activeTree: newActiveTree, _prevActiveTree: newActiveTree });
+                get().setCenterExpand('default');
+              } else {
+                set({ activeTree: newActiveTree, _prevActiveTree: newActiveTree });
+              }
+            } else {
+              // No change, just update prev (protect user手动展开)
+              set({ activeTree: newActiveTree, _prevActiveTree: newActiveTree });
             }
           },
 

@@ -12,9 +12,10 @@
  */
 'use client';
 
-import React, { useMemo, useState, useRef, useEffect } from 'react';
+import React, { useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { areAllConfirmed } from '@/lib/canvas/cascade';
+import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import { PhaseProgressBar } from './PhaseProgressBar';
 import { TreeStatus } from './TreeStatus';
 import { TreePanel } from './TreePanel';
@@ -79,6 +80,68 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const generateContexts = useCanvasStore((s) => s.generateContextsFromRequirement);
   const setRequirementText = useCanvasStore((s) => s.setRequirementText);
   const requirementText = useCanvasStore((s) => s.requirementText);
+
+  // === Component Generation State (Bug4b) ===
+  const [componentGenerating, setComponentGenerating] = useState(false);
+  const projectId = useCanvasStore((s) => s.projectId);
+  const setComponentNodes = useCanvasStore((s) => s.setComponentNodes);
+
+  // Bug4b: 继续 → 组件树 handler
+  const handleContinueToComponents = useCallback(async () => {
+    if (componentGenerating || flowNodes.length === 0) return;
+    setComponentGenerating(true);
+
+    try {
+      const sessionId = projectId ?? `session-${Date.now()}`;
+
+      // Map contexts to API format
+      const mappedContexts = contextNodes.map((ctx) => ({
+        id: ctx.nodeId,
+        name: ctx.name,
+        description: ctx.description ?? '',
+        type: ctx.type,
+      }));
+
+      // Map flows to API format
+      const mappedFlows = flowNodes.map((f) => ({
+        name: f.name,
+        contextId: f.contextId,
+        steps: f.steps.map((step) => ({
+          name: step.name,
+          actor: step.actor,
+        })),
+      }));
+
+      const result = await canvasApi.generateComponents({
+        contexts: mappedContexts,
+        flows: mappedFlows,
+        sessionId,
+      });
+
+      if (result.success && result.components && result.components.length > 0) {
+        // Convert API response to ComponentNode format
+        const newNodes = result.components.map((comp) => ({
+          flowId: comp.flowId ?? 'mock',
+          name: comp.name,
+          type: comp.type as 'page' | 'list' | 'form' | 'detail' | 'modal',
+          props: {},
+          api: comp.api ?? { method: 'GET' as const, path: '/api/' + comp.name.toLowerCase().replace(/\s+/g, '-'), params: [] },
+          previewUrl: undefined,
+          nodeId: `comp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          confirmed: false,
+          status: 'pending' as const,
+          children: [],
+        }));
+
+        setComponentNodes(newNodes);
+        setPhase('component');
+      }
+    } catch (err) {
+      console.error('[CanvasPage] handleContinueToComponents error:', err);
+    } finally {
+      setComponentGenerating(false);
+    }
+  }, [componentGenerating, flowNodes, contextNodes, projectId, setComponentNodes, setPhase]);
 
   // === Compute confirmation states ===
   const contextReady = areAllConfirmed(contextNodes);
@@ -219,6 +282,22 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             collapsed={flowPanelCollapsed}
             isActive={flowActive}
             onToggleCollapse={toggleFlowPanel}
+            actions={
+              flowNodes.length > 0 ? (
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    className={styles.secondaryButton}
+                    onClick={handleContinueToComponents}
+                    disabled={componentGenerating}
+                    aria-label="继续到组件树"
+                    title="基于已确认的流程树生成组件树"
+                  >
+                    {componentGenerating ? '◌ 生成中...' : '继续 → 组件树'}
+                  </button>
+                </div>
+              ) : undefined
+            }
           >
             <BusinessFlowTree isActive={flowActive || activeTree === null} />
           </TreePanel>
@@ -342,6 +421,20 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 collapsed={flowPanelCollapsed}
                 isActive={flowActive}
                 onToggleCollapse={toggleFlowPanel}
+                actions={
+                  flowNodes.length > 0 ? (
+                    <button
+                      type="button"
+                      className={styles.secondaryButton}
+                      onClick={handleContinueToComponents}
+                      disabled={componentGenerating}
+                      aria-label="继续到组件树"
+                      title="基于已确认的流程树生成组件树"
+                    >
+                      {componentGenerating ? '◌ 生成中...' : '继续 → 组件树'}
+                    </button>
+                  ) : undefined
+                }
               >
                 <HoverHotzone position="left-edge" panel="center" centerExpandDirection="left" />
                 <BusinessFlowTree isActive={flowActive || activeTree === null} />

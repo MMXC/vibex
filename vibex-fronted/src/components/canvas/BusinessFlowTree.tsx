@@ -368,23 +368,34 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
   const deleteStep = useCanvasStore((s) => s.deleteStep);
   const reorderSteps = useCanvasStore((s) => s.reorderSteps);
   const addFlowNode = useCanvasStore((s) => s.addFlowNode);
+  const autoGenerateFlows = useCanvasStore((s) => s.autoGenerateFlows);
+  const flowGenerating = useCanvasStore((s) => s.flowGenerating);
 
   // === Check if auto-gen should show ===
   // All contexts confirmed + no flows yet = show auto-gen hint
   const allContextsConfirmed = contextNodes.length > 0 && contextNodes.every((c) => c.confirmed);
-  const canManualAdd = contextNodes.length > 0 && !allContextsConfirmed;
+  // Any context existing → user can always manually add flows
+  const canManualAdd = contextNodes.length > 0;
 
   const handleManualAdd = useCallback(() => {
-    // Manual add: create empty flow for first unconfirmed context
+    // Manual add: create empty flow for first unconfirmed context,
+    // or first context if all are already confirmed
     const unconfirmedCtx = contextNodes.find((c) => !c.confirmed);
-    if (unconfirmedCtx) {
+    const targetCtx = unconfirmedCtx ?? contextNodes[0];
+    if (targetCtx) {
       addFlowNode({
-        contextId: unconfirmedCtx.nodeId,
-        name: `${unconfirmedCtx.name}业务流程`,
+        contextId: targetCtx.nodeId,
+        name: `${targetCtx.name}业务流程`,
         steps: [],
       });
     }
   }, [contextNodes, addFlowNode]);
+
+  // Bug4a: 重新生成流程树
+  const handleRegenerate = useCallback(() => {
+    if (flowGenerating) return;
+    autoGenerateFlows(contextNodes);
+  }, [flowGenerating, contextNodes, autoGenerateFlows]);
 
   if (!isActive) {
     return (
@@ -401,6 +412,16 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
         {canManualAdd && (
           <button className={styles.btnAddFlow} onClick={handleManualAdd}>
             + 添加流程
+          </button>
+        )}
+        {canManualAdd && flowNodes.length > 0 && (
+          <button
+            className={styles.secondaryButton}
+            onClick={handleRegenerate}
+            disabled={flowGenerating}
+            title="基于已确认的上下文重新生成流程树"
+          >
+            {flowGenerating ? '◌ 重新生成中...' : '🔄 重新生成流程树'}
           </button>
         )}
         {allContextsConfirmed && flowNodes.length === 0 && (

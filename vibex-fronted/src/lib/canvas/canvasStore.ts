@@ -872,7 +872,8 @@ export const useCanvasStore = create<CanvasStore>()(
               const contextReady = cascade.areAllConfirmed(contextNodes);
               newActiveTree = flowReady && flowNodes.length > 0 ? 'component' : 'flow';
               if (contextReady && flowReady && flowNodes.length > 0) {
-                set({ activeTree: newActiveTree, _prevActiveTree: _prevActiveTree, phase: 'component' });
+                set({ activeTree: newActiveTree, _prevActiveTree: newActiveTree, phase: 'component' });
+                get().setCenterExpand('expand-left');
                 return;
               }
             } else if (phase === 'component') {

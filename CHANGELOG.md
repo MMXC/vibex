@@ -1,3 +1,12 @@
+### Added (vibex-canvas-three-column-20260328 Epic E2-1: 三栏画布自动展开) — 2026-03-28
+- **E2-1**: `canvasStore.ts` 新增 `_prevActiveTree` 内部追踪字段
+  - `recomputeActiveTree()` 在 `activeTree` 实际切换时自动触发 `setCenterExpand`
+  - context→flow 或 flow→component: `centerExpand = 'expand-left'`
+  - phase 切换到 input/prototype: `centerExpand = 'default'`
+  - 用户手动展开状态不受覆盖（仅在 activeTree 实际变化时触发展开）
+- **E2-1 测试**: `canvasStore.test.ts` 新增 6 个测试用例，61/63 通过（2 skipped）
+- **Bug 修复**: 修复 phase='flow' 全确认时 early return 跳过的 `setCenterExpand` 调用
+
 ### Fixed (vibex-canvas-context-pass-20260328 Epic1: 流程树按钮携带用户编辑上下文) — 2026-03-28
 - **Epic1**: 修复「继续·流程树」按钮点击后未携带用户编辑确认的上下文树信息请求后端的问题
   - `canvasStore.ts`: `autoGenerateFlows` 改为调用真实 `canvasApi.generateFlows` API，传入用户编辑后的 `contextNodes` 数据

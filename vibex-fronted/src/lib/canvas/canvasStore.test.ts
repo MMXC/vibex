@@ -879,13 +879,21 @@ describe('markAllPending', () => {
 
   // E2-1: Canvas Three-Column Auto-Expand
   describe('E2-1: Three-Column Auto-Expand', () => {
-    // Ensure _prevActiveTree is reset before each test (defensive: guard against beforeEach timing issues)
+    // Full store reset before each test to ensure isolation
     beforeEach(() => {
-      const s = useCanvasStore.getState();
-      console.log('[E2-1 beforeEach] _prevActiveTree BEFORE:', s._prevActiveTree);
-      useCanvasStore.setState({ _prevActiveTree: null });
-      const s2 = useCanvasStore.getState();
-      console.log('[E2-1 beforeEach] _prevActiveTree AFTER set:', s2._prevActiveTree);
+      useCanvasStore.setState({
+        requirementText: '',
+        contextNodes: [],
+        flowNodes: [],
+        componentNodes: [],
+        phase: 'input',
+        activeTree: null,
+        _prevActiveTree: null,
+        centerExpand: 'default',
+        leftExpand: 'default',
+        rightExpand: 'default',
+        flowGenerating: false,
+      });
     });
 
     // E2-1.1: recomputeActiveTree auto-expands center panel

@@ -10,7 +10,26 @@
  * - Cascade flow → component pending
  * - Epic 5: Queue slice (projectId, polling, prototypeQueue CRUD)
  * - Tree activation recompute
+ * - S1.1: 新增独立流程入口
+ * - S1.2: 流程内新增步骤
+ * - S1.3: 节点样式标准化
  */
+
+// Mock localStorage BEFORE importing the store to prevent Zustand persist rehydration
+// This ensures every test starts with a fresh, empty store state
+Object.defineProperty(globalThis, 'localStorage', {
+  value: {
+    getItem: jest.fn(() => null),     // Always return null → no rehydration
+    setItem: jest.fn(),
+    removeItem: jest.fn(),
+    clear: jest.fn(),
+    key: jest.fn(),
+    get length() { return 0; },
+  },
+  writable: true,
+  configurable: true,
+});
+
 import { useCanvasStore, markAllPending } from './canvasStore';
 import type {
   BusinessFlowNode,
@@ -19,7 +38,13 @@ import type {
 
 describe('canvasStore', () => {
   beforeEach(() => {
-    // Reset store before each test
+    // Fully reset Zustand persist storage before each test
+    // This clears both persisted storage AND in-memory state
+    try {
+      (useCanvasStore.persist as any)?.clearStorage?.();
+    } catch (_) { /* ignore if not available */ }
+    // Fallback: clear localStorage and reset all state slices
+    localStorage.removeItem('vibex-canvas-storage');
     useCanvasStore.setState({
       phase: 'input',
       activeTree: null,
@@ -35,6 +60,20 @@ describe('canvasStore', () => {
       projectId: null,
       prototypeQueue: [],
       isPolling: false,
+      // Reset all other slices that might have state
+      leftExpand: 'default',
+      centerExpand: 'default',
+      rightExpand: 'default',
+      draggedNodeId: null,
+      dragOverNodeId: null,
+      draggedPositions: {},
+      isDragging: false,
+      boundedGroups: [],
+      aiThinking: false,
+      aiThinkingMessage: null,
+      requirementText: '',
+      flowGenerating: false,
+      flowGeneratingMessage: null,
     });
   });
 
@@ -657,5 +696,175 @@ describe('markAllPending', () => {
       // Integration with SSE is tested via dddApi.test.ts
       const { generateContextsFromRequirement } = useCanvasStore.getState();
       expect(typeof generateContextsFromRequirement).toBe('function');
+    });
+  });
+
+  // S1.1: 新增独立流程入口（零上下文场景）
+  describe('S1.1: Add independent flow (zero context)', () => {
+    it('should add a flow node with empty contextId', () => {
+      const { addFlowNode, flowNodes: beforeFlows } = useCanvasStore.getState();
+      const beforeCount = beforeFlows.length;
+      // S1.1-AC4: zero-context scenario — empty string contextId
+      addFlowNode({ name: '新业务流程', contextId: '', steps: [] });
+
+      const nodes = useCanvasStore.getState().flowNodes;
+      expect(nodes.length).toBe(beforeCount + 1);
+      expect(nodes[nodes.length - 1].contextId).toBe('');
+      expect(nodes[nodes.length - 1].name).toBe('新业务流程');
+    });
+
+    it('should set new flow status=pending and confirmed=false', () => {
+      const { addFlowNode } = useCanvasStore.getState();
+      addFlowNode({ name: '独立流程', contextId: '', steps: [] });
+
+      const flow = useCanvasStore.getState().flowNodes.find(n => n.name === '独立流程')!;
+      expect(flow.status).toBe('pending');
+      expect(flow.confirmed).toBe(false);
+    });
+
+    it('should add flow with empty contextId when no context nodes exist', () => {
+      const { addFlowNode, contextNodes: beforeContexts, flowNodes: beforeFlows } = useCanvasStore.getState();
+      // Capture before counts for state-agnostic assertions
+      const beforeFlowCount = beforeFlows.length;
+
+      addFlowNode({ name: '空上下文流程', contextId: '', steps: [] });
+      expect(useCanvasStore.getState().flowNodes.length).toBe(beforeFlowCount + 1);
+      expect(useCanvasStore.getState().flowNodes[useCanvasStore.getState().flowNodes.length - 1].contextId).toBe('');
+    });
+
+    it('should add multiple independent flows with empty contextId', () => {
+      const { addFlowNode, flowNodes } = useCanvasStore.getState();
+      const beforeCount = flowNodes.length;
+
+      addFlowNode({ name: '流程1', contextId: '', steps: [] });
+      addFlowNode({ name: '流程2', contextId: '', steps: [] });
+
+      const nodes = useCanvasStore.getState().flowNodes;
+      // Check that exactly 2 new flows were added
+      expect(nodes.length).toBe(beforeCount + 2);
+      // The last 2 flows should have empty contextId
+      const lastTwo = nodes.slice(-2);
+      expect(lastTwo.every(n => n.contextId === '')).toBe(true);
+    });
+  });
+
+  // S1.2: 流程内新增步骤
+  describe('S1.2: Add step to flow', () => {
+    it('should add a step to an existing flow', () => {
+      const { addFlowNode, addStepToFlow } = useCanvasStore.getState();
+      addFlowNode({ name: 'S1.2 Test Flow A', contextId: 'c1', steps: [] });
+      const flow = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.2 Test Flow A')!;
+
+      addStepToFlow(flow.nodeId, { name: '新步骤', actor: '待定', description: '' });
+
+      const updated = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.2 Test Flow A')!;
+      expect(updated.steps.length).toBe(1);
+      expect(updated.steps[0].name).toBe('新步骤');
+      expect(updated.steps[0].actor).toBe('待定');
+    });
+
+    it('should set new step status=pending and confirmed=false', () => {
+      const { addFlowNode, addStepToFlow } = useCanvasStore.getState();
+      addFlowNode({ name: 'S1.2 Test Flow B', contextId: 'c1', steps: [] });
+      const flow = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.2 Test Flow B')!;
+
+      addStepToFlow(flow.nodeId, { name: '待确认步骤', actor: '系统', description: '' });
+
+      const updated = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.2 Test Flow B')!;
+      expect(updated.steps[0].status).toBe('pending');
+      expect(updated.steps[0].confirmed).toBe(false);
+    });
+
+    it('should default actor to 待定 when not provided', () => {
+      const { addFlowNode, addStepToFlow } = useCanvasStore.getState();
+      addFlowNode({ name: 'S1.2 Test Flow C', contextId: 'c1', steps: [] });
+      const flow = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.2 Test Flow C')!;
+
+      addStepToFlow(flow.nodeId, { name: '步骤名' });
+
+      const updated = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.2 Test Flow C')!;
+      expect(updated.steps[updated.steps.length - 1].actor).toBe('待定');
+    });
+
+    it('should mark flow status pending after adding step', () => {
+      const { addFlowNode, addStepToFlow } = useCanvasStore.getState();
+      addFlowNode({ name: 'S1.2 Test Flow D', contextId: 'c1', steps: [] });
+      const flow = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.2 Test Flow D')!;
+
+      addStepToFlow(flow.nodeId, { name: '新步骤' });
+
+      const updated = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.2 Test Flow D')!;
+      expect(updated.status).toBe('pending');
+    });
+
+    it('should append step to existing steps list', () => {
+      const { addFlowNode, addStepToFlow } = useCanvasStore.getState();
+      addFlowNode({
+        name: 'S1.2 Test Flow E',
+        contextId: 'c1',
+        steps: [{ name: '已有步骤', actor: '用户', order: 0 }],
+      });
+      const flow = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.2 Test Flow E')!;
+      const beforeCount = flow.steps.length;
+
+      addStepToFlow(flow.nodeId, { name: '新步骤' });
+
+      const updatedFlow = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.2 Test Flow E')!;
+      expect(updatedFlow.steps.length).toBe(beforeCount + 1);
+      expect(updatedFlow.steps[updatedFlow.steps.length - 1].name).toBe('新步骤');
+    });
+
+    it('should not affect other flows when adding step', () => {
+      const { addFlowNode, addStepToFlow } = useCanvasStore.getState();
+      addFlowNode({ name: 'S1.2 Flow X', contextId: 'c1', steps: [] });
+      addFlowNode({ name: 'S1.2 Flow Y', contextId: 'c2', steps: [] });
+      const flowX = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.2 Flow X')!;
+      const flowY = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.2 Flow Y')!;
+      const stepsInYBefore = flowY.steps.length;
+
+      addStepToFlow(flowX.nodeId, { name: 'Step in X' });
+
+      const updatedX = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.2 Flow X')!;
+      const updatedY = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.2 Flow Y')!;
+      expect(updatedX.steps.length).toBe(flowX.steps.length + 1);
+      expect(updatedY.steps.length).toBe(stepsInYBefore);
+    });
+  });
+
+  // S1.3: 节点样式标准化（颜色值验证）
+  describe('S1.3: Flow step status colors', () => {
+    it('should create step with pending status for color #f59e0b', () => {
+      const { addFlowNode, addStepToFlow } = useCanvasStore.getState();
+      addFlowNode({ name: 'S1.3 Color Flow A', contextId: 'c1', steps: [] });
+      const flow = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.3 Color Flow A')!;
+      addStepToFlow(flow.nodeId, { name: 'Pending Step' });
+
+      const updated = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.3 Color Flow A')!;
+      expect(updated.steps[0].status).toBe('pending');
+      expect(updated.steps[0].status).not.toBe('confirmed');
+      expect(updated.steps[0].status).not.toBe('error');
+    });
+
+    it('should create flow with pending status for color #f59e0b', () => {
+      const { addFlowNode } = useCanvasStore.getState();
+      addFlowNode({ name: 'S1.3 Color Flow B', contextId: '', steps: [] });
+
+      const flow = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.3 Color Flow B')!;
+      expect(flow.status).toBe('pending');
+      // canvas.module.css uses var(--color-warning) = #f59e0b for .flowCard.nodePending
+    });
+
+    it('should mark confirmed step with #10b981', () => {
+      const { addFlowNode, addStepToFlow, confirmStep } = useCanvasStore.getState();
+      addFlowNode({ name: 'S1.3 Color Flow C', contextId: 'c1', steps: [] });
+      const flow = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.3 Color Flow C')!;
+      addStepToFlow(flow.nodeId, { name: 'Step to confirm' });
+      const stepId = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.3 Color Flow C')!.steps[0].stepId;
+
+      confirmStep(flow.nodeId, stepId);
+
+      const updated = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.3 Color Flow C')!;
+      expect(updated.steps[0].status).toBe('confirmed');
+      // canvas.module.css uses var(--color-success) = #10b981 for nodeConfirmed
     });
   });

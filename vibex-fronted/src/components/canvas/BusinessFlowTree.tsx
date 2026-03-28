@@ -14,8 +14,9 @@
 
 import React, { useState, useCallback } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import { CheckboxIcon } from '@/components/common/CheckboxIcon';
-import type { BusinessFlowNode, FlowStep } from '@/lib/canvas/types';
+import type { BusinessFlowNode, FlowStep, ComponentNode, BoundedContextNode } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
 
 // =============================================================================
@@ -214,6 +215,7 @@ interface FlowCardProps {
   onDelete: (nodeId: string) => void;
   onConfirm: (nodeId: string) => void;
   // Step actions
+  onAddStep: (flowNodeId: string, data: { name: string; actor?: string; description?: string }) => void;
   onConfirmStep: (flowNodeId: string, stepId: string) => void;
   onEditStep: (flowNodeId: string, stepId: string, data: Partial<FlowStep>) => void;
   onDeleteStep: (flowNodeId: string, stepId: string) => void;
@@ -226,6 +228,7 @@ function FlowCard({
   onEdit,
   onDelete,
   onConfirm,
+  onAddStep,
   onConfirmStep,
   onEditStep,
   onDeleteStep,
@@ -346,6 +349,21 @@ function FlowCard({
               />
             ))
           )}
+          {/* S1.2: 添加步骤按钮 */}
+          {!readonly && (
+            <button
+              className={styles.btnAddStep}
+              onClick={() => {
+                const name = window.prompt('步骤名称：');
+                if (name && name.trim()) {
+                  onAddStep(node.nodeId, { name: name.trim(), actor: '待定', description: '' });
+                }
+              }}
+              title="添加步骤"
+            >
+              + 添加步骤
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -368,24 +386,37 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
   const deleteStep = useCanvasStore((s) => s.deleteStep);
   const reorderSteps = useCanvasStore((s) => s.reorderSteps);
   const addFlowNode = useCanvasStore((s) => s.addFlowNode);
+  const addStepToFlow = useCanvasStore((s) => s.addStepToFlow);
   const autoGenerateFlows = useCanvasStore((s) => s.autoGenerateFlows);
   const flowGenerating = useCanvasStore((s) => s.flowGenerating);
+  const setComponentNodes = useCanvasStore((s) => s.setComponentNodes);
+  const setPhase = useCanvasStore((s) => s.setPhase);
+  const projectId = useCanvasStore((s) => s.projectId);
+
+  // === Local UI State ===
+  // S1.3: 防重复提交锁
+  const [componentGenerating, setComponentGenerating] = useState(false);
 
   // === Check if auto-gen should show ===
   // All contexts confirmed + no flows yet = show auto-gen hint
   const allContextsConfirmed = contextNodes.length > 0 && contextNodes.every((c) => c.confirmed);
-  // Any context existing → user can always manually add flows
-  const canManualAdd = contextNodes.length > 0;
 
+  // S1.1: 零上下文状态也可添加流程（独立流程入口）
   const handleManualAdd = useCallback(() => {
-    // Manual add: create empty flow for first unconfirmed context,
-    // or first context if all are already confirmed
+    // 优先找第一个未确认的上下文；无上下文时使用空 contextId
     const unconfirmedCtx = contextNodes.find((c) => !c.confirmed);
     const targetCtx = unconfirmedCtx ?? contextNodes[0];
     if (targetCtx) {
       addFlowNode({
         contextId: targetCtx.nodeId,
         name: `${targetCtx.name}业务流程`,
+        steps: [],
+      });
+    } else {
+      // 无任何上下文时，直接创建空流程
+      addFlowNode({
+        contextId: '',
+        name: '新业务流程',
         steps: [],
       });
     }
@@ -396,6 +427,52 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
     if (flowGenerating) return;
     autoGenerateFlows(contextNodes);
   }, [flowGenerating, contextNodes, autoGenerateFlows]);
+
+  // S1.3: 继续·组件树 — 调用 fetchComponentTree API，参数包含 flowData
+  const handleContinueToComponents = useCallback(async () => {
+    // 防重复提交：flowData 为空或正在生成时禁用
+    if (componentGenerating || flowNodes.length === 0) return;
+    setComponentGenerating(true);
+
+    try {
+      const sessionId = projectId ?? `session-${Date.now()}`;
+
+      // Map context nodes to API format
+      const mappedContexts: Array<{ id: string; name: string; description: string; type: string }> =
+        contextNodes.map((ctx: BoundedContextNode) => ({
+          id: ctx.nodeId,
+          name: ctx.name,
+          description: ctx.description ?? '',
+          type: ctx.type,
+        }));
+
+      // Map flow nodes (flowData) to API format
+      const mappedFlows: Array<{ name: string; contextId: string; steps: Array<{ name: string; actor: string }> }> =
+        flowNodes.map((f: BusinessFlowNode) => ({
+          name: f.name,
+          contextId: f.contextId,
+          steps: f.steps.map((step: FlowStep) => ({
+            name: step.name,
+            actor: step.actor,
+          })),
+        }));
+
+      // S1.3: Call fetchComponentTree with flowData in parameters
+      const componentNodes: ComponentNode[] = await canvasApi.fetchComponentTree({
+        contexts: mappedContexts,
+        flows: mappedFlows,
+        sessionId,
+      });
+
+      // S1.4: Store 渲染 — 更新 componentNodes 并切换 phase
+      setComponentNodes(componentNodes);
+      setPhase('component');
+    } catch (err) {
+      console.error('[BusinessFlowTree] handleContinueToComponents error:', err);
+    } finally {
+      setComponentGenerating(false);
+    }
+  }, [componentGenerating, flowNodes, contextNodes, projectId, setComponentNodes, setPhase]);
 
   if (!isActive) {
     return (
@@ -409,12 +486,11 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
     <div className={styles.flowTreePanel} data-testid="flow-tree">
       {/* Header with add button */}
       <div className={styles.treeHeader}>
-        {canManualAdd && (
-          <button className={styles.btnAddFlow} onClick={handleManualAdd}>
-            + 添加流程
-          </button>
-        )}
-        {canManualAdd && flowNodes.length > 0 && (
+        {/* S1.1: 始终显示添加流程按钮（零上下文状态也支持） */}
+        <button className={styles.btnAddFlow} onClick={handleManualAdd}>
+          + 添加流程
+        </button>
+        {flowNodes.length > 0 && (
           <button
             className={styles.secondaryButton}
             onClick={handleRegenerate}
@@ -422,6 +498,18 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
             title="基于已确认的上下文重新生成流程树"
           >
             {flowGenerating ? '◌ 重新生成中...' : '🔄 重新生成流程树'}
+          </button>
+        )}
+        {/* S1.1 & S1.2: 继续·组件树按钮 — flowData 为空时 disabled */}
+        {flowNodes.length > 0 && (
+          <button
+            className={styles.secondaryButton}
+            onClick={handleContinueToComponents}
+            disabled={componentGenerating}
+            aria-label="继续到组件树"
+            title="基于流程树数据生成组件树"
+          >
+            {componentGenerating ? '◌ 生成中...' : '继续·组件树'}
           </button>
         )}
         {allContextsConfirmed && flowNodes.length === 0 && (
@@ -451,6 +539,7 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
               onEdit={editFlowNode}
               onDelete={deleteFlowNode}
               onConfirm={confirmFlowNode}
+              onAddStep={addStepToFlow}
               onConfirmStep={confirmStep}
               onEditStep={editStep}
               onDeleteStep={deleteStep}

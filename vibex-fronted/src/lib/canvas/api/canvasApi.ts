@@ -162,6 +162,44 @@ export const canvasApi = {
 
     return res.json() as Promise<GenerateComponentsOutput>;
   },
+
+  /**
+   * 获取组件树 — 将流程树数据转换为组件树
+   * POST /api/canvas/generate-components (same underlying endpoint)
+   *
+   * @param contexts - 已确认的限界上下文节点
+   * @param flows - 已确认的业务流程节点（flowData）
+   * @param sessionId - 会话 ID
+   * @returns 组件树节点数组，格式化为可直接存入 canvasStore.componentNodes
+   */
+  fetchComponentTree: async (data: {
+    contexts: Array<{ id: string; name: string; description: string; type: string }>;
+    flows: Array<{ name: string; contextId: string; steps: Array<{ name: string; actor: string }> }>;
+    sessionId: string;
+  }): Promise<import('../types').ComponentNode[]> => {
+    const result = await canvasApi.generateComponents(data);
+
+    if (!result.success || !result.components || result.components.length === 0) {
+      throw new Error(result.error ?? '生成组件树失败，未返回有效数据');
+    }
+
+    return result.components.map((comp) => ({
+      flowId: comp.flowId ?? 'mock',
+      name: comp.name,
+      type: comp.type as import('../types').ComponentType,
+      props: {},
+      api: comp.api ?? {
+        method: 'GET' as const,
+        path: '/api/' + comp.name.toLowerCase().replace(/\s+/g, '-'),
+        params: [],
+      },
+      previewUrl: undefined,
+      nodeId: `comp-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+      confirmed: false,
+      status: 'pending' as const,
+      children: [],
+    }));
+  },
 };
 
 // === Polling Manager ===

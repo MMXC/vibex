@@ -198,6 +198,7 @@ interface CanvasStore {
   confirmFlowNode: (nodeId: string) => void;
   setFlowDraft: (draft: Partial<BusinessFlowNode> | null) => void;
   // === Step Actions (Epic 3) ===
+  addStepToFlow: (flowNodeId: string, data: { name: string; actor?: string; description?: string }) => void;
   confirmStep: (flowNodeId: string, stepId: string) => void;
   editStep: (flowNodeId: string, stepId: string, data: Partial<FlowStep>) => void;
   deleteStep: (flowNodeId: string, stepId: string) => void;
@@ -459,6 +460,28 @@ export const useCanvasStore = create<CanvasStore>()(
           setFlowDraft: (draft) => set({ flowDraft: draft }),
 
           // === Step Actions (Epic 3) ===
+          addStepToFlow: (flowNodeId, data) => {
+            set((s) => ({
+              flowNodes: s.flowNodes.map((n) => {
+                if (n.nodeId !== flowNodeId) return n;
+                const newStep: FlowStep = {
+                  stepId: generateId(),
+                  name: data.name,
+                  actor: data.actor ?? '待定',
+                  description: data.description ?? '',
+                  order: n.steps.length,
+                  confirmed: false,
+                  status: 'pending' as const,
+                };
+                return {
+                  ...n,
+                  steps: [...n.steps, newStep],
+                  status: 'pending' as const,
+                };
+              }),
+            }));
+          },
+
           confirmStep: (flowNodeId, stepId) => {
             set((s) => ({
               flowNodes: s.flowNodes.map((n) =>

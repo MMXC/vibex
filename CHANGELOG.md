@@ -1,3 +1,12 @@
+### Added (agent-self-evolution-20260328 Epic4: Analysis.md Template Standardization) — 2026-03-28
+- **F4.1**: `docs/analysis-template.md` — 标准 6 节分析文档模板
+  - 问题定义、业务场景、JTBD 分析（3-5条）、技术方案对比（≥2）、验收标准（≥4）、风险识别
+- **F4.2**: `scripts/validate_analysis.sh` — 分析文档验证脚本
+  - 扫描所有 docs/*/analysis.md，exit 1 报告违规
+  - 跳过模板本身和 docs/docs/ 归档目录
+- **F4.3**: 扫描 174 个文档（2 合规，172 待迁移）
+- Review: `docs/agent-self-evolution-20260328/docs/review-epic4-template-standardization.md`
+
 ### Added (vibex-pre-existing-test-failures: CardTreeView & Navbar 测试修复) — 2026-03-28
 - **CardTreeView.tsx**: 修复 `displayError` 逻辑，`fetchError` 不存在时不显示错误
 - **CardTreeView.test.tsx**: 添加 `useErrorHandler` mock，修复错误状态测试（29 tests ✅）

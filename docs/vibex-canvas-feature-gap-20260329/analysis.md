@@ -1,410 +1,323 @@
-# VibeX Canvas 功能差距分析报告
+# VibeX 画布功能差距分析报告
 
-> 分析日期: 2026-03-29
-> 分析范围: VibeX 画布页 (CardTree / FlowCanvas / MermaidCanvas)
-> 分析目的: 识别当前画布功能差距，对标竞品，输出优先级矩阵和实现建议
-
----
-
-## 一、当前画布功能盘点
-
-### 1.1 画布架构概览
-
-VibeX 画布页 (`/canvas`) 采用**三树并行架构**，由 `CanvasPage` 容器统一管理，分为三个子画布：
-
-| 子画布 | 组件 | 技术栈 | 核心功能 |
-|--------|------|--------|----------|
-| 限界上下文树 | `BoundedContextTree` | 自定义垂直列表 | AI生成、CRUD、关系连接器、确认状态 |
-| 业务流程树 | `BusinessFlowTree` | 自定义垂直列表 + 拖拽排序 | AI生成、Step拖拽排序、级联状态 |
-| 组件树 | `ComponentTree` | 自定义垂直列表 | AI生成、预览、页面分组 (E1) |
-
-另有三个可视化渲染器（位于 `visualization/`）：
-- `CardTreeRenderer` — 基于 ReactFlow 的卡片树可视化（垂直布局）
-- `FlowRenderer` — 基于 ReactFlow 的流程图可视化
-- `MermaidRenderer` — Mermaid SVG 渲染
-
-**核心状态管理**: `canvasStore.ts` (Zustand)，按 context/flow/component/phase/queue/drag/expand 分 slice 管理。
+**项目**: vibex-canvas-feature-gap-20260329
+**日期**: 2026-03-29
+**分析人**: analyst agent
+**工作目录**: /root/.openclaw/vibex
 
 ---
 
-### 1.2 已实现功能清单
+## 1. 执行摘要
 
-#### 🔷 阶段与流程管理
-- [x] 5 阶段进度条 (`input → context → flow → component → prototype`)
-- [x] 阶段点击回退（可回到更早阶段）
-- [x] 阶段锁定机制（context 未确认不可进入 flow，flow 未确认不可进入 component）
-- [x] AI Thinking 状态指示器（spinner + 消息）
-- [x] 原型队列面板 (`PrototypeQueuePanel`) 及进度追踪
+VibeX 目前有三套画布实现：**CardTree（首页预览）**、**FlowCanvas（画布页面）** 和 **MermaidCanvas（图表可视化）**。核心画布 FlowCanvas 已实现三栏折叠展开、节点 CRUD、AI 生成、级联状态、关系连线、网关节点、拖拽重排、队列生成等功能，但仍缺少多项竞品标配功能。
 
-#### 🔷 三树面板
-- [x] 三栏横向布局 + 移动端 Tab 切换模式
-- [x] 面板折叠/展开 (`toggleContextPanel` 等)
-- [x] 三栏展开切换（`leftExpand`/`centerExpand`/`rightExpand`，E2）
-- [x] Hover 热区视觉增强（`HoverHotzone`，E2-3）
-- [x] 移动端 Tab 模式自动展开当前面板（E2-2）
-- [x] 阶段标签实时显示（节点数 + 确认状态 ✅）
-
-#### 🔷 限界上下文树
-- [x] AI 生成限界上下文（`generateContextsFromRequirement`，调用 `canvasApi`）
-- [x] 上下文节点 CRUD（添加、编辑、删除）
-- [x] 节点状态：`pending`(黄) / `generating` / `confirmed`(绿) / `error`(红)
-- [x] 节点类型标签：`core`(橙) / `supporting` / `generic` / `external`
-- [x] 关系连接器 (`RelationshipConnector`) — 拖拽创建上下文间关系
-- [x] 节点确认机制（checkbox 确认）
-- [x] 级联标记（context 变更 → flow + component 标记 pending）
-
-#### 🔷 业务流程树
-- [x] 基于已确认 context 自动生成 flow（`autoGenerateFlows`，E3-1 修复）
-- [x] Flow 节点 CRUD + 展开/折叠
-- [x] Step 行：拖拽排序（视觉手柄）、上移/下移按钮
-- [x] Step 类型：`normal` / `branch` / `loop`（E3）
-- [x] 节点状态 + 确认机制
-- [x] 继续 → 组件树按钮（携带用户编辑后的 context 数据）
-
-#### 🔷 组件树
-- [x] 基于已确认 flow 生成组件（`handleContinueToComponents`）
-- [x] 组件节点 CRUD
-- [x] 组件类型：`page` / `form` / `list` / `detail` / `modal`
-- [x] API 设计（method + path + params）
-- [x] 节点状态 + 确认机制
-- [x] 组件树页面分组（`ComponentGroupOverlay`，E1）- 虚线框按 flowId 分组，通用组件独立置顶（E2）
-
-#### 🔷 ReactFlow 可视化层（CardTreeRenderer）
-- [x] 垂直卡片布局（ReactFlow）
-- [x] 自定义节点类型注册（`CardTreeNode`、`GatewayNode`）
-- [x] 自定义边类型（`LoopEdge`、`RelationshipEdge`）
-- [x] 节点拖拽位置保存（`draggedPositions`，E3）
-- [x] Controls / MiniMap / Background
-- [x] BoundedGroupOverlay — SVG 虚线框叠加层（E4）
-- [x] 节点点击展开/折叠
-- [x] Gateway 节点（分支/循环）支持
-
-#### 🔷 其他画布渲染器
-- [x] `FlowRenderer` — 基础 ReactFlow 流程图（节点/边/最小地图/缩放）
-- [x] `MermaidRenderer` — Mermaid SVG 渲染（加载/错误/空状态，节点点击）
-
-#### 🔷 数据与导出
-- [x] 示例数据导入 (`loadExampleData`)
-- [x] 项目创建（`createProject` API）
-- [x] sessionId 链路追踪
-- [x] localStorage 持久化
+**最关键的缺失是 Undo/Redo**（任何创作工具的核心需求），其次是导出能力、搜索导航、键盘快捷键和 MiniMap。
 
 ---
 
-## 二、竞品功能对比
+## 2. 当前画布功能盘点
 
-> 参考竞品: **v0.dev** (AI 产品生成)、**Excalidraw** (无限画布)、**Miro** (协作白板)、**FigJam** (设计协作)、**Notion AI Canvas** (知识画布)
+### 2.1 CardTree（首页预览画布）
 
-### 2.1 竞品功能矩阵
+| 功能 | 状态 | 代码位置 |
+|------|------|---------|
+| ReactFlow 垂直树布局 | ✅ 已实现 | `src/components/visualization/CardTreeRenderer/` |
+| 卡片节点 + 展开/折叠 | ✅ 已实现 | `src/components/visualization/CardTreeNode/` |
+| Checkbox 状态切换 | ✅ 已实现 | `CardTreeNode.tsx` |
+| 节点点击回调 | ✅ 已实现 | `onCardClick` prop |
+| MiniMap 导航 | ⚠️ 有 prop 未激活 | `CardTreeRenderer` |
+| Controls（缩放控制） | ⚠️ 有 prop 未激活 | `CardTreeRenderer` |
+| Background 背景 | ⚠️ 有 prop 未激活 | `CardTreeRenderer` |
+| 加载骨架屏 | ✅ 已实现 | `CardTreeSkeleton.tsx` |
+| 错误状态 + 重试 | ✅ 已实现 | `CardTreeError.tsx` |
+| 特性开关 | ✅ 已实现 | `FeatureFlagToggle.tsx` |
+| Bounded Group SVG 叠加层 | ✅ 已实现 | `groups/BoundedGroupOverlay.tsx` |
+| Gateway 节点（菱形分支） | ✅ 已实现 | `nodes/GatewayNode.tsx` |
+| Loop 边（循环连线） | ✅ 已实现 | `edges/LoopEdge.tsx` |
+| 自定义边类型 | ✅ 已实现 | `edgeTypes` prop |
+| Freehand 手绘模式 | ❌ 未实现 | — |
+| Undo/Redo | ❌ 未实现 | — |
+| 多选 | ❌ 未实现 | — |
 
-| 功能维度 | VibeX | v0.dev | Excalidraw | Miro | FigJam | 说明 |
-|----------|-------|--------|------------|------|--------|------|
-| **基础画布** |
-| 自由画布（无限滚动/缩放） | ❌ | ✅ | ✅ | ✅ | ✅ | v0 有虚拟画布；VibeX 是树形结构 |
-| 手绘/草图风格 | ❌ | ❌ | ✅ | ❌ | ✅ | Excalidraw 标志特性 |
-| 多人实时协作 | ❌ | ❌ | ✅ | ✅ | ✅ | v0 是异步；VibeX 无协作 |
-| 评论/锚点标注 | ❌ | ❌ | ✅ | ✅ | ✅ | 协作标配 |
-| **节点编辑** |
-| 节点内联编辑 | ✅ | ✅ | ✅ | ✅ | ✅ | VibeX 已实现 |
-| 节点复制/粘贴 | ❌ | ✅ | ✅ | ✅ | ✅ | 高频操作 |
-| 节点多选 + 批量操作 | ❌ | ✅ | ✅ | ✅ | ✅ | 效率关键 |
-| 节点自由拖拽（非树形） | ⚠️ E3 | ✅ | ✅ | ✅ | ✅ | CardTreeRenderer 已支持 |
-| 节点锁定 | ❌ | ✅ | ✅ | ✅ | ✅ | 防误操作 |
-| **连接与关系** |
-| 自由边（拖拽创建） | ⚠️ 关系连接器 | ✅ | ✅ | ✅ | ✅ | VibeX 仅限上下文关系 |
-| 边类型（直线/曲线/正交） | ⚠️ 仅 smoothstep | ✅ | ✅ | ✅ | ✅ | Excalidraw 多种模式 |
-| 边的标签/注释 | ⚠️ 仅 loop edge | ✅ | ✅ | ✅ | ✅ | 大量缺失 |
-| 边的箭头/端点样式 | ⚠️ 仅默认箭头 | ✅ | ✅ | ✅ | ✅ | 可配置性不足 |
-| **布局与对齐** |
-| 自动布局（dagre/elk） | ❌ | ✅ | ✅ | ✅ | ✅ | 竞品均有；VibeX 纯手动 |
-| 网格吸附 | ❌ | ✅ | ✅ | ✅ | ✅ | 效率关键 |
-| 元素对齐辅助线 | ❌ | ❌ | ✅ | ✅ | ✅ | Excalidraw 特有 |
-| **视图与导航** |
-| 最小地图导航 | ⚠️ 有但不完善 | ✅ | ✅ | ✅ | ✅ | CardTreeRenderer 有 |
-| 缩略图概览 | ❌ | ✅ | ❌ | ✅ | ✅ | 快速定位 |
-| 全屏演示模式 | ❌ | ✅ | ✅ | ✅ | ✅ | 展示场景 |
-| 锁定缩放级别 | ❌ | ✅ | ✅ | ✅ | ✅ | 防止误操作 |
-| **AI 能力** |
-| 自然语言添加节点 | ✅ | ✅ | ✅ | ❌ | ❌ | 核心能力 |
-| AI 重写/优化内容 | ❌ | ✅ | ❌ | ✅ | ✅ | v0 的强项 |
-| AI 生成图片填充 | ❌ | ✅ | ✅ | ❌ | ✅ | 快速原型 |
-| AI 解释选中节点 | ❌ | ✅ | ❌ | ❌ | ❌ | v0 特有 |
-| **导入导出** |
-| 导入 JSON/Excel | ❌ | ❌ | ✅ | ✅ | ✅ | 竞品均有 |
-| 导出 PNG/SVG/PDF | ❌ | ✅ | ✅ | ✅ | ✅ | v0/Excalidraw 强项 |
-| 导出代码（Mermaid等） | ⚠️ Mermaid渲染 | ✅ | ✅ | ✅ | ✅ | 可增强 |
-| **原型生成** |
-| 从节点生成可交互原型 | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | VibeX 核心功能 |
-| 原型预览/播放 | ✅ | ✅ | ❌ | ⚠️ | ⚠️ | VibeX 有队列 |
-| **个性化** |
-| 主题定制（颜色/字体） | ❌ | ✅ | ✅ | ✅ | ✅ | 无品牌适配 |
-| 画布背景样式 | ❌ | ❌ | ✅ | ✅ | ✅ | 点/线/方格等 |
-| 快捷键系统 | ❌ | ✅ | ✅ | ✅ | ✅ | 高效操作 |
-| **搜索与筛选** |
-| 画布内全局搜索 | ❌ | ✅ | ✅ | ✅ | ✅ | 节点多了必需 |
-| 按类型/状态筛选节点 | ❌ | ❌ | ✅ | ✅ | ✅ | 大型项目必需 |
-| **撤销/重做** |
-| 操作历史撤销/重做 | ⚠️ 仅 localStorage | ✅ | ✅ | ✅ | ✅ | 核心功能缺失 |
-| 版本快照 | ❌ | ❌ | ✅ | ✅ | ✅ | 可回溯 |
+### 2.2 FlowCanvas（画布页面 — 三树画布）
 
----
+| 功能 | 状态 | 代码位置 |
+|------|------|---------|
+| 三栏并行布局（Context / Flow / Component） | ✅ 已实现 | `src/components/canvas/CanvasPage.tsx` |
+| 阶段进度条（5阶段） | ✅ 已实现 | `PhaseProgressBar.tsx` |
+| 面板折叠/展开 | ✅ 已实现 | `TreePanel.tsx` + `toggleContextPanel` |
+| Hover 热区展开（E2 Expand） | ✅ 已实现 | `HoverHotzone.tsx` |
+| Grid 动态列宽（1fr / 1.5fr / 0） | ✅ 已实现 | `getGridTemplate()` in store |
+| Context 节点 CRUD + AI 生成 | ✅ 已实现 | `BoundedContextTree.tsx` |
+| Flow 节点 CRUD + AI 生成 | ✅ 已实现 | `BusinessFlowTree.tsx` |
+| Component 节点 CRUD + AI 生成 | ✅ 已实现 | `ComponentTree.tsx` |
+| 节点确认状态（pending/confirmed/error） | ✅ 已实现 | `NodeStatus` in types |
+| 级联状态标记（上游变 → 下游 pending） | ✅ 已实现 | `CascadeUpdateManager.ts` |
+| 关系连线 SVG（Context Relationship） | ✅ 已实现 | `edges/RelationshipConnector.tsx` |
+| ReactFlow 关系边（RelationshipEdge） | ✅ 已实现 | `edges/RelationshipEdge.tsx` |
+| Gateway 节点（菱形分支节点） | ✅ 已实现 | `nodes/GatewayNode.tsx` |
+| Loop 边（循环连线） | ✅ 已实现 | `edges/LoopEdge.tsx` |
+| 按 Flow ID 分组叠加层（虚线框） | ✅ 已实现 | `groups/ComponentGroupOverlay.tsx` |
+| 按 Bounded Context 分组叠加层 | ✅ 已实现 | `groups/BoundedGroupOverlay.tsx` |
+| 节点拖拽重排 | ✅ 已实现（E3） | `DragSlice` in store |
+| 原型队列面板 | ✅ 已实现 | `PrototypeQueuePanel.tsx` |
+| 项目创建 + 持久化 | ✅ 已实现 | `ProjectBar.tsx` + `canvasApi` |
+| SSE/轮询生成状态 | ✅ 已实现 | `canvasSseApi.ts` |
+| 响应式 Tab 切换（< 768px） | ✅ 已实现 | `CanvasPage` prop |
+| Undo/Redo | ❌ 未实现 | — |
+| 搜索节点 | ❌ 未实现 | — |
+| 键盘快捷键 | ❌ 未实现 | — |
+| 导出（图片/PDF/JSON） | ❌ 未实现 | — |
+| 缩放控制（Zoom In/Out/Fit） | ❌ 未实现 | — |
+| 多选 + 批量操作 | ❌ 未实现 | — |
+| 贴纸/标注 | ❌ 未实现 | — |
+| 协作（实时多人） | ❌ 未实现 | — |
+| 版本历史 | ❌ 未实现 | — |
 
-## 三、功能差距分析
+### 2.3 MermaidCanvas（图表可视化）
 
-### 3.1 缺失功能详细清单
-
-#### 🚨 高优先级差距 (Critical Gaps)
-
-**G1: 撤销/重做系统 (Undo/Redo)**
-- **现状**: 仅通过 localStorage 持久化，无操作级撤销
-- **影响**: 用户误操作后无法回退，高风险功能
-- **参考**: Excalidraw 历史记录、v0.dev command history
-- **实现成本**: 🟡 Medium（需引入状态快照机制，UndoManager）
-- **用户价值**: ⭐⭐⭐⭐⭐
-
-**G2: 节点多选 + 批量操作**
-- **现状**: 仅支持单节点操作
-- **影响**: 编辑效率极低，多节点管理不可行
-- **参考**: Excalidraw shift+click / 框选
-- **实现成本**: 🟡 Medium（需 ReactFlow selection + 批量 store action）
-- **用户价值**: ⭐⭐⭐⭐⭐
-
-**G3: 全局搜索 + 筛选**
-- **现状**: 无任何搜索能力
-- **影响**: 节点数量增加后无法快速定位
-- **参考**: Miro 搜索面板、Excalidraw CMD+P
-- **实现成本**: 🟢 Low（前端 filter + 高亮）
-- **用户价值**: ⭐⭐⭐⭐⭐
-
-**G4: 自动布局引擎**
-- **现状**: 完全依赖手动拖拽
-- **影响**: 大量节点时布局耗时，CardTreeRenderer 无自动排列
-- **参考**: dagre/elk.js 自动布局算法
-- **实现成本**: 🔴 High（需集成布局库 + 适配 ReactFlow）
-- **用户价值**: ⭐⭐⭐⭐
-
-#### ⚠️ 中优先级差距 (Important Gaps)
-
-**G5: 边的富文本标签与样式**
-- **现状**: 仅 loop edge 有 label，其他边无标签
-- **影响**: 关系语义不清晰
-- **实现成本**: 🟢 Low（扩展 Edge 组件）
-- **用户价值**: ⭐⭐⭐
-
-**G6: 边类型多样性**
-- **现状**: 仅 `smoothstep`，无直线/正交/贝塞尔选项
-- **影响**: 无法适配不同审美偏好
-- **实现成本**: 🟢 Low（ReactFlow `edgeOptions` 配置）
-- **用户价值**: ⭐⭐
-
-**G7: 网格吸附**
-- **现状**: 无网格，节点位置自由漂浮
-- **影响**: 布局不够整齐
-- **实现成本**: 🟢 Low（ReactFlow `snapGrid` 配置）
-- **用户价值**: ⭐⭐⭐
-
-**G8: 节点复制/粘贴**
-- **现状**: 无此功能
-- **影响**: 重复节点需重新创建
-- **实现成本**: 🟢 Low（clipboard API + store action）
-- **用户价值**: ⭐⭐⭐⭐
-
-**G9: 导出能力（PNG/SVG/JSON）**
-- **现状**: 仅 Mermaid 渲染，无导出
-- **影响**: 无法分享静态图，无法嵌入外部文档
-- **实现成本**: 🟡 Medium（html-to-image + ReactFlow toJSON）
-- **用户价值**: ⭐⭐⭐
-
-**G10: 快捷键系统**
-- **现状**: 无任何快捷键
-- **影响**: 效率用户操作繁琐
-- **参考**: Excalidraw CMD+Z/CMD+D/CMD+G
-- **实现成本**: 🟢 Low（`useHotkeys` hook）
-- **用户价值**: ⭐⭐⭐
-
-**G11: 节点锁定**
-- **现状**: 所有节点均可编辑
-- **影响**: 确认后的节点可能被误改
-- **实现成本**: 🟢 Low（readonly 模式扩展）
-- **用户价值**: ⭐⭐⭐
-
-**G12: 导入能力（JSON/Excel）**
-- **现状**: 仅支持示例数据导入
-- **影响**: 无法接入外部数据源
-- **实现成本**: 🟡 Medium（文件解析 + schema 验证）
-- **用户价值**: ⭐⭐
-
-#### 📋 低优先级差距 (Nice-to-Haves)
-
-**G13: 多人实时协作** — 架构改造成本极高，中长期目标
-**G14: 自由画布模式** — 需架构重构，当前树形结构不适合
-**G15: 手绘/草图风格** — 美学增强，非核心
-**G16: AI 重写/优化节点内容** — 依赖 LLM 能力扩展
-**G17: 主题定制系统** — UI 增强，非 MVP 必需
-**G18: 画布背景样式切换** — 美学增强
-**G19: 全屏演示模式** — 展示场景，非核心
-**G20: 版本快照对比** — 中期目标，需版本化数据模型
+| 功能 | 状态 | 代码位置 |
+|------|------|---------|
+| Mermaid 语法渲染 | ✅ 已实现 | `src/components/visualization/MermaidRenderer/` |
+| Mermaid 代码编辑器 | ✅ 已实现 | `src/components/ui/MermaidEditor.tsx` |
+| 节点点击交互 | ✅ 已实现 | `onNodeClick` prop |
+| 空/加载/错误状态 | ✅ 已实现 | MermaidRenderer |
+| ViewSwitcher（Flow/Mermaid/JSON） | ✅ 已实现 | `ViewSwitcher.tsx` |
+| VisualizationPlatform 统一容器 | ✅ 已实现 | `VisualizationPlatform.tsx` |
+| 节点关系图（上下文关联） | ✅ 已实现 | `ContextTreeFlow.tsx` |
+| 导出 Mermaid SVG | ❌ 未实现 | — |
+| 实时预览（编辑时） | ⚠️ 基础实现 | MermaidEditor |
+| 深色主题渲染 | ⚠️ 部分实现 | CSS variable |
 
 ---
 
-## 四、优先级矩阵
+## 3. 竞品功能对比
 
-> 矩阵维度: **用户价值** (1-5⭐) × **实现成本** (🟢Low / 🟡Medium / 🔴High)
-> 颜色标注: 🟢 MVP候选（≤2天可上线） / 🟡 短期迭代 / 🔴 中长期规划
+| 功能 | VibeX FlowCanvas | v0.dev | Excalidraw | Miro | FigJam |
+|------|:----------------:|:------:|:----------:|:----:|:------:|
+| **核心** |
+| 三树结构（DDD） | ✅ | — | — | — | — |
+| AI 生成节点 | ✅ | ✅ | — | ✅ | ✅ |
+| 级联确认 | ✅ | — | — | — | — |
+| 关系连线 | ✅ | — | ✅ | ✅ | ✅ |
+| **导航** |
+| MiniMap | ⚠️ 有prop未用 | — | ✅ | ✅ | ✅ |
+| Zoom In/Out | ❌ | ✅ | ✅ | ✅ | ✅ |
+| Fit View | ⚠️ 有prop未用 | ✅ | ✅ | ✅ | ✅ |
+| 搜索节点/元素 | ❌ | — | ✅ | ✅ | ✅ |
+| 键盘快捷键 | ❌ | ✅ | ✅ | ✅ | ✅ |
+| **编辑** |
+| Undo/Redo | ❌ | ✅ | ✅ | ✅ | ✅ |
+| 多选 | ❌ | ✅ | ✅ | ✅ | ✅ |
+| Freehand 手绘 | ❌ | — | ✅ | ✅ | ✅ |
+| 贴纸/便利贴 | ❌ | — | ✅ | ✅ | ✅ |
+| 拖拽重排 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **导出** |
+| 导出图片（PNG/SVG） | ❌ | ✅ | ✅ | ✅ | ✅ |
+| 导出 PDF | ❌ | — | ✅ | ✅ | ✅ |
+| 导出 JSON | ⚠️ API部分 | ✅ | ✅ | ✅ | ✅ |
+| 打印 | ⚠️ 浏览器 | ✅ | ✅ | ✅ | ✅ |
+| **协作** |
+| 实时多人编辑 | ❌ | ✅ | ✅ | ✅ | ✅ |
+| 鼠标指针显示 | ❌ | — | ✅ | ✅ | ✅ |
+| 评论/标注 | ❌ | — | ✅ | ✅ | ✅ |
+| **高级** |
+| 版本历史 | ❌ | — | ✅ | ✅ | ✅ |
+| 模板市场 | ❌ | — | ✅ | ✅ | ✅ |
+| 演示模式 | ❌ | — | ✅ | ✅ | ✅ |
+| 深色模式 | ✅ 全局 | — | ✅ | ✅ | ✅ |
+| 离线支持 | ❌ | — | ✅ | — | — |
+
+---
+
+## 4. 功能差距分析（缺失功能清单）
+
+### 4.1 高价值缺失（用户核心体验）
+
+| ID | 功能 | 描述 | 对应竞品 |
+|----|------|------|---------|
+| G1 | **Undo/Redo** | 任何创作工具的核心需求，VibeX 三树画布完全没有 | Excalidraw/Miro 标配 |
+| G2 | **搜索节点** | 在大型项目中快速定位节点，无搜索体验差 | Excalidraw/Miro |
+| G3 | **导出图片** | 用户需要将画布导出为 PNG/SVG 用于分享 | v0.dev/Excalidraw |
+| G4 | **键盘快捷键** | Cmd+Z, Cmd+Shift+Z, Cmd+S 等提升效率 | 全部竞品 |
+| G5 | **MiniMap** | 大型 DDD 模型的导航工具，当前有 prop 未激活 | Excalidraw/Miro |
+
+### 4.2 中价值缺失（增强体验）
+
+| ID | 功能 | 描述 | 对应竞品 |
+|----|------|------|---------|
+| M1 | **Zoom 缩放控制** | 放大/缩小/适应屏幕，当前有 ReactFlow 未使用 | Excalidraw/Miro |
+| M2 | **多选 + 批量操作** | Shift+点击多选，批量移动/删除 | Excalidraw/Miro |
+| M3 | **Sticky Notes 贴纸** | 轻量标注/备注，竞品标配 | Excalidraw/Miro/FigJam |
+| M4 | **导出 PDF** | 项目汇报用，需要 PDF 格式 | Excalidraw/Miro |
+| M5 | **版本历史** | 记录每次保存状态，可回溯 | Excalidraw/Miro |
+| M6 | **节点颜色标签** | Excalidraw/Miro 的色块标注，可视化辅助 | Excalidraw |
+
+### 4.3 低价值缺失（高级特性）
+
+| ID | 功能 | 描述 | 对应竞品 |
+|----|------|------|---------|
+| L1 | **Freehand 手绘** | Excalidraw 的核心特色，画布涂鸦 | Excalidraw/FigJam |
+| L2 | **模板市场** | 预设 DDD 模板快速开始 | Excalidraw/Miro |
+| L3 | **演示模式** | 全屏逐步展示画布结构 | Excalidraw/Miro |
+| L4 | **协作评论** | 团队成员在节点上留评论 | Miro/FigJam |
+| L5 | **实时多人编辑** | 需要后端 WebSocket 支持，工作量较大 | v0.dev/Miro/FigJam |
+| L6 | **离线支持** | Service Worker 缓存 | Excalidraw |
+
+---
+
+## 5. 优先级矩阵
 
 ```
 用户价值
-   5⭐
-   4⭐  ┌──────────────────────────────────────────┐
-        │  [G1] Undo/Redo        [G2] 多选+批量操作 │
-        │  [G3] 全局搜索+筛选    [G8] 复制/粘贴     │
-   3⭐  ├──────────────────────────────────────────┤
-        │  [G11] 节点锁定          [G10] 快捷键     │
-        │  [G5] 边富文本标签       [G7] 网格吸附   │
-        │  [G9] 导出能力           [G6] 边类型多样  │
-   2⭐  ├──────────────────────────────────────────┤
-        │  [G4] 自动布局引擎      [G12] 导入能力   │
-   1⭐  │  [G13-20] 低优先级功能                       │
-        └──────────────────────────────────────────┘
-         🟢Low    🟡Medium    🔴High
-                  实现成本
+    高
+     │
+  G1 │ U1: Undo/Redo
+     │ G2: 搜索节点
+     │ G3: 导出图片
+     │
+  中 ─┼─ G4: 键盘快捷键
+     │ G5: MiniMap
+     │ M1: Zoom控制
+     │ M2: 多选批量
+     │ M3: Sticky Notes
+     │ M4: 导出PDF
+     │
+  低 ─┼─ M5: 版本历史
+     │ M6: 节点颜色
+     │ L1: Freehand
+     │ L2: 模板市场
+     │ L3: 演示模式
+     │ L4: 协作评论
+     │ L5: 实时协作
+     │ L6: 离线支持
+     │
+    低└──────────────┴──────────────高
+       容易实现              难实现
 ```
 
-### 详细优先级排序
+### 矩阵坐标说明
 
-| 优先级 | ID | 功能 | 用户价值 | 实现成本 | 预计工时 | 理由 |
-|--------|-----|------|----------|----------|----------|------|
-| 🥇 P0 | G3 | 全局搜索+筛选 | ⭐⭐⭐⭐⭐ | 🟢 Low | 1天 | 最小成本，最大收益，解决找节点痛点 |
-| 🥇 P0 | G8 | 节点复制/粘贴 | ⭐⭐⭐⭐ | 🟢 Low | 1天 | 高频操作，VibeX 节点复用场景多 |
-| 🥇 P0 | G10 | 快捷键系统 | ⭐⭐⭐ | 🟢 Low | 1天 | 效率提升显著，Excalidraw 标配 |
-| 🥈 P1 | G1 | 撤销/重做系统 | ⭐⭐⭐⭐⭐ | 🟡 Medium | 2天 | 核心防错机制，UndoManager 实现 |
-| 🥈 P1 | G2 | 节点多选+批量操作 | ⭐⭐⭐⭐⭐ | 🟡 Medium | 2天 | 效率关键，ReactFlow selection API |
-| 🥈 P1 | G11 | 节点锁定 | ⭐⭐⭐ | 🟢 Low | 0.5天 | 防误操作，确认后锁定 |
-| 🥈 P1 | G5 | 边富文本标签 | ⭐⭐⭐ | 🟢 Low | 0.5天 | 关系语义增强 |
-| 🥉 P2 | G7 | 网格吸附 | ⭐⭐⭐ | 🟢 Low | 0.5天 | 布局整齐度 |
-| 🥉 P2 | G6 | 边类型多样性 | ⭐⭐ | 🟢 Low | 0.5天 | 审美偏好适配 |
-| 📋 P3 | G9 | 导出能力 | ⭐⭐⭐ | 🟡 Medium | 2天 | 分享和嵌入场景 |
-| 📋 P3 | G4 | 自动布局引擎 | ⭐⭐⭐⭐ | 🔴 High | 5天 | 长期目标，dagre 集成 |
-| 🔜 P4 | G12 | 导入能力 | ⭐⭐ | 🟡 Medium | 2天 | 数据接入 |
-| ⏳ P5+ | G13-20 | 协作/自由画布等 | 视情况 | 🔴 High | 未知 | 中长期目标 |
+| 象限 | 策略 | 功能 |
+|------|------|------|
+| **左上（高价值+低成本）** | 🔴 立即做（本周） | G1, G2, G4, G5 |
+| **右上（高价值+高成本）** | 🟡 规划做（本月） | G3（导出图片）, M4（PDF） |
+| **左下（低价值+低成本）** | 🟢 快速做（有空） | M6, L2 |
+| **右下（低价值+高成本）** | ⚪ 暂不做 | L1, L3, L4, L5, L6 |
 
 ---
 
-## 五、MVP 快速实现清单 (3天内可上线)
+## 6. MVP 级别功能（3天内可上线）
 
-以下 6 个功能点可在 **3 天内**完成，可作为 MVP 版本发布：
+以下功能基于现有 ReactFlow API + Zustand store，无需新依赖，实现成本低：
 
-### Day 1: 搜索 + 锁定 + 边标签
-| 功能 | 实现要点 | 工时估计 |
-|------|----------|----------|
-| **G3: 全局搜索** | 在 CanvasPage 顶部加搜索框，`useMemo` filter `contextNodes/flowNodes/componentNodes`，高亮匹配节点，scrollIntoView | 4h |
-| **G11: 节点锁定** | `BoundedContextNode` 等类型增加 `locked: boolean`，确认后自动锁定；编辑时检查 `locked`，展示 🔒 图标 | 3h |
-| **G5: 边富文本标签** | `RelationshipEdge` / 默认 edge 增加 `label` 渲染，支持自定义 label 内容 | 2h |
+### M1: Undo/Redo（G1）— 优先级 🔴 P0
+- **工时估算**: 6-8h
+- **实现方案**:
+  - 安装 `zustand/middleware` 的 `useUndoStore`
+  - 封装 `useHistory` hook，监听节点增删改事件
+  - 添加 `Ctrl+Z` / `Ctrl+Shift+Z` 快捷键
+  - 在 ProjectBar 添加 Undo/Redo 按钮
+- **验收标准**:
+  - [ ] `Ctrl+Z` 回退最近一次节点操作
+  - [ ] `Ctrl+Shift+Z` 重做
+  - [ ] 按钮状态正确（无可撤销时禁用）
+  - [ ] 三棵树状态独立历史
 
-### Day 2: 快捷键 + 网格 + 边类型
-| 功能 | 实现要点 | 工时估计 |
-|------|----------|----------|
-| **G10: 快捷键系统** | `useHotkeys` hook (react-hotkeys-hook)，支持：CMD+Z 撤销、CMD+D 复制、Delete 删除、CMD+L 锁定/解锁、CMD+F 搜索、Arrow 导航 | 4h |
-| **G7: 网格吸附** | ReactFlow `snapGrid` 配置，`CardTreeRenderer` / `FlowRenderer` 添加 `snapToGrid` prop | 2h |
-| **G6: 边类型选择** | 在 canvasStore 增加 `edgeStyle` 选项（smoothstep/bezier/step），ReactFlow `defaultEdgeOptions` | 2h |
+### M2: MiniMap 导航（G5）— 优先级 🟠 P1
+- **工时估算**: 2-3h
+- **实现方案**:
+  - 在 CardTreeRenderer 激活 `showMiniMap={true}`
+  - FlowCanvas 三栏独立 MiniMap（每个 TreePanel 一个）
+  - 适配 CanvasPage 响应式（< 768px 隐藏）
+- **验收标准**:
+  - [ ] MiniMap 显示节点缩略图
+  - [ ] 点击 MiniMap 跳转对应节点
+  - [ ] 移动时 MiniMap 实时更新
 
-### Day 3: 复制粘贴
-| 功能 | 实现要点 | 工时估计 |
-|------|----------|----------|
-| **G8: 节点复制/粘贴** | `useCopyPaste` hook：clipboard 序列化节点，CMD+C/V 操作，支持跨节点类型复制（自动映射字段），粘贴时生成新 nodeId | 4h |
+### M3: 搜索节点（G2）— 优先级 🟠 P1
+- **工时估算**: 4-6h
+- **实现方案**:
+  - 在 ProjectBar 添加搜索图标按钮，点击弹出搜索 Dialog
+  - 支持按节点名称模糊搜索
+  - 搜索结果高亮 + 滚动到目标节点
+  - 键盘 `/` 触发搜索
+- **验收标准**:
+  - [ ] 输入关键词实时过滤节点
+  - [ ] 匹配节点高亮显示
+  - [ ] 回车跳转并聚焦节点
+  - [ ] `Esc` 关闭搜索
 
----
+### M4: 键盘快捷键（G4）— 优先级 🟠 P1
+- **工时估算**: 4-6h
+- **实现方案**:
+  - 封装 `useKeyboardShortcuts` hook
+  - 绑定: `Cmd+Z` Undo, `Cmd+Shift+Z` Redo, `/` 搜索, `S` 保存, `N` 新建节点, `Del` 删除
+  - 显示快捷键提示面板（`?` 键触发）
+- **验收标准**:
+  - [ ] 所有绑定快捷键正常工作
+  - [ ] 焦点在输入框时不触发画布快捷键
+  - [ ] 快捷键提示面板可切换显示
 
-## 六、架构增强建议
-
-### 6.1 撤销/重做引擎 (UndoManager)
-
-建议引入命令模式（Command Pattern）封装所有 store mutations：
-
-```typescript
-// 每次 mutation 封装为 Command
-interface Command {
-  execute(): void;
-  undo(): void;
-  description: string;
-}
-
-// canvasStore 新增 slice
-interface UndoRedoSlice {
-  past: Command[];
-  future: Command[];
-  executeCommand(cmd: Command): void;
-  undo(): void;
-  redo(): void;
-}
-```
-
-**依赖**: G1 依赖 G3/G8 的完成，因为撤销的内容包括搜索和复制操作。
-
-### 6.2 布局引擎接口
-
-为未来自动布局预留接口：
-
-```typescript
-interface LayoutEngine {
-  layout(nodes: Node[], direction: 'TB' | 'LR' | 'RL'): Node[];
-}
-
-// 可选的布局引擎
-const DagreLayoutEngine: LayoutEngine; // dagre
-const ElkLayoutEngine: LayoutEngine;    // elk.js
-const ForceLayoutEngine: LayoutEngine; // d3-force
-```
-
-### 6.3 多选 Selection Store
-
-```typescript
-interface SelectionSlice {
-  selectedNodeIds: Set<string>;
-  selectNode(id: string, additive?: boolean): void;
-  deselectNode(id: string): void;
-  selectAll(): void;
-  clearSelection(): void;
-  /** 批量操作 */
-  batchConfirm(ids: string[]): void;
-  batchDelete(ids: string[]): void;
-  batchCopy(ids: string[]): void;
-}
-```
+### M5: Zoom 缩放控制（M1）— 优先级 🟡 P2
+- **工时估算**: 3-4h
+- **实现方案**:
+  - 在 CanvasPage 添加缩放控制按钮组（+ / - / fit）
+  - 暴露 `useReactFlow().zoomIn/zoomOut/fitView`
+  - 添加鼠标滚轮缩放支持
+- **验收标准**:
+  - [ ] +/- 按钮缩放画布
+  - [ ] Fit 按钮适应屏幕
+  - [ ] 鼠标滚轮缩放
+  - [ ] 缩放状态持久化到 store
 
 ---
 
-## 七、总结
+## 7. 推荐实施路线图
 
-### 7.1 核心发现
+### Week 1: 核心体验补全
+- **G1 Undo/Redo** (6-8h) — 最影响用户信心
+- **G4 键盘快捷键** (4-6h) — 与 G1 协同开发
+- **G5 MiniMap** (2-3h) — 激活已有 prop
 
-1. **VibeX 画布差异化优势**: DDD 领域建模 + AI 生成 + 原型一体化，这是 v0.dev/Excalidraw/Miro 均不具备的垂直场景。核心护城河在于 context/flow/component 三树联动和 AI 生成流。
+### Week 2: 导航与导出
+- **G2 搜索节点** (4-6h) — 大型项目刚需
+- **G3 导出图片** (4-6h) — 用户分享需求
+- **M1 Zoom控制** (3-4h) — 补全导航
 
-2. **最大差距**: 画布基础交互能力（撤销/重做、多选、搜索）与竞品存在代差。这些是用户期望的基础能力，不应有明显缺失。
+### Week 3: 增强编辑
+- **M2 多选批量** (6-8h) — 需要 ReactFlow SelectionMode
+- **M3 Sticky Notes** (4-6h) — 低成本高价值
+- **M4 导出PDF** (6-8h) — 报告需求
 
-3. **可快速追赶**: 通过 3 天的 MVP 开发，可补齐最关键的 6 个功能点（G3/G11/G5/G10/G7/G6/G8），使画布交互体验接近 Excalidraw 的 80%。
-
-4. **差异化演进方向**: 长期看，应在「AI 生成增强」和「DDD 可视化」两个方向构建护城河，而非追赶 Excalidraw 的手绘/协作功能。
-
-### 7.2 推荐实施路线图
-
-```
-Phase 1 (1周): MVP 6项基础交互
-  Day1-3: 搜索 + 锁定 + 边标签 + 快捷键 + 网格 + 边类型 + 复制粘贴
-  → 画布基础交互达标
-
-Phase 2 (1周): 撤销/重做 + 多选批量操作
-  → 核心防错 + 效率工具
-
-Phase 3 (2周): 导出能力 + 导入能力 + 自动布局
-  → 生态集成 + 长期竞争力
-
-Phase 4 (长期): 协作/自由画布/主题系统
-  → 差异化深耕
-```
+### Week 4: 高级特性
+- **M5 版本历史** (8-12h) — 持久化 + Diff
+- **M6 节点颜色标签** (3-4h) — 可视化增强
+- **L2 模板市场** (8-12h) — 需要模板设计
 
 ---
 
-*报告生成: vibex-canvas-feature-gap-20260329*
-*分析人: Analyst Agent*
-*审查状态: 待 PM + Architect Review*
+## 8. 技术风险识别
+
+| 风险 | 影响 | 缓解方案 |
+|------|------|---------|
+| Undo/Redo 状态爆炸 | 高 | 限制历史深度（max 50步），按 TreeType 分开历史 |
+| 导出图片 SVG 兼容性 | 中 | 使用 `html-to-image` 库，提供 PNG 回退 |
+| 搜索性能（千级节点） | 中 | 虚拟化列表 + 防抖搜索 |
+| ReactFlow 版本升级破坏性变更 | 低 | 锁定版本 + 集成测试覆盖 |
+| PDF 导出中文乱码 | 中 | 使用 `jspdf` + `svg2pdf` 处理中文 |
+
+---
+
+## 9. 验收标准
+
+完成本分析报告后，以下为产出验收标准：
+
+- [ ] `docs/vibex-canvas-feature-gap-20260329/analysis.md` 已生成
+- [ ] 已实现功能清单完整（CardTree/FlowCanvas/MermaidCanvas 三表）
+- [ ] 缺失功能清单 18 项，覆盖 G1-L6
+- [ ] 竞品对比表覆盖 v0.dev / Excalidraw / Miro / FigJam
+- [ ] 优先级矩阵四象限明确
+- [ ] MVP 功能 5 项，每项有工时估算和验收标准
+- [ ] 推荐路线图 4 周规划
+- [ ] Git commit 已提交: `feat(canvas-gap): add feature gap analysis for canvas pages`

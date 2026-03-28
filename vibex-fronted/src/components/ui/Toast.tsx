@@ -35,7 +35,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     (message: string, type: ToastType = 'info', duration?: number) => {
       const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2)}`;
       const defaultDuration =
-        type === 'success' ? 3000 : type === 'warning' ? 5000 : 0;
+        type === 'success' ? 3000 : type === 'warning' ? 5000 : 3000;
 
       const toast: Toast = {
         id,

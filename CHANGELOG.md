@@ -1,3 +1,11 @@
+### Added (vibex-canvas-three-column-20260328 Epic E2-2: 移动端展开入口) — 2026-03-28
+- **E2-2**: `CanvasPage.tsx` 移动端 Tab 模式面板自动展开
+  - `renderTabContent()` 中三个面板 (context/flow/component) 的 `collapsed` 属性统一设为 `false`
+  - 激活的 Tab 面板始终全屏展示，不受 desktop collapsed 状态影响
+  - 仅影响移动端 Tab 模式，不影响 desktop 三栏布局
+  - 提交: `ab934431`
+  - 审查: ✅ PASSED (reviewer-e2-2)
+
 ### Added (vibex-canvas-three-column-20260328 Epic E2-1: 三栏画布自动展开) — 2026-03-28
 - **E2-1**: `canvasStore.ts` 新增 `_prevActiveTree` 内部追踪字段
   - `recomputeActiveTree()` 在 `activeTree` 实际切换时自动触发 `setCenterExpand`

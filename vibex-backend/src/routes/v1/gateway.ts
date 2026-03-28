@@ -17,6 +17,7 @@ import { logger } from '../../lib/logger';
 import { errorHandler, notFoundHandler } from '../../lib/errorHandler';
 import analyzeStream from './analyze/stream';
 import canvas from './canvas';
+import canvasStream from './canvas/stream';
 
 // 导入所有 API 路由
 import projects from '../projects';
@@ -93,6 +94,9 @@ v1.route('/auth', auth);
 
 // SSE 流式分析端点 - 公开，无需认证 (挂载到 /analyze/stream)
 v1.route('/analyze/stream', analyzeStream);
+
+// Canvas SSE 流式端点 - 公开，无需认证
+v1.route('/canvas/stream', canvasStream);
 
 // ==================== 受保护路由 (需要认证) ====================
 

@@ -1,3 +1,34 @@
+### Added (vibex-canvas-api-standardization Epic5: E2E 测试覆盖 F5.1~F5.5) — 2026-03-29
+- **Epic5**: F5 — Canvas 完整流程 E2E 测试覆盖
+  - **F5.1**: 9 个 `/api/v1/canvas/*` 端点全覆盖测试
+    - POST `/generate-contexts` (AC-E2E-1/1b/1c): 正常流程、空输入 400、响应结构验证
+    - POST `/generate-flows` (AC-E2E-2/2b): 正常流程、空输入 400
+    - POST `/generate-components` (AC-E2E-3/3b): 正常流程、缺失参数 400
+    - GET `/status` (AC-E2E-4/5): 缺 projectId 400、合法 projectId 结构验证
+    - GET `/stream` SSE (AC-E2E-6/6b): event-stream content-type、空需求拒绝
+    - POST `/project` (AC-E2E-7): 缺失必填字段验证
+    - GET `/export` (AC-E2E-8): 缺失 projectId 验证
+    - POST `/generate` (AC-E2E-9): 缺失 projectId/pageIds 验证
+  - **F5.2**: 两步设计流程测试
+    - F5.2-1: 完整 UI 流程 (contexts → flows → components)
+    - F5.2-2: API 层级流程验证
+    - F5.2-3: UI 相位标签正确性验证
+  - **F5.3**: sessionId 链路测试
+    - F5.3-1: 分析启动后 localStorage 存储
+    - F5.3-2: generate-flows 请求包含 sessionId
+    - F5.3-3: generate-components 请求包含 sessionId
+    - F5.3-4: 全链路 sessionId 一致性
+    - F5.3-5: 页面重载后 sessionId 持久化
+  - **F5.4**: Canvas 页面导航与资源完整性
+    - F5.4-1: 无 404 资源请求
+    - F5.4-2: 无关键控制台错误
+    - F5.4-3: `/canvas` URL 直接可访问
+  - **F5.5**: API 响应结构验证
+    - F5.5-1/2/3: generate-contexts/flows/components 响应结构断言
+  - 测试文件: `vibex-fronted/tests/e2e/canvas-api-standardization-epic5.spec.ts` (864 行)
+  - 提交: `6f5867e4`
+  - 审查: ✅ PASSED (reviewer-epic5-e2e-test)
+
 ### Added (vibex-canvas-api-standardization Epic4: sessionId 链路验证) — 2026-03-29
 - **Epic4**: F4 — 两步设计流程 sessionId 链路验证
   - **后端 Hono Router** (`src/routes/v1/canvas/index.ts`): `sessionId` Zod 必填验证正确（GenerateFlows/GenerateComponents schema）

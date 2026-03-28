@@ -1,3 +1,12 @@
+### Added (vibex-canvas-flowtree-edit-20260328 Epic1: 流程树编辑增强) — 2026-03-28
+- **Epic1**: 流程树编辑功能增强
+  - `addFlowNode` 支持 `contextId=''`（独立流程，无关联限界上下文）
+  - `addStepToFlow` store action：向流程节点追加步骤
+  - 流程节点样式标准化
+  - 13 个新测试用例（canvasStore.test.ts Epic E1: 55 total pass）
+  - 提交: `d6f8ab59`
+  - 审查: ✅ PASSED (4.5/5)
+
 ### Fixed (vibex-canvas-btn-rename-20260328 Epic1: 按钮文案「重新执行」) — 2026-03-28
 - **Epic1**: Canvas 页面按钮文案优化：「AI生成上下文」→「重新执行」
   - `vibex-fronted/src/components/canvas/BoundedContextTree.tsx`:

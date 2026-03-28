@@ -58,6 +58,25 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const leftExpand = useCanvasStore((s) => s.leftExpand);
   const centerExpand = useCanvasStore((s) => s.centerExpand);
   const rightExpand = useCanvasStore((s) => s.rightExpand);
+  const setLeftExpand = useCanvasStore((s) => s.setLeftExpand);
+  const setCenterExpand = useCanvasStore((s) => s.setCenterExpand);
+  const setRightExpand = useCanvasStore((s) => s.setRightExpand);
+
+  // Bug5: Toggle handlers for expand buttons
+  const toggleLeft = useCallback(() => {
+    const next = leftExpand === 'default' ? 'expand-right' : 'default';
+    setLeftExpand(next as 'default' | 'expand-right');
+  }, [leftExpand, setLeftExpand]);
+
+  const toggleCenter = useCallback(() => {
+    const next = centerExpand === 'default' ? 'expand-left' : 'default';
+    setCenterExpand(next as 'default' | 'expand-left');
+  }, [centerExpand, setCenterExpand]);
+
+  const toggleRight = useCallback(() => {
+    const next = rightExpand === 'default' ? 'expand-left' : 'default';
+    setRightExpand(next as 'default' | 'expand-left');
+  }, [rightExpand, setRightExpand]);
 
   // === Sync expand state to CSS variables ===
   useEffect(() => {
@@ -387,6 +406,19 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             </div>
           ) : (
             <div ref={gridRef} className={styles.treePanelsGrid}>
+              {/* Bug5: Left expand toggle button */}
+              <div className={styles.expandCol}>
+                <button
+                  type="button"
+                  className={styles.expandToggleBtn}
+                  onClick={toggleLeft}
+                  aria-label={leftExpand === 'default' ? '展开左侧面板' : '收起左侧面板'}
+                  title={leftExpand === 'default' ? '展开左侧面板' : '收起左侧面板'}
+                >
+                  {leftExpand === 'default' ? '◀' : '▶'}
+                </button>
+              </div>
+
               <TreePanel
                 tree="context"
                 title="限界上下文树"
@@ -422,18 +454,29 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 isActive={flowActive}
                 onToggleCollapse={toggleFlowPanel}
                 actions={
-                  flowNodes.length > 0 ? (
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    {flowNodes.length > 0 && (
+                      <button
+                        type="button"
+                        className={styles.secondaryButton}
+                        onClick={handleContinueToComponents}
+                        disabled={componentGenerating}
+                        aria-label="继续到组件树"
+                        title="基于已确认的流程树生成组件树"
+                      >
+                        {componentGenerating ? '◌ 生成中...' : '继续 → 组件树'}
+                      </button>
+                    )}
                     <button
                       type="button"
-                      className={styles.secondaryButton}
-                      onClick={handleContinueToComponents}
-                      disabled={componentGenerating}
-                      aria-label="继续到组件树"
-                      title="基于已确认的流程树生成组件树"
+                      className={styles.expandButton}
+                      onClick={toggleCenter}
+                      aria-label={centerExpand === 'default' ? '展开中间面板' : '收起中间面板'}
+                      title={centerExpand === 'default' ? '展开中间面板' : '收起中间面板'}
                     >
-                      {componentGenerating ? '◌ 生成中...' : '继续 → 组件树'}
+                      {centerExpand === 'default' ? '⤵ 展开' : '⤴ 收起'}
                     </button>
-                  ) : undefined
+                  </div>
                 }
               >
                 <HoverHotzone position="left-edge" panel="center" centerExpandDirection="left" />
@@ -453,6 +496,19 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 <ComponentTree />
                 <HoverHotzone position="right-edge" panel="right" />
               </TreePanel>
+
+              {/* Bug5: Right expand toggle button */}
+              <div className={styles.expandCol}>
+                <button
+                  type="button"
+                  className={styles.expandToggleBtn}
+                  onClick={toggleRight}
+                  aria-label={rightExpand === 'default' ? '展开右侧面板' : '收起右侧面板'}
+                  title={rightExpand === 'default' ? '展开右侧面板' : '收起右侧面板'}
+                >
+                  {rightExpand === 'default' ? '▶' : '◀'}
+                </button>
+              </div>
             </div>
           )}
         </>

@@ -1,3 +1,21 @@
+### Added (vibex-canvas-feature-gap Epic2: Navigation — 搜索与导航) — 2026-03-29
+- **Epic2**: Fuse.js 搜索、MiniMap 导航、快捷键
+  - **E2-F5** (`useCanvasSearch.ts` + `SearchDialog.tsx`): Fuse.js 模糊搜索
+    - 合并 context/flow/component 三树节点，按名称 + 路径搜索
+    - 阈值 0.3，支持单字符匹配，防抖 150ms
+    - `SearchIndex.ts`: 统一搜索索引构建
+    - 搜索响应 < 300ms（500 节点规模）
+  - **E2-F12** (`TreePanel.tsx` MiniMapWidget): 迷你导航地图
+    - 三树各自独立 MiniMap，支持节点点击快速定位
+    - 节点计数 badge，滚动到视口功能
+  - **E2-F14**: 缩放控制（+/=/-/0 快捷键 + 重置按钮）
+  - **E2-F10**: Space + 拖拽画布平移
+  - **E2-F7** (`useDndSortable.ts`): BusinessFlowTree / ComponentTree 拖拽排序
+  - **快捷键** (`useKeyboardShortcuts.ts`): Ctrl+Z/Y Undo/Redo，`/` 打开搜索，`+`-/0 缩放，Del/Backspace 删除
+  - **约束遵守**: 无 any 类型、无 console.log
+  - 提交: `5d07e5f8`, `efe8c346`
+  - 审查: ✅ PASSED (reviewer-epic2-navigation)
+
 ### Added (vibex-canvas-feature-gap Epic1: Undo/Redo — History Slice) — 2026-03-29
 - **Epic1 F1.5 (Undo/Redo)**: Canvas 历史记录撤销/重做功能
   - **新增** `historySlice.ts`: 独立历史记录切片，独立于 ReactFlow，无冲突

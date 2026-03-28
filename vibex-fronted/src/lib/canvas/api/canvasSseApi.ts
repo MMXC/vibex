@@ -10,6 +10,12 @@
 
 import { getApiUrl, API_CONFIG } from '@/lib/api-config';
 
+function getAuthHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+  const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 // =============================================================================
 // Types
 // =============================================================================
@@ -126,11 +132,15 @@ export async function canvasSseAnalyze(
 
     const res = await fetch(url, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
       signal: mergedSignal,
     });
 
     if (!res.ok) {
+      if (res.status === 401) {
+        callbacks.onError?.('登录已过期，请重新登录', 'UNAUTHORIZED');
+        return;
+      }
       const errorText = await res.text().catch(() => '');
       throw new Error(`HTTP ${res.status}: ${res.statusText} — ${errorText}`);
     }

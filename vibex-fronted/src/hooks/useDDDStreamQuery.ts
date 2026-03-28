@@ -17,6 +17,12 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { getApiUrl } from '@/lib/api-config';
 import { BoundedContext } from '@/services/api/types/prototype/domain';
 
+function getAuthHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+  const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 // ==================== Types ====================
 
 export type DDDStreamStatus = 'idle' | 'pending' | 'thinking' | 'done' | 'error';
@@ -86,12 +92,16 @@ async function fetchSSEStream(
 ): Promise<void> {
   const response = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify(body),
     signal,
   });
 
   if (!response.ok) {
+    if (response.status === 401) {
+      onError('登录已过期，请重新登录');
+      return;
+    }
     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
   }
 

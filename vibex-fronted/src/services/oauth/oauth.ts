@@ -5,6 +5,12 @@
 
 import { getApiUrl } from '@/lib/api-config';
 
+function getAuthHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+  const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export type OAuthProvider = 'github' | 'figma';
 
 export interface OAuthConfig {
@@ -76,7 +82,7 @@ export async function getAuthUrl(provider: OAuthProvider): Promise<{
 
   const response = await fetch(getApiUrl(`/api/oauth/${provider}/auth-url`), {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify({
       state,
       codeChallenge: challenge,
@@ -85,6 +91,9 @@ export async function getAuthUrl(provider: OAuthProvider): Promise<{
   });
 
   if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('登录已过期，请重新登录');
+    }
     throw new Error('Failed to get auth URL');
   }
 
@@ -122,11 +131,14 @@ export async function handleCallback(
 
   const response = await fetch(getApiUrl(`/api/oauth/${provider}/callback`), {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify({ code, state, codeVerifier }),
   });
 
   if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error('登录已过期，请重新登录');
+    }
     const error = await response.json().catch(() => ({}));
     throw new Error(error.message || 'OAuth callback failed');
   }
@@ -190,7 +202,7 @@ export async function refreshToken(provider: OAuthProvider): Promise<boolean> {
   try {
     const response = await fetch(getApiUrl(`/api/oauth/${provider}/refresh`), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
       body: JSON.stringify({ refreshToken: refreshTokenStr }),
     });
     

@@ -18,6 +18,12 @@ export interface ChatResponse {
   error?: string;
 }
 
+function getAuthHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+  const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export class ClarificationApi {
   private baseUrl: string;
 
@@ -31,11 +37,20 @@ export class ClarificationApi {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...getAuthHeaders(),
         },
         body: JSON.stringify(request),
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          return { 
+            reply: '', 
+            completeness: 0, 
+            nextAction: 'error',
+            error: '登录已过期，请重新登录'
+          };
+        }
         const error = await response.json().catch(() => ({ error: '请求失败' }));
         return { 
           reply: '', 

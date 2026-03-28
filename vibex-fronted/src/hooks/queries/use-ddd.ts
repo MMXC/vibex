@@ -6,6 +6,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryClient } from '@/lib/query-client';
 
+function getAuthHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+  const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 // Query Keys - 用于缓存标识
 export const dddKeys = {
   all: ['ddd'] as const,
@@ -19,30 +25,39 @@ export const dddKeys = {
 async function fetchBoundedContexts(requirement: string) {
   const response = await fetch('/api/ddd/bounded-context', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify({ requirement }),
   });
-  if (!response.ok) throw new Error('Failed to fetch bounded contexts');
+  if (!response.ok) {
+    if (response.status === 401) throw new Error('登录已过期，请重新登录');
+    throw new Error('Failed to fetch bounded contexts');
+  }
   return response.json();
 }
 
 async function fetchDomainModels(requirement: string, contexts: unknown[]) {
   const response = await fetch('/api/ddd/domain-model', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify({ requirement, contexts }),
   });
-  if (!response.ok) throw new Error('Failed to fetch domain models');
+  if (!response.ok) {
+    if (response.status === 401) throw new Error('登录已过期，请重新登录');
+    throw new Error('Failed to fetch domain models');
+  }
   return response.json();
 }
 
 async function fetchBusinessFlow(requirement: string, domainModels: unknown[]) {
   const response = await fetch('/api/ddd/business-flow', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify({ requirement, domainModels }),
   });
-  if (!response.ok) throw new Error('Failed to fetch business flow');
+  if (!response.ok) {
+    if (response.status === 401) throw new Error('登录已过期，请重新登录');
+    throw new Error('Failed to fetch business flow');
+  }
   return response.json();
 }
 

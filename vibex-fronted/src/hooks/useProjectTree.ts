@@ -16,6 +16,12 @@ import { useVisualizationStore } from '@/stores/visualizationStore';
 import type { CardTreeVisualizationRaw } from '@/types/visualization';
 import type { BoundedContext } from '@/types/homepage';
 
+function getAuthHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+  const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 // ==================== Feature Flag ====================
 
 const FEATURE_FLAG = process.env.NEXT_PUBLIC_USE_CARD_TREE === 'true';
@@ -48,9 +54,13 @@ async function fetchFlowData(projectId: string): Promise<CardTreeVisualizationRa
   try {
     const res = await fetch(`${baseUrl}/api/flow-data?projectId=${projectId}`, {
       signal: controller.signal,
+      headers: getAuthHeaders(),
     });
     clearTimeout(timeout);
-    if (!res.ok) throw new Error(`Failed to fetch flow data: ${res.status}`);
+    if (!res.ok) {
+      if (res.status === 401) throw new Error('登录已过期，请重新登录');
+      throw new Error(`Failed to fetch flow data: ${res.status}`);
+    }
     const data: FlowDataResponse = await res.json();
 
     // Parse FlowData into CardTree format

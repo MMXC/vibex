@@ -8,6 +8,12 @@
 
 import type { ThemeMode } from '../types/theme';
 
+function getAuthHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+  const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 // ── Types ────────────────────────────────────────────────────────────────────
 
 export interface HomepageAPIResponse {
@@ -88,7 +94,7 @@ export async function fetchHomepageData(): Promise<HomepageAPIResponse | null> {
   try {
     const res = await fetch('/api/v1/homepage', {
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     });
 
     if (!res.ok) {

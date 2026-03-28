@@ -9,6 +9,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/query/QueryProvider';
 
+function getAuthHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+  const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 // DDD API 类型定义
 interface DDDApi {
   generateContexts: (requirement: string) => Promise<any>;
@@ -21,25 +27,37 @@ const dddApi: DDDApi = {
   generateContexts: async (requirement: string) => {
     const response = await fetch('/api/ddd/contexts', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
       body: JSON.stringify({ requirement }),
     });
+    if (!response.ok) {
+      if (response.status === 401) throw new Error('登录已过期，请重新登录');
+      throw new Error(`生成限界上下文失败: ${response.status}`);
+    }
     return response.json();
   },
   generateDomainModel: async (data: any) => {
     const response = await fetch('/api/ddd/domain-model', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
       body: JSON.stringify(data),
     });
+    if (!response.ok) {
+      if (response.status === 401) throw new Error('登录已过期，请重新登录');
+      throw new Error(`生成领域模型失败: ${response.status}`);
+    }
     return response.json();
   },
   generateBusinessFlow: async (data: any) => {
     const response = await fetch('/api/ddd/business-flow', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
       body: JSON.stringify(data),
     });
+    if (!response.ok) {
+      if (response.status === 401) throw new Error('登录已过期，请重新登录');
+      throw new Error(`生成业务流程失败: ${response.status}`);
+    }
     return response.json();
   },
 };

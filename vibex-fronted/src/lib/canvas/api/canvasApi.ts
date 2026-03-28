@@ -2,7 +2,7 @@
  * VibeX Canvas API — 原型生成队列 API 封装
  *
  * 遵守 AGENTS.md ADR-003:
- * - 统一前缀 /api/canvas/
+ * - 统一前缀 /api/v1/canvas/
  * - 队列轮询间隔 5000ms
  * - projectId 持久化到 localStorage
  *
@@ -25,7 +25,7 @@ import { getApiUrl, API_CONFIG } from '@/lib/api-config';
 export const canvasApi = {
   /**
    * 创建项目 — 将三树数据打包发送到后端
-   * POST /api/canvas/project
+   * POST /api/v1/canvas/project
    */
   createProject: async (data: CreateProjectInput): Promise<CreateProjectOutput> => {
     const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.project), {
@@ -44,7 +44,7 @@ export const canvasApi = {
 
   /**
    * 触发生成 — 启动原型页生成队列
-   * POST /api/canvas/generate
+   * POST /api/v1/canvas/generate
    */
   generate: async (data: GenerateInput): Promise<GenerateOutput> => {
     const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.generate), {
@@ -63,7 +63,7 @@ export const canvasApi = {
 
   /**
    * 轮询状态 — 获取队列中所有页面的生成进度
-   * GET /api/canvas/status?projectId=xxx
+   * GET /api/v1/canvas/status?projectId=xxx
    *
    * 轮询间隔: 5000ms (AGENTS.md ADR-003)
    */
@@ -80,7 +80,7 @@ export const canvasApi = {
 
   /**
    * 导出 Zip — 下载完整 Next.js 项目压缩包
-   * GET /api/canvas/export?projectId=xxx
+   * GET /api/v1/canvas/export?projectId=xxx
    */
   exportZip: async (projectId: string): Promise<Blob> => {
     const res = await fetch(getApiUrl(`${API_CONFIG.endpoints.canvas.export}?projectId=${encodeURIComponent(projectId)}`));
@@ -98,7 +98,7 @@ export const canvasApi = {
 
   /**
    * 生成限界上下文树
-   * POST /api/canvas/generate-contexts
+   * POST /api/v1/canvas/generate-contexts
    */
   generateContexts: async (data: {
     requirementText: string;
@@ -120,7 +120,7 @@ export const canvasApi = {
 
   /**
    * 生成业务流程树
-   * POST /api/canvas/generate-flows
+   * POST /api/v1/canvas/generate-flows
    */
   generateFlows: async (data: {
     contexts: Array<{ id: string; name: string; description: string; type: string }>;
@@ -142,7 +142,7 @@ export const canvasApi = {
 
   /**
    * 生成组件树
-   * POST /api/canvas/generate-components
+   * POST /api/v1/canvas/generate-components
    */
   generateComponents: async (data: {
     contexts: Array<{ id: string; name: string; description: string; type: string }>;
@@ -165,7 +165,7 @@ export const canvasApi = {
 
   /**
    * 获取组件树 — 将流程树数据转换为组件树
-   * POST /api/canvas/generate-components (same underlying endpoint)
+   * POST /api/v1/canvas/generate-components (same underlying endpoint)
    *
    * @param contexts - 已确认的限界上下文节点
    * @param flows - 已确认的业务流程节点（flowData）

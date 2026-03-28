@@ -32,7 +32,7 @@ const COMMON_FLOW_IDS = new Set(['mock', 'manual', 'common', '__ungrouped__', ''
  * E2.1: 推断组件是否为通用组件
  * 规则：flowId 为 mock/manual/common/空 或 类型为通用组件类型时视为通用组件
  */
-function inferIsCommon(node: ComponentNode): boolean {
+export function inferIsCommon(node: ComponentNode): boolean {
   // flowId 为通用标识
   if (COMMON_FLOW_IDS.has(node.flowId) || !node.flowId) {
     return true;
@@ -54,9 +54,12 @@ const COMMON_GROUP_COLOR = '#8b5cf6'; // purple for common/reusable components
 // E1: 分组工具函数 (已扩展支持 E2)
 // =============================================================================
 
+// E1: 分组工具函数 (已扩展支持 E2)
+// =============================================================================
+
 const GROUP_COLOR = '#10b981';
 
-interface ComponentGroup {
+export interface ComponentGroup {
   groupId: string;
   label: string;
   color: string;
@@ -74,12 +77,12 @@ function getPageLabel(flowId: string, flowNodes: BusinessFlowNode[]): string {
 }
 
 /**
- * E2.1: 按 flowId 对组件节点分组，通用组件单独置顶分组
+ * E1+E2: 按 flowId 对组件节点分组，通用组件单独置顶分组
  * 规则：
  * - isCommon=true 的组件归入通用组件组（置顶）
  * - 其他组件按 flowId 分组
  */
-function groupByFlowId(
+export function groupByFlowId(
   nodes: ComponentNode[],
   flowNodes: BusinessFlowNode[]
 ): ComponentGroup[] {

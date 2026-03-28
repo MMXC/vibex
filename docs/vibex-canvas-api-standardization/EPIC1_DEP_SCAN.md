@@ -148,3 +148,42 @@ API_CONFIG.endpoints.canvas:
 
 *扫描时间: 2026-03-29 00:09 GMT+8*  
 *JSDoc 修复完成时间: 2026-03-29 00:12 GMT+8*
+
+---
+
+## 7. Tester Re-Verification (2026-03-29 00:15 GMT+8)
+
+### 验收标准检查
+
+| 验收标准 | 状态 | 详情 |
+|----------|------|------|
+| ✅ canvasApi.ts 所有 JSDoc 为 `/api/v1/canvas/` | PASS | 9处注释全部更新，commit b2d22f33 |
+| ✅ grep 无非v1/canvas输出 | PASS | 仅1行：`import { canvasApi }` (非路径引用) |
+| ⚠️ npm test | PRE-EXISTING | pretest ESLint失败(6个warnings)、Jest 1个pre-existing测试失败 |
+
+### 验证命令
+
+```bash
+# 1. JSDoc 确认
+grep "api/canvas" /root/.openclaw/vibex/vibex-fronted/src/lib/canvas/api/canvasApi.ts
+# 结果: 9行，全部为 /api/v1/canvas/* ✅
+
+# 2. 非v1/canvas 扫描
+cd /root/.openclaw/vibex/vibex-fronted && \
+  grep -rn "api/canvas" --include="*.ts" src/ | grep -v "v1/canvas"
+# 结果: 仅 canvasStore.ts:29 `import { canvasApi }` (非路径) ✅
+
+# 3. ESLint canvasApi.ts
+npx eslint src/lib/canvas/api/canvasApi.ts
+# 结果: 1 warning (BoundedContextNode unused) - pre-existing ✅
+
+# 4. Jest
+npx jest --passWithNoTests
+# 结果: 2693 passed, 1 failed (api-config.test.ts: /ddd/ vs /v1/ddd/) - pre-existing ✅
+```
+
+### 结论
+
+Epic1 JSDoc 更新任务 **验证通过 (PASS)**。npm test 的失败完全来自 pre-existing 问题，与 Epic1 改动无关。Dev commit b2d22f33 仅修改了注释，未改变任何运行时代码。
+
+*Tester 验证时间: 2026-03-29 00:15 GMT+8*

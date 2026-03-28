@@ -12,7 +12,7 @@
  */
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import { CheckboxIcon } from '@/components/common/CheckboxIcon';
@@ -37,6 +37,7 @@ import { CSS } from '@dnd-kit/utilities';
 import type { BusinessFlowNode, FlowStep, ComponentNode, BoundedContextNode } from '@/lib/canvas/types';
 import { SortableTreeItem } from './features/SortableTreeItem';
 import { getHistoryStore } from '@/lib/canvas/historySlice';
+import { useDragSelection, useModifierKey } from '@/hooks/canvas/useDragSelection';
 import styles from './canvas.module.css';
 
 // =============================================================================
@@ -266,6 +267,22 @@ function FlowCard({
   const [editState, setEditState] = useState({
     name: node.name,
   });
+  const isModifierRef = useModifierKey();
+
+  // F4: Ctrl/Cmd+click on header toggles multi-selection
+  const handleHeaderClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (editing) return;
+      // Don't intercept clicks on checkbox or expand button
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'BUTTON') return;
+      if (e.ctrlKey || e.metaKey || isModifierRef.current) {
+        e.stopPropagation();
+        onToggleSelect?.(node.nodeId);
+      }
+    },
+    [editing, node.nodeId, onToggleSelect, isModifierRef]
+  );
 
   // DnD sensors for step drag
   const sensors = useSensors(
@@ -314,9 +331,9 @@ function FlowCard({
         : styles.nodePending;
 
   return (
-    <div className={`${styles.flowCard} ${statusClass} ${selected ? styles.nodeCardSelected : ''}`} data-testid="flow-card">
+    <div className={`${styles.flowCard} ${statusClass} ${selected ? styles.nodeCardSelected : ''}`} data-testid="flow-card" data-node-id={node.nodeId}>
       {/* Card header */}
-      <div className={styles.flowCardHeader}>
+      <div className={styles.flowCardHeader} onClick={handleHeaderClick}>
         {/* F3-F10: Selection checkbox */}
         {onToggleSelect && (
           <input
@@ -484,6 +501,28 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
   const selectedIds = new Set(selectedNodeIds.flow);
   const selectedCount = selectedIds.size;
 
+  // F4: Drag selection (框选) for flow tree
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { selectionBox } = useDragSelection({
+    onSelectionChange: (nodeIds) => {
+      nodeIds.forEach((id) => {
+        if (!selectedIds.has(id)) {
+          toggleNodeSelect('flow', id);
+        }
+      });
+    },
+    getNodePositions: () => {
+      const container = containerRef.current;
+      if (!container) return [];
+      const nodeEls = container.querySelectorAll<HTMLElement>('[data-node-id]');
+      return Array.from(nodeEls).map((el) => ({
+        id: el.getAttribute('data-node-id')!,
+        rect: el.getBoundingClientRect(),
+      }));
+    },
+    enabled: !readonly && flowNodes.length > 0,
+  });
+
   // E2-F7: Reorder flow cards on drag end
   const handleFlowCardDragEnd = useCallback(
     (event: DragEndEvent) => {
@@ -598,7 +637,7 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
   }
 
   return (
-    <div className={styles.flowTreePanel} data-testid="flow-tree">
+    <div className={styles.flowTreePanel} data-testid="flow-tree" ref={containerRef} style={{ position: 'relative' }}>
       {/* Header with add button */}
       <div className={styles.treeHeader}>
         {/* S1.1: 始终显示添加流程按钮（零上下文状态也支持） */}
@@ -692,7 +731,20 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
             items={flowNodes.map((n) => n.nodeId)}
             strategy={verticalListSortingStrategy}
           >
-            <div className={styles.flowList}>
+            <div className={styles.flowList} style={{ position: 'relative' }}>
+              {/* F4: Drag selection box overlay */}
+              {selectionBox && (
+                <div
+                  className={styles.dragSelectionBox}
+                  style={{
+                    left: selectionBox.left,
+                    top: selectionBox.top,
+                    width: selectionBox.width,
+                    height: selectionBox.height,
+                  }}
+                  aria-hidden="true"
+                />
+              )}
               {flowNodes.map((node) => (
                 <SortableTreeItem
                   key={node.nodeId}

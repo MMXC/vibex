@@ -256,54 +256,56 @@
 
 ---
 
-## 5. Epic 3 — 画布增强编辑 🟡
+## 5. Epic 3 — 画布增强编辑 🟡 ✅ **已完成**
 
 > **目标**: 多选/贴纸/关系连线，让画布更丰富
+> **完成时间**: 2026-03-29
+> **提交 ID**: d54a2b28
 
-### E3-F2: 多选 + 批量操作
+### E3-F2: 多选 + 批量操作 ✅
 **Feature ID**: `canvas-p2-f2-multi-select` | **工时**: 6–8h | **依赖**: E1-F4
 
 **任务拆分**:
-1. 配置 ReactFlow `selectionMode={SelectionMode.Partial}`（`@xyflow/react` 内置）
-2. 实现 Shift+点击多选
-3. 批量选中后支持批量移动/删除
-4. 多选状态同步到 store
+1. ✅ 配置 ReactFlow `selectionMode={SelectionMode.Partial}`（`@xyflow/react` 内置）
+2. ✅ 实现 Shift+点击多选
+3. ✅ 批量选中后支持批量移动/删除
+4. ✅ 多选状态同步到 store
 
 **验收标准**:
-- [ ] Shift+点击选中多个节点
-- [ ] 批量移动/删除操作正确
-- [ ] 批量操作触发单次 Undo 记录
+- [x] Shift+点击选中多个节点
+- [x] 批量移动/删除操作正确
+- [x] 批量操作触发单次 Undo 记录
 
 ---
 
-### E3-F3: Sticky Notes 贴纸
+### E3-F3: Sticky Notes 贴纸 ✅
 **Feature ID**: `canvas-p2-f3-sticky-notes` | **工时**: 4–6h | **依赖**: E0-F1
 
 **任务拆分**:
-1. 新建 `src/components/canvas/nodes/StickyNoteNode.tsx`
-2. 在 `nodeTypes` 中注册 `stickyNote` 类型
-3. 双击画布空白区域创建贴纸节点
-4. 支持拖拽定位和文本编辑
+1. ✅ 新建 `src/components/canvas/nodes/StickyNoteNode.tsx`
+2. ✅ 在 `nodeTypes` 中注册 `stickyNote` 类型
+3. ✅ 双击画布空白区域创建贴纸节点
+4. ✅ 支持拖拽定位和文本编辑
 
 **验收标准**:
-- [ ] 可创建、编辑、拖拽贴纸节点
-- [ ] 贴纸节点持久化到 store
+- [x] 可创建、编辑、拖拽贴纸节点
+- [x] 贴纸节点持久化到 store
 
 ---
 
-### E3-F13: 节点关系连线扩展
+### E3-F13: 节点关系连线扩展 ✅
 **Feature ID**: `canvas-p2-f13-relationship-lines` | **工时**: 6–10h | **依赖**: E0-F2
 
 **任务拆分**:
-1. 节点数据模型添加 `relationships` 字段
-2. 在 Flow 树和 Component 树复用 `RelationshipEdge` 组件
-3. 连线样式区分：实线（包含）、虚线（引用）、点线（依赖）
-4. 连线过多时提供聚类/优先级策略
+1. ✅ 节点数据模型添加 `relationships` 字段
+2. ✅ 在 Flow 树和 Component 树复用 `RelationshipEdge` 组件
+3. ✅ 连线样式区分：实线（包含）、虚线（引用）、点线（依赖）
+4. ✅ 连线过多时提供聚类/优先级策略
 
 **验收标准**:
-- [ ] Flow 树节点显示关系连线
-- [ ] Component 树节点显示关系连线
-- [ ] 三种连线样式区分清晰
+- [x] Flow 树节点显示关系连线
+- [x] Component 树节点显示关系连线
+- [x] 三种连线样式区分清晰
 
 ---
 
@@ -418,10 +420,10 @@ Week 5+
 
 | 里程碑 | 触发条件 | 预计时间 |
 |--------|---------|---------|
-| **M1: 画布可用** | E0 完成 | Week 1 结束 |
-| **M2: 核心体验** | E1 + E2-F14 + E2-F8 完成 | Week 2 结束 |
-| **M3: 导航完善** | E2-F5 + E2-F12 完成 | Week 3 结束 |
-| **M4: 生产就绪** | E3 + E4-F9 + E4-F11 完成 | Week 4 结束 |
+| **M1: 画布可用** | E0 完成 | Week 1 结束 ✅ |
+| **M2: 核心体验** | E1 + E2-F14 + E2-F8 完成 | Week 2 结束 ✅ |
+| **M3: 导航完善** | E2-F5 + E2-F12 完成 | Week 3 结束 ✅ |
+| **M4: 生产就绪** | E3 + E4-F9 + E4-F11 完成 | Week 4 结束 🚧 (E3 已完成) |
 
 ---
 

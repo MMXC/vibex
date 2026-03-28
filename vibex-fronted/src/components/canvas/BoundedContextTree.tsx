@@ -15,6 +15,7 @@ import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { RelationshipConnector } from './edges/RelationshipConnector';
 import { BoundedContextGroup } from './BoundedContextGroup';
 import { CheckboxIcon } from '@/components/common/CheckboxIcon';
+import { useModifierKey, useDragSelection } from '@/hooks/canvas/useDragSelection';
 import type { BoundedContextNode, BoundedContextDraft } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
 
@@ -65,9 +66,9 @@ interface ContextCardProps {
   onEdit: (nodeId: string, data: Partial<BoundedContextNode>) => void;
   onDelete: (nodeId: string) => void;
   readonly?: boolean;
-  /** F3-F10: 多选状态 */
+  /** F4: 多选状态 */
   selected?: boolean;
-  /** F3-F10: 多选切换回调 */
+  /** F4: 多选切换回调 */
   onToggleSelect?: (nodeId: string) => void;
 }
 
@@ -78,6 +79,7 @@ function ContextCard({ node, onConfirm, onEdit, onDelete, readonly, selected, on
     name: node.name,
     description: node.description,
   });
+  const isModifierRef = useModifierKey();
 
   const handleSave = useCallback(() => {
     onEdit(node.nodeId, { name: editState.name, description: editState.description });
@@ -88,6 +90,18 @@ function ContextCard({ node, onConfirm, onEdit, onDelete, readonly, selected, on
     setEditState({ nodeId: node.nodeId, name: node.name, description: node.description });
     setEditing(false);
   }, [node]);
+
+  // F4: Ctrl/Cmd+click on card body toggles multi-selection
+  const handleCardClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (editing) return;
+      if (e.ctrlKey || e.metaKey || isModifierRef.current) {
+        e.stopPropagation();
+        onToggleSelect?.(node.nodeId);
+      }
+    },
+    [editing, node.nodeId, onToggleSelect, isModifierRef]
+  );
 
   const statusClass =
     node.status === 'confirmed'
@@ -113,6 +127,7 @@ function ContextCard({ node, onConfirm, onEdit, onDelete, readonly, selected, on
       data-node-id={node.nodeId}
       data-status={node.status}
       data-type={node.type}
+      onClick={handleCardClick}
     >
       {editing ? (
         /* Edit mode */
@@ -354,6 +369,28 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
   const allConfirmed = contextNodes.length > 0 && contextNodes.every((n) => n.confirmed);
   const hasNodes = contextNodes.length > 0;
 
+  // F4: Drag selection (框选) — uses same containerRef
+  const { selectionBox } = useDragSelection({
+    onSelectionChange: (nodeIds) => {
+      // Add all nodes in box to selection (additive)
+      nodeIds.forEach((id) => {
+        if (!selectedIds.has(id)) {
+          toggleNodeSelect('context', id);
+        }
+      });
+    },
+    getNodePositions: () => {
+      const container = containerRef.current;
+      if (!container) return [];
+      const nodeEls = container.querySelectorAll<HTMLElement>('[data-node-id]');
+      return Array.from(nodeEls).map((el) => ({
+        id: el.getAttribute('data-node-id')!,
+        rect: el.getBoundingClientRect(),
+      }));
+    },
+    enabled: !readonly && hasNodes,
+  });
+
   return (
     <div className={styles.boundedContextTree} aria-label="限界上下文树" data-testid="context-tree" ref={containerRef}>
       {/* Generation Controls */}
@@ -448,6 +485,19 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
           nodes={contextNodes}
           containerRef={containerRef as React.RefObject<HTMLElement | null>}
         />
+        {/* F4: Drag selection box overlay */}
+        {selectionBox && (
+          <div
+            className={styles.dragSelectionBox}
+            style={{
+              left: selectionBox.left,
+              top: selectionBox.top,
+              width: selectionBox.width,
+              height: selectionBox.height,
+            }}
+            aria-hidden="true"
+          />
+        )}
         {hasNodes ? (
           <>
             {/* Group nodes by domain type */}

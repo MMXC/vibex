@@ -326,6 +326,14 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     onZoomOut: handleZoomOut,
     onZoomReset: handleZoomReset,
     onDelete: handleDeleteSelected,
+    onSelectAll: () => {
+      const tree: TreeType = activeTree ?? 'context';
+      useCanvasStore.getState().selectAllNodes(tree);
+    },
+    onClearSelection: () => {
+      const tree: TreeType = activeTree ?? 'context';
+      useCanvasStore.getState().clearNodeSelection(tree);
+    },
     enabled: phase !== 'input',
   });
 

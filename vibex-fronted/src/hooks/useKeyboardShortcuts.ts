@@ -32,6 +32,10 @@ interface KeyboardShortcutsOptions {
   onZoomReset?: () => void;
   /** Delete selected node(s) */
   onDelete?: () => void;
+  /** Select all nodes in active tree */
+  onSelectAll?: () => void;
+  /** Clear node selection */
+  onClearSelection?: () => void;
   /** Whether shortcuts should be active */
   enabled?: boolean;
 }
@@ -57,6 +61,8 @@ export function useKeyboardShortcuts({
   onZoomOut,
   onZoomReset,
   onDelete,
+  onSelectAll,
+  onClearSelection,
   enabled = true,
 }: KeyboardShortcutsOptions) {
   useEffect(() => {
@@ -147,9 +153,24 @@ export function useKeyboardShortcuts({
         onDelete?.();
         return;
       }
+
+      // === Select All: Ctrl+A / Cmd+A ===
+      if ((isCtrl || isMeta) && e.key.toLowerCase() === 'a') {
+        if (isInputFocused) return; // Let browser handle select-all in inputs
+        e.preventDefault();
+        onSelectAll?.();
+        return;
+      }
+
+      // === Clear Selection: Escape ===
+      if (e.key === 'Escape' && !isInputFocused) {
+        e.preventDefault();
+        onClearSelection?.();
+        return;
+      }
     }
 
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset, onDelete, enabled]);
+  }, [undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset, onDelete, onSelectAll, onClearSelection, enabled]);
 }

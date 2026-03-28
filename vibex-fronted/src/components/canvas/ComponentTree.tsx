@@ -31,6 +31,7 @@ import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { useToast } from '@/components/ui/Toast';
 import { SortableTreeItem } from './features/SortableTreeItem';
 import { getHistoryStore } from '@/lib/canvas/historySlice';
+import { useModifierKey, useDragSelection } from '@/hooks/canvas/useDragSelection';
 import type { ComponentNode, BusinessFlowNode } from '@/lib/canvas/types';
 import { ComponentGroupOverlay } from './groups/ComponentGroupOverlay';
 import type { ComponentGroupBBox } from './groups/ComponentGroupOverlay';
@@ -254,6 +255,7 @@ function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly, selected, 
     type: node.type,
   });
   const toast = useToast();
+  const isModifierRef = useModifierKey();
 
   const handleSave = useCallback(() => {
     onEdit(node.nodeId, {
@@ -269,15 +271,26 @@ function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly, selected, 
     setEditing(false);
   }, [node]);
 
-  // F3.2: Click to jump — open previewUrl or show toast if unavailable
-  const handleNodeClick = useCallback(() => {
-    if (readonly) return;
-    if (node.previewUrl) {
-      window.open(node.previewUrl, '_blank', 'noopener,noreferrer');
-    } else {
-      toast.showToast('该组件暂无预览链接，请先配置 previewUrl', 'error');
-    }
-  }, [readonly, node.previewUrl, toast]);
+  // F4: Ctrl/Cmd+click on card — toggle multi-selection; otherwise navigate to preview
+  const handleNodeClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (editing) return;
+      // F4: Ctrl/Cmd+click → toggle selection, no navigation
+      if (e.ctrlKey || e.metaKey || isModifierRef.current) {
+        e.stopPropagation();
+        onToggleSelect?.(node.nodeId);
+        return;
+      }
+      // Normal click → navigate to preview
+      if (readonly) return;
+      if (node.previewUrl) {
+        window.open(node.previewUrl, '_blank', 'noopener,noreferrer');
+      } else {
+        toast.showToast('该组件暂无预览链接，请先配置 previewUrl', 'error');
+      }
+    },
+    [editing, readonly, node.previewUrl, node.nodeId, toast, onToggleSelect, isModifierRef]
+  );
 
   const statusClass =
     node.status === 'confirmed'
@@ -313,6 +326,15 @@ function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly, selected, 
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={handleNodeClick}
+      onKeyDown={(e) => {
+        // F4: Enter/Space also triggers click when card is focused
+        if (e.key === 'Enter' || e.key === ' ') {
+          handleNodeClick(e as unknown as React.MouseEvent);
+        }
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label={`组件卡片 ${node.name}${selected ? '，已选中' : ''}`}
     >
       {editing ? (
         /* Edit mode */
@@ -570,6 +592,27 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
 
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // F4: Drag selection (框选) — uses same containerRef
+  const { selectionBox } = useDragSelection({
+    onSelectionChange: (nodeIds) => {
+      nodeIds.forEach((id) => {
+        if (!selectedIds.has(id)) {
+          toggleNodeSelect('component', id);
+        }
+      });
+    },
+    getNodePositions: () => {
+      const container = containerRef.current;
+      if (!container) return [];
+      const nodeEls = container.querySelectorAll<HTMLElement>('[data-node-id]');
+      return Array.from(nodeEls).map((el) => ({
+        id: el.getAttribute('data-node-id')!,
+        rect: el.getBoundingClientRect(),
+      }));
+    },
+    enabled: !readonly && componentNodes.length > 0,
+  });
+
   // E2-F7: Drag sensors — mouse and touch support
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -758,6 +801,19 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
                 containerRef={containerRef}
                 groups={overlayGroups}
                 strokeColor={GROUP_COLOR}
+              />
+            )}
+            {/* F4: Drag selection box overlay */}
+            {selectionBox && (
+              <div
+                className={styles.dragSelectionBox}
+                style={{
+                  left: selectionBox.left,
+                  top: selectionBox.top,
+                  width: selectionBox.width,
+                  height: selectionBox.height,
+                }}
+                aria-hidden="true"
               />
             )}
 

@@ -36,11 +36,11 @@ export interface UseVersionHistoryReturn {
   /** 加载快照列表 */
   loadSnapshots: () => Promise<void>;
   /** 创建手动快照 */
-  createSnapshot: (label?: string) => Promise<void>;
+  createSnapshot: (label?: string) => Promise<import('@/lib/canvas/types').CanvasSnapshot | null>;
   /** 创建 AI 完成快照 */
   createAiSnapshot: () => Promise<void>;
   /** 恢复到指定快照 */
-  restoreSnapshot: (snapshotId: string) => Promise<void>;
+  restoreSnapshot: (snapshotId: string) => Promise<boolean>;
 }
 
 export function useVersionHistory(): UseVersionHistoryReturn {
@@ -79,10 +79,10 @@ export function useVersionHistory(): UseVersionHistoryReturn {
     }
   }, [projectId]);
 
-  const createSnapshot = useCallback(async (label?: string) => {
+  const createSnapshot = useCallback(async (label?: string): Promise<import('@/lib/canvas/types').CanvasSnapshot | null> => {
     const now = Date.now();
     if (now - lastSnapshotTimeRef.current < SNAPSHOT_DEBOUNCE_MS) {
-      return;
+      return null;
     }
     lastSnapshotTimeRef.current = now;
 
@@ -98,9 +98,12 @@ export function useVersionHistory(): UseVersionHistoryReturn {
 
       if (result.success) {
         setSnapshots((prev) => [result.snapshot, ...prev]);
+        return result.snapshot;
       }
+      return null;
     } catch (err) {
       console.error('[useVersionHistory] createSnapshot error:', err);
+      return null;
     }
   }, [contextNodes, flowNodes, componentNodes, projectId]);
 
@@ -129,7 +132,7 @@ export function useVersionHistory(): UseVersionHistoryReturn {
     }
   }, [contextNodes, flowNodes, componentNodes, projectId]);
 
-  const restoreSnapshot = useCallback(async (snapshotId: string) => {
+  const restoreSnapshot = useCallback(async (snapshotId: string): Promise<boolean> => {
     try {
       const result = await canvasApi.restoreSnapshot(snapshotId);
 
@@ -139,9 +142,12 @@ export function useVersionHistory(): UseVersionHistoryReturn {
         setComponentNodes(result.componentNodes);
         setIsOpen(false);
         setSelectedSnapshot(null);
+        return true;
       }
+      return false;
     } catch (err) {
       console.error('[useVersionHistory] restoreSnapshot error:', err);
+      return false;
     }
   }, [setContextNodes, setFlowNodes, setComponentNodes]);
 

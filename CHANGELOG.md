@@ -1,3 +1,13 @@
+### Fixed (vibex-next-roadmap-ph1 Epic1: expandBoth布局切换) — 2026-03-29
+- **F1.1**: expandMode state (normal/expand-both/maximize) — canvasStore 新增 expandMode
+- **F1.2**: maximize 模式隐藏 ProjectBar/Toolbar，padding→0
+- **F1.3**: F11 快捷键切换 maximize，Escape 退出 maximize
+- **UI**: expandAllButton + maximizeButton 浮动按钮（三栏均分视口 1fr 1fr 1fr）
+- **CSS**: `.expandControls` / `.expandAllButton` / `.maximizeMode` / `.expandBothMode`
+- **测试**: 29 canvas suites / 506 tests PASS
+- **提交**: `2b3cc936`
+- **审查**: ✅ PASSED (reviewer-epic1-expandboth布局切换)
+
 ### Fixed (vibex-domain-model-full-flow-check-fix-v2 Epic2: StateSync状态同步) — 2026-03-30
 - **vibex-domain-model-full-flow-check-fix-v2 Epic2** — DDD 三页面状态同步
   - **F2.1**: `DDDStoreInitializer` — 客户端单例初始化组件，在 root layout ToastProvider 内调用 `initDDDStores()`

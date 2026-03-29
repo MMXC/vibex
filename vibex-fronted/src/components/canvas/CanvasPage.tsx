@@ -34,7 +34,7 @@ import { TemplateSelector } from './features/TemplateSelector';
 import { VersionHistoryPanel } from './features/VersionHistoryPanel';
 import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
 import type { Phase, TreeType, TreeNode } from '@/lib/canvas/types';
-import type { NodeRect, BoundedContextNode, BusinessFlowNode, ComponentNode } from '@/lib/canvas/types';
+import type { NodeRect } from '@/lib/canvas/types';
 import { BoundedEdgeLayer } from './edges/BoundedEdgeLayer';
 import { FlowEdgeLayer } from './edges/FlowEdgeLayer';
 import styles from './canvas.module.css';
@@ -316,7 +316,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     }));
   }, [flowNodes]);
 
-  const componentNodeRects = useMemo<NodeRect[]>(() => {
+  const _componentNodeRects = useMemo<NodeRect[]>(() => {
     return componentNodes.map((node, i) => ({
       id: node.nodeId,
       x: (i % 3) * (CARD_W + CARD_GAP),

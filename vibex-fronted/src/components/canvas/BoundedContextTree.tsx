@@ -387,41 +387,39 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
 
   // === Epic 2 F3.2: BoundedEdgeLayer integration ===
   // DOM measurement for BoundedEdgeLayer node rects
-  const [panelSize, setPanelSize] = useState({ width: 0, height: 0 });
+  // Compute node rects inside ResizeObserver to avoid ref access during render (ESLint react-hooks/refs)
+  const [nodeRects, setNodeRects] = useState<NodeRect[]>([]);
 
   useEffect(() => {
     if (!containerRef.current) return;
-    const observer = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (entry) {
-        setPanelSize({
-          width: entry.contentRect.width,
-          height: entry.contentRect.height,
-        });
-      }
+
+    const computeRects = () => {
+      if (!containerRef.current) return;
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const cardEls = containerRef.current.querySelectorAll<HTMLElement>('[data-node-id]');
+      const rects: NodeRect[] = Array.from(cardEls)
+        .map((el) => {
+          const rect = el.getBoundingClientRect();
+          return {
+            id: el.getAttribute('data-node-id')!,
+            x: rect.left - containerRect.left,
+            y: rect.top - containerRect.top,
+            width: el.offsetWidth || CTX_CARD_APPROX_WIDTH,
+            height: el.offsetHeight || CTX_CARD_APPROX_HEIGHT,
+          };
+        })
+        .filter((r) => contextNodes.some((n) => n.nodeId === r.id));
+      setNodeRects(rects);
+    };
+
+    const observer = new ResizeObserver(() => {
+      computeRects();
     });
     observer.observe(containerRef.current);
+    // Initial measurement
+    computeRects();
     return () => observer.disconnect();
-  }, []);
-
-  // Compute node rects from DOM positions (F3.2)
-  const nodeRects = useMemo((): NodeRect[] => {
-    if (!containerRef.current || panelSize.width === 0) return [];
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const cardEls = containerRef.current.querySelectorAll<HTMLElement>('[data-node-id]');
-    return Array.from(cardEls)
-      .map((el) => {
-        const rect = el.getBoundingClientRect();
-        return {
-          id: el.getAttribute('data-node-id')!,
-          x: rect.left - containerRect.left,
-          y: rect.top - containerRect.top,
-          width: el.offsetWidth || CTX_CARD_APPROX_WIDTH,
-          height: el.offsetHeight || CTX_CARD_APPROX_HEIGHT,
-        };
-      })
-      .filter((r) => contextNodes.some((n) => n.nodeId === r.id));
-  }, [contextNodes, panelSize]);
+  }, [contextNodes]);
 
   // Auto-infer bounded edges from context nodes (F3.2)
   const boundedEdges = useMemo(() => inferBoundedEdges(contextNodes), [contextNodes]);

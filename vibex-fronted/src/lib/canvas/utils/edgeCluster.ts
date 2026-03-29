@@ -19,7 +19,7 @@
  *   const result = clusterEdges(edges, (e) => e.from.groupId);
  */
 
-import type { BoundedEdge, BoundedEdgeType, FlowEdge, FlowEdgeType } from '@/lib/canvas/types';
+import type { BoundedEdge, FlowEdge } from '@/lib/canvas/types';
 
 // =============================================================================
 // Constants
@@ -33,26 +33,6 @@ export const MAX_EDGES_VISIBLE = 20;
  * Cluster any group with > this many edges.
  */
 const CLUSTER_THRESHOLD = 3;
-
-// =============================================================================
-// BoundedEdge Color Mapping
-// =============================================================================
-
-export const BOUNDED_EDGE_COLORS: Record<BoundedEdgeType, string> = {
-  dependency: '#6366f1',   // indigo
-  composition: '#8b5cf6',  // violet
-  association: '#94a3b8',  // slate
-} as const;
-
-// =============================================================================
-// FlowEdge Color Mapping
-// =============================================================================
-
-export const FLOW_EDGE_COLORS: Record<FlowEdgeType, string> = {
-  sequence: '#3b82f6',  // blue
-  branch:   '#f59e0b',  // amber
-  loop:     '#8b5cf6',  // violet
-} as const;
 
 // =============================================================================
 // Clustering Types

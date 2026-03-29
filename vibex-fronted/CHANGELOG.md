@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Epic3: Flow 关系可视化 (canvas-phase2 F3 Epic)
+- **F3.1** — 数据模型扩展: `BoundedEdge`/`FlowEdge`/`FlowEdgeType` 类型定义于 `lib/canvas/types.ts`
+- **F3.2** — 限界上下文连线: `BoundedEdgeLayer` SVG 渲染层 (z-index:30, pointer-events:none)
+  - `src/components/canvas/edges/BoundedEdgeLayer.tsx` + `.module.css`
+  - `src/lib/canvas/utils/edgePath.ts`: 贝塞尔曲线路径计算 + `BOUNDED_EDGE_COLORS`
+  - 三种连线类型: dependency(靛蓝)/composition(紫罗兰)/association(板岩)
+- **F3.3** — 流程节点连线: `FlowEdgeLayer` SVG 渲染层 (z-index:40)
+  - `src/components/canvas/edges/FlowEdgeLayer.tsx` + `.module.css`
+  - 三种样式: sequence(实线蓝)/branch(虚线橙)/loop(回环紫)
+- **F3.4** — 连线密度控制: 聚类算法 (CLUSTER_THRESHOLD=3, MAX_EDGES_VISIBLE=20)
+  - `src/lib/canvas/utils/edgeCluster.ts`: 聚类 + `useFlowClusteredEdges`/`useBoundedClusteredEdges` hooks
+- 修复: ESLint `react-hooks/refs` 错误 (ref 访问移至 ResizeObserver 内)
+- `src/components/canvas/edges/BoundedEdgeLayer.test.tsx`: 8 tests (渲染/颜色/标签/z-index)
+- `src/components/canvas/edges/FlowEdgeLayer.test.tsx`: 11 tests (渲染/样式/聚类/标签/transform)
+- `src/lib/canvas/utils/edgePath.test.ts`: 25 tests (路径计算/颜色常量)
+- `src/lib/canvas/utils/edgeCluster.test.ts`: 15 tests (聚类边界/安全上限/标签格式)
+- Commits: `2bead619`, `d5c86556`, `8c898c31`, `7d9ee0f3`, `b661c96d`
+
 ### Epic1: 画布 Undo/Redo 核心编辑体验 (vibex-canvas-feature-gap-20260329)
 - **✅ PASS** — 三树独立历史栈，50步限制，Ctrl+Z/Ctrl+Shift+Z 快捷键
 - `src/lib/canvas/historySlice.ts`: 三树独立 HistoryStack（context/flow/component），MAX_HISTORY_LENGTH=50

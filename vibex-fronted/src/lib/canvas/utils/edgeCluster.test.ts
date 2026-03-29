@@ -5,7 +5,6 @@
 import {
   clusterBoundedEdges,
   MAX_EDGES_VISIBLE,
-  type ClusterResult,
 } from './edgeCluster';
 import type { BoundedEdge } from '@/lib/canvas/types';
 

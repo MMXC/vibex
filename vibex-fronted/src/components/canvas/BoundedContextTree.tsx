@@ -518,7 +518,7 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
           </button>
         )}
 
-        {/* F3-F10: Multi-select controls */}
+        {/* F3-F10/S2.1: Multi-select controls — delete always visible */}
         {hasNodes && (
           <div className={styles.multiSelectControls}>
             {selectedCount > 0 ? (
@@ -536,15 +536,37 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
                   <button
                     type="button"
                     className={styles.deleteButton}
-                    onClick={() => deleteSelectedNodes('context')}
+                    onClick={() => {
+                      if (window.confirm(`确定删除 ${selectedCount} 个节点？`)) {
+                        deleteSelectedNodes('context');
+                      }
+                    }}
                     aria-label={`删除 ${selectedCount} 个选中节点`}
                   >
                     删除 ({selectedCount})
                   </button>
                 )}
               </>
-            ) : (
-              /* S1.5: Changed from "全选" to "确认所有" */
+            ) : null}
+            {/* S2.1: Delete button always visible when not readonly, no pre-selection needed */}
+            {!readonly && (
+              <button
+                type="button"
+                className={styles.deleteButton}
+                onClick={() => {
+                  if (contextNodes.length === 0) return;
+                  if (window.confirm(`确定删除全部 ${contextNodes.length} 个节点？`)) {
+                    // Delete all context nodes
+                    contextNodes.forEach(n => deleteContextNode(n.nodeId));
+                  }
+                }}
+                aria-label="删除全部节点"
+              >
+                删除全部
+              </button>
+            )}
+            {/* S1.5: 确认所有 button */}
+            {!readonly && selectedCount === 0 && (
               <button
                 type="button"
                 className={styles.secondaryButton}

@@ -90,7 +90,6 @@ class DDDStateSyncManager {
    * Register all three DDD store slices.
    * Called once on first mount; subsequent calls are no-ops.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   register(
     contextStore: StoreSlice<any>,
     modelStore: StoreSlice<any>,
@@ -143,7 +142,6 @@ class DDDStateSyncManager {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _persistAll(
     contextStore: StoreSlice<any>,
     modelStore: StoreSlice<any>,
@@ -271,7 +269,6 @@ export const dddStateSyncManager = new DDDStateSyncManager();
  * Initialize cross-slice state sync.
  * Call once at app startup with all three DDD store references.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function initDDDStateSync(
   contextStore: StoreSlice<any>,
   modelStore: StoreSlice<any>,

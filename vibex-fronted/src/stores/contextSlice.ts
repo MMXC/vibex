@@ -54,7 +54,7 @@ export interface ContextState {
 export const useContextStore = create<ContextState>()(
   devtools(
     persist(
-    (set, get) => ({
+    (set) => ({
       // Initial state
       boundedContexts: [],
       contextMermaidCode: '',

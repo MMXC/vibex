@@ -144,7 +144,7 @@ const initialState = {
   
   // Hydration tracking
   _hasHydrated: false,
-  setHasHydrated: (state: boolean) => {},
+  setHasHydrated: (_state: boolean) => {},
   
   sessionId: null,
   projectId: null,

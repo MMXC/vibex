@@ -44,17 +44,29 @@ import styles from './canvas.module.css';
 /** Common component flowId values that indicate a reusable/generic component */
 const COMMON_FLOW_IDS = new Set(['mock', 'manual', 'common', '__ungrouped__', '']);
 
+/** Common component types — 通用组件类型列表 */
+const COMMON_COMPONENT_TYPES = new Set([
+  'modal', 'button', 'input', 'select', 'checkbox', 'radio',
+  'badge', 'tag', 'tooltip', 'dropdown', 'avatar', 'spinner',
+  'switch', 'slider', 'datepicker', 'timepicker', 'colorpicker',
+  'tabs', 'accordion', 'breadcrumb', 'pagination', 'progress',
+  'alert', 'toast', 'loading', 'skeleton',
+]);
+
 /**
- * E2.1: 推断组件是否为通用组件
- * 规则：flowId 为 mock/manual/common/空 或 类型为通用组件类型时视为通用组件
+ * E2.1: 推断组件是否为通用组件（多维判断）
+ * 规则：
+ * 1. flowId 为 mock/manual/common/空 → 通用
+ * 2. 组件类型为通用类型 → 通用
+ * 3. 否则 → 非通用（按 flowId 分组到具体页面）
  */
 export function inferIsCommon(node: ComponentNode): boolean {
-  // flowId 为通用标识
+  // 1. flowId 为通用标识
   if (COMMON_FLOW_IDS.has(node.flowId) || !node.flowId) {
     return true;
   }
-  // 类型为 modal 通常是通用组件
-  if (node.type === 'modal') {
+  // 2. 组件类型为通用组件类型
+  if (COMMON_COMPONENT_TYPES.has(node.type)) {
     return true;
   }
   return false;
@@ -83,13 +95,40 @@ export interface ComponentGroup {
   isCommon?: boolean;
 }
 
-/** 从 flowNodes 中查找页面名称，找不到时返回 "未知页面" */
+/**
+ * 从 flowNodes 中查找页面名称，支持多级 fallback 匹配
+ * 优先级：精确匹配 → prefix匹配 → 名称模糊匹配 → 兜底显示 flowId
+ */
 function getPageLabel(flowId: string, flowNodes: BusinessFlowNode[]): string {
-  if (!flowId || flowId === 'mock' || flowId === 'manual' || flowId === 'common') {
+  // 0. 通用组件标识
+  if (!flowId || COMMON_FLOW_IDS.has(flowId)) {
     return '未知页面';
   }
-  const found = flowNodes.find((f) => f.nodeId === flowId);
-  return found ? `📄 ${found.name}` : '未知页面';
+
+  // 1. 精确匹配 nodeId
+  const exact = flowNodes.find((f) => f.nodeId === flowId);
+  if (exact) return `📄 ${exact.name}`;
+
+  // 2. Prefix 匹配（flowId 是 flow.nodeId 的前缀或反之）
+  const prefixMatch = flowNodes.find(
+    (f) => flowId.startsWith(f.nodeId + '-') || f.nodeId.startsWith(flowId + '-')
+  );
+  if (prefixMatch) return `📄 ${prefixMatch.name}`;
+
+  // 3. 名称模糊匹配（忽略空格/中划线/下划线）
+  const normalizedFlowId = flowId.toLowerCase().replace(/[\s\-_]/g, '');
+  const nameMatch = flowNodes.find((f) => {
+    const normalizedName = f.name.toLowerCase().replace(/[\s\-_]/g, '');
+    return (
+      normalizedName.includes(normalizedFlowId) ||
+      normalizedFlowId.includes(normalizedName)
+    );
+  });
+  if (nameMatch) return `📄 ${nameMatch.name}`;
+
+  // 4. 兜底：显示 flowId 前缀
+  const shortId = flowId.length > 12 ? flowId.slice(0, 12) + '…' : flowId;
+  return `❓ ${shortId}`;
 }
 
 /**

@@ -62,9 +62,8 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const flowGenerating = useCanvasStore((s) => s.flowGenerating);
   const flowGeneratingMessage = useCanvasStore((s) => s.flowGeneratingMessage);
 
-  // === Expand State Selectors (E2) ===
+  // === Expand State Selectors (E2 → F1: legacy, kept for toggle buttons) ===
   const gridRef = useRef<HTMLDivElement>(null);
-  const _getGridTemplate = useCanvasStore((s) => s.getGridTemplate);
   const leftExpand = useCanvasStore((s) => s.leftExpand);
   const centerExpand = useCanvasStore((s) => s.centerExpand);
   const rightExpand = useCanvasStore((s) => s.rightExpand);
@@ -98,18 +97,18 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     if (!gridRef.current) return;
     const grid = gridRef.current;
 
-    // F1: New expand mode takes priority
+    // F1: Set grid columns based on expandMode
     if (expandMode === 'expand-both' || expandMode === 'maximize') {
       grid.style.setProperty('--grid-left', '1fr');
       grid.style.setProperty('--grid-center', '1fr');
       grid.style.setProperty('--grid-right', '1fr');
     } else {
-      // Fall back to legacy 1.5fr logic
-      grid.style.setProperty('--grid-left', leftExpand === 'expand-right' ? '1.5fr' : leftExpand === 'expand-left' ? '0fr' : '1fr');
-      grid.style.setProperty('--grid-center', centerExpand === 'expand-left' ? '1.5fr' : centerExpand === 'expand-right' ? '0fr' : '1fr');
-      grid.style.setProperty('--grid-right', rightExpand === 'expand-left' ? '1.5fr' : rightExpand === 'expand-right' ? '0fr' : '1fr');
+      // F1.4: Old 1.5fr logic removed — always 1fr for normal mode
+      grid.style.setProperty('--grid-left', '1fr');
+      grid.style.setProperty('--grid-center', '1fr');
+      grid.style.setProperty('--grid-right', '1fr');
     }
-  }, [expandMode, leftExpand, centerExpand, rightExpand]);
+  }, [expandMode]);
 
   // F1: F11 keyboard shortcut for maximize mode
   useEffect(() => {

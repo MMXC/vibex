@@ -23,6 +23,8 @@ import type {
   CascadeResult,
   PanelExpandState,
   BoundedGroup,
+  BoundedEdge,
+  FlowEdge,
 } from './types';
 
 /** F1: Canvas expand mode — replaces old leftExpand/centerExpand/rightExpand logic */
@@ -157,6 +159,30 @@ interface CanvasStore {
   removeNodeFromGroup: (groupId: string, nodeId: string) => void;
   /** Clear all bounded groups */
   clearBoundedGroups: () => void;
+
+  // === F2: BoundedEdge Slice (Epic 3 F3.1/F3.2) ===
+  /** BoundedContext 连线列表 */
+  boundedEdges: BoundedEdge[];
+  /** Add a BoundedEdge */
+  addBoundedEdge: (edge: Omit<BoundedEdge, 'id'>) => void;
+  /** Remove a BoundedEdge by id */
+  removeBoundedEdge: (id: string) => void;
+  /** Clear all BoundedEdges */
+  clearBoundedEdges: () => void;
+  /** Set all BoundedEdges at once */
+  setBoundedEdges: (edges: BoundedEdge[]) => void;
+
+  // === F2: FlowEdge Slice (Epic 3 F3.3) ===
+  /** Flow node 连线列表 */
+  flowEdges: FlowEdge[];
+  /** Add a FlowEdge */
+  addFlowEdge: (edge: Omit<FlowEdge, 'id'>) => void;
+  /** Remove a FlowEdge by id */
+  removeFlowEdge: (id: string) => void;
+  /** Clear all FlowEdges */
+  clearFlowEdges: () => void;
+  /** Set all FlowEdges at once */
+  setFlowEdges: (edges: FlowEdge[]) => void;
 
   // === Context Slice ===
   contextNodes: BoundedContextNode[];
@@ -429,14 +455,8 @@ export const useCanvasStore = create<CanvasStore>()(
           rightExpand: 'default',
 
           getGridTemplate: () => {
-            const { leftExpand, centerExpand, rightExpand } = get();
-            const D = 1; const X = 1.5; const C = 0;
-
-            const leftFr = leftExpand === 'expand-right' ? X : leftExpand === 'expand-left' ? C : D;
-            const centerFr = centerExpand === 'expand-left' ? X : centerExpand === 'expand-right' ? C : D;
-            const rightFr = rightExpand === 'expand-left' ? X : rightExpand === 'expand-right' ? C : D;
-
-            return `${leftFr}fr ${centerFr}fr ${rightFr}fr`;
+            // F1.4: Old 1.5fr logic removed — always 1fr for three-column layout
+            return '1fr 1fr 1fr';
           },
 
           setLeftExpand: (state) => set({ leftExpand: state }),
@@ -467,7 +487,7 @@ export const useCanvasStore = create<CanvasStore>()(
             }
           },
 
-          resetExpand: () => set({ leftExpand: 'default', centerExpand: 'default', rightExpand: 'default' }),
+          resetExpand: () => set({ leftExpand: 'default', centerExpand: 'default', rightExpand: 'default', expandMode: 'normal' }),
 
           // === F1: New expand mode ===
           expandMode: 'normal',
@@ -1029,6 +1049,30 @@ export const useCanvasStore = create<CanvasStore>()(
 
           clearBoundedGroups: () => set({ boundedGroups: [] }),
 
+          // === F2: BoundedEdge Slice ===
+          boundedEdges: [],
+          addBoundedEdge: (edgeData) => {
+            const newEdge: BoundedEdge = { ...edgeData, id: generateId() };
+            set((s) => ({ boundedEdges: [...s.boundedEdges, newEdge] }));
+          },
+          removeBoundedEdge: (id) => {
+            set((s) => ({ boundedEdges: s.boundedEdges.filter((e) => e.id !== id) }));
+          },
+          clearBoundedEdges: () => set({ boundedEdges: [] }),
+          setBoundedEdges: (edges) => set({ boundedEdges: edges }),
+
+          // === F2: FlowEdge Slice ===
+          flowEdges: [],
+          addFlowEdge: (edgeData) => {
+            const newEdge: FlowEdge = { ...edgeData, id: generateId() };
+            set((s) => ({ flowEdges: [...s.flowEdges, newEdge] }));
+          },
+          removeFlowEdge: (id) => {
+            set((s) => ({ flowEdges: s.flowEdges.filter((e) => e.id !== id) }));
+          },
+          clearFlowEdges: () => set({ flowEdges: [] }),
+          setFlowEdges: (edges) => set({ flowEdges: edges }),
+
           // === Internal tracking ===
           _prevActiveTree: null as TreeType | null,
 
@@ -1093,6 +1137,9 @@ export const useCanvasStore = create<CanvasStore>()(
           draggedPositions: state.draggedPositions,
           // E4: persist bounded groups
           boundedGroups: state.boundedGroups,
+          // F2: persist edge layers
+          boundedEdges: state.boundedEdges,
+          flowEdges: state.flowEdges,
           // E5: persist UI state for E2E and user convenience
           phase: state.phase,
           leftExpand: state.leftExpand,

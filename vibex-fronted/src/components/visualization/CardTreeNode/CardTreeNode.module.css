@@ -40,6 +40,14 @@
   flex-shrink: 0;
 }
 
+/* F9: Start/End node markers */
+.nodeMarker {
+  font-size: 12px;
+  flex-shrink: 0;
+  margin-left: 4px;
+  line-height: 1;
+}
+
 .title {
   margin: 0;
   font-size: 13px;

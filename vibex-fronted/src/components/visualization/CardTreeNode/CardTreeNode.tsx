@@ -136,6 +136,9 @@ export const CardTreeNode = memo(function CardTreeNode(props: NodeProps<CardTree
   const hasChildren = data.children.length > 0;
   const uncheckedCount = data.children.filter((c: CardTreeChild) => !c.checked).length;
   const [containerRef, isVisible] = useIntersectionObserver(0.1);
+  // F9: Start/End node markers
+  const isStart = data.isStart === true;
+  const isEnd = data.isEnd === true;
 
   const handleCheckboxToggle = useCallback((childId: string, checked: boolean) => {
     // Parent handles state via onCheckboxToggle callback
@@ -171,6 +174,13 @@ export const CardTreeNode = memo(function CardTreeNode(props: NodeProps<CardTree
           <h3 className={styles.title} data-testid="node-title">
             {data.title}
           </h3>
+          {/* F9: Start/End node markers */}
+          {isStart && (
+            <span className={styles.nodeMarker} data-testid="node-marker-start" title="起点">◉</span>
+          )}
+          {isEnd && (
+            <span className={styles.nodeMarker} data-testid="node-marker-end" title="终点">◎</span>
+          )}
         </div>
         <div className={styles.headerRight}>
           <span className={`${styles.statusBadge} ${statusClass}`} data-testid="status-badge">

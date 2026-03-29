@@ -97,6 +97,10 @@ export interface CardTreeNodeData extends Record<string, unknown> {
   icon?: string;
   /** Timestamp of last update */
   updatedAt?: string;
+  /** F9: Start node marker — true for the first card in the tree */
+  isStart?: boolean;
+  /** F9: End node marker — true for the last card in the tree */
+  isEnd?: boolean;
 }
 
 /** Full ReactFlow node type for CardTreeNode */

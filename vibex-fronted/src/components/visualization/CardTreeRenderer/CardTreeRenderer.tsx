@@ -140,6 +140,9 @@ function buildFlowGraph(
     data: {
       ...card,
       isExpanded: expandedIds ? expandedIds.has(card.title) : card.isExpanded !== false,
+      // F9: 起止节点标记 — first node is start, last node is end
+      isStart: index === 0,
+      isEnd: index === data.nodes.length - 1,
     },
     sourcePosition: Position.Bottom,
     targetPosition: Position.Top,

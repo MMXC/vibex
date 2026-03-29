@@ -1,3 +1,14 @@
+### Fixed (vibex-bc-canvas-edge-render Epic1: 锚点算法修复) — 2026-03-30
+- **问题**: BC 树连线全部重叠在一条垂直线上（所有连线从 bottom 锚点出发）
+- **根因**: `bestAnchor()` 阈值 `absDx >= absDy` 过于严格，导致水平锚点几乎不被选中
+- **修复**: `absDx >= absDy` → `absDx >= absDy * 0.5`
+  - 使水平锚点在 dx 达到 dy 的 50% 时即可被选中（而非 100%）
+  - 水平锚点优先时，连线会从节点侧边引出，水平展开而非垂直重叠
+- **变更**: `edgePath.ts` — `bestAnchor()` 导出 + 阈值调整
+- **测试**: 15/15 edgePath 测试通过，覆盖 9 种 dx/dy 组合
+- **提交**: `b6560e68`
+- **审查**: ✅ PASSED (reviewer-epic1:锚点算法修复)
+
 ### Fixed (vibex-canvas-continu B2 Phase2 CanvasIntegration) — 2026-03-29
 - **B1 fix**: `disabled={allConfirmed}` → `disabled={false}` — 确认按钮始终可点击
   - `BoundedContextTree`: 全部确认后按钮不再禁用，仍可重新确认并推进阶段

@@ -26,6 +26,17 @@
 - **提交**: `b6560e68`
 - **审查**: ✅ PASSED (reviewer-epic1:锚点算法修复)
 
+### Fixed (vibex-bc-canvas-edge-render Epic2: CSS布局改为水平) — 2026-03-30
+- **问题**: BC 树卡片垂直堆叠（flex-direction: column），即使锚点正确也会导致连线重叠
+- **修复**: `.boundedContextTree` CSS 改为水平换行布局
+  - `flex-direction: column` → `row`
+  - `flex-wrap: wrap`（新增）
+  - `gap: 0.75rem` → `1.5rem`
+  - `align-items: flex-start`（新增）
+- **效果**: BC 卡片水平排列，间距增大，连线不再全部汇聚到单列
+- **提交**: `5be2e39d`
+- **审查**: ✅ PASSED (reviewer-epic2-css布局)
+
 ### Fixed (vibex-canvas-continu B2 Phase2 CanvasIntegration) — 2026-03-29
 - **B1 fix**: `disabled={allConfirmed}` → `disabled={false}` — 确认按钮始终可点击
   - `BoundedContextTree`: 全部确认后按钮不再禁用，仍可重新确认并推进阶段

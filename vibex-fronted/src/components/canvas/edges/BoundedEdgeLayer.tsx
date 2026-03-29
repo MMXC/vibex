@@ -13,7 +13,7 @@
  * 使用方式：
  *   <BoundedEdgeLayer
  *     edges={boundedEdges}
- *     nodes={reactFlowNodes}
+ *     nodeRects={boundedNodeRects}
  *     zoom={1}
  *     pan={{ x: 0, y: 0 }}
  *   />
@@ -22,35 +22,186 @@
 'use client';
 
 import React, { memo, useMemo } from 'react';
-import type { BoundedEdge, NodeRect } from '@/lib/canvas/types';
-import type { Node } from '@xyflow/react';
-import { computeEdgePath, BOUNDED_EDGE_COLORS } from '@/lib/canvas/utils/edgePath';
-import { clusterBoundedEdges } from '@/lib/canvas/utils/edgeCluster';
+import type { BoundedEdge, BoundedEdgeType, NodeRect } from '@/lib/canvas/types';
+import { computeEdgePath } from '@/lib/canvas/utils/edgePath';
+import { clusterBoundedEdges, type ClusteredItem } from '@/lib/canvas/utils/edgeCluster';
 import styles from './BoundedEdgeLayer.module.css';
 
 // Default node dimensions (matching CardTreeRenderer card size)
-const DEFAULT_NODE_WIDTH = 240;
-const DEFAULT_NODE_HEIGHT = 200;
+// NOTE: nodeRects are provided externally; these defaults are reserved for future use
+const _DEFAULT_NODE_WIDTH = 240;
+const _DEFAULT_NODE_HEIGHT = 200;
 
-/** 从 ReactFlow Node[] 提取 NodeRect[] */
-export function nodesToNodeRects(nodes: Node[]): NodeRect[] {
-  return nodes.map((n) => ({
-    id: n.id,
-    x: n.position.x,
-    y: n.position.y,
-    width: (n.measured?.width as number | undefined) ?? DEFAULT_NODE_WIDTH,
-    height: (n.measured?.height as number | undefined) ?? DEFAULT_NODE_HEIGHT,
-  }));
+// =============================================================================
+// Constants
+// =============================================================================
+
+const BOUNDED_EDGE_COLORS: Record<BoundedEdgeType, string> = {
+  dependency: '#6366f1',  // indigo
+  composition: '#8b5cf6', // violet
+  association: '#94a3b8', // slate
+};
+
+// =============================================================================
+// Arrow Marker
+// =============================================================================
+
+function ArrowMarker({ type }: { type: BoundedEdgeType }): React.ReactElement {
+  const color = BOUNDED_EDGE_COLORS[type] ?? BOUNDED_EDGE_COLORS.dependency;
+  const id = `bounded-arrow-${type}`;
+  return (
+    <marker
+      id={id}
+      markerWidth="8"
+      markerHeight="8"
+      refX="6"
+      refY="3"
+      orient="auto"
+    >
+      <path d="M0,0 L0,6 L8,3 z" fill={color} />
+    </marker>
+  );
 }
+
+// =============================================================================
+// Path Computation
+// =============================================================================
+
+/** Compute bezier path between two node rects */
+function computePath(from: NodeRect, to: NodeRect): string {
+  return computeEdgePath(from, to);
+}
+
+// =============================================================================
+// Single Edge Renderer
+// =============================================================================
+
+interface SingleBoundedEdgeProps {
+  item: ClusteredItem<BoundedEdge> & { kind: 'edge' };
+  nodeMap: Record<string, NodeRect>;
+}
+
+function SingleBoundedEdge({ item, nodeMap }: SingleBoundedEdgeProps): React.ReactElement | null {
+  const { edge } = item;
+  const fromRect = nodeMap[edge.from.groupId];
+  const toRect = nodeMap[edge.to.groupId];
+  if (!fromRect || !toRect) return null;
+
+  const d = computePath(fromRect, toRect);
+  const color = BOUNDED_EDGE_COLORS[edge.type] ?? BOUNDED_EDGE_COLORS.dependency;
+
+  // Label midpoint
+  const mx = (fromRect.x + fromRect.width / 2 + toRect.x + toRect.width / 2) / 2;
+  const my = (fromRect.y + fromRect.height / 2 + toRect.y + toRect.height / 2) / 2;
+
+  return (
+    <g key={item.key} className={`${styles.edge} ${styles[edge.type]}`}>
+      <path
+        d={d}
+        stroke={color}
+        strokeWidth={2}
+        fill="none"
+        markerEnd={`url(#bounded-arrow-${edge.type})`}
+      />
+      {edge.label && (
+        <g transform={`translate(${mx}, ${my - 8})`}>
+          <rect
+            x={-edge.label.length * 3.5 - 4}
+            y={-8}
+            width={edge.label.length * 7 + 8}
+            height={16}
+            fill="white"
+            fillOpacity={0.85}
+            rx={3}
+          />
+          <text
+            x={0}
+            y={4}
+            textAnchor="middle"
+            fontSize={10}
+            fill={color}
+            fontFamily="system-ui, -apple-system, sans-serif"
+            fontWeight={500}
+          >
+            {edge.label}
+          </text>
+        </g>
+      )}
+    </g>
+  );
+}
+
+// =============================================================================
+// Cluster Edge Renderer
+// =============================================================================
+
+interface ClusterBoundedEdgeProps {
+  item: ClusteredItem<BoundedEdge> & { kind: 'cluster' };
+  nodeMap: Record<string, NodeRect>;
+}
+
+function ClusterBoundedEdge({ item, nodeMap }: ClusterBoundedEdgeProps): React.ReactElement | null {
+  const { representative, label } = item;
+  const fromRect = nodeMap[representative.from.groupId];
+  const toRect = nodeMap[representative.to.groupId];
+  if (!fromRect || !toRect) return null;
+
+  const d = computePath(fromRect, toRect);
+  const color = BOUNDED_EDGE_COLORS[representative.type] ?? BOUNDED_EDGE_COLORS.dependency;
+  const mx = (fromRect.x + toRect.x) / 2;
+  const my = (fromRect.y + toRect.y) / 2;
+
+  return (
+    <g key={`cluster-${item.groupKey}`} className={styles.cluster}>
+      <path
+        d={d}
+        stroke={color}
+        strokeWidth={3.5}
+        fill="none"
+        strokeOpacity={0.6}
+        markerEnd={`url(#bounded-arrow-${representative.type})`}
+      />
+      <g transform={`translate(${mx}, ${my - 10})`}>
+        <rect
+          x={-label.length * 3 - 4}
+          y={-8}
+          width={label.length * 6 + 8}
+          height={16}
+          fill={color}
+          fillOpacity={0.15}
+          rx={3}
+          stroke={color}
+          strokeWidth={1}
+          strokeOpacity={0.5}
+        />
+        <text
+          x={0}
+          y={4}
+          textAnchor="middle"
+          fontSize={10}
+          fill={color}
+          fontFamily="system-ui, -apple-system, sans-serif"
+          fontWeight={600}
+        >
+          {label}
+        </text>
+      </g>
+    </g>
+  );
+}
+
+// =============================================================================
+// Main Component
+// =============================================================================
 
 interface BoundedEdgeLayerProps {
   /** BoundedEdge 连线列表 */
   edges: BoundedEdge[];
-  /** ReactFlow Node[] 用于定位 */
-  nodes: Node[];
-  /** 当前 zoom 级别 */
+  /** Node rectangles for positioning (nodeId → rect) */
+  nodeRects: NodeRect[];
+  /** Current zoom level */
   zoom?: number;
-  /** 当前 pan 偏移 */
+  /** Current pan offset */
   pan?: { x: number; y: number };
   /** CSS className */
   className?: string;
@@ -58,47 +209,33 @@ interface BoundedEdgeLayerProps {
 
 function BoundedEdgeLayerComponent({
   edges,
-  nodes,
+  nodeRects,
   zoom = 1,
   pan = { x: 0, y: 0 },
   className,
-}: BoundedEdgeLayerProps) {
-  // 构建 nodeMap 用于快速查找
-  const nodeMap = useMemo(() => {
-    const map: Record<string, NodeRect> = {};
-    for (const node of nodes) {
-      map[node.id] = {
-        id: node.id,
-        x: node.position.x,
-        y: node.position.y,
-        width: (node.measured?.width as number | undefined) ?? DEFAULT_NODE_WIDTH,
-        height: (node.measured?.height as number | undefined) ?? DEFAULT_NODE_HEIGHT,
-      };
-    }
-    return map;
-  }, [nodes]);
+}: BoundedEdgeLayerProps): React.ReactElement | null {
+  // Build node lookup map
+  const nodeMap = useMemo(
+    () => Object.fromEntries(nodeRects.map((n) => [n.id, n])),
+    [nodeRects]
+  );
 
-  // 聚类处理
-  const { clusterResult, hasCluster } = useMemo(() => {
-    const result = clusterBoundedEdges(edges);
-    return { clusterResult: result, hasCluster: result.type === 'cluster' };
-  }, [edges]);
+  // Compute clustering
+  const { items } = useMemo(() => clusterBoundedEdges(edges), [edges]);
 
-  // 计算 SVG 视口大小
-  const { svgWidth, svgHeight } = useMemo(() => {
-    if (nodes.length === 0) return { svgWidth: 2000, svgHeight: 2000 };
+  // SVG viewport dimensions
+  const svgDimensions = useMemo(() => {
+    if (nodeRects.length === 0) return { width: 2000, height: 2000 };
     let maxX = 0, maxY = 0;
-    for (const n of nodes) {
-      const rect = nodeMap[n.id];
-      if (!rect) continue;
+    for (const rect of nodeRects) {
       maxX = Math.max(maxX, rect.x + rect.width + 100);
       maxY = Math.max(maxY, rect.y + rect.height + 100);
     }
-    return { svgWidth: maxX, svgHeight: maxY };
-  }, [nodes, nodeMap]);
+    return { width: maxX, height: maxY };
+  }, [nodeRects]);
 
   if (edges.length === 0) {
-    return null;
+    return <></>;
   }
 
   return (
@@ -116,171 +253,31 @@ function BoundedEdgeLayerComponent({
         zIndex: 30,
       }}
     >
-      {/* 转换组以匹配 ReactFlow viewport */}
       <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
         <defs>
-          {/* 每种类型一个 marker */}
-          {(Object.entries(BOUNDED_EDGE_COLORS) as [BoundedEdge['type'], string][]).map(
-            ([type, color]) => (
-              <marker
-                key={type}
-                id={`bounded-arrow-${type}`}
-                markerWidth="8"
-                markerHeight="8"
-                refX="6"
-                refY="3"
-                orient="auto"
-              >
-                <path d="M0,0 L0,6 L8,3 z" fill={color} />
-              </marker>
-            )
-          )}
+          {/* Clip path */}
           <clipPath id="bounded-edge-clip">
             <rect
               x={-pan.x / zoom}
               y={-pan.y / zoom}
-              width={svgWidth / zoom + 200}
-              height={svgHeight / zoom + 200}
+              width={svgDimensions.width / zoom + 200}
+              height={svgDimensions.height / zoom + 200}
             />
           </clipPath>
+          {/* Arrow markers per edge type */}
+          {(Object.keys(BOUNDED_EDGE_COLORS) as BoundedEdgeType[]).map((type) => (
+            <ArrowMarker key={type} type={type} />
+          ))}
         </defs>
 
         <g clipPath="url(#bounded-edge-clip)">
-          {clusterResult.type === 'single' &&
-            (clusterResult.edges as BoundedEdge[]).map((edge) => {
-              const fromRect = nodeMap[edge.from.groupId];
-              const toRect = nodeMap[edge.to.groupId];
-              if (!fromRect || !toRect) return null;
-
-              const d = computeEdgePath(fromRect, toRect);
-              const color = BOUNDED_EDGE_COLORS[edge.type] ?? BOUNDED_EDGE_COLORS.dependency;
-
-              // 计算 label 中点
-              const mx = (fromRect.x + fromRect.width / 2 + toRect.x + toRect.width / 2) / 2;
-              const my = (fromRect.y + fromRect.height / 2 + toRect.y + toRect.height / 2) / 2;
-
-              return (
-                <g key={edge.id} className={`${styles.edge} ${styles[edge.type]}`}>
-                  {/* 主路径 */}
-                  <path
-                    d={d}
-                    stroke={color}
-                    strokeWidth={2}
-                    fill="none"
-                    markerEnd={`url(#bounded-arrow-${edge.type})`}
-                  />
-                  {/* Label */}
-                  {edge.label && (
-                    <g transform={`translate(${mx}, ${my - 8})`}>
-                      <rect
-                        x={-edge.label.length * 3.5 - 4}
-                        y={-8}
-                        width={edge.label.length * 7 + 8}
-                        height={16}
-                        fill="white"
-                        fillOpacity={0.85}
-                        rx={3}
-                      />
-                      <text
-                        x={0}
-                        y={4}
-                        textAnchor="middle"
-                        fontSize={10}
-                        fill={color}
-                        fontFamily="system-ui, -apple-system, sans-serif"
-                        fontWeight={500}
-                      >
-                        {edge.label}
-                      </text>
-                    </g>
-                  )}
-                </g>
-              );
-            })}
-
-          {/* 聚类渲染 */}
-          {clusterResult.type === 'cluster' && hasCluster && (
-            <g className={styles.cluster}>
-              {(() => {
-                // 从 edges 中提取聚类信息
-                const clusterEdges = clusterResult.edges as unknown as Array<{ type: 'cluster'; label: string; count: number; edges: BoundedEdge[] }>;
-                const singleEdges = clusterEdges.filter((e) => e.type === 'single') as unknown as BoundedEdge[];
-                const clusters = clusterEdges.filter((e) => e.type === 'cluster') as unknown as Array<{ type: 'cluster'; label: string; count: number; edges: BoundedEdge[] }>;
-
-                const elements: React.ReactNode[] = [];
-
-                // 渲染单个边
-                for (const edge of singleEdges) {
-                  const fromRect = nodeMap[edge.from.groupId];
-                  const toRect = nodeMap[edge.to.groupId];
-                  if (!fromRect || !toRect) continue;
-                  const d = computeEdgePath(fromRect, toRect);
-                  const color = BOUNDED_EDGE_COLORS[edge.type];
-                  elements.push(
-                    <path
-                      key={edge.id}
-                      d={d}
-                      stroke={color}
-                      strokeWidth={2}
-                      fill="none"
-                      markerEnd={`url(#bounded-arrow-${edge.type})`}
-                    />
-                  );
-                }
-
-                // 渲染聚类边（用一条粗线代表）
-                for (const cluster of clusters) {
-                  const firstEdge = cluster.edges[0];
-                  if (!firstEdge) continue;
-                  const fromRect = nodeMap[firstEdge.from.groupId];
-                  const toRect = nodeMap[firstEdge.to.groupId];
-                  if (!fromRect || !toRect) continue;
-                  const d = computeEdgePath(fromRect, toRect);
-                  const mx = (fromRect.x + toRect.x) / 2;
-                  const my = (fromRect.y + toRect.y) / 2;
-                  elements.push(
-                    <g key={`cluster-${firstEdge.id}`}>
-                      <path
-                        d={d}
-                        stroke="#6366f1"
-                        strokeWidth={3.5}
-                        fill="none"
-                        markerEnd="url(#bounded-arrow-dependency)"
-                        strokeOpacity={0.7}
-                      />
-                      <g transform={`translate(${mx}, ${my - 10})`}>
-                        <rect
-                          x={-cluster.label.length * 3 - 4}
-                          y={-8}
-                          width={cluster.label.length * 6 + 8}
-                          height={16}
-                          fill="#6366f1"
-                          fillOpacity={0.15}
-                          rx={3}
-                          stroke="#6366f1"
-                          strokeWidth={1}
-                          strokeOpacity={0.5}
-                        />
-                        <text
-                          x={0}
-                          y={4}
-                          textAnchor="middle"
-                          fontSize={10}
-                          fill="#6366f1"
-                          fontFamily="system-ui, -apple-system, sans-serif"
-                          fontWeight={600}
-                        >
-                          {cluster.label}
-                        </text>
-                      </g>
-                    </g>
-                  );
-                }
-
-                return elements;
-              })()}
-            </g>
-          )}
+          {items.map((item, _idx) => {
+            if (item.kind === 'edge') {
+              return <SingleBoundedEdge key={item.key} item={item} nodeMap={nodeMap} />;
+            } else {
+              return <ClusterBoundedEdge key={`cluster-${item.groupKey}`} item={item} nodeMap={nodeMap} />;
+            }
+          })}
         </g>
       </g>
     </svg>

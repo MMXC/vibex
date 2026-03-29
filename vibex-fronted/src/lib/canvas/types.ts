@@ -410,6 +410,27 @@ export const DOMAIN_TYPE_CONFIG: Record<
   external: { label: '外部域', color: '#8b5cf6', bgColor: 'rgba(139, 92, 246, 0.05)' },
 } as const;
 
+/**
+ * F2.2: deriveNodeType — 从步骤在列表中的位置推断节点类型
+ */
+export function deriveNodeType(index: number, total: number): FlowStep['nodeType'] {
+  if (index === 0) return 'start';
+  if (index === total - 1) return 'end';
+  return 'process';
+}
+
+/**
+ * F2.2: Flow node type display configuration
+ */
+export const FLOW_NODE_TYPE_CONFIG: Record<
+  NonNullable<FlowStep['nodeType']>,
+  { label: string; color: string }
+> = {
+  start: { label: '起点', color: '#22c55e' },
+  end: { label: '终点', color: '#ef4444' },
+  process: { label: '过程', color: '#6b7280' },
+} as const;
+
 // =============================================================================
 // Canvas Generate API Types (Epic 1)
 // =============================================================================

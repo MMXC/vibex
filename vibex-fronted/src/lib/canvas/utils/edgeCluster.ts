@@ -1,200 +1,260 @@
 /**
- * edgeCluster.ts — 连线密度控制
+ * edgeCluster.ts — E3-F3.4: Edge density control with MAX_EDGES_VISIBLE clustering
  *
- * Epic 3 F3.4
+ * Generic edge clustering for both BoundedEdge (Epic F3.2) and FlowEdge (Epic F3.3).
  *
- * 当连线数量超过 MAX_EDGES_VISIBLE 时，按源节点 groupId 分组聚类。
- * 聚类后的边显示为一条粗线 + "+N more" 标签。
+ * Clustering rules:
+ * 1. Always group edges by source group
+ * 2. Cluster groups with > CLUSTER_THRESHOLD (3) edges — regardless of total count
+ * 3. Safety cap: if result still exceeds MAX_EDGES_VISIBLE (20), cluster smallest groups
+ *
+ * Usage:
+ *   // BoundedEdge (uses from.groupId as groupKey)
+ *   const result = clusterBoundedEdges(edges);
+ *
+ *   // FlowEdge (uses from as nodeId as groupKey)
+ *   const result = clusterFlowEdges(edges);
+ *
+ *   // Generic (any edge type with custom key extractor)
+ *   const result = clusterEdges(edges, (e) => e.from.groupId);
  */
 
-import type { BoundedEdge, FlowEdge } from '@/lib/canvas/types';
+import type { BoundedEdge, BoundedEdgeType, FlowEdge, FlowEdgeType } from '@/lib/canvas/types';
 
 // =============================================================================
 // Constants
 // =============================================================================
 
-/** 最大可见连线数量（超过此值触发聚类） */
+/** Maximum number of items (single + clusters) to render before safety cap */
 export const MAX_EDGES_VISIBLE = 20;
 
-/** 聚类边超过此阈值时合并为一条 */
+/**
+ * Minimum edges from a single source before clustering kicks in.
+ * Cluster any group with > this many edges.
+ */
 const CLUSTER_THRESHOLD = 3;
 
 // =============================================================================
-// Types
+// BoundedEdge Color Mapping
 // =============================================================================
 
-/** 单条边 */
-export interface SingleEdge<T> {
-  type: 'single';
-  edges: T[];
+export const BOUNDED_EDGE_COLORS: Record<BoundedEdgeType, string> = {
+  dependency: '#6366f1',   // indigo
+  composition: '#8b5cf6',  // violet
+  association: '#94a3b8',  // slate
+} as const;
+
+// =============================================================================
+// FlowEdge Color Mapping
+// =============================================================================
+
+export const FLOW_EDGE_COLORS: Record<FlowEdgeType, string> = {
+  sequence: '#3b82f6',  // blue
+  branch:   '#f59e0b',  // amber
+  loop:     '#8b5cf6',  // violet
+} as const;
+
+// =============================================================================
+// Clustering Types
+// =============================================================================
+
+/** A single edge item (for direct rendering) */
+export interface SingleEdgeItem<E> {
+  kind: 'edge';
+  edge: E;
+  /** Unique key for React list rendering */
+  key: string;
 }
 
-/** 聚类边 */
-export interface ClusterEdge<T> {
-  type: 'cluster';
-  /** 聚类内原始边列表 */
-  edges: T[];
-  /** 显示 label（如 "+5 more"） */
+/** A cluster bundle (multiple edges merged) */
+export interface ClusterEdgeItem<E> {
+  kind: 'cluster';
+  representative: E;
+  edges: E[];
   label: string;
-  /** 聚类包含的边数量 */
-  count: number;
+  groupKey: string;
 }
 
-/** 聚类结果 */
-export type ClusterResult<T> = SingleEdge<T> | ClusterEdge<T>;
+/** Union of renderable items */
+export type ClusteredItem<E> = SingleEdgeItem<E> | ClusterEdgeItem<E>;
+
+/** Clustering result */
+export interface ClusterResult<E> {
+  type: 'single' | 'cluster';
+  items: ClusteredItem<E>[];
+  totalCount: number;
+  mergedCount: number;
+}
 
 // =============================================================================
-// BoundedEdge clustering
+// Core Generic Clustering Algorithm
 // =============================================================================
 
 /**
- * 对 BoundedEdge 列表进行聚类
+ * Always groups edges by source, clusters groups with > CLUSTER_THRESHOLD edges,
+ * then applies a safety cap if result exceeds MAX_EDGES_VISIBLE.
  *
- * 策略：按源 groupId 分组，组内边数 > CLUSTER_THRESHOLD 时合并
- * 如果合并后仍超阈值，优先保留小组，合并大组
+ * @param edges - Array of edges to cluster
+ * @param getGroupKeyFn - Function to extract the group key from an edge
  */
-export function clusterBoundedEdges(edges: BoundedEdge[]): ClusterResult<BoundedEdge> {
-  if (edges.length <= MAX_EDGES_VISIBLE) {
-    return { type: 'single', edges };
+function clusterEdgesImpl<E>(
+  edges: E[],
+  getGroupKeyFn: (edge: E) => string
+): ClusterResult<E> {
+  const totalCount = edges.length;
+  if (totalCount === 0) {
+    return { type: 'single', items: [], totalCount: 0, mergedCount: 0 };
   }
 
-  // 按源 groupId 分组
-  const groups: Record<string, BoundedEdge[]> = {};
+  // Step 1: Group edges by source group
+  const groups: Record<string, E[]> = {};
   for (const edge of edges) {
-    const key = edge.from.groupId;
-    (groups[key] = groups[key] || []).push(edge);
+    const key = getGroupKeyFn(edge);
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(edge);
   }
 
-  const singles: BoundedEdge[] = [];
-  const clusters: { edges: BoundedEdge[]; label: string; count: number }[] = [];
+  // Step 2: Cluster groups exceeding threshold (regardless of total count)
+  const items: ClusteredItem<E>[] = [];
+  let mergedCount = 0;
 
-  for (const [groupId, groupEdges] of Object.entries(groups)) {
+  for (const [groupKey, groupEdges] of Object.entries(groups)) {
     if (groupEdges.length > CLUSTER_THRESHOLD) {
-      clusters.push({
+      // Cluster this group
+      const excess = groupEdges.length - 1;
+      mergedCount += excess;
+      items.push({
+        kind: 'cluster',
+        representative: groupEdges[0],
         edges: groupEdges,
-        label: `+${groupEdges.length - 1} more`,
-        count: groupEdges.length,
+        label: `+${excess}`,
+        groupKey,
       });
     } else {
-      singles.push(...groupEdges);
-    }
-  }
-
-  // 如果 single + cluster 数量仍超阈值，合并最大的聚类
-  if (singles.length + clusters.length > MAX_EDGES_VISIBLE) {
-    // 按 count 升序排列，合并最大的聚类直到满足阈值
-    clusters.sort((a, b) => b.count - a.count);
-
-    while (clusters.length > 0 && singles.length + clusters.length > MAX_EDGES_VISIBLE) {
-      const largest = clusters.shift()!;
-      const newLabel = `+${largest.count} more`;
-      // 合并到现有的单个聚类中（第一个）
-      if (clusters.length > 0) {
-        const target = clusters[0];
-        clusters[0] = {
-          edges: [...target.edges, ...largest.edges],
-          label: `+${target.count + largest.count} more`,
-          count: target.count + largest.count,
-        };
-      } else {
-        // 没有其他聚类，创建一个合并的聚类
-        clusters.push({
-          edges: largest.edges,
-          label: newLabel,
-          count: largest.count,
-        });
+      // Keep individual edges for this group
+      for (const edge of groupEdges) {
+        const key = (edge as { id?: string }).id ?? groupKey;
+        items.push({ kind: 'edge', edge, key } as SingleEdgeItem<E>);
       }
     }
   }
 
-  // 转换为 ClusterResult
-  const allClusters: ClusterEdge<BoundedEdge>[] = clusters.map((c) => ({
-    type: 'cluster',
-    edges: c.edges,
-    label: c.label,
-    count: c.count,
-  }));
-
-  const total = singles.length + allClusters.length;
-  if (total <= MAX_EDGES_VISIBLE) {
-    return { type: 'single', edges: [...singles, ...allClusters.flatMap((c) => c.edges)] };
+  // Step 3: Safety cap — if still over MAX_EDGES_VISIBLE, cluster smallest groups
+  if (items.length > MAX_EDGES_VISIBLE) {
+    return applySafetyCap(edges, items, mergedCount, getGroupKeyFn);
   }
+
+  const type = mergedCount > 0 ? 'cluster' : 'single';
+  return { type, items, totalCount, mergedCount };
+}
+
+/**
+ * Apply safety cap: cluster smallest single-edge groups until under limit.
+ */
+function applySafetyCap<E>(
+  edges: E[],
+  items: ClusteredItem<E>[],
+  mergedCount: number,
+  getGroupKeyFn: (edge: E) => string
+): ClusterResult<E> {
+  const singleItems = items.filter((i): i is SingleEdgeItem<E> => i.kind === 'edge');
+  const existingClusters = items.filter((i): i is ClusterEdgeItem<E> => i.kind === 'cluster');
+
+  // Group single items by groupKey
+  const byGroup: Record<string, E[]> = {};
+  for (const item of singleItems) {
+    const key = getGroupKeyFn(item.edge);
+    if (!byGroup[key]) byGroup[key] = [];
+    byGroup[key].push(item.edge);
+  }
+
+  // Sort groups by size ascending (cluster smallest first)
+  const sortedGroups = Object.entries(byGroup).sort(([, a], [, b]) => a.length - b.length);
+
+  const newClusters: ClusterEdgeItem<E>[] = [...existingClusters];
+  let additionalMerged = 0;
+
+  for (const [gk, ge] of sortedGroups) {
+    if (newClusters.length + singleItems.length - ge.length <= MAX_EDGES_VISIBLE) {
+      // Merge all remaining groups into one big cluster
+      for (const [gk2, ge2] of sortedGroups) {
+        if (gk2 === gk) continue;
+        if (ge2.length > 0) {
+          const excess = ge2.length - 1;
+          additionalMerged += excess;
+          newClusters.push({
+            kind: 'cluster',
+            representative: ge2[0],
+            edges: ge2,
+            label: `+${excess}`,
+            groupKey: gk2,
+          });
+        }
+      }
+      break;
+    }
+    if (ge.length > 1) {
+      const excess = ge.length - 1;
+      additionalMerged += excess;
+      newClusters.push({
+        kind: 'cluster',
+        representative: ge[0],
+        edges: ge,
+        label: `+${excess}`,
+        groupKey: gk,
+      });
+    }
+  }
+
+  const resultItems = newClusters.length <= MAX_EDGES_VISIBLE
+    ? newClusters
+    : newClusters.slice(0, MAX_EDGES_VISIBLE);
 
   return {
     type: 'cluster',
-    edges: [...singles, ...allClusters] as unknown as BoundedEdge[],
-    label: `+${edges.length - MAX_EDGES_VISIBLE} edges`,
-    count: edges.length,
+    items: resultItems,
+    totalCount: edges.length,
+    mergedCount: mergedCount + additionalMerged,
   };
 }
 
 // =============================================================================
-// FlowEdge clustering
+// Typed Public APIs
 // =============================================================================
 
-/**
- * 对 FlowEdge 列表进行聚类
- *
- * 策略：按源 nodeId 分组，组内边数 > CLUSTER_THRESHOLD 时合并
- */
+/** Cluster BoundedEdges by from.groupId */
+export function clusterBoundedEdges(edges: BoundedEdge[]): ClusterResult<BoundedEdge> {
+  return clusterEdgesImpl(edges, (e) => e.from.groupId) as ClusterResult<BoundedEdge>;
+}
+
+/** Cluster FlowEdges by from (nodeId) */
 export function clusterFlowEdges(edges: FlowEdge[]): ClusterResult<FlowEdge> {
-  if (edges.length <= MAX_EDGES_VISIBLE) {
-    return { type: 'single', edges };
-  }
+  return clusterEdgesImpl(edges, (e) => e.from) as ClusterResult<FlowEdge>;
+}
 
-  const groups: Record<string, FlowEdge[]> = {};
-  for (const edge of edges) {
-    const key = edge.from;
-    (groups[key] = groups[key] || []).push(edge);
-  }
+/**
+ * Generic clusterEdges — accepts any edge array with a key extractor.
+ * Prefer the typed versions (clusterBoundedEdges / clusterFlowEdges).
+ */
+export function clusterEdges<T>(
+  edges: T[],
+  getGroupKeyFn: (edge: T) => string
+): ClusterResult<T> {
+  return clusterEdgesImpl(edges, getGroupKeyFn) as ClusterResult<T>;
+}
 
-  const singles: FlowEdge[] = [];
-  const clusters: { edges: FlowEdge[]; label: string; count: number }[] = [];
+// =============================================================================
+// React Hooks for Memoized Clustering
+// =============================================================================
 
-  for (const [nodeId, groupEdges] of Object.entries(groups)) {
-    if (groupEdges.length > CLUSTER_THRESHOLD) {
-      clusters.push({
-        edges: groupEdges,
-        label: `+${groupEdges.length - 1} more from ${nodeId}`,
-        count: groupEdges.length,
-      });
-    } else {
-      singles.push(...groupEdges);
-    }
-  }
+import { useMemo } from 'react';
 
-  clusters.sort((a, b) => b.count - a.count);
+/** Memoized BoundedEdge clustering for use in React components */
+export function useBoundedClusteredEdges(edges: BoundedEdge[]): ClusterResult<BoundedEdge> {
+  return useMemo(() => clusterBoundedEdges(edges), [edges]);
+}
 
-  while (clusters.length > 0 && singles.length + clusters.length > MAX_EDGES_VISIBLE) {
-    const largest = clusters.shift()!;
-    if (clusters.length > 0) {
-      const target = clusters[0];
-      clusters[0] = {
-        edges: [...target.edges, ...largest.edges],
-        label: `+${target.count + largest.count} more`,
-        count: target.count + largest.count,
-      };
-    } else {
-      clusters.push({ edges: largest.edges, label: `+${largest.count} more`, count: largest.count });
-    }
-  }
-
-  const allClusters: ClusterEdge<FlowEdge>[] = clusters.map((c) => ({
-    type: 'cluster',
-    edges: c.edges,
-    label: c.label,
-    count: c.count,
-  }));
-
-  const total = singles.length + allClusters.length;
-  if (total <= MAX_EDGES_VISIBLE) {
-    return { type: 'single', edges: [...singles, ...allClusters.flatMap((c) => c.edges)] };
-  }
-
-  return {
-    type: 'cluster',
-    edges: [...singles, ...allClusters] as unknown as FlowEdge[],
-    label: `+${edges.length - MAX_EDGES_VISIBLE} edges`,
-    count: edges.length,
-  };
+/** Memoized FlowEdge clustering for use in React components */
+export function useFlowClusteredEdges(edges: FlowEdge[]): ClusterResult<FlowEdge> {
+  return useMemo(() => clusterFlowEdges(edges), [edges]);
 }

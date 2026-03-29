@@ -2,6 +2,7 @@
 
 import { DesignStepLayout } from '@/components/design/DesignStepLayout';
 import { useState } from 'react';
+import { useDDDStateRestore } from '@/hooks/ddd/useDDDStateRestore';
 
 /**
  * Step 2: Bounded Context Page
@@ -13,6 +14,8 @@ import { useState } from 'react';
 
 export default function BoundedContextPage() {
   const [input, setInput] = useState('');
+  // F2.3: Restore DDD state from sessionStorage on page mount
+  useDDDStateRestore();
 
   return (
     <DesignStepLayout currentStep={2}>

@@ -8,6 +8,7 @@ import { QueryProvider } from '@/lib/query/QueryProvider';
 
 import { MermaidInitializer } from '@/components/mermaid/MermaidInitializer';
 import { SentryInitializer } from '@/components/sentry/SentryInitializer';
+import { DDDStoreInitializer } from '@/components/ddd/DDDStoreInitializer';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -35,6 +36,7 @@ export default function RootLayout({
         <MermaidInitializer />
         <SentryInitializer />
         <ToastProvider>
+          <DDDStoreInitializer />
           <QueryProvider>
             <ErrorBoundary>
               {children}

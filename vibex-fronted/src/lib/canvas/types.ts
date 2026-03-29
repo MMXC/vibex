@@ -348,6 +348,67 @@ export interface StatusOutput {
 }
 
 // =============================================================================
+// P1-T5: Domain & Step Type Derivation Utilities
+// =============================================================================
+
+/**
+ * P1-T5: deriveDomainType — 从节点名称推断领域类型
+ *
+ * 规则：
+ * - 名称包含 "用户" / "user" / "账户" / "账户" → core
+ * - 名称包含 "日志" / "log" / "审计" / "audit" / "通用" / "generic" → generic
+ * - 名称包含 "集成" / "integration" / "外部" / "external" / "第三方" / "3rd-party" → external
+ * - 默认 → supporting
+ */
+export function deriveDomainType(name: string): BoundedContextNode['type'] {
+  const lower = name.toLowerCase();
+  if (/用户|user|账户|account|会员|member/.test(lower)) return 'core';
+  if (/日志|log|审计|audit|通用|generic|配置|config|设置|settings/.test(lower)) return 'generic';
+  if (/集成|integration|外部|external|第三方|3rd.party|webhook/i.test(lower)) return 'external';
+  return 'supporting';
+}
+
+/**
+ * P1-T5: deriveStepType — 从步骤名称推断步骤类型
+ *
+ * 规则：
+ * - 名称包含 "判断" / "判断" / "if" / "条件" / "branch" / "分支" → branch
+ * - 名称包含 "循环" / "loop" / "遍历" / "迭代" / "retry" / "重试" → loop
+ * - 默认 → normal
+ */
+export function deriveStepType(name: string): FlowStep['type'] {
+  const lower = name.toLowerCase();
+  if (/判断|条件|if|branch|分支|switch/.test(lower)) return 'branch';
+  if (/循环|loop|遍历|迭代|retry|重试|repeat/.test(lower)) return 'loop';
+  return 'normal';
+}
+
+/**
+ * P1-T5: Flow step type display configuration
+ */
+export const FLOW_STEP_TYPE_CONFIG: Record<
+  NonNullable<FlowStep['type']>,
+  { label: string; color: string; bgColor: string }
+> = {
+  normal: { label: '普通', color: '#6b7280', bgColor: 'rgba(107, 114, 128, 0.1)' },
+  branch: { label: '分支', color: '#f59e0b', bgColor: 'rgba(245, 158, 11, 0.1)' },
+  loop: { label: '循环', color: '#8b5cf6', bgColor: 'rgba(139, 92, 246, 0.1)' },
+} as const;
+
+/**
+ * P1-T5: Domain type display configuration
+ */
+export const DOMAIN_TYPE_CONFIG: Record<
+  BoundedContextNode['type'],
+  { label: string; color: string; bgColor: string }
+> = {
+  core: { label: '核心域', color: '#f59e0b', bgColor: 'rgba(245, 158, 11, 0.05)' },
+  supporting: { label: '支撑域', color: '#3b82f6', bgColor: 'rgba(59, 130, 246, 0.05)' },
+  generic: { label: '通用域', color: '#6b7280', bgColor: 'rgba(107, 114, 128, 0.05)' },
+  external: { label: '外部域', color: '#8b5cf6', bgColor: 'rgba(139, 92, 246, 0.05)' },
+} as const;
+
+// =============================================================================
 // Canvas Generate API Types (Epic 1)
 // =============================================================================
 

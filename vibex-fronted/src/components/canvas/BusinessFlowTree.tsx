@@ -126,24 +126,43 @@ function SortableStepRow({
       className={`${styles.stepRow} ${statusClass}`}
       data-step-id={step.stepId}
     >
-      {/* Drag handle */}
+      {/* Drag handle — P1-T3: SVG replaces emoji ⋮⋮ */}
       {!readonly && (
-        <div className={styles.stepDragHandle} {...attributes} {...listeners} title="拖拽排序">
-          ⋮⋮
+        <div className={styles.stepDragHandle} {...attributes} {...listeners} title="拖拽排序" aria-label="拖拽排序">
+          <svg width="10" height="16" viewBox="0 0 10 16" fill="none" aria-hidden="true">
+            <circle cx="3" cy="3" r="1.5" fill="currentColor" />
+            <circle cx="7" cy="3" r="1.5" fill="currentColor" />
+            <circle cx="3" cy="8" r="1.5" fill="currentColor" />
+            <circle cx="7" cy="8" r="1.5" fill="currentColor" />
+            <circle cx="3" cy="13" r="1.5" fill="currentColor" />
+            <circle cx="7" cy="13" r="1.5" fill="currentColor" />
+          </svg>
         </div>
       )}
 
       {/* Order number */}
       <span className={styles.stepOrder}>{index + 1}</span>
 
-      {/* Step type icon */}
+      {/* P1-T3: Step type icon — SVG replaces emoji 🔀 🔁 */}
       {step.type && (
         <span
-          className={styles.flowStepIcon}
+          className={`${styles.flowStepTypeIcon} ${step.type === 'branch' ? styles['flowStepTypeIcon--branch'] : step.type === 'loop' ? styles['flowStepTypeIcon--loop'] : styles['flowStepTypeIcon--normal']}`}
           data-testid="flow-step-icon"
           title={step.type === 'branch' ? '分支步骤' : step.type === 'loop' ? '循环步骤' : '普通步骤'}
+          aria-label={step.type === 'branch' ? '分支步骤' : step.type === 'loop' ? '循环步骤' : '普通步骤'}
         >
-          {step.type === 'branch' ? '🔀' : step.type === 'loop' ? '🔁' : ''}
+          {step.type === 'branch' ? (
+            /* Branch icon — two diverging paths */
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M2 2h4v3H4v3h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M2 2v5a3 3 0 003 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          ) : step.type === 'loop' ? (
+            /* Loop icon — circular arrow */
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M9.5 2.5A3.5 3.5 0 104 6h1.5L4 8l2.5-2.5H4A4.5 4.5 0 018.5 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          ) : null}
         </span>
       )}
 
@@ -191,21 +210,31 @@ function SortableStepRow({
 
           {!readonly && (
             <div className={styles.stepActions}>
-              {/* Edit */}
+              {/* Edit — P1-T2: SVG replaces emoji ✎ */}
               <button
-                className={styles.stepActionBtn}
+                className={`${styles.iconBtn} ${styles['iconBtn--edit']}`}
                 onClick={() => setEditing(true)}
-                title="编辑"
+                title="编辑步骤"
+                aria-label="编辑步骤"
               >
-                ✎
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
               </button>
-              {/* Delete */}
+              {/* Delete — P1-T2: SVG replaces emoji × */}
               <button
-                className={styles.stepActionBtn}
+                className={`${styles.iconBtn} ${styles['iconBtn--delete']}`}
                 onClick={() => onDelete(step.stepId)}
-                title="删除"
+                title="删除步骤"
+                aria-label="删除步骤"
               >
-                ×
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+                  <path d="M10 11v6M14 11v6" />
+                  <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+                </svg>
               </button>
               {/* Confirm */}
               {!step.confirmed && (
@@ -382,18 +411,28 @@ function FlowCard({
         {!readonly && !editing && (
           <div className={styles.flowCardActions}>
             <button
-              className={styles.btnIcon}
+              className={`${styles.iconBtn} ${styles['iconBtn--edit']}`}
               onClick={() => setEditing(true)}
               title="编辑流程"
+              aria-label="编辑流程"
             >
-              ✎
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
             </button>
             <button
-              className={styles.btnIcon}
+              className={`${styles.iconBtn} ${styles['iconBtn--delete']}`}
               onClick={() => onDelete(node.nodeId)}
               title="删除流程"
+              aria-label="删除流程"
             >
-              🗑
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+                <path d="M10 11v6M14 11v6" />
+                <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+              </svg>
             </button>
             {!node.confirmed && (
               <button

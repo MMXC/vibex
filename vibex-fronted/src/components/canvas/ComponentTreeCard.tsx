@@ -131,7 +131,11 @@ function ComponentCardItem({ node, onConfirm, onEdit, onDelete, readonly }: {
               {node.type === 'page' ? '页面' : node.type === 'list' ? '列表' : node.type === 'form' ? '表单' : node.type === 'detail' ? '详情' : '弹窗'}
             </div>
             {node.confirmed && (
-              <span className={styles.confirmedBadge} aria-label="已确认">✓</span>
+              <span className={styles.confirmedBadge} aria-label="已确认">
+                <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M3 8.5L6.5 12L13 4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
             )}
             <button
               type="button"
@@ -181,7 +185,10 @@ function ComponentCardItem({ node, onConfirm, onEdit, onDelete, readonly }: {
                   onClick={() => onConfirm(node.nodeId)}
                   aria-label={`确认 ${node.name}`}
                 >
-                  ✓ 确认
+                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ marginRight: '4px' }}>
+                    <path d="M3 8.5L6.5 12L13 4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  确认
                 </button>
               )}
               <button

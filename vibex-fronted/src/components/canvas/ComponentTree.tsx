@@ -384,7 +384,11 @@ function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly, selected, 
               {node.type === 'page' ? '页面' : node.type === 'list' ? '列表' : node.type === 'form' ? '表单' : node.type === 'detail' ? '详情' : '弹窗'}
             </div>
             {node.confirmed && (
-              <span className={styles.confirmedBadge} aria-label="已确认">✓</span>
+              <span className={styles.confirmedBadge} aria-label="已确认">
+                <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M3 8.5L6.5 12L13 4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
             )}
             <button
               type="button"
@@ -439,7 +443,10 @@ function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly, selected, 
                   onClick={() => onConfirm(node.nodeId)}
                   aria-label={`确认 ${node.name}`}
                 >
-                  ✓ 确认
+                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ marginRight: '4px' }}>
+                    <path d="M3 8.5L6.5 12L13 4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  确认
                 </button>
               )}
               {/* E2-F8: Prototype preview — navigate to editor with componentId */}
@@ -770,7 +777,13 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
             aria-label="清空画布"
             title="清空画布（可撤销）"
           >
-            🗑 清空画布
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ marginRight: '4px' }}>
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+              <path d="M10 11v6M14 11v6" />
+              <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+            </svg>
+            清空画布
           </button>
         )}
 

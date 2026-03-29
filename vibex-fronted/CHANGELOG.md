@@ -22,6 +22,16 @@ All notable changes to this project will be documented in this file.
 - `src/lib/canvas/utils/edgeCluster.test.ts`: 15 tests (聚类边界/安全上限/标签格式)
 - Commits: `2bead619`, `d5c86556`, `8c898c31`, `7d9ee0f3`, `b661c96d`
 
+### Epic1: Checkbox去重重构 (vibex-canvas-checkbox-dedup)
+- **S1.1** — 移除 selection checkbox UI (保留Ctrl+click多选功能)
+- **S1.2** — 将确认checkbox移至标题前 (nodeCardHeader内)
+- **S1.3** — 点击checkbox直接切换confirmed状态
+- **S1.4** — 移除独立的'确认'按钮
+- **S1.5** — '全选'按钮改为'确认所有'
+- CSS: 新增 `.confirmCheckbox` 样式 (accent-color: success)
+- 验收标准: 无 aria-label='选择' 残留 ✓, 无'确认'按钮残留 ✓, npm run build ✓, ESLint 0 warnings ✓
+- Commit: `d36bd2b4`
+
 ### Epic1: 画布 Undo/Redo 核心编辑体验 (vibex-canvas-feature-gap-20260329)
 - **✅ PASS** — 三树独立历史栈，50步限制，Ctrl+Z/Ctrl+Shift+Z 快捷键
 - `src/lib/canvas/historySlice.ts`: 三树独立 HistoryStack（context/flow/component），MAX_HISTORY_LENGTH=50

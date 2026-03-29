@@ -1,3 +1,14 @@
+### Fixed (B1 handleConfirmAll 修复审查) — 2026-03-29
+- **B1**: handleConfirmAll P0 Bug 修复 — `f090919e`
+  - `BoundedContextTree`: 按钮条件从 `{allConfirmed}` 改为 `{hasNodes}`
+    - handleConfirmAll 现在始终调用 advancePhase()（不只是 unconfirmedIds > 0 时）
+    - 按钮文字动态：`确认所有 → 继续到流程树` ↔ `✓ 已确认 → 继续到流程树`
+    - 修复：全部确认后点击"继续 → 流程树"无反应的问题
+  - `ComponentTree`: 同样修复
+    - handleConfirmAll 现在始终调用 setPhase('prototype')
+    - 按钮文字动态：`确认所有 → 继续到原型生成` ↔ `✓ 已确认 → 继续到原型生成`
+  - 测试更新：`HandleConfirmAll.test.tsx` 10 个测试全部通过
+
 ### Added (E3.2 Canvas E2E 测试覆盖率提升) — 2026-03-29
 - **E3.2**: Canvas E2E 测试覆盖率提升（≥80%）
 - **TC-1**: 全屏展开 expand-both 模式三栏等宽 — 4 个测试用例（TC-1.1~TC-1.4）

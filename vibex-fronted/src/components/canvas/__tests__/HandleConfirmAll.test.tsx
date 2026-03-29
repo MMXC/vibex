@@ -1,12 +1,13 @@
 /**
  * Tests for handleConfirmAll functionality (Epic B1)
  *
- * Tests the "全选确认" button (BoundedContextTree) and
- * "确认所有节点后继续" button (ComponentTree)
+ * Tests the "确认所有 → 继续到流程树" button (BoundedContextTree) and
+ * "确认所有 → 继续到原型生成" button (ComponentTree)
  *
  * Tests the confirmAll logic:
  * - Button visible when hasNodes (> 0 nodes)
- * - Button hidden when allConfirmed OR when no nodes
+ * - Button disabled when allConfirmed (but still visible)
+ * - Button hidden when no nodes
  * - Clicking confirms all unconfirmed nodes
  * - Phase advances after confirming
  */
@@ -96,12 +97,13 @@ describe('BoundedContextTree handleConfirmAll (B1)', () => {
 
   it('renders confirm-all button when hasNodes', () => {
     render(<BoundedContextTree />);
-    expect(screen.getByRole('button', { name: /确认所有节点后继续/i })).toBeInTheDocument();
+    // Button text is "确认所有 → 继续到流程树" when not all confirmed
+    expect(screen.getByRole('button', { name: /确认所有.*继续到流程树/i })).toBeInTheDocument();
   });
 
   it('confirms all unconfirmed nodes when clicked', () => {
     render(<BoundedContextTree />);
-    fireEvent.click(screen.getByRole('button', { name: /确认所有节点后继续/i }));
+    fireEvent.click(screen.getByRole('button', { name: /确认所有.*继续到流程树/i }));
     expect(mockConfirmCtx).toHaveBeenCalledTimes(3);
     expect(mockConfirmCtx).toHaveBeenCalledWith('ctx-1');
     expect(mockConfirmCtx).toHaveBeenCalledWith('ctx-2');
@@ -110,20 +112,22 @@ describe('BoundedContextTree handleConfirmAll (B1)', () => {
 
   it('advances phase after confirming all', () => {
     render(<BoundedContextTree />);
-    fireEvent.click(screen.getByRole('button', { name: /确认所有节点后继续/i }));
+    fireEvent.click(screen.getByRole('button', { name: /确认所有.*继续到流程树/i }));
     expect(mockAdvancePhase).toHaveBeenCalledTimes(1);
   });
 
-  it('does NOT render confirm-all button when all already confirmed', () => {
+  it('button is DISABLED when all already confirmed (but still visible)', () => {
     mockCtxNodes.forEach((n) => { n.confirmed = true; });
     render(<BoundedContextTree />);
-    expect(screen.queryByRole('button', { name: /确认所有节点后继续/i })).not.toBeInTheDocument();
+    // Button is still in DOM but disabled; aria-label changes to "已全部确认，继续到流程树"
+    const btn = screen.getByRole('button', { name: /已全部确认.*流程树/i });
+    expect(btn).toBeDisabled();
   });
 
   it('button NOT visible when no nodes', () => {
     mockCtxNodes.length = 0;
     render(<BoundedContextTree />);
-    expect(screen.queryByRole('button', { name: /确认所有节点后继续/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /继续/i })).not.toBeInTheDocument();
   });
 });
 
@@ -142,12 +146,13 @@ describe('ComponentTree handleConfirmAll (B1)', () => {
 
   it('renders confirm-all button when hasNodes', () => {
     render(<ComponentTree />);
-    expect(screen.getByRole('button', { name: /确认所有节点后继续/i })).toBeInTheDocument();
+    // Button text is "确认所有 → 继续到原型生成" when not all confirmed
+    expect(screen.getByRole('button', { name: /确认所有.*继续到原型生成/i })).toBeInTheDocument();
   });
 
   it('confirms all unconfirmed nodes when clicked', () => {
     render(<ComponentTree />);
-    fireEvent.click(screen.getByRole('button', { name: /确认所有节点后继续/i }));
+    fireEvent.click(screen.getByRole('button', { name: /确认所有.*继续到原型生成/i }));
     expect(mockConfirmComp).toHaveBeenCalledTimes(2);
     expect(mockConfirmComp).toHaveBeenCalledWith('comp-1');
     expect(mockConfirmComp).toHaveBeenCalledWith('comp-2');
@@ -155,20 +160,21 @@ describe('ComponentTree handleConfirmAll (B1)', () => {
 
   it('sets phase to prototype after confirming all', () => {
     render(<ComponentTree />);
-    fireEvent.click(screen.getByRole('button', { name: /确认所有节点后继续/i }));
+    fireEvent.click(screen.getByRole('button', { name: /确认所有.*继续到原型生成/i }));
     expect(mockSetPhase).toHaveBeenCalledWith('prototype');
   });
 
-  it('does NOT render confirm-all button when all already confirmed', () => {
+  it('button is DISABLED when all already confirmed (but still visible)', () => {
     mockCompNodes.forEach((n) => { n.confirmed = true; });
     render(<ComponentTree />);
-    // When all confirmed, aria-label changes to "已全部确认，继续到原型生成"
-    expect(screen.queryByRole('button', { name: /确认所有节点后继续/i })).not.toBeInTheDocument();
+    // Button is still in DOM but disabled; aria-label changes to "已全部确认，继续到原型生成"
+    const btn = screen.getByRole('button', { name: /已全部确认.*原型生成/i });
+    expect(btn).toBeDisabled();
   });
 
   it('button NOT visible when no nodes', () => {
     mockCompNodes.length = 0;
     render(<ComponentTree />);
-    expect(screen.queryByRole('button', { name: /确认所有节点后继续/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /继续/i })).not.toBeInTheDocument();
   });
 });

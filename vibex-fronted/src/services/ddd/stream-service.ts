@@ -135,12 +135,15 @@ export async function streamBoundedContexts(
                   break;
                   
                 case 'context':
+                  // F1.2: 空值保护 — 无效数据静默跳过
+                  if (!parsedData || typeof parsedData !== 'object') break;
                   callbacks.onContext(parsedData as BoundedContext);
                   break;
                   
                 case 'done':
+                  // F1.2: 空值保护 — 确保 boundedContexts 是数组
                   const contexts = Array.isArray(parsedData.boundedContexts)
-                    ? parsedData.boundedContexts
+                    ? parsedData.boundedContexts.filter((c: unknown) => c != null && typeof c === 'object')
                     : [];
                   callbacks.onDone({
                     boundedContexts: contexts,
@@ -154,6 +157,7 @@ export async function streamBoundedContexts(
                   break;
               }
             } catch (e) {
+              // F1.2: JSON.parse 异常静默处理，避免 SSE 流中断
               console.error('Failed to parse SSE data:', e);
             }
             i++;
@@ -235,8 +239,9 @@ export async function streamDomainModels(
                   callbacks.onThinking(parsedData as ThinkingStep);
                   break;
                 case 'done':
+                  // F1.2: 空值保护 — 确保 domainModels 是数组
                   const models = Array.isArray(parsedData.domainModels)
-                    ? parsedData.domainModels
+                    ? parsedData.domainModels.filter((m: unknown) => m != null && typeof m === 'object')
                     : [];
                   callbacks.onDone({
                     domainModels: models,
@@ -249,6 +254,7 @@ export async function streamDomainModels(
                   break;
               }
             } catch (e) {
+              // F1.2: JSON.parse 异常静默处理
               console.error('Failed to parse SSE data:', e);
             }
             i++;
@@ -330,20 +336,22 @@ export async function streamBusinessFlow(
                   callbacks.onThinking(parsedData as ThinkingStep);
                   break;
                 case 'done':
+                  // F1.2: 空值保护 — businessFlow 可为 null，mermaidCode 兜底
                   callbacks.onDone({
-                    businessFlow: parsedData.businessFlow || null,
-                    mermaidCode: parsedData.mermaidCode || '',
+                    businessFlow: parsedData?.businessFlow || null,
+                    mermaidCode: parsedData?.mermaidCode || '',
                   });
                   result = {
-                    businessFlow: parsedData.businessFlow || null,
-                    mermaidCode: parsedData.mermaidCode || '',
+                    businessFlow: parsedData?.businessFlow || null,
+                    mermaidCode: parsedData?.mermaidCode || '',
                   };
                   break;
                 case 'error':
-                  callbacks.onError(parsedData.message || 'Unknown error');
+                  callbacks.onError(parsedData?.message || 'Unknown error');
                   break;
               }
             } catch (e) {
+              // F1.2: JSON.parse 异常静默处理
               console.error('Failed to parse SSE data:', e);
             }
             i++;

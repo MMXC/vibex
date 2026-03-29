@@ -236,8 +236,13 @@ export const useDesignStore = create<DesignState>()(
         domainEntities: (state.domainEntities ?? []).filter((e) => e.id !== id),
       })),
       
-      // Business Flows with null protection
-      setBusinessFlows: (flows) => set({ businessFlows: flows ?? [] }),
+      // F1.3: Business Flows with null protection + input validation
+      setBusinessFlows: (flows) => {
+        if (!Array.isArray(flows)) return;
+        // 过滤脏数据（无 id 的条目）
+        const valid = flows.filter((f): f is NonNullable<typeof f> => f?.id != null);
+        set({ businessFlows: valid });
+      },
       
       addBusinessFlow: (flow) => set((state) => ({
         businessFlows: [...(state.businessFlows ?? []), flow],

@@ -6,6 +6,7 @@
 'use client';
 
 import { useRef, useState, useCallback, useEffect } from 'react';
+import { EmptyFallback } from '@/components/ui/DDDFallback';
 import styles from './DomainModelDiagram.module.css';
 
 export interface DomainEntity {
@@ -147,6 +148,21 @@ export function DomainModelDiagram({
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
+        {/* F1.1: 空值保护 — 无实体时显示 fallback */}
+        {(!entities || entities.length === 0) && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              pointerEvents: 'none',
+            }}
+          >
+            <EmptyFallback message="暂无领域模型，请先生成" />
+          </div>
+        )}
         <svg
           className={styles.svg}
           viewBox={`0 0 ${width} ${height}`}

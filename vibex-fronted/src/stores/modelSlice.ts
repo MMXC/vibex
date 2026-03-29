@@ -66,8 +66,13 @@ export const useModelStore = create<ModelState>()(
       selectedModelIds: [],
       isModelPanelOpen: true,
       
-      // Actions with null protection
-      setDomainModels: (models) => set({ domainModels: models ?? [] }),
+      // F1.3: 防护非法 payload — 必须是数组
+      setDomainModels: (models) => {
+        if (!Array.isArray(models)) return;
+        // 过滤脏数据（无 id 的条目）
+        const valid = models.filter((m): m is NonNullable<typeof m> => m?.id != null);
+        set({ domainModels: valid });
+      },
       
       addDomainModel: (model) => 
         set((state) => ({ 

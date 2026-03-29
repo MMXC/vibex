@@ -6,6 +6,7 @@
 'use client';
 
 import { useRef, useState, useCallback, useMemo } from 'react';
+import { EmptyFallback } from '@/components/ui/DDDFallback';
 import styles from './FlowDiagram.module.css';
 
 export interface FlowNode {
@@ -136,6 +137,21 @@ export function FlowDiagram({
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
+        {/* F1.1: 空值保护 — 无节点时显示 fallback */}
+        {(!nodes || nodes.length === 0) && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              pointerEvents: 'none',
+            }}
+          >
+            <EmptyFallback message="暂无业务流程，请先生成" />
+          </div>
+        )}
         <svg
           className={styles.svg}
           viewBox={`0 0 ${width} ${height}`}

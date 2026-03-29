@@ -59,7 +59,13 @@ export const useContextStore = create<ContextState>()(
       isContextPanelOpen: true,
       
       // Actions with null protection
-      setBoundedContexts: (contexts) => set({ boundedContexts: contexts ?? [] }),
+      // F1.3: 防护非法 payload — 必须是数组
+      setBoundedContexts: (contexts) => {
+        if (!Array.isArray(contexts)) return;
+        // 过滤脏数据（无 id 的条目）
+        const valid = contexts.filter((c): c is NonNullable<typeof c> => c?.id != null);
+        set({ boundedContexts: valid });
+      },
       
       addBoundedContext: (context) => 
         set((state) => ({ 

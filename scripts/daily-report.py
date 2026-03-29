@@ -87,47 +87,54 @@ def compute_stats(reports: list, suggestions: list) -> dict:
 
 def generate_markdown(date: str, reports: list, suggestions: list, stats: dict) -> str:
     """生成 Markdown 格式报告"""
-    date_display = f'{date[:4]}-{date[4:6]}-{date[6:8]}' if len(date) == 8 else date
+    date_display = date[:4] + '-' + date[4:6] + '-' + date[6:8] if len(date) == 8 else date
 
-    md = f"""# 每日团队状态报告 - {date_display}
+    parts = []
+    parts.append(f"# 每日团队状态报告 - {date_display}")
+    parts.append("")
+    parts.append(f"> 自动生成于 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    parts.append("")
+    parts.append("## 概览")
+    parts.append("")
+    parts.append("| 指标 | 数值 |")
+    parts.append("|------|------|")
+    parts.append(f"| 自检报告提交数 | {stats['total_reports']} |")
+    parts.append(f"| 平均自检评分 | {stats['avg_score'] or 'N/A'} |")
+    parts.append(f"| 最低/最高评分 | {stats['min_score'] or 'N/A'} / {stats['max_score'] or 'N/A'} |")
+    parts.append(f"| 可执行建议数 | {stats['total_suggestions']} |")
+    parts.append("")
+    parts.append("## 提交状态")
+    parts.append("")
 
-> 自动生成于 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+    if reports:
+        parts.append("| Agent | 评分 | 报告 |")
+        parts.append("|------|------|------|")
+        for r in reports:
+            score_str = str(r['score']) if r['score'] is not None else '?'
+            parts.append(f"| {r['agent']} | {score_str} | `{r['file']}` |")
+    else:
+        parts.append("*暂无自检报告*")
 
-## 概览
-
-| 指标 | 数值 |
-|------|------|
-| 自检报告提交数 | {stats['total_reports']} |
-| 平均自检评分 | {stats['avg_score'] or 'N/A'} |
-| 最低/最高评分 | {stats['min_score'] or 'N/A'} / {stats['max_score'] or 'N/A'} |
-| 可执行建议数 | {stats['total_suggestions']} |
-
-## 提交状态
-
-{'| Agent | 评分 | 报告 |\\n|------|------|------|' if reports else ''}
-{chr(10).join(f'| {r["agent"]} | {r["score"] or "?"} | `{r["file"]}` |' for r in reports) if reports else '*暂无自检报告*'}
-
-## 可执行改进建议
-
-"""
+    parts.append("")
+    parts.append("## 可执行改进建议")
+    parts.append("")
 
     if not suggestions:
-        md += '*无 [ACTIONABLE] 建议*\n'
+        parts.append("*无 [ACTIONABLE] 建议*")
     else:
         by_agent = {}
         for s in suggestions:
             by_agent.setdefault(s['agent'], []).append(s['suggestion'])
         for agent, items in sorted(by_agent.items()):
-            md += f'### [{agent}]\n'
+            parts.append(f"### [{agent}]")
             for suggestion in items:
-                md += f'- [ACTIONABLE] {suggestion}\n'
-            md += '\n'
+                parts.append(f"- [ACTIONABLE] {suggestion}")
+            parts.append("")
 
-    md += f"""---
+    parts.append("---")
+    parts.append(f"*报告自动生成自 agent-self-evolution-{date.replace('-', '')} 项目*")
 
-*报告自动生成自 agent-self-evolution-{date.replace('-', '')} 项目*
-"""
-    return md
+    return "\n".join(parts)
 
 
 def main():

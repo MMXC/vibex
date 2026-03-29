@@ -12,8 +12,19 @@ jest.mock('axios', () => {
   return {
     __esModule: true,
     default: {
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       create: jest.fn(() => ({
+        interceptors: {
+          request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+          response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        },
         post: mockPost,
+        get: jest.fn(),
+        put: jest.fn(),
+        delete: jest.fn(),
       })),
       mockPost,
     },

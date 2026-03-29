@@ -27,6 +27,10 @@ jest.mock('axios', () => {
     __esModule: true,
     AxiosError: MockAxiosError,
     default: {
+      interceptors: {
+        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      },
       create: jest.fn(() => ({
         interceptors: {
           request: { use: jest.fn(() => ({ eject: jest.fn() })) },

@@ -65,7 +65,15 @@ jest.mock('html-to-image', () => ({
 // Mock axios
 jest.mock('axios', () => ({
   isAxiosError: jest.fn(() => false),
+  interceptors: {
+    request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+    response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+  },
   create: jest.fn(() => ({
+    interceptors: {
+      request: { use: jest.fn(() => ({ eject: jest.fn() })) },
+      response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+    },
     get: jest.fn(),
     post: jest.fn(),
     put: jest.fn(),

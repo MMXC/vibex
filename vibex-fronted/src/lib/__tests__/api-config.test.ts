@@ -26,10 +26,10 @@ describe('API_CONFIG', () => {
   describe('endpoints', () => {
     it('should have ddd endpoints', () => {
       expect(API_CONFIG.endpoints.ddd).toBeDefined();
-      expect(API_CONFIG.endpoints.ddd.boundedContext).toBe('/ddd/bounded-context');
-      expect(API_CONFIG.endpoints.ddd.boundedContextStream).toBe('/ddd/bounded-context/stream');
-      expect(API_CONFIG.endpoints.ddd.domainModel).toBe('/ddd/domain-model');
-      expect(API_CONFIG.endpoints.ddd.businessFlow).toBe('/ddd/business-flow');
+      expect(API_CONFIG.endpoints.ddd.boundedContext).toBe('/v1/ddd/bounded-context');
+      expect(API_CONFIG.endpoints.ddd.boundedContextStream).toBe('/v1/ddd/bounded-context/stream');
+      expect(API_CONFIG.endpoints.ddd.domainModel).toBe('/v1/ddd/domain-model');
+      expect(API_CONFIG.endpoints.ddd.businessFlow).toBe('/v1/ddd/business-flow');
     });
 
     it('should have auth endpoints', () => {

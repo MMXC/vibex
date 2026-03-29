@@ -517,7 +517,7 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
             type="button"
             className={styles.primaryButton}
             onClick={handleConfirmAll}
-            disabled={allConfirmed}
+            disabled={false}
             aria-label={allConfirmed ? '已全部确认，继续到流程树' : '确认所有节点后继续'}
           >
             {allConfirmed ? '✓ 已确认 → 继续到流程树' : '确认所有 → 继续到流程树'}

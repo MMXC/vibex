@@ -33,6 +33,7 @@ import type { CardTreeVisualizationRaw, CardTreeNodeData } from '@/types/visuali
 import type { FlowGateway, GatewayNodeData, LoopEdgeData } from '@/lib/canvas/types';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { BoundedGroupOverlay } from '@/components/canvas/groups/BoundedGroupOverlay';
+import { OverlapHighlightLayer } from '@/components/canvas/groups/OverlapHighlightLayer';
 import styles from './CardTreeRenderer.module.css';
 
 // Re-export CardTreeNode type for external use
@@ -307,6 +308,8 @@ function InternalRenderer({
   const startDrag = useCanvasStore((s) => s.startDrag);
   const endDrag = useCanvasStore((s) => s.endDrag);
   const updateDraggedPosition = useCanvasStore((s) => s.updateDraggedPosition);
+  // F2.1: Bounded groups for overlap highlight
+  const boundedGroups = useCanvasStore((s) => s.boundedGroups);
 
   // E4: Track ReactFlow viewport for BoundedGroupOverlay positioning
   const [viewport, setViewport] = React.useState({ x: 0, y: 0, zoom: 1 });
@@ -490,6 +493,12 @@ function InternalRenderer({
           nodes={nodes}
           pan={{ x: viewport.x, y: viewport.y }}
           zoom={viewport.zoom}
+        />
+        {/* F2.1: Intersection highlight overlay — z-index: 20, above BoundedGroupOverlay */}
+        <OverlapHighlightLayer
+          groups={boundedGroups}
+          zoom={viewport.zoom}
+          pan={{ x: viewport.x, y: viewport.y }}
         />
         {showControls && <Controls className={styles.controls} />}
         {showMinimap && <MiniMap className={styles.minimap} />}

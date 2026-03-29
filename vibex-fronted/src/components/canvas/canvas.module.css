@@ -268,6 +268,107 @@
 }
 
 /* ============================================
+   F1: Expand Controls (全屏展开按钮)
+   ============================================ */
+
+.expandControls {
+  position: absolute;
+  top: calc(var(--navbar-height, 0px) + 40px);
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 50;
+  padding: 4px 8px;
+  background: var(--color-surface-elevated, rgba(30, 30, 40, 0.8));
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+.expandAllButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--color-accent-dim, rgba(99, 102, 241, 0.2));
+  border: 1px solid var(--color-accent);
+  border-radius: 6px;
+  color: var(--color-accent);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.expandAllButton:hover {
+  background: var(--color-accent);
+  color: var(--color-bg-primary);
+}
+
+.expandAllButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.maximizeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: var(--color-surface-dim, rgba(50, 50, 60, 0.5));
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.maximizeButton:hover {
+  background: var(--color-accent-dim, rgba(99, 102, 241, 0.2));
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.maximizeButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   F1.2: Maximize Mode — hide toolbar/projectbar
+   ============================================ */
+
+.maximizeMode {
+  padding: 0 !important;
+}
+
+.maximizeMode .projectBarWrapper {
+  display: none;
+}
+
+.maximizeMode .phaseLabelBar {
+  display: none;
+}
+
+.maximizeMode .expandControls {
+  top: 8px;
+  right: 8px;
+}
+
+/* ============================================
+   F1.1: expand-both Mode — 1fr 1fr 1fr
+   ============================================ */
+
+.expandBothMode .treePanelsGrid {
+  grid-template-columns: 1fr 1fr 1fr !important;
+}
+
+/* ============================================
    Tree Panel
    ============================================ */
 

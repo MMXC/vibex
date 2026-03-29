@@ -25,6 +25,9 @@ import type {
   BoundedGroup,
 } from './types';
 
+/** F1: Canvas expand mode — replaces old leftExpand/centerExpand/rightExpand logic */
+export type CanvasExpandMode = 'normal' | 'expand-both' | 'maximize';
+
 import exampleCanvasData from '@/data/example-canvas.json';
 import { canvasApi } from './api/canvasApi';
 import { getHistoryStore } from './historySlice';
@@ -100,7 +103,7 @@ interface CanvasStore {
   flowPanelCollapsed: boolean;
   componentPanelCollapsed: boolean;
 
-  // === Expand Slice (E2) ===
+  // === Expand Slice (E2 → F1: 替换为 expandMode) ===
   leftExpand: PanelExpandState;
   centerExpand: PanelExpandState;
   rightExpand: PanelExpandState;
@@ -110,6 +113,14 @@ interface CanvasStore {
   setRightExpand: (state: PanelExpandState) => void;
   togglePanel: (panel: 'left' | 'center' | 'right') => void;
   resetExpand: () => void;
+
+  // === F1: New expand mode (replaces old 1.5fr logic) ===
+  /** Canvas expand mode: normal | expand-both | maximize */
+  expandMode: CanvasExpandMode;
+  /** Set expand mode */
+  setExpandMode: (mode: CanvasExpandMode) => void;
+  /** Toggle maximize mode */
+  toggleMaximize: () => void;
 
   // === Drag Slice (E3) ===
   draggedNodeId: string | null;
@@ -457,6 +468,29 @@ export const useCanvasStore = create<CanvasStore>()(
           },
 
           resetExpand: () => set({ leftExpand: 'default', centerExpand: 'default', rightExpand: 'default' }),
+
+          // === F1: New expand mode ===
+          expandMode: 'normal',
+
+          setExpandMode: (mode) => {
+            set({ expandMode: mode });
+            // Persist to localStorage
+            try {
+              localStorage.setItem('canvas-expand-mode', mode);
+            } catch {
+              // ignore quota errors
+            }
+          },
+
+          toggleMaximize: () => {
+            const next = get().expandMode === 'maximize' ? 'normal' : 'maximize';
+            set({ expandMode: next });
+            try {
+              localStorage.setItem('canvas-expand-mode', next);
+            } catch {
+              // ignore
+            }
+          },
 
           // === Context Slice Actions ===
           setContextNodes: (nodes) => set({ contextNodes: nodes }),

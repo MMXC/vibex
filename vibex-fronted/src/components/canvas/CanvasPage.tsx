@@ -72,7 +72,12 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const setCenterExpand = useCanvasStore((s) => s.setCenterExpand);
   const setRightExpand = useCanvasStore((s) => s.setRightExpand);
 
-  // Bug5: Toggle handlers for expand buttons
+  // F1: New expand mode
+  const expandMode = useCanvasStore((s) => s.expandMode);
+  const setExpandMode = useCanvasStore((s) => s.setExpandMode);
+  const toggleMaximize = useCanvasStore((s) => s.toggleMaximize);
+
+  // F1: Legacy expand handlers (keep for backward compat until F1.4)
   const toggleLeft = useCallback(() => {
     const next = leftExpand === 'default' ? 'expand-right' : 'default';
     setLeftExpand(next as 'default' | 'expand-right');
@@ -88,14 +93,39 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     setRightExpand(next as 'default' | 'expand-left');
   }, [rightExpand, setRightExpand]);
 
-  // === Sync expand state to CSS variables ===
+  // === F1: Sync expand mode to CSS variables ===
   useEffect(() => {
     if (!gridRef.current) return;
     const grid = gridRef.current;
-    grid.style.setProperty('--grid-left', leftExpand === 'expand-right' ? '1.5fr' : leftExpand === 'expand-left' ? '0fr' : '1fr');
-    grid.style.setProperty('--grid-center', centerExpand === 'expand-left' ? '1.5fr' : centerExpand === 'expand-right' ? '0fr' : '1fr');
-    grid.style.setProperty('--grid-right', rightExpand === 'expand-left' ? '1.5fr' : rightExpand === 'expand-right' ? '0fr' : '1fr');
-  }, [leftExpand, centerExpand, rightExpand]);
+
+    // F1: New expand mode takes priority
+    if (expandMode === 'expand-both' || expandMode === 'maximize') {
+      grid.style.setProperty('--grid-left', '1fr');
+      grid.style.setProperty('--grid-center', '1fr');
+      grid.style.setProperty('--grid-right', '1fr');
+    } else {
+      // Fall back to legacy 1.5fr logic
+      grid.style.setProperty('--grid-left', leftExpand === 'expand-right' ? '1.5fr' : leftExpand === 'expand-left' ? '0fr' : '1fr');
+      grid.style.setProperty('--grid-center', centerExpand === 'expand-left' ? '1.5fr' : centerExpand === 'expand-right' ? '0fr' : '1fr');
+      grid.style.setProperty('--grid-right', rightExpand === 'expand-left' ? '1.5fr' : rightExpand === 'expand-right' ? '0fr' : '1fr');
+    }
+  }, [expandMode, leftExpand, centerExpand, rightExpand]);
+
+  // F1: F11 keyboard shortcut for maximize mode
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'F11') {
+        e.preventDefault();
+        toggleMaximize();
+      }
+      // Escape only exits maximize mode
+      if (e.key === 'Escape' && expandMode === 'maximize') {
+        setExpandMode('normal');
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [expandMode, toggleMaximize, setExpandMode]);
 
   // === UI State ===
   const [activeTab, setActiveTab] = useState<TreeType>('context');
@@ -608,7 +638,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
 
   // === Render ===
   return (
-    <div className={styles.canvasContainer}>
+    <div className={`${styles.canvasContainer} ${expandMode === 'maximize' ? styles.maximizeMode : expandMode === 'expand-both' ? styles.expandBothMode : ''}`}>
       {/* Phase Progress Bar */}
       <div className={styles.phaseProgressBarWrapper}>
         <PhaseProgressBar currentPhase={phase} onPhaseClick={handlePhaseClick} />
@@ -638,6 +668,62 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
           <span className={styles.phaseHint}>{phaseHint}</span>
         )}
       </div>
+
+      {/* F1: Expand controls — shown when not in input phase */}
+      {phase !== 'input' && (
+        <div className={styles.expandControls}>
+          {/* F1.1: expand-both toggle */}
+          {expandMode !== 'maximize' && (
+            <button
+              type="button"
+              className={styles.expandAllButton}
+              onClick={() => setExpandMode(expandMode === 'normal' ? 'expand-both' : 'normal')}
+              aria-label={expandMode === 'normal' ? '全屏展开' : '退出全屏展开'}
+              title={expandMode === 'normal' ? '三栏均分视口（全屏展开）' : '恢复正常布局'}
+            >
+              {expandMode === 'normal' ? (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <polyline points="15 3 21 3 21 9" />
+                    <polyline points="9 21 3 21 3 15" />
+                    <line x1="21" y1="3" x2="14" y2="10" />
+                    <line x1="3" y1="21" x2="10" y2="14" />
+                  </svg>
+                  全屏展开
+                </>
+              ) : (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <polyline points="4 14 10 14 10 20" />
+                    <polyline points="20 10 14 10 14 4" />
+                    <line x1="10" y1="14" x2="3" y2="21" />
+                    <line x1="21" y1="3" x2="14" y2="10" />
+                  </svg>
+                  退出全屏
+                </>
+              )}
+            </button>
+          )}
+          {/* F1.2: maximize toggle */}
+          <button
+            type="button"
+            className={styles.maximizeButton}
+            onClick={toggleMaximize}
+            aria-label={expandMode === 'maximize' ? '退出最大化' : '最大化'}
+            title={expandMode === 'maximize' ? '退出最大化（F11）' : '最大化模式（F11）'}
+          >
+            {expandMode === 'maximize' ? (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
+              </svg>
+            ) : (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+              </svg>
+            )}
+          </button>
+        </div>
+      )}
 
       {/* === PROTOTYPE PHASE: Queue Panel === */}
       {phase === 'prototype' ? (

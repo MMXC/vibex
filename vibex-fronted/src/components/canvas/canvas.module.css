@@ -179,6 +179,8 @@
   /* Prevent layout shift when zoomed */
   width: calc(100% / var(--canvas-zoom, 1));
   max-width: calc(100% / min(var(--canvas-zoom, 1), 1));
+  /* F3: Edge layers are absolutely positioned relative to this grid */
+  position: relative;
 }
 
 /* E2-F14: Zoom controls in ProjectBar */

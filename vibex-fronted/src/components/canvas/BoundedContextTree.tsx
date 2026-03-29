@@ -406,7 +406,6 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
 
   // Compute node rects from DOM positions (F3.2)
   const nodeRects = useMemo((): NodeRect[] => {
-    /* eslint-disable react-hooks/refs -- DOM measurement in useMemo: ref.current is null-guarded */
     if (!containerRef.current || panelSize.width === 0) return [];
     const containerRect = containerRef.current.getBoundingClientRect();
     const cardEls = containerRef.current.querySelectorAll<HTMLElement>('[data-node-id]');
@@ -422,7 +421,6 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
         };
       })
       .filter((r) => contextNodes.some((n) => n.nodeId === r.id));
-    /* eslint-enable react-hooks/refs */
   }, [contextNodes, panelSize]);
 
   // Auto-infer bounded edges from context nodes (F3.2)

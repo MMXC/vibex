@@ -112,8 +112,17 @@ describe('matchFlowNode', () => {
     expect(result!.name).toBe('订单');
   });
 
-  test('名称模糊匹配: 中文名称部分匹配', () => {
-    const result = matchFlowNode('order', flowNodes);
+  test('名称模糊匹配: 英文名称部分匹配', () => {
+    const nodes = [
+      { nodeId: 'flow-x', name: 'Order Management', type: 'sequence' as const },
+    ];
+    const result = matchFlowNode('order', nodes);
+    expect(result).not.toBeNull();
+    expect(result!.name).toBe('Order Management');
+  });
+
+  test('名称模糊匹配: 中文名称精确匹配', () => {
+    const result = matchFlowNode('订', flowNodes);
     expect(result).not.toBeNull();
     expect(result!.name).toBe('订单流程');
   });

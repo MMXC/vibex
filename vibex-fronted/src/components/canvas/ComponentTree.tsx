@@ -104,6 +104,9 @@ export function matchFlowNode(
   flowId: string,
   flowNodes: BusinessFlowNode[]
 ): BusinessFlowNode | null {
+  // Guard: empty flowId cannot match anything
+  if (!flowId) return null;
+
   // 1. 精确匹配 nodeId
   const exact = flowNodes.find((f) => f.nodeId === flowId);
   if (exact) return exact;

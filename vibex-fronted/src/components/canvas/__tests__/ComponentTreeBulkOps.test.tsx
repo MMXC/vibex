@@ -107,8 +107,6 @@ jest.mock('@/lib/canvas/historySlice', () => ({
 
 // Mock canvasStore — factory references jest.fn() mocks which are hoisted by Jest
 jest.mock('@/lib/canvas/canvasStore', () => {
-  // These are hoisted by Jest before this factory runs
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   const useCanvasStoreFn = (selector: (state: Record<string, unknown>) => unknown) => {
     const state = { ...mockState.current };
     state.selectAllNodes = mockSelectAllNodes;
@@ -117,8 +115,7 @@ jest.mock('@/lib/canvas/canvasStore', () => {
     return selector(state);
   };
   // Attach getState so ComponentTree can call useCanvasStore.getState()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (useCanvasStoreFn as any).getState = () => mockState.current;
+  (useCanvasStoreFn as typeof useCanvasStoreFn & { getState: () => unknown }).getState = () => mockState.current;
   return { useCanvasStore: useCanvasStoreFn };
 });
 

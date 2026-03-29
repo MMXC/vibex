@@ -1,4 +1,18 @@
-### Added (vibex-domain-model-full-flow-check-fix-v2 Epic1: 空值保护 — 3层防护体系) — 2026-03-29
+### Added (agent-self-evolution-20260329 Epic3: Tester主动扫描) — 2026-03-29
+- **Epic3**: Tester主动扫描机制 — 提升 Tester 在无待处理任务时的主动贡献
+  - **扫描脚本** (`/root/.openclaw/scripts/tester-proactive-scan.sh`): 空闲时主动扫描代码质量、测试状态、Git变更
+  - **扫描范围**: npm test、ESLint、npm audit、TypeScript、Git状态、team-tasks状态
+  - **上报机制**: P0-P3 分级告警，发现问题自动上报 coord
+  - **集成方式**: 与 tester-heartbeat.sh 集成，无待处理任务时触发扫描
+  - **红线约束**: 只读不修改，发现问题上报 coord，不越界处理
+
+### Added (agent-self-evolution-20260329 Epic2: Epic规模标准化) — 2026-03-29
+- **Epic2**: Epic规模标准化 — Analyst SOUL.md 更新
+  - 添加「📏 Epic 规模治理规范」章节
+  - 规模标准表：小Epic(3-4功能点, 0.5h)、标准Epic(4-5, 1h)、大Epic(>5 必拆分)
+  - 拆分规则：按优先级排序后，取前5个功能点，其余创建 sub-Epic
+  - 创建前自检：`grep -c "Story|功能点"` 命令验证功能点数量
+
 - **Epic1**: NullProtection — 组件/Hook/状态 3层空值保护
   - **组件层** (`BoundedContextGraph.tsx`, `DomainModelGraph.tsx`, `BusinessFlowGraph.tsx`): 添加空值 fallback UI
     - 数据为空时渲染 `<DDDFallback />` 兜底组件，避免图表崩溃

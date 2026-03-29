@@ -72,6 +72,8 @@ export interface FlowStep {
   status: NodeStatus;
   /** 步骤类型：normal/branch/loop */
   type?: 'normal' | 'branch' | 'loop';
+  /** F2.2: 节点类型：start/end/process（用于 UI 标记） */
+  nodeType?: 'start' | 'end' | 'process';
 }
 
 export interface BusinessFlowNode {
@@ -533,6 +535,57 @@ export type CascadeUpstream = 'context' | 'flow';
 export interface CascadeResult {
   flowNodesMarked: number;
   componentNodesMarked: number;
+}
+
+// =============================================================================
+// F2: BoundedEdge — 限界上下文连线（Epic 3 F3.1/F3.2）
+// =============================================================================
+
+/** BoundedEdge 连线类型 */
+export type BoundedEdgeType = 'dependency' | 'composition' | 'association';
+
+/**
+ * BoundedEdge — 限界上下文卡片之间的连线
+ *
+ * from/to 指向 groupId（限界上下文组），可选 nodeId 指向组内具体节点
+ * type 决定连线颜色和样式
+ */
+export interface BoundedEdge {
+  id: string;
+  from: { groupId: string; nodeId?: string };
+  to: { groupId: string; nodeId?: string };
+  type: BoundedEdgeType;
+  label?: string;
+}
+
+/**
+ * FlowEdge 连线类型
+ *
+ * from/to 指向 nodeId（流程节点 ID）
+ * type 决定连线样式：sequence=实线, branch=虚线, loop=回环曲线
+ */
+export type FlowEdgeType = 'sequence' | 'branch' | 'loop';
+
+/** FlowEdge — 流程节点之间的连线 */
+export interface FlowEdge {
+  id: string;
+  from: string; // nodeId
+  to: string;   // nodeId
+  type: FlowEdgeType;
+  label?: string;
+}
+
+/**
+ * NodeRect — 带位置的矩形（用于连线定位计算）
+ *
+ * 从 ReactFlow Node[] 提取，供 BoundedEdgeLayer / FlowEdgeLayer 使用
+ */
+export interface NodeRect {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 }
 
 // =============================================================================

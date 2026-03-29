@@ -37,6 +37,48 @@ const LABEL_FONT_SIZE = 11;
 const LABEL_PADDING = 4;
 const LABEL_HEIGHT = LABEL_FONT_SIZE + LABEL_PADDING * 2;
 
+// F2.1: Intersection highlight color
+const OVERLAP_FILL = 'var(--color-accent, #6366f1)';
+const OVERLAP_FILL_OPACITY = 0.12;
+
+/**
+ * Check if two axis-aligned bounding boxes overlap.
+ * Returns the intersection rect or null if no overlap.
+ */
+function getIntersection(
+  a: { x: number; y: number; width: number; height: number },
+  b: { x: number; y: number; width: number; height: number }
+): { x: number; y: number; width: number; height: number } | null {
+  const ax2 = a.x + a.width;
+  const ay2 = a.y + a.height;
+  const bx2 = b.x + b.width;
+  const by2 = b.y + b.height;
+
+  const x = Math.max(a.x, b.x);
+  const y = Math.max(a.y, b.y);
+  const x2 = Math.min(ax2, bx2);
+  const y2 = Math.min(ay2, by2);
+
+  if (x >= x2 || y >= y2) return null; // no overlap
+  return { x, y, width: x2 - x, height: y2 - y };
+}
+
+/** Compute all pairwise overlaps between group bboxes */
+function computeOverlaps(bboxes: BoundedGroupBBox[]): Array<{ bbox: { x: number; y: number; width: number; height: number }; groupIds: [string, string] }> {
+  const overlaps: Array<{ bbox: { x: number; y: number; width: number; height: number }; groupIds: [string, string] }> = [];
+  for (let i = 0; i < bboxes.length; i++) {
+    for (let j = i + 1; j < bboxes.length; j++) {
+      const a = bboxes[i];
+      const b = bboxes[j];
+      const intersection = getIntersection(a, b);
+      if (intersection && intersection.width > 10 && intersection.height > 10) {
+        overlaps.push({ bbox: intersection, groupIds: [a.groupId, b.groupId] });
+      }
+    }
+  }
+  return overlaps;
+}
+
 /** Compute bounding boxes for each group based on current node positions */
 function computeGroupBBoxes(
   nodes: Node[],
@@ -140,6 +182,29 @@ function BoundedGroupOverlayComponent({
             <rect x={-svgOffsetX / zoom} y={-svgOffsetY / zoom} width={svgWidth / zoom} height={svgHeight / zoom} />
           </clipPath>
         </defs>
+
+        {/* F2.1: Intersection highlight overlay — render semi-transparent highlights for overlapping groups */}
+        {useMemo(() => {
+          const overlaps = computeOverlaps(bboxes);
+          return overlaps.map((overlap, i) => (
+            <rect
+              key={`overlap-${i}`}
+              x={overlap.bbox.x}
+              y={overlap.bbox.y}
+              width={overlap.bbox.width}
+              height={overlap.bbox.height}
+              fill={OVERLAP_FILL}
+              fillOpacity={OVERLAP_FILL_OPACITY}
+              stroke={OVERLAP_FILL}
+              strokeWidth={1}
+              strokeOpacity={0.3}
+              rx={4}
+              style={{ pointerEvents: 'none' }}
+              aria-hidden="true"
+              className="overlap-highlight"
+            />
+          ));
+        }, [bboxes])}
 
         {bboxes.map((bbox) => {
           const group = boundedGroups.find((g) => g.groupId === bbox.groupId);

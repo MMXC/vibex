@@ -68,7 +68,7 @@ interface SortableStepRowProps {
 function SortableStepRow({
   step,
   index,
-  totalSteps: _totalSteps,
+  totalSteps = 1,
   readonly,
   onConfirm,
   onEdit,
@@ -138,6 +138,24 @@ function SortableStepRow({
             <circle cx="7" cy="13" r="1.5" fill="currentColor" />
           </svg>
         </div>
+      )}
+
+      {/* F2.2: start/end node type marker */}
+      {index === 0 && (
+        <span
+          className={`${styles.nodeTypeMarker} ${styles['nodeTypeMarker--start']}`}
+          title="起点"
+          aria-label="起点"
+          data-testid="node-type-marker"
+        />
+      )}
+      {index === totalSteps - 1 && totalSteps > 1 && (
+        <span
+          className={`${styles.nodeTypeMarker} ${styles['nodeTypeMarker--end']}`}
+          title="终点"
+          aria-label="终点"
+          data-testid="node-type-marker"
+        />
       )}
 
       {/* Order number */}

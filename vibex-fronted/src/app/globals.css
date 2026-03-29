@@ -9,6 +9,8 @@
 @import '../styles/design-tokens.css';
 @import '../styles/animations.css';
 @import '../styles/utilities.css';
+/* P1-T5: Canvas CSS variable system — domain types, dashed borders, unified checkboxes */
+@import '../styles/canvas.variables.css';
 
 /* 页面背景 */
 body {

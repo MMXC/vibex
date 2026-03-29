@@ -88,9 +88,11 @@ export function ComponentSelectionStep() {
                     onChange={() => toggleComponent(comp.id)}
                   />
                   <div className={styles.cardContent}>
-                    <span className={styles.cardIcon}>
-                      {selectedComponents.includes(comp.id) ? '✓' : '○'}
-                    </span>
+                    {/* P1-T2: Unified CSS checkbox — no emoji */}
+                    <span
+                      className={`${styles.cardIcon} ${selectedComponents.includes(comp.id) ? styles.cardIconChecked : ''}`}
+                      aria-hidden="true"
+                    />
                     <span className={styles.cardName}>{comp.name}</span>
                     <span className={styles.cardDesc}>{comp.description}</span>
                   </div>

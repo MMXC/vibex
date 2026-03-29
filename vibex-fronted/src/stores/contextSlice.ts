@@ -44,6 +44,9 @@ export interface ContextState {
   
   setContextPanelOpen: (open: boolean) => void;
   toggleContextPanel: () => void;
+
+  // E2: Cross-slice state sync — batch set selection IDs from sessionStorage restore
+  setSelectedContextIds: (ids: string[]) => void;
 }
 
 // ==================== Store ====================
@@ -117,6 +120,12 @@ export const useContextStore = create<ContextState>()(
       setContextPanelOpen: (open) => set({ isContextPanelOpen: open }),
       toggleContextPanel: () => 
         set((state) => ({ isContextPanelOpen: !state.isContextPanelOpen })),
+
+      // E2: Batch set selection IDs (used by sessionStorage restore)
+      setSelectedContextIds: (ids) => {
+        if (!Array.isArray(ids)) return;
+        set({ selectedContextIds: ids });
+      },
     }),
     {
       name: 'vibex-context',

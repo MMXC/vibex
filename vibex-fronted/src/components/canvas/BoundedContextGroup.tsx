@@ -82,10 +82,11 @@ export function BoundedContextGroup({
         backgroundColor: config.bgColor,
       }}
     >
-      {/* Domain Label */}
+      {/* P1-T1: Domain Label — uses data-domain-type for CSS selector targeting */}
       <div
         className={styles.domainLabel}
         data-testid="domain-label"
+        data-domain-type={type}
         style={{ color: config.color, borderColor: config.color }}
       >
         {config.label}

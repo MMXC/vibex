@@ -52,6 +52,9 @@ export interface ModelState {
   
   setModelPanelOpen: (open: boolean) => void;
   toggleModelPanel: () => void;
+
+  // E2: Cross-slice state sync — batch set selection IDs from sessionStorage restore
+  setSelectedModelIds: (ids: string[]) => void;
 }
 
 // ==================== Store ====================
@@ -124,6 +127,12 @@ export const useModelStore = create<ModelState>()(
       setModelPanelOpen: (open) => set({ isModelPanelOpen: open }),
       toggleModelPanel: () => 
         set((state) => ({ isModelPanelOpen: !state.isModelPanelOpen })),
+
+      // E2: Batch set selection IDs (used by sessionStorage restore)
+      setSelectedModelIds: (ids) => {
+        if (!Array.isArray(ids)) return;
+        set({ selectedModelIds: ids });
+      },
     }),
     {
       name: 'vibex-model',

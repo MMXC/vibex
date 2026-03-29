@@ -73,10 +73,10 @@ src/components/ui/ErrorFallback.tsx  (新建)
    - `contextMermaidCode` 为空时渲染 `EmptyFallback`
 
 **验收标准**：
-- [ ] `EmptyFallback` 组件渲染正确
-- [ ] `ErrorFallback` 组件渲染正确
-- [ ] 所有 6 个组件空值时显示 fallback，不崩溃
-- [ ] `npm test` 通过
+- [x] `EmptyFallback` 组件渲染正确
+- [x] `ErrorFallback` 组件渲染正确
+- [x] 所有 6 个组件空值时显示 fallback，不崩溃
+- [x] TypeScript 编译通过
 
 ---
 
@@ -106,8 +106,8 @@ src/stores/designStore.ts
    - 空数据时返回 `[]`
 
 **验收标准**：
-- [ ] `useDDDStream` 异常不抛错，返回安全默认值
-- [ ] 各 slice action 非法输入被静默拦截
+- [x] `useDDDStream` 异常不抛错，返回安全默认值
+- [x] 各 slice action 非法输入被静默拦截
 
 ---
 

@@ -163,7 +163,9 @@
   max-width: 200px;
 }
 
+/* P1-T2: Unified CSS checkbox — replaces emoji ✓ */
 .checkbox {
+  position: relative;
   width: 24px;
   height: 24px;
   display: flex;
@@ -171,15 +173,33 @@
   justify-content: center;
   border: 2px solid var(--border, #e0e0e0);
   border-radius: 6px;
-  font-size: 14px;
-  color: transparent;
   transition: all 0.2s;
+  flex-shrink: 0;
 }
 
-.nodeItem.selected .checkbox {
+/* Checkmark via pseudo-element */
+.checkbox::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 7px;
+  width: 8px;
+  height: 13px;
+  border: 2px solid transparent;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) scale(0);
+  transition: transform 0.15s ease;
+}
+
+.checkboxChecked {
   background: var(--primary, #3b82f6);
   border-color: var(--primary, #3b82f6);
-  color: #fff;
+}
+
+.checkboxChecked::after {
+  border-color: white;
+  transform: rotate(45deg) scale(1);
 }
 
 /* 已选提示 */

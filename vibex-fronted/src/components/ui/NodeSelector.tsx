@@ -199,7 +199,11 @@ export function NodeSelector({
                   <div className={styles.nodeDesc}>{node.description}</div>
                 )}
               </div>
-              <div className={styles.checkbox}>{isSelected && '✓'}</div>
+              {/* P1-T2: Unified CSS checkbox — replaces emoji ✓ */}
+              <span
+                className={`${styles.checkbox} ${isSelected ? styles.checkboxChecked : ''}`}
+                aria-hidden="true"
+              />
             </div>
           );
         })}

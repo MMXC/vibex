@@ -1,3 +1,11 @@
+### Added (vibex-jest-vitest-mismatch: axios mock interceptors 修复) — 2026-03-29
+- **问题**: jest.setup.ts/js 的 axios mock 缺少 `interceptors`，导致 6 个测试套件失败（describe not defined）
+- **修复**: 在 `default` 和 `create()` 返回值中添加 `interceptors.request/response.use` mock
+- **影响套件**: api-config.test.ts, diagnosis/index.test.ts, InputAreaEpic2.test.tsx, InputArea.test.tsx, RequirementInput.test.tsx, page.test.tsx
+- **测试结果**: 229 suites, 2853 tests passed
+- **提交**: `8247130b`
+- **审查**: ✅ PASSED (reviewer-axios-mock-fix)
+
 ### Added (vibex-canvas-tree-bulk-ops-20260329: 三栏组件树批量操作) — 2026-03-29
 - **F001**: 全选按钮 — `⊞ 全选` 调用 `selectAllNodes('component')`，一键勾选所有组件节点
 - **F002**: 取消全选按钮 — `⊠ 取消全选` 调用 `clearNodeSelection('component')`，清除所有勾选

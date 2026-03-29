@@ -1,3 +1,14 @@
+### Fixed (vibex-canvas-checkbox-dedup Epic1: Checkbox去重重构) — 2026-03-30
+- **S1.1** — 移除 selection checkbox UI (保留Ctrl+click多选功能)
+- **S1.2** — 将确认checkbox移至标题前 (nodeCardHeader内)
+- **S1.3** — 点击checkbox直接切换confirmed状态
+- **S1.4** — 移除独立的'确认'按钮
+- **S1.5** — '全选'按钮改为'确认所有'
+- CSS: 新增 `.confirmCheckbox` 样式 (accent-color: success)
+- 验收: 无 aria-label='选择' 残留 ✓, 无'确认'按钮残留 ✓, npm run build ✓, ESLint 0 warnings ✓
+- 提交: `d36bd2b4`
+- 审查: ✅ PASSED (reviewer-epic1:checkbox重构)
+
 ### Fixed (ComponentTree Epic1: 分组逻辑 + page-label fallback) — 2026-03-30
 - **vibex-component-tree-grouping Epic1** — 分组逻辑多维判断
   - `inferIsCommon()` 增加 `COMMON_COMPONENT_TYPES` (25种通用组件类型)

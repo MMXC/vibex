@@ -738,6 +738,16 @@ All notable changes to this project will be documented in this file.
   - 3 个 Template: problem-analysis, competitive-analysis, solution-evaluation
   - 索引文档 _index.md
 
+### Added (proposal_tracker.py: VibeX Proposal Execution Tracker) — 2026-03-29
+- **New script**: `scripts/proposal_tracker.py` — 提案执行追踪工具
+  - 扫描 `proposals/{date}/summary.md` 目录，解析提案条目
+  - 查询 `team-tasks` 状态（支持新旧两种目录布局），关联提案与任务
+  - 提取任务 ID（支持 **负责**: `agent-proposal-id` / 显式 task_id 字段 / 前缀模式匹配）
+  - 生成 `EXECUTION_TRACKER.json` + `EXECUTION_TRACKER.md` 执行追踪报告
+  - 支持 Cron 定时运行: `0 9 * * * root cd /root/.openclaw/vibex && python3 scripts/proposal_tracker.py`
+  - **Bug fix**: 正则字符类 `[a-zA-Z0-9_-]` 未包含 `.`，导致 `dev-e1.1-proposal-tracker` 被截断为 `dev-e1` → 修复为 `[a-zA-Z0-9_\.-]`
+  - **Cleanup**: 移除未使用的 `TASK_MANAGER_SCRIPT` 常量和 `proposal_id` 参数
+
 ## [Unreleased]
 
 ## [3.9.0] - 2026-03-29

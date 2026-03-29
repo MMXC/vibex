@@ -10,10 +10,10 @@
 
 | 任务 | 负责人 | 依赖 | 状态 |
 |------|--------|------|------|
-| Epic 1: Checkbox 重构 | dev | - | pending |
-| Epic 2: 批量删除优化 | dev | Epic 1 | pending |
-| Epic 3: 测试与验证 | tester | Epic 1+2 | pending |
-| Code Review | reviewer | Epic 1+2 | pending |
+| Epic 1: Checkbox 重构 | dev | - | ✅ done |
+| Epic 2: 批量删除优化 | dev | Epic 1 | ✅ done |
+| Epic 3: 测试与验证 | tester | Epic 1+2 | ✅ done |
+| Code Review | reviewer | Epic 1+2 | in-progress |
 
 ---
 
@@ -153,8 +153,8 @@ python3 ~/.openclaw/skills/team-tasks/scripts/task_manager.py add \
 
 ## 6. 成功标准
 
-- [ ] Epic 1+2 代码改动完成并通过 review
-- [ ] Epic 3 测试通过 + gstack 截图验证通过
+- [x] Epic 1+2 代码改动完成并通过 review
+- [x] Epic 3 测试通过 + gstack 截图验证通过
 - [ ] PR 已创建并合并
-- [ ] `npm test` 全部通过
+- [x] `npm test` 全部通过
 - [ ] 90% 用户能正确完成确认/删除操作（预期达成）

@@ -96,37 +96,52 @@ export interface ComponentGroup {
 }
 
 /**
- * 从 flowNodes 中查找页面名称，支持多级 fallback 匹配
- * 优先级：精确匹配 → prefix匹配 → 名称模糊匹配 → 兜底显示 flowId
+ * 共享匹配函数 — 支持多级 fallback
+ * 优先级：精确匹配 → prefix匹配 → 名称模糊匹配
+ * 用于 getPageLabel 和其他需要 flowId→flowNode 映射的场景
  */
-function getPageLabel(flowId: string, flowNodes: BusinessFlowNode[]): string {
-  // 0. 通用组件标识
-  if (!flowId || COMMON_FLOW_IDS.has(flowId)) {
-    return '未知页面';
-  }
-
+export function matchFlowNode(
+  flowId: string,
+  flowNodes: BusinessFlowNode[]
+): BusinessFlowNode | null {
   // 1. 精确匹配 nodeId
   const exact = flowNodes.find((f) => f.nodeId === flowId);
-  if (exact) return `📄 ${exact.name}`;
+  if (exact) return exact;
 
   // 2. Prefix 匹配（flowId 是 flow.nodeId 的前缀或反之）
   const prefixMatch = flowNodes.find(
     (f) => flowId.startsWith(f.nodeId + '-') || f.nodeId.startsWith(flowId + '-')
   );
-  if (prefixMatch) return `📄 ${prefixMatch.name}`;
+  if (prefixMatch) return prefixMatch;
 
   // 3. 名称模糊匹配（忽略空格/中划线/下划线）
   const normalizedFlowId = flowId.toLowerCase().replace(/[\s\-_]/g, '');
-  const nameMatch = flowNodes.find((f) => {
-    const normalizedName = f.name.toLowerCase().replace(/[\s\-_]/g, '');
-    return (
-      normalizedName.includes(normalizedFlowId) ||
-      normalizedFlowId.includes(normalizedName)
-    );
-  });
-  if (nameMatch) return `📄 ${nameMatch.name}`;
+  return (
+    flowNodes.find((f) => {
+      const normalizedName = f.name.toLowerCase().replace(/[\s\-_]/g, '');
+      return (
+        normalizedName.includes(normalizedFlowId) ||
+        normalizedFlowId.includes(normalizedName)
+      );
+    }) || null
+  );
+}
 
-  // 4. 兜底：显示 flowId 前缀
+/**
+ * 从 flowNodes 中查找页面名称，支持多级 fallback 匹配
+ * 优先级：精确匹配 → prefix匹配 → 名称模糊匹配 → 兜底显示 flowId
+ */
+export function getPageLabel(flowId: string, flowNodes: BusinessFlowNode[]): string {
+  // 0. 通用组件标识 → 使用通用组件标签
+  if (!flowId || COMMON_FLOW_IDS.has(flowId)) {
+    return COMMON_GROUP_LABEL;
+  }
+
+  // 1. 精确匹配 nodeId
+  const matched = matchFlowNode(flowId, flowNodes);
+  if (matched) return `📄 ${matched.name}`;
+
+  // 2. 兜底：显示 flowId 前缀
   const shortId = flowId.length > 12 ? flowId.slice(0, 12) + '…' : flowId;
   return `❓ ${shortId}`;
 }
@@ -187,11 +202,11 @@ export function groupByFlowId(
     });
   });
 
-  // Sort non-common groups: actual flow names first, then unknown pages
+  // Sort non-common groups: actual flow names first, then unknown pages (❓ prefix)
   const nonCommonGroups = result.filter(g => !g.isCommon);
   nonCommonGroups.sort((a, b) => {
-    const aUnknown = a.label === '未知页面';
-    const bUnknown = b.label === '未知页面';
+    const aUnknown = a.label.startsWith('❓');
+    const bUnknown = b.label.startsWith('❓');
     if (aUnknown && !bUnknown) return 1;
     if (!aUnknown && bUnknown) return -1;
     return 0;

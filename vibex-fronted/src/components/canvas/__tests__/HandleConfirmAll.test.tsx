@@ -116,12 +116,16 @@ describe('BoundedContextTree handleConfirmAll (B1)', () => {
     expect(mockAdvancePhase).toHaveBeenCalledTimes(1);
   });
 
-  it('button is DISABLED when all already confirmed (but still visible)', () => {
+  it('button is ENABLED even when all confirmed (B1 fix)', () => {
     mockCtxNodes.forEach((n) => { n.confirmed = true; });
     render(<BoundedContextTree />);
-    // Button is still in DOM but disabled; aria-label changes to "已全部确认，继续到流程树"
+    // B1 fix: button is always enabled when hasNodes, not disabled when allConfirmed
     const btn = screen.getByRole('button', { name: /已全部确认.*流程树/i });
-    expect(btn).toBeDisabled();
+    expect(btn).not.toBeDisabled();
+    expect(btn).toBeEnabled();
+    // Clicking advances phase even when all already confirmed
+    fireEvent.click(btn);
+    expect(mockAdvancePhase).toHaveBeenCalledTimes(1);
   });
 
   it('button NOT visible when no nodes', () => {
@@ -164,12 +168,16 @@ describe('ComponentTree handleConfirmAll (B1)', () => {
     expect(mockSetPhase).toHaveBeenCalledWith('prototype');
   });
 
-  it('button is DISABLED when all already confirmed (but still visible)', () => {
+  it('button is ENABLED even when all confirmed (B1 fix)', () => {
     mockCompNodes.forEach((n) => { n.confirmed = true; });
     render(<ComponentTree />);
-    // Button is still in DOM but disabled; aria-label changes to "已全部确认，继续到原型生成"
+    // B1 fix: button is always enabled when hasNodes, not disabled when allConfirmed
     const btn = screen.getByRole('button', { name: /已全部确认.*原型生成/i });
-    expect(btn).toBeDisabled();
+    expect(btn).not.toBeDisabled();
+    expect(btn).toBeEnabled();
+    // Clicking advances phase even when all already confirmed
+    fireEvent.click(btn);
+    expect(mockSetPhase).toHaveBeenCalledWith('prototype');
   });
 
   it('button NOT visible when no nodes', () => {

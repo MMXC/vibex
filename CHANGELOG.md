@@ -1,3 +1,12 @@
+### Fixed (vibex-next-roadmap-ph1 Epic3: 交集高亮与起止标记) — 2026-03-30
+- **F8**: 交集高亮 — `OverlapHighlightLayer` 在 `CardTreeRenderer` 中渲染 BC 卡片交集区域，SVG 层 z-index:20，pointer-events:none
+- **F9**: 起止节点标记 — `CardTreeNode` 显示 ◉ (起点) 和 ◎ (终点) 标记，`buildFlowGraph` 自动设置 isStart/isEnd 标志
+- **CSS**: `.nodeMarker` 样式定义
+- **类型**: `CardTreeNodeData` 接口新增 `isStart?: boolean` 和 `isEnd?: boolean`
+- **测试**: 上游 tester 验证所有功能测试通过，TypeScript 编译通过
+- **提交**: `1c80c448`
+- **审查**: ✅ PASSED (reviewer-epic3-交集高亮与起止标记)
+
 ### Fixed (vibex-next-roadmap-ph1 Epic2: maximize全屏模式) — 2026-03-30
 - **F2.1**: maximize/expand-both 模式隐藏 expandCol 按钮列，布局更简洁
 - **F2.2**: 优化全屏/最大化按钮样式，新增 F11 快捷键切换全屏、Escape 退出全屏

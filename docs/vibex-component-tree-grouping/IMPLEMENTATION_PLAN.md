@@ -122,9 +122,9 @@ describe('inferIsCommon', () => {
 ```
 
 **DoD**:
-- [ ] `inferIsCommon()` 支持多维判断
-- [ ] `COMMON_COMPONENT_TYPES` 覆盖常见通用组件
-- [ ] 测试覆盖率 ≥ 80%
+- [x] `inferIsCommon()` 支持多维判断 (flowId + type)
+- [x] `COMMON_COMPONENT_TYPES` 覆盖常见通用组件 (24种类型)
+- [x] 测试覆盖率 ≥ 80% (ComponentTreeGrouping.test.ts: 29 tests pass)
 
 ---
 

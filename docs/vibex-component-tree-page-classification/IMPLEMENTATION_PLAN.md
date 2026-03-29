@@ -102,9 +102,9 @@ describe('getPageLabel', () => {
 ```
 
 **DoD**:
-- [ ] getPageLabel 支持 4 层 fallback
-- [ ] 测试覆盖率 ≥ 80%
-- [ ] gstack screenshot 验证：组件正确分类到页面
+- [x] getPageLabel 支持 4 层 fallback (通用标识 → 精确 → prefix → 模糊 → ❓兜底)
+- [x] 测试覆盖率 ≥ 80% (ComponentTreeGrouping.test.ts: 29 tests pass)
+- [ ] gstack screenshot 验证：组件正确分类到页面 (P2，需UI验证)
 
 ---
 

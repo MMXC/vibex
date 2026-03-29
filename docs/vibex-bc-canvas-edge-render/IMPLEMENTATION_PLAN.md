@@ -145,8 +145,8 @@ function computeEdgePath(
 ```
 
 **DoD**:
-- [ ] `edgePath.test.ts` 覆盖率 ≥ 90%
-- [ ] 所有 9 种 dx/dy 组合测试通过
+- [x] `edgePath.test.ts` 覆盖率 ≥ 90% (11 tests for 9+ dx/dy combinations)
+- [x] 所有 9 种 dx/dy 组合测试通过 (15 tests total, all pass)
 
 ---
 

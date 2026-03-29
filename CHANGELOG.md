@@ -1,3 +1,15 @@
+### Added (vibex-domain-model-full-flow-check-fix-v2 Epic1: 空值保护 — 3层防护体系) — 2026-03-29
+- **Epic1**: NullProtection — 组件/Hook/状态 3层空值保护
+  - **组件层** (`BoundedContextGraph.tsx`, `DomainModelGraph.tsx`, `BusinessFlowGraph.tsx`): 添加空值 fallback UI
+    - 数据为空时渲染 `<DDDFallback />` 兜底组件，避免图表崩溃
+    - 图表组件增加 `hasData` 守卫，缺失数据时展示空状态
+  - **Hook层** (`useDDDStream.ts`, `useDDDStreamQuery.ts`): 添加空值校验
+    - 运行时数据流入口校验，null/undefined 时返回安全默认值
+  - **状态层** (`contextSlice.ts`, `modelSlice.ts`, `designStore.ts`): reducer 输入校验
+    - action payload 空值过滤，防止非法数据写入 store
+  - **技术实现**: 可选链 `?.` + 空值合并 `??` 操作符，零运行时错误
+  - npm audit: ✅ 0 vulnerabilities
+
 ### Fixed (vibex-taskmanager-fix: 路径迁移 — team-tasks 目录重定向) — 2026-03-29
 - 修复4个遗留文件中的旧路径 `/home/ubuntu/clawd/data/team-tasks` → `/root/.openclaw/workspace-coord/team-tasks`
   - `scripts/dedup/dedup.py`

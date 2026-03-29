@@ -69,7 +69,10 @@
 - `~/.gstack/reports/` 中放入测试报告后，Tester 自动生成分析 phase 文件
 
 ### 产出物
-- 更新的 Tester HEARTBEAT.md
+- 更新的 Tester HEARTBEAT.md（commit 032dccaeb）
+
+### 状态
+- [x] **2026-03-29**: 完成 — 添加 `~/.gstack/reports/` 扫描逻辑、phase 分析文件生成、< 80% 告警机制
 
 ---
 
@@ -92,6 +95,10 @@
 ### 产出物
 - `vibex/scripts/phase-file-template.md`
 - 更新的 Dev HEARTBEAT.md
+- `vibex/scripts/migrate-phase-files.sh`
+
+### 状态
+- [x] **2026-03-29**: 完成 — 创建 `scripts/phase-file-template.md` 标准模板、`scripts/migrate-phase-files.sh` 迁移脚本（246 个文件已添加 `__FINAL__` 标记）、更新 Dev HEARTBEAT.md
 
 ---
 

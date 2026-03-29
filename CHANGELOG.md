@@ -33,6 +33,22 @@
 - 提交: `e6447f1c`
 - 审查: ✅ PASSED (reviewer-epic2:批量删除优化)
 
+### Fixed (vibex-canvas-checkbox-dedup Epic3: 测试与验证) — 2026-03-30
+- **S3.1** — 单元测试更新（checkbox 数量验证）
+  - 新增 `BoundedContextTree.test.tsx` 测试文件
+  - 9 个测试用例覆盖 Epic 1-2 所有功能点
+- **S3.2** — 测试执行与验证
+  - 单元测试: 19/19 PASS (BoundedContextTree + HandleConfirmAll)
+  - TypeScript 编译: PASS
+  - ESLint: 0 errors, 0 warnings
+- **回归测试**:
+  - 无 aria-label='选择' 残留 ✓
+  - 无'确认'按钮残留 ✓
+  - 删除按钮始终可用 ✓
+  - window.confirm 二次确认 ✓
+- 文档: `docs/vibex-canvas-checkbox-dedup/test-checklist.md`
+- 状态: ✅ Epic3 完成
+
 ### Fixed (ComponentTree Epic1: 分组逻辑 + page-label fallback) — 2026-03-30
 - **vibex-component-tree-grouping Epic1** — 分组逻辑多维判断
   - `inferIsCommon()` 增加 `COMMON_COMPONENT_TYPES` (25种通用组件类型)

@@ -40,17 +40,20 @@ export function nodeCenter(rect: NodeRect): { cx: number; cy: number } {
 }
 
 /** 确定最佳 anchor 方向（避免连线穿过节点） */
-function bestAnchor(from: NodeRect, to: NodeRect): { fromAnchor: 'right' | 'left' | 'top' | 'bottom'; toAnchor: 'left' | 'right' | 'top' | 'bottom' } {
+export function bestAnchor(from: NodeRect, to: NodeRect): { fromAnchor: 'right' | 'left' | 'top' | 'bottom'; toAnchor: 'left' | 'right' | 'top' | 'bottom' } {
   const dx = to.x - from.x;
   const dy = to.y - from.y;
+  const absDx = Math.abs(dx);
+  const absDy = Math.abs(dy);
 
-  // 如果水平距离大于垂直距离，用左右 anchor
-  if (Math.abs(dx) >= Math.abs(dy)) {
+  // 改进阈值：从 absDx >= absDy 改为 absDx >= absDy * 0.5
+  // 使水平锚点在 dx 较小（但 dy 更大）时也能被选中
+  if (absDx >= absDy * 0.5) {
     return dx >= 0
       ? { fromAnchor: 'right', toAnchor: 'left' }
       : { fromAnchor: 'left', toAnchor: 'right' };
   }
-  // 否则用上下 anchor
+  // 垂直锚点
   return dy >= 0
     ? { fromAnchor: 'bottom', toAnchor: 'top' }
     : { fromAnchor: 'top', toAnchor: 'bottom' };

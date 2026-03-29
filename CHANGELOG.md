@@ -7,6 +7,21 @@
 - **测试**: `ComponentTreeBulkOps.test.tsx` 覆盖 F001/F002/F003 全场景
 - **npm audit**: ✅ 0 vulnerabilities
 
+### Added (agent-self-evolution-20260329 Epic4: Phase文件格式升级) — 2026-03-29
+- **Epic4**: Phase 文件格式标准化 — 统一 Agent 阶段任务文件规范
+  - **模板** (`scripts/phase-file-template.md`): Phase 文件标准模板（含命名规范、Metadata 字段、读写规范）
+    - 命名规范: `<project>-<task>-<YYYYMMDD_HHMMSS>.md`
+    - Metadata 字段: `__PROJECT__`、`__EPIC__`、`__AGENT__`、`__START__`、`__STATUS__`、`__FINAL__`
+    - `__FINAL__` HTML 注释块标记完成，读取时自动忽略后续内容
+    - 写入规范: 创建阶段用新文件，执行阶段用 `>>` 追加，完成阶段写入 `__FINAL__` 标记
+  - **迁移脚本** (`scripts/migrate-phase-files.sh`): 批量为现有 246 个 phase 文件添加 `__FINAL__` 标记
+    - 扫描 6 个 phase 目录（architect/analyst/dev/reviewer/tester/pm）
+    - 仅追加 `__FINAL__` HTML 注释块，不修改原有内容
+  - **Dev HEARTBEAT.md 更新**: 引用新模板和 `__FINAL__` 规范
+  - **验收标准**: 多次执行同一任务，phase 文件大小增长 < 10%
+  - **提交**: `86b9ebb4`
+  - **审查**: ✅ PASSED (reviewer-epic4-phase文件升级)
+
 ### Added (agent-self-evolution-20260329 Epic3: Tester主动扫描) — 2026-03-29
 - **Epic3**: Tester主动扫描机制 — 提升 Tester 在无待处理任务时的主动贡献
   - **扫描脚本** (`/root/.openclaw/scripts/tester-proactive-scan.sh`): 空闲时主动扫描代码质量、测试状态、Git变更

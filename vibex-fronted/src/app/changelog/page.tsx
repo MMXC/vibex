@@ -18,6 +18,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.89',
+    date: '2026-03-29',
+    changes: [
+      '🗺️  vibex-canvas-evolution-roadmap/Phase1: 样式统一 + 导航修复 (cc2201d0)',
+      '✅ F1: CSS Checkbox 统一样式 — emoji ✓/○/× → CheckboxIcon 组件',
+      '✅ F2: example-canvas.json previewUrl 覆盖率 100% (5/5 nodes)',
+      '✅ F4: deriveDomainType() + deriveStepType() 推导函数 + 44 tests PASS',
+      '✅ npm audit: 2 间接依赖漏洞 (picomatch，非生产依赖)',
+    ],
+    commit: 'cc2201d0',
+  },
+  {
     version: '1.0.88',
     date: '2026-03-29',
     changes: [

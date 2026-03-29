@@ -808,8 +808,10 @@
 
 .boundedContextTree {
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: flex-start;
   height: 100%;
 }
 

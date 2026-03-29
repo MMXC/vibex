@@ -166,6 +166,8 @@ interface CanvasStore {
   removeFlowEdge: (edgeId: string) => void;
   /** Clear all flow edges */
   clearFlowEdges: () => void;
+  /** Set all flow edges at once */
+  setFlowEdges: (edges: FlowEdge[]) => void;
   /** Add a bounded edge */
   addBoundedEdge: (edge: import('@/lib/canvas/types').BoundedEdge) => void;
   /** Remove a bounded edge */
@@ -179,28 +181,8 @@ interface CanvasStore {
   clearBoundedGroups: () => void;
 
   // === F2: BoundedEdge Slice (Epic 3 F3.1/F3.2) ===
-  /** BoundedContext 连线列表 */
-  boundedEdges: BoundedEdge[];
-  /** Add a BoundedEdge */
-  addBoundedEdge: (edge: Omit<BoundedEdge, 'id'>) => void;
-  /** Remove a BoundedEdge by id */
-  removeBoundedEdge: (id: string) => void;
-  /** Clear all BoundedEdges */
-  clearBoundedEdges: () => void;
   /** Set all BoundedEdges at once */
   setBoundedEdges: (edges: BoundedEdge[]) => void;
-
-  // === F2: FlowEdge Slice (Epic 3 F3.3) ===
-  /** Flow node 连线列表 */
-  flowEdges: FlowEdge[];
-  /** Add a FlowEdge */
-  addFlowEdge: (edge: Omit<FlowEdge, 'id'>) => void;
-  /** Remove a FlowEdge by id */
-  removeFlowEdge: (id: string) => void;
-  /** Clear all FlowEdges */
-  clearFlowEdges: () => void;
-  /** Set all FlowEdges at once */
-  setFlowEdges: (edges: FlowEdge[]) => void;
 
   // === Context Slice ===
   contextNodes: BoundedContextNode[];

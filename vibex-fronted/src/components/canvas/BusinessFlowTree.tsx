@@ -809,7 +809,6 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
         nodeRects={nodeRects}
         zoom={1}
         pan={{ x: 0, y: 0 }}
-        className="flow-edge-layer"
       />
       {/* Header with add button */}
       <div className={styles.treeHeader}>

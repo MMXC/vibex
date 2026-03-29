@@ -729,10 +729,10 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
           {expandMode !== 'maximize' && (
             <button
               type="button"
-              className={styles.expandAllButton}
+              className={`${styles.expandAllButton} ${expandMode === 'expand-both' ? styles.expandAllButtonActive : ''}`}
               onClick={() => setExpandMode(expandMode === 'normal' ? 'expand-both' : 'normal')}
-              aria-label={expandMode === 'normal' ? '全屏展开' : '退出全屏展开'}
-              title={expandMode === 'normal' ? '三栏均分视口（全屏展开）' : '恢复正常布局'}
+              aria-label={expandMode === 'normal' ? '均分视口' : '退出均分'}
+              title={expandMode === 'normal' ? '三栏均分视口' : '恢复正常布局'}
             >
               {expandMode === 'normal' ? (
                 <>
@@ -742,7 +742,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                     <line x1="21" y1="3" x2="14" y2="10" />
                     <line x1="3" y1="21" x2="10" y2="14" />
                   </svg>
-                  全屏展开
+                  均分视口
                 </>
               ) : (
                 <>
@@ -752,7 +752,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                     <line x1="10" y1="14" x2="3" y2="21" />
                     <line x1="21" y1="3" x2="14" y2="10" />
                   </svg>
-                  退出全屏
+                  退出均分
                 </>
               )}
             </button>
@@ -760,7 +760,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
           {/* F1.2: maximize toggle */}
           <button
             type="button"
-            className={styles.maximizeButton}
+            className={`${styles.maximizeButton} ${expandMode === 'maximize' ? styles.maximizeButtonActive : ''}`}
             onClick={toggleMaximize}
             aria-label={expandMode === 'maximize' ? '退出最大化' : '最大化'}
             title={expandMode === 'maximize' ? '退出最大化（F11）' : '最大化模式（F11）'}

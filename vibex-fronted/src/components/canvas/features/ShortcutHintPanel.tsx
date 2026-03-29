@@ -33,7 +33,8 @@ const SHORTCUTS: ShortcutItem[] = [
   { keys: ['Del'], description: '删除选中节点' },
   { keys: ['Backspace'], description: '删除选中节点' },
   { keys: ['Ctrl', 'A'], description: '全选节点' },
-  { keys: ['Esc'], description: '取消选择/关闭对话框' },
+  { keys: ['Esc'], description: '取消选择/关闭对话框/退出最大化' },
+  { keys: ['F11'], description: '最大化画布/退出最大化' },
   { keys: ['?'], description: '显示/隐藏本面板' },
 ];
 

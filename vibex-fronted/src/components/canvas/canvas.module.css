@@ -274,19 +274,19 @@
    ============================================ */
 
 .expandControls {
-  position: absolute;
-  top: calc(var(--navbar-height, 0px) + 40px);
+  position: fixed;
+  top: 64px;
   right: 12px;
   display: flex;
   align-items: center;
   gap: 6px;
   z-index: 50;
   padding: 4px 8px;
-  background: var(--color-surface-elevated, rgba(30, 30, 40, 0.8));
+  background: rgba(20, 20, 32, 0.88);
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .expandAllButton {
@@ -301,18 +301,26 @@
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
   white-space: nowrap;
 }
 
 .expandAllButton:hover {
   background: var(--color-accent);
   color: var(--color-bg-primary);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
 }
 
 .expandAllButton:focus-visible {
   outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
+}
+
+/* Active state: expand-both mode is active */
+.expandAllButtonActive {
+  background: var(--color-accent) !important;
+  color: var(--color-bg-primary) !important;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
 }
 
 .maximizeButton {
@@ -327,7 +335,7 @@
   border-radius: 6px;
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
 }
 
 .maximizeButton:hover {
@@ -339,6 +347,14 @@
 .maximizeButton:focus-visible {
   outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
+}
+
+/* Active state: maximize mode is active */
+.maximizeButtonActive {
+  background: rgba(99, 102, 241, 0.25) !important;
+  color: var(--color-accent) !important;
+  border-color: var(--color-accent) !important;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
 }
 
 /* ============================================

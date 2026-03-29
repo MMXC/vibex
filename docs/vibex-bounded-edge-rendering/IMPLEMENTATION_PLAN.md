@@ -29,3 +29,23 @@
 - `vibex-fronted/src/components/canvas/canvas.module.css`
 - `vibex-fronted/src/components/diagram/edges/edgePath.ts`
 - `vibex-fronted/src/components/diagram/edges/edgePath.test.ts`
+
+---
+
+## Coord-Decision 执行记录
+
+**时间**: 2026-03-30 03:20
+**决策**: 不开启新阶段二开发，复用 `vibex-bc-canvas-edge-render` 的已完成修复
+
+**理由**:
+- `vibex-bc-canvas-edge-render` 已完成 13/13，Epic1（锚点算法）+ Epic2（CSS布局）均已测试通过并推送
+- 两项目同根因（`flex-direction: column` → bestAnchor 始终选 bottom→top → 连线汇聚）
+- 无需重复开发，直接验证 `vibex-bc-canvas-edge-render` 的修复是否覆盖本问题即可
+
+**验证方式**:
+```bash
+# 查看 vibex-bc-canvas-edge-render 的修复 commit
+git -C /root/.openclaw/workspace/vibex log --oneline vibex-bc-canvas-edge-render...main | grep -i "edge\|anchor\|layout\|css"
+```
+
+**结论**: 本项目状态变更为 completed，无需新开发。

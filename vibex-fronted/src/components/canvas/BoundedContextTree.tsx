@@ -15,7 +15,6 @@ import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { RelationshipConnector } from './edges/RelationshipConnector';
 import { BoundedContextGroup } from './BoundedContextGroup';
 import { BoundedEdgeLayer } from './edges/BoundedEdgeLayer';
-import { CheckboxIcon } from '@/components/common/CheckboxIcon';
 import { useModifierKey, useDragSelection } from '@/hooks/canvas/useDragSelection';
 import type { BoundedContextNode, BoundedContextDraft, NodeRect, BoundedEdge } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
@@ -230,18 +229,7 @@ function ContextCard({ node, onConfirm, onEdit, onDelete, readonly, selected, on
       ) : (
         /* View mode */
         <>
-          {/* F3-F10: Selection checkbox */}
-          {onToggleSelect && (
-            <div className={styles.selectionCheckbox} onClick={(e) => { e.stopPropagation(); onToggleSelect(node.nodeId); }}>
-              <input
-                type="checkbox"
-                checked={selected ?? false}
-                onChange={() => onToggleSelect(node.nodeId)}
-                aria-label={`选择 ${node.name}`}
-                onClick={(e) => e.stopPropagation()}
-              />
-            </div>
-          )}
+          {/* S1.1: Removed selection checkbox — multi-select still works via Ctrl+click on card body */}
           <div className={styles.nodeCardHeader}>
             <div className={styles.nodeTypeBadge} style={{ background: typeColor }}>
               {node.type === 'core'
@@ -252,24 +240,21 @@ function ContextCard({ node, onConfirm, onEdit, onDelete, readonly, selected, on
                     ? '通用'
                     : '外部'}
             </div>
-            {node.confirmed && (
-              <CheckboxIcon checked size="sm" aria-label="已确认" />
+            {/* S1.2: Confirmation checkbox moved BEFORE description (before h4) */}
+            {!readonly && (
+              <input
+                type="checkbox"
+                checked={node.confirmed}
+                onChange={() => onConfirm(node.nodeId)}
+                aria-label={`确认 ${node.name}`}
+                className={styles.confirmCheckbox}
+              />
             )}
           </div>
           <h4 className={styles.nodeCardTitle}>{node.name}</h4>
           <p className={styles.nodeCardDesc}>{node.description}</p>
           {!readonly && (
             <div className={styles.nodeCardActions}>
-              {!node.confirmed && (
-                <button
-                  type="button"
-                  className={styles.confirmButton}
-                  onClick={() => onConfirm(node.nodeId)}
-                  aria-label={`确认 ${node.name}`}
-                >
-                  确认
-                </button>
-              )}
               <button
                 type="button"
                 className={styles.editButton}
@@ -374,7 +359,6 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
   // F3-F10: Multi-select state
   const selectedNodeIds = useCanvasStore((s) => s.selectedNodeIds);
   const toggleNodeSelect = useCanvasStore((s) => s.toggleNodeSelect);
-  const selectAllNodes = useCanvasStore((s) => s.selectAllNodes);
   const clearNodeSelection = useCanvasStore((s) => s.clearNodeSelection);
   const deleteSelectedNodes = useCanvasStore((s) => s.deleteSelectedNodes);
 
@@ -560,13 +544,14 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
                 )}
               </>
             ) : (
+              /* S1.5: Changed from "全选" to "确认所有" */
               <button
                 type="button"
                 className={styles.secondaryButton}
-                onClick={() => selectAllNodes('context')}
-                aria-label="全选"
+                onClick={handleConfirmAll}
+                aria-label="确认所有节点"
               >
-                全选
+                确认所有
               </button>
             )}
           </div>

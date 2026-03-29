@@ -6,8 +6,14 @@
 - **B2.1 integration**: `OverlapHighlightLayer` 集成到 `CardTreeRenderer`
   - 在 `BoundedGroupOverlay` 之后渲染 (z-index 20 > 10)
   - 可视化 bounded groups 之间的交集区域
-- **测试**: 237 suites / 3005 tests passed
-- **提交**: `0b1d1300`
+- **B2 Shortcut Help Panel** (`2cbbc545`): 快捷键帮助面板 + N 新建节点
+  - **新增** `ShortcutHintPanel.tsx`: `?` 键切换快捷键提示浮层，14 个快捷键展示
+  - **新增** ProjectBar 快捷键按钮: 工具栏 `?` 按钮触发 ShortcutHintPanel
+  - **集成** `onNewNode` → `useKeyboardShortcuts`: `N` 键在当前树创建新节点（context/flow/component）
+  - **集成** `onOpenShortcuts` → Toolbar: 快捷键提示回调贯穿 CanvasPage → ProjectBar → CanvasToolbar
+  - **Bug分析**: `docs/vibex-canvas-continu/bug-analysis.md` — B1 handleConfirmAll / B2.1 OverlapHighlightLayer 未集成分析
+- **测试**: 237 suites / 3005 tests passed; canvas 27 suites / 476 tests PASS
+- **提交**: `0b1d1300` (B1+B2.1), `2cbbc545` (ShortcutPanel)
 - **审查**: ✅ PASSED (reviewer-b2-phase2canvasintegration)
 
 ### Fixed (B1 handleConfirmAll 修复审查) — 2026-03-29

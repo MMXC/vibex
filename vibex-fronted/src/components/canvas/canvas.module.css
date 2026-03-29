@@ -835,6 +835,14 @@
   margin-bottom: 0.375rem;
 }
 
+/* S1.2: Confirmation checkbox style */
+.confirmCheckbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--color-success);
+}
+
 .nodeTypeBadge {
   font-size: 0.65rem;
   font-weight: 700;

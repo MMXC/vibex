@@ -852,16 +852,30 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 onNodeClick={handleMinimapNodeClick}
                 actions={
                   contextNodes.length > 0 ? (
-                    <button
-                      type="button"
-                      className={styles.secondaryButton}
-                      onClick={() => generateContexts(requirementText)}
-                      disabled={aiThinking || !requirementText.trim()}
-                      aria-label="重新生成限界上下文"
-                      title="使用当前需求文本重新生成上下文"
-                    >
-                      {aiThinking ? '◌ 重新生成中...' : '🔄 重新生成'}
-                    </button>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        className={styles.secondaryButton}
+                        onClick={() => autoGenerateFlows(contextNodes)}
+                        disabled={flowGenerating}
+                        aria-label="继续到流程树"
+                        title="基于已确认的限界上下文生成业务流程树"
+                      >
+                        {flowGenerating
+                          ? `◌ ${flowGeneratingMessage ?? '生成中...'}`
+                          : '→ 继续 → 流程树'}
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.secondaryButton}
+                        onClick={() => generateContexts(requirementText)}
+                        disabled={aiThinking || !requirementText.trim()}
+                        aria-label="重新生成限界上下文"
+                        title="使用当前需求文本重新生成上下文"
+                      >
+                        {aiThinking ? '◌ 重新生成中...' : '🔄 重新生成'}
+                      </button>
+                    </div>
                   ) : undefined
                 }
               >

@@ -10,14 +10,76 @@
  */
 'use client';
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { RelationshipConnector } from './edges/RelationshipConnector';
 import { BoundedContextGroup } from './BoundedContextGroup';
+import { BoundedEdgeLayer } from './edges/BoundedEdgeLayer';
 import { CheckboxIcon } from '@/components/common/CheckboxIcon';
 import { useModifierKey, useDragSelection } from '@/hooks/canvas/useDragSelection';
-import type { BoundedContextNode, BoundedContextDraft } from '@/lib/canvas/types';
+import type { BoundedContextNode, BoundedContextDraft, NodeRect, BoundedEdge } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
+
+// Context card dimensions for node rect computation
+const CTX_CARD_APPROX_WIDTH = 240;
+const CTX_CARD_APPROX_HEIGHT = 120;
+
+/**
+ * inferBoundedEdges — Epic 2 F3.2: Auto-infer bounded context edges from domain type
+ *
+ * Rules:
+ * - core → supporting / supporting → core: dependency
+ * - core → core: calls
+ * - generic → core: dependency
+ * - supporting ↔ generic: association
+ */
+function inferBoundedEdges(contextNodes: BoundedContextNode[]): BoundedEdge[] {
+  const edges: BoundedEdge[] = [];
+  let idx = 0;
+
+  for (let i = 0; i < contextNodes.length; i++) {
+    for (let j = i + 1; j < contextNodes.length; j++) {
+      const a = contextNodes[i];
+      const b = contextNodes[j];
+
+      let relType: BoundedEdge['type'] = 'dependency';
+
+      // core ↔ supporting = dependency
+      if ((a.type === 'core' && b.type === 'supporting') ||
+          (a.type === 'supporting' && b.type === 'core')) {
+        relType = 'dependency';
+      }
+      // generic ↔ core = dependency
+      else if ((a.type === 'generic' && b.type === 'core') ||
+               (a.type === 'core' && b.type === 'generic')) {
+        relType = 'dependency';
+      }
+      // core ↔ core = calls
+      else if (a.type === 'core' && b.type === 'core') {
+        relType = 'dependency'; // composition relationship
+      }
+      // supporting ↔ generic / supporting ↔ supporting = association
+      else if ((a.type === 'supporting' && b.type === 'supporting') ||
+               (a.type === 'supporting' && b.type === 'generic') ||
+               (a.type === 'generic' && b.type === 'supporting')) {
+        relType = 'association';
+      }
+      // external ↔ anything = dependency
+      else if (a.type === 'external' || b.type === 'external') {
+        relType = 'dependency';
+      }
+
+      edges.push({
+        id: `bounded-edge-${idx++}`,
+        from: { groupId: a.nodeId },
+        to: { groupId: b.nodeId },
+        type: relType,
+      });
+    }
+  }
+
+  return edges;
+}
 
 // =============================================================================
 // Mock AI Context Generation
@@ -323,6 +385,49 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
   const [showAddForm, setShowAddForm] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // === Epic 2 F3.2: BoundedEdgeLayer integration ===
+  // DOM measurement for BoundedEdgeLayer node rects
+  const [panelSize, setPanelSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) {
+        setPanelSize({
+          width: entry.contentRect.width,
+          height: entry.contentRect.height,
+        });
+      }
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  // Compute node rects from DOM positions (F3.2)
+  const nodeRects = useMemo((): NodeRect[] => {
+    /* eslint-disable react-hooks/refs -- DOM measurement in useMemo: ref.current is null-guarded */
+    if (!containerRef.current || panelSize.width === 0) return [];
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const cardEls = containerRef.current.querySelectorAll<HTMLElement>('[data-node-id]');
+    return Array.from(cardEls)
+      .map((el) => {
+        const rect = el.getBoundingClientRect();
+        return {
+          id: el.getAttribute('data-node-id')!,
+          x: rect.left - containerRect.left,
+          y: rect.top - containerRect.top,
+          width: el.offsetWidth || CTX_CARD_APPROX_WIDTH,
+          height: el.offsetHeight || CTX_CARD_APPROX_HEIGHT,
+        };
+      })
+      .filter((r) => contextNodes.some((n) => n.nodeId === r.id));
+    /* eslint-enable react-hooks/refs */
+  }, [contextNodes, panelSize]);
+
+  // Auto-infer bounded edges from context nodes (F3.2)
+  const boundedEdges = useMemo(() => inferBoundedEdges(contextNodes), [contextNodes]);
+
   const handleGenerate = useCallback(async () => {
     if (generating) return;
     setGenerating(true);
@@ -392,7 +497,15 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
   });
 
   return (
-    <div className={styles.boundedContextTree} aria-label="限界上下文树" data-testid="context-tree" ref={containerRef}>
+    <div className={styles.boundedContextTree} aria-label="限界上下文树" data-testid="context-tree" ref={containerRef} style={{ position: 'relative' }}>
+      {/* F3.2: BoundedEdgeLayer SVG overlay — pointer-events: none, z-index: 30 */}
+      <BoundedEdgeLayer
+        edges={boundedEdges}
+        nodeRects={nodeRects}
+        zoom={1}
+        pan={{ x: 0, y: 0 }}
+        className="bounded-edge-layer"
+      />
       {/* Generation Controls */}
       <div className={styles.contextTreeControls}>
         <button

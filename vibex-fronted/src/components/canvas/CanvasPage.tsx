@@ -34,6 +34,9 @@ import { TemplateSelector } from './features/TemplateSelector';
 import { VersionHistoryPanel } from './features/VersionHistoryPanel';
 import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
 import type { Phase, TreeType, TreeNode } from '@/lib/canvas/types';
+import type { NodeRect } from '@/lib/canvas/types';
+import { BoundedEdgeLayer } from './edges/BoundedEdgeLayer';
+import { FlowEdgeLayer } from './edges/FlowEdgeLayer';
 import styles from './canvas.module.css';
 
 interface CanvasPageProps {
@@ -287,6 +290,45 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const ZOOM_STEP = 0.1;
   const MIN_ZOOM = 0.25;
   const MAX_ZOOM = 2.0;
+
+  // F3: Compute approximate node rects for edge layers (CSS grid → approximate positions)
+  const CARD_W = 240;
+  const CARD_H = 200;
+  const CARD_GAP = 16;
+
+  const contextNodeRects = useMemo<NodeRect[]>(() => {
+    return contextNodes.map((node, i) => ({
+      id: node.nodeId,
+      x: (i % 3) * (CARD_W + CARD_GAP),
+      y: Math.floor(i / 3) * (CARD_H + CARD_GAP),
+      width: CARD_W,
+      height: CARD_H,
+    }));
+  }, [contextNodes]);
+
+  const flowNodeRects = useMemo<NodeRect[]>(() => {
+    return flowNodes.map((node, i) => ({
+      id: node.nodeId,
+      x: (i % 3) * (CARD_W + CARD_GAP),
+      y: Math.floor(i / 3) * (CARD_H + CARD_GAP),
+      width: CARD_W,
+      height: CARD_H,
+    }));
+  }, [flowNodes]);
+
+  const _componentNodeRects = useMemo<NodeRect[]>(() => {
+    return componentNodes.map((node, i) => ({
+      id: node.nodeId,
+      x: (i % 3) * (CARD_W + CARD_GAP),
+      y: Math.floor(i / 3) * (CARD_H + CARD_GAP),
+      width: CARD_W,
+      height: CARD_H,
+    }));
+  }, [componentNodes]);
+
+  // Store selectors for edge layers
+  const flowEdges = useCanvasStore((s) => s.flowEdges);
+  const boundedEdges = useCanvasStore((s) => s.boundedEdges);
 
   const handleZoomIn = useCallback(() => {
     setZoomLevel((z) => Math.min(z + ZOOM_STEP, MAX_ZOOM));
@@ -769,6 +811,24 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
             >
+              {/* F3: Edge layer overlays — absolutely positioned, pointer-events: none */}
+              {boundedEdges.length > 0 && (
+                <BoundedEdgeLayer
+                  edges={boundedEdges}
+                  nodeRects={contextNodeRects}
+                  zoom={zoomLevel}
+                  pan={panOffset}
+                />
+              )}
+              {flowEdges.length > 0 && (
+                <FlowEdgeLayer
+                  edges={flowEdges}
+                  nodeRects={flowNodeRects}
+                  zoom={zoomLevel}
+                  pan={panOffset}
+                />
+              )}
+
               {/* Bug5: Left expand toggle button */}
               <div className={styles.expandCol}>
                 <button
@@ -875,6 +935,22 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                   {rightExpand === 'default' ? '▶' : '◀'}
                 </button>
               </div>
+
+              {/* F2: BoundedEdgeLayer — 限界上下文连线 SVG overlay */}
+              <BoundedEdgeLayer
+                edges={boundedEdges}
+                nodeRects={contextNodeRects}
+                zoom={zoomLevel}
+                pan={{ x: 0, y: 0 }}
+              />
+
+              {/* F2: FlowEdgeLayer — 流程节点连线 SVG overlay */}
+              <FlowEdgeLayer
+                edges={flowEdges}
+                nodeRects={flowNodeRects}
+                zoom={zoomLevel}
+                pan={{ x: 0, y: 0 }}
+              />
             </div>
           )}
         </>

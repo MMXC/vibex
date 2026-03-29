@@ -358,7 +358,7 @@
 }
 
 /* ============================================
-   F1.2: Maximize Mode — hide toolbar/projectbar
+   F1.2: Maximize Mode — 隐藏工具栏，三列均分
    ============================================ */
 
 .maximizeMode {
@@ -378,12 +378,25 @@
   right: 8px;
 }
 
+/* 最大化模式：三列均分，隐藏 expandCol 按钮列 */
+.maximizeMode .treePanelsGrid {
+  grid-template-columns: 1fr 1fr 1fr !important;
+}
+
+.maximizeMode .expandCol {
+  display: none;
+}
+
 /* ============================================
-   F1.1: expand-both Mode — 1fr 1fr 1fr
+   F1.1: expand-both Mode — 1fr 1fr 1fr，隐藏 expandCol
    ============================================ */
 
 .expandBothMode .treePanelsGrid {
   grid-template-columns: 1fr 1fr 1fr !important;
+}
+
+.expandBothMode .expandCol {
+  display: none;
 }
 
 /* ============================================

@@ -1,3 +1,12 @@
+### Added (vibex-canvas-tree-bulk-ops-20260329: 三栏组件树批量操作) — 2026-03-29
+- **F001**: 全选按钮 — `⊞ 全选` 调用 `selectAllNodes('component')`，一键勾选所有组件节点
+- **F002**: 取消全选按钮 — `⊠ 取消全选` 调用 `clearNodeSelection('component')`，清除所有勾选
+- **F003**: 清空画布按钮 — `🗑 清空画布` 调用 `clearComponentCanvas()`，清空所有组件节点（支持撤销）
+- **UI**: 按钮位于 `.contextTreeControls` 区域，复用 `.secondaryButton` / `.dangerButton` 样式
+- **技术实现**: `canvasStore.clearComponentCanvas()` 记录 history snapshot，支持 Ctrl+Z 撤销
+- **测试**: `ComponentTreeBulkOps.test.tsx` 覆盖 F001/F002/F003 全场景
+- **npm audit**: ✅ 0 vulnerabilities
+
 ### Added (agent-self-evolution-20260329 Epic3: Tester主动扫描) — 2026-03-29
 - **Epic3**: Tester主动扫描机制 — 提升 Tester 在无待处理任务时的主动贡献
   - **扫描脚本** (`/root/.openclaw/scripts/tester-proactive-scan.sh`): 空闲时主动扫描代码质量、测试状态、Git变更

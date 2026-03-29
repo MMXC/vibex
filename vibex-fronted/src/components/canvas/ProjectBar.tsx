@@ -36,6 +36,8 @@ interface ProjectBarProps {
   onZoomReset?: () => void;
   /** E4-F11: 打开版本历史回调 */
   onOpenHistory?: () => void;
+  /** P1-F6: 打开快捷键帮助面板回调 */
+  onOpenShortcuts?: () => void;
 }
 
 export function ProjectBar({
@@ -47,6 +49,7 @@ export function ProjectBar({
   onZoomOut,
   onZoomReset,
   onOpenHistory,
+  onOpenShortcuts,
 }: ProjectBarProps) {
   const contextNodes = useCanvasStore((s) => s.contextNodes);
   const flowNodes = useCanvasStore((s) => s.flowNodes);
@@ -218,6 +221,33 @@ export function ProjectBar({
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
           <span>搜索</span>
+        </button>
+      )}
+
+      {/* P1-F6: Shortcut help button */}
+      {onOpenShortcuts && (
+        <button
+          type="button"
+          className={styles.searchButton}
+          onClick={onOpenShortcuts}
+          aria-label="快捷键帮助"
+          title="快捷键帮助（按 ? 键）"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="2" y="4" width="20" height="16" rx="2" />
+            <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M8 16h8" />
+          </svg>
+          <span>?</span>
         </button>
       )}
 

@@ -405,6 +405,17 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
       const tree: TreeType = activeTree ?? 'context';
       useCanvasStore.getState().clearNodeSelection(tree);
     },
+    onNewNode: () => {
+      const tree: TreeType = activeTree ?? 'context';
+      const store = useCanvasStore.getState();
+      if (tree === 'context') {
+        store.addContextNode({ name: '新上下文', description: '', type: 'core' });
+      } else if (tree === 'flow') {
+        store.addFlowNode({ contextId: '', name: '新流程', steps: [] });
+      } else {
+        store.addComponentNode({ name: '新组件', flowId: '', type: 'page', props: {}, api: { method: 'GET', path: '/', params: [] } });
+      }
+    },
     enabled: phase !== 'input',
   });
 
@@ -698,6 +709,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             onZoomOut={handleZoomOut}
             onZoomReset={handleZoomReset}
             onOpenHistory={versionHistory.open}
+            onOpenShortcuts={toggleShortcutPanel}
           />
         </div>
       )}

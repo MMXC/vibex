@@ -4,15 +4,18 @@
  * Handles:
  * - Ctrl+Z / Cmd+Z: Undo
  * - Ctrl+Shift+Z / Cmd+Shift+Z / Ctrl+Y / Cmd+Y: Redo
- * - /: Open search dialog
+ * - Ctrl+K / Cmd+K: Open search dialog
+ * - /: Open search dialog (alternative)
  * - +/-: Zoom in/out
  * - 0: Reset zoom
  * - Del/Backspace: Delete selected node
+ * - N: New node (active tree)
+ * - Esc: Cancel / close dialogs
  *
  * 遵守约束:
  * - 无 any 类型
  * - 无 console.log
- * - 焦点在输入框时不触发画布快捷键（除 / 外）
+ * - 焦点在输入框时不触发画布快捷键（除 Esc 外）
  */
 'use client';
 
@@ -36,6 +39,8 @@ interface KeyboardShortcutsOptions {
   onSelectAll?: () => void;
   /** Clear node selection */
   onClearSelection?: () => void;
+  /** Create new node in active tree */
+  onNewNode?: () => void;
   /** Whether shortcuts should be active */
   enabled?: boolean;
 }
@@ -47,11 +52,14 @@ interface KeyboardShortcutsOptions {
  * - Ctrl+Z / Cmd+Z: Undo
  * - Ctrl+Shift+Z / Cmd+Shift+Z: Redo
  * - Ctrl+Y / Cmd+Y: Redo (Windows)
- * - /: Open search (when not in input)
+ * - Ctrl+K / Cmd+K: Open search dialog
+ * - /: Open search dialog (alternative)
  * - +/=: Zoom in
  * - -: Zoom out
  * - 0: Reset zoom
  * - Del / Backspace: Delete selected node
+ * - N: New node (active tree)
+ * - Esc: Cancel / close dialogs
  */
 export function useKeyboardShortcuts({
   undo,
@@ -63,6 +71,7 @@ export function useKeyboardShortcuts({
   onDelete,
   onSelectAll,
   onClearSelection,
+  onNewNode,
   enabled = true,
 }: KeyboardShortcutsOptions) {
   useEffect(() => {
@@ -121,6 +130,13 @@ export function useKeyboardShortcuts({
         return;
       }
 
+      // === Search: Ctrl+K / Cmd+K (always, even in input for search ===
+      if ((isCtrl || isMeta) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        onOpenSearch?.();
+        return;
+      }
+
       // === Zoom In: + or = ===
       if ((e.key === '+' || e.key === '=') && !isCtrl && !isMeta && !isInputFocused) {
         e.preventDefault();
@@ -154,6 +170,13 @@ export function useKeyboardShortcuts({
         return;
       }
 
+      // === New Node: N key (only when not in text input) ===
+      if (e.key === 'n' && !isCtrl && !isMeta && !isInputFocused) {
+        e.preventDefault();
+        onNewNode?.();
+        return;
+      }
+
       // === Select All: Ctrl+A / Cmd+A ===
       if ((isCtrl || isMeta) && e.key.toLowerCase() === 'a') {
         if (isInputFocused) return; // Let browser handle select-all in inputs
@@ -172,5 +195,5 @@ export function useKeyboardShortcuts({
 
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset, onDelete, onSelectAll, onClearSelection, enabled]);
+  }, [undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset, onDelete, onSelectAll, onClearSelection, onNewNode, enabled]);
 }

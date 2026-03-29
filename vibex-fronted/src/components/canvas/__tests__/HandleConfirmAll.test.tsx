@@ -97,13 +97,13 @@ describe('BoundedContextTree handleConfirmAll (B1)', () => {
 
   it('renders confirm-all button when hasNodes', () => {
     render(<BoundedContextTree />);
-    // Button text is "确认所有 → 继续到流程树" when not all confirmed
-    expect(screen.getByRole('button', { name: /确认所有.*继续到流程树/i })).toBeInTheDocument();
+    // aria-label is "确认所有节点后继续" when not all confirmed
+    expect(screen.getByRole('button', { name: /确认所有节点后继续/i })).toBeInTheDocument();
   });
 
   it('confirms all unconfirmed nodes when clicked', () => {
     render(<BoundedContextTree />);
-    fireEvent.click(screen.getByRole('button', { name: /确认所有.*继续到流程树/i }));
+    fireEvent.click(screen.getByRole('button', { name: /确认所有节点后继续/i }));
     expect(mockConfirmCtx).toHaveBeenCalledTimes(3);
     expect(mockConfirmCtx).toHaveBeenCalledWith('ctx-1');
     expect(mockConfirmCtx).toHaveBeenCalledWith('ctx-2');
@@ -112,7 +112,7 @@ describe('BoundedContextTree handleConfirmAll (B1)', () => {
 
   it('advances phase after confirming all', () => {
     render(<BoundedContextTree />);
-    fireEvent.click(screen.getByRole('button', { name: /确认所有.*继续到流程树/i }));
+    fireEvent.click(screen.getByRole('button', { name: /确认所有节点后继续/i }));
     expect(mockAdvancePhase).toHaveBeenCalledTimes(1);
   });
 
@@ -146,13 +146,13 @@ describe('ComponentTree handleConfirmAll (B1)', () => {
 
   it('renders confirm-all button when hasNodes', () => {
     render(<ComponentTree />);
-    // Button text is "确认所有 → 继续到原型生成" when not all confirmed
-    expect(screen.getByRole('button', { name: /确认所有.*继续到原型生成/i })).toBeInTheDocument();
+    // aria-label is "确认所有节点后继续" when not all confirmed
+    expect(screen.getByRole('button', { name: /确认所有节点后继续/i })).toBeInTheDocument();
   });
 
   it('confirms all unconfirmed nodes when clicked', () => {
     render(<ComponentTree />);
-    fireEvent.click(screen.getByRole('button', { name: /确认所有.*继续到原型生成/i }));
+    fireEvent.click(screen.getByRole('button', { name: /确认所有节点后继续/i }));
     expect(mockConfirmComp).toHaveBeenCalledTimes(2);
     expect(mockConfirmComp).toHaveBeenCalledWith('comp-1');
     expect(mockConfirmComp).toHaveBeenCalledWith('comp-2');
@@ -160,7 +160,7 @@ describe('ComponentTree handleConfirmAll (B1)', () => {
 
   it('sets phase to prototype after confirming all', () => {
     render(<ComponentTree />);
-    fireEvent.click(screen.getByRole('button', { name: /确认所有.*继续到原型生成/i }));
+    fireEvent.click(screen.getByRole('button', { name: /确认所有节点后继续/i }));
     expect(mockSetPhase).toHaveBeenCalledWith('prototype');
   });
 

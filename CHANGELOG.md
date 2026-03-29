@@ -1,3 +1,36 @@
+### Added (E3.2 Canvas E2E 测试覆盖率提升) — 2026-03-29
+- **E3.2**: Canvas E2E 测试覆盖率提升（≥80%）
+- **TC-1**: 全屏展开 expand-both 模式三栏等宽 — 4 个测试用例（TC-1.1~TC-1.4）
+  - 三栏变为 1fr 1fr 1fr 验证（CSS gridTemplateColumns 解析）
+  - 按钮 aria-label 切换（全屏展开 ↔ 退出全屏展开）
+  - localStorage 持久化恢复验证
+- **TC-2**: SVG overlay 层 pointer-events: none 不阻挡节点交互 — 3 个测试用例（TC-2.1~TC-2.3）
+  - BoundedEdgeLayer SVG 层 pointer-events 验证
+  - ReactFlow 节点在 edge overlay 上方可点击
+  - SVG path 区域事件穿透验证
+- **TC-3**: 关系可视化 BC 连线正确渲染 — 3 个测试用例（TC-3.1~TC-3.3）
+  - boundedEdges 时 SVG edge layer 渲染验证
+  - 连线颜色正确性（dependency=#6366f1/composition=#8b5cf6/association=#94a3b8）
+  - 清除 edges 后 SVG layer 消失
+- **TC-4**: 全屏 maximize 模式工具栏隐藏 — 5 个测试用例（TC-4.1~TC-4.5）
+  - maximizeMode class 切换验证
+  - ProjectBar/PhaseLabelBar/ExpandControls 隐藏（opacity < 0.1 或 display:none）
+  - localStorage 持久化恢复验证
+- **TC-5**: ESC 快捷键退出全屏 — 3 个测试用例（TC-5.1~TC-5.3）
+  - maximize 模式按 ESC 退出
+  - normal 模式按 ESC 无效果
+  - expand-both 模式按 ESC 不退出
+- **TC-6**: F11 快捷键切换最大化模式 — 3 个测试用例（TC-6.1~TC-6.3）
+  - F11 进入/退出 maximize 模式
+  - F11 → ESC → F11 组合快捷键
+- **TC-7**: 全链路回归测试 — 2 个测试用例（TC-7.1~TC-7.2）
+  - 页面加载无 JS 错误
+  - expand-both + maximize 互斥验证
+- **辅助函数**: gotoCanvas() + seedCanvasWithEdges()（3 个 BC 节点 + 2 条 boundedEdges）
+- **测试覆盖**: 23 个测试用例，seed 数据 + localStorage 隔离
+- **文件**: `vibex-fronted/e2e/canvas-phase2.spec.ts` (729 行)
+- **审查**: ✅ PASSED (reviewer-e3.2-canvas-e2e)
+
 ### Added (vibex-canvas-evolution-roadmap Phase1: 样式统一 + 导航修复) — 2026-03-29
 - **F1**: CSS Checkbox 统一样式 — emoji ✓/○/× → CheckboxIcon SVG 组件，三态样式一致
 - **F2**: example-canvas.json previewUrl 覆盖率 100% (5/5 nodes)

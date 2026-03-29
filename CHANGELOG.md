@@ -1,3 +1,13 @@
+### Added (vibex-canvas-evolution-roadmap Phase1: 样式统一 + 导航修复) — 2026-03-29
+- **F1**: CSS Checkbox 统一样式 — emoji ✓/○/× → CheckboxIcon SVG 组件，三态样式一致
+- **F2**: example-canvas.json previewUrl 覆盖率 100% (5/5 nodes)
+- **F4**: `deriveDomainType()` + `deriveStepType()` 类型推导函数 + 44 tests PASS
+- **UI**: Flow step emoji (🔀/🔁) → SVG branch/loop icons，canvas.variables.css 统一 CSS token 系统
+- **类型工具**: `lib/canvas/types.ts` 新增 61 行类型定义 + `types.utilities.test.ts` 125 行覆盖
+- **修复**: `src/stores/ddd/middleware.ts` 预存类型错误
+- **提交**: `cc2201d0`
+- **审查**: ✅ PASSED (reviewer-phase1)
+
 ### Added (vibex-jest-vitest-mismatch: axios mock interceptors 修复) — 2026-03-29
 - **问题**: jest.setup.ts/js 的 axios mock 缺少 `interceptors`，导致 6 个测试套件失败（describe not defined）
 - **修复**: 在 `default` 和 `create()` 返回值中添加 `interceptors.request/response.use` mock

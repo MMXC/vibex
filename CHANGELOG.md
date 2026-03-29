@@ -21,6 +21,18 @@
 - 提交: `d36bd2b4`
 - 审查: ✅ PASSED (reviewer-epic1:checkbox重构)
 
+### Fixed (vibex-canvas-checkbox-dedup Epic2: 批量删除优化) — 2026-03-30
+- **S2.1** — 删除按钮始终可用（无需预勾选）
+  - 删除全部按钮始终可见（非readonly时）
+  - 框选后显示选中数和删除(N)按钮
+  - 无选中时显示'确认所有'按钮
+  - 所有删除操作带 window.confirm 二次确认
+- 变更: BoundedContextTree.tsx — 新增删除全部按钮 + confirm 确认
+- 清理: contextSlice.ts (移除未使用 get) + middleware.ts (移除 eslint-disable)
+- 验收: tsc --noEmit ✓, ESLint 0 warnings ✓
+- 提交: `e6447f1c`
+- 审查: ✅ PASSED (reviewer-epic2:批量删除优化)
+
 ### Fixed (ComponentTree Epic1: 分组逻辑 + page-label fallback) — 2026-03-30
 - **vibex-component-tree-grouping Epic1** — 分组逻辑多维判断
   - `inferIsCommon()` 增加 `COMMON_COMPONENT_TYPES` (25种通用组件类型)

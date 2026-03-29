@@ -227,6 +227,7 @@ interface CanvasStore {
 
   // === Component Slice Actions ===
   setComponentNodes: (nodes: ComponentNode[]) => void;
+  clearComponentCanvas: () => void;
   addComponentNode: (data: Omit<ComponentNode, 'nodeId' | 'status' | 'confirmed' | 'children'>) => void;
   editComponentNode: (nodeId: string, data: Partial<ComponentNode>) => void;
   deleteComponentNode: (nodeId: string) => void;
@@ -741,6 +742,13 @@ export const useCanvasStore = create<CanvasStore>()(
 
           // === Component Slice Actions ===
           setComponentNodes: (nodes) => set({ componentNodes: nodes }),
+
+          clearComponentCanvas: () => {
+            const nodes = get().componentNodes;
+            if (nodes.length === 0) return;
+            getHistoryStore().recordSnapshot('component', nodes);
+            set({ componentNodes: [] });
+          },
 
           addComponentNode: (data) => {
             const newNode: ComponentNode = {

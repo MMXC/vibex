@@ -833,6 +833,30 @@
   outline-offset: 2px;
 }
 
+/* F003: 清空画布危险按钮 */
+.dangerButton {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--color-danger, #ef4444);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-danger, #ef4444);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.dangerButton:hover {
+  background: var(--color-danger, #ef4444);
+  color: #fff;
+}
+
+.dangerButton:focus-visible {
+  outline: 2px solid var(--color-danger, #ef4444);
+  outline-offset: 2px;
+}
+
 /* F3-F10: Multi-select controls */
 .multiSelectControls {
   display: flex;

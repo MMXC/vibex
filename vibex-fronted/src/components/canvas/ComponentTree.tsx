@@ -683,6 +683,12 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
     }
   }, [componentNodes, confirmComponentNode, setPhase]);
 
+  const handleClearCanvas = useCallback(() => {
+    if (window.confirm('确定清空画布？所有组件将被删除。')) {
+      useCanvasStore.getState().clearComponentCanvas();
+    }
+  }, []);
+
   const allConfirmed = componentNodes.length > 0 && componentNodes.every((n) => n.confirmed);
   const hasNodes = componentNodes.length > 0;
 
@@ -729,6 +735,42 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
             aria-label="手动新增组件"
           >
             + 手动新增
+          </button>
+        )}
+
+        {/* F001+F002: 全选 / 取消全选 — 独立条件按钮 */}
+        {hasNodes && (
+          selectedCount === 0 ? (
+            <button
+              type="button"
+              className={styles.secondaryButton}
+              onClick={() => selectAllNodes('component')}
+              aria-label="全选所有组件"
+            >
+              ⊞ 全选
+            </button>
+          ) : (
+            <button
+              type="button"
+              className={styles.secondaryButton}
+              onClick={() => clearNodeSelection('component')}
+              aria-label="取消全选所有组件"
+            >
+              ⊠ 取消全选
+            </button>
+          )
+        )}
+
+        {/* F003: 清空画布 */}
+        {hasNodes && !readonly && (
+          <button
+            type="button"
+            className={styles.dangerButton}
+            onClick={handleClearCanvas}
+            aria-label="清空画布"
+            title="清空画布（可撤销）"
+          >
+            🗑 清空画布
           </button>
         )}
 

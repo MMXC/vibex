@@ -154,6 +154,24 @@ interface CanvasStore {
   /** Update group label */
   updateBoundedGroupLabel: (groupId: string, label: string) => void;
   /** Assign a node to a group */
+
+  // === F3: Edge Layers ===
+  /** Flow edges (sequence/branch/loop) for flow tree visualization */
+  flowEdges: import('@/lib/canvas/types').FlowEdge[];
+  /** Bounded edges (dependency/composition/association) for bounded context visualization */
+  boundedEdges: import('@/lib/canvas/types').BoundedEdge[];
+  /** Add a flow edge */
+  addFlowEdge: (edge: import('@/lib/canvas/types').FlowEdge) => void;
+  /** Remove a flow edge */
+  removeFlowEdge: (edgeId: string) => void;
+  /** Clear all flow edges */
+  clearFlowEdges: () => void;
+  /** Add a bounded edge */
+  addBoundedEdge: (edge: import('@/lib/canvas/types').BoundedEdge) => void;
+  /** Remove a bounded edge */
+  removeBoundedEdge: (edgeId: string) => void;
+  /** Clear all bounded edges */
+  clearBoundedEdges: () => void;
   addNodeToGroup: (groupId: string, nodeId: string) => void;
   /** Remove a node from a group */
   removeNodeFromGroup: (groupId: string, nodeId: string) => void;

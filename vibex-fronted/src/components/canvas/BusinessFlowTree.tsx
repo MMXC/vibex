@@ -12,7 +12,7 @@
  */
 'use client';
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import { CheckboxIcon } from '@/components/common/CheckboxIcon';
@@ -34,11 +34,76 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import type { BusinessFlowNode, FlowStep, ComponentNode, BoundedContextNode } from '@/lib/canvas/types';
+import type { BusinessFlowNode, FlowStep, ComponentNode, BoundedContextNode, NodeRect, FlowEdge } from '@/lib/canvas/types';
 import { SortableTreeItem } from './features/SortableTreeItem';
 import { getHistoryStore } from '@/lib/canvas/historySlice';
 import { useDragSelection, useModifierKey } from '@/hooks/canvas/useDragSelection';
+import { FlowEdgeLayer } from './edges/FlowEdgeLayer';
 import styles from './canvas.module.css';
+
+// Flow card dimensions for node rect computation
+const FLOW_CARD_APPROX_WIDTH = 260;
+const FLOW_CARD_APPROX_HEIGHT = 80; // collapsed card height
+const FLOW_CARD_MARGIN_BOTTOM = 12;
+
+/**
+ * inferFlowEdges — Epic 3 F3.3: Auto-infer flow edges from step order and types
+ *
+ * Rules:
+ * - Sequential steps → sequence edge
+ * - Step type changes (normal→branch, branch→normal) → branch edge
+ * - Steps with type=loop → loop edge back to target
+ */
+function inferFlowEdges(flowNodes: BusinessFlowNode[]): FlowEdge[] {
+  const edges: FlowEdge[] = [];
+  let edgeIdx = 0;
+
+  for (const node of flowNodes) {
+    const steps = node.steps;
+    if (steps.length < 2) continue;
+
+    for (let i = 0; i < steps.length - 1; i++) {
+      const from = steps[i];
+      const to = steps[i + 1];
+      const fromType = from.type ?? 'normal';
+      const toType = to.type ?? 'normal';
+
+      // Determine edge type
+      let edgeType: FlowEdge['type'] = 'sequence';
+      if (fromType === 'loop' || toType === 'loop') {
+        edgeType = 'loop';
+      } else if (fromType === 'branch' || toType === 'branch') {
+        edgeType = 'branch';
+      }
+
+      edges.push({
+        id: `flow-edge-${edgeIdx++}`,
+        from: from.stepId,
+        to: to.stepId,
+        type: edgeType,
+      });
+    }
+
+    // Handle explicit loop: a branch/loop step that points back
+    for (let i = 0; i < steps.length; i++) {
+      const step = steps[i];
+      if (step.type === 'loop' && step.description) {
+        // Find target step by name in description (e.g., "回到: 提交订单")
+        const targetStep = steps.find((s, idx) => idx < i && s.name.includes(step.description!.replace('回到: ', '')));
+        if (targetStep) {
+          edges.push({
+            id: `flow-edge-${edgeIdx++}`,
+            from: step.stepId,
+            to: targetStep.stepId,
+            type: 'loop',
+          });
+        }
+      }
+    }
+  }
+
+  return edges;
+}
 
 // =============================================================================
 // Types
@@ -560,6 +625,49 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
 
   // F4: Drag selection (框选) for flow tree
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // === Epic 3 F3.3: FlowEdgeLayer integration ===
+  // flowPanelRef used for both: (1) DOM measurement for FlowEdgeLayer, (2) drag selection
+  const flowPanelRef = useRef<HTMLDivElement>(null);
+  const [flowPanelSize, setFlowPanelSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    if (!flowPanelRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) {
+        setFlowPanelSize({
+          width: entry.contentRect.width,
+          height: entry.contentRect.height,
+        });
+      }
+    });
+    observer.observe(flowPanelRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  // Compute node rects from DOM positions (F3.3: FlowEdgeLayer node positioning)
+  const nodeRects = useMemo((): NodeRect[] => {
+    if (!flowPanelRef.current || flowPanelSize.width === 0) return [];
+    const containerRect = flowPanelRef.current.getBoundingClientRect();
+    const cardEls = flowPanelRef.current.querySelectorAll<HTMLElement>('[data-node-id]');
+    return Array.from(cardEls)
+      .map((el) => {
+        const rect = el.getBoundingClientRect();
+        return {
+          id: el.getAttribute('data-node-id')!,
+          x: rect.left - containerRect.left,
+          y: rect.top - containerRect.top,
+          width: FLOW_CARD_APPROX_WIDTH,
+          height: rect.height || FLOW_CARD_APPROX_HEIGHT,
+        };
+      })
+      .filter((r) => flowNodes.some((n) => n.nodeId === r.id));
+  }, [flowNodes, flowPanelSize]);
+
+  // Auto-infer flow edges from step data (F3.3)
+  const flowEdges = useMemo(() => inferFlowEdges(flowNodes), [flowNodes]);
+
   const { selectionBox } = useDragSelection({
     onSelectionChange: (nodeIds) => {
       nodeIds.forEach((id) => {
@@ -569,7 +677,7 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
       });
     },
     getNodePositions: () => {
-      const container = containerRef.current;
+      const container = flowPanelRef.current;
       if (!container) return [];
       const nodeEls = container.querySelectorAll<HTMLElement>('[data-node-id]');
       return Array.from(nodeEls).map((el) => ({
@@ -694,7 +802,15 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
   }
 
   return (
-    <div className={styles.flowTreePanel} data-testid="flow-tree" ref={containerRef} style={{ position: 'relative' }}>
+    <div className={styles.flowTreePanel} data-testid="flow-tree" ref={flowPanelRef} style={{ position: 'relative' }}>
+      {/* F3.3: FlowEdgeLayer SVG overlay — pointer-events: none, z-index: 40 */}
+      <FlowEdgeLayer
+        edges={flowEdges}
+        nodeRects={nodeRects}
+        zoom={1}
+        pan={{ x: 0, y: 0 }}
+        className="flow-edge-layer"
+      />
       {/* Header with add button */}
       <div className={styles.treeHeader}>
         {/* S1.1: 始终显示添加流程按钮（零上下文状态也支持） */}

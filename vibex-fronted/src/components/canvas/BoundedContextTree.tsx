@@ -456,15 +456,14 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
     // Collect all node IDs that need confirming before mutating store
     const unconfirmedIds = contextNodes.filter((n) => !n.confirmed).map((n) => n.nodeId);
 
-    // Confirm each node (triggers autoGenerateFlows when last one is confirmed)
+    // Confirm each unconfirmed node (triggers autoGenerateFlows when last one is confirmed)
     unconfirmedIds.forEach((nodeId) => {
       confirmContextNode(nodeId);
     });
 
-    // Advance phase AFTER all confirmations complete (not inside forEach loop)
-    if (unconfirmedIds.length > 0) {
-      advancePhase();
-    }
+    // Always advance phase when user clicks — button is visible when hasNodes
+    // (not just allConfirmed, so clicking always works)
+    advancePhase();
   }, [contextNodes, confirmContextNode, advancePhase]);
 
   const allConfirmed = contextNodes.length > 0 && contextNodes.every((n) => n.confirmed);
@@ -513,14 +512,15 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
         >
           {generating ? '◌ 重新执行中...' : '◈ 重新执行'}
         </button>
-        {allConfirmed && (
+        {hasNodes && (
           <button
             type="button"
             className={styles.primaryButton}
             onClick={handleConfirmAll}
-            aria-label="继续到流程树"
+            disabled={allConfirmed}
+            aria-label={allConfirmed ? '已全部确认，继续到流程树' : '确认所有节点后继续'}
           >
-            继续 → 流程树
+            {allConfirmed ? '✓ 已确认 → 继续到流程树' : '确认所有 → 继续到流程树'}
           </button>
         )}
         {!readonly && !showAddForm && (

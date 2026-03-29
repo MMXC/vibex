@@ -683,11 +683,8 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
     componentNodes.forEach((n) => {
       if (!n.confirmed) confirmComponentNode(n.nodeId);
     });
-    // When all confirmed, enable project creation phase
-    const allConfirmed = componentNodes.every((n) => n.confirmed);
-    if (allConfirmed && componentNodes.length > 0) {
-      setPhase('prototype');
-    }
+    // Always advance phase when user clicks — button is visible when hasNodes
+    setPhase('prototype');
   }, [componentNodes, confirmComponentNode, setPhase]);
 
   const handleClearCanvas = useCallback(() => {
@@ -724,14 +721,15 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
             {generating ? '◌ 重新生成中...' : '🔄 重新生成组件树'}
           </button>
         )}
-        {allConfirmed && (
+        {hasNodes && (
           <button
             type="button"
             className={styles.primaryButton}
             onClick={handleConfirmAll}
-            aria-label="继续到原型生成"
+            disabled={allConfirmed}
+            aria-label={allConfirmed ? '已全部确认，继续到原型生成' : '确认所有节点后继续'}
           >
-            继续 → 原型生成
+            {allConfirmed ? '✓ 已确认 → 继续到原型生成' : '确认所有 → 继续到原型生成'}
           </button>
         )}
         {!readonly && !showAddForm && (

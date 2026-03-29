@@ -36,6 +36,12 @@ async function gotoCanvas(page: import('@playwright/test').Page) {
   await page.waitForLoadState('networkidle');
 }
 
+/** Reload canvas to force Zustand to rehydrate from localStorage */
+async function reloadCanvas(page: import('@playwright/test').Page) {
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForLoadState('networkidle');
+}
+
 /**
  * Seed canvas with context nodes + bounded edges.
  * Uses Zustand persist format: { state: {...}, version: 0 }
@@ -162,7 +168,7 @@ test.describe('TC-1: 全屏展开 expand-both 模式三栏等宽', () => {
     await gotoCanvas(page);
     await page.evaluate(() => localStorage.removeItem('vibex-canvas-storage'));
     await seedCanvasWithEdges(page);
-    await gotoCanvas(page);
+    await reloadCanvas(page);
   });
 
   test('TC-1.1: 点击全屏展开按钮进入 expand-both 模式，三栏变为 1fr 1fr 1fr', async ({ page }) => {
@@ -212,7 +218,7 @@ test.describe('TC-1: 全屏展开 expand-both 模式三栏等宽', () => {
     await page.waitForTimeout(300);
 
     // Button should now show exit label
-    await expect(page.locator('button', { hasText: '退出全屏展开' }).first()).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('[aria-label="退出全屏展开"]').first()).toBeVisible({ timeout: 5000 });
   });
 
   test('TC-1.3: 再次点击退出全屏展开，恢复正常布局', async ({ page }) => {
@@ -226,7 +232,7 @@ test.describe('TC-1: 全屏展开 expand-both 模式三栏等宽', () => {
     await page.waitForTimeout(500);
 
     // Exit expand-both
-    const exitBtn = page.locator('button', { hasText: '退出全屏展开' }).first();
+    const exitBtn = page.locator('[aria-label="退出全屏展开"]').first();
     await exitBtn.click();
     await page.waitForTimeout(500);
 
@@ -250,9 +256,12 @@ test.describe('TC-1: 全屏展开 expand-both 模式三栏等宽', () => {
     const grid = page.locator('[class*="treePanelsGrid"]').first();
     await expect(grid).toBeVisible();
 
-    // All 3 panels should still be visible
-    const panels = page.locator('[class*="treePanel"]');
-    await expect(panels).toHaveCount(3);
+    // All 3 panels should still be visible inside the grid (grid has 5 children: 2 expandCols + 3 treePanels)
+    // Count direct children of grid with treePanel class
+    const treePanelCount = await grid.evaluate(el =>
+      Array.from(el.children).filter(c => typeof c.className === 'string' && c.className.includes('treePanel')).length
+    );
+    expect(treePanelCount).toBe(3);
   });
 });
 
@@ -265,7 +274,7 @@ test.describe('TC-2: SVG overlay 层 pointer-events: none 不阻挡节点交互'
     await gotoCanvas(page);
     await page.evaluate(() => localStorage.removeItem('vibex-canvas-storage'));
     await seedCanvasWithEdges(page);
-    await gotoCanvas(page);
+    await reloadCanvas(page);
   });
 
   test('TC-2.1: BoundedEdgeLayer SVG 层 pointer-events 为 none', async ({ page }) => {
@@ -346,7 +355,7 @@ test.describe('TC-2: SVG overlay 层 pointer-events: none 不阻挡节点交互'
 
         // Page should remain stable — no crash
         await expect(page.locator('body')).toBeVisible();
-        const canvasArea = page.locator('[class*="canvasArea"]').first();
+        const canvasArea = page.locator('[class*="canvasContainer"]').first();
         await expect(canvasArea).toBeVisible();
       }
     } else {
@@ -366,7 +375,7 @@ test.describe('TC-3: 关系可视化 BC 连线正确渲染', () => {
     await gotoCanvas(page);
     await page.evaluate(() => localStorage.removeItem('vibex-canvas-storage'));
     await seedCanvasWithEdges(page);
-    await gotoCanvas(page);
+    await reloadCanvas(page);
   });
 
   test('TC-3.1: 有 boundedEdges 时 SVG edge layer 渲染 path 元素', async ({ page }) => {
@@ -407,13 +416,14 @@ test.describe('TC-3: 关系可视化 BC 连线正确渲染', () => {
       const path = edgePaths.nth(i);
       const stroke = await path.getAttribute('stroke');
       if (stroke) {
-        // Check if stroke is one of the expected colors (or rgba equivalent)
+        // Skip currentColor (used for ReactFlow handles, not BoundedEdges)
+        if (stroke === 'currentColor') continue;
+        // Check if stroke is one of the expected colors (or rgb/rgba equivalent)
         const isExpectedColor =
           expectedColors.includes(stroke.toLowerCase()) ||
           expectedColors.some((c) => stroke.includes(c.replace('#', '')));
-        // Also accept rgba() format
-        const isRgba = stroke.startsWith('rgba');
-        expect(isExpectedColor || isRgba).toBe(true);
+        const isRgbFormat = stroke.startsWith('rgb');
+        expect(isExpectedColor || isRgbFormat).toBe(true);
       }
     }
   });
@@ -455,14 +465,14 @@ test.describe('TC-4: 全屏 maximize 模式工具栏隐藏', () => {
     await gotoCanvas(page);
     await page.evaluate(() => localStorage.removeItem('vibex-canvas-storage'));
     await seedCanvasWithEdges(page);
-    await gotoCanvas(page);
+    await reloadCanvas(page);
   });
 
   test('TC-4.1: 点击最大化按钮进入 maximize 模式', async ({ page }) => {
     await gotoCanvas(page);
 
     // Find maximize button (visible in context phase)
-    const maximizeBtn = page.locator('button', { hasText: '最大化' }).first();
+    const maximizeBtn = page.locator('[aria-label="最大化"]').first();
     await expect(maximizeBtn).toBeVisible({ timeout: 20000 });
 
     // Click maximize
@@ -478,7 +488,7 @@ test.describe('TC-4: 全屏 maximize 模式工具栏隐藏', () => {
     await gotoCanvas(page);
 
     // First enter maximize mode
-    const maximizeBtn = page.locator('button', { hasText: '最大化' }).first();
+    const maximizeBtn = page.locator('[aria-label="最大化"]').first();
     await expect(maximizeBtn).toBeVisible({ timeout: 20000 });
     await maximizeBtn.click();
     await page.waitForTimeout(500);
@@ -505,25 +515,25 @@ test.describe('TC-4: 全屏 maximize 模式工具栏隐藏', () => {
   test('TC-4.3: maximize 模式下按钮变为「退出最大化」', async ({ page }) => {
     await gotoCanvas(page);
 
-    const maximizeBtn = page.locator('button', { hasText: '最大化' }).first();
+    const maximizeBtn = page.locator('[aria-label="最大化"]').first();
     await expect(maximizeBtn).toBeVisible({ timeout: 20000 });
     await maximizeBtn.click();
     await page.waitForTimeout(300);
 
     // Button should now show exit label
-    await expect(page.locator('button', { hasText: '退出最大化' }).first()).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('[aria-label="退出最大化"]').first()).toBeVisible({ timeout: 5000 });
   });
 
   test('TC-4.4: 再次点击退出最大化恢复正常布局', async ({ page }) => {
     await gotoCanvas(page);
 
-    const maximizeBtn = page.locator('button', { hasText: '最大化' }).first();
+    const maximizeBtn = page.locator('[aria-label="最大化"]').first();
     await expect(maximizeBtn).toBeVisible({ timeout: 20000 });
     await maximizeBtn.click();
     await page.waitForTimeout(300);
 
     // Exit maximize
-    const exitBtn = page.locator('button', { hasText: '退出最大化' }).first();
+    const exitBtn = page.locator('[aria-label="退出最大化"]').first();
     await exitBtn.click();
     await page.waitForTimeout(300);
 
@@ -532,7 +542,7 @@ test.describe('TC-4: 全屏 maximize 模式工具栏隐藏', () => {
     await expect(canvasContainer).not.toHaveClass(/maximizeMode/);
 
     // Button should be back
-    await expect(page.locator('button', { hasText: '最大化' }).first()).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('[aria-label="最大化"]').first()).toBeVisible({ timeout: 5000 });
   });
 
   test('TC-4.5: maximize 模式下 expand 按钮被隐藏（expandMode !== maximize 时显示）', async ({ page }) => {
@@ -543,7 +553,7 @@ test.describe('TC-4: 全屏 maximize 模式工具栏隐藏', () => {
     await expect(expandBtn).toBeVisible({ timeout: 20000 });
 
     // Enter maximize
-    const maximizeBtn = page.locator('button', { hasText: '最大化' }).first();
+    const maximizeBtn = page.locator('[aria-label="最大化"]').first();
     await maximizeBtn.click();
     await page.waitForTimeout(300);
 
@@ -561,14 +571,14 @@ test.describe('TC-5: ESC 快捷键退出全屏', () => {
     await gotoCanvas(page);
     await page.evaluate(() => localStorage.removeItem('vibex-canvas-storage'));
     await seedCanvasWithEdges(page);
-    await gotoCanvas(page);
+    await reloadCanvas(page);
   });
 
   test('TC-5.1: maximize 模式下按 ESC 退出全屏', async ({ page }) => {
     await gotoCanvas(page);
 
     // Enter maximize mode via button
-    const maximizeBtn = page.locator('button', { hasText: '最大化' }).first();
+    const maximizeBtn = page.locator('[aria-label="最大化"]').first();
     await expect(maximizeBtn).toBeVisible({ timeout: 20000 });
     await maximizeBtn.click();
     await page.waitForTimeout(300);
@@ -585,7 +595,7 @@ test.describe('TC-5: ESC 快捷键退出全屏', () => {
     await expect(canvasContainer).not.toHaveClass(/maximizeMode/);
 
     // Button should be back to maximize
-    await expect(page.locator('button', { hasText: '最大化' }).first()).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('[aria-label="最大化"]').first()).toBeVisible({ timeout: 5000 });
   });
 
   test('TC-5.2: normal 模式下按 ESC 无效果', async ({ page }) => {
@@ -635,7 +645,7 @@ test.describe('TC-6: F11 快捷键切换最大化模式', () => {
     await gotoCanvas(page);
     await page.evaluate(() => localStorage.removeItem('vibex-canvas-storage'));
     await seedCanvasWithEdges(page);
-    await gotoCanvas(page);
+    await reloadCanvas(page);
   });
 
   test('TC-6.1: 按 F11 进入 maximize 模式', async ({ page }) => {
@@ -700,7 +710,7 @@ test.describe('TC-7: 全链路回归测试', () => {
     await gotoCanvas(page);
     await page.evaluate(() => localStorage.removeItem('vibex-canvas-storage'));
     await seedCanvasWithEdges(page);
-    await gotoCanvas(page);
+    await reloadCanvas(page);
   });
 
   test('TC-7.1: 页面加载无 JS 错误', async ({ page }) => {
@@ -739,7 +749,7 @@ test.describe('TC-7: 全链路回归测试', () => {
     await expect(canvasContainer).toHaveClass(/expandBothMode/);
 
     // Enter maximize — should replace expand-both
-    const maximizeBtn = page.locator('button', { hasText: '最大化' }).first();
+    const maximizeBtn = page.locator('[aria-label="最大化"]').first();
     await maximizeBtn.click();
     await page.waitForTimeout(300);
 

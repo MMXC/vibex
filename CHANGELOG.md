@@ -1,3 +1,13 @@
+### Fixed (vibex-next-roadmap-ph1 Epic2: maximize全屏模式) — 2026-03-30
+- **F2.1**: maximize/expand-both 模式隐藏 expandCol 按钮列，布局更简洁
+- **F2.2**: 优化全屏/最大化按钮样式，新增 F11 快捷键切换全屏、Escape 退出全屏
+- **F2.3**: maximize 模式自动隐藏 ProjectBar/Toolbar，页面边距设为0，最大化可视区域
+- **状态管理**: canvasStore 新增 expandMode 状态（normal/expand-both/maximize）
+- **CSS**: `.maximizeMode` / `.expandControls` 样式实现全屏布局适配
+- **测试**: 上游 tester 验证所有功能测试通过
+- **提交**: `1e2de370`, `4dde9ee4`
+- **审查**: ✅ PASSED (reviewer-epic2-maximize全屏模式)
+
 ### Fixed (vibex-next-roadmap-ph1 Epic1: expandBoth布局切换) — 2026-03-29
 - **F1.1**: expandMode state (normal/expand-both/maximize) — canvasStore 新增 expandMode
 - **F1.2**: maximize 模式隐藏 ProjectBar/Toolbar，padding→0

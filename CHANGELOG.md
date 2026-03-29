@@ -1,3 +1,20 @@
+### Fixed (ComponentTree Epic1: 分组逻辑 + page-label fallback) — 2026-03-30
+- **vibex-component-tree-grouping Epic1** — 分组逻辑多维判断
+  - `inferIsCommon()` 增加 `COMMON_COMPONENT_TYPES` (25种通用组件类型)
+  - 多维判断：flowId 为通用标识 OR 组件类型为通用类型 → 通用组件
+  - 变更: `ComponentTree.tsx` — `inferIsCommon()` + `COMMON_COMPONENT_TYPES`
+  - 测试: 25/25 ComponentTree tests PASS
+  - 提交: `a283223c`
+- **vibex-component-tree-page-classification Epic1** — flowId 页面名称填充
+  - `getPageLabel()` 增加4层 fallback 匹配链:
+    1. 精确匹配 nodeId → 📄 name
+    2. Prefix匹配 → 📄 name
+    3. 名称模糊匹配（忽略空格/中划线/下划线）→ 📄 name
+    4. 兜底 → ❓ flowId前缀
+  - 变更: `ComponentTree.tsx` — `getPageLabel()` 4层fallback
+  - 提交: `a283223c`
+- **审查**: ✅ PASSED (reviewer-epic1:分组逻辑 + reviewer-epic1:flowid填充)
+
 ### Fixed (vibex-bc-canvas-edge-render Epic1: 锚点算法修复) — 2026-03-30
 - **问题**: BC 树连线全部重叠在一条垂直线上（所有连线从 bottom 锚点出发）
 - **根因**: `bestAnchor()` 阈值 `absDx >= absDy` 过于严格，导致水平锚点几乎不被选中

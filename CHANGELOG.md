@@ -1,3 +1,15 @@
+### Fixed (vibex-canvas-continu B2 Phase2 CanvasIntegration) — 2026-03-29
+- **B1 fix**: `disabled={allConfirmed}` → `disabled={false}` — 确认按钮始终可点击
+  - `BoundedContextTree`: 全部确认后按钮不再禁用，仍可重新确认并推进阶段
+  - `ComponentTree`: 同上
+  - **修复**: 点击"已全部确认，继续到流程树"无反应的问题
+- **B2.1 integration**: `OverlapHighlightLayer` 集成到 `CardTreeRenderer`
+  - 在 `BoundedGroupOverlay` 之后渲染 (z-index 20 > 10)
+  - 可视化 bounded groups 之间的交集区域
+- **测试**: 237 suites / 3005 tests passed
+- **提交**: `0b1d1300`
+- **审查**: ✅ PASSED (reviewer-b2-phase2canvasintegration)
+
 ### Fixed (B1 handleConfirmAll 修复审查) — 2026-03-29
 - **B1**: handleConfirmAll P0 Bug 修复 — `f090919e`
   - `BoundedContextTree`: 按钮条件从 `{allConfirmed}` 改为 `{hasNodes}`

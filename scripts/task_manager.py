@@ -88,6 +88,122 @@ LEGACY_TASKS_DIR = "/root/.openclaw/workspace-coord/team-tasks"
 TASKS_DIR = os.environ.get("TEAM_TASKS_DIR", TEAM_TASKS_DIR_DEFAULT)
 
 
+# ── Slack 通知配置 ───────────────────────────────────────────────────────────
+import urllib.request
+
+SLACK_API = "https://slack.com/api/chat.postMessage"
+
+AGENT_CHANNEL = {
+    "coord":     "C0AP3CPJL8N",
+    "analyst":   "C0ANZ3J40LT",
+    "pm":        "C0APZP2JX2L",
+    "architect": "C0AP93CLPQU",
+    "reviewer":  "C0AP937RXEY",
+    "tester":    "C0APJCNTKPB",
+    "dev":       "C0AP92ZGC68",
+}
+
+AGENT_TOKEN = {
+    "coord":     os.getenv("SLACK_TOKEN_coord"),
+    "analyst":   os.getenv("SLACK_TOKEN_analyst"),
+    "pm":        os.getenv("SLACK_TOKEN_pm"),
+    "architect": os.getenv("SLACK_TOKEN_architect"),
+    "reviewer":  os.getenv("SLACK_TOKEN_reviewer"),
+    "tester":    os.getenv("SLACK_TOKEN_tester"),
+    "dev":       os.getenv("SLACK_TOKEN_dev"),
+}
+
+
+def _curl_slack(channel_id: str, user_token: str, text: str) -> bool:
+    """发送 Slack 消息，返回是否成功。curl 失败不阻塞主流程。"""
+    if not user_token:
+        return False
+    payload = json.dumps({"channel": channel_id, "text": text, "mrkdwn": True}).encode()
+    req = urllib.request.Request(
+        SLACK_API,
+        data=payload,
+        headers={
+            "Authorization": f"Bearer {user_token}",
+            "Content-Type": "application/json",
+        },
+        method="POST"
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            result = json.loads(resp.read())
+            return result.get("ok", False)
+    except Exception as e:
+        print(f"⚠️  Slack 通知失败: {e}", file=sys.stderr)
+        return False
+
+
+def notify_new_task(project: str, stage_id: str, agent: str, goal: str):
+    """通知新任务 READY"""
+    text = (
+        f"*📋 新任务 READY*\n"
+        f"*项目*: `{project}`\n"
+        f"*任务*: `{stage_id}`\n"
+        f"*目标*: {goal}\n\n"
+        f"请领取: `python3 task_manager.py claim {project} {stage_id}`"
+    )
+    ch = AGENT_CHANNEL.get(agent)
+    tok = AGENT_TOKEN.get(agent)
+    if ch and tok:
+        _curl_slack(ch, tok, text)
+    elif not tok:
+        print(f"⚠️  未配置 SLACK_TOKEN_{agent}，跳过通知", file=sys.stderr)
+
+
+def notify_stage_done(project: str, stage_id: str,
+                     next_stage: str, next_agent: str, goal: str):
+    """通知下一环节任务完成"""
+    text = (
+        f"*✅ 任务完成*\n"
+        f"*项目*: `{project}` / `{stage_id}`\n"
+        f"*🎯 轮到你了*: `{next_stage}`\n"
+        f"*目标*: {goal}\n\n"
+        f"请领取: `python3 task_manager.py claim {project} {next_stage}`"
+    )
+    ch = AGENT_CHANNEL.get(next_agent)
+    tok = AGENT_TOKEN.get(next_agent)
+    if ch and tok:
+        _curl_slack(ch, tok, text)
+    elif not tok:
+        print(f"⚠️  未配置 SLACK_TOKEN_{next_agent}，跳过通知", file=sys.stderr)
+
+
+def notify_stage_rejected(project: str, stage_id: str,
+                         agent: str, reason: str):
+    """通知任务被驳回"""
+    text = (
+        f"*⚠️ 任务被驳回*\n"
+        f"*项目*: `{project}` / `{stage_id}`\n"
+        f"*📋 原因*: {reason}\n\n"
+        f"请重新处理后再次提交。"
+    )
+    ch = AGENT_CHANNEL.get(agent)
+    tok = AGENT_TOKEN.get(agent)
+    if ch and tok:
+        _curl_slack(ch, tok, text)
+    elif not tok:
+        print(f"⚠️  未配置 SLACK_TOKEN_{agent}，跳过通知", file=sys.stderr)
+
+
+def _get_downstream(project: str, stage_id: str) -> tuple[str, str] | None:
+    """从 tasks.json DAG 中查找下游 stage 和 agent"""
+    tasks_file = task_file(project)
+    if not os.path.exists(tasks_file):
+        return None
+    with open(tasks_file) as f:
+        tasks = json.load(f)
+    stages = tasks.get("stages", {})
+    for tid, stg in stages.items():
+        depends = stg.get("dependsOn", [])
+        if stage_id in depends:
+            return (tid, stg.get("agent", ""))
+    return None
+
+
 def _input_with_timeout(prompt: str = "", timeout: int = 10) -> str:
     """带超时的 input() 包装，防止脚本挂起。
 
@@ -619,6 +735,9 @@ def cmd_phase1(args):
     print("🎯 下一步调用示例：")
     print(f"   ./task_manager.py phase2 {project} --epics \"Epic1,Epic2\" --docs-subdir {docs_subdir} --work-dir {work_dir}")
 
+    # Epic 2.1: 通知首个执行者 (analyze-requirements → analyst)
+    notify_new_task(project, "analyze-requirements", "analyst", goal)
+
 
 # ── cmd_phase2 ─────────────────────────────────────────────────────
 
@@ -951,6 +1070,15 @@ git -C {work_dir} fetch && git -C {work_dir} log origin/main -1
             deps_info = f" (等待: {', '.join(deps)})"
         print(f"   coord-decision → dev-{epic_id}{deps_info} → tester-{epic_id} → reviewer-{epic_id} → reviewer-push-{epic_id}")
     print(f"   → coord-completed（统一收口）")
+
+    # Epic 2.2: 通知首个 dev Epic
+    first_epic = epics[0]
+    first_epic_id = first_epic.lower().replace(" ", "-").replace("_", "-")
+    first_dev_stage = f"dev-{first_epic_id}"
+    # Load fresh data to get goal
+    data = load_project(project)
+    goal = data.get("goal", "")
+    notify_new_task(project, first_dev_stage, "dev", goal)
 
 
 # ── cmd_add ────────────────────────────────────────────────────────
@@ -1291,6 +1419,13 @@ def cmd_update(args):
             elif data["status"] == "completed":
                 print("🎉 All tasks completed!")
 
+            # Epic 2.3: 通知下一环节 agent
+            downstream = _get_downstream(args.project, stage_id)
+            if downstream:
+                next_stage_id, next_agent = downstream
+                goal = data.get("goal", "")
+                notify_stage_done(args.project, stage_id, next_stage_id, next_agent, goal)
+
             # Auto-append to MEMORY.md if --log-analysis was provided.
             if args.log_analysis and HAS_LOG_ANALYSIS:
                 append_to_memory(
@@ -1299,6 +1434,11 @@ def cmd_update(args):
                     summary=args.log_analysis,
                     workspace=os.environ.get("WORKSPACE", "/root/.openclaw"),
                 )
+        elif new_status == "pending":
+            # Epic 2.3: 通知任务被驳回
+            agent = data["stages"][stage_id].get("agent", "")
+            reason = getattr(args, "result", None) or "未说明"
+            notify_stage_rejected(args.project, stage_id, agent, reason)
     else:
         data["updated"] = now_iso()
         # F3.1: use optimistic lock

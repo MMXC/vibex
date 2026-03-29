@@ -244,7 +244,7 @@ class ResourceMonitor:
         """获取运行中的任务数"""
         try:
             # 从 team-tasks 目录获取
-            tasks_dir = os.environ.get("TEAM_TASKS_DIR", "/home/ubuntu/clawd/data/team-tasks")
+            tasks_dir = os.environ.get("TEAM_TASKS_DIR", "/root/.openclaw/workspace-coord/team-tasks")
             if os.path.exists(tasks_dir):
                 count = 0
                 for f in os.listdir(tasks_dir):

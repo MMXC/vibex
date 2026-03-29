@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Set
 
 # 配置
-TEAM_TASKS_DIR = os.environ.get("TEAM_TASKS_DIR", "/home/ubuntu/clawd/data/team-tasks")
+TEAM_TASKS_DIR = os.environ.get("TEAM_TASKS_DIR", "/root/.openclaw/workspace-coord/team-tasks")
 LOCK_DIR = os.environ.get("LOCK_DIR", "/var/run/task-lock")
 MAX_PARALLEL = int(os.environ.get("MAX_PARALLEL", "4"))
 MAX_DEV_PARALLEL = int(os.environ.get("MAX_DEV_PARALLEL", "3"))

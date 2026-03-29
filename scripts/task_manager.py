@@ -84,7 +84,7 @@ else:
     clean_cooldown = None
 
 TEAM_TASKS_DIR_DEFAULT = "/root/.openclaw/workspace-coord/team-tasks"
-LEGACY_TASKS_DIR = "/home/ubuntu/clawd/data/team-tasks"
+LEGACY_TASKS_DIR = "/root/.openclaw/workspace-coord/team-tasks"
 TASKS_DIR = os.environ.get("TEAM_TASKS_DIR", TEAM_TASKS_DIR_DEFAULT)
 
 

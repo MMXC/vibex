@@ -275,7 +275,7 @@ def load_existing_projects(workspace: Optional[str] = None) -> list[dict]:
         base_dir = pathlib.Path(
             os.environ.get(
                 "TEAM_TASKS_DIR",
-                "/home/ubuntu/clawd/data/team-tasks"
+                "/root/.openclaw/workspace-coord/team-tasks"
             )
         )
     

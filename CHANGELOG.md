@@ -1,3 +1,10 @@
+### Fixed (vibex-taskmanager-fix: 路径迁移 — team-tasks 目录重定向) — 2026-03-29
+- 修复4个遗留文件中的旧路径 `/home/ubuntu/clawd/data/team-tasks` → `/root/.openclaw/workspace-coord/team-tasks`
+  - `scripts/dedup/dedup.py`
+  - `scripts/task_manager.py`
+  - `vibex-fronted/src/scheduler/task_scheduler.py`
+  - `vibex-fronted/src/monitor/resource_monitor.py`
+
 ### Added (vibex-canvas-feature-gap Epic4: 多选交互 — 框选 + Ctrl/Cmd 多选) — 2026-03-29
 - **Epic4**: 多选交互能力补全（框选拖拽、Ctrl/Cmd+点击、批量操作）
   - **E4-F4** (`useDragSelection.ts`): 框选（Drag-to-Select）Hook

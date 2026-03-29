@@ -117,15 +117,15 @@ export interface BoundedContextGraphProps {
 }
 
 export default function BoundedContextGraph({
-  contexts,
-  relationships,
+  contexts = [],
+  relationships = [],
   onContextsChange,
   onRelationshipsChange,
   readOnly = false,
 }: BoundedContextGraphProps) {
-  // Convert contexts to nodes
+  // Convert contexts to nodes with null protection
   const initialNodes: Node<BoundedContextNodeData>[] = useMemo(() => {
-    return contexts.map((ctx, index) => ({
+    return (contexts ?? []).map((ctx, index) => ({
       id: ctx.id,
       type: 'context',
       position: {
@@ -140,9 +140,9 @@ export default function BoundedContextGraph({
     }));
   }, [contexts]);
 
-  // Convert relationships to edges
+  // Convert relationships to edges with null protection
   const initialEdges: Edge[] = useMemo(() => {
-    return relationships.map((rel) => ({
+    return (relationships ?? []).map((rel) => ({
       id: rel.id,
       source: rel.fromContextId,
       target: rel.toContextId,
@@ -227,10 +227,10 @@ export default function BoundedContextGraph({
           style={{ background: '#1e1e2e', borderRadius: '8px' }}
           nodeColor={(node) => {
             const type = node.data?.type as keyof typeof contextTypeStyles;
-            return contextTypeStyles[type]?.background || '#a78bfa';
+            return contextTypeStyles[type]?.background ?? '#a78bfa';
           }}
         />
-        {contexts.length === 0 && (
+        {(contexts ?? []).length === 0 && (
           <Panel position="top-center">
             <div style={{ color: 'rgba(255,255,255,0.5)', padding: '20px' }}>
               暂无限界上下文，请先输入需求

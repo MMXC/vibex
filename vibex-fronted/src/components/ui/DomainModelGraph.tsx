@@ -44,8 +44,9 @@ function DomainModelNode({
   data: DomainModelNodeData;
   selected: boolean;
 }) {
-  const style = typeStyles[data.type] || typeStyles.entity;
-  const hasMethods = data.methods && data.methods.length > 0;
+  const safeData = data ?? { label: '', type: 'entity' as const, properties: [], methods: [] };
+  const style = typeStyles[safeData.type] ?? typeStyles.entity;
+  const hasMethods = safeData.methods && safeData.methods.length > 0;
 
   return (
     <div
@@ -71,7 +72,7 @@ function DomainModelNode({
         }}
       >
         <span style={{ fontWeight: 600, fontSize: '13px', color: '#1a1a2e' }}>
-          {data.label}
+          {safeData.label}
         </span>
         <span
           style={{
@@ -93,7 +94,7 @@ function DomainModelNode({
           borderBottom: hasMethods ? '1px solid rgba(255,255,255,0.1)' : 'none',
         }}
       >
-        {data.properties?.map((prop, idx) => (
+        {(safeData.properties ?? []).map((prop, idx) => (
           <div
             key={idx}
             style={{
@@ -117,7 +118,7 @@ function DomainModelNode({
       {/* Methods */}
       {hasMethods && (
         <div style={{ padding: '8px 12px' }}>
-          {data.methods.map((method, idx) => (
+          {(safeData.methods ?? []).map((method, idx) => (
             <div
               key={idx}
               style={{
@@ -173,8 +174,12 @@ export default function DomainModelGraph({
   onModelsChange,
   readOnly = false,
 }: DomainModelGraphProps) {
+  // Add null protection for inputs
+  const safeModels = models ?? [];
+  const safeRelationships = relationships ?? [];
+  
   const initialNodes: Node[] = useMemo(() => {
-    return models.map((model, index) => ({
+    return safeModels.map((model, index) => ({
       id: model.id,
       type: 'domainModel',
       position: {
@@ -188,7 +193,7 @@ export default function DomainModelGraph({
         methods: model.methods || [],
       },
     }));
-  }, [models]);
+  }, [safeModels]);
 
   const relationshipStyles = {
     association: { stroke: '#60a5fa', label: '关联' },
@@ -198,7 +203,7 @@ export default function DomainModelGraph({
   };
 
   const initialEdges: Edge[] = useMemo(() => {
-    return relationships.map((rel) => {
+    return safeRelationships.map((rel) => {
       const style =
         relationshipStyles[rel.type] || relationshipStyles.association;
       return {
@@ -217,7 +222,7 @@ export default function DomainModelGraph({
         },
       };
     });
-  }, [relationships]);
+  }, [safeRelationships]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -297,7 +302,7 @@ export default function DomainModelGraph({
             return typeStyles[type]?.background || '#60a5fa';
           }}
         />
-        {models.length === 0 && (
+        {safeModels.length === 0 && (
           <Panel position="top-center">
             <div style={{ color: 'rgba(255,255,255,0.5)', padding: '20px' }}>
               暂无领域模型，请先确认限界上下文

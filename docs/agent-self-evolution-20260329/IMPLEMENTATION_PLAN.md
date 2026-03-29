@@ -11,30 +11,22 @@
 **负责人**: Dev
 **工时**: 0.5h
 **依赖**: 无
-**状态**: ✅ 完成 (2026-03-29)
 
-### 调查结果
+### 任务步骤
 
-| URL | Status | 说明 |
-|-----|--------|------|
-| https://vibex-app.pages.dev/canvas/ | ✅ 200 | Cloudflare Pages — 画布功能完整可用 |
-| https://vibex.top/canvas/ | ❌ 404 | Vercel — 部署过期，无 Vercel CLI 无法触发 redeploy |
-
-### 根因
-- 静态导出配置正确 (`output: 'export'`)
-- `out/canvas/` 构建产物存在且正确
-- Vercel 部署是旧版本，不包含 `app/canvas/page.tsx`
-- 无 Vercel CLI / 无 deployment token
-
-### 产出物
-- 截图证据: `/tmp/canvas-working-20260329.png` (Cloudflare 正常), `/tmp/vercel-404-20260329.png` (Vercel 404)
-- 根因分析: `docs/agent-self-evolution-20260329/screenshots/canvas-404-verification.md`
-- 建议: 手动 redeploy Vercel 或将 Cloudflare Pages 设为生产域名
+1. 用 gstack 验证 `/canvas` 生产环境状态
+2. 检查 Next.js 路由配置 (`app/canvas/` 或 `pages/canvas.tsx`)
+3. 检查 `vercel.json` / `next.config.js` 路由规则
+4. 若配置缺失，补充路由并触发 redeploy
+5. 用 gstack browse 截图验证修复
 
 ### 验收标准
-- [x] `gstack browse https://vibex-app.pages.dev/canvas` 返回 200
-- [x] 截图包含三树面板元素（限界上下文树/业务流程树/组件树）
-- [x] 无代码修复需求（构建输出正确，需手动触发部署）
+- `gstack browse https://[domain]/canvas` 返回 200
+- 截图包含画布元素（非 404 错误页）
+
+### 产出物
+- PR 或 Vercel deployment 记录
+- gstack 截图证据
 
 ---
 

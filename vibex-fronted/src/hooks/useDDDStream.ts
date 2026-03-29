@@ -97,11 +97,11 @@ export function useDDDStream(): UseDDDStreamReturn {
       return streamBoundedContexts(
         requirementText,
         {
-          onThinking: (data) => setThinkingMessages(prev => [...prev, data]),
-          onContext: (data) => setContexts(prev => [...prev, data]),
+          onThinking: (data) => setThinkingMessages(prev => [...(prev ?? []), data]),
+          onContext: (data) => setContexts(prev => [...(prev ?? []), data]),
           onDone: (data) => {
-            setContexts(data.boundedContexts);
-            setMermaidCode(data.mermaidCode);
+            setContexts(data?.boundedContexts ?? []);
+            setMermaidCode(data?.mermaidCode ?? '');
           },
           onError: (message) => setErrorMessage(message),
         },
@@ -140,6 +140,7 @@ export function useDDDStream(): UseDDDStreamReturn {
     cleanup();
     setThinkingMessages([]);
     setContexts([]);
+    setMermaidCode('');
   }, [mutation, cleanup]);
   
   // Cleanup on unmount
@@ -232,14 +233,14 @@ export function useDomainModelStream(): UseDomainModelStreamReturn {
         requirementText,
         boundedContexts,
         {
-          onThinking: (data) => setThinkingMessages(prev => [...prev, data]),
+          onThinking: (data) => setThinkingMessages(prev => [...(prev ?? []), data]),
           onDone: (data) => {
             if (timeoutRef.current) {
               clearTimeout(timeoutRef.current);
               timeoutRef.current = null;
             }
-            setDomainModels(data.domainModels);
-            setMermaidCode(data.mermaidCode);
+            setDomainModels(data?.domainModels ?? []);
+            setMermaidCode(data?.mermaidCode ?? '');
           },
           onError: (message) => {
             if (timeoutRef.current) {
@@ -359,10 +360,10 @@ export function useBusinessFlowStream(): UseBusinessFlowStreamReturn {
         domainModels,
         requirementText,
         {
-          onThinking: (data) => setThinkingMessages(prev => [...prev, data]),
+          onThinking: (data) => setThinkingMessages(prev => [...(prev ?? []), data]),
           onDone: (data) => {
-            setBusinessFlow(data.businessFlow);
-            setMermaidCode(data.mermaidCode);
+            setBusinessFlow(data?.businessFlow ?? null);
+            setMermaidCode(data?.mermaidCode ?? '');
           },
           onError: (message) => setErrorMessage(message),
         },

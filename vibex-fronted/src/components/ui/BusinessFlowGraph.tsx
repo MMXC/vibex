@@ -52,13 +52,14 @@ function StateNode({
   data: BusinessFlowNodeData;
   selected: boolean;
 }) {
-  const style = stateTypeStyles[data.stateType] || stateTypeStyles.intermediate;
+  const safeData = data ?? { label: '', stateType: 'intermediate' as const };
+  const style = stateTypeStyles[safeData.stateType] ?? stateTypeStyles.intermediate;
 
   return (
     <div
       style={{
         padding: '16px 24px',
-        borderRadius: data.stateType === 'final' ? '50%' : '12px',
+        borderRadius: safeData.stateType === 'final' ? '50%' : '12px',
         background: style.background,
         border: `3px solid ${selected ? '#fff' : style.border}`,
         color: '#1a1a2e',
@@ -72,10 +73,10 @@ function StateNode({
       }}
     >
       <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '4px' }}>
-        {data.label}
+        {safeData.label}
       </div>
-      {data.description && (
-        <div style={{ fontSize: '11px', opacity: 0.8 }}>{data.description}</div>
+      {safeData.description && (
+        <div style={{ fontSize: '11px', opacity: 0.8 }}>{safeData.description}</div>
       )}
       <div
         style={{
@@ -110,18 +111,22 @@ export interface BusinessFlowGraphProps {
 }
 
 export default function BusinessFlowGraph({
-  states,
-  transitions,
+  states = [],
+  transitions = [],
   onStatesChange,
   onTransitionsChange,
   readOnly = false,
 }: BusinessFlowGraphProps) {
+  // Add null protection for inputs
+  const safeStates = states ?? [];
+  const safeTransitions = transitions ?? [];
+  
   // Layout states in a horizontal or vertical flow
   const initialNodes: Node[] = useMemo(() => {
     // Group by flow position
-    const initialStates = states.filter((s) => s.type === 'initial');
-    const intermediateStates = states.filter((s) => s.type === 'intermediate');
-    const finalStates = states.filter((s) => s.type === 'final');
+    const initialStates = safeStates.filter((s) => s.type === 'initial');
+    const intermediateStates = safeStates.filter((s) => s.type === 'intermediate');
+    const finalStates = safeStates.filter((s) => s.type === 'final');
 
     const nodes: Node[] = [];
     let yOffset = 0;
@@ -171,10 +176,10 @@ export default function BusinessFlowGraph({
     });
 
     return nodes;
-  }, [states]);
+  }, [safeStates]);
 
   const initialEdges: Edge[] = useMemo(() => {
-    return transitions.map((trans) => ({
+    return safeTransitions.map((trans) => ({
       id: trans.id,
       source: trans.fromStateId,
       target: trans.toStateId,
@@ -189,7 +194,7 @@ export default function BusinessFlowGraph({
         color: '#a78bfa',
       },
     }));
-  }, [transitions]);
+  }, [safeTransitions]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -256,7 +261,7 @@ export default function BusinessFlowGraph({
             return stateTypeStyles[type]?.background || '#60a5fa';
           }}
         />
-        {states.length === 0 && (
+        {safeStates.length === 0 && (
           <Panel position="top-center">
             <div style={{ color: 'rgba(255,255,255,0.5)', padding: '20px' }}>
               暂无流程状态，请先生成业务流程

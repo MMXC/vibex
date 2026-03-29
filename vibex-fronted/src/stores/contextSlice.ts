@@ -58,25 +58,25 @@ export const useContextStore = create<ContextState>()(
       selectedContextIds: [],
       isContextPanelOpen: true,
       
-      // Actions
-      setBoundedContexts: (contexts) => set({ boundedContexts: contexts }),
+      // Actions with null protection
+      setBoundedContexts: (contexts) => set({ boundedContexts: contexts ?? [] }),
       
       addBoundedContext: (context) => 
         set((state) => ({ 
-          boundedContexts: [...state.boundedContexts, context] 
+          boundedContexts: [...(state.boundedContexts ?? []), context] 
         })),
       
       updateBoundedContext: (id, updates) =>
         set((state) => ({
-          boundedContexts: state.boundedContexts.map((ctx) =>
+          boundedContexts: (state.boundedContexts ?? []).map((ctx) =>
             ctx.id === id ? { ...ctx, ...updates } : ctx
           ),
         })),
       
       removeBoundedContext: (id) =>
         set((state) => ({
-          boundedContexts: state.boundedContexts.filter((ctx) => ctx.id !== id),
-          selectedContextIds: state.selectedContextIds.filter((ctxId) => ctxId !== id),
+          boundedContexts: (state.boundedContexts ?? []).filter((ctx) => ctx.id !== id),
+          selectedContextIds: (state.selectedContextIds ?? []).filter((ctxId) => ctxId !== id),
         })),
       
       clearBoundedContexts: () => set({ 
@@ -89,21 +89,21 @@ export const useContextStore = create<ContextState>()(
       
       selectContext: (id) =>
         set((state) => ({
-          selectedContextIds: state.selectedContextIds.includes(id)
+          selectedContextIds: (state.selectedContextIds ?? []).includes(id)
             ? state.selectedContextIds
-            : [...state.selectedContextIds, id],
+            : [...(state.selectedContextIds ?? []), id],
         })),
       
       deselectContext: (id) =>
         set((state) => ({
-          selectedContextIds: state.selectedContextIds.filter((ctxId) => ctxId !== id),
+          selectedContextIds: (state.selectedContextIds ?? []).filter((ctxId) => ctxId !== id),
         })),
       
       toggleContextSelection: (id) =>
         set((state) => ({
-          selectedContextIds: state.selectedContextIds.includes(id)
-            ? state.selectedContextIds.filter((ctxId) => ctxId !== id)
-            : [...state.selectedContextIds, id],
+          selectedContextIds: (state.selectedContextIds ?? []).includes(id)
+            ? (state.selectedContextIds ?? []).filter((ctxId) => ctxId !== id)
+            : [...(state.selectedContextIds ?? []), id],
         })),
       
       clearSelection: () => set({ selectedContextIds: [] }),
@@ -125,18 +125,18 @@ export const useContextStore = create<ContextState>()(
   )
 );
 
-// ==================== Selectors ====================
+// ==================== Selectors with null protection ====================
 
-export const selectBoundedContexts = (state: ContextState) => state.boundedContexts;
+export const selectBoundedContexts = (state: ContextState) => state.boundedContexts ?? [];
 export const selectSelectedContexts = (state: ContextState) => 
-  state.boundedContexts.filter(ctx => state.selectedContextIds.includes(ctx.id));
+  (state.boundedContexts ?? []).filter(ctx => (state.selectedContextIds ?? []).includes(ctx.id));
 export const selectCoreContexts = (state: ContextState) => 
-  state.boundedContexts.filter(ctx => ctx.type === 'core');
+  (state.boundedContexts ?? []).filter(ctx => ctx.type === 'core');
 export const selectSupportingContexts = (state: ContextState) => 
-  state.boundedContexts.filter(ctx => ctx.type === 'supporting');
+  (state.boundedContexts ?? []).filter(ctx => ctx.type === 'supporting');
 export const selectGenericContexts = (state: ContextState) => 
-  state.boundedContexts.filter(ctx => ctx.type === 'generic');
+  (state.boundedContexts ?? []).filter(ctx => ctx.type === 'generic');
 export const selectExternalContexts = (state: ContextState) => 
-  state.boundedContexts.filter(ctx => ctx.type === 'external');
-export const selectContextMermaidCode = (state: ContextState) => state.contextMermaidCode;
-export const selectIsContextPanelOpen = (state: ContextState) => state.isContextPanelOpen;
+  (state.boundedContexts ?? []).filter(ctx => ctx.type === 'external');
+export const selectContextMermaidCode = (state: ContextState) => state.contextMermaidCode ?? '';
+export const selectIsContextPanelOpen = (state: ContextState) => state.isContextPanelOpen ?? false;

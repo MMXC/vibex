@@ -66,25 +66,25 @@ export const useModelStore = create<ModelState>()(
       selectedModelIds: [],
       isModelPanelOpen: true,
       
-      // Actions
-      setDomainModels: (models) => set({ domainModels: models }),
+      // Actions with null protection
+      setDomainModels: (models) => set({ domainModels: models ?? [] }),
       
       addDomainModel: (model) => 
         set((state) => ({ 
-          domainModels: [...state.domainModels, model] 
+          domainModels: [...(state.domainModels ?? []), model] 
         })),
       
       updateDomainModel: (id, updates) =>
         set((state) => ({
-          domainModels: state.domainModels.map((model) =>
+          domainModels: (state.domainModels ?? []).map((model) =>
             model.id === id ? { ...model, ...updates } : model
           ),
         })),
       
       removeDomainModel: (id) =>
         set((state) => ({
-          domainModels: state.domainModels.filter((model) => model.id !== id),
-          selectedModelIds: state.selectedModelIds.filter((modelId) => modelId !== id),
+          domainModels: (state.domainModels ?? []).filter((model) => model.id !== id),
+          selectedModelIds: (state.selectedModelIds ?? []).filter((modelId) => modelId !== id),
         })),
       
       clearDomainModels: () => set({ 
@@ -97,21 +97,21 @@ export const useModelStore = create<ModelState>()(
       
       selectModel: (id) =>
         set((state) => ({
-          selectedModelIds: state.selectedModelIds.includes(id)
+          selectedModelIds: (state.selectedModelIds ?? []).includes(id)
             ? state.selectedModelIds
-            : [...state.selectedModelIds, id],
+            : [...(state.selectedModelIds ?? []), id],
         })),
       
       deselectModel: (id) =>
         set((state) => ({
-          selectedModelIds: state.selectedModelIds.filter((modelId) => modelId !== id),
+          selectedModelIds: (state.selectedModelIds ?? []).filter((modelId) => modelId !== id),
         })),
       
       toggleModelSelection: (id) =>
         set((state) => ({
-          selectedModelIds: state.selectedModelIds.includes(id)
-            ? state.selectedModelIds.filter((modelId) => modelId !== id)
-            : [...state.selectedModelIds, id],
+          selectedModelIds: (state.selectedModelIds ?? []).includes(id)
+            ? (state.selectedModelIds ?? []).filter((modelId) => modelId !== id)
+            : [...(state.selectedModelIds ?? []), id],
         })),
       
       clearModelSelection: () => set({ selectedModelIds: [] }),
@@ -133,20 +133,20 @@ export const useModelStore = create<ModelState>()(
   )
 );
 
-// ==================== Selectors ====================
+// ==================== Selectors with null protection ====================
 
-export const selectDomainModels = (state: ModelState) => state.domainModels;
+export const selectDomainModels = (state: ModelState) => state.domainModels ?? [];
 export const selectSelectedModels = (state: ModelState) => {
-  const selectedIds = new Set(state.selectedModelIds);
-  return state.domainModels.filter(model => selectedIds.has(model.id));
+  const selectedIds = new Set(state.selectedModelIds ?? []);
+  return (state.domainModels ?? []).filter(model => selectedIds.has(model.id));
 };
 export const selectAggregateRoots = (state: ModelState) => 
-  state.domainModels.filter(model => model.type === 'aggregate_root');
+  (state.domainModels ?? []).filter(model => model.type === 'aggregate_root');
 export const selectEntities = (state: ModelState) => 
-  state.domainModels.filter(model => model.type === 'entity');
+  (state.domainModels ?? []).filter(model => model.type === 'entity');
 export const selectValueObjects = (state: ModelState) => 
-  state.domainModels.filter(model => model.type === 'value_object');
+  (state.domainModels ?? []).filter(model => model.type === 'value_object');
 export const selectModelsByContextId = (contextId: string) => (state: ModelState) => 
-  state.domainModels.filter(model => model.contextId === contextId);
-export const selectModelMermaidCode = (state: ModelState) => state.modelMermaidCode;
-export const selectIsModelPanelOpen = (state: ModelState) => state.isModelPanelOpen;
+  (state.domainModels ?? []).filter(model => model.contextId === contextId);
+export const selectModelMermaidCode = (state: ModelState) => state.modelMermaidCode ?? '';
+export const selectIsModelPanelOpen = (state: ModelState) => state.isModelPanelOpen ?? false;

@@ -237,14 +237,14 @@ export function useDDDStreamQuery(options: UseDDDStreamQueryOptions = {}): UseDD
         fullURL,
         { requirementText: reqText },
         (thinking) => {
-          setThinkingMessages(prev => [...prev, thinking]);
+          setThinkingMessages(prev => [...(prev ?? []), thinking]);
         },
         (context) => {
-          setContexts(prev => [...prev, context]);
+          setContexts(prev => [...(prev ?? []), context]);
         },
         (done) => {
-          setContexts(done.boundedContexts);
-          setMermaidCode(done.mermaidCode);
+          setContexts(done?.boundedContexts ?? []);
+          setMermaidCode(done?.mermaidCode ?? '');
           setStatus('done');
         },
         (error) => {
@@ -397,7 +397,7 @@ export function useDomainModelStreamQuery(options: UseDomainModelStreamQueryOpti
         fullURL,
         { requirementText: reqText, boundedContexts: ctx },
         (thinking) => {
-          setThinkingMessages(prev => [...prev, thinking]);
+          setThinkingMessages(prev => [...(prev ?? []), thinking]);
         },
         () => {}, // context event not used for domain model
         (done) => {
@@ -405,9 +405,9 @@ export function useDomainModelStreamQuery(options: UseDomainModelStreamQueryOpti
             clearTimeout(timeoutRef.current);
             timeoutRef.current = null;
           }
-          const models = (done as unknown as { domainModels: DomainModel[] }).domainModels;
-          setDomainModels(models || []);
-          setMermaidCode((done as unknown as { mermaidCode: string }).mermaidCode || '');
+          const models = (done as unknown as { domainModels?: DomainModel[] }).domainModels;
+          setDomainModels(models ?? []);
+          setMermaidCode((done as unknown as { mermaidCode?: string }).mermaidCode ?? '');
           setStatus('done');
         },
         (error) => {
@@ -548,13 +548,13 @@ export function useBusinessFlowStreamQuery(options: UseBusinessFlowStreamQueryOp
         fullURL,
         { domainModels: models, requirementText: reqText },
         (thinking) => {
-          setThinkingMessages(prev => [...prev, thinking]);
+          setThinkingMessages(prev => [...(prev ?? []), thinking]);
         },
         () => {},
         (done) => {
-          const flowData = done as unknown as { businessFlow: BusinessFlow; mermaidCode: string };
-          setBusinessFlow(flowData.businessFlow || null);
-          setMermaidCode(flowData.mermaidCode || '');
+          const flowData = done as unknown as { businessFlow?: BusinessFlow; mermaidCode?: string };
+          setBusinessFlow(flowData?.businessFlow ?? null);
+          setMermaidCode(flowData?.mermaidCode ?? '');
           setStatus('done');
         },
         (error) => {

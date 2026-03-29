@@ -1,3 +1,15 @@
+### Fixed (vibex-domain-model-full-flow-check-fix-v2 Epic2: StateSync状态同步) — 2026-03-30
+- **vibex-domain-model-full-flow-check-fix-v2 Epic2** — DDD 三页面状态同步
+  - **F2.1**: `DDDStoreInitializer` — 客户端单例初始化组件，在 root layout ToastProvider 内调用 `initDDDStores()`
+  - **F2.2**: `sessionStorageAdapter` — 30min TTL + JSON容错 + 自动清理，路由切换时恢复数据
+  - **F2.3**: `useDDDStateRestore` hook — bounded-context/domain-model/business-flow 三页面切换时自动恢复 sessionStorage 数据
+  - **中间件**: `dddStateSyncMiddleware` 38 tests 全部通过
+- **新增文件**: `DDDStoreInitializer.tsx`, `useDDDStateRestore.ts`
+- **修改文件**: `layout.tsx`, `bounded-context/page.tsx`, `domain-model/page.tsx`, `business-flow/page.tsx`
+- **测试**: 38/38 dddStateSyncMiddleware + 7 suites / 112 tests
+- **提交**: `4a5f457c`
+- **审查**: ✅ PASSED (reviewer-statesync)
+
 ### Fixed (vibex-canvas-checkbox-dedup Epic1: Checkbox去重重构) — 2026-03-30
 - **S1.1** — 移除 selection checkbox UI (保留Ctrl+click多选功能)
 - **S1.2** — 将确认checkbox移至标题前 (nodeCardHeader内)

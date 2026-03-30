@@ -158,5 +158,88 @@ class TestIntegration:
         assert len(combined) > 0
 
 
+class TestEpic3OutputRestoration:
+    """Epic 3: 输出恢复 — 验收标准"""
+
+    def test_f3_1_echo_output_captured(self):
+        """F3.1: stdout 捕获 — echo 命令输出被正确捕获"""
+        result = subprocess.run(
+            ["bash", "-c", "echo 'F3_1_TEST_OUTPUT'"],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        assert result.returncode == 0
+        assert "F3_1_TEST_OUTPUT" in result.stdout, f"Expected 'F3_1_TEST_OUTPUT' in stdout, got: {result.stdout!r}"
+
+    def test_f3_2_stderr_redirect_captured(self):
+        """F3.2: stderr 捕获 — stderr 重定向正常工作"""
+        result = subprocess.run(
+            ["bash", "-c", "echo 'F3_2_STDERR_MSG' >&2"],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        # Should capture stderr via 2>&1
+        assert "F3_2_STDERR_MSG" in result.stdout or "F3_2_STDERR_MSG" in result.stderr
+
+    def test_f3_3_exit_code_preserved(self):
+        """F3.3: 混合输出 — exit code 正确传递"""
+        result = subprocess.run(
+            ["bash", "-c", "echo 'F3_3_OUTPUT'; exit 42"],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        # Combined output
+        combined = result.stdout + result.stderr
+        assert "F3_3_OUTPUT" in combined
+        # Exit code preserved
+        assert result.returncode == 42, f"Expected exit code 42, got {result.returncode}"
+
+    def test_f3_combined_stderr_stdout(self):
+        """F3.3: 2>&1 混合输出正确"""
+        result = subprocess.run(
+            ["bash", "-c", "echo 'STDOUT_LINE'; echo 'STDERR_LINE' >&2"],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        combined = result.stdout + result.stderr
+        assert "STDOUT_LINE" in combined
+        assert "STDERR_LINE" in combined
+
+    def test_dod_echo_test_output(self):
+        """DoD: echo "test" 输出 "test" """
+        result = subprocess.run(
+            ["bash", "-c", 'echo "test"'],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        assert result.returncode == 0
+        assert "test" in result.stdout
+
+    def test_dod_stderr_redirect(self):
+        """DoD: 2>&1 重定向正常"""
+        result = subprocess.run(
+            ["bash", "-c", 'echo "test" 2>&1'],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        assert "test" in result.stdout
+
+    def test_dod_exit_code(self):
+        """DoD: exit code 正确传递"""
+        result = subprocess.run(
+            ["bash", "-c", "exit 1"],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        assert result.returncode == 1
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

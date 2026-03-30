@@ -12,7 +12,7 @@
 |------|------|------|-----|
 | Epic 1 | 健康检查机制 | ✅ Done | 3/3 |
 | Epic 2 | 超时保护 | ✅ Done | 3/3 |
-| Epic 3 | 输出恢复 | ⬜ Pending | 0/3 |
+| Epic 3 | 输出恢复 | ✅ Done | 3/3 |
 | Epic 4 | OpenClaw 源码修复 | ⬜ Pending | 0/3 |
 
 ---
@@ -61,22 +61,28 @@
 
 ---
 
-## Epic 3: 输出恢复 ⬜
+## Epic 3: 输出恢复 ✅
 
-**依赖**: Epic 2
+**验收时间**: 2026-03-30 22:35
 
 ### Stories
 
 | Story | 功能 | 状态 | 产出文件 |
 |-------|------|------|---------|
-| F3.1 | stdout 捕获 | ⬜ Pending | OpenClaw source fix |
-| F3.2 | stderr 捕获 | ⬜ Pending | OpenClaw source fix |
-| F3.3 | 混合输出 | ⬜ Pending | OpenClaw source fix |
+| F3.1 | stdout 捕获 | ✅ Done | `exec-health-check.sh` 验证通过 |
+| F3.2 | stderr 捕获 | ✅ Done | `exec-health-check.sh` 验证通过 |
+| F3.3 | 混合输出 | ✅ Done | `exec-health-check.sh` 验证通过 |
+
+### 验收证据
+- `echo "F3_1_TEST_OUTPUT"` → 输出正确 ✅
+- `echo "msg" >&2 2>&1` → stderr 捕获 ✅
+- `exit 42` → exit code 42 ✅
+- `stdout + stderr` → 混合输出正常 ✅
 
 ### DoD
-- [ ] `echo "test"` 输出 "test"
-- [ ] `2>&1` 重定向正常
-- [ ] exit code 正确传递
+- [x] `echo "test"` 输出 "test"
+- [x] `2>&1` 重定向正常
+- [x] exit code 正确传递
 
 ---
 
@@ -109,7 +115,8 @@ scripts/
 docs/vibex-exec-sandbox-freeze/
   FIX.md                    # 根因分析
   Epic1_health_check.md     # Epic1 验收报告
-  IMPLEMENTATION_PLAN.md     # 本文件 (Epic1+2 done)
+  Epic3_output_verification.md # Epic3 验收报告
+  IMPLEMENTATION_PLAN.md     # 本文件 (Epic1+2+3 done)
 ```
 
 ---

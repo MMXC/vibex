@@ -1,3 +1,10 @@
+### Fixed (canvas-epic3-test-fill Epic2: 增量测试覆盖) — 2026-03-31
+- **F2.1**: 交集高亮 — highlight-overlay SVG 存在性验证，pointer-events: none
+- **F2.2**: 起止节点 — node-marker-start 可见性验证
+- **F2.3**: 卡片连线 — connector-line SVG 存在性验证，pointer-events: none + SVG content 检查
+- **测试**: E2E F2.1-F2.3 全部通过 (2 passed, 1 flaky→passed)
+- **提交**: `c568f978`
+
 ### Fixed (canvas-epic3-test-fill Epic1: canvas-expand 测试补充) — 2026-03-31
 - **F1.1**: ExpandPanel 组件测试 — ExpandPanel.test.tsx (9 tests, F1.1-F1.3)
 - **F1.2**: E2E 测试修正 — aria-label 定位器修正 (`均分视口` / `退出均分` / `最大化` / `退出最大化`)

@@ -1,3 +1,12 @@
+### Fixed (vibex-exec-sandbox-freeze Epic1: 健康检查机制) — 2026-03-30
+- **F1.1**: 健康检查函数 — `exec-health-check.sh` 检测 stdout/stderr pipe 异常
+- **F1.2**: 警告机制 — exec-wrapper.sh 包装命令执行，超时控制
+- **F1.3**: 状态报告 — 检测到 pipe 问题时输出警告到 stderr
+- **新增文件**: `scripts/exec-health-check.sh` (+42行), `scripts/exec-wrapper.sh` (+38行)
+- **测试**: 13 tests passing
+- **提交**: `0f97056d`
+- **审查**: ✅ PASSED (reviewer-epic1-健康检查机制)
+
 ### Fixed (vibex-canvas-checkbox-unify Epic2: 流程卡片Checkbox语义澄清) — 2026-03-30
 - **F2.1**: Tooltip澄清 — FlowCard checkbox 添加 title="用于批量选择，非确认操作"
 - **F2.2**: 批量删除工具栏 — pre-existing，删除 ({selectedCount}) button 已存在

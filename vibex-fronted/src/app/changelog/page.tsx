@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.90',
+    date: '2026-03-30',
+    changes: [
+      '🔧 vibex-flow-tree-cards-fix/Epic1: 流程树展开后虚线框高度自适应内容',
+      '✅ .flowCard 移除 overflow:hidden，虚线框随内容扩展',
+      '✅ .stepsList 移除 max-height:300px，避免子卡片被裁剪',
+      '✅ 修复展开后只显示2张卡片的 bug (510ed216)',
+    ],
+    commit: '510ed216',
+  },
+  {
     version: '1.0.89',
     date: '2026-03-29',
     changes: [

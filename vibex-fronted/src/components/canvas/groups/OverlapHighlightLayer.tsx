@@ -206,6 +206,7 @@ function OverlapHighlightLayerComponent({
     <svg
       aria-hidden="true"
       className="overlap-highlight-layer"
+      data-testid="highlight-overlay"
       style={{
         position: 'absolute',
         top: 0,

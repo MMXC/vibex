@@ -242,6 +242,7 @@ function BoundedEdgeLayerComponent({
     <svg
       aria-hidden="true"
       className={`${styles.layer} ${className ?? ''}`}
+      data-testid="connector-line"
       style={{
         position: 'absolute',
         top: 0,

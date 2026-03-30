@@ -4,6 +4,7 @@ from ._false_completion import detect_false_completions
 from ._server_info import get_server_info
 from ._ready_decision import get_ready_tasks, rank_ready_tasks
 from ._blocked_analysis import get_blocked_tasks
+from ._idle_recommendations import get_idle_recommendations
 from ._output import format_text, format_json
 
 __all__ = [
@@ -13,6 +14,7 @@ __all__ = [
     "get_ready_tasks",
     "rank_ready_tasks",
     "get_blocked_tasks",
+    "get_idle_recommendations",
     "format_text",
     "format_json",
 ]

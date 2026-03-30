@@ -48,6 +48,7 @@ def generate_full_report(tasks_dir: str, idle_count: int, proposals_dir: str) ->
             get_active_projects,
             detect_false_completions,
             get_server_info,
+            get_idle_recommendations,
         )
     except ImportError as e:
         raise RuntimeError(f"Failed to import current_report modules: {e}") from e
@@ -58,6 +59,15 @@ def generate_full_report(tasks_dir: str, idle_count: int, proposals_dir: str) ->
     active = get_active_projects(tasks_dir)
     false_comp = detect_false_completions(tasks_dir)
     server = get_server_info()
+
+    # Idle recommendations: scan proposals if idle >= 2
+    recommendations = None
+    if idle_count >= 2:
+        proposals_base = str(Path(tasks_dir).parent)
+        recommendations = get_idle_recommendations(
+            proposals_dirs=[str(Path(proposals_base) / "proposals")],
+            top_n=3
+        )
 
     # 计算空转建议
     should_create_new_project = idle_count >= 3 and ready.get("count", 0) < 3
@@ -70,6 +80,7 @@ def generate_full_report(tasks_dir: str, idle_count: int, proposals_dir: str) ->
         "server_info": server,
         "idle_count": idle_count,
         "should_create_new_project": should_create_new_project,
+        "idle_recommendations": recommendations,
         "generated_at": datetime.now(timezone.utc).isoformat()
     }
 
@@ -145,6 +156,27 @@ def format_report_text(report: Dict) -> str:
     lines.append(f"  Ready: {ready_count} | Blocked: {blocked_count} | Active: {active_count}")
     if blocked_count > 5:
         lines.append("  ⚠️ WARNING: High number of blocked tasks, consider unblocking first")
+
+    # Idle Recommendations (Epic3: 空转提案推荐)
+    recs = report.get("idle_recommendations")
+    if recs:
+        lines.append("")
+        lines.append(f"=== 📌 Idle Recommendations ({recs.get('count', 0)}) ===")
+        lines.append(f"  Scanned {recs.get('total_scanned', 0)} proposal files")
+        if recs.get("error"):
+            lines.append(f"  ERROR: {recs['error']}")
+        elif recs.get("count", 0) == 0:
+            lines.append("  无提案 (no proposals found)")
+        else:
+            for r in recs.get("recommendations", []):
+                lines.append(f"  {r['rank']}. [{r['priority']}] {r['title']}")
+                lines.append(f"     Reason: {r['reason']}")
+                lines.append(f"     Source: {r['source']}")
+                lines.append("")
+    elif report["idle_count"] >= 2:
+        lines.append("")
+        lines.append("=== 📌 Idle Recommendations ===")
+        lines.append("  (idle < 2, skipping proposal scan)")
 
     return "\n".join(lines)
 

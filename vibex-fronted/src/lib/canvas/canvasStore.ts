@@ -272,6 +272,8 @@ interface CanvasStore {
   editComponentNode: (nodeId: string, data: Partial<ComponentNode>) => void;
   deleteComponentNode: (nodeId: string) => void;
   confirmComponentNode: (nodeId: string) => void;
+  /** F3.1+F3.2: Confirm all unconfirmed nodes in a group (or all if groupId omitted) */
+  confirmAllComponentNodes: (groupId?: string, nodeIds?: string[]) => void;
   setComponentDraft: (draft: Partial<ComponentNode> | null) => void;
 
   // === Queue Slice Actions ===
@@ -854,6 +856,53 @@ export const useCanvasStore = create<CanvasStore>()(
               const newNodes = s.componentNodes.map((n) =>
                 n.nodeId === nodeId ? { ...n, confirmed: true, status: 'confirmed' as const } : n
               );
+              getHistoryStore().recordSnapshot('component', newNodes);
+              return { componentNodes: newNodes };
+            });
+          },
+
+          // F3.1+F3.2+F3.3: Batch confirm all unconfirmed nodes
+          // If nodeIds provided: confirm specific nodes
+          // If groupId provided: confirm all nodes in that group (matching flowId)
+          // If neither: confirm all unconfirmed nodes
+          confirmAllComponentNodes: (groupId, nodeIds) => {
+            set((s) => {
+              let newNodes = s.componentNodes;
+
+              if (nodeIds && nodeIds.length > 0) {
+                // F3.2: Confirm specific nodeIds
+                const idSet = new Set(nodeIds);
+                newNodes = newNodes.map((n) =>
+                  idSet.has(n.nodeId) && !n.confirmed
+                    ? { ...n, confirmed: true, status: 'confirmed' as const }
+                    : n
+                );
+              } else if (groupId) {
+                // F3.3: Confirm all nodes in group (match by flowId)
+                // Handle __common__ specially (nodes without flowId or with common type)
+                if (groupId === '__common__') {
+                  newNodes = newNodes.map((n) => {
+                    if (n.confirmed) return n;
+                    // Common nodes have no flowId or flowId === '__common__'
+                    const isCommon = !n.flowId || n.flowId === '__common__';
+                    return isCommon
+                      ? { ...n, confirmed: true, status: 'confirmed' as const }
+                      : n;
+                  });
+                } else {
+                  newNodes = newNodes.map((n) =>
+                    n.flowId === groupId && !n.confirmed
+                      ? { ...n, confirmed: true, status: 'confirmed' as const }
+                      : n
+                  );
+                }
+              } else {
+                // Confirm all unconfirmed nodes
+                newNodes = newNodes.map((n) =>
+                  !n.confirmed ? { ...n, confirmed: true, status: 'confirmed' as const } : n
+                );
+              }
+
               getHistoryStore().recordSnapshot('component', newNodes);
               return { componentNodes: newNodes };
             });

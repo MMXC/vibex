@@ -1979,6 +1979,30 @@
   letter-spacing: 0.02em;
 }
 
+/* F3.1: Confirm all button next to group label */
+.confirmAllButton {
+  margin-left: auto;
+  padding: 2px 8px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  background: transparent;
+  font-size: 11px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.15s, background-color 0.15s;
+  white-space: nowrap;
+}
+
+.confirmAllButton:hover {
+  opacity: 1;
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.confirmAllButton:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
 .componentGroupCards {
   display: flex;
   flex-direction: column;

@@ -617,6 +617,7 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
   const editComponentNode = useCanvasStore((s) => s.editComponentNode);
   const deleteComponentNode = useCanvasStore((s) => s.deleteComponentNode);
   const confirmComponentNode = useCanvasStore((s) => s.confirmComponentNode);
+  const confirmAllComponentNodes = useCanvasStore((s) => s.confirmAllComponentNodes);
   const setComponentNodes = useCanvasStore((s) => s.setComponentNodes);
   const flowNodes = useCanvasStore((s) => s.flowNodes);
   const setPhase = useCanvasStore((s) => s.setPhase);
@@ -962,6 +963,22 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
                   >
                     ({group.nodes.length})
                   </span>
+                  {/* F3.1: Confirm all button — only show if group has unconfirmed nodes */}
+                  {group.nodes.some((n) => !n.confirmed) && (
+                    <button
+                      type="button"
+                      className={styles.confirmAllButton}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        confirmAllComponentNodes(group.groupId);
+                      }}
+                      title="确认组内所有组件"
+                      aria-label={`确认全部 ${group.label}`}
+                      style={{ color: group.color }}
+                    >
+                      ✓ 确认全部
+                    </button>
+                  )}
                 </div>
 
                 {/* E2-F7: DndContext for this group's draggable cards */}

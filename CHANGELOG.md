@@ -1,4 +1,13 @@
-### Fixed (coord-decision-report Epic2: 阻塞根因分析) — 2026-03-30
+### Fixed (coord-decision-report Epic3: 空转提案推荐) — 2026-03-30
+- **F3.1**: 提案扫描 — 扫描 `proposals/` 目录，支持多目录扫描，过滤 self-check 报告
+- **F3.2**: Ranking 算法 — 综合 priority(P0=100/P1=50/P2=10) + recency(<7d=+30/<14d=+15/<30d=+5) + strategic_value(关键字匹配)
+- **F3.3**: 确定性规则 — 代码注释完整记录评分算法，相同输入产生相同输出
+- **Deduplication**: 基于标题去重，避免重复推荐
+- **新增文件**: `scripts/current_report/_idle_recommendations.py` (核心逻辑)
+- **测试**: 13 个测试覆盖所有功能，21 tests passing in test_coord_decision_report
+- **审查**: ✅ PASSED (reviewer-epic3-空转提案推荐)
+
+### Fixed
 - **F2.1**: 阻塞任务检测 — pending 任务中 dependsOn 未全部完成的任务
 - **F2.2**: 根因识别 — 依赖链中第一个未完成的任务
 - **F2.3**: 阻塞时长计算 — now - 最新完成依赖时间

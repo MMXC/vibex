@@ -1,3 +1,12 @@
+### Fixed (canvas-selection-filter-bug Epic1: 只传已确认卡片到API) — 2026-03-31
+- **F1.1**: handleContinueToComponents — 只发送 `confirmed=true` 的 contexts 到 API
+- **F1.2**: handleContinueToComponents — 只发送 `confirmed=true` 的 flows 到 API
+- **F1.3**: autoGenerateFlows 调用 — 只传递 `confirmed=true` 的 contextNodes (2处)
+- **根因**: 原实现 `.map()` 遍历全部节点，未按 `confirmed` 过滤
+- **测试**: TypeScript 0 errors, build 0 errors
+- **提交**: `64afe775` (fix(canvas-card-selection): 只发送已确认的卡片到 API)
+- **审查**: ✅ PASSED (reviewer-epic1)
+
 ### Fixed (vibex-exec-sandbox-freeze Epic3: 输出恢复) — 2026-03-30
 - **F3.1**: echo输出捕获 — exec输出捕获正常返回，无pipe断裂
 - **F3.2**: stderr重定向 — 2>&1 混合输出正常

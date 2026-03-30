@@ -24,6 +24,11 @@ import signal
 import sys
 from datetime import datetime, timezone
 
+# Add scripts/ to path for current_report module
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+if _SCRIPT_DIR not in sys.path:
+    sys.path.insert(0, _SCRIPT_DIR)
+
 try:
     from timeout import timeout, TimeoutError
 except ImportError:
@@ -86,6 +91,39 @@ else:
 TEAM_TASKS_DIR_DEFAULT = "/root/.openclaw/workspace-coord/team-tasks"
 LEGACY_TASKS_DIR = "/root/.openclaw/workspace-coord/team-tasks"
 TASKS_DIR = os.environ.get("TEAM_TASKS_DIR", TEAM_TASKS_DIR_DEFAULT)
+
+# ── current-report 模块 ─────────────────────────────────────────────────────
+import importlib.util
+_current_report_pkg = os.path.join(os.path.dirname(os.path.abspath(__file__)), "current_report")
+if os.path.isdir(_current_report_pkg):
+    _cr_spec = importlib.util.spec_from_file_location("current_report", os.path.join(_current_report_pkg, "__init__.py"))
+    _cr_mod = importlib.util.module_from_spec(_cr_spec)
+    sys.modules["current_report"] = _cr_mod
+    _cr_spec.loader.exec_module(_cr_mod)
+
+    _ap_spec = importlib.util.spec_from_file_location("current_report._active_projects", os.path.join(_current_report_pkg, "_active_projects.py"))
+    _ap_mod = importlib.util.module_from_spec(_ap_spec)
+    sys.modules["current_report._active_projects"] = _ap_mod
+    _ap_spec.loader.exec_module(_ap_mod)
+
+    _fc_spec = importlib.util.spec_from_file_location("current_report._false_completion", os.path.join(_current_report_pkg, "_false_completion.py"))
+    _fc_mod = importlib.util.module_from_spec(_fc_spec)
+    sys.modules["current_report._false_completion"] = _fc_mod
+    _fc_spec.loader.exec_module(_fc_mod)
+
+    _si_spec = importlib.util.spec_from_file_location("current_report._server_info", os.path.join(_current_report_pkg, "_server_info.py"))
+    _si_mod = importlib.util.module_from_spec(_si_spec)
+    sys.modules["current_report._server_info"] = _si_mod
+    _si_spec.loader.exec_module(_si_mod)
+
+    _out_spec = importlib.util.spec_from_file_location("current_report._output", os.path.join(_current_report_pkg, "_output.py"))
+    _out_mod = importlib.util.module_from_spec(_out_spec)
+    sys.modules["current_report._output"] = _out_mod
+    _out_spec.loader.exec_module(_out_mod)
+
+    HAS_CURRENT_REPORT = True
+else:
+    HAS_CURRENT_REPORT = False
 
 
 # ── Slack 通知配置 ───────────────────────────────────────────────────────────
@@ -1912,6 +1950,12 @@ def main():
     # check-dup
     sub.add_parser("health", help="健康检查：测试 list/claim 执行时间")
 
+    # current-report: 生成项目待决策报告（活跃项目 + 虚假完成检测 + 服务器信息）
+    p = sub.add_parser("current-report", help="生成项目待决策报告")
+    p.add_argument("--json", "-j", action="store_true", help="JSON 格式输出")
+    p.add_argument("--tasks-path", default=None, help="tasks.json 路径（默认: workspace-coord/team-tasks/tasks.json）")
+    p.add_argument("--workspace", "-w", default="/root/.openclaw/vibex", help="工作区根路径（用于解析相对路径）")
+
     p = sub.add_parser("check-dup", help="检查项目是否重复（提案去重）")
     p.add_argument("name", help="项目名称")
     p.add_argument("goal", nargs="?", default="", help="项目目标描述")
@@ -1939,6 +1983,7 @@ def main():
         "clean-cooldown": cmd_clean_cooldown,
         "check-dup": cmd_check_dup,
         "health": cmd_health,
+        "current-report": cmd_current_report,
     }
 
     if args.command not in cmds:
@@ -1947,6 +1992,31 @@ def main():
         sys.exit(1)
 
     cmds[args.command](args)
+
+
+# ── cmd_current_report ──────────────────────────────────────────────────────
+
+def cmd_current_report(args):
+    """Generate current-report: active projects + false completion + server info."""
+    if not HAS_CURRENT_REPORT:
+        print("ERROR: current_report module not found", file=sys.stderr)
+        sys.exit(1)
+
+    tasks_path = args.tasks_path or os.path.join(
+        os.environ.get("WORKSPACE_COORD", "/root/.openclaw/workspace-coord"),
+        "team-tasks", "tasks.json"
+    )
+
+    active = current_report._active_projects.get_active_projects(tasks_path)
+    false_comp = current_report._false_completion.detect_false_completions(tasks_path)
+    server = current_report._server_info.get_server_info()
+
+    if args.json:
+        output = current_report._output.format_json(active, false_comp, server)
+    else:
+        output = current_report._output.format_text(active, false_comp, server)
+
+    print(output)
 
 
 # ── cmd_health ────────────────────────────────────────────────────
@@ -1988,6 +2058,55 @@ def cmd_health(args):
     else:
         print("\n❌ Health check FAILED")
         sys.exit(1)
+
+
+# ── cmd_current_report ─────────────────────────────────────────────
+
+def cmd_current_report(args):
+    """生成项目待决策报告（活跃项目 + 虚假完成检测 + 服务器信息）。"""
+    import sys as _sys
+
+    # Dynamically import to avoid hard dependency at module load time
+    try:
+        from current_report import (
+            get_active_projects,
+            detect_false_completions,
+            get_server_info,
+            format_text,
+            format_json,
+        )
+    except ImportError:
+        # Fallback: try relative import
+        try:
+            from .current_report import (
+                get_active_projects,
+                detect_false_completions,
+                get_server_info,
+                format_text,
+                format_json,
+            )
+        except ImportError:
+            print("Error: current_report module not found", file=_sys.stderr)
+            _sys.exit(1)
+
+    tasks_path = args.tasks_path
+    workspace = args.workspace
+
+    try:
+        active = get_active_projects(tasks_path)
+        false_comp = detect_false_completions(tasks_path)
+        server = get_server_info()
+    except (OSError, IOError, ValueError) as e:
+        # Catch path-related errors (e.g. invalid filenames from malformed JSON data)
+        print(f"Error gathering report data: {e}", file=_sys.stderr)
+        _sys.exit(1)
+
+    if args.json:
+        print(format_json(active, false_comp, server))
+    else:
+        print(format_text(active, false_comp, server))
+
+    _sys.exit(0)
 
 
 # ── cmd_check_dup ─────────────────────────────────────────────────

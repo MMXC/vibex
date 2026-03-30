@@ -1,60 +1,79 @@
-"""F1: Active projects status from team-tasks/*.json files."""
+"""F1: Active projects status — scans team-tasks/ directory structure."""
 import json
 import os
 from pathlib import Path
 
+
 TEAM_TASKS_DIR = "/root/.openclaw/workspace-coord/team-tasks"
 
 
-def get_active_projects(tasks_path: str = None) -> dict:
-    """Read team-tasks/*.json and return active projects summary."""
-    tasks_dir = TEAM_TASKS_DIR
-    if tasks_path:
-        # tasks_path is interpreted as the team-tasks directory
-        tasks_dir = str(Path(tasks_path).parent) if Path(tasks_path).name == "tasks.json" else tasks_path
+def get_active_projects(tasks_dir: str = None) -> dict:
+    """Scan team-tasks/ and return active projects summary.
+    
+    Scans:
+    - team-tasks/<name>.json  (legacy root-level files)
+    - team-tasks/projects/<name>/tasks.json  (new per-project layout)
+    """
+    base = tasks_dir or TEAM_TASKS_DIR
 
-    if not os.path.isdir(tasks_dir):
-        return {"count": 0, "projects": [], "error": f"Directory not found: {tasks_dir}"}
+    if not os.path.isdir(base):
+        return {"count": 0, "projects": [], "error": f"Directory not found: {base}"}
 
-    projects = []
-    errors = []
+    project_files = []
 
-    # Scan *.json files in team-tasks/
+    # Scan root-level *.json files
     try:
-        files = [f for f in os.listdir(tasks_dir) if f.endswith(".json") and not f.startswith(".")]
+        for fname in os.listdir(base):
+            if fname.endswith(".json") and not fname.startswith("."):
+                project_files.append(os.path.join(base, fname))
     except OSError as e:
         return {"count": 0, "projects": [], "error": str(e)}
 
-    for fname in files:
-        fpath = os.path.join(tasks_dir, fname)
+    # Scan projects/ subdirectories
+    projects_subdir = os.path.join(base, "projects")
+    if os.path.isdir(projects_subdir):
         try:
+            for subdir in os.listdir(projects_subdir):
+                tpath = os.path.join(projects_subdir, subdir, "tasks.json")
+                if os.path.isfile(tpath):
+                    project_files.append(tpath)
+        except OSError:
+            pass
+
+    active = []
+    errors = []
+
+    for fpath in project_files:
+        try:
+            if len(fpath) > 4096:
+                # Skip extremely long paths (malformed filenames with newlines)
+                basename = os.path.basename(fpath).split("\n")[0][:80]
+                errors.append(f"path too long ({len(fpath)} bytes), skipped: {basename}")
+                continue
             with open(fpath) as f:
                 data = json.load(f)
-        except (json.JSONDecodeError, OSError) as e:
-            errors.append(f"{fname}: {e}")
+        except (json.JSONDecodeError, OSError, UnicodeDecodeError) as e:
+            basename = os.path.basename(fpath).split("\n")[0][:80]
+            errors.append(f"{basename}: {e}")
             continue
 
         if data.get("status") != "active":
             continue
 
-        project_name = data.get("project", fname.replace(".json", ""))
         stages = data.get("stages", {})
-        current_stage = _get_current_stage(stages)
-        pending_count = _count_pending(stages)
-
-        projects.append({
-            "name": project_name,
+        active.append({
+            "name": data.get("project", os.path.basename(fpath).replace(".json", "")),
             "goal": data.get("goal", ""),
-            "stage": current_stage,
-            "pending": pending_count,
+            "stage": _get_current_stage(stages),
+            "pending": _count_pending(stages),
             "total": len(stages),
         })
 
-    error_msg = None
+    err_msg = None
     if errors:
-        error_msg = f"Failed to load {len(errors)} files: {errors[0]}"
+        err_msg = f"Failed to load {len(errors)} file(s)"
 
-    return {"count": len(projects), "projects": projects, "error": error_msg}
+    return {"count": len(active), "projects": active, "error": err_msg}
 
 
 def _get_current_stage(stages: dict) -> str:

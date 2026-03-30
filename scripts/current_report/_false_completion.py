@@ -1,55 +1,69 @@
-"""F2: False completion detection — status=done but output file missing."""
+"""F2: False completion detection — scans team-tasks/ directory structure."""
 import json
 import os
 from pathlib import Path
 
+
 TEAM_TASKS_DIR = "/root/.openclaw/workspace-coord/team-tasks"
 
 
-def detect_false_completions(tasks_path: str = None) -> dict:
-    """Detect tasks marked done but whose output file doesn't exist."""
-    tasks_dir = TEAM_TASKS_DIR
-    if tasks_path:
-        tasks_dir = str(Path(tasks_path).parent) if Path(tasks_path).name == "tasks.json" else tasks_path
+def detect_false_completions(tasks_dir: str = None) -> dict:
+    """Detect tasks marked done but whose output file doesn't exist.
+    
+    Scans:
+    - team-tasks/<name>.json  (legacy root-level files)
+    - team-tasks/projects/<name>/tasks.json  (new per-project layout)
+    """
+    base = tasks_dir or TEAM_TASKS_DIR
 
-    if not os.path.isdir(tasks_dir):
-        return {"count": 0, "items": [], "error": f"Directory not found: {tasks_dir}"}
+    if not os.path.isdir(base):
+        return {"count": 0, "items": [], "error": f"Directory not found: {base}"}
 
-    items = []
-    errors = []
+    project_files = []
 
     try:
-        files = [f for f in os.listdir(tasks_dir) if f.endswith(".json") and not f.startswith(".")]
+        for fname in os.listdir(base):
+            if fname.endswith(".json") and not fname.startswith("."):
+                project_files.append(os.path.join(base, fname))
     except OSError as e:
         return {"count": 0, "items": [], "error": str(e)}
 
-    for fname in files:
-        fpath = os.path.join(tasks_dir, fname)
+    projects_subdir = os.path.join(base, "projects")
+    if os.path.isdir(projects_subdir):
+        try:
+            for subdir in os.listdir(projects_subdir):
+                tpath = os.path.join(projects_subdir, subdir, "tasks.json")
+                if os.path.isfile(tpath):
+                    project_files.append(tpath)
+        except OSError:
+            pass
+
+    items = []
+    for fpath in project_files:
         try:
             with open(fpath) as f:
                 data = json.load(f)
-        except (json.JSONDecodeError, OSError) as e:
-            errors.append(f"{fname}: {e}")
+        except (json.JSONDecodeError, OSError, UnicodeDecodeError):
             continue
 
-        project_name = data.get("project", fname.replace(".json", ""))
+        project_name = data.get("project", os.path.basename(fpath).replace(".json", ""))
         for stage_name, stage_info in data.get("stages", {}).items():
             if stage_info.get("status") != "done":
                 continue
             output = stage_info.get("output", "")
             if not output:
                 continue
-            # Sanitize: skip if output looks like content rather than a path
+
+            # Skip outputs that look like command output/content (not file paths)
+            # e.g., "Epic4 sessionId 链路验证完成\n\n## 验证结果..."
             if "\n" in output or len(output) > 512:
                 continue
-            # Resolve path — output can be absolute or relative to workspace-coord
-            try:
-                if not os.path.isabs(output):
-                    output_path = Path(tasks_dir).parent.parent / output
-                else:
-                    output_path = Path(output)
-            except (OSError, ValueError):
-                continue
+
+            # Resolve: absolute or relative to workspace-coord root
+            if os.path.isabs(output):
+                output_path = Path(output)
+            else:
+                output_path = Path("/root/.openclaw/workspace-coord") / output
 
             if not output_path.exists():
                 items.append({
@@ -59,8 +73,4 @@ def detect_false_completions(tasks_path: str = None) -> dict:
                     "resolved_path": str(output_path),
                 })
 
-    error_msg = None
-    if errors:
-        error_msg = f"Failed to load {len(errors)} files"
-
-    return {"count": len(items), "items": items, "error": error_msg}
+    return {"count": len(items), "items": items, "error": None}

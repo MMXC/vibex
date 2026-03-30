@@ -121,6 +121,11 @@ if os.path.isdir(_current_report_pkg):
     sys.modules["current_report._output"] = _out_mod
     _out_spec.loader.exec_module(_out_mod)
 
+    _rd_spec = importlib.util.spec_from_file_location("current_report._ready_decision", os.path.join(_current_report_pkg, "_ready_decision.py"))
+    _rd_mod = importlib.util.module_from_spec(_rd_spec)
+    sys.modules["current_report._ready_decision"] = _rd_mod
+    _rd_spec.loader.exec_module(_rd_mod)
+
     HAS_CURRENT_REPORT = True
 else:
     HAS_CURRENT_REPORT = False
@@ -2002,13 +2007,10 @@ def cmd_current_report(args):
         print("ERROR: current_report module not found", file=sys.stderr)
         sys.exit(1)
 
-    tasks_path = args.tasks_path or os.path.join(
-        os.environ.get("WORKSPACE_COORD", "/root/.openclaw/workspace-coord"),
-        "team-tasks", "tasks.json"
-    )
+    tasks_dir = args.tasks_path or TASKS_DIR
 
-    active = current_report._active_projects.get_active_projects(tasks_path)
-    false_comp = current_report._false_completion.detect_false_completions(tasks_path)
+    active = current_report._active_projects.get_active_projects(tasks_dir)
+    false_comp = current_report._false_completion.detect_false_completions(tasks_dir)
     server = current_report._server_info.get_server_info()
 
     if args.json:
@@ -2063,7 +2065,7 @@ def cmd_health(args):
 # ── cmd_current_report ─────────────────────────────────────────────
 
 def cmd_current_report(args):
-    """生成项目待决策报告（活跃项目 + 虚假完成检测 + 服务器信息）。"""
+    """生成项目待决策报告（Ready任务 + 活跃项目 + 虚假完成检测 + 服务器信息）。"""
     import sys as _sys
 
     # Dynamically import to avoid hard dependency at module load time
@@ -2072,6 +2074,7 @@ def cmd_current_report(args):
             get_active_projects,
             detect_false_completions,
             get_server_info,
+            get_ready_tasks,
             format_text,
             format_json,
         )
@@ -2082,6 +2085,7 @@ def cmd_current_report(args):
                 get_active_projects,
                 detect_false_completions,
                 get_server_info,
+                get_ready_tasks,
                 format_text,
                 format_json,
             )
@@ -2093,6 +2097,7 @@ def cmd_current_report(args):
     workspace = args.workspace
 
     try:
+        ready = get_ready_tasks(tasks_path)
         active = get_active_projects(tasks_path)
         false_comp = detect_false_completions(tasks_path)
         server = get_server_info()
@@ -2102,9 +2107,9 @@ def cmd_current_report(args):
         _sys.exit(1)
 
     if args.json:
-        print(format_json(active, false_comp, server))
+        print(format_json(active, false_comp, server, ready))
     else:
-        print(format_text(active, false_comp, server))
+        print(format_text(active, false_comp, server, ready))
 
     _sys.exit(0)
 
@@ -2134,5 +2139,6 @@ def cmd_check_dup(args):
 
 
 if __name__ == '__main__':
-    print('CALLING MAIN', flush=True)
+    import sys
+    print('CALLING MAIN', flush=True, file=sys.stderr)
     main()

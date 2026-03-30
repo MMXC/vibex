@@ -2,17 +2,36 @@
 from datetime import datetime, timezone
 
 
-def format_text(active: dict, false_comp: dict, server: dict) -> str:
+def format_text(active: dict, false_comp: dict, server: dict,
+                ready: dict = None, blocked: dict = None) -> str:
     """Format report as human-readable text."""
     lines = []
 
+    # === Ready Tasks (F1: Ready Decision Engine) ===
+    if ready is not None:
+        count = ready.get("count", 0)
+        tasks = ready.get("ready", [])
+        lines.append(f"=== Ready to Execute ({count}) ===")
+        if ready.get("error"):
+            lines.append(f"  ERROR: {ready['error']}")
+        elif count == 0:
+            lines.append("  (none — no tasks with all deps satisfied)")
+        else:
+            for t in tasks:
+                lines.append(
+                    f"  [{t['agent']}] {t['project']}/{t['task_id']} "
+                    f"(wait={t['wait_str']}, priority=P{t['priority_rank']})"
+                )
+                if t.get("task_desc"):
+                    lines.append(f"    {t['task_desc']}")
+
     # === Active Projects ===
-    count = active.get("count", 0)
+    active_count = active.get("count", 0)
     projects = active.get("projects", [])
-    lines.append(f"=== Active Projects ({count}) ===")
+    lines.append(f"\n=== Active Projects ({active_count}) ===")
     if active.get("error"):
         lines.append(f"  ERROR: {active['error']}")
-    elif count == 0:
+    elif active_count == 0:
         lines.append("  (none)")
     else:
         for p in projects:
@@ -29,11 +48,13 @@ def format_text(active: dict, false_comp: dict, server: dict) -> str:
     elif fc_count == 0:
         lines.append("  ✓ No false completions detected")
     else:
-        for item in fc_items:
+        for item in fc_items[:20]:  # Show first 20
             lines.append(
                 f"  - {item['project']}/{item['task']}: "
                 f"missing={item['output']}"
             )
+        if fc_count > 20:
+            lines.append(f"  ... and {fc_count - 20} more")
 
     # === Server Info ===
     lines.append("\n=== Server Info ===")
@@ -58,17 +79,20 @@ def format_text(active: dict, false_comp: dict, server: dict) -> str:
     return "\n".join(lines)
 
 
-def format_json(active: dict, false_comp: dict, server: dict) -> str:
+def format_json(active: dict, false_comp: dict, server: dict,
+                ready: dict = None, blocked: dict = None) -> str:
     """Format report as JSON."""
     import json
 
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    return json.dumps({
+    result = {
         "active_projects": active,
         "false_completions": false_comp,
         "server_info": server,
+        "ready_tasks": ready,
         "generated_at": ts,
-    }, indent=2, ensure_ascii=False)
+    }
+    return json.dumps(result, indent=2, ensure_ascii=False)
 
 
 def _fmt(value, unit: str) -> str:

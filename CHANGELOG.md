@@ -1,3 +1,10 @@
+### Fixed (vibex-canvas-checkbox-unify Epic1: Toggle修复) — 2026-03-30
+- **F1.1**: Toggle 确认逻辑 — `confirmContextNode` 现在在 confirmed/unconfirmed 之间切换，而非单向确认
+- **F1.2**: 状态同步 — toggle off 时减少 confirmed 计数
+- **F1.3**: 单元测试 — 3 个新测试覆盖 toggle 行为，全部 63 tests 通过
+- **提交**: `96c6bf5d`
+- **审查**: ✅ PASSED (reviewer-epic1-toggle修复)
+
 ### Fixed (task-manager-current-report Epic1: CLI框架) — 2026-03-30
 - **F4.1**: current-report 子命令注册，支持 --json/--tasks-path/--workspace 选项
 - **F4.2**: cmd_current_report() 组合 active+false_comp+server 数据

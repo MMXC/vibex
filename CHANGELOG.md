@@ -1,3 +1,15 @@
+### Fixed (task-manager-current-report Epic1: CLI框架) — 2026-03-30
+- **F4.1**: current-report 子命令注册，支持 --json/--tasks-path/--workspace 选项
+- **F4.2**: cmd_current_report() 组合 active+false_comp+server 数据
+- **F1**: _active_projects.py — 扫描 team-tasks/*.json 获取 status=active 项目
+- **F2**: _false_completion.py — 检测 done 任务中缺少产出文件的任务
+- **F3**: _server_info.py — CPU/memory/disk/uptime (via psutil)
+- **F4**: _output.py — format_text() + format_json() 格式化输出
+- **修复**: _load_all_projects respects tasks_dir parameter
+- **测试**: npm test 全部通过
+- **提交**: `6d7e28fe`
+- **审查**: ✅ PASSED (reviewer-dev-current-report)
+
 ### Fixed (coord-decision-report Epic3: 空转提案推荐) — 2026-03-30
 - **F3.1**: 提案扫描 — 扫描 `proposals/` 目录，支持多目录扫描，过滤 self-check 报告
 - **F3.2**: Ranking 算法 — 综合 priority(P0=100/P1=50/P2=10) + recency(<7d=+30/<14d=+15/<30d=+5) + strategic_value(关键字匹配)

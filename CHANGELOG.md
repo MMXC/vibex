@@ -5,6 +5,15 @@
 - **提交**: `c08b8578` (aria-label 修正), `fb4aeb7f` (ExpandPanel 测试)
 - **审查**: ✅ PASSED (reviewer-epic1-canvas-expand-spec)
 
+### Fixed (canvas-epic3-test-fill Epic2: 增量测试覆盖) — 2026-03-31
+- **F1.5**: localStorage 持久化测试 — 验证 canvas-expand-mode 状态保存
+- **F2.1**: 交集高亮测试 — data-testid="highlight-overlay" 可访问性验证
+- **F2.2**: 起止节点测试 — data-testid="node-marker-start" 可见性验证
+- **F2.3**: 卡片连线测试 — data-testid="connector-line" SVG 内容验证
+- **测试**: E2E 覆盖 F1.5-F2.3，共 8 个新测试用例
+- **提交**: `6532e0b0` (F1.5 + data-testid), `c568f978` (F2.1-F2.3)
+- **审查**: ✅ PASSED (reviewer-epic2-incremental-coverage)
+
 ### Fixed (canvas-selection-filter-bug Epic1: 只传已确认卡片到API) — 2026-03-31
 - **F1.1**: handleContinueToComponents — 只发送 `confirmed=true` 的 contexts 到 API
 - **F1.2**: handleContinueToComponents — 只发送 `confirmed=true` 的 flows 到 API

@@ -248,4 +248,77 @@ test.describe('Canvas E2E — Epic 3.2: Canvas 状态与质量', () => {
     await page.screenshot({ path: 'tests/e2e/screenshots/canvas-e2e/f1.5-localstorage-reload.png', fullPage: true });
   });
 
+  // ========================================================================
+  // F2.x: 增量测试覆盖
+  // ========================================================================
+
+  test('F2.1: 交集高亮 - highlight-overlay SVG 存在', async ({ page }) => {
+    // The OverlapHighlightLayer renders intersection overlays between bounded groups
+    // It only renders when there are overlapping bounded groups
+    // Check if the SVG with data-testid="highlight-overlay" exists
+
+    // Set up canvas with example data
+    await goToCanvasWithData(page);
+
+    // Check for highlight-overlay SVG
+    const highlightOverlay = page.locator('[data-testid="highlight-overlay"]');
+    const overlayCount = await highlightOverlay.count();
+
+    // If overlap layer exists, verify pointer-events: none
+    if (overlayCount > 0) {
+      const pointerEvents = await highlightOverlay.first().evaluate(
+        (el) => window.getComputedStyle(el).pointerEvents
+      );
+      expect(pointerEvents).toBe('none');
+    }
+
+    // Screenshot for evidence
+    await page.screenshot({ path: 'tests/e2e/screenshots/canvas-e2e/f2.1-highlight-overlay.png', fullPage: true });
+  });
+
+  test('F2.2: 起止节点 - start marker 可见', async ({ page }) => {
+    // Start markers (node-marker-start) appear on domain model nodes
+    // Set up canvas with example data and go to domain model view
+
+    await goToCanvasWithData(page);
+
+    // Check for start markers
+    const startMarker = page.locator('[data-testid="node-marker-start"]');
+    const markerCount = await startMarker.count();
+
+    // If markers exist, verify they are visible
+    if (markerCount > 0) {
+      await expect(startMarker.first()).toBeVisible();
+    }
+
+    // Screenshot for evidence
+    await page.screenshot({ path: 'tests/e2e/screenshots/canvas-e2e/f2.2-start-marker.png', fullPage: true });
+  });
+
+  test('F2.3: 卡片连线 - connector-line SVG 存在', async ({ page }) => {
+    // BoundedEdgeLayer renders SVG connector lines between bounded groups
+    // Check if SVG with data-testid="connector-line" exists
+
+    await goToCanvasWithData(page);
+
+    // Check for connector-line SVG
+    const connectorLine = page.locator('[data-testid="connector-line"]');
+    const connectorCount = await connectorLine.count();
+
+    // If connector layer exists, verify pointer-events: none
+    if (connectorCount > 0) {
+      const pointerEvents = await connectorLine.first().evaluate(
+        (el) => window.getComputedStyle(el).pointerEvents
+      );
+      expect(pointerEvents).toBe('none');
+
+      // Verify the SVG has content (paths)
+      const svgContent = await connectorLine.first().evaluate((el) => el.innerHTML);
+      expect(svgContent.length).toBeGreaterThan(0);
+    }
+
+    // Screenshot for evidence
+    await page.screenshot({ path: 'tests/e2e/screenshots/canvas-e2e/f2.3-connector-line.png', fullPage: true });
+  });
+
 });

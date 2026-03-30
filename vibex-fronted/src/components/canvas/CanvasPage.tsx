@@ -454,23 +454,27 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     try {
       const sessionId = projectId ?? `session-${Date.now()}`;
 
-      // Map contexts to API format
-      const mappedContexts = contextNodes.map((ctx) => ({
-        id: ctx.nodeId,
-        name: ctx.name,
-        description: ctx.description ?? '',
-        type: ctx.type,
-      }));
+      // Map ONLY confirmed contexts to API format
+      const mappedContexts = contextNodes
+        .filter((ctx) => ctx.confirmed)
+        .map((ctx) => ({
+          id: ctx.nodeId,
+          name: ctx.name,
+          description: ctx.description ?? '',
+          type: ctx.type,
+        }));
 
-      // Map flows to API format
-      const mappedFlows = flowNodes.map((f) => ({
-        name: f.name,
-        contextId: f.contextId,
-        steps: f.steps.map((step) => ({
-          name: step.name,
-          actor: step.actor,
-        })),
-      }));
+      // Map ONLY confirmed flows to API format
+      const mappedFlows = flowNodes
+        .filter((f) => f.confirmed)
+        .map((f) => ({
+          name: f.name,
+          contextId: f.contextId,
+          steps: f.steps.map((step) => ({
+            name: step.name,
+            actor: step.actor,
+          })),
+        }));
 
       const result = await canvasApi.generateComponents({
         contexts: mappedContexts,
@@ -611,7 +615,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                   <button
                     type="button"
                     className={styles.secondaryButton}
-                    onClick={() => autoGenerateFlows(contextNodes)}
+                    onClick={() => autoGenerateFlows(contextNodes.filter((c) => c.confirmed))}
                     disabled={flowGenerating}
                     aria-label="生成流程树"
                     title="基于已确认的限界上下文生成业务流程树"
@@ -868,7 +872,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                       <button
                         type="button"
                         className={styles.secondaryButton}
-                        onClick={() => autoGenerateFlows(contextNodes)}
+                        onClick={() => autoGenerateFlows(contextNodes.filter((c) => c.confirmed))}
                         disabled={flowGenerating}
                         aria-label="继续到流程树"
                         title="基于已确认的限界上下文生成业务流程树"

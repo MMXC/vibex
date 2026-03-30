@@ -1,3 +1,14 @@
+### Fixed (coord-decision-report Epic2: 阻塞根因分析) — 2026-03-30
+- **F2.1**: 阻塞任务检测 — pending 任务中 dependsOn 未全部完成的任务
+- **F2.2**: 根因识别 — 依赖链中第一个未完成的任务
+- **F2.3**: 阻塞时长计算 — now - 最新完成依赖时间
+- **F2.4**: 输出集成 — text 和 JSON 格式的阻塞任务区块
+- **新增文件**: `coord_decision_report.py` (独立CLI), `scripts/current_report/_blocked_analysis.py` (核心逻辑)
+- **测试**: 11 个新测试覆盖 F2.1-F2.4，38 tests passing
+- **执行时间**: < 2s
+- **提交**: `c7280dce`, `cf894df2`
+- **审查**: ✅ PASSED (reviewer-epic2-阻塞根因分析)
+
 ### Fixed (vibex-next-roadmap-ph1 Epic3: 交集高亮与起止标记) — 2026-03-30
 - **F8**: 交集高亮 — `OverlapHighlightLayer` 在 `CardTreeRenderer` 中渲染 BC 卡片交集区域，SVG 层 z-index:20，pointer-events:none
 - **F9**: 起止节点标记 — `CardTreeNode` 显示 ◉ (起点) 和 ◎ (终点) 标记，`buildFlowGraph` 自动设置 isStart/isEnd 标志

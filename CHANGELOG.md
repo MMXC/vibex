@@ -1,3 +1,11 @@
+### Fixed (vibex-exec-sandbox-freeze Epic3: 输出恢复) — 2026-03-30
+- **F3.1**: echo输出捕获 — exec输出捕获正常返回，无pipe断裂
+- **F3.2**: stderr重定向 — 2>&1 混合输出正常
+- **F3.3**: exit code保留 — exit 42 被正确保留
+- **测试**: 20 tests passing（含F3.1-F3.3专项测试）
+- **提交**: `118c8247` (Epic3验收+测试), `0f97056d` (Epic1+2+3共用)
+- **审查**: ✅ PASSED (reviewer-epic3-输出恢复)
+
 ### Fixed (vibex-exec-sandbox-freeze Epic2: 超时保护) — 2026-03-30
 - **F2.1**: timeout包装器 — `timeout` 命令包装命令执行，超时返回 exit 124
 - **F2.2**: 环境变量控制 — `COMMAND_TIMEOUT` 环境变量配置超时时间，默认 30s

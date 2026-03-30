@@ -20,25 +20,30 @@ TEAM_TASKS_DIR = "/root/.openclaw/workspace-coord/team-tasks"
 PRIORITY_ORDER = {"p0": 0, "p1": 1, "p2": 2}
 
 
-def _load_all_projects() -> dict:
+def _load_all_projects(tasks_dir: str = None) -> dict:
     """Load all project JSON files from team-tasks directory.
+
+    Args:
+        tasks_dir: Directory to load from. Defaults to TEAM_TASKS_DIR.
 
     Silently skips files that cannot be read (e.g., name too long, permission denied).
     """
     projects = {}
+    if tasks_dir is None:
+        tasks_dir = TEAM_TASKS_DIR
 
-    if not os.path.isdir(TEAM_TASKS_DIR):
-        return {"projects": projects, "error": f"Directory not found: {TEAM_TASKS_DIR}"}
+    if not os.path.isdir(tasks_dir):
+        return {"projects": projects, "error": f"Directory not found: {tasks_dir}"}
 
     try:
-        entries = os.listdir(TEAM_TASKS_DIR)
+        entries = os.listdir(tasks_dir)
     except OSError:
-        return {"projects": projects, "error": f"Cannot list directory: {TEAM_TASKS_DIR}"}
+        return {"projects": projects, "error": f"Cannot list directory: {tasks_dir}"}
 
     for fname in entries:
         if not fname.endswith(".json") or fname.startswith("."):
             continue
-        fpath = os.path.join(TEAM_TASKS_DIR, fname)
+        fpath = os.path.join(tasks_dir, fname)
         try:
             with open(fpath) as f:
                 data = json.load(f)
@@ -98,7 +103,7 @@ def get_ready_tasks(tasks_dir: str = None) -> dict:
     if tasks_dir is None:
         tasks_dir = TEAM_TASKS_DIR
 
-    result = _load_all_projects()
+    result = _load_all_projects(tasks_dir)
     if result.get("error") and not result.get("projects"):
         return {"ready": [], "error": result["error"]}
 

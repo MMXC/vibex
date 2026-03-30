@@ -1,3 +1,10 @@
+### Fixed (canvas-epic3-test-fill Epic1: canvas-expand 测试补充) — 2026-03-31
+- **F1.1**: ExpandPanel 组件测试 — ExpandPanel.test.tsx (9 tests, F1.1-F1.3)
+- **F1.2**: E2E 测试修正 — aria-label 定位器修正 (`均分视口` / `退出均分` / `最大化` / `退出最大化`)
+- **测试**: ExpandPanel 9/9 pass, E2E 5/5 pass (E3.2-1 到 E3.2-5)
+- **提交**: `c08b8578` (aria-label 修正), `fb4aeb7f` (ExpandPanel 测试)
+- **审查**: ✅ PASSED (reviewer-epic1-canvas-expand-spec)
+
 ### Fixed (canvas-selection-filter-bug Epic1: 只传已确认卡片到API) — 2026-03-31
 - **F1.1**: handleContinueToComponents — 只发送 `confirmed=true` 的 contexts 到 API
 - **F1.2**: handleContinueToComponents — 只发送 `confirmed=true` 的 flows 到 API

@@ -454,6 +454,7 @@ function FlowCard({
             checked={selected ?? false}
             onChange={() => onToggleSelect(node.nodeId)}
             aria-label={`选择流程 ${node.name}`}
+            title="用于批量选择，非确认操作"
             onClick={(e) => e.stopPropagation()}
           />
         )}

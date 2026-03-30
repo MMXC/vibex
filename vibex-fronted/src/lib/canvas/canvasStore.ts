@@ -25,6 +25,7 @@ import type {
   BoundedGroup,
   BoundedEdge,
   FlowEdge,
+  NodeStatus,
 } from './types';
 
 /** F1: Canvas expand mode — replaces old leftExpand/centerExpand/rightExpand logic */

@@ -45,7 +45,7 @@ test.describe('Canvas E2E — Epic 3.2: Canvas 状态与质量', () => {
 
   test('E3.2-1: expand-both 模式下三栏等宽', async ({ page }) => {
     // Verify expand button is visible in context phase
-    const expandBtn = page.locator('button[aria-label="全屏展开"]');
+    const expandBtn = page.locator('button[aria-label="均分视口"]');
     await expect(expandBtn).toBeVisible({ timeout: 5000 });
 
     // Get tree panels before expand
@@ -61,8 +61,8 @@ test.describe('Canvas E2E — Epic 3.2: Canvas 状态与质量', () => {
     await expandBtn.click();
     await page.waitForTimeout(500);
 
-    // Verify expand button changed to "退出全屏"
-    const exitBtn = page.locator('button[aria-label="退出全屏展开"]');
+    // Verify expand button changed to "退出均分"
+    const exitBtn = page.locator('button[aria-label="退出均分"]');
     await expect(exitBtn).toBeVisible({ timeout: 3000 });
 
     // Verify 3 tree panels still present
@@ -117,12 +117,12 @@ test.describe('Canvas E2E — Epic 3.2: Canvas 状态与质量', () => {
 
     // Verify clicking a tree panel action button works (not blocked by SVG overlay)
     // Use a button in the tree panel toolbar (not inside a scrollable tree node area)
-    const expandBtn = page.locator('button[aria-label="全屏展开"]');
+    const expandBtn = page.locator('button[aria-label="均分视口"]');
     if (await expandBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
       await expandBtn.click();
       await page.waitForTimeout(300);
-      // Verify expand mode changed (button should now say "退出全屏展开")
-      const exitBtn = page.locator('button[aria-label="退出全屏展开"]');
+      // Verify expand mode changed (button should now say "退出均分")
+      const exitBtn = page.locator('button[aria-label="退出均分"]');
       const expandChanged = await exitBtn.isVisible({ timeout: 3000 }).catch(() => false);
       expect(expandChanged).toBe(true);
       // Page should still be functional (no crash)
@@ -201,7 +201,7 @@ test.describe('Canvas E2E — Epic 3.2: Canvas 状态与质量', () => {
     await expect(maximizeBtn).toBeVisible({ timeout: 3000 });
 
     // Verify expand button is visible
-    const expandBtn = page.locator('button[aria-label="全屏展开"]');
+    const expandBtn = page.locator('button[aria-label="均分视口"]');
     await expect(expandBtn).toBeVisible({ timeout: 3000 });
 
     // Verify tree panels are visible and have content

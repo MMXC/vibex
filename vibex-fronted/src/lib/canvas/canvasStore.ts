@@ -554,13 +554,22 @@ export const useCanvasStore = create<CanvasStore>()(
             get().cascadeContextChange(nodeId);
           },
 
+          // F1.1: Toggle — confirmContextNode now toggles confirmed state
+          // First click: confirmed=true, status='confirmed'
+          // Second click: confirmed=false, status='pending'
           confirmContextNode: (nodeId) => {
             const newContextNodes = get().contextNodes.map((n) =>
-              n.nodeId === nodeId ? { ...n, confirmed: true, status: 'confirmed' as const } : n
+              n.nodeId === nodeId
+                ? {
+                    ...n,
+                    confirmed: !n.confirmed,
+                    status: (!n.confirmed ? 'confirmed' : 'pending') as NodeStatus,
+                  }
+                : n
             );
             set({ contextNodes: newContextNodes });
             getHistoryStore().recordSnapshot('context', newContextNodes);
-            // Cascade: context confirmed → downstream trees may activate
+            // Cascade: context confirmed/unconfirmed → downstream trees may activate/deactivate
             get().recomputeActiveTree();
             // Epic 3 S3.1: auto-generate flow tree when ALL contexts confirmed
             const allConfirmed = cascade.areAllConfirmed(newContextNodes);

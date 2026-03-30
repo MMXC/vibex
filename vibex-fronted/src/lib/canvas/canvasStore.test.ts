@@ -161,7 +161,8 @@ describe('canvasStore', () => {
       expect(nodes[0].status).toBe('pending');
     });
 
-    it('should confirm a context node', () => {
+    // F1.1: Toggle function — first click confirms, second click unconfirms
+    it('should confirm a context node on first click', () => {
       const { addContextNode, confirmContextNode } = useCanvasStore.getState();
       addContextNode({ name: 'Test', description: '', type: 'core' });
       const nodeId = useCanvasStore.getState().contextNodes[0].nodeId;
@@ -170,6 +171,44 @@ describe('canvasStore', () => {
       const node = useCanvasStore.getState().contextNodes[0];
       expect(node.confirmed).toBe(true);
       expect(node.status).toBe('confirmed');
+    });
+
+    it('should unconfirm a context node on second click (toggle)', () => {
+      const { addContextNode, confirmContextNode } = useCanvasStore.getState();
+      addContextNode({ name: 'Test', description: '', type: 'core' });
+      const nodeId = useCanvasStore.getState().contextNodes[0].nodeId;
+
+      // First click → confirmed
+      confirmContextNode(nodeId);
+      expect(useCanvasStore.getState().contextNodes[0].confirmed).toBe(true);
+      expect(useCanvasStore.getState().contextNodes[0].status).toBe('confirmed');
+
+      // Second click → unconfirmed (toggle off)
+      confirmContextNode(nodeId);
+      const node = useCanvasStore.getState().contextNodes[0];
+      expect(node.confirmed).toBe(false);
+      expect(node.status).toBe('pending');
+    });
+
+    // F1.2: State sync — progress should update correctly on toggle
+    it('should update context confirmed count after toggle off', () => {
+      const { addContextNode, confirmContextNode } = useCanvasStore.getState();
+      addContextNode({ name: 'Test1', description: '', type: 'core' });
+      addContextNode({ name: 'Test2', description: '', type: 'supporting' });
+
+      const nodes = useCanvasStore.getState().contextNodes;
+      const id1 = nodes[0].nodeId;
+      const id2 = nodes[1].nodeId;
+
+      // Confirm both
+      confirmContextNode(id1);
+      confirmContextNode(id2);
+      expect(useCanvasStore.getState().contextNodes.filter(n => n.confirmed).length).toBe(2);
+
+      // Toggle off one
+      confirmContextNode(id1);
+      expect(useCanvasStore.getState().contextNodes.filter(n => n.confirmed).length).toBe(1);
+      expect(useCanvasStore.getState().contextNodes.filter(n => !n.confirmed).length).toBe(1);
     });
 
     it('should edit a context node and cascade to flow+component', () => {

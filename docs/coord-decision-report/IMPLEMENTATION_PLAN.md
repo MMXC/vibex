@@ -292,13 +292,84 @@ time python coord_decision_report.py
 
 ## 6. 验收标准
 
-- [ ] `coord_decision_report.py` 可执行
-- [ ] 文本输出格式正确
-- [ ] `--json` 输出 valid JSON
-- [ ] 执行时间 < 2 秒
-- [ ] 复用 task-manager 分析器
-- [ ] 测试通过
+- [x] `coord_decision_report.py` 可执行
+- [x] 文本输出格式正确
+- [x] `--json` 输出 valid JSON
+- [x] 执行时间 < 2 秒
+- [x] 复用 task-manager 分析器
+- [x] 测试通过
 
 ---
 
-*本文档由 Architect Agent 生成*
+## 7. Epic 完成状态
+
+| Epic | 功能 | 状态 | Commit |
+|------|------|------|--------|
+| Epic1 | Ready 决策引擎 | ✅ done | 62ff3190 |
+| Epic2 | 阻塞根因分析 | ✅ done | c7280dce |
+| Epic3 | 空转提案推荐 | ✅ done | 667b6d7a |
+| Epic4 | CLI 集成 | ✅ done | 见下方 |
+
+---
+
+## 8. coord-heartbeat 集成指南
+
+### 8.1 快速替换方案
+
+将 coord-heartbeat-v8.sh 中的多步扫描替换为单次 CLI 调用：
+
+```bash
+# 替换前（v8.sh 多步扫描，约 5-10s）
+$TASK_CLI list | grep "\[active\]" | ...
+$TASK_CLI status $project | grep "🟢 READY" | ...
+
+# 替换后（coord_decision_report.py，单次调用，<1s）
+python3 /root/.openclaw/vibex/coord_decision_report.py --idle $new_count
+```
+
+### 8.2 集成步骤
+
+1. 在 `coord-heartbeat-v8.sh` 的 Step 1 之前添加：
+```bash
+# ============ Step 0: Coord Decision Report（Epic4 集成） ============
+decision_output=$(python3 /root/.openclaw/vibex/coord_decision_report.py --idle $new_count 2>&1)
+decision_exit=$?
+echo "$decision_output"
+if [ $decision_exit -eq 1 ]; then
+    echo "⚠️ 决策警报: 有阻塞任务或连续空转 ≥ 3"
+fi
+```
+
+2. 可选：将 decision_output 添加到 Slack 报告头部
+
+### 8.3 退出码规范
+
+| 退出码 | 含义 |
+|--------|------|
+| 0 | 正常，无阻塞，空转 < 3 |
+| 1 | 有阻塞任务 或 连续空转 ≥ 3 |
+
+---
+
+## 9. 验证命令
+
+```bash
+# 快速验证（文本模式）
+python3 /root/.openclaw/vibex/coord_decision_report.py --idle 0
+
+# 快速验证（JSON模式）
+python3 /root/.openclaw/vibex/coord_decision_report.py --idle 3 --json
+
+# 性能测试
+time python3 /root/.openclaw/vibex/coord_decision_report.py --idle 0
+
+# 集成测试
+bash /root/.openclaw/scripts/coord-heartbeat-v8.sh 2>&1 | grep "Coord Decision"
+
+# 测试覆盖
+python3 -m pytest tests/test_coord_decision_report/ -v
+```
+
+---
+
+*本文档由 Architect Agent 生成 | Dev 更新: 2026-03-30*

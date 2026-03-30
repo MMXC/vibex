@@ -11,7 +11,7 @@
 | Epic | 名称 | 状态 | DoD |
 |------|------|------|-----|
 | Epic 1 | 健康检查机制 | ✅ Done | 3/3 |
-| Epic 2 | 超时保护 | 🔄 In Progress | 0/3 |
+| Epic 2 | 超时保护 | ✅ Done | 3/3 |
 | Epic 3 | 输出恢复 | ⬜ Pending | 0/3 |
 | Epic 4 | OpenClaw 源码修复 | ⬜ Pending | 0/3 |
 
@@ -36,22 +36,28 @@
 
 ---
 
-## Epic 2: 超时保护 🔄
+## Epic 2: 超时保护 ✅
 
-**依赖**: Epic 1
+**Commit**: `0f97056d` (与 Epic1 同期提交)
+**验收时间**: 2026-03-30 22:28
 
 ### Stories
 
 | Story | 功能 | 状态 | 产出文件 |
 |-------|------|------|---------|
-| F2.1 | 超时包装器 | 🔄 Pending | `scripts/exec-wrapper.sh` |
-| F2.2 | 可配置 timeout | 🔄 Pending | env: `COMMAND_TIMEOUT` |
-| F2.3 | 超时错误处理 | 🔄 Pending | `scripts/exec-wrapper.sh` |
+| F2.1 | 超时包装器 | ✅ Done | `scripts/exec-wrapper.sh` |
+| F2.2 | 可配置 timeout | ✅ Done | env: `COMMAND_TIMEOUT` |
+| F2.3 | 超时错误处理 | ✅ Done | `scripts/exec-wrapper.sh` |
+
+### 验收证据
+- `bash exec-wrapper.sh 2 sleep 10` → exit 124 (timeout kill) ✅
+- `COMMAND_TIMEOUT=60` 环境变量支持 ✅
+- 超时错误输出到 stderr ✅
 
 ### DoD
-- [ ] 默认 30s 超时
-- [ ] 可配置超时时间
-- [ ] 超时时正确终止进程
+- [x] 默认 30s 超时
+- [x] 可配置超时时间
+- [x] 超时时正确终止进程
 
 ---
 
@@ -101,9 +107,9 @@ scripts/
   exec-health-check.sh   # 健康检查脚本
 
 docs/vibex-exec-sandbox-freeze/
-  FIX.md                # 根因分析
-  Epic1_health_check.md # Epic1 验收报告
-  IMPLEMENTATION_PLAN.md # 本文件
+  FIX.md                    # 根因分析
+  Epic1_health_check.md     # Epic1 验收报告
+  IMPLEMENTATION_PLAN.md     # 本文件 (Epic1+2 done)
 ```
 
 ---

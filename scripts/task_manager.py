@@ -2075,6 +2075,7 @@ def cmd_current_report(args):
             detect_false_completions,
             get_server_info,
             get_ready_tasks,
+            get_blocked_tasks,
             format_text,
             format_json,
         )
@@ -2086,6 +2087,7 @@ def cmd_current_report(args):
                 detect_false_completions,
                 get_server_info,
                 get_ready_tasks,
+                get_blocked_tasks,
                 format_text,
                 format_json,
             )
@@ -2098,6 +2100,7 @@ def cmd_current_report(args):
 
     try:
         ready = get_ready_tasks(tasks_path)
+        blocked = get_blocked_tasks(tasks_path)
         active = get_active_projects(tasks_path)
         false_comp = detect_false_completions(tasks_path)
         server = get_server_info()
@@ -2107,9 +2110,9 @@ def cmd_current_report(args):
         _sys.exit(1)
 
     if args.json:
-        print(format_json(active, false_comp, server, ready))
+        print(format_json(active, false_comp, server, ready, blocked))
     else:
-        print(format_text(active, false_comp, server, ready))
+        print(format_text(active, false_comp, server, ready, blocked))
 
     _sys.exit(0)
 

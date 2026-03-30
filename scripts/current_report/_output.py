@@ -24,6 +24,26 @@ def format_text(active: dict, false_comp: dict, server: dict,
                 )
                 if t.get("task_desc"):
                     lines.append(f"    {t['task_desc']}")
+                lines.append("")
+
+    # === Blocked Tasks (F2: Blocked Root Cause Analysis) ===
+    if blocked is not None:
+        count = blocked.get("count", 0)
+        tasks = blocked.get("blocked", [])
+        lines.append(f"=== Blocked Tasks ({count}) ===")
+        if blocked.get("error"):
+            lines.append(f"  ERROR: {blocked['error']}")
+        elif count == 0:
+            lines.append("  ✓ No blocked tasks")
+        else:
+            for t in tasks:
+                dur = t.get('blocked_duration_str', 'unknown')
+                lines.append(f"  [{t['agent']}] {t['project']}/{t['task_id']} (blocked for {dur})")
+                lines.append(f"    🚫 Blocked by: {', '.join(t['blocked_by'][:3])}")
+                if len(t['blocked_by']) > 3:
+                    lines.append(f"    + {len(t['blocked_by']) - 3} more dependencies")
+                lines.append(f"    ⚠️ Root cause: {t['root_cause']}")
+                lines.append("")
 
     # === Active Projects ===
     active_count = active.get("count", 0)
@@ -90,6 +110,7 @@ def format_json(active: dict, false_comp: dict, server: dict,
         "false_completions": false_comp,
         "server_info": server,
         "ready_tasks": ready,
+        "blocked_tasks": blocked,
         "generated_at": ts,
     }
     return json.dumps(result, indent=2, ensure_ascii=False)

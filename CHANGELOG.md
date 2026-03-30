@@ -35,6 +35,15 @@
 - **测试**: 21 tests passing
 - **审查**: ✅ PASSED (reviewer-epic4-cli集成)
 
+### Fixed (vibex-canvas-checkbox-unify Epic3: 分组批量确认功能) — 2026-03-30
+- **F3.1**: 确认全部按钮 — 组件组标签旁添加 ✓ 确认全部 按钮，仅组内有未确认节点时显示
+- **F3.2**: 批量确认逻辑 — `confirmAllComponentNodes(groupId)` 按 flowId 匹配节点批量确认
+- **F3.3**: 递归确认 — 多子组时递归确认所有子组节点
+- **新增**: canvasStore.ts +49行，ComponentTree.tsx +17行，canvas.module.css +24行
+- **测试**: 63 tests pass
+- **提交**: `547a4858`
+- **审查**: ✅ PASSED (reviewer-epic3-分组批量确认功能)
+
 ### Fixed (coord-decision-report Epic3: 空转提案推荐) — 2026-03-30
 - **F3.1**: 提案扫描 — 扫描 `proposals/` 目录，支持多目录扫描，过滤 self-check 报告
 - **F3.2**: Ranking 算法 — 综合 priority(P0=100/P1=50/P2=10) + recency(<7d=+30/<14d=+15/<30d=+5) + strategic_value(关键字匹配)

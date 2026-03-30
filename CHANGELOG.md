@@ -10,6 +10,15 @@
 - **提交**: `6d7e28fe`
 - **审查**: ✅ PASSED (reviewer-dev-current-report)
 
+### Fixed (coord-decision-report Epic4: CLI集成) — 2026-03-30
+- **F4.1**: 纯文本默认输出 — 决策导向格式，可读性强（Ready/Blocked/Active/Summary）
+- **F4.2**: JSON 可选输出 — `--json` 输出 valid JSON，包含完整数据结构
+- **F4.3**: 向后兼容 — `coord_decision_report.py` 独立 CLI，支持 --workspace/--tasks-dir/--proposals-dir/--idle
+- **集成**: 复用 `scripts/current_report/` 分析器（D1/D2/D3）
+- **执行**: `python coord_decision_report.py` 和 `python coord_decision_report.py --idle 3` 均验证通过
+- **测试**: 21 tests passing
+- **审查**: ✅ PASSED (reviewer-epic4-cli集成)
+
 ### Fixed (coord-decision-report Epic3: 空转提案推荐) — 2026-03-30
 - **F3.1**: 提案扫描 — 扫描 `proposals/` 目录，支持多目录扫描，过滤 self-check 报告
 - **F3.2**: Ranking 算法 — 综合 priority(P0=100/P1=50/P2=10) + recency(<7d=+30/<14d=+15/<30d=+5) + strategic_value(关键字匹配)

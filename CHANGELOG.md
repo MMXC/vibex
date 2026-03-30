@@ -1,3 +1,11 @@
+### Fixed (vibex-exec-sandbox-freeze Epic2: 超时保护) — 2026-03-30
+- **F2.1**: timeout包装器 — `timeout` 命令包装命令执行，超时返回 exit 124
+- **F2.2**: 环境变量控制 — `COMMAND_TIMEOUT` 环境变量配置超时时间，默认 30s
+- **F2.3**: 超时错误处理 — 超时错误输出到 stderr
+- **实现**: 复用 exec-wrapper.sh（Epic1 共用）
+- **提交**: `0f97056d` (Epic1+2 共用), `9a17a9af` (IMPLEMENTATION_PLAN)
+- **审查**: ✅ PASSED (reviewer-epic2-超时保护)
+
 ### Fixed (vibex-exec-sandbox-freeze Epic1: 健康检查机制) — 2026-03-30
 - **F1.1**: 健康检查函数 — `exec-health-check.sh` 检测 stdout/stderr pipe 异常
 - **F1.2**: 警告机制 — exec-wrapper.sh 包装命令执行，超时控制

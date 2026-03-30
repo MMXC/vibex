@@ -1,3 +1,12 @@
+### Fixed (vibex-canvas-checkbox-unify Epic2: 流程卡片Checkbox语义澄清) — 2026-03-30
+- **F2.1**: Tooltip澄清 — FlowCard checkbox 添加 title="用于批量选择，非确认操作"
+- **F2.2**: 批量删除工具栏 — pre-existing，删除 ({selectedCount}) button 已存在
+- **F2.3**: Step确认独立 — checkbox onChange 仅调用 onToggleSelect，不影响 step.confirmed
+- **修复**: 添加缺失的 NodeStatus import（修复 TS2304）
+- **测试**: BusinessFlowTree.test.tsx 新增 tooltip 测试，66 tests pass
+- **提交**: `b8c24fa2`, `a81303df`
+- **审查**: ✅ PASSED (reviewer-epic2-流程卡片-checkbox-语义澄清)
+
 ### Fixed (vibex-canvas-checkbox-unify Epic1: Toggle修复) — 2026-03-30
 - **F1.1**: Toggle 确认逻辑 — `confirmContextNode` 现在在 confirmed/unconfirmed 之间切换，而非单向确认
 - **F1.2**: 状态同步 — toggle off 时减少 confirmed 计数

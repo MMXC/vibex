@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+### E3: Canvas 选区 Bug 修复 (proposals-20260401)
+- **E3-T1** — 修复 drag selection stale closure bug: useRef 替代 useState 闭包陷阱，handleMouseUp 捕获初始 null selectionBox 问题
+- **E3-T2** — E2E 测试覆盖: Playwright canvas-selection.spec.ts (4 scenarios: drag/ESC/click/outside)
+- 修复: `useDragSelection.ts` 依赖数组精简，避免 mousemove 每次重注册监听器
+- Commits: `41ff5f0f`, `bf4f2cdc`
+
 ### Epic2: 面板折叠解耦 (canvas-three-tree-unification)
 - **S2.1** — 三面板独立折叠状态持久化: contextPanelCollapsed / flowPanelCollapsed / componentPanelCollapsed
 - **S2.2** — 面板折叠状态写入 canvasStore partialize (persist 持久化到 localStorage)

@@ -1279,6 +1279,10 @@ export const useCanvasStore = create<CanvasStore>()(
           leftExpand: state.leftExpand,
           centerExpand: state.centerExpand,
           rightExpand: state.rightExpand,
+          // Epic 2: persist panel collapse state independently
+          contextPanelCollapsed: state.contextPanelCollapsed,
+          flowPanelCollapsed: state.flowPanelCollapsed,
+          componentPanelCollapsed: state.componentPanelCollapsed,
         }),
       }
     ),

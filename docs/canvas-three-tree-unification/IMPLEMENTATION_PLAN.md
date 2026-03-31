@@ -44,3 +44,9 @@
 - [x] S1.3: 移除 phase 对树操作的约束（useKeyboardShortcuts enabled）
 - [x] S1.4: hasNodes 函数替代 areAllConfirmed 作为显示指标
 - [x] 验收: npm build 通过（CI=false）
+
+### Epic 2: 面板折叠解耦 ✅
+- [x] S2.1: contextPanelCollapsed / flowPanelCollapsed / componentPanelCollapsed 独立 boolean 状态
+- [x] S2.2: persist partialize 中添加三个 panelCollapsed 字段（切换 phase 后保留折叠状态）
+- [x] S2.3: 验证可同时展开多个面板（三状态互相独立）
+- [x] 验收: tsc --noEmit 通过

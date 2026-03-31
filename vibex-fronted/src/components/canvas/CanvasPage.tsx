@@ -704,9 +704,23 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const flowActive = activeTree === 'flow';
   const componentActive = activeTree === 'component';
 
+  // === Epic 5: Drawer state for layout ===
+  const leftDrawerOpen = useCanvasStore((s) => s.leftDrawerOpen);
+  const rightDrawerOpen = useCanvasStore((s) => s.rightDrawerOpen);
+
+  // Compute container class based on drawer state
+  const containerClasses = [
+    styles.canvasContainer,
+    expandMode === 'maximize' && styles.maximizeMode,
+    expandMode === 'expand-both' && styles.expandBothMode,
+    leftDrawerOpen && styles.canvasContainerWithLeftDrawer,
+    rightDrawerOpen && styles.canvasContainerWithRightDrawer,
+    leftDrawerOpen && rightDrawerOpen && styles.canvasContainerWithBothDrawers,
+  ].filter(Boolean).join(' ');
+
   // === Render ===
   return (
-    <div className={`${styles.canvasContainer} ${expandMode === 'maximize' ? styles.maximizeMode : expandMode === 'expand-both' ? styles.expandBothMode : ''}`}>
+    <div className={containerClasses}>
       {/* Phase Progress Bar */}
       <div className={styles.phaseProgressBarWrapper}>
         <PhaseProgressBar currentPhase={phase} onPhaseClick={handlePhaseClick} />

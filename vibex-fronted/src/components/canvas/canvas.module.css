@@ -4148,3 +4148,35 @@
 .legendItem svg {
   flex-shrink: 0;
 }
+
+/* ── Epic 5 S5.1: Canvas Flex Row Layout with Drawers ───────────────────── */
+.canvasContainerWithLeftDrawer {
+  flex-direction: row !important;
+}
+
+.canvasContainerWithRightDrawer {
+  flex-direction: row !important;
+}
+
+.canvasContainerWithBothDrawers {
+  flex-direction: row !important;
+}
+
+/* ── Epic 5 S5.2: Drawer-aware Tree Panels Grid ────────────────────────── */
+.treePanelsGridWithLeftDrawer {
+  /* When left drawer is open, reduce grid flex to leave space */
+  flex: 1;
+  min-width: 400px;
+}
+
+.treePanelsGridWithRightDrawer {
+  /* When right drawer is open */
+  flex: 1;
+  min-width: 400px;
+}
+
+/* CSS variables for drawer widths (set by JavaScript) */
+.treePanelsGrid {
+  --left-drawer-width: 200px;
+  --right-drawer-width: 200px;
+}

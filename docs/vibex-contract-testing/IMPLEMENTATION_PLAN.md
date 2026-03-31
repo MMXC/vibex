@@ -26,7 +26,8 @@ Epic 1 → Epic 2 → Epic 3, 4 可并行
 ### Epic 4: CI 契约测试 ✅
 1. 创建 canvas-contract.test.ts (backend/src/lib/contract/) ✅
 2. 写 canvas API 契约测试 (F4.1-F4.11) ✅
-3. npx jest canvas-contract --no-coverage: 11/11 ✅ (commit 59d7570c)
+3. 添加 '管理' 到 forbiddenNames ✅ (fix round 2: c64604a2)
+4. npx jest --no-coverage: backend 528/528 ✅ | frontend 243 suites ✅
 
 ## 验收
 - npm test:contract 通过

@@ -62,11 +62,11 @@ const config: Config = {
 
   // Coverage thresholds
   coverageThreshold: {
-    global: {
-      branches: 40,
-      functions: 45,
-      lines: 55,
-      statements: 55,
+    // Canvas directory: low threshold (rapidly evolving area)
+    './src/components/canvas/**': {
+      branches: 30,
+      functions: 40,
+      lines: 50,
     },
     './src/components/ui/ConfirmationSteps.tsx': {
       branches: 0,

@@ -5,6 +5,20 @@
 - **测试**: S2.3 独立性测试 ✅
 - **提交**: `bdbd2d5b`, `0def9e76`
 
+### Added (canvas-three-tree-unification Epic3: confirmed→isActive 重构) — 2026-04-01
+- **S3.1**: 节点状态字段重命名: confirmed → isActive (isActive !== false 即为活跃)
+- **S3.2**: 移除 areAllConfirmed/hasAllNodes，统一用 hasNodes 检测
+- **S3.3**: CanvasPage/BoundedContextTree/BusinessFlowTree/ComponentTree 更新 isActive 引用
+- **S3.4**: 废弃 confirmationStore 中已迁移到 canvasStore 的类型
+- Commit: `108afc35`
+
+### Added (canvas-three-tree-unification Epic4: Cascade 手动触发) — 2026-04-01
+- **S4.1**: 移除自动 cascadeContextChange/cascadeFlowChange：编辑/删除节点不再自动重置下游树
+- **S4.2**: 添加 generateComponentFromFlow() 手动生成方法，用户可手动触发组件生成
+- **S4.3**: CascadeUpdateManager cascade 系列方法标记 @deprecated
+- **S4.4**: 打破原有线性约束：三树完全独立，用户可选择性触发级联更新
+- Commit: `e477743c`
+
 ### Added (canvas-three-tree-unification Epic1: Tab 切换器 + 废除 phase 约束) — 2026-04-01
 - **TabBar**: 三树 Tab 切换器组件 (context/flow/component)
 - **hasNodes**: 新函数替代 areAllConfirmed 作为显示指标

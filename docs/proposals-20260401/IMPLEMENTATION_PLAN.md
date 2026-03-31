@@ -2,8 +2,8 @@
 
 **Agent**: Architect
 **日期**: 2026-04-01
-**版本**: v1.0
-**状态**: 设计完成
+**版本**: v1.1
+**状态**: Sprint 1 进行中
 
 ---
 
@@ -35,14 +35,15 @@ Sprint 3（4/14-4/18）
 ### 负责: Dev
 ### 依赖: 无
 ### 启动: Sprint 1 Day 1
+### 状态: ✅ **已完成** (commit: `41d75bf3` + `a3c55d20`)
 
 ### 任务拆分
 
-| # | 任务 | 工时 | 产出文件 | 验收标准 |
-|---|------|------|---------|---------|
-| E1-T1 | Backend TS pre-test 修复 | 1.5h | `vibex-backend/tsconfig.json` | `npm test --workspace backend` 全绿 |
-| E1-T2 | Frontend TS pre-test 修复 | 1h | `vibex-frontend/tsconfig.json` | `npx tsc --noEmit` 0 error |
-| E1-T3 | task_manager.py 文件锁 Bug | 1h | `scripts/task_manager.py` | 并发 3 路 claim 无死锁 |
+| # | 任务 | 工时 | 产出文件 | 验收标准 | 状态 |
+|---|------|------|---------|---------|------|
+| E1-T1 | Backend TS pre-test 修复 | 1.5h | `vibex-backend/tsconfig.json` | `npm test --workspace backend` 全绿 | ✅ `41d75bf3` |
+| E1-T2 | Frontend TS pre-test 修复 | 1h | `vibex-fronted/tsconfig.json` | `pnpm tsc --noEmit` 0 error | ✅ 已有 |
+| E1-T3 | task_manager.py 文件锁 Bug | 1h | `scripts/task_manager.py` | 并发 3 路 claim 无死锁 | ✅ `54e8f152` |
 
 ### 关键路径
 ```
@@ -53,10 +54,14 @@ E1-T3: 重构 task_manager.py 文件锁逻辑 → 加 try-finally 超时保护
 
 ### 验收测试
 ```bash
-# 本地验证
-npm run pretest --workspace vibex-backend
-npm run pretest --workspace vibex-frontend
-python3 scripts/task_manager_test_concurrency.py
+# E1-T1: Backend tests
+npm test --workspace vibex-backend  # ✅ 62 suites, 528 tests passed
+
+# E1-T2: Frontend TypeScript
+pnpm tsc --noEmit  # ✅ 0 errors
+
+# E1-T3: Concurrent claim safety
+python3 -m pytest scripts/tests/test_concurrent.py scripts/tests/test_task_state_concurrency.py  # ✅ 18/18 passed
 ```
 
 ---

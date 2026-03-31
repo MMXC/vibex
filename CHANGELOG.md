@@ -1,3 +1,10 @@
+### Fixed (vibex-test-env-fix Epic2: React 19 兼容性修复) — 2026-03-31
+- **D002**: jest.setup.js — 添加 `useReactFlow` mock
+- **问题**: @xyflow/react mock 缺少 useReactFlow，CardTreeNode 15 tests 全部失败
+- **修复**: 添加 `useReactFlow` mock 返回 `{ setNodes, setEdges, getNodes, getEdges, fitView, zoomIn, zoomOut, project }`
+- **提交**: `32667283`
+- **审查**: ✅ PASSED (reviewer-epic2-d002-react19compat)
+
 ### Fixed (vibex-test-env-fix Epic1: ESLint pre-test 警告阈值调整) — 2026-03-31
 - **D001**: pre-test-check.js — `--max-warnings 0` → `--max-warnings 999`
 - **效果**: npm test 不再因 ESLint warnings 阻塞

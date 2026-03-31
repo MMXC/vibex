@@ -1,3 +1,12 @@
+### Added (canvas-data-model-unification Epic1: Phase1 样式统一) — 2026-03-31
+- **P1-T5**: deriveDomainType/deriveStepType 工具函数, FLOW_STEP_TYPE_CONFIG/DOMAIN_TYPE_CONFIG
+- **P1-T5**: canvas.variables.css 统一 CSS token 系统
+- **P1-T3**: flow step emoji (🔀/🔁) → SVG branch/loop icons
+- **P1-T2**: emoji (✎/🗑/✓/⋮⋮) → SVG icon buttons
+- **P1-T6**: 单元测试 types.utilities.test.ts
+- **验证**: pnpm build ✅, 231 suites (2921 tests) ✅
+- **提交**: `cc2201d0`
+
 ### Fixed (vibex-tree-panels-height Epic1: 面板高度修复) — 2026-03-31
 - **修复**: .treePanelsGrid 添加 `flex: 1` + `min-height: 0` 解决面板高度为0问题
 - **验证**: gstack snapshot 确认三栏面板 (context/flow/component) 均可见

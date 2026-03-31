@@ -23,11 +23,10 @@ Epic 1 → Epic 2 → Epic 3, 4 可并行
 2. 集成到 generateContexts/generateFlows/generateComponents ✅
 3. canvasApiValidation.test.ts: 16 tests ✅ (commit b537bfdb)
 
-### Epic 4: CI 契约测试
-1. 创建 __tests__/contract/ 目录
-2. 写 MSW 契约测试
-3. 更新 jest.config.ts 添加 contract project
-4. 验证 CI blocking 机制
+### Epic 4: CI 契约测试 ✅
+1. 创建 canvas-contract.test.ts (backend/src/lib/contract/) ✅
+2. 写 canvas API 契约测试 (F4.1-F4.11) ✅
+3. npx jest canvas-contract --no-coverage: 11/11 ✅ (commit 59d7570c)
 
 ## 验收
 - npm test:contract 通过

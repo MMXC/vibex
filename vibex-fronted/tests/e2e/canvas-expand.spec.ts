@@ -278,9 +278,7 @@ test.describe('Canvas E2E — Epic 3.2: Canvas 状态与质量', () => {
 
   test('F2.2: 起止节点 - start marker 可见', async ({ page }) => {
     // Start markers (node-marker-start) appear on domain model nodes
-    // Set up canvas with example data and go to domain model view
-
-    await goToCanvasWithData(page);
+    // Canvas already loaded via test.beforeEach
 
     // Check for start markers
     const startMarker = page.locator('[data-testid="node-marker-start"]');

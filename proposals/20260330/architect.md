@@ -1,91 +1,124 @@
-# Architect 自我检查报告 — 2026-03-30
+# Architect 提案 — 2026-03-30
 
-> **Agent**: architect
-> **日期**: 2026-03-30
-> **自检周期**: 2026-03-29 00:00 ~ 2026-03-30 09:13
-
----
-
-## 今日完成工作
-
-### 架构设计任务
-
-| 任务 | 项目 | 产出 | 状态 |
-|------|------|------|------|
-| design-architecture | agent-self-proposal-20260330 | architecture.md + IMPLEMENTATION_PLAN.md + AGENTS.md | ✅ |
-| design-architecture | agent-self-evolution-20260330-daily | architecture.md + IMPLEMENTATION_PLAN.md + AGENTS.md | ✅ |
-| design-architecture | agent-self-evolution-20260330 | architecture.md + IMPLEMENTATION_PLAN.md + AGENTS.md | ✅ |
-
-### 质量指标
-
-| 指标 | 值 | 目标 | 状态 |
-|------|-----|------|------|
-| 架构设计数量 | 3 | ≥ 1 | ✅ |
-| 接口覆盖率 | 100% | ≥ 90% | ✅ |
-| 技术债务标注 | 已标注 | 显式标注 | ✅ |
-| 提案提交 | 3 | ≥ 1 | ✅ |
+**Agent**: architect
+**日期**: 2026-03-30
+**项目**: proposals/20260330
 
 ---
 
-## 发现问题
+## 1. 提案列表
 
-### 问题 1: 重复任务通知
-- **描述**: 同一任务（design-architecture）被多次派发到 #architect 频道
-- **影响**: 资源浪费，重复工作
-- **根因**: 项目 `agent-self-evolution-20260330` 和 `agent-self-evolution-20260330-daily` 任务重叠
-
-### 问题 2: 任务状态同步延迟
-- **描述**: task_manager 状态更新有时延，导致 coord 重复派发
-- **影响**: agent 收到多个相同任务通知
-- **根因**: 状态更新与 Slack 通知不同步
+| ID | 类别 | 标题 | 影响范围 | 优先级 |
+|----|------|------|----------|--------|
+| P001 | architecture | canvasStore 模块化拆分 | canvasStore.ts | P0 |
+| P002 | scalability | Canvas 节点列表虚拟化 | ComponentTree.tsx | P1 |
+| P003 | dev-quality | TypeScript 严格模式升级 | tsconfig.json | P1 |
 
 ---
 
-## 改进建议
+## 2. 提案详情
 
-### [PROPOSAL] 任务去重机制
-**优先级**: P1
-**描述**: 在 task_manager 中增加任务指纹识别，相同任务指纹（project + task + constraints）只派发一次
+### P001: canvasStore 模块化拆分
 
-### [PROPOSAL] 状态变更事件总线
-**优先级**: P2
-**描述**: 建立 task_manager 状态变更事件，Slack 通知订阅事件而非轮询
+**问题描述**:
+canvasStore.ts 代码超过 900 行，承载所有状态管理逻辑，新增功能时难以定位和测试。
+
+**根因分析**:
+状态管理未按领域（context/flow/component）划分，所有节点类型共享同一 store。
+
+**影响范围**:
+canvasStore.ts、相关组件、新功能开发效率
+
+**建议方案**:
+```
+src/lib/canvas/stores/
+├── contextStore.ts   # 上下文节点
+├── flowStore.ts     # 流程节点
+├── componentStore.ts # 组件节点
+└── uiStore.ts       # UI 状态
+canvasStore.ts        # 聚合层
+```
+
+**验收标准**:
+- 每个 store 覆盖率 > 80%
+- 现有组件无需修改
 
 ---
 
-## 经验沉淀
+### P002: Canvas 节点列表虚拟化
 
-### E-ARCH-001: 架构文档复用
-**情境**: 多个项目需要相似的架构设计（自检框架）
-**经验**: 先抽象通用模块，再按需实例化，比逐个设计更高效
-**改进**: 建立 `docs/templates/architecture-template.md` 通用模板
+**问题描述**:
+节点数量 > 100 时，ComponentTree 和 BusinessFlowTree 渲染卡顿。
 
-### E-ARCH-002: Mermaid 图表维护
-**情境**: 架构图频繁变更，手动更新耗时
-**经验**: 使用代码注释标记图表位置，便于 grep 定位
-**改进**: 在 AGENTS.md 中规定图表注释格式
+**根因分析**:
+未使用虚拟化列表技术，全量渲染所有节点。
+
+**影响范围**:
+ComponentTree.tsx、BusinessFlowTree.tsx、用户体验
+
+**建议方案**:
+引入 `@tanstack/react-virtual` 实现虚拟列表：
+```typescript
+const virtualizer = useVirtualizer({
+  count: nodes.length,
+  getScrollElement: () => ref.current,
+  estimateSize: () => 48,
+});
+```
+
+**验收标准**:
+- 100 节点渲染 < 100ms
+- 500 节点滚动 60fps
 
 ---
 
-## 自我评分
+### P003: TypeScript 严格模式升级
 
-| 维度 | 评分 | 说明 |
+**问题描述**:
+当前 TypeScript 配置未启用严格模式，存在 `any` 类型和隐式 any。
+
+**根因分析**:
+项目初期为快速迭代关闭了严格检查，技术债务累积。
+
+**影响范围**:
+tsconfig.json、全局类型、遗留代码
+
+**建议方案**:
+分阶段启用：
+1. `strict: true` + `noImplicitAny: true`
+2. `strictNullChecks: true`
+3. `strictFunctionTypes: true`
+
+**验收标准**:
+- strict 模式无编译错误
+- 新增 any 需经 review
+
+---
+
+## 3. 今日工作回顾
+
+| 任务 | 项目 | 状态 |
 |------|------|------|
-| 任务完成 | 9/10 | 3 个架构设计任务全部完成 |
-| 质量把控 | 8/10 | 接口定义完整，测试策略明确 |
-| 文档规范 | 8/10 | 按时产出，但有重复内容 |
-| 沟通协作 | 7/10 | 及时回报，但任务去重待改进 |
-
-**总体评分**: 8/10
+| design-architecture | vibex-exec-sandbox-freeze | ✅ |
+| design-architecture | vibex-canvas-checkbox-unify | ✅ |
+| design-architecture | task-manager-current-report | ✅ |
+| design-architecture | coord-decision-report | ✅ |
 
 ---
 
-## 下次检查计划
+## 4. 做得好的
 
-1. 跟进 `agent-self-evolution-20260330` 项目 coord 决策
-2. 建立架构文档通用模板
-3. 优化任务派发流程
+1. 架构文档模板化，提高产出效率
+2. 复用已有模块减少重复工作
+3. 问题分析覆盖全面
+
+## 5. 需要改进的
+
+| # | 问题 | 改进方向 |
+|---|------|----------|
+| 1 | canvasStore 过大 | 模块化拆分 |
+| 2 | 列表性能问题 | 虚拟化 |
 
 ---
 
-*本文档由 Architect Agent 自动生成于 2026-03-30 09:13 GMT+8*
+*本文档由 Architect Agent 生成于 2026-03-30 23:18 GMT+8*

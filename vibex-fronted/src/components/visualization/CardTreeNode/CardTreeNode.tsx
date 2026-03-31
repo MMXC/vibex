@@ -14,6 +14,7 @@
 
 import React, { memo, useState, useCallback, useRef, useEffect } from 'react';
 import type { NodeProps } from '@xyflow/react';
+import { useReactFlow } from '@xyflow/react';
 import type { CardTreeNodeData, CardTreeChild, CardTreeNodeFull } from '@/types/visualization';
 import styles from './CardTreeNode.module.css';
 
@@ -55,6 +56,27 @@ function useIntersectionObserver(threshold = 0.1): [React.RefObject<HTMLDivEleme
   }, [threshold]);
 
   return [ref, isVisible];
+}
+
+// ==================== Toggle Helper ====================
+
+/**
+ * Recursively toggle a child in the CardTree children structure.
+ * Returns a new children array with the matching child's checked state updated.
+ */
+function toggleChildChecked(children: CardTreeChild[], childId: string, checked: boolean): CardTreeChild[] {
+  return children.map((child) => {
+    if (child.id === childId) {
+      return { ...child, checked };
+    }
+    if (child.children && child.children.length > 0) {
+      return {
+        ...child,
+        children: toggleChildChecked(child.children, childId, checked),
+      };
+    }
+    return child;
+  });
 }
 
 // ==================== CheckboxItem ====================
@@ -140,11 +162,23 @@ export const CardTreeNode = memo(function CardTreeNode(props: NodeProps<CardTree
   const isStart = data.isStart === true;
   const isEnd = data.isEnd === true;
 
+  const { setNodes } = useReactFlow();
+
   const handleCheckboxToggle = useCallback((childId: string, checked: boolean) => {
-    // Parent handles state via onCheckboxToggle callback
-    // This is a controlled component pattern
-    console.debug(`[CardTreeNode] Toggle child ${childId}: ${checked}`);
-  }, []);
+    // F4.1: Update ReactFlow node state via setNodes
+    setNodes((nds) =>
+      nds.map((n) => {
+        if (n.id !== data.nodeId) return n;
+        return {
+          ...n,
+          data: {
+            ...n.data,
+            children: toggleChildChecked(n.data.children as CardTreeChild[], childId, checked),
+          },
+        };
+      })
+    );
+  }, [data.nodeId, setNodes]);
 
   const statusClass = {
     pending: styles.statusPending,

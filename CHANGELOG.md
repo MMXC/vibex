@@ -1,3 +1,13 @@
+### Added (canvas-drawer-msg Epic1: 消息抽屉基础框架) — 2026-03-31
+- **组件**: MessageDrawer, MessageList, MessageItem (4种消息类型)
+- **Store**: messageDrawerStore.ts — Zustand + persist, addNodeMessage/addSystemMessage/addCommandMessage
+- **集成**: ProjectBar.tsx + CanvasPage.tsx 集成抽屉切换按钮
+- **样式**: messageDrawer.module.css — 抽屉动画, 消息样式
+- **测试**: MessageDrawer.test.tsx 16 tests, 245 suites pass
+- **提交**: `922c3e74`
+- **审查**: ✅ PASSED (reviewer-epic1)
+- **⚠️ Push 阻塞**: GitHub push protection 阻止旧 commit 含 Slack token，需人工放行
+
 ### Fixed (vibex-test-env-fix Epic3: 覆盖率阈值调整) — 2026-03-31
 - **D003**: jest.config.ts — 移除 global coverageThreshold，改为 canvas 目录独立阈值
 - **修改**: global (55% lines / 40% branches) → canvas (50% lines / 30% branches / 40% functions)

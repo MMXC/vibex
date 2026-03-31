@@ -16,6 +16,13 @@ All notable changes to this project will be documented in this file.
 - **S3.4** — 废弃 confirmationStore 中已迁移到 canvasStore 的类型
 - Commit: `108afc35`
 
+### Epic4: Cascade 手动触发 (canvas-three-tree-unification)
+- **S4.1** — 移除自动 cascadeContextChange/cascadeFlowChange：编辑/删除节点不再自动重置下游树
+- **S4.2** — 添加 generateComponentFromFlow() 手动生成方法，用户可手动触发组件生成
+- **S4.3** — CascadeUpdateManager cascade 系列方法标记 @deprecated
+- **S4.4** — 打破原有线性约束：三树完全独立，用户可选择性触发级联更新
+- Commit: `e477743c`
+
 ## [Unreleased]
 
 ### Epic3: Flow 关系可视化 (canvas-phase2 F3 Epic)

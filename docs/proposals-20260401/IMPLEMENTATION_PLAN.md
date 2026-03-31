@@ -302,7 +302,7 @@ npx jest tests/unit/schemas/canvas.test.ts
 |------|------|--------|--------|
 | E1 | 3.5h | Sprint 1 | ✅ |
 | E2 | 7h | Sprint 1 | ✅ | 已完成 (f04cc10c)
-| E3 | 2h | Sprint 1 | ✅ |
+| E3 | 2h | Sprint 1 | ✅ | 已完成 (41ff5f0f, bf4f2cdc, c32c378a)
 | E4 | 8h | Sprint 1 后半 | ❌ (依赖 E3) |
 | E5 | 19h | Sprint 2 | ✅ |
 | E6 | 13h | Sprint 2 | ✅ |

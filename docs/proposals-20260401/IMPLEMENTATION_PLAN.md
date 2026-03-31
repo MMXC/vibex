@@ -190,16 +190,17 @@ test('E4-S3: tooltip latency < 200ms', async () => {
 ### 负责: Tester + Dev
 ### 依赖: 无
 ### 启动: Sprint 2 Day 1
+### 状态: ✅ **文档完成** (commits: `44d30f87`, `307a2e8a`, `ac7ebfdb`, `4854a47c`)
 
 ### 任务拆分
 
-| # | 任务 | 工时 | 产出文件 | 验收标准 |
-|---|------|------|---------|---------|
-| E5-T1 | Playwright 测试规范 | 6h | `e2e/CONVENTIONS.md` + 重构测试文件 | ≥ 5 个 CI-blocking 用例，命名规范 |
-| E5-T2 | CI 覆盖率 Gate | 3h | `.github/workflows/ci.yml` | coverage < 80% 时 CI 失败 |
-| E5-T3 | 两阶段审查 SOP | 3h | `docs/process/two-phase-review.md` | SOP 可执行，reviewer 确认 |
-| E5-T4 | 验收标准明确化 | 2h | `templates/story-template.md` | 所有新 Story 含 `expect()` 格式 |
-| E5-T5 | KPI 量化体系 | 5h | `docs/kpi-dashboard.md` | Dashboard 可更新 |
+| # | 任务 | 工时 | 产出文件 | 验收标准 | 状态 |
+|---|------|------|---------|---------|------|
+| E5-T1 | Playwright 测试规范 | 6h | `vibex-fronted/tests/e2e/CONVENTIONS.md` | ≥ 5 个 CI-blocking 用例，命名规范 | ✅ `44d30f87` |
+| E5-T2 | CI 覆盖率 Gate | 3h | `.github/workflows/ci.yml` | coverage < 80% 时 CI 失败 | ✅ (已实现) |
+| E5-T3 | 两阶段审查 SOP | 3h | `docs/process/two-phase-review.md` | SOP 可执行，reviewer 确认 | ✅ `ac7ebfdb` |
+| E5-T4 | 验收标准明确化 | 2h | `templates/story-template.md` | 所有新 Story 含 `expect()` 格式 | ✅ `307a2e8a` |
+| E5-T5 | KPI 量化体系 | 5h | `docs/kpi-dashboard.md` | Dashboard 可更新 | ✅ `4854a47c` |
 
 ### 关键路径
 ```

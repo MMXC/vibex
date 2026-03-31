@@ -12,7 +12,7 @@
 import React, { useState, useCallback } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
-import { areAllConfirmed } from '@/lib/canvas/cascade';
+import { hasNodes } from '@/lib/canvas/cascade';
 import type { CreateProjectInput, PrototypePage } from '@/lib/canvas/types';
 import { getHistoryStore } from '@/lib/canvas/historySlice';
 
@@ -151,13 +151,13 @@ export function ProjectBar({
     }
   }, []);
 
-  const allConfirmed = areAllConfirmed(contextNodes) && areAllConfirmed(flowNodes) && areAllConfirmed(componentNodes)
+  const hasAllNodes = hasNodes(contextNodes) && hasNodes(flowNodes) && hasNodes(componentNodes)
     && contextNodes.length > 0 && flowNodes.length > 0 && componentNodes.length > 0;
 
   // === Handlers ===
 
   const handleCreateProject = async () => {
-    if (!allConfirmed || isCreating) return;
+    if (!hasAllNodes || isCreating) return;
 
     setIsCreating(true);
     setCreateError(null);
@@ -337,11 +337,11 @@ export function ProjectBar({
         type="button"
         className={styles.createProjectBtn}
         onClick={handleCreateProject}
-        disabled={!allConfirmed || isCreating}
+        disabled={!hasAllNodes || isCreating}
         aria-label="创建项目并开始生成原型"
         data-testid="create-project-btn"
         title={
-          !allConfirmed
+          !hasAllNodes
             ? '请先确认所有三树节点'
             : isCreating
               ? '创建中...'

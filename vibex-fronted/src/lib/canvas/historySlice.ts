@@ -31,6 +31,8 @@ export interface HistoryState {
   contextHistory: HistoryStack<BoundedContextNode[]>;
   flowHistory: HistoryStack<BusinessFlowNode[]>;
   componentHistory: HistoryStack<ComponentNode[]>;
+  /** Prevents re-entrant recordSnapshot calls (circular trigger guard) */
+  isRecording: boolean;
 }
 
 /** HistorySlice 公共接口 */
@@ -42,6 +44,8 @@ export interface HistorySlice {
   flowHistory: HistoryStack<BusinessFlowNode[]>;
   /** Component 树历史栈 */
   componentHistory: HistoryStack<ComponentNode[]>;
+  /** Readonly flag: true while recordSnapshot is executing (prevents circular triggers) */
+  isRecording: boolean;
 
   // === Computed ===
   /** 获取指定树的历史栈 */
@@ -159,6 +163,7 @@ export const useHistoryStore = create<HistorySlice>()((set, get) => ({
   contextHistory: createEmptyStack<BoundedContextNode[]>([]),
   flowHistory: createEmptyStack<BusinessFlowNode[]>([]),
   componentHistory: createEmptyStack<ComponentNode[]>([]),
+  isRecording: false,
 
   // === Computed ===
 
@@ -211,36 +216,43 @@ export const useHistoryStore = create<HistorySlice>()((set, get) => ({
 
   recordSnapshot: (tree, nodes) => {
     const state = get();
-    // Deep clone to prevent caller mutation from corrupting history
-    const clonedNodes = JSON.parse(JSON.stringify(nodes)) as
-      | BoundedContextNode[]
-      | BusinessFlowNode[]
-      | ComponentNode[];
-    if (tree === 'context') {
-      const isFirstRecord = state.contextHistory.past.length === 0 && state.contextHistory.present.length === 0;
-      if (isFirstRecord) {
-        // First record: just set present, don't push to past
-        set({ contextHistory: { ...state.contextHistory, present: clonedNodes as BoundedContextNode[] } });
+    // Guard: prevent re-entrant calls (circular trigger protection)
+    if (state.isRecording) return;
+    set({ isRecording: true });
+    try {
+      // Deep clone to prevent caller mutation from corrupting history
+      const clonedNodes = JSON.parse(JSON.stringify(nodes)) as
+        | BoundedContextNode[]
+        | BusinessFlowNode[]
+        | ComponentNode[];
+      if (tree === 'context') {
+        const isFirstRecord = state.contextHistory.past.length === 0 && state.contextHistory.present.length === 0;
+        if (isFirstRecord) {
+          // First record: just set present, don't push to past
+          set({ contextHistory: { ...state.contextHistory, present: clonedNodes as BoundedContextNode[] } });
+        } else {
+          const newStack = pushToHistory(state.contextHistory, clonedNodes as BoundedContextNode[]);
+          set({ contextHistory: newStack });
+        }
+      } else if (tree === 'flow') {
+        const isFirstRecord = state.flowHistory.past.length === 0 && state.flowHistory.present.length === 0;
+        if (isFirstRecord) {
+          set({ flowHistory: { ...state.flowHistory, present: clonedNodes as BusinessFlowNode[] } });
+        } else {
+          const newStack = pushToHistory(state.flowHistory, clonedNodes as BusinessFlowNode[]);
+          set({ flowHistory: newStack });
+        }
       } else {
-        const newStack = pushToHistory(state.contextHistory, clonedNodes as BoundedContextNode[]);
-        set({ contextHistory: newStack });
+        const isFirstRecord = state.componentHistory.past.length === 0 && state.componentHistory.present.length === 0;
+        if (isFirstRecord) {
+          set({ componentHistory: { ...state.componentHistory, present: clonedNodes as ComponentNode[] } });
+        } else {
+          const newStack = pushToHistory(state.componentHistory, clonedNodes as ComponentNode[]);
+          set({ componentHistory: newStack });
+        }
       }
-    } else if (tree === 'flow') {
-      const isFirstRecord = state.flowHistory.past.length === 0 && state.flowHistory.present.length === 0;
-      if (isFirstRecord) {
-        set({ flowHistory: { ...state.flowHistory, present: clonedNodes as BusinessFlowNode[] } });
-      } else {
-        const newStack = pushToHistory(state.flowHistory, clonedNodes as BusinessFlowNode[]);
-        set({ flowHistory: newStack });
-      }
-    } else {
-      const isFirstRecord = state.componentHistory.past.length === 0 && state.componentHistory.present.length === 0;
-      if (isFirstRecord) {
-        set({ componentHistory: { ...state.componentHistory, present: clonedNodes as ComponentNode[] } });
-      } else {
-        const newStack = pushToHistory(state.componentHistory, clonedNodes as ComponentNode[]);
-        set({ componentHistory: newStack });
-      }
+    } finally {
+      set({ isRecording: false });
     }
   },
 

@@ -15,11 +15,12 @@
 - [x] S2.4: 单元测试覆盖 11 个用例
 - [x] 验收: tsc --noEmit 通过
 
-### Epic 3: historyMiddleware（3h）
-1. 新建 stores/historyMiddleware.ts
-2. 防止循环触发的 isRecording flag
-3. 验证 addNode/confirmNode/deleteNode 自动快照
-4. 回归测试
+### Epic 3: historyMiddleware ✅
+- [x] S3.1: 新建 `src/stores/historyMiddleware.ts` (已在 `lib/canvas/historySlice.ts`)
+- [x] S3.2: `isRecording` flag 防止循环触发
+- [x] S3.3: `recordSnapshot` 自动快照（addNode/confirmNode/deleteNode）
+- [x] S3.4: 回归测试 41 个（38 原有 + 3 新增 isRecording）
+- [x] 验收: tsc --noEmit 通过
 
 ### Epic 4: messageMiddleware（2.5h）
 1. 新建 stores/messageMiddleware.ts

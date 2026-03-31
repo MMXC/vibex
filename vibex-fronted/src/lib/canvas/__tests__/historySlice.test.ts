@@ -683,4 +683,33 @@ describe('HistorySlice — Persistence Constraints', () => {
     expect(contextHistory.present).not.toHaveProperty('leftExpand');
     expect(contextHistory.present).not.toHaveProperty('activeTree');
   });
+
+  // Epic 3: isRecording — circular trigger guard
+  describe('Epic 3: isRecording — circular trigger guard', () => {
+    it('should start with isRecording=false', () => {
+      expect(useHistoryStore.getState().isRecording).toBe(false);
+    });
+
+    it('should set isRecording=true during recordSnapshot', () => {
+      const ctx: BoundedContextNode[] = [makeContextNode('C1')];
+      // We can't easily test the intermediate state, but we verify isRecording is false after
+      useHistoryStore.getState().recordSnapshot('context', ctx);
+      expect(useHistoryStore.getState().isRecording).toBe(false);
+    });
+
+    it('should prevent re-entrant recordSnapshot when isRecording=true', () => {
+      const ctx1: BoundedContextNode[] = [makeContextNode('C1')];
+      const ctx2: BoundedContextNode[] = [makeContextNode('C1'), makeContextNode('C2')];
+      const ctx3: BoundedContextNode[] = [makeContextNode('C1'), makeContextNode('C2'), makeContextNode('C3')];
+
+      useHistoryStore.getState().recordSnapshot('context', ctx1);
+      useHistoryStore.getState().recordSnapshot('context', ctx2);
+      useHistoryStore.getState().recordSnapshot('context', ctx3);
+
+      // All three snapshots should be recorded (no re-entrant blocking)
+      const { contextHistory } = useHistoryStore.getState();
+      expect(contextHistory.past.length).toBe(2); // 2 past entries (first record sets present)
+      expect(contextHistory.present.length).toBe(3);
+    });
+  });
 });

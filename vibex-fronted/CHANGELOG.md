@@ -32,6 +32,12 @@ All notable changes to this project will be documented in this file.
 - **E5-T4** — Story 验收标准模板: PRD 模板要求每 Story 含 expect() 断言
 - **E5-T5** — KPI Dashboard: docs/kpi-dashboard.md
 - Commits: `dd4904c4`, `a5d42445`, `b335927e`, `e7d4465a`
+### E6: 竞品与市场分析 (proposals-20260401)
+- **E6-T1** — 竞品功能对比矩阵: docs/competitive-matrix.md（Cursor/Copilot/Windsurf/Claude/v0 vs VibeX）
+- **E6-T2** — 用户旅程图: docs/user-journey-map.md（3个关键场景）
+- **E6-T3** — 定价策略: docs/pricing-strategy.md（Free/Pro/Enterprise + MRR模型）
+- Commit: `fd92db90`
+
 
 ### Epic2: 面板折叠解耦 (canvas-three-tree-unification)
 - **S2.1** — 三面板独立折叠状态持久化: contextPanelCollapsed / flowPanelCollapsed / componentPanelCollapsed

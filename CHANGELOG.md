@@ -1,3 +1,11 @@
+### Added (canvas-three-tree-unification Epic1: Tab 切换器 + 废除 phase 约束) — 2026-04-01
+- **TabBar**: 三树 Tab 切换器组件 (context/flow/component)
+- **hasNodes**: 新函数替代 areAllConfirmed 作为显示指标
+- **phase gates 废除**: 任意 phase 可操作任意树
+- **修复**: 30 个 TypeScript 错误 (类型链修复)
+- **测试**: 28 tests ✅
+- **提交**: `169e94eb`, `7b5960bb`
+
 ### Added (canvas-data-model-unification Epic1: Phase1 样式统一) — 2026-03-31
 - **P1-T5**: deriveDomainType/deriveStepType 工具函数, FLOW_STEP_TYPE_CONFIG/DOMAIN_TYPE_CONFIG
 - **P1-T5**: canvas.variables.css 统一 CSS token 系统

@@ -14,13 +14,14 @@
 
 import React, { useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
-import { areAllConfirmed } from '@/lib/canvas/cascade';
+import { hasNodes } from '@/lib/canvas/cascade';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import { getHistoryStore } from '@/lib/canvas/historySlice';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { SearchDialog } from './features/SearchDialog';
 import { useCanvasSearch } from '@/hooks/canvas/useCanvasSearch';
 import { PhaseProgressBar } from './PhaseProgressBar';
+import { TabBar } from './TabBar';
 import { TreePanel } from './TreePanel';
 import { BoundedContextTree } from './BoundedContextTree';
 import { ComponentTree } from './ComponentTree';
@@ -520,9 +521,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   }, [componentGenerating, flowNodes, contextNodes, selectedNodeIds, projectId, setComponentNodes, setPhase]);
 
   // === Compute confirmation states ===
-  const contextReady = areAllConfirmed(contextNodes);
-  const flowReady = areAllConfirmed(flowNodes);
-  const componentReady = areAllConfirmed(componentNodes);
+  const contextReady = hasNodes(contextNodes);
+  const flowReady = hasNodes(flowNodes);
+  const componentReady = hasNodes(componentNodes);
   const allTreesConfirmed = contextReady && flowReady && componentReady
     && contextNodes.length > 0 && flowNodes.length > 0 && componentNodes.length > 0;
 
@@ -726,6 +727,13 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         <PhaseProgressBar currentPhase={phase} onPhaseClick={handlePhaseClick} />
         {phase !== 'input' && <TreeStatus />}
       </div>
+
+      {/* Tab Bar — Epic 1: Three-tree tab switcher */}
+      {phase !== 'input' && (
+        <div className={styles.tabBarWrapper}>
+          <TabBar />
+        </div>
+      )}
 
       {/* Project Bar — Epic 5: Create Project button */}
       {phase !== 'input' && (

@@ -13,6 +13,13 @@
 - **测试**: 28 tests ✅
 - **提交**: `169e94eb`, `7b5960bb`
 
+### Added (canvas-data-model-unification Epic6: merge messageDrawerStore) — 2026-04-01
+- **MessageSlice**: canvasStore adds messages types + state + actions
+- **Persist**: messages field in canvasStore partialize
+- **Migration**: v1→v2 (messages default [])
+- **Backward compat**: messageDrawerStore proxies to canvasStore
+- **提交**: `a3362282`
+
 ### Added (canvas-data-model-unification Epic2: useCanvasSession hook) — 2026-04-01
 - **useCanvasSession**: 新建 src/lib/canvas/useCanvasSession.ts hook
 - **返回**: sessionId + 三棵树 + messages + drawerState + AI状态

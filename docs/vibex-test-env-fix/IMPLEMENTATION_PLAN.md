@@ -17,8 +17,8 @@
 
 ### Epic 3: 覆盖率阈值调整 ✅
 1. 读取 jest.config.ts coverageThreshold ✅
-2. 移除 global 阈值 (55% lines / 40% branches)，添加 canvas 目录阈值 (50% lines / 30% branches / 40% functions) ✅
-3. npx jest --no-coverage: 242 suites, 3071 tests ✅ (commit 5ecfeca5)
+2. 添加 global:0 + canvas 目录阈值 (50% lines / 30% branches / 40% functions) ✅
+3. npx jest --no-coverage: 243 suites, 3087 tests ✅ (commit b4350b52)
 
 ## 验收 ✅
 - npm test 正常执行（pre-test TypeScript 问题 pre-existing，非本 Epic 范围）

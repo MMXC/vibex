@@ -18,10 +18,10 @@ import { useCanvasStore } from '@/lib/canvas/canvasStore';
 
 // Test helper: simulate handleContinueToComponents selection filtering logic
 function getFilteredContexts(
-  contextNodes: Array<{ nodeId: string; confirmed: boolean }>,
+  contextNodes: Array<{ nodeId: string; isActive?: boolean }>,
   selectedNodeIds: string[]
 ) {
-  const confirmedContexts = contextNodes.filter((ctx) => ctx.isActive);
+  const confirmedContexts = contextNodes.filter((ctx) => ctx.isActive !== false);
   const selectedContextSet = new Set(selectedNodeIds);
   if (selectedContextSet.size > 0) {
     return confirmedContexts.filter((ctx) => selectedContextSet.has(ctx.nodeId));
@@ -30,10 +30,10 @@ function getFilteredContexts(
 }
 
 function getFilteredFlows(
-  flowNodes: Array<{ nodeId: string; confirmed: boolean }>,
+  flowNodes: Array<{ nodeId: string; isActive?: boolean }>,
   selectedNodeIds: string[]
 ) {
-  const confirmedFlows = flowNodes.filter((f) => f.isActive);
+  const confirmedFlows = flowNodes.filter((f) => f.isActive !== false);
   const selectedFlowSet = new Set(selectedNodeIds);
   if (selectedFlowSet.size > 0) {
     return confirmedFlows.filter((f) => selectedFlowSet.has(f.nodeId));
@@ -43,11 +43,11 @@ function getFilteredFlows(
 
 describe('Epic1 S1.1: CanvasPage 选区过滤 — 上下文节点', () => {
   const baseContexts = [
-    { nodeId: 'ctx-1', confirmed: true },
-    { nodeId: 'ctx-2', confirmed: true },
-    { nodeId: 'ctx-3', confirmed: true },
-    { nodeId: 'ctx-4', confirmed: false }, // unconfirmed — should never appear
-    { nodeId: 'ctx-5', confirmed: false }, // unconfirmed — should never appear
+    { nodeId: 'ctx-1', isActive: true },
+    { nodeId: 'ctx-2', isActive: true },
+    { nodeId: 'ctx-3', isActive: true },
+    { nodeId: 'ctx-4', isActive: false }, // unconfirmed — should never appear
+    { nodeId: 'ctx-5', isActive: false }, // unconfirmed — should never appear
   ];
 
   it('AC-1: 有选区时只发送选中的已确认节点', () => {
@@ -84,10 +84,10 @@ describe('Epic1 S1.1: CanvasPage 选区过滤 — 上下文节点', () => {
 
 describe('Epic1 S1.2: BusinessFlowTree 选区过滤 — 流程节点', () => {
   const baseFlows = [
-    { nodeId: 'flow-1', confirmed: true },
-    { nodeId: 'flow-2', confirmed: true },
-    { nodeId: 'flow-3', confirmed: true },
-    { nodeId: 'flow-4', confirmed: false }, // unconfirmed
+    { nodeId: 'flow-1', isActive: true },
+    { nodeId: 'flow-2', isActive: true },
+    { nodeId: 'flow-3', isActive: true },
+    { nodeId: 'flow-4', isActive: false }, // unconfirmed
   ];
 
   it('S1.2: 有选区时只发送选中的已确认流程', () => {
@@ -110,9 +110,9 @@ describe('Epic1 S1.2: BusinessFlowTree 选区过滤 — 流程节点', () => {
 
 describe('Epic1 S1.3: 选区数量与 API 请求一致', () => {
   const contexts = [
-    { nodeId: 'ctx-a', confirmed: true },
-    { nodeId: 'ctx-b', confirmed: true },
-    { nodeId: 'ctx-c', confirmed: false },
+    { nodeId: 'ctx-a', isActive: true },
+    { nodeId: 'ctx-b', isActive: true },
+    { nodeId: 'ctx-c', isActive: false },
   ];
 
   it('S1.3: 选中2个节点时，mappedContexts.length === 2', () => {
@@ -123,7 +123,7 @@ describe('Epic1 S1.3: 选区数量与 API 请求一致', () => {
   });
 
   it('S1.3: 无选中时，mappedContexts.length === all confirmed', () => {
-    const confirmedCount = contexts.filter((c) => c.isActive).length;
+    const confirmedCount = contexts.filter((c) => c.isActive !== false).length;
     const result = getFilteredContexts(contexts, []);
     expect(result.length).toBe(confirmedCount);
     expect(result.length).toBe(2);

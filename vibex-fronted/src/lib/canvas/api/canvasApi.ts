@@ -7,7 +7,14 @@
  * - projectId 持久化到 localStorage
  *
  * ADR-001 约束: 不重写 CardTreeRenderer，只扩展 adapter
+ *
+ * E7-T3: API Service Layer — Zod schema validation for canvasApi responses
+ * - Direct Prisma calls exist in: /projects, /v1/projects, /v1/flows/[flowId], /v1/pages
+ * - Service layer pattern documented via CollaborationService.ts in backend services
+ * - canvasApi responses validated via Zod schemas (see @/lib/schemas/canvas)
  */
+import { z } from 'zod';
+// Domain schemas available at @/lib/schemas/canvas (E7-T4 canonical model)
 import type {
   CreateProjectInput,
   CreateProjectOutput,
@@ -22,54 +29,90 @@ import type {
   CreateSnapshotOutput,
   ListSnapshotsOutput,
   RestoreSnapshotOutput,
+  ComponentType,
 } from '../types';
 
 import { getApiUrl, API_CONFIG } from '@/lib/api-config';
 
 // =============================================================================
-// Epic 3: Response Validation Helpers
+// E7-T3: Zod Response Schemas (replace manual type guards)
 // =============================================================================
 
-function isValidGenerateContextsResponse(value: unknown): value is GenerateContextsOutput {
-  if (!value || typeof value !== 'object') return false;
-  const obj = value as Record<string, unknown>;
-  return (
-    typeof obj.success === 'boolean' &&
-    Array.isArray(obj.contexts) &&
-    typeof obj.sessionId === 'string' &&
-    typeof obj.confidence === 'number'
-  );
-}
+// =============================================================================
+// E7-T3: Zod Response Schemas (replace manual type guards)
+// These schemas validate the actual API response shape (aligned with types.ts).
+// The domain schemas in @/lib/schemas/canvas define the canonical model.
+// =============================================================================
 
-function isValidGenerateFlowsResponse(value: unknown): value is GenerateFlowsOutput {
-  if (!value || typeof value !== 'object') return false;
-  const obj = value as Record<string, unknown>;
-  return (
-    typeof obj.success === 'boolean' &&
-    Array.isArray(obj.flows) &&
-    typeof obj.confidence === 'number'
-  );
-}
+const GenerateContextsResponseSchema = z.object({
+  success: z.boolean(),
+  contexts: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    description: z.string(),
+    type: z.enum(['core', 'supporting', 'generic', 'external']),
+    isActive: z.boolean().optional(),
+    status: z.string().optional(),
+    children: z.array(z.string()).optional(),
+  })),
+  sessionId: z.string(),
+  confidence: z.number(),
+});
 
-function isValidGenerateComponentsResponse(value: unknown): value is GenerateComponentsOutput {
-  if (!value || typeof value !== 'object') return false;
-  const obj = value as Record<string, unknown>;
-  return typeof obj.success === 'boolean' && Array.isArray(obj.components);
-}
+const GenerateFlowsResponseSchema = z.object({
+  success: z.boolean(),
+  flows: z.array(z.object({
+    name: z.string(),
+    contextId: z.string(),
+    description: z.string().optional(),
+    steps: z.array(z.object({
+      name: z.string(),
+      actor: z.string(),
+      description: z.string(),
+      order: z.number(),
+      isActive: z.boolean().optional(),
+      status: z.string().optional(),
+    })),
+  })),
+  confidence: z.number(),
+});
+
+const COMPONENT_TYPE_ENUM = z.enum(['page', 'form', 'list', 'detail', 'modal']);
+const HTTP_METHOD_ENUM = z.enum(['GET', 'POST']);
+
+const GenerateComponentsResponseSchema = z.object({
+  success: z.boolean(),
+  components: z.array(z.object({
+    name: z.string(),
+    flowId: z.string(),
+    type: COMPONENT_TYPE_ENUM,
+    description: z.string().optional(),
+    api: z.object({
+      method: HTTP_METHOD_ENUM,
+      path: z.string(),
+      params: z.array(z.string()),
+    }).optional(),
+  })),
+  confidence: z.number(),
+}).transform(data => ({
+  ...data,
+  components: data.components.map(c => ({ ...c, type: c.type as ComponentType })),
+}));
 
 async function validatedFetch<T>(
   url: string,
   options: RequestInit,
-  validator: (v: unknown) => v is T
+  schema: z.ZodSchema<T>
 ): Promise<T> {
   const res = await fetch(url, options);
   if (!res.ok) handleResponseError(res, `API 请求失败: ${res.status}`);
   const json = await res.json();
-  if (!validator(json)) {
-    console.error('[canvasApi] Response validation failed for:', url, json);
+  const result = schema.safeParse(json);
+  if (!result.success) {
+    console.error('[canvasApi] Response validation failed for:', url, json, result.error);
     throw new Error(`[canvasApi] Invalid response from ${url}`);
   }
-  return json;
+  return result.data;
 }
 
 // 获取认证 token
@@ -163,19 +206,11 @@ export const canvasApi = {
     projectId?: string;
   }): Promise<GenerateContextsOutput> => {
     const headers = { 'Content-Type': 'application/json', ...getAuthHeaders() };
-    const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.generateContexts), {
+    return validatedFetch(getApiUrl(API_CONFIG.endpoints.canvas.generateContexts), {
       method: 'POST',
       headers,
       body: JSON.stringify(data),
-    });
-
-    if (!res.ok) handleResponseError(res, `生成上下文失败: ${res.status}`);
-    const json = await res.json();
-    if (!isValidGenerateContextsResponse(json)) {
-      console.error('[canvasApi] Invalid GenerateContextsResponse:', json);
-      return { success: false, contexts: [], sessionId: '', confidence: 0, error: '响应格式无效' };
-    }
-    return json;
+    }, GenerateContextsResponseSchema);
   },
 
   /**
@@ -187,19 +222,11 @@ export const canvasApi = {
     sessionId: string;
   }): Promise<GenerateFlowsOutput> => {
     const headers = { 'Content-Type': 'application/json', ...getAuthHeaders() };
-    const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.generateFlows), {
+    return validatedFetch(getApiUrl(API_CONFIG.endpoints.canvas.generateFlows), {
       method: 'POST',
       headers,
       body: JSON.stringify(data),
-    });
-
-    if (!res.ok) handleResponseError(res, `生成流程失败: ${res.status}`);
-    const json = await res.json();
-    if (!isValidGenerateFlowsResponse(json)) {
-      console.error('[canvasApi] Invalid GenerateFlowsResponse:', json);
-      return { success: false, flows: [], confidence: 0, error: '响应格式无效' };
-    }
-    return json;
+    }, GenerateFlowsResponseSchema);
   },
 
   /**
@@ -212,19 +239,11 @@ export const canvasApi = {
     sessionId: string;
   }): Promise<GenerateComponentsOutput> => {
     const headers = { 'Content-Type': 'application/json', ...getAuthHeaders() };
-    const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.generateComponents), {
+    return validatedFetch(getApiUrl(API_CONFIG.endpoints.canvas.generateComponents), {
       method: 'POST',
       headers,
       body: JSON.stringify(data),
-    });
-
-    if (!res.ok) handleResponseError(res, `生成组件失败: ${res.status}`);
-    const json = await res.json();
-    if (!isValidGenerateComponentsResponse(json)) {
-      console.error('[canvasApi] Invalid GenerateComponentsResponse:', json);
-      return { success: false, components: [], confidence: 0, error: '响应格式无效' };
-    }
-    return json;
+    }, GenerateComponentsResponseSchema);
   },
 
   /**

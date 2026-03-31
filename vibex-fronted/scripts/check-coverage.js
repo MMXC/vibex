@@ -19,7 +19,7 @@ const HISTORY_FILE = path.join(
   'coverage-history',
   'coverage-history.jsonl'
 );
-const THRESHOLD = 70; // 70% - PR 合并覆盖率门槛
+const THRESHOLD = 85; // 85% - PR 合并覆盖率门槛（Epic1: CI Quality Gate）
 
 // 读取覆盖率报告
 function getCoverage() {

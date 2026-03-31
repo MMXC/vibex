@@ -62,12 +62,12 @@ const config: Config = {
 
   // Coverage thresholds
   coverageThreshold: {
-    // Required by Jest types; actual thresholds are per-path
+    // Global quality gate: 85% (Epic1: CI Quality Gate)
     global: {
-      branches: 0,
-      functions: 0,
-      lines: 0,
-      statements: 0,
+      branches: 85,
+      functions: 85,
+      lines: 85,
+      statements: 85,
     },
     // Canvas directory: low threshold (rapidly evolving area)
     './src/components/canvas/**': {

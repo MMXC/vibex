@@ -47,6 +47,12 @@ jobs:
           
           # Run coverage comparison
           node scripts/coverage-diff.js
+
+      # Quality Gate: block merge if coverage < 85%
+      - name: Coverage Quality Gate
+        run: |
+          echo "=== CI Quality Gate: 85% Coverage ==="
+          node scripts/check-coverage.js
         
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4

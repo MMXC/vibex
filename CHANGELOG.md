@@ -1,3 +1,22 @@
+### Added (canvas-drawer-persistent Epic2: 左抽屉实现) — 2026-03-31
+- **LeftDrawer**: 200px 可折叠展开，sessionStorage 历史（最多5条）
+- **requirementHistoryStore**: 会话存储需求历史
+- **ProjectBar**: 需求输入按钮集成
+- **测试**: 21 tests ✅
+- **提交**: `59bb21a6`
+
+### Added (canvas-drawer-persistent Epic3: 右抽屉合并) — 2026-03-31
+- **MessageDrawer**: 改用 canvasStore.rightDrawerOpen 状态
+- **SSE 状态显示**: idle/connecting/connected/reconnecting/error
+- **中止按钮**: abortGeneration 集成
+- **测试**: 14 tests ✅
+- **提交**: `4c91b2d4`
+
+### Added (canvas-drawer-persistent Epic5: 布局改造) — 2026-03-31
+- **CSS 变量**: drawer-aware 布局 (--left-drawer-width)
+- **CanvasPage**: 动态计算容器类
+- **提交**: `9f214051`
+
 ### Added (canvas-drawer-persistent Epic1: CanvasStore 状态扩展) — 2026-03-31
 - **S1.1 Drawer State**: leftDrawerOpen/rightDrawerOpen/width, toggleLeftDrawer/toggleRightDrawer actions
 - **S1.2 abortGeneration()**: abort SSE + reset status

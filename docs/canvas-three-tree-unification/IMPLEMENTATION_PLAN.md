@@ -58,3 +58,10 @@
 - [x] S3.4: 更新 CascadeUpdateManager.areAllConfirmed→hasActiveNodes
 - [x] S3.5: 移除 confirm 按钮和 checkbox UI
 - [x] 验收: npm build + tsc 通过, 3180 测试通过 (99%)
+
+### Epic 4: Cascade 手动触发 ✅
+- [x] S4.1: 移除 cascadeContextChange/cascadeFlowChange 自动调用
+- [x] S4.2: 编辑/删除 context 不重置 flow/component 树
+- [x] S4.3: 新增 generateComponentFromFlow 手动生成方法
+- [x] S4.4: CascadeUpdateManager 函数标记为 @deprecated
+- [x] 验收: tsc 通过

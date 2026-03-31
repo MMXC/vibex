@@ -397,6 +397,9 @@ interface CanvasStore {
   reorderSteps: (flowNodeId: string, fromIndex: number, toIndex: number) => void;
   // === Auto-generation (Epic 3) ===
   autoGenerateFlows: (contexts: BoundedContextNode[]) => Promise<void>;
+  // === Manual Generation (Epic 4) ===
+  /** 从 flow 节点手动生成 component 节点 */
+  generateComponentFromFlow: () => Promise<void>;
 
   // === Example Data (F-1.2) ===
   /** Load example canvas data — sets all three trees + advances phase to context */
@@ -427,8 +430,6 @@ interface CanvasStore {
   setFlowGenerating: (generating: boolean, message?: string | null) => void;
 
   // === Cascade Actions ===
-  cascadeContextChange: (nodeId: string) => void;
-  cascadeFlowChange: (nodeId: string) => void;
 
   // === Tree Activation Logic ===
   recomputeActiveTree: () => void;
@@ -726,7 +727,6 @@ export const useCanvasStore = create<CanvasStore>()(
               getHistoryStore().recordSnapshot('context', newNodes);
               return { contextNodes: newNodes };
             });
-            get().cascadeContextChange(nodeId);
           },
 
           deleteContextNode: (nodeId) => {
@@ -739,7 +739,6 @@ export const useCanvasStore = create<CanvasStore>()(
             });
             // Epic 4: auto-append user_action message
             useCanvasStore.getState().addMessage({ type: 'user_action', content: `删除了上下文节点`, meta: deletedName });
-            get().cascadeContextChange(nodeId);
           },
 
 
@@ -782,7 +781,6 @@ export const useCanvasStore = create<CanvasStore>()(
               getHistoryStore().recordSnapshot('flow', newNodes);
               return { flowNodes: newNodes };
             });
-            get().cascadeFlowChange(nodeId);
           },
 
           deleteFlowNode: (nodeId) => {
@@ -793,7 +791,6 @@ export const useCanvasStore = create<CanvasStore>()(
               getHistoryStore().recordSnapshot('flow', newNodes);
               return { flowNodes: newNodes };
             });
-            get().cascadeFlowChange(nodeId);
             // Epic 4: auto-append user_action message
             useCanvasStore.getState().addMessage({ type: 'user_action', content: `删除了流程节点`, meta: deletedName });
           },
@@ -860,7 +857,6 @@ export const useCanvasStore = create<CanvasStore>()(
               getHistoryStore().recordSnapshot('flow', newNodes);
               return { flowNodes: newNodes };
             });
-            get().cascadeFlowChange(flowNodeId);
           },
 
           deleteStep: (flowNodeId, stepId) => {
@@ -892,7 +888,6 @@ export const useCanvasStore = create<CanvasStore>()(
               getHistoryStore().recordSnapshot('flow', newNodes);
               return { flowNodes: newNodes };
             });
-            get().cascadeFlowChange(flowNodeId);
           },
 
           // === Auto-generation (Epic 3 S3.1) ===
@@ -946,6 +941,64 @@ export const useCanvasStore = create<CanvasStore>()(
               console.error('[canvasStore] autoGenerateFlows error:', err);
             } finally {
               setFlowGenerating(false, null);
+            }
+          },
+
+          // === Manual Component Generation (Epic 4) ===
+          generateComponentFromFlow: async () => {
+            const { contextNodes, flowNodes } = get();
+            if (flowNodes.length === 0) {
+              console.warn('[canvasStore] generateComponentFromFlow: no flow nodes');
+              return;
+            }
+
+            try {
+              const mappedContexts = contextNodes.map((ctx) => ({
+                id: ctx.nodeId,
+                name: ctx.name,
+                description: ctx.description ?? '',
+                type: ctx.type,
+              }));
+
+              const mappedFlows = flowNodes.map((f) => ({
+                name: f.name,
+                contextId: f.contextId,
+                steps: f.steps.map((s) => ({ name: s.name, actor: s.actor })),
+              }));
+
+              const { projectId } = get();
+              const sessionId = projectId ?? `session-${Date.now()}`;
+
+              const result = await canvasApi.generateComponents({
+                contexts: mappedContexts,
+                flows: mappedFlows,
+                sessionId,
+              });
+
+              if (result.success && result.components) {
+                const newNodes: ComponentNode[] = result.components.map((c) => ({
+                  nodeId: generateId(),
+                  flowId: c.flowId ?? '',
+                  name: c.name,
+                  type: c.type,
+                  props: {},
+                  api: c.api ? { ...c.api, params: c.api.params ?? [] } : { method: 'GET', path: '/api', params: [] },
+                  children: [],
+                  isActive: false,
+                  status: 'pending' as const,
+                }));
+
+                set({ componentNodes: newNodes });
+                get().setPhase('component');
+                useCanvasStore.getState().addMessage({
+                  type: 'user_action',
+                  content: `生成了 ${newNodes.length} 个组件节点`,
+                });
+              } else {
+                console.error('[canvasStore] generateComponentFromFlow: no components', result.error);
+              }
+            } catch (err) {
+              console.error('[canvasStore] generateComponentFromFlow error:', err);
             }
           },
 
@@ -1114,22 +1167,6 @@ export const useCanvasStore = create<CanvasStore>()(
               setAiThinking(false, null);
               console.error('[canvasStore] generateContextsFromRequirement error:', err);
             });
-          },
-
-          // === Cascade Actions ===
-          cascadeContextChange: (_nodeId) => {
-            // Apply cascade to store: context change → mark flow + component pending
-            set((s) => ({
-              flowNodes: markAllPending(s.flowNodes),
-              componentNodes: markAllPending(s.componentNodes),
-            }));
-          },
-
-          cascadeFlowChange: (_nodeId) => {
-            // Apply cascade to store: flow change → mark component pending
-            set((s) => ({
-              componentNodes: markAllPending(s.componentNodes),
-            }));
           },
 
           // === Drag Slice (E3) ===

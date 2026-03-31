@@ -57,7 +57,7 @@ export function hasActiveNodes(nodes: Array<{ isActive?: boolean }>): boolean {
 
 /**
  * 级联更新上下文节点变更
- * context 变更 → flow + component marked pending
+ * @deprecated Epic 4: cascade is now manual — editing/deleting context does NOT auto-reset downstream
  */
 export function cascadeContextChange(
   contextNodes: BoundedContextNode[],
@@ -72,7 +72,7 @@ export function cascadeContextChange(
 
 /**
  * 级联更新流程节点变更
- * flow 变更 → component marked pending
+ * @deprecated Epic 4: cascade is now manual — editing/deleting flow does NOT auto-reset downstream
  */
 export function cascadeFlowChange(
   flowNodes: BusinessFlowNode[],

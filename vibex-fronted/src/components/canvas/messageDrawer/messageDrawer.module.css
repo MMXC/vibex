@@ -291,3 +291,69 @@
   border-radius: 2px;
   padding: 0 1px;
 }
+
+/* ── S3.2: SSE Status Pill ──────────────────────────────────────── */
+.sseStatusPill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+/* ── S3.3: Abort Bar ─────────────────────────────────────────────── */
+.abortBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  background: var(--color-bg-secondary, #f9fafb);
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.abortText {
+  font-size: 12px;
+  color: var(--color-text-muted, #9ca3af);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.abortButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  border-radius: 4px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.abortButton:hover {
+  background: #fecaca;
+  border-color: #f87171;
+}
+
+.abortButton:active {
+  transform: scale(0.97);
+}
+
+.abortButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring, #3b82f6);
+  outline-offset: 1px;
+}

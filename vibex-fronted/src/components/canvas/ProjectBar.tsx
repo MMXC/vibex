@@ -39,14 +39,15 @@ function LeftDrawerToggle() {
 }
 
 function MessageDrawerToggle() {
-  const isOpen = useMessageDrawerStore((s) => s.isOpen);
-  const toggleDrawer = useMessageDrawerStore((s) => s.toggleDrawer);
+  // S3.1: Use canvasStore.rightDrawerOpen instead of messageDrawerStore
+  const isOpen = useCanvasStore((s) => s.rightDrawerOpen);
+  const toggleRightDrawer = useCanvasStore((s) => s.toggleRightDrawer);
 
   return (
     <button
       type="button"
       className={styles.searchButton}
-      onClick={toggleDrawer}
+      onClick={toggleRightDrawer}
       aria-label={isOpen ? '关闭消息抽屉' : '打开消息抽屉'}
       aria-pressed={isOpen}
       title={isOpen ? '关闭消息抽屉' : '打开消息抽屉'}
@@ -61,7 +62,6 @@ function MessageDrawerToggle() {
 
 import { UndoRedoButtons, ZoomControls } from './CanvasToolbar';
 import { ExportMenu } from './features/ExportMenu';
-import { useMessageDrawerStore } from './messageDrawer/messageDrawerStore';
 import styles from './canvas.module.css';
 
 interface ProjectBarProps {

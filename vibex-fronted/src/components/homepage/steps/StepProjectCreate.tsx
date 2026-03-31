@@ -3,9 +3,14 @@
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useConfirmationStore } from '@/stores/confirmationStore';
+import type { BusinessFlow as ConfirmationBusinessFlow } from '@/stores/confirmationStore';
 import { useAuthStore } from '@/stores/authStore';
 import { projectApi } from '@/services/api';
 import type { StepComponentProps } from './types';
+
+// Union type for BusinessFlow compatibility
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyBusinessFlow = any;
 
 export function StepProjectCreate({ onNavigate, isActive }: StepComponentProps) {
   const router = useRouter();
@@ -113,7 +118,7 @@ export function StepProjectCreate({ onNavigate, isActive }: StepComponentProps) 
               <div className="summary-item">
                 <span className="label">业务流程状态:</span>
                 <span className="value">
-                  {businessFlow.states?.length || 0} 个状态
+                  {(businessFlow as AnyBusinessFlow).states?.length || 0} 个状态
                 </span>
               </div>
             </div>

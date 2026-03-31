@@ -5,6 +5,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useConfirmationStore, type ClarificationRound } from '@/stores/confirmationStore';
 import { useDesignStore } from '@/stores/designStore';
 import { clarificationApi, type ChatResponse } from '@/lib/api/clarificationApi';
+import type { StepComponentProps } from './types';
 import styles from './StepClarification.module.css';
 
 export function StepClarification({ onNavigate }: StepComponentProps) {
@@ -46,7 +47,7 @@ export function StepClarification({ onNavigate }: StepComponentProps) {
       domainModels: domainModels.map(m => ({
         name: m.name,
         type: m.type,
-        properties: m.properties.map(p => ({ name: p.name, type: p.type })),
+        properties: m.properties.map((p: { name: string; type: string; required: boolean; description?: string }) => ({ name: p.name, type: p.type })),
       })),
       boundedContexts: selectedContexts.map(c => ({
         name: c.name,
@@ -95,7 +96,7 @@ export function StepClarification({ onNavigate }: StepComponentProps) {
           question: round.question,
           answer: round.answer,
           timestamp: round.timestamp,
-          isAccepted: round.isAccepted,
+          isAccepted: round.isAccepted ?? false,
         });
       }
     } catch (err) {

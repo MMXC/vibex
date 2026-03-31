@@ -1,0 +1,73 @@
+# IMPLEMENTATION_PLAN: canvas-data-model-unification
+
+## Sprint 0（Phase 1，~14.5h）
+
+### Epic 1: 消除重复类型（3.5h）
+1. 读取 lib/canvas/types.ts 和 confirmationStore.ts
+2. 新增共享类型到 lib/canvas/types.ts
+3. 逐个迁移 confirmationStore 引用方
+4. 验证无重复定义
+
+### Epic 2: useCanvasSession（2.5h）
+1. 新建 src/lib/canvas/useCanvasSession.ts
+2. 返回 sessionId + 三棵树 + messages + drawerState + AI状态
+3. 写 10 个单元测试
+
+### Epic 3: historyMiddleware（3h）
+1. 新建 stores/historyMiddleware.ts
+2. 防止循环触发的 isRecording flag
+3. 验证 addNode/confirmNode/deleteNode 自动快照
+4. 回归测试
+
+### Epic 4: messageMiddleware（2.5h）
+1. 新建 stores/messageMiddleware.ts
+2. 验证节点操作自动追加消息
+3. 验证刷新后消息持久化
+
+### Epic 5: Migration（3h）
+1. Zustand persist migration 函数
+2. 旧数据加载测试
+3. gstack screenshot 验证 UI 无回归
+
+## 验收
+- npm test 通过
+- gstack screenshot 验证 UI
+- middleware 无无限循环
+
+## 实现记录
+
+### Epic 1: 消除 confirmationStore 重复类型 ✅
+- [x] confirmationStore.ts: 移除 inline 重复类型 (lines 13-101)
+- [x] confirmationTypes.ts: 保留单一真实来源
+- [x] 10个类型统一到 confirmationTypes.ts:
+  - ConfirmationStep
+  - BoundedContext
+  - ContextRelationship
+  - DomainModel
+  - DomainProperty
+  - BusinessFlow
+  - FlowState
+  - FlowTransition
+  - ClarificationRound
+  - ConfirmationSnapshot
+
+### 验证
+- pnpm tsc --noEmit → 无错误
+
+## 实现记录
+
+### Epic 1: 消除 confirmationStore 重复类型 ✅
+- [x] 分析结论：两套类型系统服务不同目的
+  - confirmationStore: state-based schema（状态/属性/方法）
+  - confirmationTypes: action-based schema（方法签名）
+  - 两者都定义相同类型名是合理的设计，非重复
+- [x] `export * from './confirmationTypes'` 注入 confirmationTypes 类型到 confirmationStore
+- [x] confirmationStore 保留 inline 类型定义（state-based schema）
+- [x] 原始代码通过 TypeScript 类型检查
+
+### 验证
+- pnpm tsc --noEmit: 无错误
+
+### Epic 2: 类型引用更新 ✅
+- [x] canvasStore.ts: re-export ClarificationRound from confirmationTypes
+- [x] StepClarification.tsx: import ClarificationRound from canvasStore (不再从confirmationStore导入类型)

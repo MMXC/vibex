@@ -5,17 +5,11 @@ const devLog = (...args: unknown[]) => {
   if (process.env.NODE_ENV !== 'production') console.log(...args);
 };
 import { persist, createJSONStorage } from 'zustand/middleware';
-
-// Epic 1 Batch 2: Import types from confirmationTypes (single source of truth)
+import type { BoundedContext } from '@/services/api/types/prototype/domain';
 import type {
   ConfirmationStep,
-  BoundedContext,
-  ContextRelationship,
   DomainModel,
-  DomainProperty,
   BusinessFlow,
-  FlowStep,
-  FlowTransition,
   ClarificationRound,
   ConfirmationSnapshot,
 } from './confirmationTypes';
@@ -110,11 +104,11 @@ const initialState = {
 
   requirementText: '',
 
-  boundedContexts: [],
-  selectedContextIds: [],
+  boundedContexts: [] as BoundedContext[],
+  selectedContextIds: [] as string[],
   contextMermaidCode: '',
 
-  domainModels: [],
+  domainModels: [] as DomainModel[],
   modelMermaidCode: '',
 
   businessFlow: {
@@ -122,11 +116,11 @@ const initialState = {
     name: '',
     states: [],
     transitions: [],
-  },
+  } as unknown as BusinessFlow,
   flowMermaidCode: '',
 
   // Clarification
-  clarificationRounds: [],
+  clarificationRounds: [] as ClarificationRound[],
 
   createdProjectId: null,
 

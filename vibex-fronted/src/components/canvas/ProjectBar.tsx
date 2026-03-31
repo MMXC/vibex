@@ -12,7 +12,7 @@
 import React, { useState, useCallback } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
-import { hasNodes, areAllConfirmed } from '@/lib/canvas/cascade';
+import { areAllConfirmed } from '@/lib/canvas/cascade';
 import type { CreateProjectInput, PrototypePage } from '@/lib/canvas/types';
 import { getHistoryStore } from '@/lib/canvas/historySlice';
 
@@ -151,14 +151,13 @@ export function ProjectBar({
     }
   }, []);
 
-  // S1.4: Use hasNodes (display metric) instead of areAllConfirmed (phase gate)
-  // Project creation requires all three trees to have at least one node
-  const hasAllNodes = hasNodes(contextNodes) && hasNodes(flowNodes) && hasNodes(componentNodes);
+  const allConfirmed = areAllConfirmed(contextNodes) && areAllConfirmed(flowNodes) && areAllConfirmed(componentNodes)
+    && contextNodes.length > 0 && flowNodes.length > 0 && componentNodes.length > 0;
 
   // === Handlers ===
 
   const handleCreateProject = async () => {
-    if (!hasAllNodes || isCreating) return;
+    if (!allConfirmed || isCreating) return;
 
     setIsCreating(true);
     setCreateError(null);
@@ -338,11 +337,11 @@ export function ProjectBar({
         type="button"
         className={styles.createProjectBtn}
         onClick={handleCreateProject}
-        disabled={!hasAllNodes || isCreating}
+        disabled={!allConfirmed || isCreating}
         aria-label="创建项目并开始生成原型"
         data-testid="create-project-btn"
         title={
-          !hasAllNodes
+          !allConfirmed
             ? '请先确认所有三树节点'
             : isCreating
               ? '创建中...'

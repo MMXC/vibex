@@ -7,7 +7,7 @@
  */
 
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
-import { hasNodes } from '@/lib/canvas/cascade';
+import { areAllConfirmed } from '@/lib/canvas/cascade';
 
 describe('loadExampleData (F-1.1 ~ F-1.3)', () => {
   beforeEach(() => {
@@ -109,19 +109,19 @@ describe('loadExampleData (F-1.1 ~ F-1.3)', () => {
     it('loaded context nodes are all confirmed', () => {
       useCanvasStore.getState().loadExampleData();
       const { contextNodes } = useCanvasStore.getState();
-      expect(hasNodes(contextNodes)).toBe(true);
+      expect(areAllConfirmed(contextNodes)).toBe(true);
     });
 
-    it('loaded flow nodes have data', () => {
+    it('loaded flow nodes are all confirmed', () => {
       useCanvasStore.getState().loadExampleData();
       const { flowNodes } = useCanvasStore.getState();
-      expect(hasNodes(flowNodes)).toBe(true);
+      expect(areAllConfirmed(flowNodes)).toBe(true);
     });
 
-    it('loaded component nodes have data', () => {
+    it('loaded component nodes are all confirmed', () => {
       useCanvasStore.getState().loadExampleData();
       const { componentNodes } = useCanvasStore.getState();
-      expect(hasNodes(componentNodes)).toBe(true);
+      expect(areAllConfirmed(componentNodes)).toBe(true);
     });
 
     it('flow nodes have steps with confirmed=true', () => {
@@ -134,22 +134,25 @@ describe('loadExampleData (F-1.1 ~ F-1.3)', () => {
     });
   });
 
-  // ── F-1.3: ProjectBar hasNodes condition ───────────────────────────────────
+  // ── F-1.3: ProjectBar areAllConfirmed condition ────────────────────────────
 
-  describe('F-1.3: ProjectBar hasNodes condition', () => {
-    it('hasNodes returns true when all trees have data', () => {
+  describe('F-1.3: ProjectBar areAllConfirmed condition', () => {
+    it('areAllConfirmed returns true when all trees have confirmed nodes', () => {
       useCanvasStore.getState().loadExampleData();
       const { contextNodes, flowNodes, componentNodes } = useCanvasStore.getState();
 
-      const allHaveData =
-        hasNodes(contextNodes) &&
-        hasNodes(flowNodes) &&
-        hasNodes(componentNodes);
+      const allConfirmed =
+        areAllConfirmed(contextNodes) &&
+        areAllConfirmed(flowNodes) &&
+        areAllConfirmed(componentNodes) &&
+        contextNodes.length > 0 &&
+        flowNodes.length > 0 &&
+        componentNodes.length > 0;
 
-      expect(allHaveData).toBe(true);
+      expect(allConfirmed).toBe(true);
     });
 
-    it('hasNodes returns false when contextNodes is empty', () => {
+    it('areAllConfirmed returns false when contextNodes is empty', () => {
       useCanvasStore.setState({
         contextNodes: [],
         flowNodes: [{ nodeId: 'f1', name: 'Flow', steps: [], confirmed: true, status: 'confirmed', children: [] }],
@@ -157,12 +160,34 @@ describe('loadExampleData (F-1.1 ~ F-1.3)', () => {
       });
 
       const { contextNodes, flowNodes, componentNodes } = useCanvasStore.getState();
-      const allHaveData =
-        hasNodes(contextNodes) &&
-        hasNodes(flowNodes) &&
-        hasNodes(componentNodes);
+      const allConfirmed =
+        areAllConfirmed(contextNodes) &&
+        areAllConfirmed(flowNodes) &&
+        areAllConfirmed(componentNodes) &&
+        contextNodes.length > 0 &&
+        flowNodes.length > 0 &&
+        componentNodes.length > 0;
 
-      expect(allHaveData).toBe(false);
+      expect(allConfirmed).toBe(false);
+    });
+
+    it('areAllConfirmed returns false when a node is not confirmed', () => {
+      useCanvasStore.setState({
+        contextNodes: [{ nodeId: 'c1', name: 'Ctx', description: '', type: 'core', confirmed: false, status: 'pending', children: [] }],
+        flowNodes: [{ nodeId: 'f1', name: 'Flow', steps: [], confirmed: true, status: 'confirmed', children: [] }],
+        componentNodes: [{ nodeId: 'c2', name: 'Comp', type: 'page', props: {}, api: { method: 'GET', path: '/', params: [] }, children: [], confirmed: true, status: 'confirmed' }],
+      });
+
+      const { contextNodes, flowNodes, componentNodes } = useCanvasStore.getState();
+      const allConfirmed =
+        areAllConfirmed(contextNodes) &&
+        areAllConfirmed(flowNodes) &&
+        areAllConfirmed(componentNodes) &&
+        contextNodes.length > 0 &&
+        flowNodes.length > 0 &&
+        componentNodes.length > 0;
+
+      expect(allConfirmed).toBe(false);
     });
   });
 });

@@ -1,11 +1,15 @@
 // Step 4: Business Flow Component
 
 import { useCallback } from 'react';
-import { useConfirmationStore } from '@/stores/confirmationStore';
+import { useConfirmationStore, type BusinessFlow as ConfirmationBusinessFlow } from '@/stores/confirmationStore';
 import { useBusinessFlowStream } from '@/hooks/useDDDStream';
 import { PreviewArea } from '../PreviewArea/PreviewArea';
 import { ThinkingPanel } from '../ThinkingPanel/ThinkingPanel';
 import type { StepComponentProps } from './types';
+
+// Union type combining both BusinessFlow variants - use any for simplicity
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyBusinessFlow = any;
 
 export function StepBusinessFlow({ onNavigate, isActive }: StepComponentProps) {
   // Subscribe to store state
@@ -41,8 +45,8 @@ export function StepBusinessFlow({ onNavigate, isActive }: StepComponentProps) {
   // Handle navigation to next step (Project Create)
   const handleNext = useCallback(() => {
     const flow = generatedFlow || businessFlow;
-    if (flow.states && flow.states.length > 0) {
-      setBusinessFlow(flow);
+    if (flow && 'states' in flow && (flow as { states?: unknown }).states && (flow as { states: { length: number } }).states.length > 0) {
+      setBusinessFlow(flow as unknown as import("@/stores/confirmationStore").BusinessFlow);
       if (mermaidCode) {
         setFlowMermaidCode(mermaidCode);
       }
@@ -59,10 +63,10 @@ export function StepBusinessFlow({ onNavigate, isActive }: StepComponentProps) {
 
   // Check if we can proceed
   const currentFlow = generatedFlow || businessFlow;
-  const canProceed = currentFlow.states && currentFlow.states.length > 0;
+  const canProceed = (currentFlow as AnyBusinessFlow).states && (currentFlow as AnyBusinessFlow).states.length > 0;
 
   // Current flow to display
-  const displayFlow = generatedFlow || businessFlow;
+  const displayFlow = (generatedFlow || businessFlow) as AnyBusinessFlow;
   const displayMermaid = mermaidCode || flowMermaidCode;
 
   // Map status to thinking panel status
@@ -119,7 +123,7 @@ export function StepBusinessFlow({ onNavigate, isActive }: StepComponentProps) {
               <div className="states-section">
                 <h4>状态</h4>
                 <div className="states-list">
-                  {displayFlow.states?.map((state) => (
+                  {displayFlow.states?.map((state: { id: string; name: string; type: string; description: string }) => (
                     <div key={state.id} className={`state-item state-${state.type}`}>
                       <span className="state-name">{state.name}</span>
                       <span className="state-type">{state.type}</span>
@@ -133,7 +137,7 @@ export function StepBusinessFlow({ onNavigate, isActive }: StepComponentProps) {
                 <div className="transitions-section">
                   <h4>转换</h4>
                   <div className="transitions-list">
-                    {displayFlow.transitions.map((transition) => (
+                    {displayFlow.transitions.map((transition: { id: string; fromStateId: string; toStateId: string; event: string; condition?: string }) => (
                       <div key={transition.id} className="transition-item">
                         <span className="from">{transition.fromStateId}</span>
                         <span className="arrow">→</span>

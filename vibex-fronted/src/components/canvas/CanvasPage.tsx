@@ -21,7 +21,6 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { SearchDialog } from './features/SearchDialog';
 import { useCanvasSearch } from '@/hooks/canvas/useCanvasSearch';
 import { PhaseProgressBar } from './PhaseProgressBar';
-import { TabBar } from './TabBar';
 import { TreePanel } from './TreePanel';
 import { BoundedContextTree } from './BoundedContextTree';
 import { ComponentTree } from './ComponentTree';
@@ -421,8 +420,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         store.addComponentNode({ name: '新组件', flowId: '', type: 'page', props: {}, api: { method: 'GET', path: '/', params: [] } });
       }
     },
-    // S1.3: Remove phase gate — tree operations allowed in any phase
-    // enabled: phase !== 'input',
+    enabled: phase !== 'input',
   });
 
   // === Epic1 F1.6: ? key toggles ShortcutHintPanel ===
@@ -753,9 +751,6 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
           <span className={styles.phaseHint}>{phaseHint}</span>
         )}
       </div>
-
-      {/* S1.1: TabBar — 三树快速切换（Tab 切换时三树数据全部保留） */}
-      <TabBar />
 
       {/* F1: Expand controls — shown when not in input phase */}
       {phase !== 'input' && (

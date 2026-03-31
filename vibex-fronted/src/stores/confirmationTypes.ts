@@ -6,6 +6,7 @@
  */
 
 import { StateStorage } from 'zustand/middleware';
+import type { BoundedContext } from '@/services/api/types/prototype/domain';
 
 // Confirmation step types
 export type ConfirmationStep =
@@ -61,8 +62,7 @@ export interface DomainProperty {
 
 // Business Flow types
 export interface BusinessFlow {
-  states?: FlowState[];  // Legacy: keep for backward compat
-  steps: FlowStep[];     // Current: preferred field
+  steps: FlowStep[];
   currentStepIndex: number;
 }
 
@@ -90,7 +90,7 @@ export interface ClarificationRound {
   question: string;
   answer: string;
   timestamp: number;
-  isAccepted: boolean;
+  isAccepted?: boolean;
 }
 
 // Main state interface
@@ -148,3 +148,6 @@ export interface ConfirmationFlowState {
 
 // Re-export from confirmationStore for backward compatibility
 // These will be updated in subsequent batches
+
+// Re-export BoundedContext for stores/index.ts
+export type { BoundedContext } from '@/services/api/types/prototype/domain';

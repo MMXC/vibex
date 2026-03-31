@@ -122,7 +122,7 @@ export function StepDomainModel({ onNavigate, isActive }: StepComponentProps) {
                       <span className="model-type">{model.type}</span>
                     </div>
                     <div className="model-properties">
-                      {model.properties?.map((prop) => (
+                      {model.properties?.map((prop: { name: string; type: string; required: boolean; description?: string }) => (
                         <span key={prop.name} className="property">
                           {prop.name}: {prop.type}
                           {prop.required && <span className="required">*</span>}

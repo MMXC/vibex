@@ -11,6 +11,14 @@
 - **提交**: `700d1acf`
 - **审查**: ✅ PASSED (reviewer-epic1-d001-eslintfix)
 
+### Added (vibex-contract-testing Epic3: Canvas API 响应校验) — 2026-03-31
+- **前端校验**: canvasApi.ts 添加响应校验函数
+- **函数**: `isValidGenerateContextsResponse`, `isValidGenerateFlowsResponse`, `isValidGenerateComponentsResponse`
+- **集成**: `generateContexts/generateFlows/generateComponents` 使用 `validatedFetch` 包装
+- **测试**: canvasApiValidation.test.ts 16 tests 全部通过
+- **提交**: `b537bfdb`
+- **审查**: ✅ PASSED (reviewer-epic3-frontendvalidation)
+
 ### Added (vibex-contract-testing Epic2: Canvas Validation Middleware) — 2026-03-31
 - **中间件**: 新增 `canvas-validation.ts` — 输入校验中间件
 - **函数**: `validateContexts()` + `validateGenerateFlowsRequest()`

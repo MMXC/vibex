@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### Epic2: 面板折叠解耦 (canvas-three-tree-unification)
+- **S2.1** — 三面板独立折叠状态持久化: contextPanelCollapsed / flowPanelCollapsed / componentPanelCollapsed
+- **S2.2** — 面板折叠状态写入 canvasStore partialize (persist 持久化到 localStorage)
+- **S2.3** — 切换 Tab 不再重置折叠状态，面板状态独立保持
+- 修复: 解决页面刷新后折叠状态丢失问题
+- Commit: `bdbd2d5b`
+
 ## [Unreleased]
 
 ### Epic3: Flow 关系可视化 (canvas-phase2 F3 Epic)

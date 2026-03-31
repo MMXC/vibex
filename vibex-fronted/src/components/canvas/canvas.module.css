@@ -22,6 +22,8 @@
   height: 100vh;
   background: var(--color-bg-primary);
   overflow: hidden;
+  /* E4: Space for ShortcutBar at the bottom */
+  padding-bottom: 36px;
 }
 
 /* ============================================

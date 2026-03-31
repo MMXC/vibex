@@ -1,3 +1,10 @@
+### Added (canvas-drawer-persistent Epic1: CanvasStore 状态扩展) — 2026-03-31
+- **S1.1 Drawer State**: leftDrawerOpen/rightDrawerOpen/width, toggleLeftDrawer/toggleRightDrawer actions
+- **S1.2 abortGeneration()**: abort SSE + reset status
+- **S1.3 SSE Status**: sseStatus + sseError tracking
+- **测试**: canvasStoreEpic1.test.ts 20 tests ✅
+- **提交**: `d0abd936`
+
 ### Fixed (fix-panel-background: 面板背景可见性) — 2026-03-31
 - **问题**: body=#0a0a0f，面板背景半透明导致文字难以辨认
 - **修复**: `--color-bg-primary`: #0a0a0f→#0d0d16, `--color-bg-secondary`: #12121a→#17172a, `--color-bg-glass`: 0.7→0.88

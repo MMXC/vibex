@@ -254,15 +254,16 @@ browse --url https://copilot.microsoft.com --screenshot copilot-home.png
 ### 负责: Dev + Architect
 ### 依赖: 无
 ### 启动: Sprint 3 Day 1
+### 状态: 🔄 **进行中** (dev-e7-arch-evolution)
 
 ### 任务拆分
 
-| # | 任务 | 工时 | 产出文件 | 验收标准 |
-|---|------|------|---------|---------|
-| E7-T1 | React Flow 性能优化 | 6h | `src/components/nodes/*` + `src/stores/*` | 100 节点 FPS ≥ 30 |
-| E7-T2 | 架构文档版本化 | 3h | `docs/architecture/domain.md` | 所有章节有 `@updated` 日期 |
-| E7-T3 | API Route 服务层拆分 | 6h | `src/services/*` | API route 无直接 DB 调用 |
-| E7-T4 | canvasApi 响应校验 | 2h | `lib/schemas/canvas.ts` | Zod schema 验证通过 |
+| # | 任务 | 工时 | 产出文件 | 验收标准 | 状态 |
+|---|------|------|---------|---------|------|
+| E7-T1 | React Flow 性能优化 | 6h | `src/components/nodes/*` + `src/stores/*` | 100 节点 FPS ≥ 30 | ✅ `1e2984b0` |
+| E7-T2 | 架构文档版本化 | 3h | `docs/architecture/domain.md` | 所有章节有 `@updated` 日期 | ✅ `4416e222` |
+| E7-T3 | API Route 服务层拆分 | 6h | `src/services/*` | API route 无直接 DB 调用 | ✅ `763fab1d` |
+| E7-T4 | canvasApi 响应校验 | 2h | `lib/schemas/canvas.ts` | Zod schema 验证通过 | ✅ `f6888f5f` |
 
 ### E7-T1 详细步骤
 ```

@@ -8,10 +8,12 @@
 3. 逐个迁移 confirmationStore 引用方
 4. 验证无重复定义
 
-### Epic 2: useCanvasSession（2.5h）
-1. 新建 src/lib/canvas/useCanvasSession.ts
-2. 返回 sessionId + 三棵树 + messages + drawerState + AI状态
-3. 写 10 个单元测试
+### Epic 2: useCanvasSession ✅
+- [x] S2.1: 新建 `src/lib/canvas/useCanvasSession.ts` hook
+- [x] S2.2: hook 返回 sessionId + 三棵树 + messages + drawerState + projectId
+- [x] S2.3: hook 返回 AI 状态 (aiThinking/flowGenerating) + SSE 状态 (sseStatus/sseError)
+- [x] S2.4: 单元测试覆盖 11 个用例
+- [x] 验收: tsc --noEmit 通过
 
 ### Epic 3: historyMiddleware（3h）
 1. 新建 stores/historyMiddleware.ts

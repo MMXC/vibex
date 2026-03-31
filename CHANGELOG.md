@@ -19,6 +19,13 @@
 - **测试**: 11 unit tests ✅
 - **提交**: `cfa81b0a`
 
+### Added (canvas-data-model-unification Epic3: historyMiddleware isRecording guard) — 2026-04-01
+- **isRecording**: guard flag prevents re-entrant recordSnapshot calls
+- **try/finally**: isRecording always reset to false
+- **recordSnapshot**: covers all three trees (context/flow/component)
+- **测试**: 41 tests PASS (3 new isRecording + 38 existing)
+- **提交**: `41da04c0`
+
 ### Added (canvas-data-model-unification Epic1: Phase1 样式统一) — 2026-03-31
 - **P1-T5**: deriveDomainType/deriveStepType 工具函数, FLOW_STEP_TYPE_CONFIG/DOMAIN_TYPE_CONFIG
 - **P1-T5**: canvas.variables.css 统一 CSS token 系统

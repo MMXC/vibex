@@ -11,6 +11,15 @@
 - **提交**: `700d1acf`
 - **审查**: ✅ PASSED (reviewer-epic1-d001-eslintfix)
 
+### Added (vibex-contract-testing Epic2: Canvas Validation Middleware) — 2026-03-31
+- **中间件**: 新增 `canvas-validation.ts` — 输入校验中间件
+- **函数**: `validateContexts()` + `validateGenerateFlowsRequest()`
+- **规则**: contexts 非空、至少一个 core 类型、必填字段校验 (id/name/type)
+- **集成**: `generate-flows/route.ts` 集成 canvas-validation 中间件
+- **测试**: canvas-validation.test.ts 14 tests 全部通过
+- **提交**: `e1734c6c`
+- **审查**: ✅ PASSED (reviewer-epic2-backendmiddleware)
+
 ### Added (vibex-contract-testing Epic1: Canvas API Schema) — 2026-03-31
 - **Schema**: 创建 `packages/types/src/api/canvas.ts` — 前后端契约类型定义
 - **类型**: GenerateContextsRequest/Response, GenerateFlowsRequest/Response, GenerateComponentsRequest/Response

@@ -29,10 +29,12 @@
 - [x] S4.4: 11 个单元测试
 - [x] 验收: tsc --noEmit 通过
 
-### Epic 5: Migration（3h）
-1. Zustand persist migration 函数
-2. 旧数据加载测试
-3. gstack screenshot 验证 UI 无回归
+### Epic 5: Migration ✅
+- [x] S5.1: `runMigrations()` 函数处理 Zustand persist 数据迁移
+- [x] S5.2: 旧数据加载测试（无 panel collapse 字段 → 默认 false）
+- [x] S5.3: 回归测试（UI 字段排除在 persist 之外）
+- [x] S5.4: 7 个单元测试
+- [x] 验收: tsc --noEmit 通过
 
 ## 验收
 - npm test 通过

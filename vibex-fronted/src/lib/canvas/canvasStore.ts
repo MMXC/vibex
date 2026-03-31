@@ -8,7 +8,7 @@
  * - CascadeUpdateManager 内聚在 store 内
  */
 import { create } from 'zustand';
-import { devtools, persist, createJSONStorage } from 'zustand/middleware';
+import { devtools, persist } from 'zustand/middleware';
 import type {
   Phase,
   TreeType,
@@ -45,6 +45,42 @@ import { addNodeMessage } from '@/components/canvas/messageDrawer/messageDrawerS
 // =============================================================================
 // Helpers
 // =============================================================================
+
+// =============================================================================
+// Helpers
+// =============================================================================
+
+const CANVAS_STORAGE_KEY = 'vibex-canvas-storage';
+const CANVAS_STORAGE_VERSION_KEY = `${CANVAS_STORAGE_KEY}-version`;
+const CURRENT_STORAGE_VERSION = 1;
+
+/**
+ * Epic 5: Migration
+ * Manual migration for Zustand persist state.
+ * Handles upgrading from unversioned state to version 1.
+ * When schema changes, increment CURRENT_STORAGE_VERSION and add migration handlers.
+ */
+function runMigrations(storedState: Record<string, unknown>): Record<string, unknown> {
+  const storedVersion = localStorage.getItem(CANVAS_STORAGE_VERSION_KEY);
+  const version = storedVersion ? parseInt(storedVersion, 10) : 0;
+
+  let migrated = { ...storedState };
+
+  if (version < 1) {
+    // Migration 0→1: Add panel collapse state with defaults
+    migrated = {
+      ...migrated,
+      contextPanelCollapsed: migrated.contextPanelCollapsed ?? false,
+      flowPanelCollapsed: migrated.flowPanelCollapsed ?? false,
+      componentPanelCollapsed: migrated.componentPanelCollapsed ?? false,
+    };
+  }
+
+  // Future migrations go here:
+  // if (version < 2) { migrated = migrateV1toV2(migrated); }
+
+  return migrated;
+}
 
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -1291,7 +1327,30 @@ export const useCanvasStore = create<CanvasStore>()(
       },
       {
         name: 'vibex-canvas-storage',
-        storage: createJSONStorage(() => localStorage),
+        storage: {
+          getItem: (name: string) => {
+            const value = localStorage.getItem(name);
+            if (value === null) return null;
+            try {
+              const parsed = JSON.parse(value);
+              // Apply migrations if needed
+              const migrated = runMigrations(parsed.state ?? {});
+              // Update version
+              localStorage.setItem(CANVAS_STORAGE_VERSION_KEY, String(CURRENT_STORAGE_VERSION));
+              return { ...parsed, state: migrated };
+            } catch {
+              return value ? { state: JSON.parse(value) } : null;
+            }
+          },
+          setItem: (name: string, newValue: { state: Record<string, unknown> }) => {
+            localStorage.setItem(name, JSON.stringify(newValue));
+            localStorage.setItem(CANVAS_STORAGE_VERSION_KEY, String(CURRENT_STORAGE_VERSION));
+          },
+          removeItem: (name: string) => {
+            localStorage.removeItem(name);
+            localStorage.removeItem(CANVAS_STORAGE_VERSION_KEY);
+          },
+        },
         partialize: (state) => ({
           // Only persist project-scoped data, not UI state
           projectId: state.projectId,

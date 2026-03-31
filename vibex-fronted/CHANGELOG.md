@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+### E1: 开发环境阻塞修复 (proposals-20260401)
+- **E1-T1** — Backend npm workspace + tsconfig 测试文件排除: `exclude **/*.test.ts, **/__tests__/, coverage/, .next/`
+- **E1-T2** — Frontend TS pre-test 修复: tsconfig strict 模式验证通过
+- **E1-T3** — task_manager.py 文件锁: fcntl.flock() 30s timeout + try-finally，乐观锁 `_rev` 字段防竞态
+- Commits: `41d75bf3`, `54e8f152`
+
+### E2: 协作质量防护 (proposals-20260401)
+- **E2-T1** — JSON 越权编辑防护: LockRequired 异常类，cmd_update 要求任务必须先被 claim 才能更新状态
+- **E2-T2** — 自检报告路径规范: validate_report_path() 要求报告保存在 proposals/YYYYMMDD/ 目录
+- **E2-T3** — 重复通知过滤: _is_notif_duplicate() 基于 channel+text hash，30min TTL 去重
+- Commits: `f04cc10c`
+
+### E3: Canvas 选区 Bug 修复 (proposals-20260401)
+- **E3-T1** — 修复 drag selection stale closure bug: useRef 替代 useState 闭包陷阱
+- **E3-T2** — E2E 测试覆盖: Playwright canvas-selection.spec.ts (4 scenarios: drag/ESC/click/outside)
+- 修复: `useDragSelection.ts` 依赖数组精简，避免 mousemove 每次重注册监听器
+- Commits: `41ff5f0f`, `bf4f2cdc`
+
+### E4: 画布引导体系 (proposals-20260401)
+- **E4-T1** — CanvasOnboardingOverlay: 首次用户3步引导（localStorage 检测，三树结构/节点操作/快捷键）
+- **E4-T2** — ShortcutBar: 底部可折叠快捷键栏（Ctrl+Z/K/A/Del 等，Zustand 控制展开/折叠）
+- **E4-T3** — NodeTooltip: 节点 Hover tooltip（React.memo + CSS fade，200ms 延迟响应）
+- Commits: `4556540e`
+
 ### Epic2: 面板折叠解耦 (canvas-three-tree-unification)
 - **S2.1** — 三面板独立折叠状态持久化: contextPanelCollapsed / flowPanelCollapsed / componentPanelCollapsed
 - **S2.2** — 面板折叠状态写入 canvasStore partialize (persist 持久化到 localStorage)

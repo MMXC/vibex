@@ -89,6 +89,16 @@ jest.mock('@xyflow/react', () => ({
   MiniMap: () => null,
   useNodesState: () => [[], jest.fn(), jest.fn()],
   useEdgesState: () => [[], jest.fn(), jest.fn()],
+  useReactFlow: () => ({
+    setNodes: jest.fn(),
+    setEdges: jest.fn(),
+    getNodes: jest.fn(() => []),
+    getEdges: jest.fn(() => []),
+    fitView: jest.fn(),
+    zoomIn: jest.fn(),
+    zoomOut: jest.fn(),
+    project: jest.fn(),
+  }),
   addEdge: jest.fn(),
   MarkerType: {
     Arrow: 'arrow',

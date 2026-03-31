@@ -39,6 +39,18 @@ except ImportError:
     class TimeoutError(Exception):
         pass
 
+
+# ── E2-T1: 越权编辑防护异常 ─────────────────────────────────────────────────
+class LockRequired(Exception):
+    """任务未被领取（未处于 in-progress 状态），禁止更新状态。
+    
+    所有 update 调用必须先通过 claim 命令领取任务。
+    仅在以下情况允许绕过：
+    - 使用 --skip-lock 参数（coord 专用）
+    - 状态变更为 pending（驳回场景）
+    """
+    pass
+
 # Import log_analysis functions (graceful fallback if not available)
 try:
     from log_analysis import append_to_memory, clean_cooldown
@@ -131,6 +143,58 @@ else:
     HAS_CURRENT_REPORT = False
 
 
+# ── E2-T3: 通知去重配置 ─────────────────────────────────────────────────────
+import hashlib
+import time as _time
+
+_NOTIF_DEDUP_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".notif_dedup.json")
+_NOTIF_DEDUP_TTL = 30 * 60  # 30 分钟去重窗口（秒）
+
+
+def _notif_key(channel_id: str, text: str) -> str:
+    """生成通知去重 key（channel + 内容 hash）"""
+    content = f"{channel_id}:{text}"
+    return hashlib.sha256(content.encode()).hexdigest()[:16]
+
+
+def _is_notif_duplicate(channel_id: str, text: str) -> bool:
+    """检查通知是否在 30min 内已发送，是则返回 True。"""
+    if not os.path.exists(_NOTIF_DEDUP_FILE):
+        return False
+    try:
+        with open(_NOTIF_DEDUP_FILE) as f:
+            cache = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return False
+    key = _notif_key(channel_id, text)
+    entry = cache.get(key)
+    if not entry:
+        return False
+    sent_at = entry.get("ts", 0)
+    if _time.time() - sent_at < _NOTIF_DEDUP_TTL:
+        return True
+    # 过期，清除
+    return False
+
+
+def _record_notif(channel_id: str, text: str) -> None:
+    """记录通知发送记录，用于去重。"""
+    try:
+        cache = {}
+        if os.path.exists(_NOTIF_DEDUP_FILE):
+            with open(_NOTIF_DEDUP_FILE) as f:
+                cache = json.load(f)
+        key = _notif_key(channel_id, text)
+        # 清除过期条目
+        now = _time.time()
+        cache = {k: v for k, v in cache.items() if now - v.get("ts", 0) < _NOTIF_DEDUP_TTL}
+        cache[key] = {"ts": now, "channel": channel_id}
+        with open(_NOTIF_DEDUP_FILE, "w") as f:
+            json.dump(cache, f, indent=2)
+    except Exception:
+        pass  # 去重失败不阻塞主流程
+
+
 # ── Slack 通知配置 ───────────────────────────────────────────────────────────
 import urllib.request
 
@@ -158,8 +222,15 @@ AGENT_TOKEN = {
 
 
 def _curl_slack(channel_id: str, user_token: str, text: str) -> bool:
-    """发送 Slack 消息，返回是否成功。curl 失败不阻塞主流程。"""
+    """发送 Slack 消息，返回是否成功。curl 失败不阻塞主流程。
+    
+    E2-T3: 相同内容在 30min 内不会重复发送（去重 key = channel + text hash）。
+    """
     if not user_token:
+        return False
+    # E2-T3: 重复通知过滤
+    if _is_notif_duplicate(channel_id, text):
+        print(f"⏭️ 通知去重（30min 内已发送）: channel={channel_id}", file=sys.stderr)
         return False
     payload = json.dumps({"channel": channel_id, "text": text, "mrkdwn": True}).encode()
     req = urllib.request.Request(
@@ -174,7 +245,11 @@ def _curl_slack(channel_id: str, user_token: str, text: str) -> bool:
     try:
         with urllib.request.urlopen(req, timeout=10) as resp:
             result = json.loads(resp.read())
-            return result.get("ok", False)
+            ok = result.get("ok", False)
+            # E2-T3: 发送成功后记录（用于去重）
+            if ok:
+                _record_notif(channel_id, text)
+            return ok
     except Exception as e:
         print(f"⚠️  Slack 通知失败: {e}", file=sys.stderr)
         return False
@@ -1393,6 +1468,21 @@ def cmd_update(args):
     stage = data["stages"][stage_id]
     old_status = stage["status"]
 
+    # ── E2-T1: 越权编辑防护 ────────────────────────────────────────────────
+    # 只有已被 claim（in-progress）的任务才允许更新状态
+    # 允许的场景：
+    #   1. --skip-lock 参数（coord 专用）
+    #   2. 状态变更为 pending（驳回场景）
+    #   3. 已 in-progress 的任务（正常领取后更新）
+    if old_status != "in-progress" and new_status in ("done", "failed", "skipped"):
+        if getattr(args, "skip_lock", False):
+            print(f"⚠️  LockRequired bypassed by --skip-lock", file=sys.stderr)
+        else:
+            raise LockRequired(
+                f"任务 '{stage_id}' 当前状态为 '{old_status}'，必须先被 claim（in-progress）才能更新到 '{new_status}'。"
+                f"\n请先执行: task_manager.py claim {args.project} {stage_id}"
+            )
+
     # ── gstack 验证 ──────────────────────────────────────────────
     if new_status == "done" and not getattr(args, "skip_gstack_verify", False):
         details = stage.get("details", {})
@@ -1911,6 +2001,7 @@ def main():
     p.add_argument("--log-analysis", "-l", help="Append summary to MEMORY.md on done")
     p.add_argument("--result", "-r", help="任务产出摘要（用于 gstack 验证）")
     p.add_argument("--skip-gstack-verify", action="store_true", help="跳过 gstack 验证（coord 专用）")
+    p.add_argument("--skip-lock", action="store_true", help="跳过锁检查（E2-T1，coord 专用）")
 
     # claim
     p = sub.add_parser("claim", help="领取任务")
@@ -1996,7 +2087,14 @@ def main():
         print(f"Available commands: {', '.join(cmds.keys())}", file=sys.stderr)
         sys.exit(1)
 
-    cmds[args.command](args)
+    # E2-T1: LockRequired 异常处理
+    try:
+        cmds[args.command](args)
+    except LockRequired as e:
+        print(f"🔒 LockRequired: {e}", file=sys.stderr)
+        print(f"   提示: 任务必须先被 claim（in-progress）才能更新状态", file=sys.stderr)
+        print(f"   提示: coord 可使用 --skip-lock 强制更新", file=sys.stderr)
+        sys.exit(1)
 
 
 # ── cmd_current_report ──────────────────────────────────────────────────────

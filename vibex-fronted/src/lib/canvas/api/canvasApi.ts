@@ -26,6 +26,52 @@ import type {
 
 import { getApiUrl, API_CONFIG } from '@/lib/api-config';
 
+// =============================================================================
+// Epic 3: Response Validation Helpers
+// =============================================================================
+
+function isValidGenerateContextsResponse(value: unknown): value is GenerateContextsOutput {
+  if (!value || typeof value !== 'object') return false;
+  const obj = value as Record<string, unknown>;
+  return (
+    typeof obj.success === 'boolean' &&
+    Array.isArray(obj.contexts) &&
+    typeof obj.sessionId === 'string' &&
+    typeof obj.confidence === 'number'
+  );
+}
+
+function isValidGenerateFlowsResponse(value: unknown): value is GenerateFlowsOutput {
+  if (!value || typeof value !== 'object') return false;
+  const obj = value as Record<string, unknown>;
+  return (
+    typeof obj.success === 'boolean' &&
+    Array.isArray(obj.flows) &&
+    typeof obj.confidence === 'number'
+  );
+}
+
+function isValidGenerateComponentsResponse(value: unknown): value is GenerateComponentsOutput {
+  if (!value || typeof value !== 'object') return false;
+  const obj = value as Record<string, unknown>;
+  return typeof obj.success === 'boolean' && Array.isArray(obj.components);
+}
+
+async function validatedFetch<T>(
+  url: string,
+  options: RequestInit,
+  validator: (v: unknown) => v is T
+): Promise<T> {
+  const res = await fetch(url, options);
+  if (!res.ok) handleResponseError(res, `API 请求失败: ${res.status}`);
+  const json = await res.json();
+  if (!validator(json)) {
+    console.error('[canvasApi] Response validation failed for:', url, json);
+    throw new Error(`[canvasApi] Invalid response from ${url}`);
+  }
+  return json;
+}
+
 // 获取认证 token
 function getAuthHeaders(): Record<string, string> {
   if (typeof window === 'undefined') return {};
@@ -124,7 +170,12 @@ export const canvasApi = {
     });
 
     if (!res.ok) handleResponseError(res, `生成上下文失败: ${res.status}`);
-    return res.json() as Promise<GenerateContextsOutput>;
+    const json = await res.json();
+    if (!isValidGenerateContextsResponse(json)) {
+      console.error('[canvasApi] Invalid GenerateContextsResponse:', json);
+      return { success: false, contexts: [], sessionId: '', confidence: 0, error: '响应格式无效' };
+    }
+    return json;
   },
 
   /**
@@ -143,7 +194,12 @@ export const canvasApi = {
     });
 
     if (!res.ok) handleResponseError(res, `生成流程失败: ${res.status}`);
-    return res.json() as Promise<GenerateFlowsOutput>;
+    const json = await res.json();
+    if (!isValidGenerateFlowsResponse(json)) {
+      console.error('[canvasApi] Invalid GenerateFlowsResponse:', json);
+      return { success: false, flows: [], confidence: 0, error: '响应格式无效' };
+    }
+    return json;
   },
 
   /**
@@ -163,7 +219,12 @@ export const canvasApi = {
     });
 
     if (!res.ok) handleResponseError(res, `生成组件失败: ${res.status}`);
-    return res.json() as Promise<GenerateComponentsOutput>;
+    const json = await res.json();
+    if (!isValidGenerateComponentsResponse(json)) {
+      console.error('[canvasApi] Invalid GenerateComponentsResponse:', json);
+      return { success: false, components: [], confidence: 0, error: '响应格式无效' };
+    }
+    return json;
   },
 
   /**

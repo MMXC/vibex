@@ -19,6 +19,13 @@
 - **测试**: 11 unit tests ✅
 - **提交**: `cfa81b0a`
 
+### Added (canvas-data-model-unification Epic5: Migration) — 2026-04-01
+- **Migration**: Zustand persist v0→v1 (add panel collapse fields with defaults)
+- **runMigrations()**: custom storage with migration support
+- **Backward compat**: old data without panel collapse fields migrates correctly
+- **测试**: 7 unit tests ✅
+- **提交**: `963e0e20`
+
 ### Added (canvas-data-model-unification Epic4: messageMiddleware auto-append) — 2026-04-01
 - **messageMiddleware**: addNodeMessage integrated into all node CRUD operations
 - **覆盖**: add/delete/confirm for context/flow/component trees

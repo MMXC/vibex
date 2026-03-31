@@ -33,13 +33,6 @@ export interface ConfirmationSnapshot {
 }
 
 // Bounded Context types
-export interface BoundedContext {
-  id: string;
-  name: string;
-  description: string;
-  type: 'core' | 'supporting' | 'generic' | 'external';
-  relationships: ContextRelationship[];
-}
 
 export interface ContextRelationship {
   id: string;

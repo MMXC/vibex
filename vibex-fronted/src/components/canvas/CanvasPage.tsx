@@ -36,6 +36,9 @@ import { VersionHistoryPanel } from './features/VersionHistoryPanel';
 import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
 import { MessageDrawer } from './messageDrawer/MessageDrawer';
 import { LeftDrawer } from './leftDrawer/LeftDrawer';
+import { ShortcutBar } from '@/components/guidance/ShortcutBar';
+import { CanvasOnboardingOverlay } from '@/components/guidance/CanvasOnboardingOverlay';
+import { NodeTooltip } from '@/components/guidance/NodeTooltip';
 import type { Phase, TreeType, TreeNode } from '@/lib/canvas/types';
 import type { NodeRect } from '@/lib/canvas/types';
 import { BoundedEdgeLayer } from './edges/BoundedEdgeLayer';
@@ -1119,6 +1122,11 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         open={versionHistory.isOpen}
         onClose={versionHistory.close}
       />
+
+      {/* E4: Canvas Guidance System */}
+      <ShortcutBar onOpenShortcutPanel={toggleShortcutPanel} />
+      <CanvasOnboardingOverlay />
+      <NodeTooltip />
     </div>
   );
 }

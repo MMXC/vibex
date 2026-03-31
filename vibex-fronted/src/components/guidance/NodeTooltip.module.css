@@ -1,0 +1,38 @@
+/**
+ * NodeTooltip.module.css
+ *
+ * Hover tooltip styles for tree nodes.
+ * Optimized for <200ms response with CSS transitions.
+ */
+
+/* --- Root --- */
+.tooltip {
+  position: fixed;
+  z-index: 800;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 120ms ease-out,
+    transform 120ms ease-out;
+  max-width: 240px;
+}
+
+.tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- Content --- */
+.content {
+  background: var(--color-canvas-bg, #1a1a2e);
+  border: 1px solid var(--color-border, #2d2d44);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  color: var(--color-text-secondary, #c8c8d8);
+  line-height: 1.45;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}

@@ -6,6 +6,14 @@
  * PRD D3: PC 默认 200px
  */
 
+/* ── Responsive: Mobile (≤768px) — Epic 3 F3.2 ──────────────────── */
+@media (max-width: 768px) {
+  .drawerOpen,
+  .drawerClosed {
+    display: none;
+  }
+}
+
 /* ── Drawer Container ───────────────────────────────────────────── */
 .drawer {
   flex-shrink: 0;

@@ -7,7 +7,7 @@ import {
   cascadeFlowChange,
   markFlowNodesPending,
   markComponentNodesPending,
-  areAllConfirmed,
+  hasNodes,
 } from './CascadeUpdateManager';
 import type {
   BoundedContextNode,
@@ -81,19 +81,14 @@ describe('CascadeUpdateManager', () => {
     });
   });
 
-  describe('areAllConfirmed', () => {
-    it('should return true when all nodes confirmed', () => {
+  describe('hasNodes', () => {
+    it('should return true when array has nodes', () => {
       const nodes = [{ confirmed: true }, { confirmed: true }];
-      expect(areAllConfirmed(nodes)).toBe(true);
-    });
-
-    it('should return false when any node unconfirmed', () => {
-      const nodes = [{ confirmed: true }, { confirmed: false }];
-      expect(areAllConfirmed(nodes)).toBe(false);
+      expect(hasNodes(nodes)).toBe(true);
     });
 
     it('should return false for empty array', () => {
-      expect(areAllConfirmed([])).toBe(false);
+      expect(hasNodes([])).toBe(false);
     });
   });
 

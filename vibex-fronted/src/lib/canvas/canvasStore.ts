@@ -28,6 +28,10 @@ import type {
   NodeStatus,
 } from './types';
 
+// ── Epic 1: Left/Right Persistent Drawer State ──────────────────────────────────
+
+export type SSEStatus = 'idle' | 'connecting' | 'connected' | 'reconnecting' | 'error';
+
 /** F1: Canvas expand mode — replaces old leftExpand/centerExpand/rightExpand logic */
 export type CanvasExpandMode = 'normal' | 'expand-both' | 'maximize';
 
@@ -223,6 +227,24 @@ interface CanvasStore {
   aiThinkingMessage: string | null;
   requirementText: string;
 
+  // === Left/Right Persistent Drawer Slice (Epic 1 S1.1) ===
+  /** Left drawer open state */
+  leftDrawerOpen: boolean;
+  /** Right drawer open state */
+  rightDrawerOpen: boolean;
+  /** Left drawer width in px (100-400) */
+  leftDrawerWidth: number;
+  /** Right drawer width in px (100-400) */
+  rightDrawerWidth: number;
+
+  // === SSE Status Slice (Epic 1 S1.3) ===
+  /** SSE connection status */
+  sseStatus: SSEStatus;
+  /** SSE error message when status is 'error' */
+  sseError: string | null;
+  /** AbortController ref for cancelling SSE/AI generation requests */
+  abortControllerRef: AbortController | null;
+
   // === Flow Generation Slice ===
   flowGenerating: boolean;
   flowGeneratingMessage: string | null;
@@ -236,6 +258,22 @@ interface CanvasStore {
   toggleContextPanel: () => void;
   toggleFlowPanel: () => void;
   toggleComponentPanel: () => void;
+
+  // === Left/Right Drawer Actions (Epic 1 S1.1) ===
+  /** Toggle left drawer open/closed */
+  toggleLeftDrawer: () => void;
+  /** Toggle right drawer open/closed */
+  toggleRightDrawer: () => void;
+  /** Set left drawer width */
+  setLeftDrawerWidth: (width: number) => void;
+  /** Set right drawer width */
+  setRightDrawerWidth: (width: number) => void;
+
+  // === SSE Status Actions (Epic 1 S1.3) ===
+  /** Set SSE connection status */
+  setSseStatus: (status: SSEStatus, error?: string) => void;
+  /** Abort all in-flight SSE/AI generation requests */
+  abortGeneration: () => void;
 
   // === Context Slice Actions ===
   setContextNodes: (nodes: BoundedContextNode[]) => void;
@@ -424,6 +462,17 @@ export const useCanvasStore = create<CanvasStore>()(
           aiThinkingMessage: null,
           requirementText: '',
 
+          // === Left/Right Persistent Drawer Slice (Epic 1 S1.1) ===
+          leftDrawerOpen: false,
+          rightDrawerOpen: false,
+          leftDrawerWidth: 200,
+          rightDrawerWidth: 200,
+
+          // === SSE Status Slice (Epic 1 S1.3) ===
+          sseStatus: 'idle',
+          sseError: null,
+          abortControllerRef: null,
+
           // === Flow Generation Slice ===
           flowGenerating: false,
           flowGeneratingMessage: null,
@@ -453,6 +502,28 @@ export const useCanvasStore = create<CanvasStore>()(
             set((s) => ({ flowPanelCollapsed: !s.flowPanelCollapsed })),
           toggleComponentPanel: () =>
             set((s) => ({ componentPanelCollapsed: !s.componentPanelCollapsed })),
+
+          // === Left/Right Persistent Drawer Actions (Epic 1 S1.1) ===
+          toggleLeftDrawer: () =>
+            set((s) => ({ leftDrawerOpen: !s.leftDrawerOpen })),
+          toggleRightDrawer: () =>
+            set((s) => ({ rightDrawerOpen: !s.rightDrawerOpen })),
+          setLeftDrawerWidth: (width: number) =>
+            set({ leftDrawerWidth: Math.min(400, Math.max(100, width)) }),
+          setRightDrawerWidth: (width: number) =>
+            set({ rightDrawerWidth: Math.min(400, Math.max(100, width)) }),
+
+          // === SSE Status Actions (Epic 1 S1.3) ===
+          setSseStatus: (status, error) =>
+            set({ sseStatus: status, sseError: error ?? null }),
+
+          abortGeneration: () => {
+            const { abortControllerRef } = get();
+            if (abortControllerRef) {
+              abortControllerRef.abort();
+              set({ abortControllerRef: null, sseStatus: 'idle', flowGenerating: false, aiThinking: false });
+            }
+          },
 
           // === Expand Slice (E2) ===
           leftExpand: 'default',

@@ -28,7 +28,7 @@ export interface RelationshipEdgeData extends Record<string, unknown> {
 }
 
  
-export function RelationshipEdge(props: EdgeProps<RelationshipEdgeFull>) {
+const RelationshipEdgeComponent = (props: EdgeProps<RelationshipEdgeFull>) => {
    
   const { id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, data, selected, markerEnd } = props as any as {
     id: string; sourceX: number; sourceY: number; targetX: number; targetY: number;
@@ -127,4 +127,5 @@ export function RelationshipEdge(props: EdgeProps<RelationshipEdgeFull>) {
   );
 }
 
+export const RelationshipEdge = React.memo(RelationshipEdgeComponent);
 export default RelationshipEdge;

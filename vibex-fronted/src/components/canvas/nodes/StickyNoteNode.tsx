@@ -39,7 +39,7 @@ interface StickyNoteNodeProps extends NodeProps {
   data: StickyNoteNodeData;
 }
 
-export function StickyNoteNode({ id, data, selected }: StickyNoteNodeProps) {
+const StickyNoteNodeComponent = ({ id, data, selected }: StickyNoteNodeProps) => {
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(data.text ?? '');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -140,4 +140,5 @@ export function StickyNoteNode({ id, data, selected }: StickyNoteNodeProps) {
   );
 }
 
+export const StickyNoteNode = React.memo(StickyNoteNodeComponent);
 export default StickyNoteNode;

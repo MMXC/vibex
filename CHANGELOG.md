@@ -1,3 +1,10 @@
+### Added (canvas-three-tree-unification Epic2: 面板折叠解耦) — 2026-04-01
+- **panel collapse**: contextPanelCollapsed / flowPanelCollapsed / componentPanelCollapsed 独立 boolean 状态
+- **persist**: partialize 添加三个 panelCollapsed 字段，切换 phase 后折叠状态保留
+- **独立性**: 三状态互相独立，可同时展开多个面板
+- **测试**: S2.3 独立性测试 ✅
+- **提交**: `bdbd2d5b`, `0def9e76`
+
 ### Added (canvas-three-tree-unification Epic1: Tab 切换器 + 废除 phase 约束) — 2026-04-01
 - **TabBar**: 三树 Tab 切换器组件 (context/flow/component)
 - **hasNodes**: 新函数替代 areAllConfirmed 作为显示指标

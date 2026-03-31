@@ -27,6 +27,8 @@ import type {
   FlowEdge,
   NodeStatus,
 } from './types';
+// Epic 2: Re-export ClarificationRound from canvasStore (single source from confirmationTypes)
+export type { ClarificationRound } from '@/stores/confirmationTypes';
 
 // ── Epic 1: Left/Right Persistent Drawer State ──────────────────────────────────
 

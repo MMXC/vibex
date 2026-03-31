@@ -5,7 +5,6 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useConfirmationStore, type ClarificationRound } from '@/stores/confirmationStore';
 import { useDesignStore } from '@/stores/designStore';
 import { clarificationApi, type ChatResponse } from '@/lib/api/clarificationApi';
-import type { StepComponentProps } from './types';
 import styles from './StepClarification.module.css';
 
 export function StepClarification({ onNavigate }: StepComponentProps) {

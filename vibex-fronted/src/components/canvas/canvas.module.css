@@ -181,6 +181,8 @@
   max-width: calc(100% / min(var(--canvas-zoom, 1), 1));
   /* F3: Edge layers are absolutely positioned relative to this grid */
   position: relative;
+  /* Fix: solid background to prevent transparency issues on dark body */
+  background: var(--color-bg-secondary, #12121a);
 }
 
 /* E2-F14: Zoom controls in ProjectBar */
@@ -409,6 +411,8 @@
   border-right: 1px solid var(--color-border);
   transition: opacity 0.3s ease, background 0.3s ease;
   overflow: hidden;
+  /* Fix: ensure solid background so text is readable on dark body */
+  background: var(--color-bg-secondary, #12121a);
 }
 
 .treePanel:last-child {
@@ -416,7 +420,7 @@
 }
 
 .treePanelActive {
-  background: transparent;
+  background: var(--color-bg-secondary, #12121a);
 }
 
 .treePanelDimmed {
@@ -493,6 +497,8 @@
   padding: 0.75rem;
   scrollbar-width: thin;
   scrollbar-color: var(--color-border) transparent;
+  /* Bug fix: unauthenticated users see transparent bg over #0A0A0F body — add solid bg for readability */
+  background: var(--color-bg-secondary);
 }
 
 .treePanelBody::-webkit-scrollbar {

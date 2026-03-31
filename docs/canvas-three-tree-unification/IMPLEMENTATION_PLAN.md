@@ -50,3 +50,11 @@
 - [x] S2.2: persist partialize 中添加三个 panelCollapsed 字段（切换 phase 后保留折叠状态）
 - [x] S2.3: 验证可同时展开多个面板（三状态互相独立）
 - [x] 验收: tsc --noEmit 通过
+
+### Epic 3: confirmed → isActive ✅
+- [x] S3.1: types.ts — 移除 confirmed，新增 isActive?: boolean
+- [x] S3.2: Migration v2→v3: confirmed→isActive (true by default)
+- [x] S3.3: 移除 confirmContextNode/confirmFlowNode/confirmComponentNode/confirmAllComponentNodes
+- [x] S3.4: 更新 CascadeUpdateManager.areAllConfirmed→hasActiveNodes
+- [x] S3.5: 移除 confirm 按钮和 checkbox UI
+- [x] 验收: npm build + tsc 通过, 3180 测试通过 (99%)

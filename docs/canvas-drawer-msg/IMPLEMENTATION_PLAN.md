@@ -53,3 +53,15 @@
 - Full suite: 245 suites, 3117 tests passed ✅
 
 ### Epic 1 状态: ✅ 完成 (commit 922c3e74)
+
+### Epic 3: 收尾 ✅
+- [x] messageDrawer.module.css: ≤768px 抽屉隐藏 (F3.2)
+- [x] canvas-drawer-msg.spec.ts: 7 E2E tests (F3.3)
+- 验收: F3.1 drawer独立样式 | F3.2 移动端隐藏 | F3.3 E2E覆盖
+
+### 全部 Epic 完成
+| Epic | 状态 | 产出 |
+|------|------|------|
+| Epic1 消息抽屉基础框架 | ✅ | messageDrawerStore + MessageDrawer + MessageList + MessageItem |
+| Epic2 命令输入系统 | ✅ | CommandInput + CommandList + 5命令 + 节点过滤 |
+| Epic3 收尾 | ✅ | 移动端响应式 + E2E tests |

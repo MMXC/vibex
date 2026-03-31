@@ -34,6 +34,7 @@ import { TemplateSelector } from './features/TemplateSelector';
 import { VersionHistoryPanel } from './features/VersionHistoryPanel';
 import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
 import { MessageDrawer } from './messageDrawer/MessageDrawer';
+import { LeftDrawer } from './leftDrawer/LeftDrawer';
 import type { Phase, TreeType, TreeNode } from '@/lib/canvas/types';
 import type { NodeRect } from '@/lib/canvas/types';
 import { BoundedEdgeLayer } from './edges/BoundedEdgeLayer';
@@ -994,6 +995,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
               />
             </div>
           )}
+
+          {/* Epic 2 S2: Left Drawer — 左侧 200px 需求输入抽屉 */}
+          <LeftDrawer />
 
           {/* Epic 1 F1.1: Message Drawer — 右侧 200px 抽屉 */}
           <MessageDrawer />

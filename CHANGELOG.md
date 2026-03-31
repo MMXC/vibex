@@ -13,6 +13,12 @@
 - **测试**: 28 tests ✅
 - **提交**: `169e94eb`, `7b5960bb`
 
+### Added (canvas-data-model-unification Epic2: useCanvasSession hook) — 2026-04-01
+- **useCanvasSession**: 新建 src/lib/canvas/useCanvasSession.ts hook
+- **返回**: sessionId + 三棵树 + messages + drawerState + AI状态
+- **测试**: 11 unit tests ✅
+- **提交**: `cfa81b0a`
+
 ### Added (canvas-data-model-unification Epic1: Phase1 样式统一) — 2026-03-31
 - **P1-T5**: deriveDomainType/deriveStepType 工具函数, FLOW_STEP_TYPE_CONFIG/DOMAIN_TYPE_CONFIG
 - **P1-T5**: canvas.variables.css 统一 CSS token 系统

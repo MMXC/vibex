@@ -33,6 +33,7 @@ import { TreeStatus } from './TreeStatus';
 import { TemplateSelector } from './features/TemplateSelector';
 import { VersionHistoryPanel } from './features/VersionHistoryPanel';
 import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
+import { MessageDrawer } from './messageDrawer/MessageDrawer';
 import type { Phase, TreeType, TreeNode } from '@/lib/canvas/types';
 import type { NodeRect } from '@/lib/canvas/types';
 import { BoundedEdgeLayer } from './edges/BoundedEdgeLayer';
@@ -993,6 +994,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
               />
             </div>
           )}
+
+          {/* Epic 1 F1.1: Message Drawer — 右侧 200px 抽屉 */}
+          <MessageDrawer />
         </>
       )}
 

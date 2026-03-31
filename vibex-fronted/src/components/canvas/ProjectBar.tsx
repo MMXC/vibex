@@ -15,8 +15,32 @@ import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import { areAllConfirmed } from '@/lib/canvas/cascade';
 import type { CreateProjectInput, PrototypePage } from '@/lib/canvas/types';
 import { getHistoryStore } from '@/lib/canvas/historySlice';
+
+// ── Epic 1 F1.2: Message Drawer Toggle ────────────────────────────────────
+function MessageDrawerToggle() {
+  const isOpen = useMessageDrawerStore((s) => s.isOpen);
+  const toggleDrawer = useMessageDrawerStore((s) => s.toggleDrawer);
+
+  return (
+    <button
+      type="button"
+      className={styles.searchButton}
+      onClick={toggleDrawer}
+      aria-label={isOpen ? '关闭消息抽屉' : '打开消息抽屉'}
+      aria-pressed={isOpen}
+      title={isOpen ? '关闭消息抽屉' : '打开消息抽屉'}
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+      <span>消息</span>
+    </button>
+  );
+}
+
 import { UndoRedoButtons, ZoomControls } from './CanvasToolbar';
 import { ExportMenu } from './features/ExportMenu';
+import { useMessageDrawerStore } from './messageDrawer/messageDrawerStore';
 import styles from './canvas.module.css';
 
 interface ProjectBarProps {
@@ -263,6 +287,9 @@ export function ProjectBar({
 
       {/* E4-F9: Export Menu (PNG/SVG/JSON/Markdown) */}
       <ExportMenu label="导出" />
+
+      {/* Epic 1 F1.2: Message Drawer toggle button */}
+      <MessageDrawerToggle />
 
       {/* E4-F11: Version History button */}
       {onOpenHistory && (

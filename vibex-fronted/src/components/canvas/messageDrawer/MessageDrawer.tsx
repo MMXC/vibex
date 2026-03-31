@@ -13,6 +13,7 @@
 import React from 'react';
 import { useMessageDrawerStore } from './messageDrawerStore';
 import { MessageList } from './MessageList';
+import { CommandInput } from './CommandInput';
 import styles from './messageDrawer.module.css';
 
 export function MessageDrawer() {
@@ -32,6 +33,9 @@ export function MessageDrawer() {
 
       {/* Message list */}
       <MessageList />
+
+      {/* Epic 2 F2.1: Command input — bottom fixed */}
+      <CommandInput />
     </aside>
   );
 }

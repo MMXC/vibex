@@ -169,3 +169,117 @@
   flex-shrink: 0;
   margin-top: 2px;
 }
+
+/* ── Command Input (Epic 2) ─────────────────────────────────────────── */
+.commandInputWrapper {
+  position: relative;
+  flex-shrink: 0;
+  border-top: 1px solid var(--color-border, #e5e7eb);
+  background: var(--color-bg-secondary, #f9fafb);
+}
+
+.commandInputContainer {
+  padding: 6px 8px;
+}
+
+.commandInput {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--color-border, #d1d5db);
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: var(--color-text-primary, #111827);
+  background: var(--color-bg-primary, #ffffff);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
+}
+
+.commandInput::placeholder {
+  color: var(--color-text-muted, #9ca3af);
+}
+
+.commandInput:focus {
+  border-color: var(--color-accent, #3b82f6);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+/* ── Command List Dropdown ─────────────────────────────────────────── */
+.commandList {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  background: var(--color-bg-primary, #ffffff);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 6px 6px 0 0;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.commandListEmpty {
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--color-text-muted, #9ca3af);
+  text-align: center;
+}
+
+.commandItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 1px solid var(--color-border, #f3f4f6);
+  font-size: 12px;
+  transition: background 0.1s ease;
+}
+
+.commandItem:last-child {
+  border-bottom: none;
+}
+
+.commandItem:hover {
+  background: var(--color-bg-hover, #f3f4f6);
+}
+
+.commandItem:focus-visible {
+  outline: 2px solid var(--color-focus-ring, #3b82f6);
+  outline-offset: -2px;
+}
+
+.commandLabel {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-weight: 600;
+  color: var(--color-text-primary, #111827);
+  white-space: nowrap;
+  min-width: 80px;
+}
+
+.commandDesc {
+  font-size: 11px;
+  color: var(--color-text-muted, #9ca3af);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.commandBadge {
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.commandHighlight {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--color-accent, #3b82f6);
+  border-radius: 2px;
+  padding: 0 1px;
+}

@@ -18,9 +18,10 @@ Epic 1 → Epic 2 → Epic 3, 4 可并行
 2. 修改 generateFlows.ts 集成校验 (route.ts)
 3. 写中间件单元测试 (canvas-validation.test.ts, 14 tests ✅)
 
-### Epic 3: 前端 response 校验
-1. 修改 canvasApi.ts parseResponse
-2. 写 canvasApi 响应校验测试
+### Epic 3: 前端 response 校验 ✅
+1. 修改 canvasApi.ts: 添加 isValidGenerateContextsResponse/FlowsResponse/ComponentsResponse 校验函数 ✅
+2. 集成到 generateContexts/generateFlows/generateComponents ✅
+3. canvasApiValidation.test.ts: 16 tests ✅ (commit b537bfdb)
 
 ### Epic 4: CI 契约测试
 1. 创建 __tests__/contract/ 目录

@@ -1,3 +1,8 @@
+### Fixed (fix-panel-background: 面板背景可见性) — 2026-03-31
+- **问题**: body=#0a0a0f，面板背景半透明导致文字难以辨认
+- **修复**: `--color-bg-primary`: #0a0a0f→#0d0d16, `--color-bg-secondary`: #12121a→#17172a, `--color-bg-glass`: 0.7→0.88
+- **文件**: design-tokens.css
+
 ### Added (canvas-drawer-msg Epic1+2+3: 消息抽屉+命令输入+移动端) — 2026-03-31
 - **Epic1**: MessageDrawer + MessageList + MessageItem (4种消息类型), messageDrawerStore (Zustand persist)
 - **Epic2**: CommandInput.tsx (/命令输入), CommandList.tsx (下拉过滤), 全部测试

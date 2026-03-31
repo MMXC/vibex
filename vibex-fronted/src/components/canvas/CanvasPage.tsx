@@ -64,6 +64,8 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const autoGenerateFlows = useCanvasStore((s) => s.autoGenerateFlows);
   const flowGenerating = useCanvasStore((s) => s.flowGenerating);
   const flowGeneratingMessage = useCanvasStore((s) => s.flowGeneratingMessage);
+  // Epic1: Selection-based filtering — only send selected confirmed nodes
+  const selectedNodeIds = useCanvasStore((s) => s.selectedNodeIds);
 
   // === Expand State Selectors (E2 → F1: legacy, kept for toggle buttons) ===
   const gridRef = useRef<HTMLDivElement>(null);
@@ -455,26 +457,34 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
       const sessionId = projectId ?? `session-${Date.now()}`;
 
       // Map ONLY confirmed contexts to API format
-      const mappedContexts = contextNodes
-        .filter((ctx) => ctx.confirmed)
-        .map((ctx) => ({
-          id: ctx.nodeId,
-          name: ctx.name,
-          description: ctx.description ?? '',
-          type: ctx.type,
-        }));
+      // Epic1 S1.1: If context selection exists, only send selected+confirmed; else send all confirmed
+      const confirmedContexts = contextNodes.filter((ctx) => ctx.confirmed);
+      const selectedContextSet = new Set(selectedNodeIds.context);
+      const contextsToSend = selectedContextSet.size > 0
+        ? confirmedContexts.filter((ctx) => selectedContextSet.has(ctx.nodeId))
+        : confirmedContexts;
+      const mappedContexts = contextsToSend.map((ctx) => ({
+        id: ctx.nodeId,
+        name: ctx.name,
+        description: ctx.description ?? '',
+        type: ctx.type,
+      }));
 
       // Map ONLY confirmed flows to API format
-      const mappedFlows = flowNodes
-        .filter((f) => f.confirmed)
-        .map((f) => ({
-          name: f.name,
-          contextId: f.contextId,
-          steps: f.steps.map((step) => ({
-            name: step.name,
-            actor: step.actor,
-          })),
-        }));
+      // Epic1 S1.2: If flow selection exists, only send selected+confirmed; else send all confirmed
+      const confirmedFlows = flowNodes.filter((f) => f.confirmed);
+      const selectedFlowSet = new Set(selectedNodeIds.flow);
+      const flowsToSend = selectedFlowSet.size > 0
+        ? confirmedFlows.filter((f) => selectedFlowSet.has(f.nodeId))
+        : confirmedFlows;
+      const mappedFlows = flowsToSend.map((f) => ({
+        name: f.name,
+        contextId: f.contextId,
+        steps: f.steps.map((step) => ({
+          name: step.name,
+          actor: step.actor,
+        })),
+      }));
 
       const result = await canvasApi.generateComponents({
         contexts: mappedContexts,
@@ -505,7 +515,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     } finally {
       setComponentGenerating(false);
     }
-  }, [componentGenerating, flowNodes, contextNodes, projectId, setComponentNodes, setPhase]);
+  }, [componentGenerating, flowNodes, contextNodes, selectedNodeIds, projectId, setComponentNodes, setPhase]);
 
   // === Compute confirmation states ===
   const contextReady = areAllConfirmed(contextNodes);

@@ -811,6 +811,40 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
         zoom={1}
         pan={{ x: 0, y: 0 }}
       />
+      {/* S3.2: Flow type legend — only show when flows exist */}
+      {flowNodes.length > 0 && (
+        <div
+          className={styles.flowTypeLegend}
+          title="连线类型说明"
+          aria-label="连线类型图例"
+        >
+          <span className={styles.legendItem}>
+            <svg width="24" height="12" viewBox="0 0 24 12" aria-hidden="true">
+              <line x1="2" y1="6" x2="22" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              <polygon points="18,3 22,6 18,9" fill="currentColor" />
+            </svg>
+            顺序
+          </span>
+          <span className={styles.legendItem}>
+            <svg width="24" height="12" viewBox="0 0 24 12" aria-hidden="true">
+              <line x1="2" y1="6" x2="10" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              <line x1="10" y1="6" x2="10" y2="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              <line x1="10" y1="6" x2="10" y2="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              <line x1="10" y1="2" x2="22" y2="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              <line x1="10" y1="10" x2="22" y2="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              <polygon points="18,0 22,2 18,4" fill="currentColor" />
+              <polygon points="18,8 22,10 18,12" fill="currentColor" />
+            </svg>
+            分支
+          </span>
+          <span className={styles.legendItem}>
+            <svg width="24" height="12" viewBox="0 0 24 12" aria-hidden="true">
+              <path d="M4,6 Q12,0 20,6 Q12,12 4,6" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="3,2" />
+            </svg>
+            循环
+          </span>
+        </div>
+      )}
       {/* Header with add button */}
       <div className={styles.treeHeader}>
         {/* S1.1: 始终显示添加流程按钮（零上下文状态也支持） */}

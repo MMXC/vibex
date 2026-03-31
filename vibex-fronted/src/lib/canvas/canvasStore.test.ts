@@ -188,7 +188,9 @@ describe('canvasStore', () => {
 
 
 
-    it('should edit a context node and cascade to flow+component', () => {
+    // Epic 3: cascade from context edit to flow/component was removed.
+    // editContextNode only marks the context node itself as pending.
+    it('should edit a context node and mark it pending', () => {
       const {
         addContextNode,
         editContextNode,
@@ -225,15 +227,11 @@ describe('canvasStore', () => {
       const nodeId = useCanvasStore.getState().contextNodes[0].nodeId;
       editContextNode(nodeId, { name: 'Updated Context' });
 
-      // Flow should be marked pending
-      const updatedFlow = useCanvasStore.getState().flowNodes[0];
-      expect(updatedFlow.status).toBe('pending');
-      expect(updatedFlow.isActive).toBe(false);
+      // Context node should be marked pending
+      const updatedCtx = useCanvasStore.getState().contextNodes[0];
+      expect(updatedCtx.status).toBe('pending');
 
-      // Component should be marked pending
-      const updatedComp = useCanvasStore.getState().componentNodes[0];
-      expect(updatedComp.status).toBe('pending');
-      expect(updatedComp.isActive).toBe(false);
+      // Flow and component nodes are NOT cascaded in Epic 3 — no longer expected
     });
 
     it('should delete a context node', () => {
@@ -273,35 +271,14 @@ describe('canvasStore', () => {
       expect(nodes[0].steps[0].isActive).toBe(false);
     });
 
-    it('should confirm a flow node', () => {
-      const { addFlowNode, confirmFlowNode } = useCanvasStore.getState();
-      addFlowNode({ name: 'Test', contextId: 'c1', steps: [] });
-      const nodeId = useCanvasStore.getState().flowNodes[0].nodeId;
-
-      confirmFlowNode(nodeId);
-      const node = useCanvasStore.getState().flowNodes[0];
-      expect(node.isActive).toBe(true);
+    // Epic 3: confirmFlowNode was removed. Use confirmStep for individual steps instead.
+    it.skip('should confirm a flow node', () => {
+      // confirmFlowNode was removed in Epic 3
     });
 
-    it('should cascade flow edit to component pending', () => {
-      const { editFlowNode } = useCanvasStore.getState();
-
-      const comp: ComponentNode = {
-        nodeId: 'comp-1',
-        flowId: 'flow-1',
-        name: 'Page',
-        type: 'page',
-        props: {},
-        api: { method: 'GET', path: '/api', params: [] },
-        children: [],
-        isActive: true,
-        status: 'confirmed',
-      };
-      useCanvasStore.setState({ componentNodes: [comp] });
-
-      editFlowNode('flow-1', { name: 'Updated Flow' });
-      expect(useCanvasStore.getState().componentNodes[0].status).toBe('pending');
-      expect(useCanvasStore.getState().componentNodes[0].isActive).toBe(false);
+    // Epic 3: cascade from flow edit to component was removed
+    it.skip('should cascade flow edit to component pending', () => {
+      // cascade behavior was removed in Epic 3
     });
   });
 
@@ -325,20 +302,9 @@ describe('canvasStore', () => {
       expect(nodes[0].status).toBe('pending');
     });
 
-    it('should confirm a component node', () => {
-      const { addComponentNode, confirmComponentNode } = useCanvasStore.getState();
-      addComponentNode({
-        flowId: 'f1',
-        name: 'Test',
-        type: 'page',
-        props: {},
-        api: { method: 'GET', path: '/api', params: [] },
-        children: [],
-        isActive: false,
-      });
-      const nodeId = useCanvasStore.getState().componentNodes[0].nodeId;
-      confirmComponentNode(nodeId);
-      expect(useCanvasStore.getState().componentNodes[0].isActive).toBe(true);
+    // Epic 3: confirmComponentNode was removed. Use setActive on individual steps.
+    it.skip('should confirm a component node', () => {
+      // confirmComponentNode was removed in Epic 3
     });
   });
 
@@ -386,19 +352,10 @@ describe('canvasStore', () => {
   });
 
   describe('Tree Activation', () => {
-    it('should activate flow tree when all context nodes confirmed', () => {
-      const { addContextNode, confirmContextNode, setPhase } = useCanvasStore.getState();
-      setPhase('context');
-
-      addContextNode({ name: 'C1', description: '', type: 'core' });
-      addContextNode({ name: 'C2', description: '', type: 'core' });
-
-      const nodes = useCanvasStore.getState().contextNodes;
-      confirmContextNode(nodes[0].nodeId);
-      expect(useCanvasStore.getState().activeTree).toBe('context'); // Not all confirmed yet
-
-      confirmContextNode(nodes[1].nodeId);
-      expect(useCanvasStore.getState().activeTree).toBe('flow');
+    // Epic 3: confirmContextNode was removed. Tree activation uses isActive field.
+    it.skip('should activate flow tree when all context nodes isActive', () => {
+      // confirmContextNode was removed in Epic 3.
+      // To test tree activation: set isActive on nodes directly, then call recomputeActiveTree.
     });
 
     it('should not activate flow when no context nodes', () => {
@@ -407,70 +364,16 @@ describe('canvasStore', () => {
       expect(useCanvasStore.getState().activeTree).toBe('context');
     });
 
-    it('should cascade delete to flow+component pending', () => {
-      const {
-        addContextNode,
-        deleteContextNode,
-      } = useCanvasStore.getState();
-
-      const flowNode: BusinessFlowNode = {
-        nodeId: 'flow-1',
-        contextId: 'ctx-1',
-        name: 'Order Flow',
-        steps: [],
-        isActive: true,
-        status: 'confirmed',
-      };
-      const componentNode: ComponentNode = {
-        nodeId: 'comp-1',
-        flowId: 'flow-1',
-        name: 'Order Page',
-        type: 'page',
-        props: {},
-        api: { method: 'GET', path: '/api/orders', params: [] },
-        children: [],
-        isActive: true,
-        status: 'confirmed',
-      };
-      useCanvasStore.setState({
-        flowNodes: [flowNode],
-        componentNodes: [componentNode],
-      });
-
-      addContextNode({ name: 'Test', description: '', type: 'core' });
-      const nodeId = useCanvasStore.getState().contextNodes[0].nodeId;
-      deleteContextNode(nodeId);
-
-      // Flow should be marked pending
-      expect(useCanvasStore.getState().flowNodes[0].status).toBe('pending');
-      // Component should be marked pending
-      expect(useCanvasStore.getState().componentNodes[0].status).toBe('pending');
+    // Epic 3: cascade from context delete to flow/component was removed.
+    it.skip('should cascade delete to flow+component pending', () => {
+      // cascade behavior was removed in Epic 3
     });
   });
 
   describe('Flow Cascade', () => {
-    it('should cascade flow edit to component pending', () => {
-      const { addFlowNode, editFlowNode } = useCanvasStore.getState();
-
-      const componentNode: ComponentNode = {
-        nodeId: 'comp-1',
-        flowId: 'flow-1',
-        name: 'Order Page',
-        type: 'page',
-        props: {},
-        api: { method: 'GET', path: '/api/orders', params: [] },
-        children: [],
-        isActive: true,
-        status: 'confirmed',
-      };
-      useCanvasStore.setState({ componentNodes: [componentNode] });
-
-      addFlowNode({ name: 'Checkout', contextId: 'ctx-1', steps: [] });
-      const flowId = useCanvasStore.getState().flowNodes[0].nodeId;
-      editFlowNode(flowId, { name: 'Updated Checkout Flow' });
-
-      expect(useCanvasStore.getState().componentNodes[0].status).toBe('pending');
-      expect(useCanvasStore.getState().componentNodes[0].isActive).toBe(false);
+    // Epic 3: cascade from flow edit to component was removed.
+    it.skip('should cascade flow edit to component pending', () => {
+      // cascade behavior was removed in Epic 3
     });
   });
 
@@ -598,19 +501,9 @@ describe('canvasStore', () => {
       expect(flows[0].contextId).toBe(ctxId);
     });
 
-    it('should not auto-generate if flows already exist', () => {
-      const { addFlowNode, addContextNode, confirmContextNode, setPhase } = useCanvasStore.getState();
-      setPhase('context');
-
-      // Pre-existing flow
-      addFlowNode({ name: 'Pre-existing', contextId: 'c1', steps: [] });
-
-      addContextNode({ name: 'C1', description: '', type: 'core' });
-      const ctxId = useCanvasStore.getState().contextNodes[0].nodeId;
-      confirmContextNode(ctxId);
-
-      // Should NOT add another flow
-      expect(useCanvasStore.getState().flowNodes.length).toBe(1);
+    // Epic 3: confirmContextNode was removed. Flow auto-generation logic uses isActive field.
+    it.skip('should not auto-generate if flows already exist', () => {
+      // confirmContextNode was removed in Epic 3
     });
   });
 });
@@ -913,64 +806,76 @@ describe('markAllPending', () => {
     });
 
     // E2-1.1: recomputeActiveTree auto-expands center panel
-    it('should expand center panel when all context nodes confirmed (activeTree becomes flow)', () => {
-      const { addContextNode, confirmContextNode, setPhase } = useCanvasStore.getState();
-      // Check initial state
-      const init = useCanvasStore.getState();
-      console.log('[TEST] Initial:', 'phase:', init.phase, 'activeTree:', init.activeTree, '_prevActiveTree:', init._prevActiveTree, 'centerExpand:', init.centerExpand);
+    // Epic 3: confirmContextNode was removed. Use setActive on nodes + recomputeActiveTree.
+    it('should expand center panel when all context nodes isActive (activeTree becomes flow)', () => {
+      const { setPhase, recomputeActiveTree } = useCanvasStore.getState();
       setPhase('context');
-      const afterPhase = useCanvasStore.getState();
-      console.log('[TEST] After setPhase:', 'activeTree:', afterPhase.activeTree, '_prevActiveTree:', afterPhase._prevActiveTree, 'centerExpand:', afterPhase.centerExpand);
 
-      addContextNode({ name: 'C1', description: '', type: 'core' });
-      addContextNode({ name: 'C2', description: '', type: 'core' });
+      // Add context nodes (isActive: false by default)
+      useCanvasStore.setState({
+        contextNodes: [
+          { nodeId: 'ctx-1', name: 'C1', description: '', type: 'core' as const, isActive: false, status: 'pending' as const, children: [] },
+          { nodeId: 'ctx-2', name: 'C2', description: '', type: 'core' as const, isActive: false, status: 'pending' as const, children: [] },
+        ],
+      });
 
-      // Confirm first node
-      const nodes = useCanvasStore.getState().contextNodes;
-      confirmContextNode(nodes[0].nodeId);
-      const after1 = useCanvasStore.getState();
-      console.log('[TEST] After confirm 1:', 'activeTree:', after1.activeTree, '_prevActiveTree:', after1._prevActiveTree, 'centerExpand:', after1.centerExpand);
+      // First node isActive: only context active
+      useCanvasStore.setState((s) => ({
+        contextNodes: s.contextNodes.map((n) =>
+          n.nodeId === 'ctx-1' ? { ...n, isActive: true } : n
+        ),
+      }));
+      recomputeActiveTree();
+      expect(useCanvasStore.getState().activeTree).toBe('context');
 
-      // Confirm second node — all confirmed, activeTree becomes 'flow', center expands
-      confirmContextNode(nodes[1].nodeId);
-      const after2 = useCanvasStore.getState();
-      console.log('[TEST] After confirm 2:', 'activeTree:', after2.activeTree, '_prevActiveTree:', after2._prevActiveTree, 'centerExpand:', after2.centerExpand);
-      expect(after2.activeTree).toBe('flow');
-      expect(after2.centerExpand).toBe('expand-left');
+      // Second node isActive: all context active → flow active
+      useCanvasStore.setState((s) => ({
+        contextNodes: s.contextNodes.map((n) =>
+          n.nodeId === 'ctx-2' ? { ...n, isActive: true } : n
+        ),
+      }));
+      recomputeActiveTree();
+      expect(useCanvasStore.getState().activeTree).toBe('flow');
+      expect(useCanvasStore.getState().centerExpand).toBe('expand-left');
     });
 
-    it('should expand center panel when all flow nodes confirmed (activeTree becomes component)', () => {
-      const { addContextNode, confirmContextNode, confirmFlowNode, setPhase } = useCanvasStore.getState();
-      setPhase('context');
+    it('should expand center panel when all flow nodes isActive (activeTree becomes component)', () => {
+      const { setPhase, recomputeActiveTree } = useCanvasStore.getState();
+      setPhase('flow');
 
-      addContextNode({ name: 'C1', description: '', type: 'core' });
-      const ctxId = useCanvasStore.getState().contextNodes[0].nodeId;
-      confirmContextNode(ctxId);
+      // Set up context and flow nodes
+      useCanvasStore.setState({
+        contextNodes: [
+          { nodeId: 'ctx-1', name: 'C1', description: '', type: 'core' as const, isActive: true, status: 'confirmed' as const, children: [] },
+        ],
+        flowNodes: [
+          { nodeId: 'flow-1', contextId: 'ctx-1', name: 'Flow A', steps: [], isActive: false, status: 'pending' as const, children: [] },
+        ],
+      });
 
-      // Manually add a flow node to avoid autoGenerateFlows API call
-      const { addFlowNode } = useCanvasStore.getState();
-      addFlowNode({ name: 'Flow A', contextId: ctxId, steps: [] });
+      // Set flow node isActive: all flow active → component active
+      useCanvasStore.setState((s) => ({
+        flowNodes: s.flowNodes.map((n) =>
+          n.nodeId === 'flow-1' ? { ...n, isActive: true, status: 'confirmed' as const } : n
+        ),
+      }));
+      recomputeActiveTree();
 
-      // Move to flow phase
-      useCanvasStore.setState({ phase: 'flow' });
-
-      // Confirm flow node
-      const flowNodes = useCanvasStore.getState().flowNodes;
-      confirmFlowNode(flowNodes[0].nodeId);
-
-      // activeTree should be 'component', centerExpand stays 'expand-left'
       expect(useCanvasStore.getState().activeTree).toBe('component');
       expect(useCanvasStore.getState().centerExpand).toBe('expand-left');
     });
 
     it('should reset centerExpand to default when phase returns to input', () => {
-      const { addContextNode, confirmContextNode, setPhase } = useCanvasStore.getState();
+      const { setPhase, recomputeActiveTree } = useCanvasStore.getState();
       setPhase('context');
 
-      addContextNode({ name: 'C1', description: '', type: 'core' });
-      const nodes = useCanvasStore.getState().contextNodes;
-      confirmContextNode(nodes[0].nodeId);
-
+      // Set all context nodes isActive
+      useCanvasStore.setState({
+        contextNodes: [
+          { nodeId: 'ctx-1', name: 'C1', description: '', type: 'core' as const, isActive: true, status: 'confirmed' as const, children: [] },
+        ],
+      });
+      recomputeActiveTree();
       expect(useCanvasStore.getState().centerExpand).toBe('expand-left');
 
       // Move back to input phase
@@ -979,21 +884,17 @@ describe('markAllPending', () => {
     });
 
     it('should reset centerExpand to default when phase becomes prototype', () => {
-      const init = useCanvasStore.getState();
-      console.log('[TEST4] START:', '_prevActiveTree:', init._prevActiveTree);
-      const { addContextNode, confirmContextNode, setPhase } = useCanvasStore.getState();
+      const { setPhase, recomputeActiveTree } = useCanvasStore.getState();
       setPhase('context');
-      const afterPhase = useCanvasStore.getState();
-      console.log('[TEST4] After setPhase:', 'activeTree:', afterPhase.activeTree, '_prevActiveTree:', afterPhase._prevActiveTree);
 
-      addContextNode({ name: 'C1', description: '', type: 'core' });
-      const nodes = useCanvasStore.getState().contextNodes;
-      console.log('[TEST4] nodes:', nodes.length, 'confirmed:', nodes.map(n => n.isActive));
-      confirmContextNode(nodes[0].nodeId);
-      const afterConfirm = useCanvasStore.getState();
-      console.log('[TEST4] After confirm:', 'activeTree:', afterConfirm.activeTree, 'centerExpand:', afterConfirm.centerExpand, '_prevActiveTree:', afterConfirm._prevActiveTree);
-
-      expect(afterConfirm.centerExpand).toBe('expand-left');
+      // Set context node isActive
+      useCanvasStore.setState({
+        contextNodes: [
+          { nodeId: 'ctx-1', name: 'C1', description: '', type: 'core' as const, isActive: true, status: 'confirmed' as const, children: [] },
+        ],
+      });
+      recomputeActiveTree();
+      expect(useCanvasStore.getState().centerExpand).toBe('expand-left');
 
       // Advance to prototype
       setPhase('prototype');
@@ -1002,16 +903,20 @@ describe('markAllPending', () => {
 
     // E2-1.3: Manual expand should not be overwritten by recomputeActiveTree
     it('should NOT override manual leftExpand when recomputeActiveTree is called', () => {
-      const { addContextNode, confirmContextNode, setPhase, setLeftExpand } = useCanvasStore.getState();
+      const { setPhase, recomputeActiveTree, setLeftExpand } = useCanvasStore.getState();
       setPhase('context');
 
       // User manually expands left panel
       setLeftExpand('expand-right');
       expect(useCanvasStore.getState().leftExpand).toBe('expand-right');
 
-      addContextNode({ name: 'C1', description: '', type: 'core' });
-      const nodes = useCanvasStore.getState().contextNodes;
-      confirmContextNode(nodes[0].nodeId);
+      // Set context node isActive
+      useCanvasStore.setState({
+        contextNodes: [
+          { nodeId: 'ctx-1', name: 'C1', description: '', type: 'core' as const, isActive: true, status: 'confirmed' as const, children: [] },
+        ],
+      });
+      recomputeActiveTree();
 
       // activeTree changed but leftExpand should remain
       expect(useCanvasStore.getState().activeTree).toBe('flow');
@@ -1021,12 +926,16 @@ describe('markAllPending', () => {
     });
 
     it('should NOT override manual centerExpand when recomputeActiveTree is called with same newActiveTree', () => {
-      const { setCenterExpand, setPhase, addContextNode, confirmContextNode } = useCanvasStore.getState();
+      const { setPhase, recomputeActiveTree, setCenterExpand } = useCanvasStore.getState();
       setPhase('context');
 
-      addContextNode({ name: 'C1', description: '', type: 'core' });
-      const nodes = useCanvasStore.getState().contextNodes;
-      confirmContextNode(nodes[0].nodeId);
+      // Set context node isActive
+      useCanvasStore.setState({
+        contextNodes: [
+          { nodeId: 'ctx-1', name: 'C1', description: '', type: 'core' as const, isActive: true, status: 'confirmed' as const, children: [] },
+        ],
+      });
+      recomputeActiveTree();
 
       // Now centerExpand is 'expand-left'
       expect(useCanvasStore.getState().centerExpand).toBe('expand-left');
@@ -1036,7 +945,7 @@ describe('markAllPending', () => {
       expect(useCanvasStore.getState().centerExpand).toBe('expand-right');
 
       // Manually trigger recomputeActiveTree (same activeTree, no tree transition)
-      useCanvasStore.getState().recomputeActiveTree();
+      recomputeActiveTree();
 
       // centerExpand should NOT revert to 'expand-left'
       expect(useCanvasStore.getState().centerExpand).toBe('expand-right');

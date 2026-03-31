@@ -92,20 +92,25 @@ describe('BoundedContextTree — Epic 3: isActive (no confirm)', () => {
     expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
   });
 
-  it('has no "确认所有" buttons', () => {
+  // Epic 3 removed confirm checkboxes but kept the secondary "确认所有" button (S1.5) in multiSelectControls.
+  // It no longer gates confirmation — directly calls advancePhase().
+  it('has "确认所有" secondary button in multiSelectControls', () => {
     render(<BoundedContextTree />);
-    expect(screen.queryByRole('button', { name: /确认所有/ })).not.toBeInTheDocument();
+    // The secondary "确认所有" button (S1.5) has exact aria-label "确认所有节点"
+    expect(screen.getByRole('button', { name: '确认所有节点' })).toBeInTheDocument();
   });
 
-  it('shows "继续到原型生成" button when nodes exist', () => {
+  it('has primary flow-tree advance button when nodes exist', () => {
     render(<BoundedContextTree />);
-    expect(screen.getByRole('button', { name: /继续到原型生成/ })).toBeInTheDocument();
+    // Primary button always exists when hasNodes=true. Use getByText since aria-label doesn't contain "继续到流程树".
+    expect(screen.getByText(/继续到流程树/)).toBeInTheDocument();
   });
 
-  it('"继续到原型生成" button calls advancePhase', async () => {
+  it('primary flow-tree button calls advancePhase', async () => {
     const user = userEvent.setup();
     render(<BoundedContextTree />);
-    await user.click(screen.getByRole('button', { name: /继续到原型生成/ }));
+    // Click by text content — the button text is "确认所有 → 继续到流程树"
+    await user.click(screen.getByText(/继续到流程树/));
     expect(mockAdvancePhase).toHaveBeenCalledTimes(1);
   });
 });

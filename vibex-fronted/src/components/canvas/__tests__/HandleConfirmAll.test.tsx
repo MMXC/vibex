@@ -80,14 +80,22 @@ jest.mock('@/components/ui/Toast', () => ({
 // Tests: Epic3 — no confirm gating, only phase advancement
 // =============================================================================
 describe('Epic3 — Confirm-all removed, only phase advancement', () => {
+  // Snapshot original state for cleanup
+  const ctxSnapshot = [
+    { nodeId: 'ctx-1', name: '用户管理', description: '描述', status: 'pending' as const, isActive: false, children: [] },
+    { nodeId: 'ctx-2', name: '订单管理', description: '描述', status: 'pending' as const, isActive: false, children: [] },
+    { nodeId: 'ctx-3', name: '商品管理', description: '描述', status: 'pending' as const, isActive: false, children: [] },
+  ];
+
   beforeEach(() => {
     jest.clearAllMocks();
     mockCtxNodes.length = 0;
-    mockCtxNodes.push(
-      { nodeId: 'ctx-1', name: '用户管理', description: '描述', status: 'pending' as const, isActive: false, children: [] },
-      { nodeId: 'ctx-2', name: '订单管理', description: '描述', status: 'pending' as const, isActive: false, children: [] },
-      { nodeId: 'ctx-3', name: '商品管理', description: '描述', status: 'pending' as const, isActive: false, children: [] },
-    );
+    ctxSnapshot.forEach((n) => mockCtxNodes.push({ ...n }));
+  });
+
+  afterEach(() => {
+    mockCtxNodes.length = 0;
+    ctxSnapshot.forEach((n) => mockCtxNodes.push({ ...n }));
   });
 
   describe('ComponentTree — no confirm-all button, only prototype transition', () => {
@@ -133,13 +141,21 @@ describe('Epic3 — Confirm-all removed, only phase advancement', () => {
   });
 
   describe('BoundedContextTree — confirm-all calls advancePhase only', () => {
-    it('has "确认所有 → 继续到流程树" button when has nodes', () => {
+    // Reset nodes to original state before each test (after outer cleanup)
+    beforeEach(() => {
+      mockCtxNodes.length = 0;
+      ctxSnapshot.forEach((n) => mockCtxNodes.push({ ...n }));
+    });
+
+    it('has "继续到流程树" button when all nodes isActive', () => {
+      // Set all nodes isActive so button label includes "继续到流程树"
+      mockCtxNodes.forEach((n) => { n.isActive = true; });
       render(<BoundedContextTree />);
-      // aria-label reflects allConfirmed state; with isActive=false it says "确认所有节点后继续"
       expect(screen.getByRole('button', { name: /继续到流程树/i })).toBeInTheDocument();
     });
 
-    it('"确认所有 → 继续到流程树" calls advancePhase (no confirm gating)', () => {
+    it('"继续到流程树" button calls advancePhase', () => {
+      mockCtxNodes.forEach((n) => { n.isActive = true; });
       render(<BoundedContextTree />);
       fireEvent.click(screen.getByRole('button', { name: /继续到流程树/i }));
       expect(mockAdvancePhase).toHaveBeenCalledTimes(1);

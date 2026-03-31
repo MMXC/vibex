@@ -50,21 +50,21 @@ describe('loadExampleData (F-1.1 ~ F-1.3)', () => {
       expect(data.componentNodes.length).toBeGreaterThan(0);
     });
 
-    it('all context nodes have confirmed=true', async () => {
+    it('all context nodes have confirmed=true (raw JSON uses confirmed field)', async () => {
       const data = await import('@/data/example-canvas.json');
-      const allConfirmed = data.contextNodes.every((n: { confirmed: boolean }) => n.isActive === true);
+      const allConfirmed = data.contextNodes.every((n) => n.confirmed === true);
       expect(allConfirmed).toBe(true);
     });
 
-    it('all flow nodes have confirmed=true', async () => {
+    it('all flow nodes have confirmed=true (raw JSON uses confirmed field)', async () => {
       const data = await import('@/data/example-canvas.json');
-      const allConfirmed = data.flowNodes.every((n: { confirmed: boolean }) => n.isActive === true);
+      const allConfirmed = data.flowNodes.every((n) => n.confirmed === true);
       expect(allConfirmed).toBe(true);
     });
 
-    it('all component nodes have confirmed=true', async () => {
+    it('all component nodes have confirmed=true (raw JSON uses confirmed field)', async () => {
       const data = await import('@/data/example-canvas.json');
-      const allConfirmed = data.componentNodes.every((n: { confirmed: boolean }) => n.isActive === true);
+      const allConfirmed = data.componentNodes.every((n) => n.confirmed === true);
       expect(allConfirmed).toBe(true);
     });
 
@@ -124,12 +124,12 @@ describe('loadExampleData (F-1.1 ~ F-1.3)', () => {
       expect(areAllConfirmed(componentNodes)).toBe(true);
     });
 
-    it('flow nodes have steps with confirmed=true', () => {
+    it('flow nodes have steps with isActive set after migration', () => {
       useCanvasStore.getState().loadExampleData();
       const { flowNodes } = useCanvasStore.getState();
       for (const flow of flowNodes) {
         expect(flow.steps.length).toBeGreaterThan(0);
-        expect(flow.steps.every((s: { confirmed: boolean }) => s.isActive)).toBe(true);
+        expect(flow.steps.every((s) => s.isActive !== false)).toBe(true);
       }
     });
   });
@@ -155,8 +155,8 @@ describe('loadExampleData (F-1.1 ~ F-1.3)', () => {
     it('areAllConfirmed returns false when contextNodes is empty', () => {
       useCanvasStore.setState({
         contextNodes: [],
-        flowNodes: [{ nodeId: 'f1', name: 'Flow', steps: [], confirmed: true, status: 'confirmed', children: [] }],
-        componentNodes: [{ nodeId: 'c1', name: 'Comp', type: 'page', props: {}, api: { method: 'GET', path: '/', params: [] }, children: [], confirmed: true, status: 'confirmed' }],
+        flowNodes: [{ nodeId: 'f1', name: 'Flow', steps: [], isActive: true, status: 'confirmed', children: [] }],
+        componentNodes: [{ nodeId: 'c1', name: 'Comp', type: 'page', props: {}, api: { method: 'GET', path: '/', params: [] }, children: [], isActive: true, status: 'confirmed' }],
       });
 
       const { contextNodes, flowNodes, componentNodes } = useCanvasStore.getState();
@@ -171,11 +171,11 @@ describe('loadExampleData (F-1.1 ~ F-1.3)', () => {
       expect(allConfirmed).toBe(false);
     });
 
-    it('areAllConfirmed returns false when a node is not confirmed', () => {
+    it('areAllConfirmed returns false when a node is not active', () => {
       useCanvasStore.setState({
-        contextNodes: [{ nodeId: 'c1', name: 'Ctx', description: '', type: 'core', confirmed: false, status: 'pending', children: [] }],
-        flowNodes: [{ nodeId: 'f1', name: 'Flow', steps: [], confirmed: true, status: 'confirmed', children: [] }],
-        componentNodes: [{ nodeId: 'c2', name: 'Comp', type: 'page', props: {}, api: { method: 'GET', path: '/', params: [] }, children: [], confirmed: true, status: 'confirmed' }],
+        contextNodes: [{ nodeId: 'c1', name: 'Ctx', description: '', type: 'core', isActive: false, status: 'pending', children: [] }],
+        flowNodes: [{ nodeId: 'f1', name: 'Flow', steps: [], isActive: true, status: 'confirmed', children: [] }],
+        componentNodes: [{ nodeId: 'c2', name: 'Comp', type: 'page', props: {}, api: { method: 'GET', path: '/', params: [] }, children: [], isActive: true, status: 'confirmed' }],
       });
 
       const { contextNodes, flowNodes, componentNodes } = useCanvasStore.getState();

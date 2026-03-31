@@ -22,10 +22,12 @@
 - [x] S3.4: 回归测试 41 个（38 原有 + 3 新增 isRecording）
 - [x] 验收: tsc --noEmit 通过
 
-### Epic 4: messageMiddleware（2.5h）
-1. 新建 stores/messageMiddleware.ts
-2. 验证节点操作自动追加消息
-3. 验证刷新后消息持久化
+### Epic 4: messageMiddleware ✅
+- [x] S4.1: 新建 `stores/messageMiddleware.ts` (集成到 `canvasStore.ts` via `addNodeMessage`)
+- [x] S4.2: 节点操作自动追加 messages (add/delete/confirm — context/flow/component)
+- [x] S4.3: messageDrawerStore 持久化验证 (persist middleware)
+- [x] S4.4: 11 个单元测试
+- [x] 验收: tsc --noEmit 通过
 
 ### Epic 5: Migration（3h）
 1. Zustand persist migration 函数

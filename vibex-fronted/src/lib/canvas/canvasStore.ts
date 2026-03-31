@@ -40,6 +40,7 @@ export type CanvasExpandMode = 'normal' | 'expand-both' | 'maximize';
 import exampleCanvasData from '@/data/example-canvas.json';
 import { canvasApi } from './api/canvasApi';
 import { getHistoryStore } from './historySlice';
+import { addNodeMessage } from '@/components/canvas/messageDrawer/messageDrawerStore';
 
 // =============================================================================
 // Helpers
@@ -608,6 +609,8 @@ export const useCanvasStore = create<CanvasStore>()(
               getHistoryStore().recordSnapshot('context', newNodes);
               return { contextNodes: newNodes };
             });
+            // Epic 4: auto-append user_action message
+            addNodeMessage('add', 'context', data.name);
           },
 
           editContextNode: (nodeId, data) => {
@@ -622,11 +625,15 @@ export const useCanvasStore = create<CanvasStore>()(
           },
 
           deleteContextNode: (nodeId) => {
+            const nodeToDelete = get().contextNodes.find((n) => n.nodeId === nodeId);
+            const deletedName = nodeToDelete?.name ?? nodeId;
             set((s) => {
               const newNodes = s.contextNodes.filter((n) => n.nodeId !== nodeId);
               getHistoryStore().recordSnapshot('context', newNodes);
               return { contextNodes: newNodes };
             });
+            // Epic 4: auto-append user_action message
+            addNodeMessage('delete', 'context', deletedName);
             get().cascadeContextChange(nodeId);
           },
 
@@ -634,6 +641,7 @@ export const useCanvasStore = create<CanvasStore>()(
           // First click: confirmed=true, status='confirmed'
           // Second click: confirmed=false, status='pending'
           confirmContextNode: (nodeId) => {
+            const prevNode = get().contextNodes.find((n) => n.nodeId === nodeId);
             const newContextNodes = get().contextNodes.map((n) =>
               n.nodeId === nodeId
                 ? {
@@ -645,6 +653,10 @@ export const useCanvasStore = create<CanvasStore>()(
             );
             set({ contextNodes: newContextNodes });
             getHistoryStore().recordSnapshot('context', newContextNodes);
+            // Epic 4: auto-append user_action message
+            if (prevNode) {
+              addNodeMessage(prevNode.confirmed ? 'delete' : 'confirm', 'context', prevNode.name);
+            }
             // Cascade: context confirmed/unconfirmed → downstream trees may activate/deactivate
             get().recomputeActiveTree();
             // Epic 3 S3.1: auto-generate flow tree when ALL contexts confirmed
@@ -680,6 +692,8 @@ export const useCanvasStore = create<CanvasStore>()(
               getHistoryStore().recordSnapshot('flow', newNodes);
               return { flowNodes: newNodes };
             });
+            // Epic 4: auto-append user_action message
+            addNodeMessage('add', 'flow', data.name);
           },
 
           editFlowNode: (nodeId, data) => {
@@ -694,15 +708,21 @@ export const useCanvasStore = create<CanvasStore>()(
           },
 
           deleteFlowNode: (nodeId) => {
+            const nodeToDelete = get().flowNodes.find((n) => n.nodeId === nodeId);
+            const deletedName = nodeToDelete?.name ?? nodeId;
             set((s) => {
               const newNodes = s.flowNodes.filter((n) => n.nodeId !== nodeId);
               getHistoryStore().recordSnapshot('flow', newNodes);
               return { flowNodes: newNodes };
             });
             get().cascadeFlowChange(nodeId);
+            // Epic 4: auto-append user_action message
+            addNodeMessage('delete', 'flow', deletedName);
           },
 
           confirmFlowNode: (nodeId) => {
+            const nodeToConfirm = get().flowNodes.find((n) => n.nodeId === nodeId);
+            const nodeName = nodeToConfirm?.name ?? nodeId;
             set((s) => {
               const newNodes = s.flowNodes.map((n) =>
                 n.nodeId === nodeId ? { ...n, confirmed: true, status: 'confirmed' as const } : n
@@ -711,6 +731,8 @@ export const useCanvasStore = create<CanvasStore>()(
               return { flowNodes: newNodes };
             });
             get().recomputeActiveTree();
+            // Epic 4: auto-append user_action message
+            addNodeMessage('confirm', 'flow', nodeName);
           },
 
           setFlowDraft: (draft) => set({ flowDraft: draft }),
@@ -904,6 +926,8 @@ export const useCanvasStore = create<CanvasStore>()(
               getHistoryStore().recordSnapshot('component', newNodes);
               return { componentNodes: newNodes };
             });
+            // Epic 4: auto-append user_action message
+            addNodeMessage('add', 'component', data.name);
           },
 
           editComponentNode: (nodeId, data) => {
@@ -917,14 +941,20 @@ export const useCanvasStore = create<CanvasStore>()(
           },
 
           deleteComponentNode: (nodeId) => {
+            const nodeToDelete = get().componentNodes.find((n) => n.nodeId === nodeId);
+            const deletedName = nodeToDelete?.name ?? nodeId;
             set((s) => {
               const newNodes = s.componentNodes.filter((n) => n.nodeId !== nodeId);
               getHistoryStore().recordSnapshot('component', newNodes);
               return { componentNodes: newNodes };
             });
+            // Epic 4: auto-append user_action message
+            addNodeMessage('delete', 'component', deletedName);
           },
 
           confirmComponentNode: (nodeId) => {
+            const nodeToConfirm = get().componentNodes.find((n) => n.nodeId === nodeId);
+            const nodeName = nodeToConfirm?.name ?? nodeId;
             set((s) => {
               const newNodes = s.componentNodes.map((n) =>
                 n.nodeId === nodeId ? { ...n, confirmed: true, status: 'confirmed' as const } : n
@@ -932,6 +962,8 @@ export const useCanvasStore = create<CanvasStore>()(
               getHistoryStore().recordSnapshot('component', newNodes);
               return { componentNodes: newNodes };
             });
+            // Epic 4: auto-append user_action message
+            addNodeMessage('confirm', 'component', nodeName);
           },
 
           // F3.1+F3.2+F3.3: Batch confirm all unconfirmed nodes

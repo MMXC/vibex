@@ -3,6 +3,7 @@ export {
   cascadeFlowChange,
   markFlowNodesPending,
   markComponentNodesPending,
-  areAllConfirmed,
+  hasNodes,
+  areAllConfirmed, // @deprecated alias for hasNodes
 } from './CascadeUpdateManager';
 export type { CascadeUpstream, CascadeResult } from '../types';

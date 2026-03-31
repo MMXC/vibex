@@ -61,7 +61,8 @@ export interface DomainProperty {
 
 // Business Flow types
 export interface BusinessFlow {
-  steps: FlowStep[];
+  states?: FlowState[];  // Legacy: keep for backward compat
+  steps: FlowStep[];     // Current: preferred field
   currentStepIndex: number;
 }
 
@@ -89,6 +90,7 @@ export interface ClarificationRound {
   question: string;
   answer: string;
   timestamp: number;
+  isAccepted: boolean;
 }
 
 // Main state interface

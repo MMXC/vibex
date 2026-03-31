@@ -33,10 +33,22 @@ export function markComponentNodesPending(nodes: ComponentNode[]): ComponentNode
 }
 
 /**
- * 检查所有节点是否都已确认
+ * 检查节点数组是否有任何节点（display metric, not a gate）
+ * S1.4: phase gates removed — formerly checked every(n => n.confirmed),
+ * now just checks nodes.length > 0
+ * To be replaced by isActive in Epic 3
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function hasNodes(nodes: any[]): boolean {
+  return nodes.length > 0;
+}
+
+/**
+ * @deprecated Use hasNodes. kept for backward compat until Epic 3
+ * S1.4: removed confirmed check — now just a display metric
  */
 export function areAllConfirmed(nodes: Array<{ confirmed: boolean }>): boolean {
-  return nodes.length > 0 && nodes.every((n) => n.confirmed);
+  return nodes.length > 0;
 }
 
 /**

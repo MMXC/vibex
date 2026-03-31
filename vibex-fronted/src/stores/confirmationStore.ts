@@ -6,6 +6,20 @@ const devLog = (...args: unknown[]) => {
 };
 import { persist, createJSONStorage } from 'zustand/middleware';
 
+// Epic 1 Batch 2: Import types from confirmationTypes (single source of truth)
+import type {
+  ConfirmationStep,
+  BoundedContext,
+  ContextRelationship,
+  DomainModel,
+  DomainProperty,
+  BusinessFlow,
+  FlowStep,
+  FlowTransition,
+  ClarificationRound,
+  ConfirmationSnapshot,
+} from './confirmationTypes';
+
 // Storage version for migration
 const STORAGE_VERSION = 1;
 const STORAGE_KEY = 'confirmation-flow-storage';

@@ -19,6 +19,13 @@
 - **测试**: 11 unit tests ✅
 - **提交**: `cfa81b0a`
 
+### Added (canvas-data-model-unification Epic4: messageMiddleware auto-append) — 2026-04-01
+- **messageMiddleware**: addNodeMessage integrated into all node CRUD operations
+- **覆盖**: add/delete/confirm for context/flow/component trees
+- **持久化**: messageDrawerStore with persist middleware
+- **测试**: 11 unit tests ✅
+- **提交**: `98f8866e`
+
 ### Added (canvas-data-model-unification Epic3: historyMiddleware isRecording guard) — 2026-04-01
 - **isRecording**: guard flag prevents re-entrant recordSnapshot calls
 - **try/finally**: isRecording always reset to false

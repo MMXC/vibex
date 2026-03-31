@@ -35,12 +35,13 @@ describe('isNameFiltered', () => {
     expect(isNameFiltered('患者管理系统集成模块啊啊啊')).toBe(true); // 13 chars > 12 = too long
   });
 
-  it('C3: DDD valid names with "管理" should NOT be filtered', () => {
-    // "管理" is a valid DDD term — "患者管理" is a legitimate bounded context name
-    expect(isNameFiltered('患者管理')).toBe(false);
-    expect(isNameFiltered('订单管理')).toBe(false);
-    expect(isNameFiltered('医生管理')).toBe(false);
-    expect(isNameFiltered('问诊管理')).toBe(false);
+  it('C3: names with "管理" should be filtered (generic suffix)', () => {
+    // "管理" is a generic suffix — filtered to enforce meaningful bounded context names
+    expect(isNameFiltered('患者管理')).toBe(true);
+    expect(isNameFiltered('订单管理')).toBe(true);
+    expect(isNameFiltered('医生管理')).toBe(true);
+    expect(isNameFiltered('问诊管理')).toBe(true);
+    // "认证授权" and "通知推送" do not contain "管理"
     expect(isNameFiltered('认证授权')).toBe(false);
     expect(isNameFiltered('通知推送')).toBe(false);
   });
@@ -73,16 +74,16 @@ describe('filterInvalidContexts', () => {
     expect(result.map(c => c.name)).toEqual(['患者档案', '认证授权']);
   });
 
-  it('should NOT filter legitimate DDD "管理" names', () => {
+  it('should NOT filter legitimate DDD names', () => {
     const input = [
-      { name: '患者管理', type: 'core' as const, description: '有效', ubiquitousLanguage: [] },
-      { name: '订单管理', type: 'core' as const, description: '有效', ubiquitousLanguage: [] },
-      { name: '问诊管理', type: 'core' as const, description: '有效', ubiquitousLanguage: [] },
+      { name: '患者档案', type: 'core' as const, description: '有效', ubiquitousLanguage: [] },
+      { name: '订单处理', type: 'core' as const, description: '有效', ubiquitousLanguage: [] },
+      { name: '问诊记录', type: 'core' as const, description: '有效', ubiquitousLanguage: [] },
       { name: '患者管理系统', type: 'core' as const, description: '无效-含"系统"', ubiquitousLanguage: [] },
     ];
     const result = filterInvalidContexts(input);
     expect(result.length).toBe(3);
-    expect(result.map(c => c.name)).toEqual(['患者管理', '订单管理', '问诊管理']);
+    expect(result.map(c => c.name)).toEqual(['患者档案', '订单处理', '问诊记录']);
   });
 
   it('should return empty array for all invalid inputs', () => {
@@ -96,7 +97,7 @@ describe('filterInvalidContexts', () => {
 
   it('should return original array for all valid inputs', () => {
     const input = [
-      { name: '患者管理', type: 'core' as const, description: '', ubiquitousLanguage: [] },
+      { name: '患者档案', type: 'core' as const, description: '', ubiquitousLanguage: [] },
       { name: '认证授权', type: 'generic' as const, description: '', ubiquitousLanguage: [] },
     ];
     const result = filterInvalidContexts(input);

@@ -85,23 +85,26 @@ describe('Epic5 C2: Deterministic filtering across both APIs', () => {
   });
 });
 
-describe('Epic5 C3: "管理" names now kept consistently (fixed from over-filtering)', () => {
-  test('"管理" names are KEPT by both APIs (not over-filtered)', () => {
+describe('Epic5 C3: "管理" names now filtered (contract change)', () => {
+  test('"管理" names are FILTERED by both APIs', () => {
     const raw: BoundedContext[] = [
       { name: '患者管理', type: 'core', description: '', ubiquitousLanguage: [] },
       { name: '订单管理', type: 'supporting', description: '', ubiquitousLanguage: [] },
       { name: '问诊管理', type: 'core', description: '', ubiquitousLanguage: [] },
       { name: '认证授权', type: 'generic', description: '', ubiquitousLanguage: [] },
+      { name: '患者档案', type: 'core', description: '', ubiquitousLanguage: [] },
     ];
 
     const filtered = filterInvalidContexts(raw);
 
-    // "管理" names should be KEPT (they are valid DDD terms)
-    expect(filtered.map(c => c.name)).toContain('患者管理');
-    expect(filtered.map(c => c.name)).toContain('订单管理');
-    expect(filtered.map(c => c.name)).toContain('问诊管理');
+    // "管理" names should be FILTERED (generic suffix)
+    expect(filtered.map(c => c.name)).not.toContain('患者管理');
+    expect(filtered.map(c => c.name)).not.toContain('订单管理');
+    expect(filtered.map(c => c.name)).not.toContain('问诊管理');
+    // Valid names without "管理" suffix should be kept
     expect(filtered.map(c => c.name)).toContain('认证授权');
-    expect(filtered.length).toBe(4);
+    expect(filtered.map(c => c.name)).toContain('患者档案');
+    expect(filtered.length).toBe(2);
   });
 
   test('"系统/模块/功能/平台" also filtered consistently', () => {
@@ -172,12 +175,12 @@ describe('Epic5 C5: Name length bounds enforced consistently', () => {
 describe('Epic5: Realistic mixed scenario (simulating both API outputs)', () => {
   test('real LLM output from medical system filtered consistently', () => {
     // Simulates what both APIs would receive from the LLM
-    // "管理" names are now valid and kept; "系统" names are still filtered
+    // "管理" and "系统" names are filtered; core names without suffix are valid
     const rawLLMOutput: BoundedContext[] = [
-      { name: '患者管理', type: 'core', description: '患者建档和认证', ubiquitousLanguage: ['患者', '建档'] },
-      { name: '医生管理', type: 'core', description: '医生入驻和资质', ubiquitousLanguage: ['医生', '入驻'] },
-      { name: '问诊管理', type: 'core', description: '问诊和处方', ubiquitousLanguage: ['问诊', '处方'] },
-      { name: '预约管理', type: 'core', description: '预约和取消', ubiquitousLanguage: ['预约', '号源'] },
+      { name: '患者档案', type: 'core', description: '患者建档和认证', ubiquitousLanguage: ['患者', '建档'] },
+      { name: '医生入驻', type: 'core', description: '医生入驻和资质', ubiquitousLanguage: ['医生', '入驻'] },
+      { name: '问诊', type: 'core', description: '问诊和处方', ubiquitousLanguage: ['问诊', '处方'] },
+      { name: '预约', type: 'core', description: '预约和取消', ubiquitousLanguage: ['预约', '号源'] },
       { name: '订单系统', type: 'supporting', description: '订单和支付', ubiquitousLanguage: ['订单', '支付'] }, // "系统" → filtered
       { name: '认证授权', type: 'generic', description: '登录和Token', ubiquitousLanguage: ['登录', 'JWT'] },
       { name: '微信支付', type: 'external', description: '对接微信支付', ubiquitousLanguage: [] },
@@ -195,15 +198,17 @@ describe('Epic5: Realistic mixed scenario (simulating both API outputs)', () => 
       expect(ctx.name).not.toMatch(/系统$/);
     }
 
-    // Verify "管理" names are kept
+    // Verify valid names are kept
     const names = api1Result.map(c => c.name);
-    expect(names).toContain('患者管理');
-    expect(names).toContain('医生管理');
-    expect(names).toContain('问诊管理');
-    expect(names).toContain('预约管理');
+    expect(names).toContain('患者档案');
+    expect(names).toContain('医生入驻');
+    expect(names).toContain('问诊');
+    expect(names).toContain('预约');
     expect(names).not.toContain('订单系统'); // has "系统"
+    expect(names).toContain('认证授权');
+    expect(names).toContain('微信支付');
 
-    // Filtered: 5 kept (4 管理 + 认证授权 + 微信支付), 1 removed (订单系统)
+    // Filtered: 5 kept (4 valid + 认证授权 + 微信支付), 1 removed (订单系统)
     expect(api1Result.length).toBe(6);
 
     // Verify core ratio is within bounds (4 core out of 6 = 67%)

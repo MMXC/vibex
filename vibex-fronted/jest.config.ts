@@ -62,6 +62,13 @@ const config: Config = {
 
   // Coverage thresholds
   coverageThreshold: {
+    // Required by Jest types; actual thresholds are per-path
+    global: {
+      branches: 0,
+      functions: 0,
+      lines: 0,
+      statements: 0,
+    },
     // Canvas directory: low threshold (rapidly evolving area)
     './src/components/canvas/**': {
       branches: 30,

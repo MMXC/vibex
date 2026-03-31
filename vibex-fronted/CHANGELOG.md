@@ -9,6 +9,13 @@ All notable changes to this project will be documented in this file.
 - 修复: 解决页面刷新后折叠状态丢失问题
 - Commit: `bdbd2d5b`
 
+### Epic3: confirmed→isActive 重构 (canvas-three-tree-unification)
+- **S3.1** — 节点状态字段重命名: confirmed → isActive (isActive !== false 即为活跃)
+- **S3.2** — 移除 areAllConfirmed/hasAllNodes 逻辑，统一用 hasNodes 检测
+- **S3.3** — CanvasPage/BoundedContextTree/BusinessFlowTree/ComponentTree 更新 isActive 引用
+- **S3.4** — 废弃 confirmationStore 中已迁移到 canvasStore 的类型
+- Commit: `108afc35`
+
 ## [Unreleased]
 
 ### Epic3: Flow 关系可视化 (canvas-phase2 F3 Epic)

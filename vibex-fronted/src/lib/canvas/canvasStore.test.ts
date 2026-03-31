@@ -142,6 +142,31 @@ describe('canvasStore', () => {
       toggleComponentPanel();
       expect(useCanvasStore.getState().componentPanelCollapsed).toBe(true);
     });
+
+    // S2.3: Three panel collapse states are independent — can have multiple expanded simultaneously
+    it('should allow multiple panels to be collapsed independently (S2.3)', () => {
+      const store = useCanvasStore.getState();
+      // Reset to known state
+      if (store.contextPanelCollapsed) store.toggleContextPanel();
+      if (store.flowPanelCollapsed) store.toggleFlowPanel();
+      if (store.componentPanelCollapsed) store.toggleComponentPanel();
+
+      // Collapse context and component, leave flow expanded
+      store.toggleContextPanel();
+      store.toggleComponentPanel();
+      const s = useCanvasStore.getState();
+      expect(s.contextPanelCollapsed).toBe(true);
+      expect(s.flowPanelCollapsed).toBe(false); // flow still expanded
+      expect(s.componentPanelCollapsed).toBe(true);
+
+      // Expand all
+      store.toggleContextPanel();
+      store.toggleComponentPanel();
+      const s2 = useCanvasStore.getState();
+      expect(s2.contextPanelCollapsed).toBe(false);
+      expect(s2.flowPanelCollapsed).toBe(false);
+      expect(s2.componentPanelCollapsed).toBe(false);
+    });
   });
 
   describe('Context Slice', () => {

@@ -26,6 +26,13 @@ All notable changes to this project will be documented in this file.
 - **E4-T3** — NodeTooltip: 节点 Hover tooltip（React.memo + CSS fade，200ms 延迟响应）
 - Commits: `4556540e`
 
+### E5: 质量流程改进 (proposals-20260401)
+- **E5-T1** — Playwright E2E 测试规范: 5+ CI-blocking 测试用例，canvasquality-ci.spec.ts 覆盖选区/面板/快捷键
+- **E5-T3** — 两阶段审查 SOP: reviewer → architect 两阶段审查流程文档
+- **E5-T4** — Story 验收标准模板: PRD 模板要求每 Story 含 expect() 断言
+- **E5-T5** — KPI Dashboard: docs/kpi-dashboard.md
+- Commits: `dd4904c4`, `a5d42445`, `b335927e`, `e7d4465a`
+
 ### Epic2: 面板折叠解耦 (canvas-three-tree-unification)
 - **S2.1** — 三面板独立折叠状态持久化: contextPanelCollapsed / flowPanelCollapsed / componentPanelCollapsed
 - **S2.2** — 面板折叠状态写入 canvasStore partialize (persist 持久化到 localStorage)

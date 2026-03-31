@@ -28,13 +28,15 @@ describe('Epic 4: messageMiddleware — auto-append messages on node operations'
   beforeEach(() => {
     // Reset both stores before each test
     act(() => {
+      // Clear canvasStore messages (Epic 6: messages now live in canvasStore)
+      useCanvasStore.getState().clearMessages();
       useCanvasStore.setState({
         contextNodes: [],
         flowNodes: [],
         componentNodes: [],
         projectId: null,
       });
-      useMessageDrawerStore.setState({ messages: [] });
+      useMessageDrawerStore.setState({ messages: [], isOpen: false });
     });
   });
 
@@ -47,7 +49,7 @@ describe('Epic 4: messageMiddleware — auto-append messages on node operations'
           type: 'core',
         });
       });
-      const messages = useMessageDrawerStore.getState().messages;
+      const messages = useCanvasStore.getState().messages;
       expect(messages.length).toBeGreaterThanOrEqual(1);
       const lastMsg = messages[messages.length - 1];
       expect(lastMsg.type).toBe('user_action');
@@ -67,7 +69,7 @@ describe('Epic 4: messageMiddleware — auto-append messages on node operations'
       act(() => {
         useCanvasStore.getState().deleteContextNode(nodeId);
       });
-      const messages = useMessageDrawerStore.getState().messages;
+      const messages = useCanvasStore.getState().messages;
       const lastMsg = messages[messages.length - 1];
       expect(lastMsg.type).toBe('user_action');
       expect(lastMsg.content).toBe('删除了上下文节点');
@@ -86,7 +88,7 @@ describe('Epic 4: messageMiddleware — auto-append messages on node operations'
       act(() => {
         useCanvasStore.getState().confirmContextNode(nodeId);
       });
-      const messages = useMessageDrawerStore.getState().messages;
+      const messages = useCanvasStore.getState().messages;
       const lastMsg = messages[messages.length - 1];
       expect(lastMsg.type).toBe('user_action');
       expect(lastMsg.content).toBe('确认了上下文节点');
@@ -110,7 +112,7 @@ describe('Epic 4: messageMiddleware — auto-append messages on node operations'
       act(() => {
         useCanvasStore.getState().confirmContextNode(nodeId);
       });
-      const messages = useMessageDrawerStore.getState().messages;
+      const messages = useCanvasStore.getState().messages;
       const lastMsg = messages[messages.length - 1];
       expect(lastMsg.type).toBe('user_action');
       expect(lastMsg.content).toBe('删除了上下文节点');
@@ -127,7 +129,7 @@ describe('Epic 4: messageMiddleware — auto-append messages on node operations'
           steps: [],
         });
       });
-      const messages = useMessageDrawerStore.getState().messages;
+      const messages = useCanvasStore.getState().messages;
       const lastMsg = messages[messages.length - 1];
       expect(lastMsg.type).toBe('user_action');
       expect(lastMsg.content).toBe('添加了流程节点');
@@ -146,7 +148,7 @@ describe('Epic 4: messageMiddleware — auto-append messages on node operations'
       act(() => {
         useCanvasStore.getState().deleteFlowNode(nodeId);
       });
-      const messages = useMessageDrawerStore.getState().messages;
+      const messages = useCanvasStore.getState().messages;
       const lastMsg = messages[messages.length - 1];
       expect(lastMsg.type).toBe('user_action');
       expect(lastMsg.content).toBe('删除了流程节点');
@@ -165,7 +167,7 @@ describe('Epic 4: messageMiddleware — auto-append messages on node operations'
       act(() => {
         useCanvasStore.getState().confirmFlowNode(nodeId);
       });
-      const messages = useMessageDrawerStore.getState().messages;
+      const messages = useCanvasStore.getState().messages;
       const lastMsg = messages[messages.length - 1];
       expect(lastMsg.type).toBe('user_action');
       expect(lastMsg.content).toBe('确认了流程节点');
@@ -184,7 +186,7 @@ describe('Epic 4: messageMiddleware — auto-append messages on node operations'
           api: { method: 'GET', path: '/test', params: [] },
         });
       });
-      const messages = useMessageDrawerStore.getState().messages;
+      const messages = useCanvasStore.getState().messages;
       const lastMsg = messages[messages.length - 1];
       expect(lastMsg.type).toBe('user_action');
       expect(lastMsg.content).toBe('添加了组件节点');
@@ -205,7 +207,7 @@ describe('Epic 4: messageMiddleware — auto-append messages on node operations'
       act(() => {
         useCanvasStore.getState().deleteComponentNode(nodeId);
       });
-      const messages = useMessageDrawerStore.getState().messages;
+      const messages = useCanvasStore.getState().messages;
       const lastMsg = messages[messages.length - 1];
       expect(lastMsg.type).toBe('user_action');
       expect(lastMsg.content).toBe('删除了组件节点');
@@ -226,7 +228,7 @@ describe('Epic 4: messageMiddleware — auto-append messages on node operations'
       act(() => {
         useCanvasStore.getState().confirmComponentNode(nodeId);
       });
-      const messages = useMessageDrawerStore.getState().messages;
+      const messages = useCanvasStore.getState().messages;
       const lastMsg = messages[messages.length - 1];
       expect(lastMsg.type).toBe('user_action');
       expect(lastMsg.content).toBe('确认了组件节点');
@@ -243,7 +245,7 @@ describe('Epic 4: messageMiddleware — auto-append messages on node operations'
           type: 'core',
         });
       });
-      const messages = useMessageDrawerStore.getState().messages;
+      const messages = useCanvasStore.getState().messages;
       expect(messages.length).toBeGreaterThan(0);
       // messageDrawerStore uses persist middleware — messages survive page refresh
       const msgWithTimestamp = messages.find((m) => m.timestamp > 0);

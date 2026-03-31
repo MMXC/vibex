@@ -2,7 +2,10 @@
  * messageDrawerStore.ts — Zustand store for Canvas 消息抽屉
  *
  * Epic 1: F1.5 消息存储
- * PRD D1: Chat 模式（Slack 风格），独立于 AIChatPanel
+ * Epic 6: 消息状态合并到 canvasStore（作为 slice）
+ *   messageDrawerStore 保持独立，向后兼容
+ *   canvasStore 持有消息的真实状态（带 persist）
+ *   messageDrawerStore 通过 canvasStore.getState() 读取消息
  *
  * 消息类型:
  * - user_action: 用户操作（添加/确认/删除节点）
@@ -15,6 +18,7 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { useCanvasStore } from '@/lib/canvas/canvasStore';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -48,42 +52,39 @@ function newMessageId(): string {
   return `msg-${Date.now()}-${++_messageIdCounter}`;
 }
 
-// ── Epic 1 F1.4: canvasStore 联动 ──────────────────────────────────────────
-// canvasStore 各节点操作后调用此函数追加消息
+// messageDrawerStore maintains local message state + UI state (isOpen)
+// Epic 6: Real message state lives in canvasStore (persisted)
+// messageDrawerStore syncs with canvasStore on every addMessage
 export const useMessageDrawerStore = create<MessageDrawerState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       isOpen: false,
       messages: [],
 
-      toggleDrawer: () =>
-        set((s) => ({ isOpen: !s.isOpen })),
+      toggleDrawer: () => set((s) => ({ isOpen: !s.isOpen })),
+      openDrawer: () => set({ isOpen: true }),
+      closeDrawer: () => set({ isOpen: false }),
 
-      openDrawer: () =>
-        set({ isOpen: true }),
+      addMessage: (msg) => {
+        const newMsg: MessageItem = {
+          ...msg,
+          id: newMessageId(),
+          timestamp: Date.now(),
+        };
+        // Sync to canvasStore (Epic 6: canvasStore is the source of truth with persist)
+        useCanvasStore.getState().addMessage(msg);
+        // Also update local state
+        set((s) => ({ messages: [...s.messages, newMsg] }));
+      },
 
-      closeDrawer: () =>
-        set({ isOpen: false }),
-
-      addMessage: (msg) =>
-        set((s) => ({
-          messages: [
-            ...s.messages,
-            {
-              ...msg,
-              id: newMessageId(),
-              timestamp: Date.now(),
-            },
-          ],
-        })),
-
-      clearMessages: () =>
-        set({ messages: [] }),
+      clearMessages: () => {
+        useCanvasStore.getState().clearMessages();
+        set({ messages: [] });
+      },
     }),
     {
       name: 'message-drawer-storage',
       storage: createJSONStorage(() => localStorage),
-      // Only persist messages, not open state
       partialize: (state) => ({
         messages: state.messages,
       }),

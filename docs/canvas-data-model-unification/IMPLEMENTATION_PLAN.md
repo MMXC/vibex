@@ -36,6 +36,13 @@
 - [x] S5.4: 7 个单元测试
 - [x] 验收: tsc --noEmit 通过
 
+### Epic 6: 合并 messageDrawerStore → canvasStore ✅
+- [x] S6.1: canvasStore 添加 MessageSlice (types + state + actions)
+- [x] S6.2: canvasStore persist 添加 messages 字段
+- [x] S6.3: 迁移 v1→v2 (messages 默认空数组)
+- [x] S6.4: messageDrawerStore 作为代理（向后兼容）
+- [x] 验收: tsc --noEmit 通过 | 11 tests pass
+
 ## 验收
 - npm test 通过
 - gstack screenshot 验证 UI

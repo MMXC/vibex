@@ -40,7 +40,32 @@ export type CanvasExpandMode = 'normal' | 'expand-both' | 'maximize';
 import exampleCanvasData from '@/data/example-canvas.json';
 import { canvasApi } from './api/canvasApi';
 import { getHistoryStore } from './historySlice';
-import { addNodeMessage } from '@/components/canvas/messageDrawer/messageDrawerStore';
+
+// ── Epic 6: Message Slice Types ───────────────────────────────────────────────
+export type MessageType = 'user_action' | 'ai_suggestion' | 'system' | 'command_executed';
+
+export interface MessageItem {
+  id: string;
+  type: MessageType;
+  content: string;
+  meta?: string;
+  timestamp: number;
+}
+
+let _messageIdCounter = 0;
+function newMessageId(): string {
+  return `msg-${Date.now()}-${++_messageIdCounter}`;
+}
+
+// ── Epic 6: Message Slice ─────────────────────────────────────────────────────
+// Merges messageDrawerStore into canvasStore as a slice
+export interface MessageSlice {
+  // State
+  messages: MessageItem[];
+  // Actions
+  addMessage: (msg: Omit<MessageItem, 'id' | 'timestamp'>) => void;
+  clearMessages: () => void;
+}
 
 // =============================================================================
 // Helpers
@@ -52,7 +77,7 @@ import { addNodeMessage } from '@/components/canvas/messageDrawer/messageDrawerS
 
 const CANVAS_STORAGE_KEY = 'vibex-canvas-storage';
 const CANVAS_STORAGE_VERSION_KEY = `${CANVAS_STORAGE_KEY}-version`;
-const CURRENT_STORAGE_VERSION = 1;
+const CURRENT_STORAGE_VERSION = 2;
 
 /**
  * Epic 5: Migration
@@ -70,9 +95,16 @@ function runMigrations(storedState: Record<string, unknown>): Record<string, unk
     // Migration 0→1: Add panel collapse state with defaults
     migrated = {
       ...migrated,
-      contextPanelCollapsed: migrated.contextPanelCollapsed ?? false,
-      flowPanelCollapsed: migrated.flowPanelCollapsed ?? false,
-      componentPanelCollapsed: migrated.componentPanelCollapsed ?? false,
+      contextPanelCollapsed: (migrated.contextPanelCollapsed as boolean | undefined) ?? false,
+      flowPanelCollapsed: (migrated.flowPanelCollapsed as boolean | undefined) ?? false,
+      componentPanelCollapsed: (migrated.componentPanelCollapsed as boolean | undefined) ?? false,
+    };
+  }
+  if (version < 2) {
+    // Migration 1→2: Add messages array (Epic 6 merge)
+    migrated = {
+      ...migrated,
+      messages: (migrated.messages as unknown[]) ?? [],
     };
   }
 
@@ -271,6 +303,8 @@ interface CanvasStore {
   leftDrawerOpen: boolean;
   /** Right drawer open state */
   rightDrawerOpen: boolean;
+  // Epic 6: Message slice — merged from messageDrawerStore
+  messages: MessageItem[];
   /** Left drawer width in px (100-400) */
   leftDrawerWidth: number;
   /** Right drawer width in px (100-400) */
@@ -307,6 +341,12 @@ interface CanvasStore {
   setLeftDrawerWidth: (width: number) => void;
   /** Set right drawer width */
   setRightDrawerWidth: (width: number) => void;
+
+  // === Epic 6: Message Slice Actions (merged from messageDrawerStore) ===
+  /** Append a message to the session log */
+  addMessage: (msg: Omit<MessageItem, 'id' | 'timestamp'>) => void;
+  /** Clear all messages */
+  clearMessages: () => void;
 
   // === SSE Status Actions (Epic 1 S1.3) ===
   /** Set SSE connection status */
@@ -504,6 +544,8 @@ export const useCanvasStore = create<CanvasStore>()(
           // === Left/Right Persistent Drawer Slice (Epic 1 S1.1) ===
           leftDrawerOpen: false,
           rightDrawerOpen: false,
+          // Epic 6: Message slice initial state
+          messages: [],
           leftDrawerWidth: 200,
           rightDrawerWidth: 200,
 
@@ -551,6 +593,16 @@ export const useCanvasStore = create<CanvasStore>()(
             set({ leftDrawerWidth: Math.min(400, Math.max(100, width)) }),
           setRightDrawerWidth: (width: number) =>
             set({ rightDrawerWidth: Math.min(400, Math.max(100, width)) }),
+
+          // === Epic 6: Message Slice Actions ===
+          addMessage: (msg: Omit<MessageItem, 'id' | 'timestamp'>) =>
+            set((s) => ({
+              messages: [
+                ...s.messages,
+                { ...msg, id: newMessageId(), timestamp: Date.now() },
+              ],
+            })),
+          clearMessages: () => set({ messages: [] }),
 
           // === SSE Status Actions (Epic 1 S1.3) ===
           setSseStatus: (status, error) =>
@@ -646,7 +698,7 @@ export const useCanvasStore = create<CanvasStore>()(
               return { contextNodes: newNodes };
             });
             // Epic 4: auto-append user_action message
-            addNodeMessage('add', 'context', data.name);
+            useCanvasStore.getState().addMessage({ type: 'user_action', content: `添加了上下文节点`, meta: data.name });
           },
 
           editContextNode: (nodeId, data) => {
@@ -669,7 +721,7 @@ export const useCanvasStore = create<CanvasStore>()(
               return { contextNodes: newNodes };
             });
             // Epic 4: auto-append user_action message
-            addNodeMessage('delete', 'context', deletedName);
+            useCanvasStore.getState().addMessage({ type: 'user_action', content: `删除了上下文节点`, meta: deletedName });
             get().cascadeContextChange(nodeId);
           },
 
@@ -691,7 +743,8 @@ export const useCanvasStore = create<CanvasStore>()(
             getHistoryStore().recordSnapshot('context', newContextNodes);
             // Epic 4: auto-append user_action message
             if (prevNode) {
-              addNodeMessage(prevNode.confirmed ? 'delete' : 'confirm', 'context', prevNode.name);
+              const action = prevNode.confirmed ? '删除' : '确认';
+              useCanvasStore.getState().addMessage({ type: 'user_action', content: `${action}了上下文节点`, meta: prevNode.name });
             }
             // Cascade: context confirmed/unconfirmed → downstream trees may activate/deactivate
             get().recomputeActiveTree();
@@ -729,7 +782,7 @@ export const useCanvasStore = create<CanvasStore>()(
               return { flowNodes: newNodes };
             });
             // Epic 4: auto-append user_action message
-            addNodeMessage('add', 'flow', data.name);
+            useCanvasStore.getState().addMessage({ type: 'user_action', content: `添加了流程节点`, meta: data.name });
           },
 
           editFlowNode: (nodeId, data) => {
@@ -753,7 +806,7 @@ export const useCanvasStore = create<CanvasStore>()(
             });
             get().cascadeFlowChange(nodeId);
             // Epic 4: auto-append user_action message
-            addNodeMessage('delete', 'flow', deletedName);
+            useCanvasStore.getState().addMessage({ type: 'user_action', content: `删除了流程节点`, meta: deletedName });
           },
 
           confirmFlowNode: (nodeId) => {
@@ -768,7 +821,7 @@ export const useCanvasStore = create<CanvasStore>()(
             });
             get().recomputeActiveTree();
             // Epic 4: auto-append user_action message
-            addNodeMessage('confirm', 'flow', nodeName);
+            useCanvasStore.getState().addMessage({ type: 'user_action', content: `确认了流程节点`, meta: nodeName });
           },
 
           setFlowDraft: (draft) => set({ flowDraft: draft }),
@@ -963,7 +1016,7 @@ export const useCanvasStore = create<CanvasStore>()(
               return { componentNodes: newNodes };
             });
             // Epic 4: auto-append user_action message
-            addNodeMessage('add', 'component', data.name);
+            useCanvasStore.getState().addMessage({ type: 'user_action', content: `添加了组件节点`, meta: data.name });
           },
 
           editComponentNode: (nodeId, data) => {
@@ -985,7 +1038,7 @@ export const useCanvasStore = create<CanvasStore>()(
               return { componentNodes: newNodes };
             });
             // Epic 4: auto-append user_action message
-            addNodeMessage('delete', 'component', deletedName);
+            useCanvasStore.getState().addMessage({ type: 'user_action', content: `删除了组件节点`, meta: deletedName });
           },
 
           confirmComponentNode: (nodeId) => {
@@ -999,7 +1052,7 @@ export const useCanvasStore = create<CanvasStore>()(
               return { componentNodes: newNodes };
             });
             // Epic 4: auto-append user_action message
-            addNodeMessage('confirm', 'component', nodeName);
+            useCanvasStore.getState().addMessage({ type: 'user_action', content: `确认了组件节点`, meta: nodeName });
           },
 
           // F3.1+F3.2+F3.3: Batch confirm all unconfirmed nodes
@@ -1374,6 +1427,8 @@ export const useCanvasStore = create<CanvasStore>()(
           contextPanelCollapsed: state.contextPanelCollapsed,
           flowPanelCollapsed: state.flowPanelCollapsed,
           componentPanelCollapsed: state.componentPanelCollapsed,
+          // Epic 6: persist messages in canvasStore (merged from messageDrawerStore)
+          messages: state.messages,
         }),
       }
     ),

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+### E1: 开发环境阻塞修复 (proposals-20260401)
+- **E1-T1** — Backend npm workspace + tsconfig 测试文件排除: `exclude **/*.test.ts, **/__tests__/, coverage/, .next/`
+- **E1-T2** — Frontend TS pre-test 修复: tsconfig strict 模式验证通过
+- **E1-T3** — task_manager.py 文件锁: fcntl.flock() 30s timeout + try-finally，乐观锁 `_rev` 字段防竞态
+- Commits: `41d75bf3`, `54e8f152`
+
 ### E3: Canvas 选区 Bug 修复 (proposals-20260401)
 - **E3-T1** — 修复 drag selection stale closure bug: useRef 替代 useState 闭包陷阱，handleMouseUp 捕获初始 null selectionBox 问题
 - **E3-T2** — E2E 测试覆盖: Playwright canvas-selection.spec.ts (4 scenarios: drag/ESC/click/outside)

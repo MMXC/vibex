@@ -36,7 +36,8 @@ export interface BoundedContextNode {
   name: string;
   description: string;
   type: 'core' | 'supporting' | 'generic' | 'external';
-  confirmed: boolean;
+  /** Whether node is active (participates in generation). Default true. */
+  isActive?: boolean;
   status: NodeStatus;
   parentId?: string;
   children: string[];
@@ -68,7 +69,8 @@ export interface FlowStep {
   actor: string;
   description?: string;
   order: number;
-  confirmed: boolean;
+  /** Whether step is active (participates in generation). Default true. */
+  isActive?: boolean;
   status: NodeStatus;
   /** 步骤类型：normal/branch/loop */
   type?: 'normal' | 'branch' | 'loop';
@@ -81,7 +83,8 @@ export interface BusinessFlowNode {
   contextId: string;
   name: string;
   steps: FlowStep[];
-  confirmed: boolean;
+  /** Whether node is active (participates in generation). Default true. */
+  isActive?: boolean;
   status: NodeStatus;
   parentId?: string;
   children: string[];
@@ -124,7 +127,8 @@ export interface ComponentNode {
   api: ComponentApi;
   children: string[];
   parentId?: string;
-  confirmed: boolean;
+  /** Whether node is active (participates in generation). Default true. */
+  isActive?: boolean;
   status: NodeStatus;
   previewUrl?: string;
   /** E3-F13: Relationships to other component nodes */
@@ -491,7 +495,7 @@ export interface TreeNode {
   label: string;
   type: TreeType;
   status: NodeStatus;
-  confirmed: boolean;
+  isActive?: boolean;
   parentId?: string;
   children: string[];
   data: BoundedContextNode | BusinessFlowNode | ComponentNode;

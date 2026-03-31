@@ -15,11 +15,11 @@ export function markFlowNodesPending(nodes: BusinessFlowNode[]): BusinessFlowNod
   return nodes.map((n) => ({
     ...n,
     status: 'pending' as const,
-    confirmed: false,
+    isActive: false,
     steps: n.steps.map((s) => ({
       ...s,
       status: 'pending' as const,
-      confirmed: false,
+      isActive: false,
     })),
   }));
 }
@@ -28,7 +28,7 @@ export function markComponentNodesPending(nodes: ComponentNode[]): ComponentNode
   return nodes.map((n) => ({
     ...n,
     status: 'pending' as const,
-    confirmed: false,
+    isActive: false,
   }));
 }
 
@@ -44,8 +44,15 @@ export function hasNodes(nodes: unknown[]): boolean {
  * 检查所有节点是否都已确认
  * @deprecated Use hasNodes instead — phase gates removed in Epic 1
  */
-export function areAllConfirmed(nodes: Array<{ confirmed: boolean }>): boolean {
-  return nodes.length > 0 && nodes.every((n) => n.confirmed);
+export function areAllConfirmed(nodes: Array<{ isActive?: boolean }>): boolean {
+  return nodes.length > 0 && nodes.every((n) => n.isActive !== false);
+}
+
+/**
+ * 检查是否有激活节点（isActive=true 或 undefined）
+ */
+export function hasActiveNodes(nodes: Array<{ isActive?: boolean }>): boolean {
+  return nodes.some((n) => n.isActive !== false);
 }
 
 /**

@@ -197,8 +197,8 @@ export function SearchDialog({
                           ? '!'
                           : '◌'}
                   </span>
-                  {result.confirmed && (
-                    <span className={styles.confirmedBadge}>已确认</span>
+                  {result.isActive !== false && (
+                    <span className={styles.activeBadge}>已确认</span>
                   )}
                 </div>
               </div>

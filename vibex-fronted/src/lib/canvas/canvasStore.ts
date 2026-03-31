@@ -25,7 +25,6 @@ import type {
   BoundedGroup,
   BoundedEdge,
   FlowEdge,
-  NodeStatus,
 } from './types';
 // Epic 2: Re-export ClarificationRound from canvasStore (single source from confirmationTypes)
 export type { ClarificationRound } from '@/stores/confirmationTypes';
@@ -77,7 +76,7 @@ export interface MessageSlice {
 
 const CANVAS_STORAGE_KEY = 'vibex-canvas-storage';
 const CANVAS_STORAGE_VERSION_KEY = `${CANVAS_STORAGE_KEY}-version`;
-const CURRENT_STORAGE_VERSION = 2;
+const CURRENT_STORAGE_VERSION = 3;
 
 /**
  * Epic 5: Migration
@@ -107,6 +106,21 @@ function runMigrations(storedState: Record<string, unknown>): Record<string, unk
       messages: (migrated.messages as unknown[]) ?? [],
     };
   }
+  if (version < 3) {
+    // Migration 2→3: confirmed → isActive (Epic 3)
+    const migrateNodes = (nodes: any[]): any[] =>
+      nodes.map((n: any) => {
+        const confirmed = n.confirmed;
+        const { confirmed: _confirmed, ...rest } = n;
+        return { ...rest, isActive: confirmed ?? true };
+      });
+    migrated = {
+      ...migrated,
+      contextNodes: migrateNodes((migrated.contextNodes as unknown[]) ?? []),
+      flowNodes: migrateNodes((migrated.flowNodes as unknown[]) ?? []),
+      componentNodes: migrateNodes((migrated.componentNodes as unknown[]) ?? []),
+    };
+  }
 
   // Future migrations go here:
   // if (version < 2) { migrated = migrateV1toV2(migrated); }
@@ -118,8 +132,8 @@ function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
-function markAllPending<T extends { status: string; confirmed: boolean }>(nodes: T[]): T[] {
-  return nodes.map(n => ({ ...n, status: 'pending' as const, confirmed: false }));
+function markAllPending<T extends { status: string; isActive?: boolean }>(nodes: T[]): T[] {
+  return nodes.map(n => ({ ...n, status: 'pending' as const, isActive: false }));
 }
 
 // =============================================================================
@@ -160,10 +174,18 @@ class CascadeUpdateManager {
   }
 
   /**
-   * 检查是否所有节点都已确认
+   * 检查是否所有节点都已激活（isActive=true 或 undefined）
+   * @deprecated use hasNodes instead
    */
-  areAllConfirmed(nodes: Array<{ confirmed: boolean }>): boolean {
-    return nodes.length > 0 && nodes.every(n => n.confirmed);
+  areAllConfirmed(nodes: Array<{ isActive?: boolean }>): boolean {
+    return nodes.length > 0 && nodes.every(n => n.isActive !== false);
+  }
+
+  /**
+   * 检查是否有激活节点（isActive=true 或 undefined）
+   */
+  hasActiveNodes(nodes: Array<{ isActive?: boolean }>): boolean {
+    return nodes.some(n => n.isActive !== false);
   }
 }
 
@@ -359,7 +381,6 @@ interface CanvasStore {
   addContextNode: (data: BoundedContextDraft) => void;
   editContextNode: (nodeId: string, data: Partial<BoundedContextNode>) => void;
   deleteContextNode: (nodeId: string) => void;
-  confirmContextNode: (nodeId: string) => void;
   setContextDraft: (draft: Partial<BoundedContextNode> | null) => void;
 
   // === Flow Slice Actions ===
@@ -367,7 +388,6 @@ interface CanvasStore {
   addFlowNode: (data: BusinessFlowDraft) => void;
   editFlowNode: (nodeId: string, data: Partial<BusinessFlowNode>) => void;
   deleteFlowNode: (nodeId: string) => void;
-  confirmFlowNode: (nodeId: string) => void;
   setFlowDraft: (draft: Partial<BusinessFlowNode> | null) => void;
   // === Step Actions (Epic 3) ===
   addStepToFlow: (flowNodeId: string, data: { name: string; actor?: string; description?: string }) => void;
@@ -385,12 +405,9 @@ interface CanvasStore {
   // === Component Slice Actions ===
   setComponentNodes: (nodes: ComponentNode[]) => void;
   clearComponentCanvas: () => void;
-  addComponentNode: (data: Omit<ComponentNode, 'nodeId' | 'status' | 'confirmed' | 'children'>) => void;
+  addComponentNode: (data: Omit<ComponentNode, 'nodeId' | 'status' | 'isActive' | 'children'>) => void;
   editComponentNode: (nodeId: string, data: Partial<ComponentNode>) => void;
   deleteComponentNode: (nodeId: string) => void;
-  confirmComponentNode: (nodeId: string) => void;
-  /** F3.1+F3.2: Confirm all unconfirmed nodes in a group (or all if groupId omitted) */
-  confirmAllComponentNodes: (groupId?: string, nodeIds?: string[]) => void;
   setComponentDraft: (draft: Partial<ComponentNode> | null) => void;
 
   // === Queue Slice Actions ===
@@ -688,7 +705,7 @@ export const useCanvasStore = create<CanvasStore>()(
               name: data.name,
               description: data.description,
               type: data.type,
-              confirmed: false,
+              isActive: false,
               status: 'pending',
               children: [],
             };
@@ -725,35 +742,7 @@ export const useCanvasStore = create<CanvasStore>()(
             get().cascadeContextChange(nodeId);
           },
 
-          // F1.1: Toggle — confirmContextNode now toggles confirmed state
-          // First click: confirmed=true, status='confirmed'
-          // Second click: confirmed=false, status='pending'
-          confirmContextNode: (nodeId) => {
-            const prevNode = get().contextNodes.find((n) => n.nodeId === nodeId);
-            const newContextNodes = get().contextNodes.map((n) =>
-              n.nodeId === nodeId
-                ? {
-                    ...n,
-                    confirmed: !n.confirmed,
-                    status: (!n.confirmed ? 'confirmed' : 'pending') as NodeStatus,
-                  }
-                : n
-            );
-            set({ contextNodes: newContextNodes });
-            getHistoryStore().recordSnapshot('context', newContextNodes);
-            // Epic 4: auto-append user_action message
-            if (prevNode) {
-              const action = prevNode.confirmed ? '删除' : '确认';
-              useCanvasStore.getState().addMessage({ type: 'user_action', content: `${action}了上下文节点`, meta: prevNode.name });
-            }
-            // Cascade: context confirmed/unconfirmed → downstream trees may activate/deactivate
-            get().recomputeActiveTree();
-            // Epic 3 S3.1: auto-generate flow tree when ALL contexts confirmed
-            const allConfirmed = cascade.areAllConfirmed(newContextNodes);
-            if (allConfirmed && newContextNodes.length > 0 && get().flowNodes.length === 0) {
-              get().autoGenerateFlows(newContextNodes);
-            }
-          },
+
 
           setContextDraft: (draft) => set({ contextDraft: draft }),
 
@@ -769,10 +758,10 @@ export const useCanvasStore = create<CanvasStore>()(
                 ...s,
                 stepId: generateId(),
                 status: 'pending' as const,
-                confirmed: false,
+                isActive: false,
                 order: i,
               })),
-              confirmed: false,
+              isActive: false,
               status: 'pending',
               children: [],
             };
@@ -809,20 +798,7 @@ export const useCanvasStore = create<CanvasStore>()(
             useCanvasStore.getState().addMessage({ type: 'user_action', content: `删除了流程节点`, meta: deletedName });
           },
 
-          confirmFlowNode: (nodeId) => {
-            const nodeToConfirm = get().flowNodes.find((n) => n.nodeId === nodeId);
-            const nodeName = nodeToConfirm?.name ?? nodeId;
-            set((s) => {
-              const newNodes = s.flowNodes.map((n) =>
-                n.nodeId === nodeId ? { ...n, confirmed: true, status: 'confirmed' as const } : n
-              );
-              getHistoryStore().recordSnapshot('flow', newNodes);
-              return { flowNodes: newNodes };
-            });
-            get().recomputeActiveTree();
-            // Epic 4: auto-append user_action message
-            useCanvasStore.getState().addMessage({ type: 'user_action', content: `确认了流程节点`, meta: nodeName });
-          },
+
 
           setFlowDraft: (draft) => set({ flowDraft: draft }),
 
@@ -837,7 +813,7 @@ export const useCanvasStore = create<CanvasStore>()(
                   actor: data.actor ?? '待定',
                   description: data.description ?? '',
                   order: n.steps.length,
-                  confirmed: false,
+                  isActive: false,
                   status: 'pending' as const,
                 };
                 return {
@@ -859,7 +835,7 @@ export const useCanvasStore = create<CanvasStore>()(
                       ...n,
                       steps: n.steps.map((st) =>
                         st.stepId === stepId
-                          ? { ...st, confirmed: true, status: 'confirmed' as const }
+                          ? { ...st, isActive: true, status: 'confirmed' as const }
                           : st
                       ),
                     }
@@ -953,10 +929,10 @@ export const useCanvasStore = create<CanvasStore>()(
                     actor: step.actor,
                     description: step.description,
                     order: step.order ?? idx,
-                    confirmed: false,
+                    isActive: false,
                     status: 'pending' as const,
                   })),
-                  confirmed: false,
+                  isActive: false,
                   status: 'pending' as const,
                   children: [],
                 }));
@@ -1007,7 +983,7 @@ export const useCanvasStore = create<CanvasStore>()(
               ...data,
               nodeId: generateId(),
               status: 'pending',
-              confirmed: false,
+              isActive: false,
               children: [],
             };
             set((s) => {
@@ -1041,66 +1017,7 @@ export const useCanvasStore = create<CanvasStore>()(
             useCanvasStore.getState().addMessage({ type: 'user_action', content: `删除了组件节点`, meta: deletedName });
           },
 
-          confirmComponentNode: (nodeId) => {
-            const nodeToConfirm = get().componentNodes.find((n) => n.nodeId === nodeId);
-            const nodeName = nodeToConfirm?.name ?? nodeId;
-            set((s) => {
-              const newNodes = s.componentNodes.map((n) =>
-                n.nodeId === nodeId ? { ...n, confirmed: true, status: 'confirmed' as const } : n
-              );
-              getHistoryStore().recordSnapshot('component', newNodes);
-              return { componentNodes: newNodes };
-            });
-            // Epic 4: auto-append user_action message
-            useCanvasStore.getState().addMessage({ type: 'user_action', content: `确认了组件节点`, meta: nodeName });
-          },
 
-          // F3.1+F3.2+F3.3: Batch confirm all unconfirmed nodes
-          // If nodeIds provided: confirm specific nodes
-          // If groupId provided: confirm all nodes in that group (matching flowId)
-          // If neither: confirm all unconfirmed nodes
-          confirmAllComponentNodes: (groupId, nodeIds) => {
-            set((s) => {
-              let newNodes = s.componentNodes;
-
-              if (nodeIds && nodeIds.length > 0) {
-                // F3.2: Confirm specific nodeIds
-                const idSet = new Set(nodeIds);
-                newNodes = newNodes.map((n) =>
-                  idSet.has(n.nodeId) && !n.confirmed
-                    ? { ...n, confirmed: true, status: 'confirmed' as const }
-                    : n
-                );
-              } else if (groupId) {
-                // F3.3: Confirm all nodes in group (match by flowId)
-                // Handle __common__ specially (nodes without flowId or with common type)
-                if (groupId === '__common__') {
-                  newNodes = newNodes.map((n) => {
-                    if (n.confirmed) return n;
-                    // Common nodes have no flowId or flowId === '__common__'
-                    const isCommon = !n.flowId || n.flowId === '__common__';
-                    return isCommon
-                      ? { ...n, confirmed: true, status: 'confirmed' as const }
-                      : n;
-                  });
-                } else {
-                  newNodes = newNodes.map((n) =>
-                    n.flowId === groupId && !n.confirmed
-                      ? { ...n, confirmed: true, status: 'confirmed' as const }
-                      : n
-                  );
-                }
-              } else {
-                // Confirm all unconfirmed nodes
-                newNodes = newNodes.map((n) =>
-                  !n.confirmed ? { ...n, confirmed: true, status: 'confirmed' as const } : n
-                );
-              }
-
-              getHistoryStore().recordSnapshot('component', newNodes);
-              return { componentNodes: newNodes };
-            });
-          },
 
           setComponentDraft: (draft) => set({ componentDraft: draft }),
 

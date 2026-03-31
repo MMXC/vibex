@@ -80,7 +80,7 @@ export function TreePanel({
     setTimeout(() => setIsAnimating(false), 300);
   };
 
-  const confirmedCount = nodes.filter((n) => n.confirmed).length;
+  const activeCount = nodes.filter((n) => n.isActive !== false).length;
   const activeClass = isActive ? styles.treePanelActive : styles.treePanelDimmed;
   const treeColor = TREE_COLORS[tree];
   const treeIcon = TREE_ICONS[tree];
@@ -119,7 +119,7 @@ export function TreePanel({
         </span>
         <span className={styles.treePanelTitle}>{title}</span>
         <span className={styles.treePanelBadge}>
-          {confirmedCount}/{nodes.length}
+          {activeCount}/{nodes.length}
         </span>
         <span
           className={`${styles.treePanelChevron} ${collapsed ? styles.chevronCollapsed : ''}`}
@@ -293,7 +293,7 @@ function MiniMapWidget({ nodes, treeType, onNodeClick }: MiniMapWidgetProps) {
 
       <div className={styles.minimapLegend}>
         <span className={styles.minimapLegendItem}>
-          <span className={styles.minimapLegendDot} style={{ background: NODE_STATUS_COLORS.confirmed }} />
+          <span className={styles.minimapLegendDot} style={{ background: '#10b981' }} />
           已确认
         </span>
         <span className={styles.minimapLegendItem}>

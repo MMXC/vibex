@@ -20,8 +20,6 @@ interface BoundedContextGroupProps {
   nodes: BoundedContextNode[];
   /** 是否只读模式 */
   readonly?: boolean;
-  /** 确认回调 */
-  onConfirm: (nodeId: string) => void;
   /** 编辑回调 */
   onEdit: (nodeId: string, data: Partial<BoundedContextNode>) => void;
   /** 删除回调 */
@@ -29,7 +27,6 @@ interface BoundedContextGroupProps {
   /** 子组件渲染函数 */
   renderCard: (props: {
     node: BoundedContextNode;
-    onConfirm: (nodeId: string) => void;
     onEdit: (nodeId: string, data: Partial<BoundedContextNode>) => void;
     onDelete: (nodeId: string) => void;
     readonly?: boolean;
@@ -63,7 +60,6 @@ export function BoundedContextGroup({
   type,
   nodes,
   readonly,
-  onConfirm,
   onEdit,
   onDelete,
   renderCard,
@@ -97,7 +93,7 @@ export function BoundedContextGroup({
       <div className={styles.groupedCards} role="list" aria-label={`${config.label}节点列表`}>
         {nodes.map((node) => (
           <div key={node.nodeId} role="listitem">
-            {renderCard({ node, onConfirm, onEdit, onDelete, readonly })}
+            {renderCard({ node, onEdit, onDelete, readonly })}
           </div>
         ))}
       </div>

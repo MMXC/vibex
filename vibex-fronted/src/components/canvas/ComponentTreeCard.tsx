@@ -24,9 +24,8 @@ interface ComponentTreeCardProps {
 /**
  * 单个组件卡片 — 展示组件节点信息
  */
-function ComponentCardItem({ node, onConfirm, onEdit, onDelete, readonly }: {
+function ComponentCardItem({ node, onEdit, onDelete, readonly }: {
   node: ComponentNode;
-  onConfirm: (nodeId: string) => void;
   onEdit: (nodeId: string, data: Partial<ComponentNode>) => void;
   onDelete: (nodeId: string) => void;
   readonly?: boolean;
@@ -130,8 +129,8 @@ function ComponentCardItem({ node, onConfirm, onEdit, onDelete, readonly }: {
             <div className={styles.nodeTypeBadge} style={{ background: typeColor }}>
               {node.type === 'page' ? '页面' : node.type === 'list' ? '列表' : node.type === 'form' ? '表单' : node.type === 'detail' ? '详情' : '弹窗'}
             </div>
-            {node.confirmed && (
-              <span className={styles.confirmedBadge} aria-label="已确认">
+            {node.isActive !== false && (
+              <span className={styles.activeBadge} aria-label="已确认">
                 <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                   <path d="M3 8.5L6.5 12L13 4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -178,19 +177,6 @@ function ComponentCardItem({ node, onConfirm, onEdit, onDelete, readonly }: {
 
           {!readonly && (
             <div className={styles.nodeCardActions}>
-              {!node.confirmed && (
-                <button
-                  type="button"
-                  className={styles.confirmButton}
-                  onClick={() => onConfirm(node.nodeId)}
-                  aria-label={`确认 ${node.name}`}
-                >
-                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ marginRight: '4px' }}>
-                    <path d="M3 8.5L6.5 12L13 4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  确认
-                </button>
-              )}
               <button
                 type="button"
                 className={styles.editButton}
@@ -226,7 +212,6 @@ export function ComponentTreeCard({ readonly = false }: ComponentTreeCardProps) 
   const componentNodes = useCanvasStore((s) => s.componentNodes);
   const editComponentNode = useCanvasStore((s) => s.editComponentNode);
   const deleteComponentNode = useCanvasStore((s) => s.deleteComponentNode);
-  const confirmComponentNode = useCanvasStore((s) => s.confirmComponentNode);
 
   const hasNodes = componentNodes.length > 0;
 
@@ -243,7 +228,6 @@ export function ComponentTreeCard({ readonly = false }: ComponentTreeCardProps) 
             <ComponentCardItem
               key={node.nodeId}
               node={node}
-              onConfirm={confirmComponentNode}
               onEdit={editComponentNode}
               onDelete={deleteComponentNode}
               readonly={readonly}

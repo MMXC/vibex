@@ -19,37 +19,37 @@ export function TreeStatus() {
   const flowNodes = useCanvasStore((s) => s.flowNodes);
   const componentNodes = useCanvasStore((s) => s.componentNodes);
 
-  const confirmedContexts = contextNodes.filter((n) => n.confirmed).length;
-  const confirmedFlows = flowNodes.filter((n) => n.confirmed).length;
-  const confirmedComponents = componentNodes.filter((n) => n.confirmed).length;
+  const activeContexts = contextNodes.filter((n) => n.isActive !== false).length;
+  const activeFlows = flowNodes.filter((n) => n.isActive !== false).length;
+  const activeComponents = componentNodes.filter((n) => n.isActive !== false).length;
 
   return (
     <div className={styles.treeStatus} data-testid="tree-status" aria-label="三树进度状态">
       <span
-        className={`${styles.treeStatusItem} ${confirmedContexts === contextNodes.length && contextNodes.length > 0 ? styles.treeStatusConfirmed : ''}`}
-        title={`限界上下文：${contextNodes.length} 个节点，${confirmedContexts} 个已确认`}
+        className={`${styles.treeStatusItem} ${activeContexts === contextNodes.length && contextNodes.length > 0 ? styles.treeStatusConfirmed : ''}`}
+        title={`限界上下文：${contextNodes.length} 个节点，${activeContexts} 个已确认`}
       >
         📋 上下文{' '}
         <strong>{contextNodes.length}</strong>{' '}
-        {confirmedContexts === contextNodes.length && contextNodes.length > 0 ? '✓' : ''}
+        {activeContexts === contextNodes.length && contextNodes.length > 0 ? '✓' : ''}
       </span>
       <span className={styles.treeStatusDivider} aria-hidden="true">|</span>
       <span
-        className={`${styles.treeStatusItem} ${confirmedFlows === flowNodes.length && flowNodes.length > 0 ? styles.treeStatusConfirmed : ''}`}
-        title={`业务流程：${flowNodes.length} 个节点，${confirmedFlows} 个已确认`}
+        className={`${styles.treeStatusItem} ${activeFlows === flowNodes.length && flowNodes.length > 0 ? styles.treeStatusConfirmed : ''}`}
+        title={`业务流程：${flowNodes.length} 个节点，${activeFlows} 个已确认`}
       >
         🔀 流程{' '}
         <strong>{flowNodes.length}</strong>{' '}
-        {confirmedFlows === flowNodes.length && flowNodes.length > 0 ? '✓' : ''}
+        {activeFlows === flowNodes.length && flowNodes.length > 0 ? '✓' : ''}
       </span>
       <span className={styles.treeStatusDivider} aria-hidden="true">|</span>
       <span
-        className={`${styles.treeStatusItem} ${confirmedComponents === componentNodes.length && componentNodes.length > 0 ? styles.treeStatusConfirmed : ''}`}
-        title={`组件树：${componentNodes.length} 个节点，${confirmedComponents} 个已确认`}
+        className={`${styles.treeStatusItem} ${activeComponents === componentNodes.length && componentNodes.length > 0 ? styles.treeStatusConfirmed : ''}`}
+        title={`组件树：${componentNodes.length} 个节点，${activeComponents} 个已确认`}
       >
         🧩 组件{' '}
         <strong>{componentNodes.length}</strong>{' '}
-        {confirmedComponents === componentNodes.length && componentNodes.length > 0 ? '✓' : ''}
+        {activeComponents === componentNodes.length && componentNodes.length > 0 ? '✓' : ''}
       </span>
     </div>
   );

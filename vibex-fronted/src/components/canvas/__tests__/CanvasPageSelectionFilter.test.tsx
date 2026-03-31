@@ -21,7 +21,7 @@ function getFilteredContexts(
   contextNodes: Array<{ nodeId: string; confirmed: boolean }>,
   selectedNodeIds: string[]
 ) {
-  const confirmedContexts = contextNodes.filter((ctx) => ctx.confirmed);
+  const confirmedContexts = contextNodes.filter((ctx) => ctx.isActive);
   const selectedContextSet = new Set(selectedNodeIds);
   if (selectedContextSet.size > 0) {
     return confirmedContexts.filter((ctx) => selectedContextSet.has(ctx.nodeId));
@@ -33,7 +33,7 @@ function getFilteredFlows(
   flowNodes: Array<{ nodeId: string; confirmed: boolean }>,
   selectedNodeIds: string[]
 ) {
-  const confirmedFlows = flowNodes.filter((f) => f.confirmed);
+  const confirmedFlows = flowNodes.filter((f) => f.isActive);
   const selectedFlowSet = new Set(selectedNodeIds);
   if (selectedFlowSet.size > 0) {
     return confirmedFlows.filter((f) => selectedFlowSet.has(f.nodeId));
@@ -123,7 +123,7 @@ describe('Epic1 S1.3: 选区数量与 API 请求一致', () => {
   });
 
   it('S1.3: 无选中时，mappedContexts.length === all confirmed', () => {
-    const confirmedCount = contexts.filter((c) => c.confirmed).length;
+    const confirmedCount = contexts.filter((c) => c.isActive).length;
     const result = getFilteredContexts(contexts, []);
     expect(result.length).toBe(confirmedCount);
     expect(result.length).toBe(2);

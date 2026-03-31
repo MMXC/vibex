@@ -125,7 +125,6 @@ interface SortableStepRowProps {
   index: number;
   totalSteps?: number;
   readonly?: boolean;
-  onConfirm: (stepId: string) => void;
   onEdit: (stepId: string, data: Partial<FlowStep>) => void;
   onDelete: (stepId: string) => void;
 }
@@ -135,7 +134,6 @@ function SortableStepRow({
   index,
   totalSteps = 1,
   readonly,
-  onConfirm,
   onEdit,
   onDelete,
 }: SortableStepRowProps) {
@@ -319,17 +317,6 @@ function SortableStepRow({
                   <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
                 </svg>
               </button>
-              {/* Confirm */}
-              {!step.confirmed && (
-                <button
-                  className={`${styles.stepActionBtn} ${styles.btnConfirmStep}`}
-                  onClick={() => onConfirm(step.stepId)}
-                  title="确认"
-                  aria-label="确认步骤"
-                >
-                  <CheckboxIcon checked size="sm" aria-label="确认" />
-                </button>
-              )}
             </div>
           )}
         </>
@@ -347,10 +334,8 @@ interface FlowCardProps {
   readonly?: boolean;
   onEdit: (nodeId: string, data: Partial<BusinessFlowNode>) => void;
   onDelete: (nodeId: string) => void;
-  onConfirm: (nodeId: string) => void;
   // Step actions
   onAddStep: (flowNodeId: string, data: { name: string; actor?: string; description?: string }) => void;
-  onConfirmStep: (flowNodeId: string, stepId: string) => void;
   onEditStep: (flowNodeId: string, stepId: string, data: Partial<FlowStep>) => void;
   onDeleteStep: (flowNodeId: string, stepId: string) => void;
   onReorderSteps: (flowNodeId: string, fromIndex: number, toIndex: number) => void;
@@ -365,9 +350,7 @@ function FlowCard({
   readonly,
   onEdit,
   onDelete,
-  onConfirm,
   onAddStep,
-  onConfirmStep,
   onEditStep,
   onDeleteStep,
   onReorderSteps,
@@ -431,7 +414,7 @@ function FlowCard({
     setEditing(false);
   }, [node.name]);
 
-  const confirmedSteps = node.steps.filter((s) => s.confirmed).length;
+  const activeSteps = node.steps.filter((s) => s.isActive !== false).length;
   const totalSteps = node.steps.length;
   const stepIds = node.steps.map((s) => s.stepId);
 
@@ -487,7 +470,7 @@ function FlowCard({
           <>
             <span className={styles.flowName}>{node.name}</span>
             <span className={styles.flowProgress}>
-              {confirmedSteps}/{totalSteps} 步骤
+              {activeSteps}/{totalSteps} 步骤
             </span>
           </>
         )}
@@ -518,16 +501,7 @@ function FlowCard({
                 <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
               </svg>
             </button>
-            {!node.confirmed && (
-              <button
-                className={`${styles.btnIcon} ${styles.btnConfirm}`}
-                onClick={() => onConfirm(node.nodeId)}
-                title="确认流程"
-                aria-label="确认流程"
-              >
-                <CheckboxIcon checked size="sm" aria-label="确认流程" />
-              </button>
-            )}
+            
           </div>
         )}
       </div>
@@ -551,7 +525,7 @@ function FlowCard({
                     index={i}
                     totalSteps={node.steps.length}
                     readonly={readonly}
-                    onConfirm={(stepId) => onConfirmStep(node.nodeId, stepId)}
+
                     onEdit={(stepId, data) => onEditStep(node.nodeId, stepId, data)}
                     onDelete={(stepId) => onDeleteStep(node.nodeId, stepId)}
                   />
@@ -590,8 +564,6 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
   const contextNodes = useCanvasStore((s) => s.contextNodes);
   const editFlowNode = useCanvasStore((s) => s.editFlowNode);
   const deleteFlowNode = useCanvasStore((s) => s.deleteFlowNode);
-  const confirmFlowNode = useCanvasStore((s) => s.confirmFlowNode);
-  const confirmStep = useCanvasStore((s) => s.confirmStep);
   const editStep = useCanvasStore((s) => s.editStep);
   const deleteStep = useCanvasStore((s) => s.deleteStep);
   const reorderSteps = useCanvasStore((s) => s.reorderSteps);
@@ -719,13 +691,13 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
 
   // === Check if auto-gen should show ===
   // All contexts confirmed + no flows yet = show auto-gen hint
-  const allContextsConfirmed = contextNodes.length > 0 && contextNodes.every((c) => c.confirmed);
+  const allContextsActive = contextNodes.length > 0 && contextNodes.every((c) => c.isActive !== false);
 
   // S1.1: 零上下文状态也可添加流程（独立流程入口）
   const handleManualAdd = useCallback(() => {
     // 优先找第一个未确认的上下文；无上下文时使用空 contextId
-    const unconfirmedCtx = contextNodes.find((c) => !c.confirmed);
-    const targetCtx = unconfirmedCtx ?? contextNodes[0];
+    const inactiveCtx = contextNodes.find((c) => !c.isActive !== false);
+    const targetCtx = inactiveCtx ?? contextNodes[0];
     if (targetCtx) {
       addFlowNode({
         contextId: targetCtx.nodeId,
@@ -873,7 +845,7 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
             {componentGenerating ? '◌ 生成中...' : '继续·组件树'}
           </button>
         )}
-        {allContextsConfirmed && flowNodes.length === 0 && (
+        {allContextsActive && flowNodes.length === 0 && (
           <span className={styles.autoGenHint}>
             上下文已全部确认，流程树将自动生成
           </span>
@@ -922,7 +894,7 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
       {flowNodes.length === 0 ? (
         <div className={styles.emptyFlowList}>
           <p>暂无业务流程</p>
-          {allContextsConfirmed ? (
+          {allContextsActive ? (
             <p className={styles.hint}>确认上下文后自动生成业务流程</p>
           ) : (
             <p className={styles.hint}>请先完成上下文树的编辑和确认</p>
@@ -964,9 +936,7 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
                     readonly={readonly}
                     onEdit={editFlowNode}
                     onDelete={deleteFlowNode}
-                    onConfirm={confirmFlowNode}
                     onAddStep={addStepToFlow}
-                    onConfirmStep={confirmStep}
                     onEditStep={editStep}
                     onDeleteStep={deleteStep}
                     onReorderSteps={reorderSteps}

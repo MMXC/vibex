@@ -461,11 +461,11 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
 
       // Map ONLY confirmed contexts to API format
       // Epic1 S1.1: If context selection exists, only send selected+confirmed; else send all confirmed
-      const confirmedContexts = contextNodes.filter((ctx) => ctx.confirmed);
+      const activeContexts = contextNodes.filter((ctx) => ctx.isActive !== false);
       const selectedContextSet = new Set(selectedNodeIds.context);
       const contextsToSend = selectedContextSet.size > 0
-        ? confirmedContexts.filter((ctx) => selectedContextSet.has(ctx.nodeId))
-        : confirmedContexts;
+        ? activeContexts.filter((ctx) => selectedContextSet.has(ctx.nodeId))
+        : activeContexts;
       const mappedContexts = contextsToSend.map((ctx) => ({
         id: ctx.nodeId,
         name: ctx.name,
@@ -475,11 +475,11 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
 
       // Map ONLY confirmed flows to API format
       // Epic1 S1.2: If flow selection exists, only send selected+confirmed; else send all confirmed
-      const confirmedFlows = flowNodes.filter((f) => f.confirmed);
+      const activeFlows = flowNodes.filter((f) => f.isActive !== false);
       const selectedFlowSet = new Set(selectedNodeIds.flow);
       const flowsToSend = selectedFlowSet.size > 0
-        ? confirmedFlows.filter((f) => selectedFlowSet.has(f.nodeId))
-        : confirmedFlows;
+        ? activeFlows.filter((f) => selectedFlowSet.has(f.nodeId))
+        : activeFlows;
       const mappedFlows = flowsToSend.map((f) => ({
         name: f.name,
         contextId: f.contextId,
@@ -535,7 +535,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         label: n.name,
         type: 'context' as TreeType,
         status: n.status,
-        confirmed: n.confirmed,
+        confirmed: n.isActive !== false,
         parentId: n.parentId,
         children: n.children,
         data: n,
@@ -550,7 +550,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         label: n.name,
         type: 'flow' as TreeType,
         status: n.status,
-        confirmed: n.confirmed,
+        confirmed: n.isActive !== false,
         parentId: n.parentId,
         children: n.children,
         data: n,
@@ -565,7 +565,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         label: n.name,
         type: 'component' as TreeType,
         status: n.status,
-        confirmed: n.confirmed,
+        confirmed: n.isActive !== false,
         parentId: n.parentId,
         children: n.children,
         data: n,
@@ -628,7 +628,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                   <button
                     type="button"
                     className={styles.secondaryButton}
-                    onClick={() => autoGenerateFlows(contextNodes.filter((c) => c.confirmed))}
+                    onClick={() => autoGenerateFlows(contextNodes.filter((c) => c.isActive !== false))}
                     disabled={flowGenerating}
                     aria-label="生成流程树"
                     title="基于已确认的限界上下文生成业务流程树"
@@ -906,7 +906,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                       <button
                         type="button"
                         className={styles.secondaryButton}
-                        onClick={() => autoGenerateFlows(contextNodes.filter((c) => c.confirmed))}
+                        onClick={() => autoGenerateFlows(contextNodes.filter((c) => c.isActive !== false))}
                         disabled={flowGenerating}
                         aria-label="继续到流程树"
                         title="基于已确认的限界上下文生成业务流程树"

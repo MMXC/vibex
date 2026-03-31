@@ -107,7 +107,7 @@ function buildCanvasMarkdown(scope: ExportScope): string {
     } else {
       contextNodes.forEach((ctx) => {
         const typeIcon = ctx.type === 'core' ? '🔴' : ctx.type === 'supporting' ? '🟡' : ctx.type === 'generic' ? '🟢' : '⚪';
-        const statusIcon = ctx.confirmed ? '✅' : '⏳';
+        const statusIcon = ctx.isActive !== false ? '✅' : '⏳';
         lines.push(`### ${typeIcon} ${statusIcon} ${ctx.name}`, '');
         if (ctx.description) {
           lines.push(`> ${ctx.description}`, '');
@@ -128,12 +128,12 @@ function buildCanvasMarkdown(scope: ExportScope): string {
       lines.push('_暂无数据_', '');
     } else {
       flowNodes.forEach((flow) => {
-        const statusIcon = flow.confirmed ? '✅' : '⏳';
+        const statusIcon = flow.isActive !== false ? '✅' : '⏳';
         lines.push(`### ${statusIcon} ${flow.name}`, '');
         if (flow.steps && flow.steps.length > 0) {
           lines.push('**流程步骤:**', '');
           flow.steps.forEach((step, i) => {
-            const stepStatus = step.confirmed ? '✅' : '⏳';
+            const stepStatus = step.isActive !== false ? '✅' : '⏳';
             lines.push(`${i + 1}. ${stepStatus} **[${step.actor}]** ${step.name}`);
             if (step.description) {
               lines.push(`   > ${step.description}`);
@@ -151,7 +151,7 @@ function buildCanvasMarkdown(scope: ExportScope): string {
       lines.push('_暂无数据_', '');
     } else {
       componentNodes.forEach((comp) => {
-        const statusIcon = comp.confirmed ? '✅' : '⏳';
+        const statusIcon = comp.isActive !== false ? '✅' : '⏳';
         lines.push(`### ${statusIcon} ${comp.name}`, '');
         lines.push(`- 类型: \`${comp.type}\``, '');
         if (comp.api) {

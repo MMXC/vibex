@@ -28,8 +28,8 @@ export interface SearchResult {
   contextName?: string;
   /** 节点状态 */
   status: BoundedContextNode['status'];
-  /** 是否已确认 */
-  confirmed: boolean;
+  /** 是否已激活 */
+  isActive?: boolean;
   /** 节点原始数据 */
   data: BoundedContextNode | BusinessFlowNode | ComponentNode;
 }
@@ -82,7 +82,7 @@ export function useCanvasSearch(
       treeType: 'context' as const,
       path: n.name,
       status: n.status,
-      confirmed: n.confirmed,
+      confirmed: n.isActive !== false,
       data: n,
     }));
 
@@ -99,7 +99,7 @@ export function useCanvasSearch(
         path: contextName ? `${contextName} → ${n.name}` : n.name,
         contextName,
         status: n.status,
-        confirmed: n.confirmed,
+        confirmed: n.isActive !== false,
         data: n,
       };
     });
@@ -118,7 +118,7 @@ export function useCanvasSearch(
         path: contextName ? `${contextName} → ${n.name}` : n.name,
         contextName,
         status: n.status,
-        confirmed: n.confirmed,
+        confirmed: n.isActive !== false,
         data: n,
       };
     });

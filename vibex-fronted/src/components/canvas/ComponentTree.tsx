@@ -288,7 +288,6 @@ interface ComponentTreeProps {
 
 interface ComponentCardProps {
   node: ComponentNode;
-  onConfirm: (nodeId: string) => void;
   onEdit: (nodeId: string, data: Partial<ComponentNode>) => void;
   onDelete: (nodeId: string) => void;
   readonly?: boolean;
@@ -302,7 +301,7 @@ interface ComponentCardProps {
 // Component Card
 // =============================================================================
 
-function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly, selected, onToggleSelect }: ComponentCardProps) {
+function ComponentCard({ node, onEdit, onDelete, readonly, selected, onToggleSelect }: ComponentCardProps) {
   const [editing, setEditing] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -440,8 +439,8 @@ function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly, selected, 
             <div className={styles.nodeTypeBadge} style={{ background: typeColor }}>
               {node.type === 'page' ? '页面' : node.type === 'list' ? '列表' : node.type === 'form' ? '表单' : node.type === 'detail' ? '详情' : '弹窗'}
             </div>
-            {node.confirmed && (
-              <span className={styles.confirmedBadge} aria-label="已确认">
+            {node.isActive !== false && (
+              <span className={styles.activeBadge} aria-label="已确认">
                 <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                   <path d="M3 8.5L6.5 12L13 4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -493,19 +492,6 @@ function ComponentCard({ node, onConfirm, onEdit, onDelete, readonly, selected, 
 
           {!readonly && (
             <div className={styles.nodeCardActions}>
-              {!node.confirmed && (
-                <button
-                  type="button"
-                  className={styles.confirmButton}
-                  onClick={() => onConfirm(node.nodeId)}
-                  aria-label={`确认 ${node.name}`}
-                >
-                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ marginRight: '4px' }}>
-                    <path d="M3 8.5L6.5 12L13 4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  确认
-                </button>
-              )}
               {/* E2-F8: Prototype preview — navigate to editor with componentId */}
               <button
                 type="button"
@@ -616,8 +602,6 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
   const addComponentNode = useCanvasStore((s) => s.addComponentNode);
   const editComponentNode = useCanvasStore((s) => s.editComponentNode);
   const deleteComponentNode = useCanvasStore((s) => s.deleteComponentNode);
-  const confirmComponentNode = useCanvasStore((s) => s.confirmComponentNode);
-  const confirmAllComponentNodes = useCanvasStore((s) => s.confirmAllComponentNodes);
   const setComponentNodes = useCanvasStore((s) => s.setComponentNodes);
   const flowNodes = useCanvasStore((s) => s.flowNodes);
   const setPhase = useCanvasStore((s) => s.setPhase);
@@ -737,13 +721,7 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
     [addComponentNode]
   );
 
-  const handleConfirmAll = useCallback(() => {
-    componentNodes.forEach((n) => {
-      if (!n.confirmed) confirmComponentNode(n.nodeId);
-    });
-    // Always advance phase when user clicks — button is visible when hasNodes
-    setPhase('prototype');
-  }, [componentNodes, confirmComponentNode, setPhase]);
+
 
   const handleClearCanvas = useCallback(() => {
     if (window.confirm('确定清空画布？所有组件将被删除。')) {
@@ -751,7 +729,7 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
     }
   }, []);
 
-  const allConfirmed = componentNodes.length > 0 && componentNodes.every((n) => n.confirmed);
+  const allConfirmed = componentNodes.length > 0 && componentNodes.every((n) => n.isActive !== false);
   const hasNodes = componentNodes.length > 0;
 
   return (
@@ -783,11 +761,10 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
           <button
             type="button"
             className={styles.primaryButton}
-            onClick={handleConfirmAll}
-            disabled={false}
-            aria-label={allConfirmed ? '已全部确认，继续到原型生成' : '确认所有节点后继续'}
+            onClick={() => setPhase('prototype')}
+            aria-label="继续到原型生成"
           >
-            {allConfirmed ? '✓ 已确认 → 继续到原型生成' : '确认所有 → 继续到原型生成'}
+            继续到原型生成
           </button>
         )}
         {!readonly && !showAddForm && (
@@ -963,22 +940,6 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
                   >
                     ({group.nodes.length})
                   </span>
-                  {/* F3.1: Confirm all button — only show if group has unconfirmed nodes */}
-                  {group.nodes.some((n) => !n.confirmed) && (
-                    <button
-                      type="button"
-                      className={styles.confirmAllButton}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        confirmAllComponentNodes(group.groupId);
-                      }}
-                      title="确认组内所有组件"
-                      aria-label={`确认全部 ${group.label}`}
-                      style={{ color: group.color }}
-                    >
-                      ✓ 确认全部
-                    </button>
-                  )}
                 </div>
 
                 {/* E2-F7: DndContext for this group's draggable cards */}
@@ -1005,7 +966,6 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
                         >
                           <ComponentCard
                             node={node}
-                            onConfirm={confirmComponentNode}
                             onEdit={editComponentNode}
                             onDelete={deleteComponentNode}
                             readonly={readonly}

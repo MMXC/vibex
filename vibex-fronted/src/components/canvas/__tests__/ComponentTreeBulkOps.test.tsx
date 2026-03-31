@@ -28,7 +28,7 @@ const defaultMockNodes: ComponentNode[] = [
     props: { layout: 'full-width' },
     api: { method: 'GET', path: '/api/home' },
     children: ['comp-1-child-1'],
-    confirmed: true,
+    isActive: true,
     status: 'confirmed',
   },
   {
@@ -39,7 +39,7 @@ const defaultMockNodes: ComponentNode[] = [
     props: { layout: 'container' },
     api: { method: 'GET', path: '/api/detail/:id' },
     children: [],
-    confirmed: true,
+    isActive: true,
     status: 'confirmed',
   },
   {
@@ -50,7 +50,7 @@ const defaultMockNodes: ComponentNode[] = [
     props: {},
     api: { method: 'POST', path: '/api/form' },
     children: [],
-    confirmed: true,
+    isActive: true,
     status: 'confirmed',
   },
 ];
@@ -64,7 +64,6 @@ const buildStoreState = (
   addComponentNode: jest.fn(),
   editComponentNode: jest.fn(),
   deleteComponentNode: jest.fn(),
-  confirmComponentNode: jest.fn(),
   setComponentNodes: jest.fn(),
   flowNodes: [],
   setPhase: jest.fn(),

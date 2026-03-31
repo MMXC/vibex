@@ -70,13 +70,13 @@ function contextsToCardTree(contexts: BoundedContextNode[]): CardTreeVisualizati
       {
         id: `${ctx.nodeId}-type`,
         label: `类型: ${ctx.type === 'core' ? '核心域' : ctx.type === 'supporting' ? '支撑域' : ctx.type === 'generic' ? '通用域' : '外部域'}`,
-        checked: ctx.confirmed,
+        checked: ctx.isActive !== false,
         description: ctx.description,
       },
       {
         id: `${ctx.nodeId}-confirmed`,
-        label: ctx.confirmed ? '已确认 ✓' : '待确认',
-        checked: ctx.confirmed,
+        label: ctx.isActive !== false ? '已确认 ✓' : '待确认',
+        checked: ctx.isActive !== false,
       },
     ],
     isExpanded: true,

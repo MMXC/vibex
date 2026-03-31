@@ -52,19 +52,19 @@ describe('loadExampleData (F-1.1 ~ F-1.3)', () => {
 
     it('all context nodes have confirmed=true', async () => {
       const data = await import('@/data/example-canvas.json');
-      const allConfirmed = data.contextNodes.every((n: { confirmed: boolean }) => n.confirmed === true);
+      const allConfirmed = data.contextNodes.every((n: { confirmed: boolean }) => n.isActive === true);
       expect(allConfirmed).toBe(true);
     });
 
     it('all flow nodes have confirmed=true', async () => {
       const data = await import('@/data/example-canvas.json');
-      const allConfirmed = data.flowNodes.every((n: { confirmed: boolean }) => n.confirmed === true);
+      const allConfirmed = data.flowNodes.every((n: { confirmed: boolean }) => n.isActive === true);
       expect(allConfirmed).toBe(true);
     });
 
     it('all component nodes have confirmed=true', async () => {
       const data = await import('@/data/example-canvas.json');
-      const allConfirmed = data.componentNodes.every((n: { confirmed: boolean }) => n.confirmed === true);
+      const allConfirmed = data.componentNodes.every((n: { confirmed: boolean }) => n.isActive === true);
       expect(allConfirmed).toBe(true);
     });
 
@@ -129,7 +129,7 @@ describe('loadExampleData (F-1.1 ~ F-1.3)', () => {
       const { flowNodes } = useCanvasStore.getState();
       for (const flow of flowNodes) {
         expect(flow.steps.length).toBeGreaterThan(0);
-        expect(flow.steps.every((s: { confirmed: boolean }) => s.confirmed)).toBe(true);
+        expect(flow.steps.every((s: { confirmed: boolean }) => s.isActive)).toBe(true);
       }
     });
   });

@@ -24,7 +24,7 @@ describe('CascadeUpdateManager', () => {
           contextId: 'c1',
           name: 'Flow 1',
           steps: [],
-          confirmed: true,
+          isActive: true,
           status: 'confirmed',
           children: [],
         },
@@ -33,9 +33,9 @@ describe('CascadeUpdateManager', () => {
           contextId: 'c1',
           name: 'Flow 2',
           steps: [
-            { stepId: 's1', name: 'Step 1', actor: 'User', order: 0, confirmed: true, status: 'confirmed' },
+            { stepId: 's1', name: 'Step 1', actor: 'User', order: 0, isActive: true, status: 'confirmed' },
           ],
-          confirmed: true,
+          isActive: true,
           status: 'confirmed',
           children: [],
         },
@@ -44,12 +44,12 @@ describe('CascadeUpdateManager', () => {
       const result = markFlowNodesPending(flows);
 
       expect(result[0].status).toBe('pending');
-      expect(result[0].confirmed).toBe(false);
+      expect(result[0].isActive).toBe(false);
       expect(result[1].status).toBe('pending');
-      expect(result[1].confirmed).toBe(false);
+      expect(result[1].isActive).toBe(false);
       // Steps should also be marked pending
       expect(result[1].steps[0].status).toBe('pending');
-      expect(result[1].steps[0].confirmed).toBe(false);
+      expect(result[1].steps[0].isActive).toBe(false);
     });
 
     it('should return empty array for empty input', () => {
@@ -69,7 +69,7 @@ describe('CascadeUpdateManager', () => {
           props: {},
           api: { method: 'GET', path: '/api', params: [] },
           children: [],
-          confirmed: true,
+          isActive: true,
           status: 'confirmed',
         },
       ];
@@ -77,18 +77,18 @@ describe('CascadeUpdateManager', () => {
       const result = markComponentNodesPending(components);
 
       expect(result[0].status).toBe('pending');
-      expect(result[0].confirmed).toBe(false);
+      expect(result[0].isActive).toBe(false);
     });
   });
 
   describe('areAllConfirmed', () => {
     it('should return true when all nodes confirmed', () => {
-      const nodes = [{ confirmed: true }, { confirmed: true }];
+      const nodes = [{ isActive: true }, { isActive: true }];
       expect(areAllConfirmed(nodes)).toBe(true);
     });
 
     it('should return false when any node unconfirmed', () => {
-      const nodes = [{ confirmed: true }, { confirmed: false }];
+      const nodes = [{ isActive: true }, { isActive: false }];
       expect(areAllConfirmed(nodes)).toBe(false);
     });
 
@@ -100,23 +100,23 @@ describe('CascadeUpdateManager', () => {
   describe('cascadeContextChange', () => {
     it('should mark both flow and component pending when context changes', () => {
       const flows: BusinessFlowNode[] = [
-        { nodeId: 'f1', contextId: 'c1', name: 'Flow 1', steps: [], confirmed: true, status: 'confirmed', children: [] },
+        { nodeId: 'f1', contextId: 'c1', name: 'Flow 1', steps: [], isActive: true, status: 'confirmed', children: [] },
       ];
       const components: ComponentNode[] = [
-        { nodeId: 'c1', flowId: 'f1', name: 'Comp 1', type: 'page', props: {}, api: { method: 'GET', path: '/api', params: [] }, children: [], confirmed: true, status: 'confirmed' },
+        { nodeId: 'c1', flowId: 'f1', name: 'Comp 1', type: 'page', props: {}, api: { method: 'GET', path: '/api', params: [] }, children: [], isActive: true, status: 'confirmed' },
       ];
 
       const { flowNodes, componentNodes } = cascadeContextChange([], flows, components);
 
       expect(flowNodes[0].status).toBe('pending');
-      expect(flowNodes[0].confirmed).toBe(false);
+      expect(flowNodes[0].isActive).toBe(false);
       expect(componentNodes[0].status).toBe('pending');
-      expect(componentNodes[0].confirmed).toBe(false);
+      expect(componentNodes[0].isActive).toBe(false);
     });
 
     it('should not affect context nodes', () => {
       const contexts: BoundedContextNode[] = [
-        { nodeId: 'c1', name: 'Ctx 1', description: '', type: 'core', confirmed: true, status: 'confirmed', children: [] },
+        { nodeId: 'c1', name: 'Ctx 1', description: '', type: 'core', isActive: true, status: 'confirmed', children: [] },
       ];
       const flows: BusinessFlowNode[] = [];
       const components: ComponentNode[] = [];
@@ -132,14 +132,14 @@ describe('CascadeUpdateManager', () => {
     it('should mark only component pending when flow changes (not context)', () => {
       const flows: BusinessFlowNode[] = [];
       const components: ComponentNode[] = [
-        { nodeId: 'c1', flowId: 'f1', name: 'Comp 1', type: 'page', props: {}, api: { method: 'GET', path: '/api', params: [] }, children: [], confirmed: true, status: 'confirmed' },
-        { nodeId: 'c2', flowId: 'f1', name: 'Comp 2', type: 'form', props: {}, api: { method: 'POST', path: '/api', params: [] }, children: [], confirmed: true, status: 'confirmed' },
+        { nodeId: 'c1', flowId: 'f1', name: 'Comp 1', type: 'page', props: {}, api: { method: 'GET', path: '/api', params: [] }, children: [], isActive: true, status: 'confirmed' },
+        { nodeId: 'c2', flowId: 'f1', name: 'Comp 2', type: 'form', props: {}, api: { method: 'POST', path: '/api', params: [] }, children: [], isActive: true, status: 'confirmed' },
       ];
 
       const { componentNodes } = cascadeFlowChange(flows, components);
 
       expect(componentNodes.every((n) => n.status === 'pending')).toBe(true);
-      expect(componentNodes.every((n) => n.confirmed === false)).toBe(true);
+      expect(componentNodes.every((n) => n.isActive === false)).toBe(true);
     });
   });
 });

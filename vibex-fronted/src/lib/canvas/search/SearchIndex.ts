@@ -28,7 +28,7 @@ export interface SearchNode {
   /** 树类型中文名 */
   treeTypeLabel: string;
   status: NodeStatus;
-  confirmed: boolean;
+  isActive?: boolean;
   /** 节点路径，如 ["限界上下文", "电商域"] */
   path: string[];
   /** 原始节点数据（用于跳转） */
@@ -95,7 +95,7 @@ export class SearchIndex {
         type: 'context' as TreeType,
         treeTypeLabel: `限界上下文 / ${n.name}`,
         status: n.status,
-        confirmed: n.confirmed,
+        isActive: n.isActive !== false,
         path: ['限界上下文', n.name],
         data: n,
       })),
@@ -105,7 +105,7 @@ export class SearchIndex {
         type: 'flow' as TreeType,
         treeTypeLabel: `业务流程 / ${n.name}`,
         status: n.status,
-        confirmed: n.confirmed,
+        isActive: n.isActive !== false,
         path: ['业务流程', n.name],
         data: n,
       })),
@@ -115,7 +115,7 @@ export class SearchIndex {
         type: 'component' as TreeType,
         treeTypeLabel: `组件树 / ${n.name}`,
         status: n.status,
-        confirmed: n.confirmed,
+        isActive: n.isActive !== false,
         path: ['组件树', n.name],
         data: n,
       })),

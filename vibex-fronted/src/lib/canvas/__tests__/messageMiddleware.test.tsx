@@ -76,48 +76,9 @@ describe('Epic 4: messageMiddleware — auto-append messages on node operations'
       expect(lastMsg.meta).toBe('待删除节点');
     });
 
-    it('should append user_action message when confirming context node', () => {
-      act(() => {
-        useCanvasStore.getState().addContextNode({
-          name: '待确认节点',
-          description: '',
-          type: 'core',
-        });
-      });
-      const nodeId = useCanvasStore.getState().contextNodes[0]?.nodeId;
-      act(() => {
-        useCanvasStore.getState().confirmContextNode(nodeId);
-      });
-      const messages = useCanvasStore.getState().messages;
-      const lastMsg = messages[messages.length - 1];
-      expect(lastMsg.type).toBe('user_action');
-      expect(lastMsg.content).toBe('确认了上下文节点');
-      expect(lastMsg.meta).toBe('待确认节点');
-    });
 
-    it('should append user_action message when un-confirming context node', () => {
-      act(() => {
-        useCanvasStore.getState().addContextNode({
-          name: '待取消节点',
-          description: '',
-          type: 'core',
-        });
-      });
-      const nodeId = useCanvasStore.getState().contextNodes[0]?.nodeId;
-      // First confirm
-      act(() => {
-        useCanvasStore.getState().confirmContextNode(nodeId);
-      });
-      // Then un-confirm
-      act(() => {
-        useCanvasStore.getState().confirmContextNode(nodeId);
-      });
-      const messages = useCanvasStore.getState().messages;
-      const lastMsg = messages[messages.length - 1];
-      expect(lastMsg.type).toBe('user_action');
-      expect(lastMsg.content).toBe('删除了上下文节点');
-      expect(lastMsg.meta).toBe('待取消节点');
-    });
+
+
   });
 
   describe('S4.2: Flow node operations auto-append messages', () => {
@@ -155,24 +116,7 @@ describe('Epic 4: messageMiddleware — auto-append messages on node operations'
       expect(lastMsg.meta).toBe('待删除流程');
     });
 
-    it('should append user_action message when confirming flow node', () => {
-      act(() => {
-        useCanvasStore.getState().addFlowNode({
-          contextId: 'ctx-1',
-          name: '待确认流程',
-          steps: [],
-        });
-      });
-      const nodeId = useCanvasStore.getState().flowNodes[0]?.nodeId;
-      act(() => {
-        useCanvasStore.getState().confirmFlowNode(nodeId);
-      });
-      const messages = useCanvasStore.getState().messages;
-      const lastMsg = messages[messages.length - 1];
-      expect(lastMsg.type).toBe('user_action');
-      expect(lastMsg.content).toBe('确认了流程节点');
-      expect(lastMsg.meta).toBe('待确认流程');
-    });
+
   });
 
   describe('S4.2: Component node operations auto-append messages', () => {
@@ -214,26 +158,7 @@ describe('Epic 4: messageMiddleware — auto-append messages on node operations'
       expect(lastMsg.meta).toBe('待删除组件');
     });
 
-    it('should append user_action message when confirming component node', () => {
-      act(() => {
-        useCanvasStore.getState().addComponentNode({
-          flowId: 'flow-1',
-          name: '待确认组件',
-          type: 'page',
-          props: {},
-          api: { method: 'GET', path: '/test', params: [] },
-        });
-      });
-      const nodeId = useCanvasStore.getState().componentNodes[0]?.nodeId;
-      act(() => {
-        useCanvasStore.getState().confirmComponentNode(nodeId);
-      });
-      const messages = useCanvasStore.getState().messages;
-      const lastMsg = messages[messages.length - 1];
-      expect(lastMsg.type).toBe('user_action');
-      expect(lastMsg.content).toBe('确认了组件节点');
-      expect(lastMsg.meta).toBe('待确认组件');
-    });
+
   });
 
   describe('S4.3: Message persistence', () => {

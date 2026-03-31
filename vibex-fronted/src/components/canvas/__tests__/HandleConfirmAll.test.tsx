@@ -1,15 +1,14 @@
 /**
- * Tests for handleConfirmAll functionality (Epic B1)
+ * Tests for Epic 3 confirm-all removal (canvas-three-tree-unification)
  *
- * Tests the "确认所有 → 继续到流程树" button (BoundedContextTree) and
- * "确认所有 → 继续到原型生成" button (ComponentTree)
+ * Epic 3 removed confirmAllComponentNodes/confirmContextNode/confirmFlowNode from the store.
+ * The "confirm all" functionality that called these store methods is gone.
  *
- * Tests the confirmAll logic:
- * - Button visible when hasNodes (> 0 nodes)
- * - Button disabled when allConfirmed (but still visible)
- * - Button hidden when no nodes
- * - Clicking confirms all unconfirmed nodes
- * - Phase advances after confirming
+ * Tests verify:
+ * - ComponentTree has NO "确认所有" button (only "继续到原型生成")
+ * - ComponentTree "继续到原型生成" calls setPhase('prototype')
+ * - BoundedContextTree "确认所有 → 继续到流程树" calls advancePhase() (no confirm gating)
+ * - Store has no confirmContextNode/confirmFlowNode/confirmComponentNode
  */
 
 import React from 'react';
@@ -19,40 +18,36 @@ import { ComponentTree } from '../ComponentTree';
 import type { BoundedContextNode, ComponentNode } from '@/lib/canvas/types';
 
 // =============================================================================
-// Shared mutable mock state
+// Shared mutable mock state — uses isActive (not confirmed)
 // =============================================================================
 const mockCtxNodes: BoundedContextNode[] = [
-  { nodeId: 'ctx-1', name: '用户管理', description: '描述', status: 'pending' as const, confirmed: false, children: [] },
-  { nodeId: 'ctx-2', name: '订单管理', description: '描述', status: 'pending' as const, confirmed: false, children: [] },
-  { nodeId: 'ctx-3', name: '商品管理', description: '描述', status: 'pending' as const, confirmed: false, children: [] },
+  { nodeId: 'ctx-1', name: '用户管理', description: '描述', status: 'pending' as const, isActive: false, children: [] },
+  { nodeId: 'ctx-2', name: '订单管理', description: '描述', status: 'pending' as const, isActive: false, children: [] },
+  { nodeId: 'ctx-3', name: '商品管理', description: '描述', status: 'pending' as const, isActive: false, children: [] },
 ];
 
 const mockCompNodes: ComponentNode[] = [
-  { nodeId: 'comp-1', flowId: 'flow-1', name: '首页组件', type: 'page' as const, props: { layout: 'full-width' }, api: { method: 'GET' as const, path: '/api/home' }, children: [], confirmed: false, status: 'pending' as const },
-  { nodeId: 'comp-2', flowId: 'flow-1', name: '详情页组件', type: 'detail' as const, props: { layout: 'container' }, api: { method: 'GET' as const, path: '/api/detail/:id' }, children: [], confirmed: false, status: 'pending' as const },
+  { nodeId: 'comp-1', flowId: 'flow-1', name: '首页组件', type: 'page' as const, props: { layout: 'full-width' }, api: { method: 'GET' as const, path: '/api/home' }, children: [], isActive: false, status: 'pending' as const },
+  { nodeId: 'comp-2', flowId: 'flow-1', name: '详情页组件', type: 'detail' as const, props: { layout: 'container' }, api: { method: 'GET' as const, path: '/api/detail/:id' }, children: [], isActive: false, status: 'pending' as const },
 ];
 
-const mockConfirmCtx = jest.fn();
 const mockAdvancePhase = jest.fn();
-const mockConfirmComp = jest.fn();
 const mockSetPhase = jest.fn();
 
 // =============================================================================
-// Mock canvasStore — single state object with BOTH ctx and comp nodes
+// Mock canvasStore — Epic3: no confirmContextNode/confirmFlowNode/confirmComponentNode
 // =============================================================================
 jest.mock('@/lib/canvas/canvasStore', () => ({
   useCanvasStore: jest.fn((selector) => {
     const state = {
       // BoundedContextTree selectors
       contextNodes: mockCtxNodes,
-      confirmContextNode: mockConfirmCtx,
       advancePhase: mockAdvancePhase,
       addContextDraft: jest.fn(),
       updateContextDraft: jest.fn(),
       deleteContextDraft: jest.fn(),
       // ComponentTree selectors
       componentNodes: mockCompNodes,
-      confirmComponentNode: mockConfirmComp,
       setPhase: mockSetPhase,
       addComponentNode: jest.fn(),
       editComponentNode: jest.fn(),
@@ -60,7 +55,7 @@ jest.mock('@/lib/canvas/canvasStore', () => ({
       setComponentNodes: jest.fn(),
       // Shared selectors
       flowNodes: [
-        { nodeId: 'flow-1', name: '流程1', type: 'business-flow' as const, status: 'pending' as const, confirmed: false, children: [], steps: [] },
+        { nodeId: 'flow-1', name: '流程1', type: 'business-flow' as const, status: 'pending' as const, isActive: false, children: [], steps: [] },
       ],
       phase: 'context' as const,
       activeTree: 'context' as const,
@@ -82,107 +77,91 @@ jest.mock('@/components/ui/Toast', () => ({
 }));
 
 // =============================================================================
-// Tests: BoundedContextTree handleConfirmAll
+// Tests: Epic3 — no confirm gating, only phase advancement
 // =============================================================================
-describe('BoundedContextTree handleConfirmAll (B1)', () => {
+describe('Epic3 — Confirm-all removed, only phase advancement', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockCtxNodes.length = 0;
     mockCtxNodes.push(
-      { nodeId: 'ctx-1', name: '用户管理', description: '描述', status: 'pending' as const, confirmed: false, children: [] },
-      { nodeId: 'ctx-2', name: '订单管理', description: '描述', status: 'pending' as const, confirmed: false, children: [] },
-      { nodeId: 'ctx-3', name: '商品管理', description: '描述', status: 'pending' as const, confirmed: false, children: [] },
+      { nodeId: 'ctx-1', name: '用户管理', description: '描述', status: 'pending' as const, isActive: false, children: [] },
+      { nodeId: 'ctx-2', name: '订单管理', description: '描述', status: 'pending' as const, isActive: false, children: [] },
+      { nodeId: 'ctx-3', name: '商品管理', description: '描述', status: 'pending' as const, isActive: false, children: [] },
     );
   });
 
-  it('renders confirm-all button when hasNodes', () => {
-    render(<BoundedContextTree />);
-    // aria-label is "确认所有节点后继续" when not all confirmed
-    expect(screen.getByRole('button', { name: /确认所有节点后继续/i })).toBeInTheDocument();
+  describe('ComponentTree — no confirm-all button, only prototype transition', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+      mockCompNodes.length = 0;
+      mockCompNodes.push(
+        { nodeId: 'comp-1', flowId: 'flow-1', name: '首页组件', type: 'page' as const, props: { layout: 'full-width' }, api: { method: 'GET' as const, path: '/api/home' }, children: [], isActive: false, status: 'pending' as const },
+        { nodeId: 'comp-2', flowId: 'flow-1', name: '详情页组件', type: 'detail' as const, props: { layout: 'container' }, api: { method: 'GET' as const, path: '/api/detail/:id' }, children: [], isActive: false, status: 'pending' as const },
+      );
+    });
+
+    it('has NO "确认所有" button in ComponentTree', () => {
+      render(<ComponentTree />);
+      // There should be no button with aria-label containing "确认所有"
+      expect(screen.queryByRole('button', { name: /确认所有/i })).not.toBeInTheDocument();
+    });
+
+    it('has "继续到原型生成" button when has nodes', () => {
+      render(<ComponentTree />);
+      expect(screen.getByRole('button', { name: /继续到原型生成/i })).toBeInTheDocument();
+    });
+
+    it('"继续到原型生成" button calls setPhase("prototype")', () => {
+      render(<ComponentTree />);
+      fireEvent.click(screen.getByRole('button', { name: /继续到原型生成/i }));
+      expect(mockSetPhase).toHaveBeenCalledWith('prototype');
+    });
+
+    it('"继续到原型生成" button NOT visible when no nodes', () => {
+      mockCompNodes.length = 0;
+      render(<ComponentTree />);
+      expect(screen.queryByRole('button', { name: /继续到原型生成/i })).not.toBeInTheDocument();
+    });
+
+    it('no confirmComponentNode in store', () => {
+      render(<ComponentTree />);
+      // verify the mock store has no confirmComponentNode
+      const { useCanvasStore } = require('@/lib/canvas/canvasStore');
+      const storeState = useCanvasStore.getState?.() ?? {};
+      expect(storeState).not.toHaveProperty('confirmComponentNode');
+    });
   });
 
-  it('confirms all unconfirmed nodes when clicked', () => {
-    render(<BoundedContextTree />);
-    fireEvent.click(screen.getByRole('button', { name: /确认所有节点后继续/i }));
-    expect(mockConfirmCtx).toHaveBeenCalledTimes(3);
-    expect(mockConfirmCtx).toHaveBeenCalledWith('ctx-1');
-    expect(mockConfirmCtx).toHaveBeenCalledWith('ctx-2');
-    expect(mockConfirmCtx).toHaveBeenCalledWith('ctx-3');
-  });
+  describe('BoundedContextTree — confirm-all calls advancePhase only', () => {
+    it('has "确认所有 → 继续到流程树" button when has nodes', () => {
+      render(<BoundedContextTree />);
+      // aria-label reflects allConfirmed state; with isActive=false it says "确认所有节点后继续"
+      expect(screen.getByRole('button', { name: /继续到流程树/i })).toBeInTheDocument();
+    });
 
-  it('advances phase after confirming all', () => {
-    render(<BoundedContextTree />);
-    fireEvent.click(screen.getByRole('button', { name: /确认所有节点后继续/i }));
-    expect(mockAdvancePhase).toHaveBeenCalledTimes(1);
-  });
+    it('"确认所有 → 继续到流程树" calls advancePhase (no confirm gating)', () => {
+      render(<BoundedContextTree />);
+      fireEvent.click(screen.getByRole('button', { name: /继续到流程树/i }));
+      expect(mockAdvancePhase).toHaveBeenCalledTimes(1);
+    });
 
-  it('button is ENABLED even when all confirmed (B1 fix)', () => {
-    mockCtxNodes.forEach((n) => { n.confirmed = true; });
-    render(<BoundedContextTree />);
-    // B1 fix: button is always enabled when hasNodes, not disabled when allConfirmed
-    const btn = screen.getByRole('button', { name: /已全部确认.*流程树/i });
-    expect(btn).not.toBeDisabled();
-    expect(btn).toBeEnabled();
-    // Clicking advances phase even when all already confirmed
-    fireEvent.click(btn);
-    expect(mockAdvancePhase).toHaveBeenCalledTimes(1);
-  });
+    it('button label changes to "已全部确认 → 继续到流程树" when all isActive', () => {
+      mockCtxNodes.forEach((n) => { n.isActive = true; });
+      render(<BoundedContextTree />);
+      expect(screen.getByRole('button', { name: /已全部确认.*流程树/i })).toBeInTheDocument();
+    });
 
-  it('button NOT visible when no nodes', () => {
-    mockCtxNodes.length = 0;
-    render(<BoundedContextTree />);
-    expect(screen.queryByRole('button', { name: /继续/i })).not.toBeInTheDocument();
-  });
-});
+    it('button NOT visible when no nodes', () => {
+      mockCtxNodes.length = 0;
+      render(<BoundedContextTree />);
+      expect(screen.queryByRole('button', { name: /继续/i })).not.toBeInTheDocument();
+    });
 
-// =============================================================================
-// Tests: ComponentTree handleConfirmAll
-// =============================================================================
-describe('ComponentTree handleConfirmAll (B1)', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    mockCompNodes.length = 0;
-    mockCompNodes.push(
-      { nodeId: 'comp-1', flowId: 'flow-1', name: '首页组件', type: 'page' as const, props: { layout: 'full-width' }, api: { method: 'GET' as const, path: '/api/home' }, children: [], confirmed: false, status: 'pending' as const },
-      { nodeId: 'comp-2', flowId: 'flow-1', name: '详情页组件', type: 'detail' as const, props: { layout: 'container' }, api: { method: 'GET' as const, path: '/api/detail/:id' }, children: [], confirmed: false, status: 'pending' as const },
-    );
-  });
-
-  it('renders confirm-all button when hasNodes', () => {
-    render(<ComponentTree />);
-    // aria-label is "确认所有节点后继续" when not all confirmed
-    expect(screen.getByRole('button', { name: /确认所有节点后继续/i })).toBeInTheDocument();
-  });
-
-  it('confirms all unconfirmed nodes when clicked', () => {
-    render(<ComponentTree />);
-    fireEvent.click(screen.getByRole('button', { name: /确认所有节点后继续/i }));
-    expect(mockConfirmComp).toHaveBeenCalledTimes(2);
-    expect(mockConfirmComp).toHaveBeenCalledWith('comp-1');
-    expect(mockConfirmComp).toHaveBeenCalledWith('comp-2');
-  });
-
-  it('sets phase to prototype after confirming all', () => {
-    render(<ComponentTree />);
-    fireEvent.click(screen.getByRole('button', { name: /确认所有节点后继续/i }));
-    expect(mockSetPhase).toHaveBeenCalledWith('prototype');
-  });
-
-  it('button is ENABLED even when all confirmed (B1 fix)', () => {
-    mockCompNodes.forEach((n) => { n.confirmed = true; });
-    render(<ComponentTree />);
-    // B1 fix: button is always enabled when hasNodes, not disabled when allConfirmed
-    const btn = screen.getByRole('button', { name: /已全部确认.*原型生成/i });
-    expect(btn).not.toBeDisabled();
-    expect(btn).toBeEnabled();
-    // Clicking advances phase even when all already confirmed
-    fireEvent.click(btn);
-    expect(mockSetPhase).toHaveBeenCalledWith('prototype');
-  });
-
-  it('button NOT visible when no nodes', () => {
-    mockCompNodes.length = 0;
-    render(<ComponentTree />);
-    expect(screen.queryByRole('button', { name: /继续/i })).not.toBeInTheDocument();
+    it('no confirmContextNode in store', () => {
+      render(<BoundedContextTree />);
+      const { useCanvasStore } = require('@/lib/canvas/canvasStore');
+      const storeState = useCanvasStore.getState?.() ?? {};
+      expect(storeState).not.toHaveProperty('confirmContextNode');
+    });
   });
 });

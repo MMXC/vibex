@@ -42,7 +42,7 @@ describe('canvasStore', () => {
     // This clears both persisted storage AND in-memory state
     try {
       (useCanvasStore.persist as any)?.clearStorage?.();
-    } catch (_) { /* ignore if not available */ }
+    } catch { /* ignore if not available */ }
     // Fallback: clear localStorage and reset all state slices
     localStorage.removeItem('vibex-canvas-storage');
     const before = useCanvasStore.getState();
@@ -182,59 +182,11 @@ describe('canvasStore', () => {
       expect(nodes.length).toBe(1);
       expect(nodes[0].name).toBe('Order Context');
       expect(nodes[0].type).toBe('core');
-      expect(nodes[0].confirmed).toBe(false);
+      expect(nodes[0].isActive).toBe(false);
       expect(nodes[0].status).toBe('pending');
     });
 
-    // F1.1: Toggle function — first click confirms, second click unconfirms
-    it('should confirm a context node on first click', () => {
-      const { addContextNode, confirmContextNode } = useCanvasStore.getState();
-      addContextNode({ name: 'Test', description: '', type: 'core' });
-      const nodeId = useCanvasStore.getState().contextNodes[0].nodeId;
 
-      confirmContextNode(nodeId);
-      const node = useCanvasStore.getState().contextNodes[0];
-      expect(node.confirmed).toBe(true);
-      expect(node.status).toBe('confirmed');
-    });
-
-    it('should unconfirm a context node on second click (toggle)', () => {
-      const { addContextNode, confirmContextNode } = useCanvasStore.getState();
-      addContextNode({ name: 'Test', description: '', type: 'core' });
-      const nodeId = useCanvasStore.getState().contextNodes[0].nodeId;
-
-      // First click → confirmed
-      confirmContextNode(nodeId);
-      expect(useCanvasStore.getState().contextNodes[0].confirmed).toBe(true);
-      expect(useCanvasStore.getState().contextNodes[0].status).toBe('confirmed');
-
-      // Second click → unconfirmed (toggle off)
-      confirmContextNode(nodeId);
-      const node = useCanvasStore.getState().contextNodes[0];
-      expect(node.confirmed).toBe(false);
-      expect(node.status).toBe('pending');
-    });
-
-    // F1.2: State sync — progress should update correctly on toggle
-    it('should update context confirmed count after toggle off', () => {
-      const { addContextNode, confirmContextNode } = useCanvasStore.getState();
-      addContextNode({ name: 'Test1', description: '', type: 'core' });
-      addContextNode({ name: 'Test2', description: '', type: 'supporting' });
-
-      const nodes = useCanvasStore.getState().contextNodes;
-      const id1 = nodes[0].nodeId;
-      const id2 = nodes[1].nodeId;
-
-      // Confirm both
-      confirmContextNode(id1);
-      confirmContextNode(id2);
-      expect(useCanvasStore.getState().contextNodes.filter(n => n.confirmed).length).toBe(2);
-
-      // Toggle off one
-      confirmContextNode(id1);
-      expect(useCanvasStore.getState().contextNodes.filter(n => n.confirmed).length).toBe(1);
-      expect(useCanvasStore.getState().contextNodes.filter(n => !n.confirmed).length).toBe(1);
-    });
 
     it('should edit a context node and cascade to flow+component', () => {
       const {
@@ -248,7 +200,7 @@ describe('canvasStore', () => {
         contextId: 'ctx-1',
         name: 'Order Flow',
         steps: [],
-        confirmed: true,
+        isActive: true,
         status: 'confirmed',
       };
       const componentNode: ComponentNode = {
@@ -259,7 +211,7 @@ describe('canvasStore', () => {
         props: {},
         api: { method: 'GET', path: '/api/orders', params: [] },
         children: [],
-        confirmed: true,
+        isActive: true,
         status: 'confirmed',
       };
 
@@ -276,12 +228,12 @@ describe('canvasStore', () => {
       // Flow should be marked pending
       const updatedFlow = useCanvasStore.getState().flowNodes[0];
       expect(updatedFlow.status).toBe('pending');
-      expect(updatedFlow.confirmed).toBe(false);
+      expect(updatedFlow.isActive).toBe(false);
 
       // Component should be marked pending
       const updatedComp = useCanvasStore.getState().componentNodes[0];
       expect(updatedComp.status).toBe('pending');
-      expect(updatedComp.confirmed).toBe(false);
+      expect(updatedComp.isActive).toBe(false);
     });
 
     it('should delete a context node', () => {
@@ -318,7 +270,7 @@ describe('canvasStore', () => {
       expect(nodes.length).toBe(1);
       expect(nodes[0].name).toBe('Checkout Flow');
       expect(nodes[0].steps.length).toBe(2);
-      expect(nodes[0].steps[0].confirmed).toBe(false);
+      expect(nodes[0].steps[0].isActive).toBe(false);
     });
 
     it('should confirm a flow node', () => {
@@ -328,7 +280,7 @@ describe('canvasStore', () => {
 
       confirmFlowNode(nodeId);
       const node = useCanvasStore.getState().flowNodes[0];
-      expect(node.confirmed).toBe(true);
+      expect(node.isActive).toBe(true);
     });
 
     it('should cascade flow edit to component pending', () => {
@@ -342,14 +294,14 @@ describe('canvasStore', () => {
         props: {},
         api: { method: 'GET', path: '/api', params: [] },
         children: [],
-        confirmed: true,
+        isActive: true,
         status: 'confirmed',
       };
       useCanvasStore.setState({ componentNodes: [comp] });
 
       editFlowNode('flow-1', { name: 'Updated Flow' });
       expect(useCanvasStore.getState().componentNodes[0].status).toBe('pending');
-      expect(useCanvasStore.getState().componentNodes[0].confirmed).toBe(false);
+      expect(useCanvasStore.getState().componentNodes[0].isActive).toBe(false);
     });
   });
 
@@ -363,7 +315,7 @@ describe('canvasStore', () => {
         props: {},
         api: { method: 'POST', path: '/api/orders', params: [] },
         children: [],
-        confirmed: false,
+        isActive: false,
       });
 
       const nodes = useCanvasStore.getState().componentNodes;
@@ -382,11 +334,11 @@ describe('canvasStore', () => {
         props: {},
         api: { method: 'GET', path: '/api', params: [] },
         children: [],
-        confirmed: false,
+        isActive: false,
       });
       const nodeId = useCanvasStore.getState().componentNodes[0].nodeId;
       confirmComponentNode(nodeId);
-      expect(useCanvasStore.getState().componentNodes[0].confirmed).toBe(true);
+      expect(useCanvasStore.getState().componentNodes[0].isActive).toBe(true);
     });
   });
 
@@ -466,7 +418,7 @@ describe('canvasStore', () => {
         contextId: 'ctx-1',
         name: 'Order Flow',
         steps: [],
-        confirmed: true,
+        isActive: true,
         status: 'confirmed',
       };
       const componentNode: ComponentNode = {
@@ -477,7 +429,7 @@ describe('canvasStore', () => {
         props: {},
         api: { method: 'GET', path: '/api/orders', params: [] },
         children: [],
-        confirmed: true,
+        isActive: true,
         status: 'confirmed',
       };
       useCanvasStore.setState({
@@ -508,7 +460,7 @@ describe('canvasStore', () => {
         props: {},
         api: { method: 'GET', path: '/api/orders', params: [] },
         children: [],
-        confirmed: true,
+        isActive: true,
         status: 'confirmed',
       };
       useCanvasStore.setState({ componentNodes: [componentNode] });
@@ -518,7 +470,7 @@ describe('canvasStore', () => {
       editFlowNode(flowId, { name: 'Updated Checkout Flow' });
 
       expect(useCanvasStore.getState().componentNodes[0].status).toBe('pending');
-      expect(useCanvasStore.getState().componentNodes[0].confirmed).toBe(false);
+      expect(useCanvasStore.getState().componentNodes[0].isActive).toBe(false);
     });
   });
 
@@ -535,7 +487,7 @@ describe('canvasStore', () => {
 
       confirmStep(flowId, stepId);
       const step = useCanvasStore.getState().flowNodes[0].steps[0];
-      expect(step.confirmed).toBe(true);
+      expect(step.isActive).toBe(true);
       expect(step.status).toBe('confirmed');
     });
 
@@ -621,8 +573,8 @@ describe('canvasStore', () => {
     it.skip('should auto-generate flows for all contexts', () => {
       const { autoGenerateFlows } = useCanvasStore.getState();
       autoGenerateFlows([
-        { nodeId: 'ctx-1', name: '患者管理', description: '', type: 'core' as const, confirmed: true, status: 'confirmed' as const, children: [] },
-        { nodeId: 'ctx-2', name: '预约挂号', description: '', type: 'core' as const, confirmed: true, status: 'confirmed' as const, children: [] },
+        { nodeId: 'ctx-1', name: '患者管理', description: '', type: 'core' as const, isActive: true, status: 'confirmed' as const, children: [] },
+        { nodeId: 'ctx-2', name: '预约挂号', description: '', type: 'core' as const, isActive: true, status: 'confirmed' as const, children: [] },
       ]);
 
       const flows = useCanvasStore.getState().flowNodes;
@@ -666,14 +618,14 @@ describe('canvasStore', () => {
 describe('markAllPending', () => {
   it('should mark all nodes pending and unconfirm', () => {
     const nodes = [
-      { status: 'confirmed' as const, confirmed: true, name: 'A' },
-      { status: 'confirmed' as const, confirmed: true, name: 'B' },
+      { status: 'confirmed' as const, isActive: true, name: 'A' },
+      { status: 'confirmed' as const, isActive: true, name: 'B' },
     ];
     const result = markAllPending(nodes);
     expect(result[0].status).toBe('pending');
-    expect(result[0].confirmed).toBe(false);
+    expect(result[0].isActive).toBe(false);
     expect(result[1].status).toBe('pending');
-    expect(result[1].confirmed).toBe(false);
+    expect(result[1].isActive).toBe(false);
   });
 });
 
@@ -791,11 +743,11 @@ describe('markAllPending', () => {
 
       const flow = useCanvasStore.getState().flowNodes.find(n => n.name === '独立流程')!;
       expect(flow.status).toBe('pending');
-      expect(flow.confirmed).toBe(false);
+      expect(flow.isActive).toBe(false);
     });
 
     it('should add flow with empty contextId when no context nodes exist', () => {
-      const { addFlowNode, contextNodes: beforeContexts, flowNodes: beforeFlows } = useCanvasStore.getState();
+      const { addFlowNode, flowNodes: beforeFlows } = useCanvasStore.getState();
       // Capture before counts for state-agnostic assertions
       const beforeFlowCount = beforeFlows.length;
 
@@ -844,7 +796,7 @@ describe('markAllPending', () => {
 
       const updated = useCanvasStore.getState().flowNodes.find(n => n.name === 'S1.2 Test Flow B')!;
       expect(updated.steps[0].status).toBe('pending');
-      expect(updated.steps[0].confirmed).toBe(false);
+      expect(updated.steps[0].isActive).toBe(false);
     });
 
     it('should default actor to 待定 when not provided', () => {
@@ -1036,7 +988,7 @@ describe('markAllPending', () => {
 
       addContextNode({ name: 'C1', description: '', type: 'core' });
       const nodes = useCanvasStore.getState().contextNodes;
-      console.log('[TEST4] nodes:', nodes.length, 'confirmed:', nodes.map(n => n.confirmed));
+      console.log('[TEST4] nodes:', nodes.length, 'confirmed:', nodes.map(n => n.isActive));
       confirmContextNode(nodes[0].nodeId);
       const afterConfirm = useCanvasStore.getState();
       console.log('[TEST4] After confirm:', 'activeTree:', afterConfirm.activeTree, 'centerExpand:', afterConfirm.centerExpand, '_prevActiveTree:', afterConfirm._prevActiveTree);

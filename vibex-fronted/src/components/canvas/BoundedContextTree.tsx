@@ -123,7 +123,6 @@ interface NodeEditState {
 
 interface ContextCardProps {
   node: BoundedContextNode;
-  onConfirm: (nodeId: string) => void;
   onEdit: (nodeId: string, data: Partial<BoundedContextNode>) => void;
   onDelete: (nodeId: string) => void;
   readonly?: boolean;
@@ -133,7 +132,7 @@ interface ContextCardProps {
   onToggleSelect?: (nodeId: string) => void;
 }
 
-function ContextCard({ node, onConfirm, onEdit, onDelete, readonly, selected, onToggleSelect }: ContextCardProps) {
+function ContextCard({ node, onEdit, onDelete, readonly, selected, onToggleSelect }: ContextCardProps) {
   const [editing, setEditing] = useState(false);
   const [editState, setEditState] = useState<NodeEditState>({
     nodeId: node.nodeId,
@@ -240,17 +239,7 @@ function ContextCard({ node, onConfirm, onEdit, onDelete, readonly, selected, on
                     ? '通用'
                     : '外部'}
             </div>
-            {/* S1.2: Confirmation checkbox moved BEFORE description (before h4) */}
-            {!readonly && (
-              <input
-                type="checkbox"
-                checked={node.confirmed}
-                onChange={() => onConfirm(node.nodeId)}
-                aria-label={`确认 ${node.name}`}
-                className={styles.confirmCheckbox}
-              />
-            )}
-          </div>
+                    </div>
           <h4 className={styles.nodeCardTitle}>{node.name}</h4>
           <p className={styles.nodeCardDesc}>{node.description}</p>
           {!readonly && (
@@ -352,7 +341,6 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
   const addContextNode = useCanvasStore((s) => s.addContextNode);
   const editContextNode = useCanvasStore((s) => s.editContextNode);
   const deleteContextNode = useCanvasStore((s) => s.deleteContextNode);
-  const confirmContextNode = useCanvasStore((s) => s.confirmContextNode);
   const setContextNodes = useCanvasStore((s) => s.setContextNodes);
   const advancePhase = useCanvasStore((s) => s.advancePhase);
 
@@ -437,20 +425,11 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
   );
 
   const handleConfirmAll = useCallback(() => {
-    // Collect all node IDs that need confirming before mutating store
-    const unconfirmedIds = contextNodes.filter((n) => !n.confirmed).map((n) => n.nodeId);
-
-    // Confirm each unconfirmed node (triggers autoGenerateFlows when last one is confirmed)
-    unconfirmedIds.forEach((nodeId) => {
-      confirmContextNode(nodeId);
-    });
-
-    // Always advance phase when user clicks — button is visible when hasNodes
-    // (not just allConfirmed, so clicking always works)
+      // Advance phase (no confirm gating in Epic 3)
     advancePhase();
-  }, [contextNodes, confirmContextNode, advancePhase]);
+  }, [contextNodes, advancePhase]);
 
-  const allConfirmed = contextNodes.length > 0 && contextNodes.every((n) => n.confirmed);
+  const allConfirmed = contextNodes.length > 0 && contextNodes.every((n) => n.isActive !== false);
   const hasNodes = contextNodes.length > 0;
 
   // F4: Drag selection (框选) — uses same containerRef
@@ -626,13 +605,11 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
                   type={type}
                   nodes={groupNodes}
                   readonly={readonly}
-                  onConfirm={confirmContextNode}
                   onEdit={editContextNode}
                   onDelete={deleteContextNode}
                   renderCard={(props) => (
                     <ContextCard
                       node={props.node}
-                      onConfirm={props.onConfirm}
                       onEdit={props.onEdit}
                       onDelete={props.onDelete}
                       readonly={props.readonly}

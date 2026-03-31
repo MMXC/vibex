@@ -93,7 +93,7 @@ export const useMessageDrawerStore = create<MessageDrawerState>()(
 );
 
 // ── Epic 1 F1.4: Helper — 联动 canvasStore 节点操作 ────────────────────────
-// 在 canvasStore 的 addContextNode / confirmContextNode / deleteContextNode 等函数中调用
+// 在 canvasStore 的 addContextNode / deleteContextNode 等函数中调用
 export function addNodeMessage(
   action: 'add' | 'confirm' | 'delete',
   nodeType: 'context' | 'flow' | 'component',

@@ -32,7 +32,6 @@ jest.mock('@/lib/canvas/canvasStore', () => ({
       addComponentNode: jest.fn(),
       editComponentNode: jest.fn(),
       deleteComponentNode: jest.fn(),
-      confirmComponentNode: jest.fn(),
       setComponentNodes: jest.fn(),
       flowNodes: mockFlowNodes,
       setPhase: jest.fn(),
@@ -54,7 +53,7 @@ const mockFlowNodes: BusinessFlowNode[] = [
     contextId: 'ctx-1',
     name: '用户登录流程',
     steps: [],
-    confirmed: true,
+    isActive: true,
     status: 'confirmed',
     children: [],
   },
@@ -63,7 +62,7 @@ const mockFlowNodes: BusinessFlowNode[] = [
     contextId: 'ctx-1',
     name: '订单管理流程',
     steps: [],
-    confirmed: true,
+    isActive: true,
     status: 'confirmed',
     children: [],
   },
@@ -80,7 +79,7 @@ const mockComponentNodes: ComponentNode[] = [
     props: { size: 'md' },
     api: { method: 'GET', path: '/api/modal' },
     children: [],
-    confirmed: false,
+    isActive: false,
     status: 'pending',
   },
   {
@@ -91,7 +90,7 @@ const mockComponentNodes: ComponentNode[] = [
     props: {},
     api: { method: 'POST', path: '/api/form' },
     children: [],
-    confirmed: false,
+    isActive: false,
     status: 'pending',
   },
   {
@@ -102,7 +101,7 @@ const mockComponentNodes: ComponentNode[] = [
     props: {},
     api: { method: 'GET', path: '/api/common' },
     children: [],
-    confirmed: false,
+    isActive: false,
     status: 'pending',
   },
   // Page-specific components
@@ -114,7 +113,7 @@ const mockComponentNodes: ComponentNode[] = [
     props: { layout: 'full-width' },
     api: { method: 'POST', path: '/api/login' },
     children: [],
-    confirmed: false,
+    isActive: false,
     status: 'pending',
   },
   {
@@ -125,7 +124,7 @@ const mockComponentNodes: ComponentNode[] = [
     props: {},
     api: { method: 'GET', path: '/api/login' },
     children: [],
-    confirmed: false,
+    isActive: false,
     status: 'pending',
   },
   {
@@ -136,7 +135,7 @@ const mockComponentNodes: ComponentNode[] = [
     props: { layout: 'container' },
     api: { method: 'GET', path: '/api/orders' },
     children: [],
-    confirmed: false,
+    isActive: false,
     status: 'pending',
   },
 ];
@@ -307,7 +306,7 @@ describe('E2: Common Component Grouping', () => {
           props: {},
           api: { method: 'GET', path: '/api/modal' },
           children: [],
-          confirmed: false,
+          isActive: false,
           status: 'pending',
         },
       ];
@@ -330,7 +329,7 @@ describe('E2: Common Component Grouping', () => {
           props: {},
           api: { method: 'GET', path: '/api/login' },
           children: [],
-          confirmed: false,
+          isActive: false,
           status: 'pending',
         },
       ];

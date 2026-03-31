@@ -12,6 +12,7 @@ import { createAIService } from '@/services/ai-service';
 import { getLocalEnv as getCloudflareEnv } from '@/lib/env';
 import { generateId } from '@/lib/db';
 import type { BoundedContext } from '@/services/context/types';
+import { validateContexts } from '@/lib/canvas-validation';
 
 interface BusinessFlowResponse {
   id: string;
@@ -68,16 +69,22 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateF
   try {
     const body = await request.json().catch(() => null);
 
-    if (!body || !Array.isArray(body.contexts) || body.contexts.length === 0) {
+    // Epic 2: 使用 canvas-validation 中间件校验请求
+    const validation = validateContexts(body?.contexts);
+    if (!validation.valid) {
       return NextResponse.json(
-        { success: false, flows: [] as BusinessFlowResponse[], generationId: '', confidence: 0, error: 'contexts 不能为空' },
+        {
+          success: false,
+          flows: [] as BusinessFlowResponse[],
+          generationId: '',
+          confidence: 0,
+          error: validation.issues.map((i) => i.message).join('; '),
+        },
         { status: 400 }
       );
     }
 
-    const { contexts } = body as {
-      contexts: BoundedContext[];
-    };
+    const contexts = body.contexts as BoundedContext[];
 
     const env = getCloudflareEnv();
     const aiService = createAIService(env);

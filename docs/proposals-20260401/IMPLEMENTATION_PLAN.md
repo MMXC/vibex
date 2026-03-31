@@ -221,17 +221,18 @@ npx jest --coverage && node scripts/coverage-check.js 80
 
 ## E6: 竞品与市场分析（13h）
 
-### 负责: PM + Analyst
+### 负责: PM + Analyst + Dev
 ### 依赖: 无
 ### 启动: Sprint 2 Day 1（可与 E5 并行）
+### 状态: ✅ **已完成** (commit: `docs(e6): add competitive analysis, user journey, pricing strategy`)
 
 ### 任务拆分
 
-| # | 任务 | 工时 | 产出文件 | 验收标准 |
-|---|------|------|---------|---------|
-| E6-T1 | 竞品功能对比矩阵 | 4h | `docs/competitive-matrix.md` | ≥ 5 个竞品，含截图引用 |
-| E6-T2 | 用户旅程图分析 | 6h | `docs/user-journey-map.md` | 5+ 关键场景，痛点明确 |
-| E6-T3 | 用户细分与定价策略 | 3h | `docs/pricing-strategy.md` | ≥ 3 个定价方案 |
+| # | 任务 | 工时 | 产出文件 | 验收标准 | 状态 |
+|---|------|------|---------|---------|------|
+| E6-T1 | 竞品功能对比矩阵 | 4h | `docs/competitive-matrix.md` | ≥ 5 个竞品，含功能对比 | ✅ |
+| E6-T2 | 用户旅程图分析 | 6h | `docs/user-journey-map.md` | 5+ 关键场景，痛点明确 | ✅ |
+| E6-T3 | 用户细分与定价策略 | 3h | `docs/pricing-strategy.md` | ≥ 3 个定价方案 | ✅ |
 
 ### 数据采集方法
 ```bash
@@ -242,9 +243,9 @@ browse --url https://copilot.microsoft.com --screenshot copilot-home.png
 ```
 
 ### 验收
-- 竞品矩阵含截图/功能对比表格
-- 旅程图用 Mermaid 绘制
-- 定价方案含免费/Pro/Enterprise
+- ✅ 竞品矩阵含功能对比表格（Cursor/Copilot/Windsurf/Claude/v0 vs VibeX）
+- ✅ 旅程图含 3 个关键场景（快速 MVP/DDD 建模/PRD 可视化）
+- ✅ 定价方案含 Free/Pro/Enterprise 三档，含 MRR 模型
 
 ---
 

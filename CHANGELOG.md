@@ -1,3 +1,8 @@
+### Fixed (vibex-tree-panels-height Epic1: 面板高度修复) — 2026-03-31
+- **修复**: .treePanelsGrid 添加 `flex: 1` + `min-height: 0` 解决面板高度为0问题
+- **验证**: gstack snapshot 确认三栏面板 (context/flow/component) 均可见
+- **提交**: `9f214051` (Epic5 layout), `dc442611` (verification)
+
 ### Added (canvas-drawer-persistent Epic2: 左抽屉实现) — 2026-03-31
 - **LeftDrawer**: 200px 可折叠展开，sessionStorage 历史（最多5条）
 - **requirementHistoryStore**: 会话存储需求历史

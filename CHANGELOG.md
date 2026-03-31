@@ -18,6 +18,14 @@
 - **提交**: `700d1acf`
 - **审查**: ✅ PASSED (reviewer-epic1-d001-eslintfix)
 
+### Added (vibex-contract-testing Epic4: CI 契约测试) — 2026-03-31
+- **测试**: canvas-contract.test.ts — 11 tests 覆盖 F4.1-F4.11
+- **验证**: Valid/invalid contexts, Core context requirement, Field validation, Response shape
+- **修复**: 添加 '管理' 到 forbiddenNames，更新相关测试
+- **测试**: backend jest 528/528 ✅
+- **提交**: `59d7570c`, `c64604a2`
+- **审查**: ✅ PASSED (reviewer-epic4-cicontracttest)
+
 ### Added (vibex-contract-testing Epic3: Canvas API 响应校验) — 2026-03-31
 - **前端校验**: canvasApi.ts 添加响应校验函数
 - **函数**: `isValidGenerateContextsResponse`, `isValidGenerateFlowsResponse`, `isValidGenerateComponentsResponse`

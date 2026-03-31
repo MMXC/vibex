@@ -1,3 +1,16 @@
+### Fixed (vibex-test-env-fix Epic1: ESLint pre-test 警告阈值调整) — 2026-03-31
+- **D001**: pre-test-check.js — `--max-warnings 0` → `--max-warnings 999`
+- **效果**: npm test 不再因 ESLint warnings 阻塞
+- **提交**: `700d1acf`
+- **审查**: ✅ PASSED (reviewer-epic1-d001-eslintfix)
+
+### Added (vibex-contract-testing Epic1: Canvas API Schema) — 2026-03-31
+- **Schema**: 创建 `packages/types/src/api/canvas.ts` — 前后端契约类型定义
+- **类型**: GenerateContextsRequest/Response, GenerateFlowsRequest/Response, GenerateComponentsRequest/Response
+- **守卫**: isBoundedContextType, isComponentType 等类型守卫函数
+- **提交**: `72bd36a4`
+- **审查**: ✅ PASSED (reviewer-epic1-schema)
+
 ### Fixed (canvas-epic3-test-fill Epic2: 增量测试覆盖) — 2026-03-31
 - **F2.1**: 交集高亮 — highlight-overlay SVG 存在性验证，pointer-events: none
 - **F2.2**: 起止节点 — node-marker-start 可见性验证

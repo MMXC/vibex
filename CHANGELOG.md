@@ -1,3 +1,11 @@
+### Added (canvas-scrolltop-reset E1: 画布滚动+快捷键) — 2026-04-01
+- **TreePanel scroll reset**: 展开 TreePanel 时重置 panelBodyRef.scrollTop = 0
+- **Ctrl+G quick generate**: 快捷键触发需求→Context→Flow→Component 级联生成
+- **useCallback quickGenerate**: CanvasPage quickGenerate 带 6 deps + toast feedback + isGenerating guard
+- **rAF×2 scroll reset**: requestAnimationFrame×2 确保滚动重置
+- **E2E 测试**: canvas-scroll.spec.ts, quick-generate.spec.ts, tree-panel-scroll.spec.ts
+- **提交**: `fbf3f213`, `bab5981a`, `0d902e30`
+
 ### Added (canvas-scroll-top-bug E1: 画布滚动位置重置) — 2026-04-01
 - **scrollTop reset**: CanvasPage mount 时重置 scrollTop = 0
 - **scrollTo API**: 使用 scrollTo({ top: 0, left: 0, behavior: 'instant' })

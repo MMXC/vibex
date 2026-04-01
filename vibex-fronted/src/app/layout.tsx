@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import AppErrorBoundary from '@/components/common/AppErrorBoundary';
 import { ToastProvider } from '@/components/ui/Toast';
 import { QueryProvider } from '@/lib/query/QueryProvider';
 // OnboardingProvider removed - 2026-03-27
@@ -38,9 +38,9 @@ export default function RootLayout({
         <ToastProvider>
           <DDDStoreInitializer />
           <QueryProvider>
-            <ErrorBoundary>
+            <AppErrorBoundary>
               {children}
-            </ErrorBoundary>
+            </AppErrorBoundary>
           </QueryProvider>
         </ToastProvider>
       </body>

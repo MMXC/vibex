@@ -5,7 +5,7 @@ import {
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { listTools } from './tools/list.js';
-import { executeTool } from './tools/execute.js';
+import { executeTool, type ToolName } from './tools/execute.js';
 
 const server = new Server(
   { name: 'vibex-mcp-server', version: '0.1.0' },
@@ -17,7 +17,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 });
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  return executeTool(request.params.name, request.params.arguments);
+  return executeTool(request.params.name as ToolName, request.params.arguments ?? {});
 });
 
 async function main() {

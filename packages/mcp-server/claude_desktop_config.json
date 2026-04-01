@@ -3,7 +3,7 @@
     "vibex": {
       "command": "node",
       "args": ["./dist/index.js"],
-      "cwd": "/path/to/vibex/packages/mcp-server"
+      "cwd": "/absolute/path/to/vibex/packages/mcp-server"
     }
   }
 }

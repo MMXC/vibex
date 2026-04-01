@@ -9,7 +9,7 @@ export interface VibeXTool {
 export function listTools(): Tool[] {
   return [
     {
-      name: 'create_project',
+      name: 'createProject',
       description: 'Create a new VibeX project from a PRD description',
       inputSchema: {
         type: 'object',
@@ -21,7 +21,7 @@ export function listTools(): Tool[] {
       },
     },
     {
-      name: 'get_project',
+      name: 'getProject',
       description: 'Get project details and status',
       inputSchema: {
         type: 'object',
@@ -32,7 +32,7 @@ export function listTools(): Tool[] {
       },
     },
     {
-      name: 'list_components',
+      name: 'listComponents',
       description: 'List all components in a project',
       inputSchema: {
         type: 'object',
@@ -43,7 +43,7 @@ export function listTools(): Tool[] {
       },
     },
     {
-      name: 'generate_code',
+      name: 'generateCode',
       description: 'Generate code for a component',
       inputSchema: {
         type: 'object',

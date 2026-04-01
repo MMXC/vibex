@@ -1,4 +1,11 @@
 # Changelog
+### E2: Heartbeat Scanner + Changelog Gen (proposals-20260401-3)
+- **E2-T1** — Ghost task detection: 60min 无进展任务识别
+- **E2-T2** — Fake done detection: 缺少 output 的 done 任务检测
+- **E2-T3** — changelog-gen CLI: scripts/changelog-gen.ts，自动生成 CHANGELOG
+- **E2-T4** — commit-msg hook: .githooks/commit-msg conventional commit 验证
+- Commit: `bbb361aa`
+
 ### E1: Proposal Dedup + ErrorBoundary (proposals-20260401-3)
 - **E1-T1** — NotificationDedup: scripts/notification-dedup.ts，30min TTL hash 去重
 - **E1-T2** — AppErrorBoundary: vibex-fronted/src/components/common/AppErrorBoundary.tsx，React error boundary

@@ -414,9 +414,10 @@ function FlowCard({
     setEditing(false);
   }, [node.name]);
 
-  const activeSteps = node.steps.filter((s) => s.isActive !== false).length;
-  const totalSteps = node.steps.length;
-  const stepIds = node.steps.map((s) => s.stepId);
+  const nodeSteps = node.steps ?? [];
+  const activeSteps = nodeSteps.filter((s) => s.isActive !== false).length;
+  const totalSteps = nodeSteps.length;
+  const stepIds = nodeSteps.map((s) => s.stepId);
 
   const statusClass =
     node.status === 'confirmed'

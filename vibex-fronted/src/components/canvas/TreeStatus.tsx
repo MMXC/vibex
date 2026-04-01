@@ -19,9 +19,9 @@ export function TreeStatus() {
   const flowNodes = useCanvasStore((s) => s.flowNodes);
   const componentNodes = useCanvasStore((s) => s.componentNodes);
 
-  const activeContexts = contextNodes.filter((n) => n.isActive !== false).length;
-  const activeFlows = flowNodes.filter((n) => n.isActive !== false).length;
-  const activeComponents = componentNodes.filter((n) => n.isActive !== false).length;
+  const activeContexts = (contextNodes ?? []).filter((n) => n.isActive !== false).length;
+  const activeFlows = (flowNodes ?? []).filter((n) => n.isActive !== false).length;
+  const activeComponents = (componentNodes ?? []).filter((n) => n.isActive !== false).length;
 
   return (
     <div className={styles.treeStatus} data-testid="tree-status" aria-label="三树进度状态">

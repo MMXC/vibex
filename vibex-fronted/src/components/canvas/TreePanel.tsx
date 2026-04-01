@@ -71,6 +71,7 @@ export function TreePanel({
   actions,
   onNodeClick,
 }: TreePanelProps) {
+  const safeNodes = nodes ?? [];
   const [_isAnimating, setIsAnimating] = useState(false);
   const panelBodyRef = useRef<HTMLDivElement>(null);
 
@@ -80,7 +81,7 @@ export function TreePanel({
     setTimeout(() => setIsAnimating(false), 300);
   };
 
-  const activeCount = nodes.filter((n) => n.isActive !== false).length;
+  const activeCount = (nodes ?? []).filter((n) => n.isActive !== false).length;
   const activeClass = isActive ? styles.treePanelActive : styles.treePanelDimmed;
   const treeColor = TREE_COLORS[tree];
   const treeIcon = TREE_ICONS[tree];
@@ -119,7 +120,7 @@ export function TreePanel({
         </span>
         <span className={styles.treePanelTitle}>{title}</span>
         <span className={styles.treePanelBadge}>
-          {activeCount}/{nodes.length}
+          {activeCount}/{safeNodes.length}
         </span>
         <span
           className={`${styles.treePanelChevron} ${collapsed ? styles.chevronCollapsed : ''}`}
@@ -133,7 +134,7 @@ export function TreePanel({
       {!collapsed && (
         <div className={styles.treePanelBody} ref={panelBodyRef}>
           {/* Summary when no nodes */}
-          {nodes.length === 0 && (
+          {safeNodes.length === 0 && (
             <div className={styles.treePanelEmpty}>
               <span style={{ color: treeColor }}>{treeIcon}</span>
               <p>暂无节点</p>
@@ -151,7 +152,7 @@ export function TreePanel({
           {actions && <div className={styles.treePanelActions}>{actions}</div>}
 
           {/* Children rendered tree */}
-          {nodes.length > 0 && children}
+          {safeNodes.length > 0 && children}
 
           {/* Action buttons (shown when active) */}
           {isActive && onNodeConfirm && (
@@ -161,7 +162,7 @@ export function TreePanel({
           )}
 
           {/* E2-F12: MiniMap — only show when there are nodes, hide on mobile */}
-          {nodes.length > 0 && (
+          {safeNodes.length > 0 && (
             <MiniMapWidget
               nodes={nodes}
               treeType={tree}
@@ -172,15 +173,15 @@ export function TreePanel({
       )}
 
       {/* Collapsed Summary */}
-      {collapsed && nodes.length > 0 && (
+      {collapsed && safeNodes.length > 0 && (
         <div className={styles.treePanelCollapsedSummary}>
-          {nodes.slice(0, 3).map((n) => (
+          {safeNodes.slice(0, 3).map((n) => (
             <span key={n.id} className={styles.treePanelSummaryNode}>
               {n.label}
             </span>
           ))}
-          {nodes.length > 3 && (
-            <span className={styles.treePanelSummaryMore}>+{nodes.length - 3}</span>
+          {safeNodes.length > 3 && (
+            <span className={styles.treePanelSummaryMore}>+{safeNodes.length - 3}</span>
           )}
         </div>
       )}
@@ -205,6 +206,7 @@ interface MiniMapWidgetProps {
  * 移动端隐藏
  */
 function MiniMapWidget({ nodes, treeType, onNodeClick }: MiniMapWidgetProps) {
+  const safeNodes = nodes ?? [];
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -219,7 +221,7 @@ function MiniMapWidget({ nodes, treeType, onNodeClick }: MiniMapWidgetProps) {
   const treeColor = TREE_COLORS[treeType];
   const MAX_VISIBLE_DOTS = 30;
   const visibleNodes = nodes.slice(0, MAX_VISIBLE_DOTS);
-  const overCount = nodes.length - MAX_VISIBLE_DOTS;
+  const overCount = safeNodes.length - MAX_VISIBLE_DOTS;
 
   // Layout dots in a grid
   const COLS = 10;
@@ -233,8 +235,8 @@ function MiniMapWidget({ nodes, treeType, onNodeClick }: MiniMapWidgetProps) {
   return (
     <div
       className={styles.minimapWidget}
-      title={`${nodes.length} 个节点，点击跳转`}
-      aria-label={`${treeType} 树 MiniMap，${nodes.length} 个节点`}
+      title={`${safeNodes.length} 个节点，点击跳转`}
+      aria-label={`${treeType} 树 MiniMap，${safeNodes.length} 个节点`}
     >
       <div className={styles.minimapHeader}>
         <span
@@ -245,7 +247,7 @@ function MiniMapWidget({ nodes, treeType, onNodeClick }: MiniMapWidgetProps) {
           {TREE_ICONS[treeType]}
         </span>
         <span className={styles.minimapTitle}>导航地图</span>
-        <span className={styles.minimapCount}>{nodes.length}</span>
+        <span className={styles.minimapCount}>{safeNodes.length}</span>
       </div>
 
       <div

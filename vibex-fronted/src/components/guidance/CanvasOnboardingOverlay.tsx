@@ -84,27 +84,7 @@ export const CanvasOnboardingOverlay = memo(function CanvasOnboardingOverlay() {
   // Don't render if onboarding is completed or dismissed
   if (completed || dismissed) return null;
 
-  // Auto-start onboarding for first-time canvas users (outside if to obey Rules of Hooks)
-  useEffect(() => {
-    if (currentStep !== 0) return; // already started
-    const canvasOnboarded = localStorage.getItem('vibex-canvas-onboarded');
-    if (!canvasOnboarded) {
-      const timer = setTimeout(() => {
-        startCanvasOnboarding();
-      }, 800);
-      return () => clearTimeout(timer);
-    }
-  }, [currentStep, startCanvasOnboarding]);
-
-  // Don't render if onboarding hasn't started yet
-  if (currentStep === 0) {
-    return null;
-  }
-
-  const stepData = ONBOARDING_STEPS[currentStep - 1];
-  const isFirstStep = currentStep === 1;
-  const isLastStep = currentStep === ONBOARDING_STEPS.length;
-
+  // Define all callbacks BEFORE any early returns to obey Rules of Hooks
   const handleDismiss = useCallback(() => {
     localStorage.setItem('vibex-canvas-onboarded', 'true');
     dismissCanvasOnboarding();
@@ -123,6 +103,18 @@ export const CanvasOnboardingOverlay = memo(function CanvasOnboardingOverlay() {
     prevOnboardingStep();
   }, [prevOnboardingStep]);
 
+  // Auto-start onboarding for first-time canvas users
+  useEffect(() => {
+    if (currentStep !== 0) return; // already started
+    const canvasOnboarded = localStorage.getItem('vibex-canvas-onboarded');
+    if (!canvasOnboarded) {
+      const timer = setTimeout(() => {
+        startCanvasOnboarding();
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [currentStep, startCanvasOnboarding]);
+
   // Keyboard navigation
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -137,6 +129,15 @@ export const CanvasOnboardingOverlay = memo(function CanvasOnboardingOverlay() {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleDismiss, handleNext, handlePrev]);
+
+  // Don't render if onboarding hasn't started yet
+  if (currentStep === 0) {
+    return null;
+  }
+
+  const stepData = ONBOARDING_STEPS[currentStep - 1];
+  const isFirstStep = currentStep === 1;
+  const isLastStep = currentStep === ONBOARDING_STEPS.length;
 
   return (
     <div

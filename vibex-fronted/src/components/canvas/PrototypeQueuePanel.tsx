@@ -174,11 +174,12 @@ export function PrototypeQueuePanel({ expanded, onToggleExpand }: PrototypeQueue
   }, [projectId]);
 
   // === Computed stats ===
-  const total = prototypeQueue.length;
-  const done = prototypeQueue.filter((p) => p.status === 'done').length;
-  const generating = prototypeQueue.filter((p) => p.status === 'generating').length;
-  const queued = prototypeQueue.filter((p) => p.status === 'queued').length;
-  const errors = prototypeQueue.filter((p) => p.status === 'error').length;
+  const queue = prototypeQueue ?? [];
+  const total = queue.length;
+  const done = queue.filter((p) => p.status === 'done').length;
+  const generating = queue.filter((p) => p.status === 'generating').length;
+  const queued = queue.filter((p) => p.status === 'queued').length;
+  const errors = queue.filter((p) => p.status === 'error').length;
   const allDone = total > 0 && done === total;
   const progress = total > 0 ? Math.round((done / total) * 100) : 0;
 
@@ -274,7 +275,7 @@ export function PrototypeQueuePanel({ expanded, onToggleExpand }: PrototypeQueue
 
             {/* Queue list */}
             <ul className={styles.queueList} role="list" aria-label="原型生成队列">
-              {prototypeQueue.map((page) => (
+              {queue.map((page) => (
                 <QueueItem
                   key={page.pageId}
                   page={page}

@@ -37,6 +37,7 @@ import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
 import { MessageDrawer } from './messageDrawer/MessageDrawer';
 import { LeftDrawer } from './leftDrawer/LeftDrawer';
 import { ShortcutBar } from '@/components/guidance/ShortcutBar';
+import { UndoBar } from '@/components/undo-bar/UndoBar';
 import { CanvasOnboardingOverlay } from '@/components/guidance/CanvasOnboardingOverlay';
 import { NodeTooltip } from '@/components/guidance/NodeTooltip';
 import type { Phase, TreeType, TreeNode } from '@/lib/canvas/types';
@@ -1124,6 +1125,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
       />
 
       {/* E4: Canvas Guidance System */}
+      <UndoBar />
       <ShortcutBar onOpenShortcutPanel={toggleShortcutPanel} />
       <CanvasOnboardingOverlay />
       <NodeTooltip />

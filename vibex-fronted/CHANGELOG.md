@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+### E2: 回滚 SOP + 功能开关 (proposals-20260401-2)
+- **E2-T1** — 回滚 SOP: docs/process/ROLLBACK_SOP.md，阶段任务回滚标准操作程序
+- **E2-T2** — Epic DoD 模板: docs/process/EPIC_DOD_TEMPLATE.md，标准化 Definition of Done
+- **E2-T3** — 功能开关: vibex-fronted/src/lib/featureFlags.ts，FF_KILL_SWITCH / FF_... 枚举
+- Commit: `a2155ffd`
+
 ### E1: 开发环境阻塞修复 (proposals-20260401)
 - **E1-T1** — Backend npm workspace + tsconfig 测试文件排除: `exclude **/*.test.ts, **/__tests__/, coverage/, .next/`
 - **E1-T2** — Frontend TS pre-test 修复: tsconfig strict 模式验证通过

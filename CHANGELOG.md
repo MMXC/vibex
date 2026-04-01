@@ -1,3 +1,9 @@
+### Added (canvas-scroll-reset-fix-v2 E1: rAF 防御性修复) — 2026-04-01
+- **rAF 双重保证**: requestAnimationFrame(() => requestAnimationFrame(resetScroll))
+- **cancelAnimationFrame cleanup**: 避免内存泄漏
+- **E2E 测试**: canvas-scroll-reset.spec.ts 覆盖多种进入场景
+- **提交**: `0d902e30`, `44f55e89`
+
 ### Added (proposals-20260401-5 E1: DDD 命名规范 + Tab 快捷键) — 2026-04-01
 - **DDD 命名规范文档**: docs/ddd-naming-convention.md 含 @owner/@updated 元数据
 - **Alt+1/2/3 切换**: 快捷键切换 Context/Flow/Component 面板

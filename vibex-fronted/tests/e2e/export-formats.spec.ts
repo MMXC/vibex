@@ -6,35 +6,36 @@ test.describe('Export Formats', () => {
   });
 
   test('export panel contains PNG option', async ({ page }) => {
-    const pngOption = page.locator('text=PNG 图片');
+    const pngOption = page.locator('[data-testid="format-card-png"]');
     await expect(pngOption).toBeVisible();
   });
 
   test('export panel contains SVG option', async ({ page }) => {
-    const svgOption = page.locator('text=SVG 矢量图');
+    const svgOption = page.locator('[data-testid="format-card-svg"]');
     await expect(svgOption).toBeVisible();
   });
 
   test('export panel contains ZIP option', async ({ page }) => {
-    const zipOption = page.locator('text=ZIP 压缩包');
+    const zipOption = page.locator('[data-testid="format-card-zip"]');
     await expect(zipOption).toBeVisible();
   });
 
   test('PNG format card is selectable', async ({ page }) => {
-    const pngCard = page.locator('text=PNG 图片').first();
+    const pngCard = page.locator('[data-testid="format-card-png"]');
     await pngCard.click();
-    await expect(pngCard).toHaveClass(/selected/i);
+    // Verify selection by checking for selectedBadge
+    await expect(page.locator('[data-testid="format-card-png"] .selectedBadge')).toBeVisible();
   });
 
   test('SVG format card is selectable', async ({ page }) => {
-    const svgCard = page.locator('text=SVG 矢量图').first();
+    const svgCard = page.locator('[data-testid="format-card-svg"]');
     await svgCard.click();
-    await expect(svgCard).toHaveClass(/selected/i);
+    await expect(page.locator('[data-testid="format-card-svg"] .selectedBadge')).toBeVisible();
   });
 
   test('ZIP format card is selectable', async ({ page }) => {
-    const zipCard = page.locator('text=ZIP 压缩包').first();
+    const zipCard = page.locator('[data-testid="format-card-zip"]');
     await zipCard.click();
-    await expect(zipCard).toHaveClass(/selected/i);
+    await expect(page.locator('[data-testid="format-card-zip"] .selectedBadge')).toBeVisible();
   });
 });

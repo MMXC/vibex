@@ -280,6 +280,7 @@ export default function Export() {
                 {exportFormats.map((format) => (
                   <div
                     key={format.id}
+                    data-testid={`format-card-${format.id}`}
                     onClick={() => setSelectedFormat(format.id)}
                     className={`${styles.formatCard} ${selectedFormat === format.id ? styles.formatCardSelected : ''}`}
                   >

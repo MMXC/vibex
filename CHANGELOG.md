@@ -1,3 +1,10 @@
+### Added (proposals-20260401-6 E2: 代码质量审查) — 2026-04-01
+- **TS 严格模式**: Batch 1-5 新增代码 TypeScript 0 error
+- **ESLint 检查**: 新增代码 ESLint 0 warning
+- **键盘冲突检查**: Ctrl+G / Alt+1/2/3 无冲突
+- **内存泄漏检查**: rAF/eventListener 有对应 cleanup
+- **验证类型**: 无新代码提交，依赖现有代码审查
+
 ### Added (proposals-20260401-6 E1: PNG/SVG/ZIP 批量导出) — 2026-04-01
 - **PNG/SVG/ZIP 导出**: export panel 增加三种导出格式选项
 - **format cards data-testid**: data-testid='format-card-{id}' 便于测试

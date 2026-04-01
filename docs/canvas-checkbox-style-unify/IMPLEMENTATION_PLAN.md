@@ -176,10 +176,10 @@ npm test -- --testPathPattern="BoundedContextTree|ComponentTree" --coverage 2>&1
 ### 步骤 T3: 视觉验证
 
 使用 `/browse` 技能打开 Canvas 页面，验证：
-- [ ] ContextTree 节点只有 1 个 checkbox
-- [ ] ComponentTree checkbox 在 type badge 前
-- [ ] 未确认节点无黄色边框
-- [ ] 确认节点显示绿色 ✓
+- [x] ContextTree 节点只有 1 个 checkbox ✅ (commit 834e83b9)
+- [x] ComponentTree checkbox 在 type badge 前 ✅ (commit 18fcdc7a)
+- [x] 未确认节点无黄色边框 ✅ (commit 02b638a2)
+- [x] 确认节点显示绿色 ✓ ✅ (commit 834e83b9)
 
 ---
 
@@ -195,11 +195,11 @@ npm test -- --testPathPattern="BoundedContextTree|ComponentTree" --coverage 2>&1
 
 ## 验收清单
 
-- [ ] `npm run build` 编译通过
+- [x] `npm run build` 编译通过 ✅
 - [ ] `npm test` 所有测试通过
-- [ ] E1: ContextTree 只有 1 个 checkbox，位置在 type badge 前
-- [ ] E1: 确认节点显示绿色 ✓
-- [ ] E2: ComponentTree checkbox 在 type badge 前，inline
+- [x] E1: ContextTree 只有 1 个 checkbox，位置在 type badge 前 ✅ (834e83b9)
+- [x] E1: 确认节点显示绿色 ✓ ✅ (834e83b9)
+- [x] E2: ComponentTree checkbox 在 type badge 前，inline ✅ (18fcdc7a)
 - [x] E3: 未确认节点无黄色边框 ✅ (commit 02b638a2)
 - [ ] E4: FlowTree 显示绿色 ✓（可选）
 - [ ] 覆盖率 > 80%

@@ -1,3 +1,9 @@
+### Added (proposals-20260401-7: Sprint 复盘与规划) — 2026-04-01
+- **Sprint 1 复盘文档**: docs/retrospectives/2026-04-01.md
+- **Sprint 2 PRD**: 下个 Sprint 规划 (≥3 Epic)
+- **技术债清理计划**: tech-debt.md 含责任人
+- **提交**: `3e27fa08`
+
 ### Added (proposals-20260401-6 E2: 代码质量审查) — 2026-04-01
 - **TS 严格模式**: Batch 1-5 新增代码 TypeScript 0 error
 - **ESLint 检查**: 新增代码 ESLint 0 warning

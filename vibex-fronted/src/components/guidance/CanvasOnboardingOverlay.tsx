@@ -84,20 +84,20 @@ export const CanvasOnboardingOverlay = memo(function CanvasOnboardingOverlay() {
   // Don't render if onboarding is completed or dismissed
   if (completed || dismissed) return null;
 
+  // Auto-start onboarding for first-time canvas users (outside if to obey Rules of Hooks)
+  useEffect(() => {
+    if (currentStep !== 0) return; // already started
+    const canvasOnboarded = localStorage.getItem('vibex-canvas-onboarded');
+    if (!canvasOnboarded) {
+      const timer = setTimeout(() => {
+        startCanvasOnboarding();
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [currentStep, startCanvasOnboarding]);
+
   // Don't render if onboarding hasn't started yet
   if (currentStep === 0) {
-    // Auto-start onboarding for first-time canvas users
-    // Use a separate localStorage key to detect first canvas visit
-    useEffect(() => {
-      const canvasOnboarded = localStorage.getItem('vibex-canvas-onboarded');
-      if (!canvasOnboarded) {
-        // Small delay to let the page render first
-        const timer = setTimeout(() => {
-          startCanvasOnboarding();
-        }, 800);
-        return () => clearTimeout(timer);
-      }
-    }, [startCanvasOnboarding]);
     return null;
   }
 

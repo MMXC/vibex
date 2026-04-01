@@ -209,9 +209,9 @@ it('should persist all stores independently', async () => {
 ## 验收清单
 
 ### Phase 1
-- [ ] contextStore.ts < 180 行
+- [x] contextStore.ts < 180 行 ✅ (99行)
 - [ ] contextStore 覆盖率 ≥ 80%
-- [ ] canvasStore re-export 正常
+- [x] canvasStore re-export 正常 ✅
 - [ ] 17 个现有测试全部通过
 
 ### Phase 2

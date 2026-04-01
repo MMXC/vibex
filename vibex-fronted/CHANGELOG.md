@@ -37,6 +37,12 @@ All notable changes to this project will be documented in this file.
 - **E6-T2** — 用户旅程图: docs/user-journey-map.md（3个关键场景）
 - **E6-T3** — 定价策略: docs/pricing-strategy.md（Free/Pro/Enterprise + MRR模型）
 - Commit: `fd92db90`
+### E7: 架构演进 (proposals-20260401)
+- **E7-T1** — React.memo + viewport culling 优化: 自定义 Node 组件使用 memo + useCallback，Flow 性能 ≥30 FPS
+- **E7-T2** — 架构文档版本化: domain.md 所有章节添加 @updated 日期
+- **E7-T3** — canvasApi Zod schema 校验: 所有 canvasApi 响应经过 schema 验证
+- Commits: `1e2984b0`, `4416e222`, `763fab1d`, `f6888f5f`
+
 
 
 ### Epic2: 面板折叠解耦 (canvas-three-tree-unification)

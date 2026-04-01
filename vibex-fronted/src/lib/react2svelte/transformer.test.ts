@@ -192,4 +192,10 @@ describe('style transformation', () => {
     const result = reactComponentToSvelte(react, 'Button');
     expect(result.warnings.some(w => w.includes('Svelte 5 rune'))).toBe(true);
   });
+
+  it('should handle $props rune', () => {
+    const react = '<button onClick={$props}>Test</button>';
+    const result = reactComponentToSvelte(react, 'Button');
+    expect(result.warnings.some(w => w.includes('Svelte 5 rune'))).toBe(true);
+  });
 });

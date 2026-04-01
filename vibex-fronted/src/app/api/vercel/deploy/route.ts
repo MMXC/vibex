@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { deployToVercel } from '@/lib/vercel-deploy';
 
+// Required for dynamic routes in static export mode
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   const token = request.cookies.get('vercel_token')?.value;
   

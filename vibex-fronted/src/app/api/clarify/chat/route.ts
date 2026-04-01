@@ -5,6 +5,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+// Required for dynamic routes in static export mode
+export const dynamic = 'force-dynamic';
+
 interface ChatRequest {
   message: string;
   history: { role: string; content: string }[];

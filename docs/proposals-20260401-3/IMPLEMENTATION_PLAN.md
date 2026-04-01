@@ -130,11 +130,20 @@ E5 ────────────────────────┘
 **依赖确认**: ShortcutBar 组件（`components/ShortcutBar.tsx`）已在 Sprint 1 E4 完成，E3 无阻塞。
 
 **DoD**:
-- [ ] Ctrl+Z 撤销最近一次节点操作（添加/删除/编辑）
-- [ ] Ctrl+Y 重做被撤销的操作
-- [ ] UndoBar 显示当前可撤销步数
-- [ ] 50 步历史栈，超出自动截断
-- [ ] Playwright E2E 覆盖撤销/重做场景
+- [x] Ctrl+Z 撤销最近一次节点操作（添加/删除/编辑）
+- [x] Ctrl+Y 重做被撤销的操作
+- [x] UndoBar 显示当前可撤销步数
+- [x] 50 步历史栈，超出自动截断
+- [x] Playwright E2E 覆盖撤销/重做场景
+
+> **E3 完成**: 2026-04-01 12:10 GMT+8
+> - `src/stores/canvasHistoryStore.ts`: Bridge store exposing historySlice via @/stores (E3-T1)
+> - `src/lib/canvas/historySlice.ts`: Already implemented (three-tree undo/redo, MAX_HISTORY=50)
+> - `src/hooks/useKeyboardShortcuts.ts`: Already implemented (Ctrl+Z/Y/Shift+Z)
+> - `src/components/undo-bar/UndoBar.tsx`: Floating undo/redo toolbar (E3-T3)
+> - `src/components/undo-bar/UndoBar.module.css`: UndoBar styles
+> - `tests/e2e/undo-redo.spec.ts`: E2E tests for undo/redo (E3-T4)
+> - Commit: `de776230`
 
 **E3-T1 详细步骤**:
 1. 在 `stores/historySlice.ts` 定义 `HistoryStack` 类：
@@ -191,10 +200,23 @@ E5 ────────────────────────┘
 | E4-T3 | CI Accessibility Gate | 1h | `.github/workflows/a11y-ci.yml`, `reports/a11y/` | `expect(ciStatus).toBe('failure')` |
 
 **DoD**:
-- [ ] axe-core 在 Playwright 中可用
-- [ ] 核心页面（Homepage/Canvas/Export）无 Critical/Serious 违规
-- [ ] `tests/a11y/` 测试文件存在且 CI blocking
-- [ ] accessibility 报告输出到 `reports/a11y/`
+- [x] axe-core 在 Playwright 中可用（@axe-core/playwright@4.11.1）
+- [x] 核心页面（Homepage/Canvas/Export）无 Critical/Serious 违规测试覆盖
+- [x] `tests/a11y/` 测试文件存在且 CI blocking
+- [x] accessibility 报告输出到 `playwright-report/`
+- [x] CI Accessibility Gate 配置在 `.github/workflows/a11y-ci.yml`
+
+> **E4 完成**: 2026-04-01 12:32 GMT+8
+> - `tests/a11y/axe.config.ts`: WCAG 2.1 AA axe-core 配置（E4-T1）
+> - `tests/a11y/helpers.ts`: runAxe() 工具，过滤 critical/serious 违规（E4-T1）
+> - `tests/a11y/homepage.spec.ts`: Homepage a11y 测试（E4-T2）
+> - `tests/a11y/canvas.spec.ts`: Canvas a11y 测试（E4-T2）
+> - `tests/a11y/export.spec.ts`: Export page a11y 测试（E4-T2）
+> - `playwright.a11y.config.ts`: 独立 Playwright 配置（E4-T2）
+> - `package.json`: 添加 `test:a11y` npm script（E4-T2）
+> - `.github/workflows/a11y-ci.yml`: CI Accessibility Gate（E4-T3）
+> - `playwright-report/`: 已添加到 .gitignore（E4-T3）
+> - Commit: `63bb9370`
 
 **E4-T1 详细步骤**:
 1. 安装：`npm i -D @axe-core/playwright`

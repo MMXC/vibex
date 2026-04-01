@@ -1,7 +1,7 @@
 ### Added (proposals-20260401-7: Sprint 复盘与规划) — 2026-04-01
-- **Sprint 1 复盘文档**: docs/retrospectives/2026-04-01.md
-- **Sprint 2 PRD**: 下个 Sprint 规划 (≥3 Epic)
-- **技术债清理计划**: tech-debt.md 含责任人
+- **E1 Sprint 1 复盘文档**: docs/retrospectives/2026-04-01.md
+- **E2 Sprint 2 PRD**: docs/sprint-20260402/prd.md (≥3 Epic, 优先级排序, 工时估算)
+- **E3 技术债清理计划**: tech-debt.md 含责任人
 - **提交**: `3e27fa08`
 
 ### Added (proposals-20260401-6 E2: 代码质量审查) — 2026-04-01

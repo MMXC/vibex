@@ -1,23 +1,15 @@
 /**
- * React → Svelte converter library
- * Converts React JSX components to Svelte 4 Single File Components (SFC)
- *
- * Usage:
- *   import { reactComponentToSvelte } from '@/lib/react2svelte';
- *   const svelteCode = reactComponentToSvelte(buttonReactCode, 'Button');
+ * React → Svelte conversion library
+ * E5: Svelte Framework Export
  */
 
-// Re-export types and mapping utilities
+export { React2SvelteMappings } from './mappings';
+export type { SvelteMapping, SvelteComponentName } from './mappings';
 export {
-  React2SvelteMappings,
-  type ReactComponentName,
+  getSvelteMapping,
+  usesSlot,
+  getSupportedComponents,
 } from './mappings';
-export { getSvelteComponent, getSveltePropName } from './mappings';
 
-// Re-export transformer
-export {
-  transformReactToSvelte,
-  generateSvelteSFC,
-  reactComponentToSvelte,
-  type TransformResult,
-} from './transformer';
+export { reactComponentToSvelte, generateSvelteSFC } from './transformer';
+export type { TransformResult } from './transformer';

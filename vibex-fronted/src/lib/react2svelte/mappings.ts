@@ -1,83 +1,102 @@
 /**
  * React → Svelte component mapping table
- * Defines prop transformations when converting React components to Svelte 4
- *
- * Reference: components/react2vue/ for the React → Vue mapping pattern
+ * E5-T1: React2Svelte mappings
+ * Defines prop/event/style transformations when converting React components to Svelte 4
  */
 
-// React → Svelte component mapping
-export const React2SvelteMappings = {
+export type SvelteComponentName = 'Button' | 'Input' | 'Card' | 'Container' | 'Text';
+
+export interface SvelteMapping {
+  /** The Svelte equivalent tag */
+  svelteTag: string;
+  /** Prop transformations: React prop → Svelte equivalent */
+  props: Record<string, string>;
+  /** Event transformations: React event → Svelte event */
+  events: Record<string, string>;
+  /** Whether children should become <slot /> */
+  usesSlot: boolean;
+}
+
+export const React2SvelteMappings: Record<string, SvelteMapping> = {
   Button: {
-    svelteComponent: 'VibeXButton',
-    eventSyntax: 'on:',
+    svelteTag: 'button',
     props: {
-      onClick: 'on:click',
       disabled: 'disabled',
-      variant: 'variant',
-      size: 'size',
+      type: 'type',
     },
-    children: null, // Svelte uses slot
+    events: {
+      onClick: 'on:click',
+      onMouseEnter: 'on:mouseenter',
+      onMouseLeave: 'on:mouseleave',
+      onFocus: 'on:focus',
+      onBlur: 'on:blur',
+    },
+    usesSlot: true,
   },
   Input: {
-    svelteComponent: 'VibeXInput',
-    binding: 'bind:value',
+    svelteTag: 'input',
     props: {
+      type: 'type',
       placeholder: 'placeholder',
       disabled: 'disabled',
+      readonly: 'readonly',
+      required: 'required',
     },
-    children: null,
+    events: {
+      onInput: 'on:input',
+      onChange: 'bind:value',
+      onFocus: 'on:focus',
+      onBlur: 'on:blur',
+      onKeyDown: 'on:keydown',
+      onKeyUp: 'on:keyup',
+    },
+    usesSlot: false,
   },
   Card: {
-    svelteComponent: 'VibeXCard',
+    svelteTag: 'div',
     props: {
-      title: 'title',
-      content: 'content',
-      footer: 'footer',
+      class: 'class',
     },
-    children: '<slot />', // React children → Svelte slot
+    events: {},
+    usesSlot: true,
   },
-  Modal: {
-    svelteComponent: 'VibeXModal',
+  Container: {
+    svelteTag: 'div',
     props: {
-      visible: 'open',
-      title: 'title',
+      class: 'class',
     },
-    eventSyntax: 'on:',
-    eventMappings: {
-      onClose: 'on:close',
+    events: {},
+    usesSlot: true,
+  },
+  Text: {
+    svelteTag: 'span',
+    props: {
+      class: 'class',
     },
-    children: '<slot />',
+    events: {},
+    usesSlot: false,
   },
 } as const;
 
-export type ReactComponentName = keyof typeof React2SvelteMappings;
-
 /**
- * Get Svelte component name for a React component
+ * Get Svelte mapping for a React component name
  */
-export function getSvelteComponent(reactName: ReactComponentName): string {
-  return React2SvelteMappings[reactName]?.svelteComponent ?? reactName;
+export function getSvelteMapping(
+  reactName: string
+): SvelteMapping | undefined {
+  return React2SvelteMappings[reactName];
 }
 
 /**
- * Transform a React prop/event name to its Svelte equivalent
+ * Check if a React component uses slot (for children)
  */
-export function getSveltePropName(
-  reactName: ReactComponentName,
-  reactProp: string
-): string {
-  const mapping = React2SvelteMappings[reactName as keyof typeof React2SvelteMappings];
-  if (!mapping) return reactProp;
+export function usesSlot(reactName: string): boolean {
+  return React2SvelteMappings[reactName]?.usesSlot ?? false;
+}
 
-  // Check event mappings first
-  if ('eventMappings' in mapping && mapping.eventMappings) {
-    const eventMapping = (mapping.eventMappings as Record<string, string>)[reactProp];
-    if (eventMapping) return eventMapping;
-  }
-
-  // Check regular prop mappings
-  const propMapping = (mapping.props as Record<string, string>)[reactProp];
-  if (propMapping) return propMapping;
-
-  return reactProp;
+/**
+ * Get all supported React component names
+ */
+export function getSupportedComponents(): SvelteComponentName[] {
+  return Object.keys(React2SvelteMappings) as SvelteComponentName[];
 }

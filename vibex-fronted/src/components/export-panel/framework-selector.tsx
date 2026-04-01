@@ -39,6 +39,7 @@ export function FrameworkSelector({
           disabled={disabled}
           aria-pressed={value === fw.id}
           title={fw.description}
+          data-testid={`framework-${fw.id}`}
         >
           <span className={styles.icon} aria-hidden="true">
             {fw.icon}

@@ -1,83 +1,123 @@
 /**
  * Unit tests for React2Svelte mappings
+ * E5-C1: Must cover Button, Input, Card, Container, Text (5+ components)
  */
 
 import {
   React2SvelteMappings,
-  getSvelteComponent,
-  getSveltePropName,
+  getSvelteMapping,
+  usesSlot,
+  getSupportedComponents,
+  type SvelteComponentName,
 } from '../mappings';
 
 describe('React2SvelteMappings', () => {
   describe('Button mapping', () => {
     it('should have Button in mappings', () => {
-      expect(React2SvelteMappings.Button).toBeDefined();
-    });
-
-    it('should use on: event syntax', () => {
-      expect(React2SvelteMappings.Button.eventSyntax).toBe('on:');
+      const mapping = getSvelteMapping('Button');
+      expect(mapping).toBeDefined();
     });
 
     it('should map onClick to on:click', () => {
-      expect(React2SvelteMappings.Button.props.onClick).toBe('on:click');
+      const mapping = getSvelteMapping('Button');
+      expect(mapping?.events.onClick).toBe('on:click');
     });
 
     it('should pass through disabled prop', () => {
-      expect(React2SvelteMappings.Button.props.disabled).toBe('disabled');
+      const mapping = getSvelteMapping('Button');
+      expect(mapping?.props.disabled).toBe('disabled');
+    });
+
+    it('should use slot for children', () => {
+      expect(usesSlot('Button')).toBe(true);
     });
   });
 
   describe('Input mapping', () => {
     it('should have Input in mappings', () => {
-      expect(React2SvelteMappings.Input).toBeDefined();
+      const mapping = getSvelteMapping('Input');
+      expect(mapping).toBeDefined();
     });
 
-    it('should use bind:value for binding', () => {
-      expect(React2SvelteMappings.Input.binding).toBe('bind:value');
+    it('should map onChange to bind:value', () => {
+      const mapping = getSvelteMapping('Input');
+      expect(mapping?.events.onChange).toBe('bind:value');
+    });
+
+    it('should NOT use slot for children', () => {
+      expect(usesSlot('Input')).toBe(false);
     });
   });
 
   describe('Card mapping', () => {
     it('should have Card in mappings', () => {
-      expect(React2SvelteMappings.Card).toBeDefined();
+      const mapping = getSvelteMapping('Card');
+      expect(mapping).toBeDefined();
     });
 
-    it('should use <slot /> for children', () => {
-      expect(React2SvelteMappings.Card.children).toBe('<slot />');
+    it('should use slot for children', () => {
+      expect(usesSlot('Card')).toBe(true);
     });
   });
 
-  describe('Modal mapping', () => {
-    it('should have Modal in mappings', () => {
-      expect(React2SvelteMappings.Modal).toBeDefined();
+  describe('Container mapping', () => {
+    it('should have Container in mappings', () => {
+      const mapping = getSvelteMapping('Container');
+      expect(mapping).toBeDefined();
     });
 
-    it('should map onClose to on:close', () => {
-      expect(React2SvelteMappings.Modal.eventMappings?.onClose).toBe('on:close');
+    it('should use slot for children', () => {
+      expect(usesSlot('Container')).toBe(true);
     });
+  });
+
+  describe('Text mapping', () => {
+    it('should have Text in mappings', () => {
+      const mapping = getSvelteMapping('Text');
+      expect(mapping).toBeDefined();
+    });
+
+    it('should NOT use slot for children', () => {
+      expect(usesSlot('Text')).toBe(false);
+    });
+  });
+
+  it('should have at least 5 components (E5-C1)', () => {
+    const components = getSupportedComponents();
+    expect(components.length).toBeGreaterThanOrEqual(5);
+    expect(components).toContain('Button');
+    expect(components).toContain('Input');
+    expect(components).toContain('Card');
+    expect(components).toContain('Container');
+    expect(components).toContain('Text');
   });
 });
 
-describe('getSvelteComponent', () => {
-  it('should return Svelte component name for Button', () => {
-    expect(getSvelteComponent('Button')).toBe('VibeXButton');
+describe('getSvelteMapping', () => {
+  it('should return mapping for known component', () => {
+    const mapping = getSvelteMapping('Button');
+    expect(mapping?.svelteTag).toBe('button');
   });
 
-  it('should return original name for unknown component', () => {
-    expect(getSvelteComponent('Unknown')).toBe('Unknown');
+  it('should return undefined for unknown component', () => {
+    const mapping = getSvelteMapping('Unknown');
+    expect(mapping).toBeUndefined();
   });
 });
 
-describe('getSveltePropName', () => {
-  it('should transform onClick to on:click for Button', () => {
-    expect(getSveltePropName('Button', 'onClick')).toBe('on:click');
+describe('usesSlot', () => {
+  it('should return true for components with slot', () => {
+    expect(usesSlot('Button')).toBe(true);
+    expect(usesSlot('Card')).toBe(true);
+    expect(usesSlot('Container')).toBe(true);
   });
 
-  it('should return original prop for unknown component', () => {
-    expect(getSveltePropName('Button', 'unknownProp')).toBe('unknownProp');
+  it('should return false for components without slot', () => {
+    expect(usesSlot('Input')).toBe(false);
+    expect(usesSlot('Text')).toBe(false);
   });
 
-  it('should handle event mappings for Modal', () => {
-    expect(getSveltePropName('Modal', 'onClose')).toBe('on:close');
+  it('should return false for unknown component', () => {
+    expect(usesSlot('Unknown')).toBe(false);
   });
 });

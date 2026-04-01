@@ -14,6 +14,7 @@ name = "vibex-frontend-prod"
 [env.production.vars]
 NEXT_PUBLIC_API_BASE_URL = "https://api.vibex.top/api"
 NEXT_PUBLIC_APP_URL = "https://vibex.top"
+NEXT_PUBLIC_USE_CARD_TREE = "true"
 
 # 预览环境配置
 [env.preview]

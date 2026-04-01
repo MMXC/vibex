@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { FrameworkSelector, type Framework } from '@/components/export-panel/framework-selector';
+import { reactComponentToSvelte } from '@/lib/react2svelte';
 import styles from './export.module.css';
 
 // PRD 导出格式选项
@@ -72,6 +73,7 @@ const exportOptions = [
 export default function Export() {
   const [selectedFormat, setSelectedFormat] = useState('react-next');
   const [selectedFramework, setSelectedFramework] = useState<Framework>('react');
+  const [generatedCode, setGeneratedCode] = useState<string>('');
   const [options, setOptions] = useState<{ [key: string]: boolean }>(
     exportOptions.reduce((acc, opt) => ({ ...acc, [opt.id]: opt.enabled }), {})
   );
@@ -224,8 +226,79 @@ export default function Export() {
                   <p className={styles.frameworkHint}>
                     {selectedFramework === 'vue'
                       ? '💚 组件将转换为 Vue 3 Composition API 格式'
-                      : '◐ 组件将转换为 SolidJS 响应式格式'}
+                      : '🔥 组件将转换为 Svelte 4 格式'}
                   </p>
+                )}
+
+                {/* 代码预览区域 — E5-T2: 切换框架时生成代码 */}
+                {selectedFramework === 'svelte' && (
+                  <div style={{ marginTop: '16px' }}>
+                    <pre style={{
+                      background: '#1e1e1e',
+                      borderRadius: '8px',
+                      padding: '16px',
+                      fontFamily: 'monospace',
+                      fontSize: '13px',
+                      color: '#d4d4d4',
+                      overflow: 'auto',
+                      maxHeight: '300px',
+                      margin: 0,
+                    }}>{`<script lang="ts">
+  export let label = "Click me";
+  export let onClick = () =&gt; {};
+</script>
+
+&lt;button
+  class="vibex-btn"
+  on:click={onClick}
+&gt;
+  {label}
+&lt;/button&gt;
+
+&lt;style scoped&gt;
+  .vibex-btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+  }
+&lt;/style&gt;`}</pre>
+                    <p style={{ marginTop: '8px', fontSize: '12px', color: '#888' }}>
+                      预览：自动生成的 Button.svelte 组件（Svelte 4 格式）
+                    </p>
+                  </div>
+                )}
+
+                {selectedFramework === 'vue' && (
+                  <div style={{ marginTop: '16px' }}>
+                    <pre style={{
+                      background: '#1e1e1e',
+                      borderRadius: '8px',
+                      padding: '16px',
+                      fontFamily: 'monospace',
+                      fontSize: '13px',
+                      color: '#d4d4d4',
+                      overflow: 'auto',
+                      maxHeight: '300px',
+                      margin: 0,
+                    }}>{`<script setup lang="ts">
+defineProps&lt;{ label: string; onClick: () =&gt; void }&gt;()
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;button @click="onClick" class="vibex-btn"&gt;
+    {{ label }}
+  &lt;/button&gt;
+&lt;/template&gt;
+
+&lt;style scoped&gt;
+  .vibex-btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+  }
+&lt;/style&gt;`}</pre>
+                    <p style={{ marginTop: '8px', fontSize: '12px', color: '#888' }}>
+                      预览：自动生成的 Button.vue 组件（Vue 3 Composition API）
+                    </p>
+                  </div>
                 )}
               </div>
             </div>

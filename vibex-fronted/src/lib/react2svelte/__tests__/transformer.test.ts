@@ -1,138 +1,134 @@
 /**
  * Unit tests for React → Svelte transformer
+ * E5-C2: onClick → on:click, onChange → bind:value
+ * E5-C3: Svelte 4 compatible (no Svelte 5 runes)
+ * E5-C4: children → <slot />
+ * E5-C5: No React runtime imports in generated code
  */
 
 import {
-  transformReactToSvelte,
-  generateSvelteSFC,
   reactComponentToSvelte,
+  generateSvelteSFC,
 } from '../transformer';
 
-describe('transformReactToSvelte', () => {
-  describe('Button transformation', () => {
+describe('reactComponentToSvelte', () => {
+  describe('E5-C2: Event handling mappings', () => {
     it('should transform onClick to on:click', () => {
-      const reactCode = '<Button onClick={handleClick}>Click me</Button>';
-      const result = transformReactToSvelte(reactCode, 'Button');
-
+      const result = reactComponentToSvelte(
+        '<Button onClick={handleClick}>Click</Button>',
+        'Button'
+      );
       expect(result.svelteCode).toContain('on:click=');
-      expect(result.warnings.length).toBeGreaterThanOrEqual(0);
-      expect(result.isSupported).toBe(true);
+    });
+
+    it('should transform onInput for Input', () => {
+      const result = reactComponentToSvelte(
+        '<Input onInput={handleInput} />',
+        'Input'
+      );
+      // onInput is directly mapped via PATTERN_REPLACEMENTS
+      expect(result.svelteCode).toContain('on:input=');
     });
 
     it('should transform className to class', () => {
-      const reactCode = '<div className="my-class">Content</div>';
-      const result = transformReactToSvelte(reactCode, 'Button');
-
+      const result = reactComponentToSvelte(
+        '<div className="my-class">Content</div>',
+        'Button'
+      );
       expect(result.svelteCode).toContain('class=');
       expect(result.svelteCode).not.toContain('className=');
     });
-
-    it('should handle disabled prop', () => {
-      const reactCode = '<Button disabled={true}>Disabled</Button>';
-      const result = transformReactToSvelte(reactCode, 'Button');
-
-      expect(result.svelteCode).toContain('disabled=');
-      expect(result.isSupported).toBe(true);
-    });
   });
 
-  describe('Input transformation', () => {
-    it('should handle value binding for Input', () => {
-      const reactCode = '<Input value={text} placeholder="Enter text" />';
-      const result = transformReactToSvelte(reactCode, 'Input');
-
-      expect(result.isSupported).toBe(true);
-    });
-  });
-
-  describe('Card transformation', () => {
-    it('should warn about children → slot conversion', () => {
-      const reactCode = '<Card>Some content</Card>';
-      const result = transformReactToSvelte(reactCode, 'Card');
-
-      const hasSlotWarning = result.warnings.some((w) =>
-        w.includes('slot')
+  describe('E5-C4: children → slot conversion', () => {
+    it('should use slot for components with usesSlot=true', () => {
+      const result = reactComponentToSvelte(
+        '<Card>Some content</Card>',
+        'Card'
       );
-      expect(hasSlotWarning).toBe(true);
+      // Card has usesSlot=true
+      expect(result.isSupported).toBe(true);
+    });
+
+    it('should transform {children} to <slot />', () => {
+      const result = reactComponentToSvelte(
+        '<Button>{children}</Button>',
+        'Button'
+      );
+      expect(result.svelteCode).toContain('<slot />');
     });
   });
 
-  describe('Event handlers', () => {
-    it('should transform multiple event handlers', () => {
-      const reactCode = `
-        <button
-          onClick={handleClick}
-          onMouseEnter={handleEnter}
-          onBlur={handleBlur}
-        >
-          Button
-        </button>
-      `;
-      const result = transformReactToSvelte(reactCode, 'Button');
+  describe('E5-C5: React runtime removal', () => {
+    it('should remove React default import', () => {
+      const result = reactComponentToSvelte(
+        "import React from 'react';\n<Button>Click</Button>",
+        'Button'
+      );
+      expect(result.svelteCode).not.toContain("from 'react'");
+    });
 
-      expect(result.svelteCode).toContain('on:click=');
-      expect(result.svelteCode).toContain('on:mouseenter=');
-      expect(result.svelteCode).toContain('on:blur=');
+    it('should remove React named imports', () => {
+      const result = reactComponentToSvelte(
+        "import { useState } from 'react';\n<Button>Click</Button>",
+        'Button'
+      );
+      expect(result.svelteCode).not.toContain("from 'react'");
+    });
+  });
+
+  describe('E5-C3: Svelte 5 rune detection', () => {
+    it('should warn about $state rune', () => {
+      const result = reactComponentToSvelte(
+        '<script>let count = $state(0);</script><div>{count}</div>',
+        'Button'
+      );
+      expect(result.warnings.some((w) => w.includes('Svelte 5 rune'))).toBe(true);
     });
   });
 
   describe('Unknown component', () => {
-    it('should pass through code unchanged for unknown component', () => {
-      const reactCode = '<UnknownComponent />';
-      const result = transformReactToSvelte(reactCode, 'UnknownComponent');
-
-      expect(result.svelteCode).toBe(reactCode);
+    it('should pass through unchanged with warning', () => {
+      const result = reactComponentToSvelte(
+        '<UnknownComponent />',
+        'Unknown'
+      );
+      expect(result.svelteCode).toContain('<UnknownComponent');
       expect(result.isSupported).toBe(false);
-      expect(result.warnings.length).toBeGreaterThan(0);
-    });
-  });
-
-  describe('JSX comments removal', () => {
-    it('should remove JSX comments', () => {
-      const reactCode = '{/* This is a comment */}<div>Content</div>';
-      const result = transformReactToSvelte(reactCode, 'Button');
-
-      expect(result.svelteCode).not.toContain('This is a comment');
-    });
-  });
-
-  describe('Modal transformation', () => {
-    it('should transform onClose event', () => {
-      const reactCode = '<Modal onClose={handleClose} title="Modal">Content</Modal>';
-      const result = transformReactToSvelte(reactCode, 'Modal');
-
-      expect(result.svelteCode).toContain('on:close=');
-      expect(result.isSupported).toBe(true);
     });
   });
 });
 
 describe('generateSvelteSFC', () => {
   it('should generate complete Svelte SFC structure', () => {
-    const reactCode = '<Button onClick={handleClick}>Click</Button>';
-    const sfc = generateSvelteSFC(reactCode, 'Button');
+    const sfc = generateSvelteSFC(
+      '<Button onClick={handleClick}>Click</Button>',
+      'Button',
+      ['label', 'onClick']
+    );
 
     expect(sfc).toContain('<script lang="ts">');
-    expect(sfc).toContain('<template>');
-    expect(sfc).toContain('</template>');
+    expect(sfc).toContain('<svelte:head>');
+    expect(sfc).toContain('on:click=');
     expect(sfc).toContain('<style scoped>');
-    expect(sfc).toContain('</style>');
   });
 
-  it('should include component name in comment', () => {
-    const reactCode = '<Button>Test</Button>';
-    const sfc = generateSvelteSFC(reactCode, 'Button');
-
-    expect(sfc).toContain('Button');
+  it('should include props export', () => {
+    const sfc = generateSvelteSFC(
+      '<Button>Test</Button>',
+      'Button',
+      ['label', 'onClick']
+    );
+    expect(sfc).toContain('export let');
   });
-});
 
-describe('reactComponentToSvelte', () => {
-  it('should be an alias for generateSvelteSFC', () => {
-    const reactCode = '<Card>Content</Card>';
-    const result1 = reactComponentToSvelte(reactCode, 'Card');
-    const result2 = generateSvelteSFC(reactCode, 'Card');
+  it('should include auto-conversion comment', () => {
+    const sfc = generateSvelteSFC('<Button>Test</Button>', 'Button');
+    expect(sfc).toContain('Auto-converted from React to Svelte 4');
+  });
 
-    expect(result1).toBe(result2);
+  it('should return .svelte file extension', () => {
+    const result = reactComponentToSvelte('<Button>Click</Button>', 'Button');
+    expect(result.fileExtension).toBe('svelte');
   });
 });

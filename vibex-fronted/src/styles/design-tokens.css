@@ -36,10 +36,10 @@
   --color-bg-elevated: #22222e;
   --color-bg-glass: rgba(18, 18, 26, 0.88);
 
-  /* 文字颜色 */
+  /* 文字颜色 (WCAG AA compliant: 4.5:1+ on dark bg and canvas-bg) */
   --color-text-primary: #f0f0f5;
   --color-text-secondary: #a0a0b0;
-  --color-text-muted: #606070;
+  --color-text-muted: #9a9a9a;
   --color-text-inverse: #0a0a0f;
 
   /* 边框颜色 */

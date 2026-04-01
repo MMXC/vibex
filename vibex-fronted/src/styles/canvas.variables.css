@@ -12,11 +12,19 @@
  */
 
 /* ============================================
+   Canvas Background Color
+   E2-T3: WCAG AA compliant canvas background for ShortcutBar contrast
+   ============================================ */
+
+/* ============================================
    Domain Type Colors (BoundedContext)
    P1-T1: Dashed box domain grouping
    ============================================ */
 
 :root {
+  /* Canvas background — used by ShortcutBar, NodeTooltip, CanvasOnboardingOverlay */
+  --color-canvas-bg: #1a1a2e;
+
   /* Domain type — core (核心域) */
   --canvas-domain-core-color: #f97316;
   --canvas-domain-core-bg: rgba(249, 115, 22, 0.05);

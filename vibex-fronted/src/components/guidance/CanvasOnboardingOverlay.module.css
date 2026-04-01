@@ -200,7 +200,7 @@
 
 .nextButton {
   background: var(--color-primary, #6366f1);
-  color: #fff;
+  color: var(--color-text-inverse, #0a0a0f);
 }
 
 .nextButton:hover {
@@ -209,7 +209,7 @@
 
 .doneButton {
   background: #22c55e;
-  color: #fff;
+  color: var(--color-text-inverse, #0a0a0f);
 }
 
 .doneButton:hover {

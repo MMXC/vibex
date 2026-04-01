@@ -1,3 +1,10 @@
+### Added (canvas-scroll-top-bug E1: 画布滚动位置重置) — 2026-04-01
+- **scrollTop reset**: CanvasPage mount 时重置 scrollTop = 0
+- **scrollTo API**: 使用 scrollTo({ top: 0, left: 0, behavior: 'instant' })
+- **canvas-scroll.spec.ts**: 4 个 Playwright E2E 测试
+- **工具栏可见**: 修复从 requirements 切换到 canvas 时工具栏被推出视口
+- **提交**: `3330e3d5`, `85196764`
+
 ### Added (proposals-20260401-4 E3: E2E 测试稳定性加固) — 2026-04-01
 - **afterEach cleanup**: 8 个 canvas spec 文件添加 localStorage.clear() 清理
 - **waitForTimeout 替换**: 替换为 waitForLoadState('networkidle') 或移除冗余等待

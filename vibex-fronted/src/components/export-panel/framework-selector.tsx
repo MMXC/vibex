@@ -6,7 +6,7 @@
 import React from 'react';
 import styles from './framework-selector.module.css';
 
-export type Framework = 'react' | 'vue' | 'solid';
+export type Framework = 'react' | 'vue' | 'svelte';
 
 interface FrameworkSelectorProps {
   /** Currently selected framework */
@@ -20,7 +20,7 @@ interface FrameworkSelectorProps {
 const FRAMEWORKS: { id: Framework; label: string; icon: string; description: string }[] = [
   { id: 'react', label: 'React', icon: '⚛️', description: 'Modern React framework' },
   { id: 'vue', label: 'Vue 3', icon: '💚', description: 'Progressive JS framework' },
-  { id: 'solid', label: 'Solid', icon: '◐', description: 'Performant reactive UI' },
+  { id: 'svelte', label: 'Svelte', icon: '🔥', description: 'Compiled reactive UI framework' },
 ];
 
 export function FrameworkSelector({

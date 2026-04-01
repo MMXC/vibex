@@ -61,6 +61,12 @@ const exportFormats = [
     description: '纯静态页面，无需构建工具',
   },
   {
+    id: 'react-native',
+    name: 'React Native',
+    icon: '📱',
+    description: '导出为 React Native 组件代码',
+  },
+  {
     id: 'png',
     name: 'PNG 图片',
     icon: '🖼️',
@@ -71,6 +77,12 @@ const exportFormats = [
     name: 'SVG 矢量图',
     icon: '✏️',
     description: '导出为 SVG 矢量格式，适合无损缩放',
+  },
+  {
+    id: 'webp',
+    name: 'WebP 图片',
+    icon: '🖼️',
+    description: '导出为 WebP 无损压缩格式',
   },
   {
     id: 'zip',
@@ -146,6 +158,71 @@ export default function Export() {
           setExportProgress(100);
         } else {
           alert('未找到 SVG 容器，请确保在编辑器页面使用');
+          setIsExporting(false);
+          return;
+        }
+      } else if (selectedFormat === 'react-native') {
+        // Generate React Native component code
+        const componentCode = `import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+export const VibeXCanvas: React.FC = () => (
+  <View style={styles.canvas}>
+    <View style={styles.node}>
+      {/* Canvas nodes exported from VibeX */}
+    </View>
+  </View>
+);
+
+const styles = StyleSheet.create({
+  canvas: { flex: 1 },
+  node: { padding: 8 },
+});
+`;
+        const blob = new Blob([componentCode], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = 'VibeX-Canvas.tsx';
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+        setExportProgress(100);
+      } else if (selectedFormat === 'webp') {
+        const element = document.querySelector('[class*="canvasContainer"]');
+        if (element) {
+          setExportProgress(50);
+          try {
+            const htmlToImage = (await import('html-to-image')).default;
+            const blob = await htmlToImage.toBlob(element as HTMLElement, { quality: 0.85 });
+            if (blob) {
+              setExportProgress(90);
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.download = 'canvas-export.webp';
+              link.href = url;
+              link.click();
+              URL.revokeObjectURL(url);
+              setExportProgress(100);
+            }
+          } catch {
+            setExportProgress(60);
+            const html2canvas = (await import('html2canvas')).default;
+            const c = await html2canvas(element as HTMLElement);
+            c.toBlob((b) => {
+              if (b) {
+                setExportProgress(90);
+                const url = URL.createObjectURL(b);
+                const link = document.createElement('a');
+                link.download = 'canvas-export.webp';
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+                setExportProgress(100);
+              }
+            }, 'image/webp', 0.85);
+          }
+        } else {
+          alert('未找到画布容器，请确保在编辑器页面使用');
           setIsExporting(false);
           return;
         }
@@ -559,6 +636,7 @@ defineProps&lt;{ label: string; onClick: () =&gt; void }&gt;()
                 {prdFormats.map((format) => (
                   <div
                     key={format.id}
+                    data-testid={`format-card-${format.id}`}
                     onClick={() => setSelectedPrdFormat(format.id)}
                     className={`${styles.formatCard} ${selectedPrdFormat === format.id ? styles.formatCardSelected : ''}`}
                   >

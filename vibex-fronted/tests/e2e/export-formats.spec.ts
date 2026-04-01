@@ -38,4 +38,26 @@ test.describe('Export Formats', () => {
     await zipCard.click();
     await expect(page.locator('[data-testid="format-card-zip"] .selectedBadge')).toBeVisible();
   });
+
+  test('export panel contains React Native option', async ({ page }) => {
+    const rnOption = page.locator('[data-testid="format-card-react-native"]');
+    await expect(rnOption).toBeVisible();
+  });
+
+  test('export panel contains WebP option', async ({ page }) => {
+    const webpOption = page.locator('[data-testid="format-card-webp"]');
+    await expect(webpOption).toBeVisible();
+  });
+
+  test('React Native format card is selectable', async ({ page }) => {
+    const rnCard = page.locator('[data-testid="format-card-react-native"]');
+    await rnCard.click();
+    await expect(page.locator('[data-testid="format-card-react-native"] .selectedBadge')).toBeVisible();
+  });
+
+  test('WebP format card is selectable', async ({ page }) => {
+    const webpCard = page.locator('[data-testid="format-card-webp"]');
+    await webpCard.click();
+    await expect(page.locator('[data-testid="format-card-webp"] .selectedBadge')).toBeVisible();
+  });
 });

@@ -133,7 +133,7 @@ export default function Preview() {
           }}
         >
           {currentStep === 0 && (
-            <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.5)' }}>
+            <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.85)' }}>
               <div style={{ fontSize: '48px', marginBottom: '16px' }}>🎯</div>
               <p>输入需求后，AI 将实时生成预览</p>
             </div>

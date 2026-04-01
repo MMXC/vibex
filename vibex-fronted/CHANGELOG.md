@@ -1,4 +1,11 @@
 # Changelog
+### E4: Keyboard Shortcuts (proposals-20260401-9)
+- **E4** — useKeyboardShortcuts.ts: add Ctrl+Shift+C (confirm) and Ctrl+Shift+G (generate context)
+- **E4** — ShortcutHintPanel: display new shortcuts in hint panel
+- **E4** — CanvasPage: wire onConfirmSelected/onGenerateContext to store actions
+- **E4** — keyboard-shortcuts.spec.ts: Playwright tests F4.1-F4.4
+- Commit: `f080424b`
+
 ### E3: Responsive Layout (proposals-20260401-9)
 - **E3** — useResponsiveMode.ts: new hook (isMobile/isTablet/isDesktop/isTabMode/isOverlayDrawer)
 - **E3** — canvas.module.css: @media breakpoints for tablet (768-1023px, 2 cols) + mobile (<768px, 1 col + tabs)

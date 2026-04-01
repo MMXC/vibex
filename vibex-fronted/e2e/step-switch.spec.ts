@@ -57,11 +57,11 @@ test.describe('Step Switching (F2.3)', () => {
       const textarea = page.locator('textarea');
       if (await textarea.count() > 0) {
         await textarea.fill('Test requirement for undo');
-        await page.waitForTimeout(300);
+        await page.waitForLoadState('networkidle');
         
         // Click undo
         await undoButton.first().click();
-        await page.waitForTimeout(500);
+        await page.waitForLoadState('networkidle');
         
         // Verify state was restored (textarea should be empty or previous state)
         const value = await textarea.inputValue();
@@ -73,7 +73,7 @@ test.describe('Step Switching (F2.3)', () => {
       if (await textarea.count() > 0) {
         await textarea.fill('Test requirement');
         await page.keyboard.press('Control+z');
-        await page.waitForTimeout(300);
+        await page.waitForLoadState('networkidle');
         
         // If undo works, value should be empty or changed
         const value = await textarea.inputValue();
@@ -94,9 +94,8 @@ test.describe('Step Switching (F2.3)', () => {
     const step1 = page.locator('[class*="stepItem"], [class*="steps"] button').first();
     if (await step1.count() > 0) {
       await step1.click();
-      await page.waitForTimeout(300);
       
-      // URL should remain the same
+      // URL should remain
       expect(page.url()).toBe(initialUrl);
     }
   });
@@ -143,14 +142,14 @@ test.describe('Step Switching (F2.3)', () => {
     
     if (await backButton.count() > 0) {
       await backButton.first().click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle');
       
-      // Should go back to input step
+      // Should go back
       expect(page.url()).toContain('/confirm');
     } else {
       // Or use browser back
       await page.goBack();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle');
       
       // Should be at previous page
       expect(page.url()).toContain('/confirm');

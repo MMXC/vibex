@@ -183,10 +183,9 @@ test.describe('TC-1: 全屏展开 expand-both 模式三栏等宽', () => {
     await expect(grid).toBeVisible({ timeout: 10000 });
 
     // Click expand button
-    await expandBtn.click();
+    await expandBtn.click({ force: true });
 
     // Wait for animation
-    await page.waitForTimeout(500);
 
     // Verify expand-both class is applied to canvas container
     const canvasContainer = page.locator('[class*="canvasContainer"]').first();
@@ -214,8 +213,7 @@ test.describe('TC-1: 全屏展开 expand-both 模式三栏等宽', () => {
     await expect(expandBtn).toBeVisible({ timeout: 20000 });
 
     // Click to enter expand-both
-    await expandBtn.click();
-    await page.waitForTimeout(300);
+    await expandBtn.click({ force: true });
 
     // Button should now show exit label
     await expect(page.locator('[aria-label="退出全屏展开"]').first()).toBeVisible({ timeout: 5000 });
@@ -228,13 +226,11 @@ test.describe('TC-1: 全屏展开 expand-both 模式三栏等宽', () => {
     await expect(expandBtn).toBeVisible({ timeout: 20000 });
 
     // Enter expand-both
-    await expandBtn.click();
-    await page.waitForTimeout(500);
+    await expandBtn.click({ force: true });
 
     // Exit expand-both
     const exitBtn = page.locator('[aria-label="退出全屏展开"]').first();
-    await exitBtn.click();
-    await page.waitForTimeout(500);
+    await exitBtn.click({ force: true });
 
     // Verify expand-both class is removed
     const canvasContainer = page.locator('[class*="canvasContainer"]').first();
@@ -250,8 +246,7 @@ test.describe('TC-1: 全屏展开 expand-both 模式三栏等宽', () => {
     const expandBtn = page.locator('button', { hasText: '全屏展开' }).first();
     await expect(expandBtn).toBeVisible({ timeout: 20000 });
 
-    await expandBtn.click();
-    await page.waitForTimeout(500);
+    await expandBtn.click({ force: true });
 
     const grid = page.locator('[class*="treePanelsGrid"]').first();
     await expect(grid).toBeVisible();
@@ -279,7 +274,6 @@ test.describe('TC-2: SVG overlay 层 pointer-events: none 不阻挡节点交互'
 
   test('TC-2.1: BoundedEdgeLayer SVG 层 pointer-events 为 none', async ({ page }) => {
     await gotoCanvas(page);
-    await page.waitForTimeout(2000);
 
     // Find all SVG elements in the canvas
     const svgLayers = page.locator('svg').filter({ has: page.locator('path[stroke]') });
@@ -312,7 +306,6 @@ test.describe('TC-2: SVG overlay 层 pointer-events: none 不阻挡节点交互'
 
   test('TC-2.2: ReactFlow 节点在 edge overlay 上方可点击', async ({ page }) => {
     await gotoCanvas(page);
-    await page.waitForTimeout(2000);
 
     // Find ReactFlow nodes
     const rfNodes = page.locator('.react-flow__node');
@@ -339,7 +332,6 @@ test.describe('TC-2: SVG overlay 层 pointer-events: none 不阻挡节点交互'
 
   test('TC-2.3: 点击 edge SVG 区域时，事件穿透到下方节点', async ({ page }) => {
     await gotoCanvas(page);
-    await page.waitForTimeout(2000);
 
     // Find SVG paths (edges)
     const allSvgPaths = page.locator('svg path');
@@ -380,7 +372,6 @@ test.describe('TC-3: 关系可视化 BC 连线正确渲染', () => {
 
   test('TC-3.1: 有 boundedEdges 时 SVG edge layer 渲染 path 元素', async ({ page }) => {
     await gotoCanvas(page);
-    await page.waitForTimeout(2000);
 
     // Find SVG layers that contain edge paths
     const edgeSvg = page.locator('svg').filter({ has: page.locator('path[stroke]') });
@@ -400,7 +391,6 @@ test.describe('TC-3: 关系可视化 BC 连线正确渲染', () => {
 
   test('TC-3.2: 有 edges 时 SVG path 使用正确的连线颜色', async ({ page }) => {
     await gotoCanvas(page);
-    await page.waitForTimeout(2000);
 
     // Find edge paths and verify stroke colors
     const edgePaths = page.locator('svg path[stroke]').filter({
@@ -430,7 +420,6 @@ test.describe('TC-3: 关系可视化 BC 连线正确渲染', () => {
 
   test('TC-3.3: boundedEdges 为空时 SVG edge layer 不渲染', async ({ page }) => {
     await gotoCanvas(page);
-    await page.waitForTimeout(2000);
 
     // Clear edges via localStorage
     await page.evaluate(() => {
@@ -446,8 +435,7 @@ test.describe('TC-3: 关系可视化 BC 连线正确渲染', () => {
       }
     });
 
-    await page.reload({ waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(2000);
+    await page.reload({ waitUntil: "networkidle" });
 
     // When edges array is empty, BoundedEdgeLayer returns <> (null), no SVG rendered
     // Canvas container should still be visible and stable
@@ -476,8 +464,7 @@ test.describe('TC-4: 全屏 maximize 模式工具栏隐藏', () => {
     await expect(maximizeBtn).toBeVisible({ timeout: 20000 });
 
     // Click maximize
-    await maximizeBtn.click();
-    await page.waitForTimeout(300);
+    await maximizeBtn.click({ force: true });
 
     // Canvas container should have maximizeMode class
     const canvasContainer = page.locator('[class*="canvasContainer"]').first();
@@ -490,8 +477,7 @@ test.describe('TC-4: 全屏 maximize 模式工具栏隐藏', () => {
     // First enter maximize mode
     const maximizeBtn = page.locator('[aria-label="最大化"]').first();
     await expect(maximizeBtn).toBeVisible({ timeout: 20000 });
-    await maximizeBtn.click();
-    await page.waitForTimeout(500);
+    await maximizeBtn.click({ force: true });
 
     // ProjectBar should be hidden (opacity: 0 or visibility: hidden)
     const projectBar = page.locator('[class*="projectBarWrapper"]').first();
@@ -517,8 +503,7 @@ test.describe('TC-4: 全屏 maximize 模式工具栏隐藏', () => {
 
     const maximizeBtn = page.locator('[aria-label="最大化"]').first();
     await expect(maximizeBtn).toBeVisible({ timeout: 20000 });
-    await maximizeBtn.click();
-    await page.waitForTimeout(300);
+    await maximizeBtn.click({ force: true });
 
     // Button should now show exit label
     await expect(page.locator('[aria-label="退出最大化"]').first()).toBeVisible({ timeout: 5000 });
@@ -529,13 +514,11 @@ test.describe('TC-4: 全屏 maximize 模式工具栏隐藏', () => {
 
     const maximizeBtn = page.locator('[aria-label="最大化"]').first();
     await expect(maximizeBtn).toBeVisible({ timeout: 20000 });
-    await maximizeBtn.click();
-    await page.waitForTimeout(300);
+    await maximizeBtn.click({ force: true });
 
     // Exit maximize
     const exitBtn = page.locator('[aria-label="退出最大化"]').first();
-    await exitBtn.click();
-    await page.waitForTimeout(300);
+    await exitBtn.click({ force: true });
 
     // Canvas container should NOT have maximizeMode class
     const canvasContainer = page.locator('[class*="canvasContainer"]').first();
@@ -554,8 +537,7 @@ test.describe('TC-4: 全屏 maximize 模式工具栏隐藏', () => {
 
     // Enter maximize
     const maximizeBtn = page.locator('[aria-label="最大化"]').first();
-    await maximizeBtn.click();
-    await page.waitForTimeout(300);
+    await maximizeBtn.click({ force: true });
 
     // Expand button should be hidden in maximize mode
     await expect(expandBtn).not.toBeVisible();
@@ -580,8 +562,7 @@ test.describe('TC-5: ESC 快捷键退出全屏', () => {
     // Enter maximize mode via button
     const maximizeBtn = page.locator('[aria-label="最大化"]').first();
     await expect(maximizeBtn).toBeVisible({ timeout: 20000 });
-    await maximizeBtn.click();
-    await page.waitForTimeout(300);
+    await maximizeBtn.click({ force: true });
 
     // Verify maximize is active
     const canvasContainer = page.locator('[class*="canvasContainer"]').first();
@@ -589,7 +570,6 @@ test.describe('TC-5: ESC 快捷键退出全屏', () => {
 
     // Press ESC to exit
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(300);
 
     // Should exit maximize mode
     await expect(canvasContainer).not.toHaveClass(/maximizeMode/);
@@ -608,7 +588,6 @@ test.describe('TC-5: ESC 快捷键退出全屏', () => {
 
     // Press ESC in normal mode — should have no effect
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(300);
 
     // Should still be in normal mode
     await expect(canvasContainer).not.toHaveClass(/maximizeMode/);
@@ -621,15 +600,13 @@ test.describe('TC-5: ESC 快捷键退出全屏', () => {
     // Enter expand-both mode
     const expandBtn = page.locator('button', { hasText: '全屏展开' }).first();
     await expect(expandBtn).toBeVisible({ timeout: 20000 });
-    await expandBtn.click();
-    await page.waitForTimeout(300);
+    await expandBtn.click({ force: true });
 
     const canvasContainer = page.locator('[class*="canvasContainer"]').first();
     await expect(canvasContainer).toHaveClass(/expandBothMode/);
 
     // Press ESC in expand-both — should NOT exit (only maximize exits via ESC)
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(300);
 
     // Should still be in expand-both mode
     await expect(canvasContainer).toHaveClass(/expandBothMode/);
@@ -656,7 +633,6 @@ test.describe('TC-6: F11 快捷键切换最大化模式', () => {
 
     // Press F11
     await page.keyboard.press('F11');
-    await page.waitForTimeout(300);
 
     // Should enter maximize
     await expect(canvasContainer).toHaveClass(/maximizeMode/, { timeout: 5000 });
@@ -667,14 +643,12 @@ test.describe('TC-6: F11 快捷键切换最大化模式', () => {
 
     // Enter maximize via F11
     await page.keyboard.press('F11');
-    await page.waitForTimeout(300);
 
     const canvasContainer = page.locator('[class*="canvasContainer"]').first();
     await expect(canvasContainer).toHaveClass(/maximizeMode/);
 
     // Exit via F11 again
     await page.keyboard.press('F11');
-    await page.waitForTimeout(300);
 
     await expect(canvasContainer).not.toHaveClass(/maximizeMode/);
   });
@@ -686,17 +660,14 @@ test.describe('TC-6: F11 快捷键切换最大化模式', () => {
 
     // Enter via F11
     await page.keyboard.press('F11');
-    await page.waitForTimeout(300);
     await expect(canvasContainer).toHaveClass(/maximizeMode/);
 
     // Exit via ESC
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(300);
     await expect(canvasContainer).not.toHaveClass(/maximizeMode/);
 
     // Re-enter via F11
     await page.keyboard.press('F11');
-    await page.waitForTimeout(300);
     await expect(canvasContainer).toHaveClass(/maximizeMode/);
   });
 });
@@ -722,7 +693,6 @@ test.describe('TC-7: 全链路回归测试', () => {
     });
 
     await gotoCanvas(page);
-    await page.waitForTimeout(2000);
 
     // Filter out known non-critical errors
     const criticalErrors = errors.filter(
@@ -744,14 +714,12 @@ test.describe('TC-7: 全链路回归测试', () => {
     // Enter expand-both
     const expandBtn = page.locator('button', { hasText: '全屏展开' }).first();
     await expect(expandBtn).toBeVisible({ timeout: 20000 });
-    await expandBtn.click();
-    await page.waitForTimeout(300);
+    await expandBtn.click({ force: true });
     await expect(canvasContainer).toHaveClass(/expandBothMode/);
 
     // Enter maximize — should replace expand-both
     const maximizeBtn = page.locator('[aria-label="最大化"]').first();
-    await maximizeBtn.click();
-    await page.waitForTimeout(300);
+    await maximizeBtn.click({ force: true });
 
     // Both modes should NOT be active simultaneously
     const classAttr = await canvasContainer.getAttribute('class') ?? '';

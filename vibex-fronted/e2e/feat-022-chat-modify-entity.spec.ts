@@ -54,9 +54,6 @@ test.describe('FEAT-022: 对话修改实体', () => {
     const submitBtn = page.locator('[data-testid="chat-submit-btn"]');
     await submitBtn.click();
     
-    // 等待响应
-    await page.waitForTimeout(500);
-    
     // 验证成功消息显示
     const successMessage = chatPanel.locator('text=已成功添加实体');
     await expect(successMessage).toBeVisible();
@@ -87,9 +84,6 @@ test.describe('FEAT-022: 对话修改实体', () => {
     const submitBtn = page.locator('[data-testid="chat-submit-btn"]');
     await submitBtn.click();
     
-    // 等待响应
-    await page.waitForTimeout(500);
-    
     // 验证响应消息（成功或未找到）
     const responseMessage = chatPanel.locator('text=/已成功删除|未找到/');
     await expect(responseMessage).toBeVisible();
@@ -111,9 +105,6 @@ test.describe('FEAT-022: 对话修改实体', () => {
     // 点击发送按钮
     const submitBtn = page.locator('[data-testid="chat-submit-btn"]');
     await submitBtn.click();
-    
-    // 等待响应
-    await page.waitForTimeout(500);
     
     // 验证响应消息
     const responseMessage = chatPanel.locator('text=/已成功修改|未找到/');
@@ -137,9 +128,6 @@ test.describe('FEAT-022: 对话修改实体', () => {
     const submitBtn = page.locator('[data-testid="chat-submit-btn"]');
     await submitBtn.click();
     
-    // 等待响应
-    await page.waitForTimeout(500);
-    
     // 验证提示消息
     const helpMessage = chatPanel.locator('text=/无法理解|添加|删除|修改/');
     await expect(helpMessage).toBeVisible();
@@ -158,9 +146,6 @@ test.describe('FEAT-022: 对话修改实体', () => {
     const chatInput = page.locator('[data-testid="chat-input"]');
     await chatInput.fill('添加 EnterTest 实体');
     await chatInput.press('Enter');
-    
-    // 等待响应
-    await page.waitForTimeout(500);
     
     // 验证消息已发送（输入框应被清空）
     await expect(chatInput).toHaveValue('');

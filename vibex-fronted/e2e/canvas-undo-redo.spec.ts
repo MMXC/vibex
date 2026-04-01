@@ -19,8 +19,7 @@ test.describe('Canvas Undo/Redo — E2E', () => {
     const importBtn = page.getByTestId('import-example-btn');
     if (await importBtn.isVisible({ timeout: 3000 })) {
       await importBtn.click();
-      // Wait for data to load
-      await page.waitForTimeout(1500);
+      await page.waitForLoadState('networkidle');
     }
   });
 
@@ -46,7 +45,6 @@ test.describe('Canvas Undo/Redo — E2E', () => {
   test('should open shortcut hint panel on ? key', async ({ page }) => {
     // Press ? key to open shortcut hint panel
     await page.keyboard.press('?');
-    await page.waitForTimeout(300);
 
     // Panel should be visible
     const panel = page.locator('[aria-label="快捷键提示"]').first();
@@ -58,8 +56,7 @@ test.describe('Canvas Undo/Redo — E2E', () => {
 
     // Esc should close it
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(300);
-    // Panel should no longer be visible (it uses null return, so it disappears from DOM)
+    await expect(page.locator('[aria-label="快捷键提示"]').first()).toBeHidden({ timeout: 5000 });
   });
 
   test('should not trigger canvas shortcuts when focus is on input', async ({ page }) => {
@@ -70,7 +67,6 @@ test.describe('Canvas Undo/Redo — E2E', () => {
 
       // Press ? key — should NOT open shortcut panel when input is focused
       await page.keyboard.press('?');
-      await page.waitForTimeout(300);
 
       const panel = page.locator('[aria-label="快捷键提示"]');
       // Panel should not appear when input is focused
@@ -89,7 +85,6 @@ test.describe('Canvas Undo/Redo — E2E', () => {
     if (await contextNodes.isVisible({ timeout: 3000 })) {
       // Right-click to open context menu or edit
       await contextNodes.click({ button: 'right' });
-      await page.waitForTimeout(200);
 
       // Press Escape to close context menu without making changes
       await page.keyboard.press('Escape');
@@ -106,7 +101,6 @@ test.describe('Canvas Undo/Redo — E2E', () => {
   test('should display keyboard shortcut hints for undo/redo', async ({ page }) => {
     // Open shortcut panel
     await page.keyboard.press('?');
-    await page.waitForTimeout(300);
 
     const panel = page.locator('[aria-label="快捷键提示"]').first();
     await expect(panel).toBeVisible();
@@ -132,13 +126,13 @@ test.describe('History Slice — Unit Integration', () => {
 
   test('should track history independently per tree (context vs flow vs component)', async ({ page }) => {
     await page.goto('/canvas');
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('networkidle');
 
     // Load example data
     const importBtn = page.getByTestId('import-example-btn');
     if (await importBtn.isVisible({ timeout: 3000 })) {
       await importBtn.click();
-      await page.waitForTimeout(2000);
+      await page.waitForLoadState('networkidle');
     }
 
     // Make changes to context tree (e.g., edit a node name)
@@ -146,7 +140,6 @@ test.describe('History Slice — Unit Integration', () => {
     if (await firstContextNode.isVisible({ timeout: 3000 })) {
       // Click to select
       await firstContextNode.click();
-      await page.waitForTimeout(200);
     }
 
     // Undo button should become enabled after changes
@@ -162,7 +155,7 @@ test.describe('History Slice — Unit Integration', () => {
     const importBtn = page.getByTestId('import-example-btn');
     if (await importBtn.isVisible({ timeout: 3000 })) {
       await importBtn.click();
-      await page.waitForTimeout(2000);
+      await page.waitForLoadState('networkidle');
     }
 
     // Perform many undo operations (should not crash even at limit)

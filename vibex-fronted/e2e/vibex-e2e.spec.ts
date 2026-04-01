@@ -86,7 +86,7 @@ test.describe('E2E Tests: vibex-e2e-user-flow', () => {
 
     for (const p of pages) {
       await page.goto(`${BASE_URL}${p}`);
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle');
     }
 
     // Should have no critical JS errors

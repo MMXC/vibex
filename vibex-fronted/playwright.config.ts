@@ -9,7 +9,7 @@ export default defineConfig({
   reporter: process.env.CI ? 'list' : 'html',
   timeout: 60000, // Increase test timeout
   expect: {
-    timeout: 10000, // Increase expect timeout
+    timeout: 30000, // F1.3: CI expect timeout >= 30000ms
   },
   use: {
     baseURL: process.env.BASE_URL || 'http://localhost:3000',

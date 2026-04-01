@@ -81,7 +81,6 @@ test.describe('五步流程 E2E (Five-Step Flow)', () => {
       const step4Btn = await step4.evaluateHandle((el) => el.closest('button'));
       if (step4Btn && (await step4Btn.evaluate((btn) => (btn as HTMLElement).offsetWidth > 0))) {
         await (await step4Btn.asElement())?.click();
-        await page.waitForTimeout(300);
       }
     }
   });
@@ -105,7 +104,14 @@ test.describe('五步流程 E2E (Five-Step Flow)', () => {
     const textarea = page.getByPlaceholder(/需求/i).first();
     if (await textarea.count() > 0) {
       await textarea.fill('Test requirement for persistence');
-      await page.waitForTimeout(1500); // Wait for auto-save debounce (1s)
+      // Wait for auto-save debounce
+      await page.waitForFunction(
+        () => {
+          const draft = localStorage.getItem('homepage_draft') || localStorage.getItem('vibex-flow-state');
+          return draft !== null && draft !== '';
+        },
+        { timeout: 10000 }
+      ).catch(() => {});
       
       // Check localStorage
       const draft = await page.evaluate(() => {
@@ -145,7 +151,7 @@ test.describe('五步流程 - 完整流程 (Full Five-Step Flow)', () => {
     let nextBtn = page.getByRole('button', { name: /下一步|生成|开始/i }).first();
     if (await nextBtn.count() > 0 && !(await nextBtn.isDisabled())) {
       await nextBtn.click();
-      await page.waitForTimeout(500);
+        await page.waitForLoadState('networkidle');
 
       // Step 2: Bounded Context
       // Check we're on step 2
@@ -155,7 +161,7 @@ test.describe('五步流程 - 完整流程 (Full Five-Step Flow)', () => {
         nextBtn = page.getByRole('button', { name: /下一步|选择|确认/i }).first();
         if (await nextBtn.count() > 0 && !(await nextBtn.isDisabled())) {
           await nextBtn.click();
-          await page.waitForTimeout(500);
+        await page.waitForLoadState('networkidle');
 
           // Step 3: Business Flow
           const step3Content = page.getByText(/业务流程|flow/i).first();
@@ -163,7 +169,7 @@ test.describe('五步流程 - 完整流程 (Full Five-Step Flow)', () => {
             nextBtn = page.getByRole('button', { name: /下一步/i }).first();
             if (await nextBtn.count() > 0 && !(await nextBtn.isDisabled())) {
               await nextBtn.click();
-              await page.waitForTimeout(500);
+        await page.waitForLoadState('networkidle');
 
               // Step 4: UI Components
               const step4Content = page.getByText(/UI组件|components/i).first();
@@ -171,7 +177,7 @@ test.describe('五步流程 - 完整流程 (Full Five-Step Flow)', () => {
                 nextBtn = page.getByRole('button', { name: /下一步/i }).first();
                 if (await nextBtn.count() > 0 && !(await nextBtn.isDisabled())) {
                   await nextBtn.click();
-                  await page.waitForTimeout(500);
+        await page.waitForLoadState('networkidle');
 
                   // Step 5: Project Create
                   const step5Content = page.getByText(/项目创建|project/i).first();

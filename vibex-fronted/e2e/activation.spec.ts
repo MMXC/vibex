@@ -65,7 +65,7 @@ test.describe('Homepage Activation (V1-V4)', () => {
     await textarea.fill('测试输入触发状态更新');
     
     // Wait for potential state update
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('networkidle');
     
     // Page should still be responsive
     const isVisible = await textarea.isVisible();
@@ -163,7 +163,9 @@ test.describe('Homepage Activation (V1-V4)', () => {
     // Should not cause errors
     const errors: string[] = [];
     page.on('pageerror', (err) => errors.push(err.message));
-    await page.waitForTimeout(300);
+    
+    // Wait for any pending errors
+    await page.waitForLoadState('networkidle');
     
     expect(errors).toHaveLength(0);
   });

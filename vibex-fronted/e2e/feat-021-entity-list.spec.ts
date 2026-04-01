@@ -124,8 +124,8 @@ test.describe('FEAT-021: 实体列表组件', () => {
       // 点击第一个实体（应该高亮）
       await firstCard.click();
       
-      // 等待高亮状态应用
-      await page.waitForTimeout(100);
+      // Wait for highlight state
+      await page.waitForLoadState('networkidle');
       
       // 验证第一个卡片有 selected 类
       const firstCardAfterClick = await entityCards.first().getAttribute('class');
@@ -134,8 +134,8 @@ test.describe('FEAT-021: 实体列表组件', () => {
       // 点击第二个实体
       await secondCard.click();
       
-      // 等待状态更新
-      await page.waitForTimeout(100);
+      // Wait for state update
+      await page.waitForLoadState('networkidle');
       
       // 验证第一个卡片不再高亮
       const firstCardAfterSecondClick = await entityCards.first().getAttribute('class');

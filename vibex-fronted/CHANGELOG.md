@@ -1,4 +1,11 @@
 # Changelog
+### E3: Undo/Redo History Stack (proposals-20260401-3)
+- **E3-T1** — canvasHistoryStore bridge: stores/canvasHistoryStore.ts，暴露 historySlice 到全局 store
+- **E3-T2** — Keyboard shortcuts: useKeyboardShortcuts.ts (Ctrl+Z/Y) 已实现
+- **E3-T3** — UndoBar: undo-bar/UndoBar.tsx，floating toolbar 显示撤销历史
+- **E3-T4** — E2E tests: tests/e2e/undo-redo.spec.ts
+- Commit: `de776230`
+
 ### E2: Heartbeat Scanner + Changelog Gen (proposals-20260401-3)
 - **E2-T1** — Ghost task detection: 60min 无进展任务识别
 - **E2-T2** — Fake done detection: 缺少 output 的 done 任务检测

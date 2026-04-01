@@ -1,3 +1,9 @@
+### Added (proposals-20260401-4 E3: E2E 测试稳定性加固) — 2026-04-01
+- **afterEach cleanup**: 8 个 canvas spec 文件添加 localStorage.clear() 清理
+- **waitForTimeout 替换**: 替换为 waitForLoadState('networkidle') 或移除冗余等待
+- **CI blocking**: 验证 CI workflow 无 continue-on-error 或 failure-hiding 模式
+- **提交**: `291ff6ff`
+
 ### Added (proposals-20260401-4 E2: 颜色对比度 WCAG 2.1 AA 修复) — 2026-04-01
 - **design-tokens.css**: --color-text-muted #606070→#9a9a9a (3.1:1→5.7:1 对比度)
 - **tokens.css**: [data-theme=dark] --color-text-muted #64748b→#8a8a9a

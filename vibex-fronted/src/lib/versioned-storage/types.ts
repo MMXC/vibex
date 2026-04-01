@@ -21,7 +21,7 @@ export interface CanvasStateV2 {
   componentNodes: unknown[];
 }
 
-export interface CanvasStateV3 extends CanvasStateV2 {
+export interface CanvasStateV3 extends Omit<CanvasStateV2, '_version'> {
   _version: 3;
   activeNodes: Record<string, boolean>;
 }

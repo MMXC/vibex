@@ -24,7 +24,7 @@ export const ComponentNodeSchema = z.object({
   flowId: z.string(),
   name: z.string(),
   type: z.string(),
-  props: z.record(z.unknown()),
+  props: z.record(z.string(), z.unknown()),
   api: z.object({ method: z.string(), path: z.string() }),
   isActive: z.boolean().optional(),
   status: z.string(),

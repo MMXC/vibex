@@ -1,3 +1,9 @@
+### Fixed (canvas-bc-card-line-removal Epic1: 删除限界上下文树卡片连线) — 2026-04-02
+- **E1 RelationshipConnector 移除**: 注释 BoundedContextTree.tsx 中的 RelationshipConnector import 与 JSX 使用
+- **BoundedEdgeLayer 保留**: ReactFlow 画布边缘层保持激活（BoundedContextTree 是独立组件）
+- **Vitest 测试**: tests/canvas/bc-card-line-removal.spec.ts (3 tests, 3 passed)
+- **提交**: `5150964e`
+
 ### Added (proposals-20260401-8: E2E 稳定性 + React Native + WebP) — 2026-04-01
 - **E1 E2E stability**: test:e2e:ci script, waitForTimeout 替换为 wait strategies, waitForFunction polling
 - **E1 canvas error types**: CanvasValidationError, CanvasApiError, CanvasRenderError

@@ -1,3 +1,16 @@
+### Added (proposals-20260401-3 E4: Accessibility 测试基线) — 2026-04-01
+- **axe-core**: 安装 @axe-core/playwright 用于 WCAG 2.1 AA 无障碍测试
+- **axe.config.ts**: 配置 WCAG 2a/2aa/2.1aa 规则 + json 报告
+- **helpers.ts**: runAxe() 工具函数，过滤 critical/serious 违规
+- **homepage.spec.ts**: 测试 / 页面零 critical 违规
+- **canvas.spec.ts**: 测试 /canvas 页面零 critical 违规
+- **export.spec.ts**: 测试 /canvas/export 页面零 critical 违规
+- **playwright.a11y.config.ts**: 独立的 Playwright 配置
+- **test:a11y**: npm 脚本运行无障碍测试
+- **a11y-ci.yml**: CI gate - PR 到 main/develop 时触发axe扫描
+- **AppErrorBoundary**: 统一错误边界组件（含 'use client' 兼容 Next.js 15）
+- **提交**: `63bb9370`, `c1f07c89`
+
 ### Added (canvas-three-tree-unification Epic2: 面板折叠解耦) — 2026-04-01
 - **panel collapse**: contextPanelCollapsed / flowPanelCollapsed / componentPanelCollapsed 独立 boolean 状态
 - **persist**: partialize 添加三个 panelCollapsed 字段，切换 phase 后折叠状态保留

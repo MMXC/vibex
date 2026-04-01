@@ -1,3 +1,15 @@
+### Added (proposals-20260401-3 E5: Svelte Framework 导出) — 2026-04-01
+- **react2svelte mappings**: Button/Input/Card/Container/Text 组件映射
+- **onClick → on:click**: 事件语法转换
+- **onChange → bind:value**: Input 双向绑定转换
+- **className → class**: 属性名转换
+- **children → <slot />**: slot vs children 转换
+- **framework-selector.tsx**: 三框架切换 RadioGroup (React/Vue/Svelte)
+- **export panel**: FrameworkSelector 集成到导出页面
+- **Transformer**: 字符串替换模式转换 React JSX → Svelte 4 SFC
+- **单元测试**: 27 tests 覆盖 mappings + transformer
+- **提交**: `7eb13108`, `5ab07707`
+
 ### Added (proposals-20260401-3 E4: Accessibility 测试基线) — 2026-04-01
 - **axe-core**: 安装 @axe-core/playwright 用于 WCAG 2.1 AA 无障碍测试
 - **axe.config.ts**: 配置 WCAG 2a/2aa/2.1aa 规则 + json 报告

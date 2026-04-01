@@ -5,7 +5,6 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: '/root/.openclaw/vibex/vibex-fronted',
   },
-  output: 'export',
   images: {
     loader: 'custom',
     loaderFile: './src/lib/cf-image-loader.ts',

@@ -784,9 +784,22 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     styles.canvasContainer,
     expandMode === 'maximize' && styles.maximizeMode,
     expandMode === 'expand-both' && styles.expandBothMode,
-    leftDrawerOpen && styles.canvasContainerWithLeftDrawer,
-    rightDrawerOpen && styles.canvasContainerWithRightDrawer,
-    leftDrawerOpen && rightDrawerOpen && styles.canvasContainerWithBothDrawers,
+  ].filter(Boolean).join(' ');
+
+  // Compute row wrapper class for tree + drawers
+  const rowWrapperClasses = [
+    styles.canvasRowWrapper,
+    leftDrawerOpen && styles.canvasRowWithLeftDrawer,
+    rightDrawerOpen && styles.canvasRowWithRightDrawer,
+    leftDrawerOpen && rightDrawerOpen && styles.canvasRowWithBothDrawers,
+  ].filter(Boolean).join(' ');
+
+  // Compute grid class based on drawer state
+  const gridClasses = [
+    styles.treePanelsGrid,
+    leftDrawerOpen && styles.treePanelsGridWithLeftDrawer,
+    rightDrawerOpen && styles.treePanelsGridWithRightDrawer,
+    leftDrawerOpen && rightDrawerOpen && styles.treePanelsGridWithBothDrawers,
   ].filter(Boolean).join(' ');
 
   // === Render ===
@@ -923,14 +936,18 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
               </div>
             </div>
           ) : (
-            <div
-              ref={gridRef}
-              className={styles.treePanelsGrid}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-            >
+            <div className={rowWrapperClasses}>
+              {/* Left Drawer */}
+              <LeftDrawer />
+
+              <div
+                ref={gridRef}
+                className={gridClasses}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+              >
               {/* F3: Edge layer overlays — absolutely positioned, pointer-events: none */}
               {boundedEdges.length > 0 && (
                 <BoundedEdgeLayer
@@ -1086,13 +1103,11 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 pan={{ x: 0, y: 0 }}
               />
             </div>
+
+            {/* Right Drawer */}
+            <MessageDrawer />
+            </div>
           )}
-
-          {/* Epic 2 S2: Left Drawer — 左侧 200px 需求输入抽屉 */}
-          <LeftDrawer />
-
-          {/* Epic 1 F1.1: Message Drawer — 右侧 200px 抽屉 */}
-          <MessageDrawer />
         </>
       )}
 

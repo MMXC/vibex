@@ -4158,34 +4158,48 @@
   flex-shrink: 0;
 }
 
-/* ── Epic 5 S5.1: Canvas Flex Row Layout with Drawers ───────────────────── */
-.canvasContainerWithLeftDrawer {
-  flex-direction: row !important;
+/* ── Epic 5 S5.1: Canvas Row Wrapper (tree panels + drawers) ─────────── */
+.canvasRowWrapper {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+  gap: 0;
 }
 
-.canvasContainerWithRightDrawer {
-  flex-direction: row !important;
+.canvasRowWithLeftDrawer {
+  /* Left drawer takes 200px, grid takes remaining */
 }
 
-.canvasContainerWithBothDrawers {
-  flex-direction: row !important;
+.canvasRowWithRightDrawer {
+  /* Right drawer takes 200px, grid takes remaining */
+}
+
+.canvasRowWithBothDrawers {
+  /* Both drawers open */
 }
 
 /* ── Epic 5 S5.2: Drawer-aware Tree Panels Grid ────────────────────────── */
+.treePanelsGrid {
+  flex: 1;
+  min-width: 400px;
+  /* CSS variables for drawer widths */
+  --left-drawer-width: 200px;
+  --right-drawer-width: 200px;
+}
+
 .treePanelsGridWithLeftDrawer {
-  /* When left drawer is open, reduce grid flex to leave space */
   flex: 1;
   min-width: 400px;
 }
 
 .treePanelsGridWithRightDrawer {
-  /* When right drawer is open */
   flex: 1;
   min-width: 400px;
 }
 
-/* CSS variables for drawer widths (set by JavaScript) */
-.treePanelsGrid {
-  --left-drawer-width: 200px;
-  --right-drawer-width: 200px;
+.treePanelsGridWithBothDrawers {
+  flex: 1;
+  min-width: 400px;
 }

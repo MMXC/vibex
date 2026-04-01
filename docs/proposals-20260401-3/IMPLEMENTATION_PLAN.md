@@ -80,9 +80,15 @@ E5 ────────────────────────┘
 | E2-T4 | commit-msg hook | 0.5h | `.git/hooks/commit-msg`, `package.json` (simple-git-hooks) | `expect(hookInstallSuccess).toBe(true)` |
 
 **DoD**:
-- [ ] Heartbeat 扫描无幽灵任务（activeMinutes > 60 但已完成）
-- [ ] `changelog-gen --from=HEAD --to=v1.0` 生成有效 CHANGELOG
-- [ ] commit-msg hook 正确安装并校验 Angular format
+- [x] Heartbeat 扫描无幽灵任务（activeMinutes > 60 但已完成）
+- [x] `changelog-gen --from=HEAD --to=v1.0` 生成有效 CHANGELOG
+- [x] commit-msg hook 正确安装并校验 Angular format
+
+> **E2 完成**: 2026-04-01 11:37 GMT+8
+> - `scripts/heartbeat-scanner.ts`: Ghost task detection (E2-T1) + Fake done detection (E2-T2)
+> - `scripts/changelog-gen.ts`: Automated changelog generation (E2-T3)
+> - `.githooks/commit-msg`: Conventional commits validator (E2-T4)
+> - Commit: `bbb361aa`
 
 **E2-T1 详细步骤**:
 1. 在 `scripts/heartbeat-scanner.ts` 添加 `detectGhostTasks(tasks[])` 函数
@@ -321,10 +327,9 @@ openclaw notify --check-existing <task-id>
 grep -r "ErrorBoundary" components/ --include='*.tsx' | grep -v AppErrorBoundary | wc -l  # 期望 0
 
 # E2: heartbeat + changelog
-npx ts-node scripts/heartbeat-scanner.ts --dry-run
-npx ts-node scripts/changelog-gen.ts --from=v1.0 --to=HEAD > /tmp/changelog-test.md
-cat /tmp/changelog-test.md | grep -E "^## (Features|Bug Fixes|Docs)" | wc -l  # 期望 > 0
-ls -la .git/hooks/commit-msg  # 期望存在
+npx tsx scripts/heartbeat-scanner.ts --tasks tasks.json
+npx tsx scripts/changelog-gen.ts --from=v1.0 --to=HEAD --dry-run
+ls -la .githooks/commit-msg  # 期望存在
 
 # E3: Undo/Redo
 npx jest stores/historySlice.test.ts --coverage

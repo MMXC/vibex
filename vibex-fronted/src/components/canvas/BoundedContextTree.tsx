@@ -432,7 +432,6 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
       name: d.name,
       description: d.description,
       type: d.type,
-      confirmed: false,
       status: 'pending' as const,
       children: [],
     }));

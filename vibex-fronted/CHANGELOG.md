@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+### E5: MCP Server 集成 (proposals-20260401-2)
+- **E5-T1** — MCP Server scaffold: packages/mcp-server/，提供 tools/execute + tools/list
+- **E5-T2** — Claude Desktop 配置: claude_desktop_config.json
+- **E5-T3** — MCP 集成文档: docs/mcp-integration.md
+- Commit: `e2edaf50`
+
+### E1: 一键部署到 Vercel (proposals-20260401-2)
+- **E1-T1** — Vercel OAuth + Deploy API: vibex-fronted/src/app/api/vercel/，OAuth 登录 + deploy 触发
+- **E1-T2** — Export Panel UI: framework-selector.tsx + deploy-button.tsx + deploy-status.tsx
+- **E1-T3** — Export Page: /export 路由集成一键部署入口
+- Commit: `7c8ede0a`
+
 ### E2: 回滚 SOP + 功能开关 (proposals-20260401-2)
 - **E2-T1** — 回滚 SOP: docs/process/ROLLBACK_SOP.md，阶段任务回滚标准操作程序
 - **E2-T2** — Epic DoD 模板: docs/process/EPIC_DOD_TEMPLATE.md，标准化 Definition of Done

@@ -43,6 +43,12 @@ interface KeyboardShortcutsOptions {
   onNewNode?: () => void;
   /** Quick generate (Ctrl+G) - cascade Context → Flow → Component */
   onQuickGenerate?: () => void;
+  /** Switch to Context tab (Alt+1) */
+  onSwitchToContext?: () => void;
+  /** Switch to Flow tab (Alt+2) */
+  onSwitchToFlow?: () => void;
+  /** Switch to Component tab (Alt+3) */
+  onSwitchToComponent?: () => void;
   /** Whether shortcuts should be active */
   enabled?: boolean;
 }
@@ -75,6 +81,9 @@ export function useKeyboardShortcuts({
   onClearSelection,
   onNewNode,
   onQuickGenerate,
+  onSwitchToContext,
+  onSwitchToFlow,
+  onSwitchToComponent,
   enabled = true,
 }: KeyboardShortcutsOptions) {
   useEffect(() => {
@@ -201,9 +210,30 @@ export function useKeyboardShortcuts({
         onQuickGenerate?.();
         return;
       }
+
+      // === Tab Switch: Alt+1 (Context) ===
+      if (e.altKey && e.key === '1') {
+        e.preventDefault();
+        onSwitchToContext?.();
+        return;
+      }
+
+      // === Tab Switch: Alt+2 (Flow) ===
+      if (e.altKey && e.key === '2') {
+        e.preventDefault();
+        onSwitchToFlow?.();
+        return;
+      }
+
+      // === Tab Switch: Alt+3 (Component) ===
+      if (e.altKey && e.key === '3') {
+        e.preventDefault();
+        onSwitchToComponent?.();
+        return;
+      }
     }
 
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset, onDelete, onSelectAll, onClearSelection, onNewNode, onQuickGenerate, enabled]);
+  }, [undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset, onDelete, onSelectAll, onClearSelection, onNewNode, onQuickGenerate, onSwitchToContext, onSwitchToFlow, onSwitchToComponent, enabled]);
 }

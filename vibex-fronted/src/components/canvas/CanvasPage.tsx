@@ -37,6 +37,7 @@ import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
 import { MessageDrawer } from './messageDrawer/MessageDrawer';
 import { LeftDrawer } from './leftDrawer/LeftDrawer';
 import { ShortcutBar } from '@/components/guidance/ShortcutBar';
+import { useToast } from '@/components/ui/Toast';
 import { UndoBar } from '@/components/undo-bar/UndoBar';
 
 import { NodeTooltip } from '@/components/guidance/NodeTooltip';
@@ -69,6 +70,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   // E3-F2: Delete selected node(s) based on active tree (multi-select batch delete)
   const deleteSelectedNodes = useCanvasStore((s) => s.deleteSelectedNodes);
   const autoGenerateFlows = useCanvasStore((s) => s.autoGenerateFlows);
+  const generateComponentFromFlow = useCanvasStore((s) => s.generateComponentFromFlow);
   const flowGenerating = useCanvasStore((s) => s.flowGenerating);
   const flowGeneratingMessage = useCanvasStore((s) => s.flowGeneratingMessage);
   // Epic1: Selection-based filtering — only send selected confirmed nodes
@@ -122,9 +124,8 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     }
   }, [expandMode]);
 
-  // === F1.1: Reset scrollTop on canvas mount ===
+  // === F1.1: Reset scrollTop on canvas mount (rAF × 2) ===
   useEffect(() => {
-    // Use scrollTo API as required by AGENTS.md C2
     const resetScroll = () => {
       // Try to find canvas container by class and use scrollTo
       const container = document.querySelector('[class*="canvasContainer"]');
@@ -134,10 +135,11 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
       // Also reset window scroll for safety
       window.scrollTo(0, 0);
     };
-    
-    // Reset on mount - no setTimeout as per AGENTS.md constraints
-    resetScroll();
-  }, []);
+    // C1: Double rAF to ensure DOM is ready after mount
+    requestAnimationFrame(() => {
+      requestAnimationFrame(resetScroll);
+    });
+  }, []); // C2: empty dependency
 
   // F1: F11 keyboard shortcut for maximize mode
   useEffect(() => {
@@ -168,6 +170,8 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const [isPanning, setIsPanning] = useState(false);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const lastMousePosRef = useRef<{ x: number; y: number } | null>(null);
+  const [isQuickGenerating, setIsQuickGenerating] = useState(false);
+  const toast = useToast();
 
   // Track Space key for panning mode
   useEffect(() => {
@@ -415,6 +419,39 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     return false;
   }, []);
 
+  // === F1.1: Ctrl+G Quick Generate (useCallback for AGENTS.md C4) ===
+  const quickGenerate = useCallback(async () => {
+    // C3: Check if requirement input is empty
+    if (!requirementInput.trim()) {
+      toast.showToast('请先输入需求', 'warning');
+      return;
+    }
+    // C3: Guard against concurrent generation
+    if (isQuickGenerating || aiThinking || flowGenerating || componentGenerating) {
+      return;
+    }
+    setIsQuickGenerating(true);
+    try {
+      // Step 1: Generate contexts
+      await generateContexts(requirementInput);
+      const store = useCanvasStore.getState();
+      const ctxs = store.contextNodes.filter((c) => c.isActive !== false);
+      if (ctxs.length === 0) {
+        toast.showToast('未生成任何 Context 节点，请检查需求输入', 'error');
+        return;
+      }
+      // Step 2: Auto-generate flows
+      await autoGenerateFlows(ctxs);
+      // Step 3: Generate components
+      await generateComponentFromFlow();
+      toast.showToast('三树生成完成', 'success');
+    } catch (err) {
+      toast.showToast(err instanceof Error ? err.message : '生成失败', 'error');
+    } finally {
+      setIsQuickGenerating(false);
+    }
+  }, [requirementInput, isQuickGenerating, aiThinking, flowGenerating, componentGenerating, generateContexts, autoGenerateFlows, generateComponentFromFlow, toast]);
+
   useKeyboardShortcuts({
     undo: handleKeyboardUndo,
     redo: handleKeyboardRedo,
@@ -442,29 +479,15 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         store.addComponentNode({ name: '新组件', flowId: '', type: 'page', props: {}, api: { method: 'GET', path: '/', params: [] } });
       }
     },
-    onQuickGenerate: () => {
-      // Check if requirement input is empty
-      if (!requirementInput.trim()) {
-        // TODO: Show toast "请先输入需求"
-        return;
-      }
-      // Check if anything is already generating
-      if (aiThinking || flowGenerating || componentGenerating) {
-        // Already generating, ignore
-        return;
-      }
-      const store = useCanvasStore.getState();
-      // Cascade: Context → Flow → Component
-      store.generateContextsFromRequirement(requirementInput).then(() => {
-        // After context generation, auto-generate flows
-        const ctxs = store.contextNodes.filter((c) => c.isActive !== false);
-        if (ctxs.length > 0) {
-          store.autoGenerateFlows(ctxs).then(() => {
-            // After flow generation, auto-generate components
-            store.generateComponentFromFlow();
-          });
-        }
-      });
+    onQuickGenerate: quickGenerate,
+    onSwitchToContext: () => {
+      useCanvasStore.getState().setActiveTree('context');
+    },
+    onSwitchToFlow: () => {
+      useCanvasStore.getState().setActiveTree('flow');
+    },
+    onSwitchToComponent: () => {
+      useCanvasStore.getState().setActiveTree('component');
     },
     enabled: phase !== 'input',
   });

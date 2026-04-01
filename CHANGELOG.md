@@ -1,3 +1,7 @@
+### Added (proposals-20260401-6 E3: 用户手册文档) — 2026-04-01
+- **user-guide.md**: 12 章覆盖所有 canvas 操作
+- **提交**: `385e4a44`
+
 ### Added (canvas-quick-generate-command E1: Ctrl+G 快速生成) — 2026-04-01
 - **Ctrl+G 快捷键**: 触发需求→Context→Flow→Component 级联生成
 - **useKeyboardShortcuts.ts**: 添加 onQuickGenerate 选项和 Ctrl+G 处理器

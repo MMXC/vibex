@@ -55,7 +55,12 @@ npm audit --audit-level=high
 
 ## 验收清单
 
-- [ ] `npx tsc --noEmit` 退出码 0
+- [x] `npx tsc --noEmit` 退出码 0 ✅
 - [ ] `npm run lint` 退出码 0
 - [ ] `npm run test` 全绿
 - [ ] `npm audit --audit-level=high` 无 high/critical
+
+### Epic1 记录
+- 2026-04-02 07:15: 修复 canvas-expand.spec.ts 变量引用错误（4处）
+- 修复 contextStore.ts devtools 参数类型
+- npm build 通过

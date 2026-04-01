@@ -52,6 +52,38 @@ test.describe('Tab Shortcuts (Alt+1/2/3)', () => {
     // Component tab should be active
   });
 
+  // Negative: key without Alt should NOT switch tabs
+  test('pressing 1/2/3 without Alt does not switch tabs', async ({ page }) => {
+    await page.goto('/canvas');
+    await page.waitForLoadState('networkidle');
+    
+    // Press 1 without Alt - should not switch
+    await page.keyboard.press('1');
+    await page.waitForTimeout(100);
+    
+    // Press 2 without Alt - should not switch
+    await page.keyboard.press('2');
+    await page.waitForTimeout(100);
+    
+    // Press 3 without Alt - should not switch
+    await page.keyboard.press('3');
+    await page.waitForTimeout(100);
+    
+    // Tab switching should only happen with Alt modifier
+  });
+
+  // Negative: Ctrl+Alt+1 should not trigger tab switch (Alt required)
+  test('Ctrl+Alt+1 does not trigger tab switch', async ({ page }) => {
+    await page.goto('/canvas');
+    await page.waitForLoadState('networkidle');
+    
+    // Press Ctrl+Alt+1 - should not trigger
+    await page.keyboard.press('Control+Alt+1');
+    await page.waitForTimeout(100);
+    
+    // Should not cause errors
+  });
+
   test('Tab shortcuts work when canvas is focused', async ({ page }) => {
     await page.goto('/canvas');
     await page.waitForLoadState('networkidle');

@@ -124,7 +124,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     }
   }, [expandMode]);
 
-  // === F1.1: Reset scrollTop on canvas mount (rAF × 2) ===
+  // === F1.1: Reset scrollTop on canvas mount (rAF × 2 + cleanup) ===
   useEffect(() => {
     const resetScroll = () => {
       // Try to find canvas container by class and use scrollTo
@@ -136,10 +136,12 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
       window.scrollTo(0, 0);
     };
     // C1: Double rAF to ensure DOM is ready after mount
-    requestAnimationFrame(() => {
+    const frameId = requestAnimationFrame(() => {
       requestAnimationFrame(resetScroll);
     });
-  }, []); // C2: empty dependency
+    // C2: Cleanup with cancelAnimationFrame
+    return () => cancelAnimationFrame(frameId);
+  }, []); // C3: empty dependency
 
   // F1: F11 keyboard shortcut for maximize mode
   useEffect(() => {

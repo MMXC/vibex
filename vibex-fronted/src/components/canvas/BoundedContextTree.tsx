@@ -642,12 +642,6 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
         )}
       </div>
 
-      {/* Phase hint */}
-      {hasNodes && !allConfirmed && (
-        <p className={styles.contextTreeHint}>
-          确认所有上下文节点后，将自动解锁业务流程树
-        </p>
-      )}
     </div>
   );
 }

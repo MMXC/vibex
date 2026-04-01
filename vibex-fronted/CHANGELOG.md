@@ -1,4 +1,10 @@
 # Changelog
+### E1: Proposal Dedup + ErrorBoundary (proposals-20260401-3)
+- **E1-T1** — NotificationDedup: scripts/notification-dedup.ts，30min TTL hash 去重
+- **E1-T2** — AppErrorBoundary: vibex-fronted/src/components/common/AppErrorBoundary.tsx，React error boundary
+- **E1-T3** — 测试覆盖: AppErrorBoundary.test.tsx 38 lines
+- Commit: `38555574`
+
 
 All notable changes to this project will be documented in this file.
 

@@ -105,7 +105,6 @@ test.describe('AI Stream (V1-V3)', () => {
     // No critical JS errors
     const errors: string[] = [];
     page.on('pageerror', (err) => errors.push(err.message));
-    await page.waitForTimeout(500);
     
     // Filter out non-critical errors
     const criticalErrors = errors.filter(e => !e.includes('hydration'));

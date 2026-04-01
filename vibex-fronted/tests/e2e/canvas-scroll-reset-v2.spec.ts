@@ -21,7 +21,10 @@ test.describe('Canvas Scroll Reset v2 (rAF + cleanup)', () => {
     await page.waitForLoadState('networkidle');
     
     // Wait for rAF × 2 to execute
-    await page.waitForTimeout(200);
+    await page.waitForFunction(() => {
+      const container = document.querySelector('[class*="canvasContainer"]');
+      return container?.scrollTop === 0;
+    }, { timeout: 3000 });
     
     const scrollTop = await page.evaluate(() => {
       const container = document.querySelector('[class*="canvasContainer"]');
@@ -40,7 +43,10 @@ test.describe('Canvas Scroll Reset v2 (rAF + cleanup)', () => {
     await page.waitForLoadState('networkidle');
     
     // Wait for rAF × 2 to execute
-    await page.waitForTimeout(200);
+    await page.waitForFunction(() => {
+      const container = document.querySelector('[class*="canvasContainer"]');
+      return container?.scrollTop === 0;
+    }, { timeout: 3000 });
     
     const scrollTop = await page.evaluate(() => {
       const container = document.querySelector('[class*="canvasContainer"]');
@@ -59,7 +65,10 @@ test.describe('Canvas Scroll Reset v2 (rAF + cleanup)', () => {
     await page.waitForLoadState('networkidle');
     
     // Wait for rAF × 2 to execute
-    await page.waitForTimeout(200);
+    await page.waitForFunction(() => {
+      const container = document.querySelector('[class*="canvasContainer"]');
+      return container?.scrollTop === 0;
+    }, { timeout: 3000 });
     
     const scrollTop = await page.evaluate(() => {
       const container = document.querySelector('[class*="canvasContainer"]');

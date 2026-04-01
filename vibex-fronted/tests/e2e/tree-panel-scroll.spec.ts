@@ -35,11 +35,13 @@ test.describe('Tree Panel Scroll Reset (E1)', () => {
     // Collapse the panel using force:true to bypass intercept
     const toggleBtn = page.locator('[class*="treePanelChevron"]').first();
     await toggleBtn.click({ force: true });
-    await page.waitForTimeout(150);
     
-    // Expand the panel
+    // Expand the panel and wait for scroll reset
     await toggleBtn.click({ force: true });
-    await page.waitForTimeout(150);
+    await page.waitForFunction(() => {
+      const el = document.querySelector('[class*="treePanelBody"]');
+      return el && el.scrollTop === 0;
+    }, { timeout: 3000 });
     
     // Verify scrollTop is reset to 0
     const scrollAfter = await panelBody.evaluate((el) => el.scrollTop);
@@ -59,9 +61,11 @@ test.describe('Tree Panel Scroll Reset (E1)', () => {
       
       const toggleBtn = page.locator('[class*="treePanelChevron"]').first();
       await toggleBtn.click({ force: true });
-      await page.waitForTimeout(150);
       await toggleBtn.click({ force: true });
-      await page.waitForTimeout(150);
+      await page.waitForFunction(() => {
+        const el = document.querySelector('[class*="boundedContextTree"]');
+        return el && el.scrollTop === 0;
+      }, { timeout: 3000 });
       
       const scrollAfter = await contextPanel.evaluate((el) => el.scrollTop);
       expect(scrollAfter).toBe(0);
@@ -82,11 +86,13 @@ test.describe('Tree Panel Scroll Reset (E1)', () => {
     
     // Collapse using force
     await toggleBtn.click({ force: true });
-    await page.waitForTimeout(150);
     
     // Expand and wait for animation
     await toggleBtn.click({ force: true });
-    await page.waitForTimeout(300);
+    await page.waitForFunction(() => {
+      const el = document.querySelector('[class*="treePanelBody"]');
+      return el && el.scrollTop === 0;
+    }, { timeout: 5000 });
     
     // Final state should be 0
     const finalScroll = await panelBody.evaluate((el) => el.scrollTop);

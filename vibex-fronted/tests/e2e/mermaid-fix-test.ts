@@ -13,8 +13,8 @@ import { chromium } from 'playwright';
     // 2. 关闭引导弹窗
     const skipBtn = await page.$('button:has-text("跳过")');
     if (skipBtn) {
-      await skipBtn.click();
-      await page.waitForTimeout(500);
+      await skipBtn.click({ force: true });
+      await page.waitForSelector('button:has-text("跳过")', { state: 'hidden', timeout: 5000 }).catch(() => {});
     }
     
     // 3. 输入需求
@@ -25,8 +25,22 @@ import { chromium } from 'playwright';
     const analyzeBtn = await page.waitForSelector('button:has-text("业务流程分析")');
     await analyzeBtn.click({ force: true });
     
-    // 5. 等待分析完成
-    await page.waitForTimeout(4000);
+    // 5. 等待分析完成 - poll for SVG or text content
+    console.log('等待分析完成（最多15秒）...');
+    const startTime = Date.now();
+    
+    const done = await page.waitForFunction(() => {
+      const bodyText = document.body.innerText;
+      const svgCount = document.querySelectorAll('svg').length;
+      return svgCount > 0 || /下单|支付|审核|打包|发货|收货/.test(bodyText);
+    }, { timeout: 15000 }).then(() => {
+      const elapsed = Math.round((Date.now() - startTime) / 1000);
+      console.log(`  ✅ 分析在 ${elapsed}s 完成`);
+      return true;
+    }).catch(() => {
+      console.log('  ⚠️ 15秒内未检测到分析完成，使用最终状态');
+      return false;
+    });
     
     // 6. 截图
     await page.screenshot({ path: '/tmp/vibex-mermaid-fix-test.png', fullPage: true });

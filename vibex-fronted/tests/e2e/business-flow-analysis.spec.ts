@@ -60,7 +60,6 @@ test.describe('Vibex 业务流程分析测试', () => {
   // TC-001: 首页结构检查
   test('TC-001: 首页结构检查', async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
-    await page.waitForTimeout(2000);
 
     // 检查页面标题
     const title = await page.title();
@@ -121,7 +120,6 @@ test.describe('Vibex 业务流程分析测试', () => {
   // TC-002: 输入需求文本
   test('TC-002: 输入需求文本', async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
-    await page.waitForTimeout(1000);
 
     const textarea = page.locator('textarea').first();
     const hasTextarea = await textarea.count() > 0;
@@ -139,7 +137,6 @@ test.describe('Vibex 业务流程分析测试', () => {
   // TC-003: 选择模式并点击分析
   test('TC-003: 选择模式并点击分析', async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
-    await page.waitForTimeout(1000);
 
     // 输入需求
     const textarea = page.locator('textarea').first();
@@ -160,7 +157,6 @@ test.describe('Vibex 业务流程分析测试', () => {
         await btn.click();
         planClicked = true;
         console.log('✅ 点击 PLAN 模式');
-        await page.waitForTimeout(500);
       }
       
       if ((lowerText.includes('分析') || lowerText.includes('process') || lowerText.includes('analyze')) && !analyzeClicked) {
@@ -180,7 +176,14 @@ test.describe('Vibex 业务流程分析测试', () => {
     // 等待分析过程
     if (analyzeClicked) {
       console.log('\n等待分析结果...');
-      await page.waitForTimeout(5000);
+      // Wait for result content to appear instead of fixed timeout
+      await page.waitForFunction(() => {
+        const bodyText = document.body.innerText;
+        const svgCount = document.querySelectorAll('svg').length;
+        return svgCount > 0 || /下单|支付|审核|流程|flow/i.test(bodyText);
+      }, { timeout: 15000 }).catch(() => {
+        console.log('⚠️ 分析结果等待超时');
+      });
 
       // 检查组件状态变化
       const loadingIndicator = page.locator('[class*="loading"], [class*="spinner"], [class*="progress"]');

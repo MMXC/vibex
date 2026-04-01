@@ -20,11 +20,9 @@ test.describe('Tab Shortcuts (Alt+1/2/3)', () => {
     
     // Press Alt+2 first to switch away from default
     await page.keyboard.press('Alt+2');
-    await page.waitForTimeout(100);
     
     // Press Alt+1 to switch to Context
     await page.keyboard.press('Alt+1');
-    await page.waitForTimeout(100);
     
     // Verify context tab is active (check via store or UI state)
     // The store state should have activeTree === 'context'
@@ -36,7 +34,6 @@ test.describe('Tab Shortcuts (Alt+1/2/3)', () => {
     
     // Press Alt+2
     await page.keyboard.press('Alt+2');
-    await page.waitForTimeout(100);
     
     // Flow tab should be active
   });
@@ -47,7 +44,6 @@ test.describe('Tab Shortcuts (Alt+1/2/3)', () => {
     
     // Press Alt+3
     await page.keyboard.press('Alt+3');
-    await page.waitForTimeout(100);
     
     // Component tab should be active
   });
@@ -59,15 +55,12 @@ test.describe('Tab Shortcuts (Alt+1/2/3)', () => {
     
     // Press 1 without Alt - should not switch
     await page.keyboard.press('1');
-    await page.waitForTimeout(100);
     
     // Press 2 without Alt - should not switch
     await page.keyboard.press('2');
-    await page.waitForTimeout(100);
     
     // Press 3 without Alt - should not switch
     await page.keyboard.press('3');
-    await page.waitForTimeout(100);
     
     // Tab switching should only happen with Alt modifier
   });
@@ -79,7 +72,6 @@ test.describe('Tab Shortcuts (Alt+1/2/3)', () => {
     
     // Press Ctrl+Alt+1 - should not trigger
     await page.keyboard.press('Control+Alt+1');
-    await page.waitForTimeout(100);
     
     // Should not cause errors
   });
@@ -90,18 +82,14 @@ test.describe('Tab Shortcuts (Alt+1/2/3)', () => {
     
     // Click on canvas area to ensure focus
     await page.click('[class*="canvasContainer"]');
-    await page.waitForTimeout(100);
     
     // Alt+1 should work
     await page.keyboard.press('Alt+1');
-    await page.waitForTimeout(100);
     
     // Alt+2 should work
     await page.keyboard.press('Alt+2');
-    await page.waitForTimeout(100);
     
     // Alt+3 should work
     await page.keyboard.press('Alt+3');
-    await page.waitForTimeout(100);
   });
 });

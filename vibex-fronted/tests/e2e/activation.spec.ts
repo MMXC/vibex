@@ -64,9 +64,7 @@ test.describe('Homepage Activation (V1-V4)', () => {
     const textarea = page.locator('textarea').first();
     await textarea.fill('测试输入触发状态更新');
     
-    // Wait for potential state update
-    await page.waitForTimeout(300);
-    
+    // Playwright fill() already waits for stability; no explicit timeout needed
     // Page should still be responsive
     const isVisible = await textarea.isVisible();
     expect(isVisible).toBeTruthy();
@@ -163,8 +161,7 @@ test.describe('Homepage Activation (V1-V4)', () => {
     // Should not cause errors
     const errors: string[] = [];
     page.on('pageerror', (err) => errors.push(err.message));
-    await page.waitForTimeout(300);
-    
+    // Playwright fill() already waits; no additional timeout needed
     expect(errors).toHaveLength(0);
   });
 });

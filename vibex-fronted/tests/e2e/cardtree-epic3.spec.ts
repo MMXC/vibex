@@ -24,18 +24,19 @@ async function navigateToCardTreePage(page: Page, projectId?: string): Promise<v
   // Navigate to confirm page which has the PreviewArea
   await page.goto(`${BASE_URL}/confirm`, { waitUntil: 'networkidle' });
 
-  // Close onboarding modal if present
+  // Close onboarding modal if present — wait for modal to disappear instead of fixed timeout
   const skipBtn = page.locator('button:has-text("跳过"), button:has-text("关闭"), [aria-label="关闭"]').first();
   if (await skipBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
     await skipBtn.click();
-    await page.waitForTimeout(500);
+    await skipBtn.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
   }
 
-  // Enter test requirement to trigger analysis
+  // Enter test requirement to trigger analysis — wait for CardTree nodes instead of fixed timeout
   const textarea = page.locator('textarea').first();
   if (await textarea.isVisible({ timeout: 5000 }).catch(() => false)) {
     await textarea.fill('开发一个在线教育平台，支持课程管理、用户学习进度跟踪');
-    await page.waitForTimeout(1000);
+    // Wait for CardTree nodes to appear instead of fixed 1000ms
+    await page.waitForSelector('[data-testid="cardtree-node"]', { timeout: 10000 }).catch(() => {});
   }
 }
 
@@ -55,11 +56,11 @@ test.describe('Epic 3: CardTree UI Interactive Verification', () => {
       // Visit the page directly without triggering analysis
       await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
 
-      // Close onboarding modal
+      // Close onboarding modal — wait for button to disappear instead of fixed timeout
       const skipBtn = page.locator('button:has-text("跳过"), button:has-text("关闭")').first();
       if (await skipBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
         await skipBtn.click();
-        await page.waitForTimeout(500);
+        await skipBtn.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
       }
 
       // Check that empty state element exists if CardTree is visible
@@ -77,11 +78,11 @@ test.describe('Epic 3: CardTree UI Interactive Verification', () => {
       // gracefully handles the empty/no-project case
       await page.goto(`${BASE_URL}/confirm`, { waitUntil: 'networkidle' });
 
-      // Close modal if present
+      // Close modal if present — wait for button to disappear instead of fixed timeout
       const skipBtn = page.locator('button:has-text("跳过"), button:has-text("关闭")').first();
       if (await skipBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
         await skipBtn.click();
-        await page.waitForTimeout(500);
+        await skipBtn.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
       }
 
       // The CardTree component may or may not be visible depending on whether
@@ -110,7 +111,7 @@ test.describe('Epic 3: CardTree UI Interactive Verification', () => {
     test('E3.2.1: Should show skeleton while data is loading', async ({ page }) => {
       // Use a slow network simulation or intercept API
       await page.route('**/api/project/tree*', async (route) => {
-        // Delay response to show loading state
+        // Delay response to show loading state — this is intentional for testing loading state
         await new Promise(resolve => setTimeout(resolve, 2000));
         await route.continue();
       });
@@ -127,12 +128,12 @@ test.describe('Epic 3: CardTree UI Interactive Verification', () => {
       const textarea = page.locator('textarea').first();
       if (await textarea.isVisible({ timeout: 5000 }).catch(() => false)) {
         await textarea.fill('开发一个在线教育平台');
-        await page.waitForTimeout(500);
+        // Wait for skeleton to appear — this is a loading state wait, not animation
+        await page.waitForSelector('[data-testid="cardtree-skeleton"]', { timeout: 5000 }).catch(() => {});
       }
 
       // Skeleton should be visible during initial load
       const skeleton = page.locator('[data-testid="cardtree-skeleton"]');
-      // Note: Timing depends on actual loading speed
       console.log('[E3.2.1] Loading state test completed');
     });
   });
@@ -147,17 +148,15 @@ test.describe('Epic 3: CardTree UI Interactive Verification', () => {
       const skipBtn = page.locator('button:has-text("跳过"), button:has-text("关闭")').first();
       if (await skipBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
         await skipBtn.click();
-        await page.waitForTimeout(500);
+        await skipBtn.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
       }
 
-      // Enter text to trigger analysis
+      // Enter text to trigger analysis — wait for CardTree nodes instead of fixed timeout
       const textarea = page.locator('textarea').first();
       if (await textarea.isVisible({ timeout: 5000 }).catch(() => false)) {
         await textarea.fill('开发一个在线教育平台，支持课程管理、用户学习进度跟踪');
+        await page.waitForSelector('[data-testid="cardtree-node"]', { timeout: 10000 }).catch(() => {});
       }
-
-      // Wait for CardTree nodes to appear
-      await page.waitForTimeout(3000);
 
       // Find the toggle expand button
       const toggleBtn = page.locator('[data-testid="toggle-expand"]').first();
@@ -165,9 +164,8 @@ test.describe('Epic 3: CardTree UI Interactive Verification', () => {
       // Verify toggle button exists if there are nodes with children
       const toggleCount = await toggleBtn.count();
       if (toggleCount > 0) {
-        // Click to collapse
+        // Click to collapse — Playwright action waits for stability
         await toggleBtn.click();
-        await page.waitForTimeout(500);
 
         // Verify the collapsed hint is shown
         const collapsedHint = page.locator('[data-testid="collapsed-hint"]').first();
@@ -175,9 +173,8 @@ test.describe('Epic 3: CardTree UI Interactive Verification', () => {
 
         if (isCollapsed) {
           console.log('[E3.3.1] Node successfully collapsed');
-          // Click again to expand
+          // Click again to expand — Playwright action waits for stability
           await toggleBtn.click();
-          await page.waitForTimeout(500);
           console.log('[E3.3.1] Node successfully re-expanded');
         }
       } else {
@@ -192,25 +189,23 @@ test.describe('Epic 3: CardTree UI Interactive Verification', () => {
       const skipBtn = page.locator('button:has-text("跳过"), button:has-text("关闭")').first();
       if (await skipBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
         await skipBtn.click();
-        await page.waitForTimeout(500);
+        await skipBtn.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
       }
 
-      // Enter text
+      // Enter text — wait for CardTree nodes instead of fixed timeout
       const textarea = page.locator('textarea').first();
       if (await textarea.isVisible({ timeout: 5000 }).catch(() => false)) {
         await textarea.fill('开发一个在线教育平台');
+        await page.waitForSelector('[data-testid="cardtree-node"]', { timeout: 10000 }).catch(() => {});
       }
-
-      await page.waitForTimeout(3000);
 
       // Find a node card and click it
       const nodeCard = page.locator('[data-testid="cardtree-node"]').first();
       const nodeCount = await nodeCard.count();
 
       if (nodeCount > 0) {
-        // Click the node (triggers toggle via onNodeClick)
+        // Click the node (triggers toggle via onNodeClick) — force: true to avoid overlay intercept
         await nodeCard.click({ force: true });
-        await page.waitForTimeout(500);
         console.log('[E3.3.2] Node click handled successfully');
       } else {
         console.log('[E3.3.2] No node cards found');
@@ -228,16 +223,15 @@ test.describe('Epic 3: CardTree UI Interactive Verification', () => {
       const skipBtn = page.locator('button:has-text("跳过"), button:has-text("关闭")').first();
       if (await skipBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
         await skipBtn.click();
-        await page.waitForTimeout(500);
+        await skipBtn.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
       }
 
-      // Enter text
+      // Enter text — wait for CardTree nodes instead of fixed timeout
       const textarea = page.locator('textarea').first();
       if (await textarea.isVisible({ timeout: 5000 }).catch(() => false)) {
         await textarea.fill('开发一个在线教育平台，支持课程管理');
+        await page.waitForSelector('[data-testid="cardtree-node"]', { timeout: 10000 }).catch(() => {});
       }
-
-      await page.waitForTimeout(3000);
 
       // Find checkboxes
       const checkbox = page.locator('[data-testid^="checkbox-"]').first();
@@ -247,18 +241,16 @@ test.describe('Epic 3: CardTree UI Interactive Verification', () => {
         // Get initial state
         const initialChecked = await checkbox.isChecked();
 
-        // Click to toggle
+        // Click to toggle — Playwright click() waits for stability, no explicit timeout needed
         await checkbox.click();
-        await page.waitForTimeout(300);
 
         // Verify state changed
         const afterChecked = await checkbox.isChecked();
         expect(afterChecked).toBe(!initialChecked);
         console.log(`[E3.4.1] Checkbox toggled from ${initialChecked} to ${afterChecked}`);
 
-        // Toggle back
+        // Toggle back — Playwright click() waits for stability
         await checkbox.click();
-        await page.waitForTimeout(300);
         const finalChecked = await checkbox.isChecked();
         expect(finalChecked).toBe(initialChecked);
       } else {
@@ -273,22 +265,20 @@ test.describe('Epic 3: CardTree UI Interactive Verification', () => {
       const skipBtn = page.locator('button:has-text("跳过"), button:has-text("关闭")').first();
       if (await skipBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
         await skipBtn.click();
-        await page.waitForTimeout(500);
+        await skipBtn.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
       }
 
-      // Enter text
+      // Enter text — wait for CardTree nodes instead of fixed timeout
       const textarea = page.locator('textarea').first();
       if (await textarea.isVisible({ timeout: 5000 }).catch(() => false)) {
         await textarea.fill('开发一个在线教育平台');
+        await page.waitForSelector('[data-testid="cardtree-node"]', { timeout: 10000 }).catch(() => {});
       }
-
-      await page.waitForTimeout(3000);
 
       const checkbox = page.locator('[data-testid^="checkbox-"]').first();
       if (await checkbox.count() > 0) {
-        // Check the checkbox
+        // Check the checkbox — Playwright action waits for stability
         await checkbox.check();
-        await page.waitForTimeout(300);
 
         // Find the associated text element (sibling span)
         const label = page.locator('label').filter({ has: checkbox }).first();
@@ -313,30 +303,27 @@ test.describe('Epic 3: CardTree UI Interactive Verification', () => {
       const skipBtn = page.locator('button:has-text("跳过"), button:has-text("关闭")').first();
       if (await skipBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
         await skipBtn.click();
-        await page.waitForTimeout(500);
+        await skipBtn.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
       }
 
-      // Enter text
+      // Enter text — wait for CardTree nodes instead of fixed timeout
       const textarea = page.locator('textarea').first();
       if (await textarea.isVisible({ timeout: 5000 }).catch(() => false)) {
         await textarea.fill('开发一个在线教育平台');
+        await page.waitForSelector('[data-testid="cardtree-node"]', { timeout: 10000 }).catch(() => {});
       }
-
-      await page.waitForTimeout(3000);
 
       // Find an expand button for checkbox children
       const expandBtn = page.locator('[data-testid^="expand-btn-"]').first();
       const expandCount = await expandBtn.count();
 
       if (expandCount > 0) {
-        // Click to collapse
+        // Click to collapse — Playwright action waits for stability
         await expandBtn.click();
-        await page.waitForTimeout(300);
         console.log('[E3.4.3] Nested expand/collapse handled');
 
-        // Click to expand again
+        // Click to expand again — Playwright action waits for stability
         await expandBtn.click();
-        await page.waitForTimeout(300);
         console.log('[E3.4.3] Nested re-expansion handled');
       } else {
         console.log('[E3.4.3] No nested expand buttons found');
@@ -354,16 +341,15 @@ test.describe('Epic 3: CardTree UI Interactive Verification', () => {
       const skipBtn = page.locator('button:has-text("跳过"), button:has-text("关闭")').first();
       if (await skipBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
         await skipBtn.click();
-        await page.waitForTimeout(500);
+        await skipBtn.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
       }
 
-      // Enter text
+      // Enter text — wait for CardTree nodes instead of fixed timeout
       const textarea = page.locator('textarea').first();
       if (await textarea.isVisible({ timeout: 5000 }).catch(() => false)) {
         await textarea.fill('开发一个在线教育平台');
+        await page.waitForSelector('[data-testid="cardtree-node"]', { timeout: 10000 }).catch(() => {});
       }
-
-      await page.waitForTimeout(3000);
 
       // Find status badges
       const statusBadges = page.locator('[data-testid="status-badge"]');
@@ -396,16 +382,15 @@ test.describe('Epic 3: CardTree UI Interactive Verification', () => {
       const skipBtn = page.locator('button:has-text("跳过"), button:has-text("关闭")').first();
       if (await skipBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
         await skipBtn.click();
-        await page.waitForTimeout(500);
+        await skipBtn.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
       }
 
-      // Enter text
+      // Enter text — wait for CardTree nodes instead of fixed timeout
       const textarea = page.locator('textarea').first();
       if (await textarea.isVisible({ timeout: 5000 }).catch(() => false)) {
         await textarea.fill('开发一个在线教育平台');
+        await page.waitForSelector('[data-testid="cardtree-node"]', { timeout: 10000 }).catch(() => {});
       }
-
-      await page.waitForTimeout(3000);
 
       // Verify ReactFlow controls and minimap are present
       const controls = page.locator('.react-flow__controls');
@@ -437,16 +422,16 @@ test.describe('Epic 3: CardTree UI Interactive Verification', () => {
       const skipBtn = page.locator('button:has-text("跳过"), button:has-text("关闭")').first();
       if (await skipBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
         await skipBtn.click();
-        await page.waitForTimeout(500);
+        await skipBtn.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
       }
 
-      // Enter text
+      // Enter text — wait for Mermaid content instead of fixed timeout
       const textarea = page.locator('textarea').first();
       if (await textarea.isVisible({ timeout: 5000 }).catch(() => false)) {
         await textarea.fill('开发一个在线教育平台');
+        // Wait for Mermaid diagram to appear when CardTree is disabled
+        await page.waitForSelector('.mermaid, [class*="mermaid"]', { timeout: 10000 }).catch(() => {});
       }
-
-      await page.waitForTimeout(2000);
 
       // When CardTree is disabled, should show Mermaid diagram
       const mermaid = page.locator('.mermaid, [class*="mermaid"]');
@@ -477,16 +462,16 @@ test.describe('Epic 3: CardTree UI Interactive Verification', () => {
       const skipBtn = page.locator('button:has-text("跳过"), button:has-text("关闭")').first();
       if (await skipBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
         await skipBtn.click();
-        await page.waitForTimeout(500);
+        await skipBtn.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
       }
 
-      // Enter text to trigger API call
+      // Enter text to trigger API call — wait for error state instead of fixed timeout
       const textarea = page.locator('textarea').first();
       if (await textarea.isVisible({ timeout: 5000 }).catch(() => false)) {
         await textarea.fill('开发一个在线教育平台');
+        // Wait for error state to appear since API is aborted
+        await page.waitForSelector('[data-testid="cardtree-error"]', { timeout: 5000 }).catch(() => {});
       }
-
-      await page.waitForTimeout(2000);
 
       // Error state should be shown
       const errorState = page.locator('[data-testid="cardtree-error"]');
@@ -511,16 +496,15 @@ test.describe('Epic 3: CardTree UI Interactive Verification', () => {
       const skipBtn = page.locator('button:has-text("跳过"), button:has-text("关闭")').first();
       if (await skipBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
         await skipBtn.click();
-        await page.waitForTimeout(500);
+        await skipBtn.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
       }
 
-      // Enter text
+      // Enter text — wait for error state instead of fixed timeout
       const textarea = page.locator('textarea').first();
       if (await textarea.isVisible({ timeout: 5000 }).catch(() => false)) {
         await textarea.fill('开发一个在线教育平台');
+        await page.waitForSelector('[data-testid="cardtree-error"]', { timeout: 5000 }).catch(() => {});
       }
-
-      await page.waitForTimeout(2000);
 
       // Retry button should exist
       const retryBtn = page.locator('[data-testid="retry-button"], button:has-text("重试"), button:has-text("Retry")');
@@ -540,16 +524,15 @@ test.describe('Epic 3: CardTree UI Interactive Verification', () => {
       const skipBtn = page.locator('button:has-text("跳过"), button:has-text("关闭")').first();
       if (await skipBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
         await skipBtn.click();
-        await page.waitForTimeout(500);
+        await skipBtn.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
       }
 
-      // Enter text
+      // Enter text — wait for CardTree nodes instead of fixed timeout
       const textarea = page.locator('textarea').first();
       if (await textarea.isVisible({ timeout: 5000 }).catch(() => false)) {
         await textarea.fill('开发一个在线教育平台');
+        await page.waitForSelector('[data-testid="cardtree-node"]', { timeout: 10000 }).catch(() => {});
       }
-
-      await page.waitForTimeout(3000);
 
       // Find node titles
       const titles = page.locator('[data-testid="node-title"]');
@@ -574,16 +557,15 @@ test.describe('Epic 3: CardTree UI Interactive Verification', () => {
       const skipBtn = page.locator('button:has-text("跳过"), button:has-text("关闭")').first();
       if (await skipBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
         await skipBtn.click();
-        await page.waitForTimeout(500);
+        await skipBtn.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
       }
 
-      // Enter text
+      // Enter text — wait for CardTree nodes instead of fixed timeout
       const textarea = page.locator('textarea').first();
       if (await textarea.isVisible({ timeout: 5000 }).catch(() => false)) {
         await textarea.fill('开发一个在线教育平台');
+        await page.waitForSelector('[data-testid="cardtree-node"]', { timeout: 10000 }).catch(() => {});
       }
-
-      await page.waitForTimeout(3000);
 
       // Verify ReactFlow container is present
       const reactFlow = page.locator('.react-flow');

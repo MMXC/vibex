@@ -64,10 +64,9 @@ test.describe('Homepage UI Fix (VIBEX-006)', () => {
     
     if (hasTemplate) {
       await templateBtn.first().click();
-      await page.waitForTimeout(500);
-      
-      // 验证弹窗出现
+      // Wait for modal to appear instead of fixed timeout
       const modal = page.locator('[class*="modal"], [class*="dialog"], [class*="popup"]');
+      await modal.first().waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
       console.log('Template modal appeared:', await modal.count() > 0);
     }
   });

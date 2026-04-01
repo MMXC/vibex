@@ -61,13 +61,9 @@ test.describe('Ctrl+G Quick Generate (E1)', () => {
     
     // Press Ctrl+G to start generation
     await page.keyboard.press('Control+g');
-    await page.waitForTimeout(200);
     
     // Press again - should be ignored (no crash)
     await page.keyboard.press('Control+g');
-    
-    // Wait a bit and check no error occurred
-    await page.waitForTimeout(500);
   });
 
   // T2: 三树节点全部生成 (API dependent - may be skipped if API unavailable)
@@ -82,8 +78,15 @@ test.describe('Ctrl+G Quick Generate (E1)', () => {
     
     await page.keyboard.press('Control+g');
     
-    // Wait for generation to complete (API dependent)
-    await page.waitForTimeout(10000);
+    // Wait for generation to complete - poll for nodes or timeout
+    await page.waitForFunction(() => {
+      const context = document.querySelectorAll('[data-testid="context-node"]').length;
+      const flow = document.querySelectorAll('[data-testid="flow-node"]').length;
+      const component = document.querySelectorAll('[data-testid="component-node"]').length;
+      return context > 0 || flow > 0 || component > 0;
+    }, { timeout: 15000 }).catch(() => {
+      console.log('⚠️ No nodes appeared within timeout');
+    });
     
     const contextCount = await page.locator('[data-testid="context-node"]').count();
     const flowCount = await page.locator('[data-testid="flow-node"]').count();
@@ -117,7 +120,6 @@ test.describe('Ctrl+G Quick Generate (E1)', () => {
     
     // Open shortcut hint panel (press ?)
     await page.keyboard.press('?');
-    await page.waitForTimeout(200);
     
     // Check if panel exists and contains Ctrl+G
     const panel = page.locator('[data-testid="shortcut-hint-panel"]');

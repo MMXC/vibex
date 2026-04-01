@@ -1,3 +1,8 @@
+### Fixed (canvas-bc-checkbox-fix Epic1: 删除 confirmed:false from handleGenerate) — 2026-04-02
+- **Epic1**: 移除 handleGenerate 中新增节点的 confirmed:false 字段
+- **根因**: 新建节点无需 confirmed 字段，checkbox 默认状态由 isActive 决定
+- **提交**: `34de803d`
+
 ### Added (proposals-20260401-9: Sprint 3 - Checkbox/Drawer/Responsive/Shortcuts) — 2026-04-02
 - **E1 Checkbox Confirm**: confirmContextNode/confirmFlowNode/confirmStep actions in canvasStore.ts; BoundedContextTree/BusinessFlowTree checkbox onChange calls confirm semantics
 - **E2 Message Drawer**: canvasEvents.ts (CanvasEventType/CanvasEvent); openRightDrawer()/submitCanvas() in canvasStore.ts; CommandInput auto-open drawer on command execute; /submit logs event

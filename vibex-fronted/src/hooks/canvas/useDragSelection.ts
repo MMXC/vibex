@@ -68,10 +68,22 @@ export function useDragSelection({
   const [selectionBox, setSelectionBox] = useState<Rect | null>(null);
   const [isSelecting, setIsSelecting] = useState(false);
 
-  /** Check if a point is inside the selection box (reserved for future use) */
-  // const isPointInBox = (px: number, py: number, box: Rect) =>
-  //   px >= box.left && px <= box.left + box.width &&
-  //   py >= box.top && py <= box.top + box.height;
+  // Store callbacks and state in refs so the effect only re-runs when `enabled` changes.
+  // This avoids stale closures and constant listener re-registration during drag.
+  const onSelectionChangeRef = useRef(onSelectionChange);
+  const getNodePositionsRef = useRef(getNodePositions);
+  const isSelectingRef = useRef(isSelecting);
+  const selectionBoxRef = useRef<Rect | null>(null);
+  onSelectionChangeRef.current = onSelectionChange;
+  getNodePositionsRef.current = getNodePositions;
+  isSelectingRef.current = isSelecting;
+
+  // Keep selectionBoxRef in sync with state
+  const prevSelectionBox = useRef<Rect | null>(null);
+  if (selectionBox !== prevSelectionBox.current) {
+    selectionBoxRef.current = selectionBox;
+    prevSelectionBox.current = selectionBox;
+  }
 
   /** Check if a node rect intersects with the selection box */
   const doesNodeIntersectBox = useCallback(
@@ -95,12 +107,12 @@ export function useDragSelection({
   /** Compute which nodes are inside the current selection box */
   const computeSelectedNodes = useCallback(
     (box: Rect): string[] => {
-      const nodes = getNodePositions();
+      const nodes = getNodePositionsRef.current();
       return nodes
         .filter(({ rect }) => doesNodeIntersectBox(rect, box))
         .map(({ id }) => id);
     },
-    [getNodePositions, doesNodeIntersectBox]
+    [doesNodeIntersectBox]
   );
 
   useEffect(() => {
@@ -168,11 +180,11 @@ export function useDragSelection({
       if (!isMouseDown.current) return;
       isMouseDown.current = false;
 
-      if (selectionBox && didDrag.current) {
+      if (selectionBoxRef.current && didDrag.current) {
         // Only fire selection change if it was a real drag (not a click)
-        const selectedIds = computeSelectedNodes(selectionBox);
+        const selectedIds = computeSelectedNodes(selectionBoxRef.current);
         if (selectedIds.length > 0) {
-          onSelectionChange(selectedIds);
+          onSelectionChangeRef.current(selectedIds);
         }
       }
 
@@ -182,9 +194,9 @@ export function useDragSelection({
       setIsSelecting(false);
     };
 
-    // Cancel on Escape
+    // Cancel on Escape — use ref to avoid stale closure
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isSelecting) {
+      if (e.key === 'Escape' && isSelectingRef.current) {
         isMouseDown.current = false;
         startPoint.current = null;
         didDrag.current = false;
@@ -205,7 +217,8 @@ export function useDragSelection({
       document.removeEventListener('keydown', handleKeyDown);
       container.removeEventListener('mousedown', handleMouseDown);
     };
-  }, [enabled, selectionBox, isSelecting, computeSelectedNodes, onSelectionChange]);
+    // Only re-run when enabled changes. Callbacks are stored in refs to avoid stale closures.
+  }, [enabled]);
 
   return { selectionBox, isSelecting, containerRef };
 }

@@ -18,11 +18,91 @@ Commands:
 """
 
 import argparse
+import fcntl
 import json
 import os
 import signal
 import sys
+import threading
+import time
 from datetime import datetime, timezone
+
+# E1-T3: File-level lock with try-finally timeout protection for concurrent claim safety
+_LOCK_TIMEOUT = 30  # seconds — auto-release if process hangs
+_project_locks: dict[str, tuple[int, str]] = {}  # project → (fd, lock_path)
+
+
+def _acquire_file_lock(project: str, timeout_seconds: int = _LOCK_TIMEOUT) -> int:
+    """Acquire an exclusive advisory lock on the project's tasks.json file.
+    
+    Uses fcntl.flock() with non-blocking retry + timeout. Falls back to
+    blocking lock if the lock can be acquired immediately. On timeout,
+    raises TimeoutError.
+    
+    E1-T3: try-finally ensures lock is ALWAYS released even on exception.
+    Lock is tracked per-project so concurrent processes for different
+    projects don't block each other.
+    
+    Returns:
+        File descriptor (must be closed in _release_file_lock).
+    """
+    lock_path = task_file(project)
+    # Ensure parent directory exists
+    os.makedirs(os.path.dirname(lock_path) or ".", exist_ok=True)
+    # Create lock file if it doesn't exist
+    open(lock_path, "a").close()
+    
+    fd = os.open(lock_path, os.O_RDWR)
+    
+    deadline = time.monotonic() + timeout_seconds
+    
+    try:
+        # Try non-blocking lock first (fast path for uncontended case)
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            _project_locks[project] = (fd, lock_path)
+            return fd
+        except BlockingIOError:
+            # Lock is held by another process — retry with timeout
+            pass
+        
+        # Retry loop with timeout
+        while time.monotonic() < deadline:
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                _project_locks[project] = (fd, lock_path)
+                return fd
+            except BlockingIOError:
+                # Lock not available — sleep briefly before retry
+                time.sleep(0.1)
+        
+        # Timeout exceeded
+        os.close(fd)
+        raise TimeoutError(f"File lock timeout ({timeout_seconds}s) for '{project}' — possible deadlock")
+    
+    except TimeoutError:
+        raise
+    except Exception:
+        try:
+            os.close(fd)
+        except Exception:
+            pass
+        raise
+
+
+def _release_file_lock(project: str) -> None:
+    """Release the file lock for the given project (idempotent)."""
+    entry = _project_locks.pop(project, None)
+    if entry is not None:
+        fd, _ = entry
+        try:
+            fcntl.flock(fd, fcntl.LOCK_UN)
+        except Exception:
+            pass
+        try:
+            os.close(fd)
+        except Exception:
+            pass
 
 # Add scripts/ to path for current_report module
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -38,6 +118,18 @@ except ImportError:
             return func
     class TimeoutError(Exception):
         pass
+
+
+# ── E2-T1: 越权编辑防护异常 ─────────────────────────────────────────────────
+class LockRequired(Exception):
+    """任务未被领取（未处于 in-progress 状态），禁止更新状态。
+    
+    所有 update 调用必须先通过 claim 命令领取任务。
+    仅在以下情况允许绕过：
+    - 使用 --skip-lock 参数（coord 专用）
+    - 状态变更为 pending（驳回场景）
+    """
+    pass
 
 # Import log_analysis functions (graceful fallback if not available)
 try:
@@ -131,6 +223,58 @@ else:
     HAS_CURRENT_REPORT = False
 
 
+# ── E2-T3: 通知去重配置 ─────────────────────────────────────────────────────
+import hashlib
+import time as _time
+
+_NOTIF_DEDUP_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".notif_dedup.json")
+_NOTIF_DEDUP_TTL = 30 * 60  # 30 分钟去重窗口（秒）
+
+
+def _notif_key(channel_id: str, text: str) -> str:
+    """生成通知去重 key（channel + 内容 hash）"""
+    content = f"{channel_id}:{text}"
+    return hashlib.sha256(content.encode()).hexdigest()[:16]
+
+
+def _is_notif_duplicate(channel_id: str, text: str) -> bool:
+    """检查通知是否在 30min 内已发送，是则返回 True。"""
+    if not os.path.exists(_NOTIF_DEDUP_FILE):
+        return False
+    try:
+        with open(_NOTIF_DEDUP_FILE) as f:
+            cache = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return False
+    key = _notif_key(channel_id, text)
+    entry = cache.get(key)
+    if not entry:
+        return False
+    sent_at = entry.get("ts", 0)
+    if _time.time() - sent_at < _NOTIF_DEDUP_TTL:
+        return True
+    # 过期，清除
+    return False
+
+
+def _record_notif(channel_id: str, text: str) -> None:
+    """记录通知发送记录，用于去重。"""
+    try:
+        cache = {}
+        if os.path.exists(_NOTIF_DEDUP_FILE):
+            with open(_NOTIF_DEDUP_FILE) as f:
+                cache = json.load(f)
+        key = _notif_key(channel_id, text)
+        # 清除过期条目
+        now = _time.time()
+        cache = {k: v for k, v in cache.items() if now - v.get("ts", 0) < _NOTIF_DEDUP_TTL}
+        cache[key] = {"ts": now, "channel": channel_id}
+        with open(_NOTIF_DEDUP_FILE, "w") as f:
+            json.dump(cache, f, indent=2)
+    except Exception:
+        pass  # 去重失败不阻塞主流程
+
+
 # ── Slack 通知配置 ───────────────────────────────────────────────────────────
 import urllib.request
 
@@ -158,8 +302,15 @@ AGENT_TOKEN = {
 
 
 def _curl_slack(channel_id: str, user_token: str, text: str) -> bool:
-    """发送 Slack 消息，返回是否成功。curl 失败不阻塞主流程。"""
+    """发送 Slack 消息，返回是否成功。curl 失败不阻塞主流程。
+    
+    E2-T3: 相同内容在 30min 内不会重复发送（去重 key = channel + text hash）。
+    """
     if not user_token:
+        return False
+    # E2-T3: 重复通知过滤
+    if _is_notif_duplicate(channel_id, text):
+        print(f"⏭️ 通知去重（30min 内已发送）: channel={channel_id}", file=sys.stderr)
         return False
     payload = json.dumps({"channel": channel_id, "text": text, "mrkdwn": True}).encode()
     req = urllib.request.Request(
@@ -174,7 +325,11 @@ def _curl_slack(channel_id: str, user_token: str, text: str) -> bool:
     try:
         with urllib.request.urlopen(req, timeout=10) as resp:
             result = json.loads(resp.read())
-            return result.get("ok", False)
+            ok = result.get("ok", False)
+            # E2-T3: 发送成功后记录（用于去重）
+            if ok:
+                _record_notif(channel_id, text)
+            return ok
     except Exception as e:
         print(f"⚠️  Slack 通知失败: {e}", file=sys.stderr)
         return False
@@ -1375,217 +1530,243 @@ def cmd_graph(args):
     print("📈 Summary: %d done | %d in-progress | %d pending | %d total" % (done, ip, pending, total))
 
 def cmd_update(args):
-    """更新任务状态"""
-    # F3.1: use optimistic lock for concurrent safety
-    data, expected_rev = load_project_with_rev(args.project)
-    stage_id = args.stage
-    new_status = args.status
+    """更新任务状态
+    
+    E1-T3: Uses fcntl.flock() with 30s timeout + try-finally for
+    concurrent update safety.
+    """
+    # E1-T3: Acquire file-level lock with timeout to prevent update race conditions
+    _acquire_file_lock(args.project)
+    try:
+        # F3.1: use optimistic lock for concurrent safety
+        data, expected_rev = load_project_with_rev(args.project)
+        stage_id = args.stage
+        new_status = args.status
 
-    if stage_id not in data["stages"]:
-        print(f"Error: stage '{stage_id}' not found", file=sys.stderr)
-        sys.exit(1)
+        if stage_id not in data["stages"]:
+            print(f"Error: stage '{stage_id}' not found", file=sys.stderr)
+            sys.exit(1)
 
-    valid = ("pending", "in-progress", "done", "failed", "skipped")
-    if new_status not in valid:
-        print(f"Error: status must be one of {valid}", file=sys.stderr)
-        sys.exit(1)
+        valid = ("pending", "in-progress", "done", "failed", "skipped")
+        if new_status not in valid:
+            print(f"Error: status must be one of {valid}", file=sys.stderr)
+            sys.exit(1)
 
-    stage = data["stages"][stage_id]
-    old_status = stage["status"]
+        stage = data["stages"][stage_id]
+        old_status = stage["status"]
 
-    # ── gstack 验证 ──────────────────────────────────────────────
-    if new_status == "done" and not getattr(args, "skip_gstack_verify", False):
-        details = stage.get("details", {})
-        constraints = details.get("constraints", [])
-        result_text = getattr(args, "result", "") or ""
-
-        # 检查约束是否要求 gstack
-        gstack_required = any(
-            "gstack" in str(c).lower() or "/browse" in str(c) or "/qa" in str(c) or "/canary" in str(c)
-            for c in constraints
-        )
-
-        if gstack_required:
-            # 导入验证脚本
-            import subprocess
-            script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "verify_gstack_usage.py")
-            work_dir = details.get("workDir") or details.get("work_dir")
-
-            cmd = ["python3", script_path]
-            if result_text:
-                cmd.append(result_text)
-
-            try:
-                proc = subprocess.run(
-                    cmd + ([work_dir] if work_dir else []),
-                    capture_output=True, text=True, timeout=30
+        # ── E2-T1: 越权编辑防护 ────────────────────────────────────────────────
+        if old_status != "in-progress" and new_status in ("done", "failed", "skipped"):
+            if getattr(args, "skip_lock", False):
+                print(f"⚠️  LockRequired bypassed by --skip-lock", file=sys.stderr)
+            else:
+                raise LockRequired(
+                    f"任务 '{stage_id}' 当前状态为 '{old_status}'，必须先被 claim（in-progress）才能更新到 '{new_status}'。"
+                    f"\n请先执行: task_manager.py claim {args.project} {stage_id}"
                 )
-                if proc.returncode != 0:
-                    print(f"", file=sys.stderr)
-                    print(f"🔴 GSTACK_VERIFICATION_FAILED", file=sys.stderr)
-                    print(f"   任务要求使用 gstack 技能，但未检测到使用证据", file=sys.stderr)
-                    print(f"   请在任务报告中包含:", file=sys.stderr)
-                    print(f"   - 截图文件路径", file=sys.stderr)
-                    print(f"   - browse snapshot 输出", file=sys.stderr)
-                    print(f"   - qa/canary 报告路径", file=sys.stderr)
-                    print(f"   - console 日志", file=sys.stderr)
-                    print(f"", file=sys.stderr)
-                    print(f"   如需跳过，请使用: --skip-gstack-verify", file=sys.stderr)
-                    sys.exit(1)
-            except Exception as e:
-                print(f"⚠️  gstack 验证脚本执行失败: {e}，跳过验证", file=sys.stderr)
-    stage["status"] = new_status
 
-    if new_status == "in-progress" and not stage.get("startedAt"):
-        stage["startedAt"] = now_iso()
-    elif new_status in ("done", "failed", "skipped"):
-        stage["completedAt"] = now_iso()
+        # ── gstack 验证 ──────────────────────────────────────────────
+        if new_status == "done" and not getattr(args, "skip_gstack_verify", False):
+            details = stage.get("details", {})
+            constraints = details.get("constraints", [])
+            result_text = getattr(args, "result", "") or ""
 
-    if "logs" not in stage:
-        stage["logs"] = []
-    stage["logs"].append({
-        "time": now_iso(),
-        "event": f"status: {old_status} → {new_status}",
-    })
+            gstack_required = any(
+                "gstack" in str(c).lower() or "/browse" in str(c) or "/qa" in str(c) or "/canary" in str(c)
+                for c in constraints
+            )
 
-    if data.get("mode") == "dag":
-        check_dag_completion(data)
-        data["updated"] = now_iso()
-        # F3.1: use optimistic lock
-        new_rev = save_project_with_lock(args.project, data, expected_rev=expected_rev)
-        print(f"✅ {stage_id}: {old_status} → {new_status} (rev {expected_rev} → {new_rev})")
+            if gstack_required:
+                import subprocess
+                script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "verify_gstack_usage.py")
+                work_dir = details.get("workDir") or details.get("work_dir")
 
-        if new_status == "done":
-            ready = compute_ready_tasks(data)
-            if ready:
-                print(f"🟢 Unblocked: {', '.join(ready)}")
-            elif data["status"] == "completed":
-                print("🎉 All tasks completed!")
+                cmd = ["python3", script_path]
+                if result_text:
+                    cmd.append(result_text)
 
-            # Epic 2.3: 通知下一环节 agent
-            downstream = _get_downstream(args.project, stage_id)
-            if downstream:
-                next_stage_id, next_agent = downstream
-                goal = data.get("goal", "")
-                notify_stage_done(args.project, stage_id, next_stage_id, next_agent, goal)
+                try:
+                    proc = subprocess.run(
+                        cmd + ([work_dir] if work_dir else []),
+                        capture_output=True, text=True, timeout=30
+                    )
+                    if proc.returncode != 0:
+                        print(f"", file=sys.stderr)
+                        print(f"🔴 GSTACK_VERIFICATION_FAILED", file=sys.stderr)
+                        print(f"   任务要求使用 gstack 技能，但未检测到使用证据", file=sys.stderr)
+                        print(f"   请在任务报告中包含:", file=sys.stderr)
+                        print(f"   - 截图文件路径", file=sys.stderr)
+                        print(f"   - browse snapshot 输出", file=sys.stderr)
+                        print(f"   - qa/canary 报告路径", file=sys.stderr)
+                        print(f"   - console 日志", file=sys.stderr)
+                        print(f"", file=sys.stderr)
+                        print(f"   如需跳过，请使用: --skip-gstack-verify", file=sys.stderr)
+                        sys.exit(1)
+                except Exception as e:
+                    print(f"⚠️  gstack 验证脚本执行失败: {e}，跳过验证", file=sys.stderr)
 
-            # Auto-append to MEMORY.md if --log-analysis was provided.
-            if args.log_analysis and HAS_LOG_ANALYSIS:
-                append_to_memory(
-                    project=args.project,
-                    task_id=stage_id,
-                    summary=args.log_analysis,
-                    workspace=os.environ.get("WORKSPACE", "/root/.openclaw"),
-                )
-        elif new_status == "pending":
-            # Epic 2.3: 通知任务被驳回
-            agent = data["stages"][stage_id].get("agent", "")
-            reason = getattr(args, "result", None) or "未说明"
-            notify_stage_rejected(args.project, stage_id, agent, reason)
-    else:
-        data["updated"] = now_iso()
-        # F3.1: use optimistic lock
-        new_rev = save_project_with_lock(args.project, data, expected_rev=expected_rev)
-        print(f"✅ {stage_id}: {old_status} → {new_status} (rev {expected_rev} → {new_rev})")
+        stage["status"] = new_status
+
+        if new_status == "in-progress" and not stage.get("startedAt"):
+            stage["startedAt"] = now_iso()
+        elif new_status in ("done", "failed", "skipped"):
+            stage["completedAt"] = now_iso()
+
+        if "logs" not in stage:
+            stage["logs"] = []
+        stage["logs"].append({
+            "time": now_iso(),
+            "event": f"status: {old_status} → {new_status}",
+        })
+
+        if data.get("mode") == "dag":
+            check_dag_completion(data)
+            data["updated"] = now_iso()
+            new_rev = save_project_with_lock(args.project, data, expected_rev=expected_rev)
+            print(f"✅ {stage_id}: {old_status} → {new_status} (rev {expected_rev} → {new_rev})")
+
+            if new_status == "done":
+                ready = compute_ready_tasks(data)
+                if ready:
+                    print(f"🟢 Unblocked: {', '.join(ready)}")
+                elif data["status"] == "completed":
+                    print("🎉 All tasks completed!")
+
+                downstream = _get_downstream(args.project, stage_id)
+                if downstream:
+                    next_stage_id, next_agent = downstream
+                    goal = data.get("goal", "")
+                    notify_stage_done(args.project, stage_id, next_stage_id, next_agent, goal)
+
+                if args.log_analysis and HAS_LOG_ANALYSIS:
+                    append_to_memory(
+                        project=args.project,
+                        task_id=stage_id,
+                        summary=args.log_analysis,
+                        workspace=os.environ.get("WORKSPACE", "/root/.openclaw"),
+                    )
+            elif new_status == "pending":
+                agent = data["stages"][stage_id].get("agent", "")
+                reason = getattr(args, "result", None) or "未说明"
+                notify_stage_rejected(args.project, stage_id, agent, reason)
+        else:
+            data["updated"] = now_iso()
+            new_rev = save_project_with_lock(args.project, data, expected_rev=expected_rev)
+            print(f"✅ {stage_id}: {old_status} → {new_status} (rev {expected_rev} → {new_rev})")
+
+    finally:
+        # E1-T3: ALWAYS release file lock — prevents deadlock even on exceptions
+        _release_file_lock(args.project)
 
 
 # ── cmd_claim ──────────────────────────────────────────────────────
 
 @timeout(5)
 def cmd_claim(args):
-    """领取任务"""
-    # F3.2: use optimistic lock for concurrent safety
-    data, expected_rev = load_project_with_rev(args.project)
-    stage_id = args.stage
+    """领取任务
+    
+    E1-T3: Uses fcntl.flock() with 30s timeout + try-finally to prevent
+    concurrent 3-way claim deadlocks.
+    """
+    # E1-T3: Acquire file-level lock with timeout to prevent 3-way claim deadlock
+    _acquire_file_lock(args.project)
+    try:
+        # F3.2: use optimistic lock for concurrent safety
+        data, expected_rev = load_project_with_rev(args.project)
+        stage_id = args.stage
 
-    if stage_id not in data["stages"]:
-        print(f"Error: stage '{stage_id}' not found", file=sys.stderr)
-        sys.exit(1)
+        if stage_id not in data["stages"]:
+            print(f"Error: stage '{stage_id}' not found", file=sys.stderr)
+            sys.exit(1)
 
-    stage = data["stages"][stage_id]
+        stage = data["stages"][stage_id]
 
-    # 检查依赖
-    deps = stage.get("dependsOn", [])
-    if deps:
-        not_done = []
+        # 检查依赖
+        deps = stage.get("dependsOn", [])
+        if deps:
+            not_done = []
+            for dep in deps:
+                dep_status = data["stages"].get(dep, {}).get("status")
+                if dep_status not in ("done", "skipped"):
+                    not_done.append(f"{dep} ({dep_status})")
+            if not_done:
+                print(f"❌ Cannot claim '{stage_id}': upstream dependencies not satisfied:")
+                for d in not_done:
+                    print(f"   - {d}")
+                sys.exit(1)
+
+        # 检查状态
+        current_status = stage["status"]
+        if current_status not in ("pending", "ready"):
+            print(f"❌ Cannot claim '{stage_id}': current status is '{current_status}'")
+            sys.exit(1)
+
+        # 检查 agent 归属
+        assigned_agent = stage.get("agent", "")
+        claiming_agent = getattr(args, "agent", None) or stage_id.split("-")[0]
+        if assigned_agent and assigned_agent != claiming_agent:
+            if getattr(args, "force", False):
+                print(f"⚠️ Force claiming '{stage_id}' (assigned to '{assigned_agent}', claiming as '{claiming_agent}')")
+            else:
+                print(f"❌ Cannot claim '{stage_id}': task assigned to '{assigned_agent}', you are '{claiming_agent}'")
+                print(f"   Hint: use --force to override (coord only)")
+                sys.exit(1)
+
+        # 更新状态
+        old_status = stage["status"]
+        stage["status"] = "in-progress"
+        if not stage.get("startedAt"):
+            stage["startedAt"] = now_iso()
+        if "logs" not in stage:
+            stage["logs"] = []
+        stage["logs"].append({
+            "time": now_iso(),
+            "event": f"status: {old_status} → in-progress (claimed by {claiming_agent})",
+        })
+
+        # 收集上游产物
+        dep_outputs = {}
         for dep in deps:
-            dep_status = data["stages"].get(dep, {}).get("status")
-            if dep_status not in ("done", "skipped"):
-                not_done.append(f"{dep} ({dep_status})")
-        if not_done:
-            print(f"❌ Cannot claim '{stage_id}': upstream dependencies not satisfied:")
-            for d in not_done:
-                print(f"   - {d}")
-            sys.exit(1)
+            dep_task = data["stages"].get(dep, {})
+            if dep_task.get("output"):
+                dep_outputs[dep] = dep_task["output"]
 
-    # 检查状态
-    current_status = stage["status"]
-    if current_status not in ("pending", "ready"):
-        print(f"❌ Cannot claim '{stage_id}': current status is '{current_status}'")
-        sys.exit(1)
+        data["updated"] = now_iso()
+        # F3.2: use optimistic lock
+        new_rev = save_project_with_lock(args.project, data, expected_rev=expected_rev)
 
-    # 检查 agent 归属
-    assigned_agent = stage.get("agent", "")
-    claiming_agent = getattr(args, "agent", None) or stage_id.split("-")[0]
-    if assigned_agent and assigned_agent != claiming_agent:
-        if getattr(args, "force", False):
-            print(f"⚠️ Force claiming '{stage_id}' (assigned to '{assigned_agent}', claiming as '{claiming_agent}')")
-        else:
-            print(f"❌ Cannot claim '{stage_id}': task assigned to '{assigned_agent}', you are '{claiming_agent}'")
-            print(f"   Hint: use --force to override (coord only)")
-            sys.exit(1)
-
-    # 更新状态
-    old_status = stage["status"]
-    stage["status"] = "in-progress"
-    if not stage.get("startedAt"):
-        stage["startedAt"] = now_iso()
-    if "logs" not in stage:
-        stage["logs"] = []
-    stage["logs"].append({
-        "time": now_iso(),
-        "event": f"status: {old_status} → in-progress (claimed by {claiming_agent})",
-    })
-
-    # 收集上游产物
-    dep_outputs = {}
-    for dep in deps:
-        dep_task = data["stages"].get(dep, {})
-        if dep_task.get("output"):
-            dep_outputs[dep] = dep_task["output"]
-
-    data["updated"] = now_iso()
-    # F3.2: use optimistic lock
-    new_rev = save_project_with_lock(args.project, data, expected_rev=expected_rev)
-
-    # 输出任务详情
-    print(f"✅ Claimed: {stage_id} (rev {expected_rev} → {new_rev})")
-    print()
-    print(f"## 项目目标")
-    print(f"{data.get('goal', '')}")
-    print()
-    print(f"## 阶段任务")
-    print(f"{stage.get('task', '')}")
-    print()
-    if stage.get("constraints"):
-        print(f"## 🔴 约束清单")
-        for c in stage["constraints"]:
-            print(f"- {c}")
+        # 输出任务详情
+        print(f"✅ Claimed: {stage_id} (rev {expected_rev} → {new_rev})")
         print()
-    if stage.get("checklist"):
-        print(f"## ✅ 检查单")
-        for c in stage["checklist"]:
-            print(f"- [ ] {c}")
+        print(f"## 项目目标")
+        print(f"{data.get('goal', '')}")
         print()
-    if stage.get("output"):
-        print(f"## 📦 产出路径")
-        print(f"{stage['output']}")
+        print(f"## 阶段任务")
+        print(f"{stage.get('task', '')}")
         print()
-    if dep_outputs:
-        print(f"## 📤 上游产物")
-        for dep_id, out in dep_outputs.items():
-            print(f"- {dep_id}: {out}")
-        print()
+        if stage.get("constraints"):
+            print(f"## 🔴 约束清单")
+            for c in stage["constraints"]:
+                print(f"- {c}")
+            print()
+        if stage.get("checklist"):
+            print(f"## ✅ 检查单")
+            for c in stage["checklist"]:
+                print(f"- [ ] {c}")
+            print()
+        if stage.get("output"):
+            print(f"## 📦 产出路径")
+            print(f"{stage['output']}")
+            print()
+        if dep_outputs:
+            print(f"## 📤 上游产物")
+            for dep_id, out in dep_outputs.items():
+                print(f"- {dep_id}: {out}")
+            print()
+
+    finally:
+        # E1-T3: ALWAYS release file lock — prevents deadlock even on exceptions
+        _release_file_lock(args.project)
 
 
 # ── cmd_ready ──────────────────────────────────────────────────────
@@ -1911,6 +2092,7 @@ def main():
     p.add_argument("--log-analysis", "-l", help="Append summary to MEMORY.md on done")
     p.add_argument("--result", "-r", help="任务产出摘要（用于 gstack 验证）")
     p.add_argument("--skip-gstack-verify", action="store_true", help="跳过 gstack 验证（coord 专用）")
+    p.add_argument("--skip-lock", action="store_true", help="跳过锁检查（E2-T1，coord 专用）")
 
     # claim
     p = sub.add_parser("claim", help="领取任务")
@@ -1996,7 +2178,19 @@ def main():
         print(f"Available commands: {', '.join(cmds.keys())}", file=sys.stderr)
         sys.exit(1)
 
-    cmds[args.command](args)
+    # E2-T1: LockRequired 异常处理
+    try:
+        cmds[args.command](args)
+    except LockRequired as e:
+        print(f"🔒 LockRequired: {e}", file=sys.stderr)
+        print(f"   提示: 任务必须先被 claim（in-progress）才能更新状态", file=sys.stderr)
+        print(f"   提示: coord 可使用 --skip-lock 强制更新", file=sys.stderr)
+        sys.exit(1)
+    # E1-T3: File lock timeout — prevents deadlock in concurrent claim scenarios
+    except TimeoutError as e:
+        print(f"⏰ 文件锁超时: {e}", file=sys.stderr)
+        print(f"   提示: 30s 超时自动释放锁，请重试", file=sys.stderr)
+        sys.exit(1)
 
 
 # ── cmd_current_report ──────────────────────────────────────────────────────

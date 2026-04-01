@@ -320,7 +320,15 @@ class TestCmdUpdateMigration:
         }
         tm.atomic_write_json(path, data)
 
-        args = type("Args", (), {
+        # E1-T3: Must first claim (set to in-progress) before updating to done
+        claim_args = type("Args", (), {
+            "project": "test", "stage": "stage1", "agent": "dev", "force": False,
+        })()
+        with umock.patch.object(tm, "task_file", return_value=path):
+            tm.cmd_claim(claim_args)
+
+        # Now update to done — should trigger gstack check
+        update_args = type("Args", (), {
             "project": "test", "stage": "stage1", "status": "done",
             "skip_gstack_verify": False, "log_analysis": None,
         })()
@@ -330,7 +338,7 @@ class TestCmdUpdateMigration:
         with umock.patch.object(tm, "task_file", return_value=path):
             with umock.patch.object(subprocess, "run") as mock_run:
                 mock_run.return_value = type("r", (), {"returncode": 0})()
-                tm.cmd_update(args)
+                tm.cmd_update(update_args)
                 assert mock_run.called
 
 

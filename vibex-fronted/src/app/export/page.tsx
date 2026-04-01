@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { FrameworkSelector, type Framework } from '@/components/export-panel/framework-selector';
 import styles from './export.module.css';
 
 // PRD 导出格式选项
@@ -70,6 +71,7 @@ const exportOptions = [
 
 export default function Export() {
   const [selectedFormat, setSelectedFormat] = useState('react-next');
+  const [selectedFramework, setSelectedFramework] = useState<Framework>('react');
   const [options, setOptions] = useState<{ [key: string]: boolean }>(
     exportOptions.reduce((acc, opt) => ({ ...acc, [opt.id]: opt.enabled }), {})
   );
@@ -202,6 +204,29 @@ export default function Export() {
                     )}
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* 框架选择器 — E4-T2 */}
+            <div>
+              <h2 className={styles.sectionTitle}>目标框架</h2>
+              <div className={styles.optionsCard}>
+                <p className={styles.sectionHint}>
+                  选择导出代码的目标前端框架，组件将自动转换适配
+                </p>
+                <div style={{ marginTop: '12px' }}>
+                  <FrameworkSelector
+                    value={selectedFramework}
+                    onChange={setSelectedFramework}
+                  />
+                </div>
+                {selectedFramework !== 'react' && (
+                  <p className={styles.frameworkHint}>
+                    {selectedFramework === 'vue'
+                      ? '💚 组件将转换为 Vue 3 Composition API 格式'
+                      : '◐ 组件将转换为 SolidJS 响应式格式'}
+                  </p>
+                )}
               </div>
             </div>
 

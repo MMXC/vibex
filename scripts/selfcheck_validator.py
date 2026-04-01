@@ -9,6 +9,7 @@ import sys
 import re
 import os
 from typing import Optional
+from datetime import datetime
 
 ACTIONABLE_PATTERN = re.compile(r'\[ACTIONABLE\]\s*(.+)', re.MULTILINE)
 # Use non-greedy match after #, handle emojis (multi-byte chars) before agent name
@@ -138,6 +139,49 @@ def extract_actionable(doc: str) -> int:
     return len(ACTIONABLE_PATTERN.findall(doc))
 
 
+# ── E2-T2: 自检报告路径规范 ────────────────────────────────────────────────
+def validate_report_path(file_path: str) -> tuple[bool, Optional[str]]:
+    """
+    验证自检报告路径是否符合规范。
+    规范: 报告必须保存在 proposals/YYYYMMDD/ 目录下。
+    
+    合法路径示例:
+      - proposals/20260401/analyst.md
+      - docs/proposals/20260401/dev.md
+      - /root/.openclaw/workspace-coord/proposals/20260401/pm.md
+    
+    非法路径示例:
+      - proposals/analyst.md          (缺少日期目录)
+      - docs/20260401/dev.md         (不在 proposals/ 下)
+      - proposals/20260401_1234/xxx   (日期格式不正确)
+    
+    Returns: (is_valid, error_message)
+    """
+    if not file_path:
+        return False, "报告路径为空"
+    
+    # 提取 proposals/YYYYMMDD/ 部分
+    m = re.search(r'proposals[/\\](\d{8})[/\\]', file_path)
+    if not m:
+        return False, (
+            f"报告路径必须包含 proposals/YYYYMMDD/ 目录\n"
+            f"  ✅ 正确: proposals/20260401/analyst.md\n"
+            f"  ❌ 错误: proposals/analyst.md (缺少日期目录)\n"
+            f"  ❌ 错误: docs/proposals_20260401/xxx (日期格式错误)"
+        )
+    
+    date_str = m.group(1)
+    try:
+        year = int(date_str[:4])
+        month = int(date_str[4:6])
+        day = int(date_str[6:8])
+        datetime(year, month, day)
+    except ValueError:
+        return False, f"报告路径中的日期无效: {date_str}"
+    
+    return True, None
+
+
 def validate_selfcheck(doc: str, file_path: str = '') -> dict:
     """
     验证 self-check 文档
@@ -176,6 +220,12 @@ def validate_selfcheck(doc: str, file_path: str = '') -> dict:
     date = extract_date(doc)
     if date and not re.match(r'^\d{4}-\d{2}-\d{2}$', date):
         warnings.append(f'date 格式建议使用 YYYY-MM-DD: {date}')
+
+    # E2-T2: 报告路径规范检查
+    if file_path:
+        path_ok, path_msg = validate_report_path(file_path)
+        if not path_ok:
+            errors.append(path_msg)
 
     return {
         'valid': len(errors) == 0,

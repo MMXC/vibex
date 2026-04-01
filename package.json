@@ -1,4 +1,8 @@
 {
+	"workspaces": [
+		"vibex-backend",
+		"vibex-fronted"
+	],
 	"dependencies": {
 		"uuid": "^13.0.0"
 	},

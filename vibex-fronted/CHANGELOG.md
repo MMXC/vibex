@@ -15,7 +15,7 @@ All notable changes to this project will be documented in this file.
 - Commits: `f04cc10c`
 
 ### E3: Canvas 选区 Bug 修复 (proposals-20260401)
-- **E3-T1** — 修复 drag selection stale closure bug: useRef 替代 useState 闭包陷阱
+- **E3-T1** — 修复 drag selection stale closure bug: useRef 替代 useState 闭包陷阱，handleMouseUp 捕获初始 null selectionBox 问题
 - **E3-T2** — E2E 测试覆盖: Playwright canvas-selection.spec.ts (4 scenarios: drag/ESC/click/outside)
 - 修复: `useDragSelection.ts` 依赖数组精简，避免 mousemove 每次重注册监听器
 - Commits: `41ff5f0f`, `bf4f2cdc`
@@ -25,6 +25,25 @@ All notable changes to this project will be documented in this file.
 - **E4-T2** — ShortcutBar: 底部可折叠快捷键栏（Ctrl+Z/K/A/Del 等，Zustand 控制展开/折叠）
 - **E4-T3** — NodeTooltip: 节点 Hover tooltip（React.memo + CSS fade，200ms 延迟响应）
 - Commits: `4556540e`
+
+### E5: 质量流程改进 (proposals-20260401)
+- **E5-T1** — Playwright E2E 测试规范: 5+ CI-blocking 测试用例，canvasquality-ci.spec.ts 覆盖选区/面板/快捷键
+- **E5-T3** — 两阶段审查 SOP: reviewer → architect 两阶段审查流程文档
+- **E5-T4** — Story 验收标准模板: PRD 模板要求每 Story 含 expect() 断言
+- **E5-T5** — KPI Dashboard: docs/kpi-dashboard.md
+- Commits: `dd4904c4`, `a5d42445`, `b335927e`, `e7d4465a`
+### E6: 竞品与市场分析 (proposals-20260401)
+- **E6-T1** — 竞品功能对比矩阵: docs/competitive-matrix.md（Cursor/Copilot/Windsurf/Claude/v0 vs VibeX）
+- **E6-T2** — 用户旅程图: docs/user-journey-map.md（3个关键场景）
+- **E6-T3** — 定价策略: docs/pricing-strategy.md（Free/Pro/Enterprise + MRR模型）
+- Commit: `fd92db90`
+### E7: 架构演进 (proposals-20260401)
+- **E7-T1** — React.memo + viewport culling 优化: 自定义 Node 组件使用 memo + useCallback，Flow 性能 ≥30 FPS
+- **E7-T2** — 架构文档版本化: domain.md 所有章节添加 @updated 日期
+- **E7-T3** — canvasApi Zod schema 校验: 所有 canvasApi 响应经过 schema 验证
+- Commits: `1e2984b0`, `4416e222`, `763fab1d`, `f6888f5f`
+
+
 
 ### Epic2: 面板折叠解耦 (canvas-three-tree-unification)
 - **S2.1** — 三面板独立折叠状态持久化: contextPanelCollapsed / flowPanelCollapsed / componentPanelCollapsed

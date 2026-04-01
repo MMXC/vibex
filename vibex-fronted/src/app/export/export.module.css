@@ -528,3 +528,21 @@
     width: 100%;
   }
 }
+
+/* E4-T2: Framework selector hint styles */
+.sectionHint {
+  font-size: 13px;
+  color: var(--color-text-secondary, #64748b);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.frameworkHint {
+  font-size: 13px;
+  color: var(--color-primary, #6366f1);
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  background: var(--color-primary-bg, rgba(99, 102, 241, 0.08));
+  border-radius: 6px;
+  line-height: 1.5;
+}

@@ -50,6 +50,7 @@
     "fuse.js": "^7.1.0",
     "html-to-image": "^1.11.13",
     "jsondiffpatch": "^0.7.3",
+    "jszip": "^3.10.1",
     "lucide-react": "^0.577.0",
     "mermaid": "^11.13.0",
     "monaco-editor": "^0.53.0",

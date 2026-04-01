@@ -9,6 +9,8 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useCanvasExport, type ExportFormat, type ExportScope } from '@/hooks/canvas/useCanvasExport';
+import { zipExporter, type BatchFormat } from '@/services/export/ZipExporter';
+import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import styles from './ExportMenu.module.css';
 
 interface ExportMenuProps {
@@ -27,9 +29,12 @@ type ExportStatus = {
 export function ExportMenu({ label = '导出', disabled = false }: ExportMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedScope, setSelectedScope] = useState<ExportScope>('all');
+  const [selectedBatchFormat, setSelectedBatchFormat] = useState<BatchFormat>('png');
   const [exportStatus, setExportStatus] = useState<ExportStatus | null>(null);
+  const [batchProgress, setBatchProgress] = useState<{ current: number; total: number } | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const { exportCanvas, isExporting } = useCanvasExport();
+  const { contextNodes, flowNodes, componentNodes } = useCanvasStore();
 
   const clearStatusAfter = useCallback((ms: number) => {
     setTimeout(() => setExportStatus(null), ms);
@@ -52,6 +57,49 @@ export function ExportMenu({ label = '导出', disabled = false }: ExportMenuPro
       clearStatusAfter(4000);
     }
   }, [exportCanvas, selectedScope, clearStatusAfter]);
+
+  const handleBatchExport = useCallback(async () => {
+    setExportStatus({ format: 'png', message: '正在批量导出...', type: 'info' });
+    setBatchProgress({ current: 0, total: 1 });
+    try {
+      const zipBlob = await zipExporter.exportZip(
+        contextNodes,
+        flowNodes,
+        componentNodes,
+        {
+          format: selectedBatchFormat,
+          scope: selectedScope === 'all' ? 'all' : selectedScope,
+          onProgress: (current, total) => setBatchProgress({ current, total }),
+        }
+      );
+      // Trigger download
+      const timestamp = new Date().toISOString().slice(0, 10);
+      const url = URL.createObjectURL(zipBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `vibex-batch-${selectedScope}-${timestamp}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      const count = contextNodes.length + flowNodes.length + componentNodes.length;
+      setExportStatus({
+        format: 'png',
+        message: `批量导出成功 ✓ 共导出 ${count} 个节点`,
+        type: 'success',
+      });
+      clearStatusAfter(3000);
+    } catch (err) {
+      setExportStatus({
+        format: 'png',
+        message: `批量导出失败: ${err instanceof Error ? err.message : String(err)}`,
+        type: 'error',
+      });
+      clearStatusAfter(4000);
+    } finally {
+      setBatchProgress(null);
+    }
+  }, [contextNodes, flowNodes, componentNodes, selectedBatchFormat, selectedScope, clearStatusAfter]);
 
   // Close menu on outside click
   useEffect(() => {
@@ -144,6 +192,65 @@ export function ExportMenu({ label = '导出', disabled = false }: ExportMenuPro
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Batch Export section */}
+          <div className={styles.batchSection}>
+            <span className={styles.sectionLabel}>批量导出 (ZIP)</span>
+            <div className={styles.batchFormatRow}>
+              <label className={styles.batchFormatLabel}>
+                <input
+                  type="radio"
+                  name="batch-format"
+                  value="png"
+                  checked={selectedBatchFormat === 'png'}
+                  onChange={() => setSelectedBatchFormat('png')}
+                  className={styles.scopeRadio}
+                />
+                PNG
+              </label>
+              <label className={styles.batchFormatLabel}>
+                <input
+                  type="radio"
+                  name="batch-format"
+                  value="svg"
+                  checked={selectedBatchFormat === 'svg'}
+                  onChange={() => setSelectedBatchFormat('svg')}
+                  className={styles.scopeRadio}
+                />
+                SVG
+              </label>
+            </div>
+            <button
+              type="button"
+              className={styles.batchExportBtn}
+              onClick={handleBatchExport}
+              disabled={isExporting || (contextNodes.length === 0 && flowNodes.length === 0 && componentNodes.length === 0)}
+              data-testid="export-all-btn"
+              aria-label="导出全部节点为 ZIP 文件"
+              title="将所有节点导出为 PNG/SVG 文件并打包为 ZIP"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              {batchProgress
+                ? `导出中 ${batchProgress.current}/${batchProgress.total}...`
+                : `📦 导出全部节点 ZIP`}
+            </button>
+            {batchProgress && (
+              <div className={styles.progressBar}>
+                <div
+                  className={styles.progressFill}
+                  style={{ width: `${(batchProgress.current / Math.max(batchProgress.total, 1)) * 100}%` }}
+                  role="progressbar"
+                  aria-valuenow={batchProgress.current}
+                  aria-valuemin={0}
+                  aria-valuemax={batchProgress.total}
+                />
+              </div>
+            )}
           </div>
 
           {/* Status message */}

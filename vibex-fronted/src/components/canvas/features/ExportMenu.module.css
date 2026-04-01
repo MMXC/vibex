@@ -171,3 +171,80 @@
   color: var(--color-text-secondary, #b0b0c0);
   background: rgba(255, 255, 255, 0.03);
 }
+
+/* Batch export section */
+.batchSection {
+  padding: 0.625rem 0.75rem;
+  border-top: 1px solid var(--color-border, #2d2d44);
+}
+
+.batchFormatRow {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.batchFormatLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary, #b0b0c0);
+  cursor: pointer;
+}
+
+.batchFormatLabel:hover {
+  color: var(--color-text-primary, #e8e8f0);
+}
+
+.batchExportBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-primary, #7c3aed);
+  border: 1px solid var(--color-primary, #7c3aed);
+  border-radius: 6px;
+  color: white;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: var(--font-sans, system-ui);
+}
+
+.batchExportBtn:hover:not(:disabled) {
+  background: #6d28d9;
+  border-color: #6d28d9;
+}
+
+.batchExportBtn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.batchExportBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.batchExportBtn:focus-visible {
+  outline: 2px solid var(--color-focus-ring, #7c3aed);
+  outline-offset: 2px;
+}
+
+.progressBar {
+  height: 3px;
+  background: var(--color-border, #2d2d44);
+  border-radius: 2px;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--color-primary, #7c3aed);
+  border-radius: 2px;
+  transition: width 0.2s ease;
+}

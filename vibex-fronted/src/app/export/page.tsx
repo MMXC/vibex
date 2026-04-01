@@ -115,7 +115,7 @@ export default function Export() {
         if (element) {
           setExportProgress(50);
           const html2canvas = (await import('html2canvas')).default;
-          const canvas = await html2canvas(element);
+          const canvas = await html2canvas(element as HTMLElement);
           setExportProgress(80);
           const link = document.createElement('a');
           link.download = 'canvas-export.png';

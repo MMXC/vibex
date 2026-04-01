@@ -442,6 +442,30 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         store.addComponentNode({ name: '新组件', flowId: '', type: 'page', props: {}, api: { method: 'GET', path: '/', params: [] } });
       }
     },
+    onQuickGenerate: () => {
+      // Check if requirement input is empty
+      if (!requirementInput.trim()) {
+        // TODO: Show toast "请先输入需求"
+        return;
+      }
+      // Check if anything is already generating
+      if (aiThinking || flowGenerating || componentGenerating) {
+        // Already generating, ignore
+        return;
+      }
+      const store = useCanvasStore.getState();
+      // Cascade: Context → Flow → Component
+      store.generateContextsFromRequirement(requirementInput).then(() => {
+        // After context generation, auto-generate flows
+        const ctxs = store.contextNodes.filter((c) => c.isActive !== false);
+        if (ctxs.length > 0) {
+          store.autoGenerateFlows(ctxs).then(() => {
+            // After flow generation, auto-generate components
+            store.generateComponentFromFlow();
+          });
+        }
+      });
+    },
     enabled: phase !== 'input',
   });
 

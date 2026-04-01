@@ -41,6 +41,8 @@ interface KeyboardShortcutsOptions {
   onClearSelection?: () => void;
   /** Create new node in active tree */
   onNewNode?: () => void;
+  /** Quick generate (Ctrl+G) - cascade Context → Flow → Component */
+  onQuickGenerate?: () => void;
   /** Whether shortcuts should be active */
   enabled?: boolean;
 }
@@ -72,6 +74,7 @@ export function useKeyboardShortcuts({
   onSelectAll,
   onClearSelection,
   onNewNode,
+  onQuickGenerate,
   enabled = true,
 }: KeyboardShortcutsOptions) {
   useEffect(() => {
@@ -191,9 +194,16 @@ export function useKeyboardShortcuts({
         onClearSelection?.();
         return;
       }
+
+      // === Quick Generate: Ctrl+G / Cmd+G ===
+      if ((isCtrl || isMeta) && e.key.toLowerCase() === 'g') {
+        e.preventDefault();
+        onQuickGenerate?.();
+        return;
+      }
     }
 
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset, onDelete, onSelectAll, onClearSelection, onNewNode, enabled]);
+  }, [undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset, onDelete, onSelectAll, onClearSelection, onNewNode, onQuickGenerate, enabled]);
 }

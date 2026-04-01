@@ -230,6 +230,16 @@ function ContextCard({ node, onEdit, onDelete, readonly, selected, onToggleSelec
         <>
           {/* S1.1: Removed selection checkbox — multi-select still works via Ctrl+click on card body */}
           <div className={styles.nodeCardHeader}>
+            {!readonly && (
+              <input
+                type="checkbox"
+                checked={node.isActive !== false}
+                onChange={() => onEdit(node.nodeId, { isActive: node.isActive === false ? true : false })}
+                aria-label={`激活 ${node.name}`}
+                className={styles.confirmCheckbox}
+                onClick={(e) => e.stopPropagation()}
+              />
+            )}
             <div className={styles.nodeTypeBadge} style={{ background: typeColor }}>
               {node.type === 'core'
                 ? '核心'
@@ -239,7 +249,7 @@ function ContextCard({ node, onEdit, onDelete, readonly, selected, onToggleSelec
                     ? '通用'
                     : '外部'}
             </div>
-                    </div>
+          </div>
           <h4 className={styles.nodeCardTitle}>{node.name}</h4>
           <p className={styles.nodeCardDesc}>{node.description}</p>
           {!readonly && (

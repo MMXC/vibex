@@ -1,3 +1,10 @@
+### Added (proposals-20260401-4 E1: Canvas 运行时崩溃修复) — 2026-04-01
+- **Rules of Hooks**: 修复 CanvasOnboardingOverlay hooks 在条件返回后调用的问题
+- **defensive null checks**: TreePanel/TreeStatus/BusinessFlowTree/PrototypeQueuePanel 添加 nodes/steps/queue ?? [] 保护
+- **undefined.length 修复**: 防止 "Cannot read properties of undefined (reading 'length')" 崩溃
+- **canvas-crash E2E test**: playwright canvas-crash.spec.ts 测试验证
+- **提交**: `3e20a340`, `139de4c9`, `0b242699`
+
 ### Added (proposals-20260401-3 E5: Svelte Framework 导出) — 2026-04-01
 - **react2svelte mappings**: Button/Input/Card/Container/Text 组件映射
 - **onClick → on:click**: 事件语法转换

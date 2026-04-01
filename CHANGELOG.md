@@ -1,3 +1,9 @@
+### Added (proposals-20260401-6 E1: PNG/SVG/ZIP 批量导出) — 2026-04-01
+- **PNG/SVG/ZIP 导出**: export panel 增加三种导出格式选项
+- **format cards data-testid**: data-testid='format-card-{id}' 便于测试
+- **E2E 测试**: export-formats.spec.ts 覆盖 PNG/SVG/ZIP 选择
+- **提交**: `8675a8d2`, `aa39e046`
+
 ### Added (proposals-20260401-6 E3: 用户手册文档) — 2026-04-01
 - **user-guide.md**: 12 章覆盖所有 canvas 操作
 - **提交**: `385e4a44`

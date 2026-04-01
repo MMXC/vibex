@@ -287,10 +287,14 @@ interface CanvasStore {
   // === Context Slice ===
   contextNodes: BoundedContextNode[];
   contextDraft: Partial<BoundedContextNode> | null;
+  /** Confirm a context node — sets isActive=true, status='confirmed' */
+  confirmContextNode: (nodeId: string) => void;
 
   // === Flow Slice ===
   flowNodes: BusinessFlowNode[];
   flowDraft: Partial<BusinessFlowNode> | null;
+  /** Confirm a flow node — sets status='confirmed' */
+  confirmFlowNode: (nodeId: string) => void;
 
   // === Component Slice ===
   componentNodes: ComponentNode[];
@@ -874,23 +878,6 @@ export const useCanvasStore = create<CanvasStore>()(
               getHistoryStore().recordSnapshot('flow', newNodes);
               return { flowNodes: newNodes };
             });
-          },
-
-          confirmStep: (flowNodeId, stepId) => {
-            set((s) => ({
-              flowNodes: s.flowNodes.map((n) =>
-                n.nodeId === flowNodeId
-                  ? {
-                      ...n,
-                      steps: n.steps.map((st) =>
-                        st.stepId === stepId
-                          ? { ...st, isActive: true, status: 'confirmed' as const }
-                          : st
-                      ),
-                    }
-                  : n
-              ),
-            }));
           },
 
           editStep: (flowNodeId, stepId, data) => {

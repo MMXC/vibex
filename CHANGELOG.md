@@ -1,3 +1,23 @@
+### Added (canvas-checkbox-style-unify E1: ContextTree 单 checkbox + 确认反馈) — 2026-04-02
+- **E1**: ContextTree 卡片双 checkbox 合并为单一确认 checkbox
+- ContextTree 卡片删除冗余的 isActive checkbox，仅保留确认 checkbox
+- checkbox `checked={node.status === 'confirmed'}`，点击调用 `confirmContextNode`
+- 已确认节点显示绿色 ✓ 确认反馈图标
+- canvasStore.ts 新增 `confirmContextNode`、`confirmFlowNode` store actions
+- **提交**: `69f75437`, `02b638a2`
+
+### Added (canvas-checkbox-style-unify E2: ComponentTree checkbox 位置修正) — 2026-04-02
+- **E2**: ComponentTree checkbox 从 div 包裹改为 inline input，前移到 type badge 前
+- checkbox 直接在 `nodeCardHeader` 内部、type badge 之前
+- 移除 `position: absolute` 包裹 div，改用 `.confirmCheckbox` inline 样式
+- **提交**: `18fcdc7a`
+
+### Added (canvas-checkbox-style-unify E3: 移除未确认节点黄色边框) — 2026-04-02
+- **E3**: 删除 `.nodeUnconfirmed` 的 `border-color: var(--color-warning)` 和橙色阴影
+- 统一使用 `border: 2px solid var(--color-border)` 基础边框
+- 节点区分依赖 type badge 颜色 + 确认反馈图标，不再依赖黄色描边
+- **提交**: `02b638a2`
+
 ### Fixed (canvas-bc-checkbox-fix Epic1: 删除 confirmed:false from handleGenerate) — 2026-04-02
 - **Epic1**: 移除 handleGenerate 中新增节点的 confirmed:false 字段
 - **根因**: 新建节点无需 confirmed 字段，checkbox 默认状态由 isActive 决定

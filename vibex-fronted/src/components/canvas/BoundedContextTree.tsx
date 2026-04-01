@@ -231,38 +231,36 @@ function ContextCard({ node, onEdit, onDelete, readonly, selected, onToggleSelec
       ) : (
         /* View mode */
         <>
-          {/* F1.1: Selection checkbox */}
+          {/* E1: 单一确认 checkbox — 在 type badge 之前 */}
           {!readonly && (
             <input
               type="checkbox"
               data-testid={`context-card-checkbox-${node.nodeId}`}
-              checked={node.isActive !== false && node.status !== 'pending'}
+              checked={node.status === 'confirmed'}
               onChange={() => { confirmContextNode(node.nodeId); }}
-              aria-label={`确认 ${node.name}`}
-              className={styles.selectionCheckbox}
-              onClick={(e) => e.stopPropagation()}
-            />
-          )}
-          {/* isActive checkbox */}
-          {!readonly && (
-            <input
-              type="checkbox"
-              checked={node.isActive !== false}
-              onChange={() => onEdit(node.nodeId, { isActive: node.isActive === false ? true : false })}
-              aria-label={`激活 ${node.name}`}
+              aria-label="确认节点"
               className={styles.confirmCheckbox}
               onClick={(e) => e.stopPropagation()}
             />
           )}
-            <div className={styles.nodeTypeBadge} style={{ background: typeColor }}>
-              {node.type === 'core'
-                ? '核心'
-                : node.type === 'supporting'
-                  ? '支撑'
-                  : node.type === 'generic'
-                    ? '通用'
-                    : '外部'}
-            </div>
+          {/* E1: Type badge */}
+          <div className={styles.nodeTypeBadge} style={{ background: typeColor }}>
+            {node.type === 'core'
+              ? '核心'
+              : node.type === 'supporting'
+                ? '支撑'
+                : node.type === 'generic'
+                  ? '通用'
+                  : '外部'}
+          </div>
+          {/* E1: 确认状态绿色 ✓ 反馈 */}
+          {node.status === 'confirmed' && (
+            <span className={styles.confirmedBadge} aria-label="已确认">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 8l3.5 3.5L13 5" stroke="var(--color-success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </span>
+          )}
           <h4 className={styles.nodeCardTitle}>{node.name}</h4>
           <p className={styles.nodeCardDesc}>{node.description}</p>
           {!readonly && (

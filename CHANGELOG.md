@@ -1,8 +1,10 @@
-### Added (proposals-20260401-8 E2: React Native + WebP 导出) — 2026-04-01
-- **React Native 导出**: 生成 VibeX-Canvas.tsx React Native 组件
-- **WebP 导出**: html-to-image 或 html2canvas 导出 canvas 为 WebP
-- **导出格式扩展**: exportFormats 数组增加 react-native + webp
-- **提交**: `5e8450e3`, `edf3aaa8`
+### Added (proposals-20260401-8: E2E 稳定性 + React Native + WebP) — 2026-04-01
+- **E1 E2E stability**: test:e2e:ci script, waitForSelector 替换, force:true 处理
+- **E1 canvas error types**: CanvasValidationError, CanvasApiError, CanvasRenderError
+- **E2 React Native 导出**: 生成 VibeX-Canvas.tsx React Native 组件
+- **E2 WebP 导出**: html-to-image/html2canvas 导出 canvas 为 WebP
+- **E3 技术债清理**: waitForTimeout 状态文档化
+- **提交**: `edf3aaa8`, `5e8450e3`
 
 ### Added (proposals-20260401-7: Sprint 复盘与规划) — 2026-04-01
 - **E1 Sprint 1 复盘文档**: docs/retrospectives/2026-04-01.md

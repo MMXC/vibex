@@ -1,3 +1,9 @@
+### Added (proposals-20260401-8 E2: React Native + WebP 导出) — 2026-04-01
+- **React Native 导出**: 生成 VibeX-Canvas.tsx React Native 组件
+- **WebP 导出**: html-to-image 或 html2canvas 导出 canvas 为 WebP
+- **导出格式扩展**: exportFormats 数组增加 react-native + webp
+- **提交**: `5e8450e3`, `edf3aaa8`
+
 ### Added (proposals-20260401-7: Sprint 复盘与规划) — 2026-04-01
 - **E1 Sprint 1 复盘文档**: docs/retrospectives/2026-04-01.md
 - **E2 Sprint 2 PRD**: docs/sprint-20260402/prd.md (≥3 Epic, 优先级排序, 工时估算)

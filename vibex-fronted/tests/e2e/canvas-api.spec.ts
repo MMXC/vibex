@@ -34,8 +34,10 @@ test.describe('Canvas API E2E — Epic 3', () => {
   
   test.beforeEach(async ({ page }) => {
     await goToCanvas(page);
-    // Wait for canvas page to fully hydrate
-    await page.waitForTimeout(1000);
+  });
+
+  test.afterEach(async ({ page }) => {
+    await page.evaluate(() => localStorage.clear());
   });
 
   test('E2E-1: Normal flow — input text → launch → context tree nodes appear', async ({ page }) => {

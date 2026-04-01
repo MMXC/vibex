@@ -34,13 +34,17 @@ async function goToCanvas(page: Page) {
   const importBtn = page.locator('[data-testid="import-example-btn"]');
   if (await importBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
     await importBtn.click();
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle').catch(() => {});
   }
 }
 
 test.describe('Canvas Quality CI — E5', () => {
   test.beforeEach(async ({ page }) => {
     await goToCanvas(page);
+  });
+
+  test.afterEach(async ({ page }) => {
+    await page.evaluate(() => localStorage.clear());
   });
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -59,7 +63,6 @@ test.describe('Canvas Quality CI — E5', () => {
 
     await page.goto(CANVAS_URL);
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
 
     // Filter out known benign errors (e.g., third-party favicon 404s)
     const criticalErrors = errors.filter(
@@ -94,7 +97,7 @@ test.describe('Canvas Quality CI — E5', () => {
     const collapseBtn = firstPanel.locator('button[aria-label*="展开"][aria-label*="面板"]').first();
     if (await collapseBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
       await collapseBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle').catch(() => {});
     }
 
     // Check for tree nodes — they appear as interactive items inside the panel
@@ -122,7 +125,7 @@ test.describe('Canvas Quality CI — E5', () => {
     const expandBtn = flowPanel.locator('button[aria-label*="展开"][aria-label*="面板"]').first();
     if (await expandBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
       await expandBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle').catch(() => {});
     }
 
     // Flow tree nodes should exist
@@ -148,7 +151,7 @@ test.describe('Canvas Quality CI — E5', () => {
     const expandBtn = componentPanel.locator('button[aria-label*="展开"][aria-label*="面板"]').first();
     if (await expandBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
       await expandBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle').catch(() => {});
     }
 
     // Component tree nodes should exist
@@ -171,7 +174,7 @@ test.describe('Canvas Quality CI — E5', () => {
     const expandBtn = contextPanel.locator('button[aria-label*="展开"][aria-label*="面板"]').first();
     if (await expandBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
       await expandBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('networkidle').catch(() => {});
     }
 
     // Get first tree node
@@ -181,7 +184,8 @@ test.describe('Canvas Quality CI — E5', () => {
 
     // Click first node — should trigger selection
     await contextNodes.first().click();
-    await page.waitForTimeout(500);
+    // Wait for selection state to update
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // The node should now have a selected state (class or attribute indicating selection)
     // Check either via class containing 'selected' or via aria-selected attribute
@@ -194,7 +198,8 @@ test.describe('Canvas Quality CI — E5', () => {
 
     // Click again — should deselect
     await firstNode.click();
-    await page.waitForTimeout(300);
+    // Wait for deselection
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const nodeClassAfter = await firstNode.getAttribute('class') || '';
     const ariaSelectedAfter = await firstNode.getAttribute('aria-selected');
@@ -223,7 +228,8 @@ test.describe('Canvas Quality CI — E5', () => {
       const tabLabel = (await tab.textContent()) || `tab-${i}`;
 
       await tab.click();
-      await page.waitForTimeout(300);
+      // Wait for tab switch
+      await page.waitForLoadState('networkidle').catch(() => {});
 
       // The clicked tab should have aria-selected="true" or active class
       const ariaSelected = await tab.getAttribute('aria-selected');

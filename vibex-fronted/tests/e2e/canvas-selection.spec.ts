@@ -31,7 +31,6 @@ async function goToCanvas(page: Page) {
   }
 
   // Wait for canvas to fully hydrate
-  await page.waitForTimeout(1000);
 }
 
 async function loadExampleData(page: Page) {
@@ -39,7 +38,7 @@ async function loadExampleData(page: Page) {
   const loadBtn = page.locator('button:has-text("加载示例"), button:has-text("Load Example"), button:has-text("示例数据")').first();
   if (await loadBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
     await loadBtn.click();
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('networkidle').catch(() => {});
   }
 }
 
@@ -48,7 +47,10 @@ test.describe('Canvas Drag Selection E2E — E3', () => {
   test.beforeEach(async ({ page }) => {
     await goToCanvas(page);
     await loadExampleData(page);
-    await page.waitForTimeout(500);
+  });
+
+  test.afterEach(async ({ page }) => {
+    await page.evaluate(() => localStorage.clear());
   });
 
   // E2E-1: Drag selection selects nodes within the selection box
@@ -80,7 +82,7 @@ test.describe('Canvas Drag Selection E2E — E3', () => {
 
     // Mouse up to complete selection
     await page.mouse.up();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // After selection, some nodes should be in selected state
     // (The exact behavior depends on implementation)
@@ -104,7 +106,7 @@ test.describe('Canvas Drag Selection E2E — E3', () => {
 
     // Selection should be cancelled
     await page.mouse.up();
-    await page.waitForTimeout(300);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // No nodes should be selected after Escape
     const selectedNodes = page.locator('[class*="selected"], [class*="active"][class*="node"]');
@@ -120,7 +122,7 @@ test.describe('Canvas Drag Selection E2E — E3', () => {
     if (await firstNode.isVisible({ timeout: 5000 }).catch(() => false)) {
       // Click first node
       await firstNode.click();
-      await page.waitForTimeout(300);
+      await page.waitForLoadState('networkidle').catch(() => {});
 
       // Node should appear selected
       const selectedClass = await firstNode.getAttribute('class');
@@ -128,7 +130,7 @@ test.describe('Canvas Drag Selection E2E — E3', () => {
 
       // Click again to deselect
       await firstNode.click();
-      await page.waitForTimeout(300);
+      await page.waitForLoadState('networkidle').catch(() => {});
 
       // Node should no longer be selected
       const deselectedClass = await firstNode.getAttribute('class');
@@ -142,7 +144,6 @@ test.describe('Canvas Drag Selection E2E — E3', () => {
     const firstNode = page.locator('[class*="card"], [class*="nodeCard"]').first();
     if (await firstNode.isVisible({ timeout: 5000 }).catch(() => false)) {
       await firstNode.click();
-      await page.waitForTimeout(300);
     }
 
     // Click outside on empty canvas area
@@ -151,7 +152,6 @@ test.describe('Canvas Drag Selection E2E — E3', () => {
     if (box) {
       // Click far from any nodes
       await page.mouse.click(box.x + box.width - 20, box.y + box.height - 20);
-      await page.waitForTimeout(300);
 
       // Selection should be cleared
       const selectedNodes = page.locator('[class*="selected"]');

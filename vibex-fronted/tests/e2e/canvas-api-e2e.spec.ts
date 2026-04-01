@@ -20,6 +20,10 @@ test.describe('Canvas API E2E (Epic 3)', () => {
     await page.goto(`${BASE_URL}/canvas`, { waitUntil: 'networkidle' });
   });
 
+  test.afterEach(async ({ page }) => {
+    await page.evaluate(() => localStorage.clear());
+  });
+
   // E2E-1: Normal flow - input → start → context tree non-empty
   test('E2E-1: should navigate to context phase and show tree panel after startup', async ({ page }) => {
     // Skip onboarding modal if present

@@ -27,7 +27,10 @@ test.describe('canvas-drawer-msg — Epic 3 E2E', () => {
 
   test.beforeEach(async ({ page }) => {
     await goToCanvas(page);
-    await page.waitForTimeout(500);
+  });
+
+  test.afterEach(async ({ page }) => {
+    await page.evaluate(() => localStorage.clear());
   });
 
   // ── F3.3: Open drawer ──────────────────────────────────────────
@@ -124,7 +127,7 @@ test.describe('canvas-drawer-msg — Epic 3 E2E', () => {
   test('F3.2: ≤768px 视口下抽屉默认隐藏', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.reload();
-    await page.waitForTimeout(500);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     const drawer = page.locator('[data-testid="message-drawer"]');
     // On mobile the drawer should be hidden via CSS

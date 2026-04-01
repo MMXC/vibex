@@ -33,7 +33,7 @@ async function goToCanvasWithData(page: Page) {
   const importBtn = page.locator('button:has-text("导入示例")');
   if (await importBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
     await importBtn.click();
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle').catch(() => {});
   }
 }
 
@@ -41,6 +41,10 @@ test.describe('Canvas E2E — Epic 3.2: Canvas 状态与质量', () => {
 
   test.beforeEach(async ({ page }) => {
     await goToCanvasWithData(page);
+  });
+
+  test.afterEach(async ({ page }) => {
+    await page.evaluate(() => localStorage.clear());
   });
 
   test('E3.2-1: expand-both 模式下三栏等宽', async ({ page }) => {
@@ -59,9 +63,7 @@ test.describe('Canvas E2E — Epic 3.2: Canvas 状态与质量', () => {
 
     // Click expand-both
     await expandBtn.click();
-    await page.waitForTimeout(500);
-
-    // Verify expand button changed to "退出均分"
+    await expect(exitBtn).toBeVisible({ timeout: 3000 }); to "退出均分"
     const exitBtn = page.locator('button[aria-label="退出均分"]');
     await expect(exitBtn).toBeVisible({ timeout: 3000 });
 
@@ -86,7 +88,6 @@ test.describe('Canvas E2E — Epic 3.2: Canvas 状态与质量', () => {
 
     // Exit expand-both
     await exitBtn.click();
-    await page.waitForTimeout(500);
     await expect(expandBtn).toBeVisible({ timeout: 3000 });
   });
 
@@ -120,7 +121,6 @@ test.describe('Canvas E2E — Epic 3.2: Canvas 状态与质量', () => {
     const expandBtn = page.locator('button[aria-label="均分视口"]');
     if (await expandBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
       await expandBtn.click();
-      await page.waitForTimeout(300);
       // Verify expand mode changed (button should now say "退出均分")
       const exitBtn = page.locator('button[aria-label="退出均分"]');
       const expandChanged = await exitBtn.isVisible({ timeout: 3000 }).catch(() => false);
@@ -136,9 +136,7 @@ test.describe('Canvas E2E — Epic 3.2: Canvas 状态与质量', () => {
     const maximizeBtn = page.locator('button[aria-label="最大化"]');
     await expect(maximizeBtn).toBeVisible({ timeout: 5000 });
     await maximizeBtn.click();
-    await page.waitForTimeout(500);
-
-    // Verify maximize button changed to "退出最大化"
+    await expect(exitMaxBtn).toBeVisible({ timeout: 3000 }); to "退出最大化"
     const exitMaxBtn = page.locator('button[aria-label="退出最大化"]');
     await expect(exitMaxBtn).toBeVisible({ timeout: 3000 });
 
@@ -161,7 +159,6 @@ test.describe('Canvas E2E — Epic 3.2: Canvas 状态与质量', () => {
 
     // Exit maximize
     await exitMaxBtn.click();
-    await page.waitForTimeout(500);
     await expect(maximizeBtn).toBeVisible({ timeout: 3000 });
   });
 
@@ -172,9 +169,7 @@ test.describe('Canvas E2E — Epic 3.2: Canvas 状态与质量', () => {
 
     // Press F11 to toggle maximize
     await page.keyboard.press('F11');
-    await page.waitForTimeout(500);
-
-    // Verify maximize mode is active (expand controls should still be visible in maximize)
+    await expect(exitMaxBtn).toBeVisible({ timeout: 3000 }); (expand controls should still be visible in maximize)
     const ecDisplay = await expandControls.evaluate((el) => window.getComputedStyle(el).display);
     expect(ecDisplay).toBe('flex');
 
@@ -191,13 +186,9 @@ test.describe('Canvas E2E — Epic 3.2: Canvas 状态与质量', () => {
     const maximizeBtn = page.locator('button[aria-label="最大化"]');
     await expect(maximizeBtn).toBeVisible({ timeout: 5000 });
     await maximizeBtn.click();
-    await page.waitForTimeout(500);
-
-    // Exit via Escape key
+    await expect(exitMaxBtn).toBeVisible({ timeout: 3000 });
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(500);
-
-    // Verify maximize button is back
+    await expect(maximizeBtn).toBeVisible({ timeout: 3000 });
     await expect(maximizeBtn).toBeVisible({ timeout: 3000 });
 
     // Verify expand button is visible
@@ -225,9 +216,7 @@ test.describe('Canvas E2E — Epic 3.2: Canvas 状态与质量', () => {
     const maximizeBtn = page.locator('button[aria-label="最大化"]');
     await expect(maximizeBtn).toBeVisible({ timeout: 5000 });
     await maximizeBtn.click();
-    await page.waitForTimeout(500);
-
-    // Verify maximize mode is active
+    await expect(exitMaxBtn).toBeVisible({ timeout: 3000 });
     const exitMaxBtn = page.locator('button[aria-label="退出最大化"]');
     await expect(exitMaxBtn).toBeVisible({ timeout: 3000 });
 
@@ -237,7 +226,6 @@ test.describe('Canvas E2E — Epic 3.2: Canvas 状态与质量', () => {
 
     // Reload page
     await page.reload({ waitUntil: 'networkidle' });
-    await page.waitForTimeout(2000);
 
     // After reload, verify the expand mode is restored (or note current behavior)
     // The current implementation writes to localStorage but doesn't restore on page load

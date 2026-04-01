@@ -30,8 +30,7 @@ test.describe('Canvas Crash Fix (E1)', () => {
     await page.goto('/canvas');
     await page.waitForLoadState('networkidle');
     
-    // Wait for canvas to be fully loaded
-    await page.waitForTimeout(2000);
+    // Canvas fully loaded after networkidle
 
     // Check for the specific error
     const crashErrors = errors.filter(
@@ -55,7 +54,7 @@ test.describe('Canvas Crash Fix (E1)', () => {
       await page.click(`[data-tab="${tab}"]`).catch(() => {
         // Tab button might have different selector
       });
-      await page.waitForTimeout(500);
+      // Tab click completed
     }
 
     // Should still be on canvas page without crash
@@ -73,7 +72,6 @@ test.describe('Canvas Crash Fix (E1)', () => {
 
     await page.goto('/canvas');
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(2000);
 
     // Verify panels are visible
     const treeStatus = page.locator('[data-testid="tree-status"]');
@@ -82,5 +80,9 @@ test.describe('Canvas Crash Fix (E1)', () => {
     });
 
     expect(errors.length).toBe(0);
+  });
+
+  test.afterEach(async ({ page }) => {
+    await page.evaluate(() => localStorage.clear());
   });
 });

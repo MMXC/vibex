@@ -39,7 +39,6 @@ async function goToCanvas(page: Page): Promise<void> {
   }
 
   // Additional wait for canvas page hydration
-  await page.waitForTimeout(500);
 }
 
 /**
@@ -79,8 +78,8 @@ test.describe('F5.1: Canvas API Endpoint Coverage — /api/v1/canvas/*', () => {
     await expect(startButton).toBeEnabled();
     await startButton.click();
 
-    // Wait for loading to complete (either success or stub response)
-    await page.waitForTimeout(5000);
+    // Wait for network to settle after API call
+    await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
 
     // Should transition to context phase
     const contextTree = page.locator('[data-testid="context-tree"]').first();
@@ -329,6 +328,10 @@ test.describe('F5.1: Canvas API Endpoint Coverage — /api/v1/canvas/*', () => {
     });
     expect(response2.status()).toBe(400);
   });
+
+  test.afterEach(async ({ page }) => {
+    await page.evaluate(() => localStorage.clear());
+  });
 });
 
 // =============================================================================
@@ -363,7 +366,7 @@ test.describe('F5.2: Two-Step Design Flow Tests', () => {
     const importBtn = page.locator('[data-testid="import-example-btn"]');
     if (await importBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
       await importBtn.click();
-      await page.waitForTimeout(2000);
+      await page.waitForLoadState('networkidle').catch(() => {});
     }
 
     // Verify contexts tree has content
@@ -464,6 +467,10 @@ test.describe('F5.2: Two-Step Design Flow Tests', () => {
     await expect(contextTree).toBeVisible();
     await expect(flowTree).toBeVisible();
   });
+
+  test.afterEach(async ({ page }) => {
+    await page.evaluate(() => localStorage.clear());
+  });
 });
 
 // =============================================================================
@@ -493,8 +500,8 @@ test.describe('F5.3: sessionId Chain Tests', () => {
     // Start analysis
     await startCanvasAnalysis(page, '创建一个博客系统');
 
-    // Wait for any processing
-    await page.waitForTimeout(3000);
+    // Wait for network to settle after analysis start
+    await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
 
     // Check localStorage after
     const storageAfter = await page.evaluate(() => {
@@ -645,7 +652,7 @@ test.describe('F5.3: sessionId Chain Tests', () => {
   test('F5.3-5: sessionId/projectId should persist after page reload', async ({ page }) => {
     // Start analysis to populate localStorage
     await startCanvasAnalysis(page, '创建一个博客系统');
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
 
     // Read session/project info from localStorage
     const storageBefore = await page.evaluate(() => {
@@ -661,8 +668,7 @@ test.describe('F5.3: sessionId Chain Tests', () => {
 
     // Reload the page
     await page.reload();
-    await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     // Read storage after reload
     const storageAfter = await page.evaluate(() => {
@@ -680,6 +686,10 @@ test.describe('F5.3: sessionId Chain Tests', () => {
     if (storageBefore?.projectId) {
       expect(storageAfter?.projectId).toBe(storageBefore.projectId);
     }
+  });
+
+  test.afterEach(async ({ page }) => {
+    await page.evaluate(() => localStorage.clear());
   });
 });
 
@@ -756,6 +766,10 @@ test.describe('F5.4: Canvas Page Navigation & Resource Integrity', () => {
 
     const startButton = page.getByRole('button', { name: /启动画布/ }).first();
     await expect(startButton).toBeVisible();
+  });
+
+  test.afterEach(async ({ page }) => {
+    await page.evaluate(() => localStorage.clear());
   });
 });
 
@@ -860,5 +874,9 @@ test.describe('F5.5: API Response Structure Validation', () => {
         expect(['page', 'form', 'list', 'detail', 'modal']).toContain(comp.type);
       }
     }
+  });
+
+  test.afterEach(async ({ page }) => {
+    await page.evaluate(() => localStorage.clear());
   });
 });

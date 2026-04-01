@@ -741,6 +741,17 @@ export const useCanvasStore = create<CanvasStore>()(
             useCanvasStore.getState().addMessage({ type: 'user_action', content: `删除了上下文节点`, meta: deletedName });
           },
 
+          // [E1] 确认上下文节点 — 设置 isActive=true, status='confirmed'
+          confirmContextNode: (nodeId) => {
+            set((s) => {
+              const newNodes = s.contextNodes.map((n) =>
+                n.nodeId === nodeId
+                  ? { ...n, isActive: true, status: 'confirmed' as const }
+                  : n
+              );
+              return { contextNodes: newNodes };
+            });
+          },
 
 
           setContextDraft: (draft) => set({ contextDraft: draft }),
@@ -779,6 +790,37 @@ export const useCanvasStore = create<CanvasStore>()(
                 n.nodeId === nodeId ? { ...n, ...data, status: 'pending' as const } : n
               );
               getHistoryStore().recordSnapshot('flow', newNodes);
+              return { flowNodes: newNodes };
+            });
+          },
+
+          // [E1] 确认流程节点
+          confirmFlowNode: (nodeId) => {
+            set((s) => {
+              const newNodes = s.flowNodes.map((n) =>
+                n.nodeId === nodeId
+                  ? { ...n, isActive: true, status: 'confirmed' as const }
+                  : n
+              );
+              return { flowNodes: newNodes };
+            });
+          },
+
+          // [E1] 确认步骤 — 在流程节点内设置指定 stepId 的步骤为 confirmed
+          confirmStep: (flowNodeId, stepId) => {
+            set((s) => {
+              const newNodes = s.flowNodes.map((n) =>
+                n.nodeId === flowNodeId
+                  ? {
+                      ...n,
+                      steps: n.steps.map((step) =>
+                        step.stepId === stepId
+                          ? { ...step, isActive: true, status: 'confirmed' as const }
+                          : step
+                      ),
+                    }
+                  : n
+              );
               return { flowNodes: newNodes };
             });
           },

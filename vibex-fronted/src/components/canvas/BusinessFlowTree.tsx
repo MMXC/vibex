@@ -127,6 +127,7 @@ interface SortableStepRowProps {
   readonly?: boolean;
   onEdit: (stepId: string, data: Partial<FlowStep>) => void;
   onDelete: (stepId: string) => void;
+  flowNodeId?: string;
 }
 
 function SortableStepRow({
@@ -136,7 +137,9 @@ function SortableStepRow({
   readonly,
   onEdit,
   onDelete,
+  flowNodeId,
 }: SortableStepRowProps) {
+  const confirmStep = useCanvasStore((s) => s.confirmStep);
   const {
     attributes,
     listeners,
@@ -245,6 +248,21 @@ function SortableStepRow({
             </svg>
           ) : null}
         </span>
+      )}
+
+      {/* [E1] Step confirmation checkbox */}
+      {!readonly && (
+        <input
+          type="checkbox"
+          checked={step.status === 'confirmed'}
+          onChange={() => {
+            if (flowNodeId) confirmStep(flowNodeId, step.stepId);
+          }}
+          className={styles.stepConfirmCheckbox}
+          aria-label={`确认步骤 ${step.name}`}
+          title="确认此步骤"
+          onClick={(e) => e.stopPropagation()}
+        />
       )}
 
       {/* Step content */}
@@ -357,6 +375,7 @@ function FlowCard({
   selected,
   onToggleSelect,
 }: FlowCardProps) {
+  const confirmFlowNode = useCanvasStore((s) => s.confirmFlowNode);
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editState, setEditState] = useState({
@@ -430,15 +449,15 @@ function FlowCard({
     <div className={`${styles.flowCard} ${statusClass} ${selected ? styles.nodeCardSelected : ''}`} data-testid="flow-card" data-node-id={node.nodeId}>
       {/* Card header */}
       <div className={styles.flowCardHeader} onClick={handleHeaderClick}>
-        {/* F3-F10: Selection checkbox */}
+        {/* [E1] Confirmation checkbox — calls confirmFlowNode */}
         {onToggleSelect && (
           <input
             type="checkbox"
             className={styles.flowCardCheckbox}
-            checked={selected ?? false}
-            onChange={() => onToggleSelect(node.nodeId)}
-            aria-label={`选择流程 ${node.name}`}
-            title="用于批量选择，非确认操作"
+            checked={node.isActive !== false && node.status !== 'pending'}
+            onChange={() => confirmFlowNode(node.nodeId)}
+            aria-label={`确认流程 ${node.name}`}
+            title="确认此流程节点"
             onClick={(e) => e.stopPropagation()}
           />
         )}
@@ -526,7 +545,7 @@ function FlowCard({
                     index={i}
                     totalSteps={node.steps.length}
                     readonly={readonly}
-
+                    flowNodeId={node.nodeId}
                     onEdit={(stepId, data) => onEditStep(node.nodeId, stepId, data)}
                     onDelete={(stepId) => onDeleteStep(node.nodeId, stepId)}
                   />
@@ -565,6 +584,8 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
   const contextNodes = useCanvasStore((s) => s.contextNodes);
   const editFlowNode = useCanvasStore((s) => s.editFlowNode);
   const deleteFlowNode = useCanvasStore((s) => s.deleteFlowNode);
+  const confirmFlowNode = useCanvasStore((s) => s.confirmFlowNode);
+  const confirmStep = useCanvasStore((s) => s.confirmStep);
   const editStep = useCanvasStore((s) => s.editStep);
   const deleteStep = useCanvasStore((s) => s.deleteStep);
   const reorderSteps = useCanvasStore((s) => s.reorderSteps);

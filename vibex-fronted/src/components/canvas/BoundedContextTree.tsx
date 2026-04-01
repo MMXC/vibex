@@ -134,6 +134,7 @@ interface ContextCardProps {
 }
 
 function ContextCard({ node, onEdit, onDelete, readonly, selected, onToggleSelect }: ContextCardProps) {
+  const confirmContextNode = useCanvasStore((s) => s.confirmContextNode);
   const [editing, setEditing] = useState(false);
   const [editState, setEditState] = useState<NodeEditState>({
     nodeId: node.nodeId,
@@ -235,9 +236,9 @@ function ContextCard({ node, onEdit, onDelete, readonly, selected, onToggleSelec
             <input
               type="checkbox"
               data-testid={`context-card-checkbox-${node.nodeId}`}
-              checked={selected}
-              onChange={() => { onToggleSelect?.(node.nodeId); }}
-              aria-label={`选择 ${node.name}`}
+              checked={node.isActive !== false && node.status !== 'pending'}
+              onChange={() => { confirmContextNode(node.nodeId); }}
+              aria-label={`确认 ${node.name}`}
               className={styles.selectionCheckbox}
               onClick={(e) => e.stopPropagation()}
             />
@@ -364,6 +365,7 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
   const editContextNode = useCanvasStore((s) => s.editContextNode);
   const deleteContextNode = useCanvasStore((s) => s.deleteContextNode);
   const setContextNodes = useCanvasStore((s) => s.setContextNodes);
+  const confirmContextNode = useCanvasStore((s) => s.confirmContextNode);
   const advancePhase = useCanvasStore((s) => s.advancePhase);
 
   // F3-F10: Multi-select state

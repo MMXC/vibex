@@ -194,6 +194,20 @@
   background: var(--color-bg-secondary, #12121a);
 }
 
+/* [E3] Tablet breakpoint (768-1023px): 2 columns — context + flow panels visible */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .treePanelsGrid {
+    grid-template-columns: auto var(--grid-left, 1fr) var(--grid-center, 1fr) auto auto;
+  }
+}
+
+/* [E3] Mobile breakpoint (< 768px): single column — tab navigation manages visibility */
+@media (max-width: 767px) {
+  .treePanelsGrid {
+    grid-template-columns: auto 1fr auto;
+  }
+}
+
 /* E2-F14: Zoom controls in ProjectBar */
 .zoomControls {
   display: flex;
@@ -4209,4 +4223,24 @@
 .treePanelsGridWithBothDrawers {
   flex: 1;
   min-width: 400px;
+}
+
+/* [E3] Responsive variants for drawer-aware grids */
+
+/* Tablet: 2 columns */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .treePanelsGridWithLeftDrawer,
+  .treePanelsGridWithRightDrawer,
+  .treePanelsGridWithBothDrawers {
+    min-width: 200px;
+  }
+}
+
+/* Mobile: single column with tabs */
+@media (max-width: 767px) {
+  .treePanelsGridWithLeftDrawer,
+  .treePanelsGridWithRightDrawer,
+  .treePanelsGridWithBothDrawers {
+    min-width: 0;
+  }
 }

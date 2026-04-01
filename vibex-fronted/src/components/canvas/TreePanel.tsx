@@ -75,6 +75,18 @@ export function TreePanel({
   const [_isAnimating, setIsAnimating] = useState(false);
   const panelBodyRef = useRef<HTMLDivElement>(null);
 
+  // === F1.1: Reset scrollTop when panel expands ===
+  useEffect(() => {
+    if (!collapsed) {
+      // Panel is expanding - reset scrollTop after animation frame
+      setTimeout(() => {
+        if (panelBodyRef.current) {
+          panelBodyRef.current.scrollTop = 0;
+        }
+      }, 0);
+    }
+  }, [collapsed]);
+
   const handleToggle = () => {
     setIsAnimating(true);
     onToggleCollapse();

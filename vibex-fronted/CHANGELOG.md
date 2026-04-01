@@ -19,6 +19,18 @@ All notable changes to this project will be documented in this file.
 - **E2-T2** — Epic DoD 模板: docs/process/EPIC_DOD_TEMPLATE.md，标准化 Definition of Done
 - **E2-T3** — 功能开关: vibex-fronted/src/lib/featureFlags.ts，FF_KILL_SWITCH / FF_... 枚举
 - Commit: `a2155ffd`
+### E3: Zustand Migration 库 (proposals-20260401-2)
+- **E3-T1** — versioned-storage: src/lib/versioned-storage/，支持 state version migration
+- **E3-T2** — versioned-storage/types: 类型安全迁移
+- **E3-T3** — 测试覆盖: versioned-storage.test.ts 113 lines
+- Commit: `88e66de9`
+
+### E4: Multi-Framework 导出 (proposals-20260401-2)
+- **E4-T1** — Vue Mapping Table: 框架映射表（Next/Vue/React）
+- **E4-T2** — Export Panel Framework Switch: framework-selector.tsx，RadioGroup 切换
+- **E4-T3** — Vue Component Verification: 导出时验证目标框架支持
+- Commit: `7c8ede0a`
+
 
 ### E1: 开发环境阻塞修复 (proposals-20260401)
 - **E1-T1** — Backend npm workspace + tsconfig 测试文件排除: `exclude **/*.test.ts, **/__tests__/, coverage/, .next/`

@@ -43,6 +43,10 @@ interface KeyboardShortcutsOptions {
   onNewNode?: () => void;
   /** Quick generate (Ctrl+G) - cascade Context → Flow → Component */
   onQuickGenerate?: () => void;
+  /** [E4] Confirm selected nodes (Ctrl+Shift+C) */
+  onConfirmSelected?: () => void;
+  /** [E4] Generate context from selected (Ctrl+Shift+G) */
+  onGenerateContext?: () => void;
   /** Switch to Context tab (Alt+1) */
   onSwitchToContext?: () => void;
   /** Switch to Flow tab (Alt+2) */
@@ -81,6 +85,8 @@ export function useKeyboardShortcuts({
   onClearSelection,
   onNewNode,
   onQuickGenerate,
+  onConfirmSelected,
+  onGenerateContext,
   onSwitchToContext,
   onSwitchToFlow,
   onSwitchToComponent,
@@ -204,6 +210,20 @@ export function useKeyboardShortcuts({
         return;
       }
 
+      // === [E4] Confirm Selected: Ctrl+Shift+C / Cmd+Shift+C ===
+      if ((isCtrl || isMeta) && e.shiftKey && e.key.toLowerCase() === 'c') {
+        e.preventDefault();
+        onConfirmSelected?.();
+        return;
+      }
+
+      // === [E4] Generate Context: Ctrl+Shift+G / Cmd+Shift+G ===
+      if ((isCtrl || isMeta) && e.shiftKey && e.key.toLowerCase() === 'g') {
+        e.preventDefault();
+        onGenerateContext?.();
+        return;
+      }
+
       // === Quick Generate: Ctrl+G / Cmd+G ===
       if ((isCtrl || isMeta) && e.key.toLowerCase() === 'g') {
         e.preventDefault();
@@ -235,5 +255,5 @@ export function useKeyboardShortcuts({
 
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset, onDelete, onSelectAll, onClearSelection, onNewNode, onQuickGenerate, onSwitchToContext, onSwitchToFlow, onSwitchToComponent, enabled]);
+  }, [undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset, onDelete, onSelectAll, onClearSelection, onNewNode, onQuickGenerate, onConfirmSelected, onGenerateContext, onSwitchToContext, onSwitchToFlow, onSwitchToComponent, enabled]);
 }

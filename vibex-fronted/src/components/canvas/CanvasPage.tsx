@@ -482,6 +482,22 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
       }
     },
     onQuickGenerate: quickGenerate,
+    // [E4] Confirm selected nodes: Ctrl+Shift+C
+    onConfirmSelected: () => {
+      const store = useCanvasStore.getState();
+      const { context: ctxIds, flow: flowIds } = store.selectedNodeIds;
+      ctxIds.forEach((id) => store.confirmContextNode(id));
+      flowIds.forEach((id) => store.confirmFlowNode(id));
+    },
+    // [E4] Generate context from requirement: Ctrl+Shift+G
+    onGenerateContext: async () => {
+      if (!requirementInput.trim()) {
+        toast.showToast('请先输入需求', 'warning');
+        return;
+      }
+      if (isQuickGenerating || aiThinking || flowGenerating || componentGenerating) return;
+      await generateContexts(requirementInput);
+    },
     onSwitchToContext: () => {
       useCanvasStore.getState().setActiveTree('context');
     },

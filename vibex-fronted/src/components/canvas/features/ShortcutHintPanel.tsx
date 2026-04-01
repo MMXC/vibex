@@ -26,6 +26,8 @@ const SHORTCUTS: ShortcutItem[] = [
   { keys: ['Ctrl', 'Y'], description: '重做（Windows）' },
   { keys: ['Ctrl', 'K'], description: '搜索节点' },
   { keys: ['/'], description: '搜索节点（备选）' },
+  { keys: ['Ctrl', 'Shift', 'C'], description: '确认选中节点' },
+  { keys: ['Ctrl', 'Shift', 'G'], description: '生成上下文' },
   { keys: ['N'], description: '新建节点（当前树）' },
   { keys: ['+'], description: '放大画布' },
   { keys: ['-'], description: '缩小画布' },

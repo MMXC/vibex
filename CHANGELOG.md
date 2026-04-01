@@ -1,3 +1,11 @@
+### Added (canvas-quick-generate-command E1: Ctrl+G 快速生成) — 2026-04-01
+- **Ctrl+G 快捷键**: 触发需求→Context→Flow→Component 级联生成
+- **useKeyboardShortcuts.ts**: 添加 onQuickGenerate 选项和 Ctrl+G 处理器
+- **quickGenerate callback**: cascade Context→Flow→Component
+- **empty input guard**: 空输入和 generating 状态检查
+- **E2E 测试**: quick-generate.spec.ts
+- **提交**: `bab5981a`
+
 ### Added (canvas-scroll-reset-fix-v2 E1: rAF 防御性修复) — 2026-04-01
 - **rAF 双重保证**: requestAnimationFrame(() => requestAnimationFrame(resetScroll))
 - **cancelAnimationFrame cleanup**: 避免内存泄漏

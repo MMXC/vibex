@@ -1046,9 +1046,6 @@
   top: 0.5rem;
   left: 0.5rem;
   z-index: 2;
-}
-
-.selectionCheckbox input[type="checkbox"] {
   width: 16px;
   height: 16px;
   cursor: pointer;

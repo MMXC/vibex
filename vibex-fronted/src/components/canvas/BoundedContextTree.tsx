@@ -185,6 +185,7 @@ function ContextCard({ node, onEdit, onDelete, readonly, selected, onToggleSelec
     <div
       className={`${styles.nodeCard} ${statusClass} ${selected ? styles.nodeCardSelected : ''}`}
       data-node-id={node.nodeId}
+      data-testid={`context-card-${node.nodeId}`}
       data-status={node.status}
       data-type={node.type}
       onClick={handleCardClick}
@@ -228,18 +229,29 @@ function ContextCard({ node, onEdit, onDelete, readonly, selected, onToggleSelec
       ) : (
         /* View mode */
         <>
-          {/* S1.1: Removed selection checkbox — multi-select still works via Ctrl+click on card body */}
-          <div className={styles.nodeCardHeader}>
-            {!readonly && (
-              <input
-                type="checkbox"
-                checked={node.isActive !== false}
-                onChange={() => onEdit(node.nodeId, { isActive: node.isActive === false ? true : false })}
-                aria-label={`激活 ${node.name}`}
-                className={styles.confirmCheckbox}
-                onClick={(e) => e.stopPropagation()}
-              />
-            )}
+          {/* F1.1: Selection checkbox */}
+          {!readonly && (
+            <input
+              type="checkbox"
+              data-testid={`context-card-checkbox-${node.nodeId}`}
+              checked={selected}
+              onChange={() => { onToggleSelect?.(node.nodeId); }}
+              aria-label={`选择 ${node.name}`}
+              className={styles.selectionCheckbox}
+              onClick={(e) => e.stopPropagation()}
+            />
+          )}
+          {/* isActive checkbox */}
+          {!readonly && (
+            <input
+              type="checkbox"
+              checked={node.isActive !== false}
+              onChange={() => onEdit(node.nodeId, { isActive: node.isActive === false ? true : false })}
+              aria-label={`激活 ${node.name}`}
+              className={styles.confirmCheckbox}
+              onClick={(e) => e.stopPropagation()}
+            />
+          )}
             <div className={styles.nodeTypeBadge} style={{ background: typeColor }}>
               {node.type === 'core'
                 ? '核心'
@@ -249,7 +261,6 @@ function ContextCard({ node, onEdit, onDelete, readonly, selected, onToggleSelec
                     ? '通用'
                     : '外部'}
             </div>
-          </div>
           <h4 className={styles.nodeCardTitle}>{node.name}</h4>
           <p className={styles.nodeCardDesc}>{node.description}</p>
           {!readonly && (

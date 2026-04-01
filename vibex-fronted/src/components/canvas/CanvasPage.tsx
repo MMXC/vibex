@@ -122,6 +122,26 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     }
   }, [expandMode]);
 
+  // === F1.1: Reset scrollTop on canvas mount ===
+  useEffect(() => {
+    const resetScroll = () => {
+      // Try to find canvas container by class
+      const container = document.querySelector('[class*="canvasContainer"]') as HTMLElement;
+      if (container) {
+        container.scrollTop = 0;
+        container.scrollLeft = 0;
+      }
+      // Also reset window scroll for safety
+      window.scrollTo(0, 0);
+    };
+    
+    // Reset immediately and after a short delay to ensure DOM is ready
+    resetScroll();
+    const timeoutId = setTimeout(resetScroll, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, []);
+
   // F1: F11 keyboard shortcut for maximize mode
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {

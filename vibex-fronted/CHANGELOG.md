@@ -1,4 +1,17 @@
 # Changelog
+### E1: RelationshipConnector 注释移除 (canvas-bc-card-line-removal)
+- **E1** — RelationshipConnector 注释: import + JSX，BoundedContextTree.tsx
+- **E1** — Vitest: tests/canvas/bc-card-line-removal.spec.ts 3/3 通过
+- **E1** — gstack 验证: canvas 无 RelationshipConnector SVG 连线 ✅
+- Commit: `454212a9`
+
+### E1: E2E Stability (proposals-20260401-8)
+- **E1-F1.1** — waitForTimeout replacement: e2e/*.spec.ts 全部替换为 waitForLoadState/waitForFunction
+- **E1-F1.2** — force:true for canvas buttons: canvas-phase2.spec.ts expand/maximize/exit buttons
+- **E1-F1.3** — playwright.config.ts expect.timeout: 10000 → 30000ms
+- **E1-F1.4** — stability.spec.ts: 验收测试覆盖所有3个F1标准
+- Commit: `feae8a08`
+
 ### E3: Undo/Redo History Stack (proposals-20260401-3)
 - **E3-T1** — canvasHistoryStore bridge: stores/canvasHistoryStore.ts，暴露 historySlice 到全局 store
 - **E3-T2** — Keyboard shortcuts: useKeyboardShortcuts.ts (Ctrl+Z/Y) 已实现
@@ -338,3 +351,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 For older entries, see the commit history.
+### E1: RelationshipConnector 注释移除 (canvas-bc-card-line-removal)
+- **E1** — RelationshipConnector 注释: import + JSX，BoundedContextTree.tsx
+- **E1** — Vitest: tests/canvas/bc-card-line-removal.spec.ts 3/3 通过
+- **E1** — gstack 验证: canvas 无 RelationshipConnector SVG 连线 ✅
+- Commit: `454212a9`

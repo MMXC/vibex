@@ -12,7 +12,8 @@
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useCanvasStore } from '@/lib/canvas/canvasStore';
-import { RelationshipConnector } from './edges/RelationshipConnector';
+// [E1] 注释 RelationshipConnector — 简化 UI，移除卡片间连线
+// import { RelationshipConnector } from './edges/RelationshipConnector';
 import { BoundedContextGroup } from './BoundedContextGroup';
 import { BoundedEdgeLayer } from './edges/BoundedEdgeLayer';
 import { useModifierKey, useDragSelection } from '@/hooks/canvas/useDragSelection';
@@ -596,11 +597,13 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
 
       {/* Node List */}
       <div className={styles.contextNodeList} role="list" aria-label="限界上下文节点列表">
-        {/* E3-F13: SVG overlay for context relationships */}
+        {/* [E1] RelationshipConnector 已注释 — 移除卡片间连线 */}
+        {/* E3-F13: SVG overlay for context relationships
         <RelationshipConnector
           nodes={contextNodes}
           containerRef={containerRef as React.RefObject<HTMLElement | null>}
         />
+        */}
         {/* F4: Drag selection box overlay */}
         {selectionBox && (
           <div

@@ -1,3 +1,11 @@
+### Added (proposals-20260401-5 E1: DDD 命名规范 + Tab 快捷键) — 2026-04-01
+- **DDD 命名规范文档**: docs/ddd-naming-convention.md 含 @owner/@updated 元数据
+- **Alt+1/2/3 切换**: 快捷键切换 Context/Flow/Component 面板
+- **ShortcutHint 更新**: ShortcutHintPanel 显示 Alt+1/2/3 说明
+- **cancelAnimationFrame cleanup**: CanvasPage rAF 清理防止内存泄漏
+- **E2E 测试**: tab-shortcuts.spec.ts, canvas-scroll-reset-v2.spec.ts
+- **提交**: `44f55e89`
+
 ### Added (canvas-scrolltop-reset E1: 画布滚动+快捷键) — 2026-04-01
 - **TreePanel scroll reset**: 展开 TreePanel 时重置 panelBodyRef.scrollTop = 0
 - **Ctrl+G quick generate**: 快捷键触发需求→Context→Flow→Component 级联生成

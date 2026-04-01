@@ -359,6 +359,10 @@ interface CanvasStore {
   toggleLeftDrawer: () => void;
   /** Toggle right drawer open/closed */
   toggleRightDrawer: () => void;
+  // [E2] Open right drawer (sets to true)
+  openRightDrawer: () => void;
+  // [E2] Submit canvas event
+  submitCanvas: () => void;
   /** Set left drawer width */
   setLeftDrawerWidth: (width: number) => void;
   /** Set right drawer width */
@@ -607,6 +611,12 @@ export const useCanvasStore = create<CanvasStore>()(
             set((s) => ({ leftDrawerOpen: !s.leftDrawerOpen })),
           toggleRightDrawer: () =>
             set((s) => ({ rightDrawerOpen: !s.rightDrawerOpen })),
+          // [E2] 打开右侧抽屉
+          openRightDrawer: () => set({ rightDrawerOpen: true }),
+          // [E2] 提交画布 — 触发 /submit 命令事件
+          submitCanvas: () => {
+            console.log('[Command] /submit triggered');
+          },
           setLeftDrawerWidth: (width: number) =>
             set({ leftDrawerWidth: Math.min(400, Math.max(100, width)) }),
           setRightDrawerWidth: (width: number) =>

@@ -15,6 +15,13 @@
 
 ## 2. 实施步骤
 
+### E1 ✅ (2026-04-02 03:33)
+- [x] Step 1: 删除 confirmed 字段 (commit 34de803d)
+- [x] Step 2: TypeScript 验证通过
+- [x] Step 3: 代码确认
+- [x] Step 4: gstack UI 验证通过
+
+
 ### Step 1: 删除 confirmed 字段
 
 **文件**: `vibex-fronted/src/components/canvas/BoundedContextTree.tsx`

@@ -29,6 +29,10 @@ import type {
 // Epic 2: Re-export ClarificationRound from canvasStore (single source from confirmationTypes)
 export type { ClarificationRound } from '@/stores/confirmationTypes';
 
+// Epic 1: Import + re-export contextStore (extracted slice for modular state management)
+import { useContextStore } from './stores/contextStore';
+export { useContextStore };
+
 // ── Epic 1: Left/Right Persistent Drawer State ──────────────────────────────────
 
 export type SSEStatus = 'idle' | 'connecting' | 'connected' | 'reconnecting' | 'error';
@@ -469,9 +473,9 @@ export const useCanvasStore = create<CanvasStore>()(
           flowPanelCollapsed: false,
           componentPanelCollapsed: false,
 
-          // === Context Slice ===
-          contextNodes: [],
-          contextDraft: null,
+          // === Context Slice (delegated to useContextStore) ===
+          contextNodes: useContextStore.getState().contextNodes,
+          contextDraft: useContextStore.getState().contextDraft,
 
           // === Flow Slice ===
           flowNodes: [],
@@ -711,64 +715,13 @@ export const useCanvasStore = create<CanvasStore>()(
             }
           },
 
-          // === Context Slice Actions ===
-          setContextNodes: (nodes) => set({ contextNodes: nodes }),
-
-          addContextNode: (data) => {
-            const newNode: BoundedContextNode = {
-              nodeId: generateId(),
-              name: data.name,
-              description: data.description,
-              type: data.type,
-              isActive: false,
-              status: 'pending',
-              children: [],
-            };
-            set((s) => {
-              const newNodes = [...s.contextNodes, { ...newNode }];
-              getHistoryStore().recordSnapshot('context', newNodes);
-              return { contextNodes: newNodes };
-            });
-            // Epic 4: auto-append user_action message
-            useCanvasStore.getState().addMessage({ type: 'user_action', content: `添加了上下文节点`, meta: data.name });
-          },
-
-          editContextNode: (nodeId, data) => {
-            set((s) => {
-              const newNodes = s.contextNodes.map((n) =>
-                n.nodeId === nodeId ? { ...n, ...data, status: 'pending' as const } : n
-              );
-              getHistoryStore().recordSnapshot('context', newNodes);
-              return { contextNodes: newNodes };
-            });
-          },
-
-          deleteContextNode: (nodeId) => {
-            const nodeToDelete = get().contextNodes.find((n) => n.nodeId === nodeId);
-            const deletedName = nodeToDelete?.name ?? nodeId;
-            set((s) => {
-              const newNodes = s.contextNodes.filter((n) => n.nodeId !== nodeId);
-              getHistoryStore().recordSnapshot('context', newNodes);
-              return { contextNodes: newNodes };
-            });
-            // Epic 4: auto-append user_action message
-            useCanvasStore.getState().addMessage({ type: 'user_action', content: `删除了上下文节点`, meta: deletedName });
-          },
-
-          // [E1] 确认上下文节点 — 设置 isActive=true, status='confirmed'
-          confirmContextNode: (nodeId) => {
-            set((s) => {
-              const newNodes = s.contextNodes.map((n) =>
-                n.nodeId === nodeId
-                  ? { ...n, isActive: true, status: 'confirmed' as const }
-                  : n
-              );
-              return { contextNodes: newNodes };
-            });
-          },
-
-
-          setContextDraft: (draft) => set({ contextDraft: draft }),
+          // === Context Slice Actions (delegated to useContextStore) ===
+          setContextNodes: (nodes) => useContextStore.getState().setContextNodes(nodes),
+          addContextNode: (data) => useContextStore.getState().addContextNode(data),
+          editContextNode: (nodeId, data) => useContextStore.getState().editContextNode(nodeId, data),
+          deleteContextNode: (nodeId) => useContextStore.getState().deleteContextNode(nodeId),
+          confirmContextNode: (nodeId) => useContextStore.getState().confirmContextNode(nodeId),
+          setContextDraft: (draft) => useContextStore.getState().setContextDraft(draft),
 
           // === Flow Slice Actions ===
           setFlowNodes: (nodes) => set({ flowNodes: nodes }),
@@ -1427,6 +1380,12 @@ export const useCanvasStore = create<CanvasStore>()(
     ),
     { name: 'canvasStore' }
   )
+);
+
+// Register message bridge so extracted slices can post messages without circular deps
+import { registerMessageBridge } from './stores/messageBridge';
+registerMessageBridge(
+  useCanvasStore.getState().addMessage as (msg: { type: string; content: string; meta?: string }) => void
 );
 
 // Export for testing

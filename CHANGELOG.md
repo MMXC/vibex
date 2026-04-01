@@ -1,3 +1,10 @@
+### Added (proposals-20260401-9: Sprint 3 - Checkbox/Drawer/Responsive/Shortcuts) — 2026-04-02
+- **E1 Checkbox Confirm**: confirmContextNode/confirmFlowNode/confirmStep actions in canvasStore.ts; BoundedContextTree/BusinessFlowTree checkbox onChange calls confirm semantics
+- **E2 Message Drawer**: canvasEvents.ts (CanvasEventType/CanvasEvent); openRightDrawer()/submitCanvas() in canvasStore.ts; CommandInput auto-open drawer on command execute; /submit logs event
+- **E3 Responsive Layout**: useResponsiveMode.ts hook (isMobile/isTablet/isDesktop/isTabMode/isOverlayDrawer); @media breakpoints 768px/1023px for tablet 2-col + mobile 1-col+tabs
+- **E4 Keyboard Shortcuts**: Ctrl+Shift+C (confirm selected nodes) + Ctrl+Shift+G (generate context); ShortcutHintPanel display; CanvasPage wiring
+- **提交**: `69f75437` (E1), `c20c50da` (E2), `81febd8c` (E3), `f080424b` (E4)
+
 ### Fixed (canvas-bc-card-line-removal Epic1: 删除限界上下文树卡片连线) — 2026-04-02
 - **E1 RelationshipConnector 移除**: 注释 BoundedContextTree.tsx 中的 RelationshipConnector import 与 JSX 使用
 - **BoundedEdgeLayer 保留**: ReactFlow 画布边缘层保持激活（BoundedContextTree 是独立组件）

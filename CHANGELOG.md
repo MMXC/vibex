@@ -1,3 +1,13 @@
+### Added (proposals-20260401-4 E2: 颜色对比度 WCAG 2.1 AA 修复) — 2026-04-01
+- **design-tokens.css**: --color-text-muted #606070→#9a9a9a (3.1:1→5.7:1 对比度)
+- **tokens.css**: [data-theme=dark] --color-text-muted #64748b→#8a8a9a
+- **homepage.module.css**: hardcoded rgba text 对比度修复
+- **canvas.variables.css**: --color-canvas-bg + 按钮颜色修复
+- **canvas.module.css**: success/error/info/primary 按钮文字 → --color-text-inverse
+- **CanvasOnboardingOverlay**: nextButton/doneButton 对比度修复
+- **preview/page.tsx**: rgba text 0.5→0.85 (2.5:1→7:1)
+- **提交**: `f5f6f9d6`, `49f58e85`
+
 ### Added (proposals-20260401-4 E1: Canvas 运行时崩溃修复) — 2026-04-01
 - **Rules of Hooks**: 修复 CanvasOnboardingOverlay hooks 在条件返回后调用的问题
 - **defensive null checks**: TreePanel/TreeStatus/BusinessFlowTree/PrototypeQueuePanel 添加 nodes/steps/queue ?? [] 保护

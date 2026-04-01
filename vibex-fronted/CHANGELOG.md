@@ -3,7 +3,7 @@
 - **E1** — RelationshipConnector 注释: import + JSX，BoundedContextTree.tsx
 - **E1** — Vitest: tests/canvas/bc-card-line-removal.spec.ts 3/3 通过
 - **E1** — gstack 验证: canvas 无 RelationshipConnector SVG 连线 ✅
-- Commit: `454212a9`
+- Commit: `5150964e`
 
 ### E1: E2E Stability (proposals-20260401-8)
 - **E1-F1.1** — waitForTimeout replacement: e2e/*.spec.ts 全部替换为 waitForLoadState/waitForFunction

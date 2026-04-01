@@ -626,10 +626,10 @@
   transform: scale(0.99);
 }
 
-/* Unconfirmed: yellow border */
+/* Unconfirmed: plain border, no yellow */
 .nodeUnconfirmed {
-  border-color: var(--color-warning);
-  box-shadow: 0 0 8px rgba(255, 170, 0, 0.2);
+  /* 移除黄色边框和阴影，仅保留边框 */
+  border: 2px solid var(--color-border);
 }
 
 /* Confirmed: green border */
@@ -913,10 +913,19 @@
   letter-spacing: 0.03em;
 }
 
+/* E1: Confirmation feedback badge */
+.activeBadge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.25rem;
+  vertical-align: middle;
+}
+
 .confirmedBadge {
-  font-size: 0.875rem;
-  color: var(--color-success);
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.25rem;
+  vertical-align: middle;
 }
 
 .nodeCardTitle {

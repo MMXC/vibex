@@ -198,9 +198,9 @@ npx tsc --noEmit libs/canvas-store-migration/
 
 | # | 任务 | 工时 | 产出文件 | 验收标准 |
 |---|------|------|---------|---------|
-| E4-T1 | Vue 映射表 | 2h | `components/react2vue/mappings.ts`, `components/react2vue/transformer.ts` | `expect(mappings.Button).toBeDefined()` + Button/Input/Card/Mental 映射存在 |
-| E4-T2 | 导出面板框架切换 | 1.5h | `app/canvas/export/page.tsx`, `components/export-panel/framework-selector.tsx` | `expect(isVisible(toggle)).toBe(true)` + React/Vue RadioGroup 可切换 |
-| E4-T3 | Vue 组件运行验证 | 1.5h | `e2e/vue-components.spec.ts`, `vue-test-app/` | `expect(vueComponentsRender).toBe(true)` + Button/Input/Card E2E 测试通过 |
+| ~~E4-T1~~ | Vue 映射表 | 2h | `components/react2vue/mappings.ts`, `components/react2vue/transformer.ts` | `expect(mappings.Button).toBeDefined()` + Button/Input/Card/Mental 映射存在 |
+| ~~E4-T2~~ | 导出面板框架切换 | 1.5h | `src/app/export/page.tsx`, `src/components/export-panel/framework-selector.tsx` | `expect(isVisible(toggle)).toBe(true)` + React/Vue RadioGroup 可切换 |
+| ~~E4-T3~~ | Vue 组件运行验证 | 1.5h | `tests/e2e/vue-components.spec.ts` | `expect(vueComponentsRender).toBe(true)` + Button/Input/Card E2E 测试通过 |
 
 ### 5.2 关键路径分析
 
@@ -343,7 +343,7 @@ cd packages/mcp-server && npx jest --passWithNoTests
 | E1 | Vercel OAuth 完成 + 部署成功率 ≥ 90%（mock 测试） |
 | E2 | ROLLBACK_SOP.md ≥ 5 场景 + 至少 1 个 feature flag 使用 + DoD 双签 |
 | E3 | 库导出函数正确 + Epic6/7 全迁移 + 覆盖率 ≥ 80% |
-| E4 | Vue E2E 通过（Button/Input/Card）+ 测试覆盖率 ≥ 80% |
+| ~~E4~~ | Vue E2E 通过（Button/Input/Card）+ 测试覆盖率 ≥ 80% |
 | E5 | npm 包可安装 + Claude 连接验证（mock）+ 文档完整 |
 
 ---
@@ -375,9 +375,9 @@ cd packages/mcp-server && npx jest --passWithNoTests
 | E3-T1 | E3 | VersionedStorage API | 2h | `libs/canvas-store-migration/index.ts`, `types.ts` | `createVersionedStorage` 可导出 + migration v1→v2 自动运行 |
 | E3-T2 | E3 | Epic6/Epic7 迁移 | 2h | `stores/epic6-canvas.ts`, `stores/epic7-flow.ts`（修改） | Epic6/7 使用库 + inline migration 消除 |
 | E3-T3 | E3 | Jest 测试覆盖 | 1h | `libs/canvas-store-migration/__tests__/` | 覆盖率 ≥ 80% |
-| E4-T1 | E4 | Vue 映射表 | 2h | `components/react2vue/mappings.ts`, `transformer.ts` | Button/Input/Card/Mental 映射存在 |
-| E4-T2 | E4 | 导出面板框架切换 | 1.5h | `app/canvas/export/page.tsx`, `components/export-panel/framework-selector.tsx` | React/Vue 切换可见 + 切换后代码改变 |
-| E4-T3 | E4 | Vue 组件运行验证 | 1.5h | `e2e/vue-components.spec.ts`, `vue-test-app/` | Button/Input/Card E2E 测试通过 |
+| ~~E4-T1~~ | E4 | Vue 映射表 | 2h | `src/lib/react2vue/mappings.ts`, `src/lib/react2vue/transformer.ts` | Button/Input/Card/Mental 映射存在 |
+| ~~E4-T2~~ | E4 | 导出面板框架切换 | 1.5h | `src/app/export/page.tsx`, `src/components/export-panel/framework-selector.tsx` | React/Vue 切换可见 + 切换后代码改变 |
+| ~~E4-T3~~ | E4 | Vue 组件运行验证 | 1.5h | `tests/e2e/vue-components.spec.ts` | Button/Input/Card E2E 测试通过 |
 | E5-T1 | E5 | MCP Server 包脚手架 | 2h | `packages/mcp-server/`（全目录结构） | 包名正确 + MCP SDK 集成 |
 | E5-T2 | E5 | MCP tools 实现 | 4h | `packages/mcp-server/src/tools/`（4 个文件） | 4 个 tools 全部实现 + 类型正确 |
 | E5-T3 | E5 | Claude Desktop 集成 | 3h | `packages/mcp-server/claude_desktop_config.json`, `docs/claude-integration-guide.md` | Claude Desktop 可发现工具 + 连接成功（mock） |

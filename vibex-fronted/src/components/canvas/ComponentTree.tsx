@@ -423,19 +423,16 @@ function ComponentCard({ node, onEdit, onDelete, readonly, selected, onToggleSel
       ) : (
         /* View mode */
         <>
-          {/* E3-F2: Selection checkbox */}
-          {onToggleSelect && (
-            <div className={styles.selectionCheckbox} onClick={(e) => { e.stopPropagation(); onToggleSelect(node.nodeId); }}>
+          <div className={styles.nodeCardHeader}>
+            {onToggleSelect && (
               <input
                 type="checkbox"
+                className={styles.confirmCheckbox}
                 checked={selected ?? false}
-                onChange={() => onToggleSelect(node.nodeId)}
-                aria-label={`选择 ${node.name}`}
-                onClick={(e) => e.stopPropagation()}
+                onChange={() => { onToggleSelect(node.nodeId); }}
+                aria-label="选择节点"
               />
-            </div>
-          )}
-          <div className={styles.nodeCardHeader}>
+            )}
             <div className={styles.nodeTypeBadge} style={{ background: typeColor }}>
               {node.type === 'page' ? '页面' : node.type === 'list' ? '列表' : node.type === 'form' ? '表单' : node.type === 'detail' ? '详情' : '弹窗'}
             </div>

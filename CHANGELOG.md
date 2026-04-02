@@ -1,10 +1,16 @@
+### Added (vibex-p0-quick-fixes Epic1: TypeScript 错误清理) — 2026-04-02
+- **Epic1**: 修复 `tests/e2e/canvas-expand.spec.ts` 变量引用错误（4处）
+- 修复 `contextStore.ts` devtools 参数类型错误
+- npm build 通过，tsc --noEmit 0 error
+- **提交**: `69125676`
+
 ### Added (vibex-canvasstore-refactor Epic1: contextStore 独立 Store 提取) — 2026-04-02
 - **Epic1**: 从 canvasStore.ts 提取 contextStore 为独立 Zustand Store
 - 新建 `stores/contextStore.ts`（99 行），包含 BoundedContextNode CRUD + confirmContextNode
 - canvasStore.ts 保留 re-export 和向后兼容层（sync 到 contextStore）
 - history recording、user action messages 完整保留
 - Jest 测试: 4/4 通过（add/edit/delete/confirm）
-- **提交**: `69125676`, `133ae4dd`
+- **提交**: `133ae4dd`, `fa659b03`
 
 ### Added (canvas-checkbox-style-unify E1: ContextTree 单 checkbox + 确认反馈) — 2026-04-02
 - **E1**: ContextTree 卡片双 checkbox 合并为单一确认 checkbox

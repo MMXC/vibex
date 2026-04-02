@@ -1057,17 +1057,34 @@ export const useCanvasStore = create<CanvasStore>()(
               });
 
               if (result.success && result.components) {
-                const newNodes: ComponentNode[] = result.components.map((c) => ({
-                  nodeId: generateId(),
-                  flowId: c.flowId ?? '',
-                  name: c.name,
-                  type: c.type,
-                  props: {},
-                  api: c.api ? { ...c.api, params: c.api.params ?? [] } : { method: 'GET', path: '/api', params: [] },
-                  children: [],
-                  isActive: false,
-                  status: 'pending' as const,
-                }));
+                // E1: Defensive parsing — validate and sanitize each component
+                const validTypes = ['page', 'form', 'list', 'detail', 'modal'] as const;
+                const validMethods = ['GET', 'POST'] as const;
+                const newNodes: ComponentNode[] = result.components.map((c) => {
+                  const type = (c.type && validTypes.includes(c.type as typeof validTypes[number]))
+                    ? c.type as ComponentNode['type']
+                    : 'page';
+                  const method = (c.api?.method && validMethods.includes(c.api.method as typeof validMethods[number]))
+                    ? c.api.method
+                    : 'GET';
+                  const flowId = (c.flowId && c.flowId !== 'unknown')
+                    ? c.flowId
+                    : '';
+                  return {
+                    nodeId: generateId(),
+                    flowId,
+                    name: c.name ?? '未命名组件',
+                    type,
+                    props: {},
+                    api: {
+                      method,
+                      path: c.api?.path ?? '/api/' + (c.name ?? 'component').toLowerCase(),
+                      params: c.api?.params ?? [],
+                    },
+                    status: 'pending' as const,
+                    children: [],
+                  } as ComponentNode;
+                });
 
                 set({ componentNodes: newNodes });
                 get().setPhase('component');
@@ -1079,7 +1096,9 @@ export const useCanvasStore = create<CanvasStore>()(
                 console.error('[canvasStore] generateComponentFromFlow: no components', result.error);
               }
             } catch (err) {
+              // E2: Re-throw ZodError and other errors so React components can show toast
               console.error('[canvasStore] generateComponentFromFlow error:', err);
+              throw err;
             }
           },
 

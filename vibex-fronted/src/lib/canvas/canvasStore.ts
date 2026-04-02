@@ -33,8 +33,10 @@ export type { ClarificationRound } from '@/stores/confirmationTypes';
 import { useContextStore } from './stores/contextStore';
 export { useContextStore };
 
-// ── Epic 1: Left/Right Persistent Drawer State ──────────────────────────────────
+// Epic 2: Re-export uiStore (extracted UI slice — panels, expand, drag, drawers)
+export { useUIStore } from './stores/uiStore';
 
+// ── SSE Status Type ──────────────────────────────────────────────────────────────────
 export type SSEStatus = 'idle' | 'connecting' | 'connected' | 'reconnecting' | 'error';
 
 /** F1: Canvas expand mode — replaces old leftExpand/centerExpand/rightExpand logic */

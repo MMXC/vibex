@@ -4,7 +4,7 @@
 
 import { BaseHandler } from './base.handler';
 import type { NodeExecutionContext } from './types';
-import type { FlowExecutionNode } from '../types';
+import type { FlowExecutionNode, NodeResult } from '../types';
 
 export class LoopHandler extends BaseHandler {
   readonly type = 'loop';

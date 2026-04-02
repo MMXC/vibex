@@ -3,7 +3,7 @@
  * Re-exports and extends types from prompts/flow-execution.ts
  */
 
-export {
+import type {
   ExecutionMode,
   ExecutionStatus,
   NodeExecutionState,
@@ -14,9 +14,20 @@ export {
   ExecutableFlow,
   ExecutionResult,
   ExecutionStep,
-  SimulationResult,
-  CodeGenOptions,
 } from '../prompts/flow-execution';
+
+export type {
+  ExecutionMode,
+  ExecutionStatus,
+  NodeExecutionState,
+  FlowExecutionContext,
+  FlowExecutionConfig,
+  ExecutionNode,
+  ExecutionEdge,
+  ExecutableFlow,
+  ExecutionResult,
+  ExecutionStep,
+};
 
 /**
  * Extended ExecutionResult with execution ID
@@ -138,4 +149,35 @@ export interface FlowCodeGenOptions {
   framework?: 'express' | 'fastapi' | 'spring' | 'none';
   includeTests?: boolean;
   includeComments?: boolean;
+}
+
+/**
+ * Node execution result
+ * Used by node handlers to return execution outcome
+ */
+export interface NodeResult {
+  success: boolean;
+  output?: Record<string, unknown>;
+  nextNodeId?: string;
+  error?: string;
+}
+
+/**
+ * Simulation result
+ */
+export interface SimulationResult {
+  mode: string;
+  paths: ExecutionPath[];
+  variables: Record<string, unknown>;
+  estimatedDuration: number;
+  potentialErrors: Array<{ nodeId: string; error: string }>;
+}
+
+export interface ExecutionPath {
+  pathId: string;
+  description: string;
+  nodes: string[];
+  conditions: string[];
+  isMainPath: boolean;
+  probability?: number;
 }

@@ -2,7 +2,7 @@
  * Base Node Handler
  */
 
-import type { INodeHandler, NodeExecutionContext, HandlerValidationResult } from './types';
+import type { INodeHandler, NodeExecutionContext, HandlerValidationResult, VariableManager } from './types';
 import type { FlowExecutionNode, NodeResult } from '../types';
 
 export abstract class BaseHandler implements INodeHandler {
@@ -12,7 +12,7 @@ export abstract class BaseHandler implements INodeHandler {
     const startTime = Date.now();
     
     try {
-      const result = await this.executeNode(context);
+      const result = (await this.executeNode(context)) as NodeResult;
       const duration = Date.now() - startTime;
       
       // Log execution

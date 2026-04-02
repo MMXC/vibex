@@ -4,7 +4,7 @@
 
 import { BaseHandler } from './base.handler';
 import type { NodeExecutionContext, VariableManager } from './types';
-import type { NodeResult } from '../types';
+import type { NodeResult, FlowExecutionConfig } from '../types';
 
 export class StartHandler extends BaseHandler {
   readonly type = 'start';
@@ -14,7 +14,7 @@ export class StartHandler extends BaseHandler {
     nextNodeId?: string;
   }> {
     // Initialize execution variables from input
-    const config = context.config;
+    const config = context.config as FlowExecutionConfig & { input?: Record<string, unknown> };
     if (config.input) {
       for (const [key, value] of Object.entries(config.input)) {
         context.variables.set(key, value);

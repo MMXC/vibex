@@ -2,9 +2,9 @@
  * Execution Scheduler
  */
 
-import type { FlowExecutionNode, ExecutionEdge, ExecutionResult, ExecutionConfig } from './types';
-import type { NodeHandlerRegistry, NodeExecutionContext } from './handlers/types';
-import type { VariableManager } from './handlers/types';
+import type { FlowExecutionNode, ExecutionEdge, ExecutionResult, FlowExecutionConfig } from './types';
+import type { NodeHandlerRegistry } from './handlers';
+import type { NodeExecutionContext, VariableManager } from './handlers/types';
 import { ExecutionLogger } from './logger';
 import { VariableManager as VarManager } from './variables';
 
@@ -24,7 +24,7 @@ export class ExecutionScheduler {
   async run(
     flow: { nodes: FlowExecutionNode[]; edges: ExecutionEdge[]; startNode?: string },
     variableManager: VarManager,
-    config: ExecutionConfig,
+    config: FlowExecutionConfig,
     context: any
   ): Promise<ExecutionResult> {
     const executionId = this.generateExecutionId();
@@ -81,8 +81,8 @@ export class ExecutionScheduler {
       
       try {
         // Execute node
-        
-        
+        const result = await handler.execute(nodeContext);
+
         executedNodes.push(currentNodeId);
         pathsTaken.push(currentNodeId);
         

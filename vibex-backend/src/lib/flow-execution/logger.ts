@@ -2,9 +2,9 @@
  * Execution Logger
  */
 
-import type { ExecutionLogger, ExecutionStepLog } from './handlers/types';
+import type { ExecutionLogger as IExecutionLogger, ExecutionStepLog } from './handlers/types';
 
-export class ExecutionLogger implements ExecutionLogger {
+export class ExecutionLogger implements IExecutionLogger {
   private executionLogs: Map<string, ExecutionStepLog[]> = new Map();
   
   logExecution(executionId: string, data: unknown): void {

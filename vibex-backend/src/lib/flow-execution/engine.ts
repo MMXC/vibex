@@ -7,8 +7,8 @@ import type {
   ExecutableFlow, 
   FlowExecutionConfig, 
   FlowExecutionContext,
-  SimulationResult,
-  FlowCodeGenOptions 
+  FlowCodeGenOptions,
+  SimulationResult
 } from './types';
 import type { ExecutionResult } from '../prompts/flow-execution';
 

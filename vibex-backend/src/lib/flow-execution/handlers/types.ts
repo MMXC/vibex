@@ -2,7 +2,7 @@
  * Node Handler Types
  */
 
-import type { FlowExecutionNode, NodeResult, ServiceRegistry, ExecutionConfig } from './types';
+import type { FlowExecutionNode, NodeResult, FlowExecutionConfig, ServiceRegistry } from '../types';
 
 /**
  * Node execution context
@@ -12,7 +12,7 @@ export interface NodeExecutionContext {
   variables: VariableManager;
   services: ServiceRegistry;
   logger: ExecutionLogger;
-  config: ExecutionConfig;
+  config: FlowExecutionConfig;
   executionId: string;
   stepNumber: number;
 }

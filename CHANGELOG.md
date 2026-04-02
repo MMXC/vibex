@@ -1,3 +1,9 @@
+### Added (vibex-canvasstore-refactor Epic4: componentStore 独立 Store 提取) — 2026-04-02
+- **Epic4**: 从 canvasStore.ts 提取 componentStore 为独立 Zustand Store（114 行）
+- componentStore: ComponentNode 状态管理、多选节点操作
+- componentStore.test.ts: 13/13 通过
+- **提交**: 继承 Epic3 flowStore 重构成果
+
 ### Added (vibex-canvasstore-refactor Epic3: flowStore 独立 Store 提取) — 2026-04-02
 - **Epic3**: 从 canvasStore.ts 提取 flowStore 为独立 Zustand Store（212 行）
 - flowStore.ts: BusinessFlowNode CRUD + steps 管理 + confirmFlowNode toggle（含级联确认）

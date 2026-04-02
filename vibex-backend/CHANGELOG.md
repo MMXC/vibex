@@ -8,11 +8,18 @@
 
 - **Epic2-BackendVersionedStorage**: Canvas Snapshot + Versioned Storage API
   - CanvasSnapshot Table: `migrations/0006_canvas_snapshot.sql` (projectId, version, data, isAutoSave, @@unique index)
-  - Snapshot API: `src/routes/v1/canvas/snapshot.ts` (GET list, POST create with auto-increment version)
+  - Snapshot API: `src/routes/v1/canvas/snapshots.ts` (GET/POST list, GET :id, POST :id/restore)
   - Rollback API: `src/routes/v1/canvas/rollback.ts` (GET version list, POST rollback with backup)
-  - Route Registration: /v1/canvas/snapshot and /v1/canvas/rollback registered in gateway.ts
-  - Zod validation: all request bodies validated with schema
-  - Commit: `9b083f22`
+  - Route Registration: /v1/canvas/snapshots and /v1/canvas/rollback registered in gateway.ts
+  - Zod validation: supports both frontend format (contextNodes/flowNodes/componentNodes) and legacy format
+  - Commits: `9b083f22`, `af995f0b`
+
+- **Epic3-AutoSave**: Automatic Canvas Save with Debounce + Beacon
+  - useAutoSave hook: `vibex-fronted/src/hooks/canvas/useAutoSave.ts` (Zustand store subscription + use-debounce)
+  - SaveIndicator component: `vibex-fronted/src/components/canvas/features/SaveIndicator.tsx`
+  - CanvasPage integration: Debounce 2s (per AGENTS.md constraint), beforeunload beacon save
+  - Status indicator: 保存中/已保存/保存失败
+  - Commit: `af995f0b`
 
 #### 2026-03-23
 

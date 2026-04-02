@@ -91,6 +91,24 @@ jobs:
             test-results/**/videos/
           retention-days: 14
 
+      # E1-S2: Stability Report — parse results and update daily log
+      - name: Stability Report
+        if: always()
+        run: |
+          python3 scripts/parse-playwright-report.py test-results/results.json || true
+          if [ -f docs/daily-stability.md ]; then
+            echo "::notice title=Stability Report::$(cat docs/daily-stability.md | tail -3)"
+          fi
+
+      # E1-S3: Commit stability report on schedule
+      - name: Commit stability report
+        if: github.event_name == 'schedule'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add docs/daily-stability.md || true
+          git diff --staged --quiet || git commit -m "docs: update daily stability report $(date +%Y-%m-%d)"
+
   notify:
     needs: e2e-test
     runs-on: ubuntu-latest

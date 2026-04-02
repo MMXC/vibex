@@ -1,4 +1,10 @@
 # Changelog
+### E1: Canvas JSON 持久化 — 统一数据模型 (canvas-json-persistence)
+- **E1-S1**: NodeState 统一接口 — 三树节点类型共享统一 NodeState
+- **E1-S2**: Migration 3→4 修复 — status 映射保留 confirmed 状态
+- **E1-S3**: selected 字段 — 三树节点添加 selected boolean 字段
+- Commit: `cfe58ac4` + `a939bb0a`
+
 ### E4: Keyboard Shortcuts (proposals-20260401-9)
 - **E4** — useKeyboardShortcuts.ts: add Ctrl+Shift+C (confirm) and Ctrl+Shift+G (generate context)
 - **E4** — ShortcutHintPanel: display new shortcuts in hint panel

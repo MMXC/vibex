@@ -1,4 +1,10 @@
-### Added (vibex-canvasstore-refactor Epic5: sessionStore 独立 Store 提取) — 2026-04-02
+### Added (bc-checkbox-confirm-style-fix E1: BoundedContextTree checkbox 修复) — 2026-04-02
+- **E1**: checkbox 与标题同行、confirmed 绿色边框、toggleContextNode 双向切换
+- 代码复用 canvas-checkbox-ux-fix Epic1（commit `17719536`）
+- BoundedContextTree.test.tsx: 8/8 通过
+- **提交**: `f7c9fa5e`
+
+### Added (vibex-canvasstore-refactor Epic5: sessionStore 独立 Store 提取) — 2026-04-02 — 2026-04-02
 - **Epic5**: 从 canvasStore.ts 提取 sessionStore 为独立 Zustand Store（115 行）
 - sessionStore: session 消息、polling 状态、prototype 队列管理
 - 新增 `stores/index.ts` 统一导出所有 store

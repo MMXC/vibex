@@ -97,11 +97,11 @@
 
 ## 验收清单
 
-- [ ] BoundedContextTree 只有 1 个 checkbox
-- [ ] BoundedContextTree 无 nodeTypeBadge
-- [ ] BoundedContextTree 无 confirmedBadge
-- [ ] ComponentTree checkbox 在标题同一行
-- [ ] ComponentTree 无 nodeTypeBadge
-- [ ] `.nodeTypeBadge` / `.confirmedBadge` CSS 已删除
-- [ ] `npm test` 通过
-- [ ] `npm run build` 通过
+- [x] BoundedContextTree 只有 1 个 checkbox
+- [x] BoundedContextTree 无 nodeTypeBadge
+- [x] BoundedContextTree 无 confirmedBadge
+- [x] ComponentTree checkbox 在标题同一行
+- [x] ComponentTree 无 nodeTypeBadge
+- [x] `.nodeTypeBadge` / `.confirmedBadge` CSS 已删除
+- [x] `npm test` 通过
+- [x] `npm run build` 通过

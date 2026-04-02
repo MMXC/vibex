@@ -47,19 +47,19 @@
 ### 审查重点
 
 1. **BoundedContextTree**
-   - [ ] 只有 1 个 checkbox
-   - [ ] 无 nodeTypeBadge
-   - [ ] 无 confirmedBadge
-   - [ ] checkbox toggle 双向
+   - [x] 只有 1 个 checkbox
+   - [x] 无 nodeTypeBadge
+   - [x] 无 confirmedBadge
+   - [x] checkbox toggle 双向
 
 2. **ComponentTree**
-   - [ ] checkbox 在标题同一行
-   - [ ] 无 nodeTypeBadge
+   - [x] checkbox 在标题同一行
+   - [x] 无 nodeTypeBadge
 
 3. **CSS**
-   - [ ] `.nodeTypeBadge` 已删除
-   - [ ] `.confirmedBadge` 已删除
-   - [ ] `.confirmCheckbox` 保留
+   - [x] `.nodeTypeBadge` 已删除
+   - [x] `.confirmedBadge` 已删除
+   - [x] `.confirmCheckbox` 保留
 
 ### 驳回条件
 

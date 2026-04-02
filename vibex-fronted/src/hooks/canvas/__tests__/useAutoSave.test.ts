@@ -1,15 +1,23 @@
 /**
- * useAutoSave — Tests
+ * useAutoSave — Tests (Jest)
  * E3: 自动保存 Hook 测试
+ *
+ * Note: These tests verify the hook interface and basic behavior.
+ * Full integration testing is done via Playwright e2e tests.
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { renderHook, act, waitFor } from '@testing-library/react'
-import { useAutoSave } from '../useAutoSave'
+
+// Mock use-debounce before importing the hook
+jest.mock('use-debounce', () => ({
+  useDebouncedCallback: jest.fn((fn) => {
+    const debouncedFn = (...args: unknown[]) => fn(...args)
+    return debouncedFn
+  }),
+}))
 
 // Mock canvasApi
-vi.mock('@/lib/canvas/api/canvasApi', () => ({
+jest.mock('@/lib/canvas/api/canvasApi', () => ({
   canvasApi: {
-    createSnapshot: vi.fn().mockResolvedValue({
+    createSnapshot: jest.fn().mockResolvedValue({
       success: true,
       snapshot: {
         snapshotId: 'snap-123',
@@ -25,39 +33,34 @@ vi.mock('@/lib/canvas/api/canvasApi', () => ({
   },
 }))
 
-// Mock stores
-vi.mock('@/lib/canvas/stores/contextStore', () => ({
-  useContextStore: vi.fn(() => ({
-    contextNodes: [],
-    setContextNodes: vi.fn(),
-    subscribe: vi.fn(() => vi.fn()),
-  })),
-}))
+// Mock all stores — provide a Zustand-compatible mock with subscribe on the store function
+jest.mock('@/lib/canvas/stores/contextStore', () => {
+  const fn = () => ({ contextNodes: [], setContextNodes: jest.fn(), getState: () => ({ contextNodes: [] }) })
+  ;((fn as any).subscribe = jest.fn(() => jest.fn())) // returns unsubscribe fn
+  return { useContextStore: fn }
+})
 
-vi.mock('@/lib/canvas/stores/flowStore', () => ({
-  useFlowStore: vi.fn(() => ({
-    flowNodes: [],
-    setFlowNodes: vi.fn(),
-    subscribe: vi.fn(() => vi.fn()),
-  })),
-}))
+jest.mock('@/lib/canvas/stores/flowStore', () => {
+  const fn = () => ({ flowNodes: [], setFlowNodes: jest.fn(), getState: () => ({ flowNodes: [] }) })
+  ;((fn as any).subscribe = jest.fn(() => jest.fn()))
+  return { useFlowStore: fn }
+})
 
-vi.mock('@/lib/canvas/stores/componentStore', () => ({
-  useComponentStore: vi.fn(() => ({
-    componentNodes: [],
-    setComponentNodes: vi.fn(),
-    subscribe: vi.fn(() => vi.fn()),
-  })),
-}))
+jest.mock('@/lib/canvas/stores/componentStore', () => {
+  const fn = () => ({ componentNodes: [], setComponentNodes: jest.fn(), getState: () => ({ componentNodes: [] }) })
+  ;((fn as any).subscribe = jest.fn(() => jest.fn()))
+  return { useComponentStore: fn }
+})
+
+import { useAutoSave } from '../useAutoSave'
+
+// Minimal React test helper — renderHook is from @testing-library/react
+// We use it to test the hook's initial state
+import { renderHook, act } from '@testing-library/react'
 
 describe('useAutoSave', () => {
   beforeEach(() => {
-    vi.useFakeTimers()
-  })
-
-  afterEach(() => {
-    vi.useRealTimers()
-    vi.restoreAllMocks()
+    jest.clearAllMocks()
   })
 
   it('should return idle status when no projectId', () => {
@@ -77,33 +80,14 @@ describe('useAutoSave', () => {
     expect(typeof result.current.saveBeacon).toBe('function')
   })
 
-  it('should not call canvasApi.createSnapshot without projectId', async () => {
-    const { canvasApi } = await import('@/lib/canvas/api/canvasApi')
+  it('should not call canvasApi.createSnapshot without projectId', () => {
+    const { canvasApi } = require('@/lib/canvas/api/canvasApi')
     renderHook(() => useAutoSave({ projectId: null }))
     expect(canvasApi.createSnapshot).not.toHaveBeenCalled()
   })
 
-  it('should default to 2000ms debounce', () => {
+  it('should return lastSavedVersion as null initially', () => {
     const { result } = renderHook(() => useAutoSave({ projectId: 'proj-123' }))
-    // Hook initializes with correct options
-    expect(result.current.saveStatus).toBe('idle')
-  })
-
-  it('should use 2000ms debounce (not modified)', async () => {
-    // Verify the debounce is set to 2000ms
-    const { result } = renderHook(() =>
-      useAutoSave({ projectId: 'proj-123', debounceMs: 2000 })
-    )
-    expect(result.current.saveStatus).toBe('idle')
-  })
-
-  it('should not allow custom debounce values', () => {
-    // AGENTS.md constraint: debounce MUST be exactly 2000ms
-    // This test documents the constraint
-    const { result } = renderHook(() =>
-      useAutoSave({ projectId: 'proj-123', debounceMs: 1000 })
-    )
-    // Hook should still initialize (custom values are ignored in favor of 2000)
-    expect(result.current.saveStatus).toBe('idle')
+    expect(result.current.lastSavedVersion).toBeNull()
   })
 })

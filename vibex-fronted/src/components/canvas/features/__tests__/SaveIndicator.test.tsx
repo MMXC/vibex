@@ -1,8 +1,8 @@
 /**
- * SaveIndicator — Tests
+ * SaveIndicator — Tests (Jest)
  * E3-S2: 视觉反馈指示器测试
  */
-import { describe, it, expect, vi } from 'vitest'
+import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { SaveIndicator } from '../SaveIndicator'
 
@@ -16,8 +16,10 @@ describe('SaveIndicator', () => {
 
   it('shows saved indicator with lastSavedAt when idle', () => {
     const lastSaved = new Date()
-    render(<SaveIndicator status="idle" lastSavedAt={lastSaved} />)
-    expect(screen.getByText(/已保存/)).toBeInTheDocument()
+    const { container } = render(
+      <SaveIndicator status="idle" lastSavedAt={lastSaved} />
+    )
+    expect(container.textContent).toContain('已保存')
   })
 
   it('shows saving indicator when status is saving', () => {
@@ -36,7 +38,7 @@ describe('SaveIndicator', () => {
   })
 
   it('shows retry button on error when onSaveNow provided', () => {
-    const onSaveNow = vi.fn()
+    const onSaveNow = jest.fn()
     render(<SaveIndicator status="error" lastSavedAt={null} onSaveNow={onSaveNow} />)
     expect(screen.getByText('重试')).toBeInTheDocument()
   })

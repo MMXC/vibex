@@ -1,10 +1,11 @@
 /**
  * BoundedContextTree.test.tsx
  *
- * Epic 3: confirmed → isActive
- * - Confirmation checkbox removed (no confirmContextNode method)
- * - No "确认所有" button — replaced by "继续到原型生成"
- * - Nodes use isActive field instead of confirmed
+ * Epic 1: E1 checkbox UX fix
+ * - Single confirmation checkbox per node (replaces dual-checkbox design)
+ * - No nodeTypeBadge (type shown via border color)
+ * - No confirmedBadge (confirmation shown by border color)
+ * - Toggle bidirectional via toggleContextNode()
  */
 import React from 'react';
 import { render, screen, cleanup } from '@testing-library/react';
@@ -13,13 +14,14 @@ import { BoundedContextTree } from './BoundedContextTree';
 import type { BoundedContextNode } from '@/lib/canvas/types';
 
 const mockCtxNodes: BoundedContextNode[] = [
-  { nodeId: 'ctx-1', name: '患者管理', description: '管理患者基本信息', type: 'core', isActive: true, status: 'pending', children: [] },
-  { nodeId: 'ctx-2', name: '预约挂号', description: '处理预约和排班', type: 'core', isActive: true, status: 'pending', children: [] },
-  { nodeId: 'ctx-3', name: '支付结算', description: '诊金支付和医保结算', type: 'supporting', isActive: false, status: 'pending', children: [] },
+  { nodeId: 'ctx-1', name: '患者管理', description: '管理患者基本信息', type: 'core', isActive: true, status: 'confirmed', children: [] },
+  { nodeId: 'ctx-2', name: '预约挂号', description: '处理预约和排班', type: 'supporting', isActive: false, status: 'pending', children: [] },
+  { nodeId: 'ctx-3', name: '支付结算', description: '诊金支付和医保结算', type: 'generic', isActive: false, status: 'pending', children: [] },
 ];
 
 const mockAdvancePhase = jest.fn();
 const mockDeleteCtx = jest.fn();
+const mockToggleContextNode = jest.fn();
 
 // =============================================================================
 // Mock canvasStore
@@ -36,6 +38,7 @@ jest.mock('@/lib/canvas/canvasStore', () => ({
       deleteContextDraft: jest.fn(),
       deleteContextNode: mockDeleteCtx,
       setContextNodes: jest.fn(),
+      toggleContextNode: mockToggleContextNode,
       selectedNodeIds: { context: [] as string[], component: [] as string[], flow: [] as string[] },
       toggleNodeSelect: jest.fn(),
       selectAllNodes: jest.fn(),
@@ -69,10 +72,14 @@ jest.mock('@/components/ui/Toast', () => ({
 // =============================================================================
 // Tests
 // =============================================================================
-describe('BoundedContextTree — Epic 3: isActive (no confirm)', () => {
+describe('BoundedContextTree — Epic 1: E1 checkbox UX fix', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCtxNodes.forEach((n) => { n.isActive = true; n.status = 'pending'; });
+    mockCtxNodes[0].status = 'confirmed';
+    mockCtxNodes[0].isActive = true;
+    mockCtxNodes[1].status = 'pending';
+    mockCtxNodes[1].isActive = false;
+    mockCtxNodes[2].status = 'pending';
     mockCtxNodes[2].isActive = false;
   });
 
@@ -87,29 +94,58 @@ describe('BoundedContextTree — Epic 3: isActive (no confirm)', () => {
     expect(screen.getByText('支付结算')).toBeInTheDocument();
   });
 
-  it('has no confirmation checkboxes (Epic 3 removal)', () => {
+  // E1: Single checkbox per node (T1)
+  it('has exactly 1 checkbox per node (E1 single checkbox)', () => {
     render(<BoundedContextTree />);
-    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+    // 3 nodes → 3 checkboxes (one per node)
+    expect(screen.getAllByRole('checkbox')).toHaveLength(3);
   });
 
-  // Epic 3 removed confirm checkboxes but kept the secondary "确认所有" button (S1.5) in multiSelectControls.
-  // It no longer gates confirmation — directly calls advancePhase().
-  it('has "确认所有" secondary button in multiSelectControls', () => {
+  // E1: Checkbox has aria-label='确认节点' (T1)
+  it('each checkbox has aria-label="确认节点" (E1)', () => {
     render(<BoundedContextTree />);
-    // The secondary "确认所有" button (S1.5) has exact aria-label "确认所有节点"
-    expect(screen.getByRole('button', { name: '确认所有节点' })).toBeInTheDocument();
+    const checkboxes = screen.getAllByRole('checkbox');
+    checkboxes.forEach((cb) => {
+      expect(cb).toHaveAttribute('aria-label', '确认节点');
+    });
+  });
+
+  // E1: Clicking checkbox calls toggleContextNode (T4)
+  it('clicking checkbox calls toggleContextNode (E1 toggle)', async () => {
+    const user = userEvent.setup();
+    render(<BoundedContextTree />);
+    const firstCheckbox = screen.getAllByRole('checkbox')[0];
+    await user.click(firstCheckbox);
+    expect(mockToggleContextNode).toHaveBeenCalledWith('ctx-1');
+  });
+
+  // E1: No nodeTypeBadge (T2)
+  it('has no nodeTypeBadge element (E1 removal)', () => {
+    render(<BoundedContextTree />);
+    // nodeTypeBadge was a div with class styles.nodeTypeBadge — check it doesn't appear
+    // We verify by checking that type text (核心/支撑/通用) is NOT in document
+    expect(screen.queryByText('核心')).not.toBeInTheDocument();
+    expect(screen.queryByText('支撑')).not.toBeInTheDocument();
+    expect(screen.queryByText('通用')).not.toBeInTheDocument();
+  });
+
+  // E1: No confirmedBadge (T3)
+  it('has no confirmedBadge element (E1 removal)', () => {
+    render(<BoundedContextTree />);
+    // No SVG checkmark badges should appear
+    // The confirmedBadge was an SVG span — verify the document doesn't have extra checkmarks
+    const checkmarks = document.querySelectorAll('[aria-label="已确认"]');
+    expect(checkmarks).toHaveLength(0);
   });
 
   it('has primary flow-tree advance button when nodes exist', () => {
     render(<BoundedContextTree />);
-    // Primary button always exists when hasNodes=true. Use getByText since aria-label doesn't contain "继续到流程树".
     expect(screen.getByText(/继续到流程树/)).toBeInTheDocument();
   });
 
   it('primary flow-tree button calls advancePhase', async () => {
     const user = userEvent.setup();
     render(<BoundedContextTree />);
-    // Click by text content — the button text is "确认所有 → 继续到流程树"
     await user.click(screen.getByText(/继续到流程树/));
     expect(mockAdvancePhase).toHaveBeenCalledTimes(1);
   });

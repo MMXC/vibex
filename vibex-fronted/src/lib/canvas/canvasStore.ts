@@ -66,7 +66,7 @@ import { getHistoryStore } from './historySlice';
 
 const CANVAS_STORAGE_KEY = 'vibex-canvas-storage';
 const CANVAS_STORAGE_VERSION_KEY = `${CANVAS_STORAGE_KEY}-version`;
-const CURRENT_STORAGE_VERSION = 3;
+const CURRENT_STORAGE_VERSION = 4;
 
 /**
  * Epic 5: Migration

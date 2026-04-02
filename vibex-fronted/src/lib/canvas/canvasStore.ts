@@ -26,6 +26,8 @@ import type {
   BoundedEdge,
   FlowEdge,
 } from './types';
+// Epic 5: Import session types from sessionStore
+import type { SSEStatus, MessageItem } from './stores/sessionStore';
 // Epic 2: Re-export ClarificationRound from canvasStore (single source from confirmationTypes)
 export type { ClarificationRound } from '@/stores/confirmationTypes';
 
@@ -39,8 +41,11 @@ export { useUIStore } from './stores/uiStore';
 // Epic 3: Re-export flowStore (extracted flow slice — flowNodes CRUD, steps)
 export { useFlowStore } from './stores/flowStore';
 
-// ── SSE Status Type ──────────────────────────────────────────────────────────────────
-export type SSEStatus = 'idle' | 'connecting' | 'connected' | 'reconnecting' | 'error';
+// Epic 4: Re-export componentStore (extracted component slice — componentNodes CRUD, multi-select)
+export { useComponentStore } from './stores/componentStore';
+
+// Epic 5: Re-export sessionStore (extracted session slice — SSE, AI thinking, messages, queue)
+export { useSessionStore } from './stores/sessionStore';
 
 /** F1: Canvas expand mode — replaces old leftExpand/centerExpand/rightExpand logic */
 export type CanvasExpandMode = 'normal' | 'expand-both' | 'maximize';
@@ -49,31 +54,7 @@ import exampleCanvasData from '@/data/example-canvas.json';
 import { canvasApi } from './api/canvasApi';
 import { getHistoryStore } from './historySlice';
 
-// ── Epic 6: Message Slice Types ───────────────────────────────────────────────
-export type MessageType = 'user_action' | 'ai_suggestion' | 'system' | 'command_executed';
-
-export interface MessageItem {
-  id: string;
-  type: MessageType;
-  content: string;
-  meta?: string;
-  timestamp: number;
-}
-
-let _messageIdCounter = 0;
-function newMessageId(): string {
-  return `msg-${Date.now()}-${++_messageIdCounter}`;
-}
-
-// ── Epic 6: Message Slice ─────────────────────────────────────────────────────
-// Merges messageDrawerStore into canvasStore as a slice
-export interface MessageSlice {
-  // State
-  messages: MessageItem[];
-  // Actions
-  addMessage: (msg: Omit<MessageItem, 'id' | 'timestamp'>) => void;
-  clearMessages: () => void;
-}
+// MessageSlice types now re-exported from sessionStore
 
 // =============================================================================
 // Helpers
@@ -139,6 +120,11 @@ function runMigrations(storedState: Record<string, unknown>): Record<string, unk
 
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+let _msgIdCounter = 0;
+function newMessageId(): string {
+  return `msg-${Date.now()}-${++_msgIdCounter}`;
 }
 
 function markAllPending<T extends { status: string; isActive?: boolean }>(nodes: T[]): T[] {

@@ -1,3 +1,9 @@
+### Added (vibex-p0-quick-fixes Epic3: 依赖安全审计通过) — 2026-04-02
+- **Epic3**: 依赖安全审计完成，0 high/critical 漏洞
+- workspace root 添加 pnpm.overrides: lodash>=4.18.0（修复 CVE）
+- DOMPurify 3.3.3（所有间接依赖统一）
+- **提交**: `9fcb0a04`
+
 ### Added (vibex-p0-quick-fixes Epic2: DOMPurify XSS + lodash 安全修复) — 2026-04-02
 - **Epic2**: DOMPurify 配置正确（3.3.2），XSS 防护有效
 - 添加 `lodash >=4.18.0` 到 package.json overrides，修复已知安全漏洞

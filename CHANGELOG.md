@@ -1,3 +1,12 @@
+### Added (flow-checkbox-toggle-fix E1: toggleFlowNode 级联切换) — 2026-04-02
+- **E1**: BusinessFlowTree checkbox toggle 行为修复（双向切换）
+- `toggleFlowNode()` 新增到 flowStore，支持 confirmed ↔ pending 双向切换
+- checkbox `checked={node.status === 'confirmed'}` + `onChange=toggleFlowNode`
+- cascade: toggle 同时切换所有子步骤状态
+- **E2**: generateComponents 只传输 confirmed 节点到 API
+- flowStore.test.ts: 14/14 通过
+- **提交**: `5a56cbae`
+
 ### Added (bc-checkbox-confirm-style-fix E1: BoundedContextTree checkbox 修复) — 2026-04-02
 - **E1**: checkbox 与标题同行、confirmed 绿色边框、toggleContextNode 双向切换
 - 代码复用 canvas-checkbox-ux-fix Epic1（commit `17719536`）

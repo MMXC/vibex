@@ -97,12 +97,18 @@ function runMigrations(storedState: Record<string, unknown>): Record<string, unk
     };
   }
   if (version < 3) {
-    // Migration 2→3: confirmed → isActive (Epic 3)
+    // Migration 2→3: confirmed → isActive AND status (Epic 3)
+    // Fix: also set status='confirmed' when confirmed=true to preserve confirmation state
     const migrateNodes = (nodes: any[]): any[] =>
       nodes.map((n: any) => {
         const confirmed = n.confirmed;
         const { confirmed: _confirmed, ...rest } = n;
-        return { ...rest, isActive: confirmed ?? true };
+        return {
+          ...rest,
+          isActive: confirmed ?? true,
+          // E1 fix: preserve confirmation state in status field
+          status: confirmed ? 'confirmed' : (n.status ?? 'pending'),
+        };
       });
     migrated = {
       ...migrated,
@@ -110,6 +116,13 @@ function runMigrations(storedState: Record<string, unknown>): Record<string, unk
       flowNodes: migrateNodes((migrated.flowNodes as unknown[]) ?? []),
       componentNodes: migrateNodes((migrated.componentNodes as unknown[]) ?? []),
     };
+  }
+
+  // E1-S2: Migration 3→4 — add 'generating' to status enum for new nodes
+  if (version < 4) {
+    // Migration 3→4: ensure status values are valid (no-op since schema accepts any)
+    // This version bump ensures fresh localStorage gets version 4
+    migrated = { ...migrated };
   }
 
   // Future migrations go here:

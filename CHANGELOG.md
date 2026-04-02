@@ -1,3 +1,10 @@
+### Added (canvas-checkbox-ux-fix Epic2: ComponentTree checkbox 前移到标题同行) — 2026-04-02
+- **Epic2**: ComponentTree checkbox 从 div 包裹改为 inline，移到标题同行
+- ComponentTree.tsx: checkbox 前移到 `nodeCardHeader` 内部、nodeTypeBadge 前
+- 移除 nodeTypeBadge（type 信息改为通过 border 颜色区分）
+- ComponentTree.test.tsx: 6/6 通过（含 checkbox 同标题行、nodeTypeBadge 移除验证）
+- **提交**: `17719536`（与 Epic1 同一 commit）
+
 ### Added (canvas-checkbox-ux-fix Epic1: BoundedContextTree 单 checkbox + toggleContextNode) — 2026-04-02
 - **Epic1**: BoundedContextTree 卡片合并 checkbox/toggle，移除 nodeTypeBadge 和 confirmedBadge
 - 新增 `toggleContextNode()` action（canvasStore.ts），双向 toggle confirmed/pending

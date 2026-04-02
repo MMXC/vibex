@@ -4,6 +4,16 @@
 
 ### Backend Core
 
+#### 2026-04-03
+
+- **Epic2-BackendVersionedStorage**: Canvas Snapshot + Versioned Storage API
+  - CanvasSnapshot Table: `migrations/0006_canvas_snapshot.sql` (projectId, version, data, isAutoSave, @@unique index)
+  - Snapshot API: `src/routes/v1/canvas/snapshot.ts` (GET list, POST create with auto-increment version)
+  - Rollback API: `src/routes/v1/canvas/rollback.ts` (GET version list, POST rollback with backup)
+  - Route Registration: /v1/canvas/snapshot and /v1/canvas/rollback registered in gateway.ts
+  - Zod validation: all request bodies validated with schema
+  - Commit: `9b083f22`
+
 #### 2026-03-23
 
 - **Epic1-Infrastructure**: Backend Core for Simplified Flow

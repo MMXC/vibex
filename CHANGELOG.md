@@ -1,3 +1,8 @@
+### Added (vibex-page-cleanup: /canvas 设首页) — 2026-04-02
+- **Root `/` redirect**: `page.tsx` → `redirect('/canvas')`
+- **README**: 添加首页迁移说明，指向 `/canvas`
+- **提交**: `7092ba31`
+
 ### Added (canvas-component-validate-fix Epic2: Zod schema API 验证修复) — 2026-04-02
 - **E1**: type 枚举宽松化（accept any string + typeMap normalization）
 - **E2**: HTTP method 大小写归一化（`.toUpperCase()` → 'GET'|'POST'）

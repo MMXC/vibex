@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.91',
+    date: '2026-04-03',
+    changes: [
+      '💾 canvas-json-persistence/Epic3: 自动保存功能（防抖2秒 + Beacon API + 保存状态指示器）',
+      '✅ useAutoSave.ts: Zustand store subscription + debounced callback (2000ms)',
+      '✅ SaveIndicator.tsx: Visual feedback (saving/saved/error states)',
+      '✅ CanvasPage.tsx: Integrate useAutoSave + SaveIndicator',
+    ],
+    commit: 'af995f0b',
+  },
+  {
     version: '1.0.90',
     date: '2026-03-30',
     changes: [

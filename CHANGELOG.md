@@ -1,3 +1,11 @@
+### Added (canvas-component-validate-fix Epic2: Zod schema API 验证修复) — 2026-04-02
+- **E1**: type 枚举宽松化（accept any string + typeMap normalization）
+- **E2**: HTTP method 大小写归一化（`.toUpperCase()` → 'GET'|'POST'）
+- **E3**: confidence 设为 optional + default(1.0)
+- **E4**: flowId 空值 fallback ('unknown'|'' → '')
+- canvasApi.ts: 29 行新增，schema 层防御性解析
+- **提交**: `0dc052be`
+
 ### Added (component-api-response-fix E1+E2: API 返回值防御解析) — 2026-04-02
 - **E1**: generateComponentFromFlow 防御性解析：type invalid → 'page'、method invalid → 'GET'、flowId 'unknown' → ''、name null → '未命名组件'、path null → '/api/{name}'
 - **E2**: ZodError re-throw 让 React 组件可捕获并展示 toast 给用户

@@ -1,5 +1,11 @@
 # Changelog
 
+### E1: 技术债清理 — Sprint 4 (vibex-sprint4-20260403)
+- **S1.1**: TypeScript 错误修复 — flow-execution handlers 类型修复
+- **S2.1**: CHANGELOG 规范 — 统一格式模板
+- **S2.2**: Pre-submit 检查脚本 — scripts/pre-submit-check.sh
+- Commits: `914919b8`, `571c1f67`
+
 ### E1: Canvas JSON 持久化 — 统一数据模型 (canvas-json-persistence)
 - **E1-S1**: NodeState 统一接口 — 三树节点类型共享统一 NodeState
 - **E1-S2**: Migration 3→4 修复 — status 映射保留 confirmed 状态

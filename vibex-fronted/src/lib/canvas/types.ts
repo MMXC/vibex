@@ -38,6 +38,8 @@ export interface BoundedContextNode {
   type: 'core' | 'supporting' | 'generic' | 'external';
   /** Whether node is active (participates in generation). Default true. */
   isActive?: boolean;
+  /** E1: Whether node is selected in UI (persisted to JSON) */
+  selected?: boolean;
   status: NodeStatus;
   parentId?: string;
   children: string[];
@@ -85,6 +87,8 @@ export interface BusinessFlowNode {
   steps: FlowStep[];
   /** Whether node is active (participates in generation). Default true. */
   isActive?: boolean;
+  /** E1: Whether node is selected in UI (persisted to JSON) */
+  selected?: boolean;
   status: NodeStatus;
   parentId?: string;
   children: string[];
@@ -129,6 +133,8 @@ export interface ComponentNode {
   parentId?: string;
   /** Whether node is active (participates in generation). Default true. */
   isActive?: boolean;
+  /** E1: Whether node is selected in UI (persisted to JSON) */
+  selected?: boolean;
   status: NodeStatus;
   previewUrl?: string;
   /** E3-F13: Relationships to other component nodes */

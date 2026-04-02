@@ -1,3 +1,12 @@
+### Added (canvas-checkbox-ux-fix Epic1: BoundedContextTree 单 checkbox + toggleContextNode) — 2026-04-02
+- **Epic1**: BoundedContextTree 卡片合并 checkbox/toggle，移除 nodeTypeBadge 和 confirmedBadge
+- 新增 `toggleContextNode()` action（canvasStore.ts），双向 toggle confirmed/pending
+- checkbox onChange 调用 `toggleContextNode`，aria-label="确认节点"
+- 移除 nodeTypeBadge（type 信息改为通过 border 颜色区分：core=橙色/supporting=蓝色）
+- 移除 confirmedBadge（确认状态由 checkbox 本身表达）
+- BoundedContextTree.test.tsx: 8/8 通过（含单 checkbox、nodeTypeBadge/confirmedBadge 移除验证）
+- **提交**: `17719536`
+
 ### Added (flow-step-check-fix Epic1: confirmFlowNode 级联确认子步骤) — 2026-04-02
 - **Epic1**: 修复流程卡片勾选后子流程步骤未同步确认的 bug
 - `confirmFlowNode` 增加 toggle 逻辑：confirmed → unconfirm all steps；pending → confirm all steps

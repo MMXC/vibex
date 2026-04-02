@@ -85,18 +85,41 @@ const GenerateComponentsResponseSchema = z.object({
   components: z.array(z.object({
     name: z.string(),
     flowId: z.string(),
-    type: COMPONENT_TYPE_ENUM,
+    // E1: Relaxed type validation — accept common variants, map to valid type
+    type: z.string(),
     description: z.string().optional(),
     api: z.object({
-      method: HTTP_METHOD_ENUM,
+      // E2: Case-insensitive method validation
+      method: z.string(),
       path: z.string(),
       params: z.array(z.string()),
     }).optional(),
   })),
-  confidence: z.number(),
+  // E3: confidence optional with default value
+  confidence: z.number().optional().default(1.0),
 }).transform(data => ({
   ...data,
-  components: data.components.map(c => ({ ...c, type: c.type as ComponentType })),
+  // E1: Map common type variants to valid ComponentType
+  components: data.components.map(c => {
+    const validTypes = ['page', 'form', 'list', 'detail', 'modal'] as const;
+    const typeMap: Record<string, typeof validTypes[number]> = {
+      section: 'page',
+      component: 'page',
+      layout: 'page',
+      widget: 'page',
+      container: 'page',
+      header: 'page',
+      footer: 'page',
+      sidebar: 'page',
+    };
+    const mappedType = typeMap[c.type] ?? (validTypes.includes(c.type as typeof validTypes[number]) ? c.type : 'page') as ComponentType;
+    // E2: Normalize method to uppercase for validation
+    const normalizedApi = c.api ? {
+      ...c.api,
+      method: c.api.method.toUpperCase() as 'GET' | 'POST',
+    } : undefined;
+    return { ...c, type: mappedType, api: normalizedApi };
+  }),
 }));
 
 async function validatedFetch<T>(
@@ -267,7 +290,8 @@ export const canvasApi = {
     }
 
     return result.components.map((comp) => ({
-      flowId: comp.flowId ?? 'mock',
+      // E4: flowId fallback — 'unknown' or empty → ''
+      flowId: (comp.flowId && comp.flowId !== 'unknown') ? comp.flowId : '',
       name: comp.name,
       type: comp.type as import('../types').ComponentType,
       props: {},

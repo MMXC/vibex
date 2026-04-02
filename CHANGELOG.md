@@ -1,3 +1,10 @@
+### Added (flow-step-check-fix Epic1: confirmFlowNode 级联确认子步骤) — 2026-04-02
+- **Epic1**: 修复流程卡片勾选后子流程步骤未同步确认的 bug
+- `confirmFlowNode` 增加 toggle 逻辑：confirmed → unconfirm all steps；pending → confirm all steps
+- 新建 `flowStore.ts`（独立 Zustand Store），提取 flow slice
+- flowStore.test.ts: 13/13 通过，含 cascade confirm/unconfirm 测试
+- **提交**: `38255941`
+
 ### Added (vibex-p0-quick-fixes Epic3: 依赖安全审计通过) — 2026-04-02
 - **Epic3**: 依赖安全审计完成，0 high/critical 漏洞
 - workspace root 添加 pnpm.overrides: lodash>=4.18.0（修复 CVE）

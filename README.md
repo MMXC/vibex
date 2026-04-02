@@ -1,6 +1,6 @@
 # VibeX
 
-> AI 驱动的 DDD 产品建模平台。通过对话式需求分析，AI 生成领域模型、可视化业务流程、原型页面。
+> AI 驱动的 DDD 产品建模平台。通过对话式需求分析， AI 生成领域模型、可视化业务流程、原型页面。
 
 **在线体验**: https://vibex-app.pages.dev
 **API**: https://api.vibex.top
@@ -22,8 +22,6 @@
 | 场景 | 操作 |
 |------|------|
 | 快速启动 | 输入需求 → AI 分析 → 一键创建项目 |
-
-> 🔑 **产品哲学**：画布是主操作区，一切围绕画布展开。对话 + 可视化展示编辑是**手段**，能顺利走完流程才是**重点**。思考过程展示是锦上添花。
 | 深度分析 | 输入详细需求 → AI 追问澄清 → 多轮优化 |
 | 探索设计 | 边分析边切换步骤 → 探索不同设计方向 |
 
@@ -48,180 +46,111 @@
 | Step3 | 组件图 | 页面组件结构 |
 | Step4 | 领域模型 | DDD 限界上下文 + 聚合 |
 
-### 项目管理流程
+> 🔑 **产品哲学**：画布是主操作区，一切围绕画布展开。对话 + 可视化展示编辑是**手段**，能顺利走完流程才是**重点**。思考过程展示是锦上添花。
+
+### Canvas 原型编辑流程
 
 ```
-创建项目 → 进行中 → 已完成
-    ↓
-[原型编辑] → 左侧菜单树 → 预览区 → 组件详情抽屉 → AI 助手
+[限界上下文树] → [勾选节点] → [继续生成流程] → [勾选流程] → [继续生成组件] → [组件预览]
+     ↑                                              ↓
+     ←—————————————————————————— 任意时刻可返回编辑 ———————————————————————————→
 ```
 
----
-
-## 架构图
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      用户浏览器                               │
-│  Next.js 14 (App Router) + Zustand + React Flow            │
-└──────────────────────┬──────────────────────────────────────┘
-                       │ HTTPS
-┌──────────────────────▼──────────────────────────────────────┐
-│                  Cloudflare Edge                              │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐    │
-│  │ Workers API  │  │   D1 DB     │  │   KV Storage    │    │
-│  │  (Hono)      │  │  (SQLite)   │  │   (状态)        │    │
-│  └─────────────┘  └─────────────┘  └─────────────────┘    │
-└─────────────────────────────────────────────────────────────┘
-                       │
-              ┌────────▼────────┐
-              │   MiniMax API   │
-              │  (流式 AI)      │
-              └─────────────────┘
-```
-
-### 前端结构
-
-```
-src/
-├── app/                    # Next.js App Router
-│   ├── page.tsx           # 首页（5步流程）
-│   ├── projects/           # 项目管理
-│   ├── project/[id]/       # 原型编辑
-│   └── auth/              # 登录注册
-├── components/
-│   ├── homepage/          # 首页组件
-│   │   ├── steps/         # 各步骤组件 (Step1-4)
-│   │   ├── PreviewArea/    # 预览区
-│   │   ├── CardTree/       # 卡片树 (新) / GridLayout (旧)
-│   │   └── InputArea/     # 输入区
-│   ├── visualiztion/       # 可视化（Mermaid）
-│   └── prototype/         # 原型编辑
-├── hooks/                  # React hooks
-├── stores/                 # Zustand 状态
-└── types/                  # TypeScript 类型
-```
-
----
-
-## 时序图
-
-### 需求分析流程
-
-```
-用户          前端          Workers         MiniMax         D1
- │              │              │               │              │
- │──输入需求──▶│              │               │              │
- │              │──POST /api/analyze──▶│               │              │
- │              │              │──stream──▶│               │              │
- │              │◀────────────response──│               │              │
- │              │              │               │              │
- │◀────────────│              │               │              │
- │   [Step1 澄清]            │               │              │
- │──确认──▶│              │               │              │
- │              │──POST /api/flow──▶│               │              │
- │              │◀────────────flow──│               │              │
- │   [Step2 流程图]          │               │              │
- │──继续──▶│              │──POST /api/domain──▶│              │
- │              │◀────────────domain──│               │              │
- │   [Step4 领域模型]        │               │              │
- │──创建项目──▶│              │               │              │
- │              │──POST /api/projects──▶│               │              │
- │              │              │               │              │──INSERT──▶│
- │              │◀─────────────201──│               │              │
- │   项目已创建              │               │              │
-```
-
-### 卡片树渲染流程
-
-```
-PreviewArea         CardTreeView         useProjectTree         D1/KV
-     │                    │                    │                  │
-     │──projectId───────▶│                    │                  │
-     │                    │──projectId────────▶│                  │
-     │                    │                    │──查询───────▶│  │
-     │                    │◀──TreeData────────│                  │
-     │◀──Mermaid──────│                    │                  │
-     │   渲染完成        │                    │                  │
-```
-
----
-
-## UI 演进
-
-| 版本 | 时间 | 核心变化 |
-|------|------|---------|
-| v0.1 | 早期 | 基础页面，GridLayout 预览 |
-| v1.0 | 2026-03 | FUI 未来科幻风格，5步流程上线 |
-| v2.0 | 2026-03 中 | 首页重构，PreviewArea 优化，CardTree 实验 |
-| v2.1 | 2026-03 末 | 卡片树本地模式（Epic2），无需 API 等待 |
-
-**当前版本**：v2.1（CardTree Feature Flag: `NEXT_PUBLIC_USE_CARD_TREE`）
+**三树操作规则**（2026-04-02 已上线）：
+- **勾选状态持久化**：勾选状态写入节点 JSON，刷新/导入后保留
+- **无顺序约束**：任意时刻可增删改任意树的任意节点
+- **手动触发联动**：勾选后点"继续生成"按钮手动触发下游联动，不自动
+- **部分重生成**：选中若干节点，仅重新生成选中节点，不影响其他节点
 
 ---
 
 ## 路线图
 
-### 已完成 ✅
+### ✅ 已完成（v1.0 基础版）
 
-- [x] 首页 5 步流程
-- [x] AI 流式对话
-- [x] Mermaid 流程图/组件图渲染
-- [x] 项目管理（创建/列表/原型编辑）
-- [x] 登录注册
-- [x] 首页卡片树本地模式
-- [x] ErrorBoundary 去重与合并
-
-### 进行中 🔄
-
-- [ ] 边分析边编辑卡片树（提案中）
-- [ ] 首页卡片树调试（homepage-cardtree-debug, 21/21 已完成待验证）
-- [ ] E2E 测试覆盖率提升
-
-### 规划中 📋
-
-- [ ] 多步流程并行探索
-- [ ] AI 追问澄清自动优化
-- [ ] 模板市场
-- [ ] 团队协作功能
-
----
-
-## 团队协作
-
-### Agent 链路
-
-```
-analyst → pm → architect → dev → tester → reviewer → coord
-```
-
-### 文档规范
-
-| 文档 | 位置 | 说明 |
+| 功能 | 状态 | 说明 |
 |------|------|------|
-| 产品简介 | `README.md` | 本文件 |
-| 流程图 | `docs/flow.md` | Mermaid 流程图 |
-| 首页 PRD | `docs/首页PRD.md` | 需求定义 |
-| 首页功能清单 | `docs/首页功能清单.md` | 功能 checklist |
-| 架构文档 | `docs/architecture/` | 架构设计 |
-| Bug 追踪 | `docs/bug/` | 问题记录 |
-| 提案汇总 | `docs/proposals/` | 团队提案 |
+| 三树数据结构统一 | ✅ | 上下文/流程/组件树共享统一 JSON 模型 |
+| canvasStore 重构 | ✅ | 拆分为 contextStore/flowStore/componentStore/sessionStore |
+| Checkbox UX 统一 | ✅ | 单 checkbox、toggle 行为、标题同行、绿色确认边框 |
+| Flow 级联确认 | ✅ | 勾选流程卡片自动确认/取消所有子步骤 |
+| Component API 验证 | ✅ | Zod schema 防御性解析，非法值 fallback 不崩溃 |
+| P0 快速修复 | ✅ | scrollTop/节点 deselect/面板背景/XSS/依赖安全 |
+| 快速生成命令 | ✅ | Ctrl+G 快捷键触发三树级联生成 |
+
+### 🔄 进行中（v1.1）
+
+| 功能 | 阶段 | 说明 |
+|------|------|------|
+| Checkbox 状态持久化 | E1 开发中 | confirmed 字段写入节点 JSON，支持导入/导出保留勾选状态 |
+
+### 📋 下一阶段（v1.2-v2.0）
+
+| 功能 | 优先级 | 说明 |
+|------|--------|------|
+| 组件树实时预览 | P1 | 选中组件节点 → 原型预览区实时热更新（ Zustand 订阅） |
+| 项目导入/导出 | P1 | 完整 JSON 导出/导入，保留所有树数据和勾选状态 |
+| Prompt 对话集成 | P2 | 选中卡片 → 根据卡片类型弹出对应指令选项 |
+| E2E 测试覆盖 | P2 | Playwright 覆盖核心用户流程（生成→预览→编辑） |
+| AI 补全组件 | P3 | 选中组件节点 → AI 推荐 props/schema |
+| 差分预览 | P3 | 对比前后 uiSchema → 只重渲染变化部分 |
+
+### 🎯 长期规划
+
+| 方向 | 说明 |
+|------|------|
+| 多人协作 | 实时协同编辑 |
+| 版本管理 | 设计稿版本历史、回滚 |
+| 设计系统集成 | Figma/Sketch 导入 |
 
 ---
 
-## 技术栈
+## 技术架构
 
-| 层级 | 技术 |
-|------|------|
-| 前端框架 | Next.js 14 (App Router) |
-| 状态管理 | Zustand |
-| 可视化 | Mermaid, React Flow |
-| 后端运行时 | Cloudflare Workers |
-| API 框架 | Hono |
-| 数据库 | Cloudflare D1 (SQLite) |
-| 存储 | Cloudflare KV |
-| AI | MiniMax API (流式) |
-| 样式 | CSS Modules |
-| 测试 | Playwright (E2E), Vitest (Unit) |
+### Store 结构
 
-> ⚠️ **本文档由 Agent 系统维护，如有更新请同步修改。任何过时信息可能导致误导，欢迎报告。**
+```
+canvasStore (旧)
+    ↓ 拆分为
+contextStore   → 限界上下文节点（confirmed/toggle）
+flowStore      → 业务流程节点 + 子步骤（confirmFlowNode 级联）
+componentStore → 组件节点（type/path/api/props）
+sessionStore   → 会话消息/polling/prototype队列
+```
+
+### 关键技术
+
+- **前端**: React + TypeScript + Zustand + Tailwind CSS
+- **后端**: Node.js API（ AI 生成服务）
+- **预览渲染**: 自研 json-render 模式（ renderer.ts 2175 行）
+- **测试**: Vitest + Playwright E2E
+
+---
+
+## 开发指南
+
+### 本地开发
+
+```bash
+cd vibex
+pnpm install
+pnpm dev        # 开发模式
+pnpm build      # 生产构建
+pnpm test       # 单元测试
+```
+
+### 架构文档
+
+- [三树数据模型](./docs/canvas-three-tree-unification/architecture.md)
+- [Store 重构](./docs/vibex-canvasstore-refactor/architecture.md)
+- [Checkbox 修复](./docs/bc-checkbox-confirm-style-fix/architecture.md)
+- [Flow 级联确认](./docs/flow-step-check-fix/architecture.md)
+- [组件 API 验证](./docs/component-api-response-fix/architecture.md)
+
+### 提案收集
+
+Sprint 提案归档在 `proposals/` 目录，按日期组织。
+
+---
+
+_Last updated: 2026-04-02_

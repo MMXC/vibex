@@ -33,7 +33,9 @@ import { ShortcutHintPanel } from './features/ShortcutHintPanel';
 import { TreeStatus } from './TreeStatus';
 import { TemplateSelector } from './features/TemplateSelector';
 import { VersionHistoryPanel } from './features/VersionHistoryPanel';
+import { SaveIndicator } from './features/SaveIndicator';
 import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
+import { useAutoSave } from '@/hooks/canvas/useAutoSave';
 import { MessageDrawer } from './messageDrawer/MessageDrawer';
 import { LeftDrawer } from './leftDrawer/LeftDrawer';
 import { ShortcutBar } from '@/components/guidance/ShortcutBar';
@@ -316,6 +318,12 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const [componentGenerating, setComponentGenerating] = useState(false);
   const projectId = useCanvasStore((s) => s.projectId);
   const setComponentNodes = useCanvasStore((s) => s.setComponentNodes);
+
+  // === E3: Auto-Save Hook ===
+  const { saveStatus, lastSavedAt, saveNow } = useAutoSave({
+    projectId,
+    debounceMs: 2000, // MUST be exactly 2000 per AGENTS.md
+  });
 
   // === E2-F14: Zoom State ===
   const [zoomLevel, setZoomLevel] = useState(1); // 1 = 100%
@@ -847,6 +855,12 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             onZoomReset={handleZoomReset}
             onOpenHistory={versionHistory.open}
             onOpenShortcuts={toggleShortcutPanel}
+          />
+          {/* E3-S2: Save Indicator — shows auto-save status */}
+          <SaveIndicator
+            status={saveStatus}
+            lastSavedAt={lastSavedAt}
+            onSaveNow={saveNow}
           />
         </div>
       )}

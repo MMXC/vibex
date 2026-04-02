@@ -139,12 +139,12 @@ if (localVersion < serverVersion) {
 - [x] E1-S2: Migration 2→3 修复（status 映射 + version 4 bump）
 - [x] E1-S3: selected 字段明确（checkbox-persist-bug commit 512f3fce）
 - [x] E2-S1: CanvasSnapshot table migration (0006_canvas_snapshot.sql)
-- [x] E2-S2: Snapshot save API (POST /v1/canvas/snapshot)
+- [x] E2-S2: Snapshot save API (POST /v1/canvas/snapshots)
 - [x] E2-S3: Version list + rollback API (GET/POST /v1/canvas/rollback)
+- [x] E3-S1: Debounce 2s 保存 (useAutoSave hook, useDebouncedCallback)
+- [x] E3-S2: 状态指示器显示 (SaveIndicator component)
+- [x] E3-S3: Beacon 保存 (beforeunload handler with sendBeacon)
 - [ ] E2: Prisma migration 成功
 - [ ] E2: 3 个 API 端点工作
-- [ ] E3: Debounce 2s 保存
-- [ ] E3: 状态指示器显示
-- [ ] E3: Beacon 保存工作
 - [ ] E4: 冲突检测 + UI
 - [ ] npm test 通过

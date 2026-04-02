@@ -1,3 +1,11 @@
+### Added (vibex-canvasstore-refactor Epic1: contextStore 独立 Store 提取) — 2026-04-02
+- **Epic1**: 从 canvasStore.ts 提取 contextStore 为独立 Zustand Store
+- 新建 `stores/contextStore.ts`（99 行），包含 BoundedContextNode CRUD + confirmContextNode
+- canvasStore.ts 保留 re-export 和向后兼容层（sync 到 contextStore）
+- history recording、user action messages 完整保留
+- Jest 测试: 4/4 通过（add/edit/delete/confirm）
+- **提交**: `69125676`, `133ae4dd`
+
 ### Added (canvas-checkbox-style-unify E1: ContextTree 单 checkbox + 确认反馈) — 2026-04-02
 - **E1**: ContextTree 卡片双 checkbox 合并为单一确认 checkbox
 - ContextTree 卡片删除冗余的 isActive checkbox，仅保留确认 checkbox

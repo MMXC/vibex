@@ -650,6 +650,8 @@ export interface CanvasSnapshot {
   trigger: 'manual' | 'ai_complete' | 'auto';
   /** Snapshot creation timestamp (ISO string) */
   createdAt: string;
+  /** Snapshot version number (auto-increment per project) — E1 */
+  version: number;
   /** Number of nodes in each tree at snapshot time */
   contextCount: number;
   flowCount: number;
@@ -667,6 +669,8 @@ export interface CreateSnapshotInput {
   contextNodes: BoundedContextNode[];
   flowNodes: BusinessFlowNode[];
   componentNodes: ComponentNode[];
+  // E1: Version for optimistic locking — if provided, backend checks for conflicts
+  version?: number;
 }
 
 export interface CreateSnapshotOutput {

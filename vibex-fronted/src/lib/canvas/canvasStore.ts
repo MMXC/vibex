@@ -19,8 +19,6 @@ import type {
   BoundedContextDraft,
   BusinessFlowDraft,
   FlowStep,
-  CascadeUpstream,
-  CascadeResult,
   PanelExpandState,
   BoundedGroup,
   BoundedEdge,
@@ -52,6 +50,7 @@ export type CanvasExpandMode = 'normal' | 'expand-both' | 'maximize';
 
 import exampleCanvasData from '@/data/example-canvas.json';
 import { canvasApi } from './api/canvasApi';
+import { areAllConfirmed } from './cascade';
 import { getHistoryStore } from './historySlice';
 
 // MessageSlice types now re-exported from sessionStore
@@ -145,61 +144,7 @@ function markAllPending<T extends { status: string; isActive?: boolean }>(nodes:
 }
 
 // =============================================================================
-// CascadeUpdateManager (内聚在 store)
-// =============================================================================
-
-class CascadeUpdateManager {
-  constructor(private get: () => CanvasStore) {}
-
-  /**
-   * 上游变更时，级联标记下游为 pending
-   * - context 变更 → flow + component pending
-   * - flow 变更 → component pending
-   */
-  markDownstreamPending(upstream: CascadeUpstream): CascadeResult {
-    const store = this.get();
-
-    if (upstream === 'context') {
-      const updatedFlows = markAllPending(store.flowNodes);
-      const updatedComponents = markAllPending(store.componentNodes);
-
-      // Use Object.assign to trigger Zustand reactivity via setState
-      return {
-        flowNodesMarked: updatedFlows.length,
-        componentNodesMarked: updatedComponents.length,
-      };
-    }
-
-    if (upstream === 'flow') {
-      const updatedComponents = markAllPending(store.componentNodes);
-      return {
-        flowNodesMarked: 0,
-        componentNodesMarked: updatedComponents.length,
-      };
-    }
-
-    return { flowNodesMarked: 0, componentNodesMarked: 0 };
-  }
-
-  /**
-   * 检查是否所有节点都已激活（isActive=true 或 undefined）
-   * @deprecated use hasNodes instead
-   */
-  areAllConfirmed(nodes: Array<{ isActive?: boolean }>): boolean {
-    return nodes.length > 0 && nodes.every(n => n.isActive !== false);
-  }
-
-  /**
-   * 检查是否有激活节点（isActive=true 或 undefined）
-   */
-  hasActiveNodes(nodes: Array<{ isActive?: boolean }>): boolean {
-    return nodes.some(n => n.isActive !== false);
-  }
-}
-
-// =============================================================================
-// Store Interface
-// =============================================================================
+// areAllConfirmed imported from cascade/ (E2 migration: class removed)
 
 interface CanvasStore {
   // === Phase Slice ===
@@ -455,9 +400,6 @@ interface CanvasStore {
 
   // === Internal tracking (not exposed in public API) ===
   _prevActiveTree: TreeType | null;
-
-  // === Internal ===
-  _cascade: CascadeUpdateManager;
 }
 
 // =============================================================================
@@ -468,8 +410,6 @@ export const useCanvasStore = create<CanvasStore>()(
   devtools(
     persist(
       (set, get) => {
-        const cascade = new CascadeUpdateManager(() => get());
-
         return {
           // === Phase Slice ===
           phase: 'input',
@@ -1407,11 +1347,11 @@ export const useCanvasStore = create<CanvasStore>()(
             if (phase === 'input') {
               newActiveTree = null;
             } else if (phase === 'context') {
-              const allConfirmed = cascade.areAllConfirmed(contextNodes);
+              const allConfirmed = areAllConfirmed(contextNodes);
               newActiveTree = allConfirmed && contextNodes.length > 0 ? 'flow' : 'context';
             } else if (phase === 'flow') {
-              const flowReady = cascade.areAllConfirmed(flowNodes);
-              const contextReady = cascade.areAllConfirmed(contextNodes);
+              const flowReady = areAllConfirmed(flowNodes);
+              const contextReady = areAllConfirmed(contextNodes);
               newActiveTree = flowReady && flowNodes.length > 0 ? 'component' : 'flow';
               if (contextReady && flowReady && flowNodes.length > 0) {
                 set({ activeTree: newActiveTree, _prevActiveTree: newActiveTree, phase: 'component' });
@@ -1441,8 +1381,6 @@ export const useCanvasStore = create<CanvasStore>()(
               set({ activeTree: newActiveTree, _prevActiveTree: newActiveTree });
             }
           },
-
-          _cascade: cascade,
         };
       },
       {

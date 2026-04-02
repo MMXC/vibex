@@ -79,6 +79,23 @@ export function SaveIndicator({ status, lastSavedAt, onSaveNow }: SaveIndicatorP
         </>
       )}
 
+      {status === 'conflict' && (
+        <>
+          <span aria-hidden="true">🔄</span>
+          <span>版本冲突</span>
+          {onSaveNow && (
+            <button
+              type="button"
+              className={styles.retryBtn}
+              onClick={onSaveNow}
+              aria-label="解决冲突"
+            >
+              解决
+            </button>
+          )}
+        </>
+      )}
+
       {status === 'idle' && lastSavedAt && (
         <>
           <span aria-hidden="true">💾</span>

@@ -193,6 +193,7 @@ snapshots.post('/', async (c) => {
         label: created.name || 'Snapshot',
         trigger: (['manual', 'auto', 'ai_complete'].includes(created.description || '') ? created.description : 'manual') as 'manual' | 'auto' | 'ai_complete',
         createdAt: created.createdAt,
+        version: created.version, // E1: include version in response
         contextCount: Array.isArray(parsedData.contexts) ? parsedData.contexts.length : 0,
         flowCount: Array.isArray(parsedData.flows) ? parsedData.flows.length : 0,
         componentCount: Array.isArray(parsedData.components) ? parsedData.components.length : 0,
@@ -242,6 +243,7 @@ snapshots.get('/:id', async (c) => {
         label: snapshot.name || 'Snapshot',
         trigger: (['manual', 'auto', 'ai_complete'].includes(snapshot.description || '') ? snapshot.description : 'manual') as 'manual' | 'auto' | 'ai_complete',
         createdAt: snapshot.createdAt,
+        version: snapshot.version, // E1: include version
         contextCount: Array.isArray(parsedData.contexts) ? parsedData.contexts.length : 0,
         flowCount: Array.isArray(parsedData.flows) ? parsedData.flows.length : 0,
         componentCount: Array.isArray(parsedData.components) ? parsedData.components.length : 0,

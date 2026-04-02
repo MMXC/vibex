@@ -1,12 +1,18 @@
 /**
  * useAutoSave — Canvas Auto-Save Hook
  * E3: 自动保存 (Debounce + Beacon + Save Indicator)
+ * E1: 版本号追踪 (乐观锁支持)
  *
  * 遵守 AGENTS.md E3 约束:
  * - Debounce 2s (不得修改延迟)
  * - Beacon 保存 beforeunload 时必须触发
  * - 状态指示器: 保存中/已保存/保存失败
  * - 禁止同步 API 调用 (阻塞 UI)
+ *
+ * E1 乐观锁:
+ * - 每次保存携带 lastSnapshotVersion
+ * - 后端返回新版本号
+ * - 409 冲突时设置 conflictStatus
  */
 import { useEffect, useRef, useCallback, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
@@ -15,7 +21,10 @@ import { useFlowStore } from '@/lib/canvas/stores/flowStore'
 import { useComponentStore } from '@/lib/canvas/stores/componentStore'
 import { canvasApi } from '@/lib/canvas/api/canvasApi'
 
-export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
+export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error' | 'conflict'
+
+// E1: Version tracking ref for optimistic locking
+const lastSnapshotVersionRef = { current: 0 }
 
 interface UseAutoSaveOptions {
   /** Project ID for saving — if null, auto-save is disabled */
@@ -59,21 +68,37 @@ function getCanvasState() {
 /**
  * Core save function — shared between debounced auto-save and beacon
  */
+/**
+ * Core save function — shared between debounced auto-save and beacon
+ * E1: Sends version for optimistic locking, handles 409 conflict
+ */
 async function doSave(
   projectId: string,
   options?: { isAutoSave?: boolean }
-): Promise<void> {
+): Promise<{ version: number } | null> {
   try {
     const state = getCanvasState()
-    await canvasApi.createSnapshot({
+    const result = await canvasApi.createSnapshot({
       projectId: projectId || null,
       label: options?.isAutoSave ? '自动保存' : '手动保存',
       trigger: options?.isAutoSave ? 'auto' : 'manual',
+      // E1: Send version for optimistic locking
+      version: lastSnapshotVersionRef.current || undefined,
       contextNodes: state.contextNodes,
       flowNodes: state.flowNodes,
       componentNodes: state.componentNodes,
     })
-  } catch (err) {
+    // E1: Update local version on success
+    if (result.snapshot?.version) {
+      lastSnapshotVersionRef.current = result.snapshot.version
+    }
+    return { version: result.snapshot?.version ?? 0 }
+  } catch (err: any) {
+    // E1: Handle 409 conflict
+    if (err?.response?.status === 409 || err?.status === 409) {
+      console.warn('[useAutoSave] Version conflict detected:', err)
+      throw Object.assign(err, { isConflict: true })
+    }
     console.error('[useAutoSave] Save failed:', err)
     throw err
   }
@@ -110,8 +135,12 @@ export function useAutoSave(options: UseAutoSaveOptions): UseAutoSaveReturn {
         setLastSavedAt(new Date())
         setLastSavedVersion(null)
         setSaveStatus('saved')
-      } catch (err) {
+      } catch (err: any) {
         if (!mountedRef.current) return
+        if (err?.isConflict) {
+          setSaveStatus('conflict')
+          return
+        }
         setSaveStatus('error')
         onSaveError?.(err as Error)
       } finally {
@@ -212,8 +241,12 @@ export function useAutoSave(options: UseAutoSaveOptions): UseAutoSaveReturn {
       setLastSavedAt(new Date())
       setLastSavedVersion(null)
       setSaveStatus('saved')
-    } catch (err) {
+    } catch (err: any) {
       if (!mountedRef.current) return
+      if (err?.isConflict) {
+        setSaveStatus('conflict')
+        return
+      }
       setSaveStatus('error')
       onSaveError?.(err as Error)
     } finally {

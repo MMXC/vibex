@@ -10,6 +10,14 @@
 - npm build 通过，tsc --noEmit 0 error
 - **提交**: `69125676`
 
+### Added (vibex-canvasstore-refactor Epic2: uiStore UI 状态独立提取) — 2026-04-02
+- **Epic2**: 从 canvasStore.ts 提取 UI 状态为独立 uiStore（174 行）
+- 提取 panel collapse/expand、drawer states、drag state、gridTemplate 等 UI slice
+- canvasStore.ts 保留 re-export 向后兼容层
+- uiStore.test.ts: 21/21 测试通过，覆盖率 97.95%
+- npm build 通过
+- **提交**: `d9c4ca4f`, `a9f342bc`, `5e3cbc7e`
+
 ### Added (vibex-canvasstore-refactor Epic1: contextStore 独立 Store 提取) — 2026-04-02
 - **Epic1**: 从 canvasStore.ts 提取 contextStore 为独立 Zustand Store
 - 新建 `stores/contextStore.ts`（99 行），包含 BoundedContextNode CRUD + confirmContextNode

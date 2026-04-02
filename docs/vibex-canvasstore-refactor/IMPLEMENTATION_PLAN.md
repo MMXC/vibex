@@ -215,9 +215,10 @@ it('should persist all stores independently', async () => {
 - [ ] 17 个现有测试全部通过
 
 ### Phase 2
-- [ ] uiStore.ts < 280 行
+- [x] uiStore.ts < 280 行 ✅ (173行)
 - [ ] uiStore 覆盖率 ≥ 80%
 - [ ] ~20 个组件更新到 uiStore
+- [x] canvasStore re-export 正常 ✅
 - [ ] UI 状态渲染正常
 
 ### Phase 3

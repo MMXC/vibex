@@ -18,6 +18,8 @@ import { errorHandler, notFoundHandler } from '../../lib/errorHandler';
 import analyzeStream from './analyze/stream';
 import canvas from './canvas';
 import canvasStream from './canvas/stream';
+import canvasSnapshot from './canvas/snapshot';
+import canvasRollback from './canvas/rollback';
 
 // 导入所有 API 路由
 import projects from '../projects';
@@ -205,6 +207,10 @@ protected_.route('/confirmation-projects', confirmationProjects);
 
 // Canvas 画布 API
 protected_.route('/canvas', canvas);
+
+// Canvas 快照 API — E2 后端版本化存储
+protected_.route('/canvas/snapshot', canvasSnapshot);
+protected_.route('/canvas/rollback', canvasRollback);
 
 // DDD
 protected_.route('/ddd', ddd);

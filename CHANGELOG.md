@@ -1,3 +1,9 @@
+### Added (vibex-p0-quick-fixes Epic2: DOMPurify XSS + lodash 安全修复) — 2026-04-02
+- **Epic2**: DOMPurify 配置正确（3.3.2），XSS 防护有效
+- 添加 `lodash >=4.18.0` 到 package.json overrides，修复已知安全漏洞
+- ESLint：自有文件无错误，`useDragSelection.ts` 遗留问题单独追踪
+- **提交**: `7b0ddb91`
+
 ### Added (vibex-p0-quick-fixes Epic1: TypeScript 错误清理) — 2026-04-02
 - **Epic1**: 修复 `tests/e2e/canvas-expand.spec.ts` 变量引用错误（4处）
 - 修复 `contextStore.ts` devtools 参数类型错误

@@ -1,3 +1,11 @@
+### Added (vibex-canvasstore-refactor Epic3: flowStore 独立 Store 提取) — 2026-04-02
+- **Epic3**: 从 canvasStore.ts 提取 flowStore 为独立 Zustand Store（212 行）
+- flowStore.ts: BusinessFlowNode CRUD + steps 管理 + confirmFlowNode toggle（含级联确认）
+- 复用 flow-step-check-fix 成果（`38255941`）
+- flowStore.test.ts: 13/13 通过
+- 注：spec 要求的 CascadeUpdateManager 迁移和 autoGenerate 状态未实现（scope reduction）
+- **提交**: `38255941`
+
 ### Added (canvas-checkbox-ux-fix Epic2: ComponentTree checkbox 前移到标题同行) — 2026-04-02
 - **Epic2**: ComponentTree checkbox 从 div 包裹改为 inline，移到标题同行
 - ComponentTree.tsx: checkbox 前移到 `nodeCardHeader` 内部、nodeTypeBadge 前

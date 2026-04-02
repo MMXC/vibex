@@ -1,3 +1,10 @@
+### Added (vibex-canvasstore-refactor Epic5: sessionStore 独立 Store 提取) — 2026-04-02
+- **Epic5**: 从 canvasStore.ts 提取 sessionStore 为独立 Zustand Store（115 行）
+- sessionStore: session 消息、polling 状态、prototype 队列管理
+- 新增 `stores/index.ts` 统一导出所有 store
+- sessionStore.test.ts: 17/17 通过
+- **提交**: `43a80d9a`
+
 ### Added (vibex-canvasstore-refactor Epic4: componentStore 独立 Store 提取) — 2026-04-02
 - **Epic4**: 从 canvasStore.ts 提取 componentStore 为独立 Zustand Store（114 行）
 - componentStore: ComponentNode 状态管理、多选节点操作

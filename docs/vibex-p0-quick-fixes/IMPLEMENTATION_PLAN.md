@@ -67,5 +67,6 @@ npm audit --audit-level=high
 
 ### Epic2-3 记录
 - 2026-04-02 09:25: DOMPurify 已正确配置 (3.3.2, USE_PROFILES:svg + ADD_TAGS:foreignObject)
-- 添加 package.json overrides: lodash>=4.18.0
+- 2026-04-02 10:37: 添加 workspace root pnpm.overrides: lodash>=4.18.0
+- 审计结果: 0 high/critical (仅4 moderate + 1 low from Next.js)
 - ESLint: 我们的 stores 文件 0 errors

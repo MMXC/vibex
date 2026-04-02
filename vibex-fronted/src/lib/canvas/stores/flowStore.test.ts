@@ -98,6 +98,23 @@ describe('useFlowStore', () => {
       expect(node.steps[0].status).toBe('pending');
       expect(node.steps[0].isActive).toBe(false);
     });
+
+    it('should toggle flow node via toggleFlowNode (E1)', () => {
+      useFlowStore.getState().addFlowNode({
+        contextId: 'ctx-1',
+        name: 'ToToggle',
+        steps: [{ name: 'Step 1', actor: 'User' }],
+      });
+      const nodeId = useFlowStore.getState().flowNodes[0].nodeId;
+      // Initially pending
+      expect(useFlowStore.getState().flowNodes[0].status).toBe('pending');
+      // Toggle: pending → confirmed
+      useFlowStore.getState().toggleFlowNode(nodeId);
+      expect(useFlowStore.getState().flowNodes[0].status).toBe('confirmed');
+      // Toggle: confirmed → pending
+      useFlowStore.getState().toggleFlowNode(nodeId);
+      expect(useFlowStore.getState().flowNodes[0].status).toBe('pending');
+    });
   });
 
   describe('step operations', () => {

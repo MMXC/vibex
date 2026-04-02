@@ -375,7 +375,7 @@ function FlowCard({
   selected,
   onToggleSelect,
 }: FlowCardProps) {
-  const confirmFlowNode = useCanvasStore((s) => s.confirmFlowNode);
+  const toggleFlowNode = useCanvasStore((s) => s.toggleFlowNode);
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editState, setEditState] = useState({
@@ -454,8 +454,8 @@ function FlowCard({
           <input
             type="checkbox"
             className={styles.flowCardCheckbox}
-            checked={node.isActive !== false && node.status !== 'pending'}
-            onChange={() => confirmFlowNode(node.nodeId)}
+            checked={node.status === 'confirmed'}
+            onChange={() => toggleFlowNode(node.nodeId)}
             aria-label={`确认流程 ${node.name}`}
             title="确认此流程节点"
             onClick={(e) => e.stopPropagation()}
@@ -584,7 +584,6 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
   const contextNodes = useCanvasStore((s) => s.contextNodes);
   const editFlowNode = useCanvasStore((s) => s.editFlowNode);
   const deleteFlowNode = useCanvasStore((s) => s.deleteFlowNode);
-  const confirmFlowNode = useCanvasStore((s) => s.confirmFlowNode);
   const confirmStep = useCanvasStore((s) => s.confirmStep);
   const editStep = useCanvasStore((s) => s.editStep);
   const deleteStep = useCanvasStore((s) => s.deleteStep);

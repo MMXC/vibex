@@ -292,6 +292,7 @@ interface CanvasStore {
   flowDraft: Partial<BusinessFlowNode> | null;
   /** Confirm a flow node — sets status='confirmed' */
   confirmFlowNode: (nodeId: string) => void;
+  toggleFlowNode: (nodeId: string) => void;
 
   // === Component Slice ===
   componentNodes: ComponentNode[];
@@ -841,6 +842,22 @@ export const useCanvasStore = create<CanvasStore>()(
             });
           },
 
+          // [E1] 切换流程节点确认状态
+          toggleFlowNode: (nodeId) => {
+            set((s) => {
+              const newNodes = s.flowNodes.map((n) => {
+                if (n.nodeId !== nodeId) return n;
+                const isConfirmed = n.status === 'confirmed';
+                return {
+                  ...n,
+                  isActive: !isConfirmed,
+                  status: (isConfirmed ? 'pending' : 'confirmed') as 'confirmed' | 'pending',
+                };
+              });
+              return { flowNodes: newNodes };
+            });
+          },
+
           // [E1] 确认步骤 — 在流程节点内设置指定 stepId 的步骤为 confirmed
           confirmStep: (flowNodeId, stepId) => {
             set((s) => {
@@ -1013,14 +1030,18 @@ export const useCanvasStore = create<CanvasStore>()(
             }
 
             try {
-              const mappedContexts = contextNodes.map((ctx) => ({
+              // E2: Only send confirmed nodes to the API
+              const confirmedContexts = contextNodes.filter((ctx) => ctx.status === 'confirmed');
+              const confirmedFlows = flowNodes.filter((f) => f.status === 'confirmed');
+
+              const mappedContexts = confirmedContexts.map((ctx) => ({
                 id: ctx.nodeId,
                 name: ctx.name,
                 description: ctx.description ?? '',
                 type: ctx.type,
               }));
 
-              const mappedFlows = flowNodes.map((f) => ({
+              const mappedFlows = confirmedFlows.map((f) => ({
                 name: f.name,
                 contextId: f.contextId,
                 steps: f.steps.map((s) => ({ name: s.name, actor: s.actor })),

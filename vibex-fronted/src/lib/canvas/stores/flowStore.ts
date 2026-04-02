@@ -28,6 +28,7 @@ interface FlowStore {
   editFlowNode: (nodeId: string, data: Partial<BusinessFlowNode>) => void;
   deleteFlowNode: (nodeId: string) => void;
   confirmFlowNode: (nodeId: string) => void;
+  toggleFlowNode: (nodeId: string) => void;
 
   // Step CRUD
   confirmStep: (flowNodeId: string, stepId: string) => void;
@@ -100,6 +101,26 @@ export const useFlowStore = create<FlowStore>()(
             const newNodes = s.flowNodes.map((n) => {
               if (n.nodeId !== nodeId) return n;
               // Toggle: if already confirmed, unconfirm; otherwise confirm
+              const isConfirmed = n.status === 'confirmed';
+              return {
+                ...n,
+                isActive: !isConfirmed,
+                status: (isConfirmed ? 'pending' : 'confirmed') as 'confirmed' | 'pending',
+                steps: n.steps.map((step) => ({
+                  ...step,
+                  isActive: !isConfirmed,
+                  status: (isConfirmed ? 'pending' : 'confirmed') as 'confirmed' | 'pending',
+                })),
+              };
+            });
+            return { flowNodes: newNodes };
+          });
+        },
+
+        toggleFlowNode: (nodeId) => {
+          set((s) => {
+            const newNodes = s.flowNodes.map((n) => {
+              if (n.nodeId !== nodeId) return n;
               const isConfirmed = n.status === 'confirmed';
               return {
                 ...n,

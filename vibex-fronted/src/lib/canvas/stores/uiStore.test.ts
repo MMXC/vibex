@@ -81,6 +81,43 @@ describe('useUIStore', () => {
     });
   });
 
+  describe('togglePanel cycles', () => {
+    it('should cycle left expand: default → expand-right → default', () => {
+      useUIStore.getState().setLeftExpand('default');
+      useUIStore.getState().togglePanel('left');
+      expect(useUIStore.getState().leftExpand).toBe('expand-right');
+      useUIStore.getState().togglePanel('left');
+      expect(useUIStore.getState().leftExpand).toBe('default');
+    });
+
+    it('should cycle right expand: default → expand-left → default', () => {
+      useUIStore.getState().setRightExpand('default');
+      useUIStore.getState().togglePanel('right');
+      expect(useUIStore.getState().rightExpand).toBe('expand-left');
+      useUIStore.getState().togglePanel('right');
+      expect(useUIStore.getState().rightExpand).toBe('default');
+    });
+
+    it('should cycle center expand: default → expand-left → expand-right → default', () => {
+      useUIStore.getState().setCenterExpand('default');
+      useUIStore.getState().togglePanel('center');
+      expect(useUIStore.getState().centerExpand).toBe('expand-left');
+      useUIStore.getState().togglePanel('center');
+      expect(useUIStore.getState().centerExpand).toBe('expand-right');
+      useUIStore.getState().togglePanel('center');
+      expect(useUIStore.getState().centerExpand).toBe('default');
+    });
+
+    it('should set expand state individually', () => {
+      useUIStore.getState().setLeftExpand('expand-right');
+      useUIStore.getState().setCenterExpand('expand-left');
+      useUIStore.getState().setRightExpand('expand-left');
+      expect(useUIStore.getState().leftExpand).toBe('expand-right');
+      expect(useUIStore.getState().centerExpand).toBe('expand-left');
+      expect(useUIStore.getState().rightExpand).toBe('expand-left');
+    });
+  });
+
   describe('drag state', () => {
     it('should start drag', () => {
       expect(useUIStore.getState().isDragging).toBe(false);

@@ -357,17 +357,6 @@ function ComponentCard({ node, onEdit, onDelete, readonly, selected, onToggleSel
           ? styles.nodeGenerating
           : styles.nodeUnconfirmed;
 
-  const typeColor =
-    node.type === 'page'
-      ? '#3b82f6'
-      : node.type === 'list'
-        ? '#8b5cf6'
-        : node.type === 'form'
-          ? '#f59e0b'
-          : node.type === 'detail'
-            ? '#10b981'
-            : '#ef4444';
-
   // F3.4: Subtree count for collapsed nodes
   const childCount = node.children?.length ?? 0;
   const hasChildren = childCount > 0;
@@ -423,6 +412,7 @@ function ComponentCard({ node, onEdit, onDelete, readonly, selected, onToggleSel
       ) : (
         /* View mode */
         <>
+          {/* E2: checkbox + title 同一行 */}
           <div className={styles.nodeCardHeader}>
             {onToggleSelect && (
               <input
@@ -431,18 +421,20 @@ function ComponentCard({ node, onEdit, onDelete, readonly, selected, onToggleSel
                 checked={selected ?? false}
                 onChange={() => { onToggleSelect(node.nodeId); }}
                 aria-label="选择节点"
+                onClick={(e) => e.stopPropagation()}
               />
             )}
-            <div className={styles.nodeTypeBadge} style={{ background: typeColor }}>
-              {node.type === 'page' ? '页面' : node.type === 'list' ? '列表' : node.type === 'form' ? '表单' : node.type === 'detail' ? '详情' : '弹窗'}
-            </div>
-            {node.isActive !== false && (
-              <span className={styles.activeBadge} aria-label="已确认">
-                <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path d="M3 8.5L6.5 12L13 4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </span>
-            )}
+            <h4
+              className={styles.nodeCardTitle}
+              style={{ cursor: node.previewUrl ? 'pointer' : 'default' }}
+              title={
+                node.previewUrl
+                  ? `跳转到 ${node.previewUrl}`
+                  : undefined
+              }
+            >
+              {node.name}
+            </h4>
             <button
               type="button"
               className={styles.expandButton}
@@ -454,18 +446,6 @@ function ComponentCard({ node, onEdit, onDelete, readonly, selected, onToggleSel
               {expanded ? '▲' : `▼${hasChildren ? ` (${childCount})` : ''}`}
             </button>
           </div>
-
-          <h4
-            className={styles.nodeCardTitle}
-            style={{ cursor: node.previewUrl ? 'pointer' : 'default' }}
-            title={
-              node.previewUrl
-                ? `跳转到 ${node.previewUrl}`
-                : undefined
-            }
-          >
-            {node.name}
-          </h4>
 
           {expanded && (
             <div className={styles.componentDetails}>

@@ -134,7 +134,7 @@ interface ContextCardProps {
 }
 
 function ContextCard({ node, onEdit, onDelete, readonly, selected, onToggleSelect }: ContextCardProps) {
-  const confirmContextNode = useCanvasStore((s) => s.confirmContextNode);
+  const toggleContextNode = useCanvasStore((s) => s.toggleContextNode);
   const [editing, setEditing] = useState(false);
   const [editState, setEditState] = useState<NodeEditState>({
     nodeId: node.nodeId,
@@ -173,15 +173,6 @@ function ContextCard({ node, onEdit, onDelete, readonly, selected, onToggleSelec
         : node.status === 'generating'
           ? styles.nodeGenerating
           : styles.nodeUnconfirmed;
-
-  const typeColor =
-    node.type === 'core'
-      ? '#f59e0b'
-      : node.type === 'supporting'
-        ? '#3b82f6'
-        : node.type === 'generic'
-          ? '#6b7280'
-          : '#8b5cf6';
 
   return (
     <div
@@ -231,37 +222,20 @@ function ContextCard({ node, onEdit, onDelete, readonly, selected, onToggleSelec
       ) : (
         /* View mode */
         <>
-          {/* E1: 单一确认 checkbox — 在 type badge 之前 */}
+          {/* E1: 单一确认 checkbox — 标题同行 */}
           {!readonly && (
             <input
               type="checkbox"
               data-testid={`context-card-checkbox-${node.nodeId}`}
               checked={node.status === 'confirmed'}
-              onChange={() => { confirmContextNode(node.nodeId); }}
+              onChange={() => { toggleContextNode(node.nodeId); }}
               aria-label="确认节点"
               className={styles.confirmCheckbox}
               onClick={(e) => e.stopPropagation()}
             />
           )}
-          {/* E1: Type badge */}
-          <div className={styles.nodeTypeBadge} style={{ background: typeColor }}>
-            {node.type === 'core'
-              ? '核心'
-              : node.type === 'supporting'
-                ? '支撑'
-                : node.type === 'generic'
-                  ? '通用'
-                  : '外部'}
-          </div>
-          {/* E1: 确认状态绿色 ✓ 反馈 */}
-          {node.status === 'confirmed' && (
-            <span className={styles.confirmedBadge} aria-label="已确认">
-              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M3 8l3.5 3.5L13 5" stroke="var(--color-success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </span>
-          )}
-          <h4 className={styles.nodeCardTitle}>{node.name}</h4>
+          {/* E1: Type 信息通过 border 颜色区分（core=橙色/supporting=蓝色/generic=灰色） */}
+          <h4 className={styles.nodeCardTitle} data-type={node.type}>{node.name}</h4>
           <p className={styles.nodeCardDesc}>{node.description}</p>
           {!readonly && (
             <div className={styles.nodeCardActions}>
@@ -363,7 +337,6 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
   const editContextNode = useCanvasStore((s) => s.editContextNode);
   const deleteContextNode = useCanvasStore((s) => s.deleteContextNode);
   const setContextNodes = useCanvasStore((s) => s.setContextNodes);
-  const confirmContextNode = useCanvasStore((s) => s.confirmContextNode);
   const advancePhase = useCanvasStore((s) => s.advancePhase);
 
   // F3-F10: Multi-select state

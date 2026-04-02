@@ -36,6 +36,9 @@ export { useContextStore };
 // Epic 2: Re-export uiStore (extracted UI slice — panels, expand, drag, drawers)
 export { useUIStore } from './stores/uiStore';
 
+// Epic 3: Re-export flowStore (extracted flow slice — flowNodes CRUD, steps)
+export { useFlowStore } from './stores/flowStore';
+
 // ── SSE Status Type ──────────────────────────────────────────────────────────────────
 export type SSEStatus = 'idle' | 'connecting' | 'connected' | 'reconnecting' | 'error';
 
@@ -295,6 +298,8 @@ interface CanvasStore {
   contextDraft: Partial<BoundedContextNode> | null;
   /** Confirm a context node — sets isActive=true, status='confirmed' */
   confirmContextNode: (nodeId: string) => void;
+  /** Toggle a context node confirmation status */
+  toggleContextNode: (nodeId: string) => void;
 
   // === Flow Slice ===
   flowNodes: BusinessFlowNode[];
@@ -775,6 +780,24 @@ export const useCanvasStore = create<CanvasStore>()(
               return { contextNodes: newNodes };
             });
             useContextStore.getState().confirmContextNode(nodeId);
+          },
+
+          toggleContextNode: (nodeId) => {
+            set((s) => {
+              const node = s.contextNodes.find((n) => n.nodeId === nodeId);
+              if (!node) return {};
+              const isConfirmed = node.status === 'confirmed';
+              const newNodes = s.contextNodes.map((n) =>
+                n.nodeId === nodeId
+                  ? {
+                      ...n,
+                      isActive: isConfirmed ? false : true,
+                      status: isConfirmed ? ('pending' as const) : ('confirmed' as const),
+                    }
+                  : n
+              );
+              return { contextNodes: newNodes };
+            });
           },
 
           setContextDraft: (draft) => {

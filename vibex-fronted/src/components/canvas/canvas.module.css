@@ -626,13 +626,13 @@
   transform: scale(0.99);
 }
 
-/* Unconfirmed: plain border, no yellow */
+/* Unconfirmed: type color border, no yellow */
 .nodeUnconfirmed {
-  /* 移除黄色边框和阴影，仅保留边框 */
+  /* 移除黄色边框和阴影，通过 type-specific 颜色区分 */
   border: 2px solid var(--color-border);
 }
 
-/* Confirmed: green border */
+/* Confirmed: green border + type glow */
 .nodeConfirmed {
   border-color: var(--color-success);
   box-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
@@ -649,6 +649,38 @@
   border-color: var(--color-info);
   box-shadow: 0 0 8px rgba(0, 170, 255, 0.2);
   animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* E1: BoundedContextTree type colors via border — applied when nodeCard has data-type attribute */
+/* Type-specific unconfirmed border colors for BoundedContextTree nodes */
+.nodeCard[data-type="core"] {
+  border-color: #f59e0b;
+}
+.nodeCard[data-type="supporting"] {
+  border-color: #3b82f6;
+}
+.nodeCard[data-type="generic"] {
+  border-color: #6b7280;
+}
+.nodeCard[data-type="external"] {
+  border-color: #8b5cf6;
+}
+
+/* E2: ComponentTree type colors via border */
+.nodeCard[data-type="page"] {
+  border-color: #3b82f6;
+}
+.nodeCard[data-type="list"] {
+  border-color: #8b5cf6;
+}
+.nodeCard[data-type="form"] {
+  border-color: #f59e0b;
+}
+.nodeCard[data-type="detail"] {
+  border-color: #10b981;
+}
+.nodeCard[data-type="modal"] {
+  border-color: #ef4444;
 }
 
 @keyframes pulse {
@@ -901,31 +933,6 @@
   height: 16px;
   cursor: pointer;
   accent-color: var(--color-success);
-}
-
-.nodeTypeBadge {
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: #fff;
-  padding: 0.125rem 0.375rem;
-  border-radius: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-/* E1: Confirmation feedback badge */
-.activeBadge {
-  display: inline-flex;
-  align-items: center;
-  margin-left: 0.25rem;
-  vertical-align: middle;
-}
-
-.confirmedBadge {
-  display: inline-flex;
-  align-items: center;
-  margin-left: 0.25rem;
-  vertical-align: middle;
 }
 
 .nodeCardTitle {
@@ -1953,21 +1960,6 @@
 .iconBtn--clear:hover {
   background: var(--color-error);
   color: var(--color-text-inverse);
-}
-
-/* P1-T2: Confirmed badge (replaces emoji ✓) */
-.confirmedBadge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--color-success);
-  color: var(--color-bg-primary);
-  font-size: 10px;
-  font-weight: 700;
-  flex-shrink: 0;
 }
 
 /* P1-T3: Step drag handle (replaces emoji ⋮⋮) */

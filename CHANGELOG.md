@@ -1,3 +1,7 @@
+### Added (checkbox-persist-bug E1: selected 字段持久化) — 2026-04-02
+- **E1 数据结构扩展**: `selected?: boolean` 字段添加至 BoundedContextNode/BusinessFlowNode/ComponentNode
+- **提交**: `512f3fce`
+
 ### Added (vibex-page-cleanup: /canvas 设首页) — 2026-04-02
 - **Root `/` redirect**: `page.tsx` → `redirect('/canvas')`
 - **README**: 添加首页迁移说明，指向 `/canvas`

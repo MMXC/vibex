@@ -5,6 +5,11 @@
 - **reports/INDEX.md**: 历史报告索引维护规范
 - **提交**: `59b16597`
 
+### Added (vibex-reviewer-proposals-20260403_024652 E2: Pre-submit 检查) — 2026-04-03
+- **E2 ESLint disable monitoring**: pre-submit-check.sh 新增 ESLint disable count 检查（阈值 20 条）
+- **GitHub Actions**: pre-submit.yml CI workflow 新增 ESLint check step
+- **提交**: `000a2743`
+
 ### Added (checkbox-persist-bug E1: selected 字段持久化) — 2026-04-02
 - **E1 数据结构扩展**: `selected?: boolean` 字段添加至 BoundedContextNode/BusinessFlowNode/ComponentNode
 - **提交**: `512f3fce`

@@ -1,5 +1,9 @@
 # Changelog
 
+### E1: TypeScript 编译修复 (vibex-dev-proposals-20260403_024652)
+- **E1**: flow-execution handlers 类型修复，TS 编译 0 错误
+- Commit: `914919b8`
+
 ### E1: E2E Flaky 治理 (vibex-tester-proposals-20260403_024652)
 - **E1-S1**: Playwright Config — retries:2, workers:1, expect.timeout:30000 ✅
 - **E1-S2**: Stability Report — scripts/test-stability-report.sh + parse-playwright-report.py + docs/daily-stability.md

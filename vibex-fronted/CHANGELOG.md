@@ -1,5 +1,25 @@
 # Changelog
 
+### E4: 测试工程化 (vibex-dev-proposals-20260403_024652)
+
+#### Added
+- `tests/e2e/auto-save.spec.ts` — E2E tests for auto-save debounce (2s) and sendBeacon on beforeunload
+  - E2E-1: 编辑后 2s 自动保存（debounce）
+  - E2E-2: 页面离开前 beacon 触发
+  - E2E-3: 手动保存立即触发
+  - E2E-4: 保存失败显示错误状态
+- `tests/e2e/conflict-dialog.spec.ts` — E2E tests for E4 SyncProtocol conflict handling
+  - E2E-1: ConflictDialog 显示 3 个选项
+  - E2E-2: ConflictDialog 包含保留本地选项
+  - E2E-3: 冲突状态下页面仍可编辑
+- `tests/contract/` — Zod schema contract tests for sync API
+  - Contract-1: POST /snapshots returns valid CreateSnapshotOutput
+  - Contract-2: 409 Conflict returns valid ConflictResponse
+  - Contract-3: version field is optional (backward compatible)
+  - Contract-4: GET /snapshots returns valid snapshot list
+  - Contract-5: POST without auth returns 401/403
+- `playwright.config.ts` — Added `contract` project (testDir: `./tests/contract`)
+
 ### E1: TypeScript 编译修复 (vibex-dev-proposals-20260403_024652)
 - **E1**: flow-execution handlers 类型修复，TS 编译 0 错误
 - Commit: `914919b8`

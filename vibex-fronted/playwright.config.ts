@@ -29,6 +29,12 @@ export default defineConfig({
       testDir: './e2e',
       use: { ...devices['Desktop Chrome'] },
     },
+    // E4 Contract tests — tests API response schemas against Zod
+    {
+      name: 'contract',
+      testDir: './tests/contract',
+      use: { ...devices['Desktop Chrome'] },
+    },
   ],
   webServer: {
     command: 'npm run dev',

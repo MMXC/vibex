@@ -1,5 +1,11 @@
 # Changelog
 
+### E1: E2E Flaky 治理 (vibex-tester-proposals-20260403_024652)
+- **E1-S1**: Playwright Config — retries:2, workers:1, expect.timeout:30000 ✅
+- **E1-S2**: Stability Report — scripts/test-stability-report.sh + parse-playwright-report.py + docs/daily-stability.md
+- **E1-S3**: CI Integration — e2e-tests.yml stability report step
+- Commit: `8d2ed687`
+
 ### E1: 技术债清理 — Sprint 4 (vibex-sprint4-20260403)
 - **S1.1**: TypeScript 错误修复 — flow-execution handlers 类型修复
 - **S2.1**: CHANGELOG 规范 — 统一格式模板

@@ -25,6 +25,8 @@ interface ComponentStore {
   addComponentNode: (data: Omit<ComponentNode, 'nodeId' | 'status' | 'isActive' | 'children'>) => void;
   editComponentNode: (nodeId: string, data: Partial<ComponentNode>) => void;
   deleteComponentNode: (nodeId: string) => void;
+  confirmComponentNode: (nodeId: string) => void;
+  toggleComponentNode: (nodeId: string) => void;
 
   // Draft
   setComponentDraft: (draft: Partial<ComponentNode> | null) => void;
@@ -75,6 +77,32 @@ export const useComponentStore = create<ComponentStore>()(
           set((s) => ({
             componentNodes: s.componentNodes.filter((n) => n.nodeId !== nodeId),
           }));
+        },
+
+        confirmComponentNode: (nodeId) => {
+          set((s) => ({
+            componentNodes: s.componentNodes.map((n) =>
+              n.nodeId === nodeId ? { ...n, isActive: true, status: 'confirmed' as const } : n
+            ),
+          }));
+        },
+
+        toggleComponentNode: (nodeId) => {
+          const node = get().componentNodes.find((n) => n.nodeId === nodeId);
+          if (!node) return;
+          if (node.status === 'confirmed') {
+            set((s) => ({
+              componentNodes: s.componentNodes.map((n) =>
+                n.nodeId === nodeId ? { ...n, isActive: false, status: 'pending' as const } : n
+              ),
+            }));
+          } else {
+            set((s) => ({
+              componentNodes: s.componentNodes.map((n) =>
+                n.nodeId === nodeId ? { ...n, isActive: true, status: 'confirmed' as const } : n
+              ),
+            }));
+          }
         },
 
         setComponentDraft: (draft) => set({ componentDraft: draft }),

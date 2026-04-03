@@ -83,6 +83,42 @@ describe('useComponentStore', () => {
       });
       expect(useComponentStore.getState().componentNodes.length).toBe(2);
     });
+
+    it('should confirm a component node', () => {
+      useComponentStore.getState().addComponentNode({
+        name: 'ToConfirm', type: 'page', flowId: 'flow-1', props: {}, api: { method: 'GET', path: '/confirm', params: [] },
+      });
+      const nodeId = useComponentStore.getState().componentNodes[0].nodeId;
+      useComponentStore.getState().confirmComponentNode(nodeId);
+      const node = useComponentStore.getState().componentNodes[0];
+      expect(node.status).toBe('confirmed');
+      expect(node.isActive).toBe(true);
+    });
+
+    it('should toggle a component node from pending to confirmed', () => {
+      useComponentStore.getState().addComponentNode({
+        name: 'ToToggle', type: 'page', flowId: 'flow-1', props: {}, api: { method: 'GET', path: '/toggle', params: [] },
+      });
+      const nodeId = useComponentStore.getState().componentNodes[0].nodeId;
+      useComponentStore.getState().toggleComponentNode(nodeId);
+      const node = useComponentStore.getState().componentNodes[0];
+      expect(node.status).toBe('confirmed');
+      expect(node.isActive).toBe(true);
+    });
+
+    it('should toggle a component node from confirmed to pending', () => {
+      useComponentStore.getState().addComponentNode({
+        name: 'ToUnconfirm', type: 'page', flowId: 'flow-1', props: {}, api: { method: 'GET', path: '/unconfirm', params: [] },
+      });
+      const nodeId = useComponentStore.getState().componentNodes[0].nodeId;
+      // First confirm
+      useComponentStore.getState().confirmComponentNode(nodeId);
+      expect(useComponentStore.getState().componentNodes[0].status).toBe('confirmed');
+      // Then toggle back
+      useComponentStore.getState().toggleComponentNode(nodeId);
+      expect(useComponentStore.getState().componentNodes[0].status).toBe('pending');
+      expect(useComponentStore.getState().componentNodes[0].isActive).toBe(false);
+    });
   });
 
   describe('draft state', () => {

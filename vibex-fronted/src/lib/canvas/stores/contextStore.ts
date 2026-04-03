@@ -75,7 +75,6 @@ export const useContextStore = create<ContextStore>()(
         setActiveTree: (tree) => set({ activeTree: tree }),
         recomputeActiveTree: () => {
           const ctxs = get().contextNodes.filter((n) => n.isActive !== false);
-          const flows = []; // accessed via flowStore
           const currentTree = get().activeTree;
           if (!currentTree && ctxs.length > 0) set({ activeTree: 'context' });
         },

@@ -160,3 +160,173 @@ describe('useContextStore', () => {
     });
   });
 });
+
+// ============================================================================
+// Additional branch coverage tests (E4)
+// ============================================================================
+
+describe('useContextStore — advancePhase branches (L61-75)', () => {
+  beforeEach(() => {
+    useContextStore.setState({ phase: 'input', activeTree: null });
+  });
+
+  it('advances phase from input to context', () => {
+    useContextStore.getState().advancePhase();
+    expect(useContextStore.getState().phase).toBe('context');
+  });
+
+  it('advances phase to flow and syncs activeTree', () => {
+    useContextStore.setState({ phase: 'context' });
+    useContextStore.getState().advancePhase();
+    expect(useContextStore.getState().phase).toBe('flow');
+    expect(useContextStore.getState().activeTree).toBe('flow');
+  });
+
+  it('advances phase to component and syncs activeTree', () => {
+    useContextStore.setState({ phase: 'flow' });
+    useContextStore.getState().advancePhase();
+    expect(useContextStore.getState().phase).toBe('component');
+    expect(useContextStore.getState().activeTree).toBe('component');
+  });
+
+  it('advances phase from prototype (last phase) stays at prototype', () => {
+    useContextStore.setState({ phase: 'prototype' });
+    useContextStore.getState().advancePhase();
+    expect(useContextStore.getState().phase).toBe('prototype');
+  });
+});
+
+describe('useContextStore — selectAllNodes/clearNodeSelection branches (L111-122)', () => {
+  beforeEach(() => {
+    useContextStore.setState({
+      contextNodes: [
+        { nodeId: 'n1', name: 'Node 1', type: 'core' as const, status: 'pending' as const, isActive: false, children: [] },
+        { nodeId: 'n2', name: 'Node 2', type: 'core' as const, status: 'pending' as const, isActive: false, children: [] },
+      ],
+      selectedNodeIds: { context: [], flow: [] },
+    });
+  });
+
+  it('selectAllNodes selects all context nodes', () => {
+    useContextStore.getState().selectAllNodes('context');
+    expect(useContextStore.getState().selectedNodeIds.context).toContain('n1');
+    expect(useContextStore.getState().selectedNodeIds.context).toContain('n2');
+  });
+
+  it('selectAllNodes returns s for non-context tree (flow)', () => {
+    useContextStore.getState().selectAllNodes('flow');
+    expect(useContextStore.getState().selectedNodeIds.context).toHaveLength(0);
+  });
+
+  it('selectAllNodes returns s for component tree', () => {
+    useContextStore.getState().selectAllNodes('component');
+    expect(useContextStore.getState().selectedNodeIds.context).toHaveLength(0);
+  });
+
+  it('clearNodeSelection clears context selection', () => {
+    useContextStore.setState({ selectedNodeIds: { context: ['n1', 'n2'], flow: [] } });
+    useContextStore.getState().clearNodeSelection('context');
+    expect(useContextStore.getState().selectedNodeIds.context).toHaveLength(0);
+  });
+
+  it('clearNodeSelection returns s for non-context tree', () => {
+    useContextStore.setState({ selectedNodeIds: { context: ['n1'], flow: ['f1'] } });
+    useContextStore.getState().clearNodeSelection('flow');
+    expect(useContextStore.getState().selectedNodeIds.flow).toContain('f1');
+  });
+});
+
+describe('useContextStore — toggleContextNode branches (L197-228)', () => {
+  beforeEach(() => {
+    useContextStore.setState({
+      contextNodes: [
+        { nodeId: 'n-confirmed', name: 'Confirmed', type: 'core' as const, status: 'confirmed' as const, isActive: true, children: [] },
+        { nodeId: 'n-pending', name: 'Pending', type: 'core' as const, status: 'pending' as const, isActive: false, children: [] },
+      ],
+    });
+  });
+
+  it('unconfirms a confirmed node (confirmed branch)', () => {
+    useContextStore.getState().toggleContextNode('n-confirmed');
+    const node = useContextStore.getState().contextNodes.find((n) => n.nodeId === 'n-confirmed');
+    expect(node?.status).toBe('pending');
+    expect(node?.isActive).toBe(false);
+  });
+
+  it('confirms a pending node (pending branch)', () => {
+    useContextStore.getState().toggleContextNode('n-pending');
+    const node = useContextStore.getState().contextNodes.find((n) => n.nodeId === 'n-pending');
+    expect(node?.status).toBe('confirmed');
+    expect(node?.isActive).toBe(true);
+  });
+
+  it('does nothing for non-existent nodeId', () => {
+    expect(() => useContextStore.getState().toggleContextNode('non-existent')).not.toThrow();
+  });
+});
+
+describe('useContextStore — toggleContextSelection branches', () => {
+  beforeEach(() => {
+    useContextStore.setState({
+      contextNodes: [
+        { nodeId: 'n1', name: 'Node 1', type: 'core' as const, status: 'pending' as const, isActive: false, selected: false, children: [] },
+      ],
+    });
+  });
+
+  it('toggles selected to true', () => {
+    useContextStore.getState().toggleContextSelection('n1');
+    expect(useContextStore.getState().contextNodes[0].selected).toBe(true);
+  });
+
+  it('toggles selected back to false', () => {
+    useContextStore.getState().toggleContextSelection('n1');
+    useContextStore.getState().toggleContextSelection('n1');
+    expect(useContextStore.getState().contextNodes[0].selected).toBe(false);
+  });
+});
+
+describe('useContextStore — setContextNodes', () => {
+  beforeEach(() => {
+    useContextStore.setState({ contextNodes: [] });
+  });
+
+  it('setContextNodes replaces all context nodes', () => {
+    const nodes = [
+      { nodeId: 'c1', name: 'Context 1', type: 'core' as const, status: 'confirmed' as const, isActive: true, children: [] },
+      { nodeId: 'c2', name: 'Context 2', type: 'core' as const, status: 'pending' as const, isActive: false, children: [] },
+    ];
+    useContextStore.getState().setContextNodes(nodes);
+    expect(useContextStore.getState().contextNodes).toEqual(nodes);
+  });
+});
+
+describe('useContextStore — setContextDraft/setPhase/setBoundedGroups', () => {
+  it('setActiveTree updates activeTree', () => {
+    useContextStore.getState().setActiveTree('flow');
+    expect(useContextStore.getState().activeTree).toBe('flow');
+  });
+
+  it('setPhase updates phase', () => {
+    useContextStore.getState().setPhase('flow');
+    expect(useContextStore.getState().phase).toBe('flow');
+  });
+
+  it('setContextDraft sets draft', () => {
+    useContextStore.getState().setContextDraft({ name: 'Draft' });
+    expect(useContextStore.getState().contextDraft).toEqual({ name: 'Draft' });
+  });
+
+  it('setContextDraft clears draft with null', () => {
+    useContextStore.getState().setContextDraft({ name: 'Draft' });
+    useContextStore.getState().setContextDraft(null);
+    expect(useContextStore.getState().contextDraft).toBeNull();
+  });
+
+  it('setBoundedGroups sets groups', () => {
+    const groups = [{ groupId: 'g1', name: 'Group 1', contextIds: ['c1'] }];
+    useContextStore.getState().setBoundedGroups(groups);
+    expect(useContextStore.getState().boundedGroups).toEqual(groups);
+  });
+});
+

@@ -7,20 +7,16 @@ cd vibex-fronted
 pnpm add -D stylelint stylelint-config-standard
 ```
 
-## .stylelintrc.json
+## stylelint.config.mjs
 
-```json
-{
-  "extends": "stylelint-config-standard",
-  "rules": {
-    "no-empty-source": true,
-    "no-invalid-position-at-rule": true,
-    "no-invalid-position-declaration": true
+```js
+export default {
+  rules: {
+    // E2: Detect orphaned CSS properties (not inside any rule)
+    'no-invalid-position-declaration': true,
   },
-  "ignoreFiles": [
-    "**/*.min.css"
-  ]
-}
+  ignoreFiles: ['**/*.min.css'],
+};
 ```
 
 ## package.json script
@@ -28,7 +24,7 @@ pnpm add -D stylelint stylelint-config-standard
 ```json
 {
   "scripts": {
-    "lint:css": "stylelint \"src/**/*.css\" \"src/**/*.module.css\""
+    "lint:css": "stylelint \"**/*.css\" --ignore-path .gitignore"
   }
 }
 ```
@@ -36,7 +32,15 @@ pnpm add -D stylelint stylelint-config-standard
 ## CI 集成
 
 ```yaml
-# .github/workflows/ci.yml 新增 step
-- name: Lint CSS
-  run: pnpm run lint:css
+# .github/workflows/pre-submit.yml 新增 step
+- name: Run stylelint CSS quality gate
+  run: |
+    npx stylelint "**/*.css" --ignore-path .gitignore || exit 1
+```
+
+## 验证
+
+```bash
+pnpm run lint:css
+# exit 0 = pass
 ```

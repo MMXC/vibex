@@ -32,3 +32,7 @@ jobs:
         run: |
           COUNT=$(grep -rEn "eslint-disable" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | wc -l)
           echo "::notice::ESLint disable count: $COUNT (threshold: 20)"
+
+      - name: Run stylelint CSS quality gate
+        run: |
+          npx stylelint "**/*.css" --ignore-path .gitignore || exit 1

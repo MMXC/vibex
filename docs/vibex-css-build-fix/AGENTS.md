@@ -22,9 +22,9 @@
 - [ ] 修复前记录上下文（行号 + 周围 5 行）
 - [ ] 修复后立即 `npm run build` 验证 exit 0
 
-**E2 约束**:
-- [ ] stylelint 配置 `no-invalid-position-declaration` 规则
-- [ ] CI 中 stylelint 非 0 时构建失败
+**E2 约束**
+- [x] stylelint 配置 `no-invalid-position-declaration` 规则
+- [x] CI 中 stylelint 非 0 时构建失败
 
 **E3 约束**:
 - [ ] 批量扫描前过滤误报（如 `@keyframes` 内联属性）

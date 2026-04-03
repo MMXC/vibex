@@ -8,8 +8,7 @@
  */
 
 import React from 'react';
-import { render, act } from '@testing-library/react';
-import { renderHook } from '@testing-library/react';
+import { render, act, renderHook } from '@testing-library/react';
 import { useCanvasState } from './useCanvasState';
 
 // All mock state lives inside jest.mock factory to avoid out-of-scope-variable errors

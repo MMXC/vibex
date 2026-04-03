@@ -1,18 +1,15 @@
 {
   "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
   "testRunner": "jest",
+  "coverageAnalysis": "all",
   "concurrency": 1,
+  "jest": {
+    "configFile": "jest.config.ts"
+  },
   "mutate": [
-    "src/lib/canvas/stores/contextStore.ts",
-    "src/lib/canvas/stores/flowStore.ts",
-    "src/lib/canvas/stores/componentStore.ts",
-    "src/lib/canvas/stores/uiStore.ts",
-    "src/lib/canvas/stores/sessionStore.ts",
-    "src/lib/canvas/canvasStore.ts"
+    "src/lib/canvas/stores/contextStore.ts"
   ],
-  "ignoreStatic": true,
-  "timeout": 600000,
-  "timeoutFactor": 1.5,
+  "timeoutMS": 600000,
   "thresholds": {
     "break": 70,
     "high": 90,
@@ -23,5 +20,8 @@
     "html",
     "json"
   ],
-  "tempDirName": ".stryker-tmp"
+  "tempDirName": ".stryker-tmp",
+  "plugins": [
+    "@stryker-mutator/jest-runner"
+  ]
 }

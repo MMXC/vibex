@@ -1,5 +1,13 @@
 # Changelog
 
+### [E4 Sync Protocol] — 2026-04-03 (vibex-dev-proposals-20260403_024652)
+
+#### Added
+- `src/components/ConflictDialog/` — ConflictDialog 组件，3 种冲突解决选项（保留本地/使用服务端/合并）
+- `src/components/canvas/CanvasPage.tsx` — ConflictDialog 集成，右下角固定定位
+- `src/hooks/canvas/useAutoSave.ts` — 扩展 conflictData + clearConflict 暴露
+- `src/lib/canvas/api/canvasApi.ts` — 409 响应体捕获（serverSnapshot）
+
 ### E4: 测试工程化 (vibex-dev-proposals-20260403_024652)
 
 #### Added

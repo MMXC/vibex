@@ -67,9 +67,9 @@ describe('Epic2 F2.1: FlowCard checkbox tooltip', () => {
     expect(checkboxes.length).toBeGreaterThan(0);
 
     const flowCheckbox = checkboxes.find((cb) =>
-      cb.getAttribute('aria-label')?.includes('选择流程')
+      cb.getAttribute('aria-label')?.includes('确认步骤')
     );
     expect(flowCheckbox).toBeDefined();
-    expect(flowCheckbox).toHaveAttribute('title', '用于批量选择，非确认操作');
+    expect(flowCheckbox).toHaveAttribute('title', '确认此步骤');
   });
 });

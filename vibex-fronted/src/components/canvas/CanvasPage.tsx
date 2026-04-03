@@ -13,7 +13,17 @@
 'use client';
 
 import React, { useMemo, useState, useRef, useEffect, useCallback } from 'react';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useContextStore } from '@/lib/canvas/stores/contextStore';
+import { useFlowStore } from '@/lib/canvas/stores/flowStore';
+import { useComponentStore } from '@/lib/canvas/stores/componentStore';
+import { useUIStore } from '@/lib/canvas/stores/uiStore';
+import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
+import {
+  loadExampleData,
+  setContextNodes as canvasSetContextNodes,
+  setFlowNodes as canvasSetFlowNodes,
+  setComponentNodes,
+} from '@/lib/canvas/canvasStore';
 import { hasNodes } from '@/lib/canvas/cascade';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import { getHistoryStore } from '@/lib/canvas/historySlice';
@@ -43,6 +53,7 @@ import { useToast } from '@/components/ui/Toast';
 import { UndoBar } from '@/components/undo-bar/UndoBar';
 
 import { NodeTooltip } from '@/components/guidance/NodeTooltip';
+import { ConflictDialog as ConflictDialogComponent } from '@/components/ConflictDialog';
 import type { Phase, TreeType, TreeNode } from '@/lib/canvas/types';
 import type { NodeRect } from '@/lib/canvas/types';
 import { BoundedEdgeLayer } from './edges/BoundedEdgeLayer';
@@ -56,41 +67,40 @@ interface CanvasPageProps {
 
 export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   // === Store Selectors ===
-  const phase = useCanvasStore((s) => s.phase);
-  const activeTree = useCanvasStore((s) => s.activeTree);
-  const contextNodes = useCanvasStore((s) => s.contextNodes);
-  const flowNodes = useCanvasStore((s) => s.flowNodes);
-  const componentNodes = useCanvasStore((s) => s.componentNodes);
-  const contextPanelCollapsed = useCanvasStore((s) => s.contextPanelCollapsed);
-  const flowPanelCollapsed = useCanvasStore((s) => s.flowPanelCollapsed);
-  const componentPanelCollapsed = useCanvasStore((s) => s.componentPanelCollapsed);
-  const setPhase = useCanvasStore((s) => s.setPhase);
-  const toggleContextPanel = useCanvasStore((s) => s.toggleContextPanel);
-  const toggleFlowPanel = useCanvasStore((s) => s.toggleFlowPanel);
-  const toggleComponentPanel = useCanvasStore((s) => s.toggleComponentPanel);
-  const loadExampleData = useCanvasStore((s) => s.loadExampleData);
+  const phase = useContextStore((s) => s.phase);
+  const activeTree = useContextStore((s) => s.activeTree);
+  const contextNodes = useContextStore((s) => s.contextNodes);
+  const flowNodes = useFlowStore((s) => s.flowNodes);
+  const componentNodes = useComponentStore((s) => s.componentNodes);
+  const contextPanelCollapsed = useUIStore((s) => s.contextPanelCollapsed);
+  const flowPanelCollapsed = useUIStore((s) => s.flowPanelCollapsed);
+  const componentPanelCollapsed = useUIStore((s) => s.componentPanelCollapsed);
+  const setPhase = useContextStore((s) => s.setPhase);
+  const toggleContextPanel = useUIStore((s) => s.toggleContextPanel);
+  const toggleFlowPanel = useUIStore((s) => s.toggleFlowPanel);
+  const toggleComponentPanel = useUIStore((s) => s.toggleComponentPanel);
   // E3-F2: Delete selected node(s) based on active tree (multi-select batch delete)
-  const deleteSelectedNodes = useCanvasStore((s) => s.deleteSelectedNodes);
-  const autoGenerateFlows = useCanvasStore((s) => s.autoGenerateFlows);
-  const generateComponentFromFlow = useCanvasStore((s) => s.generateComponentFromFlow);
-  const flowGenerating = useCanvasStore((s) => s.flowGenerating);
-  const flowGeneratingMessage = useCanvasStore((s) => s.flowGeneratingMessage);
+  const deleteSelectedNodes = useContextStore((s) => s.deleteSelectedNodes);
+  const autoGenerateFlows = useFlowStore((s) => s.autoGenerateFlows);
+  const generateComponentFromFlow = useComponentStore((s) => s.generateComponentFromFlow);
+  const flowGenerating = useSessionStore((s) => s.flowGenerating);
+  const flowGeneratingMessage = useSessionStore((s) => s.flowGeneratingMessage);
   // Epic1: Selection-based filtering — only send selected confirmed nodes
-  const selectedNodeIds = useCanvasStore((s) => s.selectedNodeIds);
+  const selectedNodeIds = useContextStore((s) => s.selectedNodeIds);
 
   // === Expand State Selectors (E2 → F1: legacy, kept for toggle buttons) ===
   const gridRef = useRef<HTMLDivElement>(null);
-  const leftExpand = useCanvasStore((s) => s.leftExpand);
-  const centerExpand = useCanvasStore((s) => s.centerExpand);
-  const rightExpand = useCanvasStore((s) => s.rightExpand);
-  const setLeftExpand = useCanvasStore((s) => s.setLeftExpand);
-  const setCenterExpand = useCanvasStore((s) => s.setCenterExpand);
-  const setRightExpand = useCanvasStore((s) => s.setRightExpand);
+  const leftExpand = useUIStore((s) => s.leftExpand);
+  const centerExpand = useUIStore((s) => s.centerExpand);
+  const rightExpand = useUIStore((s) => s.rightExpand);
+  const setLeftExpand = useUIStore((s) => s.setLeftExpand);
+  const setCenterExpand = useUIStore((s) => s.setCenterExpand);
+  const setRightExpand = useUIStore((s) => s.setRightExpand);
 
   // F1: New expand mode
-  const expandMode = useCanvasStore((s) => s.expandMode);
-  const setExpandMode = useCanvasStore((s) => s.setExpandMode);
-  const toggleMaximize = useCanvasStore((s) => s.toggleMaximize);
+  const expandMode = useUIStore((s) => s.expandMode);
+  const setExpandMode = useUIStore((s) => s.setExpandMode);
+  const toggleMaximize = useUIStore((s) => s.toggleMaximize);
 
   // F1: Legacy expand handlers (keep for backward compat until F1.4)
   const toggleLeft = useCallback(() => {
@@ -273,7 +283,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const handleSearchSelect = useCallback(
     (result: { id: string; treeType: TreeType }) => {
       // Set active tree to the result's tree
-      useCanvasStore.getState().setActiveTree(result.treeType);
+      useContextStore.getState().setActiveTree(result.treeType);
       // Scroll node into view via minimap (handled by TreePanel's onNodeClick)
       const nodeEl = document.querySelector<HTMLElement>(`[data-node-id="${result.id}"]`);
       nodeEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -308,22 +318,87 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   );
 
   // === AI Thinking State (Epic 1) ===
-  const aiThinking = useCanvasStore((s) => s.aiThinking);
-  const aiThinkingMessage = useCanvasStore((s) => s.aiThinkingMessage);
-  const generateContexts = useCanvasStore((s) => s.generateContextsFromRequirement);
-  const setRequirementText = useCanvasStore((s) => s.setRequirementText);
-  const requirementText = useCanvasStore((s) => s.requirementText);
+  const aiThinking = useSessionStore((s) => s.aiThinking);
+  const aiThinkingMessage = useSessionStore((s) => s.aiThinkingMessage);
+  const generateContexts = useSessionStore((s) => s.generateContextsFromRequirement);
+  const setRequirementText = useSessionStore((s) => s.setRequirementText);
+  const requirementText = useSessionStore((s) => s.requirementText);
 
   // === Component Generation State (Bug4b) ===
   const [componentGenerating, setComponentGenerating] = useState(false);
-  const projectId = useCanvasStore((s) => s.projectId);
-  const setComponentNodes = useCanvasStore((s) => s.setComponentNodes);
+  const projectId = useSessionStore((s) => s.projectId);
 
   // === E3: Auto-Save Hook ===
-  const { saveStatus, lastSavedAt, saveNow } = useAutoSave({
+  const { saveStatus, lastSavedAt, saveNow, conflictData, clearConflict } = useAutoSave({
     projectId,
     debounceMs: 2000, // MUST be exactly 2000 per AGENTS.md
   });
+
+  // === E4: Conflict Resolution Handlers ===
+  // E4-SyncProtocol: Keep local data — force save with incremented version
+  const handleConflictKeepLocal = useCallback(() => {
+    if (!conflictData) return
+    clearConflict()
+    // The next save will automatically use the correct version
+    // because local state hasn't changed — just clear the conflict flag
+    // and the user can continue editing
+    toast.showToast('已保留本地数据，请继续编辑后自动保存', 'info')
+  }, [conflictData, clearConflict, toast])
+
+  // E4-SyncProtocol: Use server data — restore from server snapshot
+  const handleConflictUseServer = useCallback(() => {
+    if (!conflictData) return
+    const serverData = conflictData.serverSnapshot.data
+    if (serverData.contexts) {
+      canvasSetContextNodes(serverData.contexts as any)
+    }
+    if (serverData.flows) {
+      canvasSetFlowNodes(serverData.flows as any)
+    }
+    if (serverData.components) {
+      setComponentNodes(serverData.components as any)
+    }
+    clearConflict()
+    toast.showToast('已使用服务端数据，当前画布已更新', 'success')
+  }, [conflictData, clearConflict, toast])
+
+  // E4-SyncProtocol: Merge both — append server nodes to local nodes (deduplicate by ID)
+  const handleConflictMerge = useCallback(() => {
+    if (!conflictData) return
+    const serverData = conflictData.serverSnapshot.data
+
+    const localContexts = useContextStore.getState().contextNodes
+    const localFlows = useFlowStore.getState().flowNodes
+    const localComponents = useComponentStore.getState().componentNodes
+
+    const serverContexts = (serverData.contexts ?? []) as typeof localContexts
+    const serverFlows = (serverData.flows ?? []) as typeof localFlows
+    const serverComponents = (serverData.components ?? []) as typeof localComponents
+
+    // Deduplicate by nodeId
+    const localCtxIds = new Set(localContexts.map((n) => n.nodeId))
+    const localFlowIds = new Set(localFlows.map((n) => n.nodeId))
+    const localCompIds = new Set(localComponents.map((n) => n.nodeId))
+
+    const mergedContexts = [
+      ...localContexts,
+      ...serverContexts.filter((n) => !localCtxIds.has(n.nodeId)),
+    ]
+    const mergedFlows = [
+      ...localFlows,
+      ...serverFlows.filter((n) => !localFlowIds.has(n.nodeId)),
+    ]
+    const mergedComponents = [
+      ...localComponents,
+      ...serverComponents.filter((n) => !localCompIds.has(n.nodeId)),
+    ]
+
+    canvasSetContextNodes(mergedContexts)
+    canvasSetFlowNodes(mergedFlows)
+    setComponentNodes(mergedComponents)
+    clearConflict()
+    toast.showToast(`已合并：+${serverContexts.length - localContexts.length} 上下文、+${serverFlows.length - localFlows.length} 流程、+${serverComponents.length - localComponents.length} 组件`, 'success')
+  }, [conflictData, clearConflict, toast])
 
   // === E2-F14: Zoom State ===
   const [zoomLevel, setZoomLevel] = useState(1); // 1 = 100%
@@ -367,8 +442,8 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   }, [componentNodes]);
 
   // Store selectors for edge layers
-  const flowEdges = useCanvasStore((s) => s.flowEdges);
-  const boundedEdges = useCanvasStore((s) => s.boundedEdges);
+  const flowEdges = useContextStore((s) => s.flowEdges);
+  const boundedEdges = useContextStore((s) => s.boundedEdges);
 
   const handleZoomIn = useCallback(() => {
     setZoomLevel((z) => Math.min(z + ZOOM_STEP, MAX_ZOOM));
@@ -395,36 +470,34 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   // === Epic1 F1.2: Keyboard shortcuts for Undo/Redo ===
   const handleKeyboardUndo = useCallback((): boolean => {
     const historyStore = getHistoryStore();
-    const canvasStore = useCanvasStore.getState();
     if (historyStore.canUndo('context')) {
       const prev = historyStore.undo('context');
-      if (prev) { canvasStore.setContextNodes(prev as typeof canvasStore.contextNodes); return true; }
+      if (prev) { canvasSetContextNodes(prev as any); return true; }
     }
     if (historyStore.canUndo('flow')) {
       const prev = historyStore.undo('flow');
-      if (prev) { canvasStore.setFlowNodes(prev as typeof canvasStore.flowNodes); return true; }
+      if (prev) { canvasSetFlowNodes(prev as any); return true; }
     }
     if (historyStore.canUndo('component')) {
       const prev = historyStore.undo('component');
-      if (prev) { canvasStore.setComponentNodes(prev as typeof canvasStore.componentNodes); return true; }
+      if (prev) { setComponentNodes(prev as any); return true; }
     }
     return false;
   }, []);
 
   const handleKeyboardRedo = useCallback((): boolean => {
     const historyStore = getHistoryStore();
-    const canvasStore = useCanvasStore.getState();
     if (historyStore.canRedo('context')) {
       const next = historyStore.redo('context');
-      if (next) { canvasStore.setContextNodes(next as typeof canvasStore.contextNodes); return true; }
+      if (next) { canvasSetContextNodes(next as any); return true; }
     }
     if (historyStore.canRedo('flow')) {
       const next = historyStore.redo('flow');
-      if (next) { canvasStore.setFlowNodes(next as typeof canvasStore.flowNodes); return true; }
+      if (next) { canvasSetFlowNodes(next as any); return true; }
     }
     if (historyStore.canRedo('component')) {
       const next = historyStore.redo('component');
-      if (next) { canvasStore.setComponentNodes(next as typeof canvasStore.componentNodes); return true; }
+      if (next) { setComponentNodes(next as any); return true; }
     }
     return false;
   }, []);
@@ -444,8 +517,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     try {
       // Step 1: Generate contexts
       await generateContexts(requirementInput);
-      const store = useCanvasStore.getState();
-      const ctxs = store.contextNodes.filter((c) => c.isActive !== false);
+      const ctxs = useContextStore.getState().contextNodes.filter((c) => c.isActive !== false);
       if (ctxs.length === 0) {
         toast.showToast('未生成任何 Context 节点，请检查需求输入', 'error');
         return;
@@ -472,30 +544,29 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     onDelete: handleDeleteSelected,
     onSelectAll: () => {
       const tree: TreeType = activeTree ?? 'context';
-      useCanvasStore.getState().selectAllNodes(tree);
+      useContextStore.getState().selectAllNodes(tree);
     },
     onClearSelection: () => {
       const tree: TreeType = activeTree ?? 'context';
-      useCanvasStore.getState().clearNodeSelection(tree);
+      useContextStore.getState().clearNodeSelection(tree);
     },
     onNewNode: () => {
       const tree: TreeType = activeTree ?? 'context';
-      const store = useCanvasStore.getState();
       if (tree === 'context') {
-        store.addContextNode({ name: '新上下文', description: '', type: 'core' });
+        useContextStore.getState().addContextNode({ name: '新上下文', description: '', type: 'core' });
       } else if (tree === 'flow') {
-        store.addFlowNode({ contextId: '', name: '新流程', steps: [] });
+        useFlowStore.getState().addFlowNode({ contextId: '', name: '新流程', steps: [] });
       } else {
-        store.addComponentNode({ name: '新组件', flowId: '', type: 'page', props: {}, api: { method: 'GET', path: '/', params: [] } });
+        useComponentStore.getState().addComponentNode({ name: '新组件', flowId: '', type: 'page', props: {}, api: { method: 'GET', path: '/', params: [] } });
       }
     },
     onQuickGenerate: quickGenerate,
     // [E4] Confirm selected nodes: Ctrl+Shift+C
     onConfirmSelected: () => {
-      const store = useCanvasStore.getState();
+      const store = useContextStore.getState();
       const { context: ctxIds, flow: flowIds } = store.selectedNodeIds;
       ctxIds.forEach((id) => store.confirmContextNode(id));
-      flowIds.forEach((id) => store.confirmFlowNode(id));
+      flowIds.forEach((id) => useFlowStore.getState().confirmFlowNode(id));
     },
     // [E4] Generate context from requirement: Ctrl+Shift+G
     onGenerateContext: async () => {
@@ -507,13 +578,13 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
       await generateContexts(requirementInput);
     },
     onSwitchToContext: () => {
-      useCanvasStore.getState().setActiveTree('context');
+      useContextStore.getState().setActiveTree('context');
     },
     onSwitchToFlow: () => {
-      useCanvasStore.getState().setActiveTree('flow');
+      useContextStore.getState().setActiveTree('flow');
     },
     onSwitchToComponent: () => {
-      useCanvasStore.getState().setActiveTree('component');
+      useContextStore.getState().setActiveTree('component');
     },
     enabled: phase !== 'input',
   });
@@ -800,8 +871,8 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const componentActive = activeTree === 'component';
 
   // === Epic 5: Drawer state for layout ===
-  const leftDrawerOpen = useCanvasStore((s) => s.leftDrawerOpen);
-  const rightDrawerOpen = useCanvasStore((s) => s.rightDrawerOpen);
+  const leftDrawerOpen = useUIStore((s) => s.leftDrawerOpen);
+  const rightDrawerOpen = useUIStore((s) => s.rightDrawerOpen);
 
   // Compute container class based on drawer state
   const containerClasses = [
@@ -1239,6 +1310,21 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
       <UndoBar />
       <ShortcutBar onOpenShortcutPanel={toggleShortcutPanel} />
       <NodeTooltip />
+
+      {/* E4-SyncProtocol: Conflict Dialog — shown when save conflict is detected */}
+      {saveStatus === 'conflict' && conflictData && (
+        <ConflictDialogComponent
+          serverSnapshot={conflictData.serverSnapshot}
+          localData={{
+            contextNodes: contextNodes,
+            flowNodes: flowNodes,
+            componentNodes: componentNodes,
+          }}
+          onKeepLocal={handleConflictKeepLocal}
+          onUseServer={handleConflictUseServer}
+          onMerge={handleConflictMerge}
+        />
+      )}
     </div>
   );
 }

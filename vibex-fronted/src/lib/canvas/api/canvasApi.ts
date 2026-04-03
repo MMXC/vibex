@@ -322,7 +322,17 @@ export const canvasApi = {
       body: JSON.stringify(data),
     });
 
-    if (!res.ok) handleResponseError(res, `创建快照失败: ${res.status}`);
+    if (!res.ok) {
+      // E4: For 409 conflict, include response body in error for conflict data extraction
+      if (res.status === 409) {
+        const body = await res.json().catch(() => ({}));
+        const err = new Error(`创建快照失败: ${res.status}`) as Error & { status: number; data: Record<string, unknown> };
+        err.status = 409;
+        err.data = body;
+        throw err;
+      }
+      handleResponseError(res, `创建快照失败: ${res.status}`);
+    }
     return res.json() as Promise<CreateSnapshotOutput>;
   },
 

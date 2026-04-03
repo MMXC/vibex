@@ -48,6 +48,17 @@ interface UseAutoSaveReturn {
   saveNow: () => Promise<void>
   /** Trigger a manual save using Beacon (for beforeunload) */
   saveBeacon: () => void
+  /** E4: Server snapshot data when a conflict is detected */
+  conflictData: {
+    serverSnapshot: {
+      snapshotId: string
+      version: number
+      createdAt: string
+      data: { contexts?: unknown[]; flows?: unknown[]; components?: unknown[]; [key: string]: unknown }
+    }
+  } | null
+  /** E4: Clear conflict state after user resolves it */
+  clearConflict: () => void
 }
 
 /**
@@ -94,10 +105,19 @@ async function doSave(
     }
     return { version: result.snapshot?.version ?? 0 }
   } catch (err: any) {
-    // E1: Handle 409 conflict
+    // E1: Handle 409 conflict — extract server snapshot from response
     if (err?.response?.status === 409 || err?.status === 409) {
+      let serverSnapshot: UseAutoSaveReturn['conflictData'] = null
+      try {
+        const body = err?.response?.data ?? err?.data ?? {}
+        if (body?.serverSnapshot) {
+          serverSnapshot = { serverSnapshot: body.serverSnapshot }
+        }
+      } catch {
+        // ignore parse error
+      }
       console.warn('[useAutoSave] Version conflict detected:', err)
-      throw Object.assign(err, { isConflict: true })
+      throw Object.assign(err, { isConflict: true, serverSnapshot })
     }
     console.error('[useAutoSave] Save failed:', err)
     throw err
@@ -115,6 +135,13 @@ export function useAutoSave(options: UseAutoSaveOptions): UseAutoSaveReturn {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle')
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null)
   const [lastSavedVersion, setLastSavedVersion] = useState<number | null>(null)
+  // E4: Conflict data from 409 response
+  const [conflictData, setConflictData] = useState<UseAutoSaveReturn['conflictData']>(null)
+  // E4: Clear conflict state after user resolves it
+  const clearConflict = useCallback(() => {
+    setConflictData(null)
+    setSaveStatus('idle')
+  }, [])
 
   // Track whether component is mounted
   const mountedRef = useRef(true)
@@ -138,6 +165,7 @@ export function useAutoSave(options: UseAutoSaveOptions): UseAutoSaveReturn {
       } catch (err: any) {
         if (!mountedRef.current) return
         if (err?.isConflict) {
+          setConflictData(err?.serverSnapshot ?? null)
           setSaveStatus('conflict')
           return
         }
@@ -244,6 +272,7 @@ export function useAutoSave(options: UseAutoSaveOptions): UseAutoSaveReturn {
     } catch (err: any) {
       if (!mountedRef.current) return
       if (err?.isConflict) {
+        setConflictData(err?.serverSnapshot ?? null)
         setSaveStatus('conflict')
         return
       }
@@ -286,5 +315,7 @@ export function useAutoSave(options: UseAutoSaveOptions): UseAutoSaveReturn {
     lastSavedVersion,
     saveNow,
     saveBeacon,
+    conflictData,
+    clearConflict,
   }
 }

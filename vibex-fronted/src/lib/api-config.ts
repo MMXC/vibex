@@ -27,8 +27,8 @@ export const API_CONFIG = {
       generate: '/v1/canvas/generate',
       export: '/v1/canvas/export',
       stream: '/v1/canvas/stream',
-      // E4-F11: Version History — Canvas Snapshots
-      snapshots: '/v1/canvas/snapshots',
+      // E4-SyncProtocol: Canvas Snapshots (sync + conflict detection)
+      snapshots: '/canvas/snapshots',
       snapshot: (id: string) => `/v1/canvas/snapshots/${id}`,
       restoreSnapshot: (id: string) => `/v1/canvas/snapshots/${id}/restore`,
     },

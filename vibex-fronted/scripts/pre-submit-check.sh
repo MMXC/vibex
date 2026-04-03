@@ -94,6 +94,25 @@ fi
 echo ""
 
 #------------------------------------------------------------------------------
+# 2b. ESLint Disable Count Check
+#------------------------------------------------------------------------------
+
+echo "=============================================="
+echo "2b. ESLint Disable Count Check"
+echo "=============================================="
+
+DISABLE_COUNT=$(grep -rEn "eslint-disable|eslint-disable-line|eslint-disable-next-line" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | wc -l)
+DISABLE_THRESHOLD=20
+
+if [ "$DISABLE_COUNT" -gt "$DISABLE_THRESHOLD" ]; then
+    check_warning "ESLint disable count: $DISABLE_COUNT (threshold: $DISABLE_THRESHOLD). Review ESLINT_DISABLES.md"
+else
+    echo -e "${GREEN}✓ ESLint disable count: $DISABLE_COUNT (threshold: $DISABLE_THRESHOLD)${NC}"
+fi
+
+echo ""
+
+#------------------------------------------------------------------------------
 # 3. Unit Tests
 #------------------------------------------------------------------------------
 

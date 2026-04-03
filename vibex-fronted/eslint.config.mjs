@@ -1,6 +1,7 @@
 import { defineConfig, globalIgnores } from 'eslint/config';
 import nextVitals from 'eslint-config-next/core-web-vitals';
 import nextTs from 'eslint-config-next/typescript';
+import importPlugin from 'eslint-plugin-import';
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -45,7 +46,12 @@ const eslintConfig = defineConfig([
     '**/*.module.css',
   ]),
   {
+    plugins: {
+      import: importPlugin,
+    },
     rules: {
+      // import/no-duplicates: enforce consistent use of duplicate imports
+      'import/no-duplicates': 'error',
       // Allow explicit any for API responses and third-party integrations
       '@typescript-eslint/no-explicit-any': 'off',
       // Allow unused vars for destructuring patterns

@@ -12,7 +12,9 @@
 'use client';
 
 import { useEffect, useRef, useCallback } from 'react';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useContextStore } from '@/lib/canvas/stores/contextStore';
+import { useFlowStore } from '@/lib/canvas/stores/flowStore';
+import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { useHistoryStore, getHistoryStore } from '@/lib/canvas/historySlice';
 import type { TreeType } from '@/lib/canvas/types';
 
@@ -27,10 +29,10 @@ const THROTTLE_MS = 300;
  * Returns undo/redo functions that apply changes directly to canvasStore.
  */
 export function useCanvasHistory() {
-  // Select current node state from canvasStore
-  const contextNodes = useCanvasStore((s) => s.contextNodes);
-  const flowNodes = useCanvasStore((s) => s.flowNodes);
-  const componentNodes = useCanvasStore((s) => s.componentNodes);
+  // Select current node state from split stores
+  const contextNodes = useContextStore((s) => s.contextNodes);
+  const flowNodes = useFlowStore((s) => s.flowNodes);
+  const componentNodes = useComponentStore((s) => s.componentNodes);
 
   // Selectors for can-undo/redo state
   const canUndoContext = useHistoryStore((s) => s.canUndo('context'));
@@ -66,17 +68,17 @@ export function useCanvasHistory() {
 
     const historyStore = getHistoryStore();
     if (tree === 'context') {
-      const nodes = useCanvasStore.getState().contextNodes;
+      const nodes = useContextStore.getState().contextNodes;
       if (snapshotChanged('context', nodes)) {
         historyStore.recordSnapshot('context', nodes);
       }
     } else if (tree === 'flow') {
-      const nodes = useCanvasStore.getState().flowNodes;
+      const nodes = useFlowStore.getState().flowNodes;
       if (snapshotChanged('flow', nodes)) {
         historyStore.recordSnapshot('flow', nodes);
       }
     } else {
-      const nodes = useCanvasStore.getState().componentNodes;
+      const nodes = useComponentStore.getState().componentNodes;
       if (snapshotChanged('component', nodes)) {
         historyStore.recordSnapshot('component', nodes);
       }
@@ -130,21 +132,23 @@ export function useCanvasHistory() {
 
   // Initialize history on mount (load existing data into history stack)
   useEffect(() => {
-    const store = useCanvasStore.getState();
+    const ctxStore = useContextStore.getState();
+    const flowStore = useFlowStore.getState();
+    const compStore = useComponentStore.getState();
     const historyStore = getHistoryStore();
 
     // Only initialize if history stacks are empty (first load)
     if (!historyStore.canUndo('context') && !historyStore.canUndo('flow') && !historyStore.canUndo('component')) {
-      historyStore.initAllHistories(store.contextNodes, store.flowNodes, store.componentNodes);
+      historyStore.initAllHistories(ctxStore.contextNodes, flowStore.flowNodes, compStore.componentNodes);
       // Set initial snapshots
-      if (store.contextNodes.length > 0) {
-        lastSnapshotRef.current.context = JSON.stringify(store.contextNodes);
+      if (ctxStore.contextNodes.length > 0) {
+        lastSnapshotRef.current.context = JSON.stringify(ctxStore.contextNodes);
       }
-      if (store.flowNodes.length > 0) {
-        lastSnapshotRef.current.flow = JSON.stringify(store.flowNodes);
+      if (flowStore.flowNodes.length > 0) {
+        lastSnapshotRef.current.flow = JSON.stringify(flowStore.flowNodes);
       }
-      if (store.componentNodes.length > 0) {
-        lastSnapshotRef.current.component = JSON.stringify(store.componentNodes);
+      if (compStore.componentNodes.length > 0) {
+        lastSnapshotRef.current.component = JSON.stringify(compStore.componentNodes);
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -153,7 +157,6 @@ export function useCanvasHistory() {
   /** Undo for a specific tree — applies to canvasStore */
   const undoTree = useCallback((tree: TreeType): boolean => {
     const historyStore = getHistoryStore();
-    const canvasStore = useCanvasStore.getState();
 
     if (!historyStore.canUndo(tree)) return false;
 
@@ -161,11 +164,11 @@ export function useCanvasHistory() {
     if (!previous) return false;
 
     if (tree === 'context') {
-      canvasStore.setContextNodes(previous as typeof canvasStore.contextNodes);
+      useContextStore.getState().setContextNodes(previous as any);
     } else if (tree === 'flow') {
-      canvasStore.setFlowNodes(previous as typeof canvasStore.flowNodes);
+      useFlowStore.getState().setFlowNodes(previous as any);
     } else {
-      canvasStore.setComponentNodes(previous as typeof canvasStore.componentNodes);
+      useComponentStore.getState().setComponentNodes(previous as any);
     }
     return true;
   }, []);
@@ -173,7 +176,6 @@ export function useCanvasHistory() {
   /** Redo for a specific tree — applies to canvasStore */
   const redoTree = useCallback((tree: TreeType): boolean => {
     const historyStore = getHistoryStore();
-    const canvasStore = useCanvasStore.getState();
 
     if (!historyStore.canRedo(tree)) return false;
 
@@ -181,11 +183,11 @@ export function useCanvasHistory() {
     if (!next) return false;
 
     if (tree === 'context') {
-      canvasStore.setContextNodes(next as typeof canvasStore.contextNodes);
+      useContextStore.getState().setContextNodes(next as any);
     } else if (tree === 'flow') {
-      canvasStore.setFlowNodes(next as typeof canvasStore.flowNodes);
+      useFlowStore.getState().setFlowNodes(next as any);
     } else {
-      canvasStore.setComponentNodes(next as typeof canvasStore.componentNodes);
+      useComponentStore.getState().setComponentNodes(next as any);
     }
     return true;
   }, []);
@@ -193,7 +195,6 @@ export function useCanvasHistory() {
   /** Global undo — undo last action regardless of tree */
   const undo = useCallback((): boolean => {
     const historyStore = getHistoryStore();
-    const canvasStore = useCanvasStore.getState();
 
     // Priority: context > flow > component
     if (historyStore.canUndo('context')) return undoTree('context');
@@ -215,14 +216,16 @@ export function useCanvasHistory() {
 
   /** Clear all histories — called on loadExampleData */
   const clearAllHistories = useCallback(() => {
-    const store = useCanvasStore.getState();
+    const ctxStore = useContextStore.getState();
+    const flowStore = useFlowStore.getState();
+    const compStore = useComponentStore.getState();
     const historyStore = getHistoryStore();
-    historyStore.initAllHistories(store.contextNodes, store.flowNodes, store.componentNodes);
+    historyStore.initAllHistories(ctxStore.contextNodes, flowStore.flowNodes, compStore.componentNodes);
     // Reset snapshot tracking
     lastSnapshotRef.current = {
-      context: JSON.stringify(store.contextNodes),
-      flow: JSON.stringify(store.flowNodes),
-      component: JSON.stringify(store.componentNodes),
+      context: JSON.stringify(ctxStore.contextNodes),
+      flow: JSON.stringify(flowStore.flowNodes),
+      component: JSON.stringify(compStore.componentNodes),
     };
   }, []);
 

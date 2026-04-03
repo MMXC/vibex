@@ -1,0 +1,145 @@
+{
+  "id": "education-online",
+  "name": "在线教育",
+  "displayName": "在线教育平台",
+  "category": "education",
+  "icon": "📚",
+  "description": "课程管理、在线学习、作业考试、师生互动等教育功能",
+  "content": "开发一个在线教育平台，包含以下核心功能：\n\n1. 课程系统：课程创建、章节管理、课件上传、视频播放\n2. 学习系统：课程购买、进度跟踪、学习笔记\n3. 作业考试：作业布置、在线答题、自动批改、成绩统计\n4. 师生互动：提问答疑、讨论区、课后评价\n5. 用户中心：个人信息、学习记录、证书管理\n6. 教学管理：班级管理、学员管理、进度监控\n7. 营销系统：优惠券、团购、限时折扣",
+  "entities": [
+    {
+      "name": "User",
+      "type": "aggregate",
+      "attributes": ["id", "username", "email", "password", "name", "phone", "avatar", "role", "createdAt"],
+      "description": "用户聚合根（学生/老师/管理员）"
+    },
+    {
+      "name": "Course",
+      "type": "aggregate",
+      "attributes": ["id", "teacherId", "title", "description", "cover", "price", "category", "tags", "status", "chapters", "duration", "enrollmentCount", "rating", "createdAt"],
+      "description": "课程聚合根"
+    },
+    {
+      "name": "Chapter",
+      "type": "entity",
+      "attributes": ["id", "courseId", "title", "sortOrder", "lessons"],
+      "description": "课程章节"
+    },
+    {
+      "name": "Lesson",
+      "type": "entity",
+      "attributes": ["id", "chapterId", "title", "type", "content", "duration", "sortOrder", "isFree"],
+      "description": "课时"
+    },
+    {
+      "name": "Enrollment",
+      "type": "entity",
+      "attributes": ["id", "userId", "courseId", "status", "progress", "enrolledAt", "expiredAt"],
+      "description": "课程报名"
+    },
+    {
+      "name": "Progress",
+      "type": "entity",
+      "attributes": ["id", "userId", "lessonId", "status", "watchTime", "completedAt"],
+      "description": "学习进度"
+    },
+    {
+      "name": "Note",
+      "type": "entity",
+      "attributes": ["id", "userId", "lessonId", "content", "timestamp", "createdAt"],
+      "description": "学习笔记"
+    },
+    {
+      "name": "Assignment",
+      "type": "aggregate",
+      "attributes": ["id", "courseId", "title", "description", "type", "questions", "duration", "totalScore", "passScore", "dueDate"],
+      "description": "作业/考试聚合根"
+    },
+    {
+      "name": "Submission",
+      "type": "entity",
+      "attributes": ["id", "assignmentId", "userId", "answers", "score", "status", "submittedAt", "gradedAt"],
+      "description": "作业提交"
+    },
+    {
+      "name": "Question",
+      "type": "entity",
+      "attributes": ["id", "type", "content", "options", "correctAnswer", "score", "analysis"],
+      "description": "题目"
+    },
+    {
+      "name": "Discussion",
+      "type": "entity",
+      "attributes": ["id", "courseId", "lessonId", "userId", "content", "parentId", "likesCount", "createdAt"],
+      "description": "讨论区"
+    },
+    {
+      "name": "Certificate",
+      "type": "entity",
+      "attributes": ["id", "userId", "courseId", "issueDate", "certificateNo"],
+      "description": "结业证书"
+    },
+    {
+      "name": "Coupon",
+      "type": "entity",
+      "attributes": ["id", "code", "type", "value", "minAmount", "validFrom", "validTo", "usageLimit", "usedCount"],
+      "description": "优惠券"
+    }
+  ],
+  "features": [
+    {
+      "name": "用户系统",
+      "priority": "core",
+      "description": "学生注册、老师入驻、角色权限管理",
+      "entities": ["User"]
+    },
+    {
+      "name": "课程管理",
+      "priority": "core",
+      "description": "老师创建课程、编辑章节、上传课件、视频管理",
+      "entities": ["Course", "Chapter", "Lesson"]
+    },
+    {
+      "name": "在线学习",
+      "priority": "core",
+      "description": "课程购买、视频播放、进度跟踪、学习笔记",
+      "entities": ["Enrollment", "Progress", "Note", "Lesson"]
+    },
+    {
+      "name": "作业考试",
+      "priority": "core",
+      "description": "布置作业、在线答题、自动批改、成绩统计",
+      "entities": ["Assignment", "Submission", "Question"]
+    },
+    {
+      "name": "师生互动",
+      "priority": "important",
+      "description": "提问答疑、讨论区、课程评价",
+      "entities": ["Discussion", "User", "Course"]
+    },
+    {
+      "name": "教学管理",
+      "priority": "important",
+      "description": "班级管理、学员进度监控、统计分析",
+      "entities": ["Enrollment", "Progress", "User"]
+    },
+    {
+      "name": "证书管理",
+      "priority": "optional",
+      "description": "结业证书颁发、证书验证",
+      "entities": ["Certificate", "Enrollment"]
+    },
+    {
+      "name": "营销推广",
+      "priority": "optional",
+      "description": "优惠券、团购、限时折扣、拼团",
+      "entities": ["Coupon", "Enrollment"]
+    }
+  ],
+  "metadata": {
+    "complexity": "complex",
+    "estimatedTime": "3-4周",
+    "techStack": ["React", "Node.js", "MongoDB", "Redis", "OSS"],
+    "tags": ["教育", "在线学习", "课程", "直播", "考试", "作业"]
+  }
+}

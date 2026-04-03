@@ -15,7 +15,9 @@
 
 import React, { memo, useCallback } from 'react';
 import { useHistoryStore } from '@/lib/canvas/historySlice';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useContextStore } from '@/lib/canvas/stores/contextStore';
+import { useFlowStore } from '@/lib/canvas/stores/flowStore';
+import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import styles from './UndoBar.module.css';
 
 export const UndoBar = memo(function UndoBar() {
@@ -44,26 +46,25 @@ export const UndoBar = memo(function UndoBar() {
   // === Action: Undo ===
   const handleUndo = useCallback(() => {
     const historyStore = useHistoryStore.getState();
-    const canvasStore = useCanvasStore.getState();
 
     if (historyStore.canUndo('context')) {
       const prev = historyStore.undo('context');
       if (prev) {
-        canvasStore.setContextNodes(prev as typeof canvasStore.contextNodes);
+        useContextStore.getState().setContextNodes(prev as any);
         return;
       }
     }
     if (historyStore.canUndo('flow')) {
       const prev = historyStore.undo('flow');
       if (prev) {
-        canvasStore.setFlowNodes(prev as typeof canvasStore.flowNodes);
+        useFlowStore.getState().setFlowNodes(prev as any);
         return;
       }
     }
     if (historyStore.canUndo('component')) {
       const prev = historyStore.undo('component');
       if (prev) {
-        canvasStore.setComponentNodes(prev as typeof canvasStore.componentNodes);
+        useComponentStore.getState().setComponentNodes(prev as any);
       }
     }
   }, []);
@@ -71,26 +72,25 @@ export const UndoBar = memo(function UndoBar() {
   // === Action: Redo ===
   const handleRedo = useCallback(() => {
     const historyStore = useHistoryStore.getState();
-    const canvasStore = useCanvasStore.getState();
 
     if (historyStore.canRedo('context')) {
       const next = historyStore.redo('context');
       if (next) {
-        canvasStore.setContextNodes(next as typeof canvasStore.contextNodes);
+        useContextStore.getState().setContextNodes(next as any);
         return;
       }
     }
     if (historyStore.canRedo('flow')) {
       const next = historyStore.redo('flow');
       if (next) {
-        canvasStore.setFlowNodes(next as typeof canvasStore.flowNodes);
+        useFlowStore.getState().setFlowNodes(next as any);
         return;
       }
     }
     if (historyStore.canRedo('component')) {
       const next = historyStore.redo('component');
       if (next) {
-        canvasStore.setComponentNodes(next as typeof canvasStore.componentNodes);
+        useComponentStore.getState().setComponentNodes(next as any);
       }
     }
   }, []);

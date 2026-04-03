@@ -8,7 +8,10 @@
 'use client';
 
 import { useCallback, useRef, useState } from 'react';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useContextStore } from '@/lib/canvas/stores/contextStore';
+import { useFlowStore } from '@/lib/canvas/stores/flowStore';
+import { useComponentStore } from '@/lib/canvas/stores/componentStore';
+import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import type { CanvasSnapshot } from '@/lib/canvas/types';
 
@@ -54,13 +57,13 @@ export function useVersionHistory(): UseVersionHistoryReturn {
   const lastSnapshotTimeRef = useRef<number>(0);
 
   // Store selectors
-  const contextNodes = useCanvasStore((s) => s.contextNodes);
-  const flowNodes = useCanvasStore((s) => s.flowNodes);
-  const componentNodes = useCanvasStore((s) => s.componentNodes);
-  const projectId = useCanvasStore((s) => s.projectId);
-  const setContextNodes = useCanvasStore((s) => s.setContextNodes);
-  const setFlowNodes = useCanvasStore((s) => s.setFlowNodes);
-  const setComponentNodes = useCanvasStore((s) => s.setComponentNodes);
+  const contextNodes = useContextStore((s) => s.contextNodes);
+  const flowNodes = useFlowStore((s) => s.flowNodes);
+  const componentNodes = useComponentStore((s) => s.componentNodes);
+  const projectId = useSessionStore((s) => s.projectId);
+  const setContextNodes = useContextStore((s) => s.setContextNodes);
+  const setFlowNodes = useFlowStore((s) => s.setFlowNodes);
+  const setComponentNodes = useComponentStore((s) => s.setComponentNodes);
 
   const loadSnapshots = useCallback(async () => {
     setLoading(true);

@@ -10,7 +10,8 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useContextStore } from '@/lib/canvas/stores/contextStore';
+import { useUIStore } from '@/lib/canvas/stores/uiStore';
 import { addCommandMessage } from './messageDrawerStore';
 import { CommandList } from './CommandList';
 import styles from './messageDrawer.module.css';
@@ -34,10 +35,10 @@ export function CommandInput() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   // F2.4: Check selected nodes for filtering
-  const selectedNodeIds = useCanvasStore((s) => s.selectedNodeIds);
-  const openRightDrawer = useCanvasStore((s) => s.openRightDrawer);
-  const submitCanvas = useCanvasStore((s) => s.submitCanvas);
-  const hasSelection = selectedNodeIds.context.length > 0 || selectedNodeIds.flow.length > 0 || selectedNodeIds.component.length > 0;
+  const selectedNodeIds = useContextStore((s) => s.selectedNodeIds);
+  const toggleRightDrawer = useUIStore((s) => s.toggleRightDrawer);
+  const submitCanvas = useUIStore((s) => s.submitCanvas);
+  const hasSelection = selectedNodeIds.context.length > 0 || selectedNodeIds.flow.length > 0;
 
   // ── Filter commands based on input keyword + node selection ──────────
   const filteredCommands = useCallback(() => {
@@ -86,12 +87,12 @@ export function CommandInput() {
     addCommandMessage(cmd.label, logMsg);
 
     // [E2] Auto-open right drawer after command execution
-    openRightDrawer();
+    toggleRightDrawer();
 
     // Close list and clear input
     setIsCommandListOpen(false);
     setInputValue('');
-  }, [openRightDrawer, submitCanvas]);
+  }, [toggleRightDrawer, submitCanvas]);
 
   // ── Click outside to close ────────────────────────────────────────────
   useEffect(() => {

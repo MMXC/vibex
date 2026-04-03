@@ -10,6 +10,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import type { ComponentNode } from '../types';
+import { getHistoryStore } from '../historySlice';
 
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -36,6 +37,7 @@ interface ComponentStore {
   clearNodeSelection: () => void;
   selectAllNodes: () => void;
   deleteSelectedNodes: () => void;
+  clearComponentCanvas: () => void;
 }
 
 export const useComponentStore = create<ComponentStore>()(
@@ -105,6 +107,11 @@ export const useComponentStore = create<ComponentStore>()(
           if (selectedNodeIds.length === 0) return;
           const toDelete = new Set(selectedNodeIds);
           set({ componentNodes: componentNodes.filter((n) => !toDelete.has(n.nodeId)), selectedNodeIds: [] });
+        },
+
+        clearComponentCanvas: () => {
+          getHistoryStore().recordSnapshot('component', []);
+          set({ componentNodes: [], selectedNodeIds: [], componentDraft: null });
         },
       }),
       { name: 'vibex-component-store' }

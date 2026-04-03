@@ -14,22 +14,25 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useUIStore } from '@/lib/canvas/stores/uiStore';
+import { useContextStore } from '@/lib/canvas/stores/contextStore';
+import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
 import { getHistory, addHistory } from './requirementHistoryStore';
 import type { RequirementHistoryItem } from './requirementHistoryStore';
+import type { BoundedContextNode, BoundedContextDraft } from '@/lib/canvas/types';
 import styles from './leftDrawer.module.css';
 
 export function LeftDrawer() {
-  // ── Drawer state from canvasStore (Epic 1) ──────────────────────
-  const isOpen = useCanvasStore((s) => s.leftDrawerOpen);
-  const toggleLeftDrawer = useCanvasStore((s) => s.toggleLeftDrawer);
+  // ── Drawer state from UI store ────────────────────────────────
+  const isOpen = useUIStore((s) => s.leftDrawerOpen);
+  const toggleLeftDrawer = useUIStore((s) => s.toggleLeftDrawer);
 
-  // ── AI thinking state from canvasStore ─────────────────────────
-  const aiThinking = useCanvasStore((s) => s.aiThinking);
-  const aiThinkingMessage = useCanvasStore((s) => s.aiThinkingMessage);
-  const generateContexts = useCanvasStore((s) => s.generateContextsFromRequirement);
-  const setRequirementText = useCanvasStore((s) => s.setRequirementText);
-  const requirementText = useCanvasStore((s) => s.requirementText);
+  // ── AI thinking state from session store ───────────────────────
+  const aiThinking = useSessionStore((s) => s.aiThinking);
+  const aiThinkingMessage = useSessionStore((s) => s.aiThinkingMessage);
+  const setRequirementText = useSessionStore((s) => s.setRequirementText);
+  const requirementText = useSessionStore((s) => s.requirementText);
+  const setContextNodes = useContextStore((s) => s.setContextNodes);
 
   // ── Local state ────────────────────────────────────────────────
   const [inputValue, setInputValue] = useState(requirementText);
@@ -57,9 +60,21 @@ export function LeftDrawer() {
     // Sync to store
     setRequirementText(text);
 
-    // Trigger generation
-    generateContexts(text);
-  }, [inputValue, aiThinking, setRequirementText, generateContexts]);
+    // Trigger generation: inline mock context generation
+    const drafts: BoundedContextDraft[] = [
+      { name: '需求管理', description: '处理需求录入', type: 'core' },
+      { name: '业务流程', description: '核心业务处理', type: 'core' },
+    ];
+    const newCtxs: BoundedContextNode[] = drafts.map((d, i) => ({
+      nodeId: `ctx-gen-${Date.now()}-${i}`,
+      name: d.name,
+      description: d.description,
+      type: d.type,
+      status: 'pending' as const,
+      children: [],
+    }));
+    setContextNodes(newCtxs);
+  }, [inputValue, aiThinking, setRequirementText, setContextNodes]);
 
   // ── Keyboard shortcut: Ctrl/Cmd+Enter to send ──────────────────
   const handleKeyDown = useCallback(

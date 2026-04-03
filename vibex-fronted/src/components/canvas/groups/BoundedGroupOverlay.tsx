@@ -24,7 +24,7 @@
 'use client';
 
 import React, { useMemo, memo } from 'react';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import type { Node } from '@xyflow/react';
 import type { BoundedGroup, BoundedGroupBBox } from '@/lib/canvas/types';
 import { BOUNDED_GROUP_COLORS, DEFAULT_GROUP_STROKE_DASHARRAY, DEFAULT_GROUP_STROKE_WIDTH, DEFAULT_GROUP_PADDING } from '@/lib/canvas/types';
@@ -135,7 +135,7 @@ function BoundedGroupOverlayComponent({
   zoom = 1,
   pan = { x: 0, y: 0 },
 }: BoundedGroupOverlayProps) {
-  const boundedGroups = useCanvasStore((s) => s.boundedGroups);
+  const boundedGroups = useContextStore((s) => s.boundedGroups);
 
   const bboxes = useMemo(
     () => computeGroupBBoxes(nodes, boundedGroups),

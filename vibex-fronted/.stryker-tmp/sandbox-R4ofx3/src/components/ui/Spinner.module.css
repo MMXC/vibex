@@ -1,0 +1,63 @@
+/* Spinner Component Styles */
+
+.spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary, #6366f1);
+}
+
+.spinner svg {
+  width: 1em;
+  height: 1em;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Sizes */
+.small {
+  font-size: 14px;
+}
+
+.medium {
+  font-size: 20px;
+}
+
+.large {
+  font-size: 32px;
+}
+
+/* Container for text + spinner */
+.container {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+}
+
+/* Text position variations */
+.text-left {
+  flex-direction: row;
+}
+
+.text-right {
+  flex-direction: row;
+}
+
+.text-bottom {
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+}
+
+.text {
+  color: var(--color-text-secondary, #6b7280);
+  font-size: var(--text-sm, 0.875rem);
+  font-family: var(--font-sans, system-ui);
+}

@@ -1,0 +1,109 @@
+/* EmptyState Component Styles */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-12) var(--space-6);
+  text-align: center;
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--color-border);
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all var(--duration-normal) var(--ease-out-expo);
+}
+
+/* Icon */
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-muted);
+  border: 1px solid var(--color-border);
+}
+
+.icon {
+  width: 28px;
+  height: 28px;
+  color: var(--color-primary);
+}
+
+/* Content */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 320px;
+}
+
+.title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  line-height: var(--leading-tight);
+  margin: 0;
+}
+
+.description {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-normal);
+  margin: 0;
+}
+
+/* Action */
+.action {
+  margin-top: var(--space-2);
+}
+
+/* Variants */
+.default {
+  border-color: var(--color-border);
+}
+
+.search {
+  border-color: var(--color-border);
+}
+
+.search .iconWrapper {
+  background: var(--color-accent-muted);
+}
+
+.search .icon {
+  color: var(--color-accent);
+}
+
+.projects {
+  border-color: var(--color-border);
+}
+
+.projects .iconWrapper {
+  background: rgba(0, 255, 136, 0.1);
+}
+
+.projects .icon {
+  color: var(--color-success);
+}
+
+.error {
+  border-color: rgba(255, 68, 102, 0.3);
+  background: rgba(255, 68, 102, 0.05);
+}
+
+.error .iconWrapper {
+  background: rgba(255, 68, 102, 0.1);
+  border-color: rgba(255, 68, 102, 0.3);
+}
+
+.error .icon {
+  color: var(--color-error);
+}
+
+.error .title {
+  color: var(--color-error);
+}

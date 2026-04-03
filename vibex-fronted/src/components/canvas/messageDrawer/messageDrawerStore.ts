@@ -18,7 +18,7 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -72,13 +72,13 @@ export const useMessageDrawerStore = create<MessageDrawerState>()(
           timestamp: Date.now(),
         };
         // Sync to canvasStore (Epic 6: canvasStore is the source of truth with persist)
-        useCanvasStore.getState().addMessage(msg);
+        useSessionStore.getState().addMessage(msg);
         // Also update local state
         set((s) => ({ messages: [...s.messages, newMsg] }));
       },
 
       clearMessages: () => {
-        useCanvasStore.getState().clearMessages();
+        useSessionStore.getState().clearMessages();
         set({ messages: [] });
       },
     }),

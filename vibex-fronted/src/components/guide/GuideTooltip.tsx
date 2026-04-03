@@ -127,6 +127,7 @@ export const GuideTooltip = memo(function GuideTooltip({
   onPrev,
   onNext,
   onSkip,
+  children,
 }: GuideTooltipProps) {
   const [pos, setPos] = useState<Position | null>(null);
   const [mounted, setMounted] = useState(false);

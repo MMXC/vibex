@@ -7,7 +7,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useUIStore } from '@/lib/canvas/stores/uiStore';
 import styles from './hoverHotzone.module.css';
 
 interface HoverHotzoneProps {
@@ -46,21 +46,21 @@ function ExpandArrow({ direction }: { direction: 'left' | 'right' | 'contract' }
 export function HoverHotzone({ position, panel, centerExpandDirection }: HoverHotzoneProps) {
   const [hovered, setHovered] = useState(false);
 
-  const togglePanel = useCanvasStore((s) => s.togglePanel);
-  const setCenterExpand = useCanvasStore((s) => s.setCenterExpand);
-  const resetExpand = useCanvasStore((s) => s.resetExpand);
-  const isDragging = useCanvasStore((s) => s.isDragging);
+  const togglePanel = useUIStore((s) => s.togglePanel);
+  const setCenterExpand = useUIStore((s) => s.setCenterExpand);
+  const resetExpand = useUIStore((s) => s.resetExpand);
+  const isDragging = useUIStore((s) => s.isDragging);
 
-  const expandState = useCanvasStore((s) => {
+  const expandState = useUIStore((s) => {
     if (panel === 'left') return s.leftExpand;
     if (panel === 'center') return s.centerExpand;
     return s.rightExpand;
   });
 
   // E2-3: Highlight hotzone when adjacent panels are expanded
-  const leftExpand = useCanvasStore((s) => s.leftExpand);
-  const rightExpand = useCanvasStore((s) => s.rightExpand);
-  const centerExpand = useCanvasStore((s) => s.centerExpand);
+  const leftExpand = useUIStore((s) => s.leftExpand);
+  const rightExpand = useUIStore((s) => s.rightExpand);
+  const centerExpand = useUIStore((s) => s.centerExpand);
 
   // Determine if this hotzone should be visually highlighted
   // (adjacent panel is expanded, indicating content is available)

@@ -18,7 +18,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
 import { canvasApi, startPolling, stopPolling } from '@/lib/canvas/api/canvasApi';
 import type { PrototypePage, PrototypeStatus } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
@@ -129,13 +129,13 @@ export interface PrototypeQueuePanelProps {
 
 export function PrototypeQueuePanel({ expanded, onToggleExpand }: PrototypeQueuePanelProps) {
   // === Store selectors ===
-  const prototypeQueue = useCanvasStore((s) => s.prototypeQueue);
-  const projectId = useCanvasStore((s) => s.projectId);
-  const isPolling = useCanvasStore((s) => s.isPolling);
-  const updateQueueItem = useCanvasStore((s) => s.updateQueueItem);
-  const setIsPolling = useCanvasStore((s) => s.setIsPolling);
-  const removeFromQueue = useCanvasStore((s) => s.removeFromQueue);
-  const clearQueue = useCanvasStore((s) => s.clearQueue);
+  const prototypeQueue = useSessionStore((s) => s.prototypeQueue);
+  const projectId = useSessionStore((s) => s.projectId);
+  const isPolling = useSessionStore((s) => s.isPolling);
+  const updateQueueItem = useSessionStore((s) => s.updateQueueItem);
+  const setIsPolling = useSessionStore((s) => s.setIsPolling);
+  const removeFromQueue = useSessionStore((s) => s.removeFromQueue);
+  const clearQueue = useSessionStore((s) => s.clearQueue);
 
   const pollingRef = useRef(false);
 

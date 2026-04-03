@@ -8,7 +8,9 @@
  */
 
 import React from 'react';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useContextStore } from '@/lib/canvas/stores/contextStore';
+import { useFlowStore } from '@/lib/canvas/stores/flowStore';
+import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import type { TreeType } from '@/lib/canvas/types';
 import styles from './TabBar.module.css';
 
@@ -24,11 +26,11 @@ interface TabBarProps {
 }
 
 export function TabBar({ onTabChange }: TabBarProps) {
-  const activeTree = useCanvasStore((s) => s.activeTree);
-  const contextNodes = useCanvasStore((s) => s.contextNodes);
-  const flowNodes = useCanvasStore((s) => s.flowNodes);
-  const componentNodes = useCanvasStore((s) => s.componentNodes);
-  const setActiveTree = useCanvasStore((s) => s.setActiveTree);
+  const activeTree = useContextStore((s) => s.activeTree);
+  const contextNodes = useContextStore((s) => s.contextNodes);
+  const flowNodes = useFlowStore((s) => s.flowNodes);
+  const componentNodes = useComponentStore((s) => s.componentNodes);
+  const setActiveTree = useContextStore((s) => s.setActiveTree);
 
   const counts = {
     context: contextNodes.length,

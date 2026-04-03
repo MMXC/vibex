@@ -9,9 +9,9 @@
  */
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import type { BusinessFlowNode, BusinessFlowDraft, FlowStep } from '../types';
+import type { BusinessFlowNode, BusinessFlowDraft, FlowStep, BoundedContextNode } from '../types';
 import { getHistoryStore } from '../historySlice';
-import { useCanvasStore } from '../canvasStore'; // for addMessage side effect
+import { useSessionStore } from './sessionStore';
 
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -21,6 +21,7 @@ interface FlowStore {
   // State
   flowNodes: BusinessFlowNode[];
   flowDraft: Partial<BusinessFlowNode> | null;
+  flowGenerating: boolean;
 
   // Node CRUD
   setFlowNodes: (nodes: BusinessFlowNode[]) => void;
@@ -29,6 +30,7 @@ interface FlowStore {
   deleteFlowNode: (nodeId: string) => void;
   confirmFlowNode: (nodeId: string) => void;
   toggleFlowNode: (nodeId: string) => void;
+  autoGenerateFlows: (contextNodes: BoundedContextNode[]) => void;
 
   // Step CRUD
   confirmStep: (flowNodeId: string, stepId: string) => void;
@@ -48,8 +50,43 @@ export const useFlowStore = create<FlowStore>()(
         // State
         flowNodes: [],
         flowDraft: null,
+        flowGenerating: false,
 
         setFlowNodes: (nodes) => set({ flowNodes: nodes }),
+
+        autoGenerateFlows: async (contextNodes) => {
+          const confirmedCtxs = contextNodes.filter((c) => c.status === 'confirmed' || c.isActive !== false);
+          if (confirmedCtxs.length === 0) return;
+
+          set({ flowGenerating: true });
+
+          // Mock AI generation: simulate API delay
+          await new Promise((r) => setTimeout(r, 1500));
+
+          const newFlows: BusinessFlowNode[] = confirmedCtxs.map((ctx) => {
+            const defaultSteps: FlowStep[] = [
+              { stepId: generateId(), name: '需求收集', actor: '用户', description: '', order: 0, isActive: false, status: 'pending' },
+              { stepId: generateId(), name: '信息录入', actor: '用户', description: '', order: 1, isActive: false, status: 'pending' },
+              { stepId: generateId(), name: '提交确认', actor: '用户', description: '', order: 2, isActive: false, status: 'pending' },
+            ];
+            return {
+              nodeId: generateId(),
+              contextId: ctx.nodeId,
+              name: `${ctx.name}业务流程`,
+              steps: defaultSteps,
+              isActive: false,
+              status: 'pending' as const,
+              children: [],
+            };
+          });
+
+          set((s) => {
+            const allFlows = [...s.flowNodes, ...newFlows];
+            getHistoryStore().recordSnapshot('flow', allFlows);
+            return { flowNodes: allFlows, flowGenerating: false };
+          });
+          useSessionStore.getState().addMessage({ type: 'user_action', content: `自动生成了 ${newFlows.length} 个流程节点` });
+        },
 
         addFlowNode: (data) => {
           const newNode: BusinessFlowNode = {
@@ -72,7 +109,7 @@ export const useFlowStore = create<FlowStore>()(
             getHistoryStore().recordSnapshot('flow', newNodes);
             return { flowNodes: newNodes };
           });
-          useCanvasStore.getState().addMessage?.({ type: 'user_action', content: `添加了流程节点`, meta: data.name });
+          useSessionStore.getState().addMessage({ type: 'user_action', content: `添加了流程节点`, meta: data.name });
         },
 
         editFlowNode: (nodeId, data) => {
@@ -93,7 +130,7 @@ export const useFlowStore = create<FlowStore>()(
             getHistoryStore().recordSnapshot('flow', newNodes);
             return { flowNodes: newNodes };
           });
-          useCanvasStore.getState().addMessage?.({ type: 'user_action', content: `删除了流程节点`, meta: deletedName });
+          useSessionStore.getState().addMessage({ type: 'user_action', content: `删除了流程节点`, meta: deletedName });
         },
 
         confirmFlowNode: (nodeId) => {

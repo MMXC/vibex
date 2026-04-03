@@ -1,0 +1,52 @@
+#!/bin/sh
+
+# Vibex pre-commit hook
+# Security checks + tests before commit
+
+# Check for --no-verify skip option
+if [ "$1" = "--no-verify" ]; then
+  echo "⚠️ Pre-commit checks skipped via --no-verify"
+  echo "⚠️ WARNING: You are bypassing security checks!"
+  echo "⚠️ Please ensure you understand the security implications."
+  exit 0
+fi
+
+echo "🔒 Running pre-commit checks..."
+
+# 1. 敏感信息扫描 (如果 gitleaks 可用)
+if command -v gitleaks &> /dev/null; then
+  echo "Checking for sensitive data..."
+  gitleaks detect --staged --config .gitleaks.toml --no-git
+  if [ $? -ne 0 ]; then
+    echo "❌ Sensitive data detected! Please review and remove."
+    exit 1
+  fi
+else
+  echo "⚠️ gitleaks not installed locally. CI will check for sensitive data."
+fi
+
+# 2. 依赖漏洞检查
+echo "Checking dependencies..."
+npm audit --audit-level=high
+if [ $? -ne 0 ]; then
+  echo "❌ Vulnerabilities found!"
+  exit 1
+fi
+
+# 3. TypeScript 类型检查
+echo "Running TypeScript type check..."
+npx tsc --noEmit
+if [ $? -ne 0 ]; then
+  echo "❌ TypeScript check failed!"
+  exit 1
+fi
+
+# 4. 运行测试
+echo "Running tests..."
+npm test
+if [ $? -ne 0 ]; then
+  echo "❌ Tests failed!"
+  exit 1
+fi
+
+echo "✅ All pre-commit checks passed!"

@@ -11,7 +11,7 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useContextStore } from '@/lib/canvas/stores/contextStore';
 // [E1] 注释 RelationshipConnector — 简化 UI，移除卡片间连线
 // import { RelationshipConnector } from './edges/RelationshipConnector';
 import { BoundedContextGroup } from './BoundedContextGroup';
@@ -134,7 +134,7 @@ interface ContextCardProps {
 }
 
 function ContextCard({ node, onEdit, onDelete, readonly, selected, onToggleSelect }: ContextCardProps) {
-  const toggleContextNode = useCanvasStore((s) => s.toggleContextNode);
+  const toggleContextNode = useContextStore((s) => s.toggleContextNode);
   const [editing, setEditing] = useState(false);
   const [editState, setEditState] = useState<NodeEditState>({
     nodeId: node.nodeId,
@@ -332,18 +332,18 @@ function AddNodeForm({ onAdd }: AddNodeFormProps) {
 // =============================================================================
 
 export function BoundedContextTree({ readonly = false, isActive: _isActive = true }: BoundedContextTreeProps) {
-  const contextNodes = useCanvasStore((s) => s.contextNodes);
-  const addContextNode = useCanvasStore((s) => s.addContextNode);
-  const editContextNode = useCanvasStore((s) => s.editContextNode);
-  const deleteContextNode = useCanvasStore((s) => s.deleteContextNode);
-  const setContextNodes = useCanvasStore((s) => s.setContextNodes);
-  const advancePhase = useCanvasStore((s) => s.advancePhase);
+  const contextNodes = useContextStore((s) => s.contextNodes);
+  const addContextNode = useContextStore((s) => s.addContextNode);
+  const editContextNode = useContextStore((s) => s.editContextNode);
+  const deleteContextNode = useContextStore((s) => s.deleteContextNode);
+  const setContextNodes = useContextStore((s) => s.setContextNodes);
+  const advancePhase = useContextStore((s) => s.advancePhase);
 
   // F3-F10: Multi-select state
-  const selectedNodeIds = useCanvasStore((s) => s.selectedNodeIds);
-  const toggleNodeSelect = useCanvasStore((s) => s.toggleNodeSelect);
-  const clearNodeSelection = useCanvasStore((s) => s.clearNodeSelection);
-  const deleteSelectedNodes = useCanvasStore((s) => s.deleteSelectedNodes);
+  const selectedNodeIds = useContextStore((s) => s.selectedNodeIds);
+  const toggleNodeSelect = useContextStore((s) => s.toggleNodeSelect);
+  const clearNodeSelection = useContextStore((s) => s.clearNodeSelection);
+  const deleteSelectedNodes = useContextStore((s) => s.deleteSelectedNodes);
 
   const selectedIds = new Set(selectedNodeIds.context);
   const selectedCount = selectedIds.size;

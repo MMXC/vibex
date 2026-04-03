@@ -10,7 +10,11 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useContextStore } from '@/lib/canvas/stores/contextStore';
+import { useFlowStore } from '@/lib/canvas/stores/flowStore';
+import { useComponentStore } from '@/lib/canvas/stores/componentStore';
+import { useUIStore } from '@/lib/canvas/stores/uiStore';
+import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import { hasNodes } from '@/lib/canvas/cascade';
 import type { CreateProjectInput, PrototypePage } from '@/lib/canvas/types';
@@ -18,8 +22,8 @@ import { getHistoryStore } from '@/lib/canvas/historySlice';
 
 // ── Epic 1 F1.2: Message Drawer Toggle ────────────────────────────────────
 function LeftDrawerToggle() {
-  const isOpen = useCanvasStore((s) => s.leftDrawerOpen);
-  const toggleLeftDrawer = useCanvasStore((s) => s.toggleLeftDrawer);
+  const isOpen = useUIStore((s) => s.leftDrawerOpen);
+  const toggleLeftDrawer = useUIStore((s) => s.toggleLeftDrawer);
 
   return (
     <button
@@ -39,9 +43,9 @@ function LeftDrawerToggle() {
 }
 
 function MessageDrawerToggle() {
-  // S3.1: Use canvasStore.rightDrawerOpen instead of messageDrawerStore
-  const isOpen = useCanvasStore((s) => s.rightDrawerOpen);
-  const toggleRightDrawer = useCanvasStore((s) => s.toggleRightDrawer);
+  // S3.1: Use UI store for drawer state
+  const isOpen = useUIStore((s) => s.rightDrawerOpen);
+  const toggleRightDrawer = useUIStore((s) => s.toggleRightDrawer);
 
   return (
     <button
@@ -96,14 +100,14 @@ export function ProjectBar({
   onOpenHistory,
   onOpenShortcuts,
 }: ProjectBarProps) {
-  const contextNodes = useCanvasStore((s) => s.contextNodes);
-  const flowNodes = useCanvasStore((s) => s.flowNodes);
-  const componentNodes = useCanvasStore((s) => s.componentNodes);
-  const projectId = useCanvasStore((s) => s.projectId);
-  const setProjectId = useCanvasStore((s) => s.setProjectId);
-  const addToQueue = useCanvasStore((s) => s.addToQueue);
-  const setPhase = useCanvasStore((s) => s.setPhase);
-  const prototypeQueue = useCanvasStore((s) => s.prototypeQueue);
+  const contextNodes = useContextStore((s) => s.contextNodes);
+  const flowNodes = useFlowStore((s) => s.flowNodes);
+  const componentNodes = useComponentStore((s) => s.componentNodes);
+  const projectId = useSessionStore((s) => s.projectId);
+  const setProjectId = useSessionStore((s) => s.setProjectId);
+  const addToQueue = useSessionStore((s) => s.addToQueue);
+  const setPhase = useContextStore((s) => s.setPhase);
+  const prototypeQueue = useSessionStore((s) => s.prototypeQueue);
 
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
@@ -111,43 +115,41 @@ export function ProjectBar({
   // === Undo/Redo handlers (Epic1 F1.3) ===
   const handleUndo = useCallback(() => {
     const historyStore = getHistoryStore();
-    const canvasStore = useCanvasStore.getState();
 
     // Priority: context > flow > component
     if (historyStore.canUndo('context')) {
       const prev = historyStore.undo('context');
-      if (prev) canvasStore.setContextNodes(prev as typeof canvasStore.contextNodes);
+      if (prev) useContextStore.getState().setContextNodes(prev as any);
       return;
     }
     if (historyStore.canUndo('flow')) {
       const prev = historyStore.undo('flow');
-      if (prev) canvasStore.setFlowNodes(prev as typeof canvasStore.flowNodes);
+      if (prev) useFlowStore.getState().setFlowNodes(prev as any);
       return;
     }
     if (historyStore.canUndo('component')) {
       const prev = historyStore.undo('component');
-      if (prev) canvasStore.setComponentNodes(prev as typeof canvasStore.componentNodes);
+      if (prev) useComponentStore.getState().setComponentNodes(prev as any);
     }
   }, []);
 
   const handleRedo = useCallback(() => {
     const historyStore = getHistoryStore();
-    const canvasStore = useCanvasStore.getState();
 
     // Priority: context > flow > component
     if (historyStore.canRedo('context')) {
       const next = historyStore.redo('context');
-      if (next) canvasStore.setContextNodes(next as typeof canvasStore.contextNodes);
+      if (next) useContextStore.getState().setContextNodes(next as any);
       return;
     }
     if (historyStore.canRedo('flow')) {
       const next = historyStore.redo('flow');
-      if (next) canvasStore.setFlowNodes(next as typeof canvasStore.flowNodes);
+      if (next) useFlowStore.getState().setFlowNodes(next as any);
       return;
     }
     if (historyStore.canRedo('component')) {
       const next = historyStore.redo('component');
-      if (next) canvasStore.setComponentNodes(next as typeof canvasStore.componentNodes);
+      if (next) useComponentStore.getState().setComponentNodes(next as any);
     }
   }, []);
 

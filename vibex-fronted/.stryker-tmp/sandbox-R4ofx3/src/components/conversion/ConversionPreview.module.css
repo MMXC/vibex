@@ -1,0 +1,133 @@
+/* Conversion Preview Component Styles */
+
+.container {
+  margin-top: 16px;
+  border: 1px solid var(--border-color, #2a2a3e);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--bg-secondary, #12121a);
+  border-bottom: 1px solid var(--border-color, #2a2a3e);
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #e4e4e7);
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.tab {
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-secondary, #a1a1aa);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  background: var(--bg-tertiary, #1a1a24);
+  color: var(--text-primary, #e4e4e7);
+}
+
+.tabActive {
+  background: var(--accent-color, #6366f1);
+  color: white;
+}
+
+.tabActive:hover {
+  background: var(--accent-hover, #4f46e5);
+  color: white;
+}
+
+.content {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.preview {
+  padding: 16px;
+  background: var(--bg-primary, #0a0a0f);
+}
+
+.text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary, #a1a1aa);
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: inherit;
+}
+
+.editor {
+  width: 100%;
+  min-height: 300px;
+  padding: 16px;
+  background: var(--bg-primary, #0a0a0f);
+  border: none;
+  color: var(--text-primary, #e4e4e7);
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.editor:focus {
+  outline: none;
+}
+
+.editor::placeholder {
+  color: var(--text-muted, #71717a);
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--bg-secondary, #12121a);
+  border-top: 1px solid var(--border-color, #2a2a3e);
+}
+
+.metadata {
+  display: flex;
+  gap: 8px;
+}
+
+.badge {
+  padding: 4px 8px;
+  background: var(--bg-tertiary, #1a1a24);
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--text-muted, #71717a);
+}
+
+.applyButton {
+  padding: 8px 16px;
+  background: var(--accent-color, #6366f1);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.applyButton:hover {
+  background: var(--accent-hover, #4f46e5);
+}

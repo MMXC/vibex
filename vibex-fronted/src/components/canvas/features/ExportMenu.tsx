@@ -10,7 +10,9 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useCanvasExport, type ExportFormat, type ExportScope } from '@/hooks/canvas/useCanvasExport';
 import { zipExporter, type BatchFormat } from '@/services/export/ZipExporter';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useContextStore } from '@/lib/canvas/stores/contextStore';
+import { useFlowStore } from '@/lib/canvas/stores/flowStore';
+import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import styles from './ExportMenu.module.css';
 
 interface ExportMenuProps {
@@ -34,7 +36,9 @@ export function ExportMenu({ label = '导出', disabled = false }: ExportMenuPro
   const [batchProgress, setBatchProgress] = useState<{ current: number; total: number } | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const { exportCanvas, isExporting } = useCanvasExport();
-  const { contextNodes, flowNodes, componentNodes } = useCanvasStore();
+  const contextNodes = useContextStore((s) => s.contextNodes);
+  const flowNodes = useFlowStore((s) => s.flowNodes);
+  const componentNodes = useComponentStore((s) => s.componentNodes);
 
   const clearStatusAfter = useCallback((ms: number) => {
     setTimeout(() => setExportStatus(null), ms);

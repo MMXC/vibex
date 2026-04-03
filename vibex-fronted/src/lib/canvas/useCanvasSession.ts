@@ -9,14 +9,18 @@
  */
 
 import { useMemo } from 'react';
-import { useCanvasStore } from './canvasStore';
+import { useContextStore } from './stores/contextStore';
+import { useFlowStore } from './stores/flowStore';
+import { useComponentStore } from './stores/componentStore';
+import { useUIStore } from './stores/uiStore';
+import { useSessionStore } from './stores/sessionStore';
 import { useMessageDrawerStore } from '@/components/canvas/messageDrawer/messageDrawerStore';
 
 /**
  * Session ID — use projectId if set, otherwise generate from timestamp
  */
 function useSessionId(): string {
-  const projectId = useCanvasStore((s) => s.projectId);
+  const projectId = useSessionStore((s) => s.projectId);
   return useMemo(() => projectId ?? `session-${Date.now()}`, [projectId]);
 }
 
@@ -24,11 +28,11 @@ export interface UseCanvasSessionReturn {
   /** Unique session identifier (projectId or generated) */
   sessionId: string;
   /** Bounded Context nodes */
-  contextNodes: ReturnType<typeof useCanvasStore.getState>['contextNodes'];
+  contextNodes: ReturnType<typeof useContextStore.getState>['contextNodes'];
   /** Business Flow nodes */
-  flowNodes: ReturnType<typeof useCanvasStore.getState>['flowNodes'];
+  flowNodes: ReturnType<typeof useFlowStore.getState>['flowNodes'];
   /** Component nodes */
-  componentNodes: ReturnType<typeof useCanvasStore.getState>['componentNodes'];
+  componentNodes: ReturnType<typeof useComponentStore.getState>['componentNodes'];
   /** Project ID (may be null) */
   projectId: string | null;
   /** Messages from message drawer */
@@ -55,27 +59,27 @@ export function useCanvasSession(): UseCanvasSessionReturn {
   const sessionId = useSessionId();
 
   // Three trees
-  const contextNodes = useCanvasStore((s) => s.contextNodes);
-  const flowNodes = useCanvasStore((s) => s.flowNodes);
-  const componentNodes = useCanvasStore((s) => s.componentNodes);
-  const projectId = useCanvasStore((s) => s.projectId);
+  const contextNodes = useContextStore((s) => s.contextNodes);
+  const flowNodes = useFlowStore((s) => s.flowNodes);
+  const componentNodes = useComponentStore((s) => s.componentNodes);
+  const projectId = useSessionStore((s) => s.projectId);
 
   // Messages
   const messages = useMessageDrawerStore((s) => s.messages);
 
   // Drawer state
-  const leftDrawerOpen = useCanvasStore((s) => s.leftDrawerOpen);
-  const rightDrawerOpen = useCanvasStore((s) => s.rightDrawerOpen);
+  const leftDrawerOpen = useUIStore((s) => s.leftDrawerOpen);
+  const rightDrawerOpen = useUIStore((s) => s.rightDrawerOpen);
 
   // AI status
-  const aiThinking = useCanvasStore((s) => s.aiThinking);
-  const aiThinkingMessage = useCanvasStore((s) => s.aiThinkingMessage);
-  const flowGenerating = useCanvasStore((s) => s.flowGenerating);
-  const flowGeneratingMessage = useCanvasStore((s) => s.flowGeneratingMessage);
+  const aiThinking = useSessionStore((s) => s.aiThinking);
+  const aiThinkingMessage = useSessionStore((s) => s.aiThinkingMessage);
+  const flowGenerating = useSessionStore((s) => s.flowGenerating);
+  const flowGeneratingMessage = useSessionStore((s) => s.flowGeneratingMessage);
 
   // SSE status
-  const sseStatus = useCanvasStore((s) => s.sseStatus);
-  const sseError = useCanvasStore((s) => s.sseError);
+  const sseStatus = useSessionStore((s) => s.sseStatus);
+  const sseError = useSessionStore((s) => s.sseError);
 
   return useMemo(
     () => ({

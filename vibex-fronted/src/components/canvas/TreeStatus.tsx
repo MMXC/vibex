@@ -11,13 +11,15 @@
 'use client';
 
 import React from 'react';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useContextStore } from '@/lib/canvas/stores/contextStore';
+import { useFlowStore } from '@/lib/canvas/stores/flowStore';
+import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import styles from './canvas.module.css';
 
 export function TreeStatus() {
-  const contextNodes = useCanvasStore((s) => s.contextNodes);
-  const flowNodes = useCanvasStore((s) => s.flowNodes);
-  const componentNodes = useCanvasStore((s) => s.componentNodes);
+  const contextNodes = useContextStore((s) => s.contextNodes);
+  const flowNodes = useFlowStore((s) => s.flowNodes);
+  const componentNodes = useComponentStore((s) => s.componentNodes);
 
   const activeContexts = (contextNodes ?? []).filter((n) => n.isActive !== false).length;
   const activeFlows = (flowNodes ?? []).filter((n) => n.isActive !== false).length;

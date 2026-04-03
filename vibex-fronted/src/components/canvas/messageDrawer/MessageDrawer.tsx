@@ -11,7 +11,8 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useUIStore } from '@/lib/canvas/stores/uiStore';
+import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
 import { MessageList } from './MessageList';
 import { CommandInput } from './CommandInput';
 import styles from './messageDrawer.module.css';
@@ -29,16 +30,16 @@ const SSE_STATUS_CONFIG: Record<
 };
 
 export function MessageDrawer() {
-  // S3.1: Read from canvasStore instead of messageDrawerStore
-  const isOpen = useCanvasStore((s) => s.rightDrawerOpen);
-  const toggleRightDrawer = useCanvasStore((s) => s.toggleRightDrawer);
+  // S3.1: Read from UI store
+  const isOpen = useUIStore((s) => s.rightDrawerOpen);
+  const toggleRightDrawer = useUIStore((s) => s.toggleRightDrawer);
 
-  // S3.2: SSE status
-  const sseStatus = useCanvasStore((s) => s.sseStatus);
-  const sseError = useCanvasStore((s) => s.sseError);
-  const abortGeneration = useCanvasStore((s) => s.abortGeneration);
-  const flowGenerating = useCanvasStore((s) => s.flowGenerating);
-  const aiThinking = useCanvasStore((s) => s.aiThinking);
+  // S3.2: SSE status from session store
+  const sseStatus = useSessionStore((s) => s.sseStatus);
+  const sseError = useSessionStore((s) => s.sseError);
+  const abortGeneration = useSessionStore((s) => s.abortGeneration);
+  const flowGenerating = useSessionStore((s) => s.flowGenerating);
+  const aiThinking = useSessionStore((s) => s.aiThinking);
 
   const isGenerating = flowGenerating || aiThinking;
   const statusCfg = SSE_STATUS_CONFIG[sseStatus] ?? SSE_STATUS_CONFIG.idle;

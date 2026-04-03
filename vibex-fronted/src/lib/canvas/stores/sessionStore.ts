@@ -32,6 +32,7 @@ interface SessionStore {
   sseStatus: SSEStatus;
   sseError: string | null;
   setSseStatus: (status: SSEStatus, error?: string) => void;
+  abortGeneration: () => void;
 
   // AI thinking state
   aiThinking: boolean;
@@ -69,6 +70,10 @@ export const useSessionStore = create<SessionStore>()(
         sseError: null,
         setSseStatus: (status, error) =>
           set({ sseStatus: status, sseError: error ?? null }),
+
+        abortGeneration: () => {
+          set({ sseStatus: 'idle', flowGenerating: false, aiThinking: false, aiThinkingMessage: null });
+        },
 
         // AI thinking
         aiThinking: false,

@@ -13,6 +13,7 @@
 'use client';
 
 import React, { useMemo, useState, useRef, useEffect, useCallback } from 'react';
+import type { BoundedContextNode, BusinessFlowNode, ComponentNode, BoundedContextDraft, FlowStep } from '@/lib/canvas/types';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
@@ -87,7 +88,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   // E3-F2: Delete selected node(s) based on active tree (multi-select batch delete)
   const deleteSelectedNodes = useContextStore((s) => s.deleteSelectedNodes);
   const autoGenerateFlows = useFlowStore((s) => s.autoGenerateFlows);
-  const generateComponentFromFlow = useComponentStore((s) => s.generateComponentFromFlow);
+  const setComponentNodes = useComponentStore((s) => s.setComponentNodes);
   const flowGenerating = useSessionStore((s) => s.flowGenerating);
   const flowGeneratingMessage = useSessionStore((s) => s.flowGeneratingMessage);
   // Epic1: Selection-based filtering — only send selected confirmed nodes
@@ -325,7 +326,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   // === AI Thinking State (Epic 1) ===
   const aiThinking = useSessionStore((s) => s.aiThinking);
   const aiThinkingMessage = useSessionStore((s) => s.aiThinkingMessage);
-  const generateContexts = useSessionStore((s) => s.generateContextsFromRequirement);
+  const setContextNodes = useContextStore((s) => s.setContextNodes);
   const setRequirementText = useSessionStore((s) => s.setRequirementText);
   const requirementText = useSessionStore((s) => s.requirementText);
 
@@ -449,9 +450,53 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     }));
   }, [componentNodes]);
 
-  // Store selectors for edge layers
-  const flowEdges = useContextStore((s) => s.flowEdges);
-  const boundedEdges = useContextStore((s) => s.boundedEdges);
+  // Store selectors for edge layers — computed locally from store state
+  const boundedEdges = useMemo(() => {
+    const nodes = contextNodes;
+    const edges = [];
+    let idx = 0;
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const a = nodes[i];
+        const b = nodes[j];
+        let relType = 'dependency';
+        if ((a.type === 'core' && b.type === 'supporting') || (a.type === 'supporting' && b.type === 'core')) relType = 'dependency';
+        else if ((a.type === 'generic' && b.type === 'core') || (a.type === 'core' && b.type === 'generic')) relType = 'dependency';
+        else if (a.type === 'core' && b.type === 'core') relType = 'dependency';
+        else if ((a.type === 'supporting' && b.type === 'supporting') || (a.type === 'supporting' && b.type === 'generic') || (a.type === 'generic' && b.type === 'supporting')) relType = 'association';
+        else if (a.type === 'external' || b.type === 'external') relType = 'dependency';
+        edges.push({ id: `bounded-edge-${idx++}`, from: { groupId: a.nodeId }, to: { groupId: b.nodeId }, type: relType as 'dependency' | 'association' | 'composition' });
+      }
+    }
+    return edges;
+  }, [contextNodes]);
+
+  const flowEdges = useMemo(() => {
+    const edges = [];
+    let edgeIdx = 0;
+    for (const node of flowNodes) {
+      const steps = node.steps;
+      if (steps.length < 2) continue;
+      for (let i = 0; i < steps.length - 1; i++) {
+        const from = steps[i];
+        const to = steps[i + 1];
+        const fromType = from.type ?? 'normal';
+        const toType = to.type ?? 'normal';
+        let edgeType: 'sequence' | 'branch' | 'loop' = 'sequence';
+        if (fromType === 'loop' || toType === 'loop') edgeType = 'loop';
+        else if (fromType === 'branch' || toType === 'branch') edgeType = 'branch';
+        edges.push({ id: `flow-edge-${edgeIdx++}`, from: from.stepId, to: to.stepId, type: edgeType as 'sequence' | 'branch' | 'loop' });
+      }
+      for (let i = 0; i < steps.length; i++) {
+        const step = steps[i];
+        if (step.type === 'loop' && step.description) {
+          const targetStep = steps.find((s, idx) => idx < i && s.name.includes(step.description!.replace('回到: ', '')));
+          if (targetStep) edges.push({ id: `flow-edge-${edgeIdx++}`, from: step.stepId, to: targetStep.stepId, type: 'loop' as const });
+        }
+      }
+    }
+    return edges;
+  }, [flowNodes]);
 
   const handleZoomIn = useCallback(() => {
     setZoomLevel((z) => Math.min(z + ZOOM_STEP, MAX_ZOOM));
@@ -523,24 +568,49 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     }
     setIsQuickGenerating(true);
     try {
-      // Step 1: Generate contexts
-      await generateContexts(requirementInput);
-      const ctxs = useContextStore.getState().contextNodes.filter((c) => c.isActive !== false);
+      // Step 1: Generate contexts (inline mock)
+      const ctxDrafts: BoundedContextDraft[] = [
+        { name: '需求管理', description: '处理用户需求录入与管理', type: 'core' },
+        { name: '订单处理', description: '处理订单创建、支付和履约', type: 'core' },
+        { name: '通知服务', description: '消息推送和通知管理', type: 'supporting' },
+      ];
+      const newCtxNodes: BoundedContextNode[] = ctxDrafts.map((d, i) => ({
+        nodeId: `ctx-gen-${Date.now()}-${i}`,
+        name: d.name,
+        description: d.description,
+        type: d.type,
+        status: 'pending' as const,
+        children: [],
+      }));
+      setContextNodes(newCtxNodes);
+      const ctxs = newCtxNodes.filter((c) => c.isActive !== false);
       if (ctxs.length === 0) {
         toast.showToast('未生成任何 Context 节点，请检查需求输入', 'error');
         return;
       }
       // Step 2: Auto-generate flows
       await autoGenerateFlows(ctxs);
-      // Step 3: Generate components
-      await generateComponentFromFlow();
+      // Step 3: Generate components (inline mock)
+      const flows = useFlowStore.getState().flowNodes;
+      const newCompNodes: ComponentNode[] = flows.map((f, i) => ({
+        nodeId: `comp-gen-${Date.now()}-${i}`,
+        flowId: f.nodeId,
+        name: `${f.name}页面`,
+        type: 'page' as const,
+        props: { layout: 'full-width', theme: 'light' },
+        api: { method: 'GET', path: `/api/${f.name.toLowerCase().replace(/\s+/g, '-')}`, params: [] },
+        previewUrl: undefined,
+        status: 'pending' as const,
+        children: [],
+      }));
+      setComponentNodes(newCompNodes);
       toast.showToast('三树生成完成', 'success');
     } catch (err) {
       toast.showToast(err instanceof Error ? err.message : '生成失败', 'error');
     } finally {
       setIsQuickGenerating(false);
     }
-  }, [requirementInput, isQuickGenerating, aiThinking, flowGenerating, componentGenerating, generateContexts, autoGenerateFlows, generateComponentFromFlow, toast]);
+  }, [requirementInput, isQuickGenerating, aiThinking, flowGenerating, componentGenerating, setContextNodes, autoGenerateFlows, setComponentNodes, toast]);
 
   useKeyboardShortcuts({
     undo: handleKeyboardUndo,
@@ -583,7 +653,20 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         return;
       }
       if (isQuickGenerating || aiThinking || flowGenerating || componentGenerating) return;
-      await generateContexts(requirementInput);
+      // Inline mock context generation
+      const drafts: BoundedContextDraft[] = [
+        { name: '需求管理', description: '处理需求录入', type: 'core' },
+        { name: '业务流程', description: '核心业务处理', type: 'core' },
+      ];
+      const newCtxs: BoundedContextNode[] = drafts.map((d, i) => ({
+        nodeId: `ctx-gen-${Date.now()}-${i}`,
+        name: d.name,
+        description: d.description,
+        type: d.type,
+        status: 'pending' as const,
+        children: [],
+      }));
+      setContextNodes(newCtxs);
     },
     onSwitchToContext: () => {
       useContextStore.getState().setActiveTree('context');
@@ -813,7 +896,21 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                   <button
                     type="button"
                     className={styles.secondaryButton}
-                    onClick={() => generateContexts(requirementText)}
+                    onClick={() => {
+                      const drafts: BoundedContextDraft[] = [
+                        { name: '需求管理', description: '处理需求录入', type: 'core' },
+                        { name: '业务流程', description: '核心业务处理', type: 'core' },
+                      ];
+                      const newCtxs: BoundedContextNode[] = drafts.map((d, i) => ({
+                        nodeId: `ctx-gen-${Date.now()}-${i}`,
+                        name: d.name,
+                        description: d.description,
+                        type: d.type,
+                        status: 'pending' as const,
+                        children: [],
+                      }));
+                      setContextNodes(newCtxs);
+                    }}
                     disabled={aiThinking || !requirementText.trim()}
                     aria-label="重新生成限界上下文"
                     title="使用当前需求文本重新生成上下文"
@@ -1133,7 +1230,21 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                       <button
                         type="button"
                         className={styles.secondaryButton}
-                        onClick={() => generateContexts(requirementText)}
+                        onClick={() => {
+                          const drafts: BoundedContextDraft[] = [
+                            { name: '需求管理', description: '处理需求录入', type: 'core' },
+                            { name: '业务流程', description: '核心业务处理', type: 'core' },
+                          ];
+                          const newCtxs: BoundedContextNode[] = drafts.map((d, i) => ({
+                            nodeId: `ctx-gen-${Date.now()}-${i}`,
+                            name: d.name,
+                            description: d.description,
+                            type: d.type,
+                            status: 'pending' as const,
+                            children: [],
+                          }));
+                          setContextNodes(newCtxs);
+                        }}
                         disabled={aiThinking || !requirementText.trim()}
                         aria-label="重新生成限界上下文"
                         title="使用当前需求文本重新生成上下文"
@@ -1260,7 +1371,19 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 onClick={() => {
                   if (requirementInput.trim()) {
                     setRequirementText(requirementInput);
-                    generateContexts(requirementInput);
+                    const drafts: BoundedContextDraft[] = [
+                      { name: '需求管理', description: '处理需求录入', type: 'core' },
+                      { name: '业务流程', description: '核心业务处理', type: 'core' },
+                    ];
+                    const newCtxs: BoundedContextNode[] = drafts.map((d, i) => ({
+                      nodeId: `ctx-gen-${Date.now()}-${i}`,
+                      name: d.name,
+                      description: d.description,
+                      type: d.type,
+                      status: 'pending' as const,
+                      children: [],
+                    }));
+                    setContextNodes(newCtxs);
                   }
                 }}
                 disabled={!requirementInput.trim() || aiThinking}

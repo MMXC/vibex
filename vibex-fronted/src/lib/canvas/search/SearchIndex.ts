@@ -163,18 +163,19 @@ export class SearchIndex {
 
 /** 搜索节点到 store 操作的映射 */
 export function navigateToSearchResult(result: SearchResult): void {
-  const { useCanvasStore } = require('@/lib/canvas/canvasStore') as typeof import('@/lib/canvas/canvasStore');
+  const { useContextStore } = require('@/lib/canvas/stores/contextStore') as typeof import('@/lib/canvas/stores/contextStore');
+  const { useUIStore } = require('@/lib/canvas/stores/uiStore') as typeof import('@/lib/canvas/stores/uiStore');
 
   // 1. 展开对应的树面板
   if (result.type === 'context') {
-    useCanvasStore.getState().setActiveTree('context');
-    useCanvasStore.getState().toggleContextPanel();
+    useContextStore.getState().setActiveTree('context');
+    useUIStore.getState().toggleContextPanel();
   } else if (result.type === 'flow') {
-    useCanvasStore.getState().setActiveTree('flow');
-    useCanvasStore.getState().toggleFlowPanel();
+    useContextStore.getState().setActiveTree('flow');
+    useUIStore.getState().toggleFlowPanel();
   } else {
-    useCanvasStore.getState().setActiveTree('component');
-    useCanvasStore.getState().toggleComponentPanel();
+    useContextStore.getState().setActiveTree('component');
+    useUIStore.getState().toggleComponentPanel();
   }
 
   // 2. 滚动到目标节点

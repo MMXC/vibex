@@ -31,7 +31,8 @@ import '@xyflow/react/dist/style.css';
 import { CardTreeNode } from '../CardTreeNode/CardTreeNode';
 import type { CardTreeVisualizationRaw, CardTreeNodeData } from '@/types/visualization';
 import type { FlowGateway, GatewayNodeData, LoopEdgeData } from '@/lib/canvas/types';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useUIStore } from '@/lib/canvas/stores/uiStore';
+import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { BoundedGroupOverlay } from '@/components/canvas/groups/BoundedGroupOverlay';
 import { OverlapHighlightLayer } from '@/components/canvas/groups/OverlapHighlightLayer';
 import styles from './CardTreeRenderer.module.css';
@@ -305,14 +306,14 @@ function InternalRenderer({
   onSelectionChange,
   selectedIds,
 }: InternalRendererProps) {
-  // E3: Drag state from canvasStore
-  const draggedPositions = useCanvasStore((s) => s.draggedPositions);
-  const draggedNodeId = useCanvasStore((s) => s.draggedNodeId);
-  const startDrag = useCanvasStore((s) => s.startDrag);
-  const endDrag = useCanvasStore((s) => s.endDrag);
-  const updateDraggedPosition = useCanvasStore((s) => s.updateDraggedPosition);
+  // E3: Drag state from UI store
+  const draggedPositions = useUIStore((s) => s.draggedPositions);
+  const draggedNodeId = useUIStore((s) => s.draggedNodeId);
+  const startDrag = useUIStore((s) => s.startDrag);
+  const endDrag = useUIStore((s) => s.endDrag);
+  const updateDraggedPosition = useUIStore((s) => s.updateDraggedPosition);
   // F2.1: Bounded groups for overlap highlight
-  const boundedGroups = useCanvasStore((s) => s.boundedGroups);
+  const boundedGroups = useContextStore((s) => s.boundedGroups);
 
   // E4: Track ReactFlow viewport for BoundedGroupOverlay positioning
   const [viewport, setViewport] = React.useState({ x: 0, y: 0, zoom: 1 });

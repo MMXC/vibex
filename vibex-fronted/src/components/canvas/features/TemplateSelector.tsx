@@ -8,7 +8,9 @@
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useContextStore } from '@/lib/canvas/stores/contextStore';
+import { useFlowStore } from '@/lib/canvas/stores/flowStore';
+import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { loadTemplateList, type TemplateMeta } from '@/lib/canvas/templateLoader';
 import styles from './TemplateSelector.module.css';
 
@@ -25,11 +27,11 @@ export function TemplateSelector({ open, onClose }: TemplateSelectorProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [applying, setApplying] = useState(false);
 
-  const setContextNodes = useCanvasStore((s) => s.setContextNodes);
-  const setFlowNodes = useCanvasStore((s) => s.setFlowNodes);
-  const setComponentNodes = useCanvasStore((s) => s.setComponentNodes);
-  const setPhase = useCanvasStore((s) => s.setPhase);
-  const setActiveTree = useCanvasStore((s) => s.setActiveTree);
+  const setContextNodes = useContextStore((s) => s.setContextNodes);
+  const setFlowNodes = useFlowStore((s) => s.setFlowNodes);
+  const setComponentNodes = useComponentStore((s) => s.setComponentNodes);
+  const setPhase = useContextStore((s) => s.setPhase);
+  const setActiveTree = useContextStore((s) => s.setActiveTree);
 
   // Load template list on open
   useEffect(() => {

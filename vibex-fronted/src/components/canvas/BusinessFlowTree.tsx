@@ -13,7 +13,10 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useFlowStore } from '@/lib/canvas/stores/flowStore';
+import { useContextStore } from '@/lib/canvas/stores/contextStore';
+import { useComponentStore } from '@/lib/canvas/stores/componentStore';
+import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import { CheckboxIcon } from '@/components/common/CheckboxIcon';
 import {
@@ -139,7 +142,7 @@ function SortableStepRow({
   onDelete,
   flowNodeId,
 }: SortableStepRowProps) {
-  const confirmStep = useCanvasStore((s) => s.confirmStep);
+  const confirmStep = useFlowStore((s) => s.confirmStep);
   const {
     attributes,
     listeners,
@@ -375,7 +378,7 @@ function FlowCard({
   selected,
   onToggleSelect,
 }: FlowCardProps) {
-  const toggleFlowNode = useCanvasStore((s) => s.toggleFlowNode);
+  const toggleFlowNode = useFlowStore((s) => s.toggleFlowNode);
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editState, setEditState] = useState({
@@ -580,22 +583,34 @@ function FlowCard({
 
 export function BusinessFlowTree({ readonly = false, isActive = true }: BusinessFlowTreeProps) {
   // === Store ===
-  const flowNodes = useCanvasStore((s) => s.flowNodes);
-  const contextNodes = useCanvasStore((s) => s.contextNodes);
-  const editFlowNode = useCanvasStore((s) => s.editFlowNode);
-  const deleteFlowNode = useCanvasStore((s) => s.deleteFlowNode);
-  const confirmStep = useCanvasStore((s) => s.confirmStep);
-  const editStep = useCanvasStore((s) => s.editStep);
-  const deleteStep = useCanvasStore((s) => s.deleteStep);
-  const reorderSteps = useCanvasStore((s) => s.reorderSteps);
-  const addFlowNode = useCanvasStore((s) => s.addFlowNode);
-  const addStepToFlow = useCanvasStore((s) => s.addStepToFlow);
-  const autoGenerateFlows = useCanvasStore((s) => s.autoGenerateFlows);
-  const flowGenerating = useCanvasStore((s) => s.flowGenerating);
-  const setComponentNodes = useCanvasStore((s) => s.setComponentNodes);
-  const setFlowNodes = useCanvasStore((s) => s.setFlowNodes);
-  const setPhase = useCanvasStore((s) => s.setPhase);
-  const projectId = useCanvasStore((s) => s.projectId);
+  const flow = useFlowStore();
+  const flowNodes = flow.flowNodes;
+  const editFlowNode = flow.editFlowNode;
+  const deleteFlowNode = flow.deleteFlowNode;
+  const confirmStep = flow.confirmStep;
+  const editStep = flow.editStep;
+  const deleteStep = flow.deleteStep;
+  const reorderSteps = flow.reorderSteps;
+  const addFlowNode = flow.addFlowNode;
+  const addStepToFlow = flow.addStepToFlow;
+  const autoGenerateFlows = flow.autoGenerateFlows;
+  const flowGenerating = flow.flowGenerating;
+  const setFlowNodes = flow.setFlowNodes;
+
+  const ctx = useContextStore();
+  const contextNodes = ctx.contextNodes;
+  const setPhase = ctx.setPhase;
+  const selectedNodeIds = ctx.selectedNodeIds;
+  const toggleNodeSelect = ctx.toggleNodeSelect;
+  const selectAllNodes = ctx.selectAllNodes;
+  const clearNodeSelection = ctx.clearNodeSelection;
+  const deleteSelectedNodes = ctx.deleteSelectedNodes;
+
+  const comp = useComponentStore();
+  const setComponentNodes = comp.setComponentNodes;
+
+  const session = useSessionStore();
+  const projectId = session.projectId;
 
   // === E2-F7: Flow card drag sensors ===
   const flowSensors = useSensors(
@@ -606,13 +621,6 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
       activationConstraint: { delay: 200, tolerance: 5 },
     })
   );
-
-  // === E3-F2: Multi-select state ===
-  const selectedNodeIds = useCanvasStore((s) => s.selectedNodeIds);
-  const toggleNodeSelect = useCanvasStore((s) => s.toggleNodeSelect);
-  const selectAllNodes = useCanvasStore((s) => s.selectAllNodes);
-  const clearNodeSelection = useCanvasStore((s) => s.clearNodeSelection);
-  const deleteSelectedNodes = useCanvasStore((s) => s.deleteSelectedNodes);
 
   const selectedIds = new Set(selectedNodeIds.flow);
   const selectedCount = selectedIds.size;

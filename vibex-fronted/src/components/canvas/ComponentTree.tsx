@@ -27,7 +27,9 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useComponentStore } from '@/lib/canvas/stores/componentStore';
+import { useFlowStore } from '@/lib/canvas/stores/flowStore';
+import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { useToast } from '@/components/ui/Toast';
 import { SortableTreeItem } from './features/SortableTreeItem';
 import { getHistoryStore } from '@/lib/canvas/historySlice';
@@ -575,22 +577,22 @@ function AddComponentForm({ onAdd }: AddComponentFormProps) {
 // =============================================================================
 
 export function ComponentTree({ readonly = false, isActive: _isActive = true }: ComponentTreeProps) {
-  const componentNodes = useCanvasStore((s) => s.componentNodes);
-  const addComponentNode = useCanvasStore((s) => s.addComponentNode);
-  const editComponentNode = useCanvasStore((s) => s.editComponentNode);
-  const deleteComponentNode = useCanvasStore((s) => s.deleteComponentNode);
-  const setComponentNodes = useCanvasStore((s) => s.setComponentNodes);
-  const flowNodes = useCanvasStore((s) => s.flowNodes);
-  const setPhase = useCanvasStore((s) => s.setPhase);
+  const comp = useComponentStore();
+  const componentNodes = comp.componentNodes;
+  const addComponentNode = comp.addComponentNode;
+  const editComponentNode = comp.editComponentNode;
+  const deleteComponentNode = comp.deleteComponentNode;
+  const setComponentNodes = comp.setComponentNodes;
+  const selectedNodeIds_comp = comp.selectedNodeIds;
+  const toggleNodeSelect_comp = comp.toggleNodeSelect;
+  const selectAllNodes_comp = comp.selectAllNodes;
+  const clearNodeSelection_comp = comp.clearNodeSelection;
+  const deleteSelectedNodes_comp = comp.deleteSelectedNodes;
 
-  // E3-F2: Multi-select state
-  const selectedNodeIds = useCanvasStore((s) => s.selectedNodeIds);
-  const toggleNodeSelect = useCanvasStore((s) => s.toggleNodeSelect);
-  const selectAllNodes = useCanvasStore((s) => s.selectAllNodes);
-  const clearNodeSelection = useCanvasStore((s) => s.clearNodeSelection);
-  const deleteSelectedNodes = useCanvasStore((s) => s.deleteSelectedNodes);
+  const flowNodes = useFlowStore((s) => s.flowNodes);
+  const setPhase = useContextStore((s) => s.setPhase);
 
-  const selectedIds = new Set(selectedNodeIds.component);
+  const selectedIds = new Set(selectedNodeIds_comp);
   const selectedCount = selectedIds.size;
 
   const [generating, setGenerating] = useState(false);
@@ -623,7 +625,7 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
     onSelectionChange: (nodeIds) => {
       nodeIds.forEach((id) => {
         if (!selectedIds.has(id)) {
-          toggleNodeSelect('component', id);
+          toggleNodeSelect_comp(id);
         }
       });
     },
@@ -702,7 +704,7 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
 
   const handleClearCanvas = useCallback(() => {
     if (window.confirm('确定清空画布？所有组件将被删除。')) {
-      useCanvasStore.getState().clearComponentCanvas();
+      comp.clearComponentCanvas();
     }
   }, []);
 
@@ -761,7 +763,7 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
             <button
               type="button"
               className={styles.secondaryButton}
-              onClick={() => selectAllNodes('component')}
+              onClick={() => selectAllNodes_comp()}
               aria-label="全选所有组件"
             >
               ⊞ 全选
@@ -770,7 +772,7 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
             <button
               type="button"
               className={styles.secondaryButton}
-              onClick={() => clearNodeSelection('component')}
+              onClick={() => clearNodeSelection_comp()}
               aria-label="取消全选所有组件"
             >
               ⊠ 取消全选
@@ -806,7 +808,7 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
                 <button
                   type="button"
                   className={styles.secondaryButton}
-                  onClick={() => clearNodeSelection('component')}
+                  onClick={() => clearNodeSelection_comp()}
                   aria-label="取消选择"
                 >
                   取消选择
@@ -815,7 +817,7 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
                   <button
                     type="button"
                     className={styles.deleteButton}
-                    onClick={() => deleteSelectedNodes('component')}
+                    onClick={() => deleteSelectedNodes_comp()}
                     aria-label={`删除 ${selectedCount} 个选中节点`}
                   >
                     删除 ({selectedCount})
@@ -826,7 +828,7 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
               <button
                 type="button"
                 className={styles.secondaryButton}
-                onClick={() => selectAllNodes('component')}
+                onClick={() => selectAllNodes_comp()}
                 aria-label="全选"
               >
                 全选
@@ -947,7 +949,7 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
                             onDelete={deleteComponentNode}
                             readonly={readonly}
                             selected={selectedIds.has(node.nodeId)}
-                            onToggleSelect={(nodeId) => toggleNodeSelect('component', nodeId)}
+                            onToggleSelect={(nodeId) => toggleNodeSelect_comp(nodeId)}
                           />
                         </SortableTreeItem>
                       ))}

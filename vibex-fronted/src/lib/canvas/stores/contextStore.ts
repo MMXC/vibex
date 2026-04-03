@@ -10,7 +10,7 @@
  */
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import type { BoundedContextNode, BoundedContextDraft, Phase, TreeType } from '../types';
+import type { BoundedContextNode, BoundedContextDraft, Phase, TreeType, BoundedGroup } from '../types';
 import { getHistoryStore } from '../historySlice';
 import { postContextActionMessage } from './messageBridge';
 
@@ -27,12 +27,14 @@ interface ContextStore {
   // Phase state
   phase: Phase;
   setPhase: (phase: Phase) => void;
+  advancePhase: () => void;
   // Active tree
   activeTree: TreeType | null;
   setActiveTree: (tree: TreeType | null) => void;
   recomputeActiveTree: () => void;
   // Multi-select
   selectedNodeIds: SelectedNodeIds;
+  toggleNodeSelect: (tree: TreeType, nodeId: string) => void;
   selectAllNodes: (tree: TreeType) => void;
   clearNodeSelection: (tree: TreeType) => void;
   deleteSelectedNodes: (tree: TreeType) => void;
@@ -44,8 +46,12 @@ interface ContextStore {
   editContextNode: (nodeId: string, data: Partial<BoundedContextNode>) => void;
   deleteContextNode: (nodeId: string) => void;
   confirmContextNode: (nodeId: string) => void;
+  toggleContextNode: (nodeId: string) => void;
   toggleContextSelection: (nodeId: string) => void;
   setContextDraft: (draft: Partial<BoundedContextNode> | null) => void;
+  // Bounded groups
+  boundedGroups: BoundedGroup[];
+  setBoundedGroups: (groups: BoundedGroup[]) => void;
 }
 
 export const useContextStore = create<ContextStore>()(
@@ -55,6 +61,17 @@ export const useContextStore = create<ContextStore>()(
         // E3 S3.1: Phase state — drives the PhaseIndicator component
         phase: 'input',
         setPhase: (phase) => set({ phase }),
+        advancePhase: () => {
+          const phases: Phase[] = ['input', 'context', 'flow', 'component', 'prototype'];
+          const idx = phases.indexOf(get().phase);
+          if (idx < phases.length - 1) {
+            const next = phases[idx + 1] as Phase;
+            set({ phase: next });
+            // Sync activeTree
+            if (next === 'flow') set({ activeTree: 'flow' });
+            else if (next === 'component') set({ activeTree: 'component' });
+          }
+        },
         // E3 S3.1: Active tree
         activeTree: null,
         setActiveTree: (tree) => set({ activeTree: tree }),
@@ -66,6 +83,32 @@ export const useContextStore = create<ContextStore>()(
         },
         // E3 S3.1: Multi-select
         selectedNodeIds: { context: [], flow: [] },
+        toggleNodeSelect: (tree, nodeId) =>
+          set((s) => {
+            if (tree === 'context') {
+              const exists = s.selectedNodeIds.context.includes(nodeId);
+              return {
+                selectedNodeIds: {
+                  ...s.selectedNodeIds,
+                  context: exists
+                    ? s.selectedNodeIds.context.filter((id) => id !== nodeId)
+                    : [...s.selectedNodeIds.context, nodeId],
+                },
+              };
+            }
+            if (tree === 'flow') {
+              const exists = s.selectedNodeIds.flow.includes(nodeId);
+              return {
+                selectedNodeIds: {
+                  ...s.selectedNodeIds,
+                  flow: exists
+                    ? s.selectedNodeIds.flow.filter((id) => id !== nodeId)
+                    : [...s.selectedNodeIds.flow, nodeId],
+                },
+              };
+            }
+            return s;
+          }),
         selectAllNodes: (tree) =>
           set((s) => {
             if (tree === 'context') {
@@ -152,6 +195,26 @@ export const useContextStore = create<ContextStore>()(
           });
         },
 
+        toggleContextNode: (nodeId) => {
+          const node = get().contextNodes.find((n) => n.nodeId === nodeId);
+          if (!node) return;
+          if (node.status === 'confirmed') {
+            // Unconfirm
+            set((s) => ({
+              contextNodes: s.contextNodes.map((n) =>
+                n.nodeId === nodeId ? { ...n, isActive: false, status: 'pending' as const } : n
+              ),
+            }));
+          } else {
+            // Confirm
+            set((s) => ({
+              contextNodes: s.contextNodes.map((n) =>
+                n.nodeId === nodeId ? { ...n, isActive: true, status: 'confirmed' as const } : n
+              ),
+            }));
+          }
+        },
+
         toggleContextSelection: (nodeId) =>
           set((state) => ({
             contextNodes: state.contextNodes.map((node) =>
@@ -162,6 +225,9 @@ export const useContextStore = create<ContextStore>()(
           })),
 
         setContextDraft: (draft) => set({ contextDraft: draft }),
+
+        boundedGroups: [],
+        setBoundedGroups: (groups) => set({ boundedGroups: groups }),
       }),
       { name: 'vibex-context-store' }
     ),

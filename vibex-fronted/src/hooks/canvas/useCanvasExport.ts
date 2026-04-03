@@ -11,7 +11,10 @@
 
 import { useCallback, useRef } from 'react';
 import { toPng, toSvg } from 'html-to-image';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useContextStore } from '@/lib/canvas/stores/contextStore';
+import { useFlowStore } from '@/lib/canvas/stores/flowStore';
+import { useComponentStore } from '@/lib/canvas/stores/componentStore';
+import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { BoundedContextNode, BusinessFlowNode, ComponentNode } from '@/lib/canvas/types'; // types referenced in buildCanvasExportData JSDoc
 
@@ -63,8 +66,15 @@ function downloadBlob(blob: Blob, filename: string): void {
  * Convert canvas store data to a structured export object
  */
 function buildCanvasExportData(scope: ExportScope): Record<string, unknown> {
-  const store = useCanvasStore.getState();
-  const { contextNodes, flowNodes, componentNodes, phase, projectId } = store;
+  const contextStore = useContextStore.getState();
+  const flowStore = useFlowStore.getState();
+  const componentStore = useComponentStore.getState();
+  const sessionStore = useSessionStore.getState();
+  const { contextNodes } = contextStore;
+  const { flowNodes } = flowStore;
+  const { componentNodes } = componentStore;
+  const { phase } = contextStore;
+  const { projectId } = sessionStore;
 
   const result: Record<string, unknown> = {
     exportedAt: new Date().toISOString(),
@@ -90,8 +100,9 @@ function buildCanvasExportData(scope: ExportScope): Record<string, unknown> {
  * Generate Markdown representation of canvas data
  */
 function buildCanvasMarkdown(scope: ExportScope): string {
-  const store = useCanvasStore.getState();
-  const { contextNodes, flowNodes, componentNodes } = store;
+  const contextNodes = useContextStore.getState().contextNodes;
+  const flowNodes = useFlowStore.getState().flowNodes;
+  const componentNodes = useComponentStore.getState().componentNodes;
 
   const lines: string[] = [
     '# VibeX Canvas Export',

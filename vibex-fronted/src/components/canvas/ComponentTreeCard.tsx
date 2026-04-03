@@ -11,7 +11,7 @@
 'use client';
 
 import React, { useCallback, useState } from 'react';
-import { useCanvasStore } from '@/lib/canvas/canvasStore';
+import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { useToast } from '@/components/ui/Toast';
 import type { ComponentNode } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
@@ -209,9 +209,9 @@ function ComponentCardItem({ node, onEdit, onDelete, readonly }: {
  */
 export function ComponentTreeCard({ readonly = false }: ComponentTreeCardProps) {
   // S1.4: 订阅 componentTree store
-  const componentNodes = useCanvasStore((s) => s.componentNodes);
-  const editComponentNode = useCanvasStore((s) => s.editComponentNode);
-  const deleteComponentNode = useCanvasStore((s) => s.deleteComponentNode);
+  const componentNodes = useComponentStore((s) => s.componentNodes);
+  const editComponentNode = useComponentStore((s) => s.editComponentNode);
+  const deleteComponentNode = useComponentStore((s) => s.deleteComponentNode);
 
   const hasNodes = componentNodes.length > 0;
 

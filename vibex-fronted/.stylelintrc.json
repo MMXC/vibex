@@ -1,0 +1,6 @@
+{
+  "rules": {
+    "no-invalid-position-declaration": true
+  },
+  "ignoreFiles": ["**/*.min.css"]
+}

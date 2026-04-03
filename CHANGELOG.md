@@ -1,3 +1,10 @@
+### Added (vibex-reviewer-proposals-20260403_024652 E3: Reviewer 驳回模板) — 2026-04-03
+- **E3 Reviewer 驳回模板**: AGENTS.md 新增 Reviewer 驳回模板（类型A-D：CHANGELOG遗漏、TS错误、ESLint违规、App页面手动修改）
+- **AGENTS.md**: CHANGELOG规范章节、Reviewer检查清单
+- **CHANGELOG_CONVENTION.md**: Epic条目结构、类型标签说明
+- **reports/INDEX.md**: 历史报告索引维护规范
+- **提交**: `59b16597`
+
 ### Added (checkbox-persist-bug E1: selected 字段持久化) — 2026-04-02
 - **E1 数据结构扩展**: `selected?: boolean` 字段添加至 BoundedContextNode/BusinessFlowNode/ComponentNode
 - **提交**: `512f3fce`

@@ -18,18 +18,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
-    version: '1.0.97',
+    version: '1.0.98',
     date: '2026-04-04',
     changes: [
-      '🔧 checkbox-persist-bug/E3: FlowConfirm — toggleFlowNode 级联切换 + confirmed 节点过滤',
-      '✅ flowStore toggleFlowNode: 流程节点勾选级联切换子步骤',
-      '✅ generateComponentFromFlow: 只发送 confirmed 节点到 API',
-      '✅ 提交 5a56cbae',
+      '🔧 vibex-css-build-fix/E2: stylelint 集成 — CSS build quality gate',
+      '✅ .stylelintrc.json: no-invalid-position-declaration 规则',
+      '✅ lint:css script + CI gate',
+      '✅ 提交 cc4ff92f / 48b0f416',
     ],
-    commit: '5a56cbae',
+    commit: '48b0f416',
   },
   {
-    version: '1.0.96',
+    version: '1.0.97',
     date: '2026-04-04',
     changes: [
       '🎣 canvas-split-hooks/E3: useCanvasRenderer hook — memoized 渲染计算',

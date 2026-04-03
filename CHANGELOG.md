@@ -1,3 +1,7 @@
+### Fixed (canvas-phase0-cleanup E4: areAllConfirmed dead code 移除) — 2026-04-03
+- **E4 areAllConfirmed 移除**: cascade/index.ts + CascadeUpdateManager.ts 移除 areAllConfirmed
+- **提交**: `ab812506`
+
 ### Fixed (canvas-phase0-cleanup E3: generateId 抽取) — 2026-04-03
 - **E3 generateId 抽取**: 新建 `src/lib/canvas/id.ts`，统一 generateId + generatePrefixedId
 - **去重**: 从 contextStore/componentStore/flowStore 移除本地 generateId

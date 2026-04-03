@@ -3,7 +3,6 @@
  * Tests flow node CRUD, step CRUD, and draft state.
  */
 import { useFlowStore } from './flowStore';
-import { getHistoryStore } from '../historySlice';
 
 // Mock addMessage to avoid canvasStore dependency
 jest.mock('../canvasStore', () => ({
@@ -209,6 +208,73 @@ describe('useFlowStore', () => {
       const stepsAfter = useFlowStore.getState().flowNodes[0].steps.map((s) => s.name).join(',');
       expect(stepsAfter).not.toBe(stepsBefore);
       expect(stepsAfter).toBe('Step B,Step A');
+    });
+  });
+
+  describe('cascade operations', () => {
+    it('should confirm step marks step confirmed and flow active', () => {
+      useFlowStore.getState().addFlowNode({
+        contextId: 'ctx-1',
+        name: 'FlowForCascade',
+        steps: [{ name: 'Step 1', actor: 'User' }, { name: 'Step 2', actor: 'Admin' }],
+      });
+      const node = useFlowStore.getState().flowNodes[0];
+      const stepId = node.steps[0].stepId;
+      // Confirm the first step
+      useFlowStore.getState().confirmStep(node.nodeId, stepId);
+      const updatedNode = useFlowStore.getState().flowNodes[0];
+      const updatedStep = updatedNode.steps[0];
+      expect(updatedStep.status).toBe('confirmed');
+      expect(updatedStep.isActive).toBe(true);
+      // Step 2 should be unaffected
+      expect(updatedNode.steps[1].status).toBe('pending');
+      expect(updatedNode.steps[1].isActive).toBe(false);
+    });
+
+    it('should add flow node with empty steps array', () => {
+      useFlowStore.getState().addFlowNode({
+        contextId: 'ctx-1',
+        name: 'EmptyFlow',
+        steps: [],
+      });
+      const nodes = useFlowStore.getState().flowNodes;
+      expect(nodes.length).toBe(1);
+      expect(nodes[0].name).toBe('EmptyFlow');
+      expect(nodes[0].steps.length).toBe(0);
+      expect(nodes[0].status).toBe('pending');
+      expect(nodes[0].isActive).toBe(false);
+    });
+
+    it('should delete flow node cascades to nothing when no children', () => {
+      useFlowStore.getState().addFlowNode({
+        contextId: 'ctx-1',
+        name: 'LeafFlow',
+        steps: [{ name: 'Step 1', actor: 'User' }],
+      });
+      expect(useFlowStore.getState().flowNodes.length).toBe(1);
+      const nodeId = useFlowStore.getState().flowNodes[0].nodeId;
+      useFlowStore.getState().deleteFlowNode(nodeId);
+      expect(useFlowStore.getState().flowNodes.length).toBe(0);
+    });
+
+    it('should reorderSteps swap order of two steps', () => {
+      useFlowStore.getState().addFlowNode({
+        contextId: 'ctx-1',
+        name: 'ReorderFlow',
+        steps: [
+          { name: 'Step Alpha', actor: 'User' },
+          { name: 'Step Beta', actor: 'Admin' },
+          { name: 'Step Gamma', actor: 'User' },
+        ],
+      });
+      const nodeId = useFlowStore.getState().flowNodes[0].nodeId;
+      const ids = useFlowStore.getState().flowNodes[0].steps.map((s) => s.stepId);
+      // Move Step Gamma (index 2) to position 0
+      useFlowStore.getState().reorderSteps(nodeId, 2, 0);
+      const reordered = useFlowStore.getState().flowNodes[0].steps;
+      expect(reordered[0].stepId).toBe(ids[2]); // Gamma
+      expect(reordered[1].stepId).toBe(ids[0]); // Alpha
+      expect(reordered[2].stepId).toBe(ids[1]); // Beta
     });
   });
 

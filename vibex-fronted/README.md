@@ -267,6 +267,36 @@ npm run test:e2e
 | App 页面完整 | `git diff src/app/` | 无手动修改 |
 | 测试通过 | `npm test` | 全部通过 |
 
+### Pre-submit 检查脚本
+
+提交前建议运行本地检查脚本:
+
+```bash
+./scripts/pre-submit-check.sh
+```
+
+**检查项**:
+- CHANGELOG.md 内容验证
+- TypeScript 类型检查 (`tsc --noEmit`)
+- ESLint 代码规范检查
+- eslint-disable 数量监控
+
+**参数选项**:
+- `--warn-only`: 警告模式，不阻断提交
+- `--skip-changelog`: 跳过 CHANGELOG 检查
+- `--skip-ts`: 跳过 TypeScript 检查
+- `--skip-eslint`: 跳过 ESLint 检查
+
+### CHANGELOG 规范
+
+VibeX 项目统一使用 `CHANGELOG.md` 记录变更，格式规范见 `CHANGELOG_CONVENTION.md`。
+
+**关键规则**:
+- Frontend: 只维护 `vibex-fronted/CHANGELOG.md`（根目录）
+- **禁止手动修改** App 页面 `src/app/changelog/page.tsx`
+
+**更新时机**: 每个 Epic 结束时必须更新。
+
 ### 相关文档
 
 - 协作规范: `AGENTS.md`

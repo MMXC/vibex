@@ -37,7 +37,6 @@ export function CommandInput() {
   // F2.4: Check selected nodes for filtering
   const selectedNodeIds = useContextStore((s) => s.selectedNodeIds);
   const toggleRightDrawer = useUIStore((s) => s.toggleRightDrawer);
-  const submitCanvas = useUIStore((s) => s.submitCanvas);
   const hasSelection = selectedNodeIds.context.length > 0 || selectedNodeIds.flow.length > 0;
 
   // ── Filter commands based on input keyword + node selection ──────────
@@ -74,17 +73,8 @@ export function CommandInput() {
     const cmd = ALL_COMMANDS.find((c) => c.id === commandId);
     if (!cmd) return;
 
-    // [E2] /submit triggers submitCanvas event
-    if (commandId === 'submit') {
-      submitCanvas();
-    }
-
-    // D6: Only console.log, no API calls
-    const logMsg = `[Command] ${cmd.label} triggered`;
-    console.log(logMsg);
-
     // F2.7: Append command_executed message to drawer
-    addCommandMessage(cmd.label, logMsg);
+    addCommandMessage(cmd.label, `[Command] ${cmd.label} triggered`);
 
     // [E2] Auto-open right drawer after command execution
     toggleRightDrawer();
@@ -92,7 +82,7 @@ export function CommandInput() {
     // Close list and clear input
     setIsCommandListOpen(false);
     setInputValue('');
-  }, [toggleRightDrawer, submitCanvas]);
+  }, [toggleRightDrawer]);
 
   // ── Click outside to close ────────────────────────────────────────────
   useEffect(() => {

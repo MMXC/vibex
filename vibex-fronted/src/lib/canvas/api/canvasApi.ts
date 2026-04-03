@@ -132,7 +132,6 @@ async function validatedFetch<T>(
   const json = await res.json();
   const result = schema.safeParse(json);
   if (!result.success) {
-    console.error('[canvasApi] Response validation failed for:', url, json, result.error);
     throw new Error(`[canvasApi] Invalid response from ${url}`);
   }
   return result.data;
@@ -409,7 +408,7 @@ export function startPolling(
         stopPolling();
       }
     } catch (err) {
-      console.error('[canvasApi] polling error:', err);
+      // polling error — handled by caller
     }
   };
 

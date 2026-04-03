@@ -59,7 +59,6 @@ interface UIStore {
   toggleLeftDrawer: () => void;
   toggleRightDrawer: () => void;
   openRightDrawer: () => void;
-  submitCanvas: () => void;
   setLeftDrawerWidth: (width: number) => void;
   setRightDrawerWidth: (width: number) => void;
 }
@@ -163,7 +162,6 @@ export const useUIStore = create<UIStore>()(
         toggleLeftDrawer: () => set((s) => ({ leftDrawerOpen: !s.leftDrawerOpen })),
         toggleRightDrawer: () => set((s) => ({ rightDrawerOpen: !s.rightDrawerOpen })),
         openRightDrawer: () => set({ rightDrawerOpen: true }),
-        submitCanvas: () => { console.log('[Command] /submit triggered'); },
         setLeftDrawerWidth: (width) => set({ leftDrawerWidth: Math.min(400, Math.max(100, width)) }),
         setRightDrawerWidth: (width) => set({ rightDrawerWidth: Math.min(400, Math.max(100, width)) }),
       }),

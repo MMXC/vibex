@@ -72,13 +72,11 @@ export async function loadTemplate(templateId: string): Promise<CanvasTemplate |
   try {
     const res = await fetch(meta.file);
     if (!res.ok) {
-      console.error(`[templateLoader] Failed to load template ${templateId}: ${res.status}`);
       return null;
     }
     const data: CanvasTemplate = await res.json();
     return data;
-  } catch (err) {
-    console.error(`[templateLoader] Error loading template ${templateId}:`, err);
+  } catch {
     return null;
   }
 }

@@ -28,6 +28,7 @@ import {
 import { hasNodes } from '@/lib/canvas/cascade';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import { getHistoryStore } from '@/lib/canvas/historySlice';
+import { isValidContextNodes, isValidFlowNodes, isValidComponentNodes } from '@/lib/canvas/type-guards';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { SearchDialog } from './features/SearchDialog';
 import { useCanvasSearch } from '@/hooks/canvas/useCanvasSearch';
@@ -359,13 +360,13 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     if (!conflictData) return
     const serverData = conflictData.serverSnapshot.data
     if (serverData.contexts) {
-      canvasSetContextNodes(serverData.contexts as any)
+      canvasSetContextNodes(isValidContextNodes(serverData.contexts) ? serverData.contexts : []);
     }
     if (serverData.flows) {
-      canvasSetFlowNodes(serverData.flows as any)
+      canvasSetFlowNodes(isValidFlowNodes(serverData.flows) ? serverData.flows : []);
     }
     if (serverData.components) {
-      setComponentNodes(serverData.components as any)
+      setComponentNodes(isValidComponentNodes(serverData.components) ? serverData.components : []);
     }
     clearConflict()
     toast.showToast('已使用服务端数据，当前画布已更新', 'success')
@@ -525,15 +526,15 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     const historyStore = getHistoryStore();
     if (historyStore.canUndo('context')) {
       const prev = historyStore.undo('context');
-      if (prev) { canvasSetContextNodes(prev as any); return true; }
+      if (prev) { canvasSetContextNodes(isValidContextNodes(prev) ? prev : []); return true; }
     }
     if (historyStore.canUndo('flow')) {
       const prev = historyStore.undo('flow');
-      if (prev) { canvasSetFlowNodes(prev as any); return true; }
+      if (prev) { canvasSetFlowNodes(isValidFlowNodes(prev) ? prev : []); return true; }
     }
     if (historyStore.canUndo('component')) {
       const prev = historyStore.undo('component');
-      if (prev) { setComponentNodes(prev as any); return true; }
+      if (prev) { setComponentNodes(isValidComponentNodes(prev) ? prev : []); return true; }
     }
     return false;
   }, []);
@@ -542,15 +543,15 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     const historyStore = getHistoryStore();
     if (historyStore.canRedo('context')) {
       const next = historyStore.redo('context');
-      if (next) { canvasSetContextNodes(next as any); return true; }
+      if (next) { canvasSetContextNodes(isValidContextNodes(next) ? next : []); return true; }
     }
     if (historyStore.canRedo('flow')) {
       const next = historyStore.redo('flow');
-      if (next) { canvasSetFlowNodes(next as any); return true; }
+      if (next) { canvasSetFlowNodes(isValidFlowNodes(next) ? next : []); return true; }
     }
     if (historyStore.canRedo('component')) {
       const next = historyStore.redo('component');
-      if (next) { setComponentNodes(next as any); return true; }
+      if (next) { setComponentNodes(isValidComponentNodes(next) ? next : []); return true; }
     }
     return false;
   }, []);

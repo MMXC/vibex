@@ -148,3 +148,10 @@ pnpm test -- --testPathPattern="canvas"
 - `reorderSteps` 逻辑：fromIndex→toIndex 移动正确 ✅
 - flowStore tests：170/170 passed ✅
 - Commit: `7b3dbc97`
+
+### E3 验证结果 (2026-04-03)
+- `src/lib/canvas/id.ts` 已创建 ✅
+- generateId 重复定义已消除（contextStore/componentStore/flowStore 均 import from '../id'）✅
+- useCanvasSnapshot 使用 generatePrefixedId('snap') ✅
+- TypeScript: 0 errors ✅
+- Commit: `xxx` (待提交)

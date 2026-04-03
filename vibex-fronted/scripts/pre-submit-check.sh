@@ -101,13 +101,33 @@ echo "=============================================="
 echo "2b. ESLint Disable Count Check"
 echo "=============================================="
 
-DISABLE_COUNT=$(grep -rEn "eslint-disable|eslint-disable-line|eslint-disable-next-line" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | wc -l)
 DISABLE_THRESHOLD=20
+
+# Count + detailed list
+if [ -f "ESLINT_DISABLES.md" ]; then
+    TOTAL_DOC=$(grep -c "eslint-disable\|eslint-disable-next-line\|eslint-disable-line" ESLINT_DISABLES.md || echo "0")
+    echo -e "  ESLINT_DISABLES.md 记录数: ${YELLOW}$TOTAL_DOC${NC} 条"
+else
+    echo -e "  ${RED}⚠ ESLINT_DISABLES.md 不存在，请创建豁免记录表${NC}"
+    WARNINGS=$((WARNINGS + 1))
+fi
+
+DISABLE_LIST=$(grep -rEn "eslint-disable|eslint-disable-line|eslint-disable-next-line" src/ --include="*.ts" --include="*.tsx" 2>/dev/null)
+DISABLE_COUNT=$(echo "$DISABLE_LIST" | wc -l)
+
+if [ "$DISABLE_COUNT" -gt 0 ]; then
+    echo -e "  ${YELLOW}发现 $DISABLE_COUNT 条 eslint-disable:${NC}"
+    echo "$DISABLE_LIST" | while IFS=: read -r file line rest; do
+        rule=$(echo "$rest" | sed 's/^ *//' | sed 's/ --.*$//')
+        echo "    - $file:$line → $rule"
+    done
+    echo ""
+fi
 
 if [ "$DISABLE_COUNT" -gt "$DISABLE_THRESHOLD" ]; then
     check_warning "ESLint disable count: $DISABLE_COUNT (threshold: $DISABLE_THRESHOLD). Review ESLINT_DISABLES.md"
 else
-    echo -e "${GREEN}✓ ESLint disable count: $DISABLE_COUNT (threshold: $DISABLE_THRESHOLD)${NC}"
+    echo -e "  ${GREEN}✓ ESLint disable count: $DISABLE_COUNT (threshold: $DISABLE_THRESHOLD)${NC}"
 fi
 
 echo ""

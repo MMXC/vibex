@@ -1,4 +1,5 @@
 /**
+export const dynamic = 'force-static';
  * Share Page — 只读分享页面
  *
  * Epic 5 实现: S5.1 (只读分享链接)

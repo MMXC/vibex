@@ -13,6 +13,8 @@
     }
   },
   "devDependencies": {
+    "@stryker-mutator/core": "^9.6.0",
+    "@stryker-mutator/jest-runner": "^9.6.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/uuid": "^11.0.0",
     "playwright": "^1.58.2"

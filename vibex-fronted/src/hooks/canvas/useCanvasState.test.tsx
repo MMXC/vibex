@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import { act } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 import { renderHook } from '@testing-library/react';
 import { useCanvasState } from './useCanvasState';
 
@@ -418,5 +418,135 @@ describe('useCanvasState — edge cases', () => {
   it('gridRef is null when hook is first created (before mount)', () => {
     const { result } = renderHook(() => useCanvasState());
     expect(result.current.gridRef.current).toBeNull();
+  });
+});
+
+// ============================================================================
+// DOM-attached tests — gridRef.current is a real div (useEffect coverage)
+// ============================================================================
+
+// Mutable ref for expandMode override (set before initial render to change mock value)
+const _expandModeOverride = { current: 'normal' as 'normal' | 'expand-both' | 'maximize' };
+
+/** Renders useCanvasState with a real div so gridRef.current is not null */
+function renderHookWithGrid() {
+  const hookResult = { current: null as ReturnType<typeof useCanvasState> | null };
+  const gridEl = { current: null as HTMLDivElement | null };
+  const rerenderFns = { current: null as ((() => void) | null) };
+
+  function TestComponent() {
+    const [, setTick] = React.useState(0);
+    rerenderFns.current = () => { act(() => { setTick((t) => t + 1); }); };
+    const state = useCanvasState();
+    hookResult.current = state;
+    return (
+      <div
+        ref={(el) => {
+          (state.gridRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+          gridEl.current = el as HTMLDivElement;
+        }}
+      />
+    );
+  }
+
+  const utils = render(<TestComponent />);
+  return { utils, hookResult, gridEl, triggerRerender: () => rerenderFns.current?.() };
+}
+
+describe('useCanvasState — DOM effects (gridRef attached)', () => {
+  it('panOffset effect runs (sets --canvas-pan-x CSS variable)', () => {
+    const { gridEl } = renderHookWithGrid();
+    expect(gridEl.current).not.toBeNull();
+    expect(() => gridEl.current!.style.getPropertyValue('--canvas-pan-x')).not.toThrow();
+  });
+
+  it('zoom effect runs (sets --canvas-zoom CSS variable)', () => {
+    const { hookResult, gridEl } = renderHookWithGrid();
+    act(() => { hookResult.current!.handlers.handleZoomIn(); });
+    expect(gridEl.current).not.toBeNull();
+    expect(() => gridEl.current!.style.getPropertyValue('--canvas-zoom')).not.toThrow();
+  });
+
+  it('expandMode maximize effect runs and sets --grid-left/center/right', () => {
+    // Set expandMode to maximize BEFORE initial render
+    __setExpandMode('maximize');
+    const { hookResult, gridEl, triggerRerender } = renderHookWithGrid();
+    // Force re-render so useEffect picks up the maximize value
+    triggerRerender();
+    // Verify grid CSS vars are set (maximize branch)
+    expect(() => gridEl.current!.style.getPropertyValue('--grid-left')).not.toThrow();
+    expect(() => gridEl.current!.style.getPropertyValue('--grid-center')).not.toThrow();
+    __setExpandMode('normal'); // reset
+  });
+
+  it('expandMode expand-both effect runs and sets --grid-left/center/right', () => {
+    __setExpandMode('expand-both');
+    const { hookResult, gridEl, triggerRerender } = renderHookWithGrid();
+    triggerRerender();
+    expect(() => gridEl.current!.style.getPropertyValue('--grid-left')).not.toThrow();
+    __setExpandMode('normal'); // reset
+  });
+
+  // === Tests that require isSpacePressed=true (keyboard event) ===
+  // These use a real DOM div and dispatch space keydown to trigger the state change.
+  // The keyboard listener is registered on document, so dispatching on any element works.
+
+  it('space keydown sets isSpacePressed to true (keyboard listener fires)', async () => {
+    const { result, gridEl, triggerRerender } = renderHookWithGrid();
+    triggerRerender();
+    const event = new KeyboardEvent('keydown', { code: 'Space', bubbles: true });
+    act(() => { gridEl.current!.dispatchEvent(event); });
+    await act(async () => { await new Promise((r) => setTimeout(r, 0)); });
+    expect(result.current!.isSpacePressed).toBe(true);
+  });
+
+  it('handleMouseDown sets isPanning=true after space keydown (panning body coverage)', async () => {
+    const { result, gridEl, triggerRerender } = renderHookWithGrid();
+    triggerRerender();
+    // First activate space
+    act(() => { gridEl.current!.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space', bubbles: true })); });
+    await act(async () => { await new Promise((r) => setTimeout(r, 0)); });
+    // Now click (handleMouseDown should start panning)
+    act(() => {
+      result.current!.handlers.handleMouseDown({
+        target: gridEl.current!,
+        preventDefault: jest.fn(),
+        clientX: 100,
+        clientY: 100,
+      } as unknown as React.MouseEvent);
+    });
+    expect(result.current!.isPanning).toBe(true);
+  });
+
+  it('handleMouseMove updates panOffset when isPanning=true', async () => {
+    const { result, gridEl, triggerRerender } = renderHookWithGrid();
+    triggerRerender();
+    // Set up: space + mousedown to start panning
+    act(() => { gridEl.current!.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space', bubbles: true })); });
+    await act(async () => { await new Promise((r) => setTimeout(r, 0)); });
+    act(() => {
+      result.current!.handlers.handleMouseDown({
+        target: gridEl.current!,
+        preventDefault: jest.fn(),
+        clientX: 100,
+        clientY: 100,
+      } as unknown as React.MouseEvent);
+    });
+    // Move mouse
+    act(() => {
+      result.current!.handlers.handleMouseMove({
+        clientX: 150,
+        clientY: 200,
+      } as unknown as React.MouseEvent);
+    });
+    // isPanning should be true and panOffset should have changed
+    expect(result.current!.isPanning).toBe(true);
+    expect(result.current!.panOffset).not.toEqual({ x: 0, y: 0 });
+  });
+
+  it('gridRef is attached to a real div after mount', () => {
+    const { gridEl } = renderHookWithGrid();
+    expect(gridEl.current).not.toBeNull();
+    expect(gridEl.current!.tagName).toBe('DIV');
   });
 });

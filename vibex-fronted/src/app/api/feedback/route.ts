@@ -1,5 +1,4 @@
 /**
-export const dynamic = 'force-static';
  * /api/feedback — 用户反馈提交接口
  * E3 S3.3: 接收前端反馈并转发到 Slack #coord 频道
  *

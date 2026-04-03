@@ -1,3 +1,10 @@
+### Fixed (canvas-canvasstore-migration E4: SplitStores 测试补全) — 2026-04-04
+- **E4 SplitStores 测试补全**: contextStore 覆盖率提升至 stmts 100%, branch 88.63%
+- **contextStore 新增测试**: recomputeActiveTree, toggleNodeSelect, deleteSelectedNodes, advancePhase, selectAllNodes
+- **flowStore 新增测试**: cascade confirmStep, addFlowNode, deleteFlowNode cascade, reorderSteps
+- **代码修复**: contextStore.ts 移除未使用 `flows=[]` dead code
+- **提交**: `016c88a2`, `97954500`
+
 ### Fixed (canvas-canvasstore-migration E3: 废弃 store 删除) — 2026-04-04
 - **E3 废弃 store 删除**: 删除 src/stores/canvasHistoryStore.ts（无残留引用）
 - **提交**: `06ad16d8`

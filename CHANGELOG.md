@@ -135,6 +135,12 @@
 - **根因**: 新建节点无需 confirmed 字段，checkbox 默认状态由 isActive 决定
 - **提交**: `34de803d`
 
+### Added (vibex-dev-proposals-20260403_024652 E4: canvasStore 退役) — 2026-04-03
+- **E4 canvasStore Facade 退役**: canvasStore.ts 从 1451 行降级为 170 行 re-export 层
+- **迁移完成**: 所有 state/logic 迁移至 split stores (contextStore/flowStore/componentStore/uiStore/sessionStore)
+- **向后兼容**: useCanvasStore 作为 useContextStore 的别名，渐进式迁移
+- **提交**: `0ad8d5b2`
+
 ### Added (proposals-20260401-9: Sprint 3 - Checkbox/Drawer/Responsive/Shortcuts) — 2026-04-02
 - **E1 Checkbox Confirm**: confirmContextNode/confirmFlowNode/confirmStep actions in canvasStore.ts; BoundedContextTree/BusinessFlowTree checkbox onChange calls confirm semantics
 - **E2 Message Drawer**: canvasEvents.ts (CanvasEventType/CanvasEvent); openRightDrawer()/submitCanvas() in canvasStore.ts; CommandInput auto-open drawer on command execute; /submit logs event

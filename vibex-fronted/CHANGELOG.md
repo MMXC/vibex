@@ -1,5 +1,14 @@
 # Changelog
 
+### [vibex-css-build-fix E2: stylelint集成] — 2026-04-04 (vibex-css-build-fix)
+
+#### Added
+- `.stylelintrc.json` — stylelint 配置，`no-invalid-position-declaration` 规则检测孤立 CSS 属性行
+- `lint:css` npm script — targeted CSS linting
+- `.github/workflows/pre-submit.yml` CI gate — stylelint 失败时阻断构建
+
+**提交**: `cc4ff92f`, `48b0f416`
+
 ### [E1-修复CSS孤立属性] — 2026-04-04 (vibex-css-build-fix)
 
 #### Fixed

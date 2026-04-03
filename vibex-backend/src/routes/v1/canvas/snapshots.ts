@@ -36,6 +36,8 @@ const CreateSnapshotSchema = z.object({
     ui: z.record(z.string(), z.any()).optional(),
   }).optional(),
   isAutoSave: z.boolean().optional().default(false),
+  // E1: Optimistic locking — version number for conflict detection
+  version: z.number().optional(),
 })
 
 // ============================================================
@@ -118,7 +120,7 @@ snapshots.post('/', async (c) => {
       return c.json({ error: 'Invalid request body', details: parsed.error.flatten() }, 400)
     }
 
-    const { projectId, label, trigger, contextNodes, flowNodes, componentNodes, data: legacyData, isAutoSave } = parsed.data
+    const { projectId, label, trigger, contextNodes, flowNodes, componentNodes, data: legacyData, isAutoSave, version: clientVersion } = parsed.data
     const env = c.env
 
     // Use projectId from request, or fall back to one in legacy data
@@ -140,14 +142,49 @@ snapshots.post('/', async (c) => {
       _label: label,
     }
 
-    // Get the next version number for this project
+    // Get the current max version for optimistic locking
     const existing = await queryDB<{ maxVersion: number | null }>(
       env,
       'SELECT MAX(version) as maxVersion FROM CanvasSnapshot WHERE projectId = ?',
       [resolvedProjectId]
     )
-    const nextVersion = (existing[0]?.maxVersion ?? 0) + 1
+    const currentMaxVersion = existing[0]?.maxVersion ?? 0
 
+    // E1: Optimistic locking — if client provides version, check for conflict
+    if (clientVersion !== undefined && clientVersion <= currentMaxVersion) {
+      // Get server's latest snapshot for conflict response
+      const serverSnapshot = await queryOne<CanvasSnapshotRow>(
+        env,
+        'SELECT * FROM CanvasSnapshot WHERE projectId = ? ORDER BY version DESC LIMIT 1',
+        [resolvedProjectId]
+      )
+
+      // Parse server data
+      let serverData: Record<string, any> = {}
+      if (serverSnapshot) {
+        try {
+          serverData = JSON.parse(serverSnapshot.data)
+        } catch {
+          serverData = {}
+        }
+      }
+
+      return c.json({
+        success: false,
+        error: 'VERSION_CONFLICT',
+        message: 'Version conflict detected. Another client has saved a newer version.',
+        serverVersion: currentMaxVersion,
+        clientVersion,
+        serverSnapshot: serverSnapshot ? {
+          snapshotId: serverSnapshot.id,
+          version: serverSnapshot.version,
+          createdAt: serverSnapshot.createdAt,
+          data: serverData,
+        } : null,
+      }, 409)
+    }
+
+    const nextVersion = currentMaxVersion + 1
     const snapshotId = generateId()
     const now = new Date().toISOString()
 
@@ -359,6 +396,37 @@ snapshots.post('/:id/restore', async (c) => {
   } catch (err) {
     console.error('[canvas/snapshots] POST :id/restore error:', err)
     return c.json({ error: 'Failed to restore snapshot' }, 500)
+  }
+})
+
+// ============================================================
+// GET /v1/canvas/snapshots/latest?projectId=xxx — Get latest version info
+// E1: Lightweight endpoint for polling version in useAutoSave
+// ============================================================
+
+snapshots.get('/latest', async (c) => {
+  try {
+    const projectId = c.req.query('projectId')
+    const env = c.env
+
+    if (!projectId) {
+      return c.json({ error: 'Missing required query param: projectId' }, 400)
+    }
+
+    const latest = await queryOne<{ version: number; createdAt: string }>(
+      env,
+      'SELECT version, createdAt FROM CanvasSnapshot WHERE projectId = ? ORDER BY version DESC LIMIT 1',
+      [projectId]
+    )
+
+    return c.json({
+      success: true,
+      latestVersion: latest?.version ?? 0,
+      updatedAt: latest?.createdAt ?? null,
+    })
+  } catch (err) {
+    console.error('[canvas/snapshots] GET /latest error:', err)
+    return c.json({ error: 'Failed to fetch latest version' }, 500)
   }
 })
 

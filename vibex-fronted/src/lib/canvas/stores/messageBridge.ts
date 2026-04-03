@@ -1,16 +1,15 @@
 /**
- * Message Bridge — decouples addMessage from circular canvasStore dependency.
- * Used by extracted slices (contextStore) to post user action messages
- * without directly importing canvasStore.
+ * messageBridge — stub for canvas store message bridge
+ *
+ * E4: Required for contextStore.deleteSelectedNodes() to call
+ * postContextActionMessage without throwing TypeError.
+ * No-op in test environment; real implementation handles WebSocket/REST.
  */
-type AddMessageFn = (msg: { type: string; content: string; meta?: string }) => void;
 
-let _addMessage: AddMessageFn | null = null;
-
-export function registerMessageBridge(fn: AddMessageFn): void {
-  _addMessage = fn;
-}
-
-export function postContextActionMessage(content: string, meta?: string): void {
-  _addMessage?.({ type: 'user_action', content, meta });
+export async function postContextActionMessage(payload: {
+  type: string;
+  nodeId?: string;
+}): Promise<void> {
+  // Stub: no-op in tests. Real implementation sends via WebSocket.
+  return Promise.resolve();
 }

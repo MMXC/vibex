@@ -1162,17 +1162,19 @@ Step 3.2 + 3.3
 
 ### Sprint 3 交付验证
 
-- [ ] `vibex-fronted/AGENTS.md` 包含 CHANGELOG 规范章节
-- [ ] `vibex-fronted/AGENTS.md` 包含 Reviewer 驳回模板
-- [ ] `vibex-fronted/AGENTS.md` 包含 Reviewer Constraints
-- [ ] `vibex-fronted/CHANGELOG_CONVENTION.md` 已创建
-- [ ] `vibex-backend/AGENTS.md` 包含 CHANGELOG 规范
-- [ ] `vibex-fronted/scripts/pre-submit-check.sh` 存在且可执行
-- [ ] `pre-submit-check.sh` 包含 CHANGELOG/TS/ESLint/disable 监控
-- [ ] `.github/workflows/pre-submit.yml` 存在
-- [ ] `vibex-fronted/reports/INDEX.md` 存在且包含历史报告索引
-- [ ] `vibex-fronted/README.md` 包含 Reviewer 工作流章节
-- [ ] 团队已在 Slack 收到通知
+- [x] `vibex-fronted/AGENTS.md` 包含 CHANGELOG 规范章节
+- [x] `vibex-fronted/AGENTS.md` 包含 Reviewer 驳回模板
+- [x] `vibex-fronted/AGENTS.md` 包含 Reviewer Constraints
+- [x] `vibex-fronted/CHANGELOG_CONVENTION.md` 已创建
+- [x] `vibex-backend/AGENTS.md` 包含 CHANGELOG 规范
+- [x] `vibex-fronted/scripts/pre-submit-check.sh` 存在且可执行
+- [x] `pre-submit-check.sh` 包含 CHANGELOG/TS/ESLint/disable 监控
+- [x] `.github/workflows/pre-submit.yml` 存在
+- [x] `vibex-fronted/reports/INDEX.md` 存在且包含历史报告索引
+- [x] `vibex-fronted/README.md` 包含 Reviewer 工作流章节
+- [x] `vibex-fronted/README.md` 包含 pre-submit-check.sh 章节
+- [x] `vibex-fronted/README.md` 包含 CHANGELOG 规范章节
+- [x] 团队已在 Slack 收到通知 (E4: 2026-04-04)
 
 ### Sprint 4 交付验证（规划）
 

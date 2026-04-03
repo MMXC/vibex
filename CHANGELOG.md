@@ -1,3 +1,9 @@
+### Fixed (canvas-phase0-cleanup E1+E2+E4: type guards / console clean / dead code) — 2026-04-03
+- **E1 Type Guards**: type-guards.ts 新增 isValid* 验证器；CanvasPage.tsx 移除 9 处 `as any`
+- **E2 Console Clean**: canvasApi.ts + templateLoader.ts 移除 console.error
+- **E4 Dead Code**: uiStore.ts + CommandInput.tsx 移除 submitCanvas
+- **提交**: `d7c36ec7`
+
 ### Fixed (canvas-phase0-cleanup E5: recordSnapshot 修复) — 2026-04-03
 - **E5 recordSnapshot 修复**: recordSnapshot 移至 map() 外部调用（修复 stale flowNodes 问题）
 - **reorderSteps 修复**: insertAt = toIndex（修复错位问题）

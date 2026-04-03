@@ -10,3 +10,9 @@
 2026-04-03 03:59 GMT+8 | analyst | ✅ 完成测试框架标准化需求分析 | canvas-test-framework-standardize | 产出物: docs/canvas-test-framework-standardize/analysis.md | 识别5个JTBD+2个方案对比(A渐进32h/B激进28h) | 推荐方案A(渐进式标准化,5天)
 
 2026-04-03 04:12 GMT+8 | analyst | ✅ E4 Sync Protocol 需求分析完成 | canvas-sync-protocol-complete | 产出物: docs/canvas-sync-protocol-complete/analysis.md | 识别4个JTBD+2个方案对比(A REST+轮询4-6h / B WebSocket+CRDT 15-20h) | 推荐方案A（后端REST+轮询+冲突Dialog，5h）
+
+## 2026-04-03 23:53 GMT+8
+- ✅ canvas-split-hooks/analyze-requirements 完成 — 分析了 1510 行 CanvasPage.tsx，识别 6 个 hook 拆分方案（useCanvasState/useCanvasStore/useAIController/useCanvasRenderer/useCanvasEvents+useFlowStore已独立），19h 总工时，详见 docs/canvas-split-hooks/analysis.md
+
+## 2026-04-04 00:01 GMT+8
+- ✅ canvas-canvasstore-migration/analyze-requirements 完成 — 分析了 14 个文件的迁移范围：canvasStore.ts 清理（1重写）、CanvasPage.tsx import 更新（1修改）、废弃 canvasHistoryStore.ts 删除（1删除）、split store 测试覆盖补全（6测试）、新建 crossStoreSync+loadExampleData+deprecated（3新建）、集成测试（2新建）。16h 总工时分5个Epic。详见 docs/canvas-canvasstore-migration/analysis.md

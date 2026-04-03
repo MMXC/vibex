@@ -50,9 +50,26 @@ cd vibex-fronted && npm run build
 # 期望: exit code = 0
 
 # E3: 批量扫描
-rg -n '^\s{2,}[a-z-]+\s*:' src/**/*.module.css
-# 期望: 无输出
+
+## 实施结果
+
+- **脚本**: `scripts/scan-orphaned-css.js`
+- **命令**: `pnpm run scan:css`
+- **扫描文件数**: 209 个 .module.css 文件
+- **发现孤立属性数**: 0（所有文件已修复）
+- **过滤误报**: `@keyframes`, `@supports`, `@media`, `@container`, `@layer` 内的属性不报错
+
+```bash
+pnpm run scan:css
+# ✅ No orphaned CSS properties found in 209 files.
 ```
+
+## 验证结果
+
+- [x] 脚本存在且可执行
+- [x] 批量扫描 209 个 .module.css 文件
+- [x] 过滤 @keyframes 等误报
+- [x] 发现 0 个孤立属性（E1/E2 修复已完成）
 
 ---
 

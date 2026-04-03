@@ -1,3 +1,8 @@
+### Added (canvas-split-hooks E2: useCanvasStore) — 2026-04-04
+- **E2 useCanvasStore hook**: 统一 store selectors（context/flow/component/ui/session stores）
+- **代码清理**: 删除不兼容 `output:export` 的 share/[token] 路由
+- **提交**: `4d48451a`
+
 ### Added (canvas-split-hooks E1: useCanvasState) — 2026-04-04
 - **E1 useCanvasState 抽取**: 从 CanvasPage.tsx 提取 useCanvasState hook
 - **纯函数提取**: isSpaceKeyAllowed/isPanningClickTarget 100% branch coverage

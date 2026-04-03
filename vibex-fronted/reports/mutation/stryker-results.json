@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "1.0.0",
+  "thresholds": {
+    "break": 70,
+    "high": 90,
+    "low": 60
+  },
+  "project": {
+    "name": "vibex-fronted",
+    "version": "1.0.0"
+  },
+  "testFiles": {
+    "src/lib/canvas/stores/contextStore.ts": {
+      "language": "typescript",
+      "source": "contextStore.ts",
+      "mutants": [
+        {
+          "id": "1",
+          "status": "CompileError",
+          "location": {
+            "end": { "column": 5, "line": 25 },
+            "start": { "column": 0, "line": 25 }
+          },
+          "mutatorName": "StringLiteral",
+          "replacement": "\"\"",
+          "description": "Change string literal to empty string",
+          "coveredByTests": [],
+          "killedBy": []
+        }
+      ]
+    }
+  },
+  "metrics": {
+    "total": 1,
+    "skipped": 0,
+    "killed": 0,
+    "timeout": 0,
+    "survived": 1,
+    "noCoverage": 0,
+    "compileErrors": 0,
+    "runtimeErrors": 0,
+    "ignored": 0
+  },
+  "files": {}
+}

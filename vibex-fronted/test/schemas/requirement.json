@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "requirement",
+  "type": "object",
+  "description": "Requirement API response schema — E4 Contract Testing (test/schemas/requirement.json)",
+  "required": ["id", "title", "projectId"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique requirement identifier"
+    },
+    "title": {
+      "type": "string",
+      "description": "Requirement title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed requirement description"
+    },
+    "projectId": {
+      "type": "string",
+      "description": "Associated project ID"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "completed", "archived"],
+      "description": "Requirement lifecycle status"
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["P0", "P1", "P2", "P3"],
+      "description": "Requirement priority"
+    },
+    "boundedContexts": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Associated bounded context IDs"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Requirement tags"
+    },
+    "createdAt": {
+      "type": "number",
+      "description": "Creation timestamp (ms)"
+    },
+    "updatedAt": {
+      "type": "number",
+      "description": "Last update timestamp (ms)"
+    }
+  },
+  "additionalProperties": true
+}

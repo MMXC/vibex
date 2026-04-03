@@ -1,3 +1,10 @@
+### Fixed (canvas-canvasstore-migration E1: canvasStore 清理与降级) — 2026-04-04
+- **E1 canvasStore 清理**: canvasStore.ts 从 ~170 行降级为 43 行纯 re-export 层
+- **crossStoreSync.ts**: 提取跨 store 订阅逻辑（activeTree→centerExpand, flow→recompute）
+- **loadExampleData.ts**: 提取示例数据加载函数（使用 .getState() 而非 hooks）
+- **deprecated.ts**: 向后兼容 helpers（标记 @deprecated，推荐使用 split stores）
+- **提交**: `a99998cb`
+
 ### Fixed (canvas-phase0-cleanup E4: areAllConfirmed dead code 移除) — 2026-04-03
 - **E4 areAllConfirmed 移除**: cascade/index.ts + CascadeUpdateManager.ts 移除 areAllConfirmed
 - **提交**: `ab812506`

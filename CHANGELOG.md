@@ -1,3 +1,8 @@
+### Fixed (canvas-phase0-cleanup E3: generateId 抽取) — 2026-04-03
+- **E3 generateId 抽取**: 新建 `src/lib/canvas/id.ts`，统一 generateId + generatePrefixedId
+- **去重**: 从 contextStore/componentStore/flowStore 移除本地 generateId
+- **提交**: `559f6ada`
+
 ### Fixed (canvas-phase0-cleanup E1+E2+E4: type guards / console clean / dead code) — 2026-04-03
 - **E1 Type Guards**: type-guards.ts 新增 isValid* 验证器；CanvasPage.tsx 移除 9 处 `as any`
 - **E2 Console Clean**: canvasApi.ts + templateLoader.ts 移除 console.error

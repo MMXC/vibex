@@ -1,5 +1,15 @@
 # Changelog
 
+### [E4-API路由静态导出修复] — 2026-04-04 (vibex-css-build-fix)
+
+#### Removed
+- `src/app/api/share/[token]/route.ts` — 移除动态 API 路由，修复 `output: 'export'` 静态导出冲突
+- `src/app/share/[token]/page.tsx` — 移除动态分享页面（依赖 share API）
+- `src/app/share/[token]/share.module.css` — 移除分享页面样式
+
+#### Verification
+- `npm run build` ✅ 34 static pages generated, exit 0
+
 ### [E3 用户体验增强] — 2026-04-03 (dev-epic3-用户体验增强)
 
 #### Added

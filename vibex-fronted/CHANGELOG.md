@@ -8,6 +8,41 @@
 #### Verification
 - `npm run build` ✅ exit 0
 
+### [canvas-split-hooks E3: useCanvasRenderer] — 2026-04-04 (canvas-split-hooks)
+
+#### Added
+- `src/hooks/canvas/useCanvasRenderer.ts` — 从 CanvasPage.tsx 提取的 memoized 渲染计算 hook
+  - `computeNodeRects`: context/flow/component 节点矩形计算
+  - `computeBoundedEdges`: 限界上下文关系边计算
+  - `computeFlowEdges`: 流程步骤连接边计算
+  - `contextTreeNodes`, `flowTreeNodes`, `componentTreeNodes` 统一 TreeNode 数组
+
+**提交**: `8b159720`
+
+### [canvas-split-hooks E2: useCanvasStore] — 2026-04-04 (canvas-split-hooks)
+
+#### Added
+- `src/hooks/canvas/useCanvasStore.ts` — 统一 store selectors hook（context/flow/component/ui/session stores）
+- 删除不兼容 `output:export` 的 `share/[token]` 路由
+
+**提交**: `4d48451a`
+
+### [canvas-split-hooks E1: useCanvasState] — 2026-04-04 (canvas-split-hooks)
+
+#### Added
+- `src/hooks/canvas/useCanvasState.ts` — 从 CanvasPage.tsx 提取的 useCanvasState hook
+- 纯函数提取：`isSpaceKeyAllowed`, `isPanningClickTarget` — 100% branch coverage
+
+**提交**: `cc03e6ac`, `a8677bb7`
+
+### [flow-step-check-fix E1: 级联确认修复] — 2026-04-02 (flow-step-check-fix)
+
+#### Fixed
+- `flowStore.ts` `confirmFlowNode` — 勾选流程节点时级联确认所有子步骤，取消勾选时级联取消
+- 修复 flow-step-check-fix Epic1: checkbox toggle 现在正确同步 steps 数组
+
+**提交**: `38255941`
+
 ### [E5-Git Hooks强制] — 2026-04-03 (vibex-reviewer-proposals-20260403_024652)
 
 #### Added

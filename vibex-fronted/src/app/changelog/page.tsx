@@ -18,6 +18,28 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.96',
+    date: '2026-04-04',
+    changes: [
+      '🎣 canvas-split-hooks/E3: useCanvasRenderer hook — memoized 渲染计算',
+      '✅ computeNodeRects: context/flow/component 节点矩形',
+      '✅ computeBoundedEdges + computeFlowEdges: 边连接计算',
+      '✅ 提交 8b159720',
+    ],
+    commit: '8b159720',
+  },
+  {
+    version: '1.0.95',
+    date: '2026-04-04',
+    changes: [
+      '🔗 canvas-split-hooks/E2: useCanvasStore — 统一 store selectors',
+      '🔗 canvas-split-hooks/E1: useCanvasState — 从 CanvasPage 提取',
+      '🔗 flow-step-check-fix/E1: confirmFlowNode 级联确认子步骤',
+      '✅ 提交 4d48451a / cc03e6ac / a8677bb7 / 38255941',
+    ],
+    commit: '4d48451a',
+  },
+  {
     version: '1.0.93',
     date: '2026-04-04',
     changes: [

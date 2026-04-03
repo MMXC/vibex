@@ -3,12 +3,22 @@
  * Tests flow node CRUD, step CRUD, and draft state.
  */
 import { useFlowStore } from './flowStore';
+import { getHistoryStore } from '../historySlice';
 
 // Mock addMessage to avoid canvasStore dependency
 jest.mock('../canvasStore', () => ({
   useCanvasStore: {
     getState: () => ({ addMessage: jest.fn() }),
   },
+}));
+
+// Mock historyStore to avoid real history operations
+jest.mock('../historySlice', () => ({
+  getHistoryStore: () => ({
+    recordSnapshot: jest.fn(),
+    undo: jest.fn(),
+    redo: jest.fn(),
+  }),
 }));
 
 describe('useFlowStore', () => {
@@ -167,6 +177,38 @@ describe('useFlowStore', () => {
       const reordered = useFlowStore.getState().flowNodes[0].steps;
       expect(reordered[0].stepId).toBe(stepB);
       expect(reordered[1].stepId).toBe(stepA);
+    });
+  });
+
+  describe('undo/redo recordSnapshot', () => {
+    beforeEach(() => {
+      useFlowStore.setState({
+        flowNodes: [],
+        flowDraft: null,
+      });
+      useFlowStore.getState().addFlowNode({
+        contextId: 'ctx-1',
+        name: 'Test Flow',
+        steps: [],
+      });
+    });
+
+    it('should add step and record snapshot', () => {
+      const nodeId = useFlowStore.getState().flowNodes[0].nodeId;
+      useFlowStore.getState().addStepToFlow(nodeId, { name: 'New Step' });
+      expect(useFlowStore.getState().flowNodes[0].steps.length).toBe(1);
+      expect(useFlowStore.getState().flowNodes[0].steps[0].name).toBe('New Step');
+    });
+
+    it('should reorder steps and record snapshot', () => {
+      const nodeId = useFlowStore.getState().flowNodes[0].nodeId;
+      useFlowStore.getState().addStepToFlow(nodeId, { name: 'Step A' });
+      useFlowStore.getState().addStepToFlow(nodeId, { name: 'Step B' });
+      const stepsBefore = useFlowStore.getState().flowNodes[0].steps.map((s) => s.name).join(',');
+      useFlowStore.getState().reorderSteps(nodeId, 0, 1);
+      const stepsAfter = useFlowStore.getState().flowNodes[0].steps.map((s) => s.name).join(',');
+      expect(stepsAfter).not.toBe(stepsBefore);
+      expect(stepsAfter).toBe('Step B,Step A');
     });
   });
 

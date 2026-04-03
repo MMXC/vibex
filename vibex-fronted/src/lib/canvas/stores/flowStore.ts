@@ -205,9 +205,9 @@ export const useFlowStore = create<FlowStore>()(
                 isActive: false,
                 status: 'pending' as const,
               };
-              getHistoryStore().recordSnapshot('flow', [...s.flowNodes]);
               return { ...n, steps: [...n.steps, newStep], status: 'pending' as const };
             });
+            getHistoryStore().recordSnapshot('flow', newNodes);
             return { flowNodes: newNodes };
           });
         },
@@ -248,15 +248,14 @@ export const useFlowStore = create<FlowStore>()(
               if (n.nodeId !== flowNodeId) return n;
               const steps = [...n.steps];
               const [moved] = steps.splice(fromIndex, 1);
-              const insertAt = fromIndex < toIndex ? toIndex - 1 : toIndex;
-              steps.splice(insertAt, 0, moved);
-              getHistoryStore().recordSnapshot('flow', [...s.flowNodes]);
+              steps.splice(toIndex, 0, moved);
               return {
                 ...n,
                 steps: steps.map((st, i) => ({ ...st, order: i })),
                 status: 'pending' as const,
               };
             });
+            getHistoryStore().recordSnapshot('flow', newNodes);
             return { flowNodes: newNodes };
           });
         },

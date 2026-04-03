@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.92',
+    date: '2026-04-04',
+    changes: [
+      '🔧 vibex-css-build-fix/E4: 移除动态 API 路由，修复 `output: export` 静态导出冲突',
+      '✅ 删除 src/app/api/share/[token]/route.ts（动态路由与静态导出不兼容）',
+      '✅ 删除 src/app/share/[token]/page.tsx 及样式（依赖 share API）',
+      '✅ npm run build: 34 static pages generated, exit 0',
+    ],
+    commit: '4d48451a',
+  },
+  {
     version: '1.0.91',
     date: '2026-04-03',
     changes: [

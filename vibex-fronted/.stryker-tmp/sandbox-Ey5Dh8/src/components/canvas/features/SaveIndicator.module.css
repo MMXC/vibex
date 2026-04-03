@@ -1,0 +1,83 @@
+/**
+ * SaveIndicator.module.css — 视觉反馈指示器样式
+ * E3-S2: 状态指示器显示
+ *
+ * 设计原则:
+ * - 固定在工具栏区域，不遮挡主内容
+ * - 保存中: 旋转动画，蓝色文字
+ * - 已保存: 绿色文字
+ * - 失败: 红色文字 + 重试按钮
+ */
+.indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+/* Idle — subtle, just showing last saved time */
+.idle {
+  color: var(--color-text-secondary, #6b7280);
+  background: transparent;
+}
+
+/* Saving — blue + spinner */
+.saving {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.08);
+}
+
+/* Saved — green */
+.saved {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+}
+
+/* Error — red + retry */
+.error {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.savedTime {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.retryBtn {
+  margin-left: 4px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.retryBtn:hover {
+  background: rgba(239, 68, 68, 0.2);
+}

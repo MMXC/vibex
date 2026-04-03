@@ -1,0 +1,82 @@
+/* OAuth Connect Button Styles */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.connectButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-secondary, #12121a);
+  border: 1px solid var(--border-color, #2a2a3e);
+  border-radius: 8px;
+  color: var(--text-primary, #e4e4e7);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.connectButton:hover:not(:disabled) {
+  background: var(--bg-tertiary, #1a1a24);
+  border-color: var(--text-muted, #71717a);
+}
+
+.connectButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.connected {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 8px;
+}
+
+.icon {
+  font-size: 18px;
+}
+
+.name {
+  flex: 1;
+  font-size: 14px;
+  color: var(--text-primary, #e4e4e7);
+}
+
+.disconnectButton {
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  border-radius: 6px;
+  color: #ef4444;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.disconnectButton:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.disconnectButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error {
+  padding: 8px 12px;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 6px;
+  color: #ef4444;
+  font-size: 12px;
+}

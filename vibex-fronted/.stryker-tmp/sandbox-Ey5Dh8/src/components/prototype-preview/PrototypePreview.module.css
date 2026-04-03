@@ -1,0 +1,23 @@
+.container { display: flex; flex-direction: column; height: 100%; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+.pageTabs { display: flex; gap: 0.25rem; padding: 0.5rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb; overflow-x: auto; }
+.pageTab { padding: 0.5rem 1rem; background: white; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.8125rem; color: #6b7280; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+.pageTab:hover { background: #f3f4f6; }
+.pageTab.active { background: #3b82f6; color: white; border-color: #3b82f6; }
+.previewArea { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.previewHeader { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: white; border-bottom: 1px solid #e5e7eb; }
+.pageName { margin: 0; font-size: 0.9375rem; font-weight: 600; color: #111827; }
+.pageRoute { font-size: 0.75rem; color: #6b7280; background: #f3f4f6; padding: 0.25rem 0.5rem; border-radius: 4px; }
+.previewContent { flex: 1; padding: 1rem; overflow: auto; display: flex; flex-direction: column; gap: 0.5rem; }
+.component { padding: 1rem; background: white; border: 1px dashed #d1d5db; border-radius: 6px; cursor: pointer; transition: all 0.15s; }
+.component:hover, .component.hovered { border-color: #3b82f6; background: #eff6ff; }
+.component.interacted { border-style: solid; border-color: #10b981; }
+.componentContent { display: flex; align-items: center; gap: 0.5rem; }
+.componentType { font-size: 0.75rem; color: #6b7280; background: #f3f4f6; padding: 0.125rem 0.375rem; border-radius: 3px; text-transform: uppercase; }
+.componentLabel { font-size: 0.875rem; color: #111827; }
+.componentChildren { margin-top: 0.5rem; padding-left: 0.5rem; border-left: 2px solid #e5e7eb; display: flex; flex-direction: column; gap: 0.25rem; }
+.empty { flex: 1; display: flex; align-items: center; justify-content: center; color: #9ca3af; }
+.interactionLog { padding: 0.75rem; background: #f9fafb; border-top: 1px solid #e5e7eb; max-height: 120px; overflow-y: auto; }
+.interactionLog h4 { margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; color: #6b7280; }
+.logEntry { display: flex; gap: 0.5rem; font-size: 0.75rem; padding: 0.25rem 0; }
+.logId { font-family: monospace; color: #6b7280; }
+.logAction { color: #10b981; }

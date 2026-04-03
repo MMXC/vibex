@@ -1,0 +1,155 @@
+.previewCanvas {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: rgba(18, 18, 26, 0.6);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #f0f0f5;
+}
+
+.actions {
+  display: flex;
+  gap: 4px;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #9090a0;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.actionButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f0f0f5;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mermaidContainer {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+}
+
+.minimizedContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  font-size: 12px;
+  color: #9090a0;
+}
+
+.minimizedContent button {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  background: rgba(0, 212, 255, 0.2);
+  color: #00d4ff;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #9090a0;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  opacity: 0.5;
+}
+
+.emptyText {
+  font-size: 14px;
+  text-align: center;
+  max-width: 280px;
+}
+
+/* 节点勾选 */
+.nodeSelection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nodeCheckbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nodeCheckbox:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.nodeCheckbox.checked {
+  background: rgba(0, 212, 255, 0.2);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+.nodeCheckbox input {
+  width: 16px;
+  height: 16px;
+  accent-color: #00d4ff;
+}
+
+.nodeLabel {
+  font-size: 13px;
+  color: #f0f0f5;
+}
+
+@media (max-width: 768px) {
+  .nodeSelection {
+    padding: 8px;
+  }
+  
+  .nodeCheckbox {
+    padding: 4px 8px;
+  }
+  
+  .nodeLabel {
+    font-size: 12px;
+  }
+}

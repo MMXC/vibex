@@ -1,0 +1,28 @@
+/**
+ * FlowEdgeLayer.module.css
+ */
+
+.layer {
+  /* SVG overlay — pointer-events: none 在组件内设置 */
+}
+
+.edge {
+  transition: stroke-opacity 0.2s ease;
+}
+
+.edge:hover {
+  stroke-opacity: 0.8;
+}
+
+/* Flow edge types */
+.edge.sequence {
+  /* 实线, 蓝色 */
+}
+
+.edge.branch {
+  /* 虚线, 橙色 */
+}
+
+.edge.loop {
+  /* 回环, 紫色 */
+}

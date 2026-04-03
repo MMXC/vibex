@@ -1,0 +1,78 @@
+/**
+ * homepage-v4.module.css - Grid 布局 + 浅色主题
+ * 
+ * 三栏 Grid 布局: 220px(左侧) | 1fr(中央) | 260px(右侧)
+ * 底部面板: 380px 固定高度
+ * 浅色主题变量隔离
+ */
+
+/* ========== 浅色主题变量 ========== */
+.page {
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-primary-muted: #dbeafe;
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f9fafb;
+  --color-bg-tertiary: #f3f4f6;
+  --color-border: #e5e7eb;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: #9ca3af;
+
+  /* 布局变量 */
+  --header-height: 50px;
+  --left-width: 220px;
+  --right-width: 260px;
+  --bottom-height: 380px;
+}
+
+/* ========== Grid 根容器 ========== */
+.page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: var(--header-height, 50px) 1fr var(--bottom-height, 380px);
+  grid-template-columns: var(--left-width, 220px) 1fr var(--right-width, 260px);
+  background: var(--color-bg-secondary, #f9fafb);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ========== Header ========== */
+.header {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  z-index: 20;
+}
+
+/* ========== 左侧抽屉 ========== */
+.leftDrawer {
+  grid-column: 1;
+  grid-row: 2;
+  background: var(--color-bg-secondary, #f9fafb);
+  border-right: 1px solid var(--color-border, #e5e7eb);
+  overflow-y: auto;
+}
+
+/* ========== 预览区 ========== */
+.preview {
+  grid-column: 2;
+  grid-row: 2;
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ========== 右侧 AI 面板 ========== */
+.rightDrawer {
+  grid-column: 3;
+  grid-row: 2;
+  background: var(--color-bg-primary, #ffffff);
+  border-left: 1px solid var(--color-border, #e5e7eb);
+  overflow-y: auto;
+}
+
+/* ========== 底部面板 ========== */
+.bottomPanel {
+  grid-column: 1 / -1;
+  grid-row: 3;
+}

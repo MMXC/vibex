@@ -1,0 +1,62 @@
+/**
+ * FloatingMode.module.css
+ * Epic 8: 悬浮模式样式
+ *
+ * R-1: 悬浮模式不得遮挡核心内容
+ * R-2: 不得引入新的状态管理库
+ */
+
+/* 悬浮模式根容器 */
+.floatingMode {
+  /* 无特殊样式，作为状态标记 */
+}
+
+/* 悬浮模式激活状态 */
+.floatingMode.active {
+  /* 激活时添加过渡效果 */
+}
+
+/* ============================================
+   底部面板悬浮时收起
+   ============================================ */
+
+/* 悬浮时收起底部面板 (通过 class 切换) */
+.collapsed {
+  /* 收起动画 */
+  transform: translateY(100%);
+  max-height: 0 !important;
+  overflow: hidden;
+  transition: transform 300ms ease-in-out, max-height 300ms ease-in-out;
+}
+
+/* ============================================
+   右侧面板悬浮时固定
+   ============================================ */
+
+/* 悬浮时右侧面板固定定位 */
+.floating-right {
+  position: fixed !important;
+  top: 0;
+  right: 0;
+  z-index: 100;
+  /* 确保不遮挡核心内容 - 与 GridContainer 协调 */
+  /* GridContainer z-index: 1, FloatingMode z-index: 100 */
+  transition: position 300ms ease-in-out, top 300ms ease-in-out;
+}
+
+/* ============================================
+   悬浮模式指示器 (可选，用于调试)
+   ============================================ */
+
+/* .floatingMode[data-floating='true']::after {
+  content: 'Floating';
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 9999;
+} */

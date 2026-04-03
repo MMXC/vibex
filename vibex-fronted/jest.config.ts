@@ -33,6 +33,8 @@ const config: Config = {
     enableGlobally: false,
   },
 
+  // Explicit testMatch (prevents missed tests, overrides default)
+  testMatch: ['**/*.test.ts', '**/*.test.tsx'],
   // CRITICAL: Exclude e2e and performance tests (use Playwright instead)
   testPathIgnorePatterns: [
     '/node_modules/',

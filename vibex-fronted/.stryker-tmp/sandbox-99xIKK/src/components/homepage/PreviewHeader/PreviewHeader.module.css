@@ -1,0 +1,194 @@
+/* PreviewHeader.module.css - Epic 4: 预览区头部样式 */
+
+/* CSS 变量 */
+.previewHeader {
+  --header-bg: rgba(255, 255, 255, 0.98);
+  --header-border: rgba(0, 0, 0, 0.06);
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --accent-primary: #3b82f6;
+  --accent-hover: #2563eb;
+  --hover-bg: rgba(59, 130, 246, 0.08);
+  --button-bg: #f3f4f6;
+  --button-hover: #e5e7eb;
+  --slider-track: #e5e7eb;
+  --slider-thumb: var(--accent-primary);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* 图表类型标签 */
+.diagramType {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  padding: 4px 12px;
+  background: var(--hover-bg);
+  border-radius: 16px;
+}
+
+/* ST-4.4: 缩放控制 */
+.scaleControl {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.scaleLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* 快速缩放选项 */
+.scaleOptions {
+  display: flex;
+  gap: 4px;
+}
+
+.scaleOption {
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--button-bg);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.scaleOption:hover {
+  background: var(--button-hover);
+  color: var(--text-primary);
+}
+
+.scaleOptionActive {
+  background: var(--accent-primary);
+  color: #ffffff;
+}
+
+.scaleOptionActive:hover {
+  background: var(--accent-hover);
+  color: #ffffff;
+}
+
+/* 缩放滑块 */
+.scaleSlider {
+  flex: 1;
+  min-width: 100px;
+  height: 4px;
+  appearance: none;
+  background: var(--slider-track);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.scaleSlider::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--slider-thumb);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.scaleSlider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.scaleSlider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: var(--slider-thumb);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.scaleValue {
+  min-width: 40px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-primary);
+  text-align: right;
+}
+
+/* ST-4.6: 导出按钮 */
+.exportControls {
+  display: flex;
+  gap: 8px;
+}
+
+.exportButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--button-bg);
+  border: 1px solid var(--header-border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.exportButton:hover:not(:disabled) {
+  background: var(--button-hover);
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+.exportButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .previewHeader {
+    padding: 8px 12px;
+    gap: 12px;
+  }
+
+  .scaleOptions {
+    display: none;
+  }
+
+  .scaleControl {
+    min-width: 150px;
+  }
+
+  .exportButton {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .scaleLabel {
+    display: none;
+  }
+
+  .scaleControl {
+    flex: 0;
+  }
+
+  .scaleSlider {
+    min-width: 80px;
+  }
+}

@@ -1,0 +1,210 @@
+.content {
+  padding: 16px 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.versionBadge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.currentBadge {
+  background: #10b981;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.metaLabel {
+  color: #6b7280;
+  font-size: 14px;
+  min-width: 60px;
+}
+
+.metaValue {
+  color: #111827;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.description {
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border-left: 3px solid #667eea;
+}
+
+.changeList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.changeList span {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.added {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.removed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.modified {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.noChanges {
+  color: #9ca3af;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.empty {
+  text-align: center;
+  color: #9ca3af;
+  padding: 40px;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.restoreButton {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.restoreButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.restoreButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.compareButton {
+  background: white;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.compareButton:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.noteEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.noteTextarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color 0.2s ease;
+}
+
+.noteTextarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.noteTextarea::placeholder {
+  color: #9ca3af;
+}
+
+.saveNoteButton {
+  align-self: flex-end;
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.saveNoteButton:hover:not(:disabled) {
+  background: #5a67d8;
+}
+
+.saveNoteButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

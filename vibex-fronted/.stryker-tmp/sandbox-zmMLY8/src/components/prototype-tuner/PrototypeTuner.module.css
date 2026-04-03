@@ -1,0 +1,20 @@
+.container { border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+.header { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb; }
+.title { margin: 0; font-size: 0.9375rem; font-weight: 600; color: #111827; }
+.actions { display: flex; gap: 0.5rem; }
+.resetButton { padding: 0.375rem 0.75rem; background: white; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.8125rem; color: #6b7280; cursor: pointer; }
+.resetButton:hover { background: #f3f4f6; }
+.applyButton { padding: 0.375rem 0.75rem; background: #3b82f6; border: none; border-radius: 6px; font-size: 0.8125rem; color: white; cursor: pointer; }
+.applyButton:hover { background: #2563eb; }
+.configList { padding: 1rem; display: flex; flex-direction: column; gap: 1rem; }
+.configItem { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.configLabel { font-size: 0.875rem; color: #374151; min-width: 80px; }
+.input, .select { flex: 1; padding: 0.5rem; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.875rem; }
+.input:focus, .select:focus { outline: none; border-color: #3b82f6; }
+.colorInput { width: 40px; height: 32px; padding: 0; border: 1px solid #e5e7eb; border-radius: 6px; cursor: pointer; }
+.toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggleSlider { position: absolute; cursor: pointer; inset: 0; background: #d1d5db; border-radius: 24px; transition: 0.3s; }
+.toggleSlider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+.toggle input:checked + .toggleSlider { background: #3b82f6; }
+.toggle input:checked + .toggleSlider:before { transform: translateX(20px); }

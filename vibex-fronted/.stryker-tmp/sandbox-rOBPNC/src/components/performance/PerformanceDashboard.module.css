@@ -1,0 +1,157 @@
+.dashboard {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  width: 280px;
+  background: rgba(10, 10, 15, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 9999;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.dashboard.expanded {
+  width: 320px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 255, 136, 0.1));
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f0f0f5;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #9090a0;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.toggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #f0f0f5;
+}
+
+.content {
+  padding: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.metric {
+  margin-bottom: 16px;
+}
+
+.metric:last-child {
+  margin-bottom: 0;
+}
+
+.metricHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.metricName {
+  font-size: 12px;
+  font-weight: 600;
+  color: #9090a0;
+}
+
+.metricValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f0f0f5;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.metricValue.ratingGood {
+  color: #00ff88;
+}
+
+.metricValue.ratingNeedsImprovement {
+  color: #ffd700;
+}
+
+.metricValue.ratingPoor {
+  color: #ff6b6b;
+}
+
+.unit {
+  font-size: 11px;
+  font-weight: 400;
+  color: #6b7280;
+}
+
+.metricLabel {
+  font-size: 11px;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.progressBar {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+  background: linear-gradient(90deg, #00d4ff, #00ff88);
+}
+
+.progressFill.ratingGood {
+  background: linear-gradient(90deg, #00ff88, #00d4ff);
+}
+
+.progressFill.ratingNeedsImprovement {
+  background: linear-gradient(90deg, #ffd700, #ff9500);
+}
+
+.progressFill.ratingPoor {
+  background: linear-gradient(90deg, #ff6b6b, #ff3b30);
+}
+
+.footer {
+  padding: 8px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.hint {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+/* 响应式 */
+@media (max-width: 640px) {
+  .dashboard {
+    width: calc(100% - 32px);
+    left: 16px;
+    right: 16px;
+  }
+}

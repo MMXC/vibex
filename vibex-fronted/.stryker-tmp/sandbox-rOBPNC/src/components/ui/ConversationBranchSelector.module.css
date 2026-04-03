@@ -1,0 +1,143 @@
+.container {
+  background: rgba(30, 30, 46, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  min-width: 200px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e0e0e0;
+}
+
+.addBtn {
+  background: rgba(0, 112, 243, 0.2);
+  border: 1px solid rgba(0, 112, 243, 0.5);
+  color: #0070f3;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.addBtn:hover {
+  background: rgba(0, 112, 243, 0.4);
+}
+
+/* 新建分支表单 */
+.newBranchForm {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 6px 10px;
+  color: #e0e0e0;
+  font-size: 13px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #0070f3;
+}
+
+.confirmBtn {
+  background: #0070f3;
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* 分支列表 */
+.branchList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.branchItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.branchItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.branchItem.active {
+  background: rgba(0, 112, 243, 0.2);
+  border: 1px solid rgba(0, 112, 243, 0.5);
+}
+
+.branchIcon {
+  font-size: 14px;
+  color: #888;
+}
+
+.branchItem.active .branchIcon {
+  color: #0070f3;
+}
+
+.branchName {
+  flex: 1;
+  font-size: 13px;
+  color: #e0e0e0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.branchCount {
+  font-size: 11px;
+  color: #666;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.deleteBtn {
+  opacity: 0;
+  background: none;
+  border: none;
+  color: #ff6b6b;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 6px;
+  transition: opacity 0.2s ease;
+}
+
+.branchItem:hover .deleteBtn {
+  opacity: 1;
+}
+
+.deleteBtn:hover {
+  color: #ff4444;
+}

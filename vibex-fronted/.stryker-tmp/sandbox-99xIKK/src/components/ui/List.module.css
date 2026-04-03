@@ -1,0 +1,347 @@
+/* List Component Styles */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-family: var(--font-sans);
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  transition: all var(--duration-fast) var(--ease-out-expo);
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+/* Sizes */
+.sm .listItem {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  gap: var(--space-2);
+}
+
+.md .listItem {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-base);
+}
+
+.lg .listItem {
+  padding: var(--space-4) var(--space-5);
+  font-size: var(--text-lg);
+  gap: var(--space-4);
+}
+
+/* Variants */
+.default .listItem {
+  color: var(--color-text-primary);
+}
+
+.default .listItem:hover {
+  background: var(--color-bg-subtle);
+}
+
+.default .listItem:active {
+  background: var(--color-bg-hover);
+}
+
+/* Glass variant */
+.glass .listItem {
+  background: var(--color-bg-glass);
+  border-color: var(--color-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--color-text-primary);
+}
+
+.glass .listItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 15px var(--color-primary-muted);
+}
+
+/* Subtle variant */
+.subtle .listItem {
+  background: var(--color-bg-subtle);
+  color: var(--color-text-secondary);
+}
+
+.subtle .listItem:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+}
+
+/* Separated variant */
+.separated {
+  gap: 0;
+}
+
+.separated .listItem {
+  border-radius: 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.separated .listItem:first-child {
+  border-top-left-radius: var(--radius-md);
+  border-top-right-radius: var(--radius-md);
+}
+
+.separated .listItem:last-child {
+  border-bottom-left-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+  border-bottom: none;
+}
+
+/* Hoverable */
+.hoverable .listItem:hover {
+  transform: translateX(4px);
+}
+
+/* Selectable */
+.selectable .listItem {
+  position: relative;
+}
+
+.selectable .listItem.selected {
+  background: var(--color-primary-muted);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.selectable .listItem.selected::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: var(--color-primary);
+  border-radius: 0 2px 2px 0;
+}
+
+/* Clickable */
+.clickable .listItem:active {
+  transform: scale(0.98);
+}
+
+/* Disabled */
+.listItem.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Icon */
+.listIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.listIcon svg {
+  width: 1.25em;
+  height: 1.25em;
+}
+
+.sm .listIcon svg {
+  width: 1em;
+  height: 1em;
+}
+
+.lg .listIcon svg {
+  width: 1.5em;
+  height: 1.5em;
+}
+
+/* Content */
+.listContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.listTitle {
+  font-weight: var(--font-medium);
+  color: var(--color-text-primary);
+}
+
+.listDescription {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.sm .listDescription {
+  font-size: var(--text-xs);
+}
+
+.lg .listDescription {
+  font-size: var(--text-base);
+}
+
+/* Meta */
+.listMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.listMetaItem {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+}
+
+/* Actions */
+.listActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out-expo);
+}
+
+.listItem:hover .listActions {
+  opacity: 1;
+}
+
+.listAction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out-expo);
+}
+
+.listAction:hover {
+  background: var(--color-bg-subtle);
+  color: var(--color-text-primary);
+}
+
+.listAction svg {
+  width: 1em;
+  height: 1em;
+}
+
+/* Empty state */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  color: var(--color-text-tertiary);
+  text-align: center;
+  gap: var(--space-3);
+}
+
+.emptyIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--color-bg-subtle);
+}
+
+.emptyIcon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.emptyText {
+  font-size: var(--text-sm);
+}
+
+/* Loading state */
+.loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.loadingItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+}
+
+.skeletonAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-subtle) 25%,
+    var(--color-bg-hover) 50%,
+    var(--color-bg-subtle) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton 1.5s ease-in-out infinite;
+}
+
+.skeletonContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.skeletonLine {
+  height: 12px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-subtle) 25%,
+    var(--color-bg-hover) 50%,
+    var(--color-bg-subtle) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton 1.5s ease-in-out infinite;
+}
+
+.skeletonLine.short {
+  width: 40%;
+}
+
+.skeletonLine.medium {
+  width: 70%;
+}
+
+@keyframes skeleton {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Nested list */
+.nested {
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--color-border);
+  margin-left: var(--space-4);
+}
+
+.nested .listItem {
+  padding-left: var(--space-3);
+}

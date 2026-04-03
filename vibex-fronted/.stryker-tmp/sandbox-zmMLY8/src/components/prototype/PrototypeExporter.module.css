@@ -1,0 +1,82 @@
+.exporter {
+  display: inline-flex;
+  position: relative;
+}
+
+.dropdownWrapper {
+  position: relative;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  min-width: 140px;
+  background: var(--bg-primary, #fff);
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-primary, #333);
+  transition: background-color 0.15s ease;
+}
+
+.dropdownItem:hover {
+  background: var(--bg-hover, #f5f5f5);
+}
+
+.formatItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.formatIcon {
+  font-size: 14px;
+}
+
+.modalContent {
+  padding: 16px 0;
+}
+
+.modalContent p {
+  margin: 0 0 12px 0;
+  color: var(--text-primary, #333);
+  line-height: 1.5;
+}
+
+.fileInfo {
+  padding: 8px 12px;
+  background: var(--bg-secondary, #f5f5f5);
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.fileInfo code {
+  font-family: 'Monaco', 'Menlo', monospace;
+  color: var(--color-primary, #007bff);
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color, #e0e0e0);
+}

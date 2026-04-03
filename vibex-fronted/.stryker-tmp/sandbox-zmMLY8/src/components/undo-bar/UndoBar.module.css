@@ -1,0 +1,70 @@
+/**
+ * UndoBar.module.css
+ *
+ * Floating undo/redo toolbar for the canvas.
+ * Positioned top-right, compact, always visible.
+ */
+
+.undoBar {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--color-surface-elevated, #252540);
+  border: 1px solid var(--color-border, #2d2d44);
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+.undoBtn,
+.redoBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: 1px solid var(--color-border, #2d2d44);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text-secondary, #a0a0c0);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.undoBtn:hover:not(:disabled),
+.redoBtn:hover:not(:disabled) {
+  background: var(--color-surface-hover, #2d2d4a);
+  color: var(--color-text-primary, #e0e0f0);
+  border-color: var(--color-border-hover, #3d3d5a);
+}
+
+.undoBtn:focus-visible,
+.redoBtn:focus-visible {
+  outline: 2px solid var(--color-focus, #6366f1);
+  outline-offset: 1px;
+}
+
+.undoBtn:disabled,
+.redoBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.count {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.divider {
+  width: 1px;
+  height: 20px;
+  background: var(--color-border, #2d2d44);
+  margin: 0 2px;
+}

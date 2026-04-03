@@ -34,18 +34,10 @@ export function markComponentNodesPending(nodes: ComponentNode[]): ComponentNode
 
 /**
  * 检查节点数组是否有数据（显示指标，不再是 gate）
- * S1.4: 替代 areAllConfirmed，用于显示目的
+ * S1.4: 替代旧 gate 函数，用于显示目的
  */
 export function hasNodes(nodes: unknown[]): boolean {
   return nodes.length > 0;
-}
-
-/**
- * 检查所有节点是否都已确认
- * @deprecated Use hasNodes instead — phase gates removed in Epic 1
- */
-export function areAllConfirmed(nodes: Array<{ isActive?: boolean }>): boolean {
-  return nodes.length > 0 && nodes.every((n) => n.isActive !== false);
 }
 
 /**

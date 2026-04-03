@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.93',
+    date: '2026-04-04',
+    changes: [
+      '🪝 vibex-reviewer-proposals/E5: Git Hooks 强制 — commit-msg + pre-commit hooks',
+      '✅ .husky/commit-msg: commitlint conventional format validation',
+      '✅ .husky/pre-commit: gitleaks + audit + tsc --noEmit + npm test',
+      '✅ commitlint.config.js: @commitlint/config-conventional',
+    ],
+    commit: '5fd100da',
+  },
+  {
     version: '1.0.92',
     date: '2026-04-04',
     changes: [

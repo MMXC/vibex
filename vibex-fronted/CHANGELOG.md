@@ -1,5 +1,16 @@
 # Changelog
 
+### [E5-Git Hooks强制] — 2026-04-03 (vibex-reviewer-proposals-20260403_024652)
+
+#### Added
+- `.husky/commit-msg` — commitlint commit-msg hook，验证 conventional commit 格式
+- `.husky/pre-commit` — pre-commit hook：gitleaks 敏感信息扫描 + npm audit 漏洞检查 + `tsc --noEmit` 类型检查 + npm test
+- `commitlint.config.js` — @commitlint/config-conventional 配置，type-enum 支持 feat/fix/docs/test/chore/refactor/perf/ci
+
+**功能**:
+- E5-S1: commit-msg hook 验证
+- E5-S2: pre-commit hook 阻断低质量 commit
+
 ### [E4-API路由静态导出修复] — 2026-04-04 (vibex-css-build-fix)
 
 #### Removed

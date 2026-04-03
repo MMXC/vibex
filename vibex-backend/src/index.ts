@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { serve } from '@hono/node-server';
-import { CloudflareEnv, getLocalEnv } from './lib/env';
+import type { CloudflareEnv } from './lib/env';
+import { getLocalEnv } from './lib/env';
 import projects from './routes/projects';
 import projectId from './routes/projects.$id';
 import pages from './routes/pages';
@@ -145,7 +145,7 @@ export default app;
 // 导出 Durable Object 类 (Cloudflare Workers 需要)
 export { CollaborationRoom } from './websocket/CollaborationRoom';
 
-// 仅在本地开发时启动服务器
+// 仅在本地开发时启动服务器（动态导入避免 Cloudflare Workers 打包失败）
 if (process.env.NODE_ENV !== 'production') {
   const port = parseInt(process.env.PORT || '3000');
   console.log(`Server running on http://localhost:${port}`);
@@ -154,11 +154,13 @@ if (process.env.NODE_ENV !== 'production') {
   const localEnv = getLocalEnv();
   (globalThis as any).__VIBEX_LOCAL_ENV__ = localEnv;
   
-  serve({
-    fetch: (request) => {
-      // 为本地开发模拟 Cloudflare 的 env 注入
-      return app.fetch(request, localEnv);
-    },
-    port,
+  // @hono/node-server 仅用于本地开发，Cloudflare Workers 不使用
+  import('@hono/node-server').then(({ serve }) => {
+    serve({
+      fetch: (request: Request) => {
+        return app.fetch(request, localEnv);
+      },
+      port,
+    });
   });
 }

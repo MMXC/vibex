@@ -6,6 +6,12 @@
 
 #### 2026-04-03
 
+- **E4-SyncProtocol**: POST /api/canvas/snapshots — Next.js App Router 端点，冲突检测（409 + serverSnapshot）
+  - `src/app/api/canvas/snapshots/route.ts` — D1 raw SQL，支持乐观锁
+  - 409 响应包含 serverSnapshot data，客户端可显示 ConflictDialog
+
+#### 2026-04-03
+
 - **Epic2-BackendVersionedStorage**: Canvas Snapshot + Versioned Storage API
   - CanvasSnapshot Table: `migrations/0006_canvas_snapshot.sql` (projectId, version, data, isAutoSave, @@unique index)
   - Snapshot API: `src/routes/v1/canvas/snapshots.ts` (GET/POST list, GET :id, POST :id/restore)

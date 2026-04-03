@@ -27,8 +27,9 @@
 - [x] CI 中 stylelint 非 0 时构建失败
 
 **E3 约束**:
-- [ ] 批量扫描前过滤误报（如 `@keyframes` 内联属性）
-- [ ] 发现的孤立属性逐个审查后再修复
+- [x] 批量扫描前过滤误报（如 `@keyframes` 内联属性）
+- [x] 发现的孤立属性逐个审查后再修复
+- [x] scripts/scan-orphaned-css.js 存在且可执行
 
 ### Reviewer Agent
 

@@ -13,9 +13,7 @@ import type { BusinessFlowNode, BusinessFlowDraft, FlowStep, BoundedContextNode 
 import { getHistoryStore } from '../historySlice';
 import { useSessionStore } from './sessionStore';
 
-function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-}
+import { generateId } from '../id';
 
 interface FlowStore {
   // State

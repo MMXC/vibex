@@ -14,9 +14,7 @@ import type { BoundedContextNode, BoundedContextDraft, Phase, TreeType, BoundedG
 import { getHistoryStore } from '../historySlice';
 import { postContextActionMessage } from './messageBridge';
 
-function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-}
+import { generateId } from '../id';
 
 interface SelectedNodeIds {
   context: string[];

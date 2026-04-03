@@ -1,3 +1,9 @@
+### Fixed (canvas-phase0-cleanup E5: recordSnapshot 修复) — 2026-04-03
+- **E5 recordSnapshot 修复**: recordSnapshot 移至 map() 外部调用（修复 stale flowNodes 问题）
+- **reorderSteps 修复**: insertAt = toIndex（修复错位问题）
+- **flowStore 测试**: 新增 undo/redo recordSnapshot 单元测试（2 cases）
+- **提交**: `7b3dbc97`
+
 ### Added (vibex-reviewer-proposals-20260403_024652 E3: Reviewer 驳回模板) — 2026-04-03
 - **E3 Reviewer 驳回模板**: AGENTS.md 新增 Reviewer 驳回模板（类型A-D：CHANGELOG遗漏、TS错误、ESLint违规、App页面手动修改）
 - **AGENTS.md**: CHANGELOG规范章节、Reviewer检查清单

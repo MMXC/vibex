@@ -29,6 +29,16 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '5fd100da',
   },
   {
+    version: '1.0.94',
+    date: '2026-04-04',
+    changes: [
+      '🔧 vibex-css-build-fix/E1: 修复 dashboard.module.css 孤立 CSS 属性行',
+      '✅ 删除第 808 行孤立的 flex-direction: column，修复 CSS 解析错误',
+      '✅ npm run build: exit 0',
+    ],
+    commit: 'a8677bb7',
+  },
+  {
     version: '1.0.92',
     date: '2026-04-04',
     changes: [

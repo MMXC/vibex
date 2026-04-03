@@ -8,6 +8,14 @@
 #### Verification
 - `npm run build` ✅ exit 0
 
+### [checkbox-persist-bug E3: FlowConfirm] — 2026-04-02 (checkbox-persist-bug)
+
+#### Fixed
+- `flowStore.ts` `toggleFlowNode` — 流程节点勾选切换，同时级联切换子步骤
+- `generateComponentFromFlow` — 只发送 `status === 'confirmed'` 的节点到 API，修复 E3 Prompt 过滤逻辑
+
+**提交**: `5a56cbae`
+
 ### [canvas-split-hooks E3: useCanvasRenderer] — 2026-04-04 (canvas-split-hooks)
 
 #### Added

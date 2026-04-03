@@ -44,8 +44,10 @@ import { TreeStatus } from './TreeStatus';
 import { TemplateSelector } from './features/TemplateSelector';
 import { VersionHistoryPanel } from './features/VersionHistoryPanel';
 import { SaveIndicator } from './features/SaveIndicator';
+import { PhaseIndicator } from './features/PhaseIndicator';
 import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
 import { useAutoSave } from '@/hooks/canvas/useAutoSave';
+import { useHasProject } from '@/hooks/useHasProject';
 import { MessageDrawer } from './messageDrawer/MessageDrawer';
 import { LeftDrawer } from './leftDrawer/LeftDrawer';
 import { ShortcutBar } from '@/components/guidance/ShortcutBar';
@@ -55,6 +57,7 @@ import { UndoBar } from '@/components/undo-bar/UndoBar';
 import { NodeTooltip } from '@/components/guidance/NodeTooltip';
 import { NewUserGuide } from '@/components/guide';
 import { ConflictDialog as ConflictDialogComponent } from '@/components/ConflictDialog';
+import { FeedbackFAB } from '@/components/FeedbackFAB';
 import type { Phase, TreeType, TreeNode } from '@/lib/canvas/types';
 import type { NodeRect } from '@/lib/canvas/types';
 import { BoundedEdgeLayer } from './edges/BoundedEdgeLayer';
@@ -77,6 +80,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const flowPanelCollapsed = useUIStore((s) => s.flowPanelCollapsed);
   const componentPanelCollapsed = useUIStore((s) => s.componentPanelCollapsed);
   const setPhase = useContextStore((s) => s.setPhase);
+  const setActiveTree = useContextStore((s) => s.setActiveTree);
   const toggleContextPanel = useUIStore((s) => s.toggleContextPanel);
   const toggleFlowPanel = useUIStore((s) => s.toggleFlowPanel);
   const toggleComponentPanel = useUIStore((s) => s.toggleComponentPanel);
@@ -334,6 +338,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     projectId,
     debounceMs: 2000, // MUST be exactly 2000 per AGENTS.md
   });
+
+  // E3 S3.4: 检测是否有已加载的项目
+  const hasProject = useHasProject();
 
   // === E4: Conflict Resolution Handlers ===
   // E4-SyncProtocol: Keep local data — force save with incremented version
@@ -937,6 +944,25 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         </div>
       )}
 
+      {/* E3 S3.1: Phase Indicator — top-left of canvas area */}
+      {phase !== 'input' && (
+        <div className={styles.phaseIndicatorWrapper}>
+          <PhaseIndicator
+            phase={phase}
+            onPhaseChange={setPhase}
+            nodeCount={
+              phase === 'context'
+                ? contextNodes.length
+                : phase === 'flow'
+                  ? flowNodes.length
+                  : phase === 'component'
+                    ? componentNodes.length
+                    : undefined
+            }
+          />
+        </div>
+      )}
+
       {/* Phase Label */}
       <div className={styles.phaseLabelBar}>
         <span className={styles.phaseCurrentLabel}>{phaseLabel}</span>
@@ -1280,6 +1306,29 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
               open={isTemplateSelectorOpen}
               onClose={() => setIsTemplateSelectorOpen(false)}
             />
+
+            {/* E3 S3.4: 示例项目快速入口 — 仅当没有项目时显示 */}
+            {!hasProject && (
+              <div className={styles.exampleQuickEntry}>
+                <div className={styles.exampleDivider}>
+                  <span>或</span>
+                </div>
+                <button
+                  type="button"
+                  className={styles.exampleQuickButton}
+                  onClick={() => {
+                    loadExampleData();
+                    setPhase('context');
+                    setActiveTree('context');
+                  }}
+                  aria-label="从示例开始"
+                  data-testid="start-from-example-btn"
+                  title="加载示例项目，快速了解 VibeX 的功能"
+                >
+                  🚀 从示例开始
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -1314,6 +1363,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
 
       {/* E1: New User Guide — auto-triggers for first-time users */}
       <NewUserGuide />
+
+      {/* E3 S3.3: Feedback FAB — 右下角浮动反馈按钮 */}
+      <FeedbackFAB />
 
       {/* E4-SyncProtocol: Conflict Dialog — shown when save conflict is detected */}
       {saveStatus === 'conflict' && conflictData && (

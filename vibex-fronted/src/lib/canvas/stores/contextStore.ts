@@ -10,7 +10,7 @@
  */
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import type { BoundedContextNode, BoundedContextDraft } from '../types';
+import type { BoundedContextNode, BoundedContextDraft, Phase, TreeType } from '../types';
 import { getHistoryStore } from '../historySlice';
 import { postContextActionMessage } from './messageBridge';
 
@@ -18,7 +18,25 @@ function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
+interface SelectedNodeIds {
+  context: string[];
+  flow: string[];
+}
+
 interface ContextStore {
+  // Phase state
+  phase: Phase;
+  setPhase: (phase: Phase) => void;
+  // Active tree
+  activeTree: TreeType | null;
+  setActiveTree: (tree: TreeType | null) => void;
+  recomputeActiveTree: () => void;
+  // Multi-select
+  selectedNodeIds: SelectedNodeIds;
+  selectAllNodes: (tree: TreeType) => void;
+  clearNodeSelection: (tree: TreeType) => void;
+  deleteSelectedNodes: (tree: TreeType) => void;
+  // Context nodes
   contextNodes: BoundedContextNode[];
   contextDraft: Partial<BoundedContextNode> | null;
   setContextNodes: (nodes: BoundedContextNode[]) => void;
@@ -34,6 +52,49 @@ export const useContextStore = create<ContextStore>()(
   devtools(
     persist(
       (set, get) => ({
+        // E3 S3.1: Phase state — drives the PhaseIndicator component
+        phase: 'input',
+        setPhase: (phase) => set({ phase }),
+        // E3 S3.1: Active tree
+        activeTree: null,
+        setActiveTree: (tree) => set({ activeTree: tree }),
+        recomputeActiveTree: () => {
+          const ctxs = get().contextNodes.filter((n) => n.isActive !== false);
+          const flows = []; // accessed via flowStore
+          const currentTree = get().activeTree;
+          if (!currentTree && ctxs.length > 0) set({ activeTree: 'context' });
+        },
+        // E3 S3.1: Multi-select
+        selectedNodeIds: { context: [], flow: [] },
+        selectAllNodes: (tree) =>
+          set((s) => {
+            if (tree === 'context') {
+              return { selectedNodeIds: { ...s.selectedNodeIds, context: s.contextNodes.map((n) => n.nodeId) } };
+            }
+            return s;
+          }),
+        clearNodeSelection: (tree) =>
+          set((s) => {
+            if (tree === 'context') {
+              return { selectedNodeIds: { ...s.selectedNodeIds, context: [] } };
+            }
+            return s;
+          }),
+        deleteSelectedNodes: (tree) => {
+          const { selectedNodeIds, contextNodes } = get();
+          if (tree === 'context' && selectedNodeIds.context.length > 0) {
+            const ids = new Set(selectedNodeIds.context);
+            const remaining = contextNodes.filter((n) => !ids.has(n.nodeId));
+            const newSelected = { context: [], flow: selectedNodeIds.flow };
+            getHistoryStore().recordSnapshot('context', remaining);
+            set({ contextNodes: remaining, selectedNodeIds: newSelected });
+            selectedNodeIds.context.forEach((id) => {
+              const node = contextNodes.find((n) => n.nodeId === id);
+              postContextActionMessage(`删除了上下文节点`, node?.name ?? id);
+            });
+          }
+        },
+        // Existing fields
         contextNodes: [],
         contextDraft: null,
 

@@ -1,5 +1,35 @@
 # Changelog
 
+### [E3 用户体验增强] — 2026-04-03 (dev-epic3-用户体验增强)
+
+#### Added
+- `src/components/canvas/features/PhaseIndicator.tsx` — 画布左上角 Phase 状态指示器
+  - 显示当前 Phase（Context / Flow / Component）
+  - 悬浮在 canvas 区域上方，始终可见
+  - 点击可切换 Phase（dropdown 菜单）
+- `src/components/canvas/features/PhaseIndicator.module.css` — PhaseIndicator 样式（玻璃态 + 霓虹发光）
+- `src/components/FeedbackFAB.tsx` — 反馈浮动按钮（右下角）
+  - 点击展开反馈表单（标题 + 内容）
+  - 提交后发送到 Slack #coord 频道
+- `src/components/FeedbackFAB.module.css` — 反馈按钮样式
+- `src/hooks/useFeedback.ts` — 反馈提交 Hook
+- `src/app/api/feedback/route.ts` — 反馈 API 接口（POST /api/feedback）
+  - 转发到 Slack Incoming Webhook（SLACK_FEEDBACK_WEBHOOK 环境变量）
+  - 格式化为 Slack Block Kit 消息
+- `src/hooks/useHasProject.ts` — 检测是否有已加载项目的 Hook
+- `src/lib/canvas/stores/contextStore.ts` — 新增 `phase`、`setPhase`、`activeTree`、`setActiveTree`、`selectedNodeIds`、`deleteSelectedNodes`、`selectAllNodes`、`clearNodeSelection` 字段
+
+#### Changed
+- `src/components/canvas/CanvasPage.tsx` — 集成 PhaseIndicator、FeedbackFAB、示例快速入口
+- `src/components/canvas/canvas.module.css` — 新增 `.phaseIndicatorWrapper`、`.exampleQuickEntry` 样式
+- `.canvasContainer` 新增 `position: relative`（支持绝对定位 PhaseIndicator）
+
+**功能**:
+- S3.1: Phase 状态指示器
+- S3.3: Feedback FAB
+- S3.4: 示例项目快速入口
+
+
 ### [E5 协作基础设施] — 2026-04-03 (dev-epic5-协作基础设施)
 
 #### Added

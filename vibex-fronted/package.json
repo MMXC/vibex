@@ -26,6 +26,7 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.mjs,.cjs --cache --cache-location node_modules/.cache/eslint/ --ignore-pattern '**/*.yml' --ignore-pattern '**/*.yaml' --ignore-pattern '.github/**' --ignore-pattern 'tests/**' && prettier --check .",
     "generate:types": "ts-node scripts/generate-types.ts",
     "prepare": "husky",
+    "pre-commit-check": "tsc --noEmit && npx eslint ./src --max-warnings=0",
     "scan:vuln": "npm audit --audit-level=moderate",
     "report:vuln": "npm audit --json > vulnerability-report.json"
   },
@@ -73,6 +74,8 @@
     "@babel/preset-env": "^7.29.0",
     "@babel/preset-react": "^7.28.5",
     "@babel/preset-typescript": "^7.28.5",
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
     "@playwright/test": "^1.58.2",
     "@storybook/addon-essentials": "^8.6.14",
     "@storybook/addon-interactions": "^8.6.14",

@@ -19,12 +19,7 @@ import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { useUIStore } from '@/lib/canvas/stores/uiStore';
 import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
-import {
-  loadExampleData,
-  setContextNodes as canvasSetContextNodes,
-  setFlowNodes as canvasSetFlowNodes,
-  setComponentNodes,
-} from '@/lib/canvas/canvasStore';
+import { loadExampleData } from '@/lib/canvas/loadExampleData';
 import { hasNodes } from '@/lib/canvas/cascade';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import { getHistoryStore } from '@/lib/canvas/historySlice';
@@ -360,10 +355,10 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     if (!conflictData) return
     const serverData = conflictData.serverSnapshot.data
     if (serverData.contexts) {
-      canvasSetContextNodes(isValidContextNodes(serverData.contexts) ? serverData.contexts : []);
+      useContextStore.getState().setContextNodes(isValidContextNodes(serverData.contexts) ? serverData.contexts : []);
     }
     if (serverData.flows) {
-      canvasSetFlowNodes(isValidFlowNodes(serverData.flows) ? serverData.flows : []);
+      useFlowStore.getState().setFlowNodes(isValidFlowNodes(serverData.flows) ? serverData.flows : []);
     }
     if (serverData.components) {
       setComponentNodes(isValidComponentNodes(serverData.components) ? serverData.components : []);
@@ -403,8 +398,8 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
       ...serverComponents.filter((n) => !localCompIds.has(n.nodeId)),
     ]
 
-    canvasSetContextNodes(mergedContexts)
-    canvasSetFlowNodes(mergedFlows)
+    useContextStore.getState().setContextNodes(mergedContexts)
+    useFlowStore.getState().setFlowNodes(mergedFlows)
     setComponentNodes(mergedComponents)
     clearConflict()
     toast.showToast(`已合并：+${serverContexts.length - localContexts.length} 上下文、+${serverFlows.length - localFlows.length} 流程、+${serverComponents.length - localComponents.length} 组件`, 'success')
@@ -526,11 +521,11 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     const historyStore = getHistoryStore();
     if (historyStore.canUndo('context')) {
       const prev = historyStore.undo('context');
-      if (prev) { canvasSetContextNodes(isValidContextNodes(prev) ? prev : []); return true; }
+      if (prev) { useContextStore.getState().setContextNodes(isValidContextNodes(prev) ? prev : []); return true; }
     }
     if (historyStore.canUndo('flow')) {
       const prev = historyStore.undo('flow');
-      if (prev) { canvasSetFlowNodes(isValidFlowNodes(prev) ? prev : []); return true; }
+      if (prev) { useFlowStore.getState().setFlowNodes(isValidFlowNodes(prev) ? prev : []); return true; }
     }
     if (historyStore.canUndo('component')) {
       const prev = historyStore.undo('component');
@@ -543,11 +538,11 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     const historyStore = getHistoryStore();
     if (historyStore.canRedo('context')) {
       const next = historyStore.redo('context');
-      if (next) { canvasSetContextNodes(isValidContextNodes(next) ? next : []); return true; }
+      if (next) { useContextStore.getState().setContextNodes(isValidContextNodes(next) ? next : []); return true; }
     }
     if (historyStore.canRedo('flow')) {
       const next = historyStore.redo('flow');
-      if (next) { canvasSetFlowNodes(isValidFlowNodes(next) ? next : []); return true; }
+      if (next) { useFlowStore.getState().setFlowNodes(isValidFlowNodes(next) ? next : []); return true; }
     }
     if (historyStore.canRedo('component')) {
       const next = historyStore.redo('component');

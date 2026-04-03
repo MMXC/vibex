@@ -35,6 +35,13 @@ export default defineConfig({
       testDir: './tests/contract',
       use: { ...devices['Desktop Chrome'] },
     },
+    // E1 iPhone12 (390×844) — responsive design validation
+    {
+      name: 'iPhone12',
+      use: {
+        ...devices['iPhone 12'],
+      },
+    },
   ],
   webServer: {
     command: 'npm run dev',

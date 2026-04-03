@@ -492,40 +492,40 @@ describe('useCanvasState — DOM effects (gridRef attached)', () => {
   // The keyboard listener is registered on document, so dispatching on any element works.
 
   it('space keydown sets isSpacePressed to true (keyboard listener fires)', async () => {
-    const { result, gridEl, triggerRerender } = renderHookWithGrid();
+    const { hookResult, gridEl, triggerRerender } = renderHookWithGrid();
     triggerRerender();
     const event = new KeyboardEvent('keydown', { code: 'Space', bubbles: true });
     act(() => { gridEl.current!.dispatchEvent(event); });
     await act(async () => { await new Promise((r) => setTimeout(r, 0)); });
-    expect(result.current!.isSpacePressed).toBe(true);
+    expect(hookResult.current!.isSpacePressed).toBe(true);
   });
 
   it('handleMouseDown sets isPanning=true after space keydown (panning body coverage)', async () => {
-    const { result, gridEl, triggerRerender } = renderHookWithGrid();
+    const { hookResult, gridEl, triggerRerender } = renderHookWithGrid();
     triggerRerender();
     // First activate space
     act(() => { gridEl.current!.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space', bubbles: true })); });
     await act(async () => { await new Promise((r) => setTimeout(r, 0)); });
     // Now click (handleMouseDown should start panning)
     act(() => {
-      result.current!.handlers.handleMouseDown({
+      hookResult.current!.handlers.handleMouseDown({
         target: gridEl.current!,
         preventDefault: jest.fn(),
         clientX: 100,
         clientY: 100,
       } as unknown as React.MouseEvent);
     });
-    expect(result.current!.isPanning).toBe(true);
+    expect(hookResult.current!.isPanning).toBe(true);
   });
 
   it('handleMouseMove updates panOffset when isPanning=true', async () => {
-    const { result, gridEl, triggerRerender } = renderHookWithGrid();
+    const { hookResult, gridEl, triggerRerender } = renderHookWithGrid();
     triggerRerender();
     // Set up: space + mousedown to start panning
     act(() => { gridEl.current!.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space', bubbles: true })); });
     await act(async () => { await new Promise((r) => setTimeout(r, 0)); });
     act(() => {
-      result.current!.handlers.handleMouseDown({
+      hookResult.current!.handlers.handleMouseDown({
         target: gridEl.current!,
         preventDefault: jest.fn(),
         clientX: 100,
@@ -534,14 +534,14 @@ describe('useCanvasState — DOM effects (gridRef attached)', () => {
     });
     // Move mouse
     act(() => {
-      result.current!.handlers.handleMouseMove({
+      hookResult.current!.handlers.handleMouseMove({
         clientX: 150,
         clientY: 200,
       } as unknown as React.MouseEvent);
     });
     // isPanning should be true and panOffset should have changed
-    expect(result.current!.isPanning).toBe(true);
-    expect(result.current!.panOffset).not.toEqual({ x: 0, y: 0 });
+    expect(hookResult.current!.isPanning).toBe(true);
+    expect(hookResult.current!.panOffset).not.toEqual({ x: 0, y: 0 });
   });
 
   it('gridRef is attached to a real div after mount', () => {

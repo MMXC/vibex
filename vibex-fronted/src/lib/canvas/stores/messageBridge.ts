@@ -6,10 +6,6 @@
  * No-op in test environment; real implementation handles WebSocket/REST.
  */
 
-export async function postContextActionMessage(payload: {
-  type: string;
-  nodeId?: string;
-}): Promise<void> {
+export function postContextActionMessage(content: string, meta?: string): void {
   // Stub: no-op in tests. Real implementation sends via WebSocket.
-  return Promise.resolve();
 }

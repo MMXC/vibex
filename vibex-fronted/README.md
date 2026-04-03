@@ -246,3 +246,30 @@ npm run dev
 npm test
 npm run test:e2e
 ```
+
+## Reviewer 工作流
+
+### 审查流程
+
+1. **Dev 提交 PR** → Reviewer 收到通知
+2. **Reviewer 审查** → 按 `AGENTS.md` 检查清单执行
+3. **审查结果**:
+   - ✅ 通过 → 合并 PR，更新 CHANGELOG
+   - ❌ 驳回 → 按驳回模板说明问题，Dev 修复后重新提交
+
+### 审查检查项
+
+| 检查项 | 参考文档 | 通过标准 |
+|--------|----------|----------|
+| CHANGELOG 完整 | `CHANGELOG_CONVENTION.md` | Epic 条目格式合规 |
+| 类型安全 | `npm run type-check` | 0 errors |
+| 代码质量 | `npm run lint` | 0 errors |
+| App 页面完整 | `git diff src/app/` | 无手动修改 |
+| 测试通过 | `npm test` | 全部通过 |
+
+### 相关文档
+
+- 协作规范: `AGENTS.md`
+- CHANGELOG 格式: `CHANGELOG_CONVENTION.md`
+- 报告索引: `reports/INDEX.md`
+- 测试策略: `TESTING_STRATEGY.md`

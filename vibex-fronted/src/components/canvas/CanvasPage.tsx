@@ -53,6 +53,7 @@ import { useToast } from '@/components/ui/Toast';
 import { UndoBar } from '@/components/undo-bar/UndoBar';
 
 import { NodeTooltip } from '@/components/guidance/NodeTooltip';
+import { NewUserGuide } from '@/components/guide';
 import { ConflictDialog as ConflictDialogComponent } from '@/components/ConflictDialog';
 import type { Phase, TreeType, TreeNode } from '@/lib/canvas/types';
 import type { NodeRect } from '@/lib/canvas/types';
@@ -1310,6 +1311,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
       <UndoBar />
       <ShortcutBar onOpenShortcutPanel={toggleShortcutPanel} />
       <NodeTooltip />
+
+      {/* E1: New User Guide — auto-triggers for first-time users */}
+      <NewUserGuide />
 
       {/* E4-SyncProtocol: Conflict Dialog — shown when save conflict is detected */}
       {saveStatus === 'conflict' && conflictData && (

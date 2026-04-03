@@ -1,5 +1,15 @@
 # Changelog
 
+### [E1 新手引导] — 2026-04-03
+
+#### Added
+- `src/stores/guideStore.ts` — guideStore with 5-step guide, earned badges, persist to localStorage
+- `src/components/guide/GuideOverlay.tsx` — SVG spotlight cutout overlay with ResizeObserver
+- `src/components/guide/GuideTooltip.tsx` — Floating tooltip with arrow, progress dots, keyboard nav
+- `src/components/guide/MilestoneBadge.tsx` — Grid + compact badge display for earned achievements
+- `src/components/guide/NewUserGuide.tsx` — Main controller, auto-triggers on first visit
+- `src/components/canvas/CanvasPage.tsx` — NewUserGuide integration
+
 ### [E4 Sync Protocol] — 2026-04-03 (vibex-dev-proposals-20260403_024652)
 
 #### Added

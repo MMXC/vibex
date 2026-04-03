@@ -1,3 +1,7 @@
+### Fixed (canvas-canvasstore-migration E3: 废弃 store 删除) — 2026-04-04
+- **E3 废弃 store 删除**: 删除 src/stores/canvasHistoryStore.ts（无残留引用）
+- **提交**: `06ad16d8`
+
 ### Fixed (canvas-canvasstore-migration E2: CanvasPage import 迁移) — 2026-04-04
 - **E2 CanvasPage 迁移**: 移除 CanvasPage.tsx 中所有 canvasStore 导入
 - **loadExampleData**: 从 @/lib/canvas/loadExampleData 导入

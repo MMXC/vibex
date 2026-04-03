@@ -1,3 +1,9 @@
+### Added (canvas-split-hooks E1: useCanvasState) — 2026-04-04
+- **E1 useCanvasState 抽取**: 从 CanvasPage.tsx 提取 useCanvasState hook
+- **纯函数提取**: isSpaceKeyAllowed/isPanningClickTarget 100% branch coverage
+- **guard 分支覆盖**: 30 个纯函数测试 + 24 个 hook 测试 = 54 测试全部通过
+- **提交**: `cc03e6ac`, `a8677bb7`
+
 ### Fixed (canvas-canvasstore-migration E4: SplitStores 测试补全) — 2026-04-04
 - **E4 SplitStores 测试补全**: contextStore 覆盖率提升至 stmts 100%, branch 88.63%
 - **contextStore 新增测试**: recomputeActiveTree, toggleNodeSelect, deleteSelectedNodes, advancePhase, selectAllNodes

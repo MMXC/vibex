@@ -1,0 +1,102 @@
+name: RCA Code Quality Check
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'src/**'
+      - 'tools/rca-tool/**'
+      - '.github/workflows/rca-check.yml'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'tools/rca-tool/**'
+      - '.github/workflows/rca-check.yml'
+
+jobs:
+  rca-check:
+    name: RCA Pattern Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up dependencies
+        run: |
+          # Ensure bash is available
+          chmod +x tools/rca-tool/rca-tool.sh
+
+      - name: Run RCA - UI Rendering
+        run: |
+          ./tools/rca-tool/rca-tool.sh \
+            "UI Rendering Quality Check" \
+            ./src/components/ \
+            -c ui-rendering \
+            --dry-run
+
+      - name: Run RCA - API Integration
+        run: |
+          ./tools/rca-tool/rca-tool.sh \
+            "API Integration Quality Check" \
+            ./src/services/api/ \
+            -c api-integration \
+            --dry-run
+
+      - name: Run RCA - State Management
+        run: |
+          ./tools/rca-tool/rca-tool.sh \
+            "State Management Quality Check" \
+            ./src/stores/ \
+            -c state-management \
+            --dry-run
+
+      - name: Run RCA - Performance
+        run: |
+          ./tools/rca-tool/rca-tool.sh \
+            "Performance Quality Check" \
+            ./src/ \
+            -c performance \
+            --dry-run
+
+  lint-check:
+    name: ESLint
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: vibex-fronted/package-lock.json
+      
+      - name: Install dependencies
+        run: |
+          cd vibex-fronted && npm ci
+      
+      - name: Run ESLint
+        run: |
+          cd vibex-fronted && npm run lint || true
+
+  type-check:
+    name: TypeScript
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: vibex-fronted/package-lock.json
+      
+      - name: Install dependencies
+        run: |
+          cd vibex-fronted && npm ci
+      
+      - name: TypeScript check
+        run: |
+          cd vibex-fronted && npx tsc --noEmit

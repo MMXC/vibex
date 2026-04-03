@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>首页 - 全展开</title>
+  <style>
+    :root {
+      --color-primary: #3b82f6;
+      --color-primary-hover: #2563eb;
+      --color-primary-muted: #dbeafe;
+      --color-bg-primary: #ffffff;
+      --color-bg-secondary: #f9fafb;
+      --color-bg-tertiary: #f3f4f6;
+      --color-border: #e5e7eb;
+      --color-text-primary: #111827;
+      --color-text-secondary: #6b7280;
+      --color-text-muted: #9ca3af;
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      --radius-lg: 0.5rem;
+      --radius-xl: 0.75rem;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--color-bg-secondary);
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; padding: 20px;
+    }
+    .page {
+      background: var(--color-bg-primary);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      width: 100%; max-width: 1400px;
+      height: 820px;
+      display: grid;
+      grid-template-rows: 50px 1fr 380px;
+      grid-template-columns: 220px 1fr 260px;
+      position: relative;
+    }
+    .header {
+      grid-column: 1 / -1;
+      border-bottom: 1px solid var(--color-border);
+      display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
+    }
+    .logo { font-size: 18px; font-weight: 700; color: var(--color-primary); }
+    .nav { display: flex; gap: 20px; align-items: center; }
+    .nav span { font-size: 14px; color: var(--color-text-secondary); cursor: pointer; }
+    .nav span.active { color: var(--color-primary); font-weight: 500; }
+    .btn-login {
+      background: var(--color-primary); color: white; border: none;
+      padding: 8px 16px; border-radius: var(--radius-lg); font-size: 14px; cursor: pointer;
+    }
+
+    /* ========== 预览区 ========== */
+    .preview {
+      background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .mermaid-box {
+      width: 90%; height: 90%;
+      background: var(--color-bg-primary); border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 15px;
+    }
+    .mermaid-icon { font-size: 48px; }
+    .mermaid-text { color: var(--color-text-secondary); font-size: 15px; }
+
+    /* ========== 左侧抽屉 ========== */
+    .left-drawer {
+      background: var(--color-bg-secondary); border-right: 1px solid var(--color-border);
+      padding: 15px; display: flex; flex-direction: column; gap: 10px;
+      z-index: 10;
+    }
+    .drawer-title { font-size: 13px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 5px; }
+    .step-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; background: var(--color-bg-primary);
+      border-radius: var(--radius-lg); border: 1px solid var(--color-border); font-size: 13px; cursor: pointer;
+    }
+    .step-item.active { background: var(--color-primary-muted); border-color: var(--color-primary); color: var(--color-primary); }
+    .step-num {
+      width: 22px; height: 22px; background: var(--color-bg-tertiary); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;
+    }
+    .step-item.active .step-num { background: var(--color-primary); color: white; }
+
+    /* ========== 右侧抽屉 ========== */
+    .right-drawer {
+      background: var(--color-bg-secondary); border-left: 1px solid var(--color-border);
+      padding: 15px; display: flex; flex-direction: column; gap: 10px;
+      z-index: 10;
+    }
+    .thinking-item {
+      background: var(--color-bg-primary); border-radius: var(--radius-lg); padding: 10px;
+      font-size: 12px; color: var(--color-text-secondary);
+      border-left: 3px solid var(--color-primary);
+    }
+    .thinking-item.new { animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+    /* ========== 底部区域 ========== */
+    .bottom-panel {
+      grid-column: 1 / -1;
+      background: var(--color-bg-primary);
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* 底部可折叠区域 */
+    .bottom-drawer {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--color-bg-secondary);
+    }
+
+    /* 操作按钮栏 */
+    .action-bar {
+      height: 50px;
+      background: var(--color-bg-primary);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      padding: 0 15px;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .action-btn {
+      padding: 8px 14px;
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      font-size: 13px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .action-btn:hover { background: var(--color-primary-muted); border-color: var(--color-primary); color: var(--color-primary); }
+    .action-btn.primary { background: var(--color-primary); color: white; border-color: var(--color-primary); font-weight: 500; }
+    .action-btn.primary:hover { background: var(--color-primary-hover); }
+    .action-divider { width: 1px; height: 24px; background: var(--color-border); margin: 0 8px; }
+
+    /* AI展示区 */
+    .ai-display {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding: 12px 15px;
+      overflow-y: auto;
+    }
+    .display-card {
+      background: var(--color-bg-primary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    .card-icon { font-size: 16px; }
+    .card-content {
+      flex: 1;
+      background: var(--color-bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 8px;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      min-height: 60px;
+    }
+
+    /* 需求录入区 */
+    .input-area {
+      height: 80px;
+      background: var(--color-bg-primary);
+      border-top: 1px solid var(--color-border);
+      padding: 10px 15px;
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .input-field {
+      flex: 1;
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    .input-field:focus { outline: none; border-color: var(--color-primary); }
+    .btn-send {
+      width: 60px;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    /* 收起按钮 */
+    .collapse-handle {
+      height: 30px;
+      background: var(--color-bg-tertiary);
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+    .collapse-handle:hover { background: var(--color-primary-muted); color: var(--color-primary); }
+
+    /* 悬浮模式提示 */
+    .floating-hint {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-bg-primary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 6px 12px;
+      font-size: 11px;
+      color: var(--color-text-muted);
+      box-shadow: var(--shadow-md);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <div class="logo">VibeX</div>
+      <div class="nav">
+        <span>首页</span>
+        <span>项目</span>
+        <span>模板</span>
+        <span class="active">更新日志</span>
+        <button class="btn-login">登录 / 注册</button>
+      </div>
+    </div>
+
+    <!-- 左侧抽屉 -->
+    <div class="left-drawer">
+      <div class="drawer-title">步骤指示器</div>
+      <div class="step-item active">
+        <div class="step-num">1</div>
+        <span>需求录入</span>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <span>需求澄清</span>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <span>业务流程</span>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <span>组件图</span>
+      </div>
+    </div>
+
+    <!-- 预览区 -->
+    <div class="preview">
+      <div class="mermaid-box">
+        <div class="mermaid-icon">🔄</div>
+        <div class="mermaid-text">Mermaid 流程图预览区域</div>
+      </div>
+      <div class="floating-hint">↓ 滚动预览区时底部自动悬浮</div>
+    </div>
+
+    <!-- 右侧抽屉 -->
+    <div class="right-drawer">
+      <div class="drawer-title">AI 思考过程</div>
+      <div class="thinking-item new">正在分析需求结构...</div>
+      <div class="thinking-item">识别核心实体：用户、商品、订单</div>
+      <div class="thinking-item">发现 3 个限界上下文</div>
+      <div class="thinking-item">规划业务流程：浏览→选择→下单→支付</div>
+    </div>
+
+    <!-- 底部面板 -->
+    <div class="bottom-panel">
+      <!-- 收起手柄 -->
+      <div class="collapse-handle">⬆️ 拖动收起</div>
+
+      <!-- 需求录入 -->
+      <div class="input-area">
+        <input type="text" class="input-field" placeholder="输入需求或指令...">
+        <button class="btn-send">发送</button>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="action-bar">
+        <button class="action-btn">💬 AI询问</button>
+        <button class="action-btn">🔍 诊断</button>
+        <button class="action-btn">✨ 优化</button>
+        <button class="action-btn">📜 历史</button>
+        <div class="action-divider"></div>
+        <button class="action-btn">💾 保存</button>
+        <button class="action-btn">🔄 重新生成</button>
+        <div class="action-divider"></div>
+        <button class="action-btn primary">📁 创建项目</button>
+      </div>
+
+      <!-- AI展示区 -->
+      <div class="ai-display">
+        <div class="display-card">
+          <div class="card-header">
+            <span class="card-icon">🔍</span>
+            <span>智能诊断</span>
+          </div>
+          <div class="card-content">发现 2 个潜在问题需要修复...</div>
+        </div>
+        <div class="display-card">
+          <div class="card-header">
+            <span class="card-icon">✨</span>
+            <span>应用优化</span>
+          </div>
+          <div class="card-content">推荐优化方案：组件复用、状态简化...</div>
+        </div>
+        <div class="display-card">
+          <div class="card-header">
+            <span class="card-icon">💬</span>
+            <span>AI对话澄清</span>
+          </div>
+          <div class="card-content">需要澄清：用户认证方式？单设备/多设备？</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

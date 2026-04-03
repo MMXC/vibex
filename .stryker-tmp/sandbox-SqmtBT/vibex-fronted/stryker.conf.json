@@ -1,0 +1,27 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "testRunner": "jest",
+  "concurrency": 1,
+  "mutate": [
+    "src/lib/canvas/stores/contextStore.ts",
+    "src/lib/canvas/stores/flowStore.ts",
+    "src/lib/canvas/stores/componentStore.ts",
+    "src/lib/canvas/stores/uiStore.ts",
+    "src/lib/canvas/stores/sessionStore.ts",
+    "src/lib/canvas/canvasStore.ts"
+  ],
+  "ignoreStatic": true,
+  "timeout": 600000,
+  "timeoutFactor": 1.5,
+  "thresholds": {
+    "break": 70,
+    "high": 90,
+    "low": 60
+  },
+  "reporters": [
+    "progress",
+    "html",
+    "json"
+  ],
+  "tempDirName": ".stryker-tmp"
+}

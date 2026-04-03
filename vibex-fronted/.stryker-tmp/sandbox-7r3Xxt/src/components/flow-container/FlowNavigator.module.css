@@ -1,0 +1,117 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: white;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+}
+
+.left,
+.center,
+.right {
+  flex: 1;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+}
+
+.right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.left {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.btnPrimary,
+.btnSecondary,
+.btnSave {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btnPrimary {
+  background: var(--primary-color, #3b82f6);
+  color: white;
+}
+
+.btnPrimary:hover {
+  background: var(--primary-hover, #2563eb);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btnSecondary {
+  background: transparent;
+  color: var(--text-muted, #64748b);
+  border: 1px solid var(--border-color, #e2e8f0);
+}
+
+.btnSecondary:hover {
+  background: var(--bg-secondary, #f1f5f9);
+  color: var(--text-primary, #1e293b);
+}
+
+.btnSave {
+  background: transparent;
+  color: var(--text-muted, #64748b);
+  border: 1px dashed var(--border-color, #e2e8f0);
+}
+
+.btnSave:hover {
+  background: var(--bg-secondary, #f1f5f9);
+  color: var(--text-primary, #1e293b);
+  border-style: solid;
+}
+
+.completed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--success-color, #10b981);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.checkmark {
+  width: 28px;
+  height: 28px;
+  background: var(--success-color, #10b981);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+@media (max-width: 640px) {
+  .container {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .left,
+  .center,
+  .right {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .btnPrimary,
+  .btnSecondary,
+  .btnSave {
+    width: 100%;
+  }
+}

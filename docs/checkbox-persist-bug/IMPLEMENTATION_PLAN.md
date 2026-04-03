@@ -31,6 +31,9 @@ Zustand persist middleware 自动持久化所有 store 状态到 localStorage。
 - 无需单独 JSON 文件写入
 
 ✅ Done: Zustand persist 已配置在 canvasStore 和各子 store
+✅ Done: `toggleContextSelection` 方法添加到 `contextStore.ts`
+✅ Done: `toggleFlowNode` 已存在于 `flowStore.ts`（确认/取消确认节点）
+✅ Done: `toggleNodeSelect` 已存在于 `componentStore.ts`（多选节点）
 
 ---
 

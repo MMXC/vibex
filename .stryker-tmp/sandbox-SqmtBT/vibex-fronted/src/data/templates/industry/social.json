@@ -1,0 +1,139 @@
+{
+  "id": "social-community",
+  "name": "社交社区",
+  "displayName": "社交内容社区",
+  "category": "social",
+  "icon": "💬",
+  "description": "内容发布、社交互动、用户关注、私信聊天等社交功能",
+  "content": "开发一个社交内容社区平台，包含以下核心功能：\n\n1. 用户系统：注册登录、个人主页、资料编辑\n2. 内容系统：发布帖子、图文内容、话题标签\n3. 互动系统：点赞、评论、收藏、分享\n4. 社交系统：关注/粉丝、私信聊天、消息通知\n5. 搜索发现：内容搜索、用户搜索、热榜推荐\n6. 内容审核：敏感词过滤、内容举报、审核管理",
+  "entities": [
+    {
+      "name": "User",
+      "type": "aggregate",
+      "attributes": ["id", "username", "email", "password", "avatar", "bio", "followersCount", "followingCount", "postsCount", "createdAt"],
+      "description": "用户聚合根"
+    },
+    {
+      "name": "Post",
+      "type": "aggregate",
+      "attributes": ["id", "authorId", "content", "images", "topics", "location", "likesCount", "commentsCount", "sharesCount", "visibility", "createdAt"],
+      "description": "帖子聚合根"
+    },
+    {
+      "name": "Comment",
+      "type": "entity",
+      "attributes": ["id", "postId", "authorId", "content", "parentId", "likesCount", "createdAt"],
+      "description": "评论"
+    },
+    {
+      "name": "Like",
+      "type": "valueObject",
+      "attributes": ["userId", "targetId", "targetType", "createdAt"],
+      "description": "点赞记录"
+    },
+    {
+      "name": "Follow",
+      "type": "valueObject",
+      "attributes": ["followerId", "followingId", "createdAt"],
+      "description": "关注关系"
+    },
+    {
+      "name": "Collection",
+      "type": "entity",
+      "attributes": ["id", "userId", "name", "postIds", "createdAt"],
+      "description": "收藏夹"
+    },
+    {
+      "name": "Message",
+      "type": "entity",
+      "attributes": ["id", "senderId", "receiverId", "content", "type", "isRead", "createdAt"],
+      "description": "私信消息"
+    },
+    {
+      "name": "Conversation",
+      "type": "aggregate",
+      "attributes": ["id", "participants", "lastMessage", "lastMessageAt", "unreadCount"],
+      "description": "会话聚合根"
+    },
+    {
+      "name": "Notification",
+      "type": "entity",
+      "attributes": ["id", "userId", "type", "title", "content", "targetId", "isRead", "createdAt"],
+      "description": "系统通知"
+    },
+    {
+      "name": "Topic",
+      "type": "entity",
+      "attributes": ["id", "name", "description", "postsCount", "followersCount"],
+      "description": "话题"
+    },
+    {
+      "name": "Report",
+      "type": "entity",
+      "attributes": ["id", "reporterId", "targetId", "targetType", "reason", "status", "createdAt"],
+      "description": "举报记录"
+    }
+  ],
+  "features": [
+    {
+      "name": "用户注册登录",
+      "priority": "core",
+      "description": "用户可以注册账号、登录系统、第三方登录",
+      "entities": ["User"]
+    },
+    {
+      "name": "发布内容",
+      "priority": "core",
+      "description": "用户可以发布文字、图片帖子，添加话题标签",
+      "entities": ["Post", "Topic"]
+    },
+    {
+      "name": "内容互动",
+      "priority": "core",
+      "description": "用户可以点赞、评论、收藏、分享帖子",
+      "entities": ["Post", "Comment", "Like", "Collection"]
+    },
+    {
+      "name": "关注社交",
+      "priority": "core",
+      "description": "用户可以关注其他用户、查看关注/粉丝列表",
+      "entities": ["User", "Follow"]
+    },
+    {
+      "name": "私信聊天",
+      "priority": "important",
+      "description": "用户可以与其他用户一对一私信聊天",
+      "entities": ["Conversation", "Message", "User"]
+    },
+    {
+      "name": "消息通知",
+      "priority": "important",
+      "description": "用户可以接收并查看互动通知、系统消息",
+      "entities": ["Notification", "User"]
+    },
+    {
+      "name": "发现推荐",
+      "priority": "important",
+      "description": "用户可以浏览推荐内容、热榜、搜索用户和内容",
+      "entities": ["Post", "User", "Topic"]
+    },
+    {
+      "name": "个人主页",
+      "priority": "important",
+      "description": "用户可以查看自己的主页、发布的帖子、收藏的内容",
+      "entities": ["User", "Post", "Collection"]
+    },
+    {
+      "name": "内容审核",
+      "priority": "important",
+      "description": "管理员可以审核内容、处理举报、敏感词过滤",
+      "entities": ["Post", "Report"]
+    }
+  ],
+  "metadata": {
+    "complexity": "medium",
+    "estimatedTime": "2-3周",
+    "techStack": ["React", "Node.js", "MongoDB", "Redis"],
+    "tags": ["社交", "社区", "内容", "帖子", "互动", "IM"]
+  }
+}

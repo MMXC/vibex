@@ -1,0 +1,71 @@
+// @ts-nocheck
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+
+export const dynamic = 'force-dynamic';
+
+// GET /api/prototype-snapshots - List all snapshots (optionally filter by projectId)
+export async function GET(request: NextRequest) {
+  try {
+    const searchParams = request.nextUrl.searchParams;
+    const projectId = searchParams.get('projectId');
+
+    const snapshots = await prisma.prototypeSnapshot.findMany({
+      where: projectId ? { projectId } : undefined,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return NextResponse.json({ prototypeSnapshots: snapshots });
+  } catch (error) {
+    console.error('Error fetching prototype snapshots:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch prototype snapshots' },
+      { status: 500 }
+    );
+  }
+}
+
+// POST /api/prototype-snapshots - Create a new snapshot
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { projectId, name, description, content, version } = body;
+
+    if (!projectId || !content) {
+      return NextResponse.json(
+        { error: 'Missing required fields: projectId, content' },
+        { status: 400 }
+      );
+    }
+
+    // Get the next version number for this project if not provided
+    let snapshotVersion = version;
+    if (snapshotVersion === undefined) {
+      const existingSnapshots = await prisma.prototypeSnapshot.findMany({
+        where: { projectId },
+        select: { version: true },
+        orderBy: { version: 'desc' },
+        take: 1,
+      });
+      snapshotVersion = existingSnapshots.length > 0 ? existingSnapshots[0].version + 1 : 1;
+    }
+
+    const snapshot = await prisma.prototypeSnapshot.create({
+      data: {
+        projectId,
+        version: snapshotVersion,
+        name: name || null,
+        description: description || null,
+        content,
+      },
+    });
+
+    return NextResponse.json({ prototypeSnapshot: snapshot }, { status: 201 });
+  } catch (error) {
+    console.error('Error creating prototype snapshot:', error);
+    return NextResponse.json(
+      { error: 'Failed to create prototype snapshot' },
+      { status: 500 }
+    );
+  }
+}

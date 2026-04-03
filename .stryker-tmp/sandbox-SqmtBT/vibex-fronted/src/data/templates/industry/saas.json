@@ -1,0 +1,145 @@
+{
+  "id": "saas-crm",
+  "name": "SaaS CRM",
+  "displayName": "SaaS 企业客户管理系统",
+  "category": "saas",
+  "icon": "📊",
+  "description": "客户管理、销售跟进、合同管理、数据分析等企业级CRM功能",
+  "content": "开发一个SaaS企业客户管理系统，包含以下核心功能：\n\n1. 多租户系统：企业注册、租户管理、权限隔离\n2. 客户管理：客户信息录入、分配、跟进记录\n3. 销售管理：销售线索、商机转化、销售漏斗\n4. 合同管理：合同起草、审批、签署、归档\n5. 任务提醒：日程安排、任务指派、到期提醒\n6. 数据报表：销售统计、业绩分析、图表展示\n7. 系统设置：部门管理、角色权限、字段配置",
+  "entities": [
+    {
+      "name": "Tenant",
+      "type": "aggregate",
+      "attributes": ["id", "name", "domain", "plan", "status", "expiresAt", "createdAt"],
+      "description": "租户（企业）聚合根"
+    },
+    {
+      "name": "User",
+      "type": "aggregate",
+      "attributes": ["id", "tenantId", "username", "email", "password", "name", "phone", "roleId", "departmentId", "avatar", "status"],
+      "description": "用户聚合根"
+    },
+    {
+      "name": "Department",
+      "type": "entity",
+      "attributes": ["id", "tenantId", "name", "parentId", "managerId"],
+      "description": "部门"
+    },
+    {
+      "name": "Role",
+      "type": "entity",
+      "attributes": ["id", "tenantId", "name", "permissions"],
+      "description": "角色"
+    },
+    {
+      "name": "Customer",
+      "type": "aggregate",
+      "attributes": ["id", "tenantId", "name", "company", "industry", "source", "ownerId", "level", "status", "createdAt"],
+      "description": "客户聚合根"
+    },
+    {
+      "name": "Contact",
+      "type": "entity",
+      "attributes": ["id", "tenantId", "customerId", "name", "title", "phone", "email", "wechat", "isPrimary"],
+      "description": "联系人"
+    },
+    {
+      "name": "Lead",
+      "type": "entity",
+      "attributes": ["id", "tenantId", "name", "company", "source", "ownerId", "status", "convertedCustomerId", "createdAt"],
+      "description": "销售线索"
+    },
+    {
+      "name": "Opportunity",
+      "type": "aggregate",
+      "attributes": ["id", "tenantId", "customerId", "name", "stage", "amount", "probability", "expectedCloseDate", "ownerId", "createdAt"],
+      "description": "商机聚合根"
+    },
+    {
+      "name": "FollowUp",
+      "type": "entity",
+      "attributes": ["id", "tenantId", "targetId", "targetType", "userId", "content", "nextFollowUpDate", "createdAt"],
+      "description": "跟进记录"
+    },
+    {
+      "name": "Contract",
+      "type": "aggregate",
+      "attributes": ["id", "tenantId", "customerId", "opportunityId", "name", "amount", "signDate", "startDate", "endDate", "status", "createdAt"],
+      "description": "合同聚合根"
+    },
+    {
+      "name": "Task",
+      "type": "entity",
+      "attributes": ["id", "tenantId", "title", "description", "assigneeId", "dueDate", "priority", "status", "relatedType", "relatedId", "createdAt"],
+      "description": "任务"
+    },
+    {
+      "name": "Activity",
+      "type": "entity",
+      "attributes": ["id", "tenantId", "userId", "type", "targetType", "targetId", "description", "createdAt"],
+      "description": "活动日志"
+    }
+  ],
+  "features": [
+    {
+      "name": "多租户管理",
+      "priority": "core",
+      "description": "企业注册入驻、租户配置、数据隔离",
+      "entities": ["Tenant"]
+    },
+    {
+      "name": "用户权限",
+      "priority": "core",
+      "description": "用户管理、部门架构、角色权限配置",
+      "entities": ["User", "Department", "Role", "Tenant"]
+    },
+    {
+      "name": "客户管理",
+      "priority": "core",
+      "description": "客户信息管理、客户分配、跟进记录",
+      "entities": ["Customer", "Contact", "FollowUp"]
+    },
+    {
+      "name": "销售线索",
+      "priority": "core",
+      "description": "线索录入、线索分配、线索转换为客户",
+      "entities": ["Lead", "Customer"]
+    },
+    {
+      "name": "商机管理",
+      "priority": "core",
+      "description": "商机跟进、销售漏斗、阶段转化、金额预测",
+      "entities": ["Opportunity", "Customer"]
+    },
+    {
+      "name": "合同管理",
+      "priority": "important",
+      "description": "合同起草、审批流程、签署归档、到期提醒",
+      "entities": ["Contract", "Customer", "Opportunity"]
+    },
+    {
+      "name": "任务日程",
+      "priority": "important",
+      "description": "任务创建、分配、日程提醒、任务统计",
+      "entities": ["Task", "User"]
+    },
+    {
+      "name": "数据分析",
+      "priority": "important",
+      "description": "销售报表、业绩统计、图表展示、数据导出",
+      "entities": ["Customer", "Opportunity", "Contract", "Activity"]
+    },
+    {
+      "name": "系统配置",
+      "priority": "optional",
+      "description": "自定义字段、流程配置、审批规则",
+      "entities": ["Tenant"]
+    }
+  ],
+  "metadata": {
+    "complexity": "complex",
+    "estimatedTime": "3-4周",
+    "techStack": ["React", "Node.js", "PostgreSQL", "Redis", "MinIO"],
+    "tags": ["SaaS", "CRM", "客户管理", "销售", "企业", "多租户"]
+  }
+}

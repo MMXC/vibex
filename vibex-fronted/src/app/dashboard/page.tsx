@@ -1,13 +1,16 @@
 'use client';
 
 import { getAuthToken, getUserId } from '@/lib/auth-token';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
 import styles from './dashboard.module.css';
 import { apiService, Project } from '@/services/api';
 import { useProjects, useDeletedProjects, queryKeys } from '@/hooks/queries';
+
+/** 排序方式 */
+type SortOption = 'name' | 'createdAt' | 'updatedAt';
 
 // RBAC 类型
 type UserRole = 'admin' | 'editor' | 'viewer';
@@ -45,6 +48,9 @@ export default function Dashboard() {
   const [showTrash, setShowTrash] = useState(false);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<SortOption>('updatedAt');
+  const [showSortMenu, setShowSortMenu] = useState(false);
 
   // 使用 React Query 获取项目列表
   const { 
@@ -97,6 +103,53 @@ export default function Dashboard() {
 
   // 错误状态
   const errorMessage = error instanceof Error ? error.message : '';
+
+  // E4: 搜索 + 排序后的项目列表
+  const displayProjects = useMemo(() => {
+    let result = [...projects];
+
+    // 搜索过滤
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        (p.description ?? '').toLowerCase().includes(q)
+      );
+    }
+
+    // 排序
+    result.sort((a, b) => {
+      if (sortBy === 'name') {
+        return a.name.localeCompare(b.name);
+      }
+      if (sortBy === 'createdAt') {
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return bTime - aTime;
+      }
+      // updatedAt
+      const aTime = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+      const bTime = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+      return bTime - aTime;
+    });
+
+    return result;
+  }, [projects, searchQuery, sortBy]);
+
+  // 点击外部关闭排序菜单
+  useEffect(() => {
+    const handleClickOutside = () => setShowSortMenu(false);
+    if (showSortMenu) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [showSortMenu]);
+
+  const sortLabels: Record<SortOption, string> = {
+    name: '名称',
+    createdAt: '创建时间',
+    updatedAt: '最近编辑',
+  };
 
   // 拖拽处理
   const handleDragStart = (e: React.DragEvent, projectId: string) => {
@@ -365,10 +418,65 @@ export default function Dashboard() {
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>项目列表</h2>
+            <div className={styles.controls}>
+              {/* 搜索框 */}
+              <div className={styles.searchBox}>
+                <span className={styles.searchIcon}>🔍</span>
+                <input
+                  type="text"
+                  placeholder="搜索项目..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className={styles.searchInput}
+                />
+                {searchQuery && (
+                  <button
+                    className={styles.clearBtn}
+                    onClick={() => setSearchQuery('')}
+                    title="清除搜索"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              {/* 排序 */}
+              <div className={styles.sortWrapper} onClick={(e) => e.stopPropagation()}>
+                <button
+                  className={styles.sortButton}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowSortMenu(!showSortMenu);
+                  }}
+                  title="排序"
+                >
+                  <span>↕</span>
+                  <span>{sortLabels[sortBy]}</span>
+                </button>
+                {showSortMenu && (
+                  <div className={styles.sortMenu}>
+                    {(['name', 'createdAt', 'updatedAt'] as SortOption[]).map(opt => (
+                      <button
+                        key={opt}
+                        className={`${styles.sortMenuItem} ${sortBy === opt ? styles.active : ''}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSortBy(opt);
+                          setShowSortMenu(false);
+                        }}
+                      >
+                        {sortLabels[opt]}
+                        {sortBy === opt && <span className={styles.sortCheck}>✓</span>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className={styles.projectGrid}>
-            {projects.map((project) => (
+            {displayProjects.map((project) => (
               <Link
                 key={project.id}
                 href={`/project?id=${project.id}`}
@@ -384,13 +492,30 @@ export default function Dashboard() {
                   {project.description || '暂无描述'}
                 </p>
                 <div className={styles.projectFooter}>
-                  <span className={styles.projectDate}>
-                    <span className={styles.dateIcon}>◷</span>
-                    更新于{' '}
-                    {project.updatedAt
-                      ? new Date(project.updatedAt).toLocaleDateString()
-                      : '-'}
-                  </span>
+                  <div className={styles.projectMeta}>
+                    {/* 创建时间 */}
+                    <span className={styles.metaItem} title="创建时间">
+                      <span className={styles.metaIcon}>◈</span>
+                      {project.createdAt
+                        ? new Date(project.createdAt).toLocaleDateString('zh-CN', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                          })
+                        : '-'}
+                    </span>
+                    {/* 最后编辑时间 */}
+                    <span className={styles.metaItem} title="最后编辑">
+                      <span className={styles.metaIcon}>◷</span>
+                      {project.updatedAt
+                        ? new Date(project.updatedAt).toLocaleDateString('zh-CN', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                          })
+                        : '-'}
+                    </span>
+                  </div>
                   <div
                     className={styles.projectActions}
                     style={{ position: 'relative' }}
@@ -475,7 +600,6 @@ export default function Dashboard() {
                           onClick={(e) => {
                             e.preventDefault();
                             setOpenMenuId(null);
-                            // 导出功能
                             alert('导出功能开发中');
                           }}
                         >
@@ -512,6 +636,23 @@ export default function Dashboard() {
                 <div className={styles.cardGlow} />
               </Link>
             ))}
+
+            {/* 空状态 - 搜索无结果 */}
+            {!loading && displayProjects.length === 0 && searchQuery && (
+              <div className={styles.emptyState}>
+                <span className={styles.emptyIcon}>🔍</span>
+                <p className={styles.emptyTitle}>没有找到匹配的项目</p>
+                <p className={styles.emptyDesc}>
+                  没有名称包含「{searchQuery}」的项目
+                </p>
+                <button
+                  className={styles.emptyClearBtn}
+                  onClick={() => setSearchQuery('')}
+                >
+                  清除搜索
+                </button>
+              </div>
+            )}
 
             {/* 创建新项目卡片 - 需要 create 权限 */}
             {hasPermission('create') && (

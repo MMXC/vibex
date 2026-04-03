@@ -1,0 +1,115 @@
+{
+  "id": "scenario-transaction",
+  "name": "交易流程",
+  "displayName": "通用交易支付模块",
+  "category": "scenario",
+  "icon": "💰",
+  "description": "订单、支付、退款等完整的交易流程模块",
+  "content": "开发一个通用交易支付模块，包含以下核心功能：\n\n1. 购物车：商品添加、数量修改、选择规格、计算价格\n2. 订单创建：收货地址选择、优惠券使用、发票开具\n3. 支付流程：多种支付方式、支付状态回调、支付结果通知\n4. 订单管理：订单列表、订单详情、取消订单、删除订单\n5. 售后退款：退款申请、退款审核、退款处理、退款结果\n6. 评价系统：订单评价、评分、晒图、追评\n7. 发票管理：发票申请、发票开具、发票查看",
+  "entities": [
+    {
+      "name": "Cart",
+      "type": "aggregate",
+      "attributes": ["id", "userId", "items", "totalAmount", "itemCount", "updatedAt"],
+      "description": "购物车聚合根"
+    },
+    {
+      "name": "CartItem",
+      "type": "entity",
+      "attributes": ["id", "cartId", "productId", "skuId", "quantity", "price", "selected"],
+      "description": "购物车项"
+    },
+    {
+      "name": "Order",
+      "type": "aggregate",
+      "attributes": ["id", "orderNo", "userId", "items", "totalAmount", "discountAmount", "freightAmount", "payAmount", "status", "shippingAddress", "invoice", "paidAt", "createdAt", "updatedAt"],
+      "description": "订单聚合根"
+    },
+    {
+      "name": "OrderItem",
+      "type": "entity",
+      "attributes": ["id", "orderId", "productId", "skuId", "productName", "skuSpec", "price", "quantity", "subtotal"],
+      "description": "订单项"
+    },
+    {
+      "name": "Payment",
+      "type": "entity",
+      "attributes": ["id", "orderId", "amount", "method", "transactionId", "status", "paidAt", "createdAt"],
+      "description": "支付记录"
+    },
+    {
+      "name": "Refund",
+      "type": "aggregate",
+      "attributes": ["id", "orderId", "orderItemId", "amount", "reason", "status", "reviewerId", "reviewedAt", "refundedAt", "createdAt"],
+      "description": "退款聚合根"
+    },
+    {
+      "name": "Review",
+      "type": "entity",
+      "attributes": ["id", "orderId", "orderItemId", "userId", "rating", "content", "images", "reply", "replyAt", "createdAt"],
+      "description": "评价"
+    },
+    {
+      "name": "Invoice",
+      "type": "entity",
+      "attributes": ["id", "orderId", "userId", "type", "title", "taxNo", "content", "status", "issuedAt"],
+      "description": "发票"
+    },
+    {
+      "name": "Coupon",
+      "type": "entity",
+      "attributes": ["id", "userId", "couponTemplateId", "code", "amount", "minAmount", "status", "orderId", "usedAt", "expiredAt"],
+      "description": "优惠券"
+    }
+  ],
+  "features": [
+    {
+      "name": "购物车",
+      "priority": "core",
+      "description": "添加商品、选择规格、数量修改、删除、价格计算",
+      "entities": ["Cart", "CartItem"]
+    },
+    {
+      "name": "订单创建",
+      "priority": "core",
+      "description": "收货地址、优惠券使用、发票选择、订单确认",
+      "entities": ["Order", "OrderItem", "Coupon", "Invoice"]
+    },
+    {
+      "name": "支付流程",
+      "priority": "core",
+      "description": "选择支付方式、调起支付、支付回调、支付结果",
+      "entities": ["Order", "Payment"]
+    },
+    {
+      "name": "订单管理",
+      "priority": "core",
+      "description": "订单列表、详情查看、取消订单、查看物流",
+      "entities": ["Order", "OrderItem"]
+    },
+    {
+      "name": "售后退款",
+      "priority": "important",
+      "description": "退款申请、退款审核、退款处理、退款结果",
+      "entities": ["Refund", "Order"]
+    },
+    {
+      "name": "订单评价",
+      "priority": "important",
+      "description": "星级评分、文字评价、图片评价、追评、商家回复",
+      "entities": ["Review", "Order", "OrderItem"]
+    },
+    {
+      "name": "发票管理",
+      "priority": "optional",
+      "description": "发票申请、发票开具、发票查看、发票作废",
+      "entities": ["Invoice", "Order"]
+    }
+  ],
+  "metadata": {
+    "complexity": "medium",
+    "estimatedTime": "2-3周",
+    "techStack": ["React", "Node.js", "PostgreSQL", "Redis"],
+    "tags": ["交易", "订单", "支付", "退款", "评价", "优惠券"]
+  }
+}

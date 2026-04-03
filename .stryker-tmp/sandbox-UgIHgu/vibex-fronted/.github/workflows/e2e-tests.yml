@@ -1,0 +1,136 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    # 每天 6:00 UTC 运行
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+# 并行 Job 优化: E2E 4 分片并行执行 (F1.4)
+jobs:
+  e2e-test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 4 分片并行
+        shard: [1, 2, 3, 4]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # F1.1: npm 缓存配置 - 使用 hashFiles 确保一致性
+      - name: Cache node_modules
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Install dependencies
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+        env:
+          CI: true
+
+      # F1.3: Playwright 缓存 - 浏览器安装时间 <5s (缓存命中)
+      - name: Cache Playwright browsers
+        id: cache-playwright
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright browsers
+        if: steps.cache-playwright.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests (shard ${{ matrix.shard }}/4)
+        run: |
+          npx playwright test \
+            --config=playwright.ci.config.ts \
+            --shard=${{ matrix.shard }}/4 \
+            --reporter=list
+        id: test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-shard-${{ matrix.shard }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
+
+      - name: Upload screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-shard-${{ matrix.shard }}
+          path: |
+            test-results/**/screenshots/
+            test-results/**/videos/
+          retention-days: 14
+
+  notify:
+    needs: e2e-test
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Parse test results
+        run: |
+          # 汇总各分片结果
+          echo "## E2E Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          total_passed=0
+          total_failed=0
+          
+          for dir in artifacts/test-results-shard-*; do
+            if [ -d "$dir" ]; then
+              echo "### $(basename $dir)" >> $GITHUB_STEP_SUMMARY
+              if [ -f "$dir/results.json" ]; then
+                passed=$(cat "$dir/results.json" | jq -r '.stats?.passed // 0')
+                failed=$(cat "$dir/results.json" | jq -r '.stats?.failed // 0')
+                total_passed=$((total_passed + passed))
+                total_failed=$((total_failed + failed))
+                echo "- Passed: $passed, Failed: $failed" >> $GITHUB_STEP_SUMMARY
+              fi
+            fi
+          done
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Total: Passed: $total_passed, Failed: $total_failed**" >> $GITHUB_STEP_SUMMARY
+
+      - name: Send Slack notification
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

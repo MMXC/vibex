@@ -1,0 +1,230 @@
+/* Changelog Page Styles */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+.container {
+  min-height: 100vh;
+  background: #0a0a0f;
+  font-family: 'Outfit', sans-serif;
+  color: #fff;
+  position: relative;
+}
+
+.bgEffect {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.gridOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.glowOrb {
+  position: absolute;
+  top: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 255, 0.15) 0%,
+    transparent 70%
+  );
+  filter: blur(60px);
+}
+
+.main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 60px 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.title {
+  font-size: 48px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  background: linear-gradient(135deg, #00ffff, #00ff88);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.versionInfo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.versionBadge {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 255, 0.2),
+    rgba(0, 255, 255, 0.05)
+  );
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #00ffff;
+}
+
+.commitHash {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: monospace;
+}
+
+/* Timeline */
+.timeline {
+  position: relative;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 255, 255, 0.5),
+    rgba(0, 255, 255, 0.1)
+  );
+}
+
+.entry {
+  position: relative;
+  padding-left: 56px;
+  padding-bottom: 40px;
+}
+
+.entry:last-child {
+  padding-bottom: 0;
+}
+
+.entry::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  width: 18px;
+  height: 18px;
+  background: #0a0a0f;
+  border: 3px solid #00ffff;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.entryHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.version {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.date {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.changes {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background: rgba(15, 15, 25, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.changes li {
+  padding: 8px 0;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.changes li:last-child {
+  border-bottom: none;
+}
+
+.commit {
+  margin-top: 12px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: monospace;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .main {
+    padding: 40px 16px;
+  }
+
+  .title {
+    font-size: 32px;
+  }
+
+  .subtitle {
+    font-size: 16px;
+  }
+
+  .timeline::before {
+    left: 12px;
+  }
+
+  .entry {
+    padding-left: 40px;
+  }
+
+  .entry::before {
+    left: 4px;
+    width: 14px;
+    height: 14px;
+  }
+
+  .version {
+    font-size: 20px;
+  }
+
+  .changes li {
+    font-size: 14px;
+  }
+}

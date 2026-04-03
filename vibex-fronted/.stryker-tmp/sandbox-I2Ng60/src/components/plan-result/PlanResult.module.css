@@ -1,0 +1,252 @@
+/* PlanResult Component Styles */
+
+.container {
+  padding: 20px;
+  background: var(--bg-secondary, #12121a);
+  border: 1px solid var(--border-color, #2a2a3e);
+  border-radius: 12px;
+  margin-top: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color, #2a2a3e);
+}
+
+.icon {
+  font-size: 24px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary, #e4e4e7);
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #e4e4e7);
+  margin-bottom: 12px;
+}
+
+.sectionIcon {
+  font-size: 16px;
+}
+
+.analysis {
+  padding: 14px;
+  background: var(--bg-primary, #0a0a0f);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary, #a1a1aa);
+}
+
+.complexity {
+  padding: 14px;
+  background: var(--bg-primary, #0a0a0f);
+  border-radius: 8px;
+}
+
+.complexityBar {
+  height: 8px;
+  background: var(--bg-tertiary, #1a1a24);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.complexityFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.complexityInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.complexityScore {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.complexityLabel {
+  font-size: 14px;
+  color: var(--text-muted, #71717a);
+}
+
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg-primary, #0a0a0f);
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.featureName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #e4e4e7);
+  min-width: 100px;
+}
+
+.featureDesc {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text-secondary, #a1a1aa);
+}
+
+.featurePriority {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.priorityHigh {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.priorityMedium {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.priorityLow {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.risks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.risk {
+  padding: 10px 12px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 6px;
+  font-size: 13px;
+  color: #f59e0b;
+}
+
+.detailsToggle {
+  background: none;
+  border: none;
+  padding: 8px 0;
+  font-size: 13px;
+  color: var(--accent-color, #6366f1);
+  cursor: pointer;
+  text-align: left;
+}
+
+.detailsToggle:hover {
+  text-decoration: underline;
+}
+
+.contexts {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.context {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  background: var(--bg-primary, #0a0a0f);
+  border-radius: 6px;
+}
+
+.contextName {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary, #e4e4e7);
+}
+
+.contextDesc {
+  font-size: 12px;
+  color: var(--text-muted, #71717a);
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color, #2a2a3e);
+}
+
+.adjustButton {
+  padding: 12px 20px;
+  background: transparent;
+  border: 1px solid var(--border-color, #2a2a3e);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary, #a1a1aa);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.adjustButton:hover:not(:disabled) {
+  background: var(--bg-tertiary, #1a1a24);
+  color: var(--text-primary, #e4e4e7);
+}
+
+.adjustButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.confirmButton {
+  padding: 12px 24px;
+  background: var(--accent-color, #6366f1);
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.confirmButton:hover:not(:disabled) {
+  background: var(--accent-hover, #4f46e5);
+  transform: translateY(-1px);
+}
+
+.confirmButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}

@@ -1,0 +1,28 @@
+/**
+ * BoundedEdgeLayer.module.css
+ */
+
+.layer {
+  /* SVG overlay — pointer-events: none 在组件内设置 */
+}
+
+.edge {
+  transition: stroke-opacity 0.2s ease;
+}
+
+.edge:hover {
+  stroke-opacity: 0.8;
+}
+
+/* 连线类型 — 使用 CSS 变量让主题可覆盖 */
+.edge.dependency {
+  /* 默认 indigo，在 SVG path 内设置 */
+}
+
+.edge.composition {
+  /* 默认 violet */
+}
+
+.edge.association {
+  /* 默认 slate */
+}

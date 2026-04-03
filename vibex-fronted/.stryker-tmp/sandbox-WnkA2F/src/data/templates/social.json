@@ -1,0 +1,42 @@
+{
+  "id": "social-001",
+  "name": "社交网络基础模板",
+  "description": "适用于社交网络应用的需求模板，包含用户关系、动态发布、内容互动等核心功能",
+  "category": "social",
+  "scenes": ["b2c"],
+  "tags": ["user-auth", "media", "notification", "search"],
+  "createdAt": "2026-03-09T00:00:00Z",
+  "updatedAt": "2026-03-09T00:00:00Z",
+  "items": [
+    {
+      "id": "epic-001",
+      "templateId": "social-001",
+      "type": "epic",
+      "title": "用户关系系统",
+      "description": "实现关注、粉丝、好友、黑名单功能",
+      "priority": "P0",
+      "acceptanceCriteria": [
+        "支持关注/取消关注",
+        "支持粉丝列表查看",
+        "支持好友添加",
+        "支持黑名单管理"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "epic-002",
+      "templateId": "social-001",
+      "type": "epic",
+      "title": "内容发布与互动",
+      "description": "实现动态发布、点赞、评论、分享",
+      "priority": "P0",
+      "acceptanceCriteria": [
+        "支持发布图文动态",
+        "支持发布视频内容",
+        "支持点赞/评论",
+        "支持内容分享"
+      ],
+      "dependencies": ["epic-001"]
+    }
+  ]
+}

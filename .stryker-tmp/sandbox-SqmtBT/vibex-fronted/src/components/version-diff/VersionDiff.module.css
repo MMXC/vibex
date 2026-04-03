@@ -1,0 +1,138 @@
+.container {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  font-family: monospace;
+  font-size: 13px;
+}
+
+.header {
+  display: flex;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.headerCell {
+  flex: 1;
+  padding: 12px 16px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.content {
+  display: flex;
+}
+
+.pane {
+  flex: 1;
+  padding: 16px;
+  overflow-x: auto;
+  background: #fafafa;
+}
+
+.pane:first-child {
+  border-right: 1px solid #e5e7eb;
+}
+
+.code {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.diffSection {
+  padding: 16px;
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.diffItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.diffItem.added {
+  background: #dcfce7;
+}
+
+.diffItem.removed {
+  background: #fee2e2;
+}
+
+.diffItem.modified {
+  background: #fef3c7;
+}
+
+.key {
+  font-weight: 600;
+  color: #374151;
+  min-width: 100px;
+}
+
+.badge {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.added .badge {
+  background: #16a34a;
+  color: white;
+}
+
+.removed .badge {
+  background: #dc2626;
+  color: white;
+}
+
+.modified .badge {
+  background: #d97706;
+  color: white;
+}
+
+.value {
+  flex: 1;
+  color: #6b7280;
+  word-break: break-all;
+}
+
+.addedValue {
+  color: #16a34a;
+  background: #dcfce7;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.removedValue {
+  color: #dc2626;
+  background: #fee2e2;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.modified {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.noDiff {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px;
+  color: #6b7280;
+}
+
+.icon {
+  font-size: 20px;
+}

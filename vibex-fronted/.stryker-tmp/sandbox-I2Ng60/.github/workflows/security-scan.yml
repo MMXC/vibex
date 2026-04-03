@@ -1,0 +1,70 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # F4.1: npm audit 集成
+  npm-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+  # F4.2: 硬编码密钥检测
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          config-path: .gitleaks.toml
+          args: '--verbose'
+
+  # F4.3: 敏感文件检查
+  sensitive-files:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for sensitive files
+        run: |
+          # 检查是否有 .env 文件被意外提交
+          SENSITIVE_FILES=$(git ls-files | grep -E '^\.env' | grep -v -E '\.env\.(example|production|template)' | wc -l)
+          if [ "$SENSITIVE_FILES" -gt 0 ]; then
+            echo "❌ Found sensitive .env files:"
+            git ls-files | grep -E '^\.env' | grep -v -E '\.env\.(example|production|template)'
+            exit 1
+          fi
+          
+          # 检查是否有硬编码密码/密钥
+          HARDCODED_SECRETS=$(grep -r -E '(password|secret|api_key|apikey|token)["\s]*[:=]["\s]*[a-zA-Z0-9]{20,}' --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" --exclude-dir=node_modules --exclude-dir=.next . 2>/dev/null | grep -v "// " | wc -l)
+          if [ "$HARDCODED_SECRETS" -gt 0 ]; then
+            echo "⚠️ Found potential hardcoded secrets:"
+            grep -r -E '(password|secret|api_key|apikey|token)["\s]*[:=]["\s]*[a-zA-Z0-9]{20,}' --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" --exclude-dir=node_modules --exclude-dir=.next . 2>/dev/null | head -5
+          fi
+          
+          echo "✅ No sensitive files detected"
+
+  # F4.4: 安全扫描工作流（汇总）
+  security-summary:
+    needs: [npm-audit, gitleaks, sensitive-files]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Summary
+        run: |
+          echo "## Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "✅ npm audit: ${{ needs.npm-audit.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "✅ gitleaks: ${{ needs.gitleaks.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "✅ sensitive-files: ${{ needs.sensitive-files.result }}" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,144 @@
+.container {
+  padding: 16px;
+  background: var(--color-bg-secondary, #f9fafb);
+  border-radius: 8px;
+  border: 1px solid var(--color-border, #e5e7eb);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-text, #111827);
+}
+
+.legend {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legendItem::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.statusPending::before { background: #d1d5db; }
+.statusActive::before { background: #3b82f6; }
+.statusCompleted::before { background: #10b981; }
+.statusError::before { background: #ef4444; }
+
+.flow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 0;
+}
+
+.stepWrapper {
+  cursor: pointer;
+  border-radius: 6px;
+  transition: box-shadow 0.2s;
+}
+
+.stepWrapper:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.wrapperActive {
+  box-shadow: 0 0 0 2px #3b82f6;
+}
+
+.stepNode {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  background: white;
+  border: 1px solid var(--color-border, #e5e7eb);
+  color: var(--color-text, #374151);
+  min-width: 100px;
+}
+
+.stepNode.statusPending {
+  opacity: 0.6;
+  background: #f9fafb;
+}
+
+.stepNode.statusActive {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.stepNode.statusCompleted {
+  border-color: #10b981;
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.stepNode.statusError {
+  border-color: #ef4444;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.stepIcon {
+  font-size: 16px;
+}
+
+.stepLabel {
+  white-space: nowrap;
+}
+
+.pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3b82f6;
+  animation: pulse 1.5s infinite;
+  margin-left: auto;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+.connector {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.line {
+  width: 24px;
+  height: 2px;
+  background: #d1d5db;
+}
+
+.arrow {
+  color: #9ca3af;
+  font-size: 12px;
+}

@@ -330,6 +330,211 @@
   color: var(--color-primary);
 }
 
+/* E4: 控制栏（搜索 + 排序） */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* E4: 搜索框 */
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  transition: border-color var(--duration-normal);
+}
+
+.searchBox:focus-within {
+  border-color: var(--color-primary);
+}
+
+.searchIcon {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.searchInput {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  width: 180px;
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-muted);
+}
+
+.clearBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 10px;
+  transition: all var(--duration-fast);
+  flex-shrink: 0;
+}
+
+.clearBtn:hover {
+  background: var(--color-primary-muted);
+  color: var(--color-primary);
+}
+
+/* E4: 排序按钮 */
+.sortWrapper {
+  position: relative;
+}
+
+.sortButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all var(--duration-normal);
+  white-space: nowrap;
+}
+
+.sortButton:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.sortMenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 4px;
+  min-width: 120px;
+  z-index: 200;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.sortMenuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  text-align: left;
+}
+
+.sortMenuItem:hover {
+  background: var(--color-primary-muted);
+  color: var(--color-primary);
+}
+
+.sortMenuItem.active {
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.sortCheck {
+  font-size: 12px;
+}
+
+/* E4: 项目元信息 */
+.projectFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.projectMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.metaIcon {
+  font-size: 11px;
+}
+
+/* E4: 空状态 */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  grid-column: 1 / -1;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.emptyTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 8px;
+}
+
+.emptyDesc {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: 0 0 20px;
+}
+
+.emptyClearBtn {
+  padding: 8px 20px;
+  background: var(--color-primary-muted);
+  border: 1px solid var(--color-primary);
+  border-radius: 8px;
+  color: var(--color-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all var(--duration-normal);
+}
+
+.emptyClearBtn:hover {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
 /* 项目网格 */
 .projectGrid {
   display: grid;
@@ -579,21 +784,28 @@
   .header {
     flex-direction: column;
     gap: 16px;
+    align-items: flex-start;
   }
 
   .sectionHeader {
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     align-items: flex-start;
   }
 
-  .filterTabs {
+  .controls {
     width: 100%;
-    overflow-x: auto;
+  }
+
+  .searchBox {
+    flex: 1;
+  }
+
+  .searchInput {
+    width: 100%;
   }
 }
-
-/* Trash Button */
+    flex-direction: column;
 .trashButton {
   position: fixed;
   bottom: 24px;

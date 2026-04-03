@@ -1,0 +1,14 @@
+.container { border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb; }
+.title { font-size: 0.875rem; font-weight: 500; color: #111827; }
+.actions { display: flex; gap: 0.25rem; }
+.toolButton { padding: 0.25rem 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 4px; cursor: pointer; font-size: 0.875rem; }
+.toolButton:disabled { opacity: 0.5; cursor: not-allowed; }
+.editor { width: 100%; border: none; padding: 1rem; font-family: monospace; font-size: 0.8125rem; line-height: 1.5; resize: vertical; }
+.editor:focus { outline: none; }
+.error { background: #fef2f2; }
+.errorMessage { padding: 0.5rem 1rem; background: #fef2f2; color: #dc2626; font-size: 0.8125rem; }
+.footer { display: flex; justify-content: flex-end; gap: 0.5rem; padding: 0.75rem 1rem; border-top: 1px solid #e5e7eb; }
+.cancelButton { padding: 0.5rem 1rem; background: white; border: 1px solid #e5e7eb; border-radius: 6px; cursor: pointer; }
+.applyButton { padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; }
+.applyButton:disabled { opacity: 0.5; cursor: not-allowed; }

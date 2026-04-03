@@ -1,5 +1,74 @@
 # Changelog
 
+### [E4 测试工程化] — 2026-04-03 (dev-epic4-测试工程化)
+
+#### Added
+- `tests/e2e/auto-save.spec.ts` — 4 E2E tests: auto-save trigger, status indicator, save conflict detection, retry after conflict
+- `tests/e2e/conflict-dialog.spec.ts` — 3 E2E tests: dialog display, manual resolution, auto-retry
+- `tests/contract/sync.contract.spec.ts` — 5 Contract tests: CanvasSnapshot, CreateSnapshotOutput, SyncProtocol API schema validation
+
+#### Enhanced
+- `playwright.config.ts` — retries=2 (flaky retry), workers=1 (stability), reporter=html (CI: list)
+- `scripts/test-stability-report.sh` — E2E stability report generator with JSON reporter + markdown log
+- `scripts/parse-playwright-report.py` — Playwright JSON parser: flaky detection (retry→pass), pass rate ≥ 95% gate
+- `.github/workflows/pre-submit.yml` — Pre-submit CI workflow: tsc, eslint, npm test, build, changelog checks
+
+### [E2 项目模板系统增强] — 2026-04-03 (vibex-pm-proposals-20260403_024652)
+
+#### Added
+- `src/components/templates/TemplateDetail.tsx` — 重写市场模板详情组件，使用 `Template` 类型（`@/types/template`）
+  - 支持多图预览（缩略图切换）
+  - 显示创建/更新时间、页面列表、难度、标签
+  - 完整的底部操作栏（取消/使用）
+- `src/components/templates/TemplateDetail.module.css` — 详情弹窗样式（未来风格 + 响应式）
+- `src/components/templates/index.ts` — 导出 TemplateDetail
+- `src/app/templates/page.tsx` — 集成 TemplateDetail 作为模板选择流程入口
+
+#### Enhanced
+- 模板市场页面：选择模板 → 详情预览 → 确认使用，完整流程
+
+### [E4 项目浏览体验优化] — 2026-04-03 (vibex-pm-proposals-20260403_024652)
+
+#### Added
+- `src/app/dashboard/page.tsx` — 项目搜索框（按名称/描述过滤）、排序选项（名称/创建时间/最近编辑）
+- `src/app/dashboard/dashboard.module.css` — 搜索框、排序菜单、元信息、空状态样式
+- 空状态：搜索无结果时显示友好提示 + 清除搜索按钮
+
+#### Enhanced
+- 项目卡片：增加创建日期 + 最后编辑日期（使用 ◈ / ◷ 图标）
+- 项目卡片底部布局：左侧元信息 + 右侧操作按钮
+- 响应式：移动端搜索框撑满宽度
+
+### [E3 统一交付中心] — 2026-04-03 (vibex-pm-proposals-20260403_024652)
+
+#### Added
+- `src/stores/deliveryStore.ts` — 交付中心 Zustand store，支持 Tab 状态、导出进度、导出历史
+- `src/components/delivery/` — DeliveryTabs、ContextTab、FlowTab、ComponentTab、PRDTab 组件
+- `src/app/canvas/delivery/page.tsx` — 交付中心页面（路由：/canvas/delivery）
+- `src/app/canvas/delivery/delivery.module.css` — 交付中心页面样式
+
+**功能**:
+- 4 个 Tab：限界上下文、流程文档、组件清单、PRD
+- 导出格式：JSON / Markdown / PlantUML / BPMN / TypeScript / JSON Schema / PDF
+- 导出预览（格式化展示）
+- 批量导出（ZIP）
+- 导出历史记录
+
+### [E5 快捷键个性化配置] — 2026-04-03 (vibex-pm-proposals-20260403_024652)
+
+#### Added
+- `src/stores/shortcutStore.ts` — 快捷键配置 Zustand + persist store
+- `src/components/shortcuts/` — ShortcutCategory、ShortcutRow、ShortcutEditModal 组件
+- `src/app/settings/shortcuts/page.tsx` — 快捷键设置页面（路由：/settings/shortcuts）
+- `src/app/user-settings/page.tsx` — 用户设置页面新增"快捷键"Tab
+
+**功能**:
+- 4 个分类：导航、编辑、视图、Phase 切换
+- 编辑模式：监听键盘输入，捕获组合键
+- 冲突检测：检测 Ctrl+S 等被多个 action 占用
+- 配置持久化：localStorage 存储，跨会话保持
+- 重置为默认：恢复所有快捷键到默认值
+
 ### [E2 BoundedContext Tree 持久化] — 2026-04-03
 
 #### Added

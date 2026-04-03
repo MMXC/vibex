@@ -1,0 +1,83 @@
+/* GatewayNode.module.css */
+
+.gatewayNode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+.gatewayNode:hover .diamondSvg path {
+  filter: brightness(1.05);
+}
+
+.selected .diamondSvg path {
+  filter: drop-shadow(0 0 6px currentColor);
+}
+
+/* XOR gateway colors */
+.gatewayXor .diamondSvg path {
+  stroke: #d97706;
+  fill: #fef3c7;
+}
+
+/* OR gateway colors */
+.gatewayOr .diamondSvg path {
+  stroke: #2563eb;
+  fill: #dbeafe;
+}
+
+.symbol {
+  color: #374151;
+  pointer-events: none;
+}
+
+.gatewayXor .symbol {
+  color: #92400e;
+}
+
+.gatewayOr .symbol {
+  color: #1e40af;
+}
+
+.diamondSvg {
+  display: block;
+  transition: filter 0.15s ease;
+}
+
+.gatewayLabel {
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #374151;
+  text-align: center;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conditionBadge {
+  margin-top: 2px;
+  font-size: 10px;
+  color: #6b7280;
+  font-family: 'Courier New', monospace;
+  background: #f3f4f6;
+  padding: 1px 4px;
+  border-radius: 3px;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ReactFlow handles — hide default styling */
+.handle {
+  width: 8px !important;
+  height: 8px !important;
+  border: 1.5px solid currentColor !important;
+  border-radius: 50% !important;
+  background: white !important;
+}

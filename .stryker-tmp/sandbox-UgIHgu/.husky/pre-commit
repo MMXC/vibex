@@ -1,0 +1,3 @@
+#!/bin/bash
+# Auto-update pnpm lockfile when package.json changes
+pnpm install --frozen-lockfile 2>/dev/null || echo "pnpm install failed, check lockfile sync"

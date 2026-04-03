@@ -1,5 +1,13 @@
 # Changelog
 
+### [E1-修复CSS孤立属性] — 2026-04-04 (vibex-css-build-fix)
+
+#### Fixed
+- `src/app/dashboard/dashboard.module.css` — 删除第 808 行孤立 `flex-direction: column;`，修复 CSS 解析错误导致构建失败
+
+#### Verification
+- `npm run build` ✅ exit 0
+
 ### [E5-Git Hooks强制] — 2026-04-03 (vibex-reviewer-proposals-20260403_024652)
 
 #### Added

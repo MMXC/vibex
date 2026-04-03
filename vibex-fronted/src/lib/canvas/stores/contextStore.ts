@@ -26,6 +26,7 @@ interface ContextStore {
   editContextNode: (nodeId: string, data: Partial<BoundedContextNode>) => void;
   deleteContextNode: (nodeId: string) => void;
   confirmContextNode: (nodeId: string) => void;
+  toggleContextSelection: (nodeId: string) => void;
   setContextDraft: (draft: Partial<BoundedContextNode> | null) => void;
 }
 
@@ -89,6 +90,15 @@ export const useContextStore = create<ContextStore>()(
             return { contextNodes: newNodes };
           });
         },
+
+        toggleContextSelection: (nodeId) =>
+          set((state) => ({
+            contextNodes: state.contextNodes.map((node) =>
+              node.nodeId === nodeId
+                ? { ...node, selected: !node.selected }
+                : node
+            ),
+          })),
 
         setContextDraft: (draft) => set({ contextDraft: draft }),
       }),

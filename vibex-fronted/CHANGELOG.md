@@ -1,5 +1,12 @@
 # Changelog
 
+### [E2 BoundedContext Tree 持久化] — 2026-04-03
+
+#### Added
+- `toggleContextSelection` 方法：`contextStore.ts`，勾选时更新节点 `selected` 字段 + Zustand persist 自动持久化
+
+
+
 ### [E1 新手引导] — 2026-04-03
 
 #### Added

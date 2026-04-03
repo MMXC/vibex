@@ -10,7 +10,8 @@
     "start": "next start",
     "start:hono": "tsx src/index.ts",
     "lint": "eslint",
-    "test": "jest"
+    "test": "jest",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.11",

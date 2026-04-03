@@ -1,3 +1,10 @@
+### Fixed (canvas-canvasstore-migration E2: CanvasPage import 迁移) — 2026-04-04
+- **E2 CanvasPage 迁移**: 移除 CanvasPage.tsx 中所有 canvasStore 导入
+- **loadExampleData**: 从 @/lib/canvas/loadExampleData 导入
+- **setContextNodes**: 改为 useContextStore.getState().setContextNodes()
+- **setFlowNodes**: 改为 useFlowStore.getState().setFlowNodes()
+- **提交**: `fefd44b3`
+
 ### Fixed (canvas-canvasstore-migration E1: canvasStore 清理与降级) — 2026-04-04
 - **E1 canvasStore 清理**: canvasStore.ts 从 ~170 行降级为 43 行纯 re-export 层
 - **crossStoreSync.ts**: 提取跨 store 订阅逻辑（activeTree→centerExpand, flow→recompute）

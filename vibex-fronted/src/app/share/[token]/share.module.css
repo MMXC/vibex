@@ -1,0 +1,152 @@
+/**
+ * Share Page Styles
+ *
+ * Epic 5 实现: S5.1 (只读分享链接)
+ */
+
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--bg-primary, #0a0a0f);
+}
+
+.loadingSpinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: var(--text-secondary, #a0a0b0);
+}
+
+.spinnerIcon {
+  font-size: 48px;
+  animation: spin 1s linear infinite;
+  background: linear-gradient(135deg, #00ffff 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.errorContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--bg-primary, #0a0a0f);
+}
+
+.errorContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px;
+  background: var(--bg-secondary, #12121a);
+  border: 1px solid var(--border-color, #2a2a3a);
+  border-radius: 16px;
+  text-align: center;
+}
+
+.errorIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  font-size: 32px;
+  font-weight: bold;
+  color: #ff4444;
+  background: rgba(255, 68, 68, 0.1);
+  border-radius: 50%;
+}
+
+.errorContent h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary, #ffffff);
+}
+
+.errorContent p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary, #a0a0b0);
+}
+
+.homeLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+  text-decoration: none;
+  background: linear-gradient(135deg, #00ffff 0%, #8b5cf6 100%);
+  border-radius: 8px;
+  transition: opacity 0.2s ease;
+}
+
+.homeLink:hover {
+  opacity: 0.9;
+}
+
+.sharePage {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg-primary, #0a0a0f);
+}
+
+.shareBanner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  background: var(--bg-secondary, #12121a);
+  border-bottom: 1px solid var(--border-color, #2a2a3a);
+}
+
+.shareIcon {
+  font-size: 20px;
+  background: linear-gradient(135deg, #00ffff 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.shareText {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary, #a0a0b0);
+}
+
+.createBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #ffffff;
+  text-decoration: none;
+  background: linear-gradient(135deg, #00ffff 0%, #8b5cf6 100%);
+  border-radius: 6px;
+  transition: opacity 0.2s ease;
+}
+
+.createBtn:hover {
+  opacity: 0.9;
+}

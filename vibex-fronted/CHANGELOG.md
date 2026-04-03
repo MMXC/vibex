@@ -1,5 +1,26 @@
 # Changelog
 
+### [E5 协作基础设施] — 2026-04-03 (dev-epic5-协作基础设施)
+
+#### Added
+- `src/app/share/[token]/page.tsx` — 只读分享页面，接收 token 参数获取项目数据并以只读模式渲染
+- `src/app/share/[token]/share.module.css` — 分享页面样式（加载状态、错误状态、只读标识）
+- `src/app/api/share/[token]/route.ts` — 分享 API 接口（GET /api/share/:token）
+- `src/hooks/useCanvasSnapshot.ts` — 画布快照 Hook
+  - `takeSnapshot()` 创建快照
+  - `restoreSnapshot()` 恢复快照
+  - `deleteSnapshot()` 删除快照
+  - `computeSnapshotDiff()` 快照差异计算
+- `src/components/SnapshotCompare.tsx` — 快照对比组件
+  - 支持摘要、详细、JSON 三种视图模式
+  - 显示快照 A/B 信息和差异内容
+- `src/components/SnapshotCompare.module.css` — 快照对比组件样式
+
+**功能**:
+- S5.1: 只读分享链接基础
+- S5.4: 设计版本快照基础
+- S5.5: 快照对比基础
+
 ### [E4 测试工程化] — 2026-04-03 (dev-epic4-测试工程化)
 
 #### Added

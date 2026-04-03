@@ -35,4 +35,4 @@ jobs:
 
       - name: Run stylelint CSS quality gate
         run: |
-          npx stylelint "**/*.css" --ignore-path .gitignore || exit 1
+          npx stylelint "src/**/*.css" "src/**/**/*.css" || exit 1

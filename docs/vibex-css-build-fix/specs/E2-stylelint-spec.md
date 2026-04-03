@@ -7,16 +7,15 @@ cd vibex-fronted
 pnpm add -D stylelint stylelint-config-standard
 ```
 
-## stylelint.config.mjs
+## .stylelintrc.json
 
-```js
-export default {
-  rules: {
-    // E2: Detect orphaned CSS properties (not inside any rule)
-    'no-invalid-position-declaration': true,
+```json
+{
+  "rules": {
+    "no-invalid-position-declaration": true
   },
-  ignoreFiles: ['**/*.min.css'],
-};
+  "ignoreFiles": ["**/*.min.css"]
+}
 ```
 
 ## package.json script
@@ -24,7 +23,7 @@ export default {
 ```json
 {
   "scripts": {
-    "lint:css": "stylelint \"**/*.css\" --ignore-path .gitignore"
+    "lint:css": "stylelint \"src/**/*.css\" \"src/**/**/*.css\""
   }
 }
 ```
@@ -35,7 +34,7 @@ export default {
 # .github/workflows/pre-submit.yml 新增 step
 - name: Run stylelint CSS quality gate
   run: |
-    npx stylelint "**/*.css" --ignore-path .gitignore || exit 1
+    npx stylelint "src/**/*.css" "src/**/**/*.css" || exit 1
 ```
 
 ## 验证

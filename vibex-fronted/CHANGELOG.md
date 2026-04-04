@@ -1,5 +1,19 @@
 # Changelog
 
+
+### [canvas-split-hooks E5: useCanvasEvents] — 2026-04-04
+
+#### Added
+- `src/hooks/canvas/useCanvasEvents.ts` (223 行) — 画布交互事件处理 hook
+  - 鼠标事件：onMouseDown/onMouseMove/onMouseUp/onWheel
+  - 键盘事件：onKeyDown/onKeyUp（Delete/Backspace/Ctrl+A 等快捷键）
+  - 触摸事件：onTouchStart/onTouchMove/onTouchEnd
+  - 焦距管理：useRef 追踪画布容器焦点
+- `src/hooks/canvas/useCanvasEvents.test.tsx` (407 行) — 8 个测试用例全覆盖
+
+**提交**: `5b9f83b2`
+
+
 ### [api-input-validation-layer E1: Zod验证基础设施] — 2026-04-04
 
 #### Backend

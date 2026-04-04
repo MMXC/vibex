@@ -17,6 +17,18 @@ interface VersionInfo {
 }
 
 const mockChangelog: ChangelogEntry[] = [
+
+  {
+    version: '1.0.106',
+    date: '2026-04-04',
+    changes: [
+      'canvas-split-hooks/E5: useCanvasEvents -- canvas event handling hook',
+      'src/hooks/canvas/useCanvasEvents.ts (223 lines): mouse/keyboard/touch events',
+      'src/hooks/canvas/useCanvasEvents.test.tsx (407 lines): 8 test cases',
+      'commit 5b9f83b2',
+    ],
+    commit: '5b9f83b2',
+  },
   {
     version: '1.0.105',
     date: '2026-04-04',

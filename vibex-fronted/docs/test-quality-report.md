@@ -82,7 +82,45 @@ Cause: Cannot find TestRunner plugin "jest".
 
 ---
 
+## 2026-04-04 更新
+
+### 尝试运行记录
+
+1. **stryker run** - 多次尝试，但遇到问题:
+   - pnpm workspace + jest-runner 插件加载问题 (ESM paths)
+   - stryker 扫描 out/ 目录导致的 ENOENT 错误
+   - BusinessFlowTree.test.tsx 在 sandbox 中失败 (getAllByRole)
+   - 最终尝试指定单行突变 (`:15:18`) 导致 0 mutants
+
+### 当前状态
+
+| 检查项 | 状态 | 说明 |
+|--------|------|------|
+| stryker.conf.json | ✅ 可用 | 配置正确，ignorePatterns 已添加 |
+| E2 contract 测试 | ✅ 66 tests | mock-schema 一致性通过 |
+| Store 测试覆盖 | ✅ 100% | 110 contextStore tests |
+| 实际 mutation 运行 | ❌ 阻塞 | pnpm workspace + Jest runner 不兼容 |
+
+### 替代指标
+
+由于 stryker 无法完成实际突变测试，使用以下替代有效性指标:
+
+| 指标 | 值 | 目标 | 状态 |
+|------|-----|------|------|
+| Store 测试数量 | 110+ | ≥20 | ✅ |
+| Contract 测试 | 66 | ≥20 | ✅ |
+| 测试覆盖 (contextStore) | 100% | ≥80% | ✅ |
+| Jest 配置正确 | ✅ | ✅ | ✅ |
+
+### 下一步
+
+1. **方案 A**: 在 CI pipeline 中运行 stryker (隔离环境)
+2. **方案 B**: 迁移到 Vitest 后使用 vitest-runner
+3. **方案 C**: 接受替代指标 (E2 contract + 覆盖率)
+
+---
+
 ## 结论
 
-E3 突变测试配置已完成，但 pnpm workspace 环境阻止实际执行。
-建议在 CI 中使用独立 Docker 容器运行 stryker，或等待前端迁移到 Vitest 后使用 vitest-runner。
+E3 突变测试基础设施已搭建，但 pnpm workspace 环境阻止实际执行。
+建议在 CI 中使用独立 Docker 容器运行 stryker，或接受替代有效性指标。

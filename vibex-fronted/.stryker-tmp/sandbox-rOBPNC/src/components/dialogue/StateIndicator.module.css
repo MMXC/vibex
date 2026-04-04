@@ -1,9 +1,0 @@
-.container { padding: 0.75rem 1rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb; display: flex; flex-direction: column; gap: 0.5rem; }
-.header { display: flex; align-items: center; gap: 0.75rem; }
-.phase { font-size: 0.8125rem; font-weight: 600; color: #374151; }
-.topic { font-size: 0.75rem; color: #6b7280; padding: 0.125rem 0.5rem; background: #e5e7eb; border-radius: 4px; }
-.progressWrapper { display: flex; align-items: center; gap: 0.75rem; }
-.progressBar { flex: 1; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; }
-.progressFill { height: 100%; border-radius: 3px; transition: width 0.3s ease, background-color 0.3s ease; }
-.percentage { font-size: 0.8125rem; font-weight: 600; min-width: 3rem; text-align: right; }
-.description { font-size: 0.75rem; color: #6b7280; margin: 0; }

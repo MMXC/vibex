@@ -1,3 +1,23 @@
+### Added (canvas-split-hooks E5: useCanvasEvents) — 2026-04-04
+- **E5 useCanvasEvents hook**: 从 CanvasPage.tsx 提取画布交互事件处理
+  - 鼠标事件：onMouseDown/onMouseMove/onMouseUp/onWheel
+  - 键盘事件：onKeyDown/onKeyUp（Delete/Backspace/Ctrl+A 等快捷键）
+  - 触摸事件：onTouchStart/onTouchMove/onTouchEnd
+  - 焦距管理：useRef 追踪画布容器焦点
+  - 单元测试 407 行，8 个测试用例覆盖所有事件类型
+- **提交**: `5b9f83b2`
+
+### Added (api-input-validation-layer E1: Zod验证基础设施) — 2026-04-04
+- **E1 Zod验证基础设施**: 统一 API 输入验证层
+  - `validation-error.ts`: ValidationError + JsonParseError 标准错误类
+  - `api-validation.ts`: withValidation() HOF + validateBody/validateQuery/validateParams 辅助函数
+  - `json-guard.ts`: JSON.parse 安全中间件，防止畸形 JSON 导致 500
+  - `schemas/common.ts`: UUID/邮箱/密码/分页等通用 Zod schema
+  - `schemas/auth.ts`: 注册/登录 auth schema (.strict() 模式)
+  - `schemas/index.ts`: 集中 schema 导出
+  - 单元测试: api-validation.test.ts + auth.test.ts (12 cases)
+- **提交**: `43b71dad`
+
 ### Added (canvas-test-framework-standardize E1: 测试边界规范建立) — 2026-04-03
 - **E1 测试边界规范**: Playwright 配置标准化 + 测试策略文档
   - `TESTING_STRATEGY.md` (258行): 测试金字塔、框架职责、覆盖率目标、反模式

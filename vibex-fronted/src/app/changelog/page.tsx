@@ -18,6 +18,21 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.105',
+    date: '2026-04-04',
+    changes: [
+      '🔐 api-input-validation-layer E1: Zod验证基础设施 (后端)',
+      '✅ validation-error.ts: ValidationError + JsonParseError 标准错误类',
+      '✅ api-validation.ts: withValidation() HOF + validateBody/Query/Params',
+      '✅ json-guard.ts: JSON.parse 安全中间件，防畸形 JSON 500',
+      '✅ schemas/common.ts: UUID/邮箱/密码/分页通用 schema',
+      '✅ schemas/auth.ts: 注册/登录 schema (.strict() 模式)',
+      '✅ 单元测试 142 行: api-validation.test.ts + auth.test.ts',
+      '✅ 提交 43b71dad',
+    ],
+    commit: '43b71dad',
+  },
+  {
     version: '1.0.104',
     date: '2026-04-03',
     changes: [

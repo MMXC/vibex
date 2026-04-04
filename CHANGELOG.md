@@ -28,6 +28,14 @@
   - 突变测试策略
 - **提交**: `635147fb`
 
+### Added (vibex-dev-proposals-20260403_024652 E3: Playwright E2E + 合约测试) — 2026-04-03
+- **E3 Playwright E2E**: auto-save + conflict-dialog + contract tests
+  - `tests/e2e/auto-save.spec.ts` — 4 E2E tests (debounce/beacon/manual/error)
+  - `tests/e2e/conflict-dialog.spec.ts` — 3 E2E tests (conflict dialog options)
+  - `tests/contract/sync.contract.spec.ts` — 5 Zod schema contract tests
+  - `playwright.config.ts` — 新增 contract test project
+- **提交**: `a9bf78ca`
+
 ### Added (vibex-sprint4-20260403 E2: 质量门禁建立) — 2026-04-03
 - **E2 质量门禁**: Git hooks + ESLint disable 监控
   - `.husky/commit-msg` — commitlint conventional commit 验证

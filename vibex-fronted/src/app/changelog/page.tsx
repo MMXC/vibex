@@ -18,6 +18,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.104',
+    date: '2026-04-03',
+    changes: [
+      '🧪 vibex-dev-proposals/E3: Playwright E2E + 合约测试',
+      '✅ tests/e2e/auto-save.spec.ts: 4 E2E tests (debounce/beacon/manual/error)',
+      '✅ tests/e2e/conflict-dialog.spec.ts: 3 E2E tests (conflict dialog)',
+      '✅ tests/contract/sync.contract.spec.ts: 5 Zod schema contract tests',
+      '✅ 提交 a9bf78ca',
+    ],
+    commit: 'a9bf78ca',
+  },
+  {
     version: '1.0.103',
     date: '2026-04-03',
     changes: [

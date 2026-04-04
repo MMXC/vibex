@@ -63,6 +63,7 @@ import { ProjectBar } from './ProjectBar';
 import { PrototypeQueuePanel } from './PrototypeQueuePanel';
 import { HoverHotzone } from './HoverHotzone';
 import { ShortcutHintPanel } from './features/ShortcutHintPanel';
+import { ShortcutHelpPanel } from './ShortcutHelpPanel';
 import { TreeStatus } from './TreeStatus';
 import { TemplateSelector } from './features/TemplateSelector';
 import { VersionHistoryPanel } from './features/VersionHistoryPanel';
@@ -1088,6 +1089,12 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
 
       {/* Epic1 F1.6: ShortcutHintPanel */}
       <ShortcutHintPanel
+        open={isShortcutPanelOpen}
+        onClose={eventHandlers.toggleShortcutPanel}
+      />
+
+      {/* E2: ShortcutHelpPanel — Ctrl+G, Alt+1/2/3, F11, ? */}
+      <ShortcutHelpPanel
         open={isShortcutPanelOpen}
         onClose={eventHandlers.toggleShortcutPanel}
       />

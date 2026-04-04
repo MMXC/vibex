@@ -257,30 +257,44 @@ on:
 
 ---
 
-## Phase 4: Flaky 治理（1-2 天）
+## Phase 4: Flaky 治理 ✅ DONE（1-2 天）
 
-### 步骤 4.1: flaky-detector.sh
+### 步骤 4.1: flaky-detector.sh ✅
 
 详见 architecture.md 章节。
 
-### 步骤 4.2: 自动 skip 机制
+### 步骤 4.2: 自动 skip 机制 ✅
 
+**实现文件**:
+- `flaky-tests.json` — Flaky 测试注册表（schema: id, testFile, testName, reason, passRate, skip）
+- `tests/flaky-helpers.ts` — 辅助工具（markFlaky, isFlaky, getFlakyTests, removeFlaky）
+- `playwright.ci.config.ts` — CI 专用配置（retries: 3, workers: 1）
+
+**使用方式**:
 ```typescript
-// playwright.setup.ts
-import { test, beforeEach } from '@playwright/test';
-import flakyTests from '../flaky-tests.json';
+import { markFlaky, isFlaky } from './flaky-helpers';
 
-beforeEach(async ({ page }) => {
-  // 全局 setup
+// 在测试中标记为 flaky
+markFlaky(__filename, 'my-test-name', {
+  reason: 'race condition with WebSocket',
+  passRateThreshold: 0.65,
+  skipAfter: '2026-05-01',
 });
 
-// 自动 skip flaky 测试
-flakyTests.forEach(ft => {
-  if (ft.skip) {
-    test.skip(ft.test, `Flaky: pass rate ${ft.passRate}`);
-  }
-});
+// 检查是否应 skip
+if (isFlaky(__filename, 'my-test-name')) {
+  test.skip('Flaky: pass rate < 80%');
+}
 ```
+
+**治理规则**:
+- pass rate < 80% → 测试写入 `flaky-tests.json`，skip = true
+- Flaky 测试：skip，从不删除
+- 连续 5 次 CI 无 flaky 失败 → 可移除 skip
+
+**Playwright retries**:
+- Base config (`playwright.config.ts`): retries = 3
+- CI config (`playwright.ci.config.ts`): retries = 3, workers = 1, reuseExistingServer = false
 
 ---
 
@@ -296,6 +310,6 @@ flakyTests.forEach(ft => {
 - [ ] historySlice 分支覆盖 ≥ 40%
 - [ ] Canvas 核心模块分支覆盖 ≥ 50%
 - [ ] 全局行覆盖 ≥ 65%、分支覆盖 ≥ 50%
-- [ ] CI retries = 3
-- [ ] flaky-tests.json 存在且 flaky 测试已 skip
+- [x] CI retries = 3 ✅
+- [x] flaky-tests.json 存在且 flaky 测试已 skip ✅
 - [ ] 连续 5 次 CI 无 flaky 失败

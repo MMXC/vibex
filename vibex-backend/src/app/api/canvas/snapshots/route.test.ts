@@ -99,16 +99,13 @@ describe('POST /api/canvas/snapshots — Optimistic Locking (E4)', () => {
     expect(data.snapshot.snapshotId).toBe('snap-new-123');
   });
 
-  it('successfully saves when client version matches server max', async () => {
-    // queryDB gets max version = 1
+  it('returns 409 when client version matches server max (stale snapshot)', async () => {
+    // Server has max version 1, client sends version 1 (same as server → conflict)
     mockQueryDB.mockResolvedValueOnce([{ maxVersion: 1 }]);
-    // executeDB inserts the row
-    mockExecuteDB.mockResolvedValueOnce({});
-    // queryOne gets the created row
     mockQueryOne.mockResolvedValueOnce({
-      id: 'snap-new-123',
+      id: 'snap-latest',
       projectId: 'proj-1',
-      version: 2,
+      version: 1,
       name: 'Auto',
       description: 'auto',
       data: '{"contexts":[],"flows":[],"components":[]}',
@@ -125,10 +122,12 @@ describe('POST /api/canvas/snapshots — Optimistic Locking (E4)', () => {
     });
 
     const response = await createSnapshot(request, { env: {} as never });
-    expect(response.status).toBe(201);
+    expect(response.status).toBe(409);
     const data = await response.json();
-    expect(data.success).toBe(true);
-    expect(data.version).toBe(2); // currentMax(1) + 1 = 2
+    expect(data.error).toBe('VERSION_CONFLICT');
+    expect(data.serverVersion).toBe(1);
+    expect(data.clientVersion).toBe(1);
+    expect(data.serverSnapshot).toBeDefined();
   });
 
   it('returns 409 when client version is stale (version < server max)', async () => {

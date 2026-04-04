@@ -55,6 +55,9 @@ const eslintConfig = defineConfig([
     },
     rules: {
       // import/no-duplicates: enforce consistent use of duplicate imports
+      // E1-S2: Prevents duplicate import statements (spec: "no-duplicate-imports")
+      // Note: @typescript-eslint/no-duplicate-imports not available in current version
+      // import/no-duplicates from eslint-plugin-import provides equivalent coverage
       'import/no-duplicates': 'error',
       // Allow explicit any for API responses and third-party integrations
       '@typescript-eslint/no-explicit-any': 'off',

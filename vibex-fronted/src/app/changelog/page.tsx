@@ -19,6 +19,17 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.112',
+    date: '2026-04-04',
+    changes: [
+      '🔧 checkbox-persist-bug/E4: ComponentConfirm — confirmComponentNode + toggleComponentNode',
+      '✅ componentStore: confirmComponentNode() + toggleComponentNode()',
+      '✅ 159 tests (E4 3 new cases)',
+      '✅ 提交 f34702e1',
+    ],
+    commit: 'f34702e1',
+  },
+  {
     version: '1.0.107',
     date: '2026-04-03',
     changes: [

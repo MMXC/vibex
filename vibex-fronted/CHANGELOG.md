@@ -259,6 +259,14 @@
 #### Verification
 - `npm run build` ✅ exit 0
 
+### [checkbox-persist-bug E4: ComponentConfirm] — 2026-04-04 (checkbox-persist-bug)
+
+#### Added
+- `componentStore.ts`: confirmComponentNode() + toggleComponentNode()
+- `componentStore.test.ts`: 159 tests (E4 3 new cases)
+
+**提交**: `f34702e1`
+
 ### [checkbox-persist-bug E3: FlowConfirm] — 2026-04-02 (checkbox-persist-bug)
 
 #### Fixed

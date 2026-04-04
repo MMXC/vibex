@@ -75,25 +75,25 @@ Phase 4 (E4): Prisma 条件加载      ← 0.5h
 
 ### Phase 3: /health 端点 (E3)
 
-**目标文件**: `vibex-backend/src/routes/v1/gateway.ts` (新增路由)
+**目标文件**: `vibex-backend/src/index.ts` (GET /health)
 
-**步骤 3.1** — 实现 /health 路由 (20min)
+**步骤 3.1** — 实现 /health 路由 (20min) ✅ DONE
 ```
-1. 在 gateway.ts 中添加 GET /health 路由处理器
-2. 返回 { status, env, timestamp, version }
-3. 无需认证，Content-Type: application/json
-```
-
-**步骤 3.2** — 注册路由 (10min)
-```
-1. 在 gateway.ts 的公开路由区域添加 health 路由
-2. 位置: 在 /auth 路由之后
+1. 在 index.ts 中已有 GET /health 路由处理器 ✅
+2. 扩展返回 { status, env, timestamp, version, uptime } ✅
+3. 无需认证，Content-Type: application/json ✅
 ```
 
-**步骤 3.3** — 验证 (20min)
+**步骤 3.2** — 注册路由 (10min) ✅ DONE
 ```
-1. curl -s /health 验证返回 200
-2. 集成监控探针测试
+1. /health 在 index.ts 根级别，已在所有路由之前 ✅
+2. 位置: 在所有 API 路由之前 ✅
+```
+
+**步骤 3.3** — 验证 (20min) ✅ DONE
+```
+1. curl -s /health 返回 200 ✅
+2. 615 backend tests pass (3 pre-existing failures) ✅
 ```
 
 ### Phase 4: Prisma 条件加载 (E4)

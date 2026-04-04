@@ -84,11 +84,16 @@ app.get('/', (c) => {
   });
 });
 
+// E3: Health check endpoint — no auth required
 app.get('/health', (c) => {
+  const env = c.env as Record<string, unknown>;
+  const nodeEnv = typeof process !== 'undefined' ? process.env?.NODE_ENV : undefined;
   return c.json({
     status: 'healthy',
+    env: (env?.ENV as string) ?? (nodeEnv as string) ?? 'development',
+    version: (env?.VERSION as string) ?? (process.env?.npm_package_version as string) ?? '0.0.0',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime?.() || 'N/A',
+    uptime: typeof process !== 'undefined' && process.uptime ? process.uptime() : 0,
   });
 });
 

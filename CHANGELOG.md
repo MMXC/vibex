@@ -6,6 +6,14 @@
   - 单元测试 3/3 pass
 - **提交**: `b2bc5897`, `adb62068`
 
+### Added (canvas-split-hooks E3: useCanvasRenderer) — 2026-04-04
+- **E3 useCanvasRenderer hook**: 从 CanvasPage.tsx 提取 memoized 渲染计算逻辑
+  - `computeNodeRects`: context/flow/component 节点矩形计算
+  - `computeBoundedEdges`: 限界上下文关系边计算
+  - `computeFlowEdges`: 流程步骤连接边计算
+  - `contextTreeNodes`, `flowTreeNodes`, `componentTreeNodes` 统一 TreeNode 数组
+- **提交**: `8b159720`
+
 ### Added (canvas-split-hooks E2: useCanvasStore) — 2026-04-04
 - **E2 useCanvasStore hook**: 统一 store selectors（context/flow/component/ui/session stores）
 - **代码清理**: 删除不兼容 `output:export` 的 share/[token] 路由

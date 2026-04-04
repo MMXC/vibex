@@ -231,7 +231,7 @@ function ContextCard({ node, onEdit, onDelete, readonly, selected, onToggleSelec
               type="checkbox"
               data-testid={`context-card-checkbox-${node.nodeId}`}
               checked={node.status === 'confirmed'}
-              onChange={() => { toggleContextNode(node.nodeId); }}
+              onChange={() => { onToggleSelect?.(node.nodeId); }}
               aria-label="确认节点"
               className={styles.confirmCheckbox}
               onClick={(e) => e.stopPropagation()}

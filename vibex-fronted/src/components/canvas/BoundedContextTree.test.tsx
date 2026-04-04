@@ -15,6 +15,7 @@ const ctxNodes: BoundedContextNode[] = [
 ];
 
 const mockToggleContextNode = jest.fn();
+const mockToggleNodeSelect = jest.fn();
 const mockAdvancePhase = jest.fn();
 
 jest.mock('@/lib/canvas/stores/contextStore', () => ({
@@ -26,7 +27,7 @@ jest.mock('@/lib/canvas/stores/contextStore', () => ({
       activeTree: 'context',
       setActiveTree: jest.fn(),
       selectedNodeIds: { context: [] as string[], flow: [] as string[], component: [] as string[] },
-      toggleNodeSelect: jest.fn(),
+      toggleNodeSelect: mockToggleNodeSelect,
       selectAllNodes: jest.fn(),
       clearNodeSelection: jest.fn(),
       deleteSelectedNodes: jest.fn(),
@@ -92,11 +93,14 @@ describe('BoundedContextTree — Epic 1: E1 checkbox UX', () => {
     }
   });
 
-  it('clicking checkbox calls toggleContextNode', async () => {
+  it('clicking checkbox calls toggleNodeSelect (selection, not confirmation)', async () => {
     const user = userEvent.setup();
     render(<BoundedContextTree />);
     await user.click(screen.getAllByRole('checkbox')[0]);
-    expect(mockToggleContextNode).toHaveBeenCalled();
+    // E1 fix: checkbox now calls onToggleSelect → toggleNodeSelect (selection)
+    // not toggleContextNode (confirmation)
+    expect(mockToggleNodeSelect).toHaveBeenCalledWith('context', 'ctx-1');
+    expect(mockToggleContextNode).not.toHaveBeenCalled();
   });
 
   it('has no nodeTypeBadge (type text hidden)', () => {

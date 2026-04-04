@@ -1,3 +1,12 @@
+### Added (canvas-phase-nav-and-toolbar-issues E1: Canvas导航与工具栏体验优化) — 2026-04-04
+- **E1 Canvas导航与工具栏**: LeftDrawer 测试重写 + canvasApi mock
+  - T1: 移除 PhaseIndicator/PhaseLabelBar（与 TabBar 重复）
+  - T2: 修复 continue 按钮（常渲染 + disabled 状态）
+  - T3: 创建 TreeToolbar 统一三列工具栏
+  - `LeftDrawer.test.tsx`: 21 tests pass
+  - `left-drawer-send.test.tsx`: 6 tests pass
+- **提交**: `752e5da9`, `a7d51d12`
+
 ### Added (frontend-mock-cleanup E2: 检测脚本误报修复) — 2026-04-04
 - **E2 检测脚本误报修复**: `cleanup-mocks.js` 添加 `/\/test-utils\//` skip pattern
   - 防止误报跳过 test-utils 目录

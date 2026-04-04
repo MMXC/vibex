@@ -71,6 +71,19 @@ const mockChangelog: ChangelogEntry[] = [
     ],
   },
   {
+    version: '1.0.117',
+    date: '2026-04-04',
+    changes: [
+      '🎨 canvas-phase-nav/E1: Canvas导航与工具栏体验优化',
+      '✅ T1: 移除 PhaseIndicator/PhaseLabelBar',
+      '✅ T2: continue 按钮常渲染 + disabled 状态',
+      '✅ T3: TreeToolbar 统一三列工具栏',
+      '✅ LeftDrawer 21 tests + left-drawer-send 6 tests',
+      '✅ 提交 752e5da9, a7d51d12',
+    ],
+    commit: 'a7d51d12',
+  },
+  {
     version: '1.0.116',
     date: '2026-04-04',
     changes: [

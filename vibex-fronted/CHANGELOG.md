@@ -1,6 +1,19 @@
 # Changelog
 
 
+### [canvas-phase-nav-and-toolbar-issues E1: Canvas导航与工具栏体验优化] — 2026-04-04
+
+#### Fixed
+- LeftDrawer 测试重写: 21 tests pass (useUIStore/useSessionStore/useContextStore)
+- left-drawer-send 测试: 6 tests pass (canvasApi.generateContexts)
+
+#### Added
+- T1: 移除 PhaseIndicator/PhaseLabelBar
+- T2: continue 按钮常渲染 + disabled 状态
+- T3: TreeToolbar 统一三列工具栏
+
+**提交**: `752e5da9`, `a7d51d12`
+
 ### [frontend-mock-cleanup E2: 检测脚本误报修复] — 2026-04-04
 
 #### Fixed

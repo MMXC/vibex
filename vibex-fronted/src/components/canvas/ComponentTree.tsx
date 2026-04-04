@@ -27,6 +27,8 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import { Layers } from 'lucide-react';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
@@ -597,6 +599,7 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
 
   const [generating, setGenerating] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const toast = useToast();
 
   // E1: Compute groups by flowId
   const groups = useMemo(
@@ -678,19 +681,25 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
   const handleGenerate = useCallback(async () => {
     if (generating) return;
     setGenerating(true);
-    // Mock AI generation: simulate API delay
-    await new Promise((r) => setTimeout(r, 1200));
-    const drafts: Array<Omit<ComponentNode, 'nodeId' | 'status' | 'confirmed' | 'children'>> = [];
-    const newNodes: ComponentNode[] = drafts.map((d, i) => ({
-      ...d,
-      nodeId: `comp-${Date.now()}-${i}`,
-      confirmed: false,
-      status: 'pending' as const,
-      children: [],
-    }));
-    setComponentNodes(newNodes);
-    setGenerating(false);
-  }, [generating, flowNodes.length, setComponentNodes]);
+    try {
+      // Mock AI generation: simulate API delay
+      await new Promise((r) => setTimeout(r, 1200));
+      const drafts: Array<Omit<ComponentNode, 'nodeId' | 'status' | 'confirmed' | 'children'>> = mockGenerateComponents(flowNodes.length);
+      const newNodes: ComponentNode[] = drafts.map((d, i) => ({
+        ...d,
+        nodeId: `comp-${Date.now()}-${i}`,
+        confirmed: false,
+        status: 'pending' as const,
+        children: [],
+      }));
+      setComponentNodes(newNodes);
+    } catch (err) {
+      console.error('[ComponentTree] handleGenerate error:', err);
+      toast.showToast(err instanceof Error ? err.message : '生成组件失败', 'error');
+    } finally {
+      setGenerating(false);
+    }
+  }, [generating, flowNodes.length, setComponentNodes, toast]);
 
   const handleAdd = useCallback(
     (data: Omit<ComponentNode, 'nodeId' | 'status' | 'confirmed' | 'children'>) => {
@@ -960,13 +969,11 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
             ))}
           </>
         ) : (
-          <div className={styles.contextTreeEmpty}>
-            <span className={styles.emptyIcon}>▣</span>
-            <p className={styles.emptyText}>暂无组件</p>
-            <p className={styles.emptySubtext}>
-              点击「AI 生成组件」自动生成，或手动新增节点
-            </p>
-          </div>
+          <EmptyState
+            icon={Layers}
+            title="暂无组件"
+            description="点击「AI 生成组件」自动生成，或手动新增节点"
+          />
         )}
       </div>
 

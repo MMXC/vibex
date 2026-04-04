@@ -11,6 +11,9 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { Network } from 'lucide-react';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { useToast } from '@/components/ui/Toast';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
 // [E1] 注释 RelationshipConnector — 简化 UI，移除卡片间连线
 // import { RelationshipConnector } from './edges/RelationshipConnector';
@@ -351,6 +354,7 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
   const [generating, setGenerating] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const toast = useToast();
 
   // === Epic 2 F3.2: BoundedEdgeLayer integration ===
   // DOM measurement for BoundedEdgeLayer node rects
@@ -394,21 +398,27 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
   const handleGenerate = useCallback(async () => {
     if (generating) return;
     setGenerating(true);
-    // Mock AI generation: simulate API delay
-    await new Promise((r) => setTimeout(r, 1200));
-    const drafts: BoundedContextDraft[] = [];
-    // Convert drafts to BoundedContextNodes
-    const newNodes: BoundedContextNode[] = drafts.map((d, i) => ({
-      nodeId: `ctx-${Date.now()}-${i}`,
-      name: d.name,
-      description: d.description,
-      type: d.type,
-      status: 'pending' as const,
-      children: [],
-    }));
-    setContextNodes(newNodes);
-    setGenerating(false);
-  }, [generating, setContextNodes]);
+    try {
+      // Mock AI generation: simulate API delay
+      await new Promise((r) => setTimeout(r, 1200));
+      const drafts: BoundedContextDraft[] = mockGenerateContexts('mock requirement');
+      // Convert drafts to BoundedContextNodes
+      const newNodes: BoundedContextNode[] = drafts.map((d, i) => ({
+        nodeId: `ctx-${Date.now()}-${i}`,
+        name: d.name,
+        description: d.description,
+        type: d.type,
+        status: 'pending' as const,
+        children: [],
+      }));
+      setContextNodes(newNodes);
+    } catch (err) {
+      console.error('[BoundedContextTree] handleGenerate error:', err);
+      toast.showToast(err instanceof Error ? err.message : '生成限界上下文失败', 'error');
+    } finally {
+      setGenerating(false);
+    }
+  }, [generating, setContextNodes, toast]);
 
   const handleAdd = useCallback(
     (data: BoundedContextDraft) => {
@@ -618,13 +628,11 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
             })}
           </>
         ) : (
-          <div className={styles.contextTreeEmpty}>
-            <span className={styles.emptyIcon}>◇</span>
-            <p className={styles.emptyText}>暂无限界上下文</p>
-            <p className={styles.emptySubtext}>
-              点击「重新执行」自动生成，或手动新增节点
-            </p>
-          </div>
+          <EmptyState
+            icon={Network}
+            title="暂无限界上下文"
+            description="点击「重新执行」自动生成，或手动新增节点"
+          />
         )}
       </div>
 

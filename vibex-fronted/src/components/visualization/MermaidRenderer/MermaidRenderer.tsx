@@ -130,6 +130,7 @@ export function MermaidRenderer({
       <div
         className={styles.svgWrapper}
         dangerouslySetInnerHTML={{ __html: svg }}
+        suppressHydrationWarning
       />
     </div>
   );

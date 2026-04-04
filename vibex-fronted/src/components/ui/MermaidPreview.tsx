@@ -287,6 +287,7 @@ function MermaidPreviewInner({
         padding: '16px',
       }}
       dangerouslySetInnerHTML={{ __html: svg }}
+      suppressHydrationWarning
     />
   );
 }

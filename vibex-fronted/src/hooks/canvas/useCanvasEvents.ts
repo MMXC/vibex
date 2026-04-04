@@ -157,7 +157,7 @@ export function useCanvasEvents(
       // Only trigger ? key when not in an input field
       if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
         const target = e.target as HTMLElement | null;
-        if (!target || target === document || !(target instanceof Element)) {
+        if (!target || !(target instanceof Element)) {
           toggleShortcutPanel();
           return;
         }

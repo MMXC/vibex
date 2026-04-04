@@ -1,3 +1,12 @@
+### Added (vibex-tester-proposals E3: 突变测试基础设施) — 2026-04-04
+- **E3 突变测试基础设施**: stryker 配置 + 测试质量报告
+  - `stryker.conf.json` + `stryker.mini.conf.json`: 6 个 canvas store 突变测试配置
+  - `jest.config.for-stryker.ts`: 独立 jest 配置
+  - `reports/mutation/mutation.json`: 测试文件清单
+  - E2 Contract 测试: 66 个测试用例通过 (mock-schema 一致性)
+  - E3 阻塞: pnpm workspace + jest-runner 插件加载不兼容，test-quality-report.md 记录详细分析
+- **提交**: `a87c78cc`, `657905d3`
+
 ### Added (canvas-split-hooks E5: useCanvasEvents) — 2026-04-04
 - **E5 useCanvasEvents hook**: 从 CanvasPage.tsx 提取画布交互事件处理
   - 鼠标事件：onMouseDown/onMouseMove/onMouseUp/onWheel

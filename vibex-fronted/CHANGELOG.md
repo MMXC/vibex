@@ -1,6 +1,17 @@
 # Changelog
 
 
+### [vibex-tester-proposals E3: 突变测试基础设施] — 2026-04-04
+
+#### Added
+- `stryker.conf.json` — 6 个 canvas store 突变测试配置
+- `stryker.mini.conf.json` — 最小单行配置
+- `jest.config.for-stryker.ts` — 独立 jest 配置
+- `docs/test-quality-report.md` — 测试质量报告 (含 E2 contract 测试: 66 tests)
+- E3 阻塞: pnpm workspace + jest-runner 插件加载不兼容，报告含详细根因分析
+
+**提交**: `a87c78cc`
+
 ### [canvas-split-hooks E5: useCanvasEvents] — 2026-04-04
 
 #### Added

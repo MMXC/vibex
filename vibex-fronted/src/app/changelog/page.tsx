@@ -60,6 +60,18 @@ const mockChangelog: ChangelogEntry[] = [
     ],
   },
   {
+    version: '1.0.114',
+    date: '2026-04-04',
+    changes: [
+      '🧪 vibex-tester-proposals/E3: 突变测试基础设施 — stryker 配置 + 质量报告',
+      '✅ stryker.conf.json: 6 个 canvas store 突变测试配置',
+      '✅ jest.config.for-stryker.ts: 独立 jest 配置',
+      '✅ E2 Contract 测试: 66 个测试用例通过',
+      '⚠️ E3 阻塞: pnpm workspace + jest-runner 不兼容，test-quality-report.md 含详细分析',
+      'commit a87c78cc',
+    ],
+  },
+  {
     version: '1.0.106',
     date: '2026-04-04',
     changes: [

@@ -71,6 +71,17 @@ const mockChangelog: ChangelogEntry[] = [
     ],
   },
   {
+    version: '1.0.120',
+    date: '2026-04-04',
+    changes: [
+      '🐛 react-hydration-fix/E1: Hydration根因修复 — 移除 setInterval + hydrationRef',
+      '✅ MermaidInitializer: 移除 useState/setInterval，useEffect 直接调用 initialize()',
+      '✅ QueryProvider: 添加 hydrationRef 标记 hydration 完成后再 persist',
+      '✅ 提交 041d9566',
+    ],
+    commit: '041d9566',
+  },
+  {
     version: '1.0.119',
     date: '2026-04-04',
     changes: [

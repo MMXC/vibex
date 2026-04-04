@@ -1,3 +1,10 @@
+### Added (react-hydration-fix E1: Hydration根因修复) — 2026-04-04
+- **E1 Hydration根因修复**: 修复 SSR/CSR 不一致导致的 hydration error
+  - E1-T1: MermaidInitializer — 移除 useState (setTick 导致 SSR/CSR mismatch)，移除 setInterval，改为 useEffect 中直接调用 initialize()
+  - E1-T2: QueryProvider — 添加 hydrationRef 标记 hydration 完成后再 persist
+  - MermaidInitializer.test.tsx: 5 tests pass
+- **提交**: `041d9566`
+
 ### Added (vibex-proposals-20260404 E2: Canvas-UX修复) — 2026-04-04
 - **E2 Canvas-UX修复**: ShortcutHelpPanel + 键盘快捷键
   - CanvasPage.tsx: 添加 ShortcutHelpPanel 组件（? 键触发）

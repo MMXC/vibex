@@ -264,6 +264,17 @@ const mockChangelog: ChangelogEntry[] = [
     commit: 'e1346b0f',
   },
   {
+    version: '1.0.110',
+    date: '2026-04-03',
+    changes: [
+      '🧪 canvas-sync-protocol-complete/E4: 测试覆盖 — E2E 冲突解决测试套件',
+      '✅ tests/e2e/conflict-resolution.spec.ts: ConflictDialog 三按钮测试',
+      '✅ keep-local / cancel 流程测试',
+      '✅ 提交 97489a84',
+    ],
+    commit: '97489a84',
+  },
+  {
     version: '1.0.109',
     date: '2026-04-03',
     changes: [

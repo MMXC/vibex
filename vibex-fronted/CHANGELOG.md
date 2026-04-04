@@ -210,6 +210,24 @@
 
 **提交**: `1546864f`
 
+### [canvas-sync-protocol-complete E4: 测试覆盖] — 2026-04-03
+
+#### Added
+- `tests/e2e/conflict-resolution.spec.ts` — E2E 冲突解决测试套件
+  - ConflictDialog 三按钮可见性测试
+  - keep-local / cancel 流程测试
+  - Canvas page load smoke test
+  - CustomEvent 模拟冲突状态
+
+**提交**: `97489a84`
+
+#### Changed
+- `src/hooks/canvas/useAutoSave.ts` — 30s 轮询检测 remote version 变化
+- `src/lib/canvas/api/canvasApi.ts` — `getLatestVersion()` API 端点
+- `src/lib/api-config.ts` — latest endpoint 配置
+
+**提交**: `1546864f`
+
 ### [canvas-sync-protocol-complete E1: 后端SnapshotsAPI] — 2026-04-03
 
 #### Changed (backend)

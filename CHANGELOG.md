@@ -96,6 +96,18 @@
   - `api-config.ts`: latest endpoint 配置
 - **提交**: `1546864f`
 
+### Added (canvas-sync-protocol-complete E4: 测试覆盖) — 2026-04-03
+- **E4 测试覆盖**: E2E 冲突解决测试套件
+  - `tests/e2e/conflict-resolution.spec.ts`: ConflictDialog 三按钮 + keep-local + cancel
+  - Canvas page load smoke test
+  - CustomEvent 模拟冲突状态
+- **提交**: `97489a84`
+- **E3 轮询检测**: 30s 版本轮询冲突检测
+  - `useAutoSave.ts`: 30s 轮询检测 remote version 变化
+  - `canvasApi.ts`: `getLatestVersion()` API 端点
+  - `api-config.ts`: latest endpoint 配置
+- **提交**: `1546864f`
+
 ### Added (canvas-sync-protocol-complete E1: 后端SnapshotsAPI) — 2026-04-03
 - **E1 后端 SnapshotsAPI**: 乐观锁 + 冲突检测
   - `snapshots.ts`: version 字段 + 409 VERSION_CONFLICT 响应

@@ -13,7 +13,7 @@
 'use client';
 
 import { QueryCache, QueryClient, QueryClientProvider, MutationCache } from '@tanstack/react-query';
-import { ReactNode, useState, useEffect } from 'react';
+import { ReactNode, useState, useEffect, useRef } from 'react';
 import { persistQueryClient } from '@tanstack/react-query-persist-client';
 import { createLocalStoragePersister } from './persistQueryClient';
 
@@ -37,6 +37,9 @@ export interface QueryProviderProps {
 const persister = createLocalStoragePersister();
 
 export function QueryProvider({ children }: QueryProviderProps) {
+  // 标记 hydration 完成后再持久化，避免 SSR/CSR mismatch
+  const hydrationRef = useRef(false);
+
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -73,14 +76,16 @@ export function QueryProvider({ children }: QueryProviderProps) {
       })
   );
 
-  // 初始化持久化
+  // 初始化持久化（hydration 完成后再持久化）
   useEffect(() => {
-    // 异步初始化持久化，忽略错误
-    persistQueryClient({
+    // 标记 hydration 完成后再持久化
+    hydrationRef.current = true;
+    const [, persistPromise] = persistQueryClient({
       queryClient,
       persister,
       maxAge: 24 * 60 * 60 * 1000, // 24 小时
     });
+    persistPromise.catch(console.error);
   }, [queryClient]);
 
   return (

@@ -201,6 +201,13 @@
   - `README.md`: 追加Reviewer工作流章节
 - **提交**: `59b16597`
 
+### Added (vibex-reviewer-proposals-20260403_024652 E6: ESLintDisable豁免管理) — 2026-04-03
+- **E6 ESLintDisable豁免**: ESLINT_DISABLES.md 豁免规范与维护记录
+  - 17 条豁免记录（9 LEGIT / 4 NEEDS FIX / 4 QUESTIONABLE）
+  - 维护者: @reviewer，复查周期: 每 Sprint 审查一次
+  - 状态: ⚠️ NEEDS FIX 需在当前 Sprint 内修复
+- **提交**: `c5dac8bd`
+
 ### Added (vibex-reviewer-proposals-20260403_024652 E3: Reviewer 驳回模板) — 2026-04-03
 - **E3 Reviewer 驳回模板**: AGENTS.md 新增 Reviewer 驳回模板（类型A-D：CHANGELOG遗漏、TS错误、ESLint违规、App页面手动修改）
 - **AGENTS.md**: CHANGELOG规范章节、Reviewer检查清单

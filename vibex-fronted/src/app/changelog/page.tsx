@@ -42,6 +42,17 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.107',
     date: '2026-04-03',
     changes: [
+      '📋 vibex-reviewer-proposals/E6: ESLintDisable豁免管理 — ESLINT_DISABLES.md 规范',
+      '✅ 17 条豁免记录（9 LEGIT / 4 NEEDS FIX / 4 QUESTIONABLE）',
+      '✅ 维护者 @reviewer，复查周期每 Sprint 一次',
+      '✅ 提交 c5dac8bd',
+    ],
+    commit: 'c5dac8bd',
+  },
+  {
+    version: '1.0.107',
+    date: '2026-04-03',
+    changes: [
       '📋 vibex-reviewer-proposals/E3: Reviewer驳回模板 — 类型A-D 规范',
       '✅ AGENTS.md: 驳回模板（CHANGELOG遗漏/TS错误/ESLint违规/App页面修改）',
       '✅ README.md: Reviewer工作流章节',

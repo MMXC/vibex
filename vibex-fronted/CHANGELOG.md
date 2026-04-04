@@ -233,6 +233,16 @@
 
 **提交**: `000a2743`
 
+### [vibex-reviewer-proposals-20260403_024652 E6: ESLintDisable豁免管理] — 2026-04-03
+
+#### Added
+- `ESLINT_DISABLES.md` — 17 条豁免记录（9 LEGIT / 4 NEEDS FIX / 4 QUESTIONABLE）
+  - 维护者: @reviewer
+  - 复查周期: 每 Sprint 审查一次
+  - NEEDS FIX 需在当前 Sprint 内修复
+
+**提交**: `c5dac8bd`
+
 ### [vibex-reviewer-proposals-20260403_024652 E3: Reviewer驳回模板] — 2026-04-03
 
 #### Added

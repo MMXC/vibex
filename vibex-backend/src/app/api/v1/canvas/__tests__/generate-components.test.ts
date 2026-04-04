@@ -185,4 +185,36 @@ describe('E1-T4: 成功路径', () => {
     expect(data.success).toBe(false);
     expect(data.error).toBeDefined();
   });
+
+
+  it('AI 返回 flowId 为真实 ID 时保留（flow.id 在 prompt 中可用）', async () => {
+    mockGenerateJSON.mockResolvedValue({
+      success: true,
+      data: [
+        {
+          name: '课程列表页',
+          flowId: 'flow-real-id-123',
+          contextId: 'ctx-1',
+          type: 'list',
+          apis: [{ method: 'GET', path: '/api/courses', params: [] }],
+          confidence: 0.85,
+        },
+      ],
+      usage: { completionTokens: 100 },
+    });
+
+    const req = new NextRequest('http://localhost/api/v1/canvas/generate-components', {
+      method: 'POST',
+      body: JSON.stringify({
+        contexts: [{ id: 'ctx-1', name: 'Test', type: 'core', description: 'test' }],
+        flows: [{ id: 'flow-real-id-123', name: 'Test Flow', contextId: 'ctx-1' }],
+      }),
+    });
+
+    const res = await POST(req);
+    const data = await res.json();
+    expect(data.success).toBe(true);
+    expect(data.components[0].flowId).toBe('flow-real-id-123');
+  });
+
 });

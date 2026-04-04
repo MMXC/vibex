@@ -453,7 +453,7 @@ export interface GenerateContextsOutput {
     description: string;
     type: 'core' | 'supporting' | 'generic' | 'external';
   }>;
-  sessionId: string;
+  generationId: string;
   confidence: number;
   error?: string;
 }

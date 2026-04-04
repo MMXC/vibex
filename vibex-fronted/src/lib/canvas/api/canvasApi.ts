@@ -55,7 +55,7 @@ const GenerateContextsResponseSchema = z.object({
     status: z.string().optional(),
     children: z.array(z.string()).optional(),
   })),
-  sessionId: z.string(),
+  generationId: z.string(),
   confidence: z.number(),
 });
 

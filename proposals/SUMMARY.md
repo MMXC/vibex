@@ -70,3 +70,12 @@
 ---
 
 *生成时间: 2026-03-30T13:36 UTC*
+
+## Sprint 5 (2026-04-05) Tracking
+
+| Project | Epic | Status | Notes |
+|---------|------|--------|-------|
+| vibex-proposals-20260404 | E1-E4 | 🔄 In Progress | |
+| canvas-api-500-fix | E1-E3 | 🔄 In Progress | |
+| canvas-contexts-schema-fix | E1 | 🔄 In Progress | |
+| vibex-proposals-20260405 | E2-E3 | 🔄 In Progress | |

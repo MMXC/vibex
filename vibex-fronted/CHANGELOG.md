@@ -1,6 +1,13 @@
 # Changelog
 
 
+### [vibex-proposals-20260404 E2: Canvas-UX修复] — 2026-04-04
+
+**E2 Canvas-UX修复**: ShortcutHelpPanel + 键盘快捷键
+- CanvasPage.tsx: 添加 ShortcutHelpPanel 组件（? 键触发）
+
+**提交**: `78fa9b9d`
+
 ### [canvas-phase-nav-and-toolbar-issues E1: Canvas导航与工具栏体验优化] — 2026-04-04
 
 #### Fixed

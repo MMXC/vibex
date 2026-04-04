@@ -71,6 +71,28 @@ const mockChangelog: ChangelogEntry[] = [
     ],
   },
   {
+    version: '1.0.119',
+    date: '2026-04-04',
+    changes: [
+      '📋 vibex-proposals-20260404/E3: 提案流程优化 — TEMPLATE + priority_calculator',
+      '✅ proposals/TEMPLATE.md: 标准化提案模板',
+      '✅ proposals/priority_calculator.py: P0-P3 优先级计算器',
+      '✅ 23 个测试用例',
+      '✅ 提交 dbe00821',
+    ],
+    commit: 'dbe00821',
+  },
+  {
+    version: '1.0.118',
+    date: '2026-04-04',
+    changes: [
+      '📋 vibex-proposals-20260404/E2: Canvas-UX修复 — ShortcutHelpPanel',
+      '✅ CanvasPage.tsx: 添加 ? 键触发 ShortcutHelpPanel',
+      '✅ 提交 78fa9b9d',
+    ],
+    commit: '78fa9b9d',
+  },
+  {
     version: '1.0.117',
     date: '2026-04-04',
     changes: [

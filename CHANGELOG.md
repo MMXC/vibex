@@ -1,3 +1,20 @@
+### Added (vibex-proposals-20260404 E2: Canvas-UX修复) — 2026-04-04
+- **E2 Canvas-UX修复**: ShortcutHelpPanel + 键盘快捷键
+  - CanvasPage.tsx: 添加 ShortcutHelpPanel 组件（? 键触发）
+- **提交**: `78fa9b9d`
+
+### Added (vibex-proposals-20260404 E3: 提案流程优化) — 2026-04-04
+- **E3 提案流程优化**: TEMPLATE.md + priority_calculator.py
+  - proposals/TEMPLATE.md: 标准化提案模板
+  - proposals/priority_calculator.py: P0-P3 优先级计算器
+  - proposals/test_priority_calculator.py: 23 个测试用例
+- **提交**: `dbe00821`
+
+### Added (vibex-proposals-20260404 E4: 通知体验优化) — 2026-04-04
+- **E4 通知体验优化**: Slack 重复通知去重机制
+  - proposals/slack_dedup.py: 基于内容hash的去重逻辑
+- **提交**: `dbe00821`
+
 ### Added (canvas-phase-nav-and-toolbar-issues E1: Canvas导航与工具栏体验优化) — 2026-04-04
 - **E1 Canvas导航与工具栏**: LeftDrawer 测试重写 + canvasApi mock
   - T1: 移除 PhaseIndicator/PhaseLabelBar（与 TabBar 重复）

@@ -256,6 +256,19 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '1546864f',
   },
   {
+    version: '1.0.110',
+    date: '2026-04-04',
+    changes: [
+      '🎯 canvas-split-hooks/E6: CanvasPage集成 — E1-E5 hooks 全部集成',
+      '✅ CanvasPage.tsx: 从 930 行精简到模块化架构',
+      '✅ 集成 hooks: useCanvasState + useCanvasStore + useCanvasRenderer + useAIController + useCanvasSearch + useCanvasEvents',
+      '✅ historySlice.test.ts: branch coverage tests',
+      '✅ backend: security.ts + next-validation.ts',
+      '✅ 提交 90414707',
+    ],
+    commit: '90414707',
+  },
+  {
     version: '1.0.105',
     date: '2026-04-04',
     changes: [

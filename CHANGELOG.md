@@ -7,6 +7,19 @@
   - 单元测试 407 行，8 个测试用例覆盖所有事件类型
 - **提交**: `5b9f83b2`
 
+### Added (canvas-split-hooks E6: CanvasPage集成) — 2026-04-04
+- **E6 CanvasPage集成**: 将 E1-E5 所有 hooks 集成到 CanvasPage
+  - `CanvasPage.tsx`: 从 930 行精简到模块化架构
+  - useCanvasState (E1): pan/zoom/expand state + handlers
+  - useCanvasStore (E2): unified store selectors
+  - useCanvasRenderer (E3): memoized rects/edges/treeNodes
+  - useAIController (E4): requirement input + quick generate
+  - useCanvasSearch (E4): fuzzy search across three trees
+  - useCanvasEvents (E5): search dialog + global keyboard shortcuts
+  - `historySlice.test.ts`: branch coverage tests
+  - backend security schemas: `security.ts` + `next-validation.ts`
+- **提交**: `90414707`
+
 ### Added (api-input-validation-layer E1: Zod验证基础设施) — 2026-04-04
 - **E1 Zod验证基础设施**: 统一 API 输入验证层
   - `validation-error.ts`: ValidationError + JsonParseError 标准错误类

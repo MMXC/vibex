@@ -13,6 +13,19 @@
 
 **提交**: `5b9f83b2`
 
+### [canvas-split-hooks E6: CanvasPage集成] — 2026-04-04
+
+#### Changed
+- `src/components/canvas/CanvasPage.tsx` — 从 930 行精简到模块化架构
+- 集成 E1-E5 所有 hooks: useCanvasState + useCanvasStore + useCanvasRenderer + useAIController + useCanvasSearch + useCanvasEvents
+- `src/lib/canvas/__tests__/historySlice.test.ts` — branch coverage tests
+
+#### Added (backend)
+- `src/schemas/security.ts` — GitHub 路径白名单 + Prompt Injection 检测
+- `src/lib/next-validation.ts` — Next.js route validation helpers
+
+**提交**: `90414707`
+
 
 ### [api-input-validation-layer E1: Zod验证基础设施] — 2026-04-04
 

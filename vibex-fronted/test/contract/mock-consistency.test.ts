@@ -45,13 +45,13 @@ const MOCK_REGISTRY: Record<string, Record<string, unknown>> = {
   'requirement': {
     id: 'req-001',
     projectId: 'proj-001',
-    text: 'As a user I want to login',
+    title: 'As a user I want to login',
     status: 'active',
     priority: 'high',
-    createdAt: '2026-01-01T00:00:00Z',
+    createdAt: 1735689600000,
   },
   'flow': {
-    id: 'flow-001',
+    nodeId: 'flow-001',
     name: 'User Login Flow',
     projectId: 'proj-001',
     steps: [],

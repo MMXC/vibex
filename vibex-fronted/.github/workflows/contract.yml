@@ -1,0 +1,38 @@
+name: API Contract Tests
+
+on:
+  pull_request:
+    paths:
+      - 'test/schemas/**'
+      - 'test/contract/**'
+      - 'src/services/api/**'
+  push:
+    branches: [main, develop]
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run API Contract Tests
+        run: npm run test:contract
+
+      - name: Upload contract results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-results
+          path: test-results/
+          retention-days: 7

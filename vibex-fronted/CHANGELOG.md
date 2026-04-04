@@ -149,6 +149,25 @@
 
 **提交**: `629c5fe0`
 
+### [canvas-test-framework-standardize E5: 命名与目录规范] — 2026-04-04
+
+#### Added
+- `docs/TESTING_CONVENTIONS.md` — 134 行命名规范文档
+  - 命名模式: 'should|shows|displays|handles...'
+  - 目录结构: test/*.spec.ts (e2e), *.test.tsx (unit)
+  - contract 命名规则、flaky 策略
+- `.testlinter.json` — 测试命名规则 + 覆盖率最低标准 (≥70%)
+
+**提交**: `05dad6f8`
+
+#### Added
+- `flaky-tests.json` — 不稳定测试注册表
+- `tests/flaky-helpers.ts` — flakiness detection helpers
+- `playwright.ci.config.ts` — retry 配置优化
+- `src/hooks/canvas/__tests__/useAutoSave.test.ts` — 265 行扩展分支覆盖
+
+**提交**: `629c5fe0`
+
 #### Added
 - `src/lib/canvas/__tests__/historySlice.test.ts` — 45 tests, branch 98.0% (目标 ≥40%)
 - `src/lib/canvas/stores/contextStore.test.ts` — branch 88.63% (目标 ≥50%)

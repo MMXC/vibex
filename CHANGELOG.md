@@ -117,6 +117,20 @@
   - `playwright.ci.config.ts`: retry 配置优化
   - `useAutoSave.test.ts`: 265 行扩展分支覆盖
 - **提交**: `629c5fe0`
+
+### Added (canvas-test-framework-standardize E5: 命名与目录规范) — 2026-04-04
+- **E5 命名与目录规范**: 测试命名规范 + 目录结构
+  - `docs/TESTING_CONVENTIONS.md`: 命名模式、目录结构、代码风格
+  - `.testlinter.json`: 测试命名规则、flaky 策略、覆盖率最低标准
+  - 标准: `*.spec.ts` (e2e), `*.test.tsx` (unit), contract 命名规则
+  - 覆盖率最低标准: branches/statements/functions/lines ≥ 70%
+- **提交**: `05dad6f8`
+- **E4 Flaky测试治理**: 不稳定测试注册 + 重试机制
+  - `flaky-tests.json`: 不稳定测试注册表
+  - `tests/flaky-helpers.ts`: flakiness detection helpers
+  - `playwright.ci.config.ts`: retry 配置优化
+  - `useAutoSave.test.ts`: 265 行扩展分支覆盖
+- **提交**: `629c5fe0`
 - **E3 测试覆盖率提升**: Canvas 核心模块分支覆盖达标
   - `src/lib/canvas/__tests__/historySlice.test.ts`: 45 tests, branch 98.0% (目标 ≥40%)
   - `src/lib/canvas/stores/contextStore.test.ts`: branch 88.63% (目标 ≥50%)

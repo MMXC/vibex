@@ -63,6 +63,21 @@
 - **提交**: `571c1f67`
 
 ### Added (canvas-test-framework-standardize E3: 测试覆盖率提升) — 2026-04-04
+- **E3 测试覆盖率提升**: Store 分支覆盖率提升
+  - `historySlice.test.ts`: 45 tests, branch 98.0%
+  - `contextStore.test.ts`: branch 88.63%
+  - `flowStore.test.ts`: branch 63.15%
+  - `componentStore.test.ts`: branch 68.75%
+  - 全局分支覆盖 51.94% ≥ 50% 阈值
+- **提交**: `629c5fe0` (E4 commit includes E3 coverage tests)
+
+### Added (canvas-test-framework-standardize E4: Flaky测试治理) — 2026-04-04
+- **E4 Flaky测试治理**: 不稳定测试注册 + 重试机制
+  - `flaky-tests.json`: 不稳定测试注册表
+  - `tests/flaky-helpers.ts`: flakiness detection helpers
+  - `playwright.ci.config.ts`: retry 配置优化
+  - `useAutoSave.test.ts`: 265 行扩展分支覆盖
+- **提交**: `629c5fe0`
 - **E3 测试覆盖率提升**: Canvas 核心模块分支覆盖达标
   - `src/lib/canvas/__tests__/historySlice.test.ts`: 45 tests, branch 98.0% (目标 ≥40%)
   - `src/lib/canvas/stores/contextStore.test.ts`: branch 88.63% (目标 ≥50%)

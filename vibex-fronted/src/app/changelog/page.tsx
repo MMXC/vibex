@@ -218,7 +218,17 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.109',
     date: '2026-04-04',
     changes: [
-      '🧪 canvas-test-framework-standardize/E3: 测试覆盖率提升 — Canvas 核心模块分支覆盖达标',
+      '🧪 canvas-test-framework-standardize/E4: Flaky测试治理 — 不稳定测试注册 + 重试机制',
+      '✅ flaky-tests.json: 不稳定测试注册表',
+      '✅ tests/flaky-helpers.ts: flakiness detection helpers',
+      '✅ playwright.ci.config.ts: retry 配置优化',
+      '✅ useAutoSave.test.ts: 265 行扩展分支覆盖',
+      '✅ 提交 629c5fe0',
+    ],
+    commit: '629c5fe0',
+  },
+  {
+ 测试覆盖率提升 — Canvas 核心模块分支覆盖达标',
       '✅ historySlice: 45 tests, branch 98.0% (目标 ≥40%)',
       '✅ contextStore: branch 88.63% (目标 ≥50%)',
       '✅ flowStore: branch 63.15% (目标 ≥50%)',

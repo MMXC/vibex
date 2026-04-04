@@ -5,7 +5,7 @@
  * Epic 2: S2.1 — 使用统一 prompt 模块
  *
  * 输入: { requirementText: string, projectId?: string }
- * 输出: { success: boolean, contexts: BoundedContext[], sessionId: string, confidence: number }
+ * 输出: { success: boolean, contexts: BoundedContext[], generationId: string, confidence: number }
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createAIService } from '@/services/ai-service';

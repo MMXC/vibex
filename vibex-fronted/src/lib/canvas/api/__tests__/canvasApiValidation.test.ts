@@ -12,7 +12,7 @@ function isValidGenerateContextsResponse(value: unknown): value is GenerateConte
   return (
     typeof obj.success === 'boolean' &&
     Array.isArray(obj.contexts) &&
-    typeof obj.sessionId === 'string' &&
+    typeof obj.generationId === 'string' &&
     typeof obj.confidence === 'number'
   );
 }
@@ -39,7 +39,7 @@ describe('canvasApi response validation', () => {
       const response = {
         success: true,
         contexts: [{ id: 'ctx1', name: '用户管理', description: '用户注册登录', type: 'core' as const }],
-        sessionId: 'sess_123',
+        generationId: 'sess_123',
         confidence: 0.85,
       };
       expect(isValidGenerateContextsResponse(response)).toBe(true);
@@ -49,7 +49,7 @@ describe('canvasApi response validation', () => {
       const response = {
         success: false,
         contexts: [],
-        sessionId: 'sess_123',
+        generationId: 'sess_123',
         confidence: 0,
         error: 'some error',
       };
@@ -61,15 +61,15 @@ describe('canvasApi response validation', () => {
     });
 
     it('should reject missing success field', () => {
-      expect(isValidGenerateContextsResponse({ contexts: [], sessionId: 's', confidence: 0 })).toBe(false);
+      expect(isValidGenerateContextsResponse({ contexts: [], generationId: 's', confidence: 0 })).toBe(false);
     });
 
-    it('should reject missing sessionId field', () => {
+    it('should reject missing generationId field', () => {
       expect(isValidGenerateContextsResponse({ success: true, contexts: [], confidence: 0 })).toBe(false);
     });
 
     it('should reject non-array contexts', () => {
-      expect(isValidGenerateContextsResponse({ success: true, contexts: 'not-array', sessionId: 's', confidence: 0 })).toBe(false);
+      expect(isValidGenerateContextsResponse({ success: true, contexts: 'not-array', generationId: 's', confidence: 0 })).toBe(false);
     });
   });
 

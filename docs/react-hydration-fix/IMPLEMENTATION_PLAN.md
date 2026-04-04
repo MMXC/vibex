@@ -126,10 +126,10 @@ grep -rn "toLocaleDateString\|toLocaleString" vibex-fronted/src --include="*.tsx
 - `vibex-fronted/src/lib/__tests__/format.test.ts`（新增）
 
 ### 验收检查清单
-- [ ] `formatDate` 对 UTC 和 CST 时区返回相同结果
-- [ ] `toLocaleDateString` 在项目中已全部替换
-- [ ] `MermaidRenderer.tsx` 包含 `suppressHydrationWarning`
-- [ ] `MermaidPreview.tsx` 包含 `suppressHydrationWarning`
+- [x] `formatDate` 对 UTC 和 CST 时区返回相同结果 (commit 1fc58b1a)
+- [ ] `toLocaleDateString` 在项目中已全部替换 (E2-T1 工具已完成，替换待后续任务)
+- [x] `MermaidRenderer.tsx` 包含 `suppressHydrationWarning` (commit 1fc58b1a)
+- [x] `MermaidPreview.tsx` 包含 `suppressHydrationWarning` (commit 1fc58b1a)
 
 ---
 

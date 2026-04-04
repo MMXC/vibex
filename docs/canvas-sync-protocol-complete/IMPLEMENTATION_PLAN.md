@@ -265,12 +265,20 @@ conflict 按钮点击 → 打开 ConflictDialog（传入 `conflictData`）。
 
 ## 验收检查清单
 
-- [ ] POST snapshots 乐观锁成功（version > max → 200）
-- [ ] POST snapshots 冲突（version ≤ max → 409 + serverSnapshot）
-- [ ] GET snapshots/latest 返回轻量版本号
-- [ ] POST restore → 新版本快照创建成功
-- [ ] ConflictDialog 三按钮可见且可点击
-- [ ] "保留本地" 后 saveStatus 恢复 idle
-- [ ] "保留服务器" 后 canvasStore 三树数据被替换
-- [ ] 轮询 30s 检测到版本差异自动触发 conflict
+- [x] POST snapshots 乐观锁成功（version > max → 200）
+- [x] POST snapshots 冲突（version ≤ max → 409 + serverSnapshot）
+- [x] GET snapshots/latest 返回轻量版本号
+- [x] POST restore → 新版本快照创建成功
+- [x] ConflictDialog 三按钮可见且可点击
+- [x] "保留本地" 后 saveStatus 恢复 idle
+- [x] "保留服务器" 后 canvasStore 三树数据被替换
+- [x] 轮询 30s 检测到版本差异自动触发 conflict
 - [ ] E2E 完整冲突解决流程通过
+
+## E3 完成状态
+
+- [x] Backend: GET /v1/canvas/snapshots/latest (line 403-429 in snapshots.ts)
+- [x] Frontend: canvasApi.getLatestVersion() added to canvasApi.ts
+- [x] Frontend: 30s interval polling in useAutoSave.ts
+- [x] TypeScript: tsc --noEmit 0 errors
+- [x] Git: commit 1546864f pushed to origin/main

@@ -27,6 +27,23 @@
 **提交**: `90414707`
 
 
+### [api-input-validation-layer E2: 安全高风险路由集成] — 2026-04-04
+
+#### Backend
+- `schemas/security.ts`: chatMessageSchema + planAnalyzeSchema + INJECTION_KEYWORDS
+- S2.2: chat.ts 使用 `chatMessageSchema` + Prompt Injection blocklist
+  - `INJECTION_KEYWORDS`: SYSTEM_PROMPT, ##Instructions, /system 等关键词黑名单
+  - message max 10000 chars, `.safeParse()` 标准化错误响应
+  - 路由: `POST /api/chat`, `POST /api/chat/with-context`
+- S2.3: plan.ts 使用 `planAnalyzeSchema` + Prompt Injection 检测
+  - requirement max 50000 chars, detectInjection() 检测
+  - `.safeParse()` 代替 `.parse()`, 返回 `{ error, details }` 结构
+  - 路由: `POST /api/plan/analyze`
+- `lib/high-risk-validation.ts`: Next.js route validation helpers
+- tsc --noEmit: 0 errors
+
+**提交**: `f1210edb`
+
 ### [api-input-validation-layer E1: Zod验证基础设施] — 2026-04-04
 
 #### Backend

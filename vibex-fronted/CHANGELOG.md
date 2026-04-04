@@ -291,6 +291,55 @@
 - **S2.2**: Pre-submit 检查脚本 — scripts/pre-submit-check.sh
 - Commits: `914919b8`, `571c1f67`, `0ad8d5b2`
 
+### [E2: 质量门禁建立] — Sprint 4 (vibex-sprint4-20260403)
+
+#### Added
+- `.husky/commit-msg` — commitlint commit-msg hook，验证 conventional commit 格式
+- `.husky/pre-commit` — pre-commit hook：TypeScript 类型检查 + npm test
+- `commitlint.config.js` — @commitlint/config-conventional 配置
+- `.github/workflows/pre-submit.yml` — CI pre-submit workflow
+- `scripts/pre-submit-check.sh` — ESLint disable 数量监控（阈值 20）
+- `ESLINT_DISABLES.md` — 17 个 eslint-disable 豁免记录（9 LEGIT / 4 NEEDS FIX / 4 QUESTIONABLE）
+
+**功能**:
+- S5-S1: commit-msg hook 验证 conventional commit 格式
+- S5-S2: pre-commit hook 阻断低质量 commit
+
+**提交**: `5fd100da`, `000a2743`, `c5dac8bd`
+
+### [E3: 用户体验增强] — Sprint 4 (vibex-sprint4-20260403)
+
+#### Added
+- `src/components/canvas/features/PhaseIndicator.tsx` — Phase 状态指示器（Context/Flow/Component）
+- `src/components/FeedbackFAB.tsx` — 反馈浮动按钮（提交到 Slack #coord）
+- `src/hooks/useFeedback.ts` — 反馈提交 Hook
+- `src/hooks/useHasProject.ts` — 检测是否有已加载项目
+- `src/app/api/feedback/route.ts` — 反馈 API 接口
+
+**变更**: `contextStore.ts` 新增 phase/setPhase/activeTree/selectedNodeIds 等字段
+
+**提交**: `413cd5d5`
+
+### [E4: 测试工程化] — Sprint 4 (vibex-sprint4-20260403)
+
+#### Added
+- `tests/e2e/auto-save.spec.ts` — 4 E2E tests: auto-save trigger, status indicator, save conflict detection, retry after conflict
+- `tests/e2e/conflict-dialog.spec.ts` — 3 E2E tests: dialog display, manual resolution, auto-retry
+- `tests/contract/sync.contract.spec.ts` — 5 Contract tests: CanvasSnapshot, CreateSnapshotOutput, SyncProtocol API schema validation
+- `scripts/test-stability-report.sh` — E2E stability report generator
+
+**提交**: `9916cdd3`
+
+### [E5: 协作基础设施] — Sprint 4 (vibex-sprint4-20260403)
+
+#### Added
+- `src/app/share/[token]/page.tsx` — 只读分享页面
+- `src/app/api/share/[token]/route.ts` — 分享 API 接口
+- `src/hooks/useCanvasSnapshot.ts` — 画布快照 Hook（takeSnapshot/restoreSnapshot/deleteSnapshot/computeSnapshotDiff）
+- `src/components/SnapshotCompare.tsx` — 快照对比组件（摘要/详细/JSON 三种视图）
+
+**提交**: `33e25ab7`
+
 ### E1: Canvas JSON 持久化 — 统一数据模型 (canvas-json-persistence)
 - **E1-S1**: NodeState 统一接口 — 三树节点类型共享统一 NodeState
 - **E1-S2**: Migration 3→4 修复 — status 映射保留 confirmed 状态

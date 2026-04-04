@@ -183,14 +183,13 @@ vibex-fronted/src/
 
 ## 验收检查清单
 
-- [ ] TreePanel `headerActions` prop 渲染到 Header 右侧
-- [ ] 折叠状态下 `headerActions` 不可见
-- [ ] `useTreeToolbarActions` hook 返回 4 个 action 函数
-- [ ] context Header 显示：全选 / 取消 / 清空 / 继续（4个按钮）
-- [ ] flow Header 显示：全选 / 取消 / 清空（3个按钮）
-- [ ] component Header 显示：全选 / 取消 / 清空（3个按钮）
-- [ ] Header 按钮 min-height 32px，PC 和移动端可访问性达标
-- [ ] Playwright E2E：三树 Header 按钮可见
+- [x] **E1-T1**: TreePanel `headerActions` prop 渲染到 Header 区域（below toggle button）
+- [x] **E1-T1**: 折叠状态下 `headerActions` 不可见（条件渲染 `!collapsed`）
+- [x] **E1-T2**: `useTreeToolbarActions` hook 创建完成（`/hooks/canvas/useTreeToolbarActions.ts`）
+- [x] **E1-T3**: CanvasPage 全部 6 处 TreePanel 调用迁移（renderTabContent × 3 + main grid × 3）
+- [x] **E1-T4**: CSS `.treePanelHeaderActions` 样式添加（padding 0.375rem, border-bottom, bg-secondary）
+- [ ] **E1-T* (后续)**: Header 按钮尺寸/布局优化、折叠菜单、E2E 测试（见后续任务）
+- [ ] Playwright E2E：三树 Header 按钮可见（E1-T* 后续任务）
 
 ---
 

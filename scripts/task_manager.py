@@ -2200,6 +2200,12 @@ def main():
     p.add_argument("--workspace", "-w", help="工作目录")
     p.add_argument("--threshold", "-t", type=float, default=0.4, help="相似度阈值（默认 0.4）")
 
+    # E2: mock-coverage — 报告 API mock 覆盖率
+    p = sub.add_parser("mock-coverage", help="报告 API mock 覆盖率")
+    p.add_argument("project", help="项目路径（默认 vibex-fronted/src 目录）")
+    p.add_argument("--backend", default=None, help="后端路径（默认从 project 推断）")
+    p.add_argument("--json", action="store_true", help="JSON 输出")
+
     args = parser.parse_args()
     if not args.command:
         parser.print_help()
@@ -2222,6 +2228,7 @@ def main():
         "check-dup": cmd_check_dup,
         "health": cmd_health,
         "current-report": cmd_current_report,
+        "mock-coverage": cmd_mock_coverage,
     }
 
     if args.command not in cmds:
@@ -2384,6 +2391,220 @@ def cmd_check_dup(args):
     print()
     print(result["message"])
     sys.exit(1 if result["level"] == "block" else 0)
+
+
+# ── E2: cmd_mock_coverage ───────────────────────────────────────────────────
+
+import re
+import glob as _glob
+
+
+def _scan_mock_patterns(root: str) -> dict:
+    """扫描项目源码中的 mock 使用模式。
+
+    Returns:
+        {
+          "files": {rel_path: [matched_patterns]},
+          "summary": {"mockGenerateContexts": 0, "MOCK_DATA": 0, "TODO_mock": 0}
+        }
+    """
+    patterns = {
+        "mockGenerateContexts": re.compile(r"mockGenerateContexts\s*\(", re.MULTILINE),
+        "mockGenerateFlows": re.compile(r"mockGenerateFlows\s*\(", re.MULTILINE),
+        "mockGenerateComponents": re.compile(r"mockGenerateComponents\s*\(", re.MULTILINE),
+        "MOCK_DATA": re.compile(r"MOCK_DATA\s*[=:]", re.MULTILINE),
+        "MOCK_CONTEXTS": re.compile(r"MOCK_CONTEXTS\s*[=:]", re.MULTILINE),
+        "MOCK_FLOWS": re.compile(r"MOCK_FLOWS\s*[=:]", re.MULTILINE),
+        "MOCK_COMPONENTS": re.compile(r"MOCK_COMPONENTS\s*[=:]", re.MULTILINE),
+        "TODO_mock": re.compile(r"//\s*TODO.*mock|/\*\s*TODO.*mock", re.IGNORECASE),
+    }
+
+    src_dirs = ["src", "lib", "app"]
+    files_map: dict[str, list[str]] = {}
+    summary: dict[str, int] = {k: 0 for k in patterns}
+
+    for src_dir in src_dirs:
+        src_path = os.path.join(root, src_dir)
+        if not os.path.isdir(src_path):
+            continue
+        for fpath in _glob.glob(os.path.join(src_path, "**", "*.ts"), recursive=True) + \
+                      _glob.glob(os.path.join(src_path, "**", "*.tsx"), recursive=True):
+            rel = os.path.relpath(fpath, root)
+            if "node_modules" in rel or "/out/" in rel or "/.next/" in rel:
+                continue
+            try:
+                content = open(fpath, encoding="utf-8", errors="ignore").read()
+            except Exception:
+                continue
+            matched = []
+            for name, pat in patterns.items():
+                if pat.search(content):
+                    matched.append(name)
+                    summary[name] += 1
+            if matched:
+                files_map[rel] = matched
+
+    return {"files": files_map, "summary": summary}
+
+
+def _check_backend_mock(route_path: str) -> dict:
+    """Check if backend API route uses mock data.
+
+    Returns:
+        {"status": "real"|"mock"|"not_found", "reason": str}
+    """
+    if not os.path.isfile(route_path):
+        return {"status": "not_found", "reason": "file does not exist"}
+
+    try:
+        content = open(route_path, encoding="utf-8", errors="ignore").read()
+    except Exception as e:
+        return {"status": "not_found", "reason": f"read error: {e}"}
+
+    # 真实信号（优先检测）
+    real_signals = [
+        (re.compile(r"@ai-sdk/|@google-ai/|generateContent|createModel", re.IGNORECASE), "AI SDK call"),
+        (re.compile(r"from\s+['\"]ai['\"]|from\s+['\"]@ai-sdk/", re.MULTILINE), "AI SDK import"),
+        (re.compile(r"from\s+['\"]openai['\"]|from\s+['\"]anthropic['\"]", re.MULTILINE), "OpenAI/Anthropic import"),
+        (re.compile(r"\.generateContent\s*\(|chat\.create\s*\(", re.MULTILINE), "LLM generateContent/chat.create"),
+        (re.compile(r"streamText|generateText|generate\(", re.IGNORECASE), "AI SDK streamText/generateText"),
+        # 真实 AI 服务抽象（createAIService 是实际 AI 调用的入口点）
+        (re.compile(r"createAIService|aiService", re.IGNORECASE), "AIService abstraction"),
+        # MiniMax / streamFromMiniMax / other LLM calls
+        (re.compile(r"streamFromMiniMax|miniMax|minimax", re.IGNORECASE), "MiniMax API"),
+        # Real DB / fetch calls (not mock data)
+        (re.compile(r"env\.DB|await\s+db\.|prisma\.| drizzle\.", re.IGNORECASE), "Real DB"),
+    ]
+    for pat, label in real_signals:
+        if pat.search(content):
+            return {"status": "real", "reason": label}
+
+    # Mock 信号
+    mock_signals = [
+        (re.compile(r"//\s*TODO.*mock|/\*\s*TODO.*mock", re.IGNORECASE), "TODO mock comment"),
+        (re.compile(r"mockData|mock_data|MOCK_", re.IGNORECASE), "MOCK_ variable"),
+        # 强 mock：返回硬编码数组字面量（通常是 fake data）
+        (re.compile(r"return\s+\[\s*\{[^}]*id\s*:\s*['\"]|return\s+\[\s*\{[^}]*name\s*:", re.MULTILINE), "hardcoded mock array"),
+    ]
+    for pat, label in mock_signals:
+        if pat.search(content):
+            return {"status": "mock", "reason": label}
+
+    return {"status": "unknown", "reason": "no clear mock or real signal"}
+
+
+def cmd_mock_coverage(args):
+    """Report API mock coverage for a project.
+
+    Scans:
+    - Frontend: mockGenerateContexts/Flows/Components, MOCK_DATA returns, TODO mock comments
+    - Backend: api route files for mock vs real AI service usage
+    """
+    project_root = os.path.abspath(args.project)
+
+    # 默认后端路径：与 frontend 同级的 vibex-backend
+    if args.backend:
+        backend_root = os.path.abspath(args.backend)
+    else:
+        # 尝试从 project 推断
+        if "/vibex-fronted" in project_root:
+            backend_root = project_root.replace("/vibex-fronted", "/vibex-backend")
+        elif "/vibex-fronted-test" in project_root:
+            backend_root = project_root.replace("/vibex-fronted-test", "/vibex-backend")
+        elif "/vibex/" in project_root:
+            # project_root 可能指向 vibex/ 或 vibex/vibex-fronted/
+            parent = os.path.dirname(project_root.rstrip("/"))
+            backend_root = os.path.join(parent, "vibex-backend")
+            if not os.path.isdir(backend_root):
+                # 尝试 one level up from project_root itself
+                backend_root = os.path.join(project_root, "vibex-backend")
+        else:
+            backend_root = os.path.join(os.path.dirname(project_root), "vibex-backend")
+
+    print("=" * 60)
+    print("📊 Mock Coverage Report")
+    print("=" * 60)
+    print(f"Frontend: {project_root}")
+    print(f"Backend:  {backend_root}")
+    print()
+
+    # ── Canvas API endpoints to check ──────────────────────────────────────
+    canvas_apis = [
+        ("generate-contexts",  "app/api/v1/canvas/generate-contexts/route.ts"),
+        ("generate-flows",     "app/api/v1/canvas/generate-flows/route.ts"),
+        ("generate-components","app/api/v1/canvas/generate-components/route.ts"),
+        ("generate",           "app/api/v1/canvas/generate/route.ts"),
+        ("chat",               "app/api/v1/chat/route.ts"),
+        ("ai-ui-generation",   "app/api/v1/ai-ui-generation/route.ts"),
+    ]
+
+    print("## Backend API Status")
+    print()
+    backend_results = []
+    for name, rel in canvas_apis:
+        route_path = os.path.join(backend_root, "src", rel)
+        check = _check_backend_mock(route_path)
+        status_map = {
+            "real": "🟢 real",
+            "mock": "🔴 mock",
+            "not_found": "⚪ n/a",
+            "unknown": "🟡 unknown",
+        }
+        icon = status_map.get(check["status"], "❓")
+        print(f"  {icon} /{name}: {check['reason']}")
+        backend_results.append({
+            "endpoint": name,
+            "path": rel,
+            **check
+        })
+
+    print()
+
+    # ── Frontend mock patterns ─────────────────────────────────────────────
+    print("## Frontend Mock Patterns")
+    print()
+    result = _scan_mock_patterns(project_root)
+
+    summary = result["summary"]
+    total_hits = sum(summary.values())
+    if total_hits == 0:
+        print("  ✅ No mock patterns detected — all APIs appear to use real implementations")
+    else:
+        for k, v in sorted(summary.items(), key=lambda x: -x[1]):
+            if v == 0:
+                continue
+            print(f"  🔴 {k}: {v} occurrence(s)")
+        print()
+        print(f"  Files with mock usage ({len(result['files'])}):")
+        for fpath, patterns in sorted(result["files"].items()):
+            print(f"    - {fpath}: {', '.join(patterns)}")
+
+    print()
+    print("=" * 60)
+
+    # Summary counts
+    mock_count = sum(1 for r in backend_results if r["status"] == "mock")
+    real_count = sum(1 for r in backend_results if r["status"] == "real")
+    total_apis = len(backend_results)
+    print(f"## Summary")
+    print(f"  Backend APIs: {real_count} real / {mock_count} mock / {total_apis - real_count - mock_count} unknown (total {total_apis})")
+    print(f"  Frontend mock patterns: {total_hits} occurrences in {len(result['files'])} file(s)")
+    print("=" * 60)
+
+    if args.json:
+        import json as _json
+        output = {
+            "frontend": {
+                "root": project_root,
+                "summary": summary,
+                "files": result["files"],
+            },
+            "backend": {
+                "root": backend_root,
+                "results": backend_results,
+            }
+        }
+        print(_json.dumps(output, indent=2, ensure_ascii=False))
 
 
 if __name__ == '__main__':

@@ -582,6 +582,13 @@
   padding: 0.125rem 0.5rem;
 }
 
+/* E1-T4: Header Actions — rendered in panel header area below toggle button */
+.treePanelHeaderActions {
+  padding: 0.375rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+}
+
 /* Panel Actions */
 .treePanelActions {
   display: flex;

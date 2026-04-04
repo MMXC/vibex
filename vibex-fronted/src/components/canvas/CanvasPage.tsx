@@ -511,7 +511,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             isActive={contextActive}
             onToggleCollapse={toggleContextPanel}
             onNodeClick={handleMinimapNodeClick}
-            actions={
+            headerActions={
               <TreeToolbar
                 treeType="context"
                 nodeCount={contextNodes.length}
@@ -562,7 +562,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             isActive={flowActive}
             onToggleCollapse={toggleFlowPanel}
             onNodeClick={handleMinimapNodeClick}
-            actions={
+            headerActions={
               <TreeToolbar
                 treeType="flow"
                 nodeCount={flowNodes.length}
@@ -588,7 +588,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             isActive={componentActive}
             onToggleCollapse={toggleComponentPanel}
             onNodeClick={handleMinimapNodeClick}
-            actions={
+            headerActions={
               <TreeToolbar
                 treeType="component"
                 nodeCount={componentNodes.length}
@@ -816,7 +816,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 isActive={contextActive}
                 onToggleCollapse={toggleContextPanel}
                 onNodeClick={handleMinimapNodeClick}
-                actions={
+                headerActions={
                   <TreeToolbar
                     treeType="context"
                     nodeCount={contextNodes.length}
@@ -867,7 +867,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 isActive={flowActive}
                 onToggleCollapse={toggleFlowPanel}
                 onNodeClick={handleMinimapNodeClick}
-                actions={
+                headerActions={
                   <TreeToolbar
                     treeType="flow"
                     nodeCount={flowNodes.length}
@@ -904,7 +904,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 isActive={componentActive}
                 onToggleCollapse={toggleComponentPanel}
                 onNodeClick={handleMinimapNodeClick}
-                actions={
+                headerActions={
                   <TreeToolbar
                     treeType="component"
                     nodeCount={componentNodes.length}

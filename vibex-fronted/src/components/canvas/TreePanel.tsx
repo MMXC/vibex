@@ -31,8 +31,10 @@ interface TreePanelProps {
   onNodeConfirm?: (nodeId: string) => void;
   /** 子组件：树渲染器 */
   children?: React.ReactNode;
-  /** 自定义操作按钮（渲染在面板头部下方） */
+  /** 自定义操作按钮（渲染在面板头部下方 body） */
   actions?: React.ReactNode;
+  /** 自定义操作按钮（渲染在面板头部区域，紧跟在标题行下方） */
+  headerActions?: React.ReactNode;
   /** 点击 MiniMap 节点时滚动到对应节点 */
   onNodeClick?: (nodeId: string) => void;
 }
@@ -69,6 +71,7 @@ export function TreePanel({
   onNodeConfirm,
   children,
   actions,
+  headerActions,
   onNodeClick,
 }: TreePanelProps) {
   const safeNodes = nodes ?? [];
@@ -141,6 +144,13 @@ export function TreePanel({
           ▼
         </span>
       </button>
+
+      {/* E1-T1: Header actions — rendered below the header toggle button */}
+      {headerActions && !collapsed && (
+        <div data-testid="tree-panel-header-actions" className={styles.treePanelHeaderActions}>
+          {headerActions}
+        </div>
+      )}
 
       {/* Panel Body */}
       {!collapsed && (

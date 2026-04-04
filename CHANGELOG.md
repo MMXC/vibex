@@ -1,3 +1,10 @@
+### Added (vibex-backend-p0-20260405 E1: OPTIONS/CORS 修复) — 2026-04-05
+- **E1 OPTIONS/CORS 修复**: gateway.ts CORS preflight handler 顺序修复
+  - `protected_.options('/*')` 移到 `protected_.use('*', authMiddleware)` 之前
+  - 添加 CORS headers: Access-Control-Allow-Origin/Methods/Headers
+  - 新增 `gateway-cors.test.ts`: 7 tests (OPTIONS 204, CORS headers, auth 拦截)
+- **提交**: `9d915fe9`
+
 ### Added (vibex-proposals-20260405-final E1-E3: 提案追踪机制) — 2026-04-05
 - **E1 Canvas API追踪**: proposals/canvas-api-tracker.md 记录4个端点状态（100% real AI）
 - **E2 Sprint追踪**: proposals/index.md 更新，包含6条提案追踪（2026-04-05 sprint）

@@ -6,6 +6,37 @@
   - 单元测试 3/3 pass
 - **提交**: `b2bc5897`, `adb62068`
 
+### Added (vibex-sprint4-20260403 E2: 质量门禁建立) — 2026-04-03
+- **E2 质量门禁**: Git hooks + ESLint disable 监控
+  - `.husky/commit-msg` — commitlint conventional commit 验证
+  - `.husky/pre-commit` — TypeScript 类型检查 + npm test
+  - `scripts/pre-submit-check.sh` — ESLint disable 数量监控（阈值 20）
+  - `ESLINT_DISABLES.md` — 17 个豁免记录
+  - `.github/workflows/pre-submit.yml` — CI pre-submit workflow
+- **提交**: `5fd100da`, `000a2743`, `c5dac8bd`
+
+### Added (vibex-sprint4-20260403 E3: 用户体验增强) — 2026-04-03
+- **E3 用户体验增强**: PhaseIndicator + FeedbackFAB + 示例快速入口
+  - PhaseIndicator: 画布左上角 Phase 状态指示器（Context/Flow/Component 切换）
+  - FeedbackFAB: 反馈浮动按钮，表单提交到 Slack #coord
+  - useHasProject: 检测是否有已加载项目
+- **提交**: `413cd5d5`
+
+### Added (vibex-sprint4-20260403 E4: 测试工程化) — 2026-04-03
+- **E4 测试工程化**: E2E 稳定性测试 + Contract 测试
+  - `tests/e2e/auto-save.spec.ts` — 4 E2E tests
+  - `tests/e2e/conflict-dialog.spec.ts` — 3 E2E tests
+  - `tests/contract/sync.contract.spec.ts` — 5 Contract tests
+  - `scripts/test-stability-report.sh` — E2E 稳定性报告生成器
+- **提交**: `9916cdd3`
+
+### Added (vibex-sprint4-20260403 E5: 协作基础设施) — 2026-04-03
+- **E5 协作基础设施**: 只读分享链接 + 画布快照
+  - `src/app/share/[token]/page.tsx` — 只读分享页面
+  - `useCanvasSnapshot.ts` — 画布快照 Hook（take/restore/delete/diff）
+  - `SnapshotCompare.tsx` — 快照对比组件（摘要/详细/JSON 视图）
+- **提交**: `33e25ab7`
+
 ### Added (canvas-split-hooks E3: useCanvasRenderer) — 2026-04-04
 - **E3 useCanvasRenderer hook**: 从 CanvasPage.tsx 提取 memoized 渲染计算逻辑
   - `computeNodeRects`: context/flow/component 节点矩形计算

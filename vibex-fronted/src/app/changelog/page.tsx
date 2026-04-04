@@ -18,6 +18,54 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.102',
+    date: '2026-04-04',
+    changes: [
+      '🔧 vibex-sprint4-20260403/E2: 质量门禁建立 — Git hooks + ESLint disable 监控',
+      '✅ .husky/commit-msg: commitlint conventional commit 验证',
+      '✅ .husky/pre-commit: TypeScript 类型检查 + npm test',
+      '✅ ESLINT_DISABLES.md: 17 个豁免记录（9 LEGIT / 4 NEEDS FIX / 4 QUESTIONABLE）',
+      '✅ 提交 5fd100da / 000a2743 / c5dac8bd',
+    ],
+    commit: 'c5dac8bd',
+  },
+  {
+    version: '1.0.102',
+    date: '2026-04-04',
+    changes: [
+      '🎨 vibex-sprint4-20260403/E3: 用户体验增强 — PhaseIndicator + FeedbackFAB',
+      '✅ PhaseIndicator: 画布左上角 Phase 状态指示器（Context/Flow/Component 切换）',
+      '✅ FeedbackFAB: 反馈浮动按钮（提交到 Slack #coord）',
+      '✅ contextStore 新增 phase/setPhase/activeTree/selectedNodeIds 字段',
+      '✅ 提交 413cd5d5',
+    ],
+    commit: '413cd5d5',
+  },
+  {
+    version: '1.0.102',
+    date: '2026-04-04',
+    changes: [
+      '🧪 vibex-sprint4-20260403/E4: 测试工程化 — E2E 稳定性 + Contract 测试',
+      '✅ auto-save.spec.ts: 4 E2E tests',
+      '✅ conflict-dialog.spec.ts: 3 E2E tests',
+      '✅ sync.contract.spec.ts: 5 Contract tests',
+      '✅ 提交 9916cdd3',
+    ],
+    commit: '9916cdd3',
+  },
+  {
+    version: '1.0.102',
+    date: '2026-04-04',
+    changes: [
+      '🔗 vibex-sprint4-20260403/E5: 协作基础设施 — 只读分享链接 + 画布快照',
+      '✅ share/[token]/page.tsx: 只读分享页面',
+      '✅ useCanvasSnapshot.ts: takeSnapshot/restoreSnapshot/deleteSnapshot/computeSnapshotDiff',
+      '✅ SnapshotCompare.tsx: 摘要/详细/JSON 视图',
+      '✅ 提交 33e25ab7',
+    ],
+    commit: '33e25ab7',
+  },
+  {
     version: '1.0.101',
     date: '2026-04-04',
     changes: [

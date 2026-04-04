@@ -113,12 +113,16 @@ v1.options('/*', (c) => {
 
 // 所有需要认证的路由挂载到一个子 app，再统一加中间件
 const protected_ = new Hono<{ Bindings: CloudflareEnv }>();
-protected_.use('*', authMiddleware);
 
-// CORS preflight - OPTIONS 不需要 auth
+// CORS preflight - OPTIONS 在 authMiddleware 之前处理，避免返回 401
 protected_.options('/*', (c) => {
+  c.res.headers.set('Access-Control-Allow-Origin', '*');
+  c.res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  c.res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   return c.text('', 204);
 });
+
+protected_.use('*', authMiddleware);
 
 // 项目管理
 protected_.route('/projects', projects);

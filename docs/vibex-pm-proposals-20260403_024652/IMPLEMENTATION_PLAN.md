@@ -116,13 +116,13 @@
 |------|------|------|--------|------|
 | 创建 projectStore.ts (扩展现有) | 开发 | 1h | dev | ✅ 已交付 (dashboard 已有) |
 | 实现 ProjectCard 组件 (含悬停) | 开发 | 1.5h | dev | ✅ 已交付 |
-| E4-S1 最近项目横向滚动 (Intersection Observer) | 开发 | 1.5h | dev | ⏳ 进行中 |
-| E4-S2 Hero 快速开始入口 | 开发 | 1h | dev | ⏳ 进行中 |
-| E4-S3 视图切换 (Grid/List) + 筛选排序 | 开发 | 2h | dev | ⏳ 进行中 |
+| E4-S1 最近项目横向滚动 (Intersection Observer) | 开发 | 1.5h | dev | ✅ 已交付 (recentProjects) |
+| E4-S2 Hero 快速开始入口 | 开发 | 1h | dev | ✅ 已交付 (heroSection) |
+| E4-S3 视图切换 (Grid/List) + 筛选排序 | 开发 | 2h | dev | ✅ 已交付 (viewMode toggle) |
 | E4-S4 悬停操作菜单 (打开/复制/删除) | 开发 | 1h | dev | ✅ 已交付 (已有基础) |
-| E4-S5 空状态引导 | 开发 | 1h | dev | ✅ 已交付 |
-| 首页集成 + 响应式 (与 Sprint 3 E3 协同) | 开发 | 1h | dev | ⏳ 进行中 |
-| **Day 8-9 合计** | | **10h** | | **⏳ 进行中** |
+| E4-S5 空状态引导 | 开发 | 1h | dev | ✅ 已交付 (zeroEmptyState) |
+| 首页集成 + 响应式 (与 Sprint 3 E3 协同) | 开发 | 1h | dev | ✅ 已交付 |
+| **Day 8-9 合计** | | **10h** | | **✅ E4 完成** |
 
 #### Day 10: Sprint 5 收尾
 

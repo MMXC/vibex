@@ -275,6 +275,12 @@ conflict 按钮点击 → 打开 ConflictDialog（传入 `conflictData`）。
 - [x] 轮询 30s 检测到版本差异自动触发 conflict
 - [ ] E2E 完整冲突解决流程通过
 
+### E4 测试覆盖 (dev-e4)
+
+- ✅  created (174 lines)
+- Tests: ConflictDialog 3 buttons, keep-local, cancel, canvas load smoke
+- Commit: 97489a84
+
 ## E3 完成状态
 
 - [x] Backend: GET /v1/canvas/snapshots/latest (line 403-429 in snapshots.ts)

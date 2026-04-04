@@ -18,6 +18,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.101',
+    date: '2026-04-04',
+    changes: [
+      '🎣 canvas-split-hooks/E4: useAIController hook — AI 生成状态统一提取',
+      '✅ requirementInput/isQuickGenerating 本地状态 + AI thinking (sessionStore)',
+      '✅ quickGenerate: contexts → flows → components 三步生成',
+      '✅ 3 unit tests pass',
+      '✅ 提交 b2bc5897 / adb62068',
+    ],
+    commit: 'adb62068',
+  },
+  {
     version: '1.0.100',
     date: '2026-04-04',
     changes: [

@@ -42,6 +42,17 @@
 
 **提交**: `815821bc`
 
+### [canvas-split-hooks E4: useAIController] — 2026-04-04 (canvas-split-hooks)
+
+#### Added
+- `src/hooks/canvas/useAIController.ts` — 从 CanvasPage.tsx 提取的 AI 生成状态 hook
+  - `requirementInput`/`isQuickGenerating` 本地状态
+  - AI thinking 状态（sessionStore selectors）
+  - `quickGenerate` callback：contexts → flows → components 三步生成
+- `src/hooks/canvas/useAIController.test.tsx` — 3 个单元测试（initial state / input update / quickGenerate function）
+
+**提交**: `b2bc5897`, `adb62068`
+
 ### [canvas-split-hooks E3: useCanvasRenderer] — 2026-04-04 (canvas-split-hooks)
 
 #### Added

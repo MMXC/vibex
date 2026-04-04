@@ -1,3 +1,11 @@
+### Added (canvas-split-hooks E4: useAIController) — 2026-04-04
+- **E4 useAIController hook**: 从 CanvasPage.tsx 提取 AI 生成状态和逻辑
+  - requirementInput/quickGenerate 本地状态
+  - AI thinking 状态（sessionStore）
+  - quickGenerate callback（contexts → flows → components 三步生成流程）
+  - 单元测试 3/3 pass
+- **提交**: `b2bc5897`, `adb62068`
+
 ### Added (canvas-split-hooks E2: useCanvasStore) — 2026-04-04
 - **E2 useCanvasStore hook**: 统一 store selectors（context/flow/component/ui/session stores）
 - **代码清理**: 删除不兼容 `output:export` 的 share/[token] 路由

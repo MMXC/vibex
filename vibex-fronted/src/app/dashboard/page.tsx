@@ -305,6 +305,10 @@ export default function Dashboard() {
             <span className={styles.navIcon}>↗</span>
             <span>导出</span>
           </Link>
+          <Link href="/canvas/delivery" className={styles.navItem}>
+            <span className={styles.navIcon}>📦</span>
+            <span>交付中心</span>
+          </Link>
           <Link href="/" className={styles.navItem}>
             <span className={styles.navIcon}>📝</span>
             <span>需求列表</span>

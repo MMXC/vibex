@@ -14,7 +14,6 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useMemo } from 'react';
-import { Layers } from 'lucide-react';
 import {
   DndContext,
   type DragEndEvent,
@@ -32,7 +31,6 @@ import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { useToast } from '@/components/ui/Toast';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { SortableTreeItem } from './features/SortableTreeItem';
 import { getHistoryStore } from '@/lib/canvas/historySlice';
 import { useModifierKey, useDragSelection } from '@/hooks/canvas/useDragSelection';
@@ -680,23 +678,18 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
   const handleGenerate = useCallback(async () => {
     if (generating) return;
     setGenerating(true);
-    try {
-      // Mock AI generation: simulate API delay
-      await new Promise((r) => setTimeout(r, 1200));
-      const drafts = mockGenerateComponents(flowNodes.length);
-      const newNodes: ComponentNode[] = drafts.map((d, i) => ({
-        ...d,
-        nodeId: `comp-${Date.now()}-${i}`,
-        confirmed: false,
-        status: 'pending' as const,
-        children: [],
-      }));
-      setComponentNodes(newNodes);
-    } catch (err) {
-      console.error('[ComponentTree] handleGenerate error:', err);
-    } finally {
-      setGenerating(false);
-    }
+    // Mock AI generation: simulate API delay
+    await new Promise((r) => setTimeout(r, 1200));
+    const drafts: Array<Omit<ComponentNode, 'nodeId' | 'status' | 'confirmed' | 'children'>> = [];
+    const newNodes: ComponentNode[] = drafts.map((d, i) => ({
+      ...d,
+      nodeId: `comp-${Date.now()}-${i}`,
+      confirmed: false,
+      status: 'pending' as const,
+      children: [],
+    }));
+    setComponentNodes(newNodes);
+    setGenerating(false);
   }, [generating, flowNodes.length, setComponentNodes]);
 
   const handleAdd = useCallback(
@@ -967,12 +960,13 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
             ))}
           </>
         ) : (
-          <EmptyState
-            icon={Layers}
-            title="暂无组件"
-            description="点击「AI 生成组件」自动生成，或手动新增节点"
-            className={styles.componentTreeEmptyState}
-          />
+          <div className={styles.contextTreeEmpty}>
+            <span className={styles.emptyIcon}>▣</span>
+            <p className={styles.emptyText}>暂无组件</p>
+            <p className={styles.emptySubtext}>
+              点击「AI 生成组件」自动生成，或手动新增节点
+            </p>
+          </div>
         )}
       </div>
 

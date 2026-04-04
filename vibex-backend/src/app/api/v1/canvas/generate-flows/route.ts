@@ -96,26 +96,21 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateF
 
     const prompt = USER_PROMPT.replace('{contexts}', contextSummary);
 
-    const result = await aiService
-      .generateJSON<BusinessFlowResponse[]>(prompt, undefined, {
-        temperature: 0.4,
-        maxTokens: 3072,
-      })
-      .catch((err) => {
-        console.error('[canvas/generate-flows] AI service error:', err);
-        return { data: null, usage: null, error: err instanceof Error ? err.message : 'AI service error' };
-      });
+    const result = await aiService.generateJSON<BusinessFlowResponse[]>(prompt, undefined, {
+      temperature: 0.4,
+      maxTokens: 3072,
+    });
 
-    if (result.error || !result.data || !Array.isArray(result.data) || result.data.length === 0) {
+    if (!result.data || !Array.isArray(result.data) || result.data.length === 0) {
       return NextResponse.json(
         {
           success: false,
           flows: [] as BusinessFlowResponse[],
           generationId: '',
           confidence: 0,
-          error: (result.error as string) || '未能生成有效的业务流程，请重试',
+          error: '未能生成有效的业务流程，请重试',
         },
-        { status: result.error ? 500 : 200 }
+        { status: 200 }
       );
     }
 

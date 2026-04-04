@@ -13,14 +13,11 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { GitBranch } from 'lucide-react';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
-import { useToast } from '@/components/ui/Toast';
 import { CheckboxIcon } from '@/components/common/CheckboxIcon';
 import {
   DndContext,
@@ -614,7 +611,6 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
 
   const session = useSessionStore();
   const projectId = session.projectId;
-  const toast = useToast();
 
   // === E2-F7: Flow card drag sensors ===
   const flowSensors = useSensors(
@@ -794,10 +790,6 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
       setPhase('component');
     } catch (err) {
       console.error('[BusinessFlowTree] handleContinueToComponents error:', err);
-      toast.showToast(
-        err instanceof Error ? err.message : '生成组件树失败，请重试',
-        'error'
-      );
     } finally {
       setComponentGenerating(false);
     }
@@ -929,12 +921,14 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
 
       {/* Flow list */}
       {flowNodes.length === 0 ? (
-        <EmptyState
-          icon={GitBranch}
-          title="暂无业务流程"
-          description={allContextsActive ? '确认上下文后自动生成业务流程' : '请先完成上下文树的编辑和确认'}
-          className={styles.emptyFlowListState}
-        />
+        <div className={styles.emptyFlowList}>
+          <p>暂无业务流程</p>
+          {allContextsActive ? (
+            <p className={styles.hint}>确认上下文后自动生成业务流程</p>
+          ) : (
+            <p className={styles.hint}>请先完成上下文树的编辑和确认</p>
+          )}
+        </div>
       ) : (
         <DndContext
           sensors={flowSensors}

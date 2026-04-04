@@ -25,6 +25,12 @@ const canvas = new Hono<{ Bindings: Env }>()
 // Enable CORS
 canvas.use('/*', cors())
 
+// Explicit OPTIONS handler — fixes Cloudflare Workers CORS preflight 500
+// Without this, OPTIONS hits auth middleware (no auth header) → 401 → browser blocks POST
+canvas.options('/*', (c) => {
+  return c.text('', 204);
+});
+
 // ============================================================
 // Type Definitions
 // ============================================================

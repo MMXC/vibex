@@ -100,11 +100,25 @@ v1.route('/analyze/stream', analyzeStream);
 // Canvas SSE 流式端点 - 公开，无需认证
 v1.route('/canvas/stream', canvasStream);
 
+// ==================== CORS Preflight 处理 (在受保护路由之前) ====================
+// 显式处理 OPTIONS，避免 preflight 被 authMiddleware 拦截返回 401
+v1.options('/*', (c) => {
+  c.res.headers.set('Access-Control-Allow-Origin', '*');
+  c.res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  c.res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  return c.text('', 204);
+});
+
 // ==================== 受保护路由 (需要认证) ====================
 
 // 所有需要认证的路由挂载到一个子 app，再统一加中间件
 const protected_ = new Hono<{ Bindings: CloudflareEnv }>();
 protected_.use('*', authMiddleware);
+
+// CORS preflight - OPTIONS 不需要 auth
+protected_.options('/*', (c) => {
+  return c.text('', 204);
+});
 
 // 项目管理
 protected_.route('/projects', projects);

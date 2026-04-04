@@ -61,7 +61,7 @@ if os.path.isdir(_current_report_pkg):
         _cr_spec.loader.exec_module(_cr_mod)
 
 # ── E4: 虚假完成检测 ────────────────────────────────────────────────────────────
-def validate_task_completion(project: str, stage_id: str, stage_info: dict, repo: str = "/root/.openclaw/vibex", old_status: str = None) -> dict:
+def validate_task_completion(project: str, stage_id: str, stage_info: dict, old_status: str = None, repo: str = "/root/.openclaw/vibex") -> dict:
     """
     检测任务是否虚假完成。
     返回 dict: {
@@ -2093,7 +2093,7 @@ def cmd_update(args):
 
     # ── E1-T1 / E4: Commit hash recording on done ────────────────
     if new_status == "done":
-        result = validate_task_completion(args.project, stage_id, stage, old_status=old_status)
+        result = validate_task_completion(args.project, stage_id, stage, old_status)
         if result["commit"]:
             stage["commit"] = result["commit"]
         for warning in result["warnings"]:

@@ -37,6 +37,16 @@
 
 **提交**: `f1210edb`, `e9ce97ef`
 
+### [api-input-validation-layer E5: 自动化测试覆盖] — 2026-04-04
+
+#### Added
+- `vibex-backend/src/schemas/schema.test.ts` — 25 个测试用例，100% 通过
+  - Project schemas: createProjectSchema, updateProjectSchema, projectListQuerySchema
+  - Canvas schemas: generateContextsSchema, generateFlowsSchema, generateComponentsSchema, boundedContextSchema, flowStepSchema
+  - 覆盖字段验证、枚举校验、可选字段、严格模式
+
+**提交**: `28d5a6d1`
+
 ### [api-input-validation-layer E3: 中风险路由覆盖] — 2026-04-04
 
 #### Changed

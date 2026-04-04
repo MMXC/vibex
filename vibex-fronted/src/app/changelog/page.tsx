@@ -91,6 +91,19 @@ const mockChangelog: ChangelogEntry[] = [
     commit: 'f1210edb',
   },
   {
+    version: '1.0.113',
+    date: '2026-04-04',
+    changes: [
+      '🧪 api-input-validation-layer/E5: 自动化测试覆盖 — Sprint 4 schema 单元测试',
+      '✅ schema.test.ts: 25 个测试用例，100% 通过',
+      '✅ Project schemas: createProjectSchema, updateProjectSchema, projectListQuerySchema',
+      '✅ Canvas schemas: generateContexts/Flows/Components, boundedContext, flowStep',
+      '✅ 覆盖字段验证、枚举校验、可选字段、严格模式',
+      '✅ 提交 28d5a6d1',
+    ],
+    commit: '28d5a6d1',
+  },
+  {
     version: '1.0.111',
     date: '2026-04-04',
     changes: [

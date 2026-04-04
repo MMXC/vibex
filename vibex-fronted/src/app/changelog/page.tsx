@@ -275,7 +275,11 @@ const mockChangelog: ChangelogEntry[] = [
     ],
     commit: '05dad6f8',
   },
-  { Flaky测试治理 — 不稳定测试注册 + 重试机制',
+  {
+    version: '1.0.111',
+    date: '2026-04-04',
+    changes: [
+      'Flaky测试治理 — 不稳定测试注册 + 重试机制',
       '✅ flaky-tests.json: 不稳定测试注册表',
       '✅ tests/flaky-helpers.ts: flakiness detection helpers',
       '✅ playwright.ci.config.ts: retry 配置优化',

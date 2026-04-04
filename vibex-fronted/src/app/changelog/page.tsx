@@ -175,6 +175,7 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '8f8eaa79',
   },
   {
+    version: '1.0.117',
     date: '2026-04-04',
     changes: [
       '📋 vibex-pm-proposals/E3: 统一交付中心 — dashboard sidebar 入口',
@@ -184,8 +185,8 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '0ad59199',
   },
   {
-    version: '1.0.115',
-    date: '2026-04-03',
+    version: '1.0.116',
+    date: '2026-04-04',
     changes: [
       '📋 vibex-pm-proposals/E1: 新手引导 — OnboardingProvider + 5步引导流程',
       '✅ OnboardingProvider: 上下文注入 + localStorage 持久化',

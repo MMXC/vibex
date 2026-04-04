@@ -2084,7 +2084,6 @@ def cmd_update(args):
             _validate_proposal_content(proposal_path)
 
     stage["status"] = new_status
-    print(f"DEBUG_A: stage status set to {new_status!r}", flush=True)
     stage["updatedBy"] = "cli"   # CLI 触发的状态更新标识
     _log_update(args.project, stage_id, old_status, new_status, "cli")
     if new_status == "in-progress" and not stage.get("startedAt"):
@@ -2094,11 +2093,9 @@ def cmd_update(args):
 
     # ── E1-T1 / E4: Commit hash recording on done ────────────────
     if new_status == "done":
-        print(f"DEBUG COMMIT: new_status={new_status!r}, old_status={old_status!r}", flush=True)
-        result = validate_task_completion(args.project, stage_id, stage, old_status)
+        result = validate_task_completion(args.project, stage_id, stage, old_status=old_status)
         if result["commit"]:
             stage["commit"] = result["commit"]
-            print(f"DEBUG: recorded commit {result['commit'][:8]}")
         for warning in result["warnings"]:
             print(warning)
 

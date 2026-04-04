@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
 import { loginSchema } from '@/schemas/security';  // S3.1: Auth route validation'
 import { PrismaClient } from '@prisma/client';
-import { hashPassword, verifyPassword, generateToken, getAuthUser } from '@/lib/auth';
+import { verifyPassword, generateToken } from '@/lib/auth';
 import { getEnv } from '@/lib/env';
 
 const prisma = new PrismaClient();
@@ -11,8 +10,7 @@ export async function POST(request: NextRequest) {
   try {
     const env = getEnv();
     const jwtSecret = env.JWT_SECRET;
-    const body = await request.json();
-    // S3.1: Validate with Zod schema
+    // S3.1: Validate with Zod schema - JSON parse error tolerance
     let body;
     try {
       body = await request.json();

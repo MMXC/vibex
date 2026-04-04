@@ -28,12 +28,29 @@
   - plan.ts: requirement max 50000, detectInjection()
 - **提交**: `f1210edb`, `e9ce97ef`
 
+### Added (api-input-validation-layer E4: JSON解析容错) — 2026-04-04
+- **E4 JSON解析容错**: safe-json.ts 工具库，防止畸形 JSON 导致 500 错误
+  - `lib/safe-json.ts`: `safeJsonParse()` + `parseJsonBody()` 双重容错
+  - `safeJsonParse(jsonString)`: 解析 JSON 字符串，失败返回 null
+  - `parseJsonBody(request, fallback?)`: 异步解析请求 body，失败返回 fallback 或 null
+  - auth/login/route.ts: 集成 JSON 解析容错，400 返回友好错误
+  - `schemas/security.ts`: loginSchema + registerSchema + createProjectSchema + updateProjectSchema
+- **提交**: `4da45f26`
+
 ### Added (api-input-validation-layer E3: 中风险路由覆盖) — 2026-04-04
 - **E3 中风险路由覆盖**: Projects + Canvas API schema 集成
   - Projects API: project + canvas schemas with Zod validation
   - Canvas API: withValidation middleware 集成
   - `schema.test.ts`: 230 行 schema 单元测试
 - **提交**: `28d5a6d1`
+### Added (api-input-validation-layer E4: JSON解析容错) — 2026-04-04
+- **E4 JSON解析容错**: `lib/safe-json.ts` 安全 JSON 解析工具
+  - `safeJsonParse<T>(data: string, fallback?: T)`: 同步安全解析，失败返回 fallback 或 null
+  - `parseJsonBody<T>(request, fallback?)`: 异步从 Request 对象解析 JSON，失败返回错误信息
+  - 防止畸形 JSON 导致 500，改由返回 400 + 友好错误信息
+  - auth/login + projects 路由补充了 Zod schema 集成
+- **提交**: `4da45f26`
+
 - **E2 安全高风险路由**: chat.ts + plan.ts 集成安全 schema + Prompt Injection 检测
   - S2.2: chat.ts 使用 `chatMessageSchema` + `INJECTION_KEYWORDS` blocklist
     - SYSTEM_PROMPT, ##Instructions, /system 等 Prompt Injection 关键词黑名单

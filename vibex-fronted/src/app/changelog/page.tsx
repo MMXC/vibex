@@ -103,6 +103,19 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '28d5a6d1',
   },
   {
+    version: '1.0.112',
+    date: '2026-04-04',
+    changes: [
+      '🔒 api-input-validation-layer/E4: JSON解析容错 — safe-json.ts 安全解析工具',
+      '✅ safeJsonParse<T>(data, fallback?): 同步安全解析，失败返回 fallback 或 null',
+      '✅ parseJsonBody<T>(request, fallback?): 异步从 Request 解析 JSON，失败返回错误信息',
+      '✅ 防止畸形 JSON 导致 500，改为 400 + 友好错误',
+      '✅ 提交 4da45f26',
+    ],
+    commit: '4da45f26',
+  },
+
+  {
     version: '1.0.104',
     date: '2026-04-03',
     changes: [
@@ -240,7 +253,10 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '629c5fe0',
   },
   {
- 测试覆盖率提升 — Canvas 核心模块分支覆盖达标',
+    version: '1.0.110',
+    date: '2026-04-03',
+    changes: [
+      '测试覆盖率提升 — Canvas 核心模块分支覆盖达标',
       '✅ historySlice: 45 tests, branch 98.0% (目标 ≥40%)',
       '✅ contextStore: branch 88.63% (目标 ≥50%)',
       '✅ flowStore: branch 63.15% (目标 ≥50%)',

@@ -2,11 +2,13 @@
  * S4: Safe JSON parsing utility
  * Returns null on parse error, so callers can return 400 gracefully
  */
-export function safeJsonParse<T = unknown>(
-  request: Request | Request['json'] extends () => Promise<infer R> ? R : never
-): T | null {
+
+/**
+ * Parse JSON string safely, returns null on error
+ */
+export function safeJsonParse(jsonString: string): unknown | null {
   try {
-    return null as T;
+    return JSON.parse(jsonString);
   } catch {
     return null;
   }

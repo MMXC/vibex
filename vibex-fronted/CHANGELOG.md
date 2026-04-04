@@ -47,6 +47,16 @@
 - `vibex-backend/src/schemas/schema.test.ts` — 230 行 schema 单元测试
 
 **提交**: `28d5a6d1`
+### [api-input-validation-layer E4: JSON解析容错] — 2026-04-04
+
+#### Added
+- `vibex-backend/src/lib/safe-json.ts` — JSON.parse 错误容忍工具
+  - `safeJsonParse<T>(data: string, fallback?: T)`: 同步安全解析，失败返回 fallback 或 null
+  - `parseJsonBody<T>(request, fallback?)`: 异步从 Request 解析 JSON，失败返回错误信息
+  - auth/login + projects 路由补充了 Zod schema 集成
+
+**提交**: `4da45f26`
+
 
 #### Backend
 - `schemas/security.ts`: chatMessageSchema + planAnalyzeSchema + INJECTION_KEYWORDS

@@ -32,6 +32,14 @@
   - 新增 2 tests (`auth.test.ts`)
   - **提交**: `2b0d72b8`
 
+### Added (canvas-generate-components-prompt-fix Epic1: flowId 修复) — 2026-04-05
+- **Epic1 flowId 修复**: `generate-components/route.ts` 使用真实 `f.id` 替代顺序编号
+  - 旧: `[flow-1] name (上下文ID: id)`
+  - 新: `f.id: name (上下文: id)`
+  - USER_PROMPT 约束: flowId 必须使用真实 id (`flow-xxx`)，禁止使用流程名
+  - `generate-components.test.ts`: 8 tests pass
+- **提交**: `26c383f7`
+
 ### Added (vibex-backend-deploy-stability E2: Cache API 限流) — 2026-04-05
 - **E2 Cache API限流**: `rateLimit.ts` 重构为 Cache-first + InMemory fallback 架构
   - `CacheStore`: 使用 `caches.default` (Cloudflare KV) 读写限流计数

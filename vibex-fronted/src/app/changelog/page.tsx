@@ -152,6 +152,18 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.113',
+    date: '2026-04-03',
+    changes: [
+      '📋 vibex-dev-proposals/E1: TypeScript 编译修复 — flow-execution 类型 + ESLint import/no-duplicates',
+      '✅ flow-execution/types.ts: NodeResult + SimulationResult interfaces',
+      '✅ ExecutionConfig → FlowExecutionConfig reference fix',
+      '✅ import/no-duplicates fix: merge split imports',
+      '✅ 提交 914919b8, 029a3366',
+    ],
+    commit: '029a3366',
+  },
+  {
     version: '1.0.104',
     date: '2026-04-03',
     changes: [

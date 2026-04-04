@@ -616,7 +616,8 @@
 
 ### E1: TypeScript 编译修复 (vibex-dev-proposals-20260403_024652)
 - **E1**: flow-execution handlers 类型修复，TS 编译 0 错误
-- Commit: `914919b8`
+- **E1**: ESLint import/no-duplicates fix in useCanvasEvents.ts
+- Commit: `914919b8`, `029a3366`
 
 ### E1: E2E Flaky 治理 (vibex-tester-proposals-20260403_024652)
 - **E1-S1**: Playwright Config — retries:2, workers:1, expect.timeout:30000 ✅

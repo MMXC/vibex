@@ -232,6 +232,13 @@
   - 突变测试策略
 - **提交**: `635147fb`
 
+### Added (vibex-dev-proposals-20260403_024652 E1: TypeScript 编译修复) — 2026-04-03
+- **E1 TypeScript 编译修复**: flow-execution 类型修复 + ESLint import/no-duplicates
+  - `flow-execution/types.ts`: NodeResult + SimulationResult interfaces
+  - `ExecutionConfig` → `FlowExecutionConfig` reference fix
+  - `import/no-duplicates` fix: merge split imports in useCanvasEvents.ts
+- **提交**: `914919b8`, `029a3366`
+
 ### Added (vibex-dev-proposals-20260403_024652 E3: Playwright E2E + 合约测试) — 2026-04-03
 - **E3 Playwright E2E**: auto-save + conflict-dialog + contract tests
   - `tests/e2e/auto-save.spec.ts` — 4 E2E tests (debounce/beacon/manual/error)

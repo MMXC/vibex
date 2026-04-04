@@ -7,6 +7,15 @@
   - `flaky-tests.json`: 不稳定测试注册表
 - **提交**: `8d6eb70d`
 
+### Added (vibex-tester-proposals-20260403_024652 E2: Mock-Schema 一致性契约测试) — 2026-04-03
+- **E2 Mock-Schema 契约测试**: mock 与 schema 之间的 drift 检测基础设施
+  - `test/contract/mock-consistency.test.ts` — 7 个 mock-schema 一致性测试用例
+  - `scripts/generate-schemas.ts` — 从后端测试提取 JSON Schema 的工具
+  - `scripts/check-mock-sync.js` — 检测 schema-mock drift 的 CI 脚本
+  - `test/schemas/` — JSON Schema 注册表 (含 domain-model.json 示例)
+  - `StepClarification.tsx` — 修复重复 import bug
+- **提交**: `4123e34f`
+
 ### Added (canvas-sync-protocol-complete E1: 后端SnapshotsAPI) — 2026-04-03
 - **E1 后端 SnapshotsAPI**: 乐观锁 + 冲突检测
   - `snapshots.ts`: version 字段 + 409 VERSION_CONFLICT 响应

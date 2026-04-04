@@ -1,3 +1,17 @@
+### Added (vibex-canvas-context-selection E1: selectedNodeIds 读取修复) — 2026-04-05
+- **E1 selectedNodeIds 修复**: BusinessFlowTree.tsx handleContinueToComponents 发送选中上下文
+  - 读取 `selectedNodeIds.context` 而非全部 `contextNodes`
+  - 选中部分→发送选中, 未选中→fallback全部, 空→toast错误
+  - `BusinessFlowTree.test.tsx`: 4 tests pass
+- **提交**: `e222d5d6`
+
+### Added (canvas-generate-components-context-fix E1: BoundedContextTree checkbox 修复) — 2026-04-05
+- **E1 checkbox 修复**: BoundedContextTree.tsx ContextCard checkbox 调用正确函数
+  - `toggleContextNode(node.nodeId)` → `onToggleSelect?.(node.nodeId)`
+  - checkbox 点击触发 selection，确认按钮保持 `toggleContextNode` 逻辑
+  - `BoundedContextTree.test.tsx`: 测试更新
+- **提交**: `d4b5a253`
+
 ### Added (vibex-backend-p0-20260405 E1-E3: OPTIONS/CORS + NODE_ENV + JWT 修复) — 2026-04-05
 - **E1 OPTIONS/CORS 修复**: gateway.ts CORS preflight handler 顺序修复
   - `protected_.options('/*')` 移到 `protected_.use('*', authMiddleware)` 之前

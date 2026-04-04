@@ -100,16 +100,27 @@ ls vibex-fronted/src/app/api/v1/canvas/*/route.ts 2>/dev/null || echo "frontend 
 
 ### E3-T1: 空状态 UI（2h）
 
-| 步骤 | 描述 | 产出 |
-|------|------|------|
-| T1.1 | CanvasPage / Canvas 三树添加空状态组件 | 空状态文案 |
-| T1.2 | API 错误时显示错误状态（而非空白） | 错误提示 |
+| 步骤 | 描述 | 产出 | 状态 |
+|------|------|------|------|
+| T1.1 | CanvasPage / Canvas 三树添加空状态组件 | 空状态文案 | ✅ |
+| T1.2 | API 错误时显示错误状态（而非空白） | 错误提示 | ✅ |
+
+**实现细节**：
+- `BoundedContextTree`: 用 `EmptyState` 组件替换自定义 `.contextTreeEmpty` div，使用 `Network` 图标
+- `BusinessFlowTree`: 用 `EmptyState` 组件替换自定义 `.emptyFlowList` div，使用 `GitBranch` 图标
+- `ComponentTree`: 用 `EmptyState` 组件替换自定义 `.contextTreeEmpty` div，使用 `Layers` 图标
+- `handleGenerate` (`BoundedContextTree`, `ComponentTree`): 添加 try-catch 错误处理
 
 ### E3-T2: 错误提示 UI（1h）
 
-| 步骤 | 描述 | 产出 |
-|------|------|------|
-| T2.1 | API 返回 `{ success: false }` 时 toast 提示 | 用户可见错误 |
+| 步骤 | 描述 | 产出 | 状态 |
+|------|------|------|------|
+| T2.1 | API 返回 `{ success: false }` 时 toast 提示 | 用户可见错误 | ✅ |
+
+**实现细节**：
+- `BusinessFlowTree.handleContinueToComponents`: catch 块添加 `toast.showToast(err.message, 'error')`
+- `BoundedContextTree.handleGenerate`: 添加 try-catch finally 结构（mock 仍可生成）
+- `ComponentTree.handleGenerate`: 添加 try-catch finally 结构（mock 正常生成）
 
 ---
 
@@ -133,8 +144,8 @@ ls vibex-fronted/src/app/api/v1/canvas/*/route.ts 2>/dev/null || echo "frontend 
 - [ ] `task list --proposal P001` 返回完整提案链路
 
 ### E3 验收
-- [ ] Canvas 三树空状态文案正确
-- [ ] API 错误时显示 toast 提示
+- [x] Canvas 三树空状态文案正确（使用 EmptyState 组件）
+- [x] API 错误时显示 toast 提示（BusinessFlowTree.handleContinueToComponents）
 
 ---
 
@@ -149,6 +160,12 @@ git checkout HEAD -- \
 # E4 回滚
 git checkout HEAD -- \
   ~/.openclaw/skills/team-tasks/scripts/task_manager.py
+
+# E3 回滚
+git checkout HEAD -- \
+  vibex-fronted/src/components/canvas/BoundedContextTree.tsx \
+  vibex-fronted/src/components/canvas/BusinessFlowTree.tsx \
+  vibex-fronted/src/components/canvas/ComponentTree.tsx
 ```
 
 ---

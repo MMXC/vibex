@@ -66,6 +66,15 @@ app.use('*', cors({
   allowHeaders: ['Content-Type', 'Authorization'],
 }));
 
+// E2.1: 全局 OPTIONS handler — 所有路径 OPTIONS 返回 204 + CORS headers
+// 注册在 cors 之后，确保 OPTIONS preflight 不会被其他中间件拦截
+app.options('/*', (c) => {
+  c.header('Access-Control-Allow-Origin', '*');
+  c.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  c.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  return c.body(null, 204);
+});
+
 // Health check endpoints
 app.get('/', (c) => {
   return c.json({
@@ -146,7 +155,10 @@ export default app;
 export { CollaborationRoom } from './websocket/CollaborationRoom';
 
 // 仅在本地开发时启动服务器（动态导入避免 Cloudflare Workers 打包失败）
-if (process.env.NODE_ENV !== 'production') {
+// E2.2: 使用 optional chaining 避免 Workers 环境下 process.env 不存在导致崩溃
+const isWorkers = typeof globalThis.caches !== 'undefined';
+const isProduction = process.env?.NODE_ENV === 'production';
+if (!isWorkers && !isProduction) {
   const port = parseInt(process.env.PORT || '3000');
   console.log(`Server running on http://localhost:${port}`);
   

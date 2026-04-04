@@ -158,24 +158,25 @@ canvas.post('/generate-flows',
 
       const aiService = createAIService(env)
 
+      // E2: Include ctx.id in contextSummary so AI knows real IDs for contextId
       const contextSummary = contexts
-        .map((ctx) => `- ${ctx.name}: ${ctx.description} (类型: ${ctx.type})`)
+        .map((ctx) => `- ${ctx.id}: ${ctx.name}: ${ctx.description} (类型: ${ctx.type})`)
         .join('\n')
 
       // Step 2a: Get flow structure (Process)
       const flowPrompt = `根据以下限界上下文，输出一组业务流程。
 
-上下文列表：
+上下文列表（必须使用 id 字段）：
 ${contextSummary}
 
 输出 JSON 数组，每项只包含：
-- name: 流程名称
-- contextId: 所属上下文ID
+- name: 流程名称（名词短语，如"用户下单流程"），禁止使用上下文名称
+- contextId: 所属上下文 id（必须使用上面列表中的 id，不能随意填写）
 - steps: 步骤数组，每步只含 name（步骤名）和 actor（参与者）
 - 不要加 description、confidence 等元字段
 
 示例：
-[{"name":"用户下单","contextId":"xxx","steps":[{"name":"填写订单","actor":"用户"},{"name":"扣减库存","actor":"系统"}]}]`
+[{"name":"用户下单流程","contextId":"ctx-abc123","steps":[{"name":"填写订单","actor":"用户"},{"name":"扣减库存","actor":"系统"}]}]`
 
       const flowResult = await aiService.generateJSON<Array<{
         name: string
@@ -198,20 +199,32 @@ ${contextSummary}
 
       // Normalize flows
       const generationId = generateId()
-      const flows: BusinessFlow[] = flowResult.data.map((flow, idx) => ({
-        id: `flow-${generateId()}`,
-        name: flow.name || `流程 ${idx + 1}`,
-        contextId: flow.contextId || contexts[0]?.id || '',
-        description: '',
-        steps: (flow.steps || []).map((step, sIdx) => ({
-          id: `step-${generateId()}`,
-          name: step.name || `步骤 ${sIdx + 1}`,
-          actor: step.actor || '用户',
+      const contextIds = new Set(contexts.map(ctx => ctx.id))
+      const flows: BusinessFlow[] = flowResult.data.map((flow, idx) => {
+        // E2: Validate contextId — if AI returns invalid ID, try name matching
+        let validContextId = flow.contextId
+        if (!contextIds.has(flow.contextId)) {
+          // Try to find context by name match
+          const matched = contexts.find(ctx =>
+            ctx.name.includes(flow.name) || flow.name.includes(ctx.name)
+          )
+          validContextId = matched?.id ?? contexts[0]?.id ?? ''
+        }
+        return {
+          id: `flow-${generateId()}`,
+          name: flow.name || `流程 ${idx + 1}`,
+          contextId: validContextId,
           description: '',
-          order: sIdx,
-        })),
-        confidence: 0.75,
-      }))
+          steps: (flow.steps || []).map((step, sIdx) => ({
+            id: `step-${generateId()}`,
+            name: step.name || `步骤 ${sIdx + 1}`,
+            actor: step.actor || '用户',
+            description: '',
+            order: sIdx,
+          })),
+          confidence: 0.75,
+        }
+      })
 
       const confidence = flowResult.usage
         ? Math.max(0.5, Math.min(0.9, 1 - (flowResult.usage.completionTokens / 4096)))

@@ -32,6 +32,15 @@
   - 新增 2 tests (`auth.test.ts`)
   - **提交**: `2b0d72b8`
 
+### Added (vibex-backend-deploy-stability E2: Cache API 限流) — 2026-04-05
+- **E2 Cache API限流**: `rateLimit.ts` 重构为 Cache-first + InMemory fallback 架构
+  - `CacheStore`: 使用 `caches.default` (Cloudflare KV) 读写限流计数
+  - `InMemoryStore`: 本地降级 (local dev / test)
+  - 降级设计: Cache 不可用时自动使用 InMemory，两者都失败则 fail-open
+  - `wrangler.toml`: 添加 `[[caches]] name = "RATE_LIMIT_CACHE"`
+  - `rateLimit.test.ts`: 13 tests (Cache fallback, 429 enforcement, headers, fail-open)
+- **提交**: `85835af5`
+
 ### Added (vibex-backend-deploy-stability E1: SSE 超时清理) — 2026-04-05
 - **E1 SSE超时清理**: sse-stream-lib/index.ts AbortController 10s 超时 + timers 数组
   - `timers[]` 跟踪所有 setTimeout ID

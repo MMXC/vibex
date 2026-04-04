@@ -4313,3 +4313,69 @@
     min-width: 0;
   }
 }
+
+/* E1-T3: TreeToolbar 统一工具栏 */
+.treeToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-2);
+  min-height: 44px;
+  gap: 8px;
+}
+
+.treeToolbarCount {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  min-width: 60px;
+}
+
+.treeToolbarButtons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.treeToolbar .toolbarButton {
+  min-height: 32px;
+  min-width: 60px;
+  padding: 4px 10px;
+  font-size: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.treeToolbar .toolbarButton:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-hover);
+}
+
+.treeToolbar .continueButton {
+  min-height: 32px;
+  min-width: 100px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--color-primary);
+  border-radius: 6px;
+  background: var(--color-primary);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.treeToolbar .continueButton:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.treeToolbar .continueButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

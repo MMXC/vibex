@@ -56,6 +56,7 @@ import { useCanvasEvents } from '@/hooks/canvas/useCanvasEvents';
 import { PhaseProgressBar } from './PhaseProgressBar';
 import { TabBar } from './TabBar';
 import { TreePanel } from './TreePanel';
+import { TreeToolbar } from './TreeToolbar';
 import { BoundedContextTree } from './BoundedContextTree';
 import { ComponentTree } from './ComponentTree';
 import { BusinessFlowTree } from './BusinessFlowTree';
@@ -68,7 +69,6 @@ import { TreeStatus } from './TreeStatus';
 import { TemplateSelector } from './features/TemplateSelector';
 import { VersionHistoryPanel } from './features/VersionHistoryPanel';
 import { SaveIndicator } from './features/SaveIndicator';
-import { PhaseIndicator } from './features/PhaseIndicator';
 import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
 import { useAutoSave } from '@/hooks/canvas/useAutoSave';
 import { useHasProject } from '@/hooks/useHasProject';
@@ -512,20 +512,16 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             onToggleCollapse={toggleContextPanel}
             onNodeClick={handleMinimapNodeClick}
             actions={
-              contextNodes.length > 0 ? (
-                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                  <button
-                    type="button"
-                    className={styles.secondaryButton}
-                    onClick={() => autoGenerateFlows(contextNodes.filter((c) => c.isActive !== false))}
-                    disabled={flowGenerating}
-                    aria-label="生成流程树"
-                    title="基于已确认的限界上下文生成业务流程树"
-                  >
-                    {flowGenerating
-                      ? `◌ ${flowGeneratingMessage ?? '生成中...'}`
-                      : '→ 继续 → 流程树'}
-                  </button>
+              <TreeToolbar
+                treeType="context"
+                nodeCount={contextNodes.length}
+                onSelectAll={() => useContextStore.getState().selectAllNodes?.('context')}
+                onDeselectAll={() => useContextStore.getState().selectAllNodes?.('context')}
+                onClear={() => useContextStore.getState().setContextNodes([])}
+                onContinue={() => autoGenerateFlows(contextNodes.filter((c) => c.isActive !== false))}
+                continueLabel={contextNodes.length === 0 ? '→ 选择上下文' : flowGenerating ? `◌ ${flowGeneratingMessage ?? '生成中...'}` : '→ 继续 → 流程树'}
+                continueDisabled={flowGenerating || contextNodes.length === 0}
+                extraButtons={
                   <button
                     type="button"
                     className={styles.secondaryButton}
@@ -546,12 +542,11 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                     }}
                     disabled={aiThinking || !requirementText.trim()}
                     aria-label="重新生成限界上下文"
-                    title="使用当前需求文本重新生成上下文"
                   >
                     {aiThinking ? '◌ 重新生成中...' : '🔄 重新生成'}
                   </button>
-                </div>
-              ) : undefined
+                }
+              />
             }
           >
             <BoundedContextTree />
@@ -568,20 +563,16 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             onToggleCollapse={toggleFlowPanel}
             onNodeClick={handleMinimapNodeClick}
             actions={
-              flowNodes.length > 0 ? (
-                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                  <button
-                    type="button"
-                    className={styles.secondaryButton}
-                    onClick={handleContinueToComponents}
-                    disabled={componentGenerating}
-                    aria-label="继续到组件树"
-                    title="基于已确认的流程树生成组件树"
-                  >
-                    {componentGenerating ? '◌ 生成中...' : '继续 → 组件树'}
-                  </button>
-                </div>
-              ) : undefined
+              <TreeToolbar
+                treeType="flow"
+                nodeCount={flowNodes.length}
+                onSelectAll={() => {}}
+                onDeselectAll={() => {}}
+                onClear={() => useFlowStore.getState().setFlowNodes([])}
+                onContinue={handleContinueToComponents}
+                continueLabel={flowNodes.length === 0 ? '→ 选择流程' : componentGenerating ? '◌ 生成中...' : '继续 → 组件树'}
+                continueDisabled={componentGenerating || flowNodes.length === 0}
+              />
             }
           >
             <BusinessFlowTree isActive={flowActive || activeTree === null} />
@@ -597,6 +588,15 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             isActive={componentActive}
             onToggleCollapse={toggleComponentPanel}
             onNodeClick={handleMinimapNodeClick}
+            actions={
+              <TreeToolbar
+                treeType="component"
+                nodeCount={componentNodes.length}
+                onSelectAll={() => useComponentStore.getState().selectAllNodes?.()}
+                onDeselectAll={() => useComponentStore.getState().clearNodeSelection?.()}
+                onClear={() => useComponentStore.getState().setComponentNodes([])}
+              />
+            }
           >
             <ComponentTree />
           </TreePanel>
@@ -673,33 +673,6 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
           />
         </div>
       )}
-
-      {/* E3 S3.1: Phase Indicator — top-left of canvas area */}
-      {phase !== 'input' && (
-        <div className={styles.phaseIndicatorWrapper}>
-          <PhaseIndicator
-            phase={phase}
-            onPhaseChange={setPhase}
-            nodeCount={
-              phase === 'context'
-                ? contextNodes.length
-                : phase === 'flow'
-                  ? flowNodes.length
-                  : phase === 'component'
-                    ? componentNodes.length
-                    : undefined
-            }
-          />
-        </div>
-      )}
-
-      {/* Phase Label */}
-      <div className={styles.phaseLabelBar}>
-        <span className={styles.phaseCurrentLabel}>{phaseLabel}</span>
-        {phase !== 'input' && phaseHint && (
-          <span className={styles.phaseHint}>{phaseHint}</span>
-        )}
-      </div>
 
       {/* F1: Expand controls — shown when not in input phase */}
       {phase !== 'input' && (
@@ -844,20 +817,16 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 onToggleCollapse={toggleContextPanel}
                 onNodeClick={handleMinimapNodeClick}
                 actions={
-                  contextNodes.length > 0 ? (
-                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                      <button
-                        type="button"
-                        className={styles.secondaryButton}
-                        onClick={() => autoGenerateFlows(contextNodes.filter((c) => c.isActive !== false))}
-                        disabled={flowGenerating}
-                        aria-label="继续到流程树"
-                        title="基于已确认的限界上下文生成业务流程树"
-                      >
-                        {flowGenerating
-                          ? `◌ ${flowGeneratingMessage ?? '生成中...'}`
-                          : '→ 继续 → 流程树'}
-                      </button>
+                  <TreeToolbar
+                    treeType="context"
+                    nodeCount={contextNodes.length}
+                    onSelectAll={() => useContextStore.getState().selectAllNodes?.('context')}
+                    onDeselectAll={() => useContextStore.getState().selectAllNodes?.('context')}
+                    onClear={() => useContextStore.getState().setContextNodes([])}
+                    onContinue={() => autoGenerateFlows(contextNodes.filter((c) => c.isActive !== false))}
+                    continueLabel={contextNodes.length === 0 ? '→ 选择上下文' : flowGenerating ? `◌ ${flowGeneratingMessage ?? '生成中...'}` : '→ 继续 → 流程树'}
+                    continueDisabled={flowGenerating || contextNodes.length === 0}
+                    extraButtons={
                       <button
                         type="button"
                         className={styles.secondaryButton}
@@ -878,12 +847,11 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                         }}
                         disabled={aiThinking || !requirementText.trim()}
                         aria-label="重新生成限界上下文"
-                        title="使用当前需求文本重新生成上下文"
                       >
                         {aiThinking ? '◌ 重新生成中...' : '🔄 重新生成'}
                       </button>
-                    </div>
-                  ) : undefined
+                    }
+                  />
                 }
               >
                 <HoverHotzone position="left-edge" panel="left" />
@@ -900,29 +868,27 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 onToggleCollapse={toggleFlowPanel}
                 onNodeClick={handleMinimapNodeClick}
                 actions={
-                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
-                    {flowNodes.length > 0 && (
+                  <TreeToolbar
+                    treeType="flow"
+                    nodeCount={flowNodes.length}
+                    onSelectAll={() => {}}
+                    onDeselectAll={() => {}}
+                    onClear={() => useFlowStore.getState().setFlowNodes([])}
+                    onContinue={handleContinueToComponents}
+                    continueLabel={flowNodes.length === 0 ? '→ 选择流程' : componentGenerating ? '◌ 生成中...' : '继续 → 组件树'}
+                    continueDisabled={componentGenerating || flowNodes.length === 0}
+                    extraButtons={
                       <button
                         type="button"
-                        className={styles.secondaryButton}
-                        onClick={handleContinueToComponents}
-                        disabled={componentGenerating}
-                        aria-label="继续到组件树"
-                        title="基于已确认的流程树生成组件树"
+                        className={styles.expandButton}
+                        onClick={toggleCenter}
+                        aria-label={centerExpand === 'default' ? '展开中间面板' : '收起中间面板'}
+                        title={centerExpand === 'default' ? '展开中间面板' : '收起中间面板'}
                       >
-                        {componentGenerating ? '◌ 生成中...' : '继续 → 组件树'}
+                        {centerExpand === 'default' ? '⤵ 展开' : '⤴ 收起'}
                       </button>
-                    )}
-                    <button
-                      type="button"
-                      className={styles.expandButton}
-                      onClick={toggleCenter}
-                      aria-label={centerExpand === 'default' ? '展开中间面板' : '收起中间面板'}
-                      title={centerExpand === 'default' ? '展开中间面板' : '收起中间面板'}
-                    >
-                      {centerExpand === 'default' ? '⤵ 展开' : '⤴ 收起'}
-                    </button>
-                  </div>
+                    }
+                  />
                 }
               >
                 <HoverHotzone position="left-edge" panel="center" centerExpandDirection="left" />
@@ -938,6 +904,15 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 isActive={componentActive}
                 onToggleCollapse={toggleComponentPanel}
                 onNodeClick={handleMinimapNodeClick}
+                actions={
+                  <TreeToolbar
+                    treeType="component"
+                    nodeCount={componentNodes.length}
+                    onSelectAll={() => useComponentStore.getState().selectAllNodes?.()}
+                    onDeselectAll={() => useComponentStore.getState().clearNodeSelection?.()}
+                    onClear={() => useComponentStore.getState().setComponentNodes([])}
+                  />
+                }
               >
                 <HoverHotzone position="left-edge" panel="right" />
                 <ComponentTree />

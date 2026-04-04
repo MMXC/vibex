@@ -20,6 +20,7 @@ import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
 import { getHistory, addHistory } from './requirementHistoryStore';
 import type { RequirementHistoryItem } from './requirementHistoryStore';
 import type { BoundedContextNode, BoundedContextDraft } from '@/lib/canvas/types';
+import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import styles from './leftDrawer.module.css';
 
 export function LeftDrawer() {
@@ -49,7 +50,7 @@ export function LeftDrawer() {
   }, []);
 
   // ── Send handler ───────────────────────────────────────────────
-  const handleSend = useCallback(() => {
+  const handleSend = useCallback(async () => {
     const text = inputValue.trim();
     if (!text || aiThinking) return;
 
@@ -60,20 +61,31 @@ export function LeftDrawer() {
     // Sync to store
     setRequirementText(text);
 
-    // Trigger generation: inline mock context generation
-    const drafts: BoundedContextDraft[] = [
-      { name: '需求管理', description: '处理需求录入', type: 'core' },
-      { name: '业务流程', description: '核心业务处理', type: 'core' },
-    ];
-    const newCtxs: BoundedContextNode[] = drafts.map((d, i) => ({
-      nodeId: `ctx-gen-${Date.now()}-${i}`,
-      name: d.name,
-      description: d.description,
-      type: d.type,
-      status: 'pending' as const,
-      children: [],
-    }));
-    setContextNodes(newCtxs);
+    // Trigger generation: call real canvasApi
+    try {
+      const result = await canvasApi.generateContexts({
+        requirementText: text,
+        projectId: localStorage.getItem('vibex_project_id') ?? '',
+      });
+
+      if (result.success && result.contexts) {
+        const nodes: BoundedContextNode[] = result.contexts.map((ctx) => ({
+          nodeId: ctx.id,
+          name: ctx.name,
+          description: ctx.description,
+          type: ctx.type as 'core' | 'supporting' | 'generic' | 'external',
+          status: 'pending' as const,
+          children: [],
+        }));
+        setContextNodes(nodes);
+      } else {
+        // Fallback: set empty on failure
+        setContextNodes([]);
+      }
+    } catch (err) {
+      console.error('Failed to generate contexts:', err);
+      setContextNodes([]);
+    }
   }, [inputValue, aiThinking, setRequirementText, setContextNodes]);
 
   // ── Keyboard shortcut: Ctrl/Cmd+Enter to send ──────────────────

@@ -36,7 +36,9 @@
 - **E1 Canvas API追踪**: proposals/canvas-api-tracker.md 记录4个端点状态（100% real AI）
 - **E2 Sprint追踪**: proposals/index.md 更新，包含6条提案追踪（2026-04-05 sprint）
 - **E3 提案质量门禁**: proposals/quality_gate.py 提案质量评分工具（10/13通过）
-- **提交**: `8299d90a`, `785f57a4`
+  + proposals/TEMPLATE.md 新增 ## 根因分析 / ## 建议方案 章节
+  + quality_gate.py 修复：仅验证 ## P### 块，排除 .py 文件
+- **提交**: `8299d90a`, `57d9974d`, `785f57a4`
 
 ### Added (vibex-proposals-20260405 E3: Canvas UX增强) — 2026-04-05
 - **E3 Canvas UX增强**: EmptyState组件 + 错误toast通知

@@ -1,5 +1,36 @@
 # Changelog
 
+### [vibex-architect-proposals-20260403_024652 E1: 乐观锁] — 2026-04-03
+
+#### Changed
+- `src/hooks/canvas/useAutoSave.ts` — E1 乐观锁支持
+  - `lastSnapshotVersionRef` 追踪本地版本号
+  - 每次保存携带 `version` 到后端
+  - 409 冲突时设置 `conflict` 状态
+  - 成功响应包含新版本号并更新本地
+- `src/components/canvas/features/SaveIndicator.tsx` — 新增 `conflict` 状态显示（版本冲突 + 解决按钮）
+- `src/lib/canvas/types.ts` — `CanvasSnapshot.version` + `CreateSnapshotInput.version` 字段
+
+**提交**: `635147fb`
+
+### [vibex-architect-proposals-20260403_024652 E2: CascadeUpdateManager迁移] — 2026-04-03
+
+#### Changed
+- `src/lib/canvas/canvasStore.ts` — 删除内联 `CascadeUpdateManager` class
+  - 改用 `cascade/` 模块导出的 `areAllConfirmed`
+  - canvasStore.ts 从 1513 行减少（replaced inline class with import）
+
+**提交**: `635147fb`
+
+### [vibex-architect-proposals-20260403_024652 E4: 契约测试] — 2026-04-03
+
+#### Added
+- `tests/contracts/openapi.yaml` — Canvas Snapshots API 完整 OpenAPI 规范
+  - 包含 409 conflict response schema
+  - 包含 GET/POST snapshots, GET/:id, POST/:id/restore, GET/POST rollback
+
+**提交**: `635147fb`
+
 ### [vibex-architect-proposals-20260403_024652 E5: 测试策略文档] — 2026-04-03
 
 #### Added

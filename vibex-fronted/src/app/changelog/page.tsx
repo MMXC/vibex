@@ -18,6 +18,47 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.103',
+    date: '2026-04-03',
+    changes: [
+      '🔒 vibex-architect-proposals/E1: 乐观锁 — useAutoSave version tracking + 409 conflict',
+      '✅ lastSnapshotVersionRef: 每次保存携带 version，409 时设置 conflict 状态',
+      '✅ SaveIndicator: conflict 状态显示 + 解决按钮',
+      '✅ 提交 635147fb',
+    ],
+    commit: '635147fb',
+  },
+  {
+    version: '1.0.103',
+    date: '2026-04-03',
+    changes: [
+      '🔗 vibex-architect-proposals/E2: CascadeUpdateManager迁移 — canvasStore.ts class 外移',
+      '✅ 删除内联 class，改用 cascade/areAllConfirmed 导入',
+      '✅ 提交 635147fb',
+    ],
+    commit: '635147fb',
+  },
+  {
+    version: '1.0.103',
+    date: '2026-04-03',
+    changes: [
+      '📋 vibex-architect-proposals/E4: 契约测试 — OpenAPI 规范 + 409 conflict schema',
+      '✅ tests/contracts/openapi.yaml: Canvas Snapshots API 完整规范',
+      '✅ 提交 635147fb',
+    ],
+    commit: '635147fb',
+  },
+  {
+    version: '1.0.103',
+    date: '2026-04-03',
+    changes: [
+      '📝 vibex-architect-proposals/E5: 测试策略文档 — docs/TESTING_STRATEGY.md',
+      '✅ 测试分层架构: Jest 单元 + Playwright E2E + 合约测试 + 突变测试',
+      '✅ 提交 635147fb',
+    ],
+    commit: '635147fb',
+  },
+  {
     version: '1.0.102',
     date: '2026-04-04',
     changes: [

@@ -6,6 +6,21 @@
   - 单元测试 3/3 pass
 - **提交**: `b2bc5897`, `adb62068`
 
+### Added (vibex-architect-proposals-20260403_024652 E1: 乐观锁) — 2026-04-03
+- **E1 乐观锁**: useAutoSave version tracking + 409 conflict handling
+  - `useAutoSave.ts`: 发送/追踪 version，409 时设置 conflict 状态
+  - `SaveIndicator.tsx`: 新增 conflict 状态显示
+  - `types.ts`: CanvasSnapshot.version + CreateSnapshotInput.version
+- **提交**: `635147fb`
+
+### Added (vibex-architect-proposals-20260403_024652 E2: CascadeUpdateManager迁移) — 2026-04-03
+- **E2 迁移**: canvasStore.ts 删除内联 CascadeUpdateManager class，改用 cascade/ 模块导出
+- **提交**: `635147fb`
+
+### Added (vibex-architect-proposals-20260403_024652 E4: 契约测试) — 2026-04-03
+- **E4 契约测试**: `tests/contracts/openapi.yaml` Canvas Snapshots API 完整规范（含 409 conflict schema）
+- **提交**: `635147fb`
+
 ### Added (vibex-architect-proposals-20260403_024652 E5: 测试策略文档) — 2026-04-03
 - **E5 测试策略文档**: `docs/TESTING_STRATEGY.md` 测试分层架构文档
   - Jest 单元测试 + Playwright E2E 测试分层

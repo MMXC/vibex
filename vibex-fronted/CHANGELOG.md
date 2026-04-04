@@ -1,5 +1,14 @@
 # Changelog
 
+### [vibex-css-build-fix E3: 批量扫描module.css] — 2026-04-04 (vibex-css-build-fix)
+
+#### Added
+- `scripts/scan-orphaned-css.js` — 批量扫描所有 .module.css 孤立 CSS 属性行的 ESM 脚本，过滤 @keyframes/@supports/@media/@container/@layer 误报
+- `scan:css` npm script — 运行批量扫描
+- 扫描结果：209 files, 0 orphaned properties
+
+**提交**: `a0189186`
+
 ### [vibex-css-build-fix E2: stylelint集成] — 2026-04-04 (vibex-css-build-fix)
 
 #### Added

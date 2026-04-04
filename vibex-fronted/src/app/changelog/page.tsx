@@ -18,6 +18,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.99',
+    date: '2026-04-04',
+    changes: [
+      '🔧 vibex-css-build-fix/E3: 批量扫描 module.css — 0 orphaned properties',
+      '✅ scripts/scan-orphaned-css.js: 过滤 @keyframes/@media/@supports 误报',
+      '✅ 扫描 209 files, 0 orphaned',
+      '✅ 提交 a0189186',
+    ],
+    commit: 'a0189186',
+  },
+  {
     version: '1.0.98',
     date: '2026-04-04',
     changes: [

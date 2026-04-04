@@ -27,6 +27,7 @@ const SKIP_PATTERNS = [
   /__mocks__/,
   /\/mocks\//,
   /\/mock\//,
+  /\/test-utils\//,
 ];
 
 const srcDir = path.join(__dirname, '../src');

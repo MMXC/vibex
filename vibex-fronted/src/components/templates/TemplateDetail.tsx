@@ -17,6 +17,8 @@ export interface TemplateDetailProps {
   onClose?: () => void;
   /** 应用回调 */
   onApply?: (template: Template) => void;
+  /** 加载状态 */
+  loading?: boolean;
 }
 
 const DIFFICULTY_LABELS: Record<string, string> = {
@@ -34,6 +36,7 @@ export function TemplateDetail({
   template,
   onClose,
   onApply,
+  loading = false,
 }: TemplateDetailProps) {
   const [activePreview, setActivePreview] = useState(0);
   const previews = template.previewImages.length > 0
@@ -191,8 +194,8 @@ export function TemplateDetail({
           <button className={styles.cancelBtn} onClick={onClose}>
             取消
           </button>
-          <button className={styles.applyBtn} onClick={handleApply}>
-            使用此模板
+          <button className={styles.applyBtn} onClick={handleApply} disabled={loading}>
+            {loading ? '创建中...' : '使用此模板'}
           </button>
         </footer>
       </div>

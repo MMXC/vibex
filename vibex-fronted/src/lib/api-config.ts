@@ -43,6 +43,11 @@ export const API_CONFIG = {
       list: '/projects',
       create: '/projects',
       detail: (id: string) => `/projects/${id}`,
+      fromTemplate: '/projects/from-template',
+    },
+    template: {
+      list: '/templates',
+      detail: (id: string) => `/templates/${id}`,
     },
   },
 } as const;

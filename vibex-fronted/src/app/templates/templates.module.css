@@ -50,3 +50,31 @@
   z-index: 1000;
   padding: 24px;
 }
+
+.errorBanner {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2a1010;
+  border: 1px solid #c0392b;
+  color: #ff6b6b;
+  padding: 12px 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  z-index: 2000;
+  max-width: 500px;
+}
+
+.errorBanner button {
+  background: none;
+  border: none;
+  color: #ff6b6b;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  line-height: 1;
+}

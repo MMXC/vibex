@@ -17,6 +17,8 @@ const devLog = (...args: unknown[]) => {
 };
 import { TemplateGallery, TemplateDetail } from '@/components/templates';
 import type { Template } from '@/types/template';
+import { getAuthToken, getUserId } from '@/lib/auth-token';
+import { getApiUrl } from '@/lib/api-config';
 import styles from './templates.module.css';
 
 export default function TemplatesPage() {
@@ -26,27 +28,69 @@ export default function TemplatesPage() {
   const [galleryOpen, setGalleryOpen] = useState(true);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
+  const [applying, setApplying] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // 处理模板选择（点击卡片）
   const handleTemplateSelect = useCallback((template: Template) => {
     setSelectedTemplate(template);
     setDetailOpen(true);
+    setError(null);
   }, []);
 
   // 处理模板详情关闭
   const handleDetailClose = useCallback(() => {
     setDetailOpen(false);
     setSelectedTemplate(null);
+    setError(null);
   }, []);
 
-  // 处理模板应用
-  const handleApply = useCallback((template: Template) => {
+  // 处理模板应用 — E2: 创建项目并跳转
+  const handleApply = useCallback(async (template: Template) => {
     devLog('Applying template:', template.name);
-    alert(`已选择模板: ${template.name}\n点击"使用此模板"开始创建项目！\n\n模板包含 ${template.pages.length} 个页面。`);
-    setDetailOpen(false);
-    setSelectedTemplate(null);
-    // TODO: 导航到项目创建流程，传递模板 ID
-    router.push('/');
+    setApplying(true);
+    setError(null);
+
+    try {
+      const userId = getUserId();
+      if (!userId) {
+        // Not logged in — prompt login
+        router.push('/login?redirect=/templates');
+        return;
+      }
+
+      const response = await fetch(getApiUrl('/api/projects/from-template'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAuthToken() || ''}`,
+        },
+        body: JSON.stringify({
+          templateId: template.id,
+          userId,
+          projectName: template.name,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || `创建失败 (${response.status})`);
+      }
+
+      const data = await response.json();
+      devLog('Project created:', data);
+
+      setDetailOpen(false);
+      setSelectedTemplate(null);
+      // Navigate to canvas page
+      router.push(`/canvas/${data.projectId}`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '创建项目失败';
+      setError(msg);
+      devLog('Error creating project from template:', err);
+    } finally {
+      setApplying(false);
+    }
   }, [router]);
 
   return (
@@ -76,7 +120,16 @@ export default function TemplatesPage() {
           template={selectedTemplate}
           onClose={handleDetailClose}
           onApply={handleApply}
+          loading={applying}
         />
+      )}
+
+      {/* 错误提示 */}
+      {error && (
+        <div className={styles.errorBanner} role="alert">
+          <span>{error}</span>
+          <button onClick={() => setError(null)}>✕</button>
+        </div>
       )}
     </div>
   );

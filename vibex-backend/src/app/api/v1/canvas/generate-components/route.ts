@@ -66,24 +66,26 @@ type ErrorResponse = {
 
 type ApiResponse = SuccessResponse | ErrorResponse;
 
-const USER_PROMPT = `根据以下业务流程，生成 UI 组件列表。
+const USER_PROMPT = `根据以下业务流程和上下文，生成 UI 组件列表。
 
-流程列表：
-{flows}
-
-上下文列表：
+上下文列表（必须使用 id 字段）：
 {contexts}
 
-要求：
-- 每个流程对应一个或多个页面组件
-- 组件类型: page(页面)/form(表单)/list(列表)/detail(详情)/modal(弹窗)
-- 每个组件包含 name, flowId, contextId, type, apis(method/path/params)
-- 页面组件通常是用户交互入口
+流程列表（按顺序编号为 flow-1, flow-2, ...）：
+{flows}
 
-JSON 数组格式：
+要求：
+- 每个流程生成 2-5 个组件，覆盖主要用户操作
+- 组件类型（仅限以下五种，禁止使用其他类型如 navigation/card/button/header）：page(页面)/form(表单)/list(列表)/detail(详情)/modal(弹窗)
+- 每个组件的 flowId 必须是对应流程编号（flow-1、flow-2 等）
+- 每个组件的 contextId 必须是上下文 id 字段（ctx-xxx 格式）
+- apis 必须基于用户操作推断合理 API（GET 查列表、POST 创建设施、PUT 更新等）
+- 入口页面组件通常是 list 或 form 类型
+
+严格 JSON 数组格式输出：
 [
-  {"name": "注册表单", "flowId": "对应流程ID", "contextId": "对应上下文ID", "type": "form", "apis": [{"method": "POST", "path": "/api/register", "params": ["username", "password"]}]},
-  {"name": "用户列表页", "flowId": "对应流程ID", "contextId": "对应上下文ID", "type": "page", "apis": [{"method": "GET", "path": "/api/users", "params": []}]}
+  {"name": "课程列表页", "flowId": "flow-1", "contextId": "ctx-cmnku0yelrffpxlax", "type": "list", "apis": [{"method": "GET", "path": "/api/courses", "params": []}]},
+  {"name": "创建课程表单", "flowId": "flow-1", "contextId": "ctx-cmnku0yelrffpxlax", "type": "form", "apis": [{"method": "POST", "path": "/api/courses", "params": ["title", "description"]}]}
 ]`;
 
 export const dynamic = 'force-dynamic';
@@ -128,13 +130,13 @@ export async function POST(
 
     // Build context and flow summary for prompt
     const contextSummary = contexts
-      .map((c) => `- ${c.name}: ${c.description}`)
+      .map((c) => `- [${c.id}] ${c.name}: ${c.description}`)
       .join('\n');
 
     const flowSummary = flows
       .map(
         (f, idx) =>
-          `- 流程${idx + 1}: ${f.name} (上下文ID: ${f.contextId})\n  步骤: ${(f.steps || [])
+          `- [flow-${idx + 1}] ${f.name} (上下文ID: ${f.contextId})\n  步骤: ${(f.steps || [])
             .map((s) => s.name)
             .join(' → ')}`
       )

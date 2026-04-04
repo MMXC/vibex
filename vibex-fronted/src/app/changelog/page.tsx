@@ -54,6 +54,17 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.103',
     date: '2026-04-03',
     changes: [
+      '🔧 vibex-architect-proposals/E3: TypeScript Strict 模式 — tsc --noEmit 0 errors',
+      '✅ tsconfig.json: strict + noImplicitAny + strictNullChecks = true',
+      '✅ ai-autofix + OpenAPIGenerator: 修复 as any',
+      '✅ 提交 53be4cc7',
+    ],
+    commit: '53be4cc7',
+  },
+  {
+    version: '1.0.104',
+    date: '2026-04-03',
+    changes: [
       '📋 vibex-architect-proposals/E4: 契约测试 — OpenAPI 规范 + 409 conflict schema',
       '✅ tests/contracts/openapi.yaml: Canvas Snapshots API 完整规范',
       '✅ 提交 635147fb',

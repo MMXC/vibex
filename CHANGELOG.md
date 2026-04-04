@@ -17,6 +17,13 @@
 - **E2 迁移**: canvasStore.ts 删除内联 CascadeUpdateManager class，改用 cascade/ 模块导出
 - **提交**: `635147fb`
 
+### Added (vibex-architect-proposals-20260403_024652 E3: TypeScript Strict 模式) — 2026-04-03
+- **E3 TS Strict**: `tsconfig.json` strict mode 全面启用
+  - `strict: true`, `noImplicitAny: true`, `strictNullChecks: true`
+  - `tsc --noEmit` → 0 errors ✅
+  - `53be4cc7`: 修复 ai-autofix 和 OpenAPIGenerator 的 `as any`
+- **提交**: `53be4cc7`
+
 ### Added (vibex-architect-proposals-20260403_024652 E4: 契约测试) — 2026-04-03
 - **E4 契约测试**: `tests/contracts/openapi.yaml` Canvas Snapshots API 完整规范（含 409 conflict schema）
 - **提交**: `635147fb`

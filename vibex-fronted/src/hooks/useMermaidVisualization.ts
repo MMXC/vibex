@@ -10,8 +10,7 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { mermaidManager } from '@/lib/mermaid/MermaidManager';
 import { useVisualizationStore } from '@/stores/visualizationStore';
-import type { VisualizationStore } from '@/types/visualization';
-import type { MermaidVisualizationData, MermaidNodeInfo } from '@/types/visualization';
+import type { VisualizationStore, MermaidVisualizationData, MermaidNodeInfo } from '@/types/visualization';
 
 // ==================== Return Type ====================
 

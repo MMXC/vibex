@@ -18,8 +18,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { getBezierPath, EdgeLabelRenderer, BaseEdge, type EdgeProps, Position } from '@xyflow/react';
-import type { ContextRelationship } from '@/lib/canvas/types';
-import type { RelationshipEdgeFull } from '@/lib/canvas/types';
+import type { ContextRelationship, RelationshipEdgeFull } from '@/lib/canvas/types';
 import styles from './RelationshipEdge.module.css';
 
 export interface RelationshipEdgeData extends Record<string, unknown> {

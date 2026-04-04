@@ -14,8 +14,7 @@ import {
   BaseEdge,
   type EdgeProps,
 } from '@xyflow/react';
-import type { LoopEdgeData } from '@/lib/canvas/types';
-import type { LoopEdgeFull } from '@/lib/canvas/types';
+import type { LoopEdgeData, LoopEdgeFull } from '@/lib/canvas/types';
 import styles from './LoopEdge.module.css';
 
 export const LoopEdge = memo(function LoopEdgeComponent(props: EdgeProps<LoopEdgeFull>) {

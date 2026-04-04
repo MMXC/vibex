@@ -19,8 +19,7 @@ import { useCanvasState } from './useCanvasState';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
-import type { BoundedContextNode, BusinessFlowNode, ComponentNode } from '@/lib/canvas/types';
-import type { TreeType } from '@/lib/canvas/types';
+import type { BoundedContextNode, BusinessFlowNode, ComponentNode, TreeType } from '@/lib/canvas/types';
 
 // =============================================================================
 // Types

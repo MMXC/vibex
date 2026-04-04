@@ -17,8 +17,7 @@ import React, {
 import { useSearchParams } from 'next/navigation';
 import { ViewSwitcher } from '../ViewSwitcher';
 import { FlowRenderer } from '../FlowRenderer';
-import type { FlowVisualizationRaw } from '@/types/visualization';
-import type { VisualizationType } from '@/types/visualization';
+import type { FlowVisualizationRaw, VisualizationType } from '@/types/visualization';
 import styles from './VisualizationPlatform.module.css';
 
 // Lazy-loaded renderers for code-splitting

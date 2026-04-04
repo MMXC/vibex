@@ -6,8 +6,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { RequirementTemplate, TemplateCategory } from '@/data/templates';
-import { templates as defaultTemplates } from '@/data/templates';
+import { RequirementTemplate, TemplateCategory, templates as defaultTemplates } from '@/data/templates';
 
 interface TemplateStats {
   usageCount: Record<string, number>;    // 模板ID -> 使用次数

@@ -583,7 +583,8 @@ def save_project(project: str, data: dict):
 
 def make_stage(agent_id: str, task: str = "", depends_on: list = None, 
                constraints: list = None, verification: dict = None, output: str = None,
-               features: list = None, redlines: list = None, checklist: list = None) -> dict:
+               features: list = None, redlines: list = None, checklist: list = None,
+               proposal_id: str = None) -> dict:
     stage = {
         "agent": agent_id,
         "status": "pending",
@@ -605,6 +606,9 @@ def make_stage(agent_id: str, task: str = "", depends_on: list = None,
         stage["redlines"] = redlines
     if checklist is not None:
         stage["checklist"] = checklist
+    # E2-T1: proposal_id field links this task to a specific proposal (e.g. P001, P002)
+    if proposal_id is not None:
+        stage["proposal_id"] = proposal_id
     return stage
 
 
@@ -1013,6 +1017,14 @@ def cmd_phase2(args):
                 epic, dep_epic = dep_str.split(":", 1)
                 epic_deps.setdefault(epic.strip(), []).append(dep_epic.strip())
 
+    # E2-T1: 解析 Epic→提案映射（如：E1:P001,E2:P002）
+    epic_proposal_map = {}  # {epic_name: proposal_id}
+    if getattr(args, "proposal_map", None):
+        for mapping in args.proposal_map.split(","):
+            if ":" in mapping:
+                epic_name, proposal_id = mapping.split(":", 1)
+                epic_proposal_map[epic_name.strip()] = proposal_id.strip()
+
     # 构建 Epic ID 映射
     epic_id_map = {epic.lower().replace(" ", "-").replace("_", "-"): epic for epic in epics}
 
@@ -1034,10 +1046,14 @@ def cmd_phase2(args):
 
         print(f"📦 Epic: {epic} (依赖: {dev_deps[1:] if len(dev_deps) > 1 else '无'})")
 
+        # E2-T1: proposal_id for this Epic (from --proposal-map)
+        epic_proposal_id = epic_proposal_map.get(epic)
+
         # dev
         print(f"  📝 添加 dev-{epic_id}...")
         data["stages"][f"dev-{epic_id}"] = make_stage(
             agent_id="dev",
+            proposal_id=epic_proposal_id,
             task=f"""开发 Epic: {epic}
 
 ## 📁 工作目录
@@ -1079,6 +1095,7 @@ def cmd_phase2(args):
         print(f"  📝 添加 tester-{epic_id}...")
         data["stages"][f"tester-{epic_id}"] = make_stage(
             agent_id="tester",
+            proposal_id=epic_proposal_id,
             task=f"""测试 Epic: {epic}
 
 ## 📁 工作目录
@@ -1118,6 +1135,7 @@ def cmd_phase2(args):
         print(f"  📝 添加 reviewer-{epic_id}...")
         data["stages"][f"reviewer-{epic_id}"] = make_stage(
             agent_id="reviewer",
+            proposal_id=epic_proposal_id,
             task=f"""审查 Epic: {epic}（第一步：功能审查）
 
 ## 📁 工作目录
@@ -1156,6 +1174,7 @@ def cmd_phase2(args):
         print(f"  📝 添加 reviewer-push-{epic_id}...")
         data["stages"][f"reviewer-push-{epic_id}"] = make_stage(
             agent_id="reviewer",
+            proposal_id=epic_proposal_id,
             task=f"""审查 Epic: {epic}（第二步：推送验证）
 
 ## 📁 工作目录
@@ -2059,6 +2078,7 @@ def main():
     p.add_argument("--docs-subdir", help="文档子目录（默认：项目名称）")
     p.add_argument("--work-dir", help="工作目录（默认：/root/.openclaw/vibex）")
     p.add_argument("--epic-deps", help="Epic 依赖关系（如：Epic2:Epic1,Epic3:Epic1 表示 Epic2 依赖 Epic1，Epic3 依赖 Epic1）")
+    p.add_argument("--proposal-map", help="E2-T1: Epic→提案映射（如：E1:P001,E2:P002）")
     p.add_argument("--force", action="store_true", help="强制创建（跳过重复检测 block）")
     p.add_argument("--yes", "-y", action="store_true", help="自动确认 warn 提示")
     p.add_argument("--no-check", action="store_true", help="跳过重复检测")
@@ -2109,6 +2129,8 @@ def main():
     p = sub.add_parser("list", help="列出所有项目")
     p.add_argument("--topo", action="store_true", help="按拓扑排序输出任务（适用于心跳扫描）")
     p.add_argument("--project", "-p", help="仅显示指定项目的任务拓扑序")
+    # E2-T1: 按提案 ID 过滤任务
+    p.add_argument("--proposal", help="仅显示关联指定提案的任务（如 P001, P002）")
 
     # result（设置任务产出物路径，供下游依赖引用）
     p = sub.add_parser("result", help="设置任务产出物路径")

@@ -1,3 +1,10 @@
+### Added (vibex-proposals-20260405 E4: 虚假完成检测) — 2026-04-05
+- **E4 虚假完成检测**: 重构 validate_task_completion() 函数
+  - 抽取内联检查为独立函数，支持 commit 不变警告 + dev 任务测试文件检查
+  - 修复 bug: 传入 old_status 参数，正确判断"首次完成"（原 condition 永远为 False）
+  - 测试: 8 passed, 3 skipped
+  - 提交: `a50263db` + `b080a1db` + `c3dd13cf` + `ca16c506` + `a4b3b29e`
+
 ### Added (canvas-api-500-fix E1: 错误处理增强) — 2026-04-04
 - **E1 错误处理增强**: API Key 检查 + .catch() 防御
   - E1-T2: API Key 环境变量检查 → 500 + 'API Key 缺失'

@@ -11,6 +11,7 @@
  */
 
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 import { authMiddleware } from '../../lib/auth';
 import { rateLimit } from '../../lib/rateLimit';
 import { logger } from '../../lib/logger';
@@ -104,6 +105,14 @@ v1.route('/canvas/stream', canvasStream);
 
 // 所有需要认证的路由挂载到一个子 app，再统一加中间件
 const protected_ = new Hono<{ Bindings: CloudflareEnv }>();
+
+// CORS - 必须在 authMiddleware 之前处理 OPTIONS 预检请求
+protected_.use('/*', cors({
+  origin: '*',
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+}));
+
 protected_.use('*', authMiddleware);
 
 // 项目管理

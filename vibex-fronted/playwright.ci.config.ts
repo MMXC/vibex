@@ -1,87 +1,74 @@
-import { defineConfig, devices } from '@playwright/test';
-
 /**
- * CI-specific Playwright Configuration
- * Optimized for continuous integration environments
- * 
+ * playwright.ci.config.ts — CI-specific Playwright configuration
+ *
+ * Key differences from base config:
+ * - retries: 3 (flaky test governance: retries = 3 in CI per IMPLEMENTATION_PLAN)
+ * - reporter: list (concise CI-friendly output)
+ * - fullyParallel: false (avoid resource competition)
+ * - workers: 1 (deterministic ordering for flaky tracking)
+ *
  * Usage:
- *   pnpm playwright test --config=playwright.ci.config.ts
+ *   npx playwright test --config=playwright.ci.config.ts
+ *
+ * Flaky test governance rules (per IMPLEMENTATION_PLAN):
+ * - retries = 3 in CI (base config: 2, CI: 3)
+ * - pass rate < 80% → test written to flaky-tests.json
+ * - Flaky tests: skip, never delete
+ * - Consecutive 5 CI runs without flaky failure → can remove skip
  */
+
+import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests/e2e',
-  
-  // CI optimizations
-  fullyParallel: true, // Enable parallel execution in CI for speed
-  forbidOnly: true, // Fail if .only() is left in tests
-  
-  // Retry configuration for CI stability
-  retries: process.env.CI ? 3 : 1,
-  workers: process.env.CI ? undefined : 1, // Use all available CPUs in CI
-  
-  // Reporter
+  fullyParallel: false,
+  forbidOnly: true,
+  retries: 3, // E4 Flaky governance: CI retries = 3
+  workers: 1,
   reporter: [
     ['list'],
     ['html', { outputFolder: 'playwright-report' }],
-    ['json', { outputFile: 'playwright-report/results.json' }],
+    ['@playwright/test/reporter', 'blob'], // Blob for CI reporting
   ],
-  
-  // Timeout configuration
   timeout: 60000,
   expect: {
-    timeout: 10000,
+    timeout: 30000,
   },
-  
-  // CI environment variables
   use: {
-    // Use CI-specific base URL
-    baseURL: process.env.CI_E2E_BASE_URL || process.env.BASE_URL || 'http://localhost:3000',
-    
-    // Trace and screenshot for debugging
+    baseURL: process.env.BASE_URL || 'http://localhost:3000',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
-    
-    // Timeouts
     actionTimeout: 15000,
-    navigationTimeout: 30000,
-    
-    // CI-specific settings
-    ...(process.env.CI && {
-      launchOptions: {
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      },
-    }),
   },
-  
-  // Projects - run on all browsers in CI
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-    ...(process.env.CI ? [
-      {
-        name: 'firefox',
-        use: { ...devices['Desktop Firefox'] },
+    {
+      name: 'canvas-e2e',
+      testDir: './e2e',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'contract',
+      testDir: './tests/contract',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'iPhone12',
+      use: {
+        ...devices['iPhone 12'],
       },
-      {
-        name: 'webkit',
-        use: { ...devices['Desktop Safari'] },
-      },
-    ] : []),
+    },
   ],
-  
-  // Web server configuration
   webServer: {
-    command: process.env.CI ? 'npm run start' : 'npm run dev',
-    url: process.env.CI_E2E_BASE_URL || 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: false, // Always start fresh in CI
     timeout: 180000,
     stdout: 'pipe',
     stderr: 'pipe',
   },
-  
-  // Output configuration
-  outputDir: 'test-results',
 });

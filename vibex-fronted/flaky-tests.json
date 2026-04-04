@@ -1,0 +1,31 @@
+/**
+ * flaky-tests.json — Flaky test tracking registry
+ *
+ * Governance rules (per IMPLEMENTATION_PLAN):
+ * - pass rate < 80% → test added to this registry
+ * - Flaky tests are SKIPPED, never deleted
+ * - Consecutive 5 CI runs without flaky failure → can remove skip
+ *
+ * Schema:
+ * {
+ *   "generatedAt": "ISO timestamp",
+ *   "flakyTests": [
+ *     {
+ *       "id": "unique-test-id",
+ *       "testFile": "path/to/spec.ts",
+ *       "testName": "Full test name as in spec",
+ *       "reason": "Why it's flaky",
+ *       "firstDetectedAt": "ISO timestamp",
+ *       "lastFailureAt": "ISO timestamp",
+ *       "passRate": 0.65,
+ *       "skip": true
+ *     }
+ *   ]
+ * }
+ *
+ * Update mechanism: scripts/check-flaky.ts runs after each test suite
+ */
+{
+  "generatedAt": "2026-04-04T06:51:00.000Z",
+  "flakyTests": []
+}

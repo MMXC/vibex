@@ -132,6 +132,8 @@ export async function POST(
     const currentMaxVersion = existing[0]?.maxVersion ?? 0;
 
     // E4: Optimistic locking — check version conflict
+    // Conflict if client version is stale: clientVersion <= server max
+    // If clientVersion > currentMaxVersion: client proactively saved a newer version (advanced via another client)
     if (clientVersion !== undefined && clientVersion <= currentMaxVersion) {
       // Get server snapshot data for conflict response
       const serverSnapshot = await queryOne<CanvasSnapshotRow>(

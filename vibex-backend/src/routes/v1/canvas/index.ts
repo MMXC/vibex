@@ -3,57 +3,27 @@
  * POST /v1/canvas/generate-contexts
  * POST /v1/canvas/generate-flows
  * POST /v1/canvas/generate-components
+ * 
+ * Part of: api-input-validation-layer / Epic E3
  */
 
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { z } from 'zod'
 import { generateId, Env } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
 import { devDebug } from '@/lib/log-sanitizer'
+import { withValidation, ValidatedContext } from '@/lib/api-validation'
+import {
+  boundedContextSchema,
+  generateContextsSchema,
+  generateFlowsSchema,
+  generateComponentsSchema,
+} from '@/schemas/canvas'
 
 const canvas = new Hono<{ Bindings: Env }>()
 
 // Enable CORS
 canvas.use('/*', cors())
-
-// ============================================================
-// Schema Definitions
-// ============================================================
-
-const BoundedContextSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string(),
-  type: z.enum(['core', 'supporting', 'generic', 'external']).default('core'),
-})
-
-const GenerateContextsRequestSchema = z.object({
-  requirementText: z.string().min(1),
-  projectId: z.string().optional(),
-})
-
-const GenerateFlowsRequestSchema = z.object({
-  contexts: z.array(BoundedContextSchema).min(1),
-  sessionId: z.string(),
-})
-
-const GenerateComponentsRequestSchema = z.object({
-  contexts: z.array(BoundedContextSchema),
-  flows: z.array(z.object({
-    id: z.string().optional(),
-    name: z.string(),
-    contextId: z.string(),
-    steps: z.array(z.object({
-      id: z.string().optional(),
-      name: z.string(),
-      actor: z.string(),
-      description: z.string().optional(),
-      order: z.number().optional(),
-    })),
-  })),
-  sessionId: z.string(),
-})
 
 // ============================================================
 // Type Definitions
@@ -100,13 +70,13 @@ interface ComponentNode {
 // POST /v1/canvas/generate-contexts
 // ============================================================
 
-canvas.post('/generate-contexts', async (c) => {
-  try {
-    const env = c.env
-    const body = await c.req.json()
-    const { requirementText } = GenerateContextsRequestSchema.parse(body)
+canvas.post('/generate-contexts',
+  withValidation({ body: generateContextsSchema }, async (c: ValidatedContext) => {
+    try {
+      const env = c.env
+      const { requirementText } = c.validatedData.body as { requirementText: string; projectId?: string }
 
-    devDebug('[canvas/generate-contexts] Starting with requirement:', requirementText.substring(0, 50))
+      devDebug('[canvas/generate-contexts] Starting with requirement:', requirementText.substring(0, 50))
 
     const aiService = createAIService(env)
 

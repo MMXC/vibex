@@ -13,3 +13,9 @@ export * from './auth';
 
 // Security schemas (E2: 高风险路由)
 export * from './security';
+
+// Project schemas (E3: 中风险路由)
+export * from './project';
+
+// Canvas schemas (E3: 中风险路由)
+export * from './canvas';

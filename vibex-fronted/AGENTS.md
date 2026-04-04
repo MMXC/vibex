@@ -7,6 +7,7 @@
 | 类型 | 路径 | 说明 |
 |------|------|------|
 | Frontend CHANGELOG | `CHANGELOG.md` | 所有 Epic 变更记录 |
+| Frontend App Changelog | `src/app/changelog/page.tsx` | 自动渲染页面，**禁止手动修改** |
 | App 页面 | `src/app/**` | **禁止手动修改**，由代码生成 |
 | 组件 | `src/components/**` | 可修改，需同步更新 CHANGELOG |
 | 样式 | `src/**/*.module.css` | 可修改，需同步更新 CHANGELOG |

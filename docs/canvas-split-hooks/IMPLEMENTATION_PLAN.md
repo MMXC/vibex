@@ -21,7 +21,7 @@
 | Day 1 PM | E2 useCanvasStore | 2h | 封装 Hook 就绪 |
 | Day 2 AM | E3 useCanvasRenderer | 3h | 派生数据 Hook 就绪 |
 | Day 2 PM | E4 useAIController | 4h | AI 编排 Hook 就绪 |
-| Day 3 AM | E5 useCanvasEvents | 3h | 事件 Hook 就绪 |
+| Day 3 AM | E5 useCanvasEvents | 3h | ✅ 完成 — useCanvasEvents.ts + 18 tests |
 | Day 3 PM | E6 Phase1 引Hook | 2h | 所有 Hook 引入 CanvasPage |
 | Day 4 | E6 Phase2 删代码 | 2h | CanvasPage < 300 行 |
 

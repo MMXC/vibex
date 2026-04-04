@@ -314,3 +314,34 @@ if (skip) test.skip(reason);
 - [x] flaky-detector.sh 脚本实现 ✅
 - [x] playwright.setup.ts 自动 skip 机制 ✅
 - [ ] 连续 5 次 CI 无 flaky 失败
+
+---
+
+## Phase 5: 命名与目录规范 ✅ DONE（0.5 天）
+
+### 步骤 5.1: ESLint 命名强制 ✅
+
+**文件**: `eslint.config.mjs`
+
+已添加 E5 命名规范注释，引用 `TESTING_STRATEGY.md`。
+
+### 步骤 5.2: 目录结构文档化 ✅
+
+**文件**: `TESTING_STRATEGY.md`
+
+完整命名规范文档：
+- Jest: `*.test.ts` | Playwright: `*.spec.ts`
+- 目录结构：`tests/unit/` / `tests/e2e/` / `tests/a11y/` / `tests/performance/`
+- ESLint 强制规则说明
+- CI 门禁规范
+
+**产出文件**:
+- `vibex-fronted/TESTING_STRATEGY.md` ✅
+
+### 步骤 5.3: 验收检查清单更新 ✅
+
+- [x] `TESTING_STRATEGY.md` 存在且包含边界定义 ✅
+- [x] `jest.config.ts` 使用 `testMatch` 规范 ✅
+- [x] Playwright 配置文件从 7 个合并至 ≤ 3 个 ✅（保留 playwright.config.ts, playwright.ci.config.ts, playwright.a11y.config.ts）
+- [x] 目录结构符合 TESTING_STRATEGY.md ✅
+

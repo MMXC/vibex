@@ -680,7 +680,7 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
     setGenerating(true);
     // Mock AI generation: simulate API delay
     await new Promise((r) => setTimeout(r, 1200));
-    const drafts = mockGenerateComponents(flowNodes.length);
+    const drafts: Array<Omit<ComponentNode, 'nodeId' | 'status' | 'confirmed' | 'children'>> = [];
     const newNodes: ComponentNode[] = drafts.map((d, i) => ({
       ...d,
       nodeId: `comp-${Date.now()}-${i}`,

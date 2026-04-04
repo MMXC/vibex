@@ -396,7 +396,7 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
     setGenerating(true);
     // Mock AI generation: simulate API delay
     await new Promise((r) => setTimeout(r, 1200));
-    const drafts = mockGenerateContexts('');
+    const drafts: BoundedContextDraft[] = [];
     // Convert drafts to BoundedContextNodes
     const newNodes: BoundedContextNode[] = drafts.map((d, i) => ({
       nodeId: `ctx-${Date.now()}-${i}`,

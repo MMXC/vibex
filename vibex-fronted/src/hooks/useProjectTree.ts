@@ -277,9 +277,9 @@ export function useProjectTree({
       return boundedContextsToCardTree(localData.boundedContexts, projectId ?? undefined);
     }
     if (query.data) return query.data;
-    if (query.isError && useMockOnError) return MOCK_DATA;
-    if (skip) return MOCK_DATA; // Feature flag off → show mock
-    if (!projectId) return MOCK_DATA; // No project yet → show demo data
+    if (query.isError && useMockOnError) return ({ nodes: [], projectId: projectId ?? null, name: '项目分析' } as unknown as CardTreeVisualizationRaw);
+    if (skip) return ({ nodes: [], projectId: projectId ?? null, name: '项目分析' } as unknown as CardTreeVisualizationRaw);
+    if (!projectId) return ({ nodes: [], projectId: null, name: '项目分析' } as unknown as CardTreeVisualizationRaw);
     return null;
   }, [localData, query.data, query.isError, query.isLoading, useMockOnError, skip, projectId]);
 

@@ -52,6 +52,11 @@ export default function Dashboard() {
   const [sortBy, setSortBy] = useState<SortOption>('updatedAt');
   const [showSortMenu, setShowSortMenu] = useState(false);
 
+  // E4: 视图模式 (Grid/List)
+  type ViewMode = 'grid' | 'list';
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+
+
   // 使用 React Query 获取项目列表
   const { 
     data: projects = [], 
@@ -104,7 +109,18 @@ export default function Dashboard() {
   // 错误状态
   const errorMessage = error instanceof Error ? error.message : '';
 
-  // E4: 搜索 + 排序后的项目列表
+  // E4: 最近项目 (最近更新的 5 个)
+  const recentProjects = useMemo(() => {
+    return [...projects]
+      .sort((a, b) => {
+        const aTime = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+        const bTime = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+        return bTime - aTime;
+      })
+      .slice(0, 5);
+  }, [projects]);
+
+  // E4: 搜索 + 状态筛选 + 排序后的项目列表
   const displayProjects = useMemo(() => {
     let result = [...projects];
 
@@ -387,6 +403,59 @@ export default function Dashboard() {
           </div>
         )}
 
+        {/* E4: Hero 快速开始区域 */}
+        <section className={styles.heroSection}>
+          <div className={styles.heroLeft}>
+            <h2 className={styles.heroTitle}>快速开始</h2>
+            <p className={styles.heroSubtitle}>创建新项目或从模板开始</p>
+            <div className={styles.heroButtons}>
+              <button
+                className={styles.heroPrimaryBtn}
+                onClick={() => router.push('/projects/new')}
+              >
+                <span>+</span>
+                <span>创建新项目</span>
+              </button>
+              <button
+                className={styles.heroSecondaryBtn}
+                onClick={() => router.push('/templates')}
+              >
+                <span>◫</span>
+                <span>从模板创建</span>
+              </button>
+            </div>
+          </div>
+          {recentProjects.length > 0 && (
+            <div className={styles.heroRight}>
+              <h3 className={styles.recentTitle}>最近项目</h3>
+              <div className={styles.recentScroll}>
+                {recentProjects.map(project => (
+                  <Link
+                    key={project.id}
+                    href={`/project?id=${project.id}`}
+                    className={styles.recentCard}
+                  >
+                    <div className={styles.recentCardThumb}>
+                      <span className={styles.recentCardIcon}>◈</span>
+                    </div>
+                    <div className={styles.recentCardInfo}>
+                      <span className={styles.recentCardName}>{project.name}</span>
+                      <span className={styles.recentCardTime}>
+                        {project.updatedAt
+                          ? new Date(project.updatedAt).toLocaleDateString('zh-CN', {
+                              month: 'short',
+                              day: 'numeric',
+                            })
+                          : ''}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+
         {/* 统计卡片 */}
         <section className={styles.stats}>
           {[
@@ -444,6 +513,24 @@ export default function Dashboard() {
                 )}
               </div>
 
+              {/* E4: 视图切换 */}
+              <div className={styles.viewToggle}>
+                <button
+                  className={`${styles.viewToggleBtn} ${viewMode === 'grid' ? styles.viewToggleActive : ''}`}
+                  onClick={() => setViewMode('grid')}
+                  title="网格视图"
+                >
+                  ⊞
+                </button>
+                <button
+                  className={`${styles.viewToggleBtn} ${viewMode === 'list' ? styles.viewToggleActive : ''}`}
+                  onClick={() => setViewMode('list')}
+                  title="列表视图"
+                >
+                  ☰
+                </button>
+              </div>
+
               {/* 排序 */}
               <div className={styles.sortWrapper} onClick={(e) => e.stopPropagation()}>
                 <button
@@ -479,12 +566,12 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className={styles.projectGrid}>
+          <div className={`${styles.projectGrid} ${viewMode === 'list' ? styles.projectList : ''}`}>
             {displayProjects.map((project) => (
               <Link
                 key={project.id}
                 href={`/project?id=${project.id}`}
-                className={`${styles.projectCard} ${styles.active}`}
+                className={`${styles.projectCard} ${styles.active} ${viewMode === 'list' ? styles.projectCardList : ''}`}
               >
                 <div className={styles.projectHeader}>
                   <h3 className={styles.projectName}>{project.name}</h3>
@@ -640,6 +727,21 @@ export default function Dashboard() {
                 <div className={styles.cardGlow} />
               </Link>
             ))}
+
+            {/* E4: 空状态 - 无项目 */}
+            {!loading && projects.length === 0 && !searchQuery && !showTrash && (
+              <div className={styles.zeroEmptyState}>
+                <span className={styles.zeroEmptyIcon}>📋</span>
+                <h3 className={styles.zeroEmptyTitle}>还没有项目</h3>
+                <p className={styles.zeroEmptyDesc}>创建一个新项目，开始你的 DDD 建模之旅</p>
+                <button
+                  className={styles.zeroEmptyBtn}
+                  onClick={() => router.push('/projects/new')}
+                >
+                  + 创建第一个项目
+                </button>
+              </div>
+            )}
 
             {/* 空状态 - 搜索无结果 */}
             {!loading && displayProjects.length === 0 && searchQuery && (

@@ -239,6 +239,12 @@
   - `import/no-duplicates` fix: merge split imports in useCanvasEvents.ts
 - **提交**: `914919b8`, `029a3366`
 
+### Added (vibex-pm-proposals-20260403_024652 E5: 快捷键配置) — 2026-04-04
+- **E5 快捷键配置**: shortcutStore 单元测试 + 实现记录
+  - `shortcutStore.test.ts`: 7 tests (E5-S1~S5), 19 快捷键, 冲突检测
+  - `e5-shortcut-config-impl.md`: 实现记录 (shortcutStore + ShortcutCategory + ShortcutEditModal)
+- **提交**: `a81a1cbd`
+
 ### Added (vibex-pm-proposals-20260403_024652 E4: 项目浏览优化) — 2026-04-04
 - **E4 项目浏览优化**: dashboard 搜索 + 排序
   - `/dashboard`: 项目搜索框（按名称/描述过滤）、排序选项

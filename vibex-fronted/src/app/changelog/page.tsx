@@ -167,6 +167,16 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.115',
     date: '2026-04-04',
     changes: [
+      '📋 vibex-pm-proposals/E5: 快捷键配置 — shortcutStore 单元测试',
+      '✅ shortcutStore.test.ts: 7 tests (E5-S1~S5), 19 shortcuts, conflict detection',
+      '✅ e5-shortcut-config-impl.md: 实现记录',
+      '✅ 提交 a81a1cbd',
+    ],
+    commit: 'a81a1cbd',
+  },
+  {
+    date: '2026-04-04',
+    changes: [
       '📋 vibex-pm-proposals/E4: 项目浏览优化 — dashboard 搜索 + 排序',
       '✅ /dashboard: 项目搜索框（名称/描述过滤）、排序选项',
       '✅ 空状态：搜索无结果友好提示 + 清除搜索按钮',

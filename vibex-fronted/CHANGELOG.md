@@ -34,6 +34,14 @@
 
 **提交**: `5a56cbae`
 
+### [canvas-canvasstore-migration E5: Integration测试] — 2026-04-04 (canvas-canvasstore-migration)
+
+#### Added
+- `src/lib/canvas/stores/__tests__/migration.test.ts` — 84 个集成测试用例，覆盖跨 store 同步和 store reset 行为
+- E2E 测试通过率：530/530 = 100%（≥95% 门槛）
+
+**提交**: `815821bc`
+
 ### [canvas-split-hooks E3: useCanvasRenderer] — 2026-04-04 (canvas-split-hooks)
 
 #### Added

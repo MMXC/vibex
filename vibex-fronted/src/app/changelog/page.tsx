@@ -18,6 +18,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.100',
+    date: '2026-04-04',
+    changes: [
+      '🔧 canvas-canvasstore-migration/E5: Integration 测试 — 84 migration tests, E2E 530/530 pass',
+      '✅ __tests__/migration.test.ts: 跨 store 同步 + store reset 行为',
+      '✅ 提交 815821bc',
+    ],
+    commit: '815821bc',
+  },
+  {
     version: '1.0.99',
     date: '2026-04-04',
     changes: [

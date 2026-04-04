@@ -71,6 +71,17 @@ const mockChangelog: ChangelogEntry[] = [
     ],
   },
   {
+    version: '1.0.122',
+    date: '2026-04-04',
+    changes: [
+      '🔧 canvas-api-500-fix/E1: 错误处理增强 — API Key 检查 + .catch() 防御',
+      '🔧 canvas-api-500-fix/E2: API健康检查端点 — GET /api/v1/canvas/health',
+      '🧪 canvas-api-500-fix/E3: 单元测试覆盖 — 9 tests pass',
+      '✅ 提交 f2f8a63d',
+    ],
+    commit: 'f2f8a63d',
+  },
+  {
     version: '1.0.121',
     date: '2026-04-04',
     changes: [

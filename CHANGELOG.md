@@ -1,3 +1,20 @@
+### Added (canvas-api-500-fix E1: 错误处理增强) — 2026-04-04
+- **E1 错误处理增强**: API Key 检查 + .catch() 防御
+  - E1-T2: API Key 环境变量检查 → 500 + 'API Key 缺失'
+  - E1-T3: aiService.generateJSON() 添加 .catch() → 无未捕获异常
+- **提交**: `f2f8a63d`
+
+### Added (canvas-api-500-fix E2: API健康检查端点) — 2026-04-04
+- **E2 API健康检查端点**: GET /api/v1/canvas/health
+  - E2-T1: 新增 health endpoint，返回 200/503
+- **提交**: `f2f8a63d`
+
+### Added (canvas-api-500-fix E3: 单元测试覆盖) — 2026-04-04
+- **E3 单元测试覆盖**: API 端点测试
+  - E3-T1: generate-contexts.test.ts (6 tests) + health.test.ts (3 tests)
+  - 9 tests pass
+- **提交**: `f2f8a63d`
+
 ### Added (react-hydration-fix E2: 日期格式化修复) — 2026-04-04
 - **E2 日期格式化修复**: formatDate 时区安全 + suppressHydrationWarning
   - E2-T1: formatDate() 使用 split('T')[0] 替代 toLocaleDateString（时区一致）

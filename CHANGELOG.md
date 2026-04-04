@@ -1,3 +1,12 @@
+### Added (canvas-test-framework-standardize E1: 测试边界规范建立) — 2026-04-03
+- **E1 测试边界规范**: Playwright 配置标准化 + 测试策略文档
+  - `TESTING_STRATEGY.md` (258行): 测试金字塔、框架职责、覆盖率目标、反模式
+  - Playwright 配置合并 (7→3): 删除冗余配置，保留 base/ci/a11y 三套
+  - `jest.config.ts`: testMatch + forbidOnly: true 标准
+  - `playwright.setup.ts`: 测试环境设置 + factory patterns
+  - `flaky-tests.json`: 不稳定测试注册表
+- **提交**: `8d6eb70d`
+
 ### Added (canvas-sync-protocol-complete E1: 后端SnapshotsAPI) — 2026-04-03
 - **E1 后端 SnapshotsAPI**: 乐观锁 + 冲突检测
   - `snapshots.ts`: version 字段 + 409 VERSION_CONFLICT 响应

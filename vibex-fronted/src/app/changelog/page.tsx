@@ -133,6 +133,18 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.101',
     date: '2026-04-04',
     changes: [
+      '🧪 canvas-test-framework-standardize/E1: 测试边界规范建立 — Playwright 配置标准化',
+      '✅ TESTING_STRATEGY.md: 测试金字塔 + 覆盖率目标 + 反模式（258行）',
+      '✅ Playwright 配置合并: 7→3 (base/ci/a11y)',
+      '✅ jest.config.ts: testMatch + forbidOnly: true',
+      '✅ 提交 8d6eb70d',
+    ],
+    commit: '8d6eb70d',
+  },
+  {
+    version: '1.0.106',
+    date: '2026-04-03',
+    changes: [
       '🔒 canvas-sync-protocol-complete/E1: 后端 SnapshotsAPI — 乐观锁 + 409 VERSION_CONFLICT',
       '✅ snapshots.ts: version 字段 + 冲突检测响应',
       '✅ GET /v1/canvas/snapshots/latest: 轻量轮询端点',

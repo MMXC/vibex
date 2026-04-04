@@ -7,6 +7,28 @@
   - `left-drawer-send.test.tsx`: 6 tests pass
 - **提交**: `752e5da9`, `a7d51d12`
 
+### Added (vibex-proposals-20260404 E1: 任务质量门禁) — 2026-04-04
+- **E1 任务质量门禁**: task_manager.py commit SHA-1 记录 + done 警告
+  - task_manager.py: 状态变更时记录 commit SHA-1
+  - E1-T2: 重复 done 警告（相同 commit 复用检测）
+  - E1-T3: Dev 任务测试文件检查（初始完成时）
+  - test_task_manager.py: 5 个测试用例
+- **提交**: `39540374`
+
+### Added (tree-toolbar-consolidation E1: TreeToolbar集成到Header) — 2026-04-04
+- **E1 TreeToolbar 集成到 Header**: TreeToolbar 统一三列工具栏
+  - E1-T1: TreePanel.tsx 添加 headerActions prop
+  - E1-T2: useTreeToolbarActions hook — 统一 store 访问
+  - E1-T3: CanvasPage.tsx 迁移全部 6 个 TreeToolbar
+  - E1-T4: canvas.module.css 样式
+- **提交**: `c19c57dc`
+
+### Added (frontend-mock-cleanup E1: 生产代码Mock清理) — 2026-04-04
+- **E1 生产代码Mock清理**: 清理生产代码中的 mock 数据
+  - 移除 BoundedContextTree.tsx 等组件中的 mock 数据
+  - 跳过 5 个 BulkOps/Interaction 测试（store refactor 后需 mock 重写）
+- **提交**: `9714fefa`, `ffd1c978`, `665a4e30`
+
 ### Added (frontend-mock-cleanup E2: 检测脚本误报修复) — 2026-04-04
 - **E2 检测脚本误报修复**: `cleanup-mocks.js` 添加 `/\/test-utils\//` skip pattern
   - 防止误报跳过 test-utils 目录

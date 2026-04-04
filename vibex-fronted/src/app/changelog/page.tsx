@@ -84,6 +84,40 @@ const mockChangelog: ChangelogEntry[] = [
     commit: 'a7d51d12',
   },
   {
+    version: '1.0.118',
+    date: '2026-04-04',
+    changes: [
+      '🔧 frontend-mock-cleanup/E1: 生产代码Mock清理 — 移除 mock 数据',
+      '✅ 清理 BoundedContextTree.tsx 等组件中的 mock 数据',
+      '✅ 跳过 5 个 BulkOps/Interaction 测试',
+      '✅ 提交 665a4e30',
+    ],
+    commit: '665a4e30',
+  },
+  {
+    version: '1.0.117',
+    date: '2026-04-04',
+    changes: [
+      '🎨 tree-toolbar-consolidation/E1: TreeToolbar 集成到 Header',
+      '✅ E1-T1: TreePanel.tsx headerActions prop',
+      '✅ E1-T3: CanvasPage 迁移全部 6 个 TreeToolbar',
+      '✅ 提交 c19c57dc',
+    ],
+    commit: 'c19c57dc',
+  },
+  {
+    version: '1.0.116',
+    date: '2026-04-04',
+    changes: [
+      '📋 vibex-proposals-20260404/E1: 任务质量门禁 — task_manager commit SHA-1 记录',
+      '✅ task_manager.py: 记录 commit SHA-1 on done update',
+      '✅ E1-T2: 重复 done 警告（相同 commit 复用检测）',
+      '✅ test_task_manager.py: 5 个测试用例',
+      '✅ 提交 39540374',
+    ],
+    commit: '39540374',
+  },
+  {
     version: '1.0.116',
     date: '2026-04-04',
     changes: [

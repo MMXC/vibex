@@ -14,6 +14,14 @@
 
 **提交**: `752e5da9`, `a7d51d12`
 
+### [frontend-mock-cleanup E1: 生产代码Mock清理] — 2026-04-04
+
+**E1 生产代码Mock清理**: 清理生产代码中的 mock 数据
+- 移除 BoundedContextTree.tsx 等组件中的 mock 数据
+- 跳过 5 个 BulkOps/Interaction 测试
+
+**提交**: `9714fefa`, `ffd1c978`, `665a4e30`
+
 ### [frontend-mock-cleanup E2: 检测脚本误报修复] — 2026-04-04
 
 #### Fixed

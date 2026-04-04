@@ -57,177 +57,184 @@ const defaultOptions: Required<RateLimitOptions> = {
   },
 };
 
-/**
- * In-memory store for rate limiting
- * Uses a simple Map with timestamps for sliding window algorithm
- */
-class RateLimitStore {
-  private store = new Map<string, { count: number; resetTime: number; requests: number[] }>();
+// ─── In-memory fallback store (local dev / non-Workers) ───────────────────────
 
-  /**
-   * Get current window key
-   */
-  private getWindowKey(key: string, windowSeconds: number): string {
-    const now = Date.now();
-    const windowStart = Math.floor(now / (windowSeconds * 1000));
+interface InMemoryEntry {
+  count: number;
+  resetTime: number;
+}
+
+class InMemoryStore {
+  private store = new Map<string, InMemoryEntry>();
+
+  private windowKey(key: string, windowSeconds: number): string {
+    const windowStart = Math.floor(Date.now() / (windowSeconds * 1000));
     return `${key}:${windowStart}`;
   }
 
-  /**
-   * Get sliding window key (includes individual request timestamps)
-   */
-  private getSlidingWindowKey(key: string, windowSeconds: number): string {
-    return `${key}:sliding:${windowSeconds}`;
+  async get(key: string): Promise<InMemoryEntry | null> {
+    return this.store.get(key) ?? null;
   }
 
-  /**
-   * Increment count for a key using fixed window algorithm
-   */
+  async put(key: string, entry: InMemoryEntry): Promise<void> {
+    this.store.set(key, entry);
+    // Periodic cleanup
+    if (this.store.size > 10000) {
+      const now = Date.now();
+      for (const [k, v] of this.store.entries()) {
+        if (v.resetTime * 1000 < now - 60000) this.store.delete(k);
+      }
+    }
+  }
+
   increment(key: string, windowSeconds: number): { count: number; resetTime: number } {
-    const windowKey = this.getWindowKey(key, windowSeconds);
+    const windowK = this.windowKey(key, windowSeconds);
     const now = Date.now();
     const resetTime = Math.ceil((now + windowSeconds * 1000) / 1000);
-
-    let entry = this.store.get(windowKey);
-    if (!entry) {
-      entry = { count: 0, resetTime, requests: [] };
-      this.store.set(windowKey, entry);
-    }
-
+    let entry = this.store.get(windowK) ?? { count: 0, resetTime };
     entry.count++;
     entry.resetTime = resetTime;
-
-    // Clean up old entries periodically
-    if (this.store.size > 10000) {
-      this.cleanup();
-    }
-
-    return { count: entry.count, resetTime: entry.resetTime };
+    this.store.set(windowK, entry);
+    return { count: entry.count, resetTime };
   }
 
-  /**
-   * Increment count for a key using sliding window algorithm
-   */
-  incrementSliding(key: string, windowSeconds: number): { count: number; resetTime: number } {
-    const windowKey = this.getSlidingWindowKey(key, windowSeconds);
-    const now = Date.now();
-    const windowMs = windowSeconds * 1000;
-    const resetTime = Math.ceil((now + windowMs) / 1000);
-
-    let entry = this.store.get(windowKey);
-    if (!entry) {
-      entry = { count: 0, resetTime, requests: [] };
-      this.store.set(windowKey, entry);
-    }
-
-    // Remove requests outside the sliding window
-    entry.requests = entry.requests.filter((timestamp) => now - timestamp < windowMs);
-    
-    // Add current request
-    entry.requests.push(now);
-    entry.count = entry.requests.length;
-    entry.resetTime = resetTime;
-
-    // Clean up old entries periodically
-    if (this.store.size > 10000) {
-      this.cleanup();
-    }
-
-    return { count: entry.count, resetTime: entry.resetTime };
-  }
-
-  /**
-   * Decrement count (for skipFailedRequests option)
-   */
   decrement(key: string, windowSeconds: number): void {
-    const windowKey = this.getWindowKey(key, windowSeconds);
-    const entry = this.store.get(windowKey);
-    if (entry && entry.count > 0) {
-      entry.count--;
+    const windowK = this.windowKey(key, windowSeconds);
+    const entry = this.store.get(windowK);
+    if (entry && entry.count > 0) entry.count--;
+    // Also decrement at exact windowStart to handle time drift
+    const windowStart = Math.floor(Date.now() / (windowSeconds * 1000));
+    const driftKey = `${key}:${windowStart}`;
+    const driftEntry = this.store.get(driftKey);
+    if (driftEntry && driftEntry.count > 0) driftEntry.count--;
+  }
+
+  /** Clear all entries — for testing */
+  clear(): void {
+    this.store.clear();
+  }
+}
+
+// ─── Cloudflare Cache API store (multi-Worker) ────────────────────────────────
+
+interface CacheEntry {
+  count: number;
+  resetTime: number;
+}
+
+class CacheStore {
+  /** Check if Cache API is available (Workers environment) */
+  isAvailable(): boolean {
+    try {
+      const c = globalThis.caches as { default?: CacheStorage } | undefined;
+      return c != null && c.default != null;
+    } catch {
+      return false;
     }
   }
 
-  /**
-   * Reset key (for manual reset)
-   */
-  reset(key: string, windowSeconds: number): void {
-    const windowKey = this.getWindowKey(key, windowSeconds);
-    this.store.delete(windowKey);
-    const slidingKey = this.getSlidingWindowKey(key, windowSeconds);
-    this.store.delete(slidingKey);
+  private cacheKey(key: string): string {
+    return `rl:${key}`;
   }
 
-  /**
-   * Clean up expired entries
-   */
-  private cleanup(): void {
-    const now = Date.now();
-    const keysToDelete: string[] = [];
-    this.store.forEach((entry, key) => {
-      if (entry.resetTime * 1000 < now - 60000) {
-        keysToDelete.push(key);
-      }
-    });
-    for (const key of keysToDelete) {
-      this.store.delete(key);
+  async get(key: string): Promise<CacheEntry | null> {
+    if (!this.isAvailable()) return null;
+    try {
+      const c = globalThis.caches as unknown as { default?: { match: (k: string) => Promise<Response | undefined> } };
+      const cached = await c.default?.match(this.cacheKey(key));
+      if (!cached) return null;
+      return await (cached as unknown as { json: () => Promise<CacheEntry> }).json();
+    } catch {
+      return null;
     }
   }
 
-  /**
-   * Get current count for debugging
-   */
-  getCurrentCount(key: string, windowSeconds: number, slidingWindow: boolean): number {
-    if (slidingWindow) {
-      const windowKey = this.getSlidingWindowKey(key, windowSeconds);
-      const entry = this.store.get(windowKey);
-      if (!entry) return 0;
-      
-      const now = Date.now();
-      const windowMs = windowSeconds * 1000;
-      entry.requests = entry.requests.filter((timestamp) => now - timestamp < windowMs);
-      return entry.requests.length;
-    } else {
-      const windowKey = this.getWindowKey(key, windowSeconds);
-      const entry = this.store.get(windowKey);
-      return entry?.count || 0;
+  async put(key: string, entry: CacheEntry, ttlSeconds: number): Promise<void> {
+    if (!this.isAvailable()) return;
+    try {
+      const c = globalThis.caches as unknown as { default?: { put: (k: string, r: Response, opts: { expirationTtl: number }) => Promise<void> } };
+      const response = new Response(JSON.stringify(entry), {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      await c.default?.put(this.cacheKey(key), response, { expirationTtl: ttlSeconds });
+    } catch {
+      // Silently fail — rate limiting should not crash the request
     }
   }
 }
 
-// Singleton store instance
-const store = new RateLimitStore();
+// ─── Unified store: Cache-first, in-memory fallback ──────────────────────────
 
-/**
- * Create rate limiting middleware
- * @param options - Rate limit configuration
- * @returns Hono middleware
- */
+const inMemoryStore = new InMemoryStore();
+
+export { inMemoryStore };
+const cacheStore = new CacheStore();
+
+function windowStart(windowSeconds: number): number {
+  return Math.floor(Date.now() / (windowSeconds * 1000));
+}
+
+function fullKey(key: string, windowSeconds: number): string {
+  return `${key}:${windowStart(windowSeconds)}`;
+}
+
+async function getCount(key: string, windowSeconds: number): Promise<CacheEntry | null> {
+  if (cacheStore.isAvailable()) {
+    const cacheEntry = await cacheStore.get(fullKey(key, windowSeconds));
+    if (cacheEntry) return cacheEntry;
+  }
+  return inMemoryStore.get(fullKey(key, windowSeconds));
+}
+
+async function recordRequest(key: string, windowSeconds: number): Promise<{ count: number; resetTime: number }> {
+  const now = Date.now();
+  const resetTime = Math.ceil((now + windowSeconds * 1000) / 1000);
+  const fk = fullKey(key, windowSeconds);
+
+  const current = await getCount(key, windowSeconds);
+  const count = (current?.count ?? 0) + 1;
+  const entry: CacheEntry = { count, resetTime };
+
+  // Write to both stores
+  if (cacheStore.isAvailable()) {
+    await cacheStore.put(fk, entry, windowSeconds);
+  }
+  await inMemoryStore.put(fk, entry);
+
+  return { count, resetTime };
+}
+
+// ─── Hono middleware ────────────────────────────────────────────────────────
+
 export function rateLimit(options: Partial<RateLimitOptions> = {}) {
   const config = { ...defaultOptions, ...options };
-  const { 
-    limit, 
-    windowSeconds, 
-    keyGenerator, 
-    slidingWindow, 
-    message, 
-    statusCode,
+  const {
+    limit,
+    windowSeconds,
+    keyGenerator,
+    message,
     skipSuccessfulRequests,
     skipFailedRequests,
     headers,
+    statusCode,
   } = config;
 
   return async (c: Context, next: Next) => {
     const key = keyGenerator(c);
-    
-    // Check rate limit
-    let result;
-    if (slidingWindow) {
-      result = store.incrementSliding(key, windowSeconds);
-    } else {
-      result = store.increment(key, windowSeconds);
+
+    let used: number;
+    let resetTime: number;
+
+    try {
+      const result = await recordRequest(key, windowSeconds);
+      used = result.count;
+      resetTime = result.resetTime;
+    } catch {
+      // If both stores fail, allow the request (fail open)
+      used = 0;
+      resetTime = Math.ceil(Date.now() / 1000) + windowSeconds;
     }
 
-    const { count: used, resetTime } = result;
     const remaining = Math.max(0, limit - used);
 
     // Set rate limit headers
@@ -236,12 +243,7 @@ export function rateLimit(options: Partial<RateLimitOptions> = {}) {
     c.res.headers.set(headers.reset!, String(resetTime));
 
     // Attach rate limit info to context
-    (c as any).rateLimit = {
-      limit,
-      remaining,
-      reset: resetTime,
-      used,
-    };
+    (c as any).rateLimit = { limit, remaining, reset: resetTime, used };
 
     // Check if rate limit exceeded
     if (used > limit) {
@@ -261,10 +263,9 @@ export function rateLimit(options: Partial<RateLimitOptions> = {}) {
 
     // Handle skip options after request completes
     if (skipSuccessfulRequests && c.res.status < 400) {
-      // Optionally decrement - this is a simplified approach
-      store.decrement(key, windowSeconds);
+      inMemoryStore.decrement(key, windowSeconds);
     } else if (skipFailedRequests && c.res.status >= 400) {
-      store.decrement(key, windowSeconds);
+      inMemoryStore.decrement(key, windowSeconds);
     }
   };
 }
@@ -274,42 +275,33 @@ export function rateLimit(options: Partial<RateLimitOptions> = {}) {
  */
 export const createRateLimiter = (options: Partial<RateLimitOptions>) => rateLimit(options);
 
-/**
- * Pre-configured rate limiters for common use cases
- */
-
-// Strict rate limiter: 10 requests per minute
+// Pre-configured rate limiters
 export const strictRateLimit = rateLimit({
   limit: 10,
   windowSeconds: 60,
   message: 'Strict rate limit exceeded. Please wait before making more requests.',
 });
 
-// Moderate rate limiter: 60 requests per minute
 export const moderateRateLimit = rateLimit({
   limit: 60,
   windowSeconds: 60,
   message: 'Moderate rate limit exceeded. Please slow down.',
 });
 
-// Default rate limiter: 100 requests per minute
 export const defaultRateLimit = rateLimit({
   limit: 100,
   windowSeconds: 60,
 });
 
-// Generous rate limiter: 500 requests per minute (for authenticated users)
 export const generousRateLimit = rateLimit({
   limit: 500,
   windowSeconds: 60,
   keyGenerator: (c) => {
-    // Use user ID if available, otherwise fall back to IP
     const userId = (c as any).user?.id;
     return userId || c.req.header('cf-connecting-ip') || 'unknown';
   },
 });
 
-// Auth-specific rate limiter (stricter to prevent brute force)
 export const authRateLimit = rateLimit({
   limit: 5,
   windowSeconds: 60,
@@ -317,5 +309,5 @@ export const authRateLimit = rateLimit({
   statusCode: 429,
 });
 
-// Export store for testing/debugging
-export { RateLimitStore, store };
+// ─── Exports for testing ────────────────────────────────────────────────────
+export { InMemoryStore, CacheStore, getCount, recordRequest };

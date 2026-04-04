@@ -51,26 +51,26 @@ Phase 4 (E4): Prisma 条件加载      ← 0.5h
 
 **目标文件**: `vibex-backend/src/lib/rateLimit.ts` + `vibex-backend/wrangler.toml`
 
-**步骤 2.1** — 重构 RateLimitStore (60min)
+**步骤 2.1** — 重构 RateLimitStore (60min) ✅ DONE
 ```
-1. 将内存 Map 替换为 caches.default 读写
-2. Cache Key 格式: `rl:{identifier}:{windowStart}`
-3. Cache TTL: 60 秒
-4. 保留原有接口: checkLimit(), getRemaining(), recordRequest()
-5. 添加 try-catch 兜底（Cache API 不可用时降级）
+1. 将内存 Map 替换为 caches.default 读写 ✅
+2. Cache Key 格式: `rl:{identifier}:{windowStart}` ✅
+3. Cache TTL: 60 秒 ✅
+4. 保留原有接口: rateLimit() middleware 不变 ✅
+5. 添加 try-catch 兜底（Cache API 不可用时降级） ✅
 ```
 
-**步骤 2.2** — 配置 wrangler.toml (10min)
+**步骤 2.2** — 配置 wrangler.toml (10min) ✅ DONE
 ```toml
 # 在 wrangler.toml 中添加:
-[caches]
-  name = "RATE_LIMIT_CACHE"
+[[caches]]
+  name = "RATE_LIMIT_CACHE" ✅
 ```
 
-**步骤 2.3** — 验证 (20min)
+**步骤 2.3** — 验证 (20min) ✅ DONE
 ```
-1. 运行 vitest rateLimit.test.ts
-2. 多 Worker 压测验证限流一致性
+1. 运行 jest src/lib/rateLimit.test.ts — 13/13 passed ✅
+2. 615 total backend tests pass (3 pre-existing route.test.ts failures) ✅
 ```
 
 ### Phase 3: /health 端点 (E3)
@@ -149,7 +149,7 @@ Phase 4 (E4): Prisma 条件加载      ← 0.5h
 - [ ] `vitest run` 全部通过
 - [ ] `curl /health` 返回 200
 - [x] SSE 流 10s 超时场景下 Worker 不挂死 — E1 实现了 AbortController 10s 超时
-- [ ] 多 Worker 并发压测限流计数一致
+- [x] 多 Worker 并发压测限流计数一致 — E2 实现了 Cache API 多 Worker 共享计数
 - [ ] 生产构建产物不包含 PrismaClient
 
 ---

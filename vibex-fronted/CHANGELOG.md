@@ -407,6 +407,19 @@
 
 **提交**: `59b16597`
 
+### [vibex-reviewer-proposals-20260403_024652 E4: 文档整理与宣贯] — 2026-04-04
+
+#### Added
+- `README.md` — Reviewer工作流章节（CHANGELOG规范、pre-submit脚本、驳回模板、报告索引）
+- Sprint 3 审查质量规范文档化完成
+
+**验证**:
+- `expect(readme.md).toContain('Reviewer 工作流')` ✅
+- `expect(readme.md).toContain('pre-submit-check.sh')` ✅
+- `expect(readme.md).toContain('CHANGELOG 规范')` ✅
+
+**提交**: `e4-doc-org`
+
 ### [E5-Git Hooks强制] — 2026-04-03 (vibex-reviewer-proposals-20260403_024652)
 
 #### Added

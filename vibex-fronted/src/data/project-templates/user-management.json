@@ -1,0 +1,35 @@
+{
+  "id": "user-management",
+  "version": 1,
+  "name": "用户管理模块",
+  "description": "标准用户管理系统，包含注册、登录、权限管理",
+  "thumbnail": "",
+  "category": "user",
+  "contexts": [
+    {
+      "name": "认证域",
+      "description": "用户身份认证",
+      "entities": ["用户", "凭证", "会话"]
+    },
+    {
+      "name": "权限域",
+      "description": "权限和角色管理",
+      "entities": ["角色", "权限", "资源"]
+    }
+  ],
+  "flows": [
+    {
+      "name": "登录流程",
+      "context": "认证域",
+      "steps": ["输入账号", "输入密码", "验证码", "登录成功"]
+    },
+    {
+      "name": "权限校验流程",
+      "context": "权限域",
+      "steps": ["获取角色", "查询权限", "校验资源"]
+    }
+  ],
+  "tags": ["用户", "权限", "认证"],
+  "createdAt": "2026-04-03T00:00:00Z",
+  "updatedAt": "2026-04-03T00:00:00Z"
+}

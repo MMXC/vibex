@@ -1,0 +1,30 @@
+{
+  "id": "generic-business",
+  "version": 1,
+  "name": "通用业务系统",
+  "description": "适合一般业务系统的 DDD 骨架",
+  "thumbnail": "",
+  "category": "general",
+  "contexts": [
+    {
+      "name": "业务域",
+      "description": "核心业务逻辑",
+      "entities": ["业务对象"]
+    },
+    {
+      "name": "数据域",
+      "description": "数据管理",
+      "entities": ["数据实体"]
+    }
+  ],
+  "flows": [
+    {
+      "name": "标准业务流程",
+      "context": "业务域",
+      "steps": ["开始", "处理", "结束"]
+    }
+  ],
+  "tags": ["通用", "骨架"],
+  "createdAt": "2026-04-03T00:00:00Z",
+  "updatedAt": "2026-04-03T00:00:00Z"
+}

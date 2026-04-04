@@ -23,7 +23,7 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@vibex/types": ["../packages/types/src"]
+      "@vibex/types/*": ["../packages/types/src/*"]
     }
   },
   "include": [

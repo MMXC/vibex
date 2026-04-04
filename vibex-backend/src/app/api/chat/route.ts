@@ -1,4 +1,14 @@
+/**
+ * Chat API — SSE Streaming with MiniMax
+ * POST /api/chat
+ * 
+ * Part of: api-input-validation-layer / Epic E2
+ * Uses chatMessageSchema for prompt injection protection
+ */
+
 import { NextRequest } from 'next/server';
+import { validateBody } from '@/lib/next-validation';
+import { chatMessageSchema } from '@/schemas/security';
 
 // MiniMax API configuration
 const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY || '';
@@ -89,66 +99,57 @@ async function* streamFromMiniMax(messages: ChatMessage[], conversationId: strin
   }
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { message, conversationId, history } = body;
+/**
+ * POST handler with Zod validation
+ * The validateBody wrapper handles:
+ * - JSON parsing with error handling
+ * - Schema validation with prompt injection detection
+ * - Standardized error responses
+ */
+export const POST = validateBody(chatMessageSchema, async (body) => {
+  const { message, conversationId, history } = body;
 
-    if (!message) {
-      return new Response(JSON.stringify({ error: 'Message is required' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+  // Build messages for API
+  const messages: ChatMessage[] = [
+    { role: 'user', content: message },
+  ];
 
-    // Build messages for API
-    const messages: ChatMessage[] = [
-      { role: 'user', content: message },
-    ];
+  // Create a new conversation ID if not provided
+  const convId = conversationId || `conv_${Date.now()}`;
 
-    // Create a new conversation ID if not provided
-    const convId = conversationId || `conv_${Date.now()}`;
+  // Create a readable stream for SSE
+  const stream = new ReadableStream({
+    async start(controller) {
+      const encoder = new TextEncoder();
 
-    // Create a readable stream for SSE
-    const stream = new ReadableStream({
-      async start(controller) {
-        const encoder = new TextEncoder();
+      try {
+        // Send conversation ID first
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ conversationId: convId })}\n\n`));
 
-        try {
-          // Send conversation ID first
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ conversationId: convId })}\n\n`));
-
-          // Stream from MiniMax
-          for await (const chunk of streamFromMiniMax(messages, convId)) {
-            controller.enqueue(encoder.encode(chunk));
-          }
-
-          // Send done signal
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ done: true })}\n\n`));
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: errorMessage })}\n\n`));
-        } finally {
-          controller.close();
+        // Stream from MiniMax
+        for await (const chunk of streamFromMiniMax(messages, convId)) {
+          controller.enqueue(encoder.encode(chunk));
         }
-      },
-    });
 
-    return new Response(stream, {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-      },
-    });
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-}
+        // Send done signal
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ done: true })}\n\n`));
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: errorMessage })}\n\n`));
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+    },
+  });
+});
 
 export async function GET() {
   return new Response(JSON.stringify({ 

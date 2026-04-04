@@ -1,4 +1,18 @@
+/**
+ * Chat API
+ * POST /api/v1/chat
+ * 
+ * Part of: api-input-validation-layer / Epic E2 (S2.2 Chat API Prompt Injection 防护)
+ * 
+ * Validates incoming messages against chatMessageSchema to prevent:
+ * - Empty or missing messages
+ * - Messages exceeding 10000 chars
+ * - Prompt injection via suspicious keywords
+ */
+
 import { NextRequest } from 'next/server';
+import { chatMessageSchema } from '@/schemas/security';
+import { parseBody } from '@/lib/high-risk-validation';
 
 // MiniMax API configuration
 const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY || '';
@@ -12,7 +26,10 @@ interface ChatMessage {
   content: string;
 }
 
-async function* streamFromMiniMax(messages: ChatMessage[], conversationId: string): AsyncGenerator<string> {
+async function* streamFromMiniMax(
+  messages: ChatMessage[],
+  conversationId: string
+): AsyncGenerator<string> {
   const url = `${MINIMAX_API_BASE}/text/chatcompletion_v2`;
 
   const headers: Record<string, string> = {
@@ -22,7 +39,7 @@ async function* streamFromMiniMax(messages: ChatMessage[], conversationId: strin
 
   const body = JSON.stringify({
     model: MINIMAX_MODEL,
-    messages: messages,
+    messages,
     stream: true,
     temperature: 0.7,
   });
@@ -36,18 +53,21 @@ async function* streamFromMiniMax(messages: ChatMessage[], conversationId: strin
 
     if (!response.ok) {
       const errorText = await response.text();
-      yield `data: ${JSON.stringify({ error: `MiniMax API error: ${response.status} - ${errorText}` })}\n\n`;
+      yield `data: ${JSON.stringify({
+        error: `MiniMax API error: ${response.status} - ${errorText}`,
+      })}\n\n`;
       return;
     }
 
     if (!response.body) {
-      yield `data: ${JSON.stringify({ error: 'No response body from MiniMax API' })}\n\n`;
+      yield `data: ${JSON.stringify({
+        error: 'No response body from MiniMax API',
+      })}\n\n`;
       return;
     }
 
     const decoder = new TextDecoder();
     const reader = response.body.getReader();
-
     let buffer = '';
 
     try {
@@ -90,72 +110,71 @@ async function* streamFromMiniMax(messages: ChatMessage[], conversationId: strin
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { message, conversationId, history } = body;
+  // S2.2: Validate request body against security schema
+  const result = await parseBody(request, chatMessageSchema);
 
-    if (!message) {
-      return new Response(JSON.stringify({ error: 'Message is required' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    // Build messages for API
-    const messages: ChatMessage[] = [
-      { role: 'user', content: message },
-    ];
-
-    // Create a new conversation ID if not provided
-    const convId = conversationId || `conv_${Date.now()}`;
-
-    // Create a readable stream for SSE
-    const stream = new ReadableStream({
-      async start(controller) {
-        const encoder = new TextEncoder();
-
-        try {
-          // Send conversation ID first
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ conversationId: convId })}\n\n`));
-
-          // Stream from MiniMax
-          for await (const chunk of streamFromMiniMax(messages, convId)) {
-            controller.enqueue(encoder.encode(chunk));
-          }
-
-          // Send done signal
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ done: true })}\n\n`));
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: errorMessage })}\n\n`));
-        } finally {
-          controller.close();
-        }
-      },
-    });
-
-    return new Response(stream, {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-      },
-    });
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      status: 500,
+  if ('error' in result) {
+    const parsed = JSON.parse(result.error.message);
+    return new Response(result.error.message, {
+      status: result.error.status,
       headers: { 'Content-Type': 'application/json' },
     });
   }
+
+  const { message, conversationId, history } = result.data;
+
+  // Build messages for API
+  const messages: ChatMessage[] = [{ role: 'user', content: message }];
+
+  // Create a new conversation ID if not provided
+  const convId = conversationId || `conv_${Date.now()}`;
+
+  // Create a readable stream for SSE
+  const stream = new ReadableStream({
+    async start(controller) {
+      const encoder = new TextEncoder();
+
+      try {
+        controller.enqueue(
+          encoder.encode(`data: ${JSON.stringify({ conversationId: convId })}\n\n`)
+        );
+
+        for await (const chunk of streamFromMiniMax(messages, convId)) {
+          controller.enqueue(encoder.encode(chunk));
+        }
+
+        controller.enqueue(
+          encoder.encode(`data: ${JSON.stringify({ done: true })}\n\n`)
+        );
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        controller.enqueue(
+          encoder.encode(`data: ${JSON.stringify({ error: errorMessage })}\n\n`)
+        );
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+    },
+  });
 }
 
 export async function GET() {
-  return new Response(JSON.stringify({ 
-    status: 'ok',
-    message: 'Chat API is running. Use POST with { message: "your message" }'
-  }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' },
-  });
+  return new Response(
+    JSON.stringify({
+      status: 'ok',
+      message: 'Chat API is running. Use POST with { message: "your message" }',
+    }),
+    {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    }
+  );
 }

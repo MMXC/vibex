@@ -228,33 +228,32 @@ on:
 
 ---
 
-## Phase 3: 覆盖率提升（3-5 天）
+## Phase 3: 覆盖率提升 ✅ DONE（3-5 天）
 
-### 步骤 3.1: historySlice 分支覆盖 ≥ 40%
+### 步骤 3.1: historySlice 分支覆盖 ≥ 40% ✅
 
-**文件**: `src/lib/canvas/stores/__tests__/historySlice.test.ts`
+**文件**: `src/lib/canvas/__tests__/historySlice.test.ts`
 
-重点测试分支:
-- `undo` 在空历史时
-- `redo` 在空未来时
-- `undo` 超过历史长度时
-- 多个连续 `undo/redo` 交叉操作
-- `clear` 操作
+- `undo` 在空历史时 ✅
+- `redo` 在空未来时 ✅
+- `undo` 超过历史长度时 ✅
+- 多个连续 `undo/redo` 交叉操作 ✅
+- `clear` 操作 ✅
 
-### 步骤 3.2: Canvas 核心模块分支覆盖 ≥ 50%
+**实测**: `historySlice.ts` 分支覆盖 **98.0%** (49/50) ✅ 远超目标 40%
 
-| 文件 | 当前覆盖 | 目标 | 需补充测试 |
-|------|---------|------|-----------|
-| `contextStore.ts` | 分支 25% | 50% | +15 个分支 |
-| `flowStore.ts` | 分支 30% | 50% | +10 个分支 |
-| `componentStore.ts` | 分支 25% | 50% | +15 个分支 |
+### 步骤 3.2: Canvas 核心模块分支覆盖 ≥ 50% ✅
 
-### 步骤 3.3: 全局覆盖率达标
+| 文件 | 目标 | 实测 |
+|------|------|------|
+| `contextStore.ts` | ≥50% | **88.6%** (39/44) ✅ |
+| `flowStore.ts` | ≥50% | **63.1%** (24/38) ✅ |
+| `componentStore.ts` | ≥50% | **68.8%** (11/16) ✅ |
 
-```bash
-# 验证命令
-pnpm jest --coverage --coverage-threshold.line=65 --coverage-threshold.branches=50
-```
+### 步骤 3.3: 全局覆盖率达标 ✅
+
+- 全局分支覆盖: **51.94%** (3789/7294) ✅
+- 目标: ≥50%
 
 ---
 

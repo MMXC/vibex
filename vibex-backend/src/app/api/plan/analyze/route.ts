@@ -2,7 +2,14 @@
  * Plan Analyze API
  * POST /api/plan/analyze
  * 
- * Analyzes requirement text using AI and returns comprehensive plan result
+ * Analyzes requirement text using AI and returns comprehensive plan result.
+ * 
+ * Part of: api-input-validation-layer / Epic E2 (S2.3 Plan API Prompt Injection 防护)
+ * 
+ * Validates incoming requirement against planAnalyzeSchema to prevent:
+ * - Empty or missing requirement
+ * - Requirement exceeding 50000 chars
+ * - Prompt injection via suspicious keywords
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -10,14 +17,8 @@ import { createAIService } from '@/services/ai-service';
 import { getLocalEnv as getCloudflareEnv } from '@/lib/env';
 import { generateId } from '@/lib/db';
 import { devDebug, sanitize } from '@/lib/log-sanitizer';
-
-interface AnalyzeRequest {
-  requirement: string;
-  context?: {
-    projectId?: string;
-    previousPlans?: any[];
-  };
-}
+import { planAnalyzeSchema } from '@/schemas/security';
+import { parseBody } from '@/lib/high-risk-validation';
 
 interface Entity {
   id: string;
@@ -76,20 +77,19 @@ interface PlanResult {
 
 export async function POST(request: NextRequest) {
   try {
-    const body: AnalyzeRequest = await request.json();
-    
-    if (!body.requirement || body.requirement.trim().length === 0) {
-      return NextResponse.json(
-        { error: 'requirement is required' },
-        { status: 400 }
-      );
+    // S2.3: Validate request body against security schema
+    const result = await parseBody(request, planAnalyzeSchema);
+
+    if ('error' in result) {
+      const parsed = JSON.parse(result.error.message);
+      return NextResponse.json(parsed, { status: result.error.status });
     }
 
-    const { requirement } = body;
+    const { requirement, context } = result.data;
 
     // Get environment variables
     const env = getCloudflareEnv(request);
-    
+
     // Debug: Check if MINIMAX_API_KEY is available
     const debugInfo = {
       hasApiKey: !!env.MINIMAX_API_KEY,
@@ -155,13 +155,13 @@ Return a JSON object with:
 Respond ONLY with the JSON object, no other text.`;
 
     // Call AI for plan analysis
-    const result = await aiService.generateJSON<{
-      summary: string
-      entities: any[]
-      features: any[]
-      questions: any[]
-      suggestedContexts: any[]
-      confidence: number
+    const aiResult = await aiService.generateJSON<{
+      summary: string;
+      entities: any[];
+      features: any[];
+      questions: any[];
+      suggestedContexts: any[];
+      confidence: number;
     }>(
       prompt,
       {
@@ -172,7 +172,10 @@ Respond ONLY with the JSON object, no other text.`;
             type: 'object',
             properties: {
               name: { type: 'string' },
-              type: { type: 'string', enum: ['aggregate', 'entity', 'valueObject', 'service'] },
+              type: {
+                type: 'string',
+                enum: ['aggregate', 'entity', 'valueObject', 'service'],
+              },
               description: { type: 'string' },
               attributes: {
                 type: 'array',
@@ -234,16 +237,19 @@ Respond ONLY with the JSON object, no other text.`;
     );
 
     // Debug: Log the AI result (sanitized)
-    devDebug('[DEBUG] Plan API - AI result success:', result.success);
-    devDebug('[DEBUG] Plan API - AI result error:', result.error);
-    devDebug('[DEBUG] Plan API - AI result data:', result.data ? JSON.stringify(sanitize(result.data)).substring(0, 200) : 'null');
+    devDebug('[DEBUG] Plan API - AI result success:', aiResult.success);
+    devDebug('[DEBUG] Plan API - AI result error:', aiResult.error);
+    devDebug(
+      '[DEBUG] Plan API - AI result data:',
+      aiResult.data ? JSON.stringify(sanitize(aiResult.data)).substring(0, 200) : 'null'
+    );
 
     // Parse the AI response
-    if (!result?.success || !result?.data) {
+    if (!aiResult?.success || !aiResult?.data) {
       return NextResponse.json(
         {
           success: false,
-          error: result?.error || 'AI analysis failed',
+          error: aiResult?.error || 'AI analysis failed',
           result: null,
           timestamp: new Date().toISOString(),
         },
@@ -251,7 +257,7 @@ Respond ONLY with the JSON object, no other text.`;
       );
     }
 
-    const data = result.data;
+    const data = aiResult.data;
 
     // Transform AI response to PlanResult
     const planResult: PlanResult = {
@@ -301,7 +307,7 @@ Respond ONLY with the JSON object, no other text.`;
     });
   } catch (error) {
     console.error('[ERROR] Plan API - Analysis failed:', error);
-    
+
     return NextResponse.json(
       {
         success: false,

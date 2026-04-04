@@ -1,9 +1,18 @@
 /**
  * GitHub Repository README API
  * GET /api/github/repos/:owner/:repo/readme
+ * 
+ * Part of: api-input-validation-layer / Epic E2 (S2.1 GitHub 路径注入防护)
+ * 
+ * Validates owner and repo params against security schemas to prevent:
+ * - Path traversal attacks
+ * - Template injection
+ * - Shell special characters
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { githubRepoParamsSchema } from '@/schemas/security';
+import { validateParams } from '@/lib/high-risk-validation';
 
 interface GitHubContentResponse {
   name: string;
@@ -20,6 +29,13 @@ export async function GET(
 ) {
   try {
     const { owner, repo } = await params;
+
+    // S2.1: Validate params against security schema
+    const paramsResult = validateParams({ owner, repo }, githubRepoParamsSchema);
+    if ('error' in paramsResult) {
+      return paramsResult.error;
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const ref = searchParams.get('ref') || undefined;
 
@@ -30,7 +46,7 @@ export async function GET(
 
     const response = await fetch(url, {
       headers: {
-        'Accept': 'application/vnd.github.v3+json',
+        Accept: 'application/vnd.github.v3+json',
         'User-Agent': 'VibeX-Import',
       },
     });
@@ -45,7 +61,7 @@ export async function GET(
     const data: GitHubContentResponse = await response.json();
 
     // Content is Base64 encoded
-    const content = data.content 
+    const content = data.content
       ? Buffer.from(data.content, 'base64').toString('utf-8')
       : '';
 

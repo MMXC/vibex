@@ -245,6 +245,17 @@ const mockChangelog: ChangelogEntry[] = [
     commit: 'e1346b0f',
   },
   {
+    version: '1.0.109',
+    date: '2026-04-03',
+    changes: [
+      '🔄 canvas-sync-protocol-complete/E3: 轮询检测与集成 — 30s 版本轮询冲突检测',
+      '✅ useAutoSave: 30s 轮询检测 remote version 变化',
+      '✅ canvasApi.getLatestVersion(): 最新版本查询 API',
+      '✅ 提交 1546864f',
+    ],
+    commit: '1546864f',
+  },
+  {
     version: '1.0.105',
     date: '2026-04-04',
     changes: [

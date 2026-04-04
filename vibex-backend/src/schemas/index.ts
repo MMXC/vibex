@@ -10,3 +10,6 @@ export * from './common';
 
 // Auth schemas
 export * from './auth';
+
+// Security schemas (E2: 高风险路由)
+export * from './security';

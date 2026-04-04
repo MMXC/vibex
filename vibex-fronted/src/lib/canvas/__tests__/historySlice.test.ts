@@ -135,6 +135,28 @@ describe('HistorySlice — Initialization', () => {
     expect(contextHistory.past).toEqual([]);
     expect(contextHistory.future).toEqual([]);
   });
+
+  // E3: initTreeHistory for flow tree (branch coverage)
+  it('should init flow tree history', () => {
+    const flow = [makeFlowNode('F1'), makeFlowNode('F2')];
+    useHistoryStore.getState().initTreeHistory('flow', flow);
+
+    const { flowHistory } = useHistoryStore.getState();
+    expect(flowHistory.present).toEqual(flow);
+    expect(flowHistory.past).toEqual([]);
+    expect(flowHistory.future).toEqual([]);
+  });
+
+  // E3: initTreeHistory for component tree (else branch coverage)
+  it('should init component tree history', () => {
+    const comp = [makeComponentNode('P1'), makeComponentNode('P2')];
+    useHistoryStore.getState().initTreeHistory('component', comp);
+
+    const { componentHistory } = useHistoryStore.getState();
+    expect(componentHistory.present).toEqual(comp);
+    expect(componentHistory.past).toEqual([]);
+    expect(componentHistory.future).toEqual([]);
+  });
 });
 
 describe('HistorySlice — Snapshot Recording', () => {
@@ -508,6 +530,38 @@ describe('HistorySlice — Clear Operations', () => {
     expect(contextHistory.present[1].name).toBe('C2');
     // Flow: untouched (first record sets present, no past entry)
     expect(flowHistory.present[0].name).toBe('F1');
+  });
+
+  // E3: clearTreeHistory for flow tree (branch coverage)
+  it('should clear flow tree history', () => {
+    useHistoryStore.getState().recordSnapshot('flow', [makeFlowNode('F1')]);
+    useHistoryStore.getState().recordSnapshot('flow', [makeFlowNode('F1'), makeFlowNode('F2')]);
+    useHistoryStore.getState().recordSnapshot('context', [makeContextNode('C1')]);
+
+    useHistoryStore.getState().clearTreeHistory('flow');
+
+    const { flowHistory, contextHistory } = useHistoryStore.getState();
+    // Flow: past cleared, present preserved
+    expect(flowHistory.past).toEqual([]);
+    expect(flowHistory.present[0].name).toBe('F1');
+    // Context: untouched
+    expect(contextHistory.present[0].name).toBe('C1');
+  });
+
+  // E3: clearTreeHistory for component tree (else branch coverage)
+  it('should clear component tree history', () => {
+    useHistoryStore.getState().recordSnapshot('component', [makeComponentNode('P1')]);
+    useHistoryStore.getState().recordSnapshot('component', [makeComponentNode('P1'), makeComponentNode('P2')]);
+    useHistoryStore.getState().recordSnapshot('context', [makeContextNode('C1')]);
+
+    useHistoryStore.getState().clearTreeHistory('component');
+
+    const { componentHistory, contextHistory } = useHistoryStore.getState();
+    // Component: past cleared, present preserved
+    expect(componentHistory.past).toEqual([]);
+    expect(componentHistory.present[0].name).toBe('P1');
+    // Context: untouched
+    expect(contextHistory.present[0].name).toBe('C1');
   });
 
   it('should clear all histories', () => {

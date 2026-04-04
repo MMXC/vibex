@@ -1,9 +1,18 @@
 /**
  * GitHub Repository Info API
  * GET /api/github/repos/:owner/:repo
+ * 
+ * Part of: api-input-validation-layer / Epic E2 (S2.1 GitHub 路径注入防护)
+ * 
+ * Validates owner and repo params against security schemas to prevent:
+ * - Path traversal attacks
+ * - Template injection
+ * - Shell special characters
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { githubRepoParamsSchema } from '@/schemas/security';
+import { validateParams } from '@/lib/high-risk-validation';
 
 interface GitHubRepoResponse {
   name: string;
@@ -30,13 +39,22 @@ export async function GET(
 ) {
   try {
     const { owner, repo } = await params;
-    
-    const response = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': 'VibeX-Import',
-      },
-    });
+
+    // S2.1: Validate params against security schema
+    const paramsResult = validateParams({ owner, repo }, githubRepoParamsSchema);
+    if ('error' in paramsResult) {
+      return paramsResult.error;
+    }
+
+    const response = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}`,
+      {
+        headers: {
+          Accept: 'application/vnd.github.v3+json',
+          'User-Agent': 'VibeX-Import',
+        },
+      }
+    );
 
     if (!response.ok) {
       if (response.status === 404) {

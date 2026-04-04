@@ -160,6 +160,15 @@
 
 **提交**: `e1346b0f`
 
+### [canvas-sync-protocol-complete E3: 轮询检测与集成] — 2026-04-03
+
+#### Changed
+- `src/hooks/canvas/useAutoSave.ts` — 30s 轮询检测 remote version 变化
+- `src/lib/canvas/api/canvasApi.ts` — `getLatestVersion()` API 端点
+- `src/lib/api-config.ts` — latest endpoint 配置
+
+**提交**: `1546864f`
+
 ### [canvas-sync-protocol-complete E1: 后端SnapshotsAPI] — 2026-04-03
 
 #### Changed (backend)

@@ -1,9 +1,22 @@
-### Added (vibex-backend-p0-20260405 E1: OPTIONS/CORS 修复) — 2026-04-05
+### Added (vibex-backend-p0-20260405 E1-E3: OPTIONS/CORS + NODE_ENV + JWT 修复) — 2026-04-05
 - **E1 OPTIONS/CORS 修复**: gateway.ts CORS preflight handler 顺序修复
   - `protected_.options('/*')` 移到 `protected_.use('*', authMiddleware)` 之前
   - 添加 CORS headers: Access-Control-Allow-Origin/Methods/Headers
   - 新增 `gateway-cors.test.ts`: 7 tests (OPTIONS 204, CORS headers, auth 拦截)
-- **提交**: `9d915fe9`
+  - **提交**: `9d915fe9`
+- **E2.1 全局CORS**: `index.ts` 添加 `app.options('/*')` 全局 handler，返回 204 + CORS headers
+  - 新增 `index.test.ts`: 7 tests
+  - **提交**: `2b0d72b8`
+- **E2.2 NODE_ENV修复**: 使用 `isWorkers` 检测 Workers 环境 + optional chaining
+  - `const isWorkers = typeof globalThis.caches !== 'undefined'`
+  - `const isProduction = process.env?.NODE === 'production'`
+  - 避免 `process.env` 不存在时崩溃
+  - 新增 3 tests (`index.test.ts`)
+  - **提交**: `2b0d72b8`
+- **E2.3 JWT错误码**: `auth.ts` JWT_SECRET 缺失时 `code: 'CONFIG_ERROR'`
+  - 错误消息包含 `wrangler secret put JWT_SECRET` 操作指引
+  - 新增 2 tests (`auth.test.ts`)
+  - **提交**: `2b0d72b8`
 
 ### Added (vibex-proposals-20260405-final E1-E3: 提案追踪机制) — 2026-04-05
 - **E1 Canvas API追踪**: proposals/canvas-api-tracker.md 记录4个端点状态（100% real AI）

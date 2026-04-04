@@ -175,6 +175,7 @@ const mockChangelog: ChangelogEntry[] = [
     commit: 'a81a1cbd',
   },
   {
+    version: '1.0.116',
     date: '2026-04-04',
     changes: [
       '📋 vibex-pm-proposals/E4: 项目浏览优化 — dashboard 搜索 + 排序',

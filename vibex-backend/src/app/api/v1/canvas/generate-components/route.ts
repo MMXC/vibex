@@ -89,6 +89,20 @@ export async function POST(
       );
     }
 
+    if (body.contexts.length === 0) {
+      return NextResponse.json(
+        { success: false, components: [] as ComponentResponse[], generationId: '', totalCount: 0, confidence: 0, error: 'contexts 不能为空' },
+        { status: 400 }
+      );
+    }
+
+    if (body.flows.length === 0) {
+      return NextResponse.json(
+        { success: false, components: [] as ComponentResponse[], generationId: '', totalCount: 0, confidence: 0, error: 'flows 不能为空' },
+        { status: 400 }
+      );
+    }
+
     const { contexts, flows } = body as {
       contexts: BoundedContext[];
       flows: BusinessFlowInput[];
@@ -116,12 +130,17 @@ export async function POST(
       .replace('{flows}', flowSummary)
       .replace('{contexts}', contextSummary);
 
-    const result = await aiService.generateJSON<ComponentResponse[]>(prompt, undefined, {
-      temperature: 0.3,
-      maxTokens: 4096,
-    });
+    const result = await aiService
+      .generateJSON<ComponentResponse[]>(prompt, undefined, {
+        temperature: 0.3,
+        maxTokens: 4096,
+      })
+      .catch((err) => {
+        console.error('[canvas/generate-components] AI service error:', err);
+        return { data: null, usage: null, error: err instanceof Error ? err.message : 'AI service error' };
+      });
 
-    if (!result.data || !Array.isArray(result.data) || result.data.length === 0) {
+    if (result.error || !result.data || !Array.isArray(result.data) || result.data.length === 0) {
       return NextResponse.json(
         {
           success: false,
@@ -129,9 +148,9 @@ export async function POST(
           generationId: '',
           totalCount: 0,
           confidence: 0,
-          error: '未能生成有效的组件列表，请重试',
+          error: (result.error as string) || '未能生成有效的组件列表，请重试',
         },
-        { status: 200 }
+        { status: result.error ? 500 : 200 }
       );
     }
 

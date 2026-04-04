@@ -334,6 +334,208 @@ class ProposalTracker:
                 proposal["stage_started"] = None
                 proposal["stage_completed"] = None
 
+    # ── E2-T1: Proposal → Epic → Task Linking ─────────────────────────────────
+
+    def _parse_prd_epic_table(self, prd_path: Path) -> dict:
+        """Parse the Epic总览 table from a PRD file.
+
+        Returns a dict: {proposal_to_epics: {pid: [epic_name, ...], ...}, epic_to_proposals: {epic: [pid, ...], ...}}
+        E.g. {"proposal_to_epics": {"P001": ["E1"]}, "epic_to_proposals": {"E1": ["P001", "A-P0-1"]}}
+        """
+        if not prd_path or not prd_path.exists():
+            return {}
+
+        try:
+            content = prd_path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            return {}
+
+        # Find the Epic总览 table (markdown table with | Epic | 名称 | 来源提案 | ...)
+        epic_table_re = re.compile(
+            r"(?:Epic\s*总览|Epic\s*拆分|Epic\s*概览)\s*\n\s*\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|\s*\n((?:\|[^\n]+\|\s*\n)+)",
+            re.MULTILINE,
+        )
+        match = epic_table_re.search(content)
+        if not match:
+            return {}
+
+        table_rows = match.group(1).strip().split("\n")
+        proposal_to_epics: dict = {}
+        epic_to_proposals: dict = {}
+
+        for row in table_rows:
+            # Parse markdown table row: | E1 | Canvas API 端点... | P001+A-P0-1 | ...
+            cells = [c.strip().strip("|").strip() for c in row.split("|")]
+            if len(cells) < 3:
+                continue
+            epic_name = cells[0].strip()
+            # 3rd column (index 2) is "来源提案" containing "P001+A-P0-1" etc.
+            source_col = cells[2].strip() if len(cells) > 2 else ""
+
+            # Skip header-like rows
+            if not epic_name or epic_name.lower() in ("epic", "名称", "来源"):
+                continue
+
+            epic_to_proposals.setdefault(epic_name, [])
+
+            # Parse comma-or-plus-separated proposal IDs (e.g. "P001+A-P0-1" or "P001, A-P0-1")
+            # Proposal IDs: P0-N, P1-N, A-P0-N, A-P1-N, etc.
+            pid_matches = re.findall(r"[A-Z]-P\d+-\d+|[A-Z]\d+(?:[.:-]\d+)?", source_col)
+            for pid in pid_matches:
+                if pid not in epic_to_proposals[epic_name]:
+                    epic_to_proposals[epic_name].append(pid)
+                proposal_to_epics.setdefault(pid, []).append(epic_name)
+
+        return {"proposal_to_epics": proposal_to_epics, "epic_to_proposals": epic_to_proposals}
+
+    def _get_tasks_for_epic(self, project_name: str, epic_id: str) -> list[dict]:
+        """Get all task stages for an Epic in a task_manager project.
+
+        E.g. for epic_id="E2" in project "vibex-proposals-20260405",
+        finds stages: dev-e2, tester-e2, reviewer-e2, reviewer-push-e2
+        Also finds stages with proposal_id set.
+        """
+        data = load_task_json(project_name)
+        if not data:
+            return []
+
+        stages = data.get("stages", {})
+        epic_id_lower = epic_id.lower().replace(" ", "-").replace("_", "-")
+
+        # Build topological order
+        dependents = {tid: [] for tid in stages}
+        in_degree = {tid: 0 for tid in stages}
+        for tid, t in stages.items():
+            for dep in t.get("dependsOn", []):
+                if dep in dependents:
+                    dependents[dep].append(tid)
+                    in_degree[tid] = in_degree.get(tid, 0) + 1
+
+        queue = [tid for tid, deg in in_degree.items() if deg == 0]
+        sorted_ids = []
+        while queue:
+            tid = queue.pop(0)
+            sorted_ids.append(tid)
+            for dep in dependents.get(tid, []):
+                in_degree[dep] -= 1
+                if in_degree[dep] == 0:
+                    queue.append(dep)
+
+        if len(sorted_ids) < len(stages):
+            sorted_ids = list(stages.keys())
+
+        result = []
+        for tid in sorted_ids:
+            t = stages[tid]
+            tid_lower = tid.lower().replace(" ", "-").replace("_", "-")
+            # Match: dev-e2, tester-e2, reviewer-e2, reviewer-push-e2, etc.
+            if f"-{epic_id_lower}" in tid_lower or tid_lower.startswith(epic_id_lower + "-"):
+                result.append({
+                    "id": tid,
+                    "agent": t.get("agent", ""),
+                    "status": t.get("status", "pending"),
+                    "startedAt": t.get("startedAt"),
+                    "completedAt": t.get("completedAt"),
+                    "proposal_id": t.get("proposal_id"),
+                })
+            # Also match stages with proposal_id set (E2-T1 new field)
+            elif t.get("proposal_id"):
+                result.append({
+                    "id": tid,
+                    "agent": t.get("agent", ""),
+                    "status": t.get("status", "pending"),
+                    "startedAt": t.get("startedAt"),
+                    "completedAt": t.get("completedAt"),
+                    "proposal_id": t.get("proposal_id"),
+                })
+
+        return result
+
+    def _find_project_for_date_dir(self, date_dir: str) -> str | None:
+        """Find a vibex-proposals project matching a date directory.
+
+        E.g. date_dir="20260405" → "vibex-proposals-20260405"
+        """
+        # Scan for vibex-proposals-{date} projects
+        for candidate in TEAM_TASKS_DIR.glob(f"vibex-proposals-{date_dir}.json"):
+            return candidate.stem
+        # Also check projects subdirectory
+        projects_dir = TEAM_TASKS_DIR / "projects"
+        if projects_dir.is_dir():
+            for candidate in projects_dir.glob(f"vibex-proposals-{date_dir}*"):
+                tasks_file = candidate / "tasks.json"
+                if tasks_file.exists():
+                    return candidate.name
+        # Fallback: scan all vibex-proposals projects
+        for pattern in [f"vibex-proposals-{date_dir}*", f"vibex-*proposals*{date_dir}*"]:
+            for candidate in TEAM_TASKS_DIR.glob(pattern):
+                if candidate.suffix == ".json":
+                    return candidate.stem
+                elif candidate.is_dir():
+                    return candidate.name
+        return None
+
+    def _enrich_with_linked_tasks(self) -> None:
+        """E2-T1: Link proposals to task stages via PRD Epic总览 table.
+
+        For each proposal:
+        1. Find the vibex-proposals project for its date_dir
+        2. Parse the PRD's Epic总览 table for proposal→Epic mapping
+        3. Look up task stages for matching Epic in the project
+        4. Store linked task stages in proposal entry
+        """
+        for proposal in self.proposals:
+            date_dir = proposal.get("date_dir", "")
+            proposal_id = proposal.get("id", "")
+            raw_text = proposal.get("raw_text", "")
+
+            linked_tasks = []
+
+            # Strategy 1: proposal_id matches a stage's proposal_id field (E2-T1 new)
+            for f in list(TEAM_TASKS_DIR.glob("*.json")) + \
+                      list((TEAM_TASKS_DIR / "projects").glob("*/*.json")):
+                try:
+                    data = json.loads(f.read_text(encoding="utf-8"))
+                except (json.JSONDecodeError, OSError):
+                    continue
+
+                for tid, stage in data.get("stages", {}).items():
+                    if stage.get("proposal_id") == proposal_id:
+                        linked_tasks.append({
+                            "id": tid,
+                            "agent": stage.get("agent", ""),
+                            "status": stage.get("status", "pending"),
+                            "project": f.stem if f.suffix == ".json" else f.parent.name,
+                            "stage_proposal_id": stage.get("proposal_id"),
+                            "startedAt": stage.get("startedAt"),
+                            "completedAt": stage.get("completedAt"),
+                        })
+
+            # Strategy 2: Parse PRD's Epic总览 table for proposal→Epic mapping
+            project_name = self._find_project_for_date_dir(date_dir)
+            if project_name:
+                # Look for PRD in both docs/ and proposals/ directories
+                prd_paths = [
+                    VIBEX_ROOT / "docs" / f"vibex-proposals-{date_dir}" / "prd.md",
+                    PROPOSALS_DIR / date_dir / "prd.md",
+                    VIBEX_ROOT / "docs" / project_name / "prd.md",
+                ]
+                for prd_path in prd_paths:
+                    if prd_path.exists():
+                        epic_map = self._parse_prd_epic_table(prd_path)
+                        proposal_to_epics = epic_map.get("proposal_to_epics", {})
+                        epic_names = proposal_to_epics.get(proposal_id, [])
+
+                        for epic_name in epic_names:
+                            tasks = self._get_tasks_for_epic(project_name, epic_name)
+                            for task in tasks:
+                                # Avoid duplicates
+                                if not any(t["id"] == task["id"] and t.get("project") == project_name for t in linked_tasks):
+                                    linked_tasks.append({**task, "project": project_name})
+                        break  # Found and parsed PRD
+
+            proposal["linked_tasks"] = linked_tasks
+
     def _infer_task_id(self, proposal: dict) -> str | None:
         """Infer a task ID from proposal context.
 
@@ -615,6 +817,14 @@ class ProposalTracker:
         self.enrich_with_task_status()
         enrich_elapsed = time.perf_counter() - enrich_start
         print(f"  {C_GREEN}✓{C_RESET} Task status enrichment done in {enrich_elapsed:.2f}s")
+
+        # Phase 2b: E2-T1 — enrich with linked tasks from PRD Epic总览
+        print(f"{C_CYAN}Phase 2b:{C_RESET} E2-T1: linking proposals to task stages...")
+        enrich_tasks_start = time.perf_counter()
+        self._enrich_with_linked_tasks()
+        enrich_tasks_elapsed = time.perf_counter() - enrich_tasks_start
+        linked = sum(1 for p in self.proposals if p.get("linked_tasks"))
+        print(f"  {C_GREEN}✓{C_RESET} Linked tasks enriched: {linked} proposals with linked tasks in {enrich_tasks_elapsed:.2f}s")
 
         # Phase 3: Compute stats
         print(f"{C_CYAN}Phase 3:{C_RESET} Computing statistics...")

@@ -583,7 +583,8 @@ def save_project(project: str, data: dict):
 
 def make_stage(agent_id: str, task: str = "", depends_on: list = None, 
                constraints: list = None, verification: dict = None, output: str = None,
-               features: list = None, redlines: list = None, checklist: list = None) -> dict:
+               features: list = None, redlines: list = None, checklist: list = None,
+               proposal_id: str = None) -> dict:
     stage = {
         "agent": agent_id,
         "status": "pending",
@@ -605,6 +606,9 @@ def make_stage(agent_id: str, task: str = "", depends_on: list = None,
         stage["redlines"] = redlines
     if checklist is not None:
         stage["checklist"] = checklist
+    # E2-T1: proposal_id field links this task to a specific proposal (e.g. P001, P002)
+    if proposal_id is not None:
+        stage["proposal_id"] = proposal_id
     return stage
 
 
@@ -1915,6 +1919,51 @@ def cmd_list(args):
                 print(f"# {name} [error: {e}]")
         return
 
+    # E2-T1: 按提案 ID 过滤任务
+    proposal_filter = getattr(args, "proposal", None)
+    if proposal_filter:
+        print(f"📋 提案 `{proposal_filter}` 关联的任务：\n")
+        matched_any = False
+        for f in sorted(all_files):
+            name = f.replace(".json", "")
+            try:
+                root_path = os.path.join(TASKS_DIR, f)
+                if os.path.isfile(root_path):
+                    with open(root_path) as fh:
+                        data = json.load(fh)
+                else:
+                    tasks_path = os.path.join(TASKS_DIR, "projects", name, "tasks.json")
+                    if not os.path.isfile(tasks_path):
+                        continue
+                    with open(tasks_path) as fh:
+                        data = json.load(fh)
+
+                stages = data.get("stages", {})
+                matched = []
+                for tid, stage in stages.items():
+                    pid = stage.get("proposal_id", "")
+                    if pid == proposal_filter:
+                        matched.append((tid, stage))
+
+                if matched:
+                    matched_any = True
+                    goal = data.get("goal", "")[:50]
+                    print(f"# {name}: {goal}")
+                    for tid, stage in sorted(matched):
+                        status = stage.get("status", "?")
+                        agent = stage.get("agent", "?")
+                        deps = stage.get("dependsOn", [])
+                        dep_str = f" ← [{', '.join(deps)}]" if deps else ""
+                        print(f"  {tid} [{status}] agent={agent}{dep_str}")
+                    print()
+            except Exception as e:
+                print(f"# {name} [error: {e}]")
+
+        if not matched_any:
+            print(f"⚠️  未找到关联提案 `{proposal_filter}` 的任务")
+            print(f"   提示: 使用 --proposal-map 在 phase2 时指定提案映射")
+        return
+
     def print_project(name, data):
         goal = data.get("goal", "")[:50]
         status = data.get("status", "unknown")
@@ -2109,6 +2158,8 @@ def main():
     p = sub.add_parser("list", help="列出所有项目")
     p.add_argument("--topo", action="store_true", help="按拓扑排序输出任务（适用于心跳扫描）")
     p.add_argument("--project", "-p", help="仅显示指定项目的任务拓扑序")
+    # E2-T1: 按提案 ID 过滤任务
+    p.add_argument("--proposal", help="仅显示关联指定提案的任务（如 P001, P002）")
 
     # result（设置任务产出物路径，供下游依赖引用）
     p = sub.add_parser("result", help="设置任务产出物路径")

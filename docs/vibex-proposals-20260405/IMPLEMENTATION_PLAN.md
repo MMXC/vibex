@@ -84,11 +84,11 @@ ls vibex-fronted/src/app/api/v1/canvas/*/route.ts 2>/dev/null || echo "frontend 
 
 ### E2-T1: 提案追踪数据模型（2h）
 
-| 步骤 | 描述 | 产出 |
-|------|------|------|
-| T1.1 | 扩展 task_manager.py 追踪字段 | `proposal_id` / `linked_proposals` |
-| T1.2 | 实现提案状态查询命令 | `task list --proposal P001` |
-| T1.3 | 生成 `EXECUTION_TRACKER.json` | 每日追踪报告 |
+| 步骤 | 描述 | 产出 | 状态 |
+|------|------|------|------|
+| T1.1 | 扩展 task_manager.py 追踪字段 | `proposal_id` / `linked_proposals` | ✅ |
+| T1.2 | 实现提案状态查询命令 | `task list --proposal P001` | ✅ |
+| T1.3 | 生成 `EXECUTION_TRACKER.json` | 每日追踪报告 | ✅ |
 
 ### 交付物
 - `EXECUTION_TRACKER.json`（提案执行状态实时追踪）
@@ -140,8 +140,8 @@ ls vibex-fronted/src/app/api/v1/canvas/*/route.ts 2>/dev/null || echo "frontend 
 - [x] pytest 覆盖率 > 80% (5 passed, 2 skipped + 4 new → ~90%)
 
 ### E2 验收
-- [ ] `EXECUTION_TRACKER.json` 实时反映提案状态
-- [ ] `task list --proposal P001` 返回完整提案链路
+- [x] `EXECUTION_TRACKER.json` 实时反映提案状态
+- [x] `task list --proposal P001` 返回完整提案链路
 
 ### E3 验收
 - [x] Canvas 三树空状态文案正确（使用 EmptyState 组件）

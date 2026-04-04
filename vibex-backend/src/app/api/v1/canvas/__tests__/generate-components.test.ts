@@ -8,25 +8,29 @@
  * - E1-T4: Success path (200 + success + components array)
  */
 
+import { NextRequest } from 'next/server';
+
 const mockGenerateJSON = jest.fn();
+jest.mock('@/services/ai-service', () => ({
+  createAIService: jest.fn(() => ({
+    generateJSON: mockGenerateJSON,
+  })),
+}));
 
-beforeAll(() => {
-  jest.doMock('@/services/ai-service', () => ({
-    createAIService: jest.fn(() => ({
-      generateJSON: mockGenerateJSON,
-    })),
-  }));
-});
+jest.mock('@/lib/env', () => ({
+  getLocalEnv: jest.fn(() => ({ MINIMAX_API_KEY: 'test-key' })),
+}));
 
-beforeEach(() => {
-  mockGenerateJSON.mockReset();
-  jest.resetModules();
-});
+jest.mock('@/lib/db', () => ({ generateId: () => 'test-session-id' }));
+
+import { POST } from '../generate-components/route';
 
 describe('E1-T1: 输入验证', () => {
+  beforeEach(() => {
+    mockGenerateJSON.mockResolvedValue({ data: [], usage: null });
+  });
+
   it('空 contexts → 400', async () => {
-    const { POST } = await import('../generate-components/route');
-    const { NextRequest } = await import('next/server');
     const req = new NextRequest('http://localhost/api/v1/canvas/generate-components', {
       method: 'POST',
       body: JSON.stringify({ contexts: [], flows: [] }),
@@ -39,8 +43,6 @@ describe('E1-T1: 输入验证', () => {
   });
 
   it('空 flows → 400', async () => {
-    const { POST } = await import('../generate-components/route');
-    const { NextRequest } = await import('next/server');
     const req = new NextRequest('http://localhost/api/v1/canvas/generate-components', {
       method: 'POST',
       body: JSON.stringify({
@@ -55,8 +57,6 @@ describe('E1-T1: 输入验证', () => {
   });
 
   it('缺少 contexts 字段 → 400', async () => {
-    const { POST } = await import('../generate-components/route');
-    const { NextRequest } = await import('next/server');
     const req = new NextRequest('http://localhost/api/v1/canvas/generate-components', {
       method: 'POST',
       body: JSON.stringify({ flows: [{ id: 'f1', name: 'Test Flow', contextId: 'c1' }] }),
@@ -69,18 +69,16 @@ describe('E1-T1: 输入验证', () => {
 });
 
 describe('E1-T2: API Key 检查', () => {
-  it('无 API Key → 500', async () => {
+  beforeEach(() => {
     jest.resetModules();
     jest.doMock('@/lib/env', () => ({
       getLocalEnv: jest.fn(() => ({ MINIMAX_API_KEY: '' })),
     }));
-    jest.doMock('@/services/ai-service', () => ({
-      createAIService: jest.fn(() => ({
-        generateJSON: mockGenerateJSON,
-      })),
-    }));
-    const { POST } = await import('../generate-components/route');
-    const { NextRequest } = await import('next/server');
+    mockGenerateJSON.mockResolvedValue({ data: [], usage: null });
+  });
+
+  it('无 API Key → 500', async () => {
+    const { POST: POSTNoKey } = await import('../generate-components/route');
     const req = new NextRequest('http://localhost/api/v1/canvas/generate-components', {
       method: 'POST',
       body: JSON.stringify({
@@ -88,7 +86,7 @@ describe('E1-T2: API Key 检查', () => {
         flows: [{ id: 'f1', name: 'Test Flow', contextId: 'c1' }],
       }),
     });
-    const res = await POST(req);
+    const res = await POSTNoKey(req);
     expect(res.status).toBe(500);
     const data = await res.json();
     expect(data.success).toBe(false);
@@ -97,11 +95,13 @@ describe('E1-T2: API Key 检查', () => {
 });
 
 describe('E1-T3: AI 服务 .catch() 防御', () => {
+  beforeEach(() => {
+    mockGenerateJSON.mockReset();
+  });
+
   it('AI 服务异常 → 500 + error 字段，不崩溃', async () => {
     mockGenerateJSON.mockRejectedValue(new Error('AI service network error'));
 
-    const { POST } = await import('../generate-components/route');
-    const { NextRequest } = await import('next/server');
     const req = new NextRequest('http://localhost/api/v1/canvas/generate-components', {
       method: 'POST',
       body: JSON.stringify({
@@ -120,6 +120,10 @@ describe('E1-T3: AI 服务 .catch() 防御', () => {
 });
 
 describe('E1-T4: 成功路径', () => {
+  beforeEach(() => {
+    mockGenerateJSON.mockReset();
+  });
+
   it('成功时 → 200 + success + components 数组', async () => {
     mockGenerateJSON.mockResolvedValue({
       success: true,
@@ -148,8 +152,6 @@ describe('E1-T4: 成功路径', () => {
       usage: { completionTokens: 300 },
     });
 
-    const { POST } = await import('../generate-components/route');
-    const { NextRequest } = await import('next/server');
     const req = new NextRequest('http://localhost/api/v1/canvas/generate-components', {
       method: 'POST',
       body: JSON.stringify({
@@ -176,8 +178,6 @@ describe('E1-T4: 成功路径', () => {
       usage: { completionTokens: 50 },
     });
 
-    const { POST } = await import('../generate-components/route');
-    const { NextRequest } = await import('next/server');
     const req = new NextRequest('http://localhost/api/v1/canvas/generate-components', {
       method: 'POST',
       body: JSON.stringify({

@@ -61,7 +61,7 @@ if os.path.isdir(_current_report_pkg):
         _cr_spec.loader.exec_module(_cr_mod)
 
 # ── E4: 虚假完成检测 ────────────────────────────────────────────────────────────
-def validate_task_completion(project: str, stage_id: str, stage_info: dict, repo: str = "/root/.openclaw/vibex") -> dict:
+def validate_task_completion(project: str, stage_id: str, stage_info: dict, repo: str = "/root/.openclaw/vibex", old_status: str = None) -> dict:
     """
     检测任务是否虚假完成。
     返回 dict: {
@@ -91,8 +91,10 @@ def validate_task_completion(project: str, stage_id: str, stage_info: dict, repo
             f"   Recommended: Make a new commit before marking done"
         )
 
-    # 检查2: Dev 任务是否有测试文件变更
-    if stage_id.startswith("dev-") and current_commit and stage_info.get("status") != "done":
+    # 检查2: Dev 任务是否有测试文件变更（仅首次完成）
+    if old_status is None:
+        old_status = stage_info.get("status")
+    if stage_id.startswith("dev-") and current_commit and old_status != "done":
         try:
             diff = subprocess.check_output(
                 ["git", "-C", repo, "diff-tree", "--no-commit-id", "--name-only", "-r", current_commit],
@@ -2090,10 +2092,12 @@ def cmd_update(args):
         stage["completedAt"] = now_iso()
 
     # ── E1-T1 / E4: Commit hash recording on done ────────────────
+    print(f"DEBUG: new_status={new_status!r}, old_status={old_status!r}")
     if new_status == "done":
-        result = validate_task_completion(args.project, stage_id, stage)
+        result = validate_task_completion(args.project, stage_id, stage, old_status)
         if result["commit"]:
             stage["commit"] = result["commit"]
+            print(f"DEBUG: recorded commit {result['commit'][:8]}")
         for warning in result["warnings"]:
             print(warning)
 

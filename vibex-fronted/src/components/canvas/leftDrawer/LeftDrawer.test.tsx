@@ -17,15 +17,11 @@ import { LeftDrawer } from './LeftDrawer';
 import { useUIStore } from '@/lib/canvas/stores/uiStore';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
+import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import * as historyStore from './requirementHistoryStore';
 
-// ── Mock canvasApi ──────────────────────────────────────────────────────────────
-const mockGenerateContexts = jest.fn();
-jest.mock('@/lib/canvas/api/canvasApi', () => ({
-  canvasApi: {
-    generateContexts: mockGenerateContexts,
-  },
-}));
+// Mock the module
+jest.mock('@/lib/canvas/api/canvasApi');
 
 // ── Mock sessionStorage ────────────────────────────────────────────────────────
 const mockSessionStorage: Record<string, string> = {};
@@ -97,6 +93,7 @@ function setupAllStores(ui = {}, session = {}, context = {}) {
 describe('Epic 2 S2.1: Left Drawer Container', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.mocked(canvasApi.generateContexts).mockReset();
     Object.keys(mockSessionStorage).forEach(k => delete mockSessionStorage[k]);
   });
 
@@ -132,6 +129,7 @@ describe('Epic 2 S2.1: Left Drawer Container', () => {
 describe('Epic 2 S2.2: Requirement Textarea', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.mocked(canvasApi.generateContexts).mockReset();
     Object.keys(mockSessionStorage).forEach(k => delete mockSessionStorage[k]);
   });
 
@@ -171,9 +169,9 @@ describe('Epic 2 S2.2: Requirement Textarea', () => {
 describe('Epic 2 S2.3: Send Button', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.mocked(canvasApi.generateContexts).mockReset();
+    jest.mocked(canvasApi.generateContexts).mockResolvedValue({ success: true, contexts: [] } as any);
     Object.keys(mockSessionStorage).forEach(k => delete mockSessionStorage[k]);
-    mockGenerateContexts.mockReset();
-    mockGenerateContexts.mockResolvedValue({ success: true, contexts: [] });
   });
 
   it('AC-S2.3: 显示发送按钮', () => {
@@ -197,13 +195,8 @@ describe('Epic 2 S2.3: Send Button', () => {
 
   it('AC-S2.3: 点击发送按钮调用 canvasApi.generateContexts', async () => {
     const setRequirementText = jest.fn();
-    const setContextNodes = jest.fn();
-    mockGenerateContexts.mockResolvedValue({ success: true, contexts: [] });
-    setupAllStores(
-      { leftDrawerOpen: true },
-      { setRequirementText },
-      { setContextNodes }
-    );
+    setupAllStores({ leftDrawerOpen: true }, { setRequirementText }, {});
+    jest.mocked(canvasApi.generateContexts).mockResolvedValue({ success: true, contexts: [] } as any);
     render(<LeftDrawer />);
 
     fireEvent.change(screen.getByTestId('left-drawer-textarea'), { target: { value: '发送测试需求' } });
@@ -212,7 +205,7 @@ describe('Epic 2 S2.3: Send Button', () => {
     });
 
     expect(setRequirementText).toHaveBeenCalledWith('发送测试需求');
-    expect(mockGenerateContexts).toHaveBeenCalledWith(
+    expect(jest.mocked(canvasApi.generateContexts)).toHaveBeenCalledWith(
       expect.objectContaining({ requirementText: '发送测试需求' })
     );
   });
@@ -225,32 +218,26 @@ describe('Epic 2 S2.3: Send Button', () => {
 
   it('AC-S2.3: Ctrl+Enter 快捷键触发发送', async () => {
     const setRequirementText = jest.fn();
-    mockGenerateContexts.mockResolvedValue({ success: true, contexts: [] });
-    setupAllStores(
-      { leftDrawerOpen: true },
-      { setRequirementText },
-    );
+    jest.mocked(canvasApi.generateContexts).mockResolvedValue({ success: true, contexts: [] } as any);
+    setupAllStores({ leftDrawerOpen: true }, { setRequirementText }, {});
     render(<LeftDrawer />);
 
     fireEvent.change(screen.getByTestId('left-drawer-textarea'), { target: { value: '快捷键测试' } });
     await act(async () => {
-      fireEvent.keyDown(screen.getByTestId('left-drawer-textarea'), {
-        key: 'Enter',
-        ctrlKey: true,
-      });
+      fireEvent.keyDown(screen.getByTestId('left-drawer-textarea'), { key: 'Enter', ctrlKey: true });
     });
 
     expect(setRequirementText).toHaveBeenCalledWith('快捷键测试');
-    expect(mockGenerateContexts).toHaveBeenCalled();
+    expect(jest.mocked(canvasApi.generateContexts)).toHaveBeenCalled();
   });
 });
 
 describe('Epic 2 S2.4: Input History', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.mocked(canvasApi.generateContexts).mockReset();
+    jest.mocked(canvasApi.generateContexts).mockResolvedValue({ success: true, contexts: [] } as any);
     Object.keys(mockSessionStorage).forEach(k => delete mockSessionStorage[k]);
-    mockGenerateContexts.mockReset();
-    mockGenerateContexts.mockResolvedValue({ success: true, contexts: [] });
   });
 
   it('AC-S2.4: 空历史显示占位文本', () => {
@@ -262,10 +249,8 @@ describe('Epic 2 S2.4: Input History', () => {
 
   it('AC-S2.4: 发送后添加历史记录', async () => {
     const setRequirementText = jest.fn();
-    setupAllStores(
-      { leftDrawerOpen: true },
-      { setRequirementText },
-    );
+    jest.mocked(canvasApi.generateContexts).mockResolvedValue({ success: true, contexts: [] } as any);
+    setupAllStores({ leftDrawerOpen: true }, { setRequirementText }, {});
     render(<LeftDrawer />);
 
     fireEvent.change(screen.getByTestId('left-drawer-textarea'), { target: { value: '新需求' } });
@@ -292,6 +277,7 @@ describe('Epic 2 S2.4: Input History', () => {
 describe('Epic 2 S2.5: ProjectBar LeftDrawerToggle', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.mocked(canvasApi.generateContexts).mockReset();
   });
 
   it('AC-S2.5: 左抽屉按钮 aria-label 正确', () => {
@@ -305,6 +291,7 @@ describe('Epic 2 S2.5: ProjectBar LeftDrawerToggle', () => {
 describe('Epic 2: AI Thinking Indicator', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.mocked(canvasApi.generateContexts).mockReset();
   });
 
   it('AI thinking 时显示 thinking 行', () => {

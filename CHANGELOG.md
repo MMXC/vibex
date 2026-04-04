@@ -239,6 +239,13 @@
   - `import/no-duplicates` fix: merge split imports in useCanvasEvents.ts
 - **提交**: `914919b8`, `029a3366`
 
+### Added (vibex-pm-proposals-20260403_024652 E1: 新手引导) — 2026-04-03
+- **E1 新手引导**: OnboardingProvider + OnboardingModal + OnboardingProgressBar
+  - `OnboardingProvider`: 上下文注入 + localStorage 持久化
+  - `OnboardingModal`: 5 步引导流程（欢迎→创建第一个项目→构建上下文→业务流程→完成）
+  - `OnboardingProgressBar`: 进度追踪
+- **提交**: `d55d9996`
+
 ### Added (vibex-pm-proposals-20260403_024652 E2: 项目模板) — 2026-04-04
 - **E2 项目模板**: DDD 项目模板系统
   - `projectTemplateStore.ts`: 模板过滤和创建逻辑

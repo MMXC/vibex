@@ -164,6 +164,18 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '029a3366',
   },
   {
+    version: '1.0.115',
+    date: '2026-04-03',
+    changes: [
+      '📋 vibex-pm-proposals/E1: 新手引导 — OnboardingProvider + 5步引导流程',
+      '✅ OnboardingProvider: 上下文注入 + localStorage 持久化',
+      '✅ OnboardingModal: 5 步引导（欢迎→创建→构建→完成）',
+      '✅ OnboardingProgressBar: 进度追踪',
+      '✅ 提交 d55d9996',
+    ],
+    commit: 'd55d9996',
+  },
+  {
     version: '1.0.114',
     date: '2026-04-04',
     changes: [

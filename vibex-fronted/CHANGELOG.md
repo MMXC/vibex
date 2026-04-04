@@ -193,6 +193,32 @@
 
 **提交**: `38255941`
 
+### [vibex-reviewer-proposals-20260403_024652 E1: CHANGELOG规范] — 2026-04-03
+
+#### Added
+- `AGENTS.md` — CHANGELOG规范章节（路径规则表、更新时机、Reviewer检查清单）
+- `CHANGELOG_CONVENTION.md` — Epic条目结构、类型标签说明、禁止事项、示例（80行）
+- `reports/INDEX.md` — 历史报告索引维护规范和报告模板
+- `README.md` — 追加Reviewer工作流章节
+
+**提交**: `59b16597`
+
+### [vibex-reviewer-proposals-20260403_024652 E2: PreSubmit检查] — 2026-04-03
+
+#### Added
+- `scripts/pre-submit-check.sh` — ESLint disable count 检查（阈值 20 条）
+- `.github/workflows/pre-submit.yml` — GitHub Actions CI 集成
+
+**提交**: `000a2743`
+
+### [vibex-reviewer-proposals-20260403_024652 E3: Reviewer驳回模板] — 2026-04-03
+
+#### Added
+- `AGENTS.md` — Reviewer驳回模板（类型A: CHANGELOG遗漏, B: TS错误, C: ESLint违规, D: App页面修改）
+- `README.md` — Reviewer工作流章节
+
+**提交**: `59b16597`
+
 ### [E5-Git Hooks强制] — 2026-04-03 (vibex-reviewer-proposals-20260403_024652)
 
 #### Added

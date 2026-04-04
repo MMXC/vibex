@@ -184,6 +184,14 @@
 - **flowStore 测试**: 新增 undo/redo recordSnapshot 单元测试（2 cases）
 - **提交**: `7b3dbc97`
 
+### Added (vibex-reviewer-proposals-20260403_024652 E1: CHANGELOG规范) — 2026-04-03
+- **E1 CHANGELOG规范**: AGENTS.md + CHANGELOG_CONVENTION.md + reports/INDEX.md
+  - `AGENTS.md`: CHANGELOG规范章节（路径规则表、更新时机、Reviewer检查清单）
+  - `CHANGELOG_CONVENTION.md`: Epic条目结构、类型标签说明、禁止事项、示例
+  - `reports/INDEX.md`: 历史报告索引维护规范和报告模板
+  - `README.md`: 追加Reviewer工作流章节
+- **提交**: `59b16597`
+
 ### Added (vibex-reviewer-proposals-20260403_024652 E3: Reviewer 驳回模板) — 2026-04-03
 - **E3 Reviewer 驳回模板**: AGENTS.md 新增 Reviewer 驳回模板（类型A-D：CHANGELOG遗漏、TS错误、ESLint违规、App页面手动修改）
 - **AGENTS.md**: CHANGELOG规范章节、Reviewer检查清单

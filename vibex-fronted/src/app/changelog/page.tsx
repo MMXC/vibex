@@ -19,6 +19,36 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.107',
+    date: '2026-04-03',
+    changes: [
+      '📋 vibex-reviewer-proposals/E1: CHANGELOG规范 — AGENTS.md + CHANGELOG_CONVENTION.md + reports/INDEX.md',
+      '✅ CHANGELOG规范章节（路径规则表、Reviewer检查清单）',
+      '✅ CHANGELOG_CONVENTION.md: Epic条目结构、类型标签、禁止事项',
+      '✅ 提交 59b16597',
+    ],
+  },
+  {
+    version: '1.0.107',
+    date: '2026-04-03',
+    changes: [
+      '📋 vibex-reviewer-proposals/E2: PreSubmit检查 — eslint-disable 监控脚本',
+      '✅ pre-submit-check.sh: ESLint disable count 检查（阈值 20）',
+      '✅ pre-submit.yml: GitHub Actions CI 集成',
+      '✅ 提交 000a2743',
+    ],
+  },
+  {
+    version: '1.0.107',
+    date: '2026-04-03',
+    changes: [
+      '📋 vibex-reviewer-proposals/E3: Reviewer驳回模板 — 类型A-D 规范',
+      '✅ AGENTS.md: 驳回模板（CHANGELOG遗漏/TS错误/ESLint违规/App页面修改）',
+      '✅ README.md: Reviewer工作流章节',
+      '✅ 提交 59b16597',
+    ],
+  },
+  {
     version: '1.0.106',
     date: '2026-04-04',
     changes: [

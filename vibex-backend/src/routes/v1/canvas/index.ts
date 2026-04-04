@@ -261,22 +261,24 @@ canvas.post('/generate-components',
       // Build context + flow summary for prompt
       const contextMap = new Map(contexts.map(ctx => [ctx.id, ctx.name]))
       const flowSummary = flows
-        .map(f => {
+        .map((f, idx) => {
           const ctxName = contextMap.get(f.contextId) || '未知'
           const stepNames = f.steps.map(s => s.name).join(' → ')
-          return `- ${f.name} (${ctxName}): ${stepNames}`
+          const fid = f.id || `flow-${idx + 1}`
+          return `- ${fid}: ${f.name} (${ctxName}): ${stepNames}`
         })
         .join('\n')
 
       // Step 3: Get component schema (Format)
       const componentPrompt = `基于以下业务流程，生成组件树节点。
 
-流程列表：
+流程列表（必须使用 id 字段）：
 ${flowSummary}
 
 每个流程 → 多个组件。
 每个组件需包含：
-- name: 组件名（名词短语，如"订单卡片"、"支付按钮"）
+- name: 组件名（名词短语，如"订单卡片"、"支付按钮"），禁止使用流程名
+- flowId: 所属流程 id（如 flow-abc123），禁止留空或填 unknown
 - type: 类型（button|form|table|card|modal|input|list|navigation）
 - props: 默认属性（placeholder/defaultValue/title 等）
 - api: 接口 { method: GET|POST|PUT|DELETE, path: "/api/xxx", params: ["id"] }
@@ -285,6 +287,7 @@ ${flowSummary}
 
       const componentResult = await aiService.generateJSON<Array<{
         name: string
+        flowId: string
         type: string
         props: Record<string, unknown>
         api: { method: string; path: string; params: string[] }
@@ -303,19 +306,35 @@ ${flowSummary}
       }
 
       const generationId = generateId()
-      const components: ComponentNode[] = componentResult.data.map((comp) => ({
-        flowId: comp.flowId || flows[0]?.id || 'unknown',
-        name: comp.name || '未命名组件',
-        type: comp.type || 'card',
-        props: comp.props || {},
-        api: {
-          method: (['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(comp.api?.method))
-            ? comp.api.method as ComponentNode['api']['method']
-            : 'GET',
-          path: comp.api?.path || '/api/unknown',
-          params: comp.api?.params || [],
-        },
-      }))
+
+      const components: ComponentNode[] = []
+
+      if (componentResult.data && Array.isArray(componentResult.data)) {
+        for (let i = 0; i < componentResult.data.length; i++) {
+          const comp = componentResult.data[i]
+          // Determine flowId: prefer AI-returned, fallback to flows array
+          const compFlowId = comp.flowId && comp.flowId !== 'unknown'
+            ? comp.flowId
+            : (flows[i]?.id || flows[0]?.id || 'unknown')
+          // Validate API method
+          const rawMethod = comp.api?.method || 'GET'
+          const validMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
+          const apiMethod = validMethods.includes(rawMethod)
+            ? rawMethod as 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
+            : 'GET'
+          components.push({
+            flowId: compFlowId,
+            name: comp.name || '未命名组件',
+            type: comp.type || 'card',
+            props: comp.props || {},
+            api: {
+              method: apiMethod,
+              path: comp.api?.path || '/api/unknown',
+              params: comp.api?.params || [],
+            },
+          })
+        }
+      }
 
       devDebug(`[canvas/generate-components] Generated ${components.length} components`)
 

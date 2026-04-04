@@ -49,10 +49,10 @@
 
 | # | Story | 负责人 | 工时 | 依赖 |
 |---|-------|--------|------|------|
-| S3.1 | Auth 路由验证 | dev | 2h | E1 |
-| S3.2 | Projects 路由验证 | dev | 2h | E1 |
-| S3.3 | Canvas 路由验证 | dev | 2h | E1 |
-| S4 | JSON.parse 容错 | dev | 2h | E1 |
+| ✅ S3.1 | Auth 路由验证 | dev | 2h | E1 ✅ |
+| ✅ S3.2 | Projects 路由验证 | dev | 2h | E1 ✅ |
+| ✅ S3.3 | Canvas 路由验证 | dev | 2h | E1 ✅ |
+| ✅ S4 | JSON.parse 容错 | dev | 2h | E1 ✅ |
 
 **Sprint 3 交付物**:
 - Auth、Projects、Canvas 路由 100% 覆盖
@@ -64,9 +64,9 @@
 
 | # | Story | 负责人 | 工时 | 依赖 |
 |---|-------|--------|------|------|
-| S5.1 | Schema 单元测试 | tester | 2h | E2 |
-| S5.2 | API Contract 测试 | tester | 2h | E2+E3 |
-| S5.3 | 安全攻击测试 | tester | 1h | E2 |
+| ✅ S5.1 | Schema 单元测试 | tester | 2h | E2 ✅ |
+| ✅ S5.2 | API Contract 测试 | tester | 2h | E2+E3 ✅ |
+| ✅ S5.3 | 安全攻击测试 | tester | 1h | E2 ✅ |
 
 **Sprint 4 交付物**:
 - Schema 测试覆盖率 100%

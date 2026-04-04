@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { createProjectSchema } from '@/schemas/security';  // S3.2: Projects route validation'
 
 export const dynamic = 'force-dynamic';
 
@@ -30,8 +31,18 @@ export async function GET(request: NextRequest) {
 // POST /api/projects - Create a new project
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { name, description, userId } = body;
+    // S3.2: Validate with Zod schema
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+    }
+    const parsed = createProjectSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid request body', details: parsed.error.flatten() }, { status: 400 });
+    }
+    const { name, description, userId } = parsed.data;
 
     if (!name || !userId) {
       return NextResponse.json(

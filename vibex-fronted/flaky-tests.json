@@ -1,12 +1,1 @@
-{
-  "generatedAt": "2026-04-04T06:51:00Z",
-  "runs": 10,
-  "config": "playwright.ci.config.ts",
-  "flakyTests": [],
-  "summary": {
-    "totalTests": 0,
-    "flakyCount": 0,
-    "flakyRate": 0
-  },
-  "note": "Initial registry — run scripts/flaky-detector.sh to populate"
-}
+{"generatedAt":"2026-04-04T06:54:21Z","flakyTests":[],"note":"No tests found during detection run"}

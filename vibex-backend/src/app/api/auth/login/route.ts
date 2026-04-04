@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { loginSchema } from '@/schemas/security';  // S3.1: Auth route validation'
 import { PrismaClient } from '@prisma/client';
 import { hashPassword, verifyPassword, generateToken, getAuthUser } from '@/lib/auth';
 import { getEnv } from '@/lib/env';
@@ -10,14 +12,25 @@ export async function POST(request: NextRequest) {
     const env = getEnv();
     const jwtSecret = env.JWT_SECRET;
     const body = await request.json();
-    const { email, password } = body;
-
-    if (!email || !password) {
+    // S3.1: Validate with Zod schema
+    let body;
+    try {
+      body = await request.json();
+    } catch {
       return NextResponse.json(
-        { success: false, error: 'Email and password are required', code: 'BAD_REQUEST' },
+        { success: false, error: 'Invalid JSON', code: 'BAD_REQUEST' },
         { status: 400 }
       );
     }
+
+    const parsed = loginSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid request body', code: 'BAD_REQUEST' },
+        { status: 400 }
+      );
+    }
+    const { email, password } = parsed.data;
 
     const user = await prisma.user.findUnique({
       where: { email },

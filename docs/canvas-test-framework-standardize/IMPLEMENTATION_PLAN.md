@@ -261,30 +261,29 @@ on:
 
 ### 步骤 4.1: flaky-detector.sh ✅
 
-详见 architecture.md 章节。
+**文件**: `vibex-fronted/scripts/flaky-detector.sh`
+
+- 运行 E2E 测试 N 次（默认 10 次），统计 pass rate
+- pass rate < 0.8 → 写入 `flaky-tests.json`
+- 支持自定义运行次数和配置文件
+- 输出格式符合 E4 spec
 
 ### 步骤 4.2: 自动 skip 机制 ✅
 
 **实现文件**:
-- `flaky-tests.json` — Flaky 测试注册表（schema: id, testFile, testName, reason, passRate, skip）
-- `tests/flaky-helpers.ts` — 辅助工具（markFlaky, isFlaky, getFlakyTests, removeFlaky）
-- `playwright.ci.config.ts` — CI 专用配置（retries: 3, workers: 1）
+- `flaky-tests.json` — Flaky 测试注册表（schema: name, passRate, passes, failures, runs, skip, reason）
+- `tests/flaky-helpers.ts` — 辅助工具（flaky wrapper, markFlaky, isFlaky, describeFlaky）
+- `playwright.setup.ts` — Playwright 全局 setup（加载 registry，skipIfFlaky 辅助，测试结果记录）
+- `playwright.config.ts` — setup: './playwright.setup.ts' ✅
+- `playwright.ci.config.ts` — setup: './playwright.setup.ts', retries: 3 ✅
 
 **使用方式**:
 ```typescript
-import { markFlaky, isFlaky } from './flaky-helpers';
+import { skipIfFlaky } from '../../playwright.setup';
 
-// 在测试中标记为 flaky
-markFlaky(__filename, 'my-test-name', {
-  reason: 'race condition with WebSocket',
-  passRateThreshold: 0.65,
-  skipAfter: '2026-05-01',
-});
-
-// 检查是否应 skip
-if (isFlaky(__filename, 'my-test-name')) {
-  test.skip('Flaky: pass rate < 80%');
-}
+// 在测试中检查是否应 skip
+const { skip, reason } = skipIfFlaky(test.info());
+if (skip) test.skip(reason);
 ```
 
 **治理规则**:
@@ -312,4 +311,6 @@ if (isFlaky(__filename, 'my-test-name')) {
 - [ ] 全局行覆盖 ≥ 65%、分支覆盖 ≥ 50%
 - [x] CI retries = 3 ✅
 - [x] flaky-tests.json 存在且 flaky 测试已 skip ✅
+- [x] flaky-detector.sh 脚本实现 ✅
+- [x] playwright.setup.ts 自动 skip 机制 ✅
 - [ ] 连续 5 次 CI 无 flaky 失败

@@ -96,12 +96,24 @@
   - `api-config.ts`: latest endpoint 配置
 - **提交**: `1546864f`
 
-### Added (canvas-sync-protocol-complete E4: 测试覆盖) — 2026-04-03
-- **E4 测试覆盖**: E2E 冲突解决测试套件
+### Added (canvas-sync-protocol-complete E4: 测试覆盖) — 2026-04-04
+- **E4 测试覆盖**: 单元测试 + E2E 完整测试套件
+  - `vibex-backend/src/app/api/canvas/snapshots/route.test.ts`: 后端 snapshots API 单元测试
+    - GET: 400 missing projectId, 200 list snapshots
+    - POST 乐观锁: 201 首次保存(no version), 201 正常保存
+    - POST 冲突: 409 version=server max(stale), 409 version<server max
+    - 500 DB 错误处理
+  - `vibex-fronted/src/hooks/canvas/__tests__/useAutoSave.test.ts`: Hook 冲突检测测试
+    - E4-1: 409 response → saveStatus='conflict' + conflictData set
+    - E4-2: conflictData null when no conflict
+    - E4-3: clearConflict() resets status + clears conflictData
+    - E4-4: getLatestVersion polling on mount
+    - E4-5: polling skips when already in conflict state
+    - E4-6: onSaveError callback for non-conflict errors
+    - E4-7: lastSavedAt updated on successful save
   - `tests/e2e/conflict-resolution.spec.ts`: ConflictDialog 三按钮 + keep-local + cancel
-  - Canvas page load smoke test
-  - CustomEvent 模拟冲突状态
-- **提交**: `97489a84`
+  - **bug fix**: route.ts 乐观锁条件 `<=` → `<` (version 匹配时成功)
+- **提交**: `b5c3d2a1`
 - **E3 轮询检测**: 30s 版本轮询冲突检测
   - `useAutoSave.ts`: 30s 轮询检测 remote version 变化
   - `canvasApi.ts`: `getLatestVersion()` API 端点

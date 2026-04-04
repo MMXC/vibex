@@ -45,6 +45,10 @@ const eslintConfig = defineConfig([
     // CSS Module files (parsed incorrectly by ESLint)
     '**/*.module.css',
   ]),
+  // E5: 测试文件命名规范
+  // Jest: **/*.test.ts | Playwright: **/*.spec.ts
+  // 详见 TESTING_STRATEGY.md 命名规范章节
+
   {
     plugins: {
       import: importPlugin,

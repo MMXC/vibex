@@ -150,3 +150,37 @@ export const planAnalyzeSchema = z.object({
  * PlanAnalyze 类型导出
  */
 export type PlanAnalyzeInput = z.infer<typeof planAnalyzeSchema>;
+
+/**
+ * S3.1: Auth Route Validation Schemas
+ */
+export const loginSchema = z.object({
+  email: z.string().email('Invalid email format'),
+  password: z.string().min(1, 'Password is required').max(128, 'Password too long'),
+}).strict();
+
+export const registerSchema = z.object({
+  email: z.string().email('Invalid email format'),
+  password: z.string().min(8, 'Password must be at least 8 chars').max(128, 'Password too long'),
+  name: z.string().min(1, 'Name is required').max(100, 'Name too long').optional(),
+}).strict();
+
+export type LoginInput = z.infer<typeof loginSchema>;
+export type RegisterInput = z.infer<typeof registerSchema>;
+
+/**
+ * S3.2: Projects Route Validation Schemas
+ */
+export const createProjectSchema = z.object({
+  name: z.string().min(1, 'Project name is required').max(200, 'Name too long'),
+  description: z.string().max(1000, 'Description too long').optional(),
+  userId: z.string().uuid('Invalid user ID').optional(),
+}).strict();
+
+export const updateProjectSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  description: z.string().max(1000).optional(),
+}).strict();
+
+export type CreateProjectInput = z.infer<typeof createProjectSchema>;
+export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;

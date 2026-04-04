@@ -7,6 +7,7 @@ export default defineConfig({
   retries: 3, // E4 Flaky governance: retries = 3 (CI config at playwright.ci.config.ts)
   workers: 1, // Single worker for stability
   reporter: process.env.CI ? 'list' : 'html',
+  setup: './playwright.setup.ts', // E4: Auto-skip flaky tests
   timeout: 60000, // Increase test timeout
   expect: {
     timeout: 30000, // F1.3: CI expect timeout >= 30000ms

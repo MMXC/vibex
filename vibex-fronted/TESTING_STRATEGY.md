@@ -1,258 +1,157 @@
 # VibeX Testing Strategy
 
-**Version**: v1.0
-**Updated**: 2026-04-03
-**Status**: Active
+> Last updated: 2026-04-04 (E5 naming & directory standards)
 
----
+## 测试框架职责边界
 
-## Testing Pyramid
+| 框架 | 测试范围 | 文件命名 | 目录 |
+|------|---------|---------|------|
+| Jest | 单元测试 + 集成测试 | `*.test.ts` | `src/__tests__/` 或同目录 `__tests__/` |
+| Playwright | E2E 测试 | `*.spec.ts` | `tests/e2e/` |
+| Playwright | 可访问性测试 | `*.spec.ts` | `tests/a11y/` |
+| Playwright | 性能测试 | `*.spec.ts` | `tests/performance/` |
+| Playwright | 合约测试 | `*.spec.ts` | `tests/contract/` |
 
-```
-        ┌─────────────┐
-        │     E2E     │  Playwright: User flows, critical paths
-        │  (Playwright)│  ~20% of test effort
-        ├─────────────┤
-        │  Integration  │  Jest: Store integration, API contracts
-        │    (Jest)     │  ~30% of test effort
-        ├─────────────┤
-        │   Unit Tests   │  Jest: Components, hooks, utils
-        │    (Jest)     │  ~50% of test effort
-        └─────────────┘
-```
+## 文件命名规范
 
----
-
-## Framework Responsibilities
-
-| Framework | Test Type | File Pattern | Directory | CI Gate |
-|-----------|-----------|-------------|-----------|---------|
-| **Jest** | Unit + Integration | `*.test.ts` | `src/__tests__/` or co-located | ✅ |
-| **Playwright** | E2E | `*.spec.ts` | `tests/e2e/` | ✅ |
-| **Playwright** | Accessibility | `*.spec.ts` | `tests/a11y/` | ⚠️ |
-| **Playwright** | Performance | `*.spec.ts` | `tests/performance/` | ⚠️ |
-
----
-
-## Playwright Configuration Strategy
-
-### Config Files (3)
-
-| Config | Purpose | Usage |
-|--------|---------|-------|
-| `playwright.config.ts` | Base config | Local development |
-| `playwright.ci.config.ts` | CI optimized | GitHub Actions, retries=3 |
-| `playwright.a11y.config.ts` | Accessibility | Dedicated a11y testing |
-
-**Deleted Redundant Configs** (2026-04-03):
-- `playwright.test.config.ts` → merged into base
-- `playwright-canvas-phase2.config.ts` → merged into base  
-- `playwright.perf.config.ts` → merged into CI
-
-### Running Tests
+### ✅ 正确命名
 
 ```bash
-# Local development
-pnpm playwright test
+# Jest 测试
+src/lib/canvas/stores/historySlice.test.ts    # ✅ .test.ts 后缀
+src/__tests__/useAutoSave.test.ts             # ✅
+src/components/Button.test.tsx               # ✅
 
-# CI environment
-pnpm playwright test --config=playwright.ci.config.ts
-
-# Accessibility tests
-pnpm playwright test --config=playwright.a11y.config.ts
+# Playwright E2E 测试
+tests/e2e/canvas-api.spec.ts                 # ✅ .spec.ts 后缀
+tests/e2e/auth-flow.spec.ts                   # ✅
+tests/a11y/navigation.spec.ts                # ✅
+tests/performance/load.spec.ts                # ✅
 ```
 
----
+### ❌ 错误命名
 
-## Jest Standards
+```bash
+# 错误后缀
+src/components/Button.spec.tsx               # ❌ Playwright 文件放在 src/
+tests/e2e/canvas-api.test.ts                 # ❌ Jest 后缀用于 Playwright 文件
+tests/unit/canvas.test.ts                    # ❌ Playwright 文件放在 unit/
 
-### File Conventions
-
-- Unit/component tests: `*.test.ts` co-located with source
-- Integration/store tests: `src/__tests__/` directory
-- Test patterns: `describe` + `it` structure, minimum 2 `it` blocks per describe
-
-### Coverage Thresholds
-
-```yaml
-lines: 65%
-branches: 50%
-functions: 80%
+# 错误目录
+src/components/Button.test.tsx               # ✅ OK (同目录)
+tests/basic.spec.ts                          # ❌ 应该在 tests/e2e/
+src/__tests__/canvas.spec.ts                 # ❌ Playwright 文件不应在 src/
 ```
 
-### Configuration
+## ESLint 强制执行
 
-```typescript
-// jest.config.ts
+`eslint.config.mjs` 中的命名规范规则：
+
+```javascript
 {
-  testMatch: ['**/*.test.ts'],  // Required: explicit pattern
-  testPathIgnorePatterns: ['/node_modules/'],  // Only node_modules
-  coverageThreshold: {
-    lines: 65,
-    branches: 50,
-    functions: 80,
-  }
+  rules: {
+    // E5: 强制测试文件命名约定
+    // Jest: *.test.ts | Playwright: *.spec.ts
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector: 'Literal[value=/\\.spec\\.(ts|tsx)$/]',
+        message: 'Playwright spec files must be in tests/e2e/, tests/a11y/, or tests/performance/. Use .test.ts for Jest tests.',
+      },
+    ],
+  },
 }
 ```
 
-**Rule**: Never use `testPathIgnorePatterns` to skip specific test files — each test must run in CI.
-
----
-
-## E2E Test Standards
-
-### Naming Conventions
-
-- E2E tests: `*.spec.ts` (Playwright)
-- Integration tests: `*.test.ts` (Jest)
-
-### Test Structure
-
-```typescript
-// ✅ Correct: describe = feature, it = specific behavior
-describe('Canvas Auto-save', () => {
-  it('shows "保存中" during debounce delay', async () => { ... });
-  it('shows "已保存" after successful save', async () => { ... });
-});
-
-// ❌ Incorrect: implementation-focused naming
-describe('useAutoSave hook', () => {
-  it('calls fetch with correct payload', async () => { ... });
-});
-```
-
-### Flaky Test Handling
-
-```typescript
-// playwright.setup.ts — skip flaky tests automatically
-import flakyTests from '../flaky-tests.json';
-
-flakyTests.forEach(ft => {
-  if (ft.skip) {
-    test.skip(ft.test, `Flaky: pass rate ${ft.passRate}`);
-  }
-});
-```
-
-### CI Configuration
-
-```yaml
-# GitHub Actions
-- name: Playwright Tests
-  run: pnpm playwright test --config=playwright.ci.config.ts
-  env:
-    CI: true
-```
-
----
-
-## Coverage Requirements
-
-### Canvas Core Modules
-
-| Module | Branch Target | Current | Gap |
-|--------|-------------|---------|-----|
-| `contextStore.ts` | 50% | ~25% | +15 |
-| `flowStore.ts` | 50% | ~30% | +10 |
-| `componentStore.ts` | 50% | ~25% | +15 |
-| `historySlice` | 40% | ~25% | +15 |
-
-### Priority
-
-1. **Canvas stores** (context, flow, component) — highest impact
-2. **Auto-save hook** — critical user path
-3. **Conflict resolution** — new feature
-
----
-
-## Test Data Management
-
-### Mock Strategy
-
-- Use `msw` (Mock Service Worker) for API mocking
-- Avoid real network calls in unit tests
-- E2E tests use real API against staging environment
-
-### Factory Pattern
-
-```typescript
-// ✅ Correct: Factory for test data
-function createMockCanvasData(overrides?: Partial<CanvasData>): CanvasData {
-  return {
-    contextNodes: [],
-    flowNodes: [],
-    componentNodes: [],
-    ...overrides,
-  };
-}
-
-// ❌ Incorrect: Hardcoded test data scattered in tests
-const canvasData = { contextNodes: [...], ... };
-```
-
----
-
-## CI/CD Integration
-
-### Coverage Gate
-
-```yaml
-- name: Jest Coverage
-  run: pnpm jest --coverage --coverage-threshold.line=65 --coverage-threshold.branches=50
-```
-
-### Slack Alerts
-
-- E2E failure → #coord within 5 minutes
-- Coverage regression → PR comment
-
-### Daily Report
-
-- Coverage trend tracking
-- Flaky test count
-- Sent to #coord at 09:00 GMT+8
-
----
-
-## Anti-Patterns
-
-| Anti-Pattern | Problem | Solution |
-|-------------|---------|----------|
-| `test.skip()` without reason | Hidden failures | Add comment explaining why |
-| `test.only()` in committed code | Skips in CI | ESLint `forbidOnly: true` |
-| `sleep()` instead of `waitFor` | Flaky tests | Use `waitForResponse`/`waitForSelector` |
-| `any` type in tests | Type safety gap | Define proper mock types |
-| Duplicate tests in 2 files | Maintenance burden | Single source of truth |
-
----
-
-## Test File Location Guide
+## 目录结构规范
 
 ```
-src/
-├── components/
-│   └── Canvas/
-│       ├── CanvasPage.tsx
+vibex-fronted/
+├── src/
+│   ├── __tests__/           # Jest 单元测试（可选）
+│   │   └── *.test.ts
+│   ├── lib/
+│   │   └── canvas/
+│   │       └── stores/
+│   │           └── __tests__/   # 同模块目录 Jest 测试
+│   │               └── *.test.ts
+│   └── components/
 │       └── __tests__/
-│           └── CanvasPage.test.tsx    # ✅ Component unit test
-├── lib/
-│   └── canvas/
-│       ├── stores/
-│       │   ├── contextStore.ts
-│       │   └── __tests__/
-│       │       └── contextStore.test.ts  # ✅ Store integration test
-│       └── hooks/
-│           ├── useAutoSave.ts
-│           └── __tests__/
-│               └── useAutoSave.test.ts    # ✅ Hook unit test
-tests/
-├── e2e/
-│   └── canvas-autosave.spec.ts          # ✅ E2E test
-└── a11y/
-    └── canvas-accessibility.spec.ts     # ✅ A11y test
+│           └── *.test.ts
+│
+├── tests/
+│   ├── unit/                # Jest 单元测试（可选）
+│   │   └── *.test.ts
+│   ├── e2e/                 # Playwright E2E 测试
+│   │   └── *.spec.ts
+│   ├── a11y/                # Playwright 可访问性测试
+│   │   └── *.spec.ts
+│   ├── performance/         # Playwright 性能测试
+│   │   └── *.spec.ts
+│   ├── contract/            # Playwright 合约测试
+│   │   └── *.spec.ts
+│   ├── fixtures/            # 共享测试数据
+│   │   └── *.json
+│   ├── flaky-helpers.ts     # Flaky 测试治理工具
+│   ├── basic.spec.ts        # ❌ 已在 e2e/basic.spec.ts 合并
+│   └── e2e.spec.ts         # 入口文件
+│
+├── playwright.config.ts     # 开发配置
+├── playwright.ci.config.ts # CI 配置
+├── playwright.a11y.config.ts
+├── jest.config.ts
+└── flaky-tests.json         # Flaky 测试注册表
 ```
 
----
+## Jest 规范
 
-*Last updated: 2026-04-03*
-*Owner: Dev Agent*
+```typescript
+// jest.config.ts — 使用 testMatch 规范
+export default {
+  testMatch: ['**/*.test.ts'],
+  // 禁止使用 testPathIgnorePatterns 排除路径依赖
+  testPathIgnorePatterns: ['/node_modules/'],
+  // 覆盖率阈值（E3 已达标）
+  coverageThreshold: {
+    global: {
+      lines: 65,
+      branches: 50,
+      functions: 80,
+    },
+  },
+};
+```
+
+## Playwright 规范
+
+```typescript
+// playwright.config.ts — 开发配置
+export default defineConfig({
+  retries: 3, // E4: Flaky governance
+  workers: 1,  // 消除并行不确定性
+  timeout: 60000,
+  testMatch: ['**/*.spec.ts'], // E5: 命名规范
+});
+
+// playwright.ci.config.ts — CI 配置
+export default defineConfig({
+  retries: 3,
+  workers: 1,
+  setup: './playwright.setup.ts', // E4: Auto-skip flaky tests
+});
+```
+
+## Flaky 测试治理（E4）
+
+详见 `flaky-tests.json` 和 `scripts/flaky-detector.sh`。
+
+**核心规则**：
+- Flaky 测试：skip，从不删除
+- pass rate < 80% → 写入 `flaky-tests.json`
+- 连续 5 次 CI 无 flaky 失败 → 可移除 skip
+
+## CI 质量门禁
+
+- 行覆盖率 < 65% → CI 阻断
+- 分支覆盖率 < 50% → CI 阻断
+- E2E 测试失败 → Slack 告警 < 5min

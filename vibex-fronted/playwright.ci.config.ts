@@ -6,6 +6,7 @@
  * - reporter: list (concise CI-friendly output)
  * - fullyParallel: false (avoid resource competition)
  * - workers: 1 (deterministic ordering for flaky tracking)
+ * - setup: playwright.setup.ts (E4 flaky governance auto-skip)
  *
  * Usage:
  *   npx playwright test --config=playwright.ci.config.ts
@@ -25,6 +26,7 @@ export default defineConfig({
   forbidOnly: true,
   retries: 3, // E4 Flaky governance: CI retries = 3
   workers: 1,
+  setup: './playwright.setup.ts', // E4: Auto-skip flaky tests
   reporter: [
     ['list'],
     ['html', { outputFolder: 'playwright-report' }],

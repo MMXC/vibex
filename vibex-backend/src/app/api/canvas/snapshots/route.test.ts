@@ -2,12 +2,12 @@
  * route.test.ts — E4-SyncProtocol: Canvas Snapshots API + Optimistic Locking
  *
  * Tests:
- * 1. POST optimistic lock success (no version → v1)
- * 2. POST optimistic lock success (version = max → next version)
- * 3. POST 409 conflict (version < max)
- * 4. POST 409 conflict (version = max + 1 is fine, but stale version → 409)
- * 5. GET list snapshots
- * 6. Version edge cases
+ * 1. GET: list snapshots, missing projectId
+ * 2. POST: optimistic lock success (no version → v1)
+ * 3. POST: version conflict 409 (version = server max → stale)
+ * 4. POST: version conflict 409 (version < server max)
+ * 5. POST: successful save with valid projectId
+ * 6. Error handling: 500 on DB errors
  */
 import { NextRequest } from 'next/server';
 
@@ -99,7 +99,7 @@ describe('POST /api/canvas/snapshots — Optimistic Locking (E4)', () => {
     expect(data.snapshot.snapshotId).toBe('snap-new-123');
   });
 
-  it('returns 409 when client version matches server max (stale snapshot)', async () => {
+  it('returns 409 when client version matches server max (stale snapshot loaded)', async () => {
     // Server has max version 1, client sends version 1 (same as server → conflict)
     mockQueryDB.mockResolvedValueOnce([{ maxVersion: 1 }]);
     mockQueryOne.mockResolvedValueOnce({
@@ -128,12 +128,12 @@ describe('POST /api/canvas/snapshots — Optimistic Locking (E4)', () => {
     expect(data.serverVersion).toBe(1);
     expect(data.clientVersion).toBe(1);
     expect(data.serverSnapshot).toBeDefined();
+    expect(data.serverSnapshot.version).toBe(1);
   });
 
-  it('returns 409 when client version is stale (version < server max)', async () => {
-    // queryDB gets max version = 3
+  it('returns 409 when client version is behind (version < server max)', async () => {
+    // Server has max version 3, client sends version 1 (behind → conflict)
     mockQueryDB.mockResolvedValueOnce([{ maxVersion: 3 }]);
-    // Mock latest snapshot for conflict response
     mockQueryOne.mockResolvedValueOnce({
       id: 'snap-server-latest',
       projectId: 'proj-1',
@@ -166,98 +166,7 @@ describe('POST /api/canvas/snapshots — Optimistic Locking (E4)', () => {
     expect(data.serverSnapshot.data.contexts).toEqual([{ id: 'c1' }]);
   });
 
-  it('returns 409 when client version is one behind (stale)', async () => {
-    // Server has max version 5, client sends version 4 (one behind → conflict)
-    mockQueryDB.mockResolvedValueOnce([{ maxVersion: 5 }]);
-    mockQueryOne.mockResolvedValueOnce({
-      id: 'snap-latest',
-      projectId: 'proj-1',
-      version: 5,
-      name: null,
-      description: null,
-      data: '{"contexts":[],"flows":[],"components":[]}',
-      createdAt: '2026-04-01T00:00:00Z',
-      createdBy: null,
-      isAutoSave: 0,
-    });
-
-    const body = { projectId: 'proj-1', version: 4, label: 'Auto', trigger: 'auto', contextNodes: [], flowNodes: [], componentNodes: [] };
-    const request = new NextRequest('http://localhost:3000/api/canvas/snapshots', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-
-    const response = await createSnapshot(request, { env: {} as never });
-    expect(response.status).toBe(409);
-    const data = await response.json();
-    expect(data.error).toBe('VERSION_CONFLICT');
-    expect(data.serverVersion).toBe(5);
-    expect(data.clientVersion).toBe(4);
-  });
-
-  it('returns 201 when client version matches server max (client is current)', async () => {
-    // Server has max version 5, client sends version 5 (matches → can save as next version)
-    mockQueryDB.mockResolvedValueOnce([{ maxVersion: 5 }]);
-    // executeDB inserts the row
-    mockExecuteDB.mockResolvedValueOnce({});
-    // queryOne gets the created row
-    mockQueryOne.mockResolvedValueOnce({
-      id: 'snap-new-123',
-      projectId: 'proj-1',
-      version: 6, // next version
-      name: 'Auto',
-      description: 'auto',
-      data: '{"contexts":[],"flows":[],"components":[]}',
-      createdAt: '2026-04-01T00:00:00Z',
-      createdBy: null,
-      isAutoSave: 1,
-    });
-
-    const body = { projectId: 'proj-1', version: 5, label: 'Auto', trigger: 'auto', contextNodes: [], flowNodes: [], componentNodes: [] };
-    const request = new NextRequest('http://localhost:3000/api/canvas/snapshots', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-
-    const response = await createSnapshot(request, { env: {} as never });
-    expect(response.status).toBe(201);
-    const data = await response.json();
-    expect(data.success).toBe(true);
-    expect(data.version).toBe(6); // server max(5) + 1 = 6
-    expect(data.snapshot.version).toBe(6);
-  });
-    // Server has max version 5, client sends version 4 (one behind → conflict)
-    mockQueryDB.mockResolvedValueOnce([{ maxVersion: 5 }]);
-    mockQueryOne.mockResolvedValueOnce({
-      id: 'snap-latest',
-      projectId: 'proj-1',
-      version: 5,
-      name: null,
-      description: null,
-      data: '{"contexts":[],"flows":[],"components":[]}',
-      createdAt: '2026-04-01T00:00:00Z',
-      createdBy: null,
-      isAutoSave: 0,
-    });
-
-    const body = { projectId: 'proj-1', version: 4, label: 'Auto', trigger: 'auto', contextNodes: [], flowNodes: [], componentNodes: [] };
-    const request = new NextRequest('http://localhost:3000/api/canvas/snapshots', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-
-    const response = await createSnapshot(request, { env: {} as never });
-    expect(response.status).toBe(409);
-    const data = await response.json();
-    expect(data.error).toBe('VERSION_CONFLICT');
-    expect(data.serverVersion).toBe(5);
-    expect(data.clientVersion).toBe(4);
-  });
-
-  it('creates snapshot with a valid projectId', async () => {
+  it('creates snapshot with valid projectId', async () => {
     // queryDB gets max version = null (no existing snapshots)
     mockQueryDB.mockResolvedValueOnce([{ maxVersion: null }]);
     // executeDB inserts the row
@@ -265,7 +174,7 @@ describe('POST /api/canvas/snapshots — Optimistic Locking (E4)', () => {
     // queryOne gets the created row
     mockQueryOne.mockResolvedValueOnce({
       id: 'snap-new-123',
-      projectId: 'proj-guest',
+      projectId: 'proj-1',
       version: 1,
       name: 'Auto',
       description: 'auto',
@@ -275,7 +184,7 @@ describe('POST /api/canvas/snapshots — Optimistic Locking (E4)', () => {
       isAutoSave: 1,
     });
 
-    const body = { projectId: 'proj-guest', label: 'Auto', trigger: 'auto', contextNodes: [], flowNodes: [], componentNodes: [] };
+    const body = { projectId: 'proj-1', label: 'Auto', trigger: 'auto', contextNodes: [], flowNodes: [], componentNodes: [] };
     const request = new NextRequest('http://localhost:3000/api/canvas/snapshots', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -297,7 +206,6 @@ describe('POST /api/canvas/snapshots — Optimistic Locking (E4)', () => {
   });
 
   it('returns 500 on database error during create', async () => {
-    // queryDB throws
     mockQueryDB.mockRejectedValueOnce(new Error('DB error'));
 
     const body = { projectId: 'proj-1', label: 'Auto', trigger: 'auto', contextNodes: [], flowNodes: [], componentNodes: [] };

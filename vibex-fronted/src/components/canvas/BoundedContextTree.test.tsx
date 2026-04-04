@@ -93,14 +93,14 @@ describe('BoundedContextTree — Epic 1: E1 checkbox UX', () => {
     }
   });
 
-  it('clicking checkbox calls toggleNodeSelect (selection, not confirmation)', async () => {
+  it('clicking checkbox calls both toggleContextNode (confirmation) and toggleNodeSelect (selection)', async () => {
     const user = userEvent.setup();
     render(<BoundedContextTree />);
     await user.click(screen.getAllByRole('checkbox')[0]);
-    // E1 fix: checkbox now calls onToggleSelect → toggleNodeSelect (selection)
-    // not toggleContextNode (confirmation)
+    // Fix: checkbox now calls both toggleContextNode (toggles status) and
+    // onToggleSelect/toggleNodeSelect (updates selection for card color)
+    expect(mockToggleContextNode).toHaveBeenCalledWith('ctx-1');
     expect(mockToggleNodeSelect).toHaveBeenCalledWith('context', 'ctx-1');
-    expect(mockToggleContextNode).not.toHaveBeenCalled();
   });
 
   it('has no nodeTypeBadge (type text hidden)', () => {

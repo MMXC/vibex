@@ -167,6 +167,15 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.115',
     date: '2026-04-03',
     changes: [
+      '📋 vibex-pm-proposals/E3: 统一交付中心 — dashboard sidebar 入口',
+      '✅ /dashboard: 添加交付中心侧边栏入口，链接 /canvas/delivery',
+      '✅ 提交 0ad59199',
+    ],
+  },
+  {
+    version: '1.0.115',
+    date: '2026-04-03',
+    changes: [
       '📋 vibex-pm-proposals/E1: 新手引导 — OnboardingProvider + 5步引导流程',
       '✅ OnboardingProvider: 上下文注入 + localStorage 持久化',
       '✅ OnboardingModal: 5 步引导（欢迎→创建→构建→完成）',

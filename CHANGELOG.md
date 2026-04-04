@@ -239,6 +239,12 @@
   - `import/no-duplicates` fix: merge split imports in useCanvasEvents.ts
 - **提交**: `914919b8`, `029a3366`
 
+### Added (vibex-pm-proposals-20260403_024652 E3: 统一交付中心) — 2026-04-04
+- **E3 统一交付中心**: 交付中心入口 (dashboard sidebar)
+  - `/dashboard`: 添加交付中心侧边栏入口
+  - 链接到 `/canvas/delivery` 路由
+- **提交**: `0ad59199`
+
 ### Added (vibex-pm-proposals-20260403_024652 E1: 新手引导) — 2026-04-03
 - **E1 新手引导**: OnboardingProvider + OnboardingModal + OnboardingProgressBar
   - `OnboardingProvider`: 上下文注入 + localStorage 持久化

@@ -71,6 +71,16 @@ const mockChangelog: ChangelogEntry[] = [
     ],
   },
   {
+    version: '1.0.116',
+    date: '2026-04-04',
+    changes: [
+      '🔧 frontend-mock-cleanup/E2: 检测脚本误报修复 — cleanup-mocks.js skip test-utils',
+      '✅ 添加 /\\/test-utils\\// 到 SKIP_PATTERNS',
+      '✅ 提交 9820a2ad',
+    ],
+    commit: '9820a2ad',
+  },
+  {
     version: '1.0.114',
     date: '2026-04-04',
     changes: [

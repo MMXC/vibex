@@ -1,6 +1,14 @@
 # Changelog
 
 
+### [frontend-mock-cleanup E2: 检测脚本误报修复] — 2026-04-04
+
+#### Fixed
+- `vibex-fronted/scripts/cleanup-mocks.js`: 添加 `/\/test-utils\//` skip pattern
+  - 防止误报跳过 test-utils 目录
+
+**提交**: `9820a2ad`
+
 ### [vibex-tester-proposals E3: 突变测试基础设施] — 2026-04-04
 
 #### Added

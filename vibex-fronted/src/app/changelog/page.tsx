@@ -165,12 +165,23 @@ const mockChangelog: ChangelogEntry[] = [
   },
   {
     version: '1.0.115',
-    date: '2026-04-03',
+    date: '2026-04-04',
+    changes: [
+      '📋 vibex-pm-proposals/E4: 项目浏览优化 — dashboard 搜索 + 排序',
+      '✅ /dashboard: 项目搜索框（名称/描述过滤）、排序选项',
+      '✅ 空状态：搜索无结果友好提示 + 清除搜索按钮',
+      '✅ 提交 8f8eaa79',
+    ],
+    commit: '8f8eaa79',
+  },
+  {
+    date: '2026-04-04',
     changes: [
       '📋 vibex-pm-proposals/E3: 统一交付中心 — dashboard sidebar 入口',
       '✅ /dashboard: 添加交付中心侧边栏入口，链接 /canvas/delivery',
       '✅ 提交 0ad59199',
     ],
+    commit: '0ad59199',
   },
   {
     version: '1.0.115',

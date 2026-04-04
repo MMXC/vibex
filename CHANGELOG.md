@@ -239,6 +239,12 @@
   - `import/no-duplicates` fix: merge split imports in useCanvasEvents.ts
 - **提交**: `914919b8`, `029a3366`
 
+### Added (vibex-pm-proposals-20260403_024652 E4: 项目浏览优化) — 2026-04-04
+- **E4 项目浏览优化**: dashboard 搜索 + 排序
+  - `/dashboard`: 项目搜索框（按名称/描述过滤）、排序选项
+  - 空状态：搜索无结果时友好提示 + 清除搜索按钮
+- **提交**: `8f8eaa79`
+
 ### Added (vibex-pm-proposals-20260403_024652 E3: 统一交付中心) — 2026-04-04
 - **E3 统一交付中心**: 交付中心入口 (dashboard sidebar)
   - `/dashboard`: 添加交付中心侧边栏入口

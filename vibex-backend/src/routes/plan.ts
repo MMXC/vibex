@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { z } from 'zod'
+import { planAnalyzeSchema, INJECTION_KEYWORDS } from '../schemas/security'  // S2.3: Prompt Injection detection
 import { generateId, Env } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
 import { devDebug, sanitize } from '@/lib/log-sanitizer'
@@ -11,14 +12,8 @@ const plan = new Hono<{ Bindings: Env }>();
 plan.use('/*', cors())
 
 // Schema for plan analyze request
-const PlanAnalyzeRequestSchema = z.object({
-  requirement: z.string().min(1),
-  context: z.object({
-    projectId: z.string().optional(),
-    previousPlans: z.array(z.any()).optional(),
-  }).optional(),
-})
-
+// S2.3: Use security schema with Prompt Injection detection (from security.ts)
+const PlanAnalyzeRequestSchema = planAnalyzeSchema;
 type PlanAnalyzeRequest = z.infer<typeof PlanAnalyzeRequestSchema>
 
 // Plan result types
@@ -101,7 +96,11 @@ plan.post('/analyze', async (c) => {
   try {
     const env = c.env
     const body = await c.req.json()
-    const { requirement } = PlanAnalyzeRequestSchema.parse(body)
+    const parsed = PlanAnalyzeRequestSchema.safeParse(body)
+    if (!parsed.success) {
+      return c.json({ error: 'Invalid request body', details: parsed.error.flatten() }, 400)
+    }
+    const { requirement } = parsed.data
 
     // Debug: Check if MINIMAX_API_KEY is available
     const debugInfo = {

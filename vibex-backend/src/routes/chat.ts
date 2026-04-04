@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { CloudflareEnv } from '../lib/env';
 import { getSessionManager } from '../services/context';
 import { StructuredContext, CompressionConfig } from '../services/context/types';
+import { chatMessageSchema, INJECTION_KEYWORDS } from '../schemas/security';  // S2.2: Prompt Injection detection
 
 const chat = new Hono<{ Bindings: CloudflareEnv }>();
 
@@ -112,12 +113,20 @@ chat.post('/', async (c) => {
       return c.json({ error: 'MINIMAX_API_KEY is not configured' }, 500);
     }
 
-    const body = await c.req.json();
-    const { message, conversationId } = body;
-
-    if (!message) {
-      return c.json({ error: 'Message is required' }, 400);
+    // S2.2: Parse and validate request body with Prompt Injection detection
+    let body;
+    try {
+      body = await c.req.json();
+    } catch {
+      return c.json({ error: 'Invalid JSON in request body' }, 400);
     }
+
+    const parsed = chatMessageSchema.safeParse(body);
+    if (!parsed.success) {
+      return c.json({ error: 'Invalid request body', details: parsed.error.flatten() }, 400);
+    }
+
+    const { message, conversationId, history } = parsed.data;
 
     const messages: ChatMessage[] = [{ role: 'user', content: message }];
     const convId = conversationId || `conv_${Date.now()}`;
@@ -179,12 +188,33 @@ chat.post('/with-context', async (c) => {
       return c.json({ error: 'MINIMAX_API_KEY is not configured' }, 500)
     }
 
-    const body = await c.req.json() as ChatWithContextRequest
-    const { message, sessionId, structuredContext, config } = body
-
-    if (!message) {
-      return c.json({ error: 'Message is required' }, 400)
+    // S2.2: Validate body with Prompt Injection detection
+    let body;
+    try {
+      body = await c.req.json();
+    } catch {
+      return c.json({ error: 'Invalid JSON in request body' }, 400);
     }
+
+    // S2.2: Parse JSON
+    let reqBody;
+    try {
+      reqBody = await c.req.json();
+    } catch {
+      return c.json({ error: 'Invalid JSON in request body' }, 400);
+    }
+
+    // S2.2: Validate message with Prompt Injection detection
+    const msgParsed = chatMessageSchema.safeParse({ message: reqBody.message });
+    if (!msgParsed.success) {
+      return c.json({ error: 'Invalid request body', details: msgParsed.error.flatten() }, 400);
+    }
+    const message = msgParsed.data.message;
+
+    // Extract with-context fields (not in chatMessageSchema)
+    const sessionId = reqBody.sessionId || reqBody.conversationId || `ctx_${Date.now()}`;
+    const structuredContext = reqBody.structuredContext;
+    const config = reqBody.config || {};
 
     // 使用或创建会话
     const sessionIdFinal = sessionId || `ctx_${Date.now()}`

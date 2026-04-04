@@ -38,7 +38,8 @@ describe('POST /api/plan/analyze', () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.error).toContain('requirement');
+    expect(data.success).toBe(false);
+    expect(data.error.code).toBe('VALIDATION_ERROR');
   });
 
   it('should return 400 if requirement is empty string', async () => {

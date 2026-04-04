@@ -1,3 +1,29 @@
+### Added (vibex-proposals-20260405 E3: Canvas UX增强) — 2026-04-05
+- **E3 Canvas UX增强**: 空状态UI + 错误toast通知
+  - proposals/EXECUTION_TRACKER: 更新追踪状态
+  - 空状态渲染 + 错误场景 toast 提示
+- **提交**: `e5fb3b2b`
+
+### Added (vibex-proposals-20260405 E2: Sprint 4提案执行追踪) — 2026-04-05
+- **E2 提案执行追踪**: proposal_tracker.py + Canvas API实现
+  - scripts/proposal_tracker.py: 提案执行追踪命令
+  - generate-flows/route.ts: POST /api/v1/canvas/generate-flows 实现
+  - generate-components/route.ts: POST /api/v1/canvas/generate-components 实现
+  - 对应测试用例修复（align with actual API behavior）
+- **提交**: `1956986e`, `fe363e52`, `01e0b6d2`, `66a95e21`, `3033374f`, `7ead511a`, `8f25248d`
+
+### Added (vibex-proposals-20260405 E4: 虚假完成检测自动化) — 2026-04-05
+- **E4 虚假完成检测**: task_manager.py 虚假完成检测机制
+  - 基于现有 task_manager 状态机实现虚假完成检测
+- **提交**: `431bf2ac`
+
+### Added (vibex-proposals-20260405 E1: Canvas API端点实现) — 2026-04-05
+- **E1 Canvas API端点实现**: generate-flows + generate-components + 测试修复
+  - generate-flows/route.ts: 流程生成 API 端点
+  - generate-components/route.ts: 组件生成 API 端点
+  - 测试与实际 API 行为对齐（27个测试修复）
+- **提交**: `1956986e`, `fe363e52`, `01e0b6d2`, `7ead511a`, `8f25248d`
+
 ### Added (canvas-api-500-fix E1: 错误处理增强) — 2026-04-04
 - **E1 错误处理增强**: API Key 检查 + .catch() 防御
   - E1-T2: API Key 环境变量检查 → 500 + 'API Key 缺失'

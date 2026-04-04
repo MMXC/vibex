@@ -762,9 +762,29 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
     try {
       const sessionId = projectId ?? `session-${Date.now()}`;
 
+      // E1: 空上下文检查
+      if (contextNodes.length === 0) {
+        toast.showToast('请先生成上下文树', 'error');
+        return;
+      }
+
+      // E1: selection-aware context mapping (matches CanvasPage.tsx logic)
+      const activeContexts = contextNodes.filter((ctx) => ctx.isActive !== false);
+      const selectedContextSet = new Set(selectedNodeIds.context);
+      const contextsToSend = selectedContextSet.size > 0
+        ? activeContexts.filter((ctx) => selectedContextSet.has(ctx.nodeId))
+        : activeContexts;
+
+      // E1: selection-aware flow mapping
+      const activeFlows = flowNodes.filter((f) => f.isActive !== false);
+      const selectedFlowSet = new Set(selectedNodeIds.flow);
+      const flowsToSend = selectedFlowSet.size > 0
+        ? activeFlows.filter((f) => selectedFlowSet.has(f.nodeId))
+        : activeFlows;
+
       // Map context nodes to API format
       const mappedContexts: Array<{ id: string; name: string; description: string; type: string }> =
-        contextNodes.map((ctx: BoundedContextNode) => ({
+        contextsToSend.map((ctx: BoundedContextNode) => ({
           id: ctx.nodeId,
           name: ctx.name,
           description: ctx.description ?? '',
@@ -773,7 +793,7 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
 
       // Map flow nodes (flowData) to API format
       const mappedFlows: Array<{ name: string; contextId: string; steps: Array<{ name: string; actor: string }> }> =
-        flowNodes.map((f: BusinessFlowNode) => ({
+        flowsToSend.map((f: BusinessFlowNode) => ({
           name: f.name,
           contextId: f.contextId,
           steps: f.steps.map((step: FlowStep) => ({
@@ -798,7 +818,7 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
     } finally {
       setComponentGenerating(false);
     }
-  }, [componentGenerating, flowNodes, contextNodes, projectId, setComponentNodes, setPhase, toast]);
+  }, [componentGenerating, flowNodes, contextNodes, selectedNodeIds, projectId, setComponentNodes, setPhase, toast]);
 
   if (!isActive) {
     return (

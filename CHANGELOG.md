@@ -1,8 +1,10 @@
 ### Added (vibex-proposals-20260405 E3: Canvas UX增强) — 2026-04-05
-- **E3 Canvas UX增强**: 空状态UI + 错误toast通知
-  - proposals/EXECUTION_TRACKER: 更新追踪状态
-  - 空状态渲染 + 错误场景 toast 提示
-- **提交**: `e5fb3b2b`
+- **E3 Canvas UX增强**: EmptyState组件 + 错误toast通知
+  - BoundedContextTree: Network icon EmptyState + toast on generate error
+  - BusinessFlowTree: GitBranch icon EmptyState + toast.showToast in catch
+  - ComponentTree: Layers icon EmptyState + toast on generate error
+  - mockGenerateContexts/Components 恢复调用
+- **提交**: `21a270e3` (regression) → `23cf22b7` (fixed)
 
 ### Added (vibex-proposals-20260405 E2: Sprint 4提案执行追踪) — 2026-04-05
 - **E2 提案执行追踪**: proposal_tracker.py + Canvas API实现

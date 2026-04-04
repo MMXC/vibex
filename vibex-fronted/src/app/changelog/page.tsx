@@ -19,6 +19,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.113',
+    date: '2026-04-05',
+    changes: [
+      '📋 vibex-proposals-20260405/E3: Canvas UX增强 — EmptyState + error toast',
+      '✅ BoundedContextTree: EmptyState (Network icon) + toast on generate error',
+      '✅ BusinessFlowTree: EmptyState (GitBranch) + toast.showToast in catch',
+      '✅ ComponentTree: EmptyState (Layers icon) + toast on generate error',
+      '✅ mockGenerateContexts/Components 恢复调用',
+      '✅ 提交 23cf22b7',
+    ],
+    commit: '23cf22b7',
+  },
+  {
     version: '1.0.112',
     date: '2026-04-04',
     changes: [

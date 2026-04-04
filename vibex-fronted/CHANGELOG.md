@@ -1,5 +1,11 @@
 # Changelog
 
+### [vibex-proposals-20260405 E3: Canvas UX增强] — 2026-04-05
+- EmptyState组件: BoundedContextTree (Network) + BusinessFlowTree (GitBranch) + ComponentTree (Layers)
+- Error toast通知: 三个树组件的 catch 块添加 toast.showToast
+- mock生成函数恢复: mockGenerateContexts + mockGenerateComponents
+- **提交**: `23cf22b7`
+
 
 ### [react-hydration-fix E2: 日期格式化修复] — 2026-04-04
 

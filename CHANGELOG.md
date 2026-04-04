@@ -1,3 +1,10 @@
+### Added (react-hydration-fix E2: 日期格式化修复) — 2026-04-04
+- **E2 日期格式化修复**: formatDate 时区安全 + suppressHydrationWarning
+  - E2-T1: formatDate() 使用 split('T')[0] 替代 toLocaleDateString（时区一致）
+  - E2-T2: MermaidRenderer/MermaidPreview 添加 suppressHydrationWarning
+  - format.test.ts: 4 tests pass
+- **提交**: `1fc58b1a`
+
 ### Added (react-hydration-fix E1: Hydration根因修复) — 2026-04-04
 - **E1 Hydration根因修复**: 修复 SSR/CSR 不一致导致的 hydration error
   - E1-T1: MermaidInitializer — 移除 useState (setTick 导致 SSR/CSR mismatch)，移除 setInterval，改为 useEffect 中直接调用 initialize()

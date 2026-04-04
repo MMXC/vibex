@@ -71,6 +71,17 @@ const mockChangelog: ChangelogEntry[] = [
     ],
   },
   {
+    version: '1.0.121',
+    date: '2026-04-04',
+    changes: [
+      '🐛 react-hydration-fix/E2: 日期格式化修复 — formatDate 时区安全 + suppressHydrationWarning',
+      '✅ E2-T1: formatDate split(T)[0] 替代 toLocaleDateString',
+      '✅ E2-T2: MermaidRenderer + MermaidPreview suppressHydrationWarning',
+      '✅ 提交 1fc58b1a',
+    ],
+    commit: '1fc58b1a',
+  },
+  {
     version: '1.0.120',
     date: '2026-04-04',
     changes: [

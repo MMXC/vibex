@@ -19,7 +19,7 @@
 | Day | Sprint | Epics | 总工时 | 目标 |
 |------|--------|-------|--------|------|
 | Day 1 (04-03) | Sprint 3-1 | E1 Flaky 治理 | 8h | Playwright 配置 + Stability Report |
-| Day 2 (04-04) | Sprint 3-2 | E2 Contract 测试 | 8h | Schema 生成 + Mock 校验 + CI Gate |
+| Day 2 (04-04) | Sprint 3-2 | ✅ E2 Contract 测试 | 8h | Schema 生成 + Mock 校验 + CI Gate ✅ |
 | Day 3 (04-07) | Sprint 3-3 | E3 突变测试 + 验收 | 4h | 突变测试 + 有效性报告 |
 
 **总工时**: 20h
@@ -133,7 +133,7 @@ T1.3.3: Flaky 根因识别
 
 ## 3. Day 2: E2 Contract 测试 (8h)
 
-### E2-S1: 核心 API JSON Schema 生成 (3h)
+### ✅ E2-S1: 核心 API JSON Schema 生成 (3h)
 
 ```
 T2.1.1: 创建 scripts/generate-schemas.ts
@@ -171,7 +171,7 @@ T2.1.3: 创建 test/schemas/README.md
 
 ---
 
-### E2-S2: 前端 Mock 一致性校验 (3h)
+### ✅ E2-S2: 前端 Mock 一致性校验 (3h)
 
 ```
 T2.2.1: 创建 test/contract/ 目录和配置
@@ -209,7 +209,7 @@ T2.2.3: 安装 ajv 用于 Schema 校验
 
 ---
 
-### E2-S3: Schema 变更 CI 拦截 (2h)
+### ✅ E2-S3: Schema 变更 CI 拦截 (2h)
 
 ```
 T2.3.1: 创建 .github/workflows/schema-contract-gate.yml

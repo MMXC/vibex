@@ -27,3 +27,33 @@
 - **修复方案**: 删除第 808 行整行（属性已冗余，`.header` 和 `.sectionHeader` 已有相同设置）
 - **状态**: ✅ done
 - **下游**: pm/create-prd 已解锁 → ready
+
+## 2026-04-05 00:07 GMT+8 — canvas-api-500-fix 驳回消息处理
+
+### 情况分析
+- 项目状态: COMPLETED (17/17)
+- 驳回原因: tester-e2/e3 基于旧的 route.test.ts（2 FAIL），但该文件已在 5306e1c2 中移除
+- 测试验证: 9/9 pass (generate-contexts.test.ts 6个 + health.test.ts 3个)
+  ```
+  ✓ 空字符串 → 400
+  ✓ 纯空白字符串 → 400
+  ✓ 缺少字段 → 400
+  ✓ 无 API Key → 500
+  ✓ AI 服务异常 → 500 + error（不崩溃）
+  ✓ 成功时 → 200 + success
+  ✓ health 有 API Key → 200 + healthy
+  ✓ health 包含必需字段
+  ✓ health 无 API Key → 503 + degraded
+  ```
+
+### 新任务派发 (dev-e1/e2/e3)
+- 所有 Epic 已实现（f2f8a63d）：E1-T1输入验证、E1-T2 API Key检查、E1-T3 .catch()防御、E2-T1健康检查端点、E3-T1单元测试
+- 任务派发为过时消息，项目已完成，无需重新执行
+
+### 测试命令
+```bash
+cd /root/.openclaw/vibex/vibex-backend
+npx jest "__tests__/generate-contexts" --no-cache  # 6 pass
+npx jest "__tests__/health" --no-cache             # 3 pass
+```
+

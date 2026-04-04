@@ -60,6 +60,60 @@ if os.path.isdir(_current_report_pkg):
         sys.modules["current_report"] = _cr_mod
         _cr_spec.loader.exec_module(_cr_mod)
 
+# ── E4: 虚假完成检测 ────────────────────────────────────────────────────────────
+def validate_task_completion(project: str, stage_id: str, stage_info: dict, repo: str = "/root/.openclaw/vibex") -> dict:
+    """
+    检测任务是否虚假完成。
+    返回 dict: {
+        "valid": bool,           # True = 真实完成，False = 虚假完成
+        "warnings": list[str],    # 警告信息列表
+        "commit": str|None,       # 当前 HEAD commit
+    }
+    """
+    import subprocess
+    warnings = []
+
+    try:
+        current_commit = subprocess.check_output(
+            ["git", "-C", repo, "rev-parse", "HEAD"],
+            stderr=subprocess.DEVNULL, text=True
+        ).strip()[:40]
+    except Exception:
+        current_commit = None
+
+    # 检查1: commit 是否更新（虚假完成检测）
+    prev_commit = stage_info.get("commit")
+    if prev_commit and current_commit and prev_commit == current_commit:
+        warnings.append(
+            f"\n⚠️  WARNING: Duplicate 'done' without new commit\n"
+            f"   Task {project}/{stage_id} was already completed\n"
+            f"   Commit unchanged: {current_commit[:8]}\n"
+            f"   Recommended: Make a new commit before marking done"
+        )
+
+    # 检查2: Dev 任务是否有测试文件变更
+    if stage_id.startswith("dev-") and current_commit and stage_info.get("status") != "done":
+        try:
+            diff = subprocess.check_output(
+                ["git", "-C", repo, "diff-tree", "--no-commit-id", "--name-only", "-r", current_commit],
+                stderr=subprocess.DEVNULL, text=True
+            ).strip()
+            test_patterns = (".test.", ".spec.", "__tests__/", "/tests/")
+            has_test = any(p in diff for p in test_patterns)
+            if not has_test and diff:
+                # Only warn if commit has actual file changes (not empty commits)
+                warnings.append(
+                    f"\n⚠️  WARNING: Dev task '{stage_id}' marked done without test file changes\n"
+                    f"   Commit: {current_commit[:8]}\n"
+                    f"   No test files found in commit. Add tests before marking done."
+                )
+        except Exception:
+            pass
+
+    valid = len(warnings) == 0
+    return {"valid": valid, "warnings": warnings, "commit": current_commit}
+
+
 # ── E3-F1: 提案完整性验证 ────────────────────────────────────────────────────────
 _REQUIRED_PROPOSAL_SECTIONS = ['问题描述', '根因分析', '建议方案', '验收标准']
 
@@ -2035,45 +2089,13 @@ def cmd_update(args):
     elif new_status in ("done", "failed", "skipped"):
         stage["completedAt"] = now_iso()
 
-    # ── E1-T1: Commit hash recording on done ─────────────────────
+    # ── E1-T1 / E4: Commit hash recording on done ────────────────
     if new_status == "done":
-        import subprocess as _git_subprocess
-        _repo = "/root/.openclaw/vibex"
-        _commit = None
-        try:
-            _commit = _git_subprocess.check_output(
-                ["git", "-C", _repo, "rev-parse", "HEAD"],
-                stderr=_git_subprocess.DEVNULL, text=True
-            ).strip()[:40]
-            stage["commit"] = _commit
-        except Exception:
-            pass  # non-git repo or error, skip silently
-
-        # ── E1-T2: Duplicate done warning ──────────────────────
-        if old_status == "done" and stage.get("commit"):
-            if _commit and stage["commit"] == _commit:
-                print(f"\n⚠️  WARNING: Duplicate 'done' without new commit")
-                print(f"   Task {args.project}/{stage_id} was already completed")
-                print(f"   Commit unchanged: {_commit[:8]}")
-                print(f"   Recommended: Make a new commit before marking done")
-
-        # ── E1-T3: Dev task test file check ───────────────────
-        # Only check for initial completion (not re-done)
-        if stage_id.startswith("dev-") and _commit and old_status != "done":
-            try:
-                # Check if commit includes test files
-                _diff = _git_subprocess.check_output(
-                    ["git", "-C", _repo, "diff-tree", "--no-commit-id", "--name-only", "-r", _commit],
-                    stderr=_git_subprocess.DEVNULL, text=True
-                ).strip()
-                _test_patterns = (".test.", ".spec.", "__tests__/", "/tests/")
-                _has_test = any(p in _diff for p in _test_patterns)
-                if not _has_test:
-                    print(f"\n⚠️  WARNING: Dev task '{stage_id}' marked done without test file changes")
-                    print(f"   Commit: {_commit[:8]}")
-                    print(f"   No test files found in commit. Add tests before marking done.")
-            except Exception:
-                pass  # Skip silently on error
+        result = validate_task_completion(args.project, stage_id, stage)
+        if result["commit"]:
+            stage["commit"] = result["commit"]
+        for warning in result["warnings"]:
+            print(warning)
 
     # ── 失败原因记录 ──────────────────────────────────────────────
     if new_status == "rejected":

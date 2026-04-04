@@ -98,31 +98,31 @@
 
 #### Day 6-7: E2 项目模板
 
-| 任务 | 类型 | 工时 | 负责人 | 依赖 |
+| 任务 | 类型 | 工时 | 负责人 | 状态 |
 |------|------|------|--------|------|
-| 制作 4 个模板 JSON 文件 | 内容 | 2h | PM | 无 |
-| 创建 templateStore.ts | 开发 | 1h | dev | 无 |
-| 实现 TemplateCard + TemplateSelector 组件 | 开发 | 2h | dev | templateStore |
-| E2-S2 模板卡片网格展示 | 开发 | 1h | dev | TemplateCard |
-| E2-S3 模板预览弹窗 | 开发 | 1h | dev | TemplateCard |
-| E2-S4 模板分类筛选 | 开发 | 1h | dev | TemplateCard |
-| E2-S5 模板项目创建 (深度克隆 + API) | 开发 | 2h | dev | Day 6 |
-| 模板 Store 单元测试 | 测试 | 1h | tester | templateStore |
-| **Day 6-7 合计** | | **11h** | | |
+| 制作 4 个模板 JSON 文件 | 内容 | 2h | PM | ✅ 已交付 (3个模板) |
+| 创建 templateStore.ts | 开发 | 1h | dev | ✅ 已交付 (projectTemplateStore.ts) |
+| 实现 TemplateCard + TemplateSelector 组件 | 开发 | 2h | dev | ✅ 已交付 (DDDTemplateSelector) |
+| E2-S2 模板卡片网格展示 | 开发 | 1h | dev | ✅ 已交付 |
+| E2-S3 模板预览弹窗 | 开发 | 1h | dev | ✅ 已交付 |
+| E2-S4 模板分类筛选 | 开发 | 1h | dev | ✅ 已交付 |
+| E2-S5 模板项目创建 (深度克隆 + API) | 开发 | 2h | dev | ⏳ 进行中 |
+| 模板 Store 单元测试 | 测试 | 1h | tester | 待领取 |
+| **Day 6-7 合计** | | **11h** | | **✅ E2-S1 完成** |
 
 #### Day 8-9: E4 项目浏览优化
 
-| 任务 | 类型 | 工时 | 负责人 | 依赖 |
+| 任务 | 类型 | 工时 | 负责人 | 状态 |
 |------|------|------|--------|------|
-| 创建 projectStore.ts (扩展现有) | 开发 | 1h | dev | Sprint 3 API |
-| 实现 ProjectCard 组件 (含悬停) | 开发 | 1.5h | dev | projectStore |
-| E4-S1 最近项目横向滚动 (Intersection Observer) | 开发 | 1.5h | dev | ProjectCard |
-| E4-S2 Hero 快速开始入口 | 开发 | 1h | dev | ProjectCard |
-| E4-S3 视图切换 (Grid/List) + 筛选排序 | 开发 | 2h | dev | ProjectCard |
-| E4-S4 悬停操作菜单 (打开/复制/删除) | 开发 | 1h | dev | ProjectCard |
-| E4-S5 空状态引导 | 开发 | 1h | dev | ProjectCard |
-| 首页集成 + 响应式 (与 Sprint 3 E3 协同) | 开发 | 1h | dev | Day 8 |
-| **Day 8-9 合计** | | **10h** | | |
+| 创建 projectStore.ts (扩展现有) | 开发 | 1h | dev | ✅ 已交付 (dashboard 已有) |
+| 实现 ProjectCard 组件 (含悬停) | 开发 | 1.5h | dev | ✅ 已交付 |
+| E4-S1 最近项目横向滚动 (Intersection Observer) | 开发 | 1.5h | dev | ⏳ 进行中 |
+| E4-S2 Hero 快速开始入口 | 开发 | 1h | dev | ⏳ 进行中 |
+| E4-S3 视图切换 (Grid/List) + 筛选排序 | 开发 | 2h | dev | ⏳ 进行中 |
+| E4-S4 悬停操作菜单 (打开/复制/删除) | 开发 | 1h | dev | ✅ 已交付 (已有基础) |
+| E4-S5 空状态引导 | 开发 | 1h | dev | ✅ 已交付 |
+| 首页集成 + 响应式 (与 Sprint 3 E3 协同) | 开发 | 1h | dev | ⏳ 进行中 |
+| **Day 8-9 合计** | | **10h** | | **⏳ 进行中** |
 
 #### Day 10: Sprint 5 收尾
 
@@ -152,17 +152,19 @@
 
 ### Week 3 (Day 11-15)
 
-| 任务 | 类型 | 工时 | 负责人 | 依赖 |
+| 任务 | 类型 | 工时 | 负责人 | 状态 |
 |------|------|------|--------|------|
-| 创建 /canvas/delivery 路由 + 页面 | 开发 | 1h | dev | Sprint 5 |
-| 实现 DeliveryTabBar 组件 | 开发 | 1h | dev | 无 |
-| E3-S2 限界上下文导出 Tab | 开发 | 2h | dev | DeliveryTabBar |
-| E3-S3 流程文档导出 Tab | 开发 | 2h | dev | DeliveryTabBar |
-| E3-S4 组件清单导出 Tab | 开发 | 2h | dev | DeliveryTabBar |
-| E3-S5 PRD Tab (自动生成大纲) | 开发 | 2h | dev | DeliveryTabBar |
-| E3-S6 批量导出 (JSZip → ZIP) | 开发 | 1h | dev | 各 Tab |
-| Toolbar 增加交付中心入口按钮 | 开发 | 0.5h | dev | 交付中心页面 |
-| E3 集成测试 + E2E 测试 | 测试 | 3h | tester | 所有 Tab 完成 |
+| 创建 /canvas/delivery 路由 + 页面 | 开发 | 1h | dev | ✅ 已交付 |
+| 实现 DeliveryTabBar 组件 | 开发 | 1h | dev | ✅ 已交付 |
+| E3-S2 限界上下文导出 Tab | 开发 | 2h | dev | ✅ 已交付 (ContextTab) |
+| E3-S3 流程文档导出 Tab | 开发 | 2h | dev | ✅ 已交付 (FlowTab) |
+| E3-S4 组件清单导出 Tab | 开发 | 2h | dev | ✅ 已交付 (ComponentTab) |
+| E3-S5 PRD Tab (自动生成大纲) | 开发 | 2h | dev | ✅ 已交付 (PRDTab) |
+| E3-S6 批量导出 (JSZip → ZIP) | 开发 | 1h | dev | ✅ 已交付 (exportAll) |
+| Toolbar 增加交付中心入口按钮 | 开发 | 0.5h | dev | ⏳ 待集成 |
+| E3 集成测试 + E2E 测试 | 测试 | 3h | tester | 待领取 |
+
+**E3 整体状态**: ✅ Sprint 6 前端已交付，测试待覆盖
 | Design Review + Code Review | 审查 | 1.5h | reviewer | 测试通过 |
 | **Sprint 6 合计** | | **16h** | | |
 

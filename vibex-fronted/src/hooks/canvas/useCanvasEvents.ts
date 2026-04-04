@@ -156,7 +156,11 @@ export function useCanvasEvents(
     function handleKeyDown(e: KeyboardEvent) {
       // Only trigger ? key when not in an input field
       if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
-        const target = e.target as HTMLElement;
+        const target = e.target as HTMLElement | null;
+        if (!target || target === document || !(target instanceof Element)) {
+          toggleShortcutPanel();
+          return;
+        }
         const tagName = target.tagName;
         if (
           tagName === 'INPUT' ||
@@ -164,8 +168,8 @@ export function useCanvasEvents(
           tagName === 'SELECT'
         )
           return;
-        if (target.getAttribute('contenteditable') === 'true') return;
-        const role = target.getAttribute('role');
+        if (target.getAttribute?.('contenteditable') === 'true') return;
+        const role = target.getAttribute?.('role');
         if (
           role === 'textbox' ||
           role === 'searchbox' ||

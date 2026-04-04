@@ -30,13 +30,13 @@
 
 ---
 
-### Sprint 2: 安全高风险路由（~7h）
+### ✅ Sprint 2: 安全高风险路由（~7h）
 
 | # | Story | 负责人 | 工时 | 依赖 |
 |---|-------|--------|------|------|
-| S2.1 | GitHub 路径注入防护 | dev | 2h | E1 |
-| S2.2 | Chat API Prompt Injection | dev | 3h | E1 |
-| S2.3 | Plan API Prompt Injection | dev | 2h | E1 |
+| ✅ S2.1 | GitHub 路径注入防护 | dev | 2h | E1 ✅ |
+| ✅ S2.2 | Chat API Prompt Injection | dev | 3h | E1 ✅ |
+| ✅ S2.3 | Plan API Prompt Injection | dev | 2h | E1 ✅ |
 
 **Sprint 2 交付物**:
 - `/api/github/*` 路由通过 3+ 攻击 payload 测试

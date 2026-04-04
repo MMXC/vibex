@@ -199,6 +199,17 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '8d6eb70d',
   },
   {
+    version: '1.0.108',
+    date: '2026-04-03',
+    changes: [
+      '🔧 canvas-test-framework-standardize/E2: CI质量门禁 — ESLint disable 监控',
+      '✅ scripts/pre-submit-check.sh: ESLint disable count 检查（阈值 20）',
+      '✅ .github/workflows/pre-submit.yml: GitHub Actions CI pre-submit workflow',
+      '✅ 提交 000a2743',
+    ],
+    commit: '000a2743',
+  },
+  {
     version: '1.0.106',
     date: '2026-04-03',
     changes: [

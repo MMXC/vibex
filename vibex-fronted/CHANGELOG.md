@@ -40,6 +40,14 @@
 
 **提交**: `8d6eb70d`
 
+### [canvas-test-framework-standardize E2: CI质量门禁] — 2026-04-03
+
+#### Added
+- `scripts/pre-submit-check.sh` — ESLint disable count 检查（阈值 20 条）
+- `.github/workflows/pre-submit.yml` — GitHub Actions CI pre-submit workflow
+
+**提交**: `000a2743`
+
 ### [vibex-architect-proposals-20260403_024652 E1: 乐观锁] — 2026-04-03
 
 #### Changed

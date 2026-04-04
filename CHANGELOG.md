@@ -239,6 +239,14 @@
   - `import/no-duplicates` fix: merge split imports in useCanvasEvents.ts
 - **提交**: `914919b8`, `029a3366`
 
+### Added (vibex-pm-proposals-20260403_024652 E2: 项目模板) — 2026-04-04
+- **E2 项目模板**: DDD 项目模板系统
+  - `projectTemplateStore.ts`: 模板过滤和创建逻辑
+  - `DDDTemplateSelector.tsx`: 分类筛选 + 预览弹窗
+  - `project-templates/*.json`: 3 个 DDD 模板 (ecommerce, user-management, generic-business)
+  - `/projects/new` 空白/模板创建选项
+- **提交**: `bf1e9cec`
+
 ### Added (vibex-dev-proposals-20260403_024652 E3: Playwright E2E + 合约测试) — 2026-04-03
 - **E3 Playwright E2E**: auto-save + conflict-dialog + contract tests
   - `tests/e2e/auto-save.spec.ts` — 4 E2E tests (debounce/beacon/manual/error)

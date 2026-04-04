@@ -9,7 +9,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createAIService } from '@/services/ai-service';
-import { getLocalEnv as getCloudflareEnv } from '@/lib/env';
+import { getLocalEnv } from '@/lib/env';
 import { generateId } from '@/lib/db';
 import { buildBoundedContextsPrompt } from '@/lib/prompts/bounded-contexts';
 import { filterInvalidContexts } from '@/lib/bounded-contexts-filter';
@@ -37,6 +37,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateC
   try {
     const body = await request.json().catch(() => null);
 
+    // E1-T1: 输入验证
     if (!body || typeof body.requirementText !== 'string' || !body.requirementText.trim()) {
       return NextResponse.json(
         { success: false, contexts: [] as BoundedContextResponse[], generationId: '', confidence: 0, error: 'requirementText 不能为空' },
@@ -49,26 +50,44 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateC
       projectId?: string;
     };
 
-    const env = getCloudflareEnv();
+    const env = getLocalEnv();
+
+    // E1-T2: API Key 检查
+    if (!env.MINIMAX_API_KEY) {
+      return NextResponse.json(
+        { success: false, contexts: [] as BoundedContextResponse[], generationId: '', confidence: 0, error: 'AI 服务未配置（API Key 缺失）' },
+        { status: 500 }
+      );
+    }
+
     const aiService = createAIService(env);
     const sessionId = generateId();
 
     const prompt = buildBoundedContextsPrompt(requirementText);
 
-    const result = await aiService.generateJSON<BoundedContextResponse[]>(prompt, undefined, {
-      temperature: 0.3,
-      maxTokens: 3072,
-    });
+    // E1-T3: AI 服务 .catch() 防御
+    const result = await aiService
+      .generateJSON<BoundedContextResponse[]>(prompt, undefined, {
+        temperature: 0.3,
+        maxTokens: 3072,
+      })
+      .catch((err: Error) => {
+        console.error('[generate-contexts] AI service error:', err);
+        return { success: false, error: err.message, data: null as BoundedContextResponse[] | null, usage: null };
+      });
 
-    if (!result.data || !Array.isArray(result.data) || result.data.length === 0) {
+    if (!result.success || !result.data || !Array.isArray(result.data) || result.data.length === 0) {
+      const errorMsg = result.success === false
+        ? (result as { error?: string }).error ?? 'AI 服务错误'
+        : '未能提取到有效的限界上下文，请重试或补充需求描述';
       return NextResponse.json(
-        { success: false, contexts: [] as BoundedContextResponse[], generationId: sessionId, confidence: 0, error: '未能提取到有效的限界上下文，请重试或补充需求描述' },
-        { status: 200 }
+        { success: false, contexts: [] as BoundedContextResponse[], generationId: sessionId, confidence: 0, error: errorMsg },
+        { status: result.success === false ? 500 : 200 }
       );
     }
 
     // Apply post-processing filter before returning
-    const rawContexts = result.data.filter(ctx => typeof ctx.name === 'string');
+    const rawContexts = result.data.filter((ctx: BoundedContextResponse) => typeof ctx.name === 'string');
     const filtered = filterInvalidContexts(rawContexts);
 
     const validTypes = ['core', 'supporting', 'generic', 'external'] as const;

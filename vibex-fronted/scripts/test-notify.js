@@ -15,6 +15,7 @@
 
 const https = require('https');
 const http = require('http');
+const { checkDedup, recordSend, generateKey } = require('./dedup');
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -98,9 +99,17 @@ const sendNotification = async () => {
     console.log('📝 CI notification disabled (CI_NOTIFY_ENABLED=false)');
     return;
   }
-  
+
   if (!config.webhookUrl) {
     console.log('⚠️ CI_NOTIFY_WEBHOOK not configured, skipping notification');
+    return;
+  }
+
+  // E1: Skip duplicate notifications within 5-minute window
+  const dedupKey = generateKey(status);
+  const { skipped, remaining } = checkDedup(dedupKey);
+  if (skipped) {
+    console.log(`⏭️  Skip duplicate notification (${remaining}s remaining)`);
     return;
   }
   
@@ -125,6 +134,7 @@ const sendNotification = async () => {
       res.on('end', () => {
         if (res.statusCode === 200) {
           console.log('✅ Test notification sent successfully');
+          recordSend(dedupKey);
           resolve();
         } else {
           console.log(`⚠️ Notification failed: ${res.statusCode}`);

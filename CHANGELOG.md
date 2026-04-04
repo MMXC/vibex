@@ -140,8 +140,8 @@
     - E4-6: onSaveError callback for non-conflict errors
     - E4-7: lastSavedAt updated on successful save
   - `tests/e2e/conflict-resolution.spec.ts`: ConflictDialog 三按钮 + keep-local + cancel
-  - **bug fix**: route.ts 乐观锁条件 `<=` → `<` (version 匹配时成功)
-- **提交**: `b5c3d2a1`
+  - **spec clarification**: 乐观锁条件 `<=` (version <= server max 时 409 冲突)
+- **提交**: `629c5fe0`
 - **E3 轮询检测**: 30s 版本轮询冲突检测
   - `useAutoSave.ts`: 30s 轮询检测 remote version 变化
   - `canvasApi.ts`: `getLatestVersion()` API 端点

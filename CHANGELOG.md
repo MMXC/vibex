@@ -32,6 +32,17 @@
   - 新增 2 tests (`auth.test.ts`)
   - **提交**: `2b0d72b8`
 
+### Added (vibex-backend-deploy-stability E1: SSE 超时清理) — 2026-04-05
+- **E1 SSE超时清理**: sse-stream-lib/index.ts AbortController 10s 超时 + timers 数组
+  - `timers[]` 跟踪所有 setTimeout ID
+  - abort signal listener: abort 时调用 `controller.close()`
+  - `cancel()` 方法: 清理 timers + abort AI 调用
+  - finally: 清理所有 timers + abort + controller.close()
+  - `llm-provider.ts`: `LLMRequestOptions` 添加 `signal?: AbortSignal`
+  - `ai-service.ts`: `chat()` + `generateJSON()` 转发 signal
+  - `sse-stream-lib/index.test.ts`: 9 tests pass
+- **提交**: `2b33f966`
+
 ### Added (vibex-proposals-20260405-final E1-E3: 提案追踪机制) — 2026-04-05
 - **E1 Canvas API追踪**: proposals/canvas-api-tracker.md 记录4个端点状态（100% real AI）
 - **E2 Sprint追踪**: proposals/index.md 更新，包含6条提案追踪（2026-04-05 sprint）

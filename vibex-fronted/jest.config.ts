@@ -26,6 +26,7 @@ const config: Config = {
     '\\.module\\.css$': 'identity-obj-proxy',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^@vibex/types/(.*)$': '<rootDir>/../packages/types/src/$1',
   } as any) as Config['moduleNameMapper'],
 
   // Fake timers configuration

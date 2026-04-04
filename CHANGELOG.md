@@ -1,3 +1,10 @@
+### Added (canvas-sync-protocol-complete E1: 后端SnapshotsAPI) — 2026-04-03
+- **E1 后端 SnapshotsAPI**: 乐观锁 + 冲突检测
+  - `snapshots.ts`: version 字段 + 409 VERSION_CONFLICT 响应
+  - GET `/v1/canvas/snapshots/latest`: 轻量轮询端点（latestVersion + updatedAt）
+  - Conflict 响应包含 serverSnapshot 数据供前端 ConflictDialog 使用
+- **提交**: `fe95884d`
+
 ### Added (canvas-split-hooks E4: useAIController) — 2026-04-04
 - **E4 useAIController hook**: 从 CanvasPage.tsx 提取 AI 生成状态和逻辑
   - requirementInput/quickGenerate 本地状态

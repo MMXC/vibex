@@ -133,6 +133,17 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.101',
     date: '2026-04-04',
     changes: [
+      '🔒 canvas-sync-protocol-complete/E1: 后端 SnapshotsAPI — 乐观锁 + 409 VERSION_CONFLICT',
+      '✅ snapshots.ts: version 字段 + 冲突检测响应',
+      '✅ GET /v1/canvas/snapshots/latest: 轻量轮询端点',
+      '✅ 提交 fe95884d',
+    ],
+    commit: 'fe95884d',
+  },
+  {
+    version: '1.0.105',
+    date: '2026-04-04',
+    changes: [
       '🎣 canvas-split-hooks/E4: useAIController hook — AI 生成状态统一提取',
       '✅ requirementInput/isQuickGenerating 本地状态 + AI thinking (sessionStore)',
       '✅ quickGenerate: contexts → flows → components 三步生成',

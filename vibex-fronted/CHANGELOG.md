@@ -98,6 +98,15 @@
 
 **提交**: `815821bc`
 
+### [canvas-sync-protocol-complete E1: 后端SnapshotsAPI] — 2026-04-03
+
+#### Changed (backend)
+- `snapshots.ts` — version 字段 + 409 VERSION_CONFLICT 响应
+- GET `/v1/canvas/snapshots/latest` — 轻量轮询端点（latestVersion + updatedAt）
+- Conflict 响应包含 serverSnapshot 数据
+
+**提交**: `fe95884d`
+
 ### [canvas-split-hooks E4: useAIController] — 2026-04-04 (canvas-split-hooks)
 
 #### Added

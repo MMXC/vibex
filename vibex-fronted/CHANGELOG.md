@@ -29,6 +29,25 @@
 
 ### [api-input-validation-layer E2: 安全高风险路由集成] — 2026-04-04
 
+#### Changed
+- `vibex-backend/src/schemas/security.ts` — GitHub 路径白名单 + Prompt Injection 检测
+- `vibex-backend/src/lib/high-risk-validation.ts` — Next.js route validation helpers
+- chat.ts: message max 10000, safeParse() 标准化错误响应
+- plan.ts: requirement max 50000, detectInjection()
+
+**提交**: `f1210edb`, `e9ce97ef`
+
+### [api-input-validation-layer E3: 中风险路由覆盖] — 2026-04-04
+
+#### Changed
+- Projects API: project + canvas schemas with Zod validation
+- Canvas API: withValidation middleware 集成
+
+#### Added
+- `vibex-backend/src/schemas/schema.test.ts` — 230 行 schema 单元测试
+
+**提交**: `28d5a6d1`
+
 #### Backend
 - `schemas/security.ts`: chatMessageSchema + planAnalyzeSchema + INJECTION_KEYWORDS
 - S2.2: chat.ts 使用 `chatMessageSchema` + Prompt Injection blocklist

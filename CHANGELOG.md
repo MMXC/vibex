@@ -22,6 +22,19 @@
 
 ### Added (api-input-validation-layer E2: 安全高风险路由集成) — 2026-04-04
 - **E2 安全高风险路由**: chat.ts + plan.ts 集成安全 schema + Prompt Injection 检测
+  - `schemas/security.ts`: GitHub 路径白名单 + Prompt Injection 检测
+  - `lib/high-risk-validation.ts`: Next.js route validation helpers
+  - chat.ts: message max 10000, safeParse() 标准化错误响应
+  - plan.ts: requirement max 50000, detectInjection()
+- **提交**: `f1210edb`, `e9ce97ef`
+
+### Added (api-input-validation-layer E3: 中风险路由覆盖) — 2026-04-04
+- **E3 中风险路由覆盖**: Projects + Canvas API schema 集成
+  - Projects API: project + canvas schemas with Zod validation
+  - Canvas API: withValidation middleware 集成
+  - `schema.test.ts`: 230 行 schema 单元测试
+- **提交**: `28d5a6d1`
+- **E2 安全高风险路由**: chat.ts + plan.ts 集成安全 schema + Prompt Injection 检测
   - S2.2: chat.ts 使用 `chatMessageSchema` + `INJECTION_KEYWORDS` blocklist
     - SYSTEM_PROMPT, ##Instructions, /system 等 Prompt Injection 关键词黑名单
     - message max 10000 chars, `.safeParse()` 代替 `.parse()`

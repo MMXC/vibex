@@ -91,6 +91,18 @@ const mockChangelog: ChangelogEntry[] = [
     commit: 'f1210edb',
   },
   {
+    version: '1.0.111',
+    date: '2026-04-04',
+    changes: [
+      '🔒 api-input-validation-layer/E3: 中风险路由覆盖 — Projects + Canvas schema 集成',
+      '✅ Projects API: project + canvas schemas with Zod validation',
+      '✅ Canvas API: withValidation middleware 集成',
+      '✅ schema.test.ts: 230 行 schema 单元测试',
+      '✅ 提交 28d5a6d1',
+    ],
+    commit: '28d5a6d1',
+  },
+  {
     version: '1.0.104',
     date: '2026-04-03',
     changes: [

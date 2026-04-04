@@ -1,5 +1,19 @@
 # Changelog
 
+### [vibex-architect-proposals-20260403_024652 E5: 测试策略文档] — 2026-04-03
+
+#### Added
+- `docs/TESTING_STRATEGY.md` — 测试分层架构文档（Jest 单元测试 + Playwright E2E + 合约测试 + 突变测试）
+- `src/hooks/canvas/useAutoSave.ts` — 发送 version 到后端，409 冲突处理，conflict 状态
+- `src/components/canvas/features/SaveIndicator.tsx` — conflict 状态显示
+- `src/lib/canvas/types.ts` — CreateSnapshotInput.version, CanvasSnapshot.version
+- `tests/contracts/openapi.yaml` — Canvas Snapshots API 完整规范（包含 409 conflict response）
+
+#### Changed
+- `src/lib/canvas/canvasStore.ts` — 删除内联 CascadeUpdateManager，改用 cascade/ 模块导出
+
+**提交**: `635147fb`
+
 ### [vibex-css-build-fix E3: 批量扫描module.css] — 2026-04-04 (vibex-css-build-fix)
 
 #### Added

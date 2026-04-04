@@ -6,6 +6,13 @@
   - 单元测试 3/3 pass
 - **提交**: `b2bc5897`, `adb62068`
 
+### Added (vibex-architect-proposals-20260403_024652 E5: 测试策略文档) — 2026-04-03
+- **E5 测试策略文档**: `docs/TESTING_STRATEGY.md` 测试分层架构文档
+  - Jest 单元测试 + Playwright E2E 测试分层
+  - 合约测试 Schema 优先原则
+  - 突变测试策略
+- **提交**: `635147fb`
+
 ### Added (vibex-sprint4-20260403 E2: 质量门禁建立) — 2026-04-03
 - **E2 质量门禁**: Git hooks + ESLint disable 监控
   - `.husky/commit-msg` — commitlint conventional commit 验证

@@ -376,6 +376,21 @@ export const canvasApi = {
     if (!res.ok) handleResponseError(res, `恢复快照失败: ${res.status}`);
     return res.json() as Promise<RestoreSnapshotOutput>;
   },
+
+  /**
+   * E3: 获取最新版本号（轻量轮询检测）
+   * GET /api/v1/canvas/snapshots/latest?projectId=xxx
+   * 用于 30s 间隔轮询检测远程版本变化，触发 conflict 状态
+   */
+  getLatestVersion: async (projectId: string): Promise<{ success: boolean; latestVersion: number; updatedAt: string | null }> => {
+    const headers = getAuthHeaders();
+    const res = await fetch(
+      `${getApiUrl(API_CONFIG.endpoints.canvas.latest)}?projectId=${encodeURIComponent(projectId)}`,
+      { headers }
+    );
+    if (!res.ok) handleResponseError(res, `获取最新版本失败: ${res.status}`);
+    return res.json();
+  },
 };
 
 // === Polling Manager ===

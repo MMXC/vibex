@@ -31,6 +31,8 @@ export const API_CONFIG = {
       snapshots: '/canvas/snapshots',
       snapshot: (id: string) => `/v1/canvas/snapshots/${id}`,
       restoreSnapshot: (id: string) => `/v1/canvas/snapshots/${id}/restore`,
+      // E3: Version polling endpoint for conflict detection
+      latest: '/v1/canvas/snapshots/latest',
     },
     auth: {
       login: '/auth/login',

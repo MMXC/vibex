@@ -309,6 +309,37 @@ export function useAutoSave(options: UseAutoSaveOptions): UseAutoSaveReturn {
     }
   }, [])
 
+  // E3: Version polling — 30s interval to detect remote version changes (conflict)
+  useEffect(() => {
+    if (!projectId) return
+
+    const pollLatestVersion = async () => {
+      // Skip if already in conflict state or saving
+      if (saveStatus === 'conflict' || savingRef.current) return
+      try {
+        const { latestVersion } = await canvasApi.getLatestVersion(projectId)
+        if (!mountedRef.current) return
+        // Remote version is newer than our last known version → conflict detected
+        if (latestVersion > 0 && latestVersion > lastSnapshotVersionRef.current) {
+          console.info(
+            `[useAutoSave] Remote version ${latestVersion} > local ${lastSnapshotVersionRef.current}, conflict detected`
+          )
+          setSaveStatus('conflict')
+        }
+      } catch (err) {
+        // Polling error — log and continue, don't disrupt user
+        console.warn('[useAutoSave] Version polling failed:', err)
+      }
+    }
+
+    // Poll every 30 seconds (AGENTS.md E3: no shorter than 15s)
+    const intervalId = setInterval(pollLatestVersion, 30_000)
+    // Run once immediately on mount
+    pollLatestVersion()
+
+    return () => clearInterval(intervalId)
+  }, [projectId, saveStatus]) // eslint-disable-line react-hooks/exhaustive-deps
+
   return {
     saveStatus,
     lastSavedAt,

@@ -68,6 +68,16 @@ describe('canvasApi response validation', () => {
       expect(isValidGenerateContextsResponse({ success: true, contexts: [], confidence: 0 })).toBe(false);
     });
 
+    // E1-T2: Reverse test — validator must reject sessionId field
+    it('should reject sessionId field (wrong field name)', () => {
+      expect(isValidGenerateContextsResponse({
+        success: true,
+        contexts: [],
+        sessionId: 'gen_123', // ❌ wrong field name
+        confidence: 0.85,
+      })).toBe(false);
+    });
+
     it('should reject non-array contexts', () => {
       expect(isValidGenerateContextsResponse({ success: true, contexts: 'not-array', generationId: 's', confidence: 0 })).toBe(false);
     });

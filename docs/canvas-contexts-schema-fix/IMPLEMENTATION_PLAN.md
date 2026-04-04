@@ -36,7 +36,7 @@ Dev Agent
 - [x] JSDoc 注释中无 `sessionId` ✅
 - [x] Validator 测试使用 `generationId` ✅
 - [x] Validator 对 `sessionId` 字段返回 false ✅
-- [ ] `npm test -- canvasApiValidation` 通过
+- [x] `npm test -- canvasApiValidation` 通过 ✅ (17/17)
 
 ---
 

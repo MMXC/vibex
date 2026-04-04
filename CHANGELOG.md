@@ -54,6 +54,23 @@
   - `flaky-tests.json`: 不稳定测试注册表
 - **提交**: `8d6eb70d`
 
+### Added (canvas-test-framework-standardize E2: CI质量门禁) — 2026-04-03
+- **E2 CI质量门禁**: ESLint disable 监控 + GitHub Actions CI pre-submit workflow
+  - `scripts/pre-submit-check.sh`: ESLint disable count 检查（阈值 20 条）
+  - `.github/workflows/pre-submit.yml`: GitHub Actions CI pre-submit workflow
+  - `playwright.ci.config.ts`: CI 专用 Playwright 配置（retries=3, workers=4）
+  - `playwright.a11y.config.ts`: 可访问性测试配置（axe-core）
+- **提交**: `571c1f67`
+
+### Added (canvas-test-framework-standardize E3: 测试覆盖率提升) — 2026-04-04
+- **E3 测试覆盖率提升**: Canvas 核心模块分支覆盖达标
+  - `src/lib/canvas/__tests__/historySlice.test.ts`: 45 tests, branch 98.0% (目标 ≥40%)
+  - `src/lib/canvas/stores/contextStore.test.ts`: branch 88.63% (目标 ≥50%)
+  - `src/lib/canvas/stores/flowStore.test.ts`: branch 63.15% (目标 ≥50%)
+  - `src/lib/canvas/stores/componentStore.test.ts`: branch 68.75% (目标 ≥50%)
+  - 全局分支覆盖: 51.94% (目标 ≥50%) ✅
+- **提交**: `016c88a2`
+
 ### Added (vibex-tester-proposals-20260403_024652 E2: Mock-Schema 一致性契约测试) — 2026-04-03
 - **E2 Mock-Schema 契约测试**: mock 与 schema 之间的 drift 检测基础设施
   - `test/contract/mock-consistency.test.ts` — 7 个 mock-schema 一致性测试用例

@@ -215,6 +215,20 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '8d6eb70d',
   },
   {
+    version: '1.0.109',
+    date: '2026-04-04',
+    changes: [
+      '🧪 canvas-test-framework-standardize/E3: 测试覆盖率提升 — Canvas 核心模块分支覆盖达标',
+      '✅ historySlice: 45 tests, branch 98.0% (目标 ≥40%)',
+      '✅ contextStore: branch 88.63% (目标 ≥50%)',
+      '✅ flowStore: branch 63.15% (目标 ≥50%)',
+      '✅ componentStore: branch 68.75% (目标 ≥50%)',
+      '✅ 全局分支覆盖 51.94% (目标 ≥50%) ✅',
+      '✅ 提交 016c88a2',
+    ],
+    commit: '016c88a2',
+  },
+  {
     version: '1.0.108',
     date: '2026-04-03',
     changes: [

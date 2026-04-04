@@ -78,6 +78,17 @@
 
 **提交**: `000a2743`
 
+### [canvas-test-framework-standardize E3: 测试覆盖率提升] — 2026-04-04
+
+#### Added
+- `src/lib/canvas/__tests__/historySlice.test.ts` — 45 tests, branch 98.0% (目标 ≥40%)
+- `src/lib/canvas/stores/contextStore.test.ts` — branch 88.63% (目标 ≥50%)
+- `src/lib/canvas/stores/flowStore.test.ts` — branch 63.15% (目标 ≥50%)
+- `src/lib/canvas/stores/componentStore.test.ts` — branch 68.75% (目标 ≥50%)
+- 全局分支覆盖: 51.94% (目标 ≥50%) ✅
+
+**提交**: `016c88a2`
+
 ### [vibex-architect-proposals-20260403_024652 E1: 乐观锁] — 2026-04-03
 
 #### Changed

@@ -210,6 +210,19 @@ const mockChangelog: ChangelogEntry[] = [
     commit: 'fe95884d',
   },
   {
+    version: '1.0.107',
+    date: '2026-04-03',
+    changes: [
+      '🖥 canvas-sync-protocol-complete/E2: 前端冲突UI — ConflictDialog 三选项解决',
+      '✅ ConflictDialog: 保留本地/使用服务端/合并三个选项',
+      '✅ canvasStore: handleConflictKeepLocal/UseServer/Merge',
+      '✅ useAutoSave: conflictData + clearConflict',
+      '✅ 16 个 Jest 测试',
+      '✅ 提交 e1346b0f',
+    ],
+    commit: 'e1346b0f',
+  },
+  {
     version: '1.0.105',
     date: '2026-04-04',
     changes: [

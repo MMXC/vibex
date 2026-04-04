@@ -36,6 +36,15 @@
   - `StepClarification.tsx` — 修复重复 import bug
 - **提交**: `4123e34f`
 
+### Added (canvas-sync-protocol-complete E2: 前端冲突UI) — 2026-04-03
+- **E2 前端冲突UI**: ConflictDialog 组件 + CanvasPage 集成
+  - `ConflictDialog.tsx`: 三选项冲突解决（保留本地/使用服务端/合并）
+  - `ConflictDialog.test.tsx`: 16 个 Jest 测试
+  - `canvasStore.ts`: conflictData + handleConflictKeepLocal/UseServer/Merge
+  - `useAutoSave.ts`: conflictData + clearConflict 状态扩展
+  - Accessibility: aria-modal, keyboard focus trap, WCAG 2.1 AA
+- **提交**: `e1346b0f`
+
 ### Added (canvas-sync-protocol-complete E1: 后端SnapshotsAPI) — 2026-04-03
 - **E1 后端 SnapshotsAPI**: 乐观锁 + 冲突检测
   - `snapshots.ts`: version 字段 + 409 VERSION_CONFLICT 响应

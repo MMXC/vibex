@@ -138,6 +138,20 @@
 
 **提交**: `815821bc`
 
+### [canvas-sync-protocol-complete E2: 前端冲突UI] — 2026-04-03
+
+#### Added
+- `src/components/ConflictDialog/` — 三选项冲突解决组件
+  - Props: serverSnapshot, localData, onKeepLocal, onUseServer, onMerge
+  - Accessibility: aria-modal, keyboard focus trap, WCAG 2.1 AA
+  - Right-fixed overlay positioning with slide-in animation
+- `src/hooks/canvas/useAutoSave.ts` — conflictData + clearConflict 扩展
+- `src/lib/canvas/canvasStore.ts` — handleConflictKeepLocal/UseServer/Merge
+
+**测试**: `ConflictDialog.test.tsx` — 16 个 Jest 测试
+
+**提交**: `e1346b0f`
+
 ### [canvas-sync-protocol-complete E1: 后端SnapshotsAPI] — 2026-04-03
 
 #### Changed (backend)

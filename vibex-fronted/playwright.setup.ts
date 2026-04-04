@@ -7,7 +7,7 @@
  * - Set up global test timeouts and reporters
  */
 
-import { test, beforeAll, afterAll } from '@playwright/test';
+// Note: skipIfFlaky() and recordTestResult() are used by test files via import
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -66,7 +66,7 @@ if (registry.flakyTests.length > 0) {
 
 const TEST_RESULT_FILE = path.resolve(__dirname, '.test-results', 'test-runs.json');
 
-function recordTestResult(testInfo: { title: string; file: string }, passed: boolean): void {
+export function recordTestResult(testInfo: { title: string; file: string }, passed: boolean): void {
   try {
     const dir = path.dirname(TEST_RESULT_FILE);
     if (!fs.existsSync(dir)) {

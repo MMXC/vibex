@@ -1,5 +1,4 @@
 import { NextRequest } from 'next/server';
-import { hashPassword, generateToken } from '@/lib/auth';
 
 // Mock Prisma
 const mockPrisma = {
@@ -12,16 +11,15 @@ jest.mock('@prisma/client', () => ({
   PrismaClient: jest.fn(() => mockPrisma),
 }));
 
+const mockVerifyPassword = jest.fn();
+const mockGenerateToken = jest.fn();
+
 jest.mock('@/lib/auth', () => ({
-  hashPassword: jest.fn(),
-  verifyPassword: jest.fn(),
-  generateToken: jest.fn(),
-  getAuthUser: jest.fn(),
+  verifyPassword: mockVerifyPassword,
+  generateToken: mockGenerateToken,
 }));
 
 import { POST } from './route';
-import { PrismaClient } from '@prisma/client';
-import { verifyPassword, generateToken } from '@/lib/auth';
 
 describe('POST /api/auth/login', () => {
   beforeEach(() => {
@@ -39,7 +37,7 @@ describe('POST /api/auth/login', () => {
     
     expect(response.status).toBe(400);
     expect(data.success).toBe(false);
-    expect(data.error).toContain('required');
+    expect(data.error).toBe('Invalid request body');
   });
   
   it('should return 400 if password is missing', async () => {
@@ -77,7 +75,7 @@ describe('POST /api/auth/login', () => {
       email: 'test@example.com',
       password: 'hashedpassword',
     });
-    (verifyPassword as jest.Mock).mockResolvedValue(false);
+    mockVerifyPassword.mockResolvedValue(false);
     
     const request = new NextRequest('http://localhost:3000/api/auth/login', {
       method: 'POST',
@@ -103,8 +101,8 @@ describe('POST /api/auth/login', () => {
     };
     
     (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
-    (verifyPassword as jest.Mock).mockResolvedValue(true);
-    (generateToken as jest.Mock).mockReturnValue('mock-token');
+    mockVerifyPassword.mockResolvedValue(true);
+    mockGenerateToken.mockReturnValue('mock-token');
     
     const request = new NextRequest('http://localhost:3000/api/auth/login', {
       method: 'POST',

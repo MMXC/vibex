@@ -528,6 +528,7 @@ export class AIService {
           messages,
           temperature: options?.temperature ?? this.config.defaultTemperature,
           maxTokens: options?.maxTokens ?? this.config.maxTokens,
+          signal: options?.signal,
           ...options,
         });
         return response.content;
@@ -899,6 +900,7 @@ ${JSON.stringify(schema, null, 2)}`
           ],
           temperature: options?.temperature ?? 0.3,
           maxTokens: options?.maxTokens ?? this.config.maxTokens,
+          signal: options?.signal,
           // Note: responseFormat is handled in llm-provider.ts (skipped for Minimax)
           responseFormat: 'json_object',
         });

@@ -37,10 +37,49 @@ export interface SSEStreamOptions {
  * Builds the SSE ReadableStream for requirement analysis.
  * Emits 7 event types in order:
  *   thinking → step_context → step_model → step_flow → step_components → done (or error)
+ *
+ * Includes AbortController timeout (10s) and proper resource cleanup on abort/disconnect.
  */
 export function buildSSEStream({ requirement, env }: SSEStreamOptions): ReadableStream {
+  // Track all timers for cleanup
+  const timers: ReturnType<typeof setTimeout>[] = [];
+
+  const addTimer = (fn: () => void, ms: number): void => {
+    timers.push(setTimeout(fn, ms));
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let abortController: AbortController | null = null;
+
   return new ReadableStream({
     async start(controller) {
+      let aborted = false;
+
+      // Set up AbortController with 10-second timeout
+      abortController = new AbortController();
+      const { signal } = abortController;
+
+      // Auto-abort after 10 seconds to prevent Worker hanging
+      addTimer(() => {
+        if (!aborted) {
+          devDebug('[SSE Stream] Timeout reached (10s), aborting AI calls');
+          abortController?.abort();
+        }
+      }, 10_000);
+
+      // Close controller when abort is signaled (timeout or client disconnect)
+      signal.addEventListener('abort', () => {
+        if (!aborted) {
+          aborted = true;
+          devDebug('[SSE Stream] Abort signal received, closing stream');
+          try {
+            controller.close();
+          } catch {
+            // Controller may already be closed — ignore
+          }
+        }
+      });
+
       try {
         devDebug('[SSE Stream] Starting analysis for requirement:', requirement.substring(0, 100));
 
@@ -49,11 +88,11 @@ export function buildSSEStream({ requirement, env }: SSEStreamOptions): Readable
 
         // 1. Emit thinking events
         sendThinking(controller, 'TWO_STAGE_TEST_123...', true);
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise(resolve => { addTimer(() => resolve(undefined), 300); });
         sendThinking(controller, '识别核心实体和业务概念...', false);
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => { addTimer(() => resolve(undefined), 200); });
         sendThinking(controller, '分析限界上下文边界...', false);
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => { addTimer(() => resolve(undefined), 200); });
 
         // 2. Step: Generate bounded contexts
         sendThinking(controller, '正在生成限界上下文...', false);
@@ -78,7 +117,7 @@ export function buildSSEStream({ requirement, env }: SSEStreamOptions): Readable
 
 直接输出列表，不要解释，不要JSON：`;
 
-          const stage1Result = await aiService.chat(stage1Prompt);
+          const stage1Result = await aiService.chat(stage1Prompt, undefined, { signal });
           const stage1Text = stage1Result.success ? (stage1Result.data as unknown as string) || '' : '';
 
           // Stage 2: Parse free-form text into structured contexts
@@ -192,7 +231,7 @@ export function buildSSEStream({ requirement, env }: SSEStreamOptions): Readable
           });
         }
 
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => { addTimer(() => resolve(undefined), 200); });
 
         // 3. Step: Generate domain models
         sendThinking(controller, '正在生成领域模型...', false);
@@ -226,7 +265,7 @@ export function buildSSEStream({ requirement, env }: SSEStreamOptions): Readable
             entities: { type: 'array' },
             mermaidCode: { type: 'string' },
             confidence: { type: 'number' },
-          });
+          }, { signal });
 
           const modelData = modelResult.data;
           const entities = modelData?.entities ?? [];
@@ -254,7 +293,7 @@ export function buildSSEStream({ requirement, env }: SSEStreamOptions): Readable
           });
         }
 
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => { addTimer(() => resolve(undefined), 200); });
 
         // 4. Step: Generate business flow
         sendThinking(controller, '正在生成业务流程...', false);
@@ -279,7 +318,7 @@ export function buildSSEStream({ requirement, env }: SSEStreamOptions): Readable
             flow: { type: 'string' },
             mermaidCode: { type: 'string' },
             confidence: { type: 'number' },
-          });
+          }, { signal });
 
           const flowData = flowResult.data;
           sendSSE(controller, 'step_flow', {
@@ -297,7 +336,7 @@ export function buildSSEStream({ requirement, env }: SSEStreamOptions): Readable
           });
         }
 
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => { addTimer(() => resolve(undefined), 200); });
 
         // 5. Step: Generate component relationships
         sendThinking(controller, '正在分析组件关系...', false);
@@ -328,7 +367,7 @@ export function buildSSEStream({ requirement, env }: SSEStreamOptions): Readable
             components: { type: 'array' },
             mermaidCode: { type: 'string' },
             confidence: { type: 'number' },
-          });
+          }, { signal });
 
           const compData = componentsResult.data;
           const components = compData?.components ?? [];
@@ -359,10 +398,32 @@ export function buildSSEStream({ requirement, env }: SSEStreamOptions): Readable
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Stream processing failed';
         devDebug('[SSE Stream] Error:', errorMessage);
-        sendSSE(controller, 'error', { message: errorMessage, code: 'STREAM_ERROR' });
+        try {
+          sendSSE(controller, 'error', { message: errorMessage, code: 'STREAM_ERROR' });
+        } catch {
+          // Controller may already be closed
+        }
       } finally {
-        controller.close();
+        // Clean up all timers
+        timers.forEach(t => clearTimeout(t));
+        timers.length = 0;
+        // Abort any remaining AI calls
+        abortController?.abort();
+        abortController = null;
+        try {
+          controller.close();
+        } catch {
+          // Already closed
+        }
       }
+    },
+    cancel() {
+      // Called when ReadableStream is cancelled (client disconnect)
+      devDebug('[SSE Stream] Stream cancelled (client disconnect)');
+      timers.forEach(t => clearTimeout(t));
+      timers.length = 0;
+      abortController?.abort();
+      abortController = null;
     },
   });
 }

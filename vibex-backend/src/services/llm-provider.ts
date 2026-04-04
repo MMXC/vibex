@@ -116,6 +116,8 @@ export interface LLMRequestOptions {
   functionCall?: 'auto' | 'none' | { name: string };
   /** Additional provider-specific options */
   extra?: Record<string, unknown>;
+  /** Abort signal for cancellation */
+  signal?: AbortSignal;
 }
 
 /**

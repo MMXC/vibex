@@ -13,6 +13,7 @@ import { getLocalEnv } from '@/lib/env';
 import { generateId } from '@/lib/db';
 import { buildBoundedContextsPrompt } from '@/lib/prompts/bounded-contexts';
 import { filterInvalidContexts } from '@/lib/bounded-contexts-filter';
+import { canvasError, CanvasErrorCodes } from '../types';
 
 interface BoundedContextResponse {
   id: string;
@@ -23,24 +24,37 @@ interface BoundedContextResponse {
   confidence: number;
 }
 
-interface GenerateContextsOutput {
-  success: boolean;
+type SuccessResponse = {
+  success: true;
   contexts: BoundedContextResponse[];
   generationId: string;
   confidence: number;
-  error?: string;
-}
+};
+
+type ErrorResponse = {
+  success: false;
+  contexts: BoundedContextResponse[];
+  generationId: string;
+  confidence: number;
+  error: string;
+  code?: string;
+  details?: unknown;
+};
+
+type ApiResponse = SuccessResponse | ErrorResponse;
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request: NextRequest): Promise<NextResponse<GenerateContextsOutput>> {
+export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse>> {
+  const generationId = generateId();
+
   try {
     const body = await request.json().catch(() => null);
 
     // E1-T1: 输入验证
     if (!body || typeof body.requirementText !== 'string' || !body.requirementText.trim()) {
       return NextResponse.json(
-        { success: false, contexts: [] as BoundedContextResponse[], generationId: '', confidence: 0, error: 'requirementText 不能为空' },
+        { ...canvasError('requirementText 不能为空', CanvasErrorCodes.INVALID_INPUT), contexts: [] as BoundedContextResponse[], generationId, confidence: 0 },
         { status: 400 }
       );
     }
@@ -55,13 +69,12 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateC
     // E1-T2: API Key 检查
     if (!env.MINIMAX_API_KEY) {
       return NextResponse.json(
-        { success: false, contexts: [] as BoundedContextResponse[], generationId: '', confidence: 0, error: 'AI 服务未配置（API Key 缺失）' },
+        { ...canvasError('AI 服务未配置（API Key 缺失）', CanvasErrorCodes.API_KEY_MISSING), contexts: [] as BoundedContextResponse[], generationId, confidence: 0 },
         { status: 500 }
       );
     }
 
     const aiService = createAIService(env);
-    const sessionId = generateId();
 
     const prompt = buildBoundedContextsPrompt(requirementText);
 
@@ -72,7 +85,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateC
         maxTokens: 3072,
       })
       .catch((err: Error) => {
-        console.error('[generate-contexts] AI service error:', err);
+        console.error('[canvas/generate-contexts] AI service error:', err);
         return { success: false, error: err.message, data: null as BoundedContextResponse[] | null, usage: null };
       });
 
@@ -80,8 +93,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateC
       const errorMsg = result.success === false
         ? (result as { error?: string }).error ?? 'AI 服务错误'
         : '未能提取到有效的限界上下文，请重试或补充需求描述';
+      const code = result.success === false ? CanvasErrorCodes.AI_ERROR : CanvasErrorCodes.EMPTY_RESPONSE;
       return NextResponse.json(
-        { success: false, contexts: [] as BoundedContextResponse[], generationId: sessionId, confidence: 0, error: errorMsg },
+        { ...canvasError(errorMsg, code), contexts: [] as BoundedContextResponse[], generationId, confidence: 0 },
         { status: result.success === false ? 500 : 200 }
       );
     }
@@ -110,11 +124,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateC
       `[canvas/generate-contexts] Generated ${contexts.length} contexts for project ${projectId ?? 'unknown'}`
     );
 
-    return NextResponse.json({ success: true, contexts, generationId: sessionId, confidence });
+    return NextResponse.json({ success: true, contexts, generationId, confidence });
   } catch (err) {
     console.error('[canvas/generate-contexts] Error:', err);
     return NextResponse.json(
-      { success: false, contexts: [] as BoundedContextResponse[], generationId: '', confidence: 0, error: '服务器内部错误，请稍后重试' },
+      { ...canvasError('服务器内部错误，请稍后重试', CanvasErrorCodes.INTERNAL_ERROR), contexts: [] as BoundedContextResponse[], generationId, confidence: 0 },
       { status: 500 }
     );
   }

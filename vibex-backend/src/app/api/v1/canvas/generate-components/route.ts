@@ -9,10 +9,10 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createAIService } from '@/services/ai-service';
-import { getLocalEnv as getCloudflareEnv } from '@/lib/env';
+import { getLocalEnv } from '@/lib/env';
 import { generateId } from '@/lib/db';
 import type { BoundedContext } from '@/services/context/types';
-
+import { canvasError, CanvasErrorCodes } from '../types';
 
 interface FlowStep {
   name: string;
@@ -45,14 +45,26 @@ interface ComponentResponse {
   confidence: number;
 }
 
-interface GenerateComponentsOutput {
-  success: boolean;
+type SuccessResponse = {
+  success: true;
   components: ComponentResponse[];
   generationId: string;
   totalCount: number;
   confidence: number;
-  error?: string;
-}
+};
+
+type ErrorResponse = {
+  success: false;
+  components: ComponentResponse[];
+  generationId: string;
+  totalCount: number;
+  confidence: number;
+  error: string;
+  code?: string;
+  details?: unknown;
+};
+
+type ApiResponse = SuccessResponse | ErrorResponse;
 
 const USER_PROMPT = `根据以下业务流程，生成 UI 组件列表。
 
@@ -78,27 +90,29 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(
   request: NextRequest
-): Promise<NextResponse<GenerateComponentsOutput>> {
+): Promise<NextResponse<ApiResponse>> {
+  const generationId = generateId();
+
   try {
     const body = await request.json().catch(() => null);
 
     if (!body || !Array.isArray(body.contexts) || !Array.isArray(body.flows)) {
       return NextResponse.json(
-        { success: false, components: [] as ComponentResponse[], generationId: '', totalCount: 0, confidence: 0, error: 'contexts 和 flows 不能为空' },
+        { ...canvasError('contexts 和 flows 不能为空', CanvasErrorCodes.INVALID_INPUT), components: [] as ComponentResponse[], generationId, totalCount: 0, confidence: 0 },
         { status: 400 }
       );
     }
 
     if (body.contexts.length === 0) {
       return NextResponse.json(
-        { success: false, components: [] as ComponentResponse[], generationId: '', totalCount: 0, confidence: 0, error: 'contexts 不能为空' },
+        { ...canvasError('contexts 不能为空', CanvasErrorCodes.INVALID_INPUT), components: [] as ComponentResponse[], generationId, totalCount: 0, confidence: 0 },
         { status: 400 }
       );
     }
 
     if (body.flows.length === 0) {
       return NextResponse.json(
-        { success: false, components: [] as ComponentResponse[], generationId: '', totalCount: 0, confidence: 0, error: 'flows 不能为空' },
+        { ...canvasError('flows 不能为空', CanvasErrorCodes.INVALID_INPUT), components: [] as ComponentResponse[], generationId, totalCount: 0, confidence: 0 },
         { status: 400 }
       );
     }
@@ -109,7 +123,7 @@ export async function POST(
       sessionId?: string;
     };
 
-    const env = getCloudflareEnv();
+    const env = getLocalEnv();
     const aiService = createAIService(env);
 
     // Build context and flow summary for prompt
@@ -143,23 +157,23 @@ export async function POST(
     if (result.error || !result.data || !Array.isArray(result.data) || result.data.length === 0) {
       return NextResponse.json(
         {
-          success: false,
+          ...canvasError(
+            (result.error as string) || '未能生成有效的组件列表，请重试',
+            result.error ? CanvasErrorCodes.AI_ERROR : CanvasErrorCodes.EMPTY_RESPONSE
+          ),
           components: [] as ComponentResponse[],
-          generationId: '',
+          generationId,
           totalCount: 0,
           confidence: 0,
-          error: (result.error as string) || '未能生成有效的组件列表，请重试',
         },
         { status: result.error ? 500 : 200 }
       );
     }
 
-    const generationId = generateId();
     const validTypes = ['page', 'form', 'list', 'detail', 'modal'] as const;
 
     // Truncate to max 20 components
     const rawComponents = result.data.slice(0, 20);
-    
 
     const components: ComponentResponse[] = rawComponents.map((comp) => ({
       id: generateId(),
@@ -192,7 +206,7 @@ export async function POST(
   } catch (err) {
     console.error('[canvas/generate-components] Error:', err);
     return NextResponse.json(
-      { success: false, components: [] as ComponentResponse[], generationId: '', totalCount: 0, confidence: 0, error: '服务器内部错误，请稍后重试' },
+      { ...canvasError('服务器内部错误，请稍后重试', CanvasErrorCodes.INTERNAL_ERROR), components: [] as ComponentResponse[], generationId, totalCount: 0, confidence: 0 },
       { status: 500 }
     );
   }

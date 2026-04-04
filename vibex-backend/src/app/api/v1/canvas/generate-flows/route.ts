@@ -9,10 +9,11 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createAIService } from '@/services/ai-service';
-import { getLocalEnv as getCloudflareEnv } from '@/lib/env';
+import { getLocalEnv } from '@/lib/env';
 import { generateId } from '@/lib/db';
 import type { BoundedContext } from '@/services/context/types';
 import { validateContexts } from '@/lib/canvas-validation';
+import { canvasError, CanvasErrorCodes } from '../types';
 
 interface BusinessFlowResponse {
   id: string;
@@ -31,13 +32,24 @@ interface FlowStepResponse {
   order: number;
 }
 
-interface GenerateFlowsOutput {
-  success: boolean;
+type SuccessResponse = {
+  success: true;
   flows: BusinessFlowResponse[];
   generationId: string;
   confidence: number;
-  error?: string;
-}
+};
+
+type ErrorResponse = {
+  success: false;
+  flows: BusinessFlowResponse[];
+  generationId: string;
+  confidence: number;
+  error: string;
+  code?: string;
+  details?: unknown;
+};
+
+type ApiResponse = SuccessResponse | ErrorResponse;
 
 const USER_PROMPT = `根据以下限界上下文，生成业务流程。
 
@@ -65,7 +77,9 @@ JSON 格式：
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request: NextRequest): Promise<NextResponse<GenerateFlowsOutput>> {
+export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse>> {
+  const generationId = generateId();
+
   try {
     const body = await request.json().catch(() => null);
 
@@ -74,11 +88,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateF
     if (!validation.valid) {
       return NextResponse.json(
         {
-          success: false,
+          ...canvasError(validation.issues.map((i) => i.message).join('; '), CanvasErrorCodes.VALIDATION_ERROR),
           flows: [] as BusinessFlowResponse[],
-          generationId: '',
+          generationId,
           confidence: 0,
-          error: validation.issues.map((i) => i.message).join('; '),
         },
         { status: 400 }
       );
@@ -86,7 +99,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateF
 
     const contexts = body.contexts as BoundedContext[];
 
-    const env = getCloudflareEnv();
+    const env = getLocalEnv();
     const aiService = createAIService(env);
 
     // Build context summary for prompt
@@ -109,18 +122,19 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateF
     if (result.error || !result.data || !Array.isArray(result.data) || result.data.length === 0) {
       return NextResponse.json(
         {
-          success: false,
+          ...canvasError(
+            (result.error as string) || '未能生成有效的业务流程，请重试',
+            result.error ? CanvasErrorCodes.AI_ERROR : CanvasErrorCodes.EMPTY_RESPONSE
+          ),
           flows: [] as BusinessFlowResponse[],
-          generationId: '',
+          generationId,
           confidence: 0,
-          error: (result.error as string) || '未能生成有效的业务流程，请重试',
         },
         { status: result.error ? 500 : 200 }
       );
     }
 
     // Validate and normalize flows
-    const generationId = generateId();
     const flows: BusinessFlowResponse[] = result.data.map((flow) => ({
       id: generateId(),
       name: flow.name || '未命名流程',
@@ -148,7 +162,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateF
   } catch (err) {
     console.error('[canvas/generate-flows] Error:', err);
     return NextResponse.json(
-      { success: false, flows: [] as BusinessFlowResponse[], generationId: '', confidence: 0, error: '服务器内部错误，请稍后重试' },
+      { ...canvasError('服务器内部错误，请稍后重试', CanvasErrorCodes.INTERNAL_ERROR), flows: [] as BusinessFlowResponse[], generationId, confidence: 0 },
       { status: 500 }
     );
   }

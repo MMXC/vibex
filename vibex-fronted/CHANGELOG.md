@@ -14,6 +14,13 @@
 - **测试**: `gateway-cors.test.ts` 专项测试 (4 test cases, 204 响应 + CORS headers)
 - **提交**: `9d915fe9`
 
+### [vibex-proposals-20260406 E2: Canvas Context 多选修复] — 2026-04-06
+- **E2 Canvas checkbox 修复**: `BoundedContextTree` checkbox onChange 同时调用 `toggleContextNode` + `onToggleSelect`
+- **问题**: `d4b5a253` 仅调用 `onToggleSelect` 导致 checkbox 点击后视觉状态不变（回归 bug）
+- **修复**: `f44c2393` 同时调用 `toggleContextNode`(更新 node.status 控制选中态) + `onToggleSelect`(更新 selectedNodeIds 控制卡片颜色)
+- **文件**: `vibex-fronted/src/components/canvas/BoundedContextTree.tsx`
+- **提交**: `f44c2393`
+
 ### [vibex-proposals-20260406 E3: generate-components flowId Fix] — 2026-04-06
 - **E3 generate-components flowId 修复**: `ComponentResponse.flowId` 字段 + prompt 明确要求 flowId
 - **问题**: AI schema 缺少 flowId，prompt 未要求输出，导致组件树 flowId 为 unknown

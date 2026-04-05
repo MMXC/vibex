@@ -7,6 +7,14 @@
 - **提交**: `f43c4b44` (ErrorBoundary) + `be17381b` (DoD) + `b1505a23` (jest→vi 迁移)
 - **架构**: 三层架构 (UI层/Hook层/数据层)，Phase 0-3 全部完成
 
+### [canvas-jsonrender-preview E3: Preview-Edit Sync] — 2026-04-06
+- **E3 Preview-Edit Sync**: canvasPreviewStore Zustand store + componentStore 联动
+- `canvasPreviewStore.ts`: activeNodeId / previewSchema / syncEnabled 状态管理
+- `setActiveNode`: syncEnabled=true 时自动同步选中节点到 componentStore.selectedNodeIds
+- `tests/unit/stores/canvasPreviewStore.test.ts`: 13 tests covering all store actions + sync logic
+- **提交**: `83f1a7a1` (E3 impl) + `faacf42f` (test file relocation)
+- **DoD**: ✅ 13 tests passing, TypeScript clean, security scan clean
+
 ### [canvas-jsonrender-preview E2: Canvas Preview] — 2026-04-06
 - **E2 Canvas Preview**: CanvasPreviewModal + useCanvasPreview hook + JsonRenderErrorBoundary
 - `CanvasPreviewModal.tsx`: 全屏预览 Modal，overlay + componentNodes 渲染

@@ -19,6 +19,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.123',
+    date: '2026-04-06',
+    changes: [
+      '🔧 canvas-jsonrender-preview/E3: Preview-Edit Sync — canvasPreviewStore 联动',
+      '✅ canvasPreviewStore: activeNodeId / previewSchema / syncEnabled 状态管理',
+      '✅ setActiveNode: syncEnabled=true 时自动同步到 componentStore.selectedNodeIds',
+      '✅ 13 tests (tests/unit/stores/canvasPreviewStore.test.ts) — 全部通过',
+      '✅ 提交 83f1a7a1 / faacf42d',
+    ],
+    commit: '83f1a7a1',
+  },
+
+  {
     version: '1.0.122',
     date: '2026-04-06',
     changes: [

@@ -2,8 +2,8 @@
  * canvasPreviewStore unit tests — E3 Preview-Edit Sync
  * Tests preview state management and sync functionality.
  */
-import { useCanvasPreviewStore } from './canvasPreviewStore';
-import { useComponentStore } from './componentStore';
+import { useCanvasPreviewStore } from '../../../src/lib/canvas/stores/canvasPreviewStore';
+import { useComponentStore } from '../../../src/lib/canvas/stores/componentStore';
 
 describe('useCanvasPreviewStore', () => {
   beforeEach(() => {

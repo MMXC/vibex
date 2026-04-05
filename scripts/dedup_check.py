@@ -14,13 +14,65 @@ Exit codes:
 
 import json
 import os
+import subprocess
 import sys
 import urllib.request
 import urllib.error
-from pathlib import Path
 
 DEDUP_API_URL = os.environ.get("DEDUP_API_URL", "http://localhost:8765")
 TIMEOUT_SEC = 5
+SLACK_TOKEN = os.environ.get("SLACK_TOKEN_coord", "")
+SLACK_CHANNEL = "C0AP3CPJL8N"  # #coord
+SLACK_API = "https://slack.com/api/chat.postMessage"
+
+
+def _curl_slack(channel_id: str, user_token: str, text: str) -> bool:
+    """Send Slack message via curl. Non-blocking — failures logged but not raised."""
+    if not user_token or not channel_id:
+        print(f"⚠️  [dedup] 未配置 Slack token，跳过通知", file=sys.stderr)
+        return False
+    cmd = [
+        "curl", "-s", "-X", "POST", SLACK_API,
+        "-H", f"Authorization: Bearer {user_token}",
+        "-H", "Content-Type: application/json",
+        "-d", json.dumps({"channel": channel_id, "text": text}),
+    ]
+    try:
+        result = subprocess.run(cmd, capture_output=True, timeout=10)
+        return result.returncode == 0
+    except Exception as e:
+        print(f"⚠️  [dedup] Slack 通知失败: {e}", file=sys.stderr)
+        return False
+
+
+def notify_dedup_alert(level: str, project_name: str, project_goal: str,
+                       candidates: list) -> None:
+    """
+    Send Slack alert to #coord channel when dedup detects duplicates.
+    Non-blocking — failures do not affect exit code.
+    """
+    if level == "pass":
+        return
+
+    if level == "block":
+        icon = "🚫"
+        title = "提案查重阻断"
+    else:
+        icon = "⚠️"
+        title = "提案查重告警"
+
+    text = f"""{icon} *{title}*
+
+*项目*: `{project_name}`
+*目标*: {project_goal[:80]}{'...' if len(project_goal) > 80 else ''}
+*级别*: `{level.upper()}`
+"""
+    if candidates:
+        text += f"\n*相似项目* ({len(candidates)} 个):\n"
+        for c in candidates[:5]:
+            text += f"  • `{c.get('name', '?')}` (相似度 {c.get('similarity', 0):.2f})\n"
+
+    _curl_slack(SLACK_CHANNEL, SLACK_TOKEN, text)
 
 
 def call_dedup_api(name: str, goal: str) -> dict:
@@ -64,6 +116,8 @@ def check_and_exit(name: str, goal: str, force: bool = False) -> int:
         print()
         print("   阻断：项目目标与现有活跃项目高度相似。")
         print("   如需强制创建，请设置环境变量 DEDUP_FORCE=1")
+        # E3: send Slack alert to #coord
+        notify_dedup_alert(level, name, goal, candidates)
         if os.environ.get("DEDUP_FORCE") == "1":
             print("\n   ⚠️  DEDUP_FORCE=1，强制继续...")
             return 0
@@ -75,6 +129,8 @@ def check_and_exit(name: str, goal: str, force: bool = False) -> int:
             for c in candidates[:5]:
                 print(f"   • {c.get('name', '?')} (相似度 {c.get('similarity', 0):.2f})")
         print()
+        # E3: send Slack alert to #coord
+        notify_dedup_alert(level, name, goal, candidates)
         if force or os.environ.get("DEDUP_FORCE") == "1":
             print("   ⚠️  强制创建（--force 或 DEDUP_FORCE=1）")
             return 0

@@ -1,5 +1,13 @@
 # Changelog
 
+### [canvas cleanup: SVG connector edge layers removed] — 2026-04-05
+- **SVG 连线层移除**: CanvasPage 移除 BoundedEdgeLayer + FlowEdgeLayer
+- **提交**: `7dd57acd`
+
+### [canvas-api-completion E2: Canvas Snapshot API] — 2026-04-05
+- **E2 Snapshot API**: 18 tests, route order fix, version conflict fix
+- **提交**: `038485da`
+
 ### [reviewer-process-standard E1-E4: Reviewer 流程标准化] — 2026-04-05
 - **E1-E4**: reviewer-entry.sh / review-report.md / review-gate.yml / reviewer-SOP.md
 - **提交**: `9b0d098b`

@@ -19,6 +19,20 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.120',
+    date: '2026-04-05',
+    changes: [
+      '🔧 canvas cleanup: SVG connector edge layers removed from CanvasPage',
+      '✅ BoundedEdgeLayer + FlowEdgeLayer removed, -36 lines',
+      '✅ 提交 7dd57acd',
+      '🔧 canvas-api-completion/E2: Canvas Snapshot API — 18 tests',
+      '✅ route order fix + version conflict fix',
+      '✅ 提交 038485da',
+    ],
+    commit: '038485da',
+  },
+
+  {
     version: '1.0.119',
     date: '2026-04-05',
     changes: [

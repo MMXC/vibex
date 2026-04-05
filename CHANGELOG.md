@@ -1,3 +1,18 @@
+### Added (canvas-api-completion E2: Canvas Snapshot API) — 2026-04-05
+- **E2 Canvas Snapshot API**: `/api/v1/canvas/snapshots` REST API + 18 unit tests
+  - Route order fix: GET /latest moved before GET /:id
+  - Version conflict: < instead of <=
+  - `docs/.../canvas-api-completion/IMPLEMENTATION_PLAN.md` E2 DoD marked done
+- **提交**: `038485da`
+
+### Added (canvas cleanup: SVG connector edge layers removed) — 2026-04-05
+- **SVG 连线层移除**: 从 CanvasPage 移除 `BoundedEdgeLayer` + `FlowEdgeLayer` SVG overlay
+  - 删除 2 处 edge layer 渲染（left/right panel）
+  - 删除未使用的 `boundedEdges`/`flowEdges` 引用
+  - 删除未使用的 imports
+  - -36 lines, +2 lines
+- **提交**: `7dd57acd`
+
 ### Added (reviewer-process-standard E1-E4: Reviewer 流程标准化) — 2026-04-05
 - **E1-E4 Reviewer 流程标准化**: 统一评审入口、报告格式、CI 门禁、SOP 文档
   - `scripts/reviewer-entry.sh`: 统一评审入口，支持 E1/E2/E3/all phases

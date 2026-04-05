@@ -17,6 +17,63 @@ const https = require('https');
 const http = require('http');
 const { checkDedup, recordSend, generateKey } = require('./dedup');
 
+// E2: Retry config — exponential backoff
+const RETRY_CONFIG = { maxAttempts: 3, delays: [1000, 2000, 4000] };
+
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+async function sendWithRetry(url, payload) {
+  let lastError;
+  const parsedUrl = new URL(url);
+  const isHttps = parsedUrl.protocol === 'https:';
+  const lib = isHttps ? https : http;
+
+  for (let attempt = 1; attempt <= RETRY_CONFIG.maxAttempts + 1; attempt++) {
+    try {
+      const body = JSON.stringify(payload);
+      const options = {
+        hostname: parsedUrl.hostname,
+        path: parsedUrl.pathname,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
+      };
+
+      const response = await new Promise((resolve, reject) => {
+        const req = lib.request(options, (res) => {
+          let data = '';
+          res.on('data', (chunk) => (data += chunk));
+          res.on('end', () => resolve({ ok: res.statusCode >= 200 && res.statusCode < 300, status: res.statusCode }));
+        });
+        req.on('error', reject);
+        // E2: 5s timeout per attempt
+        req.setTimeout(5000, () => {
+          req.destroy();
+          reject(new Error('timeout'));
+        });
+        req.write(body);
+        req.end();
+      });
+
+      if (response.ok) {
+        return { success: true, attempts: attempt };
+      }
+      lastError = new Error(`HTTP ${response.status}`);
+    } catch (err) {
+      lastError = err;
+      // Don't retry on timeout
+      if (err.message === 'timeout') break;
+    }
+    if (attempt <= RETRY_CONFIG.maxAttempts) {
+      console.log(`⏳ Retry ${attempt}/${RETRY_CONFIG.maxAttempts} in ${RETRY_CONFIG.delays[attempt - 1]}ms...`);
+      await sleep(RETRY_CONFIG.delays[attempt - 1]);
+    }
+  }
+  console.error(`[Notify] All ${RETRY_CONFIG.maxAttempts + 1} attempts failed:`, lastError?.message);
+  return { success: false, attempts: RETRY_CONFIG.maxAttempts + 1 };
+}
+
 // Parse command line arguments
 const args = process.argv.slice(2);
 const status = args.includes('--status') 
@@ -106,51 +163,25 @@ const sendNotification = async () => {
   }
 
   // E1: Skip duplicate notifications within 5-minute window
-  const dedupKey = generateKey(status);
+  // dedup key must include test-specific info (tests/duration/errors)
+  const message = `Test ${status}: ${tests} tests in ${duration} with ${errors} errors`;
+  const dedupKey = generateKey(status, message);
   const { skipped, remaining } = checkDedup(dedupKey);
   if (skipped) {
     console.log(`⏭️  Skip duplicate notification (${remaining}s remaining)`);
     return;
   }
-  
-  const message = getMessage();
-  const payload = JSON.stringify(message);
-  
-  const url = new URL(config.webhookUrl);
-  const options = {
-    hostname: url.hostname,
-    path: url.pathname,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': Buffer.byteLength(payload)
-    }
-  };
-  
-  return new Promise((resolve, reject) => {
-    const req = (url.protocol === 'https:' ? https : http).request(options, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        if (res.statusCode === 200) {
-          console.log('✅ Test notification sent successfully');
-          recordSend(dedupKey);
-          resolve();
-        } else {
-          console.log(`⚠️ Notification failed: ${res.statusCode}`);
-          reject(new Error(`HTTP ${res.statusCode}`));
-        }
-      });
-    });
-    
-    req.on('error', (err) => {
-      console.log('⚠️ Notification error:', err.message);
-      resolve(); // Don't block on notification error
-    });
-    
-    req.write(payload);
-    req.end();
-  });
+
+  const payload = getMessage();
+
+  // E2: Use retry with exponential backoff
+  const result = await sendWithRetry(config.webhookUrl, payload);
+  if (result.success) {
+    console.log(`✅ Test notification sent (attempt ${result.attempts})`);
+    recordSend(dedupKey);
+  } else {
+    console.log(`⚠️ Notification failed after ${result.attempts} attempts`);
+  }
 };
 
 // Main

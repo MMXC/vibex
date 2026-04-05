@@ -18,4 +18,4 @@
 - [x] Tab 切换后 FlowTree 可见 — TabBar phase guard ✅ commit `8ed16fd9`
 - [x] guard 监听 TabBar + PhaseProgressBar — TabBar.tsx `phaseIdx` vs `tabIdx` guard
 - [x] E2 TabBar 同步 — setActiveTree 双向同步（phase→activeTree via advancePhase, tab→activeTree via setActiveTree）✅ 复用 E1 代码
-- [ ] E2E 测试通过
+- [x] E2E 测试通过 — TabBar 10 tests ✅ + gstack 浏览器验证 ✅

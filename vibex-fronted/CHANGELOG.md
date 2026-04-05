@@ -7,6 +7,13 @@
 - **测试**: `gateway-cors.test.ts` 专项测试 (4 test cases, 204 响应 + CORS headers)
 - **提交**: `9d915fe9`
 
+### [vibex-proposals-20260406 E3: generate-components flowId Fix] — 2026-04-06
+- **E3 generate-components flowId 修复**: `ComponentResponse.flowId` 字段 + prompt 明确要求 flowId
+- **问题**: AI schema 缺少 flowId，prompt 未要求输出，导致组件树 flowId 为 unknown
+- **修复**: ComponentResponse 接口添加 `flowId: string`，prompt 明确要求每个组件包含 flowId 字段
+- **文件**: `vibex-backend/src/app/api/v1/canvas/generate-components/route.ts`
+- **提交**: `26c383f7`
+
 ### [canvas-optimization-roadmap E4 Phase3: Reliability] — 2026-04-06
 - **E4 Phase3 可靠性**: ErrorBoundary + 测试覆盖验收
 - **ErrorBoundary**: AppErrorBoundary (layout.tsx 全局) + JsonRenderErrorBoundary (CanvasPreviewModal)

@@ -1,3 +1,17 @@
+### Added (canvas-testing-strategy E1: useCanvasRenderer 测试) — 2026-04-05
+- **E1 useCanvasRenderer 测试**: 33 个测试用例，覆盖率 97.29% stmts / 100% funcs / 98.14% lines / 77.77% branches
+  - `src/hooks/canvas/__tests__/useCanvasRenderer.test.ts`: nodeRects/boundedEdges/flowEdges/TreeNode transform/memoization/性能测试
+  - `src/lib/canvas/types.ts`: TreeNode 类型添加 `confirmed?: boolean`
+  - `tests/unit/vitest.config.ts`: 添加 `src/hooks/**/*.test.ts` 到 include，exclude Jest-syntax 文件
+  - 覆盖率阈值: stmts 80%, funcs 80%, branches 70%, lines 80%
+- **提交**: `674c2696`
+
+### Added (canvas-testing-strategy E2: useDndSortable 测试) — 2026-04-05
+- **E2 useDndSortable 测试**: 20 个测试用例
+  - `src/hooks/canvas/__tests__/useDndSortable.test.ts`: Return structure/dragStyle/disabled/id attributes
+  - 覆盖 setNodeRef/transform/transition/isDragging
+- **提交**: `9f14d32a`
+
 ### Added (vibex-e2e-test-fix E1: Playwright 隔离) — 2026-04-05
 - **E1 Playwright 隔离**: 建立独立 Playwright 配置体系，消除 Jest/Playwright 框架冲突
   - `tests/e2e/playwright.config.ts`: 独立配置，BASE_URL 环境变量，CI retries=3，grepInvert 跳过 @ci-blocking

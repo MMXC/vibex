@@ -1,5 +1,17 @@
 # Changelog
 
+### [canvas-testing-strategy E1: useCanvasRenderer 测试] — 2026-04-05
+- **E1 useCanvasRenderer 测试**: 33 tests, 97.29% stmts / 100% funcs / 98.14% lines
+- `src/hooks/canvas/__tests__/useCanvasRenderer.test.ts`: nodeRects/boundedEdges/flowEdges/TreeNode/memoization
+- `src/lib/canvas/types.ts`: TreeNode 添加 `confirmed?: boolean`
+- `tests/unit/vitest.config.ts`: 添加 src/hooks/**/*.test.ts include
+- **提交**: `674c2696`
+
+### [canvas-testing-strategy E2: useDndSortable 测试] — 2026-04-05
+- **E2 useDndSortable 测试**: 20 tests
+- `src/hooks/canvas/__tests__/useDndSortable.test.ts`: setNodeRef/transform/transition/isDragging
+- **提交**: `9f14d32a`
+
 ### [vibex-e2e-test-fix E1: Playwright 隔离] — 2026-04-05
 - **E1 Playwright 隔离**: 独立 Playwright 配置，BASE_URL 环境变量，grepInvert 跳过 @ci-blocking
 - `tests/e2e/playwright.config.ts`: CI retries=3, grepInvert @ci-blocking

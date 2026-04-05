@@ -19,6 +19,21 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.115',
+    date: '2026-04-05',
+    changes: [
+      '🔧 canvas-testing-strategy/E1: useCanvasRenderer 测试 — 33 tests, 97.29% coverage',
+      '✅ useCanvasRenderer.test.ts: nodeRects/boundedEdges/flowEdges/TreeNode/memoization',
+      '✅ types.ts: TreeNode confirmed?: boolean, vitest.config.ts include src/hooks',
+      '✅ 提交 674c2696',
+      '🔧 canvas-testing-strategy/E2: useDndSortable 测试 — 20 tests',
+      '✅ useDndSortable.test.ts: setNodeRef/transform/transition/isDragging',
+      '✅ 提交 9f14d32a',
+    ],
+    commit: '9f14d32a',
+  },
+
+  {
     version: '1.0.114',
     date: '2026-04-05',
     changes: [

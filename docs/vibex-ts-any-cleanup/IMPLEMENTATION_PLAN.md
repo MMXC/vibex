@@ -20,6 +20,6 @@
 - [x] **Canvas History `as any` 清除** — useCanvasHistory.ts (6处) + ProjectBar.tsx (6处) ✅ commit `063e9918`
 - [x] **剩余源码清理** — UndoBar.tsx (6处) + preview/page.tsx (4处) ✅ commit `288e9173`
   - Remaining: ReactFlow edge/node types (需更深入重构)
-- [ ] ESLint 规则从 'off' 改为 'error'（E3）
+- [x] **ESLint 规则启用** — `@typescript-eslint/no-explicit-any: error` ✅ commit `fe58edd6`
 
 *Architect Agent | 2026-04-07*

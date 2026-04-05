@@ -34,6 +34,9 @@ export default defineConfig({
   timeout: 60000,
   expect: { timeout: 10000 },
 
+  // CI: 跳过 @ci-blocking 测试
+  grepInvert: process.env.CI ? /@ci-blocking/ : undefined,
+
 
   use: {
     // BASE_URL 环境变量优先
@@ -41,9 +44,6 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
-
-    // CI 环境中跳过 @ci-blocking 标记的测试
-    grepInvert: process.env.CI ? /@ci-blocking/ : undefined,
 
     launchOptions: {
       args: ['--disable-dev-shm-usage'],

@@ -13,6 +13,17 @@
 - **文件**: `vibex-fronted/src/components/canvas/BoundedContextTree.tsx`
 - **提交**: `9b54b10a`
 
+### [canvas-button-consolidation E1: TreeToolbar统一入口修复] — 2026-04-06
+- **E1-T3 TreeToolbar 统一**: `TreeToolbar` 组件集成到三列 TreePanel headerActions，统一入口
+- **E1-T1/T2/T4**: TreePanel header 布局重构，三栏共享同一 TreeToolbar 实例
+- **E1 onDeselectAll Bug Fix**: 修复 `onDeselectAll` 错误调用 `selectAllNodes` → `clearNodeSelection` (2处，lines ~506/787)
+- **E2 Flow panel 方法补全**: `flowStore` 新增 `selectAllNodes`/`clearNodeSelection`/`deleteSelectedNodes`/`resetFlowCanvas`
+- **E2 TreeToolbar onDelete/onReset**: Flow 面板 TreeToolbar 新增删除/重置按钮
+- **E5 useTreeToolbarActions**: 统一 store 访问 hook，按 treeType 返回对应 store
+- **文件**: `vibex-fronted/src/components/canvas/TreeToolbar.tsx`, `vibex-fronted/src/components/canvas/CanvasPage.tsx`, `vibex-fronted/src/hooks/canvas/useTreeToolbarActions.ts`, `vibex-fronted/src/lib/canvas/stores/flowStore.ts`
+- **提交**: `c19c57dc` (E1-T1-T4), `369ff195` (E1 onDeselectAll fix), `3570e2b7` (E2 Flow methods), `eb5d9e3e` (E5 tests)
+- **测试**: 5 tests passing — `tests/unit/hooks/canvas/__tests__/useTreeToolbarActions.test.ts`
+
 ### [vibex-proposals-20260406 E1: OPTIONS Preflight CORS Fix] — 2026-04-06
 - **E1 OPTIONS 预检修复**: `protected_.options('/*', ...)` 在 `authMiddleware` 之前注册
 - **问题**: 浏览器 CORS preflight (OPTIONS) 请求被 authMiddleware 拦截返回 401

@@ -19,6 +19,21 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.128',
+    date: '2026-04-06',
+    changes: [
+      '📋 canvas-button-consolidation E1: TreeToolbar统一入口修复',
+      '✅ E1 TreeToolbar 统一: TreeToolbar 集成到三列 TreePanel headerActions，统一按钮入口',
+      '✅ E1 onDeselectAll Bug Fix: 修复错误调用 selectAllNodes → clearNodeSelection (2处)',
+      '✅ E2 Flow methods: flowStore 新增 selectAllNodes/clearNodeSelection/deleteSelectedNodes/resetFlowCanvas',
+      '✅ E2 TreeToolbar: Flow 面板新增 onDelete/onReset 按钮',
+      '✅ E5 useTreeToolbarActions: 统一 store 访问 hook，treeType 路由正确',
+      '提交: c19c57dc / 369ff195 / 3570e2b7 / eb5d9e3e',
+    ],
+    commit: '3570e2b7',
+  },
+
+  {
     version: '1.0.127',
     date: '2026-04-06',
     changes: [

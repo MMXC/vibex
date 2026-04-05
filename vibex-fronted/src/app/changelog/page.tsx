@@ -19,6 +19,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.124',
+    date: '2026-04-06',
+    changes: [
+      '📋 vibex-proposals-20260406/E1: OPTIONS Preflight CORS Fix — protected_.options before authMiddleware',
+      '✅ 修复: OPTIONS preflight 请求被 authMiddleware 拦截返回 401',
+      '✅ gateway-cors.test.ts: 4 test cases (204 + CORS headers)',
+      '✅ 提交 9d915fe9',
+    ],
+    commit: '9d915fe9',
+  },
+
+  {
     version: '1.0.123',
     date: '2026-04-06',
     changes: [

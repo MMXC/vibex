@@ -1,5 +1,12 @@
 # Changelog
 
+### [vibex-proposals-20260406 E1: OPTIONS Preflight CORS Fix] — 2026-04-06
+- **E1 OPTIONS 预检修复**: `protected_.options('/*', ...)` 在 `authMiddleware` 之前注册
+- **问题**: 浏览器 CORS preflight (OPTIONS) 请求被 authMiddleware 拦截返回 401
+- **修复**: Hono 中 OPTIONS handler 注册顺序调整，OPTIONS 在 authMiddleware 之前处理
+- **测试**: `gateway-cors.test.ts` 专项测试 (4 test cases, 204 响应 + CORS headers)
+- **提交**: `9d915fe9`
+
 ### [canvas-optimization-roadmap E4 Phase3: Reliability] — 2026-04-06
 - **E4 Phase3 可靠性**: ErrorBoundary + 测试覆盖验收
 - **ErrorBoundary**: AppErrorBoundary (layout.tsx 全局) + JsonRenderErrorBoundary (CanvasPreviewModal)

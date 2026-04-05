@@ -32,6 +32,14 @@
   - 新增 2 tests (`auth.test.ts`)
   - **提交**: `2b0d72b8`
 
+### Added (canvas-generate-components-prompt-fix Epic2: generateFlows-prompt 修复) — 2026-04-05
+- **Epic2 generateFlows-prompt**: `contextSummary` 添加 `ctx.id`，增强 prompt 约束
+  - 旧: `ctx.name: ctx.description (类型: ctx.type)`
+  - 新: `ctx.id: ctx.name: ctx.description (类型: ctx.type)`
+  - 约束: 上下文列表必须使用 id 字段，contextId 必须使用真实 id
+  - `generate-flows.test.ts`: 7 tests pass
+- **提交**: `4f26a14b`
+
 ### Added (canvas-generate-components-prompt-fix Epic1: flowId 修复) — 2026-04-05
 - **Epic1 flowId 修复**: `generate-components/route.ts` 使用真实 `f.id` 替代顺序编号
   - 旧: `[flow-1] name (上下文ID: id)`
@@ -39,6 +47,15 @@
   - USER_PROMPT 约束: flowId 必须使用真实 id (`flow-xxx`)，禁止使用流程名
   - `generate-components.test.ts`: 8 tests pass
 - **提交**: `26c383f7`
+
+### Added (vibex-backend-deploy-stability E3: Health 端点扩展) — 2026-04-05
+- **E3 Health端点**: `src/index.ts` GET /health 扩展字段
+  - 新增: `env`, `version`, `uptime`
+  - `env`: 从 `c.env` 或 `process.env.NODE_ENV` 获取
+  - `version`: 从 `c.env.VERSION` 或 `npm_package_version` 获取
+  - `uptime`: `process.uptime()`
+  - 615 backend tests pass (3 pre-existing failures)
+- **提交**: `07bf360f`
 
 ### Added (vibex-backend-deploy-stability E2: Cache API 限流) — 2026-04-05
 - **E2 Cache API限流**: `rateLimit.ts` 重构为 Cache-first + InMemory fallback 架构

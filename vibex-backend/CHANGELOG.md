@@ -13,6 +13,12 @@
   - Registered in `gateway.ts` as `protected_.route('/canvas/flows', flows)`
   - Commits: `ebd007db`, `33cd209e`
 
+- **canvas-api-completion E2: Canvas Snapshot API (Hono)**
+  - `src/routes/v1/canvas/snapshots.ts`: GET / POST / GET/:id / GET/latest / POST /:id/restore
+  - Hono + D1 pattern, optimistic locking (409 conflict), version comparison (< not <=)
+  - `src/routes/v1/canvas/__tests__/snapshots.test.ts`: 18 unit tests (all passing)
+  - Commits: `25763af1`, `038485da`
+
 #### 2026-04-03
 
 - **E4-SyncProtocol**: POST /api/canvas/snapshots — Next.js App Router 端点，冲突检测（409 + serverSnapshot）

@@ -22,6 +22,7 @@
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
+import { CanvasStoreInitializer } from './CanvasStoreInitializer';
 import type {
   BoundedContextNode,
   BusinessFlowNode,
@@ -636,6 +637,8 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   // === Render ===
   return (
     <div className={containerClasses}>
+      {/* E2: Initialize cross-store subscriptions */}
+      <CanvasStoreInitializer />
       {/* Phase Progress Bar */}
       <div className={styles.phaseProgressBarWrapper}>
         <PhaseProgressBar currentPhase={phase} onPhaseClick={handlePhaseClick} />

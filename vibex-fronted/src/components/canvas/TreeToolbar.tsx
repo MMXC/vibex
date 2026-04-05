@@ -20,6 +20,10 @@ interface TreeToolbarProps {
   onContinue?: () => void;
   continueLabel?: string;
   continueDisabled?: boolean;
+  /** 删除选中节点 (Flow panel only) */
+  onDelete?: () => void;
+  /** 重置画布 (Flow panel only) */
+  onReset?: () => void;
   /** 其他自定义按钮 */
   extraButtons?: React.ReactNode;
 }
@@ -33,6 +37,8 @@ export function TreeToolbar({
   onContinue,
   continueLabel,
   continueDisabled,
+  onDelete,
+  onReset,
   extraButtons,
 }: TreeToolbarProps) {
   return (
@@ -76,6 +82,28 @@ export function TreeToolbar({
             title={continueLabel ?? '继续'}
           >
             {continueLabel ?? '继续 →'}
+          </button>
+        )}
+        {onDelete && (
+          <button
+            type="button"
+            className={styles.toolbarButton}
+            onClick={onDelete}
+            title="删除选中"
+            aria-label="删除选中的节点"
+          >
+            🗑 删除
+          </button>
+        )}
+        {onReset && (
+          <button
+            type="button"
+            className={styles.toolbarButton}
+            onClick={onReset}
+            title="重置画布"
+            aria-label="重置画布"
+          >
+            ↺ 重置
           </button>
         )}
         {extraButtons}

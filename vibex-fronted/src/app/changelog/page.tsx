@@ -19,6 +19,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.126',
+    date: '2026-04-06',
+    changes: [
+      '📋 vibex-p0-fixes-20260406: E1-E3 P0 Bug 修复 (Sprint 1)',
+      '✅ E1 OPTIONS Preflight: protected_.options before authMiddleware (9d915fe9)',
+      '✅ E2 Canvas checkbox: toggleContextNode + onToggleSelect 双调用 (f44c2393)',
+      '✅ E3 flowId: ComponentResponse.flowId schema + prompt 明确 (26c383f7)',
+    ],
+    commit: '26c383f7',
+  },
+
+  {
     version: '1.0.124',
     date: '2026-04-06',
     changes: [

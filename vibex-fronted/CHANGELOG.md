@@ -1,5 +1,11 @@
 # Changelog
 
+### [vibex-p0-fixes-20260406 E1-E3: P0 Bug 修复 Sprint 1] — 2026-04-06
+- **E1 OPTIONS 预检修复**: `protected_.options('/*', ...)` 在 `authMiddleware` 之前注册 (提交 `9d915fe9`)
+- **E2 Canvas checkbox 修复**: `BoundedContextTree` checkbox onChange 同时调用 `toggleContextNode` + `onToggleSelect` (提交 `f44c2393`)
+- **E3 generate-components flowId 修复**: ComponentResponse 接口添加 `flowId: string`，prompt 明确要求每个组件包含 flowId 字段 (提交 `26c383f7`)
+- **文件**: `vibex-backend/src/routes/v1/gateway.ts`, `vibex-fronted/src/components/canvas/BoundedContextTree.tsx`, `vibex-backend/src/app/api/v1/canvas/generate-components/route.ts`
+
 ### [canvas-button-cleanup E1: BoundedContextTree History 修复] — 2026-04-06
 - **E1 History 快照修复**: `BoundedContextTree` CRUD 操作后添加 `recordSnapshot` 调用
 - **问题**: 编辑/新增 BoundedContext 节点后，undo/redo 历史记录未记录变更
@@ -27,6 +33,23 @@
 - **修复**: ComponentResponse 接口添加 `flowId: string`，prompt 明确要求每个组件包含 flowId 字段
 - **文件**: `vibex-backend/src/app/api/v1/canvas/generate-components/route.ts`
 - **提交**: `26c383f7`
+
+### [vibex-proposals-20260406 E4: SSE Timeout + Connection Cleanup] — 2026-04-06
+- **E4 SSE 超时控制**: `sse-stream-lib` 添加 `AbortController` 10s 超时 + 连接清理
+- **问题**: `aiService.chat()` 无超时机制，Worker 进程可能挂死
+- **修复**: `AbortController` 10s 超时，所有 AI 调用传递 `signal` 参数，清理 `timers[]` + `controller.close()`
+- **文件**: `vibex-backend/src/lib/sse-stream-lib/index.ts`, `vibex-backend/src/services/ai-service.ts`
+- **测试**: `sse-stream-lib/index.test.ts` (9 tests: AbortController 创建, cancel 清理, abort handler, ReadableStream 有效性)
+- **提交**: `2b33f966`
+
+### [vibex-proposals-20260406 E5: Distributed Rate Limiting with Cache API] — 2026-04-06
+- **E5 分布式限流**: `rateLimit.ts` 重构为 Cache-first + InMemory fallback 架构
+- **问题**: 内存 `RateLimit` 跨 Worker 不共享，单机限流在多实例部署下失效
+- **修复**: Cache-first 架构，`caches.default` (Cloudflare KV) 优先，InMemory 本地降级（local dev/test）
+- **降级设计**: Cache 不可用时自动 fallback InMemory，两者都失败则 fail-open
+- **文件**: `vibex-backend/src/lib/rateLimit.ts`, `vibex-backend/wrangler.toml`
+- **测试**: `rateLimit.test.ts` (13 tests: Cache fallback, 429 enforcement, headers, fail-open)
+- **提交**: `85835af5`
 
 ### [canvas-optimization-roadmap E4 Phase3: Reliability] — 2026-04-06
 - **E4 Phase3 可靠性**: ErrorBoundary + 测试覆盖验收

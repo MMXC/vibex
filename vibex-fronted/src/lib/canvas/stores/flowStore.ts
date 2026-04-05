@@ -22,6 +22,8 @@ interface FlowStore {
   flowDraft: Partial<BusinessFlowNode> | null;
   flowGenerating: boolean;
   flowError: string | null;
+  // Selection state (E2: TreeToolbar select/deselect for Flow panel)
+  selectedNodeIds: Set<string>;
 
   // Node CRUD
   setFlowNodes: (nodes: BusinessFlowNode[]) => void;
@@ -31,6 +33,11 @@ interface FlowStore {
   confirmFlowNode: (nodeId: string) => void;
   toggleFlowNode: (nodeId: string) => void;
   autoGenerateFlows: (contextNodes: BoundedContextNode[]) => void;
+  // Selection (E2: TreeToolbar buttons)
+  selectAllNodes: () => void;
+  clearNodeSelection: () => void;
+  deleteSelectedNodes: () => void;
+  resetFlowCanvas: () => void;
 
   // Step CRUD
   confirmStep: (flowNodeId: string, stepId: string) => void;
@@ -55,6 +62,8 @@ export const useFlowStore = create<FlowStore>()(
         flowDraft: null,
         flowGenerating: false,
         flowError: null,
+        // Selection (E2)
+        selectedNodeIds: new Set<string>(),
 
         setFlowNodes: (nodes) => set({ flowNodes: nodes }),
 
@@ -282,6 +291,28 @@ export const useFlowStore = create<FlowStore>()(
         setFlowDraft: (draft) => set({ flowDraft: draft }),
 
         setFlowError: (error) => set({ flowError: error }),
+
+        // E2: Selection methods for Flow panel TreeToolbar
+        selectAllNodes: () =>
+          set((s) => ({
+            selectedNodeIds: new Set(s.flowNodes.map((n) => n.nodeId)),
+          })),
+
+        clearNodeSelection: () => set({ selectedNodeIds: new Set() }),
+
+        deleteSelectedNodes: () =>
+          set((s) => {
+            const selected = s.selectedNodeIds;
+            if (selected.size === 0) return {};
+            const remaining = s.flowNodes.filter((n) => !selected.has(n.nodeId));
+            getHistoryStore().recordSnapshot('flow', remaining);
+            return { flowNodes: remaining, selectedNodeIds: new Set() };
+          }),
+
+        resetFlowCanvas: () => {
+          getHistoryStore().recordSnapshot('flow', []);
+          set({ flowNodes: [], selectedNodeIds: new Set() });
+        },
       }),
       { name: 'vibex-flow-store' }
     ),

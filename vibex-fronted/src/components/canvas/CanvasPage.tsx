@@ -553,8 +553,13 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
               <TreeToolbar
                 treeType="flow"
                 nodeCount={flowNodes.length}
-                onSelectAll={() => {}}
-                onDeselectAll={() => {}}
+                onSelectAll={() => useFlowStore.getState().selectAllNodes()}
+                onDeselectAll={() => useFlowStore.getState().clearNodeSelection()}
+                onDelete={() => useFlowStore.getState().deleteSelectedNodes()}
+                onReset={() => {
+                  getHistoryStore().getState().recordSnapshot()
+                  useFlowStore.getState().resetFlowCanvas()
+                }}
                 onClear={() => useFlowStore.getState().setFlowNodes([])}
                 onContinue={handleContinueToComponents}
                 continueLabel={flowNodes.length === 0 ? '→ 选择流程' : componentGenerating ? '◌ 生成中...' : '继续 → 组件树'}
@@ -834,8 +839,13 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                   <TreeToolbar
                     treeType="flow"
                     nodeCount={flowNodes.length}
-                    onSelectAll={() => {}}
-                    onDeselectAll={() => {}}
+                    onSelectAll={() => useFlowStore.getState().selectAllNodes()}
+                    onDeselectAll={() => useFlowStore.getState().clearNodeSelection()}
+                    onDelete={() => useFlowStore.getState().deleteSelectedNodes()}
+                    onReset={() => {
+                      getHistoryStore().getState().recordSnapshot()
+                      useFlowStore.getState().resetFlowCanvas()
+                    }}
                     onClear={() => useFlowStore.getState().setFlowNodes([])}
                     onContinue={handleContinueToComponents}
                     continueLabel={flowNodes.length === 0 ? '→ 选择流程' : componentGenerating ? '◌ 生成中...' : '继续 → 组件树'}

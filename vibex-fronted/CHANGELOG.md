@@ -1,5 +1,9 @@
 # Changelog
 
+### [reviewer-process-standard E1-E4: Reviewer 流程标准化] — 2026-04-05
+- **E1-E4**: reviewer-entry.sh / review-report.md / review-gate.yml / reviewer-SOP.md
+- **提交**: `9b0d098b`
+
 ### [canvas-api-completion E1: Flows CRUD API] — 2026-04-05
 - **E1 Flows CRUD**: backend `/api/v1/canvas/flows` REST API (14 tests passing)
 - `vibex-backend/src/routes/v1/flows.ts`: Hono + D1, protected routes

@@ -1,3 +1,11 @@
+### Added (reviewer-process-standard E1-E4: Reviewer 流程标准化) — 2026-04-05
+- **E1-E4 Reviewer 流程标准化**: 统一评审入口、报告格式、CI 门禁、SOP 文档
+  - `scripts/reviewer-entry.sh`: 统一评审入口，支持 E1/E2/E3/all phases
+  - `docs/templates/review-report.md`: Mustache 模板，包含所有必需字段
+  - `.github/workflows/review-gate.yml`: 3 并行 jobs (security/code-quality/test) + merge-gate
+  - `docs/reviewer-SOP.md`: 两阶段门禁流程完整说明
+- **提交**: `9b0d098b`
+
 ### Added (canvas-api-completion E1: Flows CRUD API) — 2026-04-05
 - **E1 Flows CRUD**: `/api/v1/canvas/flows` REST API (GET list, POST create, GET/:id, PUT/:id, DELETE/:id)
   - `vibex-backend/src/routes/v1/flows.ts`: Hono + D1, protected route, pagination, FlowData JSON columns

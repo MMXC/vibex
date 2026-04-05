@@ -19,6 +19,17 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.119',
+    date: '2026-04-05',
+    changes: [
+      '🔧 reviewer-process-standard/E1-E4: Reviewer 流程标准化',
+      '✅ reviewer-entry.sh / review-report.md / review-gate.yml / reviewer-SOP.md',
+      '✅ 提交 9b0d098b',
+    ],
+    commit: '9b0d098b',
+  },
+
+  {
     version: '1.0.118',
     date: '2026-04-05',
     changes: [

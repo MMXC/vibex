@@ -1,3 +1,24 @@
+### Added (canvas-flowtree-api-fix E3: 错误处理 + Empty State) — 2026-04-05
+- **E3 错误处理**: Empty State UI + error toast notifications
+  - EmptyState 组件替代各 tree 的空状态 div
+  - flowError state + setFlowError() 错误处理
+  - flowStore: error toast 展示
+- **提交**: `21a270e3`
+
+### Added (canvas-optimization-roadmap E3: O(n) edge + dead code) — 2026-04-05
+- **E3 性能优化**: O(n) edge 计算 + 死代码清理
+  - BoundedEdgeLayer/FlowEdgeLayer: useMemo + clustering
+  - 死代码清理: canvasLogger(E1) + canvasStore(E2) + phaseProgressBar(E4)
+- **提交**: `549d7b08`
+
+### Added (canvas-flowtree-guard-fix E4: 移除 PhaseProgressBar) — 2026-04-05
+- **E4 PhaseProgressBar 移除**: TabBar 替代导航
+  - 移除 PhaseProgressBar 组件和渲染
+  - 移除 TreeStatus (TabBar 已显示节点计数)
+  - 移除 handlePhaseClick (仅 PhaseProgressBar 使用)
+  - 移除 .phaseProgressBarWrapper CSS
+- **提交**: `4bcf86e9`
+
 ### Added (canvas-jsonrender-preview E1: JsonRender 集成) — 2026-04-05
 - **E1 JsonRender 集成**: `@json-render/core` + `@json-render/react`
   - `vibexCanvasCatalog`: 10 组件 Zod schemas (defineCatalog)

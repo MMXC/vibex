@@ -9,6 +9,7 @@
  * - "AI生成"按钮调用 mock API 生成上下文节点
  */
 'use client';
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Network } from 'lucide-react';
@@ -416,7 +417,7 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
       }));
       setContextNodes(newNodes);
     } catch (err) {
-      console.error('[BoundedContextTree] handleGenerate error:', err);
+      canvasLogger.BoundedContextTree.error(' handleGenerate error:', err);
       toast.showToast(err instanceof Error ? err.message : '生成限界上下文失败', 'error');
     } finally {
       setGenerating(false);

@@ -1,4 +1,5 @@
 'use client';
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 /**
  * VersionHistoryPanel — 画布版本历史侧边栏
@@ -60,7 +61,7 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
         onClose();
       } catch (err) {
         setError('恢复失败，请重试');
-        console.error('[VersionHistoryPanel] restore error:', err);
+        canvasLogger.VersionHistoryPanel.error(' restore error:', err);
       } finally {
         setRestoring(false);
       }
@@ -75,7 +76,7 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
       await createSnapshot();
     } catch (err) {
       setError('创建快照失败，请重试');
-      console.error('[VersionHistoryPanel] create error:', err);
+      canvasLogger.VersionHistoryPanel.error(' create error:', err);
     } finally {
       setCreating(false);
     }

@@ -1,4 +1,5 @@
 'use client';
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 /**
  * TemplateSelector — 需求模板选择器
@@ -64,7 +65,7 @@ export function TemplateSelector({ open, onClose }: TemplateSelectorProps) {
         onClose();
       }
     } catch (err) {
-      console.error('[TemplateSelector] Failed to apply template:', err);
+      canvasLogger.TemplateSelector.error(' Failed to apply template:', err);
     } finally {
       setApplying(false);
     }

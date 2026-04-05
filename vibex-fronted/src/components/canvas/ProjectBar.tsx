@@ -8,6 +8,7 @@
  * - 无 any 类型泄漏
  */
 'use client';
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 import React, { useState, useCallback } from 'react';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
@@ -199,7 +200,7 @@ export function ProjectBar({
       // Step 4: Advance to prototype phase
       setPhase('prototype');
     } catch (err) {
-      console.error('[ProjectBar] create project error:', err);
+      canvasLogger.ProjectBar.error(' create project error:', err);
       setCreateError(String(err));
     } finally {
       setIsCreating(false);

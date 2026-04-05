@@ -19,6 +19,7 @@
  * - 无 console.log
  */
 'use client';
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import type {
@@ -389,7 +390,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         setPhase('component');
       }
     } catch (err) {
-      console.error('[CanvasPage] handleContinueToComponents error:', err);
+      canvasLogger.CanvasPage.error(' handleContinueToComponents error:', err);
     } finally {
       setComponentGenerating(false);
     }

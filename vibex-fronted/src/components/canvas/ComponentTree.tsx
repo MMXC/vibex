@@ -12,6 +12,7 @@
  * - E1: 按 flowId 分组，通用组件单独置顶，虚线框包裹
  */
 'use client';
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 import React, { useState, useCallback, useRef, useMemo } from 'react';
 import {
@@ -694,7 +695,7 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
       }));
       setComponentNodes(newNodes);
     } catch (err) {
-      console.error('[ComponentTree] handleGenerate error:', err);
+      canvasLogger.ComponentTree.error(' handleGenerate error:', err);
       toast.showToast(err instanceof Error ? err.message : '生成组件失败', 'error');
     } finally {
       setGenerating(false);

@@ -11,6 +11,7 @@
  * - "AI生成"按钮：仅在无 flow 时可用（flow 由 context confirm 自动生成）
  */
 'use client';
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { GitBranch } from 'lucide-react';
@@ -813,7 +814,7 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
       setComponentNodes(componentNodes);
       setPhase('component');
     } catch (err) {
-      console.error('[BusinessFlowTree] handleContinueToComponents error:', err);
+      canvasLogger.BusinessFlowTree.error(' handleContinueToComponents error:', err);
       toast.showToast(err instanceof Error ? err.message : '生成组件树失败', 'error');
     } finally {
       setComponentGenerating(false);

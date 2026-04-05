@@ -12,6 +12,7 @@
  */
 
 'use client';
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { useUIStore } from '@/lib/canvas/stores/uiStore';
@@ -83,7 +84,7 @@ export function LeftDrawer() {
         setContextNodes([]);
       }
     } catch (err) {
-      console.error('Failed to generate contexts:', err);
+      canvasLogger.LeftDrawer.error('Failed to generate contexts:', err);
       setContextNodes([]);
     }
   }, [inputValue, aiThinking, setRequirementText, setContextNodes]);

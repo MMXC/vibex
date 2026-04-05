@@ -501,6 +501,8 @@ export interface TreeNode {
   label: string;
   type: TreeType;
   status: NodeStatus;
+  /** Whether the node is confirmed (active) — derived from isActive !== false */
+  confirmed?: boolean;
   isActive?: boolean;
   parentId?: string;
   children: string[];

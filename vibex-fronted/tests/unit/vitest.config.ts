@@ -16,7 +16,11 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./tests/unit/setup.ts'],
-    include: ['tests/unit/**/*.test.ts', 'tests/unit/**/*.spec.ts'],
+    include: [
+      'tests/unit/**/*.test.ts',
+      'tests/unit/**/*.spec.ts',
+      'src/hooks/**/*.test.ts',
+    ],
 
     // Coverage thresholds matching the original jest config
     coverage: {

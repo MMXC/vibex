@@ -1,3 +1,10 @@
+### Added (canvas-flowtree-guard-fix E2: TabBar 同步验证) — 2026-04-05
+- **E2 TabBar 同步**: 确认 E1 TabBar phase guard 已包含双向同步
+  - Tab 点击 → setActiveTree(tabId) ✓
+  - phase 推进 → advancePhase 同步 activeTree ✓
+  - 仅文档确认，无新代码变更
+- **提交**: `cb474bc8`
+
 ### Added (vibex-internal-tools E3: dedup Slack 告警) — 2026-04-05
 - **E3 Slack 告警**: dedup 检测到 block/warn 级别重复时通知 #coord
   - `notify_dedup_alert()`: 发送 Slack 消息到 #coord 频道

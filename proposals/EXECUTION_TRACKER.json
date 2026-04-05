@@ -1,22 +1,27 @@
 {
-  "generated_at": "2026-04-04T17:00:02.752197+00:00",
+  "generated_at": "2026-04-05T17:00:02.000480+00:00",
   "generated_by": "proposal_tracker.py",
   "proposals_dir": "/root/.openclaw/vibex/proposals",
   "stats": {
-    "total": 11,
+    "total": 12,
     "by_priority": {
       "P0": 3,
-      "P1": 8
+      "P1": 9
     },
     "by_status": {
-      "no-linked-task": 11
+      "no-linked-task": 12
     },
     "linked": 0,
-    "unlinked": 11,
+    "unlinked": 12,
     "claim_rate": 0.0,
     "by_date": {
       "20260324": {
         "total": 11,
+        "done": 0,
+        "in_progress": 0
+      },
+      "20260406": {
+        "total": 1,
         "done": 0,
         "in_progress": 0
       }
@@ -165,6 +170,19 @@
       "stage_started": null,
       "stage_completed": null,
       "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+    },
+    {
+      "id": "P1",
+      "title": "执行",
+      "priority": "P1",
+      "date_dir": "20260406",
+      "task_id": null,
+      "stage_status": "no-linked-task",
+      "stage_agent": "",
+      "task_status": "no-linked-task",
+      "stage_started": null,
+      "stage_completed": null,
+      "summary_path": "/root/.openclaw/vibex/proposals/20260406/summary.md"
     }
   ]
 }

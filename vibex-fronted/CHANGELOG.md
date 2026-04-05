@@ -1,5 +1,13 @@
 # Changelog
 
+### [canvas-jsonrender-preview E2: Canvas Preview] — 2026-04-06
+- **E2 Canvas Preview**: CanvasPreviewModal + useCanvasPreview hook + JsonRenderErrorBoundary
+- `CanvasPreviewModal.tsx`: 全屏预览 Modal，overlay + componentNodes 渲染
+- `useCanvasPreview.ts`: 读取 componentStore 返回预览节点
+- `JsonRenderErrorBoundary.tsx`: 捕获渲染错误，显示 fallback + 重试
+- `JsonRenderPreview.tsx`: @json-render/react 集成，nodesToSpec() 转换
+- **提交**: `f43c4b44`
+
 ### [canvas cleanup: SVG connector edge layers removed] — 2026-04-05
 - **SVG 连线层移除**: CanvasPage 移除 BoundedEdgeLayer + FlowEdgeLayer
 - **提交**: `7dd57acd`

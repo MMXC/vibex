@@ -19,6 +19,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.121',
+    date: '2026-04-06',
+    changes: [
+      '🔧 canvas-jsonrender-preview/E2: Canvas Preview — JsonRenderPreview modal',
+      '✅ CanvasPreviewModal + useCanvasPreview + JsonRenderErrorBoundary',
+      '✅ @json-render/react integration with vibexCanvasRegistry',
+      '✅ 提交 f43c4b44',
+    ],
+    commit: 'f43c4b44',
+  },
+
+  {
     version: '1.0.120',
     date: '2026-04-05',
     changes: [

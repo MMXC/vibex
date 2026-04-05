@@ -16,5 +16,5 @@
 
 ## DoD
 - [x] E1: json-render 渲染正常 (catalog + registry + JsonRenderPreview implemented, 5 tests passing)
-- [x] Canvas 预览可见 (JsonRenderPreview integrated into Canvas UI via CanvasPreviewModal)
-- [ ] 编辑与预览同步
+- [x] E2: Canvas 预览可见 (JsonRenderPreview integrated into Canvas UI via CanvasPreviewModal, commit f43c4b44)
+- [ ] 编辑与预览同步 (E3)

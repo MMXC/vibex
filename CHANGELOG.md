@@ -1,3 +1,10 @@
+### Added (canvas-optimization-roadmap E1: Phase0 console 清理) — 2026-04-05
+- **E1 Phase0 console 清理**: console.error → canvasLogger
+  - 新增 `src/lib/canvas/canvasLogger.ts`: 按组件名命名的日志工具
+  - 9 个组件: TemplateSelector, VersionHistoryPanel, ProjectBar, BusinessFlowTree, BoundedContextTree, ComponentTree, LeftDrawer, CanvasPage
+  - 仅非 production 环境记录日志
+- **提交**: `52e01b83`
+
 ### Added (canvas-flowtree-guard-fix E2: TabBar 同步验证) — 2026-04-05
 - **E2 TabBar 同步**: 确认 E1 TabBar phase guard 已包含双向同步
   - Tab 点击 → setActiveTree(tabId) ✓

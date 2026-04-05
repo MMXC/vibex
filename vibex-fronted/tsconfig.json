@@ -46,10 +46,15 @@
     "node_modules",
     "**/*.test.ts",
     "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
     "jest.config.ts",
     "jest.config.for-stryker.ts",
     "jest.setup.ts",
     "jest.setup.js",
-    "playwright.setup.ts"
+    "playwright.setup.ts",
+    "src/services/__mocks__",
+    "e2e",
+    "tests/unit"
   ]
 }

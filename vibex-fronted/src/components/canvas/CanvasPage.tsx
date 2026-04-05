@@ -630,11 +630,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
       {/* E2: Initialize cross-store subscriptions */}
       <CanvasStoreInitializer />
       {/* Tab Bar — Epic 1: Three-tree tab switcher */}
-      {phase !== 'input' && (
-        <div className={styles.tabBarWrapper}>
-          <TabBar />
-        </div>
-      )}
+      <div className={styles.tabBarWrapper}>
+        <TabBar />
+      </div>
 
       {/* Project Bar — Epic 5: Create Project button */}
       {phase !== 'input' && (

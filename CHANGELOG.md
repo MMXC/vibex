@@ -1,3 +1,9 @@
+### Added (canvas-flowtree-api-fix E1: autoGenerateFlows API 集成) — 2026-04-05
+- **E1 API 集成**: autoGenerateFlows 使用真实 API 替代 mock
+  - `flowStore.ts`: `canvasApi.generateFlows()` → POST /api/v1/canvas/generate-flows
+  - 添加 flowError state + setFlowError() 错误处理
+- **提交**: `533a6904`
+
 ### Added (canvas-optimization-roadmap E1: Phase0 console 清理) — 2026-04-05
 - **E1 Phase0 console 清理**: console.error → canvasLogger
   - 新增 `src/lib/canvas/canvasLogger.ts`: 按组件名命名的日志工具

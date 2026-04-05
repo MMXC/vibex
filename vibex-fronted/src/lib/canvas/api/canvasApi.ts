@@ -257,7 +257,7 @@ export const canvasApi = {
    */
   generateComponents: async (data: {
     contexts: Array<{ id: string; name: string; description: string; type: string }>;
-    flows: Array<{ name: string; contextId: string; steps: Array<{ name: string; actor: string }> }>;
+    flows: Array<{ id?: string; name: string; contextId: string; steps: Array<{ name: string; actor: string }> }>;
     sessionId: string;
   }): Promise<GenerateComponentsOutput> => {
     const headers = { 'Content-Type': 'application/json', ...getAuthHeaders() };
@@ -279,7 +279,7 @@ export const canvasApi = {
    */
   fetchComponentTree: async (data: {
     contexts: Array<{ id: string; name: string; description: string; type: string }>;
-    flows: Array<{ name: string; contextId: string; steps: Array<{ name: string; actor: string }> }>;
+    flows: Array<{ id?: string; name: string; contextId: string; steps: Array<{ name: string; actor: string }> }>;
     sessionId: string;
   }): Promise<import('../types').ComponentNode[]> => {
     const result = await canvasApi.generateComponents(data);

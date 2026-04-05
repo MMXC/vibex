@@ -359,6 +359,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         ? activeFlows.filter((f) => selectedFlowSet.has(f.nodeId))
         : activeFlows;
       const mappedFlows = flowsToSend.map((f) => ({
+        id: f.nodeId,  // E2: flowId linking — backend uses this as flowId in components
         name: f.name,
         contextId: f.contextId,
         steps: f.steps.map((step) => ({
@@ -375,7 +376,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
 
       if (result.success && result.components && result.components.length > 0) {
         const newNodes = result.components.map((comp) => ({
-          flowId: comp.flowId ?? 'mock',
+          flowId: comp.flowId || '',
           name: comp.name,
           type: comp.type as 'page' | 'list' | 'form' | 'detail' | 'modal',
           props: {},

@@ -1,3 +1,10 @@
+### Added (canvas-jsonrender-preview E1: JsonRender 集成) — 2026-04-05
+- **E1 JsonRender 集成**: `@json-render/core` + `@json-render/react`
+  - `vibexCanvasCatalog`: 10 组件 Zod schemas (defineCatalog)
+  - `vibexCanvasRegistry`: React 实现 (Tailwind) (defineRegistry)
+  - `JsonRenderPreview`: StateProvider/VisibilityProvider/ActionProvider
+- **提交**: `307ab9fd`
+
 ### Added (canvas-optimization-roadmap E2: 移除 legacy canvasStore) — 2026-04-05
 - **E2 架构分层**: 移除 legacy canvasStore.ts + deprecated.ts
   - 新增 CanvasStoreInitializer.tsx — crossStoreSync 初始化

@@ -1,5 +1,12 @@
 # Changelog
 
+### [canvas-optimization-roadmap E4 Phase3: Reliability] — 2026-04-06
+- **E4 Phase3 可靠性**: ErrorBoundary + 测试覆盖验收
+- **ErrorBoundary**: AppErrorBoundary (layout.tsx 全局) + JsonRenderErrorBoundary (CanvasPreviewModal)
+- **测试覆盖**: 120 canvas tests passing (jest→vi 迁移完成)
+- **提交**: `f43c4b44` (ErrorBoundary) + `be17381b` (DoD) + `b1505a23` (jest→vi 迁移)
+- **架构**: 三层架构 (UI层/Hook层/数据层)，Phase 0-3 全部完成
+
 ### [canvas-jsonrender-preview E2: Canvas Preview] — 2026-04-06
 - **E2 Canvas Preview**: CanvasPreviewModal + useCanvasPreview hook + JsonRenderErrorBoundary
 - `CanvasPreviewModal.tsx`: 全屏预览 Modal，overlay + componentNodes 渲染

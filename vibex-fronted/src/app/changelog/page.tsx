@@ -19,6 +19,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.122',
+    date: '2026-04-06',
+    changes: [
+      '🔧 canvas-optimization-roadmap/E4 Phase3: Reliability — ErrorBoundary + 测试覆盖',
+      '✅ ErrorBoundary: AppErrorBoundary (全局) + JsonRenderErrorBoundary (CanvasPreviewModal)',
+      '✅ 120 canvas tests passing (jest→vi 迁移)',
+      '✅ 三层架构 Phase 0-3 全部完成',
+      '✅ 提交 f43c4b44 / be17381b / b1505a23',
+    ],
+    commit: 'be17381b',
+  },
+
+  {
     version: '1.0.121',
     date: '2026-04-06',
     changes: [

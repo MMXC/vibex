@@ -151,7 +151,7 @@ snapshots.post('/', async (c) => {
     const currentMaxVersion = existing[0]?.maxVersion ?? 0
 
     // E1: Optimistic locking — if client provides version, check for conflict
-    if (clientVersion !== undefined && clientVersion <= currentMaxVersion) {
+    if (clientVersion !== undefined && clientVersion < currentMaxVersion) {
       // Get server's latest snapshot for conflict response
       const serverSnapshot = await queryOne<CanvasSnapshotRow>(
         env,
@@ -243,6 +243,38 @@ snapshots.post('/', async (c) => {
   } catch (err) {
     console.error('[canvas/snapshots] POST error:', err)
     return c.json({ error: 'Failed to create snapshot' }, 500)
+  }
+})
+
+// ============================================================
+// GET /v1/canvas/snapshots/latest?projectId=xxx — Get latest version info
+// E1: Lightweight endpoint for polling version in useAutoSave
+// NOTE: Must be defined BEFORE /:id to avoid "latest" being matched as :id param
+// ============================================================
+
+snapshots.get('/latest', async (c) => {
+  try {
+    const projectId = c.req.query('projectId')
+    const env = c.env
+
+    if (!projectId) {
+      return c.json({ error: 'Missing required query param: projectId' }, 400)
+    }
+
+    const latest = await queryOne<{ version: number; createdAt: string }>(
+      env,
+      'SELECT version, createdAt FROM CanvasSnapshot WHERE projectId = ? ORDER BY version DESC LIMIT 1',
+      [projectId]
+    )
+
+    return c.json({
+      success: true,
+      latestVersion: latest?.version ?? 0,
+      updatedAt: latest?.createdAt ?? null,
+    })
+  } catch (err) {
+    console.error('[canvas/snapshots] GET /latest error:', err)
+    return c.json({ error: 'Failed to fetch latest version' }, 500)
   }
 })
 
@@ -396,37 +428,6 @@ snapshots.post('/:id/restore', async (c) => {
   } catch (err) {
     console.error('[canvas/snapshots] POST :id/restore error:', err)
     return c.json({ error: 'Failed to restore snapshot' }, 500)
-  }
-})
-
-// ============================================================
-// GET /v1/canvas/snapshots/latest?projectId=xxx — Get latest version info
-// E1: Lightweight endpoint for polling version in useAutoSave
-// ============================================================
-
-snapshots.get('/latest', async (c) => {
-  try {
-    const projectId = c.req.query('projectId')
-    const env = c.env
-
-    if (!projectId) {
-      return c.json({ error: 'Missing required query param: projectId' }, 400)
-    }
-
-    const latest = await queryOne<{ version: number; createdAt: string }>(
-      env,
-      'SELECT version, createdAt FROM CanvasSnapshot WHERE projectId = ? ORDER BY version DESC LIMIT 1',
-      [projectId]
-    )
-
-    return c.json({
-      success: true,
-      latestVersion: latest?.version ?? 0,
-      updatedAt: latest?.createdAt ?? null,
-    })
-  } catch (err) {
-    console.error('[canvas/snapshots] GET /latest error:', err)
-    return c.json({ error: 'Failed to fetch latest version' }, 500)
   }
 })
 

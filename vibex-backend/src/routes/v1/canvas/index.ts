@@ -61,6 +61,7 @@ interface BusinessFlow {
 
 interface ComponentNode {
   flowId: string
+  contextId: string
   name: string
   type: string
   props: Record<string, unknown>
@@ -282,8 +283,16 @@ canvas.post('/generate-components',
         })
         .join('\n')
 
+      // Build context summary for prompt (E1: merged from Next.js route)
+      const contextSummary = contexts
+        .map(c => `- [${c.id}] ${c.name}: ${c.description}`)
+        .join('\n')
+
       // Step 3: Get component schema (Format)
-      const componentPrompt = `基于以下业务流程，生成组件树节点。
+      const componentPrompt = `基于以下业务流程和上下文，生成组件树节点。
+
+上下文列表（必须使用 id 字段）：
+${contextSummary}
 
 流程列表（必须使用 id 字段）：
 ${flowSummary}
@@ -292,6 +301,7 @@ ${flowSummary}
 每个组件需包含：
 - name: 组件名（名词短语，如"订单卡片"、"支付按钮"），禁止使用流程名
 - flowId: 所属流程 id（如 flow-abc123），禁止留空或填 unknown
+- contextId: 所属上下文 id（ctx-xxx 格式），禁止留空或填 unknown
 - type: 类型（button|form|table|card|modal|input|list|navigation）
 - props: 默认属性（placeholder/defaultValue/title 等）
 - api: 接口 { method: GET|POST|PUT|DELETE, path: "/api/xxx", params: ["id"] }
@@ -301,6 +311,7 @@ ${flowSummary}
       const componentResult = await aiService.generateJSON<Array<{
         name: string
         flowId: string
+        contextId: string
         type: string
         props: Record<string, unknown>
         api: { method: string; path: string; params: string[] }
@@ -329,6 +340,10 @@ ${flowSummary}
           const compFlowId = comp.flowId && comp.flowId !== 'unknown'
             ? comp.flowId
             : (flows[i]?.id || flows[0]?.id || 'unknown')
+          // Determine contextId: prefer AI-returned, fallback to flows[i].contextId or contexts[0].id
+          const compContextId = comp.contextId && comp.contextId.startsWith('ctx-')
+            ? comp.contextId
+            : (flows[i]?.contextId || contexts[0]?.id || '')
           // Validate API method
           const rawMethod = comp.api?.method || 'GET'
           const validMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
@@ -337,6 +352,7 @@ ${flowSummary}
             : 'GET'
           components.push({
             flowId: compFlowId,
+            contextId: compContextId,
             name: comp.name || '未命名组件',
             type: comp.type || 'card',
             props: comp.props || {},

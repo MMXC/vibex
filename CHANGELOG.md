@@ -1,3 +1,11 @@
+### Added (vibex-internal-tools E3: dedup Slack 告警) — 2026-04-05
+- **E3 Slack 告警**: dedup 检测到 block/warn 级别重复时通知 #coord
+  - `notify_dedup_alert()`: 发送 Slack 消息到 #coord 频道
+  - 内容包含: 项目名、goal、告警级别、Top5 相似项目
+  - 非阻塞: Slack 失败不影响 exit code
+  - 无 `SLACK_TOKEN_coord` 环境变量时优雅跳过
+- **提交**: `155339d7`
+
 ### Added (canvas-flowtree-guard-fix E1: TabBar phase guard) — 2026-04-05
 - **E1 TabBar phase guard**: FlowTree tab 受 phase 等级保护
   - TabBar: phase < flow 时禁止切换到 flow tab

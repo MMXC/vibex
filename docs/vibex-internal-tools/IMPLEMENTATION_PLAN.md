@@ -16,5 +16,5 @@
 
 ## DoD
 - [x] dedup API 存在 — `scripts/dedup_api.py` ✅ commit `e3b1e324`
-- [ ] coord 派生前调用 dedup（E2）
+- [x] coord 派生前调用 dedup — `init_project.sh` 调用 `dedup_check.py` ✅ commit `36ab6f4f`
 - [ ] 重复提案告警发送（E3）

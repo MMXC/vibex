@@ -8,7 +8,7 @@
  * - V4: Performance improvement >30%
  */
 
-import { useModelStore, ModelState, DomainModel } from '@/stores/modelSlice';
+import { useModelStore, ModelState, DomainModel, selectDomainModels, selectSelectedModels, selectAggregateRoots, selectEntities, selectValueObjects, selectModelsByContextId, selectModelMermaidCode, selectIsModelPanelOpen } from '@/stores/modelSlice';
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -192,7 +192,7 @@ describe('Model Slice (V1-V4)', () => {
       
       useModelStore.setState({ domainModels: testModels });
       
-      const { selectDomainModels } = require('@/stores/modelSlice');
+      const _sel = selectDomainModels;
       const result = selectDomainModels(useModelStore.getState());
       expect(result).toEqual(testModels);
     });
@@ -208,7 +208,7 @@ describe('Model Slice (V1-V4)', () => {
         selectedModelIds: ['1'],
       });
       
-      const { selectSelectedModels } = require('@/stores/modelSlice');
+      const _sel = selectSelectedModels;
       const result = selectSelectedModels(useModelStore.getState());
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe('1');
@@ -223,7 +223,7 @@ describe('Model Slice (V1-V4)', () => {
       
       useModelStore.setState({ domainModels: testModels });
       
-      const { selectAggregateRoots } = require('@/stores/modelSlice');
+      const _sel = selectAggregateRoots;
       const result = selectAggregateRoots(useModelStore.getState());
       expect(result).toHaveLength(2);
       expect(result.every((m: DomainModel) => m.type === 'aggregate_root')).toBe(true);
@@ -237,7 +237,7 @@ describe('Model Slice (V1-V4)', () => {
       
       useModelStore.setState({ domainModels: testModels });
       
-      const { selectEntities } = require('@/stores/modelSlice');
+      const _sel = selectEntities;
       const result = selectEntities(useModelStore.getState());
       expect(result).toHaveLength(1);
       expect(result[0].type).toBe('entity');
@@ -251,7 +251,7 @@ describe('Model Slice (V1-V4)', () => {
       
       useModelStore.setState({ domainModels: testModels });
       
-      const { selectValueObjects } = require('@/stores/modelSlice');
+      const _sel = selectValueObjects;
       const result = selectValueObjects(useModelStore.getState());
       expect(result).toHaveLength(1);
       expect(result[0].type).toBe('value_object');
@@ -265,7 +265,7 @@ describe('Model Slice (V1-V4)', () => {
       
       useModelStore.setState({ domainModels: testModels });
       
-      const { selectModelsByContextId } = require('@/stores/modelSlice');
+      const _sel = selectModelsByContextId;
       const result = selectModelsByContextId('ctx-1')(useModelStore.getState());
       expect(result).toHaveLength(1);
       expect(result[0].contextId).toBe('ctx-1');
@@ -274,7 +274,7 @@ describe('Model Slice (V1-V4)', () => {
     test('V2.7: selectModelMermaidCode returns code', () => {
       useModelStore.setState({ modelMermaidCode: 'graph TD; A-->B;' });
       
-      const { selectModelMermaidCode } = require('@/stores/modelSlice');
+      const _sel = selectModelMermaidCode;
       const result = selectModelMermaidCode(useModelStore.getState());
       expect(result).toBe('graph TD; A-->B;');
     });
@@ -282,7 +282,7 @@ describe('Model Slice (V1-V4)', () => {
     test('V2.8: selectIsModelPanelOpen returns boolean', () => {
       useModelStore.setState({ isModelPanelOpen: false });
       
-      const { selectIsModelPanelOpen } = require('@/stores/modelSlice');
+      const _sel = selectIsModelPanelOpen;
       const result = selectIsModelPanelOpen(useModelStore.getState());
       expect(result).toBe(false);
     });
@@ -367,7 +367,7 @@ describe('Model Slice (V1-V4)', () => {
       useModelStore.setState({ domainModels: largeModels, selectedModelIds: Array.from({ length: 500 }, (_, i) => `model-${i}`) });
       
       // Measure selector performance
-      const { selectSelectedModels } = require('@/stores/modelSlice');
+      const _sel = selectSelectedModels;
       
       const start = performance.now();
       for (let i = 0; i < 100; i++) {
@@ -400,7 +400,7 @@ describe('Model Slice (V1-V4)', () => {
     });
 
     test('V4.3: Selector memoization should work', () => {
-      const { selectDomainModels } = require('@/stores/modelSlice');
+      const _sel = selectDomainModels;
       
       const state = useModelStore.getState();
       

@@ -23,27 +23,27 @@ describe('useSystemTheme', () => {
     const listeners: Array<(e: MediaQueryListEvent) => void> = [];
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
-      value: jest.fn().mockImplementation((query) => ({
+      value: vi.fn().mockImplementation((query) => ({
         matches,
         media: query,
         onchange: null,
-        addListener: jest.fn((listener: (e: MediaQueryListEvent) => void) => {
+        addListener: vi.fn((listener: (e: MediaQueryListEvent) => void) => {
           listeners.push(listener);
         }),
-        removeListener: jest.fn((listener: (e: MediaQueryListEvent) => void) => {
+        removeListener: vi.fn((listener: (e: MediaQueryListEvent) => void) => {
           const idx = listeners.indexOf(listener);
           if (idx !== -1) listeners.splice(idx, 1);
         }),
-        addEventListener: jest.fn((type: string, listener: (e: MediaQueryListEvent) => void) => {
+        addEventListener: vi.fn((type: string, listener: (e: MediaQueryListEvent) => void) => {
           if (type === 'change') listeners.push(listener);
         }),
-        removeEventListener: jest.fn((type: string, listener: (e: MediaQueryListEvent) => void) => {
+        removeEventListener: vi.fn((type: string, listener: (e: MediaQueryListEvent) => void) => {
           if (type === 'change') {
             const idx = listeners.indexOf(listener);
             if (idx !== -1) listeners.splice(idx, 1);
           }
         }),
-        dispatchEvent: jest.fn(),
+        dispatchEvent: vi.fn(),
       })),
     });
   }
@@ -65,17 +65,17 @@ describe('useSystemTheme', () => {
     let changeHandler: ((e: MediaQueryListEvent) => void) | null = null;
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
-      value: jest.fn().mockImplementation(() => ({
+      value: vi.fn().mockImplementation(() => ({
         matches: false,
         media: '(prefers-color-scheme: dark)',
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-        addEventListener: jest.fn((type: string, handler: (e: MediaQueryListEvent) => void) => {
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn((type: string, handler: (e: MediaQueryListEvent) => void) => {
           if (type === 'change') changeHandler = handler;
         }),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
       })),
     });
 
@@ -100,21 +100,21 @@ describe('useSystemTheme', () => {
     let removedListener: ((e: MediaQueryListEvent) => void) | null = null;
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
-      value: jest.fn().mockImplementation(() => ({
+      value: vi.fn().mockImplementation(() => ({
         matches: false,
         media: '(prefers-color-scheme: dark)',
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-        addEventListener: jest.fn((type: string, listener: (e: MediaQueryListEvent) => void) => {
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn((type: string, listener: (e: MediaQueryListEvent) => void) => {
           if (type === 'change') removedListener = listener;
         }),
-        removeEventListener: jest.fn((type: string, listener: (e: MediaQueryListEvent) => void) => {
+        removeEventListener: vi.fn((type: string, listener: (e: MediaQueryListEvent) => void) => {
           if (type === 'change' && listener === removedListener) {
             removedListener = null;
           }
         }),
-        dispatchEvent: jest.fn(),
+        dispatchEvent: vi.fn(),
       })),
     });
 

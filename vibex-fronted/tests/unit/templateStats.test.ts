@@ -7,12 +7,12 @@ import { useTemplateStore } from '@/stores/templateStore';
 
 // Mock localStorage
 const localStorageMock = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  clear: jest.fn(),
-  removeItem: jest.fn(),
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  clear: vi.fn(),
+  removeItem: vi.fn(),
   length: 0,
-  key: jest.fn(),
+  key: vi.fn(),
 };
 
 Object.defineProperty(window, 'localStorage', {
@@ -32,7 +32,7 @@ describe('TemplateStats', () => {
   beforeEach(() => {
     localStorageMock.getItem.mockReturnValue(null);
     localStorageMock.setItem.mockReturnValue(undefined);
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Reset store state before each test
     resetStoreState();
   });

@@ -20,6 +20,7 @@ import canvas from './canvas';
 import canvasStream from './canvas/stream';
 import canvasSnapshots from './canvas/snapshots';
 import canvasRollback from './canvas/rollback';
+import flows from './flows';
 
 // 导入所有 API 路由
 import projects from '../projects';
@@ -31,7 +32,7 @@ import chat from '../chat';
 import auth from '../auth';
 import users from '../users';
 import messages from '../messages';
-import flows from '../flows';
+import flowsLegacy from '../flows';
 import flowData from '../flow-data';
 import requirements from '../requirements';
 import requirementId from '../requirements.$id';
@@ -144,8 +145,8 @@ protected_.route('/users', users);
 // 消息
 protected_.route('/messages', messages);
 
-// 流程
-protected_.route('/flows', flows);
+// 流程 (legacy — /api/flows, not /api/v1/flows)
+protected_.route('/flows', flowsLegacy);
 protected_.route('/flow-data', flowData);
 
 // 需求
@@ -225,6 +226,9 @@ protected_.route('/confirmation-projects', confirmationProjects);
 
 // Canvas 画布 API
 protected_.route('/canvas', canvas);
+
+// Canvas Flows CRUD (/api/v1/canvas/flows)
+protected_.route('/canvas/flows', flows);
 
 // Canvas 快照 API — E2 后端版本化存储
 protected_.route('/canvas/snapshots', canvasSnapshots);

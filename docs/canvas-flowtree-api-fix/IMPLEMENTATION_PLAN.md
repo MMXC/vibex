@@ -18,4 +18,4 @@
 - [x] 移除mock，API调用成功 — `autoGenerateFlows` → `canvasApi.generateFlows()` ✅ commit `533a6904`
 - [x] flowId正确生成 — `mappedFlows` 添加 `id: f.nodeId` ✅ commit `04b443ef`
   - Fix: `flowId: comp.flowId ?? 'mock'` → `comp.flowId || ''`
-- [x] 错误状态处理正确 — `flowError` state + try/catch ✅
+- [x] 错误状态处理正确 — `flowError` state + try/catch ✅ commit `533a6904`

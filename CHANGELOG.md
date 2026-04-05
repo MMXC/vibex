@@ -1,3 +1,11 @@
+### Added (canvas-flowtree-guard-fix E1: TabBar phase guard) — 2026-04-05
+- **E1 TabBar phase guard**: FlowTree tab 受 phase 等级保护
+  - TabBar: phase < flow 时禁止切换到 flow tab
+  - TabBar: phase < component 时禁止切换到 component tab
+  - 添加 disabled/locked 视觉状态（styles.tabLocked）
+  - toolTip 提示"需先完成上一阶段"
+- **提交**: `8ed16fd9`
+
 ### Added (vibex-ts-any-cleanup E3: ESLint no-explicit-any 启用) — 2026-04-05
 - **E3 ESLint 规则启用**: `@typescript-eslint/no-explicit-any` off → error
   - 测试文件忽略: `src/**/*.test.*`, `src/**/__tests__/**`

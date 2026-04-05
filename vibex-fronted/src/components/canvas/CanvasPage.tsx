@@ -55,7 +55,6 @@ import { useAIController } from '@/hooks/canvas/useAIController';
 import { useCanvasSearch } from '@/hooks/canvas/useCanvasSearch';
 import { useCanvasEvents } from '@/hooks/canvas/useCanvasEvents';
 
-import { PhaseProgressBar } from './PhaseProgressBar';
 import { TabBar } from './TabBar';
 import { TreePanel } from './TreePanel';
 import { TreeToolbar } from './TreeToolbar';
@@ -67,7 +66,6 @@ import { PrototypeQueuePanel } from './PrototypeQueuePanel';
 import { HoverHotzone } from './HoverHotzone';
 import { ShortcutHintPanel } from './features/ShortcutHintPanel';
 import { ShortcutHelpPanel } from './ShortcutHelpPanel';
-import { TreeStatus } from './TreeStatus';
 import { TemplateSelector } from './features/TemplateSelector';
 import { VersionHistoryPanel } from './features/VersionHistoryPanel';
 import { SaveIndicator } from './features/SaveIndicator';
@@ -465,16 +463,6 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const allTreesConfirmed = contextReady && flowReady && componentReady
     && contextNodes.length > 0 && flowNodes.length > 0 && componentNodes.length > 0;
 
-  // === Phase click handler ===
-  const handlePhaseClick = (p: Phase) => {
-    const phaseOrder: Phase[] = ['input', 'context', 'flow', 'component', 'prototype'];
-    const currentIdx = phaseOrder.indexOf(phase);
-    const targetIdx = phaseOrder.indexOf(p);
-    if (targetIdx <= currentIdx) {
-      setPhase(p);
-    }
-  };
-
   // === Phase label ===
   const phaseLabel =
     phase === 'input'
@@ -640,12 +628,6 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     <div className={containerClasses}>
       {/* E2: Initialize cross-store subscriptions */}
       <CanvasStoreInitializer />
-      {/* Phase Progress Bar */}
-      <div className={styles.phaseProgressBarWrapper}>
-        <PhaseProgressBar currentPhase={phase} onPhaseClick={handlePhaseClick} />
-        {phase !== 'input' && <TreeStatus />}
-      </div>
-
       {/* Tab Bar — Epic 1: Three-tree tab switcher */}
       {phase !== 'input' && (
         <div className={styles.tabBarWrapper}>

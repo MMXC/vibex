@@ -19,6 +19,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.114',
+    date: '2026-04-05',
+    changes: [
+      '🔧 vibex-e2e-test-fix/E1: Playwright 隔离',
+      '✅ 独立 playwright.config.ts，BASE_URL 环境变量，CI grepInvert @ci-blocking',
+      '✅ test.skip + fixme 注释 (auto-save/onboarding/register)',
+      '✅ @ci-blocking: 前缀 (vue-components/conflict-resolution/undo-redo)',
+      '✅ 提交 87d3542f',
+    ],
+    commit: '87d3542f',
+  },
+
+  {
     version: '1.0.113',
     date: '2026-04-05',
     changes: [

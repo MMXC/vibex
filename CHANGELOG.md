@@ -1,3 +1,12 @@
+### Added (vibex-e2e-test-fix E1: Playwright 隔离) — 2026-04-05
+- **E1 Playwright 隔离**: 建立独立 Playwright 配置体系，消除 Jest/Playwright 框架冲突
+  - `tests/e2e/playwright.config.ts`: 独立配置，BASE_URL 环境变量，CI retries=3，grepInvert 跳过 @ci-blocking
+  - `test.skip` → `test.skip` + fixme 注释 (auto-save/onboarding/register)
+  - `@ci-blocking:` 前缀添加到 vue-components/conflict-resolution/undo-redo 测试名
+  - `package.json`: `test:e2e` + `test:e2e:ci` + `test:e2e:local` 脚本更新
+  - frontend `tsc --noEmit`: 0 errors
+- **提交**: `87d3542f`
+
 ### Added (vibex-generate-components-consolidation E1: contextSummary 合并) — 2026-04-05
 - **E1 contextSummary合并**: Hono route `index.ts` 合并 Next.js route 的 prompt 改进
   - `ComponentNode` 添加 `contextId` 字段

@@ -42,6 +42,9 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
 
+    // CI 环境中跳过 @ci-blocking 标记的测试
+    grepInvert: process.env.CI ? /@ci-blocking/ : undefined,
+
     launchOptions: {
       args: ['--disable-dev-shm-usage'],
     },

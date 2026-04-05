@@ -1,5 +1,13 @@
 # Changelog
 
+### [vibex-e2e-test-fix E1: Playwright 隔离] — 2026-04-05
+- **E1 Playwright 隔离**: 独立 Playwright 配置，BASE_URL 环境变量，grepInvert 跳过 @ci-blocking
+- `tests/e2e/playwright.config.ts`: CI retries=3, grepInvert @ci-blocking
+- `test.skip` + fixme 注释 (auto-save/onboarding/register)
+- `@ci-blocking:` 前缀 (vue-components/conflict-resolution/undo-redo)
+- `package.json`: test:e2e + test:e2e:ci + test:e2e:local
+- **提交**: `87d3542f`
+
 ### [vibex-proposals-20260405 E3: Canvas UX增强] — 2026-04-05
 - EmptyState组件: BoundedContextTree (Network) + BusinessFlowTree (GitBranch) + ComponentTree (Layers)
 - Error toast通知: 三个树组件的 catch 块添加 toast.showToast

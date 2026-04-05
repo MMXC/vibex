@@ -1,5 +1,12 @@
 # Changelog
 
+### [canvas-testing-strategy E3-E6: Hook 测试套件] — 2026-04-05
+- **E3 useDragSelection**: 17 tests — 拖拽选框
+- **E4 useCanvasSearch**: 17 tests — 搜索功能
+- **E5 useTreeToolbarActions**: 5 tests — treeType 路由
+- **E6 useVersionHistory**: 17 tests — 版本历史
+- **提交**: 6aacf5c5 / 9864f8f3 / eb5d9e3e / a86949f3
+
 ### [canvas-testing-strategy E1: useCanvasRenderer 测试] — 2026-04-05
 - **E1 useCanvasRenderer 测试**: 33 tests, 97.29% stmts / 100% funcs / 98.14% lines
 - `src/hooks/canvas/__tests__/useCanvasRenderer.test.ts`: nodeRects/boundedEdges/flowEdges/TreeNode/memoization

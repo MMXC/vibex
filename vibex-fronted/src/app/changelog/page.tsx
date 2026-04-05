@@ -19,6 +19,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.117',
+    date: '2026-04-05',
+    changes: [
+      '🔧 canvas-testing-strategy/E3-E6: Hook 测试套件',
+      '✅ E3 useDragSelection 17 tests, E4 useCanvasSearch 17 tests',
+      '✅ E5 useTreeToolbarActions 5 tests, E6 useVersionHistory 17 tests',
+      '✅ 提交 6aacf5c5 / 9864f8f3 / eb5d9e3e / a86949f3',
+    ],
+    commit: 'a86949f3',
+  },
+
+  {
     version: '1.0.115',
     date: '2026-04-05',
     changes: [

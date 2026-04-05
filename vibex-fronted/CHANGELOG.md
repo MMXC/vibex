@@ -1,5 +1,12 @@
 # Changelog
 
+### [canvas-button-cleanup E1: BoundedContextTree History 修复] — 2026-04-06
+- **E1 History 快照修复**: `BoundedContextTree` CRUD 操作后添加 `recordSnapshot` 调用
+- **问题**: 编辑/新增 BoundedContext 节点后，undo/redo 历史记录未记录变更
+- **修复**: `handleEditContextNode` 和 `handleAdd` 中在变更前调用 `getHistoryStore().recordSnapshot()`
+- **文件**: `vibex-fronted/src/components/canvas/BoundedContextTree.tsx`
+- **提交**: `9b54b10a`
+
 ### [vibex-proposals-20260406 E1: OPTIONS Preflight CORS Fix] — 2026-04-06
 - **E1 OPTIONS 预检修复**: `protected_.options('/*', ...)` 在 `authMiddleware` 之前注册
 - **问题**: 浏览器 CORS preflight (OPTIONS) 请求被 authMiddleware 拦截返回 401

@@ -1,3 +1,10 @@
+### Added (canvas-flowtree-guard-fix E3: E2E 验证) — 2026-04-05
+- **E3 E2E 验证**: gstack browser 验证 TabBar phase guard
+  - TabBar phase guard: context=selected, flow+component=disabled
+  - 点击禁用 tab: 正确阻止
+  - 10 TabBar E2E tests: 全部通过
+- **提交**: `10649b0c`
+
 ### Added (canvas-flowtree-api-fix E1: autoGenerateFlows API 集成) — 2026-04-05
 - **E1 API 集成**: autoGenerateFlows 使用真实 API 替代 mock
   - `flowStore.ts`: `canvasApi.generateFlows()` → POST /api/v1/canvas/generate-flows

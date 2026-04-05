@@ -12,6 +12,7 @@
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { getHistoryStore } from '@/lib/canvas/historySlice';
 import { Network } from 'lucide-react';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { useToast } from '@/components/ui/Toast';
@@ -342,6 +343,14 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
   const contextNodes = useContextStore((s) => s.contextNodes);
   const addContextNode = useContextStore((s) => s.addContextNode);
   const editContextNode = useContextStore((s) => s.editContextNode);
+  // E1: Wrap editContextNode to record history snapshot before mutation
+  const handleEditContextNode = useCallback(
+    (nodeId: string, data: Partial<BoundedContextNode>) => {
+      getHistoryStore().recordSnapshot('context', contextNodes);
+      editContextNode(nodeId, data);
+    },
+    [contextNodes, editContextNode]
+  );
   const deleteContextNode = useContextStore((s) => s.deleteContextNode);
   const setContextNodes = useContextStore((s) => s.setContextNodes);
   const advancePhase = useContextStore((s) => s.advancePhase);
@@ -426,10 +435,12 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
 
   const handleAdd = useCallback(
     (data: BoundedContextDraft) => {
+      // E1: Record snapshot before adding node
+      getHistoryStore().recordSnapshot('context', contextNodes);
       addContextNode(data);
       setShowAddForm(false);
     },
-    [addContextNode]
+    [addContextNode, contextNodes]
   );
 
   const handleConfirmAll = useCallback(() => {
@@ -525,6 +536,8 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
                     className={styles.deleteButton}
                     onClick={() => {
                       if (window.confirm(`确定删除 ${selectedCount} 个节点？`)) {
+                        // E1: Record snapshot before deleting selected nodes
+                        getHistoryStore().recordSnapshot('context', contextNodes);
                         deleteSelectedNodes('context');
                       }
                     }}
@@ -543,6 +556,8 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
                 onClick={() => {
                   if (contextNodes.length === 0) return;
                   if (window.confirm(`确定删除全部 ${contextNodes.length} 个节点？`)) {
+                    // E1: Record snapshot before deleting all nodes
+                    getHistoryStore().recordSnapshot('context', contextNodes);
                     // Delete all context nodes
                     contextNodes.forEach(n => deleteContextNode(n.nodeId));
                   }
@@ -615,7 +630,7 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
                   type={type}
                   nodes={groupNodes}
                   readonly={readonly}
-                  onEdit={editContextNode}
+                  onEdit={handleEditContextNode}
                   onDelete={deleteContextNode}
                   renderCard={(props) => (
                     <ContextCard

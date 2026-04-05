@@ -1,765 +1,920 @@
-# VibeX 实施计划
+# VibeX Proposals 2026-04-06 — Implementation Plan
 
 > **项目**: vibex-architect-proposals-vibex-proposals-20260406  
-> **版本**: v1.0  
+> **类型**: Bug Fix Sprint Implementation  
+> **作者**: architect agent  
 > **日期**: 2026-04-06  
-> **作者**: architect agent
+> **版本**: v1.0
 
 ---
 
-## 概述
+## 1. Sprint 概览
 
-本实施计划基于架构文档，将所有改进任务分解为可执行的步骤，配合部署清单与回滚方案，确保安全、可控地落地。
+| Sprint | Epic | 内容 | 工时 | 顺序 |
+|--------|------|------|------|------|
+| Sprint 1 | E1 | OPTIONS 预检路由修复 | 0.5h | 1 |
+| Sprint 1 | E2 | Canvas Context 多选修复 | 0.3h | 2 |
+| Sprint 1 | E3 | generate-components flowId | 0.3h | 3 |
+| Sprint 2 | E4 | SSE 超时 + 连接清理 | 1.5h | 4 |
+| Sprint 2 | E5 | 分布式限流 | 1.5h | 5 |
+| Sprint 2 | E6 | test-notify 去重 | 1h | 6 |
 
-**总工时估算**: ~20h（P0-P3，不含 P3 长期规划）
-
-| 阶段 | 优先级 | 工时 | 目标 |
-|------|--------|------|------|
-| Phase 0 | P0 | 1.1h | 阻塞性 Bug 修复 |
-| Phase 1 | P1 | 4h | 稳定性改进 |
-| Phase 2 | P1 | ~2d | 架构改进 |
-| Phase 3 | P2 | ~1w | 中期改进 |
-| Phase 4 | P3 | 长期 | 基础设施 |
+**总工时**: 5.1h  
+**Sprint 节奏**: Sprint 1 (P0, 1.1h) → Sprint 2 (P1, 4h)
 
 ---
 
-## Phase 0: P0 修复（立即执行）
+## 2. Sprint 1: P0 修复（目标：当天完成）
 
-### P0-1: OPTIONS 预检路由修复
+### 2.1 Epic 1: OPTIONS 预检路由修复（0.5h）
 
-**文件**: `vibex-backend/src/gateway.ts`
+#### Step 1: 分析当前代码（5 min）
+```bash
+# 查找 gateway.ts 文件
+find /root/.openclaw/vibex -name "gateway.ts" -o -name "index.ts" | grep backend | head -5
+cat /root/.openclaw/vibex/vibex-backend/src/app/gateway.ts 2>/dev/null || cat /root/.openclaw/vibex/vibex-backend/src/index.ts 2>/dev/null
+```
 
-**步骤**:
+**预期发现**: `app.options()` 在 `app.use(authMiddleware)` 之后注册。
+
+#### Step 2: 调整注册顺序（10 min）
+
+**文件**: `vibex-backend/src/app/gateway.ts`
+
+```typescript
+// 修复：OPTIONS handler 必须在 authMiddleware 之前注册
+
+// ✅ 正确顺序
+app.options('*', corsHandler);    // Step 1: CORS handler（预检请求处理）
+app.use('*', authMiddleware);    // Step 2: Auth middleware（所有其他请求）
+
+// 不受影响的路由
+app.get('/v1/projects', handleProjectsList);
+app.post('/v1/projects', handleProjectsCreate);
+```
+
+#### Step 3: 编写单元测试（10 min）
+
+**文件**: `vibex-backend/src/__tests__/gateway/options-handler.test.ts`
+
+```typescript
+describe('OPTIONS preflight', () => {
+  it('returns 204', async () => {
+    const res = await fetch('/v1/projects', { method: 'OPTIONS' });
+    expect(res.status).toBe(204);
+  });
+
+  it('has CORS headers', () => {
+    expect(res.headers.get('Access-Control-Allow-Origin')).toBe('*');
+  });
+
+  it('not 401', () => {
+    expect(res.status).not.toBe(401);
+  });
+
+  it('GET still requires auth', async () => {
+    const res = await fetch('/v1/projects', { method: 'GET' });
+    expect(res.status).toBe(401);
+  });
+});
+```
+
+#### Step 4: 手动验证（5 min）
 
 ```bash
-# Step 1: 确认当前路由注册顺序
-cat src/gateway.ts | grep -A 5 "options"
-
-# Step 2: 调整 OPTIONS handler 注册顺序
-# 在 authMiddleware 之前注册 protected_.options
-
-# Step 3: 验证
 curl -X OPTIONS -I https://api.vibex.top/v1/projects
-# 期望: HTTP/2 204, headers 含 Access-Control-Allow-*
+# 期望: HTTP/2 204 + Access-Control-Allow-Origin: *
 ```
 
-**改动范围**:
-- `gateway.ts`: OPTIONS handler 移动到 `authMiddleware` 之前
+#### Step 5: 本地 Wrangler 验证（5 min）
 
-**验收标准**:
-- [ ] `OPTIONS /v1/projects` 返回 204
-- [ ] CORS headers 正确返回
-- [ ] GET/POST 请求不受影响
+```bash
+cd /root/.openclaw/vibex/vibex-backend
+pnpm dev:hono &
+sleep 3
+curl -X OPTIONS -I http://localhost:3000/v1/projects
+```
+
+#### ✅ E1 验收标准
+
+- [ ] `curl -X OPTIONS -I /v1/projects` → 204
+- [ ] Headers 包含 `Access-Control-Allow-Origin: *`
+- [ ] GET `/v1/projects` → 401（无 token）
+- [ ] Jest 测试全部通过
+
+#### 回滚方案
+
+```bash
+# 回滚：恢复原始顺序
+git checkout vibex-backend/src/app/gateway.ts
+
+# 如果 Wrangler 部署后出问题：
+wrangler rollback
+```
 
 ---
 
-### P0-2: Canvas Context 多选修复
+### 2.2 Epic 2: Canvas Context 多选修复（0.3h）
 
-**文件**: `vibex-frontend/src/lib/canvas/components/BoundedContextTree.tsx`
-
-**步骤**:
+#### Step 1: 定位 BoundedContextTree.tsx（5 min）
 
 ```bash
-# Step 1: 定位 checkbox onChange
-grep -n "onChange" src/lib/canvas/components/BoundedContextTree.tsx
-
-# Step 2: 确认当前调用的是 toggleContextNode
-# 期望: 应该调用 onToggleSelect
-
-# Step 3: 修改
-# 修改前: onChange={() => toggleContextNode(node.id)}
-# 修改后: onChange={() => onToggleSelect(node.id)}
+find /root/.openclaw/vibex -name "BoundedContextTree.tsx" | head -3
+cat /root/.openclaw/vibex/vibex-fronted/src/components/BoundedContextTree.tsx 2>/dev/null | grep -A 10 "Checkbox"
 ```
 
-**改动范围**:
-- `BoundedContextTree.tsx`: checkbox onChange handler
+#### Step 2: 修复 checkbox onChange（10 min）
 
-**验收标准**:
-- [ ] checkbox 点击 → `onToggleSelect` 被调用
-- [ ] `selectedNodeIds` 状态正确更新
-- [ ] `toggleContextNode` 不再被 checkbox 触发
+**文件**: `vibex-fronted/src/components/BoundedContextTree.tsx`
+
+```typescript
+// 修复前
+<Checkbox
+  checked={selectedNodeIds.includes(node.id)}
+  onChange={() => toggleContextNode(node.id)}  // ❌ 错误
+/>
+
+// 修复后
+<Checkbox
+  checked={selectedNodeIds.includes(node.id)}
+  onChange={() => onToggleSelect(node.id)}      // ✅ 正确
+/>
+```
+
+#### Step 3: 确认 props 接口兼容（5 min）
+
+检查 `BoundedContextTreeProps` 是否已定义 `onToggleSelect`，如果未定义则添加：
+
+```typescript
+interface BoundedContextTreeProps {
+  nodes: ContextNode[];
+  selectedNodeIds: string[];
+  onToggleSelect: (nodeId: string) => void;   // 必填
+  toggleContextNode?: (nodeId: string) => void; // 保留但 checkbox 不调用
+}
+```
+
+#### Step 4: 编写组件测试（5 min）
+
+**文件**: `vibex-fronted/src/__tests__/BoundedContextTree.test.tsx`
+
+```typescript
+it('checkbox calls onToggleSelect on change', async () => {
+  const onToggleSelect = jest.fn();
+  render(<BoundedContextTree nodes={nodes} onToggleSelect={onToggleSelect} />);
+  const checkbox = screen.getAllByRole('checkbox')[0];
+  await userEvent.click(checkbox);
+  expect(onToggleSelect).toHaveBeenCalledWith('node-1');
+});
+```
+
+#### Step 5: Playwright E2E 验证（5 min）
+
+**文件**: `vibex-fronted/e2e/canvas-checkbox.spec.ts`
+
+```typescript
+test('canvas checkbox multi-select', async ({ page }) => {
+  await page.goto('/canvas');
+  await page.click('[data-testid="context-node-node1"] checkbox');
+  await expect(page.locator('.selected-count')).toHaveText('1');
+
+  await page.click('[data-testid="context-node-node2"] checkbox');
+  await expect(page.locator('.selected-count')).toHaveText('2');
+});
+```
+
+#### ✅ E2 验收标准
+
+- [ ] `onToggleSelect` 被 checkbox 调用
+- [ ] `toggleContextNode` 不被 checkbox 调用
+- [ ] `selectedNodeIds` 更新
+- [ ] Jest 组件测试通过
+- [ ] Playwright E2E 通过
+
+#### 回滚方案
+
+```bash
+git checkout vibex-fronted/src/components/BoundedContextTree.tsx
+```
 
 ---
 
-### P0-3: generate-components flowId 修复
+### 2.3 Epic 3: generate-components flowId（0.3h）
 
-**文件**: 
-- `vibex-backend/src/routes/canvas/generate-components.ts`
-- AI prompt 模板
-
-**步骤**:
+#### Step 1: 定位 schema 文件（5 min）
 
 ```bash
-# Step 1: 定位 AI schema 定义
-grep -n "flowId" src/routes/canvas/generate-components.ts
-
-# Step 2: 确认 schema 中缺少 flowId 字段
-
-# Step 3: 在 schema 中添加
-flowId: z.string().describe('Flow identifier')
-
-# Step 4: 确认 prompt 模板要求输出 flowId
-grep -n "flowId" src/lib/prompts/*.ts
+find /root/.openclaw/vibex -name "ai-component*.ts" -o -name "schema*.ts" | grep -i component | head -5
+grep -rn "flowId" /root/.openclaw/vibex/vibex-backend/src/ | head -20
 ```
 
-**改动范围**:
-- AI schema 定义
-- Prompt 模板
+#### Step 2: 修复 schema（10 min）
 
-**验收标准**:
-- [ ] schema 定义包含 `flowId: string`
-- [ ] prompt 明确要求 AI 输出 flowId
-- [ ] 测试: `flowId` 不再是 "unknown"
+**文件**: `vibex-backend/src/schemas/ai-component.ts`
 
----
-
-## Phase 1: P1 稳定性改进（1 个月内）
-
-### P1-1: SSE 超时 + 连接清理
-
-**文件**:
-- `vibex-backend/src/lib/sse-stream-lib/index.ts`
-- `vibex-backend/src/routes/canvas/stream.ts`
-
-**步骤**:
-
-```bash
-# Step 1: 引入 AbortController.timeout
-# 修改 aiService.chat 调用
-const controller = AbortSignal.timeout(10000);
-const response = await aiService.chat({ ...options, signal: controller });
-
-# Step 2: 实现 ReadableStream.cancel() 清理 timers
-const stream = new ReadableStream({
-  cancel(reason) {
-    clearTimeout(timeoutId);
-    clearInterval(heartbeatInterval);
-    // ... 清理所有 timers
-  }
+```typescript
+// 添加 flowId 字段
+const AIComponentSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: z.enum(['bounded-context', 'flow', 'service', 'gateway']),
+  flowId: z.string().regex(/^flow-/, "flowId must start with 'flow-'"), // ✅ 新增
+  position: z.object({ x: z.number(), y: z.number() }),
 });
 
-# Step 3: 添加 jest 测试
-# tests/services/stream.test.ts
+// 向后兼容：历史数据 fallback
+const parseComponent = (raw: unknown) => {
+  const result = AIComponentSchema.safeParse(raw);
+  if (result.success) return result.data;
+  // 旧数据 fallback（不破坏已有功能）
+  console.warn('[aiService] Component missing flowId, using fallback');
+  return { ...(raw as object), flowId: 'unknown' };
+};
 ```
 
-**改动范围**:
-- `sse-stream-lib/index.ts`
-- `routes/canvas/stream.ts`
-- 新增 `tests/services/stream.test.ts`
+#### Step 3: 更新 prompt（5 min）
 
-**验收标准**:
-- [ ] 10s 无响应时流自动关闭
-- [ ] `stream.cancel()` 调用所有 `clearTimeout`
-- [ ] jest 测试覆盖超时和清理逻辑
+**文件**: `vibex-backend/src/prompts/component-generation.ts`
+
+```typescript
+const COMPONENT_PROMPT = `
+生成以下组件时，每个组件必须包含：
+1. id: 唯一标识符
+2. name: 组件名称
+3. type: 组件类型
+4. flowId: 所属流程 ID，格式为 "flow-{uuid}"（例: "flow-a1b2c3d4"）
+5. position: { x: number, y: number }
+
+注意：flowId 不能为空字符串或 "unknown"。
+`;
+```
+
+#### Step 4: 编写测试（5 min）
+
+```typescript
+it('flowId starts with "flow-"', async () => {
+  const components = await generateComponents(mockContext);
+  components.forEach(c => {
+    expect(c.flowId).toMatch(/^flow-/);
+    expect(c.flowId).not.toBe('unknown');
+  });
+});
+```
+
+#### ✅ E3 验收标准
+
+- [ ] schema 包含 `flowId` 字段（必填）
+- [ ] prompt 明确要求 flowId
+- [ ] `flowId` 不等于 "unknown"
+- [ ] 向后兼容 fallback 存在
+
+#### 回滚方案
+
+```bash
+git checkout vibex-backend/src/schemas/ai-component.ts vibex-backend/src/prompts/
+```
 
 ---
 
-### P1-2: 分布式限流（Cache API）
+### Sprint 1 验收
+
+| Epic | 验收标准 | 状态 |
+|------|----------|------|
+| E1 | OPTIONS → 204, not 401 | ⬜ |
+| E2 | checkbox → onToggleSelect | ⬜ |
+| E3 | flowId → /flow-*/ | ⬜ |
+
+---
+
+## 3. Sprint 2: P1 改进
+
+### 3.1 Epic 4: SSE 超时 + 连接清理（1.5h）
+
+#### Step 1: 定位 aiService.ts（10 min）
+
+```bash
+find /root/.openclaw/vibex -name "aiService.ts" -o -name "ai.ts" | grep backend | head -3
+cat /root/.openclaw/vibex/vibex-backend/src/services/aiService.ts 2>/dev/null
+```
+
+#### Step 2: 实现 chatWithTimeout（30 min）
+
+**文件**: `vibex-backend/src/services/aiService.ts`
+
+```typescript
+// 添加 TimeoutController
+function chatWithTimeout(options: ChatOptions, timeoutMs = 10_000): TimeoutController {
+  const controller = new AbortController();
+  let timerId: ReturnType<typeof setTimeout> | null = null;
+
+  timerId = setTimeout(() => {
+    controller.abort('timeout');
+  }, timeoutMs);
+
+  return {
+    signal: controller.signal,
+    cancel: () => {
+      if (timerId !== null) {
+        clearTimeout(timerId);
+        timerId = null;
+      }
+    },
+  };
+}
+
+// 更新 chat() 使用 timeout
+async function chat(options: ChatOptions): Promise<ReadableStream> {
+  const { signal, cancel } = chatWithTimeout(options, 10_000);
+
+  try {
+    const response = await fetch(AI_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: options.messages }),
+      signal,  // ✅ 传入 AbortSignal
+    });
+
+    if (!response.body) throw new Error('No response body');
+
+    const stream = response.body;
+    const reader = stream.getReader();
+
+    // 包装为带 cancel cleanup 的 ReadableStream
+    return new ReadableStream({
+      async start(controller) {
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            controller.enqueue(value);
+          }
+          controller.close();
+        } catch (err) {
+          controller.error(err);
+        } finally {
+          cancel();  // ✅ 正常结束时也清理 timer
+        }
+      },
+      async cancel() {
+        // ✅ ReadableStream.cancel() 被调用时清理
+        await reader.cancel();
+        cancel();
+      },
+    });
+  } catch (err) {
+    cancel();  // ✅ 异常时清理
+    throw err;
+  }
+}
+```
+
+#### Step 3: 编写测试（20 min）
+
+```typescript
+describe('SSE timeout', () => {
+  it('times out after 10s', async () => {
+    jest.useFakeTimers();
+    const slowStream = mockSlowStream();
+    const promise = streamAIResponse(slowStream, 10_000);
+
+    await jest.advanceTimersByTimeAsync(10_000);
+    await expect(promise).rejects.toThrow('timeout');
+
+    jest.useRealTimers();
+  });
+
+  it('clears timer on cancel', () => {
+    jest.useFakeTimers();
+    const { cancel } = chatWithTimeout({ messages: [] });
+    await jest.advanceTimersByTimeAsync(100);
+    cancel();
+    expect(clearTimeout).toHaveBeenCalled();
+    jest.useRealTimers();
+  });
+
+  it('timer cleanup on client disconnect', async () => {
+    const stream = await chat({ messages: [] });
+    await stream.cancel();
+    expect(clearTimeout).toHaveBeenCalled();
+  });
+});
+```
+
+#### Step 4: Wrangler dev 验证（15 min）
+
+```bash
+cd /root/.openclaw/vibex/vibex-backend
+pnpm dev:hono &
+sleep 3
+# 测试 SSE 超时
+timeout 12 curl -N http://localhost:3000/chat/stream
+# 期望：12s 后连接关闭，不挂死 Worker
+```
+
+#### Step 5: Wrangler 部署验证（15 min）
+
+```bash
+wrangler deploy --env staging
+# 验证 staging 环境超时行为
+```
+
+#### ✅ E4 验收标准
+
+- [ ] 10s 无响应 → `controller.close()` / `controller.error()`
+- [ ] `ReadableStream.cancel()` → `clearTimeout()` 被调用
+- [ ] Worker 不挂死（不泄漏 timer）
+- [ ] Jest 测试 > 90% 覆盖率
+
+#### 回滚方案
+
+```bash
+git checkout vibex-backend/src/services/aiService.ts
+wrangler rollback  # 如果已部署
+```
+
+---
+
+### 3.2 Epic 5: 分布式限流（1.5h）
+
+#### Step 1: 定位 rateLimit.ts（10 min）
+
+```bash
+find /root/.openclaw/vibex -name "rateLimit.ts" -o -name "rate-limit.ts" | head -3
+grep -rn "rateLimit\|rate-limit\|limiter" /root/.openclaw/vibex/vibex-backend/src/ | head -20
+```
+
+#### Step 2: 重构为 Cache API 实现（30 min）
 
 **文件**: `vibex-backend/src/lib/rateLimit.ts`
 
-**步骤**:
+```typescript
+import { caches } from '@cloudflare/workers-types';
 
-```bash
-# Step 1: 确认当前实现使用内存 Map
-grep -n "new Map" src/lib/rateLimit.ts
-
-# Step 2: 替换为 Cache API
-const cacheKey = `ratelimit:${identifier}`;
-const cached = await caches.default.match(cacheKey);
-
-if (cached) {
-  const { count, timestamp } = await cached.json();
-  // 限流逻辑
-} else {
-  // 创建新记录
-  await caches.default.put(cacheKey, new Response(JSON.stringify({...})));
+interface RateLimitOptions {
+  key: string;
+  limit: number;
+  windowMs: number;
 }
 
-# Step 3: 验证 wrangler.toml 配置 Cache API
-# 确认 wrangler.toml 中 comatibility_flags 包含 "nodejs_compat"
-```
-
-**改动范围**:
-- `lib/rateLimit.ts`
-- `wrangler.toml`（如需要）
-
-**验收标准**:
-- [ ] 限流使用 `caches.default`
-- [ ] 接口不变（向后兼容）
-- [ ] 并发 100 请求 → 限流一致
-
----
-
-### P1-3: test-notify 去重
-
-**文件**:
-- `vibex-backend/scripts/dedup.js`
-- `vibex-backend/scripts/test-notify.js`
-
-**步骤**:
-
-```bash
-# Step 1: 创建 dedup.js
-# 实现 checkDedup(key) 和 recordSend(key)
-# 使用 .dedup-cache.json 持久化
-
-# Step 2: 集成到 test-notify.js
-const dedup = checkDedup(notifyKey);
-if (dedup.skipped) {
-  console.log('Duplicate, skipping');
-  return;
-}
-recordSend(notifyKey);
-// 发送通知逻辑
-
-# Step 3: 添加 jest 测试
-# tests/scripts/dedup.test.ts
-```
-
-**改动范围**:
-- 新增 `scripts/dedup.js`
-- 修改 `scripts/test-notify.js`
-
-**验收标准**:
-- [ ] 5 分钟内相同 key 只发送一次
-- [ ] 状态持久化到 `.dedup-cache.json`
-- [ ] jest 测试覆盖
-
----
-
-## Phase 2: P1 架构改进（1-3 个月）
-
-### P2-1: E2E 测试可运行化
-
-**关联项目**: `vibex-e2e-test-fix`
-
-**步骤**:
-
-```bash
-# Step 1: 修复 Jest + Playwright 配置
-# 修改 jest.config.js
-testEnvironment: 'jsdom',  // 移除或修改
-
-# 配置 Playwright runner
-transform: {
-  '^.+\\.test\\.ts$': '@playwright/test/reporter'
+interface RateLimitResult {
+  allowed: boolean;
+  remaining: number;
+  resetAt: number;
+  total: number;
 }
 
-# Step 2: 修复 pre-existing 测试失败
-# 逐个分析失败测试，修复或标记 skip
+// 内存 fallback（Cache API 不可用时）
+const memoryFallback = new Map<string, { count: number; resetAt: number }>();
 
-# Step 3: 建立 CI gate
-# .github/workflows/test.yml
-- name: Run E2E Tests
-  run: npx playwright test --reporter=junit
-  # 允许失败但要求覆盖率报告
-```
+async function checkRateLimit(options: RateLimitOptions): Promise<RateLimitResult> {
+  const cacheKey = `ratelimit:${options.key}`;
+  const windowSec = Math.ceil(options.windowMs / 1000);
 
-**改动范围**:
-- `jest.config.js`
-- `playwright.config.ts`
-- 测试文件修复
+  try {
+    const cache = caches.default;
+    const cached = await cache.match(cacheKey);
+    let data: { count: number; resetAt: number };
 
-**验收标准**:
-- [ ] E2E 测试可在 CI 中运行
-- [ ] 无 pre-existing 测试污染
-- [ ] CI gate 阻止 flaky 测试合并
+    if (cached) {
+      data = await cached.json();
+    } else {
+      data = { count: 0, resetAt: Date.now() + options.windowMs };
+    }
 
----
+    // 重置过期窗口
+    if (Date.now() > data.resetAt) {
+      data = { count: 0, resetAt: Date.now() + options.windowMs };
+    }
 
-### P2-2: generate-components 合并
+    if (data.count >= options.limit) {
+      return { allowed: false, remaining: 0, resetAt: data.resetAt, total: data.count };
+    }
 
-**关联项目**: `vibex-generate-components-consolidation`
+    data.count++;
+    const response = new Response(JSON.stringify(data), {
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': `max-age=${windowSec}` },
+    });
+    await cache.put(cacheKey, response);
 
-**步骤**:
+    return {
+      allowed: true,
+      remaining: options.limit - data.count,
+      resetAt: data.resetAt,
+      total: data.count,
+    };
+  } catch (err) {
+    // ✅ Fallback: 内存 Map + 告警
+    console.warn('[rateLimit] Cache API unavailable, using memory fallback:', err);
+    return rateLimitMemoryFallback(options);
+  }
+}
 
-```bash
-# Step 1: 对比两个实现
-diff src/routes/canvas/route.ts src/routes/v1/canvas/generate-components/index.ts
+function rateLimitMemoryFallback(options: RateLimitOptions): RateLimitResult {
+  const key = `ratelimit:${options.key}`;
+  let data = memoryFallback.get(key);
 
-# Step 2: 确定保留哪个实现（推荐 /v1/*）
-# 迁移 /api/* 调用到 /v1/*
+  if (!data || Date.now() > data.resetAt) {
+    data = { count: 0, resetAt: Date.now() + options.windowMs };
+  }
 
-# Step 3: 删除冗余文件
-rm src/routes/canvas/route.ts
-# 或重定向到新路由
+  if (data.count >= options.limit) {
+    return { allowed: false, remaining: 0, resetAt: data.resetAt, total: data.count };
+  }
 
-# Step 4: 统一 prompt 模板
-# 确保两处 prompt 一致
-```
+  data.count++;
+  memoryFallback.set(key, data);
 
-**改动范围**:
-- `routes/canvas/route.ts`
-- `routes/v1/canvas/generate-components/`
-
-**验收标准**:
-- [ ] 只有一个 generate-components 实现
-- [ ] prompt 模板统一
-- [ ] 所有调用方迁移到新路由
-
----
-
-### P2-3: 统一 API 响应格式
-
-**步骤**:
-
-```bash
-# Step 1: 定义统一响应类型
-# src/types/api-response.ts
-interface APIResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: {
-    code: string;
-    message: string;
+  return {
+    allowed: true,
+    remaining: options.limit - data.count,
+    resetAt: data.resetAt,
+    total: data.count,
   };
-  timestamp: string;
 }
 
-# Step 2: 创建中间件
-# src/middleware/responseFormatter.ts
-
-# Step 3: 应用到所有 /v1/* 端点
-# 逐个审查 endpoint 返回格式
-
-# Step 4: 更新 openapi.json
+export { checkRateLimit };
 ```
 
-**改动范围**:
-- 新增 `types/api-response.ts`
-- 新增 `middleware/responseFormatter.ts`
-- 修改所有 `/v1/*` endpoint
+#### Step 3: 添加 wrangler.json 配置（10 min）
 
-**验收标准**:
-- [ ] 所有 /v1/* 端点返回统一格式
-- [ ] openapi.json 同步更新
-- [ ] 客户端能统一处理响应
+**文件**: `vibex-backend/wrangler.json`
+
+```json
+{
+  "main": "src/index.ts",
+  "compatibility_flags": ["streams_enable_constructors"],
+  "vars": {
+    "RATE_LIMIT_WINDOW_MS": "60000",
+    "RATE_LIMIT_MAX_REQUESTS": "100"
+  }
+}
+```
+
+#### Step 4: 编写测试（20 min）
+
+```typescript
+describe('Distributed rate limit', () => {
+  beforeEach(() => {
+    global.caches = { default: mockCache } as any;
+  });
+
+  it('uses Cache API', async () => {
+    await checkRateLimit({ key: 'test', limit: 10, windowMs: 60_000 });
+    expect(mockCache.match).toHaveBeenCalled();
+    expect(mockCache.put).toHaveBeenCalled();
+  });
+
+  it('returns 429 when limit exceeded', async () => {
+    mockCache.match.mockResolvedValue(
+      new Response(JSON.stringify({ count: 10, resetAt: Date.now() + 60_000 }))
+    );
+    const result = await checkRateLimit({ key: 'test', limit: 10, windowMs: 60_000 });
+    expect(result.allowed).toBe(false);
+  });
+
+  it('falls back to memory when Cache API throws', async () => {
+    mockCache.match.mockRejectedValue(new Error('Cache unavailable'));
+    const result = await checkRateLimit({ key: 'test', limit: 10, windowMs: 60_000 });
+    expect(result.allowed).toBe(true);
+  });
+});
+```
+
+#### Step 5: 多 Worker 集成测试（10 min）
+
+在 staging 环境启动多个并发请求验证跨 Worker 一致性。
+
+#### ✅ E5 验收标准
+
+- [ ] `caches.default` 被调用
+- [ ] 限流计数跨 Worker 共享
+- [ ] 超过 limit → 429
+- [ ] fallback 机制工作
+- [ ] Jest 测试 > 80% 覆盖率
+
+#### 回滚方案
+
+```bash
+git checkout vibex-backend/src/lib/rateLimit.ts
+wrangler rollback
+```
 
 ---
 
-### P2-4: Store 治理规范
+### 3.3 Epic 6: test-notify 去重（1h）
 
-**关联项目**: `vibex-store-governance`
+#### Step 1: 创建 dedup.ts（20 min）
 
-**步骤**:
+**文件**: `vibex-backend/src/lib/dedup.ts`
 
-```bash
-# Step 1: 制定 ADR-ARCH-001
-# 创建 docs/adr/ADR-ARCH-001-canvas-store-governance.md
+```typescript
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
-# Step 2: 合并冗余 store
-# simplifiedFlowStore + flowStore → flowStore
-# 使用 grep 确定调用方
-grep -rn "simplifiedFlowStore" src/
+const DEDUP_WINDOW_MS = 5 * 60 * 1000;
+const DEDUP_CACHE_FILE = path.join(process.cwd(), '.dedup-cache.json');
 
-# Step 3: 建立 selector 导出规范
-# 每个 store 必须导出
-export const selectXxx = (state: StoreState) => state.xxx;
+interface DedupRecord {
+  key: string;
+  sentAt: number;
+  skipped: boolean;
+}
 
-# Step 4: 引入事件总线替代直接 getState()
-# src/lib/events/index.ts
+interface DedupResult {
+  skipped: boolean;
+  reason?: string;
+  nextAllowedAt?: number;
+}
+
+const memoryCache = new Map<string, DedupRecord>();
+
+async function loadDedupCache(): Promise<Record<string, DedupRecord>> {
+  try {
+    const content = await fs.readFile(DEDUP_CACHE_FILE, 'utf-8');
+    return JSON.parse(content);
+  } catch {
+    return {};
+  }
+}
+
+async function saveDedupCache(cache: Record<string, DedupRecord>): Promise<void> {
+  await fs.writeFile(DEDUP_CACHE_FILE, JSON.stringify(cache, null, 2));
+}
+
+async function checkDedup(key: string): Promise<DedupResult> {
+  const now = Date.now();
+
+  // 快速路径
+  const memEntry = memoryCache.get(key);
+  if (memEntry && now - memEntry.sentAt < DEDUP_WINDOW_MS) {
+    return { skipped: true, reason: 'in-memory duplicate' };
+  }
+
+  // 持久化路径
+  const cache = await loadDedupCache();
+  const fileEntry = cache[key];
+
+  if (fileEntry && now - fileEntry.sentAt < DEDUP_WINDOW_MS) {
+    memoryCache.set(key, fileEntry);
+    return {
+      skipped: true,
+      reason: 'file duplicate',
+      nextAllowedAt: fileEntry.sentAt + DEDUP_WINDOW_MS,
+    };
+  }
+
+  return { skipped: false };
+}
+
+async function recordSend(key: string): Promise<void> {
+  const now = Date.now();
+  const record: DedupRecord = { key, sentAt: now, skipped: false };
+
+  memoryCache.set(key, record);
+
+  const cache = await loadDedupCache();
+  cache[key] = record;
+  await saveDedupCache(cache);
+}
+
+function hashEvent(event: unknown): string {
+  const str = typeof event === 'string' ? event : JSON.stringify(event);
+  // 简单 hash：实际生产应使用 crypto.createHash
+  return `dedup:${Buffer.from(str).toString('base64').slice(0, 32)}`;
+}
+
+export { checkDedup, recordSend, hashEvent, DEDUP_WINDOW_MS, DedupResult };
 ```
 
-**改动范围**:
-- 新增 ADR 文档
-- 合并 `simplifiedFlowStore.ts`
-- 新增事件总线
+#### Step 2: 集成到 test-notify（15 min）
 
-**验收标准**:
-- [ ] ADR-ARCH-001 审批通过
-- [ ] 冗余 store 合并
-- [ ] 新 store 必须符合规范
+**文件**: `vibex-backend/src/routes/test-notify.ts`
+
+```typescript
+import { checkDedup, recordSend, hashEvent } from '../lib/dedup';
+
+async function testNotify(event: TestEvent): Promise<void> {
+  const dedupKey = hashEvent(event);
+
+  const result = await checkDedup(dedupKey);
+  if (result.skipped) {
+    console.log(`[dedup] Skipped duplicate: ${dedupKey} (${result.reason})`);
+    return;
+  }
+
+  await sendWebhook(event);
+  await recordSend(dedupKey);
+}
+```
+
+#### Step 3: 编写测试（15 min）
+
+```typescript
+describe('test-notify deduplication', () => {
+  beforeEach(() => {
+    memoryCache.clear();
+    jest.spyOn(fs, 'readFile').mockResolvedValue('{}');
+    jest.spyOn(fs, 'writeFile').mockResolvedValue();
+  });
+
+  it('skips duplicate within 5 minutes', async () => {
+    await recordSend('event-1');
+    const result = await checkDedup('event-1');
+    expect(result.skipped).toBe(true);
+  });
+
+  it('allows after 5 minutes', async () => {
+    const oldCache: Record<string, DedupRecord> = {
+      'event-1': { key: 'event-1', sentAt: Date.now() - 6 * 60 * 1000, skipped: false },
+    };
+    jest.spyOn(fs, 'readFile').mockResolvedValue(JSON.stringify(oldCache));
+
+    const result = await checkDedup('event-1');
+    expect(result.skipped).toBe(false);
+  });
+
+  it('persists to .dedup-cache.json', async () => {
+    await recordSend('event-2');
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      '.dedup-cache.json',
+      expect.stringContaining('event-2')
+    );
+  });
+});
+```
+
+#### Step 4: 手动验证（10 min）
+
+```bash
+# 模拟重复通知
+node -e "
+const { checkDedup, recordSend } = require('./src/lib/dedup');
+(async () => {
+  await recordSend('test-event');
+  const r = await checkDedup('test-event');
+  console.log('First check:', r);
+  const r2 = await checkDedup('test-event');
+  console.log('Second check (should skip):', r2);
+})();
+"
+```
+
+#### ✅ E6 验收标准
+
+- [ ] 5 分钟内重复 → `skipped: true`
+- [ ] `.dedup-cache.json` 持久化
+- [ ] 内存缓存快速路径
+- [ ] Jest 测试 > 90% 覆盖率
+
+#### 回滚方案
+
+```bash
+git checkout vibex-backend/src/lib/dedup.ts vibex-backend/src/routes/test-notify.ts
+```
 
 ---
 
-### P2-5: Prompt 注入防护增强
+## 4. 部署清单
 
-**步骤**:
+### 4.1 Pre-deployment 检查
 
-```bash
-# Step 1: 定义检测模式
-# src/lib/security/prompt-injection.ts
-const INJECTION_PATTERNS = [
-  /ignore (previous|above|all) (instructions?|commands?|rules?)/i,
-  /you (are now|should act as) (?:a|an) (?:different|new|another)/i,
-  /\b(instead|rather|actually|rather than)\b.*\b(ignore|forget|disregard)\b/i,
-  // ... 更多模式
-];
+| # | 检查项 | 命令 |
+|---|--------|------|
+| 1 | 所有 Jest 测试通过 | `pnpm test -- --passWithNoTests` |
+| 2 | TypeScript 类型检查 | `pnpm --filter vibex-backend lint` |
+| 3 | 覆盖率 > 80% | `pnpm test -- --coverage --coverageThreshold` |
+| 4 | 无内联 style（前端） | `grep -rn "style={{" vibex-fronted/src/ --include="*.tsx"` |
+| 5 | Playwright E2E 通过 | `pnpm --filter vibex-fronted test:e2e` |
 
-# Step 2: 应用到用户输入点
-# schemas/security.ts 或专门的 middleware
-
-# Step 3: 添加日志和监控
-# 记录检测到的注入尝试
-```
-
-**改动范围**:
-- 新增 `lib/security/prompt-injection.ts`
-- 修改用户输入处理逻辑
-
-**验收标准**:
-- [ ] 主流注入模式被检测
-- [ ] 检测到时记录日志
-- [ ] 不影响正常请求
-
----
-
-## Phase 3: P2 中期改进（3-6 个月）
-
-### P3-1: SSE 流服务统一抽象
-
-**步骤**:
+### 4.2 部署步骤
 
 ```bash
-# Step 1: 定义 StreamService 接口
-# src/lib/stream/StreamService.ts
+# 1. 创建 feature 分支
+git checkout -b fix/vibex-proposals-20260406
 
-# Step 2: 重构现有 SSE 端点
-# routes/canvas/stream.ts
-# routes/v1/canvas/stream.ts
+# 2. 提交每个 Epic
+git add vibex-backend/src/app/gateway.ts
+git commit -m "fix(E1): OPTIONS handler before authMiddleware"
+git push origin fix/vibex-proposals-20260406
 
-# Step 3: 统一超时、限流、清理逻辑
-```
-
-**验收标准**:
-- [ ] 统一的 StreamService 接口
-- [ ] 所有 SSE 端点使用统一服务
-- [ ] 可测试性提升
-
----
-
-### P3-2: Prompt 模板分层
-
-**步骤**:
-
-```bash
-# Step 1: 拆分 templates
-mkdir -p src/lib/prompts/{templates,renderers,validators}
-
-# Step 2: 迁移现有模板
-mv src/lib/prompts/*.ts src/lib/prompts/templates/
-
-# Step 3: 创建渲染引擎
-# src/lib/prompts/renderers/index.ts
-
-# Step 4: 添加 Golden test
-```
-
-**验收标准**:
-- [ ] templates/renderers/validators 分离
-- [ ] 现有模板迁移完成
-- [ ] Golden test 覆盖
-
----
-
-### P3-3: D1 Repository 层统一
-
-**步骤**:
-
-```bash
-# Step 1: 定义 Repository 接口
-# src/lib/db/Repository.ts
-
-# Step 2: 创建基础实现
-# src/lib/db/BaseRepository.ts
-
-# Step 3: 迁移现有 DB 访问
-# grep -rn "env.DB.prepare" src/routes/
-```
-
-**验收标准**:
-- [ ] 统一 Repository 模式
-- [ ] 事务边界清晰
-- [ ] 可 Mock 测试
-
----
-
-### P3-4: wrangler 环境配置
-
-**步骤**:
-
-```bash
-# Step 1: 修改 wrangler.toml
-# [env.staging]
-# [env.production]
-
-# Step 2: 配置 secrets
-# wrangler secret put API_KEY --env staging
-
-# Step 3: 部署脚本
-# scripts/deploy.sh
-```
-
-**验收标准**:
-- [ ] 三个环境配置完成
-- [ ] secrets 管理规范
-- [ ] 部署脚本可用
-
----
-
-### P3-5: CanvasPage 分解
-
-**步骤**:
-
-```bash
-# Step 1: 创建目录结构
-mkdir -p src/pages/canvas/{components,hooks}
-
-# Step 2: 拆分组件
-# CanvasToolbar.tsx
-# CanvasHeader.tsx
-# CanvasBody.tsx
-
-# Step 3: 提取 hooks
-# useCanvasInit.ts
-# useCanvasEvents.ts
-# useCanvasAI.ts
-
-# Step 4: 组合到 index.tsx
-```
-
-**验收标准**:
-- [ ] CanvasPage 分解为多个文件
-- [ ] 每个文件 < 300 行
-- [ ] 功能无损失
-
----
-
-### P3-6: 内联 style 检测
-
-**步骤**:
-
-```bash
-# Step 1: 创建 CI 检测脚本
-# scripts/check-inline-styles.sh
-#!/bin/bash
-count=$(grep -rn "style={{" src/ --include="*.tsx" \
-  | grep -v node_modules \
-  | grep -v ".test." \
-  | grep -v "white-list.txt" \
-  | wc -l)
-
-if [ $count -gt 0 ]; then
-  echo "ERROR: Found $count inline styles"
-  grep -rn "style={{" src/ --include="*.tsx" \
-    | grep -v node_modules \
-    | grep -v ".test." \
-    | grep -v "white-list.txt"
-  exit 1
-fi
-
-# Step 2: 加入 CI
-# .github/workflows/lint.yml
-- name: Check inline styles
-  run: ./scripts/check-inline-styles.sh
-```
-
-**验收标准**:
-- [ ] CI 检测脚本可用
-- [ ] 白名单机制建立
-- [ ] 新增内联 style 阻止合并
-
----
-
-## 部署清单
-
-### 通用部署流程
-
-```bash
-# 1. 本地测试
-pnpm test
-pnpm test:e2e
-
-# 2. 构建
-pnpm build
-
-# 3. TypeScript 类型检查
-pnpm typecheck
-
-# 4. Lint 检查
-pnpm lint
-
-# 5. 部署 (Staging)
+# 3. 部署 staging
 wrangler deploy --env staging
 
-# 6. Staging 验证
+# 4. 验证 staging
 curl -X OPTIONS -I https://staging-api.vibex.top/v1/projects
 
-# 7. 部署 (Production)
-wrangler deploy --env production
+# 5. 创建 PR
+gh pr create --title "fix: P0+P1 bug fixes for proposals 2026-04-06" --body "..."
 
-# 8. Production 验证
-curl -X OPTIONS -I https://api.vibex.top/v1/projects
+# 6. 合并到 main
+gh pr merge --squash
+
+# 7. 自动部署到 production
+# (CI/CD pipeline 触发)
 ```
 
-### P0 修复部署清单
+### 4.3 监控清单
 
-| 检查项 | 命令/验证方式 |
-|--------|--------------|
-| OPTIONS 返回 204 | `curl -X OPTIONS -I https://api.vibex.top/v1/projects` |
-| Canvas checkbox 可用 | 手动测试 checkbox 选择 |
-| flowId 不再 unknown | API 响应检查 |
-
-### P1 修复部署清单
-
-| 检查项 | 命令/验证方式 |
-|--------|--------------|
-| SSE 10s 超时 | `curl` 模拟慢响应，计时验证 |
-| 限流跨 Worker 一致 | 并发测试脚本 |
-| test-notify 去重 | 5 分钟内重复调用验证 |
-
-### P2 修复部署清单
-
-| 检查项 | 命令/验证方式 |
-|--------|--------------|
-| E2E 测试通过 | `pnpm test:e2e` |
-| API 响应格式统一 | 审查所有 /v1/* 响应 |
-| Store 治理规范 | 代码审查 |
+| Epic | 监控指标 | 告警阈值 |
+|------|----------|----------|
+| E1 | OPTIONS 204 比例 | < 99% |
+| E2 | checkbox 点击成功率 | < 95% |
+| E3 | flowId = "unknown" 比例 | > 1% |
+| E4 | SSE 超时次数 | > 5/min |
+| E5 | 限流 429 比例 | > 20% |
+| E6 | 重复通知次数 | > 0 |
 
 ---
 
-## 回滚方案
+## 5. 回滚方案
 
-### P0 修复回滚
-
-**OPTIONS 修复回滚**:
+### 5.1 自动回滚（Wrangler）
 
 ```bash
-# 立即回滚
-git revert HEAD --no-commit
-git checkout src/gateway.ts
+# Wrangler 自动保留历史版本
+wrangler rollback [version]  # 回滚到指定版本
 
-# 或使用备份
-cp src/gateway.ts.backup src/gateway.ts
-
-# 验证
-curl -X OPTIONS -I https://api.vibex.top/v1/projects
-# 期望: 恢复 401 状态
+# 查看版本列表
+wrangler versions list
 ```
 
-**Canvas checkbox 修复回滚**:
+### 5.2 手动回滚（Git）
 
 ```bash
-# 回滚
-git checkout HEAD~1 src/lib/canvas/components/BoundedContextTree.tsx
+# 获取上一个稳定提交
+git log --oneline -5
 
-# 验证
-# checkbox 应恢复原状
+# 回滚指定文件
+git checkout <stable-commit> -- vibex-backend/src/app/gateway.ts
+
+# 回滚后重新部署
+wrangler deploy
 ```
 
-**flowId 修复回滚**:
+### 5.3 回滚决策矩阵
 
-```bash
-# 回滚 schema 和 prompt
-git checkout HEAD~1 src/routes/canvas/generate-components.ts
+| 场景 | 触发条件 | 回滚策略 |
+|------|----------|----------|
+| E1 OPTIONS 500 | > 5% OPTIONS 返回 500 | `wrangler rollback` |
+| E2 多选失效 | checkbox 无响应 | `git checkout` → `wrangler deploy` |
+| E3 flowId 全部 unknown | > 50% unknown | `git checkout` schema → redeploy |
+| E4 Worker 挂死 | SSE 连接不释放 | `wrangler rollback` |
+| E5 限流完全失效 | 大量超额请求 | `git checkout` rateLimit → redeploy |
+| E6 重复通知 | 任何重复通知 | `git checkout` dedup → redeploy |
 
-# 验证
-# AI 输出 flowId 应恢复 "unknown"
+---
+
+## 6. 成功标准
+
+### 6.1 验收标准（AC）
+
+| AC | 描述 | 验证方式 |
+|----|------|----------|
+| AC1 | OPTIONS `/v1/projects` → 204 + CORS headers | `curl -X OPTIONS -I` |
+| AC2 | Canvas checkbox → `selectedNodeIds` 更新 | Playwright E2E |
+| AC3 | `generate-components` 输出 `flowId` 不是 "unknown" | Jest + 日志检查 |
+| AC4 | SSE 流 10s 无响应 → 关闭，不挂死 Worker | Playwright SSE test |
+| AC5 | 100 并发限流 → 计数一致，后续 429 | 压力测试脚本 |
+| AC6 | test-notify 5min 内重复 → 跳过发送 | Jest 集成测试 |
+
+### 6.2 完成标准
+
+- [ ] 6 个 Epic 全部完成
+- [ ] 全部 AC 通过
+- [ ] Jest 覆盖率 > 80%
+- [ ] Playwright E2E 全部通过
+- [ ] PR 审查通过
+- [ ] 部署到 production
+- [ ] 监控指标正常（1 周无告警）
+
+---
+
+## 7. 时间线
+
 ```
+Day 1 (Sprint 1: P0)
+├── T+0:00 - T+0:30  E1 OPTIONS 修复
+├── T+0:30 - T+1:00  E1 验证
+├── T+1:00 - T+1:30  E2 Canvas 多选修复
+├── T+1:30 - T+2:00  E2 验证
+├── T+2:00 - T+2:30  E3 flowId 修复
+└── T+2:30 - T+3:00  E3 验证 + Sprint 1 收尾
 
-### P1 修复回滚
+Day 2 (Sprint 2: P1)
+├── T+3:00 - T+4:30  E4 SSE 超时
+├── T+4:30 - T+6:00  E5 分布式限流
+├── T+6:00 - T+7:00  E6 test-notify 去重
+└── T+7:00 - T+8:00  Sprint 2 验证 + PR 创建
 
-**SSE 超时回滚**:
-
-```bash
-# 移除 AbortController.timeout
-# 恢复原有 aiService.chat 调用
-
-# 验证
-# SSE 流应不再有 10s 超时
-```
-
-**限流回滚**:
-
-```bash
-# 恢复内存 Map
-# 移除 Cache API 调用
-
-# 验证
-# 限流应恢复单 Worker 模式
-```
-
-**test-notify 去重回滚**:
-
-```bash
-# 移除 dedup.js 集成
-# 恢复原有发送逻辑
-
-# 验证
-# 重复调用应正常发送
-```
-
-### 紧急回滚流程
-
-```bash
-# 1. 识别问题
-# - 监控报警
-# - 用户反馈
-# - CI 失败
-
-# 2. 立即回滚到上一个稳定版本
-wrangler rollback
-
-# 3. 通知团队
-# Slack: #incidents
-
-# 4. 分析根因
-# 查看 wrangler logs
-wrangler tail
-
-# 5. 修复后重新部署
-```
-
-### 版本标签管理
-
-```bash
-# 每次部署打标签
-git tag -a v2026-04-06-p0 -m "P0 fixes deployed"
-git push origin v2026-04-06-p0
-
-# 回滚到指定标签
-wrangler rollback --version-id <version-id>
+Day 3
+├── T+8:00 - T+9:00  Review + Merge
+└── T+9:00 - T+10:00  部署 + 监控
 ```
 
 ---
 
-## 时间线
+## 8. 执行决策
 
-```
-2026-04-06 ────────────────────────────────────────────────────►
-              │
-              ├─ Phase 0: P0 修复 (1.1h)
-              │   ├─ P0-1: OPTIONS 预检路由 (0.5h)
-              │   ├─ P0-2: Canvas checkbox (0.3h)
-              │   └─ P0-3: flowId 修复 (0.3h)
-              │
-              ├─ Phase 1: P1 稳定性 (4h)
-              │   ├─ P1-1: SSE 超时 (1.5h)
-              │   ├─ P1-2: 分布式限流 (1.5h)
-              │   └─ P1-3: test-notify 去重 (1h)
-              │
-              ├─ Phase 2: P1 架构改进 (~2d)
-              │   ├─ P2-1: E2E 测试可运行化 (2h)
-              │   ├─ P2-2: generate-components 合并 (1h)
-              │   ├─ P2-3: API 响应格式统一 (2h)
-              │   ├─ P2-4: Store 治理规范 (1d)
-              │   └─ P2-5: Prompt 注入防护 (2h)
-              │
-              ├─ Phase 3: P2 中期改进 (~1w)
-              │   ├─ P3-1: SSE 流服务统一 (1d)
-              │   ├─ P3-2: Prompt 模板分层 (2d)
-              │   ├─ P3-3: D1 Repository (1d)
-              │   ├─ P3-4: wrangler 环境 (4h)
-              │   ├─ P3-5: CanvasPage 分解 (1d)
-              │   └─ P3-6: 内联 style 检测 (2h)
-              │
-              └─ Phase 4: P3 长期规划 (长期)
-                  ├─ AI Service 测试基础设施 (3d)
-                  ├─ E2E 稳定性治理 (1d)
-                  └─ GraphQL/Durable Objects 评估 (长期)
-```
-
----
-
-*文档版本: v1.0 | Architect | 2026-04-06*
+- **决策**: 已采纳
+- **执行项目**: team-tasks 项目 ID 待分配
+- **执行日期**: 2026-04-06

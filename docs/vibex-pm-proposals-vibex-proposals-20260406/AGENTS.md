@@ -1,313 +1,456 @@
-# AGENTS: VibeX Proposals 2026-04-06
+# VibeX Proposals 2026-04-06 — AGENTS.md
 
-> **项目**: vibex-pm-proposals-vibex-proposals-20260406
-> **作者**: architect agent
-> **日期**: 2026-04-06
+> **项目**: vibex-pm-proposals-vibex-proposals-20260406  
+> **角色**: Architect  
+> **日期**: 2026-04-06  
 > **版本**: v1.0
 
----
-
-## 角色与职责
-
-| 角色 | 职责范围 | 核心任务 |
-|------|----------|----------|
-| **dev** | 代码实现 | Sprint 1 + Sprint 2 全部 Epic 实现 |
-| **tester** | 测试覆盖 | E2E 修复、单元测试、覆盖率验证 |
-| **reviewer** | 代码审查 | PR 审查、回归验证 |
-| **pm** | 进度追踪 | Sprint 管理、障碍移除 |
-| **architect** | 架构决策 | 方案评审、风险评估 |
-| **analyst** | 需求分析 | 验收标准澄清 |
+> **所有 Agent 在操作此项目前必须阅读本文档。**
 
 ---
 
-## 协作流程
+## 执行决策
+- **决策**: 已采纳
+- **执行项目**: vibex-pm-proposals-vibex-proposals-20260406
+- **执行日期**: 2026-04-06
 
-### 任务领取
+---
 
-每个 Sprint 开始前，dev 从 team-tasks 领取对应 Epic 的任务：
+## 1. 代码风格规范
+
+### 1.1 TypeScript / JavaScript 通用规范
+
+- **缩进**: 2 空格（不许用 Tab）
+- **引号**: 单引号 `'`（JS/TS），双引号（JSX attributes）
+- **分号**: 始终使用分号
+- **类型**: 显式类型声明，不使用 `any`（除非不可避免）
+- **空行**: 单个空行分隔逻辑块，不使用多余空行
+
+```typescript
+// ✅ 正确
+async function checkDedup(key: string): Promise<{ skipped: boolean; remaining: number }> {
+  const cache = readCache();
+  const lastSent = cache[key];
+  if (!lastSent) return { skipped: false, remaining: 0 };
+  return { skipped: false, remaining: 0 };
+}
+
+// ❌ 错误
+async function checkDedup(key) {   // ← 缺少类型
+    const cache = readCache();      // ← 4 空格缩进
+    if(!lastSent)                  // ← 缺少空格
+        return {skipped:false};    // ← 缺少空格
+}
+```
+
+### 1.2 Hono / Workers 规范
+
+- **路由注册顺序**: OPTIONS 路由必须在所有中间件之前
+- **错误处理**: 始终使用 `c.text()` / `c.json()` 返回响应，不直接 `throw`
+- **异步**: 所有 handler 必须 `async`，使用 `await`
+- **AbortController**: SSE 流必须处理 cancel，超时必须清理
+
+```typescript
+// ✅ 正确
+v1.options('/*', (c) => {
+  c.header('Access-Control-Allow-Origin', '*');
+  return c.text('', 204);
+});
+protected_.use('*', authMiddleware);
+
+// ❌ 错误（OPTIONS 在 authMiddleware 之后）
+const protected_ = new Hono();
+protected_.use('*', authMiddleware);
+protected_.options('/*', (c) => c.text('', 204)); // ← 太晚了！
+```
+
+### 1.3 React / Next.js 规范
+
+- **组件**: 使用函数组件，`'use client'` 声明（客户端组件）
+- **状态**: Zustand `useContextStore`，避免 useState 过度使用
+- **样式**: CSS Modules，禁用在 JSX 中使用 `style={{}}`（DESIGN.md 变量除外）
+- **事件处理**: 显式 `onChange` / `onClick` 回调签名
+
+```tsx
+// ✅ 正确
+interface ContextCardProps {
+  selected?: boolean;
+  onToggleSelect?: (nodeId: string) => void;
+}
+
+// ❌ 错误：隐式类型
+function ContextCard({ selected, onToggleSelect }) { ... }
+```
+
+### 1.4 测试规范
+
+- **文件命名**: `*.test.ts` / `*.test.tsx` / `*.test.js`
+- **描述**: 中文描述测试场景，使用 `describe` + `it`
+- **覆盖率**: 核心文件 > 80%
+- **Mock**: 使用 `jest.mock()` 或 `jest.spyOn()`，不修改原始模块
+
+```typescript
+// ✅ 正确
+describe('checkDedup', () => {
+  it('返回 skipped=false 对于新 key', () => {
+    const result = checkDedup(generateKey('passed'));
+    expect(result.skipped).toBe(false);
+  });
+});
+
+// ❌ 错误：描述不清晰
+describe('dedup', () => {
+  it('works', () => {
+    expect(checkDedup('key').skipped).toBe(false);
+  });
+});
+```
+
+---
+
+## 2. 禁止事项
+
+### 🚫 禁止在 E1 中修改
+
+- **禁止** 修改 `v1.options('/*')` 之后的任何中间件链（仅调整顺序）
+- **禁止** 在 OPTIONS handler 中调用 `authMiddleware` 或其他中间件
+- **禁止** 在 OPTIONS 响应中添加 body（必须是 204 空响应）
+
+### 🚫 禁止在 E2 中修改
+
+- **禁止** 在 checkbox `onChange` 中同时调用 `toggleContextNode` 和 `onToggleSelect`
+  - `toggleContextNode` 仅用于"确认"状态，不用于选择
+  - 选择应通过 `onToggleSelect` 独立处理
+- **禁止** 修改 `BoundedContextGroup` 的接口签名（除非 PR 包含迁移）
+- **禁止** 在 `BoundedContextTree.tsx` 中添加新的 Zustand store
+
+### 🚫 禁止在 E3 中修改
+
+- **禁止** 移除或修改 `GeneratedComponent` 中除 `flowId` 以外的其他字段
+- **禁止** 修改 AI prompt 中的其他指令（仅添加 flowId 要求）
+- **禁止** 在 component-generator 路由中添加新的参数校验
+
+### 🚫 禁止在 E4 中修改
+
+- **禁止** 移除 `clearTimeout` 调用（任何路径都必须清理）
+- **禁止** 在 `finally` 块之外清理计时器（必须覆盖正常结束和异常）
+- **禁止** 减少超时时间（10 秒是已确定的验收标准）
+- **禁止** 在 `cancel()` 中直接 `throw`，使用 `controller.error()` 替代
+
+### 🚫 禁止在 E5 中修改
+
+- **禁止** 移除原有的 rate limit 接口（保持向后兼容）
+- **禁止** 在 Cache API 失败时静默吞掉错误（必须 fallback 到内存）
+- **禁止** 修改 `rateLimit` middleware 的 `options` 接口
+- **禁止** 将 `caches.default` 替换为 Durable Objects（复杂度不匹配）
+
+### 🚫 禁止在 E6 中修改
+
+- **禁止** 修改 `dedup.js` 的 `DEDUP_WINDOW_MS`（5 分钟是固定值）
+- **禁止** 修改 `generateKey` 的格式（`test:{status}:{hash}`）
+- **禁止** 在 `recordSend` 中删除活跃 key（只清理过期 key）
+- **禁止** 在 CI 环境下绕过 dedup（生产必须生效）
+
+### 🚫 全局禁止
+
+- **禁止** 使用 `// @ts-ignore` 或 `// @ts-expect-error` 除非附上 TSDoc 说明
+- **禁止** 添加 `console.log` 调试语句（使用 `canvasLogger` 或删除）
+- **禁止** 引入新的 npm 依赖（`pnpm add` 需先审批）
+- **禁止** 硬编码任何凭证、API Key、Token（使用环境变量）
+- **禁止** 修改 `CLAUDE.md` / `AGENTS.md` / `DESIGN.md`（除非经过 PM 审批）
+- **禁止** 在 `node_modules` 目录内进行任何修改
+- **禁止** 提交包含 `TODO` / `FIXME` / `HACK` 的代码
+
+---
+
+## 3. 测试要求
+
+### 3.1 覆盖率要求
+
+| 层级 | 文件 | 覆盖率要求 |
+|------|------|-----------|
+| Backend | `gateway.ts` | > 80% |
+| Backend | `ai-service.ts` | > 80% |
+| Backend | `rateLimit.ts` | > 80% |
+| Backend | `component-generator.ts` | > 70% |
+| Frontend | `BoundedContextTree.tsx` | > 80% |
+| Scripts | `dedup.js` | > 80% |
+
+### 3.2 必需测试用例
+
+#### E1: OPTIONS
+```typescript
+describe('OPTIONS Preflight', () => {
+  it('OPTIONS /v1/projects 返回 204', async () => { ... });
+  it('包含 CORS headers', async () => { ... });
+  it('不被 auth 拦截（不返回 401）', async () => { ... });
+  it('GET 请求不受影响', async () => { ... });
+  it('POST 请求不受影响', async () => { ... });
+});
+```
+
+#### E2: Canvas Checkbox
+```typescript
+describe('ContextCard Checkbox', () => {
+  it('onChange 调用 onToggleSelect', () => { ... });
+  it('不调用 toggleContextNode', () => { ... });
+  it('selected=true 时 checkbox 选中', () => { ... });
+  it('selected=false 时 checkbox 未选中', () => { ... });
+});
+```
+
+#### E3: flowId
+```typescript
+describe('generate-components flowId', () => {
+  it('schema 包含 flowId 字段', () => { ... });
+  it('flowId 格式为 flow-xxx', () => { ... });
+  it('flowId 不是 unknown', () => { ... });
+  it('schema 拒绝无效 flowId', () => { ... });
+});
+```
+
+#### E4: SSE Timeout
+```typescript
+describe('SSE Timeout', () => {
+  it('10 秒无响应触发 abort', async () => { ... });
+  it('clearTimeout 在 finally 中调用', () => { ... });
+  it('cancel() 清理计时器', async () => { ... });
+  it('Worker 不挂死', async () => { ... });
+});
+```
+
+#### E5: Rate Limit
+```typescript
+describe('Rate Limit Cache', () => {
+  it('使用 caches.default', async () => { ... });
+  it('100 请求后第 101 返回 429', async () => { ... });
+  it('Cache 不可用时 fallback 到内存', async () => { ... });
+  it('正确设置 X-RateLimit-* headers', () => { ... });
+});
+```
+
+#### E6: Dedup
+```typescript
+describe('test-notify dedup', () => {
+  it('5 分钟内重复跳过', () => { ... });
+  it('不同 status 不跳过', () => { ... });
+  it('过期后重新发送', () => { ... });
+  it('清理过期缓存条目', () => { ... });
+});
+```
+
+### 3.3 测试运行命令
 
 ```bash
-python3 ~/.openclaw/skills/team-tasks/scripts/task_manager.py update vibex-proposals-20260406 sprint1-done done
-python3 ~/.openclaw/skills/team-tasks/scripts/task_manager.py update vibex-proposals-20260406 sprint2-done done
-```
+# 全量测试
+pnpm test
 
-### 开发流程
+# Backend 测试
+pnpm --filter vibex-backend test
 
-```
-dev 领取任务
-  ↓
-Sprint 1 开始
-  ↓
-E1 → E2 → E3 (各 0.3-0.5h)
-  ↓
-提交 PR → reviewer 审查
-  ↓
-测试通过 → 合并
-  ↓
-Sprint 2 开始
-  ↓
-E4 → E5 → E6 (各 1-1.5h)
-  ↓
-提交 PR → reviewer 审查
-  ↓
-测试通过 → 合并 → 部署
+# Frontend 测试
+pnpm --filter vibex-fronted test
+
+# 覆盖率报告
+pnpm --filter vibex-backend test --coverage --coverageReporters=lcov
+pnpm --filter vibex-fronted test --coverage --coverageReporters=lcov
+
+# Playwright E2E
+pnpm --filter vibex-fronted playwright test
+
+# Lint
+pnpm lint
 ```
 
 ---
 
-## Sprint 1: P0 优先
+## 4. PR 审查清单
 
-### Epic 1: OPTIONS 预检路由修复
+### 4.1 代码质量检查
 
-| 属性 | 值 |
-|------|-----|
-| **负责人** | dev |
-| **预计工时** | 0.5h |
-| **文件变更** | `gateway.ts` |
-| **验收标准** | OPTIONS 返回 204 + CORS headers |
+- [ ] **类型安全**: 无 `any` 类型，所有接口有类型声明
+- [ ] **编译通过**: `pnpm --filter vibex-backend build` 无错误
+- [ ] **Lint 通过**: `pnpm lint` 无 warning / error
+- [ ] **无硬编码**: 无凭证、Key、Token 硬编码
+- [ ] **无调试语句**: 无 `console.log`、`TODO`、`FIXME`
+- [ ] **代码风格**: 符合本文件的规范（2 空格缩进、分号、引号）
+- [ ] **测试覆盖**: 核心文件覆盖率 > 80%
 
-**dev 任务清单**:
-- [ ] 确认 `protected_.options` 和 `authMiddleware` 注册位置
-- [ ] 调整顺序：`options` 注册在 `authMiddleware` 之前
-- [ ] 验证所有受保护路由的 OPTIONS 处理
-- [ ] 提交 PR
+### 4.2 Epic 专项检查
 
-**reviewer 审查要点**:
-- [ ] OPTIONS 路由在其他中间件之前注册
-- [ ] 不影响 GET/POST/PUT/DELETE 认证流程
-- [ ] curl 测试通过
+#### E1: OPTIONS 路由
+- [ ] `protected_.options('/*')` 在 `protected_.use('*', authMiddleware)` 之前
+- [ ] `v1.options('/*')` 和 `protected_.options('/*')` 同时存在
+- [ ] OPTIONS 返回 204（无 body）
+- [ ] CORS headers 正确（Allow-Origin、Allow-Methods、Allow-Headers）
+- [ ] GET/POST 不受影响（401、200 均正常）
 
----
+#### E2: Canvas Checkbox
+- [ ] `onChange` 仅调用 `onToggleSelect`
+- [ ] `toggleContextNode` 不在 checkbox onChange 中调用
+- [ ] `checked={selected}` 而非 `checked={node.status === 'confirmed'}`
+- [ ] `BoundedContextTree.test.tsx` 新增或更新相关测试
+- [ ] Playwright 测试通过
 
-### Epic 2: Canvas Context 多选修复
+#### E3: flowId
+- [ ] `GeneratedComponent` 接口包含 `flowId: string`
+- [ ] AI prompt 明确要求 `flowId`
+- [ ] `expect(component.flowId).toMatch(/^flow-/)` 测试通过
+- [ ] schema 验证拒绝 `unknown`
 
-| 属性 | 值 |
-|------|-----|
-| **负责人** | dev |
-| **预计工时** | 0.3h |
-| **文件变更** | `src/components/BoundedContextTree.tsx` |
-| **验收标准** | checkbox onChange 调用 onToggleSelect |
+#### E4: SSE Timeout
+- [ ] `setTimeout` 10 秒后 abort
+- [ ] `clearTimeout` 在 `finally` 块中
+- [ ] `ReadableStream.cancel()` 中有 `clearTimeout`
+- [ ] 无计时器泄漏
+- [ ] 测试覆盖 timeout 和 cancel 路径
 
-**dev 任务清单**:
-- [ ] 定位 checkbox 的 `onChange={toggleContextNode}` 错误绑定
-- [ ] 修改为 `onChange={() => onToggleSelect(node.id)}`
-- [ ] 确认 `toggleContextNode` 不受影响
-- [ ] 提交 PR
+#### E5: Rate Limit Cache
+- [ ] `caches.default` 引用存在
+- [ ] `cache.match()` 读取限流计数
+- [ ] `cache.put()` 写入限流计数
+- [ ] fallback 到内存 Map（dev / Cache API 不可用）
+- [ ] 原有 rateLimit 接口不变（向后兼容）
 
-**reviewer 审查要点**:
-- [ ] `onChange` 绑定到 `onToggleSelect` 而非 `toggleContextNode`
-- [ ] toggleContextNode 在右键菜单中正常工作
-- [ ] 单元测试覆盖
+#### E6: Dedup
+- [ ] `dedup.js` 导入正确（`require('./dedup')`）
+- [ ] `checkDedup(key)` 在发送前调用
+- [ ] `recordSend(key)` 在发送后调用
+- [ ] `generateKey` 使用 `status` 参数
+- [ ] `dedup.test.js` 覆盖率 > 80%
 
----
+### 4.3 回归测试
 
-### Epic 3: generate-components flowId
+- [ ] **E1 回归**: `curl -X OPTIONS -I /v1/projects` → 204
+- [ ] **E1 回归**: `curl GET /v1/projects` → 不返回 500
+- [ ] **E2 回归**: Canvas 页面 checkbox 选择功能正常
+- [ ] **E3 回归**: 组件生成 API 不返回 500
+- [ ] **E4 回归**: SSE 流正常（超时外）
+- [ ] **E5 回归**: 限流不漏过（< limit 的请求正常）
+- [ ] **E6 回归**: 通知在 5 分钟间隔后重新发送
 
-| 属性 | 值 |
-|------|-----|
-| **负责人** | dev |
-| **预计工时** | 0.3h |
-| **文件变更** | schema 相关文件 + prompt 模板 |
-| **验收标准** | flowId 不是 "unknown" |
+### 4.4 文档检查
 
-**dev 任务清单**:
-- [ ] schema 添加 `flowId: string` 字段定义
-- [ ] prompt 明确要求输出 flowId
-- [ ] 后端添加兜底：`flowId = \`flow-${crypto.randomUUID()}\``
-- [ ] 测试验证输出正确
-- [ ] 提交 PR
+- [ ] PR 描述包含 Epic 关联（E1-E6）
+- [ ] PR 描述包含测试覆盖率变化（before/after）
+- [ ] PR 描述包含手动验证步骤（curl / 截图）
+- [ ] CHANGELOG.md 更新（如适用）
+- [ ] 无新增 `AGENTS.md` / `CLAUDE.md` 违规内容
 
-**reviewer 审查要点**:
-- [ ] schema 类型定义包含 flowId
-- [ ] prompt 明确提及 flowId
-- [ ] 后端兜底逻辑存在
-- [ ] API 响应测试通过
+### 4.5 安全检查
 
----
+- [ ] 无新引入的 XSS 风险（用户输入未正确转义）
+- [ ] 无 CSRF 风险（CORS 配置正确）
+- [ ] 无敏感信息泄露（log 中无凭证）
+- [ ] Rate limit 不被绕过
+- [ ] Webhook URL 验证（非钓鱼 URL）
 
-## Sprint 2: P1 改进
+### 4.6 审查者 Checklist（供 Reviewer Agent 使用）
 
-### Epic 4: SSE 超时 + 连接清理
+```
+## 审查清单
 
-| 属性 | 值 |
-|------|-----|
-| **负责人** | dev |
-| **预计工时** | 1.5h |
-| **文件变更** | `src/services/aiService.ts`, `src/routes/v1/chat.ts` |
-| **验收标准** | 10s 超时，cancel() 清理 timers |
+### 代码质量
+- [ ] 类型安全（无 any）
+- [ ] 编译通过
+- [ ] Lint 通过
+- [ ] 无硬编码
+- [ ] 无调试语句
+- [ ] 测试覆盖率 > 80%
 
-**dev 任务清单**:
-- [ ] `aiService.chat()` 添加 `AbortController.timeout(10000)`
-- [ ] ReadableStream.cancel() 中清理所有 setTimeout
-- [ ] 异常时 clearTimeout 兜底
-- [ ] jest 测试覆盖超时和 cancel 场景
-- [ ] 提交 PR
+### Epic 专项
+- [ ] E1: OPTIONS 顺序正确
+- [ ] E2: checkbox onChange 正确
+- [ ] E3: flowId schema + prompt
+- [ ] E4: timeout + cancel 清理
+- [ ] E5: Cache API 集成 + fallback
+- [ ] E6: dedup 集成正确
 
-**tester 配合**:
-- [ ] 编写 SSE 超时测试用例
-- [ ] Mock OpenAI 延迟响应
-- [ ] 验证 cancel() 调用 clearTimeout
+### 回归
+- [ ] 全量测试通过
+- [ ] 手动验证通过
 
-**reviewer 审查要点**:
-- [ ] AbortController 超时配置正确（10000ms）
-- [ ] cancel() 中所有 timer 都被清理
-- [ ] jest 测试覆盖率 > 80%
+### 文档
+- [ ] PR 描述完整
+- [ ] CHANGELOG 更新
 
----
+### 安全
+- [ ] 无注入风险
+- [ ] 无信息泄露
+- [ ] 限流不被绕过
 
-### Epic 5: 分布式限流
+## 审查结果
+[ ] 通过 / [ ] 需修改 / [ ] 拒绝
 
-| 属性 | 值 |
-|------|-----|
-| **负责人** | dev |
-| **预计工时** | 1.5h |
-| **文件变更** | `src/middleware/rateLimit.ts`, `wrangler.toml` |
-| **验收标准** | Cache API 限流，跨 Worker 一致 |
-
-**dev 任务清单**:
-- [ ] 将内存 Map 替换为 `caches.default`
-- [ ] 保留原有 `checkRateLimit()` 接口不变
-- [ ] wrangler.toml 确认 Cache API 配置
-- [ ] 100 并发测试验证限流一致性
-- [ ] 提交 PR
-
-**tester 配合**:
-- [ ] 编写并发限流测试
-- [ ] 验证多 Worker 限流计数一致
-
-**reviewer 审查要点**:
-- [ ] `caches.default` 使用正确
-- [ ] 接口返回值不变（allowed, remaining, resetAt）
-- [ ] 100 并发测试通过
+## 意见
+<具体修改意见>
+```
 
 ---
 
-### Epic 6: test-notify 去重
+## 5. 文件权限与路径规范
 
-| 属性 | 值 |
-|------|-----|
-| **负责人** | dev |
-| **预计工时** | 1h |
-| **文件变更** | `src/utils/dedup.js`, `src/routes/v1/test-notify.ts` |
-| **验收标准** | 5 分钟去重窗口 |
+### 5.1 允许修改的路径
 
-**dev 任务清单**:
-- [ ] 实现 `dedup.js`：`checkDedup()` 和 `recordSend()`
-- [ ] `.dedup-cache.json` 持久化
-- [ ] 启动时清理过期记录
-- [ ] 集成到 `test-notify.ts` 路由
-- [ ] jest 测试覆盖
-- [ ] 提交 PR
+| 前缀 | 允许操作 | 说明 |
+|------|----------|------|
+| `vibex-backend/src/routes/v1/` | 修改 | E1, E3 |
+| `vibex-backend/src/services/` | 修改 | E4 |
+| `vibex-backend/src/lib/rateLimit.ts` | 修改 | E5 |
+| `vibex-fronted/src/components/canvas/` | 修改 | E2 |
+| `vibex-fronted/scripts/dedup.js` | 验证（不修改） | E6 |
+| `vibex-fronted/scripts/test-notify.js` | 验证（不修改） | E6 |
+| `vibex-fronted/scripts/__tests__/` | 新增 | E6 |
 
-**tester 配合**:
-- [ ] 编写去重测试用例
-- [ ] 验证 5 分钟时间窗口逻辑
+### 5.2 禁止修改的路径
 
-**reviewer 审查要点**:
-- [ ] 去重逻辑正确：5 分钟内跳过
-- [ ] 文件持久化正常
-- [ ] jest 测试通过
-
----
-
-## 沟通约定
-
-### Slack 频道
-
-| 频道 | 用途 |
+| 路径 | 原因 |
 |------|------|
-| `#vibex-dev` | 日常开发沟通 |
-| `#vibex-review` | PR 审查通知 |
-| `#vibex-alerts` | 部署/监控告警 |
-
-### 进度更新
-
-dev 在完成每个 Epic 后发送简短进度更新：
-
-```
-🔄 Epic E{n}: {Epic 名称} ✅ 完成
-📊 状态: {x}/6
-📝 说明: {修改的文件} | {测试结果}
-⏰ 下一步: {下一个 Epic}
-```
-
-### 阻塞上报
-
-遇到阻塞时，立即通知 pm：
-
-```
-⚠️ Epic E{n} 阻塞
-🔒 原因: {阻塞原因}
-📋 缺失项: {缺失的资源/信息}
-❓ 需要: {需要的帮助}
-```
+| `vibex-backend/src/lib/auth.ts` | 不在本次 Epic 范围内 |
+| `vibex-fronted/src/stores/` | 新增 store 需 PM 审批 |
+| `node_modules/` | 禁止 |
+| `vibex-backend/wrangler.toml` | 需 DevOps 审批 |
+| `DESIGN.md` | 需设计审批 |
+| `CLAUDE.md` | 需架构审批 |
 
 ---
 
-## PR 审查清单
+## 6. 协作流程
 
-每个 PR 必须通过以下检查：
+### 6.1 提交规范
 
-### dev 自查
-- [ ] `npm test` 全量通过
-- [ ] `npm run lint` 无警告
-- [ ] 代码格式化（prettier）通过
-- [ ] 变更范围与 Epic 一致（无 YAGNI）
-- [ ] 提交信息清晰：`feat: E{n} {变化}`
-
-### reviewer 审查
-- [ ] 架构符合本项目规范
-- [ ] 无安全隐患（输入验证、认证绕过）
-- [ ] 测试覆盖充分
-- [ ] 不引入不必要的复杂度
-
----
-
-## 风险与依赖
-
-| 风险 | 影响 | 缓解措施 |
-|------|------|----------|
-| E1 修改破坏其他中间件 | P0 | 仅调整顺序，充分测试 |
-| E4 SSE 超时影响事件顺序 | P1 | 外层 try-catch，不修改内部流 |
-| E5 Cache API wrangler 未启用 | P1 | 部署前确认配置 |
-| E6 去重文件损坏 | P1 | 启动时验证 JSON 有效性 |
-
----
-
-## 依赖关系图
-
-```
-Sprint 1
-├── E1 (OPTIONS 修复) ──────────────────────────┐
-│   依赖: 无                                    │  独立
-└───────────────────────────────────────────────┤
-├── E2 (Canvas 多选)                           │  独立
-│   依赖: 无                                    │
-└───────────────────────────────────────────────┤
-└── E3 (flowId 修复)                           │  独立
-    依赖: 无                                    │
-
-Sprint 2
-├── E4 (SSE 超时) ──────────────────────────────┐
-│   依赖: 无                                    │  独立
-└───────────────────────────────────────────────┤
-├── E5 (分布式限流)                             │  独立
-│   依赖: E4 无依赖                            │
-└───────────────────────────────────────────────┤
-└── E6 (去重)                                  │  独立
-    依赖: 无                                    │
+```bash
+# 格式: <Epic>-<简短描述>
+git commit -m "E1: fix OPTIONS preflight route order"
+git commit -m "E2: fix checkbox onChange to call onToggleSelect"
+git commit -m "E3: add flowId to GeneratedComponent schema"
+git commit -m "E4: add AbortController timeout and cancel cleanup"
+git commit -m "E5: use Cache API for distributed rate limit"
+git commit -m "E6: verify dedup.js integration in test-notify"
 ```
 
----
+### 6.2 分支命名
 
-## 里程碑
+```bash
+# 格式: fix/epics-e1-e6-YYYYMMDD
+git checkout -b fix/epics-e1-e6-20260406
+```
 
-| 里程碑 | 目标时间 | 状态 |
-|--------|----------|------|
-| Sprint 1 完成 | Sprint 开始后 1.1h | 待开始 |
-| Sprint 2 完成 | Sprint 1 后 4h | 待开始 |
-| CI 门禁建立 | Sprint 2 后 1h | 待开始 |
-| 生产部署 | CI 通过后 0.5h | 待开始 |
+### 6.3 PR 创建
+
+```bash
+# 确保所有测试通过
+pnpm test
+
+# 确保覆盖率
+pnpm --filter vibex-backend test --coverage
+pnpm --filter vibex-fronted test --coverage
+
+# 推送
+git push origin fix/epics-e1-e6-20260406
+
+# 创建 PR（使用 skill: git-commit-push-pr）
+```
 
 ---
 

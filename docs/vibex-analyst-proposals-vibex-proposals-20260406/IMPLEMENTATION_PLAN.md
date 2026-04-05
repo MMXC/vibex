@@ -490,7 +490,7 @@ describe('test-notify deduplication', () => {
 
 | # | 检查项 | 状态 | 备注 |
 |---|--------|------|------|
-| 1 | `gateway.ts` OPTIONS 路由顺序已调整 | ☐ | 在 authMiddleware 之前 |
+| 1 | `gateway.ts` OPTIONS 路由顺序已调整 | ✅ | Lines 106,119 before authMiddleware (line 126) |
 | 2 | `BoundedContextTree.tsx` checkbox onChange 已修复 | ☐ | 改为 onToggleSelect |
 | 3 | generate-components schema 已添加 flowId | ☐ | 格式 /^flow-/ |
 | 4 | generate-components prompt 已更新 | ☐ | 明确要求 flowId |

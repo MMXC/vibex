@@ -49,6 +49,7 @@
     "jest.config.ts",
     "jest.config.for-stryker.ts",
     "jest.setup.ts",
-    "jest.setup.js"
+    "jest.setup.js",
+    "playwright.setup.ts"
   ]
 }

@@ -1,3 +1,12 @@
+### Added (vibex-generate-components-consolidation E1: contextSummary 合并) — 2026-04-05
+- **E1 contextSummary合并**: Hono route `index.ts` 合并 Next.js route 的 prompt 改进
+  - `ComponentNode` 添加 `contextId` 字段
+  - `componentPrompt` 添加 `contextSummary`（含 `ctx.id` + description）
+  - AI schema 添加 `contextId` 约束
+  - 组件创建添加 `contextId` 回退逻辑 (AI > flows[i].contextId > contexts[0].id)
+  - 8 tests pass (generate-components.test.ts)
+- **提交**: `f9fe224b`
+
 ### Added (vibex-canvas-context-selection E1: selectedNodeIds 读取修复) — 2026-04-05
 - **E1 selectedNodeIds 修复**: BusinessFlowTree.tsx handleContinueToComponents 发送选中上下文
   - 读取 `selectedNodeIds.context` 而非全部 `contextNodes`

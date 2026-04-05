@@ -3,8 +3,7 @@
  *
  * Note: ReactFlow's EdgeProps<T> generic has known TypeScript limitations where
  * destructuring from props requires 'as any' cast. This is a library-level issue.
- */
-
+ *
  * Epic 1: vibex-three-trees-enhancement
  * Spec: docs/vibex-three-trees-enhancement-20260326/specs/context-tree-relationships.md
  *

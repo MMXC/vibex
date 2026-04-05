@@ -827,7 +827,10 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
                   <button
                     type="button"
                     className={styles.deleteButton}
-                    onClick={() => deleteSelectedNodes_comp()}
+                    onClick={() => {
+                      getHistoryStore().recordSnapshot('component', componentNodes);
+                      deleteSelectedNodes_comp();
+                    }}
                     aria-label={`删除 ${selectedCount} 个选中节点`}
                   >
                     删除 ({selectedCount})

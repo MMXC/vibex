@@ -707,7 +707,7 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
 
       // Record undo snapshot before reordering
       const historyStore = getHistoryStore();
-      historyStore.recordSnapshot('flow', flowNodes);
+      getHistoryStore().recordSnapshot('flow', flowNodes);
 
       // Reorder nodes
       const newNodes = [...flowNodes];
@@ -924,7 +924,10 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
                   <button
                     type="button"
                     className={styles.deleteButton}
-                    onClick={() => deleteSelectedNodes('flow')}
+                    onClick={() => {
+                      getHistoryStore().recordSnapshot('flow', flowNodes);
+                      deleteSelectedNodes('flow');
+                    }}
                     aria-label={`删除 ${selectedCount} 个选中节点`}
                   >
                     删除 ({selectedCount})

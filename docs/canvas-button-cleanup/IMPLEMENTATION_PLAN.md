@@ -204,8 +204,8 @@ pnpm test -- --testPathPattern="flowStore|contextStore" --verbose
 | 4 | CanvasPage.tsx Flow 栏全映射修正 | ☐ | E2 |
 | 5 | CanvasPage.tsx Component 栏全映射修正 | ☐ | E2 |
 | 6 | BoundedContextTree.tsx 三处 snapshot 补充 | ☐ | E1 |
-| 7 | BusinessFlowTree.tsx 删除 snapshot 补充 | ☐ | E3 |
-| 8 | ComponentTree.tsx 删除 snapshot 补充 | ☐ | E3 |
+| 7 | BusinessFlowTree.tsx 删除 snapshot 补充 | ✅ | ☐ | E3 |
+| 8 | ComponentTree.tsx 删除 snapshot 补充 | ✅ | ☐ | E3 |
 | 9 | BoundedContextTree forEach 替换为 deleteAllNodes | ☐ | E4 |
 | 10 | Ctrl+Z 撤销测试通过（Context/Flow/Component）| ☐ | 手动 |
 | 11 | TreeToolbar 三栏按钮功能测试通过 | ☐ | 手动 |

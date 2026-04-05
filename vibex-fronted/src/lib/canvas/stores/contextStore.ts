@@ -111,12 +111,19 @@ export const useContextStore = create<ContextStore>()(
             if (tree === 'context') {
               return { selectedNodeIds: { ...s.selectedNodeIds, context: s.contextNodes.map((n) => n.nodeId) } };
             }
+            if (tree === 'flow') {
+              // flow selection managed by flowStore; contextStore tracks flow selection via selectedNodeIds
+              return s;
+            }
             return s;
           }),
         clearNodeSelection: (tree) =>
           set((s) => {
             if (tree === 'context') {
               return { selectedNodeIds: { ...s.selectedNodeIds, context: [] } };
+            }
+            if (tree === 'flow') {
+              return { selectedNodeIds: { ...s.selectedNodeIds, flow: [] } };
             }
             return s;
           }),
@@ -132,6 +139,10 @@ export const useContextStore = create<ContextStore>()(
               const node = contextNodes.find((n) => n.nodeId === id);
               postContextActionMessage(`删除了上下文节点`, node?.name ?? id);
             });
+          }
+          // E2: flow branch — clear flow selection (actual deletion handled by flowStore)
+          if (tree === 'flow' && selectedNodeIds.flow.length > 0) {
+            set({ selectedNodeIds: { ...selectedNodeIds, flow: [] } });
           }
         },
         // Existing fields

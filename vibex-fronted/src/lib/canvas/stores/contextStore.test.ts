@@ -108,16 +108,17 @@ describe('useContextStore', () => {
       expect(useContextStore.getState().selectedNodeIds.context).toEqual([]);
     });
 
-    it('should do nothing for flow tree (not implemented)', () => {
+    it('should clear flow selection for flow tree', () => {
       useContextStore.setState({
         contextNodes: [
           { nodeId: 'ctx-1', name: 'Ctx1', description: '', type: 'core' as const, isActive: false, status: 'pending' as const, children: [] },
         ],
-        selectedNodeIds: { context: [], flow: ['flow-node-1'] },
+        selectedNodeIds: { context: ['ctx-1'], flow: ['flow-node-1', 'flow-node-2'] },
       });
       useContextStore.getState().deleteSelectedNodes('flow');
-      // context node should remain untouched
-      expect(useContextStore.getState().contextNodes.length).toBe(1);
+      // flow selection should be cleared, context untouched
+      expect(useContextStore.getState().selectedNodeIds.flow).toEqual([]);
+      expect(useContextStore.getState().selectedNodeIds.context).toEqual(['ctx-1']);
     });
   });
 
@@ -229,10 +230,11 @@ describe('useContextStore — selectAllNodes/clearNodeSelection branches (L111-1
     expect(useContextStore.getState().selectedNodeIds.context).toHaveLength(0);
   });
 
-  it('clearNodeSelection returns s for non-context tree', () => {
-    useContextStore.setState({ selectedNodeIds: { context: ['n1'], flow: ['f1'] } });
+  it('clearNodeSelection clears flow selection', () => {
+    useContextStore.setState({ selectedNodeIds: { context: ['n1'], flow: ['f1', 'f2'] } });
     useContextStore.getState().clearNodeSelection('flow');
-    expect(useContextStore.getState().selectedNodeIds.flow).toContain('f1');
+    expect(useContextStore.getState().selectedNodeIds.flow).toHaveLength(0);
+    expect(useContextStore.getState().selectedNodeIds.context).toEqual(['n1']);
   });
 });
 

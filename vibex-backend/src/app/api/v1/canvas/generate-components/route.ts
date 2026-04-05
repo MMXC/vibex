@@ -178,24 +178,35 @@ export async function POST(
     // Truncate to max 20 components
     const rawComponents = result.data.slice(0, 20);
 
-    const components: ComponentResponse[] = rawComponents.map((comp) => ({
-      id: generateId(),
-      name: comp.name || '未命名组件',
-      flowId: comp.flowId || flows[0]?.id || '',
-      contextId: contexts[0]?.id || '',
-      type: validTypes.includes(comp.type as typeof validTypes[number])
-        ? (comp.type as typeof validTypes[number])
-        : ('page' as const),
-      description: comp.description || '',
-      apis: comp.apis
-        ? comp.apis.map((a) => ({
-            method: (a.method as 'GET' | 'POST') || 'GET',
-            path: a.path || '/api/',
-            params: a.params || [],
-          }))
-        : [{ method: 'GET' as const, path: '/api/', params: [] }],
-      confidence: comp.confidence ?? 0.7,
-    }));
+    const components: ComponentResponse[] = rawComponents.map((comp) => {
+      // Fallback: if flowId is "unknown" or empty, use first flow's id
+      const validFlowId =
+        comp.flowId && comp.flowId !== 'unknown'
+          ? comp.flowId
+          : flows[0]?.id || '';
+      const validContextId = comp.contextId && comp.contextId !== 'unknown'
+        ? comp.contextId
+        : contexts[0]?.id || '';
+
+      return {
+        id: generateId(),
+        name: comp.name || '未命名组件',
+        flowId: validFlowId,
+        contextId: validContextId,
+        type: validTypes.includes(comp.type as typeof validTypes[number])
+          ? (comp.type as typeof validTypes[number])
+          : ('page' as const),
+        description: comp.description || '',
+        apis: comp.apis
+          ? comp.apis.map((a) => ({
+              method: (a.method as 'GET' | 'POST') || 'GET',
+              path: a.path || '/api/',
+              params: a.params || [],
+            }))
+          : [{ method: 'GET' as const, path: '/api/', params: [] }],
+        confidence: comp.confidence ?? 0.7,
+      };
+    });
 
     const confidence = result.usage
       ? Math.max(0.5, Math.min(0.9, 1 - (result.usage.completionTokens / 4096)))

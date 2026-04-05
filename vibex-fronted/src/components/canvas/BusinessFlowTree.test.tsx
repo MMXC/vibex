@@ -1,3 +1,4 @@
+import {vi, Mock, SpyInstance} from 'vitest';
 /**
  * BusinessFlowTree.test.tsx
  *
@@ -15,18 +16,18 @@ import * as sessionStore from '@/lib/canvas/stores/sessionStore';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
 
 // ─── Mock canvasApi ─────────────────────────────────────────────────────────
-jest.mock('@/lib/canvas/api/canvasApi');
+vi.mock('@/lib/canvas/api/canvasApi');
 
 // ─── Mock toast ────────────────────────────────────────────────────────────
-jest.mock('@/components/ui/Toast', () => ({
-  useToast: () => ({ showToast: jest.fn() }),
+vi.mock('@/components/ui/Toast', () => ({
+  useToast: () => ({ showToast: vi.fn() }),
 }));
 
 // ─── Store mocks ──────────────────────────────────────────────────────────
-jest.mock('@/lib/canvas/stores/contextStore');
-jest.mock('@/lib/canvas/stores/flowStore');
-jest.mock('@/lib/canvas/stores/componentStore');
-jest.mock('@/lib/canvas/stores/sessionStore');
+vi.mock('@/lib/canvas/stores/contextStore');
+vi.mock('@/lib/canvas/stores/flowStore');
+vi.mock('@/lib/canvas/stores/componentStore');
+vi.mock('@/lib/canvas/stores/sessionStore');
 
 const defaultContextNodes = [
   { nodeId: 'ctx-1', name: '患者管理', description: '管理患者', type: 'core' as const, isActive: true, status: 'confirmed' as const, children: [] },
@@ -50,33 +51,33 @@ function setupStores(overrides: {
     flowNodes = defaultFlowNodes,
   } = overrides;
 
-  (contextStore.useContextStore as jest.Mock).mockReturnValue({
+  (contextStore.useContextStore as Mock).mockReturnValue({
     contextNodes,
     selectedNodeIds,
-    advancePhase: jest.fn(),
+    advancePhase: vi.fn(),
   });
-  (flowStore.useFlowStore as jest.Mock).mockReturnValue({ flowNodes });
-  (componentStore.useComponentStore as jest.Mock).mockReturnValue({
-    setComponentNodes: jest.fn(),
+  (flowStore.useFlowStore as Mock).mockReturnValue({ flowNodes });
+  (componentStore.useComponentStore as Mock).mockReturnValue({
+    setComponentNodes: vi.fn(),
     componentGenerating: false,
-    setComponentGenerating: jest.fn(),
+    setComponentGenerating: vi.fn(),
     componentNodes: [],
   });
-  (sessionStore.useSessionStore as jest.Mock).mockReturnValue({ projectId: 'test-project' });
+  (sessionStore.useSessionStore as Mock).mockReturnValue({ projectId: 'test-project' });
 }
 
 describe('E1: handleContinueToComponents context selection', () => {
-  let mockFetch: jest.Mock;
+  let mockFetch: Mock;
 
   beforeEach(() => {
-    mockFetch = jest.fn();
-    (canvasApi.fetchComponentTree as jest.Mock) = mockFetch;
+    mockFetch = vi.fn();
+    (canvasApi.fetchComponentTree as Mock) = mockFetch;
     mockFetch.mockResolvedValue([]);
   });
 
   afterEach(() => {
     cleanup();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // ── Scenario 1: Selected contexts only ─────────────────────────────────
@@ -117,8 +118,8 @@ describe('E1: handleContinueToComponents context selection', () => {
 
   // ── Scenario 3: Empty contextNodes → toast error ──────────────────────
   it('shows error toast and does NOT call API when contextNodes is empty', async () => {
-    const showToast = jest.fn();
-    (require('@/components/ui/Toast') as { useToast: () => { showToast: jest.Mock } }).useToast = () => ({ showToast });
+    const showToast = vi.fn();
+    (require('@/components/ui/Toast') as { useToast: () => { showToast: Mock } }).useToast = () => ({ showToast });
 
     setupStores({
       selectedNodeIds: { context: [], flow: [], component: [] },

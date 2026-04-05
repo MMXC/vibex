@@ -1,3 +1,4 @@
+import {vi, Mock, SpyInstance} from 'vitest';
 'use client';
 
 /**
@@ -10,25 +11,25 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ExportMenu } from '../ExportMenu';
 
 // Mock html-to-image
-jest.mock('html-to-image', () => ({
-  toPng: jest.fn().mockResolvedValue('data:image/png;base64,mock'),
-  toSvg: jest.fn().mockResolvedValue('data:image/svg+xml;base64,mock'),
+vi.mock('html-to-image', () => ({
+  toPng: vi.fn().mockResolvedValue('data:image/png;base64,mock'),
+  toSvg: vi.fn().mockResolvedValue('data:image/svg+xml;base64,mock'),
 }));
 
 // Mock canvas export hook
-const mockExportCanvas = jest.fn().mockResolvedValue(undefined);
-jest.mock('@/hooks/canvas/useCanvasExport', () => ({
-  useCanvasExport: jest.fn(() => ({
+const mockExportCanvas = vi.fn().mockResolvedValue(undefined);
+vi.mock('@/hooks/canvas/useCanvasExport', () => ({
+  useCanvasExport: vi.fn(() => ({
     exportCanvas: mockExportCanvas,
     isExporting: false,
     error: null,
-    cancelExport: jest.fn(),
+    cancelExport: vi.fn(),
   })),
 }));
 
 describe('ExportMenu', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render export trigger button', () => {

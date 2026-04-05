@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * SaveIndicator — Tests (Jest)
  * E3-S2: 视觉反馈指示器测试
@@ -38,7 +39,7 @@ describe('SaveIndicator', () => {
   })
 
   it('shows retry button on error when onSaveNow provided', () => {
-    const onSaveNow = jest.fn()
+    const onSaveNow = vi.fn()
     render(<SaveIndicator status="error" lastSavedAt={null} onSaveNow={onSaveNow} />)
     expect(screen.getByText('重试')).toBeInTheDocument()
   })

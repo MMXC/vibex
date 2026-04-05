@@ -1,3 +1,4 @@
+import {vi, Mock, SpyInstance} from 'vitest';
 /**
  * left-drawer-send.test.tsx — T4.6: LeftDrawer handleSend integration tests
  *
@@ -14,7 +15,7 @@ import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
 
 // Mock the entire module
-jest.mock('@/lib/canvas/api/canvasApi');
+vi.mock('@/lib/canvas/api/canvasApi');
 
 // ── Mock sessionStorage ────────────────────────────────────────────────────────
 const mockSessionStorage: Record<string, string> = {};
@@ -50,21 +51,21 @@ function setupStores(ui = {}, session = {}, context = {}) {
     rightDrawerOpen: false,
     leftDrawerWidth: 200,
     rightDrawerWidth: 200,
-    toggleLeftDrawer: jest.fn(),
-    toggleRightDrawer: jest.fn(),
-    setLeftDrawerWidth: jest.fn(),
-    setRightDrawerWidth: jest.fn(),
+    toggleLeftDrawer: vi.fn(),
+    toggleRightDrawer: vi.fn(),
+    setLeftDrawerWidth: vi.fn(),
+    setRightDrawerWidth: vi.fn(),
     ...ui,
   });
   useSessionStore.setState({
     aiThinking: false,
     aiThinkingMessage: null,
     requirementText: '',
-    setRequirementText: jest.fn(),
+    setRequirementText: vi.fn(),
     ...session,
   });
   useContextStore.setState({
-    setContextNodes: jest.fn(),
+    setContextNodes: vi.fn(),
     ...context,
   });
 }
@@ -73,15 +74,15 @@ function setupStores(ui = {}, session = {}, context = {}) {
 
 describe('T4.6: LeftDrawer handleSend — canvasApi integration', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     Object.keys(mockSessionStorage).forEach(k => delete mockSessionStorage[k]);
-    jest.mocked(canvasApi.generateContexts).mockReset();
+    vi.mocked(canvasApi.generateContexts).mockReset();
   });
 
   it('calls canvasApi.generateContexts with requirementText', async () => {
-    const setRequirementText = jest.fn();
-    const setContextNodes = jest.fn();
-    jest.mocked(canvasApi.generateContexts).mockResolvedValue({ success: true, contexts: [] } as any);
+    const setRequirementText = vi.fn();
+    const setContextNodes = vi.fn();
+    vi.mocked(canvasApi.generateContexts).mockResolvedValue({ success: true, contexts: [] } as any);
     setupStores({}, { setRequirementText }, { setContextNodes });
     render(<LeftDrawer />);
 
@@ -90,19 +91,19 @@ describe('T4.6: LeftDrawer handleSend — canvasApi integration', () => {
       fireEvent.click(screen.getByTestId('left-drawer-send-btn'));
     });
 
-    expect(jest.mocked(canvasApi.generateContexts)).toHaveBeenCalledTimes(1);
-    expect(jest.mocked(canvasApi.generateContexts)).toHaveBeenCalledWith(
+    expect(vi.mocked(canvasApi.generateContexts)).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(canvasApi.generateContexts)).toHaveBeenCalledWith(
       expect.objectContaining({ requirementText: '生成订单管理上下文' })
     );
   });
 
   it('sets contextNodes when API returns success with contexts', async () => {
-    const setContextNodes = jest.fn();
+    const setContextNodes = vi.fn();
     const mockContexts = [
       { id: 'ctx-1', name: '订单管理', description: '管理订单', type: 'core' },
       { id: 'ctx-2', name: '支付', description: '支付处理', type: 'supporting' },
     ];
-    jest.mocked(canvasApi.generateContexts).mockResolvedValue({ success: true, contexts: mockContexts } as any);
+    vi.mocked(canvasApi.generateContexts).mockResolvedValue({ success: true, contexts: mockContexts } as any);
     setupStores({}, {}, { setContextNodes });
     render(<LeftDrawer />);
 
@@ -122,8 +123,8 @@ describe('T4.6: LeftDrawer handleSend — canvasApi integration', () => {
   });
 
   it('sets empty contextNodes when API returns success but no contexts', async () => {
-    const setContextNodes = jest.fn();
-    jest.mocked(canvasApi.generateContexts).mockResolvedValue({ success: true, contexts: [] } as any);
+    const setContextNodes = vi.fn();
+    vi.mocked(canvasApi.generateContexts).mockResolvedValue({ success: true, contexts: [] } as any);
     setupStores({}, {}, { setContextNodes });
     render(<LeftDrawer />);
 
@@ -138,8 +139,8 @@ describe('T4.6: LeftDrawer handleSend — canvasApi integration', () => {
   });
 
   it('sets empty contextNodes when API throws', async () => {
-    const setContextNodes = jest.fn();
-    jest.mocked(canvasApi.generateContexts).mockRejectedValue(new Error('Network error'));
+    const setContextNodes = vi.fn();
+    vi.mocked(canvasApi.generateContexts).mockRejectedValue(new Error('Network error'));
     setupStores({}, {}, { setContextNodes });
     render(<LeftDrawer />);
 
@@ -154,7 +155,7 @@ describe('T4.6: LeftDrawer handleSend — canvasApi integration', () => {
   });
 
   it('does not call canvasApi when textarea is empty', async () => {
-    jest.mocked(canvasApi.generateContexts).mockResolvedValue({ success: true, contexts: [] } as any);
+    vi.mocked(canvasApi.generateContexts).mockResolvedValue({ success: true, contexts: [] } as any);
     setupStores();
     render(<LeftDrawer />);
 
@@ -162,11 +163,11 @@ describe('T4.6: LeftDrawer handleSend — canvasApi integration', () => {
       fireEvent.click(screen.getByTestId('left-drawer-send-btn'));
     });
 
-    expect(jest.mocked(canvasApi.generateContexts)).not.toHaveBeenCalled();
+    expect(vi.mocked(canvasApi.generateContexts)).not.toHaveBeenCalled();
   });
 
   it('does not call canvasApi when aiThinking=true', async () => {
-    jest.mocked(canvasApi.generateContexts).mockResolvedValue({ success: true, contexts: [] } as any);
+    vi.mocked(canvasApi.generateContexts).mockResolvedValue({ success: true, contexts: [] } as any);
     setupStores({}, { aiThinking: true });
     render(<LeftDrawer />);
 
@@ -175,6 +176,6 @@ describe('T4.6: LeftDrawer handleSend — canvasApi integration', () => {
       fireEvent.click(screen.getByTestId('left-drawer-send-btn'));
     });
 
-    expect(jest.mocked(canvasApi.generateContexts)).not.toHaveBeenCalled();
+    expect(vi.mocked(canvasApi.generateContexts)).not.toHaveBeenCalled();
   });
 });

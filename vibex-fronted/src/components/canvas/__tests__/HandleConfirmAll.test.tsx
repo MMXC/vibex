@@ -1,3 +1,4 @@
+import {vi, Mock, SpyInstance} from 'vitest';
 /**
  * Tests for Epic 3 confirm-all removal (canvas-three-tree-unification)
  *
@@ -31,49 +32,49 @@ const mockCompNodes: ComponentNode[] = [
   { nodeId: 'comp-2', flowId: 'flow-1', name: '详情页组件', type: 'detail' as const, props: { layout: 'container' }, api: { method: 'GET' as const, path: '/api/detail/:id' }, children: [], isActive: false, status: 'pending' as const },
 ];
 
-const mockAdvancePhase = jest.fn();
-const mockSetPhase = jest.fn();
+const mockAdvancePhase = vi.fn();
+const mockSetPhase = vi.fn();
 
 // =============================================================================
 // Mock canvasStore — Epic3: no confirmContextNode/confirmFlowNode/confirmComponentNode
 // =============================================================================
-jest.mock('@/lib/canvas/canvasStore', () => ({
-  useCanvasStore: jest.fn((selector) => {
+vi.mock('@/lib/canvas/canvasStore', () => ({
+  useCanvasStore: vi.fn((selector) => {
     const state = {
       // BoundedContextTree selectors
       contextNodes: mockCtxNodes,
       advancePhase: mockAdvancePhase,
-      addContextDraft: jest.fn(),
-      updateContextDraft: jest.fn(),
-      deleteContextDraft: jest.fn(),
+      addContextDraft: vi.fn(),
+      updateContextDraft: vi.fn(),
+      deleteContextDraft: vi.fn(),
       // ComponentTree selectors
       componentNodes: mockCompNodes,
       setPhase: mockSetPhase,
-      addComponentNode: jest.fn(),
-      editComponentNode: jest.fn(),
-      deleteComponentNode: jest.fn(),
-      setComponentNodes: jest.fn(),
+      addComponentNode: vi.fn(),
+      editComponentNode: vi.fn(),
+      deleteComponentNode: vi.fn(),
+      setComponentNodes: vi.fn(),
       // Shared selectors
       flowNodes: [
         { nodeId: 'flow-1', name: '流程1', type: 'business-flow' as const, status: 'pending' as const, isActive: false, children: [], steps: [] },
       ],
       phase: 'context' as const,
       activeTree: 'context' as const,
-      setActiveTree: jest.fn(),
-      autoGenerateFlows: jest.fn(),
-      loadExampleData: jest.fn(),
+      setActiveTree: vi.fn(),
+      autoGenerateFlows: vi.fn(),
+      loadExampleData: vi.fn(),
       selectedNodeIds: { context: [], flow: [], component: [] },
-      toggleNodeSelect: jest.fn(),
-      selectAllNodes: jest.fn(),
-      clearNodeSelection: jest.fn(),
-      deleteSelectedNodes: jest.fn(),
+      toggleNodeSelect: vi.fn(),
+      selectAllNodes: vi.fn(),
+      clearNodeSelection: vi.fn(),
+      deleteSelectedNodes: vi.fn(),
     };
     return selector(state);
   }),
 }));
 
-jest.mock('@/components/ui/Toast', () => ({
-  useToast: jest.fn(() => ({ toasts: [], showToast: jest.fn(), hideToast: jest.fn() })),
+vi.mock('@/components/ui/Toast', () => ({
+  useToast: vi.fn(() => ({ toasts: [], showToast: vi.fn(), hideToast: vi.fn() })),
 }));
 
 // =============================================================================
@@ -88,7 +89,7 @@ describe('Epic3 — Confirm-all removed, only phase advancement', () => {
   ];
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockCtxNodes.length = 0;
     ctxSnapshot.forEach((n) => mockCtxNodes.push({ ...n }));
   });
@@ -100,7 +101,7 @@ describe('Epic3 — Confirm-all removed, only phase advancement', () => {
 
   describe('ComponentTree — no confirm-all button, only prototype transition', () => {
     beforeEach(() => {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
       mockCompNodes.length = 0;
       mockCompNodes.push(
         { nodeId: 'comp-1', flowId: 'flow-1', name: '首页组件', type: 'page' as const, props: { layout: 'full-width' }, api: { method: 'GET' as const, path: '/api/home' }, children: [], isActive: false, status: 'pending' as const },

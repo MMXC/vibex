@@ -1,3 +1,4 @@
+import {vi, Mock, SpyInstance} from 'vitest';
 /**
  * CommandInput.test.tsx — Epic 2 命令输入系统测试
  *
@@ -54,18 +55,18 @@ describe('Epic 2 F2.1: CommandInput — 命令输入框', () => {
 
 describe('Epic 2 F2.2: CommandList — 命令下拉列表', () => {
   it('F2.2: 显示全部 5 个命令（默认无过滤）', () => {
-    render(<CommandList commands={ALL_COMMANDS} onSelect={jest.fn()} keyword="" />);
+    render(<CommandList commands={ALL_COMMANDS} onSelect={vi.fn()} keyword="" />);
     expect(screen.getAllByRole('option')).toHaveLength(5);
   });
 
   it('F2.2: /submit 和 /update-card 在列表中', () => {
-    render(<CommandList commands={ALL_COMMANDS} onSelect={jest.fn()} keyword="" />);
+    render(<CommandList commands={ALL_COMMANDS} onSelect={vi.fn()} keyword="" />);
     expect(screen.getByText('/submit')).toBeInTheDocument();
     expect(screen.getByText('/update-card')).toBeInTheDocument();
   });
 
   it('F2.2: 空列表显示"没有匹配的命令"', () => {
-    render(<CommandList commands={[]} onSelect={jest.fn()} keyword="xyz" />);
+    render(<CommandList commands={[]} onSelect={vi.fn()} keyword="xyz" />);
     expect(screen.getByText('没有匹配的命令')).toBeInTheDocument();
   });
 });
@@ -74,7 +75,7 @@ describe('Epic 2 F2.2: CommandList — 命令下拉列表', () => {
 
 describe('Epic 2 F2.3: 关键词过滤', () => {
   it('AC-F2.3: 输入 /gen 显示 3 个 /gen 命令', () => {
-    render(<CommandList commands={ALL_COMMANDS.filter((c) => c.label.includes('/gen'))} onSelect={jest.fn()} keyword="gen" />);
+    render(<CommandList commands={ALL_COMMANDS.filter((c) => c.label.includes('/gen'))} onSelect={vi.fn()} keyword="gen" />);
     // keyword prop is for highlighting only; CommandList renders all passed commands
     expect(screen.getAllByRole('option')).toHaveLength(3);
   });
@@ -82,7 +83,7 @@ describe('Epic 2 F2.3: 关键词过滤', () => {
   it('F2.3: /sub 只显示 /submit', () => {
     const filtered = ALL_COMMANDS.filter((c) => c.label.includes('/sub'));
     // Only /submit contains '/sub' in label
-    render(<CommandList commands={filtered} onSelect={jest.fn()} keyword="sub" />);
+    render(<CommandList commands={filtered} onSelect={vi.fn()} keyword="sub" />);
     expect(screen.getAllByRole('option')).toHaveLength(1);
     expect(screen.getByRole('option')).toHaveTextContent(/\/submit/);
   });
@@ -90,7 +91,7 @@ describe('Epic 2 F2.3: 关键词过滤', () => {
   it('F2.3: /update 只显示 /update-card', () => {
     const filtered = ALL_COMMANDS.filter((c) => c.label.includes('/update'));
     // Only /update-card contains '/update' in label
-    render(<CommandList commands={filtered} onSelect={jest.fn()} keyword="update" />);
+    render(<CommandList commands={filtered} onSelect={vi.fn()} keyword="update" />);
     expect(screen.getAllByRole('option')).toHaveLength(1);
     expect(screen.getByRole('option')).toHaveTextContent(/\/update-card/);
   });
@@ -140,12 +141,12 @@ describe('Epic 2 F2.4: 节点依赖过滤', () => {
 // ── Command Execution Tests ────────────────────────────────────────────
 
 describe('Epic 2 F2.6+F2.7: 命令执行', () => {
-  let consoleSpy: jest.SpyInstance;
+  let consoleSpy: SpyInstance;
 
   beforeEach(() => {
     useCanvasStore.setState({ selectedNodeIds: { context: [], flow: [], component: [] } });
     useMessageDrawerStore.setState({ messages: [] });
-    consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
   });
 
   afterEach(() => {

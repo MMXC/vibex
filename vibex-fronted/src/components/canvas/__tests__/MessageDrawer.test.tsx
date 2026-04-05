@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * MessageDrawer.test.tsx — Epic 3: 消息抽屉集成测试
  *
@@ -20,8 +21,8 @@ function setupCanvasStore(overrides = {}) {
     sseError: null,
     flowGenerating: false,
     aiThinking: false,
-    abortGeneration: jest.fn(),
-    toggleRightDrawer: jest.fn(),
+    abortGeneration: vi.fn(),
+    toggleRightDrawer: vi.fn(),
     ...overrides,
   });
 }
@@ -91,7 +92,7 @@ describe('Epic 3 S3.3: Abort Button', () => {
   });
 
   it('AC-S3.3: 生成中显示中止按钮', () => {
-    const abortGeneration = jest.fn();
+    const abortGeneration = vi.fn();
     setupCanvasStore({ rightDrawerOpen: true, flowGenerating: true, abortGeneration });
     render(<MessageDrawer />);
     expect(screen.getByTestId('abort-bar')).toBeInTheDocument();
@@ -99,14 +100,14 @@ describe('Epic 3 S3.3: Abort Button', () => {
   });
 
   it('AC-S3.3: aiThinking=true 时显示中止按钮', () => {
-    const abortGeneration = jest.fn();
+    const abortGeneration = vi.fn();
     setupCanvasStore({ rightDrawerOpen: true, aiThinking: true, abortGeneration });
     render(<MessageDrawer />);
     expect(screen.getByTestId('abort-bar')).toBeInTheDocument();
   });
 
   it('AC-S3.3: 点击中止按钮调用 abortGeneration', () => {
-    const abortGeneration = jest.fn();
+    const abortGeneration = vi.fn();
     setupCanvasStore({ rightDrawerOpen: true, flowGenerating: true, abortGeneration });
     render(<MessageDrawer />);
     fireEvent.click(screen.getByTestId('abort-button'));

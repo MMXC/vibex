@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * TabBar.test.tsx
  * Epic: canvas-three-tree-unification | Epic1: Tab 切换器 + 废除 phase
@@ -87,7 +88,7 @@ describe('TabBar', () => {
 
   it('calls onTabChange callback when unlocked tab is clicked', async () => {
     const user = userEvent.setup();
-    const onTabChange = jest.fn();
+    const onTabChange = vi.fn();
     render(<TabBar onTabChange={onTabChange} />);
     const tabs = screen.getAllByRole('tab');
 

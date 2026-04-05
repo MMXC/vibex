@@ -1,3 +1,4 @@
+import {vi, Mock, SpyInstance} from 'vitest';
 /**
  * E2: Common Component Grouping Tests
  *
@@ -16,31 +17,31 @@ import { ComponentTree } from '../ComponentTree';
 import type { ComponentNode, BusinessFlowNode } from '@/lib/canvas/types';
 
 // Mock useToast hook
-jest.mock('@/components/ui/Toast', () => ({
-  useToast: jest.fn(() => ({
+vi.mock('@/components/ui/Toast', () => ({
+  useToast: vi.fn(() => ({
     toasts: [],
-    showToast: jest.fn(),
-    hideToast: jest.fn(),
+    showToast: vi.fn(),
+    hideToast: vi.fn(),
   })),
 }));
 
 // Mock canvasStore with both common and page-specific components
-jest.mock('@/lib/canvas/canvasStore', () => ({
-  useCanvasStore: jest.fn((selector) => {
+vi.mock('@/lib/canvas/canvasStore', () => ({
+  useCanvasStore: vi.fn((selector) => {
     const state = {
       componentNodes: mockComponentNodes,
-      addComponentNode: jest.fn(),
-      editComponentNode: jest.fn(),
-      deleteComponentNode: jest.fn(),
-      setComponentNodes: jest.fn(),
+      addComponentNode: vi.fn(),
+      editComponentNode: vi.fn(),
+      deleteComponentNode: vi.fn(),
+      setComponentNodes: vi.fn(),
       flowNodes: mockFlowNodes,
-      setPhase: jest.fn(),
+      setPhase: vi.fn(),
       // F3-F10: Multi-select state (required by ComponentTree)
       selectedNodeIds: { context: [], flow: [], component: [] },
-      toggleNodeSelect: jest.fn(),
-      selectAllNodes: jest.fn(),
-      clearNodeSelection: jest.fn(),
-      deleteSelectedNodes: jest.fn(),
+      toggleNodeSelect: vi.fn(),
+      selectAllNodes: vi.fn(),
+      clearNodeSelection: vi.fn(),
+      deleteSelectedNodes: vi.fn(),
     };
     return selector(state);
   }),
@@ -142,7 +143,7 @@ const mockComponentNodes: ComponentNode[] = [
 
 describe('E2: Common Component Grouping', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('F2.1: Common component data model', () => {

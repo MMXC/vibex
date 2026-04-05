@@ -1,3 +1,4 @@
+import {vi, Mock, SpyInstance} from 'vitest';
 /**
  * BoundedContextTree.test.tsx — Epic 1: E1 checkbox UX fix
  * Updated for new store architecture (useContextStore only).
@@ -14,64 +15,64 @@ const ctxNodes: BoundedContextNode[] = [
   { nodeId: 'ctx-3', name: '支付结算', description: '诊金支付和医保结算', type: 'generic', isActive: false, status: 'pending', children: [] },
 ];
 
-const mockToggleContextNode = jest.fn();
-const mockToggleNodeSelect = jest.fn();
-const mockAdvancePhase = jest.fn();
+const mockToggleContextNode = vi.fn();
+const mockToggleNodeSelect = vi.fn();
+const mockAdvancePhase = vi.fn();
 
-jest.mock('@/lib/canvas/stores/contextStore', () => ({
-  useContextStore: jest.fn((selector?: (s: Record<string, unknown>) => unknown) => {
+vi.mock('@/lib/canvas/stores/contextStore', () => ({
+  useContextStore: vi.fn((selector?: (s: Record<string, unknown>) => unknown) => {
     const state = {
       contextNodes: ctxNodes,
       phase: 'context',
       advancePhase: mockAdvancePhase,
       activeTree: 'context',
-      setActiveTree: jest.fn(),
+      setActiveTree: vi.fn(),
       selectedNodeIds: { context: [] as string[], flow: [] as string[], component: [] as string[] },
       toggleNodeSelect: mockToggleNodeSelect,
-      selectAllNodes: jest.fn(),
-      clearNodeSelection: jest.fn(),
-      deleteSelectedNodes: jest.fn(),
+      selectAllNodes: vi.fn(),
+      clearNodeSelection: vi.fn(),
+      deleteSelectedNodes: vi.fn(),
       toggleContextNode: mockToggleContextNode,
-      toggleContextSelection: jest.fn(),
-      setContextNodes: jest.fn(),
-      addContextNode: jest.fn(),
-      deleteContextNode: jest.fn(),
-      editContextNode: jest.fn(),
-      confirmContextNode: jest.fn(),
-      setContextDraft: jest.fn(),
+      toggleContextSelection: vi.fn(),
+      setContextNodes: vi.fn(),
+      addContextNode: vi.fn(),
+      deleteContextNode: vi.fn(),
+      editContextNode: vi.fn(),
+      confirmContextNode: vi.fn(),
+      setContextDraft: vi.fn(),
       contextDraft: null,
     };
     return selector ? selector(state) : state;
   }),
 }));
 
-jest.mock('@/lib/canvas/stores/flowStore', () => ({
-  useFlowStore: jest.fn((selector?: (s: Record<string, unknown>) => unknown) => {
+vi.mock('@/lib/canvas/stores/flowStore', () => ({
+  useFlowStore: vi.fn((selector?: (s: Record<string, unknown>) => unknown) => {
     const state = { flowNodes: [], phase: 'context' as const, activeTree: 'context' as const };
     return selector ? selector(state) : state;
   }),
 }));
 
-jest.mock('@/lib/canvas/stores/sessionStore', () => ({
-  useSessionStore: jest.fn((selector?: (s: Record<string, unknown>) => unknown) => {
+vi.mock('@/lib/canvas/stores/sessionStore', () => ({
+  useSessionStore: vi.fn((selector?: (s: Record<string, unknown>) => unknown) => {
     const state = { aiThinking: false, aiThinkingMessage: null, requirementText: '' };
     return selector ? selector(state) : state;
   }),
 }));
 
-jest.mock('@/hooks/canvas/useDragSelection', () => ({
-  useDragSelection: jest.fn(() => ({
-    isDragging: false, selectionBox: null, containerRef: { current: null }, isNodeInBox: jest.fn(), isSelecting: false,
+vi.mock('@/hooks/canvas/useDragSelection', () => ({
+  useDragSelection: vi.fn(() => ({
+    isDragging: false, selectionBox: null, containerRef: { current: null }, isNodeInBox: vi.fn(), isSelecting: false,
   })),
-  useModifierKey: jest.fn(() => false),
+  useModifierKey: vi.fn(() => false),
 }));
 
-jest.mock('@/components/ui/Toast', () => ({
-  useToast: jest.fn(() => ({ showToast: jest.fn() })),
+vi.mock('@/components/ui/Toast', () => ({
+  useToast: vi.fn(() => ({ showToast: vi.fn() })),
 }));
 
 describe('BoundedContextTree — Epic 1: E1 checkbox UX', () => {
-  beforeEach(() => { jest.clearAllMocks(); });
+  beforeEach(() => { vi.clearAllMocks(); });
   afterEach(cleanup);
 
   it('renders all context nodes', () => {

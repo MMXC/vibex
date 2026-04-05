@@ -1,3 +1,16 @@
+### Added (canvas-optimization-roadmap E2: 移除 legacy canvasStore) — 2026-04-05
+- **E2 架构分层**: 移除 legacy canvasStore.ts + deprecated.ts
+  - 新增 CanvasStoreInitializer.tsx — crossStoreSync 初始化
+  - stores 直接导入，不再通过 canvasStore re-export layer
+  - 移除 canvasStore.test.ts (dead test)
+- **提交**: `c2d4645d`
+
+### Added (canvas-flowtree-api-fix E2: flowId 关联) — 2026-04-05
+- **E2 flowId 关联**: generateComponents 使用 flowId 关联 components → flows
+  - CanvasPage: `id: f.nodeId` → generateComponents API
+  - flowId fallback: 'mock' → '' (无假默认值)
+- **提交**: `04b443ef`
+
 ### Added (canvas-flowtree-guard-fix E3: E2E 验证) — 2026-04-05
 - **E3 E2E 验证**: gstack browser 验证 TabBar phase guard
   - TabBar phase guard: context=selected, flow+component=disabled

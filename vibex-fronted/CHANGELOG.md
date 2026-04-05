@@ -13,6 +13,15 @@
 - **文件**: `vibex-fronted/src/components/canvas/BoundedContextTree.tsx`
 - **提交**: `9b54b10a`
 
+### [canvas-button-cleanup E2: TreeToolbar 按钮逻辑修复] — 2026-04-06
+- **E2 onDeselectAll Bug Fix**: 修复 `onDeselectAll` 错误调用 `selectAllNodes` → `clearNodeSelection`（2处，lines ~503/790）
+- **E2 Flow panel 方法补全**: `flowStore` 新增 `selectAllNodes`/`clearNodeSelection`/`deleteSelectedNodes`/`resetFlowCanvas`（`resetFlowCanvas` 内部处理 `recordSnapshot`）
+- **E2 TreeToolbar onDelete/onReset**: Flow 面板 TreeToolbar 删除/重置按钮挂载真实 handler
+- **E2 Component panel 方法**: `onSelectAll`/`onDeselectAll` 挂载真实 handler
+- **文件**: `vibex-fronted/src/components/canvas/CanvasPage.tsx`, `vibex-fronted/src/lib/canvas/stores/flowStore.ts`
+- **提交**: `369ff195` (onDeselectAll fix), `3570e2b7` (Flow handlers)
+- **测试**: TypeScript 检查通过，ESLint 无新增问题
+
 ### [canvas-button-consolidation E1: TreeToolbar统一入口修复] — 2026-04-06
 - **E1-T3 TreeToolbar 统一**: `TreeToolbar` 组件集成到三列 TreePanel headerActions，统一入口
 - **E1-T1/T2/T4**: TreePanel header 布局重构，三栏共享同一 TreeToolbar 实例

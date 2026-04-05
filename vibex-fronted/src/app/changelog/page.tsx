@@ -19,6 +19,22 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.129',
+    date: '2026-04-06',
+    changes: [
+      '📋 canvas-button-cleanup E2: TreeToolbar 按钮逻辑修复',
+      '✅ E2 onDeselectAll Bug Fix: 修复错误调用 selectAllNodes → clearNodeSelection (2处，lines ~503/790)',
+      '✅ E2 Flow panel: flowStore 新增 selectAllNodes/clearNodeSelection/deleteSelectedNodes/resetFlowCanvas',
+      '✅ E2 TreeToolbar: Flow 面板新增 onDelete/onReset 按钮，挂载真实 handler',
+      '✅ E2 Component panel: onSelectAll/onDeselectAll 挂载真实 handler',
+      '提交: 369ff195 / 3570e2b7',
+    ],
+    commit: '3570e2b7',
+  },
+
+
+
+  {
     version: '1.0.128',
     date: '2026-04-06',
     changes: [

@@ -17,4 +17,5 @@
 ## DoD
 - [x] dedup API 存在 — `scripts/dedup_api.py` ✅ commit `e3b1e324`
 - [x] coord 派生前调用 dedup — `init_project.sh` 调用 `dedup_check.py` ✅ commit `36ab6f4f`
-- [ ] 重复提案告警发送（E3）
+- [x] 重复提案告警发送 — `dedup_check.py` → #coord Slack 告警 ✅ commit `155339d7`
+  **全部完成** ✅

@@ -17,7 +17,7 @@ import { useUIStore } from '@/lib/canvas/stores/uiStore';
 import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import { hasNodes } from '@/lib/canvas/cascade';
-import type { CreateProjectInput, PrototypePage } from '@/lib/canvas/types';
+import type { CreateProjectInput, PrototypePage, BoundedContextNode, BusinessFlowNode, ComponentNode } from '@/lib/canvas/types';
 import { getHistoryStore } from '@/lib/canvas/historySlice';
 
 // ── Epic 1 F1.2: Message Drawer Toggle ────────────────────────────────────
@@ -119,17 +119,17 @@ export function ProjectBar({
     // Priority: context > flow > component
     if (historyStore.canUndo('context')) {
       const prev = historyStore.undo('context');
-      if (prev) useContextStore.getState().setContextNodes(prev as any);
+      if (prev) useContextStore.getState().setContextNodes(prev as BoundedContextNode[]);
       return;
     }
     if (historyStore.canUndo('flow')) {
       const prev = historyStore.undo('flow');
-      if (prev) useFlowStore.getState().setFlowNodes(prev as any);
+      if (prev) useFlowStore.getState().setFlowNodes(prev as BusinessFlowNode[]);
       return;
     }
     if (historyStore.canUndo('component')) {
       const prev = historyStore.undo('component');
-      if (prev) useComponentStore.getState().setComponentNodes(prev as any);
+      if (prev) useComponentStore.getState().setComponentNodes(prev as ComponentNode[]);
     }
   }, []);
 
@@ -139,17 +139,17 @@ export function ProjectBar({
     // Priority: context > flow > component
     if (historyStore.canRedo('context')) {
       const next = historyStore.redo('context');
-      if (next) useContextStore.getState().setContextNodes(next as any);
+      if (next) useContextStore.getState().setContextNodes(next as BoundedContextNode[]);
       return;
     }
     if (historyStore.canRedo('flow')) {
       const next = historyStore.redo('flow');
-      if (next) useFlowStore.getState().setFlowNodes(next as any);
+      if (next) useFlowStore.getState().setFlowNodes(next as BusinessFlowNode[]);
       return;
     }
     if (historyStore.canRedo('component')) {
       const next = historyStore.redo('component');
-      if (next) useComponentStore.getState().setComponentNodes(next as any);
+      if (next) useComponentStore.getState().setComponentNodes(next as ComponentNode[]);
     }
   }, []);
 

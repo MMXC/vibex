@@ -16,7 +16,7 @@ import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { useHistoryStore, getHistoryStore } from '@/lib/canvas/historySlice';
-import type { TreeType } from '@/lib/canvas/types';
+import type { TreeType, BoundedContextNode, BusinessFlowNode, ComponentNode } from '@/lib/canvas/types';
 
 const THROTTLE_MS = 300;
 
@@ -164,11 +164,11 @@ export function useCanvasHistory() {
     if (!previous) return false;
 
     if (tree === 'context') {
-      useContextStore.getState().setContextNodes(previous as any);
+      useContextStore.getState().setContextNodes(previous as BoundedContextNode[]);
     } else if (tree === 'flow') {
-      useFlowStore.getState().setFlowNodes(previous as any);
+      useFlowStore.getState().setFlowNodes(previous as BusinessFlowNode[]);
     } else {
-      useComponentStore.getState().setComponentNodes(previous as any);
+      useComponentStore.getState().setComponentNodes(previous as ComponentNode[]);
     }
     return true;
   }, []);
@@ -183,11 +183,11 @@ export function useCanvasHistory() {
     if (!next) return false;
 
     if (tree === 'context') {
-      useContextStore.getState().setContextNodes(next as any);
+      useContextStore.getState().setContextNodes(next as BoundedContextNode[]);
     } else if (tree === 'flow') {
-      useFlowStore.getState().setFlowNodes(next as any);
+      useFlowStore.getState().setFlowNodes(next as BusinessFlowNode[]);
     } else {
-      useComponentStore.getState().setComponentNodes(next as any);
+      useComponentStore.getState().setComponentNodes(next as ComponentNode[]);
     }
     return true;
   }, []);

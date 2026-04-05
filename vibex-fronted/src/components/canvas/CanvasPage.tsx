@@ -503,7 +503,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 treeType="context"
                 nodeCount={contextNodes.length}
                 onSelectAll={() => useContextStore.getState().selectAllNodes?.('context')}
-                onDeselectAll={() => useContextStore.getState().selectAllNodes?.('context')}
+                onDeselectAll={() => useContextStore.getState().clearNodeSelection?.('context')}
                 onClear={() => useContextStore.getState().setContextNodes([])}
                 onContinue={() => autoGenerateFlows(contextNodes.filter((c) => c.isActive !== false))}
                 continueLabel={contextNodes.length === 0 ? '→ 选择上下文' : flowGenerating ? `◌ ${flowGeneratingMessage ?? '生成中...'}` : '→ 继续 → 流程树'}
@@ -784,7 +784,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                     treeType="context"
                     nodeCount={contextNodes.length}
                     onSelectAll={() => useContextStore.getState().selectAllNodes?.('context')}
-                    onDeselectAll={() => useContextStore.getState().selectAllNodes?.('context')}
+                    onDeselectAll={() => useContextStore.getState().clearNodeSelection?.('context')}
                     onClear={() => useContextStore.getState().setContextNodes([])}
                     onContinue={() => autoGenerateFlows(contextNodes.filter((c) => c.isActive !== false))}
                     continueLabel={contextNodes.length === 0 ? '→ 选择上下文' : flowGenerating ? `◌ ${flowGeneratingMessage ?? '生成中...'}` : '→ 继续 → 流程树'}

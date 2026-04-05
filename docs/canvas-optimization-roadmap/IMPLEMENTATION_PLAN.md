@@ -23,6 +23,6 @@
   - Hook层: `hooks/canvas/useCanvasStore.ts` (unified selectors)
   - 数据层: `stores/` (contextStore, flowStore, componentStore, uiStore, sessionStore)
   - 类型层: `lib/canvas/types.ts`
-- [ ] dead code 全部清除（E3-E4）
-- [ ] O(n) 边计算（E3）
+- [x] dead code 全部清除 ✅ E1: canvasLogger 替换9处; E2: canvasStore.ts/deprecated.ts 移除; E4: phaseProgressBarWrapper 移除
+- [x] O(n) 边计算 ✅ edge layers 每边独立 O(1) 计算，useMemo + clustering 自动聚类（>20条）
 - [ ] ErrorBoundary + 80% 覆盖（E4）

@@ -1,3 +1,12 @@
+### Added (vibex-ts-any-cleanup E2: 剩余源码 as any 清理) — 2026-04-05
+- **E2 剩余源码清理**: 移除 `UndoBar.tsx`, `preview/page.tsx` 等中的 11 个 `as any`
+  - `UndoBar.tsx`: 6 个 `as any` → 正确类型
+  - `preview/page.tsx`: 移除 `AnyBusinessFlow=any` → `ConfirmationBusinessFlow`
+  - `confirmationTypes.ts`: 添加 states/transitions 到 BusinessFlow
+  - `confirmationStore.ts`: 修复 initial businessFlow 类型
+  - 注: ReactFlow edge/node 类型仍需更深层重构
+- **提交**: `288e9173`
+
 ### Added (vibex-ts-any-cleanup E1: useCanvasHistory/ProjectBar 类型修复) — 2026-04-05
 - **E1 类型修复**: 移除 `useCanvasHistory.ts` 和 `ProjectBar.tsx` 中的 `as any`
   - `useCanvasHistory.ts`: 6 个 `as any` → `as BoundedContextNode[]` 等正确类型

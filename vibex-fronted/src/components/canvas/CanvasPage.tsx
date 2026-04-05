@@ -633,9 +633,8 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
       </div>
 
       {/* Project Bar — Epic 5: Create Project button */}
-      {phase !== 'input' && (
-        <div className={styles.projectBarWrapper}>
-          <ProjectBar
+      <div className={styles.projectBarWrapper}>
+        <ProjectBar
             projectName={projectName}
             onProjectNameChange={setProjectName}
             onOpenSearch={searchEvents.openSearch}
@@ -653,7 +652,6 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             onSaveNow={saveNow}
           />
         </div>
-      )}
 
       {/* F1: Expand controls — shown when not in input phase */}
       {phase !== 'input' && (

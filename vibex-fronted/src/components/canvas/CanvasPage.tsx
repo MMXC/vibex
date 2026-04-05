@@ -66,7 +66,6 @@ import { PrototypeQueuePanel } from './PrototypeQueuePanel';
 import { HoverHotzone } from './HoverHotzone';
 import { ShortcutHintPanel } from './features/ShortcutHintPanel';
 import { ShortcutHelpPanel } from './ShortcutHelpPanel';
-import { TemplateSelector } from './features/TemplateSelector';
 import { VersionHistoryPanel } from './features/VersionHistoryPanel';
 import { SaveIndicator } from './features/SaveIndicator';
 import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
@@ -168,7 +167,6 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const [activeTab, setActiveTab] = useState<TreeType>('context');
   const [projectName, setProjectName] = useState('我的项目');
   const [queuePanelExpanded, setQueuePanelExpanded] = useState(true);
-  const [isTemplateSelectorOpen, setIsTemplateSelectorOpen] = useState(false);
 
   // === Component Generation State (Bug4b) ===
   const [componentGenerating, setComponentGenerating] = useState(false);
@@ -906,112 +904,6 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             </div>
           )}
         </>
-      )}
-
-      {/* Input Phase: Requirement Input Area */}
-      {phase === 'input' && (
-        <div className={styles.inputPhaseArea}>
-          <div className={styles.inputPhaseCard}>
-            <h2 className={styles.inputPhaseTitle}>🎯 描述您的需求</h2>
-            <textarea
-              className={styles.requirementTextarea}
-              placeholder="例如：我想做一个在线预约医生系统，患者可以预约、问诊、查看病历..."
-              rows={6}
-              aria-label="需求描述"
-              value={requirementInput}
-              onChange={(e) => setRequirementInput(e.target.value)}
-              disabled={aiThinking}
-            />
-            <div className={styles.inputPhaseActions}>
-              <button
-                type="button"
-                className={styles.primaryButton}
-                onClick={() => {
-                  if (requirementInput.trim()) {
-                    setRequirementText(requirementInput);
-                    const drafts: BoundedContextDraft[] = [
-                      { name: '需求管理', description: '处理需求录入', type: 'core' },
-                      { name: '业务流程', description: '核心业务处理', type: 'core' },
-                    ];
-                    const newCtxs: BoundedContextNode[] = drafts.map((d, i) => ({
-                      nodeId: `ctx-gen-${Date.now()}-${i}`,
-                      name: d.name,
-                      description: d.description,
-                      type: d.type,
-                      status: 'pending' as const,
-                      children: [],
-                    }));
-                    useContextStore.getState().setContextNodes(newCtxs);
-                  }
-                }}
-                disabled={!requirementInput.trim() || aiThinking}
-              >
-                {aiThinking ? '分析中...' : '启动画布 →'}
-              </button>
-              <button
-                type="button"
-                className={styles.secondaryButton}
-                onClick={loadExampleData}
-                aria-label="导入示例数据"
-                data-testid="import-example-btn"
-                title="加载示例画布数据到三树"
-              >
-                导入示例
-              </button>
-            </div>
-
-            {/* AI Thinking Hint (Epic 1) */}
-            {aiThinking && (
-              <div className={styles.aiThinkingHint} role="status" aria-live="polite">
-                <span className={styles.aiSpinner} aria-hidden="true" />
-                <span className={styles.aiThinkingMessage}>
-                  {aiThinkingMessage ?? '正在分析需求...'}
-                </span>
-              </div>
-            )}
-
-            {/* E4-F10: Template Selector */}
-            <div className={styles.templateActions}>
-              <button
-                type="button"
-                className={styles.secondaryButton}
-                onClick={() => setIsTemplateSelectorOpen(true)}
-                aria-label="使用模板"
-                data-testid="open-template-selector-btn"
-                title="从模板库选择作为起点"
-              >
-                📋 使用模板
-              </button>
-            </div>
-            <TemplateSelector
-              open={isTemplateSelectorOpen}
-              onClose={() => setIsTemplateSelectorOpen(false)}
-            />
-
-            {/* E3 S3.4: 示例项目快速入口 */}
-            {!hasProject && (
-              <div className={styles.exampleQuickEntry}>
-                <div className={styles.exampleDivider}>
-                  <span>或</span>
-                </div>
-                <button
-                  type="button"
-                  className={styles.exampleQuickButton}
-                  onClick={() => {
-                    loadExampleData();
-                    setPhase('context');
-                    setActiveTree('context');
-                  }}
-                  aria-label="从示例开始"
-                  data-testid="start-from-example-btn"
-                  title="加载示例项目，快速了解 VibeX 的功能"
-                >
-                  🚀 从示例开始
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
       )}
 
       {/* Epic1 F1.6: ShortcutHintPanel */}

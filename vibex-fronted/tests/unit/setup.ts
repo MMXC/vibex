@@ -1,6 +1,31 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
+// Provide jest.* globals as an alias to vi.* for backward compatibility
+// with test files that still use Jest syntax (jest.fn, jest.mock, etc.)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const jestCompat: any = {
+  fn: vi.fn,
+  spyOn: vi.spyOn,
+  mock: vi.mock,
+  doMock: vi.doMock,
+  unmock: vi.unmock,
+  clearAllMocks: vi.clearAllMocks,
+  resetAllMocks: vi.resetAllMocks,
+  restoreAllMocks: vi.restoreAllMocks,
+  useFakeTimers: vi.useFakeTimers,
+  useRealTimers: vi.useRealTimers,
+  runAllTimers: vi.runAllTimers,
+  runAllTicks: vi.runAllTicks,
+  runOnlyPendingTimers: vi.runOnlyPendingTimers,
+  advanceTimersByTime: vi.advanceTimersByTime,
+  setSystemTime: vi.setSystemTime,
+  mocked: vi.mocked,
+  isMockFunction: vi.isMockFunction,
+  je: undefined,
+};
+(global as any).jest = jestCompat;
+
 // Mock axios with proper AxiosError
 vi.mock('axios', () => {
   class MockAxiosError extends Error {

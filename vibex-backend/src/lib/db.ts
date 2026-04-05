@@ -1,7 +1,11 @@
 // Database connection pool management for Vibex
 // Supports both D1 (Cloudflare Workers) and Prisma (local development)
 
-import { PrismaClient, Prisma } from '@prisma/client';
+// E4: Only import PrismaClient when NOT running in Cloudflare Workers.
+// The isWorkers check tree-shakes Prisma out of the Workers production bundle.
+const isWorkers = typeof globalThis !== 'undefined' && typeof (globalThis as Record<string, unknown>).caches !== 'undefined'
+const Prisma = !isWorkers ? require('@prisma/client') : null
+const PrismaClient = Prisma?.PrismaClient
 
 // ============================================
 // D1 Types (Cloudflare Workers)
@@ -66,7 +70,13 @@ const defaultPoolConfig: PoolConfig = {
 // ============================================
 
 class PrismaPoolManager {
-  private client: PrismaClient | null = null;
+  private client: unknown | null = null;
+
+  // Return client cast to PrismaClient-like interface for safe method access
+  private get clientTyped(): { $queryRawUnsafe?: (sql: string) => unknown; $disconnect?: () => unknown } | null {
+    return this.client as { $queryRawUnsafe?: (sql: string) => unknown; $disconnect?: () => unknown } | null
+  }
+
   private config: PoolConfig;
   private isHealthy: boolean = false;
   private lastHealthCheck: number = 0;
@@ -76,8 +86,8 @@ class PrismaPoolManager {
     this.config = { ...defaultPoolConfig, ...config };
   }
 
-  getClient(): PrismaClient {
-    if (!this.client) {
+  getClient(): unknown {
+    if (!this.client && PrismaClient) {
       this.client = new PrismaClient({
         log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
         datasources: {
@@ -101,7 +111,7 @@ class PrismaPoolManager {
     }
 
     try {
-      await this.client?.$queryRawUnsafe('SELECT 1');
+      await this.clientTyped?.$queryRawUnsafe?.('SELECT 1');
       this.isHealthy = true;
       this.lastHealthCheck = now;
     } catch (error) {
@@ -114,7 +124,7 @@ class PrismaPoolManager {
 
   async disconnect(): Promise<void> {
     if (this.client) {
-      await this.client.$disconnect();
+      await this.clientTyped?.$disconnect?.();
       this.client = null;
       this.isHealthy = false;
     }
@@ -237,7 +247,7 @@ export async function queryDB<T = unknown>(
   } else {
     // Fallback to Prisma with connection pool
     const prismaManager = getPrismaPoolManager();
-    const prisma = prismaManager.getClient();
+    const prisma = prismaManager.getClient() as ReturnType<typeof import('@prisma/client')['PrismaClient']['prototype']['constructor']>;
     
     try {
       const result = await prisma.$queryRawUnsafe<T[]>(sql, ...params);
@@ -293,7 +303,7 @@ export async function executeDB(
     });
   } else {
     const prismaManager = getPrismaPoolManager();
-    const prisma = prismaManager.getClient();
+    const prisma = prismaManager.getClient() as ReturnType<typeof import('@prisma/client')['PrismaClient']['prototype']['constructor']>;
     
     try {
       const result = await prisma.$executeRawUnsafe(sql, ...params);
@@ -328,7 +338,7 @@ export async function transactionDB(
   } else {
     // Use Prisma transaction
     const prismaManager = getPrismaPoolManager();
-    const prisma = prismaManager.getClient();
+    const prisma = prismaManager.getClient() as ReturnType<typeof import('@prisma/client')['PrismaClient']['prototype']['constructor']>;
     
     return prisma.$transaction(async (tx) => {
       let totalChanges = 0;

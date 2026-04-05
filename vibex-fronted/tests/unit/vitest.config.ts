@@ -18,8 +18,10 @@ export default defineConfig({
     setupFiles: ['./tests/unit/setup.ts'],
     include: [
       'tests/unit/**/*.test.ts',
+      'tests/unit/**/*.test.tsx',
       'tests/unit/**/*.spec.ts',
       'src/hooks/**/*.test.ts',
+      'src/components/**/*.test.tsx',
     ],
     // Exclude pre-existing Jest-syntax test files (still use jest.mock)
     exclude: [

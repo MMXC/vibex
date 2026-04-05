@@ -10,7 +10,7 @@ const mockPageNode = (overrides: Partial<ComponentNode> = {}): ComponentNode => 
   type: 'page',
   props: {},
   api: { method: 'GET', path: '/test', params: [] },
-  children: ['form-1'],
+  children: [],
   status: 'pending',
   ...overrides,
 });

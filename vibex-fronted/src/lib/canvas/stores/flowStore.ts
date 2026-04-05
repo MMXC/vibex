@@ -12,6 +12,7 @@ import { devtools, persist } from 'zustand/middleware';
 import type { BusinessFlowNode, BusinessFlowDraft, FlowStep, BoundedContextNode } from '../types';
 import { getHistoryStore } from '../historySlice';
 import { useSessionStore } from './sessionStore';
+import { canvasApi } from '../api/canvasApi';
 
 import { generateId } from '../id';
 
@@ -20,6 +21,7 @@ interface FlowStore {
   flowNodes: BusinessFlowNode[];
   flowDraft: Partial<BusinessFlowNode> | null;
   flowGenerating: boolean;
+  flowError: string | null;
 
   // Node CRUD
   setFlowNodes: (nodes: BusinessFlowNode[]) => void;
@@ -39,6 +41,9 @@ interface FlowStore {
 
   // Draft
   setFlowDraft: (draft: Partial<BusinessFlowNode> | null) => void;
+
+  // Error
+  setFlowError: (error: string | null) => void;
 }
 
 export const useFlowStore = create<FlowStore>()(
@@ -49,6 +54,7 @@ export const useFlowStore = create<FlowStore>()(
         flowNodes: [],
         flowDraft: null,
         flowGenerating: false,
+        flowError: null,
 
         setFlowNodes: (nodes) => set({ flowNodes: nodes }),
 
@@ -56,34 +62,49 @@ export const useFlowStore = create<FlowStore>()(
           const confirmedCtxs = contextNodes.filter((c) => c.status === 'confirmed' || c.isActive !== false);
           if (confirmedCtxs.length === 0) return;
 
-          set({ flowGenerating: true });
+          set({ flowGenerating: true, flowError: null });
 
-          // Mock AI generation: simulate API delay
-          await new Promise((r) => setTimeout(r, 1500));
+          try {
+            const sessionId = useSessionStore.getState().projectId ?? 'default';
+            const result = await canvasApi.generateFlows({
+              contexts: confirmedCtxs.map((ctx) => ({
+                id: ctx.nodeId,
+                name: ctx.name,
+                description: (ctx as never as { description?: string }).description ?? '',
+                type: (ctx as never as { type?: string }).type ?? 'bounded_context',
+              })),
+              sessionId,
+            });
 
-          const newFlows: BusinessFlowNode[] = confirmedCtxs.map((ctx) => {
-            const defaultSteps: FlowStep[] = [
-              { stepId: generateId(), name: '需求收集', actor: '用户', description: '', order: 0, isActive: false, status: 'pending' },
-              { stepId: generateId(), name: '信息录入', actor: '用户', description: '', order: 1, isActive: false, status: 'pending' },
-              { stepId: generateId(), name: '提交确认', actor: '用户', description: '', order: 2, isActive: false, status: 'pending' },
-            ];
-            return {
+            const newFlows: BusinessFlowNode[] = result.flows.map((f) => ({
               nodeId: generateId(),
-              contextId: ctx.nodeId,
-              name: `${ctx.name}业务流程`,
-              steps: defaultSteps,
+              contextId: f.contextId,
+              name: f.name,
+              steps: f.steps.map((s, i) => ({
+                stepId: generateId(),
+                name: s.name,
+                actor: s.actor,
+                description: (s as never as { description?: string }).description ?? '',
+                order: i,
+                isActive: false,
+                status: 'pending' as const,
+              })),
               isActive: false,
               status: 'pending' as const,
               children: [],
-            };
-          });
+            }));
 
-          set((s) => {
-            const allFlows = [...s.flowNodes, ...newFlows];
-            getHistoryStore().recordSnapshot('flow', allFlows);
-            return { flowNodes: allFlows, flowGenerating: false };
-          });
-          useSessionStore.getState().addMessage({ type: 'user_action', content: `自动生成了 ${newFlows.length} 个流程节点` });
+            set((s) => {
+              const allFlows = [...s.flowNodes, ...newFlows];
+              getHistoryStore().recordSnapshot('flow', allFlows);
+              return { flowNodes: allFlows, flowGenerating: false };
+            });
+            useSessionStore.getState().addMessage({ type: 'user_action', content: `自动生成了 ${newFlows.length} 个流程节点` });
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : '生成流程失败';
+            set({ flowGenerating: false, flowError: msg });
+            useSessionStore.getState().addMessage({ type: 'system', content: msg });
+          }
         },
 
         addFlowNode: (data) => {
@@ -259,6 +280,8 @@ export const useFlowStore = create<FlowStore>()(
         },
 
         setFlowDraft: (draft) => set({ flowDraft: draft }),
+
+        setFlowError: (error) => set({ flowError: error }),
       }),
       { name: 'vibex-flow-store' }
     ),

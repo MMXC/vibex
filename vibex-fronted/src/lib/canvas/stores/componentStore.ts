@@ -34,6 +34,7 @@ interface ComponentStore {
   // Multi-select
   toggleNodeSelect: (nodeId: string) => void;
   selectNode: (nodeId: string) => void;
+  setSelectedNodeIds: (nodeIds: string[]) => void;
   clearNodeSelection: () => void;
   selectAllNodes: () => void;
   deleteSelectedNodes: () => void;
@@ -120,6 +121,8 @@ export const useComponentStore = create<ComponentStore>()(
         },
 
         selectNode: (nodeId) => set({ selectedNodeIds: [nodeId] }),
+
+        setSelectedNodeIds: (nodeIds) => set({ selectedNodeIds: nodeIds }),
 
         clearNodeSelection: () => set({ selectedNodeIds: [] }),
 

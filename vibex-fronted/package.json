@@ -20,7 +20,7 @@
     "test:e2e:ci": "npx playwright install --with-deps chromium && playwright test --config=tests/e2e/playwright.config.ts",
     "test:e2e:local": "BASE_URL=http://localhost:3000 playwright test --config=tests/e2e/playwright.config.ts",
     "test:a11y": "playwright test --config playwright.a11y.config.ts",
-    "vitest": "echo 'Use npm test for Jest tests'",
+    "vitest": "vitest run",
     "test:notify": "node scripts/test-notify.js",
     "pretest": "node scripts/pre-test-check.js",
     "pretest-check": "node scripts/pre-test-check.js",

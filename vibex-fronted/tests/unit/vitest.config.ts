@@ -21,6 +21,12 @@ export default defineConfig({
       'tests/unit/**/*.spec.ts',
       'src/hooks/**/*.test.ts',
     ],
+    // Exclude pre-existing Jest-syntax test files (still use jest.mock)
+    exclude: [
+      '**/node_modules/**',
+      '**/src/hooks/canvas/__tests__/useCanvasExport.test.ts',
+      '**/src/hooks/canvas/__tests__/useAutoSave.test.ts',
+    ],
 
     // Coverage thresholds matching the original jest config
     coverage: {

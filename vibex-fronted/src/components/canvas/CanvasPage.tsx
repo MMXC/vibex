@@ -557,7 +557,6 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 onDeselectAll={() => useFlowStore.getState().clearNodeSelection()}
                 onDelete={() => useFlowStore.getState().deleteSelectedNodes()}
                 onReset={() => {
-                  getHistoryStore().getState().recordSnapshot()
                   useFlowStore.getState().resetFlowCanvas()
                 }}
                 onClear={() => useFlowStore.getState().setFlowNodes([])}
@@ -842,10 +841,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                     onSelectAll={() => useFlowStore.getState().selectAllNodes()}
                     onDeselectAll={() => useFlowStore.getState().clearNodeSelection()}
                     onDelete={() => useFlowStore.getState().deleteSelectedNodes()}
-                    onReset={() => {
-                      getHistoryStore().getState().recordSnapshot()
-                      useFlowStore.getState().resetFlowCanvas()
-                    }}
+                    onReset={() => useFlowStore.getState().resetFlowCanvas()}
                     onClear={() => useFlowStore.getState().setFlowNodes([])}
                     onContinue={handleContinueToComponents}
                     continueLabel={flowNodes.length === 0 ? '→ 选择流程' : componentGenerating ? '◌ 生成中...' : '继续 → 组件树'}

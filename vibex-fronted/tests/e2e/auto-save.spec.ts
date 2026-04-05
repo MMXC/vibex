@@ -51,7 +51,8 @@ test.describe('Auto-Save (E3-S4.3)', () => {
     const nodeExists = await node.count() > 0;
 
     if (!nodeExists) {
-      // Skip if no nodes to edit — this is a valid scenario for new projects
+      // fixme: New projects have no nodes to edit — test logic needs redesign.
+      // Track: https://github.com/MMXC/vibex/issues/XXXX
       test.skip();
       return;
     }

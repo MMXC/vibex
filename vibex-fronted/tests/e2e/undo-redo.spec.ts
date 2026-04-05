@@ -10,7 +10,7 @@
 
 import { test, expect } from '@playwright/test';
 
-test.describe('Undo/Redo', () => {
+test.describe('@ci-blocking: Undo/Redo', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to canvas page
     await page.goto('/canvas');

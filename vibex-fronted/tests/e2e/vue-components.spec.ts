@@ -26,7 +26,7 @@ test.describe('Vue Component Export', () => {
   });
 
   // @ci-blocking
-  test('framework selector has correct aria-pressed state', async ({ page }) => {
+  test('@ci-blocking: framework selector has correct aria-pressed state', async ({ page }) => {
     // React should be default selected
     await expect(
       page.getByRole('button', { name: /React/ })
@@ -42,7 +42,7 @@ test.describe('Vue Component Export', () => {
   });
 
   // @ci-blocking
-  test('switching to Vue shows Vue-specific hint', async ({ page }) => {
+  test('@ci-blocking: switching to Vue shows Vue-specific hint', async ({ page }) => {
     await page.getByRole('button', { name: /Vue 3/ }).click();
 
     // Verify Vue hint appears
@@ -53,7 +53,7 @@ test.describe('Vue Component Export', () => {
   });
 
   // @ci-blocking
-  test('switching to Solid shows Solid-specific hint', async ({ page }) => {
+  test('@ci-blocking: switching to Solid shows Solid-specific hint', async ({ page }) => {
     await page.getByRole('button', { name: /Solid/ }).click();
 
     // Verify Solid hint appears
@@ -64,7 +64,7 @@ test.describe('Vue Component Export', () => {
   });
 
   // @ci-blocking
-  test('react2vue mappings module exports correct structure', async ({ page }) => {
+  test('@ci-blocking: react2vue mappings module exports correct structure', async ({ page }) => {
     // Navigate to a page that imports the module (or test via console)
     await page.goto('/export');
     const result = await page.evaluate(() => {

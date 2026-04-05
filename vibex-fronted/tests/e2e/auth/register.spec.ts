@@ -53,6 +53,8 @@ test.describe('用户注册流程 (E2E-001)', () => {
     await expect(emailInput).toHaveAttribute('type', 'email');
   });
 
+  // fixme: Registration form does not implement password strength validation yet.
+  // Track: https://github.com/MMXC/vibex/issues/XXXX
   test.skip('SC1.1.5: 密码强度不足时，显示警告', async ({ page }) => {
     // TODO: 注册表单尚未实现密码强度验证功能，暂跳过
     // 填写弱密码

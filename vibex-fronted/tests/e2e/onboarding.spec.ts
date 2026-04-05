@@ -126,6 +126,8 @@ test.describe('User Onboarding Flow', () => {
     }
   });
 
+  // fixme: /user-settings page does not exist yet (settings page not implemented).
+  // Track: https://github.com/MMXC/vibex/issues/XXXX
   test.skip('should reset onboarding from settings', async ({ page }) => {
     // 尝试访问用户设置页面
     await page.goto('/user-settings');

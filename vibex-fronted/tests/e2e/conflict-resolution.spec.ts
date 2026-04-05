@@ -16,7 +16,7 @@
 
 import { test, expect } from '@playwright/test';
 
-test.describe('Conflict Resolution', () => {
+test.describe('@ci-blocking: Conflict Resolution', () => {
   /**
    * Navigate to canvas and open ConflictDialog via URL param simulation.
    * We simulate a conflict state by setting saveStatus=conflict via localStorage.

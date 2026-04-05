@@ -1,3 +1,9 @@
+### Added (vibex-ts-any-cleanup E3: ESLint no-explicit-any 启用) — 2026-04-05
+- **E3 ESLint 规则启用**: `@typescript-eslint/no-explicit-any` off → error
+  - 测试文件忽略: `src/**/*.test.*`, `src/**/__tests__/**`
+  - 有针对性的 eslint-disable: ReactFlow NodeProps/EdgeProps + Zustand store accessor
+- **提交**: `fe58edd6`
+
 ### Added (vibex-ts-any-cleanup E2: 剩余源码 as any 清理) — 2026-04-05
 - **E2 剩余源码清理**: 移除 `UndoBar.tsx`, `preview/page.tsx` 等中的 11 个 `as any`
   - `UndoBar.tsx`: 6 个 `as any` → 正确类型

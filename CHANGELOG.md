@@ -19,6 +19,13 @@
   - `ProjectBar.tsx`: 6 个 `as any` → `as BoundedContextNode[]` 等正确类型
 - **提交**: `063e9918`
 
+### Added (vibex-internal-tools E2: dedup CLI 集成) — 2026-04-05
+- **E2 CLI 集成**: dedup REST API 集成到 `scripts/init_project.sh`
+  - `dedup_check.py`: stdlib urllib CLI wrapper (非阻塞, exit 0/1/2/3)
+  - init_project.sh: 在创建项目前调用 dedup_check.py
+  - 高相似度 → 阻塞 (exit 1); 中等相似度 → 警告 (exit 2); 无重复 → 通过 (exit 0)
+- **提交**: `36ab6f4f`
+
 ### Added (vibex-internal-tools E1: dedup REST API) — 2026-04-05
 - **E1 dedup REST API**: `scripts/dedup_api.py` — stdlib http.server REST API
   - GET /health, GET /projects, POST /dedup, GET /dedup?name=&goal=

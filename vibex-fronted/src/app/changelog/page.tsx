@@ -19,6 +19,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.118',
+    date: '2026-04-05',
+    changes: [
+      '🔧 canvas-api-completion/E1: Flows CRUD API',
+      '✅ backend /api/v1/canvas/flows: GET/POST/GET/:id/PUT/:id/DELETE/:id',
+      '✅ 14 unit tests passing (flows.test.ts)',
+      '✅ 提交 ebd007db',
+    ],
+    commit: 'ebd007db',
+  },
+
+  {
     version: '1.0.117',
     date: '2026-04-05',
     changes: [

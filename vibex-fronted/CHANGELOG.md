@@ -1,5 +1,10 @@
 # Changelog
 
+### [canvas-api-completion E1: Flows CRUD API] — 2026-04-05
+- **E1 Flows CRUD**: backend `/api/v1/canvas/flows` REST API (14 tests passing)
+- `vibex-backend/src/routes/v1/flows.ts`: Hono + D1, protected routes
+- **提交**: `ebd007db`
+
 ### [canvas-testing-strategy E3-E6: Hook 测试套件] — 2026-04-05
 - **E3 useDragSelection**: 17 tests — 拖拽选框
 - **E4 useCanvasSearch**: 17 tests — 搜索功能

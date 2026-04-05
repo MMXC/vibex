@@ -4,6 +4,15 @@
 
 ### Backend Core
 
+#### 2026-04-05
+
+- **canvas-api-completion E1: Flows CRUD API**
+  - `src/routes/v1/flows.ts`: GET / POST / GET/:id / PUT/:id / DELETE/:id for FlowData
+  - Hono + D1 pattern, protected routes, pagination (page/limit), FlowData JSON columns (nodes TEXT, edges TEXT)
+  - `src/routes/v1/__tests__/flows.test.ts`: 14 unit tests (all passing)
+  - Registered in `gateway.ts` as `protected_.route('/canvas/flows', flows)`
+  - Commits: `ebd007db`, `33cd209e`
+
 #### 2026-04-03
 
 - **E4-SyncProtocol**: POST /api/canvas/snapshots — Next.js App Router 端点，冲突检测（409 + serverSnapshot）

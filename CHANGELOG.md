@@ -1,3 +1,10 @@
+### Added (canvas-api-completion E1: Flows CRUD API) — 2026-04-05
+- **E1 Flows CRUD**: `/api/v1/canvas/flows` REST API (GET list, POST create, GET/:id, PUT/:id, DELETE/:id)
+  - `vibex-backend/src/routes/v1/flows.ts`: Hono + D1, protected route, pagination, FlowData JSON columns
+  - `vibex-backend/src/routes/v1/__tests__/flows.test.ts`: 14 unit tests (all passing)
+  - `vibex-backend/src/routes/v1/gateway.ts`: registered on `protected_`
+- **提交**: `ebd007db`
+
 ### Added (canvas-testing-strategy E3-E6: Hook 测试套件) — 2026-04-05
 - **E3 useDragSelection 测试**: 17 tests — 拖拽选择框 (start===end/overlap/cleanup)
 - **E4 useCanvasSearch 测试**: 17 tests — 画布搜索功能

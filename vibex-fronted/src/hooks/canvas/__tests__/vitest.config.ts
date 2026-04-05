@@ -17,8 +17,5 @@ export default defineConfig({
     globals: true,
     setupFiles: [path.resolve(projectRoot, 'tests/unit/setup.ts')],
     include: [path.resolve(__dirname, '**/*.test.ts')],
-    fakeTimers: {
-      enabled: false,
-    },
   },
 });

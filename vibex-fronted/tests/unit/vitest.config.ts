@@ -48,10 +48,5 @@ export default defineConfig({
         'ConfirmationSteps.tsx',
       ],
     },
-
-    // Fake timers opt-in
-    fakeTimers: {
-      enabled: false,
-    },
   },
 });

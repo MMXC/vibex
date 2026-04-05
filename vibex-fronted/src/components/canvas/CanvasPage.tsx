@@ -81,8 +81,7 @@ import { NodeTooltip } from '@/components/guidance/NodeTooltip';
 import { NewUserGuide } from '@/components/guide';
 import { ConflictDialog as ConflictDialogComponent } from '@/components/ConflictDialog';
 import { FeedbackFAB } from '@/components/FeedbackFAB';
-import { BoundedEdgeLayer } from './edges/BoundedEdgeLayer';
-import { FlowEdgeLayer } from './edges/FlowEdgeLayer';
+// Edge layers removed — no longer needed
 import styles from './canvas.module.css';
 
 // =============================================================================
@@ -135,8 +134,6 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     contextNodeRects,
     flowNodeRects,
     componentNodeRects,
-    boundedEdges,
-    flowEdges,
     contextTreeNodes,
     flowTreeNodes,
     componentTreeNodes,
@@ -777,23 +774,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 onMouseUp={stateHandlers.handleMouseUp}
                 onMouseLeave={stateHandlers.handleMouseUp}
               >
-              {/* F3: Edge layer overlays */}
-              {boundedEdges.length > 0 && (
-                <BoundedEdgeLayer
-                  edges={boundedEdges}
-                  nodeRects={contextNodeRects}
-                  zoom={zoomLevel}
-                  pan={panOffset}
-                />
-              )}
-              {flowEdges.length > 0 && (
-                <FlowEdgeLayer
-                  edges={flowEdges}
-                  nodeRects={flowNodeRects}
-                  zoom={zoomLevel}
-                  pan={panOffset}
-                />
-              )}
+              {/* SVG edge layers removed */}
 
               {/* Bug5: Left expand toggle button */}
               <div className={styles.expandCol}>
@@ -932,21 +913,6 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 </button>
               </div>
 
-              {/* F2: BoundedEdgeLayer */}
-              <BoundedEdgeLayer
-                edges={boundedEdges}
-                nodeRects={contextNodeRects}
-                zoom={zoomLevel}
-                pan={{ x: 0, y: 0 }}
-              />
-
-              {/* F2: FlowEdgeLayer */}
-              <FlowEdgeLayer
-                edges={flowEdges}
-                nodeRects={flowNodeRects}
-                zoom={zoomLevel}
-                pan={{ x: 0, y: 0 }}
-              />
             </div>
 
             {/* Right Drawer */}

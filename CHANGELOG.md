@@ -7,6 +7,11 @@
   - frontend `tsc --noEmit`: 0 errors
 - **提交**: `87d3542f`
 
+### Added (vibex-generate-components-consolidation E2: 调用方架构验证) — 2026-04-05
+- **E2 调用方验证**: API_CONFIG 正确指向 `/v1/canvas/generate-components` (Hono route)，无需迁移
+  - 结论: 前端 API 调用已正确配置，Epic2 无需代码变更
+- **提交**: `8b22d11c`
+
 ### Added (vibex-generate-components-consolidation E1: contextSummary 合并) — 2026-04-05
 - **E1 contextSummary合并**: Hono route `index.ts` 合并 Next.js route 的 prompt 改进
   - `ComponentNode` 添加 `contextId` 字段

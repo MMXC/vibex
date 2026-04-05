@@ -1,6 +1,10 @@
 /**
  * RelationshipEdge — 自定义 ReactFlow 边组件
  *
+ * Note: ReactFlow's EdgeProps<T> generic has known TypeScript limitations where
+ * destructuring from props requires 'as any' cast. This is a library-level issue.
+ */
+
  * Epic 1: vibex-three-trees-enhancement
  * Spec: docs/vibex-three-trees-enhancement-20260326/specs/context-tree-relationships.md
  *
@@ -29,6 +33,7 @@ export interface RelationshipEdgeData extends Record<string, unknown> {
  
 const RelationshipEdgeComponent = (props: EdgeProps<RelationshipEdgeFull>) => {
    
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ReactFlow EdgeProps generic limitation
   const { id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, data, selected, markerEnd } = props as any as {
     id: string; sourceX: number; sourceY: number; targetX: number; targetY: number;
     sourcePosition: Position; targetPosition: Position;

@@ -34,8 +34,10 @@ const eslintConfig = defineConfig([
     '**/*.md',
     // Wrangler
     '.wrangler/**',
-    // Tests
+    // Tests (both root tests/ and src/ inline tests)
     'tests/**',
+    'src/**/*.test.*',
+    'src/**/__tests__/**',
     // Config files
     '*.config.ts',
     '*.config.mjs',
@@ -59,8 +61,8 @@ const eslintConfig = defineConfig([
       // Note: @typescript-eslint/no-duplicate-imports not available in current version
       // import/no-duplicates from eslint-plugin-import provides equivalent coverage
       'import/no-duplicates': 'error',
-      // Allow explicit any for API responses and third-party integrations
-      '@typescript-eslint/no-explicit-any': 'off',
+      // E3: Enable no-explicit-any rule — catches new 'as any' additions
+      '@typescript-eslint/no-explicit-any': 'error',
       // Allow unused vars for destructuring patterns
       '@typescript-eslint/no-unused-vars': [
         'warn',

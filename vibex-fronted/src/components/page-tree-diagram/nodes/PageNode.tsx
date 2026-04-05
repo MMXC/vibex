@@ -18,6 +18,7 @@ type PageNodeType = Node<PageNodeData, 'page'>;
  
 function PageNodeComponent(props: NodeProps<PageNodeType>) {
    
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ReactFlow NodeProps generic limitation
   const { data, selected } = props as any as { data: PageNodeData; selected: boolean };
   return (
     <div className="page-node" style={{

@@ -153,6 +153,7 @@ function CheckboxItem({ item, depth, onToggle }: CheckboxItemProps) {
  */
 export const CardTreeNode = memo(function CardTreeNode(props: NodeProps<CardTreeNodeFull>) {
    
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ReactFlow NodeProps generic limitation
   const { data, selected } = props as any as { data: CardTreeNodeData; selected: boolean };
   const isExpanded = data.isExpanded !== false; // default to expanded
   const hasChildren = data.children.length > 0;

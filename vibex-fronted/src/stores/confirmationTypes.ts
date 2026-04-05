@@ -64,6 +64,10 @@ export interface DomainProperty {
 export interface BusinessFlow {
   steps: FlowStep[];
   currentStepIndex: number;
+  /** State machine states (used in preview visualization) */
+  states?: Array<{ id: string; name: string }>;
+  /** State machine transitions (used in preview visualization) */
+  transitions?: FlowTransition[];
 }
 
 export interface FlowStep {

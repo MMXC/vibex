@@ -8,10 +8,6 @@ import { useConfirmationStore } from '@/stores/confirmationStore';
 import type { BusinessFlow as ConfirmationBusinessFlow } from '@/stores/confirmationStore';
 import styles from './preview.module.css';
 
-// Type alias for BusinessFlow - use any to bypass strict union type issues
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyBusinessFlow = any;
-
 // 4步设计流程
 const designSteps = ['需求输入', '限界上下文', '领域模型', '业务流程'];
 
@@ -49,11 +45,11 @@ export default function Preview() {
   // 获取 Store 数据
   const boundedContexts = useConfirmationStore((s) => s.boundedContexts) || [];
   const domainModels = useConfirmationStore((s) => s.domainModels) || [];
-  const businessFlow = (useConfirmationStore((s) => s.businessFlow) || { id: '', name: '', states: [], transitions: [] }) as AnyBusinessFlow;
+  const businessFlow = (useConfirmationStore((s) => s.businessFlow) || { steps: [], currentStepIndex: 0, states: [], transitions: [] }) as ConfirmationBusinessFlow;
 
   // 根据数据确定当前步骤
   const getCurrentStep = () => {
-    if ((businessFlow as any).states?.length > 0) return 3; // 业务流程
+    if ((businessFlow as ConfirmationBusinessFlow).states?.length ?? 0 > 0) return 3; // 业务流程
     if (domainModels?.length > 0) return 2; // 领域模型
     if (boundedContexts?.length > 0) return 1; // 限界上下文
     return 0; // 需求输入
@@ -197,7 +193,7 @@ export default function Preview() {
             </div>
           )}
 
-          {currentStep >= 3 && (businessFlow as any).states?.length > 0 && (
+          {currentStep >= 3 && ((businessFlow as ConfirmationBusinessFlow).states?.length ?? 0) > 0 && (
             <div style={{ 
               width: '100%', 
               maxWidth: '800px',
@@ -207,7 +203,7 @@ export default function Preview() {
             }}>
               <h3 style={{ color: '#fff', margin: '0 0 16px' }}>业务流程</h3>
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                {((businessFlow as any).states || []).map((state: any) => (
+                {((businessFlow as ConfirmationBusinessFlow).states || []).map((state: { id: string; name: string }) => (
                   <div
                     key={state.id}
                     style={{

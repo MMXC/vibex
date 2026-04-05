@@ -18,6 +18,7 @@ import { useHistoryStore } from '@/lib/canvas/historySlice';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
+import type { BoundedContextNode, BusinessFlowNode, ComponentNode } from '@/lib/canvas/types';
 import styles from './UndoBar.module.css';
 
 export const UndoBar = memo(function UndoBar() {
@@ -50,21 +51,21 @@ export const UndoBar = memo(function UndoBar() {
     if (historyStore.canUndo('context')) {
       const prev = historyStore.undo('context');
       if (prev) {
-        useContextStore.getState().setContextNodes(prev as any);
+        useContextStore.getState().setContextNodes(prev as BoundedContextNode[]);
         return;
       }
     }
     if (historyStore.canUndo('flow')) {
       const prev = historyStore.undo('flow');
       if (prev) {
-        useFlowStore.getState().setFlowNodes(prev as any);
+        useFlowStore.getState().setFlowNodes(prev as BusinessFlowNode[]);
         return;
       }
     }
     if (historyStore.canUndo('component')) {
       const prev = historyStore.undo('component');
       if (prev) {
-        useComponentStore.getState().setComponentNodes(prev as any);
+        useComponentStore.getState().setComponentNodes(prev as ComponentNode[]);
       }
     }
   }, []);
@@ -76,21 +77,21 @@ export const UndoBar = memo(function UndoBar() {
     if (historyStore.canRedo('context')) {
       const next = historyStore.redo('context');
       if (next) {
-        useContextStore.getState().setContextNodes(next as any);
+        useContextStore.getState().setContextNodes(next as BoundedContextNode[]);
         return;
       }
     }
     if (historyStore.canRedo('flow')) {
       const next = historyStore.redo('flow');
       if (next) {
-        useFlowStore.getState().setFlowNodes(next as any);
+        useFlowStore.getState().setFlowNodes(next as BusinessFlowNode[]);
         return;
       }
     }
     if (historyStore.canRedo('component')) {
       const next = historyStore.redo('component');
       if (next) {
-        useComponentStore.getState().setComponentNodes(next as any);
+        useComponentStore.getState().setComponentNodes(next as ComponentNode[]);
       }
     }
   }, []);

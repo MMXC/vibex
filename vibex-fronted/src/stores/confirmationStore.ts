@@ -112,8 +112,8 @@ const initialState = {
   modelMermaidCode: '',
 
   businessFlow: {
-    id: '',
-    name: '',
+    steps: [],
+    currentStepIndex: 0,
     states: [],
     transitions: [],
   } as unknown as BusinessFlow,

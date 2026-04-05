@@ -21,11 +21,13 @@
 | E4 | `src/tests/api/*.test.ts` | `pnpm test` 全部通过 |
 
 ## DoD
+- [x] 5 个 Snapshot 端点实现并测试 ✅ — 18 tests, commit `25763af1`
 - [ ] 9 个 CRUD 端点实现并测试
-- [ ] 5 个 Snapshot 端点实现并测试
 - [ ] AI 生成关联操作实现
 - [ ] E2E 测试通过
 
 **E1 进度**: E1.3 `/api/v1/canvas/flows` ✅ — 使用 Hono + D1 SQL 实现（适配实际代码库）
+
+**E2 进度**: 5 个 Snapshot 端点 ✅ — 18 tests (commit `25763af1`) + 2 bugs fixed (route order + version conflict logic)
 
 *Architect Agent | 2026-04-05 | Dev 补充 | 2026-04-05*

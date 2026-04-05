@@ -1,3 +1,17 @@
+### Added (vibex-ts-any-cleanup E1: useCanvasHistory/ProjectBar 类型修复) — 2026-04-05
+- **E1 类型修复**: 移除 `useCanvasHistory.ts` 和 `ProjectBar.tsx` 中的 `as any`
+  - `useCanvasHistory.ts`: 6 个 `as any` → `as BoundedContextNode[]` 等正确类型
+  - `ProjectBar.tsx`: 6 个 `as any` → `as BoundedContextNode[]` 等正确类型
+- **提交**: `063e9918`
+
+### Added (vibex-internal-tools E1: dedup REST API) — 2026-04-05
+- **E1 dedup REST API**: `scripts/dedup_api.py` — stdlib http.server REST API
+  - GET /health, GET /projects, POST /dedup, GET /dedup?name=&goal=
+  - 使用 `dedup.dedup.check_duplicate_projects()` 内部函数
+  - 无外部依赖（纯 stdlib）
+  - CORS headers 支持跨域请求
+- **提交**: `e3b1e324`
+
 ### Added (canvas-api-completion E2: Canvas Snapshot API) — 2026-04-05
 - **E2 Canvas Snapshot API**: `/api/v1/canvas/snapshots` REST API + 18 unit tests
   - Route order fix: GET /latest moved before GET /:id

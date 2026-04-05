@@ -25,4 +25,6 @@
   - 类型层: `lib/canvas/types.ts`
 - [x] dead code 全部清除 ✅ E1: canvasLogger 替换9处; E2: canvasStore.ts/deprecated.ts 移除; E4: phaseProgressBarWrapper 移除
 - [x] O(n) 边计算 ✅ edge layers 每边独立 O(1) 计算，useMemo + clustering 自动聚类（>20条）
-- [ ] ErrorBoundary + 80% 覆盖（E4）
+- [x] ErrorBoundary + 80% 覆盖 ✅
+  - ErrorBoundary: AppErrorBoundary (layout.tsx) 全局覆盖 + JsonRenderErrorBoundary (CanvasPreviewModal)
+  - 120 canvas tests passing (jest→vi 迁移后)

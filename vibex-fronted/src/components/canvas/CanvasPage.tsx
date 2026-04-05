@@ -81,6 +81,7 @@ import { NodeTooltip } from '@/components/guidance/NodeTooltip';
 import { NewUserGuide } from '@/components/guide';
 import { ConflictDialog as ConflictDialogComponent } from '@/components/ConflictDialog';
 import { FeedbackFAB } from '@/components/FeedbackFAB';
+import { CanvasPreviewModal } from './json-render/CanvasPreviewModal';
 // Edge layers removed — no longer needed
 import styles from './canvas.module.css';
 
@@ -1048,6 +1049,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
       <UndoBar />
       <ShortcutBar onOpenShortcutPanel={eventHandlers.toggleShortcutPanel} />
       <NodeTooltip />
+
+      {/* E2: Canvas Preview Modal */}
+      <CanvasPreviewModal />
 
       {/* E1: New User Guide */}
       <NewUserGuide />

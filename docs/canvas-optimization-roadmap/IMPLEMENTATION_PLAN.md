@@ -17,8 +17,12 @@
 | S4.1-S4.2: Phase 3 | coverage > 80% |
 
 ## DoD
-- [x] console.error → canvasLogger — `src/lib/canvas/canvasLogger.ts` ✅ commit `52e01b83`
-  - 9 console.error → canvasLogger.{Component}.error()
-- [ ] dead code 全部清除（E2-E4）
+- [x] console.error → canvasLogger ✅ commit `52e01b83` (E1)
+- [x] **E2 三层架构** ✅ 已验证
+  - UI层: `components/canvas/` (React components)
+  - Hook层: `hooks/canvas/useCanvasStore.ts` (unified selectors)
+  - 数据层: `stores/` (contextStore, flowStore, componentStore, uiStore, sessionStore)
+  - 类型层: `lib/canvas/types.ts`
+- [ ] dead code 全部清除（E3-E4）
 - [ ] O(n) 边计算（E3）
 - [ ] ErrorBoundary + 80% 覆盖（E4）

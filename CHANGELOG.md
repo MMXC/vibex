@@ -48,6 +48,14 @@
   - `generate-components.test.ts`: 8 tests pass
 - **提交**: `26c383f7`
 
+### Added (vibex-backend-deploy-stability E4: Prisma 条件加载) — 2026-04-05
+- **E4 Prisma条件加载**: `src/lib/db.ts` 条件化 PrismaClient 加载
+  - `const isWorkers = typeof caches !== 'undefined'`
+  - Workers 环境下 `Prisma = null` → `PrismaClient = undefined` → 不执行
+  - 避免 Prisma 打包进 Workers bundle
+  - 615 backend tests pass (3 pre-existing)
+- **提交**: `dfd08889`
+
 ### Added (vibex-backend-deploy-stability E3: Health 端点扩展) — 2026-04-05
 - **E3 Health端点**: `src/index.ts` GET /health 扩展字段
   - 新增: `env`, `version`, `uptime`

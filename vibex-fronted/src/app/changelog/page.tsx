@@ -19,6 +19,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.127',
+    date: '2026-04-06',
+    changes: [
+      '📋 vibex-proposals-20260406: E4 SSE Timeout + E5 Distributed Rate Limiting (Sprint 6 P1)',
+      '✅ E4 SSE 超时: AbortController 10s 超时 + sse-stream-lib 连接清理 (2b33f966)',
+      '✅ E4 aiService.chat() / generateJSON() 传递 signal 参数，timers[] 清理',
+      '✅ E5 分布式限流: Cache-first (Cloudflare KV) + InMemory fallback 架构 (85835af5)',
+      '✅ E5 wrangler.toml [[caches]] RATE_LIMIT_CACHE，fail-open 降级策略',
+    ],
+    commit: '85835af5',
+  },
+
+  {
     version: '1.0.126',
     date: '2026-04-06',
     changes: [

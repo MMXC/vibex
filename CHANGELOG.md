@@ -7,6 +7,14 @@
 - ST-11: clarificationId DB indexes added
 - **提交**: `dfd08889` (ST-09 PrismaPoolManager/isWorkers guard)
 
+### Added (vibex-dev-security-20260410 E3: 输入校验) — 2026-04-06
+- **E3 输入校验**: Zod schema validation for all canvas API routes
+  - `schemas/canvas.ts`: canvasGenerateSchema (projectId cuid, pageIds min 1, .strict())
+  - `lib/api-validation.ts`: withValidation middleware + ValidatedContext
+  - Routes using validation: canvas generate/contexts/flows/components, projects create/update
+  - cuidSchema: validates Cloudflare CUID format for all entity IDs
+- **提交**: `05eb7dd5` (prior sprint), `1ac823e2` (E1 schema unified)
+
 ### Added (vibex-dev-security-20260410 E2: 空catch块清理) — 2026-04-06
 - **E2 SSE Stream AbortSignal**: `lib/sse-stream-lib/index.ts` 新增 requestSignal 参数
   - 客户端断开连接时自动 abort AI 调用，防止 Worker 挂起

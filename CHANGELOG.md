@@ -1,3 +1,8 @@
+### Added (vibex-p0-fixes-20260409 E3: 流程治理) — 2026-04-06
+- **S3.1 Changelog 补录**: 添加 2026-04-09 提案收集 entries
+- **S3.2 TRACKING.md 建立**: 创建 docs/TRACKING.md 追踪提案执行状态
+- **S3.3 双引导移除**: 删除 CanvasPage.tsx 中的 `<NewUserGuide />`，保留 `<CanvasOnboardingOverlay />`
+
 ### Added (vibex-p0-fixes-20260409 E2: 测试基础设施恢复) — 2026-04-06
 - **E2 vitest setup**: tests/unit/setup.tsx 提供 jest globals 兼容层
   - vi.fn/vi.mock/vi.spyOn 替代 jest.*

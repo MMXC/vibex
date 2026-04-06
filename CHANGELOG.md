@@ -1,3 +1,8 @@
+### Added (vibex-tester quality-20260410 E1: Vitest修复) — 2026-04-06
+- **E1 jest→vi mock 迁移**: 50 个测试文件的 jest.mock()/jest.fn() 迁移到 vi.mock()/vi.fn()
+- **E1 vitest 兼容性**: 修复 vitest mock 方法缺失问题
+- **提交**: `99c089e5`
+
 ### Added (vibex-dev-security-20260410 E1: API认证中间件) — 2026-04-06
 - **E1 apiAuth.ts**: JWT auth middleware for all protected API routes
   - `checkAuth/requireAuth/withAuth/optionalAuth` helpers

@@ -157,7 +157,7 @@ git checkout HEAD -- vibex-fronted/src/components/canvas/BoundedContextTree.tsx
 - [ ] `expect(onToggleSelect).toHaveBeenCalledWith(nodeId)` jest 通过
 - [ ] `expect(toggleContextNode).not.toHaveBeenCalled()` 通过
 - [ ] Playwright checkbox 集成测试通过
-- [ ] 多选状态正确显示（checkbox checked）
+- [x] 多选状态正确显示（checkbox checked） ✅
 
 ---
 
@@ -338,7 +338,7 @@ git checkout HEAD -- vibex-backend/src/services/ai-service.ts
 #### 成功标准
 
 - [ ] `AbortController.timeout(10000)` 在代码中可见
-- [ ] `ReadableStream.cancel()` 中有 `clearTimeout`
+- [x] `ReadableStream.cancel()` 中有 `clearTimeout` ✅
 - [ ] `jest ai-service.test.ts` 超时测试通过
 - [ ] 覆盖率 > 80%
 
@@ -572,7 +572,7 @@ git checkout HEAD -- vibex-fronted/scripts/test-notify.js
 
 - [ ] `dedup.test.js` 全部通过
 - [ ] 5 分钟内重复调用 test-notify → 跳过发送
-- [ ] 不同 status 触发独立通知
+- [x] 不同 status 触发独立通知 ✅
 - [ ] 覆盖率 > 80%
 
 ---
@@ -733,39 +733,39 @@ git checkout HEAD~1 -- vibex-fronted/scripts/test-notify.js
 ### DoD (Definition of Done)
 
 #### E1: OPTIONS 预检路由修复 ✅
-- [ ] `protected_.options('/*')` 在 `authMiddleware` 之前注册
-- [ ] `curl -X OPTIONS -I /v1/projects` 返回 204
-- [ ] GET/POST 不受影响
-- [ ] Jest 测试通过
+- [x] `protected_.options('/*')` 在 `authMiddleware` 之前注册
+- [x] `curl -X OPTIONS -I /v1/projects` 返回 204 ✅
+- [x] GET/POST 不受影响 ✅
+- [x] Jest 测试通过 ✅
 
 #### E2: Canvas Context 多选修复 ✅
-- [ ] `BoundedContextTree.tsx` checkbox `onChange` 改为 `onToggleSelect`
+- [x] `BoundedContextTree.tsx` checkbox `onChange` 改为 `onToggleSelect` ✅
 - [ ] `expect(onToggleSelect).toHaveBeenCalledWith(nodeId)` 测试通过
 - [ ] `expect(toggleContextNode).not.toHaveBeenCalled()` 测试通过
 - [ ] Playwright 集成测试通过
 
 #### E3: generate-components flowId ✅
-- [ ] schema 添加 `flowId: string`
-- [ ] prompt 明确要求 flowId 输出
+- [x] schema 添加 `flowId: string` ✅
+- [x] prompt 明确要求 flowId 输出 ✅
 - [ ] `expect(component.flowId).toMatch(/^flow-/)` 测试通过
 
 #### E4: SSE 超时 + 连接清理 ✅
-- [ ] `AbortController.timeout(10000)` 包裹 aiService.chat
-- [ ] `ReadableStream.cancel()` 中有 `clearTimeout`
+- [x] `AbortController.timeout(10000)` 包裹 aiService.chat ✅
+- [x] `ReadableStream.cancel()` 中有 `clearTimeout` ✅
 - [ ] `expect(clearTimeout).toHaveBeenCalled()` jest 测试通过
-- [ ] Worker 不挂死
+- [x] Worker 不挂死 ✅
 
 #### E5: 分布式限流 ✅
-- [ ] `rateLimit.ts` 使用 `caches.default`
+- [x] `rateLimit.ts` 使用 `caches.default` ✅
 - [ ] 100 并发 → 前 100 通过，第 101 返回 429
-- [ ] 跨 Worker 限流一致
-- [ ] Jest 测试通过
+- [x] 跨 Worker 限流一致 ✅
+- [x] Jest 测试通过 ✅
 
 #### E6: test-notify 去重 ✅
-- [ ] `dedup.js` 模块存在且正确
-- [ ] 5 分钟窗口去重
+- [x] `dedup.js` 模块存在且正确 ✅
+- [x] 5 分钟窗口去重 ✅
 - [ ] `expect(checkDedup(key).skipped).toBe(true)` within 5min 测试通过
-- [ ] 不同 status 触发独立通知
+- [x] 不同 status 触发独立通知 ✅
 
 ---
 

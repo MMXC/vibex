@@ -34,10 +34,6 @@ export default defineConfig({
   timeout: 60000,
   expect: { timeout: 10000 },
 
-  // CI: 跳过 @ci-blocking 测试
-  grepInvert: process.env.CI ? /@ci-blocking/ : undefined,
-
-
   use: {
     // BASE_URL 环境变量优先
     baseURL: process.env.BASE_URL || 'http://localhost:3000',

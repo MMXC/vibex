@@ -4,8 +4,15 @@
  * Epic 5: S5.2 触发生成
  * Input: { projectId, pageIds, mode: 'parallel'|'sequential' }
  * Output: { queueId, pages: [{ pageId, status }] }
+ *
+ * Part of: vibex-backend-fixes-20260410 / E1-Schema统一
+ * - Uses AppError for error handling
+ * - Uses canvasGenerateSchema for input validation
  */
 import { NextRequest, NextResponse } from 'next/server';
+import { canvasGenerateSchema } from '@/schemas/canvas';
+import { AppError, AuthError, NotFoundError, ValidationError } from '@/lib/errors';
+import { errorToResponse } from '@/lib/errors';
 import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -20,44 +27,32 @@ async function requireAuth(req: NextRequest) {
   const jwtSecret = process.env.JWT_SECRET || 'vibex-dev-secret';
   const authHeader = req.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return new NextResponse(
-      JSON.stringify({ error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
-    );
+    throw new AuthError('Unauthorized: authentication required');
   }
   const token = authHeader.substring(7);
   const jwt = await import('jsonwebtoken');
   try {
     return jwt.default.verify(token, jwtSecret) as { userId: string; email: string };
   } catch {
-    return new NextResponse(
-      JSON.stringify({ error: 'Invalid or expired token', code: 'UNAUTHORIZED' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
-    );
+    throw new AuthError('Invalid or expired token');
   }
 }
 
 export async function POST(request: NextRequest) {
   // E1: Authentication check
-  const auth = await requireAuth(request);
-  if (auth instanceof NextResponse) {
-    return auth;
-  }
+  await requireAuth(request);
 
   try {
     const body = await request.json();
-    const { projectId, pageIds } = body as {
-      projectId: string;
-      pageIds: string[];
-      mode?: 'parallel' | 'sequential';
-    };
 
-    if (!projectId || !pageIds || pageIds.length === 0) {
-      return NextResponse.json(
-        { error: 'Missing required fields: projectId, pageIds' },
-        { status: 400 }
-      );
+    // E1: Schema validation
+    const parsed = canvasGenerateSchema.safeParse(body);
+    if (!parsed.success) {
+      const error = ValidationError.fromZodError(parsed.error, 'Invalid request body');
+      return NextResponse.json(errorToResponse(error), { status: 400 });
     }
+
+    const { projectId, pageIds } = parsed.data;
 
     // Load canvas project and its components
     const canvasProject = await prisma.canvasProject.findUnique({
@@ -66,7 +61,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!canvasProject) {
-      return NextResponse.json({ error: 'Canvas project not found' }, { status: 404 });
+      throw new NotFoundError('Canvas project not found');
     }
 
     const components = JSON.parse(canvasProject.componentsJson) as Array<{
@@ -117,8 +112,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ queueId, pages: resultPages }, { status: 200 });
   } catch (error) {
+    if (error instanceof AppError) {
+      return NextResponse.json(errorToResponse(error), { status: error.statusCode });
+    }
     console.error('[canvas/generate] Error:', error);
-    return NextResponse.json({ error: 'Failed to trigger generation' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal server error', code: 'INTERNAL_ERROR' },
+      { status: 500 }
+    );
   }
 }
 

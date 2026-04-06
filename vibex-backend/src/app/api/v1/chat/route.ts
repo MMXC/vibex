@@ -10,7 +10,7 @@
  * - Prompt injection via suspicious keywords
  */
 
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { chatMessageSchema } from '@/schemas/security';
 import { parseBody } from '@/lib/high-risk-validation';
 
@@ -114,9 +114,9 @@ export async function POST(request: NextRequest) {
   const jwtSecret = process.env.JWT_SECRET || 'vibex-dev-secret';
   const authHeader = request.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return new Response(
-      JSON.stringify({ error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    return NextResponse.json(
+      { error: 'Unauthorized: authentication required', code: 'AUTH_ERROR' },
+      { status: 401 }
     );
   }
   const token = authHeader.substring(7);
@@ -125,9 +125,9 @@ export async function POST(request: NextRequest) {
   try {
     payload = jwt.default.verify(token, jwtSecret) as { userId: string; email: string };
   } catch {
-    return new Response(
-      JSON.stringify({ error: 'Invalid or expired token', code: 'UNAUTHORIZED' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    return NextResponse.json(
+      { error: 'Invalid or expired token', code: 'AUTH_ERROR' },
+      { status: 401 }
     );
   }
 

@@ -154,3 +154,18 @@ export const generateComponentsResponseSchema = canvasSuccessBaseSchema.extend({
 });
 
 export type GenerateComponentsResponse = z.infer<typeof generateComponentsResponseSchema>;
+
+// ==================== Canvas Generate (E1) ====================
+
+/**
+ * Canvas generate request body (POST /api/v1/canvas/generate)
+ *
+ * Part of: vibex-backend-fixes-20260410 / E1-Schema统一
+ */
+export const canvasGenerateSchema = z.object({
+  projectId: z.string().min(1, 'projectId is required'),
+  pageIds: z.array(z.string()).min(1, 'pageIds must have at least one element'),
+  mode: z.enum(['parallel', 'sequential']).optional().default('parallel'),
+}).strict();
+
+export type CanvasGenerateInput = z.infer<typeof canvasGenerateSchema>;

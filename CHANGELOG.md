@@ -12,7 +12,15 @@
   - `routes/prototype-preview.ts`: `(generatedPage as any).component` → `isGeneratedPage()` 类型守卫
   - `body.type as any` → `ComponentType` enum
   - `body.variant as any` → 字面量联合类型 `'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'`
-- **提交**: working tree (reviewer staged)
+- **提交**: `c7208ed9`, `154f1bf6`, `ecbfc24f`
+
+### Added (vibex-dev-security-20260410 E5: CanvasPage拆分) — 2026-04-06
+- **E5 CanvasPage Hook 提取**: 将 CanvasPage 组件中的逻辑提取为独立 hooks
+  - `useCanvasToolbar.ts`: 提取工具栏相关逻辑
+  - `useCanvasPanels.ts`: 提取面板状态管理逻辑
+  - CanvasPage: 981 行 → 808 行，职责更清晰
+  - 注意: 此 Epic 与 PRD Sprint 3.2+3.3(Backend CI + E2E Security)范围不一致，代码由 dev 自行决定 Epic 归属
+- **提交**: `967af14b`
 
 ### Added (vibex-dev-security-20260410 E3: 输入校验) — 2026-04-06
 - **E3 输入校验**: Zod schema validation for all canvas API routes

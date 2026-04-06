@@ -41,6 +41,13 @@
   - 内存缓存避免重复加载，force-dynamic 路由
 - **提交**: `fe5d6988`
 
+### Added (vibex-pm-features-20260410 E2: 新手引导) — 2026-04-06
+- **E2 新手引导**: CanvasOnboardingOverlay 5步引导流程验证
+  - 5 步引导组件: WelcomeStep/InputStep/ClarifyStep/ModelStep/PreviewStep
+  - CanvasOnboardingOverlay 集成到 CanvasPage.tsx
+  - OnboardingProvider 上下文 + localStorage 持久化
+- **提交**: `803d6b8b` (CanvasOnboardingOverlay integration)
+
 ### Added (vibex-tester quality-20260410 E1: Vitest修复) — 2026-04-06
 - **E1 jest→vi mock 迁移**: 50 个测试文件的 jest.mock()/jest.fn() 迁移到 vi.mock()/vi.fn()
 - **E1 vitest 兼容性**: 修复 vitest mock 方法缺失问题

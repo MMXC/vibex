@@ -65,6 +65,21 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.129',
+    date: '2026-04-07',
+    changes: [
+      '📋 vibex-proposals-20260411 E6: AST安全扫描',
+      '✅ scanForDangerousPatterns: Babel AST 检测 dangerous patterns',
+      '✅ detectPromptInjection: 关键字 + AST 双重检测',
+      '✅ chatMessageSchema + planAnalyzeSchema 集成',
+      '✅ Graceful fallback: Babel 不可用时降级',
+      '✅ E6 单元测试: 14/14 通过',
+      '✅ 提交: 6ff6473e',
+    ],
+    commit: '6ff6473e',
+  },
+
+  {
     version: '1.0.128',
     date: '2026-04-07',
     changes: [

@@ -1,5 +1,14 @@
 # Changelog
 
+### [vibex-proposals-20260411 E6: AST安全扫描] — 2026-04-07
+- **E6 AST Prompt Security Scanner**: 用 `@babel/parser` AST 解析替代字符串正则，精确检测 eval/new Function 等危险模式
+  - 新增 `scanForDangerousPatterns()`: Babel AST 检测 dangerous patterns
+  - 新增 `detectPromptInjection()`: 关键字 + AST 双重检测
+  - 集成到 `chatMessageSchema` 和 `planAnalyzeSchema` refine 回调
+  - 添加 E6 单元测试（14 个用例，14/14 通过）
+  - Graceful fallback: Babel 不可用时降级为纯关键字检测
+  - 提交: `6ff6473e`
+
 ### [useWebVitals-ts-fix-20260407 Epic1] — 2026-04-07
 - **useWebVitals TypeScript Fix**: 修复 `data.name` 属性访问 TS 错误
   - `src/hooks/useWebVitals.ts`: 添加类型断言 `as [string, WebVitalsMetric]`

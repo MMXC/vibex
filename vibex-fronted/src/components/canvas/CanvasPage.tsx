@@ -589,7 +589,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 nodeCount={componentNodes.length}
                 onSelectAll={() => useComponentStore.getState().selectAllNodes?.()}
                 onDeselectAll={() => useComponentStore.getState().clearNodeSelection?.()}
-                onClear={() => useComponentStore.getState().setComponentNodes([])}
+                onClear={() => useComponentStore.getState().clearComponentCanvas()}
               />
             }
           >
@@ -887,7 +887,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                     nodeCount={componentNodes.length}
                     onSelectAll={() => useComponentStore.getState().selectAllNodes?.()}
                     onDeselectAll={() => useComponentStore.getState().clearNodeSelection?.()}
-                    onClear={() => useComponentStore.getState().setComponentNodes([])}
+                    onClear={() => useComponentStore.getState().clearComponentCanvas()}
                   />
                 }
               >

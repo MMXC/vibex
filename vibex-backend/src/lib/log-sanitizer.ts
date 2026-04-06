@@ -1,5 +1,6 @@
 /**
  * Log Sanitizer Utility
+ * Log Sanitizer Utility
  * 
  * Provides safe logging utilities that:
  * 1. Redact sensitive fields from logged objects
@@ -94,11 +95,11 @@ export function devDebug(...args: unknown[]): void {
     if (typeof arg === 'object' && arg !== null) return sanitize(arg);
     return arg;
   });
-  console.log(...sanitized);
+  devLog(...sanitized);
 }
 
 /**
- * Safe console.error replacement.
+ * Safe safeError replacement.
  * In production, ensures no sensitive data is leaked via error messages.
  */
 export function safeError(...args: unknown[]): void {

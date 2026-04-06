@@ -352,6 +352,7 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
     [contextNodes, editContextNode]
   );
   const deleteContextNode = useContextStore((s) => s.deleteContextNode);
+  const deleteAllNodes = useContextStore((s) => s.deleteAllNodes);
   const setContextNodes = useContextStore((s) => s.setContextNodes);
   const advancePhase = useContextStore((s) => s.advancePhase);
 
@@ -556,10 +557,8 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
                 onClick={() => {
                   if (contextNodes.length === 0) return;
                   if (window.confirm(`确定删除全部 ${contextNodes.length} 个节点？`)) {
-                    // E1: Record snapshot before deleting all nodes
-                    getHistoryStore().recordSnapshot('context', contextNodes);
-                    // Delete all context nodes
-                    contextNodes.forEach(n => deleteContextNode(n.nodeId));
+                    // E4: Use batch delete — single snapshot, no forEach
+                    deleteAllNodes();
                   }
                 }}
                 aria-label="删除全部节点"

@@ -43,6 +43,7 @@ interface ContextStore {
   addContextNode: (data: BoundedContextDraft) => void;
   editContextNode: (nodeId: string, data: Partial<BoundedContextNode>) => void;
   deleteContextNode: (nodeId: string) => void;
+  deleteAllNodes: () => void;
   confirmContextNode: (nodeId: string) => void;
   toggleContextNode: (nodeId: string) => void;
   toggleContextSelection: (nodeId: string) => void;
@@ -201,6 +202,14 @@ export const useContextStore = create<ContextStore>()(
             );
             return { contextNodes: newNodes };
           });
+        },
+
+        // E4: Batch delete all context nodes with single snapshot
+        deleteAllNodes: () => {
+          const ctxs = get().contextNodes;
+          if (ctxs.length === 0) return;
+          getHistoryStore().recordSnapshot('context', []);
+          set({ contextNodes: [], selectedNodeIds: { ...get().selectedNodeIds, context: [] } });
         },
 
         toggleContextNode: (nodeId) => {

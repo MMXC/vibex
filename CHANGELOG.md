@@ -2503,7 +2503,7 @@ All notable changes to this project will be documented in this file.
 
 ### Features (vibex-architect-proposals-vibex-proposals-20260411 Epic E2-E7)
 - **E2 WebSocket治理**: MAX_CONNECTIONS=100 limit in ConnectionPool, passive heartbeat via pruneStaleConnections() (#1253771e). E2-S2: add `__tests__/connectionPool.test.ts` (22 tests), fix disconnectTimeout=300000ms, fix empty devLog() calls. E2-S3: add `GET /api/v1/ws/health` endpoint (#f073d0b7)
-- **E3 packages/types**: Create @vibex/types/schemas workspace package with common.ts and canvas.ts Zod schemas (#1253771e)
+- **E3 packages/types**: Create @vibex/types/schemas workspace package with common.ts and canvas.ts Zod schemas (#1253771e); E3 integration: 5 backend routes updated to import @vibex/types, ESM→CommonJS switch for Jest compatibility (#fadef3f0)
 - **E4 路由分层**: withAuth() via authMiddleware on gateway, CORS middleware in gateway.ts (#existing)
 - **E5 质量评分**: Add calculateQualityScore() + isQualityDegraded() in CompressionEngine, qualityScore < 70 triggers degraded state (#b85f3ac7)
 - **E6 AST安全扫描**: Add AST-based prompt security scanner using @babel/parser + @babel/traverse, detect eval/new Function (#a05ea850)

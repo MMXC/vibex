@@ -3,6 +3,14 @@ import prisma from '@/lib/prisma';
 
 import { safeError } from '@/lib/log-sanitizer';
 
+
+// E-P0-3: API v0 deprecation header (per architecture.md ADR-003)
+const V0_DEPRECATION_HEADERS = {
+  'Deprecation': 'true',
+  'Sunset': 'Sat, 31 May 2026 23:59:59 GMT',
+  'X-API-Deprecation-Info': 'https://docs.vibex.ai/api-v0-sunset',
+};
+
 export const dynamic = 'force-dynamic';
 
 // GET /api/pages - List all pages (or filter by projectId)
@@ -19,13 +27,10 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json({ pages });
+    return NextResponse.json({ pages }, { headers: V0_DEPRECATION_HEADERS });
   } catch (error) {
     safeError('Error fetching pages:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch pages' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch pages' }, { headers: V0_DEPRECATION_HEADERS, status: 500 });
   }
 }
 
@@ -36,10 +41,7 @@ export async function POST(request: NextRequest) {
     const { name, content, projectId } = body;
 
     if (!name || !projectId) {
-      return NextResponse.json(
-        { error: 'Missing required fields: name, projectId' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing required fields: name, projectId' }, { headers: V0_DEPRECATION_HEADERS, status: 400 });
     }
 
     const page = await prisma.page.create({
@@ -53,12 +55,9 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ page }, { status: 201 });
+    return NextResponse.json({ page }, { headers: V0_DEPRECATION_HEADERS, status: 201 });
   } catch (error) {
     safeError('Error creating page:', error);
-    return NextResponse.json(
-      { error: 'Failed to create page' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create page' }, { headers: V0_DEPRECATION_HEADERS, status: 500 });
   }
 }

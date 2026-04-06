@@ -14,6 +14,14 @@ import { EntityRelation } from '@/services/entity-relations';
 
 import { safeError } from '@/lib/log-sanitizer';
 
+
+// E-P0-3: API v0 deprecation header (per architecture.md ADR-003)
+const V0_DEPRECATION_HEADERS = {
+  'Deprecation': 'true',
+  'Sunset': 'Sat, 31 May 2026 23:59:59 GMT',
+  'X-API-Deprecation-Info': 'https://docs.vibex.ai/api-v0-sunset',
+};
+
 /**
  * GET /api/domain-model/:projectId
  * Generate class diagram for a project from provided entities
@@ -65,13 +73,10 @@ export async function GET(
         options,
         message: 'Use POST to generate diagram with entities',
       },
-    });
+    }, { headers: V0_DEPRECATION_HEADERS });
   } catch (error) {
     safeError('Error generating class diagram:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to generate class diagram', code: 'GENERATION_ERROR' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: 'Failed to generate class diagram', code: 'GENERATION_ERROR' }, { headers: V0_DEPRECATION_HEADERS, status: 500 });
   }
 }
 
@@ -91,10 +96,7 @@ export async function POST(request: NextRequest) {
 
     // Validate input
     if (!Array.isArray(entities)) {
-      return NextResponse.json(
-        { success: false, error: 'entities must be an array', code: 'VALIDATION_ERROR' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'entities must be an array', code: 'VALIDATION_ERROR' }, { headers: V0_DEPRECATION_HEADERS, status: 400 });
     }
 
     // Generate the class diagram
@@ -109,12 +111,9 @@ export async function POST(request: NextRequest) {
         diagram,
         metadata,
       },
-    });
+    }, { headers: V0_DEPRECATION_HEADERS });
   } catch (error) {
     safeError('Error generating class diagram:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to generate class diagram', code: 'GENERATION_ERROR' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: 'Failed to generate class diagram', code: 'GENERATION_ERROR' }, { headers: V0_DEPRECATION_HEADERS, status: 500 });
   }
 }

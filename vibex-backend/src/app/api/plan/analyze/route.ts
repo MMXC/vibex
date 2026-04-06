@@ -21,6 +21,14 @@ import { sanitize, safeError } from '@/lib/log-sanitizer';
 import { planAnalyzeSchema } from '@/schemas/security';
 import { parseBody } from '@/lib/high-risk-validation';
 
+
+// E-P0-3: API v0 deprecation header (per architecture.md ADR-003)
+const V0_DEPRECATION_HEADERS = {
+  'Deprecation': 'true',
+  'Sunset': 'Sat, 31 May 2026 23:59:59 GMT',
+  'X-API-Deprecation-Info': 'https://docs.vibex.ai/api-v0-sunset',
+};
+
 interface Entity {
   id: string;
   name: string;
@@ -83,7 +91,7 @@ export async function POST(request: NextRequest) {
 
     if ('error' in result) {
       const parsed = JSON.parse(result.error.message);
-      return NextResponse.json(parsed, { status: result.error.status });
+      return NextResponse.json(parsed, { headers: V0_DEPRECATION_HEADERS, status: result.error.status });
     }
 
     const { requirement, context } = result.data;
@@ -267,15 +275,12 @@ Respond ONLY with the JSON object, no other text.`;
 
     // Parse the AI response
     if (!aiResult?.success || !aiResult?.data) {
-      return NextResponse.json(
-        {
+      return NextResponse.json({
           success: false,
           error: aiResult?.error || 'AI analysis failed',
           result: null,
           timestamp: new Date().toISOString(),
-        },
-        { status: 500 }
-      );
+        }, { headers: V0_DEPRECATION_HEADERS, status: 500 });
     }
 
     const data = aiResult.data;
@@ -325,18 +330,15 @@ Respond ONLY with the JSON object, no other text.`;
       success: true,
       result: planResult,
       timestamp: new Date().toISOString(),
-    });
+    }, { headers: V0_DEPRECATION_HEADERS });
   } catch (error) {
     safeError('[ERROR] Plan API - Analysis failed:', error);
 
-    return NextResponse.json(
-      {
+    return NextResponse.json({
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
         result: null,
         timestamp: new Date().toISOString(),
-      },
-      { status: 500 }
-    );
+      }, { headers: V0_DEPRECATION_HEADERS, status: 500 });
   }
 }

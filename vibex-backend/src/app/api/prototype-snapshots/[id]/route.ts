@@ -3,6 +3,14 @@ import prisma from '@/lib/prisma';
 
 import { safeError } from '@/lib/log-sanitizer';
 
+
+// E-P0-3: API v0 deprecation header (per architecture.md ADR-003)
+const V0_DEPRECATION_HEADERS = {
+  'Deprecation': 'true',
+  'Sunset': 'Sat, 31 May 2026 23:59:59 GMT',
+  'X-API-Deprecation-Info': 'https://docs.vibex.ai/api-v0-sunset',
+};
+
 export const dynamic = 'force-dynamic';
 
 // GET /api/prototype-snapshots/[id] - Get a single snapshot
@@ -18,19 +26,13 @@ export async function GET(
     });
 
     if (!snapshot) {
-      return NextResponse.json(
-        { error: 'Prototype snapshot not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Prototype snapshot not found' }, { headers: V0_DEPRECATION_HEADERS, status: 404 });
     }
 
-    return NextResponse.json({ prototypeSnapshot: snapshot });
+    return NextResponse.json({ prototypeSnapshot: snapshot }, { headers: V0_DEPRECATION_HEADERS });
   } catch (error) {
     safeError('Error fetching prototype snapshot:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch prototype snapshot' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch prototype snapshot' }, { headers: V0_DEPRECATION_HEADERS, status: 500 });
   }
 }
 
@@ -54,13 +56,10 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json({ prototypeSnapshot: snapshot });
+    return NextResponse.json({ prototypeSnapshot: snapshot }, { headers: V0_DEPRECATION_HEADERS });
   } catch (error) {
     safeError('Error updating prototype snapshot:', error);
-    return NextResponse.json(
-      { error: 'Failed to update prototype snapshot' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to update prototype snapshot' }, { headers: V0_DEPRECATION_HEADERS, status: 500 });
   }
 }
 
@@ -76,12 +75,9 @@ export async function DELETE(
       where: { id },
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true }, { headers: V0_DEPRECATION_HEADERS });
   } catch (error) {
     safeError('Error deleting prototype snapshot:', error);
-    return NextResponse.json(
-      { error: 'Failed to delete prototype snapshot' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to delete prototype snapshot' }, { headers: V0_DEPRECATION_HEADERS, status: 500 });
   }
 }

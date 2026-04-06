@@ -13,6 +13,14 @@ import jwt from 'jsonwebtoken';
 import { getAuthUserFromRequest } from '@/lib/authFromGateway';
 import { getLocalEnv } from '@/lib/env';
 
+
+// E-P0-3: API v0 deprecation header (per architecture.md ADR-003)
+const V0_DEPRECATION_HEADERS = {
+  'Deprecation': 'true',
+  'Sunset': 'Sat, 31 May 2026 23:59:59 GMT',
+  'X-API-Deprecation-Info': 'https://docs.vibex.ai/api-v0-sunset',
+};
+
 // MiniMax API configuration
 const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY || '';
 const MINIMAX_API_BASE = process.env.MINIMAX_API_BASE || 'https://api.minimax.chat/v1';
@@ -120,10 +128,8 @@ export const POST = validateBody(chatMessageSchema, async (body, req: NextReques
   // E1: Authentication check
   const auth = checkAuth(req);
   if (!auth) {
-    return new Response(JSON.stringify({ error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(JSON.stringify({ error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' }), { status: 401,
+      headers: { ...V0_DEPRECATION_HEADERS,  'Content-Type': 'application/json'  } });
   }
 
   const { message, conversationId, history } = body;
@@ -161,21 +167,17 @@ export const POST = validateBody(chatMessageSchema, async (body, req: NextReques
     },
   });
 
-  return new Response(stream, {
-    headers: {
+  return new Response(stream, { headers: { ...V0_DEPRECATION_HEADERS, 
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
       'Connection': 'keep-alive',
-    },
-  });
+     } });
 });
 
 export async function GET() {
   return new Response(JSON.stringify({ 
     status: 'ok',
     message: 'Chat API is running. Use POST with { message: "your message" }'
-  }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' },
-  });
+  }), { status: 200,
+    headers: { ...V0_DEPRECATION_HEADERS,  'Content-Type': 'application/json'  } });
 }

@@ -13,6 +13,14 @@ import { getLocalEnv } from '@/lib/env';
 
 import { safeError } from '@/lib/log-sanitizer';
 
+
+// E-P0-3: API v0 deprecation header (per architecture.md ADR-003)
+const V0_DEPRECATION_HEADERS = {
+  'Deprecation': 'true',
+  'Sunset': 'Sat, 31 May 2026 23:59:59 GMT',
+  'X-API-Deprecation-Info': 'https://docs.vibex.ai/api-v0-sunset',
+};
+
 export const dynamic = 'force-dynamic';
 
 interface ChatMessage {
@@ -69,10 +77,7 @@ export async function POST(request: NextRequest) {
     const { message, history = [], context = {} } = body;
 
     if (!message || message.trim().length === 0) {
-      return NextResponse.json(
-        { reply: '', completeness: 0, nextAction: 'error', error: '消息内容不能为空' },
-        { status: 400 }
-      );
+      return NextResponse.json({ reply: '', completeness: 0, nextAction: 'error', error: '消息内容不能为空' }, { headers: V0_DEPRECATION_HEADERS, status: 400 });
     }
 
     const env = getLocalEnv();
@@ -130,7 +135,7 @@ export async function POST(request: NextRequest) {
       nextAction,
     };
 
-    return NextResponse.json(response);
+    return NextResponse.json(response, { headers: V0_DEPRECATION_HEADERS });
 
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
@@ -140,7 +145,7 @@ export async function POST(request: NextRequest) {
       completeness: 0,
       nextAction: 'error',
       error: `澄清失败: ${errorMessage}`,
-    }, { status: 500 });
+    }, { headers: V0_DEPRECATION_HEADERS, status: 500 });
   }
 }
 
@@ -162,5 +167,5 @@ export async function GET() {
       suggestions: 'string[]',
       nextAction: 'string',
     },
-  });
+  }, { headers: V0_DEPRECATION_HEADERS });
 }

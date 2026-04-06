@@ -11,6 +11,14 @@ import { NextRequest } from 'next/server';
 
 import { safeError } from '@/lib/log-sanitizer';
 
+
+// E-P0-3: API v0 deprecation header (per architecture.md ADR-003)
+const V0_DEPRECATION_HEADERS = {
+  'Deprecation': 'true',
+  'Sunset': 'Sat, 31 May 2026 23:59:59 GMT',
+  'X-API-Deprecation-Info': 'https://docs.vibex.ai/api-v0-sunset',
+};
+
 // MiniMax API configuration
 const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY || '';
 const MINIMAX_API_BASE = process.env.MINIMAX_API_BASE || 'https://api.minimax.chat/v1';
@@ -240,29 +248,23 @@ export async function GET() {
     },
     supportedFrameworks: ['react', 'vue', 'html', 'svelte', 'angular'],
     supportedUILibraries: ['shadcn', 'mui', 'antd', 'bootstrap', 'tailwind', 'none'],
-  }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' },
-  });
+  }), { status: 200,
+    headers: { ...V0_DEPRECATION_HEADERS,  'Content-Type': 'application/json'  } });
 }
 
 export async function POST(request: NextRequest) {
   try {
     if (!MINIMAX_API_KEY) {
-      return new Response(JSON.stringify({ error: 'MINIMAX_API_KEY is not configured' }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(JSON.stringify({ error: 'MINIMAX_API_KEY is not configured' }), { status: 500,
+        headers: { ...V0_DEPRECATION_HEADERS,  'Content-Type': 'application/json'  } });
     }
 
     const body = await request.json() as UIGenerationRequest;
     const { description, framework = 'react', uiLibrary = 'tailwind', designStyle = 'modern', componentType = 'component' } = body;
 
     if (!description) {
-      return new Response(JSON.stringify({ error: 'Description is required' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(JSON.stringify({ error: 'Description is required' }), { status: 400,
+        headers: { ...V0_DEPRECATION_HEADERS,  'Content-Type': 'application/json'  } });
     }
 
     const conversationId = `ui_gen_${Date.now()}`;
@@ -344,18 +346,14 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return new Response(stream, {
-      headers: {
+    return new Response(stream, { headers: { ...V0_DEPRECATION_HEADERS, 
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
-      },
-    });
+       } });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(JSON.stringify({ error: errorMessage }), { status: 500,
+      headers: { ...V0_DEPRECATION_HEADERS,  'Content-Type': 'application/json'  } });
   }
 }

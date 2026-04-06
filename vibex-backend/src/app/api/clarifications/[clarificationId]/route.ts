@@ -13,6 +13,14 @@ import { queryOne, executeDB } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
 
+
+// E-P0-3: API v0 deprecation header (per architecture.md ADR-003)
+const V0_DEPRECATION_HEADERS = {
+  'Deprecation': 'true',
+  'Sunset': 'Sat, 31 May 2026 23:59:59 GMT',
+  'X-API-Deprecation-Info': 'https://docs.vibex.ai/api-v0-sunset',
+};
+
 export const dynamic = 'force-dynamic';
 
 interface RequirementRow {
@@ -38,10 +46,7 @@ export async function PUT(
     const { answer, status } = body;
 
     if (!answer && !status) {
-      return NextResponse.json(
-        { error: 'At least one of answer or status is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'At least one of answer or status is required' }, { headers: V0_DEPRECATION_HEADERS, status: 400 });
     }
 
     const env = getLocalEnv();
@@ -60,14 +65,11 @@ export async function PUT(
       status: status || 'answered',
       updatedAt: new Date().toISOString(),
       message: 'Clarification updated (mock - D1 indexed lookup not yet implemented)',
-    });
+    }, { headers: V0_DEPRECATION_HEADERS });
 
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
     safeError('[Clarification Update] Error:', errorMessage);
-    return NextResponse.json(
-      { error: `Failed to update clarification: ${errorMessage}` },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: `Failed to update clarification: ${errorMessage}` }, { headers: V0_DEPRECATION_HEADERS, status: 500 });
   }
 }

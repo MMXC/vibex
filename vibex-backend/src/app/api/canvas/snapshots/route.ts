@@ -15,6 +15,14 @@ import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
 
+
+// E-P0-3: API v0 deprecation header (per architecture.md ADR-003)
+const V0_DEPRECATION_HEADERS = {
+  'Deprecation': 'true',
+  'Sunset': 'Sat, 31 May 2026 23:59:59 GMT',
+  'X-API-Deprecation-Info': 'https://docs.vibex.ai/api-v0-sunset',
+};
+
 interface CanvasSnapshotRow {
   id: string;
   projectId: string;
@@ -39,7 +47,7 @@ export async function GET(
     const offset = parseInt(searchParams.get('offset') || '0');
 
     if (!projectId) {
-      return NextResponse.json({ error: 'Missing required query param: projectId' }, { status: 400 });
+      return NextResponse.json({ error: 'Missing required query param: projectId' }, { headers: V0_DEPRECATION_HEADERS, status: 400 });
     }
 
     // D1 environment binding (Cloudflare Workers)
@@ -71,10 +79,10 @@ export async function GET(
       total,
       limit,
       offset,
-    });
+    }, { headers: V0_DEPRECATION_HEADERS });
   } catch (err) {
     safeError('[canvas/snapshots] GET error:', err);
-    return NextResponse.json({ error: 'Failed to fetch snapshots' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch snapshots' }, { headers: V0_DEPRECATION_HEADERS, status: 500 });
   }
 }
 
@@ -112,7 +120,7 @@ export async function POST(
     // Resolve projectId
     const resolvedProjectId = projectId ?? (legacyData as Record<string, unknown> | undefined)?.projectId as string | undefined;
     if (!resolvedProjectId) {
-      return NextResponse.json({ error: 'Missing required field: projectId' }, { status: 400 });
+      return NextResponse.json({ error: 'Missing required field: projectId' }, { headers: V0_DEPRECATION_HEADERS, status: 400 });
     }
 
     // Build snapshot data
@@ -169,7 +177,7 @@ export async function POST(
           : null,
       };
 
-      return NextResponse.json(conflictResponse, { status: 409 });
+      return NextResponse.json(conflictResponse, { headers: V0_DEPRECATION_HEADERS, status: 409 });
     }
 
     // Version matches or no version provided — create new snapshot
@@ -200,7 +208,7 @@ export async function POST(
     );
 
     if (!created) {
-      return NextResponse.json({ error: 'Failed to create snapshot' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to create snapshot' }, { headers: V0_DEPRECATION_HEADERS, status: 500 });
     }
 
     let parsedData: Record<string, unknown> = {};
@@ -227,9 +235,9 @@ export async function POST(
         componentNodes: parsedData.components ?? [],
       },
       version: created.version,
-    }, { status: 201 });
+    }, { headers: V0_DEPRECATION_HEADERS, status: 201 });
   } catch (err) {
     safeError('[canvas/snapshots] POST error:', err);
-    return NextResponse.json({ error: 'Failed to create snapshot' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to create snapshot' }, { headers: V0_DEPRECATION_HEADERS, status: 500 });
   }
 }

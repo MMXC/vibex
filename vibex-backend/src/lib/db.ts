@@ -1,11 +1,17 @@
 // Database connection pool management for Vibex
 // Supports both D1 (Cloudflare Workers) and Prisma (local development)
 
-// E4: Only import PrismaClient when NOT running in Cloudflare Workers.
-// The isWorkers check tree-shakes Prisma out of the Workers production bundle.
-const isWorkers = typeof globalThis !== 'undefined' && typeof (globalThis as Record<string, unknown>).caches !== 'undefined'
-const Prisma = !isWorkers ? require('@prisma/client') : null
-const PrismaClient = Prisma?.PrismaClient
+// E4: Only instantiate PrismaClient when NOT running in Cloudflare Workers.
+// Detection strategy: Cloudflare Workers expose the `caches` global AND have a
+// "CF-Bin-Status" request header.  We use `caches` as a fast runtime check.
+// The actual DB choice is controlled by whether `env.DB` (D1 binding) is present,
+// so this flag is only a guard against accidental Prisma instantiation in Workers.
+const isWorkers =
+  typeof globalThis !== 'undefined' &&
+  typeof (globalThis as Record<string, unknown>).caches !== 'undefined';
+
+const Prisma = !isWorkers ? require('@prisma/client') : null;
+const PrismaClient = Prisma?.PrismaClient;
 
 // ============================================
 // D1 Types (Cloudflare Workers)

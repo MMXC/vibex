@@ -34,6 +34,7 @@ import {
 } from './domain-entities';
 import {
   EntityRelation,
+  RelationType,
   createEntityRelation,
   deleteEntityAllRelations,
   listEntityRelations,
@@ -727,7 +728,7 @@ export class RequirementAnalyzerService {
           projectId: requirement.projectId,
           sourceEntityId: sourceId,
           targetEntityId: targetId,
-          relationType: relation.relationType as any,
+          relationType: relation.relationType as RelationType,
           description: relation.description,
         });
 

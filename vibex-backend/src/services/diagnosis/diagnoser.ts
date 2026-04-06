@@ -12,7 +12,7 @@
 
 import { createHash } from 'crypto'
 import {
-  DiagnosisResult,
+  DiagnosisResult, CachedDiagnosisResult,
   IdentifiedDomain,
   MissingInfo,
   Suggestion,
@@ -90,7 +90,7 @@ export class RequirementDiagnoser {
     if (enableCache) {
       const cached = this.cache.get(cacheKey)
       if (cached && cached.expiresAt > Date.now()) {
-        return { ...cached.result, cached: true } as any
+        return { ...cached.result, cached: true } as CachedDiagnosisResult
       }
     }
 

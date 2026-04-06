@@ -1,3 +1,18 @@
+### Added (vibex-dev-security-20260410 E2: 空catch块清理) — 2026-04-06
+- **E2 SSE Stream AbortSignal**: `lib/sse-stream-lib/index.ts` 新增 requestSignal 参数
+  - 客户端断开连接时自动 abort AI 调用，防止 Worker 挂起
+  - 与内置 10s 超时组合，形成双重保护
+  - catch 块保留注释: `// Controller may already be closed — ignore`
+- **E2 TypeScript 类型安全**: `services/context/SummaryGenerator.ts`
+  - `as any` → `MiniMaxChatResponse` interface，消除类型绕行
+- **E2 诊断缓存类型**: `services/diagnosis/`
+  - `as any` → `CachedDiagnosisResult` interface，定义缓存元数据类型
+- **E2 空catch块验证**: 全代码库 catch 块审查通过
+  - SSE流解析: `catch { /* Skip invalid JSON */ }` (故意，跳过格式错误)
+  - 错误响应: `catch { return c.json({ error: ... }, 400); }` (正确返回错误)
+  - 认证失败: `catch { return NextResponse.json({ error: 'Invalid token' }, 401); }` (正确)
+  - JSON 解析: `catch { return null; }` (有文档记录的降级行为)
+
 ### Added (vibex-backend-fixes-20260410 E1: Schema统一) — 2026-04-06
 - **E1 统一错误类型**: `lib/errors.ts` 提供 AppError 基类及子类 (AuthError, ValidationError, NotFoundError, ForbiddenError, ConflictError)
   - ValidationError.fromZodError() 支持 Zod 错误 → 结构化 fieldErrors/formErrors

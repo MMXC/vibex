@@ -16,6 +16,15 @@ interface SummaryOptions {
   includeDecisions?: boolean
 }
 
+/** MiniMax chat completion API response shape */
+interface MiniMaxChatResponse {
+  choices?: Array<{
+    message?: {
+      content?: string
+    }
+  }>
+}
+
 const DEFAULT_SUMMARY_OPTIONS: SummaryOptions = {
   maxLength: 1000,
   focusOnUserGoals: true,
@@ -154,7 +163,7 @@ export class SummaryGenerator {
       throw new Error(`AI API error: ${response.status}`)
     }
 
-    const data = await response.json() as any
+    const data = await response.json() as MiniMaxChatResponse
     const content = data.choices?.[0]?.message?.content
 
     if (!content) {

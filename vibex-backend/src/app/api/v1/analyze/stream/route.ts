@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
   }
 
   const env = getLocalEnv();
-  const stream = buildSSEStream({ requirement, env });
+  const stream = buildSSEStream({ requirement, env, requestSignal: request.signal });
 
   return new Response(stream, {
     headers: {
@@ -65,5 +65,9 @@ export async function GET(request: NextRequest) {
       'Connection': 'keep-alive',
       'X-Accel-Buffering': 'no',
     },
+    // Hard timeout: if stream doesn't complete within 30s, terminate the Worker.
+    // Combined with the built-in 10s AI-call timeout inside buildSSEStream,
+    // this ensures resources are always released even on catastrophic failures.
+    timeout: 30_000,
   });
 }

@@ -9,7 +9,12 @@
 
 import { Hono } from 'hono';
 import { queryOne, queryDB, executeDB, generateId, Env } from '@/lib/db';
-import { createUIGeneratorService, UIGeneratorService, UIGeneratorOptions, UIGenerationResult, GeneratedComponent } from '@/services/ui-generator';
+import { createUIGeneratorService, UIGeneratorService, UIGeneratorOptions, UIGenerationResult, GeneratedComponent, GeneratedPage } from '@/services/ui-generator';
+
+/** Type guard: is this a GeneratedPage (has .component sub-field)? */
+function isGeneratedPage(val: GeneratedPage | GeneratedComponent): val is GeneratedPage {
+  return 'component' in val && typeof (val as GeneratedPage).component === 'object';
+}
 
 const prototypePreview = new Hono<{ Bindings: Env }>();
 
@@ -350,7 +355,7 @@ prototypePreview.post('/', async (c) => {
             const generatedPage = result.data;
             const previewId = generateId();
             const pageData = 'components' in generatedPage ? generatedPage : null;
-            const componentData = 'component' in generatedPage ? (generatedPage as any).component : null;
+            const componentData = isGeneratedPage(generatedPage) ? generatedPage.component : null;
             
             const preview: PreviewResponse['preview'] = {
               id: previewId,

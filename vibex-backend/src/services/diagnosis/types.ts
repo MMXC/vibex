@@ -5,6 +5,13 @@
  * @module services/diagnosis/types
  */
 
+/**
+ * DiagnosisResult with cache metadata (returned when serving from cache)
+ */
+export interface CachedDiagnosisResult extends DiagnosisResult {
+  cached: true
+}
+
 export interface DiagnosisResult {
   // Overall score
   overallScore: number        // 0-100

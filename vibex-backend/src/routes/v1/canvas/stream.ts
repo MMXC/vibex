@@ -30,7 +30,11 @@ canvasStream.get('/', async (c) => {
 
   // Dynamically import to avoid circular dependency issues
   const { buildSSEStream } = await import('../../../lib/sse-stream-lib');
-  const stream = buildSSEStream({ requirement, env });
+
+  // Wire client-disconnect abort signal so the stream closes promptly when
+  // the client drops the connection. The built-in 10s AI-call timeout within
+  // buildSSEStream handles the other failure mode.
+  const stream = buildSSEStream({ requirement, env, requestSignal: c.req.raw.signal });
 
   return new Response(stream, {
     headers: {
@@ -40,6 +44,7 @@ canvasStream.get('/', async (c) => {
       'Connection': 'keep-alive',
       'X-Accel-Buffering': 'no',
     },
+    timeout: 30_000,
   });
 });
 

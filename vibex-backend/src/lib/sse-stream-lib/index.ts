@@ -31,6 +31,12 @@ export function sendThinking(controller: ReadableStreamDefaultController, conten
 export interface SSEStreamOptions {
   requirement: string;
   env: CloudflareEnv;
+  /**
+   * Optional AbortSignal from the incoming request.
+   * When provided, the stream aborts when the client disconnects.
+   * Composes with the built-in 10s AI-call timeout.
+   */
+  requestSignal?: AbortSignal;
 }
 
 /**
@@ -40,7 +46,7 @@ export interface SSEStreamOptions {
  *
  * Includes AbortController timeout (10s) and proper resource cleanup on abort/disconnect.
  */
-export function buildSSEStream({ requirement, env }: SSEStreamOptions): ReadableStream {
+export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOptions): ReadableStream {
   // Track all timers for cleanup
   const timers: ReturnType<typeof setTimeout>[] = [];
 
@@ -57,7 +63,7 @@ export function buildSSEStream({ requirement, env }: SSEStreamOptions): Readable
 
       // Set up AbortController with 10-second timeout
       abortController = new AbortController();
-      const { signal } = abortController;
+      const { signal: localSignal } = abortController;
 
       // Auto-abort after 10 seconds to prevent Worker hanging
       addTimer(() => {
@@ -67,8 +73,16 @@ export function buildSSEStream({ requirement, env }: SSEStreamOptions): Readable
         }
       }, 10_000);
 
+      // Forward client-disconnect signal (request.signal) into our abort controller
+      if (requestSignal) {
+        requestSignal.addEventListener('abort', () => {
+          devDebug('[SSE Stream] Client disconnected, aborting stream');
+          abortController?.abort();
+        });
+      }
+
       // Close controller when abort is signaled (timeout or client disconnect)
-      signal.addEventListener('abort', () => {
+      localSignal.addEventListener('abort', () => {
         if (!aborted) {
           aborted = true;
           devDebug('[SSE Stream] Abort signal received, closing stream');

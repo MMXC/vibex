@@ -76,6 +76,12 @@
 - **E1 vitest 兼容性**: 修复 vitest mock 方法缺失问题
 - **提交**: `99c089e5`
 
+### Added (vibex-tester quality-20260410 E2: Jest降级与双框架统一) — 2026-04-06
+- **E2 jest→vi 完整迁移**: 141 个前端测试文件从 Jest 迁移到 Vitest
+  - `jest.fn()` → `vi.fn()`, `jest.mock()` → `vi.mock()`, `jest.spyOn()` → `vi.spyOn()`
+  - 添加 vi mock compatibility helpers (vi.fn().mockImplementation, vi.mocked())
+- **提交**: `8e363dad`
+
 ### Added (vibex-backend-fixes-20260410 E2: SSE超时修复) — 2026-04-06
 - **E2 SSE timeout**: client-disconnect abort + 30s hard timeout to all SSE routes
 - **提交**: `8a42d126`

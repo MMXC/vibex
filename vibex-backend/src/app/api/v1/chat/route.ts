@@ -14,6 +14,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { chatMessageSchema } from '@/schemas/security';
 import { parseBody } from '@/lib/high-risk-validation';
 import { getAuthUserFromRequest } from '@/lib/authFromGateway';
+import { getLocalEnv } from '@/lib/env';
 
 // MiniMax API configuration
 const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY || '';
@@ -112,7 +113,8 @@ async function* streamFromMiniMax(
 
 export async function POST(request: NextRequest) {
   // E1-S4: Use consolidated auth via getAuthUserFromRequest (reads from Hono headers + JWT fallback)
-  const auth = getAuthUserFromRequest(request);
+  const env = getLocalEnv();
+  const auth = getAuthUserFromRequest(request, env.JWT_SECRET);
   if (!auth) {
     return NextResponse.json(
       { error: 'Unauthorized: authentication required', code: 'AUTH_ERROR' },

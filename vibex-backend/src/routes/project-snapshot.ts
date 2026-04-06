@@ -30,11 +30,37 @@ const projectSnapshot = new Hono<{ Bindings: Env }>()
 export async function getProjectSnapshot(
   env: Env,
   projectId: string,
-  version?: number
+  _version?: number
 ): Promise<{ success: boolean; data?: ProjectSnapshot; error?: string; code?: string }> {
   try {
+    // Row types from database
+    interface ProjectRow {
+      id: string; name: string; description: string | null; userId: string;
+      createdAt: number; updatedAt: number;
+    }
+    interface StepStateRow {
+      projectId: string; currentStep: number; version: number; updatedAt: number;
+      lastModifiedBy: string; step1Data: string | null; step2Data: string | null; step3Data: string | null;
+    }
+    interface DomainRow {
+      id: string; name: string; description: string; type: string;
+      features: unknown[]; relationships: unknown[]; createdAt: number; updatedAt: number;
+    }
+    interface FlowRow {
+      id: string; projectId: string; nodes: string | null; edges: string | null;
+      domainIds: string | null; mermaidCode: string | null; createdAt: number; updatedAt: number;
+    }
+    interface UINodeRow {
+      id: string; projectId: string; name: string; type: string;
+      properties: string | null; children: string | null; createdAt: number; updatedAt: number;
+    }
+    interface HistoryRow {
+      id: string; projectId: string; action: string; version: number;
+      userId: string; details: string | null; createdAt: number;
+    }
+
     // Get project
-    const projectRows = await queryDB<any>(
+    const projectRows = await queryDB<ProjectRow>(
       env,
       'SELECT * FROM Project WHERE id = ? AND deletedAt IS NULL',
       [projectId]
@@ -47,7 +73,7 @@ export async function getProjectSnapshot(
     const project = projectRows[0]
 
     // E2-S1: Query actual step state from StepState table
-    const stepStateRows = await queryDB<any>(
+    const stepStateRows = await queryDB<StepStateRow>(
       env,
       'SELECT * FROM StepState WHERE projectId = ?',
       [projectId]
@@ -77,46 +103,49 @@ export async function getProjectSnapshot(
     }
 
     // E2-S1: Query actual domains from BusinessDomain table
-    const domainRows = await queryDB<any>(
+    const domainRows = await queryDB<DomainRow>(
       env,
       'SELECT * FROM BusinessDomain WHERE projectId = ? AND deletedAt IS NULL',
       [projectId]
     );
-    const domains = (domainRows || []) as any[];
+    const domains = domainRows || [];
 
     // E2-S1: Query actual flow from FlowData table
-    const flowRows = await queryDB<any>(
+    const flowRows = await queryDB<FlowRow>(
       env,
       'SELECT * FROM FlowData WHERE projectId = ? AND deletedAt IS NULL LIMIT 1',
       [projectId]
     );
     let flow: FlowData | undefined;
     if (flowRows && flowRows.length > 0) {
-      const f = flowRows[0] as any;
+      const f = flowRows[0];
       flow = {
         id: f.id,
         projectId: f.projectId,
+        domainIds: f.domainIds ? JSON.parse(f.domainIds) : [],
         nodes: f.nodes ? JSON.parse(f.nodes) : [],
         edges: f.edges ? JSON.parse(f.edges) : [],
-        metadata: {},
-      } as any;
+        mermaidCode: f.mermaidCode || undefined,
+        createdAt: f.createdAt,
+        updatedAt: f.updatedAt,
+      };
     }
 
     // E2-S1: Query actual UI nodes from UINode table
-    const uiNodeRows = await queryDB<any>(
+    const uiNodeRows = await queryDB<UINodeRow>(
       env,
       'SELECT * FROM UINode WHERE projectId = ? AND deletedAt IS NULL',
       [projectId]
     );
-    const uiNodes = (uiNodeRows || []) as any[];
+    const uiNodes = uiNodeRows || [];
 
     // E2-S1: Query actual history from ChangeLog table
-    const historyRows = await queryDB<any>(
+    const historyRows = await queryDB<HistoryRow>(
       env,
       'SELECT * FROM ChangeLog WHERE projectId = ? ORDER BY version DESC LIMIT 50',
       [projectId]
     );
-    const history = (historyRows || []) as any[];
+    const history = historyRows || [];
 
     // Compute snapshot meta
     const snapshotMeta: SnapshotMeta = {
@@ -125,7 +154,7 @@ export async function getProjectSnapshot(
       totalNodes: flow?.nodes.length ?? 0,
       totalUINodes: uiNodes.length,
       checkedFeaturesCount: domains.reduce(
-        (sum: number, d: any) => sum + ((d.features || []).filter((f: any) => f.isSelected).length),
+        (sum, d) => sum + ((d.features as Array<{ isSelected: boolean }> || []).filter(f => f.isSelected).length),
         0
       ),
       lastModified: stepState.lastModified,

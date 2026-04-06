@@ -26,7 +26,8 @@ export const dynamic = 'force-dynamic';
 
 // Auth helper for canvas routes
 function checkAuth(req: NextRequest) {
-  const auth = getAuthUserFromRequest(req);
+  const env = getLocalEnv();
+  const auth = getAuthUserFromRequest(req, env.JWT_SECRET);
   return auth ? { auth, error: null } : { auth: null, error: 'Unauthorized' };
 }
 

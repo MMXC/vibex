@@ -169,11 +169,35 @@ Respond ONLY with the JSON object, no other text.`
     // Call AI for plan analysis
     const result = await aiService.generateJSON<{
       summary: string
-      entities: any[]
-      features: any[]
-      questions: any[]
-      suggestedContexts: any[]
-      confidence: number
+      entities: Array<{
+        name: string
+        type?: string
+        description?: string
+        attributes?: Array<{ name: string; type: string; required?: boolean; description?: string }>
+        relationships?: Array<{ sourceEntity: string; targetEntity: string; type: string; description?: string }>
+      }>
+      features: Array<{
+        name: string
+        description?: string
+        priority?: string
+        category?: string
+        relatedEntities?: string[]
+        userStories?: string[]
+      }>
+      questions: Array<{
+        question: string
+        type?: string
+        options?: string[]
+        impact?: string
+      }>
+      suggestedContexts: Array<{
+        name: string
+        type?: string
+        entities?: string[]
+        description?: string
+        dependencies?: string[]
+      }>
+      confidence?: number
     }>(
       prompt,
       {
@@ -267,7 +291,7 @@ Respond ONLY with the JSON object, no other text.`
       requirement,
       summary: data.summary || '',
       confidence: data.confidence || 50,
-      entities: (data.entities || []).map((e: any, idx: number) => ({
+      entities: (data.entities || []).map((e) => ({
         id: generateId(),
         name: e.name,
         type: e.type || 'entity',
@@ -275,7 +299,7 @@ Respond ONLY with the JSON object, no other text.`
         attributes: e.attributes || [],
         relationships: e.relationships || [],
       })),
-      features: (data.features || []).map((f: any, idx: number) => ({
+      features: (data.features || []).map((f) => ({
         id: generateId(),
         name: f.name,
         description: f.description,
@@ -284,14 +308,14 @@ Respond ONLY with the JSON object, no other text.`
         relatedEntities: f.relatedEntities || [],
         userStories: f.userStories || [],
       })),
-      questions: (data.questions || []).map((q: any, idx: number) => ({
+      questions: (data.questions || []).map((q) => ({
         id: generateId(),
         question: q.question,
         type: q.type || 'text',
         options: q.options || [],
         impact: q.impact || '',
       })),
-      suggestedContexts: (data.suggestedContexts || []).map((c: any, idx: number) => ({
+      suggestedContexts: (data.suggestedContexts || []).map((c) => ({
         id: generateId(),
         name: c.name,
         type: c.type || 'core',

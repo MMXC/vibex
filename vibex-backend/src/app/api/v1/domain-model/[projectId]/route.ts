@@ -14,6 +14,7 @@ import { EntityRelation } from '@/services/entity-relations';
 
 import { safeError } from '@/lib/log-sanitizer';
 import { getAuthUserFromRequest } from '@/lib/authFromGateway';
+import { getLocalEnv } from '@/lib/env';
 
 /**
  * GET /api/domain-model/:projectId
@@ -33,8 +34,9 @@ import { getAuthUserFromRequest } from '@/lib/authFromGateway';
 
 // Auth helper
 function checkAuth(req: NextRequest) {
-  const auth = getAuthUserFromRequest(req);
-  return auth ? { auth, error: null } : { auth: null, error: 'Unauthorized' };
+  const env = getLocalEnv();
+  const auth = getAuthUserFromRequest(req, env.JWT_SECRET);
+  return auth;
 }
 
 export async function GET(
@@ -42,10 +44,10 @@ export async function GET(
   { params }: { params: Promise<{ projectId: string }> }
 ) {
   // E1: Authentication check
-  const { auth, error } = checkAuth(request);
+  const auth = checkAuth(request);
   if (!auth) {
     return NextResponse.json(
-      { success: false, error, code: 'UNAUTHORIZED' },
+      { success: false, error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' },
       { status: 401 }
     );
   }
@@ -103,10 +105,10 @@ export async function GET(
  */
 export async function POST(request: NextRequest) {
   // E1: Authentication check
-  const { auth, error } = checkAuth(request);
+  const auth = checkAuth(request);
   if (!auth) {
     return NextResponse.json(
-      { success: false, error, code: 'UNAUTHORIZED' },
+      { success: false, error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' },
       { status: 401 }
     );
   }

@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
     const { requirement, context } = result.data;
 
     // Get environment variables
-    const env = getCloudflareEnv(request);
+    const env = getCloudflareEnv();
 
     // Debug: Check if MINIMAX_API_KEY is available
     const debugInfo = {
@@ -158,11 +158,31 @@ Respond ONLY with the JSON object, no other text.`;
     // Call AI for plan analysis
     const aiResult = await aiService.generateJSON<{
       summary: string;
-      entities: any[];
-      features: any[];
-      questions: any[];
-      suggestedContexts: any[];
-      confidence: number;
+      entities: Array<{
+        name: string;
+        type?: string;
+        description?: string;
+        attributes?: Array<{ name: string; type: string; required?: boolean; description?: string }>;
+      }>;
+      features: Array<{
+        name: string;
+        description?: string;
+        priority?: string;
+        relatedEntities?: string[];
+      }>;
+      questions: Array<{
+        question: string;
+        type?: string;
+        options?: string[];
+        impact?: string;
+      }>;
+      suggestedContexts: Array<{
+        name: string;
+        type?: string;
+        entities?: string[];
+        description?: string;
+      }>;
+      confidence?: number;
     }>(
       prompt,
       {
@@ -266,31 +286,31 @@ Respond ONLY with the JSON object, no other text.`;
       requirement,
       summary: data.summary || '',
       confidence: data.confidence || 50,
-      entities: (data.entities || []).map((e: any) => ({
+      entities: (data.entities || []).map((e) => ({
         id: generateId(),
         name: e.name,
-        type: e.type || 'entity',
+        type: (e.type || 'entity') as Entity['type'],
         description: e.description || '',
         attributes: e.attributes || [],
       })),
-      features: (data.features || []).map((f: any) => ({
+      features: (data.features || []).map((f) => ({
         id: generateId(),
         name: f.name,
-        description: f.description,
-        priority: f.priority || 'P1',
+        description: f.description ?? '',
+        priority: (f.priority || 'P1') as Feature['priority'],
         relatedEntities: f.relatedEntities || [],
       })),
-      questions: (data.questions || []).map((q: any) => ({
+      questions: (data.questions || []).map((q) => ({
         id: generateId(),
         question: q.question,
-        type: q.type || 'text',
+        type: (q.type || 'text') as Question['type'],
         options: q.options || [],
         impact: q.impact || '',
       })),
-      suggestedContexts: (data.suggestedContexts || []).map((c: any) => ({
+      suggestedContexts: (data.suggestedContexts || []).map((c) => ({
         id: generateId(),
         name: c.name,
-        type: c.type || 'core',
+        type: (c.type || 'core') as SuggestedContext['type'],
         entities: c.entities || [],
         description: c.description || '',
       })),

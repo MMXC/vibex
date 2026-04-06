@@ -14,6 +14,9 @@ import { canvasGenerateSchema } from '@vibex/types/schemas/canvas';
 import { AppError, AuthError, NotFoundError, ValidationError } from '@/lib/errors';
 import { errorToResponse } from '@/lib/errors';
 import prisma from '@/lib/prisma';
+import { getLocalEnv } from '@/lib/env';
+import { safeError } from '@/lib/log-sanitizer';
+import { getAuthUserFromRequest } from '@/lib/authFromGateway';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +27,8 @@ const MINIMAX_MODEL = process.env.MINIMAX_MODEL || 'abab6.5s-chat';
 
 // Auth helper — E1-S4: use consolidated auth
 async function requireAuth(req: NextRequest) {
-  const auth = getAuthUserFromRequest(req);
+  const env = getLocalEnv();
+  const auth = getAuthUserFromRequest(req, env.JWT_SECRET);
   if (!auth) {
     throw new AuthError('Unauthorized: authentication required');
   }

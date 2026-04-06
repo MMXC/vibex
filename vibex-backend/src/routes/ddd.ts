@@ -5,6 +5,44 @@ import { generateId, Env } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
 import { debug, sanitize, devLog, safeError } from '@/lib/log-sanitizer'
 
+// AI Response Types (parsed from AI service)
+interface AIPlanResult {
+  summary: string
+  entities: Array<{ name: string; type?: string; description?: string; attributes?: unknown[] }>
+  features: Array<{ name: string; type?: string; description?: string }>
+  suggestedContexts: Array<{ name: string; type?: string; description?: string }>
+  confidence: number
+}
+
+interface AIBoundedContext {
+  name: string
+  description?: string
+  type?: string
+  keyResponsibilities?: string[]
+  relationships?: Array<{
+    targetContextName?: string
+    type?: string
+    description?: string
+  }>
+}
+
+interface AIDomainModel {
+  name: string
+  contextId?: string
+  type?: string
+  properties?: Array<{ name: string; type: string; required?: boolean; description?: string }>
+  methods?: string[]
+}
+
+interface AIBusinessFlow {
+  id?: string
+  name?: string
+  states?: Array<{ id: string; name: string; type: string; description: string }>
+  transitions?: Array<{ id: string; fromStateId: string; toStateId: string; event: string; condition?: string }>
+}
+
+type SSESendData = unknown
+
 const ddd = new Hono<{ Bindings: Env }>();
 
 // Enable CORS
@@ -16,10 +54,10 @@ const BoundedContextRequestSchema = z.object({
   projectId: z.string().optional(),
   planResult: z.object({
     summary: z.string(),
-    entities: z.array(z.any()),
-    features: z.array(z.any()),
-    questions: z.array(z.any()),
-    suggestedContexts: z.array(z.any()),
+    entities: z.array(z.object({ name: z.string(), type: z.string().optional(), description: z.string().optional(), attributes: z.array(z.unknown()).optional() })),
+    features: z.array(z.object({ name: z.string(), type: z.string().optional(), description: z.string().optional() })),
+    questions: z.array(z.object({ name: z.string(), type: z.string().optional() })),
+    suggestedContexts: z.array(z.object({ name: z.string(), type: z.string().optional(), description: z.string().optional() })),
     confidence: z.number(),
   }).optional(),
 })
@@ -76,9 +114,9 @@ ${requirementText}
 
 **Plan Analysis Result:**
 - Summary: ${planResult.summary}
-- Entities: ${planResult.entities.map((e: any) => e.name).join(', ')}
-- Features: ${planResult.features.map((f: any) => f.name).join(', ')}
-- Suggested Contexts: ${planResult.suggestedContexts.map((c: any) => c.name).join(', ')}
+- Entities: ${planResult.entities.map((e: { name: string }) => e.name).join(', ')}
+- Features: ${planResult.features.map((f: { name: string }) => f.name).join(', ')}
+- Suggested Contexts: ${planResult.suggestedContexts.map((c: { name: string }) => c.name).join(', ')}
 - Confidence: ${planResult.confidence}%
 
 **Analysis Task:**
@@ -171,7 +209,7 @@ Respond ONLY with the JSON object, no other text.`
     }
 
     // Call AI for bounded context generation
-    const result = await aiService.generateJSON<{ boundedContexts: any[] }>(
+    const result = await aiService.generateJSON<{ boundedContexts: AIBoundedContext[] }>(
       prompt,
       {
         boundedContexts: {
@@ -226,7 +264,7 @@ Respond ONLY with the JSON object, no other text.`
         // First pass: create contexts without relationships
         const contextMap = new Map<string, BoundedContext>()
         
-        result.data.boundedContexts.forEach((item: any, index: number) => {
+        result.data.boundedContexts.forEach((item, _index) => {
           const ctx: BoundedContext = {
             id: `ctx-${generateId()}-${index}`,
             name: item.name,
@@ -240,9 +278,9 @@ Respond ONLY with the JSON object, no other text.`
         })
         
         // Second pass: resolve relationships
-        result.data.boundedContexts.forEach((item: any, index: number) => {
+        result.data.boundedContexts.forEach((item, _index) => {
           if (item.relationships && Array.isArray(item.relationships)) {
-            item.relationships.forEach((rel: any) => {
+            item.relationships.forEach((rel) => {
               const targetCtx = contextMap.get(rel.targetContextName)
               if (targetCtx) {
                 const fromCtx = boundedContexts[index]
@@ -374,7 +412,7 @@ Return your response as a JSON object like:
 Respond ONLY with the JSON object, no other text.`
 
     // Call AI for domain model generation
-    const result = await aiService.generateJSON<{ domainModels: any[] }>(
+    const result = await aiService.generateJSON<{ domainModels: AIDomainModel[] }>(
       prompt,
       {
         domainModels: {
@@ -411,12 +449,12 @@ Respond ONLY with the JSON object, no other text.`
     
     try {
       if (result.success && result.data && result.data.domainModels && Array.isArray(result.data.domainModels)) {
-        domainModels = result.data.domainModels.map((item: any, index: number) => ({
+        domainModels = result.data.domainModels.map((item, _index) => ({
           id: `dm-${generateId()}-${index}`,
           name: item.name,
           contextId: item.contextId,
           type: item.type as DomainModel['type'],
-          properties: (item.properties || []).map((p: any) => ({
+          properties: (item.properties || []).map((p) => ({
             name: p.name,
             type: p.type,
             required: p.required ?? false,
@@ -488,7 +526,7 @@ ddd.post('/domain-model/stream', async (c) => {
       async start(controller) {
         const encoder = new TextEncoder()
         
-        const send = (event: string, data: any) => {
+        const send = (event: string, data: unknown) => {
           const chunk = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`
           controller.enqueue(encoder.encode(chunk))
         }
@@ -537,7 +575,7 @@ ${contextInfo}
 
           // Call AI with extended timeout for complex requests
           devLog('[Domain Model Stream] Starting AI call for domain model generation')
-          const result = await aiService.generateJSON<{ domainModels: any[] }>(
+          const result = await aiService.generateJSON<{ domainModels: AIDomainModel[] }>(
             prompt,
             { 
               systemPrompt: 'You are a DDD expert. Output only valid JSON. Keep the response concise.',
@@ -592,12 +630,12 @@ ${contextInfo}
           await new Promise(r => setTimeout(r, 100))
           
           // Transform to domain models
-          const domainModels = result.data.domainModels.map((item: any, index: number) => ({
+          const domainModels = result.data.domainModels.map((item, _index) => ({
             id: `dm-${generateId()}-${index}`,
             name: item.name || `DomainModel${index}`,
             contextId: item.contextId || 'default',
             type: item.type || 'entity',
-            properties: (item.properties || []).map((prop: any) => ({
+            properties: (item.properties || []).map((prop) => ({
               name: prop.name,
               type: prop.type,
               required: prop.required ?? true,
@@ -742,7 +780,7 @@ Return your response as a JSON object like:
 Respond ONLY with the JSON object, no other text.`
 
     // Call AI for business flow generation
-    const result = await aiService.generateJSON<{ businessFlow: any }>(
+    const result = await aiService.generateJSON<{ businessFlow: AIBusinessFlow }>(
       prompt,
       {
         businessFlow: {
@@ -792,13 +830,13 @@ Respond ONLY with the JSON object, no other text.`
         businessFlow = {
           id: bf.id || `flow-${generateId()}`,
           name: bf.name || '业务流程',
-          states: (bf.states || []).map((s: any) => ({
+          states: (bf.states || []).map((s) => ({
             id: s.id,
             name: s.name,
             type: s.type as FlowState['type'],
             description: s.description || ''
           })),
-          transitions: (bf.transitions || []).map((t: any) => ({
+          transitions: (bf.transitions || []).map((t) => ({
             id: t.id,
             fromStateId: t.fromStateId,
             toStateId: t.toStateId,
@@ -855,7 +893,7 @@ ddd.post('/business-flow/stream', async (c) => {
       async start(controller) {
         const encoder = new TextEncoder()
         
-        const send = (event: string, data: any) => {
+        const send = (event: string, data: unknown) => {
           const chunk = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`
           controller.enqueue(encoder.encode(chunk))
         }
@@ -887,7 +925,7 @@ Output:
   }
 }`
 
-          const result = await aiService.generateJSON<{ businessFlow: any }>(prompt)
+          const result = await aiService.generateJSON<{ businessFlow: AIBusinessFlow }>(prompt)
           
           if (!result.success || !result.data?.businessFlow) {
             throw new Error('Failed to generate business flow')
@@ -1016,7 +1054,7 @@ function generateMermaidCode(contexts: BoundedContext[]): string {
 // ==================== SSE Streaming API ====================
 
 // SSE event helper
-function sendSSE(c: any, event: string, data: any) {
+function sendSSE(c: { text: (s: string, n?: number) => unknown }, event: string, data: unknown) {
   return c.text(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)
 }
 
@@ -1035,7 +1073,7 @@ ddd.post('/bounded-context/stream', async (c) => {
       async start(controller) {
         const encoder = new TextEncoder()
         
-        const send = (event: string, data: any) => {
+        const send = (event: string, data: unknown) => {
           const chunk = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`
           controller.enqueue(encoder.encode(chunk))
         }
@@ -1067,9 +1105,9 @@ ${requirementText}
 
 **Plan Analysis Result:**
 - Summary: ${planResult.summary}
-- Entities: ${planResult.entities.map((e: any) => e.name).join(', ')}
-- Features: ${planResult.features.map((f: any) => f.name).join(', ')}
-- Suggested Contexts: ${planResult.suggestedContexts.map((c: any) => c.name).join(', ')}
+- Entities: ${planResult.entities.map((e: { name: string }) => e.name).join(', ')}
+- Features: ${planResult.features.map((f: { name: string }) => f.name).join(', ')}
+- Suggested Contexts: ${planResult.suggestedContexts.map((c: { name: string }) => c.name).join(', ')}
 - Confidence: ${planResult.confidence}%
 
 **IMPORTANT: All output must be in Chinese (Simplified).**
@@ -1138,7 +1176,7 @@ For each relationship, provide:
 Respond ONLY with the JSON object, no other text. All text content must be in Chinese.`
 
           // Call AI
-          const result = await aiService.generateJSON<{ boundedContexts: any[] }>(
+          const result = await aiService.generateJSON<{ boundedContexts: AIBoundedContext[] }>(
             prompt,
             {
               boundedContexts: {
@@ -1197,9 +1235,9 @@ Respond ONLY with the JSON object, no other text. All text content must be in Ch
               }
               
               // Second pass: resolve relationships
-              result.data.boundedContexts.forEach((item: any, index: number) => {
+              result.data.boundedContexts.forEach((item, _index) => {
                 if (item.relationships?.length > 0) {
-                  item.relationships.forEach((rel: any) => {
+                  item.relationships.forEach((rel) => {
                     const targetCtx = contextMap.get(rel.targetContextName)
                     if (targetCtx) {
                       const fromCtx = boundedContexts[index]

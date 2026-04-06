@@ -10,21 +10,23 @@ import prisma from '@/lib/prisma';
 
 import { safeError } from '@/lib/log-sanitizer';
 import { getAuthUserFromRequest } from '@/lib/authFromGateway';
+import { getLocalEnv } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
 
 // Auth helper for canvas routes
 function checkAuth(req: NextRequest) {
-  const auth = getAuthUserFromRequest(req);
-  return auth ? { auth, error: null } : { auth: null, error: 'Unauthorized' };
+  const env = getLocalEnv();
+  const auth = getAuthUserFromRequest(req, env.JWT_SECRET);
+  return auth;
 }
 
 export async function POST(request: NextRequest) {
   // E1: Authentication check
-  const { auth, error } = checkAuth(request);
+  const auth = checkAuth(request);
   if (!auth) {
     return NextResponse.json(
-      { error, code: 'UNAUTHORIZED' },
+      { error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' },
       { status: 401 }
     );
   }

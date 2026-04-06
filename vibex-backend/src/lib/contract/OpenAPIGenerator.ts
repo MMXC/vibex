@@ -14,7 +14,9 @@ import { validator } from 'hono/validator';
 interface Route {
   path: string;
   method: string;
-  handler: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  handler: (c: unknown, next?: unknown) => unknown;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   validators?: Record<string, any>;
 }
 
@@ -104,7 +106,7 @@ export interface SecuritySchemeObject {
   type: string;
   scheme?: string;
   bearerFormat?: string;
-  flows?: Record<string, any>;
+  flows?: Record<string, unknown>;
 }
 
 export interface SecurityRequirementObject {
@@ -245,7 +247,7 @@ export class OpenAPIGenerator {
   /**
    * 转换验证器到 OpenAPI
    */
-  private convertValidators(validators: Record<string, any>): RequestBodyObject | undefined {
+  private convertValidators(validators: Record<string, unknown>): RequestBodyObject | undefined {
     // 从 Zod schema 转换
     const bodySchema = validators.body;
     if (bodySchema) {
@@ -264,75 +266,69 @@ export class OpenAPIGenerator {
   /**
    * Zod schema 转换为 OpenAPI Schema
    */
-  private zodToOpenAPI(schema: any): SchemaObject {
+  private zodToOpenAPI(schema: unknown): SchemaObject {
     if (!schema) return { type: 'object' };
     
-    // Handle Zod schema
-    if (schema._def) {
-      const def = schema._def;
-      
-      switch (def.typeName) {
-        case 'ZodString':
-          return {
-            type: 'string',
-            minLength: def.checks?.find((c: any) => c.kind === 'min')?.value,
-            maxLength: def.checks?.find((c: any) => c.kind === 'max')?.value,
-            pattern: def.checks?.find((c: any) => c.kind === 'regex')?.regex?.source,
-          };
-          
-        case 'ZodNumber':
-        case 'ZodInteger':
-          return {
-            type: def.typeName === 'ZodInteger' ? 'integer' : 'number',
-            minimum: def.checks?.find((c: any) => c.kind === 'min')?.value,
-            maximum: def.checks?.find((c: any) => c.kind === 'max')?.value,
-          };
-          
-        case 'ZodBoolean':
-          return { type: 'boolean' };
-          
-        case 'ZodArray':
-          return {
-            type: 'array',
-            items: this.zodToOpenAPI(def.schema),
-          };
-          
-        case 'ZodObject':
-          const properties: Record<string, SchemaObject> = {};
-          const required: string[] = [];
-          
-          for (const [key, value] of Object.entries(def.shape())) {
-            const propSchema = this.zodToOpenAPI(value);
-            properties[key] = propSchema;
-            
-            // Check if required
-            const val = value as any;
-            if (val._def?.required !== false) {
-              required.push(key);
-            }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const def = (schema as any)._def;
+    if (!def) return { type: 'object' };
+    
+    const checks = def.checks as Array<{ kind: string; value?: unknown; regex?: { source?: string } }> | undefined;
+    
+    switch (def.typeName) {
+      case 'ZodString':
+        return {
+          type: 'string',
+          minLength: checks?.find(c => c.kind === 'min')?.value as number | undefined,
+          maxLength: checks?.find(c => c.kind === 'max')?.value as number | undefined,
+          pattern: checks?.find(c => c.kind === 'regex')?.regex?.source,
+        };
+        
+      case 'ZodNumber':
+      case 'ZodInteger':
+        return {
+          type: def.typeName === 'ZodInteger' ? 'integer' : 'number',
+          minimum: checks?.find(c => c.kind === 'min')?.value as number | undefined,
+          maximum: checks?.find(c => c.kind === 'max')?.value as number | undefined,
+        };
+        
+      case 'ZodBoolean':
+        return { type: 'boolean' };
+        
+      case 'ZodArray':
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return { type: 'array', items: this.zodToOpenAPI((def as any).schema) };
+        
+      case 'ZodObject': {
+        const properties: Record<string, SchemaObject> = {};
+        const required: string[] = [];
+        
+        for (const [key, value] of Object.entries(def.shape())) {
+          const propSchema = this.zodToOpenAPI(value);
+          properties[key] = propSchema;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          if ((value as any)._def?.required !== false) {
+            required.push(key);
           }
-          
-          return {
-            type: 'object',
-            properties,
-            required: required.length > 0 ? required : undefined,
-          };
-          
-        case 'ZodEnum':
-          return {
-            type: 'string',
-            enum: def.values,
-          };
-          
-        case 'ZodNullable':
-          return {
-            ...this.zodToOpenAPI(def.innerType),
-            nullable: true,
-          };
-          
-        case 'ZodOptional':
-          return this.zodToOpenAPI(def.innerType);
+        }
+        
+        return {
+          type: 'object',
+          properties,
+          required: required.length > 0 ? required : undefined,
+        };
       }
+        
+      case 'ZodEnum':
+        return { type: 'string', enum: def.values as unknown[] };
+        
+      case 'ZodNullable':
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return { ...this.zodToOpenAPI((def as any).innerType), nullable: true };
+        
+      case 'ZodOptional':
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return this.zodToOpenAPI((def as any).innerType);
     }
     
     return { type: 'object' };

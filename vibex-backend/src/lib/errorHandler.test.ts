@@ -1,10 +1,33 @@
 import { errorHandler, asyncHandler, notFoundHandler, successResponse, paginatedResponse, AppError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, ConflictError } from './errorHandler'
 
 // Mock Hono context
-const createMockContext = (path: string = '/test', method: string = 'GET'): any => ({
+interface MockResponse {
+  headers: {
+    get: jest.Mock;
+    set: jest.Mock;
+  };
+  status: number;
+}
+interface MockContext {
+  req: {
+    path: string;
+    method: string;
+  };
+  res: MockResponse;
+  text: jest.Mock;
+  json: jest.Mock;
+}
+const createMockContext = (path = '/test', method = 'GET'): MockContext => ({
   req: {
     path,
     method,
+  },
+  res: {
+    headers: {
+      get: jest.fn(),
+      set: jest.fn(),
+    },
+    status: 200,
   },
   text: jest.fn().mockReturnThis(),
   json: jest.fn().mockReturnThis(),
@@ -88,7 +111,7 @@ describe('Error Classes', () => {
 })
 
 describe('errorHandler middleware', () => {
-  let mockContext: any
+  let mockContext: MockContext
 
   beforeEach(() => {
     mockContext = createMockContext('/api/test', 'GET')
@@ -247,7 +270,7 @@ describe('errorHandler middleware', () => {
 
     it('should handle network errors gracefully', async () => {
       const error = new Error('ECONNREFUSED')
-      ;(error as any).code = 'ECONNREFUSED'
+      ;(error as Error & { code?: string }).code = 'ECONNREFUSED'
       const next = jest.fn()
 
       await errorHandler(error, mockContext, next)
@@ -258,7 +281,7 @@ describe('errorHandler middleware', () => {
 
     it('should handle timeout errors', async () => {
       const error = new Error('Timeout')
-      ;(error as any).code = 'ETIMEDOUT'
+      ;(error as Error & { code?: string }).code = 'ETIMEDOUT'
       const next = jest.fn()
 
       await errorHandler(error, mockContext, next)
@@ -368,10 +391,10 @@ describe('asyncHandler', () => {
   })
 
   it('should pass context and next to handler', async () => {
-    let capturedContext: any
-    let capturedNext: any
+    let capturedContext: unknown
+    let capturedNext: unknown
     
-    const handler = jest.fn().mockImplementation((ctx: any, next: any) => {
+    const handler = jest.fn().mockImplementation((ctx: unknown, next: unknown) => {
       capturedContext = ctx
       capturedNext = next
     })
@@ -486,7 +509,7 @@ describe('paginatedResponse', () => {
 
 // Boundary condition tests
 describe('Boundary Conditions', () => {
-  let mockContext: any
+  let mockContext: MockContext
 
   beforeEach(() => {
     mockContext = createMockContext()

@@ -56,9 +56,9 @@ export interface UIProperty {
   name: string;
   type: UIFieldType;
   required?: boolean;
-  defaultValue?: any;
+  defaultValue?: unknown;
   description?: string;
-  options?: { label: string; value: any }[];
+  options?: { label: string; value: unknown }[];
   validation?: {
     min?: number;
     max?: number;
@@ -75,7 +75,7 @@ export interface UIComponent {
   name: string;
   type: UIComponentType;
   description?: string;
-  props?: Record<string, any>;
+  props?: Record<string, unknown>;
   children?: UIComponent[];
   events?: {
     onClick?: string;
@@ -84,11 +84,11 @@ export interface UIComponent {
     onBlur?: string;
     [key: string]: string | undefined;
   };
-  styles?: Record<string, any>;
+  styles?: Record<string, unknown>;
   condition?: {
     field: string;
     operator: 'eq' | 'neq' | 'gt' | 'lt' | 'gte' | 'lte' | 'contains';
-    value: any;
+    value: unknown;
   };
 }
 
@@ -103,8 +103,8 @@ export interface UIFormField {
   placeholder?: string;
   required?: boolean;
   disabled?: boolean;
-  defaultValue?: any;
-  options?: { label: string; value: any }[];
+  defaultValue?: unknown;
+  options?: { label: string; value: unknown }[];
   validation?: {
     min?: number;
     max?: number;
@@ -148,7 +148,7 @@ export interface UIPageSchema {
     direction?: 'row' | 'column';
     columns?: number;
   };
-  styles?: Record<string, any>;
+  styles?: Record<string, unknown>;
 }
 
 /**
@@ -167,7 +167,7 @@ interface ComponentConfig {
   type: UIComponentType;
   componentName: string;
   propTypes: string;
-  defaultProps?: Record<string, any>;
+  defaultProps?: Record<string, unknown>;
 }
 
 const COMPONENT_REGISTRY: ComponentConfig[] = [
@@ -507,8 +507,8 @@ function kebabCase(str: string): string {
 export function parseUISchema(schema: UISchema): {
   type: string;
   name: string;
-  components: any[];
-  fields?: any[];
+  components: unknown[];
+  fields?: unknown[];
 } {
   const { type, data } = schema;
 
@@ -560,7 +560,7 @@ export function extractFieldNames(schema: UISchema): string[] {
 export function extractComponentTypes(schema: UISchema): UIComponentType[] {
   const types: UIComponentType[] = [];
   
-  function traverse(data: any) {
+  function traverse(data: unknown) {
     if (data.type) {
       types.push(data.type);
     }

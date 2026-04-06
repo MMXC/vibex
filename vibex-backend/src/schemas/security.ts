@@ -246,9 +246,10 @@ export async function scanForDangerousPatterns(code: string): Promise<ASTScanRes
 
     traverse(ast, {
       CallExpression(path) {
-        const node = path.node as any
-        const callee = node.callee as any
-        const nodeLoc = node.loc as any
+        const node = path.node as unknown as Record<string, unknown>
+        const callee = node.callee as unknown as Record<string, unknown>
+        const nodeLoc = node.loc as unknown as Record<string, unknown>
+        const startLoc = nodeLoc?.start as unknown as Record<string, number> | undefined
 
         // Direct eval: eval("...")
         if (
@@ -257,8 +258,8 @@ export async function scanForDangerousPatterns(code: string): Promise<ASTScanRes
         ) {
           patterns.push({
             type: 'DANGEROUS_FUNCTION',
-            line: nodeLoc?.start?.line ?? 0,
-            column: nodeLoc?.start?.column,
+            line: startLoc?.line ?? 0,
+            column: startLoc?.column,
             description: 'Direct eval() call detected — code injection risk',
           })
           path.skip()
@@ -267,17 +268,17 @@ export async function scanForDangerousPatterns(code: string): Promise<ASTScanRes
 
         // Indirect eval: (0, eval)("...") — bypasses local scope
         if (callee?.type === 'SequenceExpression') {
-          const exprs = callee.expressions as any[]
+          const exprs = callee.expressions as unknown[]
           if (
             Array.isArray(exprs) &&
             exprs.length >= 2 &&
-            exprs[1]?.type === 'Identifier' &&
-            exprs[1]?.name === 'eval'
+            (exprs[1] as Record<string, unknown>)?.type === 'Identifier' &&
+            (exprs[1] as Record<string, unknown>)?.name === 'eval'
           ) {
             patterns.push({
               type: 'INDIRECT_EVAL',
-              line: nodeLoc?.start?.line ?? 0,
-              column: nodeLoc?.start?.column,
+              line: startLoc?.line ?? 0,
+              column: startLoc?.column,
               description: 'Indirect eval() — bypasses local scope, code injection risk',
             })
             path.skip()
@@ -292,8 +293,8 @@ export async function scanForDangerousPatterns(code: string): Promise<ASTScanRes
         ) {
           patterns.push({
             type: 'NEW_FUNCTION',
-            line: nodeLoc?.start?.line ?? 0,
-            column: nodeLoc?.start?.column,
+            line: startLoc?.line ?? 0,
+            column: startLoc?.column,
             description: 'new Function() detected — dynamic code creation risk',
           })
           path.skip()
@@ -302,9 +303,10 @@ export async function scanForDangerousPatterns(code: string): Promise<ASTScanRes
       },
 
       NewExpression(path) {
-        const node = path.node as any
-        const callee = node.callee as any
-        const nodeLoc = node.loc as any
+        const node = path.node as unknown as Record<string, unknown>
+        const callee = node.callee as unknown as Record<string, unknown>
+        const nodeLoc = node.loc as unknown as Record<string, unknown>
+        const startLoc = nodeLoc?.start as unknown as Record<string, number> | undefined
 
         // new Function("...") — explicit dynamic code creation
         if (
@@ -313,8 +315,8 @@ export async function scanForDangerousPatterns(code: string): Promise<ASTScanRes
         ) {
           patterns.push({
             type: 'NEW_FUNCTION',
-            line: nodeLoc?.start?.line ?? 0,
-            column: nodeLoc?.start?.column,
+            line: startLoc?.line ?? 0,
+            column: startLoc?.column,
             description: 'new Function() detected — dynamic code creation risk',
           })
           path.skip()
@@ -323,9 +325,10 @@ export async function scanForDangerousPatterns(code: string): Promise<ASTScanRes
       },
 
       Identifier(path) {
-        const node = path.node as any
-        const nodeLoc = node.loc as any
-        const parent = path.parent as any
+        const node = path.node as unknown as Record<string, unknown>
+        const nodeLoc = node.loc as unknown as Record<string, unknown>
+        const startLoc = nodeLoc?.start as unknown as Record<string, number> | undefined
+        const parent = path.parent as unknown as Record<string, unknown>
 
         // Check for "eval" passed as argument to other functions
         // e.g., setTimeout("eval", 0) or window["eval"]
@@ -336,8 +339,8 @@ export async function scanForDangerousPatterns(code: string): Promise<ASTScanRes
           ) {
             patterns.push({
               type: 'INDIRECT_EVAL',
-              line: nodeLoc?.start?.line ?? 0,
-              column: nodeLoc?.start?.column,
+              line: startLoc?.line ?? 0,
+              column: startLoc?.column,
               description: 'Indirect eval reference via member expression — code injection risk',
             })
           }

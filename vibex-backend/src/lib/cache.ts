@@ -1,6 +1,16 @@
 import { Context, Next } from 'hono';
 import { debug } from './logger';
 
+/**
+ * Extended context with cache properties attached by the cache middleware
+ */
+interface CacheContext extends Context {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  cache?: CacheInfo & { stale?: boolean } | Record<string, unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  user?: { id: string };
+}
+
 import { safeError } from '@/lib/log-sanitizer';
 
 /**
@@ -26,15 +36,15 @@ export interface CacheOptions {
   /** Skip cache for these paths */
   excludePaths?: string[];
   /** Custom serializer */
-  serializer?: (data: any) => string;
+  serializer?: (data: unknown) => string;
   /** Custom deserializer */
-  deserializer?: (data: string) => any;
+  deserializer?: (data: string) => unknown;
 }
 
 /**
  * Cache entry interface
  */
-export interface CacheEntry<T = any> {
+export interface CacheEntry<T = unknown> {
   key: string;
   value: T;
   expiresAt: number;
@@ -95,7 +105,7 @@ class CacheStore {
   /**
    * Get entry from cache
    */
-  get<T = any>(key: string): CacheEntry<T> | null {
+  get<T = unknown>(key: string): CacheEntry<T> | null {
     const entry = this.store.get(key) as CacheEntry<T> | undefined;
     
     if (!entry) {
@@ -118,7 +128,7 @@ class CacheStore {
   /**
    * Set entry in cache
    */
-  set<T = any>(key: string, value: T, ttl: number = this.defaultTtl): void {
+  set<T = unknown>(key: string, value: T, ttl: number = this.defaultTtl): void {
     const now = Date.now();
     const expiresAt = now + (ttl * 1000);
 
@@ -313,15 +323,15 @@ export function cache(options: Partial<CacheOptions> = {}) {
     respectCacheControl,
     staleWhileRevalidate,
     excludePaths,
-    serializer,
-    deserializer,
+    serializer: _serializer,
+    deserializer: _deserializer,
   } = config;
 
   // Update store settings
   store.maxEntries = maxEntries || 1000;
   store.defaultTtl = ttl;
 
-  return async (c: Context, next: Next) => {
+  return async (c: CacheContext, next: Next) => {
     const path = c.req.path;
 
     // Skip excluded paths
@@ -332,7 +342,7 @@ export function cache(options: Partial<CacheOptions> = {}) {
       return;
     }
 
-    const cacheKey = keyGenerator(c);
+    const cacheKey = keyGenerator(c as unknown as Context);
     const method = c.req.method;
 
     // Only cache GET requests by default
@@ -370,7 +380,7 @@ export function cache(options: Partial<CacheOptions> = {}) {
       // If stale but has stale-while-revalidate, return cached and revalidate in background
       if (isStale && staleWhileRevalidate > 0) {
         // Attach cache info to context (stale response)
-        (c as any).cache = {
+        c.cache = {
           hit: true,
           key: cacheKey,
           ttl: 0,
@@ -388,9 +398,6 @@ export function cache(options: Partial<CacheOptions> = {}) {
         
         // If it's already a Response object, return it
         if (cachedResponse instanceof Response) {
-          // Clone the response for revalidation
-          const responseClone = cachedResponse.clone();
-          
           // Revalidate in background (don't await)
           next().then(() => {
             // Will be handled by the revalidation logic below
@@ -405,7 +412,7 @@ export function cache(options: Partial<CacheOptions> = {}) {
       }
 
       // Fresh cache hit
-      (c as any).cache = {
+      c.cache = {
         hit: true,
         key: cacheKey,
         ttl,
@@ -448,12 +455,13 @@ export function cache(options: Partial<CacheOptions> = {}) {
       const responseClone = c.res.clone();
       const body = await responseClone.text();
       
-      let data: any;
+      let data: unknown;
       const contentType = c.res.headers.get('content-type');
       
       if (contentType?.includes('application/json')) {
         try {
-          data = deserializer(body);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          data = (_deserializer ?? JSON.parse)(body);
         } catch {
           // If we can't parse JSON, don't cache
           return;
@@ -547,8 +555,8 @@ export const staleWhileRevalidateCache = cache({
 // User-specific cache (with user ID in key)
 export const userCache = cache({
   ttl: 300,
-  keyGenerator: (c) => {
-    const userId = (c as any).user?.id || 'anonymous';
+  keyGenerator: (c: Context) => {
+    const userId = ((c as unknown as CacheContext).user?.id) || 'anonymous';
     const path = c.req.path;
     const query = c.req.query();
     const queryString = Object.keys(query).sort()
@@ -565,7 +573,7 @@ export const cacheUtils = {
   /**
    * Get value from cache
    */
-  get: <T = any>(key: string): T | null => {
+  get: <T = unknown>(key: string): T | null => {
     const entry = store.get<T>(key);
     return entry?.value || null;
   },
@@ -573,7 +581,7 @@ export const cacheUtils = {
   /**
    * Set value in cache
    */
-  set: <T = any>(key: string, value: T, ttl?: number): void => {
+  set: <T = unknown>(key: string, value: T, ttl?: number): void => {
     store.set(key, value, ttl);
   },
 

@@ -50,23 +50,15 @@ export const dynamic = 'force-dynamic';
 
 // Auth helper for canvas routes
 async function requireAuth(req: NextRequest) {
-  const authHeader = req.headers.get('Authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  const env = getLocalEnv();
+  const auth = getAuthUserFromRequest(req, env.JWT_SECRET);
+  if (!auth) {
     return new NextResponse(
       JSON.stringify({ error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' }),
       { status: 401, headers: { 'Content-Type': 'application/json' } }
     );
   }
-  const token = authHeader.substring(7);
-  const jwt = await import('jsonwebtoken');
-  try {
-    return getAuthUserFromRequest(req);
-  } catch {
-    return new NextResponse(
-      JSON.stringify({ error: 'Invalid or expired token', code: 'UNAUTHORIZED' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } }
-    );
-  }
+  return auth;
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse>> {

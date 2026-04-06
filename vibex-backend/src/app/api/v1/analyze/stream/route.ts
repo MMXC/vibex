@@ -21,25 +21,17 @@ export const dynamic = 'force-dynamic';
 
 // Auth helper
 function checkAuth(req: NextRequest) {
-  const authHeader = req.headers.get('Authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return { auth: null, error: 'Unauthorized: authentication required' };
-  }
-  const token = authHeader.substring(7);
-  try {
-    const auth = getAuthUserFromRequest(request);
-    return { auth, error: null };
-  } catch {
-    return { auth: null, error: 'Invalid or expired token' };
-  }
+  const env = getLocalEnv();
+  const auth = getAuthUserFromRequest(req, env.JWT_SECRET);
+  return auth;
 }
 
 export async function GET(request: NextRequest) {
   // E1: Authentication check
-  const { auth, error } = checkAuth(request);
+  const auth = checkAuth(request);
   if (!auth) {
     return NextResponse.json(
-      { error, code: 'UNAUTHORIZED' },
+      { error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' },
       { status: 401 }
     );
   }

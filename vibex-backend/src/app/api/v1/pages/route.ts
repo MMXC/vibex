@@ -3,33 +3,24 @@ import prisma from '@/lib/prisma';
 
 import { safeError } from '@/lib/log-sanitizer';
 import { getAuthUserFromRequest } from '@/lib/authFromGateway';
+import { getLocalEnv } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
 
 // Auth helper
 function checkAuth(req: NextRequest) {
-  
-  const authHeader = req.headers.get('Authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return { auth: null, error: 'Unauthorized: authentication required' };
-  }
-  const token = authHeader.substring(7);
-  try {
-    const jwt = require('jsonwebtoken');
-    const auth = getAuthUserFromRequest(request, env.JWT_SECRET);
-    return { auth, error: null };
-  } catch {
-    return { auth: null, error: 'Invalid or expired token' };
-  }
+  const env = getLocalEnv();
+  const auth = getAuthUserFromRequest(req, env.JWT_SECRET);
+  return auth;
 }
 
 // GET /api/pages - List all pages (or filter by projectId)
 export async function GET(request: NextRequest) {
   // E1: Authentication check
-  const { auth, error } = checkAuth(request);
+  const auth = checkAuth(request);
   if (!auth) {
     return NextResponse.json(
-      { error, code: 'UNAUTHORIZED' },
+      { error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' },
       { status: 401 }
     );
   }
@@ -59,10 +50,10 @@ export async function GET(request: NextRequest) {
 // POST /api/pages - Create a new page
 export async function POST(request: NextRequest) {
   // E1: Authentication check
-  const { auth, error } = checkAuth(request);
+  const auth = checkAuth(request);
   if (!auth) {
     return NextResponse.json(
-      { error, code: 'UNAUTHORIZED' },
+      { error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' },
       { status: 401 }
     );
   }

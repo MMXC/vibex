@@ -11,6 +11,7 @@ import { validateBody } from '@/lib/next-validation';
 import { chatMessageSchema } from '@/schemas/security';
 import jwt from 'jsonwebtoken';
 import { getAuthUserFromRequest } from '@/lib/authFromGateway';
+import { getLocalEnv } from '@/lib/env';
 
 // MiniMax API configuration
 const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY || '';
@@ -110,24 +111,16 @@ async function* streamFromMiniMax(messages: ChatMessage[], conversationId: strin
  */
 // Auth helper
 function checkAuth(req: NextRequest) {
-  const authHeader = req.headers.get('Authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return { auth: null, error: 'Unauthorized: authentication required' };
-  }
-  const token = authHeader.substring(7);
-  try {
-    const auth = getAuthUserFromRequest(request, env.JWT_SECRET);
-    return { auth, error: null };
-  } catch {
-    return { auth: null, error: 'Invalid or expired token' };
-  }
+  const env = getLocalEnv();
+  const auth = getAuthUserFromRequest(req, env.JWT_SECRET);
+  return auth;
 }
 
 export const POST = validateBody(chatMessageSchema, async (body, req: NextRequest) => {
   // E1: Authentication check
-  const { auth, error } = checkAuth(req);
+  const auth = checkAuth(req);
   if (!auth) {
-    return new Response(JSON.stringify({ error, code: 'UNAUTHORIZED' }), {
+    return new Response(JSON.stringify({ error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' },
     });

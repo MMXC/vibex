@@ -9,7 +9,33 @@ import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
+// Auth helper for canvas routes
+function checkAuth(req: NextRequest) {
+  const jwtSecret = process.env.JWT_SECRET || 'vibex-dev-secret';
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return { auth: null, error: 'Unauthorized: authentication required' };
+  }
+  const token = authHeader.substring(7);
+  try {
+    const jwt = require('jsonwebtoken');
+    const auth = jwt.verify(token, jwtSecret) as { userId: string; email: string };
+    return { auth, error: null };
+  } catch {
+    return { auth: null, error: 'Invalid or expired token' };
+  }
+}
+
 export async function GET(request: NextRequest) {
+  // E1: Authentication check
+  const { auth, error } = checkAuth(request);
+  if (!auth) {
+    return NextResponse.json(
+      { error, code: 'UNAUTHORIZED' },
+      { status: 401 }
+    );
+  }
+
   try {
     const projectId = request.nextUrl.searchParams.get('projectId');
 

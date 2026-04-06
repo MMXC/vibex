@@ -14,10 +14,36 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildSSEStream } from '@/lib/sse-stream-lib';
 import { getLocalEnv } from '@/lib/env';
+import jwt from 'jsonwebtoken';
 
 export const dynamic = 'force-dynamic';
 
+// Auth helper
+function checkAuth(req: NextRequest) {
+  const jwtSecret = process.env.JWT_SECRET || 'vibex-dev-secret';
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return { auth: null, error: 'Unauthorized: authentication required' };
+  }
+  const token = authHeader.substring(7);
+  try {
+    const auth = jwt.verify(token, jwtSecret) as { userId: string; email: string };
+    return { auth, error: null };
+  } catch {
+    return { auth: null, error: 'Invalid or expired token' };
+  }
+}
+
 export async function GET(request: NextRequest) {
+  // E1: Authentication check
+  const { auth, error } = checkAuth(request);
+  if (!auth) {
+    return NextResponse.json(
+      { error, code: 'UNAUTHORIZED' },
+      { status: 401 }
+    );
+  }
+
   const { searchParams } = new URL(request.url);
   const requirement = searchParams.get('requirement');
 

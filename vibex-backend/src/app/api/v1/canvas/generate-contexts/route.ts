@@ -45,7 +45,35 @@ type ApiResponse = SuccessResponse | ErrorResponse;
 
 export const dynamic = 'force-dynamic';
 
+// Auth helper for canvas routes
+async function requireAuth(req: NextRequest) {
+  const jwtSecret = process.env.JWT_SECRET || 'vibex-dev-secret';
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return new NextResponse(
+      JSON.stringify({ error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+  const token = authHeader.substring(7);
+  const jwt = await import('jsonwebtoken');
+  try {
+    return jwt.default.verify(token, jwtSecret) as { userId: string; email: string };
+  } catch {
+    return new NextResponse(
+      JSON.stringify({ error: 'Invalid or expired token', code: 'UNAUTHORIZED' }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+}
+
 export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse>> {
+  // E1: Authentication check
+  const auth = await requireAuth(request);
+  if (auth instanceof NextResponse) {
+    return auth as NextResponse<ApiResponse>;
+  }
+
   const generationId = generateId();
 
   try {

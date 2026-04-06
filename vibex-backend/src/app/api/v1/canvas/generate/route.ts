@@ -15,7 +15,35 @@ const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY || '';
 const MINIMAX_API_BASE = process.env.MINIMAX_API_BASE || 'https://api.minimax.chat/v1';
 const MINIMAX_MODEL = process.env.MINIMAX_MODEL || 'abab6.5s-chat';
 
+// Auth helper
+async function requireAuth(req: NextRequest) {
+  const jwtSecret = process.env.JWT_SECRET || 'vibex-dev-secret';
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return new NextResponse(
+      JSON.stringify({ error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+  const token = authHeader.substring(7);
+  const jwt = await import('jsonwebtoken');
+  try {
+    return jwt.default.verify(token, jwtSecret) as { userId: string; email: string };
+  } catch {
+    return new NextResponse(
+      JSON.stringify({ error: 'Invalid or expired token', code: 'UNAUTHORIZED' }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+}
+
 export async function POST(request: NextRequest) {
+  // E1: Authentication check
+  const auth = await requireAuth(request);
+  if (auth instanceof NextResponse) {
+    return auth;
+  }
+
   try {
     const body = await request.json();
     const { projectId, pageIds } = body as {

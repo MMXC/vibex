@@ -110,6 +110,27 @@ async function* streamFromMiniMax(
 }
 
 export async function POST(request: NextRequest) {
+  // E1: Authentication check
+  const jwtSecret = process.env.JWT_SECRET || 'vibex-dev-secret';
+  const authHeader = request.headers.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+  const token = authHeader.substring(7);
+  const jwt = await import('jsonwebtoken');
+  let payload: { userId: string; email: string } | null = null;
+  try {
+    payload = jwt.default.verify(token, jwtSecret) as { userId: string; email: string };
+  } catch {
+    return new Response(
+      JSON.stringify({ error: 'Invalid or expired token', code: 'UNAUTHORIZED' }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   // S2.2: Validate request body against security schema
   const result = await parseBody(request, chatMessageSchema);
 

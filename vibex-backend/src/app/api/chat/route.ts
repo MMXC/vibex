@@ -9,6 +9,7 @@
 import { NextRequest } from 'next/server';
 import { validateBody } from '@/lib/next-validation';
 import { chatMessageSchema } from '@/schemas/security';
+import jwt from 'jsonwebtoken';
 
 // MiniMax API configuration
 const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY || '';
@@ -106,7 +107,32 @@ async function* streamFromMiniMax(messages: ChatMessage[], conversationId: strin
  * - Schema validation with prompt injection detection
  * - Standardized error responses
  */
-export const POST = validateBody(chatMessageSchema, async (body) => {
+// Auth helper
+function checkAuth(req: NextRequest) {
+  const jwtSecret = process.env.JWT_SECRET || 'vibex-dev-secret';
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return { auth: null, error: 'Unauthorized: authentication required' };
+  }
+  const token = authHeader.substring(7);
+  try {
+    const auth = jwt.verify(token, jwtSecret) as { userId: string; email: string };
+    return { auth, error: null };
+  } catch {
+    return { auth: null, error: 'Invalid or expired token' };
+  }
+}
+
+export const POST = validateBody(chatMessageSchema, async (body, req: NextRequest) => {
+  // E1: Authentication check
+  const { auth, error } = checkAuth(req);
+  if (!auth) {
+    return new Response(JSON.stringify({ error, code: 'UNAUTHORIZED' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   const { message, conversationId, history } = body;
 
   // Build messages for API

@@ -1,3 +1,11 @@
+### Added (vibex-dev-security-20260410 E1: API认证中间件) — 2026-04-06
+- **E1 apiAuth.ts**: JWT auth middleware for all protected API routes
+  - `checkAuth/requireAuth/withAuth/optionalAuth` helpers
+  - 15+ routes now return 401 for missing/invalid JWT
+  - Public routes (auth/*, health) remain accessible
+- **E1 测试修复**: jest→vi mock 迁移 (50 个文件)
+- **提交**: `9aa5e1b0`, `465d03c3`, `99c089e5`
+
 ### Added (vibex-p0-fixes-20260409 E6: 提案追踪) — 2026-04-06
 - **E6 proposal-tracker CLI**: scripts/proposal-tracker.py (list/status/update/create)
 - **E6 TEMPLATE.md**: docs/proposals/TEMPLATE.md 标准化提案模板

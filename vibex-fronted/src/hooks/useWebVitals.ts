@@ -53,7 +53,7 @@ export function useWebVitals(options: UseWebVitalsOptions = {}) {
     canvasLogger.default.debug = (...args) => {
       // 捕获 Web Vitals 日志
       if (args[0] && typeof args[0] === 'string' && args[0].startsWith('[Web Vitals]')) {
-        const [, data] = args;
+        const [, data] = args as [string, WebVitalsMetric];
         if (data && data.name && data.value !== undefined) {
           // 检查阈值
           if (thresholds) {

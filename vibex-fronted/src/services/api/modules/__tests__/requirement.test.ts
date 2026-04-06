@@ -6,17 +6,17 @@
 describe('Requirement API', () => {
   // Mock the requirement API module
   const mockRequirementApi = {
-    createRequirement: jest.fn().mockResolvedValue({ id: '1' }),
-    getRequirement: jest.fn().mockResolvedValue({ id: '1', text: 'test' }),
-    listRequirements: jest.fn().mockResolvedValue([]),
-    updateRequirement: jest.fn().mockResolvedValue({ id: '1' }),
-    deleteRequirement: jest.fn().mockResolvedValue(true),
-    getRequirementStatus: jest.fn().mockResolvedValue('pending'),
-    updateRequirementStatus: jest.fn().mockResolvedValue({ id: '1', status: 'completed' }),
+    createRequirement: vi.fn().mockResolvedValue({ id: '1' }),
+    getRequirement: vi.fn().mockResolvedValue({ id: '1', text: 'test' }),
+    listRequirements: vi.fn().mockResolvedValue([]),
+    updateRequirement: vi.fn().mockResolvedValue({ id: '1' }),
+    deleteRequirement: vi.fn().mockResolvedValue(true),
+    getRequirementStatus: vi.fn().mockResolvedValue('pending'),
+    updateRequirementStatus: vi.fn().mockResolvedValue({ id: '1', status: 'completed' }),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should have createRequirement method', () => {

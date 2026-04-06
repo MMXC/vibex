@@ -3,28 +3,28 @@
  */
 
 // Mock the entire module before importing
-jest.mock('@/lib/api-config', () => ({
+vi.mock('@/lib/api-config', () => ({
   API_CONFIG: { baseURL: 'http://localhost:3000' },
 }));
 
-jest.mock('axios', () => {
-  const mockPost = jest.fn();
+vi.mock('axios', () => {
+  const mockPost = vi.fn();
   return {
     __esModule: true,
     default: {
       interceptors: {
-        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
-        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        request: { use: jest.fn(() => ({ eject: vi.fn() })) },
+        response: { use: jest.fn(() => ({ eject: vi.fn() })) },
       },
       create: jest.fn(() => ({
         interceptors: {
-          request: { use: jest.fn(() => ({ eject: jest.fn() })) },
-          response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+          request: { use: jest.fn(() => ({ eject: vi.fn() })) },
+          response: { use: jest.fn(() => ({ eject: vi.fn() })) },
         },
         post: mockPost,
-        get: jest.fn(),
-        put: jest.fn(),
-        delete: jest.fn(),
+        get: vi.fn(),
+        put: vi.fn(),
+        delete: vi.fn(),
       })),
       mockPost,
     },
@@ -38,7 +38,7 @@ const mockAxios = axios as any;
 
 describe('Diagnosis Service', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('analyzeRequirement', () => {

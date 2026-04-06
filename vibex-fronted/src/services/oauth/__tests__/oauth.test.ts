@@ -9,16 +9,16 @@
 import { isConnected, getStoredToken, storeTokens, logout } from '../oauth';
 
 // Mock secure-storage to avoid TextEncoder/crypto.subtle dependency in jsdom
-jest.mock('@/lib/secure-storage', () => ({
-  secureSet: jest.fn().mockResolvedValue(undefined),
-  secureGet: jest.fn().mockResolvedValue(null),
+vi.mock('@/lib/secure-storage', () => ({
+  secureSet: vi.fn().mockResolvedValue(undefined),
+  secureGet: vi.fn().mockResolvedValue(null),
 }));
 
 describe('OAuth Service', () => {
   beforeEach(() => {
     localStorage.clear();
     sessionStorage.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('isConnected', () => {

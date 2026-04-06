@@ -13,7 +13,7 @@ import {
 
 // ── Mock global fetch ────────────────────────────────────────────────────────
 
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 const originalFetch = global.fetch;
 
 beforeAll(() => {
@@ -21,7 +21,7 @@ beforeAll(() => {
 });
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   clearHomepageCache();
 });
 

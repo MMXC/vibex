@@ -4,16 +4,16 @@
 
 describe('Entity Relation API', () => {
   const mockApi = {
-    createRelation: jest.fn().mockResolvedValue({ id: 'r1' }),
-    getRelation: jest.fn().mockResolvedValue({ id: 'r1' }),
-    listRelations: jest.fn().mockResolvedValue([]),
-    updateRelation: jest.fn().mockResolvedValue({ id: 'r1' }),
-    deleteRelation: jest.fn().mockResolvedValue(true),
-    getRelationsByEntity: jest.fn().mockResolvedValue([]),
-    getRelationsByType: jest.fn().mockResolvedValue([]),
+    createRelation: vi.fn().mockResolvedValue({ id: 'r1' }),
+    getRelation: vi.fn().mockResolvedValue({ id: 'r1' }),
+    listRelations: vi.fn().mockResolvedValue([]),
+    updateRelation: vi.fn().mockResolvedValue({ id: 'r1' }),
+    deleteRelation: vi.fn().mockResolvedValue(true),
+    getRelationsByEntity: vi.fn().mockResolvedValue([]),
+    getRelationsByType: vi.fn().mockResolvedValue([]),
   };
 
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   // Method existence
   it('should have createRelation', () => { expect(typeof mockApi.createRelation).toBe('function'); });

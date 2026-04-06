@@ -5,12 +5,12 @@
 import { flowApi } from '../flow';
 
 // Mock httpClient
-jest.mock('../../client', () => ({
+vi.mock('../../client', () => ({
   httpClient: {
-    post: jest.fn(),
-    get: jest.fn(),
-    delete: jest.fn(),
-    put: jest.fn(),
+    post: vi.fn(),
+    get: vi.fn(),
+    delete: vi.fn(),
+    put: vi.fn(),
   },
 }));
 
@@ -19,7 +19,7 @@ const mockHttpClient = httpClient as jest.Mocked<typeof httpClient>;
 
 describe('FlowApi', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('generateFlow', () => {

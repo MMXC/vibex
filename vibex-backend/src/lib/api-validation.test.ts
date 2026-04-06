@@ -31,6 +31,7 @@ function createMockContext(options: {
   } as unknown as any;
 }
 
+import { authHeader } from '@/lib/__tests__/testAuth';
 describe('ValidationError', () => {
   describe('fromZodError', () => {
     it('should convert ZodError to ValidationError with field errors', () => {

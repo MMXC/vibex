@@ -6,11 +6,11 @@ import { retry, DEFAULT_RETRY_CONFIG } from '@/services/api/retry';
 import axios from 'axios';
 
 // Mock axios
-jest.mock('axios');
+vi.mock('axios');
 
 describe('RetryService', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     jest.useFakeTimers();
   });
 
@@ -20,7 +20,7 @@ describe('RetryService', () => {
 
   describe('execute', () => {
     it('should return result on first successful attempt', async () => {
-      const fn = jest.fn().mockResolvedValue('success');
+      const fn = vi.fn().mockResolvedValue('success');
 
       const result = await retry.execute(fn);
 
@@ -54,14 +54,14 @@ describe('RetryService', () => {
       (axios.isAxiosError as unknown as jest.Mock).mockReturnValue(true);
       Object.defineProperty(nonRetryableError, 'response', { value: { status: 400 } });
 
-      const fn = jest.fn().mockRejectedValue(nonRetryableError);
+      const fn = vi.fn().mockRejectedValue(nonRetryableError);
 
       await expect(retry.execute(fn)).rejects.toThrow('Bad request');
       expect(fn).toHaveBeenCalledTimes(1);
     });
 
     it('should use custom config', async () => {
-      const fn = jest.fn().mockResolvedValue('success');
+      const fn = vi.fn().mockResolvedValue('success');
 
       await retry.execute(fn, { maxRetries: 5, baseDelay: 500 });
 

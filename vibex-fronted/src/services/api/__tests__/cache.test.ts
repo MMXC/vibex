@@ -39,7 +39,7 @@ Object.defineProperty(global, 'localStorage', {
 describe('CacheService', () => {
   beforeEach(() => {
     localStorageMock.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('get', () => {

@@ -7,6 +7,7 @@
 import { describe, it, expect } from 'vitest';
 import { registerSchema, loginSchema } from './auth';
 
+import { authHeader } from '@/lib/__tests__/testAuth';
 describe('Auth Schemas', () => {
   describe('registerSchema', () => {
     it('should validate correct registration data', () => {

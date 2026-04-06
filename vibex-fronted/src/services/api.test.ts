@@ -5,34 +5,34 @@
 describe('API Service', () => {
   const mockApiService = {
     project: {
-      createProject: jest.fn(),
-      getProject: jest.fn(),
-      getProjects: jest.fn(),
-      updateProject: jest.fn(),
-      deleteProject: jest.fn(),
+      createProject: vi.fn(),
+      getProject: vi.fn(),
+      getProjects: vi.fn(),
+      updateProject: vi.fn(),
+      deleteProject: vi.fn(),
     },
     requirement: {
-      createRequirement: jest.fn(),
-      getRequirement: jest.fn(),
-      listRequirements: jest.fn(),
-      updateRequirement: jest.fn(),
-      deleteRequirement: jest.fn(),
+      createRequirement: vi.fn(),
+      getRequirement: vi.fn(),
+      listRequirements: vi.fn(),
+      updateRequirement: vi.fn(),
+      deleteRequirement: vi.fn(),
     },
     domain: {
-      generateBoundedContext: jest.fn(),
-      generateDomainModel: jest.fn(),
+      generateBoundedContext: vi.fn(),
+      generateDomainModel: vi.fn(),
     },
     flow: {
-      generateFlow: jest.fn(),
-      getFlow: jest.fn(),
+      generateFlow: vi.fn(),
+      getFlow: vi.fn(),
     },
     prototype: {
-      generatePrototype: jest.fn(),
-      getPrototype: jest.fn(),
+      generatePrototype: vi.fn(),
+      getPrototype: vi.fn(),
     },
   };
 
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   describe('Project API', () => {
     it('should have project methods', () => {

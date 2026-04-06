@@ -4,16 +4,16 @@
 
 describe('Prototype API', () => {
   const mockApi = {
-    createPrototype: jest.fn().mockResolvedValue({ id: 'p1' }),
-    getPrototype: jest.fn().mockResolvedValue({ id: 'p1' }),
-    listPrototypes: jest.fn().mockResolvedValue([]),
-    updatePrototype: jest.fn().mockResolvedValue({ id: 'p1' }),
-    deletePrototype: jest.fn().mockResolvedValue(true),
-    exportPrototype: jest.fn().mockResolvedValue('html content'),
-    sharePrototype: jest.fn().mockResolvedValue({ url: 'http://example.com' }),
+    createPrototype: vi.fn().mockResolvedValue({ id: 'p1' }),
+    getPrototype: vi.fn().mockResolvedValue({ id: 'p1' }),
+    listPrototypes: vi.fn().mockResolvedValue([]),
+    updatePrototype: vi.fn().mockResolvedValue({ id: 'p1' }),
+    deletePrototype: vi.fn().mockResolvedValue(true),
+    exportPrototype: vi.fn().mockResolvedValue('html content'),
+    sharePrototype: vi.fn().mockResolvedValue({ url: 'http://example.com' }),
   };
 
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   // Method existence
   it('should have createPrototype', () => { expect(typeof mockApi.createPrototype).toBe('function'); });

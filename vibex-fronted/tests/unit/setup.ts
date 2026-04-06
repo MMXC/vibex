@@ -3,9 +3,22 @@ import { vi } from 'vitest';
 
 // Provide jest.* globals as an alias to vi.* for backward compatibility
 // with test files that still use Jest syntax (jest.fn, jest.mock, etc.)
+// CRITICAL: jest.fn() returned by this wrapper MUST have all vitest mock methods
+// (mockResolvedValue, mockReturnValue, etc.) since jest.mock() factories use jest.fn()
+const jestFn = vi.fn.bind(vi) as typeof vi.fn & {
+  mockResolvedValue: typeof vi.fn.prototype.mockResolvedValue;
+  mockReturnValue: typeof vi.fn.prototype.mockReturnValue;
+  mockImplementation: typeof vi.fn.prototype.mockImplementation;
+  mockResolvedValueOnce: typeof vi.fn.prototype.mockResolvedValueOnce;
+  mockReturnValueOnce: typeof vi.fn.prototype.mockReturnValueOnce;
+  mockRejectedValue: typeof vi.fn.prototype.mockRejectedValue;
+  mockRejectedValueOnce: typeof vi.fn.prototype.mockRejectedValueOnce;
+  mockName: typeof vi.fn.prototype.mockName;
+  getMockName: typeof vi.fn.prototype.getMockName;
+};
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const jestCompat: any = {
-  fn: vi.fn,
+  fn: jestFn,
   spyOn: vi.spyOn,
   mock: vi.mock,
   doMock: vi.doMock,

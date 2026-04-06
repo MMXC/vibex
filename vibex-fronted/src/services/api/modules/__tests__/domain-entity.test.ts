@@ -4,18 +4,18 @@
 
 describe('Domain Entity API', () => {
   const mockApi = {
-    createEntity: jest.fn().mockResolvedValue({ id: '1', name: 'User' }),
-    getEntity: jest.fn().mockResolvedValue({ id: '1', name: 'User' }),
-    listEntities: jest.fn().mockResolvedValue([]),
-    updateEntity: jest.fn().mockResolvedValue({ id: '1' }),
-    deleteEntity: jest.fn().mockResolvedValue(true),
-    addAttribute: jest.fn().mockResolvedValue({}),
-    removeAttribute: jest.fn().mockResolvedValue(true),
-    addRelationship: jest.fn().mockResolvedValue({}),
-    removeRelationship: jest.fn().mockResolvedValue(true),
+    createEntity: vi.fn().mockResolvedValue({ id: '1', name: 'User' }),
+    getEntity: vi.fn().mockResolvedValue({ id: '1', name: 'User' }),
+    listEntities: vi.fn().mockResolvedValue([]),
+    updateEntity: vi.fn().mockResolvedValue({ id: '1' }),
+    deleteEntity: vi.fn().mockResolvedValue(true),
+    addAttribute: vi.fn().mockResolvedValue({}),
+    removeAttribute: vi.fn().mockResolvedValue(true),
+    addRelationship: vi.fn().mockResolvedValue({}),
+    removeRelationship: vi.fn().mockResolvedValue(true),
   };
 
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   // Method existence tests
   it('should have createEntity', () => { expect(typeof mockApi.createEntity).toBe('function'); });

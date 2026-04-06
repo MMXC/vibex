@@ -6,21 +6,21 @@
 describe('projectApi', () => {
   // Test interface methods exist - no actual API calls
   const mockApi = {
-    getProjects: jest.fn().mockResolvedValue([]),
-    getProject: jest.fn().mockResolvedValue({ id: '1' }),
-    createProject: jest.fn().mockResolvedValue({ id: '1' }),
-    updateProject: jest.fn().mockResolvedValue({ id: '1' }),
-    deleteProject: jest.fn().mockResolvedValue({ success: true }),
-    softDeleteProject: jest.fn().mockResolvedValue({ id: '1' }),
-    restoreProject: jest.fn().mockResolvedValue({ id: '1' }),
-    permanentDeleteProject: jest.fn().mockResolvedValue({ success: true }),
-    getDeletedProjects: jest.fn().mockResolvedValue([]),
-    clearDeletedProjects: jest.fn().mockResolvedValue({ success: true }),
-    getProjectRole: jest.fn().mockResolvedValue({ role: 'owner' }),
+    getProjects: vi.fn().mockResolvedValue([]),
+    getProject: vi.fn().mockResolvedValue({ id: '1' }),
+    createProject: vi.fn().mockResolvedValue({ id: '1' }),
+    updateProject: vi.fn().mockResolvedValue({ id: '1' }),
+    deleteProject: vi.fn().mockResolvedValue({ success: true }),
+    softDeleteProject: vi.fn().mockResolvedValue({ id: '1' }),
+    restoreProject: vi.fn().mockResolvedValue({ id: '1' }),
+    permanentDeleteProject: vi.fn().mockResolvedValue({ success: true }),
+    getDeletedProjects: vi.fn().mockResolvedValue([]),
+    clearDeletedProjects: vi.fn().mockResolvedValue({ success: true }),
+    getProjectRole: vi.fn().mockResolvedValue({ role: 'owner' }),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Method existence', () => {

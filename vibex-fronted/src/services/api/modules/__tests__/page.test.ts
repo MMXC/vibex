@@ -4,17 +4,17 @@
 
 describe('Page API', () => {
   const mockApi = {
-    createPage: jest.fn().mockResolvedValue({ id: 'page1' }),
-    getPage: jest.fn().mockResolvedValue({ id: 'page1' }),
-    listPages: jest.fn().mockResolvedValue([]),
-    updatePage: jest.fn().mockResolvedValue({ id: 'page1' }),
-    deletePage: jest.fn().mockResolvedValue(true),
-    addComponent: jest.fn().mockResolvedValue({ id: 'comp1' }),
-    removeComponent: jest.fn().mockResolvedValue(true),
-    updateComponent: jest.fn().mockResolvedValue({ id: 'comp1' }),
+    createPage: vi.fn().mockResolvedValue({ id: 'page1' }),
+    getPage: vi.fn().mockResolvedValue({ id: 'page1' }),
+    listPages: vi.fn().mockResolvedValue([]),
+    updatePage: vi.fn().mockResolvedValue({ id: 'page1' }),
+    deletePage: vi.fn().mockResolvedValue(true),
+    addComponent: vi.fn().mockResolvedValue({ id: 'comp1' }),
+    removeComponent: vi.fn().mockResolvedValue(true),
+    updateComponent: vi.fn().mockResolvedValue({ id: 'comp1' }),
   };
 
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   // Method existence
   it('should have createPage', () => { expect(typeof mockApi.createPage).toBe('function'); });

@@ -6,26 +6,26 @@ import axios from 'axios';
 import { createHttpClient, transformError } from '@/services/api/client';
 
 // Mock axios
-jest.mock('axios', () => {
+vi.mock('axios', () => {
   const mockAxiosInstance = {
-    get: jest.fn(),
-    post: jest.fn(),
-    put: jest.fn(),
-    patch: jest.fn(),
-    delete: jest.fn(),
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    patch: vi.fn(),
+    delete: vi.fn(),
     interceptors: {
       request: {
-        use: jest.fn(),
+        use: vi.fn(),
       },
       response: {
-        use: jest.fn(),
+        use: vi.fn(),
       },
     },
   };
   
   return {
     create: jest.fn(() => mockAxiosInstance),
-    isAxiosError: jest.fn(),
+    isAxiosError: vi.fn(),
     default: { create: jest.fn(() => mockAxiosInstance) },
     __mockInstance: mockAxiosInstance,
   };
@@ -36,13 +36,13 @@ const mockInstance = (axios as any).__mockInstance;
 
 describe('HTTP Client', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Mock localStorage
     Object.defineProperty(global, 'localStorage', {
       value: {
-        getItem: jest.fn(),
-        setItem: jest.fn(),
-        removeItem: jest.fn(),
+        getItem: vi.fn(),
+        setItem: vi.fn(),
+        removeItem: vi.fn(),
       },
       writable: true,
     });

@@ -39,7 +39,7 @@ describe('themeStorage', () => {
 
   beforeEach(() => {
     localStorageMock.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getStoredTheme', () => {

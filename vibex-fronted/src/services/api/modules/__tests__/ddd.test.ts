@@ -5,9 +5,9 @@
 import { dddApi, DddApi } from '../ddd';
 
 // Mock httpClient
-jest.mock('../../client', () => ({
+vi.mock('../../client', () => ({
   httpClient: {
-    post: jest.fn(),
+    post: vi.fn(),
   },
 }));
 
@@ -16,7 +16,7 @@ const mockHttpClient = httpClient as jest.Mocked<typeof httpClient>;
 
 describe('DddApi', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('generateBoundedContext', () => {

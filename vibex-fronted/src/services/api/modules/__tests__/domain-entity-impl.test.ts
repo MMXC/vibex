@@ -8,20 +8,20 @@ import { httpClient } from '@/services/api/client';
 import { cache } from '@/services/api/cache';
 
 // Mock dependencies
-jest.mock('@/services/api/client', () => ({
+vi.mock('@/services/api/client', () => ({
   httpClient: {
-    get: jest.fn(),
-    post: jest.fn(),
-    put: jest.fn(),
-    delete: jest.fn(),
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
   },
 }));
 
-jest.mock('@/services/api/cache', () => ({
+vi.mock('@/services/api/cache', () => ({
   cache: {
-    get: jest.fn(),
-    set: jest.fn(),
-    remove: jest.fn(),
+    get: vi.fn(),
+    set: vi.fn(),
+    remove: vi.fn(),
   },
   getCacheKey: jest.fn((...args) => args.join(':')),
 }));
@@ -31,7 +31,7 @@ const mockCache = cache as jest.Mocked<typeof cache>;
 
 describe('DomainEntityApi', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     Object.defineProperty(global.navigator, 'onLine', {
       value: true,
       writable: true,

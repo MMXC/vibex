@@ -13,7 +13,7 @@ import {
 } from './stream-service';
 
 // Mock fetch
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('DDD Stream Service Types', () => {
   describe('ThinkingStep', () => {
@@ -119,10 +119,10 @@ describe('DDD Stream Service Types', () => {
   describe('Callbacks interfaces', () => {
     it('should define bounded context stream callbacks', () => {
       const callbacks: BoundedContextStreamCallbacks = {
-        onThinking: jest.fn(),
-        onContext: jest.fn(),
-        onDone: jest.fn(),
-        onError: jest.fn(),
+        onThinking: vi.fn(),
+        onContext: vi.fn(),
+        onDone: vi.fn(),
+        onError: vi.fn(),
       };
       expect(typeof callbacks.onThinking).toBe('function');
       expect(typeof callbacks.onContext).toBe('function');
@@ -132,9 +132,9 @@ describe('DDD Stream Service Types', () => {
 
     it('should define domain model stream callbacks', () => {
       const callbacks: DomainModelStreamCallbacks = {
-        onThinking: jest.fn(),
-        onDone: jest.fn(),
-        onError: jest.fn(),
+        onThinking: vi.fn(),
+        onDone: vi.fn(),
+        onError: vi.fn(),
       };
       expect(typeof callbacks.onThinking).toBe('function');
       expect(typeof callbacks.onDone).toBe('function');
@@ -143,9 +143,9 @@ describe('DDD Stream Service Types', () => {
 
     it('should define business flow stream callbacks', () => {
       const callbacks: BusinessFlowStreamCallbacks = {
-        onThinking: jest.fn(),
-        onDone: jest.fn(),
-        onError: jest.fn(),
+        onThinking: vi.fn(),
+        onDone: vi.fn(),
+        onError: vi.fn(),
       };
       expect(typeof callbacks.onThinking).toBe('function');
       expect(typeof callbacks.onDone).toBe('function');

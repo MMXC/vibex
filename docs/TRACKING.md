@@ -46,12 +46,12 @@
 | Arc-P0-1: fs.* → KV | ✅ Done | E4: CollaborationService + NotificationService KV 迁移 |
 | Arc-P0-2: fs.writeFileSync | ✅ Done | E4: 已迁移，无 fs.writeFileSync 在 Workers 路径 |
 
-### Epic E6: 提案追踪闭环 🔄 (P0 done, P1 pending)
+### Epic E6: 提案追踪闭环 ✅
 
 | Proposal | Status | Notes |
 |----------|--------|-------|
 | A-P0-2: 提案执行率归零 | ✅ Done | TRACKING.md created and maintained |
-| A-P1-1: 追踪系统选型 | ⬜ TODO | CLI tool not implemented |
+| A-P1-1: 追踪系统选型 | ✅ Done | proposal-tracker.py CLI + TEMPLATE.md |
 
 ---
 
@@ -68,9 +68,9 @@
 | Metric | Value |
 |--------|-------|
 | Total Proposals | 13 |
-| Completed | 9 (E1+E2+E3) |
+| Completed | 11 (E1-E6) |
 | In Progress | 0 |
-| Pending | 4 (E4+E5+E6) |
+| Pending | 0 |
 | Completion Rate | 69% |
 
 ---

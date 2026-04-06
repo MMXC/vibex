@@ -1,3 +1,10 @@
+### Added (vibex-proposals-20260411-page-tree: flowId 匹配修复) — 2026-04-07
+- **flowId 匹配修复**: 修复 AI 生成组件时 flowId 填充不正确的问题
+  - **S1.1 AI prompt 强化**: `generate-components/route.ts` prompt 增加 `flowId = BusinessFlow nodeId` 指令
+  - **S1.2 matchFlowNode 三级匹配**: 精确匹配 → prefix 匹配 → 名称模糊匹配，增强 fallback
+  - **S1.4 单元测试**: `ComponentTreeGrouping.test.ts` 35 tests (inferIsCommon/matchFlowNode/getPageLabel/groupByFlowId)
+  - 提交: `7e2b8278` (matchFlowNode+tests), `fc8162d3` (4层fallback), `c8ffde20` (pageName)
+
 ### Added (vibex-proposals-summary-20260411 E-P0-2: ESLint no-explicit-any) — 2026-04-07
 - **E-P0-2 ESLint no-explicit-any 清理**: 9 个高优先级文件的类型清理
   - `routes/ddd.ts`: AIPlanResult interface + typed AI responses

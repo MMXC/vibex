@@ -36,6 +36,7 @@ canvasStream.get('/', async (c) => {
   // buildSSEStream handles the other failure mode.
   const stream = buildSSEStream({ requirement, env, requestSignal: c.req.raw.signal });
 
+  // @ts-expect-error timeout is a Cloudflare Workers Response extension
   return new Response(stream, {
     headers: {
       'X-Bounded-Test': 'DEPLOYED_V2',

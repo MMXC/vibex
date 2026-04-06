@@ -65,6 +65,7 @@ export async function GET(request: NextRequest) {
       'Connection': 'keep-alive',
       'X-Accel-Buffering': 'no',
     },
+    // @ts-expect-error timeout is a Cloudflare Workers Response extension
     // Hard timeout: if stream doesn't complete within 30s, terminate the Worker.
     // Combined with the built-in 10s AI-call timeout inside buildSSEStream,
     // this ensures resources are always released even on catastrophic failures.

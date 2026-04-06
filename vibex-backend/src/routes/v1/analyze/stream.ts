@@ -36,6 +36,7 @@ stream_.get('/', async (c) => {
   // Wire client-disconnect abort signal; buildSSEStream adds 10s AI-call timeout internally.
   const stream = buildSSEStream({ requirement, env, requestSignal: c.req.raw.signal });
 
+  // @ts-expect-error timeout is a Cloudflare Workers Response extension
   return new Response(stream, {
     headers: {
       'Content-Type': 'text/event-stream',

@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 import { loginSchema } from '@/schemas/security';  // S3.1: Auth route validation'
-import { PrismaClient } from '@prisma/client';
 import { verifyPassword, generateToken } from '@/lib/auth';
 import { getEnv } from '@/lib/env';
 
 import { safeError } from '@/lib/log-sanitizer';
 import { getAuthUserFromRequest } from '@/lib/authFromGateway';
 
-const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {

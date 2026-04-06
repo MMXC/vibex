@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { getAuthUserFromRequest } from '@/lib/authFromGateway';
 import { getEnv } from '@/lib/env';
 
 import { safeError } from '@/lib/log-sanitizer';
 
-const prisma = new PrismaClient();
 
 export async function DELETE(
   request: NextRequest,

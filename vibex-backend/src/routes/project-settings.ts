@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { queryOne, executeDB, Env, generateId } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { prisma } from '@/lib/prisma';
 
 const projectSettings = new Hono<{ Bindings: Env }>();
 
@@ -450,16 +451,13 @@ async function queryDB<T = unknown>(
     const result = await stmt.all<T>();
     return result.results;
   } else {
-    const { PrismaClient } = await import('@prisma/client');
-    const prisma = new PrismaClient();
+    // Workers environment fallback: use global singleton prisma
     try {
       const result = await prisma.$queryRawUnsafe<T[]>(sql, ...params);
       return Array.isArray(result) ? result : [];
     } catch (error) {
       safeError('Prisma query error:', error);
       throw error;
-    } finally {
-      await prisma.$disconnect();
     }
   }
 }

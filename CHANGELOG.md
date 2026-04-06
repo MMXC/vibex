@@ -82,6 +82,10 @@
   - 添加 vi mock compatibility helpers (vi.fn().mockImplementation, vi.mocked())
 - **提交**: `8e363dad`
 
+### Added (vibex-tester quality-20260410 E3: @ci-blocking测试修复) — 2026-04-06
+- **E3 grepInvert 移除**: 从 playwright.config.ts 移除 grepInvert 配置，CI 现在运行 @ci-blocking 测试
+- **提交**: `7e106786`
+
 ### Added (vibex-backend-fixes-20260410 E2: SSE超时修复) — 2026-04-06
 - **E2 SSE timeout**: client-disconnect abort + 30s hard timeout to all SSE routes
 - **提交**: `8a42d126`

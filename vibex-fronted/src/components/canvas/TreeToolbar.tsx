@@ -22,6 +22,8 @@ interface TreeToolbarProps {
   continueDisabled?: boolean;
   /** 删除选中节点 (Flow panel only) */
   onDelete?: () => void;
+  /** 删除按钮禁用状态 — 无选中节点时禁用 */
+  deleteDisabled?: boolean;
   /** 重置画布 (Flow panel only) */
   onReset?: () => void;
   /** 其他自定义按钮 */
@@ -38,6 +40,7 @@ export function TreeToolbar({
   continueLabel,
   continueDisabled,
   onDelete,
+  deleteDisabled,
   onReset,
   extraButtons,
 }: TreeToolbarProps) {
@@ -88,8 +91,13 @@ export function TreeToolbar({
           <button
             type="button"
             className={styles.toolbarButton}
-            onClick={onDelete}
-            title="删除选中"
+            onClick={() => {
+              if (window.confirm('确定要删除选中的节点吗？此操作不可撤销。')) {
+                onDelete();
+              }
+            }}
+            disabled={deleteDisabled}
+            title={deleteDisabled ? '请先选择节点' : '删除选中'}
             aria-label="删除选中的节点"
           >
             🗑 删除

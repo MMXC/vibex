@@ -560,6 +560,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 onSelectAll={() => useFlowStore.getState().selectAllNodes()}
                 onDeselectAll={() => useFlowStore.getState().clearNodeSelection()}
                 onDelete={() => useFlowStore.getState().deleteSelectedNodes()}
+                deleteDisabled={selectedNodeIds.flow.length === 0}
                 onReset={() => {
                   useFlowStore.getState().resetFlowCanvas()
                 }}
@@ -849,6 +850,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                     onSelectAll={() => useFlowStore.getState().selectAllNodes()}
                     onDeselectAll={() => useFlowStore.getState().clearNodeSelection()}
                     onDelete={() => useFlowStore.getState().deleteSelectedNodes()}
+                    deleteDisabled={selectedNodeIds.flow.length === 0}
                     onReset={() => useFlowStore.getState().resetFlowCanvas()}
                     onClear={() => useFlowStore.getState().setFlowNodes([])}
                     onContinue={handleContinueToComponents}

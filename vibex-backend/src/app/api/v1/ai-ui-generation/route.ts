@@ -249,7 +249,7 @@ export async function GET() {
 
 // Auth helper
 function checkAuth(req: NextRequest) {
-  const auth = getAuthUserFromRequest(req, process.env.JWT_SECRET || 'vibex-dev-secret');
+  const auth = getAuthUserFromRequest(req);
   return auth ? { auth, error: null } : { auth: null, error: 'Unauthorized' };
 }
 

@@ -60,7 +60,7 @@ async function requireAuth(req: NextRequest) {
   const token = authHeader.substring(7);
   const jwt = await import('jsonwebtoken');
   try {
-    return getAuthUserFromRequest(req, process.env.JWT_SECRET || 'vibex-dev-secret');
+    return getAuthUserFromRequest(req);
   } catch {
     return new NextResponse(
       JSON.stringify({ error: 'Invalid or expired token', code: 'UNAUTHORIZED' }),

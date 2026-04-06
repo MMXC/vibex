@@ -27,7 +27,7 @@ function checkAuth(req: NextRequest) {
   }
   const token = authHeader.substring(7);
   try {
-    const auth = getAuthUserFromRequest(request, process.env.JWT_SECRET || 'vibex-dev-secret');
+    const auth = getAuthUserFromRequest(request);
     return { auth, error: null };
   } catch {
     return { auth: null, error: 'Invalid or expired token' };

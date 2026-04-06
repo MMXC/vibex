@@ -112,7 +112,7 @@ async function* streamFromMiniMax(
 
 export async function POST(request: NextRequest) {
   // E1-S4: Use consolidated auth via getAuthUserFromRequest (reads from Hono headers + JWT fallback)
-  const auth = getAuthUserFromRequest(request, process.env.JWT_SECRET || 'vibex-dev-secret');
+  const auth = getAuthUserFromRequest(request);
   if (!auth) {
     return NextResponse.json(
       { error: 'Unauthorized: authentication required', code: 'AUTH_ERROR' },

@@ -24,7 +24,7 @@ const MINIMAX_MODEL = process.env.MINIMAX_MODEL || 'abab6.5s-chat';
 
 // Auth helper — E1-S4: use consolidated auth
 async function requireAuth(req: NextRequest) {
-  const auth = getAuthUserFromRequest(req, process.env.JWT_SECRET || 'vibex-dev-secret');
+  const auth = getAuthUserFromRequest(req);
   if (!auth) {
     throw new AuthError('Unauthorized: authentication required');
   }

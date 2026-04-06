@@ -39,19 +39,19 @@
 | Ar-P0-2: Prisma 索引 | ⬜ TODO | |
 | D-P2-2: ConnectionPool O(n) | ⬜ TODO | E2-S7: on-demand pruning done |
 
-### Epic E5: 架构治理 ⬜
+### Epic E5: 架构治理 ✅
 
 | Proposal | Status | Notes |
 |----------|--------|-------|
-| Arc-P0-1: fs.* → KV | ⬜ TODO | |
-| Arc-P0-2: fs.writeFileSync | ⬜ TODO | |
+| Arc-P0-1: fs.* → KV | ✅ Done | E4: CollaborationService + NotificationService KV 迁移 |
+| Arc-P0-2: fs.writeFileSync | ✅ Done | E4: 已迁移，无 fs.writeFileSync 在 Workers 路径 |
 
-### Epic E6: 提案追踪闭环 ⬜
+### Epic E6: 提案追踪闭环 🔄 (P0 done, P1 pending)
 
 | Proposal | Status | Notes |
 |----------|--------|-------|
-| A-P0-2: 提案执行率归零 | ⬜ TODO | This tracking file |
-| A-P1-1: 追踪系统选型 | ⬜ TODO | |
+| A-P0-2: 提案执行率归零 | ✅ Done | TRACKING.md created and maintained |
+| A-P1-1: 追踪系统选型 | ⬜ TODO | CLI tool not implemented |
 
 ---
 

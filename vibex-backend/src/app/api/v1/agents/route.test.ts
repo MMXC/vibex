@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { authHeader } from '@/lib/__tests__/testAuth';
 
 // Mock Prisma
 const mockPrisma = {
@@ -27,7 +28,7 @@ describe('GET /api/agents', () => {
       { id: 'agent1', name: 'Agent 1', prompt: 'You are a helpful assistant', model: 'abab6.5s-chat', temperature: 0.7, userId: 'user123', createdAt: new Date(), updatedAt: new Date() },
     ]);
 
-    const request = new NextRequest('http://localhost:3000/api/agents');
+    const request = new NextRequest('http://localhost:3000/api/agents', { headers: authHeader() });
     const response = await GET(request);
     const data = await response.json();
 
@@ -38,7 +39,7 @@ describe('GET /api/agents', () => {
   it('should filter by userId', async () => {
     mockPrisma.agent.findMany.mockResolvedValue([]);
 
-    const request = new NextRequest('http://localhost:3000/api/agents?userId=user456');
+    const request = new NextRequest('http://localhost:3000/api/agents?userId=user456', { headers: authHeader() });
     const response = await GET(request);
 
     expect(response.status).toBe(200);
@@ -51,7 +52,7 @@ describe('GET /api/agents', () => {
   it('should handle errors', async () => {
     mockPrisma.agent.findMany.mockRejectedValue(new Error('DB error'));
 
-    const request = new NextRequest('http://localhost:3000/api/agents');
+    const request = new NextRequest('http://localhost:3000/api/agents', { headers: authHeader() });
     const response = await GET(request);
     const data = await response.json();
 
@@ -69,6 +70,7 @@ describe('POST /api/agents', () => {
     const request = new NextRequest('http://localhost:3000/api/agents', {
       method: 'POST',
       body: JSON.stringify({ prompt: 'You are helpful', userId: 'user123' }),
+      headers: authHeader(),
     });
     const response = await POST(request);
     const data = await response.json();
@@ -81,6 +83,7 @@ describe('POST /api/agents', () => {
     const request = new NextRequest('http://localhost:3000/api/agents', {
       method: 'POST',
       body: JSON.stringify({ name: 'New Agent', userId: 'user123' }),
+      headers: authHeader(),
     });
     const response = await POST(request);
     const data = await response.json();
@@ -93,6 +96,7 @@ describe('POST /api/agents', () => {
     const request = new NextRequest('http://localhost:3000/api/agents', {
       method: 'POST',
       body: JSON.stringify({ name: 'New Agent', prompt: 'You are helpful' }),
+      headers: authHeader(),
     });
     const response = await POST(request);
     const data = await response.json();
@@ -117,6 +121,7 @@ describe('POST /api/agents', () => {
     const request = new NextRequest('http://localhost:3000/api/agents', {
       method: 'POST',
       body: JSON.stringify({ name: 'New Agent', prompt: 'You are helpful', userId: 'user123' }),
+      headers: authHeader(),
     });
     const response = await POST(request);
     const data = await response.json();

@@ -15,6 +15,7 @@ jest.mock('@/lib/prisma', () => ({
 
 import { GET, POST } from './route';
 
+import { authHeader } from '@/lib/__tests__/testAuth';
 describe('GET /api/v1/prototype-snapshots', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -25,7 +26,7 @@ describe('GET /api/v1/prototype-snapshots', () => {
       { id: 'snap1', projectId: 'proj1', name: 'Snapshot 1', version: 1, createdAt: new Date() },
     ]);
 
-    const request = new NextRequest('http://localhost:3000/api/v1/prototype-snapshots');
+    const request = new NextRequest('http://localhost:3000/api/v1/prototype-snapshots', { headers: authHeader() });
     const response = await GET(request);
     const data = await response.json();
 
@@ -36,7 +37,7 @@ describe('GET /api/v1/prototype-snapshots', () => {
   it('should filter by projectId', async () => {
     mockPrisma.prototypeSnapshot.findMany.mockResolvedValue([]);
 
-    const request = new NextRequest('http://localhost:3000/api/v1/prototype-snapshots?projectId=proj123');
+    const request = new NextRequest('http://localhost:3000/api/v1/prototype-snapshots?projectId=proj123', { headers: authHeader() });
     const response = await GET(request);
 
     expect(response.status).toBe(200);
@@ -50,7 +51,7 @@ describe('GET /api/v1/prototype-snapshots', () => {
   it('should handle errors', async () => {
     mockPrisma.prototypeSnapshot.findMany.mockRejectedValue(new Error('DB error'));
 
-    const request = new NextRequest('http://localhost:3000/api/v1/prototype-snapshots');
+    const request = new NextRequest('http://localhost:3000/api/v1/prototype-snapshots', { headers: authHeader() });
     const response = await GET(request);
     const data = await response.json();
 
@@ -65,9 +66,7 @@ describe('POST /api/v1/prototype-snapshots', () => {
   });
 
   it('should return 400 if projectId is missing', async () => {
-    const request = new NextRequest('http://localhost:3000/api/v1/prototype-snapshots', {
-      method: 'POST',
-      body: JSON.stringify({ content: 'test' }),
+    const request = new NextRequest('http://localhost:3000/api/v1/prototype-snapshots', { headers: authHeader() }),
     });
     const response = await POST(request);
     const data = await response.json();
@@ -77,9 +76,7 @@ describe('POST /api/v1/prototype-snapshots', () => {
   });
 
   it('should return 400 if content is missing', async () => {
-    const request = new NextRequest('http://localhost:3000/api/v1/prototype-snapshots', {
-      method: 'POST',
-      body: JSON.stringify({ projectId: 'proj1' }),
+    const request = new NextRequest('http://localhost:3000/api/v1/prototype-snapshots', { headers: authHeader() }),
     });
     const response = await POST(request);
     const data = await response.json();
@@ -101,6 +98,7 @@ describe('POST /api/v1/prototype-snapshots', () => {
     const request = new NextRequest('http://localhost:3000/api/v1/prototype-snapshots', {
       method: 'POST',
       body: JSON.stringify({ projectId: 'proj1', content: { test: true } }),
+      headers: authHeader(),
     });
     const response = await POST(request);
     const data = await response.json();
@@ -115,6 +113,7 @@ describe('POST /api/v1/prototype-snapshots', () => {
     const request = new NextRequest('http://localhost:3000/api/v1/prototype-snapshots', {
       method: 'POST',
       body: JSON.stringify({ projectId: 'proj1', content: {} }),
+      headers: authHeader(),
     });
     const response = await POST(request);
 

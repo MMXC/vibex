@@ -25,15 +25,14 @@ jest.mock('@/lib/db', () => ({ generateId: () => 'test-session-id' }));
 
 import { POST } from '../generate-components/route';
 
+import { authHeader } from '@/lib/__tests__/testAuth';
 describe('E1-T1: 输入验证', () => {
   beforeEach(() => {
     mockGenerateJSON.mockResolvedValue({ data: [], usage: null });
   });
 
   it('空 contexts → validation error', async () => {
-    const req = new NextRequest('http://localhost/api/v1/canvas/generate-components', {
-      method: 'POST',
-      body: JSON.stringify({ contexts: [], flows: [] }),
+    const req = new NextRequest('http://localhost/api/v1/canvas/generate-components', { headers: authHeader() }),
     });
     const res = await POST(req);
     const data = await res.json();
@@ -48,6 +47,7 @@ describe('E1-T1: 输入验证', () => {
         contexts: [{ id: 'c1', name: 'Test', type: 'core', description: 'test' }],
         flows: [],
       }),
+      headers: authHeader(),
     });
     const res = await POST(req);
     const data = await res.json();
@@ -58,6 +58,7 @@ describe('E1-T1: 输入验证', () => {
     const req = new NextRequest('http://localhost/api/v1/canvas/generate-components', {
       method: 'POST',
       body: JSON.stringify({ flows: [{ id: 'f1', name: 'Test Flow', contextId: 'c1' }] }),
+      headers: authHeader(),
     });
     const res = await POST(req);
     const data = await res.json();
@@ -79,6 +80,7 @@ describe('E1-T2: API Key 检查', () => {
         contexts: [{ id: 'c1', name: 'Test', type: 'core', description: 'test' }],
         flows: [{ id: 'f1', name: 'Test Flow', contextId: 'c1' }],
       }),
+      headers: authHeader(),
     });
     const res = await POSTNoKey(req);
     const data = await res.json();
@@ -101,6 +103,7 @@ describe('E1-T3: AI 服务 .catch() 防御', () => {
         contexts: [{ id: 'c1', name: 'Test', type: 'core', description: 'test' }],
         flows: [{ id: 'f1', name: 'Test Flow', contextId: 'c1' }],
       }),
+      headers: authHeader(),
     });
 
     // Should NOT throw — .catch() handles it
@@ -151,6 +154,7 @@ describe('E1-T4: 成功路径', () => {
         contexts: [{ id: 'c1', name: 'Test', type: 'core', description: 'test' }],
         flows: [{ id: 'f1', name: 'Test Flow', contextId: 'c1' }],
       }),
+      headers: authHeader(),
     });
 
     const res = await POST(req);
@@ -177,6 +181,7 @@ describe('E1-T4: 成功路径', () => {
         contexts: [{ id: 'c1', name: 'Test', type: 'core', description: 'test' }],
         flows: [{ id: 'f1', name: 'Test Flow', contextId: 'c1' }],
       }),
+      headers: authHeader(),
     });
 
     const res = await POST(req);
@@ -209,6 +214,7 @@ describe('E1-T4: 成功路径', () => {
         contexts: [{ id: 'ctx-1', name: 'Test', type: 'core', description: 'test' }],
         flows: [{ id: 'flow-real-id-123', name: 'Test Flow', contextId: 'ctx-1' }],
       }),
+      headers: authHeader(),
     });
 
     const res = await POST(req);

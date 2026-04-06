@@ -45,13 +45,14 @@ async function collectSSEEvents(response: Response): Promise<Record<string, unkn
   return events;
 }
 
+import { authHeader } from '@/lib/__tests__/testAuth';
 describe('GET /api/v1/analyze/stream', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('should return 400 if requirement is missing', async () => {
-    const request = new NextRequest('http://localhost:3000/api/v1/analyze/stream');
+    const request = new NextRequest('http://localhost:3000/api/v1/analyze/stream', { headers: authHeader() });
     const response = await GET(request);
 
     expect(response.status).toBe(400);
@@ -60,7 +61,7 @@ describe('GET /api/v1/analyze/stream', () => {
   });
 
   it('should return 400 if requirement is empty string', async () => {
-    const request = new NextRequest('http://localhost:3000/api/v1/analyze/stream?requirement=');
+    const request = new NextRequest('http://localhost:3000/api/v1/analyze/stream?requirement=', { headers: authHeader() });
     const response = await GET(request);
 
     expect(response.status).toBe(400);

@@ -29,7 +29,7 @@ describe('GET /api/projects', () => {
 
   it('should return projects', async () => {
     mockPrisma.project.findMany.mockResolvedValue([
-      { id: 'proj1', name: 'Project 1', userId: 'user123', description: null, createdAt: new Date(), updatedAt: new Date(), pages: [] },
+      { id: 'proj1', name: 'Project 1', userId: '550e8400-e29b-41d4-a716-446655440000', description: null, createdAt: new Date(), updatedAt: new Date(), pages: [] },
     ]);
 
     const request = new NextRequest('http://localhost:3000/api/projects');
@@ -48,7 +48,7 @@ describe('GET /api/projects', () => {
 
     expect(response.status).toBe(200);
     expect(mockPrisma.project.findMany).toHaveBeenCalledWith({
-      where: { userId: 'user456' },
+      where: { userId: '550e8400-e29b-41d4-a716-446655440001' },
       include: { pages: true },
       orderBy: { createdAt: 'desc' },
     });
@@ -74,7 +74,7 @@ describe('POST /api/projects', () => {
   it('should return 400 if name is missing', async () => {
     const request = new NextRequest('http://localhost:3000/api/projects', {
       method: 'POST',
-      body: JSON.stringify({ userId: 'user123' }),
+      body: JSON.stringify({ userId: '550e8400-e29b-41d4-a716-446655440000' }),
     });
     const response = await POST(request);
     const data = await response.json();
@@ -100,7 +100,7 @@ describe('POST /api/projects', () => {
       id: 'proj123',
       name: 'New Project',
       description: 'Description',
-      userId: 'user123',
+      userId: '550e8400-e29b-41d4-a716-446655440000',
       createdAt: new Date(),
       updatedAt: new Date(),
       pages: [],
@@ -109,7 +109,7 @@ describe('POST /api/projects', () => {
 
     const request = new NextRequest('http://localhost:3000/api/projects', {
       method: 'POST',
-      body: JSON.stringify({ name: 'New Project', description: 'Description', userId: 'user123' }),
+      body: JSON.stringify({ name: 'New Project', description: 'Description', userId: '550e8400-e29b-41d4-a716-446655440000' }),
     });
     const response = await POST(request);
     const data = await response.json();
@@ -123,7 +123,7 @@ describe('POST /api/projects', () => {
 
     const request = new NextRequest('http://localhost:3000/api/projects', {
       method: 'POST',
-      body: JSON.stringify({ name: 'New Project', userId: 'user123' }),
+      body: JSON.stringify({ name: 'New Project', userId: '550e8400-e29b-41d4-a716-446655440000' }),
     });
     const response = await POST(request);
     const data = await response.json();

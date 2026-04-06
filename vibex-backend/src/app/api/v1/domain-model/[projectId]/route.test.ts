@@ -11,13 +11,14 @@ jest.mock('@/services/domain-model', () => ({
 
 import { GET, POST } from './route';
 
+import { authHeader } from '@/lib/__tests__/testAuth';
 describe('GET /api/v1/domain-model/[projectId]', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('should return placeholder response', async () => {
-    const request = new NextRequest('http://localhost:3000/api/v1/domain-model/proj123');
+    const request = new NextRequest('http://localhost:3000/api/v1/domain-model/proj123', { headers: authHeader() });
     const response = await GET(request, { params: Promise.resolve({ projectId: 'proj123' }) });
     const data = await response.json();
 
@@ -27,7 +28,7 @@ describe('GET /api/v1/domain-model/[projectId]', () => {
   });
 
   it('should parse query options', async () => {
-    const request = new NextRequest('http://localhost:3000/api/v1/domain-model/proj123?showProperties=false');
+    const request = new NextRequest('http://localhost:3000/api/v1/domain-model/proj123?showProperties=false', { headers: authHeader() });
     const response = await GET(request, { params: Promise.resolve({ projectId: 'proj123' }) });
     const data = await response.json();
 
@@ -42,9 +43,7 @@ describe('POST /api/v1/domain-model', () => {
   });
 
   it('should return 400 if entities is not an array', async () => {
-    const request = new NextRequest('http://localhost:3000/api/v1/domain-model', {
-      method: 'POST',
-      body: JSON.stringify({ entities: 'not an array' }),
+    const request = new NextRequest('http://localhost:3000/api/v1/domain-model', { headers: authHeader() }),
     });
     const response = await POST(request);
     const data = await response.json();
@@ -70,6 +69,7 @@ describe('POST /api/v1/domain-model', () => {
           { name: 'Order', type: 'entity', properties: [] },
         ],
       }),
+      headers: authHeader(),
     });
     const response = await POST(request);
     const data = await response.json();
@@ -89,6 +89,7 @@ describe('POST /api/v1/domain-model', () => {
       body: JSON.stringify({
         entities: [{ name: 'User', type: 'aggregateRoot', properties: [] }],
       }),
+      headers: authHeader(),
     });
     const response = await POST(request);
     const data = await response.json();

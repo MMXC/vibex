@@ -17,6 +17,7 @@ jest.mock('@prisma/client', () => ({
 
 import { GET, POST } from './route';
 
+import { authHeader } from '@/lib/__tests__/testAuth';
 describe('GET /api/pages', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -27,7 +28,7 @@ describe('GET /api/pages', () => {
       { id: 'page1', name: 'Page 1', projectId: 'proj123', content: null, createdAt: new Date(), updatedAt: new Date() },
     ]);
 
-    const request = new NextRequest('http://localhost:3000/api/pages');
+    const request = new NextRequest('http://localhost:3000/api/pages', { headers: authHeader() });
     const response = await GET(request);
     const data = await response.json();
 
@@ -38,7 +39,7 @@ describe('GET /api/pages', () => {
   it('should filter by projectId', async () => {
     mockPrisma.page.findMany.mockResolvedValue([]);
 
-    const request = new NextRequest('http://localhost:3000/api/pages?projectId=proj123');
+    const request = new NextRequest('http://localhost:3000/api/pages?projectId=proj123', { headers: authHeader() });
     const response = await GET(request);
 
     expect(response.status).toBe(200);
@@ -52,7 +53,7 @@ describe('GET /api/pages', () => {
   it('should handle errors', async () => {
     mockPrisma.page.findMany.mockRejectedValue(new Error('DB error'));
 
-    const request = new NextRequest('http://localhost:3000/api/pages');
+    const request = new NextRequest('http://localhost:3000/api/pages', { headers: authHeader() });
     const response = await GET(request);
     const data = await response.json();
 
@@ -67,9 +68,7 @@ describe('POST /api/pages', () => {
   });
 
   it('should return 400 if name is missing', async () => {
-    const request = new NextRequest('http://localhost:3000/api/pages', {
-      method: 'POST',
-      body: JSON.stringify({ projectId: 'proj123' }),
+    const request = new NextRequest('http://localhost:3000/api/pages', { headers: authHeader() }),
     });
     const response = await POST(request);
     const data = await response.json();
@@ -79,9 +78,7 @@ describe('POST /api/pages', () => {
   });
 
   it('should return 400 if projectId is missing', async () => {
-    const request = new NextRequest('http://localhost:3000/api/pages', {
-      method: 'POST',
-      body: JSON.stringify({ name: 'New Page' }),
+    const request = new NextRequest('http://localhost:3000/api/pages', { headers: authHeader() }),
     });
     const response = await POST(request);
     const data = await response.json();
@@ -101,9 +98,7 @@ describe('POST /api/pages', () => {
     };
     mockPrisma.page.create.mockResolvedValue(mockPage);
 
-    const request = new NextRequest('http://localhost:3000/api/pages', {
-      method: 'POST',
-      body: JSON.stringify({ name: 'New Page', projectId: 'proj123' }),
+    const request = new NextRequest('http://localhost:3000/api/pages', { headers: authHeader() }),
     });
     const response = await POST(request);
     const data = await response.json();

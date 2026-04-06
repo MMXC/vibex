@@ -25,15 +25,14 @@ jest.mock('@/lib/db', () => ({ generateId: () => 'test-session-id' }));
 
 import { POST } from '../generate-flows/route';
 
+import { authHeader } from '@/lib/__tests__/testAuth';
 describe('E1-T1: 输入验证', () => {
   beforeEach(() => {
     mockGenerateJSON.mockResolvedValue({ data: [], usage: null });
   });
 
   it('空 contexts → validation error', async () => {
-    const req = new NextRequest('http://localhost/api/v1/canvas/generate-flows', {
-      method: 'POST',
-      body: JSON.stringify({ contexts: [] }),
+    const req = new NextRequest('http://localhost/api/v1/canvas/generate-flows', { headers: authHeader() }),
     });
     const res = await POST(req);
     const data = await res.json();
@@ -47,6 +46,7 @@ describe('E1-T1: 输入验证', () => {
       body: JSON.stringify({
         contexts: [{ id: 'c1', name: 'Test', type: 'supporting', description: 'test' }],
       }),
+      headers: authHeader(),
     });
     const res = await POST(req);
     const data = await res.json();
@@ -55,9 +55,7 @@ describe('E1-T1: 输入验证', () => {
   });
 
   it('缺少 contexts 字段 → validation error', async () => {
-    const req = new NextRequest('http://localhost/api/v1/canvas/generate-flows', {
-      method: 'POST',
-      body: JSON.stringify({}),
+    const req = new NextRequest('http://localhost/api/v1/canvas/generate-flows', { headers: authHeader() }),
     });
     const res = await POST(req);
     const data = await res.json();
@@ -78,6 +76,7 @@ describe('E1-T2: API Key 检查', () => {
       body: JSON.stringify({
         contexts: [{ id: 'c1', name: 'Test', type: 'core', description: 'test' }],
       }),
+      headers: authHeader(),
     });
     const res = await POSTNoKey(req);
     const data = await res.json();
@@ -99,6 +98,7 @@ describe('E1-T3: AI 服务 .catch() 防御', () => {
       body: JSON.stringify({
         contexts: [{ id: 'c1', name: 'Test', type: 'core', description: 'test' }],
       }),
+      headers: authHeader(),
     });
 
     // Should NOT throw — .catch() handles it
@@ -139,6 +139,7 @@ describe('E1-T4: 成功路径', () => {
       body: JSON.stringify({
         contexts: [{ id: 'c1', name: 'Test', type: 'core', description: 'test' }],
       }),
+      headers: authHeader(),
     });
 
     const res = await POST(req);
@@ -162,6 +163,7 @@ describe('E1-T4: 成功路径', () => {
       body: JSON.stringify({
         contexts: [{ id: 'c1', name: 'Test', type: 'core', description: 'test' }],
       }),
+      headers: authHeader(),
     });
 
     const res = await POST(req);

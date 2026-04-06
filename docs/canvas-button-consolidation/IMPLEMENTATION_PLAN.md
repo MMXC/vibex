@@ -207,10 +207,10 @@ test('三栏按钮完整流程', async ({ page }) => {
 | 6 | CanvasPage 重置按钮统一加 snapshot | ✅ |
 | 7 | Component 栏调用 clearComponentCanvas | ✅ |
 | 8 | 重新生成调用真实 AI API | ✅ |
-| 9 | Playwright E2E 测试通过 | ☐ |
-| 10 | Jest 单元测试通过 | ☐ |
-| 11 | Ctrl+Z 三栏撤销测试通过 | ☐ |
-| 12 | ESLint 检查通过 | ☐ |
+| 9 | Playwright E2E 测试通过 | ✅ |
+| 10 | Jest 单元测试通过 | ✅ |
+| 11 | Ctrl+Z 三栏撤销测试通过 | ✅ |
+| 12 | ESLint 检查通过 | ✅ |
 
 ---
 

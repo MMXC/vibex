@@ -27,9 +27,7 @@ export type FlowNodeType = 'start' | 'end' | 'process' | 'decision';
 
 /** Helper to get data from props */
 function getFlowData(props: NodeProps<any>) {
-   
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ReactFlow NodeProps generic limitation
-  const { data, selected } = props as any as { data: FlowNodeData; selected: boolean };
+  const { data, selected }: { data: FlowNodeData; selected: boolean } = props;
   return { data, selected };
 }
 

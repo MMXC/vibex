@@ -152,9 +152,7 @@ function CheckboxItem({ item, depth, onToggle }: CheckboxItemProps) {
  * Non-visible cards show a skeleton placeholder for performance.
  */
 export const CardTreeNode = memo(function CardTreeNode(props: NodeProps<CardTreeNodeFull>) {
-   
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ReactFlow NodeProps generic limitation
-  const { data, selected } = props as any as { data: CardTreeNodeData; selected: boolean };
+  const { data, selected }: { data: CardTreeNodeData; selected: boolean } = props;
   const isExpanded = data.isExpanded !== false; // default to expanded
   const hasChildren = data.children.length > 0;
   const uncheckedCount = data.children.filter((c: CardTreeChild) => !c.checked).length;

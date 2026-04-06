@@ -54,6 +54,8 @@ import { useCanvasRenderer } from '@/hooks/canvas/useCanvasRenderer';
 import { useAIController } from '@/hooks/canvas/useAIController';
 import { useCanvasSearch } from '@/hooks/canvas/useCanvasSearch';
 import { useCanvasEvents } from '@/hooks/canvas/useCanvasEvents';
+import { useCanvasToolbar } from '@/hooks/canvas/useCanvasToolbar';
+import { useCanvasPanels } from '@/hooks/canvas/useCanvasPanels';
 
 import { TabBar } from './TabBar';
 import { TreePanel } from './TreePanel';
@@ -163,13 +165,14 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   // REMOVED: isSearchOpen state (now from useCanvasEvents)
   // REMOVED: zoomStep/MIN/MAX constants (now in useCanvasState)
 
-  // === UI State (kept, not in hooks) ===
-  const [activeTab, setActiveTab] = useState<TreeType>('context');
-  const [projectName, setProjectName] = useState('我的项目');
-  const [queuePanelExpanded, setQueuePanelExpanded] = useState(true);
-
-  // === Component Generation State (Bug4b) ===
-  const [componentGenerating, setComponentGenerating] = useState(false);
+  // === E6: useCanvasPanels — UI state ===
+  const panels = useCanvasPanels();
+  const {
+    activeTab, setActiveTab,
+    projectName, setProjectName,
+    queuePanelExpanded, setQueuePanelExpanded,
+    componentGenerating, setComponentGenerating,
+  } = panels;
   const projectId = useSessionStore((s) => s.projectId);
 
   // === E3: Auto-Save Hook ===
@@ -199,201 +202,25 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   // REMOVED: F11 keyboard shortcut (now in useCanvasEvents)
   // REMOVED: ? key shortcut panel (now in useCanvasEvents)
 
-  // === E1-F2: Legacy expand handlers (keep for backward compat with toggle buttons) ===
-  const toggleLeft = useCallback(() => {
-    const next = leftExpand === 'default' ? 'expand-right' : 'default';
-    setLeftExpand(next as 'default' | 'expand-right');
-  }, [leftExpand, setLeftExpand]);
-
-  const toggleCenter = useCallback(() => {
-    const next = centerExpand === 'default' ? 'expand-left' : 'default';
-    setCenterExpand(next as 'default' | 'expand-left');
-  }, [centerExpand, setCenterExpand]);
-
-  const toggleRight = useCallback(() => {
-    const next = rightExpand === 'default' ? 'expand-left' : 'default';
-    setRightExpand(next as 'default' | 'expand-left');
-  }, [rightExpand, setRightExpand]);
-
-  // === E4: Conflict Resolution Handlers ===
-  const handleConflictKeepLocal = useCallback(() => {
-    if (!conflictData) return;
-    clearConflict();
-    toast.showToast('已保留本地数据，请继续编辑后自动保存', 'info');
-  }, [conflictData, clearConflict, toast]);
-
-  const handleConflictUseServer = useCallback(() => {
-    if (!conflictData) return;
-    const serverData = conflictData.serverSnapshot.data;
-    if (serverData.contexts) {
-      useContextStore.getState().setContextNodes(isValidContextNodes(serverData.contexts) ? serverData.contexts : []);
-    }
-    if (serverData.flows) {
-      useFlowStore.getState().setFlowNodes(isValidFlowNodes(serverData.flows) ? serverData.flows : []);
-    }
-    if (serverData.components) {
-      setComponentNodes(isValidComponentNodes(serverData.components) ? serverData.components : []);
-    }
-    clearConflict();
-    toast.showToast('已使用服务端数据，当前画布已更新', 'success');
-  }, [conflictData, clearConflict, toast]);
-
-  const handleConflictMerge = useCallback(() => {
-    if (!conflictData) return;
-    const serverData = conflictData.serverSnapshot.data;
-    const localContexts = useContextStore.getState().contextNodes;
-    const localFlows = useFlowStore.getState().flowNodes;
-    const localComponents = useComponentStore.getState().componentNodes;
-
-    const serverContexts = (serverData.contexts ?? []) as typeof localContexts;
-    const serverFlows = (serverData.flows ?? []) as typeof localFlows;
-    const serverComponents = (serverData.components ?? []) as typeof localComponents;
-
-    const localCtxIds = new Set(localContexts.map((n) => n.nodeId));
-    const localFlowIds = new Set(localFlows.map((n) => n.nodeId));
-    const localCompIds = new Set(localComponents.map((n) => n.nodeId));
-
-    const mergedContexts = [...localContexts, ...serverContexts.filter((n) => !localCtxIds.has(n.nodeId))];
-    const mergedFlows = [...localFlows, ...serverFlows.filter((n) => !localFlowIds.has(n.nodeId))];
-    const mergedComponents = [...localComponents, ...serverComponents.filter((n) => !localCompIds.has(n.nodeId))];
-
-    useContextStore.getState().setContextNodes(mergedContexts);
-    useFlowStore.getState().setFlowNodes(mergedFlows);
-    setComponentNodes(mergedComponents);
-    clearConflict();
-    toast.showToast(
-      `已合并：+${serverContexts.length - localContexts.length} 上下文、+${serverFlows.length - localFlows.length} 流程、+${serverComponents.length - localComponents.length} 组件`,
-      'success'
-    );
-  }, [conflictData, clearConflict, toast]);
-
-  // E3-F2: Delete selected node(s) based on active tree
-  const handleDeleteSelected = useCallback(() => {
-    const tree: 'context' | 'flow' = (activeTree ?? 'context') as 'context' | 'flow';
-    deleteSelectedNodes(tree);
-  }, [activeTree, deleteSelectedNodes]);
-
-  // === Epic1 F1.2: Keyboard shortcuts for Undo/Redo ===
-  const handleKeyboardUndo = useCallback((): boolean => {
-    const historyStore = getHistoryStore();
-    if (historyStore.canUndo('context')) {
-      const prev = historyStore.undo('context');
-      if (prev) { useContextStore.getState().setContextNodes(isValidContextNodes(prev) ? prev : []); return true; }
-    }
-    if (historyStore.canUndo('flow')) {
-      const prev = historyStore.undo('flow');
-      if (prev) { useFlowStore.getState().setFlowNodes(isValidFlowNodes(prev) ? prev : []); return true; }
-    }
-    if (historyStore.canUndo('component')) {
-      const prev = historyStore.undo('component');
-      if (prev) { setComponentNodes(isValidComponentNodes(prev) ? prev : []); return true; }
-    }
-    return false;
-  }, []);
-
-  const handleKeyboardRedo = useCallback((): boolean => {
-    const historyStore = getHistoryStore();
-    if (historyStore.canRedo('context')) {
-      const next = historyStore.redo('context');
-      if (next) { useContextStore.getState().setContextNodes(isValidContextNodes(next) ? next : []); return true; }
-    }
-    if (historyStore.canRedo('flow')) {
-      const next = historyStore.redo('flow');
-      if (next) { useFlowStore.getState().setFlowNodes(isValidFlowNodes(next) ? next : []); return true; }
-    }
-    if (historyStore.canRedo('component')) {
-      const next = historyStore.redo('component');
-      if (next) { setComponentNodes(isValidComponentNodes(next) ? next : []); return true; }
-    }
-    return false;
-  }, []);
-
-  // === E4: Minimap node click — scroll to and highlight node ===
-  const handleMinimapNodeClick = useCallback(
-    (nodeId: string) => {
-      const ctxNode = contextNodes.find((n) => n.nodeId === nodeId);
-      if (ctxNode) {
-        searchEvents.onSearchSelect({ id: nodeId, treeType: 'context' });
-        return;
-      }
-      const flowNode = flowNodes.find((n) => n.nodeId === nodeId);
-      if (flowNode) {
-        searchEvents.onSearchSelect({ id: nodeId, treeType: 'flow' });
-        return;
-      }
-      const compNode = componentNodes.find((n) => n.nodeId === nodeId);
-      if (compNode) {
-        searchEvents.onSearchSelect({ id: nodeId, treeType: 'component' });
-        return;
-      }
-    },
-    [contextNodes, flowNodes, componentNodes, searchEvents]
-  );
-
-  // === Bug4b: 继续 → 组件树 handler ===
-  const handleContinueToComponents = useCallback(async () => {
-    if (componentGenerating || flowNodes.length === 0) return;
-    setComponentGenerating(true);
-
-    try {
-      const sessionId = projectId ?? `session-${Date.now()}`;
-
-      const activeContexts = contextNodes.filter((ctx) => ctx.isActive !== false);
-      const selectedContextSet = new Set(selectedNodeIds.context);
-      const contextsToSend = selectedContextSet.size > 0
-        ? activeContexts.filter((ctx) => selectedContextSet.has(ctx.nodeId))
-        : activeContexts;
-      const mappedContexts = contextsToSend.map((ctx) => ({
-        id: ctx.nodeId,
-        name: ctx.name,
-        description: ctx.description ?? '',
-        type: ctx.type,
-      }));
-
-      const activeFlows = flowNodes.filter((f) => f.isActive !== false);
-      const selectedFlowSet = new Set(selectedNodeIds.flow);
-      const flowsToSend = selectedFlowSet.size > 0
-        ? activeFlows.filter((f) => selectedFlowSet.has(f.nodeId))
-        : activeFlows;
-      const mappedFlows = flowsToSend.map((f) => ({
-        id: f.nodeId,  // E2: flowId linking — backend uses this as flowId in components
-        name: f.name,
-        contextId: f.contextId,
-        steps: f.steps.map((step) => ({
-          name: step.name,
-          actor: step.actor,
-        })),
-      }));
-
-      const result = await canvasApi.generateComponents({
-        contexts: mappedContexts,
-        flows: mappedFlows,
-        sessionId,
-      });
-
-      if (result.success && result.components && result.components.length > 0) {
-        const newNodes = result.components.map((comp) => ({
-          flowId: comp.flowId || '',
-          name: comp.name,
-          type: comp.type as 'page' | 'list' | 'form' | 'detail' | 'modal',
-          props: {},
-          api: comp.api ?? { method: 'GET' as const, path: '/api/' + comp.name.toLowerCase().replace(/\s+/g, '-'), params: [] },
-          previewUrl: undefined,
-          nodeId: `comp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          confirmed: false,
-          status: 'pending' as const,
-          children: [],
-        }));
-
-        setComponentNodes(newNodes);
-        setPhase('component');
-      }
-    } catch (err) {
-      canvasLogger.CanvasPage.error(' handleContinueToComponents error:', err);
-    } finally {
-      setComponentGenerating(false);
-    }
-  }, [componentGenerating, flowNodes, contextNodes, selectedNodeIds, projectId, setComponentNodes, setPhase]);
+  // === E6: useCanvasToolbar — all toolbar/action handlers ===
+  const toolbar = useCanvasToolbar({
+    leftExpand, centerExpand, rightExpand,
+    setLeftExpand, setCenterExpand, setRightExpand,
+    contextNodes, flowNodes, componentNodes,
+    activeTree, selectedNodeIds,
+    setComponentNodes, setPhase, deleteSelectedNodes, autoGenerateFlows,
+    conflictData, clearConflict, toast,
+    projectId, quickGenerate,
+    searchEvents,
+  });
+  const {
+    toggleLeft, toggleCenter, toggleRight,
+    handleConflictKeepLocal, handleConflictUseServer, handleConflictMerge,
+    handleDeleteSelected,
+    handleKeyboardUndo, handleKeyboardRedo,
+    handleMinimapNodeClick,
+    handleContinueToComponents,
+  } = toolbar;
 
   // === Keyboard shortcuts (uses hook handlers) ===
   useKeyboardShortcuts({
@@ -723,7 +550,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         <div className={styles.prototypePhase}>
           <PrototypeQueuePanel
             expanded={queuePanelExpanded}
-            onToggleExpand={() => setQueuePanelExpanded((v) => !v)}
+            onToggleExpand={() => setQueuePanelExpanded(!queuePanelExpanded)}
           />
         </div>
       ) : (

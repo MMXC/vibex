@@ -31,13 +31,10 @@ export interface RelationshipEdgeData extends Record<string, unknown> {
 
  
 const RelationshipEdgeComponent = (props: EdgeProps<RelationshipEdgeFull>) => {
-   
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ReactFlow EdgeProps generic limitation
-  const { id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, data, selected, markerEnd } = props as any as {
-    id: string; sourceX: number; sourceY: number; targetX: number; targetY: number;
-    sourcePosition: Position; targetPosition: Position;
-    data: RelationshipEdgeData; selected: boolean; markerEnd: string;
-  };
+  const {
+    id, sourceX, sourceY, targetX, targetY,
+    sourcePosition, targetPosition, data, selected, markerEnd,
+  }: EdgeProps<RelationshipEdgeFull> = props;
   const [hovered, setHovered] = useState(false);
 
   const [edgePath, labelX, labelY] = getBezierPath({

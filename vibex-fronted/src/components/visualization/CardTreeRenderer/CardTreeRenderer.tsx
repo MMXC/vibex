@@ -88,8 +88,10 @@ let _loopEdgeTypes: EdgeTypes | null = null;
 function getNodeTypes(): NodeTypes {
   if (!_gatewayNodeTypes) {
     const { GatewayNode } = require('@/components/canvas/nodes/GatewayNode');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ReactFlow NodeTypes registration
-    _gatewayNodeTypes = { cardTreeNode: CardTreeNode as any, gatewayNode: GatewayNode as any };
+    _gatewayNodeTypes = {
+      cardTreeNode: CardTreeNode as unknown as NodeTypes[string],
+      gatewayNode: GatewayNode as unknown as NodeTypes[string],
+    };
   }
   return _gatewayNodeTypes;
 }
@@ -97,8 +99,9 @@ function getNodeTypes(): NodeTypes {
 function getEdgeTypes(): EdgeTypes {
   if (!_loopEdgeTypes) {
     const { LoopEdge } = require('@/components/canvas/edges/LoopEdge');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ReactFlow EdgeTypes registration
-    _loopEdgeTypes = { loopEdge: LoopEdge as any };
+    _loopEdgeTypes = {
+      loopEdge: LoopEdge as unknown as EdgeTypes[string],
+    };
   }
   return _loopEdgeTypes;
 }

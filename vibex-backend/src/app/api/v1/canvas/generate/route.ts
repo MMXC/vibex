@@ -22,20 +22,13 @@ const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY || '';
 const MINIMAX_API_BASE = process.env.MINIMAX_API_BASE || 'https://api.minimax.chat/v1';
 const MINIMAX_MODEL = process.env.MINIMAX_MODEL || 'abab6.5s-chat';
 
-// Auth helper
+// Auth helper — E1-S4: use consolidated auth
 async function requireAuth(req: NextRequest) {
-  const jwtSecret = process.env.JWT_SECRET || 'vibex-dev-secret';
-  const authHeader = req.headers.get('Authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  const auth = getAuthUserFromRequest(req, process.env.JWT_SECRET || 'vibex-dev-secret');
+  if (!auth) {
     throw new AuthError('Unauthorized: authentication required');
   }
-  const token = authHeader.substring(7);
-  const jwt = await import('jsonwebtoken');
-  try {
-    return jwt.default.verify(token, jwtSecret) as { userId: string; email: string };
-  } catch {
-    throw new AuthError('Invalid or expired token');
-  }
+  return auth;
 }
 
 export async function POST(request: NextRequest) {
@@ -224,6 +217,7 @@ async function generateWithAI(prompt: string): Promise<string> {
 import React from 'react';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { getAuthUserFromRequest } from '@/lib/authFromGateway';
 
 export default function GeneratedPage() {
   return (

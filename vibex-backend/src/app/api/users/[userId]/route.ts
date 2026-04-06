@@ -4,6 +4,7 @@ import { getAuthUser, hashPassword } from '@/lib/auth';
 import { getEnv } from '@/lib/env';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { getAuthUserFromRequest } from '@/lib/authFromGateway';
 
 const prisma = new PrismaClient();
 
@@ -13,7 +14,7 @@ export async function GET(
 ) {
   try {
     const env = getEnv();
-    const auth = getAuthUser(request, env.JWT_SECRET);
+    const auth = getAuthUserFromRequest(request, env.JWT_SECRET);
     if (!auth) {
       return NextResponse.json(
         { success: false, error: 'Not authenticated', code: 'UNAUTHORIZED' },
@@ -69,7 +70,7 @@ export async function PUT(
 ) {
   try {
     const env = getEnv();
-    const auth = getAuthUser(request, env.JWT_SECRET);
+    const auth = getAuthUserFromRequest(request, env.JWT_SECRET);
     if (!auth) {
       return NextResponse.json(
         { success: false, error: 'Not authenticated', code: 'UNAUTHORIZED' },

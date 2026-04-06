@@ -15,19 +15,8 @@ export const dynamic = 'force-dynamic';
 
 // Auth helper for canvas routes
 function checkAuth(req: NextRequest) {
-  const jwtSecret = process.env.JWT_SECRET || 'vibex-dev-secret';
-  const authHeader = req.headers.get('Authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return { auth: null, error: 'Unauthorized: authentication required' };
-  }
-  const token = authHeader.substring(7);
-  try {
-    const jwt = require('jsonwebtoken');
-    const auth = jwt.verify(token, jwtSecret) as { userId: string; email: string };
-    return { auth, error: null };
-  } catch {
-    return { auth: null, error: 'Invalid or expired token' };
-  }
+  const auth = getAuthUserFromRequest(req, process.env.JWT_SECRET || 'vibex-dev-secret');
+  return auth ? { auth, error: null } : { auth: null, error: 'Unauthorized' };
 }
 
 export async function GET(request: NextRequest) {
@@ -172,6 +161,7 @@ export default config;
     path: 'src/app/layout.tsx',
     content: `import type { Metadata } from 'next';
 import './globals.css';
+import { getAuthUserFromRequest } from '@/lib/authFromGateway';
 
 export const metadata: Metadata = {
   title: '${projectName}',

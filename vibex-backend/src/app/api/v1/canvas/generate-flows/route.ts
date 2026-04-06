@@ -16,6 +16,7 @@ import { validateContexts } from '@/lib/canvas-validation';
 import { canvasError, CanvasErrorCodes } from '../types';
 
 import { devLog, safeError } from '@/lib/log-sanitizer';
+import { getAuthUserFromRequest } from '@/lib/authFromGateway';
 
 interface BusinessFlowResponse {
   id: string;
@@ -81,7 +82,6 @@ export const dynamic = 'force-dynamic';
 
 // Auth helper for canvas routes
 async function requireAuth(req: NextRequest) {
-  const jwtSecret = process.env.JWT_SECRET || 'vibex-dev-secret';
   const authHeader = req.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return new NextResponse(
@@ -92,7 +92,7 @@ async function requireAuth(req: NextRequest) {
   const token = authHeader.substring(7);
   const jwt = await import('jsonwebtoken');
   try {
-    return jwt.default.verify(token, jwtSecret) as { userId: string; email: string };
+    return getAuthUserFromRequest(req, process.env.JWT_SECRET || 'vibex-dev-secret');
   } catch {
     return new NextResponse(
       JSON.stringify({ error: 'Invalid or expired token', code: 'UNAUTHORIZED' }),

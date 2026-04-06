@@ -13,6 +13,7 @@ import { DomainEntity } from '@/services/domain-entities';
 import { EntityRelation } from '@/services/entity-relations';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { getAuthUserFromRequest } from '@/lib/authFromGateway';
 
 /**
  * GET /api/domain-model/:projectId
@@ -32,19 +33,8 @@ import { safeError } from '@/lib/log-sanitizer';
 
 // Auth helper
 function checkAuth(req: NextRequest) {
-  const jwtSecret = process.env.JWT_SECRET || 'vibex-dev-secret';
-  const authHeader = req.headers.get('Authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return { auth: null, error: 'Unauthorized: authentication required' };
-  }
-  const token = authHeader.substring(7);
-  try {
-    const jwt = require('jsonwebtoken');
-    const auth = jwt.verify(token, jwtSecret) as { userId: string; email: string };
-    return { auth, error: null };
-  } catch {
-    return { auth: null, error: 'Invalid or expired token' };
-  }
+  const auth = getAuthUserFromRequest(req, process.env.JWT_SECRET || 'vibex-dev-secret');
+  return auth ? { auth, error: null } : { auth: null, error: 'Unauthorized' };
 }
 
 export async function GET(

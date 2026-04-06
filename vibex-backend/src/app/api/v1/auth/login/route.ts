@@ -4,6 +4,7 @@ import { hashPassword, verifyPassword, generateToken, getAuthUser } from '@/lib/
 import { getEnv } from '@/lib/env';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { getAuthUserFromRequest } from '@/lib/authFromGateway';
 
 const prisma = new PrismaClient();
 

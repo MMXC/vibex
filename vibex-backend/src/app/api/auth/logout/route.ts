@@ -3,11 +3,12 @@ import { getAuthUser } from '@/lib/auth';
 import { getEnv } from '@/lib/env';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { getAuthUserFromRequest } from '@/lib/authFromGateway';
 
 export async function POST(request: NextRequest) {
   try {
     const env = getEnv();
-    const user = getAuthUser(request, env.JWT_SECRET);
+    const user = getAuthUserFromRequest(request, env.JWT_SECRET);
     
     if (!user) {
       return NextResponse.json(

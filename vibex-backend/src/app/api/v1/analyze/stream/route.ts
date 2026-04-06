@@ -15,19 +15,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { buildSSEStream } from '@/lib/sse-stream-lib';
 import { getLocalEnv } from '@/lib/env';
 import jwt from 'jsonwebtoken';
+import { getAuthUserFromRequest } from '@/lib/authFromGateway';
 
 export const dynamic = 'force-dynamic';
 
 // Auth helper
 function checkAuth(req: NextRequest) {
-  const jwtSecret = process.env.JWT_SECRET || 'vibex-dev-secret';
   const authHeader = req.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return { auth: null, error: 'Unauthorized: authentication required' };
   }
   const token = authHeader.substring(7);
   try {
-    const auth = jwt.verify(token, jwtSecret) as { userId: string; email: string };
+    const auth = getAuthUserFromRequest(request, process.env.JWT_SECRET || 'vibex-dev-secret');
     return { auth, error: null };
   } catch {
     return { auth: null, error: 'Invalid or expired token' };

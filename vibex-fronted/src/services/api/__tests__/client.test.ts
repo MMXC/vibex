@@ -24,9 +24,9 @@ vi.mock('axios', () => {
   };
   
   return {
-    create: jest.fn(() => mockAxiosInstance),
+    create: vi.fn(() => mockAxiosInstance),
     isAxiosError: vi.fn(),
-    default: { create: jest.fn(() => mockAxiosInstance) },
+    default: { create: vi.fn(() => mockAxiosInstance) },
     __mockInstance: mockAxiosInstance,
   };
 });
@@ -60,7 +60,7 @@ describe('HTTP Client', () => {
 
     it('should create HTTP client with custom config', () => {
       // Create a fresh client by resetting the module
-      jest.resetModules();
+      vi.resetModules();
       const { createHttpClient } = require('@/services/api/client');
       
       const client = createHttpClient({ baseURL: 'https://api.test.com' });
@@ -146,7 +146,7 @@ describe('HTTP Client', () => {
 
   describe('transformError', () => {
     it('should transform 400 error', () => {
-      (axios.isAxiosError as jest.Mock).mockReturnValue(true);
+      (axios.isAxiosError as any).mockReturnValue(true);
       const error = {
         response: {
           status: 400,
@@ -160,7 +160,7 @@ describe('HTTP Client', () => {
     });
 
     it('should transform 401 error', () => {
-      (axios.isAxiosError as jest.Mock).mockReturnValue(true);
+      (axios.isAxiosError as any).mockReturnValue(true);
       const error = {
         response: { status: 401 },
       };
@@ -171,7 +171,7 @@ describe('HTTP Client', () => {
     });
 
     it('should transform 403 error', () => {
-      (axios.isAxiosError as jest.Mock).mockReturnValue(true);
+      (axios.isAxiosError as any).mockReturnValue(true);
       const error = {
         response: { status: 403 },
       };
@@ -182,7 +182,7 @@ describe('HTTP Client', () => {
     });
 
     it('should transform 404 error', () => {
-      (axios.isAxiosError as jest.Mock).mockReturnValue(true);
+      (axios.isAxiosError as any).mockReturnValue(true);
       const error = {
         response: { status: 404 },
       };
@@ -193,7 +193,7 @@ describe('HTTP Client', () => {
     });
 
     it('should transform 409 error (email already exists)', () => {
-      (axios.isAxiosError as jest.Mock).mockReturnValue(true);
+      (axios.isAxiosError as any).mockReturnValue(true);
       const error = {
         response: { status: 409, data: { error: '该邮箱已被注册' } },
       };
@@ -204,7 +204,7 @@ describe('HTTP Client', () => {
     });
 
     it('should transform default error with message', () => {
-      (axios.isAxiosError as jest.Mock).mockReturnValue(true);
+      (axios.isAxiosError as any).mockReturnValue(true);
       const error = {
         response: { status: 418, data: { error: 'Custom error' } },
       };
@@ -215,7 +215,7 @@ describe('HTTP Client', () => {
     });
 
     it('should transform default error without message', () => {
-      (axios.isAxiosError as jest.Mock).mockReturnValue(true);
+      (axios.isAxiosError as any).mockReturnValue(true);
       const error = {
         response: { status: 418 },
       };
@@ -226,7 +226,7 @@ describe('HTTP Client', () => {
     });
 
     it('should transform network error', () => {
-      (axios.isAxiosError as jest.Mock).mockReturnValue(true);
+      (axios.isAxiosError as any).mockReturnValue(true);
       const error = {
         request: {},
         message: 'Network Error',
@@ -239,7 +239,7 @@ describe('HTTP Client', () => {
 
     it('should transform unknown error', () => {
       // When it's not an axios error, return the original error
-      (axios.isAxiosError as jest.Mock).mockReturnValue(false);
+      (axios.isAxiosError as any).mockReturnValue(false);
       const error = new Error('Unknown error');
 
       const result = transformError(error);

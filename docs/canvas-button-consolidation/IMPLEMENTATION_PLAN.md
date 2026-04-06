@@ -204,7 +204,7 @@ test('三栏按钮完整流程', async ({ page }) => {
 | 3 | CanvasPage extraButtons mock 移除 | ☐ |
 | 4 | contextStore flow 分支三个方法修复 | ✅ |
 | 5 | flowStore 三个批量方法新增 | ✅ |
-| 6 | CanvasPage 重置按钮统一加 snapshot | ☐ |
+| 6 | CanvasPage 重置按钮统一加 snapshot | ✅ |
 | 7 | Component 栏调用 clearComponentCanvas | ☐ |
 | 8 | 重新生成调用真实 AI API | ✅ |
 | 9 | Playwright E2E 测试通过 | ☐ |

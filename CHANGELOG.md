@@ -2469,6 +2469,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Features (vibex-architect-proposals-vibex-proposals-20260411 Epic E2-E7)
+- **E2 WebSocket治理**: MAX_CONNECTIONS=100 limit in ConnectionPool, passive heartbeat via pruneStaleConnections() (#1253771e)
+- **E3 packages/types**: Create @vibex/types/schemas workspace package with common.ts and canvas.ts Zod schemas (#1253771e)
+- **E4 路由分层**: withAuth() via authMiddleware on gateway, CORS middleware in gateway.ts (#existing)
+- **E5 质量评分**: Add calculateQualityScore() + isQualityDegraded() in CompressionEngine, qualityScore < 70 triggers degraded state (#b85f3ac7)
+- **E6 AST安全扫描**: Add AST-based prompt security scanner using @babel/parser + @babel/traverse, detect eval/new Function (#a05ea850)
+- **E7 MCP可观测性**: Add health_check MCP tool, structured JSON logging in MCP server (#0c63fff2)
+
 ## [3.9.0] - 2026-03-29
 
 ### Fixed (vibex-canvas-flow-card-20260328 Epic1: FlowCard样式虚线+图标) — 2026-03-28

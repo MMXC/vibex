@@ -13,6 +13,10 @@
 import { DurableObject } from 'cloudflare:workers';
 
 import { devLog, safeError } from '@/lib/log-sanitizer';
+import { ConnectionPool } from '@/services/websocket/connectionPool';
+
+// E2-S1: Connection limit constant
+const MAX_CONNECTIONS = 100;
 
 // ==================== Types ====================
 
@@ -62,7 +66,14 @@ export interface BroadcastMessage {
 
 export class CollaborationRoom extends DurableObject {
   private connections: Map<string, Connection> = new Map();
+  private connectionPool: ConnectionPool;
   private locks: Map<string, { userId: string; userName: string; expiresAt: number }> = new Map();
+
+  constructor(state: DurableObjectState, env: Env) {
+    super(state, env);
+    // E2-S1: Initialize connection pool with MAX_CONNECTIONS limit
+    this.connectionPool = new ConnectionPool({ maxConnections: MAX_CONNECTIONS });
+  }
 
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
@@ -92,8 +103,26 @@ export class CollaborationRoom extends DurableObject {
       projectId,
       webSocket: server,
     };
-    
+
+    // E2-S1: Enforce MAX_CONNECTIONS limit before accepting
+    if (this.connectionPool.getSize() >= MAX_CONNECTIONS) {
+      devLog(`Connection rejected: limit reached (${MAX_CONNECTIONS})`);
+      server.close(1008, `Too many connections (max: ${MAX_CONNECTIONS})`);
+      return new Response(null, { status: 101, webSocket: client });
+    }
+
     this.connections.set(connectionId, connection);
+
+    // E2-S1: Register with connection pool for tracking
+    this.connectionPool.add({
+      id: connectionId,
+      userId,
+      roomId: projectId,
+      socket: server,
+      connectedAt: Date.now(),
+      lastHeartbeat: Date.now(),
+      status: 'connected',
+    });
     
     // 广播上线状态
     this.broadcast({
@@ -119,6 +148,8 @@ export class CollaborationRoom extends DurableObject {
     
     // 设置关闭处理
     server.addEventListener('close', () => {
+      // E2-S1: Remove from connection pool
+      this.connectionPool.remove(connectionId);
       this.connections.delete(connectionId);
       this.broadcast({
         type: 'presence:update',
@@ -169,6 +200,10 @@ export class CollaborationRoom extends DurableObject {
         break;
       case 'presence:update':
         this.updatePresence(connection, message.payload as Partial<PresenceUpdate>);
+        break;
+      case 'heartbeat':
+        // E2-S2: Update heartbeat in connection pool (triggers passive stale cleanup)
+        this.connectionPool.updateHeartbeat(connectionId);
         break;
       default:
         devLog('Unknown message type:', message.type);

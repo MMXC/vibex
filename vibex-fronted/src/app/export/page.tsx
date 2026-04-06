@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 import { FrameworkSelector, type Framework } from '@/components/export-panel/framework-selector';
 import { reactComponentToSvelte } from '@/lib/react2svelte';
 import styles from './export.module.css';

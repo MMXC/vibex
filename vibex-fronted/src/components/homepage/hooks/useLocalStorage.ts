@@ -1,5 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 /**
  * SSR-safe localStorage hook
  * Handles SSR mismatch by only accessing localStorage on client-side
@@ -19,7 +21,7 @@ export function useLocalStorage<T>(
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      console.warn(`Error reading localStorage key "${key}":`, error);
+      canvasLogger.default.warn(`Error reading localStorage key "${key}":`, error);
       return initialValue;
     }
   });
@@ -35,7 +37,7 @@ export function useLocalStorage<T>(
           try {
             window.localStorage.setItem(key, JSON.stringify(newValue));
           } catch (error) {
-            console.warn(`Error setting localStorage key "${key}":`, error);
+            canvasLogger.default.warn(`Error setting localStorage key "${key}":`, error);
           }
         }
 
@@ -56,7 +58,7 @@ export function useLocalStorage<T>(
         try {
           setStoredValue(JSON.parse(e.newValue));
         } catch (error) {
-          console.warn(`Error parsing localStorage value for key "${key}":`, error);
+          canvasLogger.default.warn(`Error parsing localStorage value for key "${key}":`, error);
         }
       }
     };

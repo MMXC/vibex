@@ -5,7 +5,7 @@
  * guidance highlighting TabBar, TreePanel, and input area.
  *
  * Uses existing OnboardingStore pattern for consistency.
- * Follows AGENTS.md: no any, no console.log, WCAG 2.1 AA compliance.
+ * Follows AGENTS.md: no any, no canvasLogger.default.debug, WCAG 2.1 AA compliance.
  */
 'use client';
 
@@ -13,6 +13,8 @@ import React, { memo, useEffect, useRef, useCallback } from 'react';
 import { useGuidanceStore } from '@/stores/guidanceStore';
 import { X, ChevronLeft, ChevronRight, MousePointer2, Layers, ArrowRight } from 'lucide-react';
 import styles from './CanvasOnboardingOverlay.module.css';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 // =============================================================================
 // Types

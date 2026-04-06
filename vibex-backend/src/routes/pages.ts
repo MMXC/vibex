@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const pages = new Hono<{ Bindings: Env }>();
 
 interface PageRow {
@@ -31,7 +33,7 @@ pages.get('/', async (c) => {
 
     return c.json({ pages: pagesList });
   } catch (error) {
-    console.error('Error fetching pages:', error);
+    safeError('Error fetching pages:', error);
     return c.json({ error: 'Failed to fetch pages' }, 500);
   }
 });
@@ -64,7 +66,7 @@ pages.post('/', async (c) => {
 
     return c.json({ page }, 201);
   } catch (error) {
-    console.error('Error creating page:', error);
+    safeError('Error creating page:', error);
     return c.json({ error: 'Failed to create page' }, 500);
   }
 });

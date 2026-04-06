@@ -5,6 +5,8 @@
 
 import { v4 as uuidv4 } from 'uuid';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // 游客会话 key 前缀
 const GUEST_SESSION_KEY = 'vibex_guest_session';
 const GUEST_DATA_KEY = 'vibex_guest_data';
@@ -75,7 +77,7 @@ export function createGuestSession(): GuestSession {
   try {
     localStorage.setItem(GUEST_SESSION_KEY, JSON.stringify(session));
   } catch (e) {
-    console.error('[Guest] Failed to save session:', e);
+    canvasLogger.default.error('[Guest] Failed to save session:', e);
   }
   
   return session;
@@ -115,7 +117,7 @@ export function updateGuestActivity(): GuestSession | null {
   try {
     localStorage.setItem(GUEST_SESSION_KEY, JSON.stringify(session));
   } catch (e) {
-    console.error('[Guest] Failed to update session:', e);
+    canvasLogger.default.error('[Guest] Failed to update session:', e);
   }
   
   return session;
@@ -145,7 +147,7 @@ export function clearGuestSession(): void {
     localStorage.removeItem(GUEST_SESSION_KEY);
     localStorage.removeItem(GUEST_DATA_KEY);
   } catch (e) {
-    console.error('[Guest] Failed to clear session:', e);
+    canvasLogger.default.error('[Guest] Failed to clear session:', e);
   }
 }
 
@@ -191,7 +193,7 @@ export function createGuestData(): GuestData {
   try {
     localStorage.setItem(GUEST_DATA_KEY, JSON.stringify(data));
   } catch (e) {
-    console.error('[Guest] Failed to save guest data:', e);
+    canvasLogger.default.error('[Guest] Failed to save guest data:', e);
   }
   
   return data;
@@ -204,7 +206,7 @@ export function saveGuestData(data: GuestData): void {
   try {
     localStorage.setItem(GUEST_DATA_KEY, JSON.stringify(data));
   } catch (e) {
-    console.error('[Guest] Failed to save guest data:', e);
+    canvasLogger.default.error('[Guest] Failed to save guest data:', e);
   }
 }
 
@@ -215,7 +217,7 @@ export function clearGuestData(): void {
   try {
     localStorage.removeItem(GUEST_DATA_KEY);
   } catch (e) {
-    console.error('[Guest] Failed to clear guest data:', e);
+    canvasLogger.default.error('[Guest] Failed to clear guest data:', e);
   }
 }
 

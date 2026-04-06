@@ -12,6 +12,8 @@ import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 import { getAuthUserFromHono } from '@/lib/auth';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const collaboration = new Hono<{ Bindings: Env }>();
 
 // ============================================
@@ -85,7 +87,7 @@ collaboration.get('/', async (c) => {
     const results = await queryDB<CollaborationRow[]>(c.env, sql, params);
     return c.json({ success: true, data: results });
   } catch (error) {
-    console.error('Error listing collaborations:', error);
+    safeError('Error listing collaborations:', error);
     return c.json({ success: false, error: { message: 'Failed to list collaborations' } }, 500);
   }
 });
@@ -126,7 +128,7 @@ collaboration.get('/:id', async (c) => {
       },
     });
   } catch (error) {
-    console.error('Error getting collaboration:', error);
+    safeError('Error getting collaboration:', error);
     return c.json({ success: false, error: { message: 'Failed to get collaboration' } }, 500);
   }
 });
@@ -182,7 +184,7 @@ collaboration.post('/invite', async (c) => {
       data: { id, projectId, email, role, status: 'pending' },
     });
   } catch (error) {
-    console.error('Error inviting collaborator:', error);
+    safeError('Error inviting collaborator:', error);
     return c.json({ success: false, error: { message: 'Failed to invite collaborator' } }, 500);
   }
 });
@@ -226,7 +228,7 @@ collaboration.post('/:id/join', async (c) => {
       data: { id, status: 'active', userId: user.userId },
     });
   } catch (error) {
-    console.error('Error joining collaboration:', error);
+    safeError('Error joining collaboration:', error);
     return c.json({ success: false, error: { message: 'Failed to join collaboration' } }, 500);
   }
 });
@@ -252,7 +254,7 @@ collaboration.get('/:id/messages', async (c) => {
       data: messages.reverse(),
     });
   } catch (error) {
-    console.error('Error getting messages:', error);
+    safeError('Error getting messages:', error);
     return c.json({ success: false, error: { message: 'Failed to get messages' } }, 500);
   }
 });
@@ -327,7 +329,7 @@ collaboration.post('/:id/messages', async (c) => {
       },
     });
   } catch (error) {
-    console.error('Error sending message:', error);
+    safeError('Error sending message:', error);
     return c.json({ success: false, error: { message: 'Failed to send message' } }, 500);
   }
 });
@@ -375,7 +377,7 @@ collaboration.delete('/:id', async (c) => {
 
     return c.json({ success: true });
   } catch (error) {
-    console.error('Error removing collaborator:', error);
+    safeError('Error removing collaborator:', error);
     return c.json({ success: false, error: { message: 'Failed to remove collaborator' } }, 500);
   }
 });

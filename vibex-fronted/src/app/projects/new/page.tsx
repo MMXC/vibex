@@ -17,6 +17,8 @@ import { getUserId } from '@/lib/auth-token';
 import { Plus, FileText, ArrowLeft } from 'lucide-react';
 import styles from './new-project.module.css';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 export default function NewProjectPage() {
   const router = useRouter();
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
@@ -40,7 +42,7 @@ export default function NewProjectPage() {
       });
       router.push(`/project?id=${project.id}`);
     } catch (error) {
-      console.error('Failed to create project:', error);
+      canvasLogger.default.error('Failed to create project:', error);
       setIsCreating(false);
     }
   };
@@ -59,7 +61,7 @@ export default function NewProjectPage() {
       setIsCreating(false);
       return { projectId: project.id };
     } catch (error) {
-      console.error('Failed to create project from template:', error);
+      canvasLogger.default.error('Failed to create project from template:', error);
       setIsCreating(false);
       throw error;
     }

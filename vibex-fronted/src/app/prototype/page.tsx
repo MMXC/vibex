@@ -5,6 +5,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import styles from './prototype.module.css';
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 import {
   apiService,
   PrototypeSnapshot,
@@ -117,7 +119,7 @@ export default function PrototypePreview() {
           setPages([]);
         }
       } catch (err: unknown) {
-        console.error('Load error:', err);
+        canvasLogger.default.error('Load error:', err);
         // 错误时使用空数据
         setPages([]);
       } finally {

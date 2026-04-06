@@ -6,6 +6,8 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 
+import { devLog } from '@/lib/log-sanitizer';
+
 // ==================== Types ====================
 
 interface OpenAPIPath {
@@ -705,5 +707,5 @@ if (import.meta.main) {
   const outputPath = process.argv[2] || 'openapi.json';
   
   fs.writeFileSync(outputPath, JSON.stringify(ROUTE_METADATA, null, 2));
-  console.log(`✅ OpenAPI spec generated: ${outputPath}`);
+  devLog(`✅ OpenAPI spec generated: ${outputPath}`);
 }

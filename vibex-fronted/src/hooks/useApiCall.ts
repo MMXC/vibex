@@ -16,9 +16,11 @@ import { defaultErrorMapper } from '@/lib/error/ErrorCodeMapper';
 import { defaultRetryHandler } from '@/lib/error/RetryHandler';
 import { useToast } from '@/components/ui/Toast';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 /** Dev-only logger */
 const devLog = (...args: unknown[]) => {
-  if (process.env.NODE_ENV !== 'production') console.log(...args);
+  if (process.env.NODE_ENV !== 'production') canvasLogger.default.debug(...args);
 };
 
 export interface UseApiCallOptions<TArgs extends unknown[], TData> {
@@ -73,7 +75,7 @@ export interface UseApiCallReturn<TData> {
  * ```typescript
  * const { data, loading, error, execute } = useApiCall({
  *   apiFn: () => fetchProjects(),
- *   onSuccess: (data) => console.log('Success:', data),
+ *   onSuccess: (data) => canvasLogger.default.debug('Success:', data),
  *   retryCount: 3,
  *   showToast: true,
  *   mutationKey: ['projects'],
@@ -198,7 +200,7 @@ export function useApiCall<TArgs extends unknown[], TData>(
 
       // 显示错误 Toast
       if (showToast && typeof window !== 'undefined') {
-        console.error('API Error:', errorConfig.userMessage);
+        canvasLogger.default.error('API Error:', errorConfig.userMessage);
         showToastFn(errorConfig.userMessage || '操作失败，请稍后重试', 'error');
       }
     },

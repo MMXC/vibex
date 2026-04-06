@@ -61,6 +61,8 @@ import plan from './routes/plan';
 // API Gateway v1 路由
 import v1 from './routes/v1/gateway';
 
+import { devLog } from '@/lib/log-sanitizer';
+
 // 创建 Hono 应用，绑定 Cloudflare 环境变量类型
 const app = new Hono<{ Bindings: CloudflareEnv }>();
 
@@ -170,7 +172,7 @@ const isWorkers = typeof globalThis.caches !== 'undefined';
 const isProduction = process.env?.NODE_ENV === 'production';
 if (!isWorkers && !isProduction) {
   const port = parseInt(process.env.PORT || '3000');
-  console.log(`Server running on http://localhost:${port}`);
+  devLog(`Server running on http://localhost:${port}`);
   
   // 本地开发时，注入本地环境变量到 globalThis
   const localEnv = getLocalEnv();

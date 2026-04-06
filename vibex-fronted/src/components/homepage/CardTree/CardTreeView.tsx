@@ -18,6 +18,8 @@ import { CardTreeError } from './CardTreeError';
 import type { BoundedContext } from '@/types/homepage';
 import styles from './CardTree.module.css';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // ==================== Feature Flag ====================
 
 /** Feature Flag: Controls CardTree vs GridLayout rendering */
@@ -82,7 +84,7 @@ export function CardTreeView({
   // Memoize onError to prevent handleError recreation → infinite loop
   const handleCardTreeError = React.useCallback((err: unknown) => {
     if (process.env.NODE_ENV !== 'production') {
-      console.error('[CardTree] Error:', err);
+      canvasLogger.default.error('[CardTree] Error:', err);
     }
   }, []);
 

@@ -5,6 +5,8 @@ import { Modal } from '../ui/Modal';
 import { User } from '../../services/api';
 import styles from './CommentThread.module.css';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // 评论类型
 export type CommentType = 'bug' | 'suggestion' | 'question' | 'praise';
 
@@ -211,7 +213,7 @@ function CommentItem({
       await onEdit?.(comment.id);
       setIsEditing(false);
     } catch (error) {
-      console.error('Failed to edit comment:', error);
+      canvasLogger.default.error('Failed to edit comment:', error);
     }
   };
 
@@ -236,7 +238,7 @@ function CommentItem({
       setReplies(loadedReplies || []);
       setShowReplies(true);
     } catch (error) {
-      console.error('Failed to load replies:', error);
+      canvasLogger.default.error('Failed to load replies:', error);
     } finally {
       setRepliesLoading(false);
     }
@@ -253,7 +255,7 @@ function CommentItem({
         setShowReplyInput(false);
       }
     } catch (error) {
-      console.error('Failed to add reply:', error);
+      canvasLogger.default.error('Failed to add reply:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -450,7 +452,7 @@ export function CommentThread({
       await onAddComment?.(commentData);
       setNewComment('');
     } catch (error) {
-      console.error('Failed to add comment:', error);
+      canvasLogger.default.error('Failed to add comment:', error);
     } finally {
       setIsSubmitting(false);
     }

@@ -5,6 +5,8 @@ import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiService } from '@/services/api';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // 协作者类型定义
 export interface Collaborator {
   id: string;
@@ -122,7 +124,7 @@ const ProjectSettingsPage = () => {
 
         setCollaborators(mockCollaborators);
       } catch (err: unknown) {
-        console.error('加载协作者失败:', err);
+        canvasLogger.default.error('加载协作者失败:', err);
       } finally {
         setCollaboratorsLoading(false);
       }

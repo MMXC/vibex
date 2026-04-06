@@ -16,6 +16,8 @@ import ecommerceTemplate from '@/data/project-templates/ecommerce.json';
 import userManagementTemplate from '@/data/project-templates/user-management.json';
 import genericBusinessTemplate from '@/data/project-templates/generic-business.json';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // 内置模板列表
 const DEFAULT_TEMPLATES: ProjectTemplate[] = [
   ecommerceTemplate as ProjectTemplate,
@@ -117,7 +119,7 @@ export const useProjectTemplateStore = create<ProjectTemplateState>()(
         
         const projectId = `project-${Date.now()}`;
         
-        console.log(`[ProjectTemplate] Created project "${projectName}" from template "${template.name}"`, {
+        canvasLogger.default.debug(`[ProjectTemplate] Created project "${projectName}" from template "${template.name}"`, {
           contexts: template.contexts.map(c => c.name),
           flows: template.flows.map(f => f.name),
         });

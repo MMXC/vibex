@@ -8,6 +8,8 @@
 
 import type { ThemeMode } from '../types/theme';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 function getAuthHeaders(): Record<string, string> {
   if (typeof window === 'undefined') return {};
   const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
@@ -99,7 +101,7 @@ export async function fetchHomepageData(): Promise<HomepageAPIResponse | null> {
 
     if (!res.ok) {
       if (isDev) {
-        console.warn('[HomepageAPI] Non-OK response:', res.status, res.statusText);
+        canvasLogger.default.warn('[HomepageAPI] Non-OK response:', res.status, res.statusText);
       }
       return null;
     }
@@ -109,13 +111,13 @@ export async function fetchHomepageData(): Promise<HomepageAPIResponse | null> {
     // Validate theme fields
     if (data.theme && !VALID_THEMES.has(data.theme)) {
       if (isDev) {
-        console.warn('[HomepageAPI] Invalid theme from API:', data.theme);
+        canvasLogger.default.warn('[HomepageAPI] Invalid theme from API:', data.theme);
       }
       data.theme = undefined;
     }
     if (data.userPreferences?.theme && !VALID_THEMES.has(data.userPreferences.theme)) {
       if (isDev) {
-        console.warn('[HomepageAPI] Invalid userPreferences.theme:', data.userPreferences.theme);
+        canvasLogger.default.warn('[HomepageAPI] Invalid userPreferences.theme:', data.userPreferences.theme);
       }
       data.userPreferences.theme = undefined;
     }
@@ -124,7 +126,7 @@ export async function fetchHomepageData(): Promise<HomepageAPIResponse | null> {
     return data;
   } catch (err) {
     if (isDev) {
-      console.warn('[HomepageAPI] Fetch failed:', err);
+      canvasLogger.default.warn('[HomepageAPI] Fetch failed:', err);
     }
     return null;
   }
@@ -169,7 +171,7 @@ export function logThemeResolution(input: ThemeMergeInput, resolved: ThemeMode):
   if (!isDev) return;
 
   const { local, api } = input;
-  console.debug('[ThemeResolution]', {
+  canvasLogger.default.debug('[ThemeResolution]', {
     localStorage: local ?? '(none)',
     apiUserPrefs: api?.userPreferences?.theme ?? '(none)',
     apiDefault: api?.theme ?? '(none)',

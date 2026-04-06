@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 export const dynamic = 'force-dynamic';
 
 // GET /api/agents/[id] - Get a single agent
@@ -24,7 +26,7 @@ export async function GET(
 
     return NextResponse.json({ agent });
   } catch (error) {
-    console.error('Error fetching agent:', error);
+    safeError('Error fetching agent:', error);
     return NextResponse.json(
       { error: 'Failed to fetch agent' },
       { status: 500 }
@@ -54,7 +56,7 @@ export async function PUT(
 
     return NextResponse.json({ agent });
   } catch (error) {
-    console.error('Error updating agent:', error);
+    safeError('Error updating agent:', error);
     return NextResponse.json(
       { error: 'Failed to update agent' },
       { status: 500 }
@@ -76,7 +78,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting agent:', error);
+    safeError('Error deleting agent:', error);
     return NextResponse.json(
       { error: 'Failed to delete agent' },
       { status: 500 }

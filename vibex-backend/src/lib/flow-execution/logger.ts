@@ -4,11 +4,13 @@
 
 import type { ExecutionLogger as IExecutionLogger, ExecutionStepLog } from './handlers/types';
 
+import { devLog } from '@/lib/log-sanitizer';
+
 export class ExecutionLogger implements IExecutionLogger {
   private executionLogs: Map<string, ExecutionStepLog[]> = new Map();
   
   logExecution(executionId: string, data: unknown): void {
-    console.log(`[Execution ${executionId}]`, data);
+    devLog(`[Execution ${executionId}]`, data);
   }
   
   logStep(executionId: string, step: ExecutionStepLog): void {

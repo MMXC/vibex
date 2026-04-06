@@ -2,6 +2,8 @@ import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 import { getAuthUserFromHono } from '@/lib/auth';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const projectId = new Hono<{ Bindings: Env }>();
 
 interface ProjectRow {
@@ -32,7 +34,7 @@ projectId.get('/', async (c) => {
 
     return c.json({ project });
   } catch (error) {
-    console.error('Error fetching project:', error);
+    safeError('Error fetching project:', error);
     return c.json({ error: 'Failed to fetch project' }, 500);
   }
 });
@@ -59,7 +61,7 @@ projectId.patch('/soft-delete', async (c) => {
 
     return c.json({ project });
   } catch (error) {
-    console.error('Error soft-deleting project:', error);
+    safeError('Error soft-deleting project:', error);
     return c.json({ error: 'Failed to soft-delete project' }, 500);
   }
 });
@@ -86,7 +88,7 @@ projectId.patch('/restore', async (c) => {
 
     return c.json({ project });
   } catch (error) {
-    console.error('Error restoring project:', error);
+    safeError('Error restoring project:', error);
     return c.json({ error: 'Failed to restore project' }, 500);
   }
 });
@@ -101,7 +103,7 @@ projectId.delete('/permanent', async (c) => {
 
     return c.json({ success: true });
   } catch (error) {
-    console.error('Error permanently deleting project:', error);
+    safeError('Error permanently deleting project:', error);
     return c.json({ error: 'Failed to permanently delete project' }, 500);
   }
 });
@@ -147,7 +149,7 @@ projectId.put('/', async (c) => {
 
     return c.json({ project });
   } catch (error) {
-    console.error('Error updating project:', error);
+    safeError('Error updating project:', error);
     return c.json({ error: 'Failed to update project' }, 500);
   }
 });
@@ -172,7 +174,7 @@ projectId.delete('/', async (c) => {
 
     return c.json({ success: true });
   } catch (error) {
-    console.error('Error deleting project:', error);
+    safeError('Error deleting project:', error);
     return c.json({ error: 'Failed to delete project' }, 500);
   }
 });

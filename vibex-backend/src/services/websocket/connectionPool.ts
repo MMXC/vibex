@@ -50,7 +50,7 @@ export class ConnectionPool {
    */
   add(connection: WebSocketConnection): boolean {
     if (this.connections.size >= this.config.maxConnections) {
-      console.warn(`Connection pool full (${this.config.maxConnections} connections)`);
+      safeError(`Connection pool full (${this.config.maxConnections} connections)`);
       return false;
     }
 

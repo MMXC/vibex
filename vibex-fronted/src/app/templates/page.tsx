@@ -13,13 +13,15 @@ import { useRouter } from 'next/navigation';
 
 /** Dev-only logger */
 const devLog = (...args: unknown[]) => {
-  if (process.env.NODE_ENV !== 'production') console.log(...args);
+  if (process.env.NODE_ENV !== 'production') canvasLogger.default.debug(...args);
 };
 import { TemplateGallery, TemplateDetail } from '@/components/templates';
 import type { Template } from '@/types/template';
 import { getAuthToken, getUserId } from '@/lib/auth-token';
 import { getApiUrl } from '@/lib/api-config';
 import styles from './templates.module.css';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 export default function TemplatesPage() {
   const router = useRouter();

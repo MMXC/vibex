@@ -2,6 +2,8 @@ import { Hono } from 'hono';
 import { verifyPassword, generateToken } from '@/lib/auth';
 import { queryOne, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const login = new Hono<{ Bindings: Env }>();
 
 interface UserRow {
@@ -79,7 +81,7 @@ login.post('/', async (c) => {
       },
     });
   } catch (error) {
-    console.error('Login error:', error);
+    safeError('Login error:', error);
     return c.json(
       { success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' },
       500

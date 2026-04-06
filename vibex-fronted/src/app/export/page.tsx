@@ -166,6 +166,8 @@ export default function Export() {
         const componentCode = `import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 export const VibeXCanvas: React.FC = () => (
   <View style={styles.canvas}>
     <View style={styles.node}>
@@ -260,7 +262,7 @@ const styles = StyleSheet.create({
         }, 300);
       }
     } catch (err) {
-      console.error('Export failed:', err);
+      canvasLogger.default.error('Export failed:', err);
       alert('导出失败，请重试');
       setIsExporting(false);
     }

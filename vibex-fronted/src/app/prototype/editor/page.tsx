@@ -11,6 +11,8 @@ import React, {
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import styles from './prototype.module.css';
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 import {
   apiService,
   UIPage,
@@ -766,7 +768,7 @@ function EditorContent() {
           }
         }
       } catch (err) {
-        console.error('Failed to load prototype:', err);
+        canvasLogger.default.error('Failed to load prototype:', err);
       } finally {
         setLoading(false);
       }
@@ -795,7 +797,7 @@ function EditorContent() {
       versions.sort((a, b) => b.version - a.version);
       setVersionList(versions);
     } catch (err) {
-      console.error('Failed to load version history:', err);
+      canvasLogger.default.error('Failed to load version history:', err);
     } finally {
       setLoadingVersions(false);
     }
@@ -868,7 +870,7 @@ function EditorContent() {
 
         alert('回滚成功！');
       } catch (err) {
-        console.error('Failed to rollback:', err);
+        canvasLogger.default.error('Failed to rollback:', err);
         alert('回滚失败，请重试');
       } finally {
         setRollingBack(false);
@@ -901,7 +903,7 @@ function EditorContent() {
       await loadVersionHistory();
       alert('版本保存成功！');
     } catch (err) {
-      console.error('Failed to save version:', err);
+      canvasLogger.default.error('Failed to save version:', err);
       alert('保存失败，请重试');
     }
   }, [projectId, selectedPage, versionList.length, loadVersionHistory]);
@@ -992,7 +994,7 @@ function EditorContent() {
       setMessages((prev) => [...prev, assistantMessage]);
       setStreamingContent('');
     } catch (error) {
-      console.error('Chat API error:', error);
+      canvasLogger.default.error('Chat API error:', error);
       setIsStreaming(false);
       setStreamingContent('');
     }

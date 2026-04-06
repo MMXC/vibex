@@ -6,13 +6,15 @@
  * 遵守 AGENTS.md 规范：
  * - 组件接收 slice 相关 props，不直接访问多个 canvasStore slice
  * - 无 any 类型泄漏
- * - 无 console.log
+ * - 无 canvasLogger.default.debug
  */
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { Phase } from '@/lib/canvas/types';
 import styles from './PhaseIndicator.module.css';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 interface PhaseIndicatorProps {
   /** 当前阶段（从 contextStore 传入） */

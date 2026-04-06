@@ -14,12 +14,14 @@
  *
  * 遵守约束:
  * - 无 any 类型
- * - 无 console.log
+ * - 无 canvasLogger.default.debug
  * - 焦点在输入框时不触发画布快捷键（除 Esc 外）
  */
 'use client';
 
 import { useEffect } from 'react';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 interface KeyboardShortcutsOptions {
   /** Actions from useCanvasHistory */

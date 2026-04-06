@@ -16,7 +16,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAIService } from '@/services/ai-service';
 import { getLocalEnv as getCloudflareEnv } from '@/lib/env';
 import { generateId } from '@/lib/db';
-import { devDebug, sanitize } from '@/lib/log-sanitizer';
+import { devDebug, sanitize, safeError } from '@/lib/log-sanitizer';
 import { planAnalyzeSchema } from '@/schemas/security';
 import { parseBody } from '@/lib/high-risk-validation';
 
@@ -306,7 +306,7 @@ Respond ONLY with the JSON object, no other text.`;
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('[ERROR] Plan API - Analysis failed:', error);
+    safeError('[ERROR] Plan API - Analysis failed:', error);
 
     return NextResponse.json(
       {

@@ -1,13 +1,15 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // Storage version for migration
 const STORAGE_VERSION = 1;
 const STORAGE_KEY = 'vibex-homepage-session';
 
 // Dev-only logger
 const devLog = (...args: unknown[]) => {
-  if (process.env.NODE_ENV !== 'production') console.log('[homePageStore]', ...args);
+  if (process.env.NODE_ENV !== 'production') canvasLogger.default.debug('[homePageStore]', ...args);
 };
 
 // Step type - 4-step homepage flow (Epic 3)
@@ -271,7 +273,7 @@ export const useHomePageStore = create<HomePageState>()(
       version: STORAGE_VERSION,
       onRehydrateStorage: () => (state, error) => {
         if (error) {
-          console.error('Failed to rehydrate homePage store:', error);
+          canvasLogger.default.error('Failed to rehydrate homePage store:', error);
         } else if (state) {
           state.setHasHydrated(true);
         }

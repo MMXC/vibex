@@ -1,3 +1,4 @@
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 /**
  * RelationshipEdge — 自定义 ReactFlow 边组件
  *
@@ -54,7 +55,7 @@ const RelationshipEdgeComponent = (props: EdgeProps<RelationshipEdgeFull>) => {
   const handleClick = useCallback(
     (event: React.MouseEvent) => {
       event.stopPropagation();
-      console.debug('[RelationshipEdge] clicked:', id, relType);
+      canvasLogger.default.debug('[RelationshipEdge] clicked:', id, relType);
     },
     [id, relType]
   );

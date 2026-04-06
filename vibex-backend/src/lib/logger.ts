@@ -1,5 +1,7 @@
 import { Context, Next } from 'hono'
 
+import { devLog, safeError } from '@/lib/log-sanitizer';
+
 export interface RequestLog {
   method: string
   path: string
@@ -121,20 +123,20 @@ function log(level: LogLevel, entry: LogEntry): void {
     environment: process.env.NODE_ENV || 'development',
   }
 
-  // Use console.log for Cloudflare Workers compatibility
+  // Use devLog for Cloudflare Workers compatibility
   // In production, this can be replaced with a proper logging service
   switch (level) {
     case 'debug':
-      console.debug(JSON.stringify(logObject))
+      devLog(JSON.stringify(logObject))
       break
     case 'info':
-      console.log(JSON.stringify(logObject))
+      devLog(JSON.stringify(logObject))
       break
     case 'warn':
-      console.warn(JSON.stringify(logObject))
+      safeError(JSON.stringify(logObject))
       break
     case 'error':
-      console.error(JSON.stringify(logObject))
+      safeError(JSON.stringify(logObject))
       break
   }
 }

@@ -15,6 +15,8 @@ import { buildBoundedContextsPrompt } from '@/lib/prompts/bounded-contexts';
 import { filterInvalidContexts } from '@/lib/bounded-contexts-filter';
 import { canvasError, CanvasErrorCodes } from '../types';
 
+import { devLog, safeError } from '@/lib/log-sanitizer';
+
 interface BoundedContextResponse {
   id: string;
   name: string;
@@ -113,7 +115,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
         maxTokens: 3072,
       })
       .catch((err: Error) => {
-        console.error('[canvas/generate-contexts] AI service error:', err);
+        safeError('[canvas/generate-contexts] AI service error:', err);
         return { success: false, error: err.message, data: null as BoundedContextResponse[] | null, usage: null };
       });
 
@@ -148,13 +150,13 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       ? Math.max(0.5, Math.min(0.95, 1 - (result.usage.completionTokens / 4096)))
       : 0.7;
 
-    console.log(
+    devLog(
       `[canvas/generate-contexts] Generated ${contexts.length} contexts for project ${projectId ?? 'unknown'}`
     );
 
     return NextResponse.json({ success: true, contexts, generationId, confidence });
   } catch (err) {
-    console.error('[canvas/generate-contexts] Error:', err);
+    safeError('[canvas/generate-contexts] Error:', err);
     return NextResponse.json(
       { ...canvasError('服务器内部错误，请稍后重试', CanvasErrorCodes.INTERNAL_ERROR), contexts: [] as BoundedContextResponse[], generationId, confidence: 0 },
       { status: 500 }

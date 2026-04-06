@@ -9,6 +9,8 @@
 import { useEffect } from 'react';
 import { initWebVitals, getPerformanceSummary, type WebVitalsMetric } from '@/lib/web-vitals';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 /**
  * Web Vitals Hook 配置选项
  */
@@ -33,7 +35,7 @@ export interface UseWebVitalsOptions {
  * @example
  * ```tsx
  * const { metrics, isSupported } = useWebVitals({
- *   onReport: (metric) => console.log(metric)
+ *   onReport: (metric) => canvasLogger.default.debug(metric)
  * });
  * ```
  */
@@ -47,8 +49,8 @@ export function useWebVitals(options: UseWebVitalsOptions = {}) {
     initWebVitals();
     
     // 监听报告
-    const originalConsoleLog = console.log;
-    console.log = (...args) => {
+    const originalConsoleLog = canvasLogger.default.debug;
+    canvasLogger.default.debug = (...args) => {
       // 捕获 Web Vitals 日志
       if (args[0] && typeof args[0] === 'string' && args[0].startsWith('[Web Vitals]')) {
         const [, data] = args;
@@ -57,7 +59,7 @@ export function useWebVitals(options: UseWebVitalsOptions = {}) {
           if (thresholds) {
             const threshold = thresholds[data.name.toLowerCase() as keyof typeof thresholds];
             if (threshold && data.value > threshold) {
-              console.warn(`[Web Vitals] ${data.name} exceeded threshold: ${data.value} > ${threshold}`);
+              canvasLogger.default.warn(`[Web Vitals] ${data.name} exceeded threshold: ${data.value} > ${threshold}`);
             }
           }
           
@@ -71,7 +73,7 @@ export function useWebVitals(options: UseWebVitalsOptions = {}) {
     };
     
     return () => {
-      console.log = originalConsoleLog;
+      canvasLogger.default.debug = originalConsoleLog;
     };
   }, [report, onReport, thresholds]);
   

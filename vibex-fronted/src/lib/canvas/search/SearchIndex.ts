@@ -9,12 +9,14 @@
  *
  * 遵守约束:
  * - 无 any 类型
- * - 无 console.log
+ * - 无 canvasLogger.default.debug
  */
 'use client';
 
 import Fuse, { type FuseResultMatch, type IFuseOptions } from 'fuse.js';
 import type { TreeType, BoundedContextNode, BusinessFlowNode, ComponentNode, NodeStatus } from '@/lib/canvas/types';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 // =============================================================================
 // Types
@@ -127,7 +129,7 @@ export class SearchIndex {
     const elapsed = performance.now() - start;
     // 仅在超过 300ms 阈值时记录（实际应该远低于此）
     if (elapsed > 300) {
-      console.warn(`[SearchIndex] buildIndex took ${elapsed.toFixed(1)}ms, exceeding 300ms threshold`);
+      canvasLogger.default.warn(`[SearchIndex] buildIndex took ${elapsed.toFixed(1)}ms, exceeding 300ms threshold`);
     }
   }
 
@@ -149,7 +151,7 @@ export class SearchIndex {
 
     const elapsed = performance.now() - start;
     if (elapsed > 300) {
-      console.warn(`[SearchIndex] search took ${elapsed.toFixed(1)}ms, exceeding 300ms threshold`);
+      canvasLogger.default.warn(`[SearchIndex] search took ${elapsed.toFixed(1)}ms, exceeding 300ms threshold`);
     }
 
     return results;

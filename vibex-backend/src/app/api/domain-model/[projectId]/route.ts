@@ -12,6 +12,8 @@ import { generateClassDiagram, getDiagramMetadata, ClassDiagramOptions } from '@
 import { DomainEntity } from '@/services/domain-entities';
 import { EntityRelation } from '@/services/entity-relations';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 /**
  * GET /api/domain-model/:projectId
  * Generate class diagram for a project from provided entities
@@ -65,7 +67,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('Error generating class diagram:', error);
+    safeError('Error generating class diagram:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to generate class diagram', code: 'GENERATION_ERROR' },
       { status: 500 }
@@ -109,7 +111,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error generating class diagram:', error);
+    safeError('Error generating class diagram:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to generate class diagram', code: 'GENERATION_ERROR' },
       { status: 500 }

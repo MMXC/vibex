@@ -6,6 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ provider: string }> }
@@ -77,7 +79,7 @@ export async function GET(
       { status: 400 }
     );
   } catch (error) {
-    console.error('OAuth user info error:', error);
+    safeError('OAuth user info error:', error);
     return NextResponse.json(
       { error: 'Failed to get user info' },
       { status: 500 }

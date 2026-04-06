@@ -15,6 +15,8 @@
 
 import { Hono } from 'hono';
 import { Env } from '@/lib/db';
+import { safeError } from '@/lib/log-sanitizer';
+
 import {
   createAIService,
   UIGenerationResult,
@@ -133,7 +135,7 @@ uiGeneration.post('/', async (c) => {
     
     return c.json(response);
   } catch (error) {
-    console.error('UI Generation error:', error);
+    safeError('UI Generation error:', error);
     
     return c.json({
       success: false,

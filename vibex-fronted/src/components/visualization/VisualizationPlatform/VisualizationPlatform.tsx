@@ -20,6 +20,8 @@ import { FlowRenderer } from '../FlowRenderer';
 import type { FlowVisualizationRaw, VisualizationType } from '@/types/visualization';
 import styles from './VisualizationPlatform.module.css';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // Lazy-loaded renderers for code-splitting
 const LazyMermaidRenderer = React.lazy(
   () =>
@@ -148,7 +150,7 @@ export function VisualizationPlatform({
   useEffect(() => {
     const duration = Date.now() - startTime;
     if (duration > 500) {
-      console.warn(
+      canvasLogger.default.warn(
         `[VisualizationPlatform] Transition exceeded 500ms: ${duration}ms`
       );
     }
@@ -267,7 +269,7 @@ class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
-    console.error('[VisualizationPlatform] Render error:', error, info);
+    canvasLogger.default.error('[VisualizationPlatform] Render error:', error, info);
   }
 
   render() {

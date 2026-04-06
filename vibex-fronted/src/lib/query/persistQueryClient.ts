@@ -7,6 +7,8 @@
 
 import { PersistedClient, Persister } from '@tanstack/react-query-persist-client';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // localStorage 键名
 const STORAGE_KEY = 'vibex-query-cache';
 
@@ -22,7 +24,7 @@ export function createLocalStoragePersister(): Persister {
         const serialized = JSON.stringify(client);
         localStorage.setItem(STORAGE_KEY, serialized);
       } catch (error) {
-        console.error('Failed to persist query cache:', error);
+        canvasLogger.default.error('Failed to persist query cache:', error);
       }
     },
     restoreClient: async (): Promise<PersistedClient | undefined> => {
@@ -33,7 +35,7 @@ export function createLocalStoragePersister(): Persister {
         if (!serialized) return undefined;
         return JSON.parse(serialized);
       } catch (error) {
-        console.error('Failed to restore query cache:', error);
+        canvasLogger.default.error('Failed to restore query cache:', error);
         localStorage.removeItem(STORAGE_KEY);
         return undefined;
       }

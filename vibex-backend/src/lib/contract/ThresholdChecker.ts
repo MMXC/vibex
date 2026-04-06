@@ -15,6 +15,8 @@
 
 import { CoverageData } from './CoverageMonitor';
 
+import { devLog, safeError } from '@/lib/log-sanitizer';
+
 // 阈值配置
 export interface ThresholdConfig {
   lines?: number;
@@ -251,15 +253,15 @@ export class ThresholdChecker {
    */
   exitIfFailed(result: ThresholdCheckResult): void {
     if (!result.passed) {
-      console.error('\n❌ Coverage threshold check failed!\n');
-      console.error(result.summary);
+      safeError('\n❌ Coverage threshold check failed!\n');
+      safeError(result.summary);
       if (result.suggestion) {
-        console.error(`\n${result.suggestion}`);
+        safeError(`\n${result.suggestion}`);
       }
       process.exit(1);
     }
     
-    console.log('\n✅ Coverage threshold check passed!\n');
+    devLog('\n✅ Coverage threshold check passed!\n');
   }
 
   /**

@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const flows = new Hono<{ Bindings: Env }>();
 
 interface FlowRow {
@@ -32,7 +34,7 @@ flows.get('/', async (c) => {
 
     return c.json({ flows: flowsList });
   } catch (error) {
-    console.error('Error fetching flows:', error);
+    safeError('Error fetching flows:', error);
     return c.json({ error: 'Failed to fetch flows' }, 500);
   }
 });
@@ -65,7 +67,7 @@ flows.post('/', async (c) => {
 
     return c.json({ flow }, 201);
   } catch (error) {
-    console.error('Error creating flow:', error);
+    safeError('Error creating flow:', error);
     return c.json({ error: 'Failed to create flow' }, 500);
   }
 });

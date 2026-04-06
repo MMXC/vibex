@@ -14,6 +14,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { githubContentsParamsSchema } from '@/schemas/security';
 import { validateParams } from '@/lib/high-risk-validation';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 interface GitHubContentItem {
   name: string;
   path: string;
@@ -92,7 +94,7 @@ export async function GET(
       data: Array.isArray(data) ? result : result[0],
     });
   } catch (error) {
-    console.error('GitHub contents API error:', error);
+    safeError('GitHub contents API error:', error);
     return NextResponse.json(
       { success: false, message: 'Internal server error' },
       { status: 500 }

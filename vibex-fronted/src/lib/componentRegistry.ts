@@ -1,3 +1,4 @@
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 /**
  * Component Registry
  * 组件注册表 - 用于验证组件集成状态
@@ -81,12 +82,12 @@ export const componentRegistry = {
    */
   print(): void {
     if (process.env.NODE_ENV === 'production') return;
-    console.log('\n📦 Component Registry Status\n');
-    console.log('=' .repeat(50));
+    canvasLogger.default.debug('\n📦 Component Registry Status\n');
+    canvasLogger.default.debug('=' .repeat(50));
     
     const components = this.getAll();
     if (components.length === 0) {
-      console.log('No components registered yet.');
+      canvasLogger.default.debug('No components registered yet.');
       return;
     }
 
@@ -96,16 +97,16 @@ export const componentRegistry = {
       deprecated: components.filter(c => c.status === 'deprecated'),
     };
 
-    console.log(`\n✅ Integrated: ${byStatus.integrated.length}`);
-    byStatus.integrated.forEach(c => console.log(`   - ${c.name}`));
+    canvasLogger.default.debug(`\n✅ Integrated: ${byStatus.integrated.length}`);
+    byStatus.integrated.forEach(c => canvasLogger.default.debug(`   - ${c.name}`));
 
-    console.log(`\n⏳ Pending: ${byStatus.pending.length}`);
-    byStatus.pending.forEach(c => console.log(`   - ${c.name}`));
+    canvasLogger.default.debug(`\n⏳ Pending: ${byStatus.pending.length}`);
+    byStatus.pending.forEach(c => canvasLogger.default.debug(`   - ${c.name}`));
 
-    console.log(`\n⚠️  Deprecated: ${byStatus.deprecated.length}`);
-    byStatus.deprecated.forEach(c => console.log(`   - ${c.name}`));
+    canvasLogger.default.debug(`\n⚠️  Deprecated: ${byStatus.deprecated.length}`);
+    byStatus.deprecated.forEach(c => canvasLogger.default.debug(`   - ${c.name}`));
 
-    console.log('\n' + '=' .repeat(50) + '\n');
+    canvasLogger.default.debug('\n' + '=' .repeat(50) + '\n');
   }
 };
 

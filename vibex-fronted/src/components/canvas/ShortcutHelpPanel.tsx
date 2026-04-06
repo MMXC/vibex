@@ -6,13 +6,15 @@
  *
  * 遵守约束:
  * - 无 any 类型
- * - 无 console.log
+ * - 无 canvasLogger.default.debug
  */
 'use client';
 
 import React from 'react';
 import { Keyboard } from 'lucide-react';
 import styles from './canvas.module.css';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 interface ShortcutItem {
   /** 显示的快捷键（如 Ctrl+G） */

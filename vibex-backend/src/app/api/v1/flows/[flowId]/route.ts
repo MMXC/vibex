@@ -6,6 +6,8 @@ import { cuidSchema } from '@/schemas/common';
 import { ValidationError } from '@/lib/errors';
 import { errorToResponse } from '@/lib/errors';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const prisma = new PrismaClient();
 
 export async function GET(
@@ -66,7 +68,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('Get flow error:', error);
+    safeError('Get flow error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' },
       { status: 500 }
@@ -139,7 +141,7 @@ export async function PUT(
       },
     });
   } catch (error) {
-    console.error('Update flow error:', error);
+    safeError('Update flow error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' },
       { status: 500 }
@@ -194,7 +196,7 @@ export async function DELETE(
       data: { message: 'Flow deleted successfully' },
     });
   } catch (error) {
-    console.error('Delete flow error:', error);
+    safeError('Delete flow error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' },
       { status: 500 }

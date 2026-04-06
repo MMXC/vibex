@@ -11,6 +11,8 @@ import { cors } from 'hono/cors'
 import { z } from 'zod'
 import { generateId, Env, queryDB, queryOne, executeDB } from '@/lib/db'
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const templates = new Hono<{ Bindings: Env }>()
 
 // Enable CORS
@@ -161,7 +163,7 @@ templates.get('/', async (c) => {
       },
     })
   } catch (error) {
-    console.error('Error listing templates:', error)
+    safeError('Error listing templates:', error)
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to list templates',
@@ -244,7 +246,7 @@ templates.get('/:id', async (c) => {
       },
     })
   } catch (error) {
-    console.error('Error getting template:', error)
+    safeError('Error getting template:', error)
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to get template',
@@ -313,7 +315,7 @@ templates.post('/', async (c) => {
         details: error.errors,
       }, 400)
     }
-    console.error('Error creating template:', error)
+    safeError('Error creating template:', error)
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to create template',

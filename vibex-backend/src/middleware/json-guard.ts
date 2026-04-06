@@ -8,6 +8,8 @@
 import { Context, Next } from 'hono';
 import { JsonParseError } from '../lib/validation-error';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 /**
  * JSON Guard Middleware
  * 
@@ -41,7 +43,7 @@ export const jsonGuard = async (c: Context, next: Next): Promise<Response | void
     
     await next();
   } catch (error) {
-    console.error('[jsonGuard] Unexpected error:', error);
+    safeError('[jsonGuard] Unexpected error:', error);
     
     // Don't expose internal errors
     return c.json(

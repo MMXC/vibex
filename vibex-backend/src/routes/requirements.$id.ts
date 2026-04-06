@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const requirementId = new Hono<{ Bindings: Env }>();
 
 interface RequirementRow {
@@ -32,7 +34,7 @@ requirementId.get('/', async (c) => {
 
     return c.json({ requirement });
   } catch (error) {
-    console.error('Error fetching requirement:', error);
+    safeError('Error fetching requirement:', error);
     return c.json({ error: 'Failed to fetch requirement' }, 500);
   }
 });
@@ -86,7 +88,7 @@ requirementId.put('/', async (c) => {
 
     return c.json({ requirement });
   } catch (error) {
-    console.error('Error updating requirement:', error);
+    safeError('Error updating requirement:', error);
     return c.json({ error: 'Failed to update requirement' }, 500);
   }
 });
@@ -101,7 +103,7 @@ requirementId.delete('/', async (c) => {
 
     return c.json({ success: true });
   } catch (error) {
-    console.error('Error deleting requirement:', error);
+    safeError('Error deleting requirement:', error);
     return c.json({ error: 'Failed to delete requirement' }, 500);
   }
 });

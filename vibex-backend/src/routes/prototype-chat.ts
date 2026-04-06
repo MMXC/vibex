@@ -2,6 +2,8 @@ import { Hono } from 'hono';
 import { getAuthUserFromHono } from '@/lib/auth';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const prototypeChat = new Hono<{ Bindings: Env }>();
 
 interface ChatMessage {
@@ -153,7 +155,7 @@ prototypeChat.get('/', async (c) => {
 
     return c.json({ conversations: result });
   } catch (error) {
-    console.error('Error fetching prototype conversations:', error);
+    safeError('Error fetching prototype conversations:', error);
     return c.json({ error: 'Failed to fetch conversations' }, 500);
   }
 });
@@ -299,7 +301,7 @@ prototypeChat.post('/', async (c) => {
       },
     });
   } catch (error) {
-    console.error('Error in prototype chat:', error);
+    safeError('Error in prototype chat:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({ error: errorMessage }, 500);
   }
@@ -346,7 +348,7 @@ prototypeChat.get('/:id', async (c) => {
       },
     });
   } catch (error) {
-    console.error('Error fetching prototype conversation:', error);
+    safeError('Error fetching prototype conversation:', error);
     return c.json({ error: 'Failed to fetch conversation' }, 500);
   }
 });
@@ -384,7 +386,7 @@ prototypeChat.delete('/:id', async (c) => {
 
     return c.json({ success: true, message: 'Conversation deleted' });
   } catch (error) {
-    console.error('Error deleting prototype conversation:', error);
+    safeError('Error deleting prototype conversation:', error);
     return c.json({ error: 'Failed to delete conversation' }, 500);
   }
 });

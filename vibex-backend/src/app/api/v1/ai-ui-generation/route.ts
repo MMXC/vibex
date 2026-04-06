@@ -9,6 +9,8 @@
 
 import { NextRequest } from 'next/server';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 // MiniMax API configuration
 const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY || '';
 const MINIMAX_API_BASE = process.env.MINIMAX_API_BASE || 'https://api.minimax.chat/v1';
@@ -220,7 +222,7 @@ function parseAIResponse(content: string): UIGenerationResponse | null {
     }
     return null;
   } catch (error) {
-    console.error('Failed to parse AI response:', error);
+    safeError('Failed to parse AI response:', error);
     return null;
   }
 }

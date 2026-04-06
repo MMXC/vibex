@@ -8,6 +8,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { apiService } from '@/services/api';
 import { getAuthToken } from '@/lib/auth-token';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 export type GlobalRole = 'super_admin' | 'user' | 'guest';
 export type ProjectRole = 'owner' | 'admin' | 'editor' | 'viewer';
 export type UserRole = GlobalRole | ProjectRole;
@@ -184,7 +186,7 @@ export function usePermission(): UsePermissionReturn {
           );
         }
       } catch (error) {
-        console.error('Failed to get project role:', error);
+        canvasLogger.default.error('Failed to get project role:', error);
       }
       return false;
     },

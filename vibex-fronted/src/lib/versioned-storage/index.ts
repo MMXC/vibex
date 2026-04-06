@@ -5,6 +5,8 @@
 
 import type { StateCreator } from 'zustand';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 type Migration<V> = (state: V) => Partial<V>;
 
 export interface StorageConfig<V> {
@@ -49,7 +51,7 @@ const versionedStorageImpl: VersionedStorage = (config, initializer) =>
           set(migratedState as Parameters<typeof set>[0]);
         }
       } catch (e) {
-        console.error('Migration failed:', e);
+        canvasLogger.default.error('Migration failed:', e);
       }
     }
 

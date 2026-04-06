@@ -7,6 +7,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { Template } from '@/types/template';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 export const dynamic = 'force-dynamic';
 
 // In-memory template cache
@@ -27,7 +29,7 @@ async function loadTemplates(): Promise<Template[]> {
       const mod = await import(`@/data/templates/${file}`);
       templates.push(mod.default as Template);
     } catch (err) {
-      console.error(`Failed to load template ${file}:`, err);
+      safeError(`Failed to load template ${file}:`, err);
     }
   }
 
@@ -61,7 +63,7 @@ export async function GET(
       data: template,
     });
   } catch (error) {
-    console.error('Error getting template:', error);
+    safeError('Error getting template:', error);
     return NextResponse.json(
       {
         success: false,

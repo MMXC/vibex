@@ -21,6 +21,8 @@ import { useFlowStore } from '@/lib/canvas/stores/flowStore'
 import { useComponentStore } from '@/lib/canvas/stores/componentStore'
 import { canvasApi } from '@/lib/canvas/api/canvasApi'
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error' | 'conflict'
 
 // E1: Version tracking ref for optimistic locking
@@ -116,10 +118,10 @@ async function doSave(
       } catch {
         // ignore parse error
       }
-      console.warn('[useAutoSave] Version conflict detected:', err)
+      canvasLogger.default.warn('[useAutoSave] Version conflict detected:', err)
       throw Object.assign(err, { isConflict: true, serverSnapshot })
     }
-    console.error('[useAutoSave] Save failed:', err)
+    canvasLogger.default.error('[useAutoSave] Save failed:', err)
     throw err
   }
 }
@@ -297,7 +299,7 @@ export function useAutoSave(options: UseAutoSaveOptions): UseAutoSaveReturn {
       const blob = new Blob([payload], { type: 'application/json' })
       navigator.sendBeacon('/api/v1/canvas/snapshots', blob)
     } catch (err) {
-      console.error('[useAutoSave] Beacon save failed:', err)
+      canvasLogger.default.error('[useAutoSave] Beacon save failed:', err)
     }
   }, [projectId])
 
@@ -321,14 +323,14 @@ export function useAutoSave(options: UseAutoSaveOptions): UseAutoSaveReturn {
         if (!mountedRef.current) return
         // Remote version is newer than our last known version → conflict detected
         if (latestVersion > 0 && latestVersion > lastSnapshotVersionRef.current) {
-          console.info(
+          canvasLogger.default.info(
             `[useAutoSave] Remote version ${latestVersion} > local ${lastSnapshotVersionRef.current}, conflict detected`
           )
           setSaveStatus('conflict')
         }
       } catch (err) {
         // Polling error — log and continue, don't disrupt user
-        console.warn('[useAutoSave] Version polling failed:', err)
+        canvasLogger.default.warn('[useAutoSave] Version polling failed:', err)
       }
     }
 

@@ -11,6 +11,8 @@ import { Hono } from 'hono';
 import { queryOne, queryDB, executeDB, generateId, Env } from '@/lib/db';
 import { createAIService } from '@/services/ai-service';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const domainModels = new Hono<{ Bindings: Env }>();
 
 // ==================== Types ====================
@@ -138,7 +140,7 @@ function parseDomainModelResponse(content: string): { entities: ExtractedEntity[
     // Try to extract JSON from the response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error('No JSON found in response');
+      safeError('No JSON found in response');
       return null;
     }
     
@@ -146,7 +148,7 @@ function parseDomainModelResponse(content: string): { entities: ExtractedEntity[
     
     // Validate required fields
     if (!Array.isArray(parsed.entities)) {
-      console.error('Invalid response: missing entities array');
+      safeError('Invalid response: missing entities array');
       return null;
     }
     
@@ -155,7 +157,7 @@ function parseDomainModelResponse(content: string): { entities: ExtractedEntity[
       relations: parsed.relations || [],
     };
   } catch (error) {
-    console.error('Failed to parse domain model response:', error);
+    safeError('Failed to parse domain model response:', error);
     return null;
   }
 }
@@ -339,12 +341,12 @@ Extract all relevant domain entities and their relationships. Think about the co
         const targetId = entityNameToId.get(relation.targetEntity.toLowerCase());
 
         if (!sourceId || !targetId) {
-          console.warn(`Skipping relation: entity not found (${relation.sourceEntity} -> ${relation.targetEntity})`);
+          safeError(`Skipping relation: entity not found (${relation.sourceEntity} -> ${relation.targetEntity})`);
           continue;
         }
 
         if (sourceId === targetId) {
-          console.warn(`Skipping self-referencing relation: ${relation.sourceEntity}`);
+          safeError(`Skipping self-referencing relation: ${relation.sourceEntity}`);
           continue;
         }
 
@@ -396,7 +398,7 @@ Extract all relevant domain entities and their relationships. Think about the co
     }, 200);
 
   } catch (error) {
-    console.error('Error generating domain model:', error);
+    safeError('Error generating domain model:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({ 
       error: 'Failed to generate domain model', 
@@ -481,7 +483,7 @@ domainModels.get('/', async (c) => {
     }, 200);
 
   } catch (error) {
-    console.error('Error fetching domain model:', error);
+    safeError('Error fetching domain model:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({ 
       error: 'Failed to fetch domain model', 

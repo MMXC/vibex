@@ -10,6 +10,8 @@ import { configureAxiosRetry } from './api-retry';
 import { CircuitBreakerManager } from './circuit-breaker';
 import { API_CONFIG } from './api-config';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // 客户端配置
 export interface ResilientClientConfig {
   baseURL?: string;
@@ -71,7 +73,7 @@ export function createResilientClient(config: ResilientClientConfig = {}): Axios
       retryDelay: config.retry?.retryDelay ?? 1000,
       maxRetryDelay: config.retry?.maxRetryDelay ?? 10000,
       onRetry: (retryCount, error) => {
-        console.warn(`[API Retry] Attempt ${retryCount} for ${error.config?.url}`, error.message);
+        canvasLogger.default.warn(`[API Retry] Attempt ${retryCount} for ${error.config?.url}`, error.message);
       },
     });
   }

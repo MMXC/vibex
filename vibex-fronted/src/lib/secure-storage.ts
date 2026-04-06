@@ -1,3 +1,4 @@
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 /**
  * Secure Storage Utility
  * 
@@ -112,7 +113,7 @@ export async function decryptValue(encrypted: string): Promise<string> {
   } catch (err) {
     // Decryption failed - key mismatch or corrupted data
     if (process.env.NODE_ENV !== 'production') {
-      console.error('[SecureStorage] Decryption failed:', err);
+      canvasLogger.default.error('[SecureStorage] Decryption failed:', err);
     }
     return '';
   }
@@ -154,7 +155,7 @@ export async function secureGetObject<T = unknown>(key: string): Promise<T | nul
     return JSON.parse(value) as T;
   } catch (err) {
     if (process.env.NODE_ENV !== 'production') {
-      console.error('[SecureStorage] JSON parse failed:', err);
+      canvasLogger.default.error('[SecureStorage] JSON parse failed:', err);
     }
     return null;
   }

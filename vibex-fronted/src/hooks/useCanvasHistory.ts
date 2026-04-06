@@ -6,7 +6,7 @@
  *
  * 遵守约束:
  * - 无 any 类型
- * - 无 console.log
+ * - 无 canvasLogger.default.debug
  * - 性能红线: undo/redo < 50ms
  */
 'use client';
@@ -17,6 +17,8 @@ import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { useHistoryStore, getHistoryStore } from '@/lib/canvas/historySlice';
 import type { TreeType, BoundedContextNode, BusinessFlowNode, ComponentNode } from '@/lib/canvas/types';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 const THROTTLE_MS = 300;
 

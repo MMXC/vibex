@@ -13,6 +13,14 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  // Disallow console.log/error/warn/info in production code.
+  // Use devLog() / safeError() from @/lib/log-sanitizer instead.
+  {
+    rules: {
+      // Allow console.log in log-sanitizer (it IS the logging utility)
+      "no-console": ["error", { allow: ["warn", "error", "log"] }],
+    },
+  },
 ]);
 
 export default eslintConfig;

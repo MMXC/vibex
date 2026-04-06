@@ -8,6 +8,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { Template, Industry } from '@/types/template';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 // In-memory template cache loaded from JSON files
 let templateCache: Template[] | null = null;
 
@@ -26,7 +28,7 @@ async function loadTemplates(): Promise<Template[]> {
       const mod = await import(`@/data/templates/${file}`);
       templates.push(mod.default as Template);
     } catch (err) {
-      console.error(`Failed to load template ${file}:`, err);
+      safeError(`Failed to load template ${file}:`, err);
     }
   }
 
@@ -55,7 +57,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error listing templates:', error);
+    safeError('Error listing templates:', error);
     return NextResponse.json(
       {
         success: false,

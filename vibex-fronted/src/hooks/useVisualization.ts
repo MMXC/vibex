@@ -22,6 +22,8 @@ import type {
 } from '@/types/visualization';
 import { useVisualizationStore } from '@/stores/visualizationStore';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // ==================== Return Type ====================
 
 export interface UseVisualizationReturn {
@@ -72,7 +74,7 @@ export interface UseVisualizationReturn {
  * @example
  * ```tsx
  * const viz = useVisualization();
- * console.log(viz.currentType); // 'flow' | 'mermaid' | 'json'
+ * canvasLogger.default.debug(viz.currentType); // 'flow' | 'mermaid' | 'json'
  * return <button onClick={() => viz.switchType('mermaid')}>Switch</button>;
  * ```
  */

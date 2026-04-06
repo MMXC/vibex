@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const flowData = new Hono<{ Bindings: Env }>();
 
 interface FlowDataRow {
@@ -49,7 +51,7 @@ flowData.get('/', async (c) => {
 
     return c.json({ flowDataList: flowsList });
   } catch (error) {
-    console.error('Error fetching flow data:', error);
+    safeError('Error fetching flow data:', error);
     return c.json({ error: 'Failed to fetch flow data' }, 500);
   }
 });
@@ -82,7 +84,7 @@ flowData.post('/', async (c) => {
 
     return c.json({ flowData: flow }, 201);
   } catch (error) {
-    console.error('Error creating flow data:', error);
+    safeError('Error creating flow data:', error);
     return c.json({ error: 'Failed to create flow data' }, 500);
   }
 });
@@ -105,7 +107,7 @@ flowData.get('/:id', async (c) => {
 
     return c.json({ flowData: flow });
   } catch (error) {
-    console.error('Error fetching flow data:', error);
+    safeError('Error fetching flow data:', error);
     return c.json({ error: 'Failed to fetch flow data' }, 500);
   }
 });
@@ -166,7 +168,7 @@ flowData.put('/:id', async (c) => {
 
     return c.json({ flowData: flow });
   } catch (error) {
-    console.error('Error updating flow data:', error);
+    safeError('Error updating flow data:', error);
     return c.json({ error: 'Failed to update flow data' }, 500);
   }
 });
@@ -192,7 +194,7 @@ flowData.delete('/:id', async (c) => {
 
     return c.json({ success: true, message: 'Flow data deleted successfully' });
   } catch (error) {
-    console.error('Error deleting flow data:', error);
+    safeError('Error deleting flow data:', error);
     return c.json({ error: 'Failed to delete flow data' }, 500);
   }
 });

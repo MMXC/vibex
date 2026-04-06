@@ -6,11 +6,13 @@
 
 /** Dev-only logger */
 const devLog = (...args: unknown[]) => {
-  if (process.env.NODE_ENV !== 'production') console.log(...args);
+  if (process.env.NODE_ENV !== 'production') canvasLogger.default.debug(...args);
 };
 
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { create } from 'zustand';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 // 离线数据存储键
 const OFFLINE_DATA_KEY = 'vibex_offline_data';
@@ -220,7 +222,7 @@ export async function getRecommendationsWithFallback(
     
     return { ...result, isFallback: false };
   } catch (error) {
-    console.error('[Fallback] Online recommendation failed:', error);
+    canvasLogger.default.error('[Fallback] Online recommendation failed:', error);
     
     // 降级到离线模式
     return {

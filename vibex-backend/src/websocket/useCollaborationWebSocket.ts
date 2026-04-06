@@ -11,6 +11,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 
+import { devLog, safeError } from '@/lib/log-sanitizer';
+
 export interface UseWebSocketOptions {
   projectId: string;
   userId: string;
@@ -81,7 +83,7 @@ export function useCollaborationWebSocket(options: UseWebSocketOptions) {
     const ws = new WebSocket(wsUrl);
     
     ws.onopen = () => {
-      console.log('WebSocket connected');
+      devLog('WebSocket connected');
       setIsConnected(true);
       reconnectAttempts.current = 0;
       onConnect?.();
@@ -129,12 +131,12 @@ export function useCollaborationWebSocket(options: UseWebSocketOptions) {
             onMessage?.(message);
         }
       } catch (error) {
-        console.error('Failed to parse message:', error);
+        safeError('Failed to parse message:', error);
       }
     };
     
     ws.onclose = () => {
-      console.log('WebSocket disconnected');
+      devLog('WebSocket disconnected');
       setIsConnected(false);
       onDisconnect?.();
       
@@ -146,7 +148,7 @@ export function useCollaborationWebSocket(options: UseWebSocketOptions) {
     };
     
     ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
+      safeError('WebSocket error:', error);
     };
     
     wsRef.current = ws;

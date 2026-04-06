@@ -13,6 +13,8 @@ import { Hono } from 'hono';
 import { queryOne, queryDB, executeDB, generateId, Env } from '@/lib/db';
 import { createLLMService, LLMService, ChatMessage } from '@/services/llm';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const requirementsAnalysis = new Hono<{ Bindings: Env }>();
 
 // ==================== Types ====================
@@ -145,7 +147,7 @@ function parseAnalysisResponse(content: string): AnalysisResult | null {
       notes: parsed.notes,
     };
   } catch (error) {
-    console.error('Failed to parse analysis response:', error);
+    safeError('Failed to parse analysis response:', error);
     return null;
   }
 }
@@ -205,12 +207,12 @@ async function createEntityRelations(
     const targetId = entityNameToId.get(relation.targetEntity.toLowerCase());
 
     if (!sourceId || !targetId) {
-      console.warn(`Skipping relation: entity not found (${relation.sourceEntity} -> ${relation.targetEntity})`);
+      safeError(`Skipping relation: entity not found (${relation.sourceEntity} -> ${relation.targetEntity})`);
       continue;
     }
 
     if (sourceId === targetId) {
-      console.warn(`Skipping self-referencing relation: ${relation.sourceEntity}`);
+      safeError(`Skipping self-referencing relation: ${relation.sourceEntity}`);
       continue;
     }
 
@@ -431,7 +433,7 @@ Extract all domain entities, their relationships, and provide a structured analy
     }
 
   } catch (error) {
-    console.error('Error analyzing requirement:', error);
+    safeError('Error analyzing requirement:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({ 
       error: 'Failed to analyze requirement', 
@@ -635,7 +637,7 @@ Extract all domain entities, their relationships, and provide a structured analy
     }, 200);
 
   } catch (error) {
-    console.error('Error in batch analysis:', error);
+    safeError('Error in batch analysis:', error);
     return c.json({ error: 'Failed to perform batch analysis' }, 500);
   }
 });
@@ -704,7 +706,7 @@ requirementsAnalysis.get('/:requirementId', async (c) => {
     }, 200);
 
   } catch (error) {
-    console.error('Error fetching analysis:', error);
+    safeError('Error fetching analysis:', error);
     return c.json({ error: 'Failed to fetch analysis' }, 500);
   }
 });
@@ -748,7 +750,7 @@ requirementsAnalysis.delete('/:requirementId', async (c) => {
     }, 200);
 
   } catch (error) {
-    console.error('Error deleting analysis:', error);
+    safeError('Error deleting analysis:', error);
     return c.json({ error: 'Failed to delete analysis' }, 500);
   }
 });

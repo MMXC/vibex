@@ -10,7 +10,7 @@
  * 遵守约束:
  * - React.memo for performance
  * - 无 any 类型
- * - 无 console.log
+ * - 无 canvasLogger.default.debug
  */
 
 import React, { memo, useCallback } from 'react';
@@ -20,6 +20,8 @@ import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import type { BoundedContextNode, BusinessFlowNode, ComponentNode } from '@/lib/canvas/types';
 import styles from './UndoBar.module.css';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 export const UndoBar = memo(function UndoBar() {
   // === History state selectors ===

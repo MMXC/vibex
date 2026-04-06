@@ -1,3 +1,4 @@
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 /**
  * SessionStorage Adapter for DDD Cross-Page State Persistence
  * 
@@ -82,7 +83,7 @@ export function persistSnapshot(state: PersistedDDDState): void {
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(snapshot));
   } catch (err) {
     // sessionStorage full or unavailable — fail silently
-    console.warn('[dddStateSync] sessionStorage write failed:', err);
+    canvasLogger.default.warn('[dddStateSync] sessionStorage write failed:', err);
   }
 }
 

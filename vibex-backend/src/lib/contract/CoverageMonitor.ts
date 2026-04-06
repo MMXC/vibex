@@ -5,6 +5,8 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
+import { devLog } from '@/lib/log-sanitizer';
+
 export interface CoverageData {
   lines: CoverageMetric;
   statements: CoverageMetric;
@@ -162,11 +164,11 @@ export class CoverageMonitor {
   }
 
   outputForCI(report: CoverageReport): void {
-    console.log('\nCoverage Report: ' + report.project);
+    devLog('\nCoverage Report: ' + report.project);
     for (const detail of report.details) {
-      console.log('  ' + detail);
+      devLog('  ' + detail);
     }
-    console.log('\n' + (report.passed ? 'Coverage check passed!' : 'Coverage below threshold!') + '\n');
+    devLog('\n' + (report.passed ? 'Coverage check passed!' : 'Coverage below threshold!') + '\n');
     if (!report.passed) process.exit(1);
   }
 }

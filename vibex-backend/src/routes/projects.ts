@@ -3,6 +3,8 @@ import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 import { withValidation, ValidatedContext } from '@/lib/api-validation';
 import { createProjectSchema, updateProjectSchema } from '@/schemas/project';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const projects = new Hono<{ Bindings: Env }>();
 
 // ==================== Types ====================
@@ -55,7 +57,7 @@ projects.get('/', async (c) => {
 
     return c.json({ projects: projectsList });
   } catch (error) {
-    console.error('Error fetching projects:', error);
+    safeError('Error fetching projects:', error);
     return c.json({ error: 'Failed to fetch projects' }, 500);
   }
 });
@@ -79,7 +81,7 @@ projects.get('/trash', async (c) => {
 
     return c.json({ projects: projectsList });
   } catch (error) {
-    console.error('Error fetching trash:', error);
+    safeError('Error fetching trash:', error);
     return c.json({ error: 'Failed to fetch trash' }, 500);
   }
 });
@@ -123,7 +125,7 @@ projects.post('/',
 
       return c.json({ project }, 201);
     } catch (error) {
-      console.error('Error creating project:', error);
+      safeError('Error creating project:', error);
       return c.json({ error: 'Failed to create project' }, 500);
     }
   })
@@ -209,7 +211,7 @@ projects.put('/:id',
 
       return c.json({ project: updated });
     } catch (error) {
-      console.error('Error updating project:', error);
+      safeError('Error updating project:', error);
       return c.json({ error: 'Failed to update project' }, 500);
     }
   })
@@ -247,7 +249,7 @@ projects.delete('/:id', async (c) => {
 
     return c.json({ success: true, message: 'Project moved to trash' });
   } catch (error) {
-    console.error('Error deleting project:', error);
+    safeError('Error deleting project:', error);
     return c.json({ error: 'Failed to delete project' }, 500);
   }
 });

@@ -3,6 +3,8 @@
 import React, { Component, ReactNode } from 'react';
 import styles from './ErrorBoundary.module.css';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 export interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode;
@@ -26,7 +28,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    canvasLogger.default.error('ErrorBoundary caught an error:', error, errorInfo);
     this.props.onError?.(error, errorInfo);
   }
 

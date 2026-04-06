@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const entityRelationId = new Hono<{ Bindings: Env }>();
 
 interface EntityRelationRow {
@@ -30,7 +32,7 @@ entityRelationId.get('/', async (c) => {
 
     return c.json({ entityRelation: relation });
   } catch (error) {
-    console.error('Error fetching entity relation:', error);
+    safeError('Error fetching entity relation:', error);
     return c.json({ error: 'Failed to fetch entity relation' }, 500);
   }
 });
@@ -81,7 +83,7 @@ entityRelationId.put('/', async (c) => {
 
     return c.json({ entityRelation: relation });
   } catch (error) {
-    console.error('Error updating entity relation:', error);
+    safeError('Error updating entity relation:', error);
     return c.json({ error: 'Failed to update entity relation' }, 500);
   }
 });
@@ -96,7 +98,7 @@ entityRelationId.delete('/', async (c) => {
 
     return c.json({ success: true });
   } catch (error) {
-    console.error('Error deleting entity relation:', error);
+    safeError('Error deleting entity relation:', error);
     return c.json({ error: 'Failed to delete entity relation' }, 500);
   }
 });

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import styles from './MessageItem.module.css';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 export interface MessageItemProps {
   id: string;
   role: 'user' | 'assistant' | 'system';
@@ -40,7 +42,7 @@ export default function MessageItem({
         onCopy(content);
       }
     } catch (err) {
-      console.error('Failed to copy:', err);
+      canvasLogger.default.error('Failed to copy:', err);
     }
   };
 
@@ -55,7 +57,7 @@ export default function MessageItem({
           onShare(content);
         }
       } catch (err) {
-        console.error('Share failed:', err);
+        canvasLogger.default.error('Share failed:', err);
       }
     } else {
       // Fallback to copy

@@ -10,6 +10,8 @@
 
 import type { Node, Edge } from '@xyflow/react';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 /**
  * Layout direction
  */
@@ -324,7 +326,7 @@ export function autoLayout(
   
   // Validate inputs
   if (!Array.isArray(nodes) || !Array.isArray(edges)) {
-    console.warn('[flow-layout] Invalid nodes or edges array');
+    canvasLogger.default.warn('[flow-layout] Invalid nodes or edges array');
     return nodes;
   }
   

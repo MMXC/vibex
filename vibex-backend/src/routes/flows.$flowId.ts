@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const flowId = new Hono<{ Bindings: Env }>();
 
 interface FlowRow {
@@ -31,7 +33,7 @@ flowId.get('/', async (c) => {
 
     return c.json({ flow });
   } catch (error) {
-    console.error('Error fetching flow:', error);
+    safeError('Error fetching flow:', error);
     return c.json({ error: 'Failed to fetch flow' }, 500);
   }
 });
@@ -81,7 +83,7 @@ flowId.put('/', async (c) => {
 
     return c.json({ flow });
   } catch (error) {
-    console.error('Error updating flow:', error);
+    safeError('Error updating flow:', error);
     return c.json({ error: 'Failed to update flow' }, 500);
   }
 });
@@ -96,7 +98,7 @@ flowId.delete('/', async (c) => {
 
     return c.json({ success: true });
   } catch (error) {
-    console.error('Error deleting flow:', error);
+    safeError('Error deleting flow:', error);
     return c.json({ error: 'Failed to delete flow' }, 500);
   }
 });

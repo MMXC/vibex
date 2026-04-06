@@ -12,6 +12,8 @@ import { z } from 'zod'
 import { generateId, Env, executeDB, queryDB, queryOne } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const uiNodes = new Hono<{ Bindings: Env }>()
 
 // Enable CORS
@@ -202,7 +204,7 @@ ${requirement}
 
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : '未知错误'
-          console.error('[UINodes Generate] Error:', errorMessage)
+          safeError('[UINodes Generate] Error:', errorMessage)
           send('error', { message: errorMessage, code: 'UI_NODES_ERROR' })
         }
 
@@ -218,7 +220,7 @@ ${requirement}
       },
     })
   } catch (error) {
-    console.error('Error setting up ui-nodes stream:', error)
+    safeError('Error setting up ui-nodes stream:', error)
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to setup stream',
@@ -269,7 +271,7 @@ uiNodes.get('/', async (c) => {
       },
     })
   } catch (error) {
-    console.error('Error getting ui-nodes:', error)
+    safeError('Error getting ui-nodes:', error)
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to get ui-nodes',
@@ -325,7 +327,7 @@ uiNodes.put('/', async (c) => {
       data: { id, name, description, checked, priority, annotations },
     })
   } catch (error) {
-    console.error('Error updating ui-node:', error)
+    safeError('Error updating ui-node:', error)
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to update ui-node',

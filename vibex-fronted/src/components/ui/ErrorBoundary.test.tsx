@@ -1,5 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 import {
   ErrorBoundary,
   withErrorBoundary,
@@ -15,13 +17,13 @@ const BuggyComponent = ({ shouldThrow = true }: { shouldThrow?: boolean }) => {
 };
 
 describe('ErrorBoundary', () => {
-  // Suppress console.error for error boundary tests
-  const originalError = console.error;
+  // Suppress canvasLogger.default.error for error boundary tests
+  const originalError = canvasLogger.default.error;
   beforeEach(() => {
-    console.error = vi.fn();
+    canvasLogger.default.error = vi.fn();
   });
   afterEach(() => {
-    console.error = originalError;
+    canvasLogger.default.error = originalError;
   });
 
   describe('ErrorBoundary rendering', () => {

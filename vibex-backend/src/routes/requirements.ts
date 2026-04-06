@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const requirements = new Hono<{ Bindings: Env }>();
 
 interface RequirementRow {
@@ -33,7 +35,7 @@ requirements.get('/', async (c) => {
 
     return c.json({ requirements: requirementsList });
   } catch (error) {
-    console.error('Error fetching requirements:', error);
+    safeError('Error fetching requirements:', error);
     return c.json({ error: 'Failed to fetch requirements' }, 500);
   }
 });
@@ -66,7 +68,7 @@ requirements.post('/', async (c) => {
 
     return c.json({ requirement }, 201);
   } catch (error) {
-    console.error('Error creating requirement:', error);
+    safeError('Error creating requirement:', error);
     return c.json({ error: 'Failed to create requirement' }, 500);
   }
 });

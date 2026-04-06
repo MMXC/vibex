@@ -9,13 +9,15 @@
  *
  * Constraints:
  * - No any types
- * - No console.log
+ * - No canvasLogger.default.debug
  * - No custom canvas.getContext rendering
  */
 
 import JSZip from 'jszip';
 import { toPng, toSvg } from 'html-to-image';
 import type { BoundedContextNode, BusinessFlowNode, ComponentNode } from '@/lib/canvas/types';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 export type BatchFormat = 'png' | 'svg';
 
@@ -232,7 +234,7 @@ export class ZipExporter {
    * const blob = await exporter.exportZip({
    *   format: 'png',
    *   scope: 'all',
-   *   onProgress: (cur, total, node) => console.log(`${cur}/${total}: ${node.name}`),
+   *   onProgress: (cur, total, node) => canvasLogger.default.debug(`${cur}/${total}: ${node.name}`),
    * });
    */
   async exportZip(

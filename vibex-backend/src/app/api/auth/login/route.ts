@@ -4,6 +4,8 @@ import { PrismaClient } from '@prisma/client';
 import { verifyPassword, generateToken } from '@/lib/auth';
 import { getEnv } from '@/lib/env';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
@@ -69,7 +71,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Login error:', error);
+    safeError('Login error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' },
       { status: 500 }

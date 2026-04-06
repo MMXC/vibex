@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const pageId = new Hono<{ Bindings: Env }>();
 
 interface PageRow {
@@ -30,7 +32,7 @@ pageId.get('/', async (c) => {
 
     return c.json({ page });
   } catch (error) {
-    console.error('Error fetching page:', error);
+    safeError('Error fetching page:', error);
     return c.json({ error: 'Failed to fetch page' }, 500);
   }
 });
@@ -76,7 +78,7 @@ pageId.put('/', async (c) => {
 
     return c.json({ page });
   } catch (error) {
-    console.error('Error updating page:', error);
+    safeError('Error updating page:', error);
     return c.json({ error: 'Failed to update page' }, 500);
   }
 });
@@ -91,7 +93,7 @@ pageId.delete('/', async (c) => {
 
     return c.json({ success: true });
   } catch (error) {
-    console.error('Error deleting page:', error);
+    safeError('Error deleting page:', error);
     return c.json({ error: 'Failed to delete page' }, 500);
   }
 });

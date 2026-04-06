@@ -16,7 +16,7 @@
  * 遵守 AGENTS.md 规范：
  * - 组件接收 slice 相关 props，不直接访问多个 canvasStore slice
  * - 无 any 类型泄漏
- * - 无 console.log
+ * - 无 canvasLogger.default.debug
  */
 'use client';
 import { canvasLogger } from '@/lib/canvas/canvasLogger';

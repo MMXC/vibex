@@ -1,6 +1,8 @@
 import { Context, Next } from 'hono';
 import { devDebug } from './log-sanitizer';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 /**
  * Cache configuration options
  */
@@ -490,7 +492,7 @@ export function cache(options: Partial<CacheOptions> = {}) {
 
     } catch (error) {
       // Failed to cache response - continue without caching
-      console.error('Cache: Failed to cache response', error);
+      safeError('Cache: Failed to cache response', error);
     }
   };
 }

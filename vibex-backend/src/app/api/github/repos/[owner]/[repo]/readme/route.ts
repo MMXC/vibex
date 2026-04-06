@@ -14,6 +14,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { githubRepoParamsSchema } from '@/schemas/security';
 import { validateParams } from '@/lib/high-risk-validation';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 interface GitHubContentResponse {
   name: string;
   path: string;
@@ -77,7 +79,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('GitHub README API error:', error);
+    safeError('GitHub README API error:', error);
     return NextResponse.json(
       { success: false, message: 'Internal server error' },
       { status: 500 }

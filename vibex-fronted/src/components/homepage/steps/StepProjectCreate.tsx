@@ -8,6 +8,8 @@ import { useAuthStore } from '@/stores/authStore';
 import { projectApi } from '@/services/api';
 import type { StepComponentProps } from './types';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // Union type for BusinessFlow compatibility
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyBusinessFlow = any;
@@ -52,7 +54,7 @@ export function StepProjectCreate({ onNavigate, isActive }: StepComponentProps) 
       // Set created project ID
       setCreatedProjectId(result.id);
     } catch (err) {
-      console.error('Failed to create project:', err);
+      canvasLogger.default.error('Failed to create project:', err);
       setError(err instanceof Error ? err.message : 'Failed to create project');
     } finally {
       setIsCreating(false);

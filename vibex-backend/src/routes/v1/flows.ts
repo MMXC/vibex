@@ -16,6 +16,8 @@
 import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const flows = new Hono<{ Bindings: Env }>();
 
 // ============================================================
@@ -103,7 +105,7 @@ flows.get('/', async (c) => {
       },
     });
   } catch (err) {
-    console.error('[flows] GET error:', err);
+    safeError('[flows] GET error:', err);
     return c.json(
       { success: false, error: 'Failed to fetch flows', code: 'FETCH_ERROR', statusCode: 500 },
       500
@@ -147,7 +149,7 @@ flows.post('/', async (c) => {
       201
     );
   } catch (err) {
-    console.error('[flows] POST error:', err);
+    safeError('[flows] POST error:', err);
     return c.json(
       { success: false, error: 'Failed to create flow', code: 'CREATE_ERROR', statusCode: 500 },
       500
@@ -175,7 +177,7 @@ flows.get('/:id', async (c) => {
 
     return c.json({ success: true, data: parseFlowRow(row) });
   } catch (err) {
-    console.error('[flows] GET/:id error:', err);
+    safeError('[flows] GET/:id error:', err);
     return c.json(
       { success: false, error: 'Failed to fetch flow', code: 'FETCH_ERROR', statusCode: 500 },
       500
@@ -235,7 +237,7 @@ flows.put('/:id', async (c) => {
 
     return c.json({ success: true, data: updated ? parseFlowRow(updated) : null });
   } catch (err) {
-    console.error('[flows] PUT error:', err);
+    safeError('[flows] PUT error:', err);
     return c.json(
       { success: false, error: 'Failed to update flow', code: 'UPDATE_ERROR', statusCode: 500 },
       500
@@ -264,7 +266,7 @@ flows.delete('/:id', async (c) => {
 
     return c.json({ success: true });
   } catch (err) {
-    console.error('[flows] DELETE error:', err);
+    safeError('[flows] DELETE error:', err);
     return c.json(
       { success: false, error: 'Failed to delete flow', code: 'DELETE_ERROR', statusCode: 500 },
       500

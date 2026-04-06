@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 export const dynamic = 'force-dynamic';
 
 // GET /api/prototype-snapshots/[id] - Get a single snapshot
@@ -24,7 +26,7 @@ export async function GET(
 
     return NextResponse.json({ prototypeSnapshot: snapshot });
   } catch (error) {
-    console.error('Error fetching prototype snapshot:', error);
+    safeError('Error fetching prototype snapshot:', error);
     return NextResponse.json(
       { error: 'Failed to fetch prototype snapshot' },
       { status: 500 }
@@ -54,7 +56,7 @@ export async function PUT(
 
     return NextResponse.json({ prototypeSnapshot: snapshot });
   } catch (error) {
-    console.error('Error updating prototype snapshot:', error);
+    safeError('Error updating prototype snapshot:', error);
     return NextResponse.json(
       { error: 'Failed to update prototype snapshot' },
       { status: 500 }
@@ -76,7 +78,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting prototype snapshot:', error);
+    safeError('Error deleting prototype snapshot:', error);
     return NextResponse.json(
       { error: 'Failed to delete prototype snapshot' },
       { status: 500 }

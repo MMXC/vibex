@@ -11,6 +11,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getLocalEnv } from '@/lib/env';
 import { queryOne } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 export const dynamic = 'force-dynamic';
 
 interface RequirementRow {
@@ -73,7 +75,7 @@ export async function GET(
 
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-    console.error('[Requirements Clarifications] Error:', errorMessage);
+    safeError('[Requirements Clarifications] Error:', errorMessage);
     return NextResponse.json(
       { error: `Failed to fetch clarifications: ${errorMessage}` },
       { status: 500 }

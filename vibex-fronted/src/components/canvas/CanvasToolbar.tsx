@@ -5,7 +5,7 @@
  *
  * 遵守约束:
  * - 无 any 类型
- * - 无 console.log
+ * - 无 canvasLogger.default.debug
  */
 'use client';
 
@@ -13,6 +13,8 @@ import React from 'react';
 import { Undo2, Redo2 } from 'lucide-react';
 import { useHistoryStore } from '@/lib/canvas/historySlice';
 import styles from './canvas.module.css';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 interface UndoRedoButtonsProps {
   /** Callback when undo is triggered */

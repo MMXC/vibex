@@ -17,6 +17,8 @@
 import { Hono } from 'hono';
 import { queryOne, queryDB, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const aiUIGeneration = new Hono<{ Bindings: Env }>();
 
 // ==================== Types ====================
@@ -245,7 +247,7 @@ function parseAIResponse(content: string): UIGenerationResponse | null {
     }
     return null;
   } catch (error) {
-    console.error('Failed to parse AI response:', error);
+    safeError('Failed to parse AI response:', error);
     return null;
   }
 }
@@ -286,7 +288,7 @@ async function saveGeneratedComponent(
     ).run();
   } catch (error) {
     // Table might not exist, try to create or ignore
-    console.error('Failed to save component:', error);
+    safeError('Failed to save component:', error);
   }
 
   return id;
@@ -381,7 +383,7 @@ aiUIGeneration.post('/', async (c) => {
                 encoder.encode(`data: ${JSON.stringify({ saved: true, componentId })}\n\n`)
               );
             } catch (saveError) {
-              console.error('Failed to save component:', saveError);
+              safeError('Failed to save component:', saveError);
             }
           }
 
@@ -519,7 +521,7 @@ aiUIGeneration.post('/generate', async (c) => {
           saved: true,
         });
       } catch (saveError) {
-        console.error('Failed to save component:', saveError);
+        safeError('Failed to save component:', saveError);
       }
     }
 

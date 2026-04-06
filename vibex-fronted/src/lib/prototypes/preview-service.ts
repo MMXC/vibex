@@ -13,6 +13,8 @@ import type { RenderContext, RenderResult, InteractionEvent } from './renderer';
 import { createRenderer, createDefaultRenderContext } from './renderer';
 import { HistoryService, type HistoryEntry, type HistoryMetadata } from './history';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // ==================== Types ====================
 
 /**
@@ -232,7 +234,7 @@ export const DEVICE_PRESETS: DevicePreset[] = [
  * 
  * // Subscribe to events
  * preview.on('component-select', (event) => {
- *   console.log('Selected:', event.payload);
+ *   canvasLogger.default.debug('Selected:', event.payload);
  * });
  * ```
  */
@@ -794,7 +796,7 @@ export class PreviewService {
    */
   private handleStateChange(key: string, value: unknown): void {
     // Handle state changes from rendered components
-    console.debug('[PreviewService] State change:', key, value);
+    canvasLogger.default.debug('[PreviewService] State change:', key, value);
   }
 
   // ==================== Persistence ====================
@@ -811,7 +813,7 @@ export class PreviewService {
         return JSON.parse(stored) as PreviewState;
       }
     } catch (error) {
-      console.warn('[PreviewService] Failed to load persisted state:', error);
+      canvasLogger.default.warn('[PreviewService] Failed to load persisted state:', error);
     }
     return null;
   }
@@ -825,7 +827,7 @@ export class PreviewService {
     try {
       localStorage.setItem(this.config.persistenceKey, JSON.stringify(this.state));
     } catch (error) {
-      console.warn('[PreviewService] Failed to persist state:', error);
+      canvasLogger.default.warn('[PreviewService] Failed to persist state:', error);
     }
   }
 

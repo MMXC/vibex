@@ -8,6 +8,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { RequirementTemplate, TemplateCategory, templates as defaultTemplates } from '@/data/templates';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 interface TemplateStats {
   usageCount: Record<string, number>;    // 模板ID -> 使用次数
   ratings: Record<string, number[]>;     // 模板ID -> 评分数组
@@ -52,7 +54,7 @@ const getInitialStats = (): TemplateStats => {
       return JSON.parse(saved);
     }
   } catch (e) {
-    console.error('Failed to load template stats:', e);
+    canvasLogger.default.error('Failed to load template stats:', e);
   }
   
   return { usageCount: {}, ratings: {} };
@@ -65,7 +67,7 @@ const saveStats = (stats: TemplateStats) => {
   try {
     localStorage.setItem('vibex-template-stats', JSON.stringify(stats));
   } catch (e) {
-    console.error('Failed to save template stats:', e);
+    canvasLogger.default.error('Failed to save template stats:', e);
   }
 };
 

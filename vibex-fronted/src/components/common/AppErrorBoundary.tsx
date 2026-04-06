@@ -2,6 +2,8 @@
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
@@ -33,7 +35,7 @@ export default class AppErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    console.error('AppErrorBoundary caught:', error, errorInfo.componentStack);
+    canvasLogger.default.error('AppErrorBoundary caught:', error, errorInfo.componentStack);
   }
 
   handleReset = (): void => {

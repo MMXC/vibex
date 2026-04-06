@@ -6,6 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || 'your-github-client-id';
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || 'your-github-client-secret';
 const FIGMA_CLIENT_ID = process.env.FIGMA_CLIENT_ID || 'your-figma-client-id';
@@ -128,7 +130,7 @@ export async function POST(
       expiresIn: tokenData.expires_in,
     });
   } catch (error) {
-    console.error('OAuth callback error:', error);
+    safeError('OAuth callback error:', error);
     return NextResponse.json(
       { error: 'OAuth callback failed' },
       { status: 500 }

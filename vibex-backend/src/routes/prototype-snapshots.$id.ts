@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const prototypeSnapshotId = new Hono<{ Bindings: Env }>();
 
 interface PrototypeSnapshotRow {
@@ -32,7 +34,7 @@ prototypeSnapshotId.get('/', async (c) => {
 
     return c.json({ prototypeSnapshot: snapshot });
   } catch (error) {
-    console.error('Error fetching prototype snapshot:', error);
+    safeError('Error fetching prototype snapshot:', error);
     return c.json({ error: 'Failed to fetch prototype snapshot' }, 500);
   }
 });
@@ -85,7 +87,7 @@ prototypeSnapshotId.put('/', async (c) => {
 
     return c.json({ prototypeSnapshot: snapshot });
   } catch (error) {
-    console.error('Error updating prototype snapshot:', error);
+    safeError('Error updating prototype snapshot:', error);
     return c.json({ error: 'Failed to update prototype snapshot' }, 500);
   }
 });
@@ -100,7 +102,7 @@ prototypeSnapshotId.delete('/', async (c) => {
 
     return c.json({ success: true });
   } catch (error) {
-    console.error('Error deleting prototype snapshot:', error);
+    safeError('Error deleting prototype snapshot:', error);
     return c.json({ error: 'Failed to delete prototype snapshot' }, 500);
   }
 });

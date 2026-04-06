@@ -6,6 +6,8 @@
 import fs from 'fs';
 import path from 'path';
 
+import { devLog, safeError } from '@/lib/log-sanitizer';
+
 interface ChangeReport {
   baseline: string;
   current: string;
@@ -45,7 +47,7 @@ async function createGitHubPRComment(
   report: ChangeReport
 ): Promise<void> {
   if (!config || !config.owner || !config.repo || !config.token) {
-    console.log('⚠️ GitHub config not provided, skipping PR comment');
+    devLog('⚠️ GitHub config not provided, skipping PR comment');
     return;
   }
 
@@ -72,9 +74,9 @@ async function createGitHubPRComment(
     }
 
     const result = await response.json();
-    console.log(`✅ PR comment created: ${result.html_url}`);
+    devLog(`✅ PR comment created: ${result.html_url}`);
   } catch (error) {
-    console.error('❌ Failed to create PR comment:', error);
+    safeError('❌ Failed to create PR comment:', error);
     throw error;
   }
 }
@@ -159,7 +161,7 @@ async function sendSlackNotification(
   report: ChangeReport
 ): Promise<void> {
   if (!config || !config.webhookUrl) {
-    console.log('⚠️ Slack config not provided, skipping notification');
+    devLog('⚠️ Slack config not provided, skipping notification');
     return;
   }
 
@@ -237,9 +239,9 @@ async function sendSlackNotification(
       throw new Error(`Slack API error: ${response.status} - ${error}`);
     }
 
-    console.log('✅ Slack notification sent');
+    devLog('✅ Slack notification sent');
   } catch (error) {
-    console.error('❌ Failed to send Slack notification:', error);
+    safeError('❌ Failed to send Slack notification:', error);
     throw error;
   }
 }
@@ -255,10 +257,10 @@ export async function notifyChanges(
     fs.readFileSync(reportPath, 'utf-8')
   );
 
-  console.log('📤 Sending notifications...');
-  console.log(`  Breaking: ${report.summary.breaking}`);
-  console.log(`  Non-Breaking: ${report.summary.nonBreaking}`);
-  console.log(`  Info: ${report.summary.info}`);
+  devLog('📤 Sending notifications...');
+  devLog(`  Breaking: ${report.summary.breaking}`);
+  devLog(`  Non-Breaking: ${report.summary.nonBreaking}`);
+  devLog(`  Info: ${report.summary.info}`);
 
   // Send GitHub PR comment
   if (config.github) {
@@ -270,7 +272,7 @@ export async function notifyChanges(
     await sendSlackNotification(config.slack, report);
   }
 
-  console.log('✅ All notifications sent');
+  devLog('✅ All notifications sent');
 }
 
 // CLI execution
@@ -278,10 +280,10 @@ if (require.main === module) {
   const args = process.argv.slice(2);
   
   if (args.length < 1) {
-    console.log('Usage: node notifier.js <report.json> [config.json]');
-    console.log('');
-    console.log('Example:');
-    console.log('  node notifier.js change-report.json config.json');
+    devLog('Usage: node notifier.js <report.json> [config.json]');
+    devLog('');
+    devLog('Example:');
+    devLog('  node notifier.js change-report.json config.json');
     process.exit(1);
   }
 
@@ -293,7 +295,7 @@ if (require.main === module) {
     : {};
 
   notifyChanges(reportPath, config).catch((error) => {
-    console.error('❌ Notification failed:', error);
+    safeError('❌ Notification failed:', error);
     process.exit(1);
   });
 }

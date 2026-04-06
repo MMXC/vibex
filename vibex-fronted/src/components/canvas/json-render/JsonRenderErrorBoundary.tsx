@@ -8,6 +8,8 @@
 
 import React, { Component, type ErrorInfo, type ReactNode } from 'react';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
@@ -29,7 +31,7 @@ export class JsonRenderErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    console.error('[JsonRenderErrorBoundary]', error, errorInfo);
+    canvasLogger.default.error('[JsonRenderErrorBoundary]', error, errorInfo);
   }
 
   render(): ReactNode {

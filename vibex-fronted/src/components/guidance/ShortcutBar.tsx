@@ -5,7 +5,7 @@
  *
  * 遵守规范:
  * - React.memo for performance
- * - 无 any 类型，无 console.log
+ * - 无 any 类型，无 canvasLogger.default.debug
  */
 'use client';
 
@@ -13,6 +13,8 @@ import React, { memo, useCallback } from 'react';
 import { useGuidanceStore } from '@/stores/guidanceStore';
 import { ChevronUp, ChevronDown, Keyboard } from 'lucide-react';
 import styles from './ShortcutBar.module.css';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 interface ShortcutItemProps {
   keys: string[];

@@ -6,11 +6,13 @@
 
 /** Dev-only logger */
 const devLog = (...args: unknown[]) => {
-  if (process.env.NODE_ENV !== 'production') console.log(...args);
+  if (process.env.NODE_ENV !== 'production') canvasLogger.default.debug(...args);
 };
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 import { 
   extractKeywords, 
   KeywordExtractionResult,
@@ -130,7 +132,7 @@ export const useSmartRecommenderStore = create<RecommenderState>()(
             isExpanded: recommendations.length > 0,
           });
         } catch (error) {
-          console.error('[SmartRecommender] Generation failed:', error);
+          canvasLogger.default.error('[SmartRecommender] Generation failed:', error);
           set({ isLoading: false });
         }
       },

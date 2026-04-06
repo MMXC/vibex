@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const prototypeCollaboration = new Hono<{ Bindings: Env }>();
 
 interface PrototypeCollaborationRow {
@@ -54,7 +56,7 @@ prototypeCollaboration.get('/', async (c) => {
 
     return c.json({ prototypeCollaborations: collaborations });
   } catch (error) {
-    console.error('Error fetching prototype collaborations:', error);
+    safeError('Error fetching prototype collaborations:', error);
     return c.json({ error: 'Failed to fetch prototype collaborations' }, 500);
   }
 });
@@ -115,7 +117,7 @@ prototypeCollaboration.get('/users/:projectId', async (c) => {
       collaborators
     });
   } catch (error) {
-    console.error('Error fetching project users:', error);
+    safeError('Error fetching project users:', error);
     return c.json({ error: 'Failed to fetch project users' }, 500);
   }
 });
@@ -187,7 +189,7 @@ prototypeCollaboration.post('/', async (c) => {
 
     return c.json({ prototypeCollaboration: collaboration }, 201);
   } catch (error) {
-    console.error('Error creating prototype collaboration:', error);
+    safeError('Error creating prototype collaboration:', error);
     return c.json({ error: 'Failed to create prototype collaboration' }, 500);
   }
 });
@@ -289,7 +291,7 @@ prototypeCollaboration.post('/invite', async (c) => {
       return c.json({ prototypeCollaboration: invitation, userJoined: false }, 201);
     }
   } catch (error) {
-    console.error('Error inviting user to prototype:', error);
+    safeError('Error inviting user to prototype:', error);
     return c.json({ error: 'Failed to invite user to prototype' }, 500);
   }
 });
@@ -371,7 +373,7 @@ prototypeCollaboration.post('/batch', async (c) => {
       errors: errors.length > 0 ? errors : undefined
     }, results.length > 0 ? 201 : 400);
   } catch (error) {
-    console.error('Error batch adding collaborators:', error);
+    safeError('Error batch adding collaborators:', error);
     return c.json({ error: 'Failed to batch add collaborators' }, 500);
   }
 });

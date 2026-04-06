@@ -6,7 +6,7 @@
  *
  * 遵守 AGENTS.md 规范：
  * - 无 any 类型泄漏
- * - 无 console.log
+ * - 无 canvasLogger.default.debug
  */
 'use client';
 
@@ -15,6 +15,8 @@ import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import styles from './canvas.module.css';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 export function TreeStatus() {
   const contextNodes = useContextStore((s) => s.contextNodes);

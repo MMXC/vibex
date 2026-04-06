@@ -8,6 +8,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 export const dynamic = 'force-dynamic';
 
 // Auth helper for canvas routes
@@ -90,7 +92,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('[canvas/project] Error:', error);
+    safeError('[canvas/project] Error:', error);
     return NextResponse.json(
       { error: 'Failed to create canvas project' },
       { status: 500 }

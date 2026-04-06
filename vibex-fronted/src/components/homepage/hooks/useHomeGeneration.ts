@@ -2,13 +2,15 @@ import { useState, useCallback } from 'react';
 
 /** Dev-only logger to prevent sensitive data leaking in production */
 const devLog = (...args: unknown[]) => {
-  if (process.env.NODE_ENV !== 'production') console.log(...args);
+  if (process.env.NODE_ENV !== 'production') canvasLogger.default.debug(...args);
 };
 
 import { dddApi, projectApi } from '@/services/api';
 import { useAuthStore } from '@/stores/authStore';
 import type { BoundedContextResponse } from '@/types/api';
 import type { BoundedContext, DomainModel, BusinessFlow, HomeGeneration, StreamStatus } from '@/types/homepage';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 /**
  * useHomeGeneration - 生成逻辑 Hook

@@ -18,6 +18,8 @@
 
 import { OpenAPISpec, SchemaObject } from './OpenAPIGenerator';
 
+import { devLog, safeError } from '@/lib/log-sanitizer';
+
 // 变更类型
 export type ChangeType =
   | 'ENDPOINT_REMOVED'
@@ -304,14 +306,14 @@ export class BreakingChangeDetector {
     const errors = changes.filter(c => c.severity === 'error');
     
     if (errors.length > 0) {
-      console.error('❌ Breaking Changes Detected:\n');
+      safeError('❌ Breaking Changes Detected:\n');
       for (const change of errors) {
-        console.error(`  - [${change.type}] ${change.message}`);
+        safeError(`  - [${change.type}] ${change.message}`);
       }
-      console.error('\nPlease fix these changes before merging.');
+      safeError('\nPlease fix these changes before merging.');
       process.exit(1);
     } else {
-      console.log('✅ No breaking changes detected.');
+      devLog('✅ No breaking changes detected.');
     }
   }
 }

@@ -14,6 +14,8 @@ import { generateId } from '@/lib/db';
 import type { BoundedContext } from '@/services/context/types';
 import { canvasError, CanvasErrorCodes } from '../types';
 
+import { devLog, safeError } from '@/lib/log-sanitizer';
+
 interface FlowStep {
   name: string;
   actor: string;
@@ -181,7 +183,7 @@ export async function POST(
         maxTokens: 4096,
       })
       .catch((err) => {
-        console.error('[canvas/generate-components] AI service error:', err);
+        safeError('[canvas/generate-components] AI service error:', err);
         return { data: null, usage: null, error: err instanceof Error ? err.message : 'AI service error' };
       });
 
@@ -240,13 +242,13 @@ export async function POST(
       ? Math.max(0.5, Math.min(0.9, 1 - (result.usage.completionTokens / 4096)))
       : 0.6;
 
-    console.log(
+    devLog(
       `[canvas/generate-components] Generated ${components.length} components for ${flows.length} flows`
     );
 
     return NextResponse.json({ success: true, components, generationId, totalCount: components.length, confidence });
   } catch (err) {
-    console.error('[canvas/generate-components] Error:', err);
+    safeError('[canvas/generate-components] Error:', err);
     return NextResponse.json(
       { ...canvasError('服务器内部错误，请稍后重试', CanvasErrorCodes.INTERNAL_ERROR), components: [] as ComponentResponse[], generationId, totalCount: 0, confidence: 0 },
       { status: 500 }

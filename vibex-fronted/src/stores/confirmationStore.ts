@@ -2,10 +2,12 @@ import { create } from 'zustand';
 
 /** Dev-only logger */
 const devLog = (...args: unknown[]) => {
-  if (process.env.NODE_ENV !== 'production') console.log(...args);
+  if (process.env.NODE_ENV !== 'production') canvasLogger.default.debug(...args);
 };
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { BoundedContext } from '@/services/api/types/prototype/domain';
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 import type {
   ConfirmationStep,
   DomainModel,
@@ -354,7 +356,7 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
       version: STORAGE_VERSION,
       onRehydrateStorage: () => (state, error) => {
         if (error) {
-          console.error('Failed to rehydrate confirmation store:', error);
+          canvasLogger.default.error('Failed to rehydrate confirmation store:', error);
         } else if (state) {
           // Mark hydration as complete
           state.setHasHydrated(true);

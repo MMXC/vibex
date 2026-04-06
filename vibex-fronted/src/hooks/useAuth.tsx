@@ -18,6 +18,8 @@ import {
 } from 'react';
 import { apiService } from '@/services/api';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // 用户类型
 export interface User {
   id: string;
@@ -65,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const userData = await apiService.getCurrentUser();
           setUser(userData as User);
         } catch (error) {
-          console.error('Failed to fetch user:', error);
+          canvasLogger.default.error('Failed to fetch user:', error);
           // Token 失效，清除
           sessionStorage.removeItem('auth_token');
           localStorage.removeItem('auth_token');
@@ -163,7 +165,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await apiService.logout();
     } catch (error) {
       // 即使 API 调用失败也清除本地状态
-      console.error('Logout API error:', error);
+      canvasLogger.default.error('Logout API error:', error);
     } finally {
       // 清除 sessionStorage（主存储）和 localStorage（兼容）
       sessionStorage.removeItem('auth_token');
@@ -182,7 +184,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const userData = await apiService.getCurrentUser();
       setUser(userData as User);
     } catch (error) {
-      console.error('Failed to refresh user:', error);
+      canvasLogger.default.error('Failed to refresh user:', error);
     }
   }, [token]);
 

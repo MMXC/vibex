@@ -8,6 +8,8 @@
 import { getApiUrl } from '@/lib/api-config';
 import { BoundedContext } from '@/services/api/types/prototype/domain';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // ==================== Auth helper ====================
 
 function getAuthHeaders(): Record<string, string> {
@@ -158,7 +160,7 @@ export async function streamBoundedContexts(
               }
             } catch (e) {
               // F1.2: JSON.parse 异常静默处理，避免 SSE 流中断
-              console.error('Failed to parse SSE data:', e);
+              canvasLogger.default.error('Failed to parse SSE data:', e);
             }
             i++;
           }
@@ -255,7 +257,7 @@ export async function streamDomainModels(
               }
             } catch (e) {
               // F1.2: JSON.parse 异常静默处理
-              console.error('Failed to parse SSE data:', e);
+              canvasLogger.default.error('Failed to parse SSE data:', e);
             }
             i++;
           }
@@ -352,7 +354,7 @@ export async function streamBusinessFlow(
               }
             } catch (e) {
               // F1.2: JSON.parse 异常静默处理
-              console.error('Failed to parse SSE data:', e);
+              canvasLogger.default.error('Failed to parse SSE data:', e);
             }
             i++;
           }

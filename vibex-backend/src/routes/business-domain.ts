@@ -3,7 +3,7 @@ import { cors } from 'hono/cors'
 import { z } from 'zod'
 import { generateId, queryDB, executeDB, queryOne, Env } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
-import { devDebug, sanitize } from '@/lib/log-sanitizer'
+import { devDebug, sanitize, devLog, safeError } from '@/lib/log-sanitizer'
 
 const businessDomain = new Hono<{ Bindings: Env }>();
 
@@ -204,7 +204,7 @@ Respond ONLY with the JSON object. All text must be in Simplified Chinese.`
 
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : '未知错误'
-          console.error('[BusinessDomain Generate] Error:', errorMessage)
+          safeError('[BusinessDomain Generate] Error:', errorMessage)
           send('error', {
             message: errorMessage,
             code: 'BUSINESS_DOMAIN_ERROR',
@@ -223,7 +223,7 @@ Respond ONLY with the JSON object. All text must be in Simplified Chinese.`
       },
     })
   } catch (error) {
-    console.error('Error setting up business-domain stream:', error)
+    safeError('Error setting up business-domain stream:', error)
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to setup stream',
@@ -305,7 +305,7 @@ businessDomain.post('/create', async (c) => {
         [id, projectId, name, description || null, domainType, features, relationships, now, now]
       )
     } else {
-      console.log('[BusinessDomain] D1 not available, skipping DB insert for domain:', name)
+      devLog('[BusinessDomain] D1 not available, skipping DB insert for domain:', name)
     }
 
     const domain: BusinessDomainEntity = {
@@ -395,7 +395,7 @@ businessDomain.put('/', async (c) => {
         params
       )
     } else {
-      console.log('[BusinessDomain] D1 not available, skipping DB update for domain:', id)
+      devLog('[BusinessDomain] D1 not available, skipping DB update for domain:', id)
     }
 
     const updatedDomain: Partial<BusinessDomainEntity> = { updatedAt: now }
@@ -434,7 +434,7 @@ businessDomain.delete('/', async (c) => {
     if (env?.DB) {
       await executeDB(env, `DELETE FROM BusinessDomain WHERE id = ?`, [id])
     } else {
-      console.log('[BusinessDomain] D1 not available, skipping DB delete for domain:', id)
+      devLog('[BusinessDomain] D1 not available, skipping DB delete for domain:', id)
     }
 
     return c.json({ success: true, message: `Domain ${id} deleted` })

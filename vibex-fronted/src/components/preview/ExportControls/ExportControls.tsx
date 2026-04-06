@@ -12,6 +12,8 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import styles from './ExportControls.module.css';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // html2canvas 类型声明
 type Html2Canvas = (
   element: HTMLElement,
@@ -71,7 +73,7 @@ export const ExportControls: React.FC<ExportControlsProps> = ({
         const html2canvas = (await import('html2canvas')).default;
         html2canvasRef.current = html2canvas;
       } catch (err) {
-        console.warn('html2canvas not available:', err);
+        canvasLogger.default.warn('html2canvas not available:', err);
       }
     };
     loadHtml2Canvas();

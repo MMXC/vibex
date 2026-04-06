@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const entityRelations = new Hono<{ Bindings: Env }>();
 
 interface EntityRelationRow {
@@ -38,7 +40,7 @@ entityRelations.get('/', async (c) => {
 
     return c.json({ entityRelations: relations });
   } catch (error) {
-    console.error('Error fetching entity relations:', error);
+    safeError('Error fetching entity relations:', error);
     return c.json({ error: 'Failed to fetch entity relations' }, 500);
   }
 });
@@ -71,7 +73,7 @@ entityRelations.post('/', async (c) => {
 
     return c.json({ entityRelation: relation }, 201);
   } catch (error) {
-    console.error('Error creating entity relation:', error);
+    safeError('Error creating entity relation:', error);
     return c.json({ error: 'Failed to create entity relation' }, 500);
   }
 });

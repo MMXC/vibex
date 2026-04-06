@@ -4,6 +4,8 @@ import { cuidSchema } from '@/schemas/common';
 import { AppError, ValidationError } from '@/lib/errors';
 import { errorToResponse } from '@/lib/errors';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 export const dynamic = 'force-dynamic';
 
 // GET /api/pages/[id] - Get a single page
@@ -37,7 +39,7 @@ export async function GET(
 
     return NextResponse.json({ page });
   } catch (error) {
-    console.error('Error fetching page:', error);
+    safeError('Error fetching page:', error);
     return NextResponse.json(
       { error: 'Failed to fetch page' },
       { status: 500 }
@@ -76,7 +78,7 @@ export async function PUT(
 
     return NextResponse.json({ page });
   } catch (error) {
-    console.error('Error updating page:', error);
+    safeError('Error updating page:', error);
     return NextResponse.json(
       { error: 'Failed to update page' },
       { status: 500 }
@@ -105,7 +107,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting page:', error);
+    safeError('Error deleting page:', error);
     return NextResponse.json(
       { error: 'Failed to delete page' },
       { status: 500 }

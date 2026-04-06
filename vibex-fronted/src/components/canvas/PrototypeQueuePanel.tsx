@@ -12,7 +12,7 @@
  * 遵守 AGENTS.md 规范：
  * - 组件接收 slice 相关 props，不直接 dispatch 多个 slice
  * - 无 any 类型泄漏
- * - 无 console.log
+ * - 无 canvasLogger.default.debug
  * - 轮询间隔 5000ms（ADR-003）
  */
 'use client';
@@ -22,6 +22,8 @@ import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
 import { canvasApi, startPolling, stopPolling } from '@/lib/canvas/api/canvasApi';
 import type { PrototypePage, PrototypeStatus } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 // =============================================================================
 // Sub-components

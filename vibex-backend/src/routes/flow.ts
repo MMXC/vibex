@@ -4,6 +4,8 @@ import { z } from 'zod'
 import { generateId, Env, queryDB, queryOne, executeDB } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const flow = new Hono<{ Bindings: Env }>();
 
 // Enable CORS
@@ -92,7 +94,7 @@ flow.post('/generate', async (c) => {
           domainContext = `参考以下业务领域:\n${rows.map(r => `- ${r.name}（${r.domainType}）`).join('\n')}`
         }
       } catch (err) {
-        console.warn('[Flow Generate] Failed to fetch domains for context:', err)
+        safeError('[Flow Generate] Failed to fetch domains for context:', err)
       }
     }
 
@@ -270,7 +272,7 @@ ${requirement}
                 [flowId, '业务流程图', JSON.stringify(nodes), JSON.stringify(edges), flowProjectId, now, now]
               )
             } catch (dbErr) {
-              console.warn('[Flow Generate] Failed to save flow to DB:', dbErr)
+              safeError('[Flow Generate] Failed to save flow to DB:', dbErr)
             }
           }
 
@@ -293,7 +295,7 @@ ${requirement}
 
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : '未知错误'
-          console.error('[Flow Generate] Error:', errorMessage)
+          safeError('[Flow Generate] Error:', errorMessage)
           send('error', {
             type: 'error',
             error: errorMessage,
@@ -313,7 +315,7 @@ ${requirement}
       },
     })
   } catch (error) {
-    console.error('Error setting up flow stream:', error)
+    safeError('Error setting up flow stream:', error)
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to setup stream',

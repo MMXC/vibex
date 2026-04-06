@@ -7,12 +7,14 @@
  *
  * 遵守 AGENTS.md 规范:
  * - 无 any 类型泄漏
- * - 无 console.log
+ * - 无 canvasLogger.default.debug
  * - WCAG 2.1 AA 合规 (aria-labels, keyboard nav, focus management)
  */
 
 import React, { useCallback, useEffect, useRef } from 'react';
 import styles from './ConflictDialog.module.css';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 // =============================================================================
 // Types

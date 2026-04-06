@@ -12,6 +12,8 @@
 import { Hono } from 'hono';
 import { queryDB, queryOne, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const prototypeExport = new Hono<{ Bindings: Env }>();
 
 // ==================== Types ====================
@@ -515,7 +517,7 @@ prototypeExport.post('/', async (c) => {
       data: prototypeData,
     });
   } catch (error) {
-    console.error('Error exporting prototype:', error);
+    safeError('Error exporting prototype:', error);
     return c.json({ error: 'Failed to export prototype' }, 500);
   }
 });
@@ -585,7 +587,7 @@ prototypeExport.get('/:projectId', async (c) => {
       },
     });
   } catch (error) {
-    console.error('Error fetching export metadata:', error);
+    safeError('Error fetching export metadata:', error);
     return c.json({ error: 'Failed to fetch export metadata' }, 500);
   }
 });

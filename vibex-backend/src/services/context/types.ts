@@ -94,6 +94,10 @@ export interface CompressionResult {
   compressionRatio: number
   summary?: string
   strategy: CompressionStrategy
+  /** E5-S1: quality score 0-100, null if calculation not possible */
+  qualityScore?: number | null
+  /** E5-S1: true when qualityScore < QUALITY_THRESHOLD (70) */
+  degraded?: boolean
 }
 
 export interface ConfirmationState {

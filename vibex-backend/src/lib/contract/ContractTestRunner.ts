@@ -13,6 +13,8 @@
 
 import { OpenAPISpec, SchemaObject } from './OpenAPIGenerator';
 
+import { devLog } from '@/lib/log-sanitizer';
+
 // 测试类型
 export type TestType = 
   | 'REQUEST_VALIDATION'
@@ -346,19 +348,19 @@ export class ContractTestRunner {
    * 打印测试结果
    */
   private printResults(result: TestSuiteResult): void {
-    console.log('\n📋 Contract Test Results\n');
-    console.log(`Total: ${result.total} | Passed: ✅ ${result.passed} | Failed: ❌ ${result.failed}`);
-    console.log(`Duration: ${result.duration}ms\n`);
+    devLog('\n📋 Contract Test Results\n');
+    devLog(`Total: ${result.total} | Passed: ✅ ${result.passed} | Failed: ❌ ${result.failed}`);
+    devLog(`Duration: ${result.duration}ms\n`);
     
     // 打印失败的测试
     const failed = result.results.filter(r => !r.passed);
     if (failed.length > 0) {
-      console.log('❌ Failed Tests:\n');
+      devLog('❌ Failed Tests:\n');
       for (const test of failed) {
-        console.log(`  - ${test.name}`);
-        console.log(`    Type: ${test.type}`);
-        if (test.error) console.log(`    Error: ${test.error}`);
-        console.log('');
+        devLog(`  - ${test.name}`);
+        devLog(`    Type: ${test.type}`);
+        if (test.error) devLog(`    Error: ${test.error}`);
+        devLog('');
       }
     }
   }

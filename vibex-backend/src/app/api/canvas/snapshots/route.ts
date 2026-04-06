@@ -13,6 +13,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 interface CanvasSnapshotRow {
   id: string;
   projectId: string;
@@ -71,7 +73,7 @@ export async function GET(
       offset,
     });
   } catch (err) {
-    console.error('[canvas/snapshots] GET error:', err);
+    safeError('[canvas/snapshots] GET error:', err);
     return NextResponse.json({ error: 'Failed to fetch snapshots' }, { status: 500 });
   }
 }
@@ -227,7 +229,7 @@ export async function POST(
       version: created.version,
     }, { status: 201 });
   } catch (err) {
-    console.error('[canvas/snapshots] POST error:', err);
+    safeError('[canvas/snapshots] POST error:', err);
     return NextResponse.json({ error: 'Failed to create snapshot' }, { status: 500 });
   }
 }

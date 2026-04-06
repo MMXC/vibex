@@ -10,10 +10,12 @@
  *
  * 遵守约束:
  * - 无 any 类型
- * - 无 console.log
+ * - 无 canvasLogger.default.debug
  */
 import { create } from 'zustand';
 import type { TreeType, BoundedContextNode, BusinessFlowNode, ComponentNode } from './types';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 // =============================================================================
 // Types

@@ -5,6 +5,8 @@
 import { Diagnoser } from './diagnoser';
 import { DiagnosisResult, OptimizeRequest } from './types';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 /**
  * 一键优化
  */
@@ -106,7 +108,7 @@ ${requirementText}
         return { improvedText: improved, usedFallback: false };
       }
     } catch (error) {
-      console.error('[Optimizer] AI optimization failed, using fallback:', error);
+      canvasLogger.default.error('[Optimizer] AI optimization failed, using fallback:', error);
     }
 
     // 降级到本地优化

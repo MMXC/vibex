@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const agents = new Hono<{ Bindings: Env }>();
 
 interface AgentRow {
@@ -33,7 +35,7 @@ agents.get('/', async (c) => {
 
     return c.json({ agents: agentsList });
   } catch (error) {
-    console.error('Error fetching agents:', error);
+    safeError('Error fetching agents:', error);
     return c.json({ error: 'Failed to fetch agents' }, 500);
   }
 });
@@ -66,7 +68,7 @@ agents.post('/', async (c) => {
 
     return c.json({ agent }, 201);
   } catch (error) {
-    console.error('Error creating agent:', error);
+    safeError('Error creating agent:', error);
     return c.json({ error: 'Failed to create agent' }, 500);
   }
 });

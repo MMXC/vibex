@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const domainEntities = new Hono<{ Bindings: Env }>();
 
 interface DomainEntityRow {
@@ -41,7 +43,7 @@ domainEntities.get('/', async (c) => {
 
     return c.json({ domainEntities: entities });
   } catch (error) {
-    console.error('Error fetching domain entities:', error);
+    safeError('Error fetching domain entities:', error);
     return c.json({ error: 'Failed to fetch domain entities' }, 500);
   }
 });
@@ -74,7 +76,7 @@ domainEntities.post('/', async (c) => {
 
     return c.json({ domainEntity: entity }, 201);
   } catch (error) {
-    console.error('Error creating domain entity:', error);
+    safeError('Error creating domain entity:', error);
     return c.json({ error: 'Failed to create domain entity' }, 500);
   }
 });

@@ -9,6 +9,8 @@ import { API_CONFIG } from '@/lib/api-config';
 import { configureAxiosRetry } from '@/lib/api-retry';
 import { circuitBreakerManager } from '@/lib/circuit-breaker';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // ==================== 接口定义 ====================
 
 export interface HttpClientConfig {
@@ -55,10 +57,10 @@ export function createHttpClient(config?: HttpClientConfig): HttpClient {
     maxRetryDelay: 10000,
     exponentialBackoff: true,
     onRetry: (retryCount, error, requestConfig) => {
-      console.warn(`[API Retry] Attempt ${retryCount} for ${requestConfig.url}: ${error.message}`);
+      canvasLogger.default.warn(`[API Retry] Attempt ${retryCount} for ${requestConfig.url}: ${error.message}`);
     },
   }).catch((err) => {
-    console.error('[API Client] Failed to configure retry:', err);
+    canvasLogger.default.error('[API Client] Failed to configure retry:', err);
   });
 
   // 请求拦截器 - 添加认证token

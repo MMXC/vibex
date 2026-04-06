@@ -11,6 +11,8 @@ import { Hono } from 'hono';
 import { queryOne, queryDB, executeDB, generateId, Env } from '@/lib/db';
 import { createUIGeneratorService, UIGeneratorService, UIGeneratorOptions, UIGenerationResult, GeneratedComponent, GeneratedPage, ComponentType } from '@/services/ui-generator';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 /** Type guard: is this a GeneratedPage (has .component sub-field)? */
 function isGeneratedPage(val: GeneratedPage | GeneratedComponent): val is GeneratedPage {
   return 'component' in val && typeof (val as GeneratedPage).component === 'object';
@@ -445,7 +447,7 @@ prototypePreview.post('/', async (c) => {
       preview,
     });
   } catch (error) {
-    console.error('Error generating prototype preview:', error);
+    safeError('Error generating prototype preview:', error);
     return c.json<PreviewResponse>({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to generate preview',
@@ -530,7 +532,7 @@ prototypePreview.post('/component', async (c) => {
       latency: Date.now() - startTime,
     });
   } catch (error) {
-    console.error('Error generating component preview:', error);
+    safeError('Error generating component preview:', error);
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to generate component',
@@ -609,7 +611,7 @@ prototypePreview.post('/quick/:type', async (c) => {
       latency: Date.now() - startTime,
     });
   } catch (error) {
-    console.error('Error generating quick component:', error);
+    safeError('Error generating quick component:', error);
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to generate component',
@@ -669,7 +671,7 @@ prototypePreview.post('/styles', async (c) => {
       latency: Date.now() - startTime,
     });
   } catch (error) {
-    console.error('Error generating styles:', error);
+    safeError('Error generating styles:', error);
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to generate styles',
@@ -721,7 +723,7 @@ prototypePreview.post('/tokens', async (c) => {
       latency: Date.now() - startTime,
     });
   } catch (error) {
-    console.error('Error generating design tokens:', error);
+    safeError('Error generating design tokens:', error);
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to generate design tokens',
@@ -826,7 +828,7 @@ prototypePreview.get('/snapshot/:id', async (c) => {
       preview,
     });
   } catch (error) {
-    console.error('Error generating preview from snapshot:', error);
+    safeError('Error generating preview from snapshot:', error);
     return c.json<PreviewResponse>({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to generate preview',
@@ -887,7 +889,7 @@ prototypePreview.post('/variants', async (c) => {
       latency: Date.now() - startTime,
     });
   } catch (error) {
-    console.error('Error generating variants:', error);
+    safeError('Error generating variants:', error);
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to generate variants',

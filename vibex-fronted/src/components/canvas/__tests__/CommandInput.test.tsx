@@ -7,7 +7,7 @@ import {vi, Mock, SpyInstance} from 'vitest';
  * F2.3: 关键词过滤（/gen → 2 命令）
  * F2.4: 节点依赖过滤（有点选时只显示 /update-card）
  * F2.5: 取消选择恢复
- * F2.6: 命令执行（console.log）
+ * F2.6: 命令执行（canvasLogger.default.debug）
  * F2.7: 命令执行追加消息
  */
 
@@ -18,6 +18,8 @@ import { useCanvasStore } from '@/lib/canvas/canvasStore';
 import { useMessageDrawerStore } from '@/components/canvas/messageDrawer/messageDrawerStore';
 import { CommandInput, ALL_COMMANDS } from '@/components/canvas/messageDrawer/CommandInput';
 import { CommandList } from '@/components/canvas/messageDrawer/CommandList';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 const FIVE_COMMANDS = ALL_COMMANDS.map((c) => c.id);
 
@@ -153,7 +155,7 @@ describe('Epic 2 F2.6+F2.7: 命令执行', () => {
     consoleSpy.mockRestore();
   });
 
-  it('AC-F2.6: 执行 /gen-context → console.log 包含 [Command] /gen-context triggered', () => {
+  it('AC-F2.6: 执行 /gen-context → canvasLogger.default.debug 包含 [Command] /gen-context triggered', () => {
     render(<CommandInput />);
     const input = screen.getByPlaceholderText('/命令...');
     act(() => { fireEvent.change(input, { target: { value: '/' } }); });

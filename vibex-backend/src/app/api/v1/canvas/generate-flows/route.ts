@@ -15,6 +15,8 @@ import type { BoundedContext } from '@/services/context/types';
 import { validateContexts } from '@/lib/canvas-validation';
 import { canvasError, CanvasErrorCodes } from '../types';
 
+import { devLog, safeError } from '@/lib/log-sanitizer';
+
 interface BusinessFlowResponse {
   id: string;
   contextId: string;
@@ -143,7 +145,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
         maxTokens: 3072,
       })
       .catch((err) => {
-        console.error('[canvas/generate-flows] AI service error:', err);
+        safeError('[canvas/generate-flows] AI service error:', err);
         return { data: null, usage: null, error: err instanceof Error ? err.message : 'AI service error' };
       });
 
@@ -182,13 +184,13 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       ? Math.max(0.5, Math.min(0.9, 1 - (result.usage.completionTokens / 4096)))
       : 0.6;
 
-    console.log(
+    devLog(
       `[canvas/generate-flows] Generated ${flows.length} flows for ${contexts.length} contexts`
     );
 
     return NextResponse.json({ success: true, flows, generationId, confidence });
   } catch (err) {
-    console.error('[canvas/generate-flows] Error:', err);
+    safeError('[canvas/generate-flows] Error:', err);
     return NextResponse.json(
       { ...canvasError('服务器内部错误，请稍后重试', CanvasErrorCodes.INTERNAL_ERROR), flows: [] as BusinessFlowResponse[], generationId, confidence: 0 },
       { status: 500 }

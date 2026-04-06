@@ -2,6 +2,8 @@ import { Hono } from 'hono';
 import { getAuthUserFromHono, hashPassword } from '@/lib/auth';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const users = new Hono<{ Bindings: Env }>();
 
 interface UserRow {
@@ -46,7 +48,7 @@ users.get('/:userId', async (c) => {
       data: user,
     });
   } catch (error) {
-    console.error('Get user error:', error);
+    safeError('Get user error:', error);
     return c.json(
       { success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' },
       500
@@ -117,7 +119,7 @@ users.put('/:userId', async (c) => {
       data: user,
     });
   } catch (error) {
-    console.error('Update user error:', error);
+    safeError('Update user error:', error);
     return c.json(
       { success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' },
       500

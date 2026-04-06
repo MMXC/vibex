@@ -1,3 +1,4 @@
+import { safeError } from '@/lib/log-sanitizer';
 /**
  * UI Analysis Prompt Templates
  * 
@@ -777,7 +778,7 @@ export function parseUIAnalysisResponse(content: string): UIAnalysisResult | nul
       positiveFindings: parsed.positiveFindings || [],
     };
   } catch (error) {
-    console.error('Failed to parse UI analysis response:', error);
+    safeError('Failed to parse UI analysis response:', error);
     return null;
   }
 }

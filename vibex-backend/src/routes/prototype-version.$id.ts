@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const prototypeVersionId = new Hono<{ Bindings: Env }>();
 
 interface PrototypeVersionRow {
@@ -35,7 +37,7 @@ prototypeVersionId.get('/', async (c) => {
 
     return c.json({ prototypeVersion: versionRecord });
   } catch (error) {
-    console.error('Error fetching prototype version:', error);
+    safeError('Error fetching prototype version:', error);
     return c.json({ error: 'Failed to fetch prototype version' }, 500);
   }
 });
@@ -99,7 +101,7 @@ prototypeVersionId.put('/', async (c) => {
 
     return c.json({ prototypeVersion: versionRecord });
   } catch (error) {
-    console.error('Error updating prototype version:', error);
+    safeError('Error updating prototype version:', error);
     return c.json({ error: 'Failed to update prototype version' }, 500);
   }
 });
@@ -125,7 +127,7 @@ prototypeVersionId.delete('/', async (c) => {
 
     return c.json({ success: true });
   } catch (error) {
-    console.error('Error deleting prototype version:', error);
+    safeError('Error deleting prototype version:', error);
     return c.json({ error: 'Failed to delete prototype version' }, 500);
   }
 });
@@ -187,7 +189,7 @@ prototypeVersionId.post('/restore', async (c) => {
 
     return c.json({ prototypeVersion: restoredVersion }, 201);
   } catch (error) {
-    console.error('Error restoring prototype version:', error);
+    safeError('Error restoring prototype version:', error);
     return c.json({ error: 'Failed to restore prototype version' }, 500);
   }
 });
@@ -249,7 +251,7 @@ prototypeVersionId.post('/duplicate', async (c) => {
 
     return c.json({ prototypeVersion: duplicatedVersion }, 201);
   } catch (error) {
-    console.error('Error duplicating prototype version:', error);
+    safeError('Error duplicating prototype version:', error);
     return c.json({ error: 'Failed to duplicate prototype version' }, 500);
   }
 });

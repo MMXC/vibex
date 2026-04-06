@@ -7,6 +7,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 export const dynamic = 'force-dynamic';
 
 // Auth helper for canvas routes
@@ -73,7 +75,7 @@ export async function GET(request: NextRequest) {
       overallProgress: totalProgress,
     });
   } catch (error) {
-    console.error('[canvas/status] Error:', error);
+    safeError('[canvas/status] Error:', error);
     return NextResponse.json({ error: 'Failed to get status' }, { status: 500 });
   }
 }

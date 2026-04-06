@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const prototypeVersions = new Hono<{ Bindings: Env }>();
 
 interface PrototypeVersionRow {
@@ -84,7 +86,7 @@ prototypeVersions.get('/', async (c) => {
       },
     });
   } catch (error) {
-    console.error('Error fetching prototype versions:', error);
+    safeError('Error fetching prototype versions:', error);
     return c.json({ error: 'Failed to fetch prototype versions' }, 500);
   }
 });
@@ -145,7 +147,7 @@ prototypeVersions.post('/', async (c) => {
 
     return c.json({ prototypeVersion: versionRecord }, 201);
   } catch (error) {
-    console.error('Error creating prototype version:', error);
+    safeError('Error creating prototype version:', error);
     return c.json({ error: 'Failed to create prototype version' }, 500);
   }
 });
@@ -178,7 +180,7 @@ prototypeVersions.get('/latest', async (c) => {
 
     return c.json({ prototypeVersion: versionRecord });
   } catch (error) {
-    console.error('Error fetching latest prototype version:', error);
+    safeError('Error fetching latest prototype version:', error);
     return c.json({ error: 'Failed to fetch latest prototype version' }, 500);
   }
 });
@@ -219,7 +221,7 @@ prototypeVersions.get('/compare', async (c) => {
       comparison,
     });
   } catch (error) {
-    console.error('Error comparing prototype versions:', error);
+    safeError('Error comparing prototype versions:', error);
     return c.json({ error: 'Failed to compare prototype versions' }, 500);
   }
 });
@@ -242,7 +244,7 @@ prototypeVersions.get('/:id', async (c) => {
 
     return c.json({ prototypeVersion: versionRecord });
   } catch (error) {
-    console.error('Error fetching prototype version:', error);
+    safeError('Error fetching prototype version:', error);
     return c.json({ error: 'Failed to fetch prototype version' }, 500);
   }
 });
@@ -306,7 +308,7 @@ prototypeVersions.put('/:id', async (c) => {
 
     return c.json({ prototypeVersion: versionRecord });
   } catch (error) {
-    console.error('Error updating prototype version:', error);
+    safeError('Error updating prototype version:', error);
     return c.json({ error: 'Failed to update prototype version' }, 500);
   }
 });
@@ -332,7 +334,7 @@ prototypeVersions.delete('/:id', async (c) => {
 
     return c.json({ success: true });
   } catch (error) {
-    console.error('Error deleting prototype version:', error);
+    safeError('Error deleting prototype version:', error);
     return c.json({ error: 'Failed to delete prototype version' }, 500);
   }
 });
@@ -415,7 +417,7 @@ prototypeVersions.post('/:id/rollback', async (c) => {
       }
     });
   } catch (error) {
-    console.error('Error rolling back prototype version:', error);
+    safeError('Error rolling back prototype version:', error);
     return c.json({ error: 'Failed to rollback prototype version' }, 500);
   }
 });
@@ -477,7 +479,7 @@ prototypeVersions.post('/:id/restore', async (c) => {
 
     return c.json({ prototypeVersion: restoredVersion }, 201);
   } catch (error) {
-    console.error('Error restoring prototype version:', error);
+    safeError('Error restoring prototype version:', error);
     return c.json({ error: 'Failed to restore prototype version' }, 500);
   }
 });
@@ -539,7 +541,7 @@ prototypeVersions.post('/:id/duplicate', async (c) => {
 
     return c.json({ prototypeVersion: duplicatedVersion }, 201);
   } catch (error) {
-    console.error('Error duplicating prototype version:', error);
+    safeError('Error duplicating prototype version:', error);
     return c.json({ error: 'Failed to duplicate prototype version' }, 500);
   }
 });

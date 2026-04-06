@@ -19,6 +19,8 @@ import { toPng, toSvg } from 'html-to-image';
 import '@xyflow/react/dist/style.css';
 import styles from './DomainRelationGraph.module.css';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // Entity node types
 const entityNodeTypes = {
   user: { color: '#3b82f6', label: '用户' },
@@ -172,7 +174,7 @@ export default function DomainRelationGraph({
       link.href = dataUrl;
       link.click();
     } catch (error) {
-      console.error('Failed to export as PNG:', error);
+      canvasLogger.default.error('Failed to export as PNG:', error);
     } finally {
       setIsExporting(false);
     }
@@ -191,7 +193,7 @@ export default function DomainRelationGraph({
       link.href = dataUrl;
       link.click();
     } catch (error) {
-      console.error('Failed to export as SVG:', error);
+      canvasLogger.default.error('Failed to export as SVG:', error);
     } finally {
       setIsExporting(false);
     }

@@ -7,6 +7,8 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 const SLACK_WEBHOOK_URL = process.env.SLACK_FEEDBACK_WEBHOOK;
 
 export async function POST(req: NextRequest) {
@@ -24,7 +26,7 @@ export async function POST(req: NextRequest) {
 
     if (!SLACK_WEBHOOK_URL) {
       // Fallback: log to console when webhook not configured
-      console.warn('[feedback] SLACK_FEEDBACK_WEBHOOK not configured. Feedback received:', {
+      canvasLogger.default.warn('[feedback] SLACK_FEEDBACK_WEBHOOK not configured. Feedback received:', {
         title,
         content,
         timestamp,
@@ -93,7 +95,7 @@ export async function POST(req: NextRequest) {
 
     if (!webhookResponse.ok) {
       const text = await webhookResponse.text().catch(() => '');
-      console.error('[feedback] Slack webhook error:', webhookResponse.status, text);
+      canvasLogger.default.error('[feedback] Slack webhook error:', webhookResponse.status, text);
       return NextResponse.json(
         { error: `Slack webhook failed: ${webhookResponse.status}` },
         { status: 502 }
@@ -102,7 +104,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error('[feedback] POST error:', err);
+    canvasLogger.default.error('[feedback] POST error:', err);
     return NextResponse.json(
       { error: err instanceof Error ? err.message : '服务器内部错误' },
       { status: 500 }

@@ -3,6 +3,8 @@ import { PrismaClient } from '@prisma/client';
 import { getAuthUser, hashPassword } from '@/lib/auth';
 import { getEnv } from '@/lib/env';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const prisma = new PrismaClient();
 
 export async function GET(
@@ -53,7 +55,7 @@ export async function GET(
       data: user,
     });
   } catch (error) {
-    console.error('Get user error:', error);
+    safeError('Get user error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' },
       { status: 500 }
@@ -114,7 +116,7 @@ export async function PUT(
       data: user,
     });
   } catch (error) {
-    console.error('Update user error:', error);
+    safeError('Update user error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' },
       { status: 500 }

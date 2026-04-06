@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryOne, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const pageComponents = new Hono<{ Bindings: Env }>();
 
 // ============================================
@@ -238,7 +240,7 @@ pageComponents.get('/', async (c) => {
       tokens: options.includeDetails ? content.tokens : undefined,
     });
   } catch (error) {
-    console.error('Error fetching page components:', error);
+    safeError('Error fetching page components:', error);
     return c.json({ error: 'Failed to fetch page components' }, 500);
   }
 });

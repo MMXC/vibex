@@ -14,6 +14,8 @@ import { ChatMessage } from '../BottomPanel/ChatHistory/ChatHistory';
 import { analyzeRequirement, optimizeRequirement } from '@/services/api/diagnosis';
 import { projectApi } from '@/services/api';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 export interface UseHomePageReturn {
   // Auth
   isAuthenticated: boolean;
@@ -306,7 +308,7 @@ export function useHomePage(): UseHomePageReturn {
       };
       setChatHistory(prev => [...prev, msg]);
     } catch (err) {
-      console.error('[useHomePage] handleDiagnose failed:', err);
+      canvasLogger.default.error('[useHomePage] handleDiagnose failed:', err);
     }
   }, [requirementText]);
 
@@ -325,7 +327,7 @@ export function useHomePage(): UseHomePageReturn {
       setChatHistory(prev => [...prev, msg]);
       setRequirementText(optimizedText);
     } catch (err) {
-      console.error('[useHomePage] handleOptimize failed:', err);
+      canvasLogger.default.error('[useHomePage] handleOptimize failed:', err);
     }
   }, [requirementText]);
 
@@ -398,7 +400,7 @@ export function useHomePage(): UseHomePageReturn {
       };
       setChatHistory(prev => [...prev, msg]);
     } catch (err) {
-      console.error('[useHomePage] handleCreateProject failed:', err);
+      canvasLogger.default.error('[useHomePage] handleCreateProject failed:', err);
     }
   }, [requirementText]);
 

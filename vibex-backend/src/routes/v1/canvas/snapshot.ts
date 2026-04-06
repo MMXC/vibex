@@ -14,6 +14,8 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db'
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const snapshot = new Hono<{ Bindings: Env }>()
 
 // ============================================================
@@ -95,7 +97,7 @@ snapshot.get('/', async (c) => {
       offset,
     })
   } catch (err) {
-    console.error('[canvas/snapshot] GET error:', err)
+    safeError('[canvas/snapshot] GET error:', err)
     return c.json({ error: 'Failed to fetch snapshots' }, 500)
   }
 })
@@ -163,7 +165,7 @@ snapshot.post('/', async (c) => {
       version: created.version,
     }, 201)
   } catch (err) {
-    console.error('[canvas/snapshot] POST error:', err)
+    safeError('[canvas/snapshot] POST error:', err)
     return c.json({ error: 'Failed to create snapshot' }, 500)
   }
 })

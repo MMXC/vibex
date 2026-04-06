@@ -12,6 +12,8 @@ import { Hono } from 'hono';
 import { queryOne, queryDB, executeDB, generateId, Env } from '@/lib/db';
 import { createLLMService, LLMService, ChatMessage } from '@/services/llm';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const clarificationQuestions = new Hono<{ Bindings: Env }>();
 
 // ==================== Types ====================
@@ -125,7 +127,7 @@ function parseQuestionsResponse(content: string): ClarificationQuestion[] | null
     })).filter((q: ClarificationQuestion) => q.question.length > 0);
     
   } catch (error) {
-    console.error('Failed to parse questions response:', error);
+    safeError('Failed to parse questions response:', error);
     return null;
   }
 }
@@ -343,7 +345,7 @@ Format your response as a JSON object with a "questions" array.`;
     }
 
   } catch (error) {
-    console.error('Error generating clarification questions:', error);
+    safeError('Error generating clarification questions:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({ 
       error: 'Failed to generate clarification questions', 
@@ -397,7 +399,7 @@ clarificationQuestions.get('/:requirementId', async (c) => {
     }, 200);
 
   } catch (error) {
-    console.error('Error fetching clarification questions:', error);
+    safeError('Error fetching clarification questions:', error);
     return c.json({ error: 'Failed to fetch clarification questions' }, 500);
   }
 });
@@ -487,7 +489,7 @@ clarificationQuestions.post('/:requirementId/answers', async (c) => {
     }, 200);
 
   } catch (error) {
-    console.error('Error submitting answers:', error);
+    safeError('Error submitting answers:', error);
     return c.json({ error: 'Failed to submit answers' }, 500);
   }
 });
@@ -573,7 +575,7 @@ clarificationQuestions.put('/:requirementId/answers/:questionId', async (c) => {
     }, 200);
 
   } catch (error) {
-    console.error('Error updating answer:', error);
+    safeError('Error updating answer:', error);
     return c.json({ error: 'Failed to update answer' }, 500);
   }
 });
@@ -650,7 +652,7 @@ clarificationQuestions.delete('/:requirementId', async (c) => {
     }, 200);
 
   } catch (error) {
-    console.error('Error deleting clarification questions:', error);
+    safeError('Error deleting clarification questions:', error);
     return c.json({ error: 'Failed to delete clarification questions' }, 500);
   }
 });

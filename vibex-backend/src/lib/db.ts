@@ -1,3 +1,4 @@
+import { safeError } from '@/lib/log-sanitizer';
 // Database connection pool management for Vibex
 // Supports both D1 (Cloudflare Workers) and Prisma (local development)
 
@@ -121,7 +122,7 @@ class PrismaPoolManager {
       this.isHealthy = true;
       this.lastHealthCheck = now;
     } catch (error) {
-      console.error('Prisma health check failed:', error);
+      safeError('Prisma health check failed:', error);
       this.isHealthy = false;
     }
 
@@ -259,7 +260,7 @@ export async function queryDB<T = unknown>(
       const result = await prisma.$queryRawUnsafe<T[]>(sql, ...params);
       return Array.isArray(result) ? result : [];
     } catch (error) {
-      console.error('Prisma query error:', error);
+      safeError('Prisma query error:', error);
       throw error;
     }
   }
@@ -315,7 +316,7 @@ export async function executeDB(
       const result = await prisma.$executeRawUnsafe(sql, ...params);
       return { changes: result, lastInsertRowid: 0 };
     } catch (error) {
-      console.error('Prisma execute error:', error);
+      safeError('Prisma execute error:', error);
       throw error;
     }
   }

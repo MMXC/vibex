@@ -17,6 +17,8 @@ import { ReactNode, useState, useEffect, useRef } from 'react';
 import { persistQueryClient } from '@tanstack/react-query-persist-client';
 import { createLocalStoragePersister } from './persistQueryClient';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 /**
  * 全局错误处理回调
  * 用于统一处理查询和变更中的错误
@@ -25,7 +27,7 @@ const queryErrorHandler = (error: Error | null): void => {
   // 统一错误处理逻辑
   // 可以扩展: 上报 Sentry、显示 toast 等
   if (error) {
-    console.error('[React Query Error]', error.message);
+    canvasLogger.default.error('[React Query Error]', error.message);
   }
 };
 
@@ -85,7 +87,7 @@ export function QueryProvider({ children }: QueryProviderProps) {
       persister,
       maxAge: 24 * 60 * 60 * 1000, // 24 小时
     });
-    persistPromise.catch(console.error);
+    persistPromise.catch(canvasLogger.default.error);
   }, [queryClient]);
 
   return (

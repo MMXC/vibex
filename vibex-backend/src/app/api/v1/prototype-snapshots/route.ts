@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 export const dynamic = 'force-dynamic';
 
 // Auth helper
@@ -42,7 +44,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ prototypeSnapshots: snapshots });
   } catch (error) {
-    console.error('Error fetching prototype snapshots:', error);
+    safeError('Error fetching prototype snapshots:', error);
     return NextResponse.json(
       { error: 'Failed to fetch prototype snapshots' },
       { status: 500 }
@@ -96,7 +98,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ prototypeSnapshot: snapshot }, { status: 201 });
   } catch (error) {
-    console.error('Error creating prototype snapshot:', error);
+    safeError('Error creating prototype snapshot:', error);
     return NextResponse.json(
       { error: 'Failed to create prototype snapshot' },
       { status: 500 }

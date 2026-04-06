@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken';
 import { Context, Next } from 'hono';
 import { CloudflareEnv } from './env';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const JWT_EXPIRES_IN = '7d';
 
 export interface JWTPayload {
@@ -101,7 +103,7 @@ export async function authMiddleware(c: AuthContext, next: Next): Promise<Respon
 
   // No JWT_SECRET configured - reject all requests
   if (!jwtSecret) {
-    console.error('[Auth] JWT_SECRET not configured');
+    safeError('[Auth] JWT_SECRET not configured');
     return c.json(
       { success: false, error: 'JWT_SECRET not configured. Please run: wrangler secret put JWT_SECRET', code: 'CONFIG_ERROR' },
       500

@@ -8,7 +8,7 @@
  *
  * 遵守 AGENTS.md 规范：
  * - 无 any 类型
- * - 无 console.log
+ * - 无 canvasLogger.default.debug
  */
 'use client';
 
@@ -17,6 +17,8 @@ import { useDndSortable, type UseDndSortableOptions } from '@/hooks/canvas/useDn
 import { getHistoryStore } from '@/lib/canvas/historySlice';
 import type { TreeType } from '@/lib/canvas/types';
 import styles from '@/components/canvas/canvas.module.css';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 interface SortableTreeItemProps {
   /** Tree node card children */

@@ -6,6 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ provider: string }> }
@@ -31,7 +33,7 @@ export async function POST(
       expiresIn: 3600 * 24 * 30,
     });
   } catch (error) {
-    console.error('OAuth refresh error:', error);
+    safeError('OAuth refresh error:', error);
     return NextResponse.json(
       { error: 'Failed to refresh token' },
       { status: 500 }

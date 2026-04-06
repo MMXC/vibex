@@ -1,9 +1,11 @@
 import { useCallback, useState } from 'react';
 import type { AIMessage, PanelActions } from '../types';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 /** Dev-only logger */
 const devLog = (...args: unknown[]) => {
-  if (process.env.NODE_ENV !== 'production') console.log(...args);
+  if (process.env.NODE_ENV !== 'production') canvasLogger.default.debug(...args);
 };
 
 export interface UsePanelActionsReturn extends PanelActions {

@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const prototypeCollaborationId = new Hono<{ Bindings: Env }>();
 
 interface PrototypeCollaborationRow {
@@ -49,7 +51,7 @@ prototypeCollaborationId.get('/', async (c) => {
 
     return c.json({ prototypeCollaboration: collaboration });
   } catch (error) {
-    console.error('Error fetching prototype collaboration:', error);
+    safeError('Error fetching prototype collaboration:', error);
     return c.json({ error: 'Failed to fetch prototype collaboration' }, 500);
   }
 });
@@ -124,7 +126,7 @@ prototypeCollaborationId.put('/', async (c) => {
 
     return c.json({ prototypeCollaboration: updated });
   } catch (error) {
-    console.error('Error updating prototype collaboration:', error);
+    safeError('Error updating prototype collaboration:', error);
     return c.json({ error: 'Failed to update prototype collaboration' }, 500);
   }
 });
@@ -192,7 +194,7 @@ prototypeCollaborationId.patch('/', async (c) => {
 
     return c.json({ prototypeCollaboration: updated });
   } catch (error) {
-    console.error('Error patching prototype collaboration:', error);
+    safeError('Error patching prototype collaboration:', error);
     return c.json({ error: 'Failed to patch prototype collaboration' }, 500);
   }
 });
@@ -234,7 +236,7 @@ prototypeCollaborationId.delete('/', async (c) => {
 
     return c.json({ success: true, message: 'Collaboration removed successfully' });
   } catch (error) {
-    console.error('Error deleting prototype collaboration:', error);
+    safeError('Error deleting prototype collaboration:', error);
     return c.json({ error: 'Failed to delete prototype collaboration' }, 500);
   }
 });
@@ -287,7 +289,7 @@ prototypeCollaborationId.post('/revoke', async (c) => {
 
     return c.json({ prototypeCollaboration: updated });
   } catch (error) {
-    console.error('Error revoking prototype collaboration:', error);
+    safeError('Error revoking prototype collaboration:', error);
     return c.json({ error: 'Failed to revoke prototype collaboration' }, 500);
   }
 });
@@ -339,7 +341,7 @@ prototypeCollaborationId.post('/restore', async (c) => {
 
     return c.json({ prototypeCollaboration: updated });
   } catch (error) {
-    console.error('Error restoring prototype collaboration:', error);
+    safeError('Error restoring prototype collaboration:', error);
     return c.json({ error: 'Failed to restore prototype collaboration' }, 500);
   }
 });

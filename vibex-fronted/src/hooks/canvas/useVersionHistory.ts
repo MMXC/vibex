@@ -15,6 +15,8 @@ import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import type { CanvasSnapshot } from '@/lib/canvas/types';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 const SNAPSHOT_DEBOUNCE_MS = 5000; // 5s minimum between manual snapshots
 
 export interface UseVersionHistoryReturn {
@@ -76,7 +78,7 @@ export function useVersionHistory(): UseVersionHistoryReturn {
         setSnapshots(sorted);
       }
     } catch (err) {
-      console.error('[useVersionHistory] loadSnapshots error:', err);
+      canvasLogger.default.error('[useVersionHistory] loadSnapshots error:', err);
     } finally {
       setLoading(false);
     }
@@ -105,7 +107,7 @@ export function useVersionHistory(): UseVersionHistoryReturn {
       }
       return null;
     } catch (err) {
-      console.error('[useVersionHistory] createSnapshot error:', err);
+      canvasLogger.default.error('[useVersionHistory] createSnapshot error:', err);
       return null;
     }
   }, [contextNodes, flowNodes, componentNodes, projectId]);
@@ -131,7 +133,7 @@ export function useVersionHistory(): UseVersionHistoryReturn {
         setSnapshots((prev) => [result.snapshot, ...prev]);
       }
     } catch (err) {
-      console.error('[useVersionHistory] createAiSnapshot error:', err);
+      canvasLogger.default.error('[useVersionHistory] createAiSnapshot error:', err);
     }
   }, [contextNodes, flowNodes, componentNodes, projectId]);
 
@@ -149,7 +151,7 @@ export function useVersionHistory(): UseVersionHistoryReturn {
       }
       return false;
     } catch (err) {
-      console.error('[useVersionHistory] restoreSnapshot error:', err);
+      canvasLogger.default.error('[useVersionHistory] restoreSnapshot error:', err);
       return false;
     }
   }, [setContextNodes, setFlowNodes, setComponentNodes]);

@@ -4,7 +4,7 @@ import { Suspense, useState, useCallback, useEffect } from 'react';
 
 /** Dev-only logger */
 const devLog = (...args: unknown[]) => {
-  if (process.env.NODE_ENV !== 'production') console.log(...args);
+  if (process.env.NODE_ENV !== 'production') canvasLogger.default.debug(...args);
 };
 import { useSearchParams } from 'next/navigation';
 import { ReactFlow, 
@@ -18,6 +18,8 @@ import FlowEditor, { FlowNode, FlowEdge } from '@/components/ui/FlowEditor';
 import FlowPropertiesPanel from '@/components/ui/FlowPropertiesPanel';
 import { apiService } from '@/services/api';
 import styles from './flow.module.css';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 // Node templates for the library
 interface NodeTemplate {
@@ -165,7 +167,7 @@ function FlowContent() {
           setEdges(flow.edges);
         }
       } catch (err) {
-        console.error('Failed to load flow:', err);
+        canvasLogger.default.error('Failed to load flow:', err);
         setError('加载流程图失败');
       } finally {
         setLoading(false);
@@ -388,7 +390,7 @@ function FlowContent() {
       setSaving(true);
       await apiService.updateFlow(flowId, { nodes, edges });
     } catch (err) {
-      console.error('Failed to save flow:', err);
+      canvasLogger.default.error('Failed to save flow:', err);
       setError('保存失败');
     } finally {
       setSaving(false);
@@ -417,7 +419,7 @@ function FlowContent() {
         setError('AI 生成的流程为空');
       }
     } catch (err: unknown) {
-      console.error('AI generation failed:', err);
+      canvasLogger.default.error('AI generation failed:', err);
       setError(err instanceof Error ? err.message : 'AI 生成失败，请稍后重试');
     } finally {
       setAiGenerating(false);

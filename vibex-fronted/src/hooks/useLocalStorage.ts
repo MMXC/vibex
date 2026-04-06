@@ -5,6 +5,8 @@
 
 import { useState, useCallback, useEffect } from 'react';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 export function useLocalStorage<T>(
   key: string,
   initialValue: T
@@ -20,7 +22,7 @@ export function useLocalStorage<T>(
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      console.warn(`Error reading localStorage key "${key}":`, error);
+      canvasLogger.default.warn(`Error reading localStorage key "${key}":`, error);
       return initialValue;
     }
   });
@@ -36,7 +38,7 @@ export function useLocalStorage<T>(
           try {
             window.localStorage.setItem(key, JSON.stringify(newValue));
           } catch (error) {
-            console.warn(`Error setting localStorage key "${key}":`, error);
+            canvasLogger.default.warn(`Error setting localStorage key "${key}":`, error);
           }
         }
 
@@ -53,7 +55,7 @@ export function useLocalStorage<T>(
       try {
         window.localStorage.removeItem(key);
       } catch (error) {
-        console.warn(`Error removing localStorage key "${key}":`, error);
+        canvasLogger.default.warn(`Error removing localStorage key "${key}":`, error);
       }
     }
   }, [key, initialValue]);

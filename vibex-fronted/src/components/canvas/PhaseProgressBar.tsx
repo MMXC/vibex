@@ -5,11 +5,13 @@
  * 遵守 AGENTS.md 规范：
  * - Props 接口有 JSDoc
  * - 无 any 类型泄漏
- * - 无 console.log
+ * - 无 canvasLogger.default.debug
  */
 import React from 'react';
 import type { Phase } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 interface PhaseProgressBarProps {
   /** 当前阶段 */

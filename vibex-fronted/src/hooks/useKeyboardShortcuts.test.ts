@@ -5,11 +5,13 @@
  *
  * 遵守约束:
  * - 无 any 类型
- * - 无 console.log
+ * - 无 canvasLogger.default.debug
  */
 import { renderHook, act } from '@testing-library/react';
 import { useKeyboardShortcuts } from './useKeyboardShortcuts';
 
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 describe('useKeyboardShortcuts', () => {
   // Helper to simulate keyboard event

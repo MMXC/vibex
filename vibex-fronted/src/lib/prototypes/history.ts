@@ -9,6 +9,8 @@
 
 import type { UISchema, UIPage, UIComponent } from './ui-schema';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // ==================== Types ====================
 
 /**
@@ -97,7 +99,7 @@ export type HistoryEventListener<T = unknown> = (
  * ```typescript
  * const history = new HistoryService<UISchema>({
  *   maxEntries: 50,
- *   onStateChange: (state) => console.log('State changed:', state)
+ *   onStateChange: (state) => canvasLogger.default.debug('State changed:', state)
  * });
  * 
  * history.push(initialSchema, 'Initial state');
@@ -468,7 +470,7 @@ export class HistoryService<T = unknown> {
         try {
           listener(event, state, entry, this);
         } catch (error) {
-          console.error(`HistoryService: Error in listener for event "${event}":`, error);
+          canvasLogger.default.error(`HistoryService: Error in listener for event "${event}":`, error);
         }
       });
     }

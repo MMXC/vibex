@@ -6,6 +6,8 @@
 import fs from 'fs';
 import path from 'path';
 
+import { devLog, safeError } from '@/lib/log-sanitizer';
+
 interface OpenAPISpec {
   openapi: string;
   info: { title: string; version: string };
@@ -243,18 +245,18 @@ if (require.main === module) {
   const args = process.argv.slice(2);
   
   if (args.length < 2) {
-    console.log('Usage: node api-change-detector.js <baseline.json> <current.json> [output.json]');
-    console.log('');
-    console.log('Example:');
-    console.log('  node api-change-detector.js openapi.json baseline.yaml change-report.json');
+    devLog('Usage: node api-change-detector.js <baseline.json> <current.json> [output.json]');
+    devLog('');
+    devLog('Example:');
+    devLog('  node api-change-detector.js openapi.json baseline.yaml change-report.json');
     process.exit(1);
   }
 
   const [baselinePath, currentPath, outputPath] = args;
 
-  console.log(`📊 Comparing OpenAPI specs...`);
-  console.log(`  Baseline: ${baselinePath}`);
-  console.log(`  Current:  ${currentPath}`);
+  devLog(`📊 Comparing OpenAPI specs...`);
+  devLog(`  Baseline: ${baselinePath}`);
+  devLog(`  Current:  ${currentPath}`);
 
   try {
     const baseline = loadSpec(baselinePath);
@@ -263,26 +265,26 @@ if (require.main === module) {
     const changes = detectChanges(baseline, current);
     const report = generateReport(baselinePath, currentPath, changes);
 
-    console.log('');
-    console.log(`📈 Change Summary:`);
-    console.log(`  🔴 Breaking Changes:     ${report.summary.breaking}`);
-    console.log(`  🟢 Non-Breaking Changes: ${report.summary.nonBreaking}`);
-    console.log(`  🔵 Info Changes:        ${report.summary.info}`);
+    devLog('');
+    devLog(`📈 Change Summary:`);
+    devLog(`  🔴 Breaking Changes:     ${report.summary.breaking}`);
+    devLog(`  🟢 Non-Breaking Changes: ${report.summary.nonBreaking}`);
+    devLog(`  🔵 Info Changes:        ${report.summary.info}`);
 
     if (outputPath) {
       fs.writeFileSync(outputPath, JSON.stringify(report, null, 2));
-      console.log(`\n✅ Report saved to: ${outputPath}`);
+      devLog(`\n✅ Report saved to: ${outputPath}`);
     }
 
     // Exit with error code if breaking changes found
     if (report.summary.breaking > 0) {
-      console.log(`\n⚠️  Found ${report.summary.breaking} breaking changes!`);
+      devLog(`\n⚠️  Found ${report.summary.breaking} breaking changes!`);
       process.exit(1);
     }
 
-    console.log(`\n✅ No breaking changes detected.`);
+    devLog(`\n✅ No breaking changes detected.`);
   } catch (error) {
-    console.error('❌ Error:', error);
+    safeError('❌ Error:', error);
     process.exit(1);
   }
 }

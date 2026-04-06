@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Trigger generation (fire-and-forget, status updated via /status endpoint)
-      void triggerGeneration(projectId, componentId, component).catch(console.error);
+      void triggerGeneration(projectId, componentId, component).catch(safeError);
     }
 
     return NextResponse.json({ queueId, pages: resultPages }, { status: 200 });
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
     if (error instanceof AppError) {
       return NextResponse.json(errorToResponse(error), { status: error.statusCode });
     }
-    console.error('[canvas/generate] Error:', error);
+    safeError('[canvas/generate] Error:', error);
     return NextResponse.json(
       { error: 'Internal server error', code: 'INTERNAL_ERROR' },
       { status: 500 }
@@ -222,6 +222,8 @@ async function generateWithAI(prompt: string): Promise<string> {
 'use client';
 
 import React from 'react';
+
+import { safeError } from '@/lib/log-sanitizer';
 
 export default function GeneratedPage() {
   return (

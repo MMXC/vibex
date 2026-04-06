@@ -4,7 +4,7 @@
  * Epic 2: F2.1 命令输入框
  * PRD D2: 5 个命令（/submit /gen-context /gen-flow /update-card /gen-component）
  * PRD D4: 底部输入框展示 /命令，无独立预览卡片
- * PRD D6: 命令执行只用 console.log，不调用 API
+ * PRD D6: 命令执行只用 canvasLogger.default.debug，不调用 API
  */
 
 'use client';
@@ -15,6 +15,8 @@ import { useUIStore } from '@/lib/canvas/stores/uiStore';
 import { addCommandMessage } from './messageDrawerStore';
 import { CommandList } from './CommandList';
 import styles from './messageDrawer.module.css';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 const ALL_COMMANDS = [
   { id: 'submit',         label: '/submit',         description: '提交当前画布到后端',         nodeRequired: false },

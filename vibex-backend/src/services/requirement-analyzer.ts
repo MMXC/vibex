@@ -41,6 +41,8 @@ import {
 } from './entity-relations';
 import { queryOne, executeDB, generateId } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 // ==================== Types ====================
 
 /**
@@ -714,12 +716,12 @@ export class RequirementAnalyzerService {
       const targetId = entityNameToId.get(relation.targetEntity.toLowerCase());
 
       if (!sourceId || !targetId) {
-        console.warn(`Skipping relation: entity not found (${relation.sourceEntity} -> ${relation.targetEntity})`);
+        safeError(`Skipping relation: entity not found (${relation.sourceEntity} -> ${relation.targetEntity})`);
         continue;
       }
 
       if (sourceId === targetId) {
-        console.warn(`Skipping self-referencing relation: ${relation.sourceEntity}`);
+        safeError(`Skipping self-referencing relation: ${relation.sourceEntity}`);
         continue;
       }
 
@@ -734,7 +736,7 @@ export class RequirementAnalyzerService {
 
         relations.push(created);
       } catch (error) {
-        console.warn(`Failed to create relation: ${relation.sourceEntity} -> ${relation.targetEntity}`, error);
+        safeError(`Failed to create relation: ${relation.sourceEntity} -> ${relation.targetEntity}`, error);
       }
     }
 

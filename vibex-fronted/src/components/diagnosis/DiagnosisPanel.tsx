@@ -9,6 +9,8 @@ import { DiagnosisResult, DIMENSION_LABELS, DimensionName } from '@/services/dia
 import ScoreDisplay from './ScoreDisplay';
 import SuggestionList from './SuggestionList';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 interface DiagnosisPanelProps {
   onAnalyze?: (text: string) => void;
   onOptimize?: (text: string) => void;
@@ -31,7 +33,7 @@ export default function DiagnosisPanel({ onAnalyze, onOptimize }: DiagnosisPanel
       setResult(diagnosis);
       onAnalyze?.(requirementText);
     } catch (error) {
-      console.error('Diagnosis failed:', error);
+      canvasLogger.default.error('Diagnosis failed:', error);
     } finally {
       setIsAnalyzing(false);
     }
@@ -50,7 +52,7 @@ export default function DiagnosisPanel({ onAnalyze, onOptimize }: DiagnosisPanel
       setResult(diagnoser.diagnose(optResult.improvedText));
       onOptimize?.(optResult.improvedText);
     } catch (error) {
-      console.error('Optimization failed:', error);
+      canvasLogger.default.error('Optimization failed:', error);
     } finally {
       setIsOptimizing(false);
     }

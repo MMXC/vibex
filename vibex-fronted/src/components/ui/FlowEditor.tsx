@@ -31,6 +31,8 @@ import { ReactFlow,
 import '@xyflow/react/dist/style.css';
 import styles from './FlowEditor.module.css';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 export type FlowNode = Node;
 export type FlowEdge = Edge;
 
@@ -279,7 +281,7 @@ function FlowEditorInner({
  * <FlowEditor
  *   initialNodes={nodes}
  *   initialEdges={edges}
- *   onConnect={(connection) => console.log('Connected:', connection)}
+ *   onConnect={(connection) => canvasLogger.default.debug('Connected:', connection)}
  * />
  * ```
  */

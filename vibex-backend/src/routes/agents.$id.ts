@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const agentId = new Hono<{ Bindings: Env }>();
 
 interface AgentRow {
@@ -32,7 +34,7 @@ agentId.get('/', async (c) => {
 
     return c.json({ agent });
   } catch (error) {
-    console.error('Error fetching agent:', error);
+    safeError('Error fetching agent:', error);
     return c.json({ error: 'Failed to fetch agent' }, 500);
   }
 });
@@ -86,7 +88,7 @@ agentId.put('/', async (c) => {
 
     return c.json({ agent });
   } catch (error) {
-    console.error('Error updating agent:', error);
+    safeError('Error updating agent:', error);
     return c.json({ error: 'Failed to update agent' }, 500);
   }
 });
@@ -101,7 +103,7 @@ agentId.delete('/', async (c) => {
 
     return c.json({ success: true });
   } catch (error) {
-    console.error('Error deleting agent:', error);
+    safeError('Error deleting agent:', error);
     return c.json({ error: 'Failed to delete agent' }, 500);
   }
 });

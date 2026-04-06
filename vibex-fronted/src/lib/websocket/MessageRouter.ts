@@ -1,3 +1,4 @@
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 /**
  * Message Router
  * 消息路由、广播、持久化
@@ -105,7 +106,7 @@ export class MessageRouter {
 
     // 持久化
     if (this.persistence) {
-      this.persistence.save(fullMessage).catch(console.error);
+      this.persistence.save(fullMessage).catch(canvasLogger.default.error);
     }
   }
 
@@ -149,7 +150,7 @@ export class MessageRouter {
       try {
         handler(message);
       } catch (error) {
-        console.error(`Message handler error:`, error);
+        canvasLogger.default.error(`Message handler error:`, error);
       }
     });
   }

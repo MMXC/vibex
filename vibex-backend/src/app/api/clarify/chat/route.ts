@@ -11,6 +11,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAIService } from '@/services/ai-service';
 import { getLocalEnv } from '@/lib/env';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 export const dynamic = 'force-dynamic';
 
 interface ChatMessage {
@@ -132,7 +134,7 @@ export async function POST(request: NextRequest) {
 
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-    console.error('[Clarify Chat] Error:', errorMessage);
+    safeError('[Clarify Chat] Error:', errorMessage);
     return NextResponse.json({
       reply: '',
       completeness: 0,

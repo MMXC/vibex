@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const componentManager = new Hono<{ Bindings: Env }>();
 
 // ============================================
@@ -95,7 +97,7 @@ componentManager.get('/', async (c) => {
 
     return c.json({ components: parsedComponents });
   } catch (error) {
-    console.error('Error fetching components:', error);
+    safeError('Error fetching components:', error);
     return c.json({ error: 'Failed to fetch components' }, 500);
   }
 });
@@ -116,7 +118,7 @@ componentManager.get('/categories', async (c) => {
 
     return c.json({ categories });
   } catch (error) {
-    console.error('Error fetching categories:', error);
+    safeError('Error fetching categories:', error);
     return c.json({ error: 'Failed to fetch categories' }, 500);
   }
 });
@@ -153,7 +155,7 @@ componentManager.get('/:id', async (c) => {
 
     return c.json({ component: parsedComponent });
   } catch (error) {
-    console.error('Error fetching component:', error);
+    safeError('Error fetching component:', error);
     return c.json({ error: 'Failed to fetch component' }, 500);
   }
 });
@@ -231,7 +233,7 @@ componentManager.post('/', async (c) => {
 
     return c.json({ component: parsedComponent }, 201);
   } catch (error) {
-    console.error('Error creating component:', error);
+    safeError('Error creating component:', error);
     return c.json({ error: 'Failed to create component' }, 500);
   }
 });
@@ -338,7 +340,7 @@ componentManager.put('/:id', async (c) => {
 
     return c.json({ component: parsedComponent });
   } catch (error) {
-    console.error('Error updating component:', error);
+    safeError('Error updating component:', error);
     return c.json({ error: 'Failed to update component' }, 500);
   }
 });
@@ -367,7 +369,7 @@ componentManager.delete('/:id', async (c) => {
 
     return c.json({ success: true, message: 'Component deleted successfully' });
   } catch (error) {
-    console.error('Error deleting component:', error);
+    safeError('Error deleting component:', error);
     return c.json({ error: 'Failed to delete component' }, 500);
   }
 });
@@ -445,7 +447,7 @@ componentManager.post('/:id/variants', async (c) => {
 
     return c.json({ component: parsedComponent });
   } catch (error) {
-    console.error('Error adding variant:', error);
+    safeError('Error adding variant:', error);
     return c.json({ error: 'Failed to add variant' }, 500);
   }
 });
@@ -512,7 +514,7 @@ componentManager.put('/:id/variants/:variantName', async (c) => {
 
     return c.json({ component: parsedComponent });
   } catch (error) {
-    console.error('Error updating variant:', error);
+    safeError('Error updating variant:', error);
     return c.json({ error: 'Failed to update variant' }, 500);
   }
 });
@@ -573,7 +575,7 @@ componentManager.delete('/:id/variants/:variantName', async (c) => {
 
     return c.json({ component: parsedComponent });
   } catch (error) {
-    console.error('Error deleting variant:', error);
+    safeError('Error deleting variant:', error);
     return c.json({ error: 'Failed to delete variant' }, 500);
   }
 });

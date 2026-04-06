@@ -7,6 +7,8 @@
 
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, isAxiosError } from 'axios';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // 重试配置选项
 export interface RetryOptions {
   /** 重试次数，默认 3 */
@@ -86,7 +88,7 @@ export async function configureAxiosRetry(
     const axiosRetryModule = await import('axios-retry');
     axiosRetry = axiosRetryModule.default || axiosRetryModule;
   } catch (err) {
-    console.error('Failed to load axios-retry:', err);
+    canvasLogger.default.error('Failed to load axios-retry:', err);
     return;
   }
   
@@ -152,7 +154,7 @@ export function createRetryableClient(baseURL: string, options?: RetryOptions): 
   
   // 配置重试（不阻塞初始化）
   configureAxiosRetry(instance, options).catch((err) => {
-    console.error('Failed to configure retry:', err);
+    canvasLogger.default.error('Failed to configure retry:', err);
   });
   
   return instance;

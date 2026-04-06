@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import styles from './changelog.module.css';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 interface ChangelogEntry {
   version: string;
   date: string;
@@ -1860,7 +1862,7 @@ export default function Changelog() {
           setVersionInfo(data);
         }
       } catch (error) {
-        console.error('Failed to fetch version:', error);
+        canvasLogger.default.error('Failed to fetch version:', error);
       } finally {
         setLoading(false);
       }

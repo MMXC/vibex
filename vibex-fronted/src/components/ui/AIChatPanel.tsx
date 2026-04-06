@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
@@ -44,7 +46,7 @@ export default function AIChatPanel({
     try {
       await onSendMessage(message);
     } catch (error) {
-      console.error('Failed to send message:', error);
+      canvasLogger.default.error('Failed to send message:', error);
     }
   };
 

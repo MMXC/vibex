@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const branchId = new Hono<{ Bindings: Env }>();
 
 interface BranchRow {
@@ -33,7 +35,7 @@ branchId.get('/', async (c) => {
 
     return c.json({ branch });
   } catch (error) {
-    console.error('Error fetching branch:', error);
+    safeError('Error fetching branch:', error);
     return c.json({ error: 'Failed to fetch branch' }, 500);
   }
 });
@@ -91,7 +93,7 @@ branchId.put('/', async (c) => {
 
     return c.json({ branch });
   } catch (error) {
-    console.error('Error updating branch:', error);
+    safeError('Error updating branch:', error);
     return c.json({ error: 'Failed to update branch' }, 500);
   }
 });
@@ -106,7 +108,7 @@ branchId.delete('/', async (c) => {
 
     return c.json({ success: true });
   } catch (error) {
-    console.error('Error deleting branch:', error);
+    safeError('Error deleting branch:', error);
     return c.json({ error: 'Failed to delete branch' }, 500);
   }
 });

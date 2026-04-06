@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 export const dynamic = 'force-dynamic';
 
 // Auth helper
@@ -42,7 +44,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ agents });
   } catch (error) {
-    console.error('Error fetching agents:', error);
+    safeError('Error fetching agents:', error);
     return NextResponse.json(
       { error: 'Failed to fetch agents' },
       { status: 500 }
@@ -84,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ agent }, { status: 201 });
   } catch (error) {
-    console.error('Error creating agent:', error);
+    safeError('Error creating agent:', error);
     return NextResponse.json(
       { error: 'Failed to create agent' },
       { status: 500 }

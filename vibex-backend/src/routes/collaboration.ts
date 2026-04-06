@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const collaboration = new Hono<{ Bindings: Env }>();
 
 // ============================================
@@ -125,7 +127,7 @@ collaboration.get('/', async (c) => {
       permissions: ROLE_PERMISSIONS,
     });
   } catch (error) {
-    console.error('Error fetching collaborations:', error);
+    safeError('Error fetching collaborations:', error);
     return c.json({ error: 'Failed to fetch collaborations' }, 500);
   }
 });
@@ -240,7 +242,7 @@ collaboration.post('/', async (c) => {
       isExisting: false,
     }, 201);
   } catch (error) {
-    console.error('Error creating collaboration:', error);
+    safeError('Error creating collaboration:', error);
     return c.json({ error: 'Failed to create collaboration' }, 500);
   }
 });
@@ -390,7 +392,7 @@ collaboration.post('/invite', async (c) => {
       userJoined: false,
     }, 201);
   } catch (error) {
-    console.error('Error creating invitation:', error);
+    safeError('Error creating invitation:', error);
     return c.json({ error: 'Failed to create invitation' }, 500);
   }
 });
@@ -436,7 +438,7 @@ collaboration.get('/invite/:token', async (c) => {
       },
     });
   } catch (error) {
-    console.error('Error fetching invitation:', error);
+    safeError('Error fetching invitation:', error);
     return c.json({ error: 'Failed to fetch invitation' }, 500);
   }
 });
@@ -545,7 +547,7 @@ collaboration.post('/invite/:token/accept', async (c) => {
       },
     }, 201);
   } catch (error) {
-    console.error('Error accepting invitation:', error);
+    safeError('Error accepting invitation:', error);
     return c.json({ error: 'Failed to accept invitation' }, 500);
   }
 });
@@ -635,7 +637,7 @@ collaboration.post('/batch', async (c) => {
       count: enrichedResults.length,
     }, results.length > 0 ? 201 : 400);
   } catch (error) {
-    console.error('Error batch adding collaborators:', error);
+    safeError('Error batch adding collaborators:', error);
     return c.json({ error: 'Failed to batch add collaborators' }, 500);
   }
 });
@@ -753,7 +755,7 @@ collaboration.post('/batch/invite', async (c) => {
       errorCount: results.filter(r => r.error).length,
     }, 201);
   } catch (error) {
-    console.error('Error batch creating invitations:', error);
+    safeError('Error batch creating invitations:', error);
     return c.json({ error: 'Failed to batch create invitations' }, 500);
   }
 });

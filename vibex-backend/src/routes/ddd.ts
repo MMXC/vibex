@@ -3,7 +3,7 @@ import { cors } from 'hono/cors'
 import { z } from 'zod'
 import { generateId, Env } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
-import { devDebug, sanitize } from '@/lib/log-sanitizer'
+import { devDebug, sanitize, devLog, safeError } from '@/lib/log-sanitizer'
 
 const ddd = new Hono<{ Bindings: Env }>();
 
@@ -260,7 +260,7 @@ Respond ONLY with the JSON object, no other text.`
         })
       }
     } catch (parseError) {
-      console.error('Failed to parse AI response:', parseError)
+      safeError('Failed to parse AI response:', parseError)
     }
 
     // If no contexts generated, create a default one
@@ -288,7 +288,7 @@ Respond ONLY with the JSON object, no other text.`
       }
     })
   } catch (error) {
-    console.error('Error generating bounded contexts:', error)
+    safeError('Error generating bounded contexts:', error)
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to generate bounded contexts'
@@ -426,7 +426,7 @@ Respond ONLY with the JSON object, no other text.`
         }))
       }
     } catch (parseError) {
-      console.error('Failed to parse AI response:', parseError)
+      safeError('Failed to parse AI response:', parseError)
     }
 
     // If no models generated, create defaults
@@ -453,7 +453,7 @@ Respond ONLY with the JSON object, no other text.`
       }))),
     })
   } catch (error) {
-    console.error('Error generating domain models:', error)
+    safeError('Error generating domain models:', error)
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to generate domain models'
@@ -536,7 +536,7 @@ ${contextInfo}
 只输出JSON，不要其他内容。`
 
           // Call AI with extended timeout for complex requests
-          console.log('[Domain Model Stream] Starting AI call for domain model generation')
+          devLog('[Domain Model Stream] Starting AI call for domain model generation')
           const result = await aiService.generateJSON<{ domainModels: any[] }>(
             prompt,
             { 
@@ -549,7 +549,7 @@ ${contextInfo}
           // Enhanced error handling - Check for AI service failure
           // Fallback: generate domain models from bounded contexts when AI fails
           if (!result.success) {
-            console.error('[Domain Model Stream] AI service error, using fallback:', result.error)
+            safeError('[Domain Model Stream] AI service error, using fallback:', result.error)
             const fallbackModels = boundedContexts.map((ctx, index) => ({
               id: `dm-${generateId()}-${index}`,
               name: ctx.name,
@@ -573,17 +573,17 @@ ${contextInfo}
           
           // Enhanced error handling - Check for missing or invalid data
           if (!result.data) {
-            console.error('[Domain Model Stream] AI returned null data')
+            safeError('[Domain Model Stream] AI returned null data')
             throw new Error('AI 返回数据为空，请稍后重试')
           }
           
           if (!result.data.domainModels) {
-            console.error('[Domain Model Stream] AI response missing domainModels:', result.data)
+            safeError('[Domain Model Stream] AI response missing domainModels:', result.data)
             throw new Error('AI 响应格式错误：缺少 domainModels 字段')
           }
           
           if (!Array.isArray(result.data.domainModels)) {
-            console.error('[Domain Model Stream] domainModels is not an array:', typeof result.data.domainModels)
+            safeError('[Domain Model Stream] domainModels is not an array:', typeof result.data.domainModels)
             throw new Error('AI 响应格式错误：domainModels 应为数组')
           }
           
@@ -616,7 +616,7 @@ ${contextInfo}
         } catch (error) {
           // Enhanced error handling with detailed logging
           const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-          console.error('[Domain Model Stream] Error occurred:', {
+          safeError('[Domain Model Stream] Error occurred:', {
             message: errorMessage,
             stack: error instanceof Error ? error.stack : undefined,
             timestamp: new Date().toISOString()
@@ -629,7 +629,7 @@ ${contextInfo}
           })
         } finally {
           // Ensure stream is always closed
-          console.log('[Domain Model Stream] Stream completed')
+          devLog('[Domain Model Stream] Stream completed')
           controller.close()
         }
       }
@@ -643,7 +643,7 @@ ${contextInfo}
       }
     })
   } catch (error) {
-    console.error('Error setting up stream:', error)
+    safeError('Error setting up stream:', error)
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to setup stream'
@@ -808,7 +808,7 @@ Respond ONLY with the JSON object, no other text.`
         }
       }
     } catch (parseError) {
-      console.error('Failed to parse AI response:', parseError)
+      safeError('Failed to parse AI response:', parseError)
     }
 
     // If no flow generated, create a default one
@@ -834,7 +834,7 @@ Respond ONLY with the JSON object, no other text.`
       mermaidCode: generateFlowMermaidCode(businessFlow),
     })
   } catch (error) {
-    console.error('Error generating business flow:', error)
+    safeError('Error generating business flow:', error)
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to generate business flow'
@@ -903,7 +903,7 @@ Output:
           })
           
         } catch (error) {
-          console.error('Stream error:', error)
+          safeError('Stream error:', error)
           send('error', { message: error instanceof Error ? error.message : 'Unknown error' })
         }
         
@@ -1217,7 +1217,7 @@ Respond ONLY with the JSON object, no other text. All text content must be in Ch
               })
             }
           } catch (parseError) {
-            console.error('Failed to parse AI response:', parseError)
+            safeError('Failed to parse AI response:', parseError)
           }
 
           // Default fallback if no contexts
@@ -1241,7 +1241,7 @@ Respond ONLY with the JSON object, no other text. All text content must be in Ch
         }
       } catch (error) {
           // F1.4: Error event
-          console.error('SSE stream error:', error)
+          safeError('SSE stream error:', error)
           send('error', {
             message: error instanceof Error ? error.message : 'AI 分析失败，请重试'
           })
@@ -1260,7 +1260,7 @@ Respond ONLY with the JSON object, no other text. All text content must be in Ch
       },
     })
   } catch (error) {
-    console.error('Error setting up SSE stream:', error)
+    safeError('Error setting up SSE stream:', error)
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to setup stream'

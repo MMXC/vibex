@@ -17,6 +17,8 @@ import mermaid from 'mermaid';
 import { preInitialize } from './mermaidInit';
 import DOMPurify from 'dompurify';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // ==================== F1.2: LRU Cache ====================
 
 class LRUCache<T> {
@@ -170,7 +172,7 @@ export function MermaidRenderer({ chart, title }: MermaidRendererProps) {
         // F3.1: 检查是否已取消
         if (cancelledRef.current) return;
         
-        console.error('Mermaid render error:', err);
+        canvasLogger.default.error('Mermaid render error:', err);
         setError('图表渲染失败');
         setSvg('');
       } finally {

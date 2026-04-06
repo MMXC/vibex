@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const messages = new Hono<{ Bindings: Env }>();
 
 interface MessageRow {
@@ -29,7 +31,7 @@ messages.get('/', async (c) => {
 
     return c.json({ messages: messagesList });
   } catch (error) {
-    console.error('Error fetching messages:', error);
+    safeError('Error fetching messages:', error);
     return c.json({ error: 'Failed to fetch messages' }, 500);
   }
 });
@@ -62,7 +64,7 @@ messages.post('/', async (c) => {
 
     return c.json({ message }, 201);
   } catch (error) {
-    console.error('Error creating message:', error);
+    safeError('Error creating message:', error);
     return c.json({ error: 'Failed to create message' }, 500);
   }
 });

@@ -9,6 +9,8 @@ import { createGzip } from 'zlib';
 import { Readable } from 'stream';
 import prisma from '@/lib/prisma';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 export const dynamic = 'force-dynamic';
 
 // Auth helper for canvas routes
@@ -84,7 +86,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('[canvas/export] Error:', error);
+    safeError('[canvas/export] Error:', error);
     return NextResponse.json({ error: 'Failed to export project' }, { status: 500 });
   }
 }

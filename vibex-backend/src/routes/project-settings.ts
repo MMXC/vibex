@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryOne, executeDB, Env, generateId } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const projectSettings = new Hono<{ Bindings: Env }>();
 
 interface ProjectSettingsRow {
@@ -133,7 +135,7 @@ projectSettings.get('/', async (c) => {
 
     return c.json({ settings: mergedSettings });
   } catch (error) {
-    console.error('Error fetching project settings:', error);
+    safeError('Error fetching project settings:', error);
     return c.json({ error: 'Failed to fetch project settings' }, 500);
   }
 });
@@ -211,7 +213,7 @@ projectSettings.put('/', async (c) => {
 
     return c.json({ settings: mergedSettings, updated: updates });
   } catch (error) {
-    console.error('Error updating project settings:', error);
+    safeError('Error updating project settings:', error);
     return c.json({ error: 'Failed to update project settings' }, 500);
   }
 });
@@ -255,7 +257,7 @@ projectSettings.get('/preferences', async (c) => {
 
     return c.json({ preferences: mergedPrefs });
   } catch (error) {
-    console.error('Error fetching user preferences:', error);
+    safeError('Error fetching user preferences:', error);
     return c.json({ error: 'Failed to fetch user preferences' }, 500);
   }
 });
@@ -338,7 +340,7 @@ projectSettings.put('/preferences', async (c) => {
 
     return c.json({ preferences: mergedPrefs, updated: updates });
   } catch (error) {
-    console.error('Error updating user preferences:', error);
+    safeError('Error updating user preferences:', error);
     return c.json({ error: 'Failed to update user preferences' }, 500);
   }
 });
@@ -378,7 +380,7 @@ projectSettings.delete('/:key', async (c) => {
 
     return c.json({ success: true, deleted: key });
   } catch (error) {
-    console.error('Error deleting setting:', error);
+    safeError('Error deleting setting:', error);
     return c.json({ error: 'Failed to delete setting' }, 500);
   }
 });
@@ -432,7 +434,7 @@ projectSettings.post('/reset', async (c) => {
       }
     });
   } catch (error) {
-    console.error('Error resetting settings:', error);
+    safeError('Error resetting settings:', error);
     return c.json({ error: 'Failed to reset settings' }, 500);
   }
 });
@@ -454,7 +456,7 @@ async function queryDB<T = unknown>(
       const result = await prisma.$queryRawUnsafe<T[]>(sql, ...params);
       return Array.isArray(result) ? result : [];
     } catch (error) {
-      console.error('Prisma query error:', error);
+      safeError('Prisma query error:', error);
       throw error;
     } finally {
       await prisma.$disconnect();

@@ -7,6 +7,8 @@
 import { ErrorConfig } from '@/types/error';
 import { defaultErrorMapper } from '@/lib/error/ErrorCodeMapper';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 /**
  * API 错误处理器选项
  */
@@ -55,7 +57,7 @@ function handleApiError(err: unknown, options: ApiHandlerOptions): ErrorConfig {
 
   // 显示错误日志
   if (options.showToast && typeof window !== 'undefined') {
-    console.error('API Error:', finalConfig.userMessage);
+    canvasLogger.default.error('API Error:', finalConfig.userMessage);
   }
 
   return finalConfig;

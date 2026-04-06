@@ -1,3 +1,4 @@
+import { safeError } from '@/lib/log-sanitizer';
 /**
  * Code Review Prompt Templates
  * 
@@ -252,7 +253,7 @@ export const LANGUAGE_PATTERNS: Record<ProgrammingLanguage, {
       'implicit global variables',
       'unsafe equality checks',
       'missing error handling',
-      'console.log in production',
+      'devLog in production',
     ],
     bestPractices: [
       'Use const/let instead of var',
@@ -922,7 +923,7 @@ export function parseCodeReviewResponse(content: string): CodeReviewResult | nul
       linesOfCode: parsed.linesOfCode || 0,
     };
   } catch (error) {
-    console.error('Failed to parse code review response:', error);
+    safeError('Failed to parse code review response:', error);
     return null;
   }
 }

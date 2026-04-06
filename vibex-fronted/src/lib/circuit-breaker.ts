@@ -1,3 +1,4 @@
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 /**
  * Circuit Breaker Implementation
  * 
@@ -7,7 +8,7 @@
 
 /** Dev-only logger */
 const devLog = (...args: unknown[]) => {
-  if (process.env.NODE_ENV !== 'production') console.log(...args);
+  if (process.env.NODE_ENV !== 'production') canvasLogger.default.debug(...args);
 };
 
 export type CircuitState = 'closed' | 'open' | 'half-open';
@@ -188,7 +189,7 @@ export class CircuitBreaker {
     switch (newState) {
       case 'open':
         this.onCircuitOpen?.();
-        console.error(`[CircuitBreaker] OPEN: ${this.name}`);
+        canvasLogger.default.error(`[CircuitBreaker] OPEN: ${this.name}`);
         break;
       case 'closed':
         this.failureCount = 0;

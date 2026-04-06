@@ -9,6 +9,8 @@ import { NextRequest } from 'next/server';
 import { z, ZodType, ZodError } from 'zod';
 import { ValidationError, JsonParseError } from './validation-error';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 // =============================================================================
 // Type Definitions
 // =============================================================================
@@ -170,7 +172,7 @@ export function withValidation(
       }
 
       // Handle unexpected errors
-      console.error('[withValidation] Unexpected error:', error);
+      safeError('[withValidation] Unexpected error:', error);
       return Response.json(
         {
           success: false,

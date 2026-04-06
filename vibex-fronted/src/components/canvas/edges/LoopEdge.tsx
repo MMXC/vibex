@@ -1,3 +1,4 @@
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 /**
  * LoopEdge — ReactFlow custom edge for loop/cycle paths in business flows
  *
@@ -40,7 +41,7 @@ export const LoopEdge = memo(function LoopEdgeComponent(props: EdgeProps<LoopEdg
   const handleClick = useCallback(
     (event: React.MouseEvent) => {
       event.stopPropagation();
-      console.debug('[LoopEdge] clicked:', props.id);
+      canvasLogger.default.debug('[LoopEdge] clicked:', props.id);
     },
     [props.id]
   );

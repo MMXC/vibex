@@ -2,6 +2,8 @@ import { Hono } from 'hono';
 import { hashPassword, generateToken } from '@/lib/auth';
 import { queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const register = new Hono<{ Bindings: Env }>();
 
 // POST /api/auth/register
@@ -77,7 +79,7 @@ register.post('/', async (c) => {
       201
     );
   } catch (error) {
-    console.error('Register error:', error);
+    safeError('Register error:', error);
     return c.json(
       { success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' },
       500

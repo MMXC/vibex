@@ -13,9 +13,11 @@
 
 import { captureMessage } from './sentry';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 /** Dev-only logger */
 const devLog = (...args: unknown[]) => {
-  if (process.env.NODE_ENV !== 'production') console.log(...args);
+  if (process.env.NODE_ENV !== 'production') canvasLogger.default.debug(...args);
 };
 
 // PerformanceObserver entry type definitions (not in standard DOM lib)
@@ -125,7 +127,7 @@ function reportWebVitals(metric: WebVitalsMetric) {
         // navigator.sendBeacon('/api/vitals', JSON.stringify(data));
       }
     } catch (e) {
-      console.error('[Web Vitals] Report failed:', e);
+      canvasLogger.default.error('[Web Vitals] Report failed:', e);
     }
   }
 }
@@ -164,7 +166,7 @@ export function initWebVitals() {
       
       lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
     } catch (e) {
-      console.warn('[Web Vitals] LCP observer not supported');
+      canvasLogger.default.warn('[Web Vitals] LCP observer not supported');
     }
     
     // CLS (Cumulative Layout Shift)
@@ -192,7 +194,7 @@ export function initWebVitals() {
       
       clsObserver.observe({ entryTypes: ['layout-shift'] });
     } catch (e) {
-      console.warn('[Web Vitals] CLS observer not supported');
+      canvasLogger.default.warn('[Web Vitals] CLS observer not supported');
     }
     
     // FID (First Input Delay) - 旧版
@@ -218,7 +220,7 @@ export function initWebVitals() {
       
       fidObserver.observe({ entryTypes: ['first-input'] });
     } catch (e) {
-      console.warn('[Web Vitals] FID observer not supported');
+      canvasLogger.default.warn('[Web Vitals] FID observer not supported');
     }
     
     // INP (Interaction to Next Paint) - 新版 (替代 FID)
@@ -249,7 +251,7 @@ export function initWebVitals() {
       
       inpObserver.observe({ entryTypes: ['interaction'] });
     } catch (e) {
-      console.warn('[Web Vitals] INP observer not supported');
+      canvasLogger.default.warn('[Web Vitals] INP observer not supported');
     }
   }
   
@@ -276,7 +278,7 @@ export function initWebVitals() {
     
     fcpObserver.observe({ entryTypes: ['paint'] });
   } catch (e) {
-    console.warn('[Web Vitals] FCP observer not supported');
+    canvasLogger.default.warn('[Web Vitals] FCP observer not supported');
   }
   
   // TTFB (Time to First Byte)
@@ -301,7 +303,7 @@ export function initWebVitals() {
       }
     }
   } catch (e) {
-    console.warn('[Web Vitals] TTFB not supported');
+    canvasLogger.default.warn('[Web Vitals] TTFB not supported');
   }
   
   devLog('[Web Vitals] Initialized');

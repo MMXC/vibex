@@ -12,6 +12,8 @@
 
 import { DurableObject } from 'cloudflare:workers';
 
+import { devLog, safeError } from '@/lib/log-sanitizer';
+
 // ==================== Types ====================
 
 export interface Connection {
@@ -111,7 +113,7 @@ export class CollaborationRoom extends DurableObject {
         const message = JSON.parse(event.data as string) as WSMessage;
         this.handleMessage(connectionId, message);
       } catch (error) {
-        console.error('Failed to parse WebSocket message:', error);
+        safeError('Failed to parse WebSocket message:', error);
       }
     });
     
@@ -169,7 +171,7 @@ export class CollaborationRoom extends DurableObject {
         this.updatePresence(connection, message.payload as Partial<PresenceUpdate>);
         break;
       default:
-        console.log('Unknown message type:', message.type);
+        devLog('Unknown message type:', message.type);
     }
   }
 
@@ -269,7 +271,7 @@ export class CollaborationRoom extends DurableObject {
         try {
           conn.webSocket.send(messageStr);
         } catch (error) {
-          console.error('Failed to send message to connection:', id, error);
+          safeError('Failed to send message to connection:', id, error);
         }
       }
     }

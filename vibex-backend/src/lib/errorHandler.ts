@@ -1,5 +1,7 @@
 import { Context, Next } from 'hono'
 
+import { safeError } from '@/lib/log-sanitizer';
+
 export interface ApiError extends Error {
   statusCode?: number
   code?: string
@@ -68,7 +70,7 @@ export const errorHandler = async (err: Error | ApiError, c: Context, next: Next
 
     // Log error in development
     if (process.env.NODE_ENV !== 'production') {
-      console.error('Error:', {
+      safeError('Error:', {
         message: err.message,
         stack: err.stack,
         statusCode,

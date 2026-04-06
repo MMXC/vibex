@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { planAnalyzeSchema, INJECTION_KEYWORDS } from '../schemas/security'  // S2.3: Prompt Injection detection
 import { generateId, Env } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
-import { devDebug, sanitize } from '@/lib/log-sanitizer'
+import { devDebug, sanitize, safeError } from '@/lib/log-sanitizer'
 
 const plan = new Hono<{ Bindings: Env }>();
 
@@ -311,7 +311,7 @@ Respond ONLY with the JSON object, no other text.`
       timestamp: new Date().toISOString(),
     })
   } catch (error) {
-    console.error('[ERROR] Plan API - Analysis failed:', error)
+    safeError('[ERROR] Plan API - Analysis failed:', error)
     
     return c.json<PlanAnalyzeResponse>({
       success: false,

@@ -27,7 +27,7 @@
     "coverage:check": "node scripts/check-coverage.js",
     "coverage:diff": "node scripts/coverage-diff.js",
     "coverage:history": "bash scripts/save-coverage-history.sh",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.mjs,.cjs --cache --cache-location node_modules/.cache/eslint/ --ignore-pattern '**/*.yml' --ignore-pattern '**/*.yaml' --ignore-pattern '.github/**' --ignore-pattern 'tests/**' && prettier --check .",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.mjs,.cjs --max-warnings=0 --cache --cache-location node_modules/.cache/eslint/ --ignore-pattern '**/*.yml' --ignore-pattern '**/*.yaml' --ignore-pattern '.github/**' --ignore-pattern 'tests/**' && prettier --check .",
     "lint:css": "stylelint \"src/**/*.css\" \"src/**/**/*.css\"",
     "scan:css": "node scripts/scan-orphaned-css.js",
     "generate:types": "ts-node scripts/generate-types.ts",

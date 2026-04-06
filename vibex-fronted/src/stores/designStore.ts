@@ -6,6 +6,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // ==================== Types ====================
 
 export type DesignStep = 
@@ -301,7 +303,7 @@ export const useDesignStore = create<DesignState>()(
       }),
       onRehydrateStorage: () => (state, error) => {
         if (error) {
-          console.error('Failed to rehydrate design store:', error);
+          canvasLogger.default.error('Failed to rehydrate design store:', error);
         } else if (state) {
           // Mark hydration as complete
           state.setHasHydrated(true);

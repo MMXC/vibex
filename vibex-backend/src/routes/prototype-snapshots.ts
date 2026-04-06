@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const prototypeSnapshots = new Hono<{ Bindings: Env }>();
 
 interface PrototypeSnapshotRow {
@@ -33,7 +35,7 @@ prototypeSnapshots.get('/', async (c) => {
 
     return c.json({ prototypeSnapshots: snapshots });
   } catch (error) {
-    console.error('Error fetching prototype snapshots:', error);
+    safeError('Error fetching prototype snapshots:', error);
     return c.json({ error: 'Failed to fetch prototype snapshots' }, 500);
   }
 });
@@ -74,7 +76,7 @@ prototypeSnapshots.post('/', async (c) => {
 
     return c.json({ prototypeSnapshot: snapshot }, 201);
   } catch (error) {
-    console.error('Error creating prototype snapshot:', error);
+    safeError('Error creating prototype snapshot:', error);
     return c.json({ error: 'Failed to create prototype snapshot' }, 500);
   }
 });

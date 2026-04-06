@@ -5,6 +5,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || 'your-github-client-id';
 const FIGMA_CLIENT_ID = process.env.FIGMA_CLIENT_ID || 'your-figma-client-id';
 
@@ -54,7 +56,7 @@ export async function POST(
 
     return NextResponse.json({ authUrl, state });
   } catch (error) {
-    console.error('OAuth auth URL error:', error);
+    safeError('OAuth auth URL error:', error);
     return NextResponse.json(
       { error: 'Failed to generate auth URL' },
       { status: 500 }

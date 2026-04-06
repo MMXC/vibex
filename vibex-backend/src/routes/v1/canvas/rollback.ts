@@ -14,6 +14,8 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db'
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const rollback = new Hono<{ Bindings: Env }>()
 
 // ============================================================
@@ -99,7 +101,7 @@ rollback.get('/', async (c) => {
       })),
     })
   } catch (err) {
-    console.error('[canvas/rollback] GET error:', err)
+    safeError('[canvas/rollback] GET error:', err)
     return c.json({ error: 'Failed to fetch rollback info' }, 500)
   }
 })
@@ -209,7 +211,7 @@ rollback.post('/', async (c) => {
       restoredFromVersion: targetVersion,
     }, 201)
   } catch (err) {
-    console.error('[canvas/rollback] POST error:', err)
+    safeError('[canvas/rollback] POST error:', err)
     return c.json({ error: 'Failed to perform rollback' }, 500)
   }
 })

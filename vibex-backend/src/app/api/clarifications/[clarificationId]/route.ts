@@ -11,6 +11,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getLocalEnv } from '@/lib/env';
 import { queryOne, executeDB } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 export const dynamic = 'force-dynamic';
 
 interface RequirementRow {
@@ -62,7 +64,7 @@ export async function PUT(
 
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-    console.error('[Clarification Update] Error:', errorMessage);
+    safeError('[Clarification Update] Error:', errorMessage);
     return NextResponse.json(
       { error: `Failed to update clarification: ${errorMessage}` },
       { status: 500 }

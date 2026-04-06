@@ -3,6 +3,8 @@ import { PrismaClient } from '@prisma/client';
 import { getAuthUser } from '@/lib/auth';
 import { getEnv } from '@/lib/env';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const prisma = new PrismaClient();
 
 export async function DELETE(
@@ -53,7 +55,7 @@ export async function DELETE(
       data: { message: 'Message deleted successfully' },
     });
   } catch (error) {
-    console.error('Delete message error:', error);
+    safeError('Delete message error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' },
       { status: 500 }

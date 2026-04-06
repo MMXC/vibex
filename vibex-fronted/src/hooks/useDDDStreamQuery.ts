@@ -17,6 +17,8 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { getApiUrl } from '@/lib/api-config';
 import { BoundedContext } from '@/services/api/types/prototype/domain';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 function getAuthHeaders(): Record<string, string> {
   if (typeof window === 'undefined') return {};
   const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
@@ -153,7 +155,7 @@ async function fetchSSEStream(
                   break;
               }
             } catch (e) {
-              console.error('Failed to parse SSE data:', e);
+              canvasLogger.default.error('Failed to parse SSE data:', e);
             }
             i++;
           }

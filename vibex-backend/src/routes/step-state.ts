@@ -11,6 +11,8 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { z } from 'zod'
 import { generateId, Env, queryOne, executeDB } from '@/lib/db'
+import { safeError } from '@/lib/log-sanitizer';
+
 import type {
   SaveStepStateRequest,
   StepState,
@@ -295,7 +297,7 @@ stepState.post('/', async (c) => {
         details: error.issues,
       }, 400)
     }
-    console.error('Error saving step state:', error)
+    safeError('Error saving step state:', error)
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to save step state',

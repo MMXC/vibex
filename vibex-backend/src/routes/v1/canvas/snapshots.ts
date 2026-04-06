@@ -14,6 +14,8 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db'
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const snapshots = new Hono<{ Bindings: Env }>()
 
 /** Legacy snapshot data shape (supports older client versions) */
@@ -111,7 +113,7 @@ snapshots.get('/', async (c) => {
       offset,
     })
   } catch (err) {
-    console.error('[canvas/snapshot] GET error:', err)
+    safeError('[canvas/snapshot] GET error:', err)
     return c.json({ error: 'Failed to fetch snapshots' }, 500)
   }
 })
@@ -251,7 +253,7 @@ snapshots.post('/', async (c) => {
       version: created.version,
     }, 201)
   } catch (err) {
-    console.error('[canvas/snapshots] POST error:', err)
+    safeError('[canvas/snapshots] POST error:', err)
     return c.json({ error: 'Failed to create snapshot' }, 500)
   }
 })
@@ -283,7 +285,7 @@ snapshots.get('/latest', async (c) => {
       updatedAt: latest?.createdAt ?? null,
     })
   } catch (err) {
-    console.error('[canvas/snapshots] GET /latest error:', err)
+    safeError('[canvas/snapshots] GET /latest error:', err)
     return c.json({ error: 'Failed to fetch latest version' }, 500)
   }
 })
@@ -332,7 +334,7 @@ snapshots.get('/:id', async (c) => {
       },
     })
   } catch (err) {
-    console.error('[canvas/snapshots] GET :id error:', err)
+    safeError('[canvas/snapshots] GET :id error:', err)
     return c.json({ error: 'Failed to fetch snapshot' }, 500)
   }
 })
@@ -436,7 +438,7 @@ snapshots.post('/:id/restore', async (c) => {
       componentNodes: parsedData.components || [],
     }, 201)
   } catch (err) {
-    console.error('[canvas/snapshots] POST :id/restore error:', err)
+    safeError('[canvas/snapshots] POST :id/restore error:', err)
     return c.json({ error: 'Failed to restore snapshot' }, 500)
   }
 })

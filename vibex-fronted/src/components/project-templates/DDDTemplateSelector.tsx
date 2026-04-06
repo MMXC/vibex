@@ -13,6 +13,8 @@ import type { ProjectTemplate } from '@/types/project-template';
 import { X, Package, GitBranch, Layers, ChevronRight } from 'lucide-react';
 import styles from './project-templates.module.css';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 interface DDDTemplateSelectorProps {
   isOpen?: boolean;
   onClose?: () => void;
@@ -166,7 +168,7 @@ export function DDDTemplateSelector({ isOpen = true, onClose, onCreateProject }:
         window.location.href = `/project?id=${projectId}`;
       }
     } catch (error) {
-      console.error('Failed to create project from template:', error);
+      canvasLogger.default.error('Failed to create project from template:', error);
     }
   };
 

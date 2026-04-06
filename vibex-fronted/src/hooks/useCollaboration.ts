@@ -7,6 +7,8 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { MessageRouter, type WebSocketMessage } from '@/lib/websocket/MessageRouter';
 import { useRoomManager } from '@/lib/websocket/RoomManager';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 interface UseCollaborationOptions {
   url?: string;
   autoConnect?: boolean;
@@ -109,7 +111,7 @@ export function useCollaboration(options: UseCollaborationOptions = {}): UseColl
           const message = JSON.parse(event.data) as WebSocketMessage;
           routerRef.current?.subscribe(message.type, () => {});
         } catch (e) {
-          console.error('Failed to parse message:', e);
+          canvasLogger.default.error('Failed to parse message:', e);
         }
       };
 

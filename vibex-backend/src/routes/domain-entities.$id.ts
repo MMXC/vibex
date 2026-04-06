@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const domainEntityId = new Hono<{ Bindings: Env }>();
 
 interface DomainEntityRow {
@@ -33,7 +35,7 @@ domainEntityId.get('/', async (c) => {
 
     return c.json({ domainEntity: entity });
   } catch (error) {
-    console.error('Error fetching domain entity:', error);
+    safeError('Error fetching domain entity:', error);
     return c.json({ error: 'Failed to fetch domain entity' }, 500);
   }
 });
@@ -91,7 +93,7 @@ domainEntityId.put('/', async (c) => {
 
     return c.json({ domainEntity: entity });
   } catch (error) {
-    console.error('Error updating domain entity:', error);
+    safeError('Error updating domain entity:', error);
     return c.json({ error: 'Failed to update domain entity' }, 500);
   }
 });
@@ -106,7 +108,7 @@ domainEntityId.delete('/', async (c) => {
 
     return c.json({ success: true });
   } catch (error) {
-    console.error('Error deleting domain entity:', error);
+    safeError('Error deleting domain entity:', error);
     return c.json({ error: 'Failed to delete domain entity' }, 500);
   }
 });

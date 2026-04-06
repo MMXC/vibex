@@ -1,3 +1,4 @@
+import { safeError } from '@/lib/log-sanitizer';
 /**
  * Clarification Question Generation Prompt Templates
  * 
@@ -1043,7 +1044,7 @@ export function parseClarificationResponse(
       confidence: parsed.confidence || 0.8,
     };
   } catch (error) {
-    console.error('Failed to parse clarification response:', error);
+    safeError('Failed to parse clarification response:', error);
     return null;
   }
 }

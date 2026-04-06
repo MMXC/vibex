@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const branches = new Hono<{ Bindings: Env }>();
 
 interface BranchRow {
@@ -45,7 +47,7 @@ branches.get('/', async (c) => {
 
     return c.json({ branches: branchesList });
   } catch (error) {
-    console.error('Error fetching branches:', error);
+    safeError('Error fetching branches:', error);
     return c.json({ error: 'Failed to fetch branches' }, 500);
   }
 });
@@ -88,7 +90,7 @@ branches.post('/', async (c) => {
 
     return c.json({ branch }, 201);
   } catch (error) {
-    console.error('Error creating branch:', error);
+    safeError('Error creating branch:', error);
     return c.json({ error: 'Failed to create branch' }, 500);
   }
 });

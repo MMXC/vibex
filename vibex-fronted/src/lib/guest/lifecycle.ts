@@ -1,3 +1,4 @@
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 /**
  * Data Lifecycle - F3 数据生命周期
  * 游客数据的过期、清理和生命周期管理
@@ -5,7 +6,7 @@
 
 /** Dev-only logger */
 const devLog = (...args: unknown[]) => {
-  if (process.env.NODE_ENV !== 'production') console.log(...args);
+  if (process.env.NODE_ENV !== 'production') canvasLogger.default.debug(...args);
 };
 
 import { 
@@ -171,7 +172,7 @@ export function extendDataLifetime(hours: number = 24): boolean {
     localStorage.setItem('vibex_guest_data', JSON.stringify(data));
     return true;
   } catch (e) {
-    console.error('[Lifecycle] Failed to extend lifetime:', e);
+    canvasLogger.default.error('[Lifecycle] Failed to extend lifetime:', e);
     return false;
   }
 }

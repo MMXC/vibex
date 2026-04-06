@@ -3,6 +3,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import styles from './InputGuide.module.css';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 interface InputGuideProps {
   /** 占位符提示文本 */
   placeholder?: string;
@@ -104,7 +106,7 @@ export function InputGuide({
         setInputValue((prev) => prev + (prev ? '\n\n' : '') + content);
         setShowExamples(false);
       } catch (err) {
-        console.error('File read error:', err);
+        canvasLogger.default.error('File read error:', err);
       }
     },
     [onFileUpload]

@@ -11,6 +11,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 export interface QualityMetrics {
   /** E2E 测试通过率 (%) */
   e2ePassRate: number;
@@ -77,7 +79,7 @@ async function triggerAlert(metrics: QualityMetrics): Promise<void> {
     lastAlertTime = now;
   } catch {
     // 报警失败不影响主流程
-    console.error('[useQualityData] Alert trigger failed');
+    canvasLogger.default.error('[useQualityData] Alert trigger failed');
   }
 }
 

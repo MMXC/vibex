@@ -8,6 +8,8 @@ import type { NodeExecutionContext, VariableManager } from './handlers/types';
 import { ExecutionLogger } from './logger';
 import { VariableManager as VarManager } from './variables';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 interface ExecutionState {
   currentNodeId: string;
   stepNumber: number;
@@ -100,7 +102,7 @@ export class ExecutionScheduler {
         
       } catch (error) {
         failedNodes.push(currentNodeId);
-        console.error(`Error executing node ${currentNodeId}:`, error);
+        safeError(`Error executing node ${currentNodeId}:`, error);
         
         if (node.onError === 'stop') {
           break;

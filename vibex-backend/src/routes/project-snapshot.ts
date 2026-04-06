@@ -8,6 +8,8 @@
 
 import { Hono } from 'hono'
 import { queryDB, queryOne, Env } from '@/lib/db'
+import { safeError } from '@/lib/log-sanitizer';
+
 import type {
   ProjectSnapshot,
   SnapshotMeta,
@@ -105,7 +107,7 @@ export async function getProjectSnapshot(
 
     return { success: true, data: snapshot }
   } catch (error) {
-    console.error('Error getting project snapshot:', error)
+    safeError('Error getting project snapshot:', error)
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to get snapshot',

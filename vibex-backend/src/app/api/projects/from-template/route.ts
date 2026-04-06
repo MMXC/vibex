@@ -11,6 +11,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getTemplateById } from '@/lib/template-data';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
@@ -131,7 +133,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('[Projects/FromTemplate] Error:', error);
+    safeError('[Projects/FromTemplate] Error:', error);
     return NextResponse.json({ error: 'Failed to create project from template' }, { status: 500 });
   }
 }

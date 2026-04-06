@@ -11,6 +11,8 @@
 import { Hono } from 'hono';
 import { queryDB, queryOne, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const requirementsExport = new Hono<{ Bindings: Env }>();
 
 // ==================== Types ====================
@@ -588,7 +590,7 @@ requirementsExport.get('/:projectId/export', async (c) => {
       'Content-Disposition': `attachment; filename="${project.name.replace(/[^a-z0-9]/gi, '_')}_requirements.md"`,
     });
   } catch (error) {
-    console.error('Error exporting requirements:', error);
+    safeError('Error exporting requirements:', error);
     return c.json({ error: 'Failed to export requirements' }, 500);
   }
 });

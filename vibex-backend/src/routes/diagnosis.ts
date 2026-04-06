@@ -10,6 +10,8 @@
 
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { safeError } from '@/lib/log-sanitizer';
+
 import {
   requirementDiagnoser,
   requirementOptimizer,
@@ -56,7 +58,7 @@ diagnosis.post('/analyze', async (c) => {
 
     return c.json(response)
   } catch (error) {
-    console.error('Diagnosis error:', error)
+    safeError('Diagnosis error:', error)
     
     const response: AnalyzeResponse = {
       success: false,
@@ -110,7 +112,7 @@ diagnosis.post('/optimize', async (c) => {
 
     return c.json(response)
   } catch (error) {
-    console.error('Optimization error:', error)
+    safeError('Optimization error:', error)
     
     const response: OptimizeResponse = {
       success: false,

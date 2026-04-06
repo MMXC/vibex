@@ -11,6 +11,8 @@ import { Hono } from 'hono';
 import { queryOne, generateId, Env } from '@/lib/db';
 import { createUIGeneratorService, UIGeneratorOptions, UIGenerationResult, GeneratedComponent, GeneratedPage } from '@/services/ui-generator';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 /** Type guard: is this a GeneratedPage (has .component sub-field)? */
 function isGeneratedPage(val: GeneratedPage | GeneratedComponent): val is GeneratedPage {
   return 'component' in val && typeof (val as GeneratedPage).component === 'object';
@@ -367,7 +369,7 @@ livePreview.post('/', async (c) => {
       },
     });
   } catch (error) {
-    console.error('Error starting live preview:', error);
+    safeError('Error starting live preview:', error);
     return c.json<LivePreviewResponse>({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to start live preview',
@@ -491,7 +493,7 @@ livePreview.post('/update', async (c) => {
       },
     });
   } catch (error) {
-    console.error('Error updating live preview:', error);
+    safeError('Error updating live preview:', error);
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to update live preview',
@@ -642,7 +644,7 @@ livePreview.post('/quick/:type', async (c) => {
       },
     });
   } catch (error) {
-    console.error('Error generating quick live preview:', error);
+    safeError('Error generating quick live preview:', error);
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to generate quick preview',

@@ -7,6 +7,8 @@ import { useCallback } from 'react';
 import { usePlanBuildStore, type PlanResult as PlanResultType } from '@/stores/plan-build-store';
 import { analyzeRequirement } from '@/services/plan/plan-service';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 interface UsePlanBuildReturn {
   // Mode
   mode: 'plan' | 'build';
@@ -44,7 +46,7 @@ export function usePlanBuild(): UsePlanBuildReturn {
       const result = await analyzeRequirement({ requirementText });
       setPlanResult(result as unknown as PlanResultType);
     } catch (error) {
-      console.error('Plan analysis failed:', error);
+      canvasLogger.default.error('Plan analysis failed:', error);
       throw error;
     } finally {
       setPlanLoading(false);

@@ -5,7 +5,7 @@ import { Suspense, useCallback, useEffect, useState, useMemo } from 'react';
 
 /** Dev-only logger */
 const devLog = (...args: unknown[]) => {
-  if (process.env.NODE_ENV !== 'production') console.log(...args);
+  if (process.env.NODE_ENV !== 'production') canvasLogger.default.debug(...args);
 };
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -21,6 +21,8 @@ import {
 const { generateBoundedContext } = apiService;
 
 import { useConfirmationStore, DomainModel } from '@/stores/confirmationStore';
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 import { ReactFlow, 
   Node,
   Edge,
@@ -898,7 +900,7 @@ function DomainPageContent() {
       setHasChanges(false);
       alert('保存成功！');
     } catch (err: unknown) {
-      console.error('保存失败:', err);
+      canvasLogger.default.error('保存失败:', err);
       alert('保存失败: ' + (err as Error).message);
     }
   }, [domains, relations, projectId, requirementId]);
@@ -953,7 +955,7 @@ function DomainPageContent() {
         throw new Error(response.error || '生成失败');
       }
     } catch (err: unknown) {
-      console.error('生成失败:', err);
+      canvasLogger.default.error('生成失败:', err);
       alert('生成失败: ' + (err as Error).message);
     } finally {
       setGenerating(false);

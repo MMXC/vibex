@@ -17,6 +17,8 @@
 
 import { Hono } from 'hono';
 import { queryOne, queryDB, executeDB, generateId, Env } from '@/lib/db';
+import { safeError } from '@/lib/log-sanitizer';
+
 import {
   createUIGeneratorService,
   UIGeneratorService,
@@ -244,7 +246,7 @@ componentGenerator.post('/', async (c) => {
     }, 201);
 
   } catch (error) {
-    console.error('Error generating component:', error);
+    safeError('Error generating component:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({
       error: 'Failed to generate component',
@@ -356,7 +358,7 @@ componentGenerator.post('/batch', async (c) => {
     }, 200);
 
   } catch (error) {
-    console.error('Error in batch generation:', error);
+    safeError('Error in batch generation:', error);
     return c.json({ error: 'Failed to perform batch generation' }, 500);
   }
 });
@@ -460,7 +462,7 @@ componentGenerator.post('/page', async (c) => {
     }, 201);
 
   } catch (error) {
-    console.error('Error generating page:', error);
+    safeError('Error generating page:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({
       error: 'Failed to generate page',
@@ -568,7 +570,7 @@ componentGenerator.post('/quick', async (c) => {
     }, 201);
 
   } catch (error) {
-    console.error('Error in quick generation:', error);
+    safeError('Error in quick generation:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({
       error: 'Failed to generate component',
@@ -615,7 +617,7 @@ componentGenerator.post('/tokens', async (c) => {
     }, 200);
 
   } catch (error) {
-    console.error('Error generating design tokens:', error);
+    safeError('Error generating design tokens:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({
       error: 'Failed to generate design tokens',
@@ -741,7 +743,7 @@ componentGenerator.get('/', async (c) => {
     }, 200);
 
   } catch (error) {
-    console.error('Error fetching components:', error);
+    safeError('Error fetching components:', error);
     return c.json({ error: 'Failed to fetch components' }, 500);
   }
 });
@@ -777,7 +779,7 @@ componentGenerator.get('/:id', async (c) => {
     }, 200);
 
   } catch (error) {
-    console.error('Error fetching component:', error);
+    safeError('Error fetching component:', error);
     return c.json({ error: 'Failed to fetch component' }, 500);
   }
 });
@@ -811,7 +813,7 @@ componentGenerator.delete('/:id', async (c) => {
     }, 200);
 
   } catch (error) {
-    console.error('Error deleting component:', error);
+    safeError('Error deleting component:', error);
     return c.json({ error: 'Failed to delete component' }, 500);
   }
 });
@@ -859,7 +861,7 @@ componentGenerator.post('/preview', async (c) => {
     }, 200);
 
   } catch (error) {
-    console.error('Error generating preview:', error);
+    safeError('Error generating preview:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({
       error: 'Failed to generate preview',

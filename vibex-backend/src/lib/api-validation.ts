@@ -9,6 +9,8 @@ import { Context, Next, Hono } from 'hono';
 import { z, ZodType, ZodError } from 'zod';
 import { ValidationError, JsonParseError } from './validation-error';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 // ==================== Type Definitions ====================
 
 /**
@@ -179,7 +181,7 @@ export function withValidation(
       }
 
       // Handle unexpected errors
-      console.error('[withValidation] Unexpected error:', error);
+      safeError('[withValidation] Unexpected error:', error);
       return c.json(
         {
           success: false,

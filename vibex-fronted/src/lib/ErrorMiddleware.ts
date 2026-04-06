@@ -24,6 +24,8 @@ import { classifyError, getUserMessage, isCritical } from './ErrorClassifier';
 import { ErrorCodeMapper } from './ErrorCodeMapper';
 import { RetryHandler, RetryOptions } from './RetryHandler';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // Toast 显示函数类型 (可注入)
 export type ToastFunction = (message: string, type?: 'error' | 'warning' | 'info') => void;
 
@@ -144,7 +146,7 @@ export function createErrorMiddleware(options: ErrorMiddlewareOptions = {}): {
     
     // 开发模式打印详细信息
     if (options.dev) {
-      console.error('[ErrorMiddleware]', {
+      canvasLogger.default.error('[ErrorMiddleware]', {
         classified,
         mapped,
         config,

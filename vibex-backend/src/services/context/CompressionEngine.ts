@@ -6,6 +6,43 @@ import { ImportanceScorer } from './ImportanceScorer'
 import { SummaryGenerator } from './SummaryGenerator'
 import { estimateTokens, truncateToTokens } from '@/lib/token-utils'
 
+/**
+ * Quality score degradation threshold (E5)
+ * When qualityScore < QUALITY_THRESHOLD, compression is considered degraded
+ */
+export const QUALITY_THRESHOLD = 70
+
+/**
+ * Calculate quality score for compression result (E5-S1)
+ * 
+ * Formula: coverageScore × 0.6 + ratioScore × 0.4
+ * - coverageScore: based on entity count (boundedContexts + domainModels) × 10, capped at 100
+ * - ratioScore: (1 - newTokenCount / originalTokenCount) × 100
+ * 
+ * @returns score 0-100, or null if calculation not possible
+ */
+export function calculateQualityScore(
+  originalTokenCount: number,
+  newTokenCount: number,
+  entityCount: number
+): number | null {
+  if (originalTokenCount <= 0) return null
+
+  const coverageScore = entityCount > 0 ? Math.min(100, entityCount * 10) : 0
+  const ratioScore = (1 - newTokenCount / originalTokenCount) * 100
+  const score = Math.round(coverageScore * 0.6 + ratioScore * 0.4)
+
+  return Math.max(0, Math.min(100, score))
+}
+
+/**
+ * Check if quality score indicates degradation (E5-S1)
+ * Returns true when qualityScore < QUALITY_THRESHOLD (70)
+ */
+export function isQualityDegraded(score: number): boolean {
+  return score < QUALITY_THRESHOLD
+}
+
 const DEFAULT_CONFIG: CompressionConfig = {
   tokenThreshold: 20000,
   preserveRecentMessages: 6,
@@ -71,6 +108,11 @@ export class CompressionEngine {
         break
     }
     
+    // E5-S1: Calculate quality score based on entity count and compression ratio
+    const entityCount = this.countEntities(session)
+    const qualityScore = calculateQualityScore(originalTokenCount, newTokenCount, entityCount)
+    const degraded = qualityScore !== null ? isQualityDegraded(qualityScore) : false
+
     return {
       success: true,
       originalTokenCount,
@@ -78,6 +120,8 @@ export class CompressionEngine {
       compressionRatio: 1 - (newTokenCount / originalTokenCount),
       summary,
       strategy,
+      qualityScore,
+      degraded,
     }
   }
   
@@ -307,5 +351,17 @@ export class CompressionEngine {
     }
     
     return baseThreshold
+  }
+
+  /**
+   * Count entities in session for quality score calculation (E5-S1)
+   * Counts boundedContexts + domainModels from structuredContext
+   */
+  private countEntities(session: SessionContext): number {
+    if (!session.structuredContext) return 0
+    const ctx = session.structuredContext
+    const boundedContexts = ctx.boundedContexts?.length ?? 0
+    const domainModels = ctx.domainModels?.length ?? 0
+    return boundedContexts + domainModels
   }
 }

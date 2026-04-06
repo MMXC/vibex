@@ -9,6 +9,8 @@
 import { useEffect } from 'react';
 import * as Sentry from '@sentry/nextjs';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 /**
  * Initialize Sentry on client side
  */
@@ -16,7 +18,7 @@ export function SentryInitializer() {
   useEffect(() => {
     // Check if Sentry is enabled
     if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
-      console.log('[Sentry] Client initialized');
+      canvasLogger.default.debug('[Sentry] Client initialized');
     }
   }, []);
 

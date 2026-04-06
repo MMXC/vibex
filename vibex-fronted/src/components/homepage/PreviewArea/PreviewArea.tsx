@@ -1,3 +1,4 @@
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 /**
  * PreviewArea - 预览区域组件
  * 
@@ -78,7 +79,7 @@ export const PreviewArea: React.FC<PreviewAreaAllProps> = ({
   // F1.3: Debug 日志（定位问题时启用）
   useEffect(() => {
     if (process.env.NODE_ENV !== 'production') {
-      console.debug('[PreviewArea] Rerender:', {
+      canvasLogger.default.debug('[PreviewArea] Rerender:', {
         currentStep,
         storeFlowMermaidCode: storeFlowMermaidCode?.substring(0, 80),
         propMermaidCode: mermaidCode?.substring(0, 80),

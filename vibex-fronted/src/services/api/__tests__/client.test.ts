@@ -64,7 +64,7 @@ describe('HTTP Client', () => {
 
     it('should create HTTP client with custom config', () => {
       // Create a fresh client by resetting the module
-      vi.resetModules();
+      // vi.resetModules() - causes path alias resolution to break;
       const { createHttpClient } = require('@/services/api/client');
       
       const client = createHttpClient({ baseURL: 'https://api.test.com' });

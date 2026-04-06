@@ -15,6 +15,8 @@ import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { BoundedContextNode, BusinessFlowNode, ComponentNode } from '@/lib/canvas/types'; // types referenced in buildCanvasExportData JSDoc
 
@@ -277,7 +279,7 @@ export function useCanvasExport(): UseCanvasExportReturn {
 
           downloadDataUrl(dataUrl, filename);
         } catch (svgError) {
-          console.warn('[useCanvasExport] SVG export failed, falling back to PNG:', svgError);
+          canvasLogger.default.warn('[useCanvasExport] SVG export failed, falling back to PNG:', svgError);
           const pngDataUrl = await toPng(targetElement, {
             backgroundColor,
             pixelRatio: scale,

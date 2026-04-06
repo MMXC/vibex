@@ -5,6 +5,8 @@
 import { renderHook, act } from '@testing-library/react';
 import { useHomeGeneration } from '../useHomeGeneration';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 // Module-level mock functions for API
 const mockGenerateBoundedContext = vi.fn();
 const mockGenerateDomainModel = vi.fn();
@@ -191,7 +193,7 @@ describe('useHomeGeneration', () => {
   });
 
   describe('sendMessage', () => {
-    it('should call console.log with message', async () => {
+    it('should call canvasLogger.default.debug with message', async () => {
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation();
       const { result } = renderHook(() => useHomeGeneration());
 

@@ -1,3 +1,4 @@
+import { safeError } from '@/lib/log-sanitizer';
 /**
  * Bug Detection Prompt Templates
  * 
@@ -1169,7 +1170,7 @@ export function parseBugDetectionResponse(content: string): BugDetectionResult |
       recommendations: Array.isArray(parsed.recommendations) ? parsed.recommendations : [],
     };
   } catch (error) {
-    console.error('Failed to parse bug detection response:', error);
+    safeError('Failed to parse bug detection response:', error);
     return null;
   }
 }

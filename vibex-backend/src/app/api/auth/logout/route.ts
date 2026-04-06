@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { getEnv } from '@/lib/env';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 export async function POST(request: NextRequest) {
   try {
     const env = getEnv();
@@ -23,7 +25,7 @@ export async function POST(request: NextRequest) {
       data: { message: 'Logged out successfully' },
     });
   } catch (error) {
-    console.error('Logout error:', error);
+    safeError('Logout error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' },
       { status: 500 }

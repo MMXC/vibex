@@ -7,7 +7,7 @@
  *
  * 遵守约束:
  * - 无 any 类型
- * - 无 console.log
+ * - 无 canvasLogger.default.debug
  */
 'use client';
 
@@ -15,6 +15,8 @@ import React, { useCallback, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import type { SearchResult } from '@/hooks/canvas/useCanvasSearch';
 import styles from './SearchDialog.module.css';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 interface SearchDialogProps {
   /** 是否打开 */

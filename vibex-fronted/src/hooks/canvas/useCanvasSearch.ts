@@ -5,7 +5,7 @@
  *
  * 遵守约束:
  * - 无 any 类型
- * - 无 console.log
+ * - 无 canvasLogger.default.debug
  * - 搜索 < 200ms（500节点）
  */
 'use client';
@@ -13,6 +13,8 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
 import Fuse from 'fuse.js';
 import type { BoundedContextNode, BusinessFlowNode, ComponentNode } from '@/lib/canvas/types';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 /** 搜索结果项 */
 export interface SearchResult {

@@ -2,6 +2,8 @@ import { Hono } from 'hono';
 import { getAuthUserFromHono } from '@/lib/auth';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 const conversations = new Hono<{ Bindings: Env }>();
 
 interface ConversationRow {
@@ -75,7 +77,7 @@ conversations.get('/', async (c) => {
 
     return c.json({ conversations: result });
   } catch (error) {
-    console.error('Error fetching conversations:', error);
+    safeError('Error fetching conversations:', error);
     return c.json({ error: 'Failed to fetch conversations' }, 500);
   }
 });
@@ -138,7 +140,7 @@ conversations.post('/', async (c) => {
       201
     );
   } catch (error) {
-    console.error('Error creating conversation:', error);
+    safeError('Error creating conversation:', error);
     return c.json({ error: 'Failed to create conversation' }, 500);
   }
 });
@@ -183,7 +185,7 @@ conversations.get('/:id', async (c) => {
       },
     });
   } catch (error) {
-    console.error('Error fetching conversation:', error);
+    safeError('Error fetching conversation:', error);
     return c.json({ error: 'Failed to fetch conversation' }, 500);
   }
 });
@@ -249,7 +251,7 @@ conversations.put('/:id', async (c) => {
       },
     });
   } catch (error) {
-    console.error('Error updating conversation:', error);
+    safeError('Error updating conversation:', error);
     return c.json({ error: 'Failed to update conversation' }, 500);
   }
 });
@@ -287,7 +289,7 @@ conversations.delete('/:id', async (c) => {
 
     return c.json({ success: true, message: 'Conversation deleted' });
   } catch (error) {
-    console.error('Error deleting conversation:', error);
+    safeError('Error deleting conversation:', error);
     return c.json({ error: 'Failed to delete conversation' }, 500);
   }
 });

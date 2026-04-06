@@ -10,7 +10,7 @@
  * @example
  * ```typescript
  * const { error, errorInfo, retry, isRetrying, clearError } = useErrorHandler({
- *   onError: (err) => console.error(err),
+ *   onError: (err) => canvasLogger.default.error(err),
  *   maxRetries: 3,
  * });
  * ```
@@ -20,6 +20,8 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { ErrorType, ErrorConfig } from '@/types/error';
+
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 // ==================== Types ====================
 

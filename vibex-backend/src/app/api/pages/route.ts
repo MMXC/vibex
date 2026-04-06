@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 export const dynamic = 'force-dynamic';
 
 // GET /api/pages - List all pages (or filter by projectId)
@@ -19,7 +21,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ pages });
   } catch (error) {
-    console.error('Error fetching pages:', error);
+    safeError('Error fetching pages:', error);
     return NextResponse.json(
       { error: 'Failed to fetch pages' },
       { status: 500 }
@@ -53,7 +55,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ page }, { status: 201 });
   } catch (error) {
-    console.error('Error creating page:', error);
+    safeError('Error creating page:', error);
     return NextResponse.json(
       { error: 'Failed to create page' },
       { status: 500 }

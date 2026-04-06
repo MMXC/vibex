@@ -7,6 +7,8 @@
 
 import { Env, queryOne, executeDB } from '@/lib/db';
 
+import { safeError } from '@/lib/log-sanitizer';
+
 /**
  * Requirement status types
  */
@@ -156,7 +158,7 @@ export async function transitionRequirementStatus(
       newStatus,
     };
   } catch (error) {
-    console.error('Error transitioning requirement status:', error);
+    safeError('Error transitioning requirement status:', error);
     return {
       success: false,
       previousStatus: null,
@@ -265,7 +267,7 @@ export async function autoTransitionBasedOnState(
       newStatus: currentStatus,
     };
   } catch (error) {
-    console.error('Error in auto transition:', error);
+    safeError('Error in auto transition:', error);
     return {
       success: false,
       previousStatus: null,

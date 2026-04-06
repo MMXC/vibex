@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styles from './MessageActions.module.css';
 
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
+
 export interface MessageActionsProps {
   /** 消息内容 */
   content: string;
@@ -68,7 +70,7 @@ export default function MessageActions(
       setTimeout(() => setCopied(false), 2000);
       onCopy?.(content);
     } catch (err) {
-      console.error('Failed to copy:', err);
+      canvasLogger.default.error('Failed to copy:', err);
       // 降级方案：使用旧版 clipboard API
       const textArea = document.createElement('textarea');
       textArea.value = content;
@@ -82,7 +84,7 @@ export default function MessageActions(
         setTimeout(() => setCopied(false), 2000);
         onCopy?.(content);
       } catch (e) {
-        console.error('Fallback copy failed:', e);
+        canvasLogger.default.error('Fallback copy failed:', e);
       }
       document.body.removeChild(textArea);
     }
@@ -100,7 +102,7 @@ export default function MessageActions(
       } catch (err) {
         // 用户取消分享不报错
         if ((err as Error).name !== 'AbortError') {
-          console.error('Share failed:', err);
+          canvasLogger.default.error('Share failed:', err);
         }
       }
     } else {
@@ -118,7 +120,7 @@ export default function MessageActions(
       setTimeout(() => setCopied(false), 2000);
       onCopy?.(messageLink);
     } catch (err) {
-      console.error('Failed to copy link:', err);
+      canvasLogger.default.error('Failed to copy link:', err);
     }
     setShowMenu(false);
   };

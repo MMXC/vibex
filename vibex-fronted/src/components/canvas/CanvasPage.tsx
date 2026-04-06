@@ -78,6 +78,7 @@ import { useToast } from '@/components/ui/Toast';
 import { UndoBar } from '@/components/undo-bar/UndoBar';
 import { NodeTooltip } from '@/components/guidance/NodeTooltip';
 import { NewUserGuide } from '@/components/guide';
+import { CanvasOnboardingOverlay } from '@/components/guidance';
 import { ConflictDialog as ConflictDialogComponent } from '@/components/ConflictDialog';
 import { FeedbackFAB } from '@/components/FeedbackFAB';
 import { CanvasPreviewModal } from './json-render/CanvasPreviewModal';
@@ -959,6 +960,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
 
       {/* E1: New User Guide */}
       <NewUserGuide />
+
+      {/* E3: CanvasOnboardingOverlay — first-time canvas user guidance */}
+      <CanvasOnboardingOverlay />
 
       {/* E3 S3.3: Feedback FAB */}
       <FeedbackFAB />

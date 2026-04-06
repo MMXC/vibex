@@ -142,7 +142,7 @@ export const planAnalyzeSchema = z.object({
     ),
   context: z.object({
     projectId: z.string().uuid('Invalid project ID').optional(),
-    previousPlans: z.array(z.record(z.unknown())).optional(),
+    previousPlans: z.array(z.record(z.string(), z.unknown())).optional(),
   }).strict().optional(),
 }).strict();
 

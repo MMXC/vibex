@@ -1,5 +1,11 @@
 # Changelog
 
+### [useWebVitals-ts-fix-20260407 Epic1] — 2026-04-07
+- **useWebVitals TypeScript Fix**: 修复 `data.name` 属性访问 TS 错误
+  - `src/hooks/useWebVitals.ts`: 添加类型断言 `as [string, WebVitalsMetric]`
+  - 解决 `Property 'name' does not exist on type '{}'` 构建失败
+  - 提交: `e1e7ef1d`
+
 ### [vibex-proposals-20260411 E1: API治理 Safe Logging] — 2026-04-07
 - **E1 Safe Logging Refactor**: 102 个前端文件的 `console.*` → `canvasLogger.*` 替换
   - 新增 `src/lib/canvas/canvasLogger.ts`: 按组件名命名的 context-aware 日志工具

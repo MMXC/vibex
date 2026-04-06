@@ -1,3 +1,9 @@
+### Added (useWebVitals-ts-fix-20260407 Epic1) — 2026-04-07
+- **useWebVitals TypeScript Fix**: 修复 `data.name` 属性访问 TS 错误
+  - `vibex-fronted/src/hooks/useWebVitals.ts`: 添加类型断言 `as [string, WebVitalsMetric]` 到 destructure
+  - 解决 `Property 'name' does not exist on type '{}'` 构建失败
+  - 提交: `e1e7ef1d`
+
 ### Added (vibex-proposals-20260411 E4: Auth中间件统一) — 2026-04-07
 - **E4 Auth 中间件统一**: Next.js routes 使用 `getAuthUserFromRequest()` 从 Hono gateway headers 读取认证
   - 新增 `src/lib/authFromGateway.ts`: Header-based auth utility (`x-auth-user`, `x-auth-user-id`)

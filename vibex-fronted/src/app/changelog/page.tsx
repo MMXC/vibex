@@ -65,6 +65,17 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.128',
+    date: '2026-04-07',
+    changes: [
+      '📋 useWebVitals-ts-fix-20260407 Epic1',
+      '✅ useWebVitals.ts: 类型断言修复 data.name TS 错误',
+      '✅ 提交: e1e7ef1d',
+    ],
+    commit: 'e1e7ef1d',
+  },
+
+  {
     version: '1.0.127',
     date: '2026-04-07',
     changes: [

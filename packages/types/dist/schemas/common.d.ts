@@ -32,24 +32,18 @@ export declare const nonEmptyStringSchema: z.ZodString;
 /**
  * Optional string schema (allows empty, trims if present)
  */
-export declare const optionalStringSchema: z.ZodOptional<z.ZodEffects<z.ZodString, string | undefined, string>>;
+export declare const optionalStringSchema: z.ZodOptional<z.ZodPipe<z.ZodString, z.ZodTransform<string | undefined, string>>>;
 /**
  * Positive integer schema
  */
-export declare const positiveIntSchema: z.ZodEffects<z.ZodUnion<[z.ZodString, z.ZodNumber]>, number, string | number>;
+export declare const positiveIntSchema: z.ZodPipe<z.ZodUnion<[z.ZodString, z.ZodNumber]>, z.ZodTransform<number, string | number>>;
 /**
  * Pagination query schema
  */
 export declare const paginationQuerySchema: z.ZodObject<{
-    page: z.ZodEffects<z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodNumber]>>, number, string | number | undefined>;
-    pageSize: z.ZodEffects<z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodNumber]>>, number, string | number | undefined>;
-}, "strip", z.ZodTypeAny, {
-    page: number;
-    pageSize: number;
-}, {
-    page?: string | number | undefined;
-    pageSize?: string | number | undefined;
-}>;
+    page: z.ZodPipe<z.ZodOptional<z.ZodUnion<readonly [z.ZodString, z.ZodNumber]>>, z.ZodTransform<number, string | number | undefined>>;
+    pageSize: z.ZodPipe<z.ZodOptional<z.ZodUnion<readonly [z.ZodString, z.ZodNumber]>>, z.ZodTransform<number, string | number | undefined>>;
+}, z.core.$strip>;
 export type Uuid = z.infer<typeof uuidSchema>;
 export type Email = z.infer<typeof emailSchema>;
 export type Password = z.infer<typeof passwordSchema>;

@@ -18,7 +18,7 @@ import {
   generateContextsSchema,
   generateFlowsSchema,
   generateComponentsSchema,
-} from '@/schemas/canvas'
+} from '@vibex/types/schemas/canvas'
 
 const canvas = new Hono<{ Bindings: Env }>()
 

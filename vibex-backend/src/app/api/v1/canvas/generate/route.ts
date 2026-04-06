@@ -10,7 +10,7 @@
  * - Uses canvasGenerateSchema for input validation
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { canvasGenerateSchema } from '@/schemas/canvas';
+import { canvasGenerateSchema } from '@vibex/types/schemas/canvas';
 import { AppError, AuthError, NotFoundError, ValidationError } from '@/lib/errors';
 import { errorToResponse } from '@/lib/errors';
 import prisma from '@/lib/prisma';

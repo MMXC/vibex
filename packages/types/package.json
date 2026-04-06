@@ -4,10 +4,24 @@
   "private": true,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./schemas/common": {
+      "types": "./dist/schemas/common.d.ts",
+      "default": "./dist/schemas/common.js"
+    },
+    "./schemas/canvas": {
+      "types": "./dist/schemas/canvas.d.ts",
+      "default": "./dist/schemas/canvas.js"
+    }
+  },
   "scripts": {
     "build": "tsc"
   },
   "dependencies": {
-    "zod": "^3.23.8"
+    "zod": "^4.3.6"
   }
 }

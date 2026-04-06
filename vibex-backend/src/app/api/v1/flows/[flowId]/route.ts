@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getAuthUser } from '@/lib/auth';
 import { getEnv } from '@/lib/env';
-import { cuidSchema } from '@/schemas/common';
+import { cuidSchema } from '@vibex/types/schemas/common';
 import { ValidationError } from '@/lib/errors';
 import { errorToResponse } from '@/lib/errors';
 

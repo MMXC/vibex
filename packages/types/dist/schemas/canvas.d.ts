@@ -15,18 +15,13 @@ export declare const boundedContextSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
     description: z.ZodString;
-    type: z.ZodDefault<z.ZodEnum<["core", "supporting", "generic", "external"]>>;
-}, "strip", z.ZodTypeAny, {
-    id: string;
-    name: string;
-    description: string;
-    type: "core" | "supporting" | "generic" | "external";
-}, {
-    id: string;
-    name: string;
-    description: string;
-    type?: "core" | "supporting" | "generic" | "external" | undefined;
-}>;
+    type: z.ZodDefault<z.ZodEnum<{
+        core: "core";
+        supporting: "supporting";
+        generic: "generic";
+        external: "external";
+    }>>;
+}, z.core.$strip>;
 export type BoundedContextInput = z.infer<typeof boundedContextSchema>;
 /**
  * Flow step schema
@@ -37,19 +32,7 @@ export declare const flowStepSchema: z.ZodObject<{
     actor: z.ZodString;
     description: z.ZodOptional<z.ZodString>;
     order: z.ZodOptional<z.ZodNumber>;
-}, "strip", z.ZodTypeAny, {
-    name: string;
-    actor: string;
-    id?: string | undefined;
-    description?: string | undefined;
-    order?: number | undefined;
-}, {
-    name: string;
-    actor: string;
-    id?: string | undefined;
-    description?: string | undefined;
-    order?: number | undefined;
-}>;
+}, z.core.$strip>;
 export type FlowStepInput = z.infer<typeof flowStepSchema>;
 /**
  * Business flow schema
@@ -65,47 +48,9 @@ export declare const businessFlowSchema: z.ZodObject<{
         actor: z.ZodString;
         description: z.ZodOptional<z.ZodString>;
         order: z.ZodOptional<z.ZodNumber>;
-    }, "strip", z.ZodTypeAny, {
-        name: string;
-        actor: string;
-        id?: string | undefined;
-        description?: string | undefined;
-        order?: number | undefined;
-    }, {
-        name: string;
-        actor: string;
-        id?: string | undefined;
-        description?: string | undefined;
-        order?: number | undefined;
-    }>, "many">;
+    }, z.core.$strip>>;
     confidence: z.ZodOptional<z.ZodNumber>;
-}, "strip", z.ZodTypeAny, {
-    name: string;
-    contextId: string;
-    steps: {
-        name: string;
-        actor: string;
-        id?: string | undefined;
-        description?: string | undefined;
-        order?: number | undefined;
-    }[];
-    confidence?: number | undefined;
-    id?: string | undefined;
-    description?: string | undefined;
-}, {
-    name: string;
-    contextId: string;
-    steps: {
-        name: string;
-        actor: string;
-        id?: string | undefined;
-        description?: string | undefined;
-        order?: number | undefined;
-    }[];
-    confidence?: number | undefined;
-    id?: string | undefined;
-    description?: string | undefined;
-}>;
+}, z.core.$strip>;
 export type BusinessFlowInput = z.infer<typeof businessFlowSchema>;
 /**
  * Generate bounded contexts request body
@@ -113,13 +58,7 @@ export type BusinessFlowInput = z.infer<typeof businessFlowSchema>;
 export declare const generateContextsSchema: z.ZodObject<{
     requirementText: z.ZodString;
     projectId: z.ZodOptional<z.ZodString>;
-}, "strict", z.ZodTypeAny, {
-    requirementText: string;
-    projectId?: string | undefined;
-}, {
-    requirementText: string;
-    projectId?: string | undefined;
-}>;
+}, z.core.$strict>;
 export type GenerateContextsInput = z.infer<typeof generateContextsSchema>;
 /**
  * Generate business flows request body
@@ -129,36 +68,15 @@ export declare const generateFlowsSchema: z.ZodObject<{
         id: z.ZodString;
         name: z.ZodString;
         description: z.ZodString;
-        type: z.ZodDefault<z.ZodEnum<["core", "supporting", "generic", "external"]>>;
-    }, "strip", z.ZodTypeAny, {
-        id: string;
-        name: string;
-        description: string;
-        type: "core" | "supporting" | "generic" | "external";
-    }, {
-        id: string;
-        name: string;
-        description: string;
-        type?: "core" | "supporting" | "generic" | "external" | undefined;
-    }>, "many">;
+        type: z.ZodDefault<z.ZodEnum<{
+            core: "core";
+            supporting: "supporting";
+            generic: "generic";
+            external: "external";
+        }>>;
+    }, z.core.$strip>>;
     sessionId: z.ZodString;
-}, "strict", z.ZodTypeAny, {
-    contexts: {
-        id: string;
-        name: string;
-        description: string;
-        type: "core" | "supporting" | "generic" | "external";
-    }[];
-    sessionId: string;
-}, {
-    contexts: {
-        id: string;
-        name: string;
-        description: string;
-        type?: "core" | "supporting" | "generic" | "external" | undefined;
-    }[];
-    sessionId: string;
-}>;
+}, z.core.$strict>;
 export type GenerateFlowsInput = z.infer<typeof generateFlowsSchema>;
 /**
  * Generate components request body
@@ -168,18 +86,13 @@ export declare const generateComponentsSchema: z.ZodObject<{
         id: z.ZodString;
         name: z.ZodString;
         description: z.ZodString;
-        type: z.ZodDefault<z.ZodEnum<["core", "supporting", "generic", "external"]>>;
-    }, "strip", z.ZodTypeAny, {
-        id: string;
-        name: string;
-        description: string;
-        type: "core" | "supporting" | "generic" | "external";
-    }, {
-        id: string;
-        name: string;
-        description: string;
-        type?: "core" | "supporting" | "generic" | "external" | undefined;
-    }>, "many">;
+        type: z.ZodDefault<z.ZodEnum<{
+            core: "core";
+            supporting: "supporting";
+            generic: "generic";
+            external: "external";
+        }>>;
+    }, z.core.$strip>>;
     flows: z.ZodArray<z.ZodObject<{
         id: z.ZodOptional<z.ZodString>;
         name: z.ZodString;
@@ -191,93 +104,11 @@ export declare const generateComponentsSchema: z.ZodObject<{
             actor: z.ZodString;
             description: z.ZodOptional<z.ZodString>;
             order: z.ZodOptional<z.ZodNumber>;
-        }, "strip", z.ZodTypeAny, {
-            name: string;
-            actor: string;
-            id?: string | undefined;
-            description?: string | undefined;
-            order?: number | undefined;
-        }, {
-            name: string;
-            actor: string;
-            id?: string | undefined;
-            description?: string | undefined;
-            order?: number | undefined;
-        }>, "many">;
+        }, z.core.$strip>>;
         confidence: z.ZodOptional<z.ZodNumber>;
-    }, "strip", z.ZodTypeAny, {
-        name: string;
-        contextId: string;
-        steps: {
-            name: string;
-            actor: string;
-            id?: string | undefined;
-            description?: string | undefined;
-            order?: number | undefined;
-        }[];
-        confidence?: number | undefined;
-        id?: string | undefined;
-        description?: string | undefined;
-    }, {
-        name: string;
-        contextId: string;
-        steps: {
-            name: string;
-            actor: string;
-            id?: string | undefined;
-            description?: string | undefined;
-            order?: number | undefined;
-        }[];
-        confidence?: number | undefined;
-        id?: string | undefined;
-        description?: string | undefined;
-    }>, "many">;
+    }, z.core.$strip>>;
     sessionId: z.ZodString;
-}, "strict", z.ZodTypeAny, {
-    contexts: {
-        id: string;
-        name: string;
-        description: string;
-        type: "core" | "supporting" | "generic" | "external";
-    }[];
-    sessionId: string;
-    flows: {
-        name: string;
-        contextId: string;
-        steps: {
-            name: string;
-            actor: string;
-            id?: string | undefined;
-            description?: string | undefined;
-            order?: number | undefined;
-        }[];
-        confidence?: number | undefined;
-        id?: string | undefined;
-        description?: string | undefined;
-    }[];
-}, {
-    contexts: {
-        id: string;
-        name: string;
-        description: string;
-        type?: "core" | "supporting" | "generic" | "external" | undefined;
-    }[];
-    sessionId: string;
-    flows: {
-        name: string;
-        contextId: string;
-        steps: {
-            name: string;
-            actor: string;
-            id?: string | undefined;
-            description?: string | undefined;
-            order?: number | undefined;
-        }[];
-        confidence?: number | undefined;
-        id?: string | undefined;
-        description?: string | undefined;
-    }[];
-}>;
+}, z.core.$strict>;
 export type GenerateComponentsInput = z.infer<typeof generateComponentsSchema>;
 /**
  * Generate contexts response
@@ -288,41 +119,16 @@ export declare const generateContextsResponseSchema: z.ZodObject<{
         id: z.ZodString;
         name: z.ZodString;
         description: z.ZodString;
-        type: z.ZodDefault<z.ZodEnum<["core", "supporting", "generic", "external"]>>;
-    }, "strip", z.ZodTypeAny, {
-        id: string;
-        name: string;
-        description: string;
-        type: "core" | "supporting" | "generic" | "external";
-    }, {
-        id: string;
-        name: string;
-        description: string;
-        type?: "core" | "supporting" | "generic" | "external" | undefined;
-    }>, "many">;
+        type: z.ZodDefault<z.ZodEnum<{
+            core: "core";
+            supporting: "supporting";
+            generic: "generic";
+            external: "external";
+        }>>;
+    }, z.core.$strip>>;
     generationId: z.ZodString;
     confidence: z.ZodNumber;
-}, "strip", z.ZodTypeAny, {
-    success: true;
-    contexts: {
-        id: string;
-        name: string;
-        description: string;
-        type: "core" | "supporting" | "generic" | "external";
-    }[];
-    confidence: number;
-    generationId: string;
-}, {
-    success: true;
-    contexts: {
-        id: string;
-        name: string;
-        description: string;
-        type?: "core" | "supporting" | "generic" | "external" | undefined;
-    }[];
-    confidence: number;
-    generationId: string;
-}>;
+}, z.core.$strip>;
 export type GenerateContextsResponse = z.infer<typeof generateContextsResponseSchema>;
 /**
  * Generate flows response
@@ -330,7 +136,6 @@ export type GenerateContextsResponse = z.infer<typeof generateContextsResponseSc
 export declare const generateFlowsResponseSchema: z.ZodObject<{
     success: z.ZodLiteral<true>;
     generationId: z.ZodString;
-} & {
     flows: z.ZodArray<z.ZodObject<{
         id: z.ZodOptional<z.ZodString>;
         name: z.ZodString;
@@ -342,102 +147,26 @@ export declare const generateFlowsResponseSchema: z.ZodObject<{
             actor: z.ZodString;
             description: z.ZodOptional<z.ZodString>;
             order: z.ZodOptional<z.ZodNumber>;
-        }, "strip", z.ZodTypeAny, {
-            name: string;
-            actor: string;
-            id?: string | undefined;
-            description?: string | undefined;
-            order?: number | undefined;
-        }, {
-            name: string;
-            actor: string;
-            id?: string | undefined;
-            description?: string | undefined;
-            order?: number | undefined;
-        }>, "many">;
+        }, z.core.$strip>>;
         confidence: z.ZodOptional<z.ZodNumber>;
-    }, "strip", z.ZodTypeAny, {
-        name: string;
-        contextId: string;
-        steps: {
-            name: string;
-            actor: string;
-            id?: string | undefined;
-            description?: string | undefined;
-            order?: number | undefined;
-        }[];
-        confidence?: number | undefined;
-        id?: string | undefined;
-        description?: string | undefined;
-    }, {
-        name: string;
-        contextId: string;
-        steps: {
-            name: string;
-            actor: string;
-            id?: string | undefined;
-            description?: string | undefined;
-            order?: number | undefined;
-        }[];
-        confidence?: number | undefined;
-        id?: string | undefined;
-        description?: string | undefined;
-    }>, "many">;
+    }, z.core.$strip>>;
     confidence: z.ZodNumber;
-}, "strip", z.ZodTypeAny, {
-    success: true;
-    confidence: number;
-    flows: {
-        name: string;
-        contextId: string;
-        steps: {
-            name: string;
-            actor: string;
-            id?: string | undefined;
-            description?: string | undefined;
-            order?: number | undefined;
-        }[];
-        confidence?: number | undefined;
-        id?: string | undefined;
-        description?: string | undefined;
-    }[];
-    generationId: string;
-}, {
-    success: true;
-    confidence: number;
-    flows: {
-        name: string;
-        contextId: string;
-        steps: {
-            name: string;
-            actor: string;
-            id?: string | undefined;
-            description?: string | undefined;
-            order?: number | undefined;
-        }[];
-        confidence?: number | undefined;
-        id?: string | undefined;
-        description?: string | undefined;
-    }[];
-    generationId: string;
-}>;
+}, z.core.$strip>;
 export type GenerateFlowsResponse = z.infer<typeof generateFlowsResponseSchema>;
 /**
  * Component API definition
  */
 export declare const componentApiSchema: z.ZodObject<{
-    method: z.ZodEnum<["GET", "POST", "PUT", "DELETE", "PATCH"]>;
+    method: z.ZodEnum<{
+        GET: "GET";
+        POST: "POST";
+        PUT: "PUT";
+        DELETE: "DELETE";
+        PATCH: "PATCH";
+    }>;
     path: z.ZodString;
-    params: z.ZodArray<z.ZodString, "many">;
-}, "strip", z.ZodTypeAny, {
-    params: string[];
-    path: string;
-    method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-}, {
-    params: string[];
-    path: string;
-    method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-}>;
+    params: z.ZodArray<z.ZodString>;
+}, z.core.$strip>;
 export type ComponentApi = z.infer<typeof componentApiSchema>;
 /**
  * Component node schema
@@ -448,39 +177,17 @@ export declare const componentNodeSchema: z.ZodObject<{
     type: z.ZodString;
     props: z.ZodRecord<z.ZodString, z.ZodUnknown>;
     api: z.ZodObject<{
-        method: z.ZodEnum<["GET", "POST", "PUT", "DELETE", "PATCH"]>;
+        method: z.ZodEnum<{
+            GET: "GET";
+            POST: "POST";
+            PUT: "PUT";
+            DELETE: "DELETE";
+            PATCH: "PATCH";
+        }>;
         path: z.ZodString;
-        params: z.ZodArray<z.ZodString, "many">;
-    }, "strip", z.ZodTypeAny, {
-        params: string[];
-        path: string;
-        method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-    }, {
-        params: string[];
-        path: string;
-        method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-    }>;
-}, "strip", z.ZodTypeAny, {
-    api: {
-        params: string[];
-        path: string;
-        method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-    };
-    name: string;
-    type: string;
-    flowId: string;
-    props: Record<string, unknown>;
-}, {
-    api: {
-        params: string[];
-        path: string;
-        method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-    };
-    name: string;
-    type: string;
-    flowId: string;
-    props: Record<string, unknown>;
-}>;
+        params: z.ZodArray<z.ZodString>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
 export type ComponentNode = z.infer<typeof componentNodeSchema>;
 /**
  * Generate components response
@@ -488,75 +195,24 @@ export type ComponentNode = z.infer<typeof componentNodeSchema>;
 export declare const generateComponentsResponseSchema: z.ZodObject<{
     success: z.ZodLiteral<true>;
     generationId: z.ZodString;
-} & {
     components: z.ZodArray<z.ZodObject<{
         flowId: z.ZodString;
         name: z.ZodString;
         type: z.ZodString;
         props: z.ZodRecord<z.ZodString, z.ZodUnknown>;
         api: z.ZodObject<{
-            method: z.ZodEnum<["GET", "POST", "PUT", "DELETE", "PATCH"]>;
+            method: z.ZodEnum<{
+                GET: "GET";
+                POST: "POST";
+                PUT: "PUT";
+                DELETE: "DELETE";
+                PATCH: "PATCH";
+            }>;
             path: z.ZodString;
-            params: z.ZodArray<z.ZodString, "many">;
-        }, "strip", z.ZodTypeAny, {
-            params: string[];
-            path: string;
-            method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-        }, {
-            params: string[];
-            path: string;
-            method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-        }>;
-    }, "strip", z.ZodTypeAny, {
-        api: {
-            params: string[];
-            path: string;
-            method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-        };
-        name: string;
-        type: string;
-        flowId: string;
-        props: Record<string, unknown>;
-    }, {
-        api: {
-            params: string[];
-            path: string;
-            method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-        };
-        name: string;
-        type: string;
-        flowId: string;
-        props: Record<string, unknown>;
-    }>, "many">;
-}, "strip", z.ZodTypeAny, {
-    success: true;
-    components: {
-        api: {
-            params: string[];
-            path: string;
-            method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-        };
-        name: string;
-        type: string;
-        flowId: string;
-        props: Record<string, unknown>;
-    }[];
-    generationId: string;
-}, {
-    success: true;
-    components: {
-        api: {
-            params: string[];
-            path: string;
-            method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-        };
-        name: string;
-        type: string;
-        flowId: string;
-        props: Record<string, unknown>;
-    }[];
-    generationId: string;
-}>;
+            params: z.ZodArray<z.ZodString>;
+        }, z.core.$strip>;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
 export type GenerateComponentsResponse = z.infer<typeof generateComponentsResponseSchema>;
 /**
  * Canvas generate request body (POST /api/v1/canvas/generate)
@@ -564,16 +220,11 @@ export type GenerateComponentsResponse = z.infer<typeof generateComponentsRespon
  */
 export declare const canvasGenerateSchema: z.ZodObject<{
     projectId: z.ZodString;
-    pageIds: z.ZodArray<z.ZodString, "many">;
-    mode: z.ZodDefault<z.ZodOptional<z.ZodEnum<["parallel", "sequential"]>>>;
-}, "strict", z.ZodTypeAny, {
-    projectId: string;
-    pageIds: string[];
-    mode: "parallel" | "sequential";
-}, {
-    projectId: string;
-    pageIds: string[];
-    mode?: "parallel" | "sequential" | undefined;
-}>;
+    pageIds: z.ZodArray<z.ZodString>;
+    mode: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
+        parallel: "parallel";
+        sequential: "sequential";
+    }>>>;
+}, z.core.$strict>;
 export type CanvasGenerateInput = z.infer<typeof canvasGenerateSchema>;
 //# sourceMappingURL=canvas.d.ts.map

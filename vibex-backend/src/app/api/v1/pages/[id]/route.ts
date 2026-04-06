@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { cuidSchema } from '@/schemas/common';
+import { cuidSchema } from '@vibex/types/schemas/common';
 import { AppError, ValidationError } from '@/lib/errors';
 import { errorToResponse } from '@/lib/errors';
 

@@ -1,3 +1,12 @@
+### Added (vibex-backend-fixes-20260410 E3: Backend Quality) — 2026-04-06
+- **E3 Backend Quality**: Logger sanitization + PrismaPoolManager enablement + Flow TODO stubs
+- ST-07: Unified logger with sanitization (`lib/logger.ts` with BLOCKED_KEYS redaction: entityId, token, sk-, password, secret, key)
+- ST-08: Empty catch block elimination across 10+ backend files
+- ST-09: PrismaPoolManager wired to routes via `isWorkers` guard — conditional PrismaClient loading excludes from Workers bundle
+- ST-10: Flow execution TODO stubs implemented in `lib/prompts/flow-execution.ts`
+- ST-11: clarificationId DB indexes added
+- **提交**: `dfd08889` (ST-09 PrismaPoolManager/isWorkers guard)
+
 ### Added (vibex-dev-security-20260410 E2: 空catch块清理) — 2026-04-06
 - **E2 SSE Stream AbortSignal**: `lib/sse-stream-lib/index.ts` 新增 requestSignal 参数
   - 客户端断开连接时自动 abort AI 调用，防止 Worker 挂起

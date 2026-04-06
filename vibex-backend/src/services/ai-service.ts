@@ -16,7 +16,8 @@
  */
 
 import { CloudflareEnv } from '../lib/env';
-import { devDebug, sanitizeAndTruncate } from '../lib/log-sanitizer';
+import { debug } from '@/lib/logger';
+import { sanitizeAndTruncate } from '../lib/log-sanitizer';
 import {
   LLMProviderService,
   createLLMProviderService,
@@ -454,7 +455,7 @@ export class AIService {
   private parseJSON<T>(content: string, logRawResponse: boolean = true): T | null {
     // F1.2: Log sanitized raw response for debugging (no sensitive data)
     if (logRawResponse && content) {
-      devDebug('[AI Service] Raw AI response (first 200 chars):', sanitizeAndTruncate(content, 200));
+      debug('[AI Service] Raw AI response (first 200 chars):', sanitizeAndTruncate(content, 200));
     }
 
     try {
@@ -473,13 +474,13 @@ export class AIService {
       // Try to extract JSON from the response (original logic)
       const jsonMatch = content.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
       if (!jsonMatch) {
-        devDebug('[AI Service] No JSON pattern found in response');
+        debug('[AI Service] No JSON pattern found in response');
         return null;
       }
       return JSON.parse(jsonMatch[0]) as T;
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-      devDebug('[AI Service] JSON parse error:', errorMsg);
+      debug('[AI Service] JSON parse error:', errorMsg);
       return null;
     }
   }
@@ -493,7 +494,7 @@ export class AIService {
     
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       if (attempt > 0) {
-        devDebug(`[AI Service] JSON parse retry attempt ${attempt}/${maxRetries}`);
+        debug(`[AI Service] JSON parse retry attempt ${attempt}/${maxRetries}`);
       }
       
       const result = this.parseJSON<T>(content, attempt === 0); // Only log on first attempt
@@ -504,7 +505,7 @@ export class AIService {
       lastError = 'Parse returned null';
     }
     
-    devDebug('[AI Service] All parse attempts failed:', lastError);
+    debug('[AI Service] All parse attempts failed:', lastError);
     return null;
   }
 
@@ -909,8 +910,8 @@ ${JSON.stringify(schema, null, 2)}`
         const result = this.parseJSONWithRetry<T>(response.content);
         
         if (!result) {
-          devDebug('[DEBUG] Failed to parse JSON. Raw response length:', response.content?.length);
-          devDebug('[DEBUG] Raw response preview (sanitized):', sanitizeAndTruncate(response.content ?? '', 200));
+          debug('[DEBUG] Failed to parse JSON. Raw response length:', response.content?.length);
+          debug('[DEBUG] Raw response preview (sanitized):', sanitizeAndTruncate(response.content ?? '', 200));
           throw new Error('Failed to parse JSON response');
         }
 

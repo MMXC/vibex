@@ -15,6 +15,7 @@
  */
 
 import { z } from 'zod';
+import { warn } from '@/lib/logger';
 
 // =============================================================================
 // S2.1: GitHub 路径注入防护
@@ -346,7 +347,7 @@ export async function scanForDangerousPatterns(code: string): Promise<ASTScanRes
   } catch {
     // If AST parsing fails, fall back to empty scan (log warning in production)
     // This prevents the scanner from blocking legitimate prompts due to parse errors
-    console.warn('[ASTScanner] Failed to parse code, skipping AST scan')
+    warn('[ASTScanner] Failed to parse code, skipping AST scan')
   }
 
   return {

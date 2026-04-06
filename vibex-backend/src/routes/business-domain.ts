@@ -3,7 +3,7 @@ import { cors } from 'hono/cors'
 import { z } from 'zod'
 import { generateId, queryDB, executeDB, queryOne, Env } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
-import { devDebug, sanitize, devLog, safeError } from '@/lib/log-sanitizer'
+import { debug, sanitize, devLog, safeError } from '@/lib/log-sanitizer'
 
 const businessDomain = new Hono<{ Bindings: Env }>();
 

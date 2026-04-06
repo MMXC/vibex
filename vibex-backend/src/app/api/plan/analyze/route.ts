@@ -16,7 +16,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAIService } from '@/services/ai-service';
 import { getLocalEnv as getCloudflareEnv } from '@/lib/env';
 import { generateId } from '@/lib/db';
-import { devDebug, sanitize, safeError } from '@/lib/log-sanitizer';
+import { debug } from '@/lib/logger';
+import { sanitize, safeError } from '@/lib/log-sanitizer';
 import { planAnalyzeSchema } from '@/schemas/security';
 import { parseBody } from '@/lib/high-risk-validation';
 
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
       apiBase: env.MINIMAX_API_BASE || 'default',
       model: env.MINIMAX_MODEL || 'default',
     };
-    devDebug('[DEBUG] Plan API - Env debug:', debugInfo);
+    debug('[DEBUG] Plan API - Env debug:', debugInfo);
 
     // Create AI service
     const aiService = createAIService(env);
@@ -237,9 +238,9 @@ Respond ONLY with the JSON object, no other text.`;
     );
 
     // Debug: Log the AI result (sanitized)
-    devDebug('[DEBUG] Plan API - AI result success:', aiResult.success);
-    devDebug('[DEBUG] Plan API - AI result error:', aiResult.error);
-    devDebug(
+    debug('[DEBUG] Plan API - AI result success:', aiResult.success);
+    debug('[DEBUG] Plan API - AI result error:', aiResult.error);
+    debug(
       '[DEBUG] Plan API - AI result data:',
       aiResult.data ? JSON.stringify(sanitize(aiResult.data)).substring(0, 200) : 'null'
     );

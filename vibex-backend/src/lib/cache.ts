@@ -1,5 +1,5 @@
 import { Context, Next } from 'hono';
-import { devDebug } from './log-sanitizer';
+import { debug } from './logger';
 
 import { safeError } from '@/lib/log-sanitizer';
 
@@ -651,7 +651,7 @@ export function startCacheCleanup(intervalMs: number = 60000) {
   cleanupInterval = setInterval(() => {
     const cleaned = store.cleanup();
     if (cleaned > 0 && process.env.NODE_ENV !== 'production') {
-      devDebug(`Cache: Cleaned up ${cleaned} expired entries`);
+      debug(`Cache: Cleaned up ${cleaned} expired entries`);
     }
   }, intervalMs);
 

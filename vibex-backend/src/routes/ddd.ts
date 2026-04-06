@@ -3,7 +3,7 @@ import { cors } from 'hono/cors'
 import { z } from 'zod'
 import { generateId, Env } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
-import { devDebug, sanitize, devLog, safeError } from '@/lib/log-sanitizer'
+import { debug, sanitize, devLog, safeError } from '@/lib/log-sanitizer'
 
 const ddd = new Hono<{ Bindings: Env }>();
 
@@ -57,7 +57,7 @@ ddd.post('/bounded-context', async (c) => {
       apiBase: env.MINIMAX_API_BASE || 'default',
       model: env.MINIMAX_MODEL || 'default',
     }
-    devDebug('[DEBUG] Env debug:', debugInfo)
+    debug('[DEBUG] Env debug:', debugInfo)
 
     // Create AI service
     const aiService = createAIService(env)
@@ -206,9 +206,9 @@ Respond ONLY with the JSON object, no other text.`
     )
 
     // Debug: Log the AI result (sanitized)
-    devDebug('[DEBUG] AI result success:', result.success)
-    devDebug('[DEBUG] AI result error:', result.error)
-    devDebug('[DEBUG] AI result data:', result.data ? JSON.stringify(sanitize(result.data)).substring(0, 200) : 'null')
+    debug('[DEBUG] AI result success:', result.success)
+    debug('[DEBUG] AI result error:', result.error)
+    debug('[DEBUG] AI result data:', result.data ? JSON.stringify(sanitize(result.data)).substring(0, 200) : 'null')
 
     // Parse the AI response
     let boundedContexts: BoundedContext[] = []

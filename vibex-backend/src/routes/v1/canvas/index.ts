@@ -11,7 +11,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { generateId, Env } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
-import { devDebug } from '@/lib/log-sanitizer'
+import { debug } from '@/lib/logger'
 import { withValidation, ValidatedContext } from '@/lib/api-validation'
 import {
   boundedContextSchema,
@@ -83,7 +83,7 @@ canvas.post('/generate-contexts',
       const env = c.env
       const { requirementText } = c.validatedData.body as { requirementText: string; projectId?: string }
 
-      devDebug('[canvas/generate-contexts] Starting with requirement:', requirementText.substring(0, 50))
+      debug('[canvas/generate-contexts] Starting with requirement:', requirementText.substring(0, 50))
 
       const aiService = createAIService(env)
 
@@ -117,7 +117,7 @@ ${requirementText}
 
       const generationId = generateId()
 
-      devDebug(`[canvas/generate-contexts] Generated ${contexts.length} contexts`)
+      debug(`[canvas/generate-contexts] Generated ${contexts.length} contexts`)
 
       return c.json({
         success: true,
@@ -129,7 +129,7 @@ ${requirementText}
       })
 
     } catch (err) {
-      devDebug('[canvas/generate-contexts] Error:', err)
+      debug('[canvas/generate-contexts] Error:', err)
       return c.json({
         success: false,
         contexts: [],
@@ -155,7 +155,7 @@ canvas.post('/generate-flows',
         sessionId: string
       }
 
-      devDebug(`[canvas/generate-flows] Starting with ${contexts.length} contexts, sessionId: ${sessionId}`)
+      debug(`[canvas/generate-flows] Starting with ${contexts.length} contexts, sessionId: ${sessionId}`)
 
       const aiService = createAIService(env)
 
@@ -231,7 +231,7 @@ ${contextSummary}
         ? Math.max(0.5, Math.min(0.9, 1 - (flowResult.usage.completionTokens / 4096)))
         : 0.7
 
-      devDebug(`[canvas/generate-flows] Generated ${flows.length} flows`)
+      debug(`[canvas/generate-flows] Generated ${flows.length} flows`)
 
       return c.json({
         success: true,
@@ -241,7 +241,7 @@ ${contextSummary}
       })
 
     } catch (err) {
-      devDebug('[canvas/generate-flows] Error:', err)
+      debug('[canvas/generate-flows] Error:', err)
       return c.json({
         success: false,
         flows: [],
@@ -268,7 +268,7 @@ canvas.post('/generate-components',
         sessionId: string
       }
 
-      devDebug(`[canvas/generate-components] Starting with ${flows.length} flows, sessionId: ${sessionId}`)
+      debug(`[canvas/generate-components] Starting with ${flows.length} flows, sessionId: ${sessionId}`)
 
       const aiService = createAIService(env)
 
@@ -365,7 +365,7 @@ ${flowSummary}
         }
       }
 
-      devDebug(`[canvas/generate-components] Generated ${components.length} components`)
+      debug(`[canvas/generate-components] Generated ${components.length} components`)
 
       return c.json({
         success: true,
@@ -374,7 +374,7 @@ ${flowSummary}
       })
 
     } catch (err) {
-      devDebug('[canvas/generate-components] Error:', err)
+      debug('[canvas/generate-components] Error:', err)
       return c.json({
         success: false,
         components: [],

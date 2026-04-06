@@ -86,6 +86,10 @@
 - **E3 grepInvert 移除**: 从 playwright.config.ts 移除 grepInvert 配置，CI 现在运行 @ci-blocking 测试
 - **提交**: `7e106786`
 
+### Added (vibex-tester quality-20260410 E4: 提案追踪闭环) — 2026-04-06
+- **E4 proposal-tracker 验证**: 独立测试验证 CLI 功能 (list/filter/headers)
+- **提交**: `80645909`
+
 ### Added (vibex-backend-fixes-20260410 E2: SSE超时修复) — 2026-04-06
 - **E2 SSE timeout**: client-disconnect abort + 30s hard timeout to all SSE routes
 - **提交**: `8a42d126`

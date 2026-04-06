@@ -5,6 +5,26 @@
   - **P0-1 Slack Token**: 已在之前 session 完成 (`grep "xoxp-" task_manager.py == 0`)
   - 提交: `e1136605`
 
+### Added (vibex-dev-proposals-20260411 E1: 日志基础设施治理) — 2026-04-07
+- **E1 日志基础设施治理**: 完成 E1-S1/S2/S3
+  - **E1-S1 connectionPool.ts**: `console.log` → `devLog()`/`safeError()` 替换
+  - **E1-S2 devDebug 统一**: `devDebug` → `logger.debug()` 替换（SessionManager、SSE stream 等 ~30处）
+  - **E1-S3 路由 console.error**: `live-preview`/`prototype-preview` 路由 `console.error` → `safeError()`
+  - 提交: `d64a293b` (E1-S1 devLog fix), `d49b8318` (E1-S2 complete replacement)
+
+### Added (vibex-dev-proposals-20260411 E2: 技术债务清理) — 2026-04-07
+- **E2 技术债务清理**: 完成 E2-S1/S2/S3
+  - **E2-S1 project-snapshot.ts 真实化**: 5 个 mock TODO → D1 数据库真实查询（StepState/BusinessDomain/FlowData/UINode/ChangeLog）
+  - **E2-S2 TODO 清理**: 关键路由 TODO 处理，剩余 `diagnosis.ts:56` 为合理注释
+  - **E2-S3 备份文件清理**: 删除 `llm-provider.ts.backup-20260315235610`
+  - 提交: `58c8166c`
+
+### Added (vibex-dev-proposals-20260411 E3: 健壮性增强) — 2026-04-07
+- **E3 健壮性增强**: 完成 E3-S1/S2
+  - **E3-S1 ConnectionPool 熔断**: CB_THRESHOLD=5, CB_RESET_MS=60000, `isCircuitOpen()` / `recordFailure()` 实现
+  - **E3-S2 JSON 降级策略**: 新增 `src/lib/jsonExtractor.ts`，支持 markdown 包裹 JSON 解析（` ```json ... ``` `）
+  - 提交: `58c8166c`
+
 ### Added (useWebVitals-ts-fix-20260407 Epic1) — 2026-04-07
 - **useWebVitals TypeScript Fix**: 修复 `data.name` 属性访问 TS 错误
   - `vibex-fronted/src/hooks/useWebVitals.ts`: 添加类型断言 `as [string, WebVitalsMetric]` 到 destructure

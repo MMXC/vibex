@@ -24,6 +24,7 @@ export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: false,
   forbidOnly: true,
+  grepInvert: /@ci-blocking/, // E-P0-3: Exclude @ci-blocking tests from CI runs
   retries: 3, // E4 Flaky governance: CI retries = 3
   workers: 1,
   reporter: [

@@ -40,13 +40,13 @@ class_name = "CollaborationRoom"
 # and replace the id placeholders below
 [[kv_namespaces]]
 binding = "COLLABORATION_KV"
-id = "REPLACE_WITH_COLLABORATION_KV_ID"
-preview_id = "REPLACE_WITH_COLLABORATION_KV_ID"
+id = "f0dde43e5e274918a54349f959d57410"
+preview_id = "f0dde43e5e274918a54349f959d57410"
 
 [[kv_namespaces]]
 binding = "NOTIFICATION_KV"
-id = "REPLACE_WITH_NOTIFICATION_KV_ID"
-preview_id = "REPLACE_WITH_NOTIFICATION_KV_ID"
+id = "1e01fb6a0da84d90870c800df2c6303a"
+preview_id = "1e01fb6a0da84d90870c800df2c6303a"
 
 [[migrations]]
 tag = "v1"

@@ -6,7 +6,7 @@
  */
 
 import { z } from 'zod';
-import { nonEmptyStringSchema } from './common';
+import { nonEmptyStringSchema, cuidSchema } from './common';
 
 // ==================== Bounded Context ====================
 
@@ -163,8 +163,8 @@ export type GenerateComponentsResponse = z.infer<typeof generateComponentsRespon
  * Part of: vibex-backend-fixes-20260410 / E1-Schema统一
  */
 export const canvasGenerateSchema = z.object({
-  projectId: z.string().min(1, 'projectId is required'),
-  pageIds: z.array(z.string()).min(1, 'pageIds must have at least one element'),
+  projectId: cuidSchema,
+  pageIds: z.array(cuidSchema).min(1, 'pageIds must have at least one element'),
   mode: z.enum(['parallel', 'sequential']).optional().default('parallel'),
 }).strict();
 

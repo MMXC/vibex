@@ -1,3 +1,12 @@
+### Added (vibex-pm-features-20260410 E1: 需求模板库) — 2026-04-06
+- **E1 需求模板库**: 行业模板系统，支持电商/社交/SaaS 三大行业模板
+  - `types/template.ts`: Template/Entity/BoundedContext/Industry 类型定义
+  - `data/templates/`: 3 个行业模板 JSON (ecommerce/social/saas)
+  - `GET /api/v1/templates`: 模板列表 API，支持 industry 过滤
+  - `GET /api/v1/templates/:id`: 单个模板详情 API
+  - 内存缓存避免重复加载，force-dynamic 路由
+- **提交**: `fe5d6988`
+
 ### Added (vibex-tester quality-20260410 E1: Vitest修复) — 2026-04-06
 - **E1 jest→vi mock 迁移**: 50 个测试文件的 jest.mock()/jest.fn() 迁移到 vi.mock()/vi.fn()
 - **E1 vitest 兼容性**: 修复 vitest mock 方法缺失问题

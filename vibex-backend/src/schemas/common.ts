@@ -10,6 +10,12 @@ import { z } from 'zod';
 // ==================== Common Types ====================
 
 /**
+ * CUID format schema (Cloudflare ID used by Prisma)
+ * Matches Prisma's default ID format
+ */
+export const cuidSchema = z.string().regex(/^c[a-z0-9]{24}$/, 'Invalid CUID format');
+
+/**
  * UUID v4 schema
  */
 export const uuidSchema = z.string().uuid('Invalid UUID format');

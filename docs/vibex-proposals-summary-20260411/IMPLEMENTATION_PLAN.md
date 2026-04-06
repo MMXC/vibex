@@ -2,7 +2,7 @@
 
 **项目**: vibex-proposals-summary-20260411
 **日期**: 2026-04-07
-**最后更新**: 2026-04-07 05:12
+**最后更新**: 2026-04-07 07:42
 
 ---
 
@@ -10,10 +10,14 @@
 
 ### E-P0-1: P0 Tech Debt 紧急修复 ✅
 - [x] P0-1 Slack Token 迁移 (已完成，之前 session)
+- [x] P0-2 ESLint `no-explicit-any` 9 文件 (完成: commit 64d93c21 + 3555a9d1)
+- [x] P0-3 `@ci-blocking` 移除 (完成: grepInvert 到 CI config, commit 20245673)
+- [x] P0-5 WebSocket 连接数限制 (完成: ConnectionPool.maxConnections=100, commit 04d2ebc2)
+- [x] P0-6 死连接 5min 清理 (完成: disconnectTimeout=300000ms, commit 04d2ebc2)
+- [x] P0-7 健康检查端点 (完成: MCP /health, commit 0c63fff2)
+- [x] P0-8 API v0 Deprecation header (完成: 17 个 v0 路由添加 headers, commit 9b26c4f8)
 - [x] P0-9 PrismaClient Workers Guard (完成: commit e1136605)
 - [x] P0-17 删除双重 Playwright 配置 (完成: commit e1136605)
-- [x] P0-2 ESLint `no-explicit-any` 9 文件 (完成: commit 64d93c21)
-- [x] P0-3 `@ci-blocking` 移除 (完成: grepInvert 到 CI config)
 
 ### Step 1: Slack Token 迁移 (0.5h)
 ```bash
@@ -58,6 +62,13 @@ grepInvert: /@ci-blocking/  # 排除 @ci-blocking 测试从 CI 运行
 grep -rn "timeout.*10000" --include="*.config.ts"
 sed -i 's/timeout: 10000/timeout: 30000/g'
 ```
+
+### Step 5: API v0 Deprecation Header (1h) ✅ DONE
+```bash
+# 17 个 v0 路由添加 Deprecation + Sunset + X-API-Deprecation-Info headers
+# 已通过 subagent 完成，commit 9b26c4f8
+```
+验证: grep -l "Deprecation.*true" src/app/api/*/route.ts | wc -l  # 应为 17+
 
 ---
 

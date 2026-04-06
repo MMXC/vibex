@@ -1,5 +1,4 @@
 import { Context, Next } from 'hono'
-import type { ContentfulStatusCode } from 'hono/dist/types/utils/http-status'
 
 import { safeError } from '@/lib/log-sanitizer';
 
@@ -94,7 +93,14 @@ export const errorHandler = async (err: Error | ApiError, c: Context, next: Next
       path: c.req.path,
     }
 
-    return c.text(JSON.stringify(response), statusCode as ContentfulStatusCode)
+    return c.json(response, {
+      status: statusCode as
+        | 100 | 102 | 103
+        | 200 | 201 | 202 | 203 | 206 | 207 | 208 | 226
+        | 300 | 301 | 302 | 303 | 307 | 308
+        | 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 408 | 409 | 410 | 411 | 412 | 413 | 414 | 415 | 416 | 417 | 418 | 421 | 422 | 423 | 424 | 425 | 426 | 428 | 429 | 431 | 451
+        | 500 | 501 | 502 | 503 | 504 | 505 | 506 | 507 | 508 | 510 | 511
+    })
   }
 
   await next()

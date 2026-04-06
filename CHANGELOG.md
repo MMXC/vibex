@@ -1,3 +1,11 @@
+### Added (vibex-proposals-20260411-page-structure: 组件树页面结构增强) — 2026-04-07
+- **组件树页面结构增强**: Phase 1-4 完成
+  - **Phase 1**: `ComponentNode` 新增 `pageName?: string` 可选字段
+  - **Phase 2**: `getPageLabel()` 支持 `pageName` 优先，`ComponentGroup` 新增 `pageId` + `componentCount`
+  - **Phase 3**: 树结构展示优化，通用组件置顶
+  - **Phase 4**: JSON 导出支持 `pageName` 字段
+  - 提交: `c8ffde20` (与 page-tree flowId 匹配共用 commit)
+
 ### Added (vibex-proposals-20260411-page-tree: flowId 匹配修复) — 2026-04-07
 - **flowId 匹配修复**: 修复 AI 生成组件时 flowId 填充不正确的问题
   - **S1.1 AI prompt 强化**: `generate-components/route.ts` prompt 增加 `flowId = BusinessFlow nodeId` 指令

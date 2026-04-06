@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 
-jest.mock('@/lib/auth', () => ({
-  getAuthUser: jest.fn(),
+jest.mock('@/lib/authFromGateway', () => ({
+  getAuthUserFromRequest: jest.fn(),
 }));
 
 import { POST } from './route';
@@ -12,8 +12,8 @@ describe('POST /api/auth/logout', () => {
   });
 
   it('should return 401 if not authenticated', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue(null);
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue(null);
 
     const request = new NextRequest('http://localhost:3000/api/auth/logout', {
       method: 'POST',
@@ -26,8 +26,8 @@ describe('POST /api/auth/logout', () => {
   });
 
   it('should logout successfully', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
 
     const request = new NextRequest('http://localhost:3000/api/auth/logout', {
       method: 'POST',
@@ -41,8 +41,8 @@ describe('POST /api/auth/logout', () => {
   });
 
   it('should handle errors', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockImplementation(() => {
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockImplementation(() => {
       throw new Error('Unexpected error');
     });
 

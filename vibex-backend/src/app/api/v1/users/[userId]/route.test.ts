@@ -20,8 +20,10 @@ jest.mock('@prisma/client', () => ({
   PrismaClient: jest.fn(() => mockPrisma),
 }));
 
+jest.mock('@/lib/authFromGateway', () => ({
+  getAuthUserFromRequest: jest.fn(),
+}));
 jest.mock('@/lib/auth', () => ({
-  getAuthUser: jest.fn(),
   hashPassword: jest.fn(),
 }));
 
@@ -34,8 +36,8 @@ describe('GET /api/users/:userId', () => {
   });
 
   it('should return 401 if not authenticated', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue(null);
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue(null);
 
     const request = new NextRequest('http://localhost:3000/api/users/user123');
     const response = await GET(request, { params: Promise.resolve({ userId: 'user123' }) });
@@ -46,8 +48,8 @@ describe('GET /api/users/:userId', () => {
   });
 
   it('should return 403 if trying to access other user', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
 
     const request = new NextRequest('http://localhost:3000/api/users/user456');
     const response = await GET(request, { params: Promise.resolve({ userId: 'user456' }) });
@@ -57,8 +59,8 @@ describe('GET /api/users/:userId', () => {
   });
 
   it('should return 404 if user not found', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
     mockPrisma.user.findUnique.mockResolvedValue(null);
 
     const request = new NextRequest('http://localhost:3000/api/users/user123');
@@ -69,8 +71,8 @@ describe('GET /api/users/:userId', () => {
   });
 
   it('should return user successfully', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
     mockPrisma.user.findUnique.mockResolvedValue({
       id: 'user123',
       email: 'test@example.com',
@@ -97,8 +99,8 @@ describe('PUT /api/users/:userId', () => {
   });
 
   it('should return 401 if not authenticated', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue(null);
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue(null);
 
     const request = new NextRequest('http://localhost:3000/api/users/user123', {
       method: 'PUT',
@@ -111,8 +113,8 @@ describe('PUT /api/users/:userId', () => {
   });
 
   it('should return 403 if trying to update other user', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
 
     const request = new NextRequest('http://localhost:3000/api/users/user456', {
       method: 'PUT',
@@ -125,8 +127,9 @@ describe('PUT /api/users/:userId', () => {
   });
 
   it('should update user successfully', async () => {
-    const { getAuthUser, hashPassword } = require('@/lib/auth');
-    getAuthUser.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
+    const { hashPassword } = require('@/lib/auth');
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
     hashPassword.mockResolvedValue('hashedpassword');
     mockPrisma.user.update.mockResolvedValue({
       id: 'user123',

@@ -16,8 +16,8 @@ jest.mock('@prisma/client', () => ({
   PrismaClient: jest.fn(() => mockPrisma),
 }));
 
-jest.mock('@/lib/auth', () => ({
-  getAuthUser: jest.fn(),
+jest.mock('@/lib/authFromGateway', () => ({
+  getAuthUserFromRequest: jest.fn(),
 }));
 
 import { GET, PUT, DELETE } from './route';
@@ -29,48 +29,48 @@ describe('GET /api/flows/:flowId', () => {
   });
 
   it('should return 401 if not authenticated', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue(null);
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue(null);
 
     const request = new NextRequest('http://localhost:3000/api/flows/flow123');
-    const response = await GET(request, { params: Promise.resolve({ flowId: 'flow123' }) });
+    const response = await GET(request, { params: Promise.resolve({ flowId: 'cabcdefghijklmnopqrstuv00' }) });
     const data = await response.json();
 
     expect(response.status).toBe(401);
   });
 
   it('should return 404 if flow not found', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
     mockPrisma.flowData.findUnique.mockResolvedValue(null);
 
     const request = new NextRequest('http://localhost:3000/api/flows/flow123');
-    const response = await GET(request, { params: Promise.resolve({ flowId: 'flow123' }) });
+    const response = await GET(request, { params: Promise.resolve({ flowId: 'cabcdefghijklmnopqrstuv00' }) });
     const data = await response.json();
 
     expect(response.status).toBe(404);
   });
 
   it('should return 403 if user does not own flow', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
     mockPrisma.flowData.findUnique.mockResolvedValue({
-      id: 'flow123',
+      id: 'cabcdefghijklmnopqrstuv00',
       project: { userId: 'user456' },
     });
 
     const request = new NextRequest('http://localhost:3000/api/flows/flow123');
-    const response = await GET(request, { params: Promise.resolve({ flowId: 'flow123' }) });
+    const response = await GET(request, { params: Promise.resolve({ flowId: 'cabcdefghijklmnopqrstuv00' }) });
     const data = await response.json();
 
     expect(response.status).toBe(403);
   });
 
   it('should return flow successfully', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
     mockPrisma.flowData.findUnique.mockResolvedValue({
-      id: 'flow123',
+      id: 'cabcdefghijklmnopqrstuv00',
       name: 'Test Flow',
       nodes: '[{"id":"1"}]',
       edges: '[]',
@@ -81,7 +81,7 @@ describe('GET /api/flows/:flowId', () => {
     });
 
     const request = new NextRequest('http://localhost:3000/api/flows/flow123');
-    const response = await GET(request, { params: Promise.resolve({ flowId: 'flow123' }) });
+    const response = await GET(request, { params: Promise.resolve({ flowId: 'cabcdefghijklmnopqrstuv00' }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -97,29 +97,29 @@ describe('PUT /api/flows/:flowId', () => {
   });
 
   it('should return 404 if flow not found', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
     mockPrisma.flowData.findUnique.mockResolvedValue(null);
 
     const request = new NextRequest('http://localhost:3000/api/flows/flow123', {
       method: 'PUT',
       body: JSON.stringify({ name: 'Updated Flow' }),
     });
-    const response = await PUT(request, { params: Promise.resolve({ flowId: 'flow123' }) });
+    const response = await PUT(request, { params: Promise.resolve({ flowId: 'cabcdefghijklmnopqrstuv00' }) });
     const data = await response.json();
 
     expect(response.status).toBe(404);
   });
 
   it('should update flow successfully', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
     mockPrisma.flowData.findUnique.mockResolvedValue({
-      id: 'flow123',
+      id: 'cabcdefghijklmnopqrstuv00',
       project: { userId: 'user123' },
     });
     mockPrisma.flowData.update.mockResolvedValue({
-      id: 'flow123',
+      id: 'cabcdefghijklmnopqrstuv00',
       name: 'Updated Flow',
       nodes: '[{"id":"1"}]',
       edges: '[]',
@@ -132,7 +132,7 @@ describe('PUT /api/flows/:flowId', () => {
       method: 'PUT',
       body: JSON.stringify({ name: 'Updated Flow', nodes: [{ id: '1' }] }),
     });
-    const response = await PUT(request, { params: Promise.resolve({ flowId: 'flow123' }) });
+    const response = await PUT(request, { params: Promise.resolve({ flowId: 'cabcdefghijklmnopqrstuv00' }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -148,32 +148,32 @@ describe('DELETE /api/flows/:flowId', () => {
   });
 
   it('should return 404 if flow not found', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
     mockPrisma.flowData.findUnique.mockResolvedValue(null);
 
     const request = new NextRequest('http://localhost:3000/api/flows/flow123', {
       method: 'DELETE',
     });
-    const response = await DELETE(request, { params: Promise.resolve({ flowId: 'flow123' }) });
+    const response = await DELETE(request, { params: Promise.resolve({ flowId: 'cabcdefghijklmnopqrstuv00' }) });
     const data = await response.json();
 
     expect(response.status).toBe(404);
   });
 
   it('should delete flow successfully', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
     mockPrisma.flowData.findUnique.mockResolvedValue({
-      id: 'flow123',
+      id: 'cabcdefghijklmnopqrstuv00',
       project: { userId: 'user123' },
     });
-    mockPrisma.flowData.delete.mockResolvedValue({ id: 'flow123' });
+    mockPrisma.flowData.delete.mockResolvedValue({ id: 'cabcdefghijklmnopqrstuv00' });
 
     const request = new NextRequest('http://localhost:3000/api/flows/flow123', {
       method: 'DELETE',
     });
-    const response = await DELETE(request, { params: Promise.resolve({ flowId: 'flow123' }) });
+    const response = await DELETE(request, { params: Promise.resolve({ flowId: 'cabcdefghijklmnopqrstuv00' }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);

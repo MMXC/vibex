@@ -21,9 +21,8 @@ jest.mock('@prisma/client', () => ({
   PrismaClient: jest.fn(() => mockPrisma),
 }));
 
-jest.mock('@/lib/auth', () => ({
-  getAuthUser: jest.fn(),
-  hashPassword: jest.fn(),
+jest.mock('@/lib/authFromGateway', () => ({
+  getAuthUserFromRequest: jest.fn(),
 }));
 
 import { GET as MessagesGET, POST as MessagesPOST } from '../messages/route';
@@ -35,8 +34,8 @@ describe('GET /api/messages', () => {
   });
 
   it('should return 401 if not authenticated', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue(null);
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue(null);
 
     const request = new NextRequest('http://localhost:3000/api/messages?projectId=proj123');
     const response = await MessagesGET(request);
@@ -47,8 +46,8 @@ describe('GET /api/messages', () => {
   });
 
   it('should return 400 if projectId is missing', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
 
     const request = new NextRequest('http://localhost:3000/api/messages');
     const response = await MessagesGET(request);
@@ -59,8 +58,8 @@ describe('GET /api/messages', () => {
   });
 
   it('should return 404 if project not found', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
     mockPrisma.project.findFirst.mockResolvedValue(null);
 
     const request = new NextRequest('http://localhost:3000/api/messages?projectId=proj123');
@@ -71,8 +70,8 @@ describe('GET /api/messages', () => {
   });
 
   it('should return messages successfully', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
     mockPrisma.project.findFirst.mockResolvedValue({ id: 'proj123', userId: 'user123' });
     mockPrisma.message.findMany.mockResolvedValue([
       { id: 'msg1', role: 'user', content: 'Hello', projectId: 'proj123', createdAt: new Date() },
@@ -95,8 +94,8 @@ describe('POST /api/messages', () => {
   });
 
   it('should return 401 if not authenticated', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue(null);
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue(null);
 
     const request = new NextRequest('http://localhost:3000/api/messages', {
       method: 'POST',
@@ -109,8 +108,8 @@ describe('POST /api/messages', () => {
   });
 
   it('should return 400 if required fields missing', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
 
     const request = new NextRequest('http://localhost:3000/api/messages', {
       method: 'POST',
@@ -123,8 +122,8 @@ describe('POST /api/messages', () => {
   });
 
   it('should create message successfully', async () => {
-    const { getAuthUser } = require('@/lib/auth');
-    getAuthUser.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
+    const { getAuthUserFromRequest } = require('@/lib/authFromGateway');
+    getAuthUserFromRequest.mockReturnValue({ userId: 'user123', email: 'test@example.com' });
     mockPrisma.project.findFirst.mockResolvedValue({ id: 'proj123', userId: 'user123' });
     mockPrisma.message.create.mockResolvedValue({
       id: 'msg123',

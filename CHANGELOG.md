@@ -1,3 +1,9 @@
+### Added (vibex-proposals-20260411 E4: Auth中间件统一) — 2026-04-07
+- **E4 Auth 中间件统一**: Next.js routes 使用 `getAuthUserFromRequest()` 从 Hono gateway headers 读取认证
+  - 新增 `src/lib/authFromGateway.ts`: Header-based auth utility (`x-auth-user`, `x-auth-user-id`)
+  - `flows/[flowId]`, `users/[userId]`, `messages`, `messages/[messageId]`, `auth/logout` routes 更新
+  - Hono gateway 保持 JWT 验证唯一入口，Next.js 层仅读取 header
+
 ### Added (vibex-proposals-20260411 E1: API治理) — 2026-04-07
 - **E1 API v0/v1 治理**: v0 Deprecation finding + safe logging utilities refactor
   - **v0 不存在**: 代码库中所有 API 路由均位于 `/api/v1/` 下，无 `/api/v0/` 目录，E1-S1 (v0 deprecation header) 不适用

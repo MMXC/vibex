@@ -14,6 +14,16 @@
   - ErrorBoundary 覆盖：AppErrorBoundary（全局 app/layout.tsx）+ JsonRenderErrorBoundary（CanvasPreviewModal）双层部署
   - Store 错误处理：各 store 均有 try/catch + canvasLogger.error 处理
 
+### Added (vibex-proposals-20260411 E5: 质量评分) — 2026-04-11
+- **E5 CompressionEngine 质量评分**: 为压缩引擎引入质量评分机制
+  - `QUALITY_THRESHOLD = 70`: 质量评分降级阈值
+  - `calculateQualityScore()`: 基于实体覆盖率（boundedContexts + domainModels）和压缩比计算质量分
+  - `isQualityDegraded()`: 当 qualityScore < 70 时标记为降级
+  - `CompressionResult` 新增 `qualityScore`（0-100）和 `degraded` 字段
+  - `countEntities()`: 从 structuredContext 统计领域实体数量用于质量评估
+  - 测试覆盖于 `__tests__/index.test.ts`（CompressionEngine 部分）
+  - **提交**: `CompressionEngine.ts` E5-S1 质量评分实现
+
 ### Added (vibex-proposals-20260411 E4: 收尾与验证) — 2026-04-11
 - **E4 收尾验证**: TypeScript + Lint 基线确认
   - `npx tsc --noEmit` frontend: 无新增错误（8 pre-existing canvasLogger 类型问题与本项目无关）

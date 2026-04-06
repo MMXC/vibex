@@ -1,3 +1,9 @@
+### Added (vibex-p0-fixes-20260409 E6: 提案追踪) — 2026-04-06
+- **E6 proposal-tracker CLI**: scripts/proposal-tracker.py (list/status/update/create)
+- **E6 TEMPLATE.md**: docs/proposals/TEMPLATE.md 标准化提案模板
+- **E6 提案追踪闭环**: TRACKING.md E6 全部完成 (13/13 proposals)
+- **提交**: `3091cd39`
+
 ### Added (vibex-p0-fixes-20260409 E5: 架构治理) — 2026-04-06
 - **E5 KV Namespace IDs**: wrangler.toml 替换为真实 namespace IDs
   - COLLABORATION_KV: `f0dde43e5e274918a54349f959d57410`

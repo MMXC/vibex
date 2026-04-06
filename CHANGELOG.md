@@ -1,3 +1,10 @@
+### Added (vibex-proposals-summary-20260411 E-P0-1: P0 Tech Debt) — 2026-04-07
+- **E-P0-1 P0 Tech Debt 紧急修复**: 完成 P0-9 和 P0-17
+  - **P0-9 PrismaClient Workers Guard**: 12 个 API 路由 + `routes/project-settings.ts` 的 `new PrismaClient()` → 全局单例 `@/lib/prisma`，防止 Workers 内存泄漏
+  - **P0-17 删除双重 Playwright 配置**: 删除 `vibex-fronted/tests/e2e/playwright.config.ts` 重复配置
+  - **P0-1 Slack Token**: 已在之前 session 完成 (`grep "xoxp-" task_manager.py == 0`)
+  - 提交: `e1136605`
+
 ### Added (useWebVitals-ts-fix-20260407 Epic1) — 2026-04-07
 - **useWebVitals TypeScript Fix**: 修复 `data.name` 属性访问 TS 错误
   - `vibex-fronted/src/hooks/useWebVitals.ts`: 添加类型断言 `as [string, WebVitalsMetric]` 到 destructure

@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @fileoverview Common Zod Schemas — Shared across packages
  *
@@ -7,21 +8,23 @@
  * Usage in backend:
  *   import { uuidSchema, emailSchema } from '@vibex/types/schemas/common'
  */
-import { z } from 'zod';
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.paginationQuerySchema = exports.positiveIntSchema = exports.optionalStringSchema = exports.nonEmptyStringSchema = exports.passwordSchema = exports.emailSchema = exports.uuidSchema = exports.cuidSchema = void 0;
+const zod_1 = require("zod");
 // ==================== Common Types ====================
 /**
  * CUID format schema (Cloudflare ID used by Prisma)
  * Matches Prisma's default ID format
  */
-export const cuidSchema = z.string().regex(/^c[a-z0-9]{24}$/, 'Invalid CUID format');
+exports.cuidSchema = zod_1.z.string().regex(/^c[a-z0-9]{24}$/, 'Invalid CUID format');
 /**
  * UUID v4 schema
  */
-export const uuidSchema = z.string().uuid('Invalid UUID format');
+exports.uuidSchema = zod_1.z.string().uuid('Invalid UUID format');
 /**
  * Email schema with strict validation
  */
-export const emailSchema = z
+exports.emailSchema = zod_1.z
     .string()
     .min(1, 'Email is required')
     .email('Invalid email format')
@@ -31,7 +34,7 @@ export const emailSchema = z
 /**
  * Password schema with security requirements
  */
-export const passwordSchema = z
+exports.passwordSchema = zod_1.z
     .string()
     .min(8, 'Password must be at least 8 characters')
     .max(128, 'Password too long')
@@ -41,7 +44,7 @@ export const passwordSchema = z
 /**
  * Non-empty string schema
  */
-export const nonEmptyStringSchema = z
+exports.nonEmptyStringSchema = zod_1.z
     .string()
     .min(1, 'Field cannot be empty')
     .max(1000, 'Field too long')
@@ -49,7 +52,7 @@ export const nonEmptyStringSchema = z
 /**
  * Optional string schema (allows empty, trims if present)
  */
-export const optionalStringSchema = z
+exports.optionalStringSchema = zod_1.z
     .string()
     .max(1000, 'Field too long')
     .transform((val) => (val === '' ? undefined : val.trim()))
@@ -57,9 +60,9 @@ export const optionalStringSchema = z
 /**
  * Positive integer schema
  */
-export const positiveIntSchema = z
+exports.positiveIntSchema = zod_1.z
     .string()
-    .or(z.number())
+    .or(zod_1.z.number())
     .transform((val) => {
     const num = typeof val === 'string' ? parseInt(val, 10) : val;
     if (isNaN(num) || num < 1) {
@@ -70,16 +73,16 @@ export const positiveIntSchema = z
 /**
  * Pagination query schema
  */
-export const paginationQuerySchema = z.object({
-    page: z
-        .union([z.string(), z.number()])
+exports.paginationQuerySchema = zod_1.z.object({
+    page: zod_1.z
+        .union([zod_1.z.string(), zod_1.z.number()])
         .optional()
         .transform((val) => {
         const num = typeof val === 'string' ? parseInt(val, 10) : (val ?? 1);
         return isNaN(num) || num < 1 ? 1 : Math.floor(num);
     }),
-    pageSize: z
-        .union([z.string(), z.number()])
+    pageSize: zod_1.z
+        .union([zod_1.z.string(), zod_1.z.number()])
         .optional()
         .transform((val) => {
         const num = typeof val === 'string' ? parseInt(val, 10) : (val ?? 20);

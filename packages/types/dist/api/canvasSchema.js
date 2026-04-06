@@ -1,3 +1,9 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GenerateComponentsResponseSchema = exports.ComponentSchema = exports.ComponentApiSchema = exports.GenerateFlowsResponseSchema = exports.BusinessFlowSchema = exports.BusinessFlowStepSchema = exports.GenerateContextsResponseSchema = exports.BoundedContextSchema = void 0;
+exports.isValidGenerateContextsResponse = isValidGenerateContextsResponse;
+exports.isValidGenerateFlowsResponse = isValidGenerateFlowsResponse;
+exports.isValidGenerateComponentsResponse = isValidGenerateComponentsResponse;
 /**
  * @fileoverview Canvas API Zod Schemas — Shared between frontend and backend
  *
@@ -7,74 +13,74 @@
  *
  * Schema definitions for Epic: Zod Schema 统一 (E1)
  */
-import { z } from 'zod';
+const zod_1 = require("zod");
 // =============================================================================
 // Contexts API
 // =============================================================================
-export const BoundedContextSchema = z.object({
-    id: z.string(),
-    name: z.string(),
-    description: z.string(),
-    type: z.enum(['core', 'supporting', 'generic', 'external']),
+exports.BoundedContextSchema = zod_1.z.object({
+    id: zod_1.z.string(),
+    name: zod_1.z.string(),
+    description: zod_1.z.string(),
+    type: zod_1.z.enum(['core', 'supporting', 'generic', 'external']),
 });
-export const GenerateContextsResponseSchema = z.object({
-    success: z.boolean(),
-    contexts: z.array(BoundedContextSchema),
-    generationId: z.string(),
-    confidence: z.number(),
-    error: z.string().optional(),
+exports.GenerateContextsResponseSchema = zod_1.z.object({
+    success: zod_1.z.boolean(),
+    contexts: zod_1.z.array(exports.BoundedContextSchema),
+    generationId: zod_1.z.string(),
+    confidence: zod_1.z.number(),
+    error: zod_1.z.string().optional(),
 });
 // =============================================================================
 // Flows API
 // =============================================================================
-export const BusinessFlowStepSchema = z.object({
-    name: z.string(),
-    actor: z.string(),
-    description: z.string(),
-    order: z.number(),
+exports.BusinessFlowStepSchema = zod_1.z.object({
+    name: zod_1.z.string(),
+    actor: zod_1.z.string(),
+    description: zod_1.z.string(),
+    order: zod_1.z.number(),
 });
-export const BusinessFlowSchema = z.object({
-    name: z.string(),
-    contextId: z.string(),
-    description: z.string().optional(),
-    steps: z.array(BusinessFlowStepSchema),
+exports.BusinessFlowSchema = zod_1.z.object({
+    name: zod_1.z.string(),
+    contextId: zod_1.z.string(),
+    description: zod_1.z.string().optional(),
+    steps: zod_1.z.array(exports.BusinessFlowStepSchema),
 });
-export const GenerateFlowsResponseSchema = z.object({
-    success: z.boolean(),
-    flows: z.array(BusinessFlowSchema),
-    confidence: z.number(),
-    error: z.string().optional(),
+exports.GenerateFlowsResponseSchema = zod_1.z.object({
+    success: zod_1.z.boolean(),
+    flows: zod_1.z.array(exports.BusinessFlowSchema),
+    confidence: zod_1.z.number(),
+    error: zod_1.z.string().optional(),
 });
 // =============================================================================
 // Components API
 // =============================================================================
-export const ComponentApiSchema = z.object({
-    method: z.enum(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']),
-    path: z.string(),
-    params: z.array(z.string()),
+exports.ComponentApiSchema = zod_1.z.object({
+    method: zod_1.z.enum(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']),
+    path: zod_1.z.string(),
+    params: zod_1.z.array(zod_1.z.string()),
 });
-export const ComponentSchema = z.object({
-    name: z.string(),
-    flowId: z.string(),
-    type: z.enum(['page', 'form', 'list', 'detail', 'modal']),
-    description: z.string().optional(),
-    api: ComponentApiSchema.optional(),
+exports.ComponentSchema = zod_1.z.object({
+    name: zod_1.z.string(),
+    flowId: zod_1.z.string(),
+    type: zod_1.z.enum(['page', 'form', 'list', 'detail', 'modal']),
+    description: zod_1.z.string().optional(),
+    api: exports.ComponentApiSchema.optional(),
 });
-export const GenerateComponentsResponseSchema = z.object({
-    success: z.boolean(),
-    components: z.array(ComponentSchema),
-    confidence: z.number(),
-    error: z.string().optional(),
+exports.GenerateComponentsResponseSchema = zod_1.z.object({
+    success: zod_1.z.boolean(),
+    components: zod_1.z.array(exports.ComponentSchema),
+    confidence: zod_1.z.number(),
+    error: zod_1.z.string().optional(),
 });
 // =============================================================================
 // Validators (type guard wrappers)
 // =============================================================================
-export function isValidGenerateContextsResponse(value) {
-    return GenerateContextsResponseSchema.safeParse(value).success;
+function isValidGenerateContextsResponse(value) {
+    return exports.GenerateContextsResponseSchema.safeParse(value).success;
 }
-export function isValidGenerateFlowsResponse(value) {
-    return GenerateFlowsResponseSchema.safeParse(value).success;
+function isValidGenerateFlowsResponse(value) {
+    return exports.GenerateFlowsResponseSchema.safeParse(value).success;
 }
-export function isValidGenerateComponentsResponse(value) {
-    return GenerateComponentsResponseSchema.safeParse(value).success;
+function isValidGenerateComponentsResponse(value) {
+    return exports.GenerateComponentsResponseSchema.safeParse(value).success;
 }

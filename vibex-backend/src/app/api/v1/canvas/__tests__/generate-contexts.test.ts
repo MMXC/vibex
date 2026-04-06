@@ -29,8 +29,7 @@ import { POST } from '../generate-contexts/route';
 import { authHeader } from '@/lib/__tests__/testAuth';
 describe('E1-T1: 输入验证', () => {
   it('空字符串 → 400', async () => {
-    const req = new NextRequest('http://localhost/api/v1/canvas/generate-contexts', { headers: authHeader() }),
-    });
+    const req = new NextRequest('http://localhost/api/v1/canvas/generate-contexts', { headers: authHeader() });
     const res = await POST(req);
     expect(res.status).toBe(400);
     const data = await res.json();
@@ -39,15 +38,13 @@ describe('E1-T1: 输入验证', () => {
   });
 
   it('纯空白字符串 → 400', async () => {
-    const req = new NextRequest('http://localhost/api/v1/canvas/generate-contexts', { headers: authHeader() }),
-    });
+    const req = new NextRequest('http://localhost/api/v1/canvas/generate-contexts', { headers: authHeader() });
     const res = await POST(req);
     expect(res.status).toBe(400);
   });
 
   it('缺少 requirementText 字段 → 400', async () => {
-    const req = new NextRequest('http://localhost/api/v1/canvas/generate-contexts', { headers: authHeader() }),
-    });
+    const req = new NextRequest('http://localhost/api/v1/canvas/generate-contexts', { headers: authHeader() });
     const res = await POST(req);
     expect(res.status).toBe(400);
   });
@@ -68,8 +65,7 @@ describe('E1-T2: API Key 检查', () => {
   it('无 API Key → 500', async () => {
     // Re-import to pick up new mock
     const { POST: POSTNoKey } = await import('../generate-contexts/route');
-    const req = new NextRequest('http://localhost/api/v1/canvas/generate-contexts', { headers: authHeader() }),
-    });
+    const req = new NextRequest('http://localhost/api/v1/canvas/generate-contexts', { headers: authHeader() });
     const res = await POSTNoKey(req);
     expect(res.status).toBe(500);
     const data = await res.json();
@@ -94,8 +90,7 @@ describe('E1-T3: AI 服务 .catch() 防御', () => {
     const { POST: POSTError } = await import('../generate-contexts/route');
     mockGenerateJSON.mockRejectedValue(new Error('AI service network error'));
 
-    const req = new NextRequest('http://localhost/api/v1/canvas/generate-contexts', { headers: authHeader() }),
-    });
+    const req = new NextRequest('http://localhost/api/v1/canvas/generate-contexts', { headers: authHeader() });
 
     // Should NOT throw — .catch() handles it
     const res = await POSTError(req);
@@ -113,8 +108,7 @@ describe('E1-T3: AI 服务 .catch() 防御', () => {
       usage: { completionTokens: 100 },
     });
 
-    const req = new NextRequest('http://localhost/api/v1/canvas/generate-contexts', { headers: authHeader() }),
-    });
+    const req = new NextRequest('http://localhost/api/v1/canvas/generate-contexts', { headers: authHeader() });
 
     const res = await POSTSuccess(req);
     expect(res.status).toBe(200);

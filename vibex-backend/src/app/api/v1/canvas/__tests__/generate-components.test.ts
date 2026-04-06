@@ -32,8 +32,7 @@ describe('E1-T1: 输入验证', () => {
   });
 
   it('空 contexts → validation error', async () => {
-    const req = new NextRequest('http://localhost/api/v1/canvas/generate-components', { headers: authHeader() }),
-    });
+    const req = new NextRequest('http://localhost/api/v1/canvas/generate-components', { headers: authHeader() });
     const res = await POST(req);
     const data = await res.json();
     expect(data.success).toBe(false);

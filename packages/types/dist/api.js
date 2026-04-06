@@ -1,4 +1,5 @@
+"use strict";
 /**
  * @fileoverview HomePage Domain Types — API/Domain layer
  */
-export {};
+Object.defineProperty(exports, "__esModule", { value: true });

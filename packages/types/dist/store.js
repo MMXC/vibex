@@ -1,4 +1,5 @@
+"use strict";
 /**
  * @fileoverview Store/Application State Types — state management layer
  */
-export {};
+Object.defineProperty(exports, "__esModule", { value: true });

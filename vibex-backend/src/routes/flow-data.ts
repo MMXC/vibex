@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
+import { TYPES_PACKAGE_VERSION } from '@vibex/types'; // E3: @vibex/types reference
 
 import { safeError } from '@/lib/log-sanitizer';
 

@@ -98,7 +98,7 @@ describe('POST /api/pages', () => {
     };
     mockPrisma.page.create.mockResolvedValue(mockPage);
 
-    const request = new NextRequest('http://localhost:3000/api/pages', { headers: authHeader() }),
+    const request = new NextRequest('http://localhost:3000/api/pages', { headers: authHeader() });
     });
     const response = await POST(request);
     const data = await response.json();

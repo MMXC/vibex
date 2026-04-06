@@ -6,6 +6,9 @@ module.exports = {
   testMatch: ['**/*.test.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    // E3: @vibex/types — use built CJS dist for Jest
+    '^@vibex/types$': '<rootDir>/../packages/types/dist/index.js',
+    '^@vibex/types/(.*)$': '<rootDir>/../packages/types/dist/$1.js',
   },
   collectCoverageFrom: [
     'src/**/*.ts',

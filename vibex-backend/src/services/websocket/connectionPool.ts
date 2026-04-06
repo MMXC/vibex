@@ -32,7 +32,7 @@ export interface ConnectionPoolConfig {
 const DEFAULT_CONFIG: ConnectionPoolConfig = {
   maxConnections: 100,
   heartbeatInterval: 30000, // 30s
-  disconnectTimeout: 60000, // 60s
+  disconnectTimeout: 300000, // 5min
   maxReconnectAttempts: 5,
 };
 
@@ -64,7 +64,7 @@ export class ConnectionPool {
     // 被动清理过期连接
     this.pruneStaleConnections();
 
-    devLog();
+    devLog('ConnectionPool: connection added');
     return true;
   }
 
@@ -75,7 +75,7 @@ export class ConnectionPool {
     const connection = this.connections.get(connectionId);
     if (connection) {
       this.connections.delete(connectionId);
-      devLog();
+      devLog('ConnectionPool: connection removed');
     }
     return connection;
   }
@@ -180,7 +180,7 @@ export class ConnectionPool {
       const timeSinceHeartbeat = now - conn.lastHeartbeat;
 
       if (timeSinceHeartbeat > timeout) {
-        devLog();
+        devLog('ConnectionPool: stale connection pruned');
         this.handleDisconnect(id);
       }
     }

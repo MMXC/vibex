@@ -59,9 +59,9 @@
 
 ## 验收清单
 
-- [ ] BoundedContextTree 只有 1 个 checkbox
-- [ ] BoundedContextTree 无 nodeTypeBadge/confirmedBadge
-- [ ] ComponentTree checkbox 在标题同行
-- [ ] ComponentTree 无 nodeTypeBadge
-- [ ] 废弃 CSS 已删除
-- [ ] npm test 通过
+- [x] BoundedContextTree 只有 1 个 checkbox
+- [x] BoundedContextTree 无 nodeTypeBadge/confirmedBadge
+- [x] ComponentTree checkbox 在标题同行
+- [x] ComponentTree 无 nodeTypeBadge
+- [x] 废弃 CSS 已删除 (.selectionCheckbox)
+- [x] npm test 通过

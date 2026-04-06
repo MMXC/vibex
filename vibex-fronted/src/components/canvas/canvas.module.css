@@ -1127,17 +1127,6 @@
   box-shadow: 0 0 0 1px var(--color-primary), 0 0 12px rgba(124, 58, 237, 0.2);
 }
 
-.selectionCheckbox {
-  position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
-  z-index: 2;
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  accent-color: var(--color-primary);
-}
-
 /* F4: Drag Selection Box (框选) */
 .dragSelectionBox {
   position: absolute;

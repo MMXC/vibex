@@ -109,7 +109,7 @@ v1.options('/*', (c) => {
   c.res.headers.set('Access-Control-Allow-Origin', '*');
   c.res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   c.res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  return c.text('', 204);
+  return c.body(null, 204);
 });
 
 // ==================== 受保护路由 (需要认证) ====================
@@ -122,7 +122,7 @@ protected_.options('/*', (c) => {
   c.res.headers.set('Access-Control-Allow-Origin', '*');
   c.res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   c.res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  return c.text('', 204);
+  return c.body(null, 204);
 });
 
 protected_.use('*', authMiddleware);

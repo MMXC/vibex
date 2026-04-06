@@ -1,4 +1,5 @@
 import { Context, Next } from 'hono'
+import type { ContentfulStatusCode } from 'hono/dist/types/utils/http-status'
 
 import { safeError } from '@/lib/log-sanitizer';
 
@@ -93,7 +94,7 @@ export const errorHandler = async (err: Error | ApiError, c: Context, next: Next
       path: c.req.path,
     }
 
-    return c.text(JSON.stringify(response), statusCode)
+    return c.text(JSON.stringify(response), statusCode as ContentfulStatusCode)
   }
 
   await next()

@@ -16,6 +16,16 @@ import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db'
 
 const snapshots = new Hono<{ Bindings: Env }>()
 
+/** Legacy snapshot data shape (supports older client versions) */
+type LegacySnapshotData = {
+  projectId?: string
+  contexts?: unknown[]
+  flows?: unknown[]
+  components?: unknown[]
+  ui?: Record<string, unknown>
+  [key: string]: unknown
+}
+
 // ============================================================
 // Schemas
 // ============================================================
@@ -124,7 +134,7 @@ snapshots.post('/', async (c) => {
     const env = c.env
 
     // Use projectId from request, or fall back to one in legacy data
-    const resolvedProjectId = projectId || (legacyData as any)?.projectId
+    const resolvedProjectId = projectId || (legacyData as LegacySnapshotData)?.projectId
     if (!resolvedProjectId) {
       return c.json({ error: 'Missing required field: projectId' }, 400)
     }

@@ -1,3 +1,18 @@
+### Added (vibex-p0-fixes-20260409 E2: 测试基础设施恢复) — 2026-04-06
+- **E2 vitest setup**: tests/unit/setup.tsx 提供 jest globals 兼容层
+  - vi.fn/vi.mock/vi.spyOn 替代 jest.*
+  - window.matchMedia, next/navigation, axios, crypto mocks
+  - Vitest 环境下运行 jest 风格测试文件
+- **提交**: `ebc585e5`
+
+### Added (vibex-p0-fixes-20260409 E1: Backend数据完整性) — 2026-04-06
+- **E1 S1.2 errorHandler**: `c.text(JSON.stringify())` → `c.json()` (正确 Content-Type)
+  - errorHandler.ts / notFoundHandler.ts 统一 JSON 响应格式
+- **E1 S1.1 acquireLock**: 原子 `fs.open(lockFile, 'wx')` 替代 hasLock()+writeFile() TOCTOU
+  - CollaborationService.ts: 原子 exclusive-create，EEXIST → LockHeldError
+  - connectionPool.ts: 移除 setInterval（Workers 禁用），被动修剪连接
+- **提交**: `2ccc8d79`
+
 ### Added (canvas-flowtree-api-fix E3: 错误处理 + Empty State) — 2026-04-05
 - **E3 错误处理**: Empty State UI + error toast notifications
   - EmptyState 组件替代各 tree 的空状态 div

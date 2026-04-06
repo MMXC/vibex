@@ -104,6 +104,8 @@ model FlowData {
   updatedAt DateTime @updatedAt
 
   project Project @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
 }
 
 // AI Prototype Builder Models

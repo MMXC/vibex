@@ -1,16 +1,15 @@
 /**
  * NotificationService — deduplication and delivery
  *
- * E2-T3: Prevents duplicate notifications within 30min window.
+ * E2-T3: Prevents duplicate notifications within 5-minute dedup window.
  *
  * Usage:
- *   const svc = new NotificationService(cacheDir);
+ *   const svc = new NotificationService(env);
  *   await svc.send({ channel, text }); // skips if duplicate
  */
 
-import * as fs from 'fs/promises';
-import * as path from 'path';
 import crypto from 'crypto';
+import type { CloudflareEnv } from '../lib/env.js';
 
 export interface SlackNotification {
   channel: string;
@@ -18,88 +17,93 @@ export interface SlackNotification {
   token?: string;
 }
 
-export interface CachedNotification {
-  hash: string;
+interface CacheEntry {
   sentAt: number;
 }
 
-const DEFAULT_TTL_MS = 30 * 60 * 1000; // 30 minutes
-const CACHE_FILE = 'notification_cache.json';
+const DEFAULT_DEDUP_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
 
 export class NotificationService {
-  private cachePath: string;
+  private kv: CloudflareEnv['NOTIFICATION_KV'];
+  private memoryCache: Map<string, number> = new Map();
   private ttlMs: number;
-  private cache: Map<string, CachedNotification> = new Map();
 
-  constructor(cacheDir = '/tmp/vibex-notifications', ttlMs = DEFAULT_TTL_MS) {
-    this.cachePath = path.join(cacheDir, CACHE_FILE);
+  constructor(env: CloudflareEnv, ttlMs = DEFAULT_DEDUP_WINDOW_MS) {
+    this.kv = env.NOTIFICATION_KV;
     this.ttlMs = ttlMs;
   }
 
-  private async loadCache(): Promise<void> {
-    try {
-      const raw = await fs.readFile(this.cachePath, 'utf-8');
-      const entries = JSON.parse(raw) as CachedNotification[];
-      const now = Date.now();
-      this.cache.clear();
-      for (const entry of entries) {
-        if (now - entry.sentAt < this.ttlMs) {
-          this.cache.set(entry.hash, entry);
-        }
-      }
-    } catch {
-      this.cache.clear();
-    }
-  }
-
-  private async saveCache(): Promise<void> {
-    const dir = path.dirname(this.cachePath);
-    await fs.mkdir(dir, { recursive: true });
-    const entries = Array.from(this.cache.values());
-    await fs.writeFile(this.cachePath, JSON.stringify(entries), 'utf-8');
-  }
-
-  private computeHash(channel: string, text: string): string {
+  private hash(channel: string, text: string): string {
     return crypto
       .createHash('sha256')
       .update(`${channel}:${text}`)
       .digest('hex');
   }
 
+  private kvKey(hash: string): string {
+    return `notif:${hash}`;
+  }
+
   /**
    * Check if a notification (channel + text) is a duplicate within TTL window.
    */
-  isDuplicate(channel: string, text: string): boolean {
-    const hash = this.computeHash(channel, text);
-    const cached = this.cache.get(hash);
-    if (!cached) return false;
-    return Date.now() - cached.sentAt < this.ttlMs;
+  async isDuplicate(channel: string, text: string): Promise<boolean> {
+    const h = this.hash(channel, text);
+
+    // Try KV first
+    if (this.kv) {
+      const val = await this.kv.get(this.kvKey(h));
+      if (val && typeof val === 'string') {
+        const entry = JSON.parse(val) as CacheEntry;
+        if (Date.now() - entry.sentAt < this.ttlMs) {
+          return true;
+        }
+      }
+    }
+
+    // Fallback to memory cache
+    const memTs = this.memoryCache.get(h);
+    if (memTs !== undefined && Date.now() - memTs < this.ttlMs) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
    * Record that a notification was sent.
    */
-  recordSent(channel: string, text: string): void {
-    const hash = this.computeHash(channel, text);
-    this.cache.set(hash, { hash, sentAt: Date.now() });
+  async recordSent(channel: string, text: string): Promise<void> {
+    const h = this.hash(channel, text);
+    const now = Date.now();
+
+    // Always update memory cache
+    this.memoryCache.set(h, now);
+
+    // Persist to KV if available (5-min TTL via KV's built-in expiration)
+    if (this.kv) {
+      await this.kv.put(this.kvKey(h), JSON.stringify({ sentAt: now }), {
+        expirationTtl: Math.ceil(this.ttlMs / 1000),
+      });
+    }
   }
 
   /**
    * Send a notification if not a duplicate.
    * Returns { skipped: true } if duplicate, { skipped: false, ok: true } if sent.
    */
-  async send(notification: SlackNotification): Promise<{ skipped?: boolean; ok?: boolean; error?: string }> {
-    await this.loadCache();
-
-    if (this.isDuplicate(notification.channel, notification.text)) {
+  async send(notification: SlackNotification): Promise<{
+    skipped?: boolean;
+    ok?: boolean;
+    error?: string;
+  }> {
+    if (await this.isDuplicate(notification.channel, notification.text)) {
       return { skipped: true };
     }
 
     // In production, this would call the Slack API.
     // For now, we record it as sent.
-    this.recordSent(notification.channel, notification.text);
-    await this.saveCache();
-
+    await this.recordSent(notification.channel, notification.text);
     return { skipped: false, ok: true };
   }
 
@@ -107,9 +111,7 @@ export class NotificationService {
    * Clear the deduplication cache (for testing).
    */
   async clearCache(): Promise<void> {
-    this.cache.clear();
-    await this.saveCache();
+    this.memoryCache.clear();
+    // Note: KV entries will expire naturally via TTL
   }
 }
-
-export const notificationService = new NotificationService();

@@ -36,6 +36,18 @@ zone_name = "vibex.top"
 name = "COLLABORATION_ROOM"
 class_name = "CollaborationRoom"
 
+# KV namespaces — create via `wrangler kv:namespace create <name>`
+# and replace the id placeholders below
+[[kv_namespaces]]
+binding = "COLLABORATION_KV"
+id = "REPLACE_WITH_COLLABORATION_KV_ID"
+preview_id = "REPLACE_WITH_COLLABORATION_KV_ID"
+
+[[kv_namespaces]]
+binding = "NOTIFICATION_KV"
+id = "REPLACE_WITH_NOTIFICATION_KV_ID"
+preview_id = "REPLACE_WITH_NOTIFICATION_KV_ID"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["CollaborationRoom"]

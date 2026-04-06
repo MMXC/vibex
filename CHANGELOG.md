@@ -1,3 +1,14 @@
+### Added (vibex-p0-fixes-20260409 E4: 性能索引优化) — 2026-04-06
+- **CollaborationService KV 迁移**: fs.* → Cloudflare Workers KV (COLLABORATION_KV)
+  - acquireLock/hasLock/validateLock/releaseLock 全部迁移
+  - TTL 支持 + memory fallback (KV 未绑定时)
+  - 7 个并发测试: 100 并发 acquire, TTL 过期, rapid acquire-release
+- **NotificationService KV 迁移**: fs.* → Cloudflare Workers KV (NOTIFICATION_KV)
+  - 5 分钟 dedup window
+  - memory fallback (KV 未绑定时)
+- **Prisma 索引**: FlowData 表添加 `@@index([projectId])`
+- **提交**: `9e548add`, `6042f890`
+
 ### Added (vibex-p0-fixes-20260409 E3: 流程治理) — 2026-04-06
 - **S3.1 Changelog 补录**: 添加 2026-04-09 提案收集 entries
 - **S3.2 TRACKING.md 建立**: 创建 docs/TRACKING.md 追踪提案执行状态

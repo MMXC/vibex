@@ -40,6 +40,7 @@ import { useModifierKey, useDragSelection } from '@/hooks/canvas/useDragSelectio
 import type { ComponentNode, BusinessFlowNode } from '@/lib/canvas/types';
 import { ComponentGroupOverlay } from './groups/ComponentGroupOverlay';
 import type { ComponentGroupBBox } from './groups/ComponentGroupOverlay';
+import { JsonTreePreviewModal } from './json-tree/JsonTreePreviewModal';
 import styles from './canvas.module.css';
 
 // =============================================================================
@@ -98,6 +99,10 @@ export interface ComponentGroup {
   color: string;
   nodes: ComponentNode[];
   isCommon?: boolean;
+  /** E1-F2: Page ID (extracted from groupId) */
+  pageId: string;
+  /** E1-F2: Component count */
+  componentCount: number;
 }
 
 /**
@@ -138,11 +143,21 @@ export function matchFlowNode(
 /**
  * 从 flowNodes 中查找页面名称，支持多级 fallback 匹配
  * 优先级：精确匹配 → prefix匹配 → 名称模糊匹配 → 兜底显示 flowId
+ * E1-F1: pageName 优先于所有其他名称
  */
-export function getPageLabel(flowId: string, flowNodes: BusinessFlowNode[]): string {
+export function getPageLabel(
+  flowId: string,
+  flowNodes: BusinessFlowNode[],
+  pageName?: string
+): string {
   // 0. 通用组件标识 → 使用通用组件标签
   if (!flowId || COMMON_FLOW_IDS.has(flowId)) {
     return COMMON_GROUP_LABEL;
+  }
+
+  // E1-F1: pageName 优先
+  if (pageName) {
+    return `📄 ${pageName}`;
   }
 
   // 1. 精确匹配 nodeId
@@ -196,17 +211,24 @@ export function groupByFlowId(
       color: COMMON_GROUP_COLOR,
       nodes: commonNodes,
       isCommon: true,
+      pageId: '__common__',
+      componentCount: commonNodes.length,
     });
   }
 
   // Add page-specific groups
   groups.forEach((groupNodes, flowId) => {
+    // E1-F2: compute pageId + componentCount
+    const pageId = flowId || '__ungrouped__';
+    const componentCount = groupNodes.length;
     result.push({
       groupId: flowId,
-      label: getPageLabel(flowId, flowNodes),
+      label: getPageLabel(flowId, flowNodes, groupNodes[0]?.pageName),
       color: GROUP_COLOR,
       nodes: groupNodes,
       isCommon: false,
+      pageId,
+      componentCount,
     });
   });
 
@@ -600,6 +622,7 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
 
   const [generating, setGenerating] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showJsonPreview, setShowJsonPreview] = useState(false);
   const toast = useToast();
 
   // E1: Compute groups by flowId
@@ -754,6 +777,18 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
             aria-label="继续到原型生成"
           >
             继续到原型生成
+          </button>
+        )}
+        {/* E1-F3: JSON Preview button */}
+        {hasNodes && (
+          <button
+            type="button"
+            className={styles.secondaryButton}
+            onClick={() => setShowJsonPreview(true)}
+            aria-label="JSON 树视图"
+            data-testid="json-preview-button"
+          >
+            📋 JSON
           </button>
         )}
         {!readonly && !showAddForm && (
@@ -923,14 +958,9 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
                   }}
                 >
                   {group.label}
-                  <span
-                    style={{
-                      marginLeft: '6px',
-                      opacity: 0.6,
-                      fontSize: '10px',
-                    }}
-                  >
-                    ({group.nodes.length})
+                  {/* E1-F2: componentCount badge */}
+                  <span className={styles.groupCountBadge}>
+                    {group.componentCount} 个组件
                   </span>
                 </div>
 
@@ -987,6 +1017,13 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
           确认所有组件节点后，将解锁原型生成队列
         </p>
       )}
+
+      {/* E1-F3: JSON Tree Preview Modal */}
+      <JsonTreePreviewModal
+        isOpen={showJsonPreview}
+        onClose={() => setShowJsonPreview(false)}
+        nodes={componentNodes}
+      />
     </div>
   );
 }

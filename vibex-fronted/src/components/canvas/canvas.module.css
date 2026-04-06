@@ -2047,12 +2047,25 @@
   left: 0.75rem;
   display: inline-flex;
   align-items: center;
+  gap: 0.375rem;
   padding: 0.2rem 0.6rem;
   border: 1px solid;
   border-radius: 0.5rem;
   font-size: var(--text-xs);
   font-weight: 500;
   background: var(--color-bg-primary);
+}
+
+/* E1-F2: Component count badge under group label */
+.groupCountBadge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 400;
+  opacity: 0.7;
+  background: currentColor;
+  color: var(--color-bg-primary);
 }
 
 /* E2: Common component label with distinct styling */

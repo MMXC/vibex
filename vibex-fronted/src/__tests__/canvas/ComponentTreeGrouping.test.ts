@@ -173,6 +173,21 @@ describe('getPageLabel', () => {
     expect(result).toContain('…');
     expect(result.length).toBeLessThan(longId.length + 3);
   });
+
+  // E1-F1: pageName fallback tests
+  describe('pageName fallback', () => {
+    test('pageName 存在 → 返回 pageName', () => {
+      expect(getPageLabel('flow-1', flowNodes, '自定义页面名')).toBe('📄 自定义页面名');
+    });
+
+    test('pageName 不存在 → fallback 到 BusinessFlowNode.name', () => {
+      expect(getPageLabel('flow-1', flowNodes, undefined)).toBe('📄 订单流程');
+    });
+
+    test('pageName + 无 flowId 匹配 → pageName 优先', () => {
+      expect(getPageLabel('unknown', flowNodes, '自定义')).toBe('📄 自定义');
+    });
+  });
 });
 
 // =============================================================================
@@ -229,5 +244,42 @@ describe('groupByFlowId', () => {
     const unknownGroup = groups.find((g) => g.label.startsWith('❓'));
     const lastIndex = groups.indexOf(unknownGroup!);
     expect(lastIndex).toBe(groups.length - 1);
+  });
+
+  // E1-F2: componentCount metadata tests
+  describe('componentCount metadata', () => {
+    test('ComponentGroup 包含 pageId + componentCount', () => {
+      const nodes: ComponentNode[] = [
+        makeNode({ nodeId: 'p1', flowId: 'flow-1' }),
+        makeNode({ nodeId: 'p2', flowId: 'flow-1' }),
+      ];
+      const groups = groupByFlowId(nodes, flowNodes);
+      const group = groups.find((g) => g.groupId === 'flow-1');
+      expect(group?.pageId).toBe('flow-1');
+      expect(group?.componentCount).toBe(2);
+    });
+
+    test('通用组件组 pageId=__common__, componentCount 正确', () => {
+      const nodes: ComponentNode[] = [
+        makeNode({ nodeId: 'm1', flowId: 'flow-1', type: 'modal' }),
+        makeNode({ nodeId: 'b1', flowId: 'flow-2', type: 'button' }),
+      ];
+      const groups = groupByFlowId(nodes, flowNodes);
+      const commonGroup = groups.find((g) => g.isCommon);
+      expect(commonGroup?.pageId).toBe('__common__');
+      expect(commonGroup?.componentCount).toBe(2);
+    });
+
+    test('componentCount 等于 nodes.length', () => {
+      const nodes: ComponentNode[] = [
+        makeNode({ nodeId: 'p1', flowId: 'flow-1', type: 'page' }),
+        makeNode({ nodeId: 'p2', flowId: 'flow-1', type: 'page' }),
+        makeNode({ nodeId: 'p3', flowId: 'flow-1', type: 'page' }),
+      ];
+      const groups = groupByFlowId(nodes, flowNodes);
+      const group = groups.find((g) => g.groupId === 'flow-1');
+      expect(group?.componentCount).toBe(3);
+      expect(group?.nodes.length).toBe(3);
+    });
   });
 });

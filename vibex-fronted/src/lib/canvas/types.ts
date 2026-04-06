@@ -139,6 +139,8 @@ export interface ComponentNode {
   previewUrl?: string;
   /** E3-F13: Relationships to other component nodes */
   relationships?: ComponentRelationship[];
+  /** E1-F1: Optional page name, allows user override of BusinessFlowNode.name */
+  pageName?: string;
 }
 
 /** E3-F13: Relationship between component nodes */

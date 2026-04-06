@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getAuthUser } from '@/lib/auth';
 import { getEnv } from '@/lib/env';
+import { cuidSchema } from '@/schemas/common';
+import { ValidationError } from '@/lib/errors';
+import { errorToResponse } from '@/lib/errors';
 
 const prisma = new PrismaClient();
 
@@ -20,6 +23,13 @@ export async function GET(
     }
 
     const { flowId } = await params;
+
+    // E3: Validate cuid format
+    const parsed = cuidSchema.safeParse(flowId);
+    if (!parsed.success) {
+      const error = new ValidationError(`Invalid flowId format: ${flowId}`);
+      return NextResponse.json(errorToResponse(error), { status: 400 });
+    }
 
     const flow = await prisma.flowData.findUnique({
       where: { id: flowId },

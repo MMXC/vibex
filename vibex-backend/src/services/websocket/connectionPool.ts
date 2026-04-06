@@ -36,9 +36,15 @@ const DEFAULT_CONFIG: ConnectionPoolConfig = {
   maxReconnectAttempts: 5,
 };
 
+// E3-S1: Circuit breaker constants
+const CB_THRESHOLD = 5;    // failures before circuit opens
+const CB_RESET_MS = 60000; // 1min before attempting reset
+
 export class ConnectionPool {
   private connections: Map<string, WebSocketConnection> = new Map();
   private config: ConnectionPoolConfig;
+  private failureCount = 0;
+  private lastFailureAt = 0;
 
   constructor(config: Partial<ConnectionPoolConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
@@ -49,6 +55,12 @@ export class ConnectionPool {
    * 添加连接
    */
   add(connection: WebSocketConnection): boolean {
+    // E3-S1: Circuit breaker - reject if too many recent failures
+    if (this.isCircuitOpen()) {
+      safeError('ConnectionPool: circuit breaker open, rejecting connection');
+      return false;
+    }
+
     if (this.connections.size >= this.config.maxConnections) {
       safeError(`Connection pool full (${this.config.maxConnections} connections)`);
       return false;
@@ -204,6 +216,30 @@ export class ConnectionPool {
     }
 
     this.remove(connectionId);
+  }
+
+  /**
+   * E3-S1: Circuit breaker check
+   * Returns true if circuit is open (too many recent failures)
+   */
+  private isCircuitOpen(): boolean {
+    if (this.failureCount === 0) return false;
+    const now = Date.now();
+    // If enough time has passed, reset the circuit
+    if (now - this.lastFailureAt > CB_RESET_MS) {
+      this.failureCount = 0;
+      this.lastFailureAt = 0;
+      return false;
+    }
+    return this.failureCount >= CB_THRESHOLD;
+  }
+
+  /**
+   * E3-S1: Record a connection failure for circuit breaker
+   */
+  recordFailure(): void {
+    this.failureCount++;
+    this.lastFailureAt = Date.now();
   }
 
   /**

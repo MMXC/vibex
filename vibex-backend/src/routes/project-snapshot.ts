@@ -46,9 +46,13 @@ export async function getProjectSnapshot(
 
     const project = projectRows[0]
 
-    // TODO: In production, query actual step state from StepState table
-    // For now, return empty/default state
-    const stepState: StepState = {
+    // E2-S1: Query actual step state from StepState table
+    const stepStateRows = await queryDB<any>(
+      env,
+      'SELECT * FROM StepState WHERE projectId = ?',
+      [projectId]
+    );
+    let stepState: StepState = {
       projectId,
       currentStep: 1,
       version: 1,
@@ -57,19 +61,62 @@ export async function getProjectSnapshot(
       step1: null,
       step2: null,
       step3: null,
+    };
+    if (stepStateRows && stepStateRows.length > 0) {
+      const ss = stepStateRows[0];
+      stepState = {
+        projectId: ss.projectId,
+        currentStep: ss.currentStep as 1 | 2 | 3,
+        version: ss.version,
+        lastModified: ss.updatedAt,
+        lastModifiedBy: ss.lastModifiedBy,
+        step1: ss.step1Data ? JSON.parse(ss.step1Data) : null,
+        step2: ss.step2Data ? JSON.parse(ss.step2Data) : null,
+        step3: ss.step3Data ? JSON.parse(ss.step3Data) : null,
+      };
     }
 
-    // TODO: Query actual domains from DomainEntity table
-    const domains: (BusinessDomain & { features: Feature[] })[] = []
+    // E2-S1: Query actual domains from BusinessDomain table
+    const domainRows = await queryDB<any>(
+      env,
+      'SELECT * FROM BusinessDomain WHERE projectId = ? AND deletedAt IS NULL',
+      [projectId]
+    );
+    const domains = (domainRows || []) as any[];
 
-    // TODO: Query actual flow from FlowData table
-    const flow: FlowData | undefined = undefined
+    // E2-S1: Query actual flow from FlowData table
+    const flowRows = await queryDB<any>(
+      env,
+      'SELECT * FROM FlowData WHERE projectId = ? AND deletedAt IS NULL LIMIT 1',
+      [projectId]
+    );
+    let flow: FlowData | undefined;
+    if (flowRows && flowRows.length > 0) {
+      const f = flowRows[0] as any;
+      flow = {
+        id: f.id,
+        projectId: f.projectId,
+        nodes: f.nodes ? JSON.parse(f.nodes) : [],
+        edges: f.edges ? JSON.parse(f.edges) : [],
+        metadata: {},
+      } as any;
+    }
 
-    // TODO: Query actual UI nodes
-    const uiNodes: UINode[] = []
+    // E2-S1: Query actual UI nodes from UINode table
+    const uiNodeRows = await queryDB<any>(
+      env,
+      'SELECT * FROM UINode WHERE projectId = ? AND deletedAt IS NULL',
+      [projectId]
+    );
+    const uiNodes = (uiNodeRows || []) as any[];
 
-    // TODO: Query actual history from ChangeLog table
-    const history: ChangeEntry[] = []
+    // E2-S1: Query actual history from ChangeLog table
+    const historyRows = await queryDB<any>(
+      env,
+      'SELECT * FROM ChangeLog WHERE projectId = ? ORDER BY version DESC LIMIT 50',
+      [projectId]
+    );
+    const history = (historyRows || []) as any[];
 
     // Compute snapshot meta
     const snapshotMeta: SnapshotMeta = {
@@ -78,7 +125,7 @@ export async function getProjectSnapshot(
       totalNodes: flow?.nodes.length ?? 0,
       totalUINodes: uiNodes.length,
       checkedFeaturesCount: domains.reduce(
-        (sum, d) => sum + d.features.filter(f => f.isSelected).length,
+        (sum: number, d: any) => sum + ((d.features || []).filter((f: any) => f.isSelected).length),
         0
       ),
       lastModified: stepState.lastModified,

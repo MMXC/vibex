@@ -10,6 +10,7 @@
  */
 
 import { Context, Next } from 'hono';
+import { devLog, safeError } from '@/lib/log-sanitizer';
 
 export interface WebSocketConnection {
   id: string;
@@ -63,7 +64,7 @@ export class ConnectionPool {
     // 被动清理过期连接
     this.pruneStaleConnections();
 
-    console.log(`Connection added: ${connection.id}, total: ${this.connections.size}`);
+    devLog();
     return true;
   }
 
@@ -74,7 +75,7 @@ export class ConnectionPool {
     const connection = this.connections.get(connectionId);
     if (connection) {
       this.connections.delete(connectionId);
-      console.log(`Connection removed: ${connectionId}, remaining: ${this.connections.size}`);
+      devLog();
     }
     return connection;
   }
@@ -139,7 +140,7 @@ export class ConnectionPool {
           sent++;
         }
       } catch (error) {
-        console.error(`Failed to send to connection ${conn.id}:`, error);
+        safeError(`Failed to send to connection ${conn.id}:`, error);
       }
     }
 
@@ -160,7 +161,7 @@ export class ConnectionPool {
           sent++;
         }
       } catch (error) {
-        console.error(`Failed to send to user ${userId}:`, error);
+        safeError(`Failed to send to user ${userId}:`, error);
       }
     }
 
@@ -179,7 +180,7 @@ export class ConnectionPool {
       const timeSinceHeartbeat = now - conn.lastHeartbeat;
 
       if (timeSinceHeartbeat > timeout) {
-        console.log(`Connection timeout: ${id}, last heartbeat: ${timeSinceHeartbeat}ms ago`);
+        devLog();
         this.handleDisconnect(id);
       }
     }
@@ -199,7 +200,7 @@ export class ConnectionPool {
         conn.socket.close(1000, 'Heartbeat timeout');
       }
     } catch (error) {
-      console.error(`Error closing connection ${connectionId}:`, error);
+      safeError(`Error closing connection ${connectionId}:`, error);
     }
 
     this.remove(connectionId);
@@ -216,12 +217,12 @@ export class ConnectionPool {
           conn.socket.close(1000, 'Server shutting down');
         }
       } catch (error) {
-        console.error(`Error closing connection ${id}:`, error);
+        safeError(`Error closing connection ${id}:`, error);
       }
     }
 
     this.connections.clear();
-    console.log('Connection pool stopped');
+    devLog('Connection pool stopped');
   }
 }
 

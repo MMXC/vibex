@@ -9,6 +9,7 @@
  */
 
 import { getConnectionPool, WebSocketConnection } from './connectionPool';
+import { safeError } from '@/lib/log-sanitizer';
 
 export type MessageType = 
   | 'join'
@@ -66,7 +67,7 @@ export class MessageRouter {
           return this.createResponse('error', { error: 'Unknown message type' });
       }
     } catch (error) {
-      console.error('Failed to handle message:', error);
+      safeError('Failed to handle message:', error);
       return this.createResponse('error', { error: 'Invalid message format' });
     }
   }

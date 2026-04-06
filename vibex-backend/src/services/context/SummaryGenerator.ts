@@ -2,6 +2,7 @@
 
 import { ChatMessage, StructuredContext } from './types'
 import { estimateTokens } from '@/lib/token-utils'
+import { safeError } from '@/lib/log-sanitizer'
 
 // MiniMax API 配置
 const MINIMAX_CONFIG = {
@@ -67,7 +68,7 @@ export class SummaryGenerator {
       const summary = await this.callAI(prompt, opts.maxLength ?? 1000)
       return summary
     } catch (error) {
-      console.error('Summary generation failed:', error)
+      safeError('Summary generation failed:', error)
       // 降级：使用简单摘要
       return this.simpleSummary(messages)
     }

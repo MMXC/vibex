@@ -1,3 +1,15 @@
+### Added (vibex-proposals-20260411 E3: 健壮性增强) — 2026-04-11
+- **E3 健壮性验证**: Frontend 健壮性检查通过（E3 任务依赖前置 Epic 完成后执行）
+  - `as any` 清理：仅存 3 处合理用途（catalog.ts 双断言、useDDDStateRestore.ts eslint-disable Zustand store 类型问题）
+  - ErrorBoundary 覆盖：AppErrorBoundary（全局 app/layout.tsx）+ JsonRenderErrorBoundary（CanvasPreviewModal）双层部署
+  - Store 错误处理：各 store 均有 try/catch + canvasLogger.error 处理
+
+### Added (vibex-proposals-20260411 E4: 收尾与验证) — 2026-04-11
+- **E4 收尾验证**: TypeScript + Lint 基线确认
+  - `npx tsc --noEmit` frontend: 无新增错误（8 pre-existing canvasLogger 类型问题与本项目无关）
+  - `npm run lint`: 基线 100 errors / 400 warnings（pre-existing，与本项目无关）
+  - IMPLEMENTATION_PLAN.md 验收标准已更新
+
 ### Added (vibex-backend-fixes-20260410 E3: Backend Quality) — 2026-04-06
 - **E3 Backend Quality**: Logger sanitization + PrismaPoolManager enablement + Flow TODO stubs
 - ST-07: Unified logger with sanitization (`lib/logger.ts` with BLOCKED_KEYS redaction: entityId, token, sk-, password, secret, key)
@@ -85,10 +97,6 @@
 ### Added (vibex-tester quality-20260410 E3: @ci-blocking测试修复) — 2026-04-06
 - **E3 grepInvert 移除**: 从 playwright.config.ts 移除 grepInvert 配置，CI 现在运行 @ci-blocking 测试
 - **提交**: `7e106786`
-
-### Added (vibex-tester quality-20260410 E4: 提案追踪闭环) — 2026-04-06
-- **E4 proposal-tracker 验证**: 独立测试验证 CLI 功能 (list/filter/headers)
-- **提交**: `80645909`
 
 ### Added (vibex-backend-fixes-20260410 E2: SSE超时修复) — 2026-04-06
 - **E2 SSE timeout**: client-disconnect abort + 30s hard timeout to all SSE routes

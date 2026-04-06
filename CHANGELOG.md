@@ -1,3 +1,13 @@
+### Added (vibex-proposals-20260411 E1: API治理) — 2026-04-07
+- **E1 API v0/v1 治理**: v0 Deprecation finding + safe logging utilities refactor
+  - **v0 不存在**: 代码库中所有 API 路由均位于 `/api/v1/` 下，无 `/api/v0/` 目录，E1-S1 (v0 deprecation header) 不适用
+  - **API Inventory**: 30 个 v1 路由已编目 (`docs/vibex-architect-proposals-vibex-proposals-20260411/E1-API-INVENTORY.md`)
+  - **Safe Logging**: 后端 144 文件 + 前端 102 文件的 `console.*` → `devLog()`/`safeError()`/`canvasLogger` 替换
+  - **devLog Fix**: 修复 `devDebug` 调用 `console.log` 直接调用导致的 monkey-patch 递归问题 (`d64a293b`)
+  - **Contract Tests**: 已有测试 runner 使用 v1 路由，E1-S3 自动满足
+  - **Hono Gateway**: authMiddleware + rateLimit + logger + errorHandler + notFoundHandler 全覆盖
+  - **提交**: `b85f3ac7` (safe logging), `d64a293b` (devLog fix), `ad134b9d` (API inventory)
+
 ### Added (vibex-proposals-20260411 E3: 健壮性增强) — 2026-04-11
 - **E3 健壮性验证**: Frontend 健壮性检查通过（E3 任务依赖前置 Epic 完成后执行）
   - `as any` 清理：仅存 3 处合理用途（catalog.ts 双断言、useDDDStateRestore.ts eslint-disable Zustand store 类型问题）

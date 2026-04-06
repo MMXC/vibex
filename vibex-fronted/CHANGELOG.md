@@ -1,5 +1,12 @@
 # Changelog
 
+### [vibex-proposals-20260411 E1: API治理 Safe Logging] — 2026-04-07
+- **E1 Safe Logging Refactor**: 102 个前端文件的 `console.*` → `canvasLogger.*` 替换
+  - 新增 `src/lib/canvas/canvasLogger.ts`: 按组件名命名的 context-aware 日志工具
+  - canvasLogger.default: 非 canvas 组件可用的通用 logger
+  - 仅在非 production 环境输出，防止敏感数据泄露
+  - 提交: `b85f3ac7`
+
 ### [vibex-p0-fixes-20260406 E1-E3: P0 Bug 修复 Sprint 1] — 2026-04-06
 - **E1 OPTIONS 预检修复**: `protected_.options('/*', ...)` 在 `authMiddleware` 之前注册 (提交 `9d915fe9`)
 - **E2 Canvas checkbox 修复**: `BoundedContextTree` checkbox onChange 同时调用 `toggleContextNode` + `onToggleSelect` (提交 `f44c2393`)

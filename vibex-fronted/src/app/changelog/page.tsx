@@ -65,6 +65,19 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.127',
+    date: '2026-04-07',
+    changes: [
+      '📋 vibex-proposals-20260411 E1: API治理 Safe Logging',
+      '✅ 102 个前端文件 console.* → canvasLogger.* 替换',
+      '✅ 新增 canvasLogger.ts: 组件级 context-aware 日志',
+      '✅ canvasLogger.default: 非 canvas 组件通用 logger',
+      '✅ 提交: b85f3ac7',
+    ],
+    commit: 'b85f3ac7',
+  },
+
+  {
     version: '1.0.126',
     date: '2026-04-06',
     changes: [

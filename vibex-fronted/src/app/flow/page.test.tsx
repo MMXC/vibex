@@ -28,21 +28,21 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 // Mock router
 const mockRouter = {
-  push: jest.fn(),
-  back: jest.fn(),
+  push: vi.fn(),
+  back: vi.fn(),
 };
 
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => mockRouter,
   useSearchParams: () => new URLSearchParams({ projectId: 'test-project-id' }),
 }));
 
 // Mock apiService
-jest.mock('@/services/api', () => ({
+vi.mock('@/services/api', () => ({
   apiService: {
-    getFlow: jest.fn().mockResolvedValue({ nodes: [], edges: [] }),
-    updateFlow: jest.fn().mockResolvedValue({ success: true }),
-    generateFlow: jest.fn().mockResolvedValue({
+    getFlow: vi.fn().mockResolvedValue({ nodes: [], edges: [] }),
+    updateFlow: vi.fn().mockResolvedValue({ success: true }),
+    generateFlow: vi.fn().mockResolvedValue({
       nodes: [
         {
           id: '1',
@@ -57,7 +57,7 @@ jest.mock('@/services/api', () => ({
 
 describe('Flow (/flow)', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorageMock.clear();
     localStorageMock.setItem('auth_token', 'test-token');
     localStorageMock.setItem('user_id', 'test-user');
@@ -439,8 +439,8 @@ describe('Flow (/flow)', () => {
     if (nodeTemplates.length > 0) {
       const template = nodeTemplates[0];
       const mockDataTransfer = {
-        setData: jest.fn(),
-        getData: jest.fn(),
+        setData: vi.fn(),
+        getData: vi.fn(),
       };
       fireEvent.dragStart(template, { dataTransfer: mockDataTransfer });
       expect(mockDataTransfer.setData).toHaveBeenCalled();

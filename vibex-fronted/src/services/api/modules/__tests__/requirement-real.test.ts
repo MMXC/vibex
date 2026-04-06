@@ -23,11 +23,11 @@ vi.mock('@/services/api/cache', () => ({
     set: vi.fn(),
     remove: vi.fn(),
   },
-  getCacheKey: jest.fn((...args) => args.join(':')),
+  getCacheKey: vi.fn((...args) => args.join(':')),
 }));
 
-const mockHttpClient = httpClient as jest.Mocked<typeof httpClient>;
-const mockCache = cache as jest.Mocked<typeof cache>;
+const mockHttpClient = httpClient as any<typeof httpClient>;
+const mockCache = cache as any<typeof cache>;
 
 describe('RequirementApi', () => {
   beforeEach(() => {

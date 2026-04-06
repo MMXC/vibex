@@ -2,32 +2,32 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 
 // Mock router
 const mockRouter = {
-  push: jest.fn(),
-  back: jest.fn(),
+  push: vi.fn(),
+  back: vi.fn(),
 };
 
-const mockUpdateProject = jest.fn().mockResolvedValue({
+const mockUpdateProject = vi.fn().mockResolvedValue({
   id: 'test-project-id',
   name: '新项目',
   description: '',
 });
 
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => mockRouter,
   useSearchParams: () => new URLSearchParams({ projectId: 'test-project-id' }),
 }));
 
-jest.mock('@/services/api', () => ({
+vi.mock('@/services/api', () => ({
   apiService: {
     updateProject: (...args: unknown[]) => mockUpdateProject(...args),
   },
 }));
 
-jest.mock('next/dynamic', () => (component: unknown) => component);
+vi.mock('next/dynamic', () => (component: unknown) => component);
 
 describe('ProjectSettings (/project-settings)', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders page title', () => {

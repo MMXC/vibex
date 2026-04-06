@@ -9,49 +9,49 @@ import { renderHook, act } from '@testing-library/react';
 import { useAIController } from './useAIController';
 
 // Mock all required dependencies
-jest.mock('@/lib/canvas/stores/sessionStore', () => ({
-  useSessionStore: jest.fn((selector) =>
+vi.mock('@/lib/canvas/stores/sessionStore', () => ({
+  useSessionStore: vi.fn((selector) =>
     selector({
       aiThinking: false,
       aiThinkingMessage: null,
       requirementText: '',
-      setRequirementText: jest.fn(),
+      setRequirementText: vi.fn(),
       flowGenerating: false,
     })
   ),
 }));
 
-jest.mock('@/lib/canvas/stores/contextStore', () => ({
-  useContextStore: jest.fn((selector) =>
+vi.mock('@/lib/canvas/stores/contextStore', () => ({
+  useContextStore: vi.fn((selector) =>
     selector({
-      setContextNodes: jest.fn(),
+      setContextNodes: vi.fn(),
     })
   ),
 }));
 
-jest.mock('@/lib/canvas/stores/flowStore', () => ({
-  useFlowStore: jest.fn((selector) =>
+vi.mock('@/lib/canvas/stores/flowStore', () => ({
+  useFlowStore: vi.fn((selector) =>
     selector({
-      autoGenerateFlows: jest.fn(),
+      autoGenerateFlows: vi.fn(),
     })
   ),
 }));
 
-jest.mock('@/lib/canvas/stores/componentStore', () => ({
-  useComponentStore: jest.fn((selector) =>
+vi.mock('@/lib/canvas/stores/componentStore', () => ({
+  useComponentStore: vi.fn((selector) =>
     selector({
-      setComponentNodes: jest.fn(),
+      setComponentNodes: vi.fn(),
     })
   ),
 }));
 
-jest.mock('@/lib/canvas/type-guards', () => ({
-  isValidFlowNodes: jest.fn(() => true),
+vi.mock('@/lib/canvas/type-guards', () => ({
+  isValidFlowNodes: vi.fn(() => true),
 }));
 
-jest.mock('@/components/ui/Toast', () => ({
+vi.mock('@/components/ui/Toast', () => ({
   useToast: () => ({
-    showToast: jest.fn(),
+    showToast: vi.fn(),
   }),
 }));
 

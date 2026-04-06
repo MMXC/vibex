@@ -5,22 +5,27 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { MermaidPreview } from '../MermaidPreview';
 
-// Mock mermaid
-jest.mock('mermaid', () => ({
-  initialize: jest.fn(),
-  render: jest.fn().mockImplementation(async (id, code) => {
-    if (code.includes('invalid')) {
-      throw new Error('Syntax error in diagram');
-    }
-    return { svg: '<svg>rendered chart</svg>' };
-  }),
+// Use vi.hoisted to ensure mock functions are hoisted with vi.mock
+const { mockRender } = vi.hoisted(() => ({
+  mockRender: vi.fn(),
 }));
 
-import mermaid from 'mermaid';
+vi.mock('@/lib/mermaid/MermaidManager', () => ({
+  mermaidManager: {
+    initialize: vi.fn().mockResolvedValue(undefined),
+    render: mockRender,
+    isInitialized: vi.fn().mockReturnValue(true),
+  },
+}));
 
 describe('MermaidPreview', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
+    mockRender.mockReset();
+    mockRender.mockImplementation(async (code: string) => ({
+      svg: '<svg>rendered chart</svg>',
+      id: 'mermaid-svg',
+    }));
   });
 
   describe('basic rendering', () => {
@@ -36,13 +41,11 @@ describe('MermaidPreview', () => {
 
     it('should accept custom height prop', () => {
       render(<MermaidPreview code="" height="600px" />);
-      // Just check it renders - height testing is implementation detail
       expect(screen.getByText('暂无图表内容')).toBeInTheDocument();
     });
 
     it('should accept custom className prop', () => {
       render(<MermaidPreview code="" className="custom-class" />);
-      // Just check it renders - className testing is implementation detail
       expect(screen.getByText('暂无图表内容')).toBeInTheDocument();
     });
   });
@@ -51,30 +54,28 @@ describe('MermaidPreview', () => {
     it('should render with graph type', async () => {
       render(<MermaidPreview code="graph TD\nA --> B" diagramType="graph" />);
       await waitFor(() => {
-        expect(mermaid.render).toHaveBeenCalled();
+        expect(mockRender).toHaveBeenCalled();
       });
     });
 
     it('should render with classDiagram type', async () => {
       render(<MermaidPreview code="class A" diagramType="classDiagram" />);
       await waitFor(() => {
-        expect(mermaid.render).toHaveBeenCalled();
+        expect(mockRender).toHaveBeenCalled();
       });
     });
 
     it('should render with stateDiagram type', async () => {
       render(<MermaidPreview code="state A" diagramType="stateDiagram" />);
       await waitFor(() => {
-        expect(mermaid.render).toHaveBeenCalled();
+        expect(mockRender).toHaveBeenCalled();
       });
     });
 
     it('should render with flowchart type', async () => {
-      render(
-        <MermaidPreview code="flowchart TD\nA --> B" diagramType="flowchart" />
-      );
+      render(<MermaidPreview code="flowchart TD\nA --> B" diagramType="flowchart" />);
       await waitFor(() => {
-        expect(mermaid.render).toHaveBeenCalled();
+        expect(mockRender).toHaveBeenCalled();
       });
     });
   });
@@ -99,22 +100,18 @@ describe('MermaidPreview', () => {
 
   describe('error handling', () => {
     it('should render error state when rendering fails', async () => {
-      (mermaid.render as jest.Mock).mockRejectedValueOnce(
-        new Error('Invalid syntax')
-      );
+      mockRender.mockRejectedValueOnce(new Error('Invalid syntax'));
 
-      render(<MermaidPreview code="invalid code" onError={jest.fn()} />);
+      render(<MermaidPreview code="invalid code" onError={vi.fn()} />);
 
       await waitFor(() => {
-        expect(screen.getByText('语法错误: Invalid syntax')).toBeInTheDocument();
+        expect(screen.getByText(/语法错误:/)).toBeInTheDocument();
       });
     });
 
     it('should call onError callback when error occurs', async () => {
-      const onError = jest.fn();
-      (mermaid.render as jest.Mock).mockRejectedValueOnce(
-        new Error('Test error')
-      );
+      const onError = vi.fn();
+      mockRender.mockRejectedValueOnce(new Error('Test error'));
 
       render(<MermaidPreview code="invalid" onError={onError} />);
 

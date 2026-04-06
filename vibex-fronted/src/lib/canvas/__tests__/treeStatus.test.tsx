@@ -149,7 +149,7 @@ describe('F-3.1: PhaseProgressBar disabled buttons', () => {
   });
 
   it('completed and active phase buttons are enabled when onPhaseClick provided', () => {
-    render(<PhaseProgressBar currentPhase="flow" onPhaseClick={jest.fn()} />);
+    render(<PhaseProgressBar currentPhase="flow" onPhaseClick={vi.fn()} />);
     // input and context are completed (clickable), flow is active
     expect(screen.getByTestId('step-input')).toBeEnabled();
     expect(screen.getByTestId('step-context')).toBeEnabled();

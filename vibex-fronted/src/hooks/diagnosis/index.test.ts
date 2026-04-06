@@ -6,19 +6,19 @@ import { renderHook, act, waitFor } from '@testing-library/react'
 import useDiagnosis from './index'
 
 // Mock the API calls
-jest.mock('@/services/api/diagnosis', () => ({
-  analyzeRequirement: jest.fn(),
-  optimizeRequirement: jest.fn(),
+vi.mock('@/services/api/diagnosis', () => ({
+  analyzeRequirement: vi.fn(),
+  optimizeRequirement: vi.fn(),
 }))
 
 import { analyzeRequirement, optimizeRequirement } from '@/services/api/diagnosis'
 
-const mockAnalyzeRequirement = analyzeRequirement as jest.MockedFunction<typeof analyzeRequirement>
-const mockOptimizeRequirement = optimizeRequirement as jest.MockedFunction<typeof optimizeRequirement>
+const mockAnalyzeRequirement = analyzeRequirement as anyedFunction<typeof analyzeRequirement>
+const mockOptimizeRequirement = optimizeRequirement as anyedFunction<typeof optimizeRequirement>
 
 describe('useDiagnosis', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should store original text when diagnosing', async () => {

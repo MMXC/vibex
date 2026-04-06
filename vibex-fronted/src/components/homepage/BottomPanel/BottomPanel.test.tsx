@@ -11,21 +11,21 @@ import { QuickAskButtons, QUICK_ASK_QUESTIONS } from './QuickAskButtons/QuickAsk
 import { ChatHistory } from './ChatHistory/ChatHistory';
 
 // Mock useDraft hook
-jest.mock('./hooks/useDraft', () => ({
-  useDraft: jest.fn(() => ({
-    restoreDraft: jest.fn(() => ''),
-    saveDraft: jest.fn(),
-    clearDraft: jest.fn(),
-    getSavedAt: jest.fn(() => null),
+vi.mock('./hooks/useDraft', () => ({
+  useDraft: vi.fn(() => ({
+    restoreDraft: vi.fn(() => ''),
+    saveDraft: vi.fn(),
+    clearDraft: vi.fn(),
+    getSavedAt: vi.fn(() => null),
   })),
 }));
 
 // Mock useToast hook
-jest.mock('@/components/ui/Toast', () => ({
-  useToast: jest.fn(() => ({
+vi.mock('@/components/ui/Toast', () => ({
+  useToast: vi.fn(() => ({
     toasts: [],
-    showToast: jest.fn(),
-    hideToast: jest.fn(),
+    showToast: vi.fn(),
+    hideToast: vi.fn(),
   })),
 }));
 
@@ -33,33 +33,33 @@ jest.mock('@/components/ui/Toast', () => ({
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
-    getItem: jest.fn((key: string) => store[key] ?? null),
-    setItem: jest.fn((key: string, value: string) => { store[key] = value; }),
-    removeItem: jest.fn((key: string) => { delete store[key]; }),
-    clear: jest.fn(() => { store = {}; }),
+    getItem: vi.fn((key: string) => store[key] ?? null),
+    setItem: vi.fn((key: string, value: string) => { store[key] = value; }),
+    removeItem: vi.fn((key: string) => { delete store[key]; }),
+    clear: vi.fn(() => { store = {}; }),
   };
 })();
 Object.defineProperty(globalThis, 'localStorage', { value: localStorageMock });
 
 const defaultProps = {
   isGenerating: false,
-  onAIAsk: jest.fn(),
-  onDiagnose: jest.fn(),
-  onOptimize: jest.fn(),
-  onHistory: jest.fn(),
-  onSave: jest.fn(),
-  onRegenerate: jest.fn(),
-  onCreateProject: jest.fn(),
-  onSendMessage: jest.fn(),
+  onAIAsk: vi.fn(),
+  onDiagnose: vi.fn(),
+  onOptimize: vi.fn(),
+  onHistory: vi.fn(),
+  onSave: vi.fn(),
+  onRegenerate: vi.fn(),
+  onCreateProject: vi.fn(),
+  onSendMessage: vi.fn(),
   diagnosisCount: 0,
   optimizeCount: 0,
   clarificationRounds: 0,
   chatHistory: [],
-  onDraftRestored: jest.fn(),
+  onDraftRestored: vi.fn(),
 };
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   localStorageMock.clear();
 });
 

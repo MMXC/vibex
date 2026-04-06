@@ -18,11 +18,11 @@ import { clearHomepageCache } from '../../services/homepageAPI';
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
-    getItem: jest.fn((key: string) => store[key] ?? null),
-    setItem: jest.fn((key: string, value: string) => {
+    getItem: vi.fn((key: string) => store[key] ?? null),
+    setItem: vi.fn((key: string, value: string) => {
       store[key] = value;
     }),
-    removeItem: jest.fn((key: string) => {
+    removeItem: vi.fn((key: string) => {
       delete store[key];
     }),
     clear: () => {
@@ -39,10 +39,10 @@ Object.defineProperty(window, 'localStorage', {
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: jest.fn().mockReturnValue({
+  value: vi.fn().mockReturnValue({
     matches: false,
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
   }),
 });
 
@@ -53,7 +53,7 @@ function setupFetchMock(
   ok = true,
   status = 200
 ) {
-  global.fetch = jest.fn().mockResolvedValue({
+  global.fetch = vi.fn().mockResolvedValue({
     ok,
     status,
     statusText: status === 200 ? 'OK' : 'Error',
@@ -77,7 +77,7 @@ function Consumer() {
 
 beforeEach(() => {
   localStorageMock.clear();
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   clearHomepageCache();
   localStorageMock.getItem.mockReturnValue(null);
   setupFetchMock({ theme: 'light', userPreferences: {} });

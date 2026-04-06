@@ -42,11 +42,11 @@ const mockLocalData: CanvasData = {
 };
 
 // Mock onKeepLocal
-const mockOnKeepLocal = jest.fn();
+const mockOnKeepLocal = vi.fn();
 // Mock onUseServer
-const mockOnUseServer = jest.fn();
+const mockOnUseServer = vi.fn();
 // Mock onMerge
-const mockOnMerge = jest.fn();
+const mockOnMerge = vi.fn();
 
 function renderDialog(props?: Partial<React.ComponentProps<typeof ConflictDialog>>) {
   return render(
@@ -63,7 +63,7 @@ function renderDialog(props?: Partial<React.ComponentProps<typeof ConflictDialog
 
 describe('ConflictDialog', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders dialog with correct title and subtitle', () => {

@@ -12,11 +12,11 @@ import { useFirstVisitDetect } from './useFirstVisitDetect';
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
-    getItem: jest.fn((key: string) => store[key] || null),
-    setItem: jest.fn((key: string, value: string) => {
+    getItem: vi.fn((key: string) => store[key] || null),
+    setItem: vi.fn((key: string, value: string) => {
       store[key] = value;
     }),
-    removeItem: jest.fn((key: string) => {
+    removeItem: vi.fn((key: string) => {
       delete store[key];
     }),
     clear: () => {
@@ -32,7 +32,7 @@ Object.defineProperty(window, 'localStorage', {
 describe('useFirstVisitDetect', () => {
   beforeEach(() => {
     localStorageMock.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('F1.1: 首次访问自动触发', () => {

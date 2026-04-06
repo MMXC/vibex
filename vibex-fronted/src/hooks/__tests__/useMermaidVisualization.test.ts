@@ -6,31 +6,31 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { useMermaidVisualization } from '@/hooks/useMermaidVisualization';
 
 // Mock mermaidManager
-jest.mock('@/lib/mermaid/MermaidManager', () => ({
+vi.mock('@/lib/mermaid/MermaidManager', () => ({
   mermaidManager: {
-    render: jest.fn(),
-    initialize: jest.fn(),
-    isInitialized: jest.fn(() => true),
+    render: vi.fn(),
+    initialize: vi.fn(),
+    isInitialized: vi.fn(() => true),
   },
 }));
 
-jest.mock('@/stores/visualizationStore', () => ({
-  useVisualizationStore: jest.fn(() => ({
+vi.mock('@/stores/visualizationStore', () => ({
+  useVisualizationStore: vi.fn(() => ({
     visualizationData: null,
     options: { selectedNodeId: null, zoom: 1, showMinimap: true, searchQuery: '' },
-    setOption: jest.fn(),
+    setOption: vi.fn(),
   })),
 }));
 
 import { mermaidManager } from '@/lib/mermaid/MermaidManager';
 
-const mockMermaidRender = mermaidManager.render as jest.MockedFunction<
+const mockMermaidRender = mermaidManager.render as anyedFunction<
   typeof mermaidManager.render
 >;
 
 describe('useMermaidVisualization', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockMermaidRender.mockResolvedValue('<svg><rect/></svg>');
   });
 

@@ -10,16 +10,16 @@ import { useProjects, useProject, useDeletedProjects, useProjectRole } from '@/h
 import { projectApi } from '@/services/api/modules/project';
 
 // Mock the API module
-jest.mock('@/services/api/modules/project', () => ({
+vi.mock('@/services/api/modules/project', () => ({
   projectApi: {
-    getProjects: jest.fn(),
-    getProject: jest.fn(),
-    getDeletedProjects: jest.fn(),
-    getProjectRole: jest.fn(),
+    getProjects: vi.fn(),
+    getProject: vi.fn(),
+    getDeletedProjects: vi.fn(),
+    getProjectRole: vi.fn(),
   },
 }));
 
-const mockProjectApi = projectApi as jest.Mocked<typeof projectApi>;
+const mockProjectApi = projectApi as anyed<typeof projectApi>;
 
 // Create a wrapper with QueryClient
 const createWrapper = () => {
@@ -38,7 +38,7 @@ const createWrapper = () => {
 
 describe('useProjects', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch projects for a user', async () => {
@@ -102,7 +102,7 @@ describe('useProjects', () => {
 
 describe('useProject', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch single project', async () => {
@@ -133,7 +133,7 @@ describe('useProject', () => {
 
 describe('useDeletedProjects', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch deleted projects', async () => {
@@ -156,7 +156,7 @@ describe('useDeletedProjects', () => {
 
 describe('useProjectRole', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch project role', async () => {

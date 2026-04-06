@@ -5,7 +5,7 @@
 import { render, screen } from '@testing-library/react';
 
 // Mock VersionPreview component
-jest.mock('@/components/version-preview/VersionPreview', () => ({
+vi.mock('@/components/version-preview/VersionPreview', () => ({
   VersionPreview: ({ open, version, onClose }: any) => {
     if (!open) return null;
     return (
@@ -18,7 +18,7 @@ jest.mock('@/components/version-preview/VersionPreview', () => ({
 }));
 
 // Mock VersionDiff component
-jest.mock('@/components/version-diff/VersionDiff', () => ({
+vi.mock('@/components/version-diff/VersionDiff', () => ({
   VersionDiff: () => <div data-testid="version-diff">Diff Content</div>,
 }));
 

@@ -8,7 +8,7 @@ import { useCanvasExport } from '../useCanvasExport';
 
 // Mock canvas store (avoid persist/devtools middleware issues in JSDOM)
 // useCanvasExport calls useCanvasStore.getState() directly (not as a hook)
-jest.mock('@/lib/canvas/canvasStore', () => ({
+vi.mock('@/lib/canvas/canvasStore', () => ({
   useCanvasStore: Object.assign(
     () => ({}),
     {
@@ -24,14 +24,14 @@ jest.mock('@/lib/canvas/canvasStore', () => ({
 }));
 
 // Mock html-to-image
-jest.mock('html-to-image', () => ({
-  toPng: jest.fn().mockResolvedValue('data:image/png;base64,mock-png-data'),
-  toSvg: jest.fn().mockResolvedValue('data:image/svg+xml;base64,mock-svg-data'),
+vi.mock('html-to-image', () => ({
+  toPng: vi.fn().mockResolvedValue('data:image/png;base64,mock-png-data'),
+  toSvg: vi.fn().mockResolvedValue('data:image/svg+xml;base64,mock-svg-data'),
 }));
 
 // Mock global URL methods
-const mockCreateObjectURL = jest.fn(() => 'blob:mock-url');
-const mockRevokeObjectURL = jest.fn();
+const mockCreateObjectURL = vi.fn(() => 'blob:mock-url');
+const mockRevokeObjectURL = vi.fn();
 beforeAll(() => {
   global.URL.createObjectURL = mockCreateObjectURL;
   global.URL.revokeObjectURL = mockRevokeObjectURL;
@@ -40,17 +40,17 @@ beforeAll(() => {
 // Track created download link
 let createdLink: HTMLAnchorElement | null = null;
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   createdLink = null;
   // Mock appendChild and removeChild to track link without real DOM operations
   const mockBody = document.createElement('div');
-  jest.spyOn(document.body, 'appendChild').mockImplementation((node) => {
+  vi.spyOn(document.body, 'appendChild').mockImplementation((node) => {
     if (node instanceof HTMLAnchorElement) {
       createdLink = node;
     }
     return mockBody;
   });
-  jest.spyOn(document.body, 'removeChild').mockImplementation(() => mockBody);
+  vi.spyOn(document.body, 'removeChild').mockImplementation(() => mockBody);
 });
 
 describe('useCanvasExport', () => {
@@ -67,7 +67,7 @@ describe('useCanvasExport', () => {
       scrollWidth: 800,
       scrollHeight: 600,
     } as HTMLElement;
-    jest.spyOn(document, 'querySelector').mockReturnValue(mockElement);
+    vi.spyOn(document, 'querySelector').mockReturnValue(mockElement);
 
     const { result } = renderHook(() => useCanvasExport());
 
@@ -80,7 +80,7 @@ describe('useCanvasExport', () => {
   });
 
   it('should throw error when no target element found', async () => {
-    jest.spyOn(document, 'querySelector').mockReturnValue(null);
+    vi.spyOn(document, 'querySelector').mockReturnValue(null);
 
     const { result } = renderHook(() => useCanvasExport());
 

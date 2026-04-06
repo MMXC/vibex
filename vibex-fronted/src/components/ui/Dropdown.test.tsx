@@ -13,7 +13,7 @@ const mockOptions: DropdownOption[] = [
 
 describe('Dropdown', () => {
   it('should render component', () => {
-    render(<Dropdown options={mockOptions} onChange={jest.fn()} />);
+    render(<Dropdown options={mockOptions} onChange={vi.fn()} />);
     
     // Component should render
     const dropdown = document.querySelector('.wrapper');
@@ -25,7 +25,7 @@ describe('Dropdown', () => {
       <Dropdown 
         options={mockOptions} 
         placeholder="Choose..." 
-        onChange={jest.fn()} 
+        onChange={vi.fn()} 
       />
     );
     
@@ -37,7 +37,7 @@ describe('Dropdown', () => {
       <Dropdown 
         options={mockOptions} 
         label="Select Label" 
-        onChange={jest.fn()} 
+        onChange={vi.fn()} 
       />
     );
     
@@ -49,7 +49,7 @@ describe('Dropdown', () => {
       <Dropdown 
         options={mockOptions} 
         error="Error message" 
-        onChange={jest.fn()} 
+        onChange={vi.fn()} 
       />
     );
     
@@ -61,7 +61,7 @@ describe('Dropdown', () => {
       <Dropdown 
         options={mockOptions} 
         disabled={true} 
-        onChange={jest.fn()} 
+        onChange={vi.fn()} 
       />
     );
     
@@ -74,7 +74,7 @@ describe('Dropdown', () => {
       <Dropdown 
         options={mockOptions} 
         className="custom-class" 
-        onChange={jest.fn()} 
+        onChange={vi.fn()} 
       />
     );
     
@@ -86,7 +86,7 @@ describe('Dropdown', () => {
       <Dropdown 
         options={mockOptions} 
         size="lg" 
-        onChange={jest.fn()} 
+        onChange={vi.fn()} 
       />
     );
     
@@ -98,7 +98,7 @@ describe('Dropdown', () => {
       <Dropdown 
         options={mockOptions} 
         variant="filled" 
-        onChange={jest.fn()} 
+        onChange={vi.fn()} 
       />
     );
     

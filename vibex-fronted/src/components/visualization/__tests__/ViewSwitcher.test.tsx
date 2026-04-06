@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
 import { ViewSwitcher } from '../ViewSwitcher';
 
 describe('ViewSwitcher', () => {
-  const mockOnChange = jest.fn();
+  const mockOnChange = vi.fn();
 
   beforeEach(() => {
     mockOnChange.mockClear();

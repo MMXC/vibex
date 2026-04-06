@@ -9,11 +9,11 @@ import { FeatureFlagToggle } from '../FeatureFlagToggle';
 describe('FeatureFlagToggle', () => {
   const defaultProps = {
     isEnabled: false,
-    onToggle: jest.fn(),
+    onToggle: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render toggle pill', () => {

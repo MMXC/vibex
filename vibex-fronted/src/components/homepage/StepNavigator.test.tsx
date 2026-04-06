@@ -109,7 +109,7 @@ describe('StepNavigator', () => {
 
   describe('Step Click Handling', () => {
     it('should call onStepClick when step is clicked', () => {
-      const handleStepClick = jest.fn();
+      const handleStepClick = vi.fn();
       renderComponent({ 
         currentStep: 3, 
         completedSteps: [1, 2],
@@ -125,7 +125,7 @@ describe('StepNavigator', () => {
     });
 
     it('should not call onStepClick for pending steps', () => {
-      const handleStepClick = jest.fn();
+      const handleStepClick = vi.fn();
       renderComponent({ 
         currentStep: 2, 
         completedSteps: [1],
@@ -142,7 +142,7 @@ describe('StepNavigator', () => {
     });
 
     it('should respect disabled prop', () => {
-      const handleStepClick = jest.fn();
+      const handleStepClick = vi.fn();
       renderComponent({ 
         currentStep: 3, 
         completedSteps: [1, 2],
@@ -161,7 +161,7 @@ describe('StepNavigator', () => {
 
   describe('Step Order Constraints (不可跳过步骤)', () => {
     it('should not allow clicking future steps', () => {
-      const handleStepClick = jest.fn();
+      const handleStepClick = vi.fn();
       renderComponent({ 
         currentStep: 2, 
         completedSteps: [1],
@@ -177,7 +177,7 @@ describe('StepNavigator', () => {
     });
 
     it('should only allow clicking current or completed steps', () => {
-      const handleStepClick = jest.fn();
+      const handleStepClick = vi.fn();
       renderComponent({ 
         currentStep: 3, 
         completedSteps: [1, 2],

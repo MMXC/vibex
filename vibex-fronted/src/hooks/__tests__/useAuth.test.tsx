@@ -12,12 +12,12 @@ import {
 } from '../useAuth';
 
 // Mock apiService
-const mockLogin = jest.fn();
-const mockRegister = jest.fn();
-const mockLogout = jest.fn();
-const mockGetCurrentUser = jest.fn();
+const mockLogin = vi.fn();
+const mockRegister = vi.fn();
+const mockLogout = vi.fn();
+const mockGetCurrentUser = vi.fn();
 
-jest.mock('@/services/api', () => ({
+vi.mock('@/services/api', () => ({
   apiService: {
     login: (...args: any[]) => mockLogin(...args),
     register: (...args: any[]) => mockRegister(...args),
@@ -29,18 +29,18 @@ jest.mock('@/services/api', () => ({
 // Mock localStorage and sessionStorage
 // Note: useAuth now uses sessionStorage (secure) as primary storage
 const localStorageMock = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
 };
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 const sessionStorageMock = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
 };
 Object.defineProperty(window, 'sessionStorage', { value: sessionStorageMock });
 
@@ -53,7 +53,7 @@ describe('useAuth', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Both localStorage and sessionStorage must return null initially
     // to prevent initAuth from calling getCurrentUser unexpectedly
     localStorageMock.getItem.mockReturnValue(null);

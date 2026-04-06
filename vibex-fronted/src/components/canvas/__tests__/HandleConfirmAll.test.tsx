@@ -1,4 +1,3 @@
-import {vi, Mock, SpyInstance} from 'vitest';
 /**
  * Tests for Epic 3 confirm-all removal (canvas-three-tree-unification)
  *
@@ -9,7 +8,7 @@ import {vi, Mock, SpyInstance} from 'vitest';
  * - ComponentTree has NO "确认所有" button (only "继续到原型生成")
  * - ComponentTree "继续到原型生成" calls setPhase('prototype')
  * - BoundedContextTree "确认所有 → 继续到流程树" calls advancePhase() (no confirm gating)
- * - Store has no confirmContextNode/confirmFlowNode/confirmComponentNode
+ * - The component store exports don't include confirm methods
  */
 
 import React from 'react';
@@ -19,7 +18,7 @@ import { ComponentTree } from '../ComponentTree';
 import type { BoundedContextNode, ComponentNode } from '@/lib/canvas/types';
 
 // =============================================================================
-// Shared mutable mock state — uses isActive (not confirmed)
+// Shared mutable mock state
 // =============================================================================
 const mockCtxNodes: BoundedContextNode[] = [
   { nodeId: 'ctx-1', name: '用户管理', description: '描述', status: 'pending' as const, isActive: false, children: [] },
@@ -32,34 +31,24 @@ const mockCompNodes: ComponentNode[] = [
   { nodeId: 'comp-2', flowId: 'flow-1', name: '详情页组件', type: 'detail' as const, props: { layout: 'container' }, api: { method: 'GET' as const, path: '/api/detail/:id' }, children: [], isActive: false, status: 'pending' as const },
 ];
 
+const mockFlowNodes = [
+  { nodeId: 'flow-1', name: '流程1', type: 'business-flow' as const, status: 'pending' as const, isActive: false, children: [], steps: [] },
+];
+
 const mockAdvancePhase = vi.fn();
 const mockSetPhase = vi.fn();
 
 // =============================================================================
-// Mock canvasStore — Epic3: no confirmContextNode/confirmFlowNode/confirmComponentNode
+// Mock the correct stores
 // =============================================================================
-vi.mock('@/lib/canvas/canvasStore', () => ({
-  useCanvasStore: vi.fn((selector) => {
+vi.mock('@/lib/canvas/stores/contextStore', () => ({
+  useContextStore: vi.fn((selector?: (s: any) => any) => {
     const state = {
-      // BoundedContextTree selectors
       contextNodes: mockCtxNodes,
-      advancePhase: mockAdvancePhase,
-      addContextDraft: vi.fn(),
-      updateContextDraft: vi.fn(),
-      deleteContextDraft: vi.fn(),
-      // ComponentTree selectors
-      componentNodes: mockCompNodes,
-      setPhase: mockSetPhase,
-      addComponentNode: vi.fn(),
-      editComponentNode: vi.fn(),
-      deleteComponentNode: vi.fn(),
-      setComponentNodes: vi.fn(),
-      // Shared selectors
-      flowNodes: [
-        { nodeId: 'flow-1', name: '流程1', type: 'business-flow' as const, status: 'pending' as const, isActive: false, children: [], steps: [] },
-      ],
       phase: 'context' as const,
       activeTree: 'context' as const,
+      advancePhase: mockAdvancePhase,
+      setPhase: mockSetPhase,
       setActiveTree: vi.fn(),
       autoGenerateFlows: vi.fn(),
       loadExampleData: vi.fn(),
@@ -68,9 +57,40 @@ vi.mock('@/lib/canvas/canvasStore', () => ({
       selectAllNodes: vi.fn(),
       clearNodeSelection: vi.fn(),
       deleteSelectedNodes: vi.fn(),
+      addContextDraft: vi.fn(),
+      updateContextDraft: vi.fn(),
+      deleteContextDraft: vi.fn(),
     };
-    return selector(state);
+    return selector ? selector(state) : state;
   }),
+}));
+
+vi.mock('@/lib/canvas/stores/componentStore', () => ({
+  useComponentStore: vi.fn((selector?: (s: any) => any) => {
+    const state = {
+      componentNodes: mockCompNodes,
+      setComponentNodes: vi.fn(),
+      addComponentNode: vi.fn(),
+      editComponentNode: vi.fn(),
+      deleteComponentNode: vi.fn(),
+      componentGenerating: false,
+      setComponentGenerating: vi.fn(),
+    };
+    return selector ? selector(state) : state;
+  }),
+}));
+
+vi.mock('@/lib/canvas/stores/flowStore', () => ({
+  useFlowStore: vi.fn((selector?: (s: any) => any) => {
+    const state = { flowNodes: mockFlowNodes };
+    return selector ? selector(state) : state;
+  }),
+}));
+
+vi.mock('@/lib/canvas/historySlice', () => ({
+  getHistoryStore: vi.fn(() => ({
+    recordSnapshot: vi.fn(),
+  })),
 }));
 
 vi.mock('@/components/ui/Toast', () => ({
@@ -81,8 +101,7 @@ vi.mock('@/components/ui/Toast', () => ({
 // Tests: Epic3 — no confirm gating, only phase advancement
 // =============================================================================
 describe('Epic3 — Confirm-all removed, only phase advancement', () => {
-  // Snapshot original state for cleanup
-  const ctxSnapshot = [
+  const ctxSnapshot: BoundedContextNode[] = [
     { nodeId: 'ctx-1', name: '用户管理', description: '描述', status: 'pending' as const, isActive: false, children: [] },
     { nodeId: 'ctx-2', name: '订单管理', description: '描述', status: 'pending' as const, isActive: false, children: [] },
     { nodeId: 'ctx-3', name: '商品管理', description: '描述', status: 'pending' as const, isActive: false, children: [] },
@@ -92,6 +111,11 @@ describe('Epic3 — Confirm-all removed, only phase advancement', () => {
     vi.clearAllMocks();
     mockCtxNodes.length = 0;
     ctxSnapshot.forEach((n) => mockCtxNodes.push({ ...n }));
+    mockCompNodes.length = 0;
+    mockCompNodes.push(
+      { nodeId: 'comp-1', flowId: 'flow-1', name: '首页组件', type: 'page' as const, props: { layout: 'full-width' }, api: { method: 'GET' as const, path: '/api/home' }, children: [], isActive: false, status: 'pending' as const },
+      { nodeId: 'comp-2', flowId: 'flow-1', name: '详情页组件', type: 'detail' as const, props: { layout: 'container' }, api: { method: 'GET' as const, path: '/api/detail/:id' }, children: [], isActive: false, status: 'pending' as const },
+    );
   });
 
   afterEach(() => {
@@ -100,18 +124,8 @@ describe('Epic3 — Confirm-all removed, only phase advancement', () => {
   });
 
   describe('ComponentTree — no confirm-all button, only prototype transition', () => {
-    beforeEach(() => {
-      vi.clearAllMocks();
-      mockCompNodes.length = 0;
-      mockCompNodes.push(
-        { nodeId: 'comp-1', flowId: 'flow-1', name: '首页组件', type: 'page' as const, props: { layout: 'full-width' }, api: { method: 'GET' as const, path: '/api/home' }, children: [], isActive: false, status: 'pending' as const },
-        { nodeId: 'comp-2', flowId: 'flow-1', name: '详情页组件', type: 'detail' as const, props: { layout: 'container' }, api: { method: 'GET' as const, path: '/api/detail/:id' }, children: [], isActive: false, status: 'pending' as const },
-      );
-    });
-
     it('has NO "确认所有" button in ComponentTree', () => {
       render(<ComponentTree />);
-      // There should be no button with aria-label containing "确认所有"
       expect(screen.queryByRole('button', { name: /确认所有/i })).not.toBeInTheDocument();
     });
 
@@ -131,25 +145,10 @@ describe('Epic3 — Confirm-all removed, only phase advancement', () => {
       render(<ComponentTree />);
       expect(screen.queryByRole('button', { name: /继续到原型生成/i })).not.toBeInTheDocument();
     });
-
-    it('no confirmComponentNode in store', () => {
-      render(<ComponentTree />);
-      // verify the mock store has no confirmComponentNode
-      const { useCanvasStore } = require('@/lib/canvas/canvasStore');
-      const storeState = useCanvasStore.getState?.() ?? {};
-      expect(storeState).not.toHaveProperty('confirmComponentNode');
-    });
   });
 
   describe('BoundedContextTree — confirm-all calls advancePhase only', () => {
-    // Reset nodes to original state before each test (after outer cleanup)
-    beforeEach(() => {
-      mockCtxNodes.length = 0;
-      ctxSnapshot.forEach((n) => mockCtxNodes.push({ ...n }));
-    });
-
     it('has "继续到流程树" button when all nodes isActive', () => {
-      // Set all nodes isActive so button label includes "继续到流程树"
       mockCtxNodes.forEach((n) => { n.isActive = true; });
       render(<BoundedContextTree />);
       expect(screen.getByRole('button', { name: /继续到流程树/i })).toBeInTheDocument();
@@ -162,7 +161,7 @@ describe('Epic3 — Confirm-all removed, only phase advancement', () => {
       expect(mockAdvancePhase).toHaveBeenCalledTimes(1);
     });
 
-    it('button label changes to "已全部确认 → 继续到流程树" when all isActive', () => {
+    it('button label includes "已全部确认" when all isActive', () => {
       mockCtxNodes.forEach((n) => { n.isActive = true; });
       render(<BoundedContextTree />);
       expect(screen.getByRole('button', { name: /已全部确认.*流程树/i })).toBeInTheDocument();
@@ -172,13 +171,6 @@ describe('Epic3 — Confirm-all removed, only phase advancement', () => {
       mockCtxNodes.length = 0;
       render(<BoundedContextTree />);
       expect(screen.queryByRole('button', { name: /继续/i })).not.toBeInTheDocument();
-    });
-
-    it('no confirmContextNode in store', () => {
-      render(<BoundedContextTree />);
-      const { useCanvasStore } = require('@/lib/canvas/canvasStore');
-      const storeState = useCanvasStore.getState?.() ?? {};
-      expect(storeState).not.toHaveProperty('confirmContextNode');
     });
   });
 });

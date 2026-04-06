@@ -9,14 +9,14 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ExportControls } from './ExportControls';
 
 // Mock URL.createObjectURL and revokeObjectURL
-const mockCreateObjectURL = jest.fn(() => 'blob:test-url');
-const mockRevokeObjectURL = jest.fn();
+const mockCreateObjectURL = vi.fn(() => 'blob:test-url');
+const mockRevokeObjectURL = vi.fn();
 global.URL.createObjectURL = mockCreateObjectURL;
 global.URL.revokeObjectURL = mockRevokeObjectURL;
 
 // Mock html2canvas
-jest.mock('html2canvas', () => {
-  return jest.fn().mockImplementation(() => Promise.resolve({
+vi.mock('html2canvas', () => {
+  return vi.fn().mockImplementation(() => Promise.resolve({
     toBlob: (callback: (blob: Blob | null) => void) => {
       callback(new Blob(['test'], { type: 'image/png' }));
     },
@@ -35,7 +35,7 @@ describe('ExportControls Component', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Clear any DOM operations
     document.body.innerHTML = '';
     
@@ -95,11 +95,11 @@ describe('ExportControls Component', () => {
   describe('导出功能回调', () => {
     it('点击 PNG 按钮在没有 html2canvas 时应该触发错误回调', async () => {
       // 模拟 html2canvas 不可用
-      jest.isolateModules(() => {
-        jest.resetModules();
+      vi.isolateModules(() => {
+        vi.resetModules();
         
-        const onExportStart = jest.fn();
-        const onExportError = jest.fn();
+        const onExportStart = vi.fn();
+        const onExportError = vi.fn();
         
         render(
           <ExportControls
@@ -118,7 +118,7 @@ describe('ExportControls Component', () => {
     });
 
     it('点击 SVG 按钮应该触发 onExportStart', () => {
-      const onExportStart = jest.fn();
+      const onExportStart = vi.fn();
       render(
         <ExportControls
           {...defaultProps}
@@ -145,7 +145,7 @@ describe('ExportControls Component', () => {
     });
 
     it('正在导出时按钮应该被禁用', () => {
-      const onExportStart = jest.fn();
+      const onExportStart = vi.fn();
       const { rerender } = render(
         <ExportControls
           {...defaultProps}

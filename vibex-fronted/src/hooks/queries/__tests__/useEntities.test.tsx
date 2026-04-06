@@ -10,14 +10,14 @@ import { useDomainEntities, useDomainEntity } from '@/hooks/queries/useEntities'
 import { domainEntityApi } from '@/services/api/modules/domain-entity';
 
 // Mock the API module
-jest.mock('@/services/api/modules/domain-entity', () => ({
+vi.mock('@/services/api/modules/domain-entity', () => ({
   domainEntityApi: {
-    getDomainEntities: jest.fn(),
-    getDomainEntity: jest.fn(),
+    getDomainEntities: vi.fn(),
+    getDomainEntity: vi.fn(),
   },
 }));
 
-const mockDomainEntityApi = domainEntityApi as jest.Mocked<typeof domainEntityApi>;
+const mockDomainEntityApi = domainEntityApi as anyed<typeof domainEntityApi>;
 
 // Create a wrapper with QueryClient
 const createWrapper = () => {
@@ -36,7 +36,7 @@ const createWrapper = () => {
 
 describe('useDomainEntities', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch domain entities for a requirement', async () => {
@@ -97,7 +97,7 @@ describe('useDomainEntities', () => {
 
 describe('useDomainEntity', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch single domain entity', async () => {

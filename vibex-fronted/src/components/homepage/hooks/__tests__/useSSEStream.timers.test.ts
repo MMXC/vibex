@@ -63,11 +63,11 @@ afterAll(() => {
 
 beforeEach(() => {
   MockEventSource.instances = [];
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 });
 
 afterEach(() => {
-  jest.clearAllTimers();
+  vi.clearAllTimers();
 });
 
 describe('useSSEStream Timer Tests', () => {

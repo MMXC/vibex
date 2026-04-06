@@ -16,17 +16,17 @@ import { ActionBar } from '../ActionBar';
 describe('ActionBar', () => {
   const defaultProps = {
     isGenerating: false,
-    onAIAsk: jest.fn(),
-    onDiagnose: jest.fn(),
-    onOptimize: jest.fn(),
-    onHistory: jest.fn(),
-    onSave: jest.fn(),
-    onRegenerate: jest.fn(),
-    onCreateProject: jest.fn(),
+    onAIAsk: vi.fn(),
+    onDiagnose: vi.fn(),
+    onOptimize: vi.fn(),
+    onHistory: vi.fn(),
+    onSave: vi.fn(),
+    onRegenerate: vi.fn(),
+    onCreateProject: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('ST-6.4: AI 快捷询问 (左侧按钮组)', () => {

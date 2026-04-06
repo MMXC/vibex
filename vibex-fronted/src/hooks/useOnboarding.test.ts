@@ -9,19 +9,19 @@ import { useOnboarding } from './useOnboarding';
 import { useOnboardingStore } from '@/stores/onboarding/onboardingStore';
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
-  usePathname: jest.fn(() => '/'),
+vi.mock('next/navigation', () => ({
+  usePathname: vi.fn(() => '/'),
 }));
 
 describe('useOnboarding', () => {
   beforeEach(() => {
     // 重置 store 状态
     useOnboardingStore.getState().reset();
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
     useOnboardingStore.getState().reset();
   });
 
@@ -33,7 +33,7 @@ describe('useOnboarding', () => {
 
     // 快进时间到1.5秒后
     act(() => {
-      jest.advanceTimersByTime(1500);
+      vi.advanceTimersByTime(1500);
     });
 
     // 等待状态更新
@@ -51,7 +51,7 @@ describe('useOnboarding', () => {
 
     // 快进时间
     act(() => {
-      jest.advanceTimersByTime(1500);
+      vi.advanceTimersByTime(1500);
     });
 
     // 状态应该仍然是 completed
@@ -68,7 +68,7 @@ describe('useOnboarding', () => {
 
     // 快进时间
     act(() => {
-      jest.advanceTimersByTime(1500);
+      vi.advanceTimersByTime(1500);
     });
 
     // 状态应该仍然是 skipped
@@ -100,7 +100,7 @@ describe('useOnboarding', () => {
 
     // 快进时间
     act(() => {
-      jest.advanceTimersByTime(1500);
+      vi.advanceTimersByTime(1500);
     });
 
     // 状态应该仍然是 not-started

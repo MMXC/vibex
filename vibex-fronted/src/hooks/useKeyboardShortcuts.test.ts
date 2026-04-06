@@ -36,8 +36,8 @@ describe('useKeyboardShortcuts', () => {
 
   describe('Ctrl+Z / Cmd+Z → Undo', () => {
     it('should call undo when Ctrl+Z is pressed', () => {
-      const undo = jest.fn().mockReturnValue(true);
-      const redo = jest.fn();
+      const undo = vi.fn().mockReturnValue(true);
+      const redo = vi.fn();
 
       const { unmount } = renderHook(() =>
         useKeyboardShortcuts({ undo, redo, enabled: true })
@@ -54,8 +54,8 @@ describe('useKeyboardShortcuts', () => {
     });
 
     it('should call undo when Meta+Z (Mac) is pressed', () => {
-      const undo = jest.fn().mockReturnValue(true);
-      const redo = jest.fn();
+      const undo = vi.fn().mockReturnValue(true);
+      const redo = vi.fn();
 
       const { unmount } = renderHook(() =>
         useKeyboardShortcuts({ undo, redo, enabled: true })
@@ -71,8 +71,8 @@ describe('useKeyboardShortcuts', () => {
     });
 
     it("should NOT call undo when Ctrl+Shift+Z is pressed (that's redo)", () => {
-      const undo = jest.fn();
-      const redo = jest.fn();
+      const undo = vi.fn();
+      const redo = vi.fn();
 
       const { unmount } = renderHook(() =>
         useKeyboardShortcuts({ undo, redo, enabled: true })
@@ -88,8 +88,8 @@ describe('useKeyboardShortcuts', () => {
     });
 
     it('should NOT call undo when focus is on an input element', () => {
-      const undo = jest.fn();
-      const redo = jest.fn();
+      const undo = vi.fn();
+      const redo = vi.fn();
 
       // Create and focus an input element
       const input = document.createElement('input');
@@ -123,8 +123,8 @@ describe('useKeyboardShortcuts', () => {
     });
 
     it('should NOT call undo when Ctrl+Z is pressed in textarea', () => {
-      const undo = jest.fn().mockReturnValue(true);
-      const redo = jest.fn();
+      const undo = vi.fn().mockReturnValue(true);
+      const redo = vi.fn();
 
       const textarea = document.createElement('textarea');
       document.body.appendChild(textarea);
@@ -160,8 +160,8 @@ describe('useKeyboardShortcuts', () => {
 
   describe('Ctrl+Shift+Z / Cmd+Shift+Z / Ctrl+Y → Redo', () => {
     it('should call redo when Ctrl+Shift+Z is pressed', () => {
-      const undo = jest.fn();
-      const redo = jest.fn().mockReturnValue(true);
+      const undo = vi.fn();
+      const redo = vi.fn().mockReturnValue(true);
 
       const { unmount } = renderHook(() =>
         useKeyboardShortcuts({ undo, redo, enabled: true })
@@ -178,8 +178,8 @@ describe('useKeyboardShortcuts', () => {
     });
 
     it('should call redo when Meta+Shift+Z (Mac) is pressed', () => {
-      const undo = jest.fn();
-      const redo = jest.fn().mockReturnValue(true);
+      const undo = vi.fn();
+      const redo = vi.fn().mockReturnValue(true);
 
       const { unmount } = renderHook(() =>
         useKeyboardShortcuts({ undo, redo, enabled: true })
@@ -195,8 +195,8 @@ describe('useKeyboardShortcuts', () => {
     });
 
     it('should call redo when Ctrl+Y (Windows) is pressed', () => {
-      const undo = jest.fn();
-      const redo = jest.fn().mockReturnValue(true);
+      const undo = vi.fn();
+      const redo = vi.fn().mockReturnValue(true);
 
       const { unmount } = renderHook(() =>
         useKeyboardShortcuts({ undo, redo, enabled: true })
@@ -215,8 +215,8 @@ describe('useKeyboardShortcuts', () => {
 
   describe('enabled flag', () => {
     it('should not register shortcuts when enabled=false', () => {
-      const undo = jest.fn();
-      const redo = jest.fn();
+      const undo = vi.fn();
+      const redo = vi.fn();
 
       const { unmount } = renderHook(() =>
         useKeyboardShortcuts({ undo, redo, enabled: false })

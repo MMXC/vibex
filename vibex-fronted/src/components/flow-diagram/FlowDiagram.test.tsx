@@ -25,7 +25,7 @@ describe('FlowDiagram', () => {
   });
 
   it('should call onNodeClick when node clicked', () => {
-    const onNodeClick = jest.fn();
+    const onNodeClick = vi.fn();
     render(<FlowDiagram nodes={mockNodes} edges={mockEdges} onNodeClick={onNodeClick} />);
     // Click on a node (implementation detail)
     expect(mockNodes.length).toBe(3);

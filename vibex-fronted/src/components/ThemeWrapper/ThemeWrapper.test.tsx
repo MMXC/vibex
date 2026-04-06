@@ -10,12 +10,12 @@ import { ThemeWrapper, useThemeWrapper } from '../ThemeWrapper';
 import { clearHomepageCache } from '../../services/homepageAPI';
 
 // Mock fetch
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 const originalFetch = global.fetch;
 global.fetch = mockFetch;
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   clearHomepageCache();
   mockFetch.mockResolvedValue({
     ok: true,
@@ -80,7 +80,7 @@ describe('ThemeWrapper', () => {
   });
 
   it('calls onApiDataLoaded callback', async () => {
-    const onLoaded = jest.fn();
+    const onLoaded = vi.fn();
     render(
       <ThemeWrapper onApiDataLoaded={onLoaded}>
         <TestConsumer />

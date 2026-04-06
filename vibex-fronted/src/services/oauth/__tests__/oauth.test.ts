@@ -1,17 +1,19 @@
 /**
  * OAuth Service Tests
- * 
- * Fix: All token storage operations are now async (secure storage).
- * Tests updated to handle async/await pattern and mock secure-storage
- * to avoid Web Crypto API dependency in jsdom environment.
  */
 
 import { isConnected, getStoredToken, storeTokens, logout } from '../oauth';
 
+// Use vi.hoisted for module-level mock functions
+const { mockSecureGet, mockSecureSet } = vi.hoisted(() => ({
+  mockSecureGet: vi.fn(),
+  mockSecureSet: vi.fn(),
+}));
+
 // Mock secure-storage to avoid TextEncoder/crypto.subtle dependency in jsdom
 vi.mock('@/lib/secure-storage', () => ({
-  secureSet: vi.fn().mockResolvedValue(undefined),
-  secureGet: vi.fn().mockResolvedValue(null),
+  secureSet: mockSecureSet.mockResolvedValue(undefined),
+  secureGet: mockSecureGet.mockResolvedValue(null),
 }));
 
 describe('OAuth Service', () => {
@@ -19,6 +21,8 @@ describe('OAuth Service', () => {
     localStorage.clear();
     sessionStorage.clear();
     vi.clearAllMocks();
+    mockSecureGet.mockResolvedValue(null);
+    mockSecureSet.mockResolvedValue(undefined);
   });
 
   describe('isConnected', () => {
@@ -29,16 +33,14 @@ describe('OAuth Service', () => {
 
     it('should return true when token is stored', async () => {
       localStorage.setItem('oauth_github_token', 'encrypted-fake-token');
-      const { secureGet } = require('@/lib/secure-storage');
-      secureGet.mockResolvedValueOnce('decrypted-token');
+      mockSecureGet.mockResolvedValueOnce('decrypted-token');
       const result = await isConnected('github');
       expect(result).toBe(true);
     });
 
     it('should work for figma provider', async () => {
       localStorage.setItem('oauth_figma_token', 'encrypted-fake-token');
-      const { secureGet } = require('@/lib/secure-storage');
-      secureGet.mockResolvedValueOnce('decrypted-token');
+      mockSecureGet.mockResolvedValueOnce('decrypted-token');
       const result = await isConnected('figma');
       expect(result).toBe(true);
     });
@@ -58,9 +60,7 @@ describe('OAuth Service', () => {
 
     it('should return token when stored', async () => {
       localStorage.setItem('oauth_github_token', 'encrypted-fake-token');
-      // Mock secureGet to return the decrypted token
-      const { secureGet } = require('@/lib/secure-storage');
-      secureGet.mockResolvedValueOnce('test-token');
+      mockSecureGet.mockResolvedValueOnce('test-token');
       
       const result = await getStoredToken('github');
       expect(result).toBe('test-token');
@@ -77,8 +77,7 @@ describe('OAuth Service', () => {
     it('should return token when not expired', async () => {
       localStorage.setItem('oauth_github_token', 'encrypted-fake-token');
       localStorage.setItem('oauth_github_expires', String(Date.now() + 10000));
-      const { secureGet } = require('@/lib/secure-storage');
-      secureGet.mockResolvedValueOnce('test-token');
+      mockSecureGet.mockResolvedValueOnce('test-token');
       
       const result = await getStoredToken('github');
       expect(result).toBe('test-token');
@@ -91,8 +90,7 @@ describe('OAuth Service', () => {
 
     it('should work for figma provider', async () => {
       localStorage.setItem('oauth_figma_token', 'encrypted-fake-token');
-      const { secureGet } = require('@/lib/secure-storage');
-      secureGet.mockResolvedValueOnce('figma-token');
+      mockSecureGet.mockResolvedValueOnce('figma-token');
       
       const result = await getStoredToken('figma');
       expect(result).toBe('figma-token');
@@ -101,22 +99,18 @@ describe('OAuth Service', () => {
 
   describe('storeTokens', () => {
     it('should store access token', async () => {
-      const { secureSet } = require('@/lib/secure-storage');
-      
       await storeTokens('github', { accessToken: 'test-token' });
       
-      expect(secureSet).toHaveBeenCalledWith('oauth_github_token', 'test-token');
+      expect(mockSecureSet).toHaveBeenCalledWith('oauth_github_token', 'test-token');
     });
 
     it('should store refresh token', async () => {
-      const { secureSet } = require('@/lib/secure-storage');
-      
       await storeTokens('github', { 
         accessToken: 'test-token', 
         refreshToken: 'refresh-token' 
       });
       
-      expect(secureSet).toHaveBeenCalledWith('oauth_github_refresh', 'refresh-token');
+      expect(mockSecureSet).toHaveBeenCalledWith('oauth_github_refresh', 'refresh-token');
     });
 
     it('should store expiration time', async () => {
@@ -130,16 +124,12 @@ describe('OAuth Service', () => {
     });
 
     it('should work for figma provider', async () => {
-      const { secureSet } = require('@/lib/secure-storage');
-      
       await storeTokens('figma', { accessToken: 'figma-token' });
       
-      expect(secureSet).toHaveBeenCalledWith('oauth_figma_token', 'figma-token');
+      expect(mockSecureSet).toHaveBeenCalledWith('oauth_figma_token', 'figma-token');
     });
 
     it('should store all token properties', async () => {
-      const { secureSet } = require('@/lib/secure-storage');
-      
       await storeTokens('github', { 
         accessToken: 'test-token', 
         refreshToken: 'refresh-token',
@@ -147,8 +137,8 @@ describe('OAuth Service', () => {
         tokenType: 'Bearer'
       });
       
-      expect(secureSet).toHaveBeenCalledWith('oauth_github_token', 'test-token');
-      expect(secureSet).toHaveBeenCalledWith('oauth_github_refresh', 'refresh-token');
+      expect(mockSecureSet).toHaveBeenCalledWith('oauth_github_token', 'test-token');
+      expect(mockSecureSet).toHaveBeenCalledWith('oauth_github_refresh', 'refresh-token');
       expect(localStorage.getItem('oauth_github_expires')).not.toBeNull();
     });
   });

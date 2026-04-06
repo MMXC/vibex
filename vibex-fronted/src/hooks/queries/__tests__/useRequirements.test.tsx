@@ -10,15 +10,15 @@ import { useRequirements, useRequirement, useAnalysisResult } from '@/hooks/quer
 import { requirementApi } from '@/services/api/modules/requirement';
 
 // Mock the API module
-jest.mock('@/services/api/modules/requirement', () => ({
+vi.mock('@/services/api/modules/requirement', () => ({
   requirementApi: {
-    getRequirements: jest.fn(),
-    getRequirement: jest.fn(),
-    getAnalysisResult: jest.fn(),
+    getRequirements: vi.fn(),
+    getRequirement: vi.fn(),
+    getAnalysisResult: vi.fn(),
   },
 }));
 
-const mockRequirementApi = requirementApi as jest.Mocked<typeof requirementApi>;
+const mockRequirementApi = requirementApi as anyed<typeof requirementApi>;
 
 // Create a wrapper with QueryClient
 const createWrapper = () => {
@@ -37,7 +37,7 @@ const createWrapper = () => {
 
 describe('useRequirements', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch requirements for a user', async () => {
@@ -98,7 +98,7 @@ describe('useRequirements', () => {
 
 describe('useRequirement', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch single requirement', async () => {
@@ -140,7 +140,7 @@ describe('useRequirement', () => {
 
 describe('useAnalysisResult', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch analysis result for a requirement', async () => {

@@ -18,7 +18,7 @@ describe('Alert', () => {
   });
 
   it('renders with close button when closable', () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
     render(
       <Alert closable onClose={onClose}>
         Test message

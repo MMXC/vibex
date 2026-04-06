@@ -3,7 +3,7 @@
  */
 
 // Mock axios before importing anything else
-jest.mock('axios', () => {
+vi.mock('axios', () => {
   class MockAxiosError extends Error {
     code?: string;
     response?: { status?: number };
@@ -24,26 +24,26 @@ jest.mock('axios', () => {
     __esModule: true,
     AxiosError: MockAxiosError,
     default: {
-      create: jest.fn(() => ({
+      create: vi.fn(() => ({
         interceptors: {
-          request: { use: jest.fn(() => ({ eject: jest.fn() })) },
-          response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+          request: { use: vi.fn(() => ({ eject: vi.fn() })) },
+          response: { use: vi.fn(() => ({ eject: vi.fn() })) },
         },
-        get: jest.fn(),
-        post: jest.fn(),
-        put: jest.fn(),
-        delete: jest.fn(),
+        get: vi.fn(),
+        post: vi.fn(),
+        put: vi.fn(),
+        delete: vi.fn(),
       })),
     },
-    create: jest.fn(() => ({
+    create: vi.fn(() => ({
       interceptors: {
-        request: { use: jest.fn(() => ({ eject: jest.fn() })) },
-        response: { use: jest.fn(() => ({ eject: jest.fn() })) },
+        request: { use: vi.fn(() => ({ eject: vi.fn() })) },
+        response: { use: vi.fn(() => ({ eject: vi.fn() })) },
       },
-      get: jest.fn(),
-      post: jest.fn(),
-      put: jest.fn(),
-      delete: jest.fn(),
+      get: vi.fn(),
+      post: vi.fn(),
+      put: vi.fn(),
+      delete: vi.fn(),
     })),
   };
 });

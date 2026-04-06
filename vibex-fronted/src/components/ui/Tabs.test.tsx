@@ -32,7 +32,7 @@ describe('Tabs', () => {
   });
 
   it('calls onChange callback', () => {
-    const handleChange = jest.fn();
+    const handleChange = vi.fn();
     render(<Tabs items={mockItems} onChange={handleChange} />);
     
     fireEvent.click(screen.getByText('Tab 2'));

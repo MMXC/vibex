@@ -6,12 +6,20 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { CardTreeView, IS_CARD_TREE_ENABLED } from '../CardTreeView';
 
+// Module-level mock functions for useProjectTree and useErrorHandler
+const mockUseProjectTree = vi.fn();
+const mockUseErrorHandler = vi.fn();
+
 // Mock useProjectTree
-jest.mock('@/hooks/useProjectTree', () => ({
-  useProjectTree: jest.fn(),
+vi.mock('@/hooks/useProjectTree', () => ({
+  useProjectTree: mockUseProjectTree,
 }));
 
 // Mock useErrorHandler — returns controlled error state for testing
+vi.mock('@/hooks/useErrorHandler', () => ({
+  useErrorHandler: mockUseErrorHandler,
+}));
+
 const mockErrorHandler = (errorMsg: string | null, onError?: (err: unknown) => void) => ({
   error: errorMsg ? { code: 'E9999', type: 'UNKNOWN' as const, severity: 'low' as const, message: errorMsg, userMessage: errorMsg, retryable: false } : null,
   rawError: errorMsg ? new Error(errorMsg) : null,
@@ -19,22 +27,18 @@ const mockErrorHandler = (errorMsg: string | null, onError?: (err: unknown) => v
   isRetryable: false,
   retryCount: 0,
   isRetrying: false,
-  handleError: onError ?? jest.fn(),
-  retry: jest.fn(),
-  clearError: jest.fn(),
+  handleError: onError ?? vi.fn(),
+  retry: vi.fn(),
+  clearError: vi.fn(),
 });
 
-jest.mock('@/hooks/useErrorHandler', () => ({
-  useErrorHandler: jest.fn(),
-}));
-
 // Mock CardTreeRenderer
-jest.mock('@/components/visualization/CardTreeRenderer/CardTreeRenderer', () => ({
+vi.mock('@/components/visualization/CardTreeRenderer/CardTreeRenderer', () => ({
   CardTreeRenderer: () => <div data-testid="mock-cardtree-renderer">MockRenderer</div>,
 }));
 
 // Mock CSS module
-jest.mock('../CardTree.module.css', () => ({
+vi.mock('../CardTree.module.css', () => ({
   wrapper: 'wrapper',
   empty: 'empty',
   emptyIcon: 'emptyIcon',
@@ -48,14 +52,14 @@ jest.mock('../CardTree.module.css', () => ({
 }));
 
 // Mock CardTreeSkeleton
-jest.mock('../CardTreeSkeleton', () => ({
+vi.mock('../CardTreeSkeleton', () => ({
   CardTreeSkeleton: ({ 'data-testid': testId }: { 'data-testid'?: string }) => (
     <div data-testid={testId || 'cardtree-skeleton'}>Skeleton</div>
   ),
 }));
 
 // Mock CardTreeError
-jest.mock('../CardTreeError', () => ({
+vi.mock('../CardTreeError', () => ({
   CardTreeError: ({ message, onRetry, 'data-testid': testId }: { message: string; onRetry?: () => void; 'data-testid'?: string }) => (
     <div data-testid={testId || 'cardtree-error'} role="alert">
       <span>⚠️</span>
@@ -91,18 +95,18 @@ const MOCK_DATA = {
 
 describe('CardTreeView', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Provide safe default mock so initial render doesn't trigger useErrorHandler
-    const { useProjectTree } = jest.requireMock('@/hooks/useProjectTree') as { useProjectTree: jest.Mock };
+    const useProjectTree = mockUseProjectTree;
     useProjectTree.mockReturnValue({
       data: MOCK_DATA,
       isLoading: false,
       error: null,
       isMockData: false,
-      refetch: jest.fn(),
+      refetch: vi.fn(),
     });
     // Default: no error from useErrorHandler
-    const { useErrorHandler } = jest.requireMock('@/hooks/useErrorHandler') as { useErrorHandler: jest.Mock };
+    const useErrorHandler = mockUseErrorHandler;
     useErrorHandler.mockReturnValue(mockErrorHandler(null));
   });
 
@@ -112,13 +116,13 @@ describe('CardTreeView', () => {
     });
 
     it('should return null when feature flag is disabled (default)', () => {
-      const { useProjectTree } = jest.requireMock('@/hooks/useProjectTree') as { useProjectTree: jest.Mock };
+      const useProjectTree = mockUseProjectTree;
       useProjectTree.mockReturnValue({
         data: MOCK_DATA,
         isLoading: false,
         error: null,
         isMockData: true,
-        refetch: jest.fn(),
+        refetch: vi.fn(),
       });
 
       const { container } = render(<CardTreeView />);
@@ -127,13 +131,13 @@ describe('CardTreeView', () => {
     });
 
     it('should render CardTreeRenderer when forceEnabled=true', () => {
-      const { useProjectTree } = jest.requireMock('@/hooks/useProjectTree') as { useProjectTree: jest.Mock };
+      const useProjectTree = mockUseProjectTree;
       useProjectTree.mockReturnValue({
         data: MOCK_DATA,
         isLoading: false,
         error: null,
         isMockData: false,
-        refetch: jest.fn(),
+        refetch: vi.fn(),
       });
 
       render(<CardTreeView forceEnabled />);
@@ -143,13 +147,13 @@ describe('CardTreeView', () => {
 
   describe('Loading State', () => {
     it('should show skeleton when loading', () => {
-      const { useProjectTree } = jest.requireMock('@/hooks/useProjectTree') as { useProjectTree: jest.Mock };
+      const useProjectTree = mockUseProjectTree;
       useProjectTree.mockReturnValue({
         data: null,
         isLoading: true,
         error: null,
         isMockData: false,
-        refetch: jest.fn(),
+        refetch: vi.fn(),
       });
 
       render(<CardTreeView forceEnabled />);
@@ -157,13 +161,13 @@ describe('CardTreeView', () => {
     });
 
     it('should NOT show skeleton when not loading', () => {
-      const { useProjectTree } = jest.requireMock('@/hooks/useProjectTree') as { useProjectTree: jest.Mock };
+      const useProjectTree = mockUseProjectTree;
       useProjectTree.mockReturnValue({
         data: MOCK_DATA,
         isLoading: false,
         error: null,
         isMockData: false,
-        refetch: jest.fn(),
+        refetch: vi.fn(),
       });
 
       render(<CardTreeView forceEnabled />);
@@ -173,14 +177,14 @@ describe('CardTreeView', () => {
 
   describe('Error State', () => {
     it('should show error state when API fails', () => {
-      const { useProjectTree } = jest.requireMock('@/hooks/useProjectTree') as { useProjectTree: jest.Mock };
-      const { useErrorHandler } = jest.requireMock('@/hooks/useErrorHandler') as { useErrorHandler: jest.Mock };
+      const useProjectTree = mockUseProjectTree;
+      const useErrorHandler = mockUseErrorHandler;
       useProjectTree.mockReturnValue({
         data: null,
         isLoading: false,
         error: new Error('Network error'),
         isMockData: false,
-        refetch: jest.fn(),
+        refetch: vi.fn(),
       });
       useErrorHandler.mockReturnValue(mockErrorHandler('网络错误'));
 
@@ -190,9 +194,9 @@ describe('CardTreeView', () => {
     });
 
     it('should show retry button in error state', () => {
-      const { useProjectTree } = jest.requireMock('@/hooks/useProjectTree') as { useProjectTree: jest.Mock };
-      const { useErrorHandler } = jest.requireMock('@/hooks/useErrorHandler') as { useErrorHandler: jest.Mock };
-      const refetch = jest.fn();
+      const useProjectTree = mockUseProjectTree;
+      const useErrorHandler = mockUseErrorHandler;
+      const refetch = vi.fn();
       useProjectTree.mockReturnValue({
         data: null,
         isLoading: false,
@@ -208,9 +212,9 @@ describe('CardTreeView', () => {
         isRetryable: true,
         retryCount: 0,
         isRetrying: false,
-        handleError: jest.fn(),
+        handleError: vi.fn(),
         retry: (fn: () => void) => fn(),
-        clearError: jest.fn(),
+        clearError: vi.fn(),
       });
 
       render(<CardTreeView forceEnabled />);
@@ -222,14 +226,14 @@ describe('CardTreeView', () => {
     });
 
     it('should show timeout message when request times out (> 10s)', () => {
-      const { useProjectTree } = jest.requireMock('@/hooks/useProjectTree') as { useProjectTree: jest.Mock };
-      const { useErrorHandler } = jest.requireMock('@/hooks/useErrorHandler') as { useErrorHandler: jest.Mock };
+      const useProjectTree = mockUseProjectTree;
+      const useErrorHandler = mockUseErrorHandler;
       useProjectTree.mockReturnValue({
         data: null,
         isLoading: false,
         error: new Error('请求超时（10秒）'),
         isMockData: false,
-        refetch: jest.fn(),
+        refetch: vi.fn(),
       });
       useErrorHandler.mockReturnValue(mockErrorHandler('请求超时'));
 
@@ -241,13 +245,13 @@ describe('CardTreeView', () => {
 
   describe('Empty State', () => {
     it('should show empty state when no data', () => {
-      const { useProjectTree } = jest.requireMock('@/hooks/useProjectTree') as { useProjectTree: jest.Mock };
+      const useProjectTree = mockUseProjectTree;
       useProjectTree.mockReturnValue({
         data: { nodes: [] },
         isLoading: false,
         error: null,
         isMockData: false,
-        refetch: jest.fn(),
+        refetch: vi.fn(),
       });
 
       render(<CardTreeView forceEnabled />);
@@ -258,13 +262,13 @@ describe('CardTreeView', () => {
 
   describe('Mock Data Indicator', () => {
     it('should show mock indicator when using mock data', () => {
-      const { useProjectTree } = jest.requireMock('@/hooks/useProjectTree') as { useProjectTree: jest.Mock };
+      const useProjectTree = mockUseProjectTree;
       useProjectTree.mockReturnValue({
         data: MOCK_DATA,
         isLoading: false,
         error: null,
         isMockData: true,
-        refetch: jest.fn(),
+        refetch: vi.fn(),
       });
 
       render(<CardTreeView forceEnabled />);
@@ -272,13 +276,13 @@ describe('CardTreeView', () => {
     });
 
     it('should NOT show mock indicator when using real data', () => {
-      const { useProjectTree } = jest.requireMock('@/hooks/useProjectTree') as { useProjectTree: jest.Mock };
+      const useProjectTree = mockUseProjectTree;
       useProjectTree.mockReturnValue({
         data: MOCK_DATA,
         isLoading: false,
         error: null,
         isMockData: false,
-        refetch: jest.fn(),
+        refetch: vi.fn(),
       });
 
       render(<CardTreeView forceEnabled />);
@@ -288,13 +292,13 @@ describe('CardTreeView', () => {
 
   describe('Callbacks', () => {
     it('should pass projectId to useProjectTree', () => {
-      const { useProjectTree } = jest.requireMock('@/hooks/useProjectTree') as { useProjectTree: jest.Mock };
+      const useProjectTree = mockUseProjectTree;
       useProjectTree.mockReturnValue({
         data: MOCK_DATA,
         isLoading: false,
         error: null,
         isMockData: false,
-        refetch: jest.fn(),
+        refetch: vi.fn(),
       });
 
       render(<CardTreeView projectId="proj-123" forceEnabled />);
@@ -304,13 +308,13 @@ describe('CardTreeView', () => {
     });
 
     it('should render with data-testid', () => {
-      const { useProjectTree } = jest.requireMock('@/hooks/useProjectTree') as { useProjectTree: jest.Mock };
+      const useProjectTree = mockUseProjectTree;
       useProjectTree.mockReturnValue({
         data: MOCK_DATA,
         isLoading: false,
         error: null,
         isMockData: false,
-        refetch: jest.fn(),
+        refetch: vi.fn(),
       });
 
       render(<CardTreeView forceEnabled data-testid="my-cardtree" />);

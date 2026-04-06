@@ -7,7 +7,7 @@ import { ThinkingPanel } from '../ThinkingPanel';
 import { ThinkingStep } from '@/hooks/useDDDStream';
 
 // Mock MermaidPreview
-jest.mock('../MermaidPreview', () => ({
+vi.mock('../MermaidPreview', () => ({
   MermaidPreview: ({ code }: { code: string }) => <div data-testid="mermaid-preview">{code}</div>,
 }));
 
@@ -67,7 +67,7 @@ describe('ThinkingPanel', () => {
     });
 
     it('should show abort button when thinking', () => {
-      const onAbort = jest.fn();
+      const onAbort = vi.fn();
       render(
         <ThinkingPanel 
           {...defaultProps} 
@@ -138,7 +138,7 @@ describe('ThinkingPanel', () => {
     });
 
     it('should show retry button when onRetry provided', () => {
-      const onRetry = jest.fn();
+      const onRetry = vi.fn();
       render(
         <ThinkingPanel 
           {...defaultProps} 
@@ -155,7 +155,7 @@ describe('ThinkingPanel', () => {
     });
 
     it('should show use default button when onUseDefault provided', () => {
-      const onUseDefault = jest.fn();
+      const onUseDefault = vi.fn();
       render(
         <ThinkingPanel 
           {...defaultProps} 

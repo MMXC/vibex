@@ -6,9 +6,9 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MermaidEditor } from '../MermaidEditor';
 
 // Mock mermaid
-jest.mock('mermaid', () => ({
-  initialize: jest.fn(),
-  render: jest.fn().mockImplementation(async (id, code) => {
+vi.mock('mermaid', () => ({
+  initialize: vi.fn(),
+  render: vi.fn().mockImplementation(async (id, code) => {
     if (code.includes('invalid')) {
       throw new Error('Syntax error in diagram');
     }
@@ -17,7 +17,7 @@ jest.mock('mermaid', () => ({
 }));
 
 // Mock MermaidCodeEditor
-jest.mock('../MermaidCodeEditor', () => ({
+vi.mock('../MermaidCodeEditor', () => ({
   __esModule: true,
   default: function MockMermaidCodeEditor({ value, onChange, readOnly }: any) {
     return (
@@ -35,7 +35,7 @@ import mermaid from 'mermaid';
 
 describe('MermaidEditor', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('basic rendering', () => {
@@ -57,7 +57,7 @@ describe('MermaidEditor', () => {
 
   describe('code editing', () => {
     it('should call onChange when code changes', () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       render(<MermaidEditor value="" onChange={onChange} />);
 
       fireEvent.change(screen.getByTestId('code-editor'), {
@@ -83,7 +83,7 @@ describe('MermaidEditor', () => {
     });
 
     it('should not call onChange in readOnly mode', () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       const { rerender } = render(
         <MermaidEditor value="" readOnly={true} onChange={onChange} />
       );
@@ -154,8 +154,8 @@ describe('MermaidEditor', () => {
 
   describe('error handling', () => {
     it('should call onError when preview fails', async () => {
-      const onError = jest.fn();
-      (mermaid.render as jest.Mock).mockRejectedValueOnce(
+      const onError = vi.fn();
+      (mermaid.render as any).mockRejectedValueOnce(
         new Error('Invalid syntax')
       );
 

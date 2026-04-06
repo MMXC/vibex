@@ -79,7 +79,7 @@ describe('AIDisplay', () => {
 
   describe('ST-7.3: 卡片点击', () => {
     it('诊断卡片点击调用 onDiagnose', () => {
-      const onDiagnose = jest.fn();
+      const onDiagnose = vi.fn();
       render(<AIDisplay onDiagnose={onDiagnose} />);
       const cards = screen.getAllByRole('button');
       fireEvent.click(cards[0]);
@@ -87,7 +87,7 @@ describe('AIDisplay', () => {
     });
 
     it('优化卡片点击调用 onOptimize', () => {
-      const onOptimize = jest.fn();
+      const onOptimize = vi.fn();
       render(<AIDisplay onOptimize={onOptimize} />);
       const cards = screen.getAllByRole('button');
       fireEvent.click(cards[1]);
@@ -95,7 +95,7 @@ describe('AIDisplay', () => {
     });
 
     it('对话澄清卡片点击调用 onClarify', () => {
-      const onClarify = jest.fn();
+      const onClarify = vi.fn();
       render(<AIDisplay onClarify={onClarify} />);
       const cards = screen.getAllByRole('button');
       fireEvent.click(cards[2]);

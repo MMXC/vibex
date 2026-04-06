@@ -54,17 +54,17 @@ const localStorageMock = (() => {
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 const mockRouter = {
-  push: jest.fn(),
-  back: jest.fn(),
+  push: vi.fn(),
+  back: vi.fn(),
 };
 
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => mockRouter,
   useSearchParams: () => new URLSearchParams({ projectId: 'test-project-id' }),
 }));
 
 // Mock FlowEditor component (renders a simple div for accessibility testing)
-jest.mock('@/components/ui/FlowEditor', () => ({
+vi.mock('@/components/ui/FlowEditor', () => ({
   __esModule: true,
   default: function MockFlowEditor() {
     return <div data-testid="flow-editor">Flow Editor</div>;
@@ -75,14 +75,14 @@ jest.mock('@/components/ui/FlowEditor', () => ({
 }));
 
 // Mock FlowPropertiesPanel
-jest.mock('@/components/ui/FlowPropertiesPanel', () =>
+vi.mock('@/components/ui/FlowPropertiesPanel', () =>
   function MockFlowPropertiesPanel() {
     return <div data-testid="flow-properties-panel" />;
   }
 );
 
 // Mock usePermission hook - return admin permissions for tests
-jest.mock('@/hooks/usePermission', () => ({
+vi.mock('@/hooks/usePermission', () => ({
   usePermission: () => ({
     globalRole: 'super_admin',
     isAuthenticated: true,
@@ -96,55 +96,55 @@ jest.mock('@/hooks/usePermission', () => ({
       email: 'test@example.com',
       role: 'super_admin',
     },
-    refreshUser: jest.fn(),
-    getProjectRole: jest.fn(() => null),
-    hasProjectPermission: jest.fn(() => Promise.resolve(true)),
-    setProjectRole: jest.fn(),
-    clearProjectRole: jest.fn(),
+    refreshUser: vi.fn(),
+    getProjectRole: vi.fn(() => null),
+    hasProjectPermission: vi.fn(() => Promise.resolve(true)),
+    setProjectRole: vi.fn(),
+    clearProjectRole: vi.fn(),
   }),
 }));
 
 // Mock API modules
-const mockGetProjects = jest.fn();
-const mockCreateProject = jest.fn();
-const mockDeleteProject = jest.fn();
-const mockLogout = jest.fn();
-const mockGetDeletedProjects = jest.fn();
-const mockGetMessages = jest.fn();
-const mockCreateMessage = jest.fn();
-const mockGetConversations = jest.fn();
+const mockGetProjects = vi.fn();
+const mockCreateProject = vi.fn();
+const mockDeleteProject = vi.fn();
+const mockLogout = vi.fn();
+const mockGetDeletedProjects = vi.fn();
+const mockGetMessages = vi.fn();
+const mockCreateMessage = vi.fn();
+const mockGetConversations = vi.fn();
 
-jest.mock('@/services/api/modules/project', () => ({
+vi.mock('@/services/api/modules/project', () => ({
   projectApi: {
     getProjects: (...args: unknown[]) => mockGetProjects(...args),
     createProject: (...args: unknown[]) => mockCreateProject(...args),
     deleteProject: (...args: unknown[]) => mockDeleteProject(...args),
-    softDeleteProject: jest.fn(),
-    restoreProject: jest.fn(),
-    permanentDeleteProject: jest.fn(),
+    softDeleteProject: vi.fn(),
+    restoreProject: vi.fn(),
+    permanentDeleteProject: vi.fn(),
     getDeletedProjects: (...args: unknown[]) => mockGetDeletedProjects(...args),
-    clearDeletedProjects: jest.fn(),
-    getProjectRole: jest.fn(),
-    getProject: jest.fn(),
-    updateProject: jest.fn(),
+    clearDeletedProjects: vi.fn(),
+    getProjectRole: vi.fn(),
+    getProject: vi.fn(),
+    updateProject: vi.fn(),
   },
 }));
 
-jest.mock('@/services/api/modules/auth', () => ({
+vi.mock('@/services/api/modules/auth', () => ({
   authApi: {
     logout: (...args: unknown[]) => mockLogout(...args),
-    login: jest.fn(),
-    register: jest.fn(),
-    getCurrentUser: jest.fn(),
+    login: vi.fn(),
+    register: vi.fn(),
+    getCurrentUser: vi.fn(),
   },
 }));
 
-jest.mock('@/services/api', () => ({
+vi.mock('@/services/api', () => ({
   authApi: {
     logout: (...args: unknown[]) => mockLogout(...args),
-    login: jest.fn(),
-    register: jest.fn(),
-    getCurrentUser: jest.fn(),
+    login: vi.fn(),
+    register: vi.fn(),
+    getCurrentUser: vi.fn(),
   },
   projectApi: {
     getProjects: (...args: unknown[]) => mockGetProjects(...args),
@@ -161,9 +161,9 @@ jest.mock('@/services/api', () => ({
     getMessages: (...args: unknown[]) => mockGetMessages(...args),
     createMessage: (...args: unknown[]) => mockCreateMessage(...args),
     getConversations: (...args: unknown[]) => mockGetConversations(...args),
-    getFlow: jest.fn().mockResolvedValue({ nodes: [], edges: [] }),
-    updateFlow: jest.fn().mockResolvedValue({ success: true }),
-    generateFlow: jest.fn().mockResolvedValue({
+    getFlow: vi.fn().mockResolvedValue({ nodes: [], edges: [] }),
+    updateFlow: vi.fn().mockResolvedValue({ success: true }),
+    generateFlow: vi.fn().mockResolvedValue({
       nodes: [
         { id: '1', position: { x: 100, y: 100 }, data: { label: 'AI Generated' } },
       ],
@@ -177,9 +177,9 @@ class MockEventSource {
   readyState = 1;
   onmessage = null;
   onerror = null;
-  close = jest.fn();
-  addEventListener = jest.fn();
-  removeEventListener = jest.fn();
+  close = vi.fn();
+  addEventListener = vi.fn();
+  removeEventListener = vi.fn();
 }
 
 Object.defineProperty(window, 'EventSource', {
@@ -208,7 +208,7 @@ function expectNoViolations(results: { violations: unknown[] }) {
 // ─── BeforeEach setup ───────────────────────────────────────────────────────
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   localStorageMock.clear();
   localStorageMock.setItem('auth_token', 'test-token');
   localStorageMock.setItem('user_id', 'test-user');

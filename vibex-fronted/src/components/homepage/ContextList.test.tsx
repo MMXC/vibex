@@ -29,7 +29,7 @@ describe('Epic 3: ContextList - 限界上下文', () => {
   ];
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should show list of contexts', () => {

@@ -8,7 +8,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useProjectTree } from '@/hooks/useProjectTree';
 
 // Mock fetch
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 const createWrapper = () => {
@@ -22,7 +22,7 @@ const createWrapper = () => {
 
 describe('useProjectTree', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return mock data when projectId is null (feature flag off)', () => {

@@ -5,43 +5,43 @@
  */
 
 // Mock use-debounce before importing the hook
-jest.mock('use-debounce', () => ({
-  useDebouncedCallback: jest.fn((fn) => {
+vi.mock('use-debounce', () => ({
+  useDebouncedCallback: vi.fn((fn) => {
     const debouncedFn = (...args: unknown[]) => fn(...args)
     return debouncedFn
   }),
 }))
 
 // Mock canvasApi with default implementations
-jest.mock('@/lib/canvas/api/canvasApi', () => ({
+vi.mock('@/lib/canvas/api/canvasApi', () => ({
   canvasApi: {
-    createSnapshot: jest.fn(),
-    getLatestVersion: jest.fn(),
+    createSnapshot: vi.fn(),
+    getLatestVersion: vi.fn(),
   },
 }))
 
 // Mock all stores — Zustand stores have getState/subscribe as properties on the store function
-jest.mock('@/lib/canvas/stores/contextStore', () => {
-  const storeFn = () => ({ contextNodes: [], setContextNodes: jest.fn() })
+vi.mock('@/lib/canvas/stores/contextStore', () => {
+  const storeFn = () => ({ contextNodes: [], setContextNodes: vi.fn() })
   ;(storeFn as any).getState = () => ({ contextNodes: [] })
-  ;(storeFn as any).subscribe = jest.fn(() => jest.fn())
-  ;(storeFn as any).setState = jest.fn()
+  ;(storeFn as any).subscribe = vi.fn(() => vi.fn())
+  ;(storeFn as any).setState = vi.fn()
   return { useContextStore: storeFn }
 })
 
-jest.mock('@/lib/canvas/stores/flowStore', () => {
-  const storeFn = () => ({ flowNodes: [], setFlowNodes: jest.fn() })
+vi.mock('@/lib/canvas/stores/flowStore', () => {
+  const storeFn = () => ({ flowNodes: [], setFlowNodes: vi.fn() })
   ;(storeFn as any).getState = () => ({ flowNodes: [] })
-  ;(storeFn as any).subscribe = jest.fn(() => jest.fn())
-  ;(storeFn as any).setState = jest.fn()
+  ;(storeFn as any).subscribe = vi.fn(() => vi.fn())
+  ;(storeFn as any).setState = vi.fn()
   return { useFlowStore: storeFn }
 })
 
-jest.mock('@/lib/canvas/stores/componentStore', () => {
-  const storeFn = () => ({ componentNodes: [], setComponentNodes: jest.fn() })
+vi.mock('@/lib/canvas/stores/componentStore', () => {
+  const storeFn = () => ({ componentNodes: [], setComponentNodes: vi.fn() })
   ;(storeFn as any).getState = () => ({ componentNodes: [] })
-  ;(storeFn as any).subscribe = jest.fn(() => jest.fn())
-  ;(storeFn as any).setState = jest.fn()
+  ;(storeFn as any).subscribe = vi.fn(() => vi.fn())
+  ;(storeFn as any).setState = vi.fn()
   return { useComponentStore: storeFn }
 })
 
@@ -51,12 +51,12 @@ import { renderHook, act } from '@testing-library/react'
 // Get mock references after module mocking is complete
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const canvasApi = require('@/lib/canvas/api/canvasApi') as any
-const createSnapshot = canvasApi.canvasApi.createSnapshot as jest.Mock
-const getLatestVersion = canvasApi.canvasApi.getLatestVersion as jest.Mock
+const createSnapshot = canvasApi.canvasApi.createSnapshot as any
+const getLatestVersion = canvasApi.canvasApi.getLatestVersion as any
 
 describe('useAutoSave', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     createSnapshot.mockResolvedValue({
       success: true,
       snapshot: {
@@ -103,7 +103,7 @@ describe('useAutoSave', () => {
 
 describe('useAutoSave — Conflict Detection (E4)', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     // Default: successful save
     createSnapshot.mockResolvedValue({
       success: true,
@@ -253,7 +253,7 @@ describe('useAutoSave — Conflict Detection (E4)', () => {
   // E4-6: onSaveError callback is called on non-conflict errors
   // -------------------------------------------------------------------------
   it('E4-6: onSaveError callback is called for non-conflict errors', async () => {
-    const onSaveError = jest.fn()
+    const onSaveError = vi.fn()
     // Non-conflict error (no status=409)
     createSnapshot.mockRejectedValueOnce(new Error('Network error'))
 

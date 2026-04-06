@@ -14,11 +14,11 @@ import { useCanvasEvents } from './useCanvasEvents';
 // =============================================================================
 
 // Mock useCanvasState (E1 dependency)
-jest.mock('./useCanvasState', () => {
+vi.mock('./useCanvasState', () => {
   let mockExpandMode: 'normal' | 'expand-both' | 'maximize' = 'normal';
-  const mockToggleMaximize = jest.fn();
+  const mockToggleMaximize = vi.fn();
   return {
-    useCanvasState: jest.fn(() => ({
+    useCanvasState: vi.fn(() => ({
       expandMode: mockExpandMode,
       handlers: {
         toggleMaximize: mockToggleMaximize,
@@ -32,36 +32,36 @@ jest.mock('./useCanvasState', () => {
 });
 
 // Mock stores
-jest.mock('@/lib/canvas/stores/contextStore', () => ({
-  useContextStore: jest.fn((selector?: (s: any) => unknown) =>
+vi.mock('@/lib/canvas/stores/contextStore', () => ({
+  useContextStore: vi.fn((selector?: (s: any) => unknown) =>
     selector
       ? selector({
           activeTree: 'context',
-          setActiveTree: jest.fn(),
+          setActiveTree: vi.fn(),
         })
-      : { setActiveTree: jest.fn() }
+      : { setActiveTree: vi.fn() }
   ),
 }));
 
-jest.mock('@/lib/canvas/stores/flowStore', () => ({
-  useFlowStore: jest.fn((selector?: (s: any) => unknown) =>
+vi.mock('@/lib/canvas/stores/flowStore', () => ({
+  useFlowStore: vi.fn((selector?: (s: any) => unknown) =>
     selector ? selector({ flowNodes: [] }) : {}
   ),
 }));
 
-jest.mock('@/lib/canvas/stores/componentStore', () => ({
-  useComponentStore: jest.fn((selector?: (s: any) => unknown) =>
+vi.mock('@/lib/canvas/stores/componentStore', () => ({
+  useComponentStore: vi.fn((selector?: (s: any) => unknown) =>
     selector ? selector({ componentNodes: [] }) : {}
   ),
 }));
 
-const { __setExpandMode, __getToggleMaximize } = jest.requireMock(
+const { __setExpandMode, __getToggleMaximize } = vi.fn()(
   './useCanvasState'
 ) as any;
 
 afterEach(() => {
   __setExpandMode('normal');
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   document.body.innerHTML = '';
 });
 
@@ -191,10 +191,10 @@ describe('useCanvasEvents — F11 keyboard shortcut', () => {
   it('F11 preventDefault is called', () => {
     renderUseCanvasEvents();
 
-    const preventDefault = jest.fn();
+    const preventDefault = vi.fn();
     act(() => {
       const event = new KeyboardEvent('keydown', { key: 'F11' });
-      jest.spyOn(event, 'preventDefault').mockImplementation(preventDefault);
+      vi.spyOn(event, 'preventDefault').mockImplementation(preventDefault);
       document.dispatchEvent(event);
     });
 

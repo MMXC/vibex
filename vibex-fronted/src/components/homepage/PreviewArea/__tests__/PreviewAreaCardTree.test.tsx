@@ -8,19 +8,19 @@ import { render, screen } from '@testing-library/react';
 import { PreviewArea } from '../PreviewArea';
 
 // Mock CardTreeView
-jest.mock('@/components/homepage/CardTree/CardTreeView', () => ({
-  CardTreeView: jest.fn(() => <div data-testid="cardtree-view">CardTree View</div>),
+vi.mock('@/components/homepage/CardTree/CardTreeView', () => ({
+  CardTreeView: vi.fn(() => <div data-testid="cardtree-view">CardTree View</div>),
   IS_CARD_TREE_ENABLED: false, // Default to false
 }));
 
 // Mock MermaidPreview
-jest.mock('@/components/ui/MermaidPreview', () => ({
-  MermaidPreview: jest.fn(() => <div data-testid="mermaid-preview">Mermaid Preview</div>),
+vi.mock('@/components/ui/MermaidPreview', () => ({
+  MermaidPreview: vi.fn(() => <div data-testid="mermaid-preview">Mermaid Preview</div>),
 }));
 
 // Mock useConfirmationStore
-jest.mock('@/stores/confirmationStore', () => ({
-  useConfirmationStore: jest.fn(() => ''),
+vi.mock('@/stores/confirmationStore', () => ({
+  useConfirmationStore: vi.fn(() => ''),
 }));
 
 // Import after mocks
@@ -28,7 +28,7 @@ const { IS_CARD_TREE_ENABLED } = require('@/components/homepage/CardTree/CardTre
 
 describe('PreviewArea CardTree Integration', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Feature Flag Control', () => {

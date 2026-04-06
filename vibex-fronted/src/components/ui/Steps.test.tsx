@@ -31,7 +31,7 @@ describe('Steps', () => {
   });
 
   it('calls onStepClick when step is clicked', () => {
-    const handleClick = jest.fn();
+    const handleClick = vi.fn();
     render(<Steps steps={mockSteps} clickable onStepClick={handleClick} />);
     
     fireEvent.click(screen.getByText('Step 1'));
@@ -39,7 +39,7 @@ describe('Steps', () => {
   });
 
   it('does not call onStepClick for pending steps when clickable is false', () => {
-    const handleClick = jest.fn();
+    const handleClick = vi.fn();
     render(<Steps steps={mockSteps} clickable={false} onStepClick={handleClick} />);
     
     fireEvent.click(screen.getByText('Step 1'));

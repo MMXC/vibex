@@ -25,7 +25,7 @@ describe('AppErrorBoundary', () => {
   });
 
   it('has reset button that clears error', () => {
-    const onReset = jest.fn();
+    const onReset = vi.fn();
     const ThrowError = () => { throw new Error('Test error'); };
     render(
       <AppErrorBoundary onReset={onReset}>

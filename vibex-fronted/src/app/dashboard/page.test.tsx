@@ -31,15 +31,15 @@ function renderWithQueryClient(ui: React.ReactElement) {
 
 // Mock router
 const mockRouter = {
-  push: jest.fn(),
+  push: vi.fn(),
 };
 
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => mockRouter,
 }));
 
 // Mock usePermission hook - return admin permissions for tests
-jest.mock('@/hooks/usePermission', () => ({
+vi.mock('@/hooks/usePermission', () => ({
   usePermission: () => ({
     globalRole: 'super_admin',
     isAuthenticated: true,
@@ -53,11 +53,11 @@ jest.mock('@/hooks/usePermission', () => ({
       email: 'test@example.com',
       role: 'super_admin',
     },
-    refreshUser: jest.fn(),
-    getProjectRole: jest.fn(() => null),
-    hasProjectPermission: jest.fn(() => Promise.resolve(true)),
-    setProjectRole: jest.fn(),
-    clearProjectRole: jest.fn(),
+    refreshUser: vi.fn(),
+    getProjectRole: vi.fn(() => null),
+    hasProjectPermission: vi.fn(() => Promise.resolve(true)),
+    setProjectRole: vi.fn(),
+    clearProjectRole: vi.fn(),
   }),
 }));
 
@@ -81,45 +81,45 @@ const localStorageMock = (() => {
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 // Mock api modules
-const mockGetProjects = jest.fn();
-const mockCreateProject = jest.fn();
-const mockDeleteProject = jest.fn();
-const mockLogout = jest.fn();
-const mockGetDeletedProjects = jest.fn();
+const mockGetProjects = vi.fn();
+const mockCreateProject = vi.fn();
+const mockDeleteProject = vi.fn();
+const mockLogout = vi.fn();
+const mockGetDeletedProjects = vi.fn();
 
 // Mock the API modules before the main api module imports them
-jest.mock('@/services/api/modules/project', () => ({
+vi.mock('@/services/api/modules/project', () => ({
   projectApi: {
     getProjects: (...args: unknown[]) => mockGetProjects(...args),
     createProject: (...args: unknown[]) => mockCreateProject(...args),
     deleteProject: (...args: unknown[]) => mockDeleteProject(...args),
-    softDeleteProject: jest.fn(),
-    restoreProject: jest.fn(),
-    permanentDeleteProject: jest.fn(),
+    softDeleteProject: vi.fn(),
+    restoreProject: vi.fn(),
+    permanentDeleteProject: vi.fn(),
     getDeletedProjects: (...args: unknown[]) => mockGetDeletedProjects(...args),
-    clearDeletedProjects: jest.fn(),
-    getProjectRole: jest.fn(),
-    getProject: jest.fn(),
-    updateProject: jest.fn(),
+    clearDeletedProjects: vi.fn(),
+    getProjectRole: vi.fn(),
+    getProject: vi.fn(),
+    updateProject: vi.fn(),
   },
 }));
 
-jest.mock('@/services/api/modules/auth', () => ({
+vi.mock('@/services/api/modules/auth', () => ({
   authApi: {
     logout: (...args: unknown[]) => mockLogout(...args),
-    login: jest.fn(),
-    register: jest.fn(),
-    getCurrentUser: jest.fn(),
+    login: vi.fn(),
+    register: vi.fn(),
+    getCurrentUser: vi.fn(),
   },
 }));
 
 // Mock the main api module to avoid binding issues
-jest.mock('@/services/api', () => ({
+vi.mock('@/services/api', () => ({
   authApi: {
     logout: (...args: unknown[]) => mockLogout(...args),
-    login: jest.fn(),
-    register: jest.fn(),
-    getCurrentUser: jest.fn(),
+    login: vi.fn(),
+    register: vi.fn(),
+    getCurrentUser: vi.fn(),
   },
   projectApi: {
     getProjects: (...args: unknown[]) => mockGetProjects(...args),
@@ -138,7 +138,7 @@ jest.mock('@/services/api', () => ({
 
 describe('Dashboard (/dashboard)', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorageMock.clear();
     localStorageMock.setItem('auth_token', 'test-token');
     localStorageMock.setItem('user_id', 'test-user');

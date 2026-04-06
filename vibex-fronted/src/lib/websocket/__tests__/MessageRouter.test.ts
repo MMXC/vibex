@@ -13,7 +13,7 @@ describe('MessageRouter', () => {
 
   describe('subscribe', () => {
     it('should register a handler for a message type', () => {
-      const handler = jest.fn();
+      const handler = vi.fn();
       router.subscribe('chat', handler);
       
       // Handler should be registered
@@ -21,7 +21,7 @@ describe('MessageRouter', () => {
     });
 
     it('should return unsubscribe function', () => {
-      const handler = jest.fn();
+      const handler = vi.fn();
       const unsubscribe = router.subscribe('chat', handler);
       
       unsubscribe();

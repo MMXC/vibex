@@ -182,7 +182,7 @@ describe('QueryProvider', () => {
     });
 
     it('should handle mutation operations', async () => {
-      const mutateFn = jest.fn().mockResolvedValue({ success: true });
+      const mutateFn = vi.fn().mockResolvedValue({ success: true });
       
       // Mutations are handled via useMutation in components
       // Verify mutation function can be called

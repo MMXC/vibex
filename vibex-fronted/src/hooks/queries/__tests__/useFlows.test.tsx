@@ -10,13 +10,13 @@ import { useFlow } from '@/hooks/queries/useFlows';
 import { flowApi } from '@/services/api/modules/flow';
 
 // Mock the API module
-jest.mock('@/services/api/modules/flow', () => ({
+vi.mock('@/services/api/modules/flow', () => ({
   flowApi: {
-    getFlow: jest.fn(),
+    getFlow: vi.fn(),
   },
 }));
 
-const mockFlowApi = flowApi as jest.Mocked<typeof flowApi>;
+const mockFlowApi = flowApi as anyed<typeof flowApi>;
 
 // Create a wrapper with QueryClient
 const createWrapper = () => {
@@ -35,7 +35,7 @@ const createWrapper = () => {
 
 describe('useFlow', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch flow by ID', async () => {

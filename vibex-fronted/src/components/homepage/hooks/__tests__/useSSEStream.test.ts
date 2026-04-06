@@ -62,11 +62,11 @@ afterAll(() => {
 
 beforeEach(() => {
   MockEventSource.instances = [];
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 });
 
 afterEach(() => {
-  jest.clearAllTimers();
+  vi.clearAllTimers();
 });
 
 describe('useSSEStream', () => {
@@ -118,7 +118,7 @@ describe('useSSEStream', () => {
     });
 
     it('should call onThinking callback when thinking event is received', () => {
-      const onThinking = jest.fn();
+      const onThinking = vi.fn();
       const { result } = renderHook(() =>
         useSSEStream({ onThinking })
       );
@@ -277,7 +277,7 @@ describe('useSSEStream', () => {
   // ========== AI Results Parsing ==========
   describe('AI Results Parsing', () => {
     it('should call onContext callback for step_context event', () => {
-      const onContext = jest.fn();
+      const onContext = vi.fn();
       const { result } = renderHook(() =>
         useSSEStream({ onContext })
       );
@@ -308,7 +308,7 @@ describe('useSSEStream', () => {
     });
 
     it('should call onModel callback for step_model event', () => {
-      const onModel = jest.fn();
+      const onModel = vi.fn();
       const { result } = renderHook(() =>
         useSSEStream({ onModel })
       );
@@ -334,7 +334,7 @@ describe('useSSEStream', () => {
     });
 
     it('should call onFlow callback for step_flow event', () => {
-      const onFlow = jest.fn();
+      const onFlow = vi.fn();
       const { result } = renderHook(() =>
         useSSEStream({ onFlow })
       );
@@ -360,7 +360,7 @@ describe('useSSEStream', () => {
     });
 
     it('should call onDone callback when done event is received', () => {
-      const onDone = jest.fn();
+      const onDone = vi.fn();
       const { result } = renderHook(() =>
         useSSEStream({ onDone })
       );
@@ -381,7 +381,7 @@ describe('useSSEStream', () => {
     });
 
     it('should call onError callback for error event', () => {
-      const onError = jest.fn();
+      const onError = vi.fn();
       const { result } = renderHook(() =>
         useSSEStream({ onError })
       );

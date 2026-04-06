@@ -9,11 +9,11 @@ import { AIPanel } from './AIPanel';
 import type { AIMessage } from '../types';
 
 describe('AIPanel', () => {
-  const mockOnClose = jest.fn();
-  const mockOnSendMessage = jest.fn();
+  const mockOnClose = vi.fn();
+  const mockOnSendMessage = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockOnSendMessage.mockImplementation(() => Promise.resolve());
   });
 

@@ -184,7 +184,7 @@ describe('useDragSelection — E3-T1', () => {
     });
 
     it('calls onSelectionChange with node IDs when box covers nodes', async () => {
-      const onSelectionChange = jest.fn();
+      const onSelectionChange = vi.fn();
       render(
         <DragSelectionHarness
           onSelectionChange={onSelectionChange}

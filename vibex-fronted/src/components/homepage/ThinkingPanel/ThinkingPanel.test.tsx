@@ -7,7 +7,7 @@ import { render, screen } from '@testing-library/react';
 import { ThinkingPanel } from './ThinkingPanel';
 
 // Mock the UI ThinkingPanel
-jest.mock('@/components/ui/ThinkingPanel', () => ({
+vi.mock('@/components/ui/ThinkingPanel', () => ({
   ThinkingPanel: ({ status, errorMessage }: { status: string; errorMessage?: string }) => (
     <div data-testid="ui-thinking-panel">
       <span data-testid="status">{status}</span>

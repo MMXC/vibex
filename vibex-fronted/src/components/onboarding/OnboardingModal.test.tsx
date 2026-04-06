@@ -7,8 +7,8 @@ import { OnboardingModal } from './OnboardingModal';
 import { useOnboardingStore, ONBOARDING_STEPS } from '@/stores/onboarding';
 
 // Mock the store
-jest.mock('@/stores/onboarding', () => ({
-  useOnboardingStore: jest.fn(),
+vi.mock('@/stores/onboarding', () => ({
+  useOnboardingStore: vi.fn(),
   ONBOARDING_STEPS: [
     { id: 'welcome', title: '欢迎', icon: '🎯', description: '欢迎使用', duration: '1min' },
     { id: 'input', title: '输入', icon: '📝', description: '输入需求', duration: '2min' },
@@ -23,19 +23,19 @@ describe('OnboardingModal', () => {
     status: 'in-progress' as const,
     currentStep: 'welcome',
     completedSteps: [],
-    nextStep: jest.fn(),
-    prevStep: jest.fn(),
-    skip: jest.fn(),
-    complete: jest.fn(),
+    nextStep: vi.fn(),
+    prevStep: vi.fn(),
+    skip: vi.fn(),
+    complete: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (useOnboardingStore as jest.Mock).mockReturnValue(mockStore);
+    vi.clearAllMocks();
+    (useOnboardingStore as any).mockReturnValue(mockStore);
   });
 
   it('should not render when status is not in-progress', () => {
-    (useOnboardingStore as jest.Mock).mockReturnValue({
+    (useOnboardingStore as any).mockReturnValue({
       ...mockStore,
       status: 'not-started',
     });
@@ -87,7 +87,7 @@ describe('OnboardingModal', () => {
   });
 
   it('should show back button when not on first step', () => {
-    (useOnboardingStore as jest.Mock).mockReturnValue({
+    (useOnboardingStore as any).mockReturnValue({
       ...mockStore,
       currentStep: 'input',
     });

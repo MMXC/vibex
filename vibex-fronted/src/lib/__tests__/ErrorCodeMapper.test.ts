@@ -3,7 +3,7 @@
  */
 
 // Mock axios
-jest.mock('axios', () => {
+vi.mock('axios', () => {
   class MockAxiosError extends Error {
     code?: string;
     response?: { status?: number; data?: any };

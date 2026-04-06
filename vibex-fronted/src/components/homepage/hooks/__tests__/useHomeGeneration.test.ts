@@ -5,41 +5,45 @@
 import { renderHook, act } from '@testing-library/react';
 import { useHomeGeneration } from '../useHomeGeneration';
 
+// Module-level mock functions for API
+const mockGenerateBoundedContext = vi.fn();
+const mockGenerateDomainModel = vi.fn();
+const mockGenerateBusinessFlow = vi.fn();
+const mockCreateProject = vi.fn();
+
 // Mock the API modules
-jest.mock('@/services/api', () => ({
+vi.mock('@/services/api', () => ({
   dddApi: {
-    generateBoundedContext: jest.fn(),
-    generateDomainModel: jest.fn(),
-    generateBusinessFlow: jest.fn(),
+    generateBoundedContext: mockGenerateBoundedContext,
+    generateDomainModel: mockGenerateDomainModel,
+    generateBusinessFlow: mockGenerateBusinessFlow,
   },
   projectApi: {
-    createProject: jest.fn(),
+    createProject: mockCreateProject,
   },
 }));
 
 // Mock auth store
-jest.mock('@/stores/authStore', () => ({
+vi.mock('@/stores/authStore', () => ({
   useAuthStore: {
-    getState: jest.fn(() => ({ user: { id: 'test-user-id' } })),
+    getState: vi.fn(() => ({ user: { id: 'test-user-id' } })),
   },
 }));
 
 describe('useHomeGeneration', () => {
-  const mockOnContextsGenerated = jest.fn();
-  const mockOnDomainModelsGenerated = jest.fn();
-  const mockOnBusinessFlowGenerated = jest.fn();
-  const mockOnProjectCreated = jest.fn();
-  const mockOnError = jest.fn();
-
-  const { dddApi, projectApi } = jest.requireMock('@/services/api');
+  const mockOnContextsGenerated = vi.fn();
+  const mockOnDomainModelsGenerated = vi.fn();
+  const mockOnBusinessFlowGenerated = vi.fn();
+  const mockOnProjectCreated = vi.fn();
+  const mockOnError = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Default resolved values for API calls so tests don't need explicit mockSetup
-    (dddApi.generateBoundedContext as jest.Mock).mockResolvedValue({ boundedContexts: [] });
-    (dddApi.generateDomainModel as jest.Mock).mockResolvedValue({ success: true, domainModels: [] });
-    (dddApi.generateBusinessFlow as jest.Mock).mockResolvedValue({ success: true, businessFlow: {} });
-    (projectApi.createProject as jest.Mock).mockResolvedValue({ id: 'proj-1' });
+    mockGenerateBoundedContext.mockResolvedValue({ boundedContexts: [] });
+    mockGenerateDomainModel.mockResolvedValue({ success: true, domainModels: [] });
+    mockGenerateBusinessFlow.mockResolvedValue({ success: true, businessFlow: {} });
+    mockCreateProject.mockResolvedValue({ id: 'proj-1' });
   });
 
   describe('initial state', () => {
@@ -61,8 +65,8 @@ describe('useHomeGeneration', () => {
   });
 
   describe('generateContexts', () => {
-    it('should call dddApi.generateBoundedContext with requirement text', async () => {
-      (dddApi.generateBoundedContext as jest.Mock).mockResolvedValueOnce({
+    it('should call mockGenerateBoundedContext with requirement text', async () => {
+      (mockGenerateBoundedContext as any).mockResolvedValueOnce({
         boundedContexts: [{ id: '1', name: 'TestContext', description: 'Test' }],
       });
 
@@ -74,7 +78,7 @@ describe('useHomeGeneration', () => {
         await result.current.generateContexts('test requirement');
       });
 
-      expect(dddApi.generateBoundedContext).toHaveBeenCalledWith('test requirement');
+      expect(mockGenerateBoundedContext).toHaveBeenCalledWith('test requirement');
       expect(result.current.streamStatus).toBe('complete');
       expect(mockOnContextsGenerated).toHaveBeenCalledWith(
         expect.arrayContaining([
@@ -84,7 +88,7 @@ describe('useHomeGeneration', () => {
     });
 
     it('should set streamStatus to error when API fails', async () => {
-      (dddApi.generateBoundedContext as jest.Mock).mockRejectedValueOnce(new Error('API error'));
+      (mockGenerateBoundedContext as any).mockRejectedValueOnce(new Error('API error'));
 
       const { result } = renderHook(() =>
         useHomeGeneration(mockOnContextsGenerated, undefined, undefined, undefined, mockOnError)
@@ -99,7 +103,7 @@ describe('useHomeGeneration', () => {
     });
 
     it('should clear error when starting generation', async () => {
-      (dddApi.generateBoundedContext as jest.Mock).mockResolvedValueOnce({ boundedContexts: [] });
+      (mockGenerateBoundedContext as any).mockResolvedValueOnce({ boundedContexts: [] });
 
       const { result } = renderHook(() =>
         useHomeGeneration(undefined, undefined, undefined, undefined, mockOnError)
@@ -115,7 +119,7 @@ describe('useHomeGeneration', () => {
 
   describe('generateDomainModels', () => {
     it('should set generating state when called', async () => {
-      (dddApi.generateDomainModel as jest.Mock).mockResolvedValueOnce({ success: true, domainModels: [] });
+      (mockGenerateDomainModel as any).mockResolvedValueOnce({ success: true, domainModels: [] });
 
       const { result } = renderHook(() =>
         useHomeGeneration(undefined, mockOnDomainModelsGenerated)
@@ -134,7 +138,7 @@ describe('useHomeGeneration', () => {
 
   describe('generateBusinessFlow', () => {
     it('should set generating state when called', async () => {
-      (dddApi.generateBusinessFlow as jest.Mock).mockResolvedValueOnce({ success: true, businessFlow: {} });
+      (mockGenerateBusinessFlow as any).mockResolvedValueOnce({ success: true, businessFlow: {} });
 
       const { result } = renderHook(() =>
         useHomeGeneration(undefined, undefined, mockOnBusinessFlowGenerated)
@@ -152,8 +156,8 @@ describe('useHomeGeneration', () => {
   });
 
   describe('createProject', () => {
-    it('should call projectApi.createProject with correct data', async () => {
-      (projectApi.createProject as jest.Mock).mockResolvedValueOnce({ id: 'proj-1', name: 'Test Project' });
+    it('should call mockCreateProject with correct data', async () => {
+      (mockCreateProject as any).mockResolvedValueOnce({ id: 'proj-1', name: 'Test Project' });
 
       const { result } = renderHook(() =>
         useHomeGeneration(undefined, undefined, undefined, mockOnProjectCreated)
@@ -163,7 +167,7 @@ describe('useHomeGeneration', () => {
         await result.current.createProject('Test Project', 'A test description');
       });
 
-      expect(projectApi.createProject).toHaveBeenCalledWith({
+      expect(mockCreateProject).toHaveBeenCalledWith({
         name: 'Test Project',
         description: 'A test description',
         userId: 'test-user-id',
@@ -172,7 +176,7 @@ describe('useHomeGeneration', () => {
     });
 
     it('should call onError when project creation fails', async () => {
-      (projectApi.createProject as jest.Mock).mockRejectedValueOnce(new Error('Creation failed'));
+      (mockCreateProject as any).mockRejectedValueOnce(new Error('Creation failed'));
 
       const { result } = renderHook(() =>
         useHomeGeneration(undefined, undefined, undefined, mockOnProjectCreated, mockOnError)
@@ -188,7 +192,7 @@ describe('useHomeGeneration', () => {
 
   describe('sendMessage', () => {
     it('should call console.log with message', async () => {
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation();
       const { result } = renderHook(() => useHomeGeneration());
 
       await act(async () => {
@@ -281,7 +285,7 @@ describe('useHomeGeneration', () => {
     });
 
     it('should call onProjectCreated callback when provided', async () => {
-      (projectApi.createProject as jest.Mock).mockResolvedValueOnce({ id: 'proj-1' });
+      (mockCreateProject as any).mockResolvedValueOnce({ id: 'proj-1' });
 
       const { result } = renderHook(() =>
         useHomeGeneration(undefined, undefined, undefined, mockOnProjectCreated)
@@ -348,8 +352,8 @@ describe('useHomeGeneration', () => {
 
   describe('multiple operations', () => {
     it('should handle sequential generations', async () => {
-      (dddApi.generateBoundedContext as jest.Mock).mockResolvedValue({ boundedContexts: [] });
-      (dddApi.generateDomainModel as jest.Mock).mockResolvedValue({ success: true, domainModels: [] });
+      (mockGenerateBoundedContext as any).mockResolvedValue({ boundedContexts: [] });
+      (mockGenerateDomainModel as any).mockResolvedValue({ success: true, domainModels: [] });
 
       const { result } = renderHook(() => useHomeGeneration());
 

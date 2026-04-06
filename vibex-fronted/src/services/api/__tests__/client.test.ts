@@ -24,9 +24,13 @@ vi.mock('axios', () => {
   };
   
   return {
+    __esModule: true,
     create: vi.fn(() => mockAxiosInstance),
     isAxiosError: vi.fn(),
-    default: { create: vi.fn(() => mockAxiosInstance) },
+    default: {
+      create: vi.fn(() => mockAxiosInstance),
+      isAxiosError: vi.fn(),
+    },
     __mockInstance: mockAxiosInstance,
   };
 });

@@ -125,7 +125,7 @@ describe('CircuitBreaker', () => {
 
   describe('callbacks', () => {
     it('should call onOpen callback when circuit opens', async () => {
-      const onOpen = jest.fn();
+      const onOpen = vi.fn();
       breaker.onOpen(onOpen);
       
       const failingFn = () => Promise.reject(new Error('fail'));
@@ -137,7 +137,7 @@ describe('CircuitBreaker', () => {
     });
 
     it('should call onClose callback when circuit closes', async () => {
-      const onClose = jest.fn();
+      const onClose = vi.fn();
       breaker.onClose(onClose);
       
       // Open the circuit

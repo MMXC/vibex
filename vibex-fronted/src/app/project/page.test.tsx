@@ -21,24 +21,24 @@ const localStorageMock = (() => {
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 // Mock API service
-jest.mock('@/services/api', () => ({
+vi.mock('@/services/api', () => ({
   apiService: {
-    getProjects: jest.fn().mockResolvedValue([]),
-    getProject: jest.fn().mockResolvedValue(null),
+    getProjects: vi.fn().mockResolvedValue([]),
+    getProject: vi.fn().mockResolvedValue(null),
     createProject: jest
       .fn()
       .mockResolvedValue({ id: '1', name: 'New Project' }),
-    updateProject: jest.fn().mockResolvedValue({ id: '1', name: 'Updated' }),
-    deleteProject: jest.fn().mockResolvedValue(true),
-    getRequirements: jest.fn().mockResolvedValue([]),
-    getDomainEntities: jest.fn().mockResolvedValue([]),
-    getEntityRelations: jest.fn().mockResolvedValue([]),
+    updateProject: vi.fn().mockResolvedValue({ id: '1', name: 'Updated' }),
+    deleteProject: vi.fn().mockResolvedValue(true),
+    getRequirements: vi.fn().mockResolvedValue([]),
+    getDomainEntities: vi.fn().mockResolvedValue([]),
+    getEntityRelations: vi.fn().mockResolvedValue([]),
   },
 }));
 
 describe('Project (/project)', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorageMock.clear();
     localStorageMock.setItem('auth_token', 'test-token');
     localStorageMock.setItem('user_id', 'test-user');

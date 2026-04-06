@@ -58,7 +58,7 @@ describe('Epic 5: ComponentList - UI组件与项目创建', () => {
   ];
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('ComponentList', () => {

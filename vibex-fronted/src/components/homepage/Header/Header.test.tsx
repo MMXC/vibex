@@ -13,17 +13,17 @@ import { Header } from './Header';
 import { useAuthStore } from '@/stores/authStore';
 
 // Mock authStore
-jest.mock('@/stores/authStore', () => ({
-  useAuthStore: jest.fn(),
+vi.mock('@/stores/authStore', () => ({
+  useAuthStore: vi.fn(),
 }));
 
-const mockUseAuthStore = useAuthStore as jest.MockedFunction<typeof useAuthStore>;
+const mockUseAuthStore = useAuthStore as anyedFunction<typeof useAuthStore>;
 
 describe('Header Component', () => {
-  const mockOnLoginClick = jest.fn();
+  const mockOnLoginClick = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('ST-2.1: Logo 显示', () => {

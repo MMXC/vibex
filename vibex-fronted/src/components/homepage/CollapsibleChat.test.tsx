@@ -6,7 +6,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { CollapsibleChat } from './CollapsibleChat';
 
 // Mock the AIChatPanel component
-jest.mock('@/components/ui/AIChatPanel', () => ({
+vi.mock('@/components/ui/AIChatPanel', () => ({
   __esModule: true,
   default: ({ messages, onSendMessage }: any) => (
     <div data-testid="chat-panel">
@@ -20,11 +20,11 @@ describe('CollapsibleChat', () => {
   const defaultProps = {
     defaultCollapsed: true,
     messages: [],
-    onSendMessage: jest.fn(),
+    onSendMessage: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render collapsed by default', () => {

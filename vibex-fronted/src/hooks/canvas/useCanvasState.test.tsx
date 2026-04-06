@@ -11,18 +11,21 @@ import React from 'react';
 import { render, act, renderHook } from '@testing-library/react';
 import { useCanvasState } from './useCanvasState';
 
-// All mock state lives inside jest.mock factory to avoid out-of-scope-variable errors
-jest.mock('@/lib/canvas/stores/uiStore', () => {
-  let expandMode: 'normal' | 'expand-both' | 'maximize' = 'normal';
-  const mockSetExpandMode = jest.fn();
-  const mockToggleMaximize = jest.fn();
+// All mock state lives inside vi.mock factory to avoid out-of-scope-variable errors
+// Module-level state to share between mock factory and test code
+let _expandMode: 'normal' | 'expand-both' | 'maximize' = 'normal';
+const _setExpandMode = (mode: 'normal' | 'expand-both' | 'maximize') => { _expandMode = mode; };
+
+vi.mock('@/lib/canvas/stores/uiStore', () => {
+  const mockSetExpandMode = vi.fn();
+  const mockToggleMaximize = vi.fn();
 
   return {
     // Expose setters for tests via a test-utils object
-    __setExpandMode: (mode: 'normal' | 'expand-both' | 'maximize') => { expandMode = mode; },
-    useUIStore: jest.fn((selector: (s: { expandMode: string; setExpandMode: typeof mockSetExpandMode; toggleMaximize: typeof mockToggleMaximize }) => unknown) =>
+    _setExpandMode: _setExpandMode,
+    useUIStore: vi.fn((selector: (s: { expandMode: string; setExpandMode: typeof mockSetExpandMode; toggleMaximize: typeof mockToggleMaximize }) => unknown) =>
       selector({
-        expandMode,
+        expandMode: _expandMode,
         setExpandMode: mockSetExpandMode,
         toggleMaximize: mockToggleMaximize,
       })
@@ -30,11 +33,24 @@ jest.mock('@/lib/canvas/stores/uiStore', () => {
   };
 });
 
-const { __setExpandMode } = jest.requireMock('@/lib/canvas/stores/uiStore') as any;
+afterEach(() => {
+  _setExpandMode('normal');
+  vi.clearAllMocks();
+});
+
+// ==========================================================================
+// Helper: render useCanvasState with a real DOM element (gridRef attached)
+// ==========================================================================
+
+// ==========================================================================
+// Tests
+// ==========================================================================
+
+describe('useCanvasState — initial state', () => {
 
 afterEach(() => {
-  __setExpandMode('normal');
-  jest.clearAllMocks();
+  _setExpandMode('normal');
+  vi.clearAllMocks();
 });
 
 // ==========================================================================
@@ -134,28 +150,28 @@ describe('useCanvasState — zoom handlers', () => {
 describe('useCanvasState — pan handlers', () => {
   it('handleMouseDown does not start panning when isSpacePressed is false', () => {
     const { result } = renderHook(() => useCanvasState());
-    const mouseEvent = { target: document.createElement('div'), preventDefault: jest.fn(), clientX: 100, clientY: 100 } as unknown as React.MouseEvent;
+    const mouseEvent = { target: document.createElement('div'), preventDefault: vi.fn(), clientX: 100, clientY: 100 } as unknown as React.MouseEvent;
     act(() => { result.current.handlers.handleMouseDown(mouseEvent); });
     expect(result.current.isPanning).toBe(false);
   });
 
   it('handleMouseDown ignores BUTTON elements', () => {
     const { result } = renderHook(() => useCanvasState());
-    const event = { target: document.createElement('button'), preventDefault: jest.fn(), clientX: 100, clientY: 100 } as unknown as React.MouseEvent;
+    const event = { target: document.createElement('button'), preventDefault: vi.fn(), clientX: 100, clientY: 100 } as unknown as React.MouseEvent;
     act(() => { result.current.handlers.handleMouseDown(event); });
     expect(result.current.isPanning).toBe(false);
   });
 
   it('handleMouseDown ignores INPUT elements', () => {
     const { result } = renderHook(() => useCanvasState());
-    const event = { target: document.createElement('input'), preventDefault: jest.fn(), clientX: 100, clientY: 100 } as unknown as React.MouseEvent;
+    const event = { target: document.createElement('input'), preventDefault: vi.fn(), clientX: 100, clientY: 100 } as unknown as React.MouseEvent;
     act(() => { result.current.handlers.handleMouseDown(event); });
     expect(result.current.isPanning).toBe(false);
   });
 
   it('handleMouseDown ignores TEXTAREA elements', () => {
     const { result } = renderHook(() => useCanvasState());
-    const event = { target: document.createElement('textarea'), preventDefault: jest.fn(), clientX: 100, clientY: 100 } as unknown as React.MouseEvent;
+    const event = { target: document.createElement('textarea'), preventDefault: vi.fn(), clientX: 100, clientY: 100 } as unknown as React.MouseEvent;
     act(() => { result.current.handlers.handleMouseDown(event); });
     expect(result.current.isPanning).toBe(false);
   });
@@ -363,13 +379,13 @@ describe('useCanvasState — expand mode', () => {
   });
 
   it('returns expandMode maximize from uiStore', () => {
-    __setExpandMode('maximize');
+    _setExpandMode('maximize');
     const { result } = renderHook(() => useCanvasState());
     expect(result.current.expandMode).toBe('maximize');
   });
 
   it('returns expandMode expand-both from uiStore', () => {
-    __setExpandMode('expand-both');
+    _setExpandMode('expand-both');
     const { result } = renderHook(() => useCanvasState());
     expect(result.current.expandMode).toBe('expand-both');
   });
@@ -382,13 +398,13 @@ describe('useCanvasState — expand mode', () => {
   // Branches remain uncovered in unit tests; acceptable per AGENTS.md §1.2 intent.
 
   it('expandMode maximize is returned from uiStore', () => {
-    __setExpandMode('maximize');
+    _setExpandMode('maximize');
     const { result } = renderHook(() => useCanvasState());
     expect(result.current.expandMode).toBe('maximize');
   });
 
   it('expandMode expand-both is returned from uiStore', () => {
-    __setExpandMode('expand-both');
+    _setExpandMode('expand-both');
     const { result } = renderHook(() => useCanvasState());
     expect(result.current.expandMode).toBe('expand-both');
   });
@@ -468,22 +484,22 @@ describe('useCanvasState — DOM effects (gridRef attached)', () => {
 
   it('expandMode maximize effect runs and sets --grid-left/center/right', () => {
     // Set expandMode to maximize BEFORE initial render
-    __setExpandMode('maximize');
+    _setExpandMode('maximize');
     const { hookResult, gridEl, triggerRerender } = renderHookWithGrid();
     // Force re-render so useEffect picks up the maximize value
     triggerRerender();
     // Verify grid CSS vars are set (maximize branch)
     expect(() => gridEl.current!.style.getPropertyValue('--grid-left')).not.toThrow();
     expect(() => gridEl.current!.style.getPropertyValue('--grid-center')).not.toThrow();
-    __setExpandMode('normal'); // reset
+    _setExpandMode('normal'); // reset
   });
 
   it('expandMode expand-both effect runs and sets --grid-left/center/right', () => {
-    __setExpandMode('expand-both');
+    _setExpandMode('expand-both');
     const { hookResult, gridEl, triggerRerender } = renderHookWithGrid();
     triggerRerender();
     expect(() => gridEl.current!.style.getPropertyValue('--grid-left')).not.toThrow();
-    __setExpandMode('normal'); // reset
+    _setExpandMode('normal'); // reset
   });
 
   // === Tests that require isSpacePressed=true (keyboard event) ===
@@ -509,7 +525,7 @@ describe('useCanvasState — DOM effects (gridRef attached)', () => {
     act(() => {
       hookResult.current!.handlers.handleMouseDown({
         target: gridEl.current!,
-        preventDefault: jest.fn(),
+        preventDefault: vi.fn(),
         clientX: 100,
         clientY: 100,
       } as unknown as React.MouseEvent);
@@ -526,7 +542,7 @@ describe('useCanvasState — DOM effects (gridRef attached)', () => {
     act(() => {
       hookResult.current!.handlers.handleMouseDown({
         target: gridEl.current!,
-        preventDefault: jest.fn(),
+        preventDefault: vi.fn(),
         clientX: 100,
         clientY: 100,
       } as unknown as React.MouseEvent);

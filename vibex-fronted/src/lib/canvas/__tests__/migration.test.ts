@@ -11,11 +11,11 @@ const mockStorage: Record<string, string> = {};
 
 Object.defineProperty(globalThis, 'localStorage', {
   value: {
-    getItem: jest.fn((key: string) => mockStorage[key] ?? null),
-    setItem: jest.fn((key: string, value: string) => { mockStorage[key] = value; }),
-    removeItem: jest.fn((key: string) => { delete mockStorage[key]; }),
-    clear: jest.fn(() => { Object.keys(mockStorage).forEach((k) => delete mockStorage[k]); }),
-    key: jest.fn(),
+    getItem: vi.fn((key: string) => mockStorage[key] ?? null),
+    setItem: vi.fn((key: string, value: string) => { mockStorage[key] = value; }),
+    removeItem: vi.fn((key: string) => { delete mockStorage[key]; }),
+    clear: vi.fn(() => { Object.keys(mockStorage).forEach((k) => delete mockStorage[k]); }),
+    key: vi.fn(),
     get length() { return Object.keys(mockStorage).length; },
   },
   writable: true,

@@ -31,9 +31,9 @@ class MockEventSource {
   readyState = 1;
   onmessage = null;
   onerror = null;
-  close = jest.fn();
-  addEventListener = jest.fn();
-  removeEventListener = jest.fn();
+  close = vi.fn();
+  addEventListener = vi.fn();
+  removeEventListener = vi.fn();
 }
 
 Object.defineProperty(window, 'EventSource', {
@@ -42,12 +42,12 @@ Object.defineProperty(window, 'EventSource', {
 });
 
 // Mock apiService
-const mockGetMessages = jest.fn();
-const mockCreateMessage = jest.fn();
-const mockGetConversations = jest.fn();
-const mockDeleteConversation = jest.fn();
+const mockGetMessages = vi.fn();
+const mockCreateMessage = vi.fn();
+const mockGetConversations = vi.fn();
+const mockDeleteConversation = vi.fn();
 
-jest.mock('@/services/api', () => ({
+vi.mock('@/services/api', () => ({
   apiService: {
     getMessages: (...args: unknown[]) => mockGetMessages(...args),
     createMessage: (...args: unknown[]) => mockCreateMessage(...args),
@@ -58,7 +58,7 @@ jest.mock('@/services/api', () => ({
 
 describe('Chat (/chat)', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorageMock.clear();
     localStorageMock.setItem('auth_token', 'test-token');
     localStorageMock.setItem('user_id', 'test-user');
@@ -76,7 +76,7 @@ describe('Chat (/chat)', () => {
 
   afterEach(() => {
     localStorageMock.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders page', () => {

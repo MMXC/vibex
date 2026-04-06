@@ -19,7 +19,7 @@ describe('AICard', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('ST-7.2: 卡片内容填充', () => {
@@ -207,7 +207,7 @@ describe('AICard', () => {
     });
 
     it('should call onClick when clicked', () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       const result: AIResult = {
         type: 'context',
         content: 'Content',
@@ -286,7 +286,7 @@ describe('AICard', () => {
 // Mock AIResultCards
 describe('AIResultCards', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('ST-7.1: 三列卡片布局', () => {
@@ -418,7 +418,7 @@ describe('AIResultCards', () => {
 
   describe('ST-7.3: 卡片点击展开详情', () => {
     it('should call onCardClick with context type', () => {
-      const onCardClick = jest.fn();
+      const onCardClick = vi.fn();
       const contextResult: AIResult = {
         type: 'context',
         content: 'Context Content',
@@ -438,7 +438,7 @@ describe('AIResultCards', () => {
     });
 
     it('should call onCardClick with model type', () => {
-      const onCardClick = jest.fn();
+      const onCardClick = vi.fn();
       const modelResult: AIResult = {
         type: 'model',
         content: 'Model Content',
@@ -458,7 +458,7 @@ describe('AIResultCards', () => {
     });
 
     it('should call onCardClick with flow type', () => {
-      const onCardClick = jest.fn();
+      const onCardClick = vi.fn();
       const flowResult: AIResult = {
         type: 'flow',
         content: 'Flow Content',

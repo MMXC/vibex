@@ -3,19 +3,23 @@
  */
 
 import { retry, DEFAULT_RETRY_CONFIG } from '@/services/api/retry';
-import axios from 'axios';
 
 // Mock axios
-vi.mock('axios');
+const mockIsAxiosError = vi.fn();
+vi.mock('axios', () => ({
+  __esModule: true,
+  default: { isAxiosError: mockIsAxiosError },
+  isAxiosError: mockIsAxiosError,
+}));
 
 describe('RetryService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('execute', () => {
@@ -30,10 +34,10 @@ describe('RetryService', () => {
 
     it('should retry on retryable error', async () => {
       const retryableError = new Error('Network error');
-      (axios.isAxiosError as unknown as jest.Mock).mockReturnValue(true);
+      mockIsAxiosError.mockReturnValue(true);
       Object.defineProperty(retryableError, 'response', { value: { status: 503 } });
 
-      const fn = jest
+      const fn = vi
         .fn()
         .mockRejectedValueOnce(retryableError)
         .mockResolvedValue('success');
@@ -41,7 +45,7 @@ describe('RetryService', () => {
       const resultPromise = retry.execute(fn);
       
       // Fast-forward through delay
-      await jest.runAllTimersAsync();
+      await vi.runAllTimers();
 
       const result = await resultPromise;
 
@@ -51,7 +55,7 @@ describe('RetryService', () => {
 
     it('should throw immediately on non-retryable error', async () => {
       const nonRetryableError = new Error('Bad request');
-      (axios.isAxiosError as unknown as jest.Mock).mockReturnValue(true);
+      mockIsAxiosError.mockReturnValue(true);
       Object.defineProperty(nonRetryableError, 'response', { value: { status: 400 } });
 
       const fn = vi.fn().mockRejectedValue(nonRetryableError);
@@ -72,7 +76,7 @@ describe('RetryService', () => {
   describe('isRetryable', () => {
     it('should return true for network errors (no response)', () => {
       const error = new Error('Network Error');
-      (axios.isAxiosError as unknown as jest.Mock).mockReturnValue(true);
+      mockIsAxiosError.mockReturnValue(true);
       Object.defineProperty(error, 'response', { value: undefined });
 
       expect(retry.isRetryable(error)).toBe(true);
@@ -80,7 +84,7 @@ describe('RetryService', () => {
 
     it('should return true for 500 status code', () => {
       const error = new Error('Internal Server Error');
-      (axios.isAxiosError as unknown as jest.Mock).mockReturnValue(true);
+      mockIsAxiosError.mockReturnValue(true);
       Object.defineProperty(error, 'response', { value: { status: 500 } });
 
       expect(retry.isRetryable(error)).toBe(true);
@@ -88,7 +92,7 @@ describe('RetryService', () => {
 
     it('should return true for 503 status code', () => {
       const error = new Error('Service Unavailable');
-      (axios.isAxiosError as unknown as jest.Mock).mockReturnValue(true);
+      mockIsAxiosError.mockReturnValue(true);
       Object.defineProperty(error, 'response', { value: { status: 503 } });
 
       expect(retry.isRetryable(error)).toBe(true);
@@ -96,7 +100,7 @@ describe('RetryService', () => {
 
     it('should return false for 400 status code', () => {
       const error = new Error('Bad Request');
-      (axios.isAxiosError as unknown as jest.Mock).mockReturnValue(true);
+      mockIsAxiosError.mockReturnValue(true);
       Object.defineProperty(error, 'response', { value: { status: 400 } });
 
       expect(retry.isRetryable(error)).toBe(false);
@@ -104,7 +108,7 @@ describe('RetryService', () => {
 
     it('should return false for 401 status code', () => {
       const error = new Error('Unauthorized');
-      (axios.isAxiosError as unknown as jest.Mock).mockReturnValue(true);
+      mockIsAxiosError.mockReturnValue(true);
       Object.defineProperty(error, 'response', { value: { status: 401 } });
 
       expect(retry.isRetryable(error)).toBe(false);
@@ -112,7 +116,7 @@ describe('RetryService', () => {
 
     it('should return false for non-axios errors', () => {
       const error = new Error('Generic error');
-      (axios.isAxiosError as unknown as jest.Mock).mockReturnValue(false);
+      mockIsAxiosError.mockReturnValue(false);
 
       expect(retry.isRetryable(error)).toBe(false);
     });

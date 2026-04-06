@@ -12,7 +12,7 @@ vi.mock('../../client', () => ({
 }));
 
 import { httpClient } from '../../client';
-const mockHttpClient = httpClient as jest.Mocked<typeof httpClient>;
+const mockHttpClient = httpClient as any<typeof httpClient>;
 
 describe('DddApi', () => {
   beforeEach(() => {

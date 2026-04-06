@@ -39,7 +39,7 @@ describe('GenerationProgress', () => {
   });
 
   it('should call onComplete when status changes to completed', () => {
-    const handleComplete = jest.fn();
+    const handleComplete = vi.fn();
     render(<GenerationProgress steps={mockSteps} status="completed" onComplete={handleComplete} />);
     
     expect(handleComplete).toHaveBeenCalled();

@@ -18,7 +18,7 @@ describe('ErrorBoundary', () => {
   // Suppress console.error for error boundary tests
   const originalError = console.error;
   beforeEach(() => {
-    console.error = jest.fn();
+    console.error = vi.fn();
   });
   afterEach(() => {
     console.error = originalError;
@@ -57,7 +57,7 @@ describe('ErrorBoundary', () => {
 
   describe('ErrorBoundary actions', () => {
     it('calls onError callback when error occurs', () => {
-      const handleError = jest.fn();
+      const handleError = vi.fn();
       render(
         <ErrorBoundary onError={handleError}>
           <BuggyComponent />

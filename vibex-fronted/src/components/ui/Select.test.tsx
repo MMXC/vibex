@@ -30,7 +30,7 @@ describe('Select', () => {
   });
 
   it('calls onChange when option is selected', () => {
-    const handleChange = jest.fn();
+    const handleChange = vi.fn();
     render(<Select options={options} onChange={handleChange} />);
 
     // Find the native select element and change it

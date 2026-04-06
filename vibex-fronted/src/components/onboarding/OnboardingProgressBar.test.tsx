@@ -14,19 +14,19 @@ const defaultStore = {
   status: 'in-progress' as const,
   currentStep: 'welcome' as const,
   completedSteps: [] as string[],
-  start: jest.fn(),
-  nextStep: jest.fn(),
-  prevStep: jest.fn(),
-  goToStep: jest.fn(),
-  completeStep: jest.fn(),
-  complete: jest.fn(),
-  skip: jest.fn(),
-  reset: jest.fn(),
+  start: vi.fn(),
+  nextStep: vi.fn(),
+  prevStep: vi.fn(),
+  goToStep: vi.fn(),
+  completeStep: vi.fn(),
+  complete: vi.fn(),
+  skip: vi.fn(),
+  reset: vi.fn(),
 };
 
-const mockUseOnboardingStore = jest.fn(() => defaultStore);
+const mockUseOnboardingStore = vi.fn(() => defaultStore);
 
-jest.mock('@/stores/onboarding/onboardingStore', () => ({
+vi.mock('@/stores/onboarding/onboardingStore', () => ({
   useOnboardingStore: () => mockUseOnboardingStore(),
   ONBOARDING_STEPS: [
     { id: 'welcome', title: 'Welcome', description: '', icon: '🎯' },
@@ -42,7 +42,7 @@ jest.mock('@/stores/onboarding/onboardingStore', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<object>) => (
       <div data-testid="motion-div" {...props}>{children}</div>
@@ -52,7 +52,7 @@ jest.mock('framer-motion', () => ({
 
 describe('OnboardingProgressBar', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseOnboardingStore.mockReturnValue(defaultStore);
   });
 

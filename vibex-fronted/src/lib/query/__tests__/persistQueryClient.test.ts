@@ -13,14 +13,14 @@ import { PersistedClient } from '@tanstack/react-query-persist-client';
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
-    getItem: jest.fn((key: string) => store[key] || null),
-    setItem: jest.fn((key: string, value: string) => {
+    getItem: vi.fn((key: string) => store[key] || null),
+    setItem: vi.fn((key: string, value: string) => {
       store[key] = value;
     }),
-    removeItem: jest.fn((key: string) => {
+    removeItem: vi.fn((key: string) => {
       delete store[key];
     }),
-    clear: jest.fn(() => {
+    clear: vi.fn(() => {
       store = {};
     }),
     get store() {
@@ -36,7 +36,7 @@ Object.defineProperty(global, 'localStorage', {
 describe('createLocalStoragePersister', () => {
   beforeEach(() => {
     localStorageMock.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('persistClient', () => {
@@ -134,7 +134,7 @@ describe('createLocalStoragePersister', () => {
 describe('clearQueryCache', () => {
   beforeEach(() => {
     localStorageMock.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should remove cache from localStorage', () => {
@@ -147,7 +147,7 @@ describe('clearQueryCache', () => {
 describe('getCacheInfo', () => {
   beforeEach(() => {
     localStorageMock.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return correct info when cache exists', () => {

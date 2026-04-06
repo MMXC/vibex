@@ -32,7 +32,7 @@ const mockFlows: Flow[] = [
 
 describe('FlowList', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render all flows', () => {
@@ -56,7 +56,7 @@ describe('FlowList', () => {
   });
 
   it('should call onSelect when flow clicked', () => {
-    const handleSelect = jest.fn();
+    const handleSelect = vi.fn();
     render(<FlowList flows={mockFlows} onSelect={handleSelect} />);
     
     fireEvent.click(screen.getByText('User Login Flow'));

@@ -13,13 +13,13 @@ vi.mock('axios', () => {
     __esModule: true,
     default: {
       interceptors: {
-        request: { use: jest.fn(() => ({ eject: vi.fn() })) },
-        response: { use: jest.fn(() => ({ eject: vi.fn() })) },
+        request: { use: vi.fn(() => ({ eject: vi.fn() })) },
+        response: { use: vi.fn(() => ({ eject: vi.fn() })) },
       },
-      create: jest.fn(() => ({
+      create: vi.fn(() => ({
         interceptors: {
-          request: { use: jest.fn(() => ({ eject: vi.fn() })) },
-          response: { use: jest.fn(() => ({ eject: vi.fn() })) },
+          request: { use: vi.fn(() => ({ eject: vi.fn() })) },
+          response: { use: vi.fn(() => ({ eject: vi.fn() })) },
         },
         post: mockPost,
         get: vi.fn(),

@@ -73,7 +73,7 @@ describe('PageTree', () => {
   });
 
   it('should call onNodeClick when node clicked', () => {
-    const handleClick = jest.fn();
+    const handleClick = vi.fn();
     render(<PageTree nodes={mockNodes} onNodeClick={handleClick} />);
     
     fireEvent.click(screen.getByText('Home Page'));

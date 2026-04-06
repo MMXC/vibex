@@ -10,12 +10,12 @@ const mockMatchMedia = (matches: boolean) => {
   const listeners: Array<(e: { matches: boolean }) => void> = [];
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
-    value: jest.fn().mockReturnValue({
+    value: vi.fn().mockReturnValue({
       matches,
       addEventListener: (_: string, handler: (e: { matches: boolean }) => void) => {
         listeners.push(handler);
       },
-      removeEventListener: jest.fn(),
+      removeEventListener: vi.fn(),
     }),
   });
   return { getListeners: () => listeners };
@@ -23,7 +23,7 @@ const mockMatchMedia = (matches: boolean) => {
 
 describe('useSystemTheme', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns dark when system prefers dark', () => {

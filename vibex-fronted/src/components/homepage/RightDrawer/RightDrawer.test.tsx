@@ -16,11 +16,11 @@ describe('RightDrawer', () => {
     sseStatus: 'idle' as SSEStatus,
     reconnectCount: 0,
     errorMessage: null,
-    onClose: jest.fn(),
+    onClose: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // ========== ST-5.1: SSE 连接状态显示 ==========

@@ -25,7 +25,7 @@ describe('JsonTreeRenderer', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Empty state', () => {

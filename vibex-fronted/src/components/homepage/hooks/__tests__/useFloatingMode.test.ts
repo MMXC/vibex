@@ -15,8 +15,8 @@ describe('useFloatingMode', () => {
 
   beforeEach(() => {
     capturedHandler = null;
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
 
     // Reset test interface to avoid cross-test pollution
     const win = window as Window & { __testScrollY?: number; __testScrollHeight?: number; __testInnerHeight?: number };
@@ -25,14 +25,14 @@ describe('useFloatingMode', () => {
     delete win.__testInnerHeight;
 
     // Intercept addEventListener to capture the handler
-    jest.spyOn(window, 'addEventListener').mockImplementation(
+    vi.spyOn(window, 'addEventListener').mockImplementation(
       (event: string, handler: (e: Event) => void) => {
         if (event === 'scroll') capturedHandler = handler;
         return undefined as unknown as () => void;
       }
     );
 
-    jest.spyOn(window, 'removeEventListener').mockImplementation(
+    vi.spyOn(window, 'removeEventListener').mockImplementation(
       (event: string) => {
         if (event === 'scroll') capturedHandler = null;
         return undefined as unknown as () => void;
@@ -41,7 +41,7 @@ describe('useFloatingMode', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   /**
@@ -121,10 +121,10 @@ describe('useFloatingMode', () => {
       simulateScroll(0); // schedules resume
       expect(result.current.isFloating).toBe(true);
 
-      act(() => { jest.advanceTimersByTime(999); });
+      act(() => { vi.advanceTimersByTime(999); });
       expect(result.current.isFloating).toBe(true);
 
-      act(() => { jest.advanceTimersByTime(1); });
+      act(() => { vi.advanceTimersByTime(1); });
       expect(result.current.isFloating).toBe(false);
     });
 
@@ -136,10 +136,10 @@ describe('useFloatingMode', () => {
 
       simulateScroll(0);
 
-      act(() => { jest.advanceTimersByTime(499); });
+      act(() => { vi.advanceTimersByTime(499); });
       expect(result.current.isFloating).toBe(true);
 
-      act(() => { jest.advanceTimersByTime(1); });
+      act(() => { vi.advanceTimersByTime(1); });
       expect(result.current.isFloating).toBe(false);
     });
 
@@ -151,13 +151,13 @@ describe('useFloatingMode', () => {
 
       simulateScroll(0);
 
-      act(() => { jest.advanceTimersByTime(500); });
+      act(() => { vi.advanceTimersByTime(500); });
       expect(result.current.isFloating).toBe(true);
 
       simulateScroll(240); // re-trigger while waiting
       expect(result.current.isFloating).toBe(true);
 
-      act(() => { jest.advanceTimersByTime(1000); });
+      act(() => { vi.advanceTimersByTime(1000); });
       expect(result.current.isFloating).toBe(true); // still floating
     });
   });
@@ -170,14 +170,14 @@ describe('useFloatingMode', () => {
     });
 
     it('onFloatingChange 回调在状态变化时被调用', () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       renderHook(() => useFloatingMode({ onFloatingChange: onChange }));
       simulateScroll(240);
       expect(onChange).toHaveBeenCalledWith(true);
     });
 
     it('onFloatingChange 仅在状态变化时触发', () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       renderHook(() => useFloatingMode({ onFloatingChange: onChange }));
       simulateScroll(240);
       const count = onChange.mock.calls.length;
@@ -188,14 +188,14 @@ describe('useFloatingMode', () => {
 
   describe('cleanup', () => {
     it('卸载时应清理 scroll listener', () => {
-      const removeSpy = jest.spyOn(window, 'removeEventListener');
+      const removeSpy = vi.spyOn(window, 'removeEventListener');
       const { unmount } = renderHook(() => useFloatingMode());
       unmount();
       expect(removeSpy).toHaveBeenCalledWith('scroll', expect.any(Function));
     });
 
     it('卸载时应清理 pending timer', () => {
-      const clearSpy = jest.spyOn(global, 'clearTimeout');
+      const clearSpy = vi.spyOn(global, 'clearTimeout');
       const { unmount } = renderHook(() => useFloatingMode({ resumeDelay: 1000 }));
       simulateScroll(240);
       simulateScroll(0); // schedules resume

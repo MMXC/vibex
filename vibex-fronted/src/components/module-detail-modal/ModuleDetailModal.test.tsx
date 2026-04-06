@@ -14,16 +14,16 @@ describe('ModuleDetailModal', () => {
   };
 
   it('should render when open', () => {
-    render(<ModuleDetailModal isOpen module={mockModule} onClose={jest.fn()} />);
+    render(<ModuleDetailModal isOpen module={mockModule} onClose={vi.fn()} />);
     expect(screen.getByText('Test Module')).toBeInTheDocument();
   });
 
   it('should show status', () => {
-    render(<ModuleDetailModal isOpen module={mockModule} onClose={jest.fn()} />);
+    render(<ModuleDetailModal isOpen module={mockModule} onClose={vi.fn()} />);
     expect(screen.getByText('✓ 完成')).toBeInTheDocument();
   });
 
   it('should not render when closed', () => {
-    render(<ModuleDetailModal isOpen={false} module={mockModule} onClose={jest.fn()} />);
+    render(<ModuleDetailModal isOpen={false} module={mockModule} onClose={vi.fn()} />);
   });
 });

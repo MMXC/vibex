@@ -123,7 +123,7 @@ describe('Epic 1 S1.2: abortGeneration()', () => {
 
   it('AC-S1.2: abortGeneration 调用后 abortControllerRef 置 null', () => {
     // Simulate having an AbortController
-    const mockAbort = jest.fn();
+    const mockAbort = vi.fn();
     const mockController = { abort: mockAbort, signal: { aborted: false } };
     useCanvasStore.setState({ abortControllerRef: mockController as unknown as AbortController });
 
@@ -133,7 +133,7 @@ describe('Epic 1 S1.2: abortGeneration()', () => {
   });
 
   it('AC-S1.2: abortGeneration 调用后 SSE 状态重置为 idle', () => {
-    const mockAbort = jest.fn();
+    const mockAbort = vi.fn();
     const mockController = { abort: mockAbort, signal: { aborted: false } };
     useCanvasStore.setState({ abortControllerRef: mockController as unknown as AbortController, sseStatus: 'connected' });
     useCanvasStore.getState().abortGeneration();
@@ -141,7 +141,7 @@ describe('Epic 1 S1.2: abortGeneration()', () => {
   });
 
   it('AC-S1.2: abortGeneration 调用后 flowGenerating 和 aiThinking 置 false', () => {
-    const mockAbort = jest.fn();
+    const mockAbort = vi.fn();
     const mockController = { abort: mockAbort, signal: { aborted: false } };
     useCanvasStore.setState({
       abortControllerRef: mockController as unknown as AbortController,

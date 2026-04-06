@@ -49,7 +49,7 @@ describe('PrototypePreview', () => {
   });
 
   it('calls onPageChange callback', () => {
-    const handlePageChange = jest.fn();
+    const handlePageChange = vi.fn();
     render(<PrototypePreview pages={mockPages} onPageChange={handlePageChange} />);
     // Check callback prop is accepted
     expect(handlePageChange).not.toHaveBeenCalled();

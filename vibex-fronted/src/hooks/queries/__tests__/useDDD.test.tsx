@@ -9,9 +9,9 @@ import { ReactNode } from 'react';
 import { useBoundedContexts, useDomainModels, useBusinessFlowQuery, useDDDAnalysis } from '@/hooks/queries/useDDD';
 
 // Mock fetch
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
-const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
+const mockFetch = global.fetch as anyedFunction<typeof fetch>;
 
 // Create a wrapper with QueryClient
 const createWrapper = () => {
@@ -30,7 +30,7 @@ const createWrapper = () => {
 
 describe('useBoundedContexts', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch bounded contexts', async () => {
@@ -62,7 +62,7 @@ describe('useBoundedContexts', () => {
 
 describe('useDomainModels', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch domain models', async () => {
@@ -94,7 +94,7 @@ describe('useDomainModels', () => {
 
 describe('useBusinessFlowQuery', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch business flow', async () => {
@@ -117,7 +117,7 @@ describe('useBusinessFlowQuery', () => {
 
 describe('useDDDAnalysis', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should provide combined query results', () => {

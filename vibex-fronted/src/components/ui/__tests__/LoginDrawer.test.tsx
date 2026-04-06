@@ -6,23 +6,23 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { LoginDrawer } from '../LoginDrawer';
 
 // Mock apiService
-jest.mock('@/services/api', () => ({
+vi.mock('@/services/api', () => ({
   apiService: {
-    login: jest.fn(),
-    register: jest.fn(),
+    login: vi.fn(),
+    register: vi.fn(),
   },
 }));
 
 import { apiService } from '@/services/api';
 
-const mockApi = apiService as jest.Mocked<typeof apiService>;
+const mockApi = apiService as anyed<typeof apiService>;
 
 describe('LoginDrawer', () => {
-  const mockOnClose = jest.fn();
-  const mockOnSuccess = jest.fn();
+  const mockOnClose = vi.fn();
+  const mockOnSuccess = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockOnClose.mockClear();
     mockOnSuccess.mockClear();
   });

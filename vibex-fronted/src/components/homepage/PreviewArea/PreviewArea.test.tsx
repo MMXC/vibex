@@ -6,7 +6,7 @@ describe('PreviewArea', () => {
   const defaultProps = {
     content: '',
     isLoading: false,
-    onRefresh: jest.fn(),
+    onRefresh: vi.fn(),
   };
 
   it('renders correctly', () => {
@@ -32,14 +32,14 @@ describe('PreviewArea', () => {
   });
 
   it('calls onRefresh when refresh button clicked', () => {
-    const onRefresh = jest.fn();
+    const onRefresh = vi.fn();
     render(<PreviewArea {...defaultProps} onRefresh={onRefresh} />);
     fireEvent.click(screen.getByText('🔄'));
     expect(onRefresh).toHaveBeenCalled();
   });
 
   it('disables refresh button when loading', () => {
-    const onRefresh = jest.fn();
+    const onRefresh = vi.fn();
     render(<PreviewArea {...defaultProps} isLoading={true} onRefresh={onRefresh} />);
     // Use getAllByText since "加载中..." appears in multiple places
     const buttons = screen.getAllByText('加载中...');

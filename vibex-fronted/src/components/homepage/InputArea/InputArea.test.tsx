@@ -7,26 +7,26 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { InputArea } from './InputArea';
 
 // Mock the plan-build store
-jest.mock('@/stores/plan-build-store', () => ({
-  usePlanBuildStore: jest.fn(() => ({
+vi.mock('@/stores/plan-build-store', () => ({
+  usePlanBuildStore: vi.fn(() => ({
     mode: 'build',
-    setMode: jest.fn(),
+    setMode: vi.fn(),
     isPlanLoading: false,
     isBuildLoading: false,
   })),
-  useCurrentMode: jest.fn(() => 'build'),
+  useCurrentMode: vi.fn(() => 'build'),
 }));
 
 describe('InputArea', () => {
   const defaultProps = {
     currentStep: 1,
     requirementText: '',
-    onRequirementChange: jest.fn(),
-    onGenerate: jest.fn(),
-    onGenerateDomainModel: jest.fn(),
-    onGenerateBusinessFlow: jest.fn(),
-    onCreateProject: jest.fn(),
-    onAnalyzePageStructure: jest.fn(),
+    onRequirementChange: vi.fn(),
+    onGenerate: vi.fn(),
+    onGenerateDomainModel: vi.fn(),
+    onGenerateBusinessFlow: vi.fn(),
+    onCreateProject: vi.fn(),
+    onAnalyzePageStructure: vi.fn(),
     isGenerating: false,
     boundedContexts: [],
     selectedContextIds: new Set<string>(),
@@ -36,7 +36,7 @@ describe('InputArea', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders header correctly', () => {
@@ -66,7 +66,7 @@ describe('InputArea', () => {
   });
 
   it('calls onRequirementChange when typing', () => {
-    const onRequirementChange = jest.fn();
+    const onRequirementChange = vi.fn();
     render(<InputArea {...defaultProps} onRequirementChange={onRequirementChange} />);
     // Verify component renders
     expect(screen.getByText('📝 需求录入')).toBeInTheDocument();
@@ -74,7 +74,7 @@ describe('InputArea', () => {
 
   it('calls onGenerate when generate button is clicked', () => {
     // At Step 1, button calls onGenerateFlow which maps to onGenerateBusinessFlow
-    const onGenerateBusinessFlow = jest.fn();
+    const onGenerateBusinessFlow = vi.fn();
     render(
       <InputArea 
         {...defaultProps} 

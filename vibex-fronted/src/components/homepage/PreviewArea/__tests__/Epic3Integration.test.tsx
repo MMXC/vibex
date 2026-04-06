@@ -15,7 +15,7 @@ import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { PreviewArea } from '../PreviewArea';
 
 // Mock all dependencies
-jest.mock('../../CardTree/CardTreeView', () => {
+vi.mock('../../CardTree/CardTreeView', () => {
   const React = require('react');
   return {
     CardTreeView: ({ 'data-testid': testId, boundedContexts, forceEnabled }: {
@@ -38,29 +38,29 @@ jest.mock('../../CardTree/CardTreeView', () => {
   };
 });
 
-jest.mock('@/components/ui/MermaidPreview', () => ({
+vi.mock('@/components/ui/MermaidPreview', () => ({
   MermaidPreview: () => <div data-testid="mermaid-preview">MermaidPreview</div>,
 }));
 
-jest.mock('../NodeTreeSelector', () => ({
+vi.mock('../NodeTreeSelector', () => ({
   NodeTreeSelector: () => <div data-testid="node-tree-selector">NodeTree</div>,
 }));
 
-jest.mock('@/stores/confirmationStore', () => {
+vi.mock('@/stores/confirmationStore', () => {
   const mockSelector = (s: { flowMermaidCode: unknown }) => s.flowMermaidCode;
   return {
-    useConfirmationStore: jest.fn((selector: typeof mockSelector) => {
+    useConfirmationStore: vi.fn((selector: typeof mockSelector) => {
       if (selector) return selector({ flowMermaidCode: null });
       return { flowMermaidCode: null };
     }),
   };
 });
 
-jest.mock('@/components/ui/MermaidPreview', () => ({
+vi.mock('@/components/ui/MermaidPreview', () => ({
   MermaidPreview: () => <div data-testid="mermaid-preview">MermaidPreview</div>,
 }));
 
-jest.mock('../NodeTreeSelector', () => ({
+vi.mock('../NodeTreeSelector', () => ({
   NodeTreeSelector: () => <div data-testid="node-tree-selector">NodeTree</div>,
 }));
 

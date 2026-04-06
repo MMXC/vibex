@@ -8,10 +8,10 @@ import React from 'react';
 import { useDDDStream, useDomainModelStream, useBusinessFlowStream } from '../useDDDStream';
 
 // Mock fetch globally
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 // Mock getApiUrl
-jest.mock('@/lib/api-config', () => ({
+vi.mock('@/lib/api-config', () => ({
   getApiUrl: (path: string) => `http://localhost:3000${path}`,
 }));
 
@@ -34,7 +34,7 @@ const createWrapper = () => {
 
 describe('useDDDStream', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should initialize with default state', () => {
@@ -49,7 +49,7 @@ describe('useDDDStream', () => {
 
   it('should update status to thinking when generateContexts is called', async () => {
     // Mock successful response
-    (global.fetch as jest.Mock).mockImplementation(() =>
+    (global.fetch as any).mockImplementation(() =>
       Promise.resolve({
         ok: true,
         body: null,
@@ -102,7 +102,7 @@ describe('useDDDStream', () => {
 
 describe('useDomainModelStream', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should initialize with default state', () => {
@@ -132,7 +132,7 @@ describe('useDomainModelStream', () => {
 
 describe('useBusinessFlowStream', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should initialize with default state', () => {

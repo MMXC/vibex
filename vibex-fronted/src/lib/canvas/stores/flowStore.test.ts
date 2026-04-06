@@ -5,18 +5,18 @@
 import { useFlowStore } from './flowStore';
 
 // Mock addMessage to avoid canvasStore dependency
-jest.mock('../canvasStore', () => ({
+vi.mock('../canvasStore', () => ({
   useCanvasStore: {
-    getState: () => ({ addMessage: jest.fn() }),
+    getState: () => ({ addMessage: vi.fn() }),
   },
 }));
 
 // Mock historyStore to avoid real history operations
-jest.mock('../historySlice', () => ({
+vi.mock('../historySlice', () => ({
   getHistoryStore: () => ({
-    recordSnapshot: jest.fn(),
-    undo: jest.fn(),
-    redo: jest.fn(),
+    recordSnapshot: vi.fn(),
+    undo: vi.fn(),
+    redo: vi.fn(),
   }),
 }));
 

@@ -22,39 +22,39 @@ const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 // Mock the error modules
-jest.mock('@/lib/error/ErrorCodeMapper', () => ({
+vi.mock('@/lib/error/ErrorCodeMapper', () => ({
   defaultErrorMapper: {
-    mapCode: jest.fn((code: string) => {
+    mapCode: vi.fn((code: string) => {
       const map: Record<string, { code: string; type: string; severity: string; message: string; userMessage: string; retryable: boolean }> = {
         'E1001': { code: 'E1001', type: 'network', severity: 'high', message: '网络错误', userMessage: '网络连接失败', retryable: true },
         'E1002': { code: 'E1002', type: 'timeout', severity: 'medium', message: '超时', userMessage: '请求超时', retryable: true },
       };
       return map[code] || null;
     }),
-    mapStatus: jest.fn((status: number) => null),
+    mapStatus: vi.fn((status: number) => null),
   },
 }));
 
-jest.mock('@/lib/error/RetryHandler', () => ({
+vi.mock('@/lib/error/RetryHandler', () => ({
   defaultRetryHandler: {
-    execute: jest.fn(async (fn: () => Promise<unknown>) => fn()),
+    execute: vi.fn(async (fn: () => Promise<unknown>) => fn()),
   },
 }));
 
 // Mock Toast
-jest.mock('@/components/ui/Toast', () => ({
+vi.mock('@/components/ui/Toast', () => ({
   useToast: () => ({
-    showToast: jest.fn(),
+    showToast: vi.fn(),
   }),
   toast: {
-    error: jest.fn(),
-    success: jest.fn(),
+    error: vi.fn(),
+    success: vi.fn(),
   },
 }));
 
 describe('useApiCall', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('initial state', () => {
@@ -76,8 +76,8 @@ describe('useApiCall', () => {
 
   describe('API function execution', () => {
     it('should execute API call successfully', async () => {
-      const mockApiFn = jest.fn().mockResolvedValue('test data');
-      const onSuccess = jest.fn();
+      const mockApiFn = vi.fn().mockResolvedValue('test data');
+      const onSuccess = vi.fn();
 
       const { result } = renderHook(() =>
         useApiCall({
@@ -96,8 +96,8 @@ describe('useApiCall', () => {
     });
 
     it('should handle API error', async () => {
-      const mockApiFn = jest.fn().mockRejectedValue(new Error('API Error'));
-      const onError = jest.fn();
+      const mockApiFn = vi.fn().mockRejectedValue(new Error('API Error'));
+      const onError = vi.fn();
 
       const { result } = renderHook(() =>
         useApiCall({
@@ -116,7 +116,7 @@ describe('useApiCall', () => {
     });
 
     it('should return null on error', async () => {
-      const mockApiFn = jest.fn().mockRejectedValue(new Error('API Error'));
+      const mockApiFn = vi.fn().mockRejectedValue(new Error('API Error'));
 
       const { result } = renderHook(() =>
         useApiCall({
@@ -135,7 +135,7 @@ describe('useApiCall', () => {
 
   describe('reset', () => {
     it('should reset all state', async () => {
-      const mockApiFn = jest.fn().mockResolvedValue('test data');
+      const mockApiFn = vi.fn().mockResolvedValue('test data');
 
       const { result } = renderHook(() =>
         useApiCall({
@@ -179,7 +179,7 @@ describe('useApiCall', () => {
     it('should use retry handler when enabled', async () => {
       const { defaultRetryHandler } = require('@/lib/error/RetryHandler');
       
-      const mockApiFn = jest.fn().mockResolvedValue('data');
+      const mockApiFn = vi.fn().mockResolvedValue('data');
 
       const { result } = renderHook(() =>
         useApiCall({
@@ -199,7 +199,7 @@ describe('useApiCall', () => {
     it('should not use retry handler when disabled', async () => {
       const { defaultRetryHandler } = require('@/lib/error/RetryHandler');
       
-      const mockApiFn = jest.fn().mockResolvedValue('data');
+      const mockApiFn = vi.fn().mockResolvedValue('data');
 
       const { result } = renderHook(() =>
         useApiCall({

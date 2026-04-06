@@ -13,13 +13,13 @@ import { MermaidRenderer } from './MermaidRenderer';
 import { mermaidManager } from '@/lib/mermaid/MermaidManager';
 
 // Mock mermaidManager
-jest.mock('@/lib/mermaid/MermaidManager', () => ({
+vi.mock('@/lib/mermaid/MermaidManager', () => ({
   mermaidManager: {
-    render: jest.fn(),
+    render: vi.fn(),
   },
 }));
 
-const mockMermaidRender = mermaidManager.render as jest.MockedFunction<
+const mockMermaidRender = mermaidManager.render as anyedFunction<
   typeof mermaidManager.render
 >;
 
@@ -32,7 +32,7 @@ describe('MermaidRenderer Component', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockMermaidRender.mockResolvedValue('<svg>Mock SVG</svg>');
   });
 
@@ -86,7 +86,7 @@ describe('MermaidRenderer Component', () => {
     });
 
     it('渲染完成后应该调用 onRenderComplete', async () => {
-      const onRenderComplete = jest.fn();
+      const onRenderComplete = vi.fn();
       render(<MermaidRenderer {...defaultProps} onRenderComplete={onRenderComplete} />);
 
       await waitFor(() => {
@@ -97,7 +97,7 @@ describe('MermaidRenderer Component', () => {
     it('渲染错误时应该显示错误信息', async () => {
       mockMermaidRender.mockRejectedValue(new Error('Syntax error'));
 
-      const onError = jest.fn();
+      const onError = vi.fn();
       render(<MermaidRenderer {...defaultProps} onError={onError} />);
 
       await waitFor(() => {

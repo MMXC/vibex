@@ -2,8 +2,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Auth from '@/app/auth/page';
 
 // Mock router
-const mockPush = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
   }),
@@ -16,8 +16,8 @@ jest.mock('next/navigation', () => ({
 const mockLogin = jest
   .fn()
   .mockResolvedValue({ token: 'test-token', user: { id: '1' } });
-const mockRegister = jest.fn().mockResolvedValue({ id: '1' });
-jest.mock('@/services/api/modules/auth', () => ({
+const mockRegister = vi.fn().mockResolvedValue({ id: '1' });
+vi.mock('@/services/api/modules/auth', () => ({
   authApi: {
     login: (...args: unknown[]) => mockLogin(...args),
     register: (...args: unknown[]) => mockRegister(...args),
@@ -26,7 +26,7 @@ jest.mock('@/services/api/modules/auth', () => ({
 
 describe('Auth (/auth)', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorage.clear();
   });
 

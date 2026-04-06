@@ -8,9 +8,9 @@ import { MermaidRenderer } from '../MermaidRenderer';
 import type { MermaidVisualizationData } from '@/types/visualization';
 
 // Mock the useMermaidVisualization hook
-const mockUseMermaidVisualization = jest.fn();
+const mockUseMermaidVisualization = vi.fn();
 
-jest.mock('@/hooks/useMermaidVisualization', () => ({
+vi.mock('@/hooks/useMermaidVisualization', () => ({
   useMermaidVisualization: (...args: unknown[]) =>
     mockUseMermaidVisualization(...args),
 }));
@@ -30,17 +30,17 @@ function mockHook(overrides: Partial<{
     isRendering: false,
     error: null,
     code: '',
-    rerender: jest.fn(),
-    clear: jest.fn(),
+    rerender: vi.fn(),
+    clear: vi.fn(),
     nodeInfo: [],
-    clickNode: jest.fn(),
+    clickNode: vi.fn(),
     ...overrides,
   });
 }
 
 describe('MermaidRenderer', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // ----- Normal rendering -----

@@ -128,7 +128,7 @@ describe('FloatingMode', () => {
   describe('ST-8.2: 恢复延迟配置', () => {
     it('默认 resumeDelay 为 1000ms', () => {
       // Verify the component accepts resumeDelay prop
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       render(
         <FloatingMode resumeDelay={1000} onFloatingChange={onChange}>
           <div>Content</div>
@@ -139,7 +139,7 @@ describe('FloatingMode', () => {
     });
 
     it('resumeDelay 可配置为不同值', () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       render(
         <FloatingMode resumeDelay={500} onFloatingChange={onChange}>
           <div>Content</div>
@@ -167,8 +167,8 @@ describe('FloatingMode', () => {
 
   describe('onFloatingChange callback', () => {
     it('悬浮状态变化时应调用 onFloatingChange', async () => {
-      const onChange = jest.fn();
-      jest.useFakeTimers();
+      const onChange = vi.fn();
+      vi.useFakeTimers();
 
       // We can't easily simulate scroll in the component test due to jsdom limitations,
       // but we can verify the callback prop is accepted and the component renders
@@ -181,7 +181,7 @@ describe('FloatingMode', () => {
       // Component renders successfully with callback prop
       expect(screen.getByTestId('floating-mode')).toBeInTheDocument();
 
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('启用 enabled=false 时组件渲染', () => {

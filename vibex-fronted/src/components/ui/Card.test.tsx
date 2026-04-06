@@ -52,7 +52,7 @@ describe('Card', () => {
   });
 
   it('handles click events', () => {
-    const handleClick = jest.fn();
+    const handleClick = vi.fn();
     const { container } = render(<Card onClick={handleClick}>Content</Card>);
     
     fireEvent.click(container.firstChild as Element);

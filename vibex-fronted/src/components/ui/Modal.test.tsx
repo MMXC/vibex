@@ -8,11 +8,11 @@ import { Modal } from '@/components/ui/Modal';
 describe('Modal', () => {
   const defaultProps = {
     open: true,
-    onClose: jest.fn(),
+    onClose: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // Basic render tests
@@ -156,7 +156,7 @@ describe('Modal', () => {
   });
 
   it('should handle maskClosable prop', () => {
-    const handleClose = jest.fn();
+    const handleClose = vi.fn();
     render(
       <Modal {...defaultProps} onClose={handleClose} maskClosable={true}>
         <div>Content</div>
@@ -166,7 +166,7 @@ describe('Modal', () => {
   });
 
   it('should handle maskClosable false', () => {
-    const handleClose = jest.fn();
+    const handleClose = vi.fn();
     render(
       <Modal {...defaultProps} onClose={handleClose} maskClosable={false}>
         <div>Content</div>

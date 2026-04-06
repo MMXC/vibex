@@ -34,7 +34,7 @@ describe('Epic 4: FlowChart - 业务流程', () => {
     F --> G[结束]`;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render flowchart', () => {

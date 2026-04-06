@@ -7,7 +7,7 @@ import { withErrorHandling, safeApiCall, ApiHandlerOptions } from '@/lib/apiHand
 describe('apiHandler', () => {
   describe('withErrorHandling', () => {
     it('should execute successful API call', async () => {
-      const mockFn = jest.fn().mockResolvedValue('success');
+      const mockFn = vi.fn().mockResolvedValue('success');
 
       const result = await withErrorHandling(mockFn);
 
@@ -19,7 +19,7 @@ describe('apiHandler', () => {
 
     it('should handle API error', async () => {
       const error = new Error('API Error');
-      const mockFn = jest.fn().mockRejectedValue(error);
+      const mockFn = vi.fn().mockRejectedValue(error);
 
       await expect(withErrorHandling(mockFn)).rejects.toThrow();
     });
@@ -32,7 +32,7 @@ describe('apiHandler', () => {
       ];
 
       for (const err of errors) {
-        const mockFn = jest.fn().mockRejectedValue(err);
+        const mockFn = vi.fn().mockRejectedValue(err);
         try {
           await withErrorHandling(mockFn);
         } catch (e) {
@@ -46,8 +46,8 @@ describe('apiHandler', () => {
         response: { status: 500, data: { message: 'Server Error' } }, 
         message: 'API Error' 
       };
-      const mockFn = jest.fn().mockRejectedValue(error);
-      const onError = jest.fn();
+      const mockFn = vi.fn().mockRejectedValue(error);
+      const onError = vi.fn();
 
       try {
         await withErrorHandling(mockFn, { onError });
@@ -60,7 +60,7 @@ describe('apiHandler', () => {
 
     it('should handle network error', async () => {
       const error = { code: 'ERR_NETWORK', message: 'Network Error' };
-      const mockFn = jest.fn().mockRejectedValue(error);
+      const mockFn = vi.fn().mockRejectedValue(error);
 
       try {
         await withErrorHandling(mockFn, { showToast: false });
@@ -73,8 +73,8 @@ describe('apiHandler', () => {
     });
 
     it('should call onSuccess callback', async () => {
-      const mockFn = jest.fn().mockResolvedValue('success');
-      const onSuccess = jest.fn();
+      const mockFn = vi.fn().mockResolvedValue('success');
+      const onSuccess = vi.fn();
 
       await withErrorHandling(mockFn, { onSuccess });
 
@@ -83,7 +83,7 @@ describe('apiHandler', () => {
 
     it('should handle custom error message', async () => {
       const error = new Error('API Error');
-      const mockFn = jest.fn().mockRejectedValue(error);
+      const mockFn = vi.fn().mockRejectedValue(error);
 
       try {
         await withErrorHandling(mockFn, { 
@@ -101,7 +101,7 @@ describe('apiHandler', () => {
 
   describe('safeApiCall', () => {
     it('should execute wrapped call', async () => {
-      const mockFn = jest.fn().mockResolvedValue('test');
+      const mockFn = vi.fn().mockResolvedValue('test');
 
       const result = await safeApiCall(mockFn);
 
@@ -110,13 +110,13 @@ describe('apiHandler', () => {
 
     it('should handle error in safeApiCall', async () => {
       const error = new Error('API Error');
-      const mockFn = jest.fn().mockRejectedValue(error);
+      const mockFn = vi.fn().mockRejectedValue(error);
 
       await expect(safeApiCall(mockFn)).rejects.toThrow();
     });
 
     it('should work with different return types', async () => {
-      const mockFn = jest.fn().mockResolvedValue({ data: 'test' });
+      const mockFn = vi.fn().mockResolvedValue({ data: 'test' });
 
       const result = await safeApiCall(mockFn);
 
@@ -124,7 +124,7 @@ describe('apiHandler', () => {
     });
 
     it('should handle async function', async () => {
-      const mockFn = jest.fn().mockResolvedValue(Promise.resolve('async result'));
+      const mockFn = vi.fn().mockResolvedValue(Promise.resolve('async result'));
 
       const result = await safeApiCall(mockFn);
 

@@ -16,11 +16,11 @@ describe('themeStorage', () => {
   const localStorageMock = (() => {
     let store: Record<string, string> = {};
     return {
-      getItem: jest.fn((key: string) => store[key] ?? null),
-      setItem: jest.fn((key: string, value: string) => {
+      getItem: vi.fn((key: string) => store[key] ?? null),
+      setItem: vi.fn((key: string, value: string) => {
         store[key] = value;
       }),
-      removeItem: jest.fn((key: string) => {
+      removeItem: vi.fn((key: string) => {
         delete store[key];
       }),
       clear: () => {
@@ -81,7 +81,7 @@ describe('themeStorage', () => {
     it('returns light when no matchMedia', () => {
       const original = window.matchMedia;
       Object.defineProperty(window, 'matchMedia', {
-        value: jest.fn(() => ({ matches: false })),
+        value: vi.fn(() => ({ matches: false })),
         writable: true,
       });
       expect(getSystemTheme()).toBe('light');

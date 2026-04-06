@@ -12,12 +12,12 @@ describe('Epic 2: InputArea - 需求录入', () => {
   const defaultProps = {
     currentStep: 1,
     requirementText: '',
-    onRequirementChange: jest.fn(),
-    onGenerate: jest.fn(),
-    onGenerateDomainModel: jest.fn(),
-    onGenerateBusinessFlow: jest.fn(),
-    onCreateProject: jest.fn(),
-    onAnalyzePageStructure: jest.fn(),
+    onRequirementChange: vi.fn(),
+    onGenerate: vi.fn(),
+    onGenerateDomainModel: vi.fn(),
+    onGenerateBusinessFlow: vi.fn(),
+    onCreateProject: vi.fn(),
+    onAnalyzePageStructure: vi.fn(),
     isGenerating: false,
     boundedContexts: [],
     selectedContextIds: new Set<string>(),
@@ -27,7 +27,7 @@ describe('Epic 2: InputArea - 需求录入', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should accept multiline text input', () => {

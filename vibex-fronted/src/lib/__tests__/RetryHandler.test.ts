@@ -3,7 +3,7 @@
  */
 
 // Mock axios for ErrorClassifier dependency
-jest.mock('axios', () => {
+vi.mock('axios', () => {
   class MockAxiosError extends Error {
     code?: string;
     response?: { status?: number; data?: any };
@@ -71,7 +71,7 @@ describe('RetryHandler', () => {
   describe('execute', () => {
     it('should succeed on first attempt', async () => {
       const handler = new RetryHandler({ maxRetries: 3 });
-      const fn = jest.fn().mockResolvedValue('success');
+      const fn = vi.fn().mockResolvedValue('success');
       
       const result = await handler.execute(fn);
       
@@ -82,7 +82,7 @@ describe('RetryHandler', () => {
     it('should not retry non-retryable errors (400)', async () => {
       const handler = new RetryHandler({ maxRetries: 3, baseDelay: 10 });
       const error = new AxiosError('Bad request', '400', undefined, { status: 400 });
-      const fn = jest.fn().mockRejectedValue(error);
+      const fn = vi.fn().mockRejectedValue(error);
       
       await expect(handler.execute(fn)).rejects.toThrow();
       expect(fn).toHaveBeenCalledTimes(1); // No retries for 400
@@ -134,7 +134,7 @@ describe('RetryHandler', () => {
 
     it('should use custom shouldRetry function', async () => {
       const handler = new RetryHandler({ maxRetries: 1, baseDelay: 10 });
-      const shouldRetry = jest.fn().mockReturnValue(true);
+      const shouldRetry = vi.fn().mockReturnValue(true);
       
       let callCount = 0;
       const fn = async () => {
@@ -150,8 +150,8 @@ describe('RetryHandler', () => {
 
     it('should not retry when shouldRetry returns false', async () => {
       const handler = new RetryHandler({ maxRetries: 3, baseDelay: 10 });
-      const shouldRetry = jest.fn().mockReturnValue(false);
-      const fn = jest.fn().mockRejectedValue(new Error('No retry'));
+      const shouldRetry = vi.fn().mockReturnValue(false);
+      const fn = vi.fn().mockRejectedValue(new Error('No retry'));
       
       await expect(handler.execute(fn, { shouldRetry })).rejects.toThrow();
       expect(fn).toHaveBeenCalledTimes(1);
@@ -193,7 +193,7 @@ describe('RetryHandler', () => {
   describe('Boundary Conditions', () => {
     it('should handle zero maxRetries', async () => {
       const handler = new RetryHandler({ maxRetries: 0, baseDelay: 10 });
-      const fn = jest.fn().mockRejectedValue(new Error('Fail'));
+      const fn = vi.fn().mockRejectedValue(new Error('Fail'));
       
       await expect(handler.execute(fn)).rejects.toThrow();
       expect(fn).toHaveBeenCalledTimes(1);
@@ -201,7 +201,7 @@ describe('RetryHandler', () => {
 
     it('should handle very large maxRetries', async () => {
       const handler = new RetryHandler({ maxRetries: 100, baseDelay: 10 });
-      const fn = jest.fn().mockResolvedValue('success');
+      const fn = vi.fn().mockResolvedValue('success');
       
       const result = await handler.execute(fn);
       expect(result).toBe('success');
@@ -209,7 +209,7 @@ describe('RetryHandler', () => {
 
     it('should handle synchronous function that returns value', async () => {
       const handler = new RetryHandler({ maxRetries: 1, baseDelay: 10 });
-      const fn = jest.fn().mockReturnValue('sync success');
+      const fn = vi.fn().mockReturnValue('sync success');
       
       const result = await handler.execute(fn);
       expect(result).toBe('sync success');

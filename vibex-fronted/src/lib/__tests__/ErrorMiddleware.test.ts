@@ -3,7 +3,7 @@
  */
 
 // Mock axios
-jest.mock('axios', () => {
+vi.mock('axios', () => {
   class MockAxiosError extends Error {
     code?: string;
     response?: { status?: number; data?: any };
@@ -54,7 +54,7 @@ describe('ErrorMiddleware', () => {
   describe('setToastFunction', () => {
     it('should set toast function', () => {
       const middleware = new ErrorMiddleware();
-      const toastFn = jest.fn();
+      const toastFn = vi.fn();
       
       middleware.setToastFunction(toastFn);
       
@@ -124,7 +124,7 @@ describe('ErrorMiddleware', () => {
     });
 
     it('should call onError callback', () => {
-      const onError = jest.fn();
+      const onError = vi.fn();
       const middleware = new ErrorMiddleware({ showToast: false, onError });
       const error = new Error('Test error');
       
@@ -151,7 +151,7 @@ describe('ErrorMiddleware', () => {
   describe('wrap', () => {
     it('should execute successful function', async () => {
       const middleware = new ErrorMiddleware({ enableRetry: false });
-      const fn = jest.fn().mockResolvedValue('success');
+      const fn = vi.fn().mockResolvedValue('success');
       
       const result = await middleware.wrap(fn);
       
@@ -161,15 +161,15 @@ describe('ErrorMiddleware', () => {
 
     it('should handle error when enableRetry is false', async () => {
       const middleware = new ErrorMiddleware({ enableRetry: false, showToast: false });
-      const fn = jest.fn().mockRejectedValue(new Error('Test error'));
+      const fn = vi.fn().mockRejectedValue(new Error('Test error'));
       
       await expect(middleware.wrap(fn)).rejects.toThrow('Test error');
     });
 
     it('should call handleError on failure', async () => {
       const middleware = new ErrorMiddleware({ enableRetry: false, showToast: false });
-      const handleErrorSpy = jest.spyOn(middleware, 'handleError');
-      const fn = jest.fn().mockRejectedValue(new Error('Test error'));
+      const handleErrorSpy = vi.spyOn(middleware, 'handleError');
+      const fn = vi.fn().mockRejectedValue(new Error('Test error'));
       
       try {
         await middleware.wrap(fn);
@@ -203,7 +203,7 @@ describe('ErrorMiddleware', () => {
   describe('createHandler', () => {
     it('should create a wrapped function', async () => {
       const middleware = new ErrorMiddleware({ enableRetry: false });
-      const fn = jest.fn().mockResolvedValue('success');
+      const fn = vi.fn().mockResolvedValue('success');
       
       const handler = middleware.createHandler(fn);
       const result = await handler();
@@ -213,7 +213,7 @@ describe('ErrorMiddleware', () => {
 
     it('should pass options to wrap', async () => {
       const middleware = new ErrorMiddleware({ enableRetry: false });
-      const fn = jest.fn().mockResolvedValue('success');
+      const fn = vi.fn().mockResolvedValue('success');
       
       const handler = middleware.createHandler(fn, { enableRetry: true });
       await handler();
@@ -275,7 +275,7 @@ describe('ErrorMiddleware', () => {
 
   describe('withErrorHandling', () => {
     it('should execute function with error handling', async () => {
-      const fn = jest.fn().mockResolvedValue('success');
+      const fn = vi.fn().mockResolvedValue('success');
       
       const result = await withErrorHandling(fn);
       
@@ -284,7 +284,7 @@ describe('ErrorMiddleware', () => {
     });
 
     it('should handle errors with custom options', async () => {
-      const fn = jest.fn().mockRejectedValue(new Error('Test error'));
+      const fn = vi.fn().mockRejectedValue(new Error('Test error'));
       
       await expect(withErrorHandling(fn, { showToast: false })).rejects.toThrow('Test error');
     });

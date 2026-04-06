@@ -16,11 +16,11 @@
 // Mock localStorage BEFORE importing the store to prevent Zustand persist rehydration
 Object.defineProperty(globalThis, 'localStorage', {
   value: {
-    getItem: jest.fn(() => null),
-    setItem: jest.fn(),
-    removeItem: jest.fn(),
-    clear: jest.fn(),
-    key: jest.fn(),
+    getItem: vi.fn(() => null),
+    setItem: vi.fn(),
+    removeItem: vi.fn(),
+    clear: vi.fn(),
+    key: vi.fn(),
     get length() { return 0; },
   },
   writable: true,

@@ -4,17 +4,17 @@
  */
 import { useContextStore } from './contextStore';
 
-jest.mock('./messageBridge', () => ({
-  postContextActionMessage: jest.fn(),
+vi.mock('./messageBridge', () => ({
+  postContextActionMessage: vi.fn(),
 }));
 
-jest.mock('../id', () => ({ generateId: () => 'mock-id' }));
+vi.mock('../id', () => ({ generateId: () => 'mock-id' }));
 
-jest.mock('../historySlice', () => ({
+vi.mock('../historySlice', () => ({
   getHistoryStore: () => ({
-    recordSnapshot: jest.fn(),
-    undo: jest.fn(),
-    redo: jest.fn(),
+    recordSnapshot: vi.fn(),
+    undo: vi.fn(),
+    redo: vi.fn(),
   }),
 }));
 

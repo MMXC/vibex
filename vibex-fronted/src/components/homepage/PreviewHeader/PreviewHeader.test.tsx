@@ -12,13 +12,13 @@ import { PreviewHeader } from './PreviewHeader';
 describe('PreviewHeader Component', () => {
   const defaultProps = {
     scale: 1,
-    onScaleChange: jest.fn(),
-    onExportPNG: jest.fn(),
-    onExportSVG: jest.fn(),
+    onScaleChange: vi.fn(),
+    onExportPNG: vi.fn(),
+    onExportSVG: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('ST-4.4: 缩放控制 (50%–200%)', () => {

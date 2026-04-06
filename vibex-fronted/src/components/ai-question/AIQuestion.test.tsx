@@ -12,7 +12,7 @@ const mockOptions: QuestionOption[] = [
 
 describe('AIQuestion', () => {
   it('should render question text', () => {
-    render(<AIQuestion question="What is your name?" onAnswer={jest.fn()} />);
+    render(<AIQuestion question="What is your name?" onAnswer={vi.fn()} />);
     
     expect(screen.getByText('What is your name?')).toBeInTheDocument();
   });
@@ -22,7 +22,7 @@ describe('AIQuestion', () => {
       <AIQuestion 
         question="Choose an option" 
         options={mockOptions} 
-        onAnswer={jest.fn()} 
+        onAnswer={vi.fn()} 
       />
     );
     
@@ -35,7 +35,7 @@ describe('AIQuestion', () => {
       <AIQuestion 
         question="Enter text" 
         placeholder="Type here..." 
-        onAnswer={jest.fn()} 
+        onAnswer={vi.fn()} 
       />
     );
     
@@ -43,7 +43,7 @@ describe('AIQuestion', () => {
   });
 
   it('should call onAnswer with text when submitted', () => {
-    const handleAnswer = jest.fn();
+    const handleAnswer = vi.fn();
     render(<AIQuestion question="Question?" onAnswer={handleAnswer} />);
     
     const input = screen.getByPlaceholderText('请输入你的回答...');
@@ -57,7 +57,7 @@ describe('AIQuestion', () => {
   });
 
   it('should select option when clicked', () => {
-    const handleAnswer = jest.fn();
+    const handleAnswer = vi.fn();
     render(
       <AIQuestion 
         question="Choose" 
@@ -76,7 +76,7 @@ describe('AIQuestion', () => {
     render(
       <AIQuestion 
         question="Question?" 
-        onAnswer={jest.fn()} 
+        onAnswer={vi.fn()} 
         disabled={true} 
       />
     );
@@ -89,7 +89,7 @@ describe('AIQuestion', () => {
     render(
       <AIQuestion 
         question="Question?" 
-        onAnswer={jest.fn()} 
+        onAnswer={vi.fn()} 
         loading={true} 
       />
     );
@@ -103,7 +103,7 @@ describe('AIQuestion', () => {
       <AIQuestion 
         question="Question?" 
         options={[]} 
-        onAnswer={jest.fn()} 
+        onAnswer={vi.fn()} 
       />
     );
     
@@ -111,7 +111,7 @@ describe('AIQuestion', () => {
   });
 
   it('should handle text input change', () => {
-    render(<AIQuestion question="Question?" onAnswer={jest.fn()} />);
+    render(<AIQuestion question="Question?" onAnswer={vi.fn()} />);
     
     const input = screen.getByPlaceholderText('请输入你的回答...');
     fireEvent.change(input, { target: { value: 'Test input' } });

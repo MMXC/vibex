@@ -111,7 +111,7 @@ describe('P2-2 useErrorHandler 验收', () => {
   });
 
   it('onError 回调被触发', () => {
-    const onError = jest.fn();
+    const onError = vi.fn();
     const { result } = renderHook(() => useErrorHandler({ onError }));
     act(() => {
       result.current.handleError(new Error('callback test'));

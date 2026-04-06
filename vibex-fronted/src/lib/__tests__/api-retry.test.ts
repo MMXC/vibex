@@ -11,25 +11,25 @@ import {
 } from '../api-retry';
 
 // Mock axios-retry
-jest.mock('axios-retry', () => ({
+vi.mock('axios-retry', () => ({
   __esModule: true,
-  default: jest.fn(),
+  default: vi.fn(),
 }));
 
 import axiosRetry from 'axios-retry';
 
 describe('api-retry', () => {
-  let mockAxiosInstance: jest.Mocked<AxiosInstance>;
+  let mockAxiosInstance: any<AxiosInstance>;
 
   beforeEach(() => {
     mockAxiosInstance = {
       interceptors: {
-        request: { use: jest.fn() },
-        response: { use: jest.fn() },
+        request: { use: vi.fn() },
+        response: { use: vi.fn() },
       },
     } as any;
     
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('configureAxiosRetry', () => {
@@ -66,7 +66,7 @@ describe('api-retry', () => {
     it('should handle import errors gracefully', async () => {
       // Temporarily override the dynamic import to fail
       const originalImport = global.import;
-      (global as any).import = jest.fn().mockRejectedValue(new Error('Module not found'));
+      (global as any).import = vi.fn().mockRejectedValue(new Error('Module not found'));
       
       // Should not throw
       await expect(
@@ -182,7 +182,7 @@ describe('retry integration with circuit breaker', () => {
     
     // Create a mock function that fails twice then succeeds
     let attempts = 0;
-    const mockFn = jest.fn().mockImplementation(() => {
+    const mockFn = vi.fn().mockImplementation(() => {
       attempts++;
       if (attempts < 3) {
         return Promise.reject(new Error('Temporary failure'));

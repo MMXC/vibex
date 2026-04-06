@@ -6,13 +6,13 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock Next.js
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
+    push: vi.fn(),
+    replace: vi.fn(),
   }),
   useSearchParams: () => ({
-    get: jest.fn((key) => {
+    get: vi.fn((key) => {
       if (key === 'projectId') return 'test-project';
       if (key === 'requirementId') return 'test-req';
       return null;
@@ -33,28 +33,28 @@ const localStorageMock = (() => {
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 // Mock API service
-jest.mock('@/services/api', () => ({
+vi.mock('@/services/api', () => ({
   apiService: {
-    getProject: jest.fn().mockResolvedValue({ id: 'test-project', name: 'Test Project' }),
-    getDomainEntities: jest.fn().mockResolvedValue([]),
-    getEntityRelations: jest.fn().mockResolvedValue([]),
+    getProject: vi.fn().mockResolvedValue({ id: 'test-project', name: 'Test Project' }),
+    getDomainEntities: vi.fn().mockResolvedValue([]),
+    getEntityRelations: vi.fn().mockResolvedValue([]),
   },
 }));
 
 // Mock React Flow
-jest.mock('@xyflow/react', () => ({
+vi.mock('@xyflow/react', () => ({
   ReactFlow: ({ children }: { children: React.ReactNode }) => <div data-testid="react-flow">{children}</div>,
   Controls: () => null,
   Background: () => null,
   MiniMap: () => null,
-  useNodesState: () => [[], jest.fn(), jest.fn()],
-  useEdgesState: () => [[], jest.fn(), jest.fn()],
-  addEdge: jest.fn(),
+  useNodesState: () => [[], vi.fn(), vi.fn()],
+  useEdgesState: () => [[], vi.fn(), vi.fn()],
+  addEdge: vi.fn(),
   MarkerType: { Arrow: 'arrow' },
 }));
 
 // Mock Monaco Editor
-jest.mock('@monaco-editor/react', () => ({
+vi.mock('@monaco-editor/react', () => ({
   Editor: () => <div data-testid="monaco-editor" />,
 }));
 

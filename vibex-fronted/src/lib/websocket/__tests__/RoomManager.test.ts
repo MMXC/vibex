@@ -5,7 +5,7 @@
 import { useRoomManager, type RoomMember } from '../RoomManager';
 
 // Mock zustand
-jest.mock('zustand', () => ({
+vi.mock('zustand', () => ({
   create: (fn) => fn(),
   persist: (fn) => fn,
 }));

@@ -8,15 +8,15 @@ import userEvent from '@testing-library/user-event';
 import { VisualizationPlatform } from '../VisualizationPlatform';
 
 // Mock next/navigation
-const mockUseSearchParams = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockUseSearchParams = vi.fn();
+vi.mock('next/navigation', () => ({
   useSearchParams: () => mockUseSearchParams(),
-  useRouter: () => ({ push: jest.fn(), replace: jest.fn() }),
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 }));
 
 // Mock FlowRenderer
-jest.mock('@/components/visualization/FlowRenderer', () => ({
-  FlowRenderer: jest.fn(({ data, showMinimap, onNodeClick }) => (
+vi.mock('@/components/visualization/FlowRenderer', () => ({
+  FlowRenderer: vi.fn(({ data, showMinimap, onNodeClick }) => (
     <div data-testid="flow-renderer">
       <span data-testid="flow-data">{JSON.stringify({ nodeCount: data?.nodes?.length ?? 0 })}</span>
       <button onClick={() => onNodeClick?.({ id: 'node-1' })}>click node</button>
@@ -25,8 +25,8 @@ jest.mock('@/components/visualization/FlowRenderer', () => ({
 }));
 
 // Mock lazy MermaidRenderer
-jest.mock('@/components/visualization/MermaidRenderer', () => ({
-  MermaidRenderer: jest.fn(({ code }) => (
+vi.mock('@/components/visualization/MermaidRenderer', () => ({
+  MermaidRenderer: vi.fn(({ code }) => (
     <div data-testid="mermaid-renderer">
       <span data-testid="mermaid-code">{code}</span>
     </div>
@@ -34,8 +34,8 @@ jest.mock('@/components/visualization/MermaidRenderer', () => ({
 }));
 
 // Mock lazy JsonTreeRenderer
-jest.mock('@/components/visualization/JsonTreeRenderer', () => ({
-  JsonTreeRenderer: jest.fn(({ data }) => (
+vi.mock('@/components/visualization/JsonTreeRenderer', () => ({
+  JsonTreeRenderer: vi.fn(({ data }) => (
     <div data-testid="json-tree-renderer">
       <span data-testid="json-data-type">{typeof data}</span>
     </div>
@@ -43,8 +43,8 @@ jest.mock('@/components/visualization/JsonTreeRenderer', () => ({
 }));
 
 // Mock ViewSwitcher
-jest.mock('@/components/visualization/ViewSwitcher', () => ({
-  ViewSwitcher: jest.fn(({ value, onChange }) => (
+vi.mock('@/components/visualization/ViewSwitcher', () => ({
+  ViewSwitcher: vi.fn(({ value, onChange }) => (
     <div data-testid="view-switcher" data-value={value}>
       <button onClick={() => onChange('flow')}>Flow</button>
       <button onClick={() => onChange('mermaid')}>Mermaid</button>
@@ -60,7 +60,7 @@ describe('VisualizationPlatform', () => {
 
   beforeEach(() => {
     mockUseSearchParams.mockReturnValue(new URLSearchParams());
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('rendering', () => {
@@ -109,7 +109,7 @@ describe('VisualizationPlatform', () => {
     });
 
     it('calls onViewChange when view switches', async () => {
-      const onViewChange = jest.fn();
+      const onViewChange = vi.fn();
       render(
         <VisualizationPlatform
           initialType="flow"
@@ -200,7 +200,7 @@ describe('VisualizationPlatform', () => {
 
   describe('node selection callback', () => {
     it('calls onNodeSelect when a node is clicked', async () => {
-      const onNodeSelect = jest.fn();
+      const onNodeSelect = vi.fn();
       render(
         <VisualizationPlatform
           initialType="flow"

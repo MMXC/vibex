@@ -45,11 +45,11 @@ const TestComponent = () => {
 
 describe('Toast', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('ToastProvider', () => {
@@ -155,7 +155,7 @@ describe('Toast', () => {
       expect(screen.getByText('Success message')).toBeInTheDocument();
 
       await act(async () => {
-        jest.advanceTimersByTime(3000);
+        vi.advanceTimersByTime(3000);
       });
 
       expect(screen.queryByText('Success message')).not.toBeInTheDocument();
@@ -175,7 +175,7 @@ describe('Toast', () => {
       expect(screen.getByText('Custom duration')).toBeInTheDocument();
 
       await act(async () => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
 
       expect(screen.queryByText('Custom duration')).not.toBeInTheDocument();

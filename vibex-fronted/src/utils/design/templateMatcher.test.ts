@@ -10,7 +10,7 @@ describe('Template Matcher', () => {
   ];
 
   const mockMatcher = {
-    match: jest.fn((text: string) => {
+    match: vi.fn((text: string) => {
       for (const template of mockTemplates) {
         for (const keyword of template.keywords) {
           if (text.includes(keyword)) {
@@ -20,12 +20,12 @@ describe('Template Matcher', () => {
       }
       return { matched: false, template: null };
     }),
-    getAllTemplates: jest.fn(() => mockTemplates),
-    getTemplateById: jest.fn((id: string) => mockTemplates.find(t => t.id === id)),
+    getAllTemplates: vi.fn(() => mockTemplates),
+    getTemplateById: vi.fn((id: string) => mockTemplates.find(t => t.id === id)),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Template Matching', () => {

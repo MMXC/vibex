@@ -4,23 +4,26 @@
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { importOriginal } from 'vitest';
 import { FlowRenderer } from '../FlowRenderer';
 import type { FlowVisualizationRaw } from '@/types/visualization';
 
 // Mock reactflow to provide BackgroundVariant
-jest.mock('@xyflow/react', () => ({
-  ...jest.requireActual('@xyflow/react'),
-  BackgroundVariant: {
-    Lines: 'lines',
-    Dots: 'dots',
+vi.mock('@xyflow/react', async () => {
+  const actual = await importOriginal<typeof import('@xyflow/react')>();
+  return {
+    ...actual,
+    BackgroundVariant: {
+      Lines: 'lines',
+      Dots: 'dots',
     Cross: 'cross',
   },
 }));
 
 // Mock FlowEditor to avoid ReactFlow rendering in tests
-jest.mock('@/components/ui/FlowEditor', () => ({
+vi.mock('@/components/ui/FlowEditor', () => ({
   __esModule: true,
-  default: jest.fn(({ initialNodes, initialEdges, showMiniMap, ...props }) => (
+  default: vi.fn(({ initialNodes, initialEdges, showMiniMap, ...props }) => (
     <div data-testid="mock-flow-editor">
       <span data-testid="mock-node-count">{initialNodes?.length ?? 0}</span>
       <span data-testid="mock-edge-count">{initialEdges?.length ?? 0}</span>
@@ -31,8 +34,8 @@ jest.mock('@/components/ui/FlowEditor', () => ({
 }));
 
 // Mock visualizationStore to isolate FlowRenderer — returns empty by default
-jest.mock('@/stores/visualizationStore', () => ({
-  useVisualizationStore: jest.fn(() => ({
+vi.mock('@/stores/visualizationStore', () => ({
+  useVisualizationStore: vi.fn(() => ({
     visualizationData: null,
     options: {
       zoom: 1,
@@ -40,7 +43,7 @@ jest.mock('@/stores/visualizationStore', () => ({
       searchQuery: '',
       showMinimap: true,
     },
-    setOption: jest.fn(),
+    setOption: vi.fn(),
   })),
 }));
 
@@ -54,7 +57,7 @@ describe('FlowRenderer', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render empty state when data is null', () => {
@@ -90,7 +93,7 @@ describe('FlowRenderer', () => {
   });
 
   it('should pass onNodeClick prop', () => {
-    const onNodeClick = jest.fn();
+    const onNodeClick = vi.fn();
     render(<FlowRenderer data={minimalData} onNodeClick={onNodeClick} />);
     // The prop should be passed (FlowEditor mock captures it)
     const propsEl = screen.getByTestId('mock-props');
@@ -98,14 +101,14 @@ describe('FlowRenderer', () => {
   });
 
   it('should pass onInit prop', () => {
-    const onInit = jest.fn();
+    const onInit = vi.fn();
     render(<FlowRenderer data={minimalData} onInit={onInit} />);
     const propsEl = screen.getByTestId('mock-props');
     expect(propsEl.textContent).toContain('onInit');
   });
 
   it('should pass onConnect prop', () => {
-    const onConnect = jest.fn();
+    const onConnect = vi.fn();
     render(<FlowRenderer data={minimalData} onConnect={onConnect} />);
     const propsEl = screen.getByTestId('mock-props');
     expect(propsEl.textContent).toContain('onConnect');

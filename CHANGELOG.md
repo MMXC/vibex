@@ -7,6 +7,13 @@
 - ST-11: clarificationId DB indexes added
 - **提交**: `dfd08889` (ST-09 PrismaPoolManager/isWorkers guard)
 
+### Added (vibex-dev-security-20260410 E4: TypeScript类型清理) — 2026-04-06
+- **E4 TypeScript 类型清理**: 移除 `as any`，替换为正确类型
+  - `routes/prototype-preview.ts`: `(generatedPage as any).component` → `isGeneratedPage()` 类型守卫
+  - `body.type as any` → `ComponentType` enum
+  - `body.variant as any` → 字面量联合类型 `'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'`
+- **提交**: working tree (reviewer staged)
+
 ### Added (vibex-dev-security-20260410 E3: 输入校验) — 2026-04-06
 - **E3 输入校验**: Zod schema validation for all canvas API routes
   - `schemas/canvas.ts`: canvasGenerateSchema (projectId cuid, pageIds min 1, .strict())

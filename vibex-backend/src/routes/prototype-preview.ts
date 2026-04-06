@@ -9,7 +9,7 @@
 
 import { Hono } from 'hono';
 import { queryOne, queryDB, executeDB, generateId, Env } from '@/lib/db';
-import { createUIGeneratorService, UIGeneratorService, UIGeneratorOptions, UIGenerationResult, GeneratedComponent, GeneratedPage } from '@/services/ui-generator';
+import { createUIGeneratorService, UIGeneratorService, UIGeneratorOptions, UIGenerationResult, GeneratedComponent, GeneratedPage, ComponentType } from '@/services/ui-generator';
 
 /** Type guard: is this a GeneratedPage (has .component sub-field)? */
 function isGeneratedPage(val: GeneratedPage | GeneratedComponent): val is GeneratedPage {
@@ -414,7 +414,7 @@ prototypePreview.post('/', async (c) => {
     const generatedPage = result.data;
     const previewId = generateId();
     const pageData2 = 'components' in generatedPage ? generatedPage : null;
-    const componentData2 = 'component' in generatedPage ? (generatedPage as any).component : null;
+    const componentData2 = isGeneratedPage(generatedPage) ? generatedPage.component : null;
     
     const preview: PreviewResponse['preview'] = {
       id: previewId,
@@ -497,7 +497,7 @@ prototypePreview.post('/component', async (c) => {
     // Generate component
     const result = await uiGenerator.generateComponent({
       name: body.name || 'CustomComponent',
-      type: (body.type as any) || 'custom',
+      type: (body.type as ComponentType) || 'custom',
       description: body.description,
     }, generatorOptions);
     
@@ -575,7 +575,7 @@ prototypePreview.post('/quick/:type', async (c) => {
     
     switch (type) {
       case 'button':
-        result = await uiGenerator.quickButton(body.variant as any || 'primary', generatorOptions);
+        result = await uiGenerator.quickButton((body.variant as 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger') || 'primary', generatorOptions);
         break;
       case 'input':
         result = await uiGenerator.quickInput(generatorOptions);
@@ -795,7 +795,7 @@ prototypePreview.get('/snapshot/:id', async (c) => {
     const generatedPage = result.data;
     const previewId = generateId();
     const pageData3 = 'components' in generatedPage ? generatedPage : null;
-    const componentData3 = 'component' in generatedPage ? (generatedPage as any).component : null;
+    const componentData3 = isGeneratedPage(generatedPage) ? generatedPage.component : null;
     
     const preview: PreviewResponse['preview'] = {
       id: previewId,

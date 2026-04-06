@@ -1,6 +1,6 @@
 // services/context/SessionManager.ts - 会话管理器
 
-import { devDebug } from '../../lib/log-sanitizer';
+import { debug } from '@/lib/logger';
 import {
   SessionContext,
   SessionStats,
@@ -46,7 +46,7 @@ export class SessionManager {
         createdAt: Date.now(),
         updatedAt: Date.now(),
       })
-      devDebug(`[SessionManager] Created new session: ${sessionId}`)
+      debug(`[SessionManager] Created new session: ${sessionId}`)
     }
     return this.sessions.get(sessionId)!
   }
@@ -75,7 +75,7 @@ export class SessionManager {
     this.sessions.delete(sessionId)
     this.confirmations.delete(sessionId)
     if (existed) {
-      devDebug(`[SessionManager] Deleted session: ${sessionId}`)
+      debug(`[SessionManager] Deleted session: ${sessionId}`)
     }
     return existed
   }
@@ -107,11 +107,11 @@ export class SessionManager {
     session.tokenCount += estimateTokens(msgWithTimestamp.content)
     session.updatedAt = Date.now()
 
-    devDebug(`[SessionManager] Added message to ${sessionId}, total tokens: ${session.tokenCount}`)
+    debug(`[SessionManager] Added message to ${sessionId}, total tokens: ${session.tokenCount}`)
 
     // 检查是否需要压缩
     if (this.compressionEngine.needsCompression(session)) {
-      devDebug(`[SessionManager] Triggering compression for ${sessionId}`)
+      debug(`[SessionManager] Triggering compression for ${sessionId}`)
       await this.compressionEngine.compress(session)
     }
   }
@@ -156,7 +156,7 @@ export class SessionManager {
     const session = this.getOrCreateSession(sessionId)
     session.structuredContext = context
     session.updatedAt = Date.now()
-    devDebug(`[SessionManager] Set structured context for ${sessionId}`)
+    debug(`[SessionManager] Set structured context for ${sessionId}`)
   }
 
   /**
@@ -301,7 +301,7 @@ export class SessionManager {
     if (!confirmation) return false
 
     confirmation.isConfirmed = true
-    devDebug(`[SessionManager] Compression confirmed for ${sessionId}`)
+    debug(`[SessionManager] Compression confirmed for ${sessionId}`)
     return true
   }
 
@@ -322,7 +322,7 @@ export class SessionManager {
 
     this.confirmations.delete(sessionId)
 
-    devDebug(`[SessionManager] Compression rejected for ${sessionId}, restored ${session.messages.length} messages`)
+    debug(`[SessionManager] Compression rejected for ${sessionId}, restored ${session.messages.length} messages`)
     return true
   }
 
@@ -337,7 +337,7 @@ export class SessionManager {
     session.tokenCount = estimateMessagesTokens(session.messages) + estimateTokens(newSummary)
     session.updatedAt = Date.now()
 
-    devDebug(`[SessionManager] Summary updated for ${sessionId}`)
+    debug(`[SessionManager] Summary updated for ${sessionId}`)
     return true
   }
 
@@ -377,7 +377,7 @@ export class SessionManager {
     }
 
     if (cleaned > 0) {
-      devDebug(`[SessionManager] Cleaned up ${cleaned} expired sessions`)
+      debug(`[SessionManager] Cleaned up ${cleaned} expired sessions`)
     }
 
     return cleaned

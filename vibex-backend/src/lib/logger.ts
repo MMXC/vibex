@@ -19,7 +19,7 @@ export interface ResponseLog {
 }
 
 export interface LogEntry {
-  type: 'request' | 'response' | 'error'
+  type: 'request' | 'response' | 'error' | 'debug' | 'warn'
   request?: RequestLog
   response?: ResponseLog
   error?: {
@@ -139,6 +139,35 @@ function log(level: LogLevel, entry: LogEntry): void {
       safeError(JSON.stringify(logObject))
       break
   }
+}
+
+/**
+ * Debug-level logger — outputs only when LOG_LEVEL=debug
+ * E1-S2: replaces devDebug calls
+ */
+export function debug(message: string, data?: unknown): void {
+  const level = process.env.LOG_LEVEL || 'info';
+  if (level !== 'debug') return;
+
+  const entry: LogEntry = {
+    type: 'debug',
+    // @ts-ignore - debug type
+    debug: { message, ...(typeof data === 'object' && data !== null ? { data } : {}) },
+  };
+  log('debug', entry);
+}
+
+/**
+ * Warn-level logger — replaces console.warn
+ * E1-S3: replaces console.error with context
+ */
+export function warn(message: string, data?: unknown): void {
+  const entry: LogEntry = {
+    type: 'warn',
+    // @ts-ignore - warn type
+    warn: { message, ...(typeof data === 'object' && data !== null ? { data } : {}) },
+  };
+  log('warn', entry);
 }
 
 /**

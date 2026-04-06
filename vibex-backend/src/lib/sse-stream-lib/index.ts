@@ -8,7 +8,7 @@
  */
 
 import { CloudflareEnv } from '@/lib/env';
-import { devDebug } from '@/lib/log-sanitizer';
+import { debug } from '@/lib/logger';
 import { filterInvalidContexts } from '@/lib/bounded-contexts-filter';
 
 // =============================================================================
@@ -68,7 +68,7 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
       // Auto-abort after 10 seconds to prevent Worker hanging
       addTimer(() => {
         if (!aborted) {
-          devDebug('[SSE Stream] Timeout reached (10s), aborting AI calls');
+          debug('[SSE Stream] Timeout reached (10s), aborting AI calls');
           abortController?.abort();
         }
       }, 10_000);
@@ -76,7 +76,7 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
       // Forward client-disconnect signal (request.signal) into our abort controller
       if (requestSignal) {
         requestSignal.addEventListener('abort', () => {
-          devDebug('[SSE Stream] Client disconnected, aborting stream');
+          debug('[SSE Stream] Client disconnected, aborting stream');
           abortController?.abort();
         });
       }
@@ -85,7 +85,7 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
       localSignal.addEventListener('abort', () => {
         if (!aborted) {
           aborted = true;
-          devDebug('[SSE Stream] Abort signal received, closing stream');
+          debug('[SSE Stream] Abort signal received, closing stream');
           try {
             controller.close();
           } catch {
@@ -95,7 +95,7 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
       });
 
       try {
-        devDebug('[SSE Stream] Starting analysis for requirement:', requirement.substring(0, 100));
+        debug('[SSE Stream] Starting analysis for requirement:', requirement.substring(0, 100));
 
         const { createAIService } = await import('@/services/ai-service');
         const aiService = createAIService(env);
@@ -236,7 +236,7 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
           });
 
         } catch (err) {
-          devDebug('[SSE Stream] step_context error:', err);
+          debug('[SSE Stream] step_context error:', err);
           sendSSE(controller, 'step_context', {
             content: 'Bounded context analysis completed',
             mermaidCode: '',
@@ -298,7 +298,7 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
           });
 
         } catch (err) {
-          devDebug('[SSE Stream] step_model error:', err);
+          debug('[SSE Stream] step_model error:', err);
           sendSSE(controller, 'step_model', {
             content: 'Domain model analysis completed',
             mermaidCode: '',
@@ -342,7 +342,7 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
           });
 
         } catch (err) {
-          devDebug('[SSE Stream] step_flow error:', err);
+          debug('[SSE Stream] step_flow error:', err);
           sendSSE(controller, 'step_flow', {
             content: 'Business flow analysis completed',
             mermaidCode: '',
@@ -392,7 +392,7 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
           });
 
         } catch (err) {
-          devDebug('[SSE Stream] step_components error:', err);
+          debug('[SSE Stream] step_components error:', err);
           sendSSE(controller, 'step_components', {
             content: 'Component analysis completed',
             mermaidCode: '',
@@ -407,11 +407,11 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
           summary: 'Analysis complete',
         });
 
-        devDebug('[SSE Stream] Stream completed for project:', projectId);
+        debug('[SSE Stream] Stream completed for project:', projectId);
 
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Stream processing failed';
-        devDebug('[SSE Stream] Error:', errorMessage);
+        debug('[SSE Stream] Error:', errorMessage);
         try {
           sendSSE(controller, 'error', { message: errorMessage, code: 'STREAM_ERROR' });
         } catch {
@@ -433,7 +433,7 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
     },
     cancel() {
       // Called when ReadableStream is cancelled (client disconnect)
-      devDebug('[SSE Stream] Stream cancelled (client disconnect)');
+      debug('[SSE Stream] Stream cancelled (client disconnect)');
       timers.forEach(t => clearTimeout(t));
       timers.length = 0;
       abortController?.abort();

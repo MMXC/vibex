@@ -1,3 +1,10 @@
+### Added (vibex-p0-fixes-20260409 E5: 架构治理) — 2026-04-06
+- **E5 KV Namespace IDs**: wrangler.toml 替换为真实 namespace IDs
+  - COLLABORATION_KV: `f0dde43e5e274918a54349f959d57410`
+  - NOTIFICATION_KV: `1e01fb6a0da84d90870c800df2c6303a`
+- **E5 TRACKING.md**: 建立提案追踪表格 (E1-E6 执行状态)
+- **提交**: `8d35ade5`, `1e39d602`
+
 ### Added (vibex-p0-fixes-20260409 E4: 性能索引优化) — 2026-04-06
 - **CollaborationService KV 迁移**: fs.* → Cloudflare Workers KV (COLLABORATION_KV)
   - acquireLock/hasLock/validateLock/releaseLock 全部迁移

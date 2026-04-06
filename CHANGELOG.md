@@ -37,6 +37,10 @@
 - **E1 vitest 兼容性**: 修复 vitest mock 方法缺失问题
 - **提交**: `99c089e5`
 
+### Added (vibex-backend-fixes-20260410 E2: SSE超时修复) — 2026-04-06
+- **E2 SSE timeout**: client-disconnect abort + 30s hard timeout to all SSE routes
+- **提交**: `8a42d126`
+
 ### Added (vibex-dev-security-20260410 E1: API认证中间件) — 2026-04-06
 - **E1 apiAuth.ts**: JWT auth middleware for all protected API routes
   - `checkAuth/requireAuth/withAuth/optionalAuth` helpers

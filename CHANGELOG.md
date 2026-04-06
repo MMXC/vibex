@@ -1,3 +1,16 @@
+### Added (vibex-proposals-summary-20260411 E-P0-2: ESLint no-explicit-any) — 2026-04-07
+- **E-P0-2 ESLint no-explicit-any 清理**: 9 个高优先级文件的类型清理
+  - `routes/ddd.ts`: AIPlanResult interface + typed AI responses
+  - `routes/project-snapshot.ts`: typed DB row interfaces
+  - `lib/ui-schema.ts`: unknown types for UI schemas
+  - `lib/cache.ts`: CacheEntry<T = unknown> + typed serializers
+  - `lib/contract/OpenAPIGenerator.ts`: typed route handlers + Zod schemas
+  - `schemas/security.ts`: Record<string, unknown> for AST paths
+  - `lib/errorHandler.test.ts`: MockContext typed interface
+  - `app/api/plan/analyze/route.ts`: typed generateJSON<>
+  - `routes/plan.ts`: typed AI response interfaces
+  - 提交: `64d93c21`, `3555a9d1`
+
 ### Added (vibex-proposals-summary-20260411 E-P0-1: P0 Tech Debt) — 2026-04-07
 - **E-P0-1 P0 Tech Debt 紧急修复**: 完成 P0-9 和 P0-17
   - **P0-9 PrismaClient Workers Guard**: 12 个 API 路由 + `routes/project-settings.ts` 的 `new PrismaClient()` → 全局单例 `@/lib/prisma`，防止 Workers 内存泄漏

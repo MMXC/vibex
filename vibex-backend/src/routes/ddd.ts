@@ -449,7 +449,7 @@ Respond ONLY with the JSON object, no other text.`
     
     try {
       if (result.success && result.data && result.data.domainModels && Array.isArray(result.data.domainModels)) {
-        domainModels = result.data.domainModels.map((item, index) => ({
+        domainModels = result.data.domainModels.map((item, _index) => ({
           id: `dm-${generateId()}-${index}`,
           name: item.name,
           contextId: item.contextId,
@@ -630,7 +630,7 @@ ${contextInfo}
           await new Promise(r => setTimeout(r, 100))
           
           // Transform to domain models
-          const domainModels = result.data.domainModels.map((item, index) => ({
+          const domainModels = result.data.domainModels.map((item, _index) => ({
             id: `dm-${generateId()}-${index}`,
             name: item.name || `DomainModel${index}`,
             contextId: item.contextId || 'default',

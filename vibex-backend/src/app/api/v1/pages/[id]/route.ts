@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { cuidSchema } from '@/schemas/common';
+import { AppError, ValidationError } from '@/lib/errors';
+import { errorToResponse } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +13,13 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+
+    // E3: Validate id format
+    const parsed = cuidSchema.safeParse(id);
+    if (!parsed.success) {
+      const error = new ValidationError(`Invalid page ID format: ${id}`);
+      return NextResponse.json(errorToResponse(error), { status: 400 });
+    }
 
     const page = await prisma.page.findUnique({
       where: { id },
@@ -42,6 +52,14 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
+
+    // E3: Validate id format
+    const parsed = cuidSchema.safeParse(id);
+    if (!parsed.success) {
+      const error = new ValidationError(`Invalid page ID format: ${id}`);
+      return NextResponse.json(errorToResponse(error), { status: 400 });
+    }
+
     const body = await request.json();
     const { name, content } = body;
 
@@ -73,6 +91,13 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
+
+    // E3: Validate id format
+    const parsed = cuidSchema.safeParse(id);
+    if (!parsed.success) {
+      const error = new ValidationError(`Invalid page ID format: ${id}`);
+      return NextResponse.json(errorToResponse(error), { status: 400 });
+    }
 
     await prisma.page.delete({
       where: { id },

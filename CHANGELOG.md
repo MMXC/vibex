@@ -1,3 +1,13 @@
+### Added (vibex-backend-fixes-20260410 E1: Schema统一) — 2026-04-06
+- **E1 统一错误类型**: `lib/errors.ts` 提供 AppError 基类及子类 (AuthError, ValidationError, NotFoundError, ForbiddenError, ConflictError)
+  - ValidationError.fromZodError() 支持 Zod 错误 → 结构化 fieldErrors/formErrors
+  - errorToResponse() 统一 API 错误响应格式
+- **E1 Schema 验证**: `schemas/canvas.ts` 新增 canvasGenerateSchema (Zod strict)
+  - POST /api/v1/canvas/generate 输入校验 (projectId, pageIds, mode)
+  - canvas/generate route 使用 AppError + canvasGenerateSchema 替代手动校验
+  - chat route 认证失败返回 AUTH_ERROR code (替代 UNAUTHORIZED)
+- **提交**: `1ac823e2`
+
 ### Added (vibex-pm-features-20260410 E1: 需求模板库) — 2026-04-06
 - **E1 需求模板库**: 行业模板系统，支持电商/社交/SaaS 三大行业模板
   - `types/template.ts`: Template/Entity/BoundedContext/Industry 类型定义

@@ -91,7 +91,7 @@ export const errorHandler = async (err: Error | ApiError, c: Context, next: Next
       path: c.req.path,
     }
 
-    return c.text(JSON.stringify(response), statusCode as any)
+    return c.text(JSON.stringify(response), statusCode)
   }
 
   await next()

@@ -3,6 +3,11 @@ import { cors } from 'hono/cors';
 import type { CloudflareEnv } from './lib/env';
 import { getLocalEnv } from './lib/env';
 import projects from './routes/projects';
+
+declare global {
+  // eslint-disable-next-line no-var
+  var __VIBEX_LOCAL_ENV__: CloudflareEnv | undefined;
+}
 import projectId from './routes/projects.$id';
 import pages from './routes/pages';
 import pageIdComponents from './routes/pages.$id.components';
@@ -169,7 +174,7 @@ if (!isWorkers && !isProduction) {
   
   // 本地开发时，注入本地环境变量到 globalThis
   const localEnv = getLocalEnv();
-  (globalThis as any).__VIBEX_LOCAL_ENV__ = localEnv;
+  globalThis.__VIBEX_LOCAL_ENV__ = localEnv;
   
   // @hono/node-server 仅用于本地开发，Cloudflare Workers 不使用
   import('@hono/node-server').then(({ serve }) => {

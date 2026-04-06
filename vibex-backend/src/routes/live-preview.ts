@@ -9,7 +9,12 @@
 
 import { Hono } from 'hono';
 import { queryOne, generateId, Env } from '@/lib/db';
-import { createUIGeneratorService, UIGeneratorOptions, UIGenerationResult, GeneratedComponent } from '@/services/ui-generator';
+import { createUIGeneratorService, UIGeneratorOptions, UIGenerationResult, GeneratedComponent, GeneratedPage } from '@/services/ui-generator';
+
+/** Type guard: is this a GeneratedPage (has .component sub-field)? */
+function isGeneratedPage(val: GeneratedPage | GeneratedComponent): val is GeneratedPage {
+  return 'component' in val && typeof (val as GeneratedPage).component === 'object';
+}
 
 const livePreview = new Hono<{ Bindings: Env }>();
 
@@ -303,7 +308,7 @@ livePreview.post('/', async (c) => {
             });
             
             // Send complete event with full preview
-            const componentData = 'component' in generatedPage ? (generatedPage as any).component : null;
+            const componentData = isGeneratedPage(generatedPage) ? generatedPage.component : null;
             sendSSEEvent(controller, {
               type: 'complete',
               timestamp: new Date().toISOString(),
@@ -557,7 +562,7 @@ livePreview.post('/quick/:type', async (c) => {
             
             switch (type) {
               case 'button':
-                result = await uiGenerator.quickButton(body.variant as any || 'primary', generatorOptions);
+                result = await uiGenerator.quickButton((body.variant as 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger') || 'primary', generatorOptions);
                 break;
               case 'input':
                 result = await uiGenerator.quickInput(generatorOptions);

@@ -498,7 +498,7 @@ componentGenerator.post('/quick', async (c) => {
     }
 
     const validTypes = ['button', 'input', 'card', 'modal'] as const;
-    if (!validTypes.includes(type as any)) {
+    if (!validTypes.includes(type as typeof validTypes[number])) {
       return c.json({
         error: `Invalid type. Must be one of: ${validTypes.join(', ')}`,
       }, 400);

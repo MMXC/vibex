@@ -182,7 +182,7 @@ export const createLogger = (options: LoggerOptions = {}) => {
       try {
         const body = await c.req.json().catch(() => null)
         if (body) {
-          (requestLog as any).body = body
+          requestLog.body = body
         }
       } catch {
         // Ignore body parsing errors
@@ -197,7 +197,7 @@ export const createLogger = (options: LoggerOptions = {}) => {
       request: requestLog,
       requestId,
       ...(customFields && { custom: customFields(c) }),
-    } as any)
+    })
 
     try {
       await next()
@@ -215,7 +215,7 @@ export const createLogger = (options: LoggerOptions = {}) => {
         },
         requestId,
         ...(customFields && { custom: customFields(c) }),
-      } as any)
+      })
 
     } catch (err) {
       const error = err as Error
@@ -227,7 +227,7 @@ export const createLogger = (options: LoggerOptions = {}) => {
           stack: process.env.NODE_ENV !== 'production' ? error.stack : undefined,
         },
         requestId,
-      } as any)
+      })
       
       throw err
     }

@@ -36,6 +36,7 @@ type ProjectSettingsType = {
   showRuler: boolean;
   aiModel: string;
   aiTemperature: number;
+  [key: string]: unknown;
 };
 
 const defaultProjectSettings: ProjectSettingsType = {
@@ -71,6 +72,7 @@ type UserPreferencesType = {
     wordWrap: boolean;
     minimap: boolean;
   };
+  [key: string]: unknown;
 };
 
 const defaultUserPreferences: UserPreferencesType = {
@@ -122,9 +124,9 @@ projectSettings.get('/', async (c) => {
     for (const setting of settings) {
       if (setting.userId === null && setting.key in defaultProjectSettings) {
         try {
-          (mergedSettings as any)[setting.key] = JSON.parse(setting.value);
+          (mergedSettings as Record<string, unknown>)[setting.key] = JSON.parse(setting.value);
         } catch {
-          (mergedSettings as any)[setting.key] = setting.value;
+          (mergedSettings as Record<string, unknown>)[setting.key] = setting.value;
         }
       }
     }
@@ -200,9 +202,9 @@ projectSettings.put('/', async (c) => {
     for (const setting of settings) {
       if (setting.userId === null && setting.key in defaultProjectSettings) {
         try {
-          (mergedSettings as any)[setting.key] = JSON.parse(setting.value);
+          (mergedSettings as Record<string, unknown>)[setting.key] = JSON.parse(setting.value);
         } catch {
-          (mergedSettings as any)[setting.key] = setting.value;
+          (mergedSettings as Record<string, unknown>)[setting.key] = setting.value;
         }
       }
     }
@@ -244,9 +246,9 @@ projectSettings.get('/preferences', async (c) => {
     for (const pref of preferences) {
       if (pref.key in defaultUserPreferences) {
         try {
-          (mergedPrefs as any)[pref.key] = JSON.parse(pref.value);
+          (mergedPrefs as Record<string, unknown>)[pref.key] = JSON.parse(pref.value);
         } catch {
-          (mergedPrefs as any)[pref.key] = pref.value;
+          (mergedPrefs as Record<string, unknown>)[pref.key] = pref.value;
         }
       }
     }
@@ -327,9 +329,9 @@ projectSettings.put('/preferences', async (c) => {
     for (const pref of preferences) {
       if (pref.key in defaultUserPreferences) {
         try {
-          (mergedPrefs as any)[pref.key] = JSON.parse(pref.value);
+          (mergedPrefs as Record<string, unknown>)[pref.key] = JSON.parse(pref.value);
         } catch {
-          (mergedPrefs as any)[pref.key] = pref.value;
+          (mergedPrefs as Record<string, unknown>)[pref.key] = pref.value;
         }
       }
     }

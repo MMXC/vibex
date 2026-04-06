@@ -8,6 +8,16 @@ export interface VibeXTool {
 
 export function listTools(): Tool[] {
   return [
+    // E7-S1: Health check endpoint
+    {
+      name: 'health_check',
+      description: 'Check the health status of the VibeX MCP server. Returns server uptime, registered tools count, and detailed health checks.',
+      inputSchema: {
+        type: 'object',
+        properties: {},
+        required: [],
+      },
+    },
     {
       name: 'createProject',
       description: 'Create a new VibeX project from a PRD description',

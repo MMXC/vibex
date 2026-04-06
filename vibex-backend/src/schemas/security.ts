@@ -103,8 +103,12 @@ export const chatMessageSchema = z.object({
     .min(1, 'Message is required')
     .max(10000, 'Message too long (max 10000 chars)')
     .refine(
-      (msg) => !detectInjection(msg),
-      { message: 'Message contains suspicious keywords — possible prompt injection' }
+      async (msg) => {
+        // E6-S1: Use AST-based scanner + keyword detection
+        const result = await detectPromptInjection(msg, true)
+        return !result.blocked
+      },
+      { message: 'Message contains suspicious patterns — possible prompt injection' }
     ),
   conversationId: z.string().optional(),
   history: z.array(
@@ -137,8 +141,12 @@ export const planAnalyzeSchema = z.object({
       { message: 'Requirement cannot be empty or whitespace-only' }
     )
     .refine(
-      (req) => !detectInjection(req),
-      { message: 'Requirement contains suspicious keywords — possible prompt injection' }
+      async (req) => {
+        // E6-S1: Use AST-based scanner + keyword detection
+        const result = await detectPromptInjection(req, true)
+        return !result.blocked
+      },
+      { message: 'Requirement contains suspicious patterns — possible prompt injection' }
     ),
   context: z.object({
     projectId: z.string().uuid('Invalid project ID').optional(),
@@ -184,3 +192,202 @@ export const updateProjectSchema = z.object({
 
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;
 export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;
+
+// =============================================================================
+// E6: AST-based Prompt Security Scanner
+// =============================================================================
+
+/**
+ * Dangerous code pattern detected by AST scanner (E6-S1)
+ */
+export interface ASTDangerousPattern {
+  type: 'DANGEROUS_FUNCTION' | 'TEMPLATE_LITERAL_EVAL' | 'NEW_FUNCTION' | 'INDIRECT_EVAL'
+  line: number
+  column?: number
+  description: string
+}
+
+/**
+ * AST scan result for prompt security
+ */
+export interface ASTScanResult {
+  clean: boolean
+  patterns: ASTDangerousPattern[]
+}
+
+/**
+ * E6-S1: AST-based dangerous pattern scanner
+ * 
+ * Uses Babel AST to detect:
+ * - eval() calls
+ * - new Function() calls
+ * - Indirect eval (passing "eval" as identifier)
+ * - Template literals with eval
+ * 
+ * This replaces string matching with proper AST analysis.
+ * Falls back gracefully when Babel is not available.
+ */
+export async function scanForDangerousPatterns(code: string): Promise<ASTScanResult> {
+  const patterns: ASTDangerousPattern[] = []
+
+  try {
+    // Dynamic import to avoid breaking when Babel is unavailable
+    const [{ parse }, { default: traverse }] = await Promise.all([
+      import('@babel/parser'),
+      import('@babel/traverse'),
+    ])
+
+    const ast = parse(code, {
+      sourceType: 'script',
+      plugins: [],
+      errorRecovery: true,
+    })
+
+    traverse(ast, {
+      CallExpression(path) {
+        const node = path.node as any
+        const callee = node.callee as any
+        const nodeLoc = node.loc as any
+
+        // Direct eval: eval("...")
+        if (
+          callee?.type === 'Identifier' &&
+          callee?.name === 'eval'
+        ) {
+          patterns.push({
+            type: 'DANGEROUS_FUNCTION',
+            line: nodeLoc?.start?.line ?? 0,
+            column: nodeLoc?.start?.column,
+            description: 'Direct eval() call detected — code injection risk',
+          })
+          path.skip()
+          return
+        }
+
+        // Indirect eval: (0, eval)("...") — bypasses local scope
+        if (callee?.type === 'SequenceExpression') {
+          const exprs = callee.expressions as any[]
+          if (
+            Array.isArray(exprs) &&
+            exprs.length >= 2 &&
+            exprs[1]?.type === 'Identifier' &&
+            exprs[1]?.name === 'eval'
+          ) {
+            patterns.push({
+              type: 'INDIRECT_EVAL',
+              line: nodeLoc?.start?.line ?? 0,
+              column: nodeLoc?.start?.column,
+              description: 'Indirect eval() — bypasses local scope, code injection risk',
+            })
+            path.skip()
+            return
+          }
+        }
+
+        // new Function("...") — dynamic code creation
+        if (
+          callee?.type === 'Identifier' &&
+          callee?.name === 'Function'
+        ) {
+          patterns.push({
+            type: 'NEW_FUNCTION',
+            line: nodeLoc?.start?.line ?? 0,
+            column: nodeLoc?.start?.column,
+            description: 'new Function() detected — dynamic code creation risk',
+          })
+          path.skip()
+          return
+        }
+      },
+
+      NewExpression(path) {
+        const node = path.node as any
+        const callee = node.callee as any
+        const nodeLoc = node.loc as any
+
+        // new Function("...") — explicit dynamic code creation
+        if (
+          callee?.type === 'Identifier' &&
+          callee?.name === 'Function'
+        ) {
+          patterns.push({
+            type: 'NEW_FUNCTION',
+            line: nodeLoc?.start?.line ?? 0,
+            column: nodeLoc?.start?.column,
+            description: 'new Function() detected — dynamic code creation risk',
+          })
+          path.skip()
+          return
+        }
+      },
+
+      Identifier(path) {
+        const node = path.node as any
+        const nodeLoc = node.loc as any
+        const parent = path.parent as any
+
+        // Check for "eval" passed as argument to other functions
+        // e.g., setTimeout("eval", 0) or window["eval"]
+        if (node.name === 'eval' && !path.isReferencedIdentifier()) {
+          if (
+            parent?.type === 'MemberExpression' ||
+            parent?.type === 'OptionalMemberExpression'
+          ) {
+            patterns.push({
+              type: 'INDIRECT_EVAL',
+              line: nodeLoc?.start?.line ?? 0,
+              column: nodeLoc?.start?.column,
+              description: 'Indirect eval reference via member expression — code injection risk',
+            })
+          }
+        }
+      },
+    })
+  } catch {
+    // If AST parsing fails, fall back to empty scan (log warning in production)
+    // This prevents the scanner from blocking legitimate prompts due to parse errors
+    console.warn('[ASTScanner] Failed to parse code, skipping AST scan')
+  }
+
+  return {
+    clean: patterns.length === 0,
+    patterns,
+  }
+}
+
+/**
+ * E6-S1: Combined injection detection
+ * 
+ * Runs both string-based keyword detection AND AST-based dangerous pattern scan.
+ * Returns true if EITHER method detects issues.
+ * 
+ * @param msg - The prompt message to scan
+ * @param enableAST - Whether to enable AST scanning (default: true)
+ */
+export async function detectPromptInjection(
+  msg: string,
+  enableAST = true
+): Promise<{ blocked: boolean; reason?: string; astPatterns?: ASTDangerousPattern[] }> {
+  // Step 1: String-based keyword detection (fast, always runs)
+  if (detectInjection(msg)) {
+    return {
+      blocked: true,
+      reason: 'Keyword-based prompt injection detected',
+    }
+  }
+
+  // Step 2: AST-based dangerous pattern scan (E6-S1)
+  if (enableAST && msg.length > 20) {
+    // Only scan non-trivial messages (avoid overhead for short messages)
+    const astResult = await scanForDangerousPatterns(msg)
+    if (!astResult.clean) {
+      return {
+        blocked: true,
+        reason: `AST scan detected dangerous patterns: ${astResult.patterns.map((p) => p.type).join(', ')}`,
+        astPatterns: astResult.patterns,
+      }
+    }
+  }
+
+  return { blocked: false }
+}

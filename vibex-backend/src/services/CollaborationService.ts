@@ -22,6 +22,13 @@ export class LockRequiredError extends Error {
   }
 }
 
+export class LockHeldError extends Error {
+  constructor(message = 'LockHeld: a valid lock already exists for this resource') {
+    super(message);
+    this.name = 'LockHeldError';
+  }
+}
+
 export class CollaborationService {
   private lockDir: string;
 
@@ -35,6 +42,13 @@ export class CollaborationService {
 
   /** Acquire a lock for the given project+stage */
   async acquireLock(projectId: string, stageId: string, ttlMs = 300_000): Promise<void> {
+    // S1.1: 先检查已有 lock，禁止直接覆写
+    const locked = await this.hasLock(projectId, stageId);
+    if (locked) {
+      throw new LockHeldError(
+        `LockHeld: lock already held for ${projectId}/${stageId}`
+      );
+    }
     await fs.mkdir(this.lockDir, { recursive: true });
     const lockFile = this.lockPath(projectId, stageId);
     const content = JSON.stringify({ projectId, stageId, acquiredAt: Date.now(), ttlMs });
@@ -79,4 +93,3 @@ export class CollaborationService {
 }
 
 export const collaborationService = new CollaborationService();
-export { LockRequiredError };

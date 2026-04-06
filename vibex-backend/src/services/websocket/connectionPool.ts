@@ -38,11 +38,10 @@ const DEFAULT_CONFIG: ConnectionPoolConfig = {
 export class ConnectionPool {
   private connections: Map<string, WebSocketConnection> = new Map();
   private config: ConnectionPoolConfig;
-  private heartbeatTimer: NodeJS.Timeout | null = null;
 
   constructor(config: Partial<ConnectionPoolConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
-    this.startHeartbeat();
+    // Workers 环境中禁止 setInterval，改用被动清理
   }
 
   /**
@@ -60,6 +59,9 @@ export class ConnectionPool {
       connectedAt: Date.now(),
       lastHeartbeat: Date.now(),
     });
+
+    // 被动清理过期连接
+    this.pruneStaleConnections();
 
     console.log(`Connection added: ${connection.id}, total: ${this.connections.size}`);
     return true;
@@ -116,6 +118,8 @@ export class ConnectionPool {
     const connection = this.connections.get(connectionId);
     if (connection) {
       connection.lastHeartbeat = Date.now();
+      // 被动清理：顺便检查其他过期连接
+      this.pruneStaleConnections();
       return true;
     }
     return false;
@@ -164,22 +168,10 @@ export class ConnectionPool {
   }
 
   /**
-   * 启动心跳
+   * 被动清理过期连接（Workers 兼容，无 setInterval）
+   * 在 add() / updateHeartbeat() 时调用
    */
-  private startHeartbeat(): void {
-    if (this.heartbeatTimer) {
-      clearInterval(this.heartbeatTimer);
-    }
-
-    this.heartbeatTimer = setInterval(() => {
-      this.checkConnections();
-    }, this.config.heartbeatInterval);
-  }
-
-  /**
-   * 检查连接状态
-   */
-  private checkConnections(): void {
+  pruneStaleConnections(): void {
     const now = Date.now();
     const timeout = this.config.disconnectTimeout;
 
@@ -214,14 +206,9 @@ export class ConnectionPool {
   }
 
   /**
-   * 停止心跳
+   * 停止连接池
    */
   stop(): void {
-    if (this.heartbeatTimer) {
-      clearInterval(this.heartbeatTimer);
-      this.heartbeatTimer = null;
-    }
-
     // Close all connections
     for (const [id, conn] of this.connections) {
       try {

@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getAuthUserFromRequest } from '@/lib/authFromGateway';
 import { getLocalEnv } from '@/lib/env';
+import { safeError } from '@/lib/log-sanitizer';
 
 const DEPRECATION_HEADERS = {
   'Deprecation': 'true',
@@ -35,59 +36,80 @@ export async function GET(request: NextRequest) {
     deletedAt: null, // exclude soft-deleted
   };
 
-  // Search by name or description
-  if (q) {
-    where.OR = [
-      { name: { contains: q } },
-      { description: { contains: q } },
-    ];
-  }
-
   // Filters
   if (status) where.status = status;
   if (isPublicParam !== null) where.isPublic = isPublicParam === 'true';
   if (isTemplateParam !== null) where.isTemplate = isTemplateParam === 'true';
+
   // Users only see their own projects by default, unless isPublic=true
-  if (!userId && auth.userId) {
+  // Search by name or description (combines with user filter when applicable)
+  if (q) {
+    const searchOR = [
+      { name: { contains: q } },
+      { description: { contains: q } },
+    ];
+    if (userId) {
+      // Explicit userId + search
+      where.userId = userId;
+      where.OR = searchOR;
+    } else if (auth.userId) {
+      // Auth user filter + search
+      where.AND = [
+        { OR: searchOR },
+        { OR: [{ userId: auth.userId }, { isPublic: true }] },
+      ];
+    } else {
+      where.OR = searchOR;
+    }
+  } else if (userId) {
+    // Explicit userId filter only
+    where.userId = userId;
+  } else if (auth.userId) {
+    // Default: auth user's own projects + public
     where.OR = [
       { userId: auth.userId },
       { isPublic: true },
     ];
   }
 
-  const [projects, total] = await Promise.all([
-    prisma.project.findMany({
-      where,
-      take: limit,
-      skip: offset,
-      orderBy: { updatedAt: 'desc' },
-      include: {
-        user: { select: { id: true, email: true } },
-        _count: { select: { pages: true, messages: true } },
-      },
-    }),
-    prisma.project.count({ where }),
-  ]);
+  try {
+    const [projects, total] = await Promise.all([
+      prisma.project.findMany({
+        where,
+        take: limit,
+        skip: offset,
+        orderBy: { updatedAt: 'desc' },
+        include: {
+          user: { select: { id: true, email: true } },
+          _count: { select: { pages: true, messages: true } },
+        },
+      }),
+      prisma.project.count({ where }),
+    ]);
 
-  const responseTime = Date.now() - startTime;
+    const responseTime = Date.now() - startTime;
 
-  return NextResponse.json(
-    {
-      projects,
-      pagination: {
-        total,
-        limit,
-        offset,
-        hasMore: offset + projects.length < total,
+    return NextResponse.json(
+      {
+        projects,
+        pagination: {
+          total,
+          limit,
+          offset,
+          hasMore: offset + projects.length < total,
+        },
+        meta: {
+          responseTimeMs: responseTime,
+          query: q,
+        },
       },
-      meta: {
-        responseTimeMs: responseTime,
-        query: q,
-      },
-    },
-    {
-      status: 200,
-      headers: DEPRECATION_HEADERS,
-    }
-  );
+      {
+        status: 200,
+        headers: DEPRECATION_HEADERS,
+      }
+    );
+  } catch (error) {
+    safeError('Error fetching projects:', error);
+    return NextResponse.json({ error: 'Failed to fetch projects' }, { status: 500 });
+  }
 }

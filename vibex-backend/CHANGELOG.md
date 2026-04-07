@@ -4,6 +4,19 @@
 
 ### Backend Core
 
+#### 2026-04-07
+
+- **E-P0-4 P0-12/13 Test Fixes** (tester-e-p0-4)
+  - `src/app/api/projects/route.test.ts`: Complete rewrite of P0-13 project search API tests
+    - Added auth mocking (`getAuthUserFromRequest`), env mocking (`getLocalEnv`), Prisma mocking
+    - 14 tests covering: auth, pagination, q/name/description search, status/isPublic/isTemplate filters, limit/offset, deprecation headers, error handling
+  - `src/app/api/projects/route.ts`: Bug fixes
+    - Fixed search+userFilter combination (q OR was being overwritten)
+    - Added explicit userId filter support
+    - Added try-catch + safeError for error handling (matching v1 route pattern)
+  - `src/lib/ai-quality/keyword-detector.test.ts`: 10 tests (pre-existing, all passing)
+  - All 32 P0-12/13 tests: ✅ 100% pass
+
 #### 2026-04-05
 
 - **canvas-api-completion E1: Flows CRUD API**

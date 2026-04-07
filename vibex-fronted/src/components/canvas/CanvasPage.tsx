@@ -58,14 +58,12 @@ import { useCanvasToolbar } from '@/hooks/canvas/useCanvasToolbar';
 import { useCanvasPanels } from '@/hooks/canvas/useCanvasPanels';
 
 import { TabBar } from './TabBar';
-import { TreePanel } from './TreePanel';
 import { TreeToolbar } from './TreeToolbar';
-import { BoundedContextTree } from './BoundedContextTree';
-import { ComponentTree } from './ComponentTree';
-import { BusinessFlowTree } from './BusinessFlowTree';
 import { ProjectBar } from './ProjectBar';
 import { PrototypeQueuePanel } from './PrototypeQueuePanel';
-import { HoverHotzone } from './HoverHotzone';
+import { ContextTreePanel } from './panels/ContextTreePanel';
+import { FlowTreePanel } from './panels/FlowTreePanel';
+import { ComponentTreePanel } from './panels/ComponentTreePanel';
 import { ShortcutHintPanel } from './features/ShortcutHintPanel';
 import { ShortcutHelpPanel } from './ShortcutHelpPanel';
 import { VersionHistoryPanel } from './features/VersionHistoryPanel';
@@ -317,9 +315,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     switch (tab) {
       case 'context':
         return (
-          <TreePanel
-            tree="context"
-            title="限界上下文树"
+          <ContextTreePanel
             nodes={contextTreeNodes}
             collapsed={false}
             isActive={contextActive}
@@ -366,15 +362,11 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 }
               />
             }
-          >
-            <BoundedContextTree />
-          </TreePanel>
+          />
         );
       case 'flow':
         return (
-          <TreePanel
-            tree="flow"
-            title="业务流程树"
+          <FlowTreePanel
             nodes={flowTreeNodes}
             collapsed={false}
             isActive={flowActive}
@@ -397,15 +389,11 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 continueDisabled={componentGenerating || flowNodes.length === 0}
               />
             }
-          >
-            <BusinessFlowTree isActive={flowActive || activeTree === null} />
-          </TreePanel>
+          />
         );
       case 'component':
         return (
-          <TreePanel
-            tree="component"
-            title="组件树"
+          <ComponentTreePanel
             nodes={componentTreeNodes}
             collapsed={false}
             isActive={componentActive}
@@ -420,9 +408,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 onClear={() => useComponentStore.getState().clearComponentCanvas()}
               />
             }
-          >
-            <ComponentTree />
-          </TreePanel>
+          />
         );
     }
   };
@@ -607,9 +593,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 </button>
               </div>
 
-              <TreePanel
-                tree="context"
-                title="限界上下文树"
+              <ContextTreePanel
                 nodes={contextTreeNodes}
                 collapsed={contextPanelCollapsed}
                 isActive={contextActive}
@@ -656,15 +640,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                     }
                   />
                 }
-              >
-                <HoverHotzone position="left-edge" panel="left" />
-                <BoundedContextTree />
-                <HoverHotzone position="right-edge" panel="left" />
-              </TreePanel>
+              />
 
-              <TreePanel
-                tree="flow"
-                title="业务流程树"
+              <FlowTreePanel
                 nodes={flowTreeNodes}
                 collapsed={flowPanelCollapsed}
                 isActive={flowActive}
@@ -696,15 +674,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                     }
                   />
                 }
-              >
-                <HoverHotzone position="left-edge" panel="center" centerExpandDirection="left" />
-                <BusinessFlowTree isActive={flowActive || activeTree === null} />
-                <HoverHotzone position="right-edge" panel="center" centerExpandDirection="right" />
-              </TreePanel>
+              />
 
-              <TreePanel
-                tree="component"
-                title="组件树"
+              <ComponentTreePanel
                 nodes={componentTreeNodes}
                 collapsed={componentPanelCollapsed}
                 isActive={componentActive}
@@ -719,11 +691,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                     onClear={() => useComponentStore.getState().clearComponentCanvas()}
                   />
                 }
-              >
-                <HoverHotzone position="left-edge" panel="right" />
-                <ComponentTree />
-                <HoverHotzone position="right-edge" panel="right" />
-              </TreePanel>
+              />
 
               {/* Bug5: Right expand toggle button */}
               <div className={styles.expandCol}>

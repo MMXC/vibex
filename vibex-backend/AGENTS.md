@@ -39,3 +39,34 @@
 - [ ] `pnpm run lint` 通过
 - [ ] `pnpm run type-check` 通过
 - [ ] 数据库迁移脚本已验证（`prisma validate`）
+
+---
+
+## 需求澄清 SOP（Brainstorming 技能）
+
+### 何时使用 Brainstorming
+
+当遇到以下情况时，必须使用 Brainstorming 技能：
+
+1. **需求歧义**：描述包含模糊词汇（"优化体验"、"改进 UI"）无具体指标
+2. **方案分歧**：涉及多个方案权衡，无明显最优解
+3. **领域陌生**：涉及新领域，团队缺乏上下文
+4. **PRD 存疑**：PRD 中存在"待确认"项超过 3 个
+
+### Brainstorming 流程
+
+```
+1. 触发  → 在 #vibex 或对应频道 @analyst "需要 brainstorm: <需求描述>"
+2. 分析  → Analyst 使用 gstack browse 验证问题真实性
+3. 提案  → 生成 2-3 个方案选项 + 权衡分析
+4. 决策  → PM 选择方案，更新 PRD
+5. 记录  → 将决策记录到对应提案的 ANALYSIS.md
+```
+
+### 验收标准
+
+| 标准 | 验证 |
+|------|------|
+| 歧义需求被识别 | `grep "优化\\|改进\\|完善" prd.md` → 无未量化描述 |
+| 方案有权衡分析 | 每个方案有 pros/cons |
+| 决策有记录 | ANALYSIS.md 包含 decision 章节 |

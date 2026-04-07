@@ -1,0 +1,132 @@
+# .github/workflows/quarterly-reminder.yml
+# Quarterly Roadmap Update Reminder
+# Runs on the 1st of January, April, July, and October at 09:00 UTC
+# Creates a GitHub issue reminding team to update the canvas evolution roadmap
+
+name: Quarterly Roadmap Update
+
+on:
+  schedule:
+    - cron: '0 9 1 1,4,7,10 *'
+  workflow_dispatch:
+    inputs:
+      custom_message:
+        description: 'Custom reminder message'
+        required: false
+        default: 'Quarterly roadmap update reminder'
+        type: string
+
+jobs:
+  reminder:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check if roadmap needs update
+        id: check
+        run: |
+          if [ -f "docs/vibex-canvas-evolution-roadmap/roadmap.md" ]; then
+            LAST_UPDATE=$(git log -1 --format="%ai" -- "docs/vibex-canvas-evolution-roadmap/roadmap.md" 2>/dev/null || echo "never")
+            echo "last_update=$LAST_UPDATE" >> "$GITHUB_OUTPUT"
+            echo "roadmap_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "roadmap_exists=false" >> "$GITHUB_OUTPUT"
+            echo "last_update=never" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create quarterly reminder issue
+        if: steps.check.outputs.roadmap_exists == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const quarter = Math.ceil((new Date().getMonth() + 1) / 3);
+            const year = new Date().getFullYear();
+            const title = `[Reminder] ${year}-Q${quarter} Roadmap Update`;
+            
+            // Check if an open reminder issue already exists
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: ['quarterly-reminder']
+            });
+            
+            if (existing.data.length > 0) {
+              console.log('Open quarterly reminder already exists, skipping');
+              return;
+            }
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body: `## Quarterly Roadmap Update Reminder
+
+This is an automated reminder to update the VibeX Canvas Evolution Roadmap.
+
+**Roadmap file**: \`docs/vibex-canvas-evolution-roadmap/roadmap.md\`
+**Last update**: ${process.env.LAST_UPDATE || 'unknown'}
+
+### Update Checklist
+
+- [ ] Review Q${quarter} completed features
+- [ ] Add new milestones for Q${quarter + 1 > 4 ? 1 : quarter + 1}
+- [ ] Update technical debt section
+- [ ] Review and update decision records
+- [ ] Verify Mermaid diagrams are accurate
+- [ ] Update "last update" timestamp
+
+### Reference
+
+See \`docs/vibex-canvas-evolution-roadmap/roadmap.md\` for the full roadmap template.
+`,
+              labels: ['quarterly-reminder', 'documentation']
+            });
+            console.log('Created quarterly reminder issue');
+
+      - name: Create first-time setup issue
+        if: steps.check.outputs.roadmap_exists == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '[Setup] Create Canvas Evolution Roadmap';
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: ['quarterly-reminder']
+            });
+            
+            if (existing.data.length > 0) {
+              console.log('Open reminder already exists, skipping');
+              return;
+            }
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body: `## Canvas Evolution Roadmap Setup
+
+The canvas evolution roadmap document is missing. Please create:
+
+**Required file**: \`docs/vibex-canvas-evolution-roadmap/roadmap.md\`
+
+### Sections to include
+
+1. Current state (Q1 2026)
+2. Target state (Q4 2026)
+3. Evolution path by quarter
+4. Milestone history
+5. Technical debt tracking
+6. Decision records
+
+See the architect proposal \`docs/vibex-analyst-proposals-20260412-phase1/architecture.md\` for the full template.
+`,
+              labels: ['quarterly-reminder', 'documentation']
+            });

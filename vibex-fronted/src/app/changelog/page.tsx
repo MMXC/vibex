@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.133',
+    date: '2026-04-07',
+    changes: [
+      '📋 vibex-architect-proposals-20260412 A-P1-2: Canvas TreeErrorBoundary',
+      '✅ 三栏树形面板错误隔离: ContextTreePanel/FlowTreePanel/ComponentTreePanel 各自独立 ErrorBoundary',
+      '✅ 单栏崩溃不影响其他栏，fallback UI + 重试按钮',
+      '提交: 600bfb1e',
+    ],
+    commit: '600bfb1e',
+  },
+
+  {
     version: '1.0.132',
     date: '2026-04-07',
     changes: [

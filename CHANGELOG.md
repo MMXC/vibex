@@ -1,3 +1,14 @@
+### Added (vibex-architect-proposals-20260412 A-P1-2: Canvas TreeErrorBoundary) — 2026-04-07
+- **A-P1-2 Canvas TreeErrorBoundary**: 三栏树形面板错误隔离
+  - 新增 `panels/TreeErrorBoundary.tsx`: React ErrorBoundary，捕获树组件渲染错误
+  - 新增 `panels/ContextTreePanel.tsx`: ContextTree 包装 + TreeErrorBoundary
+  - 新增 `panels/FlowTreePanel.tsx`: FlowTree 包装 + TreeErrorBoundary
+  - 新增 `panels/ComponentTreePanel.tsx`: ComponentTree 包装 + TreeErrorBoundary
+  - `CanvasPage.tsx`: 三栏面板集成 TreeErrorBoundary
+  - 渲染失败 → fallback UI（重试按钮），单栏崩溃不影响其他栏
+  - `canvasLogger.default.error()` 安全日志（无 console.*）
+  - 提交: `600bfb1e`
+
 ### Added (vibex-analyst-proposals-20260412-phase1 E1-E3: 提案追踪体系) — 2026-04-07
 - **vibex-analyst-proposals-20260412-phase1 E1-E3 提案追踪体系**:
   - **E1 docs/proposals/INDEX.md**: 提案状态索引表（pending/in-progress/done/rejected），`scripts/update-index.py` 自动维护

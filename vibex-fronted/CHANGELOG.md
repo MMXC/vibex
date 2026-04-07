@@ -1,5 +1,12 @@
 # Changelog
 
+### [vibex-architect-proposals-20260412 A-P1-2: Canvas TreeErrorBoundary] — 2026-04-07
+- **A-P1-2 TreeErrorBoundary**: 三栏树形面板错误隔离
+  - `panels/TreeErrorBoundary.tsx` + ContextTreePanel/FlowTreePanel/ComponentTreePanel
+  - 单栏崩溃不影响其他栏，渲染失败显示 fallback UI + 重试按钮
+  - `canvasLogger.default.error()` 安全日志
+  - 提交: `600bfb1e`
+
 ### [vibex-analyst-proposals-20260412-phase1 E1: 提案追踪体系] — 2026-04-07
 - **E1 docs/proposals/INDEX.md**: 提案状态索引表，`scripts/update-index.py` 自动维护
 - **E3 Canvas Evolution Roadmap**: `.github/workflows/quarterly-reminder.yml` — 季度(1/4/7/10月) GitHub issue 提醒

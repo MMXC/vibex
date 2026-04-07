@@ -47,7 +47,6 @@ const mockChangelog: ChangelogEntry[] = [
 
   {
     version: '1.0.131',
-    version: '1.0.130',
     date: '2026-04-07',
     changes: [
       '📋 vibex-proposals-summary-20260411 E-P0-5: 测试基础设施 + 日志清理',

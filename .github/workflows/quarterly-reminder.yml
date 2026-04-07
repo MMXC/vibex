@@ -60,31 +60,35 @@ jobs:
               console.log('Open quarterly reminder already exists, skipping');
               return;
             }
+
+            const nextQuarter = quarter >= 4 ? 1 : quarter + 1;
+            const body = [
+              '## Quarterly Roadmap Update Reminder',
+              '',
+              'This is an automated reminder to update the VibeX Canvas Evolution Roadmap.',
+              '',
+              '**Roadmap file**: `docs/vibex-canvas-evolution-roadmap/roadmap.md`',
+              `**Last update**: ${process.env.LAST_UPDATE || 'unknown'}`,
+              '',
+              '### Update Checklist',
+              '',
+              '- [ ] Review Q' + quarter + ' completed features',
+              '- [ ] Add new milestones for Q' + nextQuarter,
+              '- [ ] Update technical debt section',
+              '- [ ] Review and update decision records',
+              '- [ ] Verify Mermaid diagrams are accurate',
+              '- [ ] Update "last update" timestamp',
+              '',
+              '### Reference',
+              '',
+              'See `docs/vibex-canvas-evolution-roadmap/roadmap.md` for the full roadmap template.'
+            ].join('\n');
             
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title,
-              body: `## Quarterly Roadmap Update Reminder
-
-This is an automated reminder to update the VibeX Canvas Evolution Roadmap.
-
-**Roadmap file**: \`docs/vibex-canvas-evolution-roadmap/roadmap.md\`
-**Last update**: ${process.env.LAST_UPDATE || 'unknown'}
-
-### Update Checklist
-
-- [ ] Review Q${quarter} completed features
-- [ ] Add new milestones for Q${quarter + 1 > 4 ? 1 : quarter + 1}
-- [ ] Update technical debt section
-- [ ] Review and update decision records
-- [ ] Verify Mermaid diagrams are accurate
-- [ ] Update "last update" timestamp
-
-### Reference
-
-See \`docs/vibex-canvas-evolution-roadmap/roadmap.md\` for the full roadmap template.
-`,
+              body,
               labels: ['quarterly-reminder', 'documentation']
             });
             console.log('Created quarterly reminder issue');
@@ -107,26 +111,29 @@ See \`docs/vibex-canvas-evolution-roadmap/roadmap.md\` for the full roadmap temp
               return;
             }
             
+            const body = [
+              '## Canvas Evolution Roadmap Setup',
+              '',
+              'The canvas evolution roadmap document is missing. Please create:',
+              '',
+              '**Required file**: `docs/vibex-canvas-evolution-roadmap/roadmap.md`',
+              '',
+              '### Sections to include',
+              '',
+              '1. Current state (Q1 2026)',
+              '2. Target state (Q4 2026)',
+              '3. Evolution path by quarter',
+              '4. Milestone history',
+              '5. Technical debt tracking',
+              '6. Decision records',
+              '',
+              'See the architect proposal `docs/vibex-analyst-proposals-20260412-phase1/architecture.md` for the full template.'
+            ].join('\n');
+            
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title,
-              body: `## Canvas Evolution Roadmap Setup
-
-The canvas evolution roadmap document is missing. Please create:
-
-**Required file**: \`docs/vibex-canvas-evolution-roadmap/roadmap.md\`
-
-### Sections to include
-
-1. Current state (Q1 2026)
-2. Target state (Q4 2026)
-3. Evolution path by quarter
-4. Milestone history
-5. Technical debt tracking
-6. Decision records
-
-See the architect proposal \`docs/vibex-analyst-proposals-20260412-phase1/architecture.md\` for the full template.
-`,
+              body,
               labels: ['quarterly-reminder', 'documentation']
             });

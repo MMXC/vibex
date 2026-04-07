@@ -21,19 +21,20 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
-    version: '1.0.131',
+    version: '1.0.132',
     date: '2026-04-07',
     changes: [
-      '📋 vibex-proposals-20260412 E1-E3: 内部工具完善',
-      '✅ E1 dedup API 验证: curl POST /dedup → {level: pass} <500ms',
-      '✅ E2 flaky-detector 参数化: flaky-params.txt 配置 PLAYWRIGHT 参数',
-      '✅ E3 npm scripts 清理: 删除 vitest/pretest-check 冗余脚本',
-      '提交: d8f344f1',
+      '📋 vibex-analyst-proposals-20260412 E1-E3: 提案追踪体系',
+      '✅ E1 docs/proposals/INDEX.md: 提案状态索引表 + update-index.py',
+      '✅ E2 Brainstorming SOP: 需求澄清 SOP 写入 AGENTS.md',
+      '✅ E3 Canvas Evolution Roadmap: 季度提醒 workflow',
+      '提交: 3fe29426',
     ],
-    commit: 'd8f344f1',
+    commit: '3fe29426',
   },
 
   {
+    version: '1.0.131',
     version: '1.0.130',
     date: '2026-04-07',
     changes: [

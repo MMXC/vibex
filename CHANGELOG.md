@@ -1,3 +1,10 @@
+### Added (vibex-analyst-proposals-20260412-phase1 E1-E3: 提案追踪体系) — 2026-04-07
+- **vibex-analyst-proposals-20260412-phase1 E1-E3 提案追踪体系**:
+  - **E1 docs/proposals/INDEX.md**: 提案状态索引表（pending/in-progress/done/rejected），`scripts/update-index.py` 自动维护
+  - **E2 Brainstorming SOP**: 需求澄清 SOP（5步流程：触发→分析→提案→决策→记录），写入 `vibex-backend/AGENTS.md`
+  - **E3 Canvas Evolution Roadmap**: `docs/vibex-canvas-evolution-roadmap/roadmap.md` + `.github/workflows/quarterly-reminder.yml` (季度提醒)
+  - 提交: `3fe29426`
+
 ### Added (vibex-proposals-20260412 E1-E3: 内部工具完善) — 2026-04-07
 - **vibex-proposals-20260412 E1-E3 内部工具验证与扩展**:
   - **E1 dedup API 验证**: `curl POST /dedup → {level: pass}` <500ms 验证通过

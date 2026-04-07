@@ -1,5 +1,10 @@
 # Changelog
 
+### [vibex-analyst-proposals-20260412-phase1 E1: 提案追踪体系] — 2026-04-07
+- **E1 docs/proposals/INDEX.md**: 提案状态索引表，`scripts/update-index.py` 自动维护
+- **E3 Canvas Evolution Roadmap**: `.github/workflows/quarterly-reminder.yml` — 季度(1/4/7/10月) GitHub issue 提醒
+- 提交: `3fe29426`
+
 ### [vibex-proposals-20260412 E2-E3: flaky-detector + npm scripts] — 2026-04-07
 - **E2 flaky-detector 参数化**: `flaky-params.txt` — Playwright 报告路径和运行参数配置
   - `scripts/flaky-detector.sh` 支持从 param file 读取参数

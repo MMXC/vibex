@@ -2718,3 +2718,4 @@ See git history for complete changelog.
   - `vibex-backend/src/routes/canvas-generate-components.ts`: 新增 Hono 路由 `/api/canvas/generate-components` for Cloudflare Workers (commit `e2557e81`)
   - `vibex-backend/src/index.ts`: 注册 Hono 路由
   - 审查: `docs/review-reports/20260328/review-vibex-canvas-component-btn-20260328-epic1.md`
+  - **P0-Backend**: Remove ambiguous [projectId] route, merge into [id]

@@ -2,7 +2,7 @@
 
 **项目**: vibex-proposals-summary-20260411
 **日期**: 2026-04-07
-**最后更新**: 2026-04-07 08:58
+**最后更新**: 2026-04-07 11:42
 
 ---
 
@@ -82,6 +82,15 @@ sed -i 's/timeout: 10000/timeout: 30000/g'
   - 响应时间元数据 (responseTimeMs)
   - commit: 待推送
 验证: grep -l "Deprecation.*true" src/app/api/*/route.ts | wc -l  # 应为 17+
+
+### E-P0-5: 测试基础设施修复 ✅ DONE (Dev tasks 全部完成)
+- [x] P0-5 WebSocket MAX_CONNECTIONS=100 (commit 04d2ebc2)
+- [x] P0-6 disconnectTimeout=300000ms 5min 清理 (commit 04d2ebc2)
+- [x] P0-7 /health endpoint (commit 0c63fff2)
+- [x] P0-10 connectionPool.ts console.log 泄露清理 (commit b85f3ac7)
+  - 验证: grep "console\." src/services/websocket/ → 0
+  - 所有日志使用 devLog/safeError
+注: E-P0-5 的 grepInvert/playwright.config/stability 路径由 Tester 负责
 
 ---
 

@@ -1,14 +1,41 @@
 #!/bin/bash
 # scripts/flaky-detector.sh — Flaky test detection for VibeX
 # Runs E2E tests N times and generates flaky-tests.json
-# Usage: bash scripts/flaky-detector.sh [runs] [config]
-# Default: 10 runs with playwright.ci.config.ts
+#
+# Usage:
+#   bash scripts/flaky-detector.sh              # reads flaky-params.txt
+#   bash scripts/flaky-detector.sh 5 custom.config.ts  # override params
+#
+# Param file (flaky-params.txt):
+#   RUNS=10
+#   CONFIG=playwright.ci.config.ts
+#   OUTPUT=flaky-tests.json
 
 set -euo pipefail
 
-RUNS="${1:-10}"
-CONFIG="${2:-playwright.ci.config.ts}"
-OUTPUT="flaky-tests.json"
+# Load params from flaky-params.txt (E2 deliverable)
+PARAMS_FILE="flaky-params.txt"
+_parse_params() {
+  if [[ -f "$PARAMS_FILE" ]]; then
+    while IFS='=' read -r key value; do
+      [[ -z "$key" || "$key" =~ ^# ]] && continue
+      case "$key" in
+        RUNS)    PARAMS_RUNS="${value}" ;;
+        CONFIG)  PARAMS_CONFIG="${value}" ;;
+        OUTPUT)  PARAMS_OUTPUT="${value}" ;;
+      esac
+    done < "$PARAMS_FILE"
+  fi
+}
+PARAMS_RUNS=""
+PARAMS_CONFIG=""
+PARAMS_OUTPUT=""
+_parse_params
+
+# CLI args override param file
+RUNS="${1:-${PARAMS_RUNS:-10}}"
+CONFIG="${2:-${PARAMS_CONFIG:-playwright.ci.config.ts}}"
+OUTPUT="${PARAMS_OUTPUT:-flaky-tests.json}"
 TMP_DIR=$(mktemp -d)
 trap "rm -rf $TMP_DIR" EXIT
 

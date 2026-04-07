@@ -13,6 +13,13 @@
   - **S1.4 单元测试**: `ComponentTreeGrouping.test.ts` 35 tests (inferIsCommon/matchFlowNode/getPageLabel/groupByFlowId)
   - 提交: `7e2b8278` (matchFlowNode+tests), `fc8162d3` (4层fallback), `c8ffde20` (pageName)
 
+### Added (vibex-proposals-summary-20260411 E-P0-4: 需求质量提升) — 2026-04-07
+- **E-P0-4 需求质量提升**:
+  - **P0-12 AI智能补全**: `lib/ai-quality/keyword-detector.ts` — `detectVagueInput()` 检测 10 种模糊输入模式
+  - **P0-13 项目搜索 API**: `GET /api/projects?q=&status=&isPublic=` 支持 name/description 搜索 + status 过滤
+  - 测试: keyword-detector 10 tests + projects 35 tests = 45/45 passed
+  - 提交: `391ac6eb`, `667b462b`
+
 ### Added (vibex-proposals-summary-20260411 E-P0-3: WebSocket治理 + CI修复) — 2026-04-07
 - **E-P0-3 WebSocket ConnectionPool 治理**:
   - **P0-5 MAX_CONNECTIONS=100**: `connectionPool.ts` 设置最大连接数限制

@@ -1,0 +1,42 @@
+{
+  "id": "healthcare-001",
+  "name": "医疗健康基础模板",
+  "description": "适用于医疗健康类应用的需求模板，包含预约挂号、问诊记录、健康档案等核心功能",
+  "category": "healthcare",
+  "scenes": ["b2c"],
+  "tags": ["user-auth", "notification", "admin", "i18n"],
+  "createdAt": "2026-03-09T00:00:00Z",
+  "updatedAt": "2026-03-09T00:00:00Z",
+  "items": [
+    {
+      "id": "epic-001",
+      "templateId": "healthcare-001",
+      "type": "epic",
+      "title": "预约挂号系统",
+      "description": "实现在线预约医生、挂号、取消预约",
+      "priority": "P0",
+      "acceptanceCriteria": [
+        "支持医生排班查询",
+        "支持预约挂号",
+        "支持取消预约",
+        "支持预约提醒通知"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "epic-002",
+      "templateId": "healthcare-001",
+      "type": "epic",
+      "title": "健康档案管理",
+      "description": "实现个人健康档案、体检记录、用药提醒",
+      "priority": "P1",
+      "acceptanceCriteria": [
+        "支持健康档案创建",
+        "支持体检记录上传",
+        "支持用药提醒设置",
+        "支持健康数据可视化"
+      ],
+      "dependencies": []
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "name": "proposals",
+  "goal": "各 agent 从专业视角提出项目改进提案，Coord 汇总决策优先级",
+  "status": "active",
+  "created_at": "2026-03-30T13:29:00Z",
+  "workspace": "/root/.openclaw/vibex",
+  "stages": {
+    "proposal-dev": {
+      "id": "proposal-dev",
+      "task_id": "proposal-dev",
+      "task": "## 提案提交: Dev 视角\n\n### 🔍 Dev 视角提案\n从代码质量、技术债务、工具链角度提出改进提案。\n\n### 输出要求\n- 文件: /root/.openclaw/vibex/proposals/dev/proposal.md\n- 格式: Markdown\n- 内容: 问题描述 + 解决方案 + 预期收益 + 工作量估算\n\n### 提案数量\n至少 3 条，每条独立 section\n\n### 完成后\npython3 task_manager.py update proposals proposal-dev done",
+      "agent": "dev",
+      "status": "pending",
+      "dependsOn": []
+    },
+    "proposal-analyst": {
+      "id": "proposal-analyst",
+      "task_id": "proposal-analyst",
+      "task": "## 提案提交: Analyst 视角\n\n### 🔍 Analyst 视角提案\n从产品分析、竞品对比、用户研究角度提出改进提案。\n\n### 输出要求\n- 文件: /root/.openclaw/vibex/proposals/analyst/proposal.md\n- 格式: Markdown\n- 内容: 市场分析 + 用户痛点 + 解决方案 + 优先级建议\n\n### 提案数量\n至少 3 条，每条独立 section\n\n### 完成后\npython3 task_manager.py update proposals proposal-analyst done",
+      "agent": "analyst",
+      "status": "pending",
+      "dependsOn": []
+    },
+    "proposal-architect": {
+      "id": "proposal-architect",
+      "task_id": "proposal-architect",
+      "task": "## 提案提交: Architect 视角\n\n### 🔍 Architect 视角提案\n从系统架构、技术选型、可扩展性角度提出改进提案。\n\n### 输出要求\n- 文件: /root/.openclaw/vibex/proposals/architect/proposal.md\n- 格式: Markdown\n- 内容: 架构问题 + 方案 + 风险评估 + 迁移成本\n\n### 提案数量\n至少 3 条，每条独立 section\n\n### 完成后\npython3 task_manager.py update proposals proposal-architect done",
+      "agent": "architect",
+      "status": "pending",
+      "dependsOn": []
+    },
+    "proposal-pm": {
+      "id": "proposal-pm",
+      "task_id": "proposal-pm",
+      "task": "## 提案提交: PM 视角\n\n### 🔍 PM 视角提案\n从产品体验、用户旅程、优先级角度提出改进提案。\n\n### 输出要求\n- 文件: /root/.openclaw/vibex/proposals/pm/proposal.md\n- 格式: Markdown\n- 内容: 用户故事 + 验收标准 + KPI 预期\n\n### 提案数量\n至少 3 条，每条独立 section\n\n### 完成后\npython3 task_manager.py update proposals proposal-pm done",
+      "agent": "pm",
+      "status": "pending",
+      "dependsOn": []
+    },
+    "proposal-tester": {
+      "id": "proposal-tester",
+      "task_id": "proposal-tester",
+      "task": "## 提案提交: Tester 视角\n\n### 🔍 Tester 视角提案\n从测试覆盖、质量保障、自动化角度提出改进提案。\n\n### 输出要求\n- 文件: /root/.openclaw/vibex/proposals/tester/proposal.md\n- 格式: Markdown\n- 内容: 质量问题 + 测试策略 + 自动化方案 + 覆盖率目标\n\n### 提案数量\n至少 3 条，每条独立 section\n\n### 完成后\npython3 task_manager.py update proposals proposal-tester done",
+      "agent": "tester",
+      "status": "pending",
+      "dependsOn": []
+    },
+    "proposal-reviewer": {
+      "id": "proposal-reviewer",
+      "task_id": "proposal-reviewer",
+      "task": "## 提案提交: Reviewer 视角\n\n### 🔍 Reviewer 视角提案\n从代码审查效率、规范遵守、安全角度提出改进提案。\n\n### 输出要求\n- 文件: /root/.openclaw/vibex/proposals/reviewer/proposal.md\n- 格式: Markdown\n- 内容: 审查问题 + 规范建议 + 安全考量 + 自动化检查\n\n### 提案数量\n至少 3 条，每条独立 section\n\n### 完成后\npython3 task_manager.py update proposals proposal-reviewer done",
+      "agent": "reviewer",
+      "status": "pending",
+      "dependsOn": []
+    },
+    "coord-aggregate": {
+      "id": "coord-aggregate",
+      "task_id": "coord-aggregate",
+      "task": "## Coord 汇总\n\n### 汇总所有 agent 提案\n读取 /root/.openclaw/vibex/proposals/ 各 agent 的 proposal.md\n\n### 产出\n- 汇总文件: /root/.openclaw/vibex/proposals/SUMMARY.md\n- 按 P0/P1/P2 分类\n- 每个提案注明来源 agent\n\n### 完成后\npython3 task_manager.py update proposals coord-aggregate done",
+      "agent": "coord",
+      "status": "pending",
+      "dependsOn": [
+        "proposal-dev",
+        "proposal-analyst",
+        "proposal-architect",
+        "proposal-pm",
+        "proposal-tester",
+        "proposal-reviewer"
+      ]
+    },
+    "coord-decision": {
+      "id": "coord-decision",
+      "task_id": "coord-decision",
+      "task": "## Coord 决策\n\n### 决策\n审阅汇总报告，决定哪些提案升级为 phase1 项目。\n\n### 决策标准\n- P0: 影响核心功能，立即处理\n- P1: 重要改进，下个迭代\n- P2: 长期规划，暂存\n\n### 完成后\npython3 task_manager.py update proposals coord-decision done",
+      "agent": "coord",
+      "status": "pending",
+      "dependsOn": [
+        "coord-aggregate"
+      ]
+    },
+    "coord-completed": {
+      "id": "coord-completed",
+      "task_id": "coord-completed",
+      "task": "## 项目收尾\n\n汇总报告已产出，提案决策已完成。",
+      "agent": "coord",
+      "status": "pending",
+      "dependsOn": [
+        "coord-decision"
+      ]
+    }
+  }
+}

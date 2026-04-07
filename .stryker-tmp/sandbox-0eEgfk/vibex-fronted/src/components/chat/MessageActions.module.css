@@ -1,0 +1,109 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.container.visible {
+  opacity: 1;
+}
+
+/* 悬停时显示操作按钮 */
+.container:hover {
+  opacity: 1;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.2s ease;
+}
+
+.actionBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  transform: scale(1.05);
+}
+
+.actionBtn.copied {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* 分享菜单容器 */
+.shareWrapper {
+  position: relative;
+}
+
+/* 分享菜单 */
+.menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  min-width: 140px;
+  background: rgba(30, 30, 46, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 4px;
+  z-index: 100;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.menuItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.menuItem:active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.menuIcon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}

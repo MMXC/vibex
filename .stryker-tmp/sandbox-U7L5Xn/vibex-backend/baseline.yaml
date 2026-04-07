@@ -1,0 +1,113 @@
+openapi: 3.0.3
+info:
+  title: VibeX API
+  version: 0.9.0
+  description: VibeX Backend API - AI-Powered Application Builder
+servers:
+  - url: http://localhost:3001
+    description: Local development server
+  - url: https://api.vibex.dev
+    description: Production server
+paths:
+  /api/auth/login:
+    post:
+      summary: User login
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: Login successful
+  /api/auth/register:
+    post:
+      summary: User registration
+      tags:
+        - Auth
+      responses:
+        '201':
+          description: Registration successful
+  /api/projects:
+    get:
+      summary: List all projects
+      tags:
+        - Projects
+      responses:
+        '200':
+          description: List of projects
+    post:
+      summary: Create a new project
+      tags:
+        - Projects
+      responses:
+        '201':
+          description: Project created
+  /api/projects/{id}:
+    get:
+      summary: Get project by ID
+      tags:
+        - Projects
+      responses:
+        '200':
+          description: Project details
+    delete:
+      summary: Delete project
+      tags:
+        - Projects
+      responses:
+        '200':
+          description: Project deleted
+  /api/requirements:
+    get:
+      summary: List all requirements
+      tags:
+        - Requirements
+      responses:
+        '200':
+          description: List of requirements
+  /api/domain-models:
+    get:
+      summary: List all domain models
+      tags:
+        - Domain Models
+      responses:
+        '200':
+          description: List of domain models
+  /api/pages:
+    get:
+      summary: List all pages
+      tags:
+        - Pages
+      responses:
+        '200':
+          description: List of pages
+  /api/pages/{id}:
+    get:
+      summary: Get page by ID
+      tags:
+        - Pages
+      responses:
+        '200':
+          description: Page details
+  /api/chat:
+    post:
+      summary: Send chat message
+      tags:
+        - Chat
+      responses:
+        '200':
+          description: Chat response
+  /api/flows:
+    get:
+      summary: List all flows
+      tags:
+        - Flows
+      responses:
+        '200':
+          description: List of flows
+  /api/users:
+    get:
+      summary: List all users
+      tags:
+        - Users
+      responses:
+        '200':
+          description: List of users

@@ -1,0 +1,188 @@
+{
+  "generated_at": "2026-04-06T17:00:03.669975+00:00",
+  "generated_by": "proposal_tracker.py",
+  "proposals_dir": "/root/.openclaw/vibex/proposals",
+  "stats": {
+    "total": 12,
+    "by_priority": {
+      "P0": 3,
+      "P1": 9
+    },
+    "by_status": {
+      "no-linked-task": 12
+    },
+    "linked": 0,
+    "unlinked": 12,
+    "claim_rate": 0.0,
+    "by_date": {
+      "20260324": {
+        "total": 11,
+        "done": 0,
+        "in_progress": 0
+      },
+      "20260406": {
+        "total": 1,
+        "done": 0,
+        "in_progress": 0
+      }
+    }
+  },
+  "proposals": [
+    {
+      "id": "P0-1",
+      "title": "page.test.tsx 4 个预存失败",
+      "priority": "P0",
+      "date_dir": "20260324",
+      "task_id": null,
+      "stage_status": "no-linked-task",
+      "stage_agent": "",
+      "task_status": "no-linked-task",
+      "stage_started": null,
+      "stage_completed": null,
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+    },
+    {
+      "id": "P0-2",
+      "title": "task_manager.py list/claim 命令挂起",
+      "priority": "P0",
+      "date_dir": "20260324",
+      "task_id": null,
+      "stage_status": "no-linked-task",
+      "stage_agent": "",
+      "task_status": "no-linked-task",
+      "stage_started": null,
+      "stage_completed": null,
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+    },
+    {
+      "id": "P0-3",
+      "title": "proposal-dedup 生产验证缺失",
+      "priority": "P0",
+      "date_dir": "20260324",
+      "task_id": null,
+      "stage_status": "no-linked-task",
+      "stage_agent": "",
+      "task_status": "no-linked-task",
+      "stage_started": null,
+      "stage_completed": null,
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+    },
+    {
+      "id": "P1-1",
+      "title": "ErrorBoundary 组件去重",
+      "priority": "P1",
+      "date_dir": "20260324",
+      "task_id": null,
+      "stage_status": "no-linked-task",
+      "stage_agent": "",
+      "task_status": "no-linked-task",
+      "stage_started": null,
+      "stage_completed": null,
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+    },
+    {
+      "id": "P1-2",
+      "title": "heartbeat 脚本幽灵任务误报",
+      "priority": "P1",
+      "date_dir": "20260324",
+      "task_id": null,
+      "stage_status": "no-linked-task",
+      "stage_agent": "",
+      "task_status": "no-linked-task",
+      "stage_started": null,
+      "stage_completed": null,
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+    },
+    {
+      "id": "P1-3",
+      "title": "CardTreeNode 组件单元测试补全",
+      "priority": "P1",
+      "date_dir": "20260324",
+      "task_id": null,
+      "stage_status": "no-linked-task",
+      "stage_agent": "",
+      "task_status": "no-linked-task",
+      "stage_started": null,
+      "stage_completed": null,
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+    },
+    {
+      "id": "P1-4",
+      "title": "confirmationStore.ts 拆分重构",
+      "priority": "P1",
+      "date_dir": "20260324",
+      "task_id": null,
+      "stage_status": "no-linked-task",
+      "stage_agent": "",
+      "task_status": "no-linked-task",
+      "stage_started": null,
+      "stage_completed": null,
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+    },
+    {
+      "id": "P1-5",
+      "title": "E2E 测试纳入 CI",
+      "priority": "P1",
+      "date_dir": "20260324",
+      "task_id": null,
+      "stage_status": "no-linked-task",
+      "stage_agent": "",
+      "task_status": "no-linked-task",
+      "stage_started": null,
+      "stage_completed": null,
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+    },
+    {
+      "id": "P1-6",
+      "title": "API 错误处理测试补全",
+      "priority": "P1",
+      "date_dir": "20260324",
+      "task_id": null,
+      "stage_status": "no-linked-task",
+      "stage_agent": "",
+      "task_status": "no-linked-task",
+      "stage_started": null,
+      "stage_completed": null,
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+    },
+    {
+      "id": "P1-7",
+      "title": "Accessibility 测试基线",
+      "priority": "P1",
+      "date_dir": "20260324",
+      "task_id": null,
+      "stage_status": "no-linked-task",
+      "stage_agent": "",
+      "task_status": "no-linked-task",
+      "stage_started": null,
+      "stage_completed": null,
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+    },
+    {
+      "id": "P1-8",
+      "title": "HEARTBEAT.md 话题追踪脚本实现",
+      "priority": "P1",
+      "date_dir": "20260324",
+      "task_id": null,
+      "stage_status": "no-linked-task",
+      "stage_agent": "",
+      "task_status": "no-linked-task",
+      "stage_started": null,
+      "stage_completed": null,
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+    },
+    {
+      "id": "P1",
+      "title": "执行",
+      "priority": "P1",
+      "date_dir": "20260406",
+      "task_id": null,
+      "stage_status": "no-linked-task",
+      "stage_agent": "",
+      "task_status": "no-linked-task",
+      "stage_started": null,
+      "stage_completed": null,
+      "summary_path": "/root/.openclaw/vibex/proposals/20260406/summary.md"
+    }
+  ]
+}

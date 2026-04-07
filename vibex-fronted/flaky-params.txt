@@ -1,0 +1,9 @@
+# flaky-params.txt — Flaky test detection parameters
+# Used by flaky-detector.sh (E2 deliverable)
+# Format: KEY=value (no spaces around =)
+
+PLAYWRIGHT_REPORT_DIR=playwright-report
+RESULTS_FILE=flaky-tests.json
+PROJECT_ID=vibex-proposals-20260412
+RUNS=10
+CONFIG=playwright.ci.config.ts

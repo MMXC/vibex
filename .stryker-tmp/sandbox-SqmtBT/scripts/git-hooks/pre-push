@@ -1,0 +1,41 @@
+#!/bin/bash
+# pre-push hook — 文件锁一致性检查
+# 安装方式: cp pre-push ~/.openclaw/vibex/.git/hooks/pre-push && chmod +x
+# 或全局安装到 /etc/.git/hooks/（需 repo 目录结构匹配）
+
+set -e
+
+LOCK_BASE="$HOME/.task_locks"
+
+echo "🔐 [pre-push] 检查任务锁一致性..."
+
+if [ ! -d "$LOCK_BASE" ]; then
+    echo "✅ 无任务锁目录，跳过检查"
+    exit 0
+fi
+
+# 读取当前仓库对应的项目（从 .git/hooks/project 文件读取，或从当前分支名推断）
+REPO_NAME=$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "")
+
+FAIL=0
+for lock_dir in "$LOCK_BASE"/*/; do
+    [ -d "$lock_dir" ] || continue
+    project=$(basename "$lock_dir")
+    lock_count=$(ls "$lock_dir"/*.lock 2>/dev/null | wc -l)
+    if [ "$lock_count" -gt 0 ]; then
+        echo "🔴 pre-push 被拒: $project 有 $lock_count 个未释放的任务锁"
+        ls "$lock_dir"/*.lock 2>/dev/null | xargs -I{} basename {} .lock | sed 's/^/   • /'
+        echo ""
+        echo "💡 修复: task_manager update $project <task_id> done"
+        echo "   或强制清理: task_manager check-lock $project --fix"
+        FAIL=1
+    fi
+done
+
+if [ "$FAIL" -eq 1 ]; then
+    echo "❌ Push 被阻止 — 请先解决上述任务锁问题"
+    exit 1
+fi
+
+echo "✅ 任务锁检查通过"
+exit 0

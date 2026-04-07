@@ -1,0 +1,105 @@
+/**
+ * AIResultCards.module.css - AI 结果卡片区样式
+ * 
+ * Epic 7: AI 展示区
+ * 
+ * Layout:
+ * - Three-column grid (architecture.md: "AI[AIResultCards 三列卡片]")
+ * - Responsive: 3 cols → 2 cols (tablet) → 1 col (mobile)
+ * - Gap between cards: 12px
+ */
+
+/* ========== Container ========== */
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* ========== Header ========== */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.loadingBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background-color: #dbeafe;
+  color: #2563eb;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ========== Cards Grid (Three Columns) ========== */
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Responsive: Tablet */
+@media (max-width: 1024px) {
+  .cardsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Responsive: Mobile */
+@media (max-width: 640px) {
+  .cardsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========== Placeholder State ========== */
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 120px;
+  color: #9ca3af;
+  text-align: center;
+  gap: 8px;
+}
+
+.placeholderIcon {
+  font-size: 32px;
+  opacity: 0.4;
+}
+
+.placeholder p {
+  font-size: 14px;
+  margin: 0;
+  max-width: 280px;
+  line-height: 1.5;
+}

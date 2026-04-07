@@ -1,0 +1,72 @@
+/**
+ * VibeX Canvas — CSS Design Tokens
+ * P1-T5: Unified CSS variable system for canvas components
+ *
+ * 所有 canvas 相关 CSS 变量集中在此文件。
+ * 组件样式应引用这些变量而非硬编码值。
+ *
+ * 设计原则：
+ * - 颜色遵循 WCAG 2.1 AA 对比度
+ * - 未来风格：玻璃态 + 霓虹发光 + 赛博朋克
+ */
+
+:root {
+  /* ── Tree colors ─────────────────────────────────────────────────── */
+  /* Context tree — amber (core domain) */
+  --tree-context-color: #f59e0b;
+  --tree-context-glow: rgba(245, 158, 11, 0.3);
+
+  /* Flow tree — blue (business process) */
+  --tree-flow-color: #3b82f6;
+  --tree-flow-glow: rgba(59, 130, 246, 0.3);
+
+  /* Component tree — green (component) */
+  --tree-component-color: #10b981;
+  --tree-component-glow: rgba(16, 185, 129, 0.3);
+
+  /* ── Domain type colors (BoundedContextGroup) ─────────────────────── */
+  --domain-core-color: #f59e0b;
+  --domain-core-bg: rgba(245, 158, 11, 0.05);
+  --domain-supporting-color: #3b82f6;
+  --domain-supporting-bg: rgba(59, 130, 246, 0.05);
+  --domain-generic-color: #6b7280;
+  --domain-generic-bg: rgba(107, 114, 128, 0.05);
+  --domain-external-color: #8b5cf6;
+  --domain-external-bg: rgba(139, 92, 246, 0.05);
+
+  /* ── Flow step type colors ───────────────────────────────────────── */
+  --step-normal-color: #6b7280;
+  --step-normal-bg: rgba(107, 114, 128, 0.1);
+  --step-branch-color: #f59e0b;
+  --step-branch-bg: rgba(245, 158, 11, 0.1);
+  --step-loop-color: #8b5cf6;
+  --step-loop-bg: rgba(139, 92, 246, 0.1);
+
+  /* ── Node status colors ─────────────────────────────────────────── */
+  --node-pending-color: #f59e0b;
+  --node-pending-glow: rgba(255, 170, 0, 0.2);
+  --node-confirmed-color: #10b981;
+  --node-confirmed-glow: rgba(0, 255, 136, 0.2);
+  --node-error-color: #ef4444;
+  --node-error-glow: rgba(255, 68, 102, 0.2);
+  --node-generating-color: #0ea5e9;
+  --node-generating-glow: rgba(14, 165, 233, 0.2);
+
+  /* ── Component type colors ───────────────────────────────────────── */
+  --comp-page-color: #3b82f6;
+  --comp-list-color: #8b5cf6;
+  --comp-form-color: #f59e0b;
+  --comp-detail-color: #10b981;
+  --comp-modal-color: #ef4444;
+
+  /* ── Dashed border styles (BoundedContextGroup / ComponentGroup) ──── */
+  --dashed-border-dasharray: 5 3;
+  --dashed-border-stroke-width: 1.5;
+  --dotted-border-dasharray: 2 3;
+  --dotted-border-stroke-width: 2;
+
+  /* ── Animation ──────────────────────────────────────────────────── */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.2s ease;
+  --transition-slow: 0.3s ease;
+}

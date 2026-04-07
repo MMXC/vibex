@@ -1,0 +1,408 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  role      String   @default("viewer") // admin, editor, viewer
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects    Project[]
+  agents      Agent[]
+  conversations Conversation[]
+}
+
+model Project {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  userId      String
+  deletedAt   DateTime? // Soft delete - trash bin support
+  status      String    @default("draft") // draft|active|converted|archived
+  version     Int       @default(1)      // Optimistic locking
+  isTemplate  Boolean   @default(false)
+  isPublic    Boolean   @default(false)
+  usageCount  Int       @default(0)
+  thumbnail   String?
+  parentDraftId String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user           User      @relation(fields: [userId], references: [id])
+  pages          Page[]
+  messages       Message[]
+  flows          FlowData[]
+  requirements   Requirement[]
+  prototypeSnapshots PrototypeSnapshot[]
+  stepState      StepState?
+  changeLogs     ChangeLog[]
+  businessDomains BusinessDomain[]
+  uiNodes        UINode[]
+}
+
+model Page {
+  id        String   @id @default(cuid())
+  name      String
+  content   String?  // JSON string for page content
+  projectId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id])
+}
+
+model Agent {
+  id          String   @id @default(cuid())
+  name        String
+  prompt      String
+  model       String   @default("abab6.5s-chat")
+  temperature Float    @default(0.7)
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  userId    String
+  messages  String   // JSON string of messages
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  role      String   // user, assistant, system
+  content   String
+  projectId String
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id])
+}
+
+model FlowData {
+  id        String   @id @default(cuid())
+  name      String?
+  nodes     String   // JSON string for React Flow nodes
+  edges     String   // JSON string for React Flow edges
+  projectId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+}
+
+// AI Prototype Builder Models
+
+model Requirement {
+  id          String   @id @default(cuid())
+  projectId   String
+  rawInput    String   // 原始需求文本
+  parsedData  String?  // JSON: 结构化解析结果
+  status      String   @default("draft") // draft, analyzing, clarified, confirmed
+  priority    String   @default("medium") // low, medium, high, critical
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  project     Project  @relation(fields: [projectId], references: [id])
+  entities    DomainEntity[]
+  clarifications ClarificationQuestion[]
+}
+
+model ClarificationQuestion {
+  id            String    @id @default(cuid())
+  requirementId String
+  question      String
+  answer        String?
+  status        String    @default("pending") // pending, answered, skipped
+  priority      String    @default("medium")   // low, medium, high
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  requirement   Requirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+}
+
+model DomainEntity {
+  id            String   @id @default(cuid())
+  requirementId String
+  name          String
+  type          String   // person, place, object, concept, event
+  description   String?
+  properties    String?  // JSON: 属性列表
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  requirement   Requirement @relation(fields: [requirementId], references: [id])
+  relationsFrom EntityRelation[] @relation("EntityRelationFrom")
+  relationsTo   EntityRelation[] @relation("EntityRelationTo")
+}
+
+model EntityRelation {
+  id          String   @id @default(cuid())
+  fromEntityId String
+  toEntityId   String
+  relationType String   // owns, uses, contains, depends-on, etc.
+  description  String?
+  createdAt    DateTime @default(now())
+  
+  fromEntity   DomainEntity @relation("EntityRelationFrom", fields: [fromEntityId], references: [id])
+  toEntity     DomainEntity @relation("EntityRelationTo", fields: [toEntityId], references: [id])
+}
+
+model PrototypeSnapshot {
+  id          String   @id @default(cuid())
+  projectId   String
+  version     Int      @default(1)
+  name        String?
+  description String?
+  content     String   // JSON: 界面快照数据
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  project     Project  @relation(fields: [projectId], references: [id])
+}
+
+// Prototype Collaboration - Manages collaborators on prototype projects
+
+model PrototypeCollaboration {
+  id          String   @id @default(cuid())
+  projectId   String
+  userId      String
+  userName    String?
+  userEmail   String?
+  role        String   @default("viewer") // owner, editor, viewer
+  status      String   @default("active") // active, pending, revoked
+  invitedBy   String?
+  invitedAt   DateTime?
+  joinedAt    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([projectId, userId]) // One collaboration per user per project
+  @@index([projectId])
+  @@index([userId])
+}
+
+// Component Library - Stores UI component definitions
+model Component {
+  id            String   @id @default(cuid())
+  name          String
+  category      String   // layout, basic, display, feedback, etc.
+  description   String?
+  props         String   @default("{}")  // JSON: default props
+  variants      String   @default("[]")  // JSON: array of variants
+  style         String   @default("{}")  // JSON: default style
+  interactions  String   @default("{}")  // JSON: interaction config
+  replaceable   Boolean  @default(false) // can be replaced by alternatives
+  alternatives  String   @default("[]")  // JSON: alternative component names
+  projectId     String?  // optional project association for custom components
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([category])
+  @@index([projectId])
+  @@index([name])
+}
+
+// Project Settings - stores project configurations and user preferences
+model ProjectSettings {
+  id        String   @id @default(cuid())
+  projectId String
+  key       String
+  value     String
+  userId    String?  // null for project-level settings, user ID for user preferences
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, key, userId])
+  @@index([projectId])
+  @@index([userId])
+}
+
+// ==================== Simplified Flow Models ====================
+
+// Step State - stores current step and step data for simplified flow
+model StepState {
+  id             String   @id @default(cuid())
+  projectId      String   @unique
+  currentStep    Int      @default(1) // 1|2|3
+  version        Int      @default(1)
+  step1Data      String?  // JSON: Step1Data
+  step2Data      String?  // JSON: Step2Data
+  step3Data      String?  // JSON: Step3Data
+  lastModifiedBy String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// Change Log - tracks all changes for history/rollback
+model ChangeLog {
+  id        String   @id @default(cuid())
+  projectId String
+  version   Int
+  source    String   // user|ai|system|rollback
+  action    String   // create|update|delete|rollback|merge
+  field     String
+  before    String?  // JSON
+  after     String?  // JSON
+  userId    String?
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, version])
+}
+
+// Business Domain - stores domain info for simplified flow
+model BusinessDomain {
+  id          String   @id @default(cuid())
+  projectId   String
+  name        String
+  description String?
+  domainType  String   @default("supporting") // core|supporting|generic|external
+  features    String   @default("[]") // JSON: Feature[]
+  relationships String @default("[]") // JSON: DomainRelationship[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+// UI Node - stores UI node tree for simplified flow
+model UINode {
+  id                String   @id @default(cuid())
+  projectId         String
+  name              String
+  nodeType          String   // page|form|list|detail|header|footer|modal|navigation|card
+  description       String?
+  linkedFlowNodeId  String?
+  children          String   @default("[]") // JSON: UINode[]
+  annotations       String   @default("[]") // JSON: UINodeAnnotation[]
+  positionX         Float?
+  positionY         Float?
+  checked           Boolean  @default(false)
+  priority          String   @default("medium") // low|medium|high
+  status            String   @default("pending") // pending|generated|failed
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+// ==================== Canvas Prototype Queue ====================
+
+// CanvasProject — 三树画布项目，关联到标准 Project
+model CanvasProject {
+  id              String   @id @default(cuid())
+  projectId       String   // 关联标准 Project.id
+  name            String
+  contextsJson    String   // JSON: BoundedContextNode[]
+  flowsJson       String   // JSON: BusinessFlowNode[]
+  componentsJson  String   // JSON: ComponentNode[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  pages           CanvasPage[]
+
+  @@index([projectId])
+}
+
+// CanvasPage — 原型生成队列中的页面
+model CanvasPage {
+  id              String   @id @default(cuid())
+  canvasProjectId String
+  componentId     String
+  name            String
+  status          String   @default("queued") // queued|generating|done|error
+  progress        Int      @default(0)         // 0-100
+  retryCount      Int      @default(0)
+  errorMessage    String?
+  generatedAt     DateTime?
+  codeJson        String?  // JSON: 生成的前端代码
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  canvasProject   CanvasProject @relation(fields: [canvasProjectId], references: [id], onDelete: Cascade)
+
+  @@index([canvasProjectId])
+}
+
+// CanvasBoundedContext — 限界上下文树节点
+model CanvasBoundedContext {
+  id          String   @id @default(cuid())
+  projectId   String
+  name        String
+  description String   @default("")
+  ctxType     String   @default("core")
+  confirmed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([projectId])
+}
+
+// CanvasFlow — 业务流程节点
+model CanvasFlow {
+  id        String   @id @default(cuid())
+  projectId String
+  ctxId     String
+  name      String
+  confirmed Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  steps     CanvasFlowStep[]
+
+  @@index([projectId])
+}
+
+// CanvasFlowStep — 流程步骤
+model CanvasFlowStep {
+  id          String   @id @default(cuid())
+  flowId     String
+  name        String
+  actor       String   @default("用户")
+  description String   @default("")
+  stepOrder  Int      @default(0)
+  confirmed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  canvasFlow CanvasFlow @relation(fields: [flowId], references: [id], onDelete: Cascade)
+
+  @@index([flowId])
+}
+
+// CanvasComponent — 组件节点
+model CanvasComponent {
+  id          String   @id @default(cuid())
+  projectId   String
+  flowId      String
+  name        String
+  compType    String   @default("page")
+  confirmed   Boolean  @default(false)
+  apiMethod   String   @default("GET")
+  apiPath     String   @default("/api/")
+  createdAt   DateTime @default(now())
+
+  @@index([projectId])
+}

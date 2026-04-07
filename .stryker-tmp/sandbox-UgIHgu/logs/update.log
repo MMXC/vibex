@@ -1,0 +1,13 @@
+2026-03-31T05:42:30Z | vibex-currentreport-modular/dev-epic1-模块独立化 | ready → done | cli
+2026-03-31T05:42:30Z | vibex-currentreport-modular/tester-epic1-模块独立化 | in-progress → ready | cli
+2026-03-31T05:42:30Z | vibex-selfcheck-path-normalization/dev-epic1-路径规范落地 | ready → done | cli
+2026-03-31T05:42:30Z | vibex-selfcheck-path-normalization/tester-epic1-路径规范落地 | pending → ready | cli
+2026-03-31T05:42:30Z | vibex-prd-template-standardization/dev-epic1-prd模板标准化 | ready → done | cli
+2026-03-31T05:42:30Z | vibex-prd-template-standardization/tester-epic1-prd模板标准化 | in-progress → ready | cli
+2026-03-31T05:45:06Z | vibex-exec-sandbox-fix/dev-epic1-execpath修复 | ready → done | cli
+2026-03-31T05:45:06Z | vibex-exec-sandbox-fix/tester-epic1-execpath修复 | pending → ready | cli
+2026-03-31T07:53:53Z | canvas-drawer-msg/dev-epic1 | pending → done | cli
+2026-03-31T07:53:53Z | canvas-drawer-msg/tester-epic1 | pending → ready | cli
+2026-03-31T07:54:10Z | canvas-drawer-msg/dev-epic1 | done → ready | cli
+2026-03-31T08:42:57Z | canvas-drawer-msg/dev-epic2 | pending → done | cli
+2026-03-31T08:42:57Z | canvas-drawer-msg/tester-epic2 | pending → ready | cli

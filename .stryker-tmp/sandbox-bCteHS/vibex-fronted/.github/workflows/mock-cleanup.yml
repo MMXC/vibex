@@ -1,0 +1,32 @@
+name: Mock Cleanup Check
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  mock-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run mock cleanup check
+        run: node scripts/cleanup-mocks.js
+
+      - name: Run static export check
+        run: node scripts/check-static-export.js
+
+      - name: Build project
+        run: npm run build

@@ -1,0 +1,5 @@
+# API 代理 - 将前端 /api/* 重写到后端
+/api/*  https://api.vibex.top/api/:splat  200
+
+# SPA 路由回退
+/*      /index.html   200

@@ -1,0 +1,40 @@
+{
+  "id": "ecommerce",
+  "version": 1,
+  "name": "电商系统",
+  "description": "适合电商平台领域建模，包含商品、订单、用户三大核心域",
+  "thumbnail": "",
+  "category": "ecommerce",
+  "contexts": [
+    {
+      "name": "商品域",
+      "description": "商品目录和库存管理",
+      "entities": ["商品", "SKU", "库存"]
+    },
+    {
+      "name": "订单域",
+      "description": "订单处理和履约",
+      "entities": ["订单", "订单项", "支付"]
+    },
+    {
+      "name": "用户域",
+      "description": "用户账户和会员",
+      "entities": ["用户", "地址", "会员"]
+    }
+  ],
+  "flows": [
+    {
+      "name": "下单流程",
+      "context": "订单域",
+      "steps": ["选择商品", "加入购物车", "提交订单", "支付", "确认发货"]
+    },
+    {
+      "name": "注册流程",
+      "context": "用户域",
+      "steps": ["填写信息", "验证手机", "完成注册"]
+    }
+  ],
+  "tags": ["电商", "标准", "入门"],
+  "createdAt": "2026-04-03T00:00:00Z",
+  "updatedAt": "2026-04-03T00:00:00Z"
+}

@@ -1,0 +1,37 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "testRunner": "jest",
+  "concurrency": 1,
+  "mutate": [
+    "vibex-fronted/src/lib/canvas/stores/contextStore.ts",
+    "vibex-fronted/src/lib/canvas/stores/flowStore.ts",
+    "vibex-fronted/src/lib/canvas/stores/componentStore.ts",
+    "vibex-fronted/src/lib/canvas/stores/uiStore.ts",
+    "vibex-fronted/src/lib/canvas/stores/sessionStore.ts",
+    "vibex-fronted/src/lib/canvas/canvasStore.ts"
+  ],
+  "ignorePatterns": [
+    "vibex-backend/**",
+    "vibex-fronted/node_modules/**",
+    "node_modules/**",
+    "**/node_modules/**",
+    ".stryker-tmp/**",
+    "reports/**"
+  ],
+  "plugins": [
+    "/root/.openclaw/vibex/node_modules/.pnpm/@stryker-mutator+jest-runner@9.6.0_@stryker-mutator+core@9.6.0_@types+node@20.19.37_/node_modules/@stryker-mutator/jest-runner/dist/src/index.js"
+  ],
+  "ignoreStatic": true,
+  "timeoutFactor": 1.5,
+  "thresholds": {
+    "break": 70,
+    "high": 90,
+    "low": 60
+  },
+  "reporters": [
+    "progress",
+    "html",
+    "json"
+  ],
+  "tempDirName": ".stryker-tmp"
+}

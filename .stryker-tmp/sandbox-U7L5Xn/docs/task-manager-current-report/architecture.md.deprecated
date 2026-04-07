@@ -1,0 +1,203 @@
+# ADR-001: task_manager.py current-report 命令架构
+
+## Status
+Accepted
+
+## Context
+
+Coord Agent 需要每 15 分钟执行一次心跳巡检，当前需要手动执行多个命令才能获取完整信息。需要在 `task_manager.py` 中新增 `current-report` 子命令，实现：
+1. 活跃项目状态报告（从 tasks.json 读取）
+2. 虚假完成检测（对比 status=done 与文件存在性）
+3. 服务器基本信息（CPU/内存/磁盘）
+
+## Decision
+
+### 技术方案：独立子命令 + 模块化设计
+
+```
+task_manager.py
+└── current_report/
+    ├── __init__.py
+    ├── commands.py        # CLI 入口（argparse 子命令注册）
+    ├── active_projects.py # F1: 活跃项目状态
+    ├── false_completion.py # F2: 虚假完成检测
+    └── server_info.py     # F3: 服务器信息
+```
+
+### 核心设计决策
+
+#### D1: 输出格式分离（文本 + JSON）
+- 默认输出人类可读文本（便于 cron 日志阅读）
+- `--json` 选项输出结构化 JSON（便于程序消费）
+- 不破坏现有 9 个子命令的输出格式
+
+#### D2: psutil 依赖 optional
+```python
+try:
+    import psutil
+    HAS_PSUTIL = True
+except ImportError:
+    HAS_PSUTIL = False
+    # graceful fallback: 输出 N/A
+```
+避免在无 psutil 环境中报错。
+
+#### D3: tasks.json 读取为唯一真实来源
+- 读取 `/root/.openclaw/workspace-coord/team-tasks/tasks.json`（主文件）
+- 不读各个独立项目 .json（避免数据不一致）
+- 使用 `json.load()` 一次性加载，不维护内存缓存
+
+#### D4: 虚假完成检测边界
+- 仅检测 `status=done` 且 `output` 字段非空的条目
+- `output` 为空字符串 → 不报错（允许无产出的任务）
+- `output` 非空但文件不存在 → 标记为虚假完成
+
+#### D5: 执行时间约束
+- 硬性上限：3 秒
+- 优化策略：
+  - `psutil.cpu_percent(interval=0.5)` 用短 interval
+  - 不递归扫描 completed 目录（仅读 tasks.json）
+  - 文件存在性检测用 `os.path.exists()`（最快）
+
+### 数据流
+
+```
+CLI: task_manager.py current-report [--json]
+        │
+        ▼
+┌─────────────────────────────────────────────┐
+│  current_report/commands.py                │
+│  argparse (subparsers)                    │
+│  - default: 打印三段文本报告                │
+│  - --json: 打印 JSON                       │
+└─────────────────────────────────────────────┘
+        │
+        ▼
+┌──────────────────┬──────────────────┬──────────────┐
+│ active_projects  │ false_completion│ server_info  │
+│ 读取 tasks.json  │ 读取 tasks.json │  psutil/os   │
+│ 过滤 status=     │ 过滤 status=    │  优雅降级    │
+│ active           │ done + output   │              │
+└──────────────────┴──────────────────┴──────────────┘
+        │                   │              │
+        └───────────────────┴──────────────┘
+                           ▼
+              三段式输出或 JSON 序列化
+```
+
+### API 定义
+
+```python
+# current_report/commands.py
+def add_subparser(subparsers):
+    parser = subparsers.add_parser(
+        'current-report',
+        help='生成项目待决报告：活跃项目 + 虚假完成 + 服务器信息'
+    )
+    parser.add_argument('--json', action='store_true', help='输出 JSON 格式')
+    parser.set_defaults(func=run_current_report)
+
+def run_current_report(args) -> int:
+    """返回 exit code，0=成功"""
+```
+
+```python
+# current_report/active_projects.py
+def get_active_projects(tasks_path: str) -> dict:
+    """
+    Returns: {
+        "count": int,
+        "projects": [{"name": str, "stage": str, "pending": int}]
+    }
+    """
+```
+
+```python
+# current_report/false_completion.py
+def detect_false_completions(tasks_path: str) -> dict:
+    """
+    Returns: {
+        "count": int,
+        "items": [{"project": str, "task": str, "missing_file": str}]
+    }
+    """
+```
+
+```python
+# current_report/server_info.py
+def get_server_info() -> dict:
+    """
+    Returns: {
+        "cpu_percent": float | None,  # None = N/A
+        "memory_percent": float | None,
+        "memory_mb": int | None,
+        "disk_percent": float | None,
+        "uptime_seconds": int | None
+    }
+    """
+```
+
+### CLI 输出格式
+
+**默认文本格式：**
+```
+=== Active Projects (N) ===
+- project-a: stage=create-prd, pending=0
+- project-b: stage=design-architecture, pending=2
+
+=== False Completion Detection ===
+✓ No false completions detected
+# 或
+- project-c: task=design-architecture, missing=docs/xxx/architecture.md
+
+=== Server Info ===
+CPU: 45% | Memory: 62% (8192MB) | Disk: 78%
+Uptime: 5d 12h 33m
+# 或（无 psutil）
+CPU: N/A | Memory: N/A | Disk: N/A
+Uptime: N/A
+```
+
+**JSON 格式（--json）：**
+```json
+{
+  "active_projects": {"count": 2, "projects": [...]},
+  "false_completions": {"count": 0, "items": []},
+  "server_info": {"cpu_percent": 45.2, "memory_percent": 62.1, ...},
+  "generated_at": "2026-03-30T06:40:00Z"
+}
+```
+
+### 文件结构
+
+```
+/root/.openclaw/vibex/
+└── docs/task-manager-current-report/
+    ├── analysis.md           ✅ analyst 产出
+    ├── prd.md                ✅ pm 产出
+    ├── architecture.md       ✅ architect 产出（本文件）
+    └── IMPLEMENTATION_PLAN.md # architect 产出（见下方）
+```
+
+### 错误处理
+
+| 场景 | 行为 |
+|------|------|
+| tasks.json 不存在 | 输出 `ERROR: tasks.json not found`，返回 1 |
+| tasks.json JSON 解析失败 | 输出 `ERROR: Invalid JSON in tasks.json`，返回 1 |
+| output 文件检查权限不足 | 跳过该文件，记录 warning，不阻塞 |
+| psutil 不可用 | 所有 server_info 字段为 None，输出 N/A |
+
+## Consequences
+
+### 正面
+- Coord 心跳脚本可简化为一行调用
+- 虚假完成检测自动化，防止人工检查遗漏
+- 服务器信息为未来自动扩容提供数据基础
+
+### 负面
+- 新增 psutil 依赖（可选，影响小）
+- tasks.json 结构变更时需同步更新解析逻辑
+
+### 中性
+- 输出格式固定，不支持自定义列（避免过度设计）

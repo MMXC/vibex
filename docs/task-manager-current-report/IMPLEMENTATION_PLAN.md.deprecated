@@ -1,0 +1,292 @@
+# Implementation Plan: task_manager.py current-report
+
+## 项目信息
+- **项目**: task-manager-current-report
+- **阶段**: Phase 1（Epic 1 + Epic 4）
+- **预计工时**: 4.5h
+- **执行者**: dev
+
+---
+
+## 目录结构
+
+```
+/root/.openclaw/skills/team-tasks/scripts/
+└── task_manager.py          # 现有文件，添加 subparser
+/root/.openclaw/skills/team-tasks/scripts/
+└── current_report/
+    ├── __init__.py
+    ├── _active_projects.py
+    ├── _false_completion.py
+    ├── _server_info.py
+    └── _output.py
+```
+
+> 注：放在 `scripts/` 下而非 `vibex/` 下，因 task_manager.py 本身在 scripts/ 目录。
+
+---
+
+## Epic 1: 活跃项目状态（P0）
+
+### Story 1.1: 读取 tasks.json 获取 active 项目列表
+
+**文件**: `current_report/_active_projects.py`
+
+```python
+import json
+from pathlib import Path
+
+def get_active_projects(tasks_path: str = None) -> dict:
+    if tasks_path is None:
+        tasks_path = "/root/.openclaw/workspace-coord/team-tasks/tasks.json"
+    
+    with open(tasks_path) as f:
+        data = json.load(f)
+    
+    active_projects = [
+        p for p in data.get("projects", [])
+        if p.get("status") == "active"
+    ]
+    
+    return {
+        "count": len(active_projects),
+        "projects": [
+            {
+                "name": p["project"],
+                "stage": _get_current_stage(p),
+                "pending": _count_pending(p)
+            }
+            for p in active_projects
+        ]
+    }
+
+def _get_current_stage(project: dict) -> str:
+    """获取当前进行中的阶段名称"""
+    stages = project.get("stages", {})
+    for name, info in stages.items():
+        if info.get("status") == "in-progress":
+            return name
+    # 没有 in-progress，返回最后一个非 done 的
+    for name, info in reversed(list(stages.items())):
+        if info.get("status") != "done":
+            return name
+    return "completed"
+
+def _count_pending(project: dict) -> int:
+    """统计 pending 任务数"""
+    return sum(1 for info in project.get("stages", {}).values()
+               if info.get("status") == "pending")
+```
+
+### Story 1.2: 格式化输出活跃项目
+
+**文件**: `current_report/_output.py`
+
+```python
+def format_active_text(data: dict) -> str:
+    lines = [f"=== Active Projects ({data['count']}) ==="]
+    if not data["projects"]:
+        lines.append("(none)")
+    for p in data["projects"]:
+        lines.append(f"- {p['name']}: stage={p['stage']}, pending={p['pending']}")
+    return "\n".join(lines)
+```
+
+---
+
+## Epic 2: 虚假完成检测（P0）
+
+### Story 2.1-2.3: 虚假完成检测逻辑
+
+**文件**: `current_report/_false_completion.py`
+
+```python
+import json
+import os
+from pathlib import Path
+
+def detect_false_completions(tasks_path: str = None, workspace: str = None) -> dict:
+    if tasks_path is None:
+        tasks_path = "/root/.openclaw/workspace-coord/team-tasks/tasks.json"
+    if workspace is None:
+        workspace = "/root/.openclaw/vibex"
+    
+    with open(tasks_path) as f:
+        data = json.load(f)
+    
+    items = []
+    for project in data.get("projects", []):
+        project_name = project.get("project", "")
+        for task_name, task_info in project.get("stages", {}).items():
+            if task_info.get("status") != "done":
+                continue
+            output = task_info.get("output", "")
+            if not output:  # output 为空不检测
+                continue
+            # output 可以是相对路径或绝对路径
+            if not output.startswith("/"):
+                output = os.path.join(workspace, output)
+            if not os.path.exists(output):
+                items.append({
+                    "project": project_name,
+                    "task": task_name,
+                    "missing_file": output
+                })
+    
+    return {"count": len(items), "items": items}
+```
+
+---
+
+## Epic 3: 服务器信息（P1）
+
+### Story 3.1-3.3: psutil + fallback
+
+**文件**: `current_report/_server_info.py`
+
+```python
+import os
+import time
+
+try:
+    import psutil
+    HAS_PSUTIL = True
+except ImportError:
+    HAS_PSUTIL = False
+
+def get_server_info() -> dict:
+    result = {
+        "cpu_percent": None,
+        "memory_percent": None,
+        "memory_mb": None,
+        "disk_percent": None,
+        "uptime_seconds": None
+    }
+    
+    if not HAS_PSUTIL:
+        return result
+    
+    try:
+        result["cpu_percent"] = psutil.cpu_percent(interval=0.5)
+    except Exception:
+        pass
+    
+    try:
+        mem = psutil.virtual_memory()
+        result["memory_percent"] = mem.percent
+        result["memory_mb"] = int(mem.used / 1024 / 1024)
+    except Exception:
+        pass
+    
+    try:
+        disk = psutil.disk_usage("/")
+        result["disk_percent"] = disk.percent
+    except Exception:
+        pass
+    
+    try:
+        # /proc/uptime 第一列为秒
+        with open("/proc/uptime") as f:
+            result["uptime_seconds"] = int(float(f.readline().split()[0]))
+    except Exception:
+        pass
+    
+    return result
+```
+
+---
+
+## Epic 4: CLI 集成（P0）
+
+### Story 4.1: 注册子命令
+
+**文件**: `task_manager.py`（修改）
+
+在 `main()` 函数中添加：
+
+```python
+# 在 existing imports 后添加
+from current_report import current_report
+
+# 在 build_parser() 中添加
+subparsers = parser.add_subparsers(dest="command", required=True)
+current_report.add_subparser(subparsers)
+```
+
+### Story 4.2: 主流程组合
+
+```python
+# current_report/__init__.py
+from ._active_projects import get_active_projects
+from ._false_completion import detect_false_completions
+from ._server_info import get_server_info
+from ._output import format_report_text, format_report_json
+
+def run(args) -> int:
+    tasks_path = args.tasks_path
+    workspace = args.workspace
+    
+    active = get_active_projects(tasks_path)
+    false_completions = detect_false_completions(tasks_path, workspace)
+    server_info = get_server_info()
+    
+    if args.json:
+        print(format_report_json(active, false_completions, server_info))
+    else:
+        print(format_report_text(active, false_completions, server_info))
+    return 0
+```
+
+### Story 4.3: --json 选项
+
+在 `add_subparser` 中添加 `--json` 参数。
+
+---
+
+## 测试策略
+
+### 单元测试（pytest）
+
+| 测试文件 | 测试内容 |
+|----------|----------|
+| `test_active_projects.py` | 正常/空 active 列表解析 |
+| `test_false_completion.py` | 文件存在/不存在/无 output 场景 |
+| `test_server_info.py` | psutil 可用/不可用分支 |
+| `test_output.py` | 文本格式 + JSON 格式 |
+
+### 集成测试
+
+```bash
+# 基本执行
+task_manager.py current-report
+echo $?  # 应为 0
+
+# JSON 模式
+task_manager.py current-report --json | python3 -m json.tool
+```
+
+---
+
+## 开发约束
+
+1. **不修改现有 9 个子命令的输出格式**
+2. **不添加新的顶层参数**（仅子命令内部选项）
+3. **psutil 为 optional import**，无依赖时不能报错
+4. **所有异常捕获**，不向用户暴露 traceback
+5. **tasks.json 路径可配置**（通过 `--tasks-path` 参数）
+6. **workspace 路径可配置**（通过 `--workspace` 参数）
+
+---
+
+## 实施顺序
+
+| 步骤 | 阶段 | 任务 | 执行者 |
+|------|------|------|--------|
+| 1 | Epic 4 | 创建目录结构 + CLI 框架 | dev |
+| 2 | Epic 1 | 实现 active_projects.py | dev |
+| 3 | Epic 2 | 实现 false_completion.py | dev |
+| 4 | Epic 3 | 实现 server_info.py | dev |
+| 5 | Epic 4 | 集成 + 输出格式化 | dev |
+| 6 | - | 单元测试 | tester |
+| 7 | - | Code review | reviewer |
+| 8 | - | 合并 + 推送 | reviewer-push |

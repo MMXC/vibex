@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "vibex": {
+      "command": "node",
+      "args": ["./dist/index.js"],
+      "cwd": "/absolute/path/to/vibex/packages/mcp-server"
+    }
+  }
+}

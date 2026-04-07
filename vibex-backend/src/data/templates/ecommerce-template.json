@@ -1,0 +1,92 @@
+{
+  "id": "tmpl-ecommerce-001",
+  "name": "电商平台",
+  "industry": "ecommerce",
+  "description": "适合电商平台、产品商城等场景，包含商品管理、订单处理、支付配送等核心功能",
+  "icon": "🛒",
+  "entities": [
+    {
+      "name": "Product",
+      "type": "aggregate",
+      "attributes": [
+        { "name": "id", "type": "uuid", "description": "商品唯一标识" },
+        { "name": "name", "type": "string", "description": "商品名称" },
+        { "name": "price", "type": "number", "description": "商品价格" },
+        { "name": "stock", "type": "integer", "description": "库存数量" },
+        { "name": "categoryId", "type": "uuid", "description": "所属分类" },
+        { "name": "status", "type": "enum", "description": "上架/下架状态" },
+        { "name": "createdAt", "type": "datetime" }
+      ],
+      "description": "商品聚合根，管理商品基本信息"
+    },
+    {
+      "name": "Order",
+      "type": "aggregate",
+      "attributes": [
+        { "name": "id", "type": "uuid", "description": "订单唯一标识" },
+        { "name": "userId", "type": "uuid", "description": "下单用户" },
+        { "name": "status", "type": "enum", "description": "待支付/已支付/已发货/已完成/已取消" },
+        { "name": "totalAmount", "type": "number", "description": "订单总金额" },
+        { "name": "shippingAddress", "type": "string", "description": "收货地址" },
+        { "name": "createdAt", "type": "datetime" },
+        { "name": "paidAt", "type": "datetime" }
+      ],
+      "description": "订单聚合根，管理订单全生命周期"
+    },
+    {
+      "name": "Cart",
+      "type": "entity",
+      "attributes": [
+        { "name": "id", "type": "uuid" },
+        { "name": "userId", "type": "uuid" },
+        { "name": "items", "type": "json", "description": "购物车项列表" },
+        { "name": "updatedAt", "type": "datetime" }
+      ],
+      "description": "购物车实体"
+    },
+    {
+      "name": "User",
+      "type": "aggregate",
+      "attributes": [
+        { "name": "id", "type": "uuid" },
+        { "name": "username", "type": "string" },
+        { "name": "email", "type": "string" },
+        { "name": "phone", "type": "string" },
+        { "name": "passwordHash", "type": "string" },
+        { "name": "createdAt", "type": "datetime" }
+      ],
+      "description": "用户聚合根"
+    },
+    {
+      "name": "Payment",
+      "type": "valueObject",
+      "attributes": [
+        { "name": "method", "type": "enum", "description": "支付方式：微信/支付宝/银行卡" },
+        { "name": "amount", "type": "number" },
+        { "name": "transactionId", "type": "string" },
+        { "name": "paidAt", "type": "datetime" }
+      ],
+      "description": "支付值对象"
+    }
+  ],
+  "boundedContexts": [
+    {
+      "name": "商品目录",
+      "entities": ["Product"],
+      "description": "负责商品信息管理、分类、搜索"
+    },
+    {
+      "name": "交易订单",
+      "entities": ["Order", "Cart", "Payment"],
+      "description": "负责购物车、订单创建、支付流程"
+    },
+    {
+      "name": "用户中心",
+      "entities": ["User"],
+      "description": "负责用户注册、登录、个人信息管理"
+    }
+  ],
+  "sampleRequirement": "用户可以浏览商品列表和详情，将商品加入购物车，从购物车下单并选择收货地址，使用微信或支付宝完成支付，商家可以在后台管理商品上下架和查看订单列表。",
+  "tags": ["电商", "商城", "交易", "支付", "购物车"],
+  "createdAt": "2026-04-10"
+}

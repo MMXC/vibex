@@ -1,0 +1,11 @@
+{
+  "baseline": "baseline.yaml",
+  "current": "openapi.json",
+  "timestamp": "2026-03-06T14:50:18.121Z",
+  "summary": {
+    "breaking": 0,
+    "nonBreaking": 0,
+    "info": 0
+  },
+  "changes": []
+}

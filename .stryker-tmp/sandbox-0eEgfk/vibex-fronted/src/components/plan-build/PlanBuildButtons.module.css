@@ -1,0 +1,115 @@
+/* PlanBuildButtons Component Styles */
+
+.container {
+  padding: 16px;
+  background: var(--bg-secondary, #12121a);
+  border: 1px solid var(--border-color, #2a2a3e);
+  border-radius: 12px;
+  margin-top: 12px;
+}
+
+.label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.labelText {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary, #e4e4e7);
+}
+
+.currentMode {
+  font-size: 13px;
+  color: var(--text-secondary, #a1a1aa);
+}
+
+.currentMode strong {
+  color: var(--accent-color, #6366f1);
+}
+
+.buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 20px;
+  background: var(--bg-primary, #0a0a0f);
+  border: 2px solid var(--border-color, #2a2a3e);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary, #a1a1aa);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.button:hover:not(:disabled) {
+  background: var(--bg-tertiary, #1a1a24);
+  border-color: var(--text-muted, #71717a);
+  transform: translateY(-2px);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.buttonActive {
+  border-color: var(--accent-color, #6366f1);
+  color: var(--text-primary, #e4e4e7);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.planButton.buttonActive {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.buildButton.buttonActive {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.icon {
+  font-size: 18px;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.description {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color, #2a2a3e);
+}
+
+.descText {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary, #a1a1aa);
+}
+
+.descText strong {
+  color: var(--text-primary, #e4e4e7);
+}

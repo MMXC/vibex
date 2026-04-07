@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "flow",
+  "type": "object",
+  "description": "BusinessFlow API response schema — E4 Contract Testing (test/schemas/flow.json)",
+  "required": ["nodeId", "name", "status"],
+  "properties": {
+    "nodeId": {
+      "type": "string",
+      "description": "Unique flow node ID"
+    },
+    "contextId": {
+      "type": "string",
+      "description": "Associated bounded context ID"
+    },
+    "name": {
+      "type": "string",
+      "description": "Flow node display name"
+    },
+    "steps": {
+      "type": "array",
+      "description": "Flow step definitions",
+      "items": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "order": { "type": "number" }
+        }
+      }
+    },
+    "isActive": {
+      "type": "boolean",
+      "description": "Whether node participates in generation (default true)"
+    },
+    "selected": {
+      "type": "boolean",
+      "description": "E1: Whether node is selected in UI (persisted to JSON)"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "confirmed", "rejected"],
+      "description": "Node confirmation status"
+    },
+    "parentId": {
+      "type": "string",
+      "description": "Parent flow node ID for nesting"
+    },
+    "children": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Child flow node IDs"
+    },
+    "relationships": {
+      "type": "array",
+      "description": "E3-F13: Flow relationships",
+      "items": {
+        "type": "object",
+        "required": ["targetId"],
+        "properties": {
+          "sourceId": { "type": "string" },
+          "targetId": { "type": "string" },
+          "type": { "type": "string", "enum": ["sequence", "parallel", "conditional"] },
+          "label": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

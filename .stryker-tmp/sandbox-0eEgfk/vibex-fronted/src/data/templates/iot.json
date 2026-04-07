@@ -1,0 +1,42 @@
+{
+  "id": "iot-001",
+  "name": "物联网基础模板",
+  "description": "适用于物联网平台的需求模板，包含设备管理、实时监控、数据分析等核心功能",
+  "category": "iot",
+  "scenes": ["b2b", "api"],
+  "tags": ["notification", "analytics", "admin", "security"],
+  "createdAt": "2026-03-09T00:00:00Z",
+  "updatedAt": "2026-03-09T00:00:00Z",
+  "items": [
+    {
+      "id": "epic-001",
+      "templateId": "iot-001",
+      "type": "epic",
+      "title": "设备管理系统",
+      "description": "实现设备注册、绑定、远程控制、固件升级",
+      "priority": "P0",
+      "acceptanceCriteria": [
+        "支持设备注册接入",
+        "支持设备绑定解绑",
+        "支持远程开关控制",
+        "支持固件 OTA 升级"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "epic-002",
+      "templateId": "iot-001",
+      "type": "epic",
+      "title": "实时监控系统",
+      "description": "实现设备状态实时监控、异常告警、数据可视化",
+      "priority": "P0",
+      "acceptanceCriteria": [
+        "支持设备状态实时显示",
+        "支持异常告警通知",
+        "支持历史数据查询",
+        "支持数据可视化报表"
+      ],
+      "dependencies": ["epic-001"]
+    }
+  ]
+}

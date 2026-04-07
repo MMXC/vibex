@@ -1,0 +1,2 @@
+// @ts-nocheck
+self.__MIDDLEWARE_MATCHERS = [];self.__MIDDLEWARE_MATCHERS_CB && self.__MIDDLEWARE_MATCHERS_CB()

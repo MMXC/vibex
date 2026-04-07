@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>首页 - 全收起</title>
+  <style>
+    :root {
+      --color-primary: #3b82f6;
+      --color-primary-hover: #2563eb;
+      --color-primary-muted: #dbeafe;
+      --color-bg-primary: #ffffff;
+      --color-bg-secondary: #f9fafb;
+      --color-bg-tertiary: #f3f4f6;
+      --color-border: #e5e7eb;
+      --color-text-primary: #111827;
+      --color-text-secondary: #6b7280;
+      --color-text-muted: #9ca3af;
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --radius-lg: 0.5rem;
+      --radius-xl: 0.75rem;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--color-bg-secondary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .page {
+      background: var(--color-bg-primary);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 1200px;
+      height: 600px;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      height: 50px;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+    .logo { font-size: 18px; font-weight: 700; color: var(--color-primary); }
+    .nav { display: flex; gap: 20px; align-items: center; }
+    .nav span { font-size: 14px; color: var(--color-text-secondary); cursor: pointer; }
+    .nav span.active { color: var(--color-primary); font-weight: 500; }
+    .btn-login {
+      background: var(--color-primary); color: white; border: none;
+      padding: 8px 16px; border-radius: var(--radius-lg); font-size: 14px; cursor: pointer;
+    }
+    .preview {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+    }
+    .placeholder {
+      width: 70%; height: 70%;
+      background: var(--color-bg-secondary);
+      border: 2px dashed var(--color-border);
+      border-radius: var(--radius-xl);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 15px;
+    }
+    .placeholder-icon { font-size: 48px; }
+    .placeholder-text { color: var(--color-text-muted); font-size: 16px; }
+    .bottom-bar {
+      height: 60px;
+      border-top: 1px solid var(--color-border);
+      display: flex; align-items: center; padding: 0 20px; gap: 15px;
+    }
+    .input-compact {
+      flex: 1; height: 40px;
+      background: var(--color-bg-tertiary); border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg); padding: 0 15px; font-size: 14px;
+    }
+    .btn-tool {
+      padding: 8px 12px;
+      background: var(--color-bg-tertiary); border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg); font-size: 13px; cursor: pointer;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .btn-tool:hover { background: var(--color-primary-muted); border-color: var(--color-primary); color: var(--color-primary); }
+    .btn-primary { background: var(--color-primary); color: white; border: none; }
+    .btn-primary:hover { background: var(--color-primary-hover); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <div class="logo">VibeX</div>
+      <div class="nav">
+        <span>首页</span>
+        <span>项目</span>
+        <span>模板</span>
+        <span class="active">更新日志</span>
+        <button class="btn-login">登录 / 注册</button>
+      </div>
+    </div>
+    <div class="preview">
+      <div class="placeholder">
+        <div class="placeholder-icon">📋</div>
+        <div class="placeholder-text">输入需求后，这里将显示 DDD 分析结果</div>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <input type="text" class="input-compact" placeholder="输入需求...">
+      <button class="btn-tool">💾 保存</button>
+      <button class="btn-tool">🔄 重新生成</button>
+      <button class="btn-tool btn-primary">📁 创建项目</button>
+      <button class="btn-tool">⬆️ 展开</button>
+    </div>
+  </div>
+</body>
+</html>

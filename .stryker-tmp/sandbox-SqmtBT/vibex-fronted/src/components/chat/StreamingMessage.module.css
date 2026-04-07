@@ -1,0 +1,179 @@
+/* StreamingMessage - 流式消息组件样式 */
+
+/* 消息容器 */
+.message {
+  display: flex;
+  gap: 12px;
+  max-width: 80%;
+  animation: messageSlideIn 0.3s ease-out;
+}
+
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.userMessage {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.assistantMessage {
+  align-self: flex-start;
+}
+
+/* 头像 */
+.avatar {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.userMessage .avatar {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary, #06b6d4) 0%,
+    var(--color-accent, #8b5cf6) 100%
+  );
+  color: var(--color-text-inverse, #fff);
+}
+
+.assistantMessage .avatar {
+  background: var(--color-bg-secondary, #1e293b);
+  border: 1px solid var(--color-border, #334155);
+  color: var(--color-primary, #06b6d4);
+}
+
+/* 内容区域 */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.userContent {
+  align-items: flex-end;
+}
+
+.assistantContent {
+  align-items: flex-start;
+}
+
+/* 消息气泡 */
+.bubble {
+  padding: 14px 18px;
+  border-radius: 16px;
+  font-size: 15px;
+  line-height: 1.6;
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  transition: background-color 0.2s ease;
+}
+
+.userMessage .bubble {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary, #06b6d4) 0%,
+    var(--color-accent, #8b5cf6) 100%
+  );
+  color: var(--color-text-inverse, #fff);
+  border-bottom-right-radius: 4px;
+}
+
+.assistantMessage .bubble {
+  background: var(--color-bg-secondary, #1e293b);
+  border: 1px solid var(--color-border, #334155);
+  color: var(--color-text-primary, #f1f5f9);
+  border-bottom-left-radius: 4px;
+}
+
+/* 时间戳 */
+.time {
+  font-size: 11px;
+  color: var(--color-text-muted, #94a3b8);
+}
+
+/* 光标效果 */
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  background-color: var(--color-primary, #06b6d4);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: cursorBlink 1s infinite;
+}
+
+@keyframes cursorBlink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* 行内代码 */
+.inlineCode {
+  background: var(--color-bg-tertiary, #0f172a);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-size: 0.9em;
+  color: var(--color-primary, #06b6d4);
+}
+
+/* 代码块 */
+.codeBlock {
+  background: var(--color-bg-tertiary, #0f172a);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 8px 0;
+  overflow-x: auto;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-primary, #f1f5f9);
+}
+
+/* 加载动画 */
+.streaming {
+  animation: contentFadeIn 0.1s ease-out;
+}
+
+@keyframes contentFadeIn {
+  from {
+    opacity: 0.8;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .message {
+    max-width: 90%;
+  }
+
+  .bubble {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "id": "tmpl-social-001",
+  "name": "社交网络",
+  "industry": "social",
+  "description": "适合社交网络应用，包含用户关系、动态发布、内容互动等核心功能",
+  "icon": "👥",
+  "entities": [
+    {
+      "name": "User",
+      "type": "aggregate",
+      "attributes": [
+        { "name": "id", "type": "uuid" },
+        { "name": "username", "type": "string" },
+        { "name": "nickname", "type": "string" },
+        { "name": "avatar", "type": "string", "description": "头像URL" },
+        { "name": "bio", "type": "string", "description": "个人简介" },
+        { "name": "createdAt", "type": "datetime" }
+      ],
+      "description": "用户聚合根"
+    },
+    {
+      "name": "Post",
+      "type": "aggregate",
+      "attributes": [
+        { "name": "id", "type": "uuid" },
+        { "name": "authorId", "type": "uuid" },
+        { "name": "content", "type": "string" },
+        { "name": "mediaUrls", "type": "string[]", "description": "图片/视频URL列表" },
+        { "name": "visibility", "type": "enum", "description": "公开/私密/仅粉丝" },
+        { "name": "likeCount", "type": "integer" },
+        { "name": "commentCount", "type": "integer" },
+        { "name": "createdAt", "type": "datetime" }
+      ],
+      "description": "动态/帖子聚合根"
+    },
+    {
+      "name": "Follow",
+      "type": "entity",
+      "attributes": [
+        { "name": "followerId", "type": "uuid", "description": "关注者" },
+        { "name": "followingId", "type": "uuid", "description": "被关注者" },
+        { "name": "createdAt", "type": "datetime" }
+      ],
+      "description": "关注关系实体"
+    },
+    {
+      "name": "Comment",
+      "type": "entity",
+      "attributes": [
+        { "name": "id", "type": "uuid" },
+        { "name": "postId", "type": "uuid" },
+        { "name": "authorId", "type": "uuid" },
+        { "name": "content", "type": "string" },
+        { "name": "parentId", "type": "uuid", "description": "父评论ID，用于嵌套" },
+        { "name": "createdAt", "type": "datetime" }
+      ],
+      "description": "评论实体"
+    },
+    {
+      "name": "Like",
+      "type": "valueObject",
+      "attributes": [
+        { "name": "userId", "type": "uuid" },
+        { "name": "postId", "type": "uuid" },
+        { "name": "createdAt", "type": "datetime" }
+      ],
+      "description": "点赞值对象"
+    }
+  ],
+  "boundedContexts": [
+    {
+      "name": "用户关系",
+      "entities": ["User", "Follow"],
+      "description": "负责用户信息和关注关系管理"
+    },
+    {
+      "name": "内容社区",
+      "entities": ["Post", "Comment", "Like"],
+      "description": "负责动态发布、内容互动（点赞/评论）"
+    }
+  ],
+  "sampleRequirement": "用户可以注册登录、编辑个人资料，关注/取消关注其他用户，发布图文或视频动态，其他用户可以点赞、评论、回复评论，支持设置动态可见性（公开/私密/仅粉丝可见）。",
+  "tags": ["社交", "动态", "关注", "点赞", "评论"],
+  "createdAt": "2026-04-10"
+}

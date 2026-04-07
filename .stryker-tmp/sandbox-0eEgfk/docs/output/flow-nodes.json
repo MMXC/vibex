@@ -1,0 +1,96 @@
+{
+  "version": "1.0",
+  "domain": "VibeX落地页",
+  "description": "VibeX产品落地页，AI驱动低代码平台展示",
+  "flow": {
+    "nodes": [
+      {
+        "id": "flow_1",
+        "name": "进入落地页",
+        "description": "用户访问VibeX落地页URL",
+        "type": "start",
+        "parentDomain": "入口",
+        "features": ["页面加载"],
+        "dependencies": [],
+        "position": 1
+      },
+      {
+        "id": "flow_2",
+        "name": "浏览Hero区域",
+        "description": "查看核心标语、CTA按钮、动态背景",
+        "type": "action",
+        "parentDomain": "Hero Section",
+        "features": ["动画展示", "CTA点击"],
+        "dependencies": ["flow_1"],
+        "position": 2
+      },
+      {
+        "id": "flow_3",
+        "name": "浏览功能特性",
+        "description": "查看三大核心能力卡片",
+        "type": "action",
+        "parentDomain": "Features Section",
+        "features": ["功能卡片交互"],
+        "dependencies": ["flow_2"],
+        "position": 3
+      },
+      {
+        "id": "flow_4",
+        "name": "了解使用流程",
+        "description": "查看AI生成页面的步骤",
+        "type": "action",
+        "parentDomain": "How It Works",
+        "features": ["步骤展示"],
+        "dependencies": ["flow_3"],
+        "position": 4
+      },
+      {
+        "id": "flow_5",
+        "name": "观看产品演示",
+        "description": "查看Demo视频或GIF",
+        "type": "action",
+        "parentDomain": "Demo Section",
+        "features": ["视频播放"],
+        "dependencies": ["flow_4"],
+        "position": 5
+      },
+      {
+        "id": "flow_6",
+        "name": "查看社会证明",
+        "description": "查看用户评价和使用案例",
+        "type": "action",
+        "parentDomain": "Social Proof",
+        "features": ["评价展示"],
+        "dependencies": ["flow_5"],
+        "position": 6
+      },
+      {
+        "id": "flow_7",
+        "name": "点击CTA",
+        "description": "点击立即体验按钮",
+        "type": "action",
+        "parentDomain": "CTA Section",
+        "features": ["页面跳转"],
+        "dependencies": ["flow_6"],
+        "position": 7
+      },
+      {
+        "id": "flow_8",
+        "name": "完成注册",
+        "description": "选择登录方式完成注册",
+        "type": "end",
+        "parentDomain": "注册流程",
+        "features": ["GitHub登录", "邮箱注册"],
+        "dependencies": ["flow_7"],
+        "position": 8
+      }
+    ],
+    "paths": [
+      {
+        "id": "path_main",
+        "name": "主流程",
+        "nodeIds": ["flow_1", "flow_2", "flow_3", "flow_4", "flow_5", "flow_6", "flow_7", "flow_8"]
+      }
+    ]
+  }
+}

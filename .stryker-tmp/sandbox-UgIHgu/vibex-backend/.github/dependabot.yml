@@ -1,0 +1,57 @@
+# Dependabot configuration
+# https://docs.github.com/en/code-security/dependabot
+
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "06:00"
+      timezone: "Asia/Shanghai"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "security"
+    reviewers:
+      - "owner"  # Replace with actual reviewer
+    groups:
+      # Group minor and patch updates together
+      production-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+        exclude-patterns:
+          - "@types/*"
+          - "*@types/*"
+      # Group dev dependencies
+      development-dependencies:
+        patterns:
+          - "@types/*"
+          - "typescript"
+          - "eslint*"
+          - "prettier*"
+          - "jest*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "06:00"
+      timezone: "Asia/Shanghai"
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "ci"
+      - "dependencies"

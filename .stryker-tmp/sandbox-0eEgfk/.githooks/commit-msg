@@ -1,0 +1,37 @@
+#!/bin/bash
+# commit-msg hook - validates Angular commit format
+# E2-T4: Enforce conventional commits
+
+COMMIT_MSG=$(cat "$1")
+
+# Conventional commits pattern
+# Format: type(scope): description
+# Examples: feat(canvas): add new feature
+#           fix(auth): resolve login issue
+PATTERN="^(feat|fix|docs|style|refactor|test|chore|perf|ci|revert)(\([^)]*\))?: .{1,50}"
+
+# Allow empty commit messages (merge commits, etc.)
+if [ -z "$COMMIT_MSG" ]; then
+    echo "✅ Commit message OK (empty - likely merge commit)"
+    exit 0
+fi
+
+# Check first line against pattern
+FIRST_LINE=$(echo "$COMMIT_MSG" | head -n1)
+
+if ! echo "$FIRST_LINE" | grep -qE "$PATTERN"; then
+    echo "❌ Invalid commit message format."
+    echo ""
+    echo "Expected format: type(scope): description"
+    echo "  type: feat|fix|docs|style|refactor|test|chore|perf|ci|revert"
+    echo "  scope: optional module name in parentheses"
+    echo "  description: 1-50 characters"
+    echo ""
+    echo "Example: feat(canvas): add new feature"
+    echo ""
+    echo "Your commit: $FIRST_LINE"
+    exit 1
+fi
+
+echo "✅ Commit message format OK"
+exit 0

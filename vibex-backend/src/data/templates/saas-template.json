@@ -1,0 +1,76 @@
+{
+  "id": "tmpl-saas-001",
+  "name": "SaaS 产品",
+  "industry": "saas",
+  "description": "适合 SaaS 软件产品，包含用户认证、订阅管理、团队协作等核心功能",
+  "icon": "☁️",
+  "entities": [
+    {
+      "name": "User",
+      "type": "aggregate",
+      "attributes": [
+        { "name": "id", "type": "uuid" },
+        { "name": "email", "type": "string" },
+        { "name": "passwordHash", "type": "string" },
+        { "name": "name", "type": "string" },
+        { "name": "role", "type": "enum", "description": "owner/admin/member/viewer" },
+        { "name": "emailVerified", "type": "boolean" },
+        { "name": "createdAt", "type": "datetime" }
+      ],
+      "description": "用户聚合根"
+    },
+    {
+      "name": "Organization",
+      "type": "aggregate",
+      "attributes": [
+        { "name": "id", "type": "uuid" },
+        { "name": "name", "type": "string" },
+        { "name": "ownerId", "type": "uuid" },
+        { "name": "plan", "type": "enum", "description": "free/pro/enterprise" },
+        { "name": "createdAt", "type": "datetime" }
+      ],
+      "description": "组织（租户）聚合根"
+    },
+    {
+      "name": "Subscription",
+      "type": "entity",
+      "attributes": [
+        { "name": "id", "type": "uuid" },
+        { "name": "organizationId", "type": "uuid" },
+        { "name": "plan", "type": "enum" },
+        { "name": "status", "type": "enum", "description": "active/trialing/past_due/canceled" },
+        { "name": "currentPeriodStart", "type": "datetime" },
+        { "name": "currentPeriodEnd", "type": "datetime" },
+        { "name": "createdAt", "type": "datetime" }
+      ],
+      "description": "订阅实体"
+    },
+    {
+      "name": "Invitation",
+      "type": "valueObject",
+      "attributes": [
+        { "name": "email", "type": "string" },
+        { "name": "role", "type": "enum" },
+        { "name": "token", "type": "string" },
+        { "name": "expiresAt", "type": "datetime" },
+        { "name": "acceptedAt", "type": "datetime" }
+      ],
+      "description": "邀请值对象"
+    }
+  ],
+  "boundedContexts": [
+    {
+      "name": "身份认证",
+      "entities": ["User"],
+      "description": "负责用户注册、登录、会话管理、密码重置"
+    },
+    {
+      "name": "组织与订阅",
+      "entities": ["Organization", "Subscription", "Invitation"],
+      "description": "负责多租户组织管理、订阅计费、成员邀请"
+    }
+  ],
+  "sampleRequirement": "用户可以通过邮箱注册并验证邮箱后登录，创建一个组织并邀请团队成员加入，可以选择免费版、专业版或企业版订阅，支持在线支付升级，可以管理组织成员的角色和权限。",
+  "tags": ["SaaS", "订阅", "多租户", "团队协作", "RBAC"],
+  "createdAt": "2026-04-10"
+}

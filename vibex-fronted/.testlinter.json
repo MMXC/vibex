@@ -1,0 +1,42 @@
+{
+  "$schema": "./node_modules/@typescript-eslint/schemas/tslint-strict-or-eslint",
+  "testNaming": {
+    "pattern": "^(should|shows|displays|handles|updates|toggles|calls|returns|prevents)[A-Z].+",
+    "enforce": true,
+    "examples": {
+      "valid": [
+        "should show conflict indicator",
+        "handles network error gracefully",
+        "updates save status on conflict"
+      ],
+      "invalid": [
+        "conflict test",
+        "button works",
+        "test 1"
+      ]
+    }
+  },
+  "describeNaming": {
+    "pattern": "^(Component|Hook|Store|Util|API|Integration)[A-Za-z]+",
+    "enforce": true
+  },
+  "noGenericNames": {
+    "forbidden": ["tests", "test", "foo", "bar", "dummy", "test123"],
+    "enforce": true
+  },
+  "assertions": {
+    "requireMatcher": true,
+    "preferAsyncWaitFor": true
+  },
+  "coverageMinimum": {
+    "branches": 70,
+    "statements": 70,
+    "functions": 70,
+    "lines": 70
+  },
+  "flakyPolicy": {
+    "maxRetries": 3,
+    "trackInFile": "flaky-tests.json",
+    "autoSkipAfterFails": 5
+  }
+}

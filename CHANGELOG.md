@@ -13,6 +13,15 @@
   - **S1.4 单元测试**: `ComponentTreeGrouping.test.ts` 35 tests (inferIsCommon/matchFlowNode/getPageLabel/groupByFlowId)
   - 提交: `7e2b8278` (matchFlowNode+tests), `fc8162d3` (4层fallback), `c8ffde20` (pageName)
 
+### Added (vibex-proposals-summary-20260411 E-P0-3: WebSocket治理 + CI修复) — 2026-04-07
+- **E-P0-3 WebSocket ConnectionPool 治理**:
+  - **P0-5 MAX_CONNECTIONS=100**: `connectionPool.ts` 设置最大连接数限制
+  - **P0-6 disconnectTimeout=300000ms**: 5min 超时自动清理死连接
+  - **P0-7 /health 端点**: MCP 健康检查端点 + 结构化日志
+  - **P0-8 v0 Deprecation Headers**: 17 个 v0 路由添加 `Deprecation: true` + `X-API-Deprecation-Info` header
+  - **@ci-blocking grepInvert**: `playwright.ci.config.ts` 添加 `grepInvert: /@ci-blocking/` 排除 CI 阻塞测试
+  - 提交: `04d2ebc2`, `0c63fff2`, `20245673`, `9b26c4f8`, `61173be0`
+
 ### Added (vibex-proposals-summary-20260411 E-P0-2: ESLint no-explicit-any) — 2026-04-07
 - **E-P0-2 ESLint no-explicit-any 清理**: 9 个高优先级文件的类型清理
   - `routes/ddd.ts`: AIPlanResult interface + typed AI responses

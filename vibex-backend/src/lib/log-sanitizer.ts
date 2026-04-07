@@ -98,6 +98,9 @@ export function devDebug(...args: unknown[]): void {
   devLog(...sanitized);
 }
 
+/** Alias for devDebug for backward compatibility */
+export const debug = devDebug;
+
 /**
  * Safe safeError replacement.
  * In production, ensures no sensitive data is leaked via error messages.

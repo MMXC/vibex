@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.130',
+    date: '2026-04-07',
+    changes: [
+      '📋 vibex-proposals-summary-20260411 E-P0-5: 测试基础设施 + 日志清理',
+      '✅ P0-10 console.log 清理: Backend 144 文件 + Frontend 102 文件 console.* → devLog()/safeError()/canvasLogger.default.*',
+      '✅ no-console ESLint 规则: Backend eslint.config.mjs 添加 no-console + CI gate (--max-warnings=0)',
+      '✅ WebSocket 治理: MAX_CONNECTIONS=100 + disconnectTimeout=300000ms + /health 端点',
+      '提交: b85f3ac7 / 04d2ebc2 / 0c63fff2 / 0b19ba9c',
+    ],
+    commit: '0b19ba9c',
+  },
+
+  {
     version: '1.0.129',
     date: '2026-04-06',
     changes: [

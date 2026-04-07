@@ -2,7 +2,7 @@
 
 **项目**: vibex-proposals-summary-20260411
 **日期**: 2026-04-07
-**最后更新**: 2026-04-07 07:42
+**最后更新**: 2026-04-07 08:58
 
 ---
 
@@ -68,6 +68,19 @@ sed -i 's/timeout: 10000/timeout: 30000/g'
 # 17 个 v0 路由添加 Deprecation + Sunset + X-API-Deprecation-Info headers
 # 已通过 subagent 完成，commit 9b26c4f8
 ```
+
+## Sprint 1 实施计划（需求输入质量）
+
+### E-P0-4: 需求输入质量提升 ✅ DONE (P0-12/P0-13 部分完成)
+- [x] P0-12 AI智能补全: `lib/ai-quality/keyword-detector.ts` (关键词检测器)
+  - 检测模糊/不完整需求输入
+  - 10 tests pass
+  - commit: 待推送
+- [x] P0-13 项目搜索过滤: `app/api/projects/route.ts` + `[projectId]/route.ts`
+  - GET /api/projects?q=&status=&limit=&offset=
+  - 支持 name/description 搜索 + status/isPublic/isTemplate 过滤
+  - 响应时间元数据 (responseTimeMs)
+  - commit: 待推送
 验证: grep -l "Deprecation.*true" src/app/api/*/route.ts | wc -l  # 应为 17+
 
 ---

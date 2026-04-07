@@ -1,5 +1,14 @@
 # Changelog
 
+### [vibex-proposals-20260412 E2-E3: flaky-detector + npm scripts] — 2026-04-07
+- **E2 flaky-detector 参数化**: `flaky-params.txt` — Playwright 报告路径和运行参数配置
+  - `scripts/flaky-detector.sh` 支持从 param file 读取参数
+  - CLI args 仍可 override，保持向后兼容
+- **E3 npm scripts 清理**: `package.json` 删除冗余 `vitest`/`pretest-check`
+  - 保留 `test:contract`（.github/workflows/contract.yml 使用）
+  - 新增 `scripts/test/notify.js` re-export
+- 提交: `d8f344f1`
+
 ### [vibex-proposals-20260411 E6: AST安全扫描] — 2026-04-07
 - **E6 AST Prompt Security Scanner**: 用 `@babel/parser` AST 解析替代字符串正则，精确检测 eval/new Function 等危险模式
   - 新增 `scanForDangerousPatterns()`: Babel AST 检测 dangerous patterns

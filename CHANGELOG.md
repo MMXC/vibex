@@ -1,3 +1,12 @@
+### Added (vibex-proposals-20260412 E1-E3: 内部工具完善) — 2026-04-07
+- **vibex-proposals-20260412 E1-E3 内部工具验证与扩展**:
+  - **E1 dedup API 验证**: `curl POST /dedup → {level: pass}` <500ms 验证通过
+  - **E2 flaky-detector 参数化**: `flaky-params.txt` — PLAYWRIGHT_REPORT_DIR/RESULTS_FILE/PROJECT_ID/RUNS/CONFIG
+    - `flaky-detector.sh` 从 param file 读取参数，CLI args 仍可 override（向后兼容）
+  - **E3 npm scripts 清理**: `package.json` 删除 `vitest`/`pretest-check` 冗余脚本，保留 `test:contract`
+    - 新增 `scripts/test/notify.js` 兼容 IMPLEMENTATION_PLAN
+  - 提交: `d8f344f1`
+
 ### Added (vibex-proposals-20260411-page-structure: 组件树页面结构增强) — 2026-04-07
 ### Added (vibex-proposals-summary-20260411 E-P0-5: 测试基础设施 + 日志清理) — 2026-04-07
 - **E-P0-5 P0 Tech Debt 收尾**:

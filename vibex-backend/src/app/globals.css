@@ -1,4 +1,4 @@
-@import "tailwindcss";
+/* tailwindcss removed - backend does not need Tailwind CSS */
 
 :root {
   --background: #ffffff;

@@ -11,7 +11,8 @@ export type MessageType =
   | 'notification' // 系统通知
   | 'sync'        // 同步消息
   | 'presence'    // 在线状态
-  | 'room';       // 房间消息
+  | 'room'        // 房间消息
+  | 'node';       // 节点变更（E1-S2: 多用户节点同步）
 
 export interface BaseMessage {
   id: string;
@@ -20,6 +21,28 @@ export interface BaseMessage {
   senderId: string;
   timestamp: number;
   payload: unknown;
+}
+
+// E1-S2: Node sync message types
+// 后端也需同步更新此协议
+
+export type NodeAction = 'create' | 'update' | 'delete';
+export type TreeType = 'context' | 'flow' | 'component';
+
+export interface NodeSyncPayload {
+  treeType: TreeType;
+  action: NodeAction;
+  nodeId: string;
+  /** 节点数据，create/update 时有值 */
+  data?: Record<string, unknown>;
+  /** 乐观锁版本号 */
+  version: number;
+  userId: string;
+}
+
+export interface NodeSyncMessage extends Omit<BaseMessage, 'type' | 'payload'> {
+  type: 'node';
+  payload: NodeSyncPayload;
 }
 
 export interface CursorMessage extends BaseMessage {
@@ -49,7 +72,7 @@ export interface NotificationMessage extends BaseMessage {
   };
 }
 
-export type WebSocketMessage = CursorMessage | ChatMessage | NotificationMessage | BaseMessage;
+export type WebSocketMessage = CursorMessage | ChatMessage | NotificationMessage | NodeSyncMessage | BaseMessage;
 
 /**
  * Message Router Class
@@ -67,7 +90,7 @@ export class MessageRouter {
     this.processing = false;
 
     // 初始化所有消息类型处理器
-    const types: MessageType[] = ['cursor', 'selection', 'chat', 'notification', 'sync', 'presence', 'room'];
+    const types: MessageType[] = ['cursor', 'selection', 'chat', 'notification', 'sync', 'presence', 'room', 'node'];
     types.forEach(type => {
       this.handlers.set(type, new Set());
     });
@@ -209,6 +232,7 @@ export function createMessageStats(): MessageStats {
       sync: 0,
       presence: 0,
       room: 0,
+      node: 0,
     },
     messagesByRoom: {},
     averageLatency: 0,

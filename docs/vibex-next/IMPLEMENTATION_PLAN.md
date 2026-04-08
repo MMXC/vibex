@@ -134,6 +134,11 @@ npm run lint        # 无新增 warning
 **依赖**: 无
 **交付物**: snapshot.ts 移除，build 通过
 
+**状态**: ✅ 完成
+- [x] vibex-fronted/src/services/canvas/snapshot.ts 已删除
+- [x] backend snapshot.ts 未删除（AGENTS.md 约束）
+- [x] npm run build 通过
+
 **实施步骤**:
 
 ```bash
@@ -156,6 +161,10 @@ cd vibex-fronted && npm run build
 **Owner**: Dev
 **依赖**: 无
 **交付物**: MEMO 豁免记录 + ESLint 配置
+
+**状态**: ✅ 完成 (commit e75641c4)
+- [x] ESLINT_EXEMPTIONS.md 豁免清单
+- [x] catalog.ts/registry.tsx/useDDDStateRestore.ts MEMO 注释
 
 **实施步骤**:
 
@@ -475,6 +484,11 @@ it('超过 7 天的数据查询为空', () => { ... });
 **依赖**: E2-S1 完成（可并行）
 **交付物**: POST /api/v1/analytics 端点
 
+**状态**: ✅ 完成 (commit 1ac78dcd)
+- [x] POST /api/v1/analytics 端点 (analytics.ts)
+- [x] 7天 expires_at TTL + 异步清理
+- [x] analytics client SDK (src/lib/analytics/client.ts)
+
 **实施步骤**:
 
 #### Step 1: 后端端点实现（1h）
@@ -595,9 +609,9 @@ it('批量上报 100 条返回 200', async () => {
 - [x] E2-S1: /health 端点 P50/P95/P99
 - [x] E2-S2: LCP > 4s 告警触发
 - [x] E2-S3: 7 天数据清除验证
-- [ ] E3-S1: snapshot.ts 删除 + build 通过
-- [ ] E3-S2: ESLint 豁免 MEMO 记录
-- [ ] E3-S3: analytics 端点 + 4 个事件采集
+- [x] E3-S1: snapshot.ts 删除 + build 通过
+- [x] E3-S2: ESLint 豁免 MEMO 记录
+- [x] E3-S3: analytics 端点 + 4 个事件采集
 - [ ] npm run build 通过
 - [ ] npm run type-check 0 错误
 - [ ] CHANGELOG.md 更新

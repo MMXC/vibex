@@ -35,7 +35,9 @@ export function useDDDStateRestore(): void {
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Zustand store accessor type mismatch
+    // MEMO: ESLint 豁免 - 2026-04-08
+    // Reason: Zustand store hooks 在 Context 外使用时需要类型断言，避免 SSR 水合错误
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     checkDDDStateRestore(
       pathname,
       useContextStore as any,

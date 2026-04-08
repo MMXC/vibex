@@ -97,6 +97,8 @@ const rawCatalog = defineCatalog(schema, {
 } as Parameters<typeof defineCatalog>[1]);
 
 // Re-export with proper type via cast-through-unknown
+// MEMO: ESLint 豁免 - 2026-04-08
+// Reason: rawCatalog 来自运行时 JSON import，无法静态类型推断，必须用 as any 中转
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const vibexCanvasCatalog = rawCatalog as any as ReturnType<typeof defineCatalog>;
 

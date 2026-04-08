@@ -12,8 +12,10 @@ type Story = StoryObj<typeof TreeToolbar>;
 
 export const Default: Story = {
   args: {
-    onExpandAll: () => {},
-    onCollapseAll: () => {},
-    onFilter: () => {},
+    treeType: 'context',
+    nodeCount: 5,
+    onSelectAll: () => {},
+    onDeselectAll: () => {},
+    onClear: () => {},
   },
 };

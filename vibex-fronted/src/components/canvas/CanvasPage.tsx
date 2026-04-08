@@ -39,9 +39,6 @@ import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { useUIStore } from '@/lib/canvas/stores/uiStore';
 import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
-import { useAuthStore } from '@/stores/authStore';
-import { usePresence } from '@/lib/firebase/presence';
-import PresenceLayer from './PresenceLayer';
 import { loadExampleData } from '@/lib/canvas/loadExampleData';
 import { hasNodes } from '@/lib/canvas/cascade';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
@@ -174,12 +171,6 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     componentGenerating, setComponentGenerating,
   } = panels;
   const projectId = useSessionStore((s) => s.projectId);
-  const user = useAuthStore((s) => s.user);
-  const userId = user?.id || 'anonymous';
-  const userName = user?.name || 'Anonymous';
-
-  // E1-S1: 实时协作感知 — Presence
-  const { others: presenceOthers } = usePresence(projectId || null, userId, userName);
 
   // === E3: Auto-Save Hook ===
   const { saveStatus, lastSavedAt, saveNow, conflictData, clearConflict } = useAutoSave({
@@ -774,13 +765,6 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
           onMerge={handleConflictMerge}
         />
       )}
-
-      {/* E1-S1: 协作者在线头像层 */}
-      <PresenceLayer
-        canvasId={projectId || null}
-        userId={userId}
-        userName={userName}
-      />
     </div>
   );
 }

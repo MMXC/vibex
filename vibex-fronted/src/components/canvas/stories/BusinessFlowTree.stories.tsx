@@ -12,6 +12,7 @@ type Story = StoryObj<typeof BusinessFlowTree>;
 
 export const Default: Story = {
   args: {
+    canvasId: 'canvas-1',
     readonly: false,
   },
 };

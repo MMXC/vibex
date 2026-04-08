@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.149',
+    date: '2026-04-09',
+    changes: [
+      '📋 vibex-third E2-S2: BusinessFlowTree 虚拟化',
+      '✅ VirtualizedFlowList: useVirtualizer + estimateSize 动态高度',
+      '✅ 协作滚动同步: 远程监听 + 本地广播',
+      '提交: dev-E2-S2 验证完成',
+    ],
+    commit: 'dev-E2-S2',
+  },
+
+  {
     version: '1.0.148',
     date: '2026-04-09',
     changes: [

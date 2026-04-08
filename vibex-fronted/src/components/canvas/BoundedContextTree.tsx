@@ -19,6 +19,7 @@ import { useToast } from '@/components/ui/Toast';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
 // [E1] 注释 RelationshipConnector — 简化 UI，移除卡片间连线
 // import { RelationshipConnector } from './edges/RelationshipConnector';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { BoundedContextGroup } from './BoundedContextGroup';
 import { BoundedEdgeLayer } from './edges/BoundedEdgeLayer';
 import { useModifierKey, useDragSelection } from '@/hooks/canvas/useDragSelection';
@@ -341,6 +342,15 @@ function AddNodeForm({ onAdd }: AddNodeFormProps) {
 
 export function BoundedContextTree({ readonly = false, isActive: _isActive = true }: BoundedContextTreeProps) {
   const contextNodes = useContextStore((s) => s.contextNodes);
+
+  // E2-S3: 虚拟化阈值
+  const VIRTUAL_THRESHOLD = 50;
+
+  // E2-S3: 检测超大上下文列表
+  const oversizedContexts = useMemo(
+    () => contextNodes.length > VIRTUAL_THRESHOLD,
+    [contextNodes]
+  );
   const addContextNode = useContextStore((s) => s.addContextNode);
   const editContextNode = useContextStore((s) => s.editContextNode);
   // E1: Wrap editContextNode to record history snapshot before mutation
@@ -619,6 +629,18 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
         )}
         {hasNodes ? (
           <>
+            {/* E2-S3: 大列表使用虚拟化 */}
+            {oversizedContexts ? (
+              <VirtualizedContextList
+                contextNodes={contextNodes}
+                readonly={readonly}
+                selectedIds={selectedIds}
+                onEdit={handleEditContextNode}
+                onDelete={deleteContextNode}
+                onToggleSelect={(nodeId) => toggleNodeSelect('context', nodeId)}
+              />
+            ) : (
+              <>
             {/* Group nodes by domain type */}
             {(['core', 'supporting', 'generic', 'external'] as const).map((type) => {
               const groupNodes = contextNodes.filter((n) => n.type === type);
@@ -644,6 +666,8 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
                 />
               );
             })}
+              </>
+            )}
           </>
         ) : (
           <EmptyState
@@ -654,6 +678,77 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
         )}
       </div>
 
+    </div>
+  );
+}
+
+// E2-S3: 虚拟化上下文列表
+function VirtualizedContextList({
+  contextNodes,
+  readonly,
+  selectedIds,
+  onEdit,
+  onDelete,
+  onToggleSelect,
+}: {
+  contextNodes: BoundedContextNode[];
+  readonly: boolean;
+  selectedIds: Set<string>;
+  onEdit: (nodeId: string, data: Partial<BoundedContextNode>) => void;
+  onDelete: (nodeId: string) => void;
+  onToggleSelect: (nodeId: string) => void;
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const virtualizer = useVirtualizer({
+    count: contextNodes.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => 120,
+    overscan: 5,
+  });
+
+  const virtualItems = virtualizer.getVirtualItems();
+
+  return (
+    <div
+      ref={scrollRef}
+      style={{ height: `${virtualizer.getTotalSize()}px`, position: 'relative', overflow: 'auto' }}
+      data-virtualized="true"
+    >
+      {virtualItems.map((virtualRow) => {
+        const node = contextNodes[virtualRow.index];
+        return (
+          <div
+            key={node.nodeId}
+            data-index={virtualRow.index}
+            ref={virtualizer.measureElement}
+            style={{
+              position: 'absolute',
+              top: 0,
+              transform: `translateY(${virtualRow.start}px)`,
+              width: '100%',
+            }}
+          >
+            <BoundedContextGroup
+              type={node.type}
+              nodes={[node]}
+              readonly={readonly}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              renderCard={(props) => (
+                <ContextCard
+                  node={props.node}
+                  onEdit={props.onEdit}
+                  onDelete={props.onDelete}
+                  readonly={props.readonly}
+                  selected={selectedIds.has(props.node.nodeId)}
+                  onToggleSelect={onToggleSelect}
+                />
+              )}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }

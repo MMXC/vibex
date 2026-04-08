@@ -29,6 +29,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { Layers } from 'lucide-react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { useFlowStore } from '@/lib/canvas/stores/flowStore';
@@ -625,10 +626,19 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
   const [showJsonPreview, setShowJsonPreview] = useState(false);
   const toast = useToast();
 
+  // E2-S1: 虚拟化阈值 — 超过此数量时建议折叠分组
+  const VIRTUAL_THRESHOLD = 50;
+
   // E1: Compute groups by flowId
   const groups = useMemo(
     () => groupByFlowId(componentNodes, flowNodes),
     [componentNodes, flowNodes]
+  );
+
+  // E2-S1: 识别超过阈值的大组（虚拟化目标）
+  const oversizedGroups = useMemo(
+    () => groups.filter((g) => g.nodes.length > VIRTUAL_THRESHOLD),
+    [groups]
   );
 
   // E1: Compute SVG overlay bounding boxes (E2: include isCommon for styling)

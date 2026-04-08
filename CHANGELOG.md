@@ -1,3 +1,10 @@
+### Added (vibex-next E3: 清理与 Analytics) — 2026-04-08
+- **E3: 清理与 Analytics (S1-S3)**:
+  - **E3-S1**: 删除废弃 `snapshot.ts`，保留 canvasSseApi snapshot 测试
+  - **E3-S2**: ESLint 豁免清单 `ESLINT_EXEMPTIONS.md`
+  - **E3-S3**: 自建轻量 analytics SDK（白名单 + 静默失败 + 匿名 session）
+  - 提交: `e75641c4`, `1d3870bb`, `94fd2fbb`
+
 ### Added (vibex-next E2: 性能可观测性) — 2026-04-08
 - **E2: 性能可观测性 (S1-S3)**:
   - **E2-S1**: `/health` 端点 P50/P95/P99 延迟（5分钟滚动窗口）

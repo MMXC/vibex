@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.142',
+    date: '2026-04-08',
+    changes: [
+      '📋 vibex-next E3: 清理与 Analytics',
+      '✅ E3-S1: 删除废弃 snapshot.ts，保留 canvasSseApi snapshot 测试',
+      '✅ E3-S2: ESLint 豁免清单 ESLINT_EXEMPTIONS.md',
+      '✅ E3-S3: 自建轻量 analytics SDK（白名单 + 静默失败 + 匿名 session）',
+      '提交: e75641c4, 1d3870bb, 94fd2fbb',
+    ],
+    commit: '94fd2fbb',
+  },
+
+  {
     version: '1.0.141',
     date: '2026-04-08',
     changes: [

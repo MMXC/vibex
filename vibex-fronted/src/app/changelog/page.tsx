@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.148',
+    date: '2026-04-09',
+    changes: [
+      '📋 vibex-third E2-S1: ComponentTree 虚拟化',
+      '✅ VirtualizedNodeList: @tanstack/react-virtual 虚拟化，阈值50',
+      '✅ 通用组件识别: inferIsCommon 多维判断，置顶分组',
+      '提交: dev-E2-S1 验证完成',
+    ],
+    commit: 'dev-E2-S1',
+  },
+
+  {
     version: '1.0.147',
     date: '2026-04-09',
     changes: [

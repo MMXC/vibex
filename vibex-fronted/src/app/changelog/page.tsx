@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.150',
+    date: '2026-04-09',
+    changes: [
+      '📋 vibex-third E2-S3: BoundedContextTree 虚拟化',
+      '✅ VirtualizedContextList: useVirtualizer + measureElement 动态高度',
+      '✅ 统一虚拟化模式: 三树虚拟化架构一致',
+      '提交: dev-E2-S3 验证完成',
+    ],
+    commit: 'dev-E2-S3',
+  },
+
+  {
     version: '1.0.149',
     date: '2026-04-09',
     changes: [

@@ -1,5 +1,10 @@
 # Changelog
 
+### [vibex-third E1-S4: SSE 数据写入 Query 缓存] — 2026-04-09
+- **SSE 桥接 (`src/lib/api/sseToQueryBridge.ts`)**: SSE → TanStack Query 缓存桥接，`createSseBridge(qc)` 工厂函数，`setQueryData` 写入缓存，`invalidateQueries` 刷新，`cancelQueries` 取消
+- **统一缓存层**: 防止 SSE 数据绕过 Query 缓存层，完成/错误时自动刷新缓存
+- **TypeScript 编译**: ✅ 无错误
+
 ### [vibex-third E1-S3: 消除散落 axios 调用] — 2026-04-09
 - **stores 合规**: `src/stores/` 目录全面清理，验证无裸 axios/fetch/XMLHttpRequest 调用
 - **统一 API 层**: 所有 API 访问统一通过 TanStack Query 层（`hooks/queries/` + `hooks/mutations/`）

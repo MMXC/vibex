@@ -58,3 +58,34 @@
 | 根因 | 简化格式缺少 `project/goal/stages` 顶层字段 |
 | 解决方案 | 统一迁移到标准格式，添加 schema 验证 |
 | 关联 | vibex-dev-proposals-20260323 D-003 (JSON schema 统一提案) |
+
+### 模式 F-006: 多用户节点同步冲突（LWW Last-Write-Wins）
+| 属性 | 值 |
+|------|-----|
+| 触发场景 | 两个用户同时编辑同一节点 |
+| 症状 | 后写入的节点覆盖先写入的节点，用户无感知 |
+| 检测命令 | Playwright 双 tab 测试 |
+| 根因 | 无冲突检测和 UI 反馈 |
+| 解决方案 | ConflictBubble UI (E1-S3)；升级 Yjs CRDT (Epic 4 预案) |
+| 关联 | vibex-next E1-S2/S3, A-010 |
+
+### A-010: 性能可观测性设计
+#### 指标定义
+- LCP (Largest Contentful Paint): 页面主要内容加载时间
+- CLS (Cumulative Layout Shift): 累积布局偏移
+- P99 延迟: API 响应时间 P99
+
+#### 告警阈值
+| 指标 | 阈值 | 触发动作 |
+|------|------|----------|
+| LCP | > 4000ms | console WARNING + Slack webhook |
+| CLS | > 0.1 | console WARNING |
+| P99 延迟 | > 2000ms | Slack webhook |
+
+#### 数据保留策略
+- 监控数据: 7 天滚动清除
+- analytics_events: expires_at = created_at + 7 days
+- 清理触发: 每次写入时异步清理过期记录
+
+#### 状态
+- [x] Architect 签署: 2026-04-08

@@ -323,13 +323,15 @@ interface ComponentCardProps {
   selected?: boolean;
   /** E3-F2: Multi-select toggle */
   onToggleSelect?: (nodeId: string) => void;
+  /** E2-S1: 确认回调（可选，VirtualizedNodeList 需要） */
+  toggleConfirm?: (nodeId: string) => void;
 }
 
 // =============================================================================
 // Component Card
 // =============================================================================
 
-function ComponentCard({ node, onEdit, onDelete, readonly, selected, onToggleSelect }: ComponentCardProps) {
+function ComponentCard({ node, onEdit, onDelete, readonly, selected, onToggleSelect, toggleConfirm }: ComponentCardProps) {
   const [editing, setEditing] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -985,28 +987,41 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
                     strategy={verticalListSortingStrategy}
                   >
                     {/* Grouped node cards */}
-                    <div
-                      className={styles.componentGroupCards}
-                      data-component-group={group.groupId}
-                    >
-                      {group.nodes.map((node) => (
-                        <SortableTreeItem
-                          key={node.nodeId}
-                          options={{ id: node.nodeId, disabled: readonly }}
-                          treeType="component"
-                          label={node.name}
-                        >
-                          <ComponentCard
-                            node={node}
-                            onEdit={editComponentNode}
-                            onDelete={deleteComponentNode}
-                            readonly={readonly}
-                            selected={selectedIds.has(node.nodeId)}
-                            onToggleSelect={(nodeId) => toggleNodeSelect_comp(nodeId)}
-                          />
-                        </SortableTreeItem>
-                      ))}
-                    </div>
+                    {/* E2-S1: 大组(>{VIRTUAL_THRESHOLD}节点)使用虚拟列表 */}
+                    {oversizedGroups.some((g) => g.groupId === group.groupId) ? (
+                      <VirtualizedNodeList
+                        nodes={group.nodes}
+                        readonly={readonly}
+                        selectedIds={selectedIds}
+                        editComponentNode={editComponentNode}
+                        deleteComponentNode={deleteComponentNode}
+                        toggleNodeSelect_comp={toggleNodeSelect_comp}
+                      />
+                    ) : (
+                      <div
+                        className={styles.componentGroupCards}
+                        data-component-group={group.groupId}
+                      >
+                        {group.nodes.map((node) => (
+                          <SortableTreeItem
+                            key={node.nodeId}
+                            options={{ id: node.nodeId, disabled: readonly }}
+                            treeType="component"
+                            label={node.name}
+                          >
+                            <ComponentCard
+                              node={node}
+                              onEdit={editComponentNode}
+                              onDelete={deleteComponentNode}
+                              readonly={readonly}
+                              selected={selectedIds.has(node.nodeId)}
+                              onToggleSelect={(nodeId) => toggleNodeSelect_comp(nodeId)}
+                              toggleConfirm={comp.toggleComponentNode}
+                            />
+                          </SortableTreeItem>
+                        ))}
+                      </div>
+                    )}
                   </SortableContext>
                 </DndContext>
               </div>
@@ -1034,6 +1049,68 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
         onClose={() => setShowJsonPreview(false)}
         nodes={componentNodes}
       />
+    </div>
+  );
+}
+
+// E2-S1: 虚拟化节点列表 — 使用 @tanstack/react-virtual
+function VirtualizedNodeList({
+  nodes,
+  readonly,
+  selectedIds,
+  editComponentNode,
+  deleteComponentNode,
+  toggleNodeSelect_comp,
+}: {
+  nodes: ComponentNode[];
+  readonly: boolean;
+  selectedIds: Set<string>;
+  editComponentNode: (nodeId: string, data: Partial<ComponentNode>) => void;
+  deleteComponentNode: (nodeId: string) => void;
+  toggleNodeSelect_comp: (nodeId: string) => void;
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const virtualizer = useVirtualizer({
+    count: nodes.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => 160,
+    overscan: 5,
+  });
+
+  const virtualItems = virtualizer.getVirtualItems();
+
+  return (
+    <div
+      ref={scrollRef}
+      style={{ height: `${virtualizer.getTotalSize()}px`, position: 'relative', overflow: 'auto' }}
+      data-virtualized="true"
+    >
+      {virtualItems.map((virtualRow) => {
+        const node = nodes[virtualRow.index];
+        return (
+          <div
+            key={node.nodeId}
+            data-index={virtualRow.index}
+            ref={virtualizer.measureElement}
+            style={{
+              position: 'absolute',
+              top: 0,
+              transform: `translateY(${virtualRow.start}px)`,
+              width: '100%',
+            }}
+          >
+            <ComponentCard
+              node={node}
+              onEdit={editComponentNode}
+              onDelete={deleteComponentNode}
+              readonly={readonly}
+              selected={selectedIds.has(node.nodeId)}
+              onToggleSelect={toggleNodeSelect_comp}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }

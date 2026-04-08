@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.137',
+    date: '2026-04-08',
+    changes: [
+      '📋 vibex-canvas-analysis Epic 4: SSE类型验证',
+      '✅ F-4.1: canvasSseApi Snapshot 测试，18 个 cases 覆盖 8 个 SSE Event 类型',
+      '✅ 修复 canvasSseApi.test.ts 从 @jest/globals 改为 vitest',
+      '提交: 326bbf19',
+    ],
+    commit: '326bbf19',
+  },
+
+  {
     version: '1.0.136',
     date: '2026-04-08',
     changes: [

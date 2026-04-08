@@ -80,7 +80,7 @@ const eslintConfig = defineConfig([
       "react-hooks/preserve-manual-memoization": "off",
       "@typescript-eslint/no-unsafe-function-type": "off",
       "@next/next/no-html-link-for-pages": "off",
-      "react": "off",
+      react: "off",
     },
   },
 ]);

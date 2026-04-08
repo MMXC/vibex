@@ -455,6 +455,12 @@ await page.waitForSelector('[data-testid="some-element"]', { timeout: 5000 });
 - [ ] `pnpm lint` 通过
 - [ ] `npx tsc --noEmit` 通过
 
+### E2-PRD 验收自动化
+
+- [x] collaborationSync.test.ts: AC4 验收测试（10 tests）
+- [ ] ConflictBubble.test.ts: ConflictBubble 组件测试
+- [ ] ConflictBubble E2E tests: 冲突场景 E2E
+
 ### Sprint 2 验收
 
 - [ ] E2-S2: ConflictBubble 集成完成

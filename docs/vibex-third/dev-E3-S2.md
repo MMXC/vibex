@@ -8,16 +8,9 @@
 
 ---
 
-## 产出
-
-| 文件 | 操作 | 说明 |
-|------|------|------|
-| `src/components/canvas/stories/` | 已存在 | 12 个 Canvas 组件 Story |
-| `docs/vibex-third/dev-E3-S2.md` | 新建 | 本文档 |
-
----
-
 ## Story 覆盖清单
+
+路径: `vibex-fronted/src/components/canvas/stories/`
 
 | 组件 | Story 文件 | 状态 |
 |------|-----------|------|
@@ -26,15 +19,17 @@
 | BusinessFlowTree | `BusinessFlowTree.stories.tsx` | ✅ |
 | BoundedContextTree | `BoundedContextTree.stories.tsx` | ✅ |
 | ComponentTree | `ComponentTree.stories.tsx` | ✅ |
-| PresenceLayer | `PresenceLayer.stories.tsx` | ✅ |
-| ConflictBubble | `ConflictBubble.stories.tsx` | ✅ |
+| PresenceLayer | `PresenceLayer.stories.tsx` | ✅ (新增) |
+| ConflictBubble | `ConflictBubble.stories.tsx` | ✅ (新增) |
 | ShortcutPanel | `ShortcutPanel.stories.tsx` | ✅ |
-| EmptyState | `EmptyState.stories.tsx` | ✅ |
-| LoadingSkeleton | `LoadingSkeleton.stories.tsx` | ✅ |
-| CollabCursor | `CollabCursor.stories.tsx` | ✅ |
-| ErrorBoundary | `ErrorBoundary.stories.tsx` | ✅ |
+| CanvasBackground | `CanvasBackground.stories.tsx` | ✅ |
+| CanvasOverlay | `CanvasOverlay.stories.tsx` | ✅ |
+| CanvasSeam | `CanvasSeam.stories.tsx` | ✅ |
+| TreeNode | `TreeNode.stories.tsx` | ✅ |
 
-共 12 个 Canvas 组件 Story，通过 `storybook build` 验证。
+共 12 个 Story。`storybook build` 验证通过。
+
+> 注: LoadingSkeleton/EmptyState/ErrorBoundary 组件不存在于 `src/components/canvas/`，未创建对应 Story。
 
 ---
 
@@ -42,7 +37,8 @@
 
 - [x] 12 个 Canvas 组件 Story 存在
 - [x] `storybook build` 通过
-- [x] `autodocs` 生成文档
+- [x] 修正文档中的路径前缀（`vibex-fronted/src/`）
+- [x] 修正 Story 数量（12个，非声称的14个）
 
 ---
 

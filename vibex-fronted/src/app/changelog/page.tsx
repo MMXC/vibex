@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.145',
+    date: '2026-04-09',
+    changes: [
+      '📋 vibex-third E1-S2: TanStack Query Hooks 迁移',
+      '✅ hooks/queries: 统一 Hooks 层（useProjects/useEntities/useFlows/useRequirements/useDDD）',
+      '✅ Query Keys 统一: queryKeys 工厂模式管理缓存键',
+      '✅ 测试覆盖: 38 个用例全部通过',
+      '提交: dev-E1-S2 集成完成',
+    ],
+    commit: 'dev-E1-S2',
+  },
+
+  {
     version: '1.0.144',
     date: '2026-04-09',
     changes: [

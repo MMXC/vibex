@@ -1,5 +1,11 @@
 # Changelog
 
+### [vibex-third E1-S2: TanStack Query Hooks 迁移] — 2026-04-09
+- **Hooks 层 (`src/hooks/queries/`)**: 迁移至统一 TanStack Query Hooks，`useProjects`/`useProject`/`useDeletedProjects`/`useProjectRole`、`useDomainEntities`、`useFlow`、`useRequirements`、`useAnalysisResult`、`useDDDAnalysis`
+- **Query Keys 统一**: 使用 `queryKeys` 工厂（`@/lib/query/QueryProvider`）管理缓存键，避免硬编码字符串
+- **测试**: 38 个测试用例全部通过（useProjects 8个 + useEntities + useFlows 5个 + useRequirements + useDDD 5个）
+- 提交: `dev-E1-S2` 集成完成
+
 ### [vibex-third E1-S1: TanStack Query 统一 API Client] — 2026-04-09
 - **统一 API Client (`src/lib/api/client.ts`)**: TanStack Query 层，实现 `QueryClient` 单例（staleTime=1m, gcTime=5m）、`apiMetrics` 百分位跟踪（p50/p95/p99）、1000 条滚动窗口、logRequest 回调
 - **熔断器 (`src/lib/circuit-breaker.ts`)**: 熔断器模式实现，closed/open/half-open 三态转换，失败率阈值触发，`CircuitBreakerManager` 管理多端点熔断器

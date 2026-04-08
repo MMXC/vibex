@@ -579,9 +579,9 @@ it('批量上报 100 条返回 200', async () => {
 - [x] E1-S2: 节点同步 < 3s
 - [x] E1-S3: 冲突提示 UI 上线
 - [x] E1-S4: 重连 + 降级测试通过
-- [ ] E2-S1: /health 端点 P50/P95/P99
-- [ ] E2-S2: LCP > 4s 告警触发
-- [ ] E2-S3: 7 天数据清除验证
+- [x] E2-S1: /health 端点 P50/P95/P99
+- [x] E2-S2: LCP > 4s 告警触发
+- [x] E2-S3: 7 天数据清除验证
 - [ ] E3-S1: snapshot.ts 删除 + build 通过
 - [ ] E3-S2: ESLint 豁免 MEMO 记录
 - [ ] E3-S3: analytics 端点 + 4 个事件采集

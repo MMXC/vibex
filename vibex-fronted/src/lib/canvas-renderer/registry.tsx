@@ -204,5 +204,7 @@ const { registry: rawRegistry } = defineRegistry(vibexCanvasCatalog, {
   },
 });
 
+// MEMO: ESLint 豁免 - 2026-04-08
+// Reason: rawRegistry 来自运行时 JSON import，类型系统无法推断 Registry 类型
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const vibexCanvasRegistry = rawRegistry as any;

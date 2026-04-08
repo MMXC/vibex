@@ -16,7 +16,7 @@ import type {
   CanvasSseOptions as DDDApiOptions,
   BoundedContext,
 } from './canvasSseApi';
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect } from 'vitest';
 
 describe('canvasSseApi (migrated from dddApi)', () => {
   // F1.1: API function export

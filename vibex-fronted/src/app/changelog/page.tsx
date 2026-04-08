@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.138',
+    date: '2026-04-08',
+    changes: [
+      '📋 vibex-canvas-analysis Epic 5: Toolbar JSDoc',
+      '✅ F-5.1: CanvasToolbar.tsx JSDoc 声明画布级操作，无 TreeToolbar 交叉引用',
+      '✅ F-5.2: TreeToolbar.tsx JSDoc 声明树级操作，无 CanvasToolbar 交叉引用',
+      '提交: 6fb02943',
+    ],
+    commit: '6fb02943',
+  },
+
+  {
     version: '1.0.137',
     date: '2026-04-08',
     changes: [

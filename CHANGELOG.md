@@ -1,3 +1,9 @@
+### Added (vibex-canvas-analysis Epic 5: Toolbar JSDoc) — 2026-04-08
+- **Epic 5: Toolbar JSDoc**:
+  - **F-5.1**: `CanvasToolbar.tsx` JSDoc 声明画布级操作，无 TreeToolbar 交叉引用
+  - **F-5.2**: `TreeToolbar.tsx` JSDoc 声明树级操作，无 CanvasToolbar 交叉引用
+  - 提交: `6fb02943`
+
 ### Added (vibex-canvas-analysis Epic 4: SSE类型验证) — 2026-04-08
 - **Epic 4: SSE类型验证**:
   - **F-4.1**: `canvasSseApi.snapshot.test.ts` Snapshot 测试（18 cases，覆盖 8 个 SSE Event 类型）

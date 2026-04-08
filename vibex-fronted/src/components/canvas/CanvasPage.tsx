@@ -64,8 +64,7 @@ import { PrototypeQueuePanel } from './PrototypeQueuePanel';
 import { ContextTreePanel } from './panels/ContextTreePanel';
 import { FlowTreePanel } from './panels/FlowTreePanel';
 import { ComponentTreePanel } from './panels/ComponentTreePanel';
-import { ShortcutHintPanel } from './features/ShortcutHintPanel';
-import { ShortcutHelpPanel } from './ShortcutHelpPanel';
+import { ShortcutPanel } from './features/ShortcutPanel';
 import { VersionHistoryPanel } from './features/VersionHistoryPanel';
 import { SaveIndicator } from './features/SaveIndicator';
 import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
@@ -715,14 +714,8 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         </>
       )}
 
-      {/* Epic1 F1.6: ShortcutHintPanel */}
-      <ShortcutHintPanel
-        open={isShortcutPanelOpen}
-        onClose={eventHandlers.toggleShortcutPanel}
-      />
-
-      {/* E2: ShortcutHelpPanel — Ctrl+G, Alt+1/2/3, F11, ? */}
-      <ShortcutHelpPanel
+      {/* ShortcutPanel — unified panel for all canvas shortcuts */}
+      <ShortcutPanel
         open={isShortcutPanelOpen}
         onClose={eventHandlers.toggleShortcutPanel}
       />

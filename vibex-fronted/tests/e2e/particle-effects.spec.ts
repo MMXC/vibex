@@ -37,7 +37,7 @@ test.describe('Particle Effects', () => {
     await page.waitForLoadState('networkidle');
     
     // Wait a bit for particles to initialize and FPS to stabilize
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     
     // Evaluate FPS from the page - look for performance data
     const fps = await page.evaluate(() => {
@@ -97,7 +97,7 @@ test.describe('Particle Effects', () => {
       // At minimum, page should load without errors on mobile
       const errors: string[] = [];
       page.on('pageerror', (err) => errors.push(err.message));
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
       expect(errors.length).toBe(0);
     }
   });
@@ -205,7 +205,7 @@ test.describe('Particle Effects', () => {
     
     await page.goto(`${BASE_URL}/`);
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState('networkidle');
     
     // Should have no critical JS errors
     expect(errors).toHaveLength(0);

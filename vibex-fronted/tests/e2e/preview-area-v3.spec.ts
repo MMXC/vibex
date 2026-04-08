@@ -56,7 +56,7 @@ test.describe('V3.1/V3.2 Preview Area - PRD 验收标准对照', () => {
     const textarea = page.locator('textarea').first();
     if (await textarea.isVisible()) {
       await textarea.fill('测试需求：创建一个电商平台');
-      await page.waitForTimeout(1000);
+      await page.page.waitForLoadState('domcontentloaded');
       
       // 检查页面仍然正常加载
       const pageState = await page.evaluate(() => document.readyState);
@@ -114,7 +114,7 @@ test.describe('V3.1/V3.2 Preview Area - PRD 验收标准对照', () => {
     const textarea = page.locator('textarea').first();
     if (await textarea.isVisible()) {
       await textarea.fill(longInput);
-      await page.waitForTimeout(1000);
+      await page.page.waitForLoadState('domcontentloaded');
       
       // 检查页面无崩溃
       const pageState = await page.evaluate(() => document.readyState);
@@ -123,7 +123,7 @@ test.describe('V3.1/V3.2 Preview Area - PRD 验收标准对照', () => {
       // 检查无 JS 错误
       const errors: string[] = [];
       page.on('pageerror', (err) => errors.push(err.message));
-      await page.waitForTimeout(500);
+      await page.page.waitForLoadState('domcontentloaded');
       
       // 过滤 hydration 警告
       const criticalErrors = errors.filter(e => !e.includes('hydration'));
@@ -144,7 +144,7 @@ test.describe('V3.1/V3.2 Preview Area - PRD 验收标准对照', () => {
     
     await page.goto(`${BASE_URL}/confirm`);
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await page.page.waitForLoadState('domcontentloaded');
     
     console.log('[JS Error] Critical errors:', errors.length);
     expect(errors.length).toBe(0);

@@ -29,7 +29,7 @@ test.describe('Preview Logic Fix', () => {
       await generateBtn.click();
       
       // 验证弹出登录抽屉或提示
-      await page.waitForTimeout(500);
+      await page.page.waitForLoadState('domcontentloaded');
       
       // 检查是否有登录相关内容
       const hasLoginContent = await page.locator('text=登录, text=auth').count() > 0;

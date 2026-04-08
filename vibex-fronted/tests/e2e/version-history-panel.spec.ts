@@ -43,7 +43,7 @@ test.describe('VersionHistoryPanel', () => {
     if (isVisible) {
       await restoreBtn.click();
       // After restore, canvas should update
-      await page.waitForTimeout(500);
+      await page.page.waitForLoadState('domcontentloaded');
     }
     expect(true).toBe(true);
   });

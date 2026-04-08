@@ -12,7 +12,6 @@ type Story = StoryObj<typeof BoundedContextTree>;
 
 export const Default: Story = {
   args: {
-    canvasId: 'canvas-1',
     readonly: false,
   },
 };

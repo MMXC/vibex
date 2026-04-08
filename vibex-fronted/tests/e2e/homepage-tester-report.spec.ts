@@ -95,7 +95,7 @@ test.describe('Vibex Homepage Test Report', () => {
 
   test('TC-002: Console Errors Check', async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
-    await page.waitForTimeout(2000); // 等待异步加载
+    await page.page.waitForLoadState('networkidle'); // 等待异步加载
     
     // 输出所有控制台日志
     console.log('\n=== All Console Logs ===');

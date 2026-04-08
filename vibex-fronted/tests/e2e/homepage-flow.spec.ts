@@ -18,7 +18,7 @@ async function testHomepageFlow() {
     if (modalClose) {
       console.log('发现引导弹窗，关闭中...');
       await modalClose.click();
-      await page.waitForTimeout(500);
+      await page.page.waitForLoadState('domcontentloaded');
     }
     
     // 2. 输入需求
@@ -27,7 +27,7 @@ async function testHomepageFlow() {
     await textarea.fill('开发一个在线教育平台，支持课程管理、用户学习进度跟踪、在线测验');
     
     // 等待字符计数更新
-    await page.waitForTimeout(500);
+    await page.page.waitForLoadState('domcontentloaded');
     
     // 3. 检查分析按钮状态
     console.log('📍 步骤3: 检查按钮状态...');
@@ -67,12 +67,12 @@ async function testHomepageFlow() {
         throw new Error('分析超时，未在预期时间内完成');
       }
       
-      await page.waitForTimeout(1000);
+      await page.page.waitForLoadState('domcontentloaded');
       attempts++;
     }
     
     // 等待额外时间确保渲染完成
-    await page.waitForTimeout(3000);
+    await page.page.waitForLoadState('networkidle');
     
     const analyzeDuration = (Date.now() - analyzeStartTime) / 1000;
     console.log(`⏱️ 分析耗时: ${analyzeDuration.toFixed(1)}秒`);

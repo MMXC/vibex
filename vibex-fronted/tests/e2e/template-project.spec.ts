@@ -38,7 +38,7 @@ test.describe('E2: Project Template Library', () => {
 
     // Check that template cards are visible
     // TemplateGallery renders cards; give it time to mount
-    await page.waitForTimeout(1000);
+    await page.page.waitForLoadState('domcontentloaded');
 
     const cards = page.locator('[class*="templateCard"], [class*="card"]');
     const cardCount = await cards.count();
@@ -51,7 +51,7 @@ test.describe('E2: Project Template Library', () => {
   test('E2-2: Clicking a template card opens the detail modal', async ({ page }) => {
     await page.goto(`${BASE_URL}/templates`, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await page.page.waitForLoadState('domcontentloaded');
 
     // Click the first template card
     const firstCard = page.locator('[class*="templateCard"], [class*="card"]').first();
@@ -98,7 +98,7 @@ test.describe('E2: Project Template Library', () => {
 
     // Reload to pick up sessionStorage values
     await page.goto(`${BASE_URL}/templates`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(1000);
+    await page.page.waitForLoadState('domcontentloaded');
 
     // Click the first template card
     const firstCard = page.locator('[class*="templateCard"], [class*="card"]').first();
@@ -135,7 +135,7 @@ test.describe('E2: Project Template Library', () => {
     });
 
     await page.goto(`${BASE_URL}/templates`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(1000);
+    await page.page.waitForLoadState('domcontentloaded');
 
     // Click first card
     const firstCard = page.locator('[class*="templateCard"], [class*="card"]').first();
@@ -160,7 +160,7 @@ test.describe('E2: Project Template Library', () => {
   test('E2-5: Not logged in redirects to login page', async ({ page }) => {
     // No auth token set
     await page.goto(`${BASE_URL}/templates`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(1000);
+    await page.page.waitForLoadState('domcontentloaded');
 
     // Click first card
     const firstCard = page.locator('[class*="templateCard"], [class*="card"]').first();

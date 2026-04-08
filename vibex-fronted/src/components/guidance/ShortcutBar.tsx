@@ -13,6 +13,7 @@ import React, { memo, useCallback } from 'react';
 import { useGuidanceStore } from '@/stores/guidanceStore';
 import { ChevronUp, ChevronDown, Keyboard } from 'lucide-react';
 import styles from './ShortcutBar.module.css';
+import { SHORTCUTS } from '@/components/canvas/features/ShortcutPanel';
 
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
@@ -30,6 +31,7 @@ const ShortcutItem = memo<ShortcutItemProps>(function ShortcutItem({ keys, descr
       onClick={onClick}
       title={description}
       aria-label={description}
+      data-testid="shortcut-bar-item"
     >
       <div className={styles.shortcutKeys} aria-hidden="true">
         {keys.map((key, i) => (
@@ -44,27 +46,20 @@ const ShortcutItem = memo<ShortcutItemProps>(function ShortcutItem({ keys, descr
   );
 });
 
-// Compact shortcuts shown when collapsed
-const COLLAPSED_SHORTCUTS = [
-  { keys: ['?'], description: '快捷键' },
-  { keys: ['Esc'], description: '关闭/退出' },
-  { keys: ['Ctrl', 'K'], description: '搜索' },
-  { keys: ['Ctrl', 'Z'], description: '撤销' },
-  { keys: ['Space'], description: '平移' },
+// Compact shortcuts shown when collapsed (subset of SHORTCUTS)
+const COLLAPSED_SHORTCUT_IDS = ['question', 'esc', 'ctrl-k', 'ctrl-z', 'space'];
+
+// Full shortcuts shown when expanded (subset of SHORTCUTS)
+const EXPANDED_SHORTCUT_IDS = [
+  ...COLLAPSED_SHORTCUT_IDS,
+  'ctrl-shift-z', 'n', 'plus', 'minus', 'zero', 'del', 'ctrl-a', 'f11', 'ctrl-g'
 ];
 
+// Compact shortcuts shown when collapsed
+const COLLAPSED_SHORTCUTS = SHORTCUTS.filter(s => COLLAPSED_SHORTCUT_IDS.includes(s.id));
+
 // Full shortcuts shown when expanded
-const EXPANDED_SHORTCUTS = [
-  ...COLLAPSED_SHORTCUTS,
-  { keys: ['Ctrl', 'Shift', 'Z'], description: '重做' },
-  { keys: ['N'], description: '新建节点' },
-  { keys: ['+'], description: '放大' },
-  { keys: ['-'], description: '缩小' },
-  { keys: ['0'], description: '重置缩放' },
-  { keys: ['Del'], description: '删除选中' },
-  { keys: ['Ctrl', 'A'], description: '全选' },
-  { keys: ['F11'], description: '最大化' },
-];
+const EXPANDED_SHORTCUTS = SHORTCUTS.filter(s => EXPANDED_SHORTCUT_IDS.includes(s.id));
 
 interface ShortcutBarProps {
   /** Callback when ? key is pressed (opens full shortcut panel) */
@@ -94,6 +89,7 @@ export const ShortcutBar = memo<ShortcutBarProps>(function ShortcutBar({ onOpenS
       className={`${styles.shortcutBar} ${collapsed ? styles.collapsed : styles.expanded}`}
       role="toolbar"
       aria-label="快捷键栏"
+      data-testid="shortcut-bar"
     >
       <div className={styles.inner}>
         <div className={styles.shortcutList} aria-label="快捷键列表">

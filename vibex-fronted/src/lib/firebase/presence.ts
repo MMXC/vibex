@@ -1,9 +1,14 @@
 /**
  * Firebase Presence — Real-time user presence tracking
- * E1-S1: Firebase Presence 接入
+ * E1-S2: Firebase Presence 真实接入
  *
  * 使用 Firebase Realtime Database 实现用户在线状态同步。
  * 凭证通过 NEXT_PUBLIC_FIREBASE_* 环境变量注入（禁止硬编码）。
+ *
+ * 接入路径:
+ * 1. 创建 Firebase 项目，启用 Realtime Database
+ * 2. 复制 .env.local.example 为 .env.local，填入凭证
+ * 3. 本模块自动从 Mock 降级切换到真实 Firebase
  */
 
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
@@ -26,12 +31,9 @@ export interface PresenceOptions {
 }
 
 // ============================================================================
-// Firebase Mock / Placeholder
-// 后端真实接入时替换为: import { initializeApp } from 'firebase/app';
+// Firebase Config
 // ============================================================================
 
-// Firebase 配置通过环境变量注入（NEXT_PUBLIC_FIREBASE_*）
-// 暂时使用 mock 实现，便于开发调试和 CI 测试
 const FIREBASE_CONFIG = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -42,18 +44,37 @@ const FIREBASE_CONFIG = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// 检查 Firebase 是否已配置
-const isFirebaseConfigured = () => {
+export function isFirebaseConfigured(): boolean {
   return Boolean(
     FIREBASE_CONFIG.apiKey &&
     FIREBASE_CONFIG.databaseURL &&
     FIREBASE_CONFIG.apiKey !== 'your-api-key'
   );
-};
+}
+
+// ============================================================================
+// Firebase SDK (lazy init)
+// ============================================================================
+
+let _app: ReturnType<typeof import('firebase/app').initializeApp> | null = null;
+let _db: ReturnType<typeof import('firebase/database').getDatabase> | null = null;
+
+async function getFirebaseDb() {
+  if (!isFirebaseConfigured()) return null;
+  if (_db) return _db;
+
+  const { initializeApp, getApps } = await import('firebase/app');
+  const { getDatabase } = await import('firebase/database');
+
+  if (!_app) {
+    _app = getApps().length === 0 ? initializeApp(FIREBASE_CONFIG) : getApps()[0];
+  }
+  _db = getDatabase(_app);
+  return _db;
+}
 
 // ============================================================================
 // Mock Presence Store（开发/CI 环境使用）
-// 生产环境替换为 Firebase Realtime Database 操作
 // ============================================================================
 
 interface MockPresenceState {
@@ -62,31 +83,16 @@ interface MockPresenceState {
   };
 }
 
-// 模拟 Firebase Realtime Database（内存存储，tab 间不共享）
 const mockPresenceDb: MockPresenceState = {};
-
-// 模拟订阅者回调
 const mockSubscribers: Map<string, (users: PresenceUser[]) => void> = new Map();
 
 // ============================================================================
 // User Color Hash
 // ============================================================================
 
-/**
- * 为 userId 分配稳定颜色（基于 userId 哈希）
- * 颜色从预定义调色板中选取，确保不同用户可区分
- */
 const PRESENCE_COLORS = [
-  '#FF6B6B', // 红
-  '#4ECDC4', // 青
-  '#45B7D1', // 蓝
-  '#96CEB4', // 绿
-  '#FFEAA7', // 黄
-  '#DDA0DD', // 紫
-  '#98D8C8', // 薄荷
-  '#F7DC6F', // 金
-  '#BB8FCE', // 薰衣草
-  '#85C1E9', // 天蓝
+  '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+  '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
 ];
 
 export function hashUserColor(userId: string): string {
@@ -121,18 +127,26 @@ export async function setPresence(
   };
 
   if (isFirebaseConfigured()) {
-    // TODO: 真实 Firebase 实现
-    // const presenceRef = ref(database, `presence/${canvasId}/${userId}`);
-    // await set(presenceRef, presenceUser);
-    // await onDisconnect(presenceRef).remove();
-    canvasLogger.default.debug('[Firebase Presence] setPresence (mock):', presenceUser);
+    try {
+      const { getDatabase, ref, set, onDisconnect } = await import('firebase/database');
+      const db = await getFirebaseDb();
+      if (!db) return;
+      const presenceRef = ref(db, `presence/${canvasId}/${userId}`);
+      await set(presenceRef, presenceUser);
+      await onDisconnect(presenceRef).remove();
+      canvasLogger.default.debug('[Firebase Presence] setPresence:', presenceUser);
+    } catch (err) {
+      canvasLogger.default.error('[Firebase Presence] setPresence failed, using mock:', err);
+      // 降级到 Mock
+      if (!mockPresenceDb[canvasId]) mockPresenceDb[canvasId] = {};
+      mockPresenceDb[canvasId][userId] = presenceUser;
+      notifySubscribers(canvasId);
+    }
   } else {
     // Mock 模式
     if (!mockPresenceDb[canvasId]) mockPresenceDb[canvasId] = {};
     mockPresenceDb[canvasId][userId] = presenceUser;
     canvasLogger.default.debug('[Mock Presence] setPresence:', presenceUser);
-
-    // 通知订阅者
     notifySubscribers(canvasId);
   }
 }
@@ -149,11 +163,16 @@ export async function updateCursor(
   if (!canvasId || !userId) return;
 
   if (isFirebaseConfigured()) {
-    // TODO: 真实 Firebase 实现
-    // const cursorRef = ref(database, `presence/${canvasId}/${userId}/cursor`);
-    // await update(cursorRef, { x, y });
+    try {
+      const db = await getFirebaseDb();
+      if (!db) return;
+      const { getDatabase, ref, update } = await import('firebase/database');
+      const cursorRef = ref(db, `presence/${canvasId}/${userId}`);
+      await update(cursorRef, { cursor: { x, y }, lastSeen: Date.now() });
+    } catch (err) {
+      canvasLogger.default.error('[Firebase Presence] updateCursor failed:', err);
+    }
   } else {
-    // Mock 模式
     if (mockPresenceDb[canvasId]?.[userId]) {
       mockPresenceDb[canvasId][userId].cursor = { x, y };
       mockPresenceDb[canvasId][userId].lastSeen = Date.now();
@@ -167,35 +186,48 @@ export async function updateCursor(
  */
 export function getOthers(canvasId: string, currentUserId: string): PresenceUser[] {
   if (!canvasId) return [];
-
-  if (isFirebaseConfigured()) {
-    // TODO: 真实 Firebase 实现
-    return [];
-  } else {
-    const canvasPresence = mockPresenceDb[canvasId];
-    if (!canvasPresence) return [];
-
-    return Object.values(canvasPresence).filter(
-      (user) => user.userId !== currentUserId
-    );
-  }
+  const canvasPresence = mockPresenceDb[canvasId];
+  if (!canvasPresence) return [];
+  return Object.values(canvasPresence).filter(
+    (user) => user.userId !== currentUserId
+  );
 }
 
 /**
  * 订阅其他用户变更
+ * 返回取消订阅函数
  */
 export function subscribeToOthers(
   canvasId: string,
   callback: (users: PresenceUser[]) => void
 ): () => void {
-  mockSubscribers.set(canvasId, callback);
-
-  // 立即调用一次
-  callback(getOthers(canvasId, ''));
-
-  return () => {
-    mockSubscribers.delete(canvasId);
-  };
+  if (isFirebaseConfigured()) {
+    let unsubscribe: (() => void) | null = null;
+    (async () => {
+      try {
+        const db = await getFirebaseDb();
+        if (!db) return;
+        const { getDatabase, ref, onValue } = await import('firebase/database');
+        const presenceRef = ref(db, `presence/${canvasId}`);
+        unsubscribe = onValue(presenceRef, (snapshot) => {
+          const data = snapshot.val() || {};
+          const users = Object.values(data) as PresenceUser[];
+          callback(users);
+        });
+      } catch (err) {
+        canvasLogger.default.error('[Firebase Presence] subscribeToOthers failed:', err);
+      }
+    })();
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  } else {
+    mockSubscribers.set(canvasId, callback);
+    callback(getOthers(canvasId, ''));
+    return () => {
+      mockSubscribers.delete(canvasId);
+    };
+  }
 }
 
 /**
@@ -205,11 +237,17 @@ export async function removePresence(canvasId: string, userId: string): Promise<
   if (!canvasId || !userId) return;
 
   if (isFirebaseConfigured()) {
-    // TODO: 真实 Firebase 实现
-    // const presenceRef = ref(database, `presence/${canvasId}/${userId}`);
-    // await remove(presenceRef);
+    try {
+      const db = await getFirebaseDb();
+      if (!db) return;
+      const { getDatabase, ref, remove } = await import('firebase/database');
+      const presenceRef = ref(db, `presence/${canvasId}/${userId}`);
+      await remove(presenceRef);
+      canvasLogger.default.debug('[Firebase Presence] removePresence:', { canvasId, userId });
+    } catch (err) {
+      canvasLogger.default.error('[Firebase Presence] removePresence failed:', err);
+    }
   } else {
-    // Mock 模式
     if (mockPresenceDb[canvasId]) {
       delete mockPresenceDb[canvasId][userId];
       notifySubscribers(canvasId);
@@ -218,13 +256,12 @@ export async function removePresence(canvasId: string, userId: string): Promise<
 }
 
 // ============================================================================
-// Notify Subscribers Helper
+// Notify Subscribers Helper (Mock mode)
 // ============================================================================
 
 function notifySubscribers(canvasId: string): void {
   const callback = mockSubscribers.get(canvasId);
   if (callback) {
-    // 通知所有非当前用户的订阅（简化处理，传入空 userId）
     callback(getOthers(canvasId, ''));
   }
 }
@@ -241,9 +278,6 @@ import { useEffect, useState, useCallback, useRef } from 'react';
  * @param canvasId - 画布 ID
  * @param userId   - 当前用户 ID
  * @param name     - 当前用户显示名
- *
- * @example
- * const { others, updateCursor, isAvailable } = usePresence(canvasId, userId, name);
  */
 export function usePresence(
   canvasId: string | null,
@@ -260,33 +294,28 @@ export function usePresence(
   const [isConnected, setIsConnected] = useState(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
-  // 注册当前用户
   useEffect(() => {
     if (!canvasId || !userId) return;
-
     let mounted = true;
 
     const init = async () => {
       try {
         await setPresence(canvasId, userId, name);
         if (mounted) {
-          setIsAvailable(isFirebaseConfigured() || true); // mock 模式也可用
+          setIsAvailable(true);
           setIsConnected(true);
         }
       } catch (err) {
         canvasLogger.default.error('[Presence] Failed to set presence:', err);
-        if (mounted) {
-          setIsAvailable(false);
-        }
+        if (mounted) setIsAvailable(false);
       }
     };
 
     init();
 
-    // 订阅其他人变更
     unsubscribeRef.current = subscribeToOthers(canvasId, (users) => {
       if (mounted) {
-        setOthers(users.slice(0, 10)); // 最多显示 10 个用户
+        setOthers(users.filter((u) => u.userId !== userId).slice(0, 10));
       }
     });
 

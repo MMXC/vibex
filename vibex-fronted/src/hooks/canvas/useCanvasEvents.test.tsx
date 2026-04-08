@@ -57,7 +57,7 @@ vi.mock('@/lib/canvas/stores/componentStore', () => ({
   ),
 }));
 
-// Mock guidanceStore — vi.hoisted ensures mocks are initialized before vi.mock runs
+// Mock guidanceStore — use vi.hoisted so mocks are accessible at module level
 const { mockShowShortcutBar, mockHideShortcutBar } = vi.hoisted(() => ({
   mockShowShortcutBar: vi.fn(),
   mockHideShortcutBar: vi.fn(),
@@ -81,8 +81,6 @@ vi.mock('@/stores/guidanceStore', () => {
 afterEach(() => {
   __setExpandMode('normal');
   mockToggleMaximize.mockClear();
-  mockShowShortcutBar.mockClear();
-  mockHideShortcutBar.mockClear();
   vi.clearAllMocks();
   document.body.innerHTML = '';
 });

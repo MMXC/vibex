@@ -190,7 +190,7 @@ export function useCanvasEvents(
         e.preventDefault();
         toggleShortcutPanel();
       }
-      // Escape closes the shortcut panel (via toggleShortcutPanel so ShortcutBar reappears)
+      // Escape closes the shortcut panel (via toggleShortcutPanel to trigger showShortcutBar)
       if (e.key === 'Escape' && isShortcutPanelOpen) {
         toggleShortcutPanel();
       }

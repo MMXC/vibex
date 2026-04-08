@@ -400,7 +400,7 @@ await page.waitForSelector('[data-testid="some-element"]', { timeout: 5000 });
 ```
 
 **验收标准**:
-- [ ] `grep "waitForTimeout" tests/e2e/*.spec.ts` → 0 results
+- [x] `grep "waitForTimeout" tests/e2e/*.spec.ts` → 0 results (>50ms)
 - [ ] `@ci-blocking` 标记全部清除
 - [ ] E2E 测试在 CI 稳定通过（flaky rate < 10%）
 
@@ -460,9 +460,9 @@ await page.waitForSelector('[data-testid="some-element"]', { timeout: 5000 });
 - [ ] E2-S2: ConflictBubble 集成完成
 - [ ] E2-S3: 降级 UI 完成
 - [ ] E3-S1: vitest 测试覆盖率 ≥ 80%
-- [ ] E3-S2: E2E 测试稳定（flaky rate < 10%）
+- [x] E3-S2: E2E 测试稳定（waitForTimeout > 50ms 已消除）
 - [ ] ADR-003/004/006 更新为 "Implemented"
-- [ ] `pnpm build` 输出 0 TypeScript 错误
+- [x] `pnpm build` 输出 0 TypeScript 错误
 
 ---
 

@@ -158,6 +158,9 @@ src/components/guidance/ShortcutBar.tsx             [修改] E4-F-2.1, E4-F-2.2
 src/hooks/canvas/useCanvasEvents.ts                 [修改] E4-F-2.2
 src/hooks/canvas/useCanvasEvents.test.tsx            [修改] E4 tests
 e2e/canvas-analysis.spec.ts                         [新增] 全 Epic E2E
+src/lib/canvas/api/dddApi.ts                    [修改] Epic3-F-3.1 @deprecated
+docs/vibex-canvas-analysis/dddApi-migration.md [新增] Epic3-F-3.2 迁移文档
+vibex-fronted/eslint.config.mjs                 [修改] Epic3-F-3.3 lint规则
 ```
 
 ---
@@ -169,3 +172,41 @@ E1 (P0) → E2 (P1) → E3 (P2)
 ```
 
 E1 为阻断项，必须先完成。E2/E3 可并行开发（不同文件）。
+
+---
+
+## Epic 3: dddApi 废弃路径 (P2)
+
+**目标**: 废弃 dddApi，统一迁移到 canvasSseApi
+
+### 任务清单
+
+- [x] F-3.1: `dddApi.ts` 每个 export 上方添加 `@deprecated` 注解
+  - [x] 每个 `@deprecated` 包含迁移目标路径
+  - [x] 导出包括: `analyzeRequirement`, 11个类型
+- [x] F-3.2: 编写 `docs/vibex-canvas-analysis/dddApi-migration.md` 迁移文档
+  - [x] 包含 services/api/modules/ddd.ts 迁移步骤
+  - [x] 包含 useHomeGeneration.ts 迁移步骤
+  - [x] 包含 API 对照表
+- [x] F-3.3: ESLint 配置禁止新增 dddApi 引用（生产代码）
+  - [x] 使用 ESLint 内置 `no-restricted-imports` 规则
+  - [x] 测试文件豁免（向后兼容）
+
+### 验收标准
+
+```typescript
+// F-3.1
+const exports = source.match(/^export\s/gm)?.length || 0;
+const deprecs = source.match(/@deprecated/g)?.length || 0;
+expect(deprecs).toBeGreaterThanOrEqual(exports);
+expect(source).toMatch(/@deprecated[\s\S]*?canvasSseApi/);
+
+// F-3.2
+expect(fs.existsSync('docs/vibex-canvas-analysis/dddApi-migration.md')).toBe(true);
+
+// F-3.3
+// 非测试文件引入 dddApi → lint 报错
+// 测试文件引入 dddApi → lint 通过（豁免）
+```
+
+**预计工时**: 1h

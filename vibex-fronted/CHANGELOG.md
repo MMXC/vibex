@@ -1,5 +1,10 @@
 # Changelog
 
+### [vibex-third E4-S1: ADR 决策记录] — 2026-04-09
+- **ADR 文档 (`docs/vibex-third/adr/`)**: 5 个架构决策记录（TanStack Query、React Virtualization、Conflict Strategy、Firebase Presence、Storybook Chromatic）
+- **决策覆盖**: API 层、虚拟化、冲突检测、实时协作、组件文档化
+- **格式规范**: 状态/背景/决策/后果/关联 全部完整
+
 ### [vibex-third E3-S2: Canvas 组件 Story 覆盖] — 2026-04-09
 - **Story 覆盖 (`src/components/canvas/stories/`)**: 12 个 Canvas story 文件（ComponentTree、BusinessFlowTree、BoundedContextTree、ConflictBubble、PresenceLayer、ShortcutPanel 等）
 - **Storybook build**: `storybook build` 通过，autodocs 正常工作

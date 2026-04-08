@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.134',
+    date: '2026-04-08',
+    changes: [
+      '📋 vibex-canvas-analysis Epic 1: ShortcutPanel合并',
+      '✅ 统一快捷键面板: 合并 ShortcutHintPanel 和 ShortcutHelpPanel 为统一 ShortcutPanel',
+      '✅ 21 个快捷键统一管理（新增 Space 键），消除重复代码 207 行',
+      '✅ 向后兼容: 旧组件标记为 @deprecated 并 re-export 新组件',
+      '提交: 74eef272',
+    ],
+    commit: '74eef272',
+  },
+
+  {
     version: '1.0.133',
     date: '2026-04-07',
     changes: [

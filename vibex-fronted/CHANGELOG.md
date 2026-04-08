@@ -1,5 +1,13 @@
 # Changelog
 
+### [vibex-canvas-analysis Epic 1: ShortcutPanel合并] — 2026-04-08
+- **ShortcutPanel 统一重构**: 合并 ShortcutHintPanel 和 ShortcutHelpPanel 为统一组件
+  - 新增 `src/components/canvas/features/ShortcutPanel.tsx`: 包含 21 个快捷键（新增 Space）
+  - 旧组件标记为 `@deprecated` 并 re-export 新组件，保持向后兼容
+  - CanvasPage 替换为单 ShortcutPanel 实例，消除重复代码 207 行
+  - 导出 `SHORTCUTS` 常量和 `ShortcutPanelProps` 类型供外部使用
+  - 提交: `74eef272`
+
 ### [vibex-architect-proposals-20260412 A-P1-2: Canvas TreeErrorBoundary] — 2026-04-07
 - **A-P1-2 TreeErrorBoundary**: 三栏树形面板错误隔离
   - `panels/TreeErrorBoundary.tsx` + ContextTreePanel/FlowTreePanel/ComponentTreePanel

@@ -22,6 +22,7 @@ import canvasSnapshots from './canvas/snapshots';
 import canvasRollback from './canvas/rollback';
 import flows from './flows';
 import wsHealth from './ws-health';
+import analytics from './analytics';
 
 // 导入所有 API 路由
 import projects from '../projects';
@@ -102,6 +103,10 @@ v1.route('/analyze/stream', analyzeStream);
 // Canvas SSE 流式端点 - 公开，无需认证
 v1.route('/canvas/stream', canvasStream);
 v1.route('/ws', wsHealth);
+
+// E2-S1: Analytics & Health — 公开，无需认证，无 DB 查询
+v1.route('/analytics', analytics);
+v1.route('/health', analytics);
 
 // ==================== CORS Preflight 处理 (在受保护路由之前) ====================
 // 显式处理 OPTIONS，避免 preflight 被 authMiddleware 拦截返回 401

@@ -70,6 +70,45 @@ expect(navigation).toHaveNavigatedTo('/canvas'); // 无 intercept 报错
 
 ---
 
+## Epic E4: ShortcutBar 与 ShortcutPanel 协同 (P1)
+
+**目标**: ShortcutBar 和 ShortcutPanel 快捷键描述一致，面板打开时 ShortcutBar 自动隐藏
+
+### 任务清单
+
+- [x] ShortcutBar 使用 ShortcutPanel 的统一 SHORTCUTS 数据（F-2.1）
+- [x] ShortcutBar 添加 `data-testid="shortcut-bar-item"` 和 `data-testid="shortcut-bar"`（F-2.1）
+- [x] useCanvasEvents.ts 中 toggleShortcutPanel 控制 ShortcutBar 可见性（F-2.2）
+- [x] useEffect 监听 isShortcutPanelOpen 变化，同步 ShortcutBar 状态（F-2.2）
+- [x] 单元测试：useCanvasEvents.test.tsx (19 tests pass)
+
+### 验收标准
+
+```typescript
+// F-2.1: ShortcutBar 与 ShortcutPanel 的 Ctrl+G 描述一致
+const barEntry = page.locator('[data-testid="shortcut-bar-item"]', { hasText: 'Ctrl+G' });
+const barDescription = await barEntry.getAttribute('title');
+
+await page.keyboard.press('?');
+const panelEntry = page.locator('[data-testid="shortcut-panel-item"]', { hasText: 'Ctrl+G' });
+const panelDescription = await panelEntry.getAttribute('title');
+
+expect(panelDescription).toBe(barDescription);
+
+// F-2.2: 面板打开时 ShortcutBar 不可见
+await page.keyboard.press('?');
+const bar = page.locator('[data-testid="shortcut-bar"]');
+await expect(bar).not.toBeVisible();
+
+// 关闭面板后 ShortcutBar 恢复可见
+await page.keyboard.press('Escape');
+await expect(bar).toBeVisible();
+```
+
+**预计工时**: 1h
+
+---
+
 ## Epic E3: 优化步骤引导体验 (P2)
 
 **目标**: 用户清楚了解当前状态和操作限制
@@ -106,16 +145,19 @@ expect(createBtn).toHaveAttribute('title', /.+/);
 ## 文件变更清单
 
 ```
-src/data/example-canvas.json             [新增] F-1.1
-src/lib/canvas/canvasStore.ts           [修改] F-1.2, F-1.3
-src/components/canvas/CanvasPage.tsx     [修改] F-1.2, F-3.2
-src/components/project/ProjectBar.tsx    [修改] F-1.3, F-3.3
-src/components/homepage/Navbar/Navbar.tsx    [修改] F-2.1
-src/components/onboarding/OnboardingProgressBar.tsx [修改] F-2.2
-src/components/homepage/Navbar/__tests__/Navbar.test.tsx [修改] F-2.1 tests
-src/components/canvas/TreeStatus.tsx     [新增] F-3.2
-src/components/canvas/PhaseProgressBar.tsx [修改] F-3.1
-e2e/canvas-analysis.spec.ts              [新增] 全 Epic E2E
+src/data/example-canvas.json                        [新增] F-1.1
+src/lib/canvas/canvasStore.ts                      [修改] F-1.2, F-1.3
+src/components/canvas/CanvasPage.tsx               [修改] F-1.2, F-3.2
+src/components/project/ProjectBar.tsx              [修改] F-1.3, F-3.3
+src/components/homepage/Navbar/Navbar.tsx           [修改] E2-F-2.1
+src/components/onboarding/OnboardingProgressBar.tsx [修改] E2-F-2.2
+src/components/homepage/Navbar/__tests__/Navbar.test.tsx [修改] E2 tests
+src/components/canvas/TreeStatus.tsx                [新增] F-3.2
+src/components/canvas/PhaseProgressBar.tsx          [修改] F-3.1
+src/components/guidance/ShortcutBar.tsx             [修改] E4-F-2.1, E4-F-2.2
+src/hooks/canvas/useCanvasEvents.ts                 [修改] E4-F-2.2
+src/hooks/canvas/useCanvasEvents.test.tsx            [修改] E4 tests
+e2e/canvas-analysis.spec.ts                         [新增] 全 Epic E2E
 ```
 
 ---

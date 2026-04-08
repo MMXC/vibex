@@ -21,6 +21,17 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.139',
+    date: '2026-04-08',
+    changes: [
+      '📋 vibex-next E0: 性能可观测性设计',
+      '✅ E0-S1: MEMORY.md 新增 A-010 条目（LCP/CLS/P99 指标 + 告警阈值 + 7天数据保留）',
+      '提交: 53274d97, 7e656676',
+    ],
+    commit: '7e656676',
+  },
+
+  {
     version: '1.0.138',
     date: '2026-04-08',
     changes: [

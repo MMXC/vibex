@@ -1,3 +1,9 @@
+### Added (vibex-next E0: 性能可观测性设计) — 2026-04-08
+- **E0: A-010 性能可观测性设计**:
+  - **MEMORY.md**: 新增 A-010 条目（LCP/CLS/P99 指标定义 + 告警阈值 + 7天数据保留策略）
+  - Architect 签署完成
+  - 提交: `53274d97`, `7e656676`
+
 ### Added (vibex-canvas-analysis Epic 5: Toolbar JSDoc) — 2026-04-08
 - **Epic 5: Toolbar JSDoc**:
   - **F-5.1**: `CanvasToolbar.tsx` JSDoc 声明画布级操作，无 TreeToolbar 交叉引用

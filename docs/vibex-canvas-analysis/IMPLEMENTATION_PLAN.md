@@ -164,6 +164,8 @@ vibex-fronted/eslint.config.mjs                 [修改] Epic3-F-3.3 lint规则
 src/lib/canvas/api/canvasSseApi.snapshot.test.ts  [新增] Epic4-F-4.1 snapshot测试
 src/lib/canvas/api/__snapshots__/canvasSseApi.snapshot.test.ts.snap [新增] Epic4快照
 vibex-fronted/src/lib/canvas/api/canvasSseApi.test.ts [修改] vitest 修复
+src/components/canvas/CanvasToolbar.tsx          [文档] Epic5-F-5.1 JSDoc（已存在）
+src/components/canvas/TreeToolbar.tsx            [文档] Epic5-F-5.2 JSDoc（已存在）
 ```
 
 ---
@@ -240,3 +242,34 @@ SSE_EVENT_TYPES.forEach(t => expect(snapshots).toContain(t));
 ```
 
 **预计工时**: 1h
+
+---
+
+## Epic 5: Toolbar JSDoc (P2)
+
+**目标**: CanvasToolbar 和 TreeToolbar 添加 JSDoc，明确组件职责，防止交叉导入
+
+### 任务清单
+
+- [x] F-5.1: CanvasToolbar.tsx 顶部 JSDoc（声明"画布级操作"职责）
+  - [x] JSDoc 包含"画布"/"canvas"
+  - [x] 无 TreeToolbar 交叉引用
+- [x] F-5.2: TreeToolbar.tsx 顶部 JSDoc（声明"树级操作"职责）
+  - [x] JSDoc 包含"树"/"tree"
+  - [x] 无 CanvasToolbar 交叉引用
+
+### 验收标准
+
+```typescript
+// F-5.1
+expect(canvasToolbarSource).toMatch(/^\/\*\*[\s\S]*?\*\//); // 有 JSDoc
+expect(jsdoc).toMatch(/画布|canvas|全局|global/i); // 提到画布
+expect(canvasToolbarSource).not.toMatch(/TreeToolbar/); // 无交叉引用
+
+// F-5.2
+expect(treeToolbarSource).toMatch(/^\/\*\*[\s\S]*?\*\//); // 有 JSDoc
+expect(jsdoc).toMatch(/树|tree|toolbar/i); // 提到树
+expect(treeToolbarSource).not.toMatch(/CanvasToolbar/); // 无交叉引用
+```
+
+**预计工时**: 0.5h（已存在）

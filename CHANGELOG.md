@@ -1,3 +1,10 @@
+### Added (vibex-fourth E1: E2E 稳定性基础) — 2026-04-09
+- **E1: E2E 稳定性基础 (Sprint 2)**:
+  - **E1: E2E 稳定性修复**: 19 个 e2e 测试文件 waitForTimeout 硬等待替换为 Playwright 语义等待 (networkidle/domcontentloaded)
+  - **F1.1**: waitForTimeout > 50ms 在 scoped e2e 文件中已消除
+  - **F1.3**: playwright.config.ts expect timeout = 30000ms
+  - 提交: `ac62e7c0`
+
 ### Added (vibex-third E1-S1: TanStack Query 统一 API Client) — 2026-04-08
 - **E1-S1: TanStack Query 统一 API Client**:
   - `services/api/client.ts`: 统一 API Client 指标跟踪（requests/failures/latency P50/P95/P99）

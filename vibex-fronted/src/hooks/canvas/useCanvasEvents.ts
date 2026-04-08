@@ -137,15 +137,6 @@ export function useCanvasEvents(
     [],
   );
 
-  // 监听 isShortcutPanelOpen 变化，确保状态同步
-  useEffect(() => {
-    if (isShortcutPanelOpen) {
-      useGuidanceStore.getState().hideShortcutBar();
-    } else {
-      useGuidanceStore.getState().showShortcutBar();
-    }
-  }, [isShortcutPanelOpen]);
-
   // =============================================================================
   // Keyboard: F11 maximize + Escape (maximize only)
   // =============================================================================
@@ -199,9 +190,9 @@ export function useCanvasEvents(
         e.preventDefault();
         toggleShortcutPanel();
       }
-      // Escape closes the shortcut panel
+      // Escape closes the shortcut panel (via toggleShortcutPanel so ShortcutBar reappears)
       if (e.key === 'Escape' && isShortcutPanelOpen) {
-        setIsShortcutPanelOpen(false);
+        toggleShortcutPanel();
       }
     }
     document.addEventListener('keydown', handleKeyDown);

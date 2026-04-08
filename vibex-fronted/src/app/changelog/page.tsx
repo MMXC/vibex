@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.135',
+    date: '2026-04-08',
+    changes: [
+      '📋 vibex-canvas-analysis Epic 2: ShortcutBar协同',
+      '✅ ShortcutBar 使用统一 SHORTCUTS 数据（F-2.1），快捷键描述与 ShortcutPanel 一致',
+      '✅ ShortcutBar 与 ShortcutPanel 可见性联动（F-2.2）: 面板打开时自动隐藏，关闭后恢复',
+      '✅ Bug 修复: 移除冗余 useEffect 双重调用，修复 Escape 处理器 ShortcutBar 不恢复问题',
+      '✅ 测试增强: 新增 hideShortcutBar/showShortcutBar 调用断言',
+    ],
+  },
+
+  {
     version: '1.0.134',
     date: '2026-04-08',
     changes: [

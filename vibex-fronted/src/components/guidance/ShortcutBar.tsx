@@ -93,9 +93,9 @@ export const ShortcutBar = memo<ShortcutBarProps>(function ShortcutBar({ onOpenS
     >
       <div className={styles.inner}>
         <div className={styles.shortcutList} aria-label="快捷键列表">
-          {shortcuts.map((shortcut, idx) => (
+          {shortcuts.map((shortcut) => (
             <ShortcutItem
-              key={idx}
+              key={shortcut.id}
               keys={shortcut.keys}
               description={shortcut.description}
               onClick={

@@ -57,32 +57,32 @@ vi.mock('@/lib/canvas/stores/componentStore', () => ({
   ),
 }));
 
-// Mock guidanceStore
+// Mock guidanceStore — vi.hoisted ensures mocks are initialized before vi.mock runs
+const { mockShowShortcutBar, mockHideShortcutBar } = vi.hoisted(() => ({
+  mockShowShortcutBar: vi.fn(),
+  mockHideShortcutBar: vi.fn(),
+}));
+
 vi.mock('@/stores/guidanceStore', () => {
-  const mockShowShortcutBar = vi.fn();
-  const mockHideShortcutBar = vi.fn();
   const state = {
     shortcutBarVisible: true,
     shortcutBarCollapsed: false,
     showShortcutBar: mockShowShortcutBar,
     hideShortcutBar: mockHideShortcutBar,
   };
-  // Create a mock that has both hook and static getState
   const mockUseGuidanceStore: any = (selector?: (s: any) => unknown) =>
     selector ? selector(state) : state;
   mockUseGuidanceStore.getState = () => state;
   return {
     useGuidanceStore: mockUseGuidanceStore,
-    __getMockFunctions: () => ({
-      showShortcutBar: mockShowShortcutBar,
-      hideShortcutBar: mockHideShortcutBar,
-    }),
   };
 });
 
 afterEach(() => {
   __setExpandMode('normal');
   mockToggleMaximize.mockClear();
+  mockShowShortcutBar.mockClear();
+  mockHideShortcutBar.mockClear();
   vi.clearAllMocks();
   document.body.innerHTML = '';
 });
@@ -177,6 +177,11 @@ describe('useCanvasEvents — search dialog', () => {
 // =============================================================================
 
 describe('useCanvasEvents — shortcut panel', () => {
+  beforeEach(() => {
+    mockShowShortcutBar.mockClear();
+    mockHideShortcutBar.mockClear();
+  });
+
   it('toggleShortcutPanel flips isShortcutPanelOpen', () => {
     const { result } = renderUseCanvasEvents();
     expect(result.current.isShortcutPanelOpen).toBe(false);
@@ -190,6 +195,39 @@ describe('useCanvasEvents — shortcut panel', () => {
       result.current.handlers.toggleShortcutPanel();
     });
     expect(result.current.isShortcutPanelOpen).toBe(false);
+  });
+
+  it('toggleShortcutPanel calls hideShortcutBar when opening', () => {
+    const { result } = renderUseCanvasEvents();
+    act(() => {
+      result.current.handlers.toggleShortcutPanel();
+    });
+    expect(mockHideShortcutBar).toHaveBeenCalledTimes(1);
+  });
+
+  it('toggleShortcutPanel calls showShortcutBar when closing', () => {
+    const { result } = renderUseCanvasEvents();
+    act(() => {
+      result.current.handlers.toggleShortcutPanel(); // open
+      result.current.handlers.toggleShortcutPanel(); // close
+    });
+    expect(mockShowShortcutBar).toHaveBeenCalledTimes(1);
+  });
+
+  it('Escape closes shortcut panel and shows ShortcutBar', () => {
+    const { result } = renderUseCanvasEvents();
+    act(() => {
+      result.current.handlers.toggleShortcutPanel();
+    });
+    expect(result.current.isShortcutPanelOpen).toBe(true);
+    mockHideShortcutBar.mockClear();
+
+    act(() => {
+      const event = new KeyboardEvent('keydown', { key: 'Escape' });
+      document.dispatchEvent(event);
+    });
+    expect(result.current.isShortcutPanelOpen).toBe(false);
+    expect(mockShowShortcutBar).toHaveBeenCalledTimes(1);
   });
 });
 

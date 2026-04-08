@@ -24,7 +24,7 @@ class TestCurlSlack(unittest.TestCase):
 
         import importlib
         spec = importlib.util.spec_from_file_location(
-            "task_manager", "/root/.openclaw/vibex/scripts/task_manager.py"
+            "task_manager", "/root/.openclaw/skills/team-tasks/scripts/task_manager.py"
         )
         tm = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(tm)
@@ -44,7 +44,7 @@ class TestCurlSlack(unittest.TestCase):
 
         import importlib
         spec = importlib.util.spec_from_file_location(
-            "task_manager", "/root/.openclaw/vibex/scripts/task_manager.py"
+            "task_manager", "/root/.openclaw/skills/team-tasks/scripts/task_manager.py"
         )
         tm = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(tm)
@@ -58,7 +58,7 @@ class TestCurlSlack(unittest.TestCase):
 
         import importlib
         spec = importlib.util.spec_from_file_location(
-            "task_manager", "/root/.openclaw/vibex/scripts/task_manager.py"
+            "task_manager", "/root/.openclaw/skills/team-tasks/scripts/task_manager.py"
         )
         tm = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(tm)
@@ -69,7 +69,7 @@ class TestCurlSlack(unittest.TestCase):
     def test_returns_false_when_no_token(self):
         import importlib
         spec = importlib.util.spec_from_file_location(
-            "task_manager", "/root/.openclaw/vibex/scripts/task_manager.py"
+            "task_manager", "/root/.openclaw/skills/team-tasks/scripts/task_manager.py"
         )
         tm = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(tm)
@@ -91,7 +91,7 @@ class TestNotifyNewTask(unittest.TestCase):
         # Re-import to pick up patched env
         import importlib
         spec = importlib.util.spec_from_file_location(
-            "task_manager2", "/root/.openclaw/vibex/scripts/task_manager.py"
+            "task_manager2", "/root/.openclaw/skills/team-tasks/scripts/task_manager.py"
         )
         tm = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(tm)
@@ -110,7 +110,7 @@ class TestNotifyNewTask(unittest.TestCase):
         # Ensure missing token doesn't raise
         import importlib
         spec = importlib.util.spec_from_file_location(
-            "task_manager3", "/root/.openclaw/vibex/scripts/task_manager.py"
+            "task_manager3", "/root/.openclaw/skills/team-tasks/scripts/task_manager.py"
         )
         tm = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(tm)
@@ -130,7 +130,7 @@ class TestGetDownstream(unittest.TestCase):
 
         import importlib
         spec = importlib.util.spec_from_file_location(
-            "task_manager4", "/root/.openclaw/vibex/scripts/task_manager.py"
+            "task_manager4", "/root/.openclaw/skills/team-tasks/scripts/task_manager.py"
         )
         tm = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(tm)
@@ -160,7 +160,7 @@ class TestGetDownstream(unittest.TestCase):
 
         import importlib
         spec = importlib.util.spec_from_file_location(
-            "task_manager5", "/root/.openclaw/vibex/scripts/task_manager.py"
+            "task_manager5", "/root/.openclaw/skills/team-tasks/scripts/task_manager.py"
         )
         tm = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(tm)

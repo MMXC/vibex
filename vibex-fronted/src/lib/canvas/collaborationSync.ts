@@ -12,9 +12,8 @@
  * - 节点变更必须通过 store action 而非直接修改状态
  */
 
-import { MessageRouter, type MessageType } from '@/lib/websocket/MessageRouter';
+import { MessageRouter, type MessageType, type NodeSyncPayload, type TreeType, type NodeAction } from '@/lib/websocket/MessageRouter';
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
-import type { NodeSyncPayload, TreeType, NodeAction } from '@/lib/websocket/MessageRouter';
 
 // ============================================================================
 // Collaboration Sync Bridge

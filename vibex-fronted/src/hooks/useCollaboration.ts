@@ -8,11 +8,10 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { MessageRouter, type WebSocketMessage } from '@/lib/websocket/MessageRouter';
+import { MessageRouter, type WebSocketMessage, type NodeSyncPayload } from '@/lib/websocket/MessageRouter';
 import { useRoomManager } from '@/lib/websocket/RoomManager';
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
 import { initCollaborationSync, handleRemoteNodeSync } from '@/lib/canvas/collaborationSync';
-import type { NodeSyncPayload } from '@/lib/websocket/MessageRouter';
 
 interface UseCollaborationOptions {
   url?: string;

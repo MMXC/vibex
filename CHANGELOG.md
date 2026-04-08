@@ -1,3 +1,11 @@
+### Added (vibex-next E1: 协作功能) — 2026-04-08
+- **E1: 协作功能 (S1-S4)**:
+  - **E1-S1**: Firebase Presence 接入（用户头像层 + 断线清除）
+  - **E1-S2**: WebSocket 节点同步（LWW 乐观锁）
+  - **E1-S3**: ConflictBubble 冲突提示 UI（5分钟去重）
+  - **E1-S4**: WebSocket 重连与降级（指数退避）
+  - 提交: `0e1b409b`, `7eb32abe`, `2675a813`, `ff0cd56b`, `26790fdb`, `b15a51fa`, `a3815c6e`, `902309ef`
+
 ### Added (vibex-next E0: 性能可观测性设计) — 2026-04-08
 - **E0: A-010 性能可观测性设计**:
   - **MEMORY.md**: 新增 A-010 条目（LCP/CLS/P99 指标定义 + 告警阈值 + 7天数据保留策略）

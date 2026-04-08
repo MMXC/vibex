@@ -21,6 +21,20 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.140',
+    date: '2026-04-08',
+    changes: [
+      '📋 vibex-next E1: 协作功能',
+      '✅ E1-S1: Firebase Presence 接入（用户头像层 + 断线清除）',
+      '✅ E1-S2: WebSocket 节点同步（LWW 乐观锁）',
+      '✅ E1-S3: ConflictBubble 冲突提示 UI（5分钟去重）',
+      '✅ E1-S4: WebSocket 重连与降级（指数退避）',
+      '提交: 0e1b409b, 7eb32abe, 2675a813, ff0cd56b, 26790fdb, b15a51fa, a3815c6e, 902309ef',
+    ],
+    commit: '902309ef',
+  },
+
+  {
     version: '1.0.139',
     date: '2026-04-08',
     changes: [

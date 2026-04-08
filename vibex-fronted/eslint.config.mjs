@@ -1,107 +1,86 @@
-import { defineConfig, globalIgnores } from 'eslint/config';
-import nextVitals from 'eslint-config-next/core-web-vitals';
-import nextTs from 'eslint-config-next/typescript';
-import importPlugin from 'eslint-plugin-import';
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
+import importPlugin from "eslint-plugin-import";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
-  // Override default ignores of eslint-config-next.
   globalIgnores([
-    // Default ignores of eslint-config-next:
-    '.next/**',
-    'out/**',
-    'build/**',
-    'next-env.d.ts',
-    // Dependencies
-    'node_modules/**',
-    // Test and coverage
-    'coverage/**',
-    'test-results/**',
-    'playwright-report/**',
-    'reports/**',
-    'coverage-history/**',
-    // Storybook
-    'storybook-static/**',
-    // Scripts
-    'scripts/**',
-    // Docs
-    'docs/**',
-    // GitHub
-    '.github/**',
-    '**/*.yml',
-    '**/*.yaml',
-    '**/*.md',
-    // Wrangler
-    '.wrangler/**',
-    // Tests (both root tests/ and src/ inline tests)
-    'tests/**',
-    'src/**/*.test.*',
-    'src/**/__tests__/**',
-    // Config files
-    '*.config.ts',
-    '*.config.mjs',
-    'tsconfig*.json',
-    // Env files
-    '.env*',
-    // CSS Module files (parsed incorrectly by ESLint)
-    '**/*.module.css',
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+    "node_modules/**",
+    "coverage/**",
+    "test-results/**",
+    "playwright-report/**",
+    "reports/**",
+    "coverage-history/**",
+    "storybook-static/**",
+    "scripts/**",
+    "docs/**",
+    ".github/**",
+    "**/*.yml",
+    "**/*.yaml",
+    "**/*.md",
+    ".wrangler/**",
+    "tests/**",
+    "src/**/*.test.*",
+    "src/**/__tests__/**",
+    "*.config.ts",
+    "*.config.mjs",
+    "tsconfig*.json",
+    ".env*",
+    "**/*.module.css",
   ]),
-  // E5: 测试文件命名规范
-  // Jest: **/*.test.ts | Playwright: **/*.spec.ts
-  // 详见 TESTING_STRATEGY.md 命名规范章节
-
+  // F-3.3: 测试文件豁免 dddApi 限制（向后兼容迁移期）
   {
-    plugins: {
-      import: importPlugin,
-    },
+    files: ["**/*.test.*", "**/__tests__/**"],
     rules: {
-      // import/no-duplicates: enforce consistent use of duplicate imports
-      // E1-S2: Prevents duplicate import statements (spec: "no-duplicate-imports")
-      // Note: @typescript-eslint/no-duplicate-imports not available in current version
-      // import/no-duplicates from eslint-plugin-import provides equivalent coverage
-      'import/no-duplicates': 'error',
-      // E3: Enable no-explicit-any rule — catches new 'as any' additions
-      '@typescript-eslint/no-explicit-any': 'error',
-      // Allow unused vars for destructuring patterns
-      '@typescript-eslint/no-unused-vars': [
-        'warn',
+      "no-restricted-imports": "off",
+    },
+  },
+  {
+    rules: {
+      "import/no-duplicates": "error",
+      // F-3.3: 禁止从 dddApi 导入（已废弃，统一使用 canvasSseApi）
+      // 测试文件豁免：在测试中允许 dddApi 引用（向后兼容）
+      // 注意：使用 ESLint 内置的 no-restricted-imports
+      "no-restricted-imports": [
+        "error",
         {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
+          name: "@/lib/canvas/api/dddApi",
+          message:
+            "@deprecated dddApi 已废弃。请使用 @/lib/canvas/api/canvasSseApi 替代。详见 docs/vibex-canvas-analysis/dddApi-migration.md",
         },
       ],
-      // Allow unused expressions (common in React useEffect)
-      '@typescript-eslint/no-unused-expressions': 'off',
-      // Relax React rules for complex components
-      'react-hooks/rules-of-hooks': 'off',
-      'react-hooks/exhaustive-deps': 'off',
-      'react-hooks/set-state-in-effect': 'off',
-      'react/display-name': 'off',
-      'react/no-danger': 'off',
-      // Allow require imports for certain patterns
-      '@typescript-eslint/no-require-imports': 'off',
-      // Allow ESM imports
-      'import/no-anonymous-default-export': 'off',
-      // Disable React compiler errors
-      'react-compiler/react-compiler': 'off',
-      // Disable all react-compiler related rules
-      'react-compiler': 'off',
-      // Disable react-hooks exhaustive deps warnings that become errors
-      'react-hooks/exhaustive-deps': 'off',
-      // Allow unescaped entities in JSX
-      'react/no-unescaped-entities': 'off',
-      // Disable React hooks rules that are too strict
-      'react-hooks/set-state-in-effect': 'off',
-      'react-hooks/immutability': 'off',
-      'react-hooks/purity': 'off',
-      'react-hooks/preserve-manual-memoization': 'off',
-      // Allow Function type
-      '@typescript-eslint/no-unsafe-function-type': 'off',
-      // Disable Next.js link rule
-      '@next/next/no-html-link-for-pages': 'off',
-      // Disable all react rules that are too strict
-      react: 'off',
+      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+        },
+      ],
+      "@typescript-eslint/no-unused-expressions": "off",
+      "react-hooks/rules-of-hooks": "off",
+      "react-hooks/exhaustive-deps": "off",
+      "react-hooks/set-state-in-effect": "off",
+      "react/display-name": "off",
+      "react/no-danger": "off",
+      "@typescript-eslint/no-require-imports": "off",
+      "import/no-anonymous-default-export": "off",
+      "react-compiler/react-compiler": "off",
+      "react-compiler": "off",
+      "react/no-unescaped-entities": "off",
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/immutability": "off",
+      "react-hooks/purity": "off",
+      "react-hooks/preserve-manual-memoization": "off",
+      "@typescript-eslint/no-unsafe-function-type": "off",
+      "@next/next/no-html-link-for-pages": "off",
+      "react": "off",
     },
   },
 ]);

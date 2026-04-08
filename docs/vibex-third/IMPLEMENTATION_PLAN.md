@@ -609,6 +609,9 @@ pnpm add -D chromatic
 
 ### E3-S2: 补全缺失 stories（2h）
 
+**状态**: ✅ 完成 (commit de829cd5)
+- [x] 12 个 Canvas 组件 Story 覆盖
+
 **Owner**: Dev
 **依赖**: E3-S1
 **交付物**: 5 个缺失组件 stories

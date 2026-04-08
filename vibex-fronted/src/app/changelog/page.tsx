@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.141',
+    date: '2026-04-08',
+    changes: [
+      '📋 vibex-next E2: 性能可观测性',
+      '✅ E2-S1: /health 端点 P50/P95/P99 延迟（5分钟滚动窗口）',
+      '✅ E2-S2: useWebVitals hook（告警阈值 LCP>4s/CLS>0.1）',
+      '✅ E2-S3: 数据保留策略（metrics 5分钟 TTL + analytics 7天清除）',
+      '提交: 1ac78dcd, 1277e652, 04dff5f3, 0f8c3b30',
+    ],
+    commit: '0f8c3b30',
+  },
+
+  {
     version: '1.0.140',
     date: '2026-04-08',
     changes: [

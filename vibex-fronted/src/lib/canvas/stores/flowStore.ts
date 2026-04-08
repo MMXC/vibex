@@ -16,6 +16,17 @@ import { canvasApi } from '../api/canvasApi';
 
 import { generateId } from '../id';
 
+// E1-S2: Collaboration sync helpers
+function safeBroadcastCreate(treeType: 'flow', nodeId: string, data: Record<string, unknown>) {
+  import('../collaborationSync').then(mod => mod.broadcastNodeCreate(treeType, nodeId, data)).catch(() => {});
+}
+function safeBroadcastUpdate(treeType: 'flow', nodeId: string, data: Record<string, unknown>) {
+  import('../collaborationSync').then(mod => mod.broadcastNodeUpdate(treeType, nodeId, data)).catch(() => {});
+}
+function safeBroadcastDelete(treeType: 'flow', nodeId: string) {
+  import('../collaborationSync').then(mod => mod.broadcastNodeDelete(treeType, nodeId)).catch(() => {});
+}
+
 interface FlowStore {
   // State
   flowNodes: BusinessFlowNode[];
@@ -117,8 +128,9 @@ export const useFlowStore = create<FlowStore>()(
         },
 
         addFlowNode: (data) => {
+          const nodeId = generateId();
           const newNode: BusinessFlowNode = {
-            nodeId: generateId(),
+            nodeId,
             contextId: data.contextId,
             name: data.name,
             steps: data.steps.map((s, i) => ({
@@ -137,6 +149,8 @@ export const useFlowStore = create<FlowStore>()(
             getHistoryStore().recordSnapshot('flow', newNodes);
             return { flowNodes: newNodes };
           });
+          // E1-S2: 广播节点创建
+          safeBroadcastCreate('flow', nodeId, newNode as unknown as Record<string, unknown>);
           useSessionStore.getState().addMessage({ type: 'user_action', content: `添加了流程节点`, meta: data.name });
         },
 
@@ -148,6 +162,8 @@ export const useFlowStore = create<FlowStore>()(
             getHistoryStore().recordSnapshot('flow', newNodes);
             return { flowNodes: newNodes };
           });
+          // E1-S2: 广播节点更新
+          safeBroadcastUpdate('flow', nodeId, data as Record<string, unknown>);
         },
 
         deleteFlowNode: (nodeId) => {
@@ -158,6 +174,8 @@ export const useFlowStore = create<FlowStore>()(
             getHistoryStore().recordSnapshot('flow', newNodes);
             return { flowNodes: newNodes };
           });
+          // E1-S2: 广播节点删除
+          safeBroadcastDelete('flow', nodeId);
           useSessionStore.getState().addMessage({ type: 'user_action', content: `删除了流程节点`, meta: deletedName });
         },
 

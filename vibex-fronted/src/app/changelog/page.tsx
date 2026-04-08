@@ -21,6 +21,21 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.144',
+    date: '2026-04-09',
+    changes: [
+      '📋 vibex-third E1-S1: TanStack Query 统一 API Client',
+      '✅ lib/api/client.ts: TanStack Query 层，QueryClient 单例 + apiMetrics 百分位跟踪',
+      '✅ lib/circuit-breaker.ts: 熔断器模式（closed/open/half-open）+ CircuitBreakerManager',
+      '✅ lib/api-config.ts: 集中式 API URL 管理',
+      '✅ lib/api-retry.ts: 指数退避重试（axios-retry）',
+      '✅ 测试覆盖: 29 个用例全部通过',
+      '提交: b22c5277, f3a819dd',
+    ],
+    commit: 'f3a819dd',
+  },
+
+  {
     version: '1.0.143',
     date: '2026-04-08',
     changes: [

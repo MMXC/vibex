@@ -1,5 +1,13 @@
 # Changelog
 
+### [vibex-third E1-S1: TanStack Query 统一 API Client] — 2026-04-09
+- **统一 API Client (`src/lib/api/client.ts`)**: TanStack Query 层，实现 `QueryClient` 单例（staleTime=1m, gcTime=5m）、`apiMetrics` 百分位跟踪（p50/p95/p99）、1000 条滚动窗口、logRequest 回调
+- **熔断器 (`src/lib/circuit-breaker.ts`)**: 熔断器模式实现，closed/open/half-open 三态转换，失败率阈值触发，`CircuitBreakerManager` 管理多端点熔断器
+- **API 配置 (`src/lib/api-config.ts`)**: 集中式 API URL 管理，支持环境变量 `NEXT_PUBLIC_API_BASE_URL`，类型安全端点定义
+- **重试机制 (`src/lib/api-retry.ts`)**: 基于 `axios-retry` 的指数退避重试（3次，默认 1s 基础延迟，最大 10s），支持网络错误/5xx/429 重试
+- **测试**: 熔断器 17 个测试用例 + API Client 12 个测试用例，全部通过
+- 提交: `b22c5277`, `f3a819dd`
+
 ### [vibex-canvas-analysis Epic 2: ShortcutBar协同] — 2026-04-08
 - **ShortcutBar 使用统一 SHORTCUTS 数据** (F-2.1): ShortcutBar 从 ShortcutPanel 导入 `SHORTCUTS`，通过 ID 过滤生成折叠/展开快捷键列表，确保描述与面板一致
 - **ShortcutBar 与 ShortcutPanel 可见性联动** (F-2.2): 按 `?` 打开面板时 ShortcutBar 自动隐藏，按 `Esc` 或再次 `?` 关闭面板后 ShortcutBar 恢复显示

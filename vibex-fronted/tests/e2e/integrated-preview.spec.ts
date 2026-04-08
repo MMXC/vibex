@@ -55,7 +55,7 @@ test.describe('Integrated Preview Tests', () => {
     if (hasTemplate) {
       await templateBtn.first().click();
       // 验证模板弹窗出现
-      await page.waitForTimeout(500);
+      await page.page.waitForLoadState('domcontentloaded');
     }
     
     console.log('Template functionality:', hasTemplate ? 'Available' : 'Not found');

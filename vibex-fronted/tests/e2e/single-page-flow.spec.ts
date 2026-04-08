@@ -33,7 +33,7 @@ test.describe('Single Page Flow (单页式流程)', () => {
     
     // 点击开始设计按钮
     await generateBtn.click();
-    await page.waitForTimeout(1000);
+    await page.page.waitForLoadState('domcontentloaded');
     
     // 验证不跳转到 /confirm
     const urlAfter = page.url();
@@ -71,7 +71,7 @@ test.describe('Single Page Flow (单页式流程)', () => {
     // 如果有可点击的步骤，测试点击
     if (stepCount > 0) {
       await steps.first().click();
-      await page.waitForTimeout(500);
+      await page.page.waitForLoadState('domcontentloaded');
       // 验证页面没有崩溃
       expect(page.url()).toContain(BASE_URL);
     }
@@ -121,7 +121,7 @@ test.describe('Single Page Flow (单页式流程)', () => {
     // 如果有按钮，尝试点击
     if (buttonCount > 0) {
       await navButtons.first().click();
-      await page.waitForTimeout(1000);
+      await page.page.waitForLoadState('domcontentloaded');
       
       // 验证仍在首页域名下
       const afterClickUrl = page.url();

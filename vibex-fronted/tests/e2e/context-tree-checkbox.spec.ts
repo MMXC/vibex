@@ -30,14 +30,14 @@ test.describe('Context Tree Selection Checkbox', () => {
     
     // Initially may or may not be selected
     await checkbox.click();
-    await page.waitForTimeout(100);
+    await page.page.waitForLoadState('domcontentloaded');
     
     // Card should now have selected class or be visually highlighted
     await expect(card).toHaveClass(/nodeCardSelected/);
     
     // Click again to deselect
     await checkbox.click();
-    await page.waitForTimeout(100);
+    await page.page.waitForLoadState('domcontentloaded');
   });
 
   test('F1.3: Ctrl+click on card body toggles selection', async ({ page }) => {
@@ -46,14 +46,14 @@ test.describe('Context Tree Selection Checkbox', () => {
     
     // Ctrl+click on card body
     await card.click({ modifiers: ['Control'] });
-    await page.waitForTimeout(100);
+    await page.page.waitForLoadState('domcontentloaded');
     
     // Card should be selected
     await expect(card).toHaveClass(/nodeCardSelected/);
     
     // Ctrl+click again to deselect
     await card.click({ modifiers: ['Control'] });
-    await page.waitForTimeout(100);
+    await page.page.waitForLoadState('domcontentloaded');
   });
 
   test('F1.4: selected card has highlight style', async ({ page }) => {
@@ -66,14 +66,14 @@ test.describe('Context Tree Selection Checkbox', () => {
     
     // Click checkbox to select
     await checkbox.click();
-    await page.waitForTimeout(200);
+    await page.page.waitForLoadState('domcontentloaded');
     
     // Verify selected class is applied (CSS: border-color + box-shadow)
     await expect(card).toHaveClass(/nodeCardSelected/);
     
     // Click again to deselect
     await checkbox.click();
-    await page.waitForTimeout(200);
+    await page.page.waitForLoadState('domcontentloaded');
     
     // Verify class is removed
     await expect(card).not.toHaveClass(/nodeCardSelected/);

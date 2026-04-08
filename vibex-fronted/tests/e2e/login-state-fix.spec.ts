@@ -55,7 +55,7 @@ test.describe('Login State Fix (VIBEX-003)', () => {
       await loginBtn.click();
       
       // 等待登录完成
-      await page.waitForTimeout(2000);
+      await page.page.waitForLoadState('networkidle');
       
       // 验证 localStorage 有 auth_token
       const hasToken = await page.evaluate(() => {
@@ -83,11 +83,11 @@ test.describe('Login State Fix (VIBEX-003)', () => {
       
       // 等待登录完成并跳转到dashboard
       await page.waitForURL('**/dashboard**', { timeout: 10000 }).catch(() => {});
-      await page.waitForTimeout(1000);
+      await page.page.waitForLoadState('domcontentloaded');
       
       // 回到首页
       await page.goto('/');
-      await page.waitForTimeout(1000);
+      await page.page.waitForLoadState('domcontentloaded');
       
       // 输入需求
       const textarea = page.locator('textarea').first();
@@ -101,7 +101,7 @@ test.describe('Login State Fix (VIBEX-003)', () => {
         await generateBtn.click();
         
         // 验证不应弹出登录抽屉（应该跳转到/confirm）
-        await page.waitForTimeout(1000);
+        await page.page.waitForLoadState('domcontentloaded');
         
         // 检查当前URL
         const currentUrl = page.url();
@@ -129,11 +129,11 @@ test.describe('Login State Fix (VIBEX-003)', () => {
       await loginBtn.click();
       
       // 等待登录完成
-      await page.waitForTimeout(2000);
+      await page.page.waitForLoadState('networkidle');
       
       // 刷新页面
       await page.reload();
-      await page.waitForTimeout(1000);
+      await page.page.waitForLoadState('domcontentloaded');
       
       // 验证 localStorage 仍有 auth_token
       const hasToken = await page.evaluate(() => {

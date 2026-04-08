@@ -25,14 +25,14 @@ test.describe('State Persistence (F5.1/F5.2)', () => {
     await textarea.fill(testInput);
     
     // Wait for potential state updates
-    await page.waitForTimeout(1500);
+    await page.page.waitForLoadState('networkidle');
     
     // Navigate away and back
     await page.goto(`${BASE_URL}/dashboard`);
     await page.waitForLoadState('networkidle');
     await page.goto(`${BASE_URL}/confirm`);
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(500);
+    await page.page.waitForLoadState('domcontentloaded');
     
     // Page should load without errors (indicating state management works)
     const hasContent = await page.locator('body').textContent();
@@ -51,7 +51,7 @@ test.describe('State Persistence (F5.1/F5.2)', () => {
     await textarea.fill(testInput);
     
     // Wait for localStorage to be updated
-    await page.waitForTimeout(500);
+    await page.page.waitForLoadState('domcontentloaded');
     
     // Get the input value before refresh
     const valueBefore = await textarea.inputValue();
@@ -62,7 +62,7 @@ test.describe('State Persistence (F5.1/F5.2)', () => {
     await page.waitForLoadState('networkidle');
     
     // Wait for state to be restored
-    await page.waitForTimeout(500);
+    await page.page.waitForLoadState('domcontentloaded');
     
     // Check if textarea has the restored value
     const textareaAfter = page.locator('textarea');
@@ -85,7 +85,7 @@ test.describe('State Persistence (F5.1/F5.2)', () => {
     // Should load without errors
     const errors: string[] = [];
     page.on('pageerror', (err) => errors.push(err.message));
-    await page.waitForTimeout(300);
+    await page.page.waitForLoadState('domcontentloaded');
     
     expect(errors).toHaveLength(0);
   });
@@ -109,7 +109,7 @@ test.describe('State Persistence (F5.1/F5.2)', () => {
     // Reload
     await page.reload();
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(500);
+    await page.page.waitForLoadState('domcontentloaded');
     
     // Page should load without errors
     const hasContent = await page.locator('body').textContent();
@@ -128,7 +128,7 @@ test.describe('State Persistence (F5.1/F5.2)', () => {
     // Fill in requirement text
     const testInput = '测试多页面状态管理';
     await textarea.fill(testInput);
-    await page.waitForTimeout(1500);
+    await page.page.waitForLoadState('networkidle');
     
     // Navigate to different page
     await page.goto(`${BASE_URL}/templates`);

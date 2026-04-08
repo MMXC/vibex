@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.152',
+    date: '2026-04-09',
+    changes: [
+      '📋 vibex-third E3-S2: Canvas 组件 Story 覆盖',
+      '✅ 12 个 Canvas story: ConflictBubble/PresenceLayer 等',
+      '✅ storybook build 通过，autodocs 正常',
+      '提交: dev-E3-S2 验证完成',
+    ],
+    commit: 'dev-E3-S2',
+  },
+
+  {
     version: '1.0.151',
     date: '2026-04-09',
     changes: [

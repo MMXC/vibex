@@ -1,0 +1,97 @@
+/**
+ * ConflictBubble Styles
+ * 协作冲突提示气泡样式
+ */
+
+.container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.bubble {
+  background-color: #fff;
+  border: 1px solid #f59e0b;
+  border-left: 4px solid #f59e0b;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  padding: 12px 14px;
+  min-width: 240px;
+  max-width: 320px;
+  pointer-events: auto;
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.bubbleHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.bubbleIcon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.bubbleTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #92400e;
+}
+
+.bubbleBody {
+  margin-bottom: 10px;
+}
+
+.bubbleText {
+  font-size: 12px;
+  color: #374151;
+  margin: 0 0 4px 0;
+  line-height: 1.4;
+}
+
+.bubbleTime {
+  font-size: 11px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.dismissButton {
+  display: block;
+  width: 100%;
+  padding: 6px 12px;
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.dismissButton:hover {
+  background-color: #fde68a;
+}
+
+.dismissButton:focus-visible {
+  outline: 2px solid #f59e0b;
+  outline-offset: 2px;
+}

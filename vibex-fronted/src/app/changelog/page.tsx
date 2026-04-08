@@ -21,6 +21,20 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.136',
+    date: '2026-04-08',
+    changes: [
+      '📋 vibex-canvas-analysis Epic 3: dddApi废弃',
+      '✅ F-3.1: dddApi.ts 每个 export 添加 @deprecated 注解，指向 canvasSseApi',
+      '✅ F-3.2: 编写 dddApi-migration.md 迁移文档（API对照表 + 迁移步骤）',
+      '✅ F-3.3: ESLint no-restricted-imports 规则禁止生产代码引入 dddApi',
+      '✅ 测试文件豁免: *.test.* 文件允许 dddApi 引用（向后兼容）',
+      '提交: 34847de8, 5fb27621',
+    ],
+    commit: '5fb27621',
+  },
+
+  {
     version: '1.0.135',
     date: '2026-04-08',
     changes: [

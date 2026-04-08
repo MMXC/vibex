@@ -1,3 +1,10 @@
+### Added (vibex-canvas-analysis Epic 3: dddApi废弃) — 2026-04-08
+- **Epic 3: dddApi废弃, 统一迁移到 canvasSseApi**:
+  - **F-3.1**: `dddApi.ts` 每个 export 添加 `@deprecated` 注解，指向 `canvasSseApi.ts`
+  - **F-3.2**: 编写 `dddApi-migration.md` 迁移文档（包含 API 对照表和所有消费者迁移步骤）
+  - **F-3.3**: ESLint `no-restricted-imports` 规则禁止生产代码引入 dddApi（测试文件豁免）
+  - 提交: `34847de8`, `5fb27621`
+
 ### Added (vibex-architect-proposals-20260412 A-P1-2: Canvas TreeErrorBoundary) — 2026-04-07
 - **A-P1-2 Canvas TreeErrorBoundary**: 三栏树形面板错误隔离
   - 新增 `panels/TreeErrorBoundary.tsx`: React ErrorBoundary，捕获树组件渲染错误

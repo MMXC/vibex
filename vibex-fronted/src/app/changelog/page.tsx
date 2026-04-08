@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.153',
+    date: '2026-04-09',
+    changes: [
+      '📋 vibex-third E4-S1: ADR 决策记录',
+      '✅ 5 个 ADR: TanStack Query/虚拟化/冲突/Firebase/Storybook',
+      '✅ 格式规范: 状态/背景/决策/后果/关联完整',
+      '提交: dev-E4-S1 验证完成',
+    ],
+    commit: 'dev-E4-S1',
+  },
+
+  {
     version: '1.0.152',
     date: '2026-04-09',
     changes: [

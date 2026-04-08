@@ -1,5 +1,10 @@
 # Changelog
 
+### [vibex-third E2-S3: BoundedContextTree 虚拟化] — 2026-04-09
+- **虚拟化列表 (`src/components/canvas/BoundedContextTree.tsx`)**: `VirtualizedContextList` 组件，`VIRTUAL_THRESHOLD=50`，`useVirtualizer` + `measureElement` 动态高度测量
+- **统一虚拟化模式**: 三树（Component/BusinessFlow/BoundedContext）虚拟化架构一致
+- **TypeScript 编译**: ✅ 无错误
+
 ### [vibex-third E2-S2: BusinessFlowTree 虚拟化] — 2026-04-09
 - **虚拟化列表 (`src/components/canvas/BusinessFlowTree.tsx`)**: `VirtualizedFlowList` 组件，`VIRTUAL_THRESHOLD=50`，`useVirtualizer` + `estimateSize` 动态高度估算
 - **协作滚动同步**: 远程用户滚动监听 + 本地滚动广播，防抖处理

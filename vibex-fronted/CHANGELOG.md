@@ -1,5 +1,12 @@
 # Changelog
 
+### [vibex-third E4-S2: ADR 实施验证] — 2026-04-09
+- **TanStack Query (`src/lib/query/`)**: QueryClient + QueryProvider + queryKeys + SSE Bridge + 7 query hooks + 2 mutation hooks，staleTime=5min, retry=3
+- **虚拟化 (`src/components/canvas/`)**: ComponentTree + BoundedContextTree，`VIRTUAL_THRESHOLD=50`，useVirtualizer，160px/120px 估算高度
+- **冲突处理 (`src/lib/canvas/collaborationSync.ts`)**: version 乐观锁 + onConflict 事件发射器 + ConflictBubble UI
+- **Firebase Presence (`src/lib/firebase/presence.ts`)**: Mock 模式完整，真实 SDK 接入路径清晰（3 处 TODO）
+- **Storybook + Chromatic**: 24 stories，`.storybook/` + `chromatic.yml` CI workflow
+
 ### [vibex-third E4-S1: ADR 决策记录] — 2026-04-09
 - **ADR 文档 (`docs/vibex-third/adr/`)**: 5 个架构决策记录（TanStack Query、React Virtualization、Conflict Strategy、Firebase Presence、Storybook Chromatic）
 - **决策覆盖**: API 层、虚拟化、冲突检测、实时协作、组件文档化

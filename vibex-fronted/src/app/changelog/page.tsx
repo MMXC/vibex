@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.147',
+    date: '2026-04-09',
+    changes: [
+      '📋 vibex-third E1-S4: SSE 数据写入 Query 缓存',
+      '✅ lib/api/sseToQueryBridge.ts: SSE → Query 缓存桥接',
+      '✅ createSseBridge 工厂函数: setQueryData + invalidateQueries + cancelQueries',
+      '提交: dev-E1-S4 验证完成',
+    ],
+    commit: 'dev-E1-S4',
+  },
+
+  {
     version: '1.0.146',
     date: '2026-04-09',
     changes: [

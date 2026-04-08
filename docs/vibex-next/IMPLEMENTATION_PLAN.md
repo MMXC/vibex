@@ -66,6 +66,12 @@
 **依赖**: E0-S1 完成
 **交付物**: 前端协作 Presence 功能
 
+**状态**: ✅ 完成 (commits 0e1b409b)
+- [x] usePresence hook (presence.ts)
+- [x] PresenceLayer.tsx 头像层
+- [x] Firebase 环境变量注入
+- [x] 断线自动清除
+
 **实施步骤**:
 
 #### Step 1: Firebase 项目配置（0.5h）
@@ -185,6 +191,12 @@ grep -rn "as any" vibex-fronted/src --include="*.ts" --include="*.tsx"
 **依赖**: E1-S1 完成
 **交付物**: WebSocket 节点实时同步
 
+**状态**: ✅ 完成 (commits 7eb32abe, 26790fdb)
+- [x] MessageRouter.ts 新增 node 消息类型
+- [x] collaborationSync.ts 节点变更广播
+- [x] Store 协作状态集成（LWW）
+- [x] version 乐观锁
+
 **实施步骤**:
 
 #### Step 1: WebSocket 消息协议扩展（1h）
@@ -233,6 +245,11 @@ interface NodeSyncMessage {
 **依赖**: E1-S2 完成
 **交付物**: 冲突提示气泡组件
 
+**状态**: ✅ 完成 (commit 2675a813)
+- [x] ConflictBubble.tsx 绝对定位气泡
+- [x] 淡入动画 < 200ms
+- [x] 5 分钟内不重复显示
+
 **实施步骤**:
 
 #### Step 1: 冲突检测（0.5h）
@@ -263,6 +280,12 @@ if (remoteUpdate.nodeId === localEditingNodeId && remoteUpdate.userId !== curren
 **Owner**: Dev
 **依赖**: E1-S2 完成
 **交付物**: 重连逻辑 + 单用户降级
+
+**状态**: ✅ 完成 (commit ff0cd56b)
+- [x] 指数退避重连（1s→2s→4s→8s→16s）
+- [x] 保留本地状态不清空
+- [x] Firebase 降级单用户模式
+- [x] 5s Firebase timeout
 
 **实施步骤**:
 
@@ -552,10 +575,10 @@ it('批量上报 100 条返回 200', async () => {
 ## 交付检查单
 
 - [x] E0-S1: MEMORY.md A-010 签署完成
-- [ ] E1-S1: Firebase Presence MVP 上线
-- [ ] E1-S2: 节点同步 < 3s
-- [ ] E1-S3: 冲突提示 UI 上线
-- [ ] E1-S4: 重连 + 降级测试通过
+- [x] E1-S1: Firebase Presence MVP 上线
+- [x] E1-S2: 节点同步 < 3s
+- [x] E1-S3: 冲突提示 UI 上线
+- [x] E1-S4: 重连 + 降级测试通过
 - [ ] E2-S1: /health 端点 P50/P95/P99
 - [ ] E2-S2: LCP > 4s 告警触发
 - [ ] E2-S3: 7 天数据清除验证

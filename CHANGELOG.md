@@ -1,3 +1,10 @@
+### Added (vibex-next E2: 性能可观测性) — 2026-04-08
+- **E2: 性能可观测性 (S1-S3)**:
+  - **E2-S1**: `/health` 端点 P50/P95/P99 延迟（5分钟滚动窗口）
+  - **E2-S2**: useWebVitals hook（LCP>4s/CLS>0.1 告警阈值）
+  - **E2-S3**: 数据保留策略（metrics 5分钟 TTL + analytics 7天 expires_at）
+  - 提交: `1ac78dcd`, `1277e652`, `04dff5f3`, `0f8c3b30`
+
 ### Added (vibex-next E1: 协作功能) — 2026-04-08
 - **E1: 协作功能 (S1-S4)**:
   - **E1-S1**: Firebase Presence 接入（用户头像层 + 断线清除）

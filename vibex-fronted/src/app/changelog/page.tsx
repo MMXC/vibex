@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.146',
+    date: '2026-04-09',
+    changes: [
+      '📋 vibex-third E1-S3: 消除散落 axios 调用',
+      '✅ stores 合规: 全面清理，无裸 axios/fetch/XMLHttpRequest',
+      '✅ 统一 API 层: 通过 TanStack Query hooks/mutations 访问',
+      '提交: dev-E1-S3 验证完成',
+    ],
+    commit: 'dev-E1-S3',
+  },
+
+  {
     version: '1.0.145',
     date: '2026-04-09',
     changes: [

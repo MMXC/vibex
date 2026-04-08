@@ -1,5 +1,10 @@
 # Changelog
 
+### [vibex-third E1-S3: 消除散落 axios 调用] — 2026-04-09
+- **stores 合规**: `src/stores/` 目录全面清理，验证无裸 axios/fetch/XMLHttpRequest 调用
+- **统一 API 层**: 所有 API 访问统一通过 TanStack Query 层（`hooks/queries/` + `hooks/mutations/`）
+- **TypeScript 编译**: ✅ 无错误
+
 ### [vibex-third E1-S2: TanStack Query Hooks 迁移] — 2026-04-09
 - **Hooks 层 (`src/hooks/queries/`)**: 迁移至统一 TanStack Query Hooks，`useProjects`/`useProject`/`useDeletedProjects`/`useProjectRole`、`useDomainEntities`、`useFlow`、`useRequirements`、`useAnalysisResult`、`useDDDAnalysis`
 - **Query Keys 统一**: 使用 `queryKeys` 工厂（`@/lib/query/QueryProvider`）管理缓存键，避免硬编码字符串

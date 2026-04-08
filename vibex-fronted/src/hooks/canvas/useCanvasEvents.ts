@@ -19,6 +19,7 @@ import { useCanvasState } from './useCanvasState';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
+import { useGuidanceStore } from '@/stores/guidanceStore';
 import type { BoundedContextNode, BusinessFlowNode, ComponentNode, TreeType } from '@/lib/canvas/types';
 
 // =============================================================================
@@ -121,9 +122,29 @@ export function useCanvasEvents(
   // =============================================================================
 
   const toggleShortcutPanel = useCallback(
-    () => setIsShortcutPanelOpen((v) => !v),
+    () => {
+      setIsShortcutPanelOpen((v) => {
+        const newState = !v;
+        // F-2.2: 打开面板时隐藏 ShortcutBar，关闭时恢复
+        if (newState) {
+          useGuidanceStore.getState().hideShortcutBar();
+        } else {
+          useGuidanceStore.getState().showShortcutBar();
+        }
+        return newState;
+      });
+    },
     [],
   );
+
+  // 监听 isShortcutPanelOpen 变化，确保状态同步
+  useEffect(() => {
+    if (isShortcutPanelOpen) {
+      useGuidanceStore.getState().hideShortcutBar();
+    } else {
+      useGuidanceStore.getState().showShortcutBar();
+    }
+  }, [isShortcutPanelOpen]);
 
   // =============================================================================
   // Keyboard: F11 maximize + Escape (maximize only)

@@ -13,23 +13,25 @@ import { useCanvasEvents } from './useCanvasEvents';
 // Mock dependencies
 // =============================================================================
 
+// Module-level variables to store mock functions (for test access)
+let mockExpandMode: 'normal' | 'expand-both' | 'maximize' = 'normal';
+const mockToggleMaximize = vi.fn();
+
 // Mock useCanvasState (E1 dependency)
-vi.mock('./useCanvasState', () => {
-  let mockExpandMode: 'normal' | 'expand-both' | 'maximize' = 'normal';
-  const mockToggleMaximize = vi.fn();
-  return {
-    useCanvasState: vi.fn(() => ({
-      expandMode: mockExpandMode,
-      handlers: {
-        toggleMaximize: mockToggleMaximize,
-      },
-    })),
-    __setExpandMode: (mode: 'normal' | 'expand-both' | 'maximize') => {
-      mockExpandMode = mode;
+vi.mock('./useCanvasState', () => ({
+  useCanvasState: vi.fn(() => ({
+    expandMode: mockExpandMode,
+    handlers: {
+      toggleMaximize: mockToggleMaximize,
     },
-    __getToggleMaximize: () => mockToggleMaximize,
-  };
-});
+  })),
+}));
+
+// Helper functions to control mock state (used in tests)
+const __setExpandMode = (mode: 'normal' | 'expand-both' | 'maximize') => {
+  mockExpandMode = mode;
+};
+const __getToggleMaximize = () => mockToggleMaximize;
 
 // Mock stores
 vi.mock('@/lib/canvas/stores/contextStore', () => ({
@@ -55,12 +57,32 @@ vi.mock('@/lib/canvas/stores/componentStore', () => ({
   ),
 }));
 
-const { __setExpandMode, __getToggleMaximize } = vi.fn()(
-  './useCanvasState'
-) as any;
+// Mock guidanceStore
+vi.mock('@/stores/guidanceStore', () => {
+  const mockShowShortcutBar = vi.fn();
+  const mockHideShortcutBar = vi.fn();
+  const state = {
+    shortcutBarVisible: true,
+    shortcutBarCollapsed: false,
+    showShortcutBar: mockShowShortcutBar,
+    hideShortcutBar: mockHideShortcutBar,
+  };
+  // Create a mock that has both hook and static getState
+  const mockUseGuidanceStore: any = (selector?: (s: any) => unknown) =>
+    selector ? selector(state) : state;
+  mockUseGuidanceStore.getState = () => state;
+  return {
+    useGuidanceStore: mockUseGuidanceStore,
+    __getMockFunctions: () => ({
+      showShortcutBar: mockShowShortcutBar,
+      hideShortcutBar: mockHideShortcutBar,
+    }),
+  };
+});
 
 afterEach(() => {
   __setExpandMode('normal');
+  mockToggleMaximize.mockClear();
   vi.clearAllMocks();
   document.body.innerHTML = '';
 });

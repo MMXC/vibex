@@ -21,6 +21,20 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.154',
+    date: '2026-04-09',
+    changes: [
+      '📋 vibex-third E4-S2: ADR 实施验证',
+      '✅ TanStack Query: QueryClient + 7 query hooks + 2 mutation hooks + SSE Bridge',
+      '✅ 虚拟化: ComponentTree + BoundedContextTree，VIRTUAL_THRESHOLD=50',
+      '✅ 冲突处理: version 乐观锁 + ConflictBubble + onConflict 事件',
+      '✅ Firebase Presence: Mock 模式完整，24 stories + Chromatic CI',
+      '提交: reviewer-E4-S2 审查通过',
+    ],
+    commit: 'reviewer-E4-S2',
+  },
+
+  {
     version: '1.0.153',
     date: '2026-04-09',
     changes: [

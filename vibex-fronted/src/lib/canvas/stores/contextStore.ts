@@ -7,6 +7,8 @@
  * - Context draft state
  * - History recording on mutations
  * - User action messages via canvasStore.addMessage
+ *
+ * E1-S2: Collaboration sync — broadcasts node changes via collaborationSync
  */
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
@@ -51,6 +53,36 @@ interface ContextStore {
   // Bounded groups
   boundedGroups: BoundedGroup[];
   setBoundedGroups: (groups: BoundedGroup[]) => void;
+}
+
+// E1-S2: Lazy collaboration sync import (avoid circular dependency)
+let _broadcastCreate: ((treeType: TreeType, nodeId: string, data: Record<string, unknown>) => void) | null = null;
+let _broadcastUpdate: ((treeType: TreeType, nodeId: string, data: Record<string, unknown>) => void) | null = null;
+let _broadcastDelete: ((treeType: TreeType, nodeId: string) => void) | null = null;
+let _mergeHandlerRegistered = false;
+
+async function getBroadcastFns() {
+  if (!_broadcastCreate) {
+    try {
+      const mod = await import('../collaborationSync');
+      _broadcastCreate = mod.broadcastNodeCreate;
+      _broadcastUpdate = mod.broadcastNodeUpdate;
+      _broadcastDelete = mod.broadcastNodeDelete;
+    } catch {
+      // collaborationSync not yet loaded — skip broadcast
+    }
+  }
+  return { broadcastCreate: _broadcastCreate, broadcastUpdate: _broadcastUpdate, broadcastDelete: _broadcastDelete };
+}
+
+function safeBroadcastCreate(treeType: TreeType, nodeId: string, data: Record<string, unknown>) {
+  getBroadcastFns().then(fn => fn.broadcastCreate?.(treeType, nodeId, data));
+}
+function safeBroadcastUpdate(treeType: TreeType, nodeId: string, data: Record<string, unknown>) {
+  getBroadcastFns().then(fn => fn.broadcastUpdate?.(treeType, nodeId, data));
+}
+function safeBroadcastDelete(treeType: TreeType, nodeId: string) {
+  getBroadcastFns().then(fn => fn.broadcastDelete?.(treeType, nodeId));
 }
 
 export const useContextStore = create<ContextStore>()(
@@ -153,8 +185,9 @@ export const useContextStore = create<ContextStore>()(
         setContextNodes: (nodes) => set({ contextNodes: nodes }),
 
         addContextNode: (data) => {
+          const nodeId = generateId();
           const newNode: BoundedContextNode = {
-            nodeId: generateId(),
+            nodeId,
             name: data.name,
             description: data.description,
             type: data.type,
@@ -167,6 +200,8 @@ export const useContextStore = create<ContextStore>()(
             getHistoryStore().recordSnapshot('context', newNodes);
             return { contextNodes: newNodes };
           });
+          // E1-S2: 广播节点创建
+          safeBroadcastCreate('context', nodeId, newNode as unknown as Record<string, unknown>);
           // Side effect: record user action message
           postContextActionMessage(`添加了上下文节点`, data.name);
         },
@@ -179,6 +214,8 @@ export const useContextStore = create<ContextStore>()(
             getHistoryStore().recordSnapshot('context', newNodes);
             return { contextNodes: newNodes };
           });
+          // E1-S2: 广播节点更新
+          safeBroadcastUpdate('context', nodeId, data as Record<string, unknown>);
         },
 
         deleteContextNode: (nodeId) => {
@@ -189,6 +226,8 @@ export const useContextStore = create<ContextStore>()(
             getHistoryStore().recordSnapshot('context', newNodes);
             return { contextNodes: newNodes };
           });
+          // E1-S2: 广播节点删除
+          safeBroadcastDelete('context', nodeId);
           // Side effect: record user action message
           postContextActionMessage(`删除了上下文节点`, deletedName);
         },
@@ -210,6 +249,8 @@ export const useContextStore = create<ContextStore>()(
           if (ctxs.length === 0) return;
           getHistoryStore().recordSnapshot('context', []);
           set({ contextNodes: [], selectedNodeIds: { ...get().selectedNodeIds, context: [] } });
+          // E1-S2: 广播所有节点删除
+          ctxs.forEach((n) => safeBroadcastDelete('context', n.nodeId));
         },
 
         toggleContextNode: (nodeId) => {

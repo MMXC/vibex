@@ -14,6 +14,17 @@ import { getHistoryStore } from '../historySlice';
 
 import { generateId } from '../id';
 
+// E1-S2: Collaboration sync helpers
+function safeBroadcastCreate(treeType: 'component', nodeId: string, data: Record<string, unknown>) {
+  import('../collaborationSync').then(mod => mod.broadcastNodeCreate(treeType, nodeId, data)).catch(() => {});
+}
+function safeBroadcastUpdate(treeType: 'component', nodeId: string, data: Record<string, unknown>) {
+  import('../collaborationSync').then(mod => mod.broadcastNodeUpdate(treeType, nodeId, data)).catch(() => {});
+}
+function safeBroadcastDelete(treeType: 'component', nodeId: string) {
+  import('../collaborationSync').then(mod => mod.broadcastNodeDelete(treeType, nodeId)).catch(() => {});
+}
+
 interface ComponentStore {
   // State
   componentNodes: ComponentNode[];
@@ -53,9 +64,10 @@ export const useComponentStore = create<ComponentStore>()(
         setComponentNodes: (nodes) => set({ componentNodes: nodes }),
 
         addComponentNode: (data) => {
+          const nodeId = generateId();
           const newNode: ComponentNode = {
             ...data,
-            nodeId: generateId(),
+            nodeId,
             status: 'pending',
             isActive: false,
             children: [],
@@ -64,6 +76,8 @@ export const useComponentStore = create<ComponentStore>()(
             const newNodes = [...s.componentNodes, newNode];
             return { componentNodes: newNodes };
           });
+          // E1-S2: 广播节点创建
+          safeBroadcastCreate('component', nodeId, newNode as unknown as Record<string, unknown>);
         },
 
         editComponentNode: (nodeId, data) => {
@@ -72,12 +86,16 @@ export const useComponentStore = create<ComponentStore>()(
               n.nodeId === nodeId ? { ...n, ...data, status: 'pending' as const } : n
             ),
           }));
+          // E1-S2: 广播节点更新
+          safeBroadcastUpdate('component', nodeId, data as Record<string, unknown>);
         },
 
         deleteComponentNode: (nodeId) => {
           set((s) => ({
             componentNodes: s.componentNodes.filter((n) => n.nodeId !== nodeId),
           }));
+          // E1-S2: 广播节点删除
+          safeBroadcastDelete('component', nodeId);
         },
 
         confirmComponentNode: (nodeId) => {

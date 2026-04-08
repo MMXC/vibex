@@ -15,7 +15,7 @@ import type {
   CanvasSseOptions,
   BoundedContext,
 } from './canvasSseApi';
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect } from 'vitest';
 
 describe('canvasSseApi', () => {
   // F2.1: API function export

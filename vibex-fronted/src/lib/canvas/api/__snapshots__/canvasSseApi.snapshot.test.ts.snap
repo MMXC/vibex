@@ -1,0 +1,198 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`canvasSseApi SSE Event Snapshots > F-4.1-1: ThinkingEvent delta snapshot 1`] = `
+{
+  "content": "补充分析",
+  "delta": true,
+  "type": "thinking",
+}
+`;
+
+exports[`canvasSseApi SSE Event Snapshots > F-4.1-1: ThinkingEvent snapshot 1`] = `
+{
+  "content": "正在分析用户需求...",
+  "delta": false,
+  "type": "thinking",
+}
+`;
+
+exports[`canvasSseApi SSE Event Snapshots > F-4.1-2: BoundedContext minimal snapshot 1`] = `
+{
+  "description": "订单处理",
+  "id": "ctx_order",
+  "name": "订单上下文",
+  "type": "supporting",
+}
+`;
+
+exports[`canvasSseApi SSE Event Snapshots > F-4.1-2: BoundedContext snapshot 1`] = `
+{
+  "description": "处理用户注册、登录、权限等",
+  "id": "ctx_user",
+  "keyResponsibilities": [
+    "用户注册",
+    "用户登录",
+    "权限验证",
+  ],
+  "name": "用户管理",
+  "type": "core",
+}
+`;
+
+exports[`canvasSseApi SSE Event Snapshots > F-4.1-3: StepContextEvent snapshot 1`] = `
+{
+  "boundedContexts": [
+    {
+      "description": "用户管理",
+      "id": "ctx1",
+      "name": "用户",
+      "type": "core",
+    },
+    {
+      "description": "订单处理",
+      "id": "ctx2",
+      "name": "订单",
+      "type": "core",
+    },
+    {
+      "description": "支付处理",
+      "id": "ctx3",
+      "name": "支付",
+      "type": "supporting",
+    },
+  ],
+  "confidence": 0.92,
+  "content": "上下文分析完成，识别出 3 个限界上下文",
+  "mermaidCode": "graph TD
+  A --> B",
+  "type": "step_context",
+}
+`;
+
+exports[`canvasSseApi SSE Event Snapshots > F-4.1-3: StepContextEvent without mermaid snapshot 1`] = `
+{
+  "boundedContexts": [],
+  "confidence": 0.85,
+  "content": "上下文分析完成",
+  "type": "step_context",
+}
+`;
+
+exports[`canvasSseApi SSE Event Snapshots > F-4.1-4: StepModelEvent snapshot 1`] = `
+{
+  "confidence": 0.88,
+  "content": "领域模型分析完成",
+  "mermaidCode": "classDiagram
+  class User",
+  "type": "step_model",
+}
+`;
+
+exports[`canvasSseApi SSE Event Snapshots > F-4.1-4: StepModelEvent without mermaid snapshot 1`] = `
+{
+  "confidence": 0.5,
+  "content": "领域模型生成中...",
+  "type": "step_model",
+}
+`;
+
+exports[`canvasSseApi SSE Event Snapshots > F-4.1-5: StepFlowEvent snapshot 1`] = `
+{
+  "confidence": 0.9,
+  "content": "业务流程分析完成",
+  "mermaidCode": "flowchart LR
+  A --> B",
+  "type": "step_flow",
+}
+`;
+
+exports[`canvasSseApi SSE Event Snapshots > F-4.1-5: StepFlowEvent without mermaid snapshot 1`] = `
+{
+  "confidence": 0.4,
+  "content": "业务流程生成中...",
+  "type": "step_flow",
+}
+`;
+
+exports[`canvasSseApi SSE Event Snapshots > F-4.1-6: StepComponentsEvent snapshot 1`] = `
+{
+  "confidence": 0.87,
+  "content": "组件树分析完成",
+  "mermaidCode": "componentDiagram
+  C1 --> C2",
+  "type": "step_components",
+}
+`;
+
+exports[`canvasSseApi SSE Event Snapshots > F-4.1-6: StepComponentsEvent without mermaid snapshot 1`] = `
+{
+  "confidence": 0.35,
+  "content": "组件树生成中...",
+  "type": "step_components",
+}
+`;
+
+exports[`canvasSseApi SSE Event Snapshots > F-4.1-7: DoneEvent snapshot 1`] = `
+{
+  "projectId": "proj_abc123",
+  "summary": "分析完成，已生成上下文、模型、流程和组件",
+  "type": "done",
+}
+`;
+
+exports[`canvasSseApi SSE Event Snapshots > F-4.1-8: ErrorEvent with code snapshot 1`] = `
+{
+  "code": "NETWORK_ERROR",
+  "message": "网络连接失败，请检查网络",
+  "type": "error",
+}
+`;
+
+exports[`canvasSseApi SSE Event Snapshots > F-4.1-8: ErrorEvent without code snapshot 1`] = `
+{
+  "message": "未知错误",
+  "type": "error",
+}
+`;
+
+exports[`canvasSseApi SSE Event Snapshots > F-4.1-9: SSEEvent union covers all types 1`] = `
+[
+  {
+    "content": "test",
+    "delta": false,
+    "type": "thinking",
+  },
+  {
+    "projectId": "p1",
+    "summary": "done",
+    "type": "done",
+  },
+  {
+    "message": "err",
+    "type": "error",
+  },
+]
+`;
+
+exports[`canvasSseApi SSE Event Snapshots > F-4.1-10: CanvasSseCallbacks snapshot 1`] = `
+[
+  "onDone",
+  "onError",
+  "onStepComponents",
+  "onStepContext",
+  "onStepFlow",
+  "onStepModel",
+  "onThinking",
+]
+`;
+
+exports[`canvasSseApi SSE Event Snapshots > F-4.1-10: CanvasSseOptions with all fields snapshot 1`] = `
+[
+  "onDone",
+  "onError",
+  "onStepContext",
+  "onThinking",
+  "signal",
+  "timeoutMs",
+]
+`;

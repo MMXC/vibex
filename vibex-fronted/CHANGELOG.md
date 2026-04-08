@@ -1,5 +1,10 @@
 # Changelog
 
+### [vibex-third E2-S2: BusinessFlowTree 虚拟化] — 2026-04-09
+- **虚拟化列表 (`src/components/canvas/BusinessFlowTree.tsx`)**: `VirtualizedFlowList` 组件，`VIRTUAL_THRESHOLD=50`，`useVirtualizer` + `estimateSize` 动态高度估算
+- **协作滚动同步**: 远程用户滚动监听 + 本地滚动广播，防抖处理
+- **TypeScript 编译**: ✅ 无错误
+
 ### [vibex-third E2-S1: ComponentTree 虚拟化] — 2026-04-09
 - **虚拟化列表 (`src/components/canvas/features/VirtualizedNodeList.tsx`)**: 使用 `@tanstack/react-virtual` 实现虚拟化，VIRTUAL_THRESHOLD=50，oversizedGroups 条件渲染
 - **通用组件识别**: `inferIsCommon()` 多维判断（flowId + 组件类型），通用组件单独置顶

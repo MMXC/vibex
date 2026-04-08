@@ -1,3 +1,9 @@
+### Added (vibex-canvas-analysis Epic 4: SSE类型验证) — 2026-04-08
+- **Epic 4: SSE类型验证**:
+  - **F-4.1**: `canvasSseApi.snapshot.test.ts` Snapshot 测试（18 cases，覆盖 8 个 SSE Event 类型）
+  - `canvasSseApi.test.ts` 从 @jest/globals 改为 vitest
+  - 提交: `326bbf19`
+
 ### Added (vibex-canvas-analysis Epic 3: dddApi废弃) — 2026-04-08
 - **Epic 3: dddApi废弃, 统一迁移到 canvasSseApi**:
   - **F-3.1**: `dddApi.ts` 每个 export 添加 `@deprecated` 注解，指向 `canvasSseApi.ts`

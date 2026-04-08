@@ -1,5 +1,10 @@
 # Changelog
 
+### [vibex-third E3-S2: Canvas 组件 Story 覆盖] — 2026-04-09
+- **Story 覆盖 (`src/components/canvas/stories/`)**: 12 个 Canvas story 文件（ComponentTree、BusinessFlowTree、BoundedContextTree、ConflictBubble、PresenceLayer、ShortcutPanel 等）
+- **Storybook build**: `storybook build` 通过，autodocs 正常工作
+- **新增 story**: ConflictBubble.stories.tsx、PresenceLayer.stories.tsx、TreeToolbar.stories.tsx
+
 ### [vibex-third E3-S1: Storybook 配置与 Chromatic CI] — 2026-04-09
 - **Chromatic CI (`.github/workflows/chromatic.yml`)**: GitHub Actions workflow，push/PR 到 main 时触发，Node 20 + pnpm，`autoAcceptChanges: main`，`onlyChanged: true`
 - **Storybook 配置**: `.storybook/main.ts` + `.storybook/preview.tsx`

@@ -318,6 +318,11 @@ if (remoteUpdate.nodeId === localEditingNodeId && remoteUpdate.userId !== curren
 **依赖**: E0-S1 完成
 **交付物**: GET /api/v1/health 端点
 
+**状态**: ✅ 完成 (commit 1ac78dcd)
+- [x] middleware/metrics.ts: 5分钟滚动窗口 P50/P95/P99
+- [x] routes/v1/analytics.ts: /health 端点 <50ms
+- [x] 无 DB 查询路径
+
 **实施步骤**:
 
 #### Step 1: 指标采集中间件（0.5h）
@@ -373,6 +378,10 @@ curl -w "\nTime: %{time_total}s\n" https://api.vibex.top/api/v1/health
 **依赖**: E0-S1 完成
 **交付物**: 完整的 WebVitals 告警
 
+**状态**: ✅ 完成 (commit 1277e652)
+- [x] ALERT_THRESHOLDS: LCP>4000ms, CLS>0.1, FCP>3000ms
+- [x] console.warn() 告警输出
+
 **实施步骤**:
 
 #### Step 1: 补全告警逻辑（0.5h）
@@ -418,6 +427,10 @@ useEffect(() => {
 **Owner**: Dev
 **依赖**: E2-S1 完成
 **交付物**: 7 天滚动清除逻辑
+
+**状态**: ✅ 完成 (commit 04dff5f3)
+- [x] metrics: 5分钟内存 TTL
+- [x] analytics: 7天 expires_at + 异步清理
 
 **实施步骤**:
 

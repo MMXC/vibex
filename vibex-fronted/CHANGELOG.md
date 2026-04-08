@@ -1,5 +1,11 @@
 # Changelog
 
+### [vibex-third E3-S1: Storybook 配置与 Chromatic CI] — 2026-04-09
+- **Chromatic CI (`.github/workflows/chromatic.yml`)**: GitHub Actions workflow，push/PR 到 main 时触发，Node 20 + pnpm，`autoAcceptChanges: main`，`onlyChanged: true`
+- **Storybook 配置**: `.storybook/main.ts` + `.storybook/preview.tsx`
+- **Story 覆盖**: 多个 `*.stories.tsx` 文件覆盖核心 UI 组件
+- **TypeScript 编译**: ✅ 无错误
+
 ### [vibex-third E2-S3: BoundedContextTree 虚拟化] — 2026-04-09
 - **虚拟化列表 (`src/components/canvas/BoundedContextTree.tsx`)**: `VirtualizedContextList` 组件，`VIRTUAL_THRESHOLD=50`，`useVirtualizer` + `measureElement` 动态高度测量
 - **统一虚拟化模式**: 三树（Component/BusinessFlow/BoundedContext）虚拟化架构一致

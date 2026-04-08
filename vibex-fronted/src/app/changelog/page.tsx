@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.151',
+    date: '2026-04-09',
+    changes: [
+      '📋 vibex-third E3-S1: Storybook 配置与 Chromatic CI',
+      '✅ .github/workflows/chromatic.yml: GitHub Actions workflow',
+      '✅ Storybook stories: 核心 UI 组件覆盖',
+      '提交: dev-E3-S1 验证完成',
+    ],
+    commit: 'dev-E3-S1',
+  },
+
+  {
     version: '1.0.150',
     date: '2026-04-09',
     changes: [

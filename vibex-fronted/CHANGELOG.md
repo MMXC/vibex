@@ -1,5 +1,13 @@
 # Changelog
 
+### [vibex-canvas-analysis Epic 2: ShortcutBar协同] — 2026-04-08
+- **ShortcutBar 使用统一 SHORTCUTS 数据** (F-2.1): ShortcutBar 从 ShortcutPanel 导入 `SHORTCUTS`，通过 ID 过滤生成折叠/展开快捷键列表，确保描述与面板一致
+- **ShortcutBar 与 ShortcutPanel 可见性联动** (F-2.2): 按 `?` 打开面板时 ShortcutBar 自动隐藏，按 `Esc` 或再次 `?` 关闭面板后 ShortcutBar 恢复显示
+- **Bug 修复**: 移除冗余 useEffect 避免双重 store 调用；修复 Escape 处理器绕过 toggleShortcutPanel 导致 ShortcutBar 不恢复的问题
+- **测试增强**: 新增 3 个测试用例验证 `hideShortcutBar`/`showShortcutBar` 调用，新增 `data-testid="shortcut-bar"` 和 `data-testid="shortcut-bar-item"`
+- **代码质量**: ShortcutItem 使用 `shortcut.id` 作为 React key，guidanceStore mock 重构为 `vi.hoisted` 模式
+- 提交: `32e44532`, `reviewer-fix-xxx`
+
 ### [vibex-canvas-analysis Epic 1: ShortcutPanel合并] — 2026-04-08
 - **ShortcutPanel 统一重构**: 合并 ShortcutHintPanel 和 ShortcutHelpPanel 为统一组件
   - 新增 `src/components/canvas/features/ShortcutPanel.tsx`: 包含 21 个快捷键（新增 Space）

@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.143',
+    date: '2026-04-08',
+    changes: [
+      '📋 vibex-third E1-S1: TanStack Query 统一 API Client',
+      '✅ services/api/client.ts: 统一 API Client 指标跟踪',
+      '✅ logRequest 配置项 + 1000条滚动窗口',
+      '提交: b22c5277, f3a819dd',
+    ],
+    commit: 'f3a819dd',
+  },
+
+  {
     version: '1.0.142',
     date: '2026-04-08',
     changes: [

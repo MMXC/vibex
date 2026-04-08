@@ -1,3 +1,9 @@
+### Added (vibex-third E1-S1: TanStack Query 统一 API Client) — 2026-04-08
+- **E1-S1: TanStack Query 统一 API Client**:
+  - `services/api/client.ts`: 统一 API Client 指标跟踪（requests/failures/latency P50/P95/P99）
+  - `logRequest` 配置项 + 1000条滚动窗口
+  - 提交: `b22c5277`, `f3a819dd`
+
 ### Added (vibex-next E3: 清理与 Analytics) — 2026-04-08
 - **E3: 清理与 Analytics (S1-S3)**:
   - **E3-S1**: 删除废弃 `snapshot.ts`，保留 canvasSseApi snapshot 测试

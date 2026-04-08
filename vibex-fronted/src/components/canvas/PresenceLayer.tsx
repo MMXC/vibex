@@ -46,11 +46,7 @@ const AvatarBadge = memo(function AvatarBadge({
     top = user.cursor.y;
   }
 
-  // 如果有容器 ref，调整为相对位置
-  if (containerRef?.current) {
-    // 位置已经是相对于画布的，这里不做额外处理
-    // 实际项目中可能需要从 canvas 坐标转换
-  }
+  // containerRef 用于未来相对坐标转换，当前位置已相对于画布
 
   return (
     <div

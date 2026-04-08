@@ -161,6 +161,9 @@ e2e/canvas-analysis.spec.ts                         [新增] 全 Epic E2E
 src/lib/canvas/api/dddApi.ts                    [修改] Epic3-F-3.1 @deprecated
 docs/vibex-canvas-analysis/dddApi-migration.md [新增] Epic3-F-3.2 迁移文档
 vibex-fronted/eslint.config.mjs                 [修改] Epic3-F-3.3 lint规则
+src/lib/canvas/api/canvasSseApi.snapshot.test.ts  [新增] Epic4-F-4.1 snapshot测试
+src/lib/canvas/api/__snapshots__/canvasSseApi.snapshot.test.ts.snap [新增] Epic4快照
+vibex-fronted/src/lib/canvas/api/canvasSseApi.test.ts [修改] vitest 修复
 ```
 
 ---
@@ -207,6 +210,33 @@ expect(fs.existsSync('docs/vibex-canvas-analysis/dddApi-migration.md')).toBe(tru
 // F-3.3
 // 非测试文件引入 dddApi → lint 报错
 // 测试文件引入 dddApi → lint 通过（豁免）
+```
+
+**预计工时**: 1h
+
+---
+
+## Epic 4: SSE 类型验证 (P2)
+
+**目标**: 为 canvasSseApi 的 SSE Event 类型编写 snapshot test，确保类型结构变更能被自动检测
+
+### 任务清单
+
+- [x] F-4.1: 创建 `src/lib/canvas/api/canvasSseApi.snapshot.test.ts`
+  - [x] 覆盖全部 8 个 SSE Event 类型（ThinkingEvent, BoundedContext, StepContextEvent, StepModelEvent, StepFlowEvent, StepComponentsEvent, DoneEvent, ErrorEvent）
+  - [x] 18 个 snapshot cases
+  - [x] `__snapshots__/canvasSseApi.snapshot.test.ts.snap` 已生成
+  - [x] 同时修复 canvasSseApi.test.ts 从 @jest/globals 改为 vitest
+- [x] vitest run 通过（28 tests pass）
+
+### 验收标准
+
+```typescript
+// F-4.1
+expect(fs.existsSync('__snapshots__/canvasSseApi.snapshot.test.ts.snap')).toBe(true);
+// 8 个 SSE Event 类型均有 snapshot
+const snapshots = readSnapshotFile();
+SSE_EVENT_TYPES.forEach(t => expect(snapshots).toContain(t));
 ```
 
 **预计工时**: 1h

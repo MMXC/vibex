@@ -212,3 +212,65 @@
   from { opacity: 0; transform: translateY(-50%); }
   to { opacity: 1; transform: translateY(-50%); }
 }
+
+/* === P002 S2.2: Glass Morphism === */
+.vx-glass {
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+}
+
+/* === P002 S2.3: Neon Hover === */
+.vx-neon-hover {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.vx-neon-hover:hover {
+  border-left: 2px solid var(--color-primary);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.25);
+}
+
+/* === P002 S2.4: Toolbar === */
+.vx-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  min-height: 40px;
+}
+
+/* === P002 S2.4: Search Input === */
+.vx-search {
+  flex: 1;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.vx-search:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.vx-search::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* === P002 S2.4: Row Hover === */
+.vx-row-hover {
+  transition: background 0.1s ease, border-color 0.1s ease;
+  cursor: pointer;
+}
+
+.vx-row-hover:hover {
+  background: var(--color-bg-hover);
+}

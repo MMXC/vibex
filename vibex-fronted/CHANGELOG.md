@@ -1,5 +1,12 @@
 # Changelog
 
+### [vibex-fifth E4: 稳定性收尾 E2E 测试] — 2026-04-09
+- **E4.1 JsonRenderPreview 集成验证** (`e2e/json-render-preview.spec.ts`): 3 E2E tests — 预览按钮存在/禁用态、空状态显示、@ci-blocking 标记
+- **E4.2 PrototypeQueuePanel API 连通性验证** (`e2e/prototype-queue.spec.ts`): 5 E2E tests (4 pass, 1 skip) — 队列面板 UI、/api/v1/canvas/status API 验证
+- **Playwright 专用配置** (`e2e/playwright.config.ts`): 解决 @playwright/test 版本冲突
+- **IMPLEMENTATION_PLAN**: E4.1/E4.2 标记为 DONE
+- 提交: `75a116c3`
+
 ### [vibex-third E4-S2: ADR 实施验证] — 2026-04-09
 - **TanStack Query (`src/lib/query/`)**: QueryClient + QueryProvider + queryKeys + SSE Bridge + 7 query hooks + 2 mutation hooks，staleTime=5min, retry=3
 - **虚拟化 (`src/components/canvas/`)**: ComponentTree + BoundedContextTree，`VIRTUAL_THRESHOLD=50`，useVirtualizer，160px/120px 估算高度

@@ -169,6 +169,13 @@ pnpm test
 - Verification: 所有提案有 `status` 字段
 - Verification: SOP 文档存在
 
+**状态**: ✅ 已完成 (2026-04-10)
+**Commit**: 86d05694
+
+**产出**:
+- `docs/proposals/PROPOSALS_STATUS_SOP.md` — 状态定义、转换规则、维护规范
+- `docs/proposals/INDEX.md` 已有 status 字段（之前已完善）
+
 ---
 
 ### E3: CI/CD 守卫增强 (1h + 0.5h WEBSOCKET)

@@ -1,3 +1,16 @@
+### Added (vibex-sprint-0412 E4: 架构增强) — 2026-04-10
+- **E4.1**: TreeErrorBoundary — Canvas 三栏独立 ErrorBoundary + 重试按钮
+  - `vibex-fronted/src/components/canvas/panels/TreeErrorBoundary.tsx`
+  - ContextTreePanel / FlowTreePanel / ComponentTreePanel 均包裹 TreeErrorBoundary
+  - 提交: `cf578266`
+- **E4.2**: @vibex/types — canvasSchema 共享类型落地
+  - `packages/types/src/api/canvasSchema.ts` — Zod schemas 统一管理
+  - `vibex-fronted/src/lib/canvas/api/canvasApiValidation.ts` 引用 @vibex/types
+  - 提交: `cf578266`
+- **E4.4**: frontend types 对齐 — canvasApiValidation.ts 引用 @vibex/types
+- **E4.5**: groupByFlowId — useMemo 记忆化优化 ComponentTree 渲染
+  - `vibex-fronted/src/components/canvas/ComponentTree.tsx` — useMemo 包裹 groupByFlowId
+
 ### Added (vibex-sprint-0412 E3: CI/CD Path Filters) — 2026-04-10
 - **E3**: GitHub Actions path filters for `.github/workflows/test.yml`
   - Trigger full test suite on playwright/vitest/jest/babel/coverage config changes

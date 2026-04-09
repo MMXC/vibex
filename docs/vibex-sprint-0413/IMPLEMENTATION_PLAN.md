@@ -31,12 +31,12 @@
   - Run Vitest to confirm no regressions
 
 ### Day 2 — Morning
-- [ ] **U3:** `ComponentTree.module.css` partial adoption
+- [x] **U3:** Extend theme-utilities.css with vx-* classes (S2.2/S2.3/S2.4) — ✅ 612eaf0b (276行, 5个新vx-工具类)
   - Replace ≥1 hardcoded style block with a `.vx-*` utility class
   - Run existing `ComponentTree.test.tsx` to confirm no breakage
 
 ### Day 2 — Afternoon
-- [ ] **U4:** CI validation + visual regression
+- [x] **U4:** CI validation + visual regression — ✅ d0357a58 (check-design-tokens.sh)
   - `pnpm lint` → 0 errors
   - `pnpm test` → 0 failures
   - Playwright visual regression on Canvas page

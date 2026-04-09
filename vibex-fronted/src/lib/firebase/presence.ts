@@ -43,13 +43,13 @@ const FIREBASE_CONFIG = {
 };
 
 // 检查 Firebase 是否已配置
-export const isFirebaseConfigured = () => {
+export function isFirebaseConfigured(): boolean {
   return Boolean(
     FIREBASE_CONFIG.apiKey &&
     FIREBASE_CONFIG.databaseURL &&
     FIREBASE_CONFIG.apiKey !== 'your-api-key'
   );
-};
+}
 
 // ============================================================================
 // Mock Presence Store（开发/CI 环境使用）

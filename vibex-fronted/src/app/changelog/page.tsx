@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.158',
+    date: '2026-04-10',
+    changes: [
+      '📋 canvas-code-audit Epic3: P2 Polish',
+      '✅ F3.2: 删除 canvasApi.ts 重复注释块',
+      '✅ F3.3: Keyboard handler 统一确认',
+      '提交: 406ce7f2, a0d581ea',
+    ],
+    commit: '406ce7f2',
+  },
+
+  {
     version: '1.0.157',
     date: '2026-04-10',
     changes: [

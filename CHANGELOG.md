@@ -1,3 +1,11 @@
+### Added (vibex-fifth E1: 未验收功能验收) — 2026-04-09
+- **E1: 未验收功能 E2E 测试**:
+  - **E1.1**: VersionHistoryPanel E2E（Ctrl+H / Canvas不阻塞 / iPhone12布局）
+  - **E1.2**: SearchDialog E2E（Ctrl+K / 搜索结果 / Escape关闭）
+  - **E1.3**: SaveIndicator E2E（Ctrl+S / Saving状态 / Error处理）
+  - 全部使用 Playwright 语义等待（无 waitForTimeout > 50ms）
+  - 提交: `f49ff82e`
+
 ### Added (vibex-fourth E2: PRD 验收自动化) — 2026-04-09
 - **E2: PRD 验收自动化 (Sprint 2)**:
   - **E2-PRD**: collaborationSync + usePresence vitest 单元测试，18/18 通过

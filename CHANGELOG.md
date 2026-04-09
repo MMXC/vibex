@@ -1,3 +1,10 @@
+### Added (vibex-sprint-0412 E5: waitForTimeout 重构) — 2026-04-10
+- **E5**: waitForTimeout 重构完成 — 主要 E2E 测试文件 0 个 waitForTimeout ✅
+  - 剩余 16 处均在特殊测试中（mermaid/performance），属合理保留
+  - stability.spec.ts 路径修复 (`df3b8cba`): `__dirname` 向上两级
+  - findTestFiles() 扩展: 支持 .spec.ts 和 .test.ts
+  - 提交: `df3b8cba`
+
 ### Added (vibex-sprint-0412 E7: 文档与工具) — 2026-04-10
 - **E7**: `docs/canvas-roadmap.md` — Canvas 演进路线图（已完成功能/Phase 1-3/技术债务）
   - `.github/workflows/changelog.yml` — CHANGELOG guard CI（验证格式）

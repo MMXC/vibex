@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.167',
+    date: '2026-04-10',
+    changes: [
+      '📋 vibex-sprint-0413 P001: JsonTreeRenderer 设计令牌迁移',
+      '✅ JsonTreeRenderer.module.css: 270→142行 (47%减少, 0 hex残留)',
+      '✅ theme-utilities.css: 40+ 工具类',
+      '提交: 4545b12e',
+    ],
+    commit: '4545b12e',
+  },
+
+  {
     version: '1.0.166',
     date: '2026-04-10',
     changes: [

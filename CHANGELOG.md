@@ -5,6 +5,15 @@
   - findTestFiles() 扩展: 支持 .spec.ts 和 .test.ts
   - 提交: `df3b8cba`
 
+### Added (vibex-sprint-0413 P001: JsonTreeRenderer 样式迁移) — 2026-04-10
+- **P001**: JsonTreeRenderer.module.css 设计令牌迁移
+  - 替换所有硬编码 hex 颜色为 CSS 变量（design-tokens）
+  - 270行 → 142行（47% 减少，目标 ≤189）
+  - 零 prohibited hex 值残留
+  - `vibex-fronted/src/styles/theme-utilities.css` — 40+ 工具类
+  - `vibex-fronted/src/styles/design-tokens.css` — 令牌扩展
+  - 提交: `4545b12e`
+
 ### Added (vibex-sprint-0412 E7: 文档与工具) — 2026-04-10
 - **E7**: `docs/canvas-roadmap.md` — Canvas 演进路线图（已完成功能/Phase 1-3/技术债务）
   - `.github/workflows/changelog.yml` — CHANGELOG guard CI（验证格式）

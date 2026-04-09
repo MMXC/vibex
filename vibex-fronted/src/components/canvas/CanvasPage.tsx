@@ -27,8 +27,7 @@ import type {
   BoundedContextNode,
   BusinessFlowNode,
   ComponentNode,
-  BoundedContextDraft,
-  FlowStep,
+FlowStep,
   Phase,
   TreeType,
   TreeNode,
@@ -271,19 +270,23 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         return;
       }
       if (isQuickGenerating || aiThinking || flowGenerating || componentGenerating) return;
-      const drafts: BoundedContextDraft[] = [
-        { name: '需求管理', description: '处理需求录入', type: 'core' },
-        { name: '业务流程', description: '核心业务处理', type: 'core' },
-      ];
-      const newCtxs: BoundedContextNode[] = drafts.map((d, i) => ({
-        nodeId: `ctx-gen-${Date.now()}-${i}`,
-        name: d.name,
-        description: d.description,
-        type: d.type,
-        status: 'pending' as const,
-        children: [],
-      }));
-      useContextStore.getState().setContextNodes(newCtxs);
+      try {
+        const result = await canvasApi.generateContexts({ requirementText });
+        const ctxs: BoundedContextNode[] = result.contexts.map((c) => ({
+          nodeId: c.id,
+          name: c.name,
+          description: c.description,
+          type: c.type,
+          status: 'pending' as const,
+          isActive: false,
+          children: [],
+        }));
+        getHistoryStore().recordSnapshot('context', ctxs);
+        useContextStore.getState().setContextNodes(ctxs);
+      } catch (err) {
+        canvasLogger.CanvasPage.error('onGenerateContext failed:', err);
+        toast.showToast('重新生成失败，请重试', 'error');
+      }
     },
     onSwitchToContext: () => setActiveTree('context'),
     onSwitchToFlow: () => setActiveTree('flow'),
@@ -361,8 +364,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                         }));
                         getHistoryStore().recordSnapshot('context', ctxs);
                         useContextStore.getState().setContextNodes(ctxs);
-                      } catch {
-                        // error handled silently
+                      } catch (err) {
+                        canvasLogger.CanvasPage.error('handleRegenerateContexts failed:', err);
+                        toast.showToast('重新生成失败，请重试', 'error');
                       }
                     }}
                     disabled={aiThinking || !requirementText.trim()}
@@ -660,8 +664,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                             }));
                             getHistoryStore().recordSnapshot('context', ctxs);
                             useContextStore.getState().setContextNodes(ctxs);
-                          } catch {
-                            // error handled silently
+                          } catch (err) {
+                            canvasLogger.CanvasPage.error('handleRegenerateContexts failed:', err);
+                            toast.showToast('重新生成失败，请重试', 'error');
                           }
                         }}
                         disabled={aiThinking || !requirementText.trim()}

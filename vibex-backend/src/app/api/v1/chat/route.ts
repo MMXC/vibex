@@ -11,6 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { debug } from '@/lib/logger';
 import { chatMessageSchema } from '@/schemas/security';
 import { parseBody } from '@/lib/high-risk-validation';
 import { getAuthUserFromRequest } from '@/lib/authFromGateway';
@@ -30,7 +31,8 @@ interface ChatMessage {
 
 async function* streamFromMiniMax(
   messages: ChatMessage[],
-  conversationId: string
+  conversationId: string,
+  signal?: AbortSignal
 ): AsyncGenerator<string> {
   const url = `${MINIMAX_API_BASE}/text/chatcompletion_v2`;
 
@@ -51,6 +53,7 @@ async function* streamFromMiniMax(
       method: 'POST',
       headers,
       body,
+      signal, // [F2.1] Forward abort signal
     });
 
     if (!response.ok) {
@@ -147,12 +150,29 @@ export async function POST(request: NextRequest) {
     async start(controller) {
       const encoder = new TextEncoder();
 
+      // [F2.1] Add 30s timeout to prevent unbounded stream
+      const abortController = new AbortController();
+      const timeoutId = setTimeout(() => {
+        abortController.abort();
+      }, 30_000);
+
+      // [F2.2] Forward client disconnect signal
+      request.signal.addEventListener('abort', () => {
+        debug('[Chat SSE] Client disconnected, aborting stream');
+        clearTimeout(timeoutId);
+        abortController.abort();
+        try { controller.close(); } catch {}
+      });
+
       try {
         controller.enqueue(
           encoder.encode(`data: ${JSON.stringify({ conversationId: convId })}\n\n`)
         );
 
-        for await (const chunk of streamFromMiniMax(messages, convId)) {
+        // [F2.1] Pass abortController.signal to MiniMax fetch
+        for await (const chunk of streamFromMiniMax(messages, convId, abortController.signal)) {
+          // Check if aborted mid-stream
+          if (abortController.signal.aborted) break;
           controller.enqueue(encoder.encode(chunk));
         }
 
@@ -165,6 +185,10 @@ export async function POST(request: NextRequest) {
           encoder.encode(`data: ${JSON.stringify({ error: errorMessage })}\n\n`)
         );
       } finally {
+        // [F2.1] Cleanup timeout timer
+        clearTimeout(timeoutId);
+        // [F2.2] Abort any pending fetch
+        abortController.abort();
         controller.close();
       }
     },

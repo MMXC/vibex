@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.164',
+    date: '2026-04-10',
+    changes: [
+      '📋 vibex-sprint-0412 E5: 测试重构优化',
+      '✅ waitForTimeout 重构: 主要 E2E 测试 0 waitForTimeout > 50ms',
+      '✅ stability.spec.ts F1.1 验收测试通过',
+      '✅ 剩余 15 处均在特殊测试中（mermaid/performance），属合理保留',
+      '提交: ac62e7c0',
+    ],
+    commit: 'ac62e7c0',
+  },
+
+  {
     version: '1.0.163',
     date: '2026-04-10',
     changes: [

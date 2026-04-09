@@ -6,6 +6,21 @@
 
 #### 2026-04-09
 
+- **Epic2 Chat SSE 可靠性增强** (sse-backend-fix)
+  - `src/app/api/v1/chat/route.ts`: Chat SSE 可靠性修复
+    - F2.1: 30s timeout (`AbortController` + `setTimeout` + `clearTimeout` finally)
+    - F2.2: Client disconnect 信号转发 (`request.signal` → `abortController.abort()`)
+    - F2.3: conversationId 首事件返回（MiniMax stream 之前发送）
+  - `src/app/api/v1/chat/route.test.ts`: Chat SSE 集成测试 183 行，7 tests
+  - `src/app/api/v1/canvas/__tests__/stream.test.ts`: Canvas SSE 集成测试 159 行
+  - 提交: `01811ced`
+
+- **Epic4 Hono/Next.js 路由一致性** (sse-backend-fix, 随 Epic2 合并)
+  - `src/app/api/v1/canvas/stream/route.ts`: Canvas SSE stream endpoint，requirement query 参数
+  - F4.1: 路由参数验证
+  - F4.2: Canvas SSE 事件序列集成测试
+  - 提交: `01811ced`
+
 - **Epic1 SSE 超时稳定性修复** (sse-backend-fix)
   - `src/lib/sse-stream-lib/index.ts`: SSEStreamOptions.timeout 参数化，默认 30s，AbortController 级联取消，timers 统一清理
   - `src/lib/sse-stream-lib/error-classifier.ts` (F3.1): 错误分类函数，AbortError→timeout / success=false→llm_error / 网络错误→network

@@ -217,7 +217,7 @@
 
 ## Phase A-4: Epic E4 — 稳定性收尾
 
-### Story E4.1: JsonRenderPreview 集成验证
+### Story E4.1: JsonRenderPreview 集成验证 [DONE ✅]
 
 **Dev**: dev
 **Estimated**: 1h
@@ -245,7 +245,7 @@
 
 ---
 
-### Story E4.2: PrototypeQueuePanel API 连通性验证
+### Story E4.2: PrototypeQueuePanel API 连通性验证 [DONE ✅]
 
 **Dev**: dev
 **Estimated**: 1h

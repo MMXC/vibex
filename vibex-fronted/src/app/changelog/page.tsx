@@ -21,6 +21,20 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.163',
+    date: '2026-04-10',
+    changes: [
+      '📋 vibex-sprint-0412 E4: 架构增强',
+      '✅ E4.1: TreeErrorBoundary.tsx — 三栏独立 ErrorBoundary + 重试按钮',
+      '✅ E4.2: @vibex/types — canvasSchema 共享类型落地',
+      '✅ E4.4: frontend types 对齐 — canvasApiValidation.ts 引用 @vibex/types',
+      '✅ E4.5: groupByFlowId — useMemo 记忆化优化 (ComponentTree)',
+      '提交: cf578266 (architect proposals)',
+    ],
+    commit: 'cf578266',
+  },
+
+  {
     version: '1.0.162',
     date: '2026-04-10',
     changes: [

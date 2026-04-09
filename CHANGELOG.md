@@ -1,3 +1,9 @@
+### Added (vibex-fifth E3: Domain Model 修复) — 2026-04-09
+- **E3: Domain Model Mermaid 渲染修复**:
+  - **E3.1**: StepDomainModel 使用 MermaidPreview 渲染类图（非纯文本）
+  - **E3.2**: 解析超时从 60s 缩短到 30s
+  - 提交: `08bfda7a`
+
 ### Added (vibex-fifth E2: 孤立组件集成) — 2026-04-09
 - **E2: 孤立组件集成**:
   - **E2.1**: TemplateSelector 集成 CanvasPage（📋 模板按钮 + Modal dialog）

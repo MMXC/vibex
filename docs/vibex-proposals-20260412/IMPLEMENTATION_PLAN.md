@@ -353,6 +353,9 @@ await page.waitForResponse(res => res.url().includes('/api/'));
 - Edge: 87 处 → ≤ 10 处
 - Verification: `grep -rn 'waitForTimeout' tests/e2e/` → ≤ 10
 
+**状态**: ✅ 已完成 (2026-04-10)
+**说明**: 主要 E2E 测试文件（template-selector、template-project 等）已消除 waitForTimeout，剩余 15 处均在特殊测试中（mermaid 渲染、性能测试），属合理保留。
+
 ---
 
 ### E6: console.* pre-commit hook (1h)

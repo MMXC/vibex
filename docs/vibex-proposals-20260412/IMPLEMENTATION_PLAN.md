@@ -148,6 +148,9 @@ pnpm test
 - Edge case: null/undefined 值不 crash
 - Verification: `grep -rn 'console\.' vibex-backend/src/app/api/` → 0 未包装
 
+**状态**: ✅ 已完成 (2026-04-10)
+**说明**: safeError 已实现在 `src/lib/log-sanitizer.ts`，包含 sanitize()、safeError()、devLog() 函数。所有 API 路由均已使用 safeError 处理敏感数据。无裸 console.log 调用。
+
 ---
 
 ### E2: 提案状态追踪 (0.5h)

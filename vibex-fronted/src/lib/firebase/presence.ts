@@ -43,7 +43,7 @@ const FIREBASE_CONFIG = {
 };
 
 // 检查 Firebase 是否已配置
-const isFirebaseConfigured = () => {
+export const isFirebaseConfigured = () => {
   return Boolean(
     FIREBASE_CONFIG.apiKey &&
     FIREBASE_CONFIG.databaseURL &&

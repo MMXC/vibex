@@ -1,3 +1,11 @@
+### Added (vibex-sprint-0412 E1: SafeError Log Sanitizer) — 2026-04-10
+- **E1**: `safeError` 日志脱敏工具（`src/lib/log-sanitizer.ts`）
+  - `sanitize()` — 递归脱敏敏感字段（password/token/email/name 等）
+  - `safeError()` — API 错误日志安全输出
+  - `devLog()` — 开发环境日志
+  - 所有 API 路由均使用 safeError，无裸 console.log
+  - 提交: `525e4ae4`
+
 ### Added (vibex-sprint-0412 E0: Auth Mock Factory) — 2026-04-10
 - **E0.2**: 创建集中式 Auth Mock Factory（`tests/unit/__mocks__/auth/index.ts`）
   - `createAuthStoreMock()` — Zustand authStore mock，支持 selector/getState

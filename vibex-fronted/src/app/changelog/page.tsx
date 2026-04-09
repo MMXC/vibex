@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.160',
+    date: '2026-04-10',
+    changes: [
+      '📋 vibex-sprint-0412 E1: SafeError Log Sanitizer',
+      '✅ sanitize() / safeError() / devLog() — 敏感字段自动脱敏',
+      '✅ 所有 API 路由使用 safeError，无裸 console.log',
+      '提交: 525e4ae4',
+    ],
+    commit: '525e4ae4',
+  },
+
+  {
     version: '1.0.159',
     date: '2026-04-10',
     changes: [

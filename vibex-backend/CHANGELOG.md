@@ -15,6 +15,12 @@
   - `src/app/api/v1/canvas/__tests__/stream.test.ts`: Canvas SSE 集成测试 159 行
   - 提交: `01811ced`
 
+- **Epic5 测试覆盖** (sse-backend-fix)
+  - `vibex-fronted/tests/e2e/sse-e2e.spec.ts`: Playwright E2E SSE 事件序列测试 205 行，6 tests (3 pass 3 skip)
+  - `vibex-fronted/playwright.sse.config.ts`: 独立 Playwright 配置，支持 `BASE_URL` 环境变量
+  - F5.1 Vitest: 已在 Epic2 的 `canvas/__tests__/stream.test.ts` 中实现
+  - 提交: `5121ca11`
+
 - **Epic4 Hono/Next.js 路由一致性** (sse-backend-fix, 随 Epic2 合并)
   - `src/app/api/v1/canvas/stream/route.ts`: Canvas SSE stream endpoint，requirement query 参数
   - F4.1: 路由参数验证

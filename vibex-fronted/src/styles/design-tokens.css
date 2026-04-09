@@ -53,6 +53,15 @@
   --color-error: #ff4466;
   --color-info: #00aaff;
 
+  /* P002 扩展: JsonTreeRenderer 专用 */
+  --color-surface: var(--color-bg-secondary);
+  --color-bg-hover: var(--color-bg-tertiary);
+  --color-primary-bg: rgba(0, 255, 255, 0.12);
+  --color-highlight: var(--color-accent);
+  --color-text: var(--color-text-primary);
+  --color-warning-bg: rgba(255, 170, 0, 0.15);
+  --transition-fast: 0.15s;
+
   /* 交互状态色 (WCAG AA focus ring) */
   --color-focus-ring: #3b82f6;
   --color-interactive: var(--color-primary);

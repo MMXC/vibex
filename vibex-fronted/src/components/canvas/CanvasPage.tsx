@@ -70,6 +70,8 @@ import { ComponentTreePanel } from './panels/ComponentTreePanel';
 import { ShortcutPanel } from './features/ShortcutPanel';
 import { VersionHistoryPanel } from './features/VersionHistoryPanel';
 import { SaveIndicator } from './features/SaveIndicator';
+import { PhaseIndicator } from './features/PhaseIndicator';
+import { TemplateSelector } from './features/TemplateSelector';
 import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
 import { useAutoSave } from '@/hooks/canvas/useAutoSave';
 import { useHasProject } from '@/hooks/useHasProject';
@@ -429,6 +431,11 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const leftDrawerOpen = useUIStore((s) => s.leftDrawerOpen);
   const rightDrawerOpen = useUIStore((s) => s.rightDrawerOpen);
 
+  // === E2.1: TemplateSelector state ===
+  const [templateOpen, setTemplateOpen] = useState(false);
+
+  // === E2.2: PhaseIndicator is read-only (PhaseIndicator.tsx manages its own open/close) ===
+
   // Compute container class based on drawer state
   const containerClasses = [
     styles.canvasContainer,
@@ -460,6 +467,8 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
       {/* Tab Bar — Epic 1: Three-tree tab switcher */}
       <div className={styles.tabBarWrapper}>
         <TabBar />
+        {/* E2.2: PhaseIndicator — shows current phase, allows switching */}
+        <PhaseIndicator phase={phase} onPhaseChange={setPhase} />
       </div>
 
       {/* Project Bar — Epic 5: Create Project button */}
@@ -482,6 +491,20 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             onSaveNow={saveNow}
           />
         </div>
+
+      {/* E2.1: Template Selector trigger button */}
+      <button
+        type="button"
+        className={styles.secondaryButton}
+        style={{ position: 'absolute', top: 8, right: 8, zIndex: 10 }}
+        onClick={() => setTemplateOpen(true)}
+        title="选择需求模板"
+      >
+        📋 模板
+      </button>
+
+      {/* E2.1: TemplateSelector modal dialog */}
+      <TemplateSelector open={templateOpen} onClose={() => setTemplateOpen(false)} />
 
       {/* F1: Expand controls — shown when not in input phase */}
       {phase !== 'input' && (

@@ -85,7 +85,7 @@ import { CanvasOnboardingOverlay } from '@/components/guidance';
 import { ConflictDialog as ConflictDialogComponent } from '@/components/ConflictDialog';
 import { FeedbackFAB } from '@/components/FeedbackFAB';
 import { CanvasPreviewModal } from './json-render/CanvasPreviewModal';
-// Edge layers removed — no longer needed
+// F2.5 decision: FlowEdgeLayer remains in BusinessFlowTree (flow panel uses it); CanvasPage itself does not render edge layers
 import styles from './canvas.module.css';
 
 // =============================================================================
@@ -625,7 +625,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 onMouseUp={stateHandlers.handleMouseUp}
                 onMouseLeave={stateHandlers.handleMouseUp}
               >
-              {/* SVG edge layers removed */}
+              {/* SVG edge layers removed — BusinessFlowTree handles its own FlowEdgeLayer */}
 
               {/* Bug5: Left expand toggle button */}
               <div className={styles.expandCol}>

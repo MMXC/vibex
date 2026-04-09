@@ -350,6 +350,30 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             : '确认所有组件后创建项目'
           : '';
 
+  // === F1.2: renderContextTreeToolbar — shared helper for context TreeToolbar ===
+  function renderContextTreeToolbar(
+    treeType: 'context' | 'flow' | 'component',
+    nodeCount: number,
+    continueDisabled: boolean,
+    continueLabel: string,
+    onContinue: () => void,
+    extraButtons?: React.ReactNode,
+  ) {
+    return (
+      <TreeToolbar
+        treeType={treeType}
+        nodeCount={nodeCount}
+        onSelectAll={() => useContextStore.getState().selectAllNodes?.('context')}
+        onDeselectAll={() => useContextStore.getState().clearNodeSelection?.('context')}
+        onClear={() => useContextStore.getState().setContextNodes([])}
+        onContinue={onContinue}
+        continueLabel={continueLabel}
+        continueDisabled={continueDisabled}
+        extraButtons={extraButtons}
+      />
+    );
+  }
+
   // === Tab content for mobile (E2-2: auto-expand active tab panel) ===
   const renderTabContent = (tab: TreeType, _treeNodes: TreeNode[], _isActive: boolean) => {
     switch (tab) {
@@ -361,29 +385,22 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             isActive={contextActive}
             onToggleCollapse={toggleContextPanel}
             onNodeClick={handleMinimapNodeClick}
-            headerActions={
-              <TreeToolbar
-                treeType="context"
-                nodeCount={contextNodes.length}
-                onSelectAll={() => useContextStore.getState().selectAllNodes?.('context')}
-                onDeselectAll={() => useContextStore.getState().clearNodeSelection?.('context')}
-                onClear={() => useContextStore.getState().setContextNodes([])}
-                onContinue={() => autoGenerateFlows(contextNodes.filter((c) => c.isActive !== false))}
-                continueLabel={contextNodes.length === 0 ? '→ 选择上下文' : flowGenerating ? `◌ ${flowGeneratingMessage ?? '生成中...'}` : '→ 继续 → 流程树'}
-                continueDisabled={flowGenerating || contextNodes.length === 0}
-                extraButtons={
-                  <button
-                    type="button"
-                    className={styles.secondaryButton}
-                    onClick={() => handleRegenerateContexts(requirementText)}
-                    disabled={aiThinking || !requirementText.trim()}
-                    aria-label="重新生成限界上下文"
-                  >
-                    {aiThinking ? '◌ 重新生成中...' : '🔄 重新生成'}
-                  </button>
-                }
-              />
-            }
+            headerActions={renderContextTreeToolbar(
+              'context',
+              contextNodes.length,
+              flowGenerating || contextNodes.length === 0,
+              contextNodes.length === 0 ? '→ 选择上下文' : flowGenerating ? `◌ ${flowGeneratingMessage ?? '生成中...'}` : '→ 继续 → 流程树',
+              () => autoGenerateFlows(contextNodes.filter((c) => c.isActive !== false)),
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                onClick={() => handleRegenerateContexts(requirementText)}
+                disabled={aiThinking || !requirementText.trim()}
+                aria-label="重新生成限界上下文"
+              >
+                {aiThinking ? '◌ 重新生成中...' : '🔄 重新生成'}
+              </button>,
+            )}
           />
         );
       case 'flow':
@@ -642,29 +659,22 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 isActive={contextActive}
                 onToggleCollapse={toggleContextPanel}
                 onNodeClick={handleMinimapNodeClick}
-                headerActions={
-                  <TreeToolbar
-                    treeType="context"
-                    nodeCount={contextNodes.length}
-                    onSelectAll={() => useContextStore.getState().selectAllNodes?.('context')}
-                    onDeselectAll={() => useContextStore.getState().clearNodeSelection?.('context')}
-                    onClear={() => useContextStore.getState().setContextNodes([])}
-                    onContinue={() => autoGenerateFlows(contextNodes.filter((c) => c.isActive !== false))}
-                    continueLabel={contextNodes.length === 0 ? '→ 选择上下文' : flowGenerating ? `◌ ${flowGeneratingMessage ?? '生成中...'}` : '→ 继续 → 流程树'}
-                    continueDisabled={flowGenerating || contextNodes.length === 0}
-                    extraButtons={
-                      <button
-                        type="button"
-                        className={styles.secondaryButton}
-                        onClick={() => handleRegenerateContexts(requirementText)}
-                        disabled={aiThinking || !requirementText.trim()}
-                        aria-label="重新生成限界上下文"
-                      >
-                        {aiThinking ? '◌ 重新生成中...' : '🔄 重新生成'}
-                      </button>
-                    }
-                  />
-                }
+                headerActions={renderContextTreeToolbar(
+                  'context',
+                  contextNodes.length,
+                  flowGenerating || contextNodes.length === 0,
+                  contextNodes.length === 0 ? '→ 选择上下文' : flowGenerating ? `◌ ${flowGeneratingMessage ?? '生成中...'}` : '→ 继续 → 流程树',
+                  () => autoGenerateFlows(contextNodes.filter((c) => c.isActive !== false)),
+                  <button
+                    type="button"
+                    className={styles.secondaryButton}
+                    onClick={() => handleRegenerateContexts(requirementText)}
+                    disabled={aiThinking || !requirementText.trim()}
+                    aria-label="重新生成限界上下文"
+                  >
+                    {aiThinking ? '◌ 重新生成中...' : '🔄 重新生成'}
+                  </button>,
+                )}
               />
 
               <FlowTreePanel

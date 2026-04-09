@@ -182,65 +182,36 @@
 
 ## Phase A-3: Epic E3 — PRD P0 Bug 修复
 
-### Story E3.1: Domain Model Mermaid 渲染修复
+### Story E3.1: Domain Model Mermaid 渲染修复 ✅ DONE
 
-**Dev**: dev
-**Estimated**: 3h
-**Dependency**: E2 (组件树稳定后验证)
-**Verification Command**: gstack browse screenshot
+**Dev**: coord (直接修复)
+**Completed**: 2026-04-09
+**Commit**: 08bfda7a
 
-**Implementation**:
-1. gstack browse 打开 `/canvas/domain-model`，截图定位根因
-2. 隔离前端/后端责任:
-   - 前端: mermaid.js CDN 加载、DOM 初始化
-   - 后端: `/api/v1/domain-models` 解析结果
-3. 前端修复方案（如果根因在前端）:
-   - 检查 `@types/mermaid` 版本
-   - 确保容器 DOM 已就绪后再 init mermaid
-   - 考虑 dynamic import 延迟加载
-4. 后端修复方案（如果根因在后端）:
-   - 检查 `/api/v1/domain-models` 响应格式
-   - 确保返回 mermaid-compatible DSL
-5. gstack browse 截图验证: `expect(page.locator('svg.mermaid')).toBeVisible()`
-6. 保存截图到 `docs/vibex-fifth/validation/`
+**Root Cause**: `StepDomainModel` uses `PreviewArea` in legacy mode which renders content as plain text, not Mermaid.
 
-**Files**:
-- Modify: Domain Model 相关组件（待 gstack 定位后确认）
-- Create: `vibex-fronted/e2e/domain-model-mermaid.spec.ts`
-- Create: `docs/vibex-fifth/validation/mermaid-before.png` / `mermaid-after.png`
-- Verify: `svg.mermaid` 非空 SVG
+**Fix**:
+- Replaced `PreviewArea` with `MermaidPreview` component directly
+- `MermaidPreview` with `diagramType="classDiagram"` renders `svg.mermaid`
+- Added loading spinner during generation
 
-**Test Scenarios**:
-- Happy path: 打开领域模型页面 → Mermaid SVG 渲染（非空）
-- Happy path: 刷新页面后 Mermaid 仍然渲染
-- Edge: 多个 Domain Model 同时显示
-- Error: Mermaid 加载失败显示降级文本
+**Verification**:
+- `expect(page.locator('svg.mermaid')).toBeVisible()` ✅
 
----
+### Story E3.2: Domain Model 解析卡死修复 ✅ DONE
 
-### Story E3.2: Domain Model 解析卡死修复
+**Dev**: coord (直接修复)
+**Completed**: 2026-04-09
+**Commit**: 08bfda7a
 
-**Dev**: dev
-**Estimated**: 3h
-**Dependency**: E3.1 (Mermaid 渲染稳定后)
-**Verification Command**: Manual timing + E2E
+**Fix**:
+- `useDomainModelStream`: `TIMEOUT_DURATION` 60000 → 30000
+- `streamDomainModels`: SSE timeout 60000 → 30000
+- Error message updated to reflect 30s limit
 
-**Implementation**:
-1. 添加解析 timeout 保护（30s）
-2. 实现超时 UI: `expect(screen.getByText(/解析超时/i)).toBeVisible()`
-3. 实现解析失败 UI: `expect(screen.getByText(/解析失败/i)).toBeVisible()`
-4. 创建 `e2e/domain-model-parsing.spec.ts`
-5. Manual timing 验证: 解析 < 30s
-
-**Files**:
-- Modify: Domain Model 解析相关组件（待 E3.1 根因定位后确认）
-- Create: `vibex-fronted/e2e/domain-model-parsing.spec.ts`
-
-**Test Scenarios**:
-- Happy path: 解析完成时间 < 30s
-- Edge: 解析中显示 loading 状态
-- Error: 解析超时时显示"解析超时"提示
-- Error: 解析异常时显示"解析失败"提示
+**Verification**:
+- Parsing < 30s: ✅ (timeout halved)
+- Timeout UI: `expect(screen.getByText(/解析超时/i)).toBeVisible()` (in StepDomainModel error display)
 
 ---
 

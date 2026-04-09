@@ -1,3 +1,7 @@
+### Added (canvas-code-audit Epic2: P1 Quality Improvements) — 2026-04-10
+- **F2.5**: FlowEdgeLayer 一致性确认 — BusinessFlowTree 保留 FlowEdgeLayer，CanvasPage 不渲染 edge layers
+- 提交: `2e076c32`, `e4c22516`
+
 ### Added (canvas-code-audit Epic1: P0 Critical Bug Fixes) — 2026-04-10
 - **F1.1**: `onGenerateContext` 连接真实 API，删除硬编码 mock 数据（`canvasApi.generateContexts`）
 - **F1.2**: `renderContextTreeToolbar` 辅助函数抽取，消除两处重复 TreeToolbar JSX

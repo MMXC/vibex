@@ -1,3 +1,12 @@
+### Added (vibex-sprint-0412 E6: console.* pre-commit hook) — 2026-04-10
+- **E6**: `eslint.config.mjs`: `@typescript-eslint/no-console` 规则，阻止 console.log
+  - `package.json`: lint-staged 配置，staged files 执行 ESLint
+  - `.husky/pre-commit`: lint-staged 优先运行
+- **E6 fix**: `stability.spec.ts` 路径修复 — `__dirname` 向上两级
+  - 修复: `resolve(__dirname, '..')` → `resolve(__dirname, '../..')`
+  - 修复: 扫描 `.spec.ts` + `.test.ts` 两种文件
+  - 提交: `beb1f712`, `df3b8cba`
+
 ### Added (vibex-sprint-0412 E5: 测试重构优化) — 2026-04-10
 - **E5**: waitForTimeout 重构 — E2E 测试稳定性优化
   - `vibex-fronted/tests/e2e/stability.spec.ts` — F1 验收测试（waitForTimeout ≤ 50ms）

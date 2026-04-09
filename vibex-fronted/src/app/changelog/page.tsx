@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.162',
+    date: '2026-04-10',
+    changes: [
+      '📋 vibex-sprint-0412 E3: CI/CD 守卫增强',
+      '✅ pre-submit-check.sh Section 7: grepInvert guard 检测 test config 变更',
+      '✅ backend/src/config/websocket.ts: WEBSOCKET_CONFIG 单一配置源',
+      '✅ GitHub Actions path filters: 测试配置变更触发全量测试',
+      '提交: 8a09a2af, 1e98c47c',
+    ],
+    commit: '8a09a2af',
+  },
+
+  {
     version: '1.0.161',
     date: '2026-04-10',
     changes: [

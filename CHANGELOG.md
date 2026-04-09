@@ -1,3 +1,13 @@
+### Added (canvas-code-audit Epic1: P0 Critical Bug Fixes) — 2026-04-10
+- **F1.1**: `onGenerateContext` 连接真实 API，删除硬编码 mock 数据（`canvasApi.generateContexts`）
+- **F1.2**: `renderContextTreeToolbar` 辅助函数抽取，消除两处重复 TreeToolbar JSX
+- **F1.3**: `handleRegenerateContexts` useCallback 抽取，消除两处重复 onClick handler
+- **F2.1**: API 错误添加 `toast.showToast('重新生成失败，请重试', 'error')` 提示
+- **F2.2**: 删除 CanvasPage.tsx 中所有 `// REMOVED:` 注释块
+- **F2.3**: 删除未使用的 `loadExampleData` import
+- **F2.4**: 抽取 `cx()` 工具函数（`src/lib/canvas/utils/class.ts`）
+- 提交: `774a08cb`, `a56ed085`, `43a4522c`, `fab64ec8`, `6c327c52`, `42c6f0c7`
+
 ### Added (vibex-fifth E3: Domain Model 修复) — 2026-04-09
 - **E3: Domain Model Mermaid 渲染修复**:
   - **E3.1**: StepDomainModel 使用 MermaidPreview 渲染类图（非纯文本）

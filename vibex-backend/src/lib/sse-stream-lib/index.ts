@@ -10,6 +10,7 @@
 import { CloudflareEnv } from '@/lib/env';
 import { debug } from '@/lib/logger';
 import { filterInvalidContexts } from '@/lib/bounded-contexts-filter';
+import { errorClassifier } from './error-classifier';
 
 // =============================================================================
 // SSE Helpers
@@ -34,9 +35,12 @@ export interface SSEStreamOptions {
   /**
    * Optional AbortSignal from the incoming request.
    * When provided, the stream aborts when the client disconnects.
-   * Composes with the built-in 10s AI-call timeout.
    */
   requestSignal?: AbortSignal;
+  /**
+   * [F1.1] AI call timeout in ms (default 30_000)
+   */
+  timeout?: number;
 }
 
 /**
@@ -44,9 +48,9 @@ export interface SSEStreamOptions {
  * Emits 7 event types in order:
  *   thinking → step_context → step_model → step_flow → step_components → done (or error)
  *
- * Includes AbortController timeout (10s) and proper resource cleanup on abort/disconnect.
+ * Includes AbortController timeout (configurable, default 30s) and proper resource cleanup on abort/disconnect.
  */
-export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOptions): ReadableStream {
+export function buildSSEStream({ requirement, env, requestSignal, timeout = 30_000 }: SSEStreamOptions): ReadableStream {
   // Track all timers for cleanup
   const timers: ReturnType<typeof setTimeout>[] = [];
 
@@ -61,17 +65,17 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
     async start(controller) {
       let aborted = false;
 
-      // Set up AbortController with 10-second timeout
+      // Set up AbortController
       abortController = new AbortController();
       const { signal: localSignal } = abortController;
 
-      // Auto-abort after 10 seconds to prevent Worker hanging
+      // [F1.1] Auto-abort after configurable timeout (default 30s) to prevent Worker hanging
       addTimer(() => {
         if (!aborted) {
-          debug('[SSE Stream] Timeout reached (10s), aborting AI calls');
+          debug(`[SSE Stream] Timeout reached (${timeout}ms), aborting AI calls`);
           abortController?.abort();
         }
-      }, 10_000);
+      }, timeout);
 
       // Forward client-disconnect signal (request.signal) into our abort controller
       if (requestSignal) {
@@ -131,7 +135,7 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
 
 直接输出列表，不要解释，不要JSON：`;
 
-          const stage1Result = await aiService.chat(stage1Prompt, undefined, { signal });
+          const stage1Result = await aiService.chat(stage1Prompt, undefined, { signal: localSignal });
           const stage1Text = stage1Result.success ? (stage1Result.data as unknown as string) || '' : '';
 
           // Stage 2: Parse free-form text into structured contexts
@@ -237,11 +241,14 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
 
         } catch (err) {
           debug('[SSE Stream] step_context error:', err);
+          // [F3.2] Include errorType in internal stage errors
+          const errorType = errorClassifier(err, { stage: 'context' });
           sendSSE(controller, 'step_context', {
             content: 'Bounded context analysis completed',
             mermaidCode: '',
             confidence: 0.7,
             boundedContexts: [],
+            errorType,
           });
         }
 
@@ -279,7 +286,7 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
             entities: { type: 'array' },
             mermaidCode: { type: 'string' },
             confidence: { type: 'number' },
-          }, { signal });
+          }, { signal: localSignal });
 
           const modelData = modelResult.data;
           const entities = modelData?.entities ?? [];
@@ -299,11 +306,14 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
 
         } catch (err) {
           debug('[SSE Stream] step_model error:', err);
+          // [F3.2] Include errorType in internal stage errors
+          const errorType = errorClassifier(err, { stage: 'model' });
           sendSSE(controller, 'step_model', {
             content: 'Domain model analysis completed',
             mermaidCode: '',
             entities: [],
             confidence: 0.7,
+            errorType,
           });
         }
 
@@ -332,7 +342,7 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
             flow: { type: 'string' },
             mermaidCode: { type: 'string' },
             confidence: { type: 'number' },
-          }, { signal });
+          }, { signal: localSignal });
 
           const flowData = flowResult.data;
           sendSSE(controller, 'step_flow', {
@@ -343,10 +353,13 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
 
         } catch (err) {
           debug('[SSE Stream] step_flow error:', err);
+          // [F3.2] Include errorType in internal stage errors
+          const errorType = errorClassifier(err, { stage: 'flow' });
           sendSSE(controller, 'step_flow', {
             content: 'Business flow analysis completed',
             mermaidCode: '',
             confidence: 0.7,
+            errorType,
           });
         }
 
@@ -381,7 +394,7 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
             components: { type: 'array' },
             mermaidCode: { type: 'string' },
             confidence: { type: 'number' },
-          }, { signal });
+          }, { signal: localSignal });
 
           const compData = componentsResult.data;
           const components = compData?.components ?? [];
@@ -393,10 +406,13 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
 
         } catch (err) {
           debug('[SSE Stream] step_components error:', err);
+          // [F3.2] Include errorType in internal stage errors
+          const errorType = errorClassifier(err, { stage: 'components' });
           sendSSE(controller, 'step_components', {
             content: 'Component analysis completed',
             mermaidCode: '',
             confidence: 0.7,
+            errorType,
           });
         }
 
@@ -412,8 +428,10 @@ export function buildSSEStream({ requirement, env, requestSignal }: SSEStreamOpt
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Stream processing failed';
         debug('[SSE Stream] Error:', errorMessage);
+        // [F3.2] Include errorType in error events
+        const errorType = errorClassifier(err, { stage: 'context' });
         try {
-          sendSSE(controller, 'error', { message: errorMessage, code: 'STREAM_ERROR' });
+          sendSSE(controller, 'error', { message: errorMessage, code: 'STREAM_ERROR', errorType });
         } catch {
           // Controller may already be closed
         }

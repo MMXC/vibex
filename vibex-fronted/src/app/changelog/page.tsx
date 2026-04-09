@@ -21,6 +21,20 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.165',
+    date: '2026-04-10',
+    changes: [
+      '📋 vibex-sprint-0412 E6: console.* pre-commit hook',
+      '✅ ESLint no-console rule: 阻止 console.log，允许 warn/error',
+      '✅ lint-staged: staged files 执行 ESLint/stylelint',
+      '✅ .husky/pre-commit: lint-staged 优先运行',
+      '✅ stability.spec.ts: 路径修复 + 扫描 .test.ts 文件',
+      '提交: beb1f712, df3b8cba',
+    ],
+    commit: 'beb1f712',
+  },
+
+  {
     version: '1.0.164',
     date: '2026-04-10',
     changes: [

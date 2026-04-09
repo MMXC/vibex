@@ -230,6 +230,32 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     handleContinueToComponents,
   } = toolbar;
 
+  // === F1.3: handleRegenerateContexts — shared handler for context regeneration ===
+  const handleRegenerateContexts = useCallback(
+    async (text: string) => {
+      if (!text.trim()) return;
+      if (aiThinking || isQuickGenerating) return;
+      try {
+        const result = await canvasApi.generateContexts({ requirementText: text });
+        const ctxs: BoundedContextNode[] = result.contexts.map((c) => ({
+          nodeId: c.id,
+          name: c.name,
+          description: c.description,
+          type: c.type,
+          status: 'pending' as const,
+          isActive: false,
+          children: [],
+        }));
+        getHistoryStore().recordSnapshot('context', ctxs);
+        useContextStore.getState().setContextNodes(ctxs);
+      } catch (err) {
+        canvasLogger.CanvasPage.error('handleRegenerateContexts failed:', err);
+        toast.showToast('重新生成失败，请重试', 'error');
+      }
+    },
+    [],
+  );
+
   // === Keyboard shortcuts (uses hook handlers) ===
   useKeyboardShortcuts({
     undo: handleKeyboardUndo,
@@ -349,26 +375,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                   <button
                     type="button"
                     className={styles.secondaryButton}
-                    onClick={async () => {
-                      if (!requirementText.trim()) return;
-                      try {
-                        const result = await canvasApi.generateContexts({ requirementText });
-                        const ctxs: BoundedContextNode[] = result.contexts.map((c) => ({
-                          nodeId: c.id,
-                          name: c.name,
-                          description: c.description,
-                          type: c.type,
-                          status: 'pending' as const,
-                          isActive: false,
-                          children: [],
-                        }));
-                        getHistoryStore().recordSnapshot('context', ctxs);
-                        useContextStore.getState().setContextNodes(ctxs);
-                      } catch (err) {
-                        canvasLogger.CanvasPage.error('handleRegenerateContexts failed:', err);
-                        toast.showToast('重新生成失败，请重试', 'error');
-                      }
-                    }}
+                    onClick={() => handleRegenerateContexts(requirementText)}
                     disabled={aiThinking || !requirementText.trim()}
                     aria-label="重新生成限界上下文"
                   >
@@ -649,26 +656,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                       <button
                         type="button"
                         className={styles.secondaryButton}
-                        onClick={async () => {
-                          if (!requirementText.trim()) return;
-                          try {
-                            const result = await canvasApi.generateContexts({ requirementText });
-                            const ctxs: BoundedContextNode[] = result.contexts.map((c) => ({
-                              nodeId: c.id,
-                              name: c.name,
-                              description: c.description,
-                              type: c.type,
-                              status: 'pending' as const,
-                              isActive: false,
-                              children: [],
-                            }));
-                            getHistoryStore().recordSnapshot('context', ctxs);
-                            useContextStore.getState().setContextNodes(ctxs);
-                          } catch (err) {
-                            canvasLogger.CanvasPage.error('handleRegenerateContexts failed:', err);
-                            toast.showToast('重新生成失败，请重试', 'error');
-                          }
-                        }}
+                        onClick={() => handleRegenerateContexts(requirementText)}
                         disabled={aiThinking || !requirementText.trim()}
                         aria-label="重新生成限界上下文"
                       >

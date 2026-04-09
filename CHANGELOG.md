@@ -1,3 +1,8 @@
+### Added (vibex-sprint-0412 E7: 文档与工具) — 2026-04-10
+- **E7**: `docs/canvas-roadmap.md` — Canvas 演进路线图（已完成功能/Phase 1-3/技术债务）
+  - `.github/workflows/changelog.yml` — CHANGELOG guard CI（验证格式）
+  - 提交: `4107f001`
+
 ### Added (vibex-sprint-0412 E6: console.* pre-commit hook) — 2026-04-10
 - **E6**: `eslint.config.mjs`: `@typescript-eslint/no-console` 规则，阻止 console.log
   - `package.json`: lint-staged 配置，staged files 执行 ESLint

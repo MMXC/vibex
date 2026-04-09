@@ -1,0 +1,24 @@
+name: Update CHANGELOG
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'CHANGELOG.md'
+
+jobs:
+  changelog-guard:
+    name: CHANGELOG Guard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check CHANGELOG.md format
+        run: |
+          # Project uses "### Added" format (not Keep a Changelog "## [Unreleased]")
+          # Verify the top entry has date and "### Added" header
+          if grep -q "^### Added" CHANGELOG.md && grep -q "^## " CHANGELOG.md; then
+            echo "CHANGELOG format OK (uses ### Added format)"
+          else
+            echo "ERROR: CHANGELOG.md must have '### Added' section with '## ' headers"
+            exit 1
+          fi

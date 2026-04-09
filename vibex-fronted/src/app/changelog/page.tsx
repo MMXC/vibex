@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.166',
+    date: '2026-04-10',
+    changes: [
+      '📋 vibex-sprint-0412 E7: 文档与工具',
+      '✅ docs/canvas-roadmap.md: Canvas 演进路线图',
+      '✅ .github/workflows/changelog.yml: CHANGELOG guard CI',
+      '提交: 4107f001',
+    ],
+    commit: '4107f001',
+  },
+
+  {
     version: '1.0.165',
     date: '2026-04-10',
     changes: [

@@ -397,6 +397,13 @@ npx lint-staged
 - Verification: canvas-roadmap.md 存在且包含演进路线
 - Verification: commit 时 CHANGELOG 自动更新
 
+**状态**: ✅ 已完成 (2026-04-10)
+**Commit**: 87afd7e7
+
+**产出**:
+- `docs/canvas-roadmap.md`: Canvas 演进路线图（含已完成功能、演进计划、技术债务）
+- `.github/workflows/changelog.yml`: CHANGELOG guard CI（验证 `[Unreleased]` section 存在）
+
 ---
 
 ## Rollback

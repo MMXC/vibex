@@ -21,6 +21,17 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.161',
+    date: '2026-04-10',
+    changes: [
+      '📋 vibex-sprint-0412 E2: 提案状态追踪 SOP',
+      '✅ PROPOSALS_STATUS_SOP.md — 状态定义/转换规则/更新时机',
+      '提交: e251c813',
+    ],
+    commit: 'e251c813',
+  },
+
+  {
     version: '1.0.160',
     date: '2026-04-10',
     changes: [

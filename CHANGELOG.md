@@ -1,3 +1,12 @@
+### Added (vibex-sprint-0412 E2: 提案状态追踪 SOP) — 2026-04-10
+- **E2**: 创建 `docs/proposals/PROPOSALS_STATUS_SOP.md`
+  - 状态定义: proposed/in-progress/done/rejected/stale/blocked
+  - 状态转换规则及触发条件
+  - 各角色更新时机规范
+  - 异常处理规则
+  - 关联文件: INDEX.md（已存在）、TEMPLATE.md（已存在）、TRACKING.md（需创建）
+  - 提交: `e251c813`
+
 ### Added (vibex-sprint-0412 E1: SafeError Log Sanitizer) — 2026-04-10
 - **E1**: `safeError` 日志脱敏工具（`src/lib/log-sanitizer.ts`）
   - `sanitize()` — 递归脱敏敏感字段（password/token/email/name 等）

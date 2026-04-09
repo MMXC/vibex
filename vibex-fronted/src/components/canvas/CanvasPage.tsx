@@ -42,8 +42,9 @@ import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
 import { useAuthStore } from '@/stores/authStore';
 import { usePresence } from '@/lib/firebase/presence';
 import PresenceLayer from './PresenceLayer';
-import { loadExampleData } from '@/lib/canvas/loadExampleData';
+
 import { hasNodes } from '@/lib/canvas/cascade';
+import { cx } from '@/lib/canvas/utils/class';
 import { canvasApi } from '@/lib/canvas/api/canvasApi';
 import { getHistoryStore } from '@/lib/canvas/historySlice';
 import { isValidContextNodes, isValidFlowNodes, isValidComponentNodes } from '@/lib/canvas/type-guards';
@@ -437,27 +438,27 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   // === E2.2: PhaseIndicator is read-only (PhaseIndicator.tsx manages its own open/close) ===
 
   // Compute container class based on drawer state
-  const containerClasses = [
+  const containerClasses = cx(
     styles.canvasContainer,
     expandMode === 'maximize' && styles.maximizeMode,
-    expandMode === 'expand-both' && styles.expandBothMode,
-  ].filter(Boolean).join(' ');
+    expandMode === 'expand-both' && styles.expandBothMode
+  );
 
   // Compute row wrapper class for tree + drawers
-  const rowWrapperClasses = [
+  const rowWrapperClasses = cx(
     styles.canvasRowWrapper,
     leftDrawerOpen && styles.canvasRowWithLeftDrawer,
     rightDrawerOpen && styles.canvasRowWithRightDrawer,
-    leftDrawerOpen && rightDrawerOpen && styles.canvasRowWithBothDrawers,
-  ].filter(Boolean).join(' ');
+    leftDrawerOpen && rightDrawerOpen && styles.canvasRowWithBothDrawers
+  );
 
   // Compute grid class based on drawer state
-  const gridClasses = [
+  const gridClasses = cx(
     styles.treePanelsGrid,
     leftDrawerOpen && styles.treePanelsGridWithLeftDrawer,
     rightDrawerOpen && styles.treePanelsGridWithRightDrawer,
-    leftDrawerOpen && rightDrawerOpen && styles.treePanelsGridWithBothDrawers,
-  ].filter(Boolean).join(' ');
+    leftDrawerOpen && rightDrawerOpen && styles.treePanelsGridWithBothDrawers
+  );
 
   // === Render ===
   return (

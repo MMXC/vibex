@@ -162,11 +162,6 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   // E6 Phase 1: Remove duplicated inline state now provided by hooks
   // =============================================================================
 
-  // REMOVED: zoomLevel state, isSpacePressed state, isPanning state, panOffset state
-  // REMOVED: gridRef (now from useCanvasState)
-  // REMOVED: isSearchOpen state (now from useCanvasEvents)
-  // REMOVED: zoomStep/MIN/MAX constants (now in useCanvasState)
-
   // === E6: useCanvasPanels — UI state ===
   const panels = useCanvasPanels();
   const {
@@ -201,14 +196,6 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   // =============================================================================
   // E6 Phase 1: Remove duplicated effects now in hooks
   // =============================================================================
-
-  // REMOVED: Space key listener (now in useCanvasState)
-  // REMOVED: Pan CSS variable effect (now in useCanvasState)
-  // REMOVED: Zoom CSS variable effect (now in useCanvasState)
-  // REMOVED: Expand mode grid CSS effect (now in useCanvasState)
-  // REMOVED: Scroll reset on mount (F1.1) — removed per refactor decision
-  // REMOVED: F11 keyboard shortcut (now in useCanvasEvents)
-  // REMOVED: ? key shortcut panel (now in useCanvasEvents)
 
   // === E6: useCanvasToolbar — all toolbar/action handlers ===
   const toolbar = useCanvasToolbar({

@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.155',
+    date: '2026-04-09',
+    changes: [
+      '📋 vibex-fifth E4: 稳定性收尾 E2E 测试',
+      '✅ E4.1 JsonRenderPreview 集成验证: 3 E2E tests (json-render-preview.spec.ts)',
+      '✅ E4.2 PrototypeQueuePanel API 连通性: 5 E2E tests (prototype-queue.spec.ts, 4 pass 1 skip)',
+      '✅ Playwright 专用配置: 解决 @playwright/test 版本冲突',
+      '提交: 75a116c3',
+    ],
+    commit: '75a116c3',
+  },
+
+  {
     version: '1.0.154',
     date: '2026-04-09',
     changes: [

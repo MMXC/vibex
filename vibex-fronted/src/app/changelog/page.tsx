@@ -21,6 +21,17 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.157',
+    date: '2026-04-10',
+    changes: [
+      '📋 canvas-code-audit Epic2: P1 Quality Improvements',
+      '✅ F2.5: FlowEdgeLayer 一致性确认 — BusinessFlowTree 保留 FlowEdgeLayer',
+      '提交: 2e076c32, e4c22516',
+    ],
+    commit: '2e076c32',
+  },
+
+  {
     version: '1.0.156',
     date: '2026-04-10',
     changes: [

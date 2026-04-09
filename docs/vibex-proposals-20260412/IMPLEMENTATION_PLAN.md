@@ -221,6 +221,9 @@ pnpm test
 - Error path: 某 panel throw → 该 panel 显示 fallback，其他两栏正常
 - Integration: Playwright E2E — 每个 panel 独立恢复
 
+**状态**: ✅ 已完成 (2026-04-10)
+**说明**: `TreeErrorBoundary.tsx` 已实现并用于所有三个 TreePanel，每个包含重试按钮 + 错误日志。
+
 ---
 
 ## Sprint 2: 架构增强 + 测试重构 (11.5h)
@@ -245,6 +248,9 @@ pnpm test
 - Happy path: backend API 返回类型 = @vibex/types 定义
 - Edge: 类型升级不 break build（先改无引用处）
 
+**状态**: ✅ 已完成 (2026-04-10)
+**说明**: `packages/types/src/api/canvas.ts` 已实现，前端 `canvasApiValidation.ts` 已引用 `@vibex/types/api/canvasSchema`。
+
 ---
 
 ### E4.3: v0→v1 迁移 (2h)
@@ -266,6 +272,9 @@ c.res.headers.set('Sunset', 'Sat, 31 Dec 2026 23:59:59 GMT');
 - Verification: v0 路由响应头包含 `Deprecation: true`
 - Verification: v1 路由无此 header
 
+**状态**: ⚠️ 暂不需要
+**说明**: v0 路由当前不存在，无需迁移。如未来添加 v0 路由，按此方案处理。
+
 ---
 
 ### E4.4: frontend types 对齐 (3h)
@@ -286,6 +295,9 @@ export type { CanvasHealthResponse };
 **Test scenarios**:
 - Verification: `grep -rn 'interface.*CanvasHealth' vibex-fronted/src/` → 0 结果
 - Verification: `pnpm tsc --noEmit` → 0 error
+
+**状态**: ✅ 已完成 (2026-04-10)
+**说明**: 前端 types.ts 已通过 `@vibex/types` 对齐，canvasApiValidation.ts 引用 `@vibex/types/api/canvasSchema`。
 
 ---
 
@@ -311,6 +323,9 @@ const flowNode = flowNodeIndex[ctx.nodeId]?.[0];
 **Test scenarios**:
 - Performance: 1000 节点渲染 < 16ms（< 1 frame）
 - Verification: Vitest perf test
+
+**状态**: ✅ 已完成 (2026-04-10)
+**说明**: `ComponentTree.tsx` 已实现 `groupByFlowId` 函数，`useMemo` 包裹 `Object.groupBy` 避免重复计算。
 
 ---
 

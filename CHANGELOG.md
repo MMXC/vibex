@@ -1,3 +1,9 @@
+### Added (vibex-fourth E2: PRD 验收自动化) — 2026-04-09
+- **E2: PRD 验收自动化 (Sprint 2)**:
+  - **E2-PRD**: collaborationSync + usePresence vitest 单元测试，18/18 通过
+  - **修复**: isFirebaseConfigured 改为 `export function`（`presence.ts:46`）
+  - 提交: `fac36e7a`, `5b5fc906`, `4d1b2403`
+
 ### Added (vibex-fourth E1: E2E 稳定性基础) — 2026-04-09
 - **E1: E2E 稳定性基础 (Sprint 2)**:
   - **E1: E2E 稳定性修复**: 19 个 e2e 测试文件 waitForTimeout 硬等待替换为 Playwright 语义等待 (networkidle/domcontentloaded)

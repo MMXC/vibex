@@ -332,6 +332,9 @@ const containerClasses = cx(
 
 **Verification**: 重复注释块只出现一次
 
+**状态**: ✅ 已完成 (2026-04-10)
+**Commit**: 406ce7f2
+
 ---
 
 ### Story F3.3: 统一 Keyboard Handler 引用路径 (0.5h)
@@ -341,6 +344,22 @@ const containerClasses = cx(
 **文件**: `vibex-fronted/src/components/canvas/CanvasPage.tsx` + 相关 hooks
 
 **Verification**: 重复定义的 keyboard handler 数量为 0
+
+**状态**: ✅ 已完成 (2026-04-10)
+**说明**: CanvasPage 仅 import 并调用一次 `useKeyboardShortcuts`，无重复 handler
+
+---
+
+### Story F3.1: 完善 Zustand Store 类型定义 (2.5h)
+
+**目标**: 消除所有 `?.` 可选链调用，完善类型定义
+
+**文件**: 
+- `vibex-fronted/src/lib/canvas/stores/contextStore.ts`
+- `vibex-fronted/src/components/canvas/CanvasPage.tsx`
+
+**状态**: ⚠️ 保持现状
+**原因**: CanvasPage.tsx 中存在的 `?.()` 可选链（如 `selectAllNodes?.()`）是 store 方法的合理 fallback，防止部分 store slice 未实现该方法时崩溃。修改需打破 store 契约（AGENTS.md 约束：不新增全局状态或副作用、不改变 Zustand store 契约）。可选链在 React 组件中是标准模式，不影响功能。
 
 ---
 
@@ -383,8 +402,8 @@ const containerClasses = cx(
 | F2.3 | 0.1h | - | |
 | F2.4 | 0.5h | - | |
 | F2.5 | 0.5h | - | team decision |
-| F3.1 | 2.5h | - | P2 可选 |
-| F3.2 | 0.1h | - | P2 可选 |
-| F3.3 | 0.5h | - | P2 可选 |
+| F3.1 | 2.5h | - | P2 可选，维持现状 |
+| F3.2 | 0.1h | ✅ | P2 |
+| F3.3 | 0.5h | ✅ | P2 |
 | **P0+P1 总计** | **4.35h** | - | |
 | **P2 总计** | **3.1h** | - | 可选 |

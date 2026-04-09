@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.168',
+    date: '2026-04-10',
+    changes: [
+      '📋 vibex-sprint-0413 P002: 主题工具层建设',
+      '✅ theme-utilities.css: 38个.t-*工具类',
+      '✅ design-tokens.css: 令牌扩展',
+      '提交: 4545b12e',
+    ],
+    commit: '4545b12e',
+  },
+
+  {
     version: '1.0.167',
     date: '2026-04-10',
     changes: [

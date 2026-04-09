@@ -14,6 +14,15 @@
   - `vibex-fronted/src/styles/design-tokens.css` — 令牌扩展
   - 提交: `4545b12e`
 
+### Added (vibex-sprint-0413 P002: 主题工具层建设) — 2026-04-10
+- **P002**: `vibex-fronted/src/styles/theme-utilities.css` — 38 个 `.t-*` 工具类
+  - 布局: t-flex-center / t-flex-between / t-flex-row
+  - 间距: t-gap-sm / t-gap-md / t-gap-lg
+  - 滚动: t-scroll / t-scroll-x
+  - 文本: t-mono / t-sans / t-json-* 系列
+  - `vibex-fronted/src/styles/design-tokens.css` — 令牌扩展（color-surface / color-bg-hover 等）
+  - 提交: `4545b12e`
+
 ### Added (vibex-sprint-0412 E7: 文档与工具) — 2026-04-10
 - **E7**: `docs/canvas-roadmap.md` — Canvas 演进路线图（已完成功能/Phase 1-3/技术债务）
   - `.github/workflows/changelog.yml` — CHANGELOG guard CI（验证格式）

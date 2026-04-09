@@ -1,3 +1,10 @@
+### Added (vibex-sprint-0412 E5: 测试重构优化) — 2026-04-10
+- **E5**: waitForTimeout 重构 — E2E 测试稳定性优化
+  - `vibex-fronted/tests/e2e/stability.spec.ts` — F1 验收测试（waitForTimeout ≤ 50ms）
+  - 主要 E2E 测试文件: 0 waitForTimeout() 调用
+  - 剩余 15 处均在特殊测试中（mermaid 渲染、性能测试），属合理保留
+  - 提交: `ac62e7c0`, `433c0f8e`
+
 ### Added (vibex-sprint-0412 E4: 架构增强) — 2026-04-10
 - **E4.1**: TreeErrorBoundary — Canvas 三栏独立 ErrorBoundary + 重试按钮
   - `vibex-fronted/src/components/canvas/panels/TreeErrorBoundary.tsx`

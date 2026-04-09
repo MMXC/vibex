@@ -3,8 +3,47 @@ name: Test Gate
 on:
   push:
     branches: [main, develop]
+    paths:
+      # E3: CI/CD 守卫增强 — full test trigger on test config changes
+      # When these files change, run the full test suite
+      - 'vibex-fronted/playwright.config.ts'
+      - 'vibex-fronted/playwright.ci.config.ts'
+      - 'vibex-fronted/playwright.a11y.config.ts'
+      - 'vibex-fronted/playwright.sse.config.ts'
+      - 'vibex-fronted/e2e/playwright.config.ts'
+      - 'vibex-fronted/vitest.config.ts'
+      - 'vibex-fronted/tests/unit/vitest.config.ts'
+      - 'vibex-fronted/coverage.config.js'
+      - 'vibex-fronted/jest.config.ts'
+      - 'vibex-fronted/babel.config.js'
+      - '.github/workflows/test.yml'
+      # Default: trigger on all other source changes
+      - 'vibex-fronted/src/**'
+      - 'vibex-fronted/tests/**'
+      - 'vibex-backend/src/**'
+      - 'packages/**'
+      - '!**/*.md'
+      - '!**/*.stories.tsx'
+      - '!**/storybook-static/**'
   pull_request:
     branches: [main]
+    paths:
+      # E3: Run tests on config changes in PRs too
+      - 'vibex-fronted/playwright.config.ts'
+      - 'vibex-fronted/playwright.ci.config.ts'
+      - 'vibex-fronted/playwright.a11y.config.ts'
+      - 'vibex-fronted/playwright.sse.config.ts'
+      - 'vibex-fronted/e2e/playwright.config.ts'
+      - 'vibex-fronted/vitest.config.ts'
+      - 'vibex-fronted/tests/unit/vitest.config.ts'
+      - 'vibex-fronted/coverage.config.js'
+      - 'vibex-fronted/jest.config.ts'
+      - 'vibex-fronted/babel.config.js'
+      - '.github/workflows/test.yml'
+      - 'vibex-fronted/src/**'
+      - 'vibex-fronted/tests/**'
+      - 'vibex-backend/src/**'
+      - 'packages/**'
 
 jobs:
   lint:

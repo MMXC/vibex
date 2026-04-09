@@ -4,6 +4,15 @@
 
 ### Backend Core
 
+#### 2026-04-09
+
+- **Epic1 SSE 超时稳定性修复** (sse-backend-fix)
+  - `src/lib/sse-stream-lib/index.ts`: SSEStreamOptions.timeout 参数化，默认 30s，AbortController 级联取消，timers 统一清理
+  - `src/lib/sse-stream-lib/error-classifier.ts` (F3.1): 错误分类函数，AbortError→timeout / success=false→llm_error / 网络错误→network
+  - `src/lib/sse-stream-lib/index.ts`: 4 个 stage catch 块 + error event 均注入 errorType (F3.2)
+  - `src/lib/sse-stream-lib/index.test.ts`: 18 Jest tests 全部通过
+  - 提交: `9ff47ab2`
+
 #### 2026-04-07
 
 - **E-P0-4 P0-12/13 Test Fixes** (tester-e-p0-4)

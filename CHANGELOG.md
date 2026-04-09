@@ -1,3 +1,10 @@
+### Added (vibex-sprint-0412 E3: CI/CD Path Filters) — 2026-04-10
+- **E3**: GitHub Actions path filters for `.github/workflows/test.yml`
+  - Trigger full test suite on playwright/vitest/jest/babel/coverage config changes
+  - Include `src/**`, `tests/**`, `vibex-backend/src/**`, `packages/**` for source changes
+  - Exclude noise files (`*.md`, `*.stories.tsx`, `storybook-static/**`)
+  - 提交: `1e98c47c`
+
 ### Added (vibex-sprint-0412 E2: 提案状态追踪 SOP) — 2026-04-10
 - **E2**: 创建 `docs/proposals/PROPOSALS_STATUS_SOP.md`
   - 状态定义: proposed/in-progress/done/rejected/stale/blocked

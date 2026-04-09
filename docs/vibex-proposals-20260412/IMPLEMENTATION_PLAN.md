@@ -1,8 +1,9 @@
-# Implementation Plan: VibeX 2026-04-12 Sprint (Revised)
+# Implementation Plan: VibeX 2026-04-12 Sprint
 
 **Project**: vibex-proposals-20260412
 **Date**: 2026-04-07
-**Status**: Revised — TS Epic 拆分
+**Revised**: 2026-04-10 (补充 Sprint 1/2 详细实施单元)
+**Status**: Complete — Sprint 1/2 实施单元已补充
 
 ---
 
@@ -10,9 +11,10 @@
 
 | 属性 | 值 |
 |------|-----|
-| Sprint 0 修正 | TS 错误从 2h → 多 Epic 并行 |
-| Auth Mock | 保持 3h（范围清晰） |
-| 总工时 | 待 Dev 验证后确认 |
+| E0.1 TypeScript | ✅ DONE（206 错误归零） |
+| E0.2 Auth Mock | ✅ DONE — Auth Mock Factory 已创建 |
+| Sprint 1 工时 | 6.3h（E1/E2/E3/E4.1） |
+| Sprint 2 工时 | 11.5h（E4.2-4.5/E5/E6/E7） |
 
 ---
 
@@ -105,26 +107,252 @@ pnpm test
 
 **验收**: `pnpm test` → 79 passed, 0 failed
 
+**状态**: ✅ 已完成 (2026-04-10)
+**Commit**: b4cb4956
+
+**产出**: `tests/unit/__mocks__/auth/index.ts`
+- `createAuthStoreMock(options)` — Zustand authStore mock factory
+- `createAuthApiMock(options)` — auth API mock (login/register/logout/getCurrentUser)
+- `authStoreMock.presets` — 预构建 authenticated/unauthenticated/loading states
+- `setSessionAuthToken()` / `clearSessionAuth()` — sessionStorage helpers
+
+**替换目标**（逐步迁移）:
+- `Navbar.test.tsx` — authStore selector pattern
+- `Header.test.tsx` — authStore mockReturnValue pattern
+- `useHomeGeneration.test.ts` — authStore getState pattern
+- `auth/page.test.tsx` — authApi mock
+- `dashboard/page.test.tsx` — authApi mock
+- `accessibility.test.tsx` — authApi mock
+
 ---
 
-## Sprint 1 & Sprint 2
+## Sprint 1: 测试基础设施 + CI 守卫 (6.3h)
 
-等待 Sprint 0 完成后，根据剩余错误数量重新评估 Sprint 1/2 范围。
+### E1: Token 日志 safeError (1.5h)
+
+**文件**:
+- 创建: `vibex-backend/src/lib/logger/safeError.ts`
+- 修改: `vibex-backend/src/app/api/chat/route.ts`
+- 修改: `vibex-backend/src/app/api/pages/route.ts`
+
+**方法**:
+1. 创建 `safeError.ts`（正则脱敏，详见 architecture.md §11.4）
+2. 扫描所有 API 路由: `grep -rn 'console\.' vibex-backend/src/app/api/`
+3. 替换 `console.log({ token: x })` → `console.log(safeError({ token: x }))`
+
+**Patterns to follow**: pino logger 现有模式
+
+**Test scenarios**:
+- Happy path: safeError({ token: 'abc123' }) → '{token: 'ab***23'}'
+- Edge case: 嵌套对象 { nested: { token: 'xyz' } } → 递归脱敏
+- Edge case: null/undefined 值不 crash
+- Verification: `grep -rn 'console\.' vibex-backend/src/app/api/` → 0 未包装
 
 ---
 
-## 并行执行时间线
+### E2: 提案状态追踪 (0.5h)
 
+**文件**:
+- 修改: `docs/PROPOSALS_INDEX.md`
+- 创建: `docs/PROPOSALS_STATUS_SOP.md`
+
+**方法**:
+1. 扫描所有提案文档，添加 `status` 字段
+2. 编写 SOP（状态转换规则）
+
+**Patterns to follow**: 现有 INDEX.md 结构
+
+**Test scenarios**:
+- Verification: 所有提案有 `status` 字段
+- Verification: SOP 文档存在
+
+---
+
+### E3: CI/CD 守卫增强 (1h + 0.5h WEBSOCKET)
+
+**文件**:
+- 修改: `.github/workflows/ci.yml`
+- 创建: `vibex-backend/src/config/websocket.ts`
+
+**方法**:
+1. CI: 添加 `grepInvert` 守卫（playwright/vitest 配置变更时触发全量）
+2. WEBSOCKET: 提取 `WEBSOCKET_CONFIG` 单一配置源
+
+**Patterns to follow**: 现有 GitHub Actions workflow
+
+**Test scenarios**:
+- Happy path: playwright.config.ts 变更 → CI 触发全量测试
+- Verification: `WEBSOCKET_CONFIG` 为唯一配置源
+
+---
+
+### E4.1: Canvas ErrorBoundary (1h)
+
+**文件**:
+- 创建: `vibex-fronted/src/components/canvas/panels/PanelError.tsx`
+- 修改: `vibex-fronted/src/components/canvas/panels/ContextTreePanel.tsx`
+- 修改: `vibex-fronted/src/components/canvas/panels/FlowTreePanel.tsx`
+- 修改: `vibex-fronted/src/components/canvas/panels/ComponentTreePanel.tsx`
+
+**方法**:
+1. 创建通用 `PanelError` fallback 组件（含重试按钮）
+2. 每个 TreePanel 用 `<ErrorBoundary fallback={PanelError}>` 包裹
+
+**Patterns to follow**: React ErrorBoundary 规范
+
+**Test scenarios**:
+- Error path: 某 panel throw → 该 panel 显示 fallback，其他两栏正常
+- Integration: Playwright E2E — 每个 panel 独立恢复
+
+---
+
+## Sprint 2: 架构增强 + 测试重构 (11.5h)
+
+### E4.2: @vibex/types 落地 (2h)
+
+**文件**:
+- 创建: `packages/types/src/api/canvas.ts`
+- 创建: `packages/types/src/api/flows.ts`
+- 创建: `packages/types/src/api/components.ts`
+- 修改: `vibex-backend/src/app/api/v1/canvas/health/route.ts`
+- 修改: `vibex-fronted/src/lib/canvas/api/canvasApi.ts`
+
+**方法**:
+1. 从现有 backend types 提取 Zod schemas
+2. 发布到 `packages/types`
+3. backend/frontend 替换 import
+
+**Patterns to follow**: 现有 `packages/types/src/core/auth.ts`
+
+**Test scenarios**:
+- Happy path: backend API 返回类型 = @vibex/types 定义
+- Edge: 类型升级不 break build（先改无引用处）
+
+---
+
+### E4.3: v0→v1 迁移 (2h)
+
+**文件**:
+- 创建: `vibex-backend/src/middleware/deprecation.ts`
+- 修改: `vibex-backend/src/app/api/v0/*/route.ts`
+
+**方法**:
+```typescript
+// middleware/deprecation.ts
+c.res.headers.set('Deprecation', 'true');
+c.res.headers.set('Sunset', 'Sat, 31 Dec 2026 23:59:59 GMT');
 ```
-Week 1 (并行):
-  TS-E1 (Zod v4) ─┐
-  Auth Mock       ─┴─→ 完成解锁 TS-E3
-Week 2:
-  TS-E3 (as any) + TS-E2 (Cloudflare)
-Week 3:
-  TS-E4 (missing modules)
-  Sprint 1 开始 (Token日志 / CI守卫 / ErrorBoundary)
+
+**Patterns to follow**: Hono middleware 规范
+
+**Test scenarios**:
+- Verification: v0 路由响应头包含 `Deprecation: true`
+- Verification: v1 路由无此 header
+
+---
+
+### E4.4: frontend types 对齐 (3h)
+
+**文件**:
+- 修改: `vibex-fronted/src/lib/canvas/types.ts`
+- 删除: 重复类型定义（散落在 components 中的）
+
+**方法**:
+```typescript
+// types.ts: 不再定义 CanvasHealthResponse，直接 re-export
+import { CanvasHealthResponse } from '@vibex/types';
+export type { CanvasHealthResponse };
 ```
+
+**Patterns to follow**: 现有 `@vibex/types` 引用模式
+
+**Test scenarios**:
+- Verification: `grep -rn 'interface.*CanvasHealth' vibex-fronted/src/` → 0 结果
+- Verification: `pnpm tsc --noEmit` → 0 error
+
+---
+
+### E4.5: groupByFlowId 记忆化优化 (1.5h)
+
+**文件**:
+- 修改: `vibex-fronted/src/components/canvas/ComponentTree.tsx`
+
+**方法**:
+```typescript
+// Before: O(n×3) find
+const flowNode = flowNodes.find(f => f.nodeId === ctx.nodeId);
+
+// After: O(1) Map lookup
+const flowNodeIndex = useMemo(() =>
+  Object.groupBy(flowNodes, f => f.nodeId),
+[flowNodes]);
+const flowNode = flowNodeIndex[ctx.nodeId]?.[0];
+```
+
+**Patterns to follow**: `useMemo` 性能优化规范
+
+**Test scenarios**:
+- Performance: 1000 节点渲染 < 16ms（< 1 frame）
+- Verification: Vitest perf test
+
+---
+
+### E5: waitForTimeout 重构 (4h + 2h E2E + 1h UT)
+
+**文件**:
+- 修改: `vibex-fronted/tests/e2e/*.spec.ts`
+- 创建: `vibex-fronted/tests/unit/components/canvas/JsonTreeModal.test.tsx`
+
+**替换规则**:
+```typescript
+// ❌ 替换前
+await page.waitForTimeout(1000);
+
+// ✅ 替换后（不稳定等待 → 确定性等待）
+await expect(page.getByTestId('element')).toBeVisible({ timeout: 5000 });
+// 或
+await page.waitForResponse(res => res.url().includes('/api/'));
+```
+
+**Patterns to follow**: Playwright 最佳实践
+
+**Test scenarios**:
+- Happy path: 重构后 E2E 测试全部通过
+- Edge: 87 处 → ≤ 10 处
+- Verification: `grep -rn 'waitForTimeout' tests/e2e/` → ≤ 10
+
+---
+
+### E6: console.* pre-commit hook (1h)
+
+**文件**:
+- 创建: `.husky/pre-commit`
+- 修改: `package.json` (lint-staged 配置)
+- 修改: `eslint.config.js` (@typescript-eslint/no-console)
+
+**方法**:
+```bash
+# .husky/pre-commit
+npx lint-staged
+```
+
+**Patterns to follow**: 现有 Husky + lint-staged 配置
+
+**Test scenarios**:
+- Happy path: `git commit -m 'test'` → console.log 被 ESLint 拦截
+- Verification: husky hook 生效
+
+---
+
+### E7: 文档与工具 (1.5h)
+
+**文件**:
+- 创建: `docs/canvas-roadmap.md`
+- 创建: `.github/workflows/changelog.yml`
+
+**Test scenarios**:
+- Verification: canvas-roadmap.md 存在且包含演进路线
+- Verification: commit 时 CHANGELOG 自动更新
 
 ---
 

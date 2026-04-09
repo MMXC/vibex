@@ -21,6 +21,23 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.156',
+    date: '2026-04-10',
+    changes: [
+      '📋 canvas-code-audit Epic1: P0 Critical Bug Fixes',
+      '✅ F1.1: onGenerateContext 连接真实 API（删除 mock 数据）',
+      '✅ F1.2: renderContextTreeToolbar 辅助函数抽取',
+      '✅ F1.3: handleRegenerateContexts useCallback 抽取',
+      '✅ F2.1: API 错误添加 toast 提示',
+      '✅ F2.2: 删除 REMOVED 注释块',
+      '✅ F2.3: 删除未使用 import',
+      '✅ F2.4: 抽取 cx() 工具函数',
+      '提交: 774a08cb, a56ed085, 43a4522c, fab64ec8, 6c327c52, 42c6f0c7',
+    ],
+    commit: '774a08cb',
+  },
+
+  {
     version: '1.0.155',
     date: '2026-04-09',
     changes: [

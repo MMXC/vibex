@@ -1,0 +1,214 @@
+/**
+ * VibeX Theme Utilities
+ * P002: 统一主题层建设
+ * 复用 design-tokens.css 中定义的 CSS 变量
+ */
+
+/* === Flex Layout === */
+.t-flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.t-flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.t-flex-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* === Spacing === */
+.t-gap-sm { gap: 4px; }
+.t-gap-md { gap: 8px; }
+.t-gap-lg { gap: 12px; }
+
+/* === Scroll === */
+.t-scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.t-scroll-x {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* === Row Pattern === */
+.t-row {
+  display: flex;
+  align-items: center;
+  height: 28px;
+  line-height: 28px;
+  cursor: pointer;
+  transition: background var(--transition-fast, 0.1s);
+  white-space: nowrap;
+  gap: 4px;
+}
+
+.t-row:hover {
+  background: var(--color-bg-hover);
+}
+
+/* === Typography === */
+.t-mono {
+  font-family: var(--font-mono, 'JetBrains Mono', 'Fira Code', monospace);
+  font-size: 12px;
+}
+
+.t-text-sm {
+  font-size: 11px;
+}
+
+.t-text-xs {
+  font-size: 10px;
+}
+
+.t-muted {
+  color: var(--color-text-secondary);
+}
+
+.t-muted-strong {
+  color: var(--color-text-muted);
+}
+
+.t-primary {
+  color: var(--color-primary);
+}
+
+.t-weight-500 {
+  font-weight: 500;
+}
+
+/* === Buttons === */
+.t-btn {
+  padding: 4px 8px;
+  font-size: 11px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: background var(--transition-fast, 0.15s);
+}
+
+.t-btn:hover {
+  background: var(--color-bg-hover);
+}
+
+.t-btn-ghost {
+  padding: 0;
+  font-size: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color var(--transition-fast, 0.15s);
+  opacity: 0;
+  flex-shrink: 0;
+}
+
+.t-row:hover .t-btn-ghost {
+  opacity: 1;
+}
+
+.t-btn-icon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+/* === Inputs === */
+.t-input {
+  padding: 4px 8px;
+  font-size: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  outline: none;
+  transition: border-color var(--transition-fast, 0.15s);
+}
+
+.t-input:focus {
+  border-color: var(--color-primary);
+}
+
+/* === Surfaces === */
+.t-surface {
+  background: var(--color-surface);
+}
+
+.t-surface-elevated {
+  background: var(--color-bg-primary);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* === Empty State === */
+.t-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  background: var(--color-surface);
+}
+
+.t-empty-text {
+  text-align: center;
+  padding: 32px;
+  font-family: var(--font-sans);
+}
+
+/* === JSON Value Colors (type-based) === */
+.t-json-string { color: var(--color-success); }
+.t-json-number { color: var(--color-info); }
+.t-json-boolean { color: var(--color-highlight); }
+.t-json-null { color: var(--color-text-muted); font-style: italic; }
+.t-json-bracket { color: var(--color-text-secondary); }
+
+/* === Overlay === */
+.t-overlay-dark {
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+/* === Highlight === */
+.t-highlight {
+  background: var(--color-warning-bg);
+  color: var(--color-text);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+/* === State Colors === */
+.t-selected {
+  background: var(--color-primary-bg) !important;
+}
+
+.t-match {
+  background: var(--color-warning-bg);
+}
+
+/* === Animation === */
+.t-fade-in {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-50%); }
+  to { opacity: 1; transform: translateY(-50%); }
+}

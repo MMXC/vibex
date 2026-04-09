@@ -36,10 +36,6 @@ import { getApiUrl, API_CONFIG } from '@/lib/api-config';
 
 // =============================================================================
 // E7-T3: Zod Response Schemas (replace manual type guards)
-// =============================================================================
-
-// =============================================================================
-// E7-T3: Zod Response Schemas (replace manual type guards)
 // These schemas validate the actual API response shape (aligned with types.ts).
 // The domain schemas in @/lib/schemas/canvas define the canonical model.
 // =============================================================================

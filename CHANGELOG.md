@@ -1,3 +1,12 @@
+### Added (vibex-sprint-0412 E0: Auth Mock Factory) — 2026-04-10
+- **E0.2**: 创建集中式 Auth Mock Factory（`tests/unit/__mocks__/auth/index.ts`）
+  - `createAuthStoreMock()` — Zustand authStore mock，支持 selector/getState
+  - `createAuthApiMock()` — auth API mock（login/register/logout/getCurrentUser）
+  - `authStoreMock.presets` — 预构建 authenticated/unauthenticated/loading 状态
+  - `setSessionAuthToken()` / `clearSessionAuth()` — sessionStorage 辅助函数
+  - 逐步替换 Navbar/Header/auth/page 等散落 auth mock
+  - 提交: `b4cb4956`
+
 ### Added (canvas-code-audit Epic3: P2 Polish) — 2026-04-10
 - **F3.2**: 删除 canvasApi.ts 中重复的 `// E7-T3: Zod Response Schemas` 注释块
 - **F3.3**: Keyboard handler 统一确认 — useKeyboardShortcuts 仅导入和调用一次，无重复

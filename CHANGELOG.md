@@ -1,3 +1,8 @@
+### Added (canvas-code-audit Epic3: P2 Polish) — 2026-04-10
+- **F3.2**: 删除 canvasApi.ts 中重复的 `// E7-T3: Zod Response Schemas` 注释块
+- **F3.3**: Keyboard handler 统一确认 — useKeyboardShortcuts 仅导入和调用一次，无重复
+- 提交: `406ce7f2`, `a0d581ea`
+
 ### Added (canvas-code-audit Epic2: P1 Quality Improvements) — 2026-04-10
 - **F2.5**: FlowEdgeLayer 一致性确认 — BusinessFlowTree 保留 FlowEdgeLayer，CanvasPage 不渲染 edge layers
 - 提交: `2e076c32`, `e4c22516`

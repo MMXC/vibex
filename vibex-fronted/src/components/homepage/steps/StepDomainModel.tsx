@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import { useConfirmationStore } from '@/stores/confirmationStore';
 import { useDomainModelStream } from '@/hooks/useDDDStream';
-import { PreviewArea } from '../PreviewArea/PreviewArea';
+import { MermaidPreview } from '@/components/ui/MermaidPreview';
 import { ThinkingPanel } from '../ThinkingPanel/ThinkingPanel';
 import type { StepComponentProps } from './types';
 
@@ -77,10 +77,19 @@ export function StepDomainModel({ onNavigate, isActive }: StepComponentProps) {
     <div className="step-domain-model">
       {/* Preview Section - Domain Model Diagram */}
       <div className="preview-section">
-        <PreviewArea
-          content={displayMermaid}
-          isLoading={status === 'thinking'}
-        />
+        {status === 'thinking' ? (
+          <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.6)', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ width: '24px', height: '24px', border: '2px solid rgba(255,255,255,0.2)', borderTopColor: '#00d4ff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+            <span>AI 正在生成领域模型...</span>
+            <style jsx>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+          </div>
+        ) : displayMermaid ? (
+          <MermaidPreview code={displayMermaid} diagramType="classDiagram" height="100%" />
+        ) : (
+          <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.4)' }}>
+            生成领域模型后，类图将显示在这里
+          </div>
+        )}
       </div>
 
       {/* Thinking Section */}

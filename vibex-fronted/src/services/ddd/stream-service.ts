@@ -192,8 +192,8 @@ export async function streamDomainModels(
   signal: AbortSignal
 ): Promise<{ domainModels: DomainModel[]; mermaidCode: string }> {
   const fullURL = getApiUrl('/ddd/domain-model/stream');
-  // ST-2.2: SSE timeout — 60s per request
-  const combinedSignal = AbortSignal.any([signal, AbortSignal.timeout(60000)]);
+  // E3.2: SSE timeout — 30s per request
+  const combinedSignal = AbortSignal.any([signal, AbortSignal.timeout(30000)]);
   
   const response = await fetch(fullURL, {
     method: 'POST',

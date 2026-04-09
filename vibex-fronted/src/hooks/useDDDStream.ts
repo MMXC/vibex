@@ -194,7 +194,7 @@ export interface UseDomainModelStreamReturn {
 export function useDomainModelStream(): UseDomainModelStreamReturn {
   const queryClient = useQueryClient();
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const TIMEOUT_DURATION = 60000;
+  const TIMEOUT_DURATION = 30000;
   
   const [thinkingMessages, setThinkingMessages] = useState<ThinkingStep[]>([]);
   const [domainModels, setDomainModels] = useState<DomainModel[]>([]);
@@ -223,7 +223,7 @@ export function useDomainModelStream(): UseDomainModelStreamReturn {
       
       // Set timeout
       timeoutRef.current = setTimeout(() => {
-        setErrorMessage('请求超时，请稍后重试 (60s)');
+        setErrorMessage('请求超时，请稍后重试 (30s)');
       }, TIMEOUT_DURATION);
       
       abortControllerRef.current = new AbortController();

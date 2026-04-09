@@ -56,6 +56,8 @@ const eslintConfig = defineConfig([
         },
       ],
       "@typescript-eslint/no-explicit-any": "error",
+      // E6: block console.log/warn/error in non-test files
+      "no-console": ["error", { allow: ["warn", "error"] }],
       "@typescript-eslint/no-unused-vars": [
         "warn",
         {

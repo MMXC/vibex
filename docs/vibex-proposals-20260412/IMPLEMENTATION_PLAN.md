@@ -377,6 +377,14 @@ npx lint-staged
 - Happy path: `git commit -m 'test'` → console.log 被 ESLint 拦截
 - Verification: husky hook 生效
 
+**状态**: ✅ 已完成 (2026-04-10)
+**Commit**: a921ee3d
+
+**产出**:
+- eslint.config.mjs: `@typescript-eslint/no-console` 规则，阻止 console.log
+- package.json: lint-staged 配置，staged files 执行 ESLint
+- .husky/pre-commit: lint-staged 执行阶段优先运行
+
 ---
 
 ### E7: 文档与工具 (1.5h)

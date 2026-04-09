@@ -120,6 +120,7 @@
 **Dev**: dev
 **Estimated**: 2h
 **Dependency**: E1 (store 接口已验证)
+**Status**: ✅ Done
 **Verification Command**: `pnpm test:e2e --grep "template-selector"`
 
 **Implementation**:
@@ -152,6 +153,7 @@
 **Dev**: dev
 **Estimated**: 2h
 **Dependency**: E1 (contextStore.phase 已存在)
+**Status**: ✅ Done
 **Verification Command**: `pnpm test:e2e --grep "phase-indicator"`
 
 **Implementation**:

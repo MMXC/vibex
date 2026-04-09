@@ -297,6 +297,10 @@ const containerClasses = cx(
 
 **Verification**: decision 已记录在 PR review 备注中
 
+**状态**: ✅ 已完成 (2026-04-10)
+**Commit**: 2e076c32
+**Decision**: FlowEdgeLayer 保留在 BusinessFlowTree；CanvasPage 注释已更新
+
 ---
 
 ## Phase 3: P2 Polish (2.7h, 可选)

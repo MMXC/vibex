@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.159',
+    date: '2026-04-10',
+    changes: [
+      '📋 vibex-sprint-0412 E0.2: Auth Mock Factory',
+      '✅ createAuthStoreMock() / createAuthApiMock() — 集中式 auth mock 工厂',
+      '✅ authStoreMock.presets — 预构建状态',
+      '✅ setSessionAuthToken() / clearSessionAuth() — sessionStorage 辅助',
+      '提交: b4cb4956',
+    ],
+    commit: 'b4cb4956',
+  },
+
+  {
     version: '1.0.158',
     date: '2026-04-10',
     changes: [

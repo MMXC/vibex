@@ -230,6 +230,43 @@ fi
 echo ""
 
 #------------------------------------------------------------------------------
+# 7. Test Config Change Detection (grepInvert guard — E3)
+#------------------------------------------------------------------------------
+
+echo "=============================================="
+echo "7. Test Config Change Detection (E3)"
+echo "=============================================="
+
+cd "$PROJECT_ROOT/vibex-fronted"
+
+TEST_CONFIG_FILES=(
+  "playwright.config.ts"
+  "vitest.config.ts"
+  "jest.config.js"
+  "jest.setup.ts"
+)
+
+CONFIG_CHANGED=""
+for file in "${TEST_CONFIG_FILES[@]}"; do
+  if [ -f "$file" ] && git diff --quiet "$file" 2>/dev/null; then
+    : # No changes
+  elif [ -f "$file" ]; then
+    CONFIG_CHANGED="$CONFIG_CHANGED $file"
+  fi
+done
+
+if [ -n "$CONFIG_CHANGED" ]; then
+  echo -e "${YELLOW}⚠ WARN${NC}: Test config files modified:$CONFIG_CHANGED"
+  echo "  CI should run FULL test suite (not incremental)."
+  echo "  E2E + unit tests both required for test infrastructure changes."
+  check_warning "Test config changed — CI should trigger full test suite"
+else
+  echo -e "  ${GREEN}✓${NC} No test config changes detected."
+fi
+
+echo ""
+
+#------------------------------------------------------------------------------
 # Summary
 #------------------------------------------------------------------------------
 

@@ -181,7 +181,7 @@ pnpm test
 ### E3: CI/CD 守卫增强 (1h + 0.5h WEBSOCKET)
 
 **文件**:
-- 修改: `.github/workflows/ci.yml`
+- 修改: `vibex-fronted/scripts/pre-submit-check.sh`
 - 创建: `vibex-backend/src/config/websocket.ts`
 
 **方法**:
@@ -193,6 +193,13 @@ pnpm test
 **Test scenarios**:
 - Happy path: playwright.config.ts 变更 → CI 触发全量测试
 - Verification: `WEBSOCKET_CONFIG` 为唯一配置源
+
+**状态**: ✅ 已完成 (2026-04-10)
+**Commit**: d50d97a5
+
+**产出**:
+- `vibex-fronted/scripts/pre-submit-check.sh` Section 7: grepInvert guard 检测 test config 变更
+- `vibex-backend/src/config/websocket.ts`: WEBSOCKET_CONFIG 单一配置源
 
 ---
 

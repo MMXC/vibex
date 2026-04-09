@@ -1,3 +1,9 @@
+### Added (vibex-fifth E2: 孤立组件集成) — 2026-04-09
+- **E2: 孤立组件集成**:
+  - **E2.1**: TemplateSelector 集成 CanvasPage（📋 模板按钮 + Modal dialog）
+  - **E2.2**: PhaseIndicator 集成 CanvasPage（TabBar Phase 导航切换）
+  - 提交: `88abb85b`
+
 ### Added (vibex-fifth E1: 未验收功能验收) — 2026-04-09
 - **E1: 未验收功能 E2E 测试**:
   - **E1.1**: VersionHistoryPanel E2E（Ctrl+H / Canvas不阻塞 / iPhone12布局）

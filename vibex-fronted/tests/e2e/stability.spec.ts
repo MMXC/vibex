@@ -11,17 +11,21 @@ import { test, expect } from '@playwright/test';
 import { readFileSync, existsSync, readdirSync } from 'fs';
 import { resolve, relative, join } from 'path';
 
-const VIBEX_FRONTED_DIR = resolve(__dirname, '..');
+// __dirname = tests/e2e, need to go up two levels to vibex-fronted/
+const VIBEX_FRONTED_DIR = resolve(__dirname, '../..');
 
-/** Recursively find all .spec.ts files in a directory */
-function findSpecFiles(dir: string): string[] {
+/** Recursively find all E2E test files in a directory */
+function findTestFiles(dir: string): string[] {
   const results: string[] = [];
   const entries = readdirSync(dir, { withFileTypes: true });
   for (const entry of entries) {
     const fullPath = join(dir, entry.name);
     if (entry.isDirectory()) {
-      results.push(...findSpecFiles(fullPath));
-    } else if (entry.isFile() && entry.name.endsWith('.spec.ts')) {
+      results.push(...findTestFiles(fullPath));
+    } else if (
+      entry.isFile() &&
+      (entry.name.endsWith('.spec.ts') || entry.name.endsWith('.test.ts'))
+    ) {
       results.push(fullPath);
     }
   }
@@ -32,7 +36,7 @@ test.describe('E2E Stability — F1 Acceptance Tests', () => {
   test('F1.1: no waitForTimeout > 50ms in e2e tests', () => {
     const failures: string[] = [];
     const e2eDir = resolve(VIBEX_FRONTED_DIR, 'tests/e2e');
-    const testFiles = findSpecFiles(e2eDir);
+    const testFiles = findTestFiles(e2eDir);
 
     for (const file of testFiles) {
       const content = readFileSync(file, 'utf-8');

@@ -12,12 +12,11 @@ type Story = StoryObj<typeof CanvasToolbar>;
 
 export const Default: Story = {
   args: {
-    canvasId: 'canvas-1',
     onUndo: () => {},
     onRedo: () => {},
   },
 };
 
 export const Empty: Story = {
-  args: { canvasId: 'canvas-empty', onUndo: () => {}, onRedo: () => {} },
+  args: { onUndo: () => {}, onRedo: () => {} },
 };

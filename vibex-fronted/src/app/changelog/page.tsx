@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.170',
+    date: '2026-04-10',
+    changes: [
+      '📋 vibex-dev-proposals P0-1: 5个v0废弃API路由添加认证',
+      '✅ /api/agents、/api/templates、/api/users、/api/domains、/api/prototypes',
+      '✅ getAuthUserFromRequest 统一认证，未认证返回401',
+      '提交: c722623e',
+    ],
+    commit: 'c722623e',
+  },
+
+  {
     version: '1.0.169',
     date: '2026-04-10',
     changes: [
@@ -730,7 +742,7 @@ const mockChangelog: ChangelogEntry[] = [
       '🔧 vibex-e2e-test-fix/E1: Playwright 隔离',
       '✅ 独立 playwright.config.ts，BASE_URL 环境变量，CI grepInvert @ci-blocking',
       '✅ test.skip + fixme 注释 (auto-save/onboarding/register)',
-      '✅ @ci-blocking: 前缀 (vue-components/conflict-resolution/undo-redo)',
+      '✅  前缀 (vue-components/conflict-resolution/undo-redo)',
       '✅ 提交 87d3542f',
     ],
     commit: '87d3542f',

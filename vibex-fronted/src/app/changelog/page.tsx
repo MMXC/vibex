@@ -79,6 +79,18 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.188',
+    date: '2026-04-11',
+    changes: [
+      '📋 vibex-reviewer-proposals E1: PR 合入标准 + prototype Renderer 重构',
+      '✅ Epic2 PR 合入标准文档',
+      '✅ Epic3 prototype renderer 重构：600行→5模块',
+      '提交: ac6a0db2, 9a924074',
+    ],
+    commit: 'ac6a0db2',
+  },
+
+  {
     version: '1.0.182',
     date: '2026-04-11',
     changes: [

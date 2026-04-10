@@ -132,8 +132,13 @@ def similarity_score(proj_a: dict, proj_b: dict) -> float:
         Jaccard 相似度 [0.0, 1.0]
     
     Algorithm:
-        keywords_a = extract_keywords(proj_a['name'] + ' ' + proj_a['goal'])
-        keywords_b = extract_keywords(proj_b['name'] + ' ' + proj_b['goal'])
+        # Support both old (name/goal) and new (project_name/description) field names
+        name_a = proj_a.get('project_name', proj_a.get('name', ''))
+        name_b = proj_b.get('project_name', proj_b.get('name', ''))
+        goal_a = proj_a.get('description', proj_a.get('goal', ''))
+        goal_b = proj_b.get('description', proj_b.get('goal', ''))
+        keywords_a = extract_keywords(name_a + ' ' + goal_a)
+        keywords_b = extract_keywords(name_b + ' ' + goal_b)
         return len(keywords_a ∩ keywords_b) / len(keywords_a ∪ keywords_b)
     
     Edge cases:

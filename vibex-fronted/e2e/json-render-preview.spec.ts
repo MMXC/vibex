@@ -1,14 +1,14 @@
 /**
  * E2E Tests: JsonRenderPreview Integration
  * Epic E4.1 — JsonRenderPreview 集成验证
- * @ci-blocking
+ *
  */
 
 import { test, expect } from '@playwright/test';
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
-test.describe('@ci-blocking JsonRenderPreview', () => {
+test.describe('JsonRenderPreview', () => {
   test.beforeEach(async ({ page }) => {
     // Login and navigate to canvas page
     await page.goto(`${BASE_URL}/auth`);

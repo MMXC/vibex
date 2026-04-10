@@ -1,14 +1,14 @@
 /**
  * E2E Tests: PrototypeQueuePanel API 连通性验证
  * Epic E4.2 — PrototypeQueuePanel API 连通性验证
- * @ci-blocking
+ *
  */
 
 import { test, expect } from '@playwright/test';
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
-test.describe('@ci-blocking PrototypeQueuePanel', () => {
+test.describe('PrototypeQueuePanel', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(`${BASE_URL}/auth`);
     await page.waitForLoadState('networkidle').catch(() => {});

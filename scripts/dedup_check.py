@@ -77,7 +77,7 @@ def notify_dedup_alert(level: str, project_name: str, project_goal: str,
 
 def call_dedup_api(name: str, goal: str) -> dict:
     """Call the dedup REST API."""
-    payload = json.dumps({"name": name, "goal": goal}).encode("utf-8")
+    payload = json.dumps({"project_name": name, "description": goal, "name": name, "goal": goal}).encode("utf-8")
     req = urllib.request.Request(
         f"{DEDUP_API_URL}/dedup",
         data=payload,
@@ -146,10 +146,17 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="提案查重 CLI")
-    parser.add_argument("name", help="项目名称")
-    parser.add_argument("goal", help="项目目标")
+    # Support both old (name/goal positional) and new (--project-name/--description) args
+    parser.add_argument("name", nargs="?", help="项目名称 (旧参数，支持 --project-name)")
+    parser.add_argument("goal", nargs="?", help="项目目标 (旧参数，支持 --description)")
+    parser.add_argument("--project-name", dest="project_name", help="项目名称 (新参数)")
+    parser.add_argument("--description", dest="description", help="项目目标 (新参数)")
     parser.add_argument("--force", action="store_true", help="强制创建（跳过 warn 确认）")
     args = parser.parse_args()
-
-    code = check_and_exit(args.name, args.goal, force=args.force)
+    resolved_name = args.project_name or args.name or ""
+    resolved_goal = args.description or args.goal or ""
+    code = check_and_exit(resolved_name, resolved_goal, force=args.force)
+    resolved_name = args.project_name or args.name or ""
+    resolved_goal = args.description or args.goal or ""
+    code = check_and_exit(resolved_name, resolved_goal, force=args.force)
     sys.exit(code)

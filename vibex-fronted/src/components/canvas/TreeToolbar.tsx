@@ -7,6 +7,7 @@
 'use client';
 
 import React from 'react';
+import { useConfirmDialogStore } from '@/lib/canvas/stores/confirmDialogStore';
 import type { TreeType } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
 
@@ -92,9 +93,15 @@ export function TreeToolbar({
             type="button"
             className={styles.toolbarButton}
             onClick={() => {
-              if (window.confirm('确定要删除选中的节点吗？此操作不可撤销。')) {
-                onDelete();
-              }
+              useConfirmDialogStore.getState().open({
+                title: '确认删除',
+                message: '确定要删除选中的节点吗？此操作不可撤销。',
+                destructive: true,
+                confirmLabel: '确认删除',
+                onConfirm: () => {
+                  onDelete();
+                },
+              });
             }}
             disabled={deleteDisabled}
             title={deleteDisabled ? '请先选择节点' : '删除选中'}

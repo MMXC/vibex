@@ -15,6 +15,7 @@
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 import React, { useState, useCallback, useRef, useMemo } from 'react';
+import { useConfirmDialogStore } from '@/lib/canvas/stores/confirmDialogStore';
 import {
   DndContext,
   type DragEndEvent,
@@ -748,9 +749,15 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
 
 
   const handleClearCanvas = useCallback(() => {
-    if (window.confirm('确定清空画布？所有组件将被删除。')) {
-      comp.clearComponentCanvas();
-    }
+    useConfirmDialogStore.getState().open({
+      title: '确认清空画布',
+      message: '确定清空画布？所有组件将被删除。此操作不可撤销。',
+      destructive: true,
+      confirmLabel: '确认清空',
+      onConfirm: () => {
+        comp.clearComponentCanvas();
+      },
+    });
   }, []);
 
   const allConfirmed = componentNodes.length > 0 && componentNodes.every((n) => n.isActive !== false);

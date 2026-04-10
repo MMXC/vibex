@@ -17,6 +17,7 @@ import { getHistoryStore } from '../historySlice';
 import { postContextActionMessage } from './messageBridge';
 
 import { generateId } from '../id';
+import { useFlowStore } from './flowStore';
 
 interface SelectedNodeIds {
   context: string[];
@@ -173,9 +174,10 @@ export const useContextStore = create<ContextStore>()(
               postContextActionMessage(`删除了上下文节点`, node?.name ?? id);
             });
           }
-          // E2: flow branch — clear flow selection (actual deletion handled by flowStore)
+          // E1: flow branch — delegate to flowStore for actual deletion (includes recordSnapshot)
           if (tree === 'flow' && selectedNodeIds.flow.length > 0) {
-            set({ selectedNodeIds: { ...selectedNodeIds, flow: [] } });
+            useFlowStore.getState().deleteSelectedNodes();
+            return;
           }
         },
         // Existing fields

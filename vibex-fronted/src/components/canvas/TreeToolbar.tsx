@@ -61,19 +61,19 @@ export function TreeToolbar({
           type="button"
           className={styles.toolbarButton}
           onClick={onDeselectAll}
-          title="取消全选"
-          aria-label="取消全选"
+          title="取消选择"
+          aria-label="取消选择"
         >
-          ○ 取消
+          ○ 取消选择
         </button>
         <button
           type="button"
           className={styles.toolbarButton}
           onClick={onClear}
-          title="清空"
-          aria-label="清空所有节点"
+          title="清空画布"
+          aria-label="清空画布"
         >
-          ✕ 清空
+          ✕ 清空画布
         </button>
         {onContinue && (
           <button

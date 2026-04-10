@@ -15,9 +15,9 @@
   - 替换 canvas stores 中的 window.confirm
   - 提交: 69df71cc
 
-### Added (vibex-canvas-button-audit E1+E2: Sprint 1) — 2026-04-10
-- **E1**: Flow undo 修复 — contextStore 批量删除改为调用 flowStore.deleteSelectedNodes（含 recordSnapshot）
-- **E2**: TreeToolbar 语义统一 — 基于 treeType 分支处理 delete（flow/component/page）
+### Added (vibex-canvas-button-audit E1+E2: Sprint 1) — 2026-04-11
+- **E1**: Flow undo 修复 — contextStore.deleteSelectedNodes('flow') 调用 flowStore.deleteSelectedNodes()（含 recordSnapshot）
+- **E2**: TreeToolbar 语义统一 — "○ 取消选择" / "✕ 清空画布" / "↺ 清空流程" 三级语义分层
   - 提交: a2707a2e, 2ba20d35, e425fc0e
 
 ### Added (vibex-analyst-proposals E2: 执行闭环追踪强化) — 2026-04-10

@@ -14,19 +14,19 @@ LOCK_FILE = '/tmp/update-tracking.lock'
 
 VALID_STATUSES = ['pending', 'in-progress', 'done', 'rejected']
 
-def read_index():
-    if not Path(INDEX).exists():
-        print(f"ERROR: INDEX.md not found at {INDEX}", file=sys.stderr)
+def read_index(index_path):
+    if not Path(index_path).exists():
+        print(f"ERROR: INDEX.md not found at {index_path}", file=sys.stderr)
         sys.exit(1)
-    with open(INDEX, 'r', encoding='utf-8') as f:
+    with open(index_path, 'r', encoding='utf-8') as f:
         return f.read()
 
-def update_status(proposal_id, new_status, dry_run=False):
+def update_status(proposal_id, new_status, dry_run=False, index_path=None):
     if new_status not in VALID_STATUSES:
         print(f"ERROR: Invalid status '{new_status}'. Valid: {VALID_STATUSES}", file=sys.stderr)
         sys.exit(2)
-    
-    content = read_index()
+    index_path = index_path or INDEX
+    content = read_index(index_path)
     original = content
     
     # Find and update the row for this proposal ID
@@ -59,7 +59,7 @@ def update_status(proposal_id, new_status, dry_run=False):
     lock_fd = open(LOCK_FILE, 'w')
     try:
         fcntl.flock(lock_fd, fcntl.LOCK_EX)
-        with open(INDEX, 'w', encoding='utf-8') as f:
+        with open(index_path, 'w', encoding='utf-8') as f:
             f.write(content)
         fcntl.flock(lock_fd, fcntl.LOCK_UN)
     finally:
@@ -72,11 +72,11 @@ def main():
     parser.add_argument('proposal_id', help='Proposal ID (e.g., A-P0-1)')
     parser.add_argument('status', choices=VALID_STATUSES, help='New status')
     parser.add_argument('--dry-run', action='store_true', help='Preview change without writing')
-    parser.add_argument('--index', default=INDEX, help='INDEX.md path')
+    parser.add_argument('--index', default=None, help='INDEX.md path')
     args = parser.parse_args()
-    
-    INDEX = args.index
-    update_status(args.proposal_id, args.status, args.dry_run)
+
+    index_path = args.index if args.index else INDEX
+    update_status(args.proposal_id, args.status, args.dry_run, index_path)
 
 if __name__ == '__main__':
     main()

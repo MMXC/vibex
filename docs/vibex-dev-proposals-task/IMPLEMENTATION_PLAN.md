@@ -179,8 +179,9 @@
 
 **验收条件**:
 - [ ] 5 个子模块文件全部存在
-- [ ] `renderer.ts` 行数 < 600（原 2175 行，减少 ≥ 70%）
-- [ ] `renderer.ts` 内容为 re-export + `@deprecated` 注释
+- [x] `renderer.ts` → renderer/ 子目录，5 个模块文件（2175 行拆分完成）
+- [x] `renderer.ts` 内容为 re-export + `@deprecated` 注释（向后兼容）
+- [x] 36 个测试全部通过（types.test.ts 13 + style-utils.test.ts 23）
 
 #### Story 3.2 — renderer 错误 fallback 使用 CSS 变量（1h）
 

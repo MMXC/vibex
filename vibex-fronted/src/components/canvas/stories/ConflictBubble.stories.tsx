@@ -11,9 +11,9 @@ export default meta;
 type Story = StoryObj<typeof ConflictBubble>;
 
 export const Default: Story = {
-  args: { nodeId: 'node-1', userA: 'Alice', userB: 'Bob', x: 100, y: 200 },
+  args: {},
 };
 
 export const Resolved: Story = {
-  args: { ...Default.args, resolved: true },
+  args: {},
 };

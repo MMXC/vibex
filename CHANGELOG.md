@@ -1,3 +1,9 @@
+### Added (vibex-dev-proposals P0-1: 安全认证修复) — 2026-04-10
+- **P0-1**: 5个v0废弃API路由添加认证 — `/api/agents`、`/api/templates`、`/api/users`、`/api/domains`、`/api/prototypes`
+  - 使用 `getAuthUserFromRequest` 统一认证
+  - 未认证请求返回 401
+  - 提交: c722623e
+
 ### Added (vibex-sprint-0413 test-infra: 测试基础设施修复) — 2026-04-10
 - **E1.1**: npm test 脚本修复 — `package.json test` 转发到 `pnpm --filter vibex-frontend run test:unit`
 - **E1.1**: vitest exit code 传播修复 — `scripts/test-with-exit-code.js` 检测 "X failed"/"Serialized Error" 强制 exit 1

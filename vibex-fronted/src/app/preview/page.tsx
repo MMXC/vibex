@@ -58,48 +58,19 @@ export default function Preview() {
   const currentStep = getCurrentStep();
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className={styles.page}>
       {/* 顶部说明区域 */}
-      <header
-        style={{
-          padding: '16px 24px',
-          backgroundColor: '#0a0a0f',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-          textAlign: 'center',
-        }}
-      >
-        <h1
-          style={{
-            fontSize: '24px',
-            fontWeight: 600,
-            color: '#fff',
-            margin: 0,
-            background: 'linear-gradient(135deg, #00d4ff 0%, #8b5cf6 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}
-        >
+      <header className={styles.header}>
+        <h1 className={styles.title}>
           用 AI 轻松构建你的 Web 应用
         </h1>
-        <p
-          style={{
-            fontSize: '14px',
-            color: 'rgba(255, 255, 255, 0.5)',
-            margin: '8px 0 0',
-          }}
-        >
+        <p className={styles.subtitle}>
           描述需求，AI 实时生成预览
         </p>
       </header>
 
       {/* 步骤指示器 */}
-      <div
-        style={{
-          padding: '16px 24px',
-          backgroundColor: '#1a1a2e',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-        }}
-      >
+      <div className={styles.stepIndicator}>
         {mounted && (
           <SimpleSteps
             steps={designSteps}
@@ -109,53 +80,24 @@ export default function Preview() {
       </div>
 
       {/* 预览画布 */}
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          backgroundColor: '#0f0f1a',
-          overflow: 'hidden',
-        }}
-      >
+      <div className={styles.previewCanvas}>
         {/* 上下文图/模型图/流程图显示区域 */}
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '24px',
-          }}
-        >
+        <div className={styles.centerPanel}>
           {currentStep === 0 && (
-            <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.85)' }}>
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>🎯</div>
+            <div className={styles.emptyState}>
+              <div className={styles.emptyStateEmoji}>🎯</div>
               <p>输入需求后，AI 将实时生成预览</p>
             </div>
           )}
 
           {currentStep >= 1 && boundedContexts.length > 0 && (
-            <div style={{ 
-              width: '100%', 
-              maxWidth: '800px',
-              background: 'rgba(255,255,255,0.03)',
-              borderRadius: '12px',
-              padding: '24px',
-              marginBottom: '16px',
-            }}>
-              <h3 style={{ color: '#fff', margin: '0 0 16px' }}>限界上下文</h3>
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <div className={styles.cardSection}>
+              <h3 className={styles.cardTitle}>限界上下文</h3>
+              <div className={styles.cardTags}>
                 {(boundedContexts ?? []).map((ctx: any) => (
                   <div
                     key={ctx.id}
-                    style={{
-                      padding: '12px 16px',
-                      background: 'rgba(0,212,255,0.1)',
-                      border: '1px solid rgba(0,212,255,0.3)',
-                      borderRadius: '8px',
-                      color: '#fff',
-                    }}
+                    className={styles.cardTag}
                   >
                     {ctx.name}
                   </div>
@@ -165,26 +107,13 @@ export default function Preview() {
           )}
 
           {currentStep >= 2 && domainModels.length > 0 && (
-            <div style={{ 
-              width: '100%', 
-              maxWidth: '800px',
-              background: 'rgba(255,255,255,0.03)',
-              borderRadius: '12px',
-              padding: '24px',
-              marginBottom: '16px',
-            }}>
-              <h3 style={{ color: '#fff', margin: '0 0 16px' }}>领域模型</h3>
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <div className={styles.cardSection}>
+              <h3 className={styles.cardTitle}>领域模型</h3>
+              <div className={styles.cardTags}>
                 {(domainModels ?? []).map((model: any) => (
                   <div
                     key={model.id}
-                    style={{
-                      padding: '12px 16px',
-                      background: 'rgba(139,92,246,0.1)',
-                      border: '1px solid rgba(139,92,246,0.3)',
-                      borderRadius: '8px',
-                      color: '#fff',
-                    }}
+                    className={`${styles.cardTag} ${styles.cardTagPurple}`}
                   >
                     {model.name}
                   </div>
@@ -194,25 +123,13 @@ export default function Preview() {
           )}
 
           {currentStep >= 3 && ((businessFlow as ConfirmationBusinessFlow).states?.length ?? 0) > 0 && (
-            <div style={{ 
-              width: '100%', 
-              maxWidth: '800px',
-              background: 'rgba(255,255,255,0.03)',
-              borderRadius: '12px',
-              padding: '24px',
-            }}>
-              <h3 style={{ color: '#fff', margin: '0 0 16px' }}>业务流程</h3>
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <div className={styles.cardSection}>
+              <h3 className={styles.cardTitle}>业务流程</h3>
+              <div className={styles.cardTags}>
                 {((businessFlow as ConfirmationBusinessFlow).states || []).map((state: { id: string; name: string }) => (
                   <div
                     key={state.id}
-                    style={{
-                      padding: '12px 16px',
-                      background: 'rgba(16,185,129,0.1)',
-                      border: '1px solid rgba(16,185,129,0.3)',
-                      borderRadius: '8px',
-                      color: '#fff',
-                    }}
+                    className={`${styles.cardTag} ${styles.cardTagGreen}`}
                   >
                     {state.name}
                   </div>
@@ -224,152 +141,69 @@ export default function Preview() {
       </div>
 
       {/* 顶部工具栏 */}
-      <div
-        style={{
-          padding: '12px 24px',
-          backgroundColor: 'white',
-          borderBottom: '1px solid #e2e8f0',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div className={styles.toolbar}>
+        <div className={styles.toolbarLeft}>
           <a
             href="/"
-            style={{
-              fontSize: '20px',
-              fontWeight: 'bold',
-              color: '#0070f3',
-              textDecoration: 'none',
-            }}
+            className={styles.logoLink}
           >
             VibeX
           </a>
-          <span style={{ color: '#94a3b8' }}>/</span>
-          <span style={{ fontWeight: 500 }}>页面预览</span>
+          <span className={styles.breadcrumbSlash}>/</span>
+          <span className={styles.breadcrumbItem}>页面预览</span>
         </div>
 
         {/* 页面选择 */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className={styles.toolbarCenter}>
           <button
             onClick={() => setShowPageList(!showPageList)}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: showPageList ? '#eff6ff' : '#f1f5f9',
-              color: showPageList ? '#0070f3' : '#64748b',
-              border: '1px solid #e2e8f0',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '14px',
-            }}
+            className={`${styles.pageSelectBtn} ${!showPageList ? styles.pageSelectBtnInactive : ''}`}
           >
             📄 {selectedPage.name}
           </button>
         </div>
 
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+        <div className={styles.toolbarRight}>
           {/* 缩放控制 */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className={styles.zoomGroup}>
             <button
               onClick={() => setZoom(Math.max(25, zoom - 25))}
-              style={{
-                width: '32px',
-                height: '32px',
-                backgroundColor: '#f1f5f9',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '14px',
-              }}
+              className={styles.zoomBtn}
             >
               -
             </button>
-            <span
-              style={{
-                fontSize: '13px',
-                minWidth: '45px',
-                textAlign: 'center',
-              }}
-            >
+            <span className={styles.zoomLabel}>
               {zoom}%
             </span>
             <button
               onClick={() => setZoom(Math.min(200, zoom + 25))}
-              style={{
-                width: '32px',
-                height: '32px',
-                backgroundColor: '#f1f5f9',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '14px',
-              }}
+              className={styles.zoomBtn}
             >
               +
             </button>
           </div>
 
-          <button
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#0070f3',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-            }}
-          >
+          <button className={styles.exportBtn}>
             📤 导出
           </button>
         </div>
       </div>
 
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+      <div className={styles.mainContent}>
         {/* 左侧设备面板 */}
-        <div
-          style={{
-            width: '180px',
-            backgroundColor: 'white',
-            borderRight: '1px solid #e2e8f0',
-            padding: '16px',
-          }}
-        >
-          <h3
-            style={{
-              fontSize: '13px',
-              fontWeight: 600,
-              marginBottom: '16px',
-              color: '#64748b',
-            }}
-          >
+        <div className={styles.leftPanel}>
+          <h3 className={styles.panelSectionTitle}>
             设备类型
           </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div className={styles.deviceList}>
             {devices.map((d) => (
               <button
                 key={d.id}
                 onClick={() => setDevice(d.id)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  padding: '12px',
-                  backgroundColor: device === d.id ? '#eff6ff' : '#f8fafc',
-                  border:
-                    device === d.id ? '1px solid #0070f3' : '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                }}
+                className={`${styles.deviceBtn} ${device === d.id ? styles.deviceBtnActive : ''}`}
               >
-                <span style={{ fontSize: '18px' }}>{d.icon}</span>
-                <span
-                  style={{
-                    fontSize: '13px',
-                    color: device === d.id ? '#0070f3' : '#64748b',
-                  }}
-                >
+                <span className={styles.deviceBtnIcon}>{d.icon}</span>
+                <span className={`${styles.deviceBtnLabel} ${device === d.id ? styles.deviceBtnLabelActive : ''}`}>
                   {d.name}
                 </span>
               </button>
@@ -377,45 +211,18 @@ export default function Preview() {
           </div>
 
           {/* 页面列表 */}
-          <h3
-            style={{
-              fontSize: '13px',
-              fontWeight: 600,
-              marginTop: '24px',
-              marginBottom: '16px',
-              color: '#64748b',
-            }}
-          >
+          <h3 className={styles.panelSectionTitle}>
             页面列表
           </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div className={styles.pageList}>
             {previewPages.map((page) => (
               <button
                 key={page.id}
                 onClick={() => setSelectedPage(page)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '10px',
-                  backgroundColor:
-                    selectedPage.id === page.id ? '#eff6ff' : '#f8fafc',
-                  border:
-                    selectedPage.id === page.id
-                      ? '1px solid #0070f3'
-                      : '1px solid #e2e8f0',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                }}
+                className={`${styles.pageBtn} ${selectedPage.id === page.id ? styles.pageBtnActive : ''}`}
               >
-                <span style={{ fontSize: '16px' }}>{page.thumbnail}</span>
-                <span
-                  style={{
-                    fontSize: '13px',
-                    color: selectedPage.id === page.id ? '#0070f3' : '#64748b',
-                  }}
-                >
+                <span className={styles.pageBtnIcon}>{page.thumbnail}</span>
+                <span className={`${styles.pageBtnLabel} ${selectedPage.id === page.id ? styles.pageBtnLabelActive : ''}`}>
                   {page.name}
                 </span>
               </button>
@@ -424,137 +231,46 @@ export default function Preview() {
         </div>
 
         {/* 中间预览区域 */}
-        <div
-          style={{
-            flex: 1,
-            backgroundColor: '#1e293b',
-            padding: '32px',
-            overflow: 'auto',
-            display: 'flex',
-            justifyContent: 'center',
-          }}
-        >
+        <div className={styles.previewCenter}>
           {/* 预览容器 */}
           <div
-            style={{
-              width: devices.find((d) => d.id === device)?.width,
-              transform: `scale(${zoom / 100})`,
-              transformOrigin: 'top center',
-              transition: 'width 0.3s ease',
-            }}
+            className={styles.previewFrame}
+            style={{ width: devices.find((d) => d.id === device)?.width, transform: `scale(${zoom / 100})` }}
           >
             {/* 浏览器地址栏 */}
-            <div
-              style={{
-                backgroundColor: '#334155',
-                borderRadius: '8px 8px 0 0',
-                padding: '10px 16px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}
-            >
-              <div style={{ display: 'flex', gap: '6px' }}>
-                <span
-                  style={{
-                    width: '12px',
-                    height: '12px',
-                    borderRadius: '50%',
-                    backgroundColor: '#ef4444',
-                  }}
-                ></span>
-                <span
-                  style={{
-                    width: '12px',
-                    height: '12px',
-                    borderRadius: '50%',
-                    backgroundColor: '#f59e0b',
-                  }}
-                ></span>
-                <span
-                  style={{
-                    width: '12px',
-                    height: '12px',
-                    borderRadius: '50%',
-                    backgroundColor: '#10b981',
-                  }}
-                ></span>
+            <div className={styles.browserBar}>
+              <div className={styles.browserDots}>
+                <span className={`${styles.browserDot} ${styles.browserDotRed}`}></span>
+                <span className={`${styles.browserDot} ${styles.browserDotYellow}`}></span>
+                <span className={`${styles.browserDot} ${styles.browserDotGreen}`}></span>
               </div>
-              <div
-                style={{
-                  flex: 1,
-                  backgroundColor: '#1e293b',
-                  borderRadius: '4px',
-                  padding: '6px 12px',
-                  fontSize: '12px',
-                  color: '#94a3b8',
-                  fontFamily: 'monospace',
-                }}
-              >
+              <div className={styles.browserUrl}>
                 vibex.app/{selectedPage.name.toLowerCase()}
               </div>
             </div>
 
             {/* 预览内容 */}
-            <div
-              style={{
-                backgroundColor: 'white',
-                borderRadius: '0 0 8px 8px',
-                minHeight: '500px',
-                overflow: 'hidden',
-              }}
-            >
+            <div className={styles.previewContent}>
               {/* 模拟页面内容 */}
-              <div style={{ padding: '32px' }}>
-                <h1
-                  style={{
-                    fontSize: '28px',
-                    fontWeight: 'bold',
-                    marginBottom: '16px',
-                  }}
-                >
+              <div className={styles.previewPage}>
+                <h1 className={styles.previewH1}>
                   {selectedPage.name}
                 </h1>
-                <p style={{ color: '#64748b', marginBottom: '24px' }}>
+                <p className={styles.previewDesc}>
                   这是 {selectedPage.name} 页面的预览效果。
                 </p>
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: '16px',
-                    marginBottom: '24px',
-                  }}
-                >
+                <div className={styles.previewGrid}>
                   {[1, 2, 3].map((i) => (
                     <div
                       key={i}
-                      style={{
-                        padding: '16px',
-                        backgroundColor: '#f8fafc',
-                        borderRadius: '8px',
-                        textAlign: 'center',
-                      }}
+                      className={styles.previewGridItem}
                     >
-                      <div style={{ fontSize: '24px', marginBottom: '8px' }}>
-                        📄
-                      </div>
-                      <div style={{ fontSize: '14px', color: '#64748b' }}>
-                        内容块 {i}
-                      </div>
+                      <div className={styles.previewGridEmoji}>📄</div>
+                      <div className={styles.previewGridText}>内容块 {i}</div>
                     </div>
                   ))}
                 </div>
-                <button
-                  style={{
-                    padding: '12px 24px',
-                    backgroundColor: '#0070f3',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                  }}
-                >
+                <button className={styles.previewCta}>
                   立即体验
                 </button>
               </div>
@@ -563,107 +279,50 @@ export default function Preview() {
         </div>
 
         {/* 右侧信息面板 */}
-        <div
-          style={{
-            width: '260px',
-            backgroundColor: 'white',
-            borderLeft: '1px solid #e2e8f0',
-            padding: '16px',
-          }}
-        >
-          <h3
-            style={{
-              fontSize: '14px',
-              fontWeight: 600,
-              marginBottom: '16px',
-              color: '#64748b',
-            }}
-          >
+        <div className={styles.rightPanel}>
+          <h3 className={styles.rightPanelTitle}>
             预览信息
           </h3>
 
-          <div style={{ marginBottom: '16px' }}>
-            <label
-              style={{
-                fontSize: '13px',
-                color: '#94a3b8',
-                display: 'block',
-                marginBottom: '4px',
-              }}
-            >
+          <div className={styles.infoRow}>
+            <label className={styles.infoLabel}>
               当前页面
             </label>
-            <div style={{ fontSize: '14px', fontWeight: 500 }}>
+            <div className={styles.infoValue}>
               {selectedPage.name}
             </div>
           </div>
 
-          <div style={{ marginBottom: '16px' }}>
-            <label
-              style={{
-                fontSize: '13px',
-                color: '#94a3b8',
-                display: 'block',
-                marginBottom: '4px',
-              }}
-            >
+          <div className={styles.infoRow}>
+            <label className={styles.infoLabel}>
               设备类型
             </label>
-            <div style={{ fontSize: '14px' }}>
+            <div className={styles.infoValue}>
               {devices.find((d) => d.id === device)?.name}
             </div>
           </div>
 
-          <div style={{ marginBottom: '16px' }}>
-            <label
-              style={{
-                fontSize: '13px',
-                color: '#94a3b8',
-                display: 'block',
-                marginBottom: '4px',
-              }}
-            >
+          <div className={styles.infoRow}>
+            <label className={styles.infoLabel}>
               缩放比例
             </label>
-            <div style={{ fontSize: '14px' }}>{zoom}%</div>
+            <div className={styles.infoValue}>{zoom}%</div>
           </div>
 
-          <div style={{ marginBottom: '16px' }}>
-            <label
-              style={{
-                fontSize: '13px',
-                color: '#94a3b8',
-                display: 'block',
-                marginBottom: '4px',
-              }}
-            >
+          <div className={styles.infoRow}>
+            <label className={styles.infoLabel}>
               视口宽度
             </label>
-            <div style={{ fontSize: '14px', fontFamily: 'monospace' }}>
+            <div className={`${styles.infoValue} ${styles.infoValueMono}`}>
               {devices.find((d) => d.id === device)?.width}
             </div>
           </div>
 
-          <div
-            style={{
-              marginTop: '24px',
-              padding: '16px',
-              backgroundColor: '#f0f9ff',
-              borderRadius: '8px',
-              border: '1px solid #bae6fd',
-            }}
-          >
-            <div
-              style={{
-                fontSize: '13px',
-                color: '#0369a1',
-                marginBottom: '8px',
-                fontWeight: 500,
-              }}
-            >
+          <div className={styles.tipBox}>
+            <div className={styles.tipTitle}>
               💡 提示
             </div>
-            <div style={{ fontSize: '12px', color: '#075985' }}>
+            <div className={styles.tipText}>
               点击"导出"按钮可以导出当前页面的 HTML、CSS 代码
             </div>
           </div>
@@ -671,36 +330,14 @@ export default function Preview() {
       </div>
 
       {/* 底部输入区域 - 需求输入框 + 生成按钮 */}
-      <div
-        style={{
-          padding: '16px 24px',
-          backgroundColor: '#1a1a2e',
-          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            gap: '12px',
-            maxWidth: '800px',
-            margin: '0 auto',
-          }}
-        >
+      <div className={styles.bottomSection}>
+        <div className={styles.bottomRow}>
           <input
             type="text"
             placeholder="描述你的产品需求，例如：创建一个在线教育平台..."
             value={requirementText}
             onChange={(e) => setRequirementText(e.target.value)}
-            style={{
-              flex: 1,
-              padding: '12px 16px',
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '8px',
-              color: '#fff',
-              fontSize: '14px',
-              outline: 'none',
-            }}
+            className={styles.requirementInput}
             onFocus={(e) => {
               e.target.style.borderColor = 'rgba(0, 212, 255, 0.5)';
             }}
@@ -710,38 +347,18 @@ export default function Preview() {
           />
           <button
             onClick={() => setShowTemplates(!showTemplates)}
-            style={{
-              padding: '12px 16px',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '8px',
-              color: '#fff',
-              fontSize: '14px',
-              cursor: 'pointer',
-            }}
+            className={styles.templateBtn}
           >
             📋 模板
           </button>
-          <button
-            style={{
-              padding: '12px 24px',
-              backgroundColor: '#00d4ff',
-              border: 'none',
-              borderRadius: '8px',
-              color: '#000',
-              fontSize: '14px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-            }}
-          >
+          <button className={styles.generateBtn}>
             🎯 开始生成
           </button>
         </div>
-        
+
         {/* 模板选择器 */}
         {showTemplates && (
-          <div style={{ maxWidth: '800px', margin: '12px auto 0' }}>
+          <div className={styles.templateSelector}>
             <TemplateSelector
               isOpen={showTemplates}
               onClose={() => setShowTemplates(false)}
@@ -752,15 +369,8 @@ export default function Preview() {
             />
           </div>
         )}
-        
-        <p
-          style={{
-            textAlign: 'center',
-            fontSize: '12px',
-            color: 'rgba(255, 255, 255, 0.4)',
-            margin: '8px 0 0',
-          }}
-        >
+
+        <p className={styles.bottomHint}>
           登录后可保存和导出项目
         </p>
       </div>

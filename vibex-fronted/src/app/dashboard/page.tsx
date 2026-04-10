@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
 import styles from './dashboard.module.css';
 import { apiService, Project } from '@/services/api';
+import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog';
 import { useProjects, useDeletedProjects, queryKeys } from '@/hooks/queries';
 
 /** 排序方式 */
@@ -51,6 +52,11 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('updatedAt');
   const [showSortMenu, setShowSortMenu] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmTitle, setConfirmTitle] = useState('');
+  const [confirmMessage, setConfirmMessage] = useState('');
+  const [confirmOnConfirm, setConfirmOnConfirm] = useState<() => void>(() => {});
+  const [confirmDestructive, setConfirmDestructive] = useState(false);
 
   // E4: 视图模式 (Grid/List)
   type ViewMode = 'grid' | 'list';
@@ -205,30 +211,36 @@ export default function Dashboard() {
     }
   };
 
+  const openConfirm = (title: string, message: string, onConfirm: () => void, destructive = false) => {
+    setConfirmTitle(title);
+    setConfirmMessage(message);
+    setConfirmOnConfirm(() => onConfirm);
+    setConfirmDestructive(destructive);
+    setConfirmOpen(true);
+  };
+
   // 永久删除
   const handlePermanentDelete = async (projectId: string) => {
-    if (!confirm('确定要永久删除此项目吗？此操作不可恢复！')) return;
-
-    try {
-      await apiService.permanentDeleteProject(projectId);
-      // 刷新回收站
-      queryClient.invalidateQueries({ queryKey: queryKeys.projects.deleted() });
-    } catch (err: unknown) {
-      setActionError(err instanceof Error ? err.message : '删除失败');
-    }
+    openConfirm('永久删除', '确定要永久删除此项目吗？此操作不可恢复！', async () => {
+      try {
+        await apiService.permanentDeleteProject(projectId);
+        queryClient.invalidateQueries({ queryKey: queryKeys.projects.deleted() });
+      } catch (err: unknown) {
+        setActionError(err instanceof Error ? err.message : '删除失败');
+      }
+    }, true);
   };
 
   // 清空回收站
   const handleClearAll = async () => {
-    if (!confirm('确定要清空回收站吗？所有项目将被永久删除！')) return;
-
-    try {
-      await apiService.clearDeletedProjects();
-      // 刷新回收站
-      queryClient.invalidateQueries({ queryKey: queryKeys.projects.deleted() });
-    } catch (err: unknown) {
-      setActionError(err instanceof Error ? err.message : '清空失败');
-    }
+    openConfirm('清空回收站', '确定要清空回收站吗？所有项目将被永久删除！', async () => {
+      try {
+        await apiService.clearDeletedProjects();
+        queryClient.invalidateQueries({ queryKey: queryKeys.projects.deleted() });
+      } catch (err: unknown) {
+        setActionError(err instanceof Error ? err.message : '清空失败');
+      }
+    }, true);
   };
 
   // 点击外部关闭下拉菜单
@@ -847,6 +859,18 @@ export default function Dashboard() {
       >
         {draggingId && <span>拖放到此处删除</span>}
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title={confirmTitle}
+        message={confirmMessage}
+        destructive={confirmDestructive}
+        onConfirm={() => {
+          confirmOnConfirm();
+          setConfirmOpen(false);
+        }}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   );
 }

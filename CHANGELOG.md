@@ -1,3 +1,10 @@
+### Added (vibex E1: 401 重定向核心机制) — 2026-04-11
+- **E1 Epic1-401**: AuthError 类 + httpClient 401 全局事件分发
+  - AuthError: isAuthError/status/returnTo 字段
+  - httpClient 401 时 dispatch auth:401 CustomEvent，区分主动登出
+  - useAuth 全局监听 → 自动 redirect /auth，防死循环
+  - 提交: 3b98caf9
+
 ### Added (vibex-canvas-button-audit E6: Sprint 4 — ProjectBar 按钮收拢设计方案) — 2026-04-11
 - **E6**: ProjectBar 按钮收拢设计方案（文字稿）
   - 11 按钮现状分析与 A/B/C/D 分类策略

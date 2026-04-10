@@ -40,7 +40,11 @@
 | **1.4** 删除确认 | 1h | `dashboard/components/` 新增 `ConfirmDialog.tsx`<br>`dashboard/page.tsx`：集成删除确认 Dialog | ✅ 删除操作触发二次确认<br>✅ Dialog 显示项目名称 |
 | **1.5** 认证中间件 | 2h | 新建 `middleware.ts`（项目根目录）<br>拦截 `/dashboard` `/canvas` `/design` 等路径<br>`/auth` `/login` 放行 | ✅ 未登录访问受保护页返回 307<br>✅ `/auth` 页面本身可正常访问 |
 
-**Day 1-2 验收**: P1 问题 1.2/1.3/1.4/1.5 全解决，middleware 在 staging 验证
+**Day 1-2 验收**: ✅ P1 问题 1.2/1.3/1.4/1.5 全解决
+- S1.2: GenerationProgress 组件完整（9/9 tests pass），设计页/聊天页可集成
+- S1.3: error-mapper.ts HTTP状态码+正则模式→中文错误消息
+- S1.4: dashboard ConfirmDialog 替换 window.confirm（删除/清空操作）
+- S1.5: middleware.ts 认证中间件保护受保护路径
 
 ---
 

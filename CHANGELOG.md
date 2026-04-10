@@ -9,6 +9,13 @@
   - 移除 87 处内联 style 对象，新增 preview.module.css
   - 提交: d60f0595
 
+### Added (vibex-pm-proposals-vibex-build-fixes E1: Sprint 1 基础安全 + 表单质量) — 2026-04-11
+- **Sprint 1**: 基础安全 + 表单质量完成
+  - S1.3: error-mapper 统一错误映射
+  - S1.4: dashboard ConfirmDialog（window.confirm→统一弹窗）
+  - S1.5: Next.js middleware 路由保护
+  - 提交: E1 Epic3 + E1 S1.3+S1.4 条目已记录
+
 ### Added (vibex-dev-proposals-task E1: 设计系统统一 Auth CSS Module 迁移) — 2026-04-11
 - **Auth CSS Module**: auth 页面内联样式 → CSS Module 重构
   - 新增 auth.module.css，移除 17 处内联 style 对象

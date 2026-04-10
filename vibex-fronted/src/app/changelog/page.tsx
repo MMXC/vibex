@@ -67,6 +67,18 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.187',
+    date: '2026-04-11',
+    changes: [
+      '📋 vibex-pm-proposals-vibex-build-fixes E1: Sprint 1 基础安全 + 表单质量',
+      '✅ error-mapper 统一错误映射 + dashboard ConfirmDialog',
+      '✅ Next.js middleware 路由保护',
+      '提交: E1 Epic3 条目',
+    ],
+    commit: 'E1 Epic3',
+  },
+
+  {
     version: '1.0.182',
     date: '2026-04-11',
     changes: [

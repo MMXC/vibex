@@ -488,12 +488,12 @@ pnpm vitest run && pnpm playwright test tests/e2e/login-state-fix.spec.ts && pnp
 - [x] Story 1.3: `useAuth` 中 `useEffect` 监听 `auth:401`
 - [x] Story 1.3: `sessionStorage.setItem('auth_return_to', returnTo)` 生效
 - [x] Story 1.3: `router.push('/auth')` 被调用
-- [ ] Story 2.1: `validateReturnTo` 函数存在并包含全部 5 种校验
-- [ ] Story 2.1: 登录成功后读 returnTo 并跳转
-- [ ] Story 2.2: OAuth 发起时透传 returnTo
-- [ ] Story 2.3: `/auth` 页面守卫条件生效（不触发循环）
-- [ ] Story 3.1: TC-004~TC-008 E2E 测试文件已创建
-- [ ] Story 3.2: validateReturnTo 单元测试 9 个 case 全覆盖
+- [x] Story 2.1: `validateReturnTo` 函数存在（6 种校验：null/undefined/空串/绝对URL/协议相对URL/javascript:URL/路径穿越）
+- [x] Story 2.1: 登录成功后读 sessionStorage.auth_return_to 并用 validateReturnTo 校验后跳转
+- [x] Story 2.2: /auth 页面从 URL 读取 returnTo 参数并存入 sessionStorage（供 OAuth 回调使用）
+- [x] Story 2.3: `/auth` 页面守卫条件生效（useAuth listener 中已检查 pathname === '/auth'）
+- [ ] Story 3.1: TC-004~TC-008 E2E 测试文件已创建（Playwright 环境待配置）
+- [x] Story 3.2: validateReturnTo 单元测试 12 个 case 全覆盖（含 null/安全路径/恶意URL/路径穿越）
 - [ ] 全部测试通过：`pnpm vitest run && pnpm playwright test`
 - [ ] `pnpm build` 无报错
 

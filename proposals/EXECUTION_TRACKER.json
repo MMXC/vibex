@@ -1,18 +1,19 @@
 {
-  "generated_at": "2026-04-06T17:00:03.669975+00:00",
+  "generated_at": "2026-04-10T17:00:01.780436+00:00",
   "generated_by": "proposal_tracker.py",
   "proposals_dir": "/root/.openclaw/vibex/proposals",
   "stats": {
-    "total": 12,
+    "total": 15,
     "by_priority": {
-      "P0": 3,
-      "P1": 9
+      "P0": 4,
+      "P1": 10,
+      "P2": 1
     },
     "by_status": {
-      "no-linked-task": 12
+      "no-linked-task": 15
     },
     "linked": 0,
-    "unlinked": 12,
+    "unlinked": 15,
     "claim_rate": 0.0,
     "by_date": {
       "20260324": {
@@ -22,6 +23,11 @@
       },
       "20260406": {
         "total": 1,
+        "done": 0,
+        "in_progress": 0
+      },
+      "20260412": {
+        "total": 3,
         "done": 0,
         "in_progress": 0
       }
@@ -183,6 +189,45 @@
       "stage_started": null,
       "stage_completed": null,
       "summary_path": "/root/.openclaw/vibex/proposals/20260406/summary.md"
+    },
+    {
+      "id": "P0",
+      "title": "— 阻断性问题（所有 Agent 共识）",
+      "priority": "P0",
+      "date_dir": "20260412",
+      "task_id": null,
+      "stage_status": "no-linked-task",
+      "stage_agent": "",
+      "task_status": "no-linked-task",
+      "stage_started": null,
+      "stage_completed": null,
+      "summary_path": "/root/.openclaw/vibex/proposals/20260412/summary.md"
+    },
+    {
+      "id": "P1",
+      "title": "— 重要问题",
+      "priority": "P1",
+      "date_dir": "20260412",
+      "task_id": null,
+      "stage_status": "no-linked-task",
+      "stage_agent": "",
+      "task_status": "no-linked-task",
+      "stage_started": null,
+      "stage_completed": null,
+      "summary_path": "/root/.openclaw/vibex/proposals/20260412/summary.md"
+    },
+    {
+      "id": "P2",
+      "title": "— 改进项",
+      "priority": "P2",
+      "date_dir": "20260412",
+      "task_id": null,
+      "stage_status": "no-linked-task",
+      "stage_agent": "",
+      "task_status": "no-linked-task",
+      "stage_started": null,
+      "stage_completed": null,
+      "summary_path": "/root/.openclaw/vibex/proposals/20260412/summary.md"
     }
   ]
 }

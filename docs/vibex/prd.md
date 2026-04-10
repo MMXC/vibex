@@ -1,138 +1,190 @@
-# PRD: homepage-theme-api-analysis
+# VibeX 认证重定向 — PRD
 
-> **项目**: homepage-theme-api-analysis  
-> **版本**: 1.0  
-> **日期**: 2026-03-21  
-> **负责人**: PM Agent  
-> **状态**: ✅ PRD 完成
+**项目**: vibex
+**状态**: 已规划
+**PM**: pm
+**日期**: 2026-04-11
+**产出**: `/root/.openclaw/vibex/docs/vibex/prd.md`
 
 ---
 
 ## 1. 执行摘要
 
-**背景**: 首页需支持主题切换（深色/浅色模式）并实现 API 数据绑定，提升用户体验和系统可维护性。
+### 背景
+当前 VibeX 前端 httpClient 在收到 401 错误时仅清除 token，未自动跳转至登录页；AuthForm 登录成功后硬编码跳转到 `/dashboard`，未考虑用户原本的页面路径。这导致用户操作中被登出后体验断裂，需要手动返回原页面。
 
-**目标**: 实现主题自由切换 + API 数据清晰绑定
+### 目标
+实现「401 自动重定向 + 登录成功 returnTo」完整流程，用户在任意受保护页面因 session 过期被登出后，能无缝恢复到原页面操作。
 
-**关键指标**:
-- 功能点: 6 个（Epic 3 / Story 6）
-- 预估工时: 8 人日
-- 验收通过率: 100%
+### 成功指标
+- API 401 响应后 100% 自动跳转 `/auth`
+- 登录成功后 returnTo 恢复成功率 ≥ 95%
+- 登录页自身不触发 redirect 循环
+- E2E 测试 AC-1 ~ AC-8 全通过
+- 无开放重定向安全漏洞
 
 ---
 
 ## 2. Epic 拆分
 
-### Epic 1: 主题状态管理
-**优先级**: P1 — 核心功能
+### Epic 1: 401 重定向核心机制
 
-| Story ID | 描述 | 验收标准 | DoD |
-|----------|------|----------|-----|
-| ST-1.1 | 主题 Context 实现 | `expect(ThemeContext).toBeDefined()` | ThemeContext 存在且导出正确 |
-| ST-1.2 | 主题切换逻辑 | `expect(toggleTheme).toBeDefined()` | toggleTheme 函数可调用 |
-| ST-1.3 | 主题状态类型定义 | `expect(Theme).toBeDefined()` | `'light' \| 'dark' \| 'system'` 类型存在 |
+| Story ID | 描述 | 工时 | 验收标准 |
+|----------|------|------|----------|
+| **1.1** | httpClient 401 标记扩展 | httpClient 收到 401 时抛出带 `isAuthError=true` 和 `returnTo` 的错误对象，区分主动登出 | - `expect(error.isAuthError).toBe(true)`<br>- `expect(error.returnTo).toMatch(/^\//)` |
+| **1.2** | Auth 事件广播 | httpClient 清除 token 后 dispatch `window` 自定义事件 `auth:401`，携带 returnTo | - `expect(event.type).toBe('auth:401')`<br>- `expect(event.detail.returnTo).toBeDefined()` |
+| **1.3** | 全局 401 监听与跳转 | App 根组件或 AuthContext 监听 `auth:401`，存 sessionStorage，跳转 `/auth` | - `expect(sessionStorage.getItem('auth_return_to')).toBeTruthy()`<br>- `expect(router.push).toHaveBeenCalledWith('/auth')` |
 
-**DoD**:
-- `src/contexts/ThemeContext.tsx` 存在
-- `useTheme()` hook 可被 import
-- 主题状态包含 `theme` 和 `toggleTheme`
+**Epic 1 总工时**: 5h
 
 ---
 
-### Epic 2: 主题持久化与同步
-**优先级**: P1 — 用户体验关键
+### Epic 2: 登录成功跳转逻辑
 
-| Story ID | 描述 | 验收标准 | DoD |
-|----------|------|----------|-----|
-| ST-2.1 | localStorage 持久化 | 刷新后 `theme` 保持 | `expect(localStorage.getItem('theme')).toBeTruthy()` |
-| ST-2.2 | 主题同步到多组件 | 各组件主题一致 | 集成测试验证 |
-| ST-2.3 | 系统主题跟随 | OS 主题变化时自动切换 | 模拟 `prefers-color-scheme` 变化 |
+| Story ID | 描述 | 工时 | 验收标准 |
+|----------|------|------|----------|
+| **2.1** | AuthForm returnTo 读取 | AuthForm 登录成功后从 sessionStorage 读 returnTo，校验后跳转；无则 fallback `/dashboard` | - `expect(router.push).toHaveBeenCalledWith(expect.stringMatching(/^\//))`<br>- `expect(router.push).not.toHaveBeenCalledWith('/dashboard')`（有 returnTo 时）<br>- `expect(router.push).toHaveBeenCalledWith('/dashboard')`（无 returnTo 时） |
+| **2.2** | LoginDrawer returnTo | 第三方登录 drawer（Google/GitHub）同步支持 returnTo | - OAuth callback 后走同一 returnTo 逻辑 |
+| **2.3** | Auth 页面守卫 | `/auth` 路由本身不触发 401 redirect 检测，避免循环 | - `expect(inAuthPage).toBe(true)` 时 skip redirect |
+| **2.4** | returnTo 白名单校验 | returnTo 必须以 `/` 开头且非外部域名，否则 fallback `/dashboard` | - `expect(validateReturnTo('//evil.com')).toBe('/dashboard')`<br>- `expect(validateReturnTo('/dashboard')).toBe('/dashboard')`<br>- `expect(validateReturnTo('/canvas')).toBe('/canvas')` |
 
-**DoD**:
-- 刷新页面后主题不变
-- 任意组件内 `useTheme()` 返回一致值
-- `window.matchMedia` 监听正确工作
+**Epic 2 总工时**: 2.5h（2.4 安全项可并行）
 
 ---
 
-### Epic 3: API 数据绑定
-**优先级**: P1 — 核心需求
+### Epic 3: 测试覆盖
 
-| Story ID | 描述 | 验收标准 | DoD |
-|----------|------|----------|-----|
-| ST-3.1 | API 返回主题配置 | `expect(theme).toBe('light' \| 'dark' \| 'system')` | API 响应格式正确 |
-| ST-3.2 | API 数据与本地合并 | 本地偏好优先，API 提供默认值 | 合并逻辑测试通过 |
-| ST-3.3 | API 请求可追踪 | 网络请求日志存在 | 调试日志可见 |
+| Story ID | 描述 | 工时 | 验收标准 |
+|----------|------|------|----------|
+| **3.1** | E2E 测试扩展 | 在 `tests/e2e/login-state-fix.spec.ts` 新增 TC-004~TC-008 | - TC-004: 401 触发 redirect<br>- TC-005: returnTo 保存正确<br>- TC-006: 登录成功返回原页面<br>- TC-007: OAuth returnTo<br>- TC-008: logout 不触发 redirect |
+| **3.2** | returnTo 白名单单元测试 | 校验函数 `validateReturnTo()` 覆盖正常路径和攻击路径 | - `expect(validateReturnTo('https://evil.com')).toBe('/dashboard')`<br>- `expect(validateReturnTo('/canvas?project=1')).toBe('/canvas?project=1')` |
 
-**DoD**:
-- `GET /api/v1/homepage` 响应正确解析
-- 本地 `localStorage` 优先级高于 API
-- DevTools Network 面板可见请求
+**Epic 3 总工时**: 3h
 
 ---
 
-## 3. 验收标准汇总
+## 3. 验收标准
 
-| ID | Given | When | Then |
-|----|-------|------|------|
-| AC-01 | 用户点击切换按钮 | 任意时刻 | 主题立即变化，响应 < 100ms |
-| AC-02 | 用户刷新页面 | 已有主题偏好 | 主题保持不变 |
-| AC-03 | API 返回数据 | 首页加载 | `theme` 字段正确解析 |
-| AC-04 | 组件渲染 | 任意主题下 | 样式正确应用，无闪烁 |
-| AC-05 | OS 主题变化 | 系统主题切换 | 页面主题跟随（system 模式） |
-| AC-06 | localStorage 无数据 | 首次访问 | 使用 API 默认值或 `system` |
+### Story 1.1 — httpClient 401 标记
 
----
+```
+expect(new AuthError('Unauthorized', 401).isAuthError).toBe(true)
+expect(new AuthError('Unauthorized', 401).returnTo).toMatch(/^\//)
+expect(() => { throw new AuthError('Unauthorized', 401) }).toThrow()
+```
 
-## 4. 回归测试
+### Story 1.3 — 全局监听跳转
 
-| ID | 描述 | 预期 |
-|----|------|------|
-| RG-1 | 原有功能不受影响 | 无主题相关功能的页面正常 |
-| RG-2 | API 不可用降级 | 使用本地默认主题 |
-| RG-3 | localStorage 损坏容错 | 降级到 system 主题 |
+```
+// 在测试中 mock router.push，触发 401
+trigger401();
+expect(router.push).toHaveBeenCalledWith('/auth');
+expect(sessionStorage.getItem('auth_return_to')).toBe('/canvas/project/123');
+```
 
----
+### Story 2.1 — 登录后 returnTo
 
-## 5. 非功能需求
+```
+// 场景 A: 有 returnTo
+sessionStorage.setItem('auth_return_to', '/canvas/project/123');
+login();
+expect(router.push).toHaveBeenCalledWith('/canvas/project/123');
+expect(sessionStorage.getItem('auth_return_to')).toBeNull();
 
-- **性能**: 主题切换响应 < 100ms，无重排
-- **可访问性**: 颜色对比度符合 WCAG AA
-- **兼容性**: 支持 Chrome/Firefox/Safari 最新版
-- **代码质量**: TypeScript 类型完整，无 `any`
+// 场景 B: 无 returnTo
+sessionStorage.removeItem('auth_return_to');
+login();
+expect(router.push).toHaveBeenCalledWith('/dashboard');
 
----
+// 场景 C: returnTo 为恶意 URL
+sessionStorage.setItem('auth_return_to', '//evil.com');
+login();
+expect(router.push).toHaveBeenCalledWith('/dashboard');
+```
 
-## 6. 技术约束
+### Story 3.1 — E2E TC-006
 
-- 使用 CSS 变量定义主题颜色（方案A）
-- React Context 管理状态
-- localStorage 持久化
-- 主题字段: `'light' | 'dark' | 'system'`
-
----
-
-## 7. 依赖
-
-| 依赖 | 来源 | 说明 |
-|------|------|------|
-| React Context | 现有依赖 | 状态管理 |
-| localStorage | Web API | 持久化 |
-| window.matchMedia | Web API | 系统主题监听 |
-
----
-
-## 8. 实施计划
-
-| 阶段 | Epic | 内容 | 工时 |
-|------|------|------|------|
-| Phase 1 | Epic 1 | 主题状态管理（Context + toggle） | 2h |
-| Phase 2 | Epic 2 | 持久化 + 组件同步 | 3h |
-| Phase 3 | Epic 3 | API 绑定 + 数据合并 | 2h |
-| Phase 4 | 测试 | 验收测试 + 回归测试 | 1h |
-
-**总计**: 8h
+```
+test('登录成功后返回原页面（TC-006）', async ({ page }) => {
+  await page.goto('/canvas/project/123');
+  // mock 401 response
+  await page.evaluate(() => {
+    window.dispatchEvent(new CustomEvent('auth:401', { detail: { returnTo: '/canvas/project/123' } }));
+  });
+  await expect(page).toHaveURL(/\/auth/);
+  await page.fill('[name="email"]', 'test@example.com');
+  await page.fill('[name="password"]', 'password');
+  await page.click('[type="submit"]');
+  await expect(page).toHaveURL('/canvas/project/123');
+});
+```
 
 ---
 
-*PRD 完成，等待 Dev 领取实现任务*
+## 4. DoD (Definition of Done)
+
+Epic 1 完成条件：
+- [ ] `client.ts` 中 401 错误携带 `isAuthError` 和 `returnTo`
+- [ ] `auth:401` 事件能正常 dispatch 和 listen
+- [ ] `AuthContext` 或 App 根组件处理事件并跳转
+
+Epic 2 完成条件：
+- [ ] `auth/page.tsx` 登录后读取 sessionStorage returnTo
+- [ ] LoginDrawer 同步支持 returnTo
+- [ ] `/auth` 页面守卫条件生效
+- [ ] `validateReturnTo()` 白名单校验通过单元测试
+
+Epic 3 完成条件：
+- [ ] TC-004~TC-008 E2E 测试全部通过
+- [ ] `validateReturnTo()` 单元测试覆盖边界情况
+
+项目整体 DoD：
+- [ ] AC-1 ~ AC-8 全部满足
+- [ ] 安全测试（白名单）通过
+- [ ] `pnpm build` + `pnpm test` 均通过
+- [ ] changelog 已更新
+
+---
+
+## 5. 功能点汇总表
+
+| ID | 功能点 | 描述 | 验收标准 | 页面集成 |
+|----|--------|------|----------|----------|
+| F1.1 | httpClient 401 标记 | 401 抛出 AuthError，含 isAuthError + returnTo | `expect(error.isAuthError).toBe(true)` | 无 |
+| F1.2 | Auth 事件广播 | dispatch `auth:401` 事件 | `expect(event.type).toBe('auth:401')` | 无 |
+| F1.3 | 全局 401 监听 | App 根组件监听事件，存 sessionStorage，跳转 | `expect(router.push).toHaveBeenCalledWith('/auth')` | ✅ App 根 |
+| F2.1 | AuthForm returnTo | 登录成功后读 returnTo，校验后跳转 | `expect(router.push).toHaveBeenCalledWith(originalPath)` | ✅ /auth |
+| F2.2 | LoginDrawer returnTo | 第三方登录同步 returnTo | 同 F2.1 | ✅ LoginDrawer |
+| F2.3 | Auth 守卫 | /auth 页面跳过 401 检测 | `expect(inAuthPage).toBe(true)` 时 skip | ✅ /auth |
+| F2.4 | 白名单校验 | validateReturnTo() 防止开放重定向 | AC-5 expect 全覆盖 | 无 |
+| F3.1 | E2E 测试 | TC-004~TC-008 覆盖 | 5 个 E2E test 全 pass | 无 |
+| F3.2 | 白名单单元测试 | validateReturnTo() 覆盖边界 | 边界 case 全 pass | 无 |
+
+---
+
+## 6. 风险提示
+
+| 风险 | 可能性 | 影响 | 缓解 |
+|------|--------|------|------|
+| 循环 redirect（/auth → 401 → /auth） | 低 | 高 | F2.3 Auth 守卫 |
+| 开放重定向 | 低 | 高 | F2.4 白名单校验 |
+| logout 误触发 redirect | 中 | 中 | httpClient 区分 isLogoutAction |
+| OAuth callback 冲突 | 低 | 中 | OAuth callback 使用 URL 参数传递 returnTo |
+
+---
+
+## 7. PRD 格式校验
+
+- [x] 执行摘要包含：背景 + 目标 + 成功指标
+- [x] Epic/Story 表格格式正确（ID/描述/工时/验收标准）
+- [x] 每个 Story 有可写的 expect() 断言
+- [x] DoD 章节存在且具体
+- [x] 功能点汇总表格式正确
+- [x] 已执行 Planning（Feature List 已产出）
+- [x] 安全风险已覆盖（白名单校验）
+
+---
+
+*Planning 输出: `plan/feature-list.md`*  
+*基于 Analyst 报告: `analysis.md`*  
+*推荐方案: 方案 A（Auth Context + Axios Interceptor）*

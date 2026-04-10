@@ -48,7 +48,7 @@ interface FlowStore {
   selectAllNodes: () => void;
   clearNodeSelection: () => void;
   deleteSelectedNodes: () => void;
-  resetFlowCanvas: () => void;
+  clearFlowCanvas: () => void;
 
   // Step CRUD
   confirmStep: (flowNodeId: string, stepId: string) => void;
@@ -327,7 +327,7 @@ export const useFlowStore = create<FlowStore>()(
             return { flowNodes: remaining, selectedNodeIds: new Set() };
           }),
 
-        resetFlowCanvas: () => {
+        clearFlowCanvas: () => {
           getHistoryStore().recordSnapshot('flow', []);
           set({ flowNodes: [], selectedNodeIds: new Set() });
         },

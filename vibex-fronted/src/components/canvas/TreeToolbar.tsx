@@ -108,10 +108,10 @@ export function TreeToolbar({
             type="button"
             className={styles.toolbarButton}
             onClick={onReset}
-            title="重置画布"
-            aria-label="重置画布"
+            title="清空当前树所有节点（配合 Ctrl+Z 可撤销）"
+            aria-label="清空流程"
           >
-            ↺ 重置
+            ↺ 清空流程
           </button>
         )}
         {extraButtons}

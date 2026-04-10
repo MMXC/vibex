@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.169',
+    date: '2026-04-10',
+    changes: [
+      '📋 vibex-sprint-0413 test-infra: 测试基础设施修复',
+      '✅ E1.1: npm test 脚本修复 + vitest exit code 传播修复',
+      '✅ E1.2: E2E 管道重入守卫 (tester-entry.sh)',
+      '✅ templates/dev-checklist.md: 开发检查清单模板',
+      '提交: dbb17650, f24d620f',
+    ],
+    commit: 'f24d620f',
+  },
+
+  {
     version: '1.0.168',
     date: '2026-04-10',
     changes: [

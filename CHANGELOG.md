@@ -1,3 +1,10 @@
+### Added (vibex-sprint-0413 test-infra: 测试基础设施修复) — 2026-04-10
+- **E1.1**: npm test 脚本修复 — `package.json test` 转发到 `pnpm --filter vibex-frontend run test:unit`
+- **E1.1**: vitest exit code 传播修复 — `scripts/test-with-exit-code.js` 检测 "X failed"/"Serialized Error" 强制 exit 1
+- **E1.2**: E2E 管道重入守卫 — `scripts/tester-entry.sh` 自动 git pull 确保测试最新代码
+- **新文件**: `templates/dev-checklist.md` — 开发检查清单模板（AC 逐项验收）
+- 提交: `dbb17650`, `f24d620f`
+
 ### Added (vibex-sprint-0412 E5: waitForTimeout 重构) — 2026-04-10
 - **E5**: waitForTimeout 重构完成 — 主要 E2E 测试文件 0 个 waitForTimeout ✅
   - 剩余 16 处均在特殊测试中（mermaid/performance），属合理保留

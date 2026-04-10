@@ -4,6 +4,14 @@
   - vibex-backend: 3个 route.ts 文件 Unicode 单引号 → ASCII 单引号
   - 提交: 378f8a56, f8743472
 
+### Added (vibex-dev-proposals-task E1: 设计系统统一 Auth CSS Module 迁移) — 2026-04-11
+- **Auth CSS Module**: auth 页面内联样式 → CSS Module 重构
+  - 新增 auth.module.css，移除 17 处内联 style 对象
+  - 提交: 0cae1330
+- **E1 S1.3+S1.4**: error-mapper 统一错误映射 + dashboard ConfirmDialog
+  - lib/error-mapper.ts + dashboard confirm-dialog.tsx
+  - 提交: 021f319a
+
 ### Added (vibex E1 Epic2: 登录成功 returnTo 安全跳转) — 2026-04-11
 - **E1 Epic2 returnTo 跳转**: validateReturnTo 安全校验 + 登录后跳转逻辑
   - validateReturnTo() 实现 6 种安全校验（null/空串/绝对URL/协议相对URL/javascript:/路径穿越）

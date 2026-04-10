@@ -7,12 +7,21 @@
  * serialized errors in worker threads may result in exit code 0 despite
  * visible test failures. This wrapper detects failures from output and
  * enforces proper CI gate behavior.
+ *
+ * Fix: Loop stripAnsi to handle nested ANSI codes (e.g. [2m[31m[1m FAIL).
  */
 const { spawn } = require('child_process');
 
-// Strip ANSI color codes for reliable pattern matching
+// Strip ANSI color codes — loop until no more changes (handles nested codes)
 function stripAnsi(str) {
-  return str.replace(/\x1b\[[0-9;]*m/g, '');
+  let result = str;
+  let prev = '';
+  // eslint-disable-next-line no-unmodified-loop-condition
+  while (prev !== result) {
+    prev = result;
+    result = result.replace(/\x1b\[[0-9;]*m/g, '');
+  }
+  return result;
 }
 
 const vitestArgs = process.argv.slice(2);

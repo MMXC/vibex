@@ -1,3 +1,11 @@
+### Added (vibex-reviewer-proposals-vibex-build-fixes E1: PR 合入标准 + Renderer 重构) — 2026-04-11
+- **Epic2 PR 合入标准**: 审查文档规范产出
+  - docs/vibex-reviewer-proposals: Epic2 PR 合入标准文档
+  - 提交: ac6a0db2
+- **Epic3 prototype Renderer 重构**: split renderer.ts into 5 sub-modules
+  - 600行 renderer.ts → 5个模块：renderer.ts/core.ts/errors.ts/templates.ts/utils.ts
+  - 提交: 9a924074
+
 ### Added (vibex-build-fixes: CanvasHeader story + Unicode quotes 修复) — 2026-04-11
 - **构建修复**: 删除 orphaned Storybook files + 修复后端 route.ts Unicode 弯引号
   - vibex-fronted: 删除 9 个 orphaned story files (CanvasHeader/CanvasToolbar/CollabCursor 等)

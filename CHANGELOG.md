@@ -1,3 +1,11 @@
+### Added (vibex-dev-proposals P0-2: 代码清理) — 2026-04-10
+- **P0-2**: E2 code cleanup — 15个根目录垃圾文件已删除
+  - E1.1~E1.5测试残留文件（e1dup/e1field/e1new/e1notest/e1test/e1testfile/test-temp*）
+  - test-new-canvas*.mjs、README-test.md
+- **E2.2**: 76个legacy Page Router路由添加 `@deprecated` 注解
+  - 指向 `docs/migration/page-router-to-app-router.md`
+  - 提交: 4c768c12
+
 ### Added (vibex-dev-proposals P0-1: 安全认证修复) — 2026-04-10
 - **P0-1**: 5个v0废弃API路由添加认证 — `/api/agents`、`/api/templates`、`/api/users`、`/api/domains`、`/api/prototypes`
   - 使用 `getAuthUserFromRequest` 统一认证

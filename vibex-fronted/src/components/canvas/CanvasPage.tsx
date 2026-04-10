@@ -83,6 +83,7 @@ import { UndoBar } from '@/components/undo-bar/UndoBar';
 import { NodeTooltip } from '@/components/guidance/NodeTooltip';
 import { CanvasOnboardingOverlay } from '@/components/guidance';
 import { ConflictDialog as ConflictDialogComponent } from '@/components/ConflictDialog';
+import { ConfirmDialog } from './features/ConfirmDialog';
 import { FeedbackFAB } from '@/components/FeedbackFAB';
 import { CanvasPreviewModal } from './json-render/CanvasPreviewModal';
 // F2.5 decision: FlowEdgeLayer remains in BusinessFlowTree (flow panel uses it); CanvasPage itself does not render edge layers
@@ -773,6 +774,8 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
 
       {/* E3 S3.3: Feedback FAB */}
       <FeedbackFAB />
+
+      <ConfirmDialog />
 
       {/* E4-SyncProtocol: Conflict Dialog */}
       {saveStatus === 'conflict' && conflictData && (

@@ -23,6 +23,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { BoundedContextGroup } from './BoundedContextGroup';
 import { BoundedEdgeLayer } from './edges/BoundedEdgeLayer';
 import { useModifierKey, useDragSelection } from '@/hooks/canvas/useDragSelection';
+import { useConfirmDialogStore } from '@/lib/canvas/stores/confirmDialogStore';
 import type { BoundedContextNode, BoundedContextDraft, NodeRect, BoundedEdge } from '@/lib/canvas/types';
 import styles from './canvas.module.css';
 
@@ -546,11 +547,16 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
                     type="button"
                     className={styles.deleteButton}
                     onClick={() => {
-                      if (window.confirm(`确定删除 ${selectedCount} 个节点？`)) {
-                        // E1: Record snapshot before deleting selected nodes
-                        getHistoryStore().recordSnapshot('context', contextNodes);
-                        deleteSelectedNodes('context');
-                      }
+                      useConfirmDialogStore.getState().open({
+                        title: '确认删除',
+                        message: `确定删除 ${selectedCount} 个节点？此操作不可撤销。`,
+                        destructive: true,
+                        confirmLabel: '确认删除',
+                        onConfirm: () => {
+                          getHistoryStore().recordSnapshot('context', contextNodes);
+                          deleteSelectedNodes('context');
+                        },
+                      });
                     }}
                     aria-label={`删除 ${selectedCount} 个选中节点`}
                   >
@@ -566,10 +572,15 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
                 className={styles.deleteButton}
                 onClick={() => {
                   if (contextNodes.length === 0) return;
-                  if (window.confirm(`确定删除全部 ${contextNodes.length} 个节点？`)) {
-                    // E4: Use batch delete — single snapshot, no forEach
-                    deleteAllNodes();
-                  }
+                  useConfirmDialogStore.getState().open({
+                    title: '确认删除全部',
+                    message: `确定删除全部 ${contextNodes.length} 个节点？此操作不可撤销。`,
+                    destructive: true,
+                    confirmLabel: '确认删除',
+                    onConfirm: () => {
+                      deleteAllNodes();
+                    },
+                  });
                 }}
                 aria-label="删除全部节点"
               >

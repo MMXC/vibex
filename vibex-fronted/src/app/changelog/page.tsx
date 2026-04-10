@@ -32,6 +32,18 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.181',
+    date: '2026-04-11',
+    changes: [
+      '📋 vibex E1 Epic1-401: 401 重定向核心机制',
+      '✅ AuthError 类 + httpClient 401 全局事件分发',
+      '✅ useAuth 全局监听 auth:401，自动 redirect /auth，防死循环',
+      '提交: 3b98caf9',
+    ],
+    commit: '3b98caf9',
+  },
+
+  {
     version: '1.0.177',
     date: '2026-04-11',
     changes: [

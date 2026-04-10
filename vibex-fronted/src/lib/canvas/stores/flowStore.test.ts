@@ -290,5 +290,93 @@ describe('useFlowStore', () => {
       useFlowStore.getState().setFlowDraft(null);
       expect(useFlowStore.getState().flowDraft).toBeNull();
     });
+
+
+  describe('deleteSelectedNodes batch delete undo', () => {
+    const makeNode = (id: string) => ({
+      nodeId: id,
+      contextId: 'ctx-1',
+      name: 'Flow' + id,
+      steps: [],
+      isActive: false,
+      status: 'pending' as const,
+      children: [],
+    }));
+
+    it('批量删除选中节点并记录 undo 快照', () => {
+      const nodes = [makeNode('node-1'), makeNode('node-2'), makeNode('node-3')];
+      useFlowStore.setState({
+        flowNodes: nodes,
+        selectedNodeIds: new Set(['node-1', 'node-2']),
+      });
+      // Mock getHistoryStore to return a mock with recordSnapshot
+      vi.mocked(getHistoryStore).mockReturnValue({
+        recordSnapshot: vi.fn(),
+        undo: vi.fn(),
+        redo: vi.fn(),
+        clear: vi.fn(),
+      });
+      useFlowStore.getState().deleteSelectedNodes();
+      const after = useFlowStore.getState();
+      expect(after.flowNodes.map(n => n.nodeId)).toEqual(['node-3']);
+      expect(after.selectedNodeIds.size).toBe(0);
+      const historyMock = vi.mocked(getHistoryStore)();
+      expect(historyMock.recordSnapshot).toHaveBeenCalled();
+    });
+
+    it('批量删除后 undo 可恢复节点', () => {
+      const nodes = [makeNode('node-1'), makeNode('node-2'), makeNode('node-3')];
+      useFlowStore.setState({
+        flowNodes: nodes,
+        selectedNodeIds: new Set(['node-1', 'node-2']),
+      });
+      vi.mocked(getHistoryStore).mockReturnValue({
+        recordSnapshot: vi.fn(),
+        undo: vi.fn(),
+        redo: vi.fn(),
+        clear: vi.fn(),
+      });
+      useFlowStore.getState().deleteSelectedNodes();
+      useFlowStore.getState().undo();
+      const historyMock = vi.mocked(getHistoryStore)();
+      expect(historyMock.recordSnapshot).toHaveBeenCalled();
+      expect(historyMock.undo).toHaveBeenCalled();
+    });
+  });
+
+
+    it('批量删除选中节点并记录 undo 快照', () => {
+      const nodes = [makeNode('node-1'), makeNode('node-2'), makeNode('node-3')];
+      useFlowStore.setState({
+        flowNodes: nodes,
+        selectedNodeIds: new Set(['node-1', 'node-2']),
+      });
+      const historyMock = getHistoryStore();
+      const recordSpy = vi.fn();
+      (historyMock as any).recordSnapshot = recordSpy;
+      useFlowStore.getState().deleteSelectedNodes();
+      const after = useFlowStore.getState();
+      expect(after.flowNodes.map(n => n.nodeId)).toEqual(['node-3']);
+      expect(after.selectedNodeIds.size).toBe(0);
+      expect(recordSpy).toHaveBeenCalled();
+    });
+
+    it('批量删除后 undo 可恢复节点', () => {
+      const nodes = [makeNode('node-1'), makeNode('node-2'), makeNode('node-3')];
+      useFlowStore.setState({
+        flowNodes: nodes,
+        selectedNodeIds: new Set(['node-1', 'node-2']),
+      });
+      const historyMock = getHistoryStore();
+      const recordSpy = vi.fn();
+      const undoSpy = vi.fn();
+      (historyMock as any).recordSnapshot = recordSpy;
+      (historyMock as any).undo = undoSpy;
+      useFlowStore.getState().deleteSelectedNodes();
+      useFlowStore.getState().undo();
+      expect(recordSpy).toHaveBeenCalled();
+      expect(undoSpy).toHaveBeenCalled();
+    });
+  });
   });
 });

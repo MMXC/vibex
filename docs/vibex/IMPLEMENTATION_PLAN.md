@@ -482,12 +482,12 @@ pnpm vitest run && pnpm playwright test tests/e2e/login-state-fix.spec.ts && pnp
 
 ## 实现检查清单（Dev 自检）
 
-- [ ] Story 1.1: `AuthError` 类已添加，`isAuthError` 和 `returnTo` 字段存在
-- [ ] Story 1.1: 响应拦截器抛出 `AuthError` 而非普通 `Error`
-- [ ] Story 1.2: `window.dispatchEvent('auth:401')` 在 401 时触发
-- [ ] Story 1.3: `useAuth` 中 `useEffect` 监听 `auth:401`
-- [ ] Story 1.3: `sessionStorage.setItem('auth_return_to', returnTo)` 生效
-- [ ] Story 1.3: `router.push('/auth')` 被调用
+- [x] Story 1.1: `AuthError` 类已添加，`isAuthError` 和 `returnTo` 字段存在
+- [x] Story 1.1: 响应拦截器抛出 `AuthError` 而非普通 `Error`
+- [x] Story 1.2: `window.dispatchEvent('auth:401')` 在 401 时触发
+- [x] Story 1.3: `useAuth` 中 `useEffect` 监听 `auth:401`
+- [x] Story 1.3: `sessionStorage.setItem('auth_return_to', returnTo)` 生效
+- [x] Story 1.3: `router.push('/auth')` 被调用
 - [ ] Story 2.1: `validateReturnTo` 函数存在并包含全部 5 种校验
 - [ ] Story 2.1: 登录成功后读 returnTo 并跳转
 - [ ] Story 2.2: OAuth 发起时透传 returnTo

@@ -44,7 +44,12 @@ $ cd /root/.openclaw/vibex && pnpm test
 No "directory not found" / "No such file" 错误
 ```
 
-**退出码**: 0 ✅
+**退出码**: 取决于测试结果 ✅
+
+**回归发现**: vitest 4.1.2 在某些场景（如 worker 序列化错误）下可能 exit 0。为防止 CI 门禁失效，添加了 wrapper 脚本：
+- `scripts/test-with-exit-code.js` — 检测 "X failed" / "Serialized Error" 模式，强制 exit 1
+- `package.json test:unit` 改为 `node scripts/test-with-exit-code.js`
+- 验证: 失败测试 → EXIT=1 ✅，通过测试 → EXIT=0 ✅
 
 ---
 
@@ -94,5 +99,5 @@ EXIT=0
 
 - [x] 功能实现与 PRD 一致 — ✅
 - [x] 使用 CE /ce:work 流程 — ✅
-- [x] npm test 通过 — ✅
+- [x] npm test 通过 — ✅（含 exit code 传播修复）
 - [x] 提交检查清单 — ✅

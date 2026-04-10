@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     // Auth check
     const auth = await getAuthUserFromRequest(request);
     if (!auth.success) {
-      return NextResponse.json({ error: '''Unauthorized''' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
   try {

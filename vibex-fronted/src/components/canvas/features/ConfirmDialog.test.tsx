@@ -73,10 +73,11 @@ describe('ConfirmDialog', () => {
     });
 
     render(<ConfirmDialog />);
-    const backdrop = screen.getByRole('dialog').parentElement;
-    if (backdrop) {
-      fireEvent.click(backdrop);
-    }
+    // Click the backdrop (the outer fixed div with the onClick handler)
+    // The dialog itself has role="dialog", its parentElement is the backdrop
+    const dialog = screen.getByRole('dialog');
+    const backdrop = dialog.parentElement!;
+    fireEvent.click(backdrop);
     expect(close).toHaveBeenCalledTimes(1);
   });
 });

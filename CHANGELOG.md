@@ -6,6 +6,12 @@
   - validateReturnTo.test.ts: 12 个单元测试 case 全覆盖
   - 提交: 5a2543bb
 
+
+### Added (vibex E1 Epic3: Next.js auth middleware 测试覆盖) — 2026-04-11
+- **E1 Epic3 middleware 测试**: Next.js middleware 保护路由 + 22个测试 case
+  - middleware.ts 保护 /dashboard/canvas/design/project-settings/preview
+  - 未认证 → 307 redirect /auth；已认证在 /auth → redirect /dashboard
+  - 提交: 1b59c5bc
 ### Added (vibex E1: 401 重定向核心机制) — 2026-04-11
 - **E1 Epic1-401**: AuthError 类 + httpClient 401 全局事件分发
   - AuthError: isAuthError/status/returnTo 字段

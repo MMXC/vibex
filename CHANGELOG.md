@@ -1,3 +1,10 @@
+### Added (vibex-canvas-button-audit E6: Sprint 4 — ProjectBar 按钮收拢设计方案) — 2026-04-11
+- **E6**: ProjectBar 按钮收拢设计方案（文字稿）
+  - 11 按钮现状分析与 A/B/C/D 分类策略
+  - 核心操作 4-5 个 + "⋯" 更多菜单
+  - WCAG 2.1 AA 无障碍 + 响应式 + 迁移路径
+  - 提交: 560d118f
+
 ### Added (vibex-canvas-button-audit E4+E5: Sprint 3 — 文案修复) — 2026-04-10
 - **E4**: 重新生成按钮 tooltip 完善 — 文案精简为「🔄 重新生成」，tooltip 说明「基于已确认上下文重新生成，清空后重建」
 - **E5**: resetFlowCanvas → clearFlowCanvas 重命名 — 语义明确化；TreeToolbar 重置按钮改为「↺ 清空流程」并更新 tooltip

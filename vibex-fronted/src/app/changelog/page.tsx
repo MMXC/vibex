@@ -32,6 +32,18 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.177',
+    date: '2026-04-11',
+    changes: [
+      '📋 vibex-canvas-button-audit E6 Sprint 4: ProjectBar 按钮收拢设计方案',
+      '✅ 设计方案: 11按钮现状 + A/B/C/D分类 + 核心4-5按钮 + ⋯菜单',
+      '✅ WCAG 2.1 AA + 响应式(3断点) + 迁移路径(Phase1/2)',
+      '提交: 560d118f',
+    ],
+    commit: '560d118f',
+  },
+
+  {
     version: '1.0.176',
     date: '2026-04-10',
     changes: [

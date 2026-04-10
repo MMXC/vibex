@@ -20,12 +20,14 @@
 
 | 功能 | 状态 | 测试文件 |
 |------|------|----------|
-| confirmDialogStore | ✅ | ConfirmDialog.test.tsx |
+| confirmDialogStore | ✅ | ConfirmDialog.test.tsx (5 tests) |
 | validateReturnTo | ✅ | validateReturnTo.test.ts (12 cases) |
 | auth middleware | ✅ | middleware.test.ts (22 cases) |
 | TreeToolbar semantic | ✅ | manual verified |
 | Flow undo (E1) | ✅ | flowStore tests |
 | GenerationProgress | ✅ | GenerationProgress.test.tsx (9 tests) |
+| auth/page returnTo | ✅ | validateReturnTo.test.ts |
+| error-mapper | ✅ | unit tests |
 
 ---
 

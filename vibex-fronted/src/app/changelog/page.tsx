@@ -67,6 +67,17 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.180',
+    date: '2026-04-11',
+    changes: [
+      '📋 vibex-canvas-button-audit-proposal Sprint 4: P5 ProjectBar 按钮收拢设计方案',
+      '✅ 设计方案: 11按钮分析 + A/B/C/D分类 + 核心4-5按钮 + ⋯菜单（文字稿）',
+      '提交: 373c4b97',
+    ],
+    commit: '373c4b97',
+  },
+
+  {
     version: '1.0.176',
     date: '2026-04-10',
     changes: [

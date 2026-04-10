@@ -592,9 +592,9 @@ git checkout HEAD~1 -- vibex-fronted/src/components/canvas/BusinessFlowTree.tsx 
 - [x] "↺ 清空流程" tooltip 说明撤销能力 — TreeToolbar 重置按钮更新
 
 #### Sprint 4: P5 ✅
-- [ ] 文字设计方案产出
-- [ ] Figma 设计稿链接（待 UX）
-- [ ] 无实现代码
+- [x] 文字设计方案产出 — ProjectBar 11按钮分析 + A/B/C/D分类 + 核心4-5按钮 + ⋯菜单
+- [ ] Figma 设计稿链接（待 UX Designer 产出后补充）
+- [x] 无实现代码 — 纯设计方案，符合要求
 
 ---
 

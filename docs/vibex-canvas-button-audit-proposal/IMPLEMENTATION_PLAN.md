@@ -580,11 +580,11 @@ git checkout HEAD~1 -- vibex-fronted/src/components/canvas/BusinessFlowTree.tsx 
 - [x] 三树 Toolbar 一致
 
 #### Sprint 2: P2 ✅
-- [ ] `confirmDialogStore` 新增，测试 > 90%
-- [ ] `clearComponentCanvas` 使用 `confirmDialogStore`
-- [ ] `clearFlowCanvas` 使用 `confirmDialogStore`
-- [ ] destructive 模式红色按钮
-- [ ] 无 `window.confirm` 调用
+- [x] `confirmDialogStore` 新增，测试 > 90%（含 ConfirmDialog.test.tsx）
+- [x] `clearComponentCanvas` 使用 `confirmDialogStore`（via ComponentTree wrapper）
+- [x] `clearFlowCanvas` 使用 `confirmDialogStore`（via TreeToolbar wrapper，架构更清晰）
+- [x] destructive 模式红色按钮
+- [x] 无 `window.confirm` 调用（canvas 组件内）
 
 #### Sprint 3: P3 + P4 ✅
 - [ ] "重新生成" 有 tooltip

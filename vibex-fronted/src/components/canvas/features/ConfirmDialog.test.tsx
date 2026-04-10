@@ -72,12 +72,14 @@ describe('ConfirmDialog', () => {
       onCancel: close,
     });
 
-    render(<ConfirmDialog />);
-    // Click the backdrop (the outer fixed div with the onClick handler)
-    // The dialog itself has role="dialog", its parentElement is the backdrop
-    const dialog = screen.getByRole('dialog');
-    const backdrop = dialog.parentElement!;
-    fireEvent.click(backdrop);
+    // The overlay div has onClick={(e) => { if (e.target === e.currentTarget) close() }}
+    // It is the parent of the dialog. Clicking its background (not the inner dialog box)
+    // should trigger close.
+    const { container } = render(<ConfirmDialog />);
+    const overlay = container.querySelector('[class*="fixed"]') as HTMLElement;
+    expect(overlay).not.toBeNull();
+    // Fire click on the overlay element directly so e.target === e.currentTarget
+    fireEvent.click(overlay, { target: overlay, currentTarget: overlay });
     expect(close).toHaveBeenCalledTimes(1);
   });
 });

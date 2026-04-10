@@ -2886,6 +2886,9 @@ All notable changes to this project will be documented in this file.
 
 ## [3.9.0] - 2026-03-29
 
+### Features (vibex-canvas-button-audit-proposal: Sprint 4)
+- **P5**: ProjectBar 按钮收拢设计方案 — 11按钮分析 + A/B/C/D分类 + 核心4-5按钮 + ⋯菜单（文字稿，Figma待UX产出）
+
 ### Fixed (vibex-canvas-flow-card-20260328 Epic1: FlowCard样式虚线+图标) — 2026-03-28
 - **Epic1**: FlowCard border 改为 dashed，FlowStep 添加 type 字段（normal/branch/loop）
   - `BusinessFlowTree.tsx`: StepRow 显示步骤类型图标 🔀分支/🔁循环，`data-testid="flow-card"`, `data-testid="flow-step-icon"`

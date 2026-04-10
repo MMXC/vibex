@@ -1,3 +1,11 @@
+### Added (vibex E1 Epic2: 登录成功 returnTo 安全跳转) — 2026-04-11
+- **E1 Epic2 returnTo 跳转**: validateReturnTo 安全校验 + 登录后跳转逻辑
+  - validateReturnTo() 实现 6 种安全校验（null/空串/绝对URL/协议相对URL/javascript:/路径穿越）
+  - handleSubmit 登录成功后读 sessionStorage.auth_return_to → validateReturnTo → router.push
+  - AuthForm useEffect 从 URL 读取 returnTo 参数并持久化到 sessionStorage（供 OAuth 回调使用）
+  - validateReturnTo.test.ts: 12 个单元测试 case 全覆盖
+  - 提交: 5a2543bb
+
 ### Added (vibex E1: 401 重定向核心机制) — 2026-04-11
 - **E1 Epic1-401**: AuthError 类 + httpClient 401 全局事件分发
   - AuthError: isAuthError/status/returnTo 字段

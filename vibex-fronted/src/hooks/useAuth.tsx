@@ -137,6 +137,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.token) {
         // 安全：使用 sessionStorage 存储认证 token
         sessionStorage.setItem('auth_token', response.token);
+        // E1-S1.5: 同时设置 cookie 让 middleware 可读
+        document.cookie = `auth_session=${response.token}; path=/; max-age=86400; SameSite=Lax`;
         // 清除旧 localStorage 中的 token
         localStorage.removeItem('auth_token');
         setToken(response.token);
@@ -164,6 +166,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (response.token) {
           // 安全：使用 sessionStorage 存储认证 token
           sessionStorage.setItem('auth_token', response.token);
+          // E1-S1.5: 同时设置 cookie 让 middleware 可读
+          document.cookie = `auth_session=${response.token}; path=/; max-age=86400; SameSite=Lax`;
           localStorage.removeItem('auth_token');
           setToken(response.token);
 
@@ -193,6 +197,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem('auth_token');
       localStorage.removeItem('project_roles');
       sessionStorage.removeItem('auth_is_logout'); // clean up flag
+      // E1-S1.5: 清除 middleware 认证 cookie
+      document.cookie = 'auth_session=; path=/; max-age=0';
       setToken(null);
       setUser(null);
     }

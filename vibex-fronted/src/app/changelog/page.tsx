@@ -32,6 +32,20 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.182',
+    date: '2026-04-11',
+    changes: [
+      '📋 vibex E1 Epic2 returnTo 跳转: validateReturnTo 安全校验 + 登录后跳转',
+      '✅ validateReturnTo() 6种安全校验（null/空串/绝对URL/协议相对URL/javascript:/路径穿越）',
+      '✅ handleSubmit 登录成功后读 sessionStorage → validateReturnTo → router.push',
+      '✅ AuthForm useEffect 从 URL 读取 returnTo 并持久化到 sessionStorage',
+      '✅ validateReturnTo.test.ts: 12个单元测试 case 全覆盖',
+      '提交: 5a2543bb',
+    ],
+    commit: '5a2543bb',
+  },
+
+  {
     version: '1.0.181',
     date: '2026-04-11',
     changes: [

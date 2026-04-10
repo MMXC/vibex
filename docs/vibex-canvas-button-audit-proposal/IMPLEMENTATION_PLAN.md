@@ -587,9 +587,9 @@ git checkout HEAD~1 -- vibex-fronted/src/components/canvas/BusinessFlowTree.tsx 
 - [x] 无 `window.confirm` 调用（canvas 组件内）
 
 #### Sprint 3: P3 + P4 ✅
-- [ ] "重新生成" 有 tooltip
-- [ ] `resetFlowCanvas` → `clearFlowCanvas` 重命名
-- [ ] "↺ 清空流程" tooltip 说明撤销能力
+- [x] "重新生成" 有 tooltip — 文案精简为「🔄 重新生成」，tooltip「基于已确认上下文重新生成，清空后重建」
+- [x] `resetFlowCanvas` → `clearFlowCanvas` 重命名 — flowStore 接口 + 实现
+- [x] "↺ 清空流程" tooltip 说明撤销能力 — TreeToolbar 重置按钮更新
 
 #### Sprint 4: P5 ✅
 - [ ] 文字设计方案产出

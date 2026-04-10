@@ -55,6 +55,18 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.179',
+    date: '2026-04-11',
+    changes: [
+      '📋 vibex-canvas-button-audit-proposal Sprint 3: P3 tooltip + P4 clearFlowCanvas',
+      '✅ P3 重新生成: tooltip 精简为「🔄 重新生成」',
+      '✅ P4 clearFlowCanvas: resetFlowCanvas→clearFlowCanvas 重命名',
+      '提交: a5c18802',
+    ],
+    commit: 'a5c18802',
+  },
+
+  {
     version: '1.0.176',
     date: '2026-04-10',
     changes: [

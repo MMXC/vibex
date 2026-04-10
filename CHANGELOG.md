@@ -2880,6 +2880,10 @@ All notable changes to this project will be documented in this file.
 ### Features (vibex-canvas-button-audit-proposal: Sprint 2)
 - **P2**: confirmDialogStore 集成 — BoundedContextTree/ComponentTree/TreeToolbar 中 window.confirm 替换为统一弹窗 (#07ad855d)
 
+### Features (vibex-canvas-button-audit-proposal: Sprint 3)
+- **P3**: 重新生成按钮 tooltip 完善 — 文案精简为「🔄 重新生成」，tooltip「基于已确认上下文重新生成，清空后重建」
+- **P4**: resetFlowCanvas → clearFlowCanvas 重命名 — 语义明确化，TreeToolbar 重置按钮改为「↺ 清空流程」
+
 ## [3.9.0] - 2026-03-29
 
 ### Fixed (vibex-canvas-flow-card-20260328 Epic1: FlowCard样式虚线+图标) — 2026-03-28

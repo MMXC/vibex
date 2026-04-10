@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.171',
+    date: '2026-04-10',
+    changes: [
+      '📋 vibex-reviewer-proposals E1: JsonTreeRenderer 测试覆盖率57%→71%',
+      '✅ +16 tests: null/string/number/boolean/array/unknown渲染',
+      '✅ Expand all/collapse all、toolbar search、copy clipboard',
+      '提交: d1f3d089',
+    ],
+    commit: 'd1f3d089',
+  },
+
+  {
     version: '1.0.170',
     date: '2026-04-10',
     changes: [

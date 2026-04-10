@@ -18,6 +18,12 @@
   - findTestFiles() 扩展: 支持 .spec.ts 和 .test.ts
   - 提交: `df3b8cba`
 
+### Added (vibex-reviewer-proposals E1: JsonTreeRenderer 覆盖率提升) — 2026-04-10
+- **E1**: JsonTreeRenderer 测试覆盖率 57%→71%（+16 tests）
+  - 新增 null/string/number/boolean/array/unknown 类型渲染测试
+  - Expand all/collapse all、toolbar search、copy clipboard
+  - 提交: d1f3d089
+
 ### Added (vibex-sprint-0413 P001: JsonTreeRenderer 样式迁移) — 2026-04-10
 - **P001**: JsonTreeRenderer.module.css 设计令牌迁移
   - 替换所有硬编码 hex 颜色为 CSS 变量（design-tokens）

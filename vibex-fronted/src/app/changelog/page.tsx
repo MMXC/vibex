@@ -21,6 +21,17 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.176',
+    date: '2026-04-10',
+    changes: [
+      '📋 vibex-canvas-button-audit E3 Sprint 2: confirmDialogStore',
+      '✅ Zustand统一确认弹窗，替换window.confirm',
+      '提交: 69df71cc',
+    ],
+    commit: '69df71cc',
+  },
+
+  {
     version: '1.0.175',
     date: '2026-04-10',
     changes: [

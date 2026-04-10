@@ -2877,6 +2877,9 @@ All notable changes to this project will be documented in this file.
 - **E6 AST安全扫描**: Add AST-based prompt security scanner using @babel/parser + @babel/traverse, detect eval/new Function (#a05ea850)
 - **E7 MCP可观测性**: Add health_check MCP tool, structured JSON logging in MCP server (#0c63fff2)
 
+### Features (vibex-canvas-button-audit-proposal: Sprint 2)
+- **P2**: confirmDialogStore 集成 — BoundedContextTree/ComponentTree/TreeToolbar 中 window.confirm 替换为统一弹窗 (#07ad855d)
+
 ## [3.9.0] - 2026-03-29
 
 ### Fixed (vibex-canvas-flow-card-20260328 Epic1: FlowCard样式虚线+图标) — 2026-03-28

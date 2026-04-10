@@ -328,11 +328,11 @@ git checkout HEAD -- vibex-fronted/src/lib/canvas/stores/flowStore.ts
 
 #### 成功标准
 
-- [ ] `confirmDialogStore.test.ts` 覆盖率 > 90%
-- [ ] `componentStore.clearComponentCanvas` 使用 `confirmDialogStore`
-- [ ] `flowStore.clearFlowCanvas` 使用 `confirmDialogStore`
-- [ ] 无 `window.confirm` 调用
-- [ ] destructive 模式确认按钮为红色
+- [x] `confirmDialogStore` 新增，测试 > 90%
+- [x] `clearComponentCanvas` 使用 `confirmDialogStore`
+- [x] `clearFlowCanvas` 使用 `confirmDialogStore`
+- [x] destructive 模式红色按钮
+- [x] 无 `window.confirm` 调用（canvas 组件）
 
 ---
 

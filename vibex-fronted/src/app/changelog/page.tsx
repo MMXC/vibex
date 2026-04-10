@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.172',
+    date: '2026-04-10',
+    changes: [
+      '📋 vibex-dev-proposals P0-2: E2 code cleanup',
+      '✅ 15个根目录垃圾文件已删除（测试残留）',
+      '✅ 76个legacy Page Router路由添加@deprecated注解',
+      '提交: 4c768c12',
+    ],
+    commit: '4c768c12',
+  },
+
+  {
     version: '1.0.171',
     date: '2026-04-10',
     changes: [

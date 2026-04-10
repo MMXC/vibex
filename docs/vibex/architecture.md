@@ -475,5 +475,41 @@ pnpm playwright show-report
 
 ---
 
+---
+
+## 8. 技术审查 (Self-Review)
+
+### 审查结论
+
+| 检查项 | 结果 | 说明 |
+|--------|------|------|
+| 架构可行性 | ✅ 通过 | Window 事件总线方案解耦、可测试、可扩展 |
+| 功能点覆盖 | ✅ 通过 | Epic 1/2/3 共 8 个 Story 均已设计 |
+| 风险评估 | ✅ 通过 | 开放重定向、事件循环、部署顺序风险均已识别 |
+| 安全设计 | ✅ 通过 | returnTo 白名单校验、auth 页面守卫均已覆盖 |
+| 实施计划 | ✅ 通过 | IMPLEMENTATION_PLAN.md 包含 Epic 1/2/3 详细步骤 |
+| 开发约束 | ✅ 通过 | AGENTS.md 含 4 条安全红线 |
+| PRD 路径修正 | ✅ 通过 | 已修正 httpClient→client.ts、AuthContext→useAuth.tsx |
+
+### 风险评估（技术层面）
+
+| 风险 | 级别 | 缓解 |
+|------|------|------|
+| 开放重定向（Open Redirect） | 中 | ADR-002 returnTo 白名单校验强制拦截 `//` 和外部域名 |
+| 部署顺序冲突（Epic 1.1） | 高 | 强制后端先部署 → 前端后部署，禁止同时 |
+| 事件循环（auth 页面守卫遗漏） | 中 | Story 2.3 强制检测 `inAuthPage`，单测 + E2E 覆盖 |
+| OAuth callback returnTo 丢失 | 低 | Story 2.2 要求 OAuth 回调复用 sessionStorage 逻辑 |
+
+### 路径修正记录
+
+| PRD 描述 | 实际文件 |
+|----------|----------|
+| `src/lib/httpClient.ts` | `src/services/api/client.ts` |
+| `src/contexts/AuthContext.tsx` | `src/hooks/useAuth.tsx` |
+| Vitest + Jest | Vitest + Playwright（已按实际框架写测试）|
+
+---
+
 *架构设计: ✅ 完成*
+*技术审查: ✅ 通过（Self-Review）*
 *Next: Dev 实现 → Tester E2E 覆盖*

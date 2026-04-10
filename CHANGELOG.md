@@ -1,5 +1,9 @@
 ### Added (vibex-reviewer-proposals-vibex-build-fixes E1: PR 合入标准 + Renderer 重构) — 2026-04-11
 
+### Added (vibex-reviewer-proposals E4: 质量门禁体系 CI L2) — 2026-04-11
+- **CI L2 quality gate**: CI L1 基础检查 + L2 TypeScript/Security/Coverage
+- 提交: 29b2da30
+
 ### Added (vibex-proposals-summary CI/CD增强) — 2026-04-11
 - **CI fix**: review-gate.yml cache-dependency-path 修正为 monorepo 单 lockfile 路径
 - 提交: 5a85a00c

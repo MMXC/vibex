@@ -88,8 +88,8 @@
 4. **验收**：每批完成后 `grep` 检测，截图对比
 
 **验收条件**:
-- [ ] `grep -rn "style={{" src/app/preview/ --include="*.tsx"` 返回空（排除动态计算类）
-- [ ] `preview.module.css` 文件存在
+- [x] `grep -rn "style={{" src/app/preview/ --include="*.tsx"` 返回空（仅保留动态计算样式）
+- [x] `preview.module.css` 文件存在且完整（~60 CSS 类）
 - [ ] Preview 页面主题切换正常
 
 #### Story 2.2 — Preview 硬编码颜色清理（1 天）

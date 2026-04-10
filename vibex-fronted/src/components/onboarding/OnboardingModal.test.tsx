@@ -42,12 +42,12 @@ describe('OnboardingModal', () => {
 
     render(<OnboardingModal />);
     // Modal should not be visible
-    expect(document.querySelector('.overlay')).toBeNull();
+    expect(screen.queryByTestId('onboarding-overlay')).toBeNull();
   });
 
   it('should render when status is in-progress', () => {
     render(<OnboardingModal />);
-    expect(document.querySelector('.overlay')).toBeInTheDocument();
+    expect(screen.getByTestId('onboarding-overlay')).toBeInTheDocument();
   });
 
   it('should display all steps in indicator', () => {

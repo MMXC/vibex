@@ -1,3 +1,9 @@
+### Added (vibex-pm-proposals E1: Onboarding 新手引导) — 2026-04-10
+- **E1**: OnboardingModal + OnboardingProvider 修复
+  - OnboardingModal.test.tsx: querySelector → getByTestId（CSS Modules 兼容）
+  - 添加 `data-testid="onboarding-modal"` 到 overlay div
+  - 提交: ee32121c
+
 ### Added (vibex-dev-proposals P0-2: 代码清理) — 2026-04-10
 - **P0-2**: E2 code cleanup — 15个根目录垃圾文件已删除
   - E1.1~E1.5测试残留文件（e1dup/e1field/e1new/e1notest/e1test/e1testfile/test-temp*）

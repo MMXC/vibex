@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.173',
+    date: '2026-04-10',
+    changes: [
+      '📋 vibex-pm-proposals E1: Onboarding 新手引导修复',
+      '✅ OnboardingModal.test: querySelector→getByTestId（CSS Modules兼容）',
+      '✅ 添加 data-testid 到 overlay div',
+      '提交: ee32121c',
+    ],
+    commit: 'ee32121c',
+  },
+
+  {
     version: '1.0.172',
     date: '2026-04-10',
     changes: [

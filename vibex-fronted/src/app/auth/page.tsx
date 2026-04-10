@@ -5,6 +5,19 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { authApi } from '@/services/api/modules/auth';
 
+/**
+ * validateReturnTo — sanitize returnTo URL to prevent open redirect.
+ * E1-S2.1
+ */
+function validateReturnTo(returnTo: string | null): string {
+  if (!returnTo) return '/dashboard';
+  if (!returnTo.startsWith('/')) return '/dashboard';
+  if (/^(https?|javascript:|data:)/i.test(returnTo)) return '/dashboard';
+  if (/^\/\//.test(returnTo)) return '/dashboard'; // protocol-relative
+  if (returnTo.includes('/../') || returnTo.endsWith('/..')) return '/dashboard';
+  return returnTo;
+}
+
 function AuthForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -15,13 +28,19 @@ function AuthForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Handle URL parameter to auto-switch form mode
+  // E1-S2.1+S2.2: Handle URL params — mode switch + returnTo persistence
   useEffect(() => {
     const mode = searchParams.get('mode');
     if (mode === 'register') {
       setIsLogin(false);
     } else if (mode === 'login') {
       setIsLogin(true);
+    }
+    // S2.2: Read returnTo from URL and persist to sessionStorage
+    const returnToParam = searchParams.get('returnTo');
+    if (returnToParam) {
+      const safe = validateReturnTo(returnToParam);
+      sessionStorage.setItem('auth_return_to', safe);
     }
   }, [searchParams]);
 
@@ -36,7 +55,12 @@ function AuthForm() {
       } else {
         await authApi.register({ name, email, password });
       }
-      router.push('/dashboard');
+      // E1-S2.1: Read returnTo from sessionStorage and validate
+      const returnTo = sessionStorage.getItem('auth_return_to');
+      const safeReturnTo = validateReturnTo(returnTo);
+      // Clean up after use
+      sessionStorage.removeItem('auth_return_to');
+      router.push(safeReturnTo);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : '操作失败，请稍后重试');
     } finally {

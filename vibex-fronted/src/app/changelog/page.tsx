@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.174',
+    date: '2026-04-10',
+    changes: [
+      '📋 vibex-analyst-proposals E2: 执行闭环追踪强化',
+      '✅ proposal-status-check.sh / proposal-dedup.sh',
+      '✅ proposal-metrics.py / update-tracking.py',
+      '提交: 04ac4ef5',
+    ],
+    commit: '04ac4ef5',
+  },
+
+  {
     version: '1.0.173',
     date: '2026-04-10',
     changes: [

@@ -1,3 +1,11 @@
+### Added (vibex-analyst-proposals E2: 执行闭环追踪强化) — 2026-04-10
+- **E2**: 提案追踪自动化工具集
+  - E2.1: `proposal-status-check.sh` — P0 状态摘要
+  - E2.2: `proposal-dedup.sh` — 检测重复提案并报告相似度
+  - E2.3: `proposal-metrics.py` — 健康度 JSON/表格输出
+  - E2.4: `update-tracking.py` — 支持 done/rejected/pending 状态更新
+  - 提交: 0ce216c7, 43c713a7, 14f4da03, 04ac4ef5
+
 ### Added (vibex-pm-proposals E1: Onboarding 新手引导) — 2026-04-10
 - **E1**: OnboardingModal + OnboardingProvider 修复
   - OnboardingModal.test.tsx: querySelector → getByTestId（CSS Modules 兼容）

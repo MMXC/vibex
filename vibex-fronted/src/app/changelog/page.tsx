@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.175',
+    date: '2026-04-10',
+    changes: [
+      '📋 vibex-canvas-button-audit E1+E2 Sprint 1',
+      '✅ E1 Flow undo: contextStore→flowStore.deleteSelectedNodes（含snapshot）',
+      '✅ E2 TreeToolbar: treeType分支统一delete语义',
+      '提交: a2707a2e',
+    ],
+    commit: 'a2707a2e',
+  },
+
+  {
     version: '1.0.174',
     date: '2026-04-10',
     changes: [

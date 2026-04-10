@@ -4,6 +4,11 @@
   - vibex-backend: 3个 route.ts 文件 Unicode 单引号 → ASCII 单引号
   - 提交: 378f8a56, f8743472
 
+### Added (vibex-dev-proposals-task E2: 设计系统统一 Preview CSS Module 迁移) — 2026-04-11
+- **Preview CSS Module**: preview 页面内联样式 → CSS Module 重构
+  - 移除 87 处内联 style 对象，新增 preview.module.css
+  - 提交: d60f0595
+
 ### Added (vibex-dev-proposals-task E1: 设计系统统一 Auth CSS Module 迁移) — 2026-04-11
 - **Auth CSS Module**: auth 页面内联样式 → CSS Module 重构
   - 新增 auth.module.css，移除 17 处内联 style 对象

@@ -111,7 +111,7 @@ Story 1.2 ──┘
 
 | Story | 验收条件 | 状态 |
 |-------|----------|------|
-| 1.1 | CanvasHeader.stories.tsx 已删除 + 前端构建成功 | 待验证 |
-| 1.2 | 后端构建成功 | ✅ 已验证 |
-| 1.3 | Commit + Push 完成 | 待验证 |
+| 1.1 | CanvasHeader.stories.tsx 已删除 + 前端构建成功 | ✅ 已完成 |
+| 1.2 | 后端构建成功 | ✅ 已完成 |
+| 1.3 | Commit + Push 完成 | ✅ 已完成 |
 

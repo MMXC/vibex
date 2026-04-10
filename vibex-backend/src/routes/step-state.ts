@@ -1,4 +1,10 @@
 /**
+/**
+ * @deprecated This router uses the legacy Page Router API. 
+ * All routes have been migrated to Next.js App Router (app/api/). 
+ * See: docs/migration/page-router-to-app-router.md 
+ * This file will be removed after E1 security fixes are complete. 
+ */
  * Step State API - Autosave Core
  * 
  * Handles step state persistence with optimistic locking using D1/SQLite.

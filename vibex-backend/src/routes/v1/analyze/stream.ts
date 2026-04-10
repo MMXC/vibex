@@ -1,4 +1,8 @@
 /**
+/**
+ * @deprecated Legacy Cloudflare Workers route. Migrated to App Router (app/api/).
+ * See: docs/migration/page-router-to-app-router.md
+ */
  * Analyze Stream API - SSE Streaming Endpoint
  * GET /v1/analyze/stream?requirement=xxx
  *

@@ -1,4 +1,8 @@
 /**
+/**
+ * @deprecated Legacy Cloudflare Workers route. Migrated to App Router (app/api/).
+ * See: docs/migration/page-router-to-app-router.md
+ */
  * WebSocket Health Endpoint
  * E2-S3: Health check for WebSocket connection pool
  * GET /api/v1/ws/health

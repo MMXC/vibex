@@ -1,4 +1,8 @@
 /**
+/**
+ * @deprecated Legacy Cloudflare Workers route. Migrated to App Router (app/api/).
+ * See: docs/migration/page-router-to-app-router.md
+ */
  * Canvas Snapshots API
  * v1/canvas/snapshots — versioned canvas state storage
  *

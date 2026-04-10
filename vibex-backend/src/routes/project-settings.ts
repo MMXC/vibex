@@ -1,4 +1,10 @@
 import { Hono } from 'hono';
+/**
+ * @deprecated This router uses the legacy Page Router API. 
+ * All routes have been migrated to Next.js App Router (app/api/). 
+ * See: docs/migration/page-router-to-app-router.md 
+ * This file will be removed after E1 security fixes are complete. 
+ */
 import { queryOne, executeDB, Env, generateId } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';

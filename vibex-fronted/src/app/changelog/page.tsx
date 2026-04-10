@@ -46,6 +46,19 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.183',
+    date: '2026-04-11',
+    changes: [
+      '📋 vibex E1 Epic3: Next.js auth middleware 测试覆盖',
+      '✅ middleware.ts 保护 /dashboard/canvas/design/project-settings/preview',
+      '✅ 未认证访问 → 307 redirect /auth；已认证访问 /auth → redirect /dashboard',
+      '✅ middleware.test.ts: 22个测试 case',
+      '提交: 1b59c5bc',
+    ],
+    commit: '1b59c5bc',
+  },
+
+  {
     version: '1.0.181',
     date: '2026-04-11',
     changes: [

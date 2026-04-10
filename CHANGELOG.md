@@ -1,3 +1,7 @@
+### Added (vibex-canvas-button-audit E4+E5: Sprint 3 — 文案修复) — 2026-04-10
+- **E4**: 重新生成按钮 tooltip 完善 — 文案精简为「🔄 重新生成」，tooltip 说明「基于已确认上下文重新生成，清空后重建」
+- **E5**: resetFlowCanvas → clearFlowCanvas 重命名 — 语义明确化；TreeToolbar 重置按钮改为「↺ 清空流程」并更新 tooltip
+
 ### Added (vibex-canvas-button-audit E3: Sprint 2 — confirmDialogStore) — 2026-04-10
 - **E3**: confirmDialogStore 统一确认弹窗（Zustand）
   - open/confirm/cancel/close 方法

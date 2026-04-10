@@ -883,9 +883,9 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
             className={styles.secondaryButton}
             onClick={handleRegenerate}
             disabled={flowGenerating}
-            title="基于已确认的上下文重新生成流程树"
+            title="基于已确认上下文重新生成，清空后重建"
           >
-            {flowGenerating ? '◌ 重新生成中...' : '🔄 重新生成流程树'}
+            {flowGenerating ? '◌ 重新生成中...' : '🔄 重新生成'}
           </button>
         )}
         {/* S1.1 & S1.2: 继续·组件树按钮 — flowData 为空时 disabled */}

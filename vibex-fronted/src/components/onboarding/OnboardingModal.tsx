@@ -85,7 +85,7 @@ export function OnboardingModal() {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className={styles.overlay}>
+        <div className={styles.overlay} data-testid="onboarding-overlay">
           <motion.div
             className={styles.backdrop}
             initial={{ opacity: 0 }}

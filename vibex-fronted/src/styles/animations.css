@@ -303,7 +303,7 @@
 }
 
 /* ---------- 特效动画 ---------- */
-.animate-pulseGlow {
+.t-glow-pulse {
   animation: pulseGlow 2s ease-in-out infinite;
 }
 

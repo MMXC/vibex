@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { Template, Industry } from '@/types/template';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { getAuthUserFromRequest } from '@/lib/authFromGateway';
 
 // In-memory template cache loaded from JSON files
 let templateCache: Template[] | null = null;
@@ -40,6 +41,12 @@ export const dynamic = 'force-dynamic';
 
 // GET /api/v1/templates - List templates with optional industry filter
 export async function GET(request: NextRequest) {
+  // Auth check
+  const auth = await getAuthUserFromRequest(request);
+  if (!auth.success) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const templates = await loadTemplates();
     const { searchParams } = request.nextUrl;

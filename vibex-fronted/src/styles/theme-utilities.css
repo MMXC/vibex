@@ -274,3 +274,8 @@
 .vx-row-hover:hover {
   background: var(--color-bg-hover);
 }
+.t-glow-pulse {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.animate-neonFlicker {

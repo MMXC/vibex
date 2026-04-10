@@ -1,4 +1,8 @@
 /**
+/**
+ * @deprecated Legacy Cloudflare Workers route. Migrated to App Router (app/api/).
+ * See: docs/migration/page-router-to-app-router.md
+ */
  * Canvas Flows API - v1 REST Routes
  * /api/v1/flows — CRUD for FlowData (React Flow canvas data)
  *

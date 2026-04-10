@@ -1,4 +1,8 @@
 import { Hono } from 'hono';
+/**
+ * @deprecated Auth routes have been migrated to App Router (app/api/auth/).
+ * See: docs/migration/page-router-to-app-router.md
+ */
 import { hashPassword, generateToken } from '@/lib/auth';
 import { queryOne, executeDB, generateId, Env } from '@/lib/db';
 

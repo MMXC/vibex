@@ -1,4 +1,8 @@
 ### Added (vibex-reviewer-proposals-vibex-build-fixes E1: PR 合入标准 + Renderer 重构) — 2026-04-11
+
+### Added (vibex-proposals-summary CI/CD增强) — 2026-04-11
+- **CI fix**: review-gate.yml cache-dependency-path 修正为 monorepo 单 lockfile 路径
+- 提交: 5a85a00c
 - **Epic2 PR 合入标准**: 审查文档规范产出
   - docs/vibex-reviewer-proposals: Epic2 PR 合入标准文档
   - 提交: ac6a0db2

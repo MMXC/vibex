@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAuthUserFromRequest } from '@/lib/authFromGateway';
+
 import prisma from '@/lib/prisma';
 
 import { safeError } from '@/lib/log-sanitizer';
@@ -15,6 +17,12 @@ export const dynamic = 'force-dynamic';
 
 // GET /api/pages - List all pages (or filter by projectId)
 export async function GET(request: NextRequest) {
+    // Auth check
+    const auth = await getAuthUserFromRequest(request);
+    if (!auth.success) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const projectId = searchParams.get('projectId');
@@ -36,6 +44,12 @@ export async function GET(request: NextRequest) {
 
 // POST /api/pages - Create a new page
 export async function POST(request: NextRequest) {
+    // Auth check
+    const auth = await getAuthUserFromRequest(request);
+    if (!auth.success) {
+      return NextResponse.json({ error: '''Unauthorized''' }, { status: 401 });
+    }
+
   try {
     const body = await request.json();
     const { name, content, projectId } = body;

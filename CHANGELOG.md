@@ -1,3 +1,9 @@
+### Added (vibex-build-fixes: CanvasHeader story + Unicode quotes 修复) — 2026-04-11
+- **构建修复**: 删除 orphaned Storybook files + 修复后端 route.ts Unicode 弯引号
+  - vibex-fronted: 删除 9 个 orphaned story files (CanvasHeader/CanvasToolbar/CollabCursor 等)
+  - vibex-backend: 3个 route.ts 文件 Unicode 单引号 → ASCII 单引号
+  - 提交: 378f8a56, f8743472
+
 ### Added (vibex E1 Epic2: 登录成功 returnTo 安全跳转) — 2026-04-11
 - **E1 Epic2 returnTo 跳转**: validateReturnTo 安全校验 + 登录后跳转逻辑
   - validateReturnTo() 实现 6 种安全校验（null/空串/绝对URL/协议相对URL/javascript:/路径穿越）

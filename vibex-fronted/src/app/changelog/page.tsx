@@ -32,6 +32,18 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.184',
+    date: '2026-04-11',
+    changes: [
+      '📋 vibex-build-fixes: CanvasHeader story + Unicode quotes 修复',
+      '✅ 删除 9 个 orphaned story files',
+      '✅ 修复后端 route.ts Unicode 弯引号',
+      '提交: 378f8a56, f8743472',
+    ],
+    commit: '378f8a56',
+  },
+
+  {
     version: '1.0.182',
     date: '2026-04-11',
     changes: [

@@ -129,8 +129,9 @@ class DedupAPIHandler(BaseHTTPRequestHandler):
                 import urllib.parse
                 parsed = urllib.parse.urlparse(self.path)
                 params = urllib.parse.parse_qs(parsed.query)
-                name = params.get("name", [""])[0]
-                goal = params.get("goal", [""])[0]
+                # Support both old (name/goal) and new (project_name/description) field names
+                name = params.get("project_name", params.get("name", [""]))[0]
+                goal = params.get("description", params.get("goal", [""]))[0]
                 workspace = params.get("workspace", [None])[0]
                 threshold_str = params.get("threshold", [None])[0]
                 threshold = float(threshold_str) if threshold_str else None
@@ -147,8 +148,9 @@ class DedupAPIHandler(BaseHTTPRequestHandler):
         try:
             if self.path == "/dedup":
                 body = self._read_body()
-                name = body.get("name", "")
-                goal = body.get("goal", "")
+                # Support both old (name/goal) and new (project_name/description) field names
+                name = body.get("project_name", body.get("name", ""))
+                goal = body.get("description", body.get("goal", ""))
                 workspace = body.get("workspace")
                 threshold = body.get("threshold")
 

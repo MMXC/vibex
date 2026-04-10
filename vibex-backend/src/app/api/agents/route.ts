@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAuthUserFromRequest } from '@/lib/authFromGateway';
+
 import prisma from '@/lib/prisma';
 
 import { safeError } from '@/lib/log-sanitizer';
@@ -15,6 +17,12 @@ export const dynamic = 'force-dynamic';
 
 // GET /api/agents - List all agents (or filter by userId)
 export async function GET(request: NextRequest) {
+    // Auth check
+    const auth = await getAuthUserFromRequest(request);
+    if (!auth.success) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const userId = searchParams.get('userId');
@@ -33,6 +41,12 @@ export async function GET(request: NextRequest) {
 
 // POST /api/agents - Create a new agent
 export async function POST(request: NextRequest) {
+    // Auth check
+    const auth = await getAuthUserFromRequest(request);
+    if (!auth.success) {
+      return NextResponse.json({ error: '''Unauthorized''' }, { status: 401 });
+    }
+
   try {
     const body = await request.json();
     const { name, prompt, model, temperature, userId } = body;

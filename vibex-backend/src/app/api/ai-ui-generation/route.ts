@@ -7,9 +7,10 @@
  * @module app/api/ai-ui-generation/route
  */
 
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { getAuthUserFromRequest } from '@/lib/authFromGateway';
 
 
 // E-P0-3: API v0 deprecation header (per architecture.md ADR-003)
@@ -237,6 +238,7 @@ function parseAIResponse(content: string): UIGenerationResponse | null {
 
 // ==================== Route Handlers ====================
 
+// GET is a health check — no auth required
 export async function GET() {
   return new Response(JSON.stringify({
     status: 'ok',
@@ -253,6 +255,15 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  // Auth check
+  const auth = await getAuthUserFromRequest(request);
+  if (!auth.success) {
+    return NextResponse.json(
+      { error: 'Unauthorized' },
+      { status: 401, headers: V0_DEPRECATION_HEADERS }
+    );
+  }
+
   try {
     if (!MINIMAX_API_KEY) {
       return new Response(JSON.stringify({ error: 'MINIMAX_API_KEY is not configured' }), { status: 500,

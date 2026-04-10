@@ -20,7 +20,7 @@
     "playwright": "^1.58.2"
   },
   "scripts": {
-    "test": "bats /root/.openclaw/scripts/tests/test_self_evolution.bats && pytest /root/.openclaw/scripts/tests/test_heartbeat_format.py"
+    "test": "pnpm --filter vibex-frontend run test:unit"
   },
   "packageManager": "pnpm@10.32.1"
 }

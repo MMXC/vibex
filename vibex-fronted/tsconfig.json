@@ -55,6 +55,9 @@
     "playwright.setup.ts",
     "src/services/__mocks__",
     "e2e",
-    "tests/unit"
+    "tests/unit",
+    "**/broken-stories/**",
+    "docs/**",
+    "**/docs/**"
   ]
 }

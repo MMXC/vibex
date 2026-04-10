@@ -11,6 +11,26 @@ import { circuitBreakerManager } from '@/lib/circuit-breaker';
 
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
+// ==================== AuthError ====================
+
+/**
+ * AuthError — thrown when a 401 response is received.
+ * Used by httpClient to distinguish auth failures from generic errors.
+ * E1-S1.1
+ */
+export class AuthError extends Error {
+  readonly isAuthError = true;
+  readonly status: number;
+  readonly returnTo: string;
+
+  constructor(message: string, status: number, returnTo: string) {
+    super(message);
+    this.name = 'AuthError';
+    this.status = status;
+    this.returnTo = returnTo;
+  }
+}
+
 // ==================== 接口定义 ====================
 
 export interface Percentiles {
@@ -193,9 +213,28 @@ export function createHttpClient(config?: HttpClientConfig): HttpClient {
         }
         if (error.response?.status === 401) {
           if (typeof window !== 'undefined') {
+            // Distinguish active logout from passive 401 — logout sets this flag
+            const isLogoutAction = sessionStorage.getItem('auth_is_logout') === '1';
+            if (!isLogoutAction) {
+              const returnTo =
+                window.location.pathname + window.location.search || '/dashboard';
+              window.dispatchEvent(
+                new CustomEvent('auth:401', { detail: { returnTo } })
+              );
+            } else {
+              // Active logout: clear the flag and do NOT redirect
+              sessionStorage.removeItem('auth_is_logout');
+            }
             localStorage.removeItem('auth_token');
             sessionStorage.removeItem('auth_token');
           }
+          const returnTo =
+            typeof window !== 'undefined'
+              ? window.location.pathname + window.location.search
+              : '/dashboard';
+          return Promise.reject(
+            new AuthError('登录已过期，请重新登录', 401, returnTo)
+          );
         }
         return Promise.reject(transformError(error));
       }

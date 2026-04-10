@@ -16,6 +16,7 @@ import {
   createContext,
   useContext,
 } from 'react';
+import { useRouter } from 'next/navigation';
 import { apiService } from '@/services/api';
 
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
@@ -54,6 +55,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  // E1-S1.3: 全局 401 监听 — 收到 auth:401 事件后自动跳转 /auth
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const customEvent = e as CustomEvent<{ returnTo: string }>;
+      const returnTo = customEvent.detail?.returnTo;
+      if (!returnTo) return;
+      // Avoid redirect loop: if already on /auth, skip
+      if (typeof window !== 'undefined' && window.location.pathname === '/auth') {
+        return;
+      }
+      sessionStorage.setItem('auth_return_to', returnTo);
+      router.push('/auth');
+    };
+    window.addEventListener('auth:401', handler);
+    return () => window.removeEventListener('auth:401', handler);
+  }, [router]);
 
   // 初始化: 检查 localStorage 中的 token
   useEffect(() => {
@@ -161,6 +180,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // 登出
   const logout = useCallback(async () => {
+    // E1-S1.3: 标记为主动登出，防止 401 触发 redirect loop
+    sessionStorage.setItem('auth_is_logout', '1');
     try {
       await apiService.logout();
     } catch (error) {
@@ -171,6 +192,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       sessionStorage.removeItem('auth_token');
       localStorage.removeItem('auth_token');
       localStorage.removeItem('project_roles');
+      sessionStorage.removeItem('auth_is_logout'); // clean up flag
       setToken(null);
       setUser(null);
     }

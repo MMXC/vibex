@@ -44,6 +44,18 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.185',
+    date: '2026-04-11',
+    changes: [
+      '📋 vibex-dev-proposals-task E1: 设计系统统一 Auth CSS Module 迁移',
+      '✅ auth 页面内联样式 → CSS Module，移除 17 处 style 对象',
+      '✅ error-mapper 统一错误映射 + dashboard ConfirmDialog',
+      '提交: 0cae1330, 021f319a',
+    ],
+    commit: '0cae1330',
+  },
+
+  {
     version: '1.0.182',
     date: '2026-04-11',
     changes: [

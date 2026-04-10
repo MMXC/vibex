@@ -56,6 +56,17 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.186',
+    date: '2026-04-11',
+    changes: [
+      '📋 vibex-dev-proposals-task E2: 设计系统统一 Preview CSS Module 迁移',
+      '✅ preview 页面内联样式 → CSS Module，移除 87 处 style 对象',
+      '提交: d60f0595',
+    ],
+    commit: 'd60f0595',
+  },
+
+  {
     version: '1.0.182',
     date: '2026-04-11',
     changes: [

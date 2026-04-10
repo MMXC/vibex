@@ -44,6 +44,17 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.178',
+    date: '2026-04-11',
+    changes: [
+      '📋 vibex-canvas-button-audit-proposal Sprint 2: P2 confirmDialog 集成',
+      '✅ BoundedContextTree/ComponentTree/TreeToolbar — window.confirm 替换为 confirmDialogStore',
+      '提交: 07ad855d',
+    ],
+    commit: '07ad855d',
+  },
+
+  {
     version: '1.0.176',
     date: '2026-04-10',
     changes: [

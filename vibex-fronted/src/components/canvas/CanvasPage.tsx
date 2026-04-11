@@ -146,7 +146,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
 
   // === E4: useAIController — requirement input + quick generate ===
   const ai = useAIController();
-  const { requirementInput, setRequirementInput, isQuickGenerating, aiThinking, aiThinkingMessage, requirementText, setRequirementText, quickGenerate } = ai;
+  const { requirementInput, setRequirementInput, isQuickGenerating, generatingState, aiThinking, aiThinkingMessage, requirementText, setRequirementText, quickGenerate } = ai;
 
   // === E4: useCanvasSearch — fuzzy search across three trees ===
   const { query: searchQuery, setQuery: setSearchQuery, results: searchResults, searchTimeMs } = useCanvasSearch(
@@ -222,7 +222,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const handleRegenerateContexts = useCallback(
     async (text: string) => {
       if (!text.trim()) return;
-      if (aiThinking || isQuickGenerating) return;
+      if (aiThinking || isQuickGenerating || generatingState !== 'idle') return;
       try {
         const result = await canvasApi.generateContexts({ requirementText: text });
         const ctxs: BoundedContextNode[] = result.contexts.map((c) => ({
@@ -241,7 +241,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         toast.showToast('重新生成失败，请重试', 'error');
       }
     },
-    [aiThinking, isQuickGenerating, toast],
+    [aiThinking, isQuickGenerating, generatingState, toast],
   );
 
   // === Keyboard shortcuts (uses hook handlers) ===
@@ -283,7 +283,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         toast.showToast('请先输入需求', 'warning');
         return;
       }
-      if (isQuickGenerating || aiThinking || flowGenerating || componentGenerating) return;
+      if (generatingState !== 'idle' || aiThinking || flowGenerating || componentGenerating) return;
       try {
         const result = await canvasApi.generateContexts({ requirementText });
         const ctxs: BoundedContextNode[] = result.contexts.map((c) => ({
@@ -386,7 +386,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 type="button"
                 className={styles.secondaryButton}
                 onClick={() => handleRegenerateContexts(requirementText)}
-                disabled={aiThinking || !requirementText.trim()}
+                disabled={aiThinking || generatingState !== 'idle' || !requirementText.trim()}
                 aria-label="重新生成限界上下文"
               >
                 {aiThinking ? '◌ 重新生成中...' : '🔄 重新生成'}
@@ -511,6 +511,29 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             onSaveNow={saveNow}
           />
         </div>
+
+      {/* E4-SSE: AI status bar — shows generatingState to the user */}
+      {(generatingState === 'generating' || generatingState === 'fallback' || generatingState === 'error') && (
+        <div
+          className={styles.aiThinkingHint}
+          role="status"
+          aria-live="polite"
+          data-testid="ai-thinking"
+        >
+          {generatingState === 'generating' && (
+            <>
+              <span className={styles.aiSpinner} aria-hidden="true" />
+              <span>{aiThinkingMessage ?? 'AI 分析中...'}</span>
+            </>
+          )}
+          {generatingState === 'fallback' && (
+            <span>🔄 同步模式生成中...</span>
+          )}
+          {generatingState === 'error' && (
+            <span>⚠️ SSE 连接失败，已切换同步模式</span>
+          )}
+        </div>
+      )}
 
       {/* E2.1: Template Selector trigger button */}
       <button
@@ -660,7 +683,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                     type="button"
                     className={styles.secondaryButton}
                     onClick={() => handleRegenerateContexts(requirementText)}
-                    disabled={aiThinking || !requirementText.trim()}
+                    disabled={aiThinking || generatingState !== 'idle' || !requirementText.trim()}
                     aria-label="重新生成限界上下文"
                   >
                     {aiThinking ? '◌ 重新生成中...' : '🔄 重新生成'}

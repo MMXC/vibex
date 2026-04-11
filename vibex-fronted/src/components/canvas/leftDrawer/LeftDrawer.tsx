@@ -183,7 +183,7 @@ export function LeftDrawer() {
             className={styles.aiThinkingRow}
             role="status"
             aria-live="polite"
-            data-testid="left-drawer-thinking"
+            data-testid="ai-thinking"
           >
             <span className={styles.aiSpinner} aria-hidden="true" />
             <span className={styles.aiThinkingMessage}>{aiThinkingMessage}</span>

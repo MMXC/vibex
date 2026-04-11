@@ -21,6 +21,17 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.188',
+    date: '2026-04-12',
+    changes: [
+      '📋 Epic-E3 命名规范文档 + CI 扫描',
+      '✅ 新增 scan-tsx-css-refs.ts：TSX styles[xxx] 引用检测（480 文件 4479 类，0 undefined）',
+      '✅ 修复 canvas-queue-styles.spec.ts BASE_URL 为 port 3000（CI 兼容）',
+      '提交: 88e4e650',
+    ],
+  },
+
+  {
     version: '1.0.187',
     date: '2026-04-12',
     changes: [

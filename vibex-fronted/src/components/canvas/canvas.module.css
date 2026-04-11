@@ -17,15 +17,20 @@
 
 /* ============================================
    CSS Module Sub-aggregation
+   NOTE: @import (CSS) not @forward (Sass) because
+   @forward is not resolved by Next.js production
+   CSS bundler — it ends up as raw text in the
+   deployed chunk, causing all canvas styles to
+   be silently dropped by the browser.
    ============================================ */
 
-@forward './canvas.base.module.css';
-@forward './canvas.toolbar.module.css';
-@forward './canvas.trees.module.css';
-@forward './canvas.context.module.css';
-@forward './canvas.flow.module.css';
-@forward './canvas.components.module.css';
-@forward './canvas.panels.module.css';
-@forward './canvas.thinking.module.css';
-@forward './canvas.export.module.css';
-@forward './canvas.misc.module.css';
+@import './canvas.base.module.css';
+@import './canvas.toolbar.module.css';
+@import './canvas.trees.module.css';
+@import './canvas.context.module.css';
+@import './canvas.flow.module.css';
+@import './canvas.components.module.css';
+@import './canvas.panels.module.css';
+@import './canvas.thinking.module.css';
+@import './canvas.export.module.css';
+@import './canvas.misc.module.css';

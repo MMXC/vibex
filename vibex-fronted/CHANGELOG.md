@@ -1,5 +1,9 @@
 # Changelog
 
+### [vibex-json-render-fix Epic1: 修复组件预览空白] — 2026-04-11
+- **根因修复** (`canvasApi.ts`): `fetchComponentTree` 返回 `props: {}` 导致预览空白，添加 `generateDefaultProps(type, name)` 根据组件类型生成合规默认 props
+- 验证: pnpm tsc ✅ (41f5aec4)
+
 ### [vibex-canvas-implementation-fix Epic2: SSE 流式生成 Phase 1] — 2026-04-11
 - **S2-1 Phase 1** (`useAIController.ts`): `GeneratingState` 替换 `isQuickGenerating`，5 状态机（idle/generating/done/error/fallback），`canvasSseAnalyze` 流式接入，完整 SSE callbacks，`fallbackToSyncGenerate` 降级策略 (cd1814a8)
 - **S2-1 Tests** (`useAIController.test.tsx`): 6 个单元测试覆盖状态机 + SSE callbacks + guards (422560da)

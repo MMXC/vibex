@@ -21,6 +21,16 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.182',
+    date: '2026-04-11',
+    changes: [
+      '🔧 修复组件预览空白（JsonTreeRenderer）',
+      '✅ generateDefaultProps 根据组件类型生成合规默认 props',
+      '提交: 41f5aec4',
+    ],
+  },
+
+  {
     version: '1.0.181',
     date: '2026-04-11',
     changes: [

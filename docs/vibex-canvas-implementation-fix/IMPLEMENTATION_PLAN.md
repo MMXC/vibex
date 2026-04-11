@@ -256,13 +256,13 @@ grep "getFlowStore().getState()" src/lib/canvas/stores/contextStore.ts  # 应有
 
 ### 启动前置
 
-- [ ] OQ-2: Dev 验证 `/api/v1/canvas/stream` 后端可用 (`curl -N <endpoint>`)
-- [ ] OQ-3: PM 确认降级策略
+- [x] OQ-2: Dev 验证 `/api/v1/canvas/stream` 后端可用（生产环境 https://api.vibex.top 可用）
+- [x] OQ-3: PM 确认降级策略（fallbackToSyncGenerate）
 
 ### S2-1: SSE 流式接入
 
 **文件**: `vibex-fronted/src/hooks/canvas/useAIController.ts`
-**优先级**: P0 | **工时**: 2-3 days
+**优先级**: P0 | **工时**: 2-3 days | **状态**: 🔄 Phase 1 完成 — 提交 cd1814a8
 
 #### Phase 1: SSE 基础设施接入 (Day 1)
 

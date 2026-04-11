@@ -53,7 +53,7 @@ function QueueItem({ page, onRetry, onDelete }: QueueItemProps) {
     : 'error';
 
   return (
-    <li className={`${styles.queueItem} ${styles[`queueItem${statusVariant.charAt(0).toUpperCase() + statusVariant.slice(1)}`]}`}>
+    <li className={`${styles.queueItem} ${(styles as Record<string, string>)[`queueItem${statusVariant.charAt(0).toUpperCase() + statusVariant.slice(1)}`]}`}>
       {/* Status icon */}
       <div className={styles.queueItemIcon}>
         <StatusIcon status={page.status} />
@@ -291,7 +291,7 @@ export function PrototypeQueuePanel({ expanded, onToggleExpand }: PrototypeQueue
             {allDone && (
               <div className={styles.queueExportArea}>
                 <p className={styles.queueExportMsg}>🎉 所有页面生成完成！</p>
-                <button type="button" className={styles.exportBtn} onClick={handleExport}>
+                <button type="button" className={styles.exportButton} onClick={handleExport}>
                   📦 导出 Zip
                 </button>
               </div>

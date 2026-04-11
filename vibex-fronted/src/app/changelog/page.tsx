@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.189',
+    date: '2026-04-12',
+    changes: [
+      '📋 vibex-css-architecture Epic-E4: CI与测试',
+      '✅ E4-S1: PrototypeQueuePanel.test.tsx — 状态样式 Vitest 单元测试（7/7 ✅）',
+      '✅ E4-S2: canvas-queue-styles.spec.ts — 队列样式 E2E 测试（4/4 ✅）',
+      '✅ 修复 24 个缺失 CSS 类名（composes 别名复用已有样式）',
+      '✅ canvas.module.css.d.ts 扩展 22 个类名声明',
+      '提交: bd69472a',
+    ],
+  },
+
+  {
     version: '1.0.188',
     date: '2026-04-12',
     changes: [

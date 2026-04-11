@@ -1,11 +1,6 @@
 /**
-/**
- * @deprecated Legacy Cloudflare Workers route. Migrated to App Router (app/api/).
- * See: docs/migration/page-router-to-app-router.md
  * Tests for Canvas Snapshots API - E2
  *
-import { Hono } from 'hono';
-
  * Verifies:
  * - GET  /               — list snapshots with projectId filter, pagination, empty result
  * - POST /               — create snapshot, validation, version conflict

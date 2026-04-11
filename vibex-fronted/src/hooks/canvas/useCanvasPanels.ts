@@ -12,6 +12,7 @@
 
 import { useState } from 'react';
 import type { TreeType } from '@/lib/canvas/types';
+import { useSessionStore } from '@/lib/canvas/stores';
 
 export interface UseCanvasPanelsReturn {
   activeTab: TreeType;
@@ -26,7 +27,8 @@ export interface UseCanvasPanelsReturn {
 
 export function useCanvasPanels(): UseCanvasPanelsReturn {
   const [activeTab, setActiveTab] = useState<TreeType>('context');
-  const [projectName, setProjectName] = useState('我的项目');
+  const session = useSessionStore();
+  const [projectName, setProjectName] = useState(session.projectName || '我的项目');
   const [queuePanelExpanded, setQueuePanelExpanded] = useState(true);
   const [componentGenerating, setComponentGenerating] = useState(false);
 

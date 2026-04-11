@@ -1,11 +1,6 @@
 /**
-/**
- * @deprecated Legacy Cloudflare Workers route. Migrated to App Router (app/api/).
- * See: docs/migration/page-router-to-app-router.md
  * Tests for Canvas Flows CRUD API - E1
  *
-import { Hono } from 'hono';
-
  * Verifies:
  * - GET / — list with pagination and projectId filter
  * - POST / — create flow

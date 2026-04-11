@@ -1,3 +1,9 @@
+### Added (vibex-canvas Epic1-CSS: CSS @use → @forward 架构修复) — 2026-04-11
+- **canvas.module.css**: @use → @forward（根因修复），恢复 13 个组件类名导出
+- **scan-css-conflicts.ts**: 新增 CSS 类名冲突扫描脚本
+- **canvas-module-exports.test.ts**: 新增类名导出验证测试（6 项全部通过）
+- **验证**: pnpm build ✅, vitest 9 tests ✅, Console errors=0 (#70ed0a1a)
+
 ### Added (vibex-json-render-fix Epic1: 修复组件预览空白) — 2026-04-11
 - **根因修复** (`canvasApi.ts`): `fetchComponentTree` 返回空 props 导致预览空白，添加 `generateDefaultProps` 根据组件类型生成合规默认 props
 - 验证: pnpm tsc ✅ (41f5aec4)

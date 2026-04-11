@@ -14,8 +14,6 @@ import { useGuidanceStore } from '@/stores/guidanceStore';
 import { X, ChevronLeft, ChevronRight, MousePointer2, Layers, ArrowRight } from 'lucide-react';
 import styles from './CanvasOnboardingOverlay.module.css';
 
-import { canvasLogger } from '@/lib/canvas/canvasLogger';
-
 // =============================================================================
 // Types
 // =============================================================================
@@ -71,6 +69,7 @@ const ONBOARDING_STEPS: OnboardingStepData[] = [
 // =============================================================================
 
 export const CanvasOnboardingOverlay = memo(function CanvasOnboardingOverlay() {
+  // === ALL HOOKS: 无条件定义，不允许 early return ===
   const overlayRef = useRef<HTMLDivElement>(null);
 
   // Onboarding state from store
@@ -83,17 +82,12 @@ export const CanvasOnboardingOverlay = memo(function CanvasOnboardingOverlay() {
   const dismissCanvasOnboarding = useGuidanceStore((s) => s.dismissCanvasOnboarding);
   const startCanvasOnboarding = useGuidanceStore((s) => s.startCanvasOnboarding);
 
-  // Don't render if onboarding is completed or dismissed
-  if (completed || dismissed) return null;
-
-  // Define all callbacks BEFORE any early returns to obey Rules of Hooks
+  // === useCallback: 在所有 hooks 之后，early return 之前 ===
   const handleDismiss = useCallback(() => {
-    localStorage.setItem('vibex-canvas-onboarded', 'true');
     dismissCanvasOnboarding();
   }, [dismissCanvasOnboarding]);
 
   const handleComplete = useCallback(() => {
-    localStorage.setItem('vibex-canvas-onboarded', 'true');
     completeCanvasOnboarding();
   }, [completeCanvasOnboarding]);
 
@@ -117,26 +111,26 @@ export const CanvasOnboardingOverlay = memo(function CanvasOnboardingOverlay() {
     }
   }, [currentStep, startCanvasOnboarding]);
 
-  // Keyboard navigation
+  // Keyboard navigation: 直接调用 store action，无中间 callback
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') {
-        handleDismiss();
+        dismissCanvasOnboarding();
       } else if (e.key === 'ArrowRight' || e.key === 'Enter') {
-        handleNext();
+        nextOnboardingStep();
       } else if (e.key === 'ArrowLeft') {
-        handlePrev();
+        prevOnboardingStep();
       }
     }
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [handleDismiss, handleNext, handlePrev]);
+  }, [dismissCanvasOnboarding, nextOnboardingStep, prevOnboardingStep]);
 
-  // Don't render if onboarding hasn't started yet
-  if (currentStep === 0) {
-    return null;
-  }
+  // === EARLY RETURNS: 所有 hooks 之后 ===
+  if (completed || dismissed) return null;
+  if (currentStep === 0) return null;
 
+  // === JSX RENDER ===
   const stepData = ONBOARDING_STEPS[currentStep - 1];
   const isFirstStep = currentStep === 1;
   const isLastStep = currentStep === ONBOARDING_STEPS.length;

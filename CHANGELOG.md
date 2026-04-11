@@ -2955,6 +2955,9 @@ All notable changes to this project will be documented in this file.
 - **S1-8**: useCanvasPanels projectName from sessionStore instead of hardcoded (b7d725d3)
 - **S1-9**: contextStore getFlowStore() lazy access to resolve circular dependency (e307ce2b)
 
+### Bug Fixes (vibex-canvas-urgent-bugs Epic2: 404 资源修复) — 2026-04-11
+- **Bug-2**: preview.module.css CSS Modules 违规（bare `*` selector）修复 — 移除并移至 globals.css，Canvas 页面 0 404 资源 (7bb5ae5b)
+
 ## [3.9.0] - 2026-03-29
 
 ### Features (vibex-canvas-button-audit-proposal: Sprint 4)

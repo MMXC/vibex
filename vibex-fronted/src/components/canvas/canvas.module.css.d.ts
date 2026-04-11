@@ -75,6 +75,7 @@ declare const styles: {
   modifierHint: string;
   multiSelectControls: string;
   nodeCardActions: string;
+  nodeTypeBadge: string;
   nodeCardDesc: string;
   nodeCardHeader: string;
   nodeCardSelected: string;
@@ -156,6 +157,7 @@ declare const styles: {
   // canvas.flow.module.css
   autoGenHint: string;
   btnAddFlow: string;
+  nodePending: string;
   btnAddStep: string;
   btnCancel: string;
   btnConfirm: string;
@@ -207,6 +209,7 @@ declare const styles: {
   flowTypeLegend: string;
   groupedCards: string;
   legendItem: string;
+  activeBadge: string;
   minimapCanvas: string;
   minimapCount: string;
   minimapDot: string;
@@ -255,6 +258,7 @@ declare const styles: {
   shortcutKbd: string;
   shortcutKeys: string;
   shortcutPlus: string;
+  sortableItemDragging: string;
   sortableTreeItem: string;
   treePanelsGrid: string;
   treePanelsGridWithBothDrawers: string;
@@ -263,6 +267,7 @@ declare const styles: {
   treeToolbar: string;
   treeToolbarButtons: string;
   treeToolbarCount: string;
+  continueButton: string;
 
   // canvas.panels.module.css
   chevronCollapsed: string;
@@ -342,6 +347,7 @@ declare const styles: {
   canvasToolbar: string;
   expandAllButton: string;
   expandAllButtonActive: string;
+  expandBothMode: string;
   expandControls: string;
   maximizeButton: string;
   maximizeButtonActive: string;
@@ -359,6 +365,7 @@ declare const styles: {
   inputPhaseArea: string;
   inputPhaseCard: string;
   inputPhaseTitle: string;
+  hovered: string;
   nodeCard: string;
   nodeConfirmed: string;
   nodeError: string;

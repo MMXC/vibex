@@ -1,11 +1,12 @@
 /**
- * @deprecated This router uses the legacy Page Router API. 
- * All routes have been migrated to Next.js App Router (app/api/). 
- * See: docs/migration/page-router-to-app-router.md 
- * This file will be removed after E1 security fixes are complete. 
+ * @deprecated This router uses the legacy Page Router API.
+ * All routes have been migrated to Next.js App Router (app/api/).
+ * See: docs/migration/page-router-to-app-router.md
+ * This file will be removed after E1 security fixes are complete.
  */
+/**
  * Templates API - Template Market & Listing
- * 
+ *
  * GET /api/templates         - List public templates with filtering/pagination
  * GET /api/templates/:id     - Get template details (snapshot)
  * POST /api/templates         - Create template from project

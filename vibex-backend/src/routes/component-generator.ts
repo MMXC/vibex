@@ -1,14 +1,15 @@
 /**
- * @deprecated This router uses the legacy Page Router API. 
- * All routes have been migrated to Next.js App Router (app/api/). 
- * See: docs/migration/page-router-to-app-router.md 
- * This file will be removed after E1 security fixes are complete. 
+ * @deprecated This router uses the legacy Page Router API.
+ * All routes have been migrated to Next.js App Router (app/api/).
+ * See: docs/migration/page-router-to-app-router.md
+ * This file will be removed after E1 security fixes are complete.
  */
+/**
  * Component Generator API Routes
- * 
+ *
  * Provides endpoints for generating UI components using AI.
  * Supports multiple frameworks, UI libraries, and design styles.
- * 
+ *
  * Features:
  * - Single component generation
  * - Batch component generation
@@ -16,7 +17,7 @@
  * - Design token generation
  * - Component variant generation
  * - Quick generation helpers for common components
- * 
+ *
  * @module routes/component-generator
  */
 

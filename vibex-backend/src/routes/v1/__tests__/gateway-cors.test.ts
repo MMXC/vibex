@@ -2,7 +2,6 @@
 /**
  * @deprecated Legacy Cloudflare Workers route. Migrated to App Router (app/api/).
  * See: docs/migration/page-router-to-app-router.md
- */
  * Tests for Gateway CORS Preflight - E1-OPTIONS顺序调整
  *
  * Verifies that OPTIONS preflight requests to protected routes:

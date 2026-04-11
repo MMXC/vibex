@@ -1,21 +1,22 @@
 /**
- * @deprecated This router uses the legacy Page Router API. 
- * All routes have been migrated to Next.js App Router (app/api/). 
- * See: docs/migration/page-router-to-app-router.md 
- * This file will be removed after E1 security fixes are complete. 
+ * @deprecated This router uses the legacy Page Router API.
+ * All routes have been migrated to Next.js App Router (app/api/).
+ * See: docs/migration/page-router-to-app-router.md
+ * This file will be removed after E1 security fixes are complete.
  */
+/**
  * AI UI Generation API Routes
- * 
+ *
  * Provides endpoints for generating UI code from natural language descriptions.
  * Supports multiple frameworks, streaming responses, and component storage.
- * 
+ *
  * Features:
  * - Natural language to UI code generation
  * - Multiple framework support (React, Vue, HTML, etc.)
  * - Streaming responses for real-time feedback
  * - Component saving to database
  * - Design system integration
- * 
+ *
  * @module routes/ai-ui-generation
  */
 

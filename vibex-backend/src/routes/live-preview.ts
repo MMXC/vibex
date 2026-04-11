@@ -1,14 +1,15 @@
 /**
- * @deprecated This router uses the legacy Page Router API. 
- * All routes have been migrated to Next.js App Router (app/api/). 
- * See: docs/migration/page-router-to-app-router.md 
- * This file will be removed after E1 security fixes are complete. 
+ * @deprecated This router uses the legacy Page Router API.
+ * All routes have been migrated to Next.js App Router (app/api/).
+ * See: docs/migration/page-router-to-app-router.md
+ * This file will be removed after E1 security fixes are complete.
  */
+/**
  * Live Preview API Routes
- * 
+ *
  * Provides real-time preview functionality with streaming updates via SSE.
  * Allows clients to receive live updates as the UI is being generated/modified.
- * 
+ *
  * @module routes/live-preview
  */
 

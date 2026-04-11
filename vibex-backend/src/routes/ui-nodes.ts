@@ -1,11 +1,12 @@
 /**
- * @deprecated This router uses the legacy Page Router API. 
- * All routes have been migrated to Next.js App Router (app/api/). 
- * See: docs/migration/page-router-to-app-router.md 
- * This file will be removed after E1 security fixes are complete. 
+ * @deprecated This router uses the legacy Page Router API.
+ * All routes have been migrated to Next.js App Router (app/api/).
+ * See: docs/migration/page-router-to-app-router.md
+ * This file will be removed after E1 security fixes are complete.
  */
+/**
  * UI Nodes API - UI Structure Generation & Persistence
- * 
+ *
  * POST /api/ui-nodes/generate  - SSE streaming UI node generation
  * GET /api/ui-nodes            - Get UI nodes for project/flow
  * PUT /api/ui-nodes            - Update UI node

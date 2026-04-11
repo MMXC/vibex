@@ -1,8 +1,6 @@
 /**
-/**
  * @deprecated Legacy Cloudflare Workers route. Migrated to App Router (app/api/).
  * See: docs/migration/page-router-to-app-router.md
- */
  * Tests for Templates API (SPEC-09)
  */
 

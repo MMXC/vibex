@@ -1,15 +1,16 @@
 /**
- * @deprecated This router uses the legacy Page Router API. 
- * All routes have been migrated to Next.js App Router (app/api/). 
- * See: docs/migration/page-router-to-app-router.md 
- * This file will be removed after E1 security fixes are complete. 
+ * @deprecated This router uses the legacy Page Router API.
+ * All routes have been migrated to Next.js App Router (app/api/).
+ * See: docs/migration/page-router-to-app-router.md
+ * This file will be removed after E1 security fixes are complete.
  */
+/**
  * Requirements Export API Routes
- * 
+ *
  * Provides export functionality for requirements in various formats:
  * - Markdown: Full requirements document in Markdown format
  * - PDF: HTML-based PDF generation (print-friendly)
- * 
+ *
  * @module routes/requirements-export
  */
 

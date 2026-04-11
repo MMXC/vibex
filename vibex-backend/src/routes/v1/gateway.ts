@@ -1,8 +1,6 @@
 /**
-/**
  * @deprecated Legacy Cloudflare Workers route. Migrated to App Router (app/api/).
  * See: docs/migration/page-router-to-app-router.md
- */
  * API Gateway - v1 版本路由
  * 
  * 包含以下中间件：

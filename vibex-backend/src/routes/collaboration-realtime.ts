@@ -1,11 +1,12 @@
 /**
- * @deprecated This router uses the legacy Page Router API. 
- * All routes have been migrated to Next.js App Router (app/api/). 
- * See: docs/migration/page-router-to-app-router.md 
- * This file will be removed after E1 security fixes are complete. 
+ * @deprecated This router uses the legacy Page Router API.
+ * All routes have been migrated to Next.js App Router (app/api/).
+ * See: docs/migration/page-router-to-app-router.md
+ * This file will be removed after E1 security fixes are complete.
  */
+/**
  * Collaboration API with Real-time Features
- * 
+ *
  * Phase 6: 协作功能 - 在现有协作 API 基础上集成实时功能
  * - 项目协作邀请管理
  * - 实时在线状态

@@ -1,8 +1,6 @@
 /**
-/**
  * @deprecated Legacy Cloudflare Workers route. Migrated to App Router (app/api/).
  * See: docs/migration/page-router-to-app-router.md
- */
  * Canvas API Routes - Hono Implementation
  * POST /v1/canvas/generate-contexts
  * POST /v1/canvas/generate-flows

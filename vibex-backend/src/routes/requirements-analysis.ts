@@ -1,16 +1,17 @@
 /**
- * @deprecated This router uses the legacy Page Router API. 
- * All routes have been migrated to Next.js App Router (app/api/). 
- * See: docs/migration/page-router-to-app-router.md 
- * This file will be removed after E1 security fixes are complete. 
+ * @deprecated This router uses the legacy Page Router API.
+ * All routes have been migrated to Next.js App Router (app/api/).
+ * See: docs/migration/page-router-to-app-router.md
+ * This file will be removed after E1 security fixes are complete.
  */
+/**
  * Requirements Analysis API Routes
- * 
+ *
  * Provides endpoints for analyzing requirements using LLM to extract:
  * - Domain entities (people, places, objects, concepts, events)
  * - Entity relationships (dependencies, associations, etc.)
  * - Structured requirement data
- * 
+ *
  * @module routes/requirements-analysis
  */
 

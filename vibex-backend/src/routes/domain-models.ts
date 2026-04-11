@@ -1,15 +1,12 @@
 /**
-/**
- * @deprecated This router uses the legacy Page Router API. 
- * All routes have been migrated to Next.js App Router (app/api/). 
- * See: docs/migration/page-router-to-app-router.md 
- * This file will be removed after E1 security fixes are complete. 
- */
+ * @deprecated This router uses the legacy Page Router API.
+ * All routes have been migrated to Next.js App Router (app/api/).
+ * See: docs/migration/page-router-to-app-router.md
+ * This file will be removed after E1 security fixes are complete.
+ *
  * Domain Models API Routes
- * 
  * Provides endpoints for generating and managing domain models using AI.
  * Returns graph data with nodes (entities) and edges (relationships).
- * 
  * @module routes/domain-models
  */
 

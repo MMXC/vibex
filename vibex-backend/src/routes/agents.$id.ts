@@ -1,4 +1,3 @@
-import { Hono } from 'hono';
 /**
  * @deprecated This router uses the legacy Page Router API. 
  * All routes have been migrated to Next.js App Router (app/api/). 

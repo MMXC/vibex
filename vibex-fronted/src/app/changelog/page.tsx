@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.186',
+    date: '2026-04-12',
+    changes: [
+      '🔧 Epic-E1 CSS 命名修复：snake_case → camelCase（queueItem_queued → queueItemQueued）',
+      '✅ PrototypeQueuePanel.tsx 动态类名修复（capitalize 模式）',
+      '✅ 新增 css-modules.d.ts 全局类型声明',
+      '✅ 新增 CSS 类名命名规范文档',
+      '提交: 978b25d8',
+    ],
+  },
+
+  {
     version: '1.0.185',
     date: '2026-04-12',
     changes: [

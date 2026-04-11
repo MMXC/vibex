@@ -21,6 +21,17 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.187',
+    date: '2026-04-12',
+    changes: [
+      '🔒 Epic-E2 类型安全体系：canvas.module.css.d.ts 覆盖 200+ 类名',
+      '✅ 新增 scan-css-conflicts.ts 支持 TSX styles[xxx] 引用检查',
+      '✅ 新增 canvas-queue-styles.spec.ts E2E 测试 4/4 passed',
+      '提交: e324cb87',
+    ],
+  },
+
+  {
     version: '1.0.186',
     date: '2026-04-12',
     changes: [

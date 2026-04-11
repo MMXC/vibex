@@ -21,6 +21,17 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.185',
+    date: '2026-04-12',
+    changes: [
+      '🔧 Epic3 构建与部署：pnpm build exit code=0 ✅',
+      '✅ Epic3 F3.2 静态导出验证：canvas.html 含 TabBar/ExportMenu/leftDrawer CSS Module',
+      '✅ 新增 scripts/verify-build-deploy.ts 验证脚本',
+      '提交: 6e33fa3e',
+    ],
+  },
+
+  {
     version: '1.0.184',
     date: '2026-04-12',
     changes: [

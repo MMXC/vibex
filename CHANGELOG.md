@@ -1,3 +1,10 @@
+### Added (vibex-canvas Epic2: 验证与回归) — 2026-04-12
+- **F2.1 类名冲突扫描**: scan-css-conflicts.test.ts 3/3 passed，检测到已存在冲突（queueItem/nodeCard/treePanelsGrid）
+- **F2.2 视觉回归**: canvas-visual-regression.spec.ts 5/5 passed，修复 PhaseIndicator 截图测试鲁棒性
+- **F2.3 运行时验证**: canvas-classname-runtime.spec.ts 7/7 passed，DOM 无新增 undefined class
+- **F3.1 构建验证**: pnpm build exit code=0 ✅
+- **验证**: vitest 9/9 canvas tests ✅ | playwright 13/13 E2E ✅ | build ✅ (#79331c71)
+
 ### Added (vibex-canvas Epic1-CSS: CSS @use → @forward 架构修复) — 2026-04-11
 - **canvas.module.css**: @use → @forward（根因修复），恢复 13 个组件类名导出
 - **scan-css-conflicts.ts**: 新增 CSS 类名冲突扫描脚本

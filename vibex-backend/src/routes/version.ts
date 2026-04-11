@@ -4,6 +4,8 @@
  * See: docs/migration/page-router-to-app-router.md 
  * This file will be removed after E1 security fixes are complete. 
  */
+import { Hono } from 'hono';
+
 import { cors } from 'hono/cors'
 
 const app = new Hono()

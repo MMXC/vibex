@@ -4,6 +4,8 @@
  * See: docs/migration/page-router-to-app-router.md 
  * This file will be removed after E1 security fixes are complete. 
  */
+import { Hono } from 'hono';
+
 import { getAuthUserFromHono } from '@/lib/auth';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 

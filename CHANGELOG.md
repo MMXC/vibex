@@ -1,3 +1,10 @@
+### Added (vibex-css-architecture Epic-E1: CSS 命名修复) — 2026-04-12
+- **E1-S1**: PrototypeQueuePanel.tsx — snake_case → camelCase 修复（queueItem_queued → queueItemQueued）
+- **E2-S1**: src/types/css-modules.d.ts — CSS Modules 全局类型声明
+- **E3-S1**: docs/vibex-css-architecture/css-naming-convention.md — CSS 类名命名规范
+- **E4-S1**: PrototypeQueuePanel.test.tsx — 状态样式单元测试（7/7 ✅）
+- **验证**: vitest 7/7 ✅ | commit 978b25d8
+
 ### Added (vibex-canvas Epic3: 构建与部署) — 2026-04-12
 - **F3.1 构建验证**: pnpm build exit code=0，静态导出含 TabBar/ExportMenu/leftDrawer CSS Module 类名
 - **F3.2 部署验证**: scripts/verify-build-deploy.ts 验证脚本，静态导出产物检查通过

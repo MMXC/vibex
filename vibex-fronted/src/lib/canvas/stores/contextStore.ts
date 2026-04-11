@@ -17,7 +17,7 @@ import { getHistoryStore } from '../historySlice';
 import { postContextActionMessage } from './messageBridge';
 
 import { generateId } from '../id';
-import { useFlowStore } from './flowStore';
+const getFlowStore = () => require('./flowStore').useFlowStore;
 
 interface SelectedNodeIds {
   context: string[];
@@ -176,7 +176,7 @@ export const useContextStore = create<ContextStore>()(
           }
           // E1: flow branch — delegate to flowStore for actual deletion (includes recordSnapshot)
           if (tree === 'flow' && selectedNodeIds.flow.length > 0) {
-            useFlowStore.getState().deleteSelectedNodes();
+            getFlowStore().getState().deleteSelectedNodes();
             return;
           }
         },

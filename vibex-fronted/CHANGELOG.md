@@ -1,5 +1,11 @@
 # Changelog
 
+### [vibex-canvas-urgent-bugs Epic2: 404 资源修复（Bug-2 修复）] — 2026-04-11
+- **CSS Module 违规修复** (`src/app/preview/preview.module.css`): 移除 bare `*` selector（违反 CSS Modules 纯度规则），移至 `globals.css`
+- **影响**: Canvas 页面不再因 CSS Module 构建错误而出现资源加载失败
+- **验证**: pnpm build ✅, gstack /canvas 0 errors, 0 404s
+- 提交: `7bb5ae5b`
+
 ### [vibex-canvas-urgent-bugs Epic1: Hooks 安全重构（Bug-1 修复）] — 2026-04-11
 - **CanvasOnboardingOverlay Hooks 重构** (`src/components/guidance/CanvasOnboardingOverlay.tsx`): 所有 `useXxx` hook 移至组件顶部，early return 移至 hooks 之后，消除 react-hooks/rules-of-hooks 违规
 - **移除多余 localStorage 写入**: `handleDismiss/handleComplete` 不再手动写 `vibex-canvas-onboarded`（store persist 已覆盖）

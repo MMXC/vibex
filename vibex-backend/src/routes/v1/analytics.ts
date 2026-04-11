@@ -1,8 +1,6 @@
 /**
-/**
  * @deprecated Legacy Cloudflare Workers route. Migrated to App Router (app/api/).
  * See: docs/migration/page-router-to-app-router.md
- */
  * Analytics API — v1 REST Routes
  *
  * E2-S1:  GET /api/v1/health  — returns latency P50/P95/P99 (no DB, no auth)

@@ -1,13 +1,14 @@
 /**
- * @deprecated This router uses the legacy Page Router API. 
- * All routes have been migrated to Next.js App Router (app/api/). 
- * See: docs/migration/page-router-to-app-router.md 
- * This file will be removed after E1 security fixes are complete. 
+ * @deprecated This router uses the legacy Page Router API.
+ * All routes have been migrated to Next.js App Router (app/api/).
+ * See: docs/migration/page-router-to-app-router.md
+ * This file will be removed after E1 security fixes are complete.
  */
+/**
  * Project Snapshot API
- * 
+ *
  * GET /api/projects?id=&include=snapshot - Get complete project snapshot
- * 
+ *
  * Based on: docs/vibex-simplified-flow/specs/SPEC-03-project-snapshot.md
  */
 

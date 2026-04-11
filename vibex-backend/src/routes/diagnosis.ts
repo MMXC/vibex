@@ -1,15 +1,16 @@
 /**
- * @deprecated This router uses the legacy Page Router API. 
- * All routes have been migrated to Next.js App Router (app/api/). 
- * See: docs/migration/page-router-to-app-router.md 
- * This file will be removed after E1 security fixes are complete. 
+ * @deprecated This router uses the legacy Page Router API.
+ * All routes have been migrated to Next.js App Router (app/api/).
+ * See: docs/migration/page-router-to-app-router.md
+ * This file will be removed after E1 security fixes are complete.
  */
+/**
  * Diagnosis API Routes
- * 
+ *
  * Endpoints:
  * - POST /api/diagnosis/analyze - Analyze requirement quality
  * - POST /api/diagnosis/optimize - One-click optimize
- * 
+ *
  * @module routes/diagnosis
  */
 

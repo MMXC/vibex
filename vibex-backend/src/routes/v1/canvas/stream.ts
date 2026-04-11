@@ -1,8 +1,6 @@
 /**
-/**
  * @deprecated Legacy Cloudflare Workers route. Migrated to App Router (app/api/).
  * See: docs/migration/page-router-to-app-router.md
- */
  * Canvas Stream API - SSE Streaming Endpoint (Hono Version)
  * GET /v1/canvas/stream?requirement=xxx
  *

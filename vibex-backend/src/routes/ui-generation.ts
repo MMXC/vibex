@@ -1,20 +1,21 @@
 /**
- * @deprecated This router uses the legacy Page Router API. 
- * All routes have been migrated to Next.js App Router (app/api/). 
- * See: docs/migration/page-router-to-app-router.md 
- * This file will be removed after E1 security fixes are complete. 
+ * @deprecated This router uses the legacy Page Router API.
+ * All routes have been migrated to Next.js App Router (app/api/).
+ * See: docs/migration/page-router-to-app-router.md
+ * This file will be removed after E1 security fixes are complete.
  */
+/**
  * UI Generation API Routes
- * 
+ *
  * Provides endpoints for AI-powered UI generation.
  * Transforms natural language descriptions into UI schemas and component trees.
- * 
+ *
  * Features:
  * - Natural language to UI schema generation
  * - Component tree structure generation
  * - Framework and UI library customization
  * - Responsive design support
- * 
+ *
  * @module routes/ui-generation
  */
 

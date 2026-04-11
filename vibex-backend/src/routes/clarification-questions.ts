@@ -1,15 +1,16 @@
 /**
- * @deprecated This router uses the legacy Page Router API. 
- * All routes have been migrated to Next.js App Router (app/api/). 
- * See: docs/migration/page-router-to-app-router.md 
- * This file will be removed after E1 security fixes are complete. 
+ * @deprecated This router uses the legacy Page Router API.
+ * All routes have been migrated to Next.js App Router (app/api/).
+ * See: docs/migration/page-router-to-app-router.md
+ * This file will be removed after E1 security fixes are complete.
  */
+/**
  * Clarification Questions API Routes
- * 
+ *
  * Provides endpoints for generating and managing clarification questions
  * for requirements using LLM. These questions help clarify ambiguous or
  * incomplete requirements before confirmation.
- * 
+ *
  * @module routes/clarification-questions
  */
 

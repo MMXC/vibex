@@ -1,9 +1,10 @@
 /**
- * @deprecated This router uses the legacy Page Router API. 
- * All routes have been migrated to Next.js App Router (app/api/). 
- * See: docs/migration/page-router-to-app-router.md 
- * This file will be removed after E1 security fixes are complete. 
+ * @deprecated This router uses the legacy Page Router API.
+ * All routes have been migrated to Next.js App Router (app/api/).
+ * See: docs/migration/page-router-to-app-router.md
+ * This file will be removed after E1 security fixes are complete.
  */
+/**
  * WebSocket Collaboration Route
  * E2-S1: 后端 WebSocket 端点 — Cloudflare Durable Object 代理
  *
@@ -19,6 +20,7 @@
  * - 每个 roomId 对应一个独立的 CollaborationRoom DO 实例
  * - DO 在 fetch() 中处理 WebSocket 升级
  */
+
 import { Hono } from 'hono';
 import type { CloudflareEnv } from '@/lib/env';
 

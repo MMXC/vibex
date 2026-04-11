@@ -1,14 +1,15 @@
 /**
- * @deprecated This router uses the legacy Page Router API. 
- * All routes have been migrated to Next.js App Router (app/api/). 
- * See: docs/migration/page-router-to-app-router.md 
- * This file will be removed after E1 security fixes are complete. 
+ * @deprecated This router uses the legacy Page Router API.
+ * All routes have been migrated to Next.js App Router (app/api/).
+ * See: docs/migration/page-router-to-app-router.md
+ * This file will be removed after E1 security fixes are complete.
  */
+/**
  * Prototype Preview API Routes
- * 
+ *
  * Provides endpoints for generating real-time UI previews from prototype snapshots.
  * Supports streaming previews, multiple framework outputs, and design customization.
- * 
+ *
  * @module routes/prototype-preview
  */
 

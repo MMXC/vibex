@@ -149,7 +149,9 @@ function capitalize(s: string): string {
 
 ---
 
-### Phase 3: CI + 测试（3.5h）
+### Phase 3: CI + 测试（3.5h） ✅
+
+#### Unit 5a: E2-S3a — 静态字面量检测脚本 ✅ (commit 88e4e650)
 
 #### Unit 5a: E2-S3a — 静态字面量检测脚本
 

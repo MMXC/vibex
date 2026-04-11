@@ -1,3 +1,8 @@
+### Added (vibex-css-architecture Epic-E3: 命名规范文档 + CI) — 2026-04-12
+- **E3-S1**: css-naming-convention.md — CSS 类名命名规范（Epic-E1 已产出）
+- **E2-S3a**: scripts/scan-tsx-css-refs.ts — TSX styles['xxx'] 引用检测脚本（0 undefined ✅）
+- **验证**: scan-tsx-css-refs.ts exit code=0 ✅ | 扫描 480 文件 4479 类 ✅ | commit 88e4e650
+
 ### Added (vibex-css-architecture Epic-E2: 类型安全体系) — 2026-04-12
 - **E2-S2**: canvas.module.css.d.ts — 200+ 类名枚举声明，覆盖 10 个 CSS 模块
 - **E2-S3**: scripts/scan-css-conflicts.ts — 扩展支持 TSX styles['xxx'] 引用检查

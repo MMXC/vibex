@@ -21,7 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
-    version: '1.0.178',
+    version: '1.0.180',
+    date: '2026-04-11',
+    changes: [
+      '📋 Epic1+Epic2 功能点完成状态汇总（PRD）',
+      '✅ Epic1 F1.1~F1.4 全部完成（Hooks 重构 Bug-1）',
+      '✅ Epic2 F2.1~F2.2 全部完成（CSS 修复 Bug-2）',
+      '提交: 83f23316',
+    ],
+  },
+
+  {
+    version: '1.0.179',
     date: '2026-04-11',
     changes: [
       '🔧 Canvas BugFix Sprint: 8 个 Hooks/Store 修复（S1-1~S1-9）',

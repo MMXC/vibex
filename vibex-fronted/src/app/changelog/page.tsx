@@ -24,6 +24,21 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.178',
     date: '2026-04-11',
     changes: [
+      '🔧 Canvas BugFix Sprint: 8 个 Hooks/Store 修复（S1-1~S1-9）',
+      '✅ S1-1/S1-7: handleRegenerateContexts deps + renderContextTreeToolbar memoization',
+      '✅ S1-3: useCanvasExport isExporting ref→useState',
+      '✅ S1-4: useCanvasSearch searchTimeMs ref→useState',
+      '✅ S1-5/S1-6: useAutoSave polling deps + lastSnapshotVersionRef 隔离',
+      '✅ S1-8: useCanvasPanels projectName 从 sessionStore 初始化',
+      '✅ S1-9: contextStore getFlowStore() lazy import 解决循环依赖',
+      '提交: 63a4f939, b466b8e3, 68d8f847, 8ddeb94d, b7d725d3, e307ce2b',
+    ],
+  },
+
+  {
+    version: '1.0.178',
+    date: '2026-04-11',
+    changes: [
       '🔧 preview.module.css CSS Module 违规修复（Bug-2 修复）',
       '✅ 移除 bare * selector，移至 globals.css，Canvas 页面 0 404 资源',
       '✅ pnpm build 编译成功，gstack 验证 0 errors, 0 404s',

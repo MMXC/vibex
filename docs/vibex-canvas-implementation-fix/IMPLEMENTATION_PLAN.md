@@ -416,3 +416,26 @@ Epic 3 (Sprint 2)
 | **Epic 1 合计** | | **~3.5h** |
 | Epic 2 | S2-1 SSE 流式接入 | ~2-3d |
 | Epic 3 | S3-1 CSS 拆分 | ~1d |
+
+## S2-1 实施状态
+
+**更新时间**: 2026-04-11
+**Commit**: cd1814a8 (Phase 1) + 422560da (Phase 2+3)
+
+### Phase 1 ✅
+- GeneratingState 类型: 'idle' | 'generating' | 'done' | 'error' | 'fallback'
+- canvasSseApi.canvasSseAnalyze 集成所有回调
+- fallbackToSyncGenerate 单层降级
+
+### Phase 2 ✅
+- CanvasPage: 生成按钮在 generatingState !== 'idle' 时 disabled
+- AI 状态条: data-testid="ai-thinking"，显示 generating/fallback/error 状态
+- LeftDrawer: data-testid="ai-thinking" 已替换
+
+### Phase 3 ✅
+- useAIController.test.tsx: 15 tests 100% 通过
+- 覆盖: Initial state, State transitions, SSE callbacks, onError fallback
+
+### 验证
+- pnpm tsc --skipLibCheck: ✅ 0 errors
+- vitest: ✅ 15/15 passed

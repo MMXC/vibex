@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.177',
+    date: '2026-04-11',
+    changes: [
+      '🪝 CanvasOnboardingOverlay Hooks 安全重构（Bug-1 修复）',
+      '✅ 所有 useXxx hook 移至组件顶部，消除 React Hooks 规则违规',
+      '✅ 移除 handleDismiss/handleComplete 中多余的 localStorage 写入',
+      '✅ Keyboard Effect 直接调用 store action',
+      '✅ 新增 22 个单元测试（跳过/导航/键盘/快速点击）',
+      '提交: 54dab01b',
+    ],
+  },
+
+  {
     version: '1.0.176',
     date: '2026-04-10',
     changes: [

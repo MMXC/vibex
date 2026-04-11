@@ -1,5 +1,14 @@
 # Changelog
 
+### [vibex-canvas-urgent-bugs Epic1: Hooks 安全重构（Bug-1 修复）] — 2026-04-11
+- **CanvasOnboardingOverlay Hooks 重构** (`src/components/guidance/CanvasOnboardingOverlay.tsx`): 所有 `useXxx` hook 移至组件顶部，early return 移至 hooks 之后，消除 react-hooks/rules-of-hooks 违规
+- **移除多余 localStorage 写入**: `handleDismiss/handleComplete` 不再手动写 `vibex-canvas-onboarded`（store persist 已覆盖）
+- **Keyboard Effect 简化**: 直接调用 `dismissCanvasOnboarding()` 等 store action，移除中间 callback
+- **单元测试** (`CanvasOnboardingOverlay.test.tsx`): 22 个测试覆盖所有交互路径 + 快速点击 + localStorage 验证
+- **配套 Hook 修复** (S1-3~S1-9): `useAutoSave` 版本 ref 实例隔离 / `useCanvasExport` isExporting state / `useCanvasSearch` searchTimeMs state / `CanvasPage` renderContextTreeToolbar memoization / `contextStore` getFlowStore lazy import
+- 验证: ESLint ✅, Jest 22/22 ✅, gstack /canvas ✅
+- 提交: `54dab01b`
+
 ### [vibex-fifth E4: 稳定性收尾 E2E 测试] — 2026-04-09
 - **E4.1 JsonRenderPreview 集成验证** (`e2e/json-render-preview.spec.ts`): 3 E2E tests — 预览按钮存在/禁用态、空状态显示、@ci-blocking 标记
 - **E4.2 PrototypeQueuePanel API 连通性验证** (`e2e/prototype-queue.spec.ts`): 5 E2E tests (4 pass, 1 skip) — 队列面板 UI、/api/v1/canvas/status API 验证

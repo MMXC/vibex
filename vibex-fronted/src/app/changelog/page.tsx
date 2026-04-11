@@ -21,6 +21,17 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.183',
+    date: '2026-04-11',
+    changes: [
+      '🔧 canvas CSS @use → @forward（根因修复），恢复 13 个组件类名导出',
+      '✅ 新增 scan-css-conflicts.ts 脚本检测 CSS 类名冲突',
+      '✅ 新增 canvas-module-exports.test.ts 验证类名导出',
+      '提交: 70ed0a1a',
+    ],
+  },
+
+  {
     version: '1.0.182',
     date: '2026-04-11',
     changes: [

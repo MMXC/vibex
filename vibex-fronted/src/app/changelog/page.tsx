@@ -21,6 +21,17 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.184',
+    date: '2026-04-12',
+    changes: [
+      '🔍 Epic2 验证与回归：F2.1 类名冲突扫描 (scan-css-conflicts.test.ts)',
+      '✅ Epic2 F2.2 视觉回归：canvas-visual-regression.spec.ts 5/5 passed',
+      '✅ Epic2 F2.3 运行时验证：canvas-classname-runtime.spec.ts 7/7 passed',
+      '提交: d68dfbb9',
+    ],
+  },
+
+  {
     version: '1.0.183',
     date: '2026-04-11',
     changes: [

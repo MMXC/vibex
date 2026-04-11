@@ -25,8 +25,7 @@ import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error' | 'conflict'
 
-// E1: Version tracking ref for optimistic locking
-const lastSnapshotVersionRef = { current: 0 }
+// E1: Version tracking ref for optimistic locking — moved to instance level in hook
 
 interface UseAutoSaveOptions {
   /** Project ID for saving — if null, auto-save is disabled */
@@ -87,7 +86,8 @@ function getCanvasState() {
  */
 async function doSave(
   projectId: string,
-  options?: { isAutoSave?: boolean }
+  options?: { isAutoSave?: boolean },
+  lastSnapshotVersionRef?: React.MutableRefObject<number>
 ): Promise<{ version: number } | null> {
   try {
     const state = getCanvasState()
@@ -96,13 +96,13 @@ async function doSave(
       label: options?.isAutoSave ? '自动保存' : '手动保存',
       trigger: options?.isAutoSave ? 'auto' : 'manual',
       // E1: Send version for optimistic locking
-      version: lastSnapshotVersionRef.current || undefined,
+      version: lastSnapshotVersionRef?.current || undefined,
       contextNodes: state.contextNodes,
       flowNodes: state.flowNodes,
       componentNodes: state.componentNodes,
     })
     // E1: Update local version on success
-    if (result.snapshot?.version) {
+    if (result.snapshot?.version && lastSnapshotVersionRef) {
       lastSnapshotVersionRef.current = result.snapshot.version
     }
     return { version: result.snapshot?.version ?? 0 }
@@ -159,7 +159,7 @@ export function useAutoSave(options: UseAutoSaveOptions): UseAutoSaveReturn {
       savingRef.current = true
       setSaveStatus('saving')
       try {
-        const result = await doSave(projectId, { isAutoSave: true })
+        const result = await doSave(projectId, { isAutoSave: true }, lastSnapshotVersionRef)
         if (!mountedRef.current) return
         setLastSavedAt(new Date())
         setLastSavedVersion(null)
@@ -266,7 +266,7 @@ export function useAutoSave(options: UseAutoSaveOptions): UseAutoSaveReturn {
     savingRef.current = true
     setSaveStatus('saving')
     try {
-      await doSave(projectId, { isAutoSave: false })
+      await doSave(projectId, { isAutoSave: false }, lastSnapshotVersionRef)
       if (!mountedRef.current) return
       setLastSavedAt(new Date())
       setLastSavedVersion(null)
@@ -311,6 +311,9 @@ export function useAutoSave(options: UseAutoSaveOptions): UseAutoSaveReturn {
     }
   }, [])
 
+  // E1: Version tracking ref for optimistic locking — instance level per hook
+  const lastSnapshotVersionRef = useRef(0)
+
   // E3: Version polling — 30s interval to detect remote version changes (conflict)
   useEffect(() => {
     if (!projectId) return
@@ -340,7 +343,7 @@ export function useAutoSave(options: UseAutoSaveOptions): UseAutoSaveReturn {
     pollLatestVersion()
 
     return () => clearInterval(intervalId)
-  }, [projectId, saveStatus]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [projectId])
 
   return {
     saveStatus,

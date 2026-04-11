@@ -51,9 +51,11 @@ interface SessionStore {
 
   // Queue / project
   projectId: string | null;
+  projectName: string | null;
   prototypeQueue: PrototypePage[];
   isPolling: boolean;
   setProjectId: (id: string | null) => void;
+  setProjectName: (name: string | null) => void;
   setIsPolling: (polling: boolean) => void;
   addToQueue: (pages: PrototypePage[]) => void;
   updateQueueItem: (pageId: string, update: Partial<PrototypePage>) => void;
@@ -97,9 +99,11 @@ export const useSessionStore = create<SessionStore>()(
 
         // Queue
         projectId: null,
+        projectName: null,
         prototypeQueue: [],
         isPolling: false,
         setProjectId: (id) => set({ projectId: id }),
+        setProjectName: (name) => set({ projectName: name }),
         setIsPolling: (polling) => set({ isPolling: polling }),
         addToQueue: (pages) =>
           set((s) => ({ prototypeQueue: [...s.prototypeQueue, ...pages] })),
@@ -111,7 +115,7 @@ export const useSessionStore = create<SessionStore>()(
           })),
         removeFromQueue: (pageId) =>
           set((s) => ({ prototypeQueue: s.prototypeQueue.filter((p) => p.pageId !== pageId) })),
-        clearQueue: () => set({ prototypeQueue: [], projectId: null }),
+        clearQueue: () => set({ prototypeQueue: [], projectId: null, projectName: null }),
       }),
       { name: 'vibex-session-store' }
     ),

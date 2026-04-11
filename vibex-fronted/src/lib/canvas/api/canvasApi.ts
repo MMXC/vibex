@@ -154,6 +154,52 @@ function handleResponseError(res: Response, defaultMsg: string): never {
   throw new Error((err as { error?: string }).error ?? defaultMsg);
 }
 
+/**
+ * 根据组件 type 生成符合 catalog Zod schema 的默认 props
+ * 用于填充 fetchComponentTree 中的 props 字段，解决预览空白问题
+ */
+export function generateDefaultProps(
+  type: string,
+  name: string
+): Record<string, unknown> {
+  switch (type) {
+    case 'page':
+      return { title: name, layout: 'topnav' };
+    case 'form':
+      return {
+        title: name,
+        fields: [
+          { name: 'email', label: '邮箱', type: 'email', placeholder: '请输入邮箱', required: true },
+          { name: 'password', label: '密码', type: 'password', placeholder: '请输入密码', required: true },
+        ],
+        submitLabel: '提交',
+      };
+    case 'list':
+      return {
+        title: name,
+        columns: [
+          { key: 'id', label: 'ID', sortable: false },
+          { key: 'name', label: '名称', sortable: true },
+          { key: 'status', label: '状态', sortable: true },
+        ],
+        rows: 10,
+        searchable: true,
+      };
+    case 'detail':
+      return {
+        title: name,
+        fields: [
+          { label: '状态', value: '待处理' },
+          { label: '创建时间', value: new Date().toLocaleDateString('zh-CN') },
+        ],
+      };
+    case 'modal':
+      return { title: name, size: 'md' };
+    default:
+      return { title: name };
+  }
+}
+
 export const canvasApi = {
   /**
    * 创建项目 — 将三树数据打包发送到后端
@@ -289,7 +335,7 @@ export const canvasApi = {
       flowId: (comp.flowId && comp.flowId !== 'unknown') ? comp.flowId : '',
       name: comp.name,
       type: comp.type as import('../types').ComponentType,
-      props: {},
+      props: generateDefaultProps(comp.type, comp.name),
       api: comp.api ?? {
         method: 'GET' as const,
         path: '/api/' + comp.name.toLowerCase().replace(/\s+/g, '-'),

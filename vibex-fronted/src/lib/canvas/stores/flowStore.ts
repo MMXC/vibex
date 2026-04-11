@@ -43,7 +43,7 @@ interface FlowStore {
   deleteFlowNode: (nodeId: string) => void;
   confirmFlowNode: (nodeId: string) => void;
   toggleFlowNode: (nodeId: string) => void;
-  autoGenerateFlows: (contextNodes: BoundedContextNode[]) => void;
+  autoGenerateFlows: (contextNodes: BoundedContextNode[]) => Promise<void>;
   // Selection (E2: TreeToolbar buttons)
   selectAllNodes: () => void;
   clearNodeSelection: () => void;

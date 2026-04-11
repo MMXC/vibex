@@ -18,8 +18,9 @@ import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
-import { canvasSseApi } from '@/lib/canvas/api/canvasSseApi';
-import type { BoundedContextDraft, BoundedContextNode, ComponentNode, BoundedContext } from '@/lib/canvas/types';
+import { canvasSseAnalyze } from '@/lib/canvas/api/canvasSseApi';
+import type { BoundedContextDraft, BoundedContextNode, ComponentNode } from '@/lib/canvas/types';
+import type { BoundedContext } from '@/lib/canvas/api/canvasSseApi';
 import { useToast } from '@/components/ui/Toast';
 
 export type GeneratingState = 'idle' | 'generating' | 'done' | 'error' | 'fallback';
@@ -140,7 +141,7 @@ function useAIControllerImpl(): UseAIControllerReturn {
     let pendingCompNodes: ComponentNode[] = [];
 
     try {
-      await canvasSseApi.canvasSseAnalyze(requirementInput, {
+      await canvasSseAnalyze(requirementInput, {
         // thinking 事件 → 更新 AI thinking 消息
         onThinking: (content, _delta) => {
           setAiThinking(true, content);

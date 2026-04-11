@@ -2970,6 +2970,14 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes (vibex-canvas-urgent-bugs Epic2: 404 资源修复) — 2026-04-11
 - **Bug-2**: preview.module.css CSS Modules 违规（bare `*` selector）修复 — 移除并移至 globals.css，Canvas 页面 0 404 资源 (7bb5ae5b)
 
+### Features (vibex-canvas-implementation-fix Epic2: SSE 流式生成) — 2026-04-11
+- **S2-1 Phase 1**: `useAIController.ts` GeneratingState 类型（idle/generating/done/error/fallback），canvasSseAnalyze 集成 (cd1814a8)
+- **S2-1 Phase 2**: CanvasPage UI 联动，按钮 disabled、AI 状态条 data-testid="ai-thinking"、fallback/error 提示 (422560da)
+- **S2-1 Phase 3**: useAIController.test.tsx 15 tests 100% (65b3f433)
+
+### Refactor (vibex-canvas-implementation-fix Epic3: CSS 架构重构) — 2026-04-11
+- **S3-1**: canvas.module.css (4383行) 拆分为 10 个子文件（base/toolbar/trees/context/flow/components/panels/thinking/export/misc），主文件聚合 @use (<500行) (8f2208e8)
+
 ## [3.9.0] - 2026-03-29
 
 ### Features (vibex-canvas-button-audit-proposal: Sprint 4)

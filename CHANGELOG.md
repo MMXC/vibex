@@ -2947,6 +2947,9 @@ All notable changes to this project will be documented in this file.
 - **P3**: 重新生成按钮 tooltip 完善 — 文案精简为「🔄 重新生成」，tooltip「基于已确认上下文重新生成，清空后重建」
 - **P4**: resetFlowCanvas → clearFlowCanvas 重命名 — 语义明确化，TreeToolbar 重置按钮改为「↺ 清空流程」
 
+### Bug Fixes (vibex-canvas-urgent-bugs Epic1: Hooks 安全重构 Bug-1 修复) — 2026-04-11
+- **Bug-1**: CanvasOnboardingOverlay Hooks 规则违规修复 — 重构所有 useXxx/useCallback 至顶部，移除条件调用；移除 localStorage 冗余写入；键盘 effect 直接调用 store action (54dab01b)
+
 ### Bug Fixes (vibex-canvas-implementation-fix Epic1: BugFix Sprint ~3.5h) — 2026-04-11
 - **S1-1/S1-7**: CanvasPage handleRegenerateContexts exhaustive-deps + renderContextTreeToolbar useCallback memoization (63a4f939)
 - **S1-3**: useCanvasExport isExporting ref→useState for reactive disabled (b466b8e3)

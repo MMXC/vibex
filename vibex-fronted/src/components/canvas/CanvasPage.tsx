@@ -241,7 +241,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         toast.showToast('重新生成失败，请重试', 'error');
       }
     },
-    [],
+    [aiThinking, isQuickGenerating, toast],
   );
 
   // === Keyboard shortcuts (uses hook handlers) ===
@@ -339,28 +339,31 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
           : '';
 
   // === F1.2: renderContextTreeToolbar — shared helper for context TreeToolbar ===
-  function renderContextTreeToolbar(
-    treeType: 'context' | 'flow' | 'component',
-    nodeCount: number,
-    continueDisabled: boolean,
-    continueLabel: string,
-    onContinue: () => void,
-    extraButtons?: React.ReactNode,
-  ) {
-    return (
-      <TreeToolbar
-        treeType={treeType}
-        nodeCount={nodeCount}
-        onSelectAll={() => useContextStore.getState().selectAllNodes?.('context')}
-        onDeselectAll={() => useContextStore.getState().clearNodeSelection?.('context')}
-        onClear={() => useContextStore.getState().setContextNodes([])}
-        onContinue={onContinue}
-        continueLabel={continueLabel}
-        continueDisabled={continueDisabled}
-        extraButtons={extraButtons}
-      />
-    );
-  }
+  const renderContextTreeToolbar = useCallback(
+    (
+      treeType: 'context' | 'flow' | 'component',
+      nodeCount: number,
+      continueDisabled: boolean,
+      continueLabel: string,
+      onContinue: () => void,
+      extraButtons?: React.ReactNode,
+    ) => {
+      return (
+        <TreeToolbar
+          treeType={treeType}
+          nodeCount={nodeCount}
+          onSelectAll={() => useContextStore.getState().selectAllNodes?.('context')}
+          onDeselectAll={() => useContextStore.getState().clearNodeSelection?.('context')}
+          onClear={() => useContextStore.getState().setContextNodes([])}
+          onContinue={onContinue}
+          continueLabel={continueLabel}
+          continueDisabled={continueDisabled}
+          extraButtons={extraButtons}
+        />
+      );
+    },
+    [],
+  );
 
   // === Tab content for mobile (E2-2: auto-expand active tab panel) ===
   const renderTabContent = (tab: TreeType, _treeNodes: TreeNode[], _isActive: boolean) => {

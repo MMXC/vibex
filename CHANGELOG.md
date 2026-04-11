@@ -1,3 +1,7 @@
+### Added (vibex-json-render-fix Epic1: 修复组件预览空白) — 2026-04-11
+- **根因修复** (`canvasApi.ts`): `fetchComponentTree` 返回空 props 导致预览空白，添加 `generateDefaultProps` 根据组件类型生成合规默认 props
+- 验证: pnpm tsc ✅ (41f5aec4)
+
 ### Added (vibex-backend-build-0411 Epic1: 修复前端构建阻断) — 2026-04-11
 - **前端构建修复** (`useAIController.ts`): 修复 `canvasSseApi.canvasSseAnalyze` 错误命名导入为 `canvasSseAnalyze`（根因修复）
 - **frontend Storybook 清理** (`*.stories.tsx`): 移除孤儿 stories，修复 Storybook orphaned stories 导致的 build 错误

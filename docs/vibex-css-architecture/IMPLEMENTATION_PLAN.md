@@ -188,7 +188,10 @@ function capitalize(s: string): string {
 
 ---
 
-#### Unit 6: E4-S1 — Vitest 单元测试覆盖
+### Phase 4: CI 与 测试（2h） ✅
+
+#### Unit 6: E4-S1 — Vitest 单元测试覆盖 ✅ (commit 978b25d8)
+#### Unit 7: E4-S2 — E2E 测试验证 ✅ (commit b6799679)
 
 **Goal**: 为 4 个状态变体编写单元测试
 

@@ -53,7 +53,7 @@ function QueueItem({ page, onRetry, onDelete }: QueueItemProps) {
     : 'error';
 
   return (
-    <li className={`${styles.queueItem} ${styles[`queueItem_${statusVariant}`]}`}>
+    <li className={`${styles.queueItem} ${styles[`queueItem${statusVariant.charAt(0).toUpperCase() + statusVariant.slice(1)}`]}`}>
       {/* Status icon */}
       <div className={styles.queueItemIcon}>
         <StatusIcon status={page.status} />

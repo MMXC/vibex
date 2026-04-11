@@ -661,18 +661,4 @@
   animation: slideUp 0.3s ease-out;
 }
 
-/* Smooth transitions */
-* {
-  transition-property: background-color, border-color, color, opacity, transform;
-  transition-duration: 0.2s;
-  transition-timing-function: ease-out;
-}
-
-/* Ensure 60fps animations */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
+/* Smooth transitions — moved to globals.css */

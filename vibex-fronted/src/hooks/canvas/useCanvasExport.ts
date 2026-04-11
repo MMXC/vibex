@@ -9,7 +9,7 @@
  * JSON 导出完整画布数据，Markdown 导出结构化描述
  */
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { toPng, toSvg } from 'html-to-image';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { useFlowStore } from '@/lib/canvas/stores/flowStore';
@@ -191,6 +191,7 @@ function buildCanvasMarkdown(scope: ExportScope): string {
  * await exportCanvas({ format: 'png', scope: 'all' });
  */
 export function useCanvasExport(): UseCanvasExportReturn {
+  const [isExporting, setIsExporting] = useState(false);
   const isExportingRef = useRef(false);
   const cancelledRef = useRef(false);
 
@@ -205,6 +206,7 @@ export function useCanvasExport(): UseCanvasExportReturn {
 
     if (isExportingRef.current) return;
     isExportingRef.current = true;
+    setIsExporting(true);
     cancelledRef.current = false;
 
     try {
@@ -213,6 +215,7 @@ export function useCanvasExport(): UseCanvasExportReturn {
       // Handle JSON and Markdown exports (no DOM needed)
       if (format === 'json' || format === 'markdown') {
         if (cancelledRef.current) {
+          setIsExporting(false);
           isExportingRef.current = false;
           return;
         }
@@ -230,6 +233,7 @@ export function useCanvasExport(): UseCanvasExportReturn {
           downloadBlob(blob, filename);
         }
 
+        setIsExporting(false);
         isExportingRef.current = false;
         return;
       }
@@ -259,6 +263,7 @@ export function useCanvasExport(): UseCanvasExportReturn {
       }
 
       if (cancelledRef.current) {
+        setIsExporting(false);
         isExportingRef.current = false;
         return;
       }
@@ -307,18 +312,20 @@ export function useCanvasExport(): UseCanvasExportReturn {
         downloadDataUrl(dataUrl, filename);
       }
     } finally {
+      setIsExporting(false);
       isExportingRef.current = false;
     }
   }, []);
 
   const cancelExport = useCallback(() => {
     cancelledRef.current = true;
+    setIsExporting(false);
     isExportingRef.current = false;
   }, []);
 
   return {
     exportCanvas,
-    isExporting: isExportingRef.current,
+    isExporting,
     error: null,
     cancelExport,
   };

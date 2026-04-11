@@ -1,5 +1,14 @@
 # Changelog
 
+### [vibex-canvas-implementation-fix Epic1: BugFix Sprint ~3.5h] — 2026-04-11
+- **S1-1/S1-7** (`CanvasPage.tsx`): `handleRegenerateContexts` exhaustive-deps 修复 + `renderContextTreeToolbar` useCallback memoization (63a4f939)
+- **S1-3** (`useCanvasExport.ts`): `isExporting` ref→useState，reactive disabled 状态 (b466b8e3)
+- **S1-4** (`useCanvasSearch.ts`): `searchTimeMs` ref→useState，reactive 耗时显示 (68d8f847)
+- **S1-5/S1-6** (`useAutoSave.ts`): 版本轮询 `[projectId]` 修复 + `lastSnapshotVersionRef` 实例隔离 (8ddeb94d)
+- **S1-8** (`useCanvasPanels.ts`): `projectName` 从 sessionStore 初始化，不再硬编码 (b7d725d3)
+- **S1-9** (`contextStore.ts`): `getFlowStore()` lazy import 解决循环依赖 (e307ce2b)
+- **注意**: S1-2 (`useCanvasRenderer` 类型安全化) 待 OQ-1 澄清后实施
+
 ### [vibex-canvas-urgent-bugs Epic2: 404 资源修复（Bug-2 修复）] — 2026-04-11
 - **CSS Module 违规修复** (`src/app/preview/preview.module.css`): 移除 bare `*` selector（违反 CSS Modules 纯度规则），移至 `globals.css`
 - **影响**: Canvas 页面不再因 CSS Module 构建错误而出现资源加载失败

@@ -10,7 +10,7 @@
  * P1-T5: Design tokens imported from canvas.variables.css
  *
  * S3-1: CSS split into 11 sub-modules (see below).
- * This file aggregates all sub-modules via @use directives.
+ * This file aggregates all sub-modules via @forward directives.
  */
 
 @import './canvas.variables.css';
@@ -19,13 +19,13 @@
    CSS Module Sub-aggregation
    ============================================ */
 
-@use './canvas.base.module.css';
-@use './canvas.toolbar.module.css';
-@use './canvas.trees.module.css';
-@use './canvas.context.module.css';
-@use './canvas.flow.module.css';
-@use './canvas.components.module.css';
-@use './canvas.panels.module.css';
-@use './canvas.thinking.module.css';
-@use './canvas.export.module.css';
-@use './canvas.misc.module.css';
+@forward './canvas.base.module.css';
+@forward './canvas.toolbar.module.css';
+@forward './canvas.trees.module.css';
+@forward './canvas.context.module.css';
+@forward './canvas.flow.module.css';
+@forward './canvas.components.module.css';
+@forward './canvas.panels.module.css';
+@forward './canvas.thinking.module.css';
+@forward './canvas.export.module.css';
+@forward './canvas.misc.module.css';

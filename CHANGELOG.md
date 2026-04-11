@@ -1,3 +1,8 @@
+### Added (vibex-backend-build-0411 Epic1: 修复前端构建阻断) — 2026-04-11
+- **前端构建修复** (`useAIController.ts`): 修复 `canvasSseApi.canvasSseAnalyze` 错误命名导入为 `canvasSseAnalyze`（根因修复）
+- **frontend Storybook 清理** (`*.stories.tsx`): 移除孤儿 stories，修复 Storybook orphaned stories 导致的 build 错误
+- 验证: pnpm build ✅ (378f8a56, 65b3f433)
+
 ### Added (vibex-canvas-implementation-fix Epic2: SSE 流式生成 Phase 1) — 2026-04-11
 - **S2-1 Phase 1** (`useAIController.ts`): `GeneratingState` 替换 `isQuickGenerating`，5 状态机，canvasSseAnalyze 流式接入，fallback 降级 (cd1814a8)
 - **S2-1 Tests**: useAIController 6 个单元测试 (422560da)

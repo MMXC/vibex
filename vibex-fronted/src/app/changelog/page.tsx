@@ -21,6 +21,17 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.178',
+    date: '2026-04-11',
+    changes: [
+      '🔧 preview.module.css CSS Module 违规修复（Bug-2 修复）',
+      '✅ 移除 bare * selector，移至 globals.css，Canvas 页面 0 404 资源',
+      '✅ pnpm build 编译成功，gstack 验证 0 errors, 0 404s',
+      '提交: 7bb5ae5b',
+    ],
+  },
+
+  {
     version: '1.0.177',
     date: '2026-04-11',
     changes: [

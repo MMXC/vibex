@@ -229,3 +229,42 @@ Epic 2: 404 资源修复
 | F2.1 | gstack 验证 404 资源 | ✅ | - | 无 404 资源（根因为 CSS build 错误） |
 | F2.2 | 修复 404 资源 | ✅ | 7bb5ae5b | Playwright: 0 404, pnpm build ✅ |
 
+
+---
+
+## 验收标准完成验证
+
+**更新时间**: 2026-04-11
+**更新人**: DEV
+
+### Epic 1 验收标准验证结果
+
+| # | 验收标准 | 验证结果 | 证据 |
+|---|---------|---------|------|
+| AC-1.1.1 | Skip 按钮正常可交互 | ✅ PASSED | Playwright: visible=true, enabled=true |
+| AC-1.1.2 | Skip 后无 ErrorBoundary | ✅ PASSED | Playwright: "Try Again" 按钮不存在 |
+| AC-1.1.3 | Store action 调用正确 | ✅ PASSED | Jest unit test (22 tests 100%) — commit 54dab01b |
+| AC-1.1.4 | 页面无 Invalid hook call | ✅ PASSED | Playwright: 0 console errors |
+| AC-1.1.5 | ESLint hooks 检查 0 errors | ✅ PASSED | ESLint `react-hooks/rules-of-hooks: error` → 0 errors |
+| AC-1.2.1 | 快速点击 Skip 5 次不崩溃 | ✅ PASSED | Jest unit test |
+| AC-1.2.2 | Next 按钮跳过后再进入正常 | ✅ PASSED | Jest unit test |
+| AC-1.2.3 | Store action 参数正确 | ✅ PASSED | Jest unit test |
+
+### Epic 1 DoD 确认
+
+- [x] `CanvasOnboardingOverlay.tsx` 重构完成：所有 hooks + useCallback 在 early return 之前定义
+- [x] ESLint `react-hooks/rules-of-hooks` 检查通过（0 errors）
+- [x] gstack 验证：访问 `/canvas` → 点击 Skip → 页面不崩溃，无 "Try Again" ErrorBoundary
+- [x] gstack 验证：连续快速点击 Skip 5 次，页面稳定
+- [x] Jest 单元测试 100% 通过（22 tests）
+- [x] AppErrorBoundary 无新增错误日志
+
+### Epic 2 验收标准验证结果
+
+| # | 验收标准 | 验证结果 | 证据 |
+|---|---------|---------|------|
+| AC-2.1.1 | /canvas 无 404 资源 | ✅ PASSED | Playwright: 0 failed requests |
+| AC-2.1.2 | 页面完整加载 | ✅ PASSED | Screenshot + console check: 0 errors |
+| AC-2.2.1 | CSS Module 修复后 build 成功 | ✅ PASSED | `pnpm build` → ✅ Compiled successfully |
+| AC-2.2.2 | Preview 页面正常 | ✅ PASSED | Playwright: 0 console errors |
+

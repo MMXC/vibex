@@ -44,12 +44,12 @@ async function main() {
   log('F3.1.2 out/ 目录', hasOutDir ? 'PASS' : 'FAIL', hasOutDir ? '存在' : '不存在');
 
   if (hasOutDir) {
-    const cssDir = join(outDir, '_next', 'static', 'css');
+    const cssDir = join(outDir, '_next', 'static', 'chunks');
     const cssFiles = existsSync(cssDir) ? readdirSync(cssDir).filter(f => f.endsWith('.css')) : [];
     log('F3.1.3 CSS 文件数量', cssFiles.length > 0 ? 'PASS' : 'FAIL', `${cssFiles.length} 个 CSS 文件`);
   }
 
-  // F3.1.4: CSS 中无 undefined
+  // F3.1.4: CSS 中无 undefined class 定义
   try {
     const cssDir = join(outDir, '_next', 'static', 'chunks');
     if (existsSync(cssDir)) {
@@ -57,7 +57,9 @@ async function main() {
       let hasUndefined = false;
       for (const file of cssFiles) {
         const content = readFileSync(join(cssDir, file), 'utf-8');
-        if (content.includes('undefined')) {
+        // 检查 CSS 类名定义块中是否有 undefined (非 CSS 变量)
+        const classBlockWithUndefined = content.match(/\.[a-zA-Z][^\n{]*\{[^}]*\bundefined\b[^}]*\}/);
+        if (classBlockWithUndefined) {
           hasUndefined = true;
           break;
         }

@@ -1,3 +1,9 @@
+### Added (vibex-css-architecture Epic-E2: 类型安全体系) — 2026-04-12
+- **E2-S2**: canvas.module.css.d.ts — 200+ 类名枚举声明，覆盖 10 个 CSS 模块
+- **E2-S3**: scripts/scan-css-conflicts.ts — 扩展支持 TSX styles['xxx'] 引用检查
+- **E4-S2**: e2e/canvas-queue-styles.spec.ts — 队列样式 E2E 测试（4/4 ✅）
+- **验证**: playwright 4/4 ✅ | 预存冲突 16 个（已知 baseline）| commit e324cb87
+
 ### Added (vibex-css-architecture Epic-E1: CSS 命名修复) — 2026-04-12
 - **E1-S1**: PrototypeQueuePanel.tsx — snake_case → camelCase 修复（queueItem_queued → queueItemQueued）
 - **E2-S1**: src/types/css-modules.d.ts — CSS Modules 全局类型声明

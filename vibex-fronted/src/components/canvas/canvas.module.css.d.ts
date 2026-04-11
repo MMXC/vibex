@@ -123,6 +123,35 @@ declare const styles: {
   queueUnlockSection: string;
   statusIconError: string;
   statusIconGenerating: string;
+  // E4-fix: missing CSS class aliases and wrappers referenced in TSX
+  clearQueueBtn: string;
+  iconSpin: string;
+  pollingDot: string;
+  progressBarFill: string;
+  queueBtn: string;
+  queueBtnDanger: string;
+  queueErrorNotice: string;
+  queueExportArea: string;
+  queueExportMsg: string;
+  queueItemBody: string;
+  queueItemNameRow: string;
+  queueItemProgressBar: string;
+  queueItemProgressFill: string;
+  queueItemProgressLabel: string;
+  queuePanelBadge: string;
+  queuePanelContent: string;
+  queuePanelContentExpanded: string;
+  queuePanelHeaderLeft: string;
+  queuePanelHint: string;
+  queuePanelProgress: string;
+  queueStatsRow: string;
+  statBadge: string;
+  statBadgeError: string;
+  statBadgeInfo: string;
+  statBadgeSuccess: string;
+  statusIconDone: string;
+  statusIconQueued: string;
+  phaseIndicatorWrapper: string;
 
   // canvas.flow.module.css
   autoGenHint: string;
@@ -353,8 +382,14 @@ declare const styles: {
   'flowStepTypeIcon--branch': string;
   'flowStepTypeIcon--loop': string;
   'flowStepTypeIcon--normal': string;
+  'iconBtn--add': string;
   'iconBtn--clear': string;
   'iconBtn--confirm': string;
+  'iconBtn--delete': string;
+  'iconBtn--edit': string;
+  'statBadge--error': string;
+  'statBadge--info': string;
+  'statBadge--success': string;
   // canvas.flow.module.css
   'nodeTypeMarker--end': string;
   'nodeTypeMarker--start': string;

@@ -1,3 +1,8 @@
+### Added (vibex-css-architecture Epic-E4: CI与测试) — 2026-04-12
+- **E4-S1**: PrototypeQueuePanel.test.tsx — 状态样式 Vitest 单元测试（7/7 ✅）
+- **E4-S2**: canvas-queue-styles.spec.ts — 队列样式 E2E 测试（4/4 ✅，BASE_URL 修复到 3000）
+- **验证**: vitest 7/7 ✅ | playwright 4/4 ✅ | 全部 Epic-E4 任务完成 ✅
+
 ### Added (vibex-css-architecture Epic-E3: 命名规范文档 + CI) — 2026-04-12
 - **E3-S1**: css-naming-convention.md — CSS 类名命名规范（Epic-E1 已产出）
 - **E2-S3a**: scripts/scan-tsx-css-refs.ts — TSX styles['xxx'] 引用检测脚本（0 undefined ✅）

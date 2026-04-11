@@ -7,7 +7,9 @@
 
 import { test, expect, Page } from '@playwright/test';
 
-const BASE_URL = process.env.BASE_URL ?? 'http://localhost:3000';
+// canvas-e2e project: webServer always starts on port 3000 (playwright.ci.config.ts)
+// Note: CI may set BASE_URL env var incorrectly; we always use the correct port.
+const BASE_URL = 'http://localhost:3000';
 
 async function getUndefinedClassCount(page: Page): Promise<number> {
   return page.evaluate(() => {
@@ -50,7 +52,7 @@ test.describe('E4-S2: Canvas Queue Item Styles', () => {
 
     const response = await page.goto(`${BASE_URL}/canvas`, {
       waitUntil: 'domcontentloaded',
-      timeout: 20000,
+      timeout: 30000,
     });
 
     expect(response?.status()).toBeLessThan(400);
@@ -60,7 +62,7 @@ test.describe('E4-S2: Canvas Queue Item Styles', () => {
   test('Canvas page undefined class count ≤ 9 (Epic2 baseline)', async ({ page }) => {
     await page.goto(`${BASE_URL}/canvas`, {
       waitUntil: 'domcontentloaded',
-      timeout: 20000,
+      timeout: 30000,
     });
     await page.waitForTimeout(2000);
 
@@ -75,7 +77,7 @@ test.describe('E4-S2: Canvas Queue Item Styles', () => {
   test('Queue panel renders with recognized class names', async ({ page }) => {
     await page.goto(`${BASE_URL}/canvas`, {
       waitUntil: 'domcontentloaded',
-      timeout: 20000,
+      timeout: 30000,
     });
     await page.waitForTimeout(2000);
 

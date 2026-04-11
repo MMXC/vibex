@@ -1,0 +1,217 @@
+/* Canvas Toolbar — zoom controls, expand/maximize buttons, canvas toolbar
+ * Split from canvas.module.css
+ */
+
+/* ============================================
+   Original @import preserved below
+   ============================================ */
+
+/* ============================================
+
+@import './canvas.variables.css';
+
+   F1: Expand Controls (全屏展开按钮)
+   ============================================ */
+
+.expandControls {
+  position: fixed;
+  top: 64px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 50;
+  padding: 4px 8px;
+  background: rgba(20, 20, 32, 0.88);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.expandAllButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--color-accent-dim, rgba(99, 102, 241, 0.2));
+  border: 1px solid var(--color-accent);
+  border-radius: 6px;
+  color: var(--color-accent);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+}
+
+.expandAllButton:hover {
+  background: var(--color-accent);
+  color: var(--color-bg-primary);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+}
+
+.expandAllButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Active state: expand-both mode is active */
+.expandAllButtonActive {
+  background: var(--color-accent) !important;
+  color: var(--color-bg-primary) !important;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
+}
+
+.maximizeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: var(--color-surface-dim, rgba(50, 50, 60, 0.5));
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.maximizeButton:hover {
+  background: var(--color-accent-dim, rgba(99, 102, 241, 0.2));
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.maximizeButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Active state: maximize mode is active */
+.maximizeButtonActive {
+  background: rgba(99, 102, 241, 0.25) !important;
+  color: var(--color-accent) !important;
+  border-color: var(--color-accent) !important;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+}
+
+/* ============================================
+   F1.2: Maximize Mode — 隐藏工具栏，三列均分
+   ============================================ */
+
+.maximizeMode {
+  padding: 0 !important;
+}
+
+.maximizeMode .projectBarWrapper {
+  display: none;
+}
+
+.maximizeMode .phaseLabelBar {
+  display: none;
+}
+
+.maximizeMode .expandControls {
+  top: 8px;
+  right: 8px;
+}
+
+/* 最大化模式：三列均分，隐藏 expandCol 按钮列 */
+.maximizeMode .treePanelsGrid {
+  grid-template-columns: 1fr 1fr 1fr !important;
+}
+
+.maximizeMode .expandCol {
+  display: none;
+}
+
+/* ============================================
+   F1.1: expand-both Mode — 1fr 1fr 1fr，隐藏 expandCol
+   ============================================ */
+
+.expandBothMode .treePanelsGrid {
+  grid-template-columns: 1fr 1fr 1fr !important;
+}
+
+.expandBothMode .expandCol {
+  display: none;
+}
+
+
+/* =============================================================================
+   Canvas Toolbar — Epic1 F1.3: Undo/Redo 工具栏
+   ============================================================================= */
+
+.canvasToolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 0.5rem;
+}
+
+.undoRedoGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.toolbarButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: transparent;
+  border: 1px solid var(--color-border, #334155);
+  border-radius: 0.375rem;
+  color: var(--color-text-secondary, #94a3b8);
+  font-size: 0.75rem;
+  font-family: var(--font-sans, system-ui);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.toolbarButton:hover:not(:disabled) {
+  background: var(--color-bg-tertiary, rgba(255, 255, 255, 0.05));
+  color: var(--color-text-primary, #e2e8f0);
+  border-color: var(--color-primary, #8b5cf6);
+}
+
+.toolbarButton:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.toolbarButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.toolbarButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring, #8b5cf6);
+  outline-offset: 2px;
+}
+
+.toolbarButtonLabel {
+  font-size: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .toolbarButtonLabel {
+    display: none;
+  }
+
+  .toolbarButton {
+    padding: 0.25rem 0.375rem;
+  }
+}
+
+/* Prototype phase area */
+.prototypePhase {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+

@@ -1,0 +1,368 @@
+/* Canvas Trees — generic node card, input phase, placeholder, mobile tab
+ * Split from canvas.module.css
+ */
+
+/* ============================================
+   Original @import preserved below
+   ============================================ */
+
+/* ============================================
+
+@import './canvas.variables.css';
+
+   Node Confirmation Styles
+   ============================================ */
+
+.nodeCard {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 2px solid transparent;
+  background: var(--color-bg-elevated);
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+  position: relative; /* For absolute-positioned selection checkbox */
+}
+
+.nodeCard:hover {
+  border-color: var(--color-border-hover);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* F3.3: Explicit hovered class (for test assertion: classList.contains('hovered')) */
+.nodeCard.hovered {
+  border-color: var(--color-border-hover);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+}
+
+.nodeCard:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.nodeCard:active {
+  transform: scale(0.99);
+}
+
+/* Unconfirmed: type color border, no yellow */
+.nodeUnconfirmed {
+  /* 移除黄色边框和阴影，通过 type-specific 颜色区分 */
+  border: 2px solid var(--color-border);
+}
+
+/* Confirmed: green border + type glow */
+.nodeConfirmed {
+  border-color: var(--color-success);
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
+}
+
+/* Error state */
+.nodeError {
+  border-color: var(--color-error);
+  box-shadow: 0 0 8px rgba(255, 68, 102, 0.2);
+}
+
+/* Generating animation */
+.nodeGenerating {
+  border-color: var(--color-info);
+  box-shadow: 0 0 8px rgba(0, 170, 255, 0.2);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* E1: BoundedContextTree type colors via border — applied when nodeCard has data-type attribute */
+/* Type-specific unconfirmed border colors for BoundedContextTree nodes */
+.nodeCard[data-type="core"] {
+  border-color: #f59e0b;
+}
+.nodeCard[data-type="supporting"] {
+  border-color: #3b82f6;
+}
+.nodeCard[data-type="generic"] {
+  border-color: #6b7280;
+}
+.nodeCard[data-type="external"] {
+  border-color: #8b5cf6;
+}
+
+/* E2: ComponentTree type colors via border */
+.nodeCard[data-type="page"] {
+  border-color: #3b82f6;
+}
+.nodeCard[data-type="list"] {
+  border-color: #8b5cf6;
+}
+.nodeCard[data-type="form"] {
+  border-color: #f59e0b;
+}
+.nodeCard[data-type="detail"] {
+  border-color: #10b981;
+}
+.nodeCard[data-type="modal"] {
+  border-color: #ef4444;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ============================================
+   Input Phase Area
+   ============================================ */
+
+.inputPhaseArea {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.inputPhaseCard {
+  width: 100%;
+  max-width: 640px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  padding: 2rem;
+}
+
+.inputPhaseTitle {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 1.5rem;
+}
+
+.requirementTextarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  resize: vertical;
+  min-height: 120px;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.requirementTextarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-muted);
+}
+
+.requirementTextarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.inputPhaseActions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+/* E4-F10: Template actions row in input phase */
+.templateActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border, #2d2d44);
+}
+
+/* E3 S3.4: 示例项目快速入口 */
+.exampleQuickEntry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.exampleDivider {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  gap: 0.75rem;
+}
+
+.exampleDivider::before,
+.exampleDivider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border, #2d2d44);
+}
+
+.exampleQuickButton {
+  width: 100%;
+  padding: 10px 1.5rem;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 0.5rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.exampleQuickButton:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(139, 92, 246, 0.25));
+  border-color: rgba(99, 102, 241, 0.5);
+  transform: translateY(-1px);
+}
+
+.exampleQuickButton:active {
+  transform: translateY(0);
+}
+
+.exampleQuickButton:focus-visible {
+  outline: 2px solid rgba(99, 102, 241, 0.6);
+  outline-offset: 2px;
+}
+
+.primaryButton {
+  padding: 0.625rem 1.5rem;
+  background: var(--color-primary);
+  color: var(--color-bg-primary);
+  border: none;
+  border-radius: 0.5rem;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.primaryButton:hover {
+  background: var(--color-primary-hover);
+  box-shadow: 0 0 16px var(--color-primary-glow);
+}
+
+.primaryButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.secondaryButton {
+  padding: 0.625rem 1.5rem;
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.secondaryButton:hover {
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary);
+}
+
+.secondaryButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   Placeholder Tree
+   ============================================ */
+
+.placeholderTree {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem 1rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  font-size: var(--text-sm);
+}
+
+.placeholderIcon {
+  font-size: 2rem;
+  opacity: 0.3;
+}
+
+/* ============================================
+   Mobile Tab Mode
+   ============================================ */
+
+.canvasMobile {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.tabBar {
+  display: flex;
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.tabButton {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.tabButton:hover {
+  color: var(--color-text-secondary);
+  background: var(--color-bg-tertiary);
+}
+
+.tabButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+.tabButtonActive {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.tabContent {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ============================================
+   Responsive Breakpoint
+   ============================================ */
+
+@media (max-width: 768px) {
+  .phaseLabel {
+    display: none;
+  }
+
+  .phaseItem {
+    padding: 0.5rem 0.75rem;
+    font-size: var(--text-xs);
+  }
+}
+

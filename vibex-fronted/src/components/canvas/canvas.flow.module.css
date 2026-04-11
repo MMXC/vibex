@@ -1,0 +1,535 @@
+/* Canvas Flow — BusinessFlowTree, flow cards, steps, edit forms
+ * Split from canvas.module.css
+ */
+
+/* ============================================
+   Original @import preserved below
+   ============================================ */
+
+/* ============================================
+
+@import './canvas.variables.css';
+
+   BusinessFlowTree (Epic 3)
+   ============================================ */
+
+.flowTreePanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100%;
+}
+
+.treeHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.btnAddFlow {
+  padding: 0.375rem 0.75rem;
+  background: var(--color-accent);
+  color: var(--color-bg-primary);
+  border: none;
+  border-radius: 6px;
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.btnAddFlow:hover {
+  opacity: 0.85;
+}
+
+.btnAddFlow:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.autoGenHint {
+  font-size: var(--text-xs);
+  color: var(--color-accent);
+  align-self: center;
+}
+
+.emptyFlowList {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.emptyFlowList p {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.hint {
+  font-size: var(--text-xs) !important;
+  color: var(--color-text-muted);
+}
+
+.flowList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0 1rem 1rem;
+  overflow-y: auto;
+}
+
+/* Flow Card */
+.flowCard {
+  border: 2px dashed var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg-secondary);
+  transition: border-color 0.2s ease;
+  position: relative; /* For absolute-positioned selection checkbox */
+}
+
+.flowCardCheckbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+/* [E1] Step confirmation checkbox */
+.stepConfirmCheckbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+.flowCard.nodeConfirmed {
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 1px var(--color-success);
+}
+
+.flowCard.nodeError {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 1px var(--color-error);
+}
+
+.flowCard.nodePending {
+  border-color: var(--color-warning);
+  box-shadow: 0 0 0 1px rgba(255, 193, 7, 0.3);
+}
+
+.flowCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.flowName {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flowProgress {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.flowCardActions {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.expandBtn {
+  padding: 0.125rem 0.25rem;
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  flex-shrink: 0;
+  line-height: 1;
+  border-radius: 4px;
+  transition: background 0.15s ease;
+}
+
+.expandBtn:hover {
+  background: var(--color-bg-tertiary);
+}
+
+/* Flow edit form */
+.flowEditForm {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.flowNameInput {
+  flex: 1;
+  padding: 0.25rem 0.5rem;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text-primary);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  min-width: 0;
+}
+
+.flowNameInput:focus {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 1px;
+}
+
+/* Steps List */
+.stepsList {
+  border-top: 1px solid var(--color-border);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.emptySteps {
+  padding: 1rem;
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.btnAddStep {
+  margin-top: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  background: transparent;
+  color: var(--color-accent);
+  border: 1px dashed var(--color-accent);
+  border-radius: 6px;
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btnAddStep:hover {
+  background: rgba(0, 212, 170, 0.08);
+  color: var(--color-accent);
+}
+
+.btnAddStep:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Step Row */
+.stepRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg-primary);
+  transition: border-color 0.2s ease;
+}
+
+.stepRow.nodeConfirmed {
+  border-color: var(--color-success);
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.stepRow.nodeError {
+  border-color: var(--color-error);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.stepRow.nodePending {
+  border-color: rgba(255, 193, 7, 0.4);
+  background: rgba(255, 193, 7, 0.03);
+}
+
+/* (stepDragHandle styles moved to P1-T2 section above) */
+
+
+.stepOrder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* F2.2: Node type markers for start/end nodes */
+.nodeTypeMarker {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  margin-right: 2px;
+}
+
+.nodeTypeMarker--start {
+  /* Green circle for start node */
+  background: #22c55e;
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(34, 197, 94, 0.6);
+}
+
+.nodeTypeMarker--end {
+  /* Red square for end node */
+  background: #ef4444;
+  border-radius: 2px;
+  box-shadow: 0 0 4px rgba(239, 68, 68, 0.6);
+}
+
+/* (flowStepIcon moved to P1-T3 section) */
+
+.stepContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.stepName {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.stepActor {
+  font-size: var(--text-xs);
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+.stepDesc {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stepActions {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.stepMoveBtn {
+  padding: 0.125rem 0.25rem;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.15s ease;
+}
+
+.stepMoveBtn:hover:not(:disabled) {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.stepMoveBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.stepActionBtn {
+  padding: 0.125rem 0.375rem;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  line-height: 1.4;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.stepActionBtn:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.btnConfirmStep {
+  color: var(--color-success);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.btnConfirmStep:hover {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+}
+
+/* FlowCard action buttons */
+.btnIcon {
+  padding: 0.25rem 0.375rem;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  line-height: 1.4;
+  transition: background 0.15s ease, color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnIcon:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.btnIcon:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.btnConfirm {
+  color: var(--color-success);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.btnConfirm:hover {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+}
+
+/* Step edit form */
+.stepEditForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  flex: 1;
+}
+
+.stepInput {
+  padding: 0.25rem 0.5rem;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text-primary);
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  width: 100%;
+}
+
+.stepInput:focus {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 1px;
+}
+
+.stepTextarea {
+  padding: 0.25rem 0.5rem;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text-primary);
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  width: 100%;
+  resize: vertical;
+  min-height: 2.5rem;
+}
+
+.stepTextarea:focus {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 1px;
+}
+
+.stepEditActions {
+  display: flex;
+  gap: 0.375rem;
+}
+
+/* Shared button styles */
+.btnSave {
+  padding: 0.25rem 0.625rem;
+  background: var(--color-success);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: 4px;
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.btnSave:hover {
+  opacity: 0.85;
+}
+
+.btnSave:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.btnCancel {
+  padding: 0.25rem 0.625rem;
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btnCancel:hover {
+  background: var(--color-bg-secondary);
+}
+
+.btnCancel:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Inactive panel */
+.inactivePanel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+

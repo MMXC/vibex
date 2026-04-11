@@ -2947,6 +2947,14 @@ All notable changes to this project will be documented in this file.
 - **P3**: 重新生成按钮 tooltip 完善 — 文案精简为「🔄 重新生成」，tooltip「基于已确认上下文重新生成，清空后重建」
 - **P4**: resetFlowCanvas → clearFlowCanvas 重命名 — 语义明确化，TreeToolbar 重置按钮改为「↺ 清空流程」
 
+### Bug Fixes (vibex-canvas-implementation-fix Epic1: BugFix Sprint ~3.5h) — 2026-04-11
+- **S1-1/S1-7**: CanvasPage handleRegenerateContexts exhaustive-deps + renderContextTreeToolbar useCallback memoization (63a4f939)
+- **S1-3**: useCanvasExport isExporting ref→useState for reactive disabled (b466b8e3)
+- **S1-4**: useCanvasSearch searchTimeMs ref→useState for reactive display (68d8f847)
+- **S1-5/S1-6**: useAutoSave polling [projectId] only + lastSnapshotVersionRef instance isolation (8ddeb94d)
+- **S1-8**: useCanvasPanels projectName from sessionStore instead of hardcoded (b7d725d3)
+- **S1-9**: contextStore getFlowStore() lazy access to resolve circular dependency (e307ce2b)
+
 ## [3.9.0] - 2026-03-29
 
 ### Features (vibex-canvas-button-audit-proposal: Sprint 4)

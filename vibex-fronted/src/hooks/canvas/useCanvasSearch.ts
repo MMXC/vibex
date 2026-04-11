@@ -73,6 +73,7 @@ export function useCanvasSearch(
 
   const [query, setQueryState] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [searchTimeMs, setSearchTimeMs] = useState<number | null>(null);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchTimeRef = useRef<number>(0);
 
@@ -168,6 +169,7 @@ export function useCanvasSearch(
     const elapsed = performance.now() - start;
     // Use ref to avoid triggering re-render during memo
     searchTimeRef.current = elapsed;
+    setSearchTimeMs(elapsed);
 
     return fuseResults.map((r) => r.item);
   }, [query, fuse]);
@@ -179,7 +181,7 @@ export function useCanvasSearch(
     setQuery,
     results,
     hasResults,
-    searchTimeMs: searchTimeRef.current,
+    searchTimeMs: searchTimeMs ?? 0,
     isSearching,
   };
 }

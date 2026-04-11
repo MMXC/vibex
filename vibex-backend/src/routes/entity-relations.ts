@@ -4,6 +4,8 @@
  * See: docs/migration/page-router-to-app-router.md 
  * This file will be removed after E1 security fixes are complete. 
  */
+import { Hono } from 'hono';
+
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 import { TYPES_PACKAGE_VERSION } from '@vibex/types'; // E3: @vibex/types reference
 

@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.181',
+    date: '2026-04-11',
+    changes: [
+      '⚡ Epic2 SSE 流式生成 Phase 1（useAIController 重构）',
+      '✅ GeneratingState 替换 isQuickGenerating（idle/generating/done/error/fallback 5 状态）',
+      '✅ canvasSseAnalyze SSE 流式接入 + fallback 降级',
+      '✅ 新增 useAIController.test.tsx 6 个单元测试',
+      '提交: cd1814a8',
+    ],
+  },
+
+  {
     version: '1.0.180',
     date: '2026-04-11',
     changes: [

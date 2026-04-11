@@ -1,5 +1,10 @@
 # Changelog
 
+### [vibex-canvas-implementation-fix Epic2: SSE 流式生成 Phase 1] — 2026-04-11
+- **S2-1 Phase 1** (`useAIController.ts`): `GeneratingState` 替换 `isQuickGenerating`，5 状态机（idle/generating/done/error/fallback），`canvasSseAnalyze` 流式接入，完整 SSE callbacks，`fallbackToSyncGenerate` 降级策略 (cd1814a8)
+- **S2-1 Tests** (`useAIController.test.tsx`): 6 个单元测试覆盖状态机 + SSE callbacks + guards (422560da)
+- 验证: pnpm build ✅
+
 ### [vibex-canvas-implementation-fix Epic1: BugFix Sprint ~3.5h] — 2026-04-11
 - **S1-1/S1-7** (`CanvasPage.tsx`): `handleRegenerateContexts` exhaustive-deps 修复 + `renderContextTreeToolbar` useCallback memoization (63a4f939)
 - **S1-3** (`useCanvasExport.ts`): `isExporting` ref→useState，reactive disabled 状态 (b466b8e3)

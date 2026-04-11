@@ -1,3 +1,7 @@
+### Added (vibex-canvas-implementation-fix Epic2: SSE 流式生成 Phase 1) — 2026-04-11
+- **S2-1 Phase 1** (`useAIController.ts`): `GeneratingState` 替换 `isQuickGenerating`，5 状态机，canvasSseAnalyze 流式接入，fallback 降级 (cd1814a8)
+- **S2-1 Tests**: useAIController 6 个单元测试 (422560da)
+
 ### Added (vibex-reviewer-proposals-vibex-build-fixes E1: PR 合入标准 + Renderer 重构) — 2026-04-11
 
 ### Added (vibex-reviewer-proposals E4: 质量门禁体系 CI L2) — 2026-04-11

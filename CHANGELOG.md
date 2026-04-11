@@ -1,3 +1,9 @@
+### Added (vibex-canvas Epic3: 构建与部署) — 2026-04-12
+- **F3.1 构建验证**: pnpm build exit code=0，静态导出含 TabBar/ExportMenu/leftDrawer CSS Module 类名
+- **F3.2 部署验证**: scripts/verify-build-deploy.ts 验证脚本，静态导出产物检查通过
+- **注意**: pnpm dev 与 output:export + middleware 存在 Next.js 16 兼容性冲突（生产部署使用静态导出，无需 dev server）
+- 提交: 6e33fa3e
+
 ### Added (vibex-canvas Epic2: 验证与回归) — 2026-04-12
 - **F2.1 类名冲突扫描**: scan-css-conflicts.test.ts 3/3 passed，检测到已存在冲突（queueItem/nodeCard/treePanelsGrid）
 - **F2.2 视觉回归**: canvas-visual-regression.spec.ts 5/5 passed，修复 PhaseIndicator 截图测试鲁棒性

@@ -130,13 +130,13 @@ VibeX Canvas 存在 2 个 P0 级阻断 bug：
 - [ ] AppErrorBoundary 无新增错误日志
 - [ ] 代码 review 通过（Architect + 1 名 Senior Dev）
 
-### Epic 2 DoD
+### Epic 2 DoD 确认 ✅
 
-- [ ] Story 2.1 完成：gstack 验证报告已产出，记录所有具体 404 URL
-- [ ] Story 2.2 完成：所有 404 资源已修复或已清理无效引用
-- [ ] gstack 验证：Network 面板 1.5s 内 404 响应数量 = 0
-- [ ] gstack screenshot 对比：UI 完整，无缺失图标/图片/字体
-- [ ] Console 无 `Failed to load resource` 错误
+- [x] Story 2.1 完成：gstack 验证报告已产出，记录所有具体 404 URL
+- [x] Story 2.2 完成：所有 404 资源已修复（根因：CSS Module 违规）
+- [x] gstack 验证：Network 面板 1.5s 内 404 响应数量 = 0
+- [x] gstack screenshot 对比：UI 完整（Playwright 验证）
+- [x] Console 无 `Failed to load resource` 错误
 
 ---
 

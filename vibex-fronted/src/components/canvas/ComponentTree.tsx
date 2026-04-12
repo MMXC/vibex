@@ -1050,11 +1050,11 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
         </p>
       )}
 
-      {/* E1-F3: JSON Tree Preview Modal */}
+      {/* E2: JSON Tree Preview Modal */}
       <JsonTreePreviewModal
         isOpen={showJsonPreview}
         onClose={() => setShowJsonPreview(false)}
-        nodes={componentNodes}
+        groups={groups}
       />
     </div>
   );

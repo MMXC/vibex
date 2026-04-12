@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.192',
+    date: '2026-04-12',
+    changes: [
+      '📋 vibex-proposals-20260412 Epic0 S0.1: TypeScript 紧急修复',
+      '✅ S0.1: import type NextResponse → value import in apiAuth.ts',
+      '✅ TypeScript 编译: 0 errors',
+      '提交: 4c4f019b',
+    ],
+    commit: '4c4f019b',
+  },
+
+  {
     version: '1.0.189',
     date: '2026-04-12',
     changes: [

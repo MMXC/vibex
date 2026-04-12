@@ -1,3 +1,17 @@
+### Added (vibex-canvas-context-nav Epic1+2: TabBar prototype tab + PhaseIndicator) — 2026-04-13
+- **E1-S1.1**: TabBar.tsx — 新增 prototype tab（🚀 原型），4 tabs 含 prototype
+  - 导入 `useSessionStore` + `PrototypePage` 类型
+  - handleTabClick 支持 `TreeType | 'prototype'`，prototype 分支调用 `setPhase('prototype')` + `setActiveTree(null)`
+  - isActive: `phase === 'prototype'` 时 prototype tab 高亮
+  - isLocked: prototype tab 永远不解锁
+  - prototypeCount badge 来自 `useSessionStore((s) => s.prototypeQueue.length)`
+- **E1-S1.1 测试**: TabBar.test.tsx — 更新 tabs 数量（4个）+ 新增 6 个 prototype 测试（17/17 ✅）
+- **E2-S2.1**: PhaseIndicator.tsx — SWITCHABLE_PHASES 增加 prototype 项，getCurrentPhaseMeta 增加 prototype 兜底，移除 `phase === 'prototype'` return null
+- **E2-S2.1 测试**: PhaseIndicator.test.tsx — 新建 5 个测试（5/5 ✅）
+- **E3-S3.3**: e2e/prototype-nav.spec.ts — 3 E2E 测试场景
+- **CSS**: canvas.variables.css — 新增 `--tree-prototype-color: #9333ea`
+- **验证**: TabBar 17/17 ✅ | PhaseIndicator 5/5 ✅ | pnpm tsc --noEmit ✅
+
 ### Added (vibex-auth-401-handling Epic2: 前端一致性) — 2026-04-13
 - **E2-S2.1**: authStore.ts — logout() 清除 auth_token + auth_session cookie（非 httpOnly 残留部分）
 - **E2 测试**: authStore 路由单元测试（22/22 ✅，新增 AC-2.1.1~2.1.3 cookie 清除断言）

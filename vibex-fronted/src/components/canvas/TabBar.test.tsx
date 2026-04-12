@@ -11,6 +11,8 @@ import { TabBar } from './TabBar';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
+import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
+import type { PrototypePage } from '@/lib/canvas/types';
 
 describe('TabBar', () => {
   beforeEach(() => {
@@ -24,11 +26,11 @@ describe('TabBar', () => {
     useComponentStore.setState({ componentNodes: [] });
   });
 
-  it('renders three tabs', () => {
+  it('renders four tabs including prototype', () => {
     render(<TabBar />);
     expect(screen.getByRole('tablist')).toBeInTheDocument();
     const tabs = screen.getAllByRole('tab');
-    expect(tabs).toHaveLength(3);
+    expect(tabs).toHaveLength(4);
   });
 
   it('shows correct tab labels', () => {
@@ -122,5 +124,59 @@ describe('TabBar', () => {
     await user.click(tabs[2]);
     // activeTree should NOT change
     expect(useContextStore.getState().activeTree).toBe('context');
+  });
+
+  // --- Epic1 prototype tab tests ---
+
+  it('prototype tab shows correct emoji 🚀', () => {
+    render(<TabBar />);
+    expect(screen.getByText('🚀')).toBeInTheDocument();
+  });
+
+  it('prototype tab shows label 原型', () => {
+    render(<TabBar />);
+    expect(screen.getByText('原型')).toBeInTheDocument();
+  });
+
+  it('prototype tab is NOT locked regardless of current phase (AC-1.2.1)', () => {
+    useContextStore.setState({ phase: 'input', activeTree: 'context' });
+    render(<TabBar />);
+    const prototypeTab = screen.getByText('原型').closest('[role="tab"]')!;
+    expect(prototypeTab).not.toHaveAttribute('aria-disabled', 'true');
+    expect(prototypeTab).not.toBeDisabled();
+  });
+
+  it('clicking prototype tab calls setPhase with prototype (AC-1.2.2)', async () => {
+    const user = userEvent.setup();
+    useContextStore.setState({ phase: 'component', activeTree: 'component' });
+    render(<TabBar />);
+    const prototypeTab = screen.getByText('原型').closest('button')!;
+    await user.click(prototypeTab);
+    expect(useContextStore.getState().phase).toBe('prototype');
+  });
+
+  it('prototype tab is active when phase === prototype (AC-1.2.3)', () => {
+    useContextStore.setState({ phase: 'prototype', activeTree: 'context' });
+    render(<TabBar />);
+    const prototypeTab = screen.getByText('原型').closest('[role="tab"]')!;
+    expect(prototypeTab).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('prototype tab shows queue count from sessionStore (AC-1.3.1)', () => {
+    useSessionStore.setState({
+      prototypeQueue: [
+        { pageId: '1', componentId: 'c1', name: 'Page1', status: 'queued', progress: 0, retryCount: 0 } as PrototypePage,
+        { pageId: '2', componentId: 'c2', name: 'Page2', status: 'done', progress: 100, retryCount: 0 } as PrototypePage,
+      ],
+    });
+    render(<TabBar />);
+    expect(screen.getByText('2')).toBeInTheDocument();
+  });
+
+  it('prototype tab is inactive when phase !== prototype', () => {
+    useContextStore.setState({ phase: 'context', activeTree: 'context' });
+    render(<TabBar />);
+    const prototypeTab = screen.getByText('原型').closest('[role="tab"]')!;
+    expect(prototypeTab).toHaveAttribute('aria-selected', 'false');
   });
 });

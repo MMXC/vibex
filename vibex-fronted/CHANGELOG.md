@@ -1,5 +1,12 @@
 # Changelog
 
+### [vibex-test-fix Epic3 补充: selector-patterns.spec.ts] — 2026-04-12
+- **tests/unit/selector-patterns.spec.ts**: 新增选择器模式规范测试（11/11 passed）
+  - S3.2: getAllByText+count / within() / regex date patterns
+  - S3.3: getByTestId / getByRole / format-card-{id} convention
+  - S3.1: redirect-only Server Component 测试策略
+- 提交: `selector-patterns.spec.ts`
+
 ### [vibex-test-fix Epic2 补充: accessibility.spec.ts] — 2026-04-12
 - **tests/unit/accessibility.spec.ts**: 新增 jest-axe 集成验证测试（7/7 passed），覆盖 S2.1 PRD 验收标准
   - `axe` 函数可导入、返回正确 `AxeResults` 结构、`violations` 检测正确

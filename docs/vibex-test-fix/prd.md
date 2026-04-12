@@ -169,10 +169,11 @@ expect(typeof axe).toBe('function');
 - [x] `tests/unit/accessibility.spec.ts` 7/7 jest-axe 集成验证通过 ✅
 
 ### Epic 3 — 页面测试选择器
-- [ ] `src/app/page.test.tsx` — 4 个测试全部通过
-- [ ] `src/app/dashboard/page.test.tsx` — 5 个测试全部通过
-- [ ] `src/app/export/page.test.tsx` — 1 个测试通过
-- [ ] 修复后不再出现 TestingLibraryElementError
+- [x] `src/app/page.test.tsx` — 4 个测试全部通过 ✅ (2026-04-12 21:47)
+- [x] `src/app/dashboard/page.test.tsx` — 5 个测试全部通过 ✅ (2026-04-12 21:47)
+- [x] `src/app/export/page.test.tsx` — 1 个测试通过 ✅ (2026-04-12 21:47)
+- [x] 修复后不再出现 TestingLibraryElementError ✅
+- [x] `tests/unit/selector-patterns.spec.ts` 11/11 选择器模式规范测试通过 ✅
 
 ### Epic 4 — 全量回归
 - [ ] `npm test` 退出码为 0

@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.195',
+    date: '2026-04-12',
+    changes: [
+      '📋 vibex-test-fix Epic2: jest-axe 包修复',
+      '✅ 安装 jest-axe@^10.0.0 无障碍测试工具',
+      '✅ accessibility.test.tsx: FlowPropertiesPanel mock 修复（__esModule + default 格式）',
+      '✅ 验收: 9/9 tests passed',
+      '提交: 9cccf168',
+    ],
+    commit: '9cccf168',
+  },
+
+  {
     version: '1.0.194',
     date: '2026-04-12',
     changes: [

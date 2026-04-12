@@ -48,9 +48,8 @@ export function buildPagesData(groups: ComponentGroup[]): {
         flowId: n.flowId,
         status: n.status,
         pageName: n.pageName,
-        children: n.children && n.children.length > 0
-          ? n.children.map((c) => ({ nodeId: c.nodeId, name: c.name, type: c.type, flowId: c.flowId, status: c.status }))
-          : undefined,
+        // children are string[] (child node IDs), include as-is
+        children: n.children.length > 0 ? n.children : undefined,
       })),
     };
   });

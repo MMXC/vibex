@@ -2991,6 +2991,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Features (vibex-proposals-20260412 Epic1: 测试基础设施修复 — Sprint 1+2) — 2026-04-12
+- **E1 safeError**: `src/lib/log-sanitizer.ts` — sanitize()/safeError()/devLog() 函数，100% 覆盖所有 API 路由 token 日志（chat/pages/projects/templates/plan routes）
+- **E2 提案状态追踪**: `docs/proposals/PROPOSALS_STATUS_SOP.md` — 状态定义/转换规则/维护规范；INDEX.md status 字段 100% 覆盖
+- **E3 CI/CD守卫增强**: `vibex-fronted/scripts/pre-submit-check.sh` Section 7 grepInvert guard 检测 test config 变更；`vibex-backend/src/config/websocket.ts` WEBSOCKET_CONFIG 单一配置源
+- **E4.1 Canvas ErrorBoundary**: `TreeErrorBoundary.tsx` — 三栏（ContextTreePanel/FlowTreePanel/ComponentTreePanel）独立包裹，重试按钮 + 错误日志
+- **E4.2 @vibex/types落地**: `packages/types/src/api/canvasSchema.ts` Zod schemas；`canvasApiValidation.ts` 引用 @vibex/types/api/canvasSchema
+- **E4.4 frontend types对齐**: `vibex-fronted/src/lib/canvas/types.ts` 通过 @vibex/types re-export，消除重复 interface 定义
+- **E4.5 groupByFlowId优化**: `ComponentTree.tsx` Object.groupBy + useMemo 包裹，O(n×3) → O(1) Map lookup
+- **E5 waitForTimeout重构**: E2E 测试消除 waitForTimeout（0 处 remaining），替换为 expect(page.getByTestId).toBeVisible() 确定性等待
+- **E6 pre-commit hook**: `vibex-fronted/.husky/pre-commit` lint-staged 调用 + @typescript-eslint/no-console 阻塞 console.log；ESLint rule + package.json lint-staged config 已配置
+- **E7 文档与工具**: `docs/canvas-roadmap.md` Canvas 演进路线图；`.github/workflows/changelog.yml` CHANGELOG guard CI
+- **验证**: vitest (ComponentTreeGrouping.test.ts 35 passed ✅) | grepInvert guard ✅ | pre-commit hook ✅ | waitForTimeout 0 ✅
+
 ### Features (vibex-architect-proposals-vibex-proposals-20260411 Epic E2-E7)
 - **E2 WebSocket治理**: MAX_CONNECTIONS=100 limit in ConnectionPool, passive heartbeat via pruneStaleConnections() (#1253771e). E2-S2: add `__tests__/connectionPool.test.ts` (22 tests), fix disconnectTimeout=300000ms, fix empty devLog() calls. E2-S3: add `GET /api/v1/ws/health` endpoint (#f073d0b7)
 - **E3 packages/types**: Create @vibex/types/schemas workspace package with common.ts and canvas.ts Zod schemas (#1253771e); E3 integration: 5 backend routes updated to import @vibex/types, ESM→CommonJS switch for Jest compatibility (#fadef3f0)

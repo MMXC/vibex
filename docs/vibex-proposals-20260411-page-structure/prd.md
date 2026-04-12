@@ -1,196 +1,260 @@
 # PRD: 组件树页面结构增强
 
-**Project**: vibex-proposals-20260411-page-structure  
-**Stage**: create-prd  
-**PM**: PM  
-**Date**: 2026-04-07  
-**Status**: Draft
+**项目**: vibex-proposals-20260411-page-structure
+**版本**: v1.0
+**日期**: 2026-04-12
+**角色**: PM
+**状态**: Draft
 
 ---
 
 ## 1. 执行摘要
 
 ### 背景
-
-当前组件树按 `flowId` 单维度分组，用户无法直观看到组件归属的具体页面名称，且无法自定义页面展示名称。JSON Preview 功能仅支持单组件预览，缺乏组件树整体结构的视图。
+当前组件树通过 `flowId` 关联 BusinessFlowNode.name 来展示页面归属，无独立 `pageId` 和 `pageName` 概念。用户无法直观看到组件的明确页面归属，JSON 预览功能缺乏统一入口查看整体树结构。
 
 ### 目标
-
-1. **pageName 可覆盖**: 组件节点支持可选的 `pageName` 字段，允许用户覆盖默认的 BusinessFlowNode.name
-2. **组件树 JSON 视图**: 组件树顶部增加「📋 JSON」按钮，点击弹出 JSON 树结构视图
-3. **分组元数据增强**: ComponentGroup 增加 `pageId` + `componentCount` 元数据
+在 `ComponentNode` 上增加 `pageName` 可选字段，允许覆盖 BusinessFlowNode.name；分组元数据增加 `pageId` 和 `componentCount`；组件树顶部增加「📋 JSON」预览入口，展示 pageId + pageName + 组件结构的 JSON 树视图。
 
 ### 成功指标
-
-| 指标 | 目标值 |
-|------|--------|
-| 组件树加载时间 | ≤ 500ms（无性能退化） |
-| 单元测试覆盖率 | groupByFlowId + getPageLabel ≥ 90% |
-| E2E 测试通过率 | 100%（JSON 预览按钮可见且功能正确） |
-| TypeScript 错误 | 0 error |
+- 组件树分组标题支持显示自定义 `pageName`
+- JSON 预览入口可见且数据格式正确
+- 通用组件组保持置顶，label 为「🔧 通用组件」，pageId='__common__'
+- 相关单元测试 100% pass
 
 ---
 
 ## 2. Epic 拆分
 
-### Epic 总览
+### Epic E1: ComponentNode 页面元数据增强
 
-| Epic | 描述 | 工时 | 优先级 | Stories |
-|------|------|------|--------|---------|
-| E1 | 类型定义增强 | 0.5h | P0 | S1.1 |
-| E2 | 组件树分组增强 | 1.5h | P0 | S2.1, S2.2, S2.3 |
-| E3 | JSON 预览功能 | 1h | P0 | S3.1, S3.2 |
-| E4 | 测试覆盖 | 0.5h | P0 | S4.1, S4.2 |
+| ID | Story | 描述 | 工时 | 验收标准 |
+|----|-------|------|------|----------|
+| E1-S1 | pageName 类型扩展 | ComponentNode 增加 `pageName?: string` 可选字段 | 0.5h | expect(pageName: '自定义名称').toBeTruthy() |
+| E1-S2 | pageName 标签优先级 | `getPageLabel()` 优先使用 pageName，fallback 到 BusinessFlowNode.name | 0.5h | expect(label).toBe('自定义名称') |
+| E1-S3 | 分组元数据 | ComponentGroup 增加 pageId + componentCount 字段 | 0.5h | expect(group.pageId).toBeTruthy(); expect(group.componentCount).toBeGreaterThan(0) |
 
-**总工时**: 3.5h
+**总工时估算**: 1.5h
+
+### Epic E2: JSON 预览功能
+
+| ID | Story | 描述 | 工时 | 验收标准 |
+|----|-------|------|------|----------|
+| E2-S1 | JSON 预览按钮 | 组件树顶部添加「📋 JSON」按钮 | 0.5h | expect(button).toBeVisible(); expect(button.textContent).toContain('JSON') |
+| E2-S2 | JSON 树视图渲染 | 点击后展示 pageId + pageName + 组件结构的 JSON 树 | 1h | expect(jsonView.data).toMatchObject({ pages: expect.any(Array) }) |
+| E2-S3 | 通用组件组 JSON | JSON 输出中 pageId='__common__' 的通用组件组 | 0.5h | expect(jsonData.pages).toContainEqual(expect.objectContaining({ pageId: '__common__' })) |
+
+**总工时估算**: 2h
+
+### Epic E3: 回归与测试
+
+| ID | Story | 描述 | 工时 | 验收标准 |
+|----|-------|------|------|----------|
+| E3-S1 | 单元测试 | getPageLabel + groupByFlowId 的 pageName fallback 逻辑测试 | 0.5h | test coverage >80% |
+| E3-S2 | E2E 测试 | JSON 预览按钮可见且点击后显示正确结构 | 0.5h | expect(JSONPreviewModal).toBeVisible() |
+
+**总工时估算**: 1h
+
+**项目总工时**: 4.5h（方案 A 最小增强，原估 3h 适度上调）
 
 ---
 
-### Epic 1: 类型定义增强
+## 3. 验收标准（expect() 断言）
 
-| Story | 描述 | 工时 | 验收标准 |
-|-------|------|------|----------|
-| S1.1 | ComponentNode 增加 pageName 字段 | 0.5h | TypeScript 类型正确 + 可选字段 |
+### E1-S1: pageName 类型扩展
 
-**功能点**:
+```typescript
+// ComponentNode 类型定义
+const node: ComponentNode = {
+  nodeId: 'c1',
+  name: 'LoginForm',
+  type: 'form',
+  flowId: 'flow-login-001',
+  pageName: '登录页（自定义）', // 新增可选字段
+};
+expect(node.pageName).toBe('登录页（自定义）');
+
+// 未设置 pageName 时类型兼容
+const node2: ComponentNode = { nodeId: 'c2', name: 'Button', type: 'button', flowId: '' };
+expect(node2.pageName).toBeUndefined();
+```
+
+### E1-S2: pageName 标签优先级
+
+```typescript
+// pageName 存在时，优先于 BusinessFlowNode.name
+const flowNodes = [{ nodeId: 'flow-login-001', name: '登录页面' }];
+const component = { flowId: 'flow-login-001', pageName: '自定义登录页' };
+const label = getPageLabel(component, flowNodes);
+expect(label).toBe('自定义登录页');
+
+// pageName 不存在时，fallback 到 BusinessFlowNode.name
+const component2 = { flowId: 'flow-login-001' };
+const label2 = getPageLabel(component2, flowNodes);
+expect(label2).toBe('登录页面');
+```
+
+### E1-S3: 分组元数据
+
+```typescript
+// groupByFlowId 输出包含 pageId 和 componentCount
+const groups = groupByFlowId(components, flowNodes);
+groups.forEach(group => {
+  expect(group.pageId).toBeTruthy();
+  expect(typeof group.pageId).toBe('string');
+  expect(group.componentCount).toBeGreaterThanOrEqual(0);
+  expect(typeof group.componentCount).toBe('number');
+});
+
+// JSON 序列化包含 pageId 和 componentCount
+const jsonStr = JSON.stringify(groups);
+expect(jsonStr).toContain('pageId');
+expect(jsonStr).toContain('componentCount');
+```
+
+### E2-S1: JSON 预览按钮
+
+```typescript
+// 组件树顶部存在 JSON 按钮
+const treeWrapper = render(<ComponentTree />);
+const jsonButton = treeWrapper.getByRole('button', { name: /json/i });
+expect(jsonButton).toBeVisible();
+
+// 按钮位置在组件树顶部
+expect(jsonButton.parentElement).toBe(treeWrapper.container.firstElementChild);
+```
+
+### E2-S2: JSON 树视图渲染
+
+```typescript
+// 点击按钮后弹出 JSON 视图，数据结构正确
+fireEvent.click(jsonButton);
+const modal = screen.getByTestId('json-preview-modal');
+expect(modal).toBeVisible();
+
+const jsonData = JSON.parse(modal.textContent);
+// 主结构
+expect(jsonData).toHaveProperty('pages');
+expect(Array.isArray(jsonData.pages)).toBe(true);
+
+// 页面组结构
+const page = jsonData.pages[0];
+expect(page).toHaveProperty('pageId');
+expect(page).toHaveProperty('pageName');
+expect(page).toHaveProperty('componentCount');
+expect(page).toHaveProperty('components');
+expect(Array.isArray(page.components)).toBe(true);
+
+// 组件节点结构
+const comp = page.components[0];
+expect(comp).toHaveProperty('nodeId');
+expect(comp).toHaveProperty('name');
+expect(comp).toHaveProperty('type');
+expect(comp).toHaveProperty('flowId');
+```
+
+### E2-S3: 通用组件组 JSON
+
+```typescript
+// JSON 数据中包含 __common__ 组
+const commonGroup = jsonData.pages.find(p => p.pageId === '__common__');
+expect(commonGroup).toBeDefined();
+expect(commonGroup.pageName).toBe('🔧 通用组件');
+expect(commonGroup.componentCount).toBeGreaterThan(0);
+expect(Array.isArray(commonGroup.components)).toBe(true);
+
+// __common__ 组位于 pages 数组最前或最后
+const commonIndex = jsonData.pages.findIndex(p => p.pageId === '__common__');
+expect(commonIndex).toBeGreaterThanOrEqual(0);
+```
+
+### E3-S1: 单元测试覆盖
+
+```typescript
+// getPageLabel pageName fallback 逻辑
+expect(getPageLabel({ flowId: 'f1', pageName: 'X' }, nodes)).toBe('X');
+expect(getPageLabel({ flowId: 'f1' }, nodes)).toBe(nodes[0].name);
+expect(getPageLabel({ flowId: '' }, nodes)).toBeNull();
+
+// groupByFlowId 输出结构
+const groups = groupByFlowId([{ flowId: '', type: 'modal' }], nodes);
+expect(groups[0].pageId).toBe('__common__');
+expect(groups[0].componentCount).toBe(1);
+```
+
+### E3-S2: E2E 测试
+
+```typescript
+// 浏览器端到端测试
+await page.goto('/canvas');
+await page.waitForSelector('[data-testid="component-tree"]');
+const jsonBtn = page.getByRole('button', { name: /json/i });
+await expect(jsonBtn).toBeVisible();
+await jsonBtn.click();
+const modal = page.getByTestId('json-preview-modal');
+await expect(modal).toBeVisible();
+const content = await modal.textContent();
+const data = JSON.parse(content);
+expect(data.pages).toBeInstanceOf(Array);
+expect(data.pages.length).toBeGreaterThan(0);
+```
+
+---
+
+## 4. 功能点明细
 
 | ID | 功能点 | 描述 | 验收标准 | 页面集成 |
 |----|--------|------|----------|----------|
-| F1.1 | pageName 可选字段 | ComponentNode 新增 `pageName?: string`，允许覆盖 BusinessFlowNode.name | `expect(typeof node.pageName).toBe('string' \| 'undefined')` | 否 |
+| F1.1 | pageName 可选字段 | ComponentNode 类型增加 `pageName?: string` | expect(pageName: 'X').toBeTruthy() | 否 |
+| F1.2 | pageName 标签优先级 | getPageLabel 优先显示 pageName | expect(label).toBe('自定义名称') | 否 |
+| F1.3 | pageId + componentCount | ComponentGroup 增加这两个元数据字段 | expect(group.pageId).toBeTruthy() | 否 |
+| F2.1 | 📋 JSON 按钮 | 组件树顶部添加 JSON 预览按钮 | expect(button).toBeVisible() | 是【需页面集成】 |
+| F2.2 | JSON 树视图 | 展示 pageId + pageName + 组件结构 | expect(data.pages).toBeInstanceOf(Array) | 是【需页面集成】 |
+| F2.3 | __common__ 组 JSON | pageId='__common__' 的通用组件组展示 | expect(pageId).toBe('__common__') | 是【需页面集成】 |
+| F3.1 | 单元测试覆盖 | getPageLabel + groupByFlowId fallback 测试 | 29+ tests pass | 否 |
+| F3.2 | E2E 测试 | JSON 预览按钮端到端测试 | expect(JSONPreviewModal).toBeVisible() | 是【需页面集成】 |
 
 ---
 
-### Epic 2: 组件树分组增强
+## 5. DoD (Definition of Done)
 
-| Story | 描述 | 工时 | 验收标准 |
-|-------|------|------|----------|
-| S2.1 | 分组标题显示 pageName | 优先使用 pageName，fallback 到 BusinessFlowNode.name | getPageLabel 逻辑正确 |
-| S2.2 | ComponentGroup 元数据 | 增加 pageId + componentCount | JSON 序列化包含这些字段 |
-| S2.3 | 通用组件组置顶 | 保持置顶，label 为「🔧 通用组件」，pageId='__common__' | 不改变现有行为 |
+### E1 完成标准
+- [ ] `src/lib/canvas/types.ts` 中 `ComponentNode` 接口包含 `pageName?: string`
+- [ ] `src/components/canvas/ComponentTree.tsx` 中 `getPageLabel` 优先使用 `pageName`
+- [ ] `ComponentGroup` 类型包含 `pageId: string` 和 `componentCount: number`
+- [ ] 单元测试覆盖 pageName fallback 逻辑，测试通过
 
-**功能点**:
+### E2 完成标准
+- [ ] 组件树顶部渲染「📋 JSON」按钮，可点击
+- [ ] 点击后弹出 JSON 视图模态框，数据格式符合 `{ pages: [{pageId, pageName, componentCount, components:[...]}] }`
+- [ ] JSON 数据包含 `__common__` 通用组件组，pageId='__common__'，pageName='🔧 通用组件'
+- [ ] 使用现有 `JsonTreeRenderer` 组件渲染 JSON 视图（复用不重复造轮子）
 
-| ID | 功能点 | 描述 | 验收标准 | 页面集成 |
-|----|--------|------|----------|----------|
-| F2.1 | getPageLabel pageName 优先 | `getPageLabel()` 优先使用 `node.pageName`，fallback 到 BusinessFlowNode.name | `expect(getPageLabel(nodeWithPageName)).toBe('自定义页面名')` | 【需页面集成】ComponentTree.tsx |
-| F2.2 | ComponentGroup pageId | 分组信息包含 `pageId`（从 groupId 提取） | `expect(group.pageId).toBeDefined()` | 【需页面集成】ComponentTree.tsx |
-| F2.3 | ComponentGroup componentCount | 分组信息包含 `componentCount` | `expect(group.componentCount).toBeGreaterThan(0)` | 【需页面集成】ComponentTree.tsx |
-| F2.4 | 通用组件组保持置顶 | isCommon=true 的组件组 label 为「🔧 通用组件」，pageId='__common__' | `expect(commonGroup.label).toBe('🔧 通用组件')` | 否 |
-
----
-
-### Epic 3: JSON 预览功能
-
-| Story | 描述 | 工时 | 验收标准 |
-|-------|------|------|----------|
-| S3.1 | JSON 按钮入口 | 组件树顶部添加「📋 JSON」按钮 | 按钮可见，点击触发 |
-| S3.2 | JSON 树视图弹窗 | 展示 `{ pages: [{pageId, pageName, componentCount, components: [...]}] }` | JSON 结构正确 |
-
-**功能点**:
-
-| ID | 功能点 | 描述 | 验收标准 | 页面集成 |
-|----|--------|------|----------|----------|
-| F3.1 | JSON 按钮入口 | 组件树顶部添加「📋 JSON」按钮 | `expect(getByText('📋 JSON')).toBeVisible()` | 【需页面集成】ComponentTree.tsx toolbar |
-| F3.2 | JSON 预览弹窗 | 点击按钮弹出 JSON 树视图，数据结构正确 | `expect(screen.getByText(/pageId/)).toBeVisible()` | 【需页面集成】CanvasPreviewModal 或新建组件 |
-| F3.3 | JSON 数据结构 | `pages` 数组，每项包含 `pageId`, `pageName`, `componentCount`, `components` | `expect(json.pages[0]).toHaveProperty('pageId')` | 否（数据结构） |
+### E3 完成标准
+- [ ] `pnpm test -- --testPathPattern=ComponentTree` 全通过
+- [ ] E2E 测试 `npx playwright test` 包含 JSON 预览测试用例，通过
+- [ ] 手动测试验证：设置 `pageName='自定义页面'` 的组件在树中显示该名称
 
 ---
 
-### Epic 4: 测试覆盖
+## 6. 依赖关系
 
-| Story | 描述 | 工时 | 验收标准 |
-|-------|------|------|----------|
-| S4.1 | 单元测试 | getPageLabel + groupByFlowId 的 pageName fallback 逻辑 | 29+ tests pass |
-| S4.2 | E2E 测试 | JSON 预览按钮可见且点击后显示正确结构 | E2E test pass |
-
-**功能点**:
-
-| ID | 功能点 | 描述 | 验收标准 | 页面集成 |
-|----|--------|------|----------|----------|
-| F4.1 | getPageLabel 单元测试 | pageName 优先 fallback 逻辑测试覆盖 | `expect(tests).toBeGreaterThanOrEqual(29)` | 否 |
-| F4.2 | E2E JSON 预览测试 | JSON 预览按钮点击测试 | `expect(JSON_BUTTON_TEST).toPass()` | 【需页面集成】E2E 测试文件 |
+```
+E1-S1 → E1-S2 → E1-S3 → E3-S1（可并行）
+                             ↘ E3-S2（依赖 E2 完成后）
+E2-S1 → E2-S2 → E2-S3 → E3-S2
+```
 
 ---
 
-## 3. 验收标准汇总
+## 7. 风险与缓解
 
-| ID | Given | When | Then | 优先级 |
-|----|-------|------|------|--------|
-| AC1 | ComponentNode 实例 | 无 pageName | pageName 为 undefined | P0 |
-| AC2 | ComponentNode 实例 | 有 pageName | getPageLabel 返回 pageName | P0 |
-| AC3 | ComponentNode 实例 | 无 pageName 且无 BusinessFlowNode | getPageLabel 返回兜底 label | P0 |
-| AC4 | ComponentGroup | 分组后 | 包含 pageId + componentCount | P0 |
-| AC5 | 通用组件组 | isCommon=true | 置顶 + label='🔧 通用组件' + pageId='__common__' | P0 |
-| AC6 | 组件树渲染 | 默认状态 | 「📋 JSON」按钮可见 | P0 |
-| AC7 | 点击「📋 JSON」 | 按钮点击 | JSON 弹窗显示 pages 数组 | P0 |
-| AC8 | JSON 弹窗数据 | 展开任意 page | 包含 pageId + pageName + componentCount + components | P0 |
-| AC9 | 单元测试 | 运行测试 | groupByFlowId + getPageLabel ≥ 90% coverage | P0 |
-| AC10 | E2E 测试 | 运行测试 | JSON 预览功能 pass 100% | P0 |
-
----
-
-## 4. DoD (Definition of Done)
-
-### 代码完成标准
-
-- [ ] TypeScript 类型定义正确，无编译错误
-- [ ] `pageName?: string` 字段已添加到 ComponentNode 类型
-- [ ] `getPageLabel()` 优先使用 pageName
-- [ ] ComponentGroup 包含 pageId + componentCount
-- [ ] 「📋 JSON」按钮已添加到组件树 toolbar
-- [ ] JSON 预览弹窗展示正确的数据结构
-- [ ] 通用组件组保持置顶，label 为「🔧 通用组件」
-
-### 测试完成标准
-
-- [ ] `getPageLabel` 单元测试新增 pageName fallback 场景（≥ 3 cases）
-- [ ] `groupByFlowId` 单元测试新增 componentCount 场景
-- [ ] E2E 测试验证 JSON 按钮可见性
-- [ ] E2E 测试验证 JSON 弹窗数据结构
-- [ ] 所有测试 pass（单元测试 29+1，E2E 测试 pass）
-
-### 文档完成标准
-
-- [ ] PRD 包含执行摘要、Epic 拆分、验收标准、DoD
-- [ ] Specs 目录包含详细实现规格（如需要）
-
----
-
-## 5. 技术约束
-
-| 约束 | 说明 |
-|------|------|
-| TypeScript | 必须保持 strict mode，无新增 TS 错误 |
-| 性能 | 组件树加载时间 ≤ 500ms |
-| 向后兼容 | 现有 flowId 分组逻辑不变 |
-| 测试框架 | Vitest（单元）+ Playwright（E2E） |
-
----
-
-## 6. 依赖
-
-| 依赖 | 说明 | 状态 |
+| 风险 | 影响 | 缓解 |
 |------|------|------|
-| BusinessFlowNode.name | pageName fallback 的目标 | 已存在 |
-| ComponentTree.tsx | 主要修改文件 | 已存在 |
-| groupByFlowId() | 分组逻辑函数 | 已存在 |
-| getPageLabel() | 标签生成函数 | 已存在 |
-| CanvasPreviewModal | JSON 预览可复用此组件 | 已存在 |
+| pageName 与 BusinessFlowNode.name 不同步 | 低 | pageName 可选，用户主动配置才生效 |
+| JSON 预览数据结构与现有 catalog 不兼容 | 低 | JSON 预览是独立视图，不影响现有 CanvasPreviewModal |
+| 组件拖拽到页面功能超出范围 | 低 | 本次不含拖拽，仅静态展示 |
 
 ---
 
-## 7. 实施计划
-
-| 阶段 | 内容 | 工时 | 输出 |
-|------|------|------|------|
-| Phase 1 | 类型定义增强 | 0.5h | types.ts 修改 |
-| Phase 2 | 组件树分组增强 | 1.5h | ComponentTree.tsx 修改 |
-| Phase 3 | JSON 预览功能 | 1h | JSONButton + Modal |
-| Phase 4 | 测试覆盖 | 0.5h | UT + E2E |
-| **Total** | | **3.5h** | |
-
----
-
-*PRD Version: 1.0*  
-*Created by: PM Agent*  
-*Last Updated: 2026-04-07*
+*PM: vibex-proposals-20260411-page-structure | 生成日期: 2026-04-12*

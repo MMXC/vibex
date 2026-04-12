@@ -3,7 +3,7 @@
  */
 
 import { render } from '@testing-library/react';
-import { MermaidCodeEditor } from '../MermaidCodeEditor';
+import MermaidCodeEditor from '../MermaidCodeEditor';
 
 describe('MermaidCodeEditor', () => {
   it('should render', () => {

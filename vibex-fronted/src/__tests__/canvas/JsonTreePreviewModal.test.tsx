@@ -114,7 +114,7 @@ describe('buildPagesData', () => {
     expect(result.pages[0].components[0].pageName).toBe('自定义页面');
   });
 
-  it('serializes nested children correctly', () => {
+  it('serializes nested children correctly (string IDs)', () => {
     const groups: ComponentGroup[] = [
       makeGroup({
         groupId: 'flow-1',
@@ -128,10 +128,7 @@ describe('buildPagesData', () => {
             name: 'Container',
             type: 'container',
             flowId: 'flow-1',
-            children: [
-              { nodeId: 'child1', name: 'Button', type: 'button', flowId: 'flow-1', status: 'pending' },
-              { nodeId: 'child2', name: 'Input', type: 'input', flowId: 'flow-1', status: 'pending' },
-            ],
+            children: ['child1', 'child2'],
           }),
         ],
       }),
@@ -139,8 +136,8 @@ describe('buildPagesData', () => {
 
     const result = buildPagesData(groups);
     expect(result.pages[0].components[0].children).toHaveLength(2);
-    expect(result.pages[0].components[0].children![0].nodeId).toBe('child1');
-    expect(result.pages[0].components[0].children![1].nodeId).toBe('child2');
+    expect(result.pages[0].components[0].children![0]).toBe('child1');
+    expect(result.pages[0].components[0].children![1]).toBe('child2');
   });
 
   it('totalComponents equals sum of all node counts', () => {

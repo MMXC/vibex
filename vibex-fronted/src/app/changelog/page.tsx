@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.198',
+    date: '2026-04-12',
+    changes: [
+      '📋 vibex-test-fix Epic1 补充: setup.spec.ts',
+      '✅ 新增 IntersectionObserver mock 行为验证测试（8/8 passed）',
+      '✅ 覆盖 S1.1 PRD 验收标准',
+      '提交: 7e6a00a9',
+    ],
+    commit: '7e6a00a9',
+  },
+
+  {
     version: '1.0.197',
     date: '2026-04-12',
     changes: [

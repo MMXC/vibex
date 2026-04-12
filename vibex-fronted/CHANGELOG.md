@@ -1,5 +1,12 @@
 # Changelog
 
+### [vibex-auth-401-handling Epic1: 后端 Cookie 设置] — 2026-04-13
+- **E1-S1.1**: login/route.ts — 设置 httpOnly auth_token cookie (HttpOnly; SameSite=Lax; Max-Age=604800)，移除未使用的 `getAuthUser` import
+- **E1-S1.2**: register/route.ts — 设置 httpOnly auth_token cookie (201)，移除未使用的 `getAuthUserFromRequest` import
+- **E1-S1.3**: logout/route.ts — 清除 auth_token + auth_session 两个 cookie，含 Secure 属性（HTTPS 环境）
+- **E1 测试**: login/register/logout 路由单元测试（19/19 ✅，含 Set-Cookie 断言）
+- 提交: `2ec3d6e2`
+
 ### [vibex-test-fix Epic4 补充: 全量回归验证完成] — 2026-04-13
 - Epic4 回归: Epic1-3 修复未引入新失败 ✅ (77/77 + 26/26 tests)
 - unit spec 测试: setup.spec.ts 8/8 + accessibility.spec.ts 7/7 + selector-patterns.spec.ts 11/11 = 26/26 ✅

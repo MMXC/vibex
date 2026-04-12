@@ -137,6 +137,12 @@ npx vitest run src/app/__tests__/accessibility.test.tsx --no-coverage
 - `pnpm-lock.yaml` — 自动更新
 - `accessibility.test.tsx` — mock 格式修复
 
+### Epic 2 补充 (2026-04-12 23:54)
+- `tests/unit/accessibility.spec.ts` — 新增 jest-axe 集成验证测试（7/7 passed）
+  - `axe` 函数可导入
+  - `axe()` 返回正确 `AxeResults` 对象结构 (`results.violations`)
+  - `axe-core` 版本信息存在
+
 ---
 
 ## 4. Epic 3：页面测试修复 ⚠️ 需先执行 §6 前置条件

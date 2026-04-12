@@ -162,10 +162,11 @@ expect(typeof axe).toBe('function');
 - [x] `tests/unit/setup.spec.ts` 8/8 mock 行为验证测试通过 ✅
 
 ### Epic 2 — jest-axe
-- [ ] `package.json` 中 `jest-axe` 已添加（devDependencies）
-- [ ] `pnpm install` 成功，无 lock 文件冲突
-- [ ] `src/app/__tests__/accessibility.test.tsx` 可正常运行（import 不报错）
-- [ ] accessibility 测试套件通过
+- [x] `package.json` 中 `jest-axe` 已添加（devDependencies） ✅ (2026-04-12)
+- [x] `pnpm install` 成功，无 lock 文件冲突 ✅
+- [x] `src/app/__tests__/accessibility.test.tsx` 可正常运行（import 不报错） ✅
+- [x] accessibility 测试套件通过 ✅ (9/9 passed)
+- [x] `tests/unit/accessibility.spec.ts` 7/7 jest-axe 集成验证通过 ✅
 
 ### Epic 3 — 页面测试选择器
 - [ ] `src/app/page.test.tsx` — 4 个测试全部通过

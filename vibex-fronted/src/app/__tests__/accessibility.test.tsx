@@ -75,11 +75,12 @@ vi.mock('@/components/ui/FlowEditor', () => ({
 }));
 
 // Mock FlowPropertiesPanel
-vi.mock('@/components/ui/FlowPropertiesPanel', () =>
-  function MockFlowPropertiesPanel() {
+vi.mock('@/components/ui/FlowPropertiesPanel', () => ({
+  __esModule: true,
+  default: function MockFlowPropertiesPanel() {
     return <div data-testid="flow-properties-panel" />;
-  }
-);
+  },
+}));
 
 // Mock usePermission hook - return admin permissions for tests
 vi.mock('@/hooks/usePermission', () => ({

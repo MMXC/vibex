@@ -108,12 +108,24 @@ pnpm install
 pnpm why axe-core  # 确认无版本冲突
 ```
 
+**✅ 已完成 (2026-04-12 21:37)** — jest-axe@10.0.0 安装成功
+
 ### S2.2 验证 accessibility 测试
 
 ```bash
 npx vitest run src/app/__tests__/accessibility.test.tsx --no-coverage
 # 预期: exitCode 0, 0 failures
 ```
+
+**✅ 已完成 (2026-04-12 21:37)** — 9/9 passed, exitCode 0
+
+**修复记录**:
+- `accessibility.test.tsx`: `FlowPropertiesPanel` mock 缺少 `default` key，修复为 `{ __esModule: true, default: ... }`
+
+### Epic 2 总结
+- `package.json` — 添加 `jest-axe@^10.0.0`
+- `pnpm-lock.yaml` — 自动更新
+- `accessibility.test.tsx` — mock 格式修复
 
 ---
 
@@ -173,8 +185,8 @@ npx vitest run src --no-coverage --exclude='src/components/**' --exclude='src/ap
 
 ## 6. 验收检查清单
 
-- [ ] `npx vitest run CardTreeNode --no-coverage` → 15/15 passed
-- [ ] `npx vitest run src/app/__tests__/accessibility.test.tsx --no-coverage` → 0 failures
+- [x] `npx vitest run CardTreeNode --no-coverage` → 15/15 passed (Epic1 ✅)
+- [x] `npx vitest run src/app/__tests__/accessibility.test.tsx --no-coverage` → 0 failures (Epic2 ✅)
 - [ ] `npx vitest run src/app/page.test.tsx --no-coverage` → 0 failures（验收：4 known failures → 0）
 - [ ] `npx vitest run src/app/dashboard/page.test.tsx --no-coverage` → 0 failures（验收：5 known failures → 0）
 - [ ] `npx vitest run src/app/export/page.test.tsx --no-coverage` → 0 failures（验收：1 known failure → 0）

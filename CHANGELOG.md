@@ -4,6 +4,13 @@
 - **验证**: npx vitest run tests/unit/authStore.test.ts 22 passed ✅
 - 提交: `bf0100cd`
 
+### Added (vibex-auth-401-handling Epic3: 测试覆盖) — 2026-04-13
+- **E3-S3.1**: middleware-auth.test.ts — 8 TC 认证中间件单元测试（mock NextRequest/NextResponse），验证 auth_token/auth_session cookie 路由保护
+- **E3-S3.2**: validateReturnTo.test.ts — 补充 5 个 fuzzing TC（T13~T17：null byte、URL编码traversal、URL编码//、纯空格、CRLF注入）
+- **E3-S3.2**: validateReturnTo 逻辑强化 — 拒绝 URL 编码后的 path traversal 和 protocol-relative URL
+- **E3-S3.3**: auth-redirect.spec.ts — 3 个 E2E 测试场景（完整登录跳转、logout 清除双 cookie、logout 后访问受保护页重新跳转）
+- **验证**: vitest middleware 8/8 ✅ | validateReturnTo 17/17 ✅
+
 ### Added (vibex-auth-401-handling Epic1: 后端 Cookie 设置) — 2026-04-13
 - **E1-S1.1**: login/route.ts — 设置 httpOnly auth_token cookie (HttpOnly; SameSite=Lax; Max-Age=604800)，移除未使用的 `getAuthUser` import
 - **E1-S1.2**: register/route.ts — 设置 httpOnly auth_token cookie (201)，移除未使用的 `getAuthUserFromRequest` import

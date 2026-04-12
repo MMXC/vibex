@@ -12,10 +12,26 @@ import styles from './auth.module.css';
  */
 function validateReturnTo(returnTo: string | null): string {
   if (!returnTo) return '/dashboard';
-  if (!returnTo.startsWith('/')) return '/dashboard';
+  // Reject non-string or whitespace-only
+  if (typeof returnTo !== 'string' || !returnTo.trim() || !returnTo.startsWith('/')) return '/dashboard';
+  // Reject absolute/unsafe URLs
   if (/^(https?|javascript:|data:)/i.test(returnTo)) return '/dashboard';
-  if (/^\/\//.test(returnTo)) return '/dashboard'; // protocol-relative
+  // Reject protocol-relative (encoded or plain)
+  if (/^\/\//i.test(returnTo)) return '/dashboard';
+  // Reject path traversal (plain and URL-encoded)
   if (returnTo.includes('/../') || returnTo.endsWith('/..')) return '/dashboard';
+  const decoded = decodeURIComponent(returnTo);
+  if (decoded !== returnTo) {
+    // Reject decoded traversal or protocol-relative
+    if (decoded.includes('/../') || decoded.startsWith('/..') || decoded.startsWith('//')) return '/dashboard';
+    // Reject if any path segment after decoding contains '..' (e.g. /canvas/../.. -> /../../)
+    const segments = decoded.split('/');
+    if (segments.some((s) => s === '..')) return '/dashboard';
+  }
+  // Reject null-byte injection and control characters
+  if (/[\x00-\x1f\x7f]/.test(returnTo)) return '/dashboard';
+  // Reject CRLF injection
+  if (/[\n\r]/.test(returnTo)) return '/dashboard';
   return returnTo;
 }
 

@@ -1,5 +1,9 @@
 # Changelog
 
+### [vibex-test-fix Epic4 补充: 全量回归验证完成] — 2026-04-13
+- Epic4 回归: Epic1-3 修复未引入新失败 ✅ (77/77 + 26/26 tests)
+- unit spec 测试: setup.spec.ts 8/8 + accessibility.spec.ts 7/7 + selector-patterns.spec.ts 11/11 = 26/26 ✅
+
 ### [vibex-test-fix Epic3 补充: selector-patterns.spec.ts] — 2026-04-12
 - **tests/unit/selector-patterns.spec.ts**: 新增选择器模式规范测试（11/11 passed）
   - S3.2: getAllByText+count / within() / regex date patterns

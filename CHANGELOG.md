@@ -415,6 +415,11 @@
   - **Phase 4**: JSON 导出支持 `pageName` 字段
   - 提交: `60cd1ac4` (单元测试), `03ce811a` (matchFlowNode/CSS修复合并)
 
+### Fixed (vibex-proposals-20260411-page-structure E2: JSON预览功能修复) — 2026-04-12
+- **E2 JSON预览Modal数据格式修复**: `JsonTreePreviewModal` 从 `JsonRenderPreview` (canvas组件渲染) 改为 `buildPagesData()` → `{pages: [{pageId, pageName, componentCount, isCommon, components}]}` JSON结构，确保 pageId/pageName/componentCount 在弹窗中可见
+- **新增单元测试**: `JsonTreePreviewModal.test.tsx` 7 tests (emoji strip, common group, nested children, pageName propagation)
+- 提交: `02c735f1`
+
 ### Added (vibex-proposals-summary-20260411 E-P0-5: 测试基础设施 + 日志清理) — 2026-04-07
 - **E-P0-5 P0 Tech Debt 收尾**:
   - **P0-10 console.log 清理**: Backend 144 文件 + Frontend 102 文件的 `console.*` → `devLog()`/`safeError()`/`canvasLogger.default.*`

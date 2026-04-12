@@ -207,8 +207,18 @@ interface ComponentTreeJson {
 interface JsonTreePreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
-  componentNodes: ComponentNode[];
-  flowNodes: BusinessFlowNode[];
+  groups: ComponentGroup[];
+}
+
+// buildPagesData: ComponentGroup[] → {pages: [...]} JSON structure
+function buildPagesData(groups: ComponentGroup[]): { pages: PageData[]; totalComponents: number; generatedAt: string; }
+
+interface PageData {
+  pageId: string;
+  pageName: string;   // label with emoji prefix stripped
+  componentCount: number;
+  isCommon: boolean;
+  components: ComponentNode[];
 }
 
 export function JsonTreePreviewModal({

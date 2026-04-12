@@ -1,6 +1,9 @@
 /**
  * JsonTreePreviewModal.module.css
- * E1-F3: JSON tree preview modal styles
+ * E2: JSON tree preview modal styles
+ *
+ * Dark theme (matches canvas dark background).
+ * JSON content rendered in <pre> with syntax-friendly styling.
  */
 
 .overlay {
@@ -16,12 +19,8 @@
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .modal {
@@ -108,4 +107,57 @@
   flex: 1;
   overflow: hidden;
   min-height: 0;
+  display: flex;
+}
+
+/* JSON <pre> styling — dark theme, monospace, scrollable */
+.jsonPre {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  width: 100%;
+  overflow: auto;
+  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas,
+    'DejaVu Sans Mono', monospace;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: #a5b4fc; /* indigo-300 for JSON keys */
+  background: transparent;
+  white-space: pre;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+.jsonPre::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.jsonPre::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.jsonPre::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+/* JSON syntax highlighting via CSS color spans (injected via dangerouslySetInnerHTML) */
+.jsonPre .key {
+  color: #93c5fd; /* blue-300 */
+}
+
+.jsonPre .string {
+  color: #86efac; /* green-300 */
+}
+
+.jsonPre .number {
+  color: #fca5a5; /* red-300 */
+}
+
+.jsonPre .boolean {
+  color: #fdba74; /* orange-300 */
+}
+
+.jsonPre .null {
+  color: #94a3b8; /* slate-400 */
 }

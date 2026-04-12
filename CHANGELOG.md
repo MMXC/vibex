@@ -1,3 +1,7 @@
+### Added (vibex-proposals-20260412 Epic0: S0.1 TypeScript 紧急修复) — 2026-04-12
+- **S0.1 TypeScript 编译错误修复**: `vibex-backend/src/lib/apiAuth.ts` — `import type NextResponse` → value import, 解决 `isolatedModules` 编译错误
+- **提交**: `4c4f019b`
+
 ### Added (vibex-css-architecture Epic-E4: CI与测试) — 2026-04-12
 - **E4-S1**: PrototypeQueuePanel.test.tsx — 状态样式 Vitest 单元测试（7/7 ✅）
 - **E4-S2**: canvas-queue-styles.spec.ts — 队列样式 E2E 测试（4/4 ✅，BASE_URL 修复到 3000）

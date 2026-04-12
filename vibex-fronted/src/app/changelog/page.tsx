@@ -34,6 +34,20 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.191',
+    date: '2026-04-07',
+    changes: [
+      '📋 vibex-proposals-20260411-page-structure E1: 组件树页面结构增强',
+      '✅ Phase 1: ComponentNode 新增 pageName 可选字段',
+      '✅ Phase 2: getPageLabel 支持 pageName 优先，ComponentGroup 新增 pageId + componentCount',
+      '✅ Phase 3: 树结构展示优化，通用组件置顶',
+      '✅ Phase 4: JSON 导出支持 pageName 字段',
+      '✅ 单元测试: ComponentTreeGrouping.test.ts 35 tests',
+    ],
+    commit: '60cd1ac4',
+  },
+
+  {
     version: '1.0.190',
     date: '2026-04-12',
     changes: [

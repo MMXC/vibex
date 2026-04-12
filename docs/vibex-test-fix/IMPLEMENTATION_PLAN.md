@@ -145,6 +145,13 @@ npx vitest run src/app/__tests__/accessibility.test.tsx --no-coverage
 
 ---
 
+### Epic 3 补充 (2026-04-12 00:03)
+
+- `tests/unit/selector-patterns.spec.ts` — 新增选择器模式规范测试（11/11 passed）
+  - S3.2: getAllByText + count / within() / regex date patterns
+  - S3.3: getByTestId / getByRole / format-card-{id} convention
+  - S3.1: redirect-only Server Component 测试策略
+
 ## 4. Epic 3：页面测试修复 ⚠️ 需先执行 §6 前置条件
 
 ### S3.1 page.test.tsx（4 处修复）

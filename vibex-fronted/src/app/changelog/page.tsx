@@ -34,6 +34,18 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.190',
+    date: '2026-04-12',
+    changes: [
+      '📋 vibex-proposals-20260411-page-tree E1: flowId 匹配修复',
+      '✅ AI prompt 强化: generate-components/route.ts 增加 flowId = nodeId 指令',
+      '✅ matchFlowNode 三级匹配: 精确匹配 → prefix 匹配 → 名称模糊匹配',
+      '✅ 单元测试: ComponentTreeGrouping.test.ts 35 tests (inferIsCommon/matchFlowNode/getPageLabel/groupByFlowId)',
+    ],
+    commit: '60cd1ac4',
+  },
+
+  {
     version: '1.0.188',
     date: '2026-04-12',
     changes: [

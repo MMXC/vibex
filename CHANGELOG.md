@@ -419,14 +419,14 @@
   - **Phase 2**: `getPageLabel()` 支持 `pageName` 优先，`ComponentGroup` 新增 `pageId` + `componentCount`
   - **Phase 3**: 树结构展示优化，通用组件置顶
   - **Phase 4**: JSON 导出支持 `pageName` 字段
-  - 提交: `c8ffde20` (与 page-tree flowId 匹配共用 commit)
+  - 提交: `60cd1ac4` (单元测试)
 
 ### Added (vibex-proposals-20260411-page-tree: flowId 匹配修复) — 2026-04-07
 - **flowId 匹配修复**: 修复 AI 生成组件时 flowId 填充不正确的问题
   - **S1.1 AI prompt 强化**: `generate-components/route.ts` prompt 增加 `flowId = BusinessFlow nodeId` 指令
   - **S1.2 matchFlowNode 三级匹配**: 精确匹配 → prefix 匹配 → 名称模糊匹配，增强 fallback
   - **S1.4 单元测试**: `ComponentTreeGrouping.test.ts` 35 tests (inferIsCommon/matchFlowNode/getPageLabel/groupByFlowId)
-  - 提交: `7e2b8278` (matchFlowNode+tests), `fc8162d3` (4层fallback), `c8ffde20` (pageName)
+  - 提交: `60cd1ac4` (单元测试), `03ce811a` (matchFlowode/CSS修复合并)
 
 ### Added (vibex-proposals-summary-20260411 E-P0-4: 需求质量提升) — 2026-04-07
 - **E-P0-4 需求质量提升**:

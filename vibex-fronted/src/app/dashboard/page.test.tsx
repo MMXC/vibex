@@ -169,7 +169,8 @@ describe('Dashboard (/dashboard)', () => {
   it('displays projects', async () => {
     renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
-      expect(screen.getByText('Project 1')).toBeInTheDocument();
+      // Use getAllByText since 'Project 1' appears in heading and card
+      expect(screen.getAllByText('Project 1').length).toBeGreaterThan(0);
     });
   });
 
@@ -197,7 +198,8 @@ describe('Dashboard (/dashboard)', () => {
   it('displays project name', async () => {
     renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
-      expect(screen.getByText('Project 1')).toBeInTheDocument();
+      // Use getAllByText since 'Project 1' appears in heading and card
+      expect(screen.getAllByText('Project 1').length).toBeGreaterThan(0);
     });
   });
 
@@ -291,8 +293,9 @@ describe('Dashboard (/dashboard)', () => {
 
     renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
-      expect(screen.getByText('Project 1')).toBeInTheDocument();
-      expect(screen.getByText('Project 2')).toBeInTheDocument();
+      // Use getAllByText since project names appear in heading and cards
+      expect(screen.getAllByText('Project 1').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Project 2').length).toBeGreaterThan(0);
     });
   });
 
@@ -512,7 +515,9 @@ describe('Dashboard (/dashboard)', () => {
 
     renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
-      expect(screen.getByText(/更新于/)).toBeInTheDocument();
+      // The date is formatted as "X月X日" (e.g., "4月12日") via toLocaleDateString
+      // Use regex to match the month-day pattern
+      expect(screen.getByText(/\d+月\d+日/)).toBeInTheDocument();
     });
   });
 
@@ -524,7 +529,8 @@ describe('Dashboard (/dashboard)', () => {
 
     renderWithQueryClient(<Dashboard />);
     await waitFor(() => {
-      expect(screen.getByText('Project 1')).toBeInTheDocument();
+      // Use getAllByText since 'Project 1' appears in heading and card
+      expect(screen.getAllByText('Project 1').length).toBeGreaterThan(0);
     });
   });
 });

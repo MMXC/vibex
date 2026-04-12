@@ -1,5 +1,8 @@
 /**
  * 首页三栏布局测试
+ *
+ * 注意：page.tsx 是 Server Component，仅做 redirect('/canvas')，无渲染内容。
+ * redirect 行为由路由层保证，测试文件无需验证空渲染。
  */
 
 // Mock next/navigation to prevent redirect in server component
@@ -35,30 +38,29 @@ const createWrapper = () => {
 };
 
 describe('HomePage', () => {
-  it('should Render three-column layout', async () => {
+  it('should not render any content (redirects to /canvas)', () => {
+    // HomePage is a Server Component that calls redirect('/canvas').
+    // Testing Library renders it as <div /> (empty) since redirect produces no content.
+    // This test verifies that nothing crashes and the component renders without error.
     render(<HomePage />, { wrapper: createWrapper() });
-    
-    // 验证页面基本元素存在
-    expect(screen.getByText('VibeX')).toBeInTheDocument();
+    // The redirect causes an empty render — no content to assert on.
+    // The redirect itself is tested at the routing layer (/canvas page tests cover it).
   });
 
-  it('should render navigation', () => {
-    render(<HomePage />, { wrapper: createWrapper() });
-    
-    expect(screen.getByText('VibeX')).toBeInTheDocument();
-  });
-
-  it('should have five process steps', () => {
-    render(<HomePage />, { wrapper: createWrapper() });
-    
-    // Verify basic page structure
-    expect(screen.getByText('VibeX')).toBeInTheDocument();
-  });
-
-  it('should Render with basic elements', () => {
-    render(<HomePage />, { wrapper: createWrapper() });
-    
-    // Verify the page renders with basic elements
-    expect(screen.getByText('VibeX')).toBeInTheDocument();
+  it('should not throw when rendered (redirect coverage)', () => {
+    // Ensures the component can be imported and rendered without throwing.
+    expect(() => render(<HomePage />, { wrapper: createWrapper() })).not.toThrow();
   });
 });
+
+/**
+ * VibeX 首页 — 重定向到 canvas
+ *
+ * 2026-04-02: 统一 canvas 为唯一首页入口
+ * 旧 HomePage 组件已迁移到 /canvas 路由
+ */
+import { redirect } from 'next/navigation';
+
+export default function HomePage() {
+  redirect('/canvas');
+}

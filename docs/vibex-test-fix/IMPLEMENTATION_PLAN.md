@@ -133,26 +133,41 @@ npx vitest run src/app/__tests__/accessibility.test.tsx --no-coverage
 
 ### S3.1 page.test.tsx（4 处修复）
 
-**前置**: 运行测试获取真实错误信息后，补充具体 diff 到 `SELECTOR_FIXES.md`
+**✅ 已完成 (2026-04-12 21:47)**
 
-**常见修复方向**（待实测确认）:
-- 组件空渲染问题 → 检查 HomePage 是否为 Server Component，必要时添加 `'use client'`
-- `getByText('VibeX')` → 改为精确选择器或使用 `findByText` 配合 waitFor
+**实测根因**: `HomePage` 是 Server Component，import 时调用 `redirect('/canvas')` 产生 `<div />` 空渲染。4 个测试均查找 'VibeX' 文本但渲染为空。
+
+**修复**:
+- 删除 4 个查找 'VibeX' 的无效测试
+- 替换为 2 个验证组件不崩溃的测试（redirect-only Server Component 无内容可测）
 
 ### S3.2 dashboard/page.test.tsx（5 处修复）
 
-**前置**: 运行测试获取真实错误信息后，补充具体 diff 到 `SELECTOR_FIXES.md`
+**✅ 已完成 (2026-04-12 21:47)**
 
-**常见修复方向**（待实测确认）:
-- API mock 未生效 → 确认 `vi.mock('@/services/api/modules/project')` 是否被正确加载
-- `getByText('Project 1')` → 改为返回精确匹配的 mock 数据
+**实测根因**: `getByText('Project 1')` 在 dashboard 中找到多个匹配（标题区 + 卡片区）；日期断言 `getByText(/更新于/)` 文本不存在。
+
+**修复**:
+- `displays projects` / `displays project name` / `handles project without update date` → `getAllByText('Project 1')` + count
+- `displays multiple projects` → `getAllByText` + count for both project names
+- `displays project update date` → `getByText(/\d+月\d+日/)` 匹配实际日期格式
 
 ### S3.3 export/page.test.tsx（1 处修复）
 
-**前置**: 运行测试获取真实错误信息后，补充具体 diff 到 `SELECTOR_FIXES.md`
+**✅ 已完成 (2026-04-12 21:47)**
 
-**常见修复方向**（待实测确认）:
-- "Found multiple: Vue 3" → 使用 `getByRole('tab', { name: 'Vue 3' })`
+**实测根因**: `getByText('Vue 3')` 匹配了多个元素（format card + tab label）。
+
+**修复**:
+- 改用 `getByTestId('format-card-vue')`（format ID 为 `vue`，非 `vue3`）
+
+### Epic 3 验证结果
+
+| 文件 | 修复前 | 修复后 |
+|------|--------|--------|
+| `page.test.tsx` | 4 failed | 2 passed |
+| `dashboard/page.test.tsx` | 5 failed | 38 passed |
+| `export/page.test.tsx` | 1 failed | 13 passed |
 
 ### 验证命令（每个文件）
 
@@ -187,9 +202,9 @@ npx vitest run src --no-coverage --exclude='src/components/**' --exclude='src/ap
 
 - [x] `npx vitest run CardTreeNode --no-coverage` → 15/15 passed (Epic1 ✅)
 - [x] `npx vitest run src/app/__tests__/accessibility.test.tsx --no-coverage` → 0 failures (Epic2 ✅)
-- [ ] `npx vitest run src/app/page.test.tsx --no-coverage` → 0 failures（验收：4 known failures → 0）
-- [ ] `npx vitest run src/app/dashboard/page.test.tsx --no-coverage` → 0 failures（验收：5 known failures → 0）
-- [ ] `npx vitest run src/app/export/page.test.tsx --no-coverage` → 0 failures（验收：1 known failure → 0）
+- [x] `npx vitest run src/app/page.test.tsx --no-coverage` → 0 failures（验收：4 known failures → 0）Epic3 S3.1 ✅
+- [x] `npx vitest run src/app/dashboard/page.test.tsx --no-coverage` → 0 failures（验收：5 known failures → 0）Epic3 S3.2 ✅
+- [x] `npx vitest run src/app/export/page.test.tsx --no-coverage` → 0 failures（验收：1 known failure → 0）Epic3 S3.3 ✅
 - [ ] 全量测试无新增失败（已知 26 个失败修复后，失败总数应为 0）
 - [ ] `npm test` 退出码为 0
 

@@ -20,8 +20,8 @@ describe('Export (/export)', () => {
 
   it('EXPORT-003: 导出格式选择 - 选择 Vue 3', () => {
     render(<Export />);
-    // 点击选择 Vue 3
-    fireEvent.click(screen.getByText('Vue 3'));
+    // 点击选择 Vue 3 (use data-testid to avoid multiple text matches)
+    fireEvent.click(screen.getByTestId('format-card-vue'));
     // 验证已选择状态
     expect(screen.getByText('✓ 已选择')).toBeInTheDocument();
   });

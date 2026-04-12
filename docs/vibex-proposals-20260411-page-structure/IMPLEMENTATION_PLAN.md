@@ -438,13 +438,13 @@ test.describe('组件树 JSON 预览功能', () => {
 
 | # | 任务 | 状态 | 负责人 |
 |---|------|------|--------|
-| 1 | Phase 1: types.ts pageName 字段 | 待办 | Dev |
-| 2 | Phase 2: getPageLabel pageName fallback | 待办 | Dev |
-| 3 | Phase 2: ComponentGroup pageId+componentCount | 待办 | Dev |
-| 4 | Phase 2: JSON 按钮添加工具栏 | 待办 | Dev |
-| 5 | Phase 3: JsonTreePreviewModal 组件 | 待办 | Dev |
-| 6 | Phase 4: 单元测试 pageName fallback | 待办 | Test |
-| 7 | Phase 4: E2E 测试 JSON 预览 | 待办 | Test |
+| 1 | Phase 1: types.ts pageName 字段 | ✅ Done | Dev |
+| 2 | Phase 2: getPageLabel pageName fallback | ✅ Done | Dev |
+| 3 | Phase 2: ComponentGroup pageId+componentCount | ✅ Done | Dev |
+| 4 | Phase 2: JSON 按钮添加工具栏 | ✅ Done | Dev |
+| 5 | Phase 3: JsonTreePreviewModal 组件 | ✅ Done | Dev |
+| 6 | Phase 4: 单元测试 pageName fallback | ✅ Done | Dev |
+| 7 | Phase 4: E2E 测试 JSON 预览 | ✅ Done | Dev |
 
 ---
 

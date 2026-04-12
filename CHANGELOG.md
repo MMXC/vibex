@@ -404,6 +404,13 @@
   - 提交: `d8f344f1`
 
 ### Added (vibex-proposals-20260411-page-structure: 组件树页面结构增强) — 2026-04-07
+- **组件树页面结构增强**: Phase 1-4 完成
+  - **Phase 1**: `ComponentNode` 新增 `pageName?: string` 可选字段
+  - **Phase 2**: `getPageLabel()` 支持 `pageName` 优先，`ComponentGroup` 新增 `pageId` + `componentCount`
+  - **Phase 3**: 树结构展示优化，通用组件置顶
+  - **Phase 4**: JSON 导出支持 `pageName` 字段
+  - 提交: `60cd1ac4` (单元测试), `03ce811a` (matchFlowNode/CSS修复合并)
+
 ### Added (vibex-proposals-summary-20260411 E-P0-5: 测试基础设施 + 日志清理) — 2026-04-07
 - **E-P0-5 P0 Tech Debt 收尾**:
   - **P0-10 console.log 清理**: Backend 144 文件 + Frontend 102 文件的 `console.*` → `devLog()`/`safeError()`/`canvasLogger.default.*`
@@ -413,13 +420,6 @@
   - **S5.3 stability.spec.ts**: 路径已修复（Tester 验证）
   - WebSocket 治理验证: `grep console\.` in `services/websocket/` = 0 条
   - 提交: `b85f3ac7`, `04d2ebc2`, `0c63fff2`, `0b19ba9c`
-
-- **组件树页面结构增强**: Phase 1-4 完成
-  - **Phase 1**: `ComponentNode` 新增 `pageName?: string` 可选字段
-  - **Phase 2**: `getPageLabel()` 支持 `pageName` 优先，`ComponentGroup` 新增 `pageId` + `componentCount`
-  - **Phase 3**: 树结构展示优化，通用组件置顶
-  - **Phase 4**: JSON 导出支持 `pageName` 字段
-  - 提交: `60cd1ac4` (单元测试)
 
 ### Added (vibex-proposals-20260411-page-tree: flowId 匹配修复) — 2026-04-07
 - **flowId 匹配修复**: 修复 AI 生成组件时 flowId 填充不正确的问题

@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.204',
+    date: '2026-04-13',
+    changes: [
+      '📋 vibex-auth-401-handling Epic3: 测试覆盖',
+      '✅ middleware-auth.test.ts: 8 TC 认证中间件单元测试',
+      '✅ validateReturnTo 强化（URL编码traversal/protocol-relative）+ fuzzing 17/17',
+      '✅ auth-redirect.spec.ts: 3 E2E 测试场景',
+      '提交: 102922c7',
+    ],
+    commit: '102922c7',
+  },
+
+  {
     version: '1.0.203',
     date: '2026-04-13',
     changes: [

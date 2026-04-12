@@ -1,5 +1,12 @@
 # Changelog
 
+### [vibex-auth-401-handling Epic3: 测试覆盖] — 2026-04-13
+- **E3-S3.1**: middleware-auth.test.ts — 8 TC 认证中间件单元测试
+- **E3-S3.2**: validateReturnTo 强化（URL编码traversal/protocol-relative）+ fuzzing TC（T13~T17）
+- **E3-S3.3**: auth-redirect.spec.ts — 3 E2E 测试场景
+- **验证**: vitest middleware 8/8 ✅ | validateReturnTo 17/17 ✅
+- 提交: `102922c7`
+
 ### [vibex-auth-401-handling Epic2: 前端一致性] — 2026-04-13
 - **E2-S2.1**: authStore.ts — logout() 清除 auth_token + auth_session cookie（非 httpOnly 残留）
 - **E2 测试**: authStore 单元测试（22/22 ✅，含 cookie 清除断言）

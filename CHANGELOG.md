@@ -2998,6 +2998,7 @@ All notable changes to this project will be documented in this file.
 
 ### Features (vibex-proposals-20260412 Epic1: 测试基础设施修复 — Sprint 1+2) — 2026-04-12
 - **E1 safeError**: `src/lib/log-sanitizer.ts` — sanitize()/safeError()/devLog() 函数，100% 覆盖所有 API 路由 token 日志（chat/pages/projects/templates/plan routes）
+- **E1 测试**: `src/lib/log-sanitizer.test.ts` — 24 tests（sanitize/sanitizeAndTruncate/safeError/devLog/devDebug）
 - **E2 提案状态追踪**: `docs/proposals/PROPOSALS_STATUS_SOP.md` — 状态定义/转换规则/维护规范；INDEX.md status 字段 100% 覆盖
 - **E3 CI/CD守卫增强**: `vibex-fronted/scripts/pre-submit-check.sh` Section 7 grepInvert guard 检测 test config 变更；`vibex-backend/src/config/websocket.ts` WEBSOCKET_CONFIG 单一配置源
 - **E4.1 Canvas ErrorBoundary**: `TreeErrorBoundary.tsx` — 三栏（ContextTreePanel/FlowTreePanel/ComponentTreePanel）独立包裹，重试按钮 + 错误日志
@@ -3007,7 +3008,7 @@ All notable changes to this project will be documented in this file.
 - **E5 waitForTimeout重构**: E2E 测试消除 waitForTimeout（0 处 remaining），替换为 expect(page.getByTestId).toBeVisible() 确定性等待
 - **E6 pre-commit hook**: `vibex-fronted/.husky/pre-commit` lint-staged 调用 + @typescript-eslint/no-console 阻塞 console.log；ESLint rule + package.json lint-staged config 已配置
 - **E7 文档与工具**: `docs/canvas-roadmap.md` Canvas 演进路线图；`.github/workflows/changelog.yml` CHANGELOG guard CI
-- **验证**: vitest (ComponentTreeGrouping.test.ts 35 passed ✅) | grepInvert guard ✅ | pre-commit hook ✅ | waitForTimeout 0 ✅
+- **验证**: vitest (ComponentTreeGrouping.test.ts 35 passed ✅, log-sanitizer.test.ts 24 passed ✅) | grepInvert guard ✅ | pre-commit hook ✅ | waitForTimeout 0 ✅
 
 ### Features (vibex-architect-proposals-vibex-proposals-20260411 Epic E2-E7)
 - **E2 WebSocket治理**: MAX_CONNECTIONS=100 limit in ConnectionPool, passive heartbeat via pruneStaleConnections() (#1253771e). E2-S2: add `__tests__/connectionPool.test.ts` (22 tests), fix disconnectTimeout=300000ms, fix empty devLog() calls. E2-S3: add `GET /api/v1/ws/health` endpoint (#f073d0b7)

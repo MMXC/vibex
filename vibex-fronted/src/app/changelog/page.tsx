@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.202',
+    date: '2026-04-13',
+    changes: [
+      '📋 vibex-auth-401-handling Epic1: 后端 Cookie 设置',
+      '✅ login/register 设置 httpOnly auth_token cookie (HttpOnly; SameSite=Lax; Max-Age=604800)',
+      '✅ logout 清除 auth_token + auth_session 两个 cookie（Secure HTTPS）',
+      '✅ 路由单元测试 19/19 通过（含 Set-Cookie 断言）',
+      '提交: 2ec3d6e2',
+    ],
+    commit: '2ec3d6e2',
+  },
+
+  {
     version: '1.0.201',
     date: '2026-04-13',
     changes: [

@@ -2,7 +2,7 @@
 
 ### [vibex-test-fix Epic1 补充: setup.spec.ts] — 2026-04-12
 - **tests/unit/setup.spec.ts**: 新增 IntersectionObserver mock 行为验证测试（8/8 passed），覆盖 S1.1 PRD 验收标准
-- 提交: `setup.spec.ts`
+- 提交: `7e6a00a9`
 
 ### [vibex-test-fix Epic4: 全量回归验证] — 2026-04-12
 - **Epic 1-3 修复验证**: CardTreeNode 15/15 ✅, accessibility 9/9 ✅, page 2/2 ✅, dashboard 38/38 ✅, export 13/13 ✅ (合计 77/77)

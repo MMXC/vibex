@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.197',
+    date: '2026-04-12',
+    changes: [
+      '📋 vibex-test-fix Epic4: 全量回归验证',
+      '✅ Epic 1-3 修复验证: CardTreeNode 15/15, accessibility 9/9, page 2/2, dashboard 38/38, export 13/13 (合计 77/77)',
+      '✅ 组件回归: 43 个预存失败与 Epic 1-3 无关',
+      '提交: d6b7ae0c',
+    ],
+    commit: 'd6b7ae0c',
+  },
+
+  {
     version: '1.0.196',
     date: '2026-04-12',
     changes: [

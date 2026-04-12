@@ -1,5 +1,10 @@
 # Changelog
 
+### [vibex-test-fix Epic4: 全量回归验证] — 2026-04-12
+- **Epic 1-3 修复验证**: CardTreeNode 15/15 ✅, accessibility 9/9 ✅, page 2/2 ✅, dashboard 38/38 ✅, export 13/13 ✅ (合计 77/77)
+- **组件回归**: 43 个预存失败（vi.mock 格式错误、act() 配置、EventSource 等），均与 Epic 1-3 无关
+- 提交: `b3f14a2e` (Epic4 回归报告)
+
 ### [vibex-test-fix Epic3: 页面测试选择器修复] — 2026-04-12
 - **page.test.tsx**: HomePage 为 Server Component（仅 redirect），移除无效测试，保留 2 个不崩溃验证
 - **dashboard/page.test.tsx**: 5 个失败全部修复（`getByText`→`getAllByText`+count，`/更新于/`→`/\d+月\d+日/`）

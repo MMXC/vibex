@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.200',
+    date: '2026-04-13',
+    changes: [
+      '📋 vibex-test-fix Epic3 补充: selector-patterns.spec.ts',
+      '✅ 新增选择器模式规范测试（11/11 passed）',
+      '✅ S3.2/S3.3 选择器模式记录：getAllByText+count、within()、regex日期',
+      '提交: 49008afc',
+    ],
+    commit: '49008afc',
+  },
+
+  {
     version: '1.0.199',
     date: '2026-04-12',
     changes: [

@@ -5,7 +5,7 @@
   - S3.2: getAllByText+count / within() / regex date patterns
   - S3.3: getByTestId / getByRole / format-card-{id} convention
   - S3.1: redirect-only Server Component 测试策略
-- 提交: `selector-patterns.spec.ts`
+- 提交: `49008afc`
 
 ### [vibex-test-fix Epic2 补充: accessibility.spec.ts] — 2026-04-12
 - **tests/unit/accessibility.spec.ts**: 新增 jest-axe 集成验证测试（7/7 passed），覆盖 S2.1 PRD 验收标准

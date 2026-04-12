@@ -1,7 +1,7 @@
 /**
  * Tests for CardTreeNode component (Epic 5)
  *
- * Includes IntersectionObserver mock for lazy loading tests.
+ * IntersectionObserver mock is provided globally via setup.ts.
  */
 
 import React from 'react';
@@ -9,37 +9,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ReactFlowProvider } from '@xyflow/react';
 import { CardTreeNode } from '../CardTreeNode';
 import type { CardTreeNodeProps } from '../CardTreeNode';
-
-// ==================== IntersectionObserver Mock ====================
-
-// Mock IntersectionObserver so cards are visible during tests
-const mockObserve = vi.fn();
-const mockUnobserve = vi.fn();
-const mockDisconnect = vi.fn();
-
-beforeAll(() => {
-  global.IntersectionObserver = vi.fn((callback: IntersectionObserverCallback) => {
-    // Store callback to fire later when observe() is called
-    return {
-      observe: (el: Element) => {
-        mockObserve(el);
-        // Immediately report element as visible
-        callback(
-          [{ isIntersecting: true, target: el }] as IntersectionObserverEntry[],
-          { observe: mockObserve, unobserve: mockUnobserve, disconnect: mockDisconnect } as unknown as IntersectionObserver
-        );
-      },
-      unobserve: mockUnobserve,
-      disconnect: mockDisconnect,
-    };
-  }) as unknown as typeof IntersectionObserver;
-});
-
-afterEach(() => {
-  mockObserve.mockClear();
-  mockUnobserve.mockClear();
-  mockDisconnect.mockClear();
-});
 
 // ==================== Test Helpers ====================
 
@@ -125,7 +94,7 @@ describe('CardTreeNode', () => {
   });
 
   it('should render nested children with expand button', () => {
-    render(
+    renderWithProvider(
       <CardTreeNode
         {...defaultProps}
         data={{
@@ -161,13 +130,15 @@ describe('CardTreeNode', () => {
     });
 
     it('should render placeholder when card is NOT visible', () => {
-      // Override mock to NOT trigger callback (element not visible)
-      (global.IntersectionObserver as any).mockImplementationOnce((_callback: IntersectionObserverCallback) => {
-        return {
-          observe: vi.fn(), // Don't call callback — simulating "not visible yet"
-          unobserve: vi.fn(),
-          disconnect: vi.fn(),
-        };
+      // Override the global mock so it does NOT fire the callback (element not visible)
+      // Note: must use regular function (not arrow) so `new` works correctly
+      (global.IntersectionObserver as any).mockImplementationOnce(function (
+        _callback: IntersectionObserverCallback
+      ) {
+        this.observe = vi.fn(); // Don't call callback — simulating "not visible yet"
+        this.unobserve = vi.fn();
+        this.disconnect = vi.fn();
+        this.takeRecords = vi.fn(() => []);
       });
 
       renderWithProvider(<CardTreeNode {...defaultProps} />);

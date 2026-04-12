@@ -1,5 +1,9 @@
 # Changelog
 
+### [vibex-test-fix Epic1 补充: setup.spec.ts] — 2026-04-12
+- **tests/unit/setup.spec.ts**: 新增 IntersectionObserver mock 行为验证测试（8/8 passed），覆盖 S1.1 PRD 验收标准
+- 提交: `setup.spec.ts`
+
 ### [vibex-test-fix Epic4: 全量回归验证] — 2026-04-12
 - **Epic 1-3 修复验证**: CardTreeNode 15/15 ✅, accessibility 9/9 ✅, page 2/2 ✅, dashboard 38/38 ✅, export 13/13 ✅ (合计 77/77)
 - **组件回归**: 43 个预存失败（vi.mock 格式错误、act() 配置、EventSource 等），均与 Epic 1-3 无关

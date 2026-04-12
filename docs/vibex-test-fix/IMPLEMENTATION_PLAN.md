@@ -89,11 +89,21 @@ npx vitest run src/components/visualization/CardTreeNode/__tests__/CardTreeNode.
 
 ---
 
+### Epic 1 补充 (2026-04-12 23:50)
+
+- **tests/unit/setup.spec.ts** — 新增 setup.ts 行为验证测试（PRD S1.1 验收标准）
+  - 8 个测试覆盖 IntersectionObserver mock 的正确性
+  - `new IntersectionObserver(callback)` 返回正确对象
+  - `observe()` 立即触发 callback (isIntersecting: true)
+  - `mockImplementationOnce` 可覆盖默认行为
+  - `unobserve/disconnect/takeRecords` 可调用
+
 ### Epic 1 总结
 
 - **S1.1 setup.ts** — 添加全局 IntersectionObserver mock（`class MockIntersectionObserver` + `vi.fn()` 包装，支持 `mockImplementationOnce`）
 - **S1.2 CardTreeNode.test.tsx** — 移除本地 mock；修复 nested children 测试漏用 `renderWithProvider`；`mockImplementationOnce` 改用 regular function
 - **S1.3 + S1.4** — 15/15 测试全部通过
+- **S1.1 补充: setup.spec.ts** — 8/8 mock 行为验证测试通过 ✅
 
 ---
 

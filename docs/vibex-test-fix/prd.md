@@ -154,11 +154,12 @@ expect(typeof axe).toBe('function');
 ## DoD (Definition of Done)
 
 ### Epic 1 — IntersectionObserver Mock
-- [ ] `tests/unit/setup.ts` 中 `global.IntersectionObserver` 全局 mock 已添加
-- [ ] mock 对象的 `observe/unobserve/disconnect/takeRecords` 方法均已实现
-- [ ] `new IntersectionObserver(callback)` 不再抛出 TypeError
-- [ ] `CardTreeNode.test.tsx` 15/15 测试通过
-- [ ] 其他测试未因全局 mock 引入新的失败
+- [x] `tests/unit/setup.ts` 中 `global.IntersectionObserver` 全局 mock 已添加 ✅ (2026-04-12)
+- [x] mock 对象的 `observe/unobserve/disconnect/takeRecords` 方法均已实现 ✅
+- [x] `new IntersectionObserver(callback)` 不再抛出 TypeError ✅
+- [x] `CardTreeNode.test.tsx` 15/15 测试通过 ✅
+- [x] 其他测试未因全局 mock 引入新的失败 ✅
+- [x] `tests/unit/setup.spec.ts` 8/8 mock 行为验证测试通过 ✅
 
 ### Epic 2 — jest-axe
 - [ ] `package.json` 中 `jest-axe` 已添加（devDependencies）

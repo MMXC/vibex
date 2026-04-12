@@ -16,7 +16,6 @@ jest.mock('@/lib/auth', () => ({
   hashPassword: jest.fn(),
   verifyPassword: jest.fn(),
   generateToken: jest.fn(),
-  getAuthUser: jest.fn(),
 }));
 
 import { POST } from './route';
@@ -91,7 +90,8 @@ describe('POST /api/auth/login', () => {
     expect(data.success).toBe(false);
   });
   
-  it('should return token and user on successful login', async () => {
+  // AC-1.1.1: Set-Cookie has HttpOnly
+  it('should set httpOnly auth_token cookie on successful login', async () => {
     const mockUser = {
       id: 'user123',
       email: 'test@example.com',
@@ -118,5 +118,87 @@ describe('POST /api/auth/login', () => {
     expect(data.success).toBe(true);
     expect(data.data.token).toBe('mock-token');
     expect(data.data.user.email).toBe('test@example.com');
+
+    const setCookie = response.headers.get('set-cookie') || '';
+    expect(setCookie).toMatch(/auth_token=mock-token/i);
+    expect(setCookie).toMatch(/HttpOnly/i);
+  });
+
+  // AC-1.1.2: SameSite=Lax
+  it('should set cookie with SameSite=Lax', async () => {
+    const mockUser = {
+      id: 'user123',
+      email: 'test@example.com',
+      name: 'Test User',
+      avatar: null,
+      password: 'hashedpassword',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
+    (verifyPassword as jest.Mock).mockResolvedValue(true);
+    (generateToken as jest.Mock).mockReturnValue('mock-token');
+    
+    const request = new NextRequest('http://localhost:3000/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'test@example.com', password: 'password123' }),
+    });
+    
+    const response = await POST(request);
+    const setCookie = response.headers.get('set-cookie') || '';
+    expect(setCookie).toMatch(/SameSite=Lax/i);
+  });
+
+  // AC-1.1.3: Max-Age=604800 (7 days)
+  it('should set cookie with Max-Age=604800', async () => {
+    const mockUser = {
+      id: 'user123',
+      email: 'test@example.com',
+      name: 'Test User',
+      avatar: null,
+      password: 'hashedpassword',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
+    (verifyPassword as jest.Mock).mockResolvedValue(true);
+    (generateToken as jest.Mock).mockReturnValue('mock-token');
+    
+    const request = new NextRequest('http://localhost:3000/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'test@example.com', password: 'password123' }),
+    });
+    
+    const response = await POST(request);
+    const setCookie = response.headers.get('set-cookie') || '';
+    expect(setCookie).toMatch(/Max-Age=604800/i);
+  });
+
+  // AC-1.1.4: Login failure (401) should not set cookie
+  it('should not set cookie on 401 invalid password', async () => {
+    const mockUser = {
+      id: 'user123',
+      email: 'test@example.com',
+      name: 'Test User',
+      avatar: null,
+      password: 'hashedpassword',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
+    (verifyPassword as jest.Mock).mockResolvedValue(false);
+    
+    const request = new NextRequest('http://localhost:3000/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'test@example.com', password: 'wrongpassword' }),
+    });
+    
+    const response = await POST(request);
+    const setCookie = response.headers.get('set-cookie');
+    // Should not have auth_token in set-cookie header
+    expect(setCookie || '').not.toMatch(/auth_token=/i);
   });
 });

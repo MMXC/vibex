@@ -11,7 +11,8 @@ import { NextRequest, NextResponse } from 'next/server';
 const PROTECTED_PATHS = ['/dashboard', '/canvas', '/design', '/project-settings', '/preview'];
 
 // 无需认证的路径（登录页、公开资源）
-const PUBLIC_PATHS = ['/auth', '/login', '/oauth/callback', '/api/auth'];
+// 注意: /auth 不在此列表 — 已登录用户访问 /auth 应重定向，而非直接放行
+const PUBLIC_PATHS = ['/login', '/oauth/callback', '/api/auth'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

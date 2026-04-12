@@ -166,34 +166,41 @@ logout: () => {
 
 ---
 
-## 4. Epic 3: 测试覆盖
+## 4. Epic 3: 测试覆盖 ✅
 
-### Story 3.1: middleware 单元测试
+### Story 3.1: middleware 单元测试 ✅
 
-**文件**: `vibex-fronted/src/__tests__/middleware.test.ts`
+**文件**: `vibex-fronted/tests/unit/middleware-auth.test.ts` (新建)
 
 **覆盖场景**（8 TC）:
 
 | TC | 输入 | 预期 |
 |----|------|------|
-| T1 | `GET /canvas` 无 cookie | 307 `/auth?returnTo=/canvas` |
-| T2 | `GET /dashboard/subpath` 无 cookie | 307 `/auth?returnTo=/dashboard/subpath` |
-| T3 | `GET /canvas` 有 auth_token cookie | 200 `next()` |
-| T4 | `GET /canvas` 有 auth_session cookie | 200 `next()` |
-| T5 | `GET /auth` 有 cookie 无 returnTo | 302 `/dashboard` |
-| T6 | `GET /auth?returnTo=/canvas` 有 cookie | 302 `/canvas` |
-| T7 | `GET /_next/static/file.js` | 200 放行 |
-| T8 | `GET /api/auth/*` 无 cookie | 200 放行 |
+| T1 | `GET /canvas` 无 cookie | 307 `/auth?returnTo=/canvas` ✅
+| T2 | `GET /dashboard/subpath` 无 cookie | 307 `/auth?returnTo=/dashboard/subpath` ✅
+| T3 | `GET /canvas` 有 auth_token cookie | 200 `next()` ✅
+| T4 | `GET /canvas` 有 auth_session cookie | 200 `next()` ✅
+| T5 | `GET /auth` 有 cookie 无 returnTo | 302 `/dashboard` ✅
+| T6 | `GET /auth?returnTo=/canvas` 有 cookie | 302 `/canvas` ✅
+| T7 | `GET /_next/static/file.js` | 200 放行 ✅
+| T8 | `GET /api/auth/*` 无 cookie | 200 放行 ✅
 
-### Story 3.2: validateReturnTo fuzzing（已有 12 TC，补充 5 TC）
+### Story 3.2: validateReturnTo fuzzing（已有 12 TC，补充 5 TC）✅
 
 **文件**: `vibex-fronted/src/app/auth/validateReturnTo.test.ts`
 
 **补充 TC**:
-- T13: null byte → `/dashboard`
-- T14: 编码 traversal `/canvas/..%2F..` → `/dashboard`
-- T15: 编码 // `%2f%2fevil.com` → `/dashboard`
-- T16: 纯空格路径 → `/dashboard`
+- T13: null byte → `/dashboard` ✅
+- T14: 编码 traversal `/canvas/..%2F..` → `/dashboard` ✅
+- T15: 编码 // `%2f%2fevil.com` → `/dashboard` ✅
+- T16: 纯空格路径 → `/dashboard` ✅
+- T17: CRLF 注入 → `/dashboard` ✅
+
+### Story 3.3: E2E 登录跳转（3 scenarios）✅
+
+**文件**: `vibex-fronted/tests/e2e/auth-redirect.spec.ts` (新建)
+
+覆盖: TC-E2E-1 ✅ | TC-E2E-2 ✅ | TC-E2E-3 ✅
 - T17: CRLF 注入 `\n` → `/dashboard`
 
 ### Story 3.3: E2E 登录跳转（3 scenarios）

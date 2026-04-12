@@ -8,10 +8,26 @@ import { describe, it, expect } from 'vitest';
 // Re-implement validateReturnTo to test (mirrors auth/page.tsx)
 function validateReturnTo(returnTo: string | null): string {
   if (!returnTo) return '/dashboard';
-  if (!returnTo.startsWith('/')) return '/dashboard';
+  // Reject non-string or whitespace-only
+  if (typeof returnTo !== 'string' || !returnTo.trim() || !returnTo.startsWith('/')) return '/dashboard';
+  // Reject absolute/unsafe URLs
   if (/^(https?|javascript:|data:)/i.test(returnTo)) return '/dashboard';
-  if (/^\/\//.test(returnTo)) return '/dashboard'; // protocol-relative
+  // Reject protocol-relative (encoded or plain)
+  if (/^\/\//i.test(returnTo)) return '/dashboard';
+  // Reject path traversal (plain and URL-encoded)
   if (returnTo.includes('/../') || returnTo.endsWith('/..')) return '/dashboard';
+  const decoded = decodeURIComponent(returnTo);
+  if (decoded !== returnTo) {
+    // Reject decoded traversal or protocol-relative
+    if (decoded.includes('/../') || decoded.startsWith('/..') || decoded.startsWith('//')) return '/dashboard';
+    // Reject if any path segment after decoding contains '..'
+    const segments = decoded.split('/');
+    if (segments.some((s) => s === '..')) return '/dashboard';
+  }
+  // Reject null-byte injection and control characters
+  if (/[\x00-\x1f\x7f]/.test(returnTo)) return '/dashboard';
+  // Reject CRLF injection
+  if (/[\n\r]/.test(returnTo)) return '/dashboard';
   return returnTo;
 }
 
@@ -78,5 +94,35 @@ describe('validateReturnTo', () => {
   // TC-012: data: URL → /dashboard
   it('returns /dashboard for data: URL', () => {
     expect(validateReturnTo('data:text/html,<script>alert(1)</script>')).toBe('/dashboard');
+  });
+
+  // T13: null byte → /dashboard (fuzzing)
+  it('returns /dashboard for null byte injection (T13)', () => {
+    expect(validateReturnTo('/canvas\x00evil')).toBe('/dashboard');
+  });
+
+  // T14: encoded path traversal /canvas/..%2F.. → /dashboard (fuzzing)
+  it('returns /dashboard for URL-encoded path traversal (T14)', () => {
+    expect(validateReturnTo('/canvas/..%2F..')).toBe('/dashboard');
+    expect(validateReturnTo('/auth/..%2F..%2Fsecret')).toBe('/dashboard');
+  });
+
+  // T15: encoded // %2f%2fevil.com → /dashboard (fuzzing)
+  it('returns /dashboard for URL-encoded protocol-relative URL (T15)', () => {
+    expect(validateReturnTo('%2f%2fevil.com')).toBe('/dashboard');
+    // /%2f%2f... starts with / but decodes to /\/evil.com which is path traversal
+    expect(validateReturnTo('/%2f%2fevil.com/redirect')).toBe('/dashboard');
+  });
+
+  // T16: pure whitespace path → /dashboard (fuzzing)
+  it('returns /dashboard for pure whitespace path (T16)', () => {
+    expect(validateReturnTo('   ')).toBe('/dashboard');
+    expect(validateReturnTo('\t')).toBe('/dashboard');
+  });
+
+  // T17: CRLF injection \n → /dashboard (fuzzing)
+  it('returns /dashboard for CRLF injection (T17)', () => {
+    expect(validateReturnTo('/canvas\n<script>evil</script>')).toBe('/dashboard');
+    expect(validateReturnTo('/auth\r\n/../secret')).toBe('/dashboard');
   });
 });

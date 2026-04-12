@@ -77,7 +77,8 @@ describe('POST /api/auth/register', () => {
     expect(data.error).toContain('exists');
   });
 
-  it('should register successfully', async () => {
+  // AC-1.2.1: Set-Cookie has HttpOnly
+  it('should set httpOnly auth_token cookie on successful registration', async () => {
     mockPrisma.user.findUnique.mockResolvedValue(null);
     (hashPassword as jest.Mock).mockResolvedValue('hashedpassword');
     (generateToken as jest.Mock).mockReturnValue('mock-token');
@@ -103,6 +104,25 @@ describe('POST /api/auth/register', () => {
     expect(response.status).toBe(201);
     expect(data.success).toBe(true);
     expect(data.data.token).toBe('mock-token');
+
+    const setCookie = response.headers.get('set-cookie') || '';
+    expect(setCookie).toMatch(/auth_token=mock-token/i);
+    expect(setCookie).toMatch(/HttpOnly/i);
+    expect(setCookie).toMatch(/SameSite=Lax/i);
+    expect(setCookie).toMatch(/Max-Age=604800/i);
+  });
+
+  // AC-1.2.2: Registration failure (409) should not set cookie
+  it('should not set cookie on 409 conflict', async () => {
+    mockPrisma.user.findUnique.mockResolvedValue({ id: 'existing' });
+
+    const request = new NextRequest('http://localhost:3000/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'existing@example.com', password: 'password123' }),
+    });
+    const response = await POST(request);
+    const setCookie = response.headers.get('set-cookie');
+    expect(setCookie || '').not.toMatch(/auth_token=/i);
   });
 
   it('should handle errors', async () => {

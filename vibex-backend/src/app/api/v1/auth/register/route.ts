@@ -4,7 +4,6 @@ import { hashPassword, generateToken } from '@/lib/auth';
 import { getEnv } from '@/lib/env';
 
 import { safeError } from '@/lib/log-sanitizer';
-import { getAuthUserFromRequest } from '@/lib/authFromGateway';
 
 
 export async function POST(request: NextRequest) {
@@ -56,7 +55,7 @@ export async function POST(request: NextRequest) {
       email: user.email,
     }, jwtSecret);
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         success: true,
         data: {
@@ -73,6 +72,17 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
+
+    response.cookies.set('auth_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/',
+      ...(process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN }),
+    });
+
+    return response;
   } catch (error) {
     safeError('Register error:', error);
     return NextResponse.json(

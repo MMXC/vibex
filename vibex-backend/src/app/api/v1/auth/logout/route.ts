@@ -16,14 +16,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // In a production environment, you would invalidate the JWT token
-    // by storing it in a blacklist (e.g., Cloudflare KV)
-    // For now, we just return success and the client should delete the token
-
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: { message: 'Logged out successfully' },
     });
+
+    // Clear auth_token cookie (with Secure for HTTPS environments)
+    response.cookies.set('auth_token', '', {
+      maxAge: 0,
+      path: '/',
+      secure: process.env.NODE_ENV === 'production',
+      ...(process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN }),
+    });
+
+    // Clear auth_session cookie (middleware also reads this cookie)
+    response.cookies.set('auth_session', '', {
+      maxAge: 0,
+      path: '/',
+      secure: process.env.NODE_ENV === 'production',
+      ...(process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN }),
+    });
+
+    return response;
   } catch (error) {
     safeError('Logout error:', error);
     return NextResponse.json(

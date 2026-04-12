@@ -1,3 +1,10 @@
+### Added (vibex-auth-401-handling Epic1: 后端 Cookie 设置) — 2026-04-13
+- **E1-S1.1**: login/route.ts — 设置 httpOnly auth_token cookie (HttpOnly; SameSite=Lax; Max-Age=604800)，移除未使用的 `getAuthUser` import
+- **E1-S1.2**: register/route.ts — 设置 httpOnly auth_token cookie (201)，移除未使用的 `getAuthUserFromRequest` import
+- **E1-S1.3**: logout/route.ts — 清除 auth_token + auth_session 两个 cookie，含 Secure 属性（HTTPS 环境）
+- **E1 测试**: login/register/logout 路由单元测试（19/19 ✅，含 Set-Cookie 断言）
+- **验证**: pnpm test src/app/api/v1/auth 19 passed ✅
+
 ### Added (vibex-proposals-20260412 Epic0: S0.1 TypeScript 紧急修复) — 2026-04-12
 - **S0.1 TypeScript 编译错误修复**: `vibex-backend/src/lib/apiAuth.ts` — `import type NextResponse` → value import, 解决 `isolatedModules` 编译错误
 - **提交**: `4c4f019b`

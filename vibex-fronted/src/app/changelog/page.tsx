@@ -21,6 +21,20 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.194',
+    date: '2026-04-12',
+    changes: [
+      '📋 vibex-test-fix Epic1: IntersectionObserver Mock 修复',
+      '✅ setup.ts: 全局 IntersectionObserver mock（class + vi.fn() 包装）',
+      '✅ CardTreeNode.test.tsx: 移除本地冗余 mock，修复 nested children renderWithProvider',
+      '✅ mockImplementationOnce: 改用 regular function 确保 new 正常',
+      '✅ 验收: 15/15 tests passed',
+      '提交: 997d8cfd',
+    ],
+    commit: '997d8cfd',
+  },
+
+  {
     version: '1.0.193',
     date: '2026-04-12',
     changes: [

@@ -1,5 +1,11 @@
 # Changelog
 
+### [vibex-test-fix Epic1: IntersectionObserver Mock 修复] — 2026-04-12
+- **setup.ts**: 添加全局 IntersectionObserver mock（class + vi.fn() 包装），jsdom 环境默认立即触发（isIntersecting: true），支持 mockImplementationOnce 覆盖
+- **CardTreeNode.test.tsx**: 移除本地冗余 mock，统一使用全局 setup；修复 nested children 测试漏用 renderWithProvider；mockImplementationOnce 改用 regular function 确保 new 正常
+- **验收**: 15/15 tests passed ✅
+- 提交: `997d8cfd`
+
 ### [vibex-json-render-fix Epic1: 修复组件预览空白] — 2026-04-11
 - **根因修复** (`canvasApi.ts`): `fetchComponentTree` 返回 `props: {}` 导致预览空白，添加 `generateDefaultProps(type, name)` 根据组件类型生成合规默认 props
 - 验证: pnpm tsc ✅ (41f5aec4)

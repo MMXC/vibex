@@ -1,0 +1,208 @@
+# vibex-meta.yaml
+# 维护: meta-arch skill 自动管理
+# ⚠️ 不要手动编辑 decisions/decisions 列表示意，
+#    请通过 meta-arch-evolve skill 更新以保持格式一致。
+
+meta:
+  version: "1.0"
+  created: "2026-04-12"
+  last_updated: "2026-04-12"
+  repo_path: "/root/.openclaw/vibex"
+  last_architect_task: null
+
+# ============================================================
+# 项目世界观（必填 — 架构决策的上下文根基）
+# ============================================================
+mission:
+  core: |
+    VibeX 是一个 AI 原生的产品原型工作台。用户在对话中描述需求 → AI 分析澄清 → 生成可交互 UI 原型 → 预览验证。
+    核心价值主张：消灭"从需求到可运行原型"之间的工具切换摩擦，让产品想法在画布上快速成型。
+    产品哲学：画布是主操作区，一切围绕画布展开。对话 + 可视化展示编辑是手段，能顺利走完流程才是重点。
+    目标用户：产品经理、独立开发者、小团队。核心场景：快速原型验证想法。
+
+  worldview: |
+    "想法到原型"应该是一个连续流，不应该因为工具切换而中断。
+    画布不只是展示区，而是思考和操作的共同空间——用户在画布上同时看到需求、分析结果、原型草稿。
+    AI 不是替代品，而是加速器：AI 的价值在于把重复性 UI 生成自动化，而不是替代产品判断。
+    团队协作是锦上添花，单人完成全流程是常态。
+
+# ============================================================
+# 核心原语（不可再分的构建块）
+# ============================================================
+primitives:
+  - name: Project
+    description: "根实体。一个项目包含页面、需求、画布流、原型快照，是用户操作的最高层容器。"
+    stability: stable
+
+  - name: Requirement
+    description: "产品需求的文本表示。用户输入，经过 AI 分析和澄清后结构化。"
+    stability: stable
+
+  - name: Canvas
+    description: "React Flow 驱动的可视化编辑器。以节点+边的形式呈现画布流状态。"
+    stability: evolving
+
+  - name: Agent
+    description: "AI 代理配置。每个 agent 有 model、prompt、temperature，决定 AI 行为风格。"
+    stability: stable
+
+  - name: Conversation
+    description: "对话历史。用户与 AI 之间的消息序列，是 AI 理解上下文的基础。"
+    stability: stable
+
+  - name: Prototype
+    description: "可交互原型。通过快照（Snapshot）保存，导出的 HTML 可独立运行。"
+    stability: evolving
+
+  - name: DomainModel
+    description: "DDD 领域模型。实体、关系图，是对产品概念的结构化建模。"
+    stability: evolving
+
+  - name: CollaborationRoom
+    description: "实时协作空间。基于 WebSocket + Durable Object，支持多人同时操作同一项目。"
+    stability: evolving
+
+# ============================================================
+# 当前架构决策
+# ============================================================
+decisions:
+  - id: ADR-001
+    date: 2026-04-12
+    decision: "前端选型 Next.js 16 + Zustand + TanStack Query，后端选型 Cloudflare Workers + Hono"
+    rationale: "Next.js 提供成熟的全栈框架和 App Router；Zustand 轻量且与 React 19 兼容良好；TanStack Query 解决服务端状态缓存问题。Cloudflare Workers 让后端天然具备边缘部署和冷启动快的优势。"
+    tradeoffs: "Workers 环境的文件系统限制意味着图片等资产必须外置存储；D1 的 SQLite 限制了复杂查询性能。"
+    status: accepted
+
+  - id: ADR-002
+    date: 2026-04-12
+    decision: "前端状态管理：Zustand（UI 状态）+ TanStack Query（服务器状态）"
+    rationale: "职责分离清晰：Zustand 管本地 UI（如画布缩放、面板展开），TanStack Query 管服务端数据缓存和失效。"
+    tradeoffs: "两个状态层需要小心同步，画布状态变化后服务端状态失效时机需要明确约定。"
+    status: accepted
+
+  - id: ADR-003
+    date: 2026-04-12
+    decision: "Monorepo 结构（pnpm workspace）：packages/types 共享类型，前后端独立部署"
+    rationale: "前端和后端部署目标不同（Cloudflare Pages vs Workers），但共享类型保证 API 接口一致性。"
+    tradeoffs: "packages/types 的版本同步需要 CI 强制执行，否则前后端类型可能漂移。"
+    status: accepted
+
+  - id: ADR-004
+    date: 2026-04-12
+    decision: "样式方案：CSS Modules + CSS Variables（design-tokens.css）"
+    rationale: "组件级别隔离用 CSS Modules，全局主题变量用 CSS Variables，与 Next.js 原生支持契合，不需要引入 Tailwind。"
+    tradeoffs: "样式复用依赖 CSS 变量命名约定，缺少类型安全的 design token 工具（如 vanilla-extract）。"
+    status: accepted
+
+  - id: ADR-005
+    date: 2026-04-12
+    decision: "Canvas 渲染选型 @xyflow/react（React Flow v12）"
+    rationale: "成熟的流程图库，支持自定义节点、边类型和交互，处理拖拽、缩放、选区等交互复杂场景。"
+    tradeoffs: "定制化节点样式需要大量 CSS；升级大版本可能破坏自定义节点实现。"
+    status: accepted
+
+  - id: ADR-006
+    date: 2026-04-12
+    decision: "实时协作基于 WebSocket + Cloudflare Durable Object（CollaborationRoom）"
+    rationale: "Durable Object 提供有状态的 WebSocket 路由，多用户连接到同一 Room 时广播操作指令。"
+    tradeoffs: "Durable Object 冷启动有延迟；免费计划有 CPU 时间限制；长连接管理复杂度高。"
+    status: accepted
+
+  - id: ADR-007
+    date: 2026-04-12
+    decision: "AI 模型支持多 provider：MiniMax（主力）、OpenAI、Anthropic、Doubao"
+    rationale: "避免单一 provider 锁死；不同场景可选择性价比最优的模型。"
+    tradeoffs: "多 provider 意味着 prompt 工程需要针对每个 provider 调优；模型能力差异导致输出不一致。"
+    status: accepted
+
+# ============================================================
+# 技术路径及成熟度
+# ============================================================
+technical_paths:
+  - area: frontend-framework
+    path: Next.js 16 (App Router)
+    maturity: production
+    alternatives_considered:
+      - name: Remix
+        reason_not_chosen: "社区生态和 Vercel 绑定过深，不如 Next.js 灵活"
+      - name: Astro
+        reason_not_chosen: "主要面向内容站，不适合复杂交互原型工具"
+
+  - area: backend-framework
+    path: Hono on Cloudflare Workers
+    maturity: production
+    alternatives_considered:
+      - name: Next.js API Routes
+        reason_not_chosen: "想解耦前后端部署；Workers 更适合长连接和边缘计算场景"
+      - name: Express/Fastify
+        reason_not_chosen: "需要自建 Node 运行环境，不适合边缘部署"
+
+  - area: database
+    path: Prisma + SQLite（D1 本地模拟 / 生产 D1）
+    maturity: production
+    alternatives_considered:
+      - name: PostgreSQL (Supabase/Turso)
+        reason_not_chosen: "引入外部数据库增加运维复杂度；D1 已满足当前规模"
+      - name: PlanetScale
+        reason_not_chosen: "Hobby 计划限制严格；不支持 Prisma 原生集成"
+
+  - area: state-management
+    path: Zustand + TanStack Query
+    maturity: production
+    alternatives_considered:
+      - name: Redux Toolkit
+        reason_not_chosen: "过度工程；Zustand 足够且更轻量"
+      - name: Jotai
+        reason_not_chosen: "原子化状态适合低交互场景，不适合画布类复杂状态"
+
+  - area: canvas-engine
+    path: "@xyflow/react" (React Flow v12)
+    maturity: production
+    alternatives_considered:
+      - name: Custom Canvas (原生 SVG/Canvas)
+        reason_not_chosen: "开发成本过高，React Flow 已覆盖大部分需求"
+      - name: Mermaid.js
+        reason_not_chosen: "只支持静态图表，不支持交互节点"
+
+  - area: realtime
+    path: WebSocket + Durable Object
+    maturity: prototype
+    note: "CollaborationRoom 已实现但功能覆盖不完整，实时协作体验仍有优化空间"
+    alternatives_considered:
+      - name: PartyKit
+        reason_not_chosen: "需要额外的托管服务，增加依赖"
+      - name: Pusher/Ably
+        reason_not_chosen: "有供应商锁定；Durable Object 已够用"
+
+  - area: ddd-features
+    path: 基础 DDD 实体（BusinessDomain, Entity, Relation）
+    maturity: evolving
+    note: "DDD 建模能力刚起步，实体关系编辑器已完成但领域模型与原型生成的联动尚未打通"
+
+  - area: auth
+    path: JWT (jsonwebtoken) + bcryptjs
+    maturity: production
+    alternatives_considered:
+      - name: NextAuth.js
+        reason_not_chosen: "需要适配 Cloudflare Workers 环境；Session 存储麻烦"
+      - name: Clerk/Auth0
+        reason_not_chosen: "外部依赖增加成本；简单 JWT 已够用"
+
+# ============================================================
+# 硬性约束
+# ============================================================
+constraints:
+  - type: deployment
+    description: "前端必须部署在 Cloudflare Pages；后端必须部署在 Cloudflare Workers（D1 + KV）"
+
+  - type: deployment
+    description: "Workers 环境无持久文件系统；图片/资产必须使用 R2 或外部存储"
+
+  - type: performance
+    description: "画布渲染须在 60fps 下流畅操作；AI 生成响应须在 10s 内开始返回（流式）"
+
+  - type: team
+    description: "当前团队通过 Agent 工作流开发，代码变更由 AI Agent 主导，人类 Reviewer 把关"
+
+  - type: compatibility
+    description: "必须兼容 Cloudflare Workers 的 Node.js 兼容模式（部分 npm 包有兼容性问题）"

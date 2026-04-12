@@ -3,7 +3,7 @@
 ### [vibex-test-fix Epic2 补充: accessibility.spec.ts] — 2026-04-12
 - **tests/unit/accessibility.spec.ts**: 新增 jest-axe 集成验证测试（7/7 passed），覆盖 S2.1 PRD 验收标准
   - `axe` 函数可导入、返回正确 `AxeResults` 结构、`violations` 检测正确
-- 提交: `accessibility.spec.ts`
+- 提交: `30e7f47c`
 
 ### [vibex-test-fix Epic1 补充: setup.spec.ts] — 2026-04-12
 - **tests/unit/setup.spec.ts**: 新增 IntersectionObserver mock 行为验证测试（8/8 passed），覆盖 S1.1 PRD 验收标准

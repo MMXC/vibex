@@ -1,3 +1,9 @@
+### Added (vibex-auth-401-handling Epic2: 前端一致性) — 2026-04-13
+- **E2-S2.1**: authStore.ts — logout() 清除 auth_token + auth_session cookie（非 httpOnly 残留部分）
+- **E2 测试**: authStore 路由单元测试（22/22 ✅，新增 AC-2.1.1~2.1.3 cookie 清除断言）
+- **验证**: npx vitest run tests/unit/authStore.test.ts 22 passed ✅
+- 提交: `bf0100cd`
+
 ### Added (vibex-auth-401-handling Epic1: 后端 Cookie 设置) — 2026-04-13
 - **E1-S1.1**: login/route.ts — 设置 httpOnly auth_token cookie (HttpOnly; SameSite=Lax; Max-Age=604800)，移除未使用的 `getAuthUser` import
 - **E1-S1.2**: register/route.ts — 设置 httpOnly auth_token cookie (201)，移除未使用的 `getAuthUserFromRequest` import

@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.203',
+    date: '2026-04-13',
+    changes: [
+      '📋 vibex-auth-401-handling Epic2: 前端一致性',
+      '✅ authStore logout() 清除 auth_token + auth_session cookie（非 httpOnly 残留）',
+      '✅ authStore 单元测试 22/22 通过（含 cookie 清除断言）',
+      '提交: bf0100cd',
+    ],
+    commit: 'bf0100cd',
+  },
+
+  {
     version: '1.0.202',
     date: '2026-04-13',
     changes: [

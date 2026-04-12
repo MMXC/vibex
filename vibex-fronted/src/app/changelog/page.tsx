@@ -21,6 +21,24 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.193',
+    date: '2026-04-12',
+    changes: [
+      '📋 vibex-proposals-20260412 Epic1: 测试基础设施修复 (Sprint 1+2)',
+      '✅ E1 safeError: log-sanitizer.ts — sanitize()/safeError()/devLog() 100% 覆盖',
+      '✅ E2 提案状态追踪: PROPOSALS_STATUS_SOP.md + INDEX.md status',
+      '✅ E3 CI/CD守卫增强: grepInvert guard + WEBSOCKET_CONFIG 单一源',
+      '✅ E4.1 Canvas ErrorBoundary: TreeErrorBoundary.tsx 三栏独立',
+      '✅ E4.2 @vibex/types落地: canvasSchema Zod schemas',
+      '✅ E4.5 groupByFlowId优化: useMemo O(n×3)→O(1)',
+      '✅ E5 waitForTimeout重构: E2E 确定性等待',
+      '✅ E6 pre-commit hook: lint-staged + ESLint no-console',
+      '提交: 02c735f1 (E2 JSON fix), 88fb2c79 (changelog)',
+    ],
+    commit: '02c735f1',
+  },
+
+  {
     version: '1.0.192',
     date: '2026-04-12',
     changes: [

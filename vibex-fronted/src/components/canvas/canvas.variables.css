@@ -24,6 +24,10 @@
   --tree-component-color: #10b981;
   --tree-component-glow: rgba(16, 185, 129, 0.3);
 
+  /* Prototype tree — purple (prototype) */
+  --tree-prototype-color: #9333ea;
+  --tree-prototype-glow: rgba(147, 51, 234, 0.3);
+
   /* ── Domain type colors (BoundedContextGroup) ─────────────────────── */
   --domain-core-color: #f59e0b;
   --domain-core-bg: rgba(245, 158, 11, 0.05);

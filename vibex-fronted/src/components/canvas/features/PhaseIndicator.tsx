@@ -30,10 +30,18 @@ const SWITCHABLE_PHASES: Array<{ key: Phase; label: string; icon: string; colorV
   { key: 'context', label: '◇ 上下文', icon: '◇', colorVar: 'var(--tree-context-color)' },
   { key: 'flow', label: '→ 流程', icon: '→', colorVar: 'var(--tree-flow-color)' },
   { key: 'component', label: '▣ 组件', icon: '▣', colorVar: 'var(--tree-component-color)' },
+  { key: 'prototype', label: '🚀 原型队列', icon: '🚀', colorVar: 'var(--tree-prototype-color)' },
 ];
 
 function getCurrentPhaseMeta(phase: Phase) {
-  return SWITCHABLE_PHASES.find((p) => p.key === phase) ?? SWITCHABLE_PHASES[0];
+  return (
+    SWITCHABLE_PHASES.find((p) => p.key === phase) ?? {
+      key: 'prototype' as Phase,
+      label: '🚀 原型队列',
+      icon: '🚀',
+      colorVar: 'var(--tree-prototype-color)',
+    }
+  );
 }
 
 export function PhaseIndicator({ phase, onPhaseChange, nodeCount }: PhaseIndicatorProps) {
@@ -73,10 +81,11 @@ export function PhaseIndicator({ phase, onPhaseChange, nodeCount }: PhaseIndicat
     [onPhaseChange]
   );
 
-  // Don't show for input/prototype phases (those are handled by PhaseProgressBar)
-  if (phase === 'input' || phase === 'prototype') {
+  // Don't show for input phase (handled by PhaseProgressBar)
+  if (phase === 'input') {
     return null;
   }
+  // PhaseIndicator 在 prototype phase 可见，显示 "🚀 原型队列"
 
   return (
     <div className={styles.wrapper} ref={dropdownRef}>

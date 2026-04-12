@@ -170,3 +170,40 @@ class MockResizeObserver {
   disconnect = vi.fn();
 }
 (global as unknown as { ResizeObserver: typeof ResizeObserver }).ResizeObserver = MockResizeObserver;
+
+// ============================================================
+// IntersectionObserver Mock (2026-04-12, vibex-test-fix)
+// ============================================================
+// jsdom 环境不提供 IntersectionObserver API
+// mock 为立即触发模式（isIntersecting: true）
+// 理由：测试中组件默认可见，懒加载由 props 控制，不由 IO 控制
+// 注意：必须用 class，这样 new 关键字正常工作；vi.spyOn 让 vitest 感知 mock 实例
+global.IntersectionObserver = (function () {
+  class MockIntersectionObserver {
+    observe = vi.fn();
+    unobserve = vi.fn();
+    disconnect = vi.fn();
+    takeRecords = vi.fn((): IntersectionObserverEntry[] => []);
+    constructor(callback: IntersectionObserverCallback) {
+      // Immediately report element as visible (isIntersecting: true)
+      this.observe = vi.fn((element: Element) => {
+        callback(
+          [
+            {
+              isIntersecting: true,
+              target: element,
+              boundingClientRect: {} as DOMRectReadOnly,
+              intersectionRatio: 1,
+              intersectionRect: {} as DOMRect,
+              rootBounds: null,
+              time: 0,
+            },
+          ] as IntersectionObserverEntry[],
+          this
+        );
+      });
+    }
+  }
+  // Wrap with vi.fn() so vitest recognizes it as a mock (enables .mockImplementationOnce etc.)
+  return vi.fn(MockIntersectionObserver as unknown as typeof IntersectionObserver);
+})() as unknown as typeof IntersectionObserver;

@@ -1,5 +1,11 @@
 # Changelog
 
+### [vibex-test-fix Epic2: jest-axe 包修复] — 2026-04-12
+- **package.json**: 安装 `jest-axe@^10.0.0` 无障碍测试工具
+- **accessibility.test.tsx**: `FlowPropertiesPanel` mock 修复（`{ __esModule: true, default: ... }` 格式），确保 ES module mock 正确注入
+- **验收**: 9/9 tests passed ✅
+- 提交: `9cccf168`
+
 ### [vibex-test-fix Epic1: IntersectionObserver Mock 修复] — 2026-04-12
 - **setup.ts**: 添加全局 IntersectionObserver mock（class + vi.fn() 包装），jsdom 环境默认立即触发（isIntersecting: true），支持 mockImplementationOnce 覆盖
 - **CardTreeNode.test.tsx**: 移除本地冗余 mock，统一使用全局 setup；修复 nested children 测试漏用 renderWithProvider；mockImplementationOnce 改用 regular function 确保 new 正常

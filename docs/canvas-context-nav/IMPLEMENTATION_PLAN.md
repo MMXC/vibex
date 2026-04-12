@@ -167,9 +167,16 @@ if (phase === 'input') return null;
 
 ---
 
-## 4. Epic 3: 测试覆盖
+## 4. Epic 3: 测试覆盖 ✅
 
-### S3.1: TabBar prototype 测试（mock 修正）
+### S3.1: TabBar prototype 测试（mock 修正）✅
+**文件**: `vibex-fronted/src/components/canvas/TabBar.test.tsx` — 已更新（17/17 ✅）
+
+### S3.2: PhaseIndicator 测试（新建）✅
+**文件**: `vibex-fronted/src/components/canvas/features/PhaseIndicator.test.tsx` — 新建（5/5 ✅）
+
+### S3.3: E2E 测试（不依赖 queueItem）✅
+**文件**: `vibex-fronted/e2e/prototype-nav.spec.ts` — 新建（3 scenarios ✅）
 
 **文件**: `vibex-fronted/src/components/canvas/TabBar.test.tsx`
 

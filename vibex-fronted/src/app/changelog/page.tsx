@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.205',
+    date: '2026-04-13',
+    changes: [
+      '📋 vibex-canvas-context-nav Epic1+2: TabBar prototype tab + PhaseIndicator',
+      '✅ TabBar.tsx: 新增 prototype tab（🚀 原型），4 tabs，prototypeCount badge',
+      '✅ PhaseIndicator.tsx: SWITCHABLE_PHASES 增加 prototype 项',
+      '✅ TabBar 17/17 | PhaseIndicator 5/5 | e2e 3 scenarios',
+      '提交: d7ce4752',
+    ],
+    commit: 'd7ce4752',
+  },
+
+  {
     version: '1.0.204',
     date: '2026-04-13',
     changes: [

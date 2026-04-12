@@ -1,5 +1,13 @@
 # Changelog
 
+### [vibex-canvas-context-nav Epic1+2: TabBar prototype tab + PhaseIndicator] — 2026-04-13
+- **E1-S1.1**: TabBar.tsx — 新增 prototype tab（🚀 原型），4 tabs 含 prototype，prototypeCount badge 来自 sessionStore.prototypeQueue.length
+- **E1 测试**: TabBar.test.tsx — 17/17 ✅（tabs 4个 + 6个 prototype 测试）
+- **E2-S2.1**: PhaseIndicator.tsx — SWITCHABLE_PHASES 增加 prototype 项，移除 return null
+- **E2 测试**: PhaseIndicator.test.tsx — 5/5 ✅
+- **E3**: e2e/prototype-nav.spec.ts — 3 E2E 测试场景
+- 提交: `d7ce4752`
+
 ### [vibex-auth-401-handling Epic3: 测试覆盖] — 2026-04-13
 - **E3-S3.1**: middleware-auth.test.ts — 8 TC 认证中间件单元测试
 - **E3-S3.2**: validateReturnTo 强化（URL编码traversal/protocol-relative）+ fuzzing TC（T13~T17）

@@ -136,7 +136,7 @@ function extractClassesFromCss(content: string): string[] {
   return classes;
 }
 
-describe('Unit 3: canvas.module.css 类名转发验证', () => {
+describe('Unit 3: canvas.module.css 类名内联验证', () => {
   it('canvas.module.css 文件存在', () => {
     expect(fs.existsSync(CANVAS_MODULE_CSS), `文件不存在: ${CANVAS_MODULE_CSS}`).toBe(true);
   });
@@ -150,23 +150,9 @@ describe('Unit 3: canvas.module.css 类名转发验证', () => {
     ).toHaveLength(0);
   });
 
-  it('canvas.module.css 包含 10 个 @forward 指令', () => {
-    const content = fs.readFileSync(CANVAS_MODULE_CSS, 'utf-8');
-    const forwards = extractForwardTargets(content);
-    expect(
-      forwards.length,
-      `期望 10 个 @forward，实际: ${forwards.length}\n列表: ${forwards.join(', ')}`
-    ).toBe(10);
-  });
-
-  it('10 个子模块全部被 @forward', () => {
-    const content = fs.readFileSync(CANVAS_MODULE_CSS, 'utf-8');
-    const forwards = extractForwardTargets(content);
-    for (const mod of SUB_MODULES) {
-      const found = forwards.some((f) => f.includes(mod));
-      expect(found, `子模块 ${mod} 未被 @forward`).toBe(true);
-    }
-  });
+  // CSS 已内联到 canvas.module.css，不再需要 @forward 验证
+  // it('canvas.module.css 包含 10 个 @forward 指令', () => { ... });
+  // it('10 个子模块全部被 @forward', () => { ... });
 
   it('所有子模块 CSS 文件存在且包含类名', () => {
     const missing: string[] = [];
@@ -189,18 +175,9 @@ describe('Unit 3: canvas.module.css 类名转发验证', () => {
     expect(emptyModules, `以下模块无类名定义: ${emptyModules.join(', ')}`).toHaveLength(0);
   });
 
-  it('@forward 覆盖至少 200 个类名（10 个子模块合计）', () => {
-    const allClasses = new Set<string>();
-    for (const mod of SUB_MODULES) {
-      const filePath = path.join(CANVAS_DIR, mod);
-      if (!fs.existsSync(filePath)) continue;
-      const content = fs.readFileSync(filePath, 'utf-8');
-      const classes = extractClassesFromCss(content);
-      classes.forEach((c) => allClasses.add(c));
-    }
-    expect(
-      allClasses.size,
-      `期望 ≥200 个类名，实际: ${allClasses.size}`
-    ).toBeGreaterThanOrEqual(200);
+  it('canvas.module.css 内联 CSS 包含至少 300 个类名', () => {
+    const content = fs.readFileSync(CANVAS_MODULE_CSS, 'utf-8');
+    const classes = extractClassesFromCss(content);
+    expect(classes.length, `期望 ≥300 个类名，实际: ${classes.length}`).toBeGreaterThanOrEqual(300);
   });
 });

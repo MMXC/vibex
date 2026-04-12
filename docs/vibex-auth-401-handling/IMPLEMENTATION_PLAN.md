@@ -156,9 +156,9 @@ logout: () => {
 **⚠️ 局限性声明**: `document.cookie` 无法删除 `httpOnly` cookie。httpOnly cookie 的真实清除完全由后端 logout 路由负责。此处清除行只处理非 httpOnly 残留。
 
 **AC 验收标准**:
-- [ ] **AC-2.1.1**: logout 后 `document.cookie` 不含 `auth_token=`
-- [ ] **AC-2.1.2**: logout 后 `document.cookie` 不含 `auth_session=`
-- [ ] **AC-2.1.3**: sessionStorage/localStorage 的 token 清除（原有行为保持）
+- [x] **AC-2.1.1**: logout 后 `document.cookie` 不含 `auth_token=` ✅
+- [x] **AC-2.1.2**: logout 后 `document.cookie` 不含 `auth_session=` ✅
+- [x] **AC-2.1.3**: sessionStorage/localStorage 的 token 清除（原有行为保持）✅
 
 ### Story 2.2: httpClient（无需修改）
 

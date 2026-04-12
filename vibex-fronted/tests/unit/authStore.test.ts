@@ -111,6 +111,48 @@ describe('authStore', () => {
       expect(sessionStorage.getItem('auth_token')).toBeNull();
       expect(useAuthStore.getState().token).toBeNull();
     });
+
+    // AC-2.1.1: logout clears auth_token from document.cookie
+    it('should clear auth_token cookie on logout (AC-2.1.1)', () => {
+      // Set a non-httpOnly auth_token cookie via document.cookie
+      document.cookie = 'auth_token=test-token; path=/;';
+      // Verify cookie exists before logout
+      expect(document.cookie).toContain('auth_token=test-token');
+
+      useAuthStore.getState().logout();
+
+      // After logout, auth_token should not be in document.cookie
+      expect(document.cookie).not.toContain('auth_token=');
+    });
+
+    // AC-2.1.2: logout clears auth_session from document.cookie
+    it('should clear auth_session cookie on logout (AC-2.1.2)', () => {
+      document.cookie = 'auth_session=test-session; path=/;';
+      expect(document.cookie).toContain('auth_session=test-session');
+
+      useAuthStore.getState().logout();
+
+      expect(document.cookie).not.toContain('auth_session=');
+    });
+
+    // AC-2.1.3: sessionStorage/localStorage token clearing preserved
+    it('should clear sessionStorage and localStorage tokens on logout (AC-2.1.3)', () => {
+      sessionStorage.setItem('auth_token', 'ss-token');
+      sessionStorage.setItem('user_id', 'u1');
+      sessionStorage.setItem('user_role', 'admin');
+      localStorage.setItem('auth_token', 'ls-token');
+      localStorage.setItem('user_id', 'u1');
+      localStorage.setItem('user_role', 'admin');
+
+      useAuthStore.getState().logout();
+
+      expect(sessionStorage.getItem('auth_token')).toBeNull();
+      expect(sessionStorage.getItem('user_id')).toBeNull();
+      expect(sessionStorage.getItem('user_role')).toBeNull();
+      expect(localStorage.getItem('auth_token')).toBeNull();
+      expect(localStorage.getItem('user_id')).toBeNull();
+      expect(localStorage.getItem('user_role')).toBeNull();
+    });
   });
 
   describe('checkAuth', () => {

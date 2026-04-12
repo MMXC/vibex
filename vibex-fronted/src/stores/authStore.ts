@@ -61,6 +61,11 @@ export const useAuthStore = create<AuthState>()(
           localStorage.removeItem('auth_token');
           localStorage.removeItem('user_id');
           localStorage.removeItem('user_role');
+          // Clear auth_token cookie (httpOnly portion cleared by backend logout,
+          // this handles non-httpOnly residue)
+          document.cookie = 'auth_token=; max-age=0; path=/';
+          // Clear auth_session cookie (middleware also reads this cookie)
+          document.cookie = 'auth_session=; max-age=0; path=/';
         }
         set({ token: null, user: null, isAuthenticated: false, isLoading: false });
       },

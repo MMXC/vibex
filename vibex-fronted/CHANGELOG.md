@@ -1,5 +1,12 @@
 # Changelog
 
+### [vibex-test-fix Epic3: 页面测试选择器修复] — 2026-04-12
+- **page.test.tsx**: HomePage 为 Server Component（仅 redirect），移除无效测试，保留 2 个不崩溃验证
+- **dashboard/page.test.tsx**: 5 个失败全部修复（`getByText`→`getAllByText`+count，`/更新于/`→`/\d+月\d+日/`）
+- **export/page.test.tsx**: "Found multiple Vue 3" → `getByTestId('format-card-vue')`
+- **验收**: page 2/2 ✅, dashboard 38/38 ✅, export 13/13 ✅
+- 提交: `57362f89`
+
 ### [vibex-test-fix Epic2: jest-axe 包修复] — 2026-04-12
 - **package.json**: 安装 `jest-axe@^10.0.0` 无障碍测试工具
 - **accessibility.test.tsx**: `FlowPropertiesPanel` mock 修复（`{ __esModule: true, default: ... }` 格式），确保 ES module mock 正确注入

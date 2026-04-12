@@ -21,6 +21,20 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.196',
+    date: '2026-04-12',
+    changes: [
+      '📋 vibex-test-fix Epic3: 页面测试选择器修复',
+      '✅ page.test.tsx: HomePage Server Component，移除无效测试',
+      '✅ dashboard/page.test.tsx: getByText→getAllByText+count，日期正则修复',
+      '✅ export/page.test.tsx: getByTestId 替代模糊文本匹配',
+      '✅ 验收: page 2/2, dashboard 38/38, export 13/13',
+      '提交: 57362f89',
+    ],
+    commit: '57362f89',
+  },
+
+  {
     version: '1.0.195',
     date: '2026-04-12',
     changes: [

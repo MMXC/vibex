@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.201',
+    date: '2026-04-13',
+    changes: [
+      '📋 vibex-test-fix Epic4 补充: 全量回归验证完成',
+      '✅ Epic1-3 未引入新失败（77/77 + 26/26 tests）',
+      '✅ unit spec 测试: setup 8/8 + accessibility 7/7 + selector-patterns 11/11',
+      '提交: 57ba3295',
+    ],
+    commit: '57ba3295',
+  },
+
+  {
     version: '1.0.200',
     date: '2026-04-13',
     changes: [

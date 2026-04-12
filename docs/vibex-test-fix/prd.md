@@ -178,7 +178,7 @@ expect(typeof axe).toBe('function');
 ### Epic 4 — 全量回归
 - [x] `npm test` 分批全量测试无新增失败 ✅ (Epic1-3 未引入新失败)
 - [x] 已知失败测试数量不增加 ✅ (43 个预存失败与 Epic1-3 无关)
-- [x] 全部 unit spec 测试通过 ✅ (setup.spec.ts 8/8 + accessibility.spec.ts 7/7 + selector-patterns.spec.ts 11/7 = 26/26)
+- [x] 全部 unit spec 测试通过 ✅ (setup.spec.ts 8/8 + accessibility.spec.ts 7/7 + selector-patterns.spec.ts 11/11 = 26/26)
 
 ---
 

@@ -1,3 +1,14 @@
+### Added (vibex-canvas-qa-fix Epic1: Hydration Mismatch 修复) — 2026-04-13
+- **E1.1-E1.5**: 5 个 canvas store 添加 `skipHydration: true`
+  - contextStore, flowStore, componentStore, uiStore, sessionStore
+  - 解决 SSR/CSR localStorage 数据水合不匹配
+- **E1.6**: CanvasPage.tsx — mount 时手动 rehydrate 全部 5 个 store
+  - `useEffect(() => { store.persist?.rehydrate?.() }, [])`
+- **TypeScript 修复**: historySlice.ts — 重载 getUndoResult/getRedoResult，避免 'as any'
+  - useCanvasHistory.ts — 替换为类型安全的重载调用
+- **验证**: tsc --noEmit ✅ | build ✅
+- 提交: `13f7c706`
+
 ### Added (vibex-canvas-context-nav Epic1+2: TabBar prototype tab + PhaseIndicator) — 2026-04-13
 - **E1-S1.1**: TabBar.tsx — 新增 prototype tab（🚀 原型），4 tabs 含 prototype
   - 导入 `useSessionStore` + `PrototypePage` 类型

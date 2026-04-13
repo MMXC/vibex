@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.206',
+    date: '2026-04-13',
+    changes: [
+      '📋 vibex-canvas-qa-fix Epic1: Hydration Mismatch 修复',
+      '✅ 5个store添加skipHydration:true (context/flow/component/ui/sessionStore)',
+      '✅ CanvasPage mount时手动rehydrate全部5个store',
+      '✅ historySlice TypeScript重载修复 (getUndoResult/getRedoResult)',
+      '提交: 13f7c706',
+    ],
+    commit: '13f7c706',
+  },
+
+  {
     version: '1.0.205',
     date: '2026-04-13',
     changes: [

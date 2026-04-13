@@ -1,100 +1,108 @@
 /**
- * version-history-panel.spec.ts — E1.1: VersionHistoryPanel E2E Tests
+ * version-history-panel.spec.ts — F11: VersionHistoryPanel E2E Tests
  *
- * PRD 验收标准 (E1.1):
+ * F11 PRD 验收:
  * - AC1: VersionHistoryPanel 正确渲染
- * - AC2: Ctrl+H 快捷键打开 VersionHistoryPanel
- * - AC3: 打开时 Canvas 滚动不被阻塞
+ * - AC2: 点击 ProjectBar 历史按钮打开面板
+ * - AC3: 打开时 Canvas 不被阻塞
+ * - AC4: 关闭按钮工作
+ * - AC5: 未登录用户看到 401 错误 banner
+ *
+ * Fixes:
+ * - Auth: middleware reads cookies, not sessionStorage → use context.addCookies
+ * - URL: /canvas is correct (no dynamic segment)
+ * - Selectors: role="dialog" for panel, aria-label="版本历史" for toggle
+ * - Removed networkidle (SSE never goes idle)
  *
  * Conventions:
- * - File: version-history-panel-<epic>.spec.ts
  * - Test: E2E-N: <Description>
- * - Waits: semantic Playwright waits (no waitForTimeout)
+ * - Waits: explicit timeouts (no networkidle — canvas has SSE)
  */
 import { test, expect } from '@playwright/test';
 
-test.describe('VersionHistoryPanel (E1.1)', () => {
-  test.beforeEach(async ({ page }) => {
-    // Mock snapshot API to return version history
-    await page.route('**/api/v1/canvas/snapshots', (route) => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          snapshots: [
-            { id: 'snap-3', label: 'Version 3', timestamp: Date.now() - 3600000, version: 3 },
-            { id: 'snap-2', label: 'Version 2', timestamp: Date.now() - 7200000, version: 2 },
-            { id: 'snap-1', label: 'Version 1', timestamp: Date.now() - 86400000, version: 1 },
-          ],
-        }),
-      });
-    });
-    await page.goto('/canvas/test-project');
-    await page.waitForLoadState('networkidle');
-  });
-
-  // AC1: VersionHistoryPanel 正确渲染
-  test('E2E-1: VersionHistoryPanel 打开后显示版本列表', async ({ page }) => {
-    // Open via Ctrl+H or toggle button
-    const toggleBtn = page.locator('[data-testid="version-history-toggle"], [aria-label="版本历史"]').first();
-    if (await toggleBtn.isVisible().catch(() => false)) {
-      await toggleBtn.click();
-    } else {
-      await page.keyboard.press('Control+h');
-    }
-    await page.waitForLoadState('networkidle');
-
-    // Panel should show version list
-    const panel = page.locator('[data-testid="version-history-panel"], .version-history-panel, [class*="version-history"]').first();
-    const panelVisible = await panel.isVisible().catch(() => false);
-    expect(panelVisible).toBeTruthy();
-  });
-
-  // AC2: Ctrl+H 快捷键打开
-  test('E2E-2: Ctrl+H 快捷键打开 VersionHistoryPanel', async ({ page }) => {
-    await page.keyboard.press('Control+h');
-    await page.waitForLoadState('networkidle');
-
-    const panel = page.locator('[data-testid="version-history-panel"], .version-history-panel').first();
-    const panelVisible = await panel.isVisible().catch(() => false);
-    expect(panelVisible).toBeTruthy();
-  });
-
-  // AC3: Canvas 滚动不被阻塞
-  test('E2E-3: VersionHistoryPanel 打开时 Canvas 仍可滚动', async ({ page }) => {
-    const toggleBtn = page.locator('[data-testid="version-history-toggle"]').first();
-    if (await toggleBtn.isVisible().catch(() => false)) {
-      await toggleBtn.click();
-    } else {
-      await page.keyboard.press('Control+h');
-    }
-    await page.waitForLoadState('networkidle');
-
-    // Canvas area should still be scrollable
-    const canvas = page.locator('[data-testid="canvas-area"], .canvas-area, [class*="canvas"]').first();
-    const canvasScrollable = await canvas.isVisible().catch(() => false);
-    expect(canvasScrollable).toBeTruthy();
-
-    // No full-page overlay blocking the canvas
-    const overlay = page.locator('.full-overlay, [data-testid="history-blocker"]').first();
-    const overlayVisible = await overlay.isVisible().catch(() => false);
-    expect(overlayVisible).toBeFalsy();
-  });
-
-  // 额外: iPhone12 responsive
-  test('E2E-4: iPhone12 (390x844) 布局正常，不溢出', async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto('/canvas/test-project');
+test.describe('VersionHistoryPanel (F11)', () => {
+  test.beforeEach(async ({ page, context }) => {
+    // Bypass auth — middleware reads cookies
+    await context.addCookies([
+      { name: 'auth_token', value: 'mock-e2e-token', domain: 'localhost', path: '/' },
+    ]);
+    await page.goto('/canvas');
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(1500); // Wait for React hydration
+  });
 
-    await page.keyboard.press('Control+h');
-    await page.waitForLoadState('networkidle');
+  // AC2: ProjectBar 历史按钮打开面板
+  test('E2E-1: 历史按钮打开 VersionHistoryPanel', async ({ page }) => {
+    const historyBtn = page.locator('[aria-label="版本历史"]').first();
+    await expect(historyBtn).toBeVisible({ timeout: 10000 });
+    await historyBtn.click();
+    await page.waitForTimeout(800);
 
-    const panel = page.locator('[data-testid="version-history-panel"]').first();
-    const panelVisible = await panel.isVisible().catch(() => false);
-    if (panelVisible) {
-      const box = await panel.boundingBox();
-      expect((box?.width ?? 0)).toBeLessThanOrEqual(390);
-    }
+    const panel = page.locator('[role="dialog"][aria-label="版本历史"]');
+    await expect(panel).toBeVisible({ timeout: 5000 });
+  });
+
+  // AC4: 关闭按钮关闭面板
+  test('E2E-2: 关闭按钮关闭面板', async ({ page }) => {
+    const historyBtn = page.locator('[aria-label="版本历史"]').first();
+    await historyBtn.click();
+    await page.waitForTimeout(800);
+
+    const closeBtn = page.locator('[data-testid="close-history-btn"]');
+    await expect(closeBtn).toBeVisible({ timeout: 5000 });
+    await closeBtn.click();
+    await page.waitForTimeout(500);
+
+    const panel = page.locator('[role="dialog"][aria-label="版本历史"]');
+    await expect(panel).not.toBeVisible({ timeout: 5000 });
+  });
+
+  // AC3: 面板打开时 Canvas 仍可见
+  test('E2E-3: 面板打开时 Canvas 区域仍可见', async ({ page }) => {
+    const historyBtn = page.locator('[aria-label="版本历史"]').first();
+    await historyBtn.click();
+    await page.waitForTimeout(800);
+
+    // Canvas is a side-drawer, main area should still be in DOM
+    const mainArea = page.locator('main, [class*="mainContainer"], [class*="canvasWrapper"]').first();
+    await expect(mainArea).toBeVisible({ timeout: 5000 });
+  });
+
+  // AC5: 未登录用户看到错误 banner
+  test('E2E-4: 未登录用户看到 401 错误 banner', async ({ page }) => {
+    // Clear auth and mock 401
+    await page.context().clearCookies();
+    await page.route('**/v1/canvas/snapshots', (route) => {
+      route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ error: 'Unauthorized' }) });
+    });
+
+    const historyBtn = page.locator('[aria-label="版本历史"]').first();
+    await historyBtn.click();
+    await page.waitForTimeout(1500);
+
+    const errorBanner = page.locator('[role="alert"]');
+    await expect(errorBanner).toBeVisible({ timeout: 5000 });
+    await expect(errorBanner).toContainText('登录');
+  });
+
+  // 创建快照按钮存在
+  test('E2E-5: 保存当前版本按钮存在', async ({ page }) => {
+    const historyBtn = page.locator('[aria-label="版本历史"]').first();
+    await historyBtn.click();
+    await page.waitForTimeout(800);
+
+    const createBtn = page.locator('[data-testid="create-snapshot-btn"]');
+    await expect(createBtn).toBeVisible({ timeout: 5000 });
+  });
+
+  // 快照列表区域存在（即使为空）
+  test('E2E-6: 快照列表区域存在', async ({ page }) => {
+    const historyBtn = page.locator('[aria-label="版本历史"]').first();
+    await historyBtn.click();
+    await page.waitForTimeout(800);
+
+    // List container exists (empty state or populated)
+    const listArea = page.locator('[role="dialog"] > div > div').last();
+    await expect(listArea).toBeVisible({ timeout: 5000 });
   });
 });

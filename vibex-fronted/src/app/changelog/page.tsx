@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.212',
+    date: '2026-04-13',
+    changes: [
+      '📋 vibex-auth-401-redirect Epic2: AuthProvider 挂载与全局监听',
+      '✅ AuthProvider.tsx: 监听 auth:401 事件，调用 logout()',
+      '✅ ClientLayout.tsx: use client wrapper',
+      '✅ sessionStore logout 5 tests',
+      '提交: 454b2694, af53c435',
+    ],
+    commit: 'af53c435',
+  },
+
+  {
     version: '1.0.211',
     date: '2026-04-13',
     changes: [

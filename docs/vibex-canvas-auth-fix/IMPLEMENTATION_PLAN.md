@@ -16,8 +16,8 @@
 | ID | Story | 工时 | 依赖 | 优先级 |
 |----|-------|------|------|--------|
 | F11.1 | CanvasPage 接入确认 | 0h | — | P0 |
-| F11.2 | 401 错误 UI 层差异化展示 | 0.5h | F11.1 | P0 |
-| F11.3 | CORS 预检验证 | 0.5h | — | P1 |
+| F11.2 | 401 错误 UI 层差异化展示 | 0.5h | F11.1 ✅ | P0 ✅ |
+| F11.3 | CORS 预检验证 | 0.5h | — | P1 ✅ |
 | F11.4 | 端到端测试 | 1.0h | F11.2+F11.3 | P0 |
 
 **总工时**: 2.0h（纯开发）+ 0.5h（CORS 验证）= 约 2.5h
@@ -49,9 +49,9 @@ vibex-fronted/src/components/canvas/CanvasPage.tsx:
 
 ---
 
-### Task F11.2: 401 错误 UI 层差异化展示（0.5h）
+### Task F11.2: 401 错误 UI 层差异化展示（0.5h） — ✅ 完成
 
-#### F11.2.1: 修改 `useVersionHistory.ts`（15min）
+#### F11.2.1: 修改 `useVersionHistory.ts`（15min） ✅ done
 
 **文件**: `vibex-fronted/src/hooks/canvas/useVersionHistory.ts`
 
@@ -130,7 +130,7 @@ export function useVersionHistory(): UseVersionHistoryReturn {
 
 ---
 
-#### F11.2.2: 修改 `VersionHistoryPanel.tsx`（15min）
+#### F11.2.2: 修改 `VersionHistoryPanel.tsx`（15min） ✅ done
 
 **文件**: `vibex-fronted/src/components/canvas/features/VersionHistoryPanel.tsx`
 
@@ -208,7 +208,7 @@ export function useVersionHistory(): UseVersionHistoryReturn {
 
 ---
 
-### Task F11.3: CORS 预检验证（0.5h）
+### Task F11.3: CORS 预检验证（0.5h） — ✅ 完成
 
 #### F11.3.1: curl 验证命令
 
@@ -232,7 +232,13 @@ curl -X OPTIONS "https://api.vibex.top/api/v1/canvas/snapshots" \
 | Access-Control-Allow-Headers | 含 `authorization` |
 | 响应体 | 空（非 401/500） |
 
-**如返回 401**: 需检查 Hono `protected_.options('/*')` 是否包含 Authorization header。
+**F11.3 curl 验证结果** ✅:
+- HTTP 204 No Content ✅
+- `Access-Control-Allow-Origin: *` ✅
+- `Access-Control-Allow-Headers: Content-Type,Authorization` ✅
+- `Access-Control-Allow-Methods: GET,POST,PUT,DELETE,OPTIONS` ✅
+
+验证脚本: `docs/vibex-canvas-auth-fix/scripts/cors-verify.sh`
 
 ---
 

@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.211',
+    date: '2026-04-13',
+    changes: [
+      '📋 vibex-auth-401-redirect Epic1: canvasApi 401 事件分发修复',
+      '✅ canvasApi.ts: 401 dispatchEvent + window.location.href 重定向',
+      '✅ validateReturnTo: 白名单防 open redirect（含 // 修复）',
+      '提交: f3a68586, d7c44637',
+    ],
+    commit: 'd7c44637',
+  },
+
+  {
     version: '1.0.210',
     date: '2026-04-13',
     changes: [

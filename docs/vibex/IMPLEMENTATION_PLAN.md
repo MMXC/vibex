@@ -19,7 +19,7 @@ Epic 2: 空状态提示设计 — ✅ 完成
   └─ S2.2: FlowTreePanel 空状态（0.5h）
   └─ S2.3: ComponentTreePanel 空状态（0.5h）
 
-Epic 3: 行为验证与测试
+Epic 3: 行为验证与测试 — ✅ 完成
   └─ S3.1: prototype tab 完全解锁验证（0.5h）
   └─ S3.2: Tab active 状态验证（0.5h）
   └─ S3.3: E2E 测试覆盖（1.5h）
@@ -299,9 +299,9 @@ test('S2.3: ComponentTreePanel 空状态', async ({ page }) => {
 
 ---
 
-## 4. Epic 3: 行为验证与测试
+## 4. Epic 3: 行为验证与测试 — ✅ 完成
 
-### S3.1 — prototype tab 完全解锁验证（0.5h）
+### S3.1 — prototype tab 完全解锁验证 ✅ done（0.5h）
 
 **验证**: prototype tab 原本就不受 phase 锁定（S1.1 改动中 `tab.id !== 'prototype'` 分支保留），无需代码改动，仅需测试覆盖。
 
@@ -317,7 +317,7 @@ test('S3.1: prototype tab 始终可点击', async ({ page }) => {
 });
 ```
 
-### S3.2 — Tab active 状态验证（0.5h）
+### S3.2 — Tab active 状态验证 ✅ done（0.5h）
 
 **验证 AC-7**: 只有一个 tab 处于 active。
 

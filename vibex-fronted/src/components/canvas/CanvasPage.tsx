@@ -633,6 +633,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                   <button
                     key={t}
                     role="tab"
+                    // @ts-ignore — comparing Phase and TreeType unions (both include context/flow/component)
                     aria-selected={phase === t}
                     className={`${styles.tabButton} ${phase === t ? styles.tabButtonActive : ''}`}
                     onClick={() => {

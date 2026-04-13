@@ -91,7 +91,7 @@ export const useContextStore = create<ContextStore>()(
     persist(
       (set, get) => ({
         // E3 S3.1: Phase state — drives the PhaseIndicator component
-        phase: 'input',
+        phase: 'context',
         setPhase: (phase) => set({ phase }),
         advancePhase: () => {
           const phases: Phase[] = ['input', 'context', 'flow', 'component', 'prototype'];

@@ -1,5 +1,10 @@
 # Changelog
 
+### [vibex-canvas-history-projectid Epic2: Phase2 URL 注入 projectId] — 2026-04-14
+- **S2.1**: CanvasPage.tsx — mount useEffect 从 URL ?projectId= 注入 sessionStore
+- **S2.2**: 合法性校验: GET /api/projects/[id]，404→toast 提示→setProjectId(null)
+- **提交**: `438af56f`
+
 ### [vibex-canvas-history-projectid Epic1: Phase1 止血修复] — 2026-04-14
 - **S1.1**: useVersionHistory.ts — loadSnapshots/projectId=null 拦截，显示引导错误，API 不发送
 - **S1.2**: createSnapshot/createAiSnapshot — projectId=null 时 reject/null，不调用 API

@@ -1514,3 +1514,11 @@ All notable changes to this project will be documented in this file.
 ---
 
 For older entries, see the commit history.
+
+### [vibex-canvas Epic1-3: TabBar 无障碍 + 空状态 + 行为验证] — 2026-04-13
+- **Epic1-S1.1**: TabBar.tsx — 移除 disabled/locked，4 tabs 均可点击；移除 handleTabClick phase 守卫
+- **Epic1-S1.2**: CanvasPage.tsx mobile TabBar — 添加 prototype tab（🚀 原型），desktop/mobile 同步
+- **Epic1 测试**: TabBar.test.tsx — 17/17 ✅
+- **Epic2-S2.1~S2.3**: TreePanel.tsx — 空状态提示文案优化（context/flow/component）
+- **Epic3-S3.1~S3.3**: tests/e2e/tab-accessibility.spec.ts — 6 E2E 测试（disabled验证/tab切换/ARIA状态）
+- **提交**: `40b3158a`, `7cb73ba3`, `7042410b`, `ef3df0af`

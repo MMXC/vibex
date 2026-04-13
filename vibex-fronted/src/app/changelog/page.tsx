@@ -46,6 +46,19 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.219',
+    date: '2026-04-14',
+    changes: [
+      '📋 vibex-design-component-library Epic2 Phase2 P1: 规模化 59 套 catalog + design-parser 集成',
+      '✅ design-parser.ts: 增强 extractColors/extractTypography/extractComponentTokens',
+      '✅ generate-catalog.ts: 集成 design-parser，生成 colorPalette/typography/catalog.components/styleComponents',
+      '✅ 58 个 individual catalog JSON: 全部含 colorPalette/typography/10标准组件/2-3特征组件',
+      '提交: 09aabcd1',
+    ],
+    commit: '09aabcd1',
+  },
+
+  {
     version: '1.0.217',
     date: '2026-04-14',
     changes: [

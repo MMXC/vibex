@@ -3,7 +3,7 @@
 > **项目**: vibex-canvas-qa-fix
 > **日期**: 2026-04-13
 > **总工时**: ~5.5h
-> **状态**: Epic 0 验证完成，待开发 E1-E4
+> **状态**: Epic 0✅ Epic 1✅ Epic 2✅，待开发 E3-E4
 
 ---
 
@@ -167,13 +167,13 @@ import { useUIStore } from '@/lib/canvas/stores/uiStore';
 
 ---
 
-## Epic 2: API 路径统一（0.5h）
+## Epic 2: API 路径统一（0.5h） — ✅ 完成
 
 > ⚠️ **审查修正**: E2 必须**后置**于 E0.1（API 真实性验证）。E0 返回 404 时需先确认后端路由，再改前端路径。
 
 ---
 
-### Story E2.1: snapshots 端点 /v1/ 前缀
+### Story E2.1: snapshots 端点 /v1/ 前缀 ✅ 完成
 
 **开发文件**: `src/lib/api-config.ts`
 
@@ -189,16 +189,13 @@ snapshots: '/v1/canvas/snapshots',
 
 ---
 
-### Story E2.2: snapshot/restoreSnapshot 路径确认
+### Story E2.2: snapshot/restoreSnapshot 路径确认 ✅ 完成
 
 **开发文件**: `src/lib/api-config.ts`
 
-**确认内容**:
-```typescript
-// 确认以下两个函数路径格式一致（均已含 /v1/ 前缀，无需修改）
-snapshot: (id: string) => `/v1/canvas/snapshots/${id}`,
-restoreSnapshot: (id: string) => `/v1/canvas/snapshots/${id}/restore`,
-```
+**确认结果** ✅: snapshot/restoreSnapshot 已有 /v1/ 前缀，无需修改
+
+**Epic2 验证结论**: 所有 canvas API 端点均含 /v1/ 前缀，统一 ✅
 
 ---
 

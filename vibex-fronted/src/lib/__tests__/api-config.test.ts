@@ -49,6 +49,19 @@ describe('API_CONFIG', () => {
       const detailEndpoint = API_CONFIG.endpoints.project.detail('123');
       expect(detailEndpoint).toBe('/projects/123');
     });
+
+    it('canvas endpoints — E4.2', () => {
+      expect(API_CONFIG.endpoints.canvas.snapshots).toBe('/v1/canvas/snapshots');
+      const base = API_CONFIG.endpoints.canvas.snapshots;
+      expect(API_CONFIG.endpoints.canvas.snapshot('123')).toBe(`${base}/123`);
+      expect(API_CONFIG.endpoints.canvas.restoreSnapshot('123')).toBe(`${base}/123/restore`);
+      const canvas = API_CONFIG.endpoints.canvas;
+      expect(canvas.generateContexts).toMatch(/^\/v1\//);
+      expect(canvas.generateFlows).toMatch(/^\/v1\//);
+      expect(canvas.generateComponents).toMatch(/^\/v1\//);
+      expect(canvas.status).toMatch(/^\/v1\//);
+      expect(canvas.latest).toMatch(/^\/v1\//);
+    });
   });
 });
 

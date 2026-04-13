@@ -72,8 +72,18 @@ export function useVersionHistory(): UseVersionHistoryReturn {
 
   const loadSnapshots = useCallback(async () => {
     setLoading(true);
+    setError(null);
+
+    // === Phase 1: projectId null 拦截 — 引导用户先创建项目 ===
+    if (!projectId) {
+      setError('请先创建项目后再查看历史版本');
+      setLoading(false);
+      setSnapshots([]);
+      return;
+    }
+
     try {
-      const result = await canvasApi.listSnapshots(projectId ?? undefined);
+      const result = await canvasApi.listSnapshots(projectId);
       if (result.success) {
         const sorted = [...result.snapshots].sort(
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -89,6 +99,12 @@ export function useVersionHistory(): UseVersionHistoryReturn {
   }, [projectId]);
 
   const createSnapshot = useCallback(async (label?: string): Promise<import('@/lib/canvas/types').CanvasSnapshot | null> => {
+    // === Phase 1: projectId null 拦截 ===
+    if (!projectId) {
+      setError('请先创建项目后再保存历史版本');
+      return null;
+    }
+
     const now = Date.now();
     if (now - lastSnapshotTimeRef.current < SNAPSHOT_DEBOUNCE_MS) {
       return null;
@@ -97,7 +113,7 @@ export function useVersionHistory(): UseVersionHistoryReturn {
 
     try {
       const result = await canvasApi.createSnapshot({
-        projectId: projectId ?? null,
+        projectId,
         label: label ?? `手动保存 (${new Date().toLocaleString('zh-CN')})`,
         trigger: 'manual',
         contextNodes,
@@ -118,6 +134,11 @@ export function useVersionHistory(): UseVersionHistoryReturn {
   }, [contextNodes, flowNodes, componentNodes, projectId]);
 
   const createAiSnapshot = useCallback(async () => {
+    // === Phase 1: projectId null 拦截 ===
+    if (!projectId) {
+      return;
+    }
+
     const now = Date.now();
     if (now - lastSnapshotTimeRef.current < SNAPSHOT_DEBOUNCE_MS) {
       return;
@@ -126,7 +147,7 @@ export function useVersionHistory(): UseVersionHistoryReturn {
 
     try {
       const result = await canvasApi.createSnapshot({
-        projectId: projectId ?? null,
+        projectId,
         label: `AI 生成完成 (${new Date().toLocaleString('zh-CN')})`,
         trigger: 'ai_complete',
         contextNodes,

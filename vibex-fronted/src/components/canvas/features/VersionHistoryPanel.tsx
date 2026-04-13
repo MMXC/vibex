@@ -166,13 +166,23 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
               <span>加载中...</span>
             </div>
           ) : snapshots.length === 0 ? (
-            <div className={styles.emptyState}>
-              <span aria-hidden="true">📭</span>
-              <span>暂无版本记录</span>
-              <span className={styles.emptyHint}>
-                点击「保存当前版本」创建第一个快照
-              </span>
-            </div>
+            hookError?.includes('请先创建项目') ? (
+              <div className={styles.emptyState}>
+                <span aria-hidden="true">🗺️</span>
+                <span>请先创建项目</span>
+                <span className={styles.emptyHint}>
+                  {hookError}
+                </span>
+              </div>
+            ) : (
+              <div className={styles.emptyState}>
+                <span aria-hidden="true">📭</span>
+                <span>暂无版本记录</span>
+                <span className={styles.emptyHint}>
+                  点击「保存当前版本」创建第一个快照
+                </span>
+              </div>
+            )
           ) : (
             snapshots.map((snap) => (
               <div

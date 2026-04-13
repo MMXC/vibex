@@ -34,6 +34,18 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.218',
+    date: '2026-04-14',
+    changes: [
+      '📋 vibex-design-component-library Epic1 Phase1 P0: 设计风格目录工具链',
+      '✅ design-schema.ts: Zod Schema',
+      '✅ generate-catalog.ts: designs.json → catalog',
+      '提交: 3513ba65',
+    ],
+    commit: '3513ba65',
+  },
+
+  {
     version: '1.0.217',
     date: '2026-04-14',
     changes: [

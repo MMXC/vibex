@@ -27,6 +27,9 @@ export function validateReturnTo(returnTo: string | null | undefined): string {
     // Must NOT be an absolute URL (no protocol)
     if (returnTo.match(/^https?:\/\//)) return '/';
 
+    // Reject protocol-relative URLs (e.g. //evil.com) — must check before prefix whitelist
+    if (returnTo.startsWith('//')) return '/';
+
     // Must match allowed prefix
     const isAllowed = ALLOWED_PREFIXES.some((prefix) =>
       returnTo === prefix || returnTo.startsWith(prefix + '/')

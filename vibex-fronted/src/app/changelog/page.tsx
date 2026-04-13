@@ -34,6 +34,19 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.217',
+    date: '2026-04-14',
+    changes: [
+      '📋 vibex-json-render-integration Epic2 Phase2 P1: ActionProvider + Button emit',
+      '✅ ButtonImpl: emit(press, {nodeId, type}) onClick',
+      '✅ ActionProvider handlers press → forward to onNodeClick',
+      '✅ JsonRenderPreview.test.tsx 5/5',
+      '提交: 7b586ddb',
+    ],
+    commit: '7b586ddb',
+  },
+
+  {
     version: '1.0.215',
     date: '2026-04-14',
     changes: [

@@ -1,5 +1,12 @@
 # Changelog
 
+### [vibex-canvas-history-projectid Epic1: Phase1 止血修复] — 2026-04-14
+- **S1.1**: useVersionHistory.ts — loadSnapshots/projectId=null 拦截，显示引导错误，API 不发送
+- **S1.2**: createSnapshot/createAiSnapshot — projectId=null 时 reject/null，不调用 API
+- **S1.3**: VersionHistoryPanel.tsx — projectId=null 时显示 🗺️「请先创建项目」引导 UI
+- **测试**: useVersionHistory.projectId.test.ts 5/5 ✅ | pnpm tsc --noEmit ✅
+- **提交**: `dd482541`
+
 ### [vibex-auth-401-redirect Epic3: LeftDrawer 401 兜底 + 测试] — 2026-04-13
 - **S3.1**: LeftDrawer.tsx — Layer 3 兜底：useEffect auth:401 监听器（已在 /auth 时跳过）+ catch 块 401 手动跳转
 - **S3.2**: auth/page.tsx — returnTo 验证（validateReturnTo）+ sessionStorage 持久化

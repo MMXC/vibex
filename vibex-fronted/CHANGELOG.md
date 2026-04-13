@@ -1,5 +1,14 @@
 # Changelog
 
+### [vibex-design-component-library Epic1 Phase1 P0: 设计风格目录工具链] — 2026-04-14
+- **design-schema.ts**: Zod Schema 定义 StyleCatalog/DesignStyle/StyleCategory/ComponentType
+- **designs-parser.ts**: designs.json 解析器
+- **design-parser.ts**: DESIGN.md 元数据提取器
+- **generate-catalog.ts**: 入口脚本，生成 design-catalog.json + design-catalog.ts
+- **design-catalog.json**: 59 designs, 9 categories
+- **design-catalog.ts**: TypeScript 类型定义（自动生成）
+- **提交**: `3513ba65`
+
 ### [vibex-json-render-integration Epic2 Phase2 P1: ActionProvider + Button emit + Unit tests] — 2026-04-14
 - **R4**: registry.tsx — ButtonImpl 添加 emit('press', { nodeId, type }) onClick
 - **R4**: JsonRenderPreview.tsx — ActionProvider handlers press → forward to onNodeClick

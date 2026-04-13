@@ -1,5 +1,12 @@
 # Changelog
 
+### [vibex-auth-401-redirect Epic3: LeftDrawer 401 兜底 + 测试] — 2026-04-13
+- **S3.1**: LeftDrawer.tsx — Layer 3 兜底：useEffect auth:401 监听器（已在 /auth 时跳过）+ catch 块 401 手动跳转
+- **S3.2**: auth/page.tsx — returnTo 验证（validateReturnTo）+ sessionStorage 持久化
+- **S3.3**: auth-redirect.spec.ts — E2E 补充 AC-5 logout不跳转 + AC-7-1~4 returnTo 边界测试
+- **测试**: validateReturnTo 16/16 ✅ | pnpm tsc --noEmit ✅
+- **提交**: `6b1683be`
+
 ### [vibex-auth-401-redirect Epic2: AuthProvider 挂载与全局监听] — 2026-04-13
 - **S2.1**: ClientLayout.tsx — 'use client' wrapper，在根 layout 下挂载 AuthProvider
 - **S2.1**: AuthProvider.tsx — useEffect 监听 'auth:401' 事件，触发 sessionStore.logout() 清除状态

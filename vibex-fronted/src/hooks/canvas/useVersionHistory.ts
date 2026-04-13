@@ -46,6 +46,8 @@ export interface UseVersionHistoryReturn {
   createAiSnapshot: () => Promise<void>;
   /** 恢复到指定快照 */
   restoreSnapshot: (snapshotId: string) => Promise<boolean>;
+  /** 最近一次加载/操作错误消息 */
+  error: string | null;
 }
 
 export function useVersionHistory(): UseVersionHistoryReturn {
@@ -55,6 +57,7 @@ export function useVersionHistory(): UseVersionHistoryReturn {
   const [selectedSnapshot, setSelectedSnapshot] = useState<CanvasSnapshot | null>(null);
   const [restoring, setRestoring] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const lastSnapshotTimeRef = useRef<number>(0);
 
@@ -79,6 +82,7 @@ export function useVersionHistory(): UseVersionHistoryReturn {
       }
     } catch (err) {
       canvasLogger.default.error('[useVersionHistory] loadSnapshots error:', err);
+      setError(err instanceof Error ? err.message : '加载失败，请重试');
     } finally {
       setLoading(false);
     }
@@ -108,6 +112,7 @@ export function useVersionHistory(): UseVersionHistoryReturn {
       return null;
     } catch (err) {
       canvasLogger.default.error('[useVersionHistory] createSnapshot error:', err);
+      setError(err instanceof Error ? err.message : '创建快照失败，请重试');
       return null;
     }
   }, [contextNodes, flowNodes, componentNodes, projectId]);
@@ -158,6 +163,7 @@ export function useVersionHistory(): UseVersionHistoryReturn {
 
   const open = useCallback(() => {
     setIsOpen(true);
+    setError(null); // 打开时清除旧错误
     loadSnapshots();
   }, [loadSnapshots]);
 
@@ -184,5 +190,6 @@ export function useVersionHistory(): UseVersionHistoryReturn {
     restoreSnapshot,
     restoring,
     creating,
+    error,
   };
 }

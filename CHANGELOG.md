@@ -1,3 +1,10 @@
+### Added (vibex-design-component-library Epic2-Stories: generate-catalog 脚本测试 19 例) — 2026-04-14
+- **tests/unit/generate-catalog.test.ts**: 19 个测试用例
+- S2.1: --all 批量模式（58 文件，slugToFilename，错误跳过）
+- S2.2: styleComponents（每 catalog 2-3 个，5 个必需字段，10 个标准组件）
+- 验证: vitest 71/71（52 + 19）✅
+- 提交: `3bad72a2`
+
 ### Added (vibex-design-component-library Epic1-Stories: 52 unit tests + design-parser 修复) — 2026-04-14
 - **tests/unit/design-catalog.test.ts**: 52 个测试用例，覆盖 S1.1-S1.4 和 S2.1-S2.2 验收标准
 - **design-parser.ts**: 修复 `### Heading` 格式解析，新增 `extractSection()` helper

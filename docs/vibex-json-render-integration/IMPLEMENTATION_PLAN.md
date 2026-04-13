@@ -309,6 +309,11 @@ pnpm exec playwright test e2e/json-render-nested.spec.ts
 - [x] `ModalImpl` 支持 children 内容 + close button ✅
 - [x] `pnpm build` 通过 ✅
 
+### Epic 1 Stories（验收标准核实）
+- [x] S1.1: catalog.ts 5个组件 slots: ["default"] 声明 ✅
+- [x] S1.2: nodesToSpec 使用 parentId 映射重建 children 关系 ✅
+- [x] S1.3: registry PageImpl min-h-full（无 min-h-screen）✅
+
 ### Phase 2
 - [x] `ActionProvider` handlers 包含 press handler（forward to onNodeClick）✅
 - [x] Button 组件触发 emit 事件（emit('press', { nodeId, type })）✅

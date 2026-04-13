@@ -1,449 +1,401 @@
-# wow-harness OpenClaw 实装 — 实施计划
+# VibeX TabBar 无障碍化 — 实施计划
 
-> **项目**: vibex
-> **日期**: 2026-04-13
-> **总工时**: ~14h
-> **状态**: 待开发
-
----
-
-## Epic 1: Review Agent 工具隔离（2h） ✅ done 216af89
+**项目**: vibex
+**阶段**: implementation
+**Architect**: architect
+**日期**: 2026-04-13
 
 ---
 
-### Story 1.1: Per-agent 工具白名单配置（1h） ✅ done
+## 1. Epic/Story 实施顺序
 
-**实施**:
-- `~/.openclaw/openclaw.json` reviewer agent 新增 `tools.sandbox.tools.allow` 配置
-- 允许的工具: `Read`, `Grep`, `sessions_history`（3个，只读）
-- 禁止工具隐式拒绝: Write, Edit, Bash, exec, applyPatch 等
-- Config validated: `openclaw config validate` → valid ✅
+```
+Epic 1: TabBar 无障碍化改造
+  └─ S1.1: TabBar.tsx 移除 disabled + 锁定逻辑（1h）
+  └─ S1.2: CanvasPage.tsx 移动端内联 TabBar 同步（0.5h）
 
-**实施commit**: `216af89`
+Epic 2: 空状态提示设计
+  └─ S2.1: ContextTreePanel 空状态（0.5h）
+  └─ S2.2: FlowTreePanel 空状态（0.5h）
+  └─ S2.3: ComponentTreePanel 空状态（0.5h）
 
-> ⚠️ **路径修正**: `tools.subagents.tools.deny` 不存在。正确路径为 `agents.list[].tools.sandbox.tools.allow`。
+Epic 3: 行为验证与测试
+  └─ S3.1: prototype tab 完全解锁验证（0.5h）
+  └─ S3.2: Tab active 状态验证（0.5h）
+  └─ S3.3: E2E 测试覆盖（1.5h）
+```
 
-**开发文件**: `~/.openclaw/openclaw.json`
+**总工时**: 5.5h
+**推荐顺序**: S1.1 → S1.2 → S2.1/S2.2/S2.3（可并行）→ S3.1 → S3.2 → S3.3
 
-**修改内容**:
+---
 
-在 `agents.list` 中为 reviewer agent 添加 tools sandbox allow 白名单：
+## 2. Epic 1: TabBar 无障碍化改造
 
-```json5
-{
-  agents: {
-    list: [
-      {
-        id: "reviewer",
-        workspace: "~/.openclaw/workspace-reviewer",
-        tools: {
-          sandbox: {
-            tools: {
-              allow: [
-                "read",
-                "grep",
-                "sessions_history",
-                "sessions_list",
-                "session_status",
-                "memory_search",
-                "memory_get",
-                "web_search",
-                "web_fetch"
-              ]
-            }
-          }
-        }
-      }
-    ]
+### S1.1 — TabBar.tsx 移除 disabled + 锁定逻辑 ✅ done
+
+**工时**: 1h
+**改动文件**: `vibex-fronted/src/components/canvas/TabBar.tsx`
+
+#### 2.1.1 删除 `isLocked` 相关变量（第37-48行区域）
+
+**删除前**:
+```typescript
+const tabIdx = PHASE_ORDER.indexOf(tab.id as Phase);
+const isLocked = tab.id !== 'prototype' && tabIdx > phaseIdx;
+const isActive =
+  tab.id === 'prototype'
+    ? phase === 'prototype'
+    : activeTree === tab.id || (activeTree === null && tab.id === 'context');
+```
+
+**删除后**（`isActive` 逻辑保持不变，仅删除 `isLocked`）:
+```typescript
+const isActive =
+  tab.id === 'prototype'
+    ? phase === 'prototype'
+    : activeTree === tab.id || (activeTree === null && tab.id === 'context');
+```
+
+#### 2.1.2 删除 `handleTabClick` 中的 phase 守卫（第52-55行）
+
+**删除前**:
+```typescript
+const handleTabClick = (tabId: TreeType | 'prototype') => {
+  if (tabId === 'prototype') {
+    setPhase('prototype');
+    setActiveTree(null);
+    return;
   }
-}
+  const tabIdx = PHASE_ORDER.indexOf(tabId as Phase);
+  if (tabIdx > phaseIdx) {
+    // Tab not yet unlocked by phase — do nothing
+    return;
+  }
+  setActiveTree(tabId as TreeType);
+  onTabChange?.(tabId as TreeType);
+};
 ```
 
-**验收标准**:
-```bash
-# 验证配置：spawn reviewer agent 后，尝试调用 write/edit
-# 期望: 工具被拒绝（不在 allow 列表）
-# 尝试调用 read/sessions_history
-# 期望: 工具可用
+**删除后**:
+```typescript
+const handleTabClick = (tabId: TreeType | 'prototype') => {
+  if (tabId === 'prototype') {
+    setPhase('prototype');
+    setActiveTree(null);
+    return;
+  }
+  setActiveTree(tabId as TreeType);
+  onTabChange?.(tabId as TreeType);
+};
 ```
 
----
+#### 2.1.3 修改 button 元素（删除 disabled 相关属性）
 
-### Story 1.2: Per-agent 工具白名单测试（1h） ✅ done
-
-**实施**:
-- `~/.openclaw/agent-governance/tests/test_reviewer_tools.py`
-- 7 个测试用例（7/7 pass）：
-  - `test_reviewer_agent_has_tools_config`
-  - `test_reviewer_has_allow_list`
-  - `test_read_tools_allowed`
-  - `test_write_tools_not_allowed`
-  - `test_only_three_tools`
-  - `test_allow_list_exact_values`
-  - `test_is_schema_level_not_prompt_level`
-
-**实施commit**: `216af89`
-
-**注意**: OpenClaw 工具名为大写开头（`Read`, `Grep`），测试适配大小写
-
-**开发文件**: `~/.openclaw/agent-governance/tests/test_reviewer_tools.py`
-
-**测试用例**:
-
-```python
-def test_reviewer_agent_allow_list():
-    """验证 reviewer agent 的 allow 白名单只含读操作"""
-    config = load_openclaw_config()
-    reviewer_agent = next(a for a in config["agents"]["list"] if a["id"] == "reviewer")
-    allow_list = reviewer_agent["tools"]["sandbox"]["tools"]["allow"]
-    assert "read" in allow_list
-    assert "grep" in allow_list
-    assert "sessions_history" in allow_list
-    # 写操作不应在 allow 列表
-    assert "write" not in allow_list
-    assert "edit" not in allow_list
-    assert "exec" not in allow_list
-    assert "apply_patch" not in allow_list
+**删除前**:
+```typescript
+return (
+  <button
+    key={tab.id}
+    role="tab"
+    aria-selected={isActive}
+    aria-disabled={isLocked}         // ← 删除
+    disabled={isLocked}             // ← 删除
+    className={`${styles.tab} ${isActive ? styles.tabActive : ''} ${isLocked ? styles.tabLocked : ''}`}  // ← 删除 isLocked 条件
+    onClick={() => handleTabClick(tab.id)}
+    title={isLocked ? `需先完成上一阶段` : `切换到 ${tab.label} 树`}  // ← 简化 title
+  >
 ```
 
----
+**删除后**:
+```typescript
+return (
+  <button
+    key={tab.id}
+    role="tab"
+    aria-selected={isActive}
+    className={`${styles.tab} ${isActive ? styles.tabActive : ''}`}
+    onClick={() => handleTabClick(tab.id)}
+    title={`切换到 ${tab.label} 树`}
+  >
+```
 
-## Epic 2: D8 机械化 Progress Check（4h）
+#### 验收标准（Vitest 单元测试）:
 
----
+```typescript
+// TabBar.unittest.tsx
+test('AC-1: 4 个 tab 均无 disabled 属性', () => {
+  render(<TabBar />);
+  const tabs = screen.getAllByRole('tab');
+  expect(tabs).toHaveLength(4);
+  tabs.forEach((tab) => expect(tab).not.toBeDisabled());
+});
 
-### Story 2.1: run_d8_check 函数（1h）
-
-**开发文件**: `~/.openclaw/skills/team-tasks/scripts/task_manager.py`
-
-**新增函数**:
-
-```python
-def run_d8_check(
-    repo: str = "/root/.openclaw/vibex",
-    commands: list = None,
-    timeout: int = 300
-) -> dict:
-    """执行 D8 机械化检查"""
-    if commands is None:
-        commands = ["pnpm build", "pnpm test"]
-    results = {"build": None, "test": None, "passed": False, "errors": []}
-    for cmd in commands:
-        try:
-            r = subprocess.run(
-                cmd, shell=True, cwd=repo,
-                capture_output=True, text=True, timeout=timeout
-            )
-            label = "build" if "build" in cmd else "test"
-            results[label] = r.returncode
-            if r.returncode != 0:
-                results["errors"].append(f"{label} failed (exit {r.returncode})")
-        except subprocess.TimeoutExpired:
-            results["errors"].append(f"{cmd} timeout (>300s)")
-            results[label] = -1
-        except FileNotFoundError:
-            results["errors"].append(f"command not found: {cmd.split()[0]}")
-            results[label] = -2
-    results["passed"] = all(v == 0 for v in [results.get("build"), results.get("test")] 
-                            if isinstance(v, int) and v >= 0)
-    return results
+test('AC-6: prototype tab 始终可点击', () => {
+  render(<TabBar />);
+  const prototypeTab = screen.getByRole('tab', { name: /原型/i });
+  expect(prototypeTab).not.toBeDisabled();
+});
 ```
 
 ---
 
-### Story 2.2: write_progress_json 函数（0.5h）
+### S1.2 — CanvasPage.tsx 移动端内联 TabBar 同步 ✅ done
 
-**开发文件**: 同上
+**工时**: 0.5h
+**改动文件**: `vibex-fronted/src/components/canvas/CanvasPage.tsx`
 
-```python
-def write_progress_json(status: str, task: str, errors: list = None):
-    """D8 检查后写入 progress.json"""
-    import json
-    from datetime import datetime
-    path = Path("~/.openclaw/progress.json").expanduser()
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "w") as f:
-        json.dump({
-            "task": task,
-            "status": status,
-            "timestamp": datetime.utcnow().isoformat(),
-            "errors": errors or []
-        }, f, indent=2)
+#### 2.2.1 检查移动端内联 TabBar（第629-648行）
+
+**当前代码**（第631-648行）:
+```typescript
+<div className={styles.tabBar} role="tablist">
+  {(['context', 'flow', 'component'] as TreeType[]).map((t) => (
+    <button
+      key={t}
+      role="tab"
+      aria-selected={activeTab === t}
+      className={`${styles.tabButton} ${activeTab === t ? styles.tabButtonActive : ''}`}
+      onClick={() => setActiveTab(t)}
+    >
+      {t === 'context' ? '◇ 上下文' : t === 'flow' ? '→ 流程' : '▣ 组件'}
+    </button>
+  ))}
+</div>
+```
+
+**确认结果**: 移动端内联 tab bar **没有 disabled 逻辑**，但只有 3 个 tab，缺少 prototype tab（🚀）。
+
+#### 2.2.2 与 desktop TabBar 保持一致（添加 prototype tab）
+
+**改动后**:
+```typescript
+<div className={styles.tabBar} role="tablist">
+  {([
+    { id: 'context', label: '◇ 上下文' },
+    { id: 'flow', label: '→ 流程' },
+    { id: 'component', label: '▣ 组件' },
+    { id: 'prototype', label: '🚀 原型' },
+  ] as const).map((t) => (
+    <button
+      key={t.id}
+      role="tab"
+      aria-selected={t.id === 'prototype' ? phase === 'prototype' : activeTab === t.id}
+      className={`${styles.tabButton} ${t.id === 'prototype' ? phase === 'prototype' ? styles.tabButtonActive : '' : activeTab === t.id ? styles.tabButtonActive : ''}`}
+      onClick={() => {
+        if (t.id === 'prototype') {
+          setPhase('prototype');
+          setActiveTree(null);
+        } else {
+          setActiveTab(t.id);
+        }
+      }}
+    >
+      {t.label}
+    </button>
+  ))}
+</div>
+```
+
+#### 验收标准（E2E）:
+
+```typescript
+test('AC-5: 移动端与桌面端行为一致', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto('/canvas?tabMode=true');
+  // 4 个 tab 均无 disabled
+  const tabs = page.locator('[role="tab"]');
+  await expect(tabs).toHaveCount(4);
+  for (const tab of await tabs.all()) {
+    await expect(tab).not.toBeDisabled();
+  }
+});
 ```
 
 ---
 
-### Story 2.3: task_manager D8 钩子（1.5h）
+## 3. Epic 2: 空状态提示设计
 
-**开发文件**: `~/.openclaw/skills/team-tasks/scripts/task_manager.py`
+**工时**: 1.5h（三个 Story 各 0.5h，可并行）
+**改动文件**: `vibex-fronted/src/components/canvas/TreePanel.tsx`
 
-**修改点**: 在 `validate_task_completion()` 函数中增加 D8 检查调用：
+### 3.1 改动范围（第157-159行区域）
 
-```python
-def validate_task_completion(project, stage_id, stage_info, old_status=None, repo=DEFAULT_WORK_DIR):
-    # ... 现有 commit 检查逻辑 ...
-    
-    # E2: D8 机械化检查（仅在 status == "done" 时触发）
-    if old_status == "done" or "done" in str(stage_info.get("status", "")):
-        d8 = run_d8_check(repo=repo)
-        write_progress_json(
-            "pass" if d8["passed"] else "fail",
-            f"{project}/{stage_id}",
-            d8["errors"]
-        )
-        if not d8["passed"]:
-            warnings.append(f"D8 CHECK FAILED: {'; '.join(d8['errors'])}")
-            return {"valid": False, "warnings": warnings, "commit": current_commit}
+**当前代码**:
+```typescript
+{/* Summary when no nodes */}
+{safeNodes.length === 0 && (
+  <div className={styles.treePanelEmpty}>
+    <span style={{ color: treeColor }}>{treeIcon}</span>
+    <p>暂无节点</p>
+    <p className={styles.treePanelEmptyHint}>
+      {tree === 'context'
+        ? '输入需求后 AI 将生成限界上下文'
+        : tree === 'flow'
+          ? '确认上下文后自动生成流程树'
+          : '确认流程后自动生成组件树'}
+    </p>
+  </div>
+)}
+```
+
+### 3.2 S2.1 — ContextTreePanel 空状态
+
+**改动后**（仅 `tree === 'context'` 分支）:
+```typescript
+{tree === 'context'
+  ? '请先在需求录入阶段输入需求'
+  : tree === 'flow'
+    ? '请先确认上下文节点，流程将自动生成'
+    : '请先完成流程树，组件将自动生成'}
+```
+
+### 3.3 完整改动
+
+**改动后完整空状态块**:
+```typescript
+{/* 空状态引导 */}
+{safeNodes.length === 0 && (
+  <div className={styles.treePanelEmpty}>
+    <span style={{ color: treeColor }}>{treeIcon}</span>
+    <p>暂无节点</p>
+    <p className={styles.treePanelEmptyHint}>
+      {tree === 'context'
+        ? '请先在需求录入阶段输入需求'
+        : tree === 'flow'
+          ? '请先确认上下文节点，流程将自动生成'
+          : '请先完成流程树，组件将自动生成'}
+    </p>
+  </div>
+)}
+```
+
+### 3.4 验收标准（E2E）
+
+```typescript
+test('S2.1: ContextTreePanel 空状态', async ({ page }) => {
+  await page.goto('/canvas');
+  await page.click('[role="tab"]:has-text("上下文")');
+  const emptyState = page.locator('text=请先在需求录入阶段输入需求');
+  await expect(emptyState).toBeVisible();
+});
+
+test('S2.2: FlowTreePanel 空状态', async ({ page }) => {
+  await page.goto('/canvas');
+  // phase=input 时 flow 为空
+  await page.click('[role="tab"]:has-text("流程")');
+  const emptyState = page.locator('text=请先确认上下文节点，流程将自动生成');
+  await expect(emptyState).toBeVisible();
+});
+
+test('S2.3: ComponentTreePanel 空状态', async ({ page }) => {
+  await page.goto('/canvas');
+  // phase=input 时 component 为空
+  await page.click('[role="tab"]:has-text("组件")');
+  const emptyState = page.locator('text=请先完成流程树，组件将自动生成');
+  await expect(emptyState).toBeVisible();
+});
 ```
 
 ---
 
-### Story 2.4: D8 测试覆盖（1h）
+## 4. Epic 3: 行为验证与测试
 
-**开发文件**: `~/.openclaw/skills/team-tasks/scripts/test_d8_check.py`
+### S3.1 — prototype tab 完全解锁验证（0.5h）
 
-**测试用例**（mock subprocess）:
+**验证**: prototype tab 原本就不受 phase 锁定（S1.1 改动中 `tab.id !== 'prototype'` 分支保留），无需代码改动，仅需测试覆盖。
 
-```python
-def test_d8_both_pass(monkeypatch):
-    monkeypatch.setattr(subprocess, "run", Mock(returncode=0))
-    result = run_d8_check()
-    assert result["passed"] is True
-
-def test_d8_build_fail(monkeypatch):
-    def fake_run(cmd, **kwargs):
-        if "build" in cmd: return Mock(returncode=1, stderr="build error")
-        return Mock(returncode=0)
-    monkeypatch.setattr(subprocess, "run", fake_run)
-    result = run_d8_check()
-    assert result["passed"] is False
-    assert "build failed" in result["errors"][0]
-
-def test_progress_json_write(tmp_path, monkeypatch):
-    monkeypatch.setattr(Path, "expanduser", lambda self: tmp_path / str(self).replace("~/.openclaw/", ""))
-    write_progress_json("pass", "vibex/test", [])
-    assert (tmp_path / "progress.json").exists()
+```typescript
+test('S3.1: prototype tab 始终可点击', async ({ page }) => {
+  await page.goto('/canvas');
+  // phase=input 时点击 prototype tab
+  const prototypeTab = page.locator('[role="tab"]:has-text("🚀")');
+  await prototypeTab.click();
+  await expect(prototypeTab).toHaveAttribute('aria-selected', 'true');
+  // prototype 队列面板可见
+  await expect(page.locator('[data-testid="prototype-queue"]')).toBeVisible();
+});
 ```
 
----
+### S3.2 — Tab active 状态验证（0.5h）
 
-## Epic 3: Loop Detection + Session Reflection（4h）
+**验证 AC-7**: 只有一个 tab 处于 active。
 
----
-
-### Story 3.1: agent-governance 目录创建（0.5h）
-
-**创建目录**: `~/.openclaw/agent-governance/`
-
-**创建文件结构**:
-```
-~/.openclaw/agent-governance/
-├── __init__.py
-├── config.json          # 集中配置（阈值、开关）
-├── loop_detector.py
-├── metrics_collector.py
-├── pattern_db.py
-└── sessions/            # 每个 session 一个 state 文件
+```typescript
+test('S3.2: 只有一个 tab 处于 active', async ({ page }) => {
+  await page.goto('/canvas');
+  const selected = page.locator('[role="tab"][aria-selected="true"]');
+  await expect(selected).toHaveCount(1);
+  // 切换后仍只有一个
+  await page.click('[role="tab"]:has-text("流程")');
+  await expect(selected).toHaveCount(1);
+  // 默认 context 为 active
+  await page.goto('/canvas');
+  const contextTab = page.locator('[role="tab"]:has-text("上下文")');
+  await expect(contextTab).toHaveAttribute('aria-selected', 'true');
+});
 ```
 
----
+### S3.3 — E2E 测试覆盖（1.5h）
 
-### Story 3.2: LoopDetector 实现（1.5h）
+**文件**: `vibex-fronted/tests/e2e/tab-switching.spec.ts`
 
-**开发文件**: `~/.openclaw/agent-governance/loop_detector.py`
-
-**核心逻辑**: 按文件路径追踪 edit/exec/write 调用次数，超阈值返回警告文本。
-
-**关键方法**:
-- `record_edit(file_path, tool)` → `Optional[str]`（警告文本或 None）
-- `get_edit_count(file_path)` → `int`
-- `reset_file(file_path)` → `None`
-- `save()` → 持久化到 `sessions/{session_id}.json`
+完整文件内容见 `architecture.md` §6.2。
 
 ---
 
-### Story 3.3: MetricsCollector 实现（1h）
-
-**开发文件**: `~/.openclaw/agent-governance/metrics_collector.py`
-
-**核心逻辑**: 记录 tool 调用频次、guard 命中数，session 结束时追加写入 metrics.jsonl。
-
-**关键方法**:
-- `record_tool(tool: str)` → `None`
-- `record_guard_hit(guard: str)` → `None`
-- `set_agent_type(agent_type: str)` → `None`
-- `write()` → 追加写入 `sessions/{session_id}/metrics.jsonl`
-
----
-
-### Story 3.4: SOUL.md Loop Detection 集成（1h）
-
-> ⚠️ **方案修正**: task_manager.py 无法拦截 agent 的 edit/write 调用，改为通过 SOUL.md system prompt 注入。
-
-**开发文件**: `~/.openclaw/workspace-<agentId>/SOUL.md`（各 agent workspace）
-
-**修改内容**: 在 SOUL.md 末尾追加 Loop Detection 集成片段：
-
-```markdown
-## Loop Detection Integration
-
-每次执行 `edit` 或 `write` 工具后，立即调用：
-
-```bash
-python3 -c "
-import sys, os, json
-sys.path.insert(0, '/root/.openclaw/agent-governance')
-from loop_detector import LoopDetector
-from metrics_collector import MetricsCollector
-
-session_id = os.environ.get('OPENCLAW_SESSION_ID', 'unknown')
-file_path = '<FILL_IN_FILE_PATH>'
-tool = '<FILL_IN_TOOL>'
-
-d = LoopDetector(session_id)
-m = MetricsCollector(session_id)
-w = d.record_edit(file_path, tool)
-if w: print(w)
-m.record_tool(tool)
-m.write()
-"
-```
-
-**填充说明**:
-- `<FILL_IN_FILE_PATH>`: 替换为 edit/write 工具操作的实际文件路径
-- `<FILL_IN_TOOL>`: 替换为 "edit" 或 "write"
-
-**Metrics 自动写入**: MetricsCollector.write() 在每次调用后执行（append-only，无性能问题）。
-
----
-
-## Epic 4: Risk Tracking + Pattern Learning（4h）
-
----
-
-### Story 4.1: Pattern DB 初始化（1h）
-
-**开发文件**: `~/.openclaw/failure-patterns.jsonl`
-
-**初始化数据**（≥10 条）:
-
-```jsonl
-{"type": "SyntaxError", "pattern": "SyntaxError.*Unexpected token", "solution": "Check for missing commas, brackets, or semicolons"}
-{"type": "TypeError", "pattern": "TypeError.*Cannot read property", "solution": "Verify object exists before accessing properties"}
-{"type": "BuildError", "pattern": "pnpm.*build.*failed", "solution": "Run pnpm build locally"}
-{"type": "ImportError", "pattern": "Cannot find module.*", "solution": "Verify import path and installation"}
-{"type": "TSError", "pattern": "TS[0-9]+:.*", "solution": "Run tsc --noEmit"}
-{"type": "TestFail", "pattern": "FAIL.*test.*", "solution": "Run test with --verbose"}
-{"type": "MergeConflict", "pattern": "<<<<<<.*======.*>>>>>>", "solution": "Resolve merge conflicts manually"}
-{"type": "LinterError", "pattern": "ESLint.*error", "solution": "Run eslint --fix"}
-{"type": "RuntimeCrash", "pattern": "ReferenceError.*is not defined", "solution": "Check variable scoping"}
-{"type": "TimeoutError", "pattern": "Timeout.*exceeded", "solution": "Increase timeout or optimize"}
-{"type": "CircularDep", "pattern": "Circular dependency detected", "solution": "Review imports and refactor"}
-{"type": "AuthError", "pattern": "401.*Unauthorized", "solution": "Refresh auth token or re-login"}
-```
-
----
-
-### Story 4.2: Pattern Lookup 接口（1h）
-
-**开发文件**: `~/.openclaw/agent-governance/pattern_db.py`
-
-```python
-def lookup_pattern(error_msg: str) -> Optional[dict]:
-    """模糊匹配，返回最匹配的 pattern"""
-    ...
-
-def add_pattern(entry: dict) -> None:
-    """追加新 pattern"""
-    ...
-```
-
----
-
-### Story 4.3: Risk 高频警告（1h）
-
-**开发文件**: `~/.openclaw/agent-governance/metrics_collector.py`
-
-在 `MetricsCollector` 中增加高频检测：
-
-```python
-RISK_THRESHOLDS = {"exec": 20, "edit": 10, "write": 5}
-
-def check_risk_warnings(self) -> Optional[str]:
-    """检查高频操作，返回警告文本"""
-    warnings = []
-    for tool, count in self.data["toolCalls"].items():
-        threshold = RISK_THRESHOLDS.get(tool, float("inf"))
-        if count >= threshold:
-            warnings.append(
-                f"⚠️ High frequency {tool}: {count} calls detected. "
-                f"Consider if this is productive or a loop."
-            )
-            self.record_guard_hit("risk_warnings")
-    return "\n".join(warnings) if warnings else None
-```
-
----
-
-### Story 4.4: Pattern DB + Metrics 测试覆盖（1h）
-
-**开发文件**: `~/.openclaw/agent-governance/tests/`
-
-```python
-def test_pattern_lookup_exact():
-    result = lookup_pattern("SyntaxError: Unexpected token in parse")
-    assert result["type"] == "SyntaxError"
-    assert "solution" in result
-
-def test_pattern_lookup_no_match():
-    result = lookup_pattern("totally unknown error xyz")
-    assert result is None
-
-def test_metrics_tool_counting():
-    mc = MetricsCollector("test")
-    for _ in range(5): mc.record_tool("edit")
-    assert mc.data["toolCalls"]["edit"] == 5
-
-def test_risk_warning_trigger():
-    mc = MetricsCollector("test")
-    for _ in range(21): mc.record_tool("exec")
-    warning = mc.check_risk_warnings()
-    assert warning is not None
-    assert "exec" in warning
-```
-
----
-
-## 完整测试命令
+## 5. 测试命令速查
 
 ```bash
-# E1: 工具策略验证
-python3 -c "import json; c=json.load(open('/root/.openclaw/openclaw.json')); print('deny:', c['tools']['subagents']['tools']['deny'])"
+cd /root/.openclaw/vibex/vibex-fronted
 
-# E2: D8 检查（本地）
-cd /root/.openclaw
-python3 -m pytest skills/team-tasks/scripts/test_d8_check.py -v
+# 单元测试（Vitest）
+pnpm test:unit tests/unit/components/canvas/TabBar.unittest.tsx
 
-# E3: Loop Detector
-python3 -m pytest ~/.openclaw/agent-governance/tests/test_loop_detector.py -v
+# 带覆盖率
+pnpm test:unit:coverage tests/unit/components/canvas/TabBar.unittest.tsx
 
-# E4: Pattern DB
-python3 -m pytest ~/.openclaw/agent-governance/tests/test_pattern_db.py -v
+# E2E 测试（需先启动 dev server）
+pnpm test:e2e tests/e2e/tab-switching.spec.ts
 
-# 完整集成测试
-python3 -m pytest ~/.openclaw/agent-governance/tests/ -v
+# E2E CI 模式
+pnpm test:e2e:ci tests/e2e/tab-switching.spec.ts
 
-# 手动验证
-python3 -c "
-from agent_governance.loop_detector import LoopDetector
-d = LoopDetector('manual-test')
-for i in range(6):
-    w = d.record_edit('src/test.ts')
-    print(f'Edit {i+1}: warning={w is not None}')
-"
+# 全部测试
+pnpm test:ci
 ```
 
 ---
 
-*实施计划: 待开发*
-*Next: Dev 领取 → 按 Epic 顺序实现 → Tester 覆盖 → Reviewer 审查*
+## 6. 验收标准矩阵
+
+| AC | 描述 | 测试方式 | 通过条件 |
+|----|------|---------|---------|
+| AC-1 | 4个tab均无`disabled`属性 | Vitest + Playwright | `expect(tab).not.toBeDisabled()` x4 |
+| AC-2 | 点击立即切换，<100ms | Playwright 计时 | `Date.now() - clickTime < 100` |
+| AC-3 | 空树显示引导提示 | Playwright | 3 个空状态文案均可见 |
+| AC-4 | PhaseIndicator 不受影响 | Playwright | 切换 tab 后 indicator 仍可见 |
+| AC-5 | 移动端与桌面端一致 | Playwright viewport | 375x812 下 4 tabs 无 disabled |
+| AC-6 | prototype tab 始终可点击 | Vitest + Playwright | `expect(prototypeTab).toBeEnabled()` |
+| AC-7 | 只有一个tab处于active | Playwright | `expect(selected).toHaveCount(1)` |
+| AC-8 | 切换tab后三树数据不丢失 | Playwright | 切回后 nodes 数量不变 |
+
+---
+
+## 7. 回滚步骤
+
+```bash
+cd /root/.openclaw/vibex/vibex-fronted
+
+# 找到引入改动的 commit
+git log --oneline -5
+
+# 回滚单个文件
+git checkout <previous-commit> -- src/components/canvas/TabBar.tsx
+
+# 或回滚整个改动
+git revert <commit-hash>
+
+# 确认回滚
+pnpm build && pnpm test:ci
+```

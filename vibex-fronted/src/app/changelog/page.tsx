@@ -24,12 +24,12 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.215',
     date: '2026-04-14',
     changes: [
-      '📋 vibex-canvas-history-projectid Epic1: Phase1 止血修复',
-      '✅ useVersionHistory: projectId=null 拦截（loadSnapshots/createSnapshot/createAiSnapshot）',
-      '✅ VersionHistoryPanel: 🗺️请先创建项目 引导 UI',
-      '提交: dd482541',
+      '📋 vibex-canvas-history-projectid Epic1+Epic2: Phase1止血+Phase2 URL注入',
+      '✅ Phase1: useVersionHistory projectId=null 拦截 + 引导 UI',
+      '✅ Phase2: CanvasPage URL ?projectId= 注入 + 合法性校验',
+      '提交: dd482541, 438af56f',
     ],
-    commit: 'dd482541',
+    commit: '438af56f',
   },
 
   {

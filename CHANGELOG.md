@@ -15,6 +15,13 @@
   - 修复 protocol-relative 绕过 (d7c44637)
 - 提交: `f3a68586`, `d7c44637`
 
+### Added (vibex Epic3 TabBar 行为验证 e2e 测试) — 2026-04-13
+- **S3.1-S3.3**: tab-accessibility.spec.ts — 6 个 Playwright e2e 测试
+  - S3.1: 所有 tab 无 disabled + prototype tab 可点击
+  - S3.2: flow/component tab 点击后 aria-selected=true
+  - S3.3: 完整 tab 切换流程 + 无 networkidle 版本
+- 提交: `7042410b`
+
 ### Added (vibex Epic1 TabBar 无障碍化改造) — 2026-04-13
 - **S1.1**: TabBar.tsx — 移除 disabled/locked/aria-disabled/guard 逻辑
   - 所有 tab 始终可点击、始终启用（无障碍化）

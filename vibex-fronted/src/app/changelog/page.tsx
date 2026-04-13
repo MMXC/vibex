@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.210',
+    date: '2026-04-13',
+    changes: [
+      '📋 vibex Epic1 TabBar 无障碍化改造',
+      '✅ TabBar.tsx: 移除 disabled/locked/guard，所有 tab 可点击',
+      '✅ CanvasPage: mobile prototype tab 新增（⚡ 原型）',
+      '提交: 40b3158a',
+    ],
+    commit: '40b3158a',
+  },
+
+  {
     version: '1.0.209',
     date: '2026-04-13',
     changes: [

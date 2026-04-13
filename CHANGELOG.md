@@ -1,3 +1,11 @@
+### Added (vibex Epic1 TabBar 无障碍化改造) — 2026-04-13
+- **S1.1**: TabBar.tsx — 移除 disabled/locked/aria-disabled/guard 逻辑
+  - 所有 tab 始终可点击、始终启用（无障碍化）
+- **S1.2**: CanvasPage.tsx — mobile prototype tab 新增
+  - ⚡ 原型 tab onClick: setPhase('prototype') + setActiveTree('component')
+  - phase='prototype' 时渲染 PrototypeQueuePanel
+- 提交: `40b3158a`
+
 ### Added (vibex-canvas-auth-fix F11.2: 401/404 错误 UI 差异化) — 2026-04-13
 - **F11.2**: useVersionHistory.ts — 新增 `error: string | null` 状态
   - loadSnapshots/createSnapshot catch 时 setError

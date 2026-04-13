@@ -289,7 +289,7 @@ export const useContextStore = create<ContextStore>()(
         boundedGroups: [],
         setBoundedGroups: (groups) => set({ boundedGroups: groups }),
       }),
-      { name: 'vibex-context-store' }
+      { name: 'vibex-context-store', skipHydration: true }
     ),
     { name: 'ContextStore' }
   )

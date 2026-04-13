@@ -165,7 +165,7 @@ export const useUIStore = create<UIStore>()(
         setLeftDrawerWidth: (width) => set({ leftDrawerWidth: Math.min(400, Math.max(100, width)) }),
         setRightDrawerWidth: (width) => set({ rightDrawerWidth: Math.min(400, Math.max(100, width)) }),
       }),
-      { name: 'vibex-ui-store' }
+      { name: 'vibex-ui-store', skipHydration: true }
     ),
     { name: 'UIStore' }
   )

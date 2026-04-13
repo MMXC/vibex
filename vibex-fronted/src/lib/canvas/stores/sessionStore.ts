@@ -117,7 +117,7 @@ export const useSessionStore = create<SessionStore>()(
           set((s) => ({ prototypeQueue: s.prototypeQueue.filter((p) => p.pageId !== pageId) })),
         clearQueue: () => set({ prototypeQueue: [], projectId: null, projectName: null }),
       }),
-      { name: 'vibex-session-store' }
+      { name: 'vibex-session-store', skipHydration: true }
     ),
     { name: 'SessionStore' }
   )

@@ -327,3 +327,57 @@ export const useHistoryStore = create<HistorySlice>()((set, get) => ({
 
 /** Singleton reference for non-hook usage */
 export const getHistoryStore = () => useHistoryStore.getState();
+
+// =============================================================================
+// Type-safe helpers (avoid 'as any' in callers)
+// =============================================================================
+
+/** Narrow the union return type of undo() using the tree discriminator */
+// Catch-all overload for union tree type — must come before specific overloads
+export function getUndoResult(
+  _tree: TreeType,
+  result: BoundedContextNode[] | BusinessFlowNode[] | ComponentNode[] | null
+): BoundedContextNode[] | BusinessFlowNode[] | ComponentNode[] | null;
+export function getUndoResult(
+  tree: 'context',
+  result: BoundedContextNode[] | BusinessFlowNode[] | ComponentNode[] | null
+): BoundedContextNode[] | null;
+export function getUndoResult(
+  tree: 'flow',
+  result: BoundedContextNode[] | BusinessFlowNode[] | ComponentNode[] | null
+): BusinessFlowNode[] | null;
+export function getUndoResult(
+  tree: 'component',
+  result: BoundedContextNode[] | BusinessFlowNode[] | ComponentNode[] | null
+): ComponentNode[] | null;
+export function getUndoResult(
+  _tree: TreeType,
+  result: BoundedContextNode[] | BusinessFlowNode[] | ComponentNode[] | null
+): BoundedContextNode[] | BusinessFlowNode[] | ComponentNode[] | null {
+  return result;
+}
+
+/** Narrow the union return type of redo() using the tree discriminator */
+// Catch-all overload for union tree type — must come before specific overloads
+export function getRedoResult(
+  _tree: TreeType,
+  result: BoundedContextNode[] | BusinessFlowNode[] | ComponentNode[] | null
+): BoundedContextNode[] | BusinessFlowNode[] | ComponentNode[] | null;
+export function getRedoResult(
+  tree: 'context',
+  result: BoundedContextNode[] | BusinessFlowNode[] | ComponentNode[] | null
+): BoundedContextNode[] | null;
+export function getRedoResult(
+  tree: 'flow',
+  result: BoundedContextNode[] | BusinessFlowNode[] | ComponentNode[] | null
+): BusinessFlowNode[] | null;
+export function getRedoResult(
+  tree: 'component',
+  result: BoundedContextNode[] | BusinessFlowNode[] | ComponentNode[] | null
+): ComponentNode[] | null;
+export function getRedoResult(
+  _tree: TreeType,
+  result: BoundedContextNode[] | BusinessFlowNode[] | ComponentNode[] | null
+): BoundedContextNode[] | BusinessFlowNode[] | ComponentNode[] | null {
+  return result;
+}

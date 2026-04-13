@@ -134,6 +134,16 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   } = canvasStore;
 
   // === E3: useCanvasRenderer — memoized rects/edges/treeNodes ===
+  // === E1.6: Manual rehydration — stores have skipHydration:true, rehydrate client-side ===
+  useEffect(() => {
+    // Rehydrate all stores that have skipHydration:true to restore persisted state
+    useContextStore.persist?.rehydrate?.();
+    useFlowStore.persist?.rehydrate?.();
+    useComponentStore.persist?.rehydrate?.();
+    useUIStore.persist?.rehydrate?.();
+    useSessionStore.persist?.rehydrate?.();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const renderer = useCanvasRenderer({ contextNodes, flowNodes, componentNodes });
   const {
     contextNodeRects,

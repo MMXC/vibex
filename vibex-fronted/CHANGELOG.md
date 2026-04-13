@@ -1,5 +1,12 @@
 # Changelog
 
+### [vibex-auth-401-redirect Epic1: canvasApi 401 事件分发修复] — 2026-04-13
+- **S1.1**: canvasApi.ts `handleResponseError` — 401 时 dispatchEvent('auth:401') + window.location.href 重定向
+- **S1.2**: validateReturnTo 白名单防 open redirect（/canvas, /design, /projects, /dashboard, /auth, /）
+- **修复**: validateReturnTo 拒绝 protocol-relative URL（//evil.com bypass）
+- **测试**: validateReturnTo.test.ts — 16/16 ✅ | canvasApi-401.test.ts — browser-only skip
+- **提交**: `f3a68586`, `d7c44637`
+
 ### [vibex-canvas-context-nav Epic1+2: TabBar prototype tab + PhaseIndicator] — 2026-04-13
 - **E1-S1.1**: TabBar.tsx — 新增 prototype tab（🚀 原型），4 tabs 含 prototype，prototypeCount badge 来自 sessionStore.prototypeQueue.length
 - **E1 测试**: TabBar.test.tsx — 17/17 ✅（tabs 4个 + 6个 prototype 测试）

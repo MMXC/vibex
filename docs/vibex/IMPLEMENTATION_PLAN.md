@@ -20,9 +20,9 @@ Epic 2: 空状态提示设计 — ✅ 完成
   └─ S2.3: ComponentTreePanel 空状态（0.5h） ✅ done
 
 Epic 3: 行为验证与测试 — ✅ 完成
-  └─ S3.1: prototype tab 完全解锁验证（0.5h）
-  └─ S3.2: Tab active 状态验证（0.5h）
-  └─ S3.3: E2E 测试覆盖（1.5h）
+  └─ S3.1: prototype tab 完全解锁验证（0.5h） ✅ done
+  └─ S3.2: Tab active 状态验证（0.5h） ✅ done
+  └─ S3.3: E2E 测试覆盖（1.5h） ✅ done
 ```
 
 **总工时**: 5.5h

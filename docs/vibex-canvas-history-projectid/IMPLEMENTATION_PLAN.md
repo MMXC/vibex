@@ -381,3 +381,8 @@ useEffect(() => {
 ### Epic 1 Stories
 - [x] S1.3: useEffect([projectId]) projectId 变化自动重载 ✅（useVersionHistory.ts）
 - [x] S1.4: E2E 无 projectId 场景测试 ✅（e2e/version-history-no-project.spec.ts）
+
+### Epic 2 Stories
+- [x] S2.1: URL 参数注入 ✅（CanvasPage.tsx useEffect，Phase2 完成）
+- [x] S2.2: projectId 合法性校验 ✅（fetch /api/projects/[id]，Phase2 完成）
+- [x] S2.3: Hook 双源订阅 ✅（useEffect([projectId]) + sessionStore 订阅，Phase2 完成）

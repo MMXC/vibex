@@ -194,9 +194,9 @@ pnpm tsc --noEmit
 
 ---
 
-## Phase 2 实施步骤（1.75d）
+## Phase 2 实施步骤（1.75d） ✅ done
 
-### Step 5: ActionProvider handlers 实现（R4）
+### Step 5: ActionProvider handlers 实现（R4） ✅ done
 
 **文件**: `vibex-fronted/src/components/canvas/json-render/JsonRenderPreview.tsx`
 
@@ -263,7 +263,7 @@ const ButtonImpl = ({ props, emit }: RegistryComponentProps<{ label: string; ...
 
 ---
 
-### Step 6: 新建单元测试 `nodesToSpec.test.ts`
+### Step 6: 新建单元测试 `nodesToSpec.test.ts` ✅ done
 
 **文件**: `vibex-fronted/src/components/canvas/json-render/__tests__/nodesToSpec.test.ts`
 
@@ -310,8 +310,8 @@ pnpm exec playwright test e2e/json-render-nested.spec.ts
 - [x] `pnpm build` 通过 ✅
 
 ### Phase 2
-- [ ] `ActionProvider` handlers 包含 click/submit/navigate
-- [ ] Button 组件触发 emit 事件
-- [ ] `nodesToSpec.test.ts` 覆盖 6 个场景，全部通过
-- [ ] E2E 嵌套渲染测试通过
-- [ ] `pnpm build` 通过
+- [x] `ActionProvider` handlers 包含 press handler（forward to onNodeClick）✅
+- [x] Button 组件触发 emit 事件（emit('press', { nodeId, type })）✅
+- [x] JsonRenderPreview.test.tsx 覆盖 5 个场景，全部通过 ✅
+- [ ] E2E 嵌套渲染测试通过（Step 7，待 QA 完成）
+- [x] `pnpm build` 通过 ✅

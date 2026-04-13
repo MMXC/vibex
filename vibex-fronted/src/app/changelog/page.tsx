@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.214',
+    date: '2026-04-13',
+    changes: [
+      '📋 vibex-auth-401-redirect Epic3: LeftDrawer 401 兜底',
+      '✅ LeftDrawer: 3层 401 兜底架构（Layer1-3）',
+      '✅ auth-redirect.spec.ts: E2E returnTo 安全验证',
+      '提交: 6b1683be, 23476571',
+    ],
+    commit: '23476571',
+  },
+
+  {
     version: '1.0.212',
     date: '2026-04-13',
     changes: [

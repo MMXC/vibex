@@ -49,7 +49,20 @@
       "sunset"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "12px",
+      "background": "#fff0c2",
+      "textColor": "#1f1f1f"
+    },
+    "Card": {
+      "borderRadius": "12px"
+    },
+    "Input": {
+      "borderRadius": "6px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -96,6 +109,7 @@
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "12px",
         "primaryColor": "#fa520f"
       }
     },
@@ -105,16 +119,30 @@
       "description": "按钮",
       "styleOverrides": {
         "borderRadius": "8px",
-        "paddingX": "16px",
-        "background": "#fa520f"
+        "paddingX": "12px",
+        "background": "#fff0c2"
       },
       "tokens": {
-        "primaryColor": "#fa520f"
+        "primaryColor": "#fa520f",
+        "borderRadius": "8px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "6px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "borderColor": "#e5e7eb",
+        "textColor": "#1f1f1f"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:48.998Z",
+    "generatedAt": "2026-04-13T20:56:38.166Z",
     "designMdPath": "design-md/mistral.ai/DESIGN.md"
   }
 }

@@ -49,7 +49,20 @@
       "liga"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "16px",
+      "background": "#6a6b6c",
+      "textColor": "#6a6b6c"
+    },
+    "Card": {
+      "borderRadius": "12px"
+    },
+    "Input": {
+      "borderRadius": "6px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -96,6 +109,7 @@
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "12px",
         "primaryColor": "#ffffff"
       }
     },
@@ -106,15 +120,29 @@
       "styleOverrides": {
         "borderRadius": "8px",
         "paddingX": "16px",
+        "background": "#6a6b6c"
+      },
+      "tokens": {
+        "primaryColor": "#ffffff",
+        "borderRadius": "8px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "6px",
         "background": "#ffffff"
       },
       "tokens": {
-        "primaryColor": "#ffffff"
+        "borderColor": "#252829",
+        "textColor": "#07080a"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:49.014Z",
+    "generatedAt": "2026-04-13T20:56:38.171Z",
     "designMdPath": "design-md/raycast/DESIGN.md"
   }
 }

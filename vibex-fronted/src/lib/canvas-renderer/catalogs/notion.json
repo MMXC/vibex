@@ -52,7 +52,22 @@
       "lnum"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "4px",
+      "paddingX": "8px",
+      "background": "#0075de",
+      "textColor": "#ffffff"
+    },
+    "Card": {
+      "borderRadius": "12px",
+      "shadow": "rgba(0,0,0,0.04) 0px 4px 18px, rgba(0,0,0,0.027) 0px 2.025px 7.84688px, rgba(0,0,0,0.02) 0px 0.8px 2.925px, rgba(0,0,0,0.01) 0px 0.175px 1.04062px"
+    },
+    "Input": {
+      "borderRadius": "4px",
+      "background": "#ffffff"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -99,6 +114,7 @@
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "12px",
         "primaryColor": "#ffffff"
       }
     },
@@ -107,17 +123,31 @@
       "catalogType": "Button",
       "description": "按钮",
       "styleOverrides": {
-        "borderRadius": "8px",
-        "paddingX": "16px",
+        "borderRadius": "4px",
+        "paddingX": "8px",
+        "background": "#0075de"
+      },
+      "tokens": {
+        "primaryColor": "#ffffff",
+        "borderRadius": "4px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "4px",
         "background": "#ffffff"
       },
       "tokens": {
-        "primaryColor": "#ffffff"
+        "borderColor": "#e5e7eb",
+        "textColor": "#31302e"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:49.002Z",
+    "generatedAt": "2026-04-13T20:56:38.168Z",
     "designMdPath": "design-md/notion/DESIGN.md"
   }
 }

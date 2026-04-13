@@ -48,7 +48,17 @@
       "elevated"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "9999px",
+      "paddingX": "8px",
+      "background": "#0f0f0f",
+      "textColor": "#fafafa"
+    },
+    "Card": {
+      "borderRadius": "8px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -90,11 +100,12 @@
       "catalogType": "Card",
       "description": "卡片容器",
       "styleOverrides": {
-        "borderRadius": "12px",
+        "borderRadius": "8px",
         "padding": "16px",
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "8px",
         "primaryColor": "#3ecf8e"
       }
     },
@@ -103,17 +114,18 @@
       "catalogType": "Button",
       "description": "按钮",
       "styleOverrides": {
-        "borderRadius": "8px",
-        "paddingX": "16px",
-        "background": "#3ecf8e"
+        "borderRadius": "9999px",
+        "paddingX": "8px",
+        "background": "#0f0f0f"
       },
       "tokens": {
-        "primaryColor": "#3ecf8e"
+        "primaryColor": "#3ecf8e",
+        "borderRadius": "9999px"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:49.031Z",
+    "generatedAt": "2026-04-13T20:56:38.177Z",
     "designMdPath": "design-md/supabase/DESIGN.md"
   }
 }

@@ -43,7 +43,18 @@
     "headingSize": "40px",
     "bodySize": "18px"
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "16px"
+    },
+    "Card": {
+      "borderRadius": "12px"
+    },
+    "Input": {
+      "borderRadius": "6px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -90,6 +101,7 @@
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "12px",
         "primaryColor": "#181d26"
       }
     },
@@ -103,12 +115,26 @@
         "background": "#181d26"
       },
       "tokens": {
-        "primaryColor": "#181d26"
+        "primaryColor": "#181d26",
+        "borderRadius": "8px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "6px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "borderColor": "#e0e2e6",
+        "textColor": "#181d26"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:48.964Z",
+    "generatedAt": "2026-04-13T20:56:38.151Z",
     "designMdPath": "design-md/airtable/DESIGN.md"
   }
 }

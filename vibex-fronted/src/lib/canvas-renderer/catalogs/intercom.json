@@ -46,7 +46,17 @@
       "growing"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "4px",
+      "paddingX": "14px",
+      "background": "#111111",
+      "textColor": "#ffffff"
+    },
+    "Card": {
+      "borderRadius": "8px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -88,11 +98,12 @@
       "catalogType": "Card",
       "description": "卡片容器",
       "styleOverrides": {
-        "borderRadius": "12px",
+        "borderRadius": "8px",
         "padding": "16px",
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "8px",
         "primaryColor": "#111111"
       }
     },
@@ -101,17 +112,18 @@
       "catalogType": "Button",
       "description": "按钮",
       "styleOverrides": {
-        "borderRadius": "8px",
-        "paddingX": "16px",
+        "borderRadius": "4px",
+        "paddingX": "14px",
         "background": "#111111"
       },
       "tokens": {
-        "primaryColor": "#111111"
+        "primaryColor": "#111111",
+        "borderRadius": "4px"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:48.989Z",
+    "generatedAt": "2026-04-13T20:56:38.162Z",
     "designMdPath": "design-md/intercom/DESIGN.md"
   }
 }

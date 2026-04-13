@@ -51,7 +51,18 @@
       "calt"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "9999px",
+      "paddingX": "5px",
+      "background": "#9fe870",
+      "textColor": "#163300"
+    },
+    "Card": {
+      "borderRadius": "16px",
+      "shadow": "rgba(14,15,12,0.12) 0px 0px 0px 1px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -93,11 +104,12 @@
       "catalogType": "Card",
       "description": "卡片容器",
       "styleOverrides": {
-        "borderRadius": "12px",
+        "borderRadius": "16px",
         "padding": "16px",
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "16px",
         "primaryColor": "#0e0f0c"
       }
     },
@@ -106,17 +118,18 @@
       "catalogType": "Button",
       "description": "按钮",
       "styleOverrides": {
-        "borderRadius": "8px",
-        "paddingX": "16px",
-        "background": "#0e0f0c"
+        "borderRadius": "9999px",
+        "paddingX": "5px",
+        "background": "#9fe870"
       },
       "tokens": {
-        "primaryColor": "#0e0f0c"
+        "primaryColor": "#0e0f0c",
+        "borderRadius": "9999px"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:49.037Z",
+    "generatedAt": "2026-04-13T20:56:38.181Z",
     "designMdPath": "design-md/wise/DESIGN.md"
   }
 }

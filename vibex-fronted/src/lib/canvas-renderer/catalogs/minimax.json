@@ -47,7 +47,14 @@
       "chapters"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "11px",
+      "background": "#181e25",
+      "textColor": "#ffffff"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -103,16 +110,17 @@
       "description": "按钮",
       "styleOverrides": {
         "borderRadius": "8px",
-        "paddingX": "16px",
-        "background": "#1456f0"
+        "paddingX": "11px",
+        "background": "#181e25"
       },
       "tokens": {
-        "primaryColor": "#1456f0"
+        "primaryColor": "#1456f0",
+        "borderRadius": "8px"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:48.994Z",
+    "generatedAt": "2026-04-13T20:56:38.164Z",
     "designMdPath": "design-md/minimax/DESIGN.md"
   }
 }

@@ -45,7 +45,19 @@
       "feel"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "0px",
+      "paddingX": "16px",
+      "textColor": "#000000"
+    },
+    "Card": {
+      "borderRadius": "12px"
+    },
+    "Input": {
+      "borderRadius": "6px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -92,6 +104,7 @@
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "12px",
         "primaryColor": "#FFC000"
       }
     },
@@ -100,17 +113,31 @@
       "catalogType": "Button",
       "description": "按钮",
       "styleOverrides": {
-        "borderRadius": "8px",
+        "borderRadius": "0px",
         "paddingX": "16px",
         "background": "#FFC000"
       },
       "tokens": {
-        "primaryColor": "#FFC000"
+        "primaryColor": "#FFC000",
+        "borderRadius": "0px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "6px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "borderColor": "#e5e7eb",
+        "textColor": "#000000"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:48.990Z",
+    "generatedAt": "2026-04-13T20:56:38.163Z",
     "designMdPath": "design-md/lamborghini/DESIGN.md"
   }
 }

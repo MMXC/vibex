@@ -48,7 +48,22 @@
       "pop"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "13px",
+      "paddingX": "8px",
+      "background": "#79628c",
+      "textColor": "#ffffff"
+    },
+    "Card": {
+      "borderRadius": "8px",
+      "shadow": "rgba(0, 0, 0, 0.1) 0px 10px 15px -3px"
+    },
+    "Input": {
+      "borderRadius": "6px",
+      "background": "#ffffff"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -90,11 +105,12 @@
       "catalogType": "Card",
       "description": "卡片容器",
       "styleOverrides": {
-        "borderRadius": "12px",
+        "borderRadius": "8px",
         "padding": "16px",
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "8px",
         "primaryColor": "#1f1633"
       }
     },
@@ -103,17 +119,31 @@
       "catalogType": "Button",
       "description": "按钮",
       "styleOverrides": {
-        "borderRadius": "8px",
-        "paddingX": "16px",
-        "background": "#1f1633"
+        "borderRadius": "13px",
+        "paddingX": "8px",
+        "background": "#79628c"
       },
       "tokens": {
-        "primaryColor": "#1f1633"
+        "primaryColor": "#1f1633",
+        "borderRadius": "13px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "6px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "borderColor": "#362d59",
+        "textColor": "#1f1633"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:49.024Z",
+    "generatedAt": "2026-04-13T20:56:38.175Z",
     "designMdPath": "design-md/sentry/DESIGN.md"
   }
 }

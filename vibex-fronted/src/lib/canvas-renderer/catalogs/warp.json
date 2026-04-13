@@ -45,7 +45,19 @@
     "fontFamilyMono": "Geist Mono",
     "letterSpacing": "2.4px"
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "16px",
+      "background": "#afaeac"
+    },
+    "Card": {
+      "borderRadius": "12px"
+    },
+    "Input": {
+      "borderRadius": "6px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -92,6 +104,7 @@
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "12px",
         "primaryColor": "#faf9f6"
       }
     },
@@ -102,15 +115,29 @@
       "styleOverrides": {
         "borderRadius": "8px",
         "paddingX": "16px",
-        "background": "#faf9f6"
+        "background": "#afaeac"
       },
       "tokens": {
-        "primaryColor": "#faf9f6"
+        "primaryColor": "#faf9f6",
+        "borderRadius": "8px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "6px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "borderColor": "#e5e7eb",
+        "textColor": "#353534"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:49.036Z",
+    "generatedAt": "2026-04-13T20:56:38.181Z",
     "designMdPath": "design-md/warp/DESIGN.md"
   }
 }

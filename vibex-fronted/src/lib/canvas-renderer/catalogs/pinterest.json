@@ -45,7 +45,21 @@
     "headingSize": "28px",
     "bodySize": "16px"
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "16px",
+      "paddingX": "6px",
+      "background": "#e60023",
+      "textColor": "#000000"
+    },
+    "Card": {
+      "borderRadius": "12px"
+    },
+    "Input": {
+      "borderRadius": "6px",
+      "background": "#91918c"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -92,6 +106,7 @@
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "12px",
         "primaryColor": "#e60023"
       }
     },
@@ -100,17 +115,31 @@
       "catalogType": "Button",
       "description": "按钮",
       "styleOverrides": {
-        "borderRadius": "8px",
-        "paddingX": "16px",
+        "borderRadius": "16px",
+        "paddingX": "6px",
         "background": "#e60023"
       },
       "tokens": {
-        "primaryColor": "#e60023"
+        "primaryColor": "#e60023",
+        "borderRadius": "16px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "6px",
+        "background": "#91918c"
+      },
+      "tokens": {
+        "borderColor": "#c8c8c1",
+        "textColor": "#211922"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:49.009Z",
+    "generatedAt": "2026-04-13T20:56:38.170Z",
     "designMdPath": "design-md/pinterest/DESIGN.md"
   }
 }

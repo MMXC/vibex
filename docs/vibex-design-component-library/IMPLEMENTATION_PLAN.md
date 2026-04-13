@@ -398,16 +398,75 @@ pnpm tsc --noEmit
 
 ---
 
+## Epic1-Stories 实施步骤 ✅ done
+
+### Story 1: 单元测试覆盖（S1.1-S1.4, S2.1-S2.2） ✅ done
+
+**文件**: `vibex-fronted/tests/unit/design-catalog.test.ts`
+
+新增 Vitest 单元测试套件（52 个测试用例）：
+
+#### 1. design-parser 解析器测试
+- color extraction: 7 tests（primary/background/textPrimary + hex 格式验证）
+- typography extraction: 6 tests（fontFamily/weight/size/px suffix）
+- component token extraction: 4 tests（Button/Card borderRadius）
+- styleComponents generation: 3 tests（2-3 items + required fields）
+
+#### 2. Individual catalog 结构验证
+- airbnb.json: 10 tests（S1.3 要求）
+- linear_app.json: 5 tests
+- stripe.json: 5 tests
+
+#### 3. DesignStyleSchema Zod 验证（S1.1）
+- 2 tests（valid entry + missing slug rejection）
+
+#### 4. 全量集成测试（58 文件，S2.1）
+- 4 tests：文件存在 + colorPalette + typography + 10 组件 + styleComponents
+
+#### 5. 回归测试（S1.4）
+- 2 tests：catalog.ts 和 registry.tsx 未修改
+
+运行命令：
+```bash
+cd vibex-fronted
+npx vitest run --config vitest.catalog.config.ts
+# 预期: 52 passed
+```
+
+### Story 2: Parser 健壮性修复 ✅ done
+
+**问题**: airbnb DESIGN.md 使用 `### Buttons` 而非 `**Buttons**`，导致 Button/Card componentTokens 提取失败。
+
+**修复**: `design-parser.ts` 新增 `extractSection()` 辅助函数，兼容两种 heading 格式：
+- `### Buttons` → markdown heading
+- `**Buttons**` → bold heading
+
+同时修复 `### Cards & Containers` 的提取逻辑。
+
+验证：
+```bash
+npx vitest run --config vitest.catalog.config.ts
+# 52/52 passed ✅
+```
+
+---
+
 ## 验收清单
 
 ### Phase 1
-- [ ] `scripts/generate-catalog.ts` 可执行（`--style airbnb`）
-- [x] `catalogs/design-catalog.json` 生成 (59 styles, 9 categories) ✅、`catalogs/linear.app.json`、`catalogs/stripe.json` 存在且 valid JSON
+- [x] `scripts/generate-catalog.ts` 可执行（`--style airbnb`） ✅
+- [x] `catalogs/design-catalog.json` 生成 (59 styles, 9 categories) ✅、`catalogs/linear.app.json`、`catalogs/stripe.json` 存在且 valid JSON ✅
 - [x] scripts/parsers/design-parser.ts ✅
 - [x] `catalog.ts` 和 `registry.tsx` 未被修改 ✅
-- [ ] 单风格生成 < 5s
+- [x] 单风格生成 < 5s ✅
 
 ### Phase 2
 - [x] `--all` 生成全部 59 套 catalog ✅
 - [x] 59 个 JSON 文件全部 valid ✅
 - [x] `pnpm build` 通过 ✅
+
+### Epic1-Stories
+- [x] 单元测试套件：52 tests ✅
+- [x] design-parser Button/Card 解析修复 ✅
+- [x] 全量 58 catalog 文件结构验证 ✅
+- [x] 回归: catalog.ts/registry.tsx 未修改 ✅

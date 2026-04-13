@@ -52,8 +52,18 @@
     ]
   },
   "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "12px",
+      "background": "#ffffff",
+      "textColor": "#1c2024"
+    },
     "Card": {
       "borderRadius": "12px"
+    },
+    "Input": {
+      "borderRadius": "6px",
+      "background": "#ffffff"
     }
   },
   "catalog": {
@@ -112,16 +122,30 @@
       "description": "按钮",
       "styleOverrides": {
         "borderRadius": "8px",
-        "paddingX": "16px",
-        "background": "#000000"
+        "paddingX": "12px",
+        "background": "#ffffff"
       },
       "tokens": {
-        "primaryColor": "#000000"
+        "primaryColor": "#000000",
+        "borderRadius": "8px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "6px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "borderColor": "#e0e1e6",
+        "textColor": "#1c2024"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:48.982Z",
+    "generatedAt": "2026-04-13T20:56:38.158Z",
     "designMdPath": "design-md/expo/DESIGN.md"
   }
 }

@@ -51,7 +51,20 @@
       "claude"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "10px",
+      "background": "#e5e5e5",
+      "textColor": "#262626"
+    },
+    "Card": {
+      "borderRadius": "12px"
+    },
+    "Input": {
+      "borderRadius": "6px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -98,6 +111,7 @@
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "12px",
         "primaryColor": "#000000"
       }
     },
@@ -107,16 +121,30 @@
       "description": "按钮",
       "styleOverrides": {
         "borderRadius": "8px",
-        "paddingX": "16px",
-        "background": "#000000"
+        "paddingX": "10px",
+        "background": "#e5e5e5"
       },
       "tokens": {
-        "primaryColor": "#000000"
+        "primaryColor": "#000000",
+        "borderRadius": "8px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "6px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "borderColor": "#d4d4d4",
+        "textColor": "#262626"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:49.006Z",
+    "generatedAt": "2026-04-13T20:56:38.169Z",
     "designMdPath": "design-md/ollama/DESIGN.md"
   }
 }

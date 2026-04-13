@@ -46,7 +46,20 @@
       "off"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "16px",
+      "background": "#292827",
+      "textColor": "#714cb6"
+    },
+    "Card": {
+      "borderRadius": "12px"
+    },
+    "Input": {
+      "borderRadius": "6px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -93,6 +106,7 @@
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "12px",
         "primaryColor": "#1b1938"
       }
     },
@@ -103,15 +117,29 @@
       "styleOverrides": {
         "borderRadius": "8px",
         "paddingX": "16px",
-        "background": "#1b1938"
+        "background": "#292827"
       },
       "tokens": {
-        "primaryColor": "#1b1938"
+        "primaryColor": "#1b1938",
+        "borderRadius": "8px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "6px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "borderColor": "#dcd7d3",
+        "textColor": "#1b1938"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:49.032Z",
+    "generatedAt": "2026-04-13T20:56:38.177Z",
     "designMdPath": "design-md/superhuman/DESIGN.md"
   }
 }

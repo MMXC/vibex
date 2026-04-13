@@ -43,7 +43,18 @@
     "headingSize": "24px",
     "bodySize": "16px"
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "4px",
+      "paddingX": "4px",
+      "background": "#201d1d",
+      "textColor": "#fdfcfc"
+    },
+    "Input": {
+      "borderRadius": "6px",
+      "background": "#f8f7f7"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -98,17 +109,31 @@
       "catalogType": "Button",
       "description": "按钮",
       "styleOverrides": {
-        "borderRadius": "8px",
-        "paddingX": "16px",
+        "borderRadius": "4px",
+        "paddingX": "4px",
         "background": "#201d1d"
       },
       "tokens": {
-        "primaryColor": "#201d1d"
+        "primaryColor": "#201d1d",
+        "borderRadius": "4px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "6px",
+        "background": "#f8f7f7"
+      },
+      "tokens": {
+        "borderColor": "#646262",
+        "textColor": "#201d1d"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:49.008Z",
+    "generatedAt": "2026-04-13T20:56:38.169Z",
     "designMdPath": "design-md/opencode.ai/DESIGN.md"
   }
 }

@@ -51,7 +51,17 @@
       "together"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "16px",
+      "background": "#010120",
+      "textColor": "#ffffff"
+    },
+    "Card": {
+      "borderRadius": "12px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -98,6 +108,7 @@
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "12px",
         "primaryColor": "#ef2cc1"
       }
     },
@@ -108,15 +119,16 @@
       "styleOverrides": {
         "borderRadius": "8px",
         "paddingX": "16px",
-        "background": "#ef2cc1"
+        "background": "#010120"
       },
       "tokens": {
-        "primaryColor": "#ef2cc1"
+        "primaryColor": "#ef2cc1",
+        "borderRadius": "8px"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:49.033Z",
+    "generatedAt": "2026-04-13T20:56:38.178Z",
     "designMdPath": "design-md/together.ai/DESIGN.md"
   }
 }

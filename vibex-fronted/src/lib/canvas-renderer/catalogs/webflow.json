@@ -44,7 +44,16 @@
     "headingSize": "56px",
     "bodySize": "20px"
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "16px",
+      "textColor": "#080808"
+    },
+    "Card": {
+      "borderRadius": "12px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -91,6 +100,7 @@
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "12px",
         "primaryColor": "#080808"
       }
     },
@@ -104,12 +114,13 @@
         "background": "#080808"
       },
       "tokens": {
-        "primaryColor": "#080808"
+        "primaryColor": "#080808",
+        "borderRadius": "8px"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:49.036Z",
+    "generatedAt": "2026-04-13T20:56:38.181Z",
     "designMdPath": "design-md/webflow/DESIGN.md"
   }
 }

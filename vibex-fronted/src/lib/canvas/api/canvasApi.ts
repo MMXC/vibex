@@ -150,6 +150,9 @@ function handleResponseError(res: Response, defaultMsg: string): never {
     }
     throw new Error('登录已过期，请重新登录');
   }
+  if (res.status === 404) {
+    throw new Error('历史功能维护中，请稍后再试');
+  }
   const err = res.json().catch(() => ({ error: `HTTP ${res.status}` }));
   throw new Error((err as { error?: string }).error ?? defaultMsg);
 }

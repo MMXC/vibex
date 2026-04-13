@@ -5,7 +5,7 @@ import { vi } from 'vitest';
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TabBar } from './TabBar';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
@@ -98,32 +98,31 @@ describe('TabBar', () => {
     expect(onTabChange).toHaveBeenCalledWith('flow');
   });
 
-  it('blocks flow tab when phase is input', async () => {
-    const user = userEvent.setup();
+  // S1.1: accessibility — no tab is disabled regardless of phase
+  it('S1.1: no tab is disabled regardless of phase', async () => {
+    useContextStore.setState({ activeTree: 'context', phase: 'input' });
+    render(<TabBar />);
+    const tabs = screen.getAllByRole('tab');
+    // All tabs accessible — no locked behavior
+    tabs.forEach((tab) => {
+      expect(tab).not.toHaveAttribute('aria-disabled', 'true');
+      expect(tab).not.toHaveAttribute('disabled');
+    });
+  });
+
+  it('S1.1: clicking any tab works regardless of current phase', async () => {
     useContextStore.setState({ activeTree: 'context', phase: 'input' });
     render(<TabBar />);
     const tabs = screen.getAllByRole('tab');
 
-    // "流程" tab (index 1) should be locked
-    expect(tabs[1]).toHaveAttribute('aria-disabled', 'true');
+    // Flow tab (index 1) should have aria-selected=false before click
+    expect(tabs[1]).toHaveAttribute('aria-selected', 'false');
 
-    await user.click(tabs[1]);
-    // activeTree should NOT change
-    expect(useContextStore.getState().activeTree).toBe('context');
-  });
+    // Click flow tab (should work even when phase='input' — no locked behavior)
+    await act(async () => { fireEvent.click(tabs[1]); });
 
-  it('blocks component tab when phase is context', async () => {
-    const user = userEvent.setup();
-    useContextStore.setState({ activeTree: 'context', phase: 'context' });
-    render(<TabBar />);
-    const tabs = screen.getAllByRole('tab');
-
-    // "组件" tab (index 2) should be locked
-    expect(tabs[2]).toHaveAttribute('aria-disabled', 'true');
-
-    await user.click(tabs[2]);
-    // activeTree should NOT change
-    expect(useContextStore.getState().activeTree).toBe('context');
+    // After click, flow tab should be selected
+    expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
   });
 
   // --- Epic1 prototype tab tests ---

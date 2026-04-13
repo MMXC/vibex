@@ -51,12 +51,7 @@ export function TabBar({ onTabChange }: TabBarProps) {
       setActiveTree(null);
       return;
     }
-    // Guard: only allow selecting 'flow' tab when phase >= 'flow'
-    const tabIdx = PHASE_ORDER.indexOf(tabId as Phase);
-    if (tabIdx > phaseIdx) {
-      // Tab not yet unlocked by phase — do nothing
-      return;
-    }
+    // S1.1 accessibility: no locked/guard — all tabs always clickable
     setActiveTree(tabId as TreeType);
     onTabChange?.(tabId as TreeType);
   };
@@ -64,8 +59,6 @@ export function TabBar({ onTabChange }: TabBarProps) {
   return (
     <div className={styles.tabBar} role="tablist" aria-label="三树切换">
       {TABS.map((tab) => {
-        const tabIdx = PHASE_ORDER.indexOf(tab.id as Phase);
-        const isLocked = tab.id !== 'prototype' && tabIdx > phaseIdx;
         const isActive =
           tab.id === 'prototype'
             ? phase === 'prototype'
@@ -84,11 +77,9 @@ export function TabBar({ onTabChange }: TabBarProps) {
             key={tab.id}
             role="tab"
             aria-selected={isActive}
-            aria-disabled={isLocked}
-            disabled={isLocked}
-            className={`${styles.tab} ${isActive ? styles.tabActive : ''} ${isLocked ? styles.tabLocked : ''}`}
+            className={`${styles.tab} ${isActive ? styles.tabActive : ''}`}
             onClick={() => handleTabClick(tab.id)}
-            title={isLocked ? `需先完成上一阶段` : `切换到 ${tab.label} 树`}
+            title={`切换到 ${tab.label} 树`}
           >
             <span className={styles.tabEmoji}>{tab.emoji}</span>
             <span className={styles.tabLabel}>{tab.label}</span>

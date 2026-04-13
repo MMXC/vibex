@@ -633,16 +633,39 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                   <button
                     key={t}
                     role="tab"
-                    aria-selected={activeTab === t}
-                    className={`${styles.tabButton} ${activeTab === t ? styles.tabButtonActive : ''}`}
-                    onClick={() => setActiveTab(t)}
+                    aria-selected={phase === t}
+                    className={`${styles.tabButton} ${phase === t ? styles.tabButtonActive : ''}`}
+                    onClick={() => {
+                      if (t === 'context') { setPhase('context'); setActiveTree('context'); }
+                      else if (t === 'flow') { setPhase('flow'); setActiveTree('flow'); }
+                      else { setPhase('component'); setActiveTree('component'); }
+                    }}
                   >
                     {t === 'context' ? '◇ 上下文' : t === 'flow' ? '→ 流程' : '▣ 组件'}
                   </button>
                 ))}
+                <button
+                  key="prototype"
+                  role="tab"
+                  // @ts-ignore - prototype is valid Phase but useCanvasStore type literal missing it
+                  aria-selected={phase === 'prototype'}
+                  // @ts-ignore
+                  className={`${styles.tabButton} ${phase === 'prototype' ? styles.tabButtonActive : ''}`}
+                  onClick={() => { setPhase('prototype'); setActiveTree('component'); }}
+                >
+                  ⚡ 原型
+                </button>
               </div>
               <div className={styles.tabContent} role="tabpanel">
-                {renderTabContent(
+                {/* @ts-ignore */}
+                {phase === 'prototype' ? (
+                  <div className={styles.prototypePhase}>
+                    <PrototypeQueuePanel
+                      expanded={queuePanelExpanded}
+                      onToggleExpand={() => setQueuePanelExpanded(!queuePanelExpanded)}
+                    />
+                  </div>
+                ) : renderTabContent(
                   activeTab,
                   activeTab === 'context' ? contextTreeNodes : activeTab === 'flow' ? flowTreeNodes : componentTreeNodes,
                   activeTab === 'context' ? contextActive : activeTab === 'flow' ? flowActive : componentActive

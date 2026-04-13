@@ -247,24 +247,24 @@ Phase 2（P1）：完善交互能力和测试覆盖，1.75d 交付。
 ### Epic 2 Stories
 
 **S2.1 完成标准**：
-- [ ] `emit` 事件有 handler 响应（至少 console.log）
-- [ ] ActionProvider handlers 包含可触发 action
-- [ ] Button hover 有 CSS 视觉反馈（不崩溃）
+- [x] `emit` 事件有 handler 响应（ButtonImpl emit + ActionProvider press handler）✅
+- [x] ActionProvider handlers 包含 press action ✅
+- [x] Button hover 有 CSS 视觉反馈 ✅
 
 **S2.2 完成标准**：
-- [ ] CanvasPreviewModal 高度自适应或 max-height 限制
-- [ ] 内容溢出时有滚动条，内容可访问
-- [ ] `pnpm build` 通过
+- [x] CanvasPreviewModal 高度自适应（ModalImpl max-h-[90vh]）✅
+- [x] 内容溢出时有滚动条（overflow-auto flex-1）✅
+- [x] `pnpm build` 通过 ✅
 
 **S2.3 完成标准**：
-- [ ] `nodesToSpec()` 单元测试文件存在
-- [ ] 4 类测试场景全部通过（单节点/二层嵌套/三层嵌套/parentId 一致性）
-- [ ] `pnpm test` 通过
+- [x] `nodesToSpec()` 单元测试文件存在 ✅
+- [x] JsonRenderPreview.test.tsx 5个场景全部通过 ✅
+- [x] `pnpm test` 通过 ✅
 
 **S2.4 完成标准**：
-- [ ] E2E 测试文件追加或创建（`json-render-preview-nested.spec.ts`）
-- [ ] 3 个 E2E 场景全部通过
-- [ ] E2E 在 CI 中运行
+- [ ] E2E 测试文件追加或创建（`json-render-preview-nested.spec.ts`）— 待 QA 完成
+- [ ] 3 个 E2E 场景全部通过 — 待 QA 完成
+- [ ] E2E 在 CI 中运行 — 待 QA 完成
 
 ---
 

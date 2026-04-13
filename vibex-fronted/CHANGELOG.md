@@ -1,5 +1,13 @@
 # Changelog
 
+### [vibex-auth-401-redirect Epic2: AuthProvider 挂载与全局监听] — 2026-04-13
+- **S2.1**: ClientLayout.tsx — 'use client' wrapper，在根 layout 下挂载 AuthProvider
+- **S2.1**: AuthProvider.tsx — useEffect 监听 'auth:401' 事件，触发 sessionStore.logout() 清除状态
+- **S2.1**: layout.tsx — 在 AppErrorBoundary 内包装 ClientLayout
+- **S2.2**: sessionStore.ts — 添加 logout() 清除 projectId/projectName/sseStatus/messages/prototypeQueue
+- **测试**: sessionStore logout 5/5 ✅ | pnpm tsc --noEmit ✅
+- **提交**: `454b2694`, `af53c435`
+
 ### [vibex-auth-401-redirect Epic1: canvasApi 401 事件分发修复] — 2026-04-13
 - **S1.1**: canvasApi.ts `handleResponseError` — 401 时 dispatchEvent('auth:401') + window.location.href 重定向
 - **S1.2**: validateReturnTo 白名单防 open redirect（/canvas, /design, /projects, /dashboard, /auth, /）

@@ -1,5 +1,12 @@
 # Changelog
 
+### [vibex-json-render-integration Epic1 Phase1 P0: catalog slots + nodesToSpec + Registry 修复] — 2026-04-14
+- **catalog.ts**: 5个容器组件 (Page/Form/DataTable/DetailView/Modal) 添加 slots: ['default']
+- **JsonRenderPreview.tsx**: nodesToSpec 使用 parentId 建立嵌套关系
+- **JsonRenderPreview.tsx**: COMPONENT_TYPE_MAP 添加 button:'Button'
+- **registry.tsx**: PageImpl min-h-full + flex 布局，ModalImpl 支持 children + close button
+- **提交**: `497f4e76`
+
 ### [vibex-canvas-history-projectid Epic2: Phase2 URL 注入 projectId] — 2026-04-14
 - **S2.1**: CanvasPage.tsx — mount useEffect 从 URL ?projectId= 注入 sessionStore
 - **S2.2**: 合法性校验: GET /api/projects/[id]，404→toast 提示→setProjectId(null)

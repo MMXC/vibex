@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.216',
+    date: '2026-04-14',
+    changes: [
+      '📋 vibex-json-render-integration Epic1 Phase1 P0: catalog slots + nodesToSpec + Registry 修复',
+      '✅ catalog.ts: 5个容器组件添加 slots: [default]',
+      '✅ JsonRenderPreview: nodesToSpec 使用 parentId 建立嵌套关系',
+      '✅ registry.tsx: PageImpl min-h-full + ModalImpl children + close button',
+      '提交: 497f4e76',
+    ],
+    commit: '497f4e76',
+  },
+
+  {
     version: '1.0.215',
     date: '2026-04-14',
     changes: [

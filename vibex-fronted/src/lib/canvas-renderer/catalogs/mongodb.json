@@ -1,77 +1,113 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.929Z",
-  "sourcePath": "design-md/mongodb/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "开发工具": [
-      "mongodb"
-    ]
+  "version": "1.0",
+  "style": "mongodb",
+  "displayName": "MongoDB",
+  "styleZh": "MongoDB",
+  "tags": [
+    "数据库",
+    "NoSQL"
+  ],
+  "styleKeywords": [
+    "数据库",
+    "NoSQL",
+    "文档数据库",
+    "绿色技术品牌"
+  ],
+  "useCases": [
+    "开发者官网",
+    "文档站",
+    "控制台后台"
+  ],
+  "bestFor": [
+    "开发者官网",
+    "文档站",
+    "控制台后台"
+  ],
+  "avoidFor": [
+    "强娱乐化内容页",
+    "情绪导向的品牌叙事页"
+  ],
+  "positioningZh": "重视结构清晰、可读性和文档感，适合开发者和 B 端产品。",
+  "colorPalette": {
+    "primary": "#001e2b",
+    "background": "#ffffff",
+    "textPrimary": "#001e2b",
+    "primaryHover": "#3860be"
   },
-  "styles": [
-    {
-      "slug": "mongodb",
-      "name": "mongodb",
-      "displayName": "MongoDB",
-      "nameZh": "MongoDB",
-      "group": "reference",
-      "summaryZh": "文档数据库，绿色技术品牌",
-      "category": "开发工具",
-      "tagsZh": [
-        "数据库",
-        "NoSQL"
-      ],
-      "styleKeywords": [
-        "数据库",
-        "NoSQL",
-        "文档数据库",
-        "绿色技术品牌"
-      ],
-      "aliases": [
-        "mongodb",
-        "MongoDB",
-        "数据库",
-        "NoSQL"
-      ],
-      "useCases": [
-        "开发者官网",
-        "文档站",
-        "控制台后台"
-      ],
-      "previewLight": "design-md/mongodb/preview.html",
-      "previewDark": "design-md/mongodb/preview-dark.html",
-      "readmePath": "design-md/mongodb/README.md",
-      "designPath": "design-md/mongodb/DESIGN.md",
-      "positioningZh": "重视结构清晰、可读性和文档感，适合开发者和 B 端产品。",
-      "bestFor": [
-        "开发者官网",
-        "文档站",
-        "控制台后台"
-      ],
-      "avoidFor": [
-        "强娱乐化内容页",
-        "情绪导向的品牌叙事页"
-      ],
-      "aiChecklist": [
-        "保证标题层级明确",
-        "让按钮和代码区块保持克制",
-        "优先确保信息扫描效率"
-      ],
-      "recommendedPromptZh": "参考 MongoDB / MongoDB 的视觉语言，设计一个中文 开发者官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "airtable",
-          "nameZh": "Airtable"
-        },
-        {
-          "slug": "clickhouse",
-          "nameZh": "ClickHouse"
-        },
-        {
-          "slug": "composio",
-          "nameZh": "Composio"
-        }
-      ]
+  "typography": {
+    "fontFamily": "#00684a",
+    "headingWeight": 600,
+    "bodyWeight": 400,
+    "headingSize": "36px",
+    "bodySize": "96px",
+    "letterSpacing": "2px"
+  },
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#001e2b"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#001e2b"
+      },
+      "tokens": {
+        "primaryColor": "#001e2b"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:48.999Z",
+    "designMdPath": "design-md/mongodb/DESIGN.md"
+  }
 }

@@ -1,82 +1,117 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.925Z",
-  "sourcePath": "design-md/awesome-design-md-cn/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "自定义案例": [
-      "awesome-design-md-cn"
-    ]
+  "version": "1.0",
+  "style": "awesome-design-md-cn",
+  "displayName": "awesome-design-md-cn",
+  "styleZh": "本站风格",
+  "tags": [
+    "中文",
+    "科技",
+    "资源库",
+    "筛选",
+    "目录"
+  ],
+  "styleKeywords": [
+    "冷灰科技风",
+    "低疲劳浏览",
+    "左侧筛选",
+    "紧凑目录卡片"
+  ],
+  "useCases": [
+    "设计资源库",
+    "导航目录页",
+    "工具聚合页"
+  ],
+  "bestFor": [
+    "设计资源库",
+    "风格导航页",
+    "文档索引页",
+    "工具聚合页"
+  ],
+  "avoidFor": [
+    "高情绪品牌大片页",
+    "娱乐化活动落地页"
+  ],
+  "positioningZh": "用于高密度内容浏览的中文科技风资源库，强调低疲劳、清晰筛选和稳定层级。",
+  "colorPalette": {
+    "primary": "#111318",
+    "background": "#ffffff",
+    "textPrimary": "#111318",
+    "primaryHover": "#1f2937",
+    "accent": "#4b6bff"
   },
-  "styles": [
-    {
-      "slug": "awesome-design-md-cn",
-      "name": "awesome-design-md-cn",
-      "displayName": "awesome-design-md-cn",
-      "nameZh": "本站风格",
-      "summaryZh": "冷灰科技风的中文 DESIGN.md 资源库界面，强调低疲劳浏览、侧栏筛选和紧凑目录卡片。",
-      "category": "自定义案例",
-      "group": "custom",
-      "tagsZh": [
-        "中文",
-        "科技",
-        "资源库",
-        "筛选",
-        "目录"
-      ],
-      "styleKeywords": [
-        "冷灰科技风",
-        "低疲劳浏览",
-        "左侧筛选",
-        "紧凑目录卡片"
-      ],
-      "aliases": [
-        "awesome-design-md-cn",
-        "awesome design md cn",
-        "本站风格",
-        "中文资源库",
-        "资源库界面"
-      ],
-      "useCases": [
-        "设计资源库",
-        "导航目录页",
-        "工具聚合页"
-      ],
-      "previewLight": "design-md/awesome-design-md-cn/preview.html",
-      "previewDark": "design-md/awesome-design-md-cn/preview-dark.html",
-      "readmePath": "design-md/awesome-design-md-cn/README.md",
-      "designPath": "design-md/awesome-design-md-cn/DESIGN.md",
-      "positioningZh": "用于高密度内容浏览的中文科技风资源库，强调低疲劳、清晰筛选和稳定层级。",
-      "bestFor": [
-        "设计资源库",
-        "风格导航页",
-        "文档索引页",
-        "工具聚合页"
-      ],
-      "avoidFor": [
-        "高情绪品牌大片页",
-        "娱乐化活动落地页"
-      ],
-      "aiChecklist": [
-        "优先降低颜色刺激和纯白疲劳",
-        "把筛选放在稳定且常驻的位置",
-        "卡片保持紧凑，主次信息明确"
-      ],
-      "recommendedPromptZh": "参考 awesome-design-md-cn 的视觉语言，设计一个中文设计资源库或风格索引页：使用浅冷灰底与深色首屏，整体只保留少量冷蓝强调；左侧使用常驻筛选栏，右侧使用紧凑目录卡片；中文标题和正文保持克制，不堆大段文案，不使用高饱和彩色块，让页面在长时间浏览时仍然低疲劳、清晰且有科技感。",
-      "relatedItems": [
-        {
-          "slug": "figma",
-          "nameZh": "Figma"
-        },
-        {
-          "slug": "notion",
-          "nameZh": "Notion"
-        },
-        {
-          "slug": "vercel",
-          "nameZh": "Vercel"
-        }
-      ]
+  "typography": {
+    "fontFamily": "SF Pro Display",
+    "headingWeight": 600,
+    "bodyWeight": 400,
+    "headingSize": "24px",
+    "bodySize": "14px"
+  },
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#111318"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#111318"
+      },
+      "tokens": {
+        "primaryColor": "#111318"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:48.961Z",
+    "designMdPath": "design-md/awesome-design-md-cn/DESIGN.md"
+  }
 }

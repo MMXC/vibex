@@ -1,76 +1,121 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.926Z",
-  "sourcePath": "design-md/clay/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "精选风格": [
-      "clay"
+  "version": "1.0",
+  "style": "clay",
+  "displayName": "Clay",
+  "styleZh": "Clay",
+  "tags": [
+    "CRM",
+    "销售"
+  ],
+  "styleKeywords": [
+    "CRM",
+    "销售",
+    "高端B2B销售CRM",
+    "精致卡片与渐变"
+  ],
+  "useCases": [
+    "产品官网",
+    "品牌页面",
+    "界面参考"
+  ],
+  "bestFor": [
+    "产品官网",
+    "品牌页面",
+    "界面参考"
+  ],
+  "avoidFor": [
+    "对行业规范要求很强的系统"
+  ],
+  "positioningZh": "适合做通用参考，先看预览再决定是否采纳。",
+  "colorPalette": {
+    "primary": "#000000",
+    "background": "#ffffff",
+    "textPrimary": "#000000",
+    "primaryHover": "#434346",
+    "accent": "#eee9df"
+  },
+  "typography": {
+    "fontFamily": "Roobert",
+    "headingWeight": 600,
+    "bodyWeight": 400,
+    "headingSize": "44px",
+    "bodySize": "20px",
+    "fontFamilyMono": "Space Mono",
+    "letterSpacing": "3.2px",
+    "openTypeFeatures": [
+      "ss01",
+      "ss03",
+      "ss10",
+      "ss11",
+      "ss12"
     ]
   },
-  "styles": [
-    {
-      "slug": "clay",
-      "name": "clay",
-      "displayName": "Clay",
-      "nameZh": "Clay",
-      "group": "reference",
-      "summaryZh": "高端B2B销售CRM，精致卡片与渐变",
-      "category": "精选风格",
-      "tagsZh": [
-        "CRM",
-        "销售"
-      ],
-      "styleKeywords": [
-        "CRM",
-        "销售",
-        "高端B2B销售CRM",
-        "精致卡片与渐变"
-      ],
-      "aliases": [
-        "clay",
-        "Clay",
-        "CRM",
-        "销售"
-      ],
-      "useCases": [
-        "产品官网",
-        "品牌页面",
-        "界面参考"
-      ],
-      "previewLight": "design-md/clay/preview.html",
-      "previewDark": "design-md/clay/preview-dark.html",
-      "readmePath": "design-md/clay/README.md",
-      "designPath": "design-md/clay/DESIGN.md",
-      "positioningZh": "适合做通用参考，先看预览再决定是否采纳。",
-      "bestFor": [
-        "产品官网",
-        "品牌页面",
-        "界面参考"
-      ],
-      "avoidFor": [
-        "对行业规范要求很强的系统"
-      ],
-      "aiChecklist": [
-        "先看预览是否接近目标气质",
-        "按中文场景二次调整信息密度",
-        "不要直接全量照搬"
-      ],
-      "recommendedPromptZh": "参考 Clay / Clay 的视觉语言，设计一个中文 产品官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "intercom",
-          "nameZh": "Intercom"
-        },
-        {
-          "slug": "posthog",
-          "nameZh": "PostHog"
-        },
-        {
-          "slug": "superhuman",
-          "nameZh": "Superhuman"
-        }
-      ]
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#000000"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#000000"
+      },
+      "tokens": {
+        "primaryColor": "#000000"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:48.972Z",
+    "designMdPath": "design-md/clay/DESIGN.md"
+  }
 }

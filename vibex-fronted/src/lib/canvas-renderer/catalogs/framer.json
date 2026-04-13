@@ -1,74 +1,115 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.928Z",
-  "sourcePath": "design-md/framer/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "内容与建站": [
-      "framer"
-    ]
+  "version": "1.0",
+  "style": "framer",
+  "displayName": "Framer",
+  "styleZh": "Framer",
+  "tags": [
+    "建站",
+    "无代码"
+  ],
+  "styleKeywords": [
+    "建站",
+    "无代码",
+    "无代码建站工具",
+    "艺术感深色着陆页"
+  ],
+  "useCases": [
+    "产品官网",
+    "模板市场",
+    "编辑器界面"
+  ],
+  "bestFor": [
+    "产品官网",
+    "模板市场",
+    "编辑器界面",
+    "建站工具官网"
+  ],
+  "avoidFor": [
+    "金融级数据台",
+    "过于严肃的企业门户"
+  ],
+  "positioningZh": "强调模块化展示和模板感，适合展示产品能力、模板和编辑体验。",
+  "colorPalette": {
+    "primary": "#000000",
+    "background": "#ffffff",
+    "textPrimary": "#090909",
+    "primaryHover": "#0099ff"
   },
-  "styles": [
-    {
-      "slug": "framer",
-      "name": "framer",
-      "displayName": "Framer",
-      "nameZh": "Framer",
-      "group": "reference",
-      "summaryZh": "无代码建站工具，艺术感深色着陆页",
-      "category": "内容与建站",
-      "tagsZh": [
-        "建站",
-        "无代码"
-      ],
-      "styleKeywords": [
-        "建站",
-        "无代码",
-        "无代码建站工具",
-        "艺术感深色着陆页"
-      ],
-      "aliases": [
-        "framer",
-        "Framer",
-        "建站",
-        "无代码"
-      ],
-      "useCases": [
-        "产品官网",
-        "模板市场",
-        "编辑器界面"
-      ],
-      "previewLight": "design-md/framer/preview.html",
-      "previewDark": "design-md/framer/preview-dark.html",
-      "readmePath": "design-md/framer/README.md",
-      "designPath": "design-md/framer/DESIGN.md",
-      "positioningZh": "强调模块化展示和模板感，适合展示产品能力、模板和编辑体验。",
-      "bestFor": [
-        "产品官网",
-        "模板市场",
-        "编辑器界面",
-        "建站工具官网"
-      ],
-      "avoidFor": [
-        "金融级数据台",
-        "过于严肃的企业门户"
-      ],
-      "aiChecklist": [
-        "让案例和模板展示更直观",
-        "保留适度视觉变化",
-        "避免区块密度过高"
-      ],
-      "recommendedPromptZh": "参考 Framer / Framer 的视觉语言，设计一个中文 产品官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "sanity",
-          "nameZh": "Sanity"
-        },
-        {
-          "slug": "webflow",
-          "nameZh": "Webflow"
-        }
-      ]
+  "typography": {
+    "fontFamily": "system-ui",
+    "headingWeight": 600,
+    "bodyWeight": 255,
+    "headingSize": "62px",
+    "bodySize": "18px",
+    "fontFamilyMono": "Azeret Mono",
+    "letterSpacing": "5.5px"
+  },
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#000000"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#000000"
+      },
+      "tokens": {
+        "primaryColor": "#000000"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:48.986Z",
+    "designMdPath": "design-md/framer/DESIGN.md"
+  }
 }

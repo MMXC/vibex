@@ -1,78 +1,117 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.929Z",
-  "sourcePath": "design-md/kraken/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "金融科技": [
-      "kraken"
-    ]
+  "version": "1.0",
+  "style": "kraken",
+  "displayName": "Kraken",
+  "styleZh": "Kraken",
+  "tags": [
+    "加密",
+    "金融"
+  ],
+  "styleKeywords": [
+    "加密",
+    "金融",
+    "加密货币交易所",
+    "海怪深色品牌"
+  ],
+  "useCases": [
+    "官网落地页",
+    "支付产品页",
+    "数据控制台"
+  ],
+  "bestFor": [
+    "官网落地页",
+    "支付产品页",
+    "数据控制台",
+    "定价页"
+  ],
+  "avoidFor": [
+    "轻社交内容页",
+    "卡通化活动页"
+  ],
+  "positioningZh": "强调专业、可信和精致的信息表达，适合价格、数据和支付流程较多的页面。",
+  "colorPalette": {
+    "primary": "#7132f5",
+    "background": "#ffffff",
+    "textPrimary": "#101114",
+    "primaryHover": "#5741d8",
+    "textSecondary": "#101114",
+    "border": "#dedee5",
+    "accent": "#5b1ecf"
   },
-  "styles": [
-    {
-      "slug": "kraken",
-      "name": "kraken",
-      "displayName": "Kraken",
-      "nameZh": "Kraken",
-      "group": "reference",
-      "summaryZh": "加密货币交易所，海怪深色品牌",
-      "category": "金融科技",
-      "tagsZh": [
-        "加密",
-        "金融"
-      ],
-      "styleKeywords": [
-        "加密",
-        "金融",
-        "加密货币交易所",
-        "海怪深色品牌"
-      ],
-      "aliases": [
-        "kraken",
-        "Kraken",
-        "加密",
-        "金融"
-      ],
-      "useCases": [
-        "官网落地页",
-        "支付产品页",
-        "数据控制台"
-      ],
-      "previewLight": "design-md/kraken/preview.html",
-      "previewDark": "design-md/kraken/preview-dark.html",
-      "readmePath": "design-md/kraken/README.md",
-      "designPath": "design-md/kraken/DESIGN.md",
-      "positioningZh": "强调专业、可信和精致的信息表达，适合价格、数据和支付流程较多的页面。",
-      "bestFor": [
-        "官网落地页",
-        "支付产品页",
-        "数据控制台",
-        "定价页"
-      ],
-      "avoidFor": [
-        "轻社交内容页",
-        "卡通化活动页"
-      ],
-      "aiChecklist": [
-        "强化数据和价格的对齐感",
-        "避免装饰元素影响可信度",
-        "CTA 要明确且节制"
-      ],
-      "recommendedPromptZh": "参考 Kraken / Kraken 的视觉语言，设计一个中文 官网落地页，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "coinbase",
-          "nameZh": "Coinbase"
-        },
-        {
-          "slug": "revolut",
-          "nameZh": "Revolut"
-        },
-        {
-          "slug": "stripe",
-          "nameZh": "Stripe"
-        }
-      ]
+  "typography": {
+    "fontFamily": "#7132f5",
+    "headingWeight": 600,
+    "bodyWeight": 400,
+    "headingSize": "36px",
+    "bodySize": "48px",
+    "letterSpacing": "1px"
+  },
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#7132f5"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#7132f5"
+      },
+      "tokens": {
+        "primaryColor": "#7132f5"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:48.990Z",
+    "designMdPath": "design-md/kraken/DESIGN.md"
+  }
 }

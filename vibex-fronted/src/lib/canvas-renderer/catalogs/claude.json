@@ -1,79 +1,123 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.926Z",
-  "sourcePath": "design-md/claude/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "AI 产品": [
-      "claude"
+  "version": "1.0",
+  "style": "claude",
+  "displayName": "Claude",
+  "styleZh": "Claude",
+  "tags": [
+    "AI",
+    "对话"
+  ],
+  "styleKeywords": [
+    "AI",
+    "对话",
+    "Anthropic旗下AI助手",
+    "极简白底",
+    "优雅紫"
+  ],
+  "useCases": [
+    "AI 工具官网",
+    "模型平台",
+    "功能介绍页"
+  ],
+  "bestFor": [
+    "AI 工具官网",
+    "模型平台",
+    "功能介绍页",
+    "模型能力介绍"
+  ],
+  "avoidFor": [
+    "强表格化后台",
+    "政企风审批系统"
+  ],
+  "positioningZh": "强调前沿感、速度感和产品未来感，适合把能力和差异点讲清楚。",
+  "colorPalette": {
+    "primary": "#141413",
+    "background": "#ffffff",
+    "textPrimary": "#4d4c48",
+    "primaryHover": "#c96442",
+    "error": "#b53333",
+    "border": "#f0eee6",
+    "accent": "#5e5d59"
+  },
+  "typography": {
+    "fontFamily": "system-ui",
+    "headingWeight": 600,
+    "bodyWeight": 400,
+    "headingSize": "52px",
+    "bodySize": "64px",
+    "openTypeFeatures": [
+      "black",
+      "gradient",
+      "voice",
+      "rooms"
     ]
   },
-  "styles": [
-    {
-      "slug": "claude",
-      "name": "claude",
-      "displayName": "Claude",
-      "nameZh": "Claude",
-      "group": "reference",
-      "summaryZh": "Anthropic旗下AI助手，极简白底+优雅紫",
-      "category": "AI 产品",
-      "tagsZh": [
-        "AI",
-        "对话"
-      ],
-      "styleKeywords": [
-        "AI",
-        "对话",
-        "Anthropic旗下AI助手",
-        "极简白底",
-        "优雅紫"
-      ],
-      "aliases": [
-        "claude",
-        "Claude",
-        "AI",
-        "对话"
-      ],
-      "useCases": [
-        "AI 工具官网",
-        "模型平台",
-        "功能介绍页"
-      ],
-      "previewLight": "design-md/claude/preview.html",
-      "previewDark": "design-md/claude/preview-dark.html",
-      "readmePath": "design-md/claude/README.md",
-      "designPath": "design-md/claude/DESIGN.md",
-      "positioningZh": "强调前沿感、速度感和产品未来感，适合把能力和差异点讲清楚。",
-      "bestFor": [
-        "AI 工具官网",
-        "模型平台",
-        "功能介绍页",
-        "模型能力介绍"
-      ],
-      "avoidFor": [
-        "强表格化后台",
-        "政企风审批系统"
-      ],
-      "aiChecklist": [
-        "突出核心能力和模型价值",
-        "让功能区块清晰分组",
-        "避免页面装饰压过信息层级"
-      ],
-      "recommendedPromptZh": "参考 Claude / Claude 的视觉语言，设计一个中文 AI 工具官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "cohere",
-          "nameZh": "Cohere"
-        },
-        {
-          "slug": "cursor",
-          "nameZh": "Cursor"
-        },
-        {
-          "slug": "elevenlabs",
-          "nameZh": "ElevenLabs"
-        }
-      ]
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#141413"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#141413"
+      },
+      "tokens": {
+        "primaryColor": "#141413"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:48.971Z",
+    "designMdPath": "design-md/claude/DESIGN.md"
+  }
 }

@@ -8,6 +8,8 @@ export interface DesignEntry {
   category: Category; group: string;
   tagsZh: string[]; styleKeywords: string[];
   descriptionZh: string; useCases: string[];
+  positioningZh?: string; bestFor?: string[]; avoidFor?: string[];
+  summaryZh?: string;
 }
 
 export const DESIGN_CATALOG: readonly DesignEntry[] = [

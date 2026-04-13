@@ -1,78 +1,116 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.931Z",
-  "sourcePath": "design-md/revolut/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "金融科技": [
-      "revolut"
-    ]
+  "version": "1.0",
+  "style": "revolut",
+  "displayName": "Revolut",
+  "styleZh": "Revolut",
+  "tags": [
+    "金融",
+    "银行"
+  ],
+  "styleKeywords": [
+    "金融",
+    "银行",
+    "数字银行",
+    "现代金融科技感"
+  ],
+  "useCases": [
+    "官网落地页",
+    "支付产品页",
+    "数据控制台"
+  ],
+  "bestFor": [
+    "官网落地页",
+    "支付产品页",
+    "数据控制台",
+    "定价页"
+  ],
+  "avoidFor": [
+    "轻社交内容页",
+    "卡通化活动页"
+  ],
+  "positioningZh": "强调专业、可信和精致的信息表达，适合价格、数据和支付流程较多的页面。",
+  "colorPalette": {
+    "primary": "#191c1f",
+    "background": "#ffffff",
+    "textPrimary": "#191c1f",
+    "primaryHover": "#ec7e00",
+    "textSecondary": "#f4f4f4",
+    "accent": "#00a87e"
   },
-  "styles": [
-    {
-      "slug": "revolut",
-      "name": "revolut",
-      "displayName": "Revolut",
-      "nameZh": "Revolut",
-      "group": "reference",
-      "summaryZh": "数字银行，现代金融科技感",
-      "category": "金融科技",
-      "tagsZh": [
-        "金融",
-        "银行"
-      ],
-      "styleKeywords": [
-        "金融",
-        "银行",
-        "数字银行",
-        "现代金融科技感"
-      ],
-      "aliases": [
-        "revolut",
-        "Revolut",
-        "金融",
-        "银行"
-      ],
-      "useCases": [
-        "官网落地页",
-        "支付产品页",
-        "数据控制台"
-      ],
-      "previewLight": "design-md/revolut/preview.html",
-      "previewDark": "design-md/revolut/preview-dark.html",
-      "readmePath": "design-md/revolut/README.md",
-      "designPath": "design-md/revolut/DESIGN.md",
-      "positioningZh": "强调专业、可信和精致的信息表达，适合价格、数据和支付流程较多的页面。",
-      "bestFor": [
-        "官网落地页",
-        "支付产品页",
-        "数据控制台",
-        "定价页"
-      ],
-      "avoidFor": [
-        "轻社交内容页",
-        "卡通化活动页"
-      ],
-      "aiChecklist": [
-        "强化数据和价格的对齐感",
-        "避免装饰元素影响可信度",
-        "CTA 要明确且节制"
-      ],
-      "recommendedPromptZh": "参考 Revolut / Revolut 的视觉语言，设计一个中文 官网落地页，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "coinbase",
-          "nameZh": "Coinbase"
-        },
-        {
-          "slug": "kraken",
-          "nameZh": "Kraken"
-        },
-        {
-          "slug": "stripe",
-          "nameZh": "Stripe"
-        }
-      ]
+  "typography": {
+    "fontFamily": "#191c1f",
+    "headingWeight": 600,
+    "bodyWeight": 136,
+    "headingSize": "48px",
+    "bodySize": "136px",
+    "letterSpacing": "2.72px"
+  },
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#191c1f"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#191c1f"
+      },
+      "tokens": {
+        "primaryColor": "#191c1f"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:49.019Z",
+    "designMdPath": "design-md/revolut/DESIGN.md"
+  }
 }

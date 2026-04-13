@@ -1,77 +1,116 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.931Z",
-  "sourcePath": "design-md/tesla/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "品牌官网": [
-      "tesla"
+  "version": "1.0",
+  "style": "tesla",
+  "displayName": "Tesla",
+  "styleZh": "特斯拉",
+  "tags": [
+    "汽车",
+    "科技"
+  ],
+  "styleKeywords": [
+    "汽车",
+    "科技",
+    "特斯拉官网",
+    "极简摄影驱动的科技产品展示气质"
+  ],
+  "useCases": [
+    "品牌官网",
+    "营销落地页",
+    "企业介绍页"
+  ],
+  "bestFor": [
+    "品牌官网",
+    "营销落地页",
+    "企业介绍页"
+  ],
+  "avoidFor": [
+    "复杂运维后台",
+    "高密度列表管理页"
+  ],
+  "positioningZh": "强调品牌气质、节奏和视觉记忆点，更适合营销和叙事表达。",
+  "colorPalette": {
+    "primary": "#3E6AE1",
+    "background": "#ffffff",
+    "textPrimary": "#171A20",
+    "textSecondary": "#FFFFFF"
+  },
+  "typography": {
+    "fontFamily": "#3E6AE1",
+    "headingWeight": 171,
+    "bodyWeight": 393,
+    "headingSize": "24px",
+    "bodySize": "14px",
+    "openTypeFeatures": [
+      "message",
+      "feel"
     ]
   },
-  "styles": [
-    {
-      "slug": "tesla",
-      "name": "tesla",
-      "displayName": "Tesla",
-      "nameZh": "特斯拉",
-      "group": "reference",
-      "summaryZh": "特斯拉官网，极简摄影驱动的科技产品展示气质",
-      "category": "品牌官网",
-      "tagsZh": [
-        "汽车",
-        "科技"
-      ],
-      "styleKeywords": [
-        "汽车",
-        "科技",
-        "特斯拉官网",
-        "极简摄影驱动的科技产品展示气质"
-      ],
-      "aliases": [
-        "tesla",
-        "特斯拉",
-        "汽车",
-        "科技"
-      ],
-      "useCases": [
-        "品牌官网",
-        "营销落地页",
-        "企业介绍页"
-      ],
-      "previewLight": "design-md/tesla/preview.html",
-      "previewDark": "design-md/tesla/preview-dark.html",
-      "readmePath": "design-md/tesla/README.md",
-      "designPath": "design-md/tesla/DESIGN.md",
-      "positioningZh": "强调品牌气质、节奏和视觉记忆点，更适合营销和叙事表达。",
-      "bestFor": [
-        "品牌官网",
-        "营销落地页",
-        "企业介绍页"
-      ],
-      "avoidFor": [
-        "复杂运维后台",
-        "高密度列表管理页"
-      ],
-      "aiChecklist": [
-        "强化首屏和大标题表现",
-        "控制信息数量",
-        "让留白和图片承担更多表达"
-      ],
-      "recommendedPromptZh": "参考 特斯拉 / Tesla 的视觉语言，设计一个中文 品牌官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "airbnb",
-          "nameZh": "爱彼迎"
-        },
-        {
-          "slug": "apple",
-          "nameZh": "苹果"
-        },
-        {
-          "slug": "bmw",
-          "nameZh": "宝马"
-        }
-      ]
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#3E6AE1"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#3E6AE1"
+      },
+      "tokens": {
+        "primaryColor": "#3E6AE1"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:49.033Z",
+    "designMdPath": "design-md/tesla/DESIGN.md"
+  }
 }

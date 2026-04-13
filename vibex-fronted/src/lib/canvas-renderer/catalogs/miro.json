@@ -1,78 +1,122 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.929Z",
-  "sourcePath": "design-md/miro/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "效率协作": [
-      "miro"
+  "version": "1.0",
+  "style": "miro",
+  "displayName": "Miro",
+  "styleZh": "Miro",
+  "tags": [
+    "协作",
+    "白板"
+  ],
+  "styleKeywords": [
+    "协作",
+    "白板",
+    "在线白板协作",
+    "创意工作空间"
+  ],
+  "useCases": [
+    "SaaS 后台",
+    "工作台",
+    "产品介绍页"
+  ],
+  "bestFor": [
+    "SaaS 后台",
+    "工作台",
+    "产品介绍页",
+    "工作台首页"
+  ],
+  "avoidFor": [
+    "纯品牌大片式营销页",
+    "重情绪化视觉实验页面"
+  ],
+  "positioningZh": "强调秩序感、工作流和信息组织，适合 SaaS 和工作台场景。",
+  "colorPalette": {
+    "primary": "#1c1c1e",
+    "background": "#ffffff",
+    "textPrimary": "#1c1c1e",
+    "border": "#c7cad5",
+    "accent": "#5b76fe"
+  },
+  "typography": {
+    "fontFamily": "system-ui",
+    "headingWeight": 600,
+    "bodyWeight": 400,
+    "headingSize": "48px",
+    "bodySize": "18px",
+    "letterSpacing": "1.68px",
+    "openTypeFeatures": [
+      "blwf",
+      "cv03",
+      "cv04",
+      "cv09",
+      "cv11"
     ]
   },
-  "styles": [
-    {
-      "slug": "miro",
-      "name": "miro",
-      "displayName": "Miro",
-      "nameZh": "Miro",
-      "group": "reference",
-      "summaryZh": "在线白板协作，创意工作空间",
-      "category": "效率协作",
-      "tagsZh": [
-        "协作",
-        "白板"
-      ],
-      "styleKeywords": [
-        "协作",
-        "白板",
-        "在线白板协作",
-        "创意工作空间"
-      ],
-      "aliases": [
-        "miro",
-        "Miro",
-        "协作",
-        "白板"
-      ],
-      "useCases": [
-        "SaaS 后台",
-        "工作台",
-        "产品介绍页"
-      ],
-      "previewLight": "design-md/miro/preview.html",
-      "previewDark": "design-md/miro/preview-dark.html",
-      "readmePath": "design-md/miro/README.md",
-      "designPath": "design-md/miro/DESIGN.md",
-      "positioningZh": "强调秩序感、工作流和信息组织，适合 SaaS 和工作台场景。",
-      "bestFor": [
-        "SaaS 后台",
-        "工作台",
-        "产品介绍页",
-        "工作台首页"
-      ],
-      "avoidFor": [
-        "纯品牌大片式营销页",
-        "重情绪化视觉实验页面"
-      ],
-      "aiChecklist": [
-        "重视内容块编排",
-        "表单和列表要易扫读",
-        "中文标题长度要控制在稳妥范围"
-      ],
-      "recommendedPromptZh": "参考 Miro / Miro 的视觉语言，设计一个中文 SaaS 后台，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "cal",
-          "nameZh": "Cal"
-        },
-        {
-          "slug": "figma",
-          "nameZh": "Figma"
-        },
-        {
-          "slug": "linear.app",
-          "nameZh": "Linear"
-        }
-      ]
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#1c1c1e"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#1c1c1e"
+      },
+      "tokens": {
+        "primaryColor": "#1c1c1e"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:48.996Z",
+    "designMdPath": "design-md/miro/DESIGN.md"
+  }
 }

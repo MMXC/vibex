@@ -1,77 +1,121 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.932Z",
-  "sourcePath": "design-md/vercel/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "开发工具": [
-      "vercel"
+  "version": "1.0",
+  "style": "vercel",
+  "displayName": "Vercel",
+  "styleZh": "Vercel",
+  "tags": [
+    "部署",
+    "前端"
+  ],
+  "styleKeywords": [
+    "部署",
+    "前端",
+    "前端部署平台",
+    "极简深色开发者美学"
+  ],
+  "useCases": [
+    "开发者官网",
+    "文档站",
+    "控制台后台"
+  ],
+  "bestFor": [
+    "开发者官网",
+    "文档站",
+    "控制台后台"
+  ],
+  "avoidFor": [
+    "强娱乐化内容页",
+    "情绪导向的品牌叙事页"
+  ],
+  "positioningZh": "重视结构清晰、可读性和文档感，适合开发者和 B 端产品。",
+  "colorPalette": {
+    "primary": "#171717",
+    "background": "#ffffff",
+    "textPrimary": "#171717",
+    "border": "#fafafa"
+  },
+  "typography": {
+    "fontFamily": "Geist",
+    "headingWeight": 171,
+    "bodyWeight": 600,
+    "headingSize": "40px",
+    "bodySize": "20px",
+    "fontFamilyMono": "Geist Mono",
+    "letterSpacing": "2.4px",
+    "openTypeFeatures": [
+      "liga",
+      "liga",
+      "liga",
+      "tnum",
+      "liga"
     ]
   },
-  "styles": [
-    {
-      "slug": "vercel",
-      "name": "vercel",
-      "displayName": "Vercel",
-      "nameZh": "Vercel",
-      "group": "reference",
-      "summaryZh": "前端部署平台，极简深色开发者美学",
-      "category": "开发工具",
-      "tagsZh": [
-        "部署",
-        "前端"
-      ],
-      "styleKeywords": [
-        "部署",
-        "前端",
-        "前端部署平台",
-        "极简深色开发者美学"
-      ],
-      "aliases": [
-        "vercel",
-        "Vercel",
-        "部署",
-        "前端"
-      ],
-      "useCases": [
-        "开发者官网",
-        "文档站",
-        "控制台后台"
-      ],
-      "previewLight": "design-md/vercel/preview.html",
-      "previewDark": "design-md/vercel/preview-dark.html",
-      "readmePath": "design-md/vercel/README.md",
-      "designPath": "design-md/vercel/DESIGN.md",
-      "positioningZh": "重视结构清晰、可读性和文档感，适合开发者和 B 端产品。",
-      "bestFor": [
-        "开发者官网",
-        "文档站",
-        "控制台后台"
-      ],
-      "avoidFor": [
-        "强娱乐化内容页",
-        "情绪导向的品牌叙事页"
-      ],
-      "aiChecklist": [
-        "保证标题层级明确",
-        "让按钮和代码区块保持克制",
-        "优先确保信息扫描效率"
-      ],
-      "recommendedPromptZh": "参考 Vercel / Vercel 的视觉语言，设计一个中文 开发者官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "airtable",
-          "nameZh": "Airtable"
-        },
-        {
-          "slug": "clickhouse",
-          "nameZh": "ClickHouse"
-        },
-        {
-          "slug": "composio",
-          "nameZh": "Composio"
-        }
-      ]
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#171717"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#171717"
+      },
+      "tokens": {
+        "primaryColor": "#171717"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:49.034Z",
+    "designMdPath": "design-md/vercel/DESIGN.md"
+  }
 }

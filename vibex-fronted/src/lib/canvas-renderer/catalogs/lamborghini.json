@@ -1,77 +1,116 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.929Z",
-  "sourcePath": "design-md/lamborghini/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "品牌官网": [
-      "lamborghini"
+  "version": "1.0",
+  "style": "lamborghini",
+  "displayName": "Lamborghini",
+  "styleZh": "兰博基尼",
+  "tags": [
+    "汽车",
+    "豪华"
+  ],
+  "styleKeywords": [
+    "汽车",
+    "豪华",
+    "兰博基尼官网",
+    "纯黑舞台感与金色强调的极致张力"
+  ],
+  "useCases": [
+    "品牌官网",
+    "营销落地页",
+    "企业介绍页"
+  ],
+  "bestFor": [
+    "品牌官网",
+    "营销落地页",
+    "企业介绍页"
+  ],
+  "avoidFor": [
+    "复杂运维后台",
+    "高密度列表管理页"
+  ],
+  "positioningZh": "强调品牌气质、节奏和视觉记忆点，更适合营销和叙事表达。",
+  "colorPalette": {
+    "primary": "#FFC000",
+    "background": "#ffffff",
+    "textPrimary": "#000000",
+    "primaryHover": "#917300",
+    "accent": "#000000"
+  },
+  "typography": {
+    "fontFamily": "system-ui",
+    "headingWeight": 600,
+    "bodyWeight": 400,
+    "headingSize": "27px",
+    "bodySize": "18px",
+    "openTypeFeatures": [
+      "feel"
     ]
   },
-  "styles": [
-    {
-      "slug": "lamborghini",
-      "name": "lamborghini",
-      "displayName": "Lamborghini",
-      "nameZh": "兰博基尼",
-      "group": "reference",
-      "summaryZh": "兰博基尼官网，纯黑舞台感与金色强调的极致张力",
-      "category": "品牌官网",
-      "tagsZh": [
-        "汽车",
-        "豪华"
-      ],
-      "styleKeywords": [
-        "汽车",
-        "豪华",
-        "兰博基尼官网",
-        "纯黑舞台感与金色强调的极致张力"
-      ],
-      "aliases": [
-        "lamborghini",
-        "兰博基尼",
-        "汽车",
-        "豪华"
-      ],
-      "useCases": [
-        "品牌官网",
-        "营销落地页",
-        "企业介绍页"
-      ],
-      "previewLight": "design-md/lamborghini/preview.html",
-      "previewDark": "design-md/lamborghini/preview-dark.html",
-      "readmePath": "design-md/lamborghini/README.md",
-      "designPath": "design-md/lamborghini/DESIGN.md",
-      "positioningZh": "强调品牌气质、节奏和视觉记忆点，更适合营销和叙事表达。",
-      "bestFor": [
-        "品牌官网",
-        "营销落地页",
-        "企业介绍页"
-      ],
-      "avoidFor": [
-        "复杂运维后台",
-        "高密度列表管理页"
-      ],
-      "aiChecklist": [
-        "强化首屏和大标题表现",
-        "控制信息数量",
-        "让留白和图片承担更多表达"
-      ],
-      "recommendedPromptZh": "参考 兰博基尼 / Lamborghini 的视觉语言，设计一个中文 品牌官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "airbnb",
-          "nameZh": "爱彼迎"
-        },
-        {
-          "slug": "apple",
-          "nameZh": "苹果"
-        },
-        {
-          "slug": "bmw",
-          "nameZh": "宝马"
-        }
-      ]
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#FFC000"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#FFC000"
+      },
+      "tokens": {
+        "primaryColor": "#FFC000"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:48.990Z",
+    "designMdPath": "design-md/lamborghini/DESIGN.md"
+  }
 }

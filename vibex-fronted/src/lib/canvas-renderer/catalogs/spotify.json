@@ -1,69 +1,118 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.931Z",
-  "sourcePath": "design-md/spotify/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "内容平台": [
-      "spotify"
+  "version": "1.0",
+  "style": "spotify",
+  "displayName": "Spotify",
+  "styleZh": "Spotify",
+  "tags": [
+    "音乐",
+    "流媒体"
+  ],
+  "styleKeywords": [
+    "音乐",
+    "流媒体",
+    "音乐流媒体",
+    "绿色品牌深色模式"
+  ],
+  "useCases": [
+    "内容社区",
+    "推荐流页面",
+    "活动专题页"
+  ],
+  "bestFor": [
+    "内容社区",
+    "推荐流页面",
+    "活动专题页"
+  ],
+  "avoidFor": [
+    "表单密集型后台",
+    "高度理性的文档站"
+  ],
+  "positioningZh": "强调流动感、内容展示效率和活跃度，适合内容消费和社区产品。",
+  "colorPalette": {
+    "primary": "#1ed760",
+    "background": "#ffffff",
+    "textPrimary": "#121212",
+    "primaryHover": "#181818",
+    "border": "#4d4d4d",
+    "accent": "#1f1f1f"
+  },
+  "typography": {
+    "fontFamily": "system-ui",
+    "headingWeight": 600,
+    "bodyWeight": 400,
+    "headingSize": "18px",
+    "bodySize": "24px",
+    "letterSpacing": "1.4px",
+    "openTypeFeatures": [
+      "label"
     ]
   },
-  "styles": [
-    {
-      "slug": "spotify",
-      "name": "spotify",
-      "displayName": "Spotify",
-      "nameZh": "Spotify",
-      "group": "reference",
-      "summaryZh": "音乐流媒体，绿色品牌深色模式",
-      "category": "内容平台",
-      "tagsZh": [
-        "音乐",
-        "流媒体"
-      ],
-      "styleKeywords": [
-        "音乐",
-        "流媒体",
-        "音乐流媒体",
-        "绿色品牌深色模式"
-      ],
-      "aliases": [
-        "spotify",
-        "Spotify",
-        "音乐",
-        "流媒体"
-      ],
-      "useCases": [
-        "内容社区",
-        "推荐流页面",
-        "活动专题页"
-      ],
-      "previewLight": "design-md/spotify/preview.html",
-      "previewDark": "design-md/spotify/preview-dark.html",
-      "readmePath": "design-md/spotify/README.md",
-      "designPath": "design-md/spotify/DESIGN.md",
-      "positioningZh": "强调流动感、内容展示效率和活跃度，适合内容消费和社区产品。",
-      "bestFor": [
-        "内容社区",
-        "推荐流页面",
-        "活动专题页"
-      ],
-      "avoidFor": [
-        "表单密集型后台",
-        "高度理性的文档站"
-      ],
-      "aiChecklist": [
-        "优先突出封面和内容卡片",
-        "降低单屏信息负担",
-        "避免全部模块同质化"
-      ],
-      "recommendedPromptZh": "参考 Spotify / Spotify 的视觉语言，设计一个中文 内容社区，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "pinterest",
-          "nameZh": "Pinterest"
-        }
-      ]
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#1ed760"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#1ed760"
+      },
+      "tokens": {
+        "primaryColor": "#1ed760"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:49.029Z",
+    "designMdPath": "design-md/spotify/DESIGN.md"
+  }
 }

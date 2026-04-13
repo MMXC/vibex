@@ -1,79 +1,121 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.928Z",
-  "sourcePath": "design-md/elevenlabs/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "AI 产品": [
-      "elevenlabs"
+  "version": "1.0",
+  "style": "elevenlabs",
+  "displayName": "ElevenLabs",
+  "styleZh": "ElevenLabs",
+  "tags": [
+    "AI",
+    "音频"
+  ],
+  "styleKeywords": [
+    "AI",
+    "音频",
+    "AI语音合成",
+    "渐变深色",
+    "科技感"
+  ],
+  "useCases": [
+    "AI 工具官网",
+    "模型平台",
+    "功能介绍页"
+  ],
+  "bestFor": [
+    "AI 工具官网",
+    "模型平台",
+    "功能介绍页",
+    "模型能力介绍"
+  ],
+  "avoidFor": [
+    "强表格化后台",
+    "政企风审批系统"
+  ],
+  "positioningZh": "强调前沿感、速度感和产品未来感，适合把能力和差异点讲清楚。",
+  "colorPalette": {
+    "primary": "#ffffff",
+    "background": "#ffffff",
+    "textPrimary": "#000000",
+    "primaryHover": "#f5f5f5",
+    "border": "#e5e5e5",
+    "accent": "#f5f2ef"
+  },
+  "typography": {
+    "fontFamily": "#000000",
+    "headingWeight": 600,
+    "bodyWeight": 400,
+    "headingSize": "36px",
+    "bodySize": "48px",
+    "fontFamilyMono": "Geist Mono",
+    "letterSpacing": "0.7px",
+    "openTypeFeatures": [
+      "whispers"
     ]
   },
-  "styles": [
-    {
-      "slug": "elevenlabs",
-      "name": "elevenlabs",
-      "displayName": "ElevenLabs",
-      "nameZh": "ElevenLabs",
-      "group": "reference",
-      "summaryZh": "AI语音合成，渐变深色+科技感",
-      "category": "AI 产品",
-      "tagsZh": [
-        "AI",
-        "音频"
-      ],
-      "styleKeywords": [
-        "AI",
-        "音频",
-        "AI语音合成",
-        "渐变深色",
-        "科技感"
-      ],
-      "aliases": [
-        "elevenlabs",
-        "ElevenLabs",
-        "AI",
-        "音频"
-      ],
-      "useCases": [
-        "AI 工具官网",
-        "模型平台",
-        "功能介绍页"
-      ],
-      "previewLight": "design-md/elevenlabs/preview.html",
-      "previewDark": "design-md/elevenlabs/preview-dark.html",
-      "readmePath": "design-md/elevenlabs/README.md",
-      "designPath": "design-md/elevenlabs/DESIGN.md",
-      "positioningZh": "强调前沿感、速度感和产品未来感，适合把能力和差异点讲清楚。",
-      "bestFor": [
-        "AI 工具官网",
-        "模型平台",
-        "功能介绍页",
-        "模型能力介绍"
-      ],
-      "avoidFor": [
-        "强表格化后台",
-        "政企风审批系统"
-      ],
-      "aiChecklist": [
-        "突出核心能力和模型价值",
-        "让功能区块清晰分组",
-        "避免页面装饰压过信息层级"
-      ],
-      "recommendedPromptZh": "参考 ElevenLabs / ElevenLabs 的视觉语言，设计一个中文 AI 工具官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "claude",
-          "nameZh": "Claude"
-        },
-        {
-          "slug": "cohere",
-          "nameZh": "Cohere"
-        },
-        {
-          "slug": "cursor",
-          "nameZh": "Cursor"
-        }
-      ]
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#ffffff"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#ffffff"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:48.981Z",
+    "designMdPath": "design-md/elevenlabs/DESIGN.md"
+  }
 }

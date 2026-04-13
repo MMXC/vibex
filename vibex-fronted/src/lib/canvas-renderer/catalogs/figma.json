@@ -1,79 +1,123 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.928Z",
-  "sourcePath": "design-md/figma/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "效率协作": [
-      "figma"
+  "version": "1.0",
+  "style": "figma",
+  "displayName": "Figma",
+  "styleZh": "Figma",
+  "tags": [
+    "设计",
+    "协作"
+  ],
+  "styleKeywords": [
+    "设计",
+    "协作",
+    "设计协作工具",
+    "标志性的深色",
+    "紫灰"
+  ],
+  "useCases": [
+    "SaaS 后台",
+    "工作台",
+    "产品介绍页"
+  ],
+  "bestFor": [
+    "SaaS 后台",
+    "工作台",
+    "产品介绍页",
+    "工作台首页"
+  ],
+  "avoidFor": [
+    "纯品牌大片式营销页",
+    "重情绪化视觉实验页面"
+  ],
+  "positioningZh": "强调秩序感、工作流和信息组织，适合 SaaS 和工作台场景。",
+  "colorPalette": {
+    "primary": "#000000",
+    "background": "#ffffff",
+    "textPrimary": "#000000",
+    "primaryHover": "#ffffff"
+  },
+  "typography": {
+    "fontFamily": "figmaSans",
+    "headingWeight": 600,
+    "bodyWeight": 400,
+    "headingSize": "64px",
+    "bodySize": "20px",
+    "fontFamilyMono": "figmaMono",
+    "letterSpacing": "1.72px",
+    "openTypeFeatures": [
+      "kern",
+      "color",
+      "regular",
+      "kern",
+      "kern"
     ]
   },
-  "styles": [
-    {
-      "slug": "figma",
-      "name": "figma",
-      "displayName": "Figma",
-      "nameZh": "Figma",
-      "group": "reference",
-      "summaryZh": "设计协作工具，标志性的深色+紫灰",
-      "category": "效率协作",
-      "tagsZh": [
-        "设计",
-        "协作"
-      ],
-      "styleKeywords": [
-        "设计",
-        "协作",
-        "设计协作工具",
-        "标志性的深色",
-        "紫灰"
-      ],
-      "aliases": [
-        "figma",
-        "Figma",
-        "设计",
-        "协作"
-      ],
-      "useCases": [
-        "SaaS 后台",
-        "工作台",
-        "产品介绍页"
-      ],
-      "previewLight": "design-md/figma/preview.html",
-      "previewDark": "design-md/figma/preview-dark.html",
-      "readmePath": "design-md/figma/README.md",
-      "designPath": "design-md/figma/DESIGN.md",
-      "positioningZh": "强调秩序感、工作流和信息组织，适合 SaaS 和工作台场景。",
-      "bestFor": [
-        "SaaS 后台",
-        "工作台",
-        "产品介绍页",
-        "工作台首页"
-      ],
-      "avoidFor": [
-        "纯品牌大片式营销页",
-        "重情绪化视觉实验页面"
-      ],
-      "aiChecklist": [
-        "重视内容块编排",
-        "表单和列表要易扫读",
-        "中文标题长度要控制在稳妥范围"
-      ],
-      "recommendedPromptZh": "参考 Figma / Figma 的视觉语言，设计一个中文 SaaS 后台，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "cal",
-          "nameZh": "Cal"
-        },
-        {
-          "slug": "linear.app",
-          "nameZh": "Linear"
-        },
-        {
-          "slug": "miro",
-          "nameZh": "Miro"
-        }
-      ]
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#000000"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#000000"
+      },
+      "tokens": {
+        "primaryColor": "#000000"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:48.986Z",
+    "designMdPath": "design-md/figma/DESIGN.md"
+  }
 }

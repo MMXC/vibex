@@ -1,76 +1,119 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.930Z",
-  "sourcePath": "design-md/posthog/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "精选风格": [
-      "posthog"
+  "version": "1.0",
+  "style": "posthog",
+  "displayName": "PostHog",
+  "styleZh": "PostHog",
+  "tags": [
+    "分析",
+    "产品"
+  ],
+  "styleKeywords": [
+    "分析",
+    "产品",
+    "产品分析平台",
+    "温暖黄色品牌"
+  ],
+  "useCases": [
+    "产品官网",
+    "品牌页面",
+    "界面参考"
+  ],
+  "bestFor": [
+    "产品官网",
+    "品牌页面",
+    "界面参考"
+  ],
+  "avoidFor": [
+    "对行业规范要求很强的系统"
+  ],
+  "positioningZh": "适合做通用参考，先看预览再决定是否采纳。",
+  "colorPalette": {
+    "primary": "#4d4f46",
+    "background": "#ffffff",
+    "textPrimary": "#1e1f23",
+    "primaryHover": "#F54E00",
+    "border": "#fdfdf8",
+    "accent": "#1e1f23"
+  },
+  "typography": {
+    "fontFamily": "system-ui",
+    "headingWeight": 700,
+    "bodyWeight": 100,
+    "headingSize": "36px",
+    "bodySize": "18px",
+    "fontFamilyMono": "ui-monospace",
+    "letterSpacing": "0.75px",
+    "openTypeFeatures": [
+      "polished",
+      "premium"
     ]
   },
-  "styles": [
-    {
-      "slug": "posthog",
-      "name": "posthog",
-      "displayName": "PostHog",
-      "nameZh": "PostHog",
-      "group": "reference",
-      "summaryZh": "产品分析平台，温暖黄色品牌",
-      "category": "精选风格",
-      "tagsZh": [
-        "分析",
-        "产品"
-      ],
-      "styleKeywords": [
-        "分析",
-        "产品",
-        "产品分析平台",
-        "温暖黄色品牌"
-      ],
-      "aliases": [
-        "posthog",
-        "PostHog",
-        "分析",
-        "产品"
-      ],
-      "useCases": [
-        "产品官网",
-        "品牌页面",
-        "界面参考"
-      ],
-      "previewLight": "design-md/posthog/preview.html",
-      "previewDark": "design-md/posthog/preview-dark.html",
-      "readmePath": "design-md/posthog/README.md",
-      "designPath": "design-md/posthog/DESIGN.md",
-      "positioningZh": "适合做通用参考，先看预览再决定是否采纳。",
-      "bestFor": [
-        "产品官网",
-        "品牌页面",
-        "界面参考"
-      ],
-      "avoidFor": [
-        "对行业规范要求很强的系统"
-      ],
-      "aiChecklist": [
-        "先看预览是否接近目标气质",
-        "按中文场景二次调整信息密度",
-        "不要直接全量照搬"
-      ],
-      "recommendedPromptZh": "参考 PostHog / PostHog 的视觉语言，设计一个中文 产品官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "clay",
-          "nameZh": "Clay"
-        },
-        {
-          "slug": "intercom",
-          "nameZh": "Intercom"
-        },
-        {
-          "slug": "superhuman",
-          "nameZh": "Superhuman"
-        }
-      ]
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#4d4f46"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#4d4f46"
+      },
+      "tokens": {
+        "primaryColor": "#4d4f46"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:49.011Z",
+    "designMdPath": "design-md/posthog/DESIGN.md"
+  }
 }

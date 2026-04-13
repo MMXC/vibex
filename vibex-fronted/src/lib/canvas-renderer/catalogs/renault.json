@@ -1,77 +1,119 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.931Z",
-  "sourcePath": "design-md/renault/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "品牌官网": [
-      "renault"
+  "version": "1.0",
+  "style": "renault",
+  "displayName": "Renault",
+  "styleZh": "雷诺",
+  "tags": [
+    "汽车",
+    "品牌"
+  ],
+  "styleKeywords": [
+    "汽车",
+    "品牌",
+    "雷诺官网",
+    "极具能量的渐变车展氛围与法式几何秩序"
+  ],
+  "useCases": [
+    "品牌官网",
+    "营销落地页",
+    "企业介绍页"
+  ],
+  "bestFor": [
+    "品牌官网",
+    "营销落地页",
+    "企业介绍页"
+  ],
+  "avoidFor": [
+    "复杂运维后台",
+    "高密度列表管理页"
+  ],
+  "positioningZh": "强调品牌气质、节奏和视觉记忆点，更适合营销和叙事表达。",
+  "colorPalette": {
+    "primary": "#EFDF00",
+    "background": "#ffffff",
+    "textPrimary": "#000000",
+    "primaryHover": "#1883FD",
+    "error": "#BE6464",
+    "border": "#D1D1D1",
+    "accent": "#1883FD"
+  },
+  "typography": {
+    "fontFamily": "#000000",
+    "headingWeight": 0,
+    "bodyWeight": 0,
+    "headingSize": "40px",
+    "bodySize": "56px",
+    "openTypeFeatures": [
+      "r",
+      "feel"
     ]
   },
-  "styles": [
-    {
-      "slug": "renault",
-      "name": "renault",
-      "displayName": "Renault",
-      "nameZh": "雷诺",
-      "group": "reference",
-      "summaryZh": "雷诺官网，极具能量的渐变车展氛围与法式几何秩序",
-      "category": "品牌官网",
-      "tagsZh": [
-        "汽车",
-        "品牌"
-      ],
-      "styleKeywords": [
-        "汽车",
-        "品牌",
-        "雷诺官网",
-        "极具能量的渐变车展氛围与法式几何秩序"
-      ],
-      "aliases": [
-        "renault",
-        "雷诺",
-        "汽车",
-        "品牌"
-      ],
-      "useCases": [
-        "品牌官网",
-        "营销落地页",
-        "企业介绍页"
-      ],
-      "previewLight": "design-md/renault/preview.html",
-      "previewDark": "design-md/renault/preview-dark.html",
-      "readmePath": "design-md/renault/README.md",
-      "designPath": "design-md/renault/DESIGN.md",
-      "positioningZh": "强调品牌气质、节奏和视觉记忆点，更适合营销和叙事表达。",
-      "bestFor": [
-        "品牌官网",
-        "营销落地页",
-        "企业介绍页"
-      ],
-      "avoidFor": [
-        "复杂运维后台",
-        "高密度列表管理页"
-      ],
-      "aiChecklist": [
-        "强化首屏和大标题表现",
-        "控制信息数量",
-        "让留白和图片承担更多表达"
-      ],
-      "recommendedPromptZh": "参考 雷诺 / Renault 的视觉语言，设计一个中文 品牌官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "airbnb",
-          "nameZh": "爱彼迎"
-        },
-        {
-          "slug": "apple",
-          "nameZh": "苹果"
-        },
-        {
-          "slug": "bmw",
-          "nameZh": "宝马"
-        }
-      ]
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#EFDF00"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#EFDF00"
+      },
+      "tokens": {
+        "primaryColor": "#EFDF00"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:49.015Z",
+    "designMdPath": "design-md/renault/DESIGN.md"
+  }
 }

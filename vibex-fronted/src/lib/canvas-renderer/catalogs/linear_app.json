@@ -1,79 +1,125 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.929Z",
-  "sourcePath": "design-md/linear.app/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "效率协作": [
-      "linear.app"
+  "version": "1.0",
+  "style": "linear.app",
+  "displayName": "Linear",
+  "styleZh": "Linear",
+  "tags": [
+    "项目管理",
+    "极简"
+  ],
+  "styleKeywords": [
+    "项目管理",
+    "极简",
+    "问题追踪神器",
+    "深色极简工程美学"
+  ],
+  "useCases": [
+    "SaaS 后台",
+    "工作台",
+    "产品介绍页"
+  ],
+  "bestFor": [
+    "SaaS 后台",
+    "工作台",
+    "产品介绍页",
+    "工作台首页"
+  ],
+  "avoidFor": [
+    "纯品牌大片式营销页",
+    "重情绪化视觉实验页面"
+  ],
+  "positioningZh": "强调秩序感、工作流和信息组织，适合 SaaS 和工作台场景。",
+  "colorPalette": {
+    "primary": "#0f1011",
+    "background": "#ffffff",
+    "textPrimary": "#f7f8f8",
+    "primaryHover": "#828fff",
+    "textSecondary": "#28282c",
+    "border": "#23252a",
+    "accent": "#5e6ad2"
+  },
+  "typography": {
+    "fontFamily": "#f7f8f8",
+    "headingWeight": 600,
+    "bodyWeight": 400,
+    "headingSize": "24px",
+    "bodySize": "18px",
+    "fontFamilyMono": "Berkeley Mono",
+    "letterSpacing": "1.056px",
+    "openTypeFeatures": [
+      "cv01",
+      "ss03",
+      "cv01",
+      "ss03",
+      "cv01"
     ]
   },
-  "styles": [
-    {
-      "slug": "linear.app",
-      "name": "linear.app",
-      "displayName": "Linear",
-      "nameZh": "Linear",
-      "group": "reference",
-      "summaryZh": "问题追踪神器，深色极简工程美学",
-      "category": "效率协作",
-      "tagsZh": [
-        "项目管理",
-        "极简"
-      ],
-      "styleKeywords": [
-        "项目管理",
-        "极简",
-        "问题追踪神器",
-        "深色极简工程美学"
-      ],
-      "aliases": [
-        "linear.app",
-        "linearapp",
-        "Linear",
-        "项目管理",
-        "极简"
-      ],
-      "useCases": [
-        "SaaS 后台",
-        "工作台",
-        "产品介绍页"
-      ],
-      "previewLight": "design-md/linear.app/preview.html",
-      "previewDark": "design-md/linear.app/preview-dark.html",
-      "readmePath": "design-md/linear.app/README.md",
-      "designPath": "design-md/linear.app/DESIGN.md",
-      "positioningZh": "强调秩序感、工作流和信息组织，适合 SaaS 和工作台场景。",
-      "bestFor": [
-        "SaaS 后台",
-        "工作台",
-        "产品介绍页",
-        "工作台首页"
-      ],
-      "avoidFor": [
-        "纯品牌大片式营销页",
-        "重情绪化视觉实验页面"
-      ],
-      "aiChecklist": [
-        "重视内容块编排",
-        "表单和列表要易扫读",
-        "中文标题长度要控制在稳妥范围"
-      ],
-      "recommendedPromptZh": "参考 Linear / Linear 的视觉语言，设计一个中文 SaaS 后台，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "cal",
-          "nameZh": "Cal"
-        },
-        {
-          "slug": "figma",
-          "nameZh": "Figma"
-        },
-        {
-          "slug": "miro",
-          "nameZh": "Miro"
-        }
-      ]
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#0f1011"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#0f1011"
+      },
+      "tokens": {
+        "primaryColor": "#0f1011"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:48.991Z",
+    "designMdPath": "design-md/linear.app/DESIGN.md"
+  }
 }

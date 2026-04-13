@@ -1,69 +1,116 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.930Z",
-  "sourcePath": "design-md/pinterest/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "内容平台": [
-      "pinterest"
-    ]
+  "version": "1.0",
+  "style": "pinterest",
+  "displayName": "Pinterest",
+  "styleZh": "Pinterest",
+  "tags": [
+    "社交",
+    "图片"
+  ],
+  "styleKeywords": [
+    "社交",
+    "图片",
+    "图片社交平台",
+    "明亮活泼红白"
+  ],
+  "useCases": [
+    "内容社区",
+    "推荐流页面",
+    "活动专题页"
+  ],
+  "bestFor": [
+    "内容社区",
+    "推荐流页面",
+    "活动专题页"
+  ],
+  "avoidFor": [
+    "表单密集型后台",
+    "高度理性的文档站"
+  ],
+  "positioningZh": "强调流动感、内容展示效率和活跃度，适合内容消费和社区产品。",
+  "colorPalette": {
+    "primary": "#e60023",
+    "background": "#ffffff",
+    "textPrimary": "#211922",
+    "primaryHover": "#0b2819",
+    "textSecondary": "#e5e5e0",
+    "error": "#9e0a0a",
+    "border": "#c8c8c1",
+    "accent": "#62625b"
   },
-  "styles": [
-    {
-      "slug": "pinterest",
-      "name": "pinterest",
-      "displayName": "Pinterest",
-      "nameZh": "Pinterest",
-      "group": "reference",
-      "summaryZh": "图片社交平台，明亮活泼红白",
-      "category": "内容平台",
-      "tagsZh": [
-        "社交",
-        "图片"
-      ],
-      "styleKeywords": [
-        "社交",
-        "图片",
-        "图片社交平台",
-        "明亮活泼红白"
-      ],
-      "aliases": [
-        "pinterest",
-        "Pinterest",
-        "社交",
-        "图片"
-      ],
-      "useCases": [
-        "内容社区",
-        "推荐流页面",
-        "活动专题页"
-      ],
-      "previewLight": "design-md/pinterest/preview.html",
-      "previewDark": "design-md/pinterest/preview-dark.html",
-      "readmePath": "design-md/pinterest/README.md",
-      "designPath": "design-md/pinterest/DESIGN.md",
-      "positioningZh": "强调流动感、内容展示效率和活跃度，适合内容消费和社区产品。",
-      "bestFor": [
-        "内容社区",
-        "推荐流页面",
-        "活动专题页"
-      ],
-      "avoidFor": [
-        "表单密集型后台",
-        "高度理性的文档站"
-      ],
-      "aiChecklist": [
-        "优先突出封面和内容卡片",
-        "降低单屏信息负担",
-        "避免全部模块同质化"
-      ],
-      "recommendedPromptZh": "参考 Pinterest / Pinterest 的视觉语言，设计一个中文 内容社区，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "spotify",
-          "nameZh": "Spotify"
-        }
-      ]
+  "typography": {
+    "fontFamily": "Pin Sans",
+    "headingWeight": 600,
+    "bodyWeight": 400,
+    "headingSize": "28px",
+    "bodySize": "16px"
+  },
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#e60023"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#e60023"
+      },
+      "tokens": {
+        "primaryColor": "#e60023"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:49.009Z",
+    "designMdPath": "design-md/pinterest/DESIGN.md"
+  }
 }

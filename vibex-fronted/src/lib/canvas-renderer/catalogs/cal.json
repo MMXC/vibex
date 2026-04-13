@@ -1,78 +1,113 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.926Z",
-  "sourcePath": "design-md/cal/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "效率协作": [
-      "cal"
-    ]
+  "version": "1.0",
+  "style": "cal",
+  "displayName": "Cal",
+  "styleZh": "Cal",
+  "tags": [
+    "日历",
+    "预约"
+  ],
+  "styleKeywords": [
+    "日历",
+    "预约",
+    "Calendly风格",
+    "简洁预约排期界面"
+  ],
+  "useCases": [
+    "SaaS 后台",
+    "工作台",
+    "产品介绍页"
+  ],
+  "bestFor": [
+    "SaaS 后台",
+    "工作台",
+    "产品介绍页",
+    "工作台首页"
+  ],
+  "avoidFor": [
+    "纯品牌大片式营销页",
+    "重情绪化视觉实验页面"
+  ],
+  "positioningZh": "强调秩序感、工作流和信息组织，适合 SaaS 和工作台场景。",
+  "colorPalette": {
+    "primary": "#242424",
+    "background": "#ffffff",
+    "textPrimary": "#242424",
+    "primaryHover": "#898989"
   },
-  "styles": [
-    {
-      "slug": "cal",
-      "name": "cal",
-      "displayName": "Cal",
-      "nameZh": "Cal",
-      "group": "reference",
-      "summaryZh": "Calendly风格，简洁预约排期界面",
-      "category": "效率协作",
-      "tagsZh": [
-        "日历",
-        "预约"
-      ],
-      "styleKeywords": [
-        "日历",
-        "预约",
-        "Calendly风格",
-        "简洁预约排期界面"
-      ],
-      "aliases": [
-        "cal",
-        "Cal",
-        "日历",
-        "预约"
-      ],
-      "useCases": [
-        "SaaS 后台",
-        "工作台",
-        "产品介绍页"
-      ],
-      "previewLight": "design-md/cal/preview.html",
-      "previewDark": "design-md/cal/preview-dark.html",
-      "readmePath": "design-md/cal/README.md",
-      "designPath": "design-md/cal/DESIGN.md",
-      "positioningZh": "强调秩序感、工作流和信息组织，适合 SaaS 和工作台场景。",
-      "bestFor": [
-        "SaaS 后台",
-        "工作台",
-        "产品介绍页",
-        "工作台首页"
-      ],
-      "avoidFor": [
-        "纯品牌大片式营销页",
-        "重情绪化视觉实验页面"
-      ],
-      "aiChecklist": [
-        "重视内容块编排",
-        "表单和列表要易扫读",
-        "中文标题长度要控制在稳妥范围"
-      ],
-      "recommendedPromptZh": "参考 Cal / Cal 的视觉语言，设计一个中文 SaaS 后台，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "figma",
-          "nameZh": "Figma"
-        },
-        {
-          "slug": "linear.app",
-          "nameZh": "Linear"
-        },
-        {
-          "slug": "miro",
-          "nameZh": "Miro"
-        }
-      ]
+  "typography": {
+    "fontFamily": "system-ui",
+    "headingWeight": 600,
+    "bodyWeight": 300,
+    "headingSize": "48px",
+    "bodySize": "18px"
+  },
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#242424"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#242424"
+      },
+      "tokens": {
+        "primaryColor": "#242424"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:48.969Z",
+    "designMdPath": "design-md/cal/DESIGN.md"
+  }
 }

@@ -1,78 +1,118 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.932Z",
-  "sourcePath": "design-md/zapier/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "效率协作": [
-      "zapier"
+  "version": "1.0",
+  "style": "zapier",
+  "displayName": "Zapier",
+  "styleZh": "Zapier",
+  "tags": [
+    "自动化",
+    "效率"
+  ],
+  "styleKeywords": [
+    "自动化",
+    "效率",
+    "自动化平台",
+    "经典蓝白效率工具"
+  ],
+  "useCases": [
+    "SaaS 后台",
+    "工作台",
+    "产品介绍页"
+  ],
+  "bestFor": [
+    "SaaS 后台",
+    "工作台",
+    "产品介绍页",
+    "工作台首页"
+  ],
+  "avoidFor": [
+    "纯品牌大片式营销页",
+    "重情绪化视觉实验页面"
+  ],
+  "positioningZh": "强调秩序感、工作流和信息组织，适合 SaaS 和工作台场景。",
+  "colorPalette": {
+    "primary": "#201515",
+    "background": "#ffffff",
+    "textPrimary": "#201515",
+    "primaryHover": "#c5c0b1",
+    "accent": "#ff4f00"
+  },
+  "typography": {
+    "fontFamily": "Inter",
+    "headingWeight": 201,
+    "bodyWeight": 363,
+    "headingSize": "48px",
+    "bodySize": "20px",
+    "letterSpacing": "0.48px",
+    "openTypeFeatures": [
+      "weight"
     ]
   },
-  "styles": [
-    {
-      "slug": "zapier",
-      "name": "zapier",
-      "displayName": "Zapier",
-      "nameZh": "Zapier",
-      "group": "reference",
-      "summaryZh": "自动化平台，经典蓝白效率工具",
-      "category": "效率协作",
-      "tagsZh": [
-        "自动化",
-        "效率"
-      ],
-      "styleKeywords": [
-        "自动化",
-        "效率",
-        "自动化平台",
-        "经典蓝白效率工具"
-      ],
-      "aliases": [
-        "zapier",
-        "Zapier",
-        "自动化",
-        "效率"
-      ],
-      "useCases": [
-        "SaaS 后台",
-        "工作台",
-        "产品介绍页"
-      ],
-      "previewLight": "design-md/zapier/preview.html",
-      "previewDark": "design-md/zapier/preview-dark.html",
-      "readmePath": "design-md/zapier/README.md",
-      "designPath": "design-md/zapier/DESIGN.md",
-      "positioningZh": "强调秩序感、工作流和信息组织，适合 SaaS 和工作台场景。",
-      "bestFor": [
-        "SaaS 后台",
-        "工作台",
-        "产品介绍页",
-        "工作台首页"
-      ],
-      "avoidFor": [
-        "纯品牌大片式营销页",
-        "重情绪化视觉实验页面"
-      ],
-      "aiChecklist": [
-        "重视内容块编排",
-        "表单和列表要易扫读",
-        "中文标题长度要控制在稳妥范围"
-      ],
-      "recommendedPromptZh": "参考 Zapier / Zapier 的视觉语言，设计一个中文 SaaS 后台，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "cal",
-          "nameZh": "Cal"
-        },
-        {
-          "slug": "figma",
-          "nameZh": "Figma"
-        },
-        {
-          "slug": "linear.app",
-          "nameZh": "Linear"
-        }
-      ]
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#201515"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#201515"
+      },
+      "tokens": {
+        "primaryColor": "#201515"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:49.038Z",
+    "designMdPath": "design-md/zapier/DESIGN.md"
+  }
 }

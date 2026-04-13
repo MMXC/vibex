@@ -1,78 +1,115 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.926Z",
-  "sourcePath": "design-md/apple/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "品牌官网": [
-      "apple"
-    ]
+  "version": "1.0",
+  "style": "apple",
+  "displayName": "Apple",
+  "styleZh": "苹果",
+  "tags": [
+    "科技",
+    "高端"
+  ],
+  "styleKeywords": [
+    "科技",
+    "高端",
+    "极致简洁",
+    "大量留白",
+    "高端科技感"
+  ],
+  "useCases": [
+    "品牌官网",
+    "营销落地页",
+    "企业介绍页"
+  ],
+  "bestFor": [
+    "品牌官网",
+    "营销落地页",
+    "企业介绍页"
+  ],
+  "avoidFor": [
+    "复杂运维后台",
+    "高密度列表管理页"
+  ],
+  "positioningZh": "强调品牌气质、节奏和视觉记忆点，更适合营销和叙事表达。",
+  "colorPalette": {
+    "primary": "#000000",
+    "background": "#ffffff",
+    "textPrimary": "#1d1d1f",
+    "primaryHover": "#f5f5f7",
+    "accent": "#1d1d1f"
   },
-  "styles": [
-    {
-      "slug": "apple",
-      "name": "apple",
-      "displayName": "Apple",
-      "nameZh": "苹果",
-      "group": "reference",
-      "summaryZh": "极致简洁、大量留白、高端科技感",
-      "category": "品牌官网",
-      "tagsZh": [
-        "科技",
-        "高端"
-      ],
-      "styleKeywords": [
-        "科技",
-        "高端",
-        "极致简洁",
-        "大量留白",
-        "高端科技感"
-      ],
-      "aliases": [
-        "apple",
-        "苹果",
-        "科技",
-        "高端"
-      ],
-      "useCases": [
-        "品牌官网",
-        "营销落地页",
-        "企业介绍页"
-      ],
-      "previewLight": "design-md/apple/preview.html",
-      "previewDark": "design-md/apple/preview-dark.html",
-      "readmePath": "design-md/apple/README.md",
-      "designPath": "design-md/apple/DESIGN.md",
-      "positioningZh": "强调品牌气质、节奏和视觉记忆点，更适合营销和叙事表达。",
-      "bestFor": [
-        "品牌官网",
-        "营销落地页",
-        "企业介绍页"
-      ],
-      "avoidFor": [
-        "复杂运维后台",
-        "高密度列表管理页"
-      ],
-      "aiChecklist": [
-        "强化首屏和大标题表现",
-        "控制信息数量",
-        "让留白和图片承担更多表达"
-      ],
-      "recommendedPromptZh": "参考 苹果 / Apple 的视觉语言，设计一个中文 品牌官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "airbnb",
-          "nameZh": "爱彼迎"
-        },
-        {
-          "slug": "bmw",
-          "nameZh": "宝马"
-        },
-        {
-          "slug": "ferrari",
-          "nameZh": "法拉利"
-        }
-      ]
+  "typography": {
+    "fontFamily": "#0071e3",
+    "headingWeight": 600,
+    "bodyWeight": 400,
+    "headingSize": "40px",
+    "bodySize": "20px",
+    "letterSpacing": "0.28px"
+  },
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#000000"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#000000"
+      },
+      "tokens": {
+        "primaryColor": "#000000"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:48.967Z",
+    "designMdPath": "design-md/apple/DESIGN.md"
+  }
 }

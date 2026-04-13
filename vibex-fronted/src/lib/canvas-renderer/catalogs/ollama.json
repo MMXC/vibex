@@ -1,78 +1,122 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.929Z",
-  "sourcePath": "design-md/ollama/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "AI 产品": [
-      "ollama"
+  "version": "1.0",
+  "style": "ollama",
+  "displayName": "Ollama",
+  "styleZh": "Ollama",
+  "tags": [
+    "AI",
+    "本地"
+  ],
+  "styleKeywords": [
+    "AI",
+    "本地",
+    "本地AI模型运行",
+    "简约开发者工具"
+  ],
+  "useCases": [
+    "AI 工具官网",
+    "模型平台",
+    "功能介绍页"
+  ],
+  "bestFor": [
+    "AI 工具官网",
+    "模型平台",
+    "功能介绍页",
+    "模型能力介绍"
+  ],
+  "avoidFor": [
+    "强表格化后台",
+    "政企风审批系统"
+  ],
+  "positioningZh": "强调前沿感、速度感和产品未来感，适合把能力和差异点讲清楚。",
+  "colorPalette": {
+    "primary": "#000000",
+    "background": "#ffffff",
+    "textPrimary": "#262626",
+    "primaryHover": "#ffffff",
+    "border": "#d4d4d4"
+  },
+  "typography": {
+    "fontFamily": "system-ui",
+    "headingWeight": 600,
+    "bodyWeight": 400,
+    "headingSize": "36px",
+    "bodySize": "48px",
+    "fontFamilyMono": "ui-monospace",
+    "openTypeFeatures": [
+      "color",
+      "muted",
+      "ollama",
+      "launch",
+      "claude"
     ]
   },
-  "styles": [
-    {
-      "slug": "ollama",
-      "name": "ollama",
-      "displayName": "Ollama",
-      "nameZh": "Ollama",
-      "group": "reference",
-      "summaryZh": "本地AI模型运行，简约开发者工具",
-      "category": "AI 产品",
-      "tagsZh": [
-        "AI",
-        "本地"
-      ],
-      "styleKeywords": [
-        "AI",
-        "本地",
-        "本地AI模型运行",
-        "简约开发者工具"
-      ],
-      "aliases": [
-        "ollama",
-        "Ollama",
-        "AI",
-        "本地"
-      ],
-      "useCases": [
-        "AI 工具官网",
-        "模型平台",
-        "功能介绍页"
-      ],
-      "previewLight": "design-md/ollama/preview.html",
-      "previewDark": "design-md/ollama/preview-dark.html",
-      "readmePath": "design-md/ollama/README.md",
-      "designPath": "design-md/ollama/DESIGN.md",
-      "positioningZh": "强调前沿感、速度感和产品未来感，适合把能力和差异点讲清楚。",
-      "bestFor": [
-        "AI 工具官网",
-        "模型平台",
-        "功能介绍页",
-        "模型能力介绍"
-      ],
-      "avoidFor": [
-        "强表格化后台",
-        "政企风审批系统"
-      ],
-      "aiChecklist": [
-        "突出核心能力和模型价值",
-        "让功能区块清晰分组",
-        "避免页面装饰压过信息层级"
-      ],
-      "recommendedPromptZh": "参考 Ollama / Ollama 的视觉语言，设计一个中文 AI 工具官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "claude",
-          "nameZh": "Claude"
-        },
-        {
-          "slug": "cohere",
-          "nameZh": "Cohere"
-        },
-        {
-          "slug": "cursor",
-          "nameZh": "Cursor"
-        }
-      ]
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#000000"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#000000"
+      },
+      "tokens": {
+        "primaryColor": "#000000"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:49.006Z",
+    "designMdPath": "design-md/ollama/DESIGN.md"
+  }
 }

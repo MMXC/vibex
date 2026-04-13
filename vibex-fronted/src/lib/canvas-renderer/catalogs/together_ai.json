@@ -1,79 +1,122 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.931Z",
-  "sourcePath": "design-md/together.ai/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "AI 产品": [
-      "together.ai"
+  "version": "1.0",
+  "style": "together.ai",
+  "displayName": "Together AI",
+  "styleZh": "Together AI",
+  "tags": [
+    "AI",
+    "云"
+  ],
+  "styleKeywords": [
+    "AI",
+    "云",
+    "AI云平台",
+    "渐变深色开发者UI"
+  ],
+  "useCases": [
+    "AI 工具官网",
+    "模型平台",
+    "功能介绍页"
+  ],
+  "bestFor": [
+    "AI 工具官网",
+    "模型平台",
+    "功能介绍页",
+    "模型能力介绍"
+  ],
+  "avoidFor": [
+    "强表格化后台",
+    "政企风审批系统"
+  ],
+  "positioningZh": "强调前沿感、速度感和产品未来感，适合把能力和差异点讲清楚。",
+  "colorPalette": {
+    "primary": "#ef2cc1",
+    "background": "#ffffff",
+    "textPrimary": "#010120",
+    "accent": "#fc4c02"
+  },
+  "typography": {
+    "fontFamily": "The Future",
+    "headingWeight": 600,
+    "bodyWeight": 400,
+    "headingSize": "40px",
+    "bodySize": "18px",
+    "fontFamilyMono": "PP Neue Montreal Mono",
+    "letterSpacing": "0.055px",
+    "openTypeFeatures": [
+      "business",
+      "research",
+      "label",
+      "academic",
+      "together"
     ]
   },
-  "styles": [
-    {
-      "slug": "together.ai",
-      "name": "together.ai",
-      "displayName": "Together AI",
-      "nameZh": "Together AI",
-      "group": "reference",
-      "summaryZh": "AI云平台，渐变深色开发者UI",
-      "category": "AI 产品",
-      "tagsZh": [
-        "AI",
-        "云"
-      ],
-      "styleKeywords": [
-        "AI",
-        "云",
-        "AI云平台",
-        "渐变深色开发者UI"
-      ],
-      "aliases": [
-        "together.ai",
-        "togetherai",
-        "Together AI",
-        "AI",
-        "云"
-      ],
-      "useCases": [
-        "AI 工具官网",
-        "模型平台",
-        "功能介绍页"
-      ],
-      "previewLight": "design-md/together.ai/preview.html",
-      "previewDark": "design-md/together.ai/preview-dark.html",
-      "readmePath": "design-md/together.ai/README.md",
-      "designPath": "design-md/together.ai/DESIGN.md",
-      "positioningZh": "强调前沿感、速度感和产品未来感，适合把能力和差异点讲清楚。",
-      "bestFor": [
-        "AI 工具官网",
-        "模型平台",
-        "功能介绍页",
-        "模型能力介绍"
-      ],
-      "avoidFor": [
-        "强表格化后台",
-        "政企风审批系统"
-      ],
-      "aiChecklist": [
-        "突出核心能力和模型价值",
-        "让功能区块清晰分组",
-        "避免页面装饰压过信息层级"
-      ],
-      "recommendedPromptZh": "参考 Together AI / Together AI 的视觉语言，设计一个中文 AI 工具官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "claude",
-          "nameZh": "Claude"
-        },
-        {
-          "slug": "cohere",
-          "nameZh": "Cohere"
-        },
-        {
-          "slug": "cursor",
-          "nameZh": "Cursor"
-        }
-      ]
+  "componentTokens": {},
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
     }
-  ]
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "primaryColor": "#ef2cc1"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#ef2cc1"
+      },
+      "tokens": {
+        "primaryColor": "#ef2cc1"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:49.033Z",
+    "designMdPath": "design-md/together.ai/DESIGN.md"
+  }
 }

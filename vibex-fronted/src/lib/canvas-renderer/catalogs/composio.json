@@ -1,78 +1,125 @@
 {
-  "version": "1.0.0",
-  "generatedAt": "2026-04-13T19:55:16.928Z",
-  "sourcePath": "design-md/composio/DESIGN.md",
-  "totalStyles": 1,
-  "byCategory": {
-    "开发工具": [
-      "composio"
+  "version": "1.0",
+  "style": "composio",
+  "displayName": "Composio",
+  "styleZh": "Composio",
+  "tags": [
+    "AI工具",
+    "开发"
+  ],
+  "styleKeywords": [
+    "AI工具",
+    "开发",
+    "AI",
+    "Agent工具平台",
+    "现代深色UI"
+  ],
+  "useCases": [
+    "开发者官网",
+    "文档站",
+    "控制台后台"
+  ],
+  "bestFor": [
+    "开发者官网",
+    "文档站",
+    "控制台后台"
+  ],
+  "avoidFor": [
+    "强娱乐化内容页",
+    "情绪导向的品牌叙事页"
+  ],
+  "positioningZh": "重视结构清晰、可读性和文档感，适合开发者和 B 端产品。",
+  "colorPalette": {
+    "primary": "#0007cd",
+    "background": "#ffffff",
+    "textPrimary": "#0f0f0f",
+    "border": "#e0e0e0",
+    "accent": "#00ffff"
+  },
+  "typography": {
+    "fontFamily": "abcDiatype",
+    "headingWeight": 255,
+    "bodyWeight": 255,
+    "headingSize": "48px",
+    "bodySize": "18px",
+    "fontFamilyMono": "JetBrains Mono",
+    "openTypeFeatures": [
+      "chapters",
+      "dawn",
+      "feel"
     ]
   },
-  "styles": [
-    {
-      "slug": "composio",
-      "name": "composio",
-      "displayName": "Composio",
-      "nameZh": "Composio",
-      "group": "reference",
-      "summaryZh": "AI Agent工具平台，现代深色UI",
-      "category": "开发工具",
-      "tagsZh": [
-        "AI工具",
-        "开发"
-      ],
-      "styleKeywords": [
-        "AI工具",
-        "开发",
-        "AI",
-        "Agent工具平台",
-        "现代深色UI"
-      ],
-      "aliases": [
-        "composio",
-        "Composio",
-        "AI工具",
-        "开发"
-      ],
-      "useCases": [
-        "开发者官网",
-        "文档站",
-        "控制台后台"
-      ],
-      "previewLight": "design-md/composio/preview.html",
-      "previewDark": "design-md/composio/preview-dark.html",
-      "readmePath": "design-md/composio/README.md",
-      "designPath": "design-md/composio/DESIGN.md",
-      "positioningZh": "重视结构清晰、可读性和文档感，适合开发者和 B 端产品。",
-      "bestFor": [
-        "开发者官网",
-        "文档站",
-        "控制台后台"
-      ],
-      "avoidFor": [
-        "强娱乐化内容页",
-        "情绪导向的品牌叙事页"
-      ],
-      "aiChecklist": [
-        "保证标题层级明确",
-        "让按钮和代码区块保持克制",
-        "优先确保信息扫描效率"
-      ],
-      "recommendedPromptZh": "参考 Composio / Composio 的视觉语言，设计一个中文 开发者官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
-      "relatedItems": [
-        {
-          "slug": "airtable",
-          "nameZh": "Airtable"
-        },
-        {
-          "slug": "clickhouse",
-          "nameZh": "ClickHouse"
-        },
-        {
-          "slug": "expo",
-          "nameZh": "Expo"
-        }
-      ]
+  "componentTokens": {
+    "Card": {
+      "borderRadius": "12px"
     }
-  ]
+  },
+  "catalog": {
+    "version": "1.0",
+    "components": {
+      "Page": {
+        "description": "页面容器"
+      },
+      "Button": {
+        "description": "按钮"
+      },
+      "Card": {
+        "description": "卡片"
+      },
+      "Input": {
+        "description": "输入框"
+      },
+      "Navigation": {
+        "description": "导航栏"
+      },
+      "Modal": {
+        "description": "弹窗"
+      },
+      "List": {
+        "description": "列表"
+      },
+      "Badge": {
+        "description": "徽章"
+      },
+      "Avatar": {
+        "description": "头像"
+      },
+      "Table": {
+        "description": "表格"
+      }
+    }
+  },
+  "styleComponents": [
+    {
+      "name": "Card",
+      "catalogType": "Card",
+      "description": "卡片容器",
+      "styleOverrides": {
+        "borderRadius": "12px",
+        "padding": "16px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "borderRadius": "12px",
+        "primaryColor": "#0007cd"
+      }
+    },
+    {
+      "name": "Button",
+      "catalogType": "Button",
+      "description": "按钮",
+      "styleOverrides": {
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "background": "#0007cd"
+      },
+      "tokens": {
+        "primaryColor": "#0007cd"
+      }
+    }
+  ],
+  "_meta": {
+    "generatedAt": "2026-04-13T20:40:48.977Z",
+    "designMdPath": "design-md/composio/DESIGN.md"
+  }
 }

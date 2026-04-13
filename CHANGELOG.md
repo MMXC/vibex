@@ -1,3 +1,11 @@
+### Added (vibex-canvas-qa-fix Epic2: API 路径统一) — 2026-04-13
+- **E2.1**: api-config.ts — snapshots 端点添加 `/v1/` 前缀
+  - `snapshots: '/v1/canvas/snapshots'`
+  - snapshot/restoreSnapshot/latest 已含 `/v1/`，无需修改
+- **E2.2**: canvasApi.ts — 消费者使用 `getApiUrl(API_CONFIG.endpoints.canvas.snapshots)`，自动获取正确路径
+- **验证**: E0.1 HTTP 401（非 404）确认后端路由存在
+- 提交: `270858a2`
+
 ### Added (vibex-canvas-qa-fix Epic1: Hydration Mismatch 修复) — 2026-04-13
 - **E1.1-E1.5**: 5 个 canvas store 添加 `skipHydration: true`
   - contextStore, flowStore, componentStore, uiStore, sessionStore

@@ -1,5 +1,4 @@
 'use client';
-import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 /**
  * VersionHistoryPanel — 画布版本历史侧边栏
@@ -11,6 +10,7 @@ import { canvasLogger } from '@/lib/canvas/canvasLogger';
  */
 
 import React, { useCallback, useState } from 'react';
+import { canvasLogger } from '@/lib/canvas/canvasLogger';
 import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
 import styles from './VersionHistoryPanel.module.css';
 
@@ -37,12 +37,13 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
     loadSnapshots,
     createSnapshot,
     restoreSnapshot,
+    error: hookError,
   } = useVersionHistory();
 
   // Local loading states for async operations
   const [creating, setCreating] = useState(false);
   const [restoring, setRestoring] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [restoreError, setRestoreError] = useState<string | null>(null);
 
   // Sync with parent open state
   React.useEffect(() => {
@@ -54,13 +55,13 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
   const handleRestore = useCallback(
     async (snapshotId: string) => {
       setRestoring(true);
-      setError(null);
+      setRestoreError(null);
       try {
         await restoreSnapshot(snapshotId);
         // After successful restore, close panel
         onClose();
       } catch (err) {
-        setError('恢复失败，请重试');
+        setRestoreError('恢复失败，请重试');
         canvasLogger.VersionHistoryPanel.error(' restore error:', err);
       } finally {
         setRestoring(false);
@@ -71,11 +72,10 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
 
   const handleCreate = useCallback(async () => {
     setCreating(true);
-    setError(null);
     try {
       await createSnapshot();
     } catch (err) {
-      setError('创建快照失败，请重试');
+      // 错误由 hook error state 管理
       canvasLogger.VersionHistoryPanel.error(' create error:', err);
     } finally {
       setCreating(false);
@@ -144,10 +144,17 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
           </button>
         </div>
 
-        {/* Error banner */}
-        {error && (
+        {/* Hook error — from load/create operations */}
+        {hookError && (
           <div className={styles.errorBanner} role="alert">
-            <span>❌ {error}</span>
+            <span>❌ {hookError}</span>
+          </div>
+        )}
+
+        {/* Restore error — local state */}
+        {restoreError && (
+          <div className={styles.errorBanner} role="alert">
+            <span>❌ {restoreError}</span>
           </div>
         )}
 

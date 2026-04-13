@@ -1,3 +1,12 @@
+### Added (vibex-auth-401-redirect Epic1: canvasApi 401 事件分发修复) — 2026-04-13
+- **S1.1**: canvasApi.ts — 401 时 dispatchEvent('auth:401') + window.location.href 重定向
+  - handleResponseError 新增 returnTo 参数
+  - 所有 API 调用点传递 window.location.pathname
+- **S1.2**: validateReturnTo.ts — 白名单: /canvas, /design, /projects, /dashboard, /auth, /
+  - 拒绝: https://, //, 非白名单路径
+  - 修复 protocol-relative 绕过 (d7c44637)
+- 提交: `f3a68586`, `d7c44637`
+
 ### Added (vibex Epic1 TabBar 无障碍化改造) — 2026-04-13
 - **S1.1**: TabBar.tsx — 移除 disabled/locked/aria-disabled/guard 逻辑
   - 所有 tab 始终可点击、始终启用（无障碍化）

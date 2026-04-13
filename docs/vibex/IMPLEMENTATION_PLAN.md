@@ -14,7 +14,7 @@ Epic 1: TabBar 无障碍化改造
   └─ S1.1: TabBar.tsx 移除 disabled + 锁定逻辑（1h）
   └─ S1.2: CanvasPage.tsx 移动端内联 TabBar 同步（0.5h）
 
-Epic 2: 空状态提示设计
+Epic 2: 空状态提示设计 — ✅ 完成
   └─ S2.1: ContextTreePanel 空状态（0.5h）
   └─ S2.2: FlowTreePanel 空状态（0.5h）
   └─ S2.3: ComponentTreePanel 空状态（0.5h）
@@ -214,7 +214,7 @@ test('AC-5: 移动端与桌面端行为一致', async ({ page }) => {
 
 ---
 
-## 3. Epic 2: 空状态提示设计
+## 3. Epic 2: 空状态提示设计 — ✅ 完成
 
 **工时**: 1.5h（三个 Story 各 0.5h，可并行）
 **改动文件**: `vibex-fronted/src/components/canvas/TreePanel.tsx`

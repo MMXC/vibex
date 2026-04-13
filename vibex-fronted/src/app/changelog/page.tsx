@@ -46,6 +46,18 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.213',
+    date: '2026-04-13',
+    changes: [
+      '📋 vibex Epic3 TabBar 行为验证 e2e 测试',
+      '✅ tab-accessibility.spec.ts: 6 Playwright tests',
+      '✅ S3.1 无disabled S3.2 aria-selected S3.3 complete flow',
+      '提交: 7042410b',
+    ],
+    commit: '7042410b',
+  },
+
+  {
     version: '1.0.210',
     date: '2026-04-13',
     changes: [

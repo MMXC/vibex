@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.208',
+    date: '2026-04-13',
+    changes: [
+      '📋 vibex-canvas-qa-fix Epic3: Tab 默认 phase 初始化',
+      '✅ contextStore: phase input → context',
+      '✅ TabBar guard: phaseIdx=1 时 flow/component locked',
+      '提交: 301971314',
+    ],
+    commit: '301971314',
+  },
+
+  {
     version: '1.0.207',
     date: '2026-04-13',
     changes: [

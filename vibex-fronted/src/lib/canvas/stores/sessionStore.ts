@@ -54,6 +54,7 @@ interface SessionStore {
   projectName: string | null;
   prototypeQueue: PrototypePage[];
   isPolling: boolean;
+  logout: () => void;
   setProjectId: (id: string | null) => void;
   setProjectName: (name: string | null) => void;
   setIsPolling: (polling: boolean) => void;
@@ -104,6 +105,15 @@ export const useSessionStore = create<SessionStore>()(
         isPolling: false,
         setProjectId: (id) => set({ projectId: id }),
         setProjectName: (name) => set({ projectName: name }),
+        // S2.1: logout — clear auth state on 401
+        logout: () => set({
+          projectId: null,
+          projectName: null,
+          sseStatus: 'idle',
+          sseError: null,
+          messages: [],
+          prototypeQueue: [],
+        }),
         setIsPolling: (polling) => set({ isPolling: polling }),
         addToQueue: (pages) =>
           set((s) => ({ prototypeQueue: [...s.prototypeQueue, ...pages] })),

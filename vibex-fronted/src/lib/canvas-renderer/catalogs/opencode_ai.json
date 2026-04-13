@@ -1,0 +1,79 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-04-13T19:55:16.930Z",
+  "sourcePath": "design-md/opencode.ai/DESIGN.md",
+  "totalStyles": 1,
+  "byCategory": {
+    "AI 产品": [
+      "opencode.ai"
+    ]
+  },
+  "styles": [
+    {
+      "slug": "opencode.ai",
+      "name": "opencode.ai",
+      "displayName": "OpenCode",
+      "nameZh": "OpenCode",
+      "group": "reference",
+      "summaryZh": "AI代码平台，现代开发者UI",
+      "category": "AI 产品",
+      "tagsZh": [
+        "AI",
+        "代码"
+      ],
+      "styleKeywords": [
+        "AI",
+        "代码",
+        "AI代码平台",
+        "现代开发者UI"
+      ],
+      "aliases": [
+        "opencode.ai",
+        "opencodeai",
+        "OpenCode",
+        "AI",
+        "代码"
+      ],
+      "useCases": [
+        "AI 工具官网",
+        "模型平台",
+        "功能介绍页"
+      ],
+      "previewLight": "design-md/opencode.ai/preview.html",
+      "previewDark": "design-md/opencode.ai/preview-dark.html",
+      "readmePath": "design-md/opencode.ai/README.md",
+      "designPath": "design-md/opencode.ai/DESIGN.md",
+      "positioningZh": "强调前沿感、速度感和产品未来感，适合把能力和差异点讲清楚。",
+      "bestFor": [
+        "AI 工具官网",
+        "模型平台",
+        "功能介绍页",
+        "模型能力介绍"
+      ],
+      "avoidFor": [
+        "强表格化后台",
+        "政企风审批系统"
+      ],
+      "aiChecklist": [
+        "突出核心能力和模型价值",
+        "让功能区块清晰分组",
+        "避免页面装饰压过信息层级"
+      ],
+      "recommendedPromptZh": "参考 OpenCode / OpenCode 的视觉语言，设计一个中文 AI 工具官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
+      "relatedItems": [
+        {
+          "slug": "claude",
+          "nameZh": "Claude"
+        },
+        {
+          "slug": "cohere",
+          "nameZh": "Cohere"
+        },
+        {
+          "slug": "cursor",
+          "nameZh": "Cursor"
+        }
+      ]
+    }
+  ]
+}

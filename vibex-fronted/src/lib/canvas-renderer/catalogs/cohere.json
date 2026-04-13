@@ -1,0 +1,79 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-04-13T19:55:16.926Z",
+  "sourcePath": "design-md/cohere/DESIGN.md",
+  "totalStyles": 1,
+  "byCategory": {
+    "AI 产品": [
+      "cohere"
+    ]
+  },
+  "styles": [
+    {
+      "slug": "cohere",
+      "name": "cohere",
+      "displayName": "Cohere",
+      "nameZh": "Cohere",
+      "group": "reference",
+      "summaryZh": "AI初创公司，现代科技感深蓝+白色",
+      "category": "AI 产品",
+      "tagsZh": [
+        "AI",
+        "技术"
+      ],
+      "styleKeywords": [
+        "AI",
+        "技术",
+        "AI初创公司",
+        "现代科技感深蓝",
+        "白色"
+      ],
+      "aliases": [
+        "cohere",
+        "Cohere",
+        "AI",
+        "技术"
+      ],
+      "useCases": [
+        "AI 工具官网",
+        "模型平台",
+        "功能介绍页"
+      ],
+      "previewLight": "design-md/cohere/preview.html",
+      "previewDark": "design-md/cohere/preview-dark.html",
+      "readmePath": "design-md/cohere/README.md",
+      "designPath": "design-md/cohere/DESIGN.md",
+      "positioningZh": "强调前沿感、速度感和产品未来感，适合把能力和差异点讲清楚。",
+      "bestFor": [
+        "AI 工具官网",
+        "模型平台",
+        "功能介绍页",
+        "模型能力介绍"
+      ],
+      "avoidFor": [
+        "强表格化后台",
+        "政企风审批系统"
+      ],
+      "aiChecklist": [
+        "突出核心能力和模型价值",
+        "让功能区块清晰分组",
+        "避免页面装饰压过信息层级"
+      ],
+      "recommendedPromptZh": "参考 Cohere / Cohere 的视觉语言，设计一个中文 AI 工具官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
+      "relatedItems": [
+        {
+          "slug": "claude",
+          "nameZh": "Claude"
+        },
+        {
+          "slug": "cursor",
+          "nameZh": "Cursor"
+        },
+        {
+          "slug": "elevenlabs",
+          "nameZh": "ElevenLabs"
+        }
+      ]
+    }
+  ]
+}

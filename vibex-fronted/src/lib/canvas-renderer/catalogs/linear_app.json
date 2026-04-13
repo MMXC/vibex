@@ -1,0 +1,79 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-04-13T19:55:16.929Z",
+  "sourcePath": "design-md/linear.app/DESIGN.md",
+  "totalStyles": 1,
+  "byCategory": {
+    "效率协作": [
+      "linear.app"
+    ]
+  },
+  "styles": [
+    {
+      "slug": "linear.app",
+      "name": "linear.app",
+      "displayName": "Linear",
+      "nameZh": "Linear",
+      "group": "reference",
+      "summaryZh": "问题追踪神器，深色极简工程美学",
+      "category": "效率协作",
+      "tagsZh": [
+        "项目管理",
+        "极简"
+      ],
+      "styleKeywords": [
+        "项目管理",
+        "极简",
+        "问题追踪神器",
+        "深色极简工程美学"
+      ],
+      "aliases": [
+        "linear.app",
+        "linearapp",
+        "Linear",
+        "项目管理",
+        "极简"
+      ],
+      "useCases": [
+        "SaaS 后台",
+        "工作台",
+        "产品介绍页"
+      ],
+      "previewLight": "design-md/linear.app/preview.html",
+      "previewDark": "design-md/linear.app/preview-dark.html",
+      "readmePath": "design-md/linear.app/README.md",
+      "designPath": "design-md/linear.app/DESIGN.md",
+      "positioningZh": "强调秩序感、工作流和信息组织，适合 SaaS 和工作台场景。",
+      "bestFor": [
+        "SaaS 后台",
+        "工作台",
+        "产品介绍页",
+        "工作台首页"
+      ],
+      "avoidFor": [
+        "纯品牌大片式营销页",
+        "重情绪化视觉实验页面"
+      ],
+      "aiChecklist": [
+        "重视内容块编排",
+        "表单和列表要易扫读",
+        "中文标题长度要控制在稳妥范围"
+      ],
+      "recommendedPromptZh": "参考 Linear / Linear 的视觉语言，设计一个中文 SaaS 后台，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
+      "relatedItems": [
+        {
+          "slug": "cal",
+          "nameZh": "Cal"
+        },
+        {
+          "slug": "figma",
+          "nameZh": "Figma"
+        },
+        {
+          "slug": "miro",
+          "nameZh": "Miro"
+        }
+      ]
+    }
+  ]
+}

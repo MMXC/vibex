@@ -1,0 +1,78 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-04-13T19:55:16.926Z",
+  "sourcePath": "design-md/apple/DESIGN.md",
+  "totalStyles": 1,
+  "byCategory": {
+    "品牌官网": [
+      "apple"
+    ]
+  },
+  "styles": [
+    {
+      "slug": "apple",
+      "name": "apple",
+      "displayName": "Apple",
+      "nameZh": "苹果",
+      "group": "reference",
+      "summaryZh": "极致简洁、大量留白、高端科技感",
+      "category": "品牌官网",
+      "tagsZh": [
+        "科技",
+        "高端"
+      ],
+      "styleKeywords": [
+        "科技",
+        "高端",
+        "极致简洁",
+        "大量留白",
+        "高端科技感"
+      ],
+      "aliases": [
+        "apple",
+        "苹果",
+        "科技",
+        "高端"
+      ],
+      "useCases": [
+        "品牌官网",
+        "营销落地页",
+        "企业介绍页"
+      ],
+      "previewLight": "design-md/apple/preview.html",
+      "previewDark": "design-md/apple/preview-dark.html",
+      "readmePath": "design-md/apple/README.md",
+      "designPath": "design-md/apple/DESIGN.md",
+      "positioningZh": "强调品牌气质、节奏和视觉记忆点，更适合营销和叙事表达。",
+      "bestFor": [
+        "品牌官网",
+        "营销落地页",
+        "企业介绍页"
+      ],
+      "avoidFor": [
+        "复杂运维后台",
+        "高密度列表管理页"
+      ],
+      "aiChecklist": [
+        "强化首屏和大标题表现",
+        "控制信息数量",
+        "让留白和图片承担更多表达"
+      ],
+      "recommendedPromptZh": "参考 苹果 / Apple 的视觉语言，设计一个中文 品牌官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
+      "relatedItems": [
+        {
+          "slug": "airbnb",
+          "nameZh": "爱彼迎"
+        },
+        {
+          "slug": "bmw",
+          "nameZh": "宝马"
+        },
+        {
+          "slug": "ferrari",
+          "nameZh": "法拉利"
+        }
+      ]
+    }
+  ]
+}

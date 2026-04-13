@@ -374,6 +374,6 @@ useEffect(() => {
 - [x] 单元测试覆盖空值场景（5/5）✅
 
 ### Phase 2
-- [ ] CanvasPage 从 URL 读取 projectId
-- [ ] 无效 projectId 时降级处理
-- [ ] Hook 支持 URL 注入 + store 主动覆盖
+- [x] CanvasPage 从 URL 读取 projectId（useEffect，mount 时执行一次）✅
+- [x] 无效 projectId 时降级处理（fetch /api/projects/[id]，404→toast→setProjectId(null)）✅
+- [x] Hook 支持 URL 注入 + store 主动覆盖 ✅

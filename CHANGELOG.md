@@ -1,3 +1,12 @@
+### Added (vibex-canvas-auth-fix F11.2: 401/404 错误 UI 差异化) — 2026-04-13
+- **F11.2**: useVersionHistory.ts — 新增 `error: string | null` 状态
+  - loadSnapshots/createSnapshot catch 时 setError
+  - open() 时 setError(null) 清除旧错误
+- **F11.2**: canvasApi.ts — 404 → "历史功能维护中，请稍后再试"
+- **F11.2**: VersionHistoryPanel.tsx — hookError banner + restoreError banner 分离
+- **测试**: vitest 24/24 ✅（17 regression + 7 new error scenarios）
+- 提交: `3138c603`, `f926fb53`, `3ce3007c`
+
 ### Added (vibex-canvas-qa-fix Epic3: Tab 默认 phase 初始化) — 2026-04-13
 - **E3.1**: contextStore.ts — `phase: 'context'`（原为 'input'）
   - TabBar 读取 `contextStore.phase`（非 sessionStore）

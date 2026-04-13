@@ -21,6 +21,20 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.209',
+    date: '2026-04-13',
+    changes: [
+      '📋 vibex-canvas-auth-fix F11.2: 401/404 错误 UI 差异化',
+      '✅ useVersionHistory: 新增 error 状态 + open() 清除',
+      '✅ canvasApi: 404 → "历史功能维护中，请稍后再试"',
+      '✅ VersionHistoryPanel: hookError/restoreError banner 分离',
+      '✅ vitest 24/24',
+      '提交: 3138c603, f926fb53, 3ce3007c',
+    ],
+    commit: '3ce3007c',
+  },
+
+  {
     version: '1.0.208',
     date: '2026-04-13',
     changes: [

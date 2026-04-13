@@ -21,6 +21,18 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.215',
+    date: '2026-04-14',
+    changes: [
+      '📋 vibex-canvas-history-projectid Epic1: Phase1 止血修复',
+      '✅ useVersionHistory: projectId=null 拦截（loadSnapshots/createSnapshot/createAiSnapshot）',
+      '✅ VersionHistoryPanel: 🗺️请先创建项目 引导 UI',
+      '提交: dd482541',
+    ],
+    commit: 'dd482541',
+  },
+
+  {
     version: '1.0.214',
     date: '2026-04-13',
     changes: [

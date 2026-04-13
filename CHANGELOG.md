@@ -1,3 +1,11 @@
+### Added (vibex-design-component-library Epic1-Stories: 52 unit tests + design-parser 修复) — 2026-04-14
+- **tests/unit/design-catalog.test.ts**: 52 个测试用例，覆盖 S1.1-S1.4 和 S2.1-S2.2 验收标准
+- **design-parser.ts**: 修复 `### Heading` 格式解析，新增 `extractSection()` helper
+- 覆盖: colorPalette/typography/componentTokens 提取测试，3 个 catalog 结构测试，58 全量集成测试
+- 回归: catalog.ts 和 registry.tsx 未被修改
+- 验证: vitest 52/52 ✅，pnpm build exit 0 ✅
+- 提交: `da11de72`
+
 ### Added (vibex-design-component-library Epic2 Phase2 P1: design-parser 集成修复) — 2026-04-14
 - **design-parser.ts**: 增强 extractColors/extractTypography/extractComponentTokens，输出 DesignColorPalette/DesignTypography
 - **generate-catalog.ts**: 集成 design-parser，为 58 个 catalog JSON 补充 colorPalette/typography/catalog.components/styleComponents

@@ -34,6 +34,19 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.221',
+    date: '2026-04-14',
+    changes: [
+      '📋 vibex-design-component-library Epic1-Stories: 52 unit tests + design-parser 修复',
+      '✅ design-catalog.test.ts: 52 测试用例覆盖 S1.1-S1.4/S2.1-S2.2',
+      '✅ design-parser.ts: 修复 ### Heading 格式，新增 extractSection()',
+      '✅ 58 catalog 全量集成测试 + 回归测试（catalog.ts/registry.tsx 未修改）',
+      '提交: da11de72',
+    ],
+    commit: 'da11de72',
+  },
+
+  {
     version: '1.0.218',
     date: '2026-04-14',
     changes: [

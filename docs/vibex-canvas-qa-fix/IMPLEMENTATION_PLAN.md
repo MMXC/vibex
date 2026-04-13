@@ -3,7 +3,7 @@
 > **项目**: vibex-canvas-qa-fix
 > **日期**: 2026-04-13
 > **总工时**: ~5.5h
-> **状态**: Epic 0✅ Epic 1✅ Epic 2✅，待开发 E3-E4
+> **状态**: Epic 0✅ Epic 1✅ Epic 2✅ Epic 3✅ Epic 4✅ 全部完成
 
 ---
 
@@ -199,17 +199,19 @@ snapshots: '/v1/canvas/snapshots',
 
 ---
 
-## Epic 3: Tab 默认 phase（0.75h）
+## Epic 3: Tab 默认 phase（0.75h） — ✅ 完成
 
 ---
 
-### Story E3.1: 默认 phase 初始化
+### Story E3.1: 默认 phase 初始化 ✅ done
 
 > ⚠️ **审查修正**: TabBar 读取 `contextStore` 的 phase，非 `sessionStore`。修改 `contextStore.ts` 第 94 行。
 
 **开发文件**: `src/lib/canvas/stores/contextStore.ts`
 
-**修改位置**: 第 94 行
+**修改位置**: contextStore.ts 第 94 行
+**修改内容**: `phase: 'input'` → `phase: 'context'`
+**commit**: `30197131`
 
 ```typescript
 // 修复前
@@ -233,7 +235,7 @@ phase: 'context',
 
 ---
 
-### Story E3.2: Tab phase 守卫逻辑确认
+### Story E3.2: Tab phase 守卫逻辑确认 ✅ done (无需修改)
 
 **开发文件**: `src/components/canvas/TabBar.tsx`
 

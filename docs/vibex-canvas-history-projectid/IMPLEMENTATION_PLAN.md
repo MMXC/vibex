@@ -377,3 +377,7 @@ useEffect(() => {
 - [x] CanvasPage 从 URL 读取 projectId（useEffect，mount 时执行一次）✅
 - [x] 无效 projectId 时降级处理（fetch /api/projects/[id]，404→toast→setProjectId(null)）✅
 - [x] Hook 支持 URL 注入 + store 主动覆盖 ✅
+
+### Epic 1 Stories
+- [x] S1.3: useEffect([projectId]) projectId 变化自动重载 ✅（useVersionHistory.ts）
+- [x] S1.4: E2E 无 projectId 场景测试 ✅（e2e/version-history-no-project.spec.ts）

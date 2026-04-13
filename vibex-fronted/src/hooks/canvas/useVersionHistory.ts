@@ -7,7 +7,7 @@
  */
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
@@ -187,6 +187,14 @@ export function useVersionHistory(): UseVersionHistoryReturn {
     setError(null); // 打开时清除旧错误
     loadSnapshots();
   }, [loadSnapshots]);
+
+  // === S1.3: projectId 从 null → 有效值时自动重载快照列表 ===
+  useEffect(() => {
+    if (!projectId) return; // 只在 projectId 有效时触发
+    if (!isOpen) return;    // 面板打开时才加载（避免不必要的后台请求）
+    loadSnapshots();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId]); // projectId 变化时触发
 
   const close = useCallback(() => {
     setIsOpen(false);

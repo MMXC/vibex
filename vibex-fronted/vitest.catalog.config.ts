@@ -16,6 +16,6 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
-    include: ['tests/unit/design-catalog.test.ts'],
+    include: ['tests/unit/design-catalog.test.ts', 'tests/unit/generate-catalog.test.ts'],
   },
 });

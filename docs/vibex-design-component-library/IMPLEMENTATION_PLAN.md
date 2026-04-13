@@ -470,3 +470,10 @@ npx vitest run --config vitest.catalog.config.ts
 - [x] design-parser Button/Card 解析修复 ✅
 - [x] 全量 58 catalog 文件结构验证 ✅
 - [x] 回归: catalog.ts/registry.tsx 未修改 ✅
+
+### Epic2-Stories ✅ done
+- [x] `generate-catalog.test.ts`: 19 tests（Epic2 批量生成 + styleComponents 验证）
+- [x] S2.1 批量生成测试：`--all` 模式、merged catalog、slugToFilename
+- [x] S2.2 styleComponents 测试：全部 58 个 catalog 的 2-3 组件 + 字段完整性
+- [x] design-parser Epic2 集成测试：airbnb/linear.app/stripe 三套 DESIGN.md 解析验证
+- [x] 总测试数：71/71 (52 + 19) ✅

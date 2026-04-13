@@ -112,7 +112,15 @@ export function JsonRenderPreview({ nodes, onNodeClick, interactive = true }: Js
     <div className="h-full overflow-auto bg-gray-50" data-testid="json-render-preview">
       <StateProvider>
         <VisibilityProvider>
-          <ActionProvider handlers={{}}>
+          <ActionProvider
+            handlers={{
+              press: async (params) => {
+                if (onNodeClick && params?.nodeId) {
+                  onNodeClick(String(params.nodeId as string), String(params.type as string ?? ''));
+                }
+              },
+            }}
+          >
             <Renderer spec={spec} registry={vibexCanvasRegistry} />
           </ActionProvider>
         </VisibilityProvider>

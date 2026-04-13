@@ -18,7 +18,7 @@ import { vibexCanvasCatalog } from './catalog';
 type RegistryComponentProps<P> = { props: P; children?: React.ReactNode };
 
 // Button component
-const ButtonImpl = ({ props }: RegistryComponentProps<{ label: string; variant?: 'primary' | 'secondary' | 'danger' | 'ghost'; size?: 'sm' | 'md' | 'lg'; disabled?: boolean }>) => {
+const ButtonImpl = ({ props, emit, elementId }: RegistryComponentProps<{ label: string; variant?: 'primary' | 'secondary' | 'danger' | 'ghost'; size?: 'sm' | 'md' | 'lg'; disabled?: boolean }> & { emit?: (event: string, params?: Record<string, unknown>) => void; elementId?: string }) => {
   const { label, variant = 'primary', size = 'md', disabled = false } = props;
   const base = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
   const variants: Record<string, string> = {
@@ -29,7 +29,7 @@ const ButtonImpl = ({ props }: RegistryComponentProps<{ label: string; variant?:
   };
   const sizes: Record<string, string> = { sm: 'px-3 py-1.5 text-sm', md: 'px-4 py-2 text-sm', lg: 'px-6 py-3 text-base' };
   return (
-    <button className={`${base} ${variants[variant]} ${sizes[size]}`} disabled={disabled}>
+    <button className={`${base} ${variants[variant]} ${sizes[size]}`} disabled={disabled} onClick={() => emit?.('press', { nodeId: elementId, type: 'button' })}>
       {label}
     </button>
   );

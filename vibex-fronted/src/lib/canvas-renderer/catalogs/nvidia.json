@@ -44,7 +44,18 @@
     "bodySize": "18px",
     "letterSpacing": "0.144px"
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "2px",
+      "paddingX": "11px",
+      "background": "#1eaedb",
+      "textColor": "#000000"
+    },
+    "Card": {
+      "borderRadius": "2px",
+      "shadow": "rgba(0, 0, 0, 0.3) 0px 0px 5px 0px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -86,11 +97,12 @@
       "catalogType": "Card",
       "description": "卡片容器",
       "styleOverrides": {
-        "borderRadius": "12px",
+        "borderRadius": "2px",
         "padding": "16px",
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "2px",
         "primaryColor": "#76b900"
       }
     },
@@ -99,17 +111,18 @@
       "catalogType": "Button",
       "description": "按钮",
       "styleOverrides": {
-        "borderRadius": "8px",
-        "paddingX": "16px",
-        "background": "#76b900"
+        "borderRadius": "2px",
+        "paddingX": "11px",
+        "background": "#1eaedb"
       },
       "tokens": {
-        "primaryColor": "#76b900"
+        "primaryColor": "#76b900",
+        "borderRadius": "2px"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:49.004Z",
+    "generatedAt": "2026-04-13T20:56:38.168Z",
     "designMdPath": "design-md/nvidia/DESIGN.md"
   }
 }

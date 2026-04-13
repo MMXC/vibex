@@ -52,7 +52,17 @@
       "kern"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "8px",
+      "background": "#000000",
+      "textColor": "#ffffff"
+    },
+    "Card": {
+      "borderRadius": "6px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -94,11 +104,12 @@
       "catalogType": "Card",
       "description": "卡片容器",
       "styleOverrides": {
-        "borderRadius": "12px",
+        "borderRadius": "6px",
         "padding": "16px",
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "6px",
         "primaryColor": "#000000"
       }
     },
@@ -108,16 +119,17 @@
       "description": "按钮",
       "styleOverrides": {
         "borderRadius": "8px",
-        "paddingX": "16px",
+        "paddingX": "8px",
         "background": "#000000"
       },
       "tokens": {
-        "primaryColor": "#000000"
+        "primaryColor": "#000000",
+        "borderRadius": "8px"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:48.986Z",
+    "generatedAt": "2026-04-13T20:56:38.159Z",
     "designMdPath": "design-md/figma/DESIGN.md"
   }
 }

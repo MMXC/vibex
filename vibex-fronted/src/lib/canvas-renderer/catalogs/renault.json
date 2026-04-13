@@ -48,7 +48,21 @@
       "feel"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "0px",
+      "paddingX": "16px",
+      "background": "#FFFFFF",
+      "textColor": "#000000"
+    },
+    "Card": {
+      "borderRadius": "12px"
+    },
+    "Input": {
+      "borderRadius": "6px",
+      "background": "#FFFFFF"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -95,6 +109,7 @@
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "12px",
         "primaryColor": "#EFDF00"
       }
     },
@@ -103,17 +118,31 @@
       "catalogType": "Button",
       "description": "按钮",
       "styleOverrides": {
-        "borderRadius": "8px",
+        "borderRadius": "0px",
         "paddingX": "16px",
-        "background": "#EFDF00"
+        "background": "#FFFFFF"
       },
       "tokens": {
-        "primaryColor": "#EFDF00"
+        "primaryColor": "#EFDF00",
+        "borderRadius": "0px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "6px",
+        "background": "#FFFFFF"
+      },
+      "tokens": {
+        "borderColor": "#D1D1D1",
+        "textColor": "#000000"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:49.015Z",
+    "generatedAt": "2026-04-13T20:56:38.172Z",
     "designMdPath": "design-md/renault/DESIGN.md"
   }
 }

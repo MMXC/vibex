@@ -50,8 +50,16 @@
     ]
   },
   "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "16px",
+      "background": "#ffffff"
+    },
     "Card": {
       "borderRadius": "12px"
+    },
+    "Input": {
+      "borderRadius": "6px"
     }
   },
   "catalog": {
@@ -111,15 +119,29 @@
       "styleOverrides": {
         "borderRadius": "8px",
         "paddingX": "16px",
-        "background": "#0007cd"
+        "background": "#ffffff"
       },
       "tokens": {
-        "primaryColor": "#0007cd"
+        "primaryColor": "#0007cd",
+        "borderRadius": "8px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "6px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "borderColor": "#e0e0e0",
+        "textColor": "#0f0f0f"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:48.977Z",
+    "generatedAt": "2026-04-13T20:56:38.157Z",
     "designMdPath": "design-md/composio/DESIGN.md"
   }
 }

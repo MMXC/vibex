@@ -48,7 +48,21 @@
       "premium"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "16px",
+      "background": "#4d4f46",
+      "textColor": "#f4f4f4"
+    },
+    "Card": {
+      "borderRadius": "12px"
+    },
+    "Input": {
+      "borderRadius": "6px",
+      "background": "#9ea096"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -95,6 +109,7 @@
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "12px",
         "primaryColor": "#4d4f46"
       }
     },
@@ -108,12 +123,26 @@
         "background": "#4d4f46"
       },
       "tokens": {
-        "primaryColor": "#4d4f46"
+        "primaryColor": "#4d4f46",
+        "borderRadius": "8px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "6px",
+        "background": "#9ea096"
+      },
+      "tokens": {
+        "borderColor": "#fdfdf8",
+        "textColor": "#1e1f23"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:49.011Z",
+    "generatedAt": "2026-04-13T20:56:38.170Z",
     "designMdPath": "design-md/posthog/DESIGN.md"
   }
 }

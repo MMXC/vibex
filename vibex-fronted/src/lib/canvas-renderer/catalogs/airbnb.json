@@ -51,7 +51,21 @@
       "salt"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "24px",
+      "background": "#222222",
+      "textColor": "#ffffff"
+    },
+    "Card": {
+      "borderRadius": "14px",
+      "shadow": "rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 6px, rgba(0,0,0,0.1) 0px 4px 8px"
+    },
+    "Input": {
+      "borderRadius": "6px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -93,11 +107,12 @@
       "catalogType": "Card",
       "description": "卡片容器",
       "styleOverrides": {
-        "borderRadius": "12px",
+        "borderRadius": "14px",
         "padding": "16px",
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "14px",
         "primaryColor": "#ff385c"
       }
     },
@@ -107,16 +122,30 @@
       "description": "按钮",
       "styleOverrides": {
         "borderRadius": "8px",
-        "paddingX": "16px",
-        "background": "#ff385c"
+        "paddingX": "24px",
+        "background": "#222222"
       },
       "tokens": {
-        "primaryColor": "#ff385c"
+        "primaryColor": "#ff385c",
+        "borderRadius": "8px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "6px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "borderColor": "#c1c1c1",
+        "textColor": "#222222"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:48.963Z",
+    "generatedAt": "2026-04-13T20:56:38.151Z",
     "designMdPath": "design-md/airbnb/DESIGN.md"
   }
 }

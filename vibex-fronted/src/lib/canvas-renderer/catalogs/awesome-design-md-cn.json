@@ -46,7 +46,12 @@
     "headingSize": "24px",
     "bodySize": "14px"
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "16px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -106,12 +111,13 @@
         "background": "#111318"
       },
       "tokens": {
-        "primaryColor": "#111318"
+        "primaryColor": "#111318",
+        "borderRadius": "8px"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:48.961Z",
+    "generatedAt": "2026-04-13T20:56:38.149Z",
     "designMdPath": "design-md/awesome-design-md-cn/DESIGN.md"
   }
 }

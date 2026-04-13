@@ -51,7 +51,18 @@
       "cv11"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "16px"
+    },
+    "Card": {
+      "borderRadius": "12px"
+    },
+    "Input": {
+      "borderRadius": "6px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -98,6 +109,7 @@
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "12px",
         "primaryColor": "#1c1c1e"
       }
     },
@@ -111,12 +123,26 @@
         "background": "#1c1c1e"
       },
       "tokens": {
-        "primaryColor": "#1c1c1e"
+        "primaryColor": "#1c1c1e",
+        "borderRadius": "8px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "6px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "borderColor": "#c7cad5",
+        "textColor": "#1c1c1e"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:48.996Z",
+    "generatedAt": "2026-04-13T20:56:38.165Z",
     "designMdPath": "design-md/miro/DESIGN.md"
   }
 }

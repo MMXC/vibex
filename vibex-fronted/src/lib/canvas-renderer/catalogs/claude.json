@@ -52,7 +52,20 @@
       "rooms"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "12px",
+      "background": "#e8e6dc",
+      "textColor": "#4d4c48"
+    },
+    "Card": {
+      "borderRadius": "12px"
+    },
+    "Input": {
+      "borderRadius": "6px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -99,6 +112,7 @@
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "12px",
         "primaryColor": "#141413"
       }
     },
@@ -108,16 +122,30 @@
       "description": "按钮",
       "styleOverrides": {
         "borderRadius": "8px",
-        "paddingX": "16px",
-        "background": "#141413"
+        "paddingX": "12px",
+        "background": "#e8e6dc"
       },
       "tokens": {
-        "primaryColor": "#141413"
+        "primaryColor": "#141413",
+        "borderRadius": "8px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "6px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "borderColor": "#f0eee6",
+        "textColor": "#4d4c48"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:48.971Z",
+    "generatedAt": "2026-04-13T20:56:38.154Z",
     "designMdPath": "design-md/claude/DESIGN.md"
   }
 }

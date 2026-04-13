@@ -45,7 +45,24 @@
     "fontFamilyMono": "IBM Plex Mono",
     "letterSpacing": "0.16px"
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "14px",
+      "background": "#0f62fe",
+      "textColor": "#ffffff"
+    },
+    "Card": {
+      "borderRadius": "12px"
+    },
+    "Input": {
+      "borderRadius": "6px",
+      "background": "#f4f4f4"
+    },
+    "Navigation": {
+      "height": "48px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -92,6 +109,7 @@
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "12px",
         "primaryColor": "#0f62fe"
       }
     },
@@ -101,16 +119,30 @@
       "description": "按钮",
       "styleOverrides": {
         "borderRadius": "8px",
-        "paddingX": "16px",
+        "paddingX": "14px",
         "background": "#0f62fe"
       },
       "tokens": {
-        "primaryColor": "#0f62fe"
+        "primaryColor": "#0f62fe",
+        "borderRadius": "8px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "6px",
+        "background": "#f4f4f4"
+      },
+      "tokens": {
+        "borderColor": "#393939",
+        "textColor": "#161616"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:48.988Z",
+    "generatedAt": "2026-04-13T20:56:38.162Z",
     "designMdPath": "design-md/ibm/DESIGN.md"
   }
 }

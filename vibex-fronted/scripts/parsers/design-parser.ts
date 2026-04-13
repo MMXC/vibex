@@ -231,52 +231,76 @@ function extractTypography(content: string): DesignTypography {
 
 // ─── Component Tokens Extraction ──────────────────────────────────────────────
 
+// Extract a section by either bold heading (**Title**) or markdown heading (### Title)
+function extractSection(content: string, heading: string): string {
+  // Try bold heading first: **Buttons** or **Cards**
+  const boldMatch = content.match(new RegExp(`\\*\\*${heading}[s]?\\*\\*([\\s\\S]*?)(?=\\*\\*[A-Z][a-z]|### [A-Z]|## [0-9]|---|$)`, 'i'));
+  if (boldMatch) return boldMatch[1];
+
+  // Try markdown heading: ### Buttons or ### Cards & Containers
+  const mdMatch = content.match(new RegExp(`### ${heading}(?:s)?[^#]*?([\\s\\S]*?)(?=### [A-Z]|## [0-9]|---|$)`));
+  if (mdMatch) return mdMatch[1];
+
+  // Try ### with specific name variations
+  if (heading === 'Buttons') {
+    const alt = content.match(/### Buttons\\n([\\s\\S]*?)(?=### [A-Z]|## |---|$)/);
+    if (alt) return alt[1];
+  }
+  if (heading === 'Cards') {
+    const alt = content.match(/### Cards(?: & Containers)?\\n([\\s\\S]*?)(?=### [A-Z]|## |---|$)/i);
+    if (alt) return alt[1];
+  }
+
+  return '';
+}
+
 function extractComponentTokens(content: string): DesignComponentTokens {
   const tokens: DesignComponentTokens = {};
 
   // Button section
-  const btnSection = content.match(/\*\*Buttons?\*\*([\s\S]*?)(?=\*\*[A-Z][a-z]|## [0-9]|\n## |---)/);
+  const btnSection = extractSection(content, 'Buttons');
   if (btnSection) {
-    const btn = btnSection[1];
-    const radius = btn.match(/Radius[:\s-]*(\d+)px/)?.[1] ?? '8';
-    const paddingX = btn.match(/Padding[:\s-]*0px\s+(\d+)px/)?.[1] ?? btn.match(/Padding[:\s-]*(\d+)px/)?.[1] ?? '16';
+    const radius = btnSection.match(/Radius[:\s-]*(\d+)px/)?.[1] ?? '8';
+    const paddingX = btnSection.match(/Padding[:\s-]*0px\s+(\d+)px/)?.[1]
+      ?? btnSection.match(/Padding[:\s-]*(\d+)px/)?.[1]
+      ?? '16';
     tokens.Button = {
       borderRadius: `${radius}px`,
       paddingX: `${paddingX}px`,
     };
-    // Background color
-    const bgMatch = btn.match(/Background[:\s-]*[^#\n]*?(#[0-9a-fA-F]{3,8})/i);
+    const bgMatch = btnSection.match(/Background[:\s-]*[^#\n]*?(#[0-9a-fA-F]{3,8})/i);
     if (bgMatch) tokens.Button.background = bgMatch[1];
-    // Text color
-    const tcMatch = btn.match(/Text[:\s-]*[^#\n]*?(#[0-9a-fA-F]{3,8})/i);
+    const tcMatch = btnSection.match(/Text[:\s-]*[^#\n]*?(#[0-9a-fA-F]{3,8})/i);
     if (tcMatch) tokens.Button.textColor = tcMatch[1];
   }
 
-  // Card section
-  const cardSection = content.match(/\*\*Cards?(?:[^S]|Shadow)??(?:[^C]|Container)\*\*([\s\S]*?)(?=\*\*[A-Z][a-z]|## [0-9]|\n## |---)/i);
+  // Card section — try multiple heading patterns
+  let cardSection = extractSection(content, 'Cards');
+  if (!cardSection) {
+    // Try "Cards & Containers" specifically
+    const alt = content.match(/### Cards & Containers\\n([\\s\\S]*?)(?=### [A-Z]|## |---|$)/i);
+    if (alt) cardSection = alt[1];
+  }
   if (cardSection) {
-    const card = cardSection[1];
-    const radius = card.match(/Radius[:\s-]*(\d+)px/)?.[1] ?? '12';
-    const shadow = card.match(/Shadow[:\s-]*`([^`]+)`/)?.[1];
+    const radius = cardSection.match(/Radius[:\s-]*(\d+)px/)?.[1] ?? '12';
+    const shadow = cardSection.match(/Shadow[:\s-]*`([^`]+)`/)?.[1];
     tokens.Card = { borderRadius: `${radius}px` };
     if (shadow) tokens.Card.shadow = shadow;
   }
 
   // Input section
-  const inputSection = content.match(/\*\*Inputs?\*\*([\s\S]*?)(?=\*\*[A-Z][a-z]|## [0-9]|\n## |---)/i);
+  const inputSection = extractSection(content, 'Inputs');
   if (inputSection) {
-    const inp = inputSection[1];
-    const radius = inp.match(/Radius[:\s-]*(\d+)px/)?.[1] ?? '6';
+    const radius = inputSection.match(/Radius[:\s-]*(\d+)px/)?.[1] ?? '6';
     tokens.Input = { borderRadius: `${radius}px` };
-    const bgMatch = inp.match(/background[:\s]*[^#\n]*?(#[0-9a-fA-F]{3,8})/i);
+    const bgMatch = inputSection.match(/background[:\s]*[^#\n]*?(#[0-9a-fA-F]{3,8})/i);
     if (bgMatch) tokens.Input.background = bgMatch[1];
   }
 
   // Navigation section
-  const navSection = content.match(/\*\*Navigation\*\*([\s\S]*?)(?=\*\*[A-Z][a-z]|## [0-9]|\n## |---)/i);
+  const navSection = extractSection(content, 'Navigation');
   if (navSection) {
-    const nav = navSection[1];
-    const height = nav.match(/Height[:\s-]*(\d+)px/)?.[1];
+    const height = navSection.match(/Height[:\s-]*(\d+)px/)?.[1];
     if (height) tokens.Navigation = { height: `${height}px` };
   }
 

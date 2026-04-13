@@ -50,7 +50,21 @@
       "ss12"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "4px",
+      "paddingX": "8px",
+      "background": "#434346",
+      "textColor": "#000000"
+    },
+    "Card": {
+      "borderRadius": "12px",
+      "shadow": "rgba(0,0,0,0.1) 0px 1px 1px, rgba(0,0,0,0.04) 0px -1px 1px inset, rgba(0,0,0,0.05) 0px -0.5px 1px"
+    },
+    "Input": {
+      "borderRadius": "4px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -97,6 +111,7 @@
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "12px",
         "primaryColor": "#000000"
       }
     },
@@ -105,17 +120,31 @@
       "catalogType": "Button",
       "description": "按钮",
       "styleOverrides": {
-        "borderRadius": "8px",
-        "paddingX": "16px",
-        "background": "#000000"
+        "borderRadius": "4px",
+        "paddingX": "8px",
+        "background": "#434346"
       },
       "tokens": {
-        "primaryColor": "#000000"
+        "primaryColor": "#000000",
+        "borderRadius": "4px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "4px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "borderColor": "#e5e7eb",
+        "textColor": "#000000"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:48.972Z",
+    "generatedAt": "2026-04-13T20:56:38.154Z",
     "designMdPath": "design-md/clay/DESIGN.md"
   }
 }

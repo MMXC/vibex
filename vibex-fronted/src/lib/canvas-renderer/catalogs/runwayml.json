@@ -44,7 +44,15 @@
     "bodySize": "16px",
     "letterSpacing": "1.2px"
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "16px"
+    },
+    "Card": {
+      "borderRadius": "12px"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -91,6 +99,7 @@
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "12px",
         "primaryColor": "#000000"
       }
     },
@@ -104,12 +113,13 @@
         "background": "#000000"
       },
       "tokens": {
-        "primaryColor": "#000000"
+        "primaryColor": "#000000",
+        "borderRadius": "8px"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:49.021Z",
+    "generatedAt": "2026-04-13T20:56:38.173Z",
     "designMdPath": "design-md/runwayml/DESIGN.md"
   }
 }

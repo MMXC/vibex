@@ -47,7 +47,22 @@
       "label"
     ]
   },
-  "componentTokens": {},
+  "componentTokens": {
+    "Button": {
+      "borderRadius": "9999px",
+      "paddingX": "43px",
+      "background": "#1f1f1f",
+      "textColor": "#ffffff"
+    },
+    "Card": {
+      "borderRadius": "6px",
+      "shadow": "rgba(0,0,0,0.3) 0px 8px 8px"
+    },
+    "Input": {
+      "borderRadius": "500px",
+      "background": "#ffffff"
+    }
+  },
   "catalog": {
     "version": "1.0",
     "components": {
@@ -89,11 +104,12 @@
       "catalogType": "Card",
       "description": "卡片容器",
       "styleOverrides": {
-        "borderRadius": "12px",
+        "borderRadius": "6px",
         "padding": "16px",
         "background": "#ffffff"
       },
       "tokens": {
+        "borderRadius": "6px",
         "primaryColor": "#1ed760"
       }
     },
@@ -102,17 +118,31 @@
       "catalogType": "Button",
       "description": "按钮",
       "styleOverrides": {
-        "borderRadius": "8px",
-        "paddingX": "16px",
-        "background": "#1ed760"
+        "borderRadius": "9999px",
+        "paddingX": "43px",
+        "background": "#1f1f1f"
       },
       "tokens": {
-        "primaryColor": "#1ed760"
+        "primaryColor": "#1ed760",
+        "borderRadius": "9999px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "500px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "borderColor": "#4d4d4d",
+        "textColor": "#121212"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:49.029Z",
+    "generatedAt": "2026-04-13T20:56:38.176Z",
     "designMdPath": "design-md/spotify/DESIGN.md"
   }
 }

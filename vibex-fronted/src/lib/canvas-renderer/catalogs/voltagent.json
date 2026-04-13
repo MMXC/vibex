@@ -54,8 +54,17 @@
     ]
   },
   "componentTokens": {
+    "Button": {
+      "borderRadius": "8px",
+      "paddingX": "16px",
+      "background": "#101010",
+      "textColor": "#ffffff"
+    },
     "Card": {
       "borderRadius": "12px"
+    },
+    "Input": {
+      "borderRadius": "6px"
     }
   },
   "catalog": {
@@ -115,15 +124,29 @@
       "styleOverrides": {
         "borderRadius": "8px",
         "paddingX": "16px",
-        "background": "#00d992"
+        "background": "#101010"
       },
       "tokens": {
-        "primaryColor": "#00d992"
+        "primaryColor": "#00d992",
+        "borderRadius": "8px"
+      }
+    },
+    {
+      "name": "Input",
+      "catalogType": "Input",
+      "description": "输入框",
+      "styleOverrides": {
+        "borderRadius": "6px",
+        "background": "#ffffff"
+      },
+      "tokens": {
+        "borderColor": "#3d3a39",
+        "textColor": "#050507"
       }
     }
   ],
   "_meta": {
-    "generatedAt": "2026-04-13T20:40:49.035Z",
+    "generatedAt": "2026-04-13T20:56:38.180Z",
     "designMdPath": "design-md/voltagent/DESIGN.md"
   }
 }

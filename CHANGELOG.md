@@ -1,3 +1,13 @@
+### Added (vibex-auth-401-redirect Epic3: LeftDrawer 401 兜底 + E2E 测试) — 2026-04-13
+- **S3.1**: LeftDrawer.tsx — 3层 401 兜底架构
+  - Layer 1: canvasApi handleResponseError (Epic1)
+  - Layer 2: LeftDrawer catch err.message.includes('401')
+  - Layer 3: useEffect 监听 'auth:401' 事件（含 /auth 防重复跳转）
+- **S3.3**: auth-redirect.spec.ts E2E 测试
+  - AC-5: logout 不触发 跳转
+  - AC-7-1~4: returnTo 白名单/阻断验证
+- 提交: `6b1683be`, `23476571`
+
 ### Added (vibex-auth-401-redirect Epic2: AuthProvider 挂载与全局监听) — 2026-04-13
 - **S2.1**: AuthProvider.tsx — 监听 window 'auth:401' 事件，调用 sessionStore.logout()
   - ClientLayout.tsx: 'use client' wrapper

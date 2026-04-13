@@ -1,3 +1,12 @@
+### Added (vibex-canvas-history-projectid: Phase1+Phase2 projectId 链路修复) — 2026-04-14
+- **Phase1**: useVersionHistory.ts — loadSnapshots/createSnapshot/createAiSnapshot 顶部 null 检查
+  - projectId=null/undefined → 显示引导 UI (🗺️请先创建项目)，不调 API
+  - VersionHistoryPanel.tsx — hookError.includes('请先创建项目') 引导状态渲染
+- **Phase2**: CanvasPage.tsx — URL ?projectId= 注入 sessionStore
+  - mount useEffect 读取 URL projectId → setProjectId
+  - 合法性校验: GET /api/projects/[id]，404→toast→setProjectId(null)
+- 提交: `dd482541`, `438af56f`
+
 ### Added (vibex-auth-401-redirect Epic3: LeftDrawer 401 兜底 + E2E 测试) — 2026-04-13
 - **S3.1**: LeftDrawer.tsx — 3层 401 兜底架构
   - Layer 1: canvasApi handleResponseError (Epic1)

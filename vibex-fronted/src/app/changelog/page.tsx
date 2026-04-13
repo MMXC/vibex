@@ -26,8 +26,9 @@ const mockChangelog: ChangelogEntry[] = [
     changes: [
       '📋 vibex-canvas-history-projectid Epic1+Epic2: Phase1止血+Phase2 URL注入',
       '✅ Phase1: useVersionHistory projectId=null 拦截 + 引导 UI',
+      '✅ Phase1: useEffect([projectId]) projectId 变化自动重载 + E2E 4场景',
       '✅ Phase2: CanvasPage URL ?projectId= 注入 + 合法性校验',
-      '提交: dd482541, 438af56f',
+      '提交: dd482541, fff16cfd, 438af56f',
     ],
     commit: '438af56f',
   },

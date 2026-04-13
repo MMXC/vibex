@@ -15,9 +15,9 @@ Epic 1: TabBar 无障碍化改造 — ✅ 完成
   └─ S1.2: CanvasPage.tsx 移动端内联 TabBar 同步（0.5h） ✅ done
 
 Epic 2: 空状态提示设计 — ✅ 完成
-  └─ S2.1: ContextTreePanel 空状态（0.5h）
-  └─ S2.2: FlowTreePanel 空状态（0.5h）
-  └─ S2.3: ComponentTreePanel 空状态（0.5h）
+  └─ S2.1: ContextTreePanel 空状态（0.5h） ✅ done
+  └─ S2.2: FlowTreePanel 空状态（0.5h） ✅ done
+  └─ S2.3: ComponentTreePanel 空状态（0.5h） ✅ done
 
 Epic 3: 行为验证与测试 — ✅ 完成
   └─ S3.1: prototype tab 完全解锁验证（0.5h）

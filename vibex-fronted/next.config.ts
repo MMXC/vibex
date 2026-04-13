@@ -5,7 +5,8 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: '/root/.openclaw/vibex/vibex-fronted',
   },
-  output: 'export',
+  // QA模式下用standalone，允许API routes和middleware
+  output: process.env.NEXT_OUTPUT_MODE === 'standalone' ? 'standalone' : 'export',
   images: {
     loader: 'custom',
     loaderFile: './src/lib/cf-image-loader.ts',

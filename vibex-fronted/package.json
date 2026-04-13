@@ -6,6 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "qa:server": "./scripts/qa-server.sh start",
+    "test:e2e:qa": "./scripts/qa-server.sh start & sleep 5 && pnpm playwright test --config=playwright.config.ts --project=chromium; ./scripts/qa-server.sh stop",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test": "node scripts/test-with-exit-code.js",

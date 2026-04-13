@@ -1,0 +1,12 @@
+{"ts": "2026-04-13T12:45:54", "session_key": "test-session-001", "event": "stop_skip", "reason": "evaluator_md_missing"}
+{"ts": "2026-04-13T13:25:04", "session_key": "264174ec-27a6-4124-a3d4-61dbb32c61f7", "event": "stop_pass", "reason": "no_session_writes"}
+{"ts": "2026-04-13T13:25:19", "session_key": "5c9631b0-fcfc-4d57-a634-9c5de529488b", "event": "stop_pass", "reason": "no_session_writes"}
+{"ts": "2026-04-13T13:31:36", "session_key": "36c562de-23e0-4725-a6f1-b3c2b1d76624", "event": "stop_pass", "reason": "no_session_writes"}
+{"ts": "2026-04-13T13:50:25", "session_key": "1f5cee1a-c941-4e67-bfb2-d099f66d55da", "event": "stop_pass", "reason": "no_session_writes"}
+{"ts": "2026-04-13T13:52:23", "session_key": "1266dec6-398c-40f3-a433-29eb5f6ef4c5", "event": "stop_pass", "reason": "no_session_writes"}
+{"ts": "2026-04-13T13:52:53", "session_key": "593b1475-4a49-4413-bc70-ad72bbb02033", "event": "stop_pass", "reason": "no_session_writes"}
+{"ts": "2026-04-13T13:53:28", "session_key": "8ff623f6-27b7-48e9-a205-0b94f9dd67b8", "event": "stop_pass", "reason": "no_session_writes"}
+{"ts": "2026-04-13T13:53:36", "session_key": "6c51d4cf-faed-4379-be84-ee920384092c", "event": "stop_pass", "reason": "no_session_writes"}
+{"ts": "2026-04-13T13:54:26", "session_key": "e85600b5-462e-4ac5-8df1-320bc9b403a6", "event": "stop_pass", "reason": "no_session_writes"}
+{"ts": "2026-04-13T13:57:28", "session_key": "b42f0be3-980d-44a1-a439-f0557306af31", "event": "stop_pass", "reason": "no_session_writes"}
+{"ts": "2026-04-13T15:38:58", "session_key": "e0219ec0-494d-49d5-9737-8bb2095a1c51", "event": "stop_pass", "reason": "no_session_writes"}

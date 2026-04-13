@@ -1,9 +1,11 @@
-# VibeX 认证重定向 — PRD
+# VibeX TabBar 无障碍切换 — PRD
 
 **项目**: vibex
-**状态**: 已规划
+**阶段**: create-prd
 **PM**: pm
-**日期**: 2026-04-11
+**日期**: 2026-04-13
+**来源**: analysis.md (analyze-requirements)
+**Planning 输出**: docs/vibex/plan/feature-list.md
 **产出**: `/root/.openclaw/vibex/docs/vibex/prd.md`
 
 ---
@@ -11,111 +13,182 @@
 ## 1. 执行摘要
 
 ### 背景
-当前 VibeX 前端 httpClient 在收到 401 错误时仅清除 token，未自动跳转至登录页；AuthForm 登录成功后硬编码跳转到 `/dashboard`，未考虑用户原本的页面路径。这导致用户操作中被登出后体验断裂，需要手动返回原页面。
+
+当前 VibeX TabBar 的 4 个标签页（上下文/流程/组件/原型）使用 `disabled` 属性实现 phase 锁定：用户必须按 input → context → flow → component 的顺序解锁标签页，点击被锁定的 tab 没有任何响应（tooltip 需要 hover 才能看到）。这是从 canvas-three-tree-unification epic 就存在的设计，从未经过 UX 验证。同时移动端 `useTabMode` 有独立的 tab bar 实现，与桌面端 TabBar 行为不一致。
+
+历史经验一致指向同一个反模式：用阻断代替告知。`disabled` 是一种静默拒绝，用户点击后没有任何反馈，体验断裂。PhaseIndicator 已承担阶段状态告知职责，与 TabBar 的 disabled 锁定存在职责重叠。
 
 ### 目标
-实现「401 自动重定向 + 登录成功 returnTo」完整流程，用户在任意受保护页面因 session 过期被登出后，能无缝恢复到原页面操作。
+
+将 TabBar 改为单一标签切换模式——点击任意 tab 立即切换内容，**不使用 disabled 阻断状态**，phase 进度通过 PhaseIndicator 告知而非用 disabled 锁住操作。
 
 ### 成功指标
-- API 401 响应后 100% 自动跳转 `/auth`
-- 登录成功后 returnTo 恢复成功率 ≥ 95%
-- 登录页自身不触发 redirect 循环
-- E2E 测试 AC-1 ~ AC-8 全通过
-- 无开放重定向安全漏洞
+
+- AC-1: 4 个 tab 均无 `disabled` 属性（`expect(tab).not.toBeDisabled()`）
+- AC-2: 点击任意 tab，内容立即切换，响应 < 100ms
+- AC-3: 空树显示引导提示而非空白
+- AC-4: PhaseIndicator 不受影响，仍正常显示
+- AC-5: 移动端与桌面端行为一致
+- AC-6: prototype tab 始终可点击，与 phase 解耦
+- AC-7: 只有一个 tab 处于 active
+- AC-8: 切换 tab 后三树数据不丢失
 
 ---
 
 ## 2. Epic 拆分
 
-### Epic 1: 401 重定向核心机制
+### Epic 1: TabBar 无障碍化改造
 
 | Story ID | 描述 | 工时 | 验收标准 |
-|----------|------|------|----------|
-| **1.1** | httpClient 401 标记扩展 | httpClient 收到 401 时抛出带 `isAuthError=true` 和 `returnTo` 的错误对象，区分主动登出 | - `expect(error.isAuthError).toBe(true)`<br>- `expect(error.returnTo).toMatch(/^\//)` |
-| **1.2** | Auth 事件广播 | httpClient 清除 token 后 dispatch `window` 自定义事件 `auth:401`，携带 returnTo | - `expect(event.type).toBe('auth:401')`<br>- `expect(event.detail.returnTo).toBeDefined()` |
-| **1.3** | 全局 401 监听与跳转 | App 根组件或 AuthContext 监听 `auth:401`，存 sessionStorage，跳转 `/auth` | - `expect(sessionStorage.getItem('auth_return_to')).toBeTruthy()`<br>- `expect(router.push).toHaveBeenCalledWith('/auth')` |
+|---|---|---|---|
+| **S1.1** | TabBar.tsx 移除 disabled + 锁定逻辑 | 1h | 见下方 expect() 条目 |
+| **S1.2** | CanvasPage.tsx 移动端内联 TabBar 同步改造 | 0.5h | `<768px` 下行为与桌面端一致 |
 
-**Epic 1 总工时**: 5h
+**Epic 1 总工时**: 1.5h
 
 ---
 
-### Epic 2: 登录成功跳转逻辑
+### Epic 2: 空状态提示设计
 
 | Story ID | 描述 | 工时 | 验收标准 |
-|----------|------|------|----------|
-| **2.1** | AuthForm returnTo 读取 | AuthForm 登录成功后从 sessionStorage 读 returnTo，校验后跳转；无则 fallback `/dashboard` | - `expect(router.push).toHaveBeenCalledWith(expect.stringMatching(/^\//))`<br>- `expect(router.push).not.toHaveBeenCalledWith('/dashboard')`（有 returnTo 时）<br>- `expect(router.push).toHaveBeenCalledWith('/dashboard')`（无 returnTo 时） |
-| **2.2** | LoginDrawer returnTo | 第三方登录 drawer（Google/GitHub）同步支持 returnTo | - OAuth callback 后走同一 returnTo 逻辑 |
-| **2.3** | Auth 页面守卫 | `/auth` 路由本身不触发 401 redirect 检测，避免循环 | - `expect(inAuthPage).toBe(true)` 时 skip redirect |
-| **2.4** | returnTo 白名单校验 | returnTo 必须以 `/` 开头且非外部域名，否则 fallback `/dashboard` | - `expect(validateReturnTo('//evil.com')).toBe('/dashboard')`<br>- `expect(validateReturnTo('/dashboard')).toBe('/dashboard')`<br>- `expect(validateReturnTo('/canvas')).toBe('/canvas')` |
+|---|---|---|---|
+| **S2.1** | ContextTreePanel 空状态 | 0.5h | `nodes.length === 0` 时显示"请先在需求录入阶段输入需求" |
+| **S2.2** | FlowTreePanel 空状态 | 0.5h | 空数据显示"请先确认上下文节点，流程将自动生成" |
+| **S2.3** | ComponentTreePanel 空状态 | 0.5h | 空数据显示"请先完成流程树，组件将自动生成" |
 
-**Epic 2 总工时**: 2.5h（2.4 安全项可并行）
+**Epic 2 总工时**: 1.5h
 
 ---
 
-### Epic 3: 测试覆盖
+### Epic 3: 行为验证与测试
 
 | Story ID | 描述 | 工时 | 验收标准 |
-|----------|------|------|----------|
-| **3.1** | E2E 测试扩展 | 在 `tests/e2e/login-state-fix.spec.ts` 新增 TC-004~TC-008 | - TC-004: 401 触发 redirect<br>- TC-005: returnTo 保存正确<br>- TC-006: 登录成功返回原页面<br>- TC-007: OAuth returnTo<br>- TC-008: logout 不触发 redirect |
-| **3.2** | returnTo 白名单单元测试 | 校验函数 `validateReturnTo()` 覆盖正常路径和攻击路径 | - `expect(validateReturnTo('https://evil.com')).toBe('/dashboard')`<br>- `expect(validateReturnTo('/canvas?project=1')).toBe('/canvas?project=1')` |
+|---|---|---|---|
+| **S3.1** | prototype tab 完全解锁验证 | 0.5h | prototype tab 不受 phase 锁定，始终可点击 |
+| **S3.2** | Tab active 状态验证 | 0.5h | `activeTree === null` 时 context 为 active；其他情况 `activeTree === tab.id` |
+| **S3.3** | E2E 测试覆盖（tab-switching.spec.ts） | 1.5h | AC-1 ~ AC-8 全部通过 |
 
-**Epic 3 总工时**: 3h
+**Epic 3 总工时**: 2.5h
+
+---
+
+### 工时汇总
+
+| Epic | 工时 |
+|---|---|
+| Epic 1: TabBar 无障碍化改造 | 1.5h |
+| Epic 2: 空状态提示设计 | 1.5h |
+| Epic 3: 行为验证与测试 | 2.5h |
+| **合计** | **5.5h** |
 
 ---
 
 ## 3. 验收标准
 
-### Story 1.1 — httpClient 401 标记
+### S1.1 — TabBar.tsx 移除 disabled + 锁定逻辑
 
-```
-expect(new AuthError('Unauthorized', 401).isAuthError).toBe(true)
-expect(new AuthError('Unauthorized', 401).returnTo).toMatch(/^\//)
-expect(() => { throw new AuthError('Unauthorized', 401) }).toThrow()
-```
+```typescript
+// 删除前（TabBar.tsx:37-42）
+const tabIdx = PHASE_ORDER.indexOf(tab.id as Phase);
+const isLocked = tab.id !== 'prototype' && tabIdx > phaseIdx;
+disabled={isLocked}
+title={isLocked ? `需先完成上一阶段` : `切换到 ${tab.label} 树`}
 
-### Story 1.3 — 全局监听跳转
+// 删除前（TabBar.tsx:48-53）
+const tabIdx = PHASE_ORDER.indexOf(tab.id as Phase);
+if (tabIdx > phaseIdx) { return; }
 
-```
-// 在测试中 mock router.push，触发 401
-trigger401();
-expect(router.push).toHaveBeenCalledWith('/auth');
-expect(sessionStorage.getItem('auth_return_to')).toBe('/canvas/project/123');
-```
+// 删除后：handleTabClick 始终执行 setActiveTree(tabId)，无 phase 守卫
 
-### Story 2.1 — 登录后 returnTo
+// AC-1: 无 disabled 按钮
+expect(tab).not.toBeDisabled()  // 4 个 tab 均通过
 
-```
-// 场景 A: 有 returnTo
-sessionStorage.setItem('auth_return_to', '/canvas/project/123');
-login();
-expect(router.push).toHaveBeenCalledWith('/canvas/project/123');
-expect(sessionStorage.getItem('auth_return_to')).toBeNull();
-
-// 场景 B: 无 returnTo
-sessionStorage.removeItem('auth_return_to');
-login();
-expect(router.push).toHaveBeenCalledWith('/dashboard');
-
-// 场景 C: returnTo 为恶意 URL
-sessionStorage.setItem('auth_return_to', '//evil.com');
-login();
-expect(router.push).toHaveBeenCalledWith('/dashboard');
+// AC-6: prototype tab 始终可点击（不受 phase 锁定）
+const prototypeBtn = page.locator('[role="tab"]', { hasText: '🚀' });
+await prototypeBtn.click();
+await expect(prototypeBtn).toBeEnabled();
 ```
 
-### Story 3.1 — E2E TC-006
+### S1.2 — 移动端内联 TabBar 同步改造
 
+```typescript
+// AC-5: 移动端行为一致
+await page.setViewportSize({ width: 375, height: 812 });
+// 移动端内联 tab bar 应无 disabled
+const mobileTabs = page.locator('[role="tab"]');
+await expect(mobileTabs.first()).not.toBeDisabled();
 ```
-test('登录成功后返回原页面（TC-006）', async ({ page }) => {
-  await page.goto('/canvas/project/123');
-  // mock 401 response
-  await page.evaluate(() => {
-    window.dispatchEvent(new CustomEvent('auth:401', { detail: { returnTo: '/canvas/project/123' } }));
-  });
-  await expect(page).toHaveURL(/\/auth/);
-  await page.fill('[name="email"]', 'test@example.com');
-  await page.fill('[name="password"]', 'password');
-  await page.click('[type="submit"]');
-  await expect(page).toHaveURL('/canvas/project/123');
+
+### S2.1 / S2.2 / S2.3 — 空状态提示
+
+```typescript
+// 在 input 阶段点击 flow tab，显示引导提示
+await page.goto('/canvas');
+await page.click('[role="tab"]', { hasText: '🔀' });  // flow tab
+// 空状态提示可见
+const emptyState = page.locator('text=请先确认上下文节点');
+await expect(emptyState).toBeVisible();
+
+// 在 input 阶段点击 component tab
+await page.click('[role="tab"]', { hasText: '🧩' });  // component tab
+const emptyState2 = page.locator('text=请先完成流程树');
+await expect(emptyState2).toBeVisible();
+```
+
+### S3.2 — Tab active 状态
+
+```typescript
+// AC-7: 只有一个 tab 处于 active
+const activeTabs = page.locator('[role="tab"][aria-selected="true"]');
+await expect(activeTabs).toHaveCount(1);
+
+// 默认状态：context 为 active
+await page.goto('/canvas');
+const contextTab = page.locator('[role="tab"]', { hasText: '🔵' });
+await expect(contextTab).toHaveAttribute('aria-selected', 'true');
+```
+
+### S3.3 — E2E 测试完整覆盖
+
+```typescript
+// tab-switching.spec.ts
+test('AC-1: 4 个 tab 均无 disabled 属性', async ({ page }) => {
+  await page.goto('/canvas');
+  const tabs = page.locator('[role="tab"]');
+  await expect(tabs).toHaveCount(4);
+  for (const tab of await tabs.all()) {
+    await expect(tab).not.toBeDisabled();
+  }
+});
+
+test('AC-2: 点击立即切换，响应 < 100ms', async ({ page }) => {
+  await page.goto('/canvas');
+  const start = Date.now();
+  await page.click('[role="tab"]', { hasText: '🔀' });
+  await expect(page.locator('text=请先确认上下文节点')).toBeVisible();
+  expect(Date.now() - start).toBeLessThan(100);
+});
+
+test('AC-4: PhaseIndicator 不受影响', async ({ page }) => {
+  await page.goto('/canvas');
+  const phaseIndicator = page.locator('[aria-label*="阶段"]');
+  await expect(phaseIndicator).toBeVisible();
+  // 切换 tab 后仍正常显示
+  await page.click('[role="tab"]', { hasText: '🔀' });
+  await expect(phaseIndicator).toBeVisible();
+});
+
+test('AC-8: 切换 tab 后数据不丢失', async ({ page }) => {
+  // 先在 context tab 添加节点
+  await page.goto('/canvas');
+  await page.click('[role="tab"]', { hasText: '🔵' });
+  // ... 添加 context 节点
+  // 切换到 flow tab 再切回
+  await page.click('[role="tab"]', { hasText: '🔀' });
+  await page.click('[role="tab"]', { hasText: '🔵' });
+  // context 节点仍存在
+  const contextNodes = page.locator('[data-testid="context-node"]');
+  await expect(contextNodes).toHaveCountGreaterThan(0);
 });
 ```
 
@@ -123,25 +196,28 @@ test('登录成功后返回原页面（TC-006）', async ({ page }) => {
 
 ## 4. DoD (Definition of Done)
 
-Epic 1 完成条件：
-- [ ] `client.ts` 中 401 错误携带 `isAuthError` 和 `returnTo`
-- [ ] `auth:401` 事件能正常 dispatch 和 listen
-- [ ] `AuthContext` 或 App 根组件处理事件并跳转
+### Epic 1 完成条件
+- [ ] `TabBar.tsx` 中 `isLocked` 变量已删除
+- [ ] `TabBar.tsx` 中 `disabled={isLocked}` 已删除
+- [ ] `TabBar.tsx` 中 `handleTabClick` 的 phase 守卫已删除
+- [ ] `CanvasPage.tsx` 中移动端内联 tab bar 的 disabled 逻辑已删除
+- [ ] AC-1: 4 个 tab 均无 `disabled` 属性
 
-Epic 2 完成条件：
-- [ ] `auth/page.tsx` 登录后读取 sessionStorage returnTo
-- [ ] LoginDrawer 同步支持 returnTo
-- [ ] `/auth` 页面守卫条件生效
-- [ ] `validateReturnTo()` 白名单校验通过单元测试
+### Epic 2 完成条件
+- [ ] `ContextTreePanel` 空状态显示"请先在需求录入阶段输入需求"
+- [ ] `FlowTreePanel` 空状态显示"请先确认上下文节点，流程将自动生成"
+- [ ] `ComponentTreePanel` 空状态显示"请先完成流程树，组件将自动生成"
+- [ ] AC-3: 空树显示引导提示而非空白
 
-Epic 3 完成条件：
-- [ ] TC-004~TC-008 E2E 测试全部通过
-- [ ] `validateReturnTo()` 单元测试覆盖边界情况
-
-项目整体 DoD：
-- [ ] AC-1 ~ AC-8 全部满足
-- [ ] 安全测试（白名单）通过
+### Epic 3 完成条件
+- [ ] prototype tab 不受 phase 锁定，始终可点击
+- [ ] AC-7: 只有一个 tab 处于 active
+- [ ] `tab-switching.spec.ts` 覆盖 AC-1 ~ AC-8
+- [ ] AC-1 ~ AC-8 全部 E2E 测试通过
 - [ ] `pnpm build` + `pnpm test` 均通过
+
+### 项目整体 DoD
+- [ ] 所有 Epic 完成条件全部满足
 - [ ] changelog 已更新
 
 ---
@@ -149,31 +225,58 @@ Epic 3 完成条件：
 ## 5. 功能点汇总表
 
 | ID | 功能点 | 描述 | 验收标准 | 页面集成 |
-|----|--------|------|----------|----------|
-| F1.1 | httpClient 401 标记 | 401 抛出 AuthError，含 isAuthError + returnTo | `expect(error.isAuthError).toBe(true)` | 无 |
-| F1.2 | Auth 事件广播 | dispatch `auth:401` 事件 | `expect(event.type).toBe('auth:401')` | 无 |
-| F1.3 | 全局 401 监听 | App 根组件监听事件，存 sessionStorage，跳转 | `expect(router.push).toHaveBeenCalledWith('/auth')` | ✅ App 根 |
-| F2.1 | AuthForm returnTo | 登录成功后读 returnTo，校验后跳转 | `expect(router.push).toHaveBeenCalledWith(originalPath)` | ✅ /auth |
-| F2.2 | LoginDrawer returnTo | 第三方登录同步 returnTo | 同 F2.1 | ✅ LoginDrawer |
-| F2.3 | Auth 守卫 | /auth 页面跳过 401 检测 | `expect(inAuthPage).toBe(true)` 时 skip | ✅ /auth |
-| F2.4 | 白名单校验 | validateReturnTo() 防止开放重定向 | AC-5 expect 全覆盖 | 无 |
-| F3.1 | E2E 测试 | TC-004~TC-008 覆盖 | 5 个 E2E test 全 pass | 无 |
-| F3.2 | 白名单单元测试 | validateReturnTo() 覆盖边界 | 边界 case 全 pass | 无 |
+|---|---|---|---|---|
+| F1.1 | TabBar 移除 disabled 锁定逻辑 | 删除 `isLocked`、`disabled` 属性、`handleTabClick` 中的 phase 守卫 | `expect(tab).not.toBeDisabled()` | 【需页面集成】 |
+| F1.2 | 移动端内联 TabBar 同步移除 | CanvasPage 中 `useTabMode` 下的内联 tab bar 删除 disabled 逻辑 | `<768px` 下无 disabled | 【需页面集成】 |
+| F2.1 | ContextTreePanel 空状态 | 空数据显示引导文案 | `expect(emptyState).toBeVisible()` | 【需页面集成】 |
+| F2.2 | FlowTreePanel 空状态 | 空数据显示引导文案 | `expect(emptyState).toBeVisible()` | 【需页面集成】 |
+| F2.3 | ComponentTreePanel 空状态 | 空数据显示引导文案 | `expect(emptyState).toBeVisible()` | 【需页面集成】 |
+| F3.1 | prototype tab 完全解锁 | 不受 phase 锁定，始终可点击 | `expect(prototypeTab).toBeEnabled()` | 【需页面集成】 |
+| F4.1 | Tab active 状态正确 | 只有一个 tab active；context 默认 active | `expect(activeTabs).toHaveCount(1)` | 【需页面集成】 |
+| F5.1 | E2E 测试覆盖 | 新增 `tab-switching.spec.ts` | AC-1 ~ AC-8 全通过 | 无 |
 
 ---
 
-## 6. 风险提示
+## 6. 依赖关系图
+
+```
+F1.1 TabBar.tsx 移除 disabled    ──┐
+F1.2 CanvasPage 移动端同步      ──┤─ 共同产出: TabBar 无障碍化
+                                  │
+F2.1/F2.2/F2.3 空状态           ──┤─ 共同产出: 空状态提示设计
+                                  │
+F3.1 prototype tab 解锁         ──┤─ 共同产出: 行为验证
+F4.1 Tab active 状态
+                                  │
+F5.1 E2E 测试                   ← 所有 Epic 的验收
+
+无外部依赖，无需协调后端或其他团队
+```
+
+---
+
+## 7. 风险提示
 
 | 风险 | 可能性 | 影响 | 缓解 |
-|------|--------|------|------|
-| 循环 redirect（/auth → 401 → /auth） | 低 | 高 | F2.3 Auth 守卫 |
-| 开放重定向 | 低 | 高 | F2.4 白名单校验 |
-| logout 误触发 redirect | 中 | 中 | httpClient 区分 isLogoutAction |
-| OAuth callback 冲突 | 低 | 中 | OAuth callback 使用 URL 参数传递 returnTo |
+|---|---|---|---|
+| 用户点击空树感到困惑 | 中 | 低 | Epic 2 空状态提示；PhaseIndicator 引导下一步 |
+| 三树同时渲染性能下降 | 低 | 低 | 可用 CSS `display:none` 视觉隐藏，不卸载数据 |
+| 原型 tab 与其他 tab 行为不一致 | 低 | 中 | prototype tab 特殊处理，不受 phase 锁定 |
 
 ---
 
-## 7. PRD 格式校验
+## 8. 关键代码位置索引
+
+| 文件 | 行 | 用途 |
+|---|---|---|
+| `vibex-fronted/src/components/canvas/TabBar.tsx` | 37-42 | `isLocked` + `disabled` 定义 |
+| `vibex-fronted/src/components/canvas/TabBar.tsx` | 48-53 | `handleTabClick` 锁定守卫 |
+| `vibex-fronted/src/components/canvas/TabBar.tsx` | 54-61 | 按钮 disabled + class 条件 |
+| `vibex-fronted/src/components/canvas/CanvasPage.tsx` | ~240-260 | 移动端内联 tab bar（含 disabled） |
+
+---
+
+## 9. PRD 格式校验
 
 - [x] 执行摘要包含：背景 + 目标 + 成功指标
 - [x] Epic/Story 表格格式正确（ID/描述/工时/验收标准）
@@ -181,10 +284,11 @@ Epic 3 完成条件：
 - [x] DoD 章节存在且具体
 - [x] 功能点汇总表格式正确
 - [x] 已执行 Planning（Feature List 已产出）
-- [x] 安全风险已覆盖（白名单校验）
+- [x] 页面集成标注完整（【需页面集成】）
+- [x] 无遗漏验收标准
 
 ---
 
-*Planning 输出: `plan/feature-list.md`*  
-*基于 Analyst 报告: `analysis.md`*  
-*推荐方案: 方案 A（Auth Context + Axios Interceptor）*
+*Planning 输出: `docs/vibex/plan/feature-list.md`*
+*基于 Analyst 报告: `docs/vibex/analysis.md`*
+*推荐方案: 方案 A（TabBar 移除 disabled + 空状态提示）*

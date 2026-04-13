@@ -1,503 +1,449 @@
-# VibeX 认证重定向 — 实现计划
+# wow-harness OpenClaw 实装 — 实施计划
 
 > **项目**: vibex
-> **日期**: 2026-04-11
-> **总工时**: 10.5h
+> **日期**: 2026-04-13
+> **总工时**: ~14h
 > **状态**: 待开发
 
 ---
 
-## Epic 1: 401 重定向核心机制（5h）
+## Epic 1: Review Agent 工具隔离（2h） ✅ done 216af89
 
 ---
 
-### Story 1.1: httpClient 401 标记扩展（2h）
+### Story 1.1: Per-agent 工具白名单配置（1h） ✅ done
 
-**开发文件**: `src/services/api/client.ts`
+**实施**:
+- `~/.openclaw/openclaw.json` reviewer agent 新增 `tools.sandbox.tools.allow` 配置
+- 允许的工具: `Read`, `Grep`, `sessions_history`（3个，只读）
+- 禁止工具隐式拒绝: Write, Edit, Bash, exec, applyPatch 等
+- Config validated: `openclaw config validate` → valid ✅
 
-**修改内容摘要**:
+**实施commit**: `216af89`
 
-1. **新增 `AuthError` 类**（文件顶部添加）:
-```typescript
-export class AuthError extends Error {
-  isAuthError = true;
-  status: number;
-  returnTo: string;
+> ⚠️ **路径修正**: `tools.subagents.tools.deny` 不存在。正确路径为 `agents.list[].tools.sandbox.tools.allow`。
 
-  constructor(message: string, status: number, returnTo: string) {
-    super(message);
-    this.name = 'AuthError';
-    this.status = status;
-    this.returnTo = returnTo;
+**开发文件**: `~/.openclaw/openclaw.json`
+
+**修改内容**:
+
+在 `agents.list` 中为 reviewer agent 添加 tools sandbox allow 白名单：
+
+```json5
+{
+  agents: {
+    list: [
+      {
+        id: "reviewer",
+        workspace: "~/.openclaw/workspace-reviewer",
+        tools: {
+          sandbox: {
+            tools: {
+              allow: [
+                "read",
+                "grep",
+                "sessions_history",
+                "sessions_list",
+                "session_status",
+                "memory_search",
+                "memory_get",
+                "web_search",
+                "web_fetch"
+              ]
+            }
+          }
+        }
+      }
+    ]
   }
-}
-```
-
-2. **扩展响应拦截器 401 分支**（`instance.interceptors.response` error handler）:
-```typescript
-// 替换现有 401 处理逻辑
-if (error.response?.status === 401) {
-  // 区分主动登出（不触发 redirect）
-  const isLogoutAction = sessionStorage.getItem('auth_is_logout') === '1';
-  if (isLogoutAction) {
-    sessionStorage.removeItem('auth_is_logout');
-  } else {
-    const returnTo = typeof window !== 'undefined'
-      ? window.location.pathname + window.location.search
-      : '/dashboard';
-    window.dispatchEvent(
-      new CustomEvent('auth:401', { detail: { returnTo } })
-    );
-  }
-  // 清除 token（保持原有逻辑）
-  localStorage.removeItem('auth_token');
-  sessionStorage.removeItem('auth_token');
-  // 抛出 AuthError 而非普通 Error
-  const returnTo = typeof window !== 'undefined'
-    ? window.location.pathname + window.location.search
-    : '/dashboard';
-  return Promise.reject(new AuthError('登录已过期，请重新登录', 401, returnTo));
 }
 ```
 
 **验收标准**:
 ```bash
-# 单元测试
-pnpm vitest run src/services/api/__tests__/client-auth-401.test.ts
-# 期望: AuthError.isAuthError === true, AuthError.returnTo 匹配 /^\//
+# 验证配置：spawn reviewer agent 后，尝试调用 write/edit
+# 期望: 工具被拒绝（不在 allow 列表）
+# 尝试调用 read/sessions_history
+# 期望: 工具可用
 ```
 
 ---
 
-### Story 1.2: Auth 事件广播（1.5h）
+### Story 1.2: Per-agent 工具白名单测试（1h） ✅ done
 
-**开发文件**: `src/services/api/client.ts`（与 S1.1 合并开发）
+**实施**:
+- `~/.openclaw/agent-governance/tests/test_reviewer_tools.py`
+- 7 个测试用例（7/7 pass）：
+  - `test_reviewer_agent_has_tools_config`
+  - `test_reviewer_has_allow_list`
+  - `test_read_tools_allowed`
+  - `test_write_tools_not_allowed`
+  - `test_only_three_tools`
+  - `test_allow_list_exact_values`
+  - `test_is_schema_level_not_prompt_level`
 
-**修改内容摘要**:
+**实施commit**: `216af89`
 
-已在 S1.1 中实现 `window.dispatchEvent(new CustomEvent('auth:401', ...))`，无需额外文件改动。
+**注意**: OpenClaw 工具名为大写开头（`Read`, `Grep`），测试适配大小写
 
-**验收标准**:
+**开发文件**: `~/.openclaw/agent-governance/tests/test_reviewer_tools.py`
+
+**测试用例**:
+
+```python
+def test_reviewer_agent_allow_list():
+    """验证 reviewer agent 的 allow 白名单只含读操作"""
+    config = load_openclaw_config()
+    reviewer_agent = next(a for a in config["agents"]["list"] if a["id"] == "reviewer")
+    allow_list = reviewer_agent["tools"]["sandbox"]["tools"]["allow"]
+    assert "read" in allow_list
+    assert "grep" in allow_list
+    assert "sessions_history" in allow_list
+    # 写操作不应在 allow 列表
+    assert "write" not in allow_list
+    assert "edit" not in allow_list
+    assert "exec" not in allow_list
+    assert "apply_patch" not in allow_list
+```
+
+---
+
+## Epic 2: D8 机械化 Progress Check（4h）
+
+---
+
+### Story 2.1: run_d8_check 函数（1h）
+
+**开发文件**: `~/.openclaw/skills/team-tasks/scripts/task_manager.py`
+
+**新增函数**:
+
+```python
+def run_d8_check(
+    repo: str = "/root/.openclaw/vibex",
+    commands: list = None,
+    timeout: int = 300
+) -> dict:
+    """执行 D8 机械化检查"""
+    if commands is None:
+        commands = ["pnpm build", "pnpm test"]
+    results = {"build": None, "test": None, "passed": False, "errors": []}
+    for cmd in commands:
+        try:
+            r = subprocess.run(
+                cmd, shell=True, cwd=repo,
+                capture_output=True, text=True, timeout=timeout
+            )
+            label = "build" if "build" in cmd else "test"
+            results[label] = r.returncode
+            if r.returncode != 0:
+                results["errors"].append(f"{label} failed (exit {r.returncode})")
+        except subprocess.TimeoutExpired:
+            results["errors"].append(f"{cmd} timeout (>300s)")
+            results[label] = -1
+        except FileNotFoundError:
+            results["errors"].append(f"command not found: {cmd.split()[0]}")
+            results[label] = -2
+    results["passed"] = all(v == 0 for v in [results.get("build"), results.get("test")] 
+                            if isinstance(v, int) and v >= 0)
+    return results
+```
+
+---
+
+### Story 2.2: write_progress_json 函数（0.5h）
+
+**开发文件**: 同上
+
+```python
+def write_progress_json(status: str, task: str, errors: list = None):
+    """D8 检查后写入 progress.json"""
+    import json
+    from datetime import datetime
+    path = Path("~/.openclaw/progress.json").expanduser()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w") as f:
+        json.dump({
+            "task": task,
+            "status": status,
+            "timestamp": datetime.utcnow().isoformat(),
+            "errors": errors or []
+        }, f, indent=2)
+```
+
+---
+
+### Story 2.3: task_manager D8 钩子（1.5h）
+
+**开发文件**: `~/.openclaw/skills/team-tasks/scripts/task_manager.py`
+
+**修改点**: 在 `validate_task_completion()` 函数中增加 D8 检查调用：
+
+```python
+def validate_task_completion(project, stage_id, stage_info, old_status=None, repo=DEFAULT_WORK_DIR):
+    # ... 现有 commit 检查逻辑 ...
+    
+    # E2: D8 机械化检查（仅在 status == "done" 时触发）
+    if old_status == "done" or "done" in str(stage_info.get("status", "")):
+        d8 = run_d8_check(repo=repo)
+        write_progress_json(
+            "pass" if d8["passed"] else "fail",
+            f"{project}/{stage_id}",
+            d8["errors"]
+        )
+        if not d8["passed"]:
+            warnings.append(f"D8 CHECK FAILED: {'; '.join(d8['errors'])}")
+            return {"valid": False, "warnings": warnings, "commit": current_commit}
+```
+
+---
+
+### Story 2.4: D8 测试覆盖（1h）
+
+**开发文件**: `~/.openclaw/skills/team-tasks/scripts/test_d8_check.py`
+
+**测试用例**（mock subprocess）:
+
+```python
+def test_d8_both_pass(monkeypatch):
+    monkeypatch.setattr(subprocess, "run", Mock(returncode=0))
+    result = run_d8_check()
+    assert result["passed"] is True
+
+def test_d8_build_fail(monkeypatch):
+    def fake_run(cmd, **kwargs):
+        if "build" in cmd: return Mock(returncode=1, stderr="build error")
+        return Mock(returncode=0)
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    result = run_d8_check()
+    assert result["passed"] is False
+    assert "build failed" in result["errors"][0]
+
+def test_progress_json_write(tmp_path, monkeypatch):
+    monkeypatch.setattr(Path, "expanduser", lambda self: tmp_path / str(self).replace("~/.openclaw/", ""))
+    write_progress_json("pass", "vibex/test", [])
+    assert (tmp_path / "progress.json").exists()
+```
+
+---
+
+## Epic 3: Loop Detection + Session Reflection（4h）
+
+---
+
+### Story 3.1: agent-governance 目录创建（0.5h）
+
+**创建目录**: `~/.openclaw/agent-governance/`
+
+**创建文件结构**:
+```
+~/.openclaw/agent-governance/
+├── __init__.py
+├── config.json          # 集中配置（阈值、开关）
+├── loop_detector.py
+├── metrics_collector.py
+├── pattern_db.py
+└── sessions/            # 每个 session 一个 state 文件
+```
+
+---
+
+### Story 3.2: LoopDetector 实现（1.5h）
+
+**开发文件**: `~/.openclaw/agent-governance/loop_detector.py`
+
+**核心逻辑**: 按文件路径追踪 edit/exec/write 调用次数，超阈值返回警告文本。
+
+**关键方法**:
+- `record_edit(file_path, tool)` → `Optional[str]`（警告文本或 None）
+- `get_edit_count(file_path)` → `int`
+- `reset_file(file_path)` → `None`
+- `save()` → 持久化到 `sessions/{session_id}.json`
+
+---
+
+### Story 3.3: MetricsCollector 实现（1h）
+
+**开发文件**: `~/.openclaw/agent-governance/metrics_collector.py`
+
+**核心逻辑**: 记录 tool 调用频次、guard 命中数，session 结束时追加写入 metrics.jsonl。
+
+**关键方法**:
+- `record_tool(tool: str)` → `None`
+- `record_guard_hit(guard: str)` → `None`
+- `set_agent_type(agent_type: str)` → `None`
+- `write()` → 追加写入 `sessions/{session_id}/metrics.jsonl`
+
+---
+
+### Story 3.4: SOUL.md Loop Detection 集成（1h）
+
+> ⚠️ **方案修正**: task_manager.py 无法拦截 agent 的 edit/write 调用，改为通过 SOUL.md system prompt 注入。
+
+**开发文件**: `~/.openclaw/workspace-<agentId>/SOUL.md`（各 agent workspace）
+
+**修改内容**: 在 SOUL.md 末尾追加 Loop Detection 集成片段：
+
+```markdown
+## Loop Detection Integration
+
+每次执行 `edit` 或 `write` 工具后，立即调用：
+
 ```bash
-# 集成测试: 手动触发
-node -e "
-window.dispatchEvent(new CustomEvent('auth:401', { detail: { returnTo: '/test' } }));
-console.log(sessionStorage.getItem('auth_return_to')); // 期望: /test
+python3 -c "
+import sys, os, json
+sys.path.insert(0, '/root/.openclaw/agent-governance')
+from loop_detector import LoopDetector
+from metrics_collector import MetricsCollector
+
+session_id = os.environ.get('OPENCLAW_SESSION_ID', 'unknown')
+file_path = '<FILL_IN_FILE_PATH>'
+tool = '<FILL_IN_TOOL>'
+
+d = LoopDetector(session_id)
+m = MetricsCollector(session_id)
+w = d.record_edit(file_path, tool)
+if w: print(w)
+m.record_tool(tool)
+m.write()
+"
+```
+
+**填充说明**:
+- `<FILL_IN_FILE_PATH>`: 替换为 edit/write 工具操作的实际文件路径
+- `<FILL_IN_TOOL>`: 替换为 "edit" 或 "write"
+
+**Metrics 自动写入**: MetricsCollector.write() 在每次调用后执行（append-only，无性能问题）。
+
+---
+
+## Epic 4: Risk Tracking + Pattern Learning（4h）
+
+---
+
+### Story 4.1: Pattern DB 初始化（1h）
+
+**开发文件**: `~/.openclaw/failure-patterns.jsonl`
+
+**初始化数据**（≥10 条）:
+
+```jsonl
+{"type": "SyntaxError", "pattern": "SyntaxError.*Unexpected token", "solution": "Check for missing commas, brackets, or semicolons"}
+{"type": "TypeError", "pattern": "TypeError.*Cannot read property", "solution": "Verify object exists before accessing properties"}
+{"type": "BuildError", "pattern": "pnpm.*build.*failed", "solution": "Run pnpm build locally"}
+{"type": "ImportError", "pattern": "Cannot find module.*", "solution": "Verify import path and installation"}
+{"type": "TSError", "pattern": "TS[0-9]+:.*", "solution": "Run tsc --noEmit"}
+{"type": "TestFail", "pattern": "FAIL.*test.*", "solution": "Run test with --verbose"}
+{"type": "MergeConflict", "pattern": "<<<<<<.*======.*>>>>>>", "solution": "Resolve merge conflicts manually"}
+{"type": "LinterError", "pattern": "ESLint.*error", "solution": "Run eslint --fix"}
+{"type": "RuntimeCrash", "pattern": "ReferenceError.*is not defined", "solution": "Check variable scoping"}
+{"type": "TimeoutError", "pattern": "Timeout.*exceeded", "solution": "Increase timeout or optimize"}
+{"type": "CircularDep", "pattern": "Circular dependency detected", "solution": "Review imports and refactor"}
+{"type": "AuthError", "pattern": "401.*Unauthorized", "solution": "Refresh auth token or re-login"}
+```
+
+---
+
+### Story 4.2: Pattern Lookup 接口（1h）
+
+**开发文件**: `~/.openclaw/agent-governance/pattern_db.py`
+
+```python
+def lookup_pattern(error_msg: str) -> Optional[dict]:
+    """模糊匹配，返回最匹配的 pattern"""
+    ...
+
+def add_pattern(entry: dict) -> None:
+    """追加新 pattern"""
+    ...
+```
+
+---
+
+### Story 4.3: Risk 高频警告（1h）
+
+**开发文件**: `~/.openclaw/agent-governance/metrics_collector.py`
+
+在 `MetricsCollector` 中增加高频检测：
+
+```python
+RISK_THRESHOLDS = {"exec": 20, "edit": 10, "write": 5}
+
+def check_risk_warnings(self) -> Optional[str]:
+    """检查高频操作，返回警告文本"""
+    warnings = []
+    for tool, count in self.data["toolCalls"].items():
+        threshold = RISK_THRESHOLDS.get(tool, float("inf"))
+        if count >= threshold:
+            warnings.append(
+                f"⚠️ High frequency {tool}: {count} calls detected. "
+                f"Consider if this is productive or a loop."
+            )
+            self.record_guard_hit("risk_warnings")
+    return "\n".join(warnings) if warnings else None
+```
+
+---
+
+### Story 4.4: Pattern DB + Metrics 测试覆盖（1h）
+
+**开发文件**: `~/.openclaw/agent-governance/tests/`
+
+```python
+def test_pattern_lookup_exact():
+    result = lookup_pattern("SyntaxError: Unexpected token in parse")
+    assert result["type"] == "SyntaxError"
+    assert "solution" in result
+
+def test_pattern_lookup_no_match():
+    result = lookup_pattern("totally unknown error xyz")
+    assert result is None
+
+def test_metrics_tool_counting():
+    mc = MetricsCollector("test")
+    for _ in range(5): mc.record_tool("edit")
+    assert mc.data["toolCalls"]["edit"] == 5
+
+def test_risk_warning_trigger():
+    mc = MetricsCollector("test")
+    for _ in range(21): mc.record_tool("exec")
+    warning = mc.check_risk_warnings()
+    assert warning is not None
+    assert "exec" in warning
+```
+
+---
+
+## 完整测试命令
+
+```bash
+# E1: 工具策略验证
+python3 -c "import json; c=json.load(open('/root/.openclaw/openclaw.json')); print('deny:', c['tools']['subagents']['tools']['deny'])"
+
+# E2: D8 检查（本地）
+cd /root/.openclaw
+python3 -m pytest skills/team-tasks/scripts/test_d8_check.py -v
+
+# E3: Loop Detector
+python3 -m pytest ~/.openclaw/agent-governance/tests/test_loop_detector.py -v
+
+# E4: Pattern DB
+python3 -m pytest ~/.openclaw/agent-governance/tests/test_pattern_db.py -v
+
+# 完整集成测试
+python3 -m pytest ~/.openclaw/agent-governance/tests/ -v
+
+# 手动验证
+python3 -c "
+from agent_governance.loop_detector import LoopDetector
+d = LoopDetector('manual-test')
+for i in range(6):
+    w = d.record_edit('src/test.ts')
+    print(f'Edit {i+1}: warning={w is not None}')
 "
 ```
 
 ---
 
-### Story 1.3: 全局 401 监听与跳转（1.5h）
-
-**开发文件**: `src/hooks/useAuth.tsx`
-
-**修改内容摘要**:
-
-1. **在 `AuthProvider` 组件内新增 useEffect**:
-```typescript
-// 监听全局 401 事件，自动跳转 /auth
-useEffect(() => {
-  const handler = (e: Event) => {
-    const customEvent = e as CustomEvent<{ returnTo: string }>;
-    const returnTo = customEvent.detail?.returnTo;
-    if (!returnTo) return;
-    // Auth 页面守卫：自身不触发重定向
-    if (typeof window !== 'undefined' && window.location.pathname === '/auth') {
-      return;
-    }
-    sessionStorage.setItem('auth_return_to', returnTo);
-    router.push('/auth');
-  };
-  window.addEventListener('auth:401', handler);
-  return () => window.removeEventListener('auth:401', handler);
-}, [router]);
-```
-
-2. **logout 方法中设置 isLogoutAction 标记**:
-```typescript
-const logout = useCallback(async () => {
-  try {
-    // 设置标记：区分主动登出 vs 401 被动登出
-    sessionStorage.setItem('auth_is_logout', '1');
-    await apiService.logout();
-  } catch (error) {
-    canvasLogger.default.error('Logout API error:', error);
-  } finally {
-    sessionStorage.removeItem('auth_token');
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('project_roles');
-    sessionStorage.removeItem('auth_is_logout'); // 清理标记
-    setToken(null);
-    setUser(null);
-  }
-}, []);
-```
-
-**验收标准**:
-```bash
-pnpm vitest run src/hooks/__tests__/useAuth.test.tsx
-# 期望: 401 事件触发后 sessionStorage.setItem 被调用，router.push('/auth') 被调用
-```
-
----
-
-## Epic 2: 登录成功跳转逻辑（2.5h）
-
----
-
-### Story 2.1: AuthForm returnTo 读取（1h）
-
-**开发文件**: `src/app/auth/page.tsx`
-
-**修改内容摘要**:
-
-1. **新增 `validateReturnTo` 函数**（文件顶部）:
-```typescript
-function validateReturnTo(returnTo: string | null): string {
-  if (!returnTo) return '/dashboard';
-  if (!returnTo.startsWith('/')) return '/dashboard';
-  if (/^(https?|javascript:|data:)/i.test(returnTo)) return '/dashboard';
-  if (/^\/\//.test(returnTo)) return '/dashboard';
-  if (returnTo.includes('/../') || returnTo.endsWith('/..')) return '/dashboard';
-  return returnTo;
-}
-```
-
-2. **修改 `handleSubmit` 登录成功分支**:
-```typescript
-// 替换硬编码 router.push('/dashboard')
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError('');
-  setLoading(true);
-
-  try {
-    if (isLogin) {
-      await authApi.login({ email, password });
-    } else {
-      await authApi.register({ name, email, password });
-    }
-    // 从 sessionStorage 读取 returnTo
-    const returnTo = sessionStorage.getItem('auth_return_to');
-    const safeReturnTo = validateReturnTo(returnTo);
-    // 登录成功后清除 returnTo
-    sessionStorage.removeItem('auth_return_to');
-    router.push(safeReturnTo);
-  } catch (err: unknown) {
-    setError(err instanceof Error ? err.message : '操作失败，请稍后重试');
-  } finally {
-    setLoading(false);
-  }
-};
-```
-
-**验收标准**:
-```bash
-# 有 returnTo 时
-sessionStorage.setItem('auth_return_to', '/canvas/project/123');
-login();
-// 期望 router.push('/canvas/project/123')
-
-# 无 returnTo 时
-sessionStorage.removeItem('auth_return_to');
-login();
-// 期望 router.push('/dashboard')
-```
-
----
-
-### Story 2.2: OAuth returnTo（0.5h）
-
-**开发文件**: `src/services/oauth/oauth.ts`
-
-**修改内容摘要**:
-
-1. **发起 OAuth 时读取 returnTo**:
-```typescript
-export async function initiateOAuth(provider: 'google' | 'github'): Promise<void> {
-  const returnTo = sessionStorage.getItem('auth_return_to') || '/dashboard';
-  const callbackUrl = `${window.location.origin}/auth/callback?provider=${provider}&returnTo=${encodeURIComponent(returnTo)}`;
-  // 触发 OAuth 跳转
-  window.location.href = callbackUrl;
-}
-```
-
-2. **在 `auth/page.tsx` 的 OAuth callback 处理**（读取 URL 参数）:
-```typescript
-// 在 AuthForm 组件内 useEffect 中
-useEffect(() => {
-  const returnToParam = searchParams.get('returnTo');
-  if (returnToParam) {
-    sessionStorage.setItem('auth_return_to', returnToParam);
-  }
-}, [searchParams]);
-```
-
-**验收标准**: OAuth 登录成功后跳转到 sessionStorage 中的 returnTo。
-
----
-
-### Story 2.3: Auth 页面守卫（0.5h）
-
-**开发文件**: `src/hooks/useAuth.tsx`
-
-**修改内容摘要**:
-
-已在 Story 1.3 的 useEffect 中实现守卫逻辑：
-```typescript
-if (typeof window !== 'undefined' && window.location.pathname === '/auth') {
-  return; // 跳过跳转，避免 /auth → 401 → /auth 循环
-}
-```
-
-**验收标准**:
-```bash
-# 模拟 /auth 页面触发的 401
-window.location.pathname = '/auth';
-window.dispatchEvent(new CustomEvent('auth:401', { detail: { returnTo: '/auth' } }));
-// 期望: router.push('/auth') 不被调用（守卫生效）
-```
-
----
-
-### Story 2.4: returnTo 白名单校验（0.5h，并行）
-
-**开发文件**: `src/app/auth/page.tsx`
-
-**修改内容摘要**:
-
-已在 Story 2.1 中实现 `validateReturnTo()` 函数，包含以下校验：
-1. `null` / 空字符串 → fallback `/dashboard`
-2. 非 `/` 开头 → `/dashboard`
-3. `//` 协议相对 URL → `/dashboard`
-4. `https://` / `javascript:` 等协议 → `/dashboard`
-5. `/../` 路径遍历 → `/dashboard`
-
-**验收标准**:
-```bash
-pnpm vitest run src/app/auth/page.test.tsx
-# 期望: 恶意 URL 全部 fallback 到 /dashboard
-```
-
----
-
-## Epic 3: 测试覆盖（3h）
-
----
-
-### Story 3.1: E2E 测试扩展（2h）
-
-**新增文件**: `tests/e2e/login-state-fix.spec.ts`
-
-**测试用例**:
-
-```typescript
-// tests/e2e/login-state-fix.spec.ts
-import { test, expect, Page } from '@playwright/test';
-
-test.describe('VibeX 认证重定向 E2E', () => {
-
-  // TC-004: 401 触发 redirect
-  test('TC-004: API 401 响应后自动跳转 /auth（TC-004）', async ({ page }) => {
-    await page.goto('/dashboard');
-    // Mock 401 响应（通过 intercept）
-    await page.route('**/api/v1/**', (route) => {
-      if (route.request().method() !== 'OPTIONS') {
-        return route.fulfill({ status: 401, body: JSON.stringify({ error: 'Unauthorized' }) });
-      }
-      return route.continue();
-    });
-    // 触发 API 调用（刷新页面）
-    await page.reload();
-    await expect(page).toHaveURL(/\/auth/);
-  });
-
-  // TC-005: returnTo 保存正确
-  test('TC-005: 401 触发后 sessionStorage 保存 returnTo（TC-005）', async ({ page }) => {
-    await page.goto('/canvas/project/123');
-    await page.evaluate(() => {
-      window.dispatchEvent(new CustomEvent('auth:401', { detail: { returnTo: '/canvas/project/123' } }));
-    });
-    const returnTo = await page.evaluate(() => sessionStorage.getItem('auth_return_to'));
-    expect(returnTo).toBe('/canvas/project/123');
-  });
-
-  // TC-006: 登录成功返回原页面
-  test('TC-006: 登录成功后返回原页面（TC-006）', async ({ page }) => {
-    await page.goto('/auth');
-    // 设置 returnTo
-    await page.evaluate(() => sessionStorage.setItem('auth_return_to', '/canvas/project/123'));
-    // 填登录表单（mock 成功响应）
-    await page.route('**/api/auth/login', (route) => {
-      return route.fulfill({ status: 200, body: JSON.stringify({ token: 'test-token' }) });
-    });
-    await page.fill('[name="email"]', 'test@example.com');
-    await page.fill('[name="password"]', 'password');
-    await page.click('[type="submit"]');
-    // 期望回到原页面
-    await expect(page).toHaveURL('/canvas/project/123');
-    // 验证 returnTo 已清除
-    const cleared = await page.evaluate(() => sessionStorage.getItem('auth_return_to'));
-    expect(cleared).toBeNull();
-  });
-
-  // TC-007: OAuth returnTo
-  test('TC-007: OAuth callback 携带 returnTo 参数登录成功（TC-007）', async ({ page }) => {
-    await page.goto('/auth/callback?provider=google&returnTo=/canvas/project/456');
-    // mock OAuth 成功
-    await page.route('**/api/auth/google', (route) => {
-      return route.fulfill({ status: 200, body: JSON.stringify({ token: 'oauth-token' }) });
-    });
-    // 自动登录流程...
-    await expect(page).toHaveURL('/canvas/project/456');
-  });
-
-  // TC-008: logout 不触发 redirect
-  test('TC-008: 主动 logout 不触发 401 redirect（TC-008）', async ({ page }) => {
-    let redirectTriggered = false;
-    await page.goto('/dashboard');
-    await page.evaluate(() => {
-      window.addEventListener('auth:401', () => { window.__redirectTriggered = true; });
-    });
-    // 触发 logout
-    await page.click('[data-testid="logout-button"]');
-    await page.waitForTimeout(500);
-    const triggered = await page.evaluate(() => (window as any).__redirectTriggered);
-    expect(triggered).toBeUndefined(); // logout 不应触发 auth:401
-  });
-});
-```
-
-**运行命令**:
-```bash
-cd /root/.openclaw/vibex/vibex-fronted
-pnpm playwright test tests/e2e/login-state-fix.spec.ts
-```
-
----
-
-### Story 3.2: returnTo 白名单单元测试（1h）
-
-**新增文件**: `src/lib/__tests__/validateReturnTo.test.ts`
-
-**测试用例**（9 个边界 case）:
-
-```typescript
-// src/lib/__tests__/validateReturnTo.test.ts
-import { describe, test, expect } from 'vitest';
-
-// inline 实现（与 auth/page.tsx 保持同步）
-function validateReturnTo(returnTo: string | null): string {
-  if (!returnTo) return '/dashboard';
-  if (!returnTo.startsWith('/')) return '/dashboard';
-  if (/^(https?|javascript:|data:)/i.test(returnTo)) return '/dashboard';
-  if (/^\/\//.test(returnTo)) return '/dashboard';
-  if (returnTo.includes('/../') || returnTo.endsWith('/..')) return '/dashboard';
-  return returnTo;
-}
-
-describe('validateReturnTo', () => {
-  test('null 返回 /dashboard', () => {
-    expect(validateReturnTo(null)).toBe('/dashboard');
-  });
-
-  test('空字符串返回 /dashboard', () => {
-    expect(validateReturnTo('')).toBe('/dashboard');
-  });
-
-  test('合法绝对路径通过', () => {
-    expect(validateReturnTo('/dashboard')).toBe('/dashboard');
-    expect(validateReturnTo('/canvas/project/123')).toBe('/canvas/project/123');
-    expect(validateReturnTo('/canvas?project=1&tab=2')).toBe('/canvas?project=1&tab=2');
-  });
-
-  test('// 协议相对 URL 拦截', () => {
-    expect(validateReturnTo('//evil.com')).toBe('/dashboard');
-  });
-
-  test('https:// 外部 URL 拦截', () => {
-    expect(validateReturnTo('https://evil.com')).toBe('/dashboard');
-    expect(validateReturnTo('http://internal.corp/evil')).toBe('/dashboard');
-  });
-
-  test('javascript: 协议拦截', () => {
-    expect(validateReturnTo('javascript:alert(1)')).toBe('/dashboard');
-    expect(validateReturnTo('javascript:void(0)')).toBe('/dashboard');
-  });
-
-  test('data: URL 拦截', () => {
-    expect(validateReturnTo('data:text/html,<script>alert(1)</script>')).toBe('/dashboard');
-  });
-
-  test('路径遍历攻击拦截', () => {
-    expect(validateReturnTo('/../etc/passwd')).toBe('/dashboard');
-    expect(validateReturnTo('/foo/../bar')).toBe('/dashboard');
-  });
-
-  test('非 / 开头路径返回 /dashboard', () => {
-    expect(validateReturnTo('dashboard')).toBe('/dashboard');
-    expect(validateReturnTo('evil.com')).toBe('/dashboard');
-  });
-});
-```
-
-**运行命令**:
-```bash
-cd /root/.openclaw/vibex/vibex-fronted
-pnpm vitest run src/lib/__tests__/validateReturnTo.test.ts --reporter=verbose
-```
-
----
-
-## 完整测试命令汇总
-
-```bash
-# ========== 开发自测命令 ==========
-
-# 1. 全部单元测试
-cd /root/.openclaw/vibex/vibex-fronted
-pnpm vitest run
-
-# 2. 新增白名单校验测试
-pnpm vitest run src/lib/__tests__/validateReturnTo.test.ts
-
-# 3. useAuth 扩展测试
-pnpm vitest run src/hooks/__tests__/useAuth.test.tsx
-
-# 4. AuthForm 测试
-pnpm vitest run src/app/auth/page.test.tsx
-
-# 5. E2E 认证重定向测试
-pnpm playwright test tests/e2e/login-state-fix.spec.ts
-
-# 6. 完整构建检查
-cd /root/.openclaw/vibex/vibex-fronted && pnpm build
-
-# 7. CI 完整流程（推荐）
-pnpm vitest run && pnpm playwright test tests/e2e/login-state-fix.spec.ts && pnpm build
-```
-
----
-
-## 实现检查清单（Dev 自检）
-
-- [x] Story 1.1: `AuthError` 类已添加，`isAuthError` 和 `returnTo` 字段存在
-- [x] Story 1.1: 响应拦截器抛出 `AuthError` 而非普通 `Error`
-- [x] Story 1.2: `window.dispatchEvent('auth:401')` 在 401 时触发
-- [x] Story 1.3: `useAuth` 中 `useEffect` 监听 `auth:401`
-- [x] Story 1.3: `sessionStorage.setItem('auth_return_to', returnTo)` 生效
-- [x] Story 1.3: `router.push('/auth')` 被调用
-- [x] Story 2.1: `validateReturnTo` 函数存在（6 种校验：null/undefined/空串/绝对URL/协议相对URL/javascript:URL/路径穿越）
-- [x] Story 2.1: 登录成功后读 sessionStorage.auth_return_to 并用 validateReturnTo 校验后跳转
-- [x] Story 2.2: /auth 页面从 URL 读取 returnTo 参数并存入 sessionStorage（供 OAuth 回调使用）
-- [x] Story 2.3: `/auth` 页面守卫条件生效（useAuth listener 中已检查 pathname === '/auth'）
-- [ ] Story 3.1: TC-004~TC-008 E2E 测试文件已创建（Playwright 环境待配置）
-- [x] Story 3.2: validateReturnTo 单元测试 12 个 case 全覆盖（含 null/安全路径/恶意URL/路径穿越）
-- [ ] 全部测试通过：`pnpm vitest run && pnpm playwright test`
-- [ ] `pnpm build` 无报错
-
----
-
-*实现计划: 待开发*
-*Next: Dev 领取任务 → Coding → Tester E2E 覆盖*
+*实施计划: 待开发*
+*Next: Dev 领取 → 按 Epic 顺序实现 → Tester 覆盖 → Reviewer 审查*

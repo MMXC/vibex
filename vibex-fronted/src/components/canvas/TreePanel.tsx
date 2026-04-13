@@ -162,10 +162,10 @@ export function TreePanel({
               <p>暂无节点</p>
               <p className={styles.treePanelEmptyHint}>
                 {tree === 'context'
-                  ? '输入需求后 AI 将生成限界上下文'
+                  ? '请先在需求录入阶段输入需求'
                   : tree === 'flow'
-                    ? '确认上下文后自动生成流程树'
-                    : '确认流程后自动生成组件树'}
+                    ? '请先确认上下文节点，流程将自动生成'
+                    : '请先完成流程树，组件将自动生成'}
               </p>
             </div>
           )}

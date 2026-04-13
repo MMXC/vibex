@@ -28,7 +28,7 @@ export const API_CONFIG = {
       export: '/v1/canvas/export',
       stream: '/v1/canvas/stream',
       // E4-SyncProtocol: Canvas Snapshots (sync + conflict detection)
-      snapshots: '/canvas/snapshots',
+      snapshots: '/v1/canvas/snapshots',
       snapshot: (id: string) => `/v1/canvas/snapshots/${id}`,
       restoreSnapshot: (id: string) => `/v1/canvas/snapshots/${id}/restore`,
       // E3: Version polling endpoint for conflict detection

@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.207',
+    date: '2026-04-13',
+    changes: [
+      '📋 vibex-canvas-qa-fix Epic2: API 路径统一',
+      '✅ api-config.ts: snapshots 端点添加 /v1/ 前缀',
+      '✅ snapshot/restoreSnapshot/latest 已含 /v1/，无需修改',
+      '✅ canvasApi.ts 消费者自动获取正确路径',
+      '提交: 270858a2',
+    ],
+    commit: '270858a2',
+  },
+
+  {
     version: '1.0.206',
     date: '2026-04-13',
     changes: [

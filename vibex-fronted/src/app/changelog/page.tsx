@@ -34,6 +34,19 @@ const mockChangelog: ChangelogEntry[] = [
   },
 
   {
+    version: '1.0.223',
+    date: '2026-04-14',
+    changes: [
+      '📋 vibex-design-component-library Epic2-Stories: generate-catalog 脚本测试 19 例',
+      '✅ generate-catalog.test.ts: S2.1 批量模式 + S2.2 styleComponents',
+      '✅ slugToFilename 边界测试（dot/space/special char）',
+      '✅ vitest 71/71（52+19）✅',
+      '提交: 3bad72a2',
+    ],
+    commit: '3bad72a2',
+  },
+
+  {
     version: '1.0.221',
     date: '2026-04-14',
     changes: [

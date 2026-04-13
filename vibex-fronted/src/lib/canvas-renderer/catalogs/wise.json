@@ -1,0 +1,78 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-04-13T19:55:16.932Z",
+  "sourcePath": "design-md/wise/DESIGN.md",
+  "totalStyles": 1,
+  "byCategory": {
+    "金融科技": [
+      "wise"
+    ]
+  },
+  "styles": [
+    {
+      "slug": "wise",
+      "name": "wise",
+      "displayName": "Wise",
+      "nameZh": "Wise",
+      "group": "reference",
+      "summaryZh": "国际汇款平台，简洁透明金融UI",
+      "category": "金融科技",
+      "tagsZh": [
+        "金融",
+        "汇款"
+      ],
+      "styleKeywords": [
+        "金融",
+        "汇款",
+        "国际汇款平台",
+        "简洁透明金融UI"
+      ],
+      "aliases": [
+        "wise",
+        "Wise",
+        "金融",
+        "汇款"
+      ],
+      "useCases": [
+        "官网落地页",
+        "支付产品页",
+        "数据控制台"
+      ],
+      "previewLight": "design-md/wise/preview.html",
+      "previewDark": "design-md/wise/preview-dark.html",
+      "readmePath": "design-md/wise/README.md",
+      "designPath": "design-md/wise/DESIGN.md",
+      "positioningZh": "强调专业、可信和精致的信息表达，适合价格、数据和支付流程较多的页面。",
+      "bestFor": [
+        "官网落地页",
+        "支付产品页",
+        "数据控制台",
+        "定价页"
+      ],
+      "avoidFor": [
+        "轻社交内容页",
+        "卡通化活动页"
+      ],
+      "aiChecklist": [
+        "强化数据和价格的对齐感",
+        "避免装饰元素影响可信度",
+        "CTA 要明确且节制"
+      ],
+      "recommendedPromptZh": "参考 Wise / Wise 的视觉语言，设计一个中文 官网落地页，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
+      "relatedItems": [
+        {
+          "slug": "coinbase",
+          "nameZh": "Coinbase"
+        },
+        {
+          "slug": "kraken",
+          "nameZh": "Kraken"
+        },
+        {
+          "slug": "revolut",
+          "nameZh": "Revolut"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-04-13T19:55:16.931Z",
+  "sourcePath": "design-md/runwayml/DESIGN.md",
+  "totalStyles": 1,
+  "byCategory": {
+    "AI 产品": [
+      "runwayml"
+    ]
+  },
+  "styles": [
+    {
+      "slug": "runwayml",
+      "name": "runwayml",
+      "displayName": "Runway",
+      "nameZh": "Runway",
+      "group": "reference",
+      "summaryZh": "AI视频生成，前沿创意技术",
+      "category": "AI 产品",
+      "tagsZh": [
+        "AI",
+        "视频"
+      ],
+      "styleKeywords": [
+        "AI",
+        "视频",
+        "AI视频生成",
+        "前沿创意技术"
+      ],
+      "aliases": [
+        "runwayml",
+        "Runway",
+        "AI",
+        "视频"
+      ],
+      "useCases": [
+        "AI 工具官网",
+        "模型平台",
+        "功能介绍页"
+      ],
+      "previewLight": "design-md/runwayml/preview.html",
+      "previewDark": "design-md/runwayml/preview-dark.html",
+      "readmePath": "design-md/runwayml/README.md",
+      "designPath": "design-md/runwayml/DESIGN.md",
+      "positioningZh": "强调前沿感、速度感和产品未来感，适合把能力和差异点讲清楚。",
+      "bestFor": [
+        "AI 工具官网",
+        "模型平台",
+        "功能介绍页",
+        "模型能力介绍"
+      ],
+      "avoidFor": [
+        "强表格化后台",
+        "政企风审批系统"
+      ],
+      "aiChecklist": [
+        "突出核心能力和模型价值",
+        "让功能区块清晰分组",
+        "避免页面装饰压过信息层级"
+      ],
+      "recommendedPromptZh": "参考 Runway / Runway 的视觉语言，设计一个中文 AI 工具官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
+      "relatedItems": [
+        {
+          "slug": "claude",
+          "nameZh": "Claude"
+        },
+        {
+          "slug": "cohere",
+          "nameZh": "Cohere"
+        },
+        {
+          "slug": "cursor",
+          "nameZh": "Cursor"
+        }
+      ]
+    }
+  ]
+}

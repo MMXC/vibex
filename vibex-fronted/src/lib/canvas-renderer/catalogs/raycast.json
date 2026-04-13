@@ -1,0 +1,78 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-04-13T19:55:16.931Z",
+  "sourcePath": "design-md/raycast/DESIGN.md",
+  "totalStyles": 1,
+  "byCategory": {
+    "效率协作": [
+      "raycast"
+    ]
+  },
+  "styles": [
+    {
+      "slug": "raycast",
+      "name": "raycast",
+      "displayName": "Raycast",
+      "nameZh": "Raycast",
+      "group": "reference",
+      "summaryZh": "macOS效率工具，简约深色工具感",
+      "category": "效率协作",
+      "tagsZh": [
+        "效率",
+        "工具"
+      ],
+      "styleKeywords": [
+        "效率",
+        "工具",
+        "macOS效率工具",
+        "简约深色工具感"
+      ],
+      "aliases": [
+        "raycast",
+        "Raycast",
+        "效率",
+        "工具"
+      ],
+      "useCases": [
+        "SaaS 后台",
+        "工作台",
+        "产品介绍页"
+      ],
+      "previewLight": "design-md/raycast/preview.html",
+      "previewDark": "design-md/raycast/preview-dark.html",
+      "readmePath": "design-md/raycast/README.md",
+      "designPath": "design-md/raycast/DESIGN.md",
+      "positioningZh": "强调秩序感、工作流和信息组织，适合 SaaS 和工作台场景。",
+      "bestFor": [
+        "SaaS 后台",
+        "工作台",
+        "产品介绍页",
+        "工作台首页"
+      ],
+      "avoidFor": [
+        "纯品牌大片式营销页",
+        "重情绪化视觉实验页面"
+      ],
+      "aiChecklist": [
+        "重视内容块编排",
+        "表单和列表要易扫读",
+        "中文标题长度要控制在稳妥范围"
+      ],
+      "recommendedPromptZh": "参考 Raycast / Raycast 的视觉语言，设计一个中文 SaaS 后台，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
+      "relatedItems": [
+        {
+          "slug": "cal",
+          "nameZh": "Cal"
+        },
+        {
+          "slug": "figma",
+          "nameZh": "Figma"
+        },
+        {
+          "slug": "linear.app",
+          "nameZh": "Linear"
+        }
+      ]
+    }
+  ]
+}

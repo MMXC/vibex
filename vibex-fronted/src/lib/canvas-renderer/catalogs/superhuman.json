@@ -1,0 +1,76 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-04-13T19:55:16.931Z",
+  "sourcePath": "design-md/superhuman/DESIGN.md",
+  "totalStyles": 1,
+  "byCategory": {
+    "精选风格": [
+      "superhuman"
+    ]
+  },
+  "styles": [
+    {
+      "slug": "superhuman",
+      "name": "superhuman",
+      "displayName": "Superhuman",
+      "nameZh": "Superhuman",
+      "group": "reference",
+      "summaryZh": "极速邮件客户端，奢华高端定位",
+      "category": "精选风格",
+      "tagsZh": [
+        "邮件",
+        "高端"
+      ],
+      "styleKeywords": [
+        "邮件",
+        "高端",
+        "极速邮件客户端",
+        "奢华高端定位"
+      ],
+      "aliases": [
+        "superhuman",
+        "Superhuman",
+        "邮件",
+        "高端"
+      ],
+      "useCases": [
+        "产品官网",
+        "品牌页面",
+        "界面参考"
+      ],
+      "previewLight": "design-md/superhuman/preview.html",
+      "previewDark": "design-md/superhuman/preview-dark.html",
+      "readmePath": "design-md/superhuman/README.md",
+      "designPath": "design-md/superhuman/DESIGN.md",
+      "positioningZh": "适合做通用参考，先看预览再决定是否采纳。",
+      "bestFor": [
+        "产品官网",
+        "品牌页面",
+        "界面参考"
+      ],
+      "avoidFor": [
+        "对行业规范要求很强的系统"
+      ],
+      "aiChecklist": [
+        "先看预览是否接近目标气质",
+        "按中文场景二次调整信息密度",
+        "不要直接全量照搬"
+      ],
+      "recommendedPromptZh": "参考 Superhuman / Superhuman 的视觉语言，设计一个中文 产品官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
+      "relatedItems": [
+        {
+          "slug": "clay",
+          "nameZh": "Clay"
+        },
+        {
+          "slug": "intercom",
+          "nameZh": "Intercom"
+        },
+        {
+          "slug": "posthog",
+          "nameZh": "PostHog"
+        }
+      ]
+    }
+  ]
+}

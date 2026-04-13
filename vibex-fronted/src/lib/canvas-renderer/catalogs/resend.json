@@ -1,0 +1,77 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-04-13T19:55:16.931Z",
+  "sourcePath": "design-md/resend/DESIGN.md",
+  "totalStyles": 1,
+  "byCategory": {
+    "开发工具": [
+      "resend"
+    ]
+  },
+  "styles": [
+    {
+      "slug": "resend",
+      "name": "resend",
+      "displayName": "Resend",
+      "nameZh": "Resend",
+      "group": "reference",
+      "summaryZh": "邮件API服务，极简开发者邮件工具",
+      "category": "开发工具",
+      "tagsZh": [
+        "邮件",
+        "API"
+      ],
+      "styleKeywords": [
+        "邮件",
+        "API",
+        "邮件API服务",
+        "极简开发者邮件工具"
+      ],
+      "aliases": [
+        "resend",
+        "Resend",
+        "邮件",
+        "API"
+      ],
+      "useCases": [
+        "开发者官网",
+        "文档站",
+        "控制台后台"
+      ],
+      "previewLight": "design-md/resend/preview.html",
+      "previewDark": "design-md/resend/preview-dark.html",
+      "readmePath": "design-md/resend/README.md",
+      "designPath": "design-md/resend/DESIGN.md",
+      "positioningZh": "重视结构清晰、可读性和文档感，适合开发者和 B 端产品。",
+      "bestFor": [
+        "开发者官网",
+        "文档站",
+        "控制台后台"
+      ],
+      "avoidFor": [
+        "强娱乐化内容页",
+        "情绪导向的品牌叙事页"
+      ],
+      "aiChecklist": [
+        "保证标题层级明确",
+        "让按钮和代码区块保持克制",
+        "优先确保信息扫描效率"
+      ],
+      "recommendedPromptZh": "参考 Resend / Resend 的视觉语言，设计一个中文 开发者官网，保留其配色、字重层级、卡片样式和留白节奏，同时把标题长度、正文排版和信息密度调整为适合中文阅读的形式。",
+      "relatedItems": [
+        {
+          "slug": "airtable",
+          "nameZh": "Airtable"
+        },
+        {
+          "slug": "clickhouse",
+          "nameZh": "ClickHouse"
+        },
+        {
+          "slug": "composio",
+          "nameZh": "Composio"
+        }
+      ]
+    }
+  ]
+}

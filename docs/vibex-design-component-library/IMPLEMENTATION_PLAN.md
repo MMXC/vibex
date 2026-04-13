@@ -373,15 +373,15 @@ time npx tsx scripts/generate-catalog.ts --style airbnb
 
 ---
 
-## Phase 2 实施步骤（1d）
+## Phase 2 实施步骤（1d） ✅ done
 
-### Step 8: 批量生成脚本（完善 `--all`）
+### Step 8: 批量生成脚本（完善 `--all`） ✅ done
 
 **文件**: `vibex-fronted/scripts/generate-catalog.ts`
 
 添加批量模式，完善错误处理和进度显示。
 
-### Step 9: 输出所有 59 套 catalog
+### Step 9: 输出所有 59 套 catalog ✅ done
 
 ```bash
 npx tsx scripts/generate-catalog.ts --all
@@ -389,7 +389,7 @@ ls src/lib/canvas-renderer/catalogs/*.json | wc -l
 # 预期: >= 59
 ```
 
-### Step 10: 构建验证
+### Step 10: 构建验证 ✅ done ✅ done
 
 ```bash
 pnpm build
@@ -408,6 +408,6 @@ pnpm tsc --noEmit
 - [ ] 单风格生成 < 5s
 
 ### Phase 2
-- [ ] `--all` 生成全部 59 套 catalog
-- [ ] 59 个 JSON 文件全部 valid
-- [ ] `pnpm build` 通过
+- [x] `--all` 生成全部 59 套 catalog ✅
+- [x] 59 个 JSON 文件全部 valid ✅
+- [x] `pnpm build` 通过 ✅

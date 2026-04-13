@@ -1,277 +1,286 @@
-# AGENTS.md — VibeX 认证重定向项目编码规范
+# VibeX TabBar 无障碍化 — 开发约束
 
-> **项目**: vibex
-> **版本**: 1.0
-> **日期**: 2026-04-11
+**项目**: vibex
+**阶段**: development
+**日期**: 2026-04-13
 
 ---
 
-## 1. 项目约束
+## 1. 变更范围
 
-### 1.1 变更范围（红线内）
+### ✅ 允许修改的文件
 
-本次迭代 **仅限** 以下文件：
-
-| 文件 | 允许操作 |
+| 文件 | 改动范围 |
 |------|----------|
-| `src/services/api/client.ts` | 修改 401 响应拦截器 |
-| `src/hooks/useAuth.tsx` | 新增 `auth:401` 事件监听 |
-| `src/app/auth/page.tsx` | 新增 `validateReturnTo()` + returnTo 逻辑 |
-| `src/services/oauth/oauth.ts` | OAuth returnTo 透传 |
-| `src/lib/__tests__/validateReturnTo.test.ts` | 新增（可创建） |
-| `src/app/auth/page.test.tsx` | 扩展（可创建） |
-| `src/hooks/__tests__/useAuth.test.tsx` | 扩展 |
-| `tests/e2e/login-state-fix.spec.ts` | 新增（可创建） |
-| `src/services/api/__tests__/client-auth-401.test.ts` | 新增（可创建） |
+| `vibex-fronted/src/components/canvas/TabBar.tsx` | 删除 isLocked/disabled/aria-disabled/phase guard |
+| `vibex-fronted/src/components/canvas/CanvasPage.tsx` | 移动端内联 TabBar 添加 prototype tab，与 desktop 保持一致 |
+| `vibex-fronted/src/components/canvas/TreePanel.tsx` | 空状态文案替换（第157-159行区域） |
+| `vibex-fronted/tests/unit/components/canvas/TabBar.unittest.tsx` | 新建单元测试 |
+| `vibex-fronted/tests/e2e/tab-switching.spec.ts` | 新建 E2E 测试 |
 
-### 1.2 禁止变更范围
+### ❌ 禁止修改的文件
 
-以下文件/模块 **不得修改**（本次迭代锁死）：
-
-- `src/lib/api-retry.ts`（重试逻辑已有）
-- `src/lib/circuit-breaker.ts`（熔断器已有）
-- `src/services/api/modules/*.ts`（API 模块层已有）
-- `src/stores/authStore.ts`（Zustand store，暂不接入本迭代）
-- `src/components/oauth/OAuthConnectButton.tsx`（UI 组件，暂不修改）
-- `src/lib/canvas/canvasLogger.ts`（日志系统已有）
-
-### 1.3 技术栈锁定
-
-| 技术 | 版本要求 | 约束理由 |
-|------|----------|----------|
-| Next.js | 16.2.0 | PRD 指定 |
-| React | 19.x | Next.js 16.2 依赖 |
-| TypeScript | strict | 非功能性要求 |
-| Axios | ^1.x | 现有 httpClient 依赖 |
-| Vitest | latest | 现有测试框架 |
-| Playwright | latest | 现有 E2E 框架 |
+| 文件 | 禁止原因 |
+|------|----------|
+| `vibex-fronted/src/lib/canvas/stores/*.ts` | Zustand store 不需要改动 |
+| `vibex-fronted/src/components/canvas/PhaseIndicator.tsx` | PhaseIndicator 职责不变，不改动 |
+| `vibex-fronted/src/components/canvas/ContextTreePanel.tsx` | 复用 TreePanel，空状态在 TreePanel 统一处理 |
+| `vibex-fronted/src/components/canvas/FlowTreePanel.tsx` | 同上 |
+| `vibex-fronted/src/components/canvas/ComponentTreePanel.tsx` | 同上 |
 
 ---
 
 ## 2. 代码规范
 
-### 2.1 AuthError 使用规范
+### 2.1 TabBar.tsx — 删除项清单
+
+**以下代码必须删除（精确位置）**:
 
 ```typescript
-// ✅ 正确：在 client.ts 401 拦截器中抛出
-const returnTo = window.location.pathname + window.location.search;
-return Promise.reject(new AuthError('登录已过期，请重新登录', 401, returnTo));
+// ❌ 删除：第37-42行区域
+const tabIdx = PHASE_ORDER.indexOf(tab.id as Phase);
+const isLocked = tab.id !== 'prototype' && tabIdx > phaseIdx;
 
-// ❌ 错误：抛出普通 Error（丢失 isAuthError 和 returnTo）
-return Promise.reject(new Error('登录已过期'));
+// ❌ 删除：button 元素中的 disabled 属性
+disabled={isLocked}
 
-// ❌ 错误：returnTo 格式不合法
-new AuthError('...', 401, 'https://evil.com') // 禁止！
-new AuthError('...', 401, '//evil.com')      // 禁止！
-```
+// ❌ 删除：button 元素中的 aria-disabled 属性
+aria-disabled={isLocked}
 
-### 2.2 事件广播规范
+// ❌ 删除：className 中的 isLocked 条件
+${isLocked ? styles.tabLocked : ''}
 
-```typescript
-// ✅ 正确：使用 CustomEvent，payload 包含 returnTo
-window.dispatchEvent(
-  new CustomEvent('auth:401', { detail: { returnTo: '/canvas/project/123' } })
-);
-
-// ❌ 错误：不传 returnTo（无法恢复用户路径）
-window.dispatchEvent(new CustomEvent('auth:401'));
-
-// ❌ 错误：事件名不一致
-window.dispatchEvent(new CustomEvent('unauthorized')); // 必须用 'auth:401'
-```
-
-### 2.3 Auth 页面守卫规范
-
-```typescript
-// ✅ 正确：在 useAuth useEffect 中检查
-useEffect(() => {
-  const handler = (e: Event) => {
-    // Auth 页面守卫
-    if (window.location.pathname === '/auth') {
-      return; // 不跳转，避免循环
-    }
-    sessionStorage.setItem('auth_return_to', returnTo);
-    router.push('/auth');
-  };
-  window.addEventListener('auth:401', handler);
-  return () => window.removeEventListener('auth:401', handler);
-}, [router]);
-
-// ❌ 错误：忘记守卫，导致 /auth 循环
-useEffect(() => {
-  window.addEventListener('auth:401', handler); // 无 pathname 检查！
-  // ...
-}, []);
-```
-
-### 2.4 validateReturnTo 规范
-
-**必须包含以下 5 种校验**（顺序敏感）：
-
-```typescript
-function validateReturnTo(returnTo: string | null): string {
-  // 1. null / 空值
-  if (!returnTo) return '/dashboard';
-  // 2. 必须以 / 开头（防止 'dashboard' 或 'evil.com')
-  if (!returnTo.startsWith('/')) return '/dashboard';
-  // 3. 协议前缀（https://, http://, javascript:, data:）
-  if (/^(https?|javascript:|data:)/i.test(returnTo)) return '/dashboard';
-  // 4. 协议相对 URL（//evil.com）
-  if (/^\/\//.test(returnTo)) return '/dashboard';
-  // 5. 路径遍历（/../ 或 /.. 结尾）
-  if (returnTo.includes('/../') || returnTo.endsWith('/..')) return '/dashboard';
-  return returnTo;
+// ❌ 删除：handleTabClick 中的 phase 守卫
+const tabIdx = PHASE_ORDER.indexOf(tabId as Phase);
+if (tabIdx > phaseIdx) {
+  return;
 }
+
+// ❌ 删除：title 中的 isLocked 三元表达式
+title={isLocked ? `需先完成上一阶段` : `切换到 ${tab.label} 树`}
 ```
 
-### 2.5 logout 标记规范
+**保留项（不要删除）**:
 
 ```typescript
-// logout 时必须设置标记
-sessionStorage.setItem('auth_is_logout', '1');
-await apiService.logout();
-sessionStorage.removeItem('auth_token');
-// ...
-sessionStorage.removeItem('auth_is_logout'); // finally 中清理
+// ✅ 保留：isActive 判断逻辑（phase === 'prototype' 分支）
+const isActive =
+  tab.id === 'prototype'
+    ? phase === 'prototype'
+    : activeTree === tab.id || (activeTree === null && tab.id === 'context');
 
-// client.ts 拦截器中必须检查
-const isLogoutAction = sessionStorage.getItem('auth_is_logout') === '1';
-if (isLogoutAction) {
-  sessionStorage.removeItem('auth_is_logout');
-  // 不 dispatch auth:401
-} else {
-  // dispatch auth:401
+// ✅ 保留：badge 渲染
+if (tab.id !== 'prototype' && counts[tab.id as TreeType] > 0) {
+  badge = <span className={styles.tabCount}>{counts[tab.id as TreeType]}</span>;
 }
+
+// ✅ 保留：role="tab" / role="tablist"
+role="tab"
+role="tablist"
+aria-label="三树切换"
+
+// ✅ 保留：onTabChange callback
+onTabChange?.(tabId as TreeType);
 ```
 
-### 2.6 类型规范
+**修改后的 button 结构**:
 
 ```typescript
-// ✅ 正确：使用现有 AuthError 类型
-import { AuthError } from '@/services/api/client';
-throw new AuthError('Unauthorized', 401, '/canvas');
-
-// ❌ 错误：any 类型
-const returnTo: any = sessionStorage.getItem('auth_return_to');
-
-// ❌ 错误：as any 绕过类型检查
-router.push(returnTo as any);
+<button
+  key={tab.id}
+  role="tab"
+  aria-selected={isActive}
+  className={`${styles.tab} ${isActive ? styles.tabActive : ''}`}
+  onClick={() => handleTabClick(tab.id)}
+  title={`切换到 ${tab.label} 树`}
+>
+  <span className={styles.tabEmoji}>{tab.emoji}</span>
+  <span className={styles.tabLabel}>{tab.label}</span>
+  {badge}
+</button>
 ```
+
+### 2.2 TreePanel.tsx — 空状态文案规范
+
+**文案必须精确匹配以下字符串**:
+
+| 树类型 | 文案 | 对应 tree 值 |
+|--------|------|--------------|
+| 上下文 | `请先在需求录入阶段输入需求` | `tree === 'context'` |
+| 流程 | `请先确认上下文节点，流程将自动生成` | `tree === 'flow'` |
+| 组件 | `请先完成流程树，组件将自动生成` | `tree === 'component'` |
+
+**空状态组件结构不变**:
+```typescript
+{safeNodes.length === 0 && (
+  <div className={styles.treePanelEmpty}>
+    <span style={{ color: treeColor }}>{treeIcon}</span>
+    <p>暂无节点</p>
+    <p className={styles.treePanelEmptyHint}>
+      {/* 仅修改此处文案 */}
+    </p>
+  </div>
+)}
+```
+
+### 2.3 CanvasPage.tsx — 移动端 TabBar
+
+**移动端内联 tab bar 必须包含 4 个 tab，与 desktop TabBar 的 TABS 数组一致**:
+
+```typescript
+{/* 必须包含：context / flow / component / prototype */}
+{[
+  { id: 'context', emoji: '◇', label: '上下文' },
+  { id: 'flow', emoji: '→', label: '流程' },
+  { id: 'component', emoji: '▣', label: '组件' },
+  { id: 'prototype', emoji: '🚀', label: '原型' },
+].map((t) => (
+  <button
+    key={t.id}
+    role="tab"
+    aria-selected={...}
+    // ❌ 禁止添加 disabled 属性
+    onClick={() => handleMobileTabClick(t.id)}
+  >
+    {`${t.emoji} ${t.label}`}
+  </button>
+))}
+```
+
+**禁止事项**:
+- ❌ 禁止在移动端 tab button 上添加 `disabled` 属性
+- ❌ 禁止在移动端 tab button 上添加 phase 检查
+- ❌ 禁止移除 prototype tab
 
 ---
 
-## 3. 安全红线（🚨 绝对禁止）
+## 3. 安全红线
 
-### 🚨 红线 1: 禁止开放重定向
-
-```
-禁止实现任何未经 validateReturnTo() 校验的重定向逻辑
-```
-
-- ❌ `router.push(userControlledUrl)` — 未校验时禁止
-- ❌ `window.location.href = userInput` — 禁止外部 URL 直接跳转
-- ❌ `sessionStorage.setItem('auth_return_to', input)` — 不校验直接存
-- ❌ `new AuthError('...', 401, userInput)` — 未校验的 returnTo
-- ✅ 所有 returnTo 路径必须经过 `validateReturnTo()` 校验
-
-### 🚨 红线 2: 禁止跳过 Auth 页面守卫
-
-```
-禁止移除 pathname === '/auth' 的守卫条件
-```
-
-- ❌ 为了"简化代码"删除守卫
-- ❌ 在 auth/page.tsx 中触发 `dispatchEvent('auth:401')`
-- ❌ 在 auth/page.tsx 中主动调用 `router.push('/auth')`
-
-### 🚨 红线 3: 禁止混淆 logout 与 401
-
-```
-logout 和 401 必须是独立的处理路径，不能合并
-```
-
-- ❌ logout 后不清除 `auth_is_logout` 标记
-- ❌ logout 时不清除 `auth_token`
-- ❌ 401 拦截器不区分 `isLogoutAction`
-
-### 🚨 红线 4: 禁止修改已有安全逻辑
-
-```
-现有 token 存储、跨标签页同步、API 错误转换逻辑不得改动
-```
-
-- ❌ 删除 `useAuth.tsx` 中的 `handleStorageChange`
-- ❌ 删除 `client.ts` 中的 `transformError`
-- ❌ 修改 `sessionStorage` vs `localStorage` 的 token 存储策略
+| 红线 | 描述 | 违规后果 |
+|------|------|----------|
+| **不要改动 PhaseIndicator** | PhaseIndicator 承担阶段告知职责，不允许删除或隐藏 | 破坏 UX 引导 |
+| **不要改动 Zustand store** | 三树 store 的数据不因 TabBar 改动而变化 | 数据丢失风险 |
+| **不要改动 PHASE_ORDER** | `['input', 'context', 'flow', 'component', 'prototype']` 常量不改动 | 影响 phase 顺序推进 |
+| **不要改动 API 层** | TabBar 移除 disabled 是纯前端 UX 改动，不改变后端权限校验 | 安全风险 |
+| **不要引入新依赖** | 禁止 `npm install` / `pnpm add` 任何新包 | 构建污染 |
+| **不要删除 `role="tab"` / `aria-selected`** | 无障碍属性必须保留 | a11y 退化 |
 
 ---
 
 ## 4. Git 提交规范
 
-### 4.1 Commit Message 格式
+### 4.1 提交信息格式
 
 ```
 <type>(<scope>): <subject>
 
-# 示例
-feat(auth-redirect): add AuthError class with isAuthError and returnTo
-feat(auth-redirect): dispatch auth:401 event on 401 response
-feat(auth-redirect): listen auth:401 and redirect to /auth
-feat(auth-redirect): add validateReturnTo whitelist validation
-feat(auth-redirect): AuthForm reads returnTo after login success
-fix(auth-redirect): add auth page guard to prevent redirect loop
-test(auth-redirect): add E2E tests TC-004~TC-008
-test(auth-redirect): add validateReturnTo unit tests
+[body]
+
+[footer]
 ```
 
-### 4.2 分支命名
+### 4.2 推荐 commit 结构
 
+**Epic 1 完成后**:
+```bash
+git add src/components/canvas/TabBar.tsx src/components/canvas/CanvasPage.tsx
+git commit -m "feat(canvas): remove disabled/lock logic from TabBar for a11y
+
+- Remove isLocked, disabled, aria-disabled from TabBar button
+- Remove phase guard from handleTabClick
+- Add prototype tab to mobile inline TabBar (CanvasPage.tsx)
+- Preserve isActive, badge, and ARIA role attributes
+
+AC-1, AC-5, AC-6 satisfied
+refs: vibex/tab-bar-unified"
 ```
-feature/vibex-auth-redirect
-fix/vibex-auth-redirect-xxx
-test/vibex-auth-redirect-e2e
+
+**Epic 2 完成后**:
+```bash
+git add src/components/canvas/TreePanel.tsx
+git commit -m "feat(canvas): add guidance text for empty tree panels
+
+- context: '请先在需求录入阶段输入需求'
+- flow: '请先确认上下文节点，流程将自动生成'
+- component: '请先完成流程树，组件将自动生成'
+
+AC-3 satisfied
+refs: vibex/tab-bar-unified"
 ```
 
-### 4.3 PR 规范
+**Epic 3 完成后**:
+```bash
+git add tests/
+git commit -m "test: add tab-switching.spec.ts covering AC-1~AC-8
 
-PR 必须包含：
-- [ ] 关联的 Story ID（VibeX-401-1 等）
-- [ ] 变更文件清单
-- [ ] 新增/修改的测试用例说明
-- [ ] 安全校验截屏（validateReturnTo 恶意 URL 测试通过）
-- [ ] `pnpm build` + `pnpm vitest run` + `pnpm playwright test` 全绿
+- TabBar.unittest.tsx: unit tests for disabled removal
+- tab-switching.spec.ts: Playwright E2E full coverage
+refs: vibex/tab-bar-unified"
+```
+
+### 4.3 禁止行为
+
+- ❌ 禁止 `git commit -m "fix"` / `"update"` / `"WIP"`
+- ❌ 禁止在一个 commit 中混合 Epic 1 和 Epic 2 的改动
+- ❌ 禁止 force push 到 main 分支
 
 ---
 
-## 5. 代码审查清单（Reviewer 用）
+## 5. Code Review 清单
 
-### 5.1 必查项
+### 5.1 TabBar.tsx 审查要点
 
-- [ ] `client.ts` 401 拦截器抛出的是 `AuthError` 而非 `Error`
-- [ ] `auth:401` 事件 payload 包含 `detail.returnTo`
-- [ ] `useAuth.tsx` 中有 pathname === '/auth' 守卫
-- [ ] `validateReturnTo()` 包含全部 5 种校验（null、以/开头、协议、//、../）
-- [ ] logout 时设置了 `auth_is_logout` 标记
-- [ ] sessionStorage key 名称正确：`auth_return_to`、`auth_is_logout`、`auth_token`
-- [ ] `sessionStorage.removeItem('auth_return_to')` 在登录成功后被调用
-- [ ] 新增代码无 `any` 类型
-- [ ] `pnpm build` 通过
-- [ ] Vitest 测试全绿
+- [ ] `isLocked` 变量已完全删除（全局搜索 `isLocked` 无结果）
+- [ ] `disabled={isLocked}` 已删除（搜索 `disabled=` 在 TabBar.tsx 内无结果）
+- [ ] `aria-disabled` 已删除
+- [ ] `handleTabClick` 中无 `if (tabIdx > phaseIdx)` 守卫
+- [ ] `isActive` 判断逻辑未改动
+- [ ] `role="tab"` 和 `aria-selected` 属性仍存在
+- [ ] `title` 已简化为 `切换到 ${tab.label} 树`
+- [ ] `className` 中无 `styles.tabLocked` 引用
 
-### 5.2 安全专项检查
+### 5.2 CanvasPage.tsx 审查要点
 
-- [ ] 无 `router.push(userInput)` 不经校验的调用
-- [ ] `validateReturnTo` 测试覆盖 9 个恶意 case
-- [ ] TC-008 E2E 测试通过（logout 不触发 redirect）
-- [ ] `/auth` 循环测试在 E2E 中覆盖
+- [ ] 移动端内联 TabBar 包含 4 个 tab
+- [ ] 移动端 tab button 无 `disabled` 属性
+- [ ] prototype tab 点击行为与 desktop TabBar 一致（`setPhase('prototype')` + `setActiveTree(null)`）
 
-### 5.3 PR 描述检查
+### 5.3 TreePanel.tsx 审查要点
 
-- [ ] 关联了正确的 Story/Epic
-- [ ] 说明清楚了为什么需要这些改动
-- [ ] 更新了 changelog（如果需要）
+- [ ] 三处空状态文案与 PRD 精确匹配
+- [ ] `{safeNodes.length === 0 && ...}` 逻辑未改动
+- [ ] `styles.treePanelEmpty` 样式未改动
+
+### 5.4 测试审查要点
+
+- [ ] `TabBar.unittest.tsx` 覆盖 AC-1, AC-6, AC-7
+- [ ] `tab-switching.spec.ts` 覆盖 AC-1 ~ AC-8 全部 8 条
+- [ ] 所有 `expect()` 断言有清晰的错误信息
+- [ ] E2E 测试在 CI 环境可运行（无硬编码 localhost 之外的域名）
+
+### 5.5 构建审查要点
+
+- [ ] `pnpm build` 成功，无 TypeScript 错误
+- [ ] `pnpm lint` 无警告
+- [ ] `pnpm test:unit` 全部通过
+- [ ] `pnpm test:e2e:ci` 全部通过
 
 ---
 
-*编码规范: ✅ 完成*
-*Next: Dev 按规范实现 → Reviewer 按清单审查*
+## 6. 依赖关系约束
+
+```
+TabBar.tsx (S1.1)
+  ↓ 仅修改组件逻辑，不依赖新依赖
+
+CanvasPage.tsx (S1.2)
+  ↓ 依赖 TabBar.tsx 改动后验证行为一致
+
+TreePanel.tsx (Epic 2)
+  ↓ 独立改动，不依赖 Epic 1
+
+Epic 3 测试
+  ↓ 依赖 Epic 1 + Epic 2 完成后编写
+```
+
+**执行顺序**: S1.1 → S1.2 → Epic 2（三 Story 可并行）→ Epic 3

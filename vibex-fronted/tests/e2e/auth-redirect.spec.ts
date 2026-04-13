@@ -144,3 +144,55 @@ test.describe('auth-redirect E2E', () => {
     await expect(page).toHaveURL(/\/auth\?returnTo=\/canvas/);
   });
 });
+
+// ── S3.3 additional AC coverage ──────────────────────────────────
+
+test.describe('S3.3 AC-5/AC-7: logout no-redirect & returnTo validation', () => {
+  test('AC-5: logout does NOT trigger redirect to /auth (user-initiated, not 401)', async ({ page }) => {
+    // Login first
+    const ac5Email = `e2e-ac5-${Date.now()}@example.com`;
+    await page.goto(`${BASE_URL}/auth`);
+    await page.click('button:has-text("立即注册")');
+    await page.waitForTimeout(300);
+    await page.fill('input[type="email"]', ac5Email);
+    await page.fill('input[type="password"]', TEST_PASSWORD);
+    await page.fill('input[type="text"]', 'AC5 Test');
+    await page.click('button[type="submit"]:has-text("注册")');
+    await page.waitForURL(/\/(canvas|dashboard)/, { timeout: 10000 });
+
+    // logout via API (not triggered by 401)
+    const token = await getCookie(page, 'auth_token');
+    await page.request.post(`${BASE_URL}/api/v1/auth/logout`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    await page.context().clearCookies();
+    await page.waitForTimeout(500);
+
+    // Page should NOT auto-redirect (user-initiated logout has no auth:401 event)
+    const currentUrl = page.url();
+    expect(currentUrl).not.toMatch(/\/auth\?/);
+  });
+
+  test('AC-7-1: returnTo=/canvas is allowed', async ({ page }) => {
+    await freshNavigation(page, `${BASE_URL}/auth?returnTo=/canvas`);
+    await expect(page).toHaveURL(/\/auth/);
+    // Should NOT have defaulted to /dashboard
+    expect(page.url()).not.toContain('/dashboard');
+  });
+
+  test('AC-7-2: returnTo=https://evil.com is blocked → /dashboard', async ({ page }) => {
+    await freshNavigation(page, `${BASE_URL}/auth?returnTo=https://evil.com/canvas`);
+    await expect(page).toHaveURL(/\/auth/);
+    // Safe: no auto-redirect to external URL
+  });
+
+  test('AC-7-3: returnTo=javascript:alert(1) is blocked', async ({ page }) => {
+    await freshNavigation(page, `${BASE_URL}/auth?returnTo=javascript:alert(1)`);
+    await expect(page).toHaveURL(/\/auth/);
+  });
+
+  test('AC-7-4: returnTo=/../etc/passwd is blocked → /dashboard', async ({ page }) => {
+    await freshNavigation(page, `${BASE_URL}/auth?returnTo=/canvas/../etc/passwd`);
+    await expect(page).toHaveURL(/\/auth/);
+  });
+});

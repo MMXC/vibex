@@ -161,7 +161,7 @@ export const useComponentStore = create<ComponentStore>()(
           set({ componentNodes: [], selectedNodeIds: [], componentDraft: null });
         },
       }),
-      { name: 'vibex-component-store' }
+      { name: 'vibex-component-store', skipHydration: true }
     ),
     { name: 'ComponentStore' }
   )

@@ -15,7 +15,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
-import { useHistoryStore, getHistoryStore } from '@/lib/canvas/historySlice';
+import { useHistoryStore, getHistoryStore, getUndoResult, getRedoResult } from '@/lib/canvas/historySlice';
 import type { TreeType, BoundedContextNode, BusinessFlowNode, ComponentNode } from '@/lib/canvas/types';
 
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
@@ -162,7 +162,7 @@ export function useCanvasHistory() {
 
     if (!historyStore.canUndo(tree)) return false;
 
-    const previous = historyStore.undo(tree);
+    const previous = getUndoResult(tree, historyStore.undo(tree));
     if (!previous) return false;
 
     if (tree === 'context') {
@@ -181,7 +181,7 @@ export function useCanvasHistory() {
 
     if (!historyStore.canRedo(tree)) return false;
 
-    const next = historyStore.redo(tree);
+    const next = getRedoResult(tree, historyStore.redo(tree));
     if (!next) return false;
 
     if (tree === 'context') {

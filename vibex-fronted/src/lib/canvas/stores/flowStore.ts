@@ -332,7 +332,7 @@ export const useFlowStore = create<FlowStore>()(
           set({ flowNodes: [], selectedNodeIds: new Set() });
         },
       }),
-      { name: 'vibex-flow-store' }
+      { name: 'vibex-flow-store', skipHydration: true }
     ),
     { name: 'FlowStore' }
   )

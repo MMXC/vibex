@@ -1,3 +1,9 @@
+### Added (vibex-canvas-qa-fix Epic3: Tab 默认 phase 初始化) — 2026-04-13
+- **E3.1**: contextStore.ts — `phase: 'context'`（原为 'input'）
+  - TabBar 读取 `contextStore.phase`（非 sessionStore）
+- **E3.2**: TabBar.tsx — guard 逻辑确认（`phaseIdx=1` 时 flow/component locked）
+- 提交: `301971314`
+
 ### Added (vibex-canvas-qa-fix Epic2: API 路径统一) — 2026-04-13
 - **E2.1**: api-config.ts — snapshots 端点添加 `/v1/` 前缀
   - `snapshots: '/v1/canvas/snapshots'`

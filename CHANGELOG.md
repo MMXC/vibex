@@ -1,3 +1,9 @@
+### Added (vibex-design-component-library Epic2 Phase2 P1: design-parser 集成修复) — 2026-04-14
+- **design-parser.ts**: 增强 extractColors/extractTypography/extractComponentTokens，输出 DesignColorPalette/DesignTypography
+- **generate-catalog.ts**: 集成 design-parser，为 58 个 catalog JSON 补充 colorPalette/typography/catalog.components/styleComponents
+- 验证: colorPalette 58/58, typography 58/58, catalog.components 58/58, styleComponents 58/58
+- 提交: `09aabcd1`
+
 ### Added (vibex-json-render-integration Phase1 P0: catalog slots + nodesToSpec + Registry 尺寸修复) — 2026-04-14
 - **catalog.ts**: 5个容器组件 (Page/Form/DataTable/DetailView/Modal) 添加 slots: ['default']
 - **JsonRenderPreview.tsx**: nodesToSpec 使用 parentId 建立嵌套关系

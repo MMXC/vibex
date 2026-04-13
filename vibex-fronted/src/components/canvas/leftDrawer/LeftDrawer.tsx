@@ -50,6 +50,22 @@ export function LeftDrawer() {
     setHistory(getHistory());
   }, []);
 
+  // S3.1: auth:401 独立兜底监听器（Layer 3 — LeftDrawer 层）
+  // Layer 1: canvasApi.handleResponseError 直接 redirect
+  // Layer 2: AuthProvider sessionStore.logout
+  // Layer 3: 本监听器兜底（确保任何遗漏的 401 都能跳转）
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if (typeof window !== 'undefined' && window.location.pathname === '/auth') {
+        return;
+      }
+      const returnTo = (e as CustomEvent<{ returnTo?: string }>).detail?.returnTo ?? window.location.pathname;
+      window.location.href = `/auth?returnTo=${encodeURIComponent(returnTo)}`;
+    };
+    window.addEventListener('auth:401', handler);
+    return () => window.removeEventListener('auth:401', handler);
+  }, []);
+
   // ── Send handler ───────────────────────────────────────────────
   const handleSend = useCallback(async () => {
     const text = inputValue.trim();
@@ -84,6 +100,11 @@ export function LeftDrawer() {
         setContextNodes([]);
       }
     } catch (err) {
+      // S3.1 Layer 2: catch 块 401 兜底跳转
+      if (err instanceof Error && err.message.includes('401')) {
+        window.location.href = `/auth?returnTo=${encodeURIComponent(window.location.pathname)}`;
+        return;
+      }
       canvasLogger.LeftDrawer.error('Failed to generate contexts:', err);
       setContextNodes([]);
     }

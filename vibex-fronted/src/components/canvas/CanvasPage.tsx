@@ -135,6 +135,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
 
   // === E3: useCanvasRenderer — memoized rects/edges/treeNodes ===
   // === E1.6: Manual rehydration — stores have skipHydration:true, rehydrate client-side ===
+  // === Toast (needed for toast notifications in useEffects) ===
+  const toast = useToast();
+
   useEffect(() => {
     // Rehydrate all stores that have skipHydration:true to restore persisted state
     useContextStore.persist?.rehydrate?.();
@@ -142,6 +145,32 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     useComponentStore.persist?.rehydrate?.();
     useUIStore.persist?.rehydrate?.();
     useSessionStore.persist?.rehydrate?.();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // === Phase 2: 从 URL 注入 projectId 并校验合法性 ===
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlProjectId = params.get('projectId');
+    if (!urlProjectId) return;
+
+    const currentProjectId = useSessionStore.getState().projectId;
+    if (urlProjectId === currentProjectId) return;
+
+    // 设置到 sessionStore（早于 useVersionHistory 挂载生效）
+    useSessionStore.getState().setProjectId(urlProjectId);
+
+    // 校验 projectId 合法性
+    fetch(`/api/projects/${encodeURIComponent(urlProjectId)}`)
+      .then((res) => {
+        if (!res.ok) {
+          useSessionStore.getState().setProjectId(null);
+          toast.showToast('项目不存在或无权限访问', 'error');
+        }
+      })
+      .catch(() => {
+        useSessionStore.getState().setProjectId(null);
+        toast.showToast('项目验证失败，请稍后重试', 'error');
+      });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const renderer = useCanvasRenderer({ contextNodes, flowNodes, componentNodes });
@@ -200,9 +229,6 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
 
   // === E4: Version History ===
   const versionHistory = useVersionHistory();
-
-  // === Toast (needed for conflict handlers) ===
-  const toast = useToast();
 
   // =============================================================================
   // E6 Phase 1: Remove duplicated effects now in hooks

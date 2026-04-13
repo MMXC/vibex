@@ -1,3 +1,10 @@
+### Added (vibex-json-render-integration Phase1 P0: catalog slots + nodesToSpec + Registry 尺寸修复) — 2026-04-14
+- **catalog.ts**: 5个容器组件 (Page/Form/DataTable/DetailView/Modal) 添加 slots: ['default']
+- **JsonRenderPreview.tsx**: nodesToSpec 使用 parentId 建立嵌套关系
+- **JsonRenderPreview.tsx**: COMPONENT_TYPE_MAP 添加 button:'Button'
+- **registry.tsx**: PageImpl min-h-full + flex 布局，ModalImpl 支持 children + close button
+- 提交: `497f4e76`
+
 ### Added (vibex-canvas-history-projectid: Phase1+Phase2 projectId 链路修复) — 2026-04-14
 - **Phase1**: useVersionHistory.ts — loadSnapshots/createSnapshot/createAiSnapshot 顶部 null 检查
   - projectId=null/undefined → 显示引导 UI (🗺️请先创建项目)，不调 API

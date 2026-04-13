@@ -18,6 +18,7 @@ const rawCatalog = defineCatalog(schema, {
         description: z.string().optional(),
       }),
       description: '页面容器 (Canvas ComponentType: page)',
+      slots: ['default'],
     },
     Form: {
       props: z.object({
@@ -32,6 +33,7 @@ const rawCatalog = defineCatalog(schema, {
         submitLabel: z.string().default('提交'),
       }),
       description: '表单容器 (Canvas ComponentType: form)',
+      slots: ['default'],
     },
     DataTable: {
       props: z.object({
@@ -41,6 +43,7 @@ const rawCatalog = defineCatalog(schema, {
         searchable: z.boolean().default(false),
       }),
       description: '数据表格 (Canvas ComponentType: list)',
+      slots: ['default'],
     },
     DetailView: {
       props: z.object({
@@ -49,6 +52,7 @@ const rawCatalog = defineCatalog(schema, {
         actions: z.array(z.object({ label: z.string(), variant: z.enum(['primary', 'secondary', 'danger']) })).optional(),
       }),
       description: '详情页 (Canvas ComponentType: detail)',
+      slots: ['default'],
     },
     Modal: {
       props: z.object({
@@ -57,6 +61,7 @@ const rawCatalog = defineCatalog(schema, {
         content: z.string().optional(),
       }),
       description: '弹窗 (Canvas ComponentType: modal)',
+      slots: ['default'],
     },
     Button: {
       props: z.object({

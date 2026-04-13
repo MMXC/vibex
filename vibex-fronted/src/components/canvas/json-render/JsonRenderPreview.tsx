@@ -33,6 +33,7 @@ const COMPONENT_TYPE_MAP: Record<string, string> = {
   list: 'DataTable',
   detail: 'DetailView',
   modal: 'Modal',
+  button: 'Button',
 };
 
 /**
@@ -46,30 +47,45 @@ function nodesToSpec(nodes: ComponentNode[]): Spec | null {
     return null;
   }
 
+  // === Phase 1 修复 (R2): 使用 parentId 建立嵌套关系 ===
+
+  // Step 1: 建立 parentId → children[] 映射
+  const childrenOfParent: Record<string, string[]> = {};
+  for (const node of nodes) {
+    if (node.parentId) {
+      if (!childrenOfParent[node.parentId]) {
+        childrenOfParent[node.parentId] = [];
+      }
+      childrenOfParent[node.parentId].push(node.nodeId);
+    }
+  }
+
+  // Step 2: 构建 elements
   const elements: Spec['elements'] = {};
-  
   for (const node of nodes) {
     if (!node.name) continue;
-    
+
     // Map Canvas ComponentType to registry component name
     const registryType = COMPONENT_TYPE_MAP[node.type] ?? node.type;
-    
-    // Build element from ComponentNode
-    const element: Spec['elements'][string] = {
+
+    // 优先使用 parentId 映射的 children，fallback 到 node.children
+    const children = childrenOfParent[node.nodeId] ?? node.children ?? [];
+
+    elements[node.nodeId] = {
       type: registryType,
       props: {
         ...node.props,
         title: node.name,
       },
-      children: node.children ?? [],
+      children,
     };
-    
-    elements[node.nodeId] = element;
   }
 
-  // Use the first page component as root, or first node
-  const root = nodes.find(n => n.type === 'page')?.nodeId ?? nodes[0]?.nodeId;
-  
+  // Step 3: 找 root — 优先 page 类型节点
+  const root = nodes.find((n) => n.type === 'page' && !n.parentId)?.nodeId
+    ?? nodes.find((n) => !n.parentId)?.nodeId
+    ?? nodes[0]?.nodeId;
+
   if (!root) return null;
 
   return { root, elements };

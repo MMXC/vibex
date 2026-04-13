@@ -78,11 +78,11 @@ const StatCardImpl = ({ props }: RegistryComponentProps<{ label: string; value: 
 const PageImpl = ({ props, children }: RegistryComponentProps<{ title: string; description?: string }> & { children?: React.ReactNode }) => {
   const { title } = props;
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-full bg-gray-50 flex flex-col">
       <header className="bg-white border-b border-gray-200 px-6 py-4">
         <h1 className="text-lg font-semibold text-gray-900">{title}</h1>
       </header>
-      <main className="p-6">{children}</main>
+      <main className="p-6 flex-1 overflow-auto">{children}</main>
     </div>
   );
 };
@@ -159,16 +159,17 @@ const DetailViewImpl = ({ props }: RegistryComponentProps<{ title: string; field
 };
 
 // Modal component
-const ModalImpl = ({ props }: RegistryComponentProps<{ title: string; size?: 'sm' | 'md' | 'lg'; content?: string }>) => {
-  const { title, size = 'md', content } = props;
-  const sizes: Record<string, string> = { sm: 'max-w-sm', md: 'max-w-md', lg: 'max-w-2xl' };
+const ModalImpl = ({ props, children }: RegistryComponentProps<{ title: string; size?: 'sm' | 'md' | 'lg'; content?: string }> & { children?: React.ReactNode }) => {
+  const { title, size = 'md' } = props;
+  const sizes: Record<string, string> = { sm: 'max-w-sm', md: 'max-w-2xl', lg: 'max-w-6xl' };
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className={`bg-white rounded-xl shadow-xl w-full ${sizes[size]} mx-4`}>
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className={`bg-white rounded-xl shadow-xl w-full ${sizes[size]} max-h-[90vh] flex flex-col`}>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 flex-shrink-0">
           <h3 className="font-semibold text-gray-900">{title}</h3>
+          <button type="button" onClick={() => {}} className="text-gray-400 hover:text-gray-600">✕</button>
         </div>
-        <div className="p-4 text-sm text-gray-600">{content}</div>
+        <div className="p-4 overflow-auto flex-1">{children}</div>
       </div>
     </div>
   );

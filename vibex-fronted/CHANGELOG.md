@@ -1,5 +1,11 @@
 # Changelog
 
+### [vibex-json-render-integration Epic2 Phase2 P1: ActionProvider + Button emit + Unit tests] — 2026-04-14
+- **R4**: registry.tsx — ButtonImpl 添加 emit('press', { nodeId, type }) onClick
+- **R4**: JsonRenderPreview.tsx — ActionProvider handlers press → forward to onNodeClick
+- **测试**: JsonRenderPreview.test.tsx 5/5 ✅
+- **提交**: `7b586ddb`
+
 ### [vibex-json-render-integration Epic1 Phase1 P0: catalog slots + nodesToSpec + Registry 修复] — 2026-04-14
 - **catalog.ts**: 5个容器组件 (Page/Form/DataTable/DetailView/Modal) 添加 slots: ['default']
 - **JsonRenderPreview.tsx**: nodesToSpec 使用 parentId 建立嵌套关系

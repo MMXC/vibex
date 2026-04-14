@@ -1,8 +1,12 @@
 ### Added (vibex-dev-proposals-20260414_143000 E2: Mermaid Dynamic Import) — 2026-04-14
-- **feat(E2)**: MermaidRenderer 改为动态导入，减少初始 bundle ~350KB
-- **MermaidSkeleton.tsx**: 轻量 CSS skeleton 占位符
-- **index.tsx**: Next.js dynamic() 包装器 (ssr:false + loading)
-- 验证: pnpm build ✅, vitest api-retry 11 passed ✅
+- **MermaidRenderer**: 改为 Next.js dynamic() 动态导入，~350KB 不进入初始 bundle
+- **MermaidSkeleton.tsx**: 轻量 CSS skeleton 占位符（加载动画 + "加载图表组件…"）
+- **index.tsx**: Next.js dynamic() 包装器 (ssr:false + loading fallback)
+- **mermaidInit.ts**: getMermaid() 改为 async import('mermaid')
+- **next.config.ts**: 集成 @next/bundle-analyzer（ANALYZE=true 启用）
+- **navigationStore.ts**: 导航项增加 DDS Canvas 入口
+- 验证: pnpm build ✅
+- 提交: `f425d4e9`
 
 ### Added (vibex-reviewer-proposals-20260414_143000 E1: 评审流程标准化) — 2026-04-14
 - **docs/templates/review-design.md**: PRD完整性/Feature list/AC/交互状态评审模板

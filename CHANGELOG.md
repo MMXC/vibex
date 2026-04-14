@@ -32,16 +32,13 @@
 - 提交: `f425d4e9`
 
 ### Added (vibex-reviewer-proposals-20260414_143000 E1: 评审流程标准化 + E3: 评审SLA与追踪) — 2026-04-14
-- **docs/templates/review-design.md**: PRD完整性/Feature list/AC/交互状态评审模板
-- **docs/templates/review-architecture.md**: Tech Stack/API Design/Data Model/Performance评审模板
-- **docs/templates/review-security.md**: Auth/Data Security/Input Validation/Dependencies评审模板
-- **docs/templates/review-performance.md**: Web Vitals/Bundle Size/API Latency/DB/Scale评审模板
-- **scripts/review-trigger.js**: 文档路径→skill类型触发规则引擎（minimatch模式匹配）
-- **scripts/sla-timer.py**: SLA超时监控（3.5h预警/4h auto-proceed conditional）+ Slack通知
-- **skills/reviewer/INTERFACE.md**: ReviewerSkill接口标准化（ReviewInput/ReviewOutput）
-- **docs/reviews/INDEX.md**: 采纳率追踪（设计/架构/安全/性能四维度记录）
-- 注: E1+E3均在同一commit `91c247dc`中，合并为一个CHANGELOG条目
-- 验证: node review-trigger-test.js ✅, python3 sla-timer.py --dry-run ✅, syntax checks ✅
+- **docs/templates/review-*.md**: 4套评审模板（design/architecture/security/performance）
+- **scripts/review-trigger.js**: minimatch触发规则引擎
+- **scripts/sla-timer.py**: SLA超时监控（3.5h预警/4h auto-proceed）+ Slack通知
+- **skills/reviewer/INTERFACE.md**: ReviewerSkill接口标准化
+- **docs/reviews/INDEX.md**: 采纳率追踪
+- 注: E1+E3内容均在同一commit `91c247dc`中
+- 验证: syntax checks ✅
 - 提交: `91c247dc`
 
 ### Added (vibex-pm-proposals-20260414_143000 Epic1-品牌一致性) — 2026-04-14

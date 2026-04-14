@@ -8,6 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import styles from './dashboard.module.css';
 import { apiService, Project } from '@/services/api';
 import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog';
+import { SearchBar } from '@/components/dashboard/SearchBar';
 import { useProjects, useDeletedProjects, queryKeys } from '@/hooks/queries';
 
 /** 排序方式 */
@@ -504,26 +505,12 @@ export default function Dashboard() {
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>项目列表</h2>
             <div className={styles.controls}>
-              {/* 搜索框 */}
-              <div className={styles.searchBox}>
-                <span className={styles.searchIcon}>🔍</span>
-                <input
-                  type="text"
-                  placeholder="搜索项目..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className={styles.searchInput}
-                />
-                {searchQuery && (
-                  <button
-                    className={styles.clearBtn}
-                    onClick={() => setSearchQuery('')}
-                    title="清除搜索"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
+              {/* 搜索框 — E3: 提取为 SearchBar 组件，内置 debounce 300ms */}
+              <SearchBar
+                placeholder="搜索项目..."
+                onSearch={setSearchQuery}
+                defaultValue={searchQuery}
+              />
 
               {/* E4: 视图切换 */}
               <div className={styles.viewToggle}>

@@ -1,3 +1,10 @@
+### [Unreleased] vibex-p0-q2-sprint1 E1: 品牌一致性 — 2026-04-14
+- **auth/page.tsx**: auth 页面 CSS Module 迁移完成，所有内联样式迁移至 auth.module.css
+- **auth/page.tsx**: validateReturnTo 安全验证函数保留（E1-S2.1）
+- **auth/auth.module.css**: 样式覆盖 CSS 变量（var(--color-bg-primary)、var(--gradient-primary) 等）
+- 验证: grep inline style = 0, pnpm build ✅
+- 提交: `0cae1330`
+
 ### Added (vibex-dev-proposals-20260414_143000 E2: Mermaid Dynamic Import) — 2026-04-14
 - **MermaidRenderer**: 改为 Next.js dynamic() 动态导入，~350KB 不进入初始 bundle
 - **MermaidSkeleton.tsx**: 轻量 CSS skeleton 占位符（加载动画 + "加载图表组件…"）

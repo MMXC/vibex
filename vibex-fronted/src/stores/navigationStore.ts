@@ -70,6 +70,8 @@ const DEFAULT_PROJECT_NAV: NavItem[] = [
   { id: 'domain', label: '领域模型', href: '/domain' },
   { id: 'flow', label: '流程图', href: '/flow' },
   { id: 'pages', label: '页面', href: '/pages' },
+  // DDS Canvas — Epic1: 入口与路由
+  { id: 'dds-canvas', label: 'DDS Canvas', href: '/design/dds-canvas' },
   { id: 'settings', label: '设置', href: '/project-settings' },
 ];
 

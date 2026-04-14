@@ -1,6 +1,6 @@
 /**
  * MermaidRenderer - Mermaid 流程图渲染组件
- * 
+ *
  * 支持五步构建法的流程可视化
  * F1.1: useEffect 优化 - 依赖数组精确
  * F1.2: 缓存机制 - LRU 缓存
@@ -8,15 +8,15 @@
  * F2.2: 初始化优化 - 使用统一的初始化逻辑
  * F3.1: 异步渲染 - cleanup 和 cancellation
  * F3.2: 非阻塞渲染 - requestIdleCallback
+ *
+ * E2.1: mermaid 改为动态导入，减少初始 bundle ~350KB
  */
 
 'use client';
 
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
-import mermaid from 'mermaid';
 import { preInitialize } from './mermaidInit';
 import DOMPurify from 'dompurify';
-
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
 // ==================== F1.2: LRU Cache ====================
@@ -31,7 +31,7 @@ class LRUCache<T> {
 
   get(key: string): T | undefined {
     if (!this.cache.has(key)) return undefined;
-    
+
     // Move to end (most recently used)
     const value = this.cache.get(key);
     this.cache.delete(key);
@@ -67,7 +67,7 @@ let mermaidReady = false;
 
 const initializeMermaid = async () => {
   if (mermaidReady) return;
-  
+
   // F2.2: 使用预初始化模块
   await preInitialize();
   mermaidReady = true;
@@ -97,10 +97,10 @@ export function MermaidRenderer({ chart, title }: MermaidRendererProps) {
   const [svg, setSvg] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // F3.1: 用于取消异步渲染
   const cancelledRef = useRef(false);
-  
+
   // F1.1: 精确依赖数组
   const cacheKey = useCacheKey(chart);
 
@@ -131,7 +131,7 @@ export function MermaidRenderer({ chart, title }: MermaidRendererProps) {
   useEffect(() => {
     // F3.1: 重置取消标志
     cancelledRef.current = false;
-    
+
     // F2.2: 使用异步初始化
     initializeMermaid();
 
@@ -149,29 +149,31 @@ export function MermaidRenderer({ chart, title }: MermaidRendererProps) {
 
       // F3.2: 显示加载状态
       setIsLoading(true);
-      
+
       try {
+        // E2.1: 动态导入 mermaid 以减小初始 bundle
+        const mermaid = await import('mermaid');
         const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
-        const { svg } = await mermaid.render(id, chart);
-        
+        const { svg } = await mermaid.default.render(id, chart);
+
         // F3.1: 检查是否已取消
         if (cancelledRef.current) return;
-        
+
         // F1.2: 存入缓存
         mermaidCache.set(cacheKey, svg);
-        
+
         // 使用 DOMPurify 防止 XSS
         const sanitizedSvg = DOMPurify.sanitize(svg, {
           USE_PROFILES: { svg: true },
           ADD_TAGS: ['foreignObject'],
         });
-        
+
         setSvg(sanitizedSvg);
         setError('');
       } catch (err) {
         // F3.1: 检查是否已取消
         if (cancelledRef.current) return;
-        
+
         canvasLogger.default.error('Mermaid render error:', err);
         setError('图表渲染失败');
         setSvg('');
@@ -184,7 +186,7 @@ export function MermaidRenderer({ chart, title }: MermaidRendererProps) {
 
     // F3.2: 非阻塞调度渲染
     const cleanup = scheduleRender(renderChart);
-    
+
     // F3.1: 清理函数 - 取消异步渲染
     return () => {
       cancelledRef.current = true;
@@ -200,18 +202,18 @@ export function MermaidRenderer({ chart, title }: MermaidRendererProps) {
   return (
     <div style={{ marginTop: '16px' }}>
       {title && (
-        <div style={{ 
-          fontSize: '14px', 
-          fontWeight: 500, 
+        <div style={{
+          fontSize: '14px',
+          fontWeight: 500,
           color: 'rgba(255,255,255,0.8)',
-          marginBottom: '8px' 
+          marginBottom: '8px'
         }}>
           {title}
         </div>
       )}
-      <div 
+      <div
         ref={containerRef}
-        style={{ 
+        style={{
           background: 'rgba(0,0,0,0.3)',
           borderRadius: '8px',
           padding: '16px',
@@ -221,9 +223,9 @@ export function MermaidRenderer({ chart, title }: MermaidRendererProps) {
       >
         {/* F3.2: 加载状态指示 */}
         {isLoading && (
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
             justifyContent: 'center',
             color: 'rgba(255,255,255,0.6)',
             fontSize: '14px',

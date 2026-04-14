@@ -12,9 +12,11 @@
 ### [Unreleased] vibex-dds-canvas Epic4: Backend CRUD API — 2026-04-15
 - **vibex-backend/src/routes/v1/dds/cards.ts**: F20 卡片 CRUD API（GET/POST/PUT/DELETE）
 - **vibex-backend/src/routes/v1/dds/relations.ts**: F21 Relations + Position API
+- **vibex-backend/src/routes/v1/dds/chapters.ts**: GET/POST /api/v1/dds/chapters?projectId=xxx（列出/创建章节）
 - **vibex-backend/src/routes/v1/gateway.ts**: 注册 /api/v1/dds 路由（protected_）
 - **vibex-backend/prisma/migrations/005_dds_tables.sql**: D1 Schema（dds_chapters/dds_cards/dds_edges 含 FK + 索引）
-- **vibex-backend/src/routes/v1/__tests__/dds-cards.test.ts**: 单元测试（jest mock）
+- **vibex-backend/src/routes/v1/__tests__/dds-cards.test.ts**: 单元测试（jest mock，cards + relations + chapters）
+- **vibex-fronted/src/hooks/dds/useDDSAPI.ts**: AbortController 5000ms timeout，防止 API 无响应时页面永驻
 - 统一响应格式 { data, success } + safeError() 错误处理
 
 ### [Unreleased] vibex-dds-canvas Epic3: AI Draft Flow — 2026-04-15

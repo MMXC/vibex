@@ -1,0 +1,161 @@
+/* RequirementCard — User Story Card Styles
+ * Epic 1: F6
+ */
+
+.container {
+  background: var(--bg-card, #111827);
+  border: 1px solid var(--border-default, #374151);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  min-width: 220px;
+  max-width: 320px;
+  cursor: grab;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.container:hover {
+  border-color: var(--border-hover, #6b7280);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.container:active {
+  cursor: grabbing;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary, #f3f4f6);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Priority Badge */
+.priorityBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  flex-shrink: 0;
+}
+
+.priorityHigh {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.priorityMedium {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.priorityLow {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+/* Story Body */
+.storyBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.storyLine {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.375rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #9ca3af);
+  line-height: 1.5;
+}
+
+.storyLine strong {
+  color: var(--text-primary, #e5e7eb);
+  font-weight: 500;
+}
+
+.roleLabel {
+  color: #60a5fa; /* blue-400 */
+  font-weight: 500;
+}
+
+.actionLabel {
+  color: #a78bfa; /* violet-400 */
+  font-weight: 500;
+}
+
+.benefitLabel {
+  color: #34d399; /* emerald-400 */
+  font-weight: 500;
+}
+
+/* Acceptance Criteria */
+.acceptanceSection {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-default, #374151);
+}
+
+.acceptanceToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: none;
+  border: none;
+  color: var(--text-muted, #6b7280);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s ease;
+}
+
+.acceptanceToggle:hover {
+  color: var(--text-secondary, #9ca3af);
+}
+
+.acceptanceList {
+  list-style: none;
+  margin: 0.5rem 0 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.acceptanceItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #9ca3af);
+  line-height: 1.4;
+}
+
+.acceptanceBullet {
+  color: var(--text-muted, #6b7280);
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+/* Selected state */
+.selected {
+  border-color: var(--accent-primary, #3b82f6);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}

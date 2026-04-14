@@ -1,3 +1,15 @@
+### [Unreleased] vibex-dds-canvas Epic1: DDSCanvasStore + 三种卡片组件 — 2026-04-15
+- **vibex-fronted/src/types/dds/index.ts**: F1 类型定义（ChapterType, BaseCard, DDSCard, DDSEdge, ChatMessage）
+- **vibex-fronted/src/stores/dds/DDSCanvasStore.ts**: F2 DDSCanvasStore（Zustand，30 tests）
+- **vibex-fronted/src/hooks/dds/useDDSCanvasFlow.ts**: F3 useDDSCanvasFlow hook（data→view 单向同步，9 tests）
+- **vibex-fronted/src/hooks/dds/useDDSAPI.ts**: F5 useDDSAPI Frontend Client
+- **vibex-fronted/src/components/dds/cards/RequirementCard.tsx**: F6 user-story 卡片（role/action/benefit）
+- **vibex-fronted/src/components/dds/cards/BoundedContextCard.tsx**: F7 bounded-context 卡片（relations 可视化）
+- **vibex-fronted/src/components/dds/cards/FlowStepCard.tsx**: F8 flow-step 卡片（pre/post conditions）
+- **vibex-fronted/src/components/dds/cards/CardRenderer.tsx**: F9 卡片分发器 + unknown fallback
+- 所有组件 memo 化，CSS Modules 隔离，TypeScript 编译通过
+- ESLint 0 errors，61 tests passing
+
 ### Added (vibex-dds-canvas Epic1: 入口与路由) — 2026-04-14
 - **vibex-fronted/src/app/design/dds-canvas/page.tsx**: 路由入口页面
 - **vibex-fronted/src/app/project/page.tsx**: 添加"详细设计"标签页

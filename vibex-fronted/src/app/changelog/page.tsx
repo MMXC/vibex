@@ -21,6 +21,24 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.224',
+    date: '2026-04-15',
+    changes: [
+      '📋 vibex-dds-canvas Epic1: DDSCanvasStore + 三种卡片组件',
+      '✅ types/dds/index.ts: F1 类型定义（ChapterType, BaseCard, DDSCard, DDSEdge, ChatMessage）',
+      '✅ stores/dds/DDSCanvasStore.ts: F2 Zustand store（30 tests）',
+      '✅ hooks/dds/useDDSCanvasFlow.ts: F3 data→view 单向同步（9 tests）',
+      '✅ hooks/dds/useDDSAPI.ts: F5 API Frontend Client',
+      '✅ RequirementCard: user-story 卡片（role/action/benefit）',
+      '✅ BoundedContextCard: bounded-context 卡片（relations 可视化）',
+      '✅ FlowStepCard: flow-step 卡片（pre/post conditions）',
+      '✅ CardRenderer: 类型分发器 + unknown fallback（22 tests）',
+      '✅ ESLint 0 errors，61 tests passing',
+    ],
+    commit: '待提交',
+  },
+
+  {
     version: '1.0.216',
     date: '2026-04-14',
     changes: [

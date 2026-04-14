@@ -1,3 +1,11 @@
+### [Unreleased] vibex-dds-canvas Epic2: 横向 Scroll-Snap Canvas 布局 — 2026-04-15
+- **vibex-fronted/src/components/dds/canvas/DDSScrollContainer.tsx**: F10 横向 Scroll-Snap 容器（19 tests）
+- **vibex-fronted/src/components/dds/canvas/DDSPanel.tsx**: F11 面板展开/收起动画（80px ↔ flex:1）
+- **vibex-fronted/src/components/dds/canvas/DDSThumbNav.tsx**: F12 缩略图导航
+- **vibex-fronted/src/components/dds/toolbar/DDSToolbar.tsx**: F13 Sticky 工具栏（14 tests）
+- 全部 memo 化，CSS Modules + Dark mode tokens
+- ESLint 0 errors，33 tests passing
+
 ### [Unreleased] vibex-dds-canvas Epic1: DDSCanvasStore + 三种卡片组件 — 2026-04-15
 - **vibex-fronted/src/types/dds/index.ts**: F1 类型定义（ChapterType, BaseCard, DDSCard, DDSEdge, ChatMessage）
 - **vibex-fronted/src/stores/dds/DDSCanvasStore.ts**: F2 DDSCanvasStore（Zustand，30 tests）

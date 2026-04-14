@@ -1,0 +1,158 @@
+/**
+ * DDSPanel — Individual Chapter Panel
+ * Epic 2: F11
+ */
+
+.panel {
+  scroll-snap-align: start;
+  height: 100%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-secondary);
+  border-right: 1px solid var(--color-border);
+  transition: width 200ms ease-in-out;
+  overflow: hidden;
+}
+
+.panelCollapsed {
+  width: 80px;
+}
+
+.panelExpanded {
+  width: 100%;
+  flex: 1;
+}
+
+.panel:last-child {
+  border-right: none;
+}
+
+/* ==================== Header ==================== */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-bg-tertiary);
+  flex-shrink: 0;
+  min-height: 48px;
+}
+
+.headerCollapsed {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  padding: 8px 0;
+  height: 100%;
+  max-height: 400px;
+  border-bottom: none;
+  border-right: 1px solid var(--color-border);
+  min-height: unset;
+}
+
+.headerTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+
+.headerTitleCollapsed {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* ==================== Content ==================== */
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-hover) transparent;
+}
+
+.content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background-color: var(--color-border-hover);
+  border-radius: 2px;
+}
+
+/* ==================== Footer / ThumbNav area ==================== */
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-bg-tertiary);
+  flex-shrink: 0;
+}
+
+.footerCollapsed {
+  padding: 8px 0;
+}
+
+/* ==================== Loading state ==================== */
+
+.loadingWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 24px;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spinAnim 0.8s linear infinite;
+}
+
+@keyframes spinAnim {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==================== Error state ==================== */
+
+.errorWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  margin: 16px;
+  border-radius: 6px;
+  background-color: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #f87171;
+  font-size: 13px;
+  text-align: center;
+}

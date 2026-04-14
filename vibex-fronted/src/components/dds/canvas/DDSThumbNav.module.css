@@ -1,0 +1,61 @@
+/**
+ * DDSThumbNav — Thumbnail Navigation Bar
+ * Epic 2: F12
+ */
+
+.thumbNav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-bg-tertiary);
+  flex-shrink: 0;
+}
+
+.thumbNavCollapsed {
+  padding: 8px 0;
+}
+
+.thumbButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 150ms ease;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-family: inherit;
+  line-height: 1;
+}
+
+.thumbButton:hover {
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-tertiary);
+}
+
+.thumbButton:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.thumbButtonActive {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.thumbButtonActive:hover {
+  opacity: 0.9;
+  border-color: var(--color-primary);
+}

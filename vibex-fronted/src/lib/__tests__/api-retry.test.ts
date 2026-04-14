@@ -3,6 +3,7 @@
  */
 
 import axios, { AxiosInstance, AxiosError } from 'axios';
+import { circuitBreakerManager } from '../circuit-breaker';
 import {
   configureAxiosRetry,
   createRetryableClient,
@@ -178,7 +179,7 @@ describe('retry integration with circuit breaker', () => {
     // This is an integration test that verifies retry and circuit breaker
     // can work together without conflicts
     
-    const { circuitBreakerManager } = require('../circuit-breaker');
+    // circuitBreakerManager imported at top of file
     
     // Create a mock function that fails twice then succeeds
     let attempts = 0;

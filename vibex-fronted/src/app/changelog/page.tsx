@@ -31,7 +31,7 @@ const mockChangelog: ChangelogEntry[] = [
       '✅ AbortController 请求生命周期管理',
       '✅ ESLint 0 errors',
     ],
-    commit: '待提交',
+    commit: '1717a097',
   },
 
   {

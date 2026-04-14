@@ -64,6 +64,11 @@ jobs:
         run: cd vibex-fronted && pnpm exec tsc --noEmit
       - name: TypeScript check (backend)
         run: cd vibex-backend && pnpm exec tsc --noEmit
+      - name: TODO grep (frontend)
+        run: |
+          TODO_COUNT=$(grep -rEn 'TODO(?!.*#[0-9]+)' vibex-fronted/src/ --include="*.ts" --include="*.tsx" 2>/dev/null | grep -v 'eslint-disable' | grep -v '// ' | wc -l)
+          if [ "$TODO_COUNT" -gt 0 ]; then echo "::warning::TODO without issue: $TODO_COUNT found"; grep -rEn 'TODO(?!.*#[0-9]+)' vibex-fronted/src/ --include="*.ts" --include="*.tsx" 2>/dev/null | grep -v 'eslint-disable' | grep -v '// ' | head -5; fi
+          echo "TODO count: $TODO_COUNT (warning only — see docs/naming-conventions.md for policy)"
 
   lint:
     name: Lint

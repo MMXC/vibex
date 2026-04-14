@@ -124,10 +124,10 @@
 - 提交: `91c247dc`
 
 ### Added (vibex-pm-proposals-20260414_143000 Epic1-品牌一致性) — 2026-04-14
+- **E1 Auth CSS Migration**: `auth/page.tsx` 无内联样式，auth.module.css 玻璃态 + gradient-primary + gridOverlay + glowEffect；page.test.tsx 新增 5 个迁移回归测试（S1.1.1/1.1.2/1.1.3/1.2）
 - **E2 ClarificationCard**: 创建 `ClarificationCard.tsx` 和 `ClarificationCard.module.css`，从 ClarificationDialog 提取卡片 UI，支持 `variant='inline'|'modal'` prop，空列表状态处理
 - **E3 Dashboard SearchBar**: 创建 `SearchBar.tsx`（debounce 300ms）、`SearchBar.module.css`、`useDebounce.ts` hook，dashboard/page.tsx 内联搜索迁移到 SearchBar 组件
-- **⚠️ E1 Auth CSS**: 待开发（代码零提交，reviewer 已驳回）
-- 验证: pnpm build ✅
+- 验证: pnpm vitest run src/app/auth/page.test.tsx ✅ (11 passed)
 
 ### Fixed (vibex-dev-proposals-20260414_143000 Epic1-CI质量门禁) — 2026-04-14
 - **.github/workflows/test.yml**: 新增 type-check CI job（frontend + backend tsc --noEmit），merge-gate 增加 type-check 依赖

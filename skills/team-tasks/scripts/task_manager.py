@@ -2984,6 +2984,12 @@ def main():
     p.add_argument("--idle", type=int, default=None, help="连续空转次数")
     p.add_argument("--notify", action="store_true", help="生成后自动发送到 #coord 频道")
 
+    p = sub.add_parser("review", help="列出/分发 review 任务（reviewer 专用）")
+    p.add_argument("project", help="项目名称")
+    p.add_argument("--skill", "-s", choices=["design", "architecture", "security", "performance"],
+                   help="筛选特定 skill 类型")
+    p.add_argument("--claim", "-c", action="store_true", help="显示 claim 命令")
+
     p = sub.add_parser("check-dup", help="检查项目是否重复（提案去重）")
     p.add_argument("name", help="项目名称")
     p.add_argument("goal", nargs="?", default="", help="项目目标描述")
@@ -3020,6 +3026,7 @@ def main():
         "activate": cmd_activate,
         "clean-cooldown": cmd_clean_cooldown,
         "exclude": cmd_exclude,
+        "review": cmd_review,
         "check-dup": cmd_check_dup,
         "resign": cmd_resign,
         "check-lock": cmd_check_lock,
@@ -3075,6 +3082,92 @@ def _send_slack_notification(channel_id: str, token: str, text: str) -> bool:
             return result.get("ok", False)
     except Exception:
         return False
+
+
+def cmd_review(args):
+    """
+    Show pending review tasks for a project, with trigger -> claim workflow.
+
+    Usage:
+      task_manager.py review <project>
+      task_manager.py review <project> --skill design
+      task_manager.py review <project> --claim
+
+    Workflow:
+      1. node scripts/review-trigger.js docs/<project>/<doc>.md  → ["architecture","design"]
+      2. task_manager.py review <project> --skill <skill>
+      3. task_manager.py claim <project> review-<skill> --agent reviewer
+      4. Use docs/templates/review-<skill>.md
+      5. task_manager.py update <project> review-<skill> done
+    """
+    REVIEW_SKILLS = ["design", "architecture", "security", "performance"]
+
+    project = args.project
+    skill_filter = getattr(args, "skill", None)
+    do_claim = getattr(args, "claim", False)
+
+    if skill_filter and skill_filter not in REVIEW_SKILLS:
+        print(f"Error: unknown skill '{skill_filter}'. Choose from: {', '.join(REVIEW_SKILLS)}", file=sys.stderr)
+        sys.exit(1)
+
+    project_dir = TASKS_DIR / project
+    project_file = project_dir / "project.json"
+    if not project_file.exists():
+        print(f"Error: project '{project}' not found", file=sys.stderr)
+        sys.exit(1)
+
+    data = json.loads(project_file.read_text())
+
+    review_stages = {}
+    for stage_id, stage in data.get("stages", {}).items():
+        if not stage_id.startswith("review-"):
+            continue
+        skill = stage_id.replace("review-", "")
+        if skill_filter and skill != skill_filter:
+            continue
+        review_stages[stage_id] = {
+            "skill": skill,
+            "status": stage.get("status", "pending"),
+            "agent": stage.get("agent", ""),
+            "sla_deadline": stage.get("sla_deadline", ""),
+            "template": f"docs/templates/review-{skill}.md",
+        }
+
+    if not review_stages:
+        if skill_filter:
+            print(f"No review-{skill_filter} stage found in '{project}'.")
+            print(f"Hint: task_manager.py add {project} review-{skill_filter} --agent reviewer")
+        else:
+            print(f"No review stages found in '{project}'.")
+        sys.exit(0)
+
+    print(f"📋 Review tasks for: {project}")
+    print()
+
+    for stage_id, info in sorted(review_stages.items()):
+        status_emoji = {
+            "pending": "⏳", "ready": "✅", "in-progress": "🔄",
+            "done": "🏁", "skipped": "⏭️", "rejected": "❌",
+        }.get(info["status"], "❓")
+
+        print(f"  {status_emoji} {stage_id}")
+        print(f"     Skill:  {info['skill']}")
+        print(f"     Status: {info['status']}")
+        print(f"     Agent:  {info['agent'] or '(unassigned)'}")
+        if info["sla_deadline"]:
+            print(f"     SLA:    {info['sla_deadline']}")
+        print(f"     Tpl:    {info['template']}")
+        if info["status"] in ("pending", "ready") and do_claim:
+            print(f"  → task_manager.py claim {project} {stage_id} --agent reviewer")
+        print()
+
+    print("---")
+    print("Workflow:  trigger → review → claim → template → done")
+    print(f"  1. node scripts/review-trigger.js docs/<project>/<doc>.md")
+    print(f"  2. task_manager.py review {project} --skill <skill>")
+    print(f"  3. task_manager.py claim {project} review-<skill> --agent reviewer")
+    print(f"  4. Use docs/templates/review-<skill>.md")
+    print(f"  5. task_manager.py update {project} review-<skill> done")
 
 
 def cmd_diagnose(args):

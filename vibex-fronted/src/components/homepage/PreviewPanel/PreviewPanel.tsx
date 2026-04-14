@@ -11,11 +11,16 @@
 import React, { useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import styles from './PreviewPanel.module.css';
+import { MermaidSkeleton } from '@/components/mermaid/MermaidSkeleton';
 
 // Dynamic import for MermaidRenderer (SSR: false to avoid window access on server)
+// E2.1: mermaid ~350KB loaded only when needed
 const MermaidRenderer = dynamic(
   () => import('@/components/mermaid/MermaidRenderer'),
-  { ssr: false }
+  {
+    ssr: false,
+    loading: () => <MermaidSkeleton />,
+  }
 );
 
 export interface MermaidCodes {

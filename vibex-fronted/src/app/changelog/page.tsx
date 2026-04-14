@@ -21,6 +21,21 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.226',
+    date: '2026-04-15',
+    changes: [
+      '📋 vibex-dds-canvas Epic3: AI Draft Flow',
+      '✅ AIDraftDrawer.tsx: F14 滑出抽屉 + 状态机（20 tests）',
+      '✅ CardPreview.tsx: F15 AI 卡片预览 + accept/edit/retry 按钮（15 tests）',
+      '✅ 状态机: IDLE → LOADING → PREVIEW | ERROR（组件级）',
+      '✅ 30s 超时，AbortController 请求取消',
+      '✅ 全部 memo 化，CSS Modules',
+      '✅ ESLint 0 errors，35 tests passing',
+    ],
+    commit: '待提交',
+  },
+
+  {
     version: '1.0.225',
     date: '2026-04-15',
     changes: [

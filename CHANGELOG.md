@@ -3,7 +3,8 @@
 - **vibex-fronted/tsconfig.json**: include/exclude 策略优化
 - **vibex-fronted/src/vitest-env.d.ts**: 声明 vitest 全局类型
 - **测试文件语法修复**: 后端 3 个文件 + 前端 9 个文件的语法 bug（逗号→分号、as any<Type>→as any 等）
-- 验证: pnpm build ✅, pnpm exec tsc --noEmit ✅（frontend exit 0）
+- **api-retry.test.ts ESM 修复** (e1b1a8e6): require()→ESM import，与 circuit-breaker 模块兼容
+- 验证: pnpm build ✅, pnpm exec tsc --noEmit ✅（frontend exit 0）, vitest api-retry 11 passed ✅
 
 ### Added (vibex-analyst-proposals-20260414_143000 Epic1: 提案可行性分析框架标准化) — 2026-04-14
 - **docs/templates/proposal-submission-template.md**: 提案提交模板，7个强制字段 + proposal ID格式 + SLA说明

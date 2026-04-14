@@ -1,3 +1,14 @@
+### Added (vibex-analyst-proposals-20260414_143000 Epic1: 提案可行性分析框架标准化) — 2026-04-14
+- **docs/templates/proposal-submission-template.md**: 提案提交模板，7个强制字段 + proposal ID格式 + SLA说明
+- **docs/templates/feasibility-analysis-template.md**: 可行性分析模板，含三维可行性评估 + 风险矩阵 + 工时估算 + Coord决策记录
+- **docs/templates/risk-matrix.md**: 风险矩阵格式标准（🔴/🟠/🟡三级，技术/业务/依赖分类）
+- **docs/templates/estimate-standard.md**: 工时估算标准，含乐观/悲观范围 + 回验机制
+- **docs/templates/gate-criteria.md**: 评审Gate标准，明确推荐/不推荐/有条件推荐判断条件
+- **scripts/sla-monitor.py**: SLA超时监控脚本，支持dry-run和Slack通知
+- **scripts/analysis-lint.py**: analysis.md合规性检查脚本（结论/风险/估算检查）
+- **skills/team-tasks/scripts/task_manager.py**: claim时自动设置sla_deadline(+24h)和proposal_id，status显示SLA列
+- 验证: pnpm build ✅，task_manager SLA/proposal-id 函数测试 ✅，analysis-lint 检测正常 ✅
+
 ### Added (vibex-design-component-library Epic2-Stories: generate-catalog 脚本测试 19 例) — 2026-04-14
 - **tests/unit/generate-catalog.test.ts**: 19 个测试用例
 - S2.1: --all 批量模式（58 文件，slugToFilename，错误跳过）

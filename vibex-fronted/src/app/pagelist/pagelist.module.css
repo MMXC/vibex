@@ -1,0 +1,415 @@
+/* pagelist.module.css — Page management styles migrated from inline
+ * Epic E1: 设计系统统一（品牌一致性）
+ */
+
+/* ── Page background (grid + glow, same as auth) ─────────── */
+.page {
+  min-height: 100vh;
+  background: var(--color-bg-primary);
+}
+
+.gridOverlay {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glowEffect {
+  position: fixed;
+  top: 0;
+  right: 5%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0, 255, 255, 0.07) 0%, transparent 65%);
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Nav ──────────────────────────────────────────────────── */
+.nav {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.navLeft {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.navLogo {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-shadow: 0 0 12px var(--color-primary-glow);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.navLogo:hover {
+  color: var(--color-primary-hover);
+  text-shadow: 0 0 20px var(--color-primary-glow);
+}
+
+.navLinks {
+  display: flex;
+  gap: 24px;
+}
+
+.navLink {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.navLink:hover {
+  color: var(--color-primary);
+  text-shadow: 0 0 8px var(--color-primary-glow);
+}
+
+.navLinkActive {
+  color: var(--color-primary);
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.navLinkActive:hover {
+  color: var(--color-primary-hover);
+  text-shadow: 0 0 8px var(--color-primary-glow);
+}
+
+.navRight {
+  display: flex;
+  align-items: center;
+}
+
+.navAction {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.navAction:hover {
+  color: var(--color-primary-hover);
+  text-shadow: 0 0 8px var(--color-primary-glow);
+}
+
+/* ── Main ─────────────────────────────────────────────────── */
+.main {
+  position: relative;
+  z-index: 1;
+  padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+.header {
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+}
+
+/* ── Search / Filter bar ─────────────────────────────────── */
+.filterBar {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+}
+
+.searchWrapper {
+  flex: 1;
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;
+  font-size: 14px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.searchInput:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.1);
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-muted);
+}
+
+.filterBtns {
+  display: flex;
+  gap: 8px;
+}
+
+.filterBtn {
+  padding: 10px 16px;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.filterBtn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.filterBtnActive {
+  padding: 10px 16px;
+  background: var(--color-primary);
+  color: var(--color-bg-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 16px rgba(0, 255, 255, 0.3);
+}
+
+.filterBtnActive:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+/* ── Table card ───────────────────────────────────────────── */
+.tableCard {
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tableHeadRow {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.tableHead {
+  padding: 14px 20px;
+  text-align: left;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.tableHeadRight {
+  padding: 14px 20px;
+  text-align: right;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.tableHeadCenter {
+  padding: 14px 20px;
+  text-align: center;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.tableRow {
+  border-top: 1px solid var(--color-border);
+  transition: background 0.15s ease;
+}
+
+.tableRow:hover {
+  background: rgba(0, 255, 255, 0.03);
+}
+
+.tableCell {
+  padding: 16px 20px;
+  color: var(--color-text-primary);
+  font-size: 14px;
+}
+
+.tableCellMono {
+  padding: 16px 20px;
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.tableCellRight {
+  padding: 16px 20px;
+  text-align: right;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.tableCellCenter {
+  padding: 16px 20px;
+  text-align: center;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.actionLink {
+  color: var(--color-primary);
+  text-decoration: none;
+  margin-right: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.actionLink:hover {
+  color: var(--color-primary-hover);
+  text-shadow: 0 0 8px var(--color-primary-glow);
+}
+
+.actionLinkMuted {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.actionLinkMuted:hover {
+  color: var(--color-primary);
+}
+
+/* ── Status badges ────────────────────────────────────────── */
+.statusPublished {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  background: rgba(0, 255, 136, 0.15);
+  color: var(--color-success);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.statusDraft {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  background: rgba(255, 170, 0, 0.15);
+  color: var(--color-warning);
+  border: 1px solid rgba(255, 170, 0, 0.3);
+}
+
+/* ── Empty state ──────────────────────────────────────────── */
+.emptyState {
+  padding: 48px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+/* ── Stats grid ───────────────────────────────────────────── */
+.statsGrid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.statCard {
+  padding: 16px;
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+
+.statValue {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.statValuePrimary {
+  color: var(--color-primary);
+  text-shadow: 0 0 10px var(--color-primary-glow);
+}
+
+.statValueSuccess {
+  color: var(--color-success);
+  text-shadow: 0 0 10px var(--color-green-glow);
+}
+
+.statValueWarning {
+  color: var(--color-warning);
+  text-shadow: 0 0 10px rgba(255, 170, 0, 0.5);
+}
+
+.statValueAccent {
+  color: var(--color-accent);
+  text-shadow: 0 0 10px var(--color-accent-glow);
+}
+
+.statLabel {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}

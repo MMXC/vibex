@@ -1,0 +1,93 @@
+/**
+ * DDSScrollContainer — Horizontal Scroll-Snap Layout
+ * Epic 2: F10
+ *
+ * Dark mode CSS tokens (data-theme="dark"):
+ * --color-bg-primary:    #111827
+ * --color-bg-secondary:  #1f2937
+ * --color-bg-tertiary:   #374151
+ * --color-border:        #374151
+ * --color-border-hover:  #4b5563
+ * --color-text-primary:  #f9fafb
+ * --color-text-secondary:#9ca3af
+ * --color-text-muted:    #8a8a9a
+ * --color-primary:       #3B82F6
+ */
+
+/* ==================== Root Container ==================== */
+
+.ddsHorizontal {
+  display: flex;
+  overflow-x: scroll;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  height: 100%;
+  width: 100%;
+  background-color: var(--color-bg-primary);
+}
+
+.ddsHorizontal::-webkit-scrollbar {
+  display: none;
+}
+
+/* ==================== Panel Content (used by DDSScrollContainer directly) ==================== */
+
+.panelContent {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-hover) transparent;
+}
+
+.panelContent::-webkit-scrollbar {
+  width: 4px;
+}
+
+.panelContent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.panelContent::-webkit-scrollbar-thumb {
+  background-color: var(--color-border-hover);
+  border-radius: 2px;
+}
+
+/* ==================== Loading / Error states ==================== */
+
+.loadingOverlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 24px;
+}
+
+.loadingSpinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 6px;
+  margin: 16px;
+  color: #f87171;
+  font-size: 13px;
+}

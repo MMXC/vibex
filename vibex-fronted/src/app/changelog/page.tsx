@@ -21,21 +21,36 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.225',
+    date: '2026-04-15',
+    changes: [
+      '📋 vibex-dds-canvas Epic2: 横向 Scroll-Snap Canvas 布局',
+      '✅ DDSScrollContainer.tsx: F10 横向 Scroll-Snap 容器（19 tests）',
+      '✅ DDSPanel.tsx: F11 面板展开/收起动画（80px ↔ flex:1）',
+      '✅ DDSThumbNav.tsx: F12 缩略图导航',
+      '✅ DDSToolbar.tsx: F13 Sticky 工具栏（14 tests）',
+      '✅ 全部 memo 化，CSS Modules + Dark mode tokens',
+      '✅ ESLint 0 errors，33 tests passing',
+    ],
+    commit: '待提交',
+  },
+
+  {
     version: '1.0.224',
     date: '2026-04-15',
     changes: [
       '📋 vibex-dds-canvas Epic1: DDSCanvasStore + 三种卡片组件',
-      '✅ types/dds/index.ts: F1 类型定义（ChapterType, BaseCard, DDSCard, DDSEdge, ChatMessage）',
+      '✅ types/dds/index.ts: F1 类型定义',
       '✅ stores/dds/DDSCanvasStore.ts: F2 Zustand store（30 tests）',
       '✅ hooks/dds/useDDSCanvasFlow.ts: F3 data→view 单向同步（9 tests）',
       '✅ hooks/dds/useDDSAPI.ts: F5 API Frontend Client',
-      '✅ RequirementCard: user-story 卡片（role/action/benefit）',
-      '✅ BoundedContextCard: bounded-context 卡片（relations 可视化）',
-      '✅ FlowStepCard: flow-step 卡片（pre/post conditions）',
-      '✅ CardRenderer: 类型分发器 + unknown fallback（22 tests）',
+      '✅ RequirementCard: user-story 卡片',
+      '✅ BoundedContextCard: bounded-context 卡片',
+      '✅ FlowStepCard: flow-step 卡片',
+      '✅ CardRenderer: 类型分发器（22 tests）',
       '✅ ESLint 0 errors，61 tests passing',
     ],
-    commit: '待提交',
+    commit: 'fe5f35ff',
   },
 
   {

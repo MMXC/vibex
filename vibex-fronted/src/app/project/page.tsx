@@ -68,7 +68,7 @@ const mockPrototypes = [
   { id: '3', name: '购物车', pages: 2 },
 ];
 
-type TabType = 'domain' | 'prototype';
+type TabType = 'domain' | 'prototype' | 'dds';
 
 function ProjectDetailContent() {
   const router = useRouter();
@@ -158,6 +158,13 @@ function ProjectDetailContent() {
             <span className={styles.navIcon}>🎨</span>
             <span>原型</span>
           </button>
+          <button
+            className={`${styles.navItem} ${activeTab === 'dds' ? styles.active : ''}`}
+            onClick={() => setActiveTab('dds')}
+          >
+            <span className={styles.navIcon}>📐</span>
+            <span>详细设计画布</span>
+          </button>
         </nav>
 
         {/* 树形结构 */}
@@ -193,6 +200,19 @@ function ProjectDetailContent() {
               ))}
             </div>
           )}
+          {activeTab === 'dds' && projectId && (
+            <div className={styles.tree}>
+              <h3 className={styles.treeTitle}>详细设计画布</h3>
+              <Link
+                href={`/design/dds-canvas?projectId=${projectId}`}
+                className={styles.treeItem}
+              >
+                <span className={styles.treeIcon}>📐</span>
+                <span>打开详细设计画布</span>
+                <span className={styles.treeBadge}>V1</span>
+              </Link>
+            </div>
+          )}
         </div>
       </aside>
 
@@ -211,6 +231,12 @@ function ProjectDetailContent() {
             onClick={() => setActiveTab('prototype')}
           >
             原型预览
+          </button>
+          <button
+            className={`${styles.tab} ${activeTab === 'dds' ? styles.active : ''}`}
+            onClick={() => setActiveTab('dds')}
+          >
+            详细设计画布
           </button>
         </div>
 
@@ -268,6 +294,18 @@ function ProjectDetailContent() {
                   </Link>
                 ))}
               </div>
+            </div>
+          )}
+          {activeTab === 'dds' && (
+            <div className={styles.ddsView}>
+              <h2>详细设计画布</h2>
+              <p>基于 @xyflow/react v12 构建，详细设计画布正在开发中。</p>
+              <Link
+                href={`/design/dds-canvas?projectId=${projectId}`}
+                className={styles.ddsLink}
+              >
+                打开详细设计画布 →
+              </Link>
             </div>
           )}
         </div>

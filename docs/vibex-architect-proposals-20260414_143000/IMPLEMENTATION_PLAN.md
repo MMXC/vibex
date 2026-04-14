@@ -36,7 +36,7 @@ grep -rn "background.*#fff\|background.*white\|#f5f5f5" app/pagelist/  # 无结�
 
 ---
 
-- [ ] **Unit 2: E2.S1 apiError() 工具函数**
+- [x] **Unit 2: E2.S1 apiError() ✅ (f459a3c6, updated: STATUS_MAP)**
 
 **Goal:** 实现统一 API 错误处理函数。
 
@@ -59,7 +59,7 @@ expect(apiError('INVALID_PARAMS', 'Missing id').status).toBe(400);
 
 ---
 
-- [ ] **Unit 3: E2.S1 路由统一错误替换**
+- [x] **Unit 3: E2.S1 路由统一错误替换** ❌ deferred Sprint 2
 
 **Goal:** 61 个后端路由错误格式统一。
 

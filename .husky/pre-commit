@@ -1,3 +1,24 @@
 #!/bin/bash
-# Auto-update pnpm lockfile when package.json changes
-pnpm install --frozen-lockfile 2>/dev/null || echo "pnpm install failed, check lockfile sync"
+# E4 Security Baseline (Epic4): block console.log/debug/error in backend src/ (non-test files)
+# Exemptions: __tests__/, *.test.ts, *.spec.ts, log-sanitizer.ts, logger.ts
+echo "🔍 Checking for console.log/debug/error in vibex-backend/src/..."
+CONSOLE_VIOLATIONS=$(grep -rn "console\.\(log\|debug\|error\)" vibex-backend/src/ \
+  --include="*.ts" \
+  --exclude-dir=node_modules \
+  --exclude-dir=__tests__ \
+  --exclude="*.test.ts" \
+  --exclude="*.spec.ts" \
+  2>/dev/null | grep -v "log-sanitizer\|logger\.ts" | head -20)
+
+if [ -n "$CONSOLE_VIOLATIONS" ]; then
+  echo "❌ console.log/debug/error found in vibex-backend/src/ (non-test files):"
+  echo "$CONSOLE_VIOLATIONS"
+  echo ""
+  echo "✅ Allowed: console.warn, console.error (in routes)"
+  echo "✅ Allowed: console.* in __tests__/, *.test.ts, *.spec.ts"
+  echo "✅ Allowed: console.* in log-sanitizer.ts, logger.ts"
+  echo ""
+  echo "💡 Use logger.info() / logger.error() from @/lib/logger instead."
+  exit 1
+fi
+echo "✅ No console.* violations in vibex-backend/src/"

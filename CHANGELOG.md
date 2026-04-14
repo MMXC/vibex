@@ -1,3 +1,9 @@
+### [Unreleased] vibex-dev-proposals-20260414 Epic4: 安全基线 — 2026-04-15
+- **vibex-backend/eslint.config.mjs**: 修复 no-console 规则，移除 log（之前错误允许）
+- **.husky/pre-commit**: 替换 pnpm-install 桩脚本为真正的 console.log/debug/error 检查器
+  - 扫描 vibex-backend/src/（排除 __tests__/、*.test.ts、log-sanitizer.ts、logger.ts）
+  - 拦截包含 console.log/debug/error 的非测试文件提交
+
 ### [Unreleased] vibex-dds-canvas Epic6: E2E 测试套件 — 2026-04-15
 - **vibex-fronted/tests/e2e/dds-canvas-e2e.spec.ts**: F25/F26/F27 Playwright E2E 测试（522行）
 - setupDDSMocks() — Playwright page.route() 拦截所有 DDS API，无后端也可运行

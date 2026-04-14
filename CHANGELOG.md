@@ -1,3 +1,9 @@
+### Added (vibex-dds-canvas Epic1: 入口与路由) — 2026-04-14
+- **vibex-fronted/src/app/design/dds-canvas/page.tsx**: 路由入口页面
+- **vibex-fronted/src/app/project/page.tsx**: 添加"详细设计"标签页
+- 提交: `1d0e4484`
+- 注: Canvas/Store/Cards 等 Unit 1-6 等待 @xyflow/react v12 类型修复
+
 - **feat(E2)**: IU-6 MermaidRenderer × 3 dynamic wrappers ✅, pagelist CSS Module 迁移 ✅ (c13ef489, 266523c2)
 - **feat(E3)**: IU-9 naming-conventions.md ✅, IU-10 TODO grep CI ✅ (faa1ffb3)
 - **task_manager.py**: add review subcommand for reviewer task management (93a3c60e)

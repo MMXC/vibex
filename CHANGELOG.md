@@ -1,3 +1,8 @@
+### [Unreleased] vibex-dds-canvas Epic6: E2E 测试套件 — 2026-04-15
+- **vibex-fronted/tests/e2e/dds-canvas-e2e.spec.ts**: F25/F26/F27 Playwright E2E 测试（4个测试用例，433行）
+- F25: 创建卡片→拖拽→编辑→删除；F26: AI Draft 完整流程；F27: 面板导航+全屏切换
+- 运行: `pnpm test:e2e -- tests/e2e/dds-canvas-e2e.spec.ts`
+
 ### [Unreleased] vibex-dds-canvas Epic5: 路由与页面集成 — 2026-04-15
 - **vibex-fronted/src/components/dds/DDSFlow.tsx**: React Flow wrapper（F23）
 - **vibex-fronted/src/components/dds/DDSCanvasPage.tsx**: 主页面组件，整合 E1-E4 全部组件（12 tests）
@@ -5,10 +10,12 @@
 - AbortController 请求生命周期管理，102 tests passing
 
 ### [Unreleased] vibex-dds-canvas Epic4: Backend CRUD API — 2026-04-15
-- **vibex-backend/src/routes/v1/dds/cards.ts**: F20 卡片 CRUD API（22 tests）
+- **vibex-backend/src/routes/v1/dds/cards.ts**: F20 卡片 CRUD API（GET/POST/PUT/DELETE）
 - **vibex-backend/src/routes/v1/dds/relations.ts**: F21 Relations + Position API
-- **vibex-backend/src/routes/v1/gateway.ts**: 注册 /api/v1/dds 路由
-- 统一响应格式 { data, success } + apiError() 错误处理
+- **vibex-backend/src/routes/v1/gateway.ts**: 注册 /api/v1/dds 路由（protected_）
+- **vibex-backend/prisma/migrations/005_dds_tables.sql**: D1 Schema（dds_chapters/dds_cards/dds_edges 含 FK + 索引）
+- **vibex-backend/src/routes/v1/__tests__/dds-cards.test.ts**: 单元测试（jest mock）
+- 统一响应格式 { data, success } + safeError() 错误处理
 
 ### [Unreleased] vibex-dds-canvas Epic3: AI Draft Flow — 2026-04-15
 - **vibex-fronted/src/components/dds/ai-draft/AIDraftDrawer.tsx**: F14 滑出抽屉 + 状态机（20 tests）

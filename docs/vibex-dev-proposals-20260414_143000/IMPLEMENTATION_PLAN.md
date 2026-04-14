@@ -589,3 +589,42 @@ npx husky install
 | `MermaidRenderer/index.tsx` | Wrapper with `dynamic()` export | Dynamic import wrappers |
 | `.size-limit.json` | Config for size-limit | Bundle size CI |
 | `no-todo-without-issue.js` | Custom ESLint rule | TODO enforcement |
+
+---
+
+## 实现记录
+
+**Dev 实现**: 2026-04-14
+**提交**: `054c3044`
+
+### 完成项
+
+| Unit | 内容 | 状态 |
+|------|------|------|
+| E1.3 | CI TypeScript 检查 job | ✅ 完成 |
+| E1.1/E1.2 | 前后端 tsconfig 改进 | ✅ 完成 |
+| E1.4 | 测试文件语法修复 | ✅ 完成 |
+
+### 实际改动
+
+```
+M .github/workflows/test.yml           — type-check job + merge-gate
+M vibex-fronted/tsconfig.json          — include/exclude 优化
+A vibex-fronted/src/vitest-env.d.ts    — vitest 全局类型声明
+M backend test files (3)               — 语法 bug 修复
+M frontend test files (9)              — 语法 bug 修复
+```
+
+### 验证结果
+
+- `pnpm build` ✅
+- `pnpm exec tsc --noEmit` ✅ (frontend, exit 0)
+
+### 待处理
+
+- E2: Bundle size 监控（需 @next/bundle-analyzer）
+- E3: Hooks/store 规范（需较大重构）
+- E4: console.log 清理（已有 Husky pre-commit hook 兜底）
+- CI Quality Gate: 前后端均有 pre-existing TS 错误，建议专项清理
+
+*Implementation Record | Dev Agent | 2026-04-14*

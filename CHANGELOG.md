@@ -5,6 +5,11 @@
 - 验证: grep inline style = 0, pnpm build ✅
 - 提交: `0cae1330`
 
+### [Unreleased] vibex-p0-q2-sprint1 Unit 2: apiError() 统一 API 错误处理 — 2026-04-14
+- **vibex-backend/src/lib/api-error.ts**: ERROR_CODES enum (16 错误码) + apiError() 工厂函数
+- **vibex-backend/src/lib/api-error.test.ts**: 4 个 Jest 测试用例 ✅
+- 提交: `f459a3c6`
+
 ### Added (vibex-dev-proposals-20260414_143000 E2: Mermaid Dynamic Import) — 2026-04-14
 - **MermaidRenderer**: 改为 Next.js dynamic() 动态导入，~350KB 不进入初始 bundle
 - **MermaidSkeleton.tsx**: 轻量 CSS skeleton 占位符（加载动画 + "加载图表组件…"）

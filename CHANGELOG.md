@@ -25,6 +25,10 @@
 - **vibex-backend/src/lib/api-error.ts**: 添加 STATUS_MAP + status 字段，统一 API 错误响应格式
 - 提交: `2a8ae5b3`
 
+### Added (vibex-architect-proposals-20260414_143000 E3: 架构演进路线)
+- **docs/vibex-architect-proposals-20260414_143000/architecture-evolution.md**: 架构演进规划文档
+- 提交: `0ddf460b`
+
 ### Added (vibex-dev-proposals-20260414_143000 E2: Mermaid Dynamic Import) — 2026-04-14
 - **MermaidRenderer**: 改为 Next.js dynamic() 动态导入，~350KB 不进入初始 bundle
 - **MermaidSkeleton.tsx**: 轻量 CSS skeleton 占位符（加载动画 + "加载图表组件…"）

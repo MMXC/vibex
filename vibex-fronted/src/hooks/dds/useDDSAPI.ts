@@ -22,16 +22,28 @@ async function apiFetch<T>(
   input: RequestInfo,
   init?: RequestInit
 ): Promise<DDSResponse<T>> {
-  const res = await fetch(input, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...init?.headers,
-    },
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+  try {
+    const res = await fetch(input, {
+      ...init,
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        ...init?.headers,
+      },
+    });
+    clearTimeout(timeout);
 
-  const data = await res.json();
-  return data as DDSResponse<T>;
+    const data = await res.json();
+    return data as DDSResponse<T>;
+  } catch (err) {
+    clearTimeout(timeout);
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new Error('请求超时，请检查网络或后端服务');
+    }
+    throw err;
+  }
 }
 
 // ==================== API Client ====================

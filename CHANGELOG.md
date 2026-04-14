@@ -36,6 +36,11 @@
 - 提交: `a805bc0f`, `054c3044`, `e1b1a8e6`
 - 注: Backend 173 TS 错误为历史债务，另专项处理
 
+### Added (vibex-dev-proposals-20260414_143000 E3: 开发规范落地) — 2026-04-14
+- **docs/naming-conventions.md**: Hook/Store 命名规范文档
+- **.github/workflows/test.yml**: 添加 TODO grep CI 步骤（warning-only）
+- 提交: `0c2249ed`
+
 ### Added (vibex-dev-proposals-20260414_143000 E2: Mermaid Dynamic Import) — 2026-04-14
 - **MermaidRenderer**: 改为 Next.js dynamic() 动态导入，~350KB 不进入初始 bundle
 - **MermaidSkeleton.tsx**: 轻量 CSS skeleton 占位符（加载动画 + "加载图表组件…"）

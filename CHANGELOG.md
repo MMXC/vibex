@@ -1,5 +1,5 @@
+- **feat(E2)**: IU-6 MermaidRenderer × 3 dynamic wrappers ✅, pagelist CSS Module 迁移 ✅ (c13ef489, 266523c2)
 - **feat(E3)**: IU-9 naming-conventions.md ✅, IU-10 TODO grep CI ✅ (faa1ffb3)
-
 - **task_manager.py**: add review subcommand for reviewer task management (93a3c60e)
 - **apiError()**: E5 统一 API 错误处理 (f459a3c6)
 

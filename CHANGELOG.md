@@ -1,6 +1,8 @@
 ### [Unreleased] vibex-dds-canvas Epic6: E2E 测试套件 — 2026-04-15
-- **vibex-fronted/tests/e2e/dds-canvas-e2e.spec.ts**: F25/F26/F27 Playwright E2E 测试（4个测试用例，433行）
-- F25: 创建卡片→拖拽→编辑→删除；F26: AI Draft 完整流程；F27: 面板导航+全屏切换
+- **vibex-fronted/tests/e2e/dds-canvas-e2e.spec.ts**: F25/F26/F27 Playwright E2E 测试（522行）
+- setupDDSMocks() — Playwright page.route() 拦截所有 DDS API，无后端也可运行
+- waitForCanvasSettled() 修复 — error state 出现时抛出错误而非静默通过
+- 覆盖: F25（CRUD）| F26（AI Draft）| F27（面板导航+全屏）| edge（空画布降级）
 - 运行: `pnpm test:e2e -- tests/e2e/dds-canvas-e2e.spec.ts`
 
 ### [Unreleased] vibex-dds-canvas Epic5: 路由与页面集成 — 2026-04-15

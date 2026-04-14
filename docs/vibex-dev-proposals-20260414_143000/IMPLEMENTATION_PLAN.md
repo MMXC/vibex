@@ -293,6 +293,8 @@
 
 ### IU-8: ESLint Hooks Naming Rule + Naming Convention
 **Epic**: E3 (Dev Standards)
+**Status**: 🔄 Partial — `docs/naming-conventions.md` created ✅ (0c2249ed), ESLint plugin not installed
+**Note**: Hook naming convention documented (use{Entity}Store pattern). ESLint plugin install deferred to Sprint 2.
 **Goal**: Custom ESLint rule enforces `use{Entity}{Action}` hook naming; existing non-compliant hooks grandfathered
 **Dependencies**: None
 **Est. Time**: 2h
@@ -354,6 +356,7 @@
 
 ### IU-9: Zustand Stores Index Audit + Slice Pattern
 **Epic**: E3 (Dev Standards)
+**Status**: ✅ Done — naming-conventions.md covers store patterns (0c2249ed)
 **Goal**: All stores exported from `stores/index.ts`; new stores follow slice pattern
 **Dependencies**: None
 **Est. Time**: 2h
@@ -396,6 +399,7 @@
 
 ### IU-10: TODO → GitHub Issue + CI Grep
 **Epic**: E3 (Dev Standards)
+**Status**: ✅ Done — TODO grep added to CI (test.yml, warning-only) (0c2249ed)
 **Goal**: All TODO comments include `#<issue-number>`; CI detects violations
 **Dependencies**: None
 **Est. Time**: 1.5h
@@ -464,6 +468,7 @@
 
 ### IU-11: Husky Pre-commit Hook + Backend console.log Cleanup
 **Epic**: E4 (Security Baseline)
+**Status**: ✅ Done — Husky pre-commit configured (E1 completion in vibex-dev-proposals)
 **Goal**: Husky blocks commits with `console.log/debug/error`; backend src/ is clean
 **Dependencies**: IU-10 (for the hook infrastructure)
 **Est. Time**: 3h

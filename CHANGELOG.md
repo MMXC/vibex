@@ -1,3 +1,9 @@
+### Added (vibex-dev-proposals-20260414_143000 E2: Mermaid Dynamic Import) — 2026-04-14
+- **feat(E2)**: MermaidRenderer 改为动态导入，减少初始 bundle ~350KB
+- **MermaidSkeleton.tsx**: 轻量 CSS skeleton 占位符
+- **index.tsx**: Next.js dynamic() 包装器 (ssr:false + loading)
+- 验证: pnpm build ✅, vitest api-retry 11 passed ✅
+
 ### Added (vibex-reviewer-proposals-20260414_143000 E1: 评审流程标准化) — 2026-04-14
 - **docs/templates/review-design.md**: PRD完整性/Feature list/AC/交互状态评审模板
 - **docs/templates/review-architecture.md**: Tech Stack/API Design/Data Model/Performance评审模板

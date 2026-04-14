@@ -139,6 +139,7 @@
 **Goal**: Identify all dependencies > 200KB, establish bundle baseline
 **Dependencies**: None
 **Est. Time**: 2h
+**Status**: ✅ Done (f425d4e9)
 
 **Files to create**:
 - `vibex-fronted/reports/bundle-audit-YYYY-MM-DD.json`
@@ -179,11 +180,22 @@
 **Goal**: 3 MermaidRenderer components wrapped with Next.js `dynamic()`
 **Dependencies**: IU-5
 **Est. Time**: 4h
+**Status**: 🔄 Partially Done (mermaid/index.tsx + MermaidSkeleton ✅, visualization/preview wrappers pending)
+
+**Completed (f425d4e9)**:
+- ✅ `vibex-fronted/src/components/mermaid/index.tsx` (wrapper)
+- ✅ `vibex-fronted/src/components/mermaid/MermaidSkeleton.tsx`
+- ✅ MermaidRenderer.tsx: async dynamic import
+
+**Remaining**:
+- ⬜ `visualization/MermaidRenderer/index.tsx` (wrapper)
+- ⬜ `preview/MermaidRenderer/index.tsx` (wrapper)
+- ⬜ Update consumers (VisualizationPlatform, PagePreview)
 
 **Files to create**:
-- `vibex-fronted/src/components/mermaid/index.tsx` (wrapper)
-- `vibex-fronted/src/components/visualization/MermaidRenderer/index.tsx` (wrapper)
-- `vibex-fronted/src/components/preview/MermaidRenderer/index.tsx` (wrapper)
+- `vibex-fronted/src/components/mermaid/index.tsx` (wrapper) ✅
+- `vibex-fronted/src/components/visualization/MermaidRenderer/index.tsx` (wrapper) ⬜
+- `vibex-fronted/src/components/preview/MermaidRenderer/index.tsx` (wrapper) ⬜
 
 **Files to modify** (update imports across codebase):
 - All files importing `MermaidRenderer` from the 3 paths above

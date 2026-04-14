@@ -1,3 +1,15 @@
+### [Unreleased] vibex-dds-canvas Epic5: 路由与页面集成 — 2026-04-15
+- **vibex-fronted/src/components/dds/DDSFlow.tsx**: React Flow wrapper（F23）
+- **vibex-fronted/src/components/dds/DDSCanvasPage.tsx**: 主页面组件，整合 E1-E4 全部组件（12 tests）
+- **vibex-fronted/src/app/design/dds-canvas/page.tsx**: 替换占位页为完整画布
+- AbortController 请求生命周期管理，102 tests passing
+
+### [Unreleased] vibex-dds-canvas Epic4: Backend CRUD API — 2026-04-15
+- **vibex-backend/src/routes/v1/dds/cards.ts**: F20 卡片 CRUD API（22 tests）
+- **vibex-backend/src/routes/v1/dds/relations.ts**: F21 Relations + Position API
+- **vibex-backend/src/routes/v1/gateway.ts**: 注册 /api/v1/dds 路由
+- 统一响应格式 { data, success } + apiError() 错误处理
+
 ### [Unreleased] vibex-dds-canvas Epic3: AI Draft Flow — 2026-04-15
 - **vibex-fronted/src/components/dds/ai-draft/AIDraftDrawer.tsx**: F14 滑出抽屉 + 状态机（20 tests）
 - **vibex-fronted/src/components/dds/ai-draft/CardPreview.tsx**: F15 AI 卡片预览 + accept/edit/retry 按钮（15 tests）

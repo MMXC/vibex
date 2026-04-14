@@ -21,6 +21,20 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
 
   {
+    version: '1.0.227',
+    date: '2026-04-15',
+    changes: [
+      '📋 vibex-dds-canvas Epic5: 路由与页面集成',
+      '✅ DDSCanvasPage.tsx: 主页面组件，整合全部组件（12 tests）',
+      '✅ DDSFlow.tsx: React Flow wrapper',
+      '✅ /design/dds-canvas/page.tsx: 替换占位页为完整画布',
+      '✅ AbortController 请求生命周期管理',
+      '✅ ESLint 0 errors',
+    ],
+    commit: '待提交',
+  },
+
+  {
     version: '1.0.226',
     date: '2026-04-15',
     changes: [
@@ -32,7 +46,7 @@ const mockChangelog: ChangelogEntry[] = [
       '✅ 全部 memo 化，CSS Modules',
       '✅ ESLint 0 errors，35 tests passing',
     ],
-    commit: '待提交',
+    commit: '538ad1a6',
   },
 
   {
@@ -47,7 +61,7 @@ const mockChangelog: ChangelogEntry[] = [
       '✅ 全部 memo 化，CSS Modules + Dark mode tokens',
       '✅ ESLint 0 errors，33 tests passing',
     ],
-    commit: '待提交',
+    commit: 'c4049d7d',
   },
 
   {

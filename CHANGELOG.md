@@ -9,6 +9,12 @@
 - **auth/auth.module.css**: 样式覆盖 CSS 变量（var(--color-bg-primary)、var(--gradient-primary) 等）
 - 验证: grep inline style = 0, pnpm build ✅
 - 提交: `0cae1330`
+- **pagelist/page.tsx**: 页面管理迁移至 CSS Module，内联样式替换为 CSS 变量
+- **pagelist/pagelist.module.css**: 新建模块，定义 nav/table/filter/stats 等所有样式类
+- 背景系统复用 auth.module.css（网格 + 发光球效果）
+- 状态徽章改为 neon 风格（published=绿/cyan, draft=warning=橙紫）
+- 验证: pnpm tsc --noEmit 无新错误（仅 pre-existing MermaidRenderer）
+- 提交: `c13ef489`
 
 ### [Unreleased] vibex-p0-q2-sprint1 Unit 2: apiError() 统一 API 错误处理 — 2026-04-14
 - **vibex-backend/src/lib/api-error.ts**: ERROR_CODES enum (16 错误码) + apiError() 工厂函数

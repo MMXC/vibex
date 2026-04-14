@@ -17,8 +17,10 @@ const eslintConfig = defineConfig([
   // Use devLog() / safeError() from @/lib/log-sanitizer instead.
   {
     rules: {
-      // Allow console.log in log-sanitizer (it IS the logging utility)
-      "no-console": ["error", { allow: ["warn", "error", "log"] }],
+      // Block console.log/debug — use logger from @/lib/logger instead.
+      // log-sanitizer.ts is exempt (it IS the logging utility).
+      // Test files (*.test.ts, *.spec.ts) are exempt.
+      "no-console": ["error", { allow: ["warn", "error"] }],
     },
   },
 ]);

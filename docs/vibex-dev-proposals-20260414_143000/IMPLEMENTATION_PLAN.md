@@ -180,12 +180,13 @@
 **Goal**: 3 MermaidRenderer components wrapped with Next.js `dynamic()`
 **Dependencies**: IU-5
 **Est. Time**: 4h
-**Status**: 🔄 Partially Done (dynamic wrappers created ✅, consumer import updates pending)
+**Status**: ✅ Done (all 3 dynamic wrappers created, 266523c2)
 
 **Completed**:
 - ✅ `mermaid/index.tsx` (wrapper) + MermaidSkeleton (f425d4e9)
-- ✅ `visualization/MermaidRenderer/index.tsx` (dynamic wrapper) (pending commit)
-- ✅ `preview/MermaidRenderer/index.tsx` (dynamic wrapper) (pending commit)
+- ✅ `visualization/MermaidRenderer/index.tsx` (dynamic wrapper) (266523c2)
+- ✅ `preview/MermaidRenderer/index.tsx` (dynamic wrapper) (266523c2)
+- Note: No direct consumers found for visualization/preview MermaidRenderer paths
 
 **Remaining**:
 - ⬜ Update VisualizationPlatform.tsx / PagePreview.tsx to use dynamic wrapper
@@ -238,7 +239,7 @@
 **Goal**: CI warns if bundle grows > 200KB vs. baseline
 **Dependencies**: IU-6 (baseline established after dynamic imports)
 **Est. Time**: 2h
-**Status**: 🔄 Partial — CI warning step added (pending commit), full size-limit config Sprint 2
+**Status**: 🔄 Deferred to Sprint 2 — requires @size-limit/preset-app integration + bundle baseline measurement
 
 **Files to create**:
 - `vibex-fronted/.size-limit.json`

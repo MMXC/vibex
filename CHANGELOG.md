@@ -9,6 +9,12 @@
 - **task_manager.py**: add review subcommand for reviewer task management (93a3c60e)
 - **apiError()**: E5 统一 API 错误处理 (f459a3c6)
 
+### [Unreleased] vibex-p0-q2-sprint1 E4: 错误体验统一 — 2026-04-14
+- **vibex-backend/src/routes/**: 53 个路由文件迁移至 apiError() 格式（Unit 3 🔄 partial）
+- **vibex-fronted/src/lib/api-error-handler.ts**: 前端统一 API 错误处理，apiError payload 解析，toast 提示（Unit 10 ✅）
+- **vibex-fronted/src/lib/query-client.ts**: mutationErrorHandler 全局注册
+- 提交: c0a7e33c
+
 ### [Unreleased] vibex-p0-q2-sprint1 E1: 品牌一致性 — 2026-04-14
 - **auth/page.tsx**: auth 页面 CSS Module 迁移完成，所有内联样式迁移至 auth.module.css
 - **auth/page.tsx**: validateReturnTo 安全验证函数保留（E1-S2.1）

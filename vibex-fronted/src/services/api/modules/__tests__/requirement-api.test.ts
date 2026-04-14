@@ -15,7 +15,7 @@ vi.mock('../../client', () => ({
 }));
 
 import { httpClient } from '../../client';
-const mockHttpClient = httpClient as any<typeof httpClient>;
+const mockHttpClient = httpClient as any;
 
 describe('RequirementApi', () => {
   beforeEach(() => {

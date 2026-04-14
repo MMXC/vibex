@@ -43,8 +43,7 @@ describe('POST /api/v1/domain-model', () => {
   });
 
   it('should return 400 if entities is not an array', async () => {
-    const request = new NextRequest('http://localhost:3000/api/v1/domain-model', { headers: authHeader() }),
-    });
+    const request = new NextRequest('http://localhost:3000/api/v1/domain-model', { headers: authHeader() });
     const response = await POST(request);
     const data = await response.json();
 

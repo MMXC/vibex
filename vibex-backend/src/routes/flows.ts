@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const flows = new Hono<{ Bindings: Env }>();
 
@@ -42,7 +43,7 @@ flows.get('/', async (c) => {
     return c.json({ flows: flowsList });
   } catch (error) {
     safeError('Error fetching flows:', error);
-    return c.json({ error: 'Failed to fetch flows' }, 500);
+    return         c.json(apiError('Failed to fetch flows', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -53,7 +54,7 @@ flows.post('/', async (c) => {
     const { name, nodes, edges, projectId } = body;
 
     if (!projectId) {
-      return c.json({ error: 'Missing required field: projectId' }, 400);
+      return         c.json(apiError('Missing required field: projectId', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -75,7 +76,7 @@ flows.post('/', async (c) => {
     return c.json({ flow }, 201);
   } catch (error) {
     safeError('Error creating flow:', error);
-    return c.json({ error: 'Failed to create flow' }, 500);
+    return         c.json(apiError('Failed to create flow', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

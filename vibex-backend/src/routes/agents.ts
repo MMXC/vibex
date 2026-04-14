@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const agents = new Hono<{ Bindings: Env }>();
 
@@ -43,7 +44,7 @@ agents.get('/', async (c) => {
     return c.json({ agents: agentsList });
   } catch (error) {
     safeError('Error fetching agents:', error);
-    return c.json({ error: 'Failed to fetch agents' }, 500);
+    return         c.json(apiError('Failed to fetch agents', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -54,7 +55,7 @@ agents.post('/', async (c) => {
     const { name, prompt, model, temperature, userId } = body;
 
     if (!name || !prompt || !userId) {
-      return c.json({ error: 'Missing required fields: name, prompt, userId' }, 400);
+      return         c.json(apiError('Missing required fields: name, prompt, userId', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -76,7 +77,7 @@ agents.post('/', async (c) => {
     return c.json({ agent }, 201);
   } catch (error) {
     safeError('Error creating agent:', error);
-    return c.json({ error: 'Failed to create agent' }, 500);
+    return         c.json(apiError('Failed to create agent', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

@@ -19,6 +19,7 @@ import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 import { getAuthUserFromHono } from '@/lib/auth';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const collaboration = new Hono<{ Bindings: Env }>();
 
@@ -94,7 +95,7 @@ collaboration.get('/', async (c) => {
     return c.json({ success: true, data: results });
   } catch (error) {
     safeError('Error listing collaborations:', error);
-    return c.json({ success: false, error: { message: 'Failed to list collaborations' } }, 500);
+    return c.json(apiError('Failed to list collaborations', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -112,7 +113,7 @@ collaboration.get('/:id', async (c) => {
     );
 
     if (!collaboration) {
-      return c.json({ success: false, error: { message: 'Collaboration not found' } }, 404);
+      return c.json(apiError('Collaboration not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Get participants
@@ -135,7 +136,7 @@ collaboration.get('/:id', async (c) => {
     });
   } catch (error) {
     safeError('Error getting collaboration:', error);
-    return c.json({ success: false, error: { message: 'Failed to get collaboration' } }, 500);
+    return c.json(apiError('Failed to get collaboration', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -147,7 +148,7 @@ collaboration.post('/invite', async (c) => {
   try {
     const user = getAuthUserFromHono(c, c.env);
     if (!user) {
-      return c.json({ success: false, error: { message: 'Unauthorized' } }, 401);
+      return c.json(apiError('Unauthorized', ERROR_CODES.UNAUTHORIZED), 401);
     }
 
     const { projectId, email, role = 'editor' } = await c.req.json();
@@ -160,7 +161,7 @@ collaboration.post('/invite', async (c) => {
     );
 
     if (!existing || !['owner', 'admin'].includes(existing.role)) {
-      return c.json({ success: false, error: { message: 'Insufficient permissions' } }, 403);
+      return c.json(apiError('Insufficient permissions', ERROR_CODES.FORBIDDEN), 403);
     }
 
     // Check if already invited
@@ -171,7 +172,7 @@ collaboration.post('/invite', async (c) => {
     );
 
     if (existingInvite) {
-      return c.json({ success: false, error: { message: 'User already invited' } }, 409);
+      return c.json(apiError('User already invited', ERROR_CODES.CONFLICT), 409);
     }
 
     // Create invitation
@@ -191,7 +192,7 @@ collaboration.post('/invite', async (c) => {
     });
   } catch (error) {
     safeError('Error inviting collaborator:', error);
-    return c.json({ success: false, error: { message: 'Failed to invite collaborator' } }, 500);
+    return c.json(apiError('Failed to invite collaborator', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -203,7 +204,7 @@ collaboration.post('/:id/join', async (c) => {
   try {
     const user = getAuthUserFromHono(c, c.env);
     if (!user) {
-      return c.json({ success: false, error: { message: 'Unauthorized' } }, 401);
+      return c.json(apiError('Unauthorized', ERROR_CODES.UNAUTHORIZED), 401);
     }
 
     const id = c.req.param('id');
@@ -214,11 +215,11 @@ collaboration.post('/:id/join', async (c) => {
     );
 
     if (!collaboration) {
-      return c.json({ success: false, error: { message: 'Collaboration not found' } }, 404);
+      return c.json(apiError('Collaboration not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     if (collaboration.status !== 'pending') {
-      return c.json({ success: false, error: { message: 'Invitation no longer valid' } }, 400);
+      return c.json(apiError('Invitation no longer valid', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     // Update to active
@@ -235,7 +236,7 @@ collaboration.post('/:id/join', async (c) => {
     });
   } catch (error) {
     safeError('Error joining collaboration:', error);
-    return c.json({ success: false, error: { message: 'Failed to join collaboration' } }, 500);
+    return c.json(apiError('Failed to join collaboration', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -261,7 +262,7 @@ collaboration.get('/:id/messages', async (c) => {
     });
   } catch (error) {
     safeError('Error getting messages:', error);
-    return c.json({ success: false, error: { message: 'Failed to get messages' } }, 500);
+    return c.json(apiError('Failed to get messages', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -273,7 +274,7 @@ collaboration.post('/:id/messages', async (c) => {
   try {
     const user = getAuthUserFromHono(c, c.env);
     if (!user) {
-      return c.json({ success: false, error: { message: 'Unauthorized' } }, 401);
+      return c.json(apiError('Unauthorized', ERROR_CODES.UNAUTHORIZED), 401);
     }
 
     const id = c.req.param('id');
@@ -287,7 +288,7 @@ collaboration.post('/:id/messages', async (c) => {
     );
 
     if (!collab) {
-      return c.json({ success: false, error: { message: 'Not a collaborator' } }, 403);
+      return c.json(apiError('Not a collaborator', ERROR_CODES.FORBIDDEN), 403);
     }
 
     // Save message (create table if not exists)
@@ -336,7 +337,7 @@ collaboration.post('/:id/messages', async (c) => {
     });
   } catch (error) {
     safeError('Error sending message:', error);
-    return c.json({ success: false, error: { message: 'Failed to send message' } }, 500);
+    return c.json(apiError('Failed to send message', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -348,7 +349,7 @@ collaboration.delete('/:id', async (c) => {
   try {
     const user = getAuthUserFromHono(c, c.env);
     if (!user) {
-      return c.json({ success: false, error: { message: 'Unauthorized' } }, 401);
+      return c.json(apiError('Unauthorized', ERROR_CODES.UNAUTHORIZED), 401);
     }
 
     const id = c.req.param('id');
@@ -361,7 +362,7 @@ collaboration.delete('/:id', async (c) => {
     );
 
     if (!existing) {
-      return c.json({ success: false, error: { message: 'Collaboration not found' } }, 404);
+      return c.json(apiError('Collaboration not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Only owner can remove
@@ -372,7 +373,7 @@ collaboration.delete('/:id', async (c) => {
     );
 
     if (!owner) {
-      return c.json({ success: false, error: { message: 'Insufficient permissions' } }, 403);
+      return c.json(apiError('Insufficient permissions', ERROR_CODES.FORBIDDEN), 403);
     }
 
     await executeDB(
@@ -384,7 +385,7 @@ collaboration.delete('/:id', async (c) => {
     return c.json({ success: true });
   } catch (error) {
     safeError('Error removing collaborator:', error);
-    return c.json({ success: false, error: { message: 'Failed to remove collaborator' } }, 500);
+    return c.json(apiError('Failed to remove collaborator', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

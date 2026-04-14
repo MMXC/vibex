@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const prototypeCollaborationId = new Hono<{ Bindings: Env }>();
 
@@ -53,13 +54,13 @@ prototypeCollaborationId.get('/', async (c) => {
     }
 
     if (!collaboration) {
-      return c.json({ error: 'Prototype collaboration not found' }, 404);
+      return         c.json(apiError('Prototype collaboration not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     return c.json({ prototypeCollaboration: collaboration });
   } catch (error) {
     safeError('Error fetching prototype collaboration:', error);
-    return c.json({ error: 'Failed to fetch prototype collaboration' }, 500);
+    return         c.json(apiError('Failed to fetch prototype collaboration', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -90,7 +91,7 @@ prototypeCollaborationId.put('/', async (c) => {
     }
 
     if (!existing) {
-      return c.json({ error: 'Prototype collaboration not found' }, 404);
+      return         c.json(apiError('Prototype collaboration not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     const updates: string[] = [];
@@ -134,7 +135,7 @@ prototypeCollaborationId.put('/', async (c) => {
     return c.json({ prototypeCollaboration: updated });
   } catch (error) {
     safeError('Error updating prototype collaboration:', error);
-    return c.json({ error: 'Failed to update prototype collaboration' }, 500);
+    return         c.json(apiError('Failed to update prototype collaboration', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -164,7 +165,7 @@ prototypeCollaborationId.patch('/', async (c) => {
     }
 
     if (!existing) {
-      return c.json({ error: 'Prototype collaboration not found' }, 404);
+      return         c.json(apiError('Prototype collaboration not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     const updates: string[] = [];
@@ -202,7 +203,7 @@ prototypeCollaborationId.patch('/', async (c) => {
     return c.json({ prototypeCollaboration: updated });
   } catch (error) {
     safeError('Error patching prototype collaboration:', error);
-    return c.json({ error: 'Failed to patch prototype collaboration' }, 500);
+    return         c.json(apiError('Failed to patch prototype collaboration', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -231,12 +232,12 @@ prototypeCollaborationId.delete('/', async (c) => {
     }
 
     if (!existing) {
-      return c.json({ error: 'Prototype collaboration not found' }, 404);
+      return         c.json(apiError('Prototype collaboration not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Don't allow removing the owner
     if (existing.role === 'owner') {
-      return c.json({ error: 'Cannot remove the owner from collaboration' }, 400);
+      return         c.json(apiError('Cannot remove the owner from collaboration', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     await executeDB(env, 'DELETE FROM PrototypeCollaboration WHERE id = ?', [existing.id]);
@@ -244,7 +245,7 @@ prototypeCollaborationId.delete('/', async (c) => {
     return c.json({ success: true, message: 'Collaboration removed successfully' });
   } catch (error) {
     safeError('Error deleting prototype collaboration:', error);
-    return c.json({ error: 'Failed to delete prototype collaboration' }, 500);
+    return         c.json(apiError('Failed to delete prototype collaboration', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -273,12 +274,12 @@ prototypeCollaborationId.post('/revoke', async (c) => {
     }
 
     if (!existing) {
-      return c.json({ error: 'Prototype collaboration not found' }, 404);
+      return         c.json(apiError('Prototype collaboration not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Don't allow revoking the owner
     if (existing.role === 'owner') {
-      return c.json({ error: 'Cannot revoke the owner from collaboration' }, 400);
+      return         c.json(apiError('Cannot revoke the owner from collaboration', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const now = new Date().toISOString();
@@ -297,7 +298,7 @@ prototypeCollaborationId.post('/revoke', async (c) => {
     return c.json({ prototypeCollaboration: updated });
   } catch (error) {
     safeError('Error revoking prototype collaboration:', error);
-    return c.json({ error: 'Failed to revoke prototype collaboration' }, 500);
+    return         c.json(apiError('Failed to revoke prototype collaboration', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -326,11 +327,11 @@ prototypeCollaborationId.post('/restore', async (c) => {
     }
 
     if (!existing) {
-      return c.json({ error: 'Prototype collaboration not found' }, 404);
+      return         c.json(apiError('Prototype collaboration not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     if (existing.status !== 'revoked') {
-      return c.json({ error: 'Collaboration is not revoked' }, 400);
+      return         c.json(apiError('Collaboration is not revoked', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const now = new Date().toISOString();
@@ -349,7 +350,7 @@ prototypeCollaborationId.post('/restore', async (c) => {
     return c.json({ prototypeCollaboration: updated });
   } catch (error) {
     safeError('Error restoring prototype collaboration:', error);
-    return c.json({ error: 'Failed to restore prototype collaboration' }, 500);
+    return         c.json(apiError('Failed to restore prototype collaboration', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

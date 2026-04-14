@@ -10,6 +10,7 @@ import { CloudflareEnv } from '../lib/env';
 import { getSessionManager } from '../services/context';
 import { StructuredContext, CompressionConfig } from '../services/context/types';
 import { chatMessageSchema, INJECTION_KEYWORDS } from '../schemas/security';  // S2.2: Prompt Injection detection
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const chat = new Hono<{ Bindings: CloudflareEnv }>();
 
@@ -117,7 +118,7 @@ chat.post('/', async (c) => {
     const model = env.MINIMAX_MODEL || 'abab6.5s-chat';
 
     if (!apiKey) {
-      return c.json({ error: 'MINIMAX_API_KEY is not configured' }, 500);
+      return         c.json(apiError('MINIMAX_API_KEY is not configured', ERROR_CODES.AI_SERVICE_ERROR), 500);
     }
 
     // S2.2: Parse and validate request body with Prompt Injection detection
@@ -125,12 +126,12 @@ chat.post('/', async (c) => {
     try {
       body = await c.req.json();
     } catch {
-      return c.json({ error: 'Invalid JSON in request body' }, 400);
+      return         c.json(apiError('Invalid JSON in request body', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const parsed = chatMessageSchema.safeParse(body);
     if (!parsed.success) {
-      return c.json({ error: 'Invalid request body', details: parsed.error.flatten() }, 400);
+      return         c.json(apiError('Invalid request body', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const { message, conversationId, history } = parsed.data;
@@ -192,7 +193,7 @@ chat.post('/with-context', async (c) => {
     const model = env.MINIMAX_MODEL || 'abab6.5s-chat'
 
     if (!apiKey) {
-      return c.json({ error: 'MINIMAX_API_KEY is not configured' }, 500)
+      return         c.json(apiError('MINIMAX_API_KEY is not configured', ERROR_CODES.AI_SERVICE_ERROR), 500)
     }
 
     // S2.2: Validate body with Prompt Injection detection
@@ -200,7 +201,7 @@ chat.post('/with-context', async (c) => {
     try {
       body = await c.req.json();
     } catch {
-      return c.json({ error: 'Invalid JSON in request body' }, 400);
+      return         c.json(apiError('Invalid JSON in request body', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     // S2.2: Parse JSON
@@ -208,13 +209,13 @@ chat.post('/with-context', async (c) => {
     try {
       reqBody = await c.req.json();
     } catch {
-      return c.json({ error: 'Invalid JSON in request body' }, 400);
+      return         c.json(apiError('Invalid JSON in request body', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     // S2.2: Validate message with Prompt Injection detection
     const msgParsed = chatMessageSchema.safeParse({ message: reqBody.message });
     if (!msgParsed.success) {
-      return c.json({ error: 'Invalid request body', details: msgParsed.error.flatten() }, 400);
+      return         c.json(apiError('Invalid request body', ERROR_CODES.BAD_REQUEST), 400);
     }
     const message = msgParsed.data.message;
 

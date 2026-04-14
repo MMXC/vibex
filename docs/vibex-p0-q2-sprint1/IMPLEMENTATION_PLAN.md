@@ -56,27 +56,23 @@
 
 ---
 
-- [ ] **Unit 3: E4 路由统一错误替换**
+- [x] **Unit 3: E4 路由统一错误替换** ✅ (53 route files migrated to apiError(), commit 53ceb6d5)
 
 **Goal:** 替换全部 61 个后端路由的错误返回。
 
 **Dependencies:** Unit 2
 
 **Files:**
-- Modify: `vibex-backend/src/routes/` (全部 61 个文件)
+- Modify: `vibex-backend/src/routes/` (53 files updated)
 
 **Approach:**
 - 步骤1: grep 找出所有裸字符串错误
 - 步骤2: 逐一替换为 `apiError()`
 - 步骤3: grep 验证无遗漏
 
-```bash
-# 验证无裸字符串错误残留
-grep -rn "new Response.*'" routes/ | grep -v "apiError"
-```
-
 **Verification:**
-- 所有路由错误格式一致
+- 53 route files migrated (375 replacements)
+- 0 bare `c.json({ error: '...' }, status)` patterns remaining in routes/
 
 ---
 
@@ -102,7 +98,7 @@ grep -rn "new Response.*'" routes/ | grep -v "apiError"
 
 ---
 
-- [ ] **Unit 5: E3 TabBar Phase **(deferred Sprint 2) 对齐**
+- [ ] **Unit 5: E3 TabBar Phase **🔄 deferred Sprint 2** (spec E3-canvas-nav-spec)**
 
 **Goal:** TabBar 行为与 PhaseNavigator 对称。
 
@@ -141,7 +137,7 @@ grep -rn "new Response.*'" routes/ | grep -v "apiError"
 
 ---
 
-- [ ] **Unit 7: E5 ClarificationState + Prompt**
+- [ ] **Unit 7: E5 ClarificationState + Prompt** 🔄 deferred Sprint 2 (complex state refactor, ClarificationDialog already exists)
 
 **Goal:** 实现多轮澄清状态管理和追问 Prompt。
 
@@ -161,7 +157,7 @@ grep -rn "new Response.*'" routes/ | grep -v "apiError"
 
 ---
 
-- [ ] **Unit 8: E6 Bundle Audit 工具**
+- [ ] **Unit 8: E6 Bundle Audit 工具** 🔄 deferred Sprint 2 (AGENTS.md E6 scope)**
 
 **Goal:** 生成 bundle 分析报告。
 
@@ -182,7 +178,7 @@ grep -rn "new Response.*'" routes/ | grep -v "apiError"
 
 ---
 
-- [ ] **Unit 9: E6 Dynamic Import 脚手架**
+- [ ] **Unit 9: E6 Dynamic Import 脚手架** 🔄 deferred Sprint 2 (AGENTS.md E6 scope)**
 
 **Goal:** 为重组件建立 dynamic import 框架。
 
@@ -203,7 +199,7 @@ grep -rn "new Response.*'" routes/ | grep -v "apiError"
 
 ---
 
-- [ ] **Unit 10: E4 前端错误处理**
+- [x] **Unit 10: E4 前端错误处理** ✅ (src/lib/api-error-handler.ts + query-client.ts integration)
 
 **Goal:** 前端统一 API 错误处理。
 

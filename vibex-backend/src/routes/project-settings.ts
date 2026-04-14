@@ -10,6 +10,7 @@ import { queryOne, executeDB, Env, generateId } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
 import { prisma } from '@/lib/prisma';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const projectSettings = new Hono<{ Bindings: Env }>();
 
@@ -119,7 +120,7 @@ projectSettings.get('/', async (c) => {
     );
 
     if (!project) {
-      return c.json({ error: 'Project not found' }, 404);
+      return         c.json(apiError('Project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404);
     }
 
     // Get all settings for this project
@@ -144,7 +145,7 @@ projectSettings.get('/', async (c) => {
     return c.json({ settings: mergedSettings });
   } catch (error) {
     safeError('Error fetching project settings:', error);
-    return c.json({ error: 'Failed to fetch project settings' }, 500);
+    return         c.json(apiError('Failed to fetch project settings', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -163,7 +164,7 @@ projectSettings.put('/', async (c) => {
     );
 
     if (!project) {
-      return c.json({ error: 'Project not found' }, 404);
+      return         c.json(apiError('Project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404);
     }
 
     const updates = [];
@@ -222,7 +223,7 @@ projectSettings.put('/', async (c) => {
     return c.json({ settings: mergedSettings, updated: updates });
   } catch (error) {
     safeError('Error updating project settings:', error);
-    return c.json({ error: 'Failed to update project settings' }, 500);
+    return         c.json(apiError('Failed to update project settings', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -241,7 +242,7 @@ projectSettings.get('/preferences', async (c) => {
     );
 
     if (!project) {
-      return c.json({ error: 'Project not found' }, 404);
+      return         c.json(apiError('Project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404);
     }
 
     // Get user-specific preferences
@@ -266,7 +267,7 @@ projectSettings.get('/preferences', async (c) => {
     return c.json({ preferences: mergedPrefs });
   } catch (error) {
     safeError('Error fetching user preferences:', error);
-    return c.json({ error: 'Failed to fetch user preferences' }, 500);
+    return         c.json(apiError('Failed to fetch user preferences', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -279,7 +280,7 @@ projectSettings.put('/preferences', async (c) => {
     const env = c.env;
 
     if (!userId) {
-      return c.json({ error: 'User ID required' }, 400);
+      return         c.json(apiError('User ID required', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     // Verify project exists
@@ -290,7 +291,7 @@ projectSettings.put('/preferences', async (c) => {
     );
 
     if (!project) {
-      return c.json({ error: 'Project not found' }, 404);
+      return         c.json(apiError('Project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404);
     }
 
     const updates = [];
@@ -349,7 +350,7 @@ projectSettings.put('/preferences', async (c) => {
     return c.json({ preferences: mergedPrefs, updated: updates });
   } catch (error) {
     safeError('Error updating user preferences:', error);
-    return c.json({ error: 'Failed to update user preferences' }, 500);
+    return         c.json(apiError('Failed to update user preferences', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -369,7 +370,7 @@ projectSettings.delete('/:key', async (c) => {
     );
 
     if (!project) {
-      return c.json({ error: 'Project not found' }, 404);
+      return         c.json(apiError('Project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404);
     }
 
     if (userId) {
@@ -389,7 +390,7 @@ projectSettings.delete('/:key', async (c) => {
     return c.json({ success: true, deleted: key });
   } catch (error) {
     safeError('Error deleting setting:', error);
-    return c.json({ error: 'Failed to delete setting' }, 500);
+    return         c.json(apiError('Failed to delete setting', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -410,7 +411,7 @@ projectSettings.post('/reset', async (c) => {
     );
 
     if (!project) {
-      return c.json({ error: 'Project not found' }, 404);
+      return         c.json(apiError('Project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404);
     }
 
     if (type === 'all' || type === 'settings') {
@@ -443,7 +444,7 @@ projectSettings.post('/reset', async (c) => {
     });
   } catch (error) {
     safeError('Error resetting settings:', error);
-    return c.json({ error: 'Failed to reset settings' }, 500);
+    return         c.json(apiError('Failed to reset settings', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

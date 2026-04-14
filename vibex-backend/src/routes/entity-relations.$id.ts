@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const entityRelationId = new Hono<{ Bindings: Env }>();
 
@@ -34,13 +35,13 @@ entityRelationId.get('/', async (c) => {
     );
 
     if (!relation) {
-      return c.json({ error: 'Entity relation not found' }, 404);
+      return         c.json(apiError('Entity relation not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     return c.json({ entityRelation: relation });
   } catch (error) {
     safeError('Error fetching entity relation:', error);
-    return c.json({ error: 'Failed to fetch entity relation' }, 500);
+    return         c.json(apiError('Failed to fetch entity relation', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -91,7 +92,7 @@ entityRelationId.put('/', async (c) => {
     return c.json({ entityRelation: relation });
   } catch (error) {
     safeError('Error updating entity relation:', error);
-    return c.json({ error: 'Failed to update entity relation' }, 500);
+    return         c.json(apiError('Failed to update entity relation', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -106,7 +107,7 @@ entityRelationId.delete('/', async (c) => {
     return c.json({ success: true });
   } catch (error) {
     safeError('Error deleting entity relation:', error);
-    return c.json({ error: 'Failed to delete entity relation' }, 500);
+    return         c.json(apiError('Failed to delete entity relation', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

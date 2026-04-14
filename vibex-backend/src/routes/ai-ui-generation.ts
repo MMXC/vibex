@@ -24,6 +24,7 @@ import { Hono } from 'hono';
 import { queryOne, queryDB, executeDB, generateId, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const aiUIGeneration = new Hono<{ Bindings: Env }>();
 
@@ -325,14 +326,14 @@ aiUIGeneration.post('/', async (c) => {
     const model = env.MINIMAX_MODEL || 'abab6.5s-chat';
 
     if (!apiKey) {
-      return c.json({ error: 'MINIMAX_API_KEY is not configured' }, 500);
+      return         c.json(apiError('MINIMAX_API_KEY is not configured', ERROR_CODES.AI_SERVICE_ERROR), 500);
     }
 
     const body = await c.req.json<UIGenerationRequest>();
     const { description, projectId, pageId, framework = 'react', uiLibrary = 'tailwind', designStyle = 'modern', componentType = 'component', context, save = false } = body;
 
     if (!description) {
-      return c.json({ error: 'Description is required' }, 400);
+      return         c.json(apiError('Description is required', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const conversationId = `ui_gen_${Date.now()}`;
@@ -454,14 +455,14 @@ aiUIGeneration.post('/generate', async (c) => {
     const model = env.MINIMAX_MODEL || 'abab6.5s-chat';
 
     if (!apiKey) {
-      return c.json({ error: 'MINIMAX_API_KEY is not configured' }, 500);
+      return         c.json(apiError('MINIMAX_API_KEY is not configured', ERROR_CODES.AI_SERVICE_ERROR), 500);
     }
 
     const body = await c.req.json<UIGenerationRequest>();
     const { description, projectId, pageId, framework = 'react', uiLibrary = 'tailwind', designStyle = 'modern', componentType = 'component', context, save = false } = body;
 
     if (!description) {
-      return c.json({ error: 'Description is required' }, 400);
+      return         c.json(apiError('Description is required', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const prompt = buildGenerationPrompt(body);

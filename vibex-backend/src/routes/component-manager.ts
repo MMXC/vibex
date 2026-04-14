@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const componentManager = new Hono<{ Bindings: Env }>();
 
@@ -105,7 +106,7 @@ componentManager.get('/', async (c) => {
     return c.json({ components: parsedComponents });
   } catch (error) {
     safeError('Error fetching components:', error);
-    return c.json({ error: 'Failed to fetch components' }, 500);
+    return         c.json(apiError('Failed to fetch components', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -126,7 +127,7 @@ componentManager.get('/categories', async (c) => {
     return c.json({ categories });
   } catch (error) {
     safeError('Error fetching categories:', error);
-    return c.json({ error: 'Failed to fetch categories' }, 500);
+    return         c.json(apiError('Failed to fetch categories', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -146,7 +147,7 @@ componentManager.get('/:id', async (c) => {
     );
 
     if (!component) {
-      return c.json({ error: 'Component not found' }, 404);
+      return         c.json(apiError('Component not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Parse JSON fields
@@ -163,7 +164,7 @@ componentManager.get('/:id', async (c) => {
     return c.json({ component: parsedComponent });
   } catch (error) {
     safeError('Error fetching component:', error);
-    return c.json({ error: 'Failed to fetch component' }, 500);
+    return         c.json(apiError('Failed to fetch component', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -188,7 +189,7 @@ componentManager.post('/', async (c) => {
     } = body;
 
     if (!name || !category) {
-      return c.json({ error: 'Missing required fields: name, category' }, 400);
+      return         c.json(apiError('Missing required fields: name, category', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -225,7 +226,7 @@ componentManager.post('/', async (c) => {
     );
 
     if (!component) {
-      return c.json({ error: 'Failed to create component' }, 500);
+      return         c.json(apiError('Failed to create component', ERROR_CODES.INTERNAL_ERROR), 500);
     }
 
     const parsedComponent = {
@@ -241,7 +242,7 @@ componentManager.post('/', async (c) => {
     return c.json({ component: parsedComponent }, 201);
   } catch (error) {
     safeError('Error creating component:', error);
-    return c.json({ error: 'Failed to create component' }, 500);
+    return         c.json(apiError('Failed to create component', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -263,7 +264,7 @@ componentManager.put('/:id', async (c) => {
     );
 
     if (!existing) {
-      return c.json({ error: 'Component not found' }, 404);
+      return         c.json(apiError('Component not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     const {
@@ -348,7 +349,7 @@ componentManager.put('/:id', async (c) => {
     return c.json({ component: parsedComponent });
   } catch (error) {
     safeError('Error updating component:', error);
-    return c.json({ error: 'Failed to update component' }, 500);
+    return         c.json(apiError('Failed to update component', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -369,7 +370,7 @@ componentManager.delete('/:id', async (c) => {
     );
 
     if (!existing) {
-      return c.json({ error: 'Component not found' }, 404);
+      return         c.json(apiError('Component not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     await executeDB(env, 'DELETE FROM Component WHERE id = ?', [id]);
@@ -377,7 +378,7 @@ componentManager.delete('/:id', async (c) => {
     return c.json({ success: true, message: 'Component deleted successfully' });
   } catch (error) {
     safeError('Error deleting component:', error);
-    return c.json({ error: 'Failed to delete component' }, 500);
+    return         c.json(apiError('Failed to delete component', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -399,13 +400,13 @@ componentManager.post('/:id/variants', async (c) => {
     );
 
     if (!existing) {
-      return c.json({ error: 'Component not found' }, 404);
+      return         c.json(apiError('Component not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     const { variant, props, style, interactions, replaceable, alternatives } = body;
 
     if (!variant) {
-      return c.json({ error: 'Missing required field: variant' }, 400);
+      return         c.json(apiError('Missing required field: variant', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     // Parse existing variants
@@ -455,7 +456,7 @@ componentManager.post('/:id/variants', async (c) => {
     return c.json({ component: parsedComponent });
   } catch (error) {
     safeError('Error adding variant:', error);
-    return c.json({ error: 'Failed to add variant' }, 500);
+    return         c.json(apiError('Failed to add variant', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -478,7 +479,7 @@ componentManager.put('/:id/variants/:variantName', async (c) => {
     );
 
     if (!existing) {
-      return c.json({ error: 'Component not found' }, 404);
+      return         c.json(apiError('Component not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Parse existing variants
@@ -522,7 +523,7 @@ componentManager.put('/:id/variants/:variantName', async (c) => {
     return c.json({ component: parsedComponent });
   } catch (error) {
     safeError('Error updating variant:', error);
-    return c.json({ error: 'Failed to update variant' }, 500);
+    return         c.json(apiError('Failed to update variant', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -544,7 +545,7 @@ componentManager.delete('/:id/variants/:variantName', async (c) => {
     );
 
     if (!existing) {
-      return c.json({ error: 'Component not found' }, 404);
+      return         c.json(apiError('Component not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Parse existing variants
@@ -583,7 +584,7 @@ componentManager.delete('/:id/variants/:variantName', async (c) => {
     return c.json({ component: parsedComponent });
   } catch (error) {
     safeError('Error deleting variant:', error);
-    return c.json({ error: 'Failed to delete variant' }, 500);
+    return         c.json(apiError('Failed to delete variant', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

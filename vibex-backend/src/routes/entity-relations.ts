@@ -10,6 +10,7 @@ import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 import { TYPES_PACKAGE_VERSION } from '@vibex/types'; // E3: @vibex/types reference
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const entityRelations = new Hono<{ Bindings: Env }>();
 
@@ -49,7 +50,7 @@ entityRelations.get('/', async (c) => {
     return c.json({ entityRelations: relations });
   } catch (error) {
     safeError('Error fetching entity relations:', error);
-    return c.json({ error: 'Failed to fetch entity relations' }, 500);
+    return         c.json(apiError('Failed to fetch entity relations', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -60,7 +61,7 @@ entityRelations.post('/', async (c) => {
     const { fromEntityId, toEntityId, relationType, description } = body;
 
     if (!fromEntityId || !toEntityId || !relationType) {
-      return c.json({ error: 'Missing required fields: fromEntityId, toEntityId, relationType' }, 400);
+      return         c.json(apiError('Missing required fields: fromEntityId, toEntityId, relationType', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -82,7 +83,7 @@ entityRelations.post('/', async (c) => {
     return c.json({ entityRelation: relation }, 201);
   } catch (error) {
     safeError('Error creating entity relation:', error);
-    return c.json({ error: 'Failed to create entity relation' }, 500);
+    return         c.json(apiError('Failed to create entity relation', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

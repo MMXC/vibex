@@ -39,6 +39,7 @@ import {
   GeneratedPage,
   DesignTokens,
 } from '@/services/ui-generator';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const componentGenerator = new Hono<{ Bindings: Env }>();
 
@@ -202,10 +203,10 @@ componentGenerator.post('/', async (c) => {
 
     // Validate required fields
     if (!projectId) {
-      return c.json({ error: 'Missing required field: projectId' }, 400);
+      return         c.json(apiError('Missing required field: projectId', ERROR_CODES.BAD_REQUEST), 400);
     }
     if (!spec || !spec.name || !spec.type) {
-      return c.json({ error: 'Missing required fields in spec: name, type' }, 400);
+      return         c.json(apiError('Missing required fields in spec: name, type', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -213,7 +214,7 @@ componentGenerator.post('/', async (c) => {
     // Validate project exists
     const project = await validateProject(env, projectId);
     if (!project) {
-      return c.json({ error: 'Project not found' }, 404);
+      return         c.json(apiError('Project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404);
     }
 
     // Generate component
@@ -221,10 +222,7 @@ componentGenerator.post('/', async (c) => {
     const result = await generator.generateComponent(spec, options);
 
     if (!result.success || !result.data) {
-      return c.json({
-        error: 'Failed to generate component',
-        details: result.error,
-      }, 500);
+      return         c.json(apiError('Failed to generate component', ERROR_CODES.INTERNAL_ERROR), 500);
     }
 
     // Save to database if requested
@@ -254,10 +252,7 @@ componentGenerator.post('/', async (c) => {
   } catch (error) {
     safeError('Error generating component:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return c.json({
-      error: 'Failed to generate component',
-      details: errorMessage,
-    }, 500);
+    return         c.json(apiError('Failed to generate component', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -280,10 +275,10 @@ componentGenerator.post('/batch', async (c) => {
 
     // Validate required fields
     if (!projectId) {
-      return c.json({ error: 'Missing required field: projectId' }, 400);
+      return         c.json(apiError('Missing required field: projectId', ERROR_CODES.BAD_REQUEST), 400);
     }
     if (!components || !Array.isArray(components) || components.length === 0) {
-      return c.json({ error: 'Missing or invalid field: components (must be a non-empty array)' }, 400);
+      return         c.json(apiError('Missing or invalid field: components (must be a non-empty array)', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -291,7 +286,7 @@ componentGenerator.post('/batch', async (c) => {
     // Validate project exists
     const project = await validateProject(env, projectId);
     if (!project) {
-      return c.json({ error: 'Project not found' }, 404);
+      return         c.json(apiError('Project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404);
     }
 
     const generator = getGeneratorService(env);
@@ -365,7 +360,7 @@ componentGenerator.post('/batch', async (c) => {
 
   } catch (error) {
     safeError('Error in batch generation:', error);
-    return c.json({ error: 'Failed to perform batch generation' }, 500);
+    return         c.json(apiError('Failed to perform batch generation', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -391,13 +386,13 @@ componentGenerator.post('/page', async (c) => {
 
     // Validate required fields
     if (!projectId) {
-      return c.json({ error: 'Missing required field: projectId' }, 400);
+      return         c.json(apiError('Missing required field: projectId', ERROR_CODES.BAD_REQUEST), 400);
     }
     if (!description) {
-      return c.json({ error: 'Missing required field: description' }, 400);
+      return         c.json(apiError('Missing required field: description', ERROR_CODES.BAD_REQUEST), 400);
     }
     if (!pageType) {
-      return c.json({ error: 'Missing required field: pageType' }, 400);
+      return         c.json(apiError('Missing required field: pageType', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -405,7 +400,7 @@ componentGenerator.post('/page', async (c) => {
     // Validate project exists
     const project = await validateProject(env, projectId);
     if (!project) {
-      return c.json({ error: 'Project not found' }, 404);
+      return         c.json(apiError('Project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404);
     }
 
     // Generate page
@@ -413,10 +408,7 @@ componentGenerator.post('/page', async (c) => {
     const result = await generator.generatePage(description, pageType, options);
 
     if (!result.success || !result.data) {
-      return c.json({
-        error: 'Failed to generate page',
-        details: result.error,
-      }, 500);
+      return         c.json(apiError('Failed to generate page', ERROR_CODES.INTERNAL_ERROR), 500);
     }
 
     const generatedPage = result.data as GeneratedPage;
@@ -470,10 +462,7 @@ componentGenerator.post('/page', async (c) => {
   } catch (error) {
     safeError('Error generating page:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return c.json({
-      error: 'Failed to generate page',
-      details: errorMessage,
-    }, 500);
+    return         c.json(apiError('Failed to generate page', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -499,10 +488,10 @@ componentGenerator.post('/quick', async (c) => {
 
     // Validate required fields
     if (!projectId) {
-      return c.json({ error: 'Missing required field: projectId' }, 400);
+      return         c.json(apiError('Missing required field: projectId', ERROR_CODES.BAD_REQUEST), 400);
     }
     if (!type) {
-      return c.json({ error: 'Missing required field: type' }, 400);
+      return         c.json(apiError('Missing required field: type', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const validTypes = ['button', 'input', 'card', 'modal'] as const;
@@ -517,7 +506,7 @@ componentGenerator.post('/quick', async (c) => {
     // Validate project exists
     const project = await validateProject(env, projectId);
     if (!project) {
-      return c.json({ error: 'Project not found' }, 404);
+      return         c.json(apiError('Project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404);
     }
 
     // Generate component using quick methods
@@ -541,14 +530,11 @@ componentGenerator.post('/quick', async (c) => {
         result = await generator.quickModal(options);
         break;
       default:
-        return c.json({ error: 'Invalid component type' }, 400);
+        return         c.json(apiError('Invalid component type', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     if (!result.success || !result.data) {
-      return c.json({
-        error: 'Failed to generate component',
-        details: result.error,
-      }, 500);
+      return         c.json(apiError('Failed to generate component', ERROR_CODES.INTERNAL_ERROR), 500);
     }
 
     // Save to database if requested
@@ -578,10 +564,7 @@ componentGenerator.post('/quick', async (c) => {
   } catch (error) {
     safeError('Error in quick generation:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return c.json({
-      error: 'Failed to generate component',
-      details: errorMessage,
-    }, 500);
+    return         c.json(apiError('Failed to generate component', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -606,10 +589,7 @@ componentGenerator.post('/tokens', async (c) => {
     const result = await generator.generateDesignTokens(description, options);
 
     if (!result.success || !result.data) {
-      return c.json({
-        error: 'Failed to generate design tokens',
-        details: result.error,
-      }, 500);
+      return         c.json(apiError('Failed to generate design tokens', ERROR_CODES.INTERNAL_ERROR), 500);
     }
 
     return c.json({
@@ -625,10 +605,7 @@ componentGenerator.post('/tokens', async (c) => {
   } catch (error) {
     safeError('Error generating design tokens:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return c.json({
-      error: 'Failed to generate design tokens',
-      details: errorMessage,
-    }, 500);
+    return         c.json(apiError('Failed to generate design tokens', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -717,7 +694,7 @@ componentGenerator.get('/', async (c) => {
     const framework = c.req.query('framework');
 
     if (!projectId) {
-      return c.json({ error: 'Missing required query parameter: projectId' }, 400);
+      return         c.json(apiError('Missing required query parameter: projectId', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -750,7 +727,7 @@ componentGenerator.get('/', async (c) => {
 
   } catch (error) {
     safeError('Error fetching components:', error);
-    return c.json({ error: 'Failed to fetch components' }, 500);
+    return         c.json(apiError('Failed to fetch components', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -769,7 +746,7 @@ componentGenerator.get('/:id', async (c) => {
     );
 
     if (!component) {
-      return c.json({ error: 'Component not found' }, 404);
+      return         c.json(apiError('Component not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Parse JSON fields
@@ -786,7 +763,7 @@ componentGenerator.get('/:id', async (c) => {
 
   } catch (error) {
     safeError('Error fetching component:', error);
-    return c.json({ error: 'Failed to fetch component' }, 500);
+    return         c.json(apiError('Failed to fetch component', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -806,7 +783,7 @@ componentGenerator.delete('/:id', async (c) => {
     );
 
     if (!component) {
-      return c.json({ error: 'Component not found' }, 404);
+      return         c.json(apiError('Component not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Delete component
@@ -820,7 +797,7 @@ componentGenerator.delete('/:id', async (c) => {
 
   } catch (error) {
     safeError('Error deleting component:', error);
-    return c.json({ error: 'Failed to delete component' }, 500);
+    return         c.json(apiError('Failed to delete component', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -840,7 +817,7 @@ componentGenerator.post('/preview', async (c) => {
     const { spec, options = {} } = body;
 
     if (!spec || !spec.name || !spec.type) {
-      return c.json({ error: 'Missing required fields in spec: name, type' }, 400);
+      return         c.json(apiError('Missing required fields in spec: name, type', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -849,10 +826,7 @@ componentGenerator.post('/preview', async (c) => {
     const result = await generator.generateComponent(spec, options);
 
     if (!result.success || !result.data) {
-      return c.json({
-        error: 'Failed to generate component preview',
-        details: result.error,
-      }, 500);
+      return         c.json(apiError('Failed to generate component preview', ERROR_CODES.INTERNAL_ERROR), 500);
     }
 
     return c.json({
@@ -869,10 +843,7 @@ componentGenerator.post('/preview', async (c) => {
   } catch (error) {
     safeError('Error generating preview:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return c.json({
-      error: 'Failed to generate preview',
-      details: errorMessage,
-    }, 500);
+    return         c.json(apiError('Failed to generate preview', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const domainEntityId = new Hono<{ Bindings: Env }>();
 
@@ -37,13 +38,13 @@ domainEntityId.get('/', async (c) => {
     );
 
     if (!entity) {
-      return c.json({ error: 'Domain entity not found' }, 404);
+      return         c.json(apiError('Domain entity not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     return c.json({ domainEntity: entity });
   } catch (error) {
     safeError('Error fetching domain entity:', error);
-    return c.json({ error: 'Failed to fetch domain entity' }, 500);
+    return         c.json(apiError('Failed to fetch domain entity', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -101,7 +102,7 @@ domainEntityId.put('/', async (c) => {
     return c.json({ domainEntity: entity });
   } catch (error) {
     safeError('Error updating domain entity:', error);
-    return c.json({ error: 'Failed to update domain entity' }, 500);
+    return         c.json(apiError('Failed to update domain entity', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -116,7 +117,7 @@ domainEntityId.delete('/', async (c) => {
     return c.json({ success: true });
   } catch (error) {
     safeError('Error deleting domain entity:', error);
-    return c.json({ error: 'Failed to delete domain entity' }, 500);
+    return         c.json(apiError('Failed to delete domain entity', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

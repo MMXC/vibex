@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const pages = new Hono<{ Bindings: Env }>();
 
@@ -41,7 +42,7 @@ pages.get('/', async (c) => {
     return c.json({ pages: pagesList });
   } catch (error) {
     safeError('Error fetching pages:', error);
-    return c.json({ error: 'Failed to fetch pages' }, 500);
+    return         c.json(apiError('Failed to fetch pages', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -52,7 +53,7 @@ pages.post('/', async (c) => {
     const { name, content, projectId } = body;
 
     if (!name || !projectId) {
-      return c.json({ error: 'Missing required fields: name, projectId' }, 400);
+      return         c.json(apiError('Missing required fields: name, projectId', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -74,7 +75,7 @@ pages.post('/', async (c) => {
     return c.json({ page }, 201);
   } catch (error) {
     safeError('Error creating page:', error);
-    return c.json({ error: 'Failed to create page' }, 500);
+    return         c.json(apiError('Failed to create page', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

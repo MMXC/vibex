@@ -16,6 +16,7 @@ import { Hono } from 'hono';
 import { queryDB, executeDB, generateId, Env } from '@/lib/db';
 import { metricsStore, type LatencyStats } from '@/middleware/metrics';
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const analytics = new Hono<{ Bindings: Env }>();
 
@@ -59,7 +60,7 @@ analytics.post('/', async (c) => {
     const events: AnalyticsEvent[] = Array.isArray(body) ? body : [body];
 
     if (!Array.isArray(events) || events.length === 0) {
-      return c.json({ error: 'events array required' }, 400);
+      return         c.json(apiError('events array required', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const ids: string[] = [];
@@ -69,7 +70,7 @@ analytics.post('/', async (c) => {
 
     for (const event of events) {
       if (!event.event || typeof event.event !== 'string') {
-        return c.json({ error: 'event.name required' }, 400);
+        return         c.json(apiError('event.name required', ERROR_CODES.BAD_REQUEST), 400);
       }
 
       const id = generateId();
@@ -97,7 +98,7 @@ analytics.post('/', async (c) => {
     return c.json({ received: ids.length, ids });
   } catch (err) {
     safeError('[analytics] POST error:', err);
-    return c.json({ error: 'Internal server error' }, 500);
+    return         c.json(apiError('Internal server error', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -146,7 +147,7 @@ analytics.get('/', async (c) => {
     });
   } catch (err) {
     safeError('[analytics] GET error:', err);
-    return c.json({ error: 'Internal server error' }, 500);
+    return         c.json(apiError('Internal server error', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

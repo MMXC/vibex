@@ -11,6 +11,7 @@ import { z } from 'zod'
 import { generateId, queryDB, executeDB, queryOne, Env } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
 import { debug, sanitize, devLog, safeError } from '@/lib/log-sanitizer'
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const businessDomain = new Hono<{ Bindings: Env }>();
 
@@ -247,7 +248,7 @@ businessDomain.get('/', async (c) => {
     const projectId = c.req.query('projectId')
 
     if (!projectId) {
-      return c.json({ success: false, error: 'projectId is required' }, 400)
+      return c.json(apiError('projectId is required', ERROR_CODES.BAD_REQUEST), 400)
     }
 
     if (!env?.DB) {
@@ -297,7 +298,7 @@ businessDomain.post('/create', async (c) => {
     const { name, description, type, projectId } = CreateDomainSchema.parse(body)
 
     if (!projectId) {
-      return c.json({ success: false, error: 'projectId is required' }, 400)
+      return c.json(apiError('projectId is required', ERROR_CODES.BAD_REQUEST), 400)
     }
 
     const id = `bd-${generateId()}`
@@ -358,7 +359,7 @@ businessDomain.put('/', async (c) => {
     const { id, name, description, type, features } = UpdateDomainSchema.parse(body)
 
     if (!id) {
-      return c.json({ success: false, error: 'id is required' }, 400)
+      return c.json(apiError('id is required', ERROR_CODES.BAD_REQUEST), 400)
     }
 
     // Build dynamic update
@@ -388,7 +389,7 @@ businessDomain.put('/', async (c) => {
     }
 
     if (sets.length === 0) {
-      return c.json({ success: false, error: 'No fields to update' }, 400)
+      return c.json(apiError('No fields to update', ERROR_CODES.BAD_REQUEST), 400)
     }
 
     const now = Date.now()
@@ -435,7 +436,7 @@ businessDomain.delete('/', async (c) => {
     const env = c.env
     const id = c.req.query('id')
     if (!id) {
-      return c.json({ success: false, error: 'id is required' }, 400)
+      return c.json(apiError('id is required', ERROR_CODES.BAD_REQUEST), 400)
     }
 
     if (env?.DB) {

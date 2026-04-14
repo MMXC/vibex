@@ -11,6 +11,7 @@ import { z } from 'zod'
 import { generateId, Env } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
 import { debug, sanitize, devLog, safeError } from '@/lib/log-sanitizer'
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 // AI Response Types (parsed from AI service)
 interface AIPlanResult {
@@ -964,7 +965,7 @@ Output:
       }
     })
   } catch (error) {
-    return c.json({ success: false, error: 'Failed to setup stream' }, 500)
+    return c.json(apiError('Failed to setup stream', ERROR_CODES.INTERNAL_ERROR), 500)
   }
 })
 

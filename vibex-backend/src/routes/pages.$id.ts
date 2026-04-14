@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const pageId = new Hono<{ Bindings: Env }>();
 
@@ -34,13 +35,13 @@ pageId.get('/', async (c) => {
     );
 
     if (!page) {
-      return c.json({ error: 'Page not found' }, 404);
+      return         c.json(apiError('Page not found', ERROR_CODES.PAGE_NOT_FOUND), 404);
     }
 
     return c.json({ page });
   } catch (error) {
     safeError('Error fetching page:', error);
-    return c.json({ error: 'Failed to fetch page' }, 500);
+    return         c.json(apiError('Failed to fetch page', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -86,7 +87,7 @@ pageId.put('/', async (c) => {
     return c.json({ page });
   } catch (error) {
     safeError('Error updating page:', error);
-    return c.json({ error: 'Failed to update page' }, 500);
+    return         c.json(apiError('Failed to update page', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -101,7 +102,7 @@ pageId.delete('/', async (c) => {
     return c.json({ success: true });
   } catch (error) {
     safeError('Error deleting page:', error);
-    return c.json({ error: 'Failed to delete page' }, 500);
+    return         c.json(apiError('Failed to delete page', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

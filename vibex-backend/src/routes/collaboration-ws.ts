@@ -23,6 +23,7 @@
 
 import { Hono } from 'hono';
 import type { CloudflareEnv } from '@/lib/env';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const collaborationWs = new Hono<{ Bindings: CloudflareEnv }>();
 
@@ -36,7 +37,7 @@ collaborationWs.get('/collaboration', async (c) => {
   // E2-S1: 获取 COLLABORATION_ROOM DO binding
   const doNamespace = env.COLLABORATION_ROOM;
   if (!doNamespace) {
-    return c.json({ error: 'Collaboration DO not configured' }, 500);
+    return         c.json(apiError('Collaboration DO not configured', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 
   // 解析查询参数
@@ -46,7 +47,7 @@ collaborationWs.get('/collaboration', async (c) => {
   const userName = url.searchParams.get('userName') || 'Anonymous';
 
   if (!roomId) {
-    return c.json({ error: 'roomId query parameter required' }, 400);
+    return         c.json(apiError('roomId query parameter required', ERROR_CODES.BAD_REQUEST), 400);
   }
 
   // 获取 DO stub（每个 roomId 对应一个 DO 实例）

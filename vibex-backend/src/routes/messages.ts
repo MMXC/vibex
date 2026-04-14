@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const messages = new Hono<{ Bindings: Env }>();
 
@@ -26,7 +27,7 @@ messages.get('/', async (c) => {
     const projectId = c.req.query('projectId');
     
     if (!projectId) {
-      return c.json({ error: 'projectId is required' }, 400);
+      return         c.json(apiError('projectId is required', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -39,7 +40,7 @@ messages.get('/', async (c) => {
     return c.json({ messages: messagesList });
   } catch (error) {
     safeError('Error fetching messages:', error);
-    return c.json({ error: 'Failed to fetch messages' }, 500);
+    return         c.json(apiError('Failed to fetch messages', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -50,7 +51,7 @@ messages.post('/', async (c) => {
     const { role, content, projectId } = body;
 
     if (!role || !content || !projectId) {
-      return c.json({ error: 'Missing required fields: role, content, projectId' }, 400);
+      return         c.json(apiError('Missing required fields: role, content, projectId', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -72,7 +73,7 @@ messages.post('/', async (c) => {
     return c.json({ message }, 201);
   } catch (error) {
     safeError('Error creating message:', error);
-    return c.json({ error: 'Failed to create message' }, 500);
+    return         c.json(apiError('Failed to create message', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

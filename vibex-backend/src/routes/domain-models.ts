@@ -15,6 +15,7 @@ import { queryOne, queryDB, executeDB, generateId, Env } from '@/lib/db';
 import { createAIService } from '@/services/ai-service';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const domainModels = new Hono<{ Bindings: Env }>();
 
@@ -230,7 +231,7 @@ domainModels.post('/generate', async (c) => {
     const { description, projectId, saveToDatabase } = body;
 
     if (!description) {
-      return c.json({ error: 'Missing required field: description' }, 400);
+      return         c.json(apiError('Missing required field: description', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -285,10 +286,7 @@ Extract all relevant domain entities and their relationships. Think about the co
     );
 
     if (!result.success || !result.data) {
-      return c.json({ 
-        error: 'Failed to generate domain model', 
-        details: result.error 
-      }, 500);
+      return         c.json(apiError('Failed to generate domain model', ERROR_CODES.INTERNAL_ERROR), 500);
     }
 
     const { entities, relations } = result.data;
@@ -403,10 +401,7 @@ Extract all relevant domain entities and their relationships. Think about the co
   } catch (error) {
     safeError('Error generating domain model:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return c.json({ 
-      error: 'Failed to generate domain model', 
-      details: errorMessage 
-    }, 500);
+    return         c.json(apiError('Failed to generate domain model', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -426,7 +421,7 @@ domainModels.get('/', async (c) => {
     const projectId = c.req.query('projectId');
 
     if (!projectId) {
-      return c.json({ error: 'Missing required query parameter: projectId' }, 400);
+      return         c.json(apiError('Missing required query parameter: projectId', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -488,10 +483,7 @@ domainModels.get('/', async (c) => {
   } catch (error) {
     safeError('Error fetching domain model:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return c.json({ 
-      error: 'Failed to fetch domain model', 
-      details: errorMessage 
-    }, 500);
+    return         c.json(apiError('Failed to fetch domain model', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

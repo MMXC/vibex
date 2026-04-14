@@ -15,6 +15,7 @@
 
 import { Hono } from 'hono';
 import { CloudflareEnv } from '../lib/env';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const aiDesignChat = new Hono<{ Bindings: CloudflareEnv }>();
 
@@ -188,14 +189,14 @@ aiDesignChat.post('/', async (c) => {
     const model = env.MINIMAX_MODEL || 'abab6.5s-chat';
 
     if (!apiKey) {
-      return c.json({ error: 'MINIMAX_API_KEY is not configured' }, 500);
+      return         c.json(apiError('MINIMAX_API_KEY is not configured', ERROR_CODES.AI_SERVICE_ERROR), 500);
     }
 
     const body = await c.req.json<DesignChatRequest>();
     const { message, conversationId, projectId, context } = body;
 
     if (!message) {
-      return c.json({ error: 'Message is required' }, 400);
+      return         c.json(apiError('Message is required', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     // Generate or use provided conversation ID
@@ -297,7 +298,7 @@ aiDesignChat.get('/history', async (c) => {
   const { conversationId } = await c.req.query();
   
   if (!conversationId) {
-    return c.json({ error: 'conversationId is required' }, 400);
+    return         c.json(apiError('conversationId is required', ERROR_CODES.BAD_REQUEST), 400);
   }
   
   const history = conversations.get(conversationId) || [];

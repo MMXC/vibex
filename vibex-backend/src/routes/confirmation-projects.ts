@@ -8,6 +8,7 @@ import { Hono } from 'hono';
 
 import { cors } from 'hono/cors'
 import { z } from 'zod'
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const confirmationProjects = new Hono()
 
@@ -99,7 +100,7 @@ confirmationProjects.get('/:id', async (c) => {
   const project = projects.get(id)
   
   if (!project) {
-    return c.json({ error: 'Project not found' }, 404)
+    return         c.json(apiError('Project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404)
   }
   
   return c.json(project)
@@ -130,7 +131,7 @@ confirmationProjects.put('/:id', async (c) => {
   const existing = projects.get(id)
   
   if (!existing) {
-    return c.json({ error: 'Project not found' }, 404)
+    return         c.json(apiError('Project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404)
   }
   
   const body = await c.req.json()
@@ -153,7 +154,7 @@ confirmationProjects.delete('/:id', async (c) => {
   const id = c.req.param('id')
   
   if (!projects.has(id)) {
-    return c.json({ error: 'Project not found' }, 404)
+    return         c.json(apiError('Project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404)
   }
   
   projects.delete(id)
@@ -167,7 +168,7 @@ confirmationProjects.post('/:id/convert-to-project', async (c) => {
   const confirmation = projects.get(id)
   
   if (!confirmation) {
-    return c.json({ error: 'Confirmation project not found' }, 404)
+    return         c.json(apiError('Confirmation project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404)
   }
   
   // In a real implementation, this would:

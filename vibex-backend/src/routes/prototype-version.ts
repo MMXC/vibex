@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const prototypeVersions = new Hono<{ Bindings: Env }>();
 
@@ -90,7 +91,7 @@ prototypeVersions.get('/', async (c) => {
     });
   } catch (error) {
     safeError('Error fetching prototype versions:', error);
-    return c.json({ error: 'Failed to fetch prototype versions' }, 500);
+    return         c.json(apiError('Failed to fetch prototype versions', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -101,7 +102,7 @@ prototypeVersions.post('/', async (c) => {
     const { projectId, branchId, name, description, content, snapshotId, createdBy, version } = body;
 
     if (!projectId || !content) {
-      return c.json({ error: 'Missing required fields: projectId, content' }, 400);
+      return         c.json(apiError('Missing required fields: projectId, content', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -151,7 +152,7 @@ prototypeVersions.post('/', async (c) => {
     return c.json({ prototypeVersion: versionRecord }, 201);
   } catch (error) {
     safeError('Error creating prototype version:', error);
-    return c.json({ error: 'Failed to create prototype version' }, 500);
+    return         c.json(apiError('Failed to create prototype version', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -163,7 +164,7 @@ prototypeVersions.get('/latest', async (c) => {
     const env = c.env;
 
     if (!projectId) {
-      return c.json({ error: 'Missing required query parameter: projectId' }, 400);
+      return         c.json(apiError('Missing required query parameter: projectId', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     let sql = 'SELECT * FROM PrototypeVersion WHERE projectId = ?';
@@ -178,13 +179,13 @@ prototypeVersions.get('/latest', async (c) => {
     const versionRecord = await queryOne<PrototypeVersionRow>(env, sql, params);
 
     if (!versionRecord) {
-      return c.json({ error: 'No version found for this project' }, 404);
+      return         c.json(apiError('No version found for this project', ERROR_CODES.PROJECT_NOT_FOUND), 404);
     }
 
     return c.json({ prototypeVersion: versionRecord });
   } catch (error) {
     safeError('Error fetching latest prototype version:', error);
-    return c.json({ error: 'Failed to fetch latest prototype version' }, 500);
+    return         c.json(apiError('Failed to fetch latest prototype version', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -196,7 +197,7 @@ prototypeVersions.get('/compare', async (c) => {
     const env = c.env;
 
     if (!version1Id || !version2Id) {
-      return c.json({ error: 'Missing required query parameters: version1Id, version2Id' }, 400);
+      return         c.json(apiError('Missing required query parameters: version1Id, version2Id', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const version1 = await queryOne<PrototypeVersionRow>(
@@ -212,7 +213,7 @@ prototypeVersions.get('/compare', async (c) => {
     );
 
     if (!version1 || !version2) {
-      return c.json({ error: 'One or both versions not found' }, 404);
+      return         c.json(apiError('One or both versions not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     return c.json({
@@ -225,7 +226,7 @@ prototypeVersions.get('/compare', async (c) => {
     });
   } catch (error) {
     safeError('Error comparing prototype versions:', error);
-    return c.json({ error: 'Failed to compare prototype versions' }, 500);
+    return         c.json(apiError('Failed to compare prototype versions', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

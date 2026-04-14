@@ -10,6 +10,7 @@ import { getAuthUserFromHono } from '@/lib/auth';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const conversations = new Hono<{ Bindings: Env }>();
 
@@ -64,7 +65,7 @@ conversations.get('/', async (c) => {
     // Only allow users to see their own conversations
     const targetUserId = userId || auth.userId;
     if (targetUserId !== auth.userId) {
-      return c.json({ success: false, error: 'Forbidden', code: 'FORBIDDEN' }, 403);
+      return c.json(apiError('Forbidden', ERROR_CODES.FORBIDDEN), 403);
     }
 
     const conversationsList = await queryDB<ConversationRow>(
@@ -85,7 +86,7 @@ conversations.get('/', async (c) => {
     return c.json({ conversations: result });
   } catch (error) {
     safeError('Error fetching conversations:', error);
-    return c.json({ error: 'Failed to fetch conversations' }, 500);
+    return         c.json(apiError('Failed to fetch conversations', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -108,7 +109,7 @@ conversations.post('/', async (c) => {
 
     // Only allow creating conversations for yourself
     if (targetUserId !== auth.userId) {
-      return c.json({ success: false, error: 'Forbidden', code: 'FORBIDDEN' }, 403);
+      return c.json(apiError('Forbidden', ERROR_CODES.FORBIDDEN), 403);
     }
 
     const env = c.env;
@@ -131,7 +132,7 @@ conversations.post('/', async (c) => {
     );
 
     if (!conversation) {
-      return c.json({ error: 'Failed to create conversation' }, 500);
+      return         c.json(apiError('Failed to create conversation', ERROR_CODES.INTERNAL_ERROR), 500);
     }
 
     return c.json(
@@ -148,7 +149,7 @@ conversations.post('/', async (c) => {
     );
   } catch (error) {
     safeError('Error creating conversation:', error);
-    return c.json({ error: 'Failed to create conversation' }, 500);
+    return         c.json(apiError('Failed to create conversation', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -173,12 +174,12 @@ conversations.get('/:id', async (c) => {
     );
 
     if (!conversation) {
-      return c.json({ success: false, error: 'Conversation not found', code: 'NOT_FOUND' }, 404);
+      return c.json(apiError('Conversation not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Only allow users to get their own conversations
     if (conversation.userId !== auth.userId) {
-      return c.json({ success: false, error: 'Forbidden', code: 'FORBIDDEN' }, 403);
+      return c.json(apiError('Forbidden', ERROR_CODES.FORBIDDEN), 403);
     }
 
     return c.json({
@@ -193,7 +194,7 @@ conversations.get('/:id', async (c) => {
     });
   } catch (error) {
     safeError('Error fetching conversation:', error);
-    return c.json({ error: 'Failed to fetch conversation' }, 500);
+    return         c.json(apiError('Failed to fetch conversation', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -218,12 +219,12 @@ conversations.put('/:id', async (c) => {
     );
 
     if (!existing) {
-      return c.json({ success: false, error: 'Conversation not found', code: 'NOT_FOUND' }, 404);
+      return c.json(apiError('Conversation not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Only allow users to update their own conversations
     if (existing.userId !== auth.userId) {
-      return c.json({ success: false, error: 'Forbidden', code: 'FORBIDDEN' }, 403);
+      return c.json(apiError('Forbidden', ERROR_CODES.FORBIDDEN), 403);
     }
 
     const body = await c.req.json();
@@ -259,7 +260,7 @@ conversations.put('/:id', async (c) => {
     });
   } catch (error) {
     safeError('Error updating conversation:', error);
-    return c.json({ error: 'Failed to update conversation' }, 500);
+    return         c.json(apiError('Failed to update conversation', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -284,12 +285,12 @@ conversations.delete('/:id', async (c) => {
     );
 
     if (!existing) {
-      return c.json({ success: false, error: 'Conversation not found', code: 'NOT_FOUND' }, 404);
+      return c.json(apiError('Conversation not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Only allow users to delete their own conversations
     if (existing.userId !== auth.userId) {
-      return c.json({ success: false, error: 'Forbidden', code: 'FORBIDDEN' }, 403);
+      return c.json(apiError('Forbidden', ERROR_CODES.FORBIDDEN), 403);
     }
 
     await executeDB(env, 'DELETE FROM Conversation WHERE id = ?', [id]);
@@ -297,7 +298,7 @@ conversations.delete('/:id', async (c) => {
     return c.json({ success: true, message: 'Conversation deleted' });
   } catch (error) {
     safeError('Error deleting conversation:', error);
-    return c.json({ error: 'Failed to delete conversation' }, 500);
+    return         c.json(apiError('Failed to delete conversation', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

@@ -10,6 +10,7 @@ import { getAuthUserFromHono, hashPassword } from '@/lib/auth';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const users = new Hono<{ Bindings: Env }>();
 
@@ -37,7 +38,7 @@ users.get('/:userId', async (c) => {
 
     // Only allow users to get their own profile
     if (auth.userId !== userId) {
-      return c.json({ success: false, error: 'Forbidden', code: 'FORBIDDEN' }, 403);
+      return c.json(apiError('Forbidden', ERROR_CODES.FORBIDDEN), 403);
     }
 
     const user = await queryOne<UserRow>(
@@ -47,7 +48,7 @@ users.get('/:userId', async (c) => {
     );
 
     if (!user) {
-      return c.json({ success: false, error: 'User not found', code: 'NOT_FOUND' }, 404);
+      return c.json(apiError('User not found', ERROR_CODES.USER_NOT_FOUND), 404);
     }
 
     return c.json({
@@ -78,7 +79,7 @@ users.put('/:userId', async (c) => {
 
     // Only allow users to update their own profile
     if (auth.userId !== userId) {
-      return c.json({ success: false, error: 'Forbidden', code: 'FORBIDDEN' }, 403);
+      return c.json(apiError('Forbidden', ERROR_CODES.FORBIDDEN), 403);
     }
 
     const body = await c.req.json();

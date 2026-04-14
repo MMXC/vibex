@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const agentId = new Hono<{ Bindings: Env }>();
 
@@ -36,13 +37,13 @@ agentId.get('/', async (c) => {
     );
 
     if (!agent) {
-      return c.json({ error: 'Agent not found' }, 404);
+      return         c.json(apiError('Agent not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     return c.json({ agent });
   } catch (error) {
     safeError('Error fetching agent:', error);
-    return c.json({ error: 'Failed to fetch agent' }, 500);
+    return         c.json(apiError('Failed to fetch agent', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -96,7 +97,7 @@ agentId.put('/', async (c) => {
     return c.json({ agent });
   } catch (error) {
     safeError('Error updating agent:', error);
-    return c.json({ error: 'Failed to update agent' }, 500);
+    return         c.json(apiError('Failed to update agent', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -111,7 +112,7 @@ agentId.delete('/', async (c) => {
     return c.json({ success: true });
   } catch (error) {
     safeError('Error deleting agent:', error);
-    return c.json({ error: 'Failed to delete agent' }, 500);
+    return         c.json(apiError('Failed to delete agent', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

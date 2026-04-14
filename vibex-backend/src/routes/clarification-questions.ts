@@ -19,6 +19,7 @@ import { queryOne, queryDB, executeDB, generateId, Env } from '@/lib/db';
 import { createLLMService, LLMService, ChatMessage } from '@/services/llm';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const clarificationQuestions = new Hono<{ Bindings: Env }>();
 
@@ -240,7 +241,7 @@ clarificationQuestions.post('/', async (c) => {
     const { requirementId, maxQuestions = 5, regenerate } = body;
 
     if (!requirementId) {
-      return c.json({ error: 'Missing required field: requirementId' }, 400);
+      return         c.json(apiError('Missing required field: requirementId', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -253,7 +254,7 @@ clarificationQuestions.post('/', async (c) => {
     );
 
     if (!requirement) {
-      return c.json({ error: 'Requirement not found' }, 404);
+      return         c.json(apiError('Requirement not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Check if clarification questions already exist
@@ -353,10 +354,7 @@ Format your response as a JSON object with a "questions" array.`;
   } catch (error) {
     safeError('Error generating clarification questions:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return c.json({ 
-      error: 'Failed to generate clarification questions', 
-      details: errorMessage 
-    }, 500);
+    return         c.json(apiError('Failed to generate clarification questions', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -381,7 +379,7 @@ clarificationQuestions.get('/:requirementId', async (c) => {
     );
 
     if (!requirement) {
-      return c.json({ error: 'Requirement not found' }, 404);
+      return         c.json(apiError('Requirement not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Get clarification data
@@ -406,7 +404,7 @@ clarificationQuestions.get('/:requirementId', async (c) => {
 
   } catch (error) {
     safeError('Error fetching clarification questions:', error);
-    return c.json({ error: 'Failed to fetch clarification questions' }, 500);
+    return         c.json(apiError('Failed to fetch clarification questions', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -428,7 +426,7 @@ clarificationQuestions.post('/:requirementId/answers', async (c) => {
     const { answers } = body;
 
     if (!answers || !Array.isArray(answers) || answers.length === 0) {
-      return c.json({ error: 'Missing or invalid field: answers (must be a non-empty array)' }, 400);
+      return         c.json(apiError('Missing or invalid field: answers (must be a non-empty array)', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -441,16 +439,14 @@ clarificationQuestions.post('/:requirementId/answers', async (c) => {
     );
 
     if (!requirement) {
-      return c.json({ error: 'Requirement not found' }, 404);
+      return         c.json(apiError('Requirement not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Get existing clarification data
     const clarificationData = getClarificationData(requirement.parsedData);
 
     if (!clarificationData) {
-      return c.json({ 
-        error: 'No clarification questions found. Generate questions first.' 
-      }, 400);
+      return         c.json(apiError('No clarification questions found. Generate questions first.', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     // Process answers
@@ -496,7 +492,7 @@ clarificationQuestions.post('/:requirementId/answers', async (c) => {
 
   } catch (error) {
     safeError('Error submitting answers:', error);
-    return c.json({ error: 'Failed to submit answers' }, 500);
+    return         c.json(apiError('Failed to submit answers', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -518,7 +514,7 @@ clarificationQuestions.put('/:requirementId/answers/:questionId', async (c) => {
     const { answer } = body;
 
     if (!answer) {
-      return c.json({ error: 'Missing required field: answer' }, 400);
+      return         c.json(apiError('Missing required field: answer', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -531,23 +527,21 @@ clarificationQuestions.put('/:requirementId/answers/:questionId', async (c) => {
     );
 
     if (!requirement) {
-      return c.json({ error: 'Requirement not found' }, 404);
+      return         c.json(apiError('Requirement not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Get existing clarification data
     const clarificationData = getClarificationData(requirement.parsedData);
 
     if (!clarificationData) {
-      return c.json({ 
-        error: 'No clarification questions found. Generate questions first.' 
-      }, 400);
+      return         c.json(apiError('No clarification questions found. Generate questions first.', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     // Find and update the question
     const question = clarificationData.questions.find(q => q.id === questionId);
     
     if (!question) {
-      return c.json({ error: 'Question not found' }, 404);
+      return         c.json(apiError('Question not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Update answer
@@ -582,7 +576,7 @@ clarificationQuestions.put('/:requirementId/answers/:questionId', async (c) => {
 
   } catch (error) {
     safeError('Error updating answer:', error);
-    return c.json({ error: 'Failed to update answer' }, 500);
+    return         c.json(apiError('Failed to update answer', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -605,7 +599,7 @@ clarificationQuestions.delete('/:requirementId', async (c) => {
     );
 
     if (!requirement) {
-      return c.json({ error: 'Requirement not found' }, 404);
+      return         c.json(apiError('Requirement not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Get current parsedData
@@ -659,7 +653,7 @@ clarificationQuestions.delete('/:requirementId', async (c) => {
 
   } catch (error) {
     safeError('Error deleting clarification questions:', error);
-    return c.json({ error: 'Failed to delete clarification questions' }, 500);
+    return         c.json(apiError('Failed to delete clarification questions', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

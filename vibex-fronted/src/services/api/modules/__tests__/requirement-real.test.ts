@@ -26,8 +26,8 @@ vi.mock('@/services/api/cache', () => ({
   getCacheKey: vi.fn((...args) => args.join(':')),
 }));
 
-const mockHttpClient = httpClient as any<typeof httpClient>;
-const mockCache = cache as any<typeof cache>;
+const mockHttpClient = httpClient as any;
+const mockCache = cache as any;
 
 describe('RequirementApi', () => {
   beforeEach(() => {

@@ -16,9 +16,10 @@ vi.mock('@xyflow/react', async () => {
     BackgroundVariant: {
       Lines: 'lines',
       Dots: 'dots',
-    Cross: 'cross',
-  },
-}));
+      Cross: 'cross',
+    },
+  };
+})
 
 // Mock FlowEditor to avoid ReactFlow rendering in tests
 vi.mock('@/components/ui/FlowEditor', () => ({

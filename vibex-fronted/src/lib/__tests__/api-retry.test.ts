@@ -19,7 +19,7 @@ vi.mock('axios-retry', () => ({
 import axiosRetry from 'axios-retry';
 
 describe('api-retry', () => {
-  let mockAxiosInstance: any<AxiosInstance>;
+  let mockAxiosInstance: any;
 
   beforeEach(() => {
     mockAxiosInstance = {

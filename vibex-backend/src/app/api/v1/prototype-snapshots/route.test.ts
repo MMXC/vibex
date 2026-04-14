@@ -66,8 +66,7 @@ describe('POST /api/v1/prototype-snapshots', () => {
   });
 
   it('should return 400 if projectId is missing', async () => {
-    const request = new NextRequest('http://localhost:3000/api/v1/prototype-snapshots', { headers: authHeader() }),
-    });
+    const request = new NextRequest('http://localhost:3000/api/v1/prototype-snapshots', { headers: authHeader() });
     const response = await POST(request);
     const data = await response.json();
 
@@ -76,8 +75,7 @@ describe('POST /api/v1/prototype-snapshots', () => {
   });
 
   it('should return 400 if content is missing', async () => {
-    const request = new NextRequest('http://localhost:3000/api/v1/prototype-snapshots', { headers: authHeader() }),
-    });
+    const request = new NextRequest('http://localhost:3000/api/v1/prototype-snapshots', { headers: authHeader() });
     const response = await POST(request);
     const data = await response.json();
 

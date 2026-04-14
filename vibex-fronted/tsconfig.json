@@ -20,11 +20,6 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "paths": {
       "@/*": [
         "./src/*"
@@ -32,18 +27,34 @@
       "@vibex/types/*": [
         "../packages/types/src/*"
       ]
-    }
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*",
+    "lib/**/*",
+    "app/**/*",
+    "components/**/*",
+    "hooks/**/*",
+    "stores/**/*",
+    "contexts/**/*",
+    "config/**/*",
+    "constants/**/*",
+    "data/**/*",
+    "middleware.ts",
+    "**.d.ts",
+    "*.d.ts",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
+    "**/__tests__/**",
     "**/*.test.ts",
     "**/*.test.tsx",
     "**/*.spec.ts",
@@ -54,7 +65,6 @@
     "jest.setup.js",
     "playwright.setup.ts",
     "src/services/__mocks__",
-    "e2e",
-    "tests/unit"
+    "e2e"
   ]
 }

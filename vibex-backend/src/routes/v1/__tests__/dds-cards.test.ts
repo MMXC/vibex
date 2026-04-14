@@ -444,3 +444,82 @@ describe('DDS Relations & Position API', () => {
     });
   });
 });
+
+// ─── Chapters API Tests ────────────────────────────────────────────────────────
+/* eslint-disable @typescript-eslint/no-require-imports */
+const chaptersRoutes = require('../dds/chapters').default;
+
+const buildChaptersApp = () => {
+  const { Hono } = require('hono');
+  const app = new Hono();
+  app.route('/', chaptersRoutes);
+  return app;
+};
+
+describe('DDS Chapters API', () => {
+  let app: ReturnType<typeof buildChaptersApp>;
+
+  beforeEach(() => {
+    mockQueryDB.mockReset();
+    mockQueryOne.mockReset();
+    mockExecuteDB.mockReset();
+    app = buildChaptersApp();
+  });
+
+  describe('GET /chapters?projectId=xxx', () => {
+    it('returns 422 if projectId is missing', async () => {
+      const res = await require('supertest').default(app).get('/');
+      expect(res.status).toBe(422);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.message).toContain('projectId');
+    });
+
+    it('returns chapters for a project', async () => {
+      mockQueryDB.mockResolvedValueOnce([
+        { id: 'ch-1', project_id: 'proj-1', type: 'requirement', created_at: '2026-04-10T10:00:00Z', updated_at: '2026-04-10T10:00:00Z' },
+        { id: 'ch-2', project_id: 'proj-1', type: 'context', created_at: '2026-04-10T11:00:00Z', updated_at: '2026-04-10T11:00:00Z' },
+      ]);
+      const res = await require('supertest').default(app).get('/?projectId=proj-1');
+      expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({ success: true });
+      expect(res.body.data).toHaveLength(2);
+      expect(res.body.data[0]).toMatchObject({ id: 'ch-1', type: 'requirement' });
+    });
+
+    it('returns empty array if no chapters', async () => {
+      mockQueryDB.mockResolvedValueOnce([]);
+      const res = await require('supertest').default(app).get('/?projectId=proj-empty');
+      expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({ success: true, data: [] });
+    });
+
+    it('returns 500 on DB error', async () => {
+      mockQueryDB.mockRejectedValueOnce(new Error('DB error'));
+      const res = await require('supertest').default(app).get('/?projectId=proj-1');
+      expect(res.status).toBe(500);
+      expect(res.body.success).toBe(false);
+    });
+  });
+
+  describe('POST /chapters?projectId=xxx&type=xxx', () => {
+    it('returns 422 if projectId or type is missing', async () => {
+      const res1 = await require('supertest').default(app).post('/');
+      expect(res1.status).toBe(422);
+    });
+
+    it('returns 422 for invalid type', async () => {
+      const res = await require('supertest').default(app).post('/?projectId=proj-1&type=invalid');
+      expect(res.status).toBe(422);
+      expect(res.body.error.message).toContain('type');
+    });
+
+    it('creates a chapter with valid params', async () => {
+      mockExecuteDB.mockResolvedValueOnce({ meta: {} });
+      mockQueryOne.mockResolvedValueOnce({ id: 'ch-new', project_id: 'proj-1', type: 'flow', created_at: '2026-04-15T00:00:00Z', updated_at: '2026-04-15T00:00:00Z' });
+      const res = await require('supertest').default(app).post('/?projectId=proj-1&type=flow');
+      expect(res.status).toBe(201);
+      expect(res.body).toMatchObject({ success: true });
+      expect(res.body.data).toMatchObject({ projectId: 'proj-1', type: 'flow' });
+    });
+  });
+});

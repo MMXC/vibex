@@ -27,6 +27,7 @@ import wsHealth from './ws-health';
 import analytics from './analytics';
 import ddsCards from './dds/cards';
 import ddsRelations from './dds/relations';
+import ddsChapters from './dds/chapters';
 
 // 导入所有 API 路由
 import projects from '../projects';
@@ -257,6 +258,7 @@ protected_.route('/plan', plan);
 // DDS Canvas API — E2 Epic4
 protected_.route('/dds', ddsCards);
 protected_.route('/dds', ddsRelations);
+protected_.route('/dds', ddsChapters);
 
 // 将受保护的路由挂载到 v1 主路由
 v1.route('/', protected_);

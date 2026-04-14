@@ -17,6 +17,7 @@ import { z } from 'zod'
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db'
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const snapshots = new Hono<{ Bindings: Env }>()
 
@@ -81,7 +82,7 @@ snapshots.get('/', async (c) => {
     const offset = parseInt(c.req.query('offset') || '0')
 
     if (!projectId) {
-      return c.json({ error: 'Missing required query param: projectId' }, 400)
+      return         c.json(apiError('Missing required query param: projectId', ERROR_CODES.BAD_REQUEST), 400)
     }
 
     const env = c.env
@@ -116,7 +117,7 @@ snapshots.get('/', async (c) => {
     })
   } catch (err) {
     safeError('[canvas/snapshot] GET error:', err)
-    return c.json({ error: 'Failed to fetch snapshots' }, 500)
+    return         c.json(apiError('Failed to fetch snapshots', ERROR_CODES.INTERNAL_ERROR), 500)
   }
 })
 
@@ -131,7 +132,7 @@ snapshots.post('/', async (c) => {
     const parsed = CreateSnapshotSchema.safeParse(body)
 
     if (!parsed.success) {
-      return c.json({ error: 'Invalid request body', details: parsed.error.flatten() }, 400)
+      return         c.json(apiError('Invalid request body', ERROR_CODES.BAD_REQUEST), 400)
     }
 
     const { projectId, label, trigger, contextNodes, flowNodes, componentNodes, data: legacyData, isAutoSave, version: clientVersion } = parsed.data
@@ -140,7 +141,7 @@ snapshots.post('/', async (c) => {
     // Use projectId from request, or fall back to one in legacy data
     const resolvedProjectId = projectId || (legacyData as LegacySnapshotData)?.projectId
     if (!resolvedProjectId) {
-      return c.json({ error: 'Missing required field: projectId' }, 400)
+      return         c.json(apiError('Missing required field: projectId', ERROR_CODES.BAD_REQUEST), 400)
     }
 
     // Build the snapshot data object
@@ -225,7 +226,7 @@ snapshots.post('/', async (c) => {
     )
 
     if (!created) {
-      return c.json({ error: 'Failed to create snapshot' }, 500)
+      return         c.json(apiError('Failed to create snapshot', ERROR_CODES.INTERNAL_ERROR), 500)
     }
 
     // Parse stored data back to object
@@ -256,7 +257,7 @@ snapshots.post('/', async (c) => {
     }, 201)
   } catch (err) {
     safeError('[canvas/snapshots] POST error:', err)
-    return c.json({ error: 'Failed to create snapshot' }, 500)
+    return         c.json(apiError('Failed to create snapshot', ERROR_CODES.INTERNAL_ERROR), 500)
   }
 })
 
@@ -272,7 +273,7 @@ snapshots.get('/latest', async (c) => {
     const env = c.env
 
     if (!projectId) {
-      return c.json({ error: 'Missing required query param: projectId' }, 400)
+      return         c.json(apiError('Missing required query param: projectId', ERROR_CODES.BAD_REQUEST), 400)
     }
 
     const latest = await queryOne<{ version: number; createdAt: string }>(
@@ -288,7 +289,7 @@ snapshots.get('/latest', async (c) => {
     })
   } catch (err) {
     safeError('[canvas/snapshots] GET /latest error:', err)
-    return c.json({ error: 'Failed to fetch latest version' }, 500)
+    return         c.json(apiError('Failed to fetch latest version', ERROR_CODES.INTERNAL_ERROR), 500)
   }
 })
 
@@ -308,7 +309,7 @@ snapshots.get('/:id', async (c) => {
     )
 
     if (!snapshot) {
-      return c.json({ error: 'Snapshot not found' }, 404)
+      return         c.json(apiError('Snapshot not found', ERROR_CODES.NOT_FOUND), 404)
     }
 
     let parsedData: Record<string, any> = {}
@@ -337,7 +338,7 @@ snapshots.get('/:id', async (c) => {
     })
   } catch (err) {
     safeError('[canvas/snapshots] GET :id error:', err)
-    return c.json({ error: 'Failed to fetch snapshot' }, 500)
+    return         c.json(apiError('Failed to fetch snapshot', ERROR_CODES.INTERNAL_ERROR), 500)
   }
 })
 
@@ -359,7 +360,7 @@ snapshots.post('/:id/restore', async (c) => {
     )
 
     if (!targetSnapshot) {
-      return c.json({ error: 'Snapshot not found' }, 404)
+      return         c.json(apiError('Snapshot not found', ERROR_CODES.NOT_FOUND), 404)
     }
 
     const projectId = targetSnapshot.projectId
@@ -441,7 +442,7 @@ snapshots.post('/:id/restore', async (c) => {
     }, 201)
   } catch (err) {
     safeError('[canvas/snapshots] POST :id/restore error:', err)
-    return c.json({ error: 'Failed to restore snapshot' }, 500)
+    return         c.json(apiError('Failed to restore snapshot', ERROR_CODES.INTERNAL_ERROR), 500)
   }
 })
 

@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const collaboration = new Hono<{ Bindings: Env }>();
 
@@ -135,7 +136,7 @@ collaboration.get('/', async (c) => {
     });
   } catch (error) {
     safeError('Error fetching collaborations:', error);
-    return c.json({ error: 'Failed to fetch collaborations' }, 500);
+    return         c.json(apiError('Failed to fetch collaborations', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -171,13 +172,13 @@ collaboration.post('/', async (c) => {
     const { projectId, userId, userName, userEmail, role, invitedBy } = body;
 
     if (!projectId || !userId) {
-      return c.json({ error: 'Missing required fields: projectId, userId' }, 400);
+      return         c.json(apiError('Missing required fields: projectId, userId', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     // Validate role
     const validRoles: CollaboratorRole[] = ['owner', 'admin', 'editor', 'viewer'];
     if (role && !validRoles.includes(role)) {
-      return c.json({ error: `Invalid role. Must be one of: ${validRoles.join(', ')}` }, 400);
+      return c.json(apiError('Invalid role', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -250,7 +251,7 @@ collaboration.post('/', async (c) => {
     }, 201);
   } catch (error) {
     safeError('Error creating collaboration:', error);
-    return c.json({ error: 'Failed to create collaboration' }, 500);
+    return         c.json(apiError('Failed to create collaboration', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -265,13 +266,13 @@ collaboration.post('/invite', async (c) => {
     const { projectId, email, role, expiresIn, maxUses, invitedBy } = body;
 
     if (!projectId) {
-      return c.json({ error: 'Missing required field: projectId' }, 400);
+      return         c.json(apiError('Missing required field: projectId', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     // Validate role
     const validRoles: CollaboratorRole[] = ['admin', 'editor', 'viewer'];
     if (role && !validRoles.includes(role)) {
-      return c.json({ error: `Invalid role for invitation. Must be one of: ${validRoles.join(', ')}` }, 400);
+      return c.json(apiError('Invalid role for invitation', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -317,7 +318,7 @@ collaboration.post('/invite', async (c) => {
         );
 
         if (existing) {
-          return c.json({ error: 'User is already a collaborator', collaboration: existing }, 400);
+          return         c.json(apiError('User is already a collaborator', ERROR_CODES.BAD_REQUEST), 400);
         }
 
         // Create active collaboration
@@ -400,7 +401,7 @@ collaboration.post('/invite', async (c) => {
     }, 201);
   } catch (error) {
     safeError('Error creating invitation:', error);
-    return c.json({ error: 'Failed to create invitation' }, 500);
+    return         c.json(apiError('Failed to create invitation', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -421,7 +422,7 @@ collaboration.get('/invite/:token', async (c) => {
     );
 
     if (!invitation) {
-      return c.json({ error: 'Invitation not found or already used' }, 404);
+      return         c.json(apiError('Invitation not found or already used', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Check if expired (if we have expiration logic)
@@ -431,7 +432,7 @@ collaboration.get('/invite/:token', async (c) => {
       const daysSinceInvite = (now.getTime() - invitationDate.getTime()) / (1000 * 60 * 60 * 24);
       
       if (daysSinceInvite > 7) {
-        return c.json({ error: 'Invitation has expired' }, 410);
+        return         c.json(apiError('Invitation has expired', ERROR_CODES.INTERNAL_ERROR), 410);
       }
     }
 
@@ -446,7 +447,7 @@ collaboration.get('/invite/:token', async (c) => {
     });
   } catch (error) {
     safeError('Error fetching invitation:', error);
-    return c.json({ error: 'Failed to fetch invitation' }, 500);
+    return         c.json(apiError('Failed to fetch invitation', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -458,7 +459,7 @@ collaboration.post('/invite/:token/accept', async (c) => {
     const { userId, userName, userEmail } = body;
 
     if (!userId) {
-      return c.json({ error: 'Missing required field: userId' }, 400);
+      return         c.json(apiError('Missing required field: userId', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -472,7 +473,7 @@ collaboration.post('/invite/:token/accept', async (c) => {
     );
 
     if (!invitation) {
-      return c.json({ error: 'Invitation not found or already used' }, 404);
+      return         c.json(apiError('Invitation not found or already used', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Check if user already has access
@@ -555,7 +556,7 @@ collaboration.post('/invite/:token/accept', async (c) => {
     }, 201);
   } catch (error) {
     safeError('Error accepting invitation:', error);
-    return c.json({ error: 'Failed to accept invitation' }, 500);
+    return         c.json(apiError('Failed to accept invitation', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -570,7 +571,7 @@ collaboration.post('/batch', async (c) => {
     const { projectId, collaborators, invitedBy } = body;
 
     if (!projectId || !collaborators || !Array.isArray(collaborators)) {
-      return c.json({ error: 'Missing required fields: projectId, collaborators (array)' }, 400);
+      return         c.json(apiError('Missing required fields: projectId, collaborators (array)', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -645,7 +646,7 @@ collaboration.post('/batch', async (c) => {
     }, results.length > 0 ? 201 : 400);
   } catch (error) {
     safeError('Error batch adding collaborators:', error);
-    return c.json({ error: 'Failed to batch add collaborators' }, 500);
+    return         c.json(apiError('Failed to batch add collaborators', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -656,7 +657,7 @@ collaboration.post('/batch/invite', async (c) => {
     const { projectId, emails, role, invitedBy } = body;
 
     if (!projectId || !emails || !Array.isArray(emails)) {
-      return c.json({ error: 'Missing required fields: projectId, emails (array)' }, 400);
+      return         c.json(apiError('Missing required fields: projectId, emails (array)', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -763,7 +764,7 @@ collaboration.post('/batch/invite', async (c) => {
     }, 201);
   } catch (error) {
     safeError('Error batch creating invitations:', error);
-    return c.json({ error: 'Failed to batch create invitations' }, 500);
+    return         c.json(apiError('Failed to batch create invitations', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const messageId = new Hono<{ Bindings: Env }>();
 
@@ -33,13 +34,13 @@ messageId.get('/', async (c) => {
     );
 
     if (!message) {
-      return c.json({ error: 'Message not found' }, 404);
+      return         c.json(apiError('Message not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     return c.json({ message });
   } catch (error) {
     safeError('Error fetching message:', error);
-    return c.json({ error: 'Failed to fetch message' }, 500);
+    return         c.json(apiError('Failed to fetch message', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -54,7 +55,7 @@ messageId.delete('/', async (c) => {
     return c.json({ success: true });
   } catch (error) {
     safeError('Error deleting message:', error);
-    return c.json({ error: 'Failed to delete message' }, 500);
+    return         c.json(apiError('Failed to delete message', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

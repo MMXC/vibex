@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const prototypeSnapshotId = new Hono<{ Bindings: Env }>();
 
@@ -36,13 +37,13 @@ prototypeSnapshotId.get('/', async (c) => {
     );
 
     if (!snapshot) {
-      return c.json({ error: 'Prototype snapshot not found' }, 404);
+      return         c.json(apiError('Prototype snapshot not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     return c.json({ prototypeSnapshot: snapshot });
   } catch (error) {
     safeError('Error fetching prototype snapshot:', error);
-    return c.json({ error: 'Failed to fetch prototype snapshot' }, 500);
+    return         c.json(apiError('Failed to fetch prototype snapshot', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -95,7 +96,7 @@ prototypeSnapshotId.put('/', async (c) => {
     return c.json({ prototypeSnapshot: snapshot });
   } catch (error) {
     safeError('Error updating prototype snapshot:', error);
-    return c.json({ error: 'Failed to update prototype snapshot' }, 500);
+    return         c.json(apiError('Failed to update prototype snapshot', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -110,7 +111,7 @@ prototypeSnapshotId.delete('/', async (c) => {
     return c.json({ success: true });
   } catch (error) {
     safeError('Error deleting prototype snapshot:', error);
-    return c.json({ error: 'Failed to delete prototype snapshot' }, 500);
+    return         c.json(apiError('Failed to delete prototype snapshot', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

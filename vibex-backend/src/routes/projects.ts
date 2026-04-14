@@ -11,6 +11,7 @@ import { withValidation, ValidatedContext } from '@/lib/api-validation';
 import { createProjectSchema, updateProjectSchema } from '@/schemas/project';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const projects = new Hono<{ Bindings: Env }>();
 
@@ -65,7 +66,7 @@ projects.get('/', async (c) => {
     return c.json({ projects: projectsList });
   } catch (error) {
     safeError('Error fetching projects:', error);
-    return c.json({ error: 'Failed to fetch projects' }, 500);
+    return         c.json(apiError('Failed to fetch projects', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -89,7 +90,7 @@ projects.get('/trash', async (c) => {
     return c.json({ projects: projectsList });
   } catch (error) {
     safeError('Error fetching trash:', error);
-    return c.json({ error: 'Failed to fetch trash' }, 500);
+    return         c.json(apiError('Failed to fetch trash', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -105,7 +106,7 @@ projects.post('/',
 
       // Check D1 availability
       if (!env?.DB) {
-        return c.json({ error: 'Database unavailable' }, 503);
+        return         c.json(apiError('Database unavailable', ERROR_CODES.SERVICE_UNAVAILABLE), 503);
       }
 
       // Insert Project with default status 'draft' and version 1
@@ -133,7 +134,7 @@ projects.post('/',
       return c.json({ project }, 201);
     } catch (error) {
       safeError('Error creating project:', error);
-      return c.json({ error: 'Failed to create project' }, 500);
+      return         c.json(apiError('Failed to create project', ERROR_CODES.INTERNAL_ERROR), 500);
     }
   })
 );
@@ -153,7 +154,7 @@ projects.put('/:id',
 
       // Check D1 availability
       if (!env?.DB) {
-        return c.json({ error: 'Database unavailable' }, 503);
+        return         c.json(apiError('Database unavailable', ERROR_CODES.SERVICE_UNAVAILABLE), 503);
       }
 
       // Optimistic locking: check version matches
@@ -164,15 +165,11 @@ projects.put('/:id',
       );
 
       if (!existing) {
-        return c.json({ error: 'Project not found' }, 404);
+        return         c.json(apiError('Project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404);
       }
 
       if (version !== undefined && existing.version !== version) {
-        return c.json({ 
-          error: 'Version conflict - project has been modified',
-          code: 'VERSION_CONFLICT',
-          currentVersion: existing.version 
-        }, 409);
+        return         c.json(apiError('Version conflict - project has been modified', ERROR_CODES.CONFLICT), 409);
       }
 
       // Build dynamic update query
@@ -193,7 +190,7 @@ projects.put('/:id',
       }
 
       if (updates.length === 0) {
-        return c.json({ error: 'No fields to update' }, 400);
+        return         c.json(apiError('No fields to update', ERROR_CODES.BAD_REQUEST), 400);
       }
 
       // Increment version on update
@@ -219,7 +216,7 @@ projects.put('/:id',
       return c.json({ project: updated });
     } catch (error) {
       safeError('Error updating project:', error);
-      return c.json({ error: 'Failed to update project' }, 500);
+      return         c.json(apiError('Failed to update project', ERROR_CODES.INTERNAL_ERROR), 500);
     }
   })
 );
@@ -232,7 +229,7 @@ projects.delete('/:id', async (c) => {
 
     // Check D1 availability
     if (!env?.DB) {
-      return c.json({ error: 'Database unavailable' }, 503);
+      return         c.json(apiError('Database unavailable', ERROR_CODES.SERVICE_UNAVAILABLE), 503);
     }
 
     // Check project exists
@@ -243,7 +240,7 @@ projects.delete('/:id', async (c) => {
     );
 
     if (!existing) {
-      return c.json({ error: 'Project not found' }, 404);
+      return         c.json(apiError('Project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404);
     }
 
     // Soft delete: set deletedAt timestamp
@@ -257,7 +254,7 @@ projects.delete('/:id', async (c) => {
     return c.json({ success: true, message: 'Project moved to trash' });
   } catch (error) {
     safeError('Error deleting project:', error);
-    return c.json({ error: 'Failed to delete project' }, 500);
+    return         c.json(apiError('Failed to delete project', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

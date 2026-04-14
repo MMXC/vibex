@@ -10,6 +10,7 @@ import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 import { TYPES_PACKAGE_VERSION } from '@vibex/types'; // E3: @vibex/types reference
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const flowData = new Hono<{ Bindings: Env }>();
 
@@ -39,7 +40,7 @@ flowData.get('/', async (c) => {
       );
 
       if (!flow) {
-        return c.json({ error: 'Flow data not found' }, 404);
+        return         c.json(apiError('Flow data not found', ERROR_CODES.FLOW_NOT_FOUND), 404);
       }
 
       return c.json({ flowData: flow });
@@ -60,7 +61,7 @@ flowData.get('/', async (c) => {
     return c.json({ flowDataList: flowsList });
   } catch (error) {
     safeError('Error fetching flow data:', error);
-    return c.json({ error: 'Failed to fetch flow data' }, 500);
+    return         c.json(apiError('Failed to fetch flow data', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -71,7 +72,7 @@ flowData.post('/', async (c) => {
     const { name, nodes, edges, projectId } = body;
 
     if (!projectId) {
-      return c.json({ error: 'Missing required field: projectId' }, 400);
+      return         c.json(apiError('Missing required field: projectId', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -93,7 +94,7 @@ flowData.post('/', async (c) => {
     return c.json({ flowData: flow }, 201);
   } catch (error) {
     safeError('Error creating flow data:', error);
-    return c.json({ error: 'Failed to create flow data' }, 500);
+    return         c.json(apiError('Failed to create flow data', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -110,13 +111,13 @@ flowData.get('/:id', async (c) => {
     );
 
     if (!flow) {
-      return c.json({ error: 'Flow data not found' }, 404);
+      return         c.json(apiError('Flow data not found', ERROR_CODES.FLOW_NOT_FOUND), 404);
     }
 
     return c.json({ flowData: flow });
   } catch (error) {
     safeError('Error fetching flow data:', error);
-    return c.json({ error: 'Failed to fetch flow data' }, 500);
+    return         c.json(apiError('Failed to fetch flow data', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -136,7 +137,7 @@ flowData.put('/:id', async (c) => {
     );
 
     if (!existing) {
-      return c.json({ error: 'Flow data not found' }, 404);
+      return         c.json(apiError('Flow data not found', ERROR_CODES.FLOW_NOT_FOUND), 404);
     }
 
     const now = new Date().toISOString();
@@ -177,7 +178,7 @@ flowData.put('/:id', async (c) => {
     return c.json({ flowData: flow });
   } catch (error) {
     safeError('Error updating flow data:', error);
-    return c.json({ error: 'Failed to update flow data' }, 500);
+    return         c.json(apiError('Failed to update flow data', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -195,7 +196,7 @@ flowData.delete('/:id', async (c) => {
     );
 
     if (!existing) {
-      return c.json({ error: 'Flow data not found' }, 404);
+      return         c.json(apiError('Flow data not found', ERROR_CODES.FLOW_NOT_FOUND), 404);
     }
 
     await executeDB(env, 'DELETE FROM FlowData WHERE id = ?', [id]);
@@ -203,7 +204,7 @@ flowData.delete('/:id', async (c) => {
     return c.json({ success: true, message: 'Flow data deleted successfully' });
   } catch (error) {
     safeError('Error deleting flow data:', error);
-    return c.json({ error: 'Failed to delete flow data' }, 500);
+    return         c.json(apiError('Failed to delete flow data', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

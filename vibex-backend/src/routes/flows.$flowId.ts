@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const flowId = new Hono<{ Bindings: Env }>();
 
@@ -35,13 +36,13 @@ flowId.get('/', async (c) => {
     );
 
     if (!flow) {
-      return c.json({ error: 'Flow not found' }, 404);
+      return         c.json(apiError('Flow not found', ERROR_CODES.FLOW_NOT_FOUND), 404);
     }
 
     return c.json({ flow });
   } catch (error) {
     safeError('Error fetching flow:', error);
-    return c.json({ error: 'Failed to fetch flow' }, 500);
+    return         c.json(apiError('Failed to fetch flow', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -91,7 +92,7 @@ flowId.put('/', async (c) => {
     return c.json({ flow });
   } catch (error) {
     safeError('Error updating flow:', error);
-    return c.json({ error: 'Failed to update flow' }, 500);
+    return         c.json(apiError('Failed to update flow', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -106,7 +107,7 @@ flowId.delete('/', async (c) => {
     return c.json({ success: true });
   } catch (error) {
     safeError('Error deleting flow:', error);
-    return c.json({ error: 'Failed to delete flow' }, 500);
+    return         c.json(apiError('Failed to delete flow', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

@@ -12,6 +12,7 @@ import { planAnalyzeSchema, INJECTION_KEYWORDS } from '../schemas/security'  // 
 import { generateId, Env } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
 import { debug, sanitize, safeError } from '@/lib/log-sanitizer'
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const plan = new Hono<{ Bindings: Env }>();
 
@@ -105,7 +106,7 @@ plan.post('/analyze', async (c) => {
     const body = await c.req.json()
     const parsed = PlanAnalyzeRequestSchema.safeParse(body)
     if (!parsed.success) {
-      return c.json({ error: 'Invalid request body', details: parsed.error.flatten() }, 400)
+      return         c.json(apiError('Invalid request body', ERROR_CODES.BAD_REQUEST), 400)
     }
     const { requirement } = parsed.data
 

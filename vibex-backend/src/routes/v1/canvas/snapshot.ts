@@ -17,6 +17,7 @@ import { z } from 'zod'
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db'
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const snapshot = new Hono<{ Bindings: Env }>()
 
@@ -65,7 +66,7 @@ snapshot.get('/', async (c) => {
     const offset = parseInt(c.req.query('offset') || '0')
 
     if (!projectId) {
-      return c.json({ error: 'Missing required query param: projectId' }, 400)
+      return         c.json(apiError('Missing required query param: projectId', ERROR_CODES.BAD_REQUEST), 400)
     }
 
     const env = c.env
@@ -100,7 +101,7 @@ snapshot.get('/', async (c) => {
     })
   } catch (err) {
     safeError('[canvas/snapshot] GET error:', err)
-    return c.json({ error: 'Failed to fetch snapshots' }, 500)
+    return         c.json(apiError('Failed to fetch snapshots', ERROR_CODES.INTERNAL_ERROR), 500)
   }
 })
 
@@ -115,7 +116,7 @@ snapshot.post('/', async (c) => {
     const parsed = CreateSnapshotSchema.safeParse(body)
 
     if (!parsed.success) {
-      return c.json({ error: 'Invalid request body', details: parsed.error.flatten() }, 400)
+      return         c.json(apiError('Invalid request body', ERROR_CODES.BAD_REQUEST), 400)
     }
 
     const { projectId, name, description, data, isAutoSave } = parsed.data
@@ -155,7 +156,7 @@ snapshot.post('/', async (c) => {
     )
 
     if (!created) {
-      return c.json({ error: 'Failed to create snapshot' }, 500)
+      return         c.json(apiError('Failed to create snapshot', ERROR_CODES.INTERNAL_ERROR), 500)
     }
 
     return c.json({
@@ -168,7 +169,7 @@ snapshot.post('/', async (c) => {
     }, 201)
   } catch (err) {
     safeError('[canvas/snapshot] POST error:', err)
-    return c.json({ error: 'Failed to create snapshot' }, 500)
+    return         c.json(apiError('Failed to create snapshot', ERROR_CODES.INTERNAL_ERROR), 500)
   }
 })
 

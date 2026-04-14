@@ -10,6 +10,7 @@ import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 import { TYPES_PACKAGE_VERSION } from '@vibex/types'; // E3: @vibex/types reference
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const domainEntities = new Hono<{ Bindings: Env }>();
 
@@ -52,7 +53,7 @@ domainEntities.get('/', async (c) => {
     return c.json({ domainEntities: entities });
   } catch (error) {
     safeError('Error fetching domain entities:', error);
-    return c.json({ error: 'Failed to fetch domain entities' }, 500);
+    return         c.json(apiError('Failed to fetch domain entities', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -63,7 +64,7 @@ domainEntities.post('/', async (c) => {
     const { projectId, name, type, description, properties, requirementId } = body;
 
     if (!projectId || !name || !type) {
-      return c.json({ error: 'Missing required fields: projectId, name, type' }, 400);
+      return         c.json(apiError('Missing required fields: projectId, name, type', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -85,7 +86,7 @@ domainEntities.post('/', async (c) => {
     return c.json({ domainEntity: entity }, 201);
   } catch (error) {
     safeError('Error creating domain entity:', error);
-    return c.json({ error: 'Failed to create domain entity' }, 500);
+    return         c.json(apiError('Failed to create domain entity', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

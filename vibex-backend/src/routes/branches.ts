@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const branches = new Hono<{ Bindings: Env }>();
 
@@ -55,7 +56,7 @@ branches.get('/', async (c) => {
     return c.json({ branches: branchesList });
   } catch (error) {
     safeError('Error fetching branches:', error);
-    return c.json({ error: 'Failed to fetch branches' }, 500);
+    return         c.json(apiError('Failed to fetch branches', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -66,7 +67,7 @@ branches.post('/', async (c) => {
     const { name, description, parentId, rootMessageId, metadata, projectId } = body;
 
     if (!projectId) {
-      return c.json({ error: 'Missing required field: projectId' }, 400);
+      return         c.json(apiError('Missing required field: projectId', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -98,7 +99,7 @@ branches.post('/', async (c) => {
     return c.json({ branch }, 201);
   } catch (error) {
     safeError('Error creating branch:', error);
-    return c.json({ error: 'Failed to create branch' }, 500);
+    return         c.json(apiError('Failed to create branch', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

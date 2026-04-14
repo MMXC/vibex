@@ -10,6 +10,7 @@ import { queryOne, executeDB, Env } from '@/lib/db';
 import { getAuthUserFromHono } from '@/lib/auth';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const projectId = new Hono<{ Bindings: Env }>();
 
@@ -36,13 +37,13 @@ projectId.get('/', async (c) => {
     );
 
     if (!project) {
-      return c.json({ error: 'Project not found' }, 404);
+      return         c.json(apiError('Project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404);
     }
 
     return c.json({ project });
   } catch (error) {
     safeError('Error fetching project:', error);
-    return c.json({ error: 'Failed to fetch project' }, 500);
+    return         c.json(apiError('Failed to fetch project', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -69,7 +70,7 @@ projectId.patch('/soft-delete', async (c) => {
     return c.json({ project });
   } catch (error) {
     safeError('Error soft-deleting project:', error);
-    return c.json({ error: 'Failed to soft-delete project' }, 500);
+    return         c.json(apiError('Failed to soft-delete project', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -96,7 +97,7 @@ projectId.patch('/restore', async (c) => {
     return c.json({ project });
   } catch (error) {
     safeError('Error restoring project:', error);
-    return c.json({ error: 'Failed to restore project' }, 500);
+    return         c.json(apiError('Failed to restore project', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -111,7 +112,7 @@ projectId.delete('/permanent', async (c) => {
     return c.json({ success: true });
   } catch (error) {
     safeError('Error permanently deleting project:', error);
-    return c.json({ error: 'Failed to permanently delete project' }, 500);
+    return         c.json(apiError('Failed to permanently delete project', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -157,7 +158,7 @@ projectId.put('/', async (c) => {
     return c.json({ project });
   } catch (error) {
     safeError('Error updating project:', error);
-    return c.json({ error: 'Failed to update project' }, 500);
+    return         c.json(apiError('Failed to update project', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -182,7 +183,7 @@ projectId.delete('/', async (c) => {
     return c.json({ success: true });
   } catch (error) {
     safeError('Error deleting project:', error);
-    return c.json({ error: 'Failed to delete project' }, 500);
+    return         c.json(apiError('Failed to delete project', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

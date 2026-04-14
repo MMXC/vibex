@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const requirementId = new Hono<{ Bindings: Env }>();
 
@@ -36,13 +37,13 @@ requirementId.get('/', async (c) => {
     );
 
     if (!requirement) {
-      return c.json({ error: 'Requirement not found' }, 404);
+      return         c.json(apiError('Requirement not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     return c.json({ requirement });
   } catch (error) {
     safeError('Error fetching requirement:', error);
-    return c.json({ error: 'Failed to fetch requirement' }, 500);
+    return         c.json(apiError('Failed to fetch requirement', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -96,7 +97,7 @@ requirementId.put('/', async (c) => {
     return c.json({ requirement });
   } catch (error) {
     safeError('Error updating requirement:', error);
-    return c.json({ error: 'Failed to update requirement' }, 500);
+    return         c.json(apiError('Failed to update requirement', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -111,7 +112,7 @@ requirementId.delete('/', async (c) => {
     return c.json({ success: true });
   } catch (error) {
     safeError('Error deleting requirement:', error);
-    return c.json({ error: 'Failed to delete requirement' }, 500);
+    return         c.json(apiError('Failed to delete requirement', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

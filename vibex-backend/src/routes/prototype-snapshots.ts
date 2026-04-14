@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const prototypeSnapshots = new Hono<{ Bindings: Env }>();
 
@@ -43,7 +44,7 @@ prototypeSnapshots.get('/', async (c) => {
     return c.json({ prototypeSnapshots: snapshots });
   } catch (error) {
     safeError('Error fetching prototype snapshots:', error);
-    return c.json({ error: 'Failed to fetch prototype snapshots' }, 500);
+    return         c.json(apiError('Failed to fetch prototype snapshots', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -54,7 +55,7 @@ prototypeSnapshots.post('/', async (c) => {
     const { projectId, name, description, content, version } = body;
 
     if (!projectId || !content) {
-      return c.json({ error: 'Missing required fields: projectId, content' }, 400);
+      return         c.json(apiError('Missing required fields: projectId, content', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -84,7 +85,7 @@ prototypeSnapshots.post('/', async (c) => {
     return c.json({ prototypeSnapshot: snapshot }, 201);
   } catch (error) {
     safeError('Error creating prototype snapshot:', error);
-    return c.json({ error: 'Failed to create prototype snapshot' }, 500);
+    return         c.json(apiError('Failed to create prototype snapshot', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

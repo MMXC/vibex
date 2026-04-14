@@ -18,6 +18,7 @@ import { Hono } from 'hono';
 import { queryDB, queryOne, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const requirementsExport = new Hono<{ Bindings: Env }>();
 
@@ -555,7 +556,7 @@ requirementsExport.get('/:projectId/export', async (c) => {
     );
 
     if (!project) {
-      return c.json({ error: 'Project not found' }, 404);
+      return         c.json(apiError('Project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404);
     }
 
     // Fetch requirements
@@ -597,7 +598,7 @@ requirementsExport.get('/:projectId/export', async (c) => {
     });
   } catch (error) {
     safeError('Error exporting requirements:', error);
-    return c.json({ error: 'Failed to export requirements' }, 500);
+    return         c.json(apiError('Failed to export requirements', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

@@ -19,6 +19,7 @@ import { Hono } from 'hono';
 import { queryDB, queryOne, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const prototypeExport = new Hono<{ Bindings: Env }>();
 
@@ -463,7 +464,7 @@ prototypeExport.post('/', async (c) => {
     } = body;
 
     if (!projectId) {
-      return c.json({ error: 'Missing required field: projectId' }, 400);
+      return         c.json(apiError('Missing required field: projectId', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -476,7 +477,7 @@ prototypeExport.post('/', async (c) => {
     );
 
     if (!project) {
-      return c.json({ error: 'Project not found' }, 404);
+      return         c.json(apiError('Project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404);
     }
 
     const options: ExportOptions = {
@@ -524,7 +525,7 @@ prototypeExport.post('/', async (c) => {
     });
   } catch (error) {
     safeError('Error exporting prototype:', error);
-    return c.json({ error: 'Failed to export prototype' }, 500);
+    return         c.json(apiError('Failed to export prototype', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -538,7 +539,7 @@ prototypeExport.get('/:projectId', async (c) => {
     const env = c.env;
 
     if (!projectId) {
-      return c.json({ error: 'Missing projectId parameter' }, 400);
+      return         c.json(apiError('Missing projectId parameter', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     // Fetch project info and counts
@@ -549,7 +550,7 @@ prototypeExport.get('/:projectId', async (c) => {
     );
 
     if (!project) {
-      return c.json({ error: 'Project not found' }, 404);
+      return         c.json(apiError('Project not found', ERROR_CODES.PROJECT_NOT_FOUND), 404);
     }
 
     // Get counts for export options
@@ -594,7 +595,7 @@ prototypeExport.get('/:projectId', async (c) => {
     });
   } catch (error) {
     safeError('Error fetching export metadata:', error);
-    return c.json({ error: 'Failed to fetch export metadata' }, 500);
+    return         c.json(apiError('Failed to fetch export metadata', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

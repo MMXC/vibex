@@ -17,6 +17,7 @@ import { z } from 'zod'
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db'
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const rollback = new Hono<{ Bindings: Env }>()
 
@@ -57,7 +58,7 @@ rollback.get('/', async (c) => {
     const versionStr = c.req.query('version')
 
     if (!projectId) {
-      return c.json({ error: 'Missing required query param: projectId' }, 400)
+      return         c.json(apiError('Missing required query param: projectId', ERROR_CODES.BAD_REQUEST), 400)
     }
 
     if (versionStr) {
@@ -104,7 +105,7 @@ rollback.get('/', async (c) => {
     })
   } catch (err) {
     safeError('[canvas/rollback] GET error:', err)
-    return c.json({ error: 'Failed to fetch rollback info' }, 500)
+    return         c.json(apiError('Failed to fetch rollback info', ERROR_CODES.INTERNAL_ERROR), 500)
   }
 })
 
@@ -119,7 +120,7 @@ rollback.post('/', async (c) => {
     const parsed = RollbackSchema.safeParse(body)
 
     if (!parsed.success) {
-      return c.json({ error: 'Invalid request body', details: parsed.error.flatten() }, 400)
+      return         c.json(apiError('Invalid request body', ERROR_CODES.BAD_REQUEST), 400)
     }
 
     const { projectId, targetVersion, createBackup } = parsed.data
@@ -214,7 +215,7 @@ rollback.post('/', async (c) => {
     }, 201)
   } catch (err) {
     safeError('[canvas/rollback] POST error:', err)
-    return c.json({ error: 'Failed to perform rollback' }, 500)
+    return         c.json(apiError('Failed to perform rollback', ERROR_CODES.INTERNAL_ERROR), 500)
   }
 })
 

@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const prototypeCollaboration = new Hono<{ Bindings: Env }>();
 
@@ -64,7 +65,7 @@ prototypeCollaboration.get('/', async (c) => {
     return c.json({ prototypeCollaborations: collaborations });
   } catch (error) {
     safeError('Error fetching prototype collaborations:', error);
-    return c.json({ error: 'Failed to fetch prototype collaborations' }, 500);
+    return         c.json(apiError('Failed to fetch prototype collaborations', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -125,7 +126,7 @@ prototypeCollaboration.get('/users/:projectId', async (c) => {
     });
   } catch (error) {
     safeError('Error fetching project users:', error);
-    return c.json({ error: 'Failed to fetch project users' }, 500);
+    return         c.json(apiError('Failed to fetch project users', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -136,7 +137,7 @@ prototypeCollaboration.post('/', async (c) => {
     const { projectId, userId, userName, userEmail, role, invitedBy } = body;
 
     if (!projectId || !userId) {
-      return c.json({ error: 'Missing required fields: projectId, userId' }, 400);
+      return         c.json(apiError('Missing required fields: projectId, userId', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -197,7 +198,7 @@ prototypeCollaboration.post('/', async (c) => {
     return c.json({ prototypeCollaboration: collaboration }, 201);
   } catch (error) {
     safeError('Error creating prototype collaboration:', error);
-    return c.json({ error: 'Failed to create prototype collaboration' }, 500);
+    return         c.json(apiError('Failed to create prototype collaboration', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -208,7 +209,7 @@ prototypeCollaboration.post('/invite', async (c) => {
     const { projectId, email, role, invitedBy } = body;
 
     if (!projectId || !email) {
-      return c.json({ error: 'Missing required fields: projectId, email' }, 400);
+      return         c.json(apiError('Missing required fields: projectId, email', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -231,7 +232,7 @@ prototypeCollaboration.post('/invite', async (c) => {
       );
 
       if (existing) {
-        return c.json({ error: 'User is already a collaborator', existingCollaboration: existing }, 400);
+        return         c.json(apiError('User is already a collaborator', ERROR_CODES.BAD_REQUEST), 400);
       }
 
       // Create active collaboration directly
@@ -299,7 +300,7 @@ prototypeCollaboration.post('/invite', async (c) => {
     }
   } catch (error) {
     safeError('Error inviting user to prototype:', error);
-    return c.json({ error: 'Failed to invite user to prototype' }, 500);
+    return         c.json(apiError('Failed to invite user to prototype', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -310,7 +311,7 @@ prototypeCollaboration.post('/batch', async (c) => {
     const { projectId, collaborators, invitedBy } = body;
 
     if (!projectId || !collaborators || !Array.isArray(collaborators)) {
-      return c.json({ error: 'Missing required fields: projectId, collaborators (array)' }, 400);
+      return         c.json(apiError('Missing required fields: projectId, collaborators (array)', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -381,7 +382,7 @@ prototypeCollaboration.post('/batch', async (c) => {
     }, results.length > 0 ? 201 : 400);
   } catch (error) {
     safeError('Error batch adding collaborators:', error);
-    return c.json({ error: 'Failed to batch add collaborators' }, 500);
+    return         c.json(apiError('Failed to batch add collaborators', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

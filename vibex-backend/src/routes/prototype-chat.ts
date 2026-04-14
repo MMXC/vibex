@@ -10,6 +10,7 @@ import { getAuthUserFromHono } from '@/lib/auth';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const prototypeChat = new Hono<{ Bindings: Env }>();
 
@@ -163,7 +164,7 @@ prototypeChat.get('/', async (c) => {
     return c.json({ conversations: result });
   } catch (error) {
     safeError('Error fetching prototype conversations:', error);
-    return c.json({ error: 'Failed to fetch conversations' }, 500);
+    return         c.json(apiError('Failed to fetch conversations', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -184,14 +185,14 @@ prototypeChat.post('/', async (c) => {
     const model = env.MINIMAX_MODEL || 'abab6.5s-chat';
 
     if (!apiKey) {
-      return c.json({ error: 'MINIMAX_API_KEY is not configured' }, 500);
+      return         c.json(apiError('MINIMAX_API_KEY is not configured', ERROR_CODES.AI_SERVICE_ERROR), 500);
     }
 
     const body = await c.req.json();
     const { message, conversationId, prototypeId, clearContext } = body;
 
     if (!message) {
-      return c.json({ error: 'Message is required' }, 400);
+      return         c.json(apiError('Message is required', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     let convId = conversationId;
@@ -335,12 +336,12 @@ prototypeChat.get('/:id', async (c) => {
     );
 
     if (!conversation) {
-      return c.json({ success: false, error: 'Conversation not found', code: 'NOT_FOUND' }, 404);
+      return c.json(apiError('Conversation not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Only allow users to get their own conversations
     if (conversation.userId !== auth.userId) {
-      return c.json({ success: false, error: 'Forbidden', code: 'FORBIDDEN' }, 403);
+      return c.json(apiError('Forbidden', ERROR_CODES.FORBIDDEN), 403);
     }
 
     return c.json({
@@ -356,7 +357,7 @@ prototypeChat.get('/:id', async (c) => {
     });
   } catch (error) {
     safeError('Error fetching prototype conversation:', error);
-    return c.json({ error: 'Failed to fetch conversation' }, 500);
+    return         c.json(apiError('Failed to fetch conversation', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -381,12 +382,12 @@ prototypeChat.delete('/:id', async (c) => {
     );
 
     if (!existing) {
-      return c.json({ success: false, error: 'Conversation not found', code: 'NOT_FOUND' }, 404);
+      return c.json(apiError('Conversation not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Only allow users to delete their own conversations
     if (existing.userId !== auth.userId) {
-      return c.json({ success: false, error: 'Forbidden', code: 'FORBIDDEN' }, 403);
+      return c.json(apiError('Forbidden', ERROR_CODES.FORBIDDEN), 403);
     }
 
     await executeDB(env, 'DELETE FROM Conversation WHERE id = ?', [id]);
@@ -394,7 +395,7 @@ prototypeChat.delete('/:id', async (c) => {
     return c.json({ success: true, message: 'Conversation deleted' });
   } catch (error) {
     safeError('Error deleting prototype conversation:', error);
-    return c.json({ error: 'Failed to delete conversation' }, 500);
+    return         c.json(apiError('Failed to delete conversation', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

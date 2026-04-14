@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryDB, queryOne, executeDB, generateId, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const requirements = new Hono<{ Bindings: Env }>();
 
@@ -43,7 +44,7 @@ requirements.get('/', async (c) => {
     return c.json({ requirements: requirementsList });
   } catch (error) {
     safeError('Error fetching requirements:', error);
-    return c.json({ error: 'Failed to fetch requirements' }, 500);
+    return         c.json(apiError('Failed to fetch requirements', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -54,7 +55,7 @@ requirements.post('/', async (c) => {
     const { projectId, rawInput, parsedData, status, priority } = body;
 
     if (!projectId || !rawInput) {
-      return c.json({ error: 'Missing required fields: projectId, rawInput' }, 400);
+      return         c.json(apiError('Missing required fields: projectId, rawInput', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -76,7 +77,7 @@ requirements.post('/', async (c) => {
     return c.json({ requirement }, 201);
   } catch (error) {
     safeError('Error creating requirement:', error);
-    return c.json({ error: 'Failed to create requirement' }, 500);
+    return         c.json(apiError('Failed to create requirement', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

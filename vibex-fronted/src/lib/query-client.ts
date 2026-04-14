@@ -10,6 +10,7 @@
  */
 
 import { QueryClient } from '@tanstack/react-query';
+import { mutationErrorHandler, registerToastHandler } from './api-error-handler';
 
 // ==================== 统一缓存配置 ====================
 
@@ -49,8 +50,18 @@ export const queryClient = new QueryClient({
     mutations: {
       // 失败后重试 2 次
       retry: CACHE_CONFIG.MUTATION_RETRY,
+      // 注意: 全局 onError 由 api-error-handler.ts mutationErrorHandler 提供
+      // 组件中请使用: useMutation({ onError: mutationErrorHandler })
     },
   },
+});
+
+// 注册全局 toast 处理器 (Unit 10)
+// TODO: 集成 sonner 或 imperative toast 后替换 console.warn
+registerToastHandler((message: string, type?: 'error' | 'warning' | 'info') => {
+  // 临时: console.warn 输出，生产环境应替换为 sonner/toast 库
+  const prefix = type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
+  console.warn(`${prefix} [api-error-handler] ${message}`);
 });
 
 // 导出 QueryClient 实例类型

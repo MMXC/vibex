@@ -20,6 +20,7 @@
 
 import { Hono } from 'hono';
 import { CloudflareEnv } from '../../../lib/env';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const stream_ = new Hono<{ Bindings: CloudflareEnv }>();
 
@@ -27,7 +28,7 @@ stream_.get('/', async (c) => {
   const requirement = c.req.query('requirement');
 
   if (!requirement || requirement.trim().length === 0) {
-    return c.json({ error: 'requirement query parameter is required' }, 400);
+    return         c.json(apiError('requirement query parameter is required', ERROR_CODES.BAD_REQUEST), 400);
   }
 
   const env = c.env as CloudflareEnv;

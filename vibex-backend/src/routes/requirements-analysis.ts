@@ -20,6 +20,7 @@ import { queryOne, queryDB, executeDB, generateId, Env } from '@/lib/db';
 import { createLLMService, LLMService, ChatMessage } from '@/services/llm';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const requirementsAnalysis = new Hono<{ Bindings: Env }>();
 
@@ -297,7 +298,7 @@ requirementsAnalysis.post('/', async (c) => {
     const { requirementId, forceReanalyze } = body;
 
     if (!requirementId) {
-      return c.json({ error: 'Missing required field: requirementId' }, 400);
+      return         c.json(apiError('Missing required field: requirementId', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const env = c.env;
@@ -310,15 +311,12 @@ requirementsAnalysis.post('/', async (c) => {
     );
 
     if (!requirement) {
-      return c.json({ error: 'Requirement not found' }, 404);
+      return         c.json(apiError('Requirement not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Check if already analyzed (unless force reanalyze)
     if (requirement.status === 'confirmed' && !forceReanalyze) {
-      return c.json({
-        error: 'Requirement already confirmed. Use forceReanalyze=true to re-analyze.',
-        requirement,
-      }, 400);
+      return         c.json(apiError('Requirement already confirmed. Use forceReanalyze=true to re-analyze.', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     // Update status to analyzing
@@ -441,10 +439,7 @@ Extract all domain entities, their relationships, and provide a structured analy
   } catch (error) {
     safeError('Error analyzing requirement:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return c.json({ 
-      error: 'Failed to analyze requirement', 
-      details: errorMessage 
-    }, 500);
+    return         c.json(apiError('Failed to analyze requirement', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -465,7 +460,7 @@ requirementsAnalysis.post('/batch', async (c) => {
     const { requirementIds, stopOnError } = body;
 
     if (!requirementIds || !Array.isArray(requirementIds) || requirementIds.length === 0) {
-      return c.json({ error: 'Missing or invalid field: requirementIds (must be a non-empty array)' }, 400);
+      return         c.json(apiError('Missing or invalid field: requirementIds (must be a non-empty array)', ERROR_CODES.BAD_REQUEST), 400);
     }
 
     const results: Array<{
@@ -644,7 +639,7 @@ Extract all domain entities, their relationships, and provide a structured analy
 
   } catch (error) {
     safeError('Error in batch analysis:', error);
-    return c.json({ error: 'Failed to perform batch analysis' }, 500);
+    return         c.json(apiError('Failed to perform batch analysis', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -670,7 +665,7 @@ requirementsAnalysis.get('/:requirementId', async (c) => {
     );
 
     if (!requirement) {
-      return c.json({ error: 'Requirement not found' }, 404);
+      return         c.json(apiError('Requirement not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Parse analysis result from parsedData
@@ -713,7 +708,7 @@ requirementsAnalysis.get('/:requirementId', async (c) => {
 
   } catch (error) {
     safeError('Error fetching analysis:', error);
-    return c.json({ error: 'Failed to fetch analysis' }, 500);
+    return         c.json(apiError('Failed to fetch analysis', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -736,7 +731,7 @@ requirementsAnalysis.delete('/:requirementId', async (c) => {
     );
 
     if (!requirement) {
-      return c.json({ error: 'Requirement not found' }, 404);
+      return         c.json(apiError('Requirement not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Delete existing analysis
@@ -757,7 +752,7 @@ requirementsAnalysis.delete('/:requirementId', async (c) => {
 
   } catch (error) {
     safeError('Error deleting analysis:', error);
-    return c.json({ error: 'Failed to delete analysis' }, 500);
+    return         c.json(apiError('Failed to delete analysis', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

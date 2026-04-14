@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryOne, executeDB, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const branchId = new Hono<{ Bindings: Env }>();
 
@@ -37,13 +38,13 @@ branchId.get('/', async (c) => {
     );
 
     if (!branch) {
-      return c.json({ error: 'Branch not found' }, 404);
+      return         c.json(apiError('Branch not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     return c.json({ branch });
   } catch (error) {
     safeError('Error fetching branch:', error);
-    return c.json({ error: 'Failed to fetch branch' }, 500);
+    return         c.json(apiError('Failed to fetch branch', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -101,7 +102,7 @@ branchId.put('/', async (c) => {
     return c.json({ branch });
   } catch (error) {
     safeError('Error updating branch:', error);
-    return c.json({ error: 'Failed to update branch' }, 500);
+    return         c.json(apiError('Failed to update branch', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -116,7 +117,7 @@ branchId.delete('/', async (c) => {
     return c.json({ success: true });
   } catch (error) {
     safeError('Error deleting branch:', error);
-    return c.json({ error: 'Failed to delete branch' }, 500);
+    return         c.json(apiError('Failed to delete branch', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

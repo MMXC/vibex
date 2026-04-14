@@ -9,6 +9,7 @@ import { Hono } from 'hono';
 import { queryOne, executeDB, generateId, Env } from '@/lib/db';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const prototypeVersionId = new Hono<{ Bindings: Env }>();
 
@@ -39,13 +40,13 @@ prototypeVersionId.get('/', async (c) => {
     );
 
     if (!versionRecord) {
-      return c.json({ error: 'Prototype version not found' }, 404);
+      return         c.json(apiError('Prototype version not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     return c.json({ prototypeVersion: versionRecord });
   } catch (error) {
     safeError('Error fetching prototype version:', error);
-    return c.json({ error: 'Failed to fetch prototype version' }, 500);
+    return         c.json(apiError('Failed to fetch prototype version', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -65,7 +66,7 @@ prototypeVersionId.put('/', async (c) => {
     );
 
     if (!existing) {
-      return c.json({ error: 'Prototype version not found' }, 404);
+      return         c.json(apiError('Prototype version not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     const updates: string[] = [];
@@ -109,7 +110,7 @@ prototypeVersionId.put('/', async (c) => {
     return c.json({ prototypeVersion: versionRecord });
   } catch (error) {
     safeError('Error updating prototype version:', error);
-    return c.json({ error: 'Failed to update prototype version' }, 500);
+    return         c.json(apiError('Failed to update prototype version', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -127,7 +128,7 @@ prototypeVersionId.delete('/', async (c) => {
     );
 
     if (!existing) {
-      return c.json({ error: 'Prototype version not found' }, 404);
+      return         c.json(apiError('Prototype version not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     await executeDB(env, 'DELETE FROM PrototypeVersion WHERE id = ?', [id]);
@@ -135,7 +136,7 @@ prototypeVersionId.delete('/', async (c) => {
     return c.json({ success: true });
   } catch (error) {
     safeError('Error deleting prototype version:', error);
-    return c.json({ error: 'Failed to delete prototype version' }, 500);
+    return         c.json(apiError('Failed to delete prototype version', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -155,7 +156,7 @@ prototypeVersionId.post('/restore', async (c) => {
     );
 
     if (!existing) {
-      return c.json({ error: 'Prototype version not found' }, 404);
+      return         c.json(apiError('Prototype version not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Get the next version number
@@ -197,7 +198,7 @@ prototypeVersionId.post('/restore', async (c) => {
     return c.json({ prototypeVersion: restoredVersion }, 201);
   } catch (error) {
     safeError('Error restoring prototype version:', error);
-    return c.json({ error: 'Failed to restore prototype version' }, 500);
+    return         c.json(apiError('Failed to restore prototype version', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -217,7 +218,7 @@ prototypeVersionId.post('/duplicate', async (c) => {
     );
 
     if (!existing) {
-      return c.json({ error: 'Prototype version not found' }, 404);
+      return         c.json(apiError('Prototype version not found', ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Get the next version number
@@ -259,7 +260,7 @@ prototypeVersionId.post('/duplicate', async (c) => {
     return c.json({ prototypeVersion: duplicatedVersion }, 201);
   } catch (error) {
     safeError('Error duplicating prototype version:', error);
-    return c.json({ error: 'Failed to duplicate prototype version' }, 500);
+    return         c.json(apiError('Failed to duplicate prototype version', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

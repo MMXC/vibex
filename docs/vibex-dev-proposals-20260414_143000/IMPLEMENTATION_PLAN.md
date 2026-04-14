@@ -628,3 +628,11 @@ M frontend test files (9)              — 语法 bug 修复
 - CI Quality Gate: 前后端均有 pre-existing TS 错误，建议专项清理
 
 *Implementation Record | Dev Agent | 2026-04-14*
+
+### 追加修复记录
+**时间**: 2026-04-14 14:42
+**提交**: `e1b1a8e6`
+**修复**: api-retry.test.ts ESM/CJS 不兼容问题
+**内容**: 将 `require('../circuit-breaker')` 改为 ESM import，与 circuit-breaker 模块兼容
+**验证**: `pnpm exec vitest run src/lib/__tests__/api-retry.test.ts` — 11 passed ✅
+

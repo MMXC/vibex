@@ -6,8 +6,9 @@
 - **docs/templates/gate-criteria.md**: 评审Gate标准，明确推荐/不推荐/有条件推荐判断条件
 - **scripts/sla-monitor.py**: SLA超时监控脚本，支持dry-run和Slack通知
 - **scripts/analysis-lint.py**: analysis.md合规性检查脚本（结论/风险/估算检查）
-- **skills/team-tasks/scripts/task_manager.py**: claim时自动设置sla_deadline(+24h)和proposal_id，status显示SLA列
-- 验证: pnpm build ✅，task_manager SLA/proposal-id 函数测试 ✅，analysis-lint 检测正常 ✅
+- 验证: pnpm build ✅，analysis-lint 检测正常 ✅（sla-monitor.py dry-run 验证通过）
+
+> ℹ️ task_manager.py 的 sla_deadline/proposal_id 功能在 `openclaw` repo `5453725` 单独提交，不在本 Epic 范围内。
 
 ### Added (vibex-design-component-library Epic2-Stories: generate-catalog 脚本测试 19 例) — 2026-04-14
 - **tests/unit/generate-catalog.test.ts**: 19 个测试用例

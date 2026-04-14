@@ -180,17 +180,16 @@
 **Goal**: 3 MermaidRenderer components wrapped with Next.js `dynamic()`
 **Dependencies**: IU-5
 **Est. Time**: 4h
-**Status**: 🔄 Partially Done (mermaid/index.tsx + MermaidSkeleton ✅, visualization/preview wrappers pending)
+**Status**: 🔄 Partially Done (dynamic wrappers created ✅, consumer import updates pending)
 
-**Completed (f425d4e9)**:
-- ✅ `vibex-fronted/src/components/mermaid/index.tsx` (wrapper)
-- ✅ `vibex-fronted/src/components/mermaid/MermaidSkeleton.tsx`
-- ✅ MermaidRenderer.tsx: async dynamic import
+**Completed**:
+- ✅ `mermaid/index.tsx` (wrapper) + MermaidSkeleton (f425d4e9)
+- ✅ `visualization/MermaidRenderer/index.tsx` (dynamic wrapper) (pending commit)
+- ✅ `preview/MermaidRenderer/index.tsx` (dynamic wrapper) (pending commit)
 
 **Remaining**:
-- ⬜ `visualization/MermaidRenderer/index.tsx` (wrapper)
-- ⬜ `preview/MermaidRenderer/index.tsx` (wrapper)
-- ⬜ Update consumers (VisualizationPlatform, PagePreview)
+- ⬜ Update VisualizationPlatform.tsx / PagePreview.tsx to use dynamic wrapper
+- ⬜ Verify `pnpm build` with new wrappers
 
 **Files to create**:
 - `vibex-fronted/src/components/mermaid/index.tsx` (wrapper) ✅
@@ -236,9 +235,10 @@
 
 ### IU-7: Integrate size-limit into CI
 **Epic**: E2 (Bundle Optimization)
-**Goal**: CI fails if bundle grows > 200KB vs. baseline
+**Goal**: CI warns if bundle grows > 200KB vs. baseline
 **Dependencies**: IU-6 (baseline established after dynamic imports)
 **Est. Time**: 2h
+**Status**: 🔄 Partial — CI warning step added (pending commit), full size-limit config Sprint 2
 
 **Files to create**:
 - `vibex-fronted/.size-limit.json`

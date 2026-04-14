@@ -188,3 +188,14 @@ jobs:
             echo "❌ E2E tests failed"; exit 1;
           fi
           echo "✅ All gates passed"
+
+      - name: Bundle size check (warning)
+        run: |
+          # Check if .next/static chunks are reasonable
+          if [ -d ".next/static/chunks" ]; then
+            LARGEST=$(find .next/static/chunks -name "*.js" -exec du -k {} + 2>/dev/null | sort -rn | head -1 | cut -f1)
+            echo "Largest chunk: ${LARGEST}KB"
+            if [ "${LARGEST:-0}" -gt 500 ]; then
+              echo "::warning::Largest chunk exceeds 500KB — consider dynamic imports"
+            fi
+          fi

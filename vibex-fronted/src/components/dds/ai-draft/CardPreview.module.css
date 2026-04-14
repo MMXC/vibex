@@ -1,0 +1,122 @@
+/* CardPreview — AI Card Preview with Action Buttons
+ * Epic 3: F15
+ */
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--color-bg-secondary, #1f2937);
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border, #374151);
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cardItem {
+  background: var(--color-bg-primary, #111827);
+  border: 1px solid var(--color-border, #374151);
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  transition: border-color 0.15s ease;
+}
+
+.cardItem:hover {
+  border-color: var(--color-border-hover, #4b5563);
+}
+
+/* Action Buttons */
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border, #374151);
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
+  line-height: 1;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btnAccept {
+  background: var(--color-primary, #3B82F6);
+  color: #ffffff;
+}
+
+.btnAccept:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.btnEdit {
+  background: var(--color-bg-tertiary, #374151);
+  color: var(--color-text-primary, #f9fafb);
+  border: 1px solid var(--color-border, #374151);
+}
+
+.btnEdit:hover:not(:disabled) {
+  background: var(--color-border-hover, #4b5563);
+  border-color: var(--color-border-hover, #4b5563);
+}
+
+.btnRetry {
+  background: transparent;
+  color: var(--color-text-secondary, #9ca3af);
+  border: 1px solid var(--color-border, #374151);
+}
+
+.btnRetry:hover:not(:disabled) {
+  color: var(--color-text-primary, #f9fafb);
+  border-color: var(--color-border-hover, #4b5563);
+  background: var(--color-bg-tertiary, #374151);
+}
+
+/* Empty State */
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--color-text-muted, #8a8a9a);
+  font-size: 0.875rem;
+}
+
+/* Count Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-tertiary, #374151);
+  color: var(--color-text-secondary, #9ca3af);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.125rem 0.5rem;
+  margin-left: auto;
+}

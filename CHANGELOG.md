@@ -1,3 +1,10 @@
+### [Unreleased] vibex-dds-canvas Epic3: AI Draft Flow — 2026-04-15
+- **vibex-fronted/src/components/dds/ai-draft/AIDraftDrawer.tsx**: F14 滑出抽屉 + 状态机（20 tests）
+- **vibex-fronted/src/components/dds/ai-draft/CardPreview.tsx**: F15 AI 卡片预览 + accept/edit/retry 按钮（15 tests）
+- AI Draft 状态机：IDLE → LOADING → PREVIEW | ERROR（组件级，不进 store）
+- 复用 ai-client.ts，30s 超时，accept → ddsChapterActions.addCard()
+- ESLint 0 errors，35 tests passing
+
 ### [Unreleased] vibex-dds-canvas Epic2: 横向 Scroll-Snap Canvas 布局 — 2026-04-15
 - **vibex-fronted/src/components/dds/canvas/DDSScrollContainer.tsx**: F10 横向 Scroll-Snap 容器（19 tests）
 - **vibex-fronted/src/components/dds/canvas/DDSPanel.tsx**: F11 面板展开/收起动画（80px ↔ flex:1）

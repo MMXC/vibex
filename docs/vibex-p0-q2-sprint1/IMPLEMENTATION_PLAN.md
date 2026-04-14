@@ -80,7 +80,7 @@ grep -rn "new Response.*'" routes/ | grep -v "apiError"
 
 ---
 
-- [ ] **Unit 4: E2 Dashboard Fuzzy Search**
+- [x] **Unit 4: E2 Dashboard Fuzzy Search **✅ (SearchBar + debounce, pm-proposals)**
 
 **Goal:** 搜索组件，debounce 300ms。
 
@@ -102,7 +102,7 @@ grep -rn "new Response.*'" routes/ | grep -v "apiError"
 
 ---
 
-- [ ] **Unit 5: E3 TabBar Phase 对齐**
+- [ ] **Unit 5: E3 TabBar Phase **(deferred Sprint 2) 对齐**
 
 **Goal:** TabBar 行为与 PhaseNavigator 对称。
 
@@ -118,7 +118,7 @@ grep -rn "new Response.*'" routes/ | grep -v "apiError"
 
 ---
 
-- [ ] **Unit 6: E5 ClarificationCard 组件**
+- [x] **Unit 6: E5 ClarificationCard **✅ (ClarificationCard.tsx, pm-proposals) 组件**
 
 **Goal:** 从 ClarificationDialog 提取 ClarificationCard，支持对话流内嵌。
 

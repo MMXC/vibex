@@ -36,7 +36,7 @@
 
 ---
 
-- [ ] **Unit 2: E4 apiError() 工具函数**
+- [x] **Unit 2: E4 apiError() (✅ DONE — f459a3c6) 工具函数**
 
 **Goal:** 实现统一 API 错误处理函数。
 

@@ -1,3 +1,5 @@
+- **feat(E3)**: IU-9 naming-conventions.md ✅, IU-10 TODO grep CI ✅ (faa1ffb3)
+
 - **task_manager.py**: add review subcommand for reviewer task management (93a3c60e)
 - **apiError()**: E5 统一 API 错误处理 (f459a3c6)
 

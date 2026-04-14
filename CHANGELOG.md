@@ -29,6 +29,13 @@
 - **docs/vibex-architect-proposals-20260414_143000/architecture-evolution.md**: 架构演进规划文档
 - 提交: `0ddf460b`
 
+### Added (vibex-dev-proposals-20260414_143000 E1: CI质量门禁) — 2026-04-14
+- **.github/workflows/test.yml**: Frontend tsc --noEmit 加入 CI，Backend tsc --noEmit 加入 CI
+- **.husky/pre-commit**: Husky pre-commit hook
+- **vibex-fronted/src/lib/__tests__/api-retry.test.ts**: ESM import 修复 (e1b1a8e6)
+- 提交: `a805bc0f`, `054c3044`, `e1b1a8e6`
+- 注: Backend 173 TS 错误为历史债务，另专项处理
+
 ### Added (vibex-dev-proposals-20260414_143000 E2: Mermaid Dynamic Import) — 2026-04-14
 - **MermaidRenderer**: 改为 Next.js dynamic() 动态导入，~350KB 不进入初始 bundle
 - **MermaidSkeleton.tsx**: 轻量 CSS skeleton 占位符（加载动画 + "加载图表组件…"）

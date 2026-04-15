@@ -1,5 +1,17 @@
 ### [Unreleased] vibex-dev-proposals-20260414 Epic5: 长期规划 — 2026-04-15
 
+### [Unreleased] vibex-qa-canvas-dashboard: Sprint 2 QA 验收 — 2026-04-15
+- **Q1-E5-E2E验收**: `e2e/canvas-project-creation.spec.ts` E2E 测试文件已创建（blocked: Zustand skipHydration）
+  - 单元测试 `ProjectCreationStep.test.tsx` 7/7 passing (TC-E5-01~07)
+  - `canvas-project-creation.spec.ts` E2E 文件已创建，等待 Zustand skipHydration 修复后运行
+  - Commits: #169bf680, #956b8667
+- **Q2-E1-TabState验收**: Tab State 验收复用 `canvas-tab-state.spec.ts`（已在 vibex-fix-canvas-bugs Bug2 中覆盖）
+  - `useCanvasPanels.test.ts` 5/5 passing
+  - Commit: #bc34f0a6
+- **Q3-E6-三树持久化验收**: Canvas store rehydration hook 实现 + 测试
+  - `useRehydrateCanvasStores.test.ts` 4/4 passing (TC-E6-01~04)
+  - Commits: #cfb780c4, #8ec8c422, #8ea96dcf, #4b2a349c
+
 ### [Unreleased] Bug Fixes — 2026-04-15
 - **vibex-fix-canvas-bugs Bug1 (B1-U1+U2)**: DDS API 404 修复
   - `/api/v1/dds/*` 404 导致画布崩溃

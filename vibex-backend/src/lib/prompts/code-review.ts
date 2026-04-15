@@ -1132,26 +1132,5 @@ export default {
   generateMarkdownReport,
 };
 
-/**
- * Generate security warnings for code analysis based on AST scanning.
- */
-export function generateSecurityWarnings(code: string): string {
-  const report = analyzeCodeSecurity(code);
-  if (!report.hasUnsafe) {
-    return '';
-  }
-
-  const warnings: string[] = ['[Security Warning] Potentially unsafe code patterns detected:'];
-
-  if (report.unsafeEval.length > 0) {
-    warnings.push(`  - eval() calls: ${report.unsafeEval.join(', ')}`);
-  }
-  if (report.unsafeNewFunction.length > 0) {
-    warnings.push(`  - new Function(): ${report.unsafeNewFunction.join(', ')}`);
-  }
-  if (report.unsafeDynamicCode.length > 0) {
-    warnings.push(`  - Dynamic code execution: ${report.unsafeDynamicCode.join(', ')}`);
-  }
-
-  return warnings.join('\n');
-}
+// Re-export generateSecurityWarnings from the single canonical implementation
+export { generateSecurityWarnings } from '@/lib/security/codeAnalyzer';

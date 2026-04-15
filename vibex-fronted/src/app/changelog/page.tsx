@@ -20,6 +20,15 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.240',
+    date: '2026-04-16',
+    changes: [
+      '🌲 E4: 三树持久化 — serialize.ts 三树序列化 + useProjectLoader 自动加载最新快照 + CanvasPage 集成',
+      '✅ 10/10 PASS (serialize.test.ts 100% 覆盖率)',
+    ],
+    commit: 'dab897c0',
+  },
+  {
     version: '1.0.239',
     date: '2026-04-16',
     changes: [

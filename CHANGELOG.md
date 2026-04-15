@@ -1,3 +1,14 @@
+### [Unreleased] vibex-dev-proposals-20260414 Epic5: 长期规划 — 2026-04-15
+- **docs/vibex-dev-proposals-20260414_143000/SPRINT2_ROADMAP.md**: Sprint 2 完整路线图（148行）
+  - S2-1: size-limit CI（IU-7 延续，2h）
+  - S2-2: @next/bundle-analyzer 集成（1h）
+  - S2-3: Backend TypeScript Debt Clearance（6-8h）
+  - S2-4: Hooks/Store 规范深化（3h）
+  - S2-5: Backend Husky lint-staged Full Setup
+  - 执行计划: Week1 Foundation + Week2 Polish（14-16h total）
+  - Vitest 迁移方案: Sprint 2 → Sprint 3 分阶段（24h+，高风险）
+  - 认证中间件规划: ~12h，依赖 Architect P0-3 路由重组
+
 ### [Unreleased] vibex-dev-proposals-20260414 Epic4: 安全基线 — 2026-04-15
 - **vibex-backend/eslint.config.mjs**: 修复 no-console 规则，移除 log（之前错误允许）
 - **.husky/pre-commit**: 替换 pnpm-install 桩脚本为真正的 console.log/debug/error 检查器

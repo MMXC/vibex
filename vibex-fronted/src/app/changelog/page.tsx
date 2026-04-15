@@ -20,6 +20,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.231',
+    date: '2026-04-15',
+    changes: [
+      '🔬 E5-U1: Sprint 2 QA TC-E5-04~07 测试扩展',
+      '✅ 7/7 PASS — handleCreate + flowMachine + router.push 覆盖',
+    ],
+    commit: '169bf680',
+  },
+
+  {
     version: '1.0.230',
     date: '2026-04-15',
     changes: [

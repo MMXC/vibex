@@ -1,14 +1,17 @@
 /**
  * ProjectCreationStep - Epic 5: Project Creation
- * 
+ *
  * Final step - project metadata and creation
  */
 
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useMachine } from '@xstate/react';
 import { flowMachine, FlowEvent } from '../flow-container/flowMachine';
+import { projectApi } from '@/services/api/modules/project';
+import { useAuthStore } from '@/stores/authStore';
 import styles from './ProjectCreationStep.module.css';
 
 const TECH_STACKS = [
@@ -21,12 +24,15 @@ const TECH_STACKS = [
 ];
 
 export function ProjectCreationStep() {
+  const router = useRouter();
   const [state, send] = useMachine(flowMachine);
   const [projectName, setProjectName] = useState(state.context.projectMeta.name);
   const [projectDesc, setProjectDesc] = useState(state.context.projectMeta.description);
   const [selectedStack, setSelectedStack] = useState<string[]>(state.context.projectMeta.techStack);
   const [isCreating, setIsCreating] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [createdProjectId, setCreatedProjectId] = useState<string | null>(null);
 
   const toggleStack = (id: string) => {
     const newStack = selectedStack.includes(id)
@@ -38,29 +44,44 @@ export function ProjectCreationStep() {
 
   const handleCreate = async () => {
     if (!projectName.trim()) return;
-    
     setIsCreating(true);
-    
-    // Save project metadata
-    send({
-      type: 'SET_PROJECT_META',
-      meta: {
+    setError(null);
+
+    const userId = useAuthStore.getState().user?.id;
+    if (!userId) {
+      setError('请先登录');
+      setIsCreating(false);
+      return;
+    }
+
+    try {
+      const created = await projectApi.createProject({
         name: projectName,
         description: projectDesc,
-        techStack: selectedStack,
-        createdAt: new Date().toISOString(),
-      },
-    });
+        userId,
+      });
 
-    // Simulate project creation
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsCreating(false);
-    setIsComplete(true);
-    send({ type: 'SAVE' } satisfies FlowEvent);
+      send({
+        type: 'SET_PROJECT_META',
+        meta: {
+          name: projectName,
+          description: projectDesc,
+          techStack: selectedStack,
+          createdAt: new Date().toISOString(),
+        },
+      });
+
+      setCreatedProjectId(created.id);
+      setIsCreating(false);
+      setIsComplete(true);
+      send({ type: 'SAVE' } satisfies FlowEvent);
+    } catch (err) {
+      setIsCreating(false);
+      setError(err instanceof Error ? err.message : '创建失败，请重试');
+    }
   };
 
-  if (isComplete) {
+  if (isComplete && createdProjectId) {
     return (
       <div className={styles.container}>
         <div className={styles.successCard}>
@@ -75,7 +96,12 @@ export function ProjectCreationStep() {
               <span className={styles.detailValue}>{selectedStack.join(', ')}</span>
             </div>
           </div>
-          <button className={styles.viewBtn}>View Project →</button>
+          <button
+            className={styles.viewBtn}
+            onClick={() => router.push(`/project?id=${createdProjectId}`)}
+          >
+            View Project →
+          </button>
         </div>
       </div>
     );
@@ -91,6 +117,21 @@ export function ProjectCreationStep() {
       </div>
 
       <div className={styles.form}>
+        {error && (
+          <div className={styles.errorBanner} role="alert">
+            <span className={styles.errorIcon}>⚠</span>
+            <span className={styles.errorText}>{error}</span>
+            <button
+              type="button"
+              className={styles.errorClose}
+              onClick={() => setError(null)}
+              aria-label="关闭"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         <div className={styles.field}>
           <label className={styles.label}>Project Name *</label>
           <input

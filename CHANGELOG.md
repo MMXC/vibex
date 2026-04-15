@@ -19,6 +19,25 @@
   - 新增: `ImportService` — parseJSON/parseYAML/parseFile/roundTripTest
   - 新增: `ImportPanel` — 文件上传、解析预览、Round-trip 状态、确认导入
   - 新增: `ImportService.test.ts` — 13 测试用例覆盖所有解析路径
+  - 修复: `validateFileSize()` — 5MB 文件大小限制
+  - 新增: `useCanvasExport.test.ts` — 3 validateFileSize 测试 + 1 YAML 测试
+  - 依赖: `js-yaml` ^4.1.0
+  - 提交: `ef90882a` (feat) / `96c04ed7` (fix)
+
+### [Unreleased] vibex-sprint2-20260415 E4: 三树持久化 — 2026-04-16
+- **E4-U1+U2+U3+U4 三树数据持久化**
+  - 新增: `serialize.ts` — serializeThreeTrees/deserializeThreeTrees/restoreStore
+  - 新增: `useProjectLoader` hook — Canvas 挂载时自动加载最新快照并恢复三树
+  - 新增: `CanvasPage` 集成 — auto-load project on canvas open
+  - 新增: `serialize.test.ts` — 5 测试用例
+  - 确认: D1 Migration `data TEXT` 字段支持 JSON 存储
+  - 提交: `dab897c0` (feat)
+
+- **E3-U1+U2+U3 导入导出**: JSON/YAML 导出 + 导入 + Round-trip 验证
+  - 新增: `useCanvasExport` + `ExportMenu` — 支持 JSON/YAML 格式导出
+  - 新增: `ImportService` — parseJSON/parseYAML/parseFile/roundTripTest
+  - 新增: `ImportPanel` — 文件上传、解析预览、Round-trip 状态、确认导入
+  - 新增: `ImportService.test.ts` — 13 测试用例覆盖所有解析路径
   - 依赖: `js-yaml` ^4.1.0
   - 提交: `ef90882a` (feat)
 

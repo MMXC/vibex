@@ -3,6 +3,16 @@
 - **.husky/pre-commit**: 替换 pnpm-install 桩脚本为真正的 console.log/debug/error 检查器
   - 扫描 vibex-backend/src/（排除 __tests__/、*.test.ts、log-sanitizer.ts、logger.ts）
   - 拦截包含 console.log/debug/error 的非测试文件提交
+### [Unreleased] vibex-dev-proposals-20260414 Epic5: 长期规划 — 2026-04-15
+- **docs/vibex-dev-proposals-20260414_143000/SPRINT2_ROADMAP.md** (new): Sprint 2 长期规划文档
+  - S2-1: size-limit CI (IU-7 延续)
+  - S2-2: @next/bundle-analyzer 集成
+  - S2-3: Backend TypeScript Debt Clearance
+  - S2-4: Hooks/Store 规范深化
+  - S2-5: Backend Husky lint-staged Full Setup
+  - 总工时估算: 14-16h
+- **docs/.../IMPLEMENTATION_PLAN.md**: append Sprint 2 section
+
 
 ### [Unreleased] vibex-dds-canvas Epic6: E2E 测试套件 — 2026-04-15
 - **vibex-fronted/tests/e2e/dds-canvas-e2e.spec.ts**: F25/F26/F27 Playwright E2E 测试（522行）

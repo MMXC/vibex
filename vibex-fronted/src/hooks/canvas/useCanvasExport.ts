@@ -49,6 +49,17 @@ interface UseCanvasExportReturn {
 }
 
 const DEFAULT_BG_COLOR = '#0f0f1a'; // 深色背景匹配主题
+const MAX_EXPORT_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+
+/**
+ * 验证导出文件大小不超过 5MB
+ * @throws Error 超过限制时抛出
+ */
+export function validateFileSize(blob: Blob): void {
+  if (blob.size > MAX_EXPORT_SIZE_BYTES) {
+    throw new Error(`文件大小 ${(blob.size / 1024 / 1024).toFixed(2)}MB 超过 5MB 限制`);
+  }
+}
 
 /**
  * Trigger browser download from data URL or text blob
@@ -225,17 +236,20 @@ export function useCanvasExport(): UseCanvasExportReturn {
           const data = buildCanvasExportData(scope);
           const json = JSON.stringify(data, null, 2);
           const blob = new Blob([json], { type: 'application/json' });
+          validateFileSize(blob);
           const filename = `${filenamePrefix}-${scope}-${timestamp}.json`;
           downloadBlob(blob, filename);
         } else if (format === 'yaml') {
           const data = buildCanvasExportData(scope);
           const yamlStr = yaml.dump(data, { indent: 2, lineWidth: -1 });
           const blob = new Blob([yamlStr], { type: 'text/yaml;charset=utf-8' });
+          validateFileSize(blob);
           const filename = `${filenamePrefix}-${scope}-${timestamp}.yaml`;
           downloadBlob(blob, filename);
         } else {
           const markdown = buildCanvasMarkdown(scope);
           const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
+          validateFileSize(blob);
           const filename = `${filenamePrefix}-${scope}-${timestamp}.md`;
           downloadBlob(blob, filename);
         }

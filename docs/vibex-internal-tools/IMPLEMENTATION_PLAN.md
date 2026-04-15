@@ -234,3 +234,37 @@ Phase 1 (E1) ──→ Phase 2 (E2) ──→ Phase 3 (E3) ──→ Phase 4 (E4
 
 **注意**: Phase 1 和 Phase 2 可并行（不同文件，无依赖）。
 Phase 3 需在 Phase 1/2 之后执行（避免脚本被删除后无法运行）。
+
+---
+
+## 7. E1-Reviewer-Dedup Fix
+
+**问题**: `wake_downstream` 在下游依赖完成时错误地重新激活 `in-progress` 状态的任务，导致虚假触发（spurious triggers）。
+
+**根因**: `task_manager.py` 中 `wake_downstream` 函数只检查 `done` 状态，对 `in-progress` 任务也执行激活逻辑。
+
+**修复位置**: `skills/team-tasks/scripts/task_manager.py` 第 736 行附近
+
+**修复内容**:
+```python
+# 修复前
+if not all_deps_done:
+    continue
+old_status = task["status"]
+task["status"] = "ready"
+
+# 修复后
+if not all_deps_done:
+    continue
+# Skip in-progress tasks — they are already being worked on
+if task["status"] == "in-progress":
+    continue
+old_status = task["status"]
+task["status"] = "ready"
+```
+
+**验证**: 
+- [x] `pytest skills/team-tasks/scripts/tests/test_dedup.py` 全通过
+- [x] `wake_downstream` 不再改变 `in-progress` 任务状态
+
+**状态**: ✅ done (2026-04-15)

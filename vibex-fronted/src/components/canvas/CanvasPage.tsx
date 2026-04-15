@@ -69,6 +69,7 @@ import { FlowTreePanel } from './panels/FlowTreePanel';
 import { ComponentTreePanel } from './panels/ComponentTreePanel';
 import { ShortcutPanel } from './features/ShortcutPanel';
 import { VersionHistoryPanel } from './features/VersionHistoryPanel';
+import { ImportPanel } from './features/ImportPanel';
 import { SaveIndicator } from './features/SaveIndicator';
 import { PhaseIndicator } from './features/PhaseIndicator';
 import { TemplateSelector } from './features/TemplateSelector';
@@ -499,6 +500,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
 
   // === E2.1: TemplateSelector state ===
   const [templateOpen, setTemplateOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
 
   // === E2.2: PhaseIndicator is read-only (PhaseIndicator.tsx manages its own open/close) ===
 
@@ -549,6 +551,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             onZoomReset={stateHandlers.handleZoomReset}
             onOpenHistory={versionHistory.open}
             onOpenShortcuts={eventHandlers.toggleShortcutPanel}
+            onImportClick={() => setIsImportOpen(true)}
           />
           {/* E3-S2: Save Indicator — shows auto-save status */}
           <SaveIndicator
@@ -855,6 +858,12 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
       <VersionHistoryPanel
         open={versionHistory.isOpen}
         onClose={versionHistory.close}
+      />
+
+      {/* E3-U3: Import Panel */}
+      <ImportPanel
+        open={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
       />
 
       {/* E4: Canvas Guidance System — removed 2026-04-01 */}

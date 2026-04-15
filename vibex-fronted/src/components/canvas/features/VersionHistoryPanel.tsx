@@ -10,8 +10,11 @@
  */
 
 import React, { useCallback, useState } from 'react';
+import type { CanvasSnapshot } from '@/lib/canvas/types';
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
+import { computeSnapshotDiff } from '@/lib/canvas/snapshotDiff';
 import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
+import { SnapshotDiffView } from './SnapshotDiffView';
 import styles from './VersionHistoryPanel.module.css';
 
 interface VersionHistoryPanelProps {
@@ -44,6 +47,29 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
   const [creating, setCreating] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const [restoreError, setRestoreError] = useState<string | null>(null);
+
+  // Compare mode state
+  const [compareSnapshots, setCompareSnapshots] = useState<CanvasSnapshot[]>([]);
+  const [diffResult, setDiffResult] = useState<ReturnType<typeof computeSnapshotDiff> | null>(null);
+
+  // Check if a snapshot is in compare list
+  const isInCompare = (snap: CanvasSnapshot) =>
+    compareSnapshots.some(s => s.snapshotId === snap.snapshotId);
+
+  // Toggle compare selection
+  const toggleCompare = (snap: CanvasSnapshot) => {
+    setDiffResult(null);
+    if (isInCompare(snap)) {
+      setCompareSnapshots(prev => prev.filter(s => s.snapshotId !== snap.snapshotId));
+    } else {
+      if (compareSnapshots.length < 2) {
+        setCompareSnapshots(prev => [...prev, snap]);
+      } else {
+        // Replace oldest
+        setCompareSnapshots([compareSnapshots[1], snap]);
+      }
+    }
+  };
 
   // Sync with parent open state
   React.useEffect(() => {
@@ -158,97 +184,146 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
           </div>
         )}
 
-        {/* Snapshot list */}
-        <div className={styles.list}>
-          {loading ? (
-            <div className={styles.emptyState}>
-              <span className={styles.spinner} aria-hidden="true" />
-              <span>加载中...</span>
-            </div>
-          ) : snapshots.length === 0 ? (
-            hookError?.includes('请先创建项目') ? (
-              <div className={styles.emptyState}>
-                <span aria-hidden="true">🗺️</span>
-                <span>请先创建项目</span>
-                <span className={styles.emptyHint}>
-                  {hookError}
-                </span>
-              </div>
-            ) : (
-              <div className={styles.emptyState}>
-                <span aria-hidden="true">📭</span>
-                <span>暂无版本记录</span>
-                <span className={styles.emptyHint}>
-                  点击「保存当前版本」创建第一个快照
-                </span>
-              </div>
-            )
-          ) : (
-            snapshots.map((snap) => (
-              <div
-                key={snap.snapshotId}
-                className={`${styles.snapshotCard} ${
-                  selectedSnapshot?.snapshotId === snap.snapshotId
-                    ? styles.snapshotCardSelected
-                    : ''
-                }`}
-                onClick={() =>
-                  selectSnapshot(
-                    selectedSnapshot?.snapshotId === snap.snapshotId
-                      ? null
-                      : snap
-                  )
-                }
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    selectSnapshot(
+        {/* Diff view */}
+        {diffResult && compareSnapshots.length === 2 ? (
+          <SnapshotDiffView
+            diff={diffResult}
+            labelA={compareSnapshots[0].label}
+            labelB={compareSnapshots[1].label}
+            onBack={() => setDiffResult(null)}
+          />
+        ) : (
+          <>
+            {/* Snapshot list */}
+            <div className={styles.list}>
+              {loading ? (
+                <div className={styles.emptyState}>
+                  <span className={styles.spinner} aria-hidden="true" />
+                  <span>加载中...</span>
+                </div>
+              ) : snapshots.length === 0 ? (
+                hookError?.includes('请先创建项目') ? (
+                  <div className={styles.emptyState}>
+                    <span aria-hidden="true">🗺️</span>
+                    <span>请先创建项目</span>
+                    <span className={styles.emptyHint}>
+                      {hookError}
+                    </span>
+                  </div>
+                ) : (
+                  <div className={styles.emptyState}>
+                    <span aria-hidden="true">📭</span>
+                    <span>暂无版本记录</span>
+                    <span className={styles.emptyHint}>
+                      点击「保存当前版本」创建第一个快照
+                    </span>
+                  </div>
+                )
+              ) : (
+                snapshots.map((snap) => (
+                  <div
+                    key={snap.snapshotId}
+                    className={`${styles.snapshotCard} ${
+                      styles.snapshotCardRelative
+                    } ${
                       selectedSnapshot?.snapshotId === snap.snapshotId
-                        ? null
-                        : snap
-                    );
-                  }
-                }}
-                data-testid={`snapshot-item-${snap.snapshotId}`}
-              >
-                <div className={styles.snapshotHeader}>
-                  <span className={styles.snapshotTrigger}>
-                    {TRIGGER_LABELS[snap.trigger] ?? snap.trigger}
-                  </span>
-                  <span className={styles.snapshotTime}>
-                    {formatDate(snap.createdAt)}
-                  </span>
+                        ? styles.snapshotCardSelected
+                        : ''
+                    } ${
+                      isInCompare(snap) ? styles.snapshotCardCompareSelected : ''
+                    }`}
+                    onClick={() =>
+                      selectSnapshot(
+                        selectedSnapshot?.snapshotId === snap.snapshotId
+                          ? null
+                          : snap
+                      )
+                    }
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        selectSnapshot(
+                          selectedSnapshot?.snapshotId === snap.snapshotId
+                            ? null
+                            : snap
+                        );
+                      }
+                    }}
+                    data-testid={`snapshot-item-${snap.snapshotId}`}
+                  >
+                    <div className={styles.snapshotHeader}>
+                      <span className={styles.snapshotTrigger}>
+                        {TRIGGER_LABELS[snap.trigger] ?? snap.trigger}
+                      </span>
+                      <span className={styles.snapshotTime}>
+                        {formatDate(snap.createdAt)}
+                      </span>
+                    </div>
+
+                    <div className={styles.snapshotLabel}>{snap.label}</div>
+
+                    <div className={styles.cardLeft}>
+                      <input
+                        type="checkbox"
+                        className={styles.compareCheckbox}
+                        checked={isInCompare(snap)}
+                        onChange={() => toggleCompare(snap)}
+                        onClick={(e) => e.stopPropagation()}
+                        aria-label={`选择 ${snap.label} 用于对比`}
+                      />
+                    </div>
+
+                    <div className={styles.snapshotStats}>
+                      <span title="限界上下文">◇ {snap.contextCount}</span>
+                      <span title="业务流程">→ {snap.flowCount}</span>
+                      <span title="组件">▣ {snap.componentCount}</span>
+                    </div>
+
+                    {/* Restore button — shown when card is selected */}
+                    {selectedSnapshot?.snapshotId === snap.snapshotId && (
+                      <button
+                        type="button"
+                        className={styles.restoreBtn}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRestore(snap.snapshotId);
+                        }}
+                        disabled={restoring}
+                        data-testid={`restore-snapshot-${snap.snapshotId}`}
+                        aria-label={`恢复到 ${snap.label}`}
+                      >
+                        {restoring ? '恢复中...' : '↩ 恢复'}
+                      </button>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Compare section */}
+            {compareSnapshots.length > 0 && (
+              <div className={styles.compareSection}>
+                <div className={styles.compareLabel}>
+                  已选择 {compareSnapshots.length}/2 个版本对比
                 </div>
-
-                <div className={styles.snapshotLabel}>{snap.label}</div>
-
-                <div className={styles.snapshotStats}>
-                  <span title="限界上下文">◇ {snap.contextCount}</span>
-                  <span title="业务流程">→ {snap.flowCount}</span>
-                  <span title="组件">▣ {snap.componentCount}</span>
-                </div>
-
-                {/* Restore button — shown when card is selected */}
-                {selectedSnapshot?.snapshotId === snap.snapshotId && (
+                {compareSnapshots.length === 2 && (
                   <button
                     type="button"
-                    className={styles.restoreBtn}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRestore(snap.snapshotId);
+                    className={styles.compareBtn}
+                    onClick={() => {
+                      const diff = computeSnapshotDiff(compareSnapshots[0], compareSnapshots[1]);
+                      setDiffResult(diff);
                     }}
-                    disabled={restoring}
-                    data-testid={`restore-snapshot-${snap.snapshotId}`}
-                    aria-label={`恢复到 ${snap.label}`}
+                    data-testid="compare-snapshots-btn"
                   >
-                    {restoring ? '恢复中...' : '↩ 恢复'}
+                    📊 对比
                   </button>
                 )}
               </div>
-            ))
-          )}
-        </div>
+            )}
+          </>
+        )}
       </div>
     </>
   );

@@ -20,7 +20,21 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
-    version: '1.0.228',
+    version: '1.0.230',
+    date: '2026-04-15',
+    changes: [
+      '🎯 dev-e5-canvas-dashboard: ProjectCreationStep 真实 API 集成',
+      '✅ handleCreate() 调用 projectApi.createProject()（替换 setTimeout mock）',
+      '✅ userId null → "请先登录" Toast 提示',
+      '✅ API 失败 → error banner + try/catch',
+      '✅ 成功 → router.push(/project?id=)',
+      '✅ 单元测试 3/3 PASS',
+    ],
+    commit: '4090fc26',
+  },
+
+  {
+    version: '1.0.229',
     date: '2026-04-15',
     changes: [
       '🔧 E1-Reviewer-Dedup: wake_downstream 跳过 in-progress 任务，避免重复激活',

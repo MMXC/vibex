@@ -20,6 +20,15 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.239',
+    date: '2026-04-16',
+    changes: [
+      '📥 E3: JSON/YAML 导入导出 — ImportService parseJSON/parseYAML/roundTripTest + ImportPanel 上传预览 + YAML 导出',
+      '✅ 13/13 PASS (parseJSON/parseYAML/parseFile/roundTrip)',
+    ],
+    commit: 'ef90882a',
+  },
+  {
     version: '1.0.238',
     date: '2026-04-16',
     changes: [

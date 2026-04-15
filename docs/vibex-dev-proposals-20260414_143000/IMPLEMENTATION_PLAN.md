@@ -660,3 +660,45 @@ M frontend test files (9)              — 语法 bug 修复
 **内容**: 将 `require('../circuit-breaker')` 改为 ESM import，与 circuit-breaker 模块兼容
 **验证**: `pnpm exec vitest run src/lib/__tests__/api-retry.test.ts` — 11 passed ✅
 
+
+---
+
+## Sprint 2: 长期规划 (Epic5)
+
+**Status**: 🔄 Planned — 2026-04-15
+
+### S2-1: size-limit CI (IU-7 延续)
+**Status**: 🔄 Planned
+**Goal**: CI 自动检测 bundle size 增长 > 200KB
+**Est. Time**: 2h
+**Files**: `.size-limit.json`, `reports/bundle-baseline.json`, `.github/workflows/bundle-check.yml`
+**Approach**: 安装 @size-limit/preset-app → 配置阈值 → 建基线 → CI 集成
+
+### S2-2: @next/bundle-analyzer 集成
+**Status**: 🔄 Planned
+**Goal**: 每次 PR build 生成 bundle 分析报告
+**Est. Time**: 1h
+**Files**: `next.config.js`
+**Approach**: ANALYZE=true npm run build → .next/analyze/bundle.html
+
+### S2-3: Backend TypeScript Debt Clearance
+**Status**: 🔄 Planned
+**Goal**: `cd vibex-backend && tsc --noEmit` → 0 errors
+**Est. Time**: 6-8h
+**Files**: vibex-backend/src/**/*.ts
+**Approach**: 逐文件修复，@ts-ignore 作为最后手段
+
+### S2-4: Hooks/Store 规范深化
+**Status**: 🔄 Planned
+**Goal**: 所有 stores 从 index.ts 导出；非规范 hooks grandfather
+**Est. Time**: 3h
+**Files**: `vibex-fronted/src/stores/index.ts`, `eslint.config.mjs`
+
+### S2-5: Backend Husky lint-staged Full Setup
+**Status**: 🔄 Planned
+**Goal**: 完整 lint-staged pre-commit pipeline
+**Est. Time**: 1h
+**Files**: `vibex-backend/.husky/pre-commit`, `vibex-backend/package.json`
+
+*Long-term Planning | Dev Agent | 2026-04-15*
+

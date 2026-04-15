@@ -11,6 +11,7 @@
 
 import { useCallback, useRef, useState } from 'react';
 import { toPng, toSvg } from 'html-to-image';
+import yaml from 'js-yaml';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
@@ -20,7 +21,7 @@ import { canvasLogger } from '@/lib/canvas/canvasLogger';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { BoundedContextNode, BusinessFlowNode, ComponentNode } from '@/lib/canvas/types'; // types referenced in buildCanvasExportData JSDoc
 
-export type ExportFormat = 'png' | 'svg' | 'json' | 'markdown';
+export type ExportFormat = 'png' | 'svg' | 'json' | 'yaml' | 'markdown';
 export type ExportScope = 'context' | 'flow' | 'component' | 'all';
 
 interface ExportOptions {
@@ -212,8 +213,8 @@ export function useCanvasExport(): UseCanvasExportReturn {
     try {
       const timestamp = new Date().toISOString().slice(0, 10);
 
-      // Handle JSON and Markdown exports (no DOM needed)
-      if (format === 'json' || format === 'markdown') {
+      // Handle JSON / YAML and Markdown exports (no DOM needed)
+      if (format === 'json' || format === 'yaml' || format === 'markdown') {
         if (cancelledRef.current) {
           setIsExporting(false);
           isExportingRef.current = false;
@@ -225,6 +226,12 @@ export function useCanvasExport(): UseCanvasExportReturn {
           const json = JSON.stringify(data, null, 2);
           const blob = new Blob([json], { type: 'application/json' });
           const filename = `${filenamePrefix}-${scope}-${timestamp}.json`;
+          downloadBlob(blob, filename);
+        } else if (format === 'yaml') {
+          const data = buildCanvasExportData(scope);
+          const yamlStr = yaml.dump(data, { indent: 2, lineWidth: -1 });
+          const blob = new Blob([yamlStr], { type: 'text/yaml;charset=utf-8' });
+          const filename = `${filenamePrefix}-${scope}-${timestamp}.yaml`;
           downloadBlob(blob, filename);
         } else {
           const markdown = buildCanvasMarkdown(scope);

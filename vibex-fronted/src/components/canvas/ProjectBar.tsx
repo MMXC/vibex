@@ -88,6 +88,8 @@ interface ProjectBarProps {
   onOpenHistory?: () => void;
   /** P1-F6: 打开快捷键帮助面板回调 */
   onOpenShortcuts?: () => void;
+  /** E3-U3: 打开导入面板回调 */
+  onImportClick?: () => void;
 }
 
 export function ProjectBar({
@@ -100,6 +102,7 @@ export function ProjectBar({
   onZoomReset,
   onOpenHistory,
   onOpenShortcuts,
+  onImportClick,
 }: ProjectBarProps) {
   const contextNodes = useContextStore((s) => s.contextNodes);
   const flowNodes = useFlowStore((s) => s.flowNodes);
@@ -310,7 +313,7 @@ export function ProjectBar({
       )}
 
       {/* E4-F9: Export Menu (PNG/SVG/JSON/Markdown) */}
-      <ExportMenu label="导出" />
+      <ExportMenu label="导出" onImportClick={onImportClick} />
 
       {/* Epic 2 S2.5: Left Drawer toggle button */}
       <LeftDrawerToggle />

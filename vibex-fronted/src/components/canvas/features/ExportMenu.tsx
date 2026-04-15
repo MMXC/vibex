@@ -20,6 +20,8 @@ interface ExportMenuProps {
   label?: string;
   /** 是否禁用 */
   disabled?: boolean;
+  /** 导入按钮点击回调 */
+  onImportClick?: () => void;
 }
 
 type ExportStatus = {
@@ -28,7 +30,7 @@ type ExportStatus = {
   type: 'success' | 'error' | 'info';
 };
 
-export function ExportMenu({ label = '导出', disabled = false }: ExportMenuProps) {
+export function ExportMenu({ label = '导出', disabled = false, onImportClick }: ExportMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedScope, setSelectedScope] = useState<ExportScope>('all');
   const [selectedBatchFormat, setSelectedBatchFormat] = useState<BatchFormat>('png');
@@ -49,6 +51,7 @@ export function ExportMenu({ label = '导出', disabled = false }: ExportMenuPro
       png: 'PNG',
       svg: 'SVG',
       json: 'JSON',
+      yaml: 'YAML',
       markdown: 'Markdown',
     };
     setExportStatus({ format, message: `正在导出 ${statusLabel[format]}...`, type: 'info' });
@@ -128,6 +131,7 @@ export function ExportMenu({ label = '导出', disabled = false }: ExportMenuPro
     { format: 'png', label: 'PNG', description: '位图，适合截图分享' },
     { format: 'svg', label: 'SVG', description: '矢量图，可无损缩放' },
     { format: 'json', label: 'JSON', description: '完整画布数据' },
+    { format: 'yaml', label: 'YAML', description: '可读性高的配置文件格式' },
     { format: 'markdown', label: 'Markdown', description: '结构化文本文档' },
   ];
 
@@ -197,6 +201,31 @@ export function ExportMenu({ label = '导出', disabled = false }: ExportMenuPro
               ))}
             </div>
           </div>
+
+          {/* E3-U3: Import section */}
+          {onImportClick && (
+            <div className={styles.batchSection}>
+              <span className={styles.sectionLabel}>导入</span>
+              <button
+                type="button"
+                className={styles.batchExportBtn}
+                onClick={() => {
+                  setIsOpen(false);
+                  onImportClick();
+                }}
+                role="menuitem"
+                data-testid="import-btn"
+                title="从 JSON/YAML 文件导入画布数据"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+                📥 导入文件
+              </button>
+            </div>
+          )}
 
           {/* Batch Export section */}
           <div className={styles.batchSection}>
@@ -301,6 +330,17 @@ function FormatIcon({ format }: { format: ExportFormat }) {
         <line x1="16" y1="13" x2="8" y2="13" />
         <line x1="16" y1="17" x2="8" y2="17" />
         <polyline points="10 9 9 9 8 9" />
+      </svg>
+    );
+  }
+  // yaml
+  if (format === 'yaml') {
+    return (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+        <line x1="9" y1="8" x2="15" y2="8" />
+        <line x1="9" y1="12" x2="15" y2="12" />
+        <line x1="9" y1="16" x2="13" y2="16" />
       </svg>
     );
   }

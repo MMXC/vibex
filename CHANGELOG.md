@@ -1,4 +1,12 @@
 ### [Unreleased] vibex-dev-proposals-20260414 Epic5: 长期规划 — 2026-04-15
+
+### [Unreleased] Bug Fixes — 2026-04-15
+- **vibex-fix-canvas-bugs Bug1 (B1-U1+U2)**: DDS API 404 修复
+  - `/api/v1/dds/*` 404 导致画布崩溃
+  - 根因: Cloudflare Pages `_redirects` 对 Next.js SSR `/api/v1/*` 重写不稳定
+  - 修复: `vibex-fronted/src/app/api/v1/dds/[...path]/route.ts` Next.js API proxy
+  - Commits: #762f411d
+
 - **docs/vibex-dev-proposals-20260414_143000/SPRINT2_ROADMAP.md**: Sprint 2 完整路线图（148行）
   - S2-1: size-limit CI（IU-7 延续，2h）
   - S2-2: @next/bundle-analyzer 集成（1h）

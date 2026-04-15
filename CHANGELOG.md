@@ -5,6 +5,14 @@
   - 测试: `CanvasPage.test.tsx` 3/3 passing (AC3 resetPanelState)
   - 提交: `cb82559a` (fix) / `4dbe738e` (feat)
 
+### [Unreleased] vibex-sprint2-20260415 E2: 版本历史 Diff 对比 — 2026-04-16
+- **E2-U1+U2+U3 版本历史集成**: 快照列表 + Diff 对比 + 恢复功能
+  - 新增: `src/lib/canvas/snapshotDiff.ts` — 树级别 diff 工具（added/removed 检测）
+  - 新增: `SnapshotDiffView` 组件 — 对比结果视图（摘要统计 + 分组差异列表）
+  - 增强: `VersionHistoryPanel` — 支持勾选 2 个快照进行对比
+  - 保留: 原有单快照预览 + 恢复功能
+  - 提交: `11a87f53` (feat)
+
 ### [Unreleased] vibex-architect-proposals-vibex-proposals-20260416 Epic6: Prompts安全AST扫描 — 2026-04-16
 - **E6-S1 AST解析实现**: `vibex-backend/src/lib/security/codeAnalyzer.ts` — `@babel/parser` AST 扫描
   - 检测: `eval()`, `new Function()`, `setTimeout/setInterval` 字符串字面量参数

@@ -1,5 +1,10 @@
 # Changelog
 
+### [vibex-qa-canvas-dashboard E5-U1: Sprint 2 QA TC-E5 测试扩展] — 2026-04-15
+- **TC-E5-04~07**: handleCreate 真实 API + flowMachine + router.push 覆盖
+- **测试**: 7/7 PASS
+- **提交**: `169bf680`
+
 ### [vibex-design-component-library Epic1 Phase1 P0: 设计风格目录工具链] — 2026-04-14
 - **design-schema.ts**: Zod Schema 定义 StyleCatalog/DesignStyle/StyleCategory/ComponentType
 - **designs-parser.ts**: designs.json 解析器

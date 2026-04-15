@@ -3,16 +3,19 @@
  *
  * E6: Zustand stores rehydrate from localStorage on page load.
  * Tests the manual rehydration hook (skipHydration: true → false).
+ *
+ * NOTE: mock functions must use vi.hoisted() so they're initialized before
+ * vi.mock hoists the factory (avoids Temporal Dead Zone / TDZ errors).
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useRehydrateCanvasStores } from '../useRehydrateCanvasStores';
 
-// Mutable store mocks
-const contextRehydrate = vi.fn().mockResolvedValue(undefined);
-const flowRehydrate = vi.fn().mockResolvedValue(undefined);
-const componentRehydrate = vi.fn().mockResolvedValue(undefined);
+// MUST use vi.hoisted() — vi.mock factory runs BEFORE module-level const declarations
+const contextRehydrate = vi.hoisted(() => vi.fn<() => Promise<void>>().mockResolvedValue(undefined));
+const flowRehydrate    = vi.hoisted(() => vi.fn<() => Promise<void>>().mockResolvedValue(undefined));
+const componentRehydrate = vi.hoisted(() => vi.fn<() => Promise<void>>().mockResolvedValue(undefined));
 
 vi.mock('@/lib/canvas/stores/contextStore', () => ({
   useContextStore: Object.assign(vi.fn(() => ({ nodes: [], addNode: vi.fn() })), { persist: { rehydrate: contextRehydrate } }),
@@ -59,7 +62,7 @@ describe('useRehydrateCanvasStores — E6 AC2', () => {
     contextRehydrate.mockRejectedValue(new Error('Storage unavailable'));
     const { result } = renderHook(() => useRehydrateCanvasStores());
     await act(async () => { await new Promise(r => setTimeout(r, 100)); });
-    // Graceful degradation — app should still work
+    // Graceful degradation — app should still work even if storage fails
     expect(result.current.isRehydrated).toBe(true);
   });
 });

@@ -212,10 +212,11 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     resetPanelState,
   } = panels;
   // Root Cause #2: Tab 切换时 queuePanelExpanded 未重置，导致旧面板状态残留
-  // Fix: activeTab 变化时重置面板状态
+  // Fix: activeTab 变化时重置面板状态 + 重置 phase
   useEffect(() => {
     resetPanelState();
-  }, [activeTab, resetPanelState]);
+    setPhase('input');
+  }, [activeTab, resetPanelState, setPhase]);
 
   const projectId = useSessionStore((s) => s.projectId);
   const user = useAuthStore((s) => s.user);

@@ -21,6 +21,7 @@ export interface UseCanvasPanelsReturn {
   setProjectName: (name: string) => void;
   queuePanelExpanded: boolean;
   setQueuePanelExpanded: (v: boolean) => void;
+  resetPanelState: () => void;
   componentGenerating: boolean;
   setComponentGenerating: (v: boolean) => void;
 }

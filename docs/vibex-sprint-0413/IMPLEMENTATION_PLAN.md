@@ -6,6 +6,17 @@
 
 ---
 
+## Unit Index
+
+| ID | Name | Status | Depends_On | Acceptance_Criteria |
+|----|------|--------|-----------|---------------------|
+| U1 | theme-utilities.css 基础工具类 | ✅ | - | 71a65f7f commit: ≥15 .vx- classes, backdrop-filter present |
+| U2 | JsonTreeRenderer CSS 重构 | ✅ | - | 71a65f7f commit: 0 prohibited hex, ≤149 non-empty lines |
+| U3 | 扩展 theme-utilities (S2.2/S2.3/S2.4) | ✅ | - | 612eaf0b commit: 5 new vx- classes, Vitest pass |
+| U4 | CI 验证 + 视觉回归 | ✅ | U3 | d0357a58 commit: lint 0 errors, test 0 failures, Playwright pass |
+
+---
+
 ## Execution Summary
 
 **Sprint duration:** ~1.5 days (6.5h estimated)

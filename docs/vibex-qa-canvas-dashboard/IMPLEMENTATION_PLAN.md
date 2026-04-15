@@ -177,17 +177,17 @@
 1. 使用 MSW mock `/api/v1/canvas/project` 响应
 2. 测试创建接口
 3. 测试加载接口
-4. 测试三树数据 round-trip（contexts + flows + components）
-
-**风险**: 高 — API 端点尚未实现，测试初期必须 mock
-
+| ⚠️ 前置条件 | `/api/v1/canvas/project` endpoint implemented ✅ (projectApi.createProject) |
+| TC-E6-01 | Store persists to localStorage | ✅ |
+| TC-E6-02 | Store rehydrates on page load | ✅ |
+| TC-E6-03 | Three trees load correctly after rehydration | ✅ |
 ---
 
 ### E6-U2: Phase 2 E2E 三树持久化测试
-
-| Field | Value |
-|-------|-------|
-| **Name** | Phase 2 E2E 三树持久化 |
+| ⚠️ 前置条件 | `/api/v1/canvas/project` ✅ (projectApi.createProject) |
+| TC-E6-01 | Store persists to localStorage | ✅ |
+| TC-E6-02 | Store rehydrates on page load | ✅ |
+| TC-E6-03 | Three trees load correctly after rehydration | ✅ |
 | **Status** | ⬜ (Phase 2 后启动) |
 | **Depends On** | E6-U1 |
 | **Acceptance Criteria** | |

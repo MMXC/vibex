@@ -8,6 +8,13 @@
   - 测试: `route.test.ts` (8 passing) + `e2e/dds-canvas-load.spec.ts` (TC-B1-E2E-01~03)
   - Commits: #762f411d, #2217a658
 
+- **vibex-fix-canvas-bugs Bug2 (B2-U1+U2)**: Canvas Tab State 丢失修复
+  - 切换 Tab 后刷新页面，Tab 状态丢失
+  - 根因: CanvasPanelSSR hydration mismatch（Zustand store 未就绪时读取 localStorage）
+  - 修复: skipHydration + hydrateOnClient + flushSync 强制同步
+  - 测试: `useCanvasPanels.test.ts` (5 passing)
+  - Commits: #6d80bf4d
+
 - **docs/vibex-dev-proposals-20260414_143000/SPRINT2_ROADMAP.md**: Sprint 2 完整路线图（148行）
   - S2-1: size-limit CI（IU-7 延续，2h）
   - S2-2: @next/bundle-analyzer 集成（1h）

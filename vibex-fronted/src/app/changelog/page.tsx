@@ -20,6 +20,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.233',
+    date: '2026-04-15',
+    changes: [
+      '🐛 Bug2: Canvas Tab State 丢失修复 — skipHydration + hydrateOnClient + flushSync',
+      '✅ 5/5 PASS',
+    ],
+    commit: '6d80bf4d',
+  },
+
+  {
     version: '1.0.232',
     date: '2026-04-15',
     changes: [

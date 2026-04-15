@@ -1,5 +1,11 @@
 # Changelog
 
+### [vibex-fix-canvas-bugs Bug2: Canvas Tab State 丢失修复] — 2026-04-15
+- **根因**: CanvasPanelSSR hydration mismatch（Zustand store 未就绪）
+- **修复**: skipHydration + hydrateOnClient + flushSync
+- **测试**: 5/5 PASS
+- **提交**: `6d80bf4d`
+
 ### [vibex-qa-canvas-dashboard E5-U1: Sprint 2 QA TC-E5 测试扩展] — 2026-04-15
 - **TC-E5-04~07**: handleCreate 真实 API + flowMachine + router.push 覆盖
 - **测试**: 7/7 PASS

@@ -21,7 +21,7 @@
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
 | B1-U1 | Cloudflare Pages 路由验证（文件已存在，降级方案已实现） | ✅ | — | `_redirects` 文件存在（正确），Cloudflare Pages Next.js SSR 模式下重写不稳定，B1-U2 已实现 |
-| B1-U2 | API Route 代理实现（降级方案） | ✅ | — | `src/app/api/v1/dds/[...path]/route.ts` GET/POST/PUT/DELETE 支持，`NEXT_PUBLIC_API_BASE_URL` 配置 |
+| B1-U2 | API Route 代理实现（降级方案） | ✅ | — | `src/app/api/v1/dds/[...path]/route.ts` GET/POST/PUT/DELETE + `route.test.ts` 8 passing + `e2e/dds-canvas-load.spec.ts` |
 
 ### B1-U1 详细说明
 
@@ -53,24 +53,20 @@ curl -s "https://api.vibex.top/api/v1/dds/chapters?projectId=test" | jq .
 **触发条件**：B1-U1 发现 Cloudflare Pages 无法正确 proxy `/api/*` 到 `api.vibex.top`
 
 **实现步骤**：
-1. 创建 `vibex-fronted/src/app/api/v1/dds/chapters/route.ts`
-2. 在 route handler 中 Server-side fetch 到 `https://api.vibex.top/api/v1/dds/chapters`
-3. 直接透传 response（不修改 body）
-4. 测试：`curl http://localhost:3000/api/v1/dds/chapters?projectId=test`
+1. 创建 `vibex-fronted/src/app/api/v1/dds/[...path]/route.ts`
+2. 在 route handler 中 Server-side fetch 到 `https://api.vibex.top/api/v1/dds/[splat]`
+3. 支持 GET/POST/PUT/DELETE 方法透传
+4. 测试：`pnpm test` (route.test.ts 8 passing) + E2E (`e2e/dds-canvas-load.spec.ts`)
 
 **文件变更**：
-- Create: `vibex-fronted/src/app/api/v1/dds/chapters/route.ts`
-- Modify: `vibex-fronted/src/hooks/dds/useDDSAPI.ts`（改为相对路径调用）
+- Create: `vibex-fronted/src/app/api/v1/dds/[...path]/route.ts`
+- Create: `vibex-fronted/src/app/api/v1/dds/[...path]/route.test.ts` (8 passing)
+- Create: `vibex-fronted/e2e/dds-canvas-load.spec.ts` (TC-B1-E2E-01~03)
+- useDDSAPI.ts: `createDDSAPI(baseUrl='')` → 相对路径 `/api/v1/dds` (无需修改，已正确)
 
 **测试用例**：
-```typescript
-test('API proxy returns 200 with valid projectId', async ({ request }) => {
-  const res = await request.get('/api/v1/dds/chapters?projectId=test-project');
-  expect(res.status()).toBe(200);
-  const body = await res.json();
-  expect(body).toHaveProperty('success');
-});
-```
+- Unit: `route.test.ts` — 8 passing (URL构造/GET/POST/DELETE/502错误处理)
+- E2E: `dds-canvas-load.spec.ts` — TC-B1-E2E-01~03 (DDS Canvas加载/API代理端点)
 
 **风险**：低 — 不影响现有 API 调用逻辑，降级方案隔离
 

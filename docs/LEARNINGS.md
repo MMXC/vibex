@@ -1,6 +1,6 @@
 # Analyst LEARNINGS — 知识积累
 
-**最后更新**: 2026-03-25
+**最后更新**: 2026-04-15
 
 ---
 
@@ -16,6 +16,8 @@
 ### 已完成分析的项目
 | 项目 | 关键发现 | 状态 |
 |------|----------|------|
+| vibex-qa-canvas-dashboard | Sprint 2 QA 验收（3 Epic：E5-E2E、E1-TabState、E6-三树持久化） | 2026-04-15 |
+| vibex-fix-canvas-bugs | 2 Bug 修复（DDS API 404 + Tab State 丢失） | 2026-04-15 |
 | vibex-simplified-flow-test-fix | 单元测试通过，E2E 5 个失败 (步骤数变化) | 2026-03-24 |
 | vibex-proposal-dedup-mechanism | 方案 A (关键词匹配) 推荐，3 方案对比完整 | 2026-03-23 |
 | vibex-homepage-improvements | 11 项需求 P0-P3 分级 | 历史 |

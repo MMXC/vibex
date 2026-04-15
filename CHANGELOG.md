@@ -21,6 +21,7 @@
 - waitForCanvasSettled() 修复 — error state 出现时抛出错误而非静默通过
 - 覆盖: F25（CRUD）| F26（AI Draft）| F27（面板导航+全屏）| edge（空画布降级）
 - 运行: `pnpm test:e2e -- tests/e2e/dds-canvas-e2e.spec.ts`
+- 修复: auth/me mock格式（`{user}`而非`{success,data}`）、删除injectMockCards死代码、Zustand patch变量重命名（#a443f5df, #cc91c831）
 
 ### [Unreleased] vibex-dds-canvas Epic5: 路由与页面集成 — 2026-04-15
 - **vibex-fronted/src/components/dds/DDSFlow.tsx**: React Flow wrapper（F23）

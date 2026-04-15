@@ -55,19 +55,19 @@ const allMockCards = Object.values(mockDCards).flat();
  */
 async function setupDDSMocks(page: Page) {
   // Set auth cookie BEFORE setting up route handlers to bypass middleware
+  // Set auth token via cookie so middleware/hooks can read it during app init
   await page.context().addCookies([
     { name: 'auth_token', value: 'e2e-test-token', domain: 'localhost', path: '/' },
   ]);
 
-  // Zustand store patch: inject cards into the DDS Canvas store via window.__ZUSTAND_PATCH__
-  // The app reads window.__ZUSTAND_PATCH__ after hydration and applies it to the store.
-  // This avoids the broken `new Function('return import("@/...")')` approach.
-  const zustandPatchScript = `
-    window.__ZUSTAND_PATCH__ = {
-      cards: ${JSON.stringify(Object.values(mockDCards).flat())}
-    };
-  `;
-  await page.addInitScript(zustandPatchScript);
+  // Inject mock cards via Zustand store init script (instead of broken dynamic import)
+  await page.addInitScript(`
+    (function() {
+      const mockCards = ${JSON.stringify(Object.values(mockDCards).flat())};
+      // Patch Zustand store before React hydrates
+      window.__ZUSTAND_STORE_PATCH__ = { cards: mockCards };
+    })();
+  `);
 
   // Route handler — intercept ALL requests and handle API routes
   await page.context().route('**', async (route) => {
@@ -109,7 +109,7 @@ async function setupDDSMocks(page: Page) {
         }
       }
       else if (url.includes('/api/auth/me')) {
-        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: { id: 'user-1', email: 'test@example.com', name: 'Test User' } }) });
+        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ user: { id: 'user-1', name: 'Test User', email: 'test@example.com', role: 'user' } }) });
       }
       // Mock /api/chat for AI Draft functionality (F26)
       else if (url.includes('/api/chat')) {
@@ -147,20 +147,6 @@ async function goToDDSCanvas(page: Page) {
   await page.waitForLoadState('domcontentloaded');
   // Allow hydration + initial render
   await page.waitForTimeout(800);
-}
-
-/**
- * injectMockCards — DEPRECATED.
- * Cards are now loaded via the API mock (setupDDSMocks) which intercepts
- * /api/v1/dds/chapters and /api/v1/dds/chapters/:id/cards requests.
- * The page's loadChapters() populates the Zustand store automatically.
- * Keeping this as a no-op for backward compatibility with test structure.
- */
-async function injectMockCards(_page: Page) {
-  // No-op: cards are injected via page.addInitScript + API mock
-  // The addInitScript in setupDDSMocks sets window.__ZUSTAND_PATCH__ with cards,
-  // and the page's API calls (intercepted by the route mock) return cards for
-  // each chapter, populating the Zustand store via loadChapters().
 }
 
 /**

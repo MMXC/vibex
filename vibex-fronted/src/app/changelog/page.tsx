@@ -20,6 +20,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.232',
+    date: '2026-04-15',
+    changes: [
+      '🐛 Bug1: P0 DDS API 404 修复 — Next.js API 路由代理绕过 Cloudflare 不稳定重写',
+      '✅ GET/POST/PUT/DELETE 覆盖，Cookie 透传',
+    ],
+    commit: '762f411d',
+  },
+
+  {
     version: '1.0.231',
     date: '2026-04-15',
     changes: [

@@ -1,5 +1,11 @@
 # Changelog
 
+### [vibex-qa-canvas-dashboard Q3-E6: Canvas 三树持久化 Rehydration Hook + 测试] — 2026-04-15
+- **根因**: Tab 切换后刷新页面，三树（Component/BusinessFlow/BoundedContext）状态丢失
+- **修复**: useRehydrateCanvasStores hook，skipHydration + 客户端 rehydration
+- **测试**: 4/4 PASS (TC-E6-01~04)
+- **提交**: `cfb780c4`, `8ea96dcf`
+
 ### [vibex-fix-canvas-bugs Bug2: Canvas Tab State 丢失修复] — 2026-04-15
 - **根因**: CanvasPanelSSR hydration mismatch（Zustand store 未就绪）
 - **修复**: skipHydration + hydrateOnClient + flushSync

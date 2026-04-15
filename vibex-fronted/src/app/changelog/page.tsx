@@ -20,6 +20,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.234',
+    date: '2026-04-15',
+    changes: [
+      '🌳 Q3-E6: Canvas 三树持久化 — useRehydrateCanvasStores hook，4/4 PASS',
+      '✅ skipHydration + 客户端 rehydration，覆盖 Component/BusinessFlow/BoundedContext',
+    ],
+    commit: 'cfb780c4',
+  },
+
+  {
     version: '1.0.233',
     date: '2026-04-15',
     changes: [

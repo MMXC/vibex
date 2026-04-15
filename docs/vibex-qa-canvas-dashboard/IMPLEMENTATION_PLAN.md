@@ -82,7 +82,7 @@
 | Field | Value |
 |-------|-------|
 | **Name** | Dashboard React Query 刷新验证 |
-| **Status** | ⬜ |
+| **Status** | ✅ |
 | **Depends On** | E5-U2 |
 | **Acceptance Criteria** | |
 | AC1 | `queryClient.invalidateQueries({ queryKey: queryKeys.projects.lists() })` 存在 |
@@ -104,7 +104,7 @@
 | Field | Value |
 |-------|-------|
 | **Name** | E5 错误场景回归测试 |
-| **Status** | ⬜ |
+| **Status** | ✅ |
 | **Depends On** | E5-U1 |
 | **Acceptance Criteria** | |
 | AC1 | API 500 错误时 error banner `role="alert"` 可见 |
@@ -131,7 +131,7 @@
 | Field | Value |
 |-------|-------|
 | **Name** | Tab State E2E 验证 |
-| **Status** | ⬜ |
+| **Status** | ✅ |
 | **Depends On** | — |
 | **Acceptance Criteria** | |
 | AC1 | Tab 切换后 `phase === 'prototype'`（不是 `phase === 0`，`phase` 初始值是 `'input'`） |

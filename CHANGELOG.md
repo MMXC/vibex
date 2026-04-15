@@ -1,3 +1,16 @@
+### [Unreleased] vibex-architect-proposals-vibex-proposals-20260416 Epic7: MCP可观测性 — 2026-04-16
+- **E7-S1 Health Check**: `packages/mcp-server/src/health.ts` — `health_check` MCP tool (stdio transport)
+  - Returns: status/version/uptime/timestamp/connectedClients/tools/checks
+  - Health checks: `server_running` + `tools_registered`
+  - Tests: `health.test.ts` 5/5 passing
+  - 提交: `3e8667da`
+- **E7-S2 Structured Logging**: `packages/mcp-server/src/logger.ts` — JSON log output
+  - `logToolCall(tool, durationMs, success)` 含 tool/duration/success 字段
+  - 启动时 SDK version check (`MCP SDK 0.5.0`)
+  - `MCP_LOG_LEVEL` 环境变量可配置
+  - Tests: `logger.test.ts` 5/5 passing
+  - 提交: `3e8667da`
+
 ### [Unreleased] vibex-dev-proposals-20260414 Epic5: 长期规划 — 2026-04-15
 
 ### [Unreleased] vibex-qa-canvas-dashboard: Sprint 2 QA 验收 — 2026-04-15

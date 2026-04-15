@@ -20,6 +20,15 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.235',
+    date: '2026-04-16',
+    changes: [
+      '🔧 E7-S1: `health_check` MCP tool (stdio) — status/version/uptime/checks，5/5 PASS',
+      '📊 E7-S2: Structured JSON logger — tool/duration/success 字段，5/5 PASS',
+    ],
+    commit: '3e8667da',
+  },
+  {
     version: '1.0.234',
     date: '2026-04-15',
     changes: [

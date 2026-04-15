@@ -1,8 +1,8 @@
 /**
- * E7-S1: MCP Health Check Tool + HTTP Health Endpoint
+ * E7-S1: MCP Health Check Tool
  *
- * Provides /health endpoint functionality for MCP server.
- * Returns structured health status of the MCP server.
+ * Provides health_check MCP tool functionality via stdio transport.
+ * The HTTP endpoint approach is NOT used — MCP uses stdio transport.
  */
 
 import { listTools } from './tools/list.js';
@@ -21,6 +21,7 @@ export interface HealthCheckResult {
     status: 'pass' | 'fail';
     message?: string;
   }[];
+  // E7-S1: connectedClients — stdio transport: single host process client
   connectedClients: number;
 }
 
@@ -92,39 +93,3 @@ export async function performHealthCheck(): Promise<HealthCheckResult> {
     connectedClients: 1,
   };
 }
-
-/**
- * E7-S1: Add a GET /health HTTP endpoint to the MCP server.
- * Starts a small HTTP server on the given port (default 3100).
- */
-export function addHealthEndpoint(port = 3100): void {
-  const server = createServer((req, res) => {
-    if (req.method === 'GET' && req.url === '/health') {
-      performHealthCheck().then((result) => {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(result));
-      });
-    } else {
-      res.writeHead(404);
-      res.end();
-    }
-  });
-
-  server.listen(port, () => {
-    console.log(`Health endpoint listening on http://localhost:${port}/health`);
-  });
-}
-
-/**
- * E7-S1: Health check tool definition for MCP
- * This tool can be called by clients to check MCP server health
- */
-export const healthCheckTool = {
-  name: 'health_check',
-  description:
-    'Check the health status of the VibeX MCP server. Returns server uptime, registered tools, and health status.',
-  inputSchema: healthCheckSchema,
-  handler: async (): Promise<HealthCheckResult> => {
-    return performHealthCheck();
-  },
-} as const;

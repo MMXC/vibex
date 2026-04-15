@@ -75,6 +75,7 @@ import { PhaseIndicator } from './features/PhaseIndicator';
 import { TemplateSelector } from './features/TemplateSelector';
 import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
 import { useAutoSave } from '@/hooks/canvas/useAutoSave';
+import { useProjectLoader } from '@/hooks/canvas/useProjectLoader';
 import { useHasProject } from '@/hooks/useHasProject';
 import { MessageDrawer } from './messageDrawer/MessageDrawer';
 import { LeftDrawer } from './leftDrawer/LeftDrawer';
@@ -240,6 +241,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
 
   // === E4: Version History ===
   const versionHistory = useVersionHistory();
+
+  // E4-U3: Auto-load project snapshot on mount
+  const projectLoader = useProjectLoader({ projectId });
 
   // =============================================================================
   // E6 Phase 1: Remove duplicated effects now in hooks

@@ -1,1 +1,1 @@
-console.log('hook test');
+console.log('hook test should be blocked');

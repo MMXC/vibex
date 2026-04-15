@@ -13,6 +13,15 @@
   - 保留: 原有单快照预览 + 恢复功能
   - 提交: `11a87f53` (feat)
 
+### [Unreleased] vibex-sprint2-20260415 E3: 导入导出 — 2026-04-16
+- **E3-U1+U2+U3 导入导出**: JSON/YAML 导出 + 导入 + Round-trip 验证
+  - 新增: `useCanvasExport` + `ExportMenu` — 支持 JSON/YAML 格式导出
+  - 新增: `ImportService` — parseJSON/parseYAML/parseFile/roundTripTest
+  - 新增: `ImportPanel` — 文件上传、解析预览、Round-trip 状态、确认导入
+  - 新增: `ImportService.test.ts` — 13 测试用例覆盖所有解析路径
+  - 依赖: `js-yaml` ^4.1.0
+  - 提交: `ef90882a` (feat)
+
 ### [Unreleased] vibex-architect-proposals-vibex-proposals-20260416 Epic6: Prompts安全AST扫描 — 2026-04-16
 - **E6-S1 AST解析实现**: `vibex-backend/src/lib/security/codeAnalyzer.ts` — `@babel/parser` AST 扫描
   - 检测: `eval()`, `new Function()`, `setTimeout/setInterval` 字符串字面量参数

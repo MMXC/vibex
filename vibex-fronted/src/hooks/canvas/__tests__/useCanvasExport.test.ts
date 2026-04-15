@@ -4,7 +4,7 @@
  */
 
 import { renderHook, act } from '@testing-library/react';
-import { useCanvasExport } from '../useCanvasExport';
+import { useCanvasExport, validateFileSize } from '../useCanvasExport';
 
 // Mock canvas store (avoid persist/devtools middleware issues in JSDOM)
 // useCanvasExport calls useCanvasStore.getState() directly (not as a hook)
@@ -114,5 +114,34 @@ describe('useCanvasExport', () => {
 
     expect(createdLink).not.toBeNull();
     expect(createdLink?.download).toMatch(/vibex-canvas.*\.md/);
+  });
+
+  it('should export YAML format', async () => {
+    const { result } = renderHook(() => useCanvasExport());
+
+    await act(async () => {
+      await result.current.exportCanvas({ format: 'yaml', scope: 'all' });
+    });
+
+    expect(createdLink).not.toBeNull();
+    expect(createdLink?.download).toMatch(/vibex-canvas.*\.yaml/);
+  });
+});
+
+describe('validateFileSize', () => {
+  it('should not throw for blob under 5MB', () => {
+    const smallBlob = new Blob([new Array(1024 * 1024).fill('a').join('')]); // 1MB
+    expect(() => validateFileSize(smallBlob)).not.toThrow();
+  });
+
+  it('should throw for blob over 5MB', () => {
+    const largeBlob = new Blob([new Array(6 * 1024 * 1024).fill('a').join('')]); // 6MB
+    expect(() => validateFileSize(largeBlob)).toThrow(/超过 5MB 限制/);
+  });
+
+  it('should throw exactly at 5MB boundary', () => {
+    // Exactly 5MB should pass, just over should fail
+    const fiveMB = new Blob([new Array(5 * 1024 * 1024).fill('a').join('')]);
+    expect(() => validateFileSize(fiveMB)).not.toThrow();
   });
 });

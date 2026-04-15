@@ -10,7 +10,7 @@
  * Part of: vibex-dev-security-20260410 / dev-e5-canvaspage拆分
  */
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import type { TreeType } from '@/lib/canvas/types';
 import { useSessionStore } from '@/lib/canvas/stores';
 
@@ -29,7 +29,13 @@ export function useCanvasPanels(): UseCanvasPanelsReturn {
   const [activeTab, setActiveTab] = useState<TreeType>('context');
   const session = useSessionStore();
   const [projectName, setProjectName] = useState(session.projectName || '我的项目');
-  const [queuePanelExpanded, setQueuePanelExpanded] = useState(true);
+  // Root Cause #1: queuePanelExpanded 初始为 true → 导致 Tab 切换时面板状态异常
+  // Fix: 默认关闭，节省屏幕空间，用户可按需展开
+  const [queuePanelExpanded, setQueuePanelExpanded] = useState(false);
+  // resetPanelState — Tab 切换时调用，重置面板展开状态
+  const resetPanelState = useCallback(() => {
+    setQueuePanelExpanded(false);
+  }, []);
   const [componentGenerating, setComponentGenerating] = useState(false);
 
   return {
@@ -39,6 +45,7 @@ export function useCanvasPanels(): UseCanvasPanelsReturn {
     setProjectName,
     queuePanelExpanded,
     setQueuePanelExpanded,
+    resetPanelState,
     componentGenerating,
     setComponentGenerating,
   };

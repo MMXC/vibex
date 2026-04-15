@@ -10,10 +10,14 @@ export type LogLevel = 'debug' | 'info' | 'warn' | 'error'
 export interface LogEntry {
   timestamp: string
   level: LogLevel
-  event: string
   service: 'vibex-mcp-server'
   version: string
+  // E7-S2: tool/duration/success fields for observability
+  tool?: string
+  duration?: number
+  success?: boolean
   message?: string
+  event?: string
   [key: string]: unknown
 }
 
@@ -30,13 +34,13 @@ function shouldLog(level: LogLevel): boolean {
   return LOG_LEVELS[level] >= LOG_LEVELS[LOG_LEVEL]
 }
 
-function formatLog(level: LogLevel, event: string, extra?: Record<string, unknown>): LogEntry {
+function formatLog(level: LogLevel, message: string, extra?: Record<string, unknown>): LogEntry {
   return {
     timestamp: new Date().toISOString(),
     level,
-    event,
     service: 'vibex-mcp-server',
     version: '0.1.0',
+    message,
     ...extra,
   }
 }
@@ -54,27 +58,36 @@ function write(entry: LogEntry): void {
  * E7-S2: Structured logger
  */
 export const logger = {
-  debug(event: string, extra?: Record<string, unknown>): void {
+  debug(message: string, extra?: Record<string, unknown>): void {
     if (shouldLog('debug')) {
-      write(formatLog('debug', event, extra))
+      write(formatLog('debug', message, extra))
     }
   },
 
-  info(event: string, extra?: Record<string, unknown>): void {
+  info(message: string, extra?: Record<string, unknown>): void {
     if (shouldLog('info')) {
-      write(formatLog('info', event, extra))
+      write(formatLog('info', message, extra))
     }
   },
 
-  warn(event: string, extra?: Record<string, unknown>): void {
+  warn(message: string, extra?: Record<string, unknown>): void {
     if (shouldLog('warn')) {
-      write(formatLog('warn', event, extra))
+      write(formatLog('warn', message, extra))
     }
   },
 
-  error(event: string, extra?: Record<string, unknown>): void {
+  error(message: string, extra?: Record<string, unknown>): void {
     if (shouldLog('error')) {
-      write(formatLog('error', event, extra))
+      write(formatLog('error', message, extra))
     }
+  },
+
+  // E7-S2: Log tool call with duration and success
+  logToolCall(tool: string, durationMs: number, success: boolean): void {
+    write(formatLog('info', `Tool call: ${tool}`, {
+      tool,
+      duration: durationMs,
+      success,
+    }))
   },
 }

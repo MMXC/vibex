@@ -8,8 +8,9 @@ import { listTools } from './tools/list.js';
 import { executeTool, type ToolName } from './tools/execute.js';
 import { logger } from './logger.js'
 
-// E7-S1: Structured logging — server startup
-logger.info('mcp_server_starting', { version: '0.1.0' })
+// E7-S1: SDK version check at startup
+const MCP_SDK_VERSION = '0.5.0'
+logger.info('mcp_server_starting', { version: '0.1.0', sdkVersion: MCP_SDK_VERSION })
 
 const server = new Server(
   { name: 'vibex-mcp-server', version: '0.1.0' },
@@ -26,7 +27,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const toolName = request.params.name as ToolName
   const args = request.params.arguments ?? {}
   
-  // E7-S2: Structured logging — tool call
+  // E7-S2: Structured logging with tool/duration/success
+  const startTime = Date.now()
   logger.info('mcp_tool_call', {
     tool: toolName,
     argsKeys: Object.keys(args),
@@ -34,9 +36,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   
   try {
     const result = await executeTool(toolName, args)
-    logger.info('mcp_tool_success', { tool: toolName })
+    const durationMs = Date.now() - startTime
+    // E7-S2: logToolCall includes tool/duration/success
+    logger.logToolCall(toolName, durationMs, true)
     return result
   } catch (error) {
+    const durationMs = Date.now() - startTime
+    logger.logToolCall(toolName, durationMs, false)
     logger.error('mcp_tool_error', {
       tool: toolName,
       error: error instanceof Error ? error.message : String(error),

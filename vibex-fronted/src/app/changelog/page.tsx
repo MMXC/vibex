@@ -20,6 +20,15 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.238',
+    date: '2026-04-16',
+    changes: [
+      '📜 E2: 版本历史 Diff 对比 — snapshotDiff.ts 树级 diff + SnapshotDiffView 对比视图 + VersionHistoryPanel 勾选对比集成',
+      '✅ 4/4 PASS (added/removed/empty/unchanged)',
+    ],
+    commit: '11a87f53',
+  },
+  {
     version: '1.0.237',
     date: '2026-04-16',
     changes: [

@@ -1,9 +1,10 @@
 # Implementation Plan: Canvas-Dashboard Project Persistence V2
 
 **Project**: vibex-canvas-dashboard-integration-v2
-**Stage**: dev-dev-e5-canvas-dashboard
+**Stage**: dev-dev-e5-canvas-dashboard ✅
 **Date**: 2026-04-15
-**Status**: ✅ Done (commit: 3f91a72b)
+**Status**: ✅ Done
+**Commits**: 4090fc26 (API替换) | 7be7ab79 (测试修复)
 
 ---
 

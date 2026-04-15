@@ -20,6 +20,14 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.236',
+    date: '2026-04-16',
+    changes: [
+      '🔒 E6-S1: AST安全扫描 — `@babel/parser` 检测 eval/new Function/setTimeout 字符串参数，8/8 PASS',
+    ],
+    commit: '02263c66',
+  },
+  {
     version: '1.0.235',
     date: '2026-04-16',
     changes: [

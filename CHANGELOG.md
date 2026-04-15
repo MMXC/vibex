@@ -1,3 +1,11 @@
+### [Unreleased] vibex-architect-proposals-vibex-proposals-20260416 Epic6: Prompts安全AST扫描 — 2026-04-16
+- **E6-S1 AST解析实现**: `vibex-backend/src/lib/security/codeAnalyzer.ts` — `@babel/parser` AST 扫描
+  - 检测: `eval()`, `new Function()`, `setTimeout/setInterval` 字符串字面量参数
+  - 集成到 `code-review.ts` 和 `code-generation.ts`
+  - 优雅处理解析失败 (confidence=50)
+  - Tests: `codeAnalyzer.test.ts` 8/8 passing (TC01~TC05 + 性能 + warnings)
+  - 提交: `02263c66`
+
 ### [Unreleased] vibex-architect-proposals-vibex-proposals-20260416 Epic7: MCP可观测性 — 2026-04-16
 - **E7-S1 Health Check**: `packages/mcp-server/src/health.ts` — `health_check` MCP tool (stdio transport)
   - Returns: status/version/uptime/timestamp/connectedClients/tools/checks

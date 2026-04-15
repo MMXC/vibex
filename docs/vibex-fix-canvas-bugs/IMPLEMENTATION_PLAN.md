@@ -76,7 +76,7 @@ curl -s "https://api.vibex.top/api/v1/dds/chapters?projectId=test" | jq .
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| B2-U1 | Tab 切换状态重置 | ⬜ | — | Tab 切换后 `phase` 归零，`queuePanelExpanded === false` |
+| B2-U1 | Tab 切换状态重置 | ✅ | — | useCanvasPanels.ts: queuePanelExpanded默认false + resetPanelState() + CanvasPage.tsx: useEffect([activeTab]) |
 
 ### B2-U1 详细说明
 

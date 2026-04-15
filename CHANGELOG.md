@@ -1,3 +1,10 @@
+### [Unreleased] vibex-sprint2-20260415 E1: Tab State 重置修复 — 2026-04-16
+- **E1-U1 Tab State 修复**: `CanvasPage.tsx` — `useEffect([activeTree])` 重置 phase
+  - 修复: TabBar 切换时 phase 未重置（root cause: useEffect 依赖 dead activeTab state）
+  - 修复: `useCanvasPanels` 添加 `resetPanelState()` 重置 queuePanelExpanded
+  - 测试: `CanvasPage.test.tsx` 3/3 passing (AC3 resetPanelState)
+  - 提交: `cb82559a` (fix) / `4dbe738e` (feat)
+
 ### [Unreleased] vibex-architect-proposals-vibex-proposals-20260416 Epic6: Prompts安全AST扫描 — 2026-04-16
 - **E6-S1 AST解析实现**: `vibex-backend/src/lib/security/codeAnalyzer.ts` — `@babel/parser` AST 扫描
   - 检测: `eval()`, `new Function()`, `setTimeout/setInterval` 字符串字面量参数

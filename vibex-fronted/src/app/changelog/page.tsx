@@ -20,6 +20,15 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.237',
+    date: '2026-04-16',
+    changes: [
+      '🔧 E1-U1: Tab State 重置修复 — `useEffect([activeTree])` 重置 phase，修复 Tab 切换时 phase 未重置 bug',
+      '✅ 3/3 PASS',
+    ],
+    commit: 'cb82559a',
+  },
+  {
     version: '1.0.236',
     date: '2026-04-16',
     changes: [

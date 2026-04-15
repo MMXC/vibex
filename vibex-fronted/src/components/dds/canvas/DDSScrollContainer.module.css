@@ -22,8 +22,31 @@
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   height: 100%;
+  min-height: 600px; /* fallback height for React Flow rendering */
   width: 100%;
   background-color: var(--color-bg-primary);
+}
+
+/* Force React Flow inside DDS horizontal container to be visible and full-size */
+/* React Flow v12 may have visibility:hidden during SSR hydration */
+:global(.ddsHorizontal) > :global(.react-flow),
+.ddsHorizontal :global(.react-flow) {
+  visibility: visible !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 500px;
+}
+
+/* Ensure React Flow viewport and renderer are always visible */
+.ddsHorizontal :global(.react-flow__viewport),
+.ddsHorizontal :global(.react-flow__renderer) {
+  visibility: visible !important;
+}
+
+/* Ensure nodes are always rendered */
+.ddsHorizontal :global(.react-flow__node) {
+  visibility: visible !important;
 }
 
 .ddsHorizontal::-webkit-scrollbar {

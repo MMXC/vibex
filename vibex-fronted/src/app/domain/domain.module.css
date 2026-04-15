@@ -925,12 +925,23 @@
 }
 
 /* React Flow 自定义样式 */
+/* Fix visibility:hidden from React Flow v12 SSR hydration */
 .flowContainer :global(.react-flow) {
   background: var(--color-bg-secondary);
+  visibility: visible !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.flowContainer :global(.react-flow__viewport),
+.flowContainer :global(.react-flow__renderer) {
+  visibility: visible !important;
 }
 
 .flowContainer :global(.react-flow__node) {
   cursor: pointer;
+  visibility: visible !important;
 }
 
 .flowContainer :global(.react-flow__controls) {

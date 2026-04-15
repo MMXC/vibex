@@ -11,7 +11,7 @@
 
 | Epic | Units | Status | Next |
 |------|-------|--------|------|
-| E5: E5 项目持久化验收 | E5-U1 ✅ | E5-U2 |
+| E5: E5 项目持久化验收 | E5-U1 ✅ | E5-U2 ⚠️ |
 | E1: Tab State 修复验证 | E1-U1 | 0/1 | E1-U1 |
 | E6: E6 三树持久化验收 | E6-U1 ~ E6-U2 | 0/2 | — (Phase 2 后启动) |
 
@@ -52,7 +52,8 @@
 | Field | Value |
 |-------|-------|
 | **Name** | E5 E2E 全链路验证 |
-| **Status** | ⬜ |
+| **Status** | 🔶 File Created (blocked: Zustand skipHydration) |
+| **Commit** | `956b8667` |
 | **Depends On** | E5-U1 |
 | **Acceptance Criteria** | |
 | AC1 | `canvas-project-creation.spec.ts` 存在且包含 Canvas 创建 → Dashboard 可见流程 |

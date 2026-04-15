@@ -23,7 +23,14 @@
 - 运行: `pnpm test:e2e -- tests/e2e/dds-canvas-e2e.spec.ts`
 - 修复: auth/me mock格式（`{user}`而非`{success,data}`）、删除injectMockCards死代码、Zustand patch变量重命名（#a443f5df, #cc91c831）
 
-### [Unreleased] vibex-dds-canvas Epic5: 路由与页面集成 — 2026-04-15
+### [Unreleased] vibex-dds-canvas Epic5: Project Creation API 替换 — 2026-04-15
+- **vibex-fronted/src/components/flow-project/ProjectCreationStep.tsx**: handleCreate 替换 setTimeout mock 为 projectApi.createProject()
+  - 添加 useRouter 导航到 /project?id=xxx
+  - 添加 error state 和 error banner UI
+  - 添加 useAuthStore.getState().user?.id 检查
+- **vibex-fronted/src/components/flow-project/__tests__/ProjectCreationStep.test.tsx**: 3 passing tests
+- Commits: #4090fc26, #7be7ab79
+
 - **vibex-fronted/src/components/dds/DDSFlow.tsx**: React Flow wrapper（F23）
 - **vibex-fronted/src/components/dds/DDSCanvasPage.tsx**: 主页面组件，整合 E1-E4 全部组件（12 tests）
 - **vibex-fronted/src/app/design/dds-canvas/page.tsx**: 替换占位页为完整画布

@@ -8,8 +8,26 @@
   overflow: hidden;
 }
 
+.react-flow {
+  /* Fix: prevent visibility:hidden from SSR hydration or third-party styles */
+  visibility: visible !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
 .container :global(.react-flow) {
   background: transparent;
+}
+
+/* Ensure React Flow viewport is always visible */
+.container :global(.react-flow__viewport) {
+  visibility: visible !important;
+}
+
+/* Ensure renderer layer is always visible */
+.container :global(.react-flow__renderer) {
+  visibility: visible !important;
 }
 
 .controls {

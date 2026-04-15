@@ -19,6 +19,16 @@ interface VersionInfo {
 }
 
 const mockChangelog: ChangelogEntry[] = [
+  {
+    version: '1.0.228',
+    date: '2026-04-15',
+    changes: [
+      '🔧 E1-Reviewer-Dedup: wake_downstream 跳过 in-progress 任务，避免重复激活',
+      '📝 task_manager.py: in-progress 状态检查',
+      '🧪 test_dedup.py 26/26 ✅',
+    ],
+    commit: 'e8590cb8',
+  },
 
   {
     version: '1.0.227',

@@ -81,7 +81,8 @@
   - `logToolCall(tool, durationMs, success)` 含 tool/duration/success 字段
   - 启动时 SDK version check (`MCP SDK 0.5.0`)
   - `MCP_LOG_LEVEL` 环境变量可配置
-  - Tests: `logger.test.ts` 5/5 passing
+  - 敏感数据过滤: token/password/secret/key/auth/credential → `[REDACTED]`（递归）
+  - Tests: `logger.test.ts` 12/12 passing
   - 提交: `3e8667da`
 
 ### [Unreleased] vibex-dev-proposals-20260414 Epic5: 长期规划 — 2026-04-15

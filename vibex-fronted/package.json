@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "NEXT_OUTPUT_MODE=standalone next build",
     "start": "next start",
     "qa:server": "./scripts/qa-server.sh start",
     "test:e2e:qa": "./scripts/qa-server.sh start & sleep 5 && pnpm playwright test --config=playwright.config.ts --project=chromium; ./scripts/qa-server.sh stop",

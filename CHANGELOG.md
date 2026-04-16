@@ -132,6 +132,17 @@
 - **.husky/pre-commit**: 替换 pnpm-install 桩脚本为真正的 console.log/debug/error 检查器
   - 扫描 vibex-backend/src/（排除 __tests__/、*.test.ts、log-sanitizer.ts、logger.ts）
   - 拦截包含 console.log/debug/error 的非测试文件提交
+### [Unreleased] vibex-dds-canvas-s2 Epic2a: 奏折布局 ScrollContainer — 2026-04-16
+- **E2-U1 fullscreen**: `DDSScrollContainer.tsx` — body.overflow=hidden 横铺视口
+  - `isFullscreen` prop 控制 CSS class
+  - 全屏状态 store 管理 (`setFullscreen`/`toggleFullscreen`)
+- **E2-U1 URL sync**: `useChapterURLSync` hook
+  - `?chapter=requirement` 参数同步
+  - 章节切换时 URL 更新，页面刷新时恢复章节
+  - 刷新后 ReactFlow miniMap scroll 复位修复
+- Tests: `DDSScrollContainer.test.tsx` + `useChapterURLSync.test.ts` passing
+- 提交: `edd08e1d` (feat E2a) / `476ec40d` (test E2a)
+
 
 ### [Unreleased] vibex-dds-canvas-s2 Epic2b: ReactFlow 画布集成 — 2026-04-16
 - **E2b-1 ReactFlow 集成**: `vibex-fronted/src/components/dds/canvas/DDSFlow.tsx`

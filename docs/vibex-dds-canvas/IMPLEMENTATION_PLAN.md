@@ -263,8 +263,13 @@ Unit 7 (Route)
 - `vibex-fronted/src/components/dds/toolbar/DDSToolbar.tsx`
 - `vibex-fronted/src/components/dds/toolbar/DDSToolbar.test.tsx`
 
-**Commit:** fe5f35ff (reviewed)
-**Tests:** 14 passed (DDSToolbar)
+**Epic 4 新增 (15de96a6):**
+- Export 按钮 → 调用 ddsPersistence.exportToJSON() → .vibex-dds.json 下载
+- Import 按钮 → 文件选择器 → parseImportFile() → dispatch 'dds:import' event
+- Import 错误 toast 通知
+
+**Commit:** 15de96a6 (feat: Epic4 toolbar Export/Import)
+**Tests:** 14 passed (DDSToolbar) ✅
 
 ---
 

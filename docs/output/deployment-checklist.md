@@ -209,65 +209,9 @@ curl -w "Time: %{time_total}s\n" https://api.vibex.top/api/projects?userId=test
 
 ---
 
-## 八、standalone 构建 + Workers 部署（推荐）
+## 八、回滚准备
 
-> **2026-04-16 更新**：vibex-frontend 已切换到 standalone 输出模式，支持 Cloudflare Workers 部署动态 API 路由。
-
-### 8.1 构建配置
-
-**package.json** (`vibex-fronted/package.json`):
-```json
-"build": "NEXT_OUTPUT_MODE=standalone next build"
-```
-
-**wrangler.toml** (`vibex-fronted/wrangler.toml`):
-- 必须移除 `pages_build_output_dir = "./out"` 行
-- standalone 构建产物由 wrangler 自动识别 `.next/standalone/`
-
-### 8.2 构建步骤
-
-```bash
-cd vibex-fronted
-NEXT_OUTPUT_MODE=standalone pnpm build
-```
-
-- 产物输出到 `.next/standalone/`
-- 包含 Node.js 兼容层，可直接部署为 Cloudflare Worker
-
-### 8.3 Workers 部署
-
-```bash
-wrangler deploy          # 开发预览
-wrangler deploy --env production  # 生产环境
-```
-
-### 8.4 验证构建产物
-
-```bash
-# DDS 动态路由
-ls .next/standalone/vibex-fronted/.next/server/app/api/v1/dds/
-
-# feedback API
-ls .next/standalone/vibex-fronted/.next/server/app/api/feedback/
-
-# quality API
-ls .next/standalone/vibex/standalone/.next/server/app/api/quality/metrics/
-```
-
-### 8.5 环境变量
-
-通过 `wrangler secret put` 配置生产环境变量：
-
-```bash
-wrangler secret put JWT_SECRET
-wrangler secret put MINIMAX_API_KEY
-wrangler secret put MINIMAX_API_BASE
-wrangler secret put MINIMAX_MODEL
-```
-
-## 九、回滚准备
-
-### 9.1 后端回滚命令
+### 8.1 后端回滚命令
 ```bash
 # 查看历史部署
 wrangler deployments list
@@ -276,15 +220,13 @@ wrangler deployments list
 wrangler rollback
 ```
 
-### 9.2 前端回滚命令
+### 8.2 前端回滚命令
 ```bash
-# 回滚 package.json build 脚本
-git checkout package.json wrangler.toml
-# 重新执行静态导出构建
-pnpm build
+git revert HEAD
+npm run build
 ```
 
-### 9.3 数据库回滚脚本
+### 8.3 数据库回滚脚本
 ```sql
 -- 根据实际情况准备反向迁移 SQL
 -- D1 暂不支持自动回滚

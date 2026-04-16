@@ -83,6 +83,14 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '02263c66',
   },
   {
+    version: '1.0.238',
+    date: '2026-04-16',
+    changes: [
+      '📊 E7-S2: MCP 日志敏感数据脱敏 — sanitize() 递归过滤 token/password/secret/key/auth/credential，12/12 PASS',
+    ],
+    commit: 'f4dafb18',
+  },
+  {
     version: '1.0.235',
     date: '2026-04-16',
     changes: [

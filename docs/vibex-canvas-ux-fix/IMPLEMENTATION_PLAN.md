@@ -45,7 +45,7 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E2-U1 | computeTreePayload 纯函数 + 按钮逻辑同步 | ⬜ | — | AC-F2.1-1~4: contexts/flows 全 deactive/partial 场景按钮状态正确 |
+| E2-U1 | computeTreePayload 纯函数 + 按钮逻辑同步 | ✅ | — | AC-F2.1-1~4: contexts/flows 全 deactive/partial 场景按钮状态正确 |
 | E2-U2 | componentGenerating unmount cleanup | ⬜ | E2-U1 | AC-F2.2-1: unmount 后状态重置 |
 
 ### E3: Project Creation Button
@@ -91,10 +91,10 @@
 **改动文件**: `vibex-fronted/src/components/canvas/BusinessFlowTree.tsx`
 **新增文件**: `vibex-fronted/src/utils/canvasPayload.ts`（或置于 `BusinessFlowTree.tsx` 底部）
 
-- [ ] 2.1.1 新增 `computeTreePayload` 纯函数，逻辑与 handler 内 `contextsToSend`/`flowsToSend` 构建完全一致
-- [ ] 2.1.2 `canGenerateComponents` useMemo 改为调用 `computeTreePayload`，基于返回的 `contextsToSend.length > 0 && flowsToSend.length > 0`
-- [ ] 2.1.3 `handleContinueToComponents` 复用 `computeTreePayload` 结果
-- [ ] 2.1.4 单元测试覆盖 AC-F2.1-1 至 AC-F2.1-4（4 个边界场景）
+- [x] 2.1.1 新增 `computeTreePayload` 纯函数，逻辑与 handler 内 `contextsToSend`/`flowsToSend` 构建完全一致
+- [x] 2.1.2 `canGenerateComponents` useMemo 改为调用 `computeTreePayload`，基于返回的 `contextsToSend.length > 0 && flowsToSend.length > 0`
+- [x] 2.1.3 `handleContinueToComponents` 复用 `computeTreePayload` 结果
+- [x] 2.1.4 单元测试覆盖 AC-F2.1-1 至 AC-F2.1-4（4 个边界场景）
 
 ### F2.2: componentGenerating unmount cleanup
 

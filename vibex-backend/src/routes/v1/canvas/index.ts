@@ -5,6 +5,7 @@
  * POST /v1/canvas/generate-contexts
  * POST /v1/canvas/generate-flows
  * POST /v1/canvas/generate-components
+ * POST /v1/canvas/project (vibex-canvas-404-post-project E1)
  * 
  * Part of: api-input-validation-layer / Epic E3
  */
@@ -15,8 +16,8 @@ import { generateId, Env } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
 import { debug } from '@/lib/logger'
 import { withValidation, ValidatedContext } from '@/lib/api-validation'
+import { getAuthUserFromHono } from '@/lib/auth'
 import {
-  boundedContextSchema,
   generateContextsSchema,
   generateFlowsSchema,
   generateComponentsSchema,
@@ -386,5 +387,86 @@ ${flowSummary}
     }
   })
 )
+
+// ============================================================
+// Step 4: Create Canvas Project
+// POST /v1/canvas/project
+// ============================================================
+
+canvas.post('/project', async (c) => {
+  // --- Auth check ---
+  const auth = getAuthUserFromHono(c);
+  if (!auth) {
+    return c.json(
+      { success: false, error: 'Authentication required', code: 'UNAUTHORIZED' },
+      401
+    );
+  }
+
+  let body: { requirementText?: unknown; contexts?: unknown; flows?: unknown; components?: unknown };
+  try {
+    body = await c.req.json();
+  } catch {
+    return c.json(
+      { success: false, error: 'Invalid JSON body', code: 'INVALID_REQUEST' },
+      400
+    );
+  }
+
+  const { requirementText, contexts, flows, components } = body;
+
+  if (!requirementText || !contexts || !flows || !components) {
+    return c.json(
+      {
+        success: false,
+        error: 'Missing required fields: requirementText, contexts, flows, components',
+        code: 'INVALID_REQUEST',
+      },
+      400
+    );
+  }
+
+  try {
+    const env = c.env;
+    const projectId = generateId();
+    const canvasProjectId = generateId();
+    const projectName = String(requirementText).substring(0, 200) || '未命名画布项目';
+    const now = new Date().toISOString();
+
+    // 1. Create Project in D1
+    const projectSql = `INSERT INTO Project (id, name, description, userId, createdAt, updatedAt)
+      VALUES (?, ?, ?, ?, ?, ?)`;
+    await env.DB.prepare(projectSql)
+      .bind(projectId, projectName, JSON.stringify({ canvas: true }), auth.userId, now, now)
+      .run();
+
+    // 2. Create CanvasProject in D1
+    const canvasProjectSql = `INSERT INTO CanvasProject (id, projectId, name, contextsJson, flowsJson, componentsJson, createdAt, updatedAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+    await env.DB.prepare(canvasProjectSql)
+      .bind(
+        canvasProjectId,
+        projectId,
+        projectName,
+        JSON.stringify(contexts),
+        JSON.stringify(flows),
+        JSON.stringify(components),
+        now,
+        now
+      )
+      .run();
+
+    debug(`[canvas/project] Created canvas project ${canvasProjectId} for user ${auth.userId}`);
+
+    return c.json({ projectId: canvasProjectId, status: 'created' }, 201);
+
+  } catch (err) {
+    debug('[canvas/project] Error:', err);
+    return c.json(
+      { success: false, error: 'Failed to create canvas project', code: 'INTERNAL_ERROR' },
+      500
+    );
+  }
+});
 
 export default canvas

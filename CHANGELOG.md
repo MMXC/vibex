@@ -24,6 +24,12 @@
   - 新增: `BoundedContextTree.test.tsx` — 3 测试覆盖 AC-F4.1-1~3
   - 提交: `4ca97fd6` (fix)
 
+### [Unreleased] vibex-canvas-ux-fix Epic4-F4.3: Panel lock 审计完成 — 2026-04-17
+- **E4-F4.3 Panel lock 审计**: `BusinessFlowTree.tsx` — 审计 inactivePanel 与 allConfirmed 一致性
+  - 审计结论: inactivePanel 使用 isActive prop，CanvasPage 未传 → inactivePanel 永不显示
+  - 面板锁定功能当前未实际使用，无需代码修改
+  - 提交: `2edb5eb1` (audit)
+
 ### [Unreleased] vibex-canvas-ux-fix Epic4-F4.2: handleConfirmAll 原子性设置双字段 — 2026-04-17
 - **E4-F4.2 handleConfirmAll 原子性设置**: `BoundedContextTree.tsx` — handleConfirmAll 调用 confirmContextNode
   - 修复: 原先只调用 advancePhase()，不设置任何状态，导致 allConfirmed 无法正确反映

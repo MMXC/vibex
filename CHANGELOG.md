@@ -17,6 +17,13 @@
   - 新增: `ProjectBar.test.tsx` — 4 测试覆盖 AC-F3.1-1~4
   - 提交: `a38f79be` (fix)
 
+### [Unreleased] vibex-canvas-ux-fix Epic4: allConfirmed status === confirmed 检查 — 2026-04-17
+- **E4-F4.1 allConfirmed status === confirmed**: `BoundedContextTree.tsx` — allConfirmed 改为检查 status === 'confirmed'
+  - 修复: 原先检查 isActive !== false，与 checkbox 操作的 status !== 'confirmed' 语义不同步
+  - 修复后: checkbox 勾选设置 status，按钮文案由 allConfirmed（status === 'confirmed'）决定
+  - 新增: `BoundedContextTree.test.tsx` — 3 测试覆盖 AC-F4.1-1~3
+  - 提交: `4ca97fd6` (fix)
+
 ### [Unreleased] vibex-canvas-ux-fix Epic1: handleResponseError async/await 修复 — 2026-04-17
 - **E1-U1 handleResponseError async/await**: `canvasApi.ts` — `handleResponseError` 改为 async，await `res.json()` 解析后端错误
   - 修复: 后端 400 错误信息透传到 toast（之前统一显示 "API 请求失败: 400"）

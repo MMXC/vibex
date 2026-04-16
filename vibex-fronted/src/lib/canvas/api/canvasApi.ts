@@ -125,7 +125,7 @@ async function validatedFetch<T>(
   schema: z.ZodSchema<T>
 ): Promise<T> {
   const res = await fetch(url, options);
-  if (!res.ok) handleResponseError(res, `API 请求失败: ${res.status}`, window.location.pathname);
+  if (!res.ok) await handleResponseError(res, `API 请求失败: ${res.status}`, window.location.pathname);
   const json = await res.json();
   const result = schema.safeParse(json);
   if (!result.success) {
@@ -142,7 +142,7 @@ function getAuthHeaders(): Record<string, string> {
 }
 
 // 检查 401 错误并提示
-function handleResponseError(res: Response, defaultMsg: string, returnTo?: string): never {
+async function handleResponseError(res: Response, defaultMsg: string, returnTo?: string): Promise<never> {
   if (res.status === 401) {
     // 401 时清除 token
     if (typeof window !== 'undefined') {
@@ -161,8 +161,14 @@ function handleResponseError(res: Response, defaultMsg: string, returnTo?: strin
   if (res.status === 404) {
     throw new Error('历史功能维护中，请稍后再试');
   }
-  const err = res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-  throw new Error((err as { error?: string }).error ?? defaultMsg);
+  let errData: { error?: string; message?: string; details?: string } = { error: `HTTP ${res.status}` };
+  try {
+    errData = await res.json();
+  } catch {
+    // fallback to default HTTP status message
+  }
+  const message = errData.error ?? errData.message ?? errData.details ?? defaultMsg;
+  throw new Error(message);
 }
 
 /**
@@ -224,7 +230,7 @@ export const canvasApi = {
       body: JSON.stringify(data),
     });
 
-    if (!res.ok) handleResponseError(res, `创建项目失败: ${res.status}`, window.location.pathname);
+    if (!res.ok) await handleResponseError(res, `创建项目失败: ${res.status}`, window.location.pathname);
     return res.json() as Promise<CreateProjectOutput>;
   },
 
@@ -240,7 +246,7 @@ export const canvasApi = {
       body: JSON.stringify(data),
     });
 
-    if (!res.ok) handleResponseError(res, `生成失败: ${res.status}`, window.location.pathname);
+    if (!res.ok) await handleResponseError(res, `生成失败: ${res.status}`, window.location.pathname);
     return res.json() as Promise<GenerateOutput>;
   },
 
@@ -254,7 +260,7 @@ export const canvasApi = {
     const headers = getAuthHeaders();
     const res = await fetch(getApiUrl(`${API_CONFIG.endpoints.canvas.status}?projectId=${encodeURIComponent(projectId)}`), { headers });
 
-    if (!res.ok) handleResponseError(res, `查询状态失败: ${res.status}`, window.location.pathname);
+    if (!res.ok) await handleResponseError(res, `查询状态失败: ${res.status}`, window.location.pathname);
     return res.json() as Promise<StatusOutput>;
   },
 
@@ -266,7 +272,7 @@ export const canvasApi = {
     const headers = getAuthHeaders();
     const res = await fetch(getApiUrl(`${API_CONFIG.endpoints.canvas.export}?projectId=${encodeURIComponent(projectId)}`), { headers });
 
-    if (!res.ok) handleResponseError(res, `导出失败: ${res.status}`, window.location.pathname);
+    if (!res.ok) await handleResponseError(res, `导出失败: ${res.status}`, window.location.pathname);
     return res.blob();
   },
 
@@ -383,7 +389,7 @@ export const canvasApi = {
         err.data = body;
         throw err;
       }
-      handleResponseError(res, `创建快照失败: ${res.status}`, window.location.pathname);
+      await handleResponseError(res, `创建快照失败: ${res.status}`, window.location.pathname);
     }
     return res.json() as Promise<CreateSnapshotOutput>;
   },
@@ -399,7 +405,7 @@ export const canvasApi = {
       : getApiUrl(API_CONFIG.endpoints.canvas.snapshots);
     const res = await fetch(url, { headers });
 
-    if (!res.ok) handleResponseError(res, `获取快照列表失败: ${res.status}`, window.location.pathname);
+    if (!res.ok) await handleResponseError(res, `获取快照列表失败: ${res.status}`, window.location.pathname);
     return res.json() as Promise<ListSnapshotsOutput>;
   },
 
@@ -411,7 +417,7 @@ export const canvasApi = {
     const headers = getAuthHeaders();
     const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.snapshot(snapshotId)), { headers });
 
-    if (!res.ok) handleResponseError(res, `获取快照失败: ${res.status}`, window.location.pathname);
+    if (!res.ok) await handleResponseError(res, `获取快照失败: ${res.status}`, window.location.pathname);
     return res.json();
   },
 
@@ -426,7 +432,7 @@ export const canvasApi = {
       headers,
     });
 
-    if (!res.ok) handleResponseError(res, `恢复快照失败: ${res.status}`, window.location.pathname);
+    if (!res.ok) await handleResponseError(res, `恢复快照失败: ${res.status}`, window.location.pathname);
     return res.json() as Promise<RestoreSnapshotOutput>;
   },
 
@@ -441,7 +447,7 @@ export const canvasApi = {
       `${getApiUrl(API_CONFIG.endpoints.canvas.latest)}?projectId=${encodeURIComponent(projectId)}`,
       { headers }
     );
-    if (!res.ok) handleResponseError(res, `获取最新版本失败: ${res.status}`, window.location.pathname);
+    if (!res.ok) await handleResponseError(res, `获取最新版本失败: ${res.status}`, window.location.pathname);
     return res.json();
   },
 };

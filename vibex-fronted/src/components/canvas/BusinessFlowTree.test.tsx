@@ -267,3 +267,88 @@ describe('F1.2: Continue button disabled state', () => {
     expect(mockFetch).toHaveBeenCalled();
   });
 });
+
+// ─── E2-F2.1: canGenerateComponents 与 handler 逻辑同步 ───────────────────────────────────────
+// Bug: canGenerateComponents 只检查 flowNodes.length > 0，未检查 flowsToSend（即 active+selected flows）
+// 导致 flowNodes 存在但全部 isActive===false 时，按钮错误地 enabled
+describe('E2-F2.1: canGenerateComponents 同步 handler 校验 flowsToSend', () => {
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  // AC-F2.1-1: contexts 全 deactive，flows 有 active → button disabled
+  it('AC-F2.1-1: contexts 全 deactive 时按钮 disabled', () => {
+    setupStores({
+      selectedNodeIds: { context: [], flow: [], component: [] },
+      contextNodes: [
+        { nodeId: 'ctx-1', name: '患者管理', description: '管理患者', type: 'core' as const, isActive: false, status: 'confirmed' as const, children: [] },
+        { nodeId: 'ctx-2', name: '预约挂号', description: '处理预约', type: 'supporting' as const, isActive: false, status: 'confirmed' as const, children: [] },
+      ],
+      flowNodes: [
+        { nodeId: 'flow-1', contextId: 'ctx-1', name: 'Order Flow', steps: [], confirmed: false, status: 'pending' as const, isActive: true },
+      ],
+    });
+
+    render(<BusinessFlowTree />);
+    const continueBtn = screen.getByRole('button', { name: '继续到组件树' }) as HTMLButtonElement;
+    expect(continueBtn.disabled).toBe(true);
+  });
+
+  // AC-F2.1-2: flows 全 deactive，contexts 有 active → button disabled（核心 bug 场景）
+  it('AC-F2.1-2: flows 全 deactive 时按钮 disabled（核心 bug）', () => {
+    setupStores({
+      selectedNodeIds: { context: [], flow: [], component: [] },
+      contextNodes: [
+        { nodeId: 'ctx-1', name: '患者管理', description: '管理患者', type: 'core' as const, isActive: true, status: 'confirmed' as const, children: [] },
+      ],
+      flowNodes: [
+        { nodeId: 'flow-1', contextId: 'ctx-1', name: 'Order Flow', steps: [], confirmed: false, status: 'pending' as const, isActive: false },
+        { nodeId: 'flow-2', contextId: 'ctx-1', name: 'Booking Flow', steps: [], confirmed: false, status: 'pending' as const, isActive: false },
+      ],
+    });
+
+    render(<BusinessFlowTree />);
+    const continueBtn = screen.getByRole('button', { name: '继续到组件树' }) as HTMLButtonElement;
+    // Bug: 当前代码 flowNodes.length > 0 → true，所以按钮 enabled
+    // 修复后: flowsToSend = [] → button disabled
+    expect(continueBtn.disabled).toBe(true);
+  });
+
+  // AC-F2.1-3: contexts 和 flows 均有 active，但 selection 选中 deactive 节点 → button disabled
+  it('AC-F2.1-3: selection 包含 deactive 节点时按钮 disabled', () => {
+    setupStores({
+      // 选中 ctx-2（inactive）和 flow-2（inactive）
+      selectedNodeIds: { context: ['ctx-2'], flow: ['flow-2'], component: [] },
+      contextNodes: [
+        { nodeId: 'ctx-1', name: '患者管理', description: '管理患者', type: 'core' as const, isActive: true, status: 'confirmed' as const, children: [] },
+        { nodeId: 'ctx-2', name: '预约挂号', description: '处理预约', type: 'supporting' as const, isActive: false, status: 'confirmed' as const, children: [] },
+      ],
+      flowNodes: [
+        { nodeId: 'flow-1', contextId: 'ctx-1', name: 'Order Flow', steps: [], confirmed: false, status: 'pending' as const, isActive: true },
+        { nodeId: 'flow-2', contextId: 'ctx-2', name: 'Booking Flow', steps: [], confirmed: false, status: 'pending' as const, isActive: false },
+      ],
+    });
+
+    render(<BusinessFlowTree />);
+    const continueBtn = screen.getByRole('button', { name: '继续到组件树' }) as HTMLButtonElement;
+    expect(continueBtn.disabled).toBe(true);
+  });
+
+  // AC-F2.1-4: contexts 和 flows 均有 active（无 selection）→ button enabled
+  it('AC-F2.1-4: contexts 和 flows 均有 active 时按钮 enabled', () => {
+    setupStores({
+      selectedNodeIds: { context: [], flow: [], component: [] },
+      contextNodes: [
+        { nodeId: 'ctx-1', name: '患者管理', description: '管理患者', type: 'core' as const, isActive: true, status: 'confirmed' as const, children: [] },
+      ],
+      flowNodes: [
+        { nodeId: 'flow-1', contextId: 'ctx-1', name: 'Order Flow', steps: [], confirmed: false, status: 'pending' as const, isActive: true },
+      ],
+    });
+
+    render(<BusinessFlowTree />);
+    const continueBtn = screen.getByRole('button', { name: '继续到组件树' }) as HTMLButtonElement;
+    expect(continueBtn.disabled).toBe(false);
+  });
+});

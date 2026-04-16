@@ -20,6 +20,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.248',
+    date: '2026-04-17',
+    changes: [
+      '🔧 E4-F4.2: handleConfirmAll 原子性设置 — confirmContextNode 同时设置 status+isActive 双字段',
+      '📌 Bug: 原来直接 advancePhase，deactive 节点未激活；修复后遍历调用 confirmContextNode',
+      '✅ 14/14 tests passed (含 AC-F4.2-1~3)',
+    ],
+    commit: '1085762e',
+  },
+  {
     version: '1.0.247',
     date: '2026-04-17',
     changes: [

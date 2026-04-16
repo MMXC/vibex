@@ -20,6 +20,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.245',
+    date: '2026-04-17',
+    changes: [
+      '🔧 E2-F2.1: canGenerateComponents flowsToSend 校验 — computeTreePayload 纯函数统一过滤逻辑',
+      '📌 Bug: 原来只检查 flowNodes.length>0，未过滤 deactive flows；修复后同步检查 contextsToSend && flowsToSend',
+      '✅ 13/13 tests passed (含 AC-F2.1-1~4)',
+    ],
+    commit: '3f8a8b52',
+  },
+  {
     version: '1.0.243',
     date: '2026-04-17',
     changes: [

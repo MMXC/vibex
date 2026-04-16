@@ -290,7 +290,7 @@ Unit 7 (Route)
 - `vibex-fronted/src/components/dds/ai-draft/__tests__/CardPreview.test.tsx` (15 tests)
 
 **Commit:** 538ad1a6 (reviewed)
-**Tests:** 35 passed (AIDraftDrawer + DraftPreview)
+**Tests:** 35 passed (AIDraftDrawer + DraftPreview) ✅
 
 ---
 

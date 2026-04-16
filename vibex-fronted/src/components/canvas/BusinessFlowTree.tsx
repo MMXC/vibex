@@ -652,6 +652,13 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
     return () => observer.disconnect();
   }, []);
 
+  // E2-F2.2: unmount cleanup — API 调用期间组件卸载时重置 componentGenerating
+  useEffect(() => {
+    return () => {
+      setComponentGenerating(false);
+    };
+  }, []);
+
   // Compute node rects from DOM positions (F3.3: FlowEdgeLayer node positioning)
   const nodeRects = useMemo((): NodeRect[] => {
     if (!flowPanelRef.current || flowPanelSize.width === 0) return [];

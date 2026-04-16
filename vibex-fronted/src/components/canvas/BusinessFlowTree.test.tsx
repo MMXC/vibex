@@ -352,3 +352,52 @@ describe('E2-F2.1: canGenerateComponents 同步 handler 校验 flowsToSend', () 
     expect(continueBtn.disabled).toBe(false);
   });
 });
+
+// ─── E2-F2.2: componentGenerating unmount cleanup ───────────────────────────────────────
+describe('E2-F2.2: componentGenerating unmount cleanup', () => {
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  // AC-F2.2-1: 组件 unmount 时 componentGenerating 重置 → remount 后按钮初始状态正确
+  it('AC-F2.2-1: unmount 后 remount，按钮初始 enabled（cleanup 执行）', () => {
+    setupStores({
+      selectedNodeIds: { context: [], flow: [], component: [] },
+      contextNodes: defaultContextNodes,
+      flowNodes: defaultFlowNodes,
+    });
+
+    const { unmount } = render(<BusinessFlowTree />);
+    const continueBtn1 = screen.getByRole('button', { name: '继续到组件树' }) as HTMLButtonElement;
+    expect(continueBtn1.disabled).toBe(false);
+
+    unmount();
+
+    // Re-render：验证按钮状态未受残留状态影响
+    setupStores({
+      selectedNodeIds: { context: [], flow: [], component: [] },
+      contextNodes: defaultContextNodes,
+      flowNodes: defaultFlowNodes,
+    });
+    render(<BusinessFlowTree />);
+    const continueBtn2 = screen.getByRole('button', { name: '继续到组件树' }) as HTMLButtonElement;
+    expect(continueBtn2.disabled).toBe(false);
+  });
+
+  // AC-F2.2-2: cleanup effect 在 unmount 时执行，不抛异常
+  it('AC-F2.2-2: unmount 触发 cleanup，不抛异常', () => {
+    setupStores({
+      selectedNodeIds: { context: [], flow: [], component: [] },
+      contextNodes: defaultContextNodes,
+      flowNodes: defaultFlowNodes,
+    });
+
+    const { unmount } = render(<BusinessFlowTree />);
+    expect(screen.getByRole('button', { name: '继续到组件树' })).toBeDefined();
+
+    // unmount 触发 cleanup effect（setComponentGenerating(false)）
+    // 若 cleanup 有 bug（e.g. 引用错误变量），这里会 throw
+    expect(() => unmount()).not.toThrow();
+  });
+});

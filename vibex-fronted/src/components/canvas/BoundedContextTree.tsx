@@ -460,7 +460,9 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
     advancePhase();
   }, [contextNodes, advancePhase]);
 
-  const allConfirmed = contextNodes.length > 0 && contextNodes.every((n) => n.isActive !== false);
+  // E4-F4.1: allConfirmed 改为检查 status === 'confirmed'
+  // Bug: 原先检查 isActive !== false，与 checkbox 操作的 status !== 'confirmed' 语义不同步
+  const allConfirmed = contextNodes.length > 0 && contextNodes.every((n) => n.status === 'confirmed');
   const hasNodes = contextNodes.length > 0;
 
   // F4: Drag selection (框选) — uses same containerRef

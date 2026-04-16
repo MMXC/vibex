@@ -81,9 +81,12 @@
   - `logToolCall(tool, durationMs, success)` 含 tool/duration/success 字段
   - 启动时 SDK version check (`MCP SDK 0.5.0`)
   - `MCP_LOG_LEVEL` 环境变量可配置
-  - 敏感数据过滤: token/password/secret/key/auth/credential → `[REDACTED]`（递归）
-  - Tests: `logger.test.ts` 12/12 passing
   - 提交: `3e8667da`
+- **E7-S2 敏感数据过滤**: `sanitize()` — 递归过滤 token/password/secret/key/auth/credential 等字段
+  - `SENSITIVE_KEYS` 匹配（大小写不敏感）
+  - 嵌套对象深度脱敏
+  - Tests: `logger.test.ts` 12/12 passing（含 E7-S2 脱敏用例）
+  - 提交: `f4dafb18`
 
 ### [Unreleased] vibex-dev-proposals-20260414 Epic5: 长期规划 — 2026-04-15
 

@@ -20,6 +20,15 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.241',
+    date: '2026-04-16',
+    changes: [
+      '🎨 Canvas 项目创建 — POST /api/v1/canvas/project Handler（Hono + D1）— 三树数据持久化',
+      '✅ POST /project handler + CanvasProject D1 表（contexts/flows/components）',
+    ],
+    commit: '51327329',
+  },
+  {
     version: '1.0.240',
     date: '2026-04-16',
     changes: [

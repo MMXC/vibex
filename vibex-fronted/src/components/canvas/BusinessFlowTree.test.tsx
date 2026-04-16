@@ -19,8 +19,9 @@ import { canvasApi } from '@/lib/canvas/api/canvasApi';
 vi.mock('@/lib/canvas/api/canvasApi');
 
 // ─── Mock toast ────────────────────────────────────────────────────────────
+const showToastMock = vi.fn();
 vi.mock('@/components/ui/Toast', () => ({
-  useToast: () => ({ showToast: vi.fn() }),
+  useToast: () => ({ showToast: showToastMock }),
 }));
 
 // ─── Store mocks ──────────────────────────────────────────────────────────
@@ -55,6 +56,7 @@ function setupStores(overrides: {
     contextNodes,
     selectedNodeIds,
     advancePhase: vi.fn(),
+    setPhase: vi.fn(),
   });
   (flowStore.useFlowStore as Mock).mockReturnValue({ flowNodes });
   (componentStore.useComponentStore as Mock).mockReturnValue({
@@ -73,6 +75,7 @@ describe('E1: handleContinueToComponents context selection', () => {
     mockFetch = vi.fn();
     (canvasApi.fetchComponentTree as Mock) = mockFetch;
     mockFetch.mockResolvedValue([]);
+    showToastMock.mockClear();
   });
 
   afterEach(() => {
@@ -116,25 +119,18 @@ describe('E1: handleContinueToComponents context selection', () => {
     expect(callArgs?.contexts.map((c) => c.id)).toEqual(['ctx-1', 'ctx-2', 'ctx-3']);
   });
 
-  // ── Scenario 3: Empty contextNodes → toast error ──────────────────────
-  it('shows error toast and does NOT call API when contextNodes is empty', async () => {
-    const showToast = vi.fn();
-    (require('@/components/ui/Toast') as { useToast: () => { showToast: Mock } }).useToast = () => ({ showToast });
-
+  // ── Scenario 3: Empty contextNodes → button disabled (F1.2 guard) ────
+  it('button disabled when contextNodes is empty (no contextsToSend possible)', () => {
     setupStores({
       selectedNodeIds: { context: [], flow: [], component: [] },
       contextNodes: [],
+      flowNodes: defaultFlowNodes,
     });
 
     render(<BusinessFlowTree />);
 
-    const continueBtn = screen.getByRole('button', { name: '继续到组件树' });
-    await act(async () => {
-      await userEvent.click(continueBtn);
-    });
-
-    expect(showToast).toHaveBeenCalledWith('请先生成上下文树', 'error');
-    expect(mockFetch).not.toHaveBeenCalled();
+    const continueBtn = screen.getByRole('button', { name: '继续到组件树' }) as HTMLButtonElement;
+    expect(continueBtn.disabled).toBe(true);
   });
 
   // ── Scenario 4: Multiple selected contexts ───────────────────────────
@@ -153,5 +149,121 @@ describe('E1: handleContinueToComponents context selection', () => {
     expect(mockFetch).toHaveBeenCalledTimes(1);
     const callArgs = mockFetch.mock.calls[0]?.[0] as { contexts: Array<{ id: string }> };
     expect(callArgs?.contexts.map((c) => c.id)).toEqual(['ctx-1', 'ctx-3']);
+  });
+});
+
+// ─── F1.1: contextsToSend empty check ──────────────────────────────────────
+describe('F1.1: contextsToSend empty validation', () => {
+  let mockFetch: Mock;
+
+  beforeEach(() => {
+    mockFetch = vi.fn();
+    (canvasApi.fetchComponentTree as Mock) = mockFetch;
+    mockFetch.mockResolvedValue([]);
+    showToastMock.mockClear();
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  // F1.2 is the primary guard (button disabled when contextsToSend empty).
+  // F1.1 guard exists as a defence-in-depth for programmatic calls.
+  // We verify button is disabled when all contexts are inactive (isActive: false).
+  it('F1.2 guard: button disabled when all contexts are inactive (contextsToSend empty)', () => {
+    setupStores({
+      selectedNodeIds: { context: [], flow: [], component: [] },
+      // Context exists but isActive: false → activeContexts filter → []
+      contextNodes: [
+        { nodeId: 'ctx-1', name: '患者管理', description: '管理患者', type: 'core' as const, isActive: false, status: 'confirmed' as const, children: [] },
+      ],
+      flowNodes: defaultFlowNodes,
+    });
+
+    render(<BusinessFlowTree />);
+
+    const continueBtn = screen.getByRole('button', { name: '继续到组件树' }) as HTMLButtonElement;
+    expect(continueBtn.disabled).toBe(true);
+  });
+
+  // AC1: With valid contexts, button is enabled and click triggers correct behavior
+  it('button enabled and calls API when contextsToSend is valid', async () => {
+    setupStores({
+      selectedNodeIds: { context: [], flow: [], component: [] },
+      contextNodes: defaultContextNodes,
+      flowNodes: defaultFlowNodes,
+    });
+
+    render(<BusinessFlowTree />);
+
+    const continueBtn = screen.getByRole('button', { name: '继续到组件树' }) as HTMLButtonElement;
+    expect(continueBtn.disabled).toBe(false);
+
+    await act(async () => {
+      await userEvent.click(continueBtn);
+    });
+
+    expect(mockFetch).toHaveBeenCalled();
+    expect(showToastMock).not.toHaveBeenCalled();
+  });
+});
+
+// ─── F1.2: Button disabled logic ─────────────────────────────────────────────
+describe('F1.2: Continue button disabled state', () => {
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  // AC1: contextsToSend 为空时按钮 disabled === true
+  it('disables button when contextsToSend is empty (all contexts inactive)', () => {
+    setupStores({
+      selectedNodeIds: { context: [], flow: [], component: [] },
+      // Context exists but isActive: false → contextsToSend will be []
+      contextNodes: [
+        { nodeId: 'ctx-1', name: '患者管理', description: '管理患者', type: 'core' as const, isActive: false, status: 'confirmed' as const, children: [] },
+      ],
+      flowNodes: defaultFlowNodes,
+    });
+
+    render(<BusinessFlowTree />);
+
+    const continueBtn = screen.getByRole('button', { name: '继续到组件树' }) as HTMLButtonElement;
+    expect(continueBtn.disabled).toBe(true);
+  });
+
+  // AC2: contextsToSend 有效时按钮 disabled === componentGenerating
+  it('enables button when contextsToSend is valid and not generating', () => {
+    setupStores({
+      selectedNodeIds: { context: [], flow: [], component: [] },
+      contextNodes: defaultContextNodes,
+      flowNodes: defaultFlowNodes,
+    });
+
+    render(<BusinessFlowTree />);
+
+    const continueBtn = screen.getByRole('button', { name: '继续到组件树' }) as HTMLButtonElement;
+    expect(continueBtn.disabled).toBe(false);
+  });
+
+  // Regression: Normal path (valid contexts + flows) button remains clickable
+  it('regression: enables button with valid contexts and flows', async () => {
+    setupStores({
+      selectedNodeIds: { context: [], flow: [], component: [] },
+      contextNodes: defaultContextNodes,
+      flowNodes: defaultFlowNodes,
+    });
+
+    render(<BusinessFlowTree />);
+
+    const continueBtn = screen.getByRole('button', { name: '继续到组件树' }) as HTMLButtonElement;
+    await act(async () => {
+      await userEvent.click(continueBtn);
+    });
+
+    // Should have called the API (button was enabled and clickable)
+    const mockFetch = canvasApi.fetchComponentTree as Mock;
+    expect(mockFetch).toHaveBeenCalled();
   });
 });

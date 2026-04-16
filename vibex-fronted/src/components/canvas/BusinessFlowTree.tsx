@@ -821,6 +821,16 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
     }
   }, [componentGenerating, flowNodes, contextNodes, selectedNodeIds, projectId, setComponentNodes, setPhase, toast]);
 
+  // F1.2: Derive canGenerateComponents — shared logic for button disabled + validation
+  const canGenerateComponents = useMemo(() => {
+    const activeContexts = contextNodes.filter((ctx) => ctx.isActive !== false);
+    const selectedContextSet = new Set(selectedNodeIds.context);
+    const validContexts = selectedContextSet.size > 0
+      ? activeContexts.filter((ctx) => selectedContextSet.has(ctx.nodeId))
+      : activeContexts;
+    return validContexts.length > 0 && flowNodes.length > 0;
+  }, [contextNodes, selectedNodeIds.context, flowNodes.length]);
+
   if (!isActive) {
     return (
       <div className={styles.inactivePanel}>
@@ -888,12 +898,12 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
             {flowGenerating ? '◌ 重新生成中...' : '🔄 重新生成'}
           </button>
         )}
-        {/* S1.1 & S1.2: 继续·组件树按钮 — flowData 为空时 disabled */}
+        {/* S1.1 & S1.2: 继续·组件树按钮 — F1.2: disabled when no valid contexts */}
         {flowNodes.length > 0 && (
           <button
             className={styles.secondaryButton}
             onClick={handleContinueToComponents}
-            disabled={componentGenerating}
+            disabled={!canGenerateComponents || componentGenerating}
             aria-label="继续到组件树"
             title="基于流程树数据生成组件树"
           >

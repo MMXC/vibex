@@ -4,6 +4,11 @@
   - 修复后: `canGenerateComponents` 和 `handleContinueToComponents` 共用 `computeTreePayload`，校验 `contextsToSend.length > 0 && flowsToSend.length > 0`
   - 新增: `BusinessFlowTree.test.tsx` — 4 测试覆盖 AC-F2.1-1~4
   - 提交: `3f8a8b52` (fix)
+- **E2-F2.2 componentGenerating unmount cleanup**: `BusinessFlowTree.tsx` — 新增 useEffect cleanup
+  - 修复: API 调用期间组件卸载时 `componentGenerating` 状态粘滞，导致按钮永久 disabled
+  - 修复: unmount 时调用 `setComponentGenerating(false)`
+  - 新增: `BusinessFlowTree.test.tsx` — 2 测试覆盖 AC-F2.2-1~2
+  - 提交: `4d2d73b9` (fix)
 
 ### [Unreleased] vibex-canvas-ux-fix Epic1: handleResponseError async/await 修复 — 2026-04-17
 - **E1-U1 handleResponseError async/await**: `canvasApi.ts` — `handleResponseError` 改为 async，await `res.json()` 解析后端错误

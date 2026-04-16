@@ -133,6 +133,18 @@
   - 扫描 vibex-backend/src/（排除 __tests__/、*.test.ts、log-sanitizer.ts、logger.ts）
   - 拦截包含 console.log/debug/error 的非测试文件提交
 
+### [Unreleased] vibex-dds-canvas-s2 Epic2b: ReactFlow 画布集成 — 2026-04-16
+- **E2b-1 ReactFlow 集成**: `vibex-fronted/src/components/dds/canvas/DDSFlow.tsx`
+  - `ReactFlowProvider` 包裹，`@xyflow/react` v12
+  - 三章节（requirement/context/flow）各自渲染对应卡片类型
+  - `cardToFlowNode` / `edgeToRFEdge` 转换 store → ReactFlow
+  - `onConnect` → `storeAddEdge`，`handleNodesChange` 持久化 position
+  - `CustomEvent('dds:editCard')` 派发给父组件处理
+  - `MiniMap` + `Controls` + `Background` dots
+  - `fitView` + `proOptions.hideAttribution`
+- **E2b-2 测试**: `DDSFlow.test.tsx` 8/8 passing
+- 提交: `b72455ba` (feat E2b) / `849cb8a0` (test E2b)
+
 ### [Unreleased] vibex-dds-canvas-s2 Epic4: 工具栏 Export/Import — 2026-04-16
 - **E4-1 Export 按钮**: `DDSToolbar.tsx` — `exportToJSON()` 下载 `.vibex-dds.json`
   - 工具栏集成 `ddsPersistence` 的 `exportToJSON()`

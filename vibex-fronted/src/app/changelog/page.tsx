@@ -83,6 +83,14 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '02263c66',
   },
   {
+    version: '1.0.241',
+    date: '2026-04-16',
+    changes: [
+      '🎨 DDS Epic2b: ReactFlow 画布集成 — DDSFlow 组件 + @xyflow/react v12，8/8 PASS',
+    ],
+    commit: 'b72455ba',
+  },
+  {
     version: '1.0.240',
     date: '2026-04-16',
     changes: [

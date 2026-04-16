@@ -229,6 +229,26 @@ Unit 7 (Route)
 
 ---
 
+## Epic 2a: ScrollContainer 奏折布局
+
+### E2-U1: ScrollContainer (URL sync + Fullscreen)
+
+**验收标准:**
+- [x] E2-U1-AC1: URL sync — ?chapter= ↔ store.activeChapter 双向同步
+- [x] E2-U1-AC2: Fullscreen mode — 工具栏切换全屏，viewport 100%覆盖
+- [x] DDSScrollContainer.module.css — .fullscreen class
+- [x] useChapterURLSync.ts — URL hook
+
+**Files:**
+- `vibex-fronted/src/components/dds/canvas/DDSScrollContainer.tsx` (updated)
+- `vibex-fronted/src/components/dds/canvas/DDSScrollContainer.module.css` (updated)
+- `vibex-fronted/src/hooks/dds/useChapterURLSync.ts` (new, 73 lines)
+- `vibex-fronted/src/hooks/dds/__tests__/useChapterURLSync.test.ts` (new, 2 tests)
+
+**Commit:** edd08e1d (feat: URL sync + fullscreen) | 476ec40d (test: hook tests)
+
+---
+
 ## Epic 2b: ReactFlow集成
 
 **Files:**

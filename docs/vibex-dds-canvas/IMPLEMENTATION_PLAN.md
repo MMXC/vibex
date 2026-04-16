@@ -238,7 +238,7 @@ Unit 7 (Route)
 **验收标准:**
 - [x] ReactFlow 渲染正常
 - [x] 节点/边 CRUD
-- [x] 145 tests passing
+- [x] 153 tests passing (full suite)
 
 **Commit:** fe5f35ff (epic1 reviewed), c4049d7d (epic2 reviewed)
 
@@ -253,6 +253,7 @@ Unit 7 (Route)
 - `vibex-fronted/src/components/dds/ai-draft/__tests__/CardPreview.test.tsx` (15 tests)
 
 **Commit:** 538ad1a6 (reviewed)
+**Tests:** 35 passed (AIDraftDrawer + DraftPreview)
 
 ---
 
@@ -263,6 +264,7 @@ Unit 7 (Route)
 - `vibex-fronted/src/components/dds/toolbar/DDSToolbar.test.tsx`
 
 **Commit:** fe5f35ff (reviewed)
+**Tests:** 14 passed (DDSToolbar)
 
 ---
 
@@ -273,3 +275,4 @@ Unit 7 (Route)
 - `vibex-fronted/src/components/dds/__tests__/DDSCanvasPage.test.tsx` (12 tests)
 
 **Commit:** 1717a097 (reviewed)
+**Tests:** 12 passed (DDSCanvasPage) + 8 passed (DDSFlow)

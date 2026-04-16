@@ -20,6 +20,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.247',
+    date: '2026-04-17',
+    changes: [
+      '🔧 E3-F3.1: hasAllNodes isActive !== false 检查 — 三树全部节点 must be active',
+      '📌 Bug: 原来只检查节点长度，deactive 节点存在时按钮错误 enabled；修复后 every(isActive!==false)',
+      '✅ 4/4 tests passed (含 AC-F3.1-1~4)',
+    ],
+    commit: 'a38f79be',
+  },
+  {
     version: '1.0.246',
     date: '2026-04-17',
     changes: [

@@ -226,3 +226,50 @@ Unit 7 (Route)
 - tsc --noEmit (0 errors)
 
 **Commit:** 5fc4c178
+
+---
+
+## Epic 2b: ReactFlow集成
+
+**Files:**
+- `vibex-fronted/src/components/dds/canvas/DDSFlow.tsx` (ReactFlow 画布)
+- `vibex-fronted/src/components/dds/canvas/DDSFlow.module.css`
+
+**验收标准:**
+- [x] ReactFlow 渲染正常
+- [x] 节点/边 CRUD
+- [x] 145 tests passing
+
+**Commit:** fe5f35ff (epic1 reviewed), c4049d7d (epic2 reviewed)
+
+---
+
+## Epic 3: AI Draft Flow
+
+**Files:**
+- `vibex-fronted/src/components/dds/ai-draft/AIDraftDrawer.tsx`
+- `vibex-fronted/src/components/dds/ai-draft/AIDraftModal.tsx`
+- `vibex-fronted/src/components/dds/ai-draft/DraftPreview.tsx`
+- `vibex-fronted/src/components/dds/ai-draft/__tests__/CardPreview.test.tsx` (15 tests)
+
+**Commit:** 538ad1a6 (reviewed)
+
+---
+
+## Epic 4: 工具栏
+
+**Files:**
+- `vibex-fronted/src/components/dds/toolbar/DDSToolbar.tsx`
+- `vibex-fronted/src/components/dds/toolbar/DDSToolbar.test.tsx`
+
+**Commit:** fe5f35ff (reviewed)
+
+---
+
+## Epic 5: Route & Page
+
+**Files:**
+- `vibex-fronted/src/components/dds/DDSCanvasPage.tsx`
+- `vibex-fronted/src/components/dds/__tests__/DDSCanvasPage.test.tsx` (12 tests)
+
+**Commit:** 1717a097 (reviewed)

@@ -240,7 +240,18 @@ Unit 7 (Route)
 - [x] 节点/边 CRUD
 - [x] 153 tests passing (full suite)
 
-**Commit:** fe5f35ff (epic1 reviewed), c4049d7d (epic2 reviewed)
+**Files:**
+- `vibex-fronted/src/components/dds/canvas/DDSFlow.tsx` ← 修复: 之前 untracked，现已 commit (b72455ba)
+- `vibex-fronted/src/components/dds/canvas/DDSFlow.module.css` (164 lines)
+
+**Epic 2b 新增 (b72455ba):**
+- ReactFlow canvas 渲染每个 chapter 的卡片为节点
+- useDDSCanvasFlow hook: store ↔ view 单向同步
+- Background / Controls / MiniMap
+- fitView on mount, node click → onSelectCard
+- 修复: updateCard bug resolved (正确调用 store actions)
+
+**Commit:** b72455ba (feat: Epic2b canvas/DDSFlow ReactFlow)
 
 ---
 

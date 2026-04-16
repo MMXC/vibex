@@ -732,6 +732,9 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
 
   // === Check if auto-gen should show ===
   // All contexts confirmed + no flows yet = show auto-gen hint
+  // E4-F4.3 审计: inactivePanel 使用 isActive prop（来自 BusinessFlowTreeProps）而非 allConfirmed
+  // 当前 CanvasPage 未传 isActive prop → BusinessFlowTree 默认 isActive=true → inactivePanel 永不显示
+  // 面板锁定功能（inactivePanel）当前未实际使用，allContextsActive 仅用于 hint 文本显示
   const allContextsActive = contextNodes.length > 0 && contextNodes.every((c) => c.isActive !== false);
 
   // S1.1: 零上下文状态也可添加流程（独立流程入口）

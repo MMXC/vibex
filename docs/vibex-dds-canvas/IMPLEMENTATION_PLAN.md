@@ -14,7 +14,7 @@
 
 ## Implementation Units
 
-- [ ] **Unit 1: DDSCanvasStore (E1)**
+- [x] **Unit 1: DDSCanvasStore (E1)**
 
 **Goal:** 实现 Zustand store，覆盖所有 canvas 状态。
 
@@ -33,7 +33,7 @@
 
 ---
 
-- [ ] **Unit 2: 三种卡片类型 (E1)**
+- [x] **Unit 2: 三种卡片类型 (E1)**
 
 **Goal:** 实现 Requirement / Acceptance / Constraint 三种卡片组件。
 
@@ -52,7 +52,7 @@
 
 ---
 
-- [ ] **Unit 3: Horizontal Scroll Canvas (E2)**
+- [x] **Unit 3: Horizontal Scroll Canvas (E2)**
 
 **Goal:** 实现横向 scroll-snap 布局。
 
@@ -69,7 +69,7 @@
 
 ---
 
-- [ ] **Unit 4: AI Draft Flow (E3)**
+- [x] **Unit 4: AI Draft Flow (E3)**
 
 **Goal:** 实现 AI 生成卡片流程（输入 → 预览 → 编辑 → 接受）。
 
@@ -111,7 +111,7 @@ const DRAFT_STATES = {
 
 ---
 
-- [ ] **Unit 5: Backend CRUD API (E4)**
+- [x] **Unit 5: Backend CRUD API (E4)**
 
 **Goal:** 实现卡片和章节的 CRUD API。
 
@@ -134,7 +134,7 @@ const DRAFT_STATES = {
 
 ---
 
-- [ ] **Unit 6: 前端 API Client (E4)**
+- [x] **Unit 6: 前端 API Client (E4)**
 
 **Goal:** 前端 API 调用封装。
 
@@ -149,7 +149,7 @@ const DRAFT_STATES = {
 
 ---
 
-- [ ] **Unit 7: Route & Page (E1-E4)**
+- [x] **Unit 7: Route & Page (E1-E4)**
 
 **Goal:** 集成到前端路由。
 

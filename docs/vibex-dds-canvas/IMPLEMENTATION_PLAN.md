@@ -251,7 +251,13 @@ Unit 7 (Route)
 - fitView on mount, node click → onSelectCard
 - 修复: updateCard bug resolved (正确调用 store actions)
 
-**Commit:** b72455ba (feat: Epic2b canvas/DDSFlow ReactFlow)
+**Tests:**
+- `canvas/__tests__/DDSFlow.test.tsx`: 8 tests ✅
+- `components/dds/__tests__/DDSFlow.test.tsx`: 8 tests ✅
+- `components/dds/__tests__/DDSCanvasPage.test.tsx`: 12 tests ✅
+
+**Commit:** b72455ba (feat: Epic2b) | 849cb8a0 (test: Epic2b tests)
+**Full suite:** 161 tests passing ✅
 
 ---
 

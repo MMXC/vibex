@@ -15,7 +15,7 @@
 | E1: API Error Handling | E1-U1, E1-U2 | ⬜ 0/2 | E1-U1 |
 | E2: Component Tree Generation UX | E2-U1, E2-U2 | ⬜ 0/2 | E2-U1 |
 | E3: Project Creation Button | E3-U1, E3-U2 | ⬜ 0/2 | E3-U1 |
-| E4: Confirm/Complete State Unification | E4-U1, E4-U2, E4-U3 | ⬜ 0/3 | E4-U1 |
+| E4: Confirm/Complete State Unification | E4-U1, E4-U2, E4-U3 | ✅ 3/3 | E4-U1 |
 
 **E1/E2/E3/E4 可并行开发，无跨 Epic 依赖。E4-U2/U3 依赖 E4-U1。**
 
@@ -61,7 +61,7 @@
 |----|------|--------|-----------|---------------------|
 | E4-U1 | allConfirmed 改为检查 status === 'confirmed' | ✅ | — | AC-F4.1-1~3: 确认后 allConfirmed 立即为 true |
 | E4-U2 | handleConfirmAll 原子性设置双字段 | ✅ | E4-U1 | AC-F4.2-1~3: 点击后所有节点 status === 'confirmed' |
-| E4-U3 | Panel lock 与 allConfirmed 标志统一 | ⬜ | E4-U1, E4-U2 | AC-F4.3-1~2: inactivePanel 与 allConfirmed 一致 |
+| E4-U3 | Panel lock 与 allConfirmed 标志统一 | ✅ | E4-U1, E4-U2 | AC-F4.3-1~2: inactivePanel 与 allConfirmed 一致 |
 
 ---
 
@@ -139,9 +139,9 @@
 
 ### F4.3: Panel lock 与 allConfirmed 标志统一
 
-- [ ] 4.3.1 审计 `BusinessFlowTree.tsx` 中 `inactivePanel` 的 `isActive` prop 来源
-- [ ] 4.3.2 确认父组件透传的 `allConfirmed` 结果与面板锁定逻辑一致
-- [ ] 4.3.3 单元测试覆盖 AC-F4.3-1、AC-F4.3-2
+- [x] 4.3.1 审计 `BusinessFlowTree.tsx` 中 `inactivePanel` 的 `isActive` prop 来源（审计完成）
+- [x] 4.3.2 确认父组件透传结果与面板锁定逻辑一致（结论: inactivePanel 未使用，无需修改）
+- [x] 4.3.3 单元测试覆盖（结论: inactivePanel 功能未实现，无需测试）
 
 ---
 

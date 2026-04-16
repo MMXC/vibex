@@ -1,3 +1,13 @@
+### [Unreleased] vibex-canvas-404-post-project: POST /project Handler — 2026-04-16
+- **E1-U1+U2+U3+U4 Canvas 项目创建接口**: `POST /api/v1/canvas/project`
+  - 新增: `src/routes/v1/canvas/index.ts` — `POST /project` handler（Hono, Cloudflare Workers）
+  - 新增: `migrations/0007_canvas_project.sql` — `CanvasProject` D1 表（三树数据持久化）
+  - 认证: `getAuthUserFromHono` — 无 JWT 返回 401
+  - 校验: `requirementText`, `contexts`, `flows`, `components` 必填检查，缺字段返回 400
+  - D1 写入: `Project` 表 + `CanvasProject` 表（事务性插入）
+  - 返回: `{ projectId, status: 'created' }` with status 201
+  - 提交: `51327329` (feat)
+
 ### [Unreleased] vibex-sprint2-20260415 E1: Tab State 重置修复 — 2026-04-16
 - **E1-U1 Tab State 修复**: `CanvasPage.tsx` — `useEffect([activeTree])` 重置 phase
   - 修复: TabBar 切换时 phase 未重置（root cause: useEffect 依赖 dead activeTab state）

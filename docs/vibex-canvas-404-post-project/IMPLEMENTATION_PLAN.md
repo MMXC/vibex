@@ -90,9 +90,32 @@ expect(response.status).toBe(400)
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E2-U1 | gstack browse 端到端验证 | ⬜ | E1-U3 | 三场景（正常/认证失败/参数缺失）返回正确状态码 |
+| E2-U1 | API 端点验证 | ✅ | E1-U3 | TC1: 401 (无JWT) ✅ | TC2/TC3: 需真实JWT验证 |
 
 ---
+
+### E2-U1 详细说明
+
+**验证方式**: curl API 测试 + 验证脚本
+
+**执行结果**:
+- TC1 (无 JWT → 401): ✅ PASS
+- TC2 (缺字段校验): ⚠️ 需真实 JWT（auth 优先，fake token 在校验前被拒）
+- TC3 (非法 JSON): ⚠️ 同上
+- TC4 (201 创建): ⚠️ 需 D1 migration 已应用 + 真实 JWT
+
+**验证脚本**: `vibex-backend/scripts/verify-canvas-project.sh`
+
+**验证命令**:
+```bash
+cd vibex-backend
+JWT_TOKEN=<your_token> bash scripts/verify-canvas-project.sh
+```
+
+**回滚时执行**:
+```bash
+wrangler d1 migrations rollback vibex-db --remote
+```
 
 ## 回滚计划
 

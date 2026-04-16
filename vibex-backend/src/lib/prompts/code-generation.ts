@@ -1,4 +1,4 @@
-import { analyzeCodeSecurity } from '@/lib/security/codeAnalyzer';
+import { analyzeCodeSecurity, generateSecurityWarnings } from '@/lib/security/codeAnalyzer';
 
 /**
  * Code Generation Prompt Templates
@@ -229,6 +229,11 @@ export function generateCodePrompt(input: CodeGenerationInput): string {
   const complexityGuide = COMPLEXITY_GUIDELINES[complexity];
   const securityPatterns = SECURITY_PATTERNS[security];
 
+  // --- E6-U1: AST Security Analysis for existing code ---
+  const existingCodeAnalysis = input.existingCode
+    ? generateSecurityWarnings(input.existingCode)
+    : '';
+
   return `## Code Generation Request
 
 ### Requirements
@@ -259,7 +264,7 @@ ${input.existingCode ? `### Existing Code Context
 \`\`\`${language}
 ${input.existingCode}
 \`\`\`
-` : ''}
+${existingCodeAnalysis ? existingCodeAnalysis + '\n' : ''}` : ''}
 
 ---
 

@@ -1,5 +1,5 @@
 import { safeError } from '@/lib/log-sanitizer';
-import { analyzeCodeSecurity } from '@/lib/security/codeAnalyzer';
+import { analyzeCodeSecurity, generateSecurityWarnings } from '@/lib/security/codeAnalyzer';
 /**
  * Code Review Prompt Templates
  * 
@@ -613,6 +613,16 @@ ${diff}
 ${code}
 \`\`\`
 `;
+  }
+
+  // --- E6-U1: AST Security Analysis Integration ---
+  if (code) {
+    const securityWarnings = generateSecurityWarnings(code);
+    if (securityWarnings) {
+      prompt += `
+${securityWarnings}
+`;
+    }
   }
 
   // Add file information

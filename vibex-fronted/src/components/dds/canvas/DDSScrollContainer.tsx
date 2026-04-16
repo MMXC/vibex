@@ -22,6 +22,7 @@ import { useDDSCanvasStore } from '@/stores/dds';
 import type { ChapterType, ChapterData } from '@/types/dds';
 import { DDSPanel } from './DDSPanel';
 import { DDSThumbNav, DDSThumbButton } from './DDSThumbNav';
+import { useChapterURLSync } from '@/hooks/dds/useChapterURLSync';
 import styles from './DDSScrollContainer.module.css';
 
 // ==================== Constants ====================
@@ -55,9 +56,13 @@ export const DDSScrollContainer = memo(function DDSScrollContainer({
   renderChapterContent,
   className = '',
 }: DDSScrollContainerProps) {
+  // E2-U1-AC1: URL sync — reads ?chapter= from URL, updates URL when activeChapter changes
+  useChapterURLSync();
+
   const activeChapter = useDDSCanvasStore((s) => s.activeChapter);
   const setActiveChapter = useDDSCanvasStore((s) => s.setActiveChapter);
   const chapters = useDDSCanvasStore((s) => s.chapters);
+  const isFullscreen = useDDSCanvasStore((s) => s.isFullscreen);
 
   // Refs for each panel — used for scrollIntoView
   const panelRefs = useRef<Record<ChapterType, HTMLDivElement | null>>({
@@ -140,7 +145,7 @@ export const DDSScrollContainer = memo(function DDSScrollContainer({
 
   return (
     <div
-      className={`${styles.ddsHorizontal} ${className}`}
+      className={`${styles.ddsHorizontal} ${isFullscreen ? styles.fullscreen : ''} ${className}`}
       onScroll={handleScroll}
       data-theme="dark"
       role="main"

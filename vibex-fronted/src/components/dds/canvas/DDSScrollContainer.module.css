@@ -114,3 +114,24 @@
   color: #f87171;
   font-size: 13px;
 }
+
+/* ============================================
+   E2-U1-AC2: Fullscreen mode
+   Toolbar toggles isFullscreen → full viewport layout
+   ============================================ */
+
+.fullscreen {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  background: #0f0f23 !important;
+  /* Hide toolbar and other chrome in fullscreen */
+  height: 100dvh !important;
+  width: 100vw !important;
+  /* Override scroll container size in fullscreen */
+  --dds-panel-collapsed-width: 0px !important;
+  --dds-panel-expanded-width: 100vw !important;
+}

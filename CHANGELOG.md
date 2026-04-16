@@ -1,3 +1,12 @@
+### [Unreleased] vibex-canvas-ux-fix Epic1: handleResponseError async/await 修复 — 2026-04-17
+- **E1-U1 handleResponseError async/await**: `canvasApi.ts` — `handleResponseError` 改为 async，await `res.json()` 解析后端错误
+  - 修复: 后端 400 错误信息透传到 toast（之前统一显示 "API 请求失败: 400"）
+  - 错误字段优先级: `error` > `message` > `details` > HTTP status fallback
+  - 非 JSON 响应 fallback 到 `{ error: \`HTTP ${res.status}\` }`
+  - 10 处调用点全部加 `await`
+  - 新增: `canvasApi.test.ts` — 8 测试覆盖 AC1/AC2 + 回归
+  - 提交: `2a10b064` (fix)
+
 ### [Unreleased] vibex-sprint-0415 Epic1: DDS路由构建修复 — 2026-04-16
 - **E1-U1 DDS API Route 移除**: 删除 `vibex-fronted/src/app/api/v1/dds/[...path]/route.ts`
   - 根因: Next.js `output:'export'` 静态导出与 `[...path]` catch-all 动态路由不兼容

@@ -120,3 +120,16 @@ npx playwright test <spec-file> --reporter=line
 ---
 
 _持续更新中_
+
+### 4. DDS Canvas Sprint 2 — Epic2-6 完整交付 (2026-04-17 新增)
+**情境**: vibex-dds-canvas-s2 完成 6 Epic（Epic2a/2b/3/4/5/6），涉及奏折布局、ReactFlow 集成、AI Draft、工具栏、数据持久化。
+**关键经验**:
+- Epic 之间的 DAG 依赖链正确（2a→2b→3→4→5，Epic6 独立）
+- 所有 Epic 的 dev commit + 测试 + changelog 需在 coord-completed 前交叉验证
+- Epic5（路由与页面集成）是画布功能最终落地步骤，PR 合并后即可对外提供完整功能
+**操作**:
+```bash
+# 验证所有 Epic 交付
+git log origin/main --oneline | grep "vibex-dds-canvas-s2"
+grep -A2 "vibex-dds-canvas-s2" CHANGELOG.md
+```

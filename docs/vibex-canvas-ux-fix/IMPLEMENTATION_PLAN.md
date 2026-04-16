@@ -59,7 +59,7 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E4-U1 | allConfirmed 改为检查 status === 'confirmed' | ⬜ | — | AC-F4.1-1~3: 确认后 allConfirmed 立即为 true |
+| E4-U1 | allConfirmed 改为检查 status === 'confirmed' | ✅ | — | AC-F4.1-1~3: 确认后 allConfirmed 立即为 true |
 | E4-U2 | handleConfirmAll 原子性设置双字段 | ⬜ | E4-U1 | AC-F4.2-1~3: 点击后所有节点 status === 'confirmed' |
 | E4-U3 | Panel lock 与 allConfirmed 标志统一 | ⬜ | E4-U1, E4-U2 | AC-F4.3-1~2: inactivePanel 与 allConfirmed 一致 |
 
@@ -126,10 +126,10 @@
 
 **改动文件**: `vibex-fronted/src/components/canvas/BoundedContextTree.tsx`
 
-- [ ] 4.1.1 `allConfirmed` 改为 `contextNodes.every((n) => n.status === 'confirmed')`
-- [ ] 4.1.2 全量审计：`grep -rn "isActive" vibex-fronted/src/components/canvas/` 查找所有 `isActive !== false` 用法
-- [ ] 4.1.3 确认 `inactivePanel` 的 `isActive` prop 与父组件透传的 `allConfirmed` 结果一致（F4.3）
-- [ ] 4.1.4 单元测试覆盖 AC-F4.1-1 至 AC-F4.1-3
+- [x] 4.1.1 `allConfirmed` 改为 `contextNodes.every((n) => n.status === 'confirmed')`
+- [ ] 4.1.2 全量审计（见 F4.3 checklist）
+- [ ] 4.1.3 inactivePanel 与 allConfirmed 一致性（见 F4.3 checklist）
+- [x] 4.1.4 单元测试覆盖 AC-F4.1-1 至 AC-F4.1-3（BoundedContextTree.test.tsx 新增 3 测试）
 
 ### F4.2: handleConfirmAll 原子性设置双字段
 

@@ -52,7 +52,7 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E3-U1 | hasAllNodes 增加 isActive 检查 | ⬜ | — | AC-F3.1-1~3: 三树全部 isActive 时解锁 |
+| E3-U1 | hasAllNodes 增加 isActive 检查 | ✅ | — | AC-F3.1-1~3: 三树全部 isActive 时解锁 |
 | E3-U2 | 按钮 tooltip 与实际条件一致 | ⬜ | E3-U1 | AC-F3.2-1~2: tooltip 准确反映失败原因 |
 
 ### E4: Confirm/Complete State Unification
@@ -109,9 +109,9 @@
 
 **改动文件**: `vibex-fronted/src/components/canvas/ProjectBar.tsx`
 
-- [ ] 3.1.1 将 `hasAllNodes` 从长度检查改为 `every(isActive !== false)`
-- [ ] 3.1.2 检查 `handleCreateProject` 内联守卫逻辑（ProjectBar.tsx:165-198），与 disabled 条件保持一致
-- [ ] 3.1.3 单元测试覆盖 AC-F3.1-1 至 AC-F3.1-3
+- [x] 3.1.1 将 `hasAllNodes` 从长度检查改为 `every(isActive !== false)`
+- [x] 3.1.2 检查 `handleCreateProject` 内联守卫逻辑（ProjectBar.tsx:165-198），与 disabled 条件保持一致（已一致，均使用 hasAllNodes）
+- [x] 3.1.3 单元测试覆盖 AC-F3.1-1 至 AC-F3.1-3（新增 ProjectBar.test.tsx，4 测试）
 
 ### F3.2: 按钮 tooltip 与实际条件一致
 

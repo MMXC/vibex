@@ -83,6 +83,22 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '02263c66',
   },
   {
+    version: '1.0.244',
+    date: '2026-04-16',
+    changes: [
+      '🤖 DDS Epic5: 路由与页面集成 — DDSCanvasPage 路由参数 + 章节状态同步，12/12 PASS',
+    ],
+    commit: '1717a097',
+  },
+  {
+    version: '1.0.243',
+    date: '2026-04-16',
+    changes: [
+      '💬 DDS Epic3: AI Draft Flow — AIDraftDrawer 滑出抽屉 + CardPreview，15/15 PASS',
+    ],
+    commit: '538ad1a6',
+  },
+  {
     version: '1.0.242',
     date: '2026-04-16',
     changes: [

@@ -20,6 +20,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.243',
+    date: '2026-04-17',
+    changes: [
+      '🔧 E1-U1: canvasApi handleResponseError async/await 修复 — 后端 400 错误信息透传到 toast',
+      '📌 错误字段优先级: error > message > details > HTTP status fallback；10 处调用点全部加 await',
+      '✅ 新增 8 个测试覆盖 AC1/AC2 + 回归（vitest 8/8 passed）',
+    ],
+    commit: '2a10b064',
+  },
+  {
     version: '1.0.242',
     date: '2026-04-16',
     changes: [

@@ -10,6 +10,13 @@
   - 新增: `BusinessFlowTree.test.tsx` — 2 测试覆盖 AC-F2.2-1~2
   - 提交: `4d2d73b9` (fix)
 
+### [Unreleased] vibex-canvas-ux-fix Epic3: hasAllNodes isActive !== false 检查 — 2026-04-17
+- **E3-F3.1 hasAllNodes isActive !== false**: `ProjectBar.tsx` — hasAllNodes 改为 every(isActive !== false)
+  - 修复: 原先只检查 nodes.length > 0，导致 deactive 节点存在时按钮错误 enabled
+  - 修复后: 三树全部节点 isActive !== false 时按钮解锁
+  - 新增: `ProjectBar.test.tsx` — 4 测试覆盖 AC-F3.1-1~4
+  - 提交: `a38f79be` (fix)
+
 ### [Unreleased] vibex-canvas-ux-fix Epic1: handleResponseError async/await 修复 — 2026-04-17
 - **E1-U1 handleResponseError async/await**: `canvasApi.ts` — `handleResponseError` 改为 async，await `res.json()` 解析后端错误
   - 修复: 后端 400 错误信息透传到 toast（之前统一显示 "API 请求失败: 400"）

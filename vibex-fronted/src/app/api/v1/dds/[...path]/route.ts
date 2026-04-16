@@ -11,6 +11,12 @@
  * 支持方法: GET, POST, PUT, DELETE
  */
 
+export const dynamic = "force-static";
+
+export function generateStaticParams() {
+  return [];
+}
+
 import { NextRequest, NextResponse } from 'next/server';
 
 const BACKEND_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://api.vibex.top/api';

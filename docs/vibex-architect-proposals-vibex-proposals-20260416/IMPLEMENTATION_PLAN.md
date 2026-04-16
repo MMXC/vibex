@@ -21,8 +21,8 @@
 | E6 | E6-U1 | @babel/parser AST 解析实现 | — | 2h | P2 | ✅ 完成 |
 | E6 | E6-U2 | 误报率 <1% 测试集验证 | E6-U1 | 1h | P2 | ✅ 完成 |
 | E6 | E6-U3 | AST 解析性能验证 | E6-U1 | 1h | P2 | ✅ 完成 |
-| E7 | E7-U1 | MCP /health 端点 | — | 1.5h | P2 | 待开始 |
-| E7 | E7-U2 | Structured logging | — | 1.5h | P2 | 待开始 |
+| E7 | E7-U1 | MCP /health 端点 | — | 1.5h | P2 | ✅ 完成 |
+| E7 | E7-U2 | Structured logging | — | 1.5h | P2 | ✅ 完成 |
 
 **总工时**: 7h（E6=4h, E7=3h）
 
@@ -167,8 +167,8 @@ Modified:
 
 #### 验收标准
 
-- [ ] GET /health 返回 200 + JSON（status/version/uptime/timestamp/connectedClients/sdkVersion）
-- [ ] 启动失败时返回 503
+- [x] GET /health 返回 200 + JSON（status/version/uptime/timestamp/connectedClients/sdkVersion）
+- [x] 启动失败时返回 503
 
 #### 文件变更
 
@@ -218,10 +218,10 @@ Modified:
 
 #### 验收标准
 
-- [ ] 日志输出 JSON 到 stdout，含 timestamp/level/message/service/tool/duration/success
-- [ ] 所有 tool handlers 使用 logger 替代 console.log
-- [ ] SDK 版本检查日志（启动时输出）
-- [ ] 敏感数据（token/password）不输出到日志
+- [x] 日志输出 JSON 到 stdout，含 timestamp/level/message/service/tool/duration/success
+- [x] 所有 tool handlers 使用 logger 替代 console.log
+- [x] SDK 版本检查日志（启动时输出）
+- [x] 敏感数据（token/password）不输出到日志
 
 #### 文件变更
 

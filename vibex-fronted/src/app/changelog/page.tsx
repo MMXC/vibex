@@ -20,6 +20,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.246',
+    date: '2026-04-17',
+    changes: [
+      '🔧 E2-F2.2: componentGenerating unmount cleanup — useEffect cleanup 防止状态粘滞',
+      '📌 Bug: API调用期间组件卸载导致 componentGenerating 状态粘滞；修复后 unmount 时重置',
+      '✅ 15/15 tests passed (含 AC-F2.2-1~2)',
+    ],
+    commit: '4d2d73b9',
+  },
+  {
     version: '1.0.245',
     date: '2026-04-17',
     changes: [

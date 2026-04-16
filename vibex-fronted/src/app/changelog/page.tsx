@@ -20,6 +20,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.249',
+    date: '2026-04-17',
+    changes: [
+      '🔍 E4-F4.3: Panel lock 审计完成 — inactivePanel 当前未使用，无代码修改（审计结论）',
+      '📌 审计: CanvasPage 未传 isActive prop → BusinessFlowTree inactivePanel 永不显示',
+      '✅ 15/15 tests passed (回归)',
+    ],
+    commit: '2edb5eb1',
+  },
+  {
     version: '1.0.248',
     date: '2026-04-17',
     changes: [

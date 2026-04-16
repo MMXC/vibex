@@ -24,6 +24,13 @@
   - 新增: `BoundedContextTree.test.tsx` — 3 测试覆盖 AC-F4.1-1~3
   - 提交: `4ca97fd6` (fix)
 
+### [Unreleased] vibex-canvas-ux-fix Epic4-F4.2: handleConfirmAll 原子性设置双字段 — 2026-04-17
+- **E4-F4.2 handleConfirmAll 原子性设置**: `BoundedContextTree.tsx` — handleConfirmAll 调用 confirmContextNode
+  - 修复: 原先只调用 advancePhase()，不设置任何状态，导致 allConfirmed 无法正确反映
+  - 修复: contextNodes.forEach((n) => confirmContextNode(n.nodeId)) 设置 status:'confirmed' + isActive:true
+  - 新增: `BoundedContextTree.test.tsx` — 3 测试覆盖 AC-F4.2-1~3
+  - 提交: `1085762e` (fix)
+
 ### [Unreleased] vibex-canvas-ux-fix Epic1: handleResponseError async/await 修复 — 2026-04-17
 - **E1-U1 handleResponseError async/await**: `canvasApi.ts` — `handleResponseError` 改为 async，await `res.json()` 解析后端错误
   - 修复: 后端 400 错误信息透传到 toast（之前统一显示 "API 请求失败: 400"）

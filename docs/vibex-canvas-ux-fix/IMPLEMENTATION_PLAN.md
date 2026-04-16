@@ -60,7 +60,7 @@
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
 | E4-U1 | allConfirmed 改为检查 status === 'confirmed' | ✅ | — | AC-F4.1-1~3: 确认后 allConfirmed 立即为 true |
-| E4-U2 | handleConfirmAll 原子性设置双字段 | ⬜ | E4-U1 | AC-F4.2-1~3: 点击后所有节点 status === 'confirmed' |
+| E4-U2 | handleConfirmAll 原子性设置双字段 | ✅ | E4-U1 | AC-F4.2-1~3: 点击后所有节点 status === 'confirmed' |
 | E4-U3 | Panel lock 与 allConfirmed 标志统一 | ⬜ | E4-U1, E4-U2 | AC-F4.3-1~2: inactivePanel 与 allConfirmed 一致 |
 
 ---
@@ -133,9 +133,9 @@
 
 ### F4.2: handleConfirmAll 原子性设置双字段
 
-- [ ] 4.2.1 `handleConfirmAll` 改为先 `forEach` 调用 `confirmContextNode`（设置 `status: 'confirmed'`），再 `advancePhase()`
-- [ ] 4.2.2 确认 store 的 `confirmContextNode` 同步设置 `isActive: true`（若不设置则手动补上）
-- [ ] 4.2.3 单元测试覆盖 AC-F4.2-1 至 AC-F4.2-3
+- [x] 4.2.1 `handleConfirmAll` 改为先 `forEach` 调用 `confirmContextNode`（设置 `status: 'confirmed'`），再 `advancePhase()`
+- [x] 4.2.2 确认 store 的 `confirmContextNode` 同步设置 `isActive: true`（store 已实现）
+- [x] 4.2.3 单元测试覆盖 AC-F4.2-1 至 AC-F4.2-3（BoundedContextTree.test.tsx 新增 3 测试）
 
 ### F4.3: Panel lock 与 allConfirmed 标志统一
 

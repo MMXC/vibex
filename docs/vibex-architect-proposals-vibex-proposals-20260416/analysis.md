@@ -1,9 +1,9 @@
-# 需求分析报告 — E6 AST安全扫描 + E7 MCP可观测性架构
+# 需求分析报告 — E6 AST 安全扫描 + E7 MCP 可观测性架构
 
 **项目**: vibex-architect-proposals-vibex-proposals-20260416
+**阶段**: Phase 1 — 需求分析（analyze-requirements）
 **日期**: 2026-04-16
 **分析人**: Analyst
-**状态**: 有条件推荐（E7 需修订）
 
 ---
 
@@ -11,188 +11,216 @@
 
 ### E6 — Prompts 安全 AST 扫描
 
-**业务背景**：VibeX 是一个 AI 代码分析和生成平台，其 `code-review.ts` 和 `code-generation.ts` 向 AI 注入用户提交的代码片段。当用户提交包含 `eval()`、`new Function()` 等动态代码执行语句时，当前系统依赖 prompt 指令让 AI 自行识别，无法真正阻止危险代码进入 AI 上下文。
+**业务目标**: 在 AI 代码审查和代码生成流程中，用 AST 解析替代字符串正则匹配，精确检测 `eval`/`new Function` 等危险代码模式，降低误报率。
 
-**目标用户**：VibeX 平台自身（安全扫描作为平台层能力，保护 AI 服务不被滥用）
+**目标用户**: 使用 VibeX 进行 AI 代码辅助开发的工程师。
 
-**核心价值**：
-- 降低因恶意/危险代码导致的 AI 误判或平台安全风险
-- 通过 AST 精确检测替代模糊的 prompt 指令，减少误报
+**核心价值**:
+- 减少安全扫描误报（当前正则方案会把变量名含 `eval` 的合法代码标记为危险）
+- 提高扫描置信度，为 AI 提供更可靠的安全上下文
+- 将安全分析从 prompt 指令降级为确定性代码检测
 
-**Jobs-To-Be-Done (JTBD)**：
-1. JTBD-1: 平台需在 AI 分析用户代码前，准确识别出动态代码执行类危险模式
-2. JTBD-2: 平台需确保安全扫描本身不产生过多误报（不阻断正常业务代码）
-3. JTBD-3: 安全扫描需足够快，不影响 code-review 和 code-generation 的响应时间
+### E7 — MCP 可观测性架构
 
----
+**业务目标**: 为 `packages/mcp-server` 添加健康检查和结构化日志，使服务状态可监控、可追踪。
 
-### E7 — MCP Server 可观测性
+**目标用户**: DevOps 工程师、平台运维团队。
 
-**业务背景**：VibeX MCP Server 通过 stdio 与 AI 客户端通信，提供代码生成和分析工具。当前缺少健康检查和结构化日志，运维团队无法感知服务状态和问题定位。
-
-**目标用户**：VibeX 运维团队 / 平台监控层
-
-**核心价值**：
-- 让运维团队能感知 MCP Server 的运行状态
-- 结构化日志支持日志聚合系统接入（Datadog/Fluentd）
-- SDK 版本一致性检查防止版本漂移
-
-**Jobs-To-Be-Done (JTBD)**：
-4. JTBD-4: 运维需能查询 MCP Server 当前是否健康（uptime、工具注册数）
-5. JTBD-5: 日志需能被结构化采集，供后续分析（JSON 格式）
-6. JTBD-6: 团队需感知 MCP SDK 版本是否与预期一致
+**核心价值**:
+- 可观测性：了解 MCP 服务运行状态、连接数、响应时间
+- 可追踪：结构化日志便于日志聚合系统（Datadog/Fluentd）采集分析
+- 可告警：健康检查端点供负载均衡器或监控系统探测
 
 ---
 
 ## 2. 技术方案选项
 
-### E6 技术方案
+### 2.1 E6 技术方案
 
-#### 方案一（推荐）：AST 解析替代正则匹配
+#### 方案 A：@babel/parser AST 解析（推荐）
 
-**描述**：使用 `@babel/parser` 解析代码为 AST，通过 `@babel/traverse` 遍历节点，精确检测 `CallExpression` 中的 `eval` 和 `Function` 引用。
+**描述**: 用 `@babel/parser` 解析代码为 AST，遍历 `CallExpression` 节点精确检测危险函数调用。
 
-**优点**：
-- 精确：AST 层面检测，不受字符串编码、混淆影响
-- 性能：单文件 <50ms（babel parser 经过大量优化）
-- 误报率低：基于语法结构，非正则模糊匹配
+**优势**:
+- 精确检测：AST 层面识别 `eval()` 调用，不受字符串混淆影响
+- 置信度高：解析成功时 confidence=100，解析失败时降为 50
+- 性能可控：单文件 <50ms（Babel 解析 5000 行代码约 30-40ms）
+- 依赖已就绪：`@babel/parser`、`@babel/traverse` 已在 `vibex-backend/package.json` 中
 
-**缺点**：
-- 包体积：`@babel/parser` ~5MB，增加 bundle size
-- 解析失败：某些非标准语法（如草案阶段语法）可能解析失败，需 fallback
-- 覆盖范围有限：无法检测 `eval("ev\x61l")` 等 Unicode 逃逸
+**劣势**:
+- 解析器不支持所有语法：某些实验性 TypeScript/JSX 语法可能不完全支持
+- 包体积：@babel/parser ~5MB，对 bundle size 有轻微影响
+- 混淆代码：Unicode 逃逸（如 `ev\x61l`）可能绕过 AST 检测
 
-#### 方案二：沙箱执行（仅检测 eval）
+**实施路径**:
+1. 新建 `vibex-backend/src/lib/security/codeAnalyzer.ts`
+2. 集成到 `code-review.ts` 和 `code-generation.ts`
+3. 移除旧 `vibex-backend/src/lib/prompts/_regexSecurity.ts`
+4. 单元测试 + 误报率测试集验证
 
-**描述**：在沙箱环境（如 vm2、isolated-vm）中执行代码，观察是否触发动态执行。
+#### 方案 B：正则匹配增强
 
-**优点**：能检测到逃逸后的 eval 调用
+**描述**: 保留现有正则方案，增加 negative lookahead 等增强模式。
 
-**缺点**：
-- 复杂度高：需要独立沙箱进程或线程
-- 性能差：每次分析需启动沙箱
-- 资源消耗大
-- 无法检测 `new Function`
-
-**结论**：方案一为推荐路径，方案二作为未来增强方向。
+**结论**: 不推荐。正则方案本质上是字符串匹配，无法区分 `const safeEval = 1;`（安全）和 `eval("x")`（危险）。E6 的核心目标就是消除这种误报，正则增强无法达成。
 
 ---
 
-### E7 技术方案
+### 2.2 E7 技术方案
 
-#### 方案一（推荐，修正）：MCP Tool 健康检查 + Structured Logging（已实现）
+**⚠️ 关键冲突**：Spec E7 描述的 HTTP `/health` 端点与 MCP server 当前架构不兼容。
 
-**描述**：`health_check` MCP tool 已实现（返回 status/uptime/tools）；structured logging 已实现（JSON 格式输出 stdout）。
+Research 发现 `packages/mcp-server/src/` 下已有：
+- `health.ts` — 已实现 `health_check` MCP tool（非 HTTP 端点）
+- `logger.ts` — 已实现 structured JSON logging
+- `tools/` — 已有 `logger.info/error` 调用
 
-**优点**：
-- MCP tool 方式与 stdio 传输模式完全兼容
-- 客户端通过 MCP 协议查询健康状态
-- 无需额外 HTTP 服务
+这意味着 E7 已被部分实现。但 Spec 中描述的 HTTP `/health` 方案存在架构问题。
 
-**缺点**：
-- 不兼容 HTTP 健康检查协议（如 Kubernetes liveness/readiness）
+#### 方案 A：MCP Tool 健康检查（推荐）
 
-#### 方案二（问题方案）：HTTP /health 端点
+**描述**: 保留现有 `health_check` MCP tool 方案，通过 MCP 协议自身的 stdio 通信响应健康状态。
 
-**描述**：在 MCP Server 中新增 HTTP Express 服务，监听 3100 端口。
+**优势**:
+- 架构一致：MCP server 使用 stdio 传输，不监听 HTTP 端口
+- 已有实现：健康检查逻辑和 structured logging 均已实现
+- 可观测性达标：客户端通过调用 `health_check` tool 获取服务状态
 
-**问题**：
-- MCP Server 使用 `StdioServerTransport`，是单进程 stdio 通信，无 HTTP 监听
-- 在 stdio 服务中混入 HTTP 服务是架构冲突
-- 增加复杂度，无实际收益
+**劣势**:
+- 无法被外部负载均衡器直接探测（需要通过 MCP 客户端中转）
+- 与 Spec 原描述（HTTP 端点）不一致，需要修订 Spec
 
-**结论**：方案一为正确路径。Spec 中的 HTTP /health 描述需修正为"MCP tool health_check"。
+**实施路径**:
+1. 验收现有 `health.ts` 和 `logger.ts` 实现是否符合 Spec
+2. 如有缺口，补全 structured logging 字段（`tool/duration/success`）
+3. 修订 Spec 中"HTTP `/health` endpoint"描述为"MCP `health_check` tool"
+
+#### 方案 B：MCP Server + HTTP 健康检查共存（不推荐）
+
+**描述**: 在 stdio 传输模式之上额外添加 HTTP 服务器用于健康检查。
+
+**结论**: 不推荐。引入额外 HTTP 服务器增加复杂性，且 MCP server 通常作为子进程运行，HTTP 端口暴露有安全风险。E7 的核心目标是可观测性，通过 MCP tool + structured logging 已可达成。
 
 ---
 
 ## 3. 可行性评估
 
-### E6 可行性：**高**
+### E6 — AST 安全扫描
 
-| 维度 | 评估 |
-|------|------|
-| 技术难度 | 低。@babel/parser API 成熟，文档完善 |
-| 依赖就绪 | 高。`@babel/parser`、`@babel/traverse` 已安装在 package.json |
-| 集成复杂度 | 低。只需在 code-review.ts 和 code-generation.ts 中引入并调用 |
-| 测试覆盖 | 可行。单元测试 + 1000 条样本误报率验证 |
-| 风险点 | Babel 解析失败时的 fallback 策略；Unicode 逃逸的 limitations |
+| 维度 | 评估 | 说明 |
+|------|------|------|
+| 技术可行性 | ✅ 高 | @babel/parser 成熟稳定，API 清晰，已有依赖 |
+| 依赖完整性 | ✅ 就绪 | @babel/parser、@babel/traverse 已在 package.json |
+| 性能可行性 | ✅ 可达 | AST 解析性能 <50ms/文件，Babel 优化良好 |
+| 测试可行性 | ✅ 可达 | 可构造 safe/unsafe 测试集验证误报率 |
+| 风险点 | ⚠️ 需处理 | Babel 不支持所有语法需 fallback；混淆代码检测有限制 |
 
-**结论**：技术可行，工时 4h 估算合理。
+### E7 — MCP 可观测性
 
-### E7 可行性：**高（已实现，需修订 Spec）**
-
-| 维度 | 评估 |
-|------|------|
-| 技术难度 | 低。代码已存在 |
-| 实现状态 | health_check tool 和 logger.ts 已集成到 index.ts |
-| Spec 准确性 | 中。Spec 描述与实现不一致（HTTP vs MCP tool） |
-| 剩余工作 | 验证已实现的功能是否符合验收标准；SDK version check 日志输出 |
-
-**结论**：E7 大部分已完成，剩余工作 <1h。需修订 spec 中的 HTTP 端点描述。
+| 维度 | 评估 | 说明 |
+|------|------|------|
+| 技术可行性 | ✅ 高 | 核心功能（health_check tool、logger）已实现 |
+| 架构一致性 | ⚠️ 需修订 | Spec 描述 HTTP 端点，但 MCP stdio 模式不适用 |
+| 依赖完整性 | ✅ 就绪 | logger.ts、health.ts 均已存在 |
+| 风险点 | ⚠️ 需确认 | 现有实现是否符合 Spec 所有验收条件 |
 
 ---
 
 ## 4. 初步风险识别
 
-### E6 风险矩阵
-
-| 风险 | 可能性 | 影响 | 等级 | 缓解措施 |
-|------|--------|------|------|----------|
-| Babel 解析失败导致漏报 | 中 | 高 | 🟡 中 | confidence 字段标记低置信度；保留 prompt-based 备用 |
-| Unicode 逃逸绕过检测 | 低 | 中 | 🟢 低 | 文档说明 limitations；建议安全红线不使用此类模式 |
-| 误报率超 1% | 低 | 中 | 🟢 低 | 1000 条样本测试集验证；可配置白名单 |
-| Bundle size 增加 | 中 | 低 | 🟢 低 | @babel/parser 仅在 Node 侧使用，不影响前端 bundle |
-
-### E7 风险矩阵
-
-| 风险 | 可能性 | 影响 | 等级 | 缓解措施 |
-|------|--------|------|------|----------|
-| HTTP endpoint 方案不可行 | 高（已在代码中发现） | 中 | 🔴 高 | 改用 MCP tool health_check（已实现） |
-| Structured log 敏感信息泄露 | 低 | 高 | 🟢 低 | 添加自动脱敏层（spec 中已标注） |
-| SDK 版本检查缺失 | 中 | 低 | 🟡 中 | 添加 SDK version 读取和日志输出 |
+| ID | 风险描述 | 影响 | 概率 | 缓解措施 |
+|----|----------|------|------|----------|
+| R1 | Babel 解析失败导致 confidence 骤降，漏报危险代码 | 高 | 低 | 解析失败时 fallback 到正则检测，记录为 warning |
+| R2 | 混淆代码（`ev\x61l`）绕过 AST 检测 | 中 | 低 | 在文档中标注为已知限制，不依赖 AST 作为唯一防线 |
+| R3 | E7 Spec 与实现不匹配，Spec 需修订 | 中 | 高 | Analyst 在评审报告中标注，Architect 负责修订 Spec |
+| R4 | Structured log 暴露敏感数据（token/secret） | 高 | 中 | 实现自动脱敏层，对匹配 `*token*/*secret*/password` 的字段值做 mask |
+| R5 | @babel/parser 包体积影响 bundle size | 低 | 中 | 确认 CI bundlesize 基线是否可接受；如超限，考虑 tree-shaking |
 
 ---
 
-## 5. 验收标准（具体可测试）
+## 5. 验收标准
 
-### E6 验收标准
+### E6 — AST 安全扫描
 
-- [ ] `analyzeCodeSecurity('eval("x")')` 返回 `hasUnsafe=true`，`unsafeEval` 包含检测结果
-- [ ] `analyzeCodeSecurity('new Function("return 1")')` 返回 `hasUnsafe=true`，`unsafeNewFunction` 包含检测结果
-- [ ] `analyzeCodeSecurity('const x = 1; return x * 2')` 返回 `hasUnsafe=false`（无误报）
-- [ ] 1000 条合法代码样本误报率 <1%（测试集运行）
-- [ ] 单文件（5000 行）解析耗时 <50ms
-- [ ] `code-review.ts` 集成 `analyzeCodeSecurity`，安全警告注入 AI 结果
-- [ ] `code-generation.ts` 集成 `analyzeCodeSecurity`
-- [ ] TypeScript 类型检查通过（`tsc --noEmit`）
-- [ ] 新增 `codeAnalyzer.test.ts`，测试覆盖率 ≥80%
+| ID | 验收条件 | 测试方式 |
+|----|----------|----------|
+| AC01 | `analyzeCodeSecurity('eval("x")')` 返回 `hasUnsafe=true`，`unsafeEval` 包含该调用 | 单元测试 |
+| AC02 | `analyzeCodeSecurity('new Function("return 1")')` 返回 `hasUnsafe=true` | 单元测试 |
+| AC03 | `analyzeCodeSecurity('const safeEval = 1')` 返回 `hasUnsafe=false`（不误报） | 单元测试 |
+| AC04 | `analyzeCodeSecurity('setTimeout("code", 0)')` 返回 `hasUnsafe=true` | 单元测试 |
+| AC05 | 1000 条合法代码样本误报率 <1% | 集成测试 |
+| AC06 | 5000 行代码 AST 解析 <50ms | 性能测试 |
+| AC07 | 解析失败时 confidence=50，不抛异常 | 单元测试 |
+| AC08 | `code-review.ts` 和 `code-generation.ts` 均集成 AST 扫描 | 集成测试 |
+| AC09 | 旧 `_regexSecurity.ts` 已删除 | 代码审查 |
 
-### E7 验收标准
+### E7 — MCP 可观测性
 
-- [ ] `health_check` MCP tool 可通过 MCP 协议调用，返回 `{status, timestamp, version, uptime, tools}`
-- [ ] 结构化日志输出到 stdout，格式为 JSON，包含 `timestamp`, `level`, `event`, `service`, `version` 字段
-- [ ] 工具调用日志包含 `tool`, `argsKeys` 字段
-- [ ] 工具错误日志包含 `error` 字段
-- [ ] MCP Server 启动时输出 `mcp_server_starting` 日志
-- [ ] SDK 版本检查（读取 `@modelcontextprotocol/sdk/package.json`）并输出 warn/info 日志（如版本不匹配）
-- [ ] Spec 修订：移除 HTTP `/health` 端点描述，改为 MCP tool health_check
+| ID | 验收条件 | 测试方式 |
+|----|----------|----------|
+| AC10 | MCP `health_check` tool 返回 status/version/uptime/connectedClients | 集成测试 |
+| AC11 | Structured log 输出 JSON 格式到 stdout | 单元测试 |
+| AC12 | 日志包含 `tool/duration/success` 字段 | 单元测试 |
+| AC13 | 日志包含 `timestamp/level/message/service` 字段 | 单元测试 |
+| AC14 | SDK 版本不匹配时输出 warn 日志 | 集成测试 |
+| AC15 | `logger.info/warn/error` 均正常输出对应 level | 单元测试 |
 
 ---
 
-## 6. 驳回条件检查
+## 6. 工期估算
 
-| 检查项 | 状态 | 说明 |
-|--------|------|------|
-| 需求模糊无法实现 | ✅ 通过 | 需求清晰：AST 扫描 + 可观测性 |
-| 缺少验收标准 | ✅ 通过 | 已列出具体可测试条目 |
-| 未执行 Research | ✅ 通过 | 已完成 git history + learnings 分析 |
-| 技术可行性 | ✅ 通过 | 依赖已就绪，实现路径明确 |
+| Epic | Story | 工时 | 备注 |
+|------|-------|------|------|
+| E6-S1 | @babel/parser AST 解析实现 | 2h | 含 codeAnalyzer.ts + 测试 |
+| E6-S2 | 误报率 <1% 测试集验证 | 1h | 含测试集构造 + 运行 |
+| E6-S3 | AST 解析性能验证 | 1h | 含性能基准测试 |
+| **E6 合计** | | **4h** | |
+| E7-S1 | MCP `health_check` tool 验收/补全 | 1.5h | 验收现有实现，补缺口 |
+| E7-S2 | Structured logging 验收/补全 | 1.5h | 验收 logger.ts，补缺失字段 |
+| **E7 合计** | | **3h** | |
+| **总计** | | **7h** | |
+
+**说明**: E7 工期基于"核心功能已部分实现"的前提。如需额外开发，工作量可能上升至 4-5h。
+
+---
+
+## 7. 依赖分析
+
+```
+E6 依赖:
+  ├── @babel/parser  ✅ 已安装（vibex-backend）
+  ├── @babel/traverse  ✅ 已安装（vibex-backend）
+  ├── @babel/types  ⚠️ 需确认是否存在
+  ├── code-review.ts  ✅ 存在
+  └── code-generation.ts  ✅ 存在
+
+E7 依赖:
+  ├── @modelcontextprotocol/sdk  ✅ 存在
+  ├── health.ts  ✅ 已实现
+  ├── logger.ts  ✅ 已实现
+  └── tools/*.ts  ✅ 已有 logger 调用
+```
+
+---
+
+## 8. 评审结论
+
+**结论**: Conditional — 有条件推荐
+
+**理由**:
+1. E6 技术方案可行，依赖已就绪，工期合理（4h）
+2. E7 核心功能已部分实现，但 Spec 存在架构描述错误（HTTP endpoint 不适用于 MCP stdio 模式），需要修订 Spec 后再实施
+3. E7 需在 Spec 修订完成后重新评估实施范围
+
+**前置条件**:
+- E7 Spec 需修订"HTTP `/health` endpoint"为"MCP `health_check` tool"
+- E6 需确认 `@babel/types` 依赖是否存在
 
 ---
 
 ## 执行决策
 
-- **决策**: 已采纳（E6 全额通过，E7 条件通过）
-- **执行项目**: vibex-architect-proposals-vibex-proposals-20260416
-- **执行日期**: 待定（Coord 决策）
-- **备注**: E7 spec 中的 HTTP /health 端点方案不可行，需修订为 MCP tool health_check（已实现）。建议 Dev 优先实施 E6（4h），E7 扫尾（<1h）可并行。
+- **决策**: 有条件推荐
+- **执行项目**: 待定（E7 需先修订 Spec）
+- **执行日期**: 待定
+- **备注**: E6 可立即进入实施阶段；E7 需 Architect 修订 Spec 后再分配开发任务

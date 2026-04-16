@@ -65,6 +65,16 @@ const mockChangelog: ChangelogEntry[] = [
     commit: 'cb82559a',
   },
   {
+    version: '1.0.237',
+    date: '2026-04-16',
+    changes: [
+      '🔒 E6-U1: 轻量级AST Walker — 替换 `@babel/traverse`，5000行 ~19ms (< 50ms ✓)，移除 traverse 依赖',
+      '🔒 E6-U2: 误报率验证 — 1000个合法样本，误报率 0% ✓',
+      '🔒 E6-U3: 性能测试 — 5000行 warm-run ~19ms / 1000行 < 10ms / 危险代码快速检测，16/16 PASS',
+    ],
+    commit: '4266c91d',
+  },
+  {
     version: '1.0.236',
     date: '2026-04-16',
     changes: [

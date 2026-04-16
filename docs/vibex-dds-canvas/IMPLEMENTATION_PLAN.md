@@ -281,7 +281,27 @@ Unit 7 (Route)
 
 ---
 
-## Epic 3: AI Draft Flow
+## Epic 3: 三章节画布集成
+
+### E3-U1: DDSCanvasPage 与后端集成
+
+**实现状态:** ✅ 已完成（之前 sprint 完成）
+
+**功能:**
+- `DDSCanvasPage.tsx` 调用 `api.getChapters(pid)` 获取章节列表
+- 对每个 chapter 并行调用 `api.getCards(id)` 获取卡片
+- 数据写入 DDSCanvasStore (`ddsChapterActions.addCard`)
+- 支持 loading / error / retry 状态
+- AbortController 防止 unmount 后 setState
+
+**Files:**
+- `vibex-fronted/src/components/dds/DDSCanvasPage.tsx` (223 lines)
+- `vibex-fronted/src/components/dds/__tests__/DDSCanvasPage.test.tsx` (205 lines, 12 tests)
+
+**Commit:** 76c24d4c
+**Tests:** 12 passed (DDSCanvasPage) ✅
+
+**Epic 3 AI Draft Flow:**
 
 **Files:**
 - `vibex-fronted/src/components/dds/ai-draft/AIDraftDrawer.tsx`

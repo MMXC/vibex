@@ -1,3 +1,10 @@
+### [Unreleased] vibex-canvas-ux-fix Epic2: canGenerateComponents flowsToSend 校验 — 2026-04-17
+- **E2-F2.1 canGenerateComponents flowsToSend 校验**: `BusinessFlowTree.tsx` — 新增 `computeTreePayload` 纯函数
+  - 修复: `canGenerateComponents` 原先只检查 `flowNodes.length > 0`，未过滤 deactive flows，导致 flows 全 deactive 时按钮错误 enabled
+  - 修复后: `canGenerateComponents` 和 `handleContinueToComponents` 共用 `computeTreePayload`，校验 `contextsToSend.length > 0 && flowsToSend.length > 0`
+  - 新增: `BusinessFlowTree.test.tsx` — 4 测试覆盖 AC-F2.1-1~4
+  - 提交: `3f8a8b52` (fix)
+
 ### [Unreleased] vibex-canvas-ux-fix Epic1: handleResponseError async/await 修复 — 2026-04-17
 - **E1-U1 handleResponseError async/await**: `canvasApi.ts` — `handleResponseError` 改为 async，await `res.json()` 解析后端错误
   - 修复: 后端 400 错误信息透传到 toast（之前统一显示 "API 请求失败: 400"）

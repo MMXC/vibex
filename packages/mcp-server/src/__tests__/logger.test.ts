@@ -62,4 +62,33 @@ describe('E7-S2 StructuredLogger', () => {
     expect(warnEntry.level).toBe('warn');
     expect(errorEntry.level).toBe('error');
   });
+
+  it('E7-S2: should redact sensitive fields (token/password/secret/key/auth)', () => {
+    logger.info('login attempt', {
+      token: 'secret-token-123',
+      password: 'myPassword',
+      user_secret: 'hidden',
+      apiKey: 'sk-abc',
+      authHeader: 'Bearer xyz',
+      public: 'safe-value',
+    });
+    const entry = JSON.parse(logs[0]);
+    expect(entry.token).toBe('[REDACTED]');
+    expect(entry.password).toBe('[REDACTED]');
+    expect(entry.user_secret).toBe('[REDACTED]');
+    expect(entry.apiKey).toBe('[REDACTED]');
+    expect(entry.authHeader).toBe('[REDACTED]');
+    expect(entry.public).toBe('safe-value');
+  });
+
+  it('E7-S2: should redact nested sensitive fields', () => {
+    logger.info('user update', {
+      user: { password: 'secret123', name: 'Alice' },
+      api_key: 'sk-key',
+    });
+    const entry = JSON.parse(logs[0]);
+    expect(entry.user.password).toBe('[REDACTED]');
+    expect(entry.user.name).toBe('Alice');
+    expect(entry.api_key).toBe('[REDACTED]');
+  });
 });

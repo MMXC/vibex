@@ -34,14 +34,38 @@ function shouldLog(level: LogLevel): boolean {
   return LOG_LEVELS[level] >= LOG_LEVELS[LOG_LEVEL]
 }
 
+/**
+ * E7-S2: Keys that should be redacted in logs
+ */
+const SENSITIVE_KEYS = ['token', 'password', 'secret', 'key', 'auth', 'credential', 'passphrase', 'private']
+
+/**
+ * E7-S2: Recursively sanitize sensitive fields from log metadata.
+ * Deep-clones the object to avoid mutation.
+ */
+function sanitize(meta: Record<string, unknown>): Record<string, unknown> {
+  const result: Record<string, unknown> = {}
+  for (const [k, v] of Object.entries(meta)) {
+    if (SENSITIVE_KEYS.some((sk) => k.toLowerCase().includes(sk))) {
+      result[k] = '[REDACTED]'
+    } else if (v && typeof v === 'object' && !Array.isArray(v)) {
+      result[k] = sanitize(v as Record<string, unknown>)
+    } else {
+      result[k] = v
+    }
+  }
+  return result
+}
+
 function formatLog(level: LogLevel, message: string, extra?: Record<string, unknown>): LogEntry {
+  const sanitized = extra ? sanitize(extra) : undefined
   return {
     timestamp: new Date().toISOString(),
     level,
     service: 'vibex-mcp-server',
     version: '0.1.0',
     message,
-    ...extra,
+    ...sanitized,
   }
 }
 

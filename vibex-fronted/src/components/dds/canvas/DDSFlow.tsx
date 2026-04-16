@@ -26,7 +26,7 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import { useDDSCanvasFlow } from '@/hooks/dds/useDDSCanvasFlow';
-import CardRenderer from '@/components/dds/cards/CardRenderer';
+import { CardRenderer } from '@/components/dds/cards/CardRenderer';
 import type { ChapterType, DDSCard } from '@/types/dds';
 import styles from './DDSFlow.module.css';
 

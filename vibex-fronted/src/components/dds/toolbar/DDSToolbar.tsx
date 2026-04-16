@@ -12,6 +12,7 @@
 import React, { memo } from 'react';
 import { useDDSCanvasStore } from '@/stores/dds';
 import type { ChapterType } from '@/types/dds';
+import { exportToJSON, parseImportFile } from '@/services/dds';
 import styles from './DDSToolbar.module.css';
 
 // ==================== Constants ====================

@@ -58,6 +58,18 @@
   - 优雅处理解析失败 (confidence=50)
   - Tests: `codeAnalyzer.test.ts` 8/8 passing (TC01~TC05 + 性能 + warnings)
   - 提交: `02263c66`
+- **E6-U1 轻量级AST Walker**: 替换 `@babel/traverse` Path 对象为手写递归 walker
+  - Babel parse: ~40ms | Custom walker: ~18ms warm | 5000行文件总耗时 ~19ms (< 50ms ✓)
+  - 移除 `@babel/traverse` 依赖
+  - 解析失败 → confidence=50 fallback
+- **E6-U2 误报率验证**: `false-positive-samples.ts` — 1000个合法代码样本
+  - 覆盖: 声明/函数/类/React/TS/异步/Node/DOM/算法/危险标识符误识
+  - 误报率 0% (0/1000) ✓
+- **E6-U3 性能测试**: `codeAnalyzer.perf.test.ts`
+  - 5000行 warm-run: avg ~19ms ✓ | 1000行: < 10ms ✓
+  - 危险代码快速检测 ✓ | 解析错误优雅降级 ✓
+  - Tests: 16 passed total (`pnpm test -- src/lib/security/`)
+  - 提交: `4266c91d`
 
 ### [Unreleased] vibex-architect-proposals-vibex-proposals-20260416 Epic7: MCP可观测性 — 2026-04-16
 - **E7-S1 Health Check**: `packages/mcp-server/src/health.ts` — `health_check` MCP tool (stdio transport)

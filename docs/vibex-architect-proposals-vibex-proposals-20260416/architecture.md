@@ -1,6 +1,6 @@
-# VibeX Sprint 2 技术架构设计
+# VibeX E6/E7 技术架构设计
 
-**项目**: vibex-sprint2
+**项目**: vibex-architect-proposals-vibex-proposals-20260416
 **日期**: 2026-04-16
 **作者**: Architect
 
@@ -20,230 +20,162 @@
 
 | Epic | 技术选型 | 理由 |
 |------|----------|------|
-| **E1** | React useEffect + Zustand selective reset | Tab 切换重置逻辑集中于 CanvasPage，避免改动 canvasStore 核心；依赖现有 `useCanvasPanels.resetPanelState()` |
-| **E2** | 前端集成现有 Hono API + 自研 Diff UI | Snapshot API 后端已实现（`/v1/canvas/snapshots`），前端只需消费；Diff 使用 `json-diff` 库做结构化比较 |
-| **E3** | 纯前端序列化（JSZip + yaml 库） | 项目数据全在 Zustand 三树状态中，前端直接序列化；无需后端改动；5MB 限制在写入前校验 |
-| **E4** | Cloudflare D1 Migration + 前端序列化 | Canvas 创建时写入 D1，三树数据随 Project 表一并存储；Migration 先本地验证再合入 |
+| **E6** | @babel/parser + @babel/traverse + @babel/types | AST 解析替代正则，精确检测 eval/new Function；Babel 是业界标准，TypeScript/JSX 支持好 |
+| **E7** | Express.js + 自研 logger.ts | MCP Server 已有 Express 基础，logger 用 console.log(JSON) 写 stdout 兼容日志收集 |
 
 ### 1.2 技术栈详情
 
-- **Frontend**: Next.js 14 (App Router), TypeScript, React 18, Zustand 4
-- **Backend**: Hono (Cloudflare Workers), D1 (SQLite), TypeScript
-- **Export**: JSZip 3.x, yaml (js-yaml)
-- **Diff**: json-diff 或手写递归比较
-- **Testing**: Vitest (单元), Playwright (E2E)
-- **CI**: 已有 bundlesize 基线（E6 CI 门控继承）
+- **Frontend**: N/A（本轮纯后端）
+- **Backend**: Node.js 20 LTS, TypeScript 5
+- **E6 AST**: @babel/parser ^7.24, @babel/traverse ^7.24, @babel/types ^7.24
+- **E7 MCP**: Express 4.x, @modelcontextprotocol/sdk ^0.5.0
+- **Testing**: Vitest（单元）
+- **Lint**: ESLint + TypeScript strict
+
+### 1.3 约束
+
+- Babel 包体积 ~5MB，bundle size 需监控（参考 E6 CI 基线）
+- 日志禁止输出 token/secret 等敏感数据
+- Babel 解析失败时 confidence 降至 50，不阻断流程
 
 ---
 
 ## 2. Architecture Diagram
 
-### 2.1 系统数据流图
+### 2.1 E6 安全扫描数据流
 
 ```mermaid
 flowchart TD
-    subgraph Frontend["前端 (Next.js)"]
-        CanvasPage["CanvasPage.tsx"]
-        ZustandStores["Zustand Stores"]
-        useCanvasPanels["useCanvasPanels"]
-        useVersionHistory["useVersionHistory"]
-        useAutoSave["useAutoSave"]
-        ExportService["ExportService"]
-        ImportService["ImportService"]
-        PanelReset["resetPanelState()"]
+    subgraph Input["代码输入"]
+        CodeReview["code-review.ts\n用户代码输入"]
+        CodeGen["code-generation.ts\n生成代码输入"]
     end
 
-    subgraph Backend["后端 (Cloudflare Workers)"]
-        SnapshotAPI["/v1/canvas/snapshots"]
-        ProjectAPI["/api/projects"]
-        D1DB["D1 Database"]
+    subgraph Analyzer["安全分析层"]
+        CodeAnalyzer["codeAnalyzer.ts\nanalyzeCodeSecurity()"]
+        ASTParser["@babel/parser\nAST 解析"]
+        Traversal["@babel/traverse\n节点遍历"]
     end
 
-    subgraph Data["数据层"]
-        ThreeTrees["三树状态\n(contexts/flows/components)"]
-        ProjectData["ProjectData\n(name + 三树序列化)"]
-        Snapshots["CanvasSnapshot\n(版本历史)"]
+    subgraph Output["结果输出"]
+        SecurityReport["SecurityReport\nhasUnsafe/unsafeEval/unsafeNewFunction/confidence"]
+        WarningInject["警告注入到 AI 结果"]
     end
 
-    %% E1: Tab State 残留修复
-    E1_Fix["E1: Tab 切换 → 重置 panel state"]
-    CanvasPage --> PanelReset
-    PanelReset --> |reset currentPhase| ZustandStores
-    PanelReset --> |close accordion| ZustandStores
-
-    %% E2: 版本历史集成
-    E2_Panel["E2: VersionHistoryPanel"]
-    useVersionHistory --> |GET /snapshots| SnapshotAPI
-    E2_Panel --> |restore| SnapshotAPI
-    SnapshotAPI --> |contexts/flows/components| E2_Panel
-
-    %% E3: 导入导出
-    E3_Export["E3: JSON/YAML Export"]
-    E3_Import["E3: JSON/YAML Import"]
-    ZustandStores --> |读取三树| E3_Export
-    E3_Export --> |写入文件| Download["文件下载"]
-    E3_Import --> |解析文件| ZustandStores
-    E3_Import --> |5MB 校验| E3_Import
-
-    %% E4: 三树持久化
-    E4_Save["E4: 项目保存时序列化三树"]
-    E4_Load["E4: Dashboard 打开时恢复三树"]
-    ZustandStores --> |serialize| E4_Save
-    E4_Save --> |write| D1DB
-    D1DB --> |deserialize| E4_Load
-    E4_Load --> |restore| ZustandStores
-    E4_Load --> |render| CanvasPage
+    CodeReview --> CodeAnalyzer
+    CodeGen --> CodeAnalyzer
+    CodeAnalyzer --> ASTParser
+    ASTParser --> Traversal
+    Traversal --> SecurityReport
+    SecurityReport --> WarningInject
 ```
 
-### 2.2 E4 模块依赖图
+### 2.2 E7 MCP 可观测性架构
 
 ```mermaid
 flowchart LR
-    subgraph Migration["D1 Migration"]
-        M1["创建 canvas_state 表"]
-        M2["添加 projectId 外键"]
-        M3["三树 JSON 列"]
+    subgraph MCP["MCP Server (:3100)"]
+        Health["/health\n健康检查端点"]
+        Logger["logger.ts\nStructured logging"]
+        Tools["tools/*.ts\nTool handlers"]
     end
 
-    subgraph Serialize["序列化层"]
-        S1["三树数据提取"]
-        S2["JSON stringify"]
-        S3["写入 project.name"]
+    subgraph Output["日志输出"]
+        Stdout["stdout\nJSON 格式"]
+        LogAgg["日志收集\n(Datadog/Fluentd)"]
     end
 
-    subgraph Deserialize["反序列化层"]
-        D1["从 project.name 读 JSON"]
-        D2["JSON parse"]
-        D3["restoreStore()"]
-    end
-
-    M1 --> M2 --> M3
-    M3 --> S1
-    S1 --> S2 --> S3
-    D1 --> D2 --> D3
+    Health --> |健康状态| Logger
+    Tools --> |tool调用| Logger
+    Logger --> |JSON| Stdout
+    Stdout --> |收集| LogAgg
 ```
 
 ---
 
 ## 3. API Definitions
 
-### 3.1 E2: 版本历史 API（前端消费，后端已实现）
+### 3.1 E6: SecurityReport 接口
 
 ```typescript
-// GET /v1/canvas/snapshots?projectId=xxx
-interface SnapshotListResponse {
-  snapshots: Array<{
-    snapshotId: string;
-    projectId: string;
-    label: string;
-    trigger: 'manual' | 'auto' | 'ai_complete';
-    createdAt: string;         // ISO 8601
-    version: number;
-    contextCount: number;
-    flowCount: number;
-    componentCount: number;
-    isAutoSave: boolean;
-  }>;
-  total: number;
-  limit: number;
-  offset: number;
+// vibex-backend/src/lib/security/codeAnalyzer.ts
+
+interface SecurityReport {
+  /** 是否检测到危险模式 */
+  hasUnsafe: boolean
+  /** eval() 调用位置列表 */
+  unsafeEval: string[]
+  /** new Function() 调用位置列表 */
+  unsafeNewFunction: string[]
+  /** setTimeout/setInterval 字符串参数调用 */
+  unsafeDynamicCode: string[]
+  /** 置信度 0-100，解析失败时降为 50 */
+  confidence: number
 }
 
-// GET /v1/canvas/snapshots/:id
-interface SnapshotDetailResponse {
-  success: true;
-  snapshot: {
-    snapshotId: string;
-    projectId: string;
-    label: string;
-    trigger: 'manual' | 'auto' | 'ai_complete';
-    createdAt: string;
-    version: number;
-    contextCount: number;
-    contextNodes: unknown[];    // 完整数据
-    flowNodes: unknown[];      // 完整数据
-    componentNodes: unknown[];
-  };
-}
-
-// POST /v1/canvas/snapshots/:id/restore
-interface RestoreSnapshotResponse {
-  success: true;
-  contextNodes: BoundedContextNode[];
-  flowNodes: BusinessFlowNode[];
-  componentNodes: ComponentNode[];
-}
+/**
+ * 分析代码安全性
+ * @param code - 待分析的代码字符串
+ * @returns SecurityReport
+ */
+function analyzeCodeSecurity(code: string): SecurityReport
 ```
 
-### 3.2 E3: 导入导出 API（纯前端）
+### 3.2 E7: /health 响应格式
 
 ```typescript
-// 导出格式
-interface ProjectExport {
-  version: '1.0.0';
-  exportedAt: string;        // ISO 8601
-  projectName: string;
-  projectId?: string;
-  data: {
-    contexts: BoundedContextNode[];
-    flows: BusinessFlowNode[];
-    components: ComponentNode[];
-  };
-  metadata: {
-    appVersion: string;
-    format: 'json' | 'yaml';
-    nodeCount: {
-      contexts: number;
-      flows: number;
-      components: number;
-    };
-  };
+// packages/mcp-server/src/health.ts
+
+interface HealthResponse {
+  /** 服务状态 */
+  status: 'ok'
+  /** 服务版本 */
+  version: string
+  /** 已连接客户端数 */
+  connectedClients: number
+  /** 进程运行秒数 */
+  uptime: number
+  /** ISO 8601 时间戳 */
+  timestamp: string
+  /** MCP SDK 版本 */
+  sdkVersion: string
 }
 
-// 导出服务签名
-interface ExportService {
-  exportAsJSON(projectName: string): Promise<Blob>;
-  exportAsYAML(projectName: string): Promise<Blob>;
-  validateFileSize(file: File): boolean;  // 5MB limit
-  validateFormat(content: string): boolean;
-}
-
-// 导入服务签名
-interface ImportService {
-  parseJSON(content: string): ProjectExport;
-  parseYAML(content: string): ProjectExport;
-  roundTripTest(project: ProjectExport): boolean;  // serialize → deserialize = original
-}
+// GET /health → 200 OK + HealthResponse
+// GET /health → 503 Service Unavailable（启动失败时）
 ```
 
-### 3.3 E4: 三树持久化（前端写入，后端读取）
+### 3.3 E7: Structured Log 格式
 
 ```typescript
-// Project API（已有）
-interface ProjectResponse {
-  id: string;
-  name: string;            // 包含序列化三树数据的 JSON 字符串
-  createdAt: string;
-  updatedAt: string;
+// packages/mcp-server/src/lib/logger.ts
+
+interface LogEntry {
+  /** ISO 8601 时间戳 */
+  timestamp: string
+  /** 日志级别 */
+  level: 'debug' | 'info' | 'warn' | 'error'
+  /** 日志消息（事件名） */
+  message: string
+  /** 服务标识 */
+  service: 'mcp-server'
+  /** 调用工具名（可选） */
+  tool?: string
+  /** 执行时长 ms（可选） */
+  duration?: number
+  /** 调用结果（可选） */
+  success?: boolean
+  /** 客户端 ID（可选） */
+  clientId?: string
+  /** 扩展字段 */
+  [key: string]: unknown
 }
 
-// E4 序列化格式（存入 project.name 字段）
-interface ThreeTreesPayload {
-  version: 1;
-  contextNodes: BoundedContextNode[];
-  flowNodes: BusinessFlowNode[];
-  componentNodes: ComponentNode[];
-  savedAt: string;          // ISO 8601
-}
-
-// D1 存储结构（通过 Migration 创建）
-interface CanvasStateRow {
-  id: string;
-  projectId: string;        // FK → Project.id
-  contextNodes: string;     // JSON
-  flowNodes: string;       // JSON
-  componentNodes: string;   // JSON
-  savedAt: string;
+const logger = {
+  debug: (message: string, meta?: Record<string, unknown>) => void
+  info: (message: string, meta?: Record<string, unknown>) => void
+  warn: (message: string, meta?: Record<string, unknown>) => void
+  error: (message: string, meta?: Record<string, unknown>) => void
 }
 ```
 
@@ -251,73 +183,30 @@ interface CanvasStateRow {
 
 ## 4. Data Model
 
-### 4.1 核心实体关系（ER 图）
-
-```mermaid
-erDiagram
-    Project {
-        string id PK
-        string name          -- 包含序列化三树数据（E4 Payload）或纯名称
-        datetime createdAt
-        datetime updatedAt
-        string userId
-    }
-
-    CanvasSnapshot {
-        string id PK
-        string projectId FK
-        int version
-        string name
-        string description
-        string data          -- JSON: {contexts, flows, components, _trigger, _label}
-        datetime createdAt
-        bool isAutoSave
-    }
-
-    CanvasState {
-        string id PK
-        string projectId FK  -- 与 Project 一对一（E4 新增）
-        string contextNodes   -- JSON 数组
-        string flowNodes      -- JSON 数组
-        string componentNodes -- JSON 数组
-        datetime savedAt
-    }
-
-    Project ||--o{ CanvasSnapshot : "has"
-    Project ||--|| CanvasState : "stores"
-```
-
-### 4.2 三树节点数据结构
+### 4.1 E6 SecurityReport 结构
 
 ```typescript
-// 限界上下文节点
-interface BoundedContextNode {
-  nodeId: string;
-  name: string;
-  description: string;
-  type: 'core' | 'supporting' | 'generic';
-  status: 'pending' | 'confirmed' | 'rejected';
-  isActive: boolean;
-  children: BoundedContextNode[];
-}
+// SecurityReport 字段说明
 
-// 业务流程节点
-interface BusinessFlowNode {
-  nodeId: string;
-  name: string;
-  contextId: string;        // 关联 BoundedContext
-  steps: FlowStep[];
-  status: 'pending' | 'confirmed';
+interface SecurityReport {
+  hasUnsafe: boolean          // 任意危险模式检测到时为 true
+  unsafeEval: string[]       // eval() 调用源码列表
+  unsafeNewFunction: string[] // new Function() 调用源码列表
+  unsafeDynamicCode: string[] // setTimeout(fn, ms) 字符串参数调用
+  confidence: number         // 0-100，解析失败时降为 50
 }
+```
 
-// 组件节点
-interface ComponentNode {
-  nodeId: string;
-  name: string;
-  flowId: string;          // 关联 BusinessFlow
-  type: 'page' | 'component' | 'api';
-  props: Record<string, unknown>;
-  api: { method: string; path: string; params: unknown[] };
+### 4.2 E7 HealthResponse 结构
+
+```typescript
+interface HealthResponse {
+  status: 'ok' | 'degraded' | 'unhealthy'
+  version: string           // MCP Server 版本（环境变量 MCP_VERSION，默认 0.5.0）
+  connectedClients: number  // 当前连接数
+  uptime: number            // process.uptime() 秒数
+  timestamp: string         // new Date().toISOString()
+  sdkVersion: string        // @modelcontextprotocol/sdk 版本
 }
 ```
 
@@ -327,121 +216,149 @@ interface ComponentNode {
 
 ### 5.1 测试框架
 
-- **单元测试**: Vitest（Zustand store、序列化/反序列化、Diff 逻辑）
-- **集成测试**: Playwright（Tab 切换、导入导出 round-trip、Dashboard 打开恢复）
-- **覆盖率要求**: 核心逻辑 > 80%（Diff 算法、三树序列化/反序列化、Tab 重置逻辑）
+- **单元测试**: Vitest（codeAnalyzer.ts, logger.ts, health.ts）
+- **覆盖率要求**: 核心逻辑 > 80%（AST 解析路径、危险模式检测、日志输出）
 
-### 5.2 核心测试用例
-
-#### E1: Tab State 修复
+### 5.2 E6 核心测试用例
 
 ```typescript
-describe('CanvasPage Tab State Reset', () => {
-  it('should reset currentPhase to context when switching tabs', async () => {
-    // Arrange: 设置 phase 为 flow
-    // Act: 点击 context tab
-    // Assert: phase === 'context'
-  });
+describe('analyzeCodeSecurity', () => {
+  it('should detect eval()', () => {
+    const report = analyzeCodeSecurity('eval("alert(1)")')
+    expect(report.hasUnsafe).toBe(true)
+    expect(report.unsafeEval.length).toBeGreaterThan(0)
+  })
 
-  it('should close Prototype accordion when leaving prototype tab', async () => {
-    // Arrange: queuePanelExpanded = true, phase = 'prototype'
-    // Act: 点击 context tab
-    // Assert: queuePanelExpanded === false
-  });
+  it('should detect new Function()', () => {
+    const report = analyzeCodeSecurity('new Function("return 1")')
+    expect(report.hasUnsafe).toBe(true)
+    expect(report.unsafeNewFunction.length).toBeGreaterThan(0)
+  })
 
-  it('should reset all panel states on tab switch', async () => {
-    // Arrange: 多个面板状态为非默认值
-    // Act: setActiveTab('flow')
-    // Assert: resetPanelState() 被调用，phase → flow
-  });
-});
+  it('should detect setTimeout(string, 0)', () => {
+    const report = analyzeCodeSecurity('setTimeout("code", 0)')
+    expect(report.hasUnsafe).toBe(true)
+    expect(report.unsafeDynamicCode.length).toBeGreaterThan(0)
+  })
+
+  it('should NOT detect safe code as unsafe', () => {
+    const report = analyzeCodeSecurity('const x = 1; return x * 2')
+    expect(report.hasUnsafe).toBe(false)
+    expect(report.unsafeEval).toHaveLength(0)
+  })
+
+  it('should handle syntax error gracefully', () => {
+    const report = analyzeCodeSecurity('=== not valid js ===')
+    expect(report.confidence).toBeLessThan(100)
+    expect(report.hasUnsafe).toBe(false)
+  })
+
+  it('should have false positive rate < 1% on 1000 safe samples', () => {
+    const safeSamples = loadSafeCodeSamples(1000)
+    const falsePositives = safeSamples
+      .map(code => analyzeCodeSecurity(code))
+      .filter(r => r.hasUnsafe).length
+    const rate = falsePositives / safeSamples.length
+    expect(rate).toBeLessThan(0.01)
+  })
+
+  it('should parse 5000-line file < 50ms', () => {
+    const largeCode = generateLargeCodeFile(5000)
+    const start = Date.now()
+    analyzeCodeSecurity(largeCode)
+    expect(Date.now() - start).toBeLessThan(50)
+  })
+})
 ```
 
-#### E2: 版本历史集成
+### 5.3 E7 核心测试用例
 
 ```typescript
-describe('VersionHistory Integration', () => {
-  it('should fetch snapshot list from API', async () => {
-    // Mock GET /v1/canvas/snapshots
-    // Assert: snapshots 正确渲染
-  });
+describe('GET /health', () => {
+  it('should return 200 with status ok', async () => {
+    const res = await fetch('http://localhost:3100/health')
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.status).toBe('ok')
+  })
 
-  it('should render diff between two versions', async () => {
-    // Arrange: 两个 snapshot 有不同内容
-    // Act: 选择两个版本
-    // Assert: diff 面板显示 added/removed/changed
-  });
+  it('should include version, uptime, timestamp fields', async () => {
+    const res = await fetch('http://localhost:3100/health')
+    const body = await res.json()
+    expect(body.version).toBeDefined()
+    expect(typeof body.uptime).toBe('number')
+    expect(body.uptime).toBeGreaterThan(0)
+    expect(body.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T/)
+  })
 
-  it('should restore snapshot and update store', async () => {
-    // Mock POST /v1/canvas/snapshots/:id/restore
-    // Assert: contextNodes/flowNodes/componentNodes 被更新
-  });
-});
+  it('should include connectedClients', async () => {
+    const res = await fetch('http://localhost:3100/health')
+    const body = await res.json()
+    expect(typeof body.connectedClients).toBe('number')
+  })
+
+  it('should include sdkVersion', async () => {
+    const res = await fetch('http://localhost:3100/health')
+    const body = await res.json()
+    expect(body.sdkVersion).toMatch(/^\d+\.\d+.\d+$/)
+  })
+})
+
+describe('Structured Logging', () => {
+  it('should output JSON to stdout with all required fields', () => {
+    const logOutput = captureStdout(() => {
+      logger.info('tool_called', { tool: 'test', duration: 42, success: true })
+    })
+    const parsed = JSON.parse(logOutput.trim())
+    expect(parsed.level).toBe('info')
+    expect(parsed.message).toBe('tool_called')
+    expect(parsed.service).toBe('mcp-server')
+    expect(parsed.tool).toBe('test')
+    expect(parsed.duration).toBe(42)
+    expect(parsed.success).toBe(true)
+    expect(parsed.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T/)
+  })
+
+  it('should include error level logs', () => {
+    const logOutput = captureStdout(() => {
+      logger.error('connection_failed', { clientId: 'c1', error: 'timeout' })
+    })
+    const parsed = JSON.parse(logOutput.trim())
+    expect(parsed.level).toBe('error')
+    expect(parsed.message).toBe('connection_failed')
+    expect(parsed.clientId).toBe('c1')
+  })
+
+  it('should NOT output sensitive data in logs', () => {
+    const logOutput = captureStdout(() => {
+      logger.info('auth_attempt', { token: 'secret123', password: 'hunter2' })
+    })
+    const parsed = JSON.parse(logOutput.trim())
+    // 敏感字段应被过滤或未出现在日志中
+    expect(Object.keys(parsed)).not.toContain('token')
+    expect(Object.keys(parsed)).not.toContain('password')
+  })
+})
 ```
 
-#### E3: 导入导出
-
-```typescript
-describe('Import/Export', () => {
-  it('should export project as JSON', async () => {
-    // Arrange: 三树有数据
-    // Act: exportAsJSON()
-    // Assert: 文件内容包含 version/exportedAt/data
-  });
-
-  it('should export project as YAML', async () => {
-    // Act: exportAsYAML()
-    // Assert: YAML 格式正确，可被 yaml.load() 解析
-  });
-
-  it('should pass round-trip: serialize → deserialize = original', () => {
-    const original: ProjectExport = { /* ... */ };
-    const jsonStr = JSON.stringify(original);
-    const parsed = JSON.parse(jsonStr);
-    expect(parsed).toEqual(original);
-  });
-
-  it('should reject files larger than 5MB', () => {
-    // Assert: validateFileSize() 对 >5MB 返回 false
-  });
-});
-```
-
-#### E4: 三树持久化
-
-```typescript
-describe('Three Trees Persistence', () => {
-  it('should serialize three trees to JSON string', () => {
-    const payload = serializeThreeTrees(contextNodes, flowNodes, componentNodes);
-    expect(payload.version).toBe(1);
-    expect(typeof payload.contextNodes).toBe('object');
-  });
-
-  it('should deserialize JSON string to store state', () => {
-    const jsonStr = '{"version":1,"contextNodes":[]}';
-    const state = deserializeThreeTrees(jsonStr);
-    expect(state.contextNodes).toEqual([]);
-  });
-
-  it('should restore three trees when opening project on Dashboard', async () => {
-    // E2E: create project → add nodes → close → reopen → assert nodes present
-  });
-
-  it('should handle empty three trees gracefully', () => {
-    const payload = serializeThreeTrees([], [], []);
-    expect(JSON.stringify(payload)).toBeTruthy();
-  });
-});
-```
-
-### 5.3 覆盖率目标
+### 5.4 覆盖率目标
 
 | Epic | 关键路径 | 覆盖率目标 |
 |------|----------|------------|
-| E1 | Tab 切换 → resetPanelState → phase 重置 | > 90% |
-| E2 | snapshot list → render → restore | > 85% |
-| E3 | JSON export, YAML export, round-trip, 5MB limit | > 90% |
-| E4 | serialize, deserialize, D1 write, D1 read | > 85% |
+| E6 | AST 解析 → 危险模式检测 → SecurityReport | > 85% |
+| E7 | /health 响应, logger 输出, 敏感数据过滤 | > 80% |
+
+---
+
+## 6. 风险评估
+
+| 风险 | Epic | 影响 | 缓解措施 |
+|------|------|------|----------|
+| Babel 包体积 ~5MB 导致 bundle size regression | E6 | bundlesize CI 失败 | 确认 E6 基线，用 tree-shaking 按需导入 |
+| Babel 解析失败阻断流程 | E6 | 安全扫描失效 | confidence 降为 50，不抛异常 |
+| Unicode 逃逸绕过检测（ev\x61l） | E6 | 漏报 | 记录为 limitations，后续版本增强 |
+| 日志聚合基础设施缺失 | E7 | 日志无法收集 | 初期输出到 stdout 即可，兼容现有收集管道 |
+| SDK 版本不匹配 | E7 | 功能异常 | 启动时检查并 warn 日志输出 |
 
 ---
 

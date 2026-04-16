@@ -133,6 +133,20 @@
   - 扫描 vibex-backend/src/（排除 __tests__/、*.test.ts、log-sanitizer.ts、logger.ts）
   - 拦截包含 console.log/debug/error 的非测试文件提交
 
+### [Unreleased] vibex-dds-canvas-s2 Epic6: 数据持久化 — 2026-04-16
+- **E6-1 localStorage 持久化**: `vibex-fronted/src/services/dds/ddsPersistence.ts`
+  - `quickSave`/`quickLoad`: LRU 缓存（最多 10 个项目），快速同步 UI 状态
+  - `isLocalStorageAvailable` 守卫 + localStorage 满时静默降级
+- **E6-2 IndexedDB 持久化**: `saveSnapshot`/`loadSnapshot`/`listSnapshots`/`deleteSnapshot`
+  - `openIDB` 单例模式，`onupgradeneeded` 初始化 snapshots + meta 两个 object store
+  - `loadLatestSnapshot` 按 `savedAt` 降序取最新快照
+  - IndexedDB 不可用时优雅降级
+- **E6-3 Export/Import**: `exportToJSON()` → `.vibex-dds.json` 下载 + `parseImportFile()` + `validateImportData()`
+  - 文件名清理（非法字符 → `_`），支持中文项目名
+- **E6-4 Storage Info**: `getStorageInfo()` 返回 localStorage/IndexedDB 可用性及项目数
+- Tests: `ddsPersistence.test.ts` 13/13 passing（`npx vitest run`）
+- 提交: `5fc4c178`
+
 ### [Unreleased] vibex-dds-canvas Epic6: E2E 测试套件 — 2026-04-15
 - **vibex-fronted/tests/e2e/dds-canvas-e2e.spec.ts**: F25/F26/F27 Playwright E2E 测试（522行）
 - setupDDSMocks() — Playwright page.route() 拦截所有 DDS API，无后端也可运行

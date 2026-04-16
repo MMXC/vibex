@@ -148,3 +148,19 @@
   background-color: rgba(59, 130, 246, 0.25);
   border-color: var(--color-primary);
 }
+
+/* Toast notification (import errors) */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ef4444;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 9999;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}

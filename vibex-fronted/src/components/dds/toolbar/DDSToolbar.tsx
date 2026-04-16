@@ -70,9 +70,43 @@ export const DDSToolbar = memo(function DDSToolbar({
   const isFullscreen = useDDSCanvasStore((s) => s.isFullscreen);
   const isGenerating = useDDSCanvasStore((s) => s.isGenerating);
   const toggleFullscreen = useDDSCanvasStore((s) => s.toggleFullscreen);
+  const chapters = useDDSCanvasStore((s) => s.chapters);
+  const chatHistory = useDDSCanvasStore((s) => s.chatHistory);
 
   const chapterLabel = CHAPTER_LABELS[activeChapter];
   const generating = isGeneratingProp ?? isGenerating;
+
+  // ---- Export handler ----
+  const handleExport = () => {
+    exportToJSON(
+      'dds-canvas',
+      'DDS Project',
+      {
+        requirement: { cards: chapters.requirement.cards, edges: chapters.requirement.edges },
+        context: { cards: chapters.context.cards, edges: chapters.context.edges },
+        flow: { cards: chapters.flow.cards, edges: chapters.flow.edges },
+      },
+      chatHistory
+    );
+  };
+
+  // ---- Import handler ----
+  const importRef = React.useRef<HTMLInputElement>(null);
+  const [importError, setImportError] = React.useState<string | null>(null);
+  const handleImportClick = () => importRef.current?.click();
+  const handleImportChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImportError(null);
+    try {
+      const data = await parseImportFile(file);
+      window.dispatchEvent(new CustomEvent('dds:import', { detail: { data } }));
+    } catch (err) {
+      setImportError(err instanceof Error ? err.message : 'Import failed');
+    } finally {
+      e.target.value = '';
+    }
+  };
 
   const handleFullscreenToggle = () => {
     toggleFullscreen();
@@ -113,6 +147,43 @@ export const DDSToolbar = memo(function DDSToolbar({
           <span>{generating ? '生成中...' : 'AI 生成'}</span>
         </button>
 
+        {/* Export */}
+        <button
+          type="button"
+          className={styles.iconButton}
+          onClick={handleExport}
+          aria-label="导出项目"
+          title="导出"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+        </button>
+
+        {/* Import */}
+        <button
+          type="button"
+          className={styles.iconButton}
+          onClick={handleImportClick}
+          aria-label="导入项目"
+          title="导入"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+        </button>
+
+        {/* Hidden file input */}
+        <input
+          ref={importRef}
+          type="file"
+          accept=".json,.vibex-dds.json,application/json"
+          onChange={handleImportChange}
+          style={{ display: 'none' }}
+          aria-hidden="true"
+          tabIndex={-1}
+        />
+
         {/* Fullscreen toggle */}
         <button
           type="button"
@@ -124,6 +195,13 @@ export const DDSToolbar = memo(function DDSToolbar({
           {isFullscreen ? <ExitFullscreenIcon /> : <FullscreenIcon />}
         </button>
       </div>
+
+      {/* Import error */}
+      {importError && (
+        <div className={styles.toast} role="alert" aria-live="polite">
+          {importError}
+        </div>
+      )}
     </header>
   );
 });

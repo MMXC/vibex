@@ -83,6 +83,14 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '02263c66',
   },
   {
+    version: '1.0.239',
+    date: '2026-04-16',
+    changes: [
+      '💾 DDS Epic6: 数据持久化 — localStorage LRU + IndexedDB snapshots + Export/Import，13/13 PASS',
+    ],
+    commit: '5fc4c178',
+  },
+  {
     version: '1.0.238',
     date: '2026-04-16',
     changes: [

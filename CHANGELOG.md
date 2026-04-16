@@ -133,6 +133,17 @@
   - 扫描 vibex-backend/src/（排除 __tests__/、*.test.ts、log-sanitizer.ts、logger.ts）
   - 拦截包含 console.log/debug/error 的非测试文件提交
 
+### [Unreleased] vibex-dds-canvas-s2 Epic4: 工具栏 Export/Import — 2026-04-16
+- **E4-1 Export 按钮**: `DDSToolbar.tsx` — `exportToJSON()` 下载 `.vibex-dds.json`
+  - 工具栏集成 `ddsPersistence` 的 `exportToJSON()`
+  - 使用 `URL.createObjectURL` + `<a>` 下载，下载后 `URL.revokeObjectURL` 清理
+- **E4-2 Import 按钮**: 文件选择器 → `parseImportFile()` → 派发 `dds:import` 自定义事件
+  - `accept=".json,.vibex-dds.json,application/json"` 限制文件类型
+  - 解析失败显示 `importError` toast 提示
+  - 导入后清空 `<input>` value
+- Tests: `DDSToolbar.test.tsx` 14/14 passing
+- 提交: `15de96a6` (feat E4) / `f3233edb` (changelog)
+
 ### [Unreleased] vibex-dds-canvas-s2 Epic6: 数据持久化 — 2026-04-16
 - **E6-1 localStorage 持久化**: `vibex-fronted/src/services/dds/ddsPersistence.ts`
   - `quickSave`/`quickLoad`: LRU 缓存（最多 10 个项目），快速同步 UI 状态

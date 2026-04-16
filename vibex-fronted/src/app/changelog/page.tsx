@@ -83,6 +83,14 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '02263c66',
   },
   {
+    version: '1.0.240',
+    date: '2026-04-16',
+    changes: [
+      '🔧 DDS Epic4: 工具栏 Export/Import — exportToJSON() 下载 + parseImportFile() 导入，14/14 PASS',
+    ],
+    commit: '15de96a6',
+  },
+  {
     version: '1.0.239',
     date: '2026-04-16',
     changes: [

@@ -46,7 +46,7 @@
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
 | E2-U1 | computeTreePayload 纯函数 + 按钮逻辑同步 | ✅ | — | AC-F2.1-1~4: contexts/flows 全 deactive/partial 场景按钮状态正确 |
-| E2-U2 | componentGenerating unmount cleanup | ⬜ | E2-U1 | AC-F2.2-1: unmount 后状态重置 |
+| E2-U2 | componentGenerating unmount cleanup | ✅ | E2-U1 | AC-F2.2-1: unmount 后状态重置 |
 
 ### E3: Project Creation Button
 
@@ -98,8 +98,8 @@
 
 ### F2.2: componentGenerating unmount cleanup
 
-- [ ] 2.2.1 在 `BusinessFlowTree` 组件添加 `useEffect(() => () => setComponentGenerating(false), [])`
-- [ ] 2.2.2 单元测试覆盖 AC-F2.2-1（unmount 重置）
+- [x] 2.2.1 在 `BusinessFlowTree` 组件添加 `useEffect(() => () => setComponentGenerating(false), [])`
+- [x] 2.2.2 单元测试覆盖 AC-F2.2-1、AC-F2.2-2（unmount 重置 + cleanup 不抛错）
 
 ---
 

@@ -157,8 +157,12 @@ export function ProjectBar({
     }
   }, []);
 
+  // E3-F3.1: hasAllNodes 要求所有节点 isActive !== false
+  // Bug: 原先只检查长度，导致 deactive 节点存在时按钮错误 enabled
   const hasAllNodes = hasNodes(contextNodes) && hasNodes(flowNodes) && hasNodes(componentNodes)
-    && contextNodes.length > 0 && flowNodes.length > 0 && componentNodes.length > 0;
+    && contextNodes.every((n) => n.isActive !== false)
+    && flowNodes.every((n) => n.isActive !== false)
+    && componentNodes.every((n) => n.isActive !== false);
 
   // === Handlers ===
 

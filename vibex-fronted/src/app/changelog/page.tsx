@@ -83,6 +83,14 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '02263c66',
   },
   {
+    version: '1.0.242',
+    date: '2026-04-16',
+    changes: [
+      '📜 DDS Epic2a: 奏折布局 ScrollContainer — fullscreen + useChapterURLSync hook',
+    ],
+    commit: 'edd08e1d',
+  },
+  {
     version: '1.0.241',
     date: '2026-04-16',
     changes: [

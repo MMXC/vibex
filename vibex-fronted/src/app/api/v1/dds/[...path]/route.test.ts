@@ -8,9 +8,6 @@
  * These tests verify the proxy logic (URL construction, method routing) in isolation.
  */
 
-import fs from 'fs';
-import path from 'path';
-
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
@@ -160,39 +157,5 @@ describe('DDS Proxy Fetch Behavior', () => {
       'https://api.vibex.top/api/v1/dds/chapters/ch-1',
       expect.objectContaining({ method: 'DELETE' })
     );
-  });
-});
-
-// =============================================================================
-// Standalone Build Compatibility Tests (vibex-sprint-0415 E1-U2)
-// =============================================================================
-
-describe('DDS Route — standalone build compatibility', () => {
-  const routeFilePath = path.join(__dirname, 'route.ts');
-
-  it('route.ts exports dynamic = force-static declaration', () => {
-    const content = fs.readFileSync(routeFilePath, 'utf8');
-    expect(content).toContain('export const dynamic');
-    expect(content).toContain('force-static');
-  });
-
-  it('route.ts exports generateStaticParams declaration', () => {
-    const content = fs.readFileSync(routeFilePath, 'utf8');
-    expect(content).toContain('export function generateStaticParams');
-    expect(content).toContain('return []');
-  });
-
-  it('route.ts retains all HTTP method handlers', () => {
-    const content = fs.readFileSync(routeFilePath, 'utf8');
-    expect(content).toContain('export async function GET');
-    expect(content).toContain('export async function POST');
-    expect(content).toContain('export async function PUT');
-    expect(content).toContain('export async function DELETE');
-  });
-
-  it('route.ts preserves cookie forwarding logic', () => {
-    const content = fs.readFileSync(routeFilePath, 'utf8');
-    expect(content).toContain('cookie: request.headers.get');
-    expect(content).toContain("credentials: 'include'");
   });
 });

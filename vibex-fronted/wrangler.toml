@@ -1,4 +1,6 @@
 name = "vibex-frontend"
+pages_build_output_dir = "./out"
+
 # 环境变量配置
 [vars]
 NEXT_PUBLIC_API_BASE_URL = "https://api.vibex.top/api"

@@ -366,6 +366,7 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
   const deleteAllNodes = useContextStore((s) => s.deleteAllNodes);
   const setContextNodes = useContextStore((s) => s.setContextNodes);
   const advancePhase = useContextStore((s) => s.advancePhase);
+  const confirmContextNode = useContextStore((s) => s.confirmContextNode);
 
   // F3-F10: Multi-select state
   const selectedNodeIds = useContextStore((s) => s.selectedNodeIds);
@@ -455,10 +456,12 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
     [addContextNode, contextNodes]
   );
 
+  // E4-F4.2: handleConfirmAll 原子性设置双字段
   const handleConfirmAll = useCallback(() => {
-      // Advance phase (no confirm gating in Epic 3)
+    // confirmContextNode 同时设置 status:'confirmed' + isActive:true
+    contextNodes.forEach((n) => confirmContextNode(n.nodeId));
     advancePhase();
-  }, [contextNodes, advancePhase]);
+  }, [contextNodes, confirmContextNode, advancePhase]);
 
   // E4-F4.1: allConfirmed 改为检查 status === 'confirmed'
   // Bug: 原先检查 isActive !== false，与 checkbox 操作的 status !== 'confirmed' 语义不同步

@@ -754,10 +754,30 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
     autoGenerateFlows(contextNodes);
   }, [flowGenerating, contextNodes, autoGenerateFlows]);
 
+  // E2-F2.1: computeTreePayload — 纯函数，封装 contextsToSend/flowsToSend 计算逻辑
+  // canGenerateComponents 和 handleContinueToComponents 共用同一份过滤规则
+  const computeTreePayload = useCallback(() => {
+    const activeContexts = contextNodes.filter((ctx) => ctx.isActive !== false);
+    const selectedContextSet = new Set(selectedNodeIds.context);
+    const contextsToSend = selectedContextSet.size > 0
+      ? activeContexts.filter((ctx) => selectedContextSet.has(ctx.nodeId))
+      : activeContexts;
+
+    const activeFlows = flowNodes.filter((f) => f.isActive !== false);
+    const selectedFlowSet = new Set(selectedNodeIds.flow);
+    const flowsToSend = selectedFlowSet.size > 0
+      ? activeFlows.filter((f) => selectedFlowSet.has(f.nodeId))
+      : activeFlows;
+
+    return { contextsToSend, flowsToSend };
+  }, [contextNodes, flowNodes, selectedNodeIds]);
+
   // S1.3: 继续·组件树 — 调用 fetchComponentTree API，参数包含 flowData
   const handleContinueToComponents = useCallback(async () => {
-    // 防重复提交：flowData 为空或正在生成时禁用
-    if (componentGenerating || flowNodes.length === 0) return;
+    if (componentGenerating) return;
+    const { contextsToSend, flowsToSend } = computeTreePayload();
+    // E2-F2.1: flowsToSend.length 校验必须与 canGenerateComponents 一致
+    if (contextsToSend.length === 0 || flowsToSend.length === 0) return;
     setComponentGenerating(true);
 
     try {
@@ -768,20 +788,6 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
         toast.showToast('请先生成上下文树', 'error');
         return;
       }
-
-      // E1: selection-aware context mapping (matches CanvasPage.tsx logic)
-      const activeContexts = contextNodes.filter((ctx) => ctx.isActive !== false);
-      const selectedContextSet = new Set(selectedNodeIds.context);
-      const contextsToSend = selectedContextSet.size > 0
-        ? activeContexts.filter((ctx) => selectedContextSet.has(ctx.nodeId))
-        : activeContexts;
-
-      // E1: selection-aware flow mapping
-      const activeFlows = flowNodes.filter((f) => f.isActive !== false);
-      const selectedFlowSet = new Set(selectedNodeIds.flow);
-      const flowsToSend = selectedFlowSet.size > 0
-        ? activeFlows.filter((f) => selectedFlowSet.has(f.nodeId))
-        : activeFlows;
 
       // Map context nodes to API format
       const mappedContexts: Array<{ id: string; name: string; description: string; type: string }> =
@@ -819,17 +825,14 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
     } finally {
       setComponentGenerating(false);
     }
-  }, [componentGenerating, flowNodes, contextNodes, selectedNodeIds, projectId, setComponentNodes, setPhase, toast]);
+  }, [componentGenerating, computeTreePayload, projectId, setComponentNodes, setPhase, toast]);
 
-  // F1.2: Derive canGenerateComponents — shared logic for button disabled + validation
+  // E2-F2.1: Derive canGenerateComponents — 与 handleContinueToComponents 共用 computeTreePayload
+  // Bug 修复: 原来只检查 flowNodes.length > 0，未校验 flowsToSend.length
   const canGenerateComponents = useMemo(() => {
-    const activeContexts = contextNodes.filter((ctx) => ctx.isActive !== false);
-    const selectedContextSet = new Set(selectedNodeIds.context);
-    const validContexts = selectedContextSet.size > 0
-      ? activeContexts.filter((ctx) => selectedContextSet.has(ctx.nodeId))
-      : activeContexts;
-    return validContexts.length > 0 && flowNodes.length > 0;
-  }, [contextNodes, selectedNodeIds.context, flowNodes.length]);
+    const { contextsToSend, flowsToSend } = computeTreePayload();
+    return contextsToSend.length > 0 && flowsToSend.length > 0;
+  }, [computeTreePayload]);
 
   if (!isActive) {
     return (

@@ -20,6 +20,15 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.242',
+    date: '2026-04-16',
+    changes: [
+      '🔧 Epic1: DDS路由构建修复 — 删除 catch-all API route.ts，依赖 public/_redirects 代理',
+      '📌 根因: Next.js output:export 与 [...path] 动态路由不兼容（learnings: vibex-dds-route-revert-0416）',
+    ],
+    commit: '384ff637',
+  },
+  {
     version: '1.0.241',
     date: '2026-04-16',
     changes: [

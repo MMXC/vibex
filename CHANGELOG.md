@@ -1,3 +1,10 @@
+### [Unreleased] vibex-sprint-0415 Epic1: DDS路由构建修复 — 2026-04-16
+- **E1-U1 DDS API Route 移除**: 删除 `vibex-fronted/src/app/api/v1/dds/[...path]/route.ts`
+  - 根因: Next.js `output:'export'` 静态导出与 `[...path]` catch-all 动态路由不兼容
+  - 解决: 删除 route.ts，依赖 `public/_redirects` 的 `/api/* → https://api.vibex.top/api/:splat` 做代理
+  - 经验: 前端不应创建 catch-all API 路由代理后端接口（learnings: `vibex-dds-route-revert-0416`）
+  - 提交: #384ff637
+
 ### [Unreleased] vibex-canvas-404-post-project: POST /project Handler — 2026-04-16
 - **E1-U1+U2+U3+U4 Canvas 项目创建接口**: `POST /api/v1/canvas/project`
   - 新增: `src/routes/v1/canvas/index.ts` — `POST /project` handler（Hono, Cloudflare Workers）

@@ -201,3 +201,28 @@ Unit 7 (Route)
 ---
 
 *Implementation Plan | Architect Agent | 2026-04-14*
+
+---
+
+## Epic 6: 数据持久化
+
+### E6-U1: 本地存储 + IndexedDB 双轨
+
+**Goal:** 本地存储 + IndexedDB 双轨，支持导出导入
+
+**Files:**
+- Create: `vibex-fronted/src/services/dds/ddsPersistence.ts`
+- Test: `vibex-fronted/src/services/dds/__tests__/ddsPersistence.test.ts`
+
+**验收标准:**
+- [x] localStorage: quickSave/quickLoad (LRU eviction, max 10 items)
+- [x] IndexedDB: saveSnapshot/loadSnapshot/listSnapshots/deleteSnapshot
+- [x] 导出: exportToJSON → .vibex-dds.json download
+- [x] 导入: parseImportFile + validateImportData
+- [x] 优雅降级: IndexedDB 不可用时不报错
+
+**验证:**
+- vitest run (13 passed ✓)
+- tsc --noEmit (0 errors)
+
+**Commit:** 5fc4c178

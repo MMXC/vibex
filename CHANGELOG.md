@@ -157,6 +157,20 @@
 - 提交: `b72455ba` (feat E2b) / `849cb8a0` (test E2b)
 
 ### [Unreleased] vibex-dds-canvas-s2 Epic4: 工具栏 Export/Import — 2026-04-16
+### [Unreleased] vibex-dds-canvas-s2 Epic3: AI Draft Flow — 2026-04-16
+- **E3-1 AIDraftDrawer**: `vibex-fronted/src/components/dds/ai-draft/AIDraftDrawer.tsx`
+  - F14/F16/F17: 滑出抽屉 + 状态机
+  - CardPreview 组件嵌入
+  - Tests: `CardPreview.test.tsx` 15/15 passing
+  - 提交: `538ad1a6` (feat E3)
+
+### [Unreleased] vibex-dds-canvas-s2 Epic5: 路由与页面集成 — 2026-04-16
+- **E5-1 DDSCanvasPage**: `vibex-fronted/src/components/dds/DDSCanvasPage.tsx`
+  - F22/F23/F24: 路由与页面集成
+  - 路由参数与章节状态同步
+  - Tests: `DDSCanvasPage.test.tsx` 12/12 passing
+  - 提交: `1717a097` (feat E5)
+
 - **E4-1 Export 按钮**: `DDSToolbar.tsx` — `exportToJSON()` 下载 `.vibex-dds.json`
   - 工具栏集成 `ddsPersistence` 的 `exportToJSON()`
   - 使用 `URL.createObjectURL` + `<a>` 下载，下载后 `URL.revokeObjectURL` 清理

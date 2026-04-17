@@ -9,11 +9,11 @@
 
 'use client';
 
-import React, { memo } from 'react';
+import React, { memo, useState, useCallback } from 'react';
 import { useDDSCanvasStore } from '@/stores/dds';
-import type { ChapterType } from '@/types/dds';
-
+import type { ChapterType, APIEndpointCard, StateMachineCard } from '@/types/dds';
 import { exportToJSON, parseImportFile } from '@/services/dds';
+import { exportDDSCanvasData, exportToStateMachine } from '@/services/dds/exporter';
 import styles from './DDSToolbar.module.css';
 
 // ==================== Constants ====================
@@ -54,6 +54,18 @@ function ExitFullscreenIcon() {
   );
 }
 
+// ==================== Shared download helper ====================
+
+function downloadJSON(content: string, filename: string) {
+  const blob = new Blob([content], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 // ==================== Component ====================
 
 export interface DDSToolbarProps {
@@ -80,6 +92,38 @@ export const DDSToolbar = memo(function DDSToolbar({
   const chapterLabel = CHAPTER_LABELS[activeChapter];
   const generating = isGeneratingProp ?? isGenerating;
 
+  // E4-U3/U4: Export modal state
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+
+  // E4-U3: Download OpenAPI handler
+  const handleDownloadOpenAPI = useCallback(() => {
+    try {
+      const apiCards = chapters.api.cards as APIEndpointCard[];
+      const json = exportDDSCanvasData(apiCards);
+      downloadJSON(json, 'openapi.json');
+      setIsExportModalOpen(false);
+      setExportError(null);
+    } catch (err) {
+      setExportError('导出 OpenAPI 失败');
+      console.error('[DDSToolbar] OpenAPI export error:', err);
+    }
+  }, [chapters.api.cards]);
+
+  // E4-U4: Download StateMachine handler
+  const handleDownloadStateMachine = useCallback(() => {
+    try {
+      const smCards = chapters['business-rules'].cards as StateMachineCard[];
+      const json = exportToStateMachine(smCards);
+      downloadJSON(json, 'statemachine.json');
+      setIsExportModalOpen(false);
+      setExportError(null);
+    } catch (err) {
+      setExportError('导出 StateMachine 失败');
+      console.error('[DDSToolbar] StateMachine export error:', err);
+    }
+  }, [chapters['business-rules'].cards]);
+
   // ---- Export handler ----
   const handleExport = () => {
     exportToJSON(
@@ -98,7 +142,7 @@ export const DDSToolbar = memo(function DDSToolbar({
 
   // ---- Import handler ----
   const importRef = React.useRef<HTMLInputElement>(null);
-  const [importError, setImportError] = React.useState<string | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
   const handleImportClick = () => importRef.current?.click();
   const handleImportChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -116,7 +160,6 @@ export const DDSToolbar = memo(function DDSToolbar({
 
   const handleFullscreenToggle = () => {
     toggleFullscreen();
-    // Toggle browser fullscreen
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen?.().catch(() => {/* ignore */});
     } else {
@@ -125,99 +168,121 @@ export const DDSToolbar = memo(function DDSToolbar({
   };
 
   return (
-    <header
-      className={`${styles.toolbar} ${className}`}
-      data-theme="dark"
-      role="banner"
-    >
-      {/* Left: Chapter indicator */}
-      <div className={styles.leftSection}>
-        {/* E2-U3: Clickable chapter tabs for quick navigation */}
-        {(Object.keys(CHAPTER_LABELS) as ChapterType[]).map((ch) => (
+    <>
+      <header
+        className={`${styles.toolbar} ${className}`}
+        data-theme="dark"
+        role="banner"
+      >
+        {/* Left: Chapter indicator */}
+        <div className={styles.leftSection}>
+          {/* E2-U3: Clickable chapter tabs for quick navigation */}
+          {(Object.keys(CHAPTER_LABELS) as ChapterType[]).map((ch) => (
+            <button
+              key={ch}
+              type="button"
+              className={`${styles.chapterTab} ${activeChapter === ch ? styles.chapterTabActive : ''}`}
+              onClick={() => useDDSCanvasStore.getState().setActiveChapter(ch)}
+              aria-label={`切换到${CHAPTER_LABELS[ch]}章节`}
+              aria-pressed={activeChapter === ch}
+            >
+              {CHAPTER_LABELS[ch]}
+            </button>
+          ))}
+
+          {/* E4-U3/U4: Export button */}
           <button
-            key={ch}
             type="button"
-            className={`${styles.chapterTab} ${activeChapter === ch ? styles.chapterTabActive : ''}`}
-            onClick={() => useDDSCanvasStore.getState().setActiveChapter(ch)}
-            aria-label={`切换到${CHAPTER_LABELS[ch]}章节`}
-            aria-pressed={activeChapter === ch}
+            className={styles.exportBtn}
+            onClick={() => setIsExportModalOpen(true)}
+            aria-label="导出"
+            title="导出为 OpenAPI / StateMachine"
           >
-            {CHAPTER_LABELS[ch]}
+            导出
           </button>
-        ))}
-      </div>
+        </div>
 
-      {/* Right: Action buttons */}
-      <div className={styles.rightSection}>
-        {/* AI Generate button */}
-        <button
-          type="button"
-          className={`${styles.actionButton} ${styles.aiButton}`}
-          onClick={onAIGenerate}
-          disabled={generating}
-          aria-label={generating ? 'AI 生成中...' : 'AI 生成'}
-          aria-busy={generating}
+        {/* Right: Action buttons */}
+        <div className={styles.rightSection}>
+          {/* AI Generate button */}
+          <button
+            type="button"
+            className={`${styles.actionButton} ${styles.aiButton}`}
+            onClick={onAIGenerate}
+            disabled={generating}
+            aria-label={generating ? 'AI 生成中...' : 'AI 生成'}
+            aria-busy={generating}
+          >
+            <AiIcon />
+            <span>{generating ? '生成中...' : 'AI 生成'}</span>
+          </button>
+
+          {/* Fullscreen toggle */}
+          <button
+            type="button"
+            className={`${styles.iconButton} ${isFullscreen ? styles.iconButtonActive : ''}`}
+            onClick={handleFullscreenToggle}
+            aria-label={isFullscreen ? '退出全屏' : '全屏'}
+            aria-pressed={isFullscreen}
+          >
+            {isFullscreen ? <ExitFullscreenIcon /> : <FullscreenIcon />}
+          </button>
+        </div>
+
+        {/* Import error */}
+        {importError && (
+          <div className={styles.toast} role="alert" aria-live="polite">
+            {importError}
+          </div>
+        )}
+      </header>
+
+      {/* E4-U3/U4: Export modal */}
+      {isExportModalOpen && (
+        <div
+          className={styles.exportOverlay}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="export-modal-title"
+          onClick={(e) => { if (e.target === e.currentTarget) setIsExportModalOpen(false); }}
         >
-          <AiIcon />
-          <span>{generating ? '生成中...' : 'AI 生成'}</span>
-        </button>
-
-        {/* Export */}
-        <button
-          type="button"
-          className={styles.iconButton}
-          onClick={handleExport}
-          aria-label="导出项目"
-          title="导出"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
-        </button>
-
-        {/* Import */}
-        <button
-          type="button"
-          className={styles.iconButton}
-          onClick={handleImportClick}
-          aria-label="导入项目"
-          title="导入"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
-          </svg>
-        </button>
-
-        {/* Hidden file input */}
-        <input
-          ref={importRef}
-          type="file"
-          accept=".json,.vibex-dds.json,application/json"
-          onChange={handleImportChange}
-          style={{ display: 'none' }}
-          aria-hidden="true"
-          tabIndex={-1}
-        />
-
-        {/* Fullscreen toggle */}
-        <button
-          type="button"
-          className={`${styles.iconButton} ${isFullscreen ? styles.iconButtonActive : ''}`}
-          onClick={handleFullscreenToggle}
-          aria-label={isFullscreen ? '退出全屏' : '全屏'}
-          aria-pressed={isFullscreen}
-        >
-          {isFullscreen ? <ExitFullscreenIcon /> : <FullscreenIcon />}
-        </button>
-      </div>
-
-      {/* Import error */}
-      {importError && (
-        <div className={styles.toast} role="alert" aria-live="polite">
-          {importError}
+          <div className={styles.exportModal}>
+            <div className={styles.modalHeader}>
+              <h2 id="export-modal-title" className={styles.modalTitle}>导出文档</h2>
+              <button
+                type="button"
+                className={styles.modalClose}
+                onClick={() => setIsExportModalOpen(false)}
+                aria-label="关闭"
+              >
+                ×
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <button
+                type="button"
+                className={styles.exportOption}
+                onClick={handleDownloadOpenAPI}
+              >
+                <span className={styles.exportOptionTitle}>OpenAPI 3.0</span>
+                <span className={styles.exportOptionDesc}>导出 API 端点为 OpenAPI JSON</span>
+              </button>
+              <button
+                type="button"
+                className={styles.exportOption}
+                onClick={handleDownloadStateMachine}
+              >
+                <span className={styles.exportOptionTitle}>State Machine JSON</span>
+                <span className={styles.exportOptionDesc}>导出版务规则状态机</span>
+              </button>
+              {exportError && (
+                <p className={styles.exportError} role="alert">{exportError}</p>
+              )}
+            </div>
+          </div>
         </div>
       )}
-    </header>
+    </>
   );
 });
 

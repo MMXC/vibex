@@ -1,3 +1,24 @@
+### [Unreleased] vibex-sprint1-prototype-canvas Epic1: 拖拽布局编辑器 — 2026-04-17
+- **E1-U1 组件面板**: `ComponentPanel.tsx` — 左侧面板展示 10 个默认组件，支持 HTML5 drag-and-drop
+- **E1-U2 React Flow 画布**: `ProtoFlowCanvas.tsx` — 接收组件拖拽，节点自由定位，MiniMap + Controls
+- **E1-U3 自定义节点渲染**: `ProtoNode.tsx` — 10 种组件类型的真实 UI 渲染
+- **E1-U4 属性面板**: `ProtoAttrPanel.tsx` — Props Tab + Mock 数据 Tab，支持实时编辑和保存
+- **E3 路由抽屉**: `RoutingDrawer.tsx` — 页面列表视图，支持增删页面
+- **E4 导出**: `ProtoEditor.tsx` — 导出/导入 JSON v2.0，含节点/Mock数据/路由
+- **集成**: `/app/prototype/editor/page.tsx` 替换为 ProtoEditor 主视图
+- **Store**: `prototypeStore.ts` — Zustand + localStorage 持久化
+- 提交: f18d48f4
+
+### [Unreleased] vibex-sprint1-prototype-canvas Epic2: Mock数据绑定 — 2026-04-17
+- **E2-U1 Mock数据Tab**: `ProtoAttrPanel.tsx` — 属性/Mock Tab切换，Mock Tab textarea输入JSON，blur时验证
+- **E2-U2 Mock存储与渲染**: `prototypeStore.ts` — `updateNodeMockData`保存，localStorage持久化，`ProtoNode`读取渲染
+- 提交: bde8f7a8
+
+### [Unreleased] vibex-sprint1-prototype-canvas Epic3: 路由树 — 2026-04-17
+- **E3-U1 页面列表**: `RoutingDrawer.tsx` — 页面列表抽屉，增删页面，navigateToPage
+- **E3-U2 路由导航**: prototypeStore — `addPage`/`removePage`，ProtoEditor整合RoutingDrawer
+- 提交: vibex-sprint1-prototype-canvas/dev-epic3-路由树
+
 ### [Unreleased] vibex-sprint2-spec-canvas Epic3: AI 草稿生成 — 2026-04-17
 - **E3-U1 AI入口**: `DDSToolbar.tsx` — handleAIGenerate → toggleDrawer → AIDraftDrawer
 - **E3-U2 生成预览**: `AIDraftDrawer.tsx` — IDLE/LOADING/REVIEW/ERROR 状态机，prompt → /api/chat → CardPreview
@@ -25,6 +46,11 @@
 - **E2-U1 Mock数据Tab**: `ProtoAttrPanel.tsx` — 属性/Mock Tab切换，Mock Tab textarea输入JSON，blur时验证
 - **E2-U2 Mock存储与渲染**: `prototypeStore.ts` — `updateNodeMockData`保存，localStorage持久化，`ProtoNode`读取渲染
 - 提交: vibex-sprint1-prototype-canvas/dev-epic2-mock数据绑定
+
+### [Unreleased] vibex-sprint1-prototype-canvas Epic3: 路由树 — 2026-04-17
+- **E3-U1 页面列表**: `RoutingDrawer.tsx` — 页面列表抽屉，增删页面，navigateToPage
+- **E3-U2 路由导航**: prototypeStore — `addPage`/`removePage`，ProtoEditor整合RoutingDrawer
+- 提交: vibex-sprint1-prototype-canvas/dev-epic3-路由树
 
 ### [Unreleased] vibex-sprint1-prototype-canvas Epic1: 拖拽布局编辑器 — 2026-04-17
 - **E1-U1 组件面板**: `ComponentPanel.tsx` — 左侧面板展示 10 个默认组件，支持 HTML5 drag-and-drop

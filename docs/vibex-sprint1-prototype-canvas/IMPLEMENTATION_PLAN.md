@@ -12,8 +12,8 @@
 | Epic | Units | E1-U1 | ✅ DONE | ✅ | Next |
 |------|-------|--------|------|
 | E1: 拖拽布局编辑器 | E1-U1 | ✅ DONE | ✅~ E1-U4 |E1-U1 | ✅ DONE | ✅ 0/4 | E1-U1 | ✅ DONE | ✅|
-| E2: Mock数据绑定 | E2-U1 ~ E2-U2 |E1-U1 | ✅ DONE | ✅ 0/2 | E2-U1 |
-| E3: 路由树 | E3-U1 ~ E3-U2 |E1-U1 | ✅ DONE | ✅ 0/2 | E3-U1 |
+| E2: Mock数据绑定 | E2-U1 ~ E2-U2 | ✅ 2/2 | E2-U1 |
+| E3: 路由树 | E3-U1 ~ E3-U2 |E1-U1 | ✅ DONE | ✅ 2/2 | E3-U1 |
 | E4: JSON导出增强 | E4-U1 ~ E4-U2 |E1-U1 | ✅ DONE | ✅ 0/2 | E4-U1 |
 | E5: 组件库完善 | E5-U1 |E1-U1 | ✅ DONE | ✅ 0/1 | E5-U1 |
 

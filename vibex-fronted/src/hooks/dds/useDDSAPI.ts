@@ -15,6 +15,7 @@ import type {
   ChapterType,
   ChatMessage,
 } from '@/types/dds';
+import { API_CONFIG } from '@/lib/api-config';
 
 // ==================== API Client Functions ====================
 
@@ -139,7 +140,7 @@ function createDDSAPI(baseUrl = ''): DDSAPIClient {
  */
 export function useDDSAPI(): DDSAPIClient {
   // 使用 useCallback 确保稳定的引用
-  return useCallback(() => createDDSAPI(), [])() as DDSAPIClient;
+  return useCallback(() => createDDSAPI(API_CONFIG.baseURL), [])() as DDSAPIClient;
 }
 
 // ==================== 独立导出（可不用 hook 直接调用）================

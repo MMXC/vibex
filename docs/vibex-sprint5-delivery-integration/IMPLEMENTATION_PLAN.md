@@ -13,7 +13,7 @@
 | Epic | Units | Status | Next |
 |------|-------|--------|------|
 | E1: 数据层集成 | T1-T3 | 3/3 ✅ | T1 |
-| E2: 跨画布导航 | T4-T5 | 0/2 | T4 |
+| E2: 跨画布导航 | T4-T5 | 2/2 ✅ | done |
 | E3: DDL 生成 | T6-T7 | ⬜ | BLOCKED |
 
 **⚠️ E3 BLOCKED**: 依赖 Sprint4 `api` 章节实现（Sprint4 的 APIEndpointCard 类型和 APICanvasExporter）
@@ -92,8 +92,8 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| T4 | DeliveryNav 组件 | ⬜ | E1 | DeliveryCenter 顶部显示三画布导航 Tab |
-| T5 | 面包屑导航 | ⬜ | T4 | 每个画布顶部显示面包屑链接 |
+| T4 | DeliveryNav 组件 | ✅ | E1 | DeliveryCenter 顶部显示三画布导航 Tab |
+| T5 | 面包屑导航 | ✅ | T4 | 每个画布顶部显示面包屑链接 |
 
 ### T4: DeliveryNav 组件
 

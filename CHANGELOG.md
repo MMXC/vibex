@@ -1,3 +1,10 @@
+### [Unreleased] vibex-sprint2-spec-canvas Epic3: AI 草稿生成 — 2026-04-17
+- **E3-U1 AI入口**: `DDSToolbar.tsx` — handleAIGenerate → toggleDrawer → AIDraftDrawer
+- **E3-U2 生成预览**: `AIDraftDrawer.tsx` — IDLE/LOADING/REVIEW/ERROR 状态机，prompt → /api/chat → CardPreview
+- **E3-U3 上下文传递**: AIDraftDrawer — chatHistory state，addChatMessage，handleRetry上下文延续
+- **E3-U4 边生成**: AIDraftDrawer — parseEdgesFromResponse提取edges，handleAccept调用addEdge，CardPreview显示edges badge
+- 提交: vibex-sprint2-spec-canvas/dev-epic3-ai-草稿生成
+
 ### [Unreleased] vibex-sprint2-spec-canvas Epic2: 横向滚奏体验 — 2026-04-17
 - **E2-U1 横向滚奏 UI**: `DDSScrollContainer.tsx` — scroll-snap 横向滚奏，`handleScroll` 检测可见面板，ratio > 0.3 时更新 `activeChapter`
 - **E2-U2 URL同步**: `useChapterURLSync` hook — mount 时从 `?chapter=` 读取参数写入 store，章节变化时 `router.replace` 更新 URL（不污染 history）

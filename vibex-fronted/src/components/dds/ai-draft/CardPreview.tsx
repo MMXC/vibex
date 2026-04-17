@@ -16,7 +16,7 @@
 'use client';
 
 import React, { memo, useCallback } from 'react';
-import type { DDSCard } from '@/types/dds';
+import type { DDSCard, DDSEdge } from '@/types/dds';
 import { CardRenderer } from '../cards/CardRenderer';
 import styles from './CardPreview.module.css';
 
@@ -24,6 +24,8 @@ import styles from './CardPreview.module.css';
 
 export interface CardPreviewProps {
   cards: DDSCard[];
+  // E3-U4: Edges between cards
+  edges?: DDSEdge[];
   onAccept: () => void;
   onEdit: () => void;
   onRetry: () => void;
@@ -34,6 +36,7 @@ export interface CardPreviewProps {
 
 export const CardPreview = memo(function CardPreview({
   cards,
+  edges = [],
   onAccept,
   onEdit,
   onRetry,
@@ -80,6 +83,11 @@ export const CardPreview = memo(function CardPreview({
             预览 ({cards.length})
           </span>
           <span className={styles.badge}>{cards.length} 张卡片</span>
+          {edges.length > 0 && (
+            <span className={styles.badge} style={{ background: 'rgba(34,197,94,0.15)', borderColor: 'rgba(34,197,94,0.3)', color: '#4ade80' }}>
+              {edges.length} 条关系
+            </span>
+          )}
         </div>
 
         {/* Card List */}

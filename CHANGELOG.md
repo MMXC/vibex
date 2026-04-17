@@ -47,6 +47,14 @@
 - **E5-U3 错误态重试**: `ChapterPanel.tsx` — error message + loadChapter 重试按钮，error优先于loading/empty
 - 提交: 676c1be9
 
+### [Unreleased] vibex-sprint2-spec-canvas Epic6: 测试覆盖 — 2026-04-18
+- **E6-U1 单元测试覆盖**: 143 tests passing，覆盖 DDSCanvasStore/ChapterPanel/DDSScrollContainer/DDSToolbar
+- **DDSScrollContainer 测试修复**: 3-panel 渲染验证（role=region）、章节导航点击切换 activeChapter
+- **DDSToolbar 测试修复**: 章节 Tab 高亮状态验证（aria-pressed）
+- **ChapterPanel 新测试**: 空状态/CRUD/卡片选择/表单渲染
+- **DDSCanvasStore 新测试**: addCard/deleteCard/selectCard/toggleFullscreen/toggleDrawer
+- 提交: vibex-sprint2-spec-canvas/dev-epic6-测试覆盖
+
 ### [Unreleased] vibex-sprint2-spec-canvas Epic3: AI 草稿生成 — 2026-04-17
 - **E3-U1 AI入口**: `DDSToolbar.tsx` — handleAIGenerate → toggleDrawer → AIDraftDrawer
 - **E3-U2 生成预览**: `AIDraftDrawer.tsx` — IDLE/LOADING/REVIEW/ERROR 状态机，prompt → /api/chat → CardPreview

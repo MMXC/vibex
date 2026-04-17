@@ -95,11 +95,29 @@ describe('DDSToolbar', () => {
     expect(screen.getByRole('button', { name: /全屏/i })).toHaveAttribute('aria-pressed', 'false');
   });
 
-  it('renders chapter dot indicator', () => {
-    const { container } = render(<DDSToolbar />);
-    // Find dot element
-    const dot = container.querySelector('span[class*="chapterDot"]');
-    expect(dot).toBeInTheDocument();
+  it('renders chapter tab indicator — default requirement active', () => {
+    render(<DDSToolbar />);
+    const tabs = screen.getAllByRole('button', { name: /切换到.*章节/ });
+    expect(tabs).toHaveLength(3);
+    // Default active chapter is 'requirement' → its tab has aria-pressed=true
+    const reqTab = tabs.find((btn) => btn.textContent === '需求');
+    expect(reqTab).toHaveAttribute('aria-pressed', 'true');
+    const ctxTab = tabs.find((btn) => btn.textContent === '上下文');
+    expect(ctxTab).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('renders chapter tab indicator — switching chapter updates aria-pressed', () => {
+    render(<DDSToolbar />);
+    // Click '上下文' tab to switch active chapter
+    const ctxTab = screen.getByRole('button', { name: '切换到上下文章节' });
+    fireEvent.click(ctxTab);
+    // After clicking, context tab should be active (aria-pressed=true)
+    expect(ctxTab).toHaveAttribute('aria-pressed', 'true');
+    // Requirement tab should no longer be active
+    const reqTab = screen.getByRole('button', { name: '切换到需求章节' });
+    expect(reqTab).toHaveAttribute('aria-pressed', 'false');
+    // Store should reflect the change
+    expect(useDDSCanvasStore.getState().activeChapter).toBe('context');
   });
 
   it('overrides isGenerating from prop', () => {

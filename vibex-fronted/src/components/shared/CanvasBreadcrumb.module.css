@@ -1,0 +1,47 @@
+/**
+ * CanvasBreadcrumb.module.css — Sprint5 T5
+ */
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 16px;
+}
+
+.list {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.link {
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.link:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.current {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.separator {
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 10px;
+  margin: 0 2px;
+}

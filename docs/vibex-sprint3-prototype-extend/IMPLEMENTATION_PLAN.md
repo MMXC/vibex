@@ -15,7 +15,7 @@
 | E1: 页面跳转连线 | E1-U1 ~ E1-U3 | ✅ 3/3 | — |
 | E2: 组件属性面板 | E2-U1 ~ E2-U5 | ✅ 5/5 | — |
 | E3: 响应式断点 | E3-U1 ~ E3-U3 | ✅ 3/3 | — |
-| E4: AI 草图导入 | E4-U1 ~ E4-U2 | ⬜ 0/2 | E4-U1 |
+| E4: AI 草图导入 | E4-U1 ~ E4-U2 | ✅ 2/2 | — |
 
 ---
 
@@ -357,8 +357,8 @@ const onNodeDoubleClick = useCallback(
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E4-U1 | image-import.ts AI 解析服务 | ⬜ | — | `importFromImage(file)` 调用 AI Vision API，返回 `ImportedComponent[]` |
-| E4-U2 | ImportPanel 图片上传 UI + 确认导入 | ⬜ | E4-U1 | 上传图片 → AI 解析 → 显示识别结果 → 确认导入画布 |
+| E4-U1 | image-import.ts AI 解析服务 | ✅ | — | `importFromImage(file)` 调用 /api/chat，返回 `ImportedComponent[]` |
+| E4-U2 | ImportPanel 图片上传 UI + 确认导入 | ✅ | E4-U1 | 上传图片 → AI 解析 → 显示识别结果 → 确认导入画布 |
 
 ---
 

@@ -19,6 +19,12 @@
 - **E3-U2 路由导航**: prototypeStore — `addPage`/`removePage`，ProtoEditor整合RoutingDrawer
 - 提交: vibex-sprint1-prototype-canvas/dev-epic3-路由树
 
+### [Unreleased] vibex-sprint3-prototype-extend Epic1: 页面跳转连线 — 2026-04-17
+- **E1-U1 prototypeStore CRUD**: `prototypeStore.ts` — addEdge/removeEdge，edges 独立于 nodes
+- **E1-U2 RoutingDrawer 连线UI**: `RoutingDrawer.tsx` — 添加连线按钮 + modal select（源/目标页面）
+- **E1-U3 ProtoFlowCanvas 渲染**: `ProtoFlowCanvas.tsx` — onConnect callback，Delete键删除边，store→local edges sync
+- 提交: vibex-sprint3-prototype-extend/dev-epic1-页面跳转连线（epic-1）
+
 ### [Unreleased] vibex-sprint2-spec-canvas Epic4: 章节间 DAG 关系 — 2026-04-17
 - **E4-U1 跨章节边创建**: `DDSCanvasStore.ts` — addCrossChapterEdge/deleteCrossChapterEdge, crossChapterEdges state
 - **E4-U2 跨章节边渲染**: `CrossChapterEdgesOverlay.tsx` — SVG overlay with ResizeObserver + RAF 双层监听

@@ -13,7 +13,7 @@
 | Epic | Units | Status | Next |
 |------|-------|--------|------|
 | E1: API 规格章节 | E1-U1 ~ E1-U5 | ✅ 5/5 | — |
-| E2: 业务规则章节 | E2-U1 ~ E2-U5 | 0/5 | E2-U1 |
+| E2: 业务规则章节 | E2-U1 ~ E2-U2 | ✅ 2/2 | — |
 | E3: 跨章节集成 | E3-U1 ~ E3-U2 | 0/2 | E3-U1 |
 | E4: 导出功能 | E4-U1 ~ E4-U5 | 0/5 | E4-U1 |
 | E5: 章节四态规范 | E5-U1 ~ E5-U2 | 0/2 | E5-U1 |
@@ -136,8 +136,8 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E2-U1 | StateMachineCard 类型定义 | ⬜ | — | `types/dds/state-machine.ts` 包含完整定义 |
-| E2-U2 | StateMachineCard 组件 | ⬜ | E2-U1 | 节点显示状态图标 + stateId，选中高亮 |
+| E2-U1 | StateMachineCard 类型定义 | ✅ | — | `types/dds/state-machine.ts` 包含完整定义 |
+| E2-U2 | StateMachineCard 组件 | ✅ | E2-U1 | 节点显示状态图标 + stateId，选中高亮 |
 | E2-U3 | SM 组件面板 | ⬜ | E2-U2 | 3 种组件（state/transition/choice）可拖拽 |
 | E2-U4 | 状态属性面板 | ⬜ | E2-U2 | stateId/stateType/events 编辑 → 节点实时更新 |
 | E2-U5 | 业务规则章节持久化 | ⬜ | E2-U2 | DDSCanvasStore 支持 businessRules chapter |

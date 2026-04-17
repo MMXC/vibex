@@ -127,6 +127,14 @@ function ProtoFlowCanvasInner({ className = '' }: ProtoFlowCanvasProps) {
     [selectNode]
   );
 
+  // E2-AC1: Double-click to select node
+  const onNodeDoubleClick = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      selectNode(node.id);
+    },
+    [selectNode]
+  );
+
   // ---- Drag-and-Drop from ComponentPanel ----
   const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -172,6 +180,7 @@ function ProtoFlowCanvasInner({ className = '' }: ProtoFlowCanvasProps) {
         onConnect={onConnect}
         onNodeDragStop={onNodeDragStop}
         onSelectionChange={onSelectionChange}
+        onNodeDoubleClick={onNodeDoubleClick}
         onDragOver={onDragOver}
         onDrop={onDrop}
         nodeTypes={nodeTypes}

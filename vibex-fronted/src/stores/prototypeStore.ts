@@ -25,8 +25,28 @@ export interface ProtoNodeData {
     data: Record<string, unknown>;
     source: 'inline';
   };
+  /** Navigation data for a node (E2-AC3) */
+  navigation?: ProtoNodeNavigation;
+  /** Breakpoints visibility (E2-AC4) */
+  breakpoints?: ProtoNodeBreakpoints;
   /** Index signature for React Flow compatibility */
   [key: string]: unknown;
+}
+
+// Navigation data for a node
+
+export interface ProtoNodeNavigation {
+  pageId: string;
+  pageName: string;
+  pageRoute: string;
+}
+
+// Breakpoints visibility
+
+export interface ProtoNodeBreakpoints {
+  mobile: boolean;
+  tablet: boolean;
+  desktop: boolean;
 }
 
 export interface ProtoNode extends Node<ProtoNodeData> {}
@@ -78,6 +98,10 @@ export interface PrototypeStoreState {
   // ---- Edge Actions (Sprint3 E1) ----
   addEdge: (source: string, target: string) => string;
   removeEdge: (edgeId: string) => void;
+
+  // ---- Navigation & Breakpoints (Epic2 E2-AC3, E2-AC4) ----
+  updateNodeBreakpoints: (nodeId: string, breakpoints: ProtoNodeBreakpoints) => void;
+  updateNodeNavigation: (nodeId: string, navigation: ProtoNodeNavigation | undefined) => void;
 
   // ---- Import / Export ----
   getExportData: () => PrototypeExportV2;
@@ -206,6 +230,27 @@ export const usePrototypeStore = create<PrototypeStoreState>()(
       removeEdge: (edgeId: string) => {
         set((state) => ({
           edges: state.edges.filter((e) => e.id !== edgeId),
+        }));
+      },
+
+      // ---- Navigation & Breakpoints (Epic2 E2-AC3, E2-AC4) ----
+      updateNodeBreakpoints: (nodeId: string, breakpoints: ProtoNodeBreakpoints) => {
+        set((state) => ({
+          nodes: state.nodes.map((n) =>
+            n.id === nodeId
+              ? { ...n, data: { ...n.data, breakpoints } }
+              : n
+          ),
+        }));
+      },
+
+      updateNodeNavigation: (nodeId: string, navigation: ProtoNodeNavigation | undefined) => {
+        set((state) => ({
+          nodes: state.nodes.map((n) =>
+            n.id === nodeId
+              ? { ...n, data: { ...n.data, navigation } }
+              : n
+          ),
         }));
       },
 

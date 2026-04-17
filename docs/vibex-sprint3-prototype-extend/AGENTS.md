@@ -233,11 +233,28 @@ $B is visible text="正在识别组件..."
 | 测试样式 | 与源测试文件同目录 |
 | 服务扩展 | `vibex-fronted/src/services/figma/image-import.ts` |
 
+### G8.1 文件引用核查（强制）
+
+**architect 在编写 IMPLEMENTATION_PLAN 时，必须对每个文件路径做代码库核查**（`find` / `grep` 确认文件存在），禁止引用不存在的文件。
+
+**发现错误引用的处理方式**：
+- Coord 发现文件路径不存在 → **驳回 architect 完善**，在 AGENTS.md 中记入本节
+- Architect 收到驳回后，必须先 `find`/`grep` 代码库确认实际文件，再更新 IMPLEMENTATION_PLAN
+
+**已发现并修正的错误引用（本案）**：
+| 错误引用 | 正确引用 | 来源 |
+|---------|---------|------|
+| `MockDataPanel.tsx` | `ProtoAttrPanel.tsx`（258行）| Architect |
+| `CanvasPage.tsx`（911行，三树并行画布）| `ProtoEditor.tsx`（323行，原型编辑器）| ce-plan 子任务 |
+| `jest` 测试框架 | `vitest` 测试框架 | 项目实际配置 |
+| E4 直调 OpenAI API | `/api/ai/analyze-image` 后端代理（llm-provider.ts）| ce-plan 子任务 |
+
 **禁止**：
 - ❌ 在非 `__tests__` 目录放置测试文件
 - ❌ 在 `app/` 目录直接创建组件（组件放 `components/`）
 - ❌ 在 `CanvasPage.tsx` 中增加原型编辑器功能（CanvasPage 是三树并行画布）
 - ❌ 使用相对路径以外的方式引用组件
+- ❌ 引用 IMPLEMENTATION_PLAN 时不核查代码库
 
 ---
 

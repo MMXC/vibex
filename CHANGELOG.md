@@ -1,3 +1,13 @@
+### [Unreleased] vibex-sprint4-spec-canvas-extend E1: API 规格章节 — 2026-04-18
+- **E1-U1 类型定义**: `types/dds/api-endpoint.ts` — `APIEndpointCard` 接口（extends BaseCard），含 HTTPMethod/APIParameter/APIResponse
+- **E1-U2 组件**: `components/dds/cards/APIEndpointCard.tsx` — method badge（颜色映射）+ path（monospace）+ summary + tags + status codes，memo 优化
+- **E1-U3 CardRenderer 注册**: `CardRenderer.tsx` — `case 'api-endpoint'` 分发，`UnknownCardFallback`兜底
+- **E1-U4 DDSCanvasStore 扩展**: `stores/dds/DDSCanvasStore.ts` — `initialChapters` 新增 `api`，chapter CRUD actions
+- **E1-U5 持久化**: `services/dds/ddsPersistence.ts` — exportToJSON/quickSave/saveSnapshot 等全部包含 `api` chapter
+- **Canvas 布局**: 4-chapter 架构（requirement/context/flow/api）完整落地，ChapterPanel/DDSPanel/DDSScrollContainer/CrossChapterEdgesOverlay/DDSToolbar 均支持 api 章节
+- **单元测试**: `APIEndpointCard.test.tsx` — 11 个测试用例覆盖 method badge/path/summary/tags/parameters/responses
+- 提交: 581b5ad7
+
 ### [Unreleased] vibex-sprint1-prototype-canvas Epic1: 拖拽布局编辑器 — 2026-04-17
 - **E1-U1 组件面板**: `ComponentPanel.tsx` — 左侧面板展示 10 个默认组件，支持 HTML5 drag-and-drop
 - **E1-U2 React Flow 画布**: `ProtoFlowCanvas.tsx` — 接收组件拖拽，节点自由定位，MiniMap + Controls

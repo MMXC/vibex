@@ -52,6 +52,16 @@ const mockChangelog: ChangelogEntry[] = [
     commit: 'd48fc901',
   },
   {
+    version: '1.0.265',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint3-prototype-extend E4-QA: 图片导入测试',
+      '✅ E4-QA image-import: 5 个用例 (success/empty/non-JSON/file-size/timeout)',
+      '✅ E4-QA image-ai-import: 6 个用例 (AC1/AC2/AC3)',
+    ],
+    commit: 'd48fc901',
+  },
+  {
     version: '1.0.262',
     date: '2026-04-18',
     changes: [

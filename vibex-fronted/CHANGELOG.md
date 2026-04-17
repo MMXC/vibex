@@ -61,6 +61,11 @@
 - **E4-U5 Tests**: `exporter.test.ts` — 16 passing tests
 - **提交**: `9a3e239d` (E4-U1~U5)
 
+### [vibex-sprint3-prototype-extend E4-QA: 图片导入测试] — 2026-04-18
+- **E4-QA image-import**: `services/figma/image-import.test.ts` — 5 个用例（success/empty/non-JSON/file-size/timeout）
+- **E4-QA image-ai-import**: `lib/figma/image-ai-import.test.ts` — 6 个用例 (AC1/AC2/AC3)
+- **提交**: `d48fc901` (E4-QA, 与 E1-E4 QA 同一 commit)
+
 - **根因**: Tab 切换后刷新页面，三树（Component/BusinessFlow/BoundedContext）状态丢失
 - **修复**: useRehydrateCanvasStores hook，skipHydration + 客户端 rehydration
 - **测试**: 4/4 PASS (TC-E6-01~04)

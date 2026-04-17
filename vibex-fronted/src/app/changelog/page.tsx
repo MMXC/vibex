@@ -20,6 +20,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.256',
+    date: '2026-04-17',
+    changes: [
+      '📋 vibex-sprint2-spec-canvas Epic5: 状态与错误处理',
+      '✅ E5-U1 骨架屏: ChapterPanel.tsx — loading时显示 shimmer skeleton cards (3张卡片, shimmer动画)',
+      '✅ E5-U2 空状态引导: ChapterPanel.tsx — 无卡片时显示空状态插图 + 引导文字',
+      '✅ E5-U3 错误态重试: ChapterPanel.tsx — error message + loadChapter 重试按钮, error优先于loading/empty',
+    ],
+    commit: '676c1be9',
+  },
+  {
     version: '1.0.254',
     date: '2026-04-17',
     changes: [

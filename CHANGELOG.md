@@ -42,9 +42,10 @@
 - 提交: 2b3d69f4
 
 ### [Unreleased] vibex-sprint2-spec-canvas Epic5: 状态与错误处理 — 2026-04-17
-- **E5-U1 骨架屏**: `ChapterPanel.tsx` — loading时显示 shimmer skeleton cards
-- **E5-U3 错误态**: `ChapterPanel.tsx` — error message + loadChapter 重试按钮
-- 提交: vibex-sprint2-spec-canvas/dev-epic5-状态与错误处理
+- **E5-U1 骨架屏**: `ChapterPanel.tsx` — loading时显示 shimmer skeleton cards（3张卡片，shimmer动画）
+- **E5-U2 空状态引导**: `ChapterPanel.tsx` — 无卡片时显示空状态插图 + 引导文字
+- **E5-U3 错误态重试**: `ChapterPanel.tsx` — error message + loadChapter 重试按钮，error优先于loading/empty
+- 提交: 676c1be9
 
 ### [Unreleased] vibex-sprint2-spec-canvas Epic3: AI 草稿生成 — 2026-04-17
 - **E3-U1 AI入口**: `DDSToolbar.tsx` — handleAIGenerate → toggleDrawer → AIDraftDrawer

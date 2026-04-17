@@ -12,7 +12,7 @@
 
 | Epic | Units | Status | Next |
 |------|-------|--------|------|
-| E1: 设计稿导入 | U1-U2 | ✅ 1/2 | — |
+| E1: 设计稿导入 | U1-U2 | ✅ 2/2 | — |
 | E2: AI Coding Agent | U3-U5 | 0/3 | U3 |
 | E3: 版本 Diff | U6-U7 | 0/2 | U6 |
 
@@ -22,7 +22,7 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| U1 | Image AI 解析 | ⬜ | — | `image-ai-import.ts` 复用 cf-image-loader 生成组件列表 |
+| U1 | Image AI 解析 ✅ | — | `image-ai-import.ts` 复用 cf-image-loader 生成组件列表 |
 | U2 | Figma URL 解析完善 | ✅ | — | `/api/figma` GET endpoint + ImportPanel Figma Tab（URL 输入 + 加载 + 结果展示） |
 
 ### U1: Image AI 解析

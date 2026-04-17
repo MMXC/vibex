@@ -59,6 +59,7 @@ describe('DDSToolbar', () => {
   it('displays flow chapter name when active', () => {
     useDDSCanvasStore.getState().setActiveChapter('flow');
     render(<DDSToolbar />);
+    ['\u4e1a\u52a1\u89c4\u5236', 'business-rules'],
     expect(screen.getByText('流程')).toBeInTheDocument();
   });
 
@@ -83,6 +84,7 @@ describe('DDSToolbar', () => {
     const onAIGenerate = vi.fn();
     render(<DDSToolbar onAIGenerate={onAIGenerate} />);
     fireEvent.click(screen.getByRole('button', { name: /AI 生成/i }));
+    ['\u4e1a\u52a1\u89c4\u5236', 'business-rules'],
     expect(onAIGenerate).toHaveBeenCalled();
   });
 

@@ -141,6 +141,16 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     };
   }, [projectId, loadChapters]);
 
+  // ---- Sync activeChapter from URL query param ----
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const chapterParam = params.get('chapter') as ChapterType | null;
+    if (chapterParam) {
+      useDDSCanvasStore.getState().setActiveChapter(chapterParam);
+    }
+  }, []);
+
   // ---- Handlers ----
 
   const handleSelectCard = useCallback(

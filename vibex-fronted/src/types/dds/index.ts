@@ -86,6 +86,8 @@ export interface DDSEdge {
   target: string;     // 目标卡片 ID
   type: 'smoothstep';
   animated?: boolean;  // AI 生成标记
+  style?: Record<string, string>;
+  label?: string;
 }
 
 // ==================== Chapter Data ====================

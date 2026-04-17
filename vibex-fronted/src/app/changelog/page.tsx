@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.259',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint6-ai-coding-integration E1: 设计稿导入',
+      '✅ E1-U1 /api/figma route: GET/POST Figma REST API proxy',
+      '✅ E1-U1 Image AI import: importFromImage(file) — AI vision 分析图片，base64 → GPT-4o vision',
+      '✅ E1-U1 /api/chat route: AI chat completions 端点，支持 vision image_url',
+      '✅ 单元测试: image-ai-import.test.ts — 6 个用例 (AC1/AC2/AC3)',
+    ],
+    commit: 'e6dd07a5',
+  },
+  {
     version: '1.0.258',
     date: '2026-04-18',
     changes: [

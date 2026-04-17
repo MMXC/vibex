@@ -1,5 +1,12 @@
 # Changelog
 
+### [vibex-sprint6-ai-coding-integration E1: 设计稿导入] — 2026-04-18
+- **E1-U1 /api/figma route**: GET/POST Figma REST API proxy (`app/api/figma/route.ts`)
+- **E1-U1 Image AI import**: `src/lib/figma/image-ai-import.ts` — `importFromImage(file)` AI vision 分析图片，base64 → /api/chat → GPT-4o vision
+- **E1-U1 /api/chat route**: AI chat completions 端点，支持 vision (image_url) content parts
+- **单元测试**: `image-ai-import.test.ts` — 6 个用例 (AC1/AC2/AC3)
+- 提交: 8e710864 (figma) + e6dd07a5 (image-ai)
+
 ### [vibex-sprint1-prototype-canvas Epic1: 拖拽布局编辑器] — 2026-04-17
 - **Epic 1: 拖拽布局编辑器** — 可视化原型画布正式上线
 - 左侧组件面板：10 个默认组件（Button/Input/Card/Container/Header/Navigation/Modal/Table/Form/Image）支持拖拽到画布

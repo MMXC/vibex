@@ -15,11 +15,11 @@
 - 提交: e87a5f06
 
 ### [Unreleased] vibex-sprint5-delivery-integration E1: 数据层集成 — 2026-04-18
-- **T1 loadMockData**: 从 prototypeStore + DDSCanvasStore 拉取数据
+- **T1 loadFromStores**: 从 prototypeStore + DDSCanvasStore 拉取数据，映射 chapters.context → contexts, chapters.flow → flows, prototypeStore → components
 - **T2 数据转换**: toComponent/toSchema/toDDL 函数实现
 - **T3 saveToStorage**: localStorage 持久化（已存在）
-- deliveryStore.ts 新增测试 7 个用例
-- 提交: 3adcd4d7
+- deliveryStore.ts 新增测试 12 个用例
+- 提交: a57b23f1 (T1) + 2d540bca (T2)
 ### [Unreleased] vibex-sprint6-ai-coding-integration E1: 设计稿导入 — 2026-04-18
 - **E1-U1 /api/figma route**: GET/POST Figma REST API proxy (`app/api/figma/route.ts`)
 - **E1-U1 Image AI import**: `src/lib/figma/image-ai-import.ts` — `importFromImage(file)` AI vision 分析图片，base64 → /api/chat → GPT-4o vision，JSON/markdown fallback，10MB 限制

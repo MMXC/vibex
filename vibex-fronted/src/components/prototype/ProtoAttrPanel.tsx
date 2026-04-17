@@ -16,7 +16,7 @@ import styles from './ProtoAttrPanel.module.css';
 
 // ==================== Tab ====================
 
-type Tab = 'props' | 'mock';
+type Tab = 'props' | 'styles' | 'events' | 'mock';
 
 // ==================== Props ====================
 
@@ -34,6 +34,17 @@ export const ProtoAttrPanel = memo(function ProtoAttrPanel({
 
   const selectedNode = nodes.find((n) => n.id === selectedNodeId) ?? null;
   const [activeTab, setActiveTab] = useState<Tab>('props');
+  const [nodeStyles, setNodeStyles] = useState({
+    backgroundColor: '',
+    borderRadius: '',
+    opacity: 1,
+    border: '',
+  });
+  const [nodeEvents, setNodeEvents] = useState({
+    onClick: '',
+    onHover: '',
+    onFocus: '',
+  });
   const [mockInput, setMockInput] = useState('');
   const [mockError, setMockError] = useState<string | null>(null);
 
@@ -138,6 +149,24 @@ export const ProtoAttrPanel = memo(function ProtoAttrPanel({
         </button>
         <button
           role="tab"
+          aria-selected={activeTab === 'styles'}
+          className={`${styles.tab} ${activeTab === 'styles' ? styles.tabActive : ''}`}
+          onClick={() => setActiveTab('styles')}
+          type="button"
+        >
+          样式
+        </button>
+        <button
+          role="tab"
+          aria-selected={activeTab === 'events'}
+          className={`${styles.tab} ${activeTab === 'events' ? styles.tabActive : ''}`}
+          onClick={() => setActiveTab('events')}
+          type="button"
+        >
+          事件
+        </button>
+        <button
+          role="tab"
           aria-selected={activeTab === 'mock'}
           className={`${styles.tab} ${activeTab === 'mock' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('mock')}
@@ -230,6 +259,115 @@ export const ProtoAttrPanel = memo(function ProtoAttrPanel({
             </button>
             <p className={styles.mockHint}>
               表格等数据组件会优先使用 Mock 数据渲染
+            </p>
+          </div>
+        )}
+
+        {/* E2-U2: Styles tab */}
+        {activeTab === 'styles' && (
+          <div className={styles.stylesTab} role="tabpanel">
+            <div className={styles.propRow}>
+              <label className={styles.propLabel}>背景色</label>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <input
+                  type="color"
+                  value={nodeStyles.backgroundColor || '#ffffff'}
+                  onChange={(e) => setNodeStyles((s) => ({ ...s, backgroundColor: e.target.value }))}
+                  className={styles.colorInput}
+                  title="背景色"
+                />
+                <input
+                  type="text"
+                  value={nodeStyles.backgroundColor}
+                  onChange={(e) => setNodeStyles((s) => ({ ...s, backgroundColor: e.target.value }))}
+                  placeholder="#ffffff"
+                  className={styles.propInput}
+                  style={{ flex: 1 }}
+                />
+              </div>
+            </div>
+            <div className={styles.propRow}>
+              <label className={styles.propLabel}>圆角</label>
+              <input
+                type="text"
+                value={nodeStyles.borderRadius}
+                onChange={(e) => setNodeStyles((s) => ({ ...s, borderRadius: e.target.value }))}
+                placeholder="8px"
+                className={styles.propInput}
+              />
+            </div>
+            <div className={styles.propRow}>
+              <label className={styles.propLabel}>透明度</label>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.1"
+                value={nodeStyles.opacity}
+                onChange={(e) => setNodeStyles((s) => ({ ...s, opacity: Number(e.target.value) }))}
+                className={styles.rangeInput}
+              />
+              <span className={styles.propValue}>{nodeStyles.opacity}</span>
+            </div>
+            <div className={styles.propRow}>
+              <label className={styles.propLabel}>边框</label>
+              <input
+                type="text"
+                value={nodeStyles.border}
+                onChange={(e) => setNodeStyles((s) => ({ ...s, border: e.target.value }))}
+                placeholder="1px solid #e5e7eb"
+                className={styles.propInput}
+              />
+            </div>
+            <button
+              type="button"
+              className={styles.applyBtn}
+              onClick={() => {
+                if (selectedNode) {
+                  updateNode(selectedNode.id, { style: nodeStyles });
+                }
+              }}
+            >
+              应用样式
+            </button>
+          </div>
+        )}
+
+        {/* E2-U3: Events tab */}
+        {activeTab === 'events' && (
+          <div className={styles.eventsTab} role="tabpanel">
+            <div className={styles.propRow}>
+              <label className={styles.propLabel}>onClick</label>
+              <input
+                type="text"
+                value={nodeEvents.onClick}
+                onChange={(e) => setNodeEvents((s) => ({ ...s, onClick: e.target.value }))}
+                placeholder="handleSubmit()"
+                className={styles.propInput}
+              />
+            </div>
+            <div className={styles.propRow}>
+              <label className={styles.propLabel}>onHover</label>
+              <input
+                type="text"
+                value={nodeEvents.onHover}
+                onChange={(e) => setNodeEvents((s) => ({ ...s, onHover: e.target.value }))}
+                placeholder="handleHover()"
+                className={styles.propInput}
+              />
+            </div>
+            <div className={styles.propRow}>
+              <label className={styles.propLabel}>onFocus</label>
+              <input
+                type="text"
+                value={nodeEvents.onFocus}
+                onChange={(e) => setNodeEvents((s) => ({ ...s, onFocus: e.target.value }))}
+                placeholder="handleFocus()"
+                className={styles.propInput}
+              />
+            </div>
+            <p className={styles.eventsHint}>
+              事件会在导出 JSON 时作为 interactions 字段保存
             </p>
           </div>
         )}

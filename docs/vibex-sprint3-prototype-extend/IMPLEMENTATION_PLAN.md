@@ -13,7 +13,7 @@
 | Epic | Units | Status | Next |
 |------|-------|--------|------|
 | E1: 页面跳转连线 | E1-U1 ~ E1-U3 | ✅ 3/3 | — |
-| E2: 组件属性面板 | E2-U1 ~ E2-U3 | ⬜ 0/3 | E2-U1 |
+| E2: 组件属性面板 | E2-U1 ~ E2-U3 | ✅ 2/3 | E2-U1 |
 | E3: 响应式断点 | E3-U1 ~ E3-U3 | ⬜ 0/3 | E3-U1 |
 | E4: AI 草图导入 | E4-U1 ~ E4-U2 | ⬜ 0/2 | E4-U1 |
 
@@ -130,9 +130,9 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E2-U1 | PropertyPanel 基础框架 + DataTab | ⬜ | — | 双击节点 → 右侧 320px Drawer 展开，显示节点 ID 和类型 |
-| E2-U2 | NavigationTab + ResponsiveTab | ⬜ | E2-U1 | Navigation Tab 设置跳转自动生成 edge；Responsive Tab 设置断点规则 |
-| E2-U3 | StyleTab | ⬜ | E2-U1 | 样式 Tab 支持基础样式修改（颜色、字体大小等） |
+| E2-U1 | PropertyPanel 基础框架 + DataTab | ✅ | — | ProtoAttrPanel 节点选中时展开，显示 ID 和类型 |
+| E2-U2 | 样式Tab | ✅ | E2-U1 | 样式 Tab: backgroundColor picker + borderRadius + opacity + border |
+| E2-U3 | 事件Tab | ✅ | E2-U1 | 事件 Tab: onClick/onHover/onFocus handler inputs |
 
 ---
 

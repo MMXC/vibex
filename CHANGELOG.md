@@ -22,6 +22,11 @@
 - 提交: 3adcd4d7
 ### [Unreleased] vibex-sprint6-ai-coding-integration E1: 设计稿导入 — 2026-04-18
 - **E1-U1 /api/figma route**: GET/POST Figma REST API proxy (`app/api/figma/route.ts`)
+- **E1-U1 Image AI import**: `src/lib/figma/image-ai-import.ts` — `importFromImage(file)` AI vision 分析图片，base64 → /api/chat → GPT-4o vision，JSON/markdown fallback，10MB 限制
+- **E1-U1 /api/chat route**: AI chat completions 端点，支持 vision (image_url) content parts，转发到 OpenAI-compatible AI provider
+- **单元测试**: `image-ai-import.test.ts` — 6 个用例 (AC1/AC2/AC3)，5/5 PASS for E4-QA image-import
+- 提交: 8e710864 (figma) + e6dd07a5 (image-ai)
+
 ### [Unreleased] vibex-sprint4-spec-canvas-extend E2: 业务规则章节 — 2026-04-18
 - **E2-U1 类型定义**: `types/dds/state-machine.ts` — StateType/TransitionType/SMState/SMTransition/StateMachineCard
 - **E2-U2 StateMachineCard**: `StateMachineCard.tsx` — state list/transition count/selected highlight

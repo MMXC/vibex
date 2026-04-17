@@ -20,6 +20,7 @@ function setupStore(overrides = {}) {
       context: { type: 'context', cards: [], edges: [], loading: false, error: null },
       flow: { type: 'flow', cards: [], edges: [], loading: false, error: null },
       api: { type: 'api', cards: [], edges: [], loading: false, error: null },
+      businessRules: { type: 'business-rules', cards: [], edges: [], loading: false, error: null },
     },
     selectedCardIds: [],
     ...overrides,

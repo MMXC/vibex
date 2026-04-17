@@ -20,6 +20,7 @@ function setupStore() {
       requirement: { type: 'requirement', cards: [], edges: [], loading: false, error: null },
       context: { type: 'context', cards: [], edges: [], loading: false, error: null },
       flow: { type: 'flow', cards: [], edges: [], loading: false, error: null },
+      api: { type: 'api', cards: [], edges: [], loading: false, error: null },
     },
     isFullscreen: false,
     isGenerating: false,
@@ -33,11 +34,11 @@ describe('DDSScrollContainer', () => {
     setupStore();
   });
 
-  it('renders 3 panels as region elements', () => {
+  it('renders 4 panels as region elements', () => {
     const { container } = render(<DDSScrollContainer />);
     // DDSPanel renders with role="region" and aria-label
     const regions = container.querySelectorAll('[role="region"]');
-    expect(regions).toHaveLength(3);
+    expect(regions).toHaveLength(4);
     // Each panel should have its chapter label as aria-label
     expect(screen.getByRole('region', { name: '需求' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: '上下文' })).toBeInTheDocument();
@@ -58,7 +59,7 @@ describe('DDSScrollContainer', () => {
     render(<DDSScrollContainer />);
     // The collapsed panel should have aria-hidden header
     const headers = screen.getAllByRole('region');
-    expect(headers).toHaveLength(3);
+    expect(headers).toHaveLength(4);
   });
 
   it('renders thumb buttons with correct aria-pressed state for active chapter', () => {

@@ -21,6 +21,7 @@ describe('validateImportData', () => {
         requirement: { cards: [], edges: [] },
         context: { cards: [], edges: [] },
         flow: { cards: [], edges: [] },
+        api: { cards: [], edges: [] },
       },
       chatHistory: [],
       exportedAt: '2026-04-16T00:00:00.000Z',
@@ -51,6 +52,7 @@ describe('validateImportData', () => {
         requirement: { cards: [], edges: [] },
         context: { cards: [], edges: [] },
         flow: { cards: [], edges: [] },
+        api: { cards: [], edges: [] },
       },
       chatHistory: [],
     };
@@ -66,6 +68,7 @@ describe('validateImportData', () => {
         requirement: { cards: [], edges: [] },
         context: { cards: [], edges: [] },
         flow: { cards: [], edges: [] },
+        api: { cards: [], edges: [] },
       },
       chatHistory: [],
     };
@@ -92,6 +95,7 @@ describe('validateImportData', () => {
         requirement: { cards: [], edges: [] },
         context: { cards: [], edges: [] },
         flow: { cards: [], edges: [] },
+        api: { cards: [], edges: [] },
       },
       chatHistory: 'not an array',
     };
@@ -158,6 +162,7 @@ describe('localStorage quickSave/quickLoad', () => {
       requirement: { cards: [{ id: 'c1', type: 'requirement' } as unknown as never], edges: [] },
       context: { cards: [], edges: [] },
       flow: { cards: [], edges: [] },
+      api: { cards: [], edges: [] },
     };
 
     quickSave('proj-1', 'My Project', chapters, []);
@@ -181,6 +186,7 @@ describe('localStorage quickSave/quickLoad', () => {
       requirement: { cards: [], edges: [] },
       context: { cards: [], edges: [] },
       flow: { cards: [], edges: [] },
+      api: { cards: [], edges: [] },
     };
 
     quickSave('proj-2', 'Project A', baseChapters, []);
@@ -188,6 +194,7 @@ describe('localStorage quickSave/quickLoad', () => {
       requirement: { cards: [{ id: 'c2', type: 'requirement' } as unknown as never], edges: [] },
       context: { cards: [], edges: [] },
       flow: { cards: [], edges: [] },
+      api: { cards: [], edges: [] },
     }, []);
 
     const loaded = quickLoad('proj-2');
@@ -201,6 +208,7 @@ describe('localStorage quickSave/quickLoad', () => {
       requirement: { cards: [], edges: [] },
       context: { cards: [], edges: [] },
       flow: { cards: [], edges: [] },
+      api: { cards: [], edges: [] },
     };
 
     quickSave('proj-3', 'Test', chapters, []);

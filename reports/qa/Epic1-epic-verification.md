@@ -3,25 +3,52 @@
 **Agent**: TESTER
 **项目**: vibex-sprint3-prototype-extend
 **阶段**: tester-epic1-页面跳转连线（epic-1）
-**时间**: 2026-04-17 23:07 GMT+8
+**时间**: 2026-04-17 23:13 GMT+8
+**Commit**: `1837905e`
 
 ---
 
-## 变更确认
+## 1. 变更确认
 
-### Commit 检查
 ```
-07d864fb test(dds): Epic4 E4-U1/E4-U2 跨章节边单元测试 + 文档
-32f787db docs(sprint3): E1 标记完成 + changelog 补档
+1837905e test(prototype): Sprint3 E1 addEdge/removeEdge 单元测试
 ```
-无 prototype-extend 功能代码实现。
+
+### 变更文件
+- `src/stores/prototypeStore.test.ts` — 新增 7 个 edge 测试用例
+- 已有实现：`src/stores/prototypeStore.ts` (addEdge/removeEdge)
+- 已有集成：`src/components/prototype/ProtoFlowCanvas.tsx` (onConnect → addEdge)
 
 ---
 
-## 🔴 驳回
+## 2. 构建验证
 
-**原因**: sprint3 prototype-extend 项目处于规划阶段，docs 目录有 AGENTS.md 但无任何实现代码。
+```
+pnpm build → ✅ PASS
+```
 
-- 无 ProtoFlowCanvas edge 创建相关代码
-- 无页面跳转连线 UI 实现
-- 无 prototype-extend 相关分支或 commit
+---
+
+## 3. 单元测试验证
+
+```
+prototypeStore.test.ts: 24/24 通过 ✅
+```
+
+新增 edge 测试覆盖：
+- adds an edge to the store
+- addEdge generates a unique id
+- removes an edge by id
+- removeEdge of last edge leaves empty array
+- edges are independent from nodes
+- clears all nodes and edges
+
+---
+
+## 检查单
+
+- [x] git commit 存在且有变更文件
+- [x] pnpm build 通过
+- [x] addEdge/removeEdge 实现存在
+- [x] ProtoFlowCanvas onConnect 集成
+- [x] prototypeStore edge 测试 — 24/24 通过

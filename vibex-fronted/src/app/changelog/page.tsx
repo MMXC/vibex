@@ -43,6 +43,18 @@ const mockChangelog: ChangelogEntry[] = [
     commit: 'd48fc901',
   },
   {
+    version: '1.0.262',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint4-spec-canvas-extend E3: 跨章节集成',
+      '✅ E3-U1 DDSToolbar: 5 章节按钮，点击切换 activeChapter',
+      '✅ E3-U1 DDSCanvasPage: ?chapter= URL 参数支持',
+      '✅ E3-U2 CrossChapterEdgesOverlay: 5-chapter 支持',
+      '✅ 测试: ChapterPanel 24/24, CrossChapterEdgesOverlay 5/5, DDSToolbar 15/15',
+    ],
+    commit: 'f3271119 + 92f1e00d',
+  },
+  {
     version: '1.0.259',
     date: '2026-04-18',
     changes: [

@@ -14,6 +14,12 @@
 - **E2-U2 StateMachineCard**: `StateMachineCard.tsx` — state list/transition count/selected highlight
 - 提交: e87a5f06
 
+### [Unreleased] vibex-sprint4-spec-canvas-extend E3: 跨章节集成 — 2026-04-18
+- **E3-U1 DDSToolbar 扩展**: 5 章节按钮 (requirement/context/flow/api/business-rules)，点击切换 activeChapter，aria-pressed 状态
+- **E3-U1 DDSCanvasPage**: `?chapter=` URL 参数支持，mount 时读取并 setActiveChapter
+- **E3-U2 CrossChapterEdgesOverlay**: 5-chapter 支持 (CHAPTER_ORDER 含 api + business-rules)，跨章节边渲染验证
+- 提交: f3271119 (E3-U1) + 92f1e00d (E3-U2 tests)
+
 ### [Unreleased] vibex-sprint5-delivery-integration E1: 数据层集成 — 2026-04-18
 - **T1 loadFromStores**: 从 prototypeStore + DDSCanvasStore 拉取数据，映射 chapters.context → contexts, chapters.flow → flows, prototypeStore → components
 - **T2 数据转换**: toComponent/toSchema/toDDL 函数实现

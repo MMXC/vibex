@@ -1,3 +1,11 @@
+### [Unreleased] vibex-canvas-silent-400 E1-F1.1: 前置校验 toast 补充 — 2026-04-17
+- **E1-F1.1 前置校验 toast**: `BusinessFlowTree.tsx` — handleContinueToComponents 增加前置校验 toast
+  - 修复: contextsToSend/flowsToSend 为空时静默 return，用户无反馈
+  - contextsToSend 为空 → toast('请先勾选至少一个上下文节点后再生成组件树', 'error')
+  - flowsToSend 为空 → toast('请先完成业务流程树的编辑和确认', 'error')
+  - contextNodes 为空 → toast('请先生成上下文树', 'error')
+  - 提交: `4d716a38` (fix)
+
 ### [Unreleased] vibex-canvas-ux-fix Epic2: canGenerateComponents flowsToSend 校验 — 2026-04-17
 - **E2-F2.1 canGenerateComponents flowsToSend 校验**: `BusinessFlowTree.tsx` — 新增 `computeTreePayload` 纯函数
   - 修复: `canGenerateComponents` 原先只检查 `flowNodes.length > 0`，未过滤 deactive flows，导致 flows 全 deactive 时按钮错误 enabled

@@ -8,8 +8,18 @@
 - **单元测试**: `APIEndpointCard.test.tsx` — 11 个测试用例覆盖 method badge/path/summary/tags/parameters/responses
 - 提交: 581b5ad7
 
+
+### [Unreleased] vibex-sprint4-spec-canvas-extend E2: 业务规则章节 — 2026-04-18
+- **E2-U1 类型定义**: `types/dds/state-machine.ts` — StateType/TransitionType/SMState/SMTransition/StateMachineCard
+- **E2-U2 StateMachineCard**: `StateMachineCard.tsx` — state list/transition count/selected highlight
+- 提交: e87a5f06
 ### [Unreleased] vibex-sprint6-ai-coding-integration E1: 设计稿导入 — 2026-04-18
 - **E1-U1 /api/figma route**: GET/POST Figma REST API proxy (`app/api/figma/route.ts`)
+### [Unreleased] vibex-sprint4-spec-canvas-extend E2: 业务规则章节 — 2026-04-18
+- **E2-U1 类型定义**: `types/dds/state-machine.ts` — StateType/TransitionType/SMState/SMTransition/StateMachineCard
+- **E2-U2 StateMachineCard**: `StateMachineCard.tsx` — state list/transition count/selected highlight
+- **E2-U3 CardRenderer**: `CardRenderer.tsx` dispatch for state-machine type
+- 提交: e87a5f06
 - **E1-U2 ImportPanel FigmaTab**: URL input + loading + result display (`ImportPanel.tsx`)
 - **figma-import.ts**: `fetchFigmaFile()` + `parseFigmaUrl()` with node ID support
 - **ImportPanel.module.css**: Figma tab styles (figmaTab/figmaBtn/figmaError/figmaSuccess)

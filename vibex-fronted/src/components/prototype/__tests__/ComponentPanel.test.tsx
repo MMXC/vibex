@@ -120,15 +120,13 @@ describe('ComponentPanel', () => {
     });
   });
 
-  it('sets dataTransfer JSON on drag start', () => {
-    // Simulate what handleDragStart does by directly testing the callback behavior
-    // The actual drag event dispatch is tested via integration tests
-    // Here we verify the component mounts correctly
+  it('renders a draggable card for each component', () => {
     renderComponent();
-    const card = screen.getByText('Button');
-    expect(card).toHaveAttribute('draggable', 'true');
-    // Verify the card can receive drag events (basic smoke test)
-    const dragEvent = new DragEvent('dragstart', { bubbles: true, cancelable: true });
-    expect(() => card.dispatchEvent(dragEvent)).not.toThrow();
+    const cards = screen.getAllByRole('listitem');
+    expect(cards).toHaveLength(10);
+    // All cards are draggable
+    cards.forEach((card) => {
+      expect(card).toHaveAttribute('draggable', 'true');
+    });
   });
 });

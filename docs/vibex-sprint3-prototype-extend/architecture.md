@@ -30,7 +30,7 @@
 | 画布引擎 | @xyflow/react (React Flow) | ^12.x | Sprint1 已上线，edges API 成熟 |
 | 样式 | CSS Modules + CSS Variables | — | CLAUDE.md 规范要求 |
 | API 层 | TanStack Query | ^5.x | API 数据缓存 |
-| 外部 AI | GPT-4o Vision | — | E4 图片识别，API key 通过 env 注入 |
+| 外部 AI | MiniMax Vision | — | E4 图片识别，复用后端 llm-provider.ts Minimax 集成 |
 
 ### Sprint3 新增依赖
 
@@ -52,7 +52,7 @@
 ```mermaid
 %%{ init: { "theme": "base", "themeVariables": { "fontSize": "13px" } } }%%
 flowchart TB
-    subgraph CanvasPage["CanvasPage.tsx (911行，分区修改)"]
+    subgraph ProtoEditor["ProtoEditor.tsx (原型编辑器主容器)"]
         Toolbar["工具栏区<br/>(新增设备切换)"]
         Canvas["ProtoFlowCanvas + 左侧面板"]
         RightPanel["右侧面板区<br/>(PropertyPanel 新增)"]
@@ -77,13 +77,13 @@ flowchart TB
 
     subgraph Panels["Panel Components"]
         FTP["FlowTreePanel.tsx<br/>(扩展 E1 连线 UI)"]
-        PP["PropertyPanel.tsx<br/>(新建，替代 MockDataPanel 概念)"]
+        PP["PropertyPanel/<br/>(基于 ProtoAttrPanel 重构)"]
         IP["ImportPanel.tsx<br/>(扩展 E4 图片上传 Tab)"]
     end
 
     subgraph Services["Services"]
         FI["figma-import.ts<br/>(扩展 E4: importFromImage)"]
-        AI["AI Vision API<br/>(GPT-4o Vision)"]
+        AI["MiniMax Vision API<br/>(via llm-provider.ts proxy)"]
     end
 
     subgraph ReactFlow["React Flow (@xyflow/react)"]
@@ -105,7 +105,7 @@ flowchart TB
     PFC --> ProtoNode
 
     style prototypeStore fill:#1e3a5f,color:#fff
-    style CanvasPage fill:#2d4a1e,color:#fff
+    style ProtoEditor fill:#2d4a1e,color:#fff
     style Services fill:#4a1e3a,color:#fff
 ```
 
@@ -114,7 +114,7 @@ flowchart TB
 ```mermaid
 sequenceDiagram
     participant User
-    participant CanvasPage
+    participant ProtoEditor
     participant ProtoFlowCanvas
     participant prototypeStore
     participant ReactFlow
@@ -132,7 +132,7 @@ sequenceDiagram
     %% E2: 属性面板
     User->>ProtoFlowCanvas: 双击节点
     ProtoFlowCanvas->>prototypeStore: selectNode(nodeId)
-    CanvasPage->>PropertyPanel: 展开（selectedNodeId 变化）
+    ProtoEditor->>PropertyPanel: 展开（selectedNodeId 变化）
     User->>PropertyPanel: 修改 Data/Navigation/Responsive Tab
     PropertyPanel->>prototypeStore: updateNode(nodeId, partial)
 
@@ -143,15 +143,15 @@ sequenceDiagram
     end
 
     %% E3: 断点切换
-    User->>CanvasPage: 点击设备按钮
-    CanvasPage->>prototypeStore: setBreakpoint('375')
-    prototypeStore-->>CanvasPage: breakpoint 状态更新
-    CanvasPage-->>User: 画布缩放至 375px
+    User->>ProtoEditor: 点击设备按钮
+    ProtoEditor->>prototypeStore: setBreakpoint('375')
+    prototypeStore-->>ProtoEditor: breakpoint 状态更新
+    ProtoEditor-->>User: 画布缩放至 375px
 
     %% E4: AI 导入
     User->>ImportPanel: 上传图片
     ImportPanel->>figmaImport: importFromImage(file)
-    figmaImport->>AI: GPT-4o Vision API
+    figmaImport->>AI: MiniMax Vision API (via /api/ai/analyze-image)
     AI-->>figmaImport: 组件结构 JSON
     figmaImport-->>ImportPanel: ComponentNode[]
     User->>ImportPanel: 确认导入
@@ -360,7 +360,7 @@ erDiagram
 
 ### 5.1 测试框架
 
-- **单元测试**: Jest + React Testing Library（`vibex-fronted/src/**/*.test.tsx`）
+- **单元测试**: Vitest + React Testing Library（`vibex-fronted/src/**/*.test.tsx`，项目已配置 `vitest`）
 - **集成测试**: Playwright（gstack browse 自动化验证）
 - **覆盖率要求**: 核心逻辑（prototypeStore actions、figma-import 解析）覆盖率 > 80%
 
@@ -474,21 +474,21 @@ describe('PropertyPanel — E2 Integration', () => {
 });
 ```
 
-#### CanvasPage 断点切换测试（E3）
+#### ProtoEditor 断点切换测试（E3）
 
 ```typescript
-// components/canvas/__tests__/CanvasPage.test.tsx (扩展现有测试)
+// components/prototype/__tests__/ProtoEditor.test.tsx (扩展现有测试)
 
-describe('CanvasPage — E3 Responsive Breakpoints', () => {
+describe('ProtoEditor — E3 Responsive Breakpoints', () => {
   it('E3-AC1: 工具栏显示 3 个设备按钮', () => {
-    render(<CanvasPage />);
+    render(<ProtoEditor />);
     expect(screen.getByLabelText(/手机/)).toBeInTheDocument();
     expect(screen.getByLabelText(/平板/)).toBeInTheDocument();
     expect(screen.getByLabelText(/桌面/)).toBeInTheDocument();
   });
 
   it('E3-AC2: 点击手机按钮，画布宽度缩放至 375px', async () => {
-    render(<CanvasPage />);
+    render(<ProtoEditor />);
     fireEvent.click(screen.getByLabelText(/手机/));
     const canvas = screen.getByTestId('proto-canvas-container');
     expect(canvas).toHaveStyle({ width: '375px' });
@@ -496,7 +496,7 @@ describe('CanvasPage — E3 Responsive Breakpoints', () => {
   });
 
   it('E3-AC2: 切换断点，store.breakpoint 同步更新', async () => {
-    render(<CanvasPage />);
+    render(<ProtoEditor />);
     fireEvent.click(screen.getByLabelText(/平板/));
     expect(usePrototypeStore.getState().breakpoint).toBe('768');
   });
@@ -560,7 +560,7 @@ vibex-fronted/src/
 ├── components/
 │   ├── canvas/
 │   │   ├── __tests__/
-│   │   │   └── CanvasPage.test.tsx       # E3 集成
+│   │   │   └── ProtoEditor.test.tsx       # E3 集成
 │   │   ├── panels/
 │   │   │   ├── __tests__/
 │   │   │   │   └── PropertyPanel.test.tsx  # E2
@@ -578,20 +578,27 @@ vibex-fronted/src/
 
 ## 6. 文件变更清单
 
-| 操作 | 文件路径 | 说明 |
-|------|---------|------|
-| 修改 | `stores/prototypeStore.ts` | 新增 `breakpoint`/`addEdge`/`removeEdge`/`addNodes`/`setBreakpoint`/`updateNodeBreakpoints` |
-| 新建 | `components/canvas/panels/PropertyPanel.tsx` | 属性面板主组件（E2） |
-| 新建 | `components/canvas/panels/PropertyPanel/DataTab.tsx` | Data Tab（E2） |
-| 新建 | `components/canvas/panels/PropertyPanel/StyleTab.tsx` | Style Tab（E2） |
-| 新建 | `components/canvas/panels/PropertyPanel/NavigationTab.tsx` | Navigation Tab（E2） |
-| 新建 | `components/canvas/panels/PropertyPanel/ResponsiveTab.tsx` | Responsive Tab（E2） |
-| 修改 | `components/canvas/panels/FlowTreePanel.tsx` | 增加「添加连线」按钮（E1） |
-| 修改 | `components/prototype/ProtoFlowCanvas.tsx` | edge 渲染 + 双击事件（E1/E2） |
-| 修改 | `components/canvas/CanvasPage.tsx` | 工具栏增加设备切换按钮（E3，911行分区修改） |
-| 修改 | `components/canvas/features/ImportPanel.tsx` | 增加图片上传 Tab（E4） |
-| 新建 | `services/figma/image-import.ts` | 新增 `importFromImage()` 方法（E4） |
-| 修改 | `lib/prototypes/ui-schema.ts` | 新增 `NodeBreakpoints`/`NavigationTarget` 类型 |
+| 操作 | 文件路径（repo-relative） | 说明 |
+|------|---------|
+| 修改 | `vibex-fronted/src/stores/prototypeStore.ts` | 新增 `breakpoint`/`addEdge`/`removeEdge`/`addNodes()`/`setBreakpoint`/`updateNodeBreakpoints` |
+| 新建 | `vibex-fronted/src/components/prototype/PropertyPanel/` | 属性面板（E2，基于 ProtoAttrPanel.tsx 重构，4 Tab） |
+| 新建 | `vibex-fronted/src/components/prototype/PropertyPanel/DataTab.tsx` | Data Tab（E2） |
+| 新建 | `vibex-fronted/src/components/prototype/PropertyPanel/StyleTab.tsx` | Style Tab（E2） |
+| 新建 | `vibex-fronted/src/components/prototype/PropertyPanel/NavigationTab.tsx` | Navigation Tab（E2） |
+| 新建 | `vibex-fronted/src/components/prototype/PropertyPanel/ResponsiveTab.tsx` | Responsive Tab（E2） |
+| 修改 | `vibex-fronted/src/components/canvas/panels/FlowTreePanel.tsx` | 增加「添加连线」按钮（E1） |
+| 修改 | `vibex-fronted/src/components/prototype/ProtoFlowCanvas.tsx` | edge 渲染 + 双击事件（E1/E2） |
+| 修改 | `vibex-fronted/src/components/prototype/ProtoEditor.tsx` | 工具栏增加设备切换按钮（E3，ProtoEditor 323行） |
+| 修改 | `vibex-fronted/src/components/canvas/features/ImportPanel.tsx` | 增加图片上传 Tab（E4） |
+| 新建 | `vibex-fronted/src/services/figma/image-import.ts` | 新增 `importFromImage()` 方法（E4） |
+| 修改 | `vibex-fronted/src/lib/prototypes/ui-schema.ts` | 新增 `NodeBreakpoints`/`NavigationTarget` 类型 |
+
+> **⚠️ 代码库核查修正**（由 ce-plan 子任务发现）：
+> - `MockDataPanel.tsx` 不存在 → 属性面板前身是 `ProtoAttrPanel.tsx`（258行，已有 props/mock Tab），PropertyPanel 基于其重构
+> - `CanvasPage.tsx` 是 app 级三树并行画布页面（911行），不是原型编辑器 → E3 设备切换在 `ProtoEditor.tsx`（323行）
+> - 测试框架是 **Vitest**，不是 Jest
+> - `figma-import.ts` 是后端 API 代理 → E4 AI 识别需新建 `image-import.ts` 前端服务
+> - `removeNode` 已有级联删除 edges 逻辑 ✓
 
 ---
 
@@ -599,7 +606,7 @@ vibex-fronted/src/
 
 | 风险 | 可能性 | 影响 | 缓解方案 |
 |------|--------|------|---------|
-| CanvasPage.tsx（911行）分区修改破坏现有功能 | 中 | 高 | 用 `// === E{n}: 注释 ===` 分区隔离，每次修改后 gstack browse 验证 |
+| ProtoEditor.tsx 工具栏扩展破坏现有布局 | 中 | 高 | 用 `// === E3: DeviceSwitcher ===` 分区隔离，每次修改后 Vitest 验证 |
 | AI 图像识别质量不可控 | 高 | 中 | 设计为「辅助建议」模式，用户可编辑后再导入；E4 设为 P2 |
 | React Flow edges 与节点拖拽事件冲突 | 低 | 中 | edges 在 FlowTreePanel 管理，与 ProtoFlowCanvas 节点拖拽分离 |
 | AI 服务 API 成本/延迟 | 高 | 低 | 异步导入，UI 显示 loading，支持取消 |
@@ -611,11 +618,11 @@ vibex-fronted/src/
 
 | 项 | 状态 | 负责人 |
 |----|------|-------|
-| AI 服务提供商（GPT-4o Vision vs 其他） | TBD | Architect/后端确认 |
+| AI 服务提供商 | **确认使用 MiniMax**（后端 llm-provider.ts 已集成） | Architect |
 | AI API Key 来源与配额 | TBD | DevOps |
 | PropertyPanel Tab 切换动画规范 | TBD | Design |
 | E4 AI 识别准确率 SLO | TBD | Product |
-| CanvasPage 工具栏设备按钮具体位置（行号区间） | TBD | Architect（待设计评审） |
+| ProtoEditor 工具栏设备按钮具体插入位置 | TBD | Architect（待设计评审） |
 
 ---
 

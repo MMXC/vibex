@@ -136,7 +136,7 @@
 
 ### E2-U1: PropertyPanel 基础框架 + DataTab
 
-**Goal:** 新建 PropertyPanel.tsx，重构自 MockDataPanel 概念。实现 DataTab（修改节点文字/数据）。
+**Goal:** 新建 `PropertyPanel/`，基于 `ProtoAttrPanel.tsx`（258行）重构。实现 DataTab（修改节点文字/数据）。
 
 **Requirements:** E2-AC1, E2-AC2
 
@@ -249,26 +249,26 @@ const onNodeDoubleClick = useCallback(
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E3-U1 | CanvasPage 设备切换工具栏 | ⬜ | — | 工具栏显示手机/平板/桌面按钮，点击切换画布宽度 |
+| E3-U1 | ProtoEditor 设备切换工具栏 | ⬜ | — | 工具栏显示手机/平板/桌面按钮，点击切换画布宽度 |
 | E3-U2 | prototypeStore breakpoint 状态 + 断点自动标记 | ⬜ | E3-U1 | `setBreakpoint(bp)` 方法；特定断点下新增节点自动标记断点规则 |
 | E3-U3 | 画布响应式缩放渲染 | ⬜ | E3-U1, E3-U2 | 切换断点后，画布容器宽度缩放，节点应用缩放样式 |
 
 ---
 
-### E3-U1: CanvasPage 设备切换工具栏
+### E3-U1: ProtoEditor 设备切换工具栏
 
-**Goal:** CanvasPage 工具栏增加设备切换按钮（手机/平板/桌面）。
+**Goal:** ProtoEditor.tsx（323行）工具栏增加设备切换按钮（手机/平板/桌面）。
 
 **Requirements:** E3-AC1, E3-AC2
 
 **Dependencies:** —
 
 **Files:**
-- Modify: `vibex-fronted/src/components/canvas/CanvasPage.tsx`（约 911 行，分区修改）
-- Test: `vibex-fronted/src/components/canvas/__tests__/CanvasPage.test.tsx`
+- Modify: `vibex-fronted/src/components/prototype/ProtoEditor.tsx`（323行，ProtoEditor 主容器）
+- Test: `vibex-fronted/src/components/prototype/__tests__/ProtoEditor.test.tsx`
 
 **Approach:**
-- 在 `CanvasPage.tsx` 工具栏区域（行 ~535 `return (` 之后）增加 `DeviceSwitcher` 组件
+- 在 `ProtoEditor.tsx` 工具栏区域增加 `DeviceSwitcher` 组件，用 `// === E3: DeviceSwitcher ===` 注释分区
 - 使用 `// === E3: DeviceSwitcher ===` 注释分区
 - `DeviceSwitcher` 调用 `prototypeStore.setBreakpoint(bp)` 并渲染三个按钮
 - 通过 `NEXT_PUBLIC_E3_ENABLED` feature flag 保护
@@ -280,7 +280,7 @@ const onNodeDoubleClick = useCallback(
 - Happy path: 三个设备按钮可见，各自 aria-label 正确
 - Happy path: 点击「手机」→ `setBreakpoint('375')` 被调用
 - Edge case: feature flag = false 时，工具栏不渲染设备按钮
-- Error path: CanvasPage 中无 ProtoFlowCanvas 时不崩溃（空值保护）
+- Error path: ProtoEditor 中无 ProtoFlowCanvas 时不崩溃（空值保护）
 
 **Verification:**
 - gstack browse: `is visible [aria-label="手机"]` / `[aria-label="平板"]` / `[aria-label="桌面"]`
@@ -331,11 +331,11 @@ const onNodeDoubleClick = useCallback(
 
 **Files:**
 - Modify: `vibex-fronted/src/components/prototype/ProtoFlowCanvas.tsx`（画布容器样式）
-- Modify: `vibex-fronted/src/components/canvas/CanvasPage.tsx`（容器宽度控制）
-- Test: 扩展 CanvasPage 测试
+- Modify: `vibex-fronted/src/components/prototype/ProtoEditor.tsx`（容器宽度控制）
+- Test: 扩展 ProtoEditor Vitest 测试
 
 **Approach:**
-- CanvasPage 中画布容器 `div` 应用动态 width style（`{ width: breakpoint }`）
+- ProtoEditor 中画布容器 `div` 应用动态 width style（`{ width: breakpoint }`）
 - `ProtoFlowCanvas` 外层容器监听 `breakpoint` 变化，应用 `transform: scale(ratio)` 缩放
   - ratio = 375 / breakpoint（如 breakpoint='768' → scale(375/768)）
 - 节点可见性通过 `nodes[i].data.breakpoints` 控制：在当前断点下 `breakpoints[currentBreakpoint] = false` 时隐藏节点
@@ -372,10 +372,10 @@ const onNodeDoubleClick = useCallback(
 **Files:**
 - Create: `vibex-fronted/src/services/figma/image-import.ts`
 - Test: `vibex-fronted/src/services/figma/__tests__/image-import.test.ts`
-- Env: `NEXT_PUBLIC_AI_API_KEY`（或 `AI_API_KEY` 服务端代理）
+- Env: `MINIMAX_API_KEY`（后端通过 llm-provider.ts 注入，不暴露在前端）
 
 **Approach:**
-- 将图片转为 base64 → 调用 GPT-4o Vision API（`https://api.openai.com/v1/chat/completions`，model: `gpt-4o`）
+- 将图片转为 base64 → 调用后端 `/api/ai/analyze-image` 代理（复用 llm-provider.ts 的 MiniMax 集成）
 - System prompt 要求模型返回 JSON 格式的组件列表（遵循 `ImportedComponent` 类型）
 - 解析 API 响应 JSON → 转换为 `ImportedComponent[]`
 - 支持超时（30s）和错误处理（API 不可用时返回友好错误）
@@ -384,17 +384,15 @@ const onNodeDoubleClick = useCallback(
 **Technical design (directional):**
 ```typescript
 // image-import.ts 核心结构
-export async function importFromImage(file: File, apiKey?: string): Promise<ImageImportResult> {
+export async function importFromImage(file: File): Promise<ImageImportResult> {
   const base64 = await fileToBase64(file);
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  // 前端不持有 API key，走后端代理
+  const response = await fetch('/api/ai/analyze-image', {
     method: 'POST',
-    headers: { 'Authorization': `Bearer ${apiKey || process.env.NEXT_PUBLIC_AI_API_KEY}` },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'gpt-4o',
-      messages: [
-        { role: 'system', content: 'You are a UI component recognizer...' },
-        { role: 'user', content: [{ type: 'image_url', image_url: { url: `data:image/png;base64,${base64}` } }] }
-      ]
+      image: base64,
+      prompt: '识别图片中的 UI 组件结构，返回 JSON 格式的组件列表'
     })
   });
   // parse response → return ImportedComponent[]
@@ -412,7 +410,7 @@ export async function importFromImage(file: File, apiKey?: string): Promise<Imag
 - Error path: 网络超时（30s）→ 返回超时错误
 
 **Verification:**
-- unit test（mock OpenAI API）: `expect(result.success).toBe(true)` 且 `result.components.length > 0`
+- unit test（mock /api/ai/analyze-image）: `expect(result.success).toBe(true)` 且 `result.components.length > 0`
 
 ---
 
@@ -464,7 +462,7 @@ E2-U1 (PropertyPanel 基础 + DataTab)
   ├── E2-U2 (NavigationTab + ResponsiveTab) ← E1-U1 完成后可并发
   └── E2-U3 (StyleTab) ← E2-U1 完成后可并发
 
-E3-U1 (CanvasPage 设备切换工具栏) ← 可与 E1/E2 并发
+E3-U1 (ProtoEditor 设备切换工具栏) ← 可与 E1/E2 并发
 E3-U2 (prototypeStore breakpoint 扩展) ← 可与 E1-U1 并发
   └── E3-U3 (画布响应式缩放) ← E3-U1 + E3-U2 完成后
 
@@ -480,7 +478,7 @@ E4-U1 (image-import AI 服务) ← 可独立开发
 |-----|---------|-----------|
 | Day 1 | E1-U1 + E1-U2 | E1-U3 + E3-U2（并发 prototypeStore 扩展）|
 | Day 2 | E2-U1 PropertyPanel 框架 | E2-U2 NavigationTab + ResponsiveTab |
-| Day 3 | E2-U3 StyleTab + E3-U1 CanvasPage 工具栏 | E3-U3 画布缩放 + 全局回归测试 |
+| Day 3 | E2-U3 StyleTab + E3-U1 ProtoEditor 工具栏 | E3-U3 画布缩放 + 全局回归测试 |
 | Day 4 | E4-U1 image-import.ts | E4-U2 ImportPanel + gstack browse 验证 |
 | Day 5 | 全局回归 + E3/E4 QA | Feature flag 打开 + 最终验证 + 文档更新 |
 

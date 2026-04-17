@@ -20,6 +20,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.260',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint5-delivery-integration E1: 数据层集成',
+      '✅ T1 loadFromStores: 从 prototypeStore + DDSCanvasStore 拉取数据',
+      '✅ T2 数据转换: toComponent/toSchema/toDDL 函数实现',
+      '✅ deliveryStore 测试: 12 个用例',
+    ],
+    commit: 'a57b23f1 + 2d540bca',
+  },
+  {
     version: '1.0.259',
     date: '2026-04-18',
     changes: [

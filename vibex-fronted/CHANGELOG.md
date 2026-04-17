@@ -40,6 +40,13 @@
 - **E2-QA prototypeStore 测试**: 9 个新用例，36 total in prototypeStore.test.ts
 - **提交**: `d48fc901` (E2-QA)
 
+### [vibex-sprint4-spec-canvas-extend E3: 跨章节集成] — 2026-04-18
+- **E3-U1 DDSToolbar 扩展**: 5 章节按钮 (requirement/context/flow/api/business-rules)，点击切换 activeChapter，aria-pressed 状态
+- **E3-U1 DDSCanvasPage**: `?chapter=` URL 参数支持，mount 时读取并 setActiveChapter
+- **E3-U2 CrossChapterEdgesOverlay**: 5-chapter 支持，跨章节边渲染 (CHAPTER_ORDER 含 api + business-rules)
+- **测试**: ChapterPanel 24/24, CrossChapterEdgesOverlay 5/5, DDSToolbar 15/15
+- **提交**: `f3271119` (E3-U1) + `92f1e00d` (E3-U2 tests)
+
 - **根因**: Tab 切换后刷新页面，三树（Component/BusinessFlow/BoundedContext）状态丢失
 - **修复**: useRehydrateCanvasStores hook，skipHydration + 客户端 rehydration
 - **测试**: 4/4 PASS (TC-E6-01~04)

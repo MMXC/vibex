@@ -6,6 +6,8 @@
 
 import type { Position, BaseCard as BaseCardType } from './base';
 import type { APIEndpointCard } from './api-endpoint';
+import type { StateMachineCard } from './state-machine';
+export * from './state-machine';
 
 // Re-export base types
 export type { Position };
@@ -17,11 +19,11 @@ export interface BaseCard extends BaseCardType {
 
 // ==================== Chapter Types ====================
 
-export type ChapterType = 'requirement' | 'context' | 'flow' | 'api';
+export type ChapterType = 'requirement' | 'context' | 'flow' | 'api' | 'business-rules';
 
 // ==================== Card Types ====================
 
-export type CardType = 'user-story' | 'bounded-context' | 'flow-step' | 'api-endpoint';
+export type CardType = 'user-story' | 'bounded-context' | 'flow-step' | 'api-endpoint' | 'state-machine';
 
 export type Priority = 'high' | 'medium' | 'low';
 
@@ -70,7 +72,7 @@ export interface FlowStepCard extends BaseCard {
 
 // ==================== Union Type ====================
 
-export type DDSCard = UserStoryCard | BoundedContextCard | FlowStepCard | APIEndpointCard;
+export type DDSCard = UserStoryCard | BoundedContextCard | FlowStepCard | APIEndpointCard | StateMachineCard;
 
 // ==================== Edge ====================
 

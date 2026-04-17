@@ -27,6 +27,7 @@ const CHAPTER_LABELS: Record<ChapterType, string> = {
   context: '上下文',
   flow: '流程',
   api: 'API',
+  'business-rules': '业务规则',
 };
 
 const CHAPTER_CARD_TYPES: Record<ChapterType, CardType[]> = {
@@ -34,6 +35,7 @@ const CHAPTER_CARD_TYPES: Record<ChapterType, CardType[]> = {
   context: ['bounded-context'],
   flow: ['flow-step'],
   api: ['api-endpoint'],
+  'business-rules': ['state-machine'],
 };
 
 const CARD_TYPE_LABELS: Record<CardType, string> = {
@@ -41,6 +43,7 @@ const CARD_TYPE_LABELS: Record<CardType, string> = {
   'bounded-context': '限界上下文',
   'flow-step': '流程步骤',
   'api-endpoint': 'API 端点',
+  'state-machine': '状态机',
 };
 
 // ==================== ID Generator ====================

@@ -30,13 +30,14 @@ import styles from './DDSScrollContainer.module.css';
 
 // ==================== Constants ====================
 
-const CHAPTER_ORDER: ChapterType[] = ['requirement', 'context', 'flow', 'api'];
+const CHAPTER_ORDER: ChapterType[] = ['requirement', 'context', 'flow', 'api', 'business-rules'];
 
 const CHAPTER_LABELS: Record<ChapterType, string> = {
   requirement: '需求',
   context: '上下文',
   flow: '流程',
   api: 'API',
+  'business-rules': '业务规则',
 };
 
 const CHAPTER_SHORT_LABELS: Record<ChapterType, string> = {
@@ -44,6 +45,7 @@ const CHAPTER_SHORT_LABELS: Record<ChapterType, string> = {
   context: '上',
   flow: '流',
   api: 'API',
+  'business-rules': '规',
 };
 
 // ==================== Props ====================
@@ -79,6 +81,7 @@ export const DDSScrollContainer = memo(
     context: null,
     flow: null,
     api: null,
+    'business-rules': null,
   });
 
   // Set ref for a panel

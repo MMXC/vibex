@@ -355,6 +355,58 @@
   line-height: 1.5;
 }
 
+/* ---- Navigation Tab (E2-AC3) ---- */
+
+.navTab {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.propSelect {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 28px;
+}
+
+.propSelect:focus {
+  border-color: #6366f1;
+}
+
+.propSelect option {
+  background: #1f2937;
+  color: #f9fafb;
+}
+
+.navInfo {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 4px;
+}
+
+/* ---- Responsive Tab (E2-AC4) ---- */
+
+.responsiveTab {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 /* ---- Footer ---- */
 
 .footer {

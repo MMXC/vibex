@@ -12,11 +12,12 @@
 
 import React, { memo, useState, useCallback, useEffect } from 'react';
 import { usePrototypeStore } from '@/stores/prototypeStore';
+import type { ProtoNodeNavigation, ProtoNodeBreakpoints } from '@/stores/prototypeStore';
 import styles from './ProtoAttrPanel.module.css';
 
 // ==================== Tab ====================
 
-type Tab = 'props' | 'styles' | 'events' | 'mock';
+type Tab = 'props' | 'styles' | 'events' | 'mock' | 'navigation' | 'responsive';
 
 // ==================== Props ====================
 
@@ -29,8 +30,17 @@ export interface ProtoAttrPanelProps {
 export const ProtoAttrPanel = memo(function ProtoAttrPanel({
   className = '',
 }: ProtoAttrPanelProps) {
-  const { selectedNodeId, nodes, updateNode, updateNodeMockData, selectNode, removeNode } =
-    usePrototypeStore();
+  const {
+    selectedNodeId,
+    nodes,
+    updateNode,
+    updateNodeMockData,
+    selectNode,
+    removeNode,
+    updateNodeBreakpoints,
+    updateNodeNavigation,
+    pages,
+  } = usePrototypeStore();
 
   const selectedNode = nodes.find((n) => n.id === selectedNodeId) ?? null;
   const [activeTab, setActiveTab] = useState<Tab>('props');
@@ -173,6 +183,24 @@ export const ProtoAttrPanel = memo(function ProtoAttrPanel({
           type="button"
         >
           Mock 数据
+        </button>
+        <button
+          role="tab"
+          aria-selected={activeTab === 'navigation'}
+          className={`${styles.tab} ${activeTab === 'navigation' ? styles.tabActive : ''}`}
+          onClick={() => setActiveTab('navigation')}
+          type="button"
+        >
+          导航
+        </button>
+        <button
+          role="tab"
+          aria-selected={activeTab === 'responsive'}
+          className={`${styles.tab} ${activeTab === 'responsive' ? styles.tabActive : ''}`}
+          onClick={() => setActiveTab('responsive')}
+          type="button"
+        >
+          响应式
         </button>
       </div>
 
@@ -369,6 +397,92 @@ export const ProtoAttrPanel = memo(function ProtoAttrPanel({
             <p className={styles.eventsHint}>
               事件会在导出 JSON 时作为 interactions 字段保存
             </p>
+          </div>
+        )}
+
+        {/* E2-AC3: Navigation tab */}
+        {activeTab === 'navigation' && (
+          <div className={styles.navTab} role="tabpanel">
+            <div className={styles.propRow}>
+              <label className={styles.propKey} htmlFor="nav-page-select">
+                跳转目标页面
+              </label>
+              <select
+                id="nav-page-select"
+                className={styles.propSelect}
+                value={selectedNode.data.navigation?.pageId ?? ''}
+                onChange={(e) => {
+                  const page = pages.find((p) => p.id === e.target.value);
+                  if (!page) return;
+                  const nav: ProtoNodeNavigation = {
+                    pageId: page.id,
+                    pageName: page.name,
+                    pageRoute: page.route,
+                  };
+                  updateNodeNavigation(selectedNode.id, nav);
+                }}
+              >
+                <option value="">-- 无跳转 --</option>
+                {pages.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} ({p.route})
+                  </option>
+                ))}
+              </select>
+            </div>
+            {selectedNode.data.navigation && (
+              <div className={styles.navInfo}>
+                当前设置: {selectedNode.data.navigation.pageName}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* E2-AC4: Responsive tab */}
+        {activeTab === 'responsive' && (
+          <div className={styles.responsiveTab} role="tabpanel">
+            <div className={styles.propRow}>
+              <label className={styles.propKey}>手机端</label>
+              <button
+                type="button"
+                className={`${styles.toggle} ${(selectedNode.data.breakpoints?.mobile ?? true) ? styles.toggleOn : ''}`}
+                aria-pressed={selectedNode.data.breakpoints?.mobile ?? true}
+                onClick={() => {
+                  const current = selectedNode.data.breakpoints ?? { mobile: true, tablet: true, desktop: true };
+                  updateNodeBreakpoints(selectedNode.id, { ...current, mobile: !current.mobile });
+                }}
+              >
+                {(selectedNode.data.breakpoints?.mobile ?? true) ? '可见' : '隐藏'}
+              </button>
+            </div>
+            <div className={styles.propRow}>
+              <label className={styles.propKey}>平板端</label>
+              <button
+                type="button"
+                className={`${styles.toggle} ${(selectedNode.data.breakpoints?.tablet ?? true) ? styles.toggleOn : ''}`}
+                aria-pressed={selectedNode.data.breakpoints?.tablet ?? true}
+                onClick={() => {
+                  const current = selectedNode.data.breakpoints ?? { mobile: true, tablet: true, desktop: true };
+                  updateNodeBreakpoints(selectedNode.id, { ...current, tablet: !current.tablet });
+                }}
+              >
+                {(selectedNode.data.breakpoints?.tablet ?? true) ? '可见' : '隐藏'}
+              </button>
+            </div>
+            <div className={styles.propRow}>
+              <label className={styles.propKey}>桌面端</label>
+              <button
+                type="button"
+                className={`${styles.toggle} ${(selectedNode.data.breakpoints?.desktop ?? true) ? styles.toggleOn : ''}`}
+                aria-pressed={selectedNode.data.breakpoints?.desktop ?? true}
+                onClick={() => {
+                  const current = selectedNode.data.breakpoints ?? { mobile: true, tablet: true, desktop: true };
+                  updateNodeBreakpoints(selectedNode.id, { ...current, desktop: !current.desktop });
+                }}
+              >
+                {(selectedNode.data.breakpoints?.desktop ?? true) ? '可见' : '隐藏'}
+              </button>
+            </div>
           </div>
         )}
       </div>

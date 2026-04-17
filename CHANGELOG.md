@@ -25,6 +25,11 @@
 - **E1-U3 ProtoFlowCanvas 渲染**: `ProtoFlowCanvas.tsx` — onConnect callback，Delete键删除边，store→local edges sync
 - 提交: vibex-sprint3-prototype-extend/dev-epic1-页面跳转连线（epic-1）
 
+### [Unreleased] vibex-sprint3-prototype-extend Epic2: 组件属性面板 — 2026-04-17
+- **E2-U2 样式Tab**: `ProtoAttrPanel.tsx` — backgroundColor picker + borderRadius + opacity slider + border
+- **E2-U3 事件Tab**: `ProtoAttrPanel.tsx` — onClick/onHover/onFocus handler inputs
+- 提交: vibex-sprint3-prototype-extend/dev-epic2-组件属性面板（epic-2）
+
 ### [Unreleased] vibex-sprint2-spec-canvas Epic4: 章节间 DAG 关系 — 2026-04-17
 - **E4-U1 跨章节边创建**: `DDSCanvasStore.ts` — addCrossChapterEdge/deleteCrossChapterEdge, crossChapterEdges state
 - **E4-U2 跨章节边渲染**: `CrossChapterEdgesOverlay.tsx` — SVG overlay with ResizeObserver + RAF 双层监听

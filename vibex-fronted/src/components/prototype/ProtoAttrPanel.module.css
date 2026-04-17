@@ -216,6 +216,69 @@
   border-color: rgba(99, 102, 241, 0.5);
 }
 
+/* ---- Styles Tab (E2-U2) ---- */
+
+.stylesTab {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.colorInput {
+  width: 32px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.rangeInput {
+  flex: 1;
+  accent-color: #6366f1;
+}
+
+.propValue {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  min-width: 28px;
+  text-align: right;
+}
+
+.applyBtn {
+  padding: 7px 12px;
+  background: rgba(99,102,241,0.15);
+  border: 1px solid rgba(99,102,241,0.3);
+  border-radius: 6px;
+  color: #818cf8;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  margin-top: 4px;
+}
+
+.applyBtn:hover {
+  background: rgba(99,102,241,0.25);
+  border-color: rgba(99,102,241,0.5);
+}
+
+/* ---- Events Tab (E2-U3) ---- */
+
+.eventsTab {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.eventsHint {
+  font-size: 10px;
+  color: rgba(255,255,255,0.25);
+  text-align: center;
+  line-height: 1.4;
+}
+
 /* ---- Mock Tab ---- */
 
 .mockTab {

@@ -5,10 +5,11 @@
  * 职责：
  * - 从 DDSCanvasStore 读取 cards/edges
  * - 转换为 React Flow 的 nodes/edges 格式
- * - 处理 onConnect（创建新边）→ store.addEdge
+ * - 处理 onConnect（创建新边）→ store.addEdge / store.addCrossChapterEdge
  * - 处理 onNodesChange（位置变更）→ store.updateCard
  *
  * Epic 1: F3
+ * Epic 4-U1: 跨章节 DAG 边检测
  * 参考: specs/dds-canvas-state.md §2.3
  */
 
@@ -25,7 +26,7 @@ import {
   applyNodeChanges,
 } from '@xyflow/react';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
-import type { ChapterType, DDSCard, DDSEdge } from '@/types/dds';
+import type { ChapterType, DDSCard, DDSEdge, ChapterData } from '@/types/dds';
 
 // ==================== Card → Node 转换 ====================
 
@@ -83,6 +84,12 @@ export function useDDSCanvasFlow(
   // 从 store 读取 chapter 数据
   const chapterData = useDDSCanvasStore((s) => s.chapters[chapter]);
 
+  // E4-U1: 获取所有章节的所有卡片，用于判断跨章节连接
+  const allCards = useDDSCanvasStore(
+    (s) =>
+      (Object.values(s.chapters) as ChapterData[]).flatMap((c) => c.cards) as DDSCard[]
+  );
+
   // React Flow state
   const [nodes, setNodes] = useNodesState(
     initialNodes ?? toReactFlowNodes(chapterData.cards)
@@ -94,36 +101,55 @@ export function useDDSCanvasFlow(
   // React Flow 实例（用于 fitView 等）
   useReactFlow();
 
-  // 同步 store → view（当 store 数据变化时更新 React Flow nodes）
-  // 注意：这是单向同步 data → view，view 变化通过 onNodesChange 回写 store
-
-  // onConnect: 创建新边
+  // onConnect: 创建新边（E4-U1: 跨章节检测）
   const handleConnect = useCallback(
     (connection: Connection) => {
       if (!connection.source || !connection.target) return;
 
-      const newEdge: DDSEdge = {
-        id: crypto.randomUUID(),
-        source: connection.source,
-        target: connection.target,
-        type: 'smoothstep',
-        animated: true, // 新创建的边标记为 animated
-      };
+      const sourceCard = allCards.find((c) => c.id === connection.source);
+      const targetCard = allCards.find((c) => c.id === connection.target);
 
-      // 写入 store
-      ddsChapterActions.addEdge(chapter, newEdge);
+      if (!sourceCard || !targetCard) return;
 
-      // 同步到 React Flow（通过 edges state 更新）
-      setEdges((eds) => [
-        ...eds,
-        {
-          ...newEdge,
-          source: newEdge.source,
-          target: newEdge.target,
-        },
-      ]);
+      const sourceChapter = (sourceCard as DDSCard & { chapter?: ChapterType }).chapter ?? chapter;
+      const targetChapter = (targetCard as DDSCard & { chapter?: ChapterType }).chapter ?? chapter;
+
+      // E4-U1: 判断是否跨章节
+      if (sourceChapter !== targetChapter) {
+        // 跨章节边：添加到全局 crossChapterEdges
+        const newEdge: DDSEdge = {
+          id: crypto.randomUUID(),
+          source: connection.source,
+          target: connection.target,
+          type: 'smoothstep',
+          animated: true,
+          sourceChapter,
+          targetChapter,
+        };
+        ddsChapterActions.addCrossChapterEdge(newEdge);
+      } else {
+        // 同章节边：添加到 chapter edges（现有行为）
+        const newEdge: DDSEdge = {
+          id: crypto.randomUUID(),
+          source: connection.source,
+          target: connection.target,
+          type: 'smoothstep',
+          animated: true,
+        };
+        ddsChapterActions.addEdge(chapter, newEdge);
+
+        // 同步到 React Flow
+        setEdges((eds) => [
+          ...eds,
+          {
+            ...newEdge,
+            source: newEdge.source,
+            target: newEdge.target,
+          },
+        ]);
+      }
     },
-    [chapter, setEdges]
+    [chapter, allCards, setEdges]
   );
 
   // onNodesChange: 处理节点位置变更

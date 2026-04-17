@@ -6,6 +6,9 @@
 export { DDSScrollContainer } from './DDSScrollContainer';
 export type { DDSScrollContainerProps } from './DDSScrollContainer';
 
+export { CrossChapterEdgesOverlay } from './CrossChapterEdgesOverlay';
+export type { CrossChapterEdgesOverlayProps } from './CrossChapterEdgesOverlay';
+
 export { DDSPanel } from './DDSPanel';
 export type { DDSPanelProps } from './DDSPanel';
 

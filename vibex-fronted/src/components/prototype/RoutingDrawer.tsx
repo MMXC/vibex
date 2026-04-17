@@ -9,7 +9,7 @@
 
 'use client';
 
-import React, { memo, useState, useCallback } from 'react';
+import React, { memo, useState, useCallback, useMemo } from 'react';
 import { usePrototypeStore } from '@/stores/prototypeStore';
 import styles from './ProtoEditor.module.css';
 
@@ -24,12 +24,16 @@ export interface RoutingDrawerProps {
 export const RoutingDrawer = memo(function RoutingDrawer({
   className = '',
 }: RoutingDrawerProps) {
-  const { pages, nodes, addPage, removePage, selectedNodeId, selectNode } =
+  const { pages, nodes, edges, addPage, removePage, addEdge, removeEdge, selectedNodeId, selectNode } =
     usePrototypeStore();
 
   const [addingPage, setAddingPage] = useState(false);
   const [newRoute, setNewRoute] = useState('');
   const [newName, setNewName] = useState('');
+  // E1-U2: Edge creation modal
+  const [addingEdge, setAddingEdge] = useState(false);
+  const [edgeSource, setEdgeSource] = useState('');
+  const [edgeTarget, setEdgeTarget] = useState('');
 
   // Count nodes per page (MVP: all nodes belong to first page)
   const getNodeCount = useCallback(
@@ -56,6 +60,34 @@ export const RoutingDrawer = memo(function RoutingDrawer({
     },
     [pages.length, removePage]
   );
+
+  // E1-U2: Edge creation
+  const handleAddEdge = useCallback(() => {
+    if (!edgeSource || !edgeTarget || edgeSource === edgeTarget) return;
+    addEdge(edgeSource, edgeTarget);
+    setEdgeSource('');
+    setEdgeTarget('');
+    setAddingEdge(false);
+  }, [edgeSource, edgeTarget, addEdge]);
+
+  const handleRemoveEdge = useCallback(
+    (e: React.MouseEvent, edgeId: string) => {
+      e.stopPropagation();
+      removeEdge(edgeId);
+    },
+    [removeEdge]
+  );
+
+  // Build a map from node/page id to page name for edge labels
+  const pageNameMap = useMemo(
+    () => Object.fromEntries(pages.map((p) => [p.id, p.name || p.route])),
+    [pages]
+  );
+
+  // For edge display: source/target are node IDs, but user sees page names.
+  // For MVP, show "source → target" using page name if found, else raw id.
+  const getEdgeLabel = (edge: { source: string; target: string }) =>
+    `${pageNameMap[edge.source] ?? edge.source} → ${pageNameMap[edge.target] ?? edge.target}`;
 
   return (
     <div className={`${styles.routingDrawer} ${className}`}>
@@ -103,6 +135,82 @@ export const RoutingDrawer = memo(function RoutingDrawer({
           })
         )}
       </div>
+
+      {/* E1-U2: Edge list section */}
+      <div className={styles.drawerSectionHeader}>
+        <span>连线</span>
+        <button
+          className={styles.addPageBtn}
+          onClick={() => setAddingEdge(true)}
+          disabled={pages.length < 2}
+          title={pages.length < 2 ? '需要至少两个页面' : '添加连线'}
+          style={{ fontSize: 10, padding: '2px 6px' }}
+        >
+          + 添加连线
+        </button>
+      </div>
+
+      {edges.length > 0 && (
+        <div className={styles.edgeList}>
+          {edges.map((edge) => (
+            <div key={edge.id} className={styles.edgeItem}>
+              <span className={styles.edgeLabel}>{getEdgeLabel(edge)}</span>
+              <button
+                className={styles.iconBtn}
+                onClick={(e) => handleRemoveEdge(e, edge.id)}
+                title="删除连线"
+                style={{ width: 16, height: 16, fontSize: 11 }}
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {addingEdge && (
+        <div className={styles.edgeModal}>
+          <div className={styles.edgeModalTitle}>添加连线</div>
+          <select
+            value={edgeSource}
+            onChange={(e) => setEdgeSource(e.target.value)}
+            className={styles.edgeSelect}
+          >
+            <option value="">选择源页面</option>
+            {pages.map((p) => (
+              <option key={p.id} value={p.id}>{p.name || p.route}</option>
+            ))}
+          </select>
+          <span style={{ textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 11 }}>→</span>
+          <select
+            value={edgeTarget}
+            onChange={(e) => setEdgeTarget(e.target.value)}
+            className={styles.edgeSelect}
+          >
+            <option value="">选择目标页面</option>
+            {pages.map((p) => (
+              <option key={p.id} value={p.id}>{p.name || p.route}</option>
+            ))}
+          </select>
+          <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
+            <button
+              onClick={handleAddEdge}
+              disabled={!edgeSource || !edgeTarget || edgeSource === edgeTarget}
+              className={styles.addPageBtn}
+              style={{ flex: 1, fontSize: 11 }}
+            >
+              确定
+            </button>
+            <button
+              onClick={() => { setAddingEdge(false); setEdgeSource(''); setEdgeTarget(''); }}
+              className={styles.addPageBtn}
+              style={{ flex: 1, fontSize: 11, opacity: 0.6 }}
+            >
+              取消
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className={styles.drawerFooter}>
         {addingPage ? (

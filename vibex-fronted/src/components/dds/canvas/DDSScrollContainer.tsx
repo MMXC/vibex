@@ -13,10 +13,12 @@
 
 import React, {
   memo,
+  forwardRef,
   useRef,
   useCallback,
   useEffect,
   type ReactNode,
+  type RefObject,
 } from 'react';
 import { useDDSCanvasStore } from '@/stores/dds';
 import type { ChapterType, ChapterData } from '@/types/dds';
@@ -49,13 +51,17 @@ export interface DDSScrollContainerProps {
   renderChapterContent?: (chapter: ChapterType, data: ChapterData) => ReactNode;
   /** Additional class for the root container */
   className?: string;
+  /** Ref forwarded to the root scroll container div */
+  rootRef?: RefObject<HTMLDivElement | null>;
 }
 
 // ==================== Component ====================
 
-export const DDSScrollContainer = memo(function DDSScrollContainer({
+export const DDSScrollContainer = memo(
+  forwardRef<HTMLDivElement, DDSScrollContainerProps>(function DDSScrollContainer({
   renderChapterContent,
   className = '',
+  rootRef,
 }: DDSScrollContainerProps) {
   // E2-U1-AC1: URL sync — reads ?chapter= from URL, updates URL when activeChapter changes
   useChapterURLSync();
@@ -161,6 +167,7 @@ export const DDSScrollContainer = memo(function DDSScrollContainer({
 
   return (
     <div
+      ref={rootRef}
       className={`${styles.ddsHorizontal} ${isFullscreen ? styles.fullscreen : ''} ${className}`}
       onScroll={handleScroll}
       data-theme="dark"
@@ -214,6 +221,6 @@ export const DDSScrollContainer = memo(function DDSScrollContainer({
       })}
     </div>
   );
-});
+}))
 
 export default DDSScrollContainer;

@@ -43,6 +43,7 @@ const initialState = {
   projectId: null,
   activeChapter: 'requirement' as ChapterType,
   chapters: initialChapters,
+  crossChapterEdges: [] as DDSEdge[],
   chatHistory: [],
   isGenerating: false,
   selectedCardIds: [],
@@ -119,6 +120,10 @@ type ChapterActions = {
   deleteCard: (chapter: ChapterType, id: string) => void;
   addEdge: (chapter: ChapterType, edge: DDSEdge) => void;
   deleteEdge: (chapter: ChapterType, id: string) => void;
+  /** 添加跨章节 DAG 边（E4-U1） */
+  addCrossChapterEdge: (edge: DDSEdge) => void;
+  /** 删除跨章节 DAG 边（E4-U1） */
+  deleteCrossChapterEdge: (id: string) => void;
 };
 
 export const ddsChapterActions: ChapterActions = {
@@ -181,6 +186,16 @@ export const ddsChapterActions: ChapterActions = {
           edges: state.chapters[chapter].edges.filter((e) => e.id !== id),
         },
       },
+    })),
+
+  addCrossChapterEdge: (edge) =>
+    useDDSCanvasStore.setState((state) => ({
+      crossChapterEdges: [...state.crossChapterEdges, edge],
+    })),
+
+  deleteCrossChapterEdge: (id) =>
+    useDDSCanvasStore.setState((state) => ({
+      crossChapterEdges: state.crossChapterEdges.filter((e) => e.id !== id),
     })),
 };
 

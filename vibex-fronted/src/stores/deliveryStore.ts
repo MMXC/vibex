@@ -5,6 +5,27 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { ProtoNode } from './prototypeStore';
+import type { ChapterData, DDSCard } from '@/types/dds';
+
+// ==================== Delivery Spec Types ====================
+
+export interface ComponentSpec {
+  id: string;
+  type: string;
+  name: string;
+  props: Record<string, unknown>;
+  position: { x: number; y: number };
+  styles?: Record<string, unknown>;
+  breakpoints?: import('./prototypeStore').ProtoNodeBreakpoints;
+}
+
+export interface SchemaSpec {
+  projectName: string;
+  chapters: Record<string, { type: string; cards: Array<{ id: string; type: string; title: string; data: unknown }> }>;
+}
+
+export type DDLOutput = string;
 
 // ==================== Types ====================
 
@@ -51,24 +72,27 @@ export interface DeliveryState {
   activeTab: DeliveryTab;
   searchQuery: string;
   typeFilter: string;
-  
+
   // Data
   contexts: BoundedContext[];
   flows: BusinessFlow[];
   components: Component[];
-  
+
   // Export state
   exportProgress: ExportProgress | null;
   isExporting: boolean;
-  
+
   // History
   exportHistory: ExportHistoryItem[];
-  
+
   // Actions
   setActiveTab: (tab: DeliveryTab) => void;
   setSearchQuery: (query: string) => void;
   setTypeFilter: (type: string) => void;
   loadMockData: () => void;
+  toComponent: (node: ProtoNode) => ComponentSpec;
+  toSchema: (chapters: Record<string, ChapterData>) => SchemaSpec;
+  toDDL: (schema: SchemaSpec) => string;
   exportItem: (type: ExportType, id: string, format: ExportFormat) => Promise<void>;
   exportAll: (type: ExportAllType) => Promise<void>;
   addToHistory: (item: ExportHistoryItem) => void;
@@ -171,23 +195,23 @@ export const useDeliveryStore = create<DeliveryState>()(
       activeTab: 'contexts',
       searchQuery: '',
       typeFilter: 'all',
-      
+
       contexts: [],
       flows: [],
       components: [],
-      
+
       exportProgress: null,
       isExporting: false,
-      
+
       exportHistory: [],
-      
+
       // Actions
       setActiveTab: (tab) => set({ activeTab: tab }),
-      
+
       setSearchQuery: (query) => set({ searchQuery: query }),
-      
+
       setTypeFilter: (type) => set({ typeFilter: type }),
-      
+
       loadMockData: () => {
         set({
           contexts: MOCK_CONTEXTS,
@@ -195,10 +219,70 @@ export const useDeliveryStore = create<DeliveryState>()(
           components: MOCK_COMPONENTS,
         });
       },
-      
+
+      // T2: 数据转换函数
+
+      toComponent: (node: ProtoNode): ComponentSpec => {
+        return {
+          id: node.id,
+          type: node.data.component?.type ?? 'unknown',
+          name: node.data.component?.name ?? node.data.component?.type ?? 'Unknown',
+          props: node.data.component?.props ?? {},
+          position: node.position,
+          styles: {
+            width: node.data.width,
+            height: node.data.height,
+            backgroundColor: node.data.backgroundColor,
+            borderRadius: node.data.borderRadius,
+          },
+          breakpoints: node.data.breakpoints,
+        };
+      },
+
+      toSchema: (chapters: Record<string, ChapterData>): SchemaSpec => {
+        const schema: SchemaSpec = {
+          projectName: '',
+          chapters: {},
+        };
+
+        for (const [key, chapter] of Object.entries(chapters)) {
+          schema.chapters[key] = {
+            type: key,
+            cards: chapter.cards.map((card: DDSCard) => ({
+              id: card.id,
+              type: card.type,
+              title: card.title ?? '',
+              data: card,
+            })),
+          };
+        }
+        return schema;
+      },
+
+      toDDL: (schema: SchemaSpec): string => {
+        const tables: string[] = [];
+
+        // 从 context 章节提取 bounded-context 作为表
+        const contexts = schema.chapters['context'];
+        if (contexts?.cards) {
+          for (const card of contexts.cards) {
+            if (card.type === 'bounded-context') {
+              const tableName = (card.title ?? 'unknown').replace(/\s+/g, '_').toLowerCase();
+              tables.push(`CREATE TABLE ${tableName} (`);
+              tables.push(`  id BIGSERIAL PRIMARY KEY,`);
+              tables.push(`  created_at TIMESTAMP DEFAULT NOW(),`);
+              tables.push(`  updated_at TIMESTAMP DEFAULT NOW()`);
+              tables.push(`);\n`);
+            }
+          }
+        }
+
+        return tables.join('\n') || '-- No tables defined';
+      },
+
       exportItem: async (type, id, format) => {
         const state = get();
-        
+
         // Find item name
         let name = '';
         if (type === 'context') {
@@ -213,7 +297,7 @@ export const useDeliveryStore = create<DeliveryState>()(
         } else {
           name = 'PRD';
         }
-        
+
         set({
           isExporting: true,
           exportProgress: {
@@ -223,7 +307,7 @@ export const useDeliveryStore = create<DeliveryState>()(
             status: 'exporting',
           },
         });
-        
+
         // Simulate export progress
         for (let i = 0; i <= 100; i += 20) {
           await new Promise(resolve => setTimeout(resolve, 100));
@@ -236,7 +320,7 @@ export const useDeliveryStore = create<DeliveryState>()(
             },
           });
         }
-        
+
         // Add to history
         get().addToHistory({
           id: `export-${Date.now()}`,
@@ -246,7 +330,7 @@ export const useDeliveryStore = create<DeliveryState>()(
           timestamp: Date.now(),
           status: 'success',
         });
-        
+
         // TODO: Replace with actual API call
         // const response = await fetch('/api/delivery/export', {
         //   method: 'POST',
@@ -255,7 +339,7 @@ export const useDeliveryStore = create<DeliveryState>()(
         // });
         // const data = await response.json();
         // triggerDownload(data.downloadUrl, data.filename);
-        
+
         set({
           isExporting: false,
           exportProgress: {
@@ -265,16 +349,16 @@ export const useDeliveryStore = create<DeliveryState>()(
             status: 'completed',
           },
         });
-        
+
         // Clear progress after 2s
         setTimeout(() => {
           set({ exportProgress: null });
         }, 2000);
       },
-      
+
       exportAll: async (type) => {
         const state = get();
-        
+
         set({
           isExporting: true,
           exportProgress: {
@@ -284,12 +368,12 @@ export const useDeliveryStore = create<DeliveryState>()(
             status: 'exporting',
           },
         });
-        
+
         // Simulate batch export
         const items = type === 'contexts' ? state.contexts
           : type === 'flows' ? state.flows
           : state.components;
-        
+
         for (let i = 0; i <= items.length; i++) {
           await new Promise(resolve => setTimeout(resolve, 200));
           set({
@@ -301,7 +385,7 @@ export const useDeliveryStore = create<DeliveryState>()(
             },
           });
         }
-        
+
         get().addToHistory({
           id: `export-${Date.now()}`,
           type: type.slice(0, -1) as ExportType,
@@ -310,7 +394,7 @@ export const useDeliveryStore = create<DeliveryState>()(
           timestamp: Date.now(),
           status: 'success',
         });
-        
+
         set({
           isExporting: false,
           exportProgress: {
@@ -320,18 +404,18 @@ export const useDeliveryStore = create<DeliveryState>()(
             status: 'completed',
           },
         });
-        
+
         setTimeout(() => {
           set({ exportProgress: null });
         }, 2000);
       },
-      
+
       addToHistory: (item) => {
         set((state) => ({
           exportHistory: [item, ...state.exportHistory].slice(0, 50),
         }));
       },
-      
+
       clearHistory: () => set({ exportHistory: [] }),
     }),
     {

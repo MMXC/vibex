@@ -11,14 +11,16 @@
 - 路由抽屉：左侧抽屉支持添加/删除页面路由
 - **提交**: `f18d48f4`
 
-### [vibex-sprint3-prototype-extend E1: 页面跳转连线] — 2026-04-17
+### [vibex-sprint3-prototype-extend E1: 页面跳转连线] — 2026-04-18
 - **Sprint3 E1: 页面跳转连线** — prototype 画布支持页面间连线
 - **E1-U1**: prototypeStore edges 扩展 — `addEdge`/`removeEdge` 方法，返回 edge id，`smoothstep` + `animated` 样式
 - **E1-U2**: RoutingDrawer 连线 UI — 添加连线按钮 + 源/目标页面选择器 + 连线列表展示/删除
 - **E1-U3**: ProtoFlowCanvas 连线渲染 — React Flow `onConnect` 启用，`deleteKeyCode="Delete"` 支持连线删除
+- **E1-QA**: EdgeCreationModal 组件（+158 行）— modal 对话框，源/目标页面下拉选择，同页校验；8 个单元测试用例（render/cancel/validation）
+- **E1-QA**: FlowTreePanel +连线按钮 — CanvasPage 工具栏注入 `+连线` 按钮，触发 EdgeCreationModal
 - **E1 测试**: addEdge CRUD + removeEdge 幂等性 + edges/nodes 独立性（7 新用例，24 total）
 - **Note**: 代码在 `2b3d69f4`（与 Epic4 跨章节 DAG 同一 commit），测试补充在 `1837905e`
-- **提交**: `2b3d69f4` + `1837905e`
+- **提交**: `2b3d69f4` + `1837905e` + `d48fc901` (E1-QA)
 
 - **根因**: Tab 切换后刷新页面，三树（Component/BusinessFlow/BoundedContext）状态丢失
 - **修复**: useRehydrateCanvasStores hook，skipHydration + 客户端 rehydration

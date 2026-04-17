@@ -20,6 +20,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.258',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint3-prototype-extend E1-QA: 页面跳转连线测试',
+      '✅ E1-QA EdgeCreationModal 组件: modal 对话框，源/目标页面下拉选择，同页校验',
+      '✅ E1-QA EdgeCreationModal 测试: 8 个单元测试用例（render/cancel/validation）',
+      '✅ E1-QA FlowTreePanel 集成: +连线按钮注入 CanvasPage 工具栏',
+    ],
+    commit: 'd48fc901',
+  },
+  {
     version: '1.0.257',
     date: '2026-04-18',
     changes: [

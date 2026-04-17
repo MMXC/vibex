@@ -20,6 +20,19 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.250',
+    date: '2026-04-17',
+    changes: [
+      '📋 vibex-sprint2-spec-canvas Epic1: 三章节卡片管理',
+      '✅ E1-U1 三章节结构 (DDSPanel data-chapter + ChapterPanel 默认渲染)',
+      '✅ E1-U2 卡片CRUD (创建表单 + 删除按钮)',
+      '✅ E1-U3 Schema渲染 (CardRenderer 分发 3 种卡片类型)',
+      '✅ E2-U1 横向滚奏 (scroll-snap + URL 同步)',
+      '✅ 15/15 tests passed',
+    ],
+    commit: '5bfb1e54',
+  },
+  {
     version: '1.0.249',
     date: '2026-04-17',
     changes: [

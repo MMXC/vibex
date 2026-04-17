@@ -8,6 +8,13 @@
 - **单元测试**: `APIEndpointCard.test.tsx` — 11 个测试用例覆盖 method badge/path/summary/tags/parameters/responses
 - 提交: 581b5ad7
 
+### [Unreleased] vibex-sprint6-ai-coding-integration E1: 设计稿导入 — 2026-04-18
+- **E1-U1 /api/figma route**: GET/POST Figma REST API proxy (`app/api/figma/route.ts`)
+- **E1-U2 ImportPanel FigmaTab**: URL input + loading + result display (`ImportPanel.tsx`)
+- **figma-import.ts**: `fetchFigmaFile()` + `parseFigmaUrl()` with node ID support
+- **ImportPanel.module.css**: Figma tab styles (figmaTab/figmaBtn/figmaError/figmaSuccess)
+- 提交: 8e710864
+
 ### [Unreleased] vibex-sprint1-prototype-canvas Epic1: 拖拽布局编辑器 — 2026-04-17
 - **E1-U1 组件面板**: `ComponentPanel.tsx` — 左侧面板展示 10 个默认组件，支持 HTML5 drag-and-drop
 - **E1-U2 React Flow 画布**: `ProtoFlowCanvas.tsx` — 接收组件拖拽，节点自由定位，MiniMap + Controls

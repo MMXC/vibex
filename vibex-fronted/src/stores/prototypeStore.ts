@@ -78,6 +78,9 @@ export interface PrototypeStoreState {
   // ---- Selection ----
   selectedNodeId: string | null;
 
+  // ---- Breakpoint (E3) ----
+  breakpoint: '375' | '768' | '1024';
+
   // ---- Pages (E3) ----
   pages: ProtoPage[];
 
@@ -90,6 +93,9 @@ export interface PrototypeStoreState {
 
   selectNode: (nodeId: string | null) => void;
   clearCanvas: () => void;
+
+  // ---- Breakpoint Actions (E3) ----
+  setBreakpoint: (bp: '375' | '768' | '1024') => void;
 
   // ---- Page Actions (E3) ----
   addPage: (route: string, name?: string) => void;
@@ -132,6 +138,7 @@ export const usePrototypeStore = create<PrototypeStoreState>()(
       nodes: [],
       edges: [],
       selectedNodeId: null,
+      breakpoint: '1024' as const,
       pages: DEFAULT_PAGES,
 
       // ---- Node Actions ----
@@ -232,6 +239,9 @@ export const usePrototypeStore = create<PrototypeStoreState>()(
           edges: state.edges.filter((e) => e.id !== edgeId),
         }));
       },
+
+      // ---- Breakpoint (E3) ----
+      setBreakpoint: (bp: '375' | '768' | '1024') => set({ breakpoint: bp }),
 
       // ---- Navigation & Breakpoints (Epic2 E2-AC3, E2-AC4) ----
       updateNodeBreakpoints: (nodeId: string, breakpoints: ProtoNodeBreakpoints) => {

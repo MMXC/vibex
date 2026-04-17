@@ -171,6 +171,8 @@ export const ProtoEditor = memo(function ProtoEditor({
   className = '',
 }: ProtoEditorProps) {
   const { getExportData, loadFromExport, nodes, clearCanvas } = usePrototypeStore();
+  const breakpoint = usePrototypeStore((s) => s.breakpoint);
+  const setBreakpoint = usePrototypeStore((s) => s.setBreakpoint);
 
   const [showRoutingDrawer, setShowRoutingDrawer] = useState(true);
   const [showExport, setShowExport] = useState(false);
@@ -227,6 +229,51 @@ export const ProtoEditor = memo(function ProtoEditor({
         <div className={styles.headerSpacer} />
 
         <div className={styles.headerActions}>
+          {/* === E3: DeviceSwitcher === */}
+          <div className={styles.deviceSwitcher} role="toolbar" aria-label="设备切换">
+            <button
+              type="button"
+              className={`${styles.deviceBtn} ${breakpoint === '375' ? styles.deviceBtnActive : ''}`}
+              onClick={() => setBreakpoint('375')}
+              aria-label="手机"
+              aria-pressed={breakpoint === '375'}
+              title="375px — 手机"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <rect x="5" y="2" width="14" height="20" rx="2" />
+                <line x1="12" y1="18" x2="12" y2="18.01" strokeWidth="2" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className={`${styles.deviceBtn} ${breakpoint === '768' ? styles.deviceBtnActive : ''}`}
+              onClick={() => setBreakpoint('768')}
+              aria-label="平板"
+              aria-pressed={breakpoint === '768'}
+              title="768px — 平板"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <rect x="4" y="2" width="16" height="20" rx="2" />
+                <line x1="12" y1="18" x2="12" y2="18.01" strokeWidth="2" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className={`${styles.deviceBtn} ${breakpoint === '1024' ? styles.deviceBtnActive : ''}`}
+              onClick={() => setBreakpoint('1024')}
+              aria-label="桌面"
+              aria-pressed={breakpoint === '1024'}
+              title="1024px — 桌面"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <rect x="2" y="3" width="20" height="14" rx="2" />
+                <line x1="8" y1="21" x2="16" y2="21" />
+                <line x1="12" y1="17" x2="12" y2="21" />
+              </svg>
+            </button>
+          </div>
+          {/* === E3: END === */}
+
           {/* Routing drawer toggle */}
           <button
             className={`${styles.iconBtn} ${showRoutingDrawer ? styles.active : ''}`}

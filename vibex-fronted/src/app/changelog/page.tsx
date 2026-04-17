@@ -64,6 +64,18 @@ const mockChangelog: ChangelogEntry[] = [
     commit: 'f3271119 + 92f1e00d',
   },
   {
+    version: '1.0.264',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint4-spec-canvas-extend E4: 导出功能',
+      '✅ E4-U1 APICanvasExporter: exportDDSCanvasData() → OpenAPI 3.0.3 JSON',
+      '✅ E4-U2 SMExporter: exportToStateMachine() → StateMachine JSON',
+      '✅ E4-U3/U4 Export Modal: DDSToolbar OpenAPI + StateMachine download',
+      '✅ E4-U5 Tests: exporter.test.ts — 16 passing tests',
+    ],
+    commit: '9a3e239d',
+  },
+  {
     version: '1.0.259',
     date: '2026-04-18',
     changes: [

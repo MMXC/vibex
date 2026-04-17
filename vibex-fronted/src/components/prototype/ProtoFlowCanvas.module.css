@@ -1,0 +1,80 @@
+/**
+ * ProtoFlowCanvas — CSS Module
+ * Epic1: E1-U2
+ */
+
+.canvasWrap {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-bg, #0f0f17);
+}
+
+.reactFlow {
+  width: 100%;
+  height: 100%;
+}
+
+/* ---- Controls ---- */
+
+.controls {
+  background: rgba(30, 30, 46, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+  overflow: hidden;
+}
+
+.controls button {
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+  transition: background 0.15s ease !important;
+}
+
+.controls button:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #fff !important;
+}
+
+.controls button:last-child {
+  border-bottom: none !important;
+}
+
+/* ---- MiniMap ---- */
+
+.miniMap {
+  background: rgba(20, 20, 35, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+  overflow: hidden;
+}
+
+/* ---- Empty Hint ---- */
+
+.emptyHint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.4;
+}
+
+.emptyHint svg {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.emptyHint p {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+}

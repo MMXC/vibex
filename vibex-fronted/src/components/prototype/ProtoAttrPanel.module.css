@@ -1,0 +1,322 @@
+/**
+ * ProtoAttrPanel — CSS Module
+ * Epic1: E1-U4, Epic2: E2-U1
+ */
+
+/* ---- Panel ---- */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  width: 260px;
+  min-width: 260px;
+  background: var(--color-surface, #1e1e2e);
+  border-left: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ---- Empty ---- */
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 100%;
+  color: rgba(255, 255, 255, 0.25);
+  padding: 24px;
+  text-align: center;
+}
+
+.empty p {
+  margin: 0;
+  font-size: 13px;
+}
+
+/* ---- Header ---- */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.headerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.headerName {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.headerType {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ---- Tabs ---- */
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  color: rgba(255, 255, 255, 0.4);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  margin-bottom: -1px;
+}
+
+.tab:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.tabActive {
+  color: rgba(255, 255, 255, 0.9);
+  border-bottom-color: #6366f1;
+}
+
+/* ---- Content ---- */
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+}
+
+/* ---- Props Tab ---- */
+
+.propList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.propRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.propKey {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+
+.propInput {
+  padding: 6px 10px;
+  font-size: 12px;
+  font-family: inherit;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.propInput:focus {
+  border-color: #6366f1;
+}
+
+.propReadonly {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: 'Courier New', monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.propEmpty {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.3);
+  text-align: center;
+  margin: 0;
+  padding: 20px 0;
+}
+
+/* ---- Toggle ---- */
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-family: inherit;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  width: fit-content;
+}
+
+.toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.toggleOn {
+  color: #fff;
+  background: rgba(99, 102, 241, 0.3);
+  border-color: rgba(99, 102, 241, 0.5);
+}
+
+/* ---- Mock Tab ---- */
+
+.mockTab {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mockHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.02em;
+}
+
+.mockHasData {
+  font-size: 10px;
+  color: #4ade80;
+}
+
+.mockTextarea {
+  padding: 10px;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  resize: vertical;
+  outline: none;
+  line-height: 1.5;
+  transition: border-color 0.15s;
+  min-height: 120px;
+}
+
+.mockTextarea:focus {
+  border-color: #6366f1;
+}
+
+.mockTextareaError {
+  border-color: #ef4444;
+}
+
+.mockError {
+  font-size: 11px;
+  color: #ef4444;
+  padding: 4px 0;
+}
+
+.mockSaveBtn {
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  color: #fff;
+  background: #6366f1;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.mockSaveBtn:hover {
+  background: #5558e3;
+}
+
+.mockHint {
+  margin: 0;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.25);
+  line-height: 1.5;
+}
+
+/* ---- Footer ---- */
+
+.footer {
+  padding: 12px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.deleteBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-family: inherit;
+  color: rgba(255, 255, 255, 0.4);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.deleteBtn:hover {
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.06);
+}

@@ -31,6 +31,18 @@ const mockChangelog: ChangelogEntry[] = [
     commit: 'a57b23f1 + 2d540bca',
   },
   {
+    version: '1.0.261',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint3-prototype-extend E2-QA: 节点属性更新测试',
+      '✅ E2-QA prototypeStore: updateNodeNavigation 4 个用例 (E2-U1)',
+      '✅ E2-QA prototypeStore: updateNodeBreakpoints 4 个用例 (E2-U2)',
+      '✅ E2-QA prototypeStore: navigation + breakpoints 组合 1 个用例 (E2-U3)',
+      '✅ prototypeStore 测试: 9 个新用例，36 total',
+    ],
+    commit: 'd48fc901',
+  },
+  {
     version: '1.0.259',
     date: '2026-04-18',
     changes: [

@@ -27,30 +27,42 @@
 .leftSection {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 2px;
 }
 
-.chapterIndicator {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* E2-U3: Chapter tabs — clickable tabs for quick chapter navigation */
+.chapterTab {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
 }
 
-.chapterDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--color-primary);
-  flex-shrink: 0;
-  box-shadow: 0 0 6px var(--color-primary);
+.chapterTab:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
 }
 
-.chapterName {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  white-space: nowrap;
-  user-select: none;
+.chapterTab:focus-visible {
+  outline: 2px solid rgba(99, 102, 241, 0.5);
+  outline-offset: 1px;
+}
+
+.chapterTabActive {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: #818cf8;
+}
+
+.chapterTabActive:hover {
+  background: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
 }
 
 /* ==================== Right: Actions ==================== */

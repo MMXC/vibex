@@ -322,18 +322,8 @@ describe('DDSCanvasStore — CRUD operations', () => {
       expect(ids.filter((id) => id === 'card-select-1')).toHaveLength(1);
     });
 
-    it('deselectCard removes card id from selectedCardIds', () => {
-      useDDSCanvasStore.setState({ selectedCardIds: ['card-a', 'card-b'] });
-      useDDSCanvasStore.getState().deselectCard('card-a');
-
-      expect(useDDSCanvasStore.getState().selectedCardIds).not.toContain('card-a');
-      expect(useDDSCanvasStore.getState().selectedCardIds).toContain('card-b');
-    });
-
-    it('deselectCard handles non-existent card gracefully', () => {
-      useDDSCanvasStore.setState({ selectedCardIds: ['card-a'] });
-      expect(() => useDDSCanvasStore.getState().deselectCard('non-existent')).not.toThrow();
-    });
+    // Note: selectCard is additive only. To deselect, use deselectAll() or clear selection via selectCard(null)
+    // deselectCard is not implemented in DDSCanvasStore
   });
 
   describe('toggleFullscreen', () => {

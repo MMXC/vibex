@@ -20,6 +20,19 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.252',
+    date: '2026-04-17',
+    changes: [
+      '📋 vibex-sprint2-spec-canvas Epic2: 横向滚奏体验',
+      '✅ E2-U1 横向滚奏: scroll-snap + handleScroll ratio>0.3 检测可见面板',
+      '✅ E2-U2 URL同步: useChapterURLSync — mount读URL + router.replace 更新（不污染history）',
+      '✅ E2-U3 章节Tab切换: DDSToolbar 3个可点击tab，setActiveChapter 直接更新store',
+      '✅ E2-U3 滚动同步: useEffect监听activeChapter触发scrollIntoView，lastScrollChapterRef防循环',
+      '✅ E2-U3 Tab样式: glassmorphism暗色主题，active高亮#818cf8，hover/focus-visible',
+    ],
+    commit: 'd82ba715',
+  },
+  {
     version: '1.0.251',
     date: '2026-04-17',
     changes: [

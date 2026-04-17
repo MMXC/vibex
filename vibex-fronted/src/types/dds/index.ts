@@ -4,34 +4,28 @@
  * 对应 specs/schema-card-types.md
  */
 
+import type { Position, BaseCard as BaseCardType } from './base';
+import type { APIEndpointCard } from './api-endpoint';
+
+// Re-export base types
+export type { Position };
+export type { APIEndpointCard };
+
+export interface BaseCard extends BaseCardType {
+  type: CardType;
+}
+
 // ==================== Chapter Types ====================
 
-export type ChapterType = 'requirement' | 'context' | 'flow';
+export type ChapterType = 'requirement' | 'context' | 'flow' | 'api';
 
 // ==================== Card Types ====================
 
-export type CardType = 'user-story' | 'bounded-context' | 'flow-step';
+export type CardType = 'user-story' | 'bounded-context' | 'flow-step' | 'api-endpoint';
 
 export type Priority = 'high' | 'medium' | 'low';
 
 export type RelationType = 'upstream' | 'downstream' | 'anticorruption' | 'shared-kernel';
-
-// ==================== Base Card ====================
-
-export interface Position {
-  x: number;
-  y: number;
-}
-
-export interface BaseCard {
-  id: string;
-  type: CardType;
-  title: string;
-  description?: string;
-  position: Position;
-  createdAt: string;
-  updatedAt: string;
-}
 
 // ==================== User Story Card ====================
 
@@ -76,7 +70,7 @@ export interface FlowStepCard extends BaseCard {
 
 // ==================== Union Type ====================
 
-export type DDSCard = UserStoryCard | BoundedContextCard | FlowStepCard;
+export type DDSCard = UserStoryCard | BoundedContextCard | FlowStepCard | APIEndpointCard;
 
 // ==================== Edge ====================
 

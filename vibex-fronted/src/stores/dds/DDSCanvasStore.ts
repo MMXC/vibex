@@ -37,6 +37,7 @@ const initialChapters: Record<ChapterType, ChapterData> = {
   requirement: createInitialChapterData('requirement'),
   context: createInitialChapterData('context'),
   flow: createInitialChapterData('flow'),
+  api: createInitialChapterData('api'),
 };
 
 const initialState = {

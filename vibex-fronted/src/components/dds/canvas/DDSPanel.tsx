@@ -26,6 +26,7 @@ const CHAPTER_LABELS: Record<ChapterType, string> = {
   requirement: '需求',
   context: '上下文',
   flow: '流程',
+  api: 'API',
 };
 
 export const DDSPanel = memo(function DDSPanel({

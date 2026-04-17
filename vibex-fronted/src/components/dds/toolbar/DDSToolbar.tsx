@@ -22,6 +22,7 @@ const CHAPTER_LABELS: Record<ChapterType, string> = {
   requirement: '需求',
   context: '上下文',
   flow: '流程',
+  api: 'API',
 };
 
 // ==================== Icon SVGs ====================
@@ -87,6 +88,7 @@ export const DDSToolbar = memo(function DDSToolbar({
         requirement: { cards: chapters.requirement.cards, edges: chapters.requirement.edges },
         context: { cards: chapters.context.cards, edges: chapters.context.edges },
         flow: { cards: chapters.flow.cards, edges: chapters.flow.edges },
+        api: { cards: chapters.api.cards, edges: chapters.api.edges },
       },
       chatHistory
     );

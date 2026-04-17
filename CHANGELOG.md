@@ -19,6 +19,12 @@
 - **E3-U2 路由导航**: prototypeStore — `addPage`/`removePage`，ProtoEditor整合RoutingDrawer
 - 提交: vibex-sprint1-prototype-canvas/dev-epic3-路由树
 
+### [Unreleased] vibex-sprint3-prototype-extend Epic1: 页面跳转连线 — 2026-04-17
+- **E1-U1 prototypeStore CRUD**: `prototypeStore.ts` — addEdge/removeEdge，页面间连线管理
+- **E1-U2 RoutingDrawer 连线UI**: `RoutingDrawer.tsx` — 添加连线按钮 + modal select（源页面 → 目标页面）
+- **E1-U3 ProtoFlowCanvas 渲染**: `ProtoFlowCanvas.tsx` — onConnect callback 实现，Delete键删除边，store→local edges sync
+- 提交: vibex-sprint3-prototype-extend/dev-epic1-页面跳转连线（epic-1）
+
 ### [Unreleased] vibex-sprint2-spec-canvas Epic3: AI 草稿生成 — 2026-04-17
 - **E3-U1 AI入口**: `DDSToolbar.tsx` — handleAIGenerate → toggleDrawer → AIDraftDrawer
 - **E3-U2 生成预览**: `AIDraftDrawer.tsx` — IDLE/LOADING/REVIEW/ERROR 状态机，prompt → /api/chat → CardPreview

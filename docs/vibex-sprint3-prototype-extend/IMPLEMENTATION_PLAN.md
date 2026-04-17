@@ -23,9 +23,9 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E1-U1 | prototypeStore edges CRUD 扩展 | ⬜ | — | store.addEdge/removeEdge 方法可用，级联清除正确 |
-| E1-U2 | FlowTreePanel 连线创建 UI | ⬜ | E1-U1 | 「添加连线」按钮可见，点击后能选择源/目标页面 |
-| E1-U3 | ProtoFlowCanvas 连线渲染 | ⬜ | E1-U1 | 画布上两点之间出现箭头连线，连线可被选中并删除 |
+| E1-U1 | prototypeStore edges CRUD 扩展 | ✅ | — | prototypeStore.addEdge/removeEdge 方法可用 |
+| E1-U2 | RoutingDrawer 连线创建 UI | ✅ | E1-U1 | RoutingDrawer 添加连线按钮可见，点击后能选择源/目标页面 |
+| E1-U3 | ProtoFlowCanvas 连线渲染 | ✅ | E1-U1 | 画布上两点之间出现箭头连线，连线可被选中并删除 |
 
 ---
 
@@ -61,17 +61,17 @@
 
 ---
 
-### E1-U2: FlowTreePanel 连线创建 UI
+### E1-U2: RoutingDrawer 连线创建 UI
 
-**Goal:** FlowTreePanel 增加「添加连线」按钮，用户可选择源页面和目标页面创建连线。
+**Goal:** RoutingDrawer 增加「添加连线」按钮，用户可选择源页面和目标页面创建连线。
 
 **Requirements:** E1-AC1
 
 **Dependencies:** E1-U1
 
 **Files:**
-- Modify: `vibex-fronted/src/components/canvas/panels/FlowTreePanel.tsx`
-- Test: `vibex-fronted/src/components/canvas/panels/__tests__/FlowTreePanel.test.tsx`
+- Modify: `vibex-fronted/src/components/prototype/RoutingDrawer.tsx`
+- Modify: `vibex-fronted/src/components/prototype/ProtoEditor.module.css`
 
 **Approach:**
 - 在 FlowTreePanel 工具栏区域增加「添加连线」图标按钮
@@ -94,7 +94,7 @@
 
 ### E1-U3: ProtoFlowCanvas 连线渲染
 
-**Goal:** React Flow 画布渲染 edges，连线可被选中并删除（Delete 键）。
+**Goal:** React Flow 画布渲染 edges，`onConnect` 实现页面节点连线，Delete 键删除边。
 
 **Requirements:** E1-AC2, E1-AC3
 

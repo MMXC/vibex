@@ -7,6 +7,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { ProtoNode } from './prototypeStore';
 import type { ChapterData, DDSCard } from '@/types/dds';
+import { useDDSCanvasStore } from './dds/DDSCanvasStore';
+import { usePrototypeStore } from './prototypeStore';
 
 // ==================== Delivery Spec Types ====================
 
@@ -269,6 +271,44 @@ export const useDeliveryStore = create<DeliveryState>()(
       setSearchQuery: (query) => set({ searchQuery: query }),
 
       setTypeFilter: (type) => set({ typeFilter: type }),
+
+      loadFromStores: () => {
+        // Load bounded contexts from DDSCanvasStore.chapters.context
+        const ddsStore = useDDSCanvasStore.getState();
+        const contextCards = ddsStore.chapters.context?.cards ?? [];
+        const contexts: BoundedContext[] = contextCards.map((card) => ({
+          id: card.id,
+          name: card.title ?? '',
+          description: card.description ?? '',
+          nodeCount: 0,
+          relationCount: 0,
+          relations: [],
+        }));
+
+        // Load business flows from DDSCanvasStore.chapters.flow
+        const flowCards = ddsStore.chapters.flow?.cards ?? [];
+        const flows: BusinessFlow[] = flowCards.map((card) => ({
+          id: card.id,
+          name: card.title ?? '',
+          contextName: '上下文',
+          stepCount: 0,
+          decisionCount: 0,
+          steps: [],
+        }));
+
+        // Load components from prototypeStore
+        const protoData = usePrototypeStore.getState().getExportData();
+        const components: Component[] = protoData.nodes.map((node): Component => ({
+          id: node.id,
+          name: node.data.component?.name ?? node.data.component?.type ?? 'Unknown',
+          type: 'Service',
+          description: '',
+          referenceCount: 0,
+          methodCount: 0,
+        }));
+
+        set({ contexts, flows, components });
+      },
 
       loadMockData: () => {
         set({

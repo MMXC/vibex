@@ -68,6 +68,11 @@
 - **E3-U3 画布缩放**: `ProtoFlowCanvas.tsx` — 容器 width 根据 breakpoint 动态设置，CSS transition 平滑切换
 - 提交: 46477b60
 
+### [Unreleased] vibex-sprint3-prototype-extend Epic4: AI 草图导入 — 2026-04-18
+- **E4-U1 image-import.ts**: `services/figma/image-import.ts` — importFromImage() 调用 /api/chat 识别图片组件（base64 + JSON 解析）
+- **E4-U2 ImportPanel**: `ImportPanel.tsx` — 新增图片识别 Tab（上传/预览/识别/确认导入）
+- 提交: d795e72e
+
 ### [Unreleased] vibex-sprint2-spec-canvas Epic3: AI 草稿生成 — 2026-04-17
 - **E3-U1 AI入口**: `DDSToolbar.tsx` — handleAIGenerate → toggleDrawer → AIDraftDrawer
 - **E3-U2 生成预览**: `AIDraftDrawer.tsx` — IDLE/LOADING/REVIEW/ERROR 状态机，prompt → /api/chat → CardPreview

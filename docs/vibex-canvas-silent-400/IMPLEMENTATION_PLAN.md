@@ -32,22 +32,22 @@
 
 ---
 
-### Sprint 2: F2.1（API 层 async/await 修复）
+### Sprint 2: F2.1（API 层 async/await 修复）✅
 
 | Story | 任务 | 负责人 | 工时 |
 |-------|------|--------|------|
-| F2.1 | canvasApi.ts 中 res.json() await 修复 | FE | 0.5h |
-| F2.2 | 全局 res.json() 扫描验证 | FE | 0.5h |
+| F2.1 | canvasApi.ts 中 res.json() await 修复 | FE ✅ | 0.5h |
+| F2.2 | 全局 res.json() 扫描验证 | FE ✅ | 0.5h |
 
 **开始条件**: 无依赖，可与 Sprint 1 并行
 **结束条件**: handleResponseError 正确解析后端错误 + 全局无遗漏
 
 #### 任务清单
 
-- [ ] 2.1.1 修复 `canvasApi.ts` 中 `handleResponseError` 函数的 `res.json()` 添加 `await`
-- [ ] 2.1.2 单元测试覆盖 AC1（JSON 解析）+ AC2（非 JSON fallback）
-- [ ] 2.2.1 执行 `grep -rn "res\.json()" vibex-fronted/src/` 全局扫描
-- [ ] 2.2.2 验证每处 `res.json()` 均有 `await`（无遗漏）
+- [x] 2.1.1 修复 `canvasApi.ts` 中 `handleResponseError` 函数的 `res.json()` 添加 `await`
+- [x] 2.1.2 单元测试覆盖 AC1（JSON 解析）+ AC2（非 JSON fallback）
+- [x] 2.2.1 执行 `grep -rn "res\.json()" vibex-fronted/src/` 全局扫描（8 处）
+- [x] 2.2.2 验证每处 `res.json()` 均有 `await`（无遗漏）
 
 ---
 

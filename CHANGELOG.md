@@ -36,6 +36,11 @@
 - **类型扩展**: `DDSEdge` 新增 sourceChapter/targetChapter 可选字段
 - 提交: 2b3d69f4
 
+### [Unreleased] vibex-sprint2-spec-canvas Epic5: 状态与错误处理 — 2026-04-17
+- **E5-U1 骨架屏**: `ChapterPanel.tsx` — loading时显示 shimmer skeleton cards
+- **E5-U3 错误态**: `ChapterPanel.tsx` — error message + loadChapter 重试按钮
+- 提交: vibex-sprint2-spec-canvas/dev-epic5-状态与错误处理
+
 ### [Unreleased] vibex-sprint2-spec-canvas Epic3: AI 草稿生成 — 2026-04-17
 - **E3-U1 AI入口**: `DDSToolbar.tsx` — handleAIGenerate → toggleDrawer → AIDraftDrawer
 - **E3-U2 生成预览**: `AIDraftDrawer.tsx` — IDLE/LOADING/REVIEW/ERROR 状态机，prompt → /api/chat → CardPreview

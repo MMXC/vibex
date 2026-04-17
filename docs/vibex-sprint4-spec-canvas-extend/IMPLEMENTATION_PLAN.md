@@ -12,7 +12,7 @@
 
 | Epic | Units | Status | Next |
 |------|-------|--------|------|
-| E1: API 规格章节 | E1-U1 ~ E1-U5 | ✅ 2/5 | — |
+| E1: API 规格章节 | E1-U1 ~ E1-U5 | ✅ 5/5 | — |
 | E2: 业务规则章节 | E2-U1 ~ E2-U5 | 0/5 | E2-U1 |
 | E3: 跨章节集成 | E3-U1 ~ E3-U2 | 0/2 | E3-U1 |
 | E4: 导出功能 | E4-U1 ~ E4-U5 | 0/5 | E4-U1 |
@@ -24,11 +24,11 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E1-U1 | APIEndpointCard 类型定义 | ⬜ | — | `types/dds/api-endpoint.ts` 包含完整 APIEndpointCard 接口 |
-| E1-U2 | APIEndpointCard 组件 | ⬜ | E1-U1 | 节点显示 method badge + path + summary，选中高亮 |
-| E1-U3 | DDSPanel API 组件面板 | ⬜ | E1-U2 | 5 种方法卡片（GET/POST/PUT/DELETE/PATCH）可拖拽 |
-| E1-U4 | API 属性面板 | ⬜ | E1-U2 | path/method/summary 编辑 → 节点标签实时更新 |
-| E1-U5 | API 章节持久化 | ⬜ | E1-U2 | DDSCanvasStore 支持 api chapter，刷新数据保留 |
+| E1-U1 | APIEndpointCard 类型定义 | ✅ | — | `types/dds/api-endpoint.ts` 包含完整 APIEndpointCard 接口 |
+| E1-U2 | APIEndpointCard 组件 | ✅ | E1-U1 | 节点显示 method badge + path + summary，选中高亮 |
+| E1-U3 | DDSPanel API 组件面板 | ✅ | E1-U2 | 5 种方法卡片（GET/POST/PUT/DELETE/PATCH）可拖拽 |
+| E1-U4 | API 属性面板 | ✅ | E1-U2 | path/method/summary 编辑 → 节点标签实时更新 |
+| E1-U5 | API 章节持久化 | ✅ | E1-U2 | DDSCanvasStore 支持 api chapter，刷新数据保留 |
 
 ### E1-U1: APIEndpointCard 类型定义
 

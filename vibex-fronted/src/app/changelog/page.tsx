@@ -20,6 +20,21 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.257',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint4-spec-canvas-extend E1: API 规格章节',
+      '✅ E1-U1 类型定义: types/dds/api-endpoint.ts — APIEndpointCard 接口 (HTTPMethod/APIParameter/APIResponse)',
+      '✅ E1-U2 组件: APIEndpointCard — method badge 颜色映射 + path monospace + summary + tags + status codes',
+      '✅ E1-U3 CardRenderer 注册: case api-endpoint 分发 + UnknownCardFallback 兜底',
+      '✅ E1-U4 DDSCanvasStore: initialChapters 新增 api，chapter CRUD actions',
+      '✅ E1-U5 持久化: ddsPersistence exportToJSON/quickSave/saveSnapshot 全部包含 api chapter',
+      '✅ Canvas 布局: 4-chapter (requirement/context/flow/api) 完整落地',
+      '✅ 单元测试: APIEndpointCard.test.tsx — 11 个测试用例',
+    ],
+    commit: '581b5ad7',
+  },
+  {
     version: '1.0.256',
     date: '2026-04-17',
     changes: [

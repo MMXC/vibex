@@ -12,7 +12,7 @@
 import React, { memo } from 'react';
 import { useDDSCanvasStore } from '@/stores/dds';
 import type { ChapterType } from '@/types/dds';
-import { ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
+
 import { exportToJSON, parseImportFile } from '@/services/dds';
 import styles from './DDSToolbar.module.css';
 
@@ -134,7 +134,7 @@ export const DDSToolbar = memo(function DDSToolbar({
             key={ch}
             type="button"
             className={`${styles.chapterTab} ${activeChapter === ch ? styles.chapterTabActive : ''}`}
-            onClick={() => setActiveChapter(ch)}
+            onClick={() => useDDSCanvasStore.getState().setActiveChapter(ch)}
             aria-label={`切换到${CHAPTER_LABELS[ch]}章节`}
             aria-pressed={activeChapter === ch}
           >

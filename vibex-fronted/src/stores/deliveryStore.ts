@@ -240,8 +240,7 @@ export function toDDL(schema: SchemaSpec): DDLOutput {
       }
     }
   }
-  return tables.join('
-') || '-- No tables defined';
+  return tables.join('\n') || '-- No tables defined';
 }
 
 // ==================== Store ====================

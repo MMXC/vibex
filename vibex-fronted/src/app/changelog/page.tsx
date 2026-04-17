@@ -20,6 +20,20 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.251',
+    date: '2026-04-17',
+    changes: [
+      '🎨 Epic1: 拖拽布局编辑器上线',
+      '✅ 组件面板：10 个默认组件拖拽',
+      '✅ React Flow 画布：节点自由定位，localStorage 持久化',
+      '✅ 自定义节点渲染：Button 可点击、Table 显示 Mock 数据',
+      '✅ 属性面板：props 编辑 + Mock 数据 Tab',
+      '✅ JSON 导出/导入 v2.0',
+      '✅ 路由抽屉：页面增删',
+    ],
+    commit: 'f18d48f4',
+  },
+  {
     version: '1.0.250',
     date: '2026-04-17',
     changes: [

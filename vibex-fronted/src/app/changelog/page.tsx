@@ -20,6 +20,19 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.253',
+    date: '2026-04-17',
+    changes: [
+      '📋 vibex-sprint2-spec-canvas Epic3: AI 草稿生成',
+      '✅ E3-U1 AI入口: DDSToolbar → handleAIGenerate → toggleDrawer → AIDraftDrawer',
+      '✅ E3-U2 生成预览: AIDraftDrawer 状态机 IDLE→LOADING→PREVIEW/ERROR，prompt→/api/chat→CardPreview，30s超时',
+      '✅ E3-U3 上下文传递: chatHistory state + lastPromptRef，handleRetry 上下文延续',
+      '✅ E3-U4 边生成: parseEdgesFromResponse 提取edges，handleAccept 调用 addEdge，CardPreview 显示edges badge',
+      '✅ DDSToolbar cleanup: 删除未使用 import，直接调用 useDDSCanvasStore.getState().setActiveChapter()',
+    ],
+    commit: 'aa966492',
+  },
+  {
     version: '1.0.252',
     date: '2026-04-17',
     changes: [

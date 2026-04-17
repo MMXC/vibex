@@ -231,7 +231,7 @@ export const canvasApi = {
     });
 
     if (!res.ok) await handleResponseError(res, `创建项目失败: ${res.status}`, window.location.pathname);
-    return res.json() as Promise<CreateProjectOutput>;
+    return await res.json() as CreateProjectOutput;
   },
 
   /**
@@ -247,7 +247,7 @@ export const canvasApi = {
     });
 
     if (!res.ok) await handleResponseError(res, `生成失败: ${res.status}`, window.location.pathname);
-    return res.json() as Promise<GenerateOutput>;
+    return await res.json() as GenerateOutput;
   },
 
   /**
@@ -261,7 +261,7 @@ export const canvasApi = {
     const res = await fetch(getApiUrl(`${API_CONFIG.endpoints.canvas.status}?projectId=${encodeURIComponent(projectId)}`), { headers });
 
     if (!res.ok) await handleResponseError(res, `查询状态失败: ${res.status}`, window.location.pathname);
-    return res.json() as Promise<StatusOutput>;
+    return await res.json() as StatusOutput;
   },
 
   /**
@@ -391,7 +391,7 @@ export const canvasApi = {
       }
       await handleResponseError(res, `创建快照失败: ${res.status}`, window.location.pathname);
     }
-    return res.json() as Promise<CreateSnapshotOutput>;
+    return await res.json() as CreateSnapshotOutput;
   },
 
   /**
@@ -406,7 +406,7 @@ export const canvasApi = {
     const res = await fetch(url, { headers });
 
     if (!res.ok) await handleResponseError(res, `获取快照列表失败: ${res.status}`, window.location.pathname);
-    return res.json() as Promise<ListSnapshotsOutput>;
+    return await res.json() as ListSnapshotsOutput;
   },
 
   /**
@@ -418,7 +418,7 @@ export const canvasApi = {
     const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.snapshot(snapshotId)), { headers });
 
     if (!res.ok) await handleResponseError(res, `获取快照失败: ${res.status}`, window.location.pathname);
-    return res.json();
+    return await res.json() as { success: boolean; snapshot: import('../types').CanvasSnapshot };
   },
 
   /**
@@ -433,7 +433,7 @@ export const canvasApi = {
     });
 
     if (!res.ok) await handleResponseError(res, `恢复快照失败: ${res.status}`, window.location.pathname);
-    return res.json() as Promise<RestoreSnapshotOutput>;
+    return await res.json() as RestoreSnapshotOutput;
   },
 
   /**
@@ -448,7 +448,7 @@ export const canvasApi = {
       { headers }
     );
     if (!res.ok) await handleResponseError(res, `获取最新版本失败: ${res.status}`, window.location.pathname);
-    return res.json();
+    return await res.json() as { success: boolean; latestVersion: number; updatedAt: string | null };
   },
 };
 

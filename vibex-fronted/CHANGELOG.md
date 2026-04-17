@@ -35,6 +35,11 @@
 - **Note**: 代码在 `2b3d69f4`（与 Epic4 跨章节 DAG 同一 commit），测试补充在 `1837905e`
 - **提交**: `2b3d69f4` + `1837905e` + `d48fc901` (E1-QA)
 
+### [vibex-sprint3-prototype-extend E2-QA: 节点属性更新测试] — 2026-04-18
+- **E2-QA prototypeStore**: `updateNodeNavigation` 4 个用例（E2-U1），`updateNodeBreakpoints` 4 个用例（E2-U2），navigation + breakpoints 组合 1 个用例（E2-U3）
+- **E2-QA prototypeStore 测试**: 9 个新用例，36 total in prototypeStore.test.ts
+- **提交**: `d48fc901` (E2-QA)
+
 - **根因**: Tab 切换后刷新页面，三树（Component/BusinessFlow/BoundedContext）状态丢失
 - **修复**: useRehydrateCanvasStores hook，skipHydration + 客户端 rehydration
 - **测试**: 4/4 PASS (TC-E6-01~04)

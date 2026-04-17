@@ -12,6 +12,11 @@
 - **创建表单**: 用户故事（role/action/benefit/priority）、限界上下文（name/desc/resp）、流程步骤（stepName/actor/pre/post）
 - 提交: vibex-sprint2-spec-canvas/dev-epic1-三章节卡片管理
 
+### [Unreleased] vibex-sprint1-prototype-canvas Epic2: Mock数据绑定 — 2026-04-17
+- **E2-U1 Mock数据Tab**: `ProtoAttrPanel.tsx` — 属性/Mock Tab切换，Mock Tab textarea输入JSON，blur时验证
+- **E2-U2 Mock存储与渲染**: `prototypeStore.ts` — `updateNodeMockData`保存，localStorage持久化，`ProtoNode`读取渲染
+- 提交: vibex-sprint1-prototype-canvas/dev-epic2-mock数据绑定
+
 ### [Unreleased] vibex-sprint1-prototype-canvas Epic1: 拖拽布局编辑器 — 2026-04-17
 - **E1-U1 组件面板**: `ComponentPanel.tsx` — 左侧面板展示 10 个默认组件，支持 HTML5 drag-and-drop
 - **E1-U2 React Flow 画布**: `ProtoFlowCanvas.tsx` — 接收组件拖拽，节点自由定位，MiniMap + Controls

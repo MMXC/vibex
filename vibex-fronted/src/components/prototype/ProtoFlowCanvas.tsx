@@ -55,6 +55,8 @@ function ProtoFlowCanvasInner({ className = '' }: ProtoFlowCanvasProps) {
     nodes: storeNodes,
     edges: storeEdges,
     addNode,
+    addEdge,
+    removeEdge,
     updateNodePosition,
     selectNode,
   } = usePrototypeStore();
@@ -71,6 +73,11 @@ function ProtoFlowCanvasInner({ className = '' }: ProtoFlowCanvasProps) {
     setNodes(storeNodesCasted);
   }, [storeNodes, setNodes, storeNodesCasted]);
 
+  // E1-U3: Sync store edges → local state
+  React.useEffect(() => {
+    setEdges(storeEdgesCasted);
+  }, [storeEdges, setEdges, storeEdgesCasted]);
+
   // ---- React Flow change handlers ----
   const onNodesChange: OnNodesChange<Node> = useCallback(
     (changes) => {
@@ -81,16 +88,23 @@ function ProtoFlowCanvasInner({ className = '' }: ProtoFlowCanvasProps) {
 
   const onEdgesChange: OnEdgesChange = useCallback(
     (changes) => {
+      // E1-U3: Sync deletions to store
+      changes.forEach((change) => {
+        if (change.type === 'remove') {
+          removeEdge(change.id);
+        }
+      });
       setEdges((eds) => applyEdgeChanges(changes, eds));
     },
-    [setEdges]
+    [setEdges, removeEdge]
   );
 
   const onConnect = useCallback(
-    (_connection: Connection) => {
-      // E1 MVP: no edge creation
+    (connection: Connection) => {
+      if (!connection.source || !connection.target) return;
+      addEdge(connection.source, connection.target);
     },
-    []
+    [addEdge]
   );
 
   // ---- Position persistence ----
@@ -163,7 +177,7 @@ function ProtoFlowCanvasInner({ className = '' }: ProtoFlowCanvasProps) {
         nodeTypes={nodeTypes}
         fitView
         fitViewOptions={{ padding: 0.2 }}
-        deleteKeyCode={null}
+        deleteKeyCode="Delete"
         selectionKeyCode={null}
         multiSelectionKeyCode={null}
         panOnDrag={[1, 2]}

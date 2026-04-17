@@ -63,7 +63,7 @@ cd vibex-fronted && pnpm lint
 
 ---
 
-## G3: CanvasPage.tsx 修改规范（911行文件）
+## G3: ProtoEditor.tsx 修改规范（323行文件）
 
 ### G3.1 分区注释（强制）
 
@@ -89,8 +89,8 @@ const E3_ENABLED = process.env.NEXT_PUBLIC_E3_ENABLED === 'true';
 
 ### G3.3 验证要求
 
-- 每次修改后运行 `pnpm build` 确保 911 行文件不破坏构建
-- CanvasPage 有现有测试套件时，修改后运行测试确保无回归
+- 每次修改后运行 `pnpm build` 确保 ProtoEditor 不破坏构建
+- 运行 `pnpm test:unit` 确保 Vitest 测试通过
 
 ---
 
@@ -99,14 +99,16 @@ const E3_ENABLED = process.env.NEXT_PUBLIC_E3_ENABLED === 'true';
 ### G4.1 组件目录结构
 
 ```
-components/canvas/panels/PropertyPanel/
-├── PropertyPanel.tsx          # 主容器，管理 Tab 状态和 Drawer 开关
+vibex-fronted/src/components/prototype/PropertyPanel/
+├── PropertyPanel.tsx          # 主容器，管理 Tab 状态和 Drawer 开关（基于 ProtoAttrPanel 重构）
 ├── PropertyPanel.module.css   # 布局样式（320px drawer）
 ├── DataTab.tsx                # 数据 Tab
 ├── StyleTab.tsx               # 样式 Tab
 ├── NavigationTab.tsx          # 导航 Tab（调用 addEdge）
 └── ResponsiveTab.tsx          # 响应式 Tab（调用 updateNodeBreakpoints）
 ```
+
+> **注意**: PRD 中的 `MockDataPanel.tsx` 不存在，属性面板前身是 `ProtoAttrPanel.tsx`（已有 props/mock 两 Tab）。
 
 ### G4.2 Drawer 行为
 
@@ -173,14 +175,14 @@ components/canvas/panels/PropertyPanel/
 
 ### G7.1 单元测试要求
 
-每个 Epic 至少一个测试文件：
+每个 Epic 至少一个 Vitest 测试文件：
 
 | Epic | 测试文件 | 覆盖率目标 |
 |------|---------|-----------|
-| E1 | `stores/__tests__/prototypeStore.test.ts` | > 80%（edges CRUD）|
-| E2 | `components/canvas/panels/__tests__/PropertyPanel.test.tsx` | > 80% |
-| E3 | `components/canvas/__tests__/CanvasPage.test.tsx` | > 80%（断点相关）|
-| E4 | `services/figma/__tests__/image-import.test.ts` | > 80% |
+| E1 | `vibex-fronted/src/stores/__tests__/prototypeStore.test.ts` | > 80%（edges CRUD）|
+| E2 | `vibex-fronted/src/components/prototype/__tests__/PropertyPanel.test.tsx` | > 80% |
+| E3 | `vibex-fronted/src/components/prototype/__tests__/ProtoEditor.test.tsx` | > 80%（断点相关）|
+| E4 | `vibex-fronted/src/services/figma/__tests__/image-import.test.ts` | > 80% |
 
 ### G7.2 gstack Browse QA 要求
 
@@ -216,7 +218,8 @@ $B is visible text="正在识别组件..."
 ### G7.3 回归测试
 
 - Sprint1 所有已有功能在 gstack browse 中必须保持通过
-- 重点回归：`CanvasPage` 加载、`ProtoFlowCanvas` 节点拖拽、`FlowTreePanel` 页面切换
+- 重点回归：`ProtoEditor` 加载、`ProtoFlowCanvas` 节点拖拽、`FlowTreePanel` 页面切换
+- 运行 `pnpm test:unit` 确保 Vitest 测试全部通过
 
 ---
 
@@ -224,7 +227,7 @@ $B is visible text="正在识别组件..."
 
 | 场景 | 路径规则 |
 |------|---------|
-| 新建组件 | `vibex-fronted/src/components/canvas/panels/PropertyPanel/` |
+| 新建组件 | `vibex-fronted/src/components/prototype/PropertyPanel/` |
 | 测试文件 | 与源文件同目录 `__tests__/` 子目录 |
 | 样式文件 | 同目录 `.module.css` 文件 |
 | 测试样式 | 与源测试文件同目录 |
@@ -233,6 +236,7 @@ $B is visible text="正在识别组件..."
 **禁止**：
 - ❌ 在非 `__tests__` 目录放置测试文件
 - ❌ 在 `app/` 目录直接创建组件（组件放 `components/`）
+- ❌ 在 `CanvasPage.tsx` 中增加原型编辑器功能（CanvasPage 是三树并行画布）
 - ❌ 使用相对路径以外的方式引用组件
 
 ---
@@ -242,7 +246,7 @@ $B is visible text="正在识别组件..."
 - 每个 Epic 单独 PR（P0 E1+E2 可合并为一个 PR）
 - PR 必须包含：单元测试、gstack browse QA 结果、架构说明更新
 - Feature flag 默认为 `false`，在 PR 描述中明确说明如何打开
-- 合并前必须通过 ESLint + TypeScript 类型检查 + 单元测试
+- 合并前必须通过 `pnpm lint` + TypeScript 类型检查 + Vitest 单元测试 + gstack browse QA
 
 ---
 

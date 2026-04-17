@@ -88,6 +88,10 @@ export interface DDSEdge {
   animated?: boolean;  // AI 生成标记
   style?: Record<string, string>;
   label?: string;
+  /** 跨章节边的源章节类型（same-chapter edges 省略） */
+  sourceChapter?: ChapterType;
+  /** 跨章节边的目标章节类型（same-chapter edges 省略） */
+  targetChapter?: ChapterType;
 }
 
 // ==================== Chapter Data ====================
@@ -111,6 +115,9 @@ export interface DDSCanvasStoreState {
   // 章节数据
   chapters: Record<ChapterType, ChapterData>;
   loadChapter: (chapter: ChapterType) => Promise<void>;
+
+  // 跨章节 DAG 边（E4-U1）
+  crossChapterEdges: DDSEdge[];
 
   // AI 对话
   chatHistory: ChatMessage[];

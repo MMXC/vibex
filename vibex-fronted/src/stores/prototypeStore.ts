@@ -75,6 +75,10 @@ export interface PrototypeStoreState {
   addPage: (route: string, name?: string) => void;
   removePage: (pageId: string) => void;
 
+  // ---- Edge Actions (Sprint3 E1) ----
+  addEdge: (source: string, target: string) => void;
+  removeEdge: (edgeId: string) => void;
+
   // ---- Import / Export ----
   getExportData: () => PrototypeExportV2;
   loadFromExport: (data: PrototypeExportV2) => void;
@@ -177,6 +181,30 @@ export const usePrototypeStore = create<PrototypeStoreState>()(
       removePage: (pageId: string) => {
         set((state) => ({
           pages: state.pages.filter((p) => p.id !== pageId),
+        }));
+      },
+
+      // ---- Edge Actions (Sprint3 E1) ----
+      addEdge: (source: string, target: string) => {
+        if (!source || !target) return;
+        const id = `edge-${generateId()}`;
+        set((state) => ({
+          edges: [
+            ...state.edges,
+            {
+              id,
+              source,
+              target,
+              type: 'smoothstep' as const,
+              animated: true,
+            },
+          ],
+        }));
+      },
+
+      removeEdge: (edgeId: string) => {
+        set((state) => ({
+          edges: state.edges.filter((e) => e.id !== edgeId),
         }));
       },
 

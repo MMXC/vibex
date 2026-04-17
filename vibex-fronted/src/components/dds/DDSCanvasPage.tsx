@@ -21,6 +21,7 @@ import React, {
 } from 'react';
 import { DDSToolbar } from '@/components/dds/toolbar';
 import { DDSScrollContainer } from '@/components/dds/canvas';
+import { CrossChapterEdgesOverlay } from '@/components/dds/canvas/CrossChapterEdgesOverlay';
 import { AIDraftDrawer } from '@/components/dds/ai-draft';
 import { DDSFlow } from '@/components/dds/DDSFlow';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
@@ -60,6 +61,10 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   // Store refs
   const selectedCardIds = useDDSCanvasStore((s) => s.selectedCardIds);
   const toggleDrawer = useDDSCanvasStore((s) => s.toggleDrawer);
+
+  // Abort controller for cleanup
+  // Ref for the scroll container (used by CrossChapterEdgesOverlay)
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Abort controller for cleanup
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -247,19 +252,27 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
       )}
 
       {/* Canvas Scroll Container */}
-      <DDSScrollContainer
-        className="dds-scroll-container"
-        renderChapterContent={(
-          chapter: ChapterType,
-          _data: ChapterData
-        ): ReactNode => (
-          <DDSFlow
-            chapter={chapter}
-            onSelectCard={handleSelectCard}
-            selectedCardIds={selectedCardIds}
-          />
-        )}
-      />
+      <div style={{ position: 'relative' }}>
+        <DDSScrollContainer
+          className="dds-scroll-container"
+          rootRef={scrollContainerRef}
+          renderChapterContent={(
+            chapter: ChapterType,
+            _data: ChapterData
+          ): ReactNode => (
+            <DDSFlow
+              chapter={chapter}
+              onSelectCard={handleSelectCard}
+              selectedCardIds={selectedCardIds}
+            />
+          )}
+        />
+        {/* Cross-chapter DAG edge overlay (E4-U1) */}
+        <CrossChapterEdgesOverlay
+          scrollContainerRef={scrollContainerRef}
+          className="cross-chapter-edges-overlay"
+        />
+      </div>
 
       {/* AI Draft Drawer */}
       <AIDraftDrawer />

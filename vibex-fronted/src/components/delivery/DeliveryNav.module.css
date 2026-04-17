@@ -1,0 +1,44 @@
+/**
+ * DeliveryNav.module.css
+ * Sprint5 T4
+ */
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 36px;
+  padding: 0 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.navLink {
+  height: 28px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.navLink:hover {
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.navLinkActive {
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(99, 102, 241, 0.2);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.navLinkActive:hover {
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(99, 102, 241, 0.25);
+}

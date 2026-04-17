@@ -9,7 +9,9 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useDeliveryStore } from '@/stores/deliveryStore';
 import {
+  DeliveryNav,
   DeliveryTabs,
+  CanvasBreadcrumb,
   ContextTab,
   FlowTab,
   ComponentTab,
@@ -100,6 +102,13 @@ export default function DeliveryCenterPage() {
         </div>
 
         {/* Tabs */}
+        <CanvasBreadcrumb
+          items={[
+            { label: "Canvas", href: "/canvas" },
+            { label: "交付中心" },
+          ]}
+        />
+        <DeliveryNav />
         <DeliveryTabs />
 
         {/* Tab Content */}

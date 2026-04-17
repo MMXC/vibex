@@ -26,18 +26,21 @@ const CHAPTER_LABELS: Record<ChapterType, string> = {
   requirement: '需求',
   context: '上下文',
   flow: '流程',
+  api: 'API',
 };
 
 const CHAPTER_CARD_TYPES: Record<ChapterType, CardType[]> = {
   requirement: ['user-story'],
   context: ['bounded-context'],
   flow: ['flow-step'],
+  api: ['api-endpoint'],
 };
 
 const CARD_TYPE_LABELS: Record<CardType, string> = {
   'user-story': '用户故事',
   'bounded-context': '限界上下文',
   'flow-step': '流程步骤',
+  'api-endpoint': 'API 端点',
 };
 
 // ==================== ID Generator ====================

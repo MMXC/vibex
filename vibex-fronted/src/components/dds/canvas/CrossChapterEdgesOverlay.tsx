@@ -23,13 +23,14 @@ import type { DDSEdge, ChapterType, DDSCard } from '@/types/dds';
 
 // ==================== Constants ====================
 
-const CHAPTER_ORDER: ChapterType[] = ['requirement', 'context', 'flow'];
+const CHAPTER_ORDER: ChapterType[] = ['requirement', 'context', 'flow', 'api'];
 
 /** Chapter horizontal offset as fraction of scroll container width */
 const CHAPTER_OFFSETS: Record<ChapterType, number> = {
   requirement: 0,
   context: 1 / 3,
   flow: 2 / 3,
+  api: 3 / 4,
 };
 
 const COLLAPSED_WIDTH_PX = 80; // DDSPanel panelCollapsed width
@@ -118,6 +119,7 @@ export const CrossChapterEdgesOverlay = memo(function CrossChapterEdgesOverlay({
       requirement: 0,
       context: COLLAPSED_WIDTH_PX,
       flow: COLLAPSED_WIDTH_PX * 2,
+      api: COLLAPSED_WIDTH_PX * 3,
     };
     return offsets;
   })();

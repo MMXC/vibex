@@ -1,3 +1,10 @@
+### [Unreleased] vibex-sprint4-spec-canvas-extend E4: 导出功能 — 2026-04-18
+- **E4-U1 APICanvasExporter**: `services/dds/exporter.ts` — `exportDDSCanvasData()` converts `APIEndpointCard[]` → OpenAPI 3.0.3 JSON with tags/responses/requestBody
+- **E4-U2 SMExporter**: `exportToStateMachine()` converts `StateMachineCard[]` → StateMachine JSON with transitions mapped to `on` entries
+- **E4-U3/U4 Export Modal**: `components/dds/toolbar/DDSToolbar.tsx` + `.module.css` — modal with OpenAPI + StateMachine download buttons
+- **E4-U5 Tests**: `services/dds/__tests__/exporter.test.ts` — 16 passing tests (null guard, method mapping, transitions, responses, initial state, deduplication)
+- Commit: 9a3e239d
+
 ### [Unreleased] vibex-sprint4-spec-canvas-extend E1: API 规格章节 — 2026-04-18
 - **E1-U1 类型定义**: `types/dds/api-endpoint.ts` — `APIEndpointCard` 接口（extends BaseCard），含 HTTPMethod/APIParameter/APIResponse
 - **E1-U2 组件**: `components/dds/cards/APIEndpointCard.tsx` — method badge（颜色映射）+ path（monospace）+ summary + tags + status codes，memo 优化

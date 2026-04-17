@@ -15,7 +15,7 @@
 | E1: API 规格章节 | E1-U1 ~ E1-U5 | ✅ 5/5 | — |
 | E2: 业务规则章节 | E2-U1 ~ E2-U2 | ✅ 2/2 | — |
 | E3: 跨章节集成 | E3-U1 ~ E3-U2 | 0/2 | E3-U1 |
-| E4: 导出功能 | E4-U1 ~ E4-U5 | 0/5 | E4-U1 |
+| E4: 导出功能 | E4-U1 ~ E4-U5 | 5/5 ✅ | done |
 | E5: 章节四态规范 | E5-U1 ~ E5-U2 | 0/2 | E5-U1 |
 
 ---
@@ -293,11 +293,11 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E4-U1 | APICanvasExporter | ⬜ | E1-U1 | `exportToOpenAPI(cards)` 返回 OpenAPISpec |
-| E4-U2 | SMExporter | ⬜ | E2-U1 | `exportToStateMachine(nodes, edges)` 返回 StateMachineJSON |
-| E4-U3 | OpenAPI Export Modal | ⬜ | E4-U1 | Modal 显示 JSON 预览 + 复制/下载 |
-| E4-U4 | StateMachine Export Modal | ⬜ | E4-U2 | Modal 显示 JSON 预览 + 复制/下载 |
-| E4-U5 | Export 测试覆盖 | ⬜ | E4-U1, E4-U2 | 10 个测试用例（5 个 OpenAPI + 5 个 SM） |
+| ~~E4-U1~~ | APICanvasExporter | ⬜ | E1-U1 | `exportToOpenAPI(cards)` 返回 OpenAPISpec |
+| ~~E4-U2~~ | SMExporter | ⬜ | E2-U1 | `exportToStateMachine(nodes, edges)` 返回 StateMachineJSON |
+| ~~E4-U3~~ | OpenAPI Export Modal | ⬜ | ~~E4-U1~~ | Modal 显示 JSON 预览 + 复制/下载 |
+| ~~E4-U4~~ | StateMachine Export Modal | ⬜ | ~~E4-U2~~ | Modal 显示 JSON 预览 + 复制/下载 |
+| ~~E4-U5~~ | Export 测试覆盖 | ⬜ | E4-U1, E4-U2 | 10 个测试用例（5 个 OpenAPI + 5 个 SM） |
 
 ### E4-U1: APICanvasExporter
 

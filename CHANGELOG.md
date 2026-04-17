@@ -62,6 +62,12 @@
 - **Store 扩展**: `prototypeStore.ts` — 新增 updateNodeNavigation/updateNodeBreakpoints 方法 + ProtoNodeNavigation/ProtoNodeBreakpoints 类型
 - 提交: bd7a9dea
 
+### [Unreleased] vibex-sprint3-prototype-extend Epic3: 响应式断点 — 2026-04-18
+- **E3-U1 设备切换工具栏**: `ProtoEditor.tsx` — DeviceSwitcher（手机/平板/桌面 SVG 按钮，点击切换断点）
+- **E3-U2 breakpoint 状态**: `prototypeStore.ts` — 新增 `breakpoint: '375'|'768'|'1024'` 状态 + `setBreakpoint` 方法
+- **E3-U3 画布缩放**: `ProtoFlowCanvas.tsx` — 容器 width 根据 breakpoint 动态设置，CSS transition 平滑切换
+- 提交: 46477b60
+
 ### [Unreleased] vibex-sprint2-spec-canvas Epic3: AI 草稿生成 — 2026-04-17
 - **E3-U1 AI入口**: `DDSToolbar.tsx` — handleAIGenerate → toggleDrawer → AIDraftDrawer
 - **E3-U2 生成预览**: `AIDraftDrawer.tsx` — IDLE/LOADING/REVIEW/ERROR 状态机，prompt → /api/chat → CardPreview

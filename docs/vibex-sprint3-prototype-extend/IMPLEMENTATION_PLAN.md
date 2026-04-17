@@ -14,7 +14,7 @@
 |------|-------|--------|------|
 | E1: 页面跳转连线 | E1-U1 ~ E1-U3 | ✅ 3/3 | — |
 | E2: 组件属性面板 | E2-U1 ~ E2-U5 | ✅ 5/5 | — |
-| E3: 响应式断点 | E3-U1 ~ E3-U3 | ⬜ 0/3 | E3-U1 |
+| E3: 响应式断点 | E3-U1 ~ E3-U3 | ✅ 3/3 | — |
 | E4: AI 草图导入 | E4-U1 ~ E4-U2 | ⬜ 0/2 | E4-U1 |
 
 ---
@@ -250,9 +250,9 @@ const onNodeDoubleClick = useCallback(
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E3-U1 | ProtoEditor 设备切换工具栏 | ⬜ | — | 工具栏显示手机/平板/桌面按钮，点击切换画布宽度 |
-| E3-U2 | prototypeStore breakpoint 状态 + 断点自动标记 | ⬜ | E3-U1 | `setBreakpoint(bp)` 方法；特定断点下新增节点自动标记断点规则 |
-| E3-U3 | 画布响应式缩放渲染 | ⬜ | E3-U1, E3-U2 | 切换断点后，画布容器宽度缩放，节点应用缩放样式 |
+| E3-U1 | ProtoEditor 设备切换工具栏 | ✅ | — | 工具栏显示手机/平板/桌面按钮，点击切换画布宽度 |
+| E3-U2 | prototypeStore breakpoint 状态 | ✅ | — | `setBreakpoint(bp)` 方法；breakpoint 状态管理 |
+| E3-U3 | 画布响应式缩放渲染 | ✅ | E3-U1, E3-U2 | 切换断点后，画布容器宽度缩放，节点应用缩放样式 |
 
 ---
 

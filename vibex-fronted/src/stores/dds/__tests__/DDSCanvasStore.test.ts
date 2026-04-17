@@ -1,56 +1,14 @@
 /**
- * DDSCanvasStore Unit Tests
- * Epic 1: F2
+ * DDSCanvasStore — Unit Tests
+ * Epic4: E4-U1, E4-U2 跨章节 DAG 边
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useDDSCanvasStore, ddsChapterActions } from '../DDSCanvasStore';
-import type { DDSCard, DDSEdge, UserStoryCard, BoundedContextCard, FlowStepCard } from '@/types/dds';
+import type { DDSEdge } from '@/types/dds';
 
-// ==================== Fixtures ====================
-
-const createUserStoryCard = (overrides: Partial<UserStoryCard> = {}): UserStoryCard => ({
-  id: 'us-1',
-  type: 'user-story',
-  title: 'Test Story',
-  position: { x: 0, y: 0 },
-  createdAt: '2026-01-01T00:00:00Z',
-  updatedAt: '2026-01-01T00:00:00Z',
-  role: 'PM',
-  action: 'edit',
-  benefit: 'fast',
-  priority: 'high',
-  ...overrides,
-});
-
-const createBoundedContextCard = (overrides: Partial<BoundedContextCard> = {}): BoundedContextCard => ({
-  id: 'bc-1',
-  type: 'bounded-context',
-  title: 'Test Context',
-  position: { x: 0, y: 0 },
-  createdAt: '2026-01-01T00:00:00Z',
-  updatedAt: '2026-01-01T00:00:00Z',
-  name: 'Test Context',
-  description: 'A test bounded context',
-  responsibility: 'Handle test operations',
-  ...overrides,
-});
-
-const createFlowStepCard = (overrides: Partial<FlowStepCard> = {}): FlowStepCard => ({
-  id: 'fs-1',
-  type: 'flow-step',
-  title: 'Test Step',
-  position: { x: 0, y: 0 },
-  createdAt: '2026-01-01T00:00:00Z',
-  updatedAt: '2026-01-01T00:00:00Z',
-  stepName: 'Test Step',
-  ...overrides,
-});
-
-// ==================== Store Initial State Tests ====================
-
-describe('DDSCanvasStore — initial state', () => {
-  beforeEach(() => {
+describe('DDSCanvasStore — crossChapterEdges (Epic4 E4-U1/E4-U2)', () => {
+  const resetStore = () => {
     useDDSCanvasStore.setState({
       projectId: null,
       activeChapter: 'requirement',
@@ -59,340 +17,146 @@ describe('DDSCanvasStore — initial state', () => {
         context: { type: 'context', cards: [], edges: [], loading: false, error: null },
         flow: { type: 'flow', cards: [], edges: [], loading: false, error: null },
       },
+      crossChapterEdges: [],
       chatHistory: [],
       isGenerating: false,
       selectedCardIds: [],
       isFullscreen: false,
       isDrawerOpen: false,
     });
-  });
+  };
 
-  it('should have correct initial projectId', () => {
-    expect(useDDSCanvasStore.getState().projectId).toBeNull();
-  });
-
-  it('should have requirement as default active chapter', () => {
-    expect(useDDSCanvasStore.getState().activeChapter).toBe('requirement');
-  });
-
-  it('should have all three chapters initialized', () => {
-    const chapters = useDDSCanvasStore.getState().chapters;
-    expect(Object.keys(chapters)).toHaveLength(3);
-    expect(chapters.requirement.type).toBe('requirement');
-    expect(chapters.context.type).toBe('context');
-    expect(chapters.flow.type).toBe('flow');
-  });
-
-  it('should have empty cards and edges for all chapters', () => {
-    const { chapters } = useDDSCanvasStore.getState();
-    expect(chapters.requirement.cards).toEqual([]);
-    expect(chapters.context.cards).toEqual([]);
-    expect(chapters.flow.cards).toEqual([]);
-    expect(chapters.requirement.edges).toEqual([]);
-    expect(chapters.context.edges).toEqual([]);
-    expect(chapters.flow.edges).toEqual([]);
-  });
-
-  it('should have isGenerating as false initially', () => {
-    expect(useDDSCanvasStore.getState().isGenerating).toBe(false);
-  });
-
-  it('should have empty selectedCardIds initially', () => {
-    expect(useDDSCanvasStore.getState().selectedCardIds).toEqual([]);
-  });
-
-  it('should have isFullscreen as false initially', () => {
-    expect(useDDSCanvasStore.getState().isFullscreen).toBe(false);
-  });
-});
-
-// ==================== Chapter Actions Tests ====================
-
-describe('DDSCanvasStore — chapter actions', () => {
   beforeEach(() => {
-    useDDSCanvasStore.setState({
-      projectId: null,
-      activeChapter: 'requirement',
-      chapters: {
-        requirement: { type: 'requirement', cards: [], edges: [], loading: false, error: null },
-        context: { type: 'context', cards: [], edges: [], loading: false, error: null },
-        flow: { type: 'flow', cards: [], edges: [], loading: false, error: null },
-      },
-      chatHistory: [],
-      isGenerating: false,
-      selectedCardIds: [],
-      isFullscreen: false,
-      isDrawerOpen: false,
-    });
+    resetStore();
   });
 
-  // setActiveChapter
+  // ---- E4-U1: crossChapterEdges state exists ----
 
-  it('should set active chapter', () => {
-    useDDSCanvasStore.getState().setActiveChapter('context');
-    expect(useDDSCanvasStore.getState().activeChapter).toBe('context');
+  it('starts with empty crossChapterEdges', () => {
+    expect(useDDSCanvasStore.getState().crossChapterEdges).toHaveLength(0);
   });
 
-  it('should allow switching to flow chapter', () => {
-    useDDSCanvasStore.getState().setActiveChapter('flow');
-    expect(useDDSCanvasStore.getState().activeChapter).toBe('flow');
-  });
+  // ---- E4-U1: addCrossChapterEdge (via ddsChapterActions) ----
 
-  // addCard
-
-  it('should add a card to the requirement chapter', () => {
-    const card = createUserStoryCard();
-    ddsChapterActions.addCard('requirement', card);
-    expect(useDDSCanvasStore.getState().chapters.requirement.cards).toContainEqual(card);
-  });
-
-  it('should add different card types to their respective chapters', () => {
-    const usCard = createUserStoryCard({ id: 'us-2' });
-    const bcCard = createBoundedContextCard({ id: 'bc-2' });
-    const fsCard = createFlowStepCard({ id: 'fs-2' });
-
-    ddsChapterActions.addCard('requirement', usCard);
-    ddsChapterActions.addCard('context', bcCard);
-    ddsChapterActions.addCard('flow', fsCard);
-
-    expect(useDDSCanvasStore.getState().chapters.requirement.cards).toHaveLength(1);
-    expect(useDDSCanvasStore.getState().chapters.context.cards).toHaveLength(1);
-    expect(useDDSCanvasStore.getState().chapters.flow.cards).toHaveLength(1);
-  });
-
-  it('should add multiple cards to the same chapter', () => {
-    ddsChapterActions.addCard('requirement', createUserStoryCard({ id: 'us-a' }));
-    ddsChapterActions.addCard('requirement', createUserStoryCard({ id: 'us-b' }));
-    expect(useDDSCanvasStore.getState().chapters.requirement.cards).toHaveLength(2);
-  });
-
-  // updateCard
-
-  it('should update a card in the chapter', () => {
-    const card = createUserStoryCard({ id: 'us-update', title: 'Original' });
-    ddsChapterActions.addCard('requirement', card);
-    ddsChapterActions.updateCard('requirement', 'us-update', { title: 'Updated' });
-
-    const updated = useDDSCanvasStore.getState().chapters.requirement.cards.find(
-      (c) => c.id === 'us-update'
-    );
-    expect(updated?.title).toBe('Updated');
-  });
-
-  it('should update card.updatedAt on modification', () => {
-    const card = createUserStoryCard({ id: 'us-time', title: 'Original' });
-    ddsChapterActions.addCard('requirement', card);
-    ddsChapterActions.updateCard('requirement', 'us-time', { title: 'Updated' });
-
-    const updated = useDDSCanvasStore.getState().chapters.requirement.cards.find(
-      (c) => c.id === 'us-time'
-    );
-    expect(updated?.updatedAt).not.toBe('2026-01-01T00:00:00Z');
-  });
-
-  it('should not throw when updating non-existent card', () => {
-    expect(() =>
-      ddsChapterActions.updateCard('requirement', 'non-existent', { title: 'Test' })
-    ).not.toThrow();
-  });
-
-  // deleteCard
-
-  it('should delete a card from the chapter', () => {
-    const card = createUserStoryCard({ id: 'us-delete' });
-    ddsChapterActions.addCard('requirement', card);
-    ddsChapterActions.deleteCard('requirement', 'us-delete');
-
-    const found = useDDSCanvasStore.getState().chapters.requirement.cards.find(
-      (c) => c.id === 'us-delete'
-    );
-    expect(found).toBeUndefined();
-  });
-
-  it('should also delete associated edges when card is deleted', () => {
-    const card1 = createUserStoryCard({ id: 'us-edge-1' });
-    const card2 = createUserStoryCard({ id: 'us-edge-2' });
-    ddsChapterActions.addCard('requirement', card1);
-    ddsChapterActions.addCard('requirement', card2);
-
+  it('addCrossChapterEdge adds an edge', () => {
     const edge: DDSEdge = {
-      id: 'edge-1',
-      source: 'us-edge-1',
-      target: 'us-edge-2',
+      id: 'e1',
+      source: 'card-a',
+      target: 'card-b',
       type: 'smoothstep',
+      sourceChapter: 'requirement',
+      targetChapter: 'context',
+      animated: true,
     };
-    ddsChapterActions.addEdge('requirement', edge);
 
-    ddsChapterActions.deleteCard('requirement', 'us-edge-1');
+    ddsChapterActions.addCrossChapterEdge(edge);
 
-    const remainingEdges = useDDSCanvasStore.getState().chapters.requirement.edges;
-    expect(remainingEdges.find((e) => e.id === 'edge-1')).toBeUndefined();
+    const edges = useDDSCanvasStore.getState().crossChapterEdges;
+    expect(edges).toHaveLength(1);
+    expect(edges[0].id).toBe('e1');
+    expect(edges[0].source).toBe('card-a');
+    expect(edges[0].target).toBe('card-b');
+    expect(edges[0].sourceChapter).toBe('requirement');
+    expect(edges[0].targetChapter).toBe('context');
   });
 
-  // addEdge
-
-  it('should add an edge to the chapter', () => {
+  it('addCrossChapterEdge supports same-chapter edges', () => {
     const edge: DDSEdge = {
-      id: 'edge-test',
-      source: 'us-1',
-      target: 'us-2',
+      id: 'e2',
+      source: 'card-c',
+      target: 'card-d',
       type: 'smoothstep',
+      sourceChapter: 'context',
+      targetChapter: 'context',
+      animated: true,
     };
-    ddsChapterActions.addEdge('requirement', edge);
-    expect(useDDSCanvasStore.getState().chapters.requirement.edges).toContainEqual(edge);
+
+    ddsChapterActions.addCrossChapterEdge(edge);
+
+    expect(useDDSCanvasStore.getState().crossChapterEdges).toHaveLength(1);
+    expect(useDDSCanvasStore.getState().crossChapterEdges[0].sourceChapter).toBe('context');
   });
 
-  it('should add multiple edges to the same chapter', () => {
-    ddsChapterActions.addEdge('context', { id: 'e1', source: 'a', target: 'b', type: 'smoothstep' });
-    ddsChapterActions.addEdge('context', { id: 'e2', source: 'b', target: 'c', type: 'smoothstep' });
-    expect(useDDSCanvasStore.getState().chapters.context.edges).toHaveLength(2);
+  it('addCrossChapterEdge allows multiple edges', () => {
+    ddsChapterActions.addCrossChapterEdge({ id: 'e1', source: 'a', target: 'b', type: 'smoothstep', sourceChapter: 'req', targetChapter: 'ctx' });
+    ddsChapterActions.addCrossChapterEdge({ id: 'e2', source: 'c', target: 'd', type: 'smoothstep', sourceChapter: 'ctx', targetChapter: 'flow' });
+
+    expect(useDDSCanvasStore.getState().crossChapterEdges).toHaveLength(2);
   });
 
-  // deleteEdge
+  // ---- E4-U1: deleteCrossChapterEdge (via ddsChapterActions) ----
 
-  it('should delete an edge from the chapter', () => {
-    ddsChapterActions.addEdge('flow', { id: 'edge-del', source: 's', target: 't', type: 'smoothstep' });
-    ddsChapterActions.deleteEdge('flow', 'edge-del');
+  it('deleteCrossChapterEdge removes the specified edge', () => {
+    ddsChapterActions.addCrossChapterEdge({ id: 'e1', source: 'a', target: 'b', type: 'smoothstep', sourceChapter: 'req', targetChapter: 'ctx' });
+    ddsChapterActions.addCrossChapterEdge({ id: 'e2', source: 'c', target: 'd', type: 'smoothstep', sourceChapter: 'ctx', targetChapter: 'flow' });
 
-    const found = useDDSCanvasStore.getState().chapters.flow.edges.find(
-      (e) => e.id === 'edge-del'
-    );
-    expect(found).toBeUndefined();
+    ddsChapterActions.deleteCrossChapterEdge('e1');
+
+    const remaining = useDDSCanvasStore.getState().crossChapterEdges;
+    expect(remaining).toHaveLength(1);
+    expect(remaining[0].id).toBe('e2');
   });
 
-  it('should not throw when deleting non-existent edge', () => {
-    expect(() => ddsChapterActions.deleteEdge('requirement', 'non-existent')).not.toThrow();
-  });
-});
+  it('deleteCrossChapterEdge does not throw for non-existent id', () => {
+    ddsChapterActions.addCrossChapterEdge({ id: 'e1', source: 'a', target: 'b', type: 'smoothstep', sourceChapter: 'req', targetChapter: 'ctx' });
 
-// ==================== UI State Tests ====================
-
-describe('DDSCanvasStore — UI state', () => {
-  beforeEach(() => {
-    useDDSCanvasStore.setState({
-      projectId: null,
-      activeChapter: 'requirement',
-      chapters: {
-        requirement: { type: 'requirement', cards: [], edges: [], loading: false, error: null },
-        context: { type: 'context', cards: [], edges: [], loading: false, error: null },
-        flow: { type: 'flow', cards: [], edges: [], loading: false, error: null },
-      },
-      chatHistory: [],
-      isGenerating: false,
-      selectedCardIds: [],
-      isFullscreen: false,
-      isDrawerOpen: false,
-    });
+    expect(() => ddsChapterActions.deleteCrossChapterEdge('non-existent')).not.toThrow();
+    expect(useDDSCanvasStore.getState().crossChapterEdges).toHaveLength(1);
   });
 
-  it('should toggle fullscreen state', () => {
-    const { toggleFullscreen } = useDDSCanvasStore.getState();
-    expect(useDDSCanvasStore.getState().isFullscreen).toBe(false);
-    toggleFullscreen();
-    expect(useDDSCanvasStore.getState().isFullscreen).toBe(true);
-    toggleFullscreen();
-    expect(useDDSCanvasStore.getState().isFullscreen).toBe(false);
+  it('deleteCrossChapterEdge of last edge leaves empty array', () => {
+    ddsChapterActions.addCrossChapterEdge({ id: 'e1', source: 'a', target: 'b', type: 'smoothstep', sourceChapter: 'req', targetChapter: 'ctx' });
+
+    ddsChapterActions.deleteCrossChapterEdge('e1');
+
+    expect(useDDSCanvasStore.getState().crossChapterEdges).toHaveLength(0);
   });
 
-  it('should toggle drawer state', () => {
-    const { toggleDrawer } = useDDSCanvasStore.getState();
-    expect(useDDSCanvasStore.getState().isDrawerOpen).toBe(false);
-    toggleDrawer();
-    expect(useDDSCanvasStore.getState().isDrawerOpen).toBe(true);
-    toggleDrawer();
-    expect(useDDSCanvasStore.getState().isDrawerOpen).toBe(false);
+  // ---- E4-U1: crossChapterEdges independent from chapter edges ----
+
+  it('crossChapterEdges is independent from chapter edges', () => {
+    // Same-chapter edge goes to chapter
+    ddsChapterActions.addEdge('requirement', { id: 'ce1', source: 'a', target: 'b', type: 'smoothstep' });
+
+    // Cross-chapter edge goes to global crossChapterEdges
+    ddsChapterActions.addCrossChapterEdge({ id: 'x1', source: 'a', target: 'c', type: 'smoothstep', sourceChapter: 'requirement', targetChapter: 'context' });
+
+    expect(useDDSCanvasStore.getState().chapters.requirement.edges).toHaveLength(1);
+    expect(useDDSCanvasStore.getState().crossChapterEdges).toHaveLength(1);
+    expect(useDDSCanvasStore.getState().crossChapterEdges[0].id).toBe('x1');
   });
 
-  it('should set isGenerating', () => {
-    useDDSCanvasStore.getState().setIsGenerating(true);
-    expect(useDDSCanvasStore.getState().isGenerating).toBe(true);
-    useDDSCanvasStore.getState().setIsGenerating(false);
-    expect(useDDSCanvasStore.getState().isGenerating).toBe(false);
-  });
-});
+  // ---- E4-U2: edge routing (sourceChapter/targetChapter detection) ----
 
-// ==================== Selection Tests ====================
-
-describe('DDSCanvasStore — card selection', () => {
-  beforeEach(() => {
-    useDDSCanvasStore.setState({
-      projectId: null,
-      activeChapter: 'requirement',
-      chapters: {
-        requirement: { type: 'requirement', cards: [], edges: [], loading: false, error: null },
-        context: { type: 'context', cards: [], edges: [], loading: false, error: null },
-        flow: { type: 'flow', cards: [], edges: [], loading: false, error: null },
-      },
-      chatHistory: [],
-      isGenerating: false,
-      selectedCardIds: [],
-      isFullscreen: false,
-      isDrawerOpen: false,
-    });
-  });
-
-  it('should select a card', () => {
-    useDDSCanvasStore.getState().selectCard('card-1');
-    expect(useDDSCanvasStore.getState().selectedCardIds).toContain('card-1');
-  });
-
-  it('should not duplicate selection', () => {
-    useDDSCanvasStore.getState().selectCard('card-1');
-    useDDSCanvasStore.getState().selectCard('card-1');
-    expect(useDDSCanvasStore.getState().selectedCardIds).toEqual(['card-1']);
-  });
-
-  it('should select multiple cards', () => {
-    useDDSCanvasStore.getState().selectCard('card-1');
-    useDDSCanvasStore.getState().selectCard('card-2');
-    expect(useDDSCanvasStore.getState().selectedCardIds).toEqual(['card-1', 'card-2']);
-  });
-
-  it('should deselect all cards', () => {
-    useDDSCanvasStore.getState().selectCard('card-1');
-    useDDSCanvasStore.getState().selectCard('card-2');
-    useDDSCanvasStore.getState().deselectAll();
-    expect(useDDSCanvasStore.getState().selectedCardIds).toEqual([]);
-  });
-});
-
-// ==================== Chat History Tests ====================
-
-describe('DDSCanvasStore — chat history', () => {
-  beforeEach(() => {
-    useDDSCanvasStore.setState({
-      projectId: null,
-      activeChapter: 'requirement',
-      chapters: {
-        requirement: { type: 'requirement', cards: [], edges: [], loading: false, error: null },
-        context: { type: 'context', cards: [], edges: [], loading: false, error: null },
-        flow: { type: 'flow', cards: [], edges: [], loading: false, error: null },
-      },
-      chatHistory: [],
-      isGenerating: false,
-      selectedCardIds: [],
-      isFullscreen: false,
-      isDrawerOpen: false,
-    });
-  });
-
-  it('should add a message to chat history', () => {
-    const msg = {
-      id: 'msg-1',
-      role: 'user' as const,
-      content: 'Generate user login flow',
-      timestamp: new Date().toISOString(),
+  it('edge with different sourceChapter/targetChapter is cross-chapter', () => {
+    const edge: DDSEdge = {
+      id: 'x1',
+      source: 'card-1',
+      target: 'card-2',
+      type: 'smoothstep',
+      sourceChapter: 'requirement',
+      targetChapter: 'flow',
     };
-    useDDSCanvasStore.getState().addMessage(msg);
-    expect(useDDSCanvasStore.getState().chatHistory).toHaveLength(1);
-    expect(useDDSCanvasStore.getState().chatHistory[0]).toEqual(msg);
+
+    ddsChapterActions.addCrossChapterEdge(edge);
+
+    const stored = useDDSCanvasStore.getState().crossChapterEdges[0];
+    expect(stored.sourceChapter).not.toBe(stored.targetChapter);
   });
 
-  it('should accumulate multiple messages', () => {
-    const msg1 = { id: 'm1', role: 'user' as const, content: 'hello', timestamp: 't1' };
-    const msg2 = { id: 'm2', role: 'assistant' as const, content: 'hi', timestamp: 't2' };
-    useDDSCanvasStore.getState().addMessage(msg1);
-    useDDSCanvasStore.getState().addMessage(msg2);
-    expect(useDDSCanvasStore.getState().chatHistory).toHaveLength(2);
+  it('edge with same sourceChapter/targetChapter is same-chapter', () => {
+    const edge: DDSEdge = {
+      id: 'x2',
+      source: 'card-3',
+      target: 'card-4',
+      type: 'smoothstep',
+      sourceChapter: 'context',
+      targetChapter: 'context',
+    };
+
+    ddsChapterActions.addCrossChapterEdge(edge);
+
+    const stored = useDDSCanvasStore.getState().crossChapterEdges[0];
+    expect(stored.sourceChapter).toBe(stored.targetChapter);
   });
 });

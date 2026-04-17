@@ -76,7 +76,7 @@ export interface PrototypeStoreState {
   removePage: (pageId: string) => void;
 
   // ---- Edge Actions (Sprint3 E1) ----
-  addEdge: (source: string, target: string) => void;
+  addEdge: (source: string, target: string) => string;
   removeEdge: (edgeId: string) => void;
 
   // ---- Import / Export ----
@@ -185,8 +185,8 @@ export const usePrototypeStore = create<PrototypeStoreState>()(
       },
 
       // ---- Edge Actions (Sprint3 E1) ----
-      addEdge: (source: string, target: string) => {
-        if (!source || !target) return;
+      addEdge: (source: string, target: string): string => {
+        if (!source || !target) return '';
         const id = `edge-${generateId()}`;
         set((state) => ({
           edges: [
@@ -200,6 +200,7 @@ export const usePrototypeStore = create<PrototypeStoreState>()(
             },
           ],
         }));
+        return id;
       },
 
       removeEdge: (edgeId: string) => {

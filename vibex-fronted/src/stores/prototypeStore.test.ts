@@ -241,4 +241,63 @@ describe('prototypeStore', () => {
     expect(state.edges).toHaveLength(0);
     expect(state.selectedNodeId).toBeNull();
   });
+
+  // ---- Sprint3 E1: addEdge/removeEdge ----
+
+  it('adds an edge to the store', () => {
+    const { addEdge } = usePrototypeStore.getState();
+    addEdge('node-1', 'node-2');
+    const edges = usePrototypeStore.getState().edges;
+    expect(edges).toHaveLength(1);
+    expect(edges[0].source).toBe('node-1');
+    expect(edges[0].target).toBe('node-2');
+    expect(edges[0].type).toBe('smoothstep');
+    expect(edges[0].animated).toBe(true);
+  });
+
+  it('addEdge generates a unique id for each edge', () => {
+    const { addEdge } = usePrototypeStore.getState();
+    const id1 = addEdge('a', 'b');
+    const id2 = addEdge('c', 'd');
+    expect(id1).not.toBe(id2);
+  });
+
+  it('addEdge ignores empty source or target', () => {
+    const { addEdge } = usePrototypeStore.getState();
+    addEdge('', 'node-2');
+    addEdge('node-1', '');
+    expect(usePrototypeStore.getState().edges).toHaveLength(0);
+  });
+
+  it('removes an edge by id', () => {
+    const { addEdge, removeEdge } = usePrototypeStore.getState();
+    const id = addEdge('node-1', 'node-2');
+    addEdge('node-3', 'node-4');
+    removeEdge(id);
+    const edges = usePrototypeStore.getState().edges;
+    expect(edges).toHaveLength(1);
+    expect(edges[0].source).toBe('node-3');
+  });
+
+  it('removeEdge does not throw for non-existent id', () => {
+    const { addEdge, removeEdge } = usePrototypeStore.getState();
+    addEdge('node-1', 'node-2');
+    expect(() => removeEdge('non-existent')).not.toThrow();
+    expect(usePrototypeStore.getState().edges).toHaveLength(1);
+  });
+
+  it('removeEdge of last edge leaves empty array', () => {
+    const { addEdge, removeEdge } = usePrototypeStore.getState();
+    const id = addEdge('node-1', 'node-2');
+    removeEdge(id);
+    expect(usePrototypeStore.getState().edges).toHaveLength(0);
+  });
+
+  it('edges are independent from nodes', () => {
+    const { addNode, addEdge } = usePrototypeStore.getState();
+    addNode({ id: 'c1', type: 'button', name: 'Button', props: {} }, { x: 0, y: 0 });
+    addEdge('node-1', 'node-2');
+    expect(usePrototypeStore.getState().nodes).toHaveLength(1);
+    expect(usePrototypeStore.getState().edges).toHaveLength(1);
+  });
 });

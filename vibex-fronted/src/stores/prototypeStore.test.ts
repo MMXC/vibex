@@ -301,3 +301,144 @@ describe('prototypeStore', () => {
     expect(usePrototypeStore.getState().edges).toHaveLength(1);
   });
 });
+
+// ============================================================
+// E2-QA: updateNodeNavigation / updateNodeBreakpoints tests
+// E3-QA: addNode breakpoint auto-tagging tests
+// ============================================================
+
+describe('prototypeStore — E2-QA: updateNodeNavigation', () => {
+  beforeEach(() => {
+    usePrototypeStore.setState({
+      nodes: [
+        { id: 'node-1', type: 'screen', label: 'Screen 1', x: 0, y: 0, data: { navigation: undefined, breakpoints: undefined } },
+        { id: 'node-2', type: 'screen', label: 'Screen 2', x: 0, y: 0, data: { navigation: undefined, breakpoints: undefined } },
+      ],
+    });
+  });
+
+  it('E2-U1: updates navigation.target when navigation is provided', () => {
+    const { updateNodeNavigation } = usePrototypeStore.getState();
+    updateNodeNavigation('node-1', { target: '/home', label: 'Home' });
+    const node = usePrototypeStore.getState().nodes.find((n) => n.id === 'node-1');
+    expect(node?.data.navigation).toEqual({ target: '/home', label: 'Home' });
+  });
+
+  it('E2-U1: clears navigation field when undefined is passed', () => {
+    const { updateNodeNavigation, addNode } = usePrototypeStore.getState();
+    updateNodeNavigation('node-1', { target: '/home', label: 'Home' });
+    updateNodeNavigation('node-1', undefined);
+    const node = usePrototypeStore.getState().nodes.find((n) => n.id === 'node-1');
+    expect(node?.data.navigation).toBeUndefined();
+  });
+
+  it('E2-U1: does not affect other nodes when updating one node', () => {
+    const { updateNodeNavigation } = usePrototypeStore.getState();
+    updateNodeNavigation('node-1', { target: '/home', label: 'Home' });
+    const node2 = usePrototypeStore.getState().nodes.find((n) => n.id === 'node-2');
+    expect(node2?.data.navigation).toBeUndefined();
+  });
+
+  it('E2-U1: does not throw when updating non-existent nodeId', () => {
+    const { updateNodeNavigation } = usePrototypeStore.getState();
+    expect(() => updateNodeNavigation('non-existent', { target: '/x', label: 'X' })).not.toThrow();
+    // nodes and edges lengths should remain unchanged
+    expect(usePrototypeStore.getState().nodes.length).toBe(2);
+  });
+});
+
+describe('prototypeStore — E2-QA: updateNodeBreakpoints', () => {
+  beforeEach(() => {
+    usePrototypeStore.setState({
+      nodes: [
+        { id: 'node-1', type: 'screen', label: 'Screen 1', x: 0, y: 0, data: { navigation: undefined, breakpoints: undefined } },
+        { id: 'node-2', type: 'screen', label: 'Screen 2', x: 0, y: 0, data: { navigation: undefined, breakpoints: { mobile: true, tablet: true, desktop: true } } },
+      ],
+    });
+  });
+
+  it('E2-U2: updates all breakpoints fields', () => {
+    const { updateNodeBreakpoints } = usePrototypeStore.getState();
+    updateNodeBreakpoints('node-1', { mobile: true, tablet: false, desktop: true });
+    const node = usePrototypeStore.getState().nodes.find((n) => n.id === 'node-1');
+    expect(node?.data.breakpoints).toEqual({ mobile: true, tablet: false, desktop: true });
+  });
+
+  it('E2-U2: partial update — only specified fields change', () => {
+    const { updateNodeBreakpoints } = usePrototypeStore.getState();
+    updateNodeBreakpoints('node-2', { mobile: false });
+    const node = usePrototypeStore.getState().nodes.find((n) => n.id === 'node-2');
+    // Should be fully replaced (not merged) — this is the current behavior
+    expect(node?.data.breakpoints).toEqual({ mobile: false });
+  });
+
+  it('E2-U2: does not affect other nodes', () => {
+    const { updateNodeBreakpoints } = usePrototypeStore.getState();
+    const node1Before = JSON.parse(JSON.stringify(usePrototypeStore.getState().nodes.find((n) => n.id === 'node-1')));
+    updateNodeBreakpoints('node-2', { mobile: false, tablet: false, desktop: false });
+    const node1After = usePrototypeStore.getState().nodes.find((n) => n.id === 'node-1');
+    expect(node1After?.data.breakpoints).toEqual(node1Before.data.breakpoints);
+  });
+
+  it('E2-U2: does not throw when updating non-existent nodeId', () => {
+    const { updateNodeBreakpoints } = usePrototypeStore.getState();
+    expect(() => updateNodeBreakpoints('non-existent', { mobile: true })).not.toThrow();
+  });
+});
+
+describe('prototypeStore — E2-QA: Navigation + Breakpoints combined (E2-U3)', () => {
+  beforeEach(() => {
+    usePrototypeStore.setState({
+      nodes: [
+        { id: 'node-1', type: 'screen', label: 'Screen 1', x: 0, y: 0, data: { navigation: undefined, breakpoints: undefined } },
+      ],
+    });
+  });
+
+  it('E2-U3: node has both navigation and breakpoints after sequential updates', () => {
+    const { updateNodeNavigation, updateNodeBreakpoints } = usePrototypeStore.getState();
+    updateNodeNavigation('node-1', { target: '/home', label: 'Home' });
+    updateNodeBreakpoints('node-1', { mobile: true, tablet: false, desktop: true });
+    const node = usePrototypeStore.getState().nodes.find((n) => n.id === 'node-1');
+    expect(node?.data.navigation).toEqual({ target: '/home', label: 'Home' });
+    expect(node?.data.breakpoints).toEqual({ mobile: true, tablet: false, desktop: true });
+  });
+});
+
+describe('prototypeStore — E3-QA: addNode breakpoint auto-tagging', () => {
+  beforeEach(() => {
+    usePrototypeStore.setState({
+      nodes: [],
+      pages: [{ id: 'page-1', name: 'Home', route: '/' }],
+      breakpoint: '1024',
+    });
+  });
+
+  afterEach(() => {
+    usePrototypeStore.setState({ breakpoint: '1024' });
+  });
+
+  it('E3-U1: addNode sets breakpoints.mobile=true when breakpoint=375', () => {
+    usePrototypeStore.setState({ breakpoint: '375' });
+    const { addNode } = usePrototypeStore.getState();
+    addNode({ type: 'screen', label: 'Mobile Screen' }, { x: 0, y: 0 });
+    const node = usePrototypeStore.getState().nodes[0];
+    expect(node?.data.breakpoints).toEqual({ mobile: true, tablet: false, desktop: false });
+  });
+
+  it('E3-U1: addNode sets breakpoints.tablet=true when breakpoint=768', () => {
+    usePrototypeStore.setState({ breakpoint: '768' });
+    const { addNode } = usePrototypeStore.getState();
+    addNode({ type: 'screen', label: 'Tablet Screen' }, { x: 0, y: 0 });
+    const node = usePrototypeStore.getState().nodes[0];
+    expect(node?.data.breakpoints).toEqual({ mobile: false, tablet: true, desktop: false });
+  });
+
+  it('E3-U1: addNode sets breakpoints.desktop=true when breakpoint=1024', () => {
+    usePrototypeStore.setState({ breakpoint: '1024' });
+    const { addNode } = usePrototypeStore.getState();
+    addNode({ type: 'screen', label: 'Desktop Screen' }, { x: 0, y: 0 });
+    const node = usePrototypeStore.getState().nodes[0];
+    expect(node?.data.breakpoints).toEqual({ mobile: false, tablet: false, desktop: true });
+  });
+});

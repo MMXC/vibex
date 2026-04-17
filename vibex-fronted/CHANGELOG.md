@@ -54,6 +54,13 @@
 - **测试**: ChapterPanel 24/24, CrossChapterEdgesOverlay 5/5, DDSToolbar 15/15
 - **提交**: `f3271119` (E3-U1) + `92f1e00d` (E3-U2 tests)
 
+### [vibex-sprint4-spec-canvas-extend E4: 导出功能] — 2026-04-18
+- **E4-U1 APICanvasExporter**: `services/dds/exporter.ts` — `exportDDSCanvasData()` converts `APIEndpointCard[]` → OpenAPI 3.0.3 JSON
+- **E4-U2 SMExporter**: `exportToStateMachine()` converts `StateMachineCard[]` → StateMachine JSON with transitions
+- **E4-U3/U4 Export Modal**: DDSToolbar modal with OpenAPI + StateMachine download buttons
+- **E4-U5 Tests**: `exporter.test.ts` — 16 passing tests
+- **提交**: `9a3e239d` (E4-U1~U5)
+
 - **根因**: Tab 切换后刷新页面，三树（Component/BusinessFlow/BoundedContext）状态丢失
 - **修复**: useRehydrateCanvasStores hook，skipHydration + 客户端 rehydration
 - **测试**: 4/4 PASS (TC-E6-01~04)

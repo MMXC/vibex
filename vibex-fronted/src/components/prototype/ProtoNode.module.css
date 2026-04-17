@@ -1,0 +1,361 @@
+/**
+ * ProtoNode — CSS Module
+ * Epic1: E1-U3
+ */
+
+/* ---- Node Wrapper ---- */
+
+.node {
+  position: relative;
+  min-width: 120px;
+  max-width: 280px;
+  background: var(--color-surface, #1e1e2e);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: visible;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.nodeSelected {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.35), 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ---- Node Badge ---- */
+
+.nodeBadge {
+  position: absolute;
+  top: -10px;
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(30, 30, 46, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+  z-index: 1;
+}
+
+/* ---- Node Content ---- */
+
+.nodeContent {
+  padding: 16px 12px 12px;
+}
+
+/* ---- Fallback ---- */
+
+.protoFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+}
+
+.protoFallbackLabel {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  font-style: italic;
+}
+
+/* ---- Button ---- */
+
+.protoButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: default;
+  transition: opacity 0.15s;
+}
+
+.loadingDot {
+  width: 10px;
+  height: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- Input ---- */
+
+.protoInputWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.protoInputLabel {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.protoInput {
+  padding: 6px 10px;
+  font-size: 12px;
+  font-family: inherit;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ---- Card ---- */
+
+.protoCard {
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.protoCardTitle {
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.protoCardBody {
+  padding: 10px 12px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.protoCardHover {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.03);
+  pointer-events: none;
+}
+
+/* ---- Container ---- */
+
+.protoContainer {
+  display: flex;
+  align-items: center;
+  min-height: 50px;
+  border: 1.5px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.protoContainerFluid {
+  width: 100%;
+}
+
+.protoContainerDashed {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* ---- Header ---- */
+
+.protoHeader {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 6px 6px 0 0;
+}
+
+.protoHeaderTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ---- Navigation ---- */
+
+.protoNav {
+  display: flex;
+  gap: 4px;
+}
+
+.protoNavItem,
+.protoNavItemActive {
+  padding: 4px 10px;
+  font-size: 11px;
+  border-radius: 4px;
+  cursor: default;
+}
+
+.protoNavItem {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.protoNavItemActive {
+  color: #fff;
+  background: rgba(99, 102, 241, 0.4);
+}
+
+/* ---- Modal ---- */
+
+.protoModal {
+  position: relative;
+}
+
+.protoModalOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.protoModalBox {
+  width: 80%;
+  background: #2a2a3e;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.protoModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.protoModalClose {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: default;
+}
+
+.protoModalBody {
+  padding: 10px 12px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ---- Table ---- */
+
+.protoTable {
+  overflow: hidden;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.protoTable table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.protoTable th {
+  padding: 6px 10px;
+  text-align: left;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.protoTable td {
+  padding: 5px 10px;
+  color: rgba(255, 255, 255, 0.6);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.protoTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.protoTableMore {
+  padding: 4px 10px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  text-align: center;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ---- Form ---- */
+
+.protoForm {
+  display: flex;
+  gap: 8px;
+}
+
+.protoFormItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.protoFormLabel {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.protoFormInput {
+  padding: 5px 8px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  min-width: 60px;
+}
+
+.protoFormBtn {
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #fff;
+  background: rgba(99, 102, 241, 0.7);
+  border-radius: 4px;
+  align-self: flex-end;
+}
+
+/* ---- Image ---- */
+
+.protoImageWrap {
+  width: 100%;
+  height: 80px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.protoImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.protoImagePlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 11px;
+}

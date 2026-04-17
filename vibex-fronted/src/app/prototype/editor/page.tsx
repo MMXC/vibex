@@ -1538,14 +1538,8 @@ function EditorContent() {
   );
 }
 
+import { ProtoEditor } from '@/components/prototype/ProtoEditor';
+
 export default function PrototypeEditor() {
-  return (
-    <Suspense
-      fallback={
-        <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>
-      }
-    >
-      <EditorContent />
-    </Suspense>
-  );
+  return <ProtoEditor />;
 }

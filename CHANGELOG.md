@@ -1,3 +1,14 @@
+### [Unreleased] vibex-sprint1-prototype-canvas Epic1: 拖拽布局编辑器 — 2026-04-17
+- **E1-U1 组件面板**: `ComponentPanel.tsx` — 左侧面板展示 10 个默认组件，支持 HTML5 drag-and-drop
+- **E1-U2 React Flow 画布**: `ProtoFlowCanvas.tsx` — 接收组件拖拽，节点自由定位，MiniMap + Controls
+- **E1-U3 自定义节点渲染**: `ProtoNode.tsx` — 10 种组件类型的真实 UI 渲染（Button/Input/Card/Container/Header/Navigation/Modal/Table/Form/Image）
+- **E1-U4 属性面板**: `ProtoAttrPanel.tsx` — Props Tab + Mock 数据 Tab，支持实时编辑和保存
+- **E1-E3 路由抽屉**: `RoutingDrawer.tsx` — 页面列表视图，支持增删页面
+- **E1-E4 导出**: `ProtoEditor.tsx` — 导出/导入 JSON v2.0，含节点、Mock数据、页面路由
+- **集成**: `/app/prototype/editor/page.tsx` 替换为 ProtoEditor 主视图
+- **Store**: `prototypeStore.ts` — Zustand + localStorage 持久化
+- 提交: vibex-sprint1-prototype-canvas/dev-epic1-拖拽布局编辑器
+
 ### [Unreleased] vibex-canvas-silent-400 E1-F1.1: 前置校验 toast 补充 — 2026-04-17
 - **E1-F1.1 前置校验 toast**: `BusinessFlowTree.tsx` — handleContinueToComponents 增加前置校验 toast
   - 修复: contextsToSend/flowsToSend 为空时静默 return，用户无反馈

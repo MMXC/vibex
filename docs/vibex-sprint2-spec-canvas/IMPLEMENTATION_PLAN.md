@@ -12,7 +12,7 @@
 | Epic | Units | Status | Next |
 |------|-------|--------|------|
 | E1: 三章节卡片管理 | E1-U1 ~ E1-U5 | ✅ 5/5 | E1-U1 |
-| E2: 横向滚奏体验 | E2-U1 ~ E2-U3 | ⬜ 0/3 | E2-U1 |
+| E2: 横向滚奏体验 | E2-U1 ~ E2-U3 | ✅ 3/3 | E2-U1 |
 | E3: AI 草稿生成 | E3-U1 ~ E3-U4 | ⬜ 0/4 | E3-U1 |
 | E4: 章节间 DAG 关系 | E4-U1 ~ E4-U2 | ⬜ 0/2 | E4-U1 |
 | E5: 状态与错误处理 | E5-U1 ~ E5-U3 | ⬜ 0/3 | E5-U1 |
@@ -144,7 +144,7 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E2-U1 | 横向滚奏 UI 实现 | ⬜ | E1-U1 | DDSScrollContainer scroll-snap 横向滚奏，鼠标拖动切换章节 |
+| E2-U1 | ✅ 横向滚奏 UI 实现 | ✅ | E1-U1 | DDSScrollContainer scroll-snap 横向滚奏，鼠标拖动切换章节 |
 | E2-U2 | URL 章节同步实现 | ⬜ | E2-U1 | `?chapter=requirement` 参数同步当前章节，刷新保持 |
 | E2-U3 | 工具栏章节指示实现 | ⬜ | E2-U1 | Toolbar 显示当前章节名称，点击快速跳转 |
 

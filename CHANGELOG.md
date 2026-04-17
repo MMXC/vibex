@@ -1,3 +1,9 @@
+### [Unreleased] vibex-sprint2-spec-canvas Epic2: 横向滚奏体验 — 2026-04-17
+- **E2-U3 工具栏章节Tab**: `DDSToolbar.tsx` — 3个可点击章节Tab（需求/上下文/流程），`setActiveChapter` 切换
+- **E2-U3 画布滚动同步**: `DDSScrollContainer.tsx` — 监听外部 `activeChapter` 变化触发滚动，`lastScrollChapterRef` 防循环，`handleScroll` 更新 ref
+- **E2-U1/E2-U2**: `useChapterURLSync` + `DDSScrollContainer` 已实现
+- 提交: vibex-sprint2-spec-canvas/dev-epic2-横向滚奏体验
+
 ### [Unreleased] vibex-sprint2-spec-canvas Epic1: 三章节卡片管理 — 2026-04-17
 - **E1-U1 三章节结构**: `DDSScrollContainer.tsx` — DDSPanel 已有 data-chapter 属性，默认渲染 ChapterPanel
 - **E1-U2 CRUD**: `ChapterPanel.tsx` — 单章节面板，含卡片列表、创建表单、删除按钮

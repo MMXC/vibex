@@ -12,6 +12,7 @@
 import React, { memo } from 'react';
 import { useDDSCanvasStore } from '@/stores/dds';
 import type { ChapterType } from '@/types/dds';
+import { ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
 import { exportToJSON, parseImportFile } from '@/services/dds';
 import styles from './DDSToolbar.module.css';
 
@@ -127,10 +128,19 @@ export const DDSToolbar = memo(function DDSToolbar({
     >
       {/* Left: Chapter indicator */}
       <div className={styles.leftSection}>
-        <div className={styles.chapterIndicator} aria-label={`当前章节: ${chapterLabel}`}>
-          <span className={styles.chapterDot} aria-hidden="true" />
-          <span className={styles.chapterName}>{chapterLabel}</span>
-        </div>
+        {/* E2-U3: Clickable chapter tabs for quick navigation */}
+        {(Object.keys(CHAPTER_LABELS) as ChapterType[]).map((ch) => (
+          <button
+            key={ch}
+            type="button"
+            className={`${styles.chapterTab} ${activeChapter === ch ? styles.chapterTabActive : ''}`}
+            onClick={() => setActiveChapter(ch)}
+            aria-label={`切换到${CHAPTER_LABELS[ch]}章节`}
+            aria-pressed={activeChapter === ch}
+          >
+            {CHAPTER_LABELS[ch]}
+          </button>
+        ))}
       </div>
 
       {/* Right: Action buttons */}

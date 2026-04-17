@@ -77,7 +77,8 @@ export const DDSScrollContainer = memo(function DDSScrollContainer({
     panelRefs.current[chapter] = el;
   }, []);
 
-  // Jump to a chapter panel via scrollIntoView
+  // E2-U3: Jump to a chapter panel via scrollIntoView
+  // Also called by toolbar chapter tabs (via setActiveChapter → useEffect below)
   const navigateToChapter = useCallback(
     (chapter: ChapterType) => {
       const el = panelRefs.current[chapter];
@@ -88,12 +89,25 @@ export const DDSScrollContainer = memo(function DDSScrollContainer({
         block: 'nearest',
         inline: 'start',
       });
-
-      // Also update the active chapter in the store
-      setActiveChapter(chapter);
     },
-    [setActiveChapter]
+    []
   );
+
+  // E2-U3: Listen to activeChapter changes from toolbar tabs and scroll to the chapter.
+  // Use a ref to distinguish internal (IntersectionObserver) vs external (toolbar) changes.
+  const lastScrollChapterRef = useRef<ChapterType | null>(null);
+  useEffect(() => {
+    // If the active chapter changed to a value different from what we just scrolled to,
+    // it means the change came from an external source (toolbar tab click → setActiveChapter).
+    // In that case, scroll to the new chapter.
+    if (activeChapter !== lastScrollChapterRef.current) {
+      const el = panelRefs.current[activeChapter];
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+      }
+      lastScrollChapterRef.current = activeChapter;
+    }
+  }, [activeChapter]);
 
   // Scroll event handler — detect which panel is in view and sync activeChapter
   const handleScroll = useCallback(
@@ -127,6 +141,7 @@ export const DDSScrollContainer = memo(function DDSScrollContainer({
 
       if (bestChapter !== activeChapter && bestRatio > 0.3) {
         setActiveChapter(bestChapter);
+        lastScrollChapterRef.current = bestChapter;
       }
     },
     [activeChapter, setActiveChapter]

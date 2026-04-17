@@ -40,6 +40,13 @@
 - **E2-QA prototypeStore 测试**: 9 个新用例，36 total in prototypeStore.test.ts
 - **提交**: `d48fc901` (E2-QA)
 
+### [vibex-sprint3-prototype-extend E3-QA: 节点断点自动标注测试] — 2026-04-18
+- **E3-QA prototypeStore**: `addNode` 自动标注 breakpoints — 3 个用例（E3-U1）
+  - `breakpoint=375` → `breakpoints.mobile=true`
+  - `breakpoint=768` → `breakpoints.tablet=true`
+  - `breakpoint=1024` → `breakpoints.desktop=true`
+- **提交**: `d48fc901` (E3-QA, 与 E2-QA 同一 commit)
+
 ### [vibex-sprint4-spec-canvas-extend E3: 跨章节集成] — 2026-04-18
 - **E3-U1 DDSToolbar 扩展**: 5 章节按钮 (requirement/context/flow/api/business-rules)，点击切换 activeChapter，aria-pressed 状态
 - **E3-U1 DDSCanvasPage**: `?chapter=` URL 参数支持，mount 时读取并 setActiveChapter

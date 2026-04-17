@@ -43,6 +43,15 @@ const mockChangelog: ChangelogEntry[] = [
     commit: 'd48fc901',
   },
   {
+    version: '1.0.263',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint3-prototype-extend E3-QA: 节点断点自动标注测试',
+      '✅ E3-QA addNode: breakpoint=375 → mobile, breakpoint=768 → tablet, breakpoint=1024 → desktop',
+    ],
+    commit: 'd48fc901',
+  },
+  {
     version: '1.0.262',
     date: '2026-04-18',
     changes: [

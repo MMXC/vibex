@@ -145,11 +145,17 @@ export const usePrototypeStore = create<PrototypeStoreState>()(
 
       addNode: (component: UIComponent, position: { x: number; y: number }) => {
         const id = `proto-${generateId()}`;
+        const bp = get().breakpoint;
+        const breakpoints: ProtoNodeBreakpoints = {
+          mobile: bp === '375',
+          tablet: bp === '768',
+          desktop: bp === '1024',
+        };
         const newNode: ProtoNode = {
           id,
           type: 'protoNode',
           position,
-          data: { component },
+          data: { component, breakpoints },
         };
         set((state) => ({
           nodes: [...state.nodes, newNode],

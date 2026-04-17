@@ -4,6 +4,15 @@
 - **E4-U3/U4 Export Modal**: `components/dds/toolbar/DDSToolbar.tsx` + `.module.css` — modal with OpenAPI + StateMachine download buttons
 - **E4-U5 Tests**: `services/dds/__tests__/exporter.test.ts` — 16 passing tests (null guard, method mapping, transitions, responses, initial state, deduplication)
 - Commit: 9a3e239d
+### [Unreleased] vibex-sprint4-spec-canvas-extend E5: 章节四态规范 — 2026-04-18
+- **E5-U1/U2 AC3 CardErrorBoundary**: `canvas/CardErrorBoundary.tsx` — 捕获卡片渲染错误，显示 'API 端点渲染失败' / '状态节点渲染失败'
+- **E5-U1/U2 AC2 骨架屏**: DDSCanvasPage 加载态改用 ChapterSkeleton，var(--color-skeleton) token 替代进度条
+- **E5-U1 AC1 API 空状态**: ChapterEmptyState — '暂无 API 端点' 引导文案
+- **E5-U2 AC1 SM 空状态**: ChapterEmptyState — '暂无状态节点' 引导文案
+- **集成**: CardRenderer 包裹 APIEndpointCard + StateMachineCard with CardErrorBoundary
+- **测试**: DDSFourStates.test.tsx — 5 passing tests
+- 提交: 9d1bd809
+
 
 ### [Unreleased] vibex-sprint4-spec-canvas-extend E1: API 规格章节 — 2026-04-18
 - **E1-U1 类型定义**: `types/dds/api-endpoint.ts` — `APIEndpointCard` 接口（extends BaseCard），含 HTTPMethod/APIParameter/APIResponse

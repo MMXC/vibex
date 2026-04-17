@@ -52,6 +52,7 @@ export async function importFromImage(file: File): Promise<ImageImportResult> {
     const authHeaders = getAuthHeaders();
 
     const response = await fetch('/api/chat', {
+      signal: AbortSignal.timeout(30_000),
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

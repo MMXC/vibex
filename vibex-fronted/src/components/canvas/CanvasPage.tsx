@@ -39,6 +39,8 @@ import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { useUIStore } from '@/lib/canvas/stores/uiStore';
 import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
 import { useAuthStore } from '@/stores/authStore';
+import { usePrototypeStore } from '@/stores/prototypeStore';
+import { EdgeCreationModal } from '@/components/prototype/EdgeCreationModal';
 import { usePresence } from '@/lib/firebase/presence';
 import PresenceLayer from './PresenceLayer';
 
@@ -468,6 +470,18 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
                 onContinue={handleContinueToComponents}
                 continueLabel={flowNodes.length === 0 ? '→ 选择流程' : componentGenerating ? '◌ 生成中...' : '继续 → 组件树'}
                 continueDisabled={componentGenerating || flowNodes.length === 0}
+                extraButtons={
+                  <button
+                    type="button"
+                    className={styles.addEdgeBtn}
+                    onClick={() => setIsEdgeModalOpen(true)}
+                    disabled={pages.length < 2}
+                    aria-label="添加连线"
+                    title="添加页面连线"
+                  >
+                    +连线
+                  </button>
+                }
               />
             }
           />
@@ -504,6 +518,10 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
 
   // === E2.1: TemplateSelector state ===
   const [templateOpen, setTemplateOpen] = useState(false);
+  // E1-QA: EdgeCreationModal state
+  const [isEdgeModalOpen, setIsEdgeModalOpen] = useState(false);
+  const pages = usePrototypeStore((s) => s.pages);
+  const addEdge = usePrototypeStore((s) => s.addEdge);
   const [isImportOpen, setIsImportOpen] = useState(false);
 
   // === E2.2: PhaseIndicator is read-only (PhaseIndicator.tsx manages its own open/close) ===
@@ -529,6 +547,15 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
     leftDrawerOpen && styles.treePanelsGridWithLeftDrawer,
     rightDrawerOpen && styles.treePanelsGridWithRightDrawer,
     leftDrawerOpen && rightDrawerOpen && styles.treePanelsGridWithBothDrawers
+  );
+
+  // E1-QA: EdgeCreationModal confirm handler
+  const handleEdgeConfirm = useCallback(
+    (sourceId: string, targetId: string) => {
+      addEdge(sourceId, targetId);
+      setIsEdgeModalOpen(false);
+    },
+    [addEdge]
   );
 
   // === Render ===
@@ -906,6 +933,14 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
         canvasId={projectId || null}
         userId={userId}
         userName={userName}
+      />
+
+      {/* E1-QA: EdgeCreationModal for adding page-to-page flow edges */}
+      <EdgeCreationModal
+        open={isEdgeModalOpen}
+        pages={pages}
+        onConfirm={handleEdgeConfirm}
+        onCancel={() => setIsEdgeModalOpen(false)}
       />
     </div>
   );

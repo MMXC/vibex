@@ -20,6 +20,19 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.254',
+    date: '2026-04-17',
+    changes: [
+      '📋 vibex-sprint2-spec-canvas Epic4: 章节间 DAG 关系',
+      '✅ E4-U1 跨章节边创建: addCrossChapterEdge/deleteCrossChapterEdge, crossChapterEdges state',
+      '✅ E4-U2 跨章节边渲染: CrossChapterEdgesOverlay SVG (ResizeObserver + RAF 双层监听)',
+      '✅ E4-U2 虚线样式: strokeDasharray="6 4" + arrow marker, crypto.randomUUID() 边ID',
+      '✅ E4-U1 handleConnect: 自动识别跨章节连接, 双轨设计 (overlay SVG vs React Flow edges)',
+      '✅ E4-U2 cardAbsoluteCenter: PANEL_HEADER_HEIGHT + card.position 坐标系转换',
+    ],
+    commit: '2b3d69f4',
+  },
+  {
     version: '1.0.253',
     date: '2026-04-17',
     changes: [

@@ -21,8 +21,14 @@
 
 ### [Unreleased] vibex-sprint2-spec-canvas Epic4: 章节间 DAG 关系 — 2026-04-17
 - **E4-U1 跨章节边创建**: `DDSCanvasStore.ts` — addCrossChapterEdge/deleteCrossChapterEdge, crossChapterEdges state
-- **E4-U2 跨章节边渲染**: `useDDSCanvasFlow.ts` — 自动识别跨章节连接, CrossChapterEdgesOverlay SVG
-- 提交: vibex-sprint2-spec-canvas/dev-epic4-章节间-dag-关系
+- **E4-U2 跨章节边渲染**: `CrossChapterEdgesOverlay.tsx` — SVG overlay with ResizeObserver + RAF 双层监听
+  - `strokeDasharray="6 4"` 虚线样式 + arrow marker
+  - `crypto.randomUUID()` 生成边 ID
+  - crossChapterEdges 独立于 React Flow edges 的双轨设计（overlay SVG vs React Flow edges）
+- **E4-U1 handleConnect**: `useDDSCanvasFlow.ts` — 自动识别跨章节连接，sourceChapter !== targetChapter 时走 crossChapterEdges
+- **E4-U2 Card Position**: `cardAbsoluteCenter()` — PANEL_HEADER_HEIGHT + card.position 坐标系转换
+- **类型扩展**: `DDSEdge` 新增 sourceChapter/targetChapter 可选字段
+- 提交: 2b3d69f4
 
 ### [Unreleased] vibex-sprint2-spec-canvas Epic3: AI 草稿生成 — 2026-04-17
 - **E3-U1 AI入口**: `DDSToolbar.tsx` — handleAIGenerate → toggleDrawer → AIDraftDrawer

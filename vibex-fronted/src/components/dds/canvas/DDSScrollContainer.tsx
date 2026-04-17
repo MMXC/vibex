@@ -21,6 +21,7 @@ import React, {
 import { useDDSCanvasStore } from '@/stores/dds';
 import type { ChapterType, ChapterData } from '@/types/dds';
 import { DDSPanel } from './DDSPanel';
+import { ChapterPanel } from './ChapterPanel';
 import { DDSThumbNav, DDSThumbButton } from './DDSThumbNav';
 import { useChapterURLSync } from '@/hooks/dds/useChapterURLSync';
 import styles from './DDSScrollContainer.module.css';
@@ -189,8 +190,8 @@ export const DDSScrollContainer = memo(function DDSScrollContainer({
               ) : renderChapterContent ? (
                 renderChapterContent(chapter, data)
               ) : (
-                // Default empty state
-                <DefaultChapterContent chapter={chapter} />
+                // Default: render ChapterPanel with card CRUD
+                <ChapterPanel chapter={chapter} />
               )}
             </div>
           </DDSPanel>
@@ -199,34 +200,5 @@ export const DDSScrollContainer = memo(function DDSScrollContainer({
     </div>
   );
 });
-
-// ==================== Default Empty Content ====================
-
-function DefaultChapterContent({ chapter }: { chapter: ChapterType }) {
-  const placeholders: Record<ChapterType, string> = {
-    requirement: '暂无需求卡片\n\n点击 + 添加用户故事',
-    context: '暂无限界上下文\n\n点击 + 添加上下文',
-    flow: '暂无流程步骤\n\n点击 + 添加流程',
-  };
-
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100%',
-        color: 'var(--color-text-muted)',
-        fontSize: '14px',
-        whiteSpace: 'pre-line',
-        textAlign: 'center',
-      }}
-      role="status"
-      aria-label={placeholders[chapter]}
-    >
-      {placeholders[chapter]}
-    </div>
-  );
-}
 
 export default DDSScrollContainer;

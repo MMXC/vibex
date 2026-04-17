@@ -1,3 +1,11 @@
+### [Unreleased] vibex-sprint2-spec-canvas Epic1: 三章节卡片管理 — 2026-04-17
+- **E1-U1 三章节结构**: `DDSScrollContainer.tsx` — DDSPanel 已有 data-chapter 属性，默认渲染 ChapterPanel
+- **E1-U2 CRUD**: `ChapterPanel.tsx` — 单章节面板，含卡片列表、创建表单、删除按钮
+- **E1-U3 Schema渲染**: `ChapterPanel` 使用 `CardRenderer` 分发渲染 3 种卡片类型
+- **Store**: `ddsChapterActions` 已有 addCard/deleteCard，ChapterPanel 直接使用
+- **创建表单**: 用户故事（role/action/benefit/priority）、限界上下文（name/desc/resp）、流程步骤（stepName/actor/pre/post）
+- 提交: vibex-sprint2-spec-canvas/dev-epic1-三章节卡片管理
+
 ### [Unreleased] vibex-sprint1-prototype-canvas Epic1: 拖拽布局编辑器 — 2026-04-17
 - **E1-U1 组件面板**: `ComponentPanel.tsx` — 左侧面板展示 10 个默认组件，支持 HTML5 drag-and-drop
 - **E1-U2 React Flow 画布**: `ProtoFlowCanvas.tsx` — 接收组件拖拽，节点自由定位，MiniMap + Controls

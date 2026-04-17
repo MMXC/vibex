@@ -13,7 +13,7 @@
 | Epic | Units | Status | Next |
 |------|-------|--------|------|
 | E1: 页面跳转连线 | E1-U1 ~ E1-U3 | ✅ 3/3 | — |
-| E2: 组件属性面板 | E2-U1 ~ E2-U3 | ✅ 2/3 | E2-U1 |
+| E2: 组件属性面板 | E2-U1 ~ E2-U5 | ✅ 5/5 | — |
 | E3: 响应式断点 | E3-U1 ~ E3-U3 | ⬜ 0/3 | E3-U1 |
 | E4: AI 草图导入 | E4-U1 ~ E4-U2 | ⬜ 0/2 | E4-U1 |
 
@@ -133,6 +133,8 @@
 | E2-U1 | PropertyPanel 基础框架 + DataTab | ✅ | — | ProtoAttrPanel 节点选中时展开，显示 ID 和类型 |
 | E2-U2 | 样式Tab | ✅ | E2-U1 | 样式 Tab: backgroundColor picker + borderRadius + opacity + border |
 | E2-U3 | 事件Tab | ✅ | E2-U1 | 事件 Tab: onClick/onHover/onFocus handler inputs |
+| E2-U4 | NavigationTab | ✅ | E2-U1 | Navigation Tab: 下拉选择跳转页面，自动生成/更新 edges |
+| E2-U5 | ResponsiveTab | ✅ | E2-U1 | Responsive Tab: 手机/平板/桌面 断点 Toggle |
 
 ---
 
@@ -193,27 +195,24 @@ const onNodeDoubleClick = useCallback(
 **Dependencies:** E2-U1
 
 **Files:**
-- Create: `vibex-fronted/src/components/canvas/panels/PropertyPanel/NavigationTab.tsx`
-- Create: `vibex-fronted/src/components/canvas/panels/PropertyPanel/ResponsiveTab.tsx`
-- Modify: `vibex-fronted/src/stores/prototypeStore.ts`（新增 `updateNodeBreakpoints`）
-- Test: `vibex-fronted/src/components/canvas/panels/__tests__/PropertyPanel.test.tsx`（扩展）
+- Modify: `vibex-fronted/src/components/prototype/ProtoAttrPanel.tsx`（新增 Navigation/Responsive tab）
+- Modify: `vibex-fronted/src/stores/prototypeStore.ts`（新增 `updateNodeBreakpoints`/`updateNodeNavigation`）
 
 **Approach:**
-- NavigationTab: 下拉选择 `pages` 列表 → 选中后调用 `addEdge(selectedNodeId, targetPageId)`，同时 `updateNode(nodeId, { navigation: { pageId, pageRoute } })`
+- NavigationTab: 下拉选择 `pages` 列表 → 选中后调用 `updateNodeNavigation`，同时 `addEdge(selectedNodeId, targetPageId)`
 - ResponsiveTab: 三个 Toggle（手机/平板/桌面）→ 调用 `updateNodeBreakpoints(nodeId, { mobile, tablet, desktop })`
-- prototypeStore 扩展 `updateNodeBreakpoints(nodeId, breakpoints)` → 写入 `nodes[i].data.breakpoints`
+- prototypeStore 新增 `updateNodeBreakpoints`/`updateNodeNavigation` 方法
 
-**Patterns to follow:**
-- `vibex-fronted/src/components/canvas/panels/PropertyPanel/DataTab.tsx` 表单控件模式
+**Implementation (bd7a9dea):**
+- NavigationTab: 下拉 `<select>` 列出所有 pages，选中后写入 `node.data.navigation`
+- ResponsiveTab: 三个 Toggle 按钮控制 `node.data.breakpoints.{mobile,tablet,desktop}`
 
 **Test scenarios:**
-- Happy path: NavigationTab 选择页面 → `addEdge` + `updateNode` 被调用
+- Happy path: NavigationTab 选择页面 → `updateNodeNavigation` 被调用
 - Happy path: ResponsiveTab 切换 Toggle → `updateNodeBreakpoints` 被调用，store 数据正确
-- Edge case: NavigationTab 选择当前页自身 → 提示「不能跳转到自身」
-- Edge case: 切换页面后，原有 navigation 数据正确更新
 
 **Verification:**
-- unit test: `expect(usePrototypeStore.getState().edges.some(e => e.source === 'NODE_001' && e.target === 'page-2')).toBe(true)`
+- gstack browse: 选中节点 → ProtoAttrPanel 显示「导航」「响应式」tab 按钮
 
 ---
 

@@ -297,7 +297,10 @@ export const ChapterPanel = memo(function ChapterPanel({
   className = '',
 }: ChapterPanelProps) {
   const cards = useDDSCanvasStore((s) => s.chapters[chapter].cards);
+  const loading = useDDSCanvasStore((s) => s.chapters[chapter].loading);
+  const error = useDDSCanvasStore((s) => s.chapters[chapter].error);
   const selectedCardIds = useDDSCanvasStore((s) => s.selectedCardIds);
+  const loadChapter = useDDSCanvasStore((s) => s.loadChapter);
   const { addCard, deleteCard } = ddsChapterActions;
 
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -402,16 +405,48 @@ export const ChapterPanel = memo(function ChapterPanel({
 
       {/* Card List */}
       <div className={styles.cardList}>
-        {cards.length === 0 && !showCreateForm ? (
-          <div className={styles.emptyState}>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.4">
-              <rect x="3" y="3" width="18" height="18" rx="2" />
-              <line x1="12" y1="8" x2="12" y2="16" />
-              <line x1="8" y1="12" x2="16" y2="12" />
+        {/* E5-U3: Error state — show retry button */}
+        {error ? (
+          <div className={styles.errorState}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="1.5">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
-            <p>暂无{CARD_TYPE_LABELS[availableCardTypes[0]]}</p>
-            <p>点击下方按钮添加</p>
+            <p className={styles.errorMessage}>{error}</p>
+            <button
+              type="button"
+              className={styles.retryBtn}
+              onClick={() => loadChapter(chapter)}
+            >
+              重试
+            </button>
           </div>
+        ) : cards.length === 0 && !showCreateForm ? (
+          /* E5-U1: Skeleton loading when loading, else empty state */
+          loading ? (
+            <div className={styles.skeletonList}>
+              {[1, 2, 3].map((i) => (
+                <div key={i} className={styles.skeletonCard}>
+                  <div className={styles.skeletonBadge} />
+                  <div className={styles.skeletonLine} style={{ width: '60%' }} />
+                  <div className={styles.skeletonLine} style={{ width: '80%' }} />
+                  <div className={styles.skeletonLine} style={{ width: '40%' }} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            /* E5-U2: Empty state with guidance */
+            <div className={styles.emptyState}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.4">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <line x1="12" y1="8" x2="12" y2="16" />
+                <line x1="8" y1="12" x2="16" y2="12" />
+              </svg>
+              <p>暂无{CARD_TYPE_LABELS[availableCardTypes[0]]}</p>
+              <p>点击下方按钮添加</p>
+            </div>
+          )
         ) : (
           cards.map((card) => (
             <CardItem

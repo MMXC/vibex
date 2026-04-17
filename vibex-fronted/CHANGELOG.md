@@ -1,6 +1,16 @@
 # Changelog
 
-### [vibex-qa-canvas-dashboard Q3-E6: Canvas 三树持久化 Rehydration Hook + 测试] — 2026-04-15
+### [vibex-sprint1-prototype-canvas Epic1: 拖拽布局编辑器] — 2026-04-17
+- **Epic 1: 拖拽布局编辑器** — 可视化原型画布正式上线
+- 左侧组件面板：10 个默认组件（Button/Input/Card/Container/Header/Navigation/Modal/Table/Form/Image）支持拖拽到画布
+- React Flow 画布：节点自由定位，位置自动保存至 localStorage
+- 自定义节点渲染：拖入节点渲染为真实 UI（Button 可点击、Table 显示 Mock 数据等）
+- 节点属性面板：双击节点打开右侧面板，支持 props 编辑 + Mock 数据 Tab
+- Mock 数据随节点保存，刷新页面后保留
+- JSON 导出/导入 v2.0 格式（含 nodes/mockDataBindings/pages）
+- 路由抽屉：左侧抽屉支持添加/删除页面路由
+- **提交**: `f18d48f4`
+
 - **根因**: Tab 切换后刷新页面，三树（Component/BusinessFlow/BoundedContext）状态丢失
 - **修复**: useRehydrateCanvasStores hook，skipHydration + 客户端 rehydration
 - **测试**: 4/4 PASS (TC-E6-01~04)

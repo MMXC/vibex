@@ -77,6 +77,11 @@ vibex/                          # 根目录
 - 是否帮助用户走完流程？
 - 思考过程展示是否锦上添花（而非喧宾夺主）？
 
+## 经验沉淀
+
+`docs/solutions/` — 已解决问题的文档化方案（bugs、best practices、workflow patterns），按 category 组织，含 YAML frontmatter（module、tags、problem_type）。**在 documented areas 中实现或 debug 前必查。**
+`docs/.learnings/` — 项目级经验沉淀，按项目命名（vibex-*.md）。
+
 ## 常用命令
 
 ```bash

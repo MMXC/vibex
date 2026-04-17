@@ -1,0 +1,1 @@
+- [vibex-canvas-silent-400](vibex-canvas-silent-400.md) — Canvas 静默 400 + async/await 修复 (2026-04-17)

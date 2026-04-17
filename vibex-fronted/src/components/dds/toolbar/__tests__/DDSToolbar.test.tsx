@@ -18,6 +18,7 @@ function setupStore(overrides = {}) {
       requirement: { type: 'requirement', cards: [], edges: [], loading: false, error: null },
       context: { type: 'context', cards: [], edges: [], loading: false, error: null },
       flow: { type: 'flow', cards: [], edges: [], loading: false, error: null },
+      api: { type: 'api', cards: [], edges: [], loading: false, error: null },
     },
     isFullscreen: false,
     isGenerating: false,
@@ -98,7 +99,7 @@ describe('DDSToolbar', () => {
   it('renders chapter tab indicator — default requirement active', () => {
     render(<DDSToolbar />);
     const tabs = screen.getAllByRole('button', { name: /切换到.*章节/ });
-    expect(tabs).toHaveLength(3);
+    expect(tabs).toHaveLength(4);
     // Default active chapter is 'requirement' → its tab has aria-pressed=true
     const reqTab = tabs.find((btn) => btn.textContent === '需求');
     expect(reqTab).toHaveAttribute('aria-pressed', 'true');

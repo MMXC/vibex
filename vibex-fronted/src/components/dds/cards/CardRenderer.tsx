@@ -18,6 +18,7 @@ import { RequirementCard } from './RequirementCard';
 import { BoundedContextCard } from './BoundedContextCard';
 import { FlowStepCard } from './FlowStepCard';
 import { APIEndpointCard } from './APIEndpointCard';
+import { CardErrorBoundary } from '@/components/dds/canvas/CardErrorBoundary';
 import { StateMachineCard } from './StateMachineCard';
 import type { APIEndpointCard as APIEndpointCardType, StateMachineCard as SMCardType } from '@/types/dds';
 
@@ -89,10 +90,18 @@ export const CardRenderer = memo(function CardRenderer({
       );
 
     case 'api-endpoint':
-      return <APIEndpointCard card={card as APIEndpointCardType} selected={selected} />;
+      return (
+        <CardErrorBoundary cardType="api-endpoint">
+          <APIEndpointCard card={card as APIEndpointCardType} selected={selected} />
+        </CardErrorBoundary>
+      );
 
     case 'state-machine':
-      return <StateMachineCard card={card as SMCardType} selected={selected} />;
+      return (
+        <CardErrorBoundary cardType="state-machine">
+          <StateMachineCard card={card as SMCardType} selected={selected} />
+        </CardErrorBoundary>
+      );
 
     default: {
       // TypeScript exhaustive check — this branch should never be reached

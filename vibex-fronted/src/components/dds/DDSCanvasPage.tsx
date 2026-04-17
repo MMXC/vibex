@@ -27,6 +27,7 @@ import { DDSFlow } from '@/components/dds/DDSFlow';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
 import { createDDSAPI } from '@/hooks/dds/useDDSAPI';
 import type { ChapterType, ChapterData } from '@/types/dds';
+import type { DDSCard } from '@/types/dds';
 import type { ReactNode } from 'react';
 
 // ==================== Props ====================
@@ -48,6 +49,112 @@ interface DDSCanvasPageState {
 }
 
 // ==================== Component ====================
+
+
+// ==================== E5: Four States Components ====================
+
+/** E5-U1/U2 AC2: Skeleton state — uses var(--color-skeleton) token */
+function ChapterSkeleton({ title }: { title: string }) {
+  return (
+    <div
+      style={{
+        height: '64px',
+        borderRadius: '10px',
+        background: 'var(--color-skeleton, rgba(255,255,255,0.06))',
+        animation: 'dds-skeleton-shimmer 1.5s ease-in-out infinite',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '0 16px',
+        gap: '12px',
+      }}
+      aria-hidden="true"
+    >
+      <div style={{
+        width: '36px', height: '36px', borderRadius: '8px',
+        background: 'var(--color-skeleton, rgba(255,255,255,0.04))',
+      }} />
+      <div style={{ flex: 1 }}>
+        <div style={{
+          height: '12px', width: '40%', borderRadius: '4px', marginBottom: '8px',
+          background: 'var(--color-skeleton, rgba(255,255,255,0.04))',
+        }} />
+        <div style={{
+          height: '10px', width: '60%', borderRadius: '4px',
+          background: 'var(--color-skeleton, rgba(255,255,255,0.04))',
+        }} />
+      </div>
+    </div>
+  );
+}
+
+/** E5-U1 AC1: Empty state — API chapter */
+function APIEmptyState() {
+  return (
+    <div
+      style={{
+        position: 'absolute', inset: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        pointerEvents: 'none',
+        zIndex: 5,
+      }}
+      data-testid="api-empty-state"
+    >
+      <div style={{
+        textAlign: 'center', padding: '32px',
+        color: 'rgba(255,255,255,0.3)',
+        fontFamily: 'system-ui, sans-serif',
+      }}>
+        <div style={{ fontSize: '2rem', marginBottom: '12px', opacity: 0.4 }}>🔌</div>
+        <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}>
+          暂无 API 端点
+        </div>
+        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.2)' }}>
+          从左侧卡片面板拖入 API Endpoint 节点
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** E5-U2 AC1: Empty state — SM chapter */
+function SMEmptyState() {
+  return (
+    <div
+      style={{
+        position: 'absolute', inset: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        pointerEvents: 'none',
+        zIndex: 5,
+      }}
+      data-testid="sm-empty-state"
+    >
+      <div style={{
+        textAlign: 'center', padding: '32px',
+        color: 'rgba(255,255,255,0.3)',
+        fontFamily: 'system-ui, sans-serif',
+      }}>
+        <div style={{ fontSize: '2rem', marginBottom: '12px', opacity: 0.4 }}>⚙️</div>
+        <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}>
+          暂无状态节点
+        </div>
+        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.2)' }}>
+          从左侧卡片面板拖入 State Machine 节点
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * E5-U1 AC1 / E5-U2 AC1: Chapter empty state overlay.
+ * Shows when the active chapter has no cards.
+ */
+function ChapterEmptyState({ chapter, cards }: { chapter: ChapterType; cards: DDSCard[] }) {
+  if (cards.length > 0) return null;
+  if (chapter === 'api') return <APIEmptyState />;
+  if (chapter === 'business-rules') return <SMEmptyState />;
+  return null;
+}
 
 export const DDSCanvasPage = memo(function DDSCanvasPage({
   projectId,
@@ -228,36 +335,22 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
             top: '56px',
             left: 0,
             right: 0,
+            bottom: 0,
             zIndex: 10,
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '0.5rem',
-            background: 'rgba(0,0,0,0.6)',
+            flexDirection: 'column',
+            gap: '12px',
+            padding: '24px 32px',
+            background: 'rgba(0,0,0,0.7)',
             backdropFilter: 'blur(4px)',
           }}
           role="status"
-          aria-label="加载章节数据..."
-          data-testid="dds-loading-bar"
+          aria-label="骨架屏加载中..."
+          data-testid="dds-skeleton-overlay"
         >
-          <div
-            style={{
-              width: '120px',
-              height: '3px',
-              background: 'rgba(255,255,255,0.1)',
-              borderRadius: '2px',
-              overflow: 'hidden',
-            }}
-          >
-            <div
-              style={{
-                height: '100%',
-                background: '#3b82f6',
-                borderRadius: '2px',
-                animation: 'dds-loading-shrink 1.5s ease-in-out infinite',
-              }}
-            />
-          </div>
+          <ChapterSkeleton title="需求章节" />
+          <ChapterSkeleton title="上下文章节" />
+          <ChapterSkeleton title="流程章节" />
         </div>
       )}
 
@@ -268,13 +361,16 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
           rootRef={scrollContainerRef}
           renderChapterContent={(
             chapter: ChapterType,
-            _data: ChapterData
+            data: ChapterData
           ): ReactNode => (
-            <DDSFlow
-              chapter={chapter}
-              onSelectCard={handleSelectCard}
-              selectedCardIds={selectedCardIds}
-            />
+            <>
+              <ChapterEmptyState chapter={chapter} cards={data.cards} />
+              <DDSFlow
+                chapter={chapter}
+                onSelectCard={handleSelectCard}
+                selectedCardIds={selectedCardIds}
+              />
+            </>
           )}
         />
         {/* Cross-chapter DAG edge overlay (E4-U1) */}
@@ -289,6 +385,11 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
 
       {/* Loading animation style */}
       <style>{`
+        @keyframes dds-skeleton-shimmer {
+          0% { opacity: 0.4; }
+          50% { opacity: 0.8; }
+          100% { opacity: 0.4; }
+        }
         @keyframes dds-loading-shrink {
           0% { width: 0%; margin-left: 0; }
           50% { width: 60%; margin-left: 20%; }

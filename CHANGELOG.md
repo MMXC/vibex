@@ -55,6 +55,13 @@
 - **DDSCanvasStore 新测试**: addCard/deleteCard/selectCard/toggleFullscreen/toggleDrawer
 - 提交: vibex-sprint2-spec-canvas/dev-epic6-测试覆盖
 
+### [Unreleased] vibex-sprint3-prototype-extend Epic2: 组件属性面板 — 2026-04-18
+- **E2-AC1 双击打开面板**: `ProtoFlowCanvas.tsx` — 添加 `onNodeDoubleClick` → `selectNode(node.id)`
+- **E2-AC3 Navigation Tab**: `ProtoAttrPanel.tsx` — 新增 Navigation tab（下拉选择跳转页面，调用 updateNodeNavigation）
+- **E2-AC4 Responsive Tab**: `ProtoAttrPanel.tsx` — 新增 Responsive tab（手机/平板/桌面 Toggle，调用 updateNodeBreakpoints）
+- **Store 扩展**: `prototypeStore.ts` — 新增 updateNodeNavigation/updateNodeBreakpoints 方法 + ProtoNodeNavigation/ProtoNodeBreakpoints 类型
+- 提交: bd7a9dea
+
 ### [Unreleased] vibex-sprint2-spec-canvas Epic3: AI 草稿生成 — 2026-04-17
 - **E3-U1 AI入口**: `DDSToolbar.tsx` — handleAIGenerate → toggleDrawer → AIDraftDrawer
 - **E3-U2 生成预览**: `AIDraftDrawer.tsx` — IDLE/LOADING/REVIEW/ERROR 状态机，prompt → /api/chat → CardPreview

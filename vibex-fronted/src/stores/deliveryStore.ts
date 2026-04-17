@@ -186,6 +186,65 @@ const MOCK_COMPONENTS: Component[] = [
   },
 ];
 
+
+// ==================== Data Conversion ====================
+
+export function toComponent(node: ProtoNode): ComponentSpec {
+  return {
+    id: node.id,
+    type: node.data.component?.type ?? 'unknown',
+    name: node.data.component?.name ?? node.data.component?.type ?? 'Unknown',
+    props: node.data.component?.props ?? {},
+    position: node.position,
+    styles: {
+      width: node.data.width,
+      height: node.data.height,
+      backgroundColor: node.data.backgroundColor,
+      borderRadius: node.data.borderRadius,
+    },
+    breakpoints: node.data.breakpoints,
+  };
+}
+
+export function toSchema(chapters: Record<string, ChapterData>): SchemaSpec {
+  const schema: SchemaSpec = {
+    projectName: '',
+    chapters: {},
+  };
+  for (const [key, chapter] of Object.entries(chapters)) {
+    schema.chapters[key] = {
+      type: key,
+      cards: chapter.cards.map((card: DDSCard) => ({
+        id: card.id,
+        type: card.type,
+        title: card.title ?? '',
+        data: card,
+      })),
+    };
+  }
+  return schema;
+}
+
+export function toDDL(schema: SchemaSpec): DDLOutput {
+  const tables: string[] = [];
+  const contexts = schema.chapters['context'];
+  if (contexts?.cards) {
+    for (const card of contexts.cards) {
+      if (card.type === 'bounded-context') {
+        const tableName = (card.title ?? 'unknown').replace(/\s+/g, '_').toLowerCase();
+        tables.push(`CREATE TABLE ${tableName} (`);
+        tables.push('  id BIGSERIAL PRIMARY KEY,');
+        tables.push('  created_at TIMESTAMP DEFAULT NOW(),');
+        tables.push('  updated_at TIMESTAMP DEFAULT NOW()');
+        tables.push(');');
+      }
+    }
+  }
+  return tables.join('
+') || '-- No tables defined';
+}
+
+// ==================== Store ====================
 // ==================== Store ====================
 
 export const useDeliveryStore = create<DeliveryState>()(

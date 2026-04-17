@@ -12,7 +12,7 @@
 
 | Epic | Units | Status | Next |
 |------|-------|--------|------|
-| E1: 页面跳转连线 | E1-U1 ~ E1-U3 | ⬜ 0/3 | E1-U1 |
+| E1: 页面跳转连线 | E1-U1 ~ E1-U3 | ✅ 3/3 | — |
 | E2: 组件属性面板 | E2-U1 ~ E2-U3 | ⬜ 0/3 | E2-U1 |
 | E3: 响应式断点 | E3-U1 ~ E3-U3 | ⬜ 0/3 | E3-U1 |
 | E4: AI 草图导入 | E4-U1 ~ E4-U2 | ⬜ 0/2 | E4-U1 |
@@ -23,9 +23,9 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E1-U1 | prototypeStore edges CRUD 扩展 | ⬜ | — | store.addEdge/removeEdge 方法可用，级联清除正确 |
-| E1-U2 | FlowTreePanel 连线创建 UI | ⬜ | E1-U1 | 「添加连线」按钮可见，点击后能选择源/目标页面 |
-| E1-U3 | ProtoFlowCanvas 连线渲染 | ⬜ | E1-U1 | 画布上两点之间出现箭头连线，连线可被选中并删除 |
+| E1-U1 | prototypeStore edges CRUD 扩展 | ✅ | — | prototypeStore.addEdge/removeEdge 方法可用 |
+| E1-U2 | RoutingDrawer 连线创建 UI | ✅ | E1-U1 | RoutingDrawer 添加连线按钮可见，点击后能选择源/目标页面 |
+| E1-U3 | ProtoFlowCanvas 连线渲染 | ✅ | E1-U1 | 画布上两点之间出现箭头连线，连线可被选中并删除 |
 
 ---
 

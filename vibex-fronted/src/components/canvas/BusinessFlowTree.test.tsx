@@ -401,3 +401,7 @@ describe('E2-F2.2: componentGenerating unmount cleanup', () => {
     expect(() => unmount()).not.toThrow();
   });
 });
+
+// ─── E1-F1.1: 前置校验已由 canGenerateComponents + guard 覆盖 ───────────────────────
+// contextsToSend/flowsToSend 为空 → canGenerateComponents=false → 按钮 disabled（由 E2-F2.1 测试覆盖）
+// guard 内的 toast 为防御性代码，防止非按钮触发路径的错误调用

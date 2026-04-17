@@ -786,18 +786,25 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
   const handleContinueToComponents = useCallback(async () => {
     if (componentGenerating) return;
     const { contextsToSend, flowsToSend } = computeTreePayload();
-    // E2-F2.1: flowsToSend.length 校验必须与 canGenerateComponents 一致
-    if (contextsToSend.length === 0 || flowsToSend.length === 0) return;
+
+    // E1-F1.1 前置校验 toast（顺序：从根到叶）
+    if (contextNodes.length === 0) {
+      toast.showToast('请先生成上下文树', 'error');
+      return;
+    }
+    if (contextsToSend.length === 0) {
+      toast.showToast('请先勾选至少一个上下文节点后再生成组件树', 'error');
+      return;
+    }
+    if (flowsToSend.length === 0) {
+      toast.showToast('请先完成业务流程树的编辑和确认', 'error');
+      return;
+    }
+
     setComponentGenerating(true);
 
     try {
       const sessionId = projectId ?? `session-${Date.now()}`;
-
-      // E1: 空上下文检查
-      if (contextNodes.length === 0) {
-        toast.showToast('请先生成上下文树', 'error');
-        return;
-      }
 
       // Map context nodes to API format
       const mappedContexts: Array<{ id: string; name: string; description: string; type: string }> =

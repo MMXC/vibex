@@ -5,7 +5,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useDDSCanvasStore, ddsChapterActions } from '../DDSCanvasStore';
-import type { DDSEdge } from '@/types/dds';
+import type { DDSEdge, UserStoryCard, BoundedContextCard, FlowStepCard } from '@/types/dds';
 
 describe('DDSCanvasStore — crossChapterEdges (Epic4 E4-U1/E4-U2)', () => {
   const resetStore = () => {
@@ -158,5 +158,227 @@ describe('DDSCanvasStore — crossChapterEdges (Epic4 E4-U1/E4-U2)', () => {
 
     const stored = useDDSCanvasStore.getState().crossChapterEdges[0];
     expect(stored.sourceChapter).toBe(stored.targetChapter);
+  });
+});
+
+// ==================== CRUD Tests ====================
+
+describe('DDSCanvasStore — CRUD operations', () => {
+  const resetStore = () => {
+    useDDSCanvasStore.setState({
+      projectId: null,
+      activeChapter: 'requirement',
+      chapters: {
+        requirement: { type: 'requirement', cards: [], edges: [], loading: false, error: null },
+        context: { type: 'context', cards: [], edges: [], loading: false, error: null },
+        flow: { type: 'flow', cards: [], edges: [], loading: false, error: null },
+      },
+      crossChapterEdges: [],
+      chatHistory: [],
+      isGenerating: false,
+      selectedCardIds: [],
+      isFullscreen: false,
+      isDrawerOpen: false,
+    });
+  };
+
+  beforeEach(() => {
+    resetStore();
+  });
+
+  describe('addCard', () => {
+    it('adds a card to the correct chapter', () => {
+      const card: UserStoryCard = {
+        id: 'card-req-1',
+        type: 'user-story',
+        title: 'As a user, I want to login',
+        role: 'user',
+        action: 'login',
+        benefit: 'access my account',
+        priority: 'high',
+        position: { x: 0, y: 0 },
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      };
+
+      ddsChapterActions.addCard('requirement', card);
+
+      const cards = useDDSCanvasStore.getState().chapters.requirement.cards;
+      expect(cards).toHaveLength(1);
+      expect(cards[0].id).toBe('card-req-1');
+    });
+
+    it('does not affect other chapters when adding a card', () => {
+      const card: BoundedContextCard = {
+        id: 'card-ctx-1',
+        type: 'bounded-context',
+        title: 'User Domain',
+        name: 'User Domain',
+        description: 'user domain',
+        responsibility: 'manage user data',
+        position: { x: 0, y: 0 },
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      };
+
+      ddsChapterActions.addCard('context', card);
+
+      expect(useDDSCanvasStore.getState().chapters.requirement.cards).toHaveLength(0);
+      expect(useDDSCanvasStore.getState().chapters.flow.cards).toHaveLength(0);
+      expect(useDDSCanvasStore.getState().chapters.context.cards).toHaveLength(1);
+    });
+
+    it('adds multiple cards to the same chapter', () => {
+      const card1: FlowStepCard = {
+        id: 'card-flow-1',
+        type: 'flow-step',
+        title: 'Step 1',
+        stepName: 'Step 1',
+        position: { x: 0, y: 0 },
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      };
+      const card2: FlowStepCard = {
+        id: 'card-flow-2',
+        type: 'flow-step',
+        title: 'Step 2',
+        stepName: 'Step 2',
+        position: { x: 0, y: 10 },
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      };
+
+      ddsChapterActions.addCard('flow', card1);
+      ddsChapterActions.addCard('flow', card2);
+
+      expect(useDDSCanvasStore.getState().chapters.flow.cards).toHaveLength(2);
+    });
+  });
+
+  describe('deleteCard', () => {
+    it('deletes the specified card from the chapter', () => {
+      ddsChapterActions.addCard('requirement', {
+        id: 'card-del-1',
+        type: 'user-story',
+        title: 'Story to delete',
+        role: 'user',
+        action: 'login',
+        benefit: 'access',
+        priority: 'high',
+        position: { x: 0, y: 0 },
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      } as UserStoryCard);
+
+      ddsChapterActions.deleteCard('requirement', 'card-del-1');
+
+      expect(useDDSCanvasStore.getState().chapters.requirement.cards).toHaveLength(0);
+    });
+
+    it('deletes only the target card, preserving others', () => {
+      ddsChapterActions.addCard('context', {
+        id: 'card-keep',
+        type: 'bounded-context',
+        title: 'Keep me',
+        name: 'Keep me',
+        description: 'keep',
+        responsibility: 'keep',
+        position: { x: 0, y: 0 },
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      } as BoundedContextCard);
+      ddsChapterActions.addCard('context', {
+        id: 'card-del',
+        type: 'bounded-context',
+        title: 'Delete me',
+        name: 'Delete me',
+        description: 'del',
+        responsibility: 'del',
+        position: { x: 0, y: 10 },
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      } as BoundedContextCard);
+
+      ddsChapterActions.deleteCard('context', 'card-del');
+
+      const cards = useDDSCanvasStore.getState().chapters.context.cards;
+      expect(cards).toHaveLength(1);
+      expect(cards[0].id).toBe('card-keep');
+    });
+  });
+
+  describe('selectCard / deselectCard', () => {
+    it('selectCard adds card id to selectedCardIds', () => {
+      useDDSCanvasStore.getState().selectCard('card-select-1');
+
+      expect(useDDSCanvasStore.getState().selectedCardIds).toContain('card-select-1');
+    });
+
+    it('selectCard does not duplicate already selected card', () => {
+      useDDSCanvasStore.setState({ selectedCardIds: ['card-select-1'] });
+      useDDSCanvasStore.getState().selectCard('card-select-1');
+
+      const ids = useDDSCanvasStore.getState().selectedCardIds;
+      expect(ids.filter((id) => id === 'card-select-1')).toHaveLength(1);
+    });
+
+    it('deselectCard removes card id from selectedCardIds', () => {
+      useDDSCanvasStore.setState({ selectedCardIds: ['card-a', 'card-b'] });
+      useDDSCanvasStore.getState().deselectCard('card-a');
+
+      expect(useDDSCanvasStore.getState().selectedCardIds).not.toContain('card-a');
+      expect(useDDSCanvasStore.getState().selectedCardIds).toContain('card-b');
+    });
+
+    it('deselectCard handles non-existent card gracefully', () => {
+      useDDSCanvasStore.setState({ selectedCardIds: ['card-a'] });
+      expect(() => useDDSCanvasStore.getState().deselectCard('non-existent')).not.toThrow();
+    });
+  });
+
+  describe('toggleFullscreen', () => {
+    it('toggles isFullscreen from false to true', () => {
+      expect(useDDSCanvasStore.getState().isFullscreen).toBe(false);
+      useDDSCanvasStore.getState().toggleFullscreen();
+      expect(useDDSCanvasStore.getState().isFullscreen).toBe(true);
+    });
+
+    it('toggles isFullscreen from true to false', () => {
+      useDDSCanvasStore.setState({ isFullscreen: true });
+      useDDSCanvasStore.getState().toggleFullscreen();
+      expect(useDDSCanvasStore.getState().isFullscreen).toBe(false);
+    });
+  });
+
+  describe('toggleDrawer', () => {
+    it('toggles isDrawerOpen from false to true', () => {
+      expect(useDDSCanvasStore.getState().isDrawerOpen).toBe(false);
+      useDDSCanvasStore.getState().toggleDrawer();
+      expect(useDDSCanvasStore.getState().isDrawerOpen).toBe(true);
+    });
+
+    it('toggles isDrawerOpen from true to false', () => {
+      useDDSCanvasStore.setState({ isDrawerOpen: true });
+      useDDSCanvasStore.getState().toggleDrawer();
+      expect(useDDSCanvasStore.getState().isDrawerOpen).toBe(false);
+    });
+  });
+
+  describe('setActiveChapter', () => {
+    it('sets activeChapter to the specified chapter', () => {
+      useDDSCanvasStore.getState().setActiveChapter('context');
+      expect(useDDSCanvasStore.getState().activeChapter).toBe('context');
+    });
+
+    it('sets activeChapter to flow', () => {
+      useDDSCanvasStore.getState().setActiveChapter('flow');
+      expect(useDDSCanvasStore.getState().activeChapter).toBe('flow');
+    });
+
+    it('overwrites previous activeChapter', () => {
+      useDDSCanvasStore.getState().setActiveChapter('context');
+      useDDSCanvasStore.getState().setActiveChapter('requirement');
+      expect(useDDSCanvasStore.getState().activeChapter).toBe('requirement');
+    });
   });
 });

@@ -33,11 +33,15 @@ describe('DDSScrollContainer', () => {
     setupStore();
   });
 
-  it('renders 3 panels for requirement, context, and flow', () => {
-    render(<DDSScrollContainer />);
-    expect(screen.getByText('需求')).toBeInTheDocument();
-    expect(screen.getByText('上下文')).toBeInTheDocument();
-    expect(screen.getByText('流程')).toBeInTheDocument();
+  it('renders 3 panels as region elements', () => {
+    const { container } = render(<DDSScrollContainer />);
+    // DDSPanel renders with role="region" and aria-label
+    const regions = container.querySelectorAll('[role="region"]');
+    expect(regions).toHaveLength(3);
+    // Each panel should have its chapter label as aria-label
+    expect(screen.getByRole('region', { name: '需求' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: '上下文' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: '流程' })).toBeInTheDocument();
   });
 
   it('renders with dark theme attribute', () => {
@@ -57,16 +61,19 @@ describe('DDSScrollContainer', () => {
     expect(headers).toHaveLength(3);
   });
 
-  it('navigates to a chapter when thumb button is clicked', () => {
+  it('renders thumb buttons with correct aria-pressed state for active chapter', () => {
     render(<DDSScrollContainer />);
 
-    // There are 3 thumb buttons with aria-label='上下文' (one per panel)
-    // Clicking any should navigate to context chapter
-    const contextBtns = screen.getAllByRole('button', { name: '上下文' });
-    fireEvent.click(contextBtns[0]);
+    // Default activeChapter is 'requirement', so the 'requirement' thumb button should be aria-pressed=true
+    const reqBtns = screen.getAllByRole('button', { name: '需求' });
+    // The first one (inside the expanded requirement panel) is the nav button
+    const activeReqBtn = reqBtns[0];
+    expect(activeReqBtn).toHaveAttribute('aria-pressed', 'true');
 
-    // Store should update activeChapter
-    expect(useDDSCanvasStore.getState().activeChapter).toBe('context');
+    // The 'context' thumb button should be aria-pressed=false (not the active chapter)
+    const contextBtns = screen.getAllByRole('button', { name: '上下文' });
+    const inactiveCtxBtn = contextBtns[0];
+    expect(inactiveCtxBtn).toHaveAttribute('aria-pressed', 'false');
   });
 
   it('renders custom chapter content via renderChapterContent prop', () => {

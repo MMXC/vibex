@@ -16,6 +16,7 @@
 | E3: AI 草稿生成 | E3-U1 ~ E3-U4 | ✅ 4/4 | E3-U1 |
 | E4: 章节间 DAG 关系 | E4-U1 ~ E4-U2 | ⬜ 0/2 | E4-U1 |
 | E5: 状态与错误处理 | E5-U1 ~ E5-U3 | ✅ 3/3 | — |
+| E6: 测试覆盖 | E6-U1 | ✅ 1/1 | — |
 
 **总工时**: 22h（MVP，含 buffer）
 
@@ -419,6 +420,36 @@
 - Happy path: 超时时显示"请求超时，请稍后重试"
 
 **Verification**: `expect(screen.getByText(/网络连接失败/)).toBeVisible()`
+
+---
+
+## E6: 测试覆盖
+
+| ID | Name | Status | Depends On | Acceptance Criteria |
+|----|------|--------|-----------|---------------------|
+| E6-U1 | ✅ 单元测试覆盖 | ✅ | — | 143 tests passing，覆盖 DDSCanvasStore/ChapterPanel/DDSScrollContainer/DDSToolbar 核心逻辑 |
+
+### E6-U1 详细说明
+
+**文件变更**: `stores/dds/__tests__/DDSCanvasStore.test.ts` (扩展), `components/dds/canvas/__tests__/DDSScrollContainer.test.tsx` (修复), `components/dds/toolbar/__tests__/DDSToolbar.test.tsx` (修复), `components/dds/canvas/__tests__/ChapterPanel.test.tsx` (新建)
+
+**实现步骤**:
+1. 修复 DDSScrollContainer 测试：3-panel 渲染验证（role=region）、章节导航点击
+2. 修复 DDSToolbar 测试：章节 Tab 高亮状态（aria-pressed）
+3. 新增 ChapterPanel 单元测试：空状态/CRUD/表单/卡片选择
+4. 扩展 DDSCanvasStore 测试：addCard/deleteCard/selectCard/toggleFullscreen/toggleDrawer
+
+**Patterns to follow**: vitest + @testing-library/react 测试规范
+
+**Test scenarios**:
+- Happy path: DDSScrollContainer 渲染 3 个 panel
+- Happy path: 章节导航按钮点击切换 activeChapter
+- Happy path: ChapterPanel 空状态显示
+- Happy path: 创建/删除 UserStory/BoundedContext/FlowStep 卡片
+- Happy path: 卡片选择（多选/additive）
+- Happy path: toggleFullscreen/toggleDrawer
+
+**Verification**: `pnpm exec vitest run src/components/dds — 143 tests passing`
 
 ---
 

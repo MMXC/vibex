@@ -135,6 +135,15 @@ function ProtoFlowCanvasInner({ className = '' }: ProtoFlowCanvasProps) {
     [selectNode]
   );
 
+  // E3-U3: Responsive container — apply width style based on breakpoint
+  const breakpoint = usePrototypeStore((s) => s.breakpoint);
+  const containerStyle: React.CSSProperties = {
+    width: breakpoint,
+    maxWidth: '100%',
+    transition: 'width 0.3s ease',
+    overflow: 'hidden',
+  };
+
   // ---- Drag-and-Drop from ComponentPanel ----
   const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -171,7 +180,7 @@ function ProtoFlowCanvasInner({ className = '' }: ProtoFlowCanvasProps) {
   const miniMapNodeColor = useCallback(() => '#6366f1', []);
 
   return (
-    <div className={`${styles.canvasWrap} ${className}`}>
+    <div className={`${styles.canvasWrap} ${className}`} style={containerStyle}>
       <ReactFlow
         nodes={nodes}
         edges={edges}

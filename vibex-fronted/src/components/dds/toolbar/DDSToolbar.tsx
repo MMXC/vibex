@@ -23,6 +23,7 @@ const CHAPTER_LABELS: Record<ChapterType, string> = {
   context: '上下文',
   flow: '流程',
   api: 'API',
+  'business-rules': '业务规则',
 };
 
 // ==================== Icon SVGs ====================
@@ -89,6 +90,7 @@ export const DDSToolbar = memo(function DDSToolbar({
         context: { cards: chapters.context.cards, edges: chapters.context.edges },
         flow: { cards: chapters.flow.cards, edges: chapters.flow.edges },
         api: { cards: chapters.api.cards, edges: chapters.api.edges },
+        'business-rules': { cards: chapters['business-rules'].cards, edges: chapters['business-rules'].edges },
       },
       chatHistory
     );

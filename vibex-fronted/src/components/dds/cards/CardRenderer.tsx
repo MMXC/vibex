@@ -18,7 +18,8 @@ import { RequirementCard } from './RequirementCard';
 import { BoundedContextCard } from './BoundedContextCard';
 import { FlowStepCard } from './FlowStepCard';
 import { APIEndpointCard } from './APIEndpointCard';
-import type { APIEndpointCard as APIEndpointCardType } from '@/types/dds';
+import { StateMachineCard } from './StateMachineCard';
+import type { APIEndpointCard as APIEndpointCardType, StateMachineCard as SMCardType } from '@/types/dds';
 
 export interface CardRendererProps {
   card: DDSCard;
@@ -89,6 +90,9 @@ export const CardRenderer = memo(function CardRenderer({
 
     case 'api-endpoint':
       return <APIEndpointCard card={card as APIEndpointCardType} selected={selected} />;
+
+    case 'state-machine':
+      return <StateMachineCard card={card as SMCardType} selected={selected} />;
 
     default: {
       // TypeScript exhaustive check — this branch should never be reached

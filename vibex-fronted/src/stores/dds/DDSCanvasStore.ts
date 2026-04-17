@@ -38,6 +38,7 @@ const initialChapters: Record<ChapterType, ChapterData> = {
   context: createInitialChapterData('context'),
   flow: createInitialChapterData('flow'),
   api: createInitialChapterData('api'),
+  'business-rules': createInitialChapterData('business-rules'),
 };
 
 const initialState = {

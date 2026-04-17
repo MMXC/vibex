@@ -50,7 +50,7 @@ export function ImportPanel({ open, onClose }: ImportPanelProps) {
   const [figmaUrl, setFigmaUrl] = useState('');
   const [figmaLoading, setFigmaLoading] = useState(false);
   const [figmaError, setFigmaError] = useState<string | null>(null);
-  const [figmaResult, setFigmaResult] = useState<unknown | null>(null);
+  const [figmaResult, setFigmaResult] = useState<object | null>(null);
 
   const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -369,8 +369,8 @@ interface FigmaTabProps {
   setFigmaLoading: (v: boolean) => void;
   figmaError: string | null;
   setFigmaError: (v: string | null) => void;
-  figmaResult: unknown | null;
-  setFigmaResult: (v: unknown | null) => void;
+  figmaResult: object | null;
+  setFigmaResult: (v: object | null) => void;
 }
 
 function FigmaTab({
@@ -401,7 +401,7 @@ function FigmaTab({
       const res = await fetch(`/api/figma?url=${encodeURIComponent(url)}`);
       const data = await res.json();
       if (data.success) {
-        setFigmaResult(data.data);
+        setFigmaResult(data.data as object);
       } else {
         setFigmaError(data.error ?? '导入失败');
       }
@@ -441,7 +441,7 @@ function FigmaTab({
         </div>
       )}
 
-      {figmaResult && (
+      {figmaResult !== null && (
         <div className={styles.figmaSuccess}>
           <p>Figma 文件加载成功</p>
           <p className={styles.figmaHint}>组件数据已提取（可在后续步骤导入到画布）</p>

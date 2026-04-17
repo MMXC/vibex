@@ -15,11 +15,11 @@ export async function GET(request: Request) {
   }
 
   try {
-    const { fileKey, nodeId } = parseFigmaUrl(url);
-    if (!fileKey) {
+    const parsed = parseFigmaUrl(url);
+    if (!parsed) {
       return Response.json({ error: 'Figma URL 格式无效' }, { status: 400 });
     }
-
+    const { fileKey, nodeId } = parsed;
     const apiUrl = nodeId
       ? `https://api.figma.com/v1/files/${fileKey}/nodes/${nodeId}`
       : `https://api.figma.com/v1/files/${fileKey}`;
@@ -105,7 +105,7 @@ function parseFigmaUrl(url: string): { fileKey: string; nodeId?: string } | null
     if (match) {
       const fileKey = match[1];
       // Extract node-id from query params
-      const nodeMatch = url.match(/[?&]node-id=([^&]+)/);
+      const nodeMatch = url.match(/[?&]node-id=([^&#]+)/);
       return {
         fileKey,
         nodeId: nodeMatch ? decodeURIComponent(nodeMatch[1]) : undefined,

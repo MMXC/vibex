@@ -33,6 +33,19 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '2b3d69f4',
   },
   {
+    version: '1.0.255',
+    date: '2026-04-17',
+    changes: [
+      '📋 vibex-sprint3-prototype-extend E1: 页面跳转连线',
+      '✅ E1-U1 prototypeStore edges: addEdge/removeEdge (smoothstep + animated)',
+      '✅ E1-U2 RoutingDrawer 连线 UI: 添加按钮 + 源/目标选择器 + 连线列表',
+      '✅ E1-U3 ProtoFlowCanvas 连线渲染: onConnect 启用 + Delete 键删除',
+      '✅ E1 测试: 7 个新用例覆盖 CRUD + 幂等性 + edges/nodes 独立性',
+      '⚠️ Note: 代码在 2b3d69f4（与 Epic4 同一 commit，测试补充在 1837905e）',
+    ],
+    commit: '2b3d69f4 + 1837905e',
+  },
+  {
     version: '1.0.253',
     date: '2026-04-17',
     changes: [

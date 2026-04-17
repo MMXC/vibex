@@ -61,25 +61,27 @@
 
 ---
 
-### E1-U2: FlowTreePanel 连线创建 UI
+### E1-U2: RoutingDrawer 连线创建 UI
 
-**Goal:** FlowTreePanel 增加「添加连线」按钮，用户可选择源页面和目标页面创建连线。
+**Goal:** RoutingDrawer 增加「添加连线」按钮，用户可选择源页面和目标页面创建连线。
 
 **Requirements:** E1-AC1
 
 **Dependencies:** E1-U1
 
 **Files:**
-- Modify: `vibex-fronted/src/components/canvas/panels/FlowTreePanel.tsx`
-- Test: `vibex-fronted/src/components/canvas/panels/__tests__/FlowTreePanel.test.tsx`
+- Modify: `vibex-fronted/src/components/prototype/RoutingDrawer.tsx`
+- Test: `vibex-fronted/src/stores/prototypeStore.test.ts`
 
 **Approach:**
-- 在 FlowTreePanel 工具栏区域增加「添加连线」图标按钮
+- 在 RoutingDrawer 抽屉内增加「添加连线」图标按钮
 - 点击后弹出 `Select` 下拉框（源页面 → 目标页面），确认后调用 `prototypeStore.addEdge()`
-- 连接成功后刷新页面树，显示连线列表（每条连线显示为 "页面A → 页面B"）
+- 连接成功后显示连线列表（每条连线显示为 "页面A → 页面B"），支持删除
 
 **Patterns to follow:**
-- `vibex-fronted/src/components/canvas/panels/FlowTreePanel.tsx` 现有按钮交互模式
+- `vibex-fronted/src/components/prototype/RoutingDrawer.tsx` 现有页面管理交互模式
+
+**Note:** 计划文件曾误写为 FlowTreePanel.tsx，实际实现在 RoutingDrawer.tsx（2b3d69f4）
 
 **Test scenarios:**
 - Happy path: 点击「添加连线」→ 选择页面 → 确认 → `addEdge` 被调用

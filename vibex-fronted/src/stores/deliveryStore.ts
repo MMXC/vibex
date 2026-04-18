@@ -429,14 +429,27 @@ export const useDeliveryStore = create<DeliveryState>()(
           status: 'success',
         });
 
-        // TODO: Replace with actual API call
-        // const response = await fetch('/api/delivery/export', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({ type, id, format }),
-        // });
-        // const data = await response.json();
-        // triggerDownload(data.downloadUrl, data.filename);
+        // E4-U3: Real download via /api/delivery/export
+        try {
+          const response = await fetch('/api/delivery/export', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type, id, format }),
+          });
+          if (!response.ok) throw new Error('Export failed');
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          const filename = response.headers.get('X-Filename') || `${type}-${id}.${format === 'pdf' ? 'pdf' : 'md'}`;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        } catch (err) {
+          console.error('[deliveryStore] exportItem failed:', err);
+        }
 
         set({
           isExporting: false,

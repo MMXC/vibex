@@ -1,78 +1,72 @@
 /**
  * PRDTab - PRD 导出 Tab
+ *
+ * E4-U2: Replaced hardcoded "电商系统" with generatePRDMarkdown from delivery store data.
  */
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useDeliveryStore } from '@/stores/deliveryStore';
+import { generatePRDMarkdown } from '@/lib/delivery/PRDGenerator';
 import { FileText } from 'lucide-react';
 import styles from './delivery.module.css';
 
-const PRD_SECTIONS = [
-  {
-    id: 'overview',
-    title: '项目概述',
-    content: `## 项目概述
-
-- 项目名称: 电商系统
-- 领域: 电商平台
-- 核心目标: 构建高效的电商交易平台`,
-  },
-  {
-    id: 'contexts',
-    title: '限界上下文',
-    content: `## 限界上下文
-
-### 商品域
-商品目录和库存管理
-
-### 订单域
-订单处理和履约
-
-### 用户域
-用户账号和权限管理`,
-  },
-  {
-    id: 'flows',
-    title: '业务流程',
-    content: `## 业务流程
-
-### 下单流程
-1. 用户浏览商品
-2. 加入购物车
-3. 确认订单
-4. 发起支付
-5. 支付成功
-
-### 注册流程
-1. 填写注册信息
-2. 验证邮箱
-3. 完成注册`,
-  },
-  {
-    id: 'components',
-    title: '组件架构',
-    content: `## 组件架构
-
-### 商品服务
-商品相关业务逻辑
-
-### 订单控制器
-订单 API 接口
-
-### 用户仓储
-用户数据持久化`,
-  },
-];
-
 export function PRDTab() {
-  const { exportItem, isExporting, exportProgress } = useDeliveryStore();
+  const { contexts, flows, components, exportItem, isExporting, exportProgress } =
+    useDeliveryStore();
   const [showFullPRD, setShowFullPRD] = useState(false);
-  
+
   const isCurrentExport = exportProgress?.type === 'prd';
   const isExportingPRD = isCurrentExport && exportProgress?.status === 'exporting';
-  
+
+  // Build PRD sections from store data (E4-U2)
+  const prdSections = useMemo(() => {
+    const md = generatePRDMarkdown({
+      projectName: 'Vibex DDD 项目',
+      domain: '领域驱动设计',
+      goal: '通过 DDS 画布构建完整的系统架构文档',
+      contexts,
+      flows,
+      components,
+    });
+
+    // Parse markdown into sections
+    const sections = [
+      {
+        id: 'overview',
+        title: '项目概述',
+        preview: 'Vibex DDD 项目 / 领域驱动设计 / 系统架构文档',
+      },
+    ];
+
+    if (contexts.length > 0) {
+      sections.push({
+        id: 'contexts',
+        title: '限界上下文',
+        preview: `共 ${contexts.length} 个限界上下文`,
+      });
+    }
+
+    if (flows.length > 0) {
+      sections.push({
+        id: 'flows',
+        title: '业务流程',
+        preview: `共 ${flows.length} 个业务流程`,
+      });
+    }
+
+    if (components.length > 0) {
+      sections.push({
+        id: 'components',
+        title: '组件架构',
+        preview: `共 ${components.length} 个组件`,
+      });
+    }
+
+    return { sections, fullMarkdown: md };
+  }, [contexts, flows, components]);
+
   const handleExport = async (format: 'markdown' | 'pdf') => {
     await exportItem('prd', 'prd-main', format);
   };
@@ -82,14 +76,14 @@ export function PRDTab() {
       <div className={styles.sectionHeader}>
         <span className={styles.count}>PRD 大纲</span>
         <div className={styles.prdExportActions}>
-          <button 
+          <button
             className={styles.exportBtn}
             onClick={() => handleExport('markdown')}
             disabled={isExporting}
           >
             Markdown
           </button>
-          <button 
+          <button
             className={styles.exportBtn}
             onClick={() => handleExport('pdf')}
             disabled={isExporting}
@@ -101,31 +95,31 @@ export function PRDTab() {
           </button>
         </div>
       </div>
-      
+
       {isExportingPRD && (
         <div className={styles.progressBar}>
-          <div 
-            className={styles.progressFill} 
+          <div
+            className={styles.progressFill}
             style={{ width: `${exportProgress?.progress || 0}%` }}
           />
         </div>
       )}
-      
+
       <div className={styles.prdOutline}>
-        {PRD_SECTIONS.map((section) => (
+        {prdSections.sections.map((section) => (
           <div key={section.id} className={styles.prdSection}>
             <h3 className={styles.prdSectionTitle}>
               <FileText size={16} />
               {section.title}
             </h3>
             {showFullPRD && (
-              <pre className={styles.prdSectionContent}>{section.content}</pre>
+              <pre className={styles.prdSectionContent}>{section.preview}</pre>
             )}
           </div>
         ))}
       </div>
-      
-      <button 
+
+      <button
         className={styles.previewBtn}
         onClick={() => setShowFullPRD(!showFullPRD)}
         style={{ marginTop: '16px' }}

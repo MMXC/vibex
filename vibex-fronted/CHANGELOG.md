@@ -24,6 +24,11 @@
 - **E4-U3 exportItem**: `stores/deliveryStore.ts` + `/api/delivery/export/route.ts` — POST API 实现实际下载功能
 - **测试**: delivery/__tests__ 27 passing
 - **提交**: `339d2da9`
+### [vibex-sprint5-delivery-integration E5: PRDTab 空状态组件] — 2026-04-18
+- **E5-U1 空状态引导**: `components/delivery/PRDTab.tsx` — 添加"请先在 DDS 画布中创建限界上下文、业务流程或组件，再生成 PRD 文档"空状态提示
+- **E5-U1 样式**: `delivery.module.css` — .emptyStateText 样式
+- **测试**: delivery/__tests__ 34 passing
+- **提交**: `03df8e2c`
 
 ### [vibex-sprint6-ai-coding-integration E1: 设计稿导入] — 2026-04-18
 - **E1-U1 /api/figma route**: GET/POST Figma REST API proxy (`app/api/figma/route.ts`)

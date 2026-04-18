@@ -79,8 +79,8 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E6-U1 | DDSCanvasStore 测试数量 | ⬜ | — | 24 tests，确认 analyst 声称的 143 为全局总计 |
-| E6-U2 | deselectCard 状态 | ⬜ | U1 | deselectCard 测试状态确认 |
+| E6-U1 | DDSCanvasStore 测试数量 | :white_check_mark: | — | 24 tests，确认 analyst 声称的 143 为全局总计 |
+| E6-U2 | deselectCard 状态 | :white_check_mark: | U1 | deselectCard 测试状态确认 |
 
 ---
 

@@ -5,14 +5,13 @@
  * state sync and sessionStorage persistence for the three DDD stores:
  *   - contextSlice (bounded contexts)
  *   - modelSlice   (domain models)
- *   - designStore  (business flows)
+ *   - confirmationStore (managed independently)
  *
  * Safe to call multiple times (singleton pattern).
  */
 
 import { useContextStore } from '../contextSlice';
 import { useModelStore } from '../modelSlice';
-import { useDesignStore } from '../designStore';
 import { initDDDStateSync } from './middleware';
 
 let _initialized = false;
@@ -32,7 +31,6 @@ export function initDDDStores(): void {
   initDDDStateSync(
     useContextStore,
     useModelStore,
-    useDesignStore
   );
 }
 

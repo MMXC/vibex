@@ -4,7 +4,7 @@
  * Cross-slice sync manager for the three DDD stores:
  * - contextSlice  (bounded contexts)
  * - modelSlice    (domain models)
- * - designStore  (business flows via businessFlows)
+ * Note: businessFlows are managed by confirmationStore which handles its own persistence.
  *
  * Responsibilities:
  * 1. Listen to state changes across the three slices
@@ -93,7 +93,7 @@ class DDDStateSyncManager {
   register(
     contextStore: StoreSlice<any>,
     modelStore: StoreSlice<any>,
-    designStore: StoreSlice<any>
+    _designStore: StoreSlice<any> | undefined
   ): void {
     if (this._registered) return;
     this._registered = true;
@@ -104,7 +104,7 @@ class DDDStateSyncManager {
       const prevContexts = (prev['boundedContexts'] ?? []) as unknown[];
       if (contexts === prevContexts) return;
       this._syncKeys.context = computeContextSyncKey(contexts);
-      this._persistAll(contextStore, modelStore, designStore);
+      this._persistAll(contextStore, modelStore, _designStore);
     });
     this._unsubscribers.push(unsubContext);
 
@@ -114,19 +114,9 @@ class DDDStateSyncManager {
       const prevModels = (prev['domainModels'] ?? []) as unknown[];
       if (models === prevModels) return;
       this._syncKeys.model = computeModelSyncKey(models);
-      this._persistAll(contextStore, modelStore, designStore);
+      this._persistAll(contextStore, modelStore, _designStore);
     });
     this._unsubscribers.push(unsubModel);
-
-    // --- Subscribe to designStore (flow) changes ---
-    const unsubDesign = designStore.subscribe((state, prev) => {
-      const flows = (state['businessFlows'] ?? []) as unknown[];
-      const prevFlows = (prev['businessFlows'] ?? []) as unknown[];
-      if (flows === prevFlows) return;
-      this._syncKeys.flow = computeFlowSyncKey(flows);
-      this._persistAll(contextStore, modelStore, designStore);
-    });
-    this._unsubscribers.push(unsubDesign);
 
     // --- Listen to browser navigation (popstate) ---
     if (typeof window !== 'undefined') {
@@ -134,7 +124,7 @@ class DDDStateSyncManager {
         const newRoute = window.location.pathname;
         if (newRoute !== this._currentRoute) {
           this._currentRoute = newRoute;
-          this._persistAll(contextStore, modelStore, designStore);
+          this._persistAll(contextStore, modelStore, _designStore);
         }
       };
       window.addEventListener('popstate', handlePopstate);
@@ -145,11 +135,11 @@ class DDDStateSyncManager {
   private _persistAll(
     contextStore: StoreSlice<any>,
     modelStore: StoreSlice<any>,
-    designStore: StoreSlice<any>
+    _designStore: StoreSlice<any> | undefined
   ): void {
     const ctx = contextStore.getState();
     const model = modelStore.getState();
-    const design = designStore.getState();
+    // confirmationStore handles its own persistence via history/undo
 
     const state: PersistedDDDState = {
       boundedContexts: (ctx['boundedContexts'] ?? []) as unknown[],
@@ -158,8 +148,8 @@ class DDDStateSyncManager {
       domainModels: (model['domainModels'] ?? []) as unknown[],
       modelMermaidCode: (model['modelMermaidCode'] ?? '') as string,
       selectedModelIds: (model['selectedModelIds'] ?? []) as string[],
-      businessFlows: (design['businessFlows'] ?? []) as unknown[],
-      requirementText: (design['requirementText'] ?? '') as string,
+      businessFlows: [],
+      requirementText: '',
       _lastSync: Date.now(),
     };
 
@@ -188,11 +178,9 @@ class DDDStateSyncManager {
       setModelMermaidCode?: (c: string) => void;
       setSelectedModelIds?: (ids: string[]) => void;
     },
-    designStore: {
+    _designStore: {
       getState: () => Record<string, unknown>;
-      setBusinessFlows?: (f: unknown[]) => void;
-      setRequirementText?: (t: string) => void;
-    }
+    } | undefined
   ): boolean {
     const snapshot = restoreSnapshot();
     if (!snapshot) return false;
@@ -229,17 +217,7 @@ class DDDStateSyncManager {
       }
     }
 
-    // Restore business flows
-    if (route.includes('business-flow') || route.includes('flow')) {
-      const design = designStore.getState();
-      if (!((design['businessFlows'] as unknown[])?.length) && snapshot.businessFlows?.length) {
-        designStore.setBusinessFlows?.(snapshot.businessFlows);
-        if (snapshot.requirementText) {
-          designStore.setRequirementText?.(snapshot.requirementText);
-        }
-        restored = true;
-      }
-    }
+    // confirmationStore manages its own persistence via history/undo
 
     return restored;
   }
@@ -272,9 +250,9 @@ export const dddStateSyncManager = new DDDStateSyncManager();
 export function initDDDStateSync(
   contextStore: StoreSlice<any>,
   modelStore: StoreSlice<any>,
-  designStore: StoreSlice<any>
+  _designStore?: StoreSlice<any>
 ): void {
-  dddStateSyncManager.register(contextStore, modelStore, designStore);
+  dddStateSyncManager.register(contextStore, modelStore, _designStore);
 }
 
 /**
@@ -286,9 +264,9 @@ export function checkDDDStateRestore(
   route: string,
   contextStore: Parameters<typeof dddStateSyncManager.checkAndRestore>[1],
   modelStore: Parameters<typeof dddStateSyncManager.checkAndRestore>[2],
-  designStore: Parameters<typeof dddStateSyncManager.checkAndRestore>[3]
+  _designStore?: Parameters<typeof dddStateSyncManager.checkAndRestore>[3]
 ): boolean {
-  return dddStateSyncManager.checkAndRestore(route, contextStore, modelStore, designStore);
+  return dddStateSyncManager.checkAndRestore(route, contextStore, modelStore, _designStore);
 }
 
 /**

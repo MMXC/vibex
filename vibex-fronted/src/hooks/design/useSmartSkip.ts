@@ -4,7 +4,7 @@
  */
 
 import { useMemo, useCallback } from 'react';
-import { useDesignStore } from '@/stores/designStore';
+import { useConfirmationStore } from '@/stores/confirmationStore';
 
 export interface SkipRule {
   questionId: string;
@@ -15,9 +15,8 @@ export interface SkipContext {
   requirementText: string;
   clarificationRounds: Array<{ question: string; answer: string; isAccepted: boolean }>;
   boundedContexts: Array<{ name: string; description: string }>;
-  domainEntities: Array<{ name: string; type: string }>;
-  businessFlows: Array<{ name: string }>;
-  uiPages: Array<{ name: string }>;
+  domainModels: Array<{ name: string; type: string }>;
+  hasBusinessFlow: boolean;
 }
 
 // 预定义跳过规则
@@ -35,19 +34,14 @@ export const defaultSkipRules: SkipRule[] = [
   // 如果已有领域实体，跳过基础概念解释
   {
     questionId: 'entity-explanation',
-    check: (ctx) => ctx.domainEntities.length > 0,
+    check: (ctx) => ctx.domainModels.length > 0,
   },
   // 如果已有业务流程，跳过流程概念解释
   {
     questionId: 'flow-explanation',
-    check: (ctx) => ctx.businessFlows.length > 0,
+    check: (ctx) => ctx.hasBusinessFlow,
   },
-  // 如果已有 UI 页面，跳过 UI 概念解释
-  {
-    questionId: 'ui-explanation',
-    check: (ctx) => ctx.uiPages.length > 0,
-  },
-  // 如果需求文本已包含多端相关内容
+// 如果需求文本已包含多端相关内容
   {
     questionId: 'multi-platform',
     check: (ctx) => /小程序|APP|移动端|PC端|网页|响应式/.test(ctx.requirementText),
@@ -60,7 +54,7 @@ export const defaultSkipRules: SkipRule[] = [
 ];
 
 export function useSmartSkip() {
-  const store = useDesignStore();
+  const store = useConfirmationStore();
 
   const getSkipContext = useCallback((): SkipContext => {
     return {
@@ -68,27 +62,21 @@ export function useSmartSkip() {
       clarificationRounds: store.clarificationRounds.map((r) => ({
         question: r.question,
         answer: r.answer,
-        isAccepted: r.isAccepted,
+        isAccepted: r.isAccepted ?? false,
       })),
       boundedContexts: store.boundedContexts,
-      domainEntities: store.domainEntities.map((e) => ({
-        name: e.name,
-        type: e.type,
+      domainModels: store.domainModels.map((e) => ({
+        name: e.name ?? '',
+        type: e.type ?? '',
       })),
-      businessFlows: store.businessFlows.map((f) => ({
-        name: f.name,
-      })),
-      uiPages: store.uiPages.map((p) => ({
-        name: p.name,
-      })),
+      hasBusinessFlow: (store.businessFlow?.steps?.length ?? 0) > 0,
     };
   }, [
     store.requirementText,
     store.clarificationRounds,
     store.boundedContexts,
-    store.domainEntities,
-    store.businessFlows,
-    store.uiPages,
+    store.domainModels,
+    store.businessFlow?.steps?.length,
   ]);
 
   const shouldSkipQuestion = useCallback(

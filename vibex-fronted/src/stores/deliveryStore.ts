@@ -50,6 +50,8 @@ export interface BusinessFlow {
   contextName: string;
   stepCount: number;
   decisionCount: number;
+  steps?: string[];
+  relations?: unknown[];
 }
 
 export interface Component {
@@ -91,6 +93,7 @@ export interface DeliveryState {
   setActiveTab: (tab: DeliveryTab) => void;
   setSearchQuery: (query: string) => void;
   setTypeFilter: (type: string) => void;
+  loadFromStores: () => void;
   loadMockData: () => void;
   toComponent: (node: ProtoNode) => ComponentSpec;
   toSchema: (chapters: Record<string, ChapterData>) => SchemaSpec;

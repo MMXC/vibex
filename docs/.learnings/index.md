@@ -1,1 +1,2 @@
 - [vibex-canvas-silent-400](vibex-canvas-silent-400.md) — Canvas 静默 400 + async/await 修复 (2026-04-17)
+- [sprint-qa-stub-detection-pattern](sibex-sprint-qa-stub-detection-pattern-20260418.md) — Sprint QA 持续发现 Stub 未替换 — 结构性数据流断链 (2026-04-18)

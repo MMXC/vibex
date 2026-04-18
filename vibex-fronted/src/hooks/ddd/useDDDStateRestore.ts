@@ -19,7 +19,6 @@ import {
   checkDDDStateRestore,
   useContextStore,
   useModelStore,
-  useDesignStore,
 } from '@/stores/ddd';
 
 export function useDDDStateRestore(): void {
@@ -42,7 +41,6 @@ export function useDDDStateRestore(): void {
       pathname,
       useContextStore as any,
       useModelStore as any,
-      useDesignStore as any
     );
   }, [pathname]);
 }

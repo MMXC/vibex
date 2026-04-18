@@ -67,7 +67,7 @@ function toUpperMethod(method: string): string {
 export function toOpenAPISpec(
   cards: APIEndpointCard[],
   options: { title?: string; version?: string } = {}
-): string {
+): OpenAPISpec {
   const { title = 'DDS Canvas API', version = '1.0.0' } = options;
 
   const paths: OpenAPISpec['paths'] = {};

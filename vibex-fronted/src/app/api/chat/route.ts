@@ -1,3 +1,5 @@
+export const dynamic = "force-static";
+
 /**
  * /api/chat — AI Chat Completions API
  * Sprint6 E1-U1: Image AI 解析端点

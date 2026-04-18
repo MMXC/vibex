@@ -7,7 +7,7 @@
 
 'use client';
 
-import type { DDLTable } from './DDLGenerator';
+import type { DDLTable, DDLColumn } from './DDLGenerator';
 
 export type DBType = 'mysql' | 'postgresql';
 

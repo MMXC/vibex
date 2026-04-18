@@ -53,8 +53,8 @@
 - **T4 DeliveryNav**: `components/delivery/DeliveryNav.tsx` — 3-canvas nav tabs (原型/DDS/交付中心)，usePathname 高亮当前
 - **T5 CanvasBreadcrumb**: `components/shared/CanvasBreadcrumb.tsx` — 面包屑导航组件，支援 items[] 任意层级
 - **交付中心集成**: delivery/page.tsx 导入 DeliveryNav + CanvasBreadcrumb，DeliveryNav.index.ts 导出
-- **测试**: DeliveryNav (3 tests) + CanvasBreadcrumb (4 tests) = 7 passing
-- 提交: 75bf4ec3
+- **测试**: DeliveryNav (7 tests, 扩自 3) + CanvasBreadcrumb (4 tests) = 11 passing
+- 提交: 75bf4ec3 + e213ccc5 (QA)
 
 ### [Unreleased] vibex-sprint5-delivery-integration E3: DDL 生成 — 2026-04-18
 - **T6 DDLGenerator**: `lib/delivery/DDLGenerator.ts` — `generateDDL()` converts `APIEndpointCard[]` → `DDLTable[]` (tableName/columns/primaryKey/foreignKeys)

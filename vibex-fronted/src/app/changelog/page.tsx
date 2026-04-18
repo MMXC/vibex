@@ -37,9 +37,9 @@ const mockChangelog: ChangelogEntry[] = [
       '📋 vibex-sprint5-delivery-integration E2: 跨画布导航',
       '✅ T4 DeliveryNav: 3-canvas nav tabs (原型画布/详设画布/交付中心)',
       '✅ T5 CanvasBreadcrumb: 面包屑导航组件',
-      '✅ 测试: DeliveryNav 3 + CanvasBreadcrumb 4 = 7 passing',
+      '✅ 测试: DeliveryNav 7 + CanvasBreadcrumb 4 = 11 passing (QA扩自3)',
     ],
-    commit: '75bf4ec3',
+    commit: '75bf4ec3 + e213ccc5 (QA)',
   },
   {
     version: '1.0.268',

@@ -27,10 +27,10 @@ const CHAPTER_ORDER: ChapterType[] = ['requirement', 'context', 'flow', 'api', '
 
 /** Chapter horizontal offset as fraction of scroll container width */
 const CHAPTER_OFFSETS: Record<ChapterType, number> = {
-  requirement: 0,
-  context: 1 / 3,
-  flow: 2 / 3,
-  api: 3 / 4,
+// P2-001 fix: evenly distributed (0, 0.25, 0.5, 0.75, 1)
+  context: 0.25,
+  flow: 0.5,
+  api: 0.75,
   'business-rules': 1,
 };
 

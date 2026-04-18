@@ -31,7 +31,7 @@ export type DDLOutput = string;
 
 // ==================== Types ====================
 
-export type DeliveryTab = 'contexts' | 'flows' | 'components' | 'prd';
+export type DeliveryTab = 'contexts' | 'flows' | 'components' | 'prd' | 'ddl';
 export type ExportFormat = 'json' | 'markdown' | 'plantuml' | 'bpmn' | 'typescript' | 'schema' | 'zip' | 'pdf';
 export type ExportType = 'context' | 'flow' | 'component' | 'prd';
 export type ExportAllType = 'contexts' | 'flows' | 'components';

@@ -16,6 +16,7 @@ import {
   FlowTab,
   ComponentTab,
   PRDTab,
+  DDLDrawer,
 } from '@/components/delivery';
 import { ArrowLeft, Search, History, Trash2 } from 'lucide-react';
 import styles from './delivery.module.css';
@@ -64,6 +65,8 @@ export default function DeliveryCenterPage() {
         return <ComponentTab />;
       case 'prd':
         return <PRDTab />;
+      case 'ddl':
+        return <DDLDrawer />;
       default:
         return <ContextTab />;
     }

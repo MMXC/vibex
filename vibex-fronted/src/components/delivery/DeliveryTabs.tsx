@@ -13,6 +13,7 @@ const TABS: { id: DeliveryTab; label: string; icon: string }[] = [
   { id: 'flows', label: '流程文档', icon: '📋' },
   { id: 'components', label: '组件清单', icon: '🧩' },
   { id: 'prd', label: 'PRD', icon: '📄' },
+  { id: 'ddl', label: 'DDL', icon: '🗄️' },
 ];
 
 export function DeliveryTabs() {

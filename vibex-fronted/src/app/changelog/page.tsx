@@ -120,6 +120,15 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '9d1bd809',
   },
   {
+    version: '1.0.275',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint4-spec-canvas-extend E5-QA: 章节存在性测试',
+      '✅ chapter-existence.test.ts: 3 个测试用例',
+    ],
+    commit: '5ee0081e',
+  },
+  {
     version: '1.0.271',
     date: '2026-04-18',
     changes: [

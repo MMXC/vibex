@@ -17,7 +17,7 @@
 import React, { memo, useState, useCallback } from 'react';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
 import { CardRenderer } from '@/components/dds/cards';
-import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog';
+import { useConfirmDialogStore } from '@/lib/canvas/stores/confirmDialogStore';
 import type { ChapterType, DDSCard, CardType, UserStoryCard, BoundedContextCard, FlowStepCard, APIEndpointCard } from '@/types/dds';
 import styles from './ChapterPanel.module.css';
 
@@ -311,8 +311,6 @@ export const ChapterPanel = memo(function ChapterPanel({
   const { addCard, deleteCard } = ddsChapterActions;
 
   const [showCreateForm, setShowCreateForm] = useState(false);
-  // E1-U2: Replace window.confirm() with ConfirmationModal
-  const [deleteConfirmCardId, setDeleteConfirmCardId] = useState<string | null>(null);
   const [creatingType, setCreatingType] = useState<CardType | null>(null);
 
   // ---- Add card ----
@@ -378,6 +376,9 @@ export const ChapterPanel = memo(function ChapterPanel({
       tags: [],
       parameters: [],
       responses: [],
+      position: { x: 0, y: 0 },
+      createdAt: nowISO(),
+      updatedAt: nowISO(),
     };
     addCard('api', card);
     setShowCreateForm(false);
@@ -405,14 +406,25 @@ export const ChapterPanel = memo(function ChapterPanel({
     [chapter, addCard]
   );
 
-  // E1-U2: Handle confirmed delete
-  const handleConfirmDelete = useCallback(() => {
-    if (deleteConfirmCardId) { deleteCard(chapter, deleteConfirmCardId); setDeleteConfirmCardId(null); }
-  }, [deleteConfirmCardId, onDelete]);
+  // E1-U2: Cancel button for create form
+  const handleCancelCreate = useCallback(() => {
+    setShowCreateForm(false);
+    setCreatingType(null);
+  }, []);
 
+  // E1-U2: Open confirmation dialog before delete
   const handleDeleteCard = useCallback(
     (cardId: string) => {
-      setDeleteConfirmCardId(cardId);
+      useConfirmDialogStore.getState().open({
+        title: '确认删除',
+        message: '确定删除此卡片？',
+        confirmLabel: '删除',
+        cancelLabel: '取消',
+        destructive: true,
+        onConfirm: () => {
+          deleteCard(chapter, cardId);
+        },
+      });
     },
     [chapter, deleteCard]
   );

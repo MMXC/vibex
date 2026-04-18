@@ -142,6 +142,17 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '0d36227d',
   },
   {
+    version: '1.0.270',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint6-ai-coding-integration E3: 版本 Diff',
+      '✅ U6 VersionDiff: diffVersions() 结构化 diff (added/removed/modified/changed)',
+      '✅ U7 集成: app/canvas/delivery/version/page.tsx — VersionDiff 页面',
+      '✅ 测试: VersionDiff.test.ts — 11 passing',
+    ],
+    commit: '90a90155',
+  },
+  {
     version: '1.0.258',
     date: '2026-04-18',
     changes: [

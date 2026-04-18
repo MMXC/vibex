@@ -68,6 +68,12 @@
 - **E4-U5 Tests**: `exporter.test.ts` — 16 passing tests
 - **提交**: `9a3e239d` (E4-U1~U5)
 
+### [vibex-sprint4-spec-canvas-extend E5: 章节四态规范] — 2026-04-18
+- **E5-U1 CardErrorBoundary**: `components/dds/canvas/CardErrorBoundary.tsx` — ErrorBoundary 捕获卡片渲染异常，显示错误状态
+- **E5-U2 章节四态**: ChapterPanel 骨架屏/加载中/空状态/错误态 (ChapterSkeleton/ChapterLoading/ChapterEmpty/ChapterError)
+- **测试**: `DDSFourStates.test.tsx` — 5 passing tests
+- **提交**: `9d1bd809` (E5-U1~U2)
+
 ### [vibex-sprint3-prototype-extend E4-QA: 图片导入测试] — 2026-04-18
 - **E4-QA image-import**: `services/figma/image-import.test.ts` — 5 个用例（success/empty/non-JSON/file-size/timeout）
 - **E4-QA image-ai-import**: `lib/figma/image-ai-import.test.ts` — 6 个用例 (AC1/AC2/AC3)

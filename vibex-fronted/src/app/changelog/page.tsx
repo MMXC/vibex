@@ -97,6 +97,17 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '9a3e239d',
   },
   {
+    version: '1.0.267',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint4-spec-canvas-extend E5: 章节四态规范',
+      '✅ E5-U1 CardErrorBoundary: 捕获卡片渲染异常',
+      '✅ E5-U2 章节四态: 骨架屏/加载中/空状态/错误态',
+      '✅ 测试: DDSFourStates.test.tsx — 5 passing',
+    ],
+    commit: '9d1bd809',
+  },
+  {
     version: '1.0.259',
     date: '2026-04-18',
     changes: [

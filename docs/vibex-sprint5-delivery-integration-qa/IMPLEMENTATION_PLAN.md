@@ -20,7 +20,7 @@
 | E1: 数据层审查 | U1~U2 | 0/2 | U1 |
 | E2: 导航审查 | U3 | 0/1 | U3 |
 | E3: 导出器审查 | U4 | 0/1 | U4 |
-| E4: PRD融合审查 | U5~U7 | 0/3 | U5 |
+| E4: PRD融合审查 | U5~U7 | 3/3 ✅ | — |
 | E5: 状态处理审查 | U8 | 0/1 | U8 |
 | E6: 缺陷归档 | U9~U10 | 0/2 | U9 |
 | E7: 最终报告 | U11 | 0/1 | U11 |
@@ -68,9 +68,9 @@ useEffect(() => { loadFromStores(); }, []);
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E4-U1 | PRDGenerator 新建 | ⬜ | — | `src/lib/delivery/PRDGenerator.ts` 存在，含 generatePRD + generatePRDMarkdown |
-| E4-U2 | PRDTab 替换硬编码 | ⬜ | U1 | PRDTab.tsx 调用 generatePRDMarkdown，grep "电商系统" → 0 |
-| E4-U3 | exportItem 替换 TODO | ⬜ | U2 | exportItem 有实际下载逻辑，grep "TODO.*Replace" → 0 |
+| E4-U1 | PRDGenerator 新建 | ✅ | — | lib/delivery/PRDGenerator.ts ✅ 5 tests |
+| E4-U2 | PRDTab 替换硬编码 | ✅ | U1 | PRDTab.tsx ✅ 无"电商系统"硬编码，使用 generatePRDMarkdown |
+| E4-U3 | exportItem 替换 TODO | ✅ | U2 | deliveryStore.ts ✅ 无 TODO:Replace，/api/delivery/export 实现 |
 
 ### E4-U1 详细说明
 

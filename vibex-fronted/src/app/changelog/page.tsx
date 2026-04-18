@@ -131,6 +131,17 @@ const mockChangelog: ChangelogEntry[] = [
     commit: 'e6dd07a5',
   },
   {
+    version: '1.0.269',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint6-ai-coding-integration E2: AI Coding Agent',
+      '✅ U4 AgentFeedbackPanel: AI 反馈面板，session list + message history + retry',
+      '✅ U5 AgentSessions: 会话列表，支持新建/删除/切换',
+      '✅ agentStore: sessions/activeSession/currentMessage/retryCount 状态管理',
+    ],
+    commit: '0d36227d',
+  },
+  {
     version: '1.0.258',
     date: '2026-04-18',
     changes: [

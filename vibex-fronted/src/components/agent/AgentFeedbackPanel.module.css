@@ -1,0 +1,238 @@
+/**
+ * AgentFeedbackPanel.module.css — Sprint6 U4
+ */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 300px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.headerTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 11px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.status_idle { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.4); }
+.status_starting { background: rgba(234,179,8,0.2); color: rgba(234,179,8,0.9); }
+.status_running { background: rgba(59,130,246,0.2); color: rgba(59,130,246,0.9); }
+.status_complete { background: rgba(34,197,94,0.2); color: rgba(34,197,94,0.9); }
+.status_error { background: rgba(248,113,113,0.2); color: rgba(248,113,113,0.9); }
+.status_terminated { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); }
+
+.taskBanner {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: 12px;
+}
+
+.taskLabel {
+  color: rgba(255, 255, 255, 0.3);
+  white-space: nowrap;
+}
+
+.taskText {
+  color: rgba(255, 255, 255, 0.6);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(248, 113, 113, 0.08);
+  border-bottom: 1px solid rgba(248, 113, 113, 0.15);
+  font-size: 12px;
+  color: rgba(248, 113, 113, 0.9);
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.emptyMessages {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 100px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.idleState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 32px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Message bubbles */
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.agentMessage {
+  align-items: flex-start;
+}
+
+.userMessage {
+  align-items: flex-end;
+}
+
+.messageRole {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.3);
+  padding: 0 4px;
+}
+
+.messageContent {
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  max-width: 90%;
+}
+
+.userMessage .messageContent {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* Code blocks */
+.codeBlock {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: border-color 0.15s;
+  max-width: 90%;
+}
+
+.accepted {
+  border-color: rgba(34, 197, 94, 0.3);
+  background: rgba(34, 197, 94, 0.05);
+}
+
+.rejected {
+  border-color: rgba(248, 113, 113, 0.2);
+  opacity: 0.5;
+}
+
+.codeFilePath {
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 10px;
+  font-family: 'Courier New', monospace;
+  color: rgba(255, 255, 255, 0.4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.codeContent {
+  margin: 0;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  overflow-x: auto;
+}
+
+.codeContent code {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.75);
+  white-space: pre;
+}
+
+.codeActions {
+  display: flex;
+  gap: 6px;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.2);
+  justify-content: flex-end;
+}
+
+.acceptBtn {
+  height: 26px;
+  padding: 0 10px;
+  background: rgba(34, 197, 94, 0.2);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 5px;
+  color: rgba(34, 197, 94, 0.9);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.acceptBtn:hover {
+  background: rgba(34, 197, 94, 0.3);
+}
+
+.rejectBtn {
+  height: 26px;
+  padding: 0 10px;
+  background: rgba(248, 113, 113, 0.15);
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  border-radius: 5px;
+  color: rgba(248, 113, 113, 0.8);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.rejectBtn:hover {
+  background: rgba(248, 113, 113, 0.25);
+}
+
+.acceptedLabel {
+  font-size: 11px;
+  color: rgba(34, 197, 94, 0.8);
+  font-weight: 500;
+}
+
+.rejectedLabel {
+  font-size: 11px;
+  color: rgba(248, 113, 113, 0.6);
+  font-weight: 500;
+}

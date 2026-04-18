@@ -14,7 +14,7 @@
 | E1: 设计稿导入 | U1~U2 | 1/2 | U1 |
 | E2: AI Coding Agent | U3 | 1/1 ✅ | — |
 | E3: 版本Diff | U4~U5 | 2/2 ✅ | — |
-| E6: 缺陷归档 | U6~U7 | 0/2 | U6 |
+| E6: 缺陷归档 | U6~U7 | 1/2 | U6 |
 | E7: 最终报告 | U8 | 0/1 | U8 |
 
 ---
@@ -62,7 +62,7 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E6-U1 | 缺陷归档 | ⬜ | E2-U1,E3-U2 | BLOCKER×2 + P2×1 |
+| E6-U1 | 缺陷归档 | ✅ | E2-U1,E3-U2 | BLOCKER×2 (E2+E3) + P2×3 (test/file/rate/xss) defects/ 全部存在 |
 | E6-U2 | qa-final-report.md | ⬜ | E6-U1 | 含所有 Epic PASS/FAIL |
 
 ---

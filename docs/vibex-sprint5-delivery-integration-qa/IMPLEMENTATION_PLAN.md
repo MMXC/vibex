@@ -22,8 +22,8 @@
 | E3: 导出器审查 | U4 | 0/1 | U4 |
 | E4: PRD融合审查 | U5~U7 | 3/3 ✅ | — |
 | E5: 状态处理审查 | U8 | 1/1 ✅ | — |
-| E6: 缺陷归档 | U9~U10 | 0/2 | U9 |
-| E7: 最终报告 | U11 | 0/1 | U11 |
+| E6: 缺陷归档 | U9~U10 | 2/2 ✅ | — |
+| E7: 最终报告 | U11 | 1/1 ✅ | — |
 
 ---
 
@@ -94,8 +94,8 @@ useEffect(() => { loadFromStores(); }, []);
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E6-U1 | BLOCKER/P1/P2 缺陷归档 | ⬜ | E1-U2,E4-U3,E5-U1 | BLOCKER×4 + P1×1 + P2×2 |
-| E6-U2 | 缺陷文件格式审查 | ⬜ | U9 | 每个文件含 7 个必需字段 |
+| E6-U1 | BLOCKER/P1/P2 缺陷归档 | ✅ | E1-U2,E4-U3,E5-U1 | BLOCKER×4 + P1×1 + P2×2 + P0×5 = 12 defects 全部存在 |
+| E6-U2 | 缺陷文件格式审查 | ✅ | U9 | 每个文件含 7 个必需字段 |
 
 ---
 
@@ -103,7 +103,7 @@ useEffect(() => { loadFromStores(); }, []);
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E7-U1 | qa-final-report.md | ⬜ | E6-U1 | 含所有 Epic PASS/FAIL、DoD、BLOCKER 追踪 |
+| E7-U1 | qa-final-report.md | ✅ | E6-U1 | 含所有 Epic PASS/FAIL、DoD、BLOCKER 追踪 |
 
 ---
 

@@ -26,6 +26,12 @@
 - **单元测试**: `image-ai-import.test.ts` — 6 个用例 (AC1/AC2/AC3)
 - 提交: 8e710864 (figma) + e6dd07a5 (image-ai)
 
+### [vibex-sprint6-ai-coding-integration E1-QA: 设计稿元数据 Store] — 2026-04-18
+- **designStore 重构**: `stores/designStore.ts` — 343 行重构，新增 `designs[]` 状态 + `saveDesign/getDesign/deleteDesign` CRUD，localStorage 持久化
+- **/api/designs route**: GET/POST/DELETE endpoints — 设计稿元数据 CRUD API
+- **测试**: `designStore.test.ts` — 6 个用例
+- 提交: a12689e7 + 347d5cda
+
 ### [vibex-sprint6-ai-coding-integration E2: AI Coding Agent] — 2026-04-18
 - **U4 AgentFeedbackPanel**: `components/dds/canvas/AgentFeedbackPanel.tsx` — AI 反馈面板，session list + message history + retry
 - **U5 AgentSessions**: `components/dds/canvas/AgentSessions.tsx` — 会话列表，支持新建/删除/切换

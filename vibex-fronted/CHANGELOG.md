@@ -108,6 +108,11 @@
 ### [vibex-sprint4-spec-canvas-extend E5-QA: 章节存在性测试] — 2026-04-18
 - **chapter-existence.test.ts**: 3 个测试用例 — 验证 chapters API + context 存在性
 - **提交**: `5ee0081e`
+### [vibex-sprint4-spec-canvas-extend tester-gstack: G1-G5 UI 验证] — 2026-04-18
+- **G1**: DDSToolbar 5 chapters 验证 ✅
+- **G2/G3**: ChapterEmptyState 缺失 P0-006 确认 ❌ (待 P0-006 修复)
+- **G4/G5**: Export Modal + method badge 验证 ✅
+- **提交**: `7d2fc9be`
 
 ### [vibex-sprint3-prototype-extend E4-QA: 图片导入测试] — 2026-04-18
 - **E4-QA image-import**: `services/figma/image-import.test.ts` — 5 个用例（success/empty/non-JSON/file-size/timeout）

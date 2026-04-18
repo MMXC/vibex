@@ -130,6 +130,16 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '5ee0081e',
   },
   {
+    version: '1.0.276',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint4-spec-canvas-extend tester-gstack: G1-G5 UI 验证',
+      '✅ G1: DDSToolbar 5 chapters ✅ | G2/G3: P0-006 ChapterEmptyState ❌ (待修复)',
+      '✅ G4/G5: Export Modal + method badge ✅',
+    ],
+    commit: '7d2fc9be',
+  },
+  {
     version: '1.0.271',
     date: '2026-04-18',
     changes: [

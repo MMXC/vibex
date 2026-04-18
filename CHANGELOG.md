@@ -188,6 +188,7 @@
 - 提交: `aa966492` (feat(dds): Epic3 AI 草稿生成完成)
 
 ### [Unreleased] vibex-sprint2-spec-canvas Epic2: 横向滚奏体验 — 2026-04-17
+- **E2-U1 BLOCKER 修复**: useChapterURLSync.ts — VALID_CHAPTERS 扩展到 5 个章节类型，支持 api/business-rules URL 同步
 - **E2-U1 横向滚奏 UI**: `DDSScrollContainer.tsx` — scroll-snap 横向滚奏，`handleScroll` 检测可见面板，ratio > 0.3 时更新 `activeChapter`
 - **E2-U2 URL同步**: `useChapterURLSync` hook — mount 时从 `?chapter=` 读取参数写入 store，章节变化时 `router.replace` 更新 URL（不污染 history）
 - **E2-U3 章节Tab切换**: `DDSToolbar.tsx` — 3个可点击章节Tab（需求/上下文/流程），`setActiveChapter` 直接更新 store

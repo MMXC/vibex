@@ -15,7 +15,7 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useDDSCanvasStore } from '@/stores/dds';
 import type { ChapterType } from '@/types/dds';
 
-const VALID_CHAPTERS: ChapterType[] = ['requirement', 'context', 'flow'];
+const VALID_CHAPTERS: ChapterType[] = ['requirement', 'context', 'flow', 'api', 'business-rules'];
 const DEFAULT_CHAPTER: ChapterType = 'requirement';
 
 export function useChapterURLSync(): void {

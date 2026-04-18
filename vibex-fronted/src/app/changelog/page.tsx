@@ -42,6 +42,17 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '75bf4ec3',
   },
   {
+    version: '1.0.268',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint5-delivery-integration E3: DDL 生成',
+      '✅ T6 DDLGenerator: generateDDL() API → DDLTable[]',
+      '✅ T7 formatDDL: formatDDL() + downloadDDL() SQL formatting',
+      '✅ 测试: DDLGenerator 3 + formatDDL 5 = 8 passing',
+    ],
+    commit: '6ee00b62',
+  },
+  {
     version: '1.0.261',
     date: '2026-04-18',
     changes: [

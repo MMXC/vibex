@@ -57,6 +57,9 @@
 - 提交: 90a90155
 - **E3-U1/U2 QA确认**: E3-U1 ✅ VersionDiff; E3-U2 /canvas/delivery/version 缺失 BLOCKER defect 已归档
 - 提交: 8f97bd90 (E3-U1/U2 QA确认)
+### [vibex-sprint6-ai-coding-integration E6: 缺陷归档] — 2026-04-18
+- **E6-U1 缺陷归档确认**: BLOCKER×2 + P0×2 + P1×1 + P2×3 = 8 defects，全部归档确认
+- **提交**: `8c0a8823`
 
 ### [vibex-sprint1-prototype-canvas Epic1: 拖拽布局编辑器] — 2026-04-17
 - **Epic 1: 拖拽布局编辑器** — 可视化原型画布正式上线

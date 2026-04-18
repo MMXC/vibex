@@ -13,7 +13,7 @@
 | Epic | Units | Status | Next |
 |------|-------|--------|------|
 | E1: 设计稿导入 | U1-U2 | ✅ 2/2 | — |
-| E2: AI Coding Agent | U3-U5 | 0/3 | U3 |
+| E2: AI Coding Agent | U3-U5 | 2/3 | U3 |
 | E3: 版本 Diff | U6-U7 | 0/2 | U6 |
 
 ---
@@ -48,11 +48,11 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| U3 | CodingAgentService | ⬜ | — | `createSession()` 调用 sessions_spawn，返回 sessionKey |
-| U4 | AgentFeedbackPanel | ⬜ | U3 | 实时显示 Agent 代码反馈，支持接受/拒绝 |
-| U5 | Agent 会话管理 | ⬜ | U3 | 终止会话、查看历史、状态显示 |
+| U3 | CodingAgentService | ⬜ BLOCKED | — | `createSession()` 调用 sessions_spawn，返回 sessionKey |
+| U4 | AgentFeedbackPanel | ✅ | U3 | 实时显示 Agent 代码反馈，支持接受/拒绝 |
+| U5 | Agent 会话管理 | ✅ | U3 | 终止会话、查看历史、状态显示 |
 
-### U3: CodingAgentService
+### U3: CodingAgentService（⚠️ BLOCKED）
 
 **文件**: `src/services/agent/coding-agent.ts` (新建)
 **测试**: `src/services/agent/__tests__/coding-agent.test.ts` (新建)

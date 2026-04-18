@@ -34,7 +34,6 @@ const CHAPTER_OFFSETS: Record<ChapterType, number> = {
   'business-rules': 1,
 };
 
-const COLLAPSED_WIDTH_PX = 80; // DDSPanel panelCollapsed width
 const PANEL_HEADER_HEIGHT_PX = 48; // approximate panel header height
 
 // ==================== Props ====================
@@ -112,17 +111,24 @@ export const CrossChapterEdgesOverlay = memo(function CrossChapterEdgesOverlay({
     };
   }, [scrollContainerRef, updateDimensions]);
 
-  // Build chapter → collapsed pixel offset map
-  // Collapsed panels are always 80px regardless of scroll position.
-  // When expanded, a chapter fills the remaining space.
+  // Build chapter → collapsed pixel offset map from actual DOM
+  // Dynamically measure collapsed panel width from DOM (not hardcoded 80px).
+  // Falls back to 80px if panel not yet rendered.
   const collapsedOffsets = (() => {
-    const offsets: Record<ChapterType, number> = {
-      requirement: 0,
-      context: COLLAPSED_WIDTH_PX,
-      flow: COLLAPSED_WIDTH_PX * 2,
-      api: COLLAPSED_WIDTH_PX * 3,
-      'business-rules': COLLAPSED_WIDTH_PX * 4,
-    };
+    const offsets: Record<ChapterType, number> = { requirement: 0 };
+    let totalPx = 0;
+    for (const chapter of CHAPTER_ORDER) {
+      if (chapter === 'requirement') continue;
+      // Try to read actual collapsed panel width from DOM
+      const collapsedEl = scrollContainerRef.current?.querySelector(
+        `[data-chapter="${chapter}"][data-expanded="false"]`
+      );
+      const panelWidth = collapsedEl
+        ? collapsedEl.getBoundingClientRect().width
+        : totalPx === 0 ? 80 : totalPx; // fallback to previous total or 80px
+      totalPx += panelWidth;
+      offsets[chapter] = totalPx;
+    }
     return offsets;
   })();
 

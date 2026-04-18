@@ -105,6 +105,15 @@ export function PRDTab() {
         </div>
       )}
 
+      {/* E5-U1: Empty state when no data */}
+      {contexts.length === 0 && flows.length === 0 && components.length === 0 && (
+        <div className={styles.emptyState}>
+          <p className={styles.emptyStateText}>
+            请先在 DDS 画布中创建限界上下文、业务流程或组件，再生成 PRD 文档。
+          </p>
+        </div>
+      )}
+
       <div className={styles.prdOutline}>
         {prdSections.sections.map((section) => (
           <div key={section.id} className={styles.prdSection}>

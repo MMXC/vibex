@@ -32,6 +32,12 @@
 - **agentStore**: `stores/agentStore.ts` — sessions/activeSession/currentMessage/retryCount
 - 提交: 0d36227d
 
+### [vibex-sprint6-ai-coding-integration E3: 版本 Diff] — 2026-04-18
+- **U6 VersionDiff**: `lib/version/VersionDiff.ts` — `diffVersions()` 结构化 diff (added/removed/modified/changed)
+- **U7 集成**: `app/canvas/delivery/version/page.tsx` — VersionDiff 页面
+- **测试**: `VersionDiff.test.ts` — 11 passing tests
+- 提交: 90a90155
+
 ### [vibex-sprint1-prototype-canvas Epic1: 拖拽布局编辑器] — 2026-04-17
 - **Epic 1: 拖拽布局编辑器** — 可视化原型画布正式上线
 - 左侧组件面板：10 个默认组件（Button/Input/Card/Container/Header/Navigation/Modal/Table/Form/Image）支持拖拽到画布

@@ -56,6 +56,12 @@
 - **测试**: DDLGenerator (3 tests) + formatDDL (5 tests) = 8 passing
 - 提交: 6ee00b62 (T6/T7)
 
+### [Unreleased] vibex-sprint6-ai-coding-integration E3: 版本 Diff — 2026-04-18
+- **U6 VersionDiff**: `lib/version/VersionDiff.ts` — `diffVersions()` computes structural diff between two project snapshots (components added/removed/modified/changed type)
+- **U7 集成**: `app/canvas/delivery/version/page.tsx` — VersionDiff 页面，展示变更差异
+- **测试**: `VersionDiff.test.ts` — 11 passing tests
+- 提交: 90a90155
+
 ### [Unreleased] vibex-sprint6-ai-coding-integration E1: 设计稿导入 — 2026-04-18
 - **E1-U1 /api/figma route**: GET/POST Figma REST API proxy (`app/api/figma/route.ts`)
 - **E1-U1 Image AI import**: `src/lib/figma/image-ai-import.ts` — `importFromImage(file)` AI vision 分析图片，base64 → /api/chat → GPT-4o vision，JSON/markdown fallback，10MB 限制

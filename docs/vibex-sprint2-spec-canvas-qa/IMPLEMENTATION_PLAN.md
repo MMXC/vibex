@@ -56,7 +56,7 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E4-U1 | E4 代码审查 | ⬜ | — | SVG Overlay + 坐标系审查完成 |
+| E4-U1 | E4 代码审查 | :white_check_mark: | — | SVG Overlay + 坐标系审查完成 |
 | E4-U2 | collapsedOffsets 修复 | ⬜ | U1 | 无 px 硬编码，使用相对偏移量 |
 
 ### E4-U2 详细说明

@@ -2,6 +2,7 @@
  * Delivery Components Index
  */
 
+export { CanvasBreadcrumb } from "@/components/shared/CanvasBreadcrumb";
 export { DeliveryNav } from "./DeliveryNav";
 export { DDLDrawer } from "./DDLDrawer";
 export { DeliveryTabs } from './DeliveryTabs';

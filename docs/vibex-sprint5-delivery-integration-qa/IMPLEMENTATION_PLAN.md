@@ -60,7 +60,7 @@ useEffect(() => { loadFromStores(); }, []);
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E3-U1 | DDLGenerator 测试覆盖率 | ⬜ | — | DDLGenerator.test.ts 补充 6 tests |
+| E3-U1 | DDLGenerator 测试覆盖率 | ✅ | — | DDLGenerator.test.ts 10→16 tests ✅ |
 
 ---
 

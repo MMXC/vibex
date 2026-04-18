@@ -124,3 +124,62 @@ describe('generateDDL — T6', () => {
     expect(tables[0].comment).toBe('User management');
   });
 });
+
+// ==================== E3-U1: Additional tests ====================
+
+describe('generateDDL — E3-U1: Extended Coverage', () => {
+  it('custom prefix option strips /v1 from path', () => {
+    const cards: APIEndpointCard[] = [
+      { id: 'ep-1', type: 'api-endpoint', title: 'Items', method: 'GET', path: '/v1/items' },
+    ];
+    const tables = generateDDL(cards, { prefix: '/v1' });
+    expect(tables[0].tableName).toBe('items');
+  });
+
+  it('version prefix v2 stripped', () => {
+    const cards: APIEndpointCard[] = [
+      { id: 'ep-1', type: 'api-endpoint', title: 'Products', method: 'GET', path: '/v2/products' },
+    ];
+    const tables = generateDDL(cards);
+    expect(tables[0].tableName).toBe('products');
+  });
+
+  it('status not pluralized', () => {
+    const cards: APIEndpointCard[] = [
+      { id: 'ep-1', type: 'api-endpoint', title: 'Status', method: 'GET', path: '/api/status' },
+    ];
+    const tables = generateDDL(cards);
+    expect(tables[0].tableName).toBe('status');
+  });
+
+  it('requestBody with string field → VARCHAR(255)', () => {
+    const cards: APIEndpointCard[] = [
+      { id: 'ep-1', type: 'api-endpoint', title: 'Create User', method: 'POST', path: '/api/users', requestBody: { schema: JSON.stringify({ properties: { name: { type: 'string' }, email: { type: 'string' } } }) } },
+    ];
+    const tables = generateDDL(cards);
+    const cols = tables[0].columns;
+    expect(cols.find(c => c.name === 'name')?.type).toBe('VARCHAR(255)');
+    expect(cols.find(c => c.name === 'email')?.type).toBe('VARCHAR(255)');
+  });
+
+  it('boolean field → TINYINT(1)', () => {
+    const cards: APIEndpointCard[] = [
+      { id: 'ep-1', type: 'api-endpoint', title: 'Toggle', method: 'PATCH', path: '/api/settings', parameters: [{ name: 'enabled', in: 'body', schema: { type: 'boolean' } }] },
+    ];
+    const tables = generateDDL(cards);
+    const cols = tables[0].columns;
+    expect(cols.find(c => c.name === 'enabled')?.type).toBe('TINYINT(1)');
+  });
+
+  it('null/undefined cards skipped without crash', () => {
+    const cards: (APIEndpointCard | null | undefined)[] = [
+      null,
+      undefined,
+      { id: 'ep-1', type: 'api-endpoint', title: 'Users', method: 'GET', path: '/api/users' },
+    ];
+    expect(() => generateDDL(cards)).not.toThrow();
+    const tables = generateDDL(cards);
+    expect(tables).toHaveLength(1);
+    expect(tables[0].tableName).toBe('users');
+  });
+});

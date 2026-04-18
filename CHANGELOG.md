@@ -10,6 +10,11 @@
 - **StateMachineCard**: 移除硬编码 `amber`/`pink`/`purple` 颜色，使用 CSS tokens
 - **exporter.ts**: 修复导出类型定义
 - 提交: 83d40fae (P0 defects fix)
+### [Unreleased] vibex-sprint4-spec-canvas-extend E3-E5 P1/P2 缺陷修复 — 2026-04-18
+- **exporter.ts 修复**: 修复 `toStateMachineSpec` 中缺少的大括号语法错误
+- **exporter.ts 重构**: 变量重命名 `allStates` → `states` 解决作用域冲突
+- **exporter.ts 测试**: 新增 `E4-U3: handles undefined allStates properly` 测试
+- 提交: 7debf56e (P1/P2 defects fix)
 
 ### [Unreleased] vibex-sprint4-spec-canvas-extend E5: 章节四态规范 — 2026-04-18
 - **E5-U1/U2 AC3 CardErrorBoundary**: `canvas/CardErrorBoundary.tsx` — 捕获卡片渲染错误，显示 'API 端点渲染失败' / '状态节点渲染失败'

@@ -173,6 +173,15 @@ const mockChangelog: ChangelogEntry[] = [
     commit: 'adc7e7a0',
   },
   {
+    version: '1.0.281',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint4-spec-canvas-extend E5: QA 最终报告',
+      '✅ E5-U1 qa-final-report.md: E1~E4 全部 PASS，DoD 全部通过',
+    ],
+    commit: '7ba2f35b',
+  },
+  {
     version: '1.0.271',
     date: '2026-04-18',
     changes: [

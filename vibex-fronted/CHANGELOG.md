@@ -104,6 +104,9 @@
 - **E5-U2 章节四态**: ChapterPanel 骨架屏/加载中/空状态/错误态 (ChapterSkeleton/ChapterLoading/ChapterEmpty/ChapterError)
 - **测试**: `DDSFourStates.test.tsx` — 5 passing tests
 - **提交**: `9d1bd809` (E5-U1~U2)
+### [vibex-sprint4-spec-canvas-extend E5-QA: 章节存在性测试] — 2026-04-18
+- **chapter-existence.test.ts**: 3 个测试用例 — 验证 chapters API + context 存在性
+- **提交**: `5ee0081e`
 
 ### [vibex-sprint3-prototype-extend E4-QA: 图片导入测试] — 2026-04-18
 - **E4-QA image-import**: `services/figma/image-import.test.ts` — 5 个用例（success/empty/non-JSON/file-size/timeout）

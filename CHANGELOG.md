@@ -24,7 +24,9 @@
 - **集成**: CardRenderer 包裹 APIEndpointCard + StateMachineCard with CardErrorBoundary
 - **测试**: DDSFourStates.test.tsx — 5 passing tests
 - 提交: 9d1bd809
-
+### [Unreleased] vibex-sprint4-spec-canvas-extend E5-QA: 章节存在性测试 — 2026-04-18
+- **chapter-existence.test.ts**: 3 个测试用例 — 验证 chapters API + context 存在性
+- 提交: 5ee0081e
 
 ### [Unreleased] vibex-sprint4-spec-canvas-extend E1: API 规格章节 — 2026-04-18
 - **E1-U1 类型定义**: `types/dds/api-endpoint.ts` — `APIEndpointCard` 接口（extends BaseCard），含 HTTPMethod/APIParameter/APIResponse

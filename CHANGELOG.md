@@ -48,6 +48,14 @@
 - **交付中心集成**: delivery/page.tsx 导入 DeliveryNav + CanvasBreadcrumb，DeliveryNav.index.ts 导出
 - **测试**: DeliveryNav (3 tests) + CanvasBreadcrumb (4 tests) = 7 passing
 - 提交: 75bf4ec3
+
+### [Unreleased] vibex-sprint5-delivery-integration E3: DDL 生成 — 2026-04-18
+- **T6 DDLGenerator**: `lib/delivery/DDLGenerator.ts` — `generateDDL()` converts `APIEndpointCard[]` → `DDLTable[]` (tableName/columns/primaryKey/foreignKeys)
+- **T7 formatDDL**: `lib/delivery/formatDDL.ts` — `formatDDL()` converts `DDLTable[]` → SQL string, `downloadDDL()` triggers browser download
+- **DDL Tab 集成**: delivery/page.tsx DDL Tab，导入 generateDDL + formatDDL
+- **测试**: DDLGenerator (3 tests) + formatDDL (5 tests) = 8 passing
+- 提交: 6ee00b62 (T6/T7)
+
 ### [Unreleased] vibex-sprint6-ai-coding-integration E1: 设计稿导入 — 2026-04-18
 - **E1-U1 /api/figma route**: GET/POST Figma REST API proxy (`app/api/figma/route.ts`)
 - **E1-U1 Image AI import**: `src/lib/figma/image-ai-import.ts` — `importFromImage(file)` AI vision 分析图片，base64 → /api/chat → GPT-4o vision，JSON/markdown fallback，10MB 限制

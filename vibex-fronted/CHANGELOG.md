@@ -13,6 +13,12 @@
 - **测试**: DeliveryNav (3 tests) + CanvasBreadcrumb (4 tests) = 7 passing
 - 提交: 75bf4ec3
 
+### [vibex-sprint5-delivery-integration E3: DDL 生成] — 2026-04-18
+- **T6 DDLGenerator**: `lib/delivery/DDLGenerator.ts` — `generateDDL()` converts `APIEndpointCard[]` → `DDLTable[]`
+- **T7 formatDDL**: `lib/delivery/formatDDL.ts` — `formatDDL()` + `downloadDDL()` SQL formatting
+- **测试**: DDLGenerator (3 tests) + formatDDL (5 tests) = 8 passing
+- 提交: 6ee00b62
+
 ### [vibex-sprint6-ai-coding-integration E1: 设计稿导入] — 2026-04-18
 - **E1-U1 /api/figma route**: GET/POST Figma REST API proxy (`app/api/figma/route.ts`)
 - **E1-U1 Image AI import**: `src/lib/figma/image-ai-import.ts` — `importFromImage(file)` AI vision 分析图片，base64 → /api/chat → GPT-4o vision

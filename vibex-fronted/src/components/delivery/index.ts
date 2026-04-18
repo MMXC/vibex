@@ -2,8 +2,8 @@
  * Delivery Components Index
  */
 
-export { DeliveryNav };
-export { DDLDrawer } from "./DDLDrawer"; from "./DeliveryNav";
+export { DeliveryNav } from "./DeliveryNav";
+export { DDLDrawer } from "./DDLDrawer";
 export { DeliveryTabs } from './DeliveryTabs';
 export { ContextTab } from './ContextTab';
 export { FlowTab } from './FlowTab';

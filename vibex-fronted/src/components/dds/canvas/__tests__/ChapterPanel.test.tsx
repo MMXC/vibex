@@ -1,13 +1,15 @@
 /**
  * ChapterPanel Unit Tests
- * Epic 2: F10 (DDSScrollContainer content), Epic 2-E1-U2 (CRUD)
+ * Epic 2: F10 (DDSScrollContainer content), Epic 2-E1-U2 (CRUD — ConfirmDialog)
  */
 
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ChapterPanel } from '../ChapterPanel';
+import { ConfirmDialog } from '@/components/canvas/features/ConfirmDialog';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
+import { useConfirmDialogStore } from '@/lib/canvas/stores/confirmDialogStore';
 import type { UserStoryCard, BoundedContextCard, FlowStepCard } from '@/types/dds';
 
 // ==================== Store Setup ====================
@@ -25,12 +27,15 @@ function setupStore(overrides = {}) {
     selectedCardIds: [],
     ...overrides,
   });
+  // Reset confirm dialog store
+  useConfirmDialogStore.setState({ isOpen: false, title: '', message: '', onConfirm: undefined });
 }
 
-function setupConfirmMock(returnValue = true) {
-  const confirmMock = vi.fn(() => returnValue);
-  vi.stubGlobal('confirm', confirmMock);
-  return confirmMock;
+// ==================== ChapterPanel + ConfirmDialog Wrapper ====================
+
+function renderWithDialog(ui: React.ReactElement) {
+  const result = render(ui);
+  return result;
 }
 
 // ==================== ChapterPanel Tests ====================
@@ -49,8 +54,7 @@ describe('ChapterPanel', () => {
 
     it('renders card count badge — zero cards', () => {
       render(<ChapterPanel chapter="requirement" />);
-      const count = screen.getByText('0');
-      expect(count).toBeInTheDocument();
+      expect(screen.getByText('0')).toBeInTheDocument();
     });
 
     it('renders card count badge — shows actual count', () => {
@@ -115,7 +119,6 @@ describe('ChapterPanel', () => {
         },
       });
       render(<ChapterPanel chapter="requirement" />);
-      // Skeleton cards have data-chapter on parent, but we just check no empty state
       expect(screen.queryByText(/暂无用户故事/)).not.toBeInTheDocument();
     });
   });
@@ -154,7 +157,6 @@ describe('ChapterPanel', () => {
     it('shows create form after clicking add card button', () => {
       render(<ChapterPanel chapter="requirement" />);
       fireEvent.click(screen.getByRole('button', { name: /添加用户故事/i }));
-      // Form should show role/作为 input
       expect(screen.getByPlaceholderText('角色，如：用户、管理员')).toBeInTheDocument();
     });
 
@@ -168,9 +170,7 @@ describe('ChapterPanel', () => {
       render(<ChapterPanel chapter="requirement" />);
       fireEvent.click(screen.getByRole('button', { name: /添加用户故事/i }));
       fireEvent.click(screen.getByRole('button', { name: '取消' }));
-      // Add button should be back
       expect(screen.getByRole('button', { name: /添加用户故事/i })).toBeInTheDocument();
-      // Form should be gone
       expect(screen.queryByPlaceholderText('角色，如：用户、管理员')).not.toBeInTheDocument();
     });
   });
@@ -190,15 +190,12 @@ describe('ChapterPanel', () => {
         target: { value: '确保用户身份合法' },
       });
 
-      // Submit button should be enabled now
       const submitBtn = screen.getByRole('button', { name: '创建' });
       expect(submitBtn).not.toBeDisabled();
 
       fireEvent.click(submitBtn);
 
-      // Form should be closed
       expect(screen.queryByPlaceholderText('角色，如：用户、管理员')).not.toBeInTheDocument();
-      // Store should have the card
       const cards = useDDSCanvasStore.getState().chapters.requirement.cards;
       expect(cards).toHaveLength(1);
       expect(cards[0].type).toBe('user-story');
@@ -245,12 +242,11 @@ describe('ChapterPanel', () => {
       render(<ChapterPanel chapter="requirement" />);
       fireEvent.click(screen.getByRole('button', { name: /添加用户故事/i }));
 
-      // role is empty → submit should be disabled
       const submitBtn = screen.getByRole('button', { name: '创建' });
       expect(submitBtn).toBeDisabled();
 
       fireEvent.change(screen.getByPlaceholderText('角色，如：用户、管理员'), {
-        target: { value: ' ' }, // whitespace only
+        target: { value: ' ' },
       });
       expect(submitBtn).toBeDisabled();
     });
@@ -293,7 +289,6 @@ describe('ChapterPanel', () => {
     });
 
     it('clicking already-selected card keeps it selected (additive selection)', () => {
-      // selectCard is additive — clicking a selected card stays selected
       setupStore({
         chapters: {
           requirement: {
@@ -326,13 +321,13 @@ describe('ChapterPanel', () => {
       const cardItem = screen.getByText('Story 1');
       fireEvent.click(cardItem);
 
-      // selectCard is additive, card stays selected
       expect(useDDSCanvasStore.getState().selectedCardIds).toContain('card-1');
     });
   });
 
+  // E1-U2: Card deletion with ConfirmDialog (replaces window.confirm)
   describe('card deletion', () => {
-    it('deletes a card when delete button is clicked and confirmed', () => {
+    it('deletes a card when delete button is clicked and confirmed via ConfirmDialog', async () => {
       setupStore({
         chapters: {
           requirement: {
@@ -359,20 +354,37 @@ describe('ChapterPanel', () => {
           flow: { type: 'flow', cards: [], edges: [], loading: false, error: null },
         },
       });
-      const confirmMock = setupConfirmMock(true);
-      vi.stubGlobal('confirm', confirmMock);
 
-      render(<ChapterPanel chapter="requirement" />);
+      // Render ChapterPanel + ConfirmDialog together
+      render(
+        <>
+          <ChapterPanel chapter="requirement" />
+          <ConfirmDialog />
+        </>
+      );
       expect(screen.getByText('Story 1')).toBeInTheDocument();
 
+      // Click delete button → opens ConfirmDialog via store
       const deleteBtn = screen.getByRole('button', { name: '删除卡片' });
       fireEvent.click(deleteBtn);
 
-      expect(confirmMock).toHaveBeenCalledWith('确定删除此卡片？');
+      // Dialog should be visible
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByText('确认删除')).toBeInTheDocument();
+      expect(screen.getByText('确定删除此卡片？')).toBeInTheDocument();
+
+      // Click confirm → card is deleted
+      const confirmBtn = screen.getByRole('button', { name: '删除' });
+      fireEvent.click(confirmBtn);
+
+      // Dialog should be closed and card deleted
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
       expect(useDDSCanvasStore.getState().chapters.requirement.cards).toHaveLength(0);
     });
 
-    it('does not delete card when confirm returns false', () => {
+    it('does not delete card when cancel is clicked', async () => {
       setupStore({
         chapters: {
           requirement: {
@@ -399,12 +411,28 @@ describe('ChapterPanel', () => {
           flow: { type: 'flow', cards: [], edges: [], loading: false, error: null },
         },
       });
-      const confirmMock = setupConfirmMock(false);
-      vi.stubGlobal('confirm', confirmMock);
 
-      render(<ChapterPanel chapter="requirement" />);
+      render(
+        <>
+          <ChapterPanel chapter="requirement" />
+          <ConfirmDialog />
+        </>
+      );
+
+      // Click delete button
       fireEvent.click(screen.getByRole('button', { name: '删除卡片' }));
 
+      // Dialog visible
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+      // Click cancel
+      const cancelBtn = screen.getByRole('button', { name: '取消' });
+      fireEvent.click(cancelBtn);
+
+      // Dialog closed, card still present
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
       expect(useDDSCanvasStore.getState().chapters.requirement.cards).toHaveLength(1);
     });
   });

@@ -508,7 +508,7 @@ export const ChapterPanel = memo(function ChapterPanel({
             onSubmit={handleCreateFlowStep}
             onCancel={() => { setShowCreateForm(false); setCreatingType(null); }}
           />
-
+        )}
         {showCreateForm && creatingType === 'api-endpoint' && (
           <div className={styles.createForm}>
             <div className={styles.formRow}>
@@ -550,7 +550,6 @@ export const ChapterPanel = memo(function ChapterPanel({
               </button>
             </div>
           </div>
-        )}
         )}
       </div>
 

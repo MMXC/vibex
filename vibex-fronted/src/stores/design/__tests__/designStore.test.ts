@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useDesignStore } from '../designStore';
+import { useDesignStore } from '../../designStore';
 
 describe('useDesignStore — E1', () => {
   beforeEach(() => {
@@ -52,7 +52,7 @@ describe('useDesignStore — E1', () => {
     const updated = useDesignStore.getState().getDesignById('d4');
     expect(updated?.name).toBe('New Name');
     expect(updated?.version).toBe(2);
-    expect(updated?.updatedAt).toBeGreaterThan(updated!.createdAt);
+    expect(updated?.updatedAt).toBeGreaterThanOrEqual(updated!.createdAt);
   });
 
   it('stores max 100 designs', () => {

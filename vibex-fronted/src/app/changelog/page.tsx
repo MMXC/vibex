@@ -49,8 +49,9 @@ const mockChangelog: ChangelogEntry[] = [
       '✅ T6 DDLGenerator: generateDDL() API → DDLTable[]',
       '✅ T7 formatDDL: formatDDL() + downloadDDL() SQL formatting',
       '✅ 测试: DDLGenerator 3 + formatDDL 5 = 8 passing',
+      '✅ E3-U1 扩测: DDLGenerator 10→16 tests (custom prefix/v2 stripping/pluralization/VARCHAR/TINYINT)',
     ],
-    commit: '6ee00b62',
+    commit: '6ee00b62 + 31275654',
   },
   {
     version: '1.0.261',
@@ -180,8 +181,9 @@ const mockChangelog: ChangelogEntry[] = [
       '✅ U4 AgentFeedbackPanel: AI 反馈面板，session list + message history + retry',
       '✅ U5 AgentSessions: 会话列表，支持新建/删除/切换',
       '✅ agentStore: sessions/activeSession/currentMessage/retryCount 状态管理',
+      '✅ E2-U1 mock stub 确认: CodingAgentService mockAgentCall() 已确认，TODO 待替换',
     ],
-    commit: '0d36227d',
+    commit: '0d36227d + a1f09907',
   },
   {
     version: '1.0.270',

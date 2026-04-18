@@ -16,8 +16,8 @@
 ### [vibex-sprint5-delivery-integration E3: DDL 生成] — 2026-04-18
 - **T6 DDLGenerator**: `lib/delivery/DDLGenerator.ts` — `generateDDL()` converts `APIEndpointCard[]` → `DDLTable[]`
 - **T7 formatDDL**: `lib/delivery/formatDDL.ts` — `formatDDL()` + `downloadDDL()` SQL formatting
-- **测试**: DDLGenerator (3 tests) + formatDDL (5 tests) = 8 passing
-- 提交: 6ee00b62
+- **测试**: DDLGenerator (16 tests) + formatDDL (5 tests) = 21 passing (扩自 8)
+- **提交**: `6ee00b62` + `31275654` (E3-U1 测试扩测: 10→16)
 
 ### [vibex-sprint6-ai-coding-integration E1: 设计稿导入] — 2026-04-18
 - **E1-U1 /api/figma route**: GET/POST Figma REST API proxy (`app/api/figma/route.ts`)
@@ -36,7 +36,8 @@
 - **U4 AgentFeedbackPanel**: `components/dds/canvas/AgentFeedbackPanel.tsx` — AI 反馈面板，session list + message history + retry
 - **U5 AgentSessions**: `components/dds/canvas/AgentSessions.tsx` — 会话列表，支持新建/删除/切换
 - **agentStore**: `stores/agentStore.ts` — sessions/activeSession/currentMessage/retryCount
-- 提交: 0d36227d
+- **E2-U1 mock stub 确认**: `CodingAgentService.ts` mockAgentCall() 已确认，TODO 待替换为真实 agent
+- 提交: 0d36227d + a1f09907
 
 ### [vibex-sprint6-ai-coding-integration E3: 版本 Diff] — 2026-04-18
 - **U6 VersionDiff**: `lib/version/VersionDiff.ts` — `diffVersions()` 结构化 diff (added/removed/modified/changed)

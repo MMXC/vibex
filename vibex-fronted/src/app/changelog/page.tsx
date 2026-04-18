@@ -119,6 +119,16 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '9d1bd809',
   },
   {
+    version: '1.0.271',
+    date: '2026-04-18',
+    changes: [
+      '🐛 vibex-sprint4-spec-canvas-extend P0: 硬编码颜色修复',
+      '✅ CSS tokens: APIEndpointCard/StateMachineCard 移除硬编码颜色',
+      '✅ exporter.ts: 修复导出类型定义',
+    ],
+    commit: '83d40fae',
+  },
+  {
     version: '1.0.259',
     date: '2026-04-18',
     changes: [

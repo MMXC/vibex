@@ -4,6 +4,13 @@
 - **E4-U3/U4 Export Modal**: `components/dds/toolbar/DDSToolbar.tsx` + `.module.css` — modal with OpenAPI + StateMachine download buttons
 - **E4-U5 Tests**: `services/dds/__tests__/exporter.test.ts` — 16 passing tests (null guard, method mapping, transitions, responses, initial state, deduplication)
 - Commit: 9a3e239d
+### [Unreleased] vibex-sprint4-spec-canvas-extend P0: 硬编码颜色修复 — 2026-04-18
+- **CSS tokens**: 修复硬编码颜色 → CSS 变量 (`--color-primary` 等)
+- **APIEndpointCard**: 移除硬编码 `indigo`/`blue` 颜色，使用 CSS tokens
+- **StateMachineCard**: 移除硬编码 `amber`/`pink`/`purple` 颜色，使用 CSS tokens
+- **exporter.ts**: 修复导出类型定义
+- 提交: 83d40fae (P0 defects fix)
+
 ### [Unreleased] vibex-sprint4-spec-canvas-extend E5: 章节四态规范 — 2026-04-18
 - **E5-U1/U2 AC3 CardErrorBoundary**: `canvas/CardErrorBoundary.tsx` — 捕获卡片渲染错误，显示 'API 端点渲染失败' / '状态节点渲染失败'
 - **E5-U1/U2 AC2 骨架屏**: DDSCanvasPage 加载态改用 ChapterSkeleton，var(--color-skeleton) token 替代进度条

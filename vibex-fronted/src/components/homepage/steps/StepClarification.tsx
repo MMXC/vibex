@@ -3,7 +3,6 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useConfirmationStore, type ClarificationRound } from '@/stores/confirmationStore';
-import { useDesignStore } from '@/stores/designStore';
 import { clarificationApi, type ChatResponse } from '@/lib/api/clarificationApi';
 import type { StepComponentProps } from './types';
 import styles from './StepClarification.module.css';
@@ -22,9 +21,7 @@ export function StepClarification({ onNavigate }: StepComponentProps) {
   const addClarificationRound = useConfirmationStore((s) => s.addClarificationRound);
   const acceptClarificationRound = useConfirmationStore((s) => s.acceptClarificationRound);
   
-  // Design store actions (for sync bridge)
-  const addDesignClarificationRound = useDesignStore((s) => s.addClarificationRound);
-  
+
   // Local state
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -90,22 +87,14 @@ export function StepClarification({ onNavigate }: StepComponentProps) {
         };
         addClarificationRound(round);
         
-        // Sync to designStore
-        addDesignClarificationRound({
-          id: round.id,
-          question: round.question,
-          answer: round.answer,
-          timestamp: round.timestamp,
-          isAccepted: round.isAccepted ?? false,
-        });
-      }
+}
     } catch (err) {
       setError(err instanceof Error ? err.message : '发送失败');
       setChatHistory(prev => prev.slice(0, -1));
     } finally {
       setIsLoading(false);
     }
-  }, [inputMessage, isLoading, chatHistory, addClarificationRound, addDesignClarificationRound]);
+  }, [inputMessage, isLoading, chatHistory, addClarificationRound]);
 
   // Handle key press (Enter to send)
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {

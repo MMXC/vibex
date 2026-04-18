@@ -38,18 +38,6 @@ export {
 } from '../modelSlice';
 
 export {
-  useDesignStore,
-  type DesignStep,
-  selectCurrentStep,
-  selectRequirementText,
-  selectClarificationRounds,
-  selectDomainEntities,
-  selectBusinessFlows,
-  selectUIPages,
-  selectPrototype,
-} from '../designStore';
-
-export {
   initDDDStateSync,
   checkDDDStateRestore,
   clearDDDSnapshot,

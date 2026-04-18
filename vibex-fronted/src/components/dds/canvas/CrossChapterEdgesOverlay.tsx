@@ -28,6 +28,7 @@ const CHAPTER_ORDER: ChapterType[] = ['requirement', 'context', 'flow', 'api', '
 /** Chapter horizontal offset as fraction of scroll container width */
 const CHAPTER_OFFSETS: Record<ChapterType, number> = {
 // P2-001 fix: evenly distributed (0, 0.25, 0.5, 0.75, 1)
+  requirement: 0,
   context: 0.25,
   flow: 0.5,
   api: 0.75,
@@ -115,7 +116,7 @@ export const CrossChapterEdgesOverlay = memo(function CrossChapterEdgesOverlay({
   // Dynamically measure collapsed panel width from DOM (not hardcoded 80px).
   // Falls back to 80px if panel not yet rendered.
   const collapsedOffsets = (() => {
-    const offsets: Record<ChapterType, number> = { requirement: 0 };
+    const offsets = { requirement: 0 } as Record<ChapterType, number>;
     let totalPx = 0;
     for (const chapter of CHAPTER_ORDER) {
       if (chapter === 'requirement') continue;

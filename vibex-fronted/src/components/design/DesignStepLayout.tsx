@@ -10,7 +10,8 @@
 
 import React from 'react';
 import { StepNavigator } from '@/components/homepage/StepNavigator';
-import { useDesignStore } from '@/stores/designStore';
+import { useConfirmationStore } from '@/stores/confirmationStore';
+import { NUMBER_TO_STEP, STEP_LABELS } from '@/components/homepage/steps/types';
 import styles from './DesignStepLayout.module.css';
 
 export interface DesignStepLayoutProps {
@@ -20,40 +21,32 @@ export interface DesignStepLayoutProps {
 }
 
 const DESIGN_STEPS = [
-  { id: 1, label: '需求澄清', description: 'Clarification' },
+  { id: 1, label: '需求输入', description: 'Requirement Input' },
   { id: 2, label: '限界上下文', description: 'Bounded Context' },
   { id: 3, label: '领域模型', description: 'Domain Model' },
-  { id: 4, label: '业务流程', description: 'Business Flow' },
-  { id: 5, label: 'UI生成', description: 'UI Generation' },
+  { id: 4, label: '需求澄清', description: 'Clarification' },
+  { id: 5, label: '业务流程', description: 'Business Flow' },
+  { id: 6, label: '项目创建', description: 'Project Create' },
 ];
 
-/** 将数字步骤映射到 DesignStep 字符串 */
-const STEP_MAP: Record<number, string> = {
-  1: 'clarification',
-  2: 'bounded-context',
-  3: 'domain-model',
-  4: 'business-flow',
-  5: 'ui-generation',
-};
-
 export function DesignStepLayout({ children, currentStep }: DesignStepLayoutProps) {
-  const setCurrentStep = useDesignStore((s) => s.setCurrentStep);
-  const stepHistory = useDesignStore((s) => s.stepHistory);
+  const setCurrentStep = useConfirmationStore((s) => s.setCurrentStep);
+  const stepHistory = useConfirmationStore((s) => s.stepHistory);
 
   // 已完成步骤 = 历史中出现的步骤 + 当前步骤
   const completedSteps = React.useMemo(() => {
     const done = new Set<number>();
     for (const stepStr of stepHistory) {
-      const num = Number(Object.entries(STEP_MAP).find(([, v]) => v === stepStr)?.[0] ?? 0);
-      if (num > 0) done.add(num);
+      const num = Object.entries(NUMBER_TO_STEP).find(([, v]) => v === stepStr)?.[0];
+      if (num) done.add(Number(num));
     }
     return Array.from(done);
   }, [stepHistory]);
 
   const handleStepClick = (stepId: number) => {
-    const designStepStr = STEP_MAP[stepId] as import('@/stores/designStore').DesignStep;
-    if (designStepStr) {
-      setCurrentStep(designStepStr);
+    const confirmationStep = NUMBER_TO_STEP[stepId as keyof typeof NUMBER_TO_STEP];
+    if (confirmationStep) {
+      setCurrentStep(confirmationStep);
     }
   };
 
@@ -66,7 +59,7 @@ export function DesignStepLayout({ children, currentStep }: DesignStepLayoutProp
           completedSteps={completedSteps}
           onStepClick={handleStepClick}
         />
-        <p className={styles.stepIndicator}>Step {currentStep} of 5</p>
+        <p className={styles.stepIndicator}>Step {currentStep} of 6</p>
       </header>
       <main className={styles.main}>
         {children}

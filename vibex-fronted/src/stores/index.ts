@@ -25,27 +25,6 @@ export type { PreviewStep } from './previewStore';
 // ==================== Template Store ====================
 export { useTemplateStore } from './templateStore';
 
-// ==================== Design Store ====================
-export { useDesignStore } from './designStore';
-export type { 
-  DesignStep,
-  ClarificationRound,
-  DomainEntity,
-  BusinessFlow,
-  UIComponent,
-  UIPage,
-  PrototypeData
-} from './designStore';
-export {
-  selectCurrentStep,
-  selectRequirementText,
-  selectClarificationRounds,
-  selectDomainEntities,
-  selectBusinessFlows,
-  selectUIPages,
-  selectPrototype
-} from './designStore';
-
 // ==================== Confirmation Store ====================
 export { useConfirmationStore } from './confirmationStore';
 export type {

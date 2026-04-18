@@ -77,6 +77,16 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '03df8e2c',
   },
   {
+    version: '1.0.282',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint5-delivery-integration-qa E6: 缺陷归档 + E7: 最终报告',
+      '✅ E6: BLOCKER×4 + P1×1 + P2×2 + P0×5 = 12 defects归档，7必需字段 ✅',
+      '✅ E7: qa-final-report.md — E1~E7 全部 PASS，DoD 全部通过 ✅',
+    ],
+    commit: '8400ef2d',
+  },
+  {
     version: '1.0.261',
     date: '2026-04-18',
     changes: [

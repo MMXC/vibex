@@ -167,45 +167,38 @@ function parseSchema(schema: string): unknown {
  * const smJson = exportToStateMachine(smCards);
  */
 export function toStateMachineSpec(cards: StateMachineCard[]): string {
-  const allStates: SMStateExport[] = [];
-  let initialState = '';
+  // Spec format: { initial: string; states: Record<string, SMStateSpec> }
+  const states: Record<string, unknown> = {};
+  let initial = '';
 
   for (const card of cards) {
-    const states = card.states ?? [];
+    const smStates = card.states ?? [];
     const transitions = card.transitions ?? [];
-    const initial = card.initialState ?? states[0]?.stateId ?? '';
+    const cardInitial = card.initialState ?? smStates[0]?.stateId ?? '';
 
-    // Build on-entry map from transitions
+    // Build on-entry map from transitions: from → { event: target }
     const onMap: Record<string, Record<string, string>> = {};
     for (const t of transitions) {
-      if (!onMap[t.from]) onMap[t.from] = {};
+      if (!onMap[t.from]) { onMap[t.from] = {}; }
       onMap[t.from][t.event] = t.to;
     }
 
-    for (const state of states) {
-      // Avoid duplicates across multiple cards
-      if (!allStates.find((s) => s.id === state.stateId)) {
-        allStates.push({
-          id: state.stateId,
-          name: state.label,
+    for (const state of smStates) {
+      if (!states[state.stateId]) {
+        states[state.stateId] = {
           type: state.stateType,
+          label: state.label,
           on: onMap[state.stateId] ?? {},
-        });
+        };
       }
     }
 
-    if (!initialState && initial) {
-      initialState = initial;
+    if (!initial && cardInitial) {
+      initial = cardInitial;
     }
   }
 
-  const doc: SMExportData = {
-    smVersion: '1.0.0',
-    states: allStates,
-    initial: initialState,
-  };
-
-  return doc;
+  return JSON.stringify({ initial, states }, null, 2);
 }
 
 /** E4-U2: Export state machine cards as JSON string */

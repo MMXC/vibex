@@ -8,18 +8,18 @@ import { describe, it, expect } from 'vitest';
 import { toOpenAPISpec, toStateMachineSpec, exportDDSCanvasData, exportToStateMachine } from '../exporter';
 import type { APIEndpointCard, StateMachineCard } from '@/types/dds';
 
-describe('exportDDSCanvasData — E4-U1', () => {
+// ==================== E4-U1: APICanvasExporter ====================
+
+describe('toOpenAPISpec — E4-U1', () => {
   it('E4-U5.1: returns OpenAPI 3.0.3 version', () => {
     const cards: APIEndpointCard[] = [
-      {
-        id: 'ep-1', type: 'api-endpoint', title: 'Get Users', method: 'GET', path: '/users',
-      },
+      { id: 'ep-1', type: 'api-endpoint', title: 'Get Users', method: 'GET', path: '/users' },
     ];
     const doc = toOpenAPISpec(cards);
     expect(doc.openapi).toBe('3.0.3');
   });
 
-  it('E4-U5.2: maps GET/POST/PUT/DELETE/PATCH correctly', () => {
+  it('E4-U5.2: GET/POST/PUT/DELETE/PATCH all mapped', () => {
     const cards: APIEndpointCard[] = [
       { id: 'ep-1', type: 'api-endpoint', title: 'List', method: 'GET', path: '/items' },
       { id: 'ep-2', type: 'api-endpoint', title: 'Create', method: 'POST', path: '/items' },
@@ -35,35 +35,15 @@ describe('exportDDSCanvasData — E4-U1', () => {
     expect(doc.paths['/items/{id}'].patch).toBeDefined();
   });
 
-  it('E4-U5.3: empty array exports empty paths', () => {
+  it('E4-U5.3: empty cards exports empty paths', () => {
     const doc = toOpenAPISpec([]);
     expect(doc.paths).toEqual({});
   });
 
-  it('E4-U5.4: handles null/undefined fields without crashing', () => {
-    const cards: APIEndpointCard[] = [
-      { id: 'ep-1', type: 'api-endpoint', title: 'Null Test', method: 'GET', path: '/null' },
-    ];
-    // @ts-expect-error — testing invalid input
+  it('E4-U5.4: null card skipped without crash', () => {
+    // @ts-expect-error testing invalid input
     const result = exportDDSCanvasData([null]);
     expect(result).toBeTruthy();
-  });
-
-  it('E4-U5.5: initial state exported correctly', () => {
-    const cards: StateMachineCard[] = [
-      {
-        id: 'sm-1', type: 'state-machine', title: 'Test SM',
-        initialState: 'idle',
-        states: [
-          { id: 'sm-state-1', stateId: 'idle', stateType: 'initial', label: 'Idle' },
-          { id: 'sm-state-2', stateId: 'active', stateType: 'normal', label: 'Active' },
-        ],
-        transitions: [],
-      },
-    ];
-    const doc = toStateMachineSpec(cards);
-    expect(doc.initial).toBe('idle');
-    expect(doc.states).toHaveLength(2);
   });
 
   it('uses card title as summary fallback', () => {
@@ -80,13 +60,13 @@ describe('exportDDSCanvasData — E4-U1', () => {
       { id: 'ep-2', type: 'api-endpoint', title: 'B', method: 'POST', path: '/b', tags: ['users', 'admin'] },
     ];
     const doc = toOpenAPISpec(cards);
-    const tagNames = doc.tags?.map((t: { name: string }) => t.name) ?? [];
+    const tagNames = doc.tags?.map((t) => t.name) ?? [];
     expect(tagNames).toContain('users');
     expect(tagNames).toContain('admin');
   });
 
   it('respects options.title and options.version', () => {
-    const doc = JSON.parse(exportDDSCanvasData([], { title: 'My API', version: '2.0.0' }));
+    const doc = toOpenAPISpec([], { title: 'My API', version: '2.0.0' });
     expect(doc.info.title).toBe('My API');
     expect(doc.info.version).toBe('2.0.0');
   });
@@ -129,27 +109,42 @@ describe('exportDDSCanvasData — E4-U1', () => {
   });
 });
 
-describe('exportToStateMachine — E4-U2', () => {
-  it('exports states and initial correctly', () => {
+// ==================== E4-U2: SMExporter ====================
+
+describe('toStateMachineSpec — E4-U2', () => {
+  it('E4-U5.6: exports initial + states object', () => {
     const cards: StateMachineCard[] = [
       {
-        id: 'sm-1', type: 'state-machine', title: 'User State Machine',
+        id: 'sm-1', type: 'state-machine', title: 'User SM',
         initialState: 'idle',
         states: [
           { id: 's1', stateId: 'idle', stateType: 'initial', label: 'Idle' },
           { id: 's2', stateId: 'active', stateType: 'normal', label: 'Active' },
-          { id: 's3', stateId: 'done', stateType: 'final', label: 'Done' },
         ],
         transitions: [],
       },
     ];
-    const doc = toStateMachineSpec(cards);
-    expect(doc.smVersion).toBe('1.0.0');
-    expect(doc.states).toHaveLength(3);
+    const doc = JSON.parse(toStateMachineSpec(cards));
     expect(doc.initial).toBe('idle');
+    expect(doc.states).toBeDefined();
+    expect(typeof doc.states).toBe('object');
   });
 
-  it('maps transitions to state.on entries', () => {
+  it('E4-U5.7: states is Record<string, stateSpec> (not array)', () => {
+    const cards: StateMachineCard[] = [
+      {
+        id: 'sm-1', type: 'state-machine', title: 'SM',
+        initialState: 'idle',
+        states: [{ id: 's1', stateId: 'idle', stateType: 'initial', label: 'Idle' }],
+        transitions: [],
+      },
+    ];
+    const doc = JSON.parse(toStateMachineSpec(cards));
+    expect(Array.isArray(doc.states)).toBe(false);
+    expect(doc.states['idle']).toBeDefined();
+  });
+
+  it('E4-U5.8: stateSpec contains type, label, on', () => {
     const cards: StateMachineCard[] = [
       {
         id: 'sm-1', type: 'state-machine', title: 'SM',
@@ -163,9 +158,29 @@ describe('exportToStateMachine — E4-U2', () => {
         ],
       },
     ];
-    const doc = toStateMachineSpec(cards);
-    const idle = doc.states.find((s: SMStateExport) => s.id === 'idle');
-    expect(idle?.on?.START).toBe('active');
+    const doc = JSON.parse(toStateMachineSpec(cards));
+    const idle = doc.states['idle'];
+    expect(idle.type).toBe('initial');
+    expect(idle.on?.START).toBe('active');
+  });
+
+  it('E4-U5.9: empty cards → empty states', () => {
+    const doc = JSON.parse(toStateMachineSpec([]));
+    expect(doc.states).toEqual({});
+    expect(doc.initial).toBe('');
+  });
+
+  it('E4-U5.10: no smVersion field (spec format)', () => {
+    const cards: StateMachineCard[] = [
+      {
+        id: 'sm-1', type: 'state-machine', title: 'SM',
+        initialState: 'idle',
+        states: [{ id: 's1', stateId: 'idle', stateType: 'initial', label: 'Idle' }],
+        transitions: [],
+      },
+    ];
+    const doc = JSON.parse(toStateMachineSpec(cards));
+    expect(doc.smVersion).toBeUndefined();
   });
 
   it('merges states from multiple cards without duplicates', () => {
@@ -182,22 +197,20 @@ describe('exportToStateMachine — E4-U2', () => {
         id: 'sm-2', type: 'state-machine', title: 'SM2', initialState: 'c',
         states: [
           { id: 's3', stateId: 'c', stateType: 'normal', label: 'C' },
-          { id: 's4', stateId: 'a', stateType: 'normal', label: 'A Duplicate' },
+          { id: 's4', stateId: 'a', stateType: 'normal', label: 'A Dup' },
         ],
         transitions: [],
       },
     ];
-    const doc = toStateMachineSpec(cards);
-    expect(doc.states).toHaveLength(3);
+    const doc = JSON.parse(toStateMachineSpec(cards));
+    const keys = Object.keys(doc.states);
+    expect(keys).toHaveLength(3);
+    expect(keys).toContain('a');
+    expect(keys).toContain('b');
+    expect(keys).toContain('c');
   });
 
-  it('handles empty cards gracefully', () => {
-    const doc = toStateMachineSpec([]);
-    expect(doc.states).toEqual([]);
-    expect(doc.initial).toBe('');
-  });
-
-  it('uses first state as initial when no initialState is set', () => {
+  it('uses first state as initial when no initialState', () => {
     const cards: StateMachineCard[] = [
       {
         id: 'sm-1', type: 'state-machine', title: 'SM',
@@ -208,15 +221,7 @@ describe('exportToStateMachine — E4-U2', () => {
         transitions: [],
       },
     ];
-    const doc = toStateMachineSpec(cards);
+    const doc = JSON.parse(toStateMachineSpec(cards));
     expect(doc.initial).toBe('first');
   });
 });
-
-// Type for test use
-interface SMStateExport {
-  id: string;
-  name: string;
-  type?: string;
-  on?: Record<string, string>;
-}

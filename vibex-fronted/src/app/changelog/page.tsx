@@ -215,8 +215,9 @@ const mockChangelog: ChangelogEntry[] = [
       '✅ U6 VersionDiff: diffVersions() 结构化 diff (added/removed/modified/changed)',
       '✅ U7 集成: app/canvas/delivery/version/page.tsx — VersionDiff 页面',
       '✅ 测试: VersionDiff.test.ts — 11 passing',
+      '✅ E3-U1/U2 QA确认: VersionDiff ✅, /canvas/delivery/version 路由缺失 BLOCKER 已归档',
     ],
-    commit: '90a90155',
+    commit: '90a90155 + 8f97bd90',
   },
   {
     version: '1.0.258',

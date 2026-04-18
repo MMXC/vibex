@@ -50,6 +50,8 @@
 - **U7 集成**: `app/canvas/delivery/version/page.tsx` — VersionDiff 页面
 - **测试**: `VersionDiff.test.ts` — 11 passing tests
 - 提交: 90a90155
+- **E3-U1/U2 QA确认**: E3-U1 ✅ VersionDiff; E3-U2 /canvas/delivery/version 缺失 BLOCKER defect 已归档
+- 提交: 8f97bd90 (E3-U1/U2 QA确认)
 
 ### [vibex-sprint1-prototype-canvas Epic1: 拖拽布局编辑器] — 2026-04-17
 - **Epic 1: 拖拽布局编辑器** — 可视化原型画布正式上线

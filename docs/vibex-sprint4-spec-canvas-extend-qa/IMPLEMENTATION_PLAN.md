@@ -18,10 +18,10 @@
 | Epic | Units | Status | Next |
 |------|-------|--------|------|
 | E1: 产出物代码审查 | U1~U3 | 3/3 ✅ | — |
-| E2: 产出物测试验证 | U4~U6 | 0/3 | U4 |
+| E2: 产出物测试验证 | U1~U2 | 2/2 ✅ | — |
 | E3: 补充测试编写 | U7~U8 | 2/2 ✅ | — |
 | E4: 缺陷归档 | U9~U10 | 2/2 ✅ | — |
-| E5: 最终报告 | U11 | 0/1 | U11 |
+| E5: 最终报告 | U11 | 1/1 ✅ | — |
 ## tester-gstack: gstack UI 验证
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
@@ -79,8 +79,8 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E2-U1 | 上游测试覆盖率确认 | ⬜ | — | E1(154) + E2(158) + E3(166) + E4(31) + E5(5) 测试文件存在 |
-| E2-U2 | Vitest 测试执行 | ⬜ | E2-U1 | `pnpm vitest run` 可执行 |
+| E2-U1 | 上游测试覆盖率确认 | ✅ | — | E1(154) + E2(158) + E3(166) + E4(31) + E5(5) 测试文件存在 |
+| E2-U2 | Vitest 测试执行 | ✅ | E2-U1 | `pnpm vitest run` 可执行 |
 
 ### E2-U1 详细说明
 
@@ -164,7 +164,7 @@ describe('E5 Spec Alignment', () => {
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E5-U1 | qa-final-report.md | ⬜ | E4-U1 | 包含所有 Epic 的 PASS/FAIL 判定、DoD 检查单、缺陷汇总表 |
+| E5-U1 | qa-final-report.md | ✅ | E4-U1 | qa-final-report.md ✅ 含所有 Epic PASS/FAIL + DoD 检查单 + 缺陷汇总表 |
 
 ---
 

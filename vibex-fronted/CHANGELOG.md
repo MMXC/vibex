@@ -86,6 +86,10 @@
 - **E4-U5 Tests**: `exporter.test.ts` — 16 passing tests
 - **提交**: `9a3e239d` (E4-U1~U5)
 
+### [vibex-sprint4-spec-canvas-extend P0: 硬编码颜色修复] — 2026-04-18
+- **CSS tokens**: APIEndpointCard/StateMachineCard 移除硬编码颜色 → CSS tokens
+- **exporter.ts**: 修复导出类型定义
+- 提交: 83 d40fae
 ### [vibex-sprint4-spec-canvas-extend E5: 章节四态规范] — 2026-04-18
 - **E5-U1 CardErrorBoundary**: `components/dds/canvas/CardErrorBoundary.tsx` — ErrorBoundary 捕获卡片渲染异常，显示错误状态
 - **E5-U2 章节四态**: ChapterPanel 骨架屏/加载中/空状态/错误态 (ChapterSkeleton/ChapterLoading/ChapterEmpty/ChapterError)

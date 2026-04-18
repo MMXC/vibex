@@ -66,6 +66,17 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '339d2da9',
   },
   {
+    version: '1.0.279',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint5-delivery-integration E5: PRDTab 空状态组件',
+      '✅ E5-U1 空状态引导: "请先在 DDS 画布中创建限界上下文..."',
+      '✅ E5-U1 样式: delivery.module.css .emptyStateText',
+      '✅ 测试: delivery/__tests__ 34 passing',
+    ],
+    commit: '03df8e2c',
+  },
+  {
     version: '1.0.261',
     date: '2026-04-18',
     changes: [

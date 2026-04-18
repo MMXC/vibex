@@ -19,7 +19,7 @@
 |------|-------|--------|------|
 | E1: 产出物代码审查 | U1~U3 | 0/3 | U1 |
 | E2: 产出物测试验证 | U4~U6 | 0/3 | U4 |
-| E3: 补充测试编写 | U7~U8 | 2/2 ✅ | U7 |
+| E3: 补充测试编写 | U7~U8 | 2/2 ✅ | — |
 | E4: 缺陷归档 | U9~U10 | 2/2 ✅ | U9 |
 | E5: 最终报告 | U11 | 1/1 ✅ | U11 |
 
@@ -74,7 +74,7 @@ pnpm vitest run --reporter=dot
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E3-U1 | E4 Spec 对齐测试 | ⬜ | E2-U1 | `spec-alignment.test.ts` 包含 exportDDSCanvasData 和 exportToStateMachine 的 Spec 对齐测试 |
+| E3-U1 | E4 Spec 对齐测试 | ✅ | E2-U1 | `spec-alignment.test.ts` 包含 exportDDSCanvasData 和 exportToStateMachine 的 Spec 对齐测试 |
 | E3-U2 | E5 组件存在性测试 | ⬜ | E2-U1 | ChapterEmptyState + ChapterSkeleton 文件存在性测试 |
 
 ### E3-U1 详细说明

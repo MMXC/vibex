@@ -241,6 +241,15 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '90a90155 + 8f97bd90',
   },
   {
+    version: '1.0.280',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint6-ai-coding-integration E6: 缺陷归档',
+      '✅ E6-U1 缺陷归档确认: BLOCKER×2 + P0×2 + P1×1 + P2×3 = 8 defects',
+    ],
+    commit: '8c0a8823',
+  },
+  {
     version: '1.0.258',
     date: '2026-04-18',
     changes: [

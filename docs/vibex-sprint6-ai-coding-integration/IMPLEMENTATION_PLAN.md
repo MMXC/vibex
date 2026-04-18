@@ -14,7 +14,7 @@
 |------|-------|--------|------|
 | E1: 设计稿导入 | U1-U2 | ✅ 2/2 | — |
 | E2: AI Coding Agent | U3-U5 | 2/3 | U3 |
-| E3: 版本 Diff | U6-U7 | 0/2 | U6 |
+| E3: 版本 Diff | U6-U7 | 2/2 ✅ | U6 |
 
 ---
 
@@ -123,8 +123,8 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| U6 | VersionDiff 逻辑 | ⬜ | — | `diffVersions(v1, v2)` 返回 added/removed/modified |
-| U7 | 版本历史 UI 集成 | ⬜ | U6 | version-history 页面显示 diff 视图 |
+| U6 | VersionDiff 逻辑 | ✅ | — | `diffVersions(v1, v2)` 返回 added/removed/modified |
+| U7 | 版本历史 UI 集成 | ✅ | U6 | version-history 页面显示 diff 视图 |
 
 ### U6: VersionDiff 逻辑
 

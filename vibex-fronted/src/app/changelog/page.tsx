@@ -104,6 +104,7 @@ const mockChangelog: ChangelogEntry[] = [
       '✅ E4-U2 SMExporter: exportToStateMachine() → StateMachine JSON',
       '✅ E4-U3/U4 Export Modal: DDSToolbar OpenAPI + StateMachine download',
       '✅ E4-U5 Tests: exporter.test.ts — 16 passing tests',
+      '✅ E4 spec-alignment tests: spec-alignment.test.ts — 5 passing tests',
     ],
     commit: '9a3e239d',
   },

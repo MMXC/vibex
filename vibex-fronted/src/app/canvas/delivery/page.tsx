@@ -26,14 +26,14 @@ export default function DeliveryCenterPage() {
     activeTab,
     searchQuery,
     setSearchQuery,
-    loadMockData,
+    loadFromStores,
     exportHistory,
     clearHistory,
   } = useDeliveryStore();
 
   useEffect(() => {
-    loadMockData();
-  }, [loadMockData]);
+    loadFromStores();
+  }, []);
 
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp);

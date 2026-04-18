@@ -26,6 +26,12 @@
 - **单元测试**: `image-ai-import.test.ts` — 6 个用例 (AC1/AC2/AC3)
 - 提交: 8e710864 (figma) + e6dd07a5 (image-ai)
 
+### [vibex-sprint6-ai-coding-integration E2: AI Coding Agent] — 2026-04-18
+- **U4 AgentFeedbackPanel**: `components/dds/canvas/AgentFeedbackPanel.tsx` — AI 反馈面板，session list + message history + retry
+- **U5 AgentSessions**: `components/dds/canvas/AgentSessions.tsx` — 会话列表，支持新建/删除/切换
+- **agentStore**: `stores/agentStore.ts` — sessions/activeSession/currentMessage/retryCount
+- 提交: 0d36227d
+
 ### [vibex-sprint1-prototype-canvas Epic1: 拖拽布局编辑器] — 2026-04-17
 - **Epic 1: 拖拽布局编辑器** — 可视化原型画布正式上线
 - 左侧组件面板：10 个默认组件（Button/Input/Card/Container/Header/Navigation/Modal/Table/Form/Image）支持拖拽到画布

@@ -63,6 +63,12 @@
 - **单元测试**: `image-ai-import.test.ts` — 6 个用例 (AC1/AC2/AC3)，5/5 PASS for E4-QA image-import
 - 提交: 8e710864 (figma) + e6dd07a5 (image-ai)
 
+### [Unreleased] vibex-sprint6-ai-coding-integration E2: AI Coding Agent — 2026-04-18
+- **U4 AgentFeedbackPanel**: `components/dds/canvas/AgentFeedbackPanel.tsx` — AI 反馈面板，session list + message history + retry
+- **U5 AgentSessions**: `components/dds/canvas/AgentSessions.tsx` — 会话列表，支持新建/删除/切换
+- **agentStore**: `stores/agentStore.ts` — sessions/activeSession/currentMessage/retryCount 状态管理
+- 提交: 0d36227d
+
 ### [Unreleased] vibex-sprint4-spec-canvas-extend E2: 业务规则章节 — 2026-04-18
 - **E2-U1 类型定义**: `types/dds/state-machine.ts` — StateType/TransitionType/SMState/SMTransition/StateMachineCard
 - **E2-U2 StateMachineCard**: `StateMachineCard.tsx` — state list/transition count/selected highlight

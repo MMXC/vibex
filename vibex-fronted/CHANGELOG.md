@@ -18,6 +18,12 @@
 - **T7 formatDDL**: `lib/delivery/formatDDL.ts` — `formatDDL()` + `downloadDDL()` SQL formatting
 - **测试**: DDLGenerator (16 tests) + formatDDL (5 tests) = 21 passing (扩自 8)
 - **提交**: `6ee00b62` + `31275654` (E3-U1 测试扩测: 10→16)
+### [vibex-sprint5-delivery-integration E4: PRD 融合] — 2026-04-18
+- **E4-U1 PRDGenerator**: `lib/delivery/PRDGenerator.ts` — generatePRD() + generatePRDMarkdown()，将 deliveryStore 数据转换为 PRD JSON/Markdown
+- **E4-U2 PRDTab**: `components/delivery/PRDTab.tsx` — 移除硬编码"电商系统"，动态生成 contexts/flows/components 数量
+- **E4-U3 exportItem**: `stores/deliveryStore.ts` + `/api/delivery/export/route.ts` — POST API 实现实际下载功能
+- **测试**: delivery/__tests__ 27 passing
+- **提交**: `339d2da9`
 
 ### [vibex-sprint6-ai-coding-integration E1: 设计稿导入] — 2026-04-18
 - **E1-U1 /api/figma route**: GET/POST Figma REST API proxy (`app/api/figma/route.ts`)

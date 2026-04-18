@@ -69,6 +69,11 @@
 - **DDL Tab 集成**: delivery/page.tsx DDL Tab，导入 generateDDL + formatDDL
 - **测试**: DDLGenerator (3 tests) + formatDDL (5 tests) = 8 passing
 - 提交: 6ee00b62 (T6/T7)
+### [Unreleased] vibex-sprint5-delivery-integration E4: PRD 融合 — 2026-04-18
+- **E4-U1 PRDGenerator**: `lib/delivery/PRDGenerator.ts` — generatePRD() + generatePRDMarkdown()，动态生成 PRD JSON/Markdown
+- **E4-U2 PRDTab**: `components/delivery/PRDTab.tsx` — 移除硬编码，动态展示 contexts/flows/components 数量
+- **E4-U3 exportItem**: `stores/deliveryStore.ts` + `/api/delivery/export/route.ts` — POST API 实现下载功能
+- 提交: 339d2da9
 
 ### [Unreleased] vibex-sprint6-ai-coding-integration E3: 版本 Diff — 2026-04-18
 - **U6 VersionDiff**: `lib/version/VersionDiff.ts` — `diffVersions()` computes structural diff between two project snapshots (components added/removed/modified/changed type)

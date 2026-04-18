@@ -54,6 +54,18 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '6ee00b62 + 31275654',
   },
   {
+    version: '1.0.277',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint5-delivery-integration E4: PRD 融合',
+      '✅ E4-U1 PRDGenerator: generatePRD() + generatePRDMarkdown() 动态生成',
+      '✅ E4-U2 PRDTab: 移除硬编码，动态展示 contexts/flows/components 数量',
+      '✅ E4-U3 exportItem: /api/delivery/export POST API 实现',
+      '✅ 测试: delivery/__tests__ 27 passing',
+    ],
+    commit: '339d2da9',
+  },
+  {
     version: '1.0.261',
     date: '2026-04-18',
     changes: [

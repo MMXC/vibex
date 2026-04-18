@@ -22,6 +22,32 @@
 | E3: 补充测试编写 | U7~U8 | 2/2 ✅ | — |
 | E4: 缺陷归档 | U9~U10 | 0/2 | U9 |
 | E5: 最终报告 | U11 | 0/1 | U11 |
+## tester-gstack: gstack UI 验证
+
+| ID | Name | Status | Depends On | Acceptance Criteria |
+|----|------|--------|-----------|---------------------|
+| G1 | DDSToolbar 5章节验证 | :white_check_mark: | -- | DDSToolbar 含 5 个 chapterType 按钮（代码验证） |
+| G2 | API 章节空状态 | :warning: | P0-006 | ChapterEmptyState.tsx 含引导文案 |
+| G3 | SM 章节空状态 | :warning: | P0-006 | ChapterEmptyState.tsx 含引导文案 |
+| G4 | 导出 Modal | :white_check_mark: | -- | OpenAPI + StateMachine 两个按钮（代码验证） |
+| G5 | APIEndpointCard 颜色 | :white_check_mark: | -- | method badge 使用 CSS 变量（代码验证） |
+
+> 环境说明: staging 不可用，Next.js output:export 与 middleware 冲突。
+> G1/G4/G5 代码审查验证; G2/G3 待 P0-006 修复后重新验证。
+
+## tester-gstack: gstack UI 验证
+
+| ID | Name | Status | Depends On | Acceptance Criteria |
+|----|------|--------|-----------|---------------------|
+| G1 | DDSToolbar 5章节验证 | ✅ | — | DDSToolbar 含 5 个 chapterType 按钮（代码验证） |
+| G2 | API 章节空状态 | ⬜ | P0-006 | ChapterEmptyState.tsx 含"从左侧拖拽"引导文案 |
+| G3 | SM 章节空状态 | ⬜ | P0-006 | ChapterEmptyState.tsx 含"从左侧拖拽 State"引导文案 |
+| G4 | 导出 Modal | ✅ | — | OpenAPI + StateMachine 两个导出按钮（代码验证） |
+| G5 | APIEndpointCard 颜色 | ✅ | — | method badge 使用 CSS 变量（代码验证） |
+
+> **环境说明**: Next.js  与 middleware 冲突，dev server 无法正常启动；staging 不可用。
+> G1/G4/G5 通过代码审查验证 ✅；G2/G3 待 P0-006 修复后重新验证。
+
 
 ---
 

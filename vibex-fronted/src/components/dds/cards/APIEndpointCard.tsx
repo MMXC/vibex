@@ -14,21 +14,22 @@ export interface APIEndpointCardProps {
   selected?: boolean;
 }
 
+/** P0-001/P0-002: Use CSS token variables for method colors */
 const METHOD_COLORS: Record<string, string> = {
-  GET: '#10b981',
-  POST: '#3b82f6',
-  PUT: '#f59e0b',
-  DELETE: '#ef4444',
+  GET: 'var(--color-method-get, #10b981)',
+  POST: 'var(--color-method-post, #3b82f6)',
+  PUT: 'var(--color-method-put, #f59e0b)',
+  DELETE: 'var(--color-method-delete, #ef4444)',
   PATCH: '#8b5cf6',
-  OPTIONS: '#6b7280',
-  HEAD: '#6b7280',
+  OPTIONS: "var(--color-method-options, #6b7280)",
+  HEAD: "var(--color-method-options, #6b7280)",
 };
 
 export const APIEndpointCard = memo(function APIEndpointCard({
   card,
   selected = false,
 }: APIEndpointCardProps) {
-  const methodColor = METHOD_COLORS[card.method] ?? '#6b7280';
+  const methodColor = METHOD_COLORS[card.method] ?? "var(--color-method-options, #6b7280)";
 
   return (
     <div className={`${styles.card} ${selected ? styles.selected : ''}`}>

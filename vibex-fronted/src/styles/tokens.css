@@ -185,4 +185,21 @@
   --color-text-muted: #8a8a9a;
   --color-text-disabled: #4b5563;
   --color-text-inverse: #111827;
+
+  /* ---- E1: API Method Colors ---- */
+  --color-method-get: #10b981;
+  --color-method-post: #3b82f6;
+  --color-method-put: #f59e0b;
+  --color-method-patch: #8b5cf6;
+  --color-method-delete: #ef4444;
+  --color-method-options: #6b7280;
+  --color-method-head: #6b7280;
+
+  /* ---- E2: State Machine Colors ---- */
+  --color-sm-initial: #10b981;
+  --color-sm-normal: #3b82f6;
+  --color-sm-final: #f59e0b;
+  --color-sm-choice: #8b5cf6;
+  --color-sm-join: #6b7280;
+  --color-sm-fork: #06b6d4;
 }

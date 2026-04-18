@@ -23,12 +23,12 @@ const STATE_ICONS: Record<string, string> = {
 };
 
 const STATE_COLORS: Record<string, string> = {
-  initial: '#f59e0b',
-  normal: '#3b82f6',
-  final: '#10b981',
-  choice: '#8b5cf6',
-  join: '#06b6d4',
-  fork: '#ec4899',
+  initial: "var(--color-sm-initial, #f59e0b)",
+  normal: "var(--color-sm-normal, #3b82f6)",
+  final: "var(--color-sm-final, #10b981)",
+  choice: "var(--color-sm-choice, #8b5cf6)",
+  join: "var(--color-sm-join, #06b6d4)",
+  fork: "var(--color-sm-fork, #ec4899)",
 };
 
 export const StateMachineCard = memo(function StateMachineCard({

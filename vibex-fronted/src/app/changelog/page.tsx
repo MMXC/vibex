@@ -152,6 +152,17 @@ const mockChangelog: ChangelogEntry[] = [
     commit: 'e6dd07a5',
   },
   {
+    version: '1.0.273',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint6-ai-coding-integration E1-QA: 设计稿元数据 Store',
+      '✅ designStore: 重构 343 行，新增 designs[] + CRUD，localStorage 持久化',
+      '✅ /api/designs: GET/POST/DELETE endpoints — 设计稿元数据 CRUD',
+      '✅ 测试: designStore.test.ts — 6 个用例',
+    ],
+    commit: 'a12689e7 + 347d5cda',
+  },
+  {
     version: '1.0.269',
     date: '2026-04-18',
     changes: [

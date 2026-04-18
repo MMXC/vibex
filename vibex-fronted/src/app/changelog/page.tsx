@@ -152,6 +152,16 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '7d2fc9be',
   },
   {
+    version: '1.0.278',
+    date: '2026-04-18',
+    changes: [
+      '📋 vibex-sprint4-spec-canvas-extend reviewer-E4-defects: E4 缺陷归档 QA',
+      '✅ E4-U1 缺陷归档: P0×6 + P1×1 + P2×2 = 9 defects，全部含7必需字段',
+      '✅ E4-U2 格式审查: 严重性/Epic/Spec引用/问题描述/代码证据/修复建议/影响范围',
+    ],
+    commit: 'adc7e7a0',
+  },
+  {
     version: '1.0.271',
     date: '2026-04-18',
     changes: [

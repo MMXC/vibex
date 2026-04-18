@@ -121,6 +121,10 @@
 - **G2/G3**: ChapterEmptyState 缺失 P0-006 确认 ❌ (待 P0-006 修复)
 - **G4/G5**: Export Modal + method badge 验证 ✅
 - **提交**: `7d2fc9be`
+### [vibex-sprint4-spec-canvas-extend reviewer-E4-defects: E4 缺陷归档 QA] — 2026-04-18
+- **E4-U1 缺陷归档**: P0 ×6 + P1 ×1 + P2 ×2 = 9 个 defects 文件，全部含 7 必需字段
+- **E4-U2 格式审查**: 全部 9 文件含严重性/Epic/Spec引用/问题描述/代码证据/修复建议/影响范围
+- **提交**: `adc7e7a0`
 
 ### [vibex-sprint3-prototype-extend E4-QA: 图片导入测试] — 2026-04-18
 - **E4-QA image-import**: `services/figma/image-import.test.ts` — 5 个用例（success/empty/non-JSON/file-size/timeout）

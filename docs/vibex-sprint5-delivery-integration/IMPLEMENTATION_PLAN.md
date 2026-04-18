@@ -14,7 +14,7 @@
 |------|-------|--------|------|
 | E1: 数据层集成 | T1-T3 | 3/3 ✅ | T1 |
 | E2: 跨画布导航 | T4-T5 | 2/2 ✅ | done |
-| E3: DDL 生成 | T6-T7 | ⬜ | BLOCKED |
+| E3: DDL 生成 | T6-T7 | 2/2 ✅ | done |
 
 **⚠️ E3 BLOCKED**: 依赖 Sprint4 `api` 章节实现（Sprint4 的 APIEndpointCard 类型和 APICanvasExporter）
 
@@ -130,14 +130,14 @@
 
 ---
 
-## E3: DDL 生成（⚠️ BLOCKED）
+## E3: DDL 生成
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| T6 | DDLGenerator | ⬜ | Sprint4 api 章节 | `generateDDL(apiCards)` 返回 DDLTable[] |
-| T7 | formatDDL / downloadDDL | ⬜ | T6 | 生成 MySQL SQL 文件，支持下载 |
+| T6 | DDLGenerator | ✅ | Sprint4 api 章节 | `generateDDL(apiCards)` 返回 DDLTable[] |
+| T7 | formatDDL / downloadDDL | ✅ | T6 | 生成 MySQL SQL 文件，支持下载 |
 
-### T6: DDLGenerator（⚠️ BLOCKED）
+### T6: DDLGenerator
 
 **文件**: `src/lib/delivery/DDLGenerator.ts`（新建）
 

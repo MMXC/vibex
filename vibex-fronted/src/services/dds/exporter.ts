@@ -64,7 +64,7 @@ function toUpperMethod(method: string): string {
  * @example
  * const openapi = exportDDSCanvasData(apiCards, { title: 'My API', version: '2.0.0' });
  */
-export function exportDDSCanvasData(
+export function toOpenAPISpec(
   cards: APIEndpointCard[],
   options: { title?: string; version?: string } = {}
 ): string {
@@ -122,7 +122,15 @@ export function exportDDSCanvasData(
     doc.tags = Array.from(allTags).map((name) => ({ name }));
   }
 
-  return JSON.stringify(doc, null, 2);
+  return doc;
+}
+
+/** E4-U1: Export API cards as OpenAPI JSON string */
+export function exportDDSCanvasData(
+  cards: APIEndpointCard[],
+  options: { title?: string; version?: string } = {}
+): string {
+  return JSON.stringify(toOpenAPISpec(cards, options), null, 2);
 }
 
 function buildResponses(responses?: APIEndpointCard['responses']): Record<string, unknown> {
@@ -158,7 +166,7 @@ function parseSchema(schema: string): unknown {
  * @example
  * const smJson = exportToStateMachine(smCards);
  */
-export function exportToStateMachine(cards: StateMachineCard[]): string {
+export function toStateMachineSpec(cards: StateMachineCard[]): string {
   const allStates: SMStateExport[] = [];
   let initialState = '';
 
@@ -197,5 +205,10 @@ export function exportToStateMachine(cards: StateMachineCard[]): string {
     initial: initialState,
   };
 
-  return JSON.stringify(doc, null, 2);
+  return doc;
+}
+
+/** E4-U2: Export state machine cards as JSON string */
+export function exportToStateMachine(cards: StateMachineCard[]): string {
+  return JSON.stringify(toStateMachineSpec(cards), null, 2);
 }

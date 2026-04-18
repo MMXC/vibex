@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { exportDDSCanvasData, exportToStateMachine } from '../exporter';
+import { toOpenAPISpec, toStateMachineSpec, exportDDSCanvasData, exportToStateMachine } from '../exporter';
 import type { APIEndpointCard, StateMachineCard } from '@/types/dds';
 
 describe('exportDDSCanvasData — E4-U1', () => {
@@ -15,7 +15,7 @@ describe('exportDDSCanvasData — E4-U1', () => {
         id: 'ep-1', type: 'api-endpoint', title: 'Get Users', method: 'GET', path: '/users',
       },
     ];
-    const doc = JSON.parse(exportDDSCanvasData(cards));
+    const doc = toOpenAPISpec(cards);
     expect(doc.openapi).toBe('3.0.3');
   });
 
@@ -27,7 +27,7 @@ describe('exportDDSCanvasData — E4-U1', () => {
       { id: 'ep-4', type: 'api-endpoint', title: 'Remove', method: 'DELETE', path: '/items/{id}' },
       { id: 'ep-5', type: 'api-endpoint', title: 'Modify', method: 'PATCH', path: '/items/{id}' },
     ];
-    const doc = JSON.parse(exportDDSCanvasData(cards));
+    const doc = toOpenAPISpec(cards);
     expect(doc.paths['/items'].get).toBeDefined();
     expect(doc.paths['/items'].post).toBeDefined();
     expect(doc.paths['/items/{id}'].put).toBeDefined();
@@ -36,7 +36,7 @@ describe('exportDDSCanvasData — E4-U1', () => {
   });
 
   it('E4-U5.3: empty array exports empty paths', () => {
-    const doc = JSON.parse(exportDDSCanvasData([]));
+    const doc = toOpenAPISpec([]);
     expect(doc.paths).toEqual({});
   });
 
@@ -61,7 +61,7 @@ describe('exportDDSCanvasData — E4-U1', () => {
         transitions: [],
       },
     ];
-    const doc = JSON.parse(exportToStateMachine(cards));
+    const doc = toStateMachineSpec(cards);
     expect(doc.initial).toBe('idle');
     expect(doc.states).toHaveLength(2);
   });
@@ -70,7 +70,7 @@ describe('exportDDSCanvasData — E4-U1', () => {
     const cards: APIEndpointCard[] = [
       { id: 'ep-1', type: 'api-endpoint', title: 'My Endpoint', method: 'GET', path: '/x' },
     ];
-    const doc = JSON.parse(exportDDSCanvasData(cards));
+    const doc = toOpenAPISpec(cards);
     expect(doc.paths['/x'].get.summary).toBe('My Endpoint');
   });
 
@@ -79,7 +79,7 @@ describe('exportDDSCanvasData — E4-U1', () => {
       { id: 'ep-1', type: 'api-endpoint', title: 'A', method: 'GET', path: '/a', tags: ['users'] },
       { id: 'ep-2', type: 'api-endpoint', title: 'B', method: 'POST', path: '/b', tags: ['users', 'admin'] },
     ];
-    const doc = JSON.parse(exportDDSCanvasData(cards));
+    const doc = toOpenAPISpec(cards);
     const tagNames = doc.tags?.map((t: { name: string }) => t.name) ?? [];
     expect(tagNames).toContain('users');
     expect(tagNames).toContain('admin');
@@ -99,7 +99,7 @@ describe('exportDDSCanvasData — E4-U1', () => {
         requestBody: { contentType: 'application/json', schema: '{"type":"object"}' },
       },
     ];
-    const doc = JSON.parse(exportDDSCanvasData(cards));
+    const doc = toOpenAPISpec(cards);
     expect(doc.paths['/items'].post.requestBody).toBeDefined();
     expect(doc.paths['/items'].post.requestBody.required).toBe(true);
   });
@@ -108,7 +108,7 @@ describe('exportDDSCanvasData — E4-U1', () => {
     const cards: APIEndpointCard[] = [
       { id: 'ep-1', type: 'api-endpoint', title: 'API', method: 'GET', path: 'api/data' },
     ];
-    const doc = JSON.parse(exportDDSCanvasData(cards));
+    const doc = toOpenAPISpec(cards);
     expect(doc.paths['/api/data']).toBeDefined();
   });
 
@@ -123,7 +123,7 @@ describe('exportDDSCanvasData — E4-U1', () => {
         ],
       },
     ];
-    const doc = JSON.parse(exportDDSCanvasData(cards));
+    const doc = toOpenAPISpec(cards);
     expect(doc.paths['/test'].get.responses['200']).toBeDefined();
     expect(doc.paths['/test'].get.responses['404']).toBeDefined();
   });
@@ -143,7 +143,7 @@ describe('exportToStateMachine — E4-U2', () => {
         transitions: [],
       },
     ];
-    const doc = JSON.parse(exportToStateMachine(cards));
+    const doc = toStateMachineSpec(cards);
     expect(doc.smVersion).toBe('1.0.0');
     expect(doc.states).toHaveLength(3);
     expect(doc.initial).toBe('idle');
@@ -163,7 +163,7 @@ describe('exportToStateMachine — E4-U2', () => {
         ],
       },
     ];
-    const doc = JSON.parse(exportToStateMachine(cards));
+    const doc = toStateMachineSpec(cards);
     const idle = doc.states.find((s: SMStateExport) => s.id === 'idle');
     expect(idle?.on?.START).toBe('active');
   });
@@ -187,12 +187,12 @@ describe('exportToStateMachine — E4-U2', () => {
         transitions: [],
       },
     ];
-    const doc = JSON.parse(exportToStateMachine(cards));
+    const doc = toStateMachineSpec(cards);
     expect(doc.states).toHaveLength(3);
   });
 
   it('handles empty cards gracefully', () => {
-    const doc = JSON.parse(exportToStateMachine([]));
+    const doc = toStateMachineSpec([]);
     expect(doc.states).toEqual([]);
     expect(doc.initial).toBe('');
   });
@@ -208,7 +208,7 @@ describe('exportToStateMachine — E4-U2', () => {
         transitions: [],
       },
     ];
-    const doc = JSON.parse(exportToStateMachine(cards));
+    const doc = toStateMachineSpec(cards);
     expect(doc.initial).toBe('first');
   });
 });

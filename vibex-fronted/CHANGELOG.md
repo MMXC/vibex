@@ -30,6 +30,17 @@
 - **测试**: delivery/__tests__ 34 passing
 - **提交**: `03df8e2c`
 
+### [vibex-sprint5-delivery-integration-qa E6: 缺陷归档] — 2026-04-18
+- **E6-U1**: 12 defects confirmed (BLOCKER×4 + P0×5 + P1×1 + P2×2) — 7 required fields ✅
+- **E6-U2**: defect format review ✅
+- 提交: `8400ef2d`
+
+### [vibex-sprint5-delivery-integration-qa E7: 最终报告] — 2026-04-18
+- **E7-U1**: qa-final-report.md — 执行摘要: E1~E7 全部 PASS ✅
+- **E7-U1**: DoD 检查单 ✅ / 缺陷汇总表 ✅
+- 提交: `8400ef2d`
+
+
 ### [vibex-sprint6-ai-coding-integration E1: 设计稿导入] — 2026-04-18
 - **E1-U1 /api/figma route**: GET/POST Figma REST API proxy (`app/api/figma/route.ts`)
 - **E1-U1 Image AI import**: `src/lib/figma/image-ai-import.ts` — `importFromImage(file)` AI vision 分析图片，base64 → /api/chat → GPT-4o vision

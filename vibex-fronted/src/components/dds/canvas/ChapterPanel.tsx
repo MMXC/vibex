@@ -17,7 +17,7 @@
 import React, { memo, useState, useCallback } from 'react';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
 import { CardRenderer } from '@/components/dds/cards';
-import type { ChapterType, DDSCard, CardType, UserStoryCard, BoundedContextCard, FlowStepCard } from '@/types/dds';
+import type { ChapterType, DDSCard, CardType, UserStoryCard, BoundedContextCard, FlowStepCard, APIEndpointCard } from '@/types/dds';
 import styles from './ChapterPanel.module.css';
 
 // ==================== Constants ====================
@@ -362,6 +362,25 @@ export const ChapterPanel = memo(function ChapterPanel({
     [chapter, addCard]
   );
 
+  const handleCreateAPIEndpoint = useCallback((data: { method: string; path: string; summary?: string; description?: string }) => {
+    const id = `api-ep-${Date.now()}`;
+    const card: APIEndpointCard = {
+      id,
+      type: 'api-endpoint',
+      title: data.summary || `${data.method} ${data.path}`,
+      method: data.method as APIEndpointCard['method'],
+      path: data.path,
+      summary: data.summary,
+      description: data.description,
+      tags: [],
+      parameters: [],
+      responses: [],
+    };
+    addCard('api', card);
+    setShowCreateForm(false);
+    setCreatingType(null);
+  }, [addCard]);
+
   const handleCreateFlowStep = useCallback(
     ({ stepName, actor, preCondition, postCondition }: { stepName: string; actor?: string; preCondition?: string; postCondition?: string }) => {
       const card: FlowStepCard = {
@@ -483,6 +502,49 @@ export const ChapterPanel = memo(function ChapterPanel({
             onSubmit={handleCreateFlowStep}
             onCancel={() => { setShowCreateForm(false); setCreatingType(null); }}
           />
+
+        {showCreateForm && creatingType === 'api-endpoint' && (
+          <div className={styles.createForm}>
+            <div className={styles.formRow}>
+              <label className={styles.formLabel}>方法</label>
+              <select className={styles.formInput} id="create-api-method">
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+                <option value="PATCH">PATCH</option>
+              </select>
+            </div>
+            <div className={styles.formRow}>
+              <label className={styles.formLabel}>路径</label>
+              <input className={styles.formInput} id="create-api-path" placeholder="/api/users" />
+            </div>
+            <div className={styles.formRow}>
+              <label className={styles.formLabel}>摘要</label>
+              <input className={styles.formInput} id="create-api-summary" placeholder="用户列表" />
+            </div>
+            <div className={styles.formRow}>
+              <label className={styles.formLabel}>描述</label>
+              <input className={styles.formInput} id="create-api-desc" placeholder="获取所有用户" />
+            </div>
+            <div className={styles.formActions}>
+              <button type="button" className={styles.cancelBtn} onClick={handleCancelCreate}>取消</button>
+              <button
+                type="button"
+                className={styles.createBtn}
+                onClick={() => {
+                  const method = (document.getElementById('create-api-method') as HTMLSelectElement)?.value || 'GET';
+                  const path = (document.getElementById('create-api-path') as HTMLInputElement)?.value || '/';
+                  const summary = (document.getElementById('create-api-summary') as HTMLInputElement)?.value;
+                  const description = (document.getElementById('create-api-desc') as HTMLInputElement)?.value;
+                  handleCreateAPIEndpoint({ method, path, summary, description });
+                }}
+              >
+                创建端点
+              </button>
+            </div>
+          </div>
+        )}
         )}
       </div>
 

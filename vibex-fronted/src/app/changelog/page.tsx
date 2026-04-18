@@ -129,6 +129,17 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '83d40fae',
   },
   {
+    version: '1.0.272',
+    date: '2026-04-18',
+    changes: [
+      '🐛 vibex-sprint4-spec-canvas-extend E3-E5 P1/P2: exporter 语法修复',
+      '✅ exporter.ts: 修复 toStateMachineSpec 缺少的大括号语法错误',
+      '✅ exporter.ts: 变量作用域修复 (allStates → states)',
+      '✅ exporter.test.ts: 扩展至 17 测试',
+    ],
+    commit: '7debf56e',
+  },
+  {
     version: '1.0.259',
     date: '2026-04-18',
     changes: [

@@ -13,7 +13,7 @@
 |------|-------|--------|------|
 | E1: 设计稿导入 | U1~U2 | 1/2 | U1 |
 | E2: AI Coding Agent | U3 | 1/1 ✅ | — |
-| E3: 版本Diff | U4~U5 | 0/2 | U4 |
+| E3: 版本Diff | U4~U5 | 2/2 ✅ | — |
 | E6: 缺陷归档 | U6~U7 | 0/2 | U6 |
 | E7: 最终报告 | U8 | 0/1 | U8 |
 
@@ -53,8 +53,8 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E3-U1 | VersionDiff 组件审查 | ⬜ | — | VersionDiff.tsx + diffVersions() 存在 |
-| E3-U2 | 路由页面缺失确认 | ⬜ | U1 | `/canvas/delivery/version/page.tsx` 不存在，归档为 BLOCKER |
+| E3-U1 | VersionDiff 组件审查 | ✅ | — | VersionDiff.tsx + diffVersions() ✅ 存在 |
+| E3-U2 | 路由页面缺失确认 | ✅ | U1 | /canvas/delivery/version/page.tsx 不存在 ✅，BLOCKER defect 已归档 |
 
 ---
 

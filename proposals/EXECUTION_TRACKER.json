@@ -1,19 +1,20 @@
 {
-  "generated_at": "2026-04-12T17:00:02.280530+00:00",
+  "generated_at": "2026-04-20T14:58:17.860994+00:00",
   "generated_by": "proposal_tracker.py",
   "proposals_dir": "/root/.openclaw/vibex/proposals",
   "stats": {
-    "total": 15,
+    "total": 17,
     "by_priority": {
       "P0": 4,
-      "P1": 10,
+      "P1": 9,
+      "P?": 3,
       "P2": 1
     },
     "by_status": {
-      "no-linked-task": 15
+      "no-linked-task": 17
     },
     "linked": 0,
-    "unlinked": 15,
+    "unlinked": 17,
     "claim_rate": 0.0,
     "by_date": {
       "20260324": {
@@ -21,17 +22,13 @@
         "done": 0,
         "in_progress": 0
       },
-      "20260406": {
-        "total": 1,
-        "done": 0,
-        "in_progress": 0
-      },
       "20260412": {
-        "total": 3,
+        "total": 6,
         "done": 0,
         "in_progress": 0
       }
-    }
+    },
+    "dedup_count": 0
   },
   "proposals": [
     {
@@ -45,7 +42,8 @@
       "task_status": "no-linked-task",
       "stage_started": null,
       "stage_completed": null,
-      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md",
+      "linked_tasks": []
     },
     {
       "id": "P0-2",
@@ -58,7 +56,8 @@
       "task_status": "no-linked-task",
       "stage_started": null,
       "stage_completed": null,
-      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md",
+      "linked_tasks": []
     },
     {
       "id": "P0-3",
@@ -71,7 +70,8 @@
       "task_status": "no-linked-task",
       "stage_started": null,
       "stage_completed": null,
-      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md",
+      "linked_tasks": []
     },
     {
       "id": "P1-1",
@@ -84,7 +84,8 @@
       "task_status": "no-linked-task",
       "stage_started": null,
       "stage_completed": null,
-      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md",
+      "linked_tasks": []
     },
     {
       "id": "P1-2",
@@ -97,7 +98,8 @@
       "task_status": "no-linked-task",
       "stage_started": null,
       "stage_completed": null,
-      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md",
+      "linked_tasks": []
     },
     {
       "id": "P1-3",
@@ -110,7 +112,8 @@
       "task_status": "no-linked-task",
       "stage_started": null,
       "stage_completed": null,
-      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md",
+      "linked_tasks": []
     },
     {
       "id": "P1-4",
@@ -123,7 +126,8 @@
       "task_status": "no-linked-task",
       "stage_started": null,
       "stage_completed": null,
-      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md",
+      "linked_tasks": []
     },
     {
       "id": "P1-5",
@@ -136,7 +140,8 @@
       "task_status": "no-linked-task",
       "stage_started": null,
       "stage_completed": null,
-      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md",
+      "linked_tasks": []
     },
     {
       "id": "P1-6",
@@ -149,7 +154,8 @@
       "task_status": "no-linked-task",
       "stage_started": null,
       "stage_completed": null,
-      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md",
+      "linked_tasks": []
     },
     {
       "id": "P1-7",
@@ -162,7 +168,8 @@
       "task_status": "no-linked-task",
       "stage_started": null,
       "stage_completed": null,
-      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md",
+      "linked_tasks": []
     },
     {
       "id": "P1-8",
@@ -175,24 +182,12 @@
       "task_status": "no-linked-task",
       "stage_started": null,
       "stage_completed": null,
-      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md"
-    },
-    {
-      "id": "P1",
-      "title": "执行",
-      "priority": "P1",
-      "date_dir": "20260406",
-      "task_id": null,
-      "stage_status": "no-linked-task",
-      "stage_agent": "",
-      "task_status": "no-linked-task",
-      "stage_started": null,
-      "stage_completed": null,
-      "summary_path": "/root/.openclaw/vibex/proposals/20260406/summary.md"
+      "summary_path": "/root/.openclaw/vibex/proposals/20260324/summary.md",
+      "linked_tasks": []
     },
     {
       "id": "P0",
-      "title": "— 阻断性问题（所有 Agent 共识）",
+      "title": "阻断性问题（所有 Agent 共识）",
       "priority": "P0",
       "date_dir": "20260412",
       "task_id": null,
@@ -201,11 +196,40 @@
       "task_status": "no-linked-task",
       "stage_started": null,
       "stage_completed": null,
-      "summary_path": "/root/.openclaw/vibex/proposals/20260412/summary.md"
+      "summary_path": "/root/.openclaw/vibex/proposals/20260412/summary.md",
+      "linked_tasks": []
+    },
+    {
+      "id": "TS-001",
+      "title": "Backend TypeScript Compilation Errors",
+      "priority": "P?",
+      "date_dir": "20260412",
+      "task_id": null,
+      "stage_status": "no-linked-task",
+      "stage_agent": "",
+      "task_status": "no-linked-task",
+      "stage_started": null,
+      "stage_completed": null,
+      "summary_path": "/root/.openclaw/vibex/proposals/20260412/summary.md",
+      "linked_tasks": []
+    },
+    {
+      "id": "LINT-001",
+      "title": "Frontend ESLint Config Conflict",
+      "priority": "P?",
+      "date_dir": "20260412",
+      "task_id": null,
+      "stage_status": "no-linked-task",
+      "stage_agent": "",
+      "task_status": "no-linked-task",
+      "stage_started": null,
+      "stage_completed": null,
+      "summary_path": "/root/.openclaw/vibex/proposals/20260412/summary.md",
+      "linked_tasks": []
     },
     {
       "id": "P1",
-      "title": "— 重要问题",
+      "title": "重要问题",
       "priority": "P1",
       "date_dir": "20260412",
       "task_id": null,
@@ -214,11 +238,26 @@
       "task_status": "no-linked-task",
       "stage_started": null,
       "stage_completed": null,
-      "summary_path": "/root/.openclaw/vibex/proposals/20260412/summary.md"
+      "summary_path": "/root/.openclaw/vibex/proposals/20260412/summary.md",
+      "linked_tasks": []
+    },
+    {
+      "id": "A-P1-2",
+      "title": "Canvas TreeErrorBoundary ✅ DONE",
+      "priority": "P?",
+      "date_dir": "20260412",
+      "task_id": null,
+      "stage_status": "no-linked-task",
+      "stage_agent": "",
+      "task_status": "no-linked-task",
+      "stage_started": null,
+      "stage_completed": null,
+      "summary_path": "/root/.openclaw/vibex/proposals/20260412/summary.md",
+      "linked_tasks": []
     },
     {
       "id": "P2",
-      "title": "— 改进项",
+      "title": "改进项",
       "priority": "P2",
       "date_dir": "20260412",
       "task_id": null,
@@ -227,7 +266,8 @@
       "task_status": "no-linked-task",
       "stage_started": null,
       "stage_completed": null,
-      "summary_path": "/root/.openclaw/vibex/proposals/20260412/summary.md"
+      "summary_path": "/root/.openclaw/vibex/proposals/20260412/summary.md",
+      "linked_tasks": []
     }
   ]
 }

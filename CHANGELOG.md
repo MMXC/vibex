@@ -1,3 +1,11 @@
+### [Unreleased] vibex-tech-debt-qa E4: ErrorBoundary 去重 — 2026-04-21
+- **E4-U1 VisualizationPlatform**: 内联 `class ErrorBoundary` → 复用 `ui/ErrorBoundary`，减少 37 行重复代码；统一日志格式和 fallback UI
+- 提交: 92b7418b
+
+### [Unreleased] vibex-tech-debt-qa E5: HEARTBEAT 话题追踪脚本 — 2026-04-21
+- **E5-U1 heartbeat_tracker.py**: 追踪 heartbeat 话题变化，支持 `--diff`/`--watch`/`--format json|md`；检测幽灵任务（连续 N 天无变化）；自动更新 IMPLEMENTATION_PLAN.md
+- 提交: 92b7418b
+
 ### [Unreleased] vibex-tech-debt-qa E2: proposal-dedup 正则修复 + 去重逻辑 — 2026-04-20
 - **proposal_tracker.py**: 修复正则支持 TS-001/LINT-001/A-P1-2 等新 ID 格式；添加 `(id, date_dir)` 去重逻辑；新增 `linked_tasks` 字段到 JSON 输出
 - **test_proposal_tracker.py**: 新增 10 个测试用例，覆盖 parse/dedup/extract 路径 — 10/10 PASS ✅

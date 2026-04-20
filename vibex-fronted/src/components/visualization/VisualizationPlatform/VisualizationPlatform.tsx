@@ -16,6 +16,7 @@ import React, {
 } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ViewSwitcher } from '../ViewSwitcher';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { FlowRenderer } from '../FlowRenderer';
 import type { FlowVisualizationRaw, VisualizationType } from '@/types/visualization';
 import styles from './VisualizationPlatform.module.css';
@@ -244,40 +245,6 @@ export function VisualizationPlatform({
       </div>
     </div>
   );
-}
-
-// ==================== Error Boundary ====================
-
-interface ErrorBoundaryProps {
-  children: React.ReactNode;
-  fallback: React.ReactNode;
-}
-
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error?: Error;
-}
-
-class ErrorBoundary extends React.Component<
-  ErrorBoundaryProps,
-  ErrorBoundaryState
-> {
-  state: ErrorBoundaryState = { hasError: false };
-
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, info: React.ErrorInfo) {
-    canvasLogger.default.error('[VisualizationPlatform] Render error:', error, info);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return this.props.fallback;
-    }
-    return this.props.children;
-  }
 }
 
 export default VisualizationPlatform;

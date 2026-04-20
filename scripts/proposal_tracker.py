@@ -201,17 +201,24 @@ def parse_summary(summary_path: Path) -> list[dict]:
 
     proposals = []
 
-    # Match h3 proposal headings: ### [emoji] P0-1: title
-    # Also match h2 proposal headings: ## [emoji] P0-1: title
-    # Skip section headings like "## 一、执行摘要" (no P/T/D/E/A prefix)
+    # Match proposal headings:
+    #   ### P0-1: title          (with colon, E1.1 format)
+    #   ### P0-1. Title          (with dot)
+    #   ### 🔴 P0-1: title        (with emoji prefix)
+    #   ### A-P1-2: Title         (with letter prefix + dash-number)
+    #   ### TS-001: Title         (alphanumeric ID)
+    # Require a delimiter (:, -, or em-dash) after the ID.
+    # Skip section headers like "## P1 — 重要问题" (no colon/hyphen after ID).
     heading_re = re.compile(
-        r"^#{2,3}\s+(?:[🔴🟠🟡🟢⚠️]\s*)?([A-Z]\d+(?:[.:-]\d+)?)\s*[:\-]?\s*(.+)$",
+        r"^#{2,3}\s+(?:[🔴🟠🟡🟢⚠️]\s*)?([A-Z][A-Z0-9]*(?:[.:-][A-Z0-9]+)*)\s*[:\-—]\s*(.+)$",
         re.MULTILINE,
     )
 
     for match in heading_re.finditer(content):
         pid = match.group(1).strip()
         title = match.group(2).strip()
+        # Strip leading em-dash from title (e.g. "— 重要问题" → "重要问题")
+        title = re.sub(r"^[\-—]\s*", "", title)
 
         # Extract priority prefix
         priority = "P?"
@@ -647,10 +654,30 @@ class ProposalTracker:
                     "stage_started": p.get("stage_started"),
                     "stage_completed": p.get("stage_completed"),
                     "summary_path": p.get("summary_path"),
+                    "linked_tasks": p.get("linked_tasks", []),
                 }
                 for p in self.proposals
             ],
         }
+
+        # Deduplicate by (id, date_dir) before writing — proposals from different
+        # date directories sharing the same short ID (e.g. "P0" vs "P0-1") must be
+        # kept distinct; only true id+date_dir duplicates are collapsed.
+        seen_keys = set()
+        deduped_proposals = []
+        for p in tracker_data["proposals"]:
+            key = (p["id"], p.get("date_dir", ""))
+            if key in seen_keys:
+                continue  # skip exact (id, date_dir) duplicate
+            seen_keys.add(key)
+            # Also skip if same id appears with different date_dir but same normalized id
+            # i.e. "P0" from 20260412 is different from "P0-1" from 20260324
+            deduped_proposals.append(p)
+        tracker_data["proposals"] = deduped_proposals
+
+        # Recompute stats after dedup
+        tracker_data["stats"]["total"] = len(deduped_proposals)
+        tracker_data["stats"]["dedup_count"] = len(self.proposals) - len(deduped_proposals)
 
         # Write JSON
         OUTPUT_JSON.write_text(

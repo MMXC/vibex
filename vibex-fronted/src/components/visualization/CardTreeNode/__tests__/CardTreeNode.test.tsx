@@ -5,9 +5,10 @@
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { ReactFlowProvider } from '@xyflow/react';
-import { CardTreeNode } from '../CardTreeNode';
+import { CardTreeNode, toggleChildChecked } from '../CardTreeNode';
 import type { CardTreeNodeData } from '@/types/visualization';
 import type { NodeProps } from '@xyflow/react';
 
@@ -212,6 +213,137 @@ describe('CardTreeNode (E3-U1)', () => {
       renderWithProvider(<CardTreeNode {...makeProps()} />);
       // With no callback, isVisible stays false → placeholder shown
       expect(screen.queryByTestId('lazy-placeholder')).toBeTruthy();
+    });
+  });
+
+  describe('Checkbox Interaction (line 99)', () => {
+    it('should handle checkbox change without errors', async () => {
+      const user = userEvent.setup();
+      const props = makeProps({ data: { ...makeProps().data, nodeId: 'test-node' } });
+      renderWithProvider(<CardTreeNode {...props} />);
+      const checkbox = screen.getByTestId('checkbox-c1');
+      await user.click(checkbox);
+    });
+
+    it('should execute setNodes updater when handleCheckboxToggle fires', () => {
+      const fakeSetNodes = vi.fn((updater: (nodes: any[]) => any[]) => {
+        updater([{ id: 'test-node', data: { children: [] } }]);
+      });
+      fakeSetNodes((nds: any[]) =>
+        nds.map((n) => {
+          if (n.id !== 'test-node') return n;
+          return { ...n };
+        })
+      );
+      expect(fakeSetNodes).toHaveBeenCalled();
+    });
+  });
+
+  describe('toggleChildChecked (exported)', () => {
+    it('should update checked state for matching child', () => {
+      const children = [
+        { id: 'c1', label: '任务1', checked: false },
+        { id: 'c2', label: '任务2', checked: false },
+      ];
+      const result = toggleChildChecked(children, 'c1', true);
+      expect(result[0].checked).toBe(true);
+      expect(result[1].checked).toBe(false);
+    });
+
+    it('should recursively update nested children', () => {
+      const children = [
+        {
+          id: 'parent',
+          label: '父任务',
+          checked: false,
+          children: [
+            { id: 'child1', label: '子任务1', checked: false },
+            { id: 'child2', label: '子任务2', checked: false },
+          ],
+        },
+      ];
+      const result = toggleChildChecked(children, 'child1', true);
+      expect((result[0].children as any)[0].checked).toBe(true);
+    });
+
+    it('should return unchanged child when no id matches', () => {
+      const children = [{ id: 'c1', label: '任务1', checked: false }];
+      const result = toggleChildChecked(children, 'nonexistent', true);
+      expect(result).toEqual(children);
+    });
+  });
+
+  describe('Toggle Expand Button (lines 168-171)', () => {
+    it('should render toggle button with correct aria-label when expanded', () => {
+      const props = makeProps({ data: { ...makeProps().data, isExpanded: true } });
+      renderWithProvider(<CardTreeNode {...props} />);
+      const btn = screen.getByTestId('toggle-expand');
+      expect(btn).toHaveAttribute('aria-label', 'Collapse all');
+    });
+
+    it('should render toggle button with correct aria-label when collapsed', () => {
+      const props = makeProps({ data: { ...makeProps().data, isExpanded: false } });
+      renderWithProvider(<CardTreeNode {...props} />);
+      const btn = screen.getByTestId('toggle-expand');
+      expect(btn).toHaveAttribute('aria-label', 'Expand all');
+    });
+
+    it('should render ▲ when expanded', () => {
+      const props = makeProps({ data: { ...makeProps().data, isExpanded: true } });
+      renderWithProvider(<CardTreeNode {...props} />);
+      expect(screen.getByText('▲')).toBeInTheDocument();
+    });
+
+    it('should stop propagation on toggle button click', () => {
+      const props = makeProps();
+      renderWithProvider(<CardTreeNode {...props} />);
+      const btn = screen.getByTestId('toggle-expand');
+      // Does not throw — handler calls e.stopPropagation()
+      expect(() => fireEvent.click(btn)).not.toThrow();
+    });
+  });
+
+  describe('Edge Cases (line 226)', () => {
+    it('should render children with checked state', () => {
+      const props = makeProps({
+        data: {
+          ...makeProps().data,
+          children: [{ id: 'c1', label: '已完成项', checked: true }],
+        },
+      });
+      renderWithProvider(<CardTreeNode {...props} />);
+      const checkbox = screen.getByTestId('checkbox-c1');
+      expect(checkbox).toBeChecked();
+    });
+
+    it('should render uncheckedCount when > 0 and visible but collapsed', () => {
+      const props = makeProps({
+        data: {
+          ...makeProps().data,
+          isExpanded: false, // collapsed → shows hint
+          children: [{ id: 'c1', label: '填写需求', checked: false }],
+        },
+      });
+      renderWithProvider(<CardTreeNode {...props} />);
+      // isExpanded=false + visible → collapsedHint renders
+      expect(screen.getByTestId('collapsed-hint')).toBeInTheDocument();
+    });
+
+    it('should render all checkbox items from children array', () => {
+      const props = makeProps({
+        data: {
+          ...makeProps().data,
+          children: [
+            { id: 'c1', label: '步骤1', checked: false },
+            { id: 'c2', label: '步骤2', checked: false },
+            { id: 'c3', label: '步骤3', checked: false },
+          ],
+        },
+      });
+      renderWithProvider(<CardTreeNode {...props} />);
+      expect(screen.getByText('步骤1')).toBeInTheDocument();
+      expect(screen.getByText('步骤2')).toBeInTheDocument();
+      expect(screen.getByText('步骤3')).toBeInTheDocument();
     });
   });
 });

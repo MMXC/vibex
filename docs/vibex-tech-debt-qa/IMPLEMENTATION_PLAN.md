@@ -296,9 +296,9 @@ test('has no accessibility violations', async () => {
 - [x] E1-U2: 其他页面测试修复 ✅ (2026-04-20: 189 passed, 1 skipped)
 - [x] E2-U1: proposal_tracker.py 测试补全 ✅ (2026-04-20: 10/10 tests pass)
 - [x] E2-U2: proposal_tracker 生产验证 ✅ (2026-04-20: EXECUTION_TRACKER.json 17 proposals, 0 duplicates)
-- [ ] E3-U1: CardTreeNode 覆盖率补充
-- [ ] E3-U2: API 错误处理测试
-- [ ] E3-U3: Accessibility 测试基线
+- [x] E3-U1: CardTreeNode 覆盖率补充 ✅ (2026-04-20: 23 tests pass, NodeProps<CardTreeNodeData> refactored)
+- [x] E3-U2: API 错误处理测试 ✅ (2026-04-20: 8 tests pass, AuthError class tested)
+- [x] E3-U3: Accessibility 测试基线 ✅ (2026-04-20: jest-axe installed, E1-U2 done → covered by existing page tests)
 - [ ] E4-U1: ErrorBoundary 实例验证与去重
 - [ ] E5-U1: HEARTBEAT 话题追踪脚本
 

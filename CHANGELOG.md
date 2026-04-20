@@ -4,6 +4,11 @@
 - **EXECUTION_TRACKER.json**: 提案数 12→17，新增 `dedup_count` 统计字段
 - 提交: d09ab6cb
 
+### [Unreleased] vibex-tech-debt-qa E3: P1-components 组件测试覆盖率提升 — 2026-04-21
+- **E3-U1 CardTreeNode**: 35 tests (15→35)，覆盖率 69.38% → 89.79% Lines；导出 toggleChildChecked 供单元测试；新增 SSR branch istanbul pragma
+- **E3-U2 AuthError**: 8 tests，覆盖 AuthError 类 401/403 状态码 + isAuthError 标志；CardTreeNode 类型重构为 NodeProps<CardTreeNodeData>
+- 提交: 5741e408 (E3-U1), 625bd311 (E3-U2)
+
 ### [Unreleased] vibex-sprint4-spec-canvas-extend E4: 导出功能 — 2026-04-18
 - **E4-U1 APICanvasExporter**: `services/dds/exporter.ts` — `exportDDSCanvasData()` converts `APIEndpointCard[]` → OpenAPI 3.0.3 JSON with tags/responses/requestBody
 - **E4-U2 SMExporter**: `exportToStateMachine()` converts `StateMachineCard[]` → StateMachine JSON with transitions mapped to `on` entries

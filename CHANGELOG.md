@@ -1,3 +1,9 @@
+### [Unreleased] vibex-tech-debt-qa E2: proposal-dedup 正则修复 + 去重逻辑 — 2026-04-20
+- **proposal_tracker.py**: 修复正则支持 TS-001/LINT-001/A-P1-2 等新 ID 格式；添加 `(id, date_dir)` 去重逻辑；新增 `linked_tasks` 字段到 JSON 输出
+- **test_proposal_tracker.py**: 新增 10 个测试用例，覆盖 parse/dedup/extract 路径 — 10/10 PASS ✅
+- **EXECUTION_TRACKER.json**: 提案数 12→17，新增 `dedup_count` 统计字段
+- 提交: d09ab6cb
+
 ### [Unreleased] vibex-sprint4-spec-canvas-extend E4: 导出功能 — 2026-04-18
 - **E4-U1 APICanvasExporter**: `services/dds/exporter.ts` — `exportDDSCanvasData()` converts `APIEndpointCard[]` → OpenAPI 3.0.3 JSON with tags/responses/requestBody
 - **E4-U2 SMExporter**: `exportToStateMachine()` converts `StateMachineCard[]` → StateMachine JSON with transitions mapped to `on` entries

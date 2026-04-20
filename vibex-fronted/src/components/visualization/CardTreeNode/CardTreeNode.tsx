@@ -34,7 +34,7 @@ function useIntersectionObserver(threshold = 0.1): [React.RefObject<HTMLDivEleme
     const el = ref.current;
     if (!el) return;
 
-    // In SSR or unsupported environments, show content immediately
+    /* istanbul ignore next — SSR/unsupported env, not reachable in test/browser */
     if (typeof IntersectionObserver === 'undefined') {
       setIsVisible(true);
       return;
@@ -58,13 +58,8 @@ function useIntersectionObserver(threshold = 0.1): [React.RefObject<HTMLDivEleme
   return [ref, isVisible];
 }
 
-// ==================== Toggle Helper ====================
-
-/**
- * Recursively toggle a child in the CardTree children structure.
- * Returns a new children array with the matching child's checked state updated.
- */
-function toggleChildChecked(children: CardTreeChild[], childId: string, checked: boolean): CardTreeChild[] {
+// Exported for unit testing
+export function toggleChildChecked(children: CardTreeChild[], childId: string, checked: boolean): CardTreeChild[] {
   return children.map((child) => {
     if (child.id === childId) {
       return { ...child, checked };

@@ -11,7 +11,16 @@
 
 验证命令: `pnpm exec vitest run CardTreeNode.test.tsx --coverage`
 
-提交: (pending)
+提交: 5741e408
+
+### E3-U2: AuthError 类测试
+
+- **api-error.test.ts**: 新增 8 个测试用例，覆盖 AuthError 类 401/403 状态码 + isAuthError 标志判断
+- **CardTreeNode.test.tsx**: 重构为 NodeProps<CardTreeNodeData> 类型，修复泛型不匹配问题
+
+验证命令: `pnpm exec vitest run src/services/api/api-error.test.ts` (8 pass)
+
+提交: 625bd311
 
 ---
 

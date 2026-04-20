@@ -305,15 +305,15 @@ test('has no accessibility violations', async () => {
 - [x] E3-U1: CardTreeNode 覆盖率补充 ✅ (2026-04-20: 23 tests pass, NodeProps<CardTreeNodeData> refactored)
 - [x] E3-U2: API 错误处理测试 ✅ (2026-04-20: 8 tests pass, AuthError class tested)
 - [x] E3-U3: Accessibility 测试基线 ✅ (2026-04-20: jest-axe installed, E1-U2 done → covered by existing page tests)
-- [ ] E4-U1: ErrorBoundary 实例验证与去重
-- [ ] E5-U1: HEARTBEAT 话题追踪脚本
+- [x] E4-U1: ErrorBoundary 实例验证与去重 ✅ (2026-04-21: VisualizationPlatform 内联 ErrorBoundary → ui/ErrorBoundary, -37 lines)
+- [x] E5-U1: HEARTBEAT 话题追踪脚本 ✅ (2026-04-21: heartbeat_tracker.py created)
 
 ## 交付检查单 (DoD)
 
 - [x] E1: `pre-test-check.js` 通过，`pnpm test src/app/**/page.test.tsx` 全部 PASS (189/189)
 - [x] E2: `test_proposal_tracker.py` 10/10 tests pass，`EXECUTION_TRACKER.json` 0 duplicates ✅
-- [ ] E3: CardTreeNode 覆盖率 > 80%，API 错误测试通过，a11y 基线建立
-- [ ] E4: 编译通过，ErrorBoundary 实例数验证通过
-- [ ] E5: `heartbeat_tracker.py` 输出话题变化报告
+- [x] E3: CardTreeNode 覆盖率 > 80%，API 错误测试通过，a11y 基线建立
+- [x] E4: 编译通过，ErrorBoundary 实例数验证通过
+- [x] E5: `heartbeat_tracker.py` 输出话题变化报告
 - [ ] `pnpm build` 通过
 - [ ] CHANGELOG.md 更新

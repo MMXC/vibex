@@ -1,5 +1,37 @@
 # Changelog
 
+## [vibex-tech-debt-qa] P0-page-test E1 修复 — 2026-04-20
+
+### E1: page.test.tsx 验证通过
+
+- **tsc --noEmit**: 0 errors ✅
+- **page.test.tsx 全量测试**: 10 files, 189 passed, 1 skipped ✅
+  - page.test.tsx, dashboard/page.test.tsx, chat/page.test.tsx, flow/page.test.tsx, editor/page.test.tsx, project/page.test.tsx, export/page.test.tsx, project-settings/page.test.tsx, auth/page.test.tsx, version-history/page.test.tsx
+- **pre-test-check.js TypeScript check**: PASS ✅
+
+验证命令: `cd vibex-fronted && pnpm exec vitest run src/app/page.test.tsx src/app/dashboard/page.test.tsx src/app/chat/page.test.tsx ...`
+
+提交: 55e6fdf6
+
+---
+
+## [vibex-next] 实时协作感知 + 性能可观测性 + Analytics (2026-04-19)
+
+### feat / fix / chore
+
+### 变更摘要
+- **E1 实时协作感知** (`feat`): Firebase 真实接入 PresenceLayer，`src/lib/firebase/presence.ts` — 节点同步 <3s，ConflictBubble 冲突提示 UI，5s timeout + 单用户降级模式
+- **E2 性能可观测性** (`feat`): WebVitals hook (`useWebVitals`) + 告警阈值 (LCP>4s, CLS>0.1)，`/health` 端点 P50/P95/P99，`middleware/metrics.ts` 5分钟滚动窗口
+- **E3 Analytics** (`feat`): `src/lib/analytics/client.ts` 前端 SDK，4 个事件采集 (page_view/canvas_open/component_create/delivery_export)，7天 expires_at TTL + 异步清理
+- **MEMORY.md A-010**: 性能可观测性设计签署（LCP/CLS/P99 阈值 + 7天滚动清除）
+- **snapshot.ts 删除**: 技术债清理，`npm run build` 通过
+- **ESLint 豁免**: MEMO 使用规则豁免记录
+- **npm run build + type-check**: 全部通过 ✅
+
+### 影响范围
+- `src/lib/firebase/presence.ts`, `src/components/collaboration/`, `src/hooks/useWebVitals.ts`, `src/middleware/metrics.ts`, `src/lib/analytics/client.ts`, `routes/v1/health.ts`, `routes/v1/analytics.ts`
+- 提交: 862fb85a (E1), 1277e652 (E2-S2), 1d3870bb (E3-S3), 53274d97 (A-010), 04dff5f3 (E2-S3), 1ac78dcd (E2-S1)
+
 ### [vibex-sprint5-delivery-integration E1: 数据层集成] — 2026-04-18
 - **T1 loadFromStores**: 从 prototypeStore + DDSCanvasStore 拉取数据，映射 chapters.context → contexts, chapters.flow → flows, prototypeStore → components
 - **T2 数据转换**: toComponent/toSchema/toDDL 函数实现

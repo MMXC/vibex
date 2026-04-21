@@ -14,6 +14,23 @@
 
 ---
 
+## Unit Index
+
+| Epic | Units | Status | Next |
+|------|-------|--------|------|
+| E1: 品牌一致性 | U1 | ✅ | — |
+| E2: 核心价值链 | U2 | ✅ | — |
+| E3: 效率体验 | U3 | ✅ | — |
+| E4: Canvas 导航 | U4 | ⬜ | U4 |
+| E5: 错误体验 | U5 | ⬜ | U5 |
+| E6: 团队协作 | U6 | ⬜ | U6 |
+| E7: 版本历史 | U7 | ⬜ | U7 |
+| E8: 导入导出 | U8 | ⬜ | U8 |
+
+**依赖说明**: U6 依赖 U5（统一错误格式），U8 无依赖可独立实现
+
+---
+
 ## Overview
 
 8 个 Epic，总工时 14h。按依赖关系分 3 个 Sprint。
@@ -21,6 +38,10 @@
 ---
 
 ## Implementation Units
+
+> **单元状态说明**: ✅ = 已完成, ⬜ = 待派发, 🔄 = 进行中
+
+---
 
 - [x] **Unit 1: E1 Auth CSS Module 迁移**
 
@@ -140,7 +161,9 @@ const filtered = results.results.filter(p =>
 
 ---
 
-- [ ] **Unit 4: E4 TabBar Phase 对齐**
+- [x] **Unit 4: E4 TabBar Phase 对齐**
+
+> **Status**: ✅ 已完成（dev-e4-tabbar对齐）
 
 **Goal:** TabBar 行为与 PhaseNavigator 对称，Phase1 仅显示 "输入/澄清" 步骤。
 
@@ -165,12 +188,14 @@ const filtered = results.results.filter(p =>
 - Integration: 画布工具栏切换 phase，TabBar 同步高亮
 
 **Verification:**
-- Phase1 TabBar tabs 数量 ≤ 其他 phase
-- TabBar 和 PhaseNavigator 双向同步
+- ✅ Phase1 TabBar tabs 数量 ≤ 其他 phase
+- ✅ TabBar 和 PhaseNavigator 双向同步
 
 ---
 
 - [ ] **Unit 5: E5 统一错误处理**
+
+> **Status**: ⬜ 待派发
 
 **Goal:** 全局统一 API 错误格式，复用 architect-proposals 方案。
 
@@ -214,6 +239,9 @@ export function apiError(status: number, code: string, message: string) {
 
 - [ ] **Unit 6: E6 Teams API**
 
+> **Status**: ⬜ 待派发
+> **Dependencies**: Unit 5（统一错误格式）
+
 **Goal:** 实现团队协作 API，包括 CRUD、成员管理和权限检查。
 
 **Requirements:** E6
@@ -251,6 +279,8 @@ export function apiError(status: number, code: string, message: string) {
 
 - [ ] **Unit 7: E7 版本历史修复**
 
+> **Status**: ⬜ 待派发
+
 **Goal:** 修复 version history 的 projectId=null 边界，添加 diff 视图。
 
 **Requirements:** E7
@@ -279,6 +309,8 @@ export function apiError(status: number, code: string, message: string) {
 ---
 
 - [ ] **Unit 8: E8 Import/Export**
+
+> **Status**: ⬜ 待派发
 
 **Goal:** 实现 DDD schema 导入导出（JSON/MD/YAML 格式）。
 

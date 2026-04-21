@@ -158,7 +158,11 @@ export function ProjectBar({
   }, []);
 
   // E3-F3.1: hasAllNodes 要求所有节点 isActive !== false
-  // Bug: 原先只检查长度，导致 deactive 节点存在时按钮错误 enabled
+  // E3-F3.2: tooltip 与 hasAllNodes 失败原因一致
+  // Bug (F3.2): 原先 tooltip 统一显示"请先确认所有三树节点"，不区分具体哪棵树失败
+  const contextInactive = contextNodes.length > 0 && contextNodes.some((n) => n.isActive === false);
+  const flowInactive = flowNodes.length > 0 && flowNodes.some((n) => n.isActive === false);
+  const componentInactive = componentNodes.length > 0 && componentNodes.some((n) => n.isActive === false);
   const hasAllNodes = hasNodes(contextNodes) && hasNodes(flowNodes) && hasNodes(componentNodes)
     && contextNodes.every((n) => n.isActive !== false)
     && flowNodes.every((n) => n.isActive !== false)
@@ -351,10 +355,18 @@ export function ProjectBar({
         aria-label="创建项目并开始生成原型"
         data-testid="create-project-btn"
         title={
-          !hasAllNodes
-            ? '请先确认所有三树节点'
-            : isCreating
-              ? '创建中...'
+          isCreating
+            ? '创建中...'
+            : !hasAllNodes
+              ? componentNodes.length === 0
+                ? '请先生成组件树'
+                : contextInactive
+                  ? '请先确认所有上下文节点'
+                  : flowInactive
+                    ? '请先确认所有流程节点'
+                    : componentInactive
+                      ? '请先确认所有组件节点'
+                      : '请先确认所有三树节点'
               : '创建项目并开始生成原型'
         }
       >

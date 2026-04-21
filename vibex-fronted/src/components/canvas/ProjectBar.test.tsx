@@ -140,3 +140,85 @@ describe('E3-F3.1: hasAllNodes isActive !== false 检查', () => {
     expect(btn.disabled).toBe(true);
   });
 });
+
+describe('E3-F3.2: tooltip 与 hasAllNodes 失败原因一致', () => {
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  // AC-F3.2-1: componentNodes 为空 → tooltip "请先生成组件树"
+  it('AC-F3.2-1: 组件树为空时 tooltip 显示"请先生成组件树"', () => {
+    setupStores({
+      contextNodes: [{ nodeId: 'ctx-1', name: '患者管理', isActive: true, status: 'confirmed' }],
+      flowNodes: [{ nodeId: 'flow-1', name: 'Order Flow', contextId: 'ctx-1', isActive: true, status: 'confirmed' }],
+      componentNodes: [],
+    });
+
+    render(<ProjectBar />);
+    const btn = screen.getByRole('button', { name: '创建项目并开始生成原型' }) as HTMLButtonElement;
+    expect(btn.disabled).toBe(true);
+    expect(btn.title).toBe('请先生成组件树');
+  });
+
+  // AC-F3.2-2: contextInactive 时 tooltip 显示对应原因
+  it('AC-F3.2-2: contextInactive 时 tooltip 显示"请先确认所有上下文节点"', () => {
+    setupStores({
+      contextNodes: [
+        { nodeId: 'ctx-1', name: '患者管理', isActive: false, status: 'pending' },
+      ],
+      flowNodes: [{ nodeId: 'flow-1', name: 'Order Flow', contextId: 'ctx-1', isActive: true, status: 'confirmed' }],
+      componentNodes: [{ nodeId: 'comp-1', name: 'Component A', isActive: true, status: 'confirmed' }],
+    });
+
+    render(<ProjectBar />);
+    const btn = screen.getByRole('button', { name: '创建项目并开始生成原型' }) as HTMLButtonElement;
+    expect(btn.disabled).toBe(true);
+    expect(btn.title).toBe('请先确认所有上下文节点');
+  });
+
+  it('AC-F3.2-3: flowInactive 时 tooltip 显示"请先确认所有流程节点"', () => {
+    setupStores({
+      contextNodes: [{ nodeId: 'ctx-1', name: '患者管理', isActive: true, status: 'confirmed' }],
+      flowNodes: [
+        { nodeId: 'flow-1', name: 'Order Flow', contextId: 'ctx-1', isActive: false, status: 'pending' },
+      ],
+      componentNodes: [{ nodeId: 'comp-1', name: 'Component A', isActive: true, status: 'confirmed' }],
+    });
+
+    render(<ProjectBar />);
+    const btn = screen.getByRole('button', { name: '创建项目并开始生成原型' }) as HTMLButtonElement;
+    expect(btn.disabled).toBe(true);
+    expect(btn.title).toBe('请先确认所有流程节点');
+  });
+
+  it('AC-F3.2-4: componentInactive 时 tooltip 显示"请先确认所有组件节点"', () => {
+    setupStores({
+      contextNodes: [{ nodeId: 'ctx-1', name: '患者管理', isActive: true, status: 'confirmed' }],
+      flowNodes: [{ nodeId: 'flow-1', name: 'Order Flow', contextId: 'ctx-1', isActive: true, status: 'confirmed' }],
+      componentNodes: [
+        { nodeId: 'comp-1', name: 'Component A', isActive: true, status: 'confirmed' },
+        { nodeId: 'comp-2', name: 'Component B', isActive: false, status: 'pending' },
+      ],
+    });
+
+    render(<ProjectBar />);
+    const btn = screen.getByRole('button', { name: '创建项目并开始生成原型' }) as HTMLButtonElement;
+    expect(btn.disabled).toBe(true);
+    expect(btn.title).toBe('请先确认所有组件节点');
+  });
+
+  // AC-F3.2-5: 按钮 enabled 时 tooltip 显示"创建项目并开始生成原型"
+  it('AC-F3.2-5: 三树全部 active 时 tooltip 显示"创建项目并开始生成原型"', () => {
+    setupStores({
+      contextNodes: [{ nodeId: 'ctx-1', name: '患者管理', isActive: true, status: 'confirmed' }],
+      flowNodes: [{ nodeId: 'flow-1', name: 'Order Flow', contextId: 'ctx-1', isActive: true, status: 'confirmed' }],
+      componentNodes: [{ nodeId: 'comp-1', name: 'Component A', isActive: true, status: 'confirmed' }],
+    });
+
+    render(<ProjectBar />);
+    const btn = screen.getByRole('button', { name: '创建项目并开始生成原型' }) as HTMLButtonElement;
+    expect(btn.disabled).toBe(false);
+    expect(btn.title).toBe('创建项目并开始生成原型');
+  });
+});

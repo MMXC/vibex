@@ -612,10 +612,11 @@ it('批量上报 100 条返回 200', async () => {
 - [x] E3-S1: snapshot.ts 删除 + build 通过
 - [x] E3-S2: ESLint 豁免 MEMO 记录
 - [x] E3-S3: analytics 端点 + 4 个事件采集
-- [ ] npm run build 通过
-- [ ] npm run type-check 0 错误
-- [ ] CHANGELOG.md 更新
+- [x] npm run build 通过 ✅ (2026-04-20: pnpm build PASS)
+- [x] npm run type-check 0 错误 ✅ (2026-04-20: tsc --noEmit PASS)
+- [x] CHANGELOG.md 更新 ✅ (2026-04-20: vibex-next 协作感知+可观测性+Analytics 条目已追加至 CHANGELOG.md 顶部)
 
 ---
 
 *Architect Agent | 2026-04-08 22:15 GMT+8*
+*Updated: 2026-04-20 — build/type-check confirmed passing*

@@ -273,7 +273,7 @@ export const canvasApi = {
     const res = await fetch(getApiUrl(`${API_CONFIG.endpoints.canvas.export}?projectId=${encodeURIComponent(projectId)}`), { headers });
 
     if (!res.ok) await handleResponseError(res, `导出失败: ${res.status}`, window.location.pathname);
-    return res.blob();
+    return await res.blob();
   },
 
   // === Epic 1: Canvas Generate APIs ===

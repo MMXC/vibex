@@ -12,9 +12,9 @@
 
 | Epic | Units | Status | Next |
 |------|-------|--------|------|
-| E1: API Error Handling | E1-U1, E1-U2 | ⬜ 0/2 | E1-U1 |
-| E2: Component Tree Generation UX | E2-U1, E2-U2 | ⬜ 0/2 | E2-U1 |
-| E3: Project Creation Button | E3-U1, E3-U2 | ⬜ 0/2 | E3-U1 |
+| E1: API Error Handling | E1-U1, E1-U2 | ✅ 2/2 | E2-U1 |
+| E2: Component Tree Generation UX | E2-U1, E2-U2 | ✅ 2/2 | E3-U1 |
+| E3: Project Creation Button | E3-U1, E3-U2 | ✅ 2/2 | E4-U1 |
 | E4: Confirm/Complete State Unification | E4-U1, E4-U2, E4-U3 | ✅ 3/3 | E4-U1 |
 
 **E1/E2/E3/E4 可并行开发，无跨 Epic 依赖。E4-U2/U3 依赖 E4-U1。**
@@ -38,8 +38,8 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E1-U1 | handleResponseError async/await 修复 | ⬜ | — | AC-F1.1-1~4: 后端错误透传、fallback、TS 类型正确 |
-| E1-U2 | 全局 res.json() 安全审计 | ⬜ | E1-U1 | AC-F1.2-1: 所有 res.json() 均有 await |
+| E1-U1 | handleResponseError async/await 修复 | ✅ | — | AC-F1.1-1~4: 后端错误透传、fallback、TS 类型正确 |
+| E1-U2 | 全局 res.json() 安全审计 | ✅ | E1-U1 | AC-F1.2-1: 所有 res.json() 均有 await |
 
 ### E2: Component Tree Generation UX
 
@@ -53,7 +53,7 @@
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
 | E3-U1 | hasAllNodes 增加 isActive 检查 | ✅ | — | AC-F3.1-1~3: 三树全部 isActive 时解锁 |
-| E3-U2 | 按钮 tooltip 与实际条件一致 | ⬜ | E3-U1 | AC-F3.2-1~2: tooltip 准确反映失败原因 |
+| E3-U2 | 按钮 tooltip 与实际条件一致 | ✅ | E3-U1 | AC-F3.2-1~2: tooltip 准确反映失败原因 |
 
 ### E4: Confirm/Complete State Unification
 
@@ -71,16 +71,16 @@
 
 **改动文件**: `vibex-fronted/src/lib/canvas/api/canvasApi.ts`
 
-- [ ] 1.1.1 将 `handleResponseError` 改为 `async function`，返回类型 `Promise<never>`
-- [ ] 1.1.2 `res.json()` 前加 `await`，用 `try/catch` 包裹，解析失败时 fallback
-- [ ] 1.1.3 搜索所有 `handleResponseError(` 调用处，确认都已加 `await`（预期 3 处：generateContexts / generateFlows / generateComponents）
-- [ ] 1.1.4 单元测试覆盖 AC-F1.1-1 至 AC-F1.1-4
+- [x] 1.1.1 将 `handleResponseError` 改为 `async function`，返回类型 `Promise<never>`
+- [x] 1.1.2 `res.json()` 前加 `await`，用 `try/catch` 包裹，解析失败时 fallback
+- [x] 1.1.3 搜索所有 `handleResponseError(` 调用处，确认都已加 `await`（预期 3 处：generateContexts / generateFlows / generateComponents）
+- [x] 1.1.4 单元测试覆盖 AC-F1.1-1 至 AC-F1.1-4
 
 ### F1.2: 全局 res.json() 安全审计
 
-- [ ] 1.2.1 执行 `grep -rn "res\.json()" vibex-fronted/src/lib/canvas/api/` 扫描
-- [ ] 1.2.2 验证所有 `res.json()` 均有 `await`（除 `handleResponseError` 内已被修复）
-- [ ] 1.2.3 若发现其他未 await 处，同步修复
+- [x] 1.2.1 执行 `grep -rn "res\.json()" vibex-fronted/src/lib/canvas/api/` 扫描
+- [x] 1.2.2 验证所有 `res.json()` 均有 `await`（除 `handleResponseError` 内已被修复）
+- [x] 1.2.3 若发现其他未 await 处，同步修复（发现 `exportZip` 未 await，修复）
 
 ---
 
@@ -115,8 +115,8 @@
 
 ### F3.2: 按钮 tooltip 与实际条件一致
 
-- [ ] 3.2.1 更新 tooltip 文案，使其与 `hasAllNodes` 失败原因一致（不再误导用户）
-- [ ] 3.2.2 单元测试覆盖 AC-F3.2-1、AC-F3.2-2
+- [x] 3.2.1 更新 tooltip 文案，使其与 `hasAllNodes` 失败原因一致（不再误导用户）
+- [x] 3.2.2 单元测试覆盖 AC-F3.2-1、AC-F3.2-2、AC-F3.2-3、AC-F3.2-4、AC-F3.2-5（5 个场景）
 
 ---
 

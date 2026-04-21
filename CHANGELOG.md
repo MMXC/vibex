@@ -1,3 +1,9 @@
+### [Unreleased] vibex-canvas-ux-fix — E1 API Error + E3 Project Button Fix — 2026-04-21
+- **E1-U1 handleResponseError**: async/await 修复，`res.json()` 加 `await`，后端错误消息正确透传到 toast
+- **E1-U2 res.json() 安全审计**: 全局扫描 `res.json()` + `res.blob()`，发现 `exportZip` 缺少 await 已修复（8 tests PASS）
+- **E3-U2 tooltip 与失败原因一致**: 组件树为空→"请先生成组件树"；context/flow/componentInactive→对应文案；9 tests PASS
+- 提交: [dev-e1-u1](vibex-canvas-ux-fix/dev-e1-u1)
+
 ### [Unreleased] vibex-tech-debt-qa E4: ErrorBoundary 去重 — 2026-04-21
 - **E4-U1 VisualizationPlatform**: 内联 `class ErrorBoundary` → 复用 `ui/ErrorBoundary`，减少 37 行重复代码；统一日志格式和 fallback UI
 - 提交: 92b7418b

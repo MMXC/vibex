@@ -361,6 +361,270 @@ versions table (已有) 字段: id, project_id, snapshot_json, created_at, messa
 - [ ] E7: projectId=null 引导 UI 测试
 - [ ] E8: 三种格式导入/导出 round-trip 测试
 
+## 10. Testing Strategy
+
+### 10.1 测试框架
+
+| 层级 | 框架 | 位置 |
+|------|------|------|
+| 前端单元 | Vitest | vibex-fronted/src/__tests__/ |
+| 前端 E2E | Playwright | vibex-fronted/playwright.config.ts |
+| 后端单元 | Vitest | vibex-backend/src/__tests__/ |
+| 后端 API | Vitest + Supertest | vibex-backend/src/__tests__/api/ |
+
+### 10.2 覆盖率要求
+
+| Epic | 覆盖率目标 | 测试类型 |
+|------|-----------|----------|
+| E1 Auth CSS | 回归覆盖 | Vitest snapshot |
+| E2 ClarificationCard | > 80% | Vitest unit + snapshot |
+| E3 Dashboard Search | E2E | Playwright E2E |
+| E4 TabBar | 对称性测试 | Vitest 对称性测试 |
+| E5 统一错误 | 集成覆盖 | API 集成测试 |
+| E6 Teams API | > 70% | Vitest unit + API |
+| E7 版本历史 | 边界覆盖 | Vitest 边界测试 |
+| E8 Import/Export | 100% round-trip | Vitest 三格式 round-trip |
+
+### 10.3 核心测试用例示例
+
+#### E2 ClarificationCard (Vitest)
+
+```typescript
+// vibex-fronted/src/components/ui/ClarificationCard.test.tsx
+describe('ClarificationCard', () => {
+  it('renders question text', () => {
+    render(<ClarificationCard question="What is the target audience?" options={[]} onSelect={() => {}} />);
+    expect(screen.getByText('What is the target audience?')).toBeInTheDocument();
+  });
+
+  it('shows max 3 options', () => {
+    const options = [{ id: '1', label: 'A' }, { id: '2', label: 'B' }, { id: '3', label: 'C' }, { id: '4', label: 'D' }];
+    render(<ClarificationCard question="Q" options={options} onSelect={() => {}} />);
+    expect(screen.getAllByRole('button')).toHaveLength(3); // max 3
+  });
+
+  it('triggers onSelect with option id', async () => {
+    const onSelect = jest.fn();
+    render(<ClarificationCard question="Q" options={[{ id: 'opt1', label: 'Option 1' }]} onSelect={onSelect} />);
+    await userEvent.click(screen.getByText('Option 1'));
+    expect(onSelect).toHaveBeenCalledWith('opt1');
+  });
+});
+```
+
+#### E5 API 错误格式 (Vitest Integration)
+
+```typescript
+// vibex-backend/src/__tests__/api/error-format.test.ts
+describe('API Error Format', () => {
+  it('returns { error: { code, message } } for VALIDATION_ERROR', async () => {
+    const res = await api.post('/api/v1/projects', { name: '' });
+    expect(res.status).toBe(400);
+    expect(res.data).toMatchObject({
+      error: { code: 'VALIDATION_ERROR', message: expect.any(String) }
+    });
+  });
+
+  it('returns { error: { code, message } } for NOT_FOUND', async () => {
+    const res = await api.get('/api/v1/projects/nonexistent-id');
+    expect(res.status).toBe(404);
+    expect(res.data).toMatchObject({ error: { code: 'NOT_FOUND' } });
+  });
+});
+```
+
+#### E8 Import/Export Round-trip (Vitest)
+
+```typescript
+// vibex-backend/src/__tests__/import-export.test.ts
+describe('Import/Export Round-trip', () => {
+  it('JSON: export -> import preserves boundedContexts', () => {
+    const project = { name: 'Test', boundedContexts: [{ name: 'BC1' }], domainModels: [] };
+    const exported = exportAsJSON(project);
+    const imported = importFromJSON(exported);
+    expect(imported.boundedContexts).toEqual(project.boundedContexts);
+  });
+
+  it('YAML: export -> import preserves domainModels', () => {
+    const project = { name: 'Test', boundedContexts: [], domainModels: [{ name: 'DM1', boundedContext: 'BC1' }] };
+    const exported = exportAsYAML(project);
+    const imported = importFromYAML(exported);
+    expect(imported.domainModels).toEqual(project.domainModels);
+  });
+
+
+  it('rejects files > 5MB', async () => {
+    const largeFile = Buffer.alloc(6 * 1024 * 1024);
+    const res = await api.post('/api/v1/projects/import', largeFile, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    expect(res.status).toBe(413);
+  });
+});
+```
+
+### 10.4 CI 集成
+
+- 所有 PR 必须通过 `pnpm test && pnpm playwright` 才能合并
+- E2/E3 需要 snapshot 更新权限（需要 reviewer 手动 approval）
+- 覆盖率低于阈值时 CI 失败
+
+### 10.5 E2E 测试场景
+
+| Epic | 测试场景 | 预期结果 |
+|------|---------|----------|
+| E3 | Dashboard 搜索 "project" | 返回匹配项目，响应 < 2s |
+| E4 | TabBar 点击每个 tab | Phase 正确更新，刷新保持 |
+| E5 | API 返回 401 | 前端显示人类可读 toast，有重试按钮 |
+| E6 | 创建团队并添加成员 | 201 创建，成员列表正确 |
+| E8 | 导出 JSON 后导入 | 内容一致，boundedContexts 不变 |
+
+### 10.6 测试数据约定
+
+
+- 使用 D1 fixture fixtures/teams.json 和 fixtures/projects.json
+- Mock 外部 API（AI clarify）返回固定测试数据
+- JWT 测试使用固定 test user token
+
 ---
+
+## 10. Testing Strategy
+
+### 10.1 测试框架
+
+| 层级 | 框架 | 位置 |
+|------|------|------|
+| 前端单元 | Vitest | `vibex-fronted/src/__tests__/` |
+| 前端 E2E | Playwright | `vibex-fronted/playwright.config.ts` |
+| 后端单元 | Vitest | `vibex-backend/src/__tests__/` |
+| 后端 API | Vitest + Supertest | `vibex-backend/src/__tests__/api/` |
+
+### 10.2 覆盖率要求
+
+| Epic | 覆盖率目标 | 测试类型 |
+|------|-----------|---------|
+| E1 Auth CSS | 回归覆盖 | Vitest snapshot |
+| E2 ClarificationCard | > 80% | Vitest unit + snapshot |
+| E3 Dashboard Search | E2E | Playwright E2E |
+| E4 TabBar | 对称性测试 | Vitest 对称性测试 |
+| E5 统一错误 | 集成覆盖 | API 集成测试 |
+| E6 Teams API | > 70% | Vitest unit + API |
+| E7 版本历史 | 边界覆盖 | Vitest 边界测试 |
+| E8 Import/Export | 100% round-trip | Vitest 三格式 round-trip |
+
+### 10.3 核心测试用例示例
+
+#### E2 ClarificationCard (Vitest)
+
+
+```typescript
+// vibex-fronted/src/components/ui/ClarificationCard.test.tsx
+describe('ClarificationCard', () => {
+  it('renders question text', () => {
+    render(<ClarificationCard question="What is the target audience?" options={[]} onSelect={() => {}} />);
+    expect(screen.getByText('What is the target audience?')).toBeInTheDocument();
+  });
+
+
+  it('shows max 3 options', () => {
+    const options = [{ id: '1', label: 'A' }, { id: '2', label: 'B' }, { id: '3', label: 'C' }, { id: '4', label: 'D' }];
+    render(<ClarificationCard question="Q" options={options} onSelect={() => {}} />);
+    expect(screen.getAllByRole('button')).toHaveLength(3); // max 3
+  });
+
+
+  it('triggers onSelect with option id', async () => {
+    const onSelect = jest.fn();
+    render(<ClarificationCard question="Q" options={[{ id: 'opt1', label: 'Option 1' }]} onSelect={onSelect} />);
+    await userEvent.click(screen.getByText('Option 1'));
+    expect(onSelect).toHaveBeenCalledWith('opt1');
+  });
+});
+```
+
+
+#### E5 API 错误格式 (Vitest Integration)
+
+
+```typescript
+// vibex-backend/src/__tests__/api/error-format.test.ts
+describe('API Error Format', () => {
+  it('returns { error: { code, message } } for VALIDATION_ERROR', async () => {
+    const res = await api.post('/api/v1/projects', { name: '' });
+    expect(res.status).toBe(400);
+    expect(res.data).toMatchObject({
+      error: { code: 'VALIDATION_ERROR', message: expect.any(String) }
+    });
+  });
+
+
+  it('returns { error: { code, message } } for NOT_FOUND', async () => {
+    const res = await api.get('/api/v1/projects/nonexistent-id');
+    expect(res.status).toBe(404);
+    expect(res.data).toMatchObject({ error: { code: 'NOT_FOUND' } });
+  });
+});
+```
+
+#### E8 Import/Export Round-trip (Vitest)
+
+
+```typescript
+// vibex-backend/src/__tests__/import-export.test.ts
+describe('Import/Export Round-trip', () => {
+  it('JSON: export -> import preserves boundedContexts', () => {
+    const project = { name: 'Test', boundedContexts: [{ name: 'BC1' }], domainModels: [] };
+    const exported = exportAsJSON(project);
+    const imported = importFromJSON(exported);
+    expect(imported.boundedContexts).toEqual(project.boundedContexts);
+  });
+
+  it('YAML: export -> import preserves domainModels', () => {
+    const project = { name: 'Test', boundedContexts: [], domainModels: [{ name: 'DM1', boundedContext: 'BC1' }] };
+    const exported = exportAsYAML(project);
+    const imported = importFromYAML(exported);
+    expect(imported.domainModels).toEqual(project.domainModels);
+  });
+
+
+  it('rejects files > 5MB', async () => {
+    const largeFile = Buffer.alloc(6 * 1024 * 1024);
+    const res = await api.post('/api/v1/projects/import', largeFile, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    expect(res.status).toBe(413);
+  });
+});
+```
+
+### 10.4 CI 集成
+
+- 所有 PR 必须通过 `pnpm test && pnpm playwright` 才能合并
+- E2/E3 需要 snapshot 更新权限（需要 reviewer 手动 approval）
+- 覆盖率低于阈值时 CI 失败
+
+### 10.5 E2E 测试场景
+
+| Epic | 测试场景 | 预期结果 |
+|------|---------|---------|
+| E3 | Dashboard 搜索 "project" | 返回匹配项目，响应 < 2s |
+| E4 | TabBar 点击每个 tab | Phase 正确更新，刷新保持 |
+| E5 | API 返回 401 | 前端显示人类可读 toast，有重试按钮 |
+| E6 | 创建团队并添加成员 | 201 创建，成员列表正确 |
+| E8 | 导出 JSON 后导入 | 内容一致，boundedContexts 不变 |
+
+### 10.6 测试数据约定
+
+
+- 使用 D1 fixture `fixtures/teams.json` 和 `fixtures/projects.json`
+- Mock 外部 API（AI clarify）返回固定测试数据
+- JWT 测试使用固定 test user token
+
+---
+
+## 执行决策
+- **决策**: 已采纳
+- **执行项目**: vibex-pm-proposals-20260414_143000
+- **执行日期**: 2026-04-14
 
 *Architect Agent | 2026-04-14*

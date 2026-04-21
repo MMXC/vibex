@@ -1,3 +1,9 @@
+### [Unreleased] vibex-pm-proposals-20260414_143000 E4-U1: TabBar Phase 对齐 — 2026-04-22
+- **E4-U1 TabBar Phase 对齐**: TabBar 按 phase 显示可见 tabs（input 仅 context，context/flow 仅 context+flow，component/prototype 显示全部）
+- **双向同步**: TabBar 点击 tab 同步 setPhase(phase)，与 PhaseNavigator 行为对称；phase 变化时 TabBar 高亮同步
+- **新增测试**: TabBarSymmetry.test.tsx — 13 个测试覆盖 phase-gated 可见性 + 双向同步验证（26 tests PASS）
+- 提交: 6c319f5e
+
 ### [Unreleased] vibex-canvas-ux-fix — E1 API Error + E3 Project Button Fix — 2026-04-21
 - **E1-U1 handleResponseError**: async/await 修复，`res.json()` 加 `await`，后端错误消息正确透传到 toast
 - **E1-U2 res.json() 安全审计**: 全局扫描 `res.json()` + `res.blob()`，发现 `exportZip` 缺少 await 已修复（8 tests PASS）

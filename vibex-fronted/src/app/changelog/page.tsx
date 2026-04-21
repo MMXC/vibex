@@ -20,6 +20,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.290',
+    date: '2026-04-22',
+    changes: [
+      '📋 vibex-pm-proposals E4-U1: TabBar Phase 对齐',
+      '✅ PHASE_TABS 映射: input 仅 context, context/flow 仅 context+flow, component/prototype 显示全部',
+      '✅ 双向同步: TabBar 点击 → setPhase(phase)，与 PhaseNavigator 对称',
+      '✅ TabBarSymmetry.test.tsx: 13 tests, 26 total TabBar tests PASS',
+    ],
+    commit: '6c319f5e',
+  },
+  {
     version: '1.0.260',
     date: '2026-04-18',
     changes: [

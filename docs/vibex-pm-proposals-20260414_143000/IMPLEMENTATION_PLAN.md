@@ -313,9 +313,9 @@ export function apiError(status: number, code: string, message: string) {
 
 ---
 
-- [ ] **Unit 8: E8 Import/Export**
+- [x] **Unit 8: E8 Import/Export**
 
-> **Status**: ⬜ 待派发
+> **Status**: ✅ 已完成（dev-e8-importexport）
 
 **Goal:** 实现 DDD schema 导入导出（JSON/MD/YAML 格式）。
 
@@ -347,8 +347,10 @@ export function apiError(status: number, code: string, message: string) {
 - Edge case: 缺少必填字段（boundedContexts.name 缺失）
 
 **Verification:**
-- JSON/YAML round-trip 测试全部通过
-- API 错误格式符合统一标准（E5）
+- ✅ JSON/YAML round-trip 测试通过（12 tests）
+- ✅ 5MB 文件大小限制
+- ✅ SSRF 防护（禁止外部 URL）
+- ✅ apiError() 用于所有错误返回
 
 ---
 

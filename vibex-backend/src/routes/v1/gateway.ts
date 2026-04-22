@@ -32,6 +32,8 @@ import ddsChapters from './dds/chapters';
 // 导入所有 API 路由
 import projects from '../projects';
 import projectId from '../projects.$id';
+import import_ from './projects/import';
+import export_ from './projects/export';
 import pages from '../pages';
 import pageIdComponents from '../pages.$id.components';
 import agents from '../agents';
@@ -144,6 +146,8 @@ protected_.use('*', authMiddleware);
 // 项目管理
 protected_.route('/projects', projects);
 protected_.route('/projects/:id', projectId);
+protected_.route('/projects/import', import_);
+protected_.route('/projects/export', export_);
 
 // 页面管理
 protected_.route('/pages', pages);

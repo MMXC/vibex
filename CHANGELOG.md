@@ -1,3 +1,10 @@
+### [Unreleased] vibex-pm-proposals-20260414_143000 E7-U1: 版本历史 projectId=null 边界处理 — 2026-04-22
+- **E7-U1 version history**: projectId=null 时显示引导 UI（"请先选择项目" + /projects/new 链接）
+- **page.tsx**: 使用 useSearchParams() 读取 projectId，null 边界路由
+- **CSS**: .emptyAction 按钮样式（蓝色渐变）
+- **Tests**: page.test.tsx — 2 tests 验证 null 边界逻辑 PASS
+- 提交: feb5dff1
+
 ### [Unreleased] vibex-pm-proposals-20260414_143000 E6-U1: Teams API — 2026-04-22
 - **E6-U1 Teams API**: D1 migration (Team + TeamMember + TeamInvite 表), TeamService (CRUD + 成员管理 + 权限分层)
 - **Backend routes**: GET/POST /v1/teams, GET/PUT/DELETE /v1/teams/:id, GET/POST /v1/teams/:id/members, PUT/DELETE /v1/teams/:id/members/:userId, GET /v1/teams/:id/permissions

@@ -20,6 +20,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.293',
+    date: '2026-04-22',
+    changes: [
+      '📋 vibex-pm-proposals E7-U1: 版本历史 projectId=null 边界处理',
+      '✅ projectId=null → 显示引导 UI（"请先选择项目" + /projects/new 链接）',
+      '✅ useSearchParams() 读取 projectId，CSS .emptyAction 蓝色按钮样式',
+      '✅ page.test.tsx: 2 tests PASS',
+    ],
+    commit: 'feb5dff1',
+  },
+  {
     version: '1.0.292',
     date: '2026-04-22',
     changes: [

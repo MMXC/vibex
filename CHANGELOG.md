@@ -1,3 +1,10 @@
+### [Unreleased] vibex-pm-proposals-20260414_143000 E8-U1: Import/Export API — 2026-04-22
+- **E8-U1 Import/Export API**: JSON+YAML parsers, round-trip validation, SSRF protection
+- **Backend**: import.ts (POST /v1/projects/import, 5MB limit), export.ts (GET /v1/projects/export, JSON/YAML format)
+- **Parsers**: json-importer.ts, yaml-importer.ts (js-yaml), json-exporter.ts, yaml-exporter.ts
+- **Tests**: import-export.test.ts — 12 tests PASS (JSON/YAML round-trip, 5MB limit, SSRF)
+- 提交: 80d2801e
+
 ### [Unreleased] vibex-pm-proposals-20260414_143000 E7-U1: 版本历史 projectId=null 边界处理 — 2026-04-22
 - **E7-U1 version history**: projectId=null 时显示引导 UI（"请先选择项目" + /projects/new 链接）
 - **page.tsx**: 使用 useSearchParams() 读取 projectId，null 边界路由

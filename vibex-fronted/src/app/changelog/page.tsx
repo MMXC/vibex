@@ -20,6 +20,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.294',
+    date: '2026-04-22',
+    changes: [
+      '📋 vibex-pm-proposals E8-U1: Import/Export API',
+      '✅ JSON+YAML parsers: json-importer/yaml-importer + json-exporter/yaml-exporter',
+      '✅ Backend: POST /v1/projects/import (5MB limit, SSRF protection), GET /v1/projects/export (JSON/YAML)',
+      '✅ import-export.test.ts: 12 tests PASS',
+    ],
+    commit: '80d2801e',
+  },
+  {
     version: '1.0.293',
     date: '2026-04-22',
     changes: [

@@ -240,10 +240,9 @@ export function apiError(status: number, code: string, message: string) {
 
 ---
 
-- [ ] **Unit 6: E6 Teams API**
+- [x] **Unit 6: E6 Teams API**
 
-> **Status**: ⬜ 待派发
-> **Dependencies**: Unit 5（统一错误格式）
+> **Status**: ✅ 已完成（dev-e6-teamsapi）
 
 **Goal:** 实现团队协作 API，包括 CRUD、成员管理和权限检查。
 
@@ -275,8 +274,10 @@ export function apiError(status: number, code: string, message: string) {
 - Integration: 成员列表显示正确角色
 
 **Verification:**
-- D1 migration 成功执行
-- Teams API 端到端测试通过
+- ✅ D1 migration 0011_add_teams.sql 创建
+- ✅ TeamService.ts CRUD + 权限检查实现
+- ✅ teams API 端到端测试通过（9 tests）
+- ✅ tsc --noEmit 无错误（backend + frontend）
 
 ---
 

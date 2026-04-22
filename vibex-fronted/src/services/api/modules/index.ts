@@ -24,3 +24,5 @@ export { clarificationApi, createClarificationApi } from './clarification';
 export type { ClarificationApi } from './clarification';
 export { dddApi, createDddApi } from './ddd';
 export type { DddApi } from './ddd';
+export { teamsApi } from './teams';
+export type { TeamsApi } from './teams';

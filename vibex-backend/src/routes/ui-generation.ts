@@ -22,6 +22,7 @@
 import { Hono } from 'hono';
 import { Env } from '@/lib/db';
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 import {
   createAIService,
@@ -94,24 +95,15 @@ uiGeneration.post('/', async (c) => {
     const { description, projectId, pageId, framework, uiLibrary, platforms } = body;
     
     if (!description || typeof description !== 'string') {
-      return c.json({
-        success: false,
-        error: 'Description is required and must be a string',
-      }, 400);
+      return         c.json(apiError('Description is required and must be a string', ERROR_CODES.BAD_REQUEST), 400);
     }
     
     if (description.length < 3) {
-      return c.json({
-        success: false,
-        error: 'Description must be at least 3 characters',
-      }, 400);
+      return         c.json(apiError('Description must be at least 3 characters', ERROR_CODES.BAD_REQUEST), 400);
     }
     
     if (description.length > 5000) {
-      return c.json({
-        success: false,
-        error: 'Description must not exceed 5000 characters',
-      }, 400);
+      return         c.json(apiError('Description must not exceed 5000 characters', ERROR_CODES.BAD_REQUEST), 400);
     }
     
     // Create AI service and generate UI
@@ -124,10 +116,7 @@ uiGeneration.post('/', async (c) => {
     });
     
     if (!result.success || !result.data) {
-      return c.json({
-        success: false,
-        error: result.error || 'UI generation failed',
-      }, 500);
+      return         c.json(apiError(result.error || 'UI generation failed', ERROR_CODES.INTERNAL_ERROR), 500);
     }
     
     const response: UIGenerationResponse = {

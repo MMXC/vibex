@@ -18,6 +18,7 @@ import { z } from 'zod'
 import { generateId, Env, queryDB, queryOne, executeDB } from '@/lib/db'
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const templates = new Hono<{ Bindings: Env }>()
 
@@ -314,12 +315,7 @@ templates.post('/', async (c) => {
     })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return c.json({
-        success: false,
-        error: 'Validation error',
-        code: 'VALIDATION_ERROR',
-        details: error.errors,
-      }, 400)
+      return         c.json(apiError('Validation error', ERROR_CODES.VALIDATION_ERROR, error.errors), 400)
     }
     safeError('Error creating template:', error)
     return c.json({

@@ -173,7 +173,7 @@ chat.post('/', async (c) => {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return c.json({ error: errorMessage }, 500);
+    return c.json(apiError(errorMessage, ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -308,7 +308,7 @@ chat.post('/with-context', async (c) => {
     })
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    return c.json({ error: errorMessage }, 500)
+    return c.json(apiError(errorMessage, ERROR_CODES.INTERNAL_ERROR), 500)
   }
 })
 

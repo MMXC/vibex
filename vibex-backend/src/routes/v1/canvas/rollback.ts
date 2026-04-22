@@ -73,7 +73,7 @@ rollback.get('/', async (c) => {
       )
 
       if (!snapshot) {
-        return c.json({ error: `Snapshot version ${version} not found` }, 404)
+        return         c.json(apiError(`Snapshot version ${version} not found`, ERROR_CODES.NOT_FOUND), 404)
       }
 
       return c.json({
@@ -134,7 +134,7 @@ rollback.post('/', async (c) => {
     )
 
     if (!targetSnapshot) {
-      return c.json({ error: `Snapshot version ${targetVersion} not found` }, 404)
+      return         c.json(apiError(`Snapshot version ${targetVersion} not found`, ERROR_CODES.NOT_FOUND), 404)
     }
 
     // Get current max version

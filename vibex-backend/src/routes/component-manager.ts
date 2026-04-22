@@ -415,7 +415,7 @@ componentManager.post('/:id/variants', async (c) => {
     // Check if variant already exists
     const variantExists = existingVariants.some(v => v.variant === variant);
     if (variantExists) {
-      return c.json({ error: `Variant "${variant}" already exists` }, 400);
+      return         c.json(apiError(`Variant "${variant}" already exists`, ERROR_CODES.CONFLICT), 400);
     }
 
     // Add new variant
@@ -488,7 +488,7 @@ componentManager.put('/:id/variants/:variantName', async (c) => {
     // Find and update variant
     const variantIndex = existingVariants.findIndex(v => v.variant === variantName);
     if (variantIndex === -1) {
-      return c.json({ error: `Variant "${variantName}" not found` }, 404);
+      return         c.json(apiError(`Variant "${variantName}" not found`, ERROR_CODES.NOT_FOUND), 404);
     }
 
     // Merge update
@@ -555,7 +555,7 @@ componentManager.delete('/:id/variants/:variantName', async (c) => {
     const newVariants = existingVariants.filter(v => v.variant !== variantName);
     
     if (newVariants.length === existingVariants.length) {
-      return c.json({ error: `Variant "${variantName}" not found` }, 404);
+      return         c.json(apiError(`Variant "${variantName}" not found`, ERROR_CODES.NOT_FOUND), 404);
     }
 
     const now = new Date().toISOString();

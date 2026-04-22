@@ -193,9 +193,9 @@ const filtered = results.results.filter(p =>
 
 ---
 
-- [ ] **Unit 5: E5 统一错误处理**
+- [x] **Unit 5: E5 统一错误处理**
 
-> **Status**: ⬜ 待派发
+> **Status**: ✅ 已完成（dev-e5-统一错误处理）
 
 **Goal:** 全局统一 API 错误格式，复用 architect-proposals 方案。
 
@@ -232,8 +232,11 @@ export function apiError(status: number, code: string, message: string) {
 - Error path: 前端正确解析错误并显示 toast
 
 **Verification:**
-- 所有 API 错误格式一致
-- 前端错误 toast 显示 code 和 message
+- ✅ 所有 API 错误格式一致（`{ error, code, status, details? }`）
+- ✅ 全部 10 个未使用 apiError 的路由文件已迁移
+- ✅ chat.ts 2 处漏网之鱼已修复
+- ✅ component-manager.ts 3 处裸错误返回已修复
+- ✅ ai-ui-generation.ts 3 处裸错误返回已修复
 
 ---
 

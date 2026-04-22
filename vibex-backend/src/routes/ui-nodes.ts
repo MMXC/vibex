@@ -19,6 +19,7 @@ import { generateId, Env, executeDB, queryDB, queryOne } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const uiNodes = new Hono<{ Bindings: Env }>()
 
@@ -227,10 +228,7 @@ ${requirement}
     })
   } catch (error) {
     safeError('Error setting up ui-nodes stream:', error)
-    return c.json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to setup stream',
-    }, 500)
+    return         c.json(apiError(error instanceof Error ? error.message : 'Failed to setup stream', ERROR_CODES.INTERNAL_ERROR), 500)
   }
 })
 
@@ -244,11 +242,7 @@ uiNodes.get('/', async (c) => {
     const flowId = c.req.query('flowId')
 
     if (!projectId && !flowId) {
-      return c.json({
-        success: false,
-        error: 'projectId or flowId is required',
-        code: 'VALIDATION_ERROR',
-      }, 400)
+      return         c.json(apiError('projectId or flowId is required', ERROR_CODES.BAD_REQUEST), 400)
     }
 
     let sql = 'SELECT * FROM UINode WHERE 1=1'
@@ -278,10 +272,7 @@ uiNodes.get('/', async (c) => {
     })
   } catch (error) {
     safeError('Error getting ui-nodes:', error)
-    return c.json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to get ui-nodes',
-    }, 500)
+    return         c.json(apiError(error instanceof Error ? error.message : 'Failed to get ui-nodes', ERROR_CODES.INTERNAL_ERROR), 500)
   }
 })
 
@@ -334,10 +325,7 @@ uiNodes.put('/', async (c) => {
     })
   } catch (error) {
     safeError('Error updating ui-node:', error)
-    return c.json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to update ui-node',
-    }, 500)
+    return         c.json(apiError(error instanceof Error ? error.message : 'Failed to update ui-node', ERROR_CODES.INTERNAL_ERROR), 500)
   }
 })
 

@@ -18,6 +18,7 @@ import { cors } from 'hono/cors'
 import { z } from 'zod'
 import { generateId, Env, queryOne, executeDB } from '@/lib/db'
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 import type {
   SaveStepStateRequest,

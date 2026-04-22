@@ -19,6 +19,7 @@
     "@vibex/types": "workspace:*",
     "bcryptjs": "^3.0.3",
     "hono": "^4.12.5",
+    "js-yaml": "^4.1.1",
     "jsonwebtoken": "^9.0.3",
     "next": "16.1.6",
     "prisma": "^5.22.0",

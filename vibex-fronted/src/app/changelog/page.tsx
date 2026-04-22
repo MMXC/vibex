@@ -20,6 +20,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.291',
+    date: '2026-04-22',
+    changes: [
+      '📋 vibex-pm-proposals E5-U1: 统一 API 错误格式',
+      '✅ 61 个后端路由全部迁移到 apiError() — 统一 { error, code, status, details } 格式',
+      '✅ 修复 8 处漏网之鱼 (chat/component-manager/ai-ui-generation)',
+      '✅ api-error-integration.test.ts: 26 tests, 后端 2 suites PASS',
+    ],
+    commit: '13e4f079 + 0c06941a',
+  },
+  {
     version: '1.0.290',
     date: '2026-04-22',
     changes: [

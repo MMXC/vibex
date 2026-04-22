@@ -1,3 +1,10 @@
+### [Unreleased] vibex-pm-proposals-20260414_143000 E5-U1: 统一 API 错误格式 — 2026-04-22
+- **E5-U1 统一 API 错误格式**: 61 个后端路由全部迁移到 `apiError()`，统一 `{ error, code, status, details }` 格式
+- **修复漏网之鱼**: chat.ts 2处裸错误、component-manager.ts 3处裸错误、ai-ui-generation.ts 3处裸错误全部修正
+- **集成测试**: `api-error-integration.test.ts` — 26 tests 覆盖 4xx/5xx/domain-specific 错误码全映射
+- **后端测试**: 2 suites, 26 tests PASS
+- 提交: 13e4f079 + 0c06941a
+
 ### [Unreleased] vibex-pm-proposals-20260414_143000 E4-U1: TabBar Phase 对齐 — 2026-04-22
 - **E4-U1 TabBar Phase 对齐**: TabBar 按 phase 显示可见 tabs（input 仅 context，context/flow 仅 context+flow，component/prototype 显示全部）
 - **双向同步**: TabBar 点击 tab 同步 setPhase(phase)，与 PhaseNavigator 行为对称；phase 变化时 TabBar 高亮同步

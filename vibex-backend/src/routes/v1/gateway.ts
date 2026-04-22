@@ -73,6 +73,10 @@ import projectSettings from '../project-settings';
 import ddd from '../ddd';
 import diagnosis from '../diagnosis';
 import plan from '../plan';
+import teamsIndex from './teams';
+import teamId from './teams/:id';
+import teamMembers from './teams/:id/members';
+import teamPermissions from './teams/:id/permissions';
 
 // 创建 v1 路由
 const v1 = new Hono();
@@ -251,6 +255,12 @@ protected_.route('/ddd', ddd);
 
 // 诊断
 protected_.route('/diagnosis', diagnosis);
+
+// Teams — E6
+protected_.route('/teams', teamsIndex);
+protected_.route('/teams/:id', teamId);
+protected_.route('/teams/:id/members', teamMembers);
+protected_.route('/teams/:id/permissions', teamPermissions);
 
 // 计划
 protected_.route('/plan', plan);

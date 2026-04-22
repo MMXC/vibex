@@ -163,6 +163,23 @@
   cursor: pointer;
 }
 
+.emptyAction {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 8px 20px;
+  background: #3b82f6;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.emptyAction:hover {
+  background: #2563eb;
+}
+
 .diffContainer {
   padding: 24px;
 }

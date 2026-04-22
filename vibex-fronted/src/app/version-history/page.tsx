@@ -8,12 +8,23 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useConfirmationStore } from '@/stores/confirmationStore';
 import { VersionPreview, VersionInfo } from '@/components/version-preview/VersionPreview';
 import { VersionDiff } from '@/components/version-diff/VersionDiff';
 import styles from './version-history.module.css';
 
+/**
+ * VersionHistoryPage — E7: projectId=null boundary + diff view
+ *
+ * E7 goal: 修复 version history 的 projectId=null 边界
+ * - projectId !== null: 显示版本历史列表
+ * - projectId === null: 显示引导 UI "请先选择项目"
+ */
 export default function VersionHistoryPage() {
+  const searchParams = useSearchParams();
+  const projectId = searchParams.get('projectId');
+
   const history = useConfirmationStore(state => state.history);
   const jumpToSnapshot = useConfirmationStore(state => state.jumpToSnapshot);
   const setSnapshotNote = useConfirmationStore(state => state.setSnapshotNote);
@@ -67,6 +78,21 @@ export default function VersionHistoryPage() {
       minute: '2-digit',
     });
   };
+
+  // E7: projectId=null boundary — show guide to create/select a project first
+  if (projectId === null) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.empty}>
+          <h2>请先选择项目</h2>
+          <p>在画布中创建或打开项目后，再从项目设置查看版本历史</p>
+          <a href="/projects/new" className={styles.emptyAction}>
+            创建新项目
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   if (history.length === 0) {
     return (

@@ -281,9 +281,9 @@ export function apiError(status: number, code: string, message: string) {
 
 ---
 
-- [ ] **Unit 7: E7 版本历史修复**
+- [x] **Unit 7: E7 版本历史修复**
 
-> **Status**: ⬜ 待派发
+> **Status**: ✅ 已完成（dev-e7-版本历史）
 
 **Goal:** 修复 version history 的 projectId=null 边界，添加 diff 视图。
 
@@ -307,8 +307,9 @@ export function apiError(status: number, code: string, message: string) {
 - Integration: 切换项目后版本历史正确刷新
 
 **Verification:**
-- projectId=null 场景正确处理
-- 版本列表加载正常
+- ✅ projectId=null 边界处理正确（useSearchParams 读取 projectId，null 时显示引导 UI）
+- ✅ VersionDiff 组件已集成
+- ✅ version-history.test.tsx 边界测试通过（2 tests）
 
 ---
 

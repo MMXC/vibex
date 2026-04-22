@@ -1,3 +1,11 @@
+### [Unreleased] vibex-pm-proposals-20260414_143000 E6-U1: Teams API — 2026-04-22
+- **E6-U1 Teams API**: D1 migration (Team + TeamMember + TeamInvite 表), TeamService (CRUD + 成员管理 + 权限分层)
+- **Backend routes**: GET/POST /v1/teams, GET/PUT/DELETE /v1/teams/:id, GET/POST /v1/teams/:id/members, PUT/DELETE /v1/teams/:id/members/:userId, GET /v1/teams/:id/permissions
+- **Role hierarchy**: owner(3) > admin(2) > member(1)，权限检查 + 4 个专用错误类
+- **Frontend**: teams.ts API client + team.ts types + index.ts export
+- **Tests**: TeamService.test.ts — 9 unit tests (角色分层 + 错误类验证)
+- 提交: 276d56ad + 96422922
+
 ### [Unreleased] vibex-pm-proposals-20260414_143000 E5-U1: 统一 API 错误格式 — 2026-04-22
 - **E5-U1 统一 API 错误格式**: 61 个后端路由全部迁移到 `apiError()`，统一 `{ error, code, status, details }` 格式
 - **修复漏网之鱼**: chat.ts 2处裸错误、component-manager.ts 3处裸错误、ai-ui-generation.ts 3处裸错误全部修正

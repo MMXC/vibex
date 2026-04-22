@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.292',
+    date: '2026-04-22',
+    changes: [
+      '📋 vibex-pm-proposals E6-U1: Teams API',
+      '✅ D1 migration: Team + TeamMember + TeamInvite 表，role 分层 (owner/admin/member)',
+      '✅ Backend: GET/POST /v1/teams, GET/PUT/DELETE /v1/teams/:id, CRUD members, permissions',
+      '✅ Frontend: teams.ts client + team.ts types',
+      '✅ TeamService.test.ts: 9 unit tests PASS',
+    ],
+    commit: '276d56ad + 96422922',
+  },
+  {
     version: '1.0.291',
     date: '2026-04-22',
     changes: [

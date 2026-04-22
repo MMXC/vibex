@@ -18,6 +18,7 @@ import { queryOne, generateId, Env } from '@/lib/db';
 import { createUIGeneratorService, UIGeneratorOptions, UIGenerationResult, GeneratedComponent, GeneratedPage } from '@/services/ui-generator';
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 /** Type guard: is this a GeneratedPage (has .component sub-field)? */
 function isGeneratedPage(val: GeneratedPage | GeneratedComponent): val is GeneratedPage {
@@ -169,10 +170,7 @@ livePreview.post('/', async (c) => {
     
     // Validate request
     if (!body.snapshotId && !body.requirement) {
-      return c.json<LivePreviewResponse>({
-        success: false,
-        error: 'Either snapshotId or requirement must be provided',
-      }, 400);
+      return         c.json(apiError('Either snapshotId or requirement must be provided', ERROR_CODES.BAD_REQUEST), 400);
     }
     
     let description: string;
@@ -189,10 +187,7 @@ livePreview.post('/', async (c) => {
       );
       
       if (!snapshot) {
-        return c.json<LivePreviewResponse>({
-          success: false,
-          error: 'Prototype snapshot not found',
-        }, 404);
+        return         c.json(apiError('Prototype snapshot not found', ERROR_CODES.NOT_FOUND), 404);
       }
       
       const parsed = parseSnapshotContent(snapshot.content);
@@ -202,10 +197,7 @@ livePreview.post('/', async (c) => {
       pageType = pageType || parsed.pageType;
     } else {
       if (!body.projectId) {
-        return c.json<LivePreviewResponse>({
-          success: false,
-          error: 'projectId is required when using direct requirement',
-        }, 400);
+        return         c.json(apiError('projectId is required when using direct requirement', ERROR_CODES.BAD_REQUEST), 400);
       }
       description = body.requirement!;
       projectId = body.projectId;

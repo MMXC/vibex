@@ -12,6 +12,7 @@ import { generateId, Env, queryDB, queryOne, executeDB } from '@/lib/db'
 import { createAIService } from '@/services/ai-service'
 
 import { safeError } from '@/lib/log-sanitizer';
+import { apiError, ERROR_CODES } from '@/lib/api-error';
 
 const flow = new Hono<{ Bindings: Env }>();
 
@@ -71,11 +72,7 @@ flow.post('/generate', async (c) => {
     const parseResult = GenerateFlowRequestSchema.safeParse(body)
 
     if (!parseResult.success) {
-      return c.json({
-        success: false,
-        error: parseResult.error.issues[0].message,
-        code: 'VALIDATION_ERROR',
-      }, 400)
+      return         c.json(apiError(parseResult.error.issues[0].message, ERROR_CODES.VALIDATION_ERROR), 400)
     }
 
     const { requirement, domainIds, projectId, userId, flowType } = parseResult.data

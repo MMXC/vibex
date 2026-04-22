@@ -442,7 +442,7 @@ aiUIGeneration.post('/', async (c) => {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return c.json({ error: errorMessage }, 500);
+    return         c.json(apiError(errorMessage, ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 
@@ -491,7 +491,7 @@ aiUIGeneration.post('/generate', async (c) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      return c.json({ error: `MiniMax API error: ${response.status} - ${errorText}` }, 500);
+      return         c.json(apiError(`MiniMax API error: ${response.status} - ${errorText}`, ERROR_CODES.AI_SERVICE_ERROR), 500);
     }
 
     const data = await response.json();
@@ -535,7 +535,7 @@ aiUIGeneration.post('/generate', async (c) => {
     return c.json(parsedResponse);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return c.json({ error: errorMessage }, 500);
+    return         c.json(apiError(errorMessage, ERROR_CODES.INTERNAL_ERROR), 500);
   }
 });
 

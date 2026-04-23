@@ -9,7 +9,7 @@ import { safeError } from '@/lib/log-sanitizer';
 export async function GET(request: NextRequest) {
   try {
     const env = getEnv();
-    const auth = getAuthUserFromRequest(request, env.JWT_SECRET);
+    const { success, user } = getAuthUserFromRequest(request);
     if (!auth) {
       return NextResponse.json(
         { success: false, error: 'Not authenticated', code: 'UNAUTHORIZED' },
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     const project = await prisma.project.findFirst({
       where: {
         id: projectId,
-        userId: auth.userId,
+        userId: user?.userId,
       },
     });
 
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const env = getEnv();
-    const auth = getAuthUserFromRequest(request, env.JWT_SECRET);
+    const { success, user } = getAuthUserFromRequest(request);
     if (!auth) {
       return NextResponse.json(
         { success: false, error: 'Not authenticated', code: 'UNAUTHORIZED' },
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
     const project = await prisma.project.findFirst({
       where: {
         id: projectId,
-        userId: auth.userId,
+        userId: user?.userId,
       },
     });
 

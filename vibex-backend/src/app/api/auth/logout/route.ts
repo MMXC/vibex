@@ -8,7 +8,7 @@ import { getAuthUserFromRequest } from '@/lib/authFromGateway';
 export async function POST(request: NextRequest) {
   try {
     const env = getEnv();
-    const user = getAuthUserFromRequest(request, env.JWT_SECRET);
+    const user = getAuthUserFromRequest(request);
     
     if (!user) {
       return NextResponse.json(

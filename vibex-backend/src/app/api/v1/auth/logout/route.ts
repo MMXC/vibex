@@ -7,7 +7,7 @@ import { safeError } from '@/lib/log-sanitizer';
 export async function POST(request: NextRequest) {
   try {
     const env = getEnv();
-    const user = getAuthUserFromRequest(request, env.JWT_SECRET);
+    const user = getAuthUserFromRequest(request);
     
     if (!user) {
       return NextResponse.json(

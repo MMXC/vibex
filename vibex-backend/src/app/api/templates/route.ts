@@ -1,22 +1,20 @@
-/**
+import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserFromRequest } from '@/lib/authFromGateway';
+import { TEMPLATES } from '@/lib/template-data';
+import { safeError } from '@/lib/log-sanitizer';
 
+/**
  * GET /api/templates — List all project templates
  *
  * Returns the built-in template library for the project template feature (E2).
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { TEMPLATES } from '@/lib/template-data';
-
-import { safeError } from '@/lib/log-sanitizer';
-
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
     // Auth check
-    const auth = await getAuthUserFromRequest(request);
-    if (!auth.success) {
+    const { success, user } = getAuthUserFromRequest(request);
+    if (!success) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

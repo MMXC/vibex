@@ -18,8 +18,8 @@ export const dynamic = 'force-dynamic';
 // GET /api/pages - List all pages (or filter by projectId)
 export async function GET(request: NextRequest) {
     // Auth check
-    const auth = await getAuthUserFromRequest(request);
-    if (!auth.success) {
+    const { success, user } = getAuthUserFromRequest(request);
+    if (!success) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -45,8 +45,8 @@ export async function GET(request: NextRequest) {
 // POST /api/pages - Create a new page
 export async function POST(request: NextRequest) {
     // Auth check
-    const auth = await getAuthUserFromRequest(request);
-    if (!auth.success) {
+    const { success, user } = getAuthUserFromRequest(request);
+    if (!success) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

@@ -18,8 +18,8 @@ export const dynamic = 'force-dynamic';
 // GET /api/agents - List all agents (or filter by userId)
 export async function GET(request: NextRequest) {
     // Auth check
-    const auth = await getAuthUserFromRequest(request);
-    if (!auth.success) {
+    const { success, user } = getAuthUserFromRequest(request);
+    if (!success) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -42,8 +42,8 @@ export async function GET(request: NextRequest) {
 // POST /api/agents - Create a new agent
 export async function POST(request: NextRequest) {
     // Auth check
-    const auth = await getAuthUserFromRequest(request);
-    if (!auth.success) {
+    const { success, user } = getAuthUserFromRequest(request);
+    if (!success) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

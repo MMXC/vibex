@@ -16,7 +16,7 @@ const DEPRECATION_HEADERS = {
 
 export async function GET(request: NextRequest) {
   const env = getLocalEnv();
-  const auth = getAuthUserFromRequest(request, env.JWT_SECRET);
+  const { success, user } = getAuthUserFromRequest(request);
   if (!auth) {
     return NextResponse.json({ error: 'Unauthorized: authentication required' }, { status: 401 });
   }
@@ -52,11 +52,11 @@ export async function GET(request: NextRequest) {
       // Explicit userId + search
       where.userId = userId;
       where.OR = searchOR;
-    } else if (auth.userId) {
+    } else if (user?.userId) {
       // Auth user filter + search
       where.AND = [
         { OR: searchOR },
-        { OR: [{ userId: auth.userId }, { isPublic: true }] },
+        { OR: [{ userId: user?.userId }, { isPublic: true }] },
       ];
     } else {
       where.OR = searchOR;
@@ -64,10 +64,10 @@ export async function GET(request: NextRequest) {
   } else if (userId) {
     // Explicit userId filter only
     where.userId = userId;
-  } else if (auth.userId) {
+  } else if (user?.userId) {
     // Default: auth user's own projects + public
     where.OR = [
-      { userId: auth.userId },
+      { userId: user?.userId },
       { isPublic: true },
     ];
   }

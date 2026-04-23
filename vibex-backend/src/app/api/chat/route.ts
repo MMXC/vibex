@@ -120,7 +120,7 @@ async function* streamFromMiniMax(messages: ChatMessage[], conversationId: strin
 // Auth helper
 function checkAuth(req: NextRequest) {
   const env = getLocalEnv();
-  const auth = getAuthUserFromRequest(req, env.JWT_SECRET);
+  const { success, user } = getAuthUserFromRequest(req);
   return auth;
 }
 

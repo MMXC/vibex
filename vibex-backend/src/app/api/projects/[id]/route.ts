@@ -25,7 +25,7 @@ export async function GET(
   try {
     const { id } = await params;
     const env = getLocalEnv();
-    const auth = getAuthUserFromRequest(request, env.JWT_SECRET);
+    const { success, user } = getAuthUserFromRequest(request);
 
     if (!auth) {
       return NextResponse.json(
@@ -39,7 +39,7 @@ export async function GET(
         id,
         deletedAt: null,
         OR: [
-          { userId: auth.userId },
+          { userId: user?.userId },
           { isPublic: true },
         ],
       },
@@ -74,7 +74,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const env = getLocalEnv();
-    const auth = getAuthUserFromRequest(request, env.JWT_SECRET);
+    const { success, user } = getAuthUserFromRequest(request);
 
     if (!auth) {
       return NextResponse.json(
@@ -85,7 +85,7 @@ export async function PUT(
 
     // Ownership check
     const existing = await prisma.project.findUnique({ where: { id } });
-    if (!existing || existing.userId !== auth.userId) {
+    if (!existing || existing.userId !== user?.userId) {
       return NextResponse.json(
         { error: 'Forbidden: not the project owner' },
         { status: 403 }
@@ -125,7 +125,7 @@ export async function DELETE(
   try {
     const { id } = await params;
     const env = getLocalEnv();
-    const auth = getAuthUserFromRequest(request, env.JWT_SECRET);
+    const { success, user } = getAuthUserFromRequest(request);
 
     if (!auth) {
       return NextResponse.json(
@@ -136,7 +136,7 @@ export async function DELETE(
 
     // Ownership check
     const existing = await prisma.project.findUnique({ where: { id } });
-    if (!existing || existing.userId !== auth.userId) {
+    if (!existing || existing.userId !== user?.userId) {
       return NextResponse.json(
         { error: 'Forbidden: not the project owner' },
         { status: 403 }

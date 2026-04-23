@@ -1,3 +1,11 @@
+### [Unreleased] vibex-proposals-20260424 E1-U1-U3: 后端TS债务清理 — 2026-04-24
+- **E1-U1 auth签名统一**: getAuthUserFromRequest重载，单参数→{success,user}，两参数→AuthUser|null
+- **E1-U2 lib/db.ts泛型约束**: PrismaClientType类型别名替代ReturnType<...>，修复Function约束
+- **E1-U3 CloudflareEnv类型**: index.ts双重cast修复
+- **Backend files**: authFromGateway.ts, lib/db.ts, index.ts, 34个route文件
+- **Tests**: E1相关tsc错误归零
+- 提交: 01016558
+
 ### [Unreleased] vibex-pm-proposals-20260414_143000 E8-U1: Import/Export API — 2026-04-22
 - **E8-U1 Import/Export API**: JSON+YAML parsers, round-trip validation, SSRF protection
 - **Backend**: import.ts (POST /v1/projects/import, 5MB limit), export.ts (GET /v1/projects/export, JSON/YAML format)

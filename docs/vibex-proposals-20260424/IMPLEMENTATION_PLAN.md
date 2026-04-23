@@ -11,7 +11,7 @@
 | Epic | Units | Status | Next |
 |------|-------|--------|------|
 | E1: 后端 TS 债务清理 | E1-U1 ~ E1-U4 | 3/4 | E1-U1 |
-| E2: 实时协作可行性验证 | E2-U1 ~ E2-U3 | 0/3 | E2-U1 |
+| E2: 实时协作可行性验证 | E2-U1 ~ E2-U4 | 3/4 | E2-U1 |
 | E3: Teams API 前端集成 | E3-U1 ~ E3-U4 | 0/4 | E3-U1 |
 | E4: Import/Export 完整集成 | E4-U1 ~ E4-U2 | 0/2 | E4-U1 |
 | E5: 多文件组件导出 | E5-U1 ~ E5-U2 | 0/2 | E5-U1 |
@@ -90,9 +90,9 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E2-U1 | Firebase SDK 接入 | 🔄 | — | Firebase SDK 正确初始化，无 404 资源，bundle size < 200KB |
-| E2-U2 | Presence UI 层实现 | 🔄 | E2-U1 | 页面显示在线用户头像（hardcode 数据验证 UI） |
-| E2-U3 | 断线清除逻辑 | 🔄 | E2-U2 | 刷新/页面卸载后 presence 数据正确清除 |
+| E2-U1 | Firebase SDK 接入 | ✅ | — | Firebase SDK 正确初始化，无 404 资源，bundle size < 200KB |
+| E2-U2 | Presence UI 层实现 | ✅ | E2-U1 | 页面显示在线用户头像（hardcode 数据验证 UI） |
+| E2-U3 | 断线清除逻辑 | ✅ | E2-U2 | 刷新/页面卸载后 presence 数据正确清除 |
 | E2-U4 | Architect 可行性评审 | ⬜ | E2-U3 | 架构文档确认 Firebase + Cloudflare Workers 可行性结论 |
 
 ### E2-U1 详细说明

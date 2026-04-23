@@ -1,3 +1,10 @@
+### [Unreleased] vibex-proposals-20260424 E2-U1-U3: Firebase Presence MVP — 2026-04-24
+- **E2-U1 Firebase SDK接入**: src/lib/firebase/presence.ts SDK初始化, 无404资源
+- **E2-U2 Presence UI层**: PresenceAvatars头像气泡, PresenceCursor光标, usePresence hook
+- **E2-U3 断线清除**: beforeunload监听器清除presence数据
+- **Files**: components/canvas/Presence/PresenceAvatars.tsx, hooks/usePresence.ts, tests/e2e/presence-mvp.spec.ts
+- 提交: 3bf5fad4
+
 ### [Unreleased] vibex-proposals-20260424 E1-U1-U3: 后端TS债务清理 — 2026-04-24
 - **E1-U1 auth签名统一**: getAuthUserFromRequest重载，单参数→{success,user}，两参数→AuthUser|null
 - **E1-U2 lib/db.ts泛型约束**: PrismaClientType类型别名替代ReturnType<...>，修复Function约束

@@ -4005,3 +4005,9 @@ See git history for complete changelog.
   - `vibex-backend/src/index.ts`: 注册 Hono 路由
   - 审查: `docs/review-reports/20260328/review-vibex-canvas-component-btn-20260328-epic1.md`
   - **P0-Backend**: Remove ambiguous [projectId] route, merge into [id]
+### [Unreleased] vibex-canvas-evolution Epic1-5: Phase1+Phase2 Canvas 架构演进 — 2026-04-23
+- **Epic1 样式统一**: emoji checkbox → native `<input type="checkbox">` + CSS class `.cardIcon`；4 色域 CSS 变量统一在 `canvas.variables.css` (core/supporting/generic/external)；`deriveDomainType()`/`deriveStepType()` 推导函数，44 tests PASS
+- **Epic2 三栏展开**: 三栏展开方向独立控制 (`expandBoth` 布局)，CanvasBreadcrumb 导入导航修复
+- **Epic3 数据持久化**: localStorage 快速同步 + IndexedDB 快照存档，`quickSave`/`quickLoad` LRU 缓存
+- **Epic4 批量操作**: `selectAllNodes`/`clearNodeSelection`/`onDeselectAll`，多选交互能力
+- **Epic5 拖拽排序**: `useDndSortable` BusinessFlowTree / ComponentTree 拖拽排序，order 字段正确更新

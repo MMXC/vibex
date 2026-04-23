@@ -8,9 +8,9 @@ import { getAuthUserFromRequest } from '@/lib/authFromGateway';
 export async function POST(request: NextRequest) {
   try {
     const env = getEnv();
-    const user = getAuthUserFromRequest(request);
+    const { success, user } = getAuthUserFromRequest(request);
     
-    if (!user) {
+    if (!success) {
       return NextResponse.json(
         { success: false, error: 'Not authenticated', code: 'UNAUTHORIZED' },
         { status: 401 }

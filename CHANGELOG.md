@@ -1,3 +1,11 @@
+### [Unreleased] vibex-proposals-20260424 E3-U1-U4: Teams API前端集成 — 2026-04-24
+- **E3-U1 团队列表页面**: /dashboard/teams, TanStack Query, TeamList组件
+- **E3-U2 创建团队Dialog**: 表单验证(1-100/500), 乐观更新onMutate/onError/onSettled
+- **E3-U3 成员管理面板**: TeamMemberPanel, invite/updateRole/remove成员
+- **E3-U4 权限分层UI**: RoleBadge owner>admin>member颜色分层
+- **Files**: app/dashboard/teams/, components/teams/, lib/api/teams.ts, tests/e2e/teams-ui.spec.ts
+- 提交: 5a8df17a
+
 ### [Unreleased] vibex-proposals-20260424 E2-U1-U3: Firebase Presence MVP — 2026-04-24
 - **E2-U1 Firebase SDK接入**: src/lib/firebase/presence.ts SDK初始化, 无404资源
 - **E2-U2 Presence UI层**: PresenceAvatars头像气泡, PresenceCursor光标, usePresence hook

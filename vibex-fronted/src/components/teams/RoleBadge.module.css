@@ -1,0 +1,26 @@
+/* RoleBadge.module.css */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.role_owner {
+  background: var(--color-accent-warning-bg, #fef3c7);
+  color: var(--color-accent-warning-text, #92400e);
+}
+
+.role_admin {
+  background: var(--color-accent-info-bg, #dbeafe);
+  color: var(--color-accent-info-text, #1e40af);
+}
+
+.role_member {
+  background: var(--color-surface-muted, #f3f4f6);
+  color: var(--color-text-secondary, #4b5563);
+}

@@ -1,0 +1,143 @@
+/* ImportExportCard.module.css */
+
+.card {
+  padding: 20px;
+  background: var(--color-surface-elevated, #fff);
+  border: 1px solid var(--color-border-subtle, #e5e7eb);
+  border-radius: 12px;
+}
+
+.title {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary, #111827);
+}
+
+.subtitle {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.dropZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  border: 2px dashed var(--color-border-default, #d1d5db);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  text-align: center;
+}
+
+.dropZone:hover {
+  border-color: var(--color-primary, #4f46e5);
+  background: var(--color-primary-tint, #f5f3ff);
+}
+
+.dropZoneActive {
+  border-color: var(--color-primary, #4f46e5);
+  background: var(--color-primary-tint, #f5f3ff);
+}
+
+.fileInput {
+  display: none;
+}
+
+.dropIcon {
+  font-size: 32px;
+  margin-bottom: 8px;
+  opacity: 0.7;
+}
+
+.dropText {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary, #111827);
+}
+
+.dropHint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-text-tertiary, #9ca3af);
+}
+
+.errorMsg {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--color-error-bg, #fef2f2);
+  border: 1px solid var(--color-error, #dc2626);
+  border-radius: 8px;
+  color: var(--color-error, #dc2626);
+  font-size: 13px;
+}
+
+.successMsg {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--color-success-bg, #f0fdf4);
+  border: 1px solid var(--color-success, #16a34a);
+  border-radius: 8px;
+  color: var(--color-success, #16a34a);
+  font-size: 13px;
+}
+
+.exportSection {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border-subtle, #e5e7eb);
+}
+
+.exportLabel {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.exportBtns {
+  display: flex;
+  gap: 10px;
+}
+
+.exportBtn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.exportBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.exportBtnJson {
+  background: var(--color-surface-muted, #f3f4f6);
+  color: var(--color-text-primary, #111827);
+}
+
+.exportBtnJson:hover:not(:disabled) {
+  background: var(--color-border-default, #e5e7eb);
+}
+
+.exportBtnYaml {
+  background: var(--color-surface-muted, #f3f4f6);
+  color: var(--color-text-primary, #111827);
+}
+
+.exportBtnYaml:hover:not(:disabled) {
+  background: var(--color-border-default, #e5e7eb);
+}

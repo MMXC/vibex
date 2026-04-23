@@ -117,14 +117,15 @@ async function* streamFromMiniMax(
 export async function POST(request: NextRequest) {
   // E1-S4: Use consolidated auth via getAuthUserFromRequest (reads from Hono headers + JWT fallback)
   const env = getLocalEnv();
-  const auth = getAuthUserFromRequest(request, env.JWT_SECRET);
+  const { success, user } = getAuthUserFromRequest(request);
   if (!auth) {
     return NextResponse.json(
       { error: 'Unauthorized: authentication required', code: 'AUTH_ERROR' },
       { status: 401 }
     );
   }
-  const { userId, email } = auth;
+  const userId = user?.userId;
+  const email = user?.email;
 
   // S2.2: Validate request body against security schema
   const result = await parseBody(request, chatMessageSchema);

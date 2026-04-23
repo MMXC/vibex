@@ -21,7 +21,7 @@ export async function GET(
 ) {
   try {
     const env = getEnv();
-    const auth = getAuthUserFromRequest(request, env.JWT_SECRET);
+    const { success, user } = getAuthUserFromRequest(request);
     if (!auth) {
       return NextResponse.json({ success: false, error: 'Not authenticated', code: 'UNAUTHORIZED' }, { headers: V0_DEPRECATION_HEADERS, status: 401 });
     }
@@ -29,7 +29,7 @@ export async function GET(
     const { userId } = await params;
 
     // Only allow users to get their own profile
-    if (auth.userId !== userId) {
+    if (user?.userId !== userId) {
       return NextResponse.json({ success: false, error: 'Forbidden', code: 'FORBIDDEN' }, { headers: V0_DEPRECATION_HEADERS, status: 403 });
     }
 
@@ -65,7 +65,7 @@ export async function PUT(
 ) {
   try {
     const env = getEnv();
-    const auth = getAuthUserFromRequest(request, env.JWT_SECRET);
+    const { success, user } = getAuthUserFromRequest(request);
     if (!auth) {
       return NextResponse.json({ success: false, error: 'Not authenticated', code: 'UNAUTHORIZED' }, { headers: V0_DEPRECATION_HEADERS, status: 401 });
     }
@@ -73,7 +73,7 @@ export async function PUT(
     const { userId } = await params;
 
     // Only allow users to update their own profile
-    if (auth.userId !== userId) {
+    if (user?.userId !== userId) {
       return NextResponse.json({ success: false, error: 'Forbidden', code: 'FORBIDDEN' }, { headers: V0_DEPRECATION_HEADERS, status: 403 });
     }
 

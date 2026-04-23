@@ -15,7 +15,7 @@ export async function GET(
 ) {
   try {
     const env = getEnv();
-    const auth = getAuthUserFromRequest(request, env.JWT_SECRET);
+    const { success, user } = getAuthUserFromRequest(request);
     if (!auth) {
       return NextResponse.json(
         { success: false, error: 'Not authenticated', code: 'UNAUTHORIZED' },
@@ -47,7 +47,7 @@ export async function GET(
     }
 
     // Verify ownership
-    if (flow.project.userId !== auth.userId) {
+    if (flow.project.userId !== user?.userId) {
       return NextResponse.json(
         { success: false, error: 'Forbidden', code: 'FORBIDDEN' },
         { status: 403 }
@@ -81,7 +81,7 @@ export async function PUT(
 ) {
   try {
     const env = getEnv();
-    const auth = getAuthUserFromRequest(request, env.JWT_SECRET);
+    const { success, user } = getAuthUserFromRequest(request);
     if (!auth) {
       return NextResponse.json(
         { success: false, error: 'Not authenticated', code: 'UNAUTHORIZED' },
@@ -106,7 +106,7 @@ export async function PUT(
       );
     }
 
-    if (existingFlow.project.userId !== auth.userId) {
+    if (existingFlow.project.userId !== user?.userId) {
       return NextResponse.json(
         { success: false, error: 'Forbidden', code: 'FORBIDDEN' },
         { status: 403 }
@@ -154,7 +154,7 @@ export async function DELETE(
 ) {
   try {
     const env = getEnv();
-    const auth = getAuthUserFromRequest(request, env.JWT_SECRET);
+    const { success, user } = getAuthUserFromRequest(request);
     if (!auth) {
       return NextResponse.json(
         { success: false, error: 'Not authenticated', code: 'UNAUTHORIZED' },
@@ -179,7 +179,7 @@ export async function DELETE(
       );
     }
 
-    if (flow.project.userId !== auth.userId) {
+    if (flow.project.userId !== user?.userId) {
       return NextResponse.json(
         { success: false, error: 'Forbidden', code: 'FORBIDDEN' },
         { status: 403 }

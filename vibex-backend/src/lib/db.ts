@@ -52,6 +52,13 @@ interface Env {
 // Connection Pool Configuration
 // ============================================
 
+type PrismaClientType = {
+  $queryRawUnsafe: (sql: string, ...params: unknown[]) => Promise<unknown>;
+  $executeRawUnsafe: (sql: string, ...params: unknown[]) => Promise<number>;
+  $transaction: any;
+  $disconnect: () => Promise<unknown>;
+};
+
 interface PoolConfig {
   maxConnections: number;
   minConnections: number;
@@ -254,10 +261,10 @@ export async function queryDB<T = unknown>(
   } else {
     // Fallback to Prisma with connection pool
     const prismaManager = getPrismaPoolManager();
-    const prisma = prismaManager.getClient() as ReturnType<typeof import('@prisma/client')['PrismaClient']['prototype']['constructor']>;
+    const prisma = prismaManager.getClient() as PrismaClientType;
     
     try {
-      const result = await prisma.$queryRawUnsafe<T[]>(sql, ...params);
+      const result = (await prisma.$queryRawUnsafe(sql, ...params)) as T[];
       return Array.isArray(result) ? result : [];
     } catch (error) {
       safeError('Prisma query error:', error);
@@ -310,7 +317,7 @@ export async function executeDB(
     });
   } else {
     const prismaManager = getPrismaPoolManager();
-    const prisma = prismaManager.getClient() as ReturnType<typeof import('@prisma/client')['PrismaClient']['prototype']['constructor']>;
+    const prisma = prismaManager.getClient() as PrismaClientType;
     
     try {
       const result = await prisma.$executeRawUnsafe(sql, ...params);
@@ -345,9 +352,9 @@ export async function transactionDB(
   } else {
     // Use Prisma transaction
     const prismaManager = getPrismaPoolManager();
-    const prisma = prismaManager.getClient() as ReturnType<typeof import('@prisma/client')['PrismaClient']['prototype']['constructor']>;
+    const prisma = prismaManager.getClient() as PrismaClientType;
     
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: PrismaClientType) => {
       let totalChanges = 0;
       const lastRowId: number | bigint = 0;
       

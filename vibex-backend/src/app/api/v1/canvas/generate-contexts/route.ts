@@ -51,7 +51,7 @@ export const dynamic = 'force-dynamic';
 // Auth helper for canvas routes
 async function requireAuth(req: NextRequest) {
   const env = getLocalEnv();
-  const auth = getAuthUserFromRequest(req, env.JWT_SECRET);
+  const { success, user } = getAuthUserFromRequest(req);
   if (!auth) {
     return new NextResponse(
       JSON.stringify({ error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' }),

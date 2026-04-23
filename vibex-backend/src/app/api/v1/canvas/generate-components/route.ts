@@ -107,7 +107,7 @@ async function requireAuth(req: NextRequest) {
   const jwt = await import('jsonwebtoken');
   try {
     const env = getLocalEnv();
-    return getAuthUserFromRequest(req, env.JWT_SECRET);
+    return getAuthUserFromRequest(req);
   } catch {
     return new NextResponse(
       JSON.stringify({ error: 'Invalid or expired token', code: 'UNAUTHORIZED' }),

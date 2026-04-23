@@ -42,8 +42,8 @@ export const dynamic = 'force-dynamic';
 // GET /api/v1/templates - List templates with optional industry filter
 export async function GET(request: NextRequest) {
   // Auth check
-  const auth = await getAuthUserFromRequest(request);
-  if (!auth.success) {
+  const { success, user } = getAuthUserFromRequest(request);
+  if (!success) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

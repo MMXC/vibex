@@ -21,7 +21,7 @@ export async function DELETE(
 ) {
   try {
     const env = getEnv();
-    const auth = getAuthUserFromRequest(request, env.JWT_SECRET);
+    const { success, user } = getAuthUserFromRequest(request);
     if (!auth) {
       return NextResponse.json({ success: false, error: 'Not authenticated', code: 'UNAUTHORIZED' }, { headers: V0_DEPRECATION_HEADERS, status: 401 });
     }
@@ -41,7 +41,7 @@ export async function DELETE(
     }
 
     // Only allow users to delete their own messages
-    if (message.project.userId !== auth.userId) {
+    if (message.project.userId !== user?.userId) {
       return NextResponse.json({ success: false, error: 'Forbidden', code: 'FORBIDDEN' }, { headers: V0_DEPRECATION_HEADERS, status: 403 });
     }
 

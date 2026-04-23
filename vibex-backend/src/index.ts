@@ -93,7 +93,7 @@ app.get('/', (c) => {
 
 // E3: Health check endpoint — no auth required
 app.get('/health', (c) => {
-  const env = c.env as Record<string, unknown>;
+  const env = c.env as unknown as Record<string, unknown>;
   const nodeEnv = typeof process !== 'undefined' ? process.env?.NODE_ENV : undefined;
   return c.json({
     status: 'healthy',

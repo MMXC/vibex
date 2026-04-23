@@ -1,3 +1,9 @@
+### [Unreleased] vibex-proposals-20260424 E4-U1-U2: Import/Export 完整集成 — 2026-04-24
+- **E4-U1 Import/Export完整集成**: lib/import-export/api.ts API客户端, 5MB文件校验, JSON/YAML导入导出
+- **E4-U2 Import/Export UI集成**: ImportExportCard.tsx 拖拽上传, 导出按钮, 错误/成功状态
+- **Files**: lib/import-export/api.ts, components/import-export/, tests/e2e/import-export-roundtrip.spec.ts
+- 提交: 4e8c4ce7
+
 ### [Unreleased] vibex-proposals-20260424 E3-U1-U4: Teams API前端集成 — 2026-04-24
 - **E3-U1 团队列表页面**: /dashboard/teams, TanStack Query, TeamList组件
 - **E3-U2 创建团队Dialog**: 表单验证(1-100/500), 乐观更新onMutate/onError/onSettled

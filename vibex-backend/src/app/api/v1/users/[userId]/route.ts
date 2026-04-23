@@ -31,7 +31,7 @@ export async function GET(
       );
     }
 
-    const user = await prisma.user.findUnique({
+    const userRecord = await prisma.user.findUnique({
       where: { id: userId },
       select: {
         id: true,
@@ -98,7 +98,7 @@ export async function PUT(
       updateData.password = await hashPassword(password);
     }
 
-    const user = await prisma.user.update({
+    const userRecord = await prisma.user.update({
       where: { id: userId },
       data: updateData,
       select: {

@@ -32,8 +32,8 @@ async function requireAuth(req: NextRequest) {
   if (!success) {
     throw new AuthError('Unauthorized: authentication required');
   }
-  return auth;
-}
+  return { success, user };
+    }
 
 export async function POST(request: NextRequest) {
   // E1: Authentication check

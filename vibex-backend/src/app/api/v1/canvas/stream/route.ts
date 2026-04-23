@@ -28,15 +28,15 @@ export const dynamic = 'force-dynamic';
 function checkAuth(req: NextRequest) {
   const env = getLocalEnv();
   const { success, user } = getAuthUserFromRequest(req);
-  return auth ? { auth, error: null } : { auth: null, error: 'Unauthorized' };
+  return { success, user };
 }
 
 export async function GET(request: NextRequest) {
   // E1: Authentication check
-  const { auth, error } = checkAuth(request);
-  if (!auth) {
+  const { success, user } = getAuthUserFromRequest(request);
+  if (!success) {
     return NextResponse.json(
-      { error, code: 'UNAUTHORIZED' },
+      { error: "Unauthorized", code: "UNAUTHORIZED" },
       { status: 401 }
     );
   }

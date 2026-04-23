@@ -1,3 +1,9 @@
+### [Unreleased] vibex-proposals-20260424 E5-U1-U2: 多文件组件批量导出 — 2026-04-24
+- **E5-U1 多文件组件导出**: batch-export/route.ts JSZip生成ZIP, max 100组件, 5MB限制
+- **E5-U2 批量导出UI**: BatchExportCard.tsx 组件多选, Select All/None, 导出ZIP
+- **Files**: batch-export/route.ts, BatchExportCard.tsx, tests/e2e/batch-export.spec.ts
+- 提交: 5d1dce08
+
 ### [Unreleased] vibex-proposals-20260424 E4-U1-U2: Import/Export 完整集成 — 2026-04-24
 - **E4-U1 Import/Export完整集成**: lib/import-export/api.ts API客户端, 5MB文件校验, JSON/YAML导入导出
 - **E4-U2 Import/Export UI集成**: ImportExportCard.tsx 拖拽上传, 导出按钮, 错误/成功状态

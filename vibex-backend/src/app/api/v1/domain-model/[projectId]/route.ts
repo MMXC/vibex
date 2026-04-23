@@ -36,16 +36,16 @@ import { getLocalEnv } from '@/lib/env';
 function checkAuth(req: NextRequest) {
   const env = getLocalEnv();
   const { success, user } = getAuthUserFromRequest(req);
-  return auth;
-}
+  return { success, user };
+    }
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ projectId: string }> }
 ) {
   // E1: Authentication check
-  const auth = checkAuth(request);
-  if (!auth) {
+  const { success, user } = checkAuth(request);
+    if (!success) {
     return NextResponse.json(
       { success: false, error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' },
       { status: 401 }
@@ -105,8 +105,8 @@ export async function GET(
  */
 export async function POST(request: NextRequest) {
   // E1: Authentication check
-  const auth = checkAuth(request);
-  if (!auth) {
+  const { success, user } = checkAuth(request);
+    if (!success) {
     return NextResponse.json(
       { success: false, error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' },
       { status: 401 }

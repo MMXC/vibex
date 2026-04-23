@@ -58,8 +58,8 @@ async function requireAuth(req: NextRequest) {
       { status: 401, headers: { 'Content-Type': 'application/json' } }
     );
   }
-  return auth;
-}
+  return { success, user };
+    }
 
 export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse>> {
   // E1: Authentication check

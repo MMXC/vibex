@@ -252,13 +252,13 @@ export async function GET() {
 function checkAuth(req: NextRequest) {
   const env = getLocalEnv();
   const { success, user } = getAuthUserFromRequest(req);
-  return auth;
-}
+  return { success, user };
+    }
 
 export async function POST(request: NextRequest) {
   // E1: Authentication check
-  const auth = checkAuth(request);
-  if (!auth) {
+  const { success, user } = checkAuth(request);
+    if (!success) {
     return new Response(JSON.stringify({ error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' },

@@ -18,13 +18,13 @@ export const dynamic = 'force-dynamic';
 function checkAuth(req: NextRequest) {
   const env = getLocalEnv();
   const { success, user } = getAuthUserFromRequest(req);
-  return auth;
-}
+  return { success, user };
+    }
 
 export async function POST(request: NextRequest) {
   // E1: Authentication check
-  const auth = checkAuth(request);
-  if (!auth) {
+  const { success, user } = checkAuth(request);
+    if (!success) {
     return NextResponse.json(
       { error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' },
       { status: 401 }

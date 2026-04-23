@@ -121,13 +121,13 @@ async function* streamFromMiniMax(messages: ChatMessage[], conversationId: strin
 function checkAuth(req: NextRequest) {
   const env = getLocalEnv();
   const { success, user } = getAuthUserFromRequest(req);
-  return auth;
-}
+  return { success, user };
+    }
 
 export const POST = validateBody(chatMessageSchema, async (body, req: NextRequest) => {
   // E1: Authentication check
-  const auth = checkAuth(req);
-  if (!auth) {
+  const { success, user } = checkAuth(req);
+    if (!success) {
     return new Response(JSON.stringify({ error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' }), { status: 401,
       headers: { ...V0_DEPRECATION_HEADERS,  'Content-Type': 'application/json'  } });
   }

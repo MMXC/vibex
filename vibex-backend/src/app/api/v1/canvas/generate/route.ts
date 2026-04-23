@@ -29,7 +29,7 @@ const MINIMAX_MODEL = process.env.MINIMAX_MODEL || 'abab6.5s-chat';
 async function requireAuth(req: NextRequest) {
   const env = getLocalEnv();
   const { success, user } = getAuthUserFromRequest(req);
-  if (!auth) {
+  if (!success) {
     throw new AuthError('Unauthorized: authentication required');
   }
   return auth;

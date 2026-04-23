@@ -17,7 +17,7 @@ const DEPRECATION_HEADERS = {
 export async function GET(request: NextRequest) {
   const env = getLocalEnv();
   const { success, user } = getAuthUserFromRequest(request);
-  if (!auth) {
+  if (!success) {
     return NextResponse.json({ error: 'Unauthorized: authentication required' }, { status: 401 });
   }
 

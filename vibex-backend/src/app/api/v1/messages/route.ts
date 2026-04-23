@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   try {
     const env = getEnv();
     const { success, user } = getAuthUserFromRequest(request);
-    if (!auth) {
+    if (!success) {
       return NextResponse.json(
         { success: false, error: 'Not authenticated', code: 'UNAUTHORIZED' },
         { status: 401 }
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
   try {
     const env = getEnv();
     const { success, user } = getAuthUserFromRequest(request);
-    if (!auth) {
+    if (!success) {
       return NextResponse.json(
         { success: false, error: 'Not authenticated', code: 'UNAUTHORIZED' },
         { status: 401 }

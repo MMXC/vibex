@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
   // E1-S4: Use consolidated auth via getAuthUserFromRequest (reads from Hono headers + JWT fallback)
   const env = getLocalEnv();
   const { success, user } = getAuthUserFromRequest(request);
-  if (!auth) {
+  if (!success) {
     return NextResponse.json(
       { error: 'Unauthorized: authentication required', code: 'AUTH_ERROR' },
       { status: 401 }

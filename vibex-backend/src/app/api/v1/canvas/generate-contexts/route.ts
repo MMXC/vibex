@@ -52,7 +52,7 @@ export const dynamic = 'force-dynamic';
 async function requireAuth(req: NextRequest) {
   const env = getLocalEnv();
   const { success, user } = getAuthUserFromRequest(req);
-  if (!auth) {
+  if (!success) {
     return new NextResponse(
       JSON.stringify({ error: 'Unauthorized: authentication required', code: 'UNAUTHORIZED' }),
       { status: 401, headers: { 'Content-Type': 'application/json' } }

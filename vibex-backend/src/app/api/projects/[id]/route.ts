@@ -27,7 +27,7 @@ export async function GET(
     const env = getLocalEnv();
     const { success, user } = getAuthUserFromRequest(request);
 
-    if (!auth) {
+    if (!success) {
       return NextResponse.json(
         { error: 'Unauthorized: authentication required' },
         { status: 401 }
@@ -76,7 +76,7 @@ export async function PUT(
     const env = getLocalEnv();
     const { success, user } = getAuthUserFromRequest(request);
 
-    if (!auth) {
+    if (!success) {
       return NextResponse.json(
         { error: 'Unauthorized: authentication required' },
         { status: 401 }
@@ -127,7 +127,7 @@ export async function DELETE(
     const env = getLocalEnv();
     const { success, user } = getAuthUserFromRequest(request);
 
-    if (!auth) {
+    if (!success) {
       return NextResponse.json(
         { error: 'Unauthorized: authentication required' },
         { status: 401 }

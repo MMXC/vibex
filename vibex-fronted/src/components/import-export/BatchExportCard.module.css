@@ -1,0 +1,144 @@
+/* BatchExportCard.module.css */
+
+.card {
+  padding: 20px;
+  background: var(--color-surface-elevated, #fff);
+  border: 1px solid var(--color-border-subtle, #e5e7eb);
+  border-radius: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary, #111827);
+}
+
+.headerActions {
+  display: flex;
+  gap: 8px;
+}
+
+.smallBtn {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid var(--color-border-default, #d1d5db);
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--color-text-secondary, #6b7280);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.smallBtn:hover {
+  background: var(--color-surface-muted, #f3f4f6);
+}
+
+.componentList {
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border-subtle, #e5e7eb);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.emptyState {
+  padding: 24px;
+  text-align: center;
+  color: var(--color-text-tertiary, #9ca3af);
+  font-size: 14px;
+}
+
+.componentItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border-subtle, #e5e7eb);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.componentItem:last-child {
+  border-bottom: none;
+}
+
+.componentItem:hover {
+  background: var(--color-surface-muted, #f9fafb);
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary, #4f46e5);
+  cursor: pointer;
+}
+
+.componentName {
+  font-size: 14px;
+  color: var(--color-text-primary, #111827);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.selectionInfo {
+  font-size: 13px;
+  color: var(--color-text-secondary, #6b7280);
+  margin-bottom: 12px;
+}
+
+.limitWarning {
+  color: var(--color-error, #dc2626);
+  font-weight: 500;
+}
+
+.exportBtn {
+  width: 100%;
+  padding: 12px 20px;
+  background: var(--color-primary, #4f46e5);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.exportBtn:hover:not(:disabled) {
+  background: var(--color-primary-hover, #4338ca);
+}
+
+.exportBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.errorMsg {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--color-error-bg, #fef2f2);
+  border: 1px solid var(--color-error, #dc2626);
+  border-radius: 8px;
+  color: var(--color-error, #dc2626);
+  font-size: 13px;
+}
+
+.successMsg {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--color-success-bg, #f0fdf4);
+  border: 1px solid var(--color-success, #16a34a);
+  border-radius: 8px;
+  color: var(--color-success, #16a34a);
+  font-size: 13px;
+}

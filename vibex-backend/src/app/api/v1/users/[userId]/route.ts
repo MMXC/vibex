@@ -43,7 +43,7 @@ export async function GET(
       },
     });
 
-    if (!user) {
+    if (!userRecord) {
       return NextResponse.json(
         { success: false, error: 'User not found', code: 'NOT_FOUND' },
         { status: 404 }
@@ -52,7 +52,7 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      data: user,
+      data: userRecord,
     });
   } catch (error) {
     safeError('Get user error:', error);
@@ -113,7 +113,7 @@ export async function PUT(
 
     return NextResponse.json({
       success: true,
-      data: user,
+      data: userRecord,
     });
   } catch (error) {
     safeError('Update user error:', error);

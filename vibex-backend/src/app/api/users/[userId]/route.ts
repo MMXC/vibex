@@ -45,13 +45,13 @@ export async function GET(
       },
     });
 
-    if (!user) {
+    if (!userRecord) {
       return NextResponse.json({ success: false, error: 'User not found', code: 'NOT_FOUND' }, { headers: V0_DEPRECATION_HEADERS, status: 404 });
     }
 
     return NextResponse.json({
       success: true,
-      data: user,
+      data: userRecord,
     }, { headers: V0_DEPRECATION_HEADERS });
   } catch (error) {
     safeError('Get user error:', error);
@@ -103,7 +103,7 @@ export async function PUT(
 
     return NextResponse.json({
       success: true,
-      data: user,
+      data: userRecord,
     }, { headers: V0_DEPRECATION_HEADERS });
   } catch (error) {
     safeError('Update user error:', error);

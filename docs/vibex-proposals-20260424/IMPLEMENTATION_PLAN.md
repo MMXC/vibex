@@ -10,7 +10,7 @@
 
 | Epic | Units | Status | Next |
 |------|-------|--------|------|
-| E1: 后端 TS 债务清理 | E1-U1 ~ E1-U3 | 0/3 | E1-U1 |
+| E1: 后端 TS 债务清理 | E1-U1 ~ E1-U4 | 3/4 | E1-U1 |
 | E2: 实时协作可行性验证 | E2-U1 ~ E2-U3 | 0/3 | E2-U1 |
 | E3: Teams API 前端集成 | E3-U1 ~ E3-U4 | 0/4 | E3-U1 |
 | E4: Import/Export 完整集成 | E4-U1 ~ E4-U2 | 0/2 | E4-U1 |
@@ -23,9 +23,9 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E1-U1 | 修复 auth 签名不匹配 | 🔄 | — | `getAuthUserFromRequest(request)` 调用签名统一为 1 参数（header 注入 env） |
-| E1-U2 | 修复 `lib/db.ts` 泛型约束 | 🔄 | — | `tsc --noEmit` 中 `Function` 类型约束错误归零 |
-| E1-U3 | 修复 Prisma/CloudflareEnv 类型 | 🔄 | — | `PrismaClient` 单例模式正确，`CloudflareEnv` 绑定无泄漏 |
+| E1-U1 | 修复 auth 签名不匹配 | ✅ | — | `getAuthUserFromRequest(request)` 调用签名统一为 1 参数（header 注入 env） |
+| E1-U2 | 修复 `lib/db.ts` 泛型约束 | ✅ | — | `tsc --noEmit` 中 `Function` 类型约束错误归零 |
+| E1-U3 | 修复 Prisma/CloudflareEnv 类型 | ✅ | — | `PrismaClient` 单例模式正确，`CloudflareEnv` 绑定无泄漏 |
 | E1-U4 | CI 门禁：tsc + as any 监控 | ⬜ | E1-U3 | CI pipeline 包含 `tsc --noEmit` + `as any` grep 检查 |
 
 ### E1-U1 详细说明

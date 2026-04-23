@@ -22,7 +22,7 @@ export async function DELETE(
   try {
     const env = getEnv();
     const { success, user } = getAuthUserFromRequest(request);
-    if (!auth) {
+    if (!success) {
       return NextResponse.json({ success: false, error: 'Not authenticated', code: 'UNAUTHORIZED' }, { headers: V0_DEPRECATION_HEADERS, status: 401 });
     }
 

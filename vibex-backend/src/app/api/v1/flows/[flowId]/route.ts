@@ -16,7 +16,7 @@ export async function GET(
   try {
     const env = getEnv();
     const { success, user } = getAuthUserFromRequest(request);
-    if (!auth) {
+    if (!success) {
       return NextResponse.json(
         { success: false, error: 'Not authenticated', code: 'UNAUTHORIZED' },
         { status: 401 }
@@ -82,7 +82,7 @@ export async function PUT(
   try {
     const env = getEnv();
     const { success, user } = getAuthUserFromRequest(request);
-    if (!auth) {
+    if (!success) {
       return NextResponse.json(
         { success: false, error: 'Not authenticated', code: 'UNAUTHORIZED' },
         { status: 401 }
@@ -155,7 +155,7 @@ export async function DELETE(
   try {
     const env = getEnv();
     const { success, user } = getAuthUserFromRequest(request);
-    if (!auth) {
+    if (!success) {
       return NextResponse.json(
         { success: false, error: 'Not authenticated', code: 'UNAUTHORIZED' },
         { status: 401 }

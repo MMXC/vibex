@@ -9,13 +9,13 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { PresenceAvatarUser } from '@/components/canvas/Presence/PresenceAvatars';
+import type { PresenceUser } from '@/lib/firebase/presence';
 
 // Default hardcoded users for MVP UI verification
-const MOCK_USERS: PresenceAvatarUser[] = [
-  { userId: 'user-1', name: 'Alice', color: '#4F46E5' },
-  { userId: 'user-2', name: 'Bob', color: '#059669' },
-  { userId: 'user-3', name: 'Carol', color: '#DC2626' },
+const MOCK_USERS: PresenceUser[] = [
+  { userId: 'user-1', name: 'Alice', color: '#4F46E5', lastSeen: Date.now() },
+  { userId: 'user-2', name: 'Bob', color: '#059669', lastSeen: Date.now() },
+  { userId: 'user-3', name: 'Carol', color: '#DC2626', lastSeen: Date.now() },
 ];
 
 export interface UsePresenceOptions {
@@ -27,7 +27,7 @@ export interface UsePresenceOptions {
 
 export interface UsePresenceReturn {
   /** List of online users on the current page */
-  onlineUsers: PresenceAvatarUser[];
+  onlineUsers: PresenceUser[];
   /** Set current user's presence (call on mount, update on activity) */
   setPresence: (userId: string, userName: string, color?: string) => void;
   /** Clear current user's presence (call on unmount) */
@@ -55,7 +55,7 @@ export function usePresence({
   pageId,
   mockMode = true,
 }: UsePresenceOptions): UsePresenceReturn {
-  const [onlineUsers, setOnlineUsers] = useState<PresenceAvatarUser[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<PresenceUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Initialize with mock data in mock mode

@@ -1,3 +1,9 @@
+### [Unreleased] vibex-sprint7-fix EpicE1: CI TypeScript Gate — 2026-04-24
+- **E1-U1 TypeScript Gate**: CI新增typecheck-backend+typecheck-frontend独立job, tsc --noEmit作为独立gate
+- **E1-U2 as any Baseline**: CI新增as-any-baseline job, 基线163 pre-existing存量
+- **Files**: .github/workflows/test.yml, AGENTS.md, AS_ANY_BASELINE.md
+- 提交: 6b4e432c
+
 ### [Unreleased] vibex-sprint7-fix EpicE5: Batch Export Real DB + KV — 2026-04-24
 - **E5-U1 ZipArchiveService**: 真实D1查询, JSZip生成Uint8Array ZIP, manifest.json索引
 - **E5-U2 KV存储**: batch-export路由POST返回download URL, KV.put(base64) 5min TTL

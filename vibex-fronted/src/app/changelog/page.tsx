@@ -20,6 +20,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.297',
+    date: '2026-04-24',
+    changes: [
+      '📋 vibex-sprint7-fix EpicE1: CI TypeScript Gate',
+      '✅ E1-U1 TypeScript Gate: typecheck-backend+typecheck-frontend独立job',
+      '✅ E1-U2 as any Baseline: 基线163, pre-existing存量',
+    ],
+    commit: '6b4e432c',
+  },
+  {
     version: '1.0.296',
     date: '2026-04-24',
     changes: [

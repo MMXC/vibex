@@ -24,6 +24,7 @@ export interface CloudflareEnv {
   DOUBAO_MODEL?: string;
   COLLABORATION_KV?: KVNamespace;
   NOTIFICATION_KV?: KVNamespace;
+  EXPORT_KV?: KVNamespace;
 }
 
 // D1 types

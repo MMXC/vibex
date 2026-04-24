@@ -1,160 +1,157 @@
 /**
  * Batch Export API — Backend ZIP generation for multiple components
- * E5: 多文件组件导出
+ * EpicE5: Batch Export with Real DB + KV
  *
- * Generates ZIP files containing multiple components as JSON files
- * with a manifest.json index.
+ * 流程：
+ * 1. 校验请求（projectId, componentIds）
+ * 2. D1 查询真实组件数据
+ * 3. ZipArchiveService 生成 ZIP（Uint8Array）
+ * 4. KV 存储 ZIP（5min TTL）
+ * 5. 返回一次性下载 URL
  *
- * Constraints:
- * - Max 100 components per export
- * - Total ZIP size < 5MB
- * - Signed URL valid for 5 minutes
+ * 约束：
+ * - 禁止 Buffer（Workers 不支持），使用 Uint8Array
+ * - Max 100 components, Max 5MB ZIP
+ * - KV key 一次性下载后删除
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserFromRequest } from '@/lib/authFromGateway';
-
-export interface BatchExportComponent {
-  id: string;
-  name: string;
-  type: string;
-  content: string;
-  version: number;
-  updatedAt: string;
-}
+import { zipArchiveService, type ComponentExport } from '@/services/ZipArchiveService';
+import { getLocalEnv } from '@/lib/env';
 
 export interface BatchExportRequest {
   projectId: string;
   componentIds: string[];
-  format: 'json' | 'yaml';
+  format?: 'json' | 'yaml';
 }
 
-export interface BatchExportResult {
+export interface BatchExportResponse {
   success: boolean;
   downloadUrl?: string;
   expiresAt?: string;
+  componentCount?: number;
+  sizeBytes?: number;
   error?: string;
 }
 
 const MAX_COMPONENTS = 100;
 const MAX_ZIP_SIZE = 5 * 1024 * 1024; // 5MB
-
-/**
- * Generate ZIP content from components
- * Each component is a JSON file named {id}.json
- * Plus a manifest.json with metadata
- */
-async function generateZip(components: BatchExportComponent[]): Promise<Buffer> {
-  // Lazy load JSZip only when needed
-  const JSZip = (await import('jszip')).default;
-  const zip = new JSZip();
-
-  // Add manifest
-  const manifest = {
-    exportDate: new Date().toISOString(),
-    componentCount: components.length,
-    components: components.map((c) => ({
-      id: c.id,
-      name: c.name,
-      type: c.type,
-      version: c.version,
-    })),
-  };
-  zip.file('manifest.json', JSON.stringify(manifest, null, 2));
-
-  // Add each component as JSON file
-  for (const component of components) {
-    const filename = `${component.id}.json`;
-    zip.file(filename, JSON.stringify(component, null, 2));
-  }
-
-  const zipBuffer = await zip.generateAsync({ type: 'base64' });
-  return Buffer.from(zipBuffer, 'base64');
-}
-
-/**
- * Validate batch export request
- */
-function validateRequest(data: BatchExportRequest): string[] {
-  const errors: string[] = [];
-
-  if (!data.projectId) {
-    errors.push('projectId is required');
-  }
-
-  if (!Array.isArray(data.componentIds) || data.componentIds.length === 0) {
-    errors.push('componentIds must be a non-empty array');
-  }
-
-  if (data.componentIds.length > MAX_COMPONENTS) {
-    errors.push(`Maximum ${MAX_COMPONENTS} components per export`);
-  }
-
-  if (!['json', 'yaml'].includes(data.format)) {
-    errors.push('format must be json or yaml');
-  }
-
-  return errors;
-}
+const KV_TTL_SECONDS = 300; // 5 minutes
 
 // POST /api/v1/projects/batch-export
 export async function POST(request: NextRequest) {
-  // Auth check
-  const { success } = getAuthUserFromRequest(request);
-  if (!success) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { user, success } = getAuthUserFromRequest(request);
+  if (!success || !user) {
+    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
+  const userId = user.userId;
 
   try {
     const body: BatchExportRequest = await request.json();
 
     // Validate
-    const errors = validateRequest(body);
-    if (errors.length > 0) {
+    if (!body.projectId) {
       return NextResponse.json(
-        { success: false, error: errors.join(', ') },
+        { success: false, error: 'projectId is required' },
+        { status: 400 }
+      );
+    }
+    if (!Array.isArray(body.componentIds) || body.componentIds.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'componentIds must be a non-empty array' },
+        { status: 400 }
+      );
+    }
+    if (body.componentIds.length > MAX_COMPONENTS) {
+      return NextResponse.json(
+        { success: false, error: `Maximum ${MAX_COMPONENTS} components per export` },
         { status: 400 }
       );
     }
 
-    // In MVP, we return mock data (no actual DB query)
-    // Full implementation would:
-    // 1. Query DB for components
-    // 2. Validate each component belongs to projectId
-    // 3. Generate ZIP
-    // 4. Upload to storage (Cloudflare R2 or similar)
-    // 5. Return signed URL with 5min expiry
+    // ================================================================
+    // E5-U2: 真实 D1 查询
+    // ================================================================
+    const env = getLocalEnv();
+    const db = env.DB;
+    const kv = env.EXPORT_KV;
 
-    const mockComponents: BatchExportComponent[] = body.componentIds.slice(0, 5).map((id, i) => ({
-      id,
-      name: `Component ${i + 1}`,
-      type: 'canvas-component',
-      content: JSON.stringify({ id, nodes: [] }),
-      version: 1,
-      updatedAt: new Date().toISOString(),
+    // D1 不支持 IN () 直接绑定，用 placeholders + bind
+    const placeholders = body.componentIds.map((_, i) => `$${i + 1}`).join(', ');
+    const query = `SELECT id, name, type, props, version, updatedAt as updatedAt
+FROM components
+WHERE id IN (${placeholders}) AND project_id = $${body.componentIds.length + 1}
+LIMIT ${MAX_COMPONENTS}`;
+
+    const stmt = db.prepare(query);
+    const boundStmt = stmt.bind(...body.componentIds, body.projectId);
+    const dbResult = await (boundStmt as { all: () => Promise<{ results: Array<{ id: string; name: string; type: string; props: string; version: number; updatedAt: string }> }> }).all();
+    const components = dbResult.results;
+
+    if (components.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'No components found for the given ids and project' },
+        { status: 404 }
+      );
+    }
+
+    // 转换为 ComponentExport
+    const exportComponents: ComponentExport[] = components.map((c) => ({
+      id: c.id,
+      name: c.name,
+      type: c.type,
+      data: c.props, // store the props as data
+      version: c.version,
+      updatedAt: c.updatedAt,
     }));
 
-    // Generate ZIP
-    const zipBuffer = await generateZip(mockComponents);
+    // ================================================================
+    // E5-U1: 生成 ZIP（Uint8Array）
+    // ================================================================
+    const zipBytes = await zipArchiveService.generateZip(exportComponents);
 
-    // Check size
-    if (zipBuffer.length > MAX_ZIP_SIZE) {
+    // ================================================================
+    // E5-U3: KV 暂存 + download URL
+    // ================================================================
+    if (zipBytes.length > MAX_ZIP_SIZE) {
       return NextResponse.json(
         { success: false, error: 'Export exceeds 5MB size limit' },
         { status: 413 }
       );
     }
 
-    // In MVP, we return the ZIP as base64 (production would use signed URL)
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 minutes
+    let downloadUrl = '/api/v1/projects/batch-export/download?key=';
+
+    if (kv) {
+      const key = `batch-export:${crypto.randomUUID()}`;
+      // KV.put accepts string; encode Uint8Array as base64
+      const base64 = btoa(String.fromCharCode(...zipBytes));
+      await kv.put(key, base64, {
+        expirationTtl: KV_TTL_SECONDS,
+      });
+      downloadUrl = `/api/v1/projects/batch-export/download?key=${key}`;
+    } else {
+      // KV not configured — embed ZIP as base64 (dev fallback, not for production)
+      const base64 = btoa(String.fromCharCode(...zipBytes));
+      return NextResponse.json({
+        success: true,
+        downloadUrl: undefined,
+        zipData: base64, // dev fallback only
+        componentCount: exportComponents.length,
+        sizeBytes: zipBytes.length,
+        expiresAt: new Date(Date.now() + KV_TTL_SECONDS * 1000).toISOString(),
+      });
+    }
+
+    const expiresAt = new Date(Date.now() + KV_TTL_SECONDS * 1000).toISOString();
 
     return NextResponse.json({
       success: true,
-      // MVP: base64 ZIP (production: signed URL)
-      zipData: zipBuffer.toString('base64'),
-      componentCount: mockComponents.length,
-      sizeBytes: zipBuffer.length,
+      downloadUrl,
       expiresAt,
+      componentCount: exportComponents.length,
+      sizeBytes: zipBytes.length,
     });
   } catch (error) {
     return NextResponse.json(

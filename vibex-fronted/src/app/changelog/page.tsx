@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.295',
+    date: '2026-04-24',
+    changes: [
+      '📋 vibex-sprint7-fix EpicE2: Firebase Presence 真实接入',
+      '✅ E2-U1 Firebase REST API: 零SDK依赖, fetch+EventSource实时同步, polling fallback',
+      '✅ E2-U2 PresenceAvatars四态: 理想态/空状态/加载态/错误态',
+      '✅ E2-U3 visibilitychange兜底: hidden时removePresence',
+      '✅ E2-U4 usePresence真实接入: setPresence/subscribeToOthers',
+    ],
+    commit: '3c092e14',
+  },
+  {
     version: '1.0.294',
     date: '2026-04-22',
     changes: [

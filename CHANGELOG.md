@@ -1,3 +1,10 @@
+### [Unreleased] vibex-proposals-20260425 P002: Firebase 实时协作验证 — 2026-04-25
+- **P002-S2 Firebase Cold Start**: 单元测试验证 isFirebaseConfigured() < 5ms, setPresence/subscribeToOthers mock < 10ms
+- **P002-S3 Presence Latency**: 单元测试验证 setPresence/subscribeToOthers/removePresence mock < 10ms, 多用户并发 < 50ms
+- **P002-S5 SSE Bridge E2E**: E2E 测试覆盖 Canvas SSE 完整事件序列
+- **Files**: src/lib/firebase/__tests__/firebase-config.test.ts, src/lib/firebase/__tests__/firebase-presence-latency.test.ts, tests/e2e/presence-mvp.spec.ts, tests/e2e/sse-e2e.spec.ts
+- 提交: eb51c4f7
+
 ### [Unreleased] vibex-proposals-20260425 P001: TypeScript 债务清理 — 2026-04-25
 - **P001 Backend TS Debt**: 后端 TypeScript 编译错误从 197 → 28（第一阶段），修复 ddd.ts/openapi.ts/logger.ts/notifier.ts/schemas/index.ts 等文件
 - **P001-Zod4 Compatibility**: ZodSchema 结构化接口替换 ZodType<unknown>，解决 Zod 4 复杂泛型内部不可赋值问题

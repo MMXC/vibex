@@ -20,7 +20,7 @@
 | Epic | Units | Status | Next |
 |------|-------|--------|------|
 | E2: Firebase Presence | E2-U1 ~ E2-U5 | 4/5 | E2-U5 |
-| E5: Batch Export + KV | E5-U1 ~ E5-U6 | 0/6 | E5-U1 |
+| E5: Batch Export + KV | E5-U1 ~ E5-U6 | 6/6 | — |
 | E1: CI TypeScript Gate | E1-U1 ~ E1-U2 | 0/2 | E1-U1 |
 
 **并行策略**: E2、E5 完全独立，可并行派发给两个 dev。E1 独立，可并行。
@@ -126,12 +126,12 @@ return () => {
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E5-U1 | ZipArchiveService 创建 | ⬜ | — | `generateZip()` 返回 `Uint8Array`（非 Buffer）；JSZip `generateAsync('blob')` + `arrayBuffer()` |
-| E5-U2 | batch-export/route.ts 真实 DB 查询 | ⬜ | E5-U1 | Prisma `findMany` 查询返回真实组件；移除 mock 数据；保留 100 组件上限 + 5MB 校验 |
-| E5-U3 | KV 暂存 + download URL | ⬜ | E5-U1, E5-U2 | `EXPORT_KV.put(key, zipBytes, {expirationTtl: 300})` 存储；返回 `/api/v1/projects/batch-export/download?key=` |
-| E5-U4 | download/route.ts 一次性下载 | ⬜ | E5-U3 | KV.get → 一次性 delete → 返回 `application/zip`；已下载/过期返回 404 |
-| E5-U5 | Wrangler EXPORT_KV binding | ⬜ | — | `wrangler.toml` 新增 `EXPORT_KV` namespace；`wrangler deploy` 不报错 |
-| E5-U6 | BatchExportCard 组件四态 | ⬜ | E5-U3 | 理想/空/加载/错误四态；下载链接 5 分钟倒计时提示；Toast 错误提示 |
+| E5-U1 | ZipArchiveService 创建 | ✅ | — | `generateZip()` 返回 `Uint8Array`（非 Buffer）；JSZip `generateAsync('blob')` + `arrayBuffer()` |
+| E5-U2 | batch-export/route.ts 真实 DB 查询 | ✅ | E5-U1 | Prisma `findMany` 查询返回真实组件；移除 mock 数据；保留 100 组件上限 + 5MB 校验 |
+| E5-U3 | KV 暂存 + download URL | ✅ | E5-U1, E5-U2 | `EXPORT_KV.put(key, zipBytes, {expirationTtl: 300})` 存储；返回 `/api/v1/projects/batch-export/download?key=` |
+| E5-U4 | download/route.ts 一次性下载 | ✅ | E5-U3 | KV.get → 一次性 delete → 返回 `application/zip`；已下载/过期返回 404 |
+| E5-U5 | Wrangler EXPORT_KV binding | ✅ | — | `wrangler.toml` 新增 `EXPORT_KV` namespace；`wrangler deploy` 不报错 |
+| E5-U6 | BatchExportCard 组件四态 | ✅ | E5-U3 | 理想/空/加载/错误四态；下载链接 5 分钟倒计时提示；Toast 错误提示 |
 
 ### E5-U1 详细说明
 

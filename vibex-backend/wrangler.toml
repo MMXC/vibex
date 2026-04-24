@@ -48,6 +48,12 @@ binding = "NOTIFICATION_KV"
 id = "1e01fb6a0da84d90870c800df2c6303a"
 preview_id = "1e01fb6a0da84d90870c800df2c6303a"
 
+# E5: Batch export KV store (5-min TTL for one-time download links)
+[[kv_namespaces]]
+binding = "EXPORT_KV"
+id = "EXPORT_KV_PLACEHOLDER"
+preview_id = "EXPORT_KV_PREVIEW_PLACEHOLDER"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["CollaborationRoom"]

@@ -104,6 +104,7 @@ export const errorHandler = async (err: Error | ApiError, c: Context, next: Next
   }
 
   await next()
+  return c.json({ success: false, error: { code: 'UNKNOWN_ERROR', message: 'An unknown error occurred' } }, 500)
 }
 
 /**

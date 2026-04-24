@@ -8,6 +8,7 @@ import {
   StructuredContext,
   CompressionConfig,
   ConfirmationState,
+  CompressionResult,
 } from './types'
 import { CompressionEngine } from './CompressionEngine'
 import { estimateTokens, estimateMessagesTokens } from '../../lib/token-utils'
@@ -81,6 +82,13 @@ export class SessionManager {
   }
 
   /**
+   * Alias for deleteSession
+   */
+  destroy(sessionId: string): boolean {
+    return this.deleteSession(sessionId)
+  }
+
+  /**
    * F1.4: Token 统计
    */
   getTokenCount(sessionId: string): number {
@@ -91,7 +99,7 @@ export class SessionManager {
   /**
    * F2.1: 添加消息
    */
-  async addMessage(sessionId: string, message: ChatMessage): Promise<void> {
+  async addMessage(sessionId: string, message: ChatMessage): Promise<CompressionResult | null> {
     const session = this.getOrCreateSession(sessionId)
 
     // 添加时间戳
@@ -112,8 +120,11 @@ export class SessionManager {
     // 检查是否需要压缩
     if (this.compressionEngine.needsCompression(session)) {
       debug(`[SessionManager] Triggering compression for ${sessionId}`)
-      await this.compressionEngine.compress(session)
+      const result = await this.compressionEngine.compress(session)
+      return result
     }
+
+    return null
   }
 
   /**
@@ -382,4 +393,24 @@ export class SessionManager {
 
     return cleaned
   }
+}
+
+// Singleton instance
+let _sessionManager: SessionManager | null = null
+
+/**
+ * Get the singleton SessionManager instance
+ */
+export function getSessionManager(config?: Partial<CompressionConfig>): SessionManager {
+  if (!_sessionManager) {
+    _sessionManager = new SessionManager(config)
+  }
+  return _sessionManager
+}
+
+/**
+ * Reset the singleton SessionManager (for testing)
+ */
+export function resetSessionManager(): void {
+  _sessionManager = null
 }

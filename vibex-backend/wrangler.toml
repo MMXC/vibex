@@ -33,6 +33,9 @@ zone_name = "vibex.top"
 
 # Durable Objects
 [[durable_objects.bindings]]
+name = "COLLABORATION_DO"
+class_name = "CollaborationRoom"
+[[durable_objects.bindings]]
 name = "COLLABORATION_ROOM"
 class_name = "CollaborationRoom"
 

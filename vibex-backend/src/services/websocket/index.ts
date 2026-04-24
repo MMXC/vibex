@@ -3,5 +3,7 @@
  * WebSocket 服务入口
  */
 
-export { ConnectionPool, WebSocketConnection, getConnectionPool, createConnectionPool } from './connectionPool';
-export { MessageRouter, WSMessage, WSResponse, getMessageRouter } from './messageRouter';
+export type { WebSocketConnection } from './connectionPool';
+export { ConnectionPool, getConnectionPool, createConnectionPool } from './connectionPool';
+export type { WSMessage, WSResponse } from './messageRouter';
+export { MessageRouter, getMessageRouter } from './messageRouter';

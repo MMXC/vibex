@@ -34,10 +34,10 @@ const collaborationWs = new Hono<{ Bindings: CloudflareEnv }>();
 collaborationWs.get('/collaboration', async (c) => {
   const env = c.env as CloudflareEnv;
 
-  // E2-S1: 获取 COLLABORATION_KV DO binding
-  const doNamespace = env.COLLABORATION_KV;
+  // E2-S1: 获取 COLLABORATION_DO binding
+  const doNamespace = env.COLLABORATION_DO;
   if (!doNamespace) {
-    return         c.json(apiError('Collaboration DO not configured', ERROR_CODES.INTERNAL_ERROR), 500);
+    return c.json(apiError('Collaboration DO not configured', ERROR_CODES.INTERNAL_ERROR), 500);
   }
 
   // 解析查询参数
@@ -70,9 +70,8 @@ collaborationWs.get('/collaboration', async (c) => {
   const doRequest = new Request(c.req.url, {
     method: 'GET',
     headers,
-    // @ts-expect-error - Cloudflare Workers 支持 duplex 请求体用于 WebSocket
     body: undefined,
-    // @ts-expect-error - Cloudflare Workers WebSocket 支持
+    // @ts-expect-error - Cloudflare Workers 支持 duplex 请求体用于 WebSocket
     duplex: 'half',
   });
 
@@ -85,9 +84,9 @@ collaborationWs.get('/collaboration', async (c) => {
     status: doResponse.status,
     statusText: doResponse.statusText,
     headers: doResponse.headers,
-    // @ts-expect-error - Cloudflare Workers WebSocket 支持
-    webSocket: doResponse.webSocket,
-  } satisfies ResponseInit);
+    // @ts-expect-error - webSocket 是 Cloudflare Workers Response 扩展属性
+    webSocket: doResponse.webSocket as unknown as undefined,
+  });
 });
 
 export default collaborationWs;

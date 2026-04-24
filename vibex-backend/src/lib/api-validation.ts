@@ -6,7 +6,7 @@
  */
 
 import { Context, Next, Hono } from 'hono';
-import { z, ZodType, ZodError } from 'zod';
+import { ZodError } from 'zod';
 import { ValidationError, JsonParseError } from './validation-error';
 
 import { safeError } from '@/lib/log-sanitizer';
@@ -32,10 +32,21 @@ export interface ValidatedContext extends Context {
 /**
  * Validation schema configuration
  */
+/**
+ * Minimal structural type satisfied by all Zod schemas.
+ * Avoids Zod 4's complex generic internals that make ZodObject
+ * not structurally compatible with ZodType<unknown>.
+ */
+export interface ZodSchema {
+  safeParse(data: unknown): { success: true; data: unknown } | { success: false; error: unknown };
+  safeParseAsync(data: unknown): Promise<{ success: true; data: unknown } | { success: false; error: unknown }>;
+  parse(data: unknown): unknown;
+}
+
 export interface ValidationSchemas {
-  body?: ZodType<unknown>;
-  param?: ZodType<unknown>;
-  query?: ZodType<unknown>;
+  body?: ZodSchema;
+  param?: ZodSchema;
+  query?: ZodSchema;
   /** @deprecated Use options.skipBody instead */
   skipBody?: boolean;
 }
@@ -98,16 +109,16 @@ async function parseBody(c: Context): Promise<Record<string, unknown>> {
  */
 function validateData<T>(
   data: unknown,
-  schema: ZodType<T>,
+  schema: ZodSchema,
   dataType: 'body' | 'param' | 'query'
 ): T {
   const result = schema.safeParse(data);
   
   if (!result.success) {
-    throw ValidationError.fromZodError(result.error);
+    throw ValidationError.fromZodError(result.error as Parameters<typeof ValidationError.fromZodError>[0]);
   }
   
-  return result.data;
+  return result.data as T;
 }
 
 // ==================== withValidation HOF ====================
@@ -201,7 +212,7 @@ export function withValidation(
 /**
  * Create a validation middleware for POST/PUT/PATCH routes
  */
-export function validateBody<T>(schema: ZodType<T>, handler: ValidatedHandler) {
+export function validateBody<T>(schema: ZodSchema, handler: ValidatedHandler) {
   return withValidation({ body: schema }, handler);
 }
 
@@ -209,7 +220,7 @@ export function validateBody<T>(schema: ZodType<T>, handler: ValidatedHandler) {
  * Create a validation middleware for GET routes with query params
  */
 export function validateQuery<T>(
-  schema: ZodType<T>,
+  schema: ZodSchema,
   handler: ValidatedHandler
 ) {
   return withValidation({ query: schema, skipBody: true }, handler);
@@ -219,7 +230,7 @@ export function validateQuery<T>(
  * Create a validation middleware for routes with path params
  */
 export function validateParams<T>(
-  schema: ZodType<T>,
+  schema: ZodSchema,
   handler: ValidatedHandler
 ) {
   return withValidation({ param: schema }, handler);

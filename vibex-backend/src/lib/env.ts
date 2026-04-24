@@ -8,6 +8,21 @@ interface KVNamespace {
   list(options?: { prefix?: string; limit?: number; cursor?: string }): Promise<{ keys: { name: string; expiration?: number }[]; cursor?: string; list_complete: boolean }>;
 }
 
+// DurableObjectNamespace type (Cloudflare Workers built-in)
+interface DurableObjectId {
+  toString(): string;
+  equals(other: DurableObjectId): boolean;
+}
+
+interface DurableObjectNamespace {
+  idFromName(name: string): DurableObjectId;
+  get(id: DurableObjectId): DurableObjectStub;
+}
+
+interface DurableObjectStub {
+  fetch(request: Request): Promise<Response>;
+}
+
 export interface CloudflareEnv {
   DB: D1Database;
   ENVIRONMENT?: string;
@@ -22,6 +37,9 @@ export interface CloudflareEnv {
   DOUBAO_API_KEY?: string;
   DOUBAO_API_BASE?: string;
   DOUBAO_MODEL?: string;
+  /** Durable Object binding for real-time collaboration WebSocket */
+  COLLABORATION_DO?: DurableObjectNamespace;
+  /** KV namespace for collaboration state */
   COLLABORATION_KV?: KVNamespace;
   NOTIFICATION_KV?: KVNamespace;
   EXPORT_KV?: KVNamespace;

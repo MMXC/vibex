@@ -1,3 +1,11 @@
+### [Unreleased] vibex-sprint7-fix EpicE2: Firebase Presence 真实接入 — 2026-04-24
+- **E2-U1 Firebase REST API**: 零SDK依赖, fetch+EventSource实时同步, polling fallback
+- **E2-U2 PresenceAvatars四态**: 理想态(彩色头像堆叠)/空状态(NoCollaboratorsIcon)/加载态(骨架屏)/错误态(WifiOffIcon)
+- **E2-U3 visibilitychange兜底**: document.visibilityState=hidden时removePresence清除
+- **E2-U4 usePresence真实接入**: usePresence hook调用setPresence/subscribeToOthers
+- **Files**: lib/firebase/presence.ts, hooks/usePresence.ts, components/canvas/Presence/PresenceAvatars.tsx, tests/e2e/presence-mvp.spec.ts
+- 提交: 3c092e14
+
 ### [Unreleased] vibex-proposals-20260424 E6-U1-U2: 性能可观测性落地 — 2026-04-24
 - **E6-U1 /health端点P50/P95/P99**: /api/health GET返回延迟指标, POST记录响应时间, 滑动窗口算法
 - **E6-U2 Web Vitals阈值监控**: LCP>4000ms→degraded, CLS>0.1→unhealthy, Cache-Control no-store

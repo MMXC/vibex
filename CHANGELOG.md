@@ -1,3 +1,9 @@
+### [Unreleased] vibex-proposals-20260424 E6-U1-U2: 性能可观测性落地 — 2026-04-24
+- **E6-U1 /health端点P50/P95/P99**: /api/health GET返回延迟指标, POST记录响应时间, 滑动窗口算法
+- **E6-U2 Web Vitals阈值监控**: LCP>4000ms→degraded, CLS>0.1→unhealthy, Cache-Control no-store
+- **Files**: src/app/api/health/route.ts, tests/e2e/health-api.spec.ts
+- 提交: aaeb4e4c
+
 ### [Unreleased] vibex-proposals-20260424 E5-U1-U2: 多文件组件批量导出 — 2026-04-24
 - **E5-U1 多文件组件导出**: batch-export/route.ts JSZip生成ZIP, max 100组件, 5MB限制
 - **E5-U2 批量导出UI**: BatchExportCard.tsx 组件多选, Select All/None, 导出ZIP

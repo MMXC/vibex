@@ -212,7 +212,7 @@ export function validateQuery<T>(
   handler: (query: T, request: NextRequest) => Promise<Response>
 ) {
   return withValidation(
-    { query: schema, skipBody: true },
+    { query: schema },
     async (data, request) => handler(data.query as T, request)
   );
 }

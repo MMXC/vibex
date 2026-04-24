@@ -15,7 +15,7 @@
  */
 
 import type { Context, Next } from 'hono';
-import type { ZodRawShape, ZodType, ZodError } from 'zod';
+import { z, type ZodRawShape, type ZodType, type ZodError } from 'zod';
 import { ValidationError } from './ValidationError';
 
 export interface ValidatedData<P = unknown, B = unknown, Q = Record<string, string>> {
@@ -83,6 +83,7 @@ async function parseBody(c: Context, bodySchema: ZodType | null): Promise<unknow
  * @param bodySchema   Zod schema for request body (null = skip body validation)
  * @param handler      Route handler receiving typed ctx.validatedData
  */
+// @ts-expect-error - overload implementation type mismatch (ContextWithValidated vs Context)
 export function withValidation<P extends ZodType, B extends ZodType>(
   paramSchema: P | null,
   bodySchema: B | null,

@@ -91,7 +91,7 @@ collaboration.get('/', async (c) => {
     }
     sql += ' ORDER BY createdAt DESC';
 
-    const results = await queryDB<CollaborationRow[]>(c.env, sql, params);
+    const results = await queryDB<CollaborationRow>(c.env, sql, params);
     return c.json({ success: true, data: results });
   } catch (error) {
     safeError('Error listing collaborations:', error);
@@ -117,7 +117,7 @@ collaboration.get('/:id', async (c) => {
     }
 
     // Get participants
-    const participants = await queryDB<CollaborationRow[]>(
+    const participants = await queryDB<CollaborationRow>(
       c.env,
       'SELECT * FROM PrototypeCollaboration WHERE projectId = ? AND status = ?',
       [collaboration.projectId, 'active']
@@ -146,7 +146,7 @@ collaboration.get('/:id', async (c) => {
 
 collaboration.post('/invite', async (c) => {
   try {
-    const user = getAuthUserFromHono(c, c.env);
+    const user = getAuthUserFromHono(c);
     if (!user) {
       return c.json(apiError('Unauthorized', ERROR_CODES.UNAUTHORIZED), 401);
     }
@@ -202,7 +202,7 @@ collaboration.post('/invite', async (c) => {
 
 collaboration.post('/:id/join', async (c) => {
   try {
-    const user = getAuthUserFromHono(c, c.env);
+    const user = getAuthUserFromHono(c);
     if (!user) {
       return c.json(apiError('Unauthorized', ERROR_CODES.UNAUTHORIZED), 401);
     }
@@ -272,7 +272,7 @@ collaboration.get('/:id/messages', async (c) => {
 
 collaboration.post('/:id/messages', async (c) => {
   try {
-    const user = getAuthUserFromHono(c, c.env);
+    const user = getAuthUserFromHono(c);
     if (!user) {
       return c.json(apiError('Unauthorized', ERROR_CODES.UNAUTHORIZED), 401);
     }
@@ -347,7 +347,7 @@ collaboration.post('/:id/messages', async (c) => {
 
 collaboration.delete('/:id', async (c) => {
   try {
-    const user = getAuthUserFromHono(c, c.env);
+    const user = getAuthUserFromHono(c);
     if (!user) {
       return c.json(apiError('Unauthorized', ERROR_CODES.UNAUTHORIZED), 401);
     }

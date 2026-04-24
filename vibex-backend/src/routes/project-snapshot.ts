@@ -87,7 +87,7 @@ export async function getProjectSnapshot(
     let stepState: StepState = {
       projectId,
       currentStep: 1,
-      version: 1,
+      version: '1',
       lastModified: project.updatedAt,
       lastModifiedBy: project.userId,
       step1: null,
@@ -99,7 +99,7 @@ export async function getProjectSnapshot(
       stepState = {
         projectId: ss.projectId,
         currentStep: ss.currentStep as 1 | 2 | 3,
-        version: ss.version,
+        version: String(ss.version),
         lastModified: ss.updatedAt,
         lastModifiedBy: ss.lastModifiedBy,
         step1: ss.step1Data ? JSON.parse(ss.step1Data) : null,
@@ -174,7 +174,7 @@ export async function getProjectSnapshot(
         description: project.description ?? undefined,
         status: 'draft',
         userId: project.userId,
-        version: 1,
+        version: '1',
         createdAt: project.createdAt,
         updatedAt: project.updatedAt,
         isTemplate: false,

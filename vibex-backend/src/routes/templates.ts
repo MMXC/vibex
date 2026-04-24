@@ -315,7 +315,7 @@ templates.post('/', async (c) => {
     })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return         c.json(apiError('Validation error', ERROR_CODES.VALIDATION_ERROR, error.errors), 400)
+      return         c.json(apiError('Validation error', ERROR_CODES.VALIDATION_ERROR, error.issues), 400)
     }
     safeError('Error creating template:', error)
     return c.json({

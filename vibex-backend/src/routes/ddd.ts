@@ -274,7 +274,7 @@ Respond ONLY with the JSON object, no other text.`
         
         result.data.boundedContexts.forEach((item, _index) => {
           const ctx: BoundedContext = {
-            id: `ctx-${generateId()}-${index}`,
+            id: `ctx-${generateId()}-${_index}`,
             name: item.name,
             description: item.description || '',
             type: item.type as BoundedContext['type'],
@@ -289,9 +289,9 @@ Respond ONLY with the JSON object, no other text.`
         result.data.boundedContexts.forEach((item, _index) => {
           if (item.relationships && Array.isArray(item.relationships)) {
             item.relationships.forEach((rel) => {
-              const targetCtx = contextMap.get(rel.targetContextName)
+              const targetCtx = contextMap.get(rel.targetContextName ?? '')
               if (targetCtx) {
-                const fromCtx = boundedContexts[index]
+                const fromCtx = boundedContexts[_index]
                 fromCtx.relationships.push({
                   id: `rel-${generateId()}`,
                   fromContextId: fromCtx.id,
@@ -458,9 +458,9 @@ Respond ONLY with the JSON object, no other text.`
     try {
       if (result.success && result.data && result.data.domainModels && Array.isArray(result.data.domainModels)) {
         domainModels = result.data.domainModels.map((item, _index) => ({
-          id: `dm-${generateId()}-${index}`,
+          id: `dm-${generateId()}-${_index}`,
           name: item.name,
-          contextId: item.contextId,
+          contextId: item.contextId ?? 'default',
           type: item.type as DomainModel['type'],
           properties: (item.properties || []).map((p) => ({
             name: p.name,
@@ -596,7 +596,7 @@ ${contextInfo}
           // Fallback: generate domain models from bounded contexts when AI fails
           if (!result.success) {
             safeError('[Domain Model Stream] AI service error, using fallback:', result.error)
-            const fallbackModels = boundedContexts.map((ctx, index) => ({
+            const fallbackModels = (boundedContexts ?? []).map((ctx, index) => ({
               id: `dm-${generateId()}-${index}`,
               name: ctx.name,
               contextId: ctx.id,
@@ -610,7 +610,7 @@ ${contextInfo}
             await new Promise(r => setTimeout(r, 100))
             send('done', {
               domainModels: fallbackModels,
-              mermaidCode: generateDomainModelMermaidCode(fallbackModels, boundedContexts),
+              mermaidCode: generateDomainModelMermaidCode(fallbackModels, boundedContexts as BoundedContext[]),
               message: '领域模型生成完成（备用方案）'
             })
             controller.close()
@@ -639,8 +639,8 @@ ${contextInfo}
           
           // Transform to domain models
           const domainModels = result.data.domainModels.map((item, _index) => ({
-            id: `dm-${generateId()}-${index}`,
-            name: item.name || `DomainModel${index}`,
+            id: `dm-${generateId()}-${_index}`,
+            name: item.name || `DomainModel${_index}`,
             contextId: item.contextId || 'default',
             type: item.type || 'entity',
             properties: (item.properties || []).map((prop) => ({
@@ -655,7 +655,7 @@ ${contextInfo}
           // Send done event
           send('done', { 
             domainModels,
-            mermaidCode: generateDomainModelMermaidCode(domainModels, boundedContexts ? boundedContexts.map(c => ({ ...c, relationships: [], description: c.description || '' })) : []),
+            mermaidCode: generateDomainModelMermaidCode(domainModels as DomainModel[], (boundedContexts as BoundedContext[]).map(c => ({ ...c, relationships: [], description: c.description || '' }))),
             message: '领域模型生成完成'
           })
           
@@ -916,7 +916,7 @@ ddd.post('/business-flow/stream', async (c) => {
           send('thinking', { step: 'calling-ai', message: '正在调用 AI...' })
           
           const modelInfo = domainModels 
-            ? domainModels.map(m => `- ${m.name} (${m.type})`).join('\n')
+            ? domainModels.map((m: DomainModel) => `- ${m.name} (${m.type})`).join('\n')
             : '无领域模型'
           
           const prompt = `You are a Business Flow expert. Generate a business flow in Chinese.
@@ -944,7 +944,7 @@ Output:
           
           send('done', { 
             businessFlow: result.data.businessFlow,
-            mermaidCode: generateFlowMermaidCode(result.data.businessFlow),
+            mermaidCode: generateFlowMermaidCode(result.data.businessFlow as BusinessFlow),
             message: '业务流程生成完成'
           })
           
@@ -1219,12 +1219,12 @@ Respond ONLY with the JSON object, no other text. All text content must be in Ch
           let boundedContexts: BoundedContext[] = []
           
           try {
-            if (result.success && result.data?.boundedContexts?.length > 0) {
+            if (result.success && result.data && result.data.boundedContexts && result.data.boundedContexts.length > 0) {
               const contextMap = new Map<string, BoundedContext>()
               
               // First pass: create contexts
-              for (let index = 0; index < result.data.boundedContexts.length; index++) {
-                const item = result.data.boundedContexts[index]
+              for (let index = 0; index < (result.data!.boundedContexts ?? []).length; index++) {
+                const item = (result.data!.boundedContexts ?? [])[index]
                 const ctx: BoundedContext = {
                   id: `ctx-${generateId()}-${index}`,
                   name: item.name,
@@ -1244,11 +1244,11 @@ Respond ONLY with the JSON object, no other text. All text content must be in Ch
               
               // Second pass: resolve relationships
               result.data.boundedContexts.forEach((item, _index) => {
-                if (item.relationships?.length > 0) {
+                if (item.relationships && item.relationships.length > 0) {
                   item.relationships.forEach((rel) => {
-                    const targetCtx = contextMap.get(rel.targetContextName)
+                    const targetCtx = contextMap.get(rel.targetContextName ?? '')
                     if (targetCtx) {
-                      const fromCtx = boundedContexts[index]
+                      const fromCtx = boundedContexts[_index]
                       fromCtx.relationships.push({
                         id: `rel-${generateId()}`,
                         fromContextId: fromCtx.id,

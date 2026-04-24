@@ -561,14 +561,16 @@ export function extractComponentTypes(schema: UISchema): UIComponentType[] {
   const types: UIComponentType[] = [];
   
   function traverse(data: unknown) {
-    if (data.type) {
-      types.push(data.type);
+    if (typeof data !== 'object' || data === null) return;
+    const obj = data as Record<string, unknown>;
+    if (obj.type) {
+      types.push(obj.type as UIComponentType);
     }
-    if (data.components) {
-      data.components.forEach(traverse);
+    if (obj.components) {
+      (obj.components as unknown[]).forEach(traverse);
     }
-    if (data.children) {
-      data.children.forEach(traverse);
+    if (obj.children) {
+      (obj.children as unknown[]).forEach(traverse);
     }
   }
 

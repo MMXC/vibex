@@ -25,7 +25,7 @@ export class SubflowHandler extends BaseHandler {
     
     // Map input variables to subflow
     const subflowInput: Record<string, unknown> = {};
-    for (const [targetVar, sourceVar] of Object.entries(inputMapping)) {
+    for (const [targetVar, sourceVar] of Object.entries(inputMapping as Record<string, string>)) {
       subflowInput[targetVar] = context.variables.get(sourceVar);
     }
     

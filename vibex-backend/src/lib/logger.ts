@@ -10,6 +10,7 @@ export interface RequestLog {
   ip?: string
   userAgent?: string
   timestamp: string
+  body?: unknown
 }
 
 export interface ResponseLog {
@@ -26,6 +27,7 @@ export interface LogEntry {
     message: string
     stack?: string
   }
+  requestId?: string
 }
 
 /**

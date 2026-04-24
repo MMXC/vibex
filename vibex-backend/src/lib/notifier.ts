@@ -73,7 +73,7 @@ async function createGitHubPRComment(
       throw new Error(`GitHub API error: ${response.status} - ${error}`);
     }
 
-    const result = await response.json();
+    const result = (await response.json()) as { html_url: string };
     devLog(`✅ PR comment created: ${result.html_url}`);
   } catch (error) {
     safeError('❌ Failed to create PR comment:', error);
@@ -300,5 +300,5 @@ if (require.main === module) {
   });
 }
 
-export { notifyChanges, createGitHubPRComment, sendSlackNotification };
+export { createGitHubPRComment, sendSlackNotification };
 export type { ChangeReport, NotificationConfig };

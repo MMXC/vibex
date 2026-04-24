@@ -2,7 +2,7 @@
  * Execution Scheduler
  */
 
-import type { FlowExecutionNode, ExecutionEdge, ExecutionResult, FlowExecutionConfig } from './types';
+import type { FlowExecutionNode, ExecutionEdge, ExecutionResult, FlowExecutionConfig, ServiceRegistry } from './types';
 import type { NodeHandlerRegistry } from './handlers';
 import type { NodeExecutionContext, VariableManager } from './handlers/types';
 import { ExecutionLogger } from './logger';
@@ -28,7 +28,7 @@ export class ExecutionScheduler {
     variableManager: VarManager,
     config: FlowExecutionConfig,
     context: any
-  ): Promise<ExecutionResult> {
+  ): Promise<unknown> {
     const executionId = this.generateExecutionId();
     const logger = new ExecutionLogger();
     const executedNodes: string[] = [];
@@ -66,7 +66,7 @@ export class ExecutionScheduler {
       const handler = this.handlerRegistry.get(node.type);
       if (!handler) {
         failedNodes.push(currentNodeId);
-        currentNodeId = this.getNextNodeId(flow.edges, currentNodeId, undefined);
+        currentNodeId = this.getNextNodeId(flow.edges, currentNodeId, undefined) ?? "";
         continue;
       }
       
@@ -74,7 +74,7 @@ export class ExecutionScheduler {
       const nodeContext: NodeExecutionContext = {
         node,
         variables: variableManager,
-        services: this.createMockServices(),
+        services: this.createMockServices() as unknown as ServiceRegistry,
         logger,
         config: config as any,
         executionId,
@@ -98,7 +98,7 @@ export class ExecutionScheduler {
         }
         
         // Get next node
-        currentNodeId = result.nextNodeId || this.getNextNodeId(flow.edges, currentNodeId, result);
+        currentNodeId = (result.nextNodeId || this.getNextNodeId(flow.edges, currentNodeId, result)) ?? '';
         
       } catch (error) {
         failedNodes.push(currentNodeId);
@@ -108,7 +108,7 @@ export class ExecutionScheduler {
           break;
         }
         
-        currentNodeId = node.fallbackNodeId || this.getNextNodeId(flow.edges, currentNodeId, undefined);
+        currentNodeId = (node.fallbackNodeId || this.getNextNodeId(flow.edges, currentNodeId, undefined)) ?? '';
       }
     }
     

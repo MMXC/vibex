@@ -13,3 +13,6 @@ __pycache__/
 *.pytest_cache/
 .gstack/
 .eslintcache
+
+# Playwright browser cache
+vibex-fronted/~/.cache/

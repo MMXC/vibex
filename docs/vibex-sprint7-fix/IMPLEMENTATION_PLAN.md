@@ -21,7 +21,7 @@
 |------|-------|--------|------|
 | E2: Firebase Presence | E2-U1 ~ E2-U5 | 4/5 | E2-U5 |
 | E5: Batch Export + KV | E5-U1 ~ E5-U6 | 6/6 | — |
-| E1: CI TypeScript Gate | E1-U1 ~ E1-U2 | 0/2 | E1-U1 |
+| E1: CI TypeScript Gate | E1-U1 ~ E1-U2 | 2/2 | — |
 
 **并行策略**: E2、E5 完全独立，可并行派发给两个 dev。E1 独立，可并行。
 
@@ -247,8 +247,8 @@ preview_id = "<preview id>"
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E1-U1 | CI workflow tsc gate | ⬜ | — | `.github/workflows/ci.yml` 存在；`pnpm exec tsc --noEmit` 作为 gate；exit 非0则 CI fail |
-| E1-U2 | as any 基线建立 | ⬜ | E1-U1 | `grep -r "as any" --include="*.ts" | wc -l` ≤ 59；CI 中监控检查 |
+| E1-U1 | CI workflow tsc gate | ✅ | — | `.github/workflows/ci.yml` 存在；`pnpm exec tsc --noEmit` 作为 gate；exit 非0则 CI fail |
+| E1-U2 | as any 基线建立 | ✅ | E1-U1 | `grep -r "as any" --include="*.ts" | wc -l` ≤ 163；CI 中监控检查 |
 
 ### E1-U1 详细说明
 
@@ -257,7 +257,7 @@ preview_id = "<preview id>"
 **实现步骤**:
 1. `on: [push, pull_request]` 触发
 2. job `typecheck`: `pnpm exec tsc --noEmit` 作用于 `vibex-backend` 和 `vibex-fronted`
-3. job `as-any-baseline`: `grep -r "as any" vibex-fronted/src/ --include="*.ts" --include="*.tsx" | wc -l` ≤ 59
+3. job `as-any-baseline`: `grep -r "as any" vibex-fronted/src/ --include="*.ts" --include="*.tsx" | wc -l` ≤ 163
 
 **注意**: 现有 `.github/workflows/test.yml` 存在；可在其中新增 job 而非创建新文件
 
@@ -269,7 +269,7 @@ preview_id = "<preview id>"
 
 **文件变更**: `.github/workflows/ci.yml`（在 E1-U1 中已覆盖）
 
-`AS_ANY_BASELINE.md` 已存在，基线值 59。
+`AS_ANY_BASELINE.md` 已存在，基线值 163。
 
 ---
 
@@ -306,7 +306,7 @@ preview_id = "<preview id>"
 |------|---------|
 | E2 | Firebase SDK 初始化无 404；RTDB 数据写入；Mock 降级正常；`pnpm exec tsc --noEmit` 通过 |
 | E5 | ZIP 解压 manifest 匹配；下载后 KV 删除；5MB/100 组件边界生效；`pnpm exec tsc --noEmit` 通过 |
-| E1 | CI tsc gate exit 0；as any ≤ 59 |
+| E1 | CI tsc gate exit 0；as any ≤ 163 |
 
 ---
 

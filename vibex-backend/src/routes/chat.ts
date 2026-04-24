@@ -15,7 +15,7 @@ import { apiError, ERROR_CODES } from '@/lib/api-error';
 const chat = new Hono<{ Bindings: CloudflareEnv }>();
 
 interface ChatMessage {
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'system';
   content: string;
 }
 

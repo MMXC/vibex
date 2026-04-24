@@ -13,6 +13,7 @@
  */
 
 import { Hono } from 'hono';
+import type { CloudflareEnv } from '@/lib/env';
 import { authMiddleware } from '../../lib/auth';
 import { rateLimit } from '../../lib/rateLimit';
 import { logger } from '../../lib/logger';

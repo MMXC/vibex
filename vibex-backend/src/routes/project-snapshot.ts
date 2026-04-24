@@ -87,8 +87,8 @@ export async function getProjectSnapshot(
     let stepState: StepState = {
       projectId,
       currentStep: 1,
-      version: '1',
-      lastModified: project.updatedAt,
+      version: 1,
+      lastModified: String(project.updatedAt),
       lastModifiedBy: project.userId,
       step1: null,
       step2: null,
@@ -99,8 +99,8 @@ export async function getProjectSnapshot(
       stepState = {
         projectId: ss.projectId,
         currentStep: ss.currentStep as 1 | 2 | 3,
-        version: String(ss.version),
-        lastModified: ss.updatedAt,
+        version: ss.version,
+        lastModified: String(ss.updatedAt),
         lastModifiedBy: ss.lastModifiedBy,
         step1: ss.step1Data ? JSON.parse(ss.step1Data) : null,
         step2: ss.step2Data ? JSON.parse(ss.step2Data) : null,
@@ -114,7 +114,16 @@ export async function getProjectSnapshot(
       'SELECT * FROM BusinessDomain WHERE projectId = ? AND deletedAt IS NULL',
       [projectId]
     );
-    const domains = domainRows || [];
+    const domains: BusinessDomain[] = (domainRows || []).map((row) => ({
+      id: row.id,
+      name: row.name,
+      description: row.description,
+      type: row.type as BusinessDomain['type'],
+      features: (row.features ?? []) as BusinessDomain['features'],
+      relationships: (row.relationships ?? []) as BusinessDomain['relationships'],
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    }));
 
     // E2-S1: Query actual flow from FlowData table
     const flowRows = await queryDB<FlowRow>(
@@ -143,7 +152,17 @@ export async function getProjectSnapshot(
       'SELECT * FROM UINode WHERE projectId = ? AND deletedAt IS NULL',
       [projectId]
     );
-    const uiNodes = uiNodeRows || [];
+    const uiNodes: UINode[] = (uiNodeRows || []).map((row) => ({
+      id: row.id,
+      name: row.name,
+      nodeType: (row.type || 'page') as UINode['nodeType'],
+      description: row.properties ?? undefined,
+      children: [],
+      annotations: [],
+      checked: false,
+      priority: 'medium',
+      status: 'pending',
+    }));
 
     // E2-S1: Query actual history from ChangeLog table
     const historyRows = await queryDB<HistoryRow>(
@@ -151,7 +170,17 @@ export async function getProjectSnapshot(
       'SELECT * FROM ChangeLog WHERE projectId = ? ORDER BY version DESC LIMIT 50',
       [projectId]
     );
-    const history = historyRows || [];
+    const history: ChangeEntry[] = (historyRows || []).map((row) => ({
+      id: row.id,
+      version: row.version,
+      timestamp: String(row.createdAt),
+      source: 'user',
+      action: (row.action || 'update') as ChangeEntry['action'],
+      field: '',
+      before: null,
+      after: row.details ? JSON.parse(row.details) : null,
+      userId: row.userId,
+    }));
 
     // Compute snapshot meta
     const snapshotMeta: SnapshotMeta = {
@@ -174,9 +203,9 @@ export async function getProjectSnapshot(
         description: project.description ?? undefined,
         status: 'draft',
         userId: project.userId,
-        version: '1',
-        createdAt: project.createdAt,
-        updatedAt: project.updatedAt,
+        version: 1,
+        createdAt: String(project.createdAt),
+        updatedAt: String(project.updatedAt),
         isTemplate: false,
       },
       stepState,

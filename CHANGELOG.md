@@ -1,3 +1,11 @@
+### [Unreleased] vibex-proposals-20260425 P003: Teams + Import/Export 测试覆盖 — 2026-04-25
+- **P003-S1 Teams API CRUD E2E**: teams-api.spec.ts 覆盖 GET/POST/GET/:id/DELETE/:id + 页面渲染
+- **P003-S2 JSON round-trip E2E**: json-export-import.spec.ts 覆盖字段完整性/嵌套对象/非法JSON/UTF-8
+- **P003-S3 YAML round-trip E2E**: yaml-export-import.spec.ts 覆盖特殊字符 :#| / 多行块 literal/folded / Unicode
+- **P003-S4 File Size Limit E2E**: import-size-limit.spec.ts 覆盖 5MB 边界值 / 拦截逻辑
+- **Files**: e2e/teams-api.spec.ts, e2e/json-export-import.spec.ts, e2e/yaml-export-import.spec.ts, e2e/import-size-limit.spec.ts
+- 提交: c07b3c77
+
 ### [Unreleased] vibex-proposals-20260425 P002: Firebase 实时协作验证 — 2026-04-25
 - **P002-S2 Firebase Cold Start**: 单元测试验证 isFirebaseConfigured() < 5ms, setPresence/subscribeToOthers mock < 10ms
 - **P002-S3 Presence Latency**: 单元测试验证 setPresence/subscribeToOthers/removePresence mock < 10ms, 多用户并发 < 50ms

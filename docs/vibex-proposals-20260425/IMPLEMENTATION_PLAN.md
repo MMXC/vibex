@@ -1381,14 +1381,14 @@ async function reviewPRD(proposalPath: string) {
 
 ### P003 — Teams + Import/Export 测试覆盖
 
-- [ ] P003-S1: Teams API CRUD 测试通过
-- [ ] P003-S1: Teams 页面 UI 渲染正常
-- [ ] P003-S2: JSON round-trip 保留所有字段（含嵌套对象）
-- [ ] P003-S2: 非法 JSON 正确返回 400 错误
-- [ ] P003-S3: YAML round-trip 保留特殊字符 `:#|` 和多行块
-- [ ] P003-S3: Unicode 字符（中文、emoji）正确处理
-- [ ] P003-S4: > 5MB 文件在前端被拦截，显示错误信息
-- [ ] P003-S4: < 5MB 文件正常导入，无 regression
+- [x] P003-S1: Teams API CRUD 测试通过
+- [x] P003-S1: Teams 页面 UI 渲染正常
+- [x] P003-S2: JSON round-trip 保留所有字段（含嵌套对象）
+- [x] P003-S2: 非法 JSON 正确返回 400 错误
+- [x] P003-S3: YAML round-trip 保留特殊字符 `:#|` 和多行块
+- [x] P003-S3: Unicode 字符（中文、emoji）正确处理
+- [x] P003-S4: > 5MB 文件在前端被拦截，显示错误信息
+- [x] P003-S4: < 5MB 文件正常导入，无 regression
 
 ### P004 — PM 神技质量门禁建立
 

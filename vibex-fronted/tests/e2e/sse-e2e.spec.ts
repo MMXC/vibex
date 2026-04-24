@@ -1,6 +1,8 @@
 /**
- * [F5.2] SSE E2E Tests
+ * [F5.2] SSE E2E Tests — P002-S5 SSE Bridge Verification
  * Verifies Canvas SSE complete event sequence in real browser
+ *
+ * P002-S5: SSE bridge E2E < 2s
  *
  * These tests validate:
  * 1. Canvas page loads without crashing

@@ -2,12 +2,15 @@
  * presence-mvp.spec.ts — E2 Firebase E2E tests
  * EpicE2: Firebase Presence 真实接入
  *
+ * P002-S3: Presence update latency < 1s
+ *
  * 验收标准:
  * - Firebase configured → 写入 RTDB
  * - Firebase not configured → mock 降级 + console.warn
  * - onDisconnect 注册
  * - visibilitychange(hidden) → removePresence
  * - 多个用户 subscribe → 实时回调
+ * - Mock mode latency < 50ms (SSE latency < 1s requires Firebase config)
  */
 
 import { test, expect } from '@playwright/test';

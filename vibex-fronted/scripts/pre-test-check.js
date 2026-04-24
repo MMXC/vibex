@@ -84,7 +84,7 @@ async function main() {
 
   // 2. TypeScript Check
   logStep('2/5', 'Running TypeScript type check...');
-  if (runCommand('npx tsc --noEmit', { stdio: 'pipe' })) {
+  if (runCommand('pnpm exec tsc --noEmit', { stdio: 'pipe' })) {
     logSuccess('TypeScript: OK');
     checks.push({ name: 'TypeScript', passed: true });
   } else {
@@ -95,7 +95,7 @@ async function main() {
 
   // 3. ESLint Check
   logStep('3/5', 'Running ESLint...');
-  if (runCommand('npx eslint src/ --max-warnings 999', { stdio: 'pipe' })) {
+  if (runCommand('pnpm exec eslint src/ --max-warnings 999', { stdio: 'pipe' })) {
     logSuccess('ESLint: OK');
     checks.push({ name: 'ESLint', passed: true });
   } else {

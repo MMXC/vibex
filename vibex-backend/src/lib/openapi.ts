@@ -10,21 +10,27 @@ import { devLog } from '@/lib/log-sanitizer';
 
 // ==================== Types ====================
 
-interface OpenAPIPath {
-  [method: string]: {
-    summary?: string;
-    tags?: string[];
-    responses: {
-      [statusCode: string]: {
-        description: string;
-        content?: {
-          [mediaType: string]: {
-            schema?: object;
-          };
+interface HttpMethodSpec {
+  summary?: string;
+  tags?: string[];
+  responses: {
+    [statusCode: string]: {
+      description: string;
+      content?: {
+        [mediaType: string]: {
+          schema?: object;
         };
       };
     };
   };
+}
+
+interface OpenAPIPath {
+  get?: HttpMethodSpec;
+  post?: HttpMethodSpec;
+  put?: HttpMethodSpec;
+  delete?: HttpMethodSpec;
+  patch?: HttpMethodSpec;
 }
 
 interface OpenAPISpec {
@@ -38,7 +44,7 @@ interface OpenAPISpec {
     url: string;
     description: string;
   }[];
-  paths: OpenAPIPath;
+  paths: { [route: string]: OpenAPIPath };
   components?: {
     schemas?: object;
   };
@@ -700,7 +706,7 @@ const ROUTE_METADATA: OpenAPISpec = {
 export default ROUTE_METADATA;
 
 // CLI execution
-if (import.meta.main) {
+if (require.main === module) {
   const fs = require('fs');
   const path = require('path');
   

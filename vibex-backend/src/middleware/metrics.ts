@@ -88,12 +88,11 @@ export const metricsStore = new MetricsStore();
 // Middleware — records every API request latency
 // ============================================================
 
-export async function metricsMiddleware(c: Context, next: Next): Promise<Response> {
+export async function metricsMiddleware(c: Context, next: Next): Promise<void> {
   const start = Date.now();
-  const response = await next();
+  await next();
   const duration = Date.now() - start;
   metricsStore.push(duration);
-  return response;
 }
 
 // ============================================================

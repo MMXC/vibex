@@ -291,14 +291,14 @@ Respond ONLY with the JSON object, no other text.`;
       requirement,
       summary: data.summary || '',
       confidence: data.confidence || 50,
-      entities: (data.entities || []).map((e) => ({
+      entities: ((data.entities || []) as any[]).map((e) => ({
         id: generateId(),
         name: e.name,
         type: (e.type || 'entity') as Entity['type'],
         description: e.description || '',
         attributes: e.attributes || [],
       })),
-      features: (data.features || []).map((f) => ({
+      features: ((data.features || []) as any[]).map((f) => ({
         id: generateId(),
         name: f.name,
         description: f.description ?? '',
@@ -312,7 +312,7 @@ Respond ONLY with the JSON object, no other text.`;
         options: q.options || [],
         impact: q.impact || '',
       })),
-      suggestedContexts: (data.suggestedContexts || []).map((c) => ({
+      suggestedContexts: ((data.suggestedContexts || []) as any[]).map((c) => ({
         id: generateId(),
         name: c.name,
         type: (c.type || 'core') as SuggestedContext['type'],

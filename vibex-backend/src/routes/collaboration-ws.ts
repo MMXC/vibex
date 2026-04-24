@@ -12,7 +12,7 @@
  * - 接收前端 WebSocket 升级请求
  * - 从查询参数获取 roomId/userId/userName
  * - 注入 x-user-id / x-user-name / x-project-id headers
- * - 委托给 COLLABORATION_ROOM Durable Object 处理
+ * - 委托给 COLLABORATION_KV Durable Object 处理
  *
  * 路由: GET /api/v1/ws/collaboration?roomId=xxx&userId=xxx&userName=xxx
  *
@@ -34,8 +34,8 @@ const collaborationWs = new Hono<{ Bindings: CloudflareEnv }>();
 collaborationWs.get('/collaboration', async (c) => {
   const env = c.env as CloudflareEnv;
 
-  // E2-S1: 获取 COLLABORATION_ROOM DO binding
-  const doNamespace = env.COLLABORATION_ROOM;
+  // E2-S1: 获取 COLLABORATION_KV DO binding
+  const doNamespace = env.COLLABORATION_KV;
   if (!doNamespace) {
     return         c.json(apiError('Collaboration DO not configured', ERROR_CODES.INTERNAL_ERROR), 500);
   }

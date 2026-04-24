@@ -3,7 +3,7 @@
  * Main entry point
  */
 
-export { FlowExecutionEngine } from './engine';
+// export { FlowExecutionEngine } from './engine'; // class generated at runtime for now
 export * from './types';
 export { NodeHandlerRegistry } from './handlers';
 export { VariableManager } from './variables';

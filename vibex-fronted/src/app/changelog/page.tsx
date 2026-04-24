@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.296',
+    date: '2026-04-24',
+    changes: [
+      '📋 vibex-sprint7-fix EpicE5: Batch Export Real DB + KV',
+      '✅ E5-U1 ZipArchiveService: D1查询+JSZip生成Uint8Array',
+      '✅ E5-U2 KV存储: POST返回download URL, 5min TTL',
+      '✅ E5-U3 一次性下载: GET从KV读取→解码→delete→返回ZIP',
+      '✅ E5-U4 ENV配置: EXPORT_KV binding',
+    ],
+    commit: '76fc9719',
+  },
+  {
     version: '1.0.295',
     date: '2026-04-24',
     changes: [

@@ -1,3 +1,11 @@
+### [Unreleased] vibex-sprint7-fix EpicE5: Batch Export Real DB + KV — 2026-04-24
+- **E5-U1 ZipArchiveService**: 真实D1查询, JSZip生成Uint8Array ZIP, manifest.json索引
+- **E5-U2 KV存储**: batch-export路由POST返回download URL, KV.put(base64) 5min TTL
+- **E5-U3 一次性下载**: download路由GET从KV读取→base64解码→delete key→返回application/zip
+- **E5-U4 ENV配置**: EXPORT_KV binding, wrangler.toml kv_namespaces配置
+- **Files**: services/ZipArchiveService.ts, api/v1/projects/batch-export/route.ts, download/route.ts, lib/env.ts
+- 提交: 76fc9719
+
 ### [Unreleased] vibex-sprint7-fix EpicE2: Firebase Presence 真实接入 — 2026-04-24
 - **E2-U1 Firebase REST API**: 零SDK依赖, fetch+EventSource实时同步, polling fallback
 - **E2-U2 PresenceAvatars四态**: 理想态(彩色头像堆叠)/空状态(NoCollaboratorsIcon)/加载态(骨架屏)/错误态(WifiOffIcon)

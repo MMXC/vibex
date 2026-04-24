@@ -1,3 +1,12 @@
+### [Unreleased] vibex-proposals-20260425 P001: TypeScript 债务清理 — 2026-04-25
+- **P001 Backend TS Debt**: 后端 TypeScript 编译错误从 197 → 28（第一阶段），修复 ddd.ts/openapi.ts/logger.ts/notifier.ts/schemas/index.ts 等文件
+- **P001-Zod4 Compatibility**: ZodSchema 结构化接口替换 ZodType<unknown>，解决 Zod 4 复杂泛型内部不可赋值问题
+- **P001-DurableObject Binding**: 分离 COLLABORATION_DO（DurableObject）和 COLLABORATION_KV（KV），修复 wrangler.toml 和 env.ts
+- **P001-Row Mapping**: BusinessDomain/UINode/ChangeEntry 行映射修复，StepState timestamp 类型修正
+- **P001-SessionManager**: addMessage() 返回 CompressionResult，getSessionManager/resetSessionManager 单例
+- **Files**: src/lib/api-validation.ts, src/lib/env.ts, src/lib/errorHandler.ts, src/routes/collaboration-ws.ts, src/routes/project-snapshot.ts, src/services/context/SessionManager.ts, src/services/websocket/index.ts, wrangler.toml
+- 提交: cb737d5a, ddeea90e
+
 ### [Unreleased] vibex-sprint7-fix EpicE1: CI TypeScript Gate — 2026-04-24
 - **E1-U1 TypeScript Gate**: CI新增typecheck-backend+typecheck-frontend独立job, tsc --noEmit作为独立gate
 - **E1-U2 as any Baseline**: CI新增as-any-baseline job, 基线163 pre-existing存量

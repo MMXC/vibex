@@ -9,6 +9,15 @@ import styles from './dashboard.module.css';
 import { apiService, Project } from '@/services/api';
 import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog';
 import { SearchBar } from '@/components/dashboard/SearchBar';
+import dynamic from 'next/dynamic';
+
+const AnalyticsWidget = dynamic(
+  () => import('@/components/dashboard/AnalyticsWidget'),
+  {
+    ssr: false,
+    loading: () => null,
+  }
+);
 import { useProjects, useDeletedProjects, queryKeys } from '@/hooks/queries';
 
 /** 排序方式 */
@@ -498,6 +507,11 @@ export default function Dashboard() {
               </div>
             </div>
           ))}
+        </section>
+
+        {/* 数据分析 Widget */}
+        <section>
+          <AnalyticsWidget />
         </section>
 
         {/* 项目列表 */}

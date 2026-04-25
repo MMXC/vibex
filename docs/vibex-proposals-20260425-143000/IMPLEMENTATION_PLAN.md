@@ -22,9 +22,9 @@
 
 | Epic | Story | 工时 | 担当 | 依赖 |
 |------|-------|------|------|------|
-| E4 | E4-S1 DDL 类型扩展 | 1d | dev | 无 |
-| E4 | E4-S2 PRD 双格式 | 0.5d | dev | 无 |
-| E4 | E4-S3 PRD 预览面板 | 0.5d | dev | E4-S2 |
+| E4 | E4-S1 DDL 类型扩展 | 1d | dev | 无 | ✅ |
+| E4 | E4-S2 PRD 双格式 | 0.5d | dev | 无 | ✅ |
+| E4 | E4-S3 PRD 预览面板 | 0.5d | dev | E4-S2 | ✅ |
 
 ### 第三批次（3d，条件性执行）
 
@@ -125,6 +125,10 @@
 
 ### E4-S1: DDL 类型扩展（1d）
 
+**状态**: ✅ 完成
+**Commit**: `964b31392 feat(e4-s1): extend DDLGenerator with 4 new types + index generation`
+**分支**: `s9-e4-generator`
+
 **执行步骤**:
 1. 定位 `DDLGenerator` 实现（可能在 `src/lib/generators/ddl.ts`）
 2. 新增 4 种类型映射:
@@ -144,6 +148,10 @@
 
 ### E4-S2: PRD 双格式输出（0.5d）
 
+**状态**: ✅ 完成
+**Commit**: `0865c2805 feat(e4-s2): add JSON Schema dual format to PRDGenerator`
+**分支**: `s9-e4-generator`
+
 **执行步骤**:
 1. 定位 `PRDGenerator` 实现
 2. 修改输出结构: `{ markdown: string, jsonSchema: object }`
@@ -157,6 +165,10 @@
 ---
 
 ### E4-S3: PRD 预览面板（0.5d）
+
+**状态**: ✅ 完成
+**Commit**: `454c16a99 feat(e4-s3): add PRDPreviewPanel with markdown/json tabs`
+**分支**: `s9-e4-generator`
 
 **执行步骤**:
 1. 在 Generator 页面（`/dashboard/generators`）添加 `PRDPreviewPanel`

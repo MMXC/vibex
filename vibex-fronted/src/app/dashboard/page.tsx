@@ -9,16 +9,8 @@ import styles from './dashboard.module.css';
 import { apiService, Project } from '@/services/api';
 import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog';
 import { SearchBar } from '@/components/dashboard/SearchBar';
-import dynamic from 'next/dynamic';
-
-const AnalyticsWidget = dynamic(
-  () => import('@/components/dashboard/AnalyticsWidget'),
-  {
-    ssr: false,
-    loading: () => null,
-  }
-);
 import { useProjects, useDeletedProjects, queryKeys } from '@/hooks/queries';
+import { AnalyticsWidget } from '@/components/dashboard/AnalyticsWidget';
 
 /** 排序方式 */
 type SortOption = 'name' | 'createdAt' | 'updatedAt';

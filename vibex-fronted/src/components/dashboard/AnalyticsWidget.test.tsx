@@ -12,52 +12,57 @@ const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 const MOCK_SUCCESS_DATA = {
-  metrics: {
+  success: true,
+  data: {
     page_view: [
-      { timestamp: '2026-04-20T00:00:00Z', value: 120 },
-      { timestamp: '2026-04-21T00:00:00Z', value: 145 },
-      { timestamp: '2026-04-22T00:00:00Z', value: 132 },
-      { timestamp: '2026-04-23T00:00:00Z', value: 180 },
-      { timestamp: '2026-04-24T00:00:00Z', value: 210 },
+      { date: '2026-04-20', count: 120 },
+      { date: '2026-04-21', count: 145 },
+      { date: '2026-04-22', count: 132 },
+      { date: '2026-04-23', count: 180 },
+      { date: '2026-04-24', count: 210 },
     ],
     canvas_open: [
-      { timestamp: '2026-04-20T00:00:00Z', value: 40 },
-      { timestamp: '2026-04-21T00:00:00Z', value: 55 },
-      { timestamp: '2026-04-22T00:00:00Z', value: 48 },
-      { timestamp: '2026-04-23T00:00:00Z', value: 70 },
-      { timestamp: '2026-04-24T00:00:00Z', value: 85 },
+      { date: '2026-04-20', count: 40 },
+      { date: '2026-04-21', count: 55 },
+      { date: '2026-04-22', count: 48 },
+      { date: '2026-04-23', count: 70 },
+      { date: '2026-04-24', count: 85 },
     ],
     component_create: [
-      { timestamp: '2026-04-20T00:00:00Z', value: 10 },
-      { timestamp: '2026-04-21T00:00:00Z', value: 15 },
-      { timestamp: '2026-04-22T00:00:00Z', value: 12 },
-      { timestamp: '2026-04-23T00:00:00Z', value: 20 },
-      { timestamp: '2026-04-24T00:00:00Z', value: 25 },
+      { date: '2026-04-20', count: 10 },
+      { date: '2026-04-21', count: 15 },
+      { date: '2026-04-22', count: 12 },
+      { date: '2026-04-23', count: 20 },
+      { date: '2026-04-24', count: 25 },
     ],
     delivery_export: [
-      { timestamp: '2026-04-20T00:00:00Z', value: 5 },
-      { timestamp: '2026-04-21T00:00:00Z', value: 8 },
-      { timestamp: '2026-04-22T00:00:00Z', value: 6 },
-      { timestamp: '2026-04-23T00:00:00Z', value: 12 },
-      { timestamp: '2026-04-24T00:00:00Z', value: 15 },
+      { date: '2026-04-20', count: 5 },
+      { date: '2026-04-21', count: 8 },
+      { date: '2026-04-22', count: 6 },
+      { date: '2026-04-23', count: 12 },
+      { date: '2026-04-24', count: 15 },
     ],
   },
-  period: {
-    start: '2026-04-20T00:00:00Z',
-    end: '2026-04-24T23:59:59Z',
+  meta: {
+    start_date: '2026-04-20',
+    end_date: '2026-04-24',
+    total_days: 5,
   },
 };
 
+
 const MOCK_EMPTY_DATA = {
-  metrics: {
+  success: true,
+  data: {
     page_view: [],
     canvas_open: [],
     component_create: [],
     delivery_export: [],
   },
-  period: {
-    start: '2026-04-20T00:00:00Z',
-    end: '2026-04-24T23:59:59Z',
+  meta: {
+    start_date: '2026-04-20',
+    end_date: '2026-04-24',
+    total_days: 5,
   },
 };
 

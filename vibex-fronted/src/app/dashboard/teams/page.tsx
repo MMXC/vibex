@@ -120,7 +120,7 @@ export default function TeamsPage() {
       </div>
 
       {error && (
-        <div className={styles.error} role="alert">
+        <div className={`${styles.error} teams-error`} data-testid="teams-error" role="alert">
           Failed to load teams: {(error as Error).message}
         </div>
       )}

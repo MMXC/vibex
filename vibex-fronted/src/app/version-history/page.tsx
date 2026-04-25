@@ -1,13 +1,13 @@
 /**
  * Version History Page
- * 
+ *
  * Displays the history of versions/snapshots for the current project.
  * Allows users to view, compare, and restore previous versions.
  */
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useConfirmationStore } from '@/stores/confirmationStore';
 import { VersionPreview, VersionInfo } from '@/components/version-preview/VersionPreview';
@@ -15,13 +15,13 @@ import { VersionDiff } from '@/components/version-diff/VersionDiff';
 import styles from './version-history.module.css';
 
 /**
- * VersionHistoryPage — E7: projectId=null boundary + diff view
+ * VersionHistoryPage - E7: projectId=null boundary + diff view
  *
  * E7 goal: 修复 version history 的 projectId=null 边界
  * - projectId !== null: 显示版本历史列表
  * - projectId === null: 显示引导 UI "请先选择项目"
  */
-export default function VersionHistoryPage() {
+function VersionHistoryContent() {
   const searchParams = useSearchParams();
   const projectId = searchParams.get('projectId');
 
@@ -29,7 +29,7 @@ export default function VersionHistoryPage() {
   const jumpToSnapshot = useConfirmationStore(state => state.jumpToSnapshot);
   const setSnapshotNote = useConfirmationStore(state => state.setSnapshotNote);
   const currentStep = useConfirmationStore(state => state.currentStep);
-  
+
   const [selectedVersion, setSelectedVersion] = useState<VersionInfo | null>(null);
   const [compareVersion, setCompareVersion] = useState<VersionInfo | null>(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -79,13 +79,13 @@ export default function VersionHistoryPage() {
     });
   };
 
-  // E7: projectId=null boundary — show guide to create/select a project first
+  // E7: projectId=null boundary - show guide to create/select a project first
   if (projectId === null) {
     return (
       <div className={styles.container}>
         <div className={styles.empty}>
           <h2>请先选择项目</h2>
-          <p>在画布中创建或打开项目后，再从项目设置查看版本历史</p>
+          <p>在画布中创建或打开项目后,再从项目设置查看版本历史</p>
           <a href="/projects/new" className={styles.emptyAction}>
             创建新项目
           </a>
@@ -99,7 +99,7 @@ export default function VersionHistoryPage() {
       <div className={styles.container}>
         <div className={styles.empty}>
           <h2>暂无版本历史</h2>
-          <p>在确认流程中进行操作后，系统会自动保存版本快照</p>
+          <p>在确认流程中进行操作后,系统会自动保存版本快照</p>
         </div>
       </div>
     );
@@ -116,8 +116,8 @@ export default function VersionHistoryPage() {
 
       <div className={styles.list}>
         {versions.map((version) => (
-          <div 
-            key={version.id} 
+          <div
+            key={version.id}
             className={`${styles.item} ${version.id === currentVersion?.id ? styles.current : ''}`}
           >
             <div className={styles.itemMain}>
@@ -134,13 +134,13 @@ export default function VersionHistoryPage() {
               </div>
             </div>
             <div className={styles.itemActions}>
-              <button 
+              <button
                 className={styles.actionButton}
                 onClick={() => handleViewVersion(version)}
               >
                 预览
               </button>
-              <button 
+              <button
                 className={styles.actionButton}
                 onClick={() => handleCompare(version)}
               >
@@ -184,5 +184,13 @@ export default function VersionHistoryPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function VersionHistoryPage() {
+  return (
+    <Suspense fallback={<div className={styles.container}><div className={styles.empty}><p>加载中...</p></div></div>}>
+      <VersionHistoryContent />
+    </Suspense>
   );
 }

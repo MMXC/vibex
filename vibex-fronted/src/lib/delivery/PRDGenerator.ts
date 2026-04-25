@@ -23,7 +23,62 @@ export interface PRDSection {
   content: string;
 }
 
-/** Generate structured PRD data from delivery store */
+export interface JSONSchemaProperty {
+  type: string;
+  description?: string;
+}
+
+export interface PRDJsonSchema {
+  type: 'object';
+  properties: Record<string, JSONSchemaProperty>;
+  required: string[];
+}
+
+export interface PRDDual {
+  markdown: string;
+  jsonSchema: PRDJsonSchema;
+}
+
+/**
+ * Build a JSON Schema from contexts, flows, and components.
+ */
+function buildJsonSchema(
+  contexts: BoundedContext[],
+  flows: BusinessFlow[],
+  components: Component[]
+): PRDJsonSchema {
+  const properties: Record<string, JSONSchemaProperty> = {
+    projectName: { type: 'string', description: 'Project name' },
+    domain: { type: 'string', description: 'Domain' },
+    goal: { type: 'string', description: 'Core goal' },
+  };
+  const required: string[] = ['projectName', 'domain', 'goal'];
+
+  if (contexts.length > 0) {
+    properties.contexts = {
+      type: 'array',
+      description: `${contexts.length} bounded contexts`,
+    };
+  }
+  if (flows.length > 0) {
+    properties.flows = {
+      type: 'array',
+      description: `${flows.length} business flows`,
+    };
+  }
+  if (components.length > 0) {
+    properties.components = {
+      type: 'array',
+      description: `${components.length} components`,
+    };
+  }
+
+  return { type: 'object', properties, required };
+}
+
+/**
+ * Generate PRD data (passthrough, same input returned).
+ */
 export function generatePRD(data: PRDData): PRDData {
   return {
     projectName: data.projectName || '未命名项目',
@@ -33,6 +88,16 @@ export function generatePRD(data: PRDData): PRDData {
     flows: data.flows ?? [],
     components: data.components ?? [],
   };
+}
+
+/**
+ * Generate PRD in dual format: markdown string + JSON Schema object.
+ */
+export function generatePRDDual(data: PRDData): PRDDual {
+  const prd = generatePRD(data);
+  const markdown = generatePRDMarkdown(data);
+  const jsonSchema = buildJsonSchema(prd.contexts, prd.flows, prd.components);
+  return { markdown, jsonSchema };
 }
 
 /** Generate PRD as markdown string */

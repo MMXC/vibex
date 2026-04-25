@@ -1,3 +1,17 @@
+### [Unreleased] vibex-proposals-20260425 E4: DDL/PRD Generator v2 — 2026-04-25
+- **E4-S1 DDL 类型扩展**: DDLGenerator 新增 ENUM→CHECK、JSONB、UUID、ARRAY 类型，新增 generateIndex 语句，7/7 类型覆盖
+- **E4-S2 PRD 双格式**: PRDGenerator 输出 { markdown, jsonSchema } 双格式，JSON Schema 含 type/properties/required
+- **E4-S3 PRD 预览面板**: PRDPreviewPanel 组件，Markdown/JSON Tab 切换（react-markdown fallback to pre）
+- **Files**: src/lib/delivery/DDLGenerator.ts, src/lib/delivery/PRDGenerator.ts, src/lib/delivery/__tests__/DDLGenerator.test.ts, src/lib/delivery/__tests__/PRDGenerator.test.ts, src/components/delivery/PRDPreviewPanel.tsx + .module.css
+- 提交: 964b31392, 0865c2805, 454c16a99
+
+### [Unreleased] vibex-proposals-20260425 E4: DDL/PRD Generator v2 — 2026-04-25
+- **E4-S1 DDL 类型扩展**: DDLGenerator 新增 ENUM→CHECK、JSONB、UUID、ARRAY 类型，新增 generateIndex 语句，7/7 类型覆盖
+- **E4-S2 PRD 双格式**: PRDGenerator 输出 { markdown, jsonSchema } 双格式，JSON Schema 含 type/properties/required
+- **E4-S3 PRD 预览面板**: PRDPreviewPanel 组件，Markdown/JSON Tab 切换（react-markdown fallback to pre）
+- **Files**: src/lib/delivery/DDLGenerator.ts, src/lib/delivery/PRDGenerator.ts, src/lib/delivery/__tests__/DDLGenerator.test.ts, src/lib/delivery/__tests__/PRDGenerator.test.ts, src/components/delivery/PRDPreviewPanel.tsx + .module.css
+- 提交: 964b31392, 0865c2805, 454c16a99
+
 ### [Unreleased] vibex-proposals-20260425 E1: Analytics API 修复 + Dashboard Widget — 2026-04-25
 - **E1-S1 后端 API 修复**: GET /api/v1/analytics DB 错误时返回空数组而非 500，GET /api/v1/health 指标错误时返回 degraded 状态
 - **E1-S2 AnalyticsWidget**: 纯 SVG 折线图组件（无 recharts/chart.js 依赖），四态（idle/loading/success/error/empty），data-testid 规范

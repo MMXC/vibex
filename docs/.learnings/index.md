@@ -1,3 +1,4 @@
+- [vibex-next](vibex-next.md) — 实时协作感知 + Firebase零SDK + Import/Export E2E + PM质量门禁 (2026-04-25)
 - [vibex-tech-debt-qa](vibex-tech-debt-qa.md) — Tech Debt QA: 测试债务清理 + 质量基线建立 (2026-04-21)
 - [vibex-canvas-silent-400](vibex-canvas-silent-400.md) — Canvas 静默 400 + async/await 修复 (2026-04-17)
 - [sprint-qa-stub-detection-pattern](sibex-sprint-qa-stub-detection-pattern-20260418.md) — Sprint QA 持续发现 Stub 未替换 — 结构性数据流断链 (2026-04-18)

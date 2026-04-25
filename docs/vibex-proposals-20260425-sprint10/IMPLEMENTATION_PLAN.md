@@ -15,6 +15,10 @@
 
 ## E0 — Sprint 9 债务清理（2-4h）
 
+**状态**: ✅ 完成
+**Commit**: `d8502b150 docs(e0-debt): Sprint 9 debt cleanup — fix js-yaml TS errors in frontend/backend`
+**分支**: `s9-e0-debt-cleanup`
+
 ### 步骤
 
 1. 运行 `make validate`，记录所有错误

@@ -29,6 +29,8 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ShortcutEditModal } from '@/components/shortcuts/ShortcutEditModal';
 import { useShortcutStore } from '@/stores/shortcutStore';
 import { createDDSAPI } from '@/hooks/dds/useDDSAPI';
+import { useDDSCanvasSearch } from '@/hooks/dds/useDDSCanvasSearch';
+import { DDSSearchPanel } from '@/components/dds/DDSSearchPanel';
 import type { ChapterType, ChapterData } from '@/types/dds';
 import type { DDSCard } from '@/types/dds';
 import type { ReactNode } from 'react';
@@ -278,6 +280,23 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   // Note: useKeyboardShortcuts uses OLD canvas history (context/flow/component).
   // For DDS canvas, undo/redo will be wired when DDS history is implemented.
   // For now, pass no-op stubs that return false (required by hook interface).
+  // ---- E3: DDS Canvas Search ----
+  const [searchPanelOpen, setSearchPanelOpen] = useState(false);
+  const { query: searchQuery, setQuery: setSearchQuery, results: searchResults, clearResults } =
+    useDDSCanvasSearch();
+
+  // Ctrl+K / Cmd+K: toggle search panel
+  useEffect(() => {
+    function handleCtrlK(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setSearchPanelOpen((v) => !v);
+      }
+    }
+    document.addEventListener('keydown', handleCtrlK);
+    return () => document.removeEventListener('keydown', handleCtrlK);
+  }, []);
+
   const undoCallback = useCallback((): boolean => false, []);
   const redoCallback = useCallback((): boolean => false, []);
 
@@ -444,6 +463,21 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
       {/* Keyboard shortcut edit modal */}
       <ShortcutEditModalPortal />
 
+      {/* E3: Search Panel */}
+      <DDSSearchPanel
+        open={searchPanelOpen}
+        onClose={() => {
+          setSearchPanelOpen(false);
+          clearResults();
+        }}
+        results={searchResults}
+        query={searchQuery}
+        onQueryChange={setSearchQuery}
+        onSelectResult={() => {
+          setSearchPanelOpen(false);
+        }}
+      />
+
       {/* Loading animation style */}
       <style>{`
         @keyframes dds-skeleton-shimmer {
@@ -455,6 +489,15 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
           0% { width: 0%; margin-left: 0; }
           50% { width: 60%; margin-left: 20%; }
           100% { width: 0%; margin-left: 100%; }
+        }
+        @keyframes search-highlight-pulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); }
+          50% { box-shadow: 0 0 0 4px rgba(234, 179, 8, 0.5); }
+        }
+        .search-highlight {
+          animation: search-highlight-pulse 0.5s ease-in-out 4;
+          border: 2px solid #eab308 !important;
+          z-index: 100;
         }
       `}</style>
     </div>

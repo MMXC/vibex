@@ -20,16 +20,80 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.304',
+    date: '2026-04-26',
+    changes: [
+      '📋 vibex-proposals-20260426 E3: 画布搜索',
+      '✅ E3-S1 搜索面板UI: DDSSearchPanel深色主题,键盘导航,data-testid',
+      '✅ E3-S2 全文搜索: useDDSCanvasSearch 300ms debounce,5 chapter覆盖',
+      '✅ E3-S3 搜索跳转: scrollIntoView+smooth+highlight动画',
+      '✅ E3-S4 Ctrl+K: DDSCanvasPage集成,onOpenSearch no-op修复',
+    ],
+    commit: '9bc9330c1, d48ad4f09',
+  },
+  {
     version: '1.0.303',
     date: '2026-04-26',
     changes: [
       '📋 vibex-proposals-20260426 E2: 画布快捷键系统',
-      '✅ E2-S1 键盘监听: useKeyboardShortcuts集成DDSCanvasPage; Delete遍历5 chapter; Esc绑定deselectAll',
-      '✅ E2-S2 ShortcutEditModal: shortcutStore.startEditing("go-to-canvas")唤起; Portal条件渲染',
-      '✅ E2-S3 快捷键绑定: Delete/Backspace→deleteCard; Ctrl+Z/Y→placeholder; Esc→deselectAll',
-      '✅ E2-S4 E2E测试: F4.5 ?打开modal; F4.6 Delete; F4.7 Escape',
+      '✅ E2-S1 键盘监听: useKeyboardShortcuts集成DDSCanvasPage',
+      '✅ E2-S2 ShortcutEditModal: shortcutStore.startEditing唤起,Portal条件渲染',
+      '✅ E2-S3 快捷键绑定: Delete→deleteCard, Ctrl+Z/Y→placeholder, Esc→deselectAll',
+      '✅ E2-S4 E2E测试: F4.5 ?打开modal, F4.6 Delete, F4.7 Escape',
     ],
     commit: '9a4403419, 044611019',
+  },
+  {
+    version: '1.0.302',
+    date: '2026-04-26',
+    changes: [
+      '📋 vibex-proposals-20260426 E1: 后端TS债务清理（Sprint 11）',
+      '✅ E1-S1 wrangler types: 生成与env.ts类型整合, 零TS错误',
+      '✅ E1-S2 ZodSchema泛型: ZodType<unknown>用于API参数泛型, 合理且通过tsc',
+      '✅ E1-S3 DurableObject绑定: 67处as any在test/schema场景, env.ts提供完整类型兜底',
+      '✅ E1-S4 CI typecheck-backend gate: test.yml第49行, working-directory: vibex-backend',
+    ],
+    commit: 'e41f1ff2a',
+  },
+  {
+    version: '1.0.301',
+    date: '2026-04-26',
+    changes: [
+      '📋 vibex-proposals-20260425 E4: PRD 双格式预览',
+      '✅ E4-S1 格式转换库: yamlToJson/jsonToYaml 双向转换, 友好错误提示',
+      '✅ E4-S2 PRD Editor UI: /editor页面PRD tab, JSON/YAML切换按钮, 内联错误展示',
+    ],
+    commit: '557fda78',
+  },
+  {
+    version: '1.0.300',
+    date: '2026-04-26',
+    changes: [
+      '📋 vibex-proposals-20260425 E6: Canvas 本地持久化',
+      '✅ E6-S1 Zustand Persist: partialize白名单projectId/chapters/crossChapterEdges, 排除UI状态',
+      '✅ E6-S2 useCanvasPersistence: 暴露canvas/setCanvas/clearCanvas Hook',
+    ],
+    commit: 'a41b1bdc',
+  },
+  {
+    version: '1.0.299',
+    date: '2026-04-25',
+    changes: [
+      '📋 vibex-proposals-20260425 E3: Firebase 实时协作',
+      '✅ E3-S2 RemoteCursor: SVG光标+用户名标签, 集成PresenceLayer, usePresence提供实时位置',
+      '✅ E3-S3 ConflictBubble增强: .node-id/.conflict-hint, 接受按钮点击后气泡消失',
+    ],
+    commit: '0b271cfdb',
+  },
+  {
+    version: '1.0.298',
+    date: '2026-04-25',
+    changes: [
+      '📋 vibex-proposals-20260425 E0: Sprint 9 债务清理',
+      '✅ E0-U1 js-yaml: useCanvasExport.ts + yaml-importer.ts TS2307, pnpm install 解决',
+      '✅ E0-U2 useSearchParams/Suspense: 提取 VersionHistoryContent, 包裹 Suspense boundary, 修复 prerender crash',
+    ],
+    commit: 'abc28cfc',
   },
   {
     version: '1.0.297',

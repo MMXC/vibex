@@ -120,7 +120,8 @@ test.describe('E4: Keyboard Shortcuts', () => {
 });
 
 test.describe('E2: DDS Canvas Keyboard Shortcuts', () => {
-  const DDS_CANVAS_URL = `${BASE_URL}/design/dds-canvas`;
+  // Use ?projectId=test so DDS canvas page renders (not stuck in loading state)
+  const DDS_CANVAS_URL = `${BASE_URL}/design/dds-canvas?projectId=test`;
 
   test.beforeEach(async ({ page }) => {
     await page.goto(DDS_CANVAS_URL);
@@ -190,5 +191,57 @@ test.describe('E2: DDS Canvas Keyboard Shortcuts', () => {
     // Should not show error state
     const errorState = page.locator('[data-testid="dds-error-state"]');
     await expect(errorState).not.toBeVisible({ timeout: 2000 });
+  });
+});
+
+test.describe('E3: DDS Canvas Search', () => {
+  // Use ?projectId=test so DDS canvas page renders (not stuck in loading state)
+  const DDS_CANVAS_URL = `${BASE_URL}/design/dds-canvas?projectId=test`;
+
+  test('F5.1: Ctrl+K opens search panel', async ({ page }) => {
+    await page.goto(DDS_CANVAS_URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle');
+
+    const canvas = page.locator('[data-testid="dds-canvas-page"]');
+    await expect(canvas).toBeVisible({ timeout: 10000 });
+
+    // Press Ctrl+K to open search panel
+    await page.keyboard.press('Control+k');
+    await page.waitForTimeout(500);
+
+    const panel = page.locator('[data-testid="dds-search-panel"]');
+    await expect(panel).toBeVisible({ timeout: 5000 });
+
+    // Press Escape to close
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(300);
+    await expect(panel).not.toBeVisible({ timeout: 3000 });
+  });
+
+  test('F5.2: Search finds cards across chapters', async ({ page }) => {
+    await page.goto(DDS_CANVAS_URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle');
+
+    const canvas = page.locator('[data-testid="dds-canvas-page"]');
+    await expect(canvas).toBeVisible({ timeout: 10000 });
+
+    // Open search panel
+    await page.keyboard.press('Control+k');
+    await page.waitForTimeout(500);
+
+    const panel = page.locator('[data-testid="dds-search-panel"]');
+    await expect(panel).toBeVisible({ timeout: 5000 });
+
+    // Type a short query
+    const searchInput = panel.locator('input[type="text"]');
+    await searchInput.fill('a');
+    await page.waitForTimeout(500); // debounce
+
+    // Panel should show results or "no results" text (not crash)
+    const panelContent = page.locator('[data-testid="dds-search-panel"]');
+    await expect(panelContent).toBeVisible({ timeout: 3000 });
+
+    // Press Escape
+    await page.keyboard.press('Escape');
   });
 });

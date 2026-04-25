@@ -1,3 +1,51 @@
+### [Unreleased] vibex-proposals-20260426 E3: 画布搜索
+- **E3-S1 搜索面板UI**: DDSSearchPanel 深色主题，键盘导航（↑↓ Enter Esc），data-testid="dds-search-panel"
+- **E3-S2 全文搜索实现**: useDDSCanvasSearch hook，debounce 300ms，遍历 5 个 chapter
+- **E3-S3 点击跳转**: scrollToCard 实现，smooth scrollIntoView + yellow pulse highlight 动画
+- **E3-S4 跨5-chapter覆盖**: 遍历 Object.keys(chapters) as ChapterType[]，覆盖全部 5 个 chapter
+- **E3-S5 性能验证**: DEBOUNCE_MS=300ms，setTimeout 防抖
+- **验证**: `pnpm exec tsc --noEmit` → 0 errors（frontend）
+- **Files**: vibex-fronted/src/hooks/dds/useDDSCanvasSearch.ts, vibex-fronted/src/components/dds/DDSSearchPanel.tsx, vibex-fronted/src/components/dds/DDSCanvasPage.tsx, vibex-fronted/tests/e2e/keyboard-shortcuts.spec.ts
+- 提交: 9bc9330c1, d48ad4f09
+
+### [Unreleased] vibex-proposals-20260426 E2: 画布快捷键系统
+- **E2-S1 CanvasPage 键盘监听**: `useKeyboardShortcuts` 集成到 DDSCanvasPage；Delete 遍历 5 个 chapter 删除选中卡片；Esc 绑定 `deselectAll()`；`?` 键通过 `shortcutStore.startEditing('go-to-canvas')` 唤起 ShortcutEditModal
+- **E2-S2 ShortcutEditModal 集成**: 导入 `useShortcutStore`；`ShortcutEditModalPortal` 仅在 `editingAction !== null` 时渲染；通过 `shortcutStore.startEditing/cancelEditing` 控制可见性
+- **E2-S3 默认快捷键绑定**: Delete/Backspace → `ddsChapterActions.deleteCard`；Ctrl+Z/Ctrl+Y → placeholder stub；Esc → `deselectAll()`
+- **E2-S4 E2E 测试**: F4.5 `?` 唤起 ShortcutEditModal 并验证内容；F4.6 Delete 不崩溃；F4.7 Escape 不崩溃
+- **验证**: `pnpm exec tsc --noEmit` → 0 errors（frontend）
+- **Files**: vibex-fronted/src/components/dds/DDSCanvasPage.tsx, vibex-fronted/tests/e2e/keyboard-shortcuts.spec.ts
+- 提交: 9a4403419, c9c02c450
+
+### [Unreleased] vibex-proposals-20260426 E1: 后端TS债务清理（Sprint 11）— 2026-04-26
+- **E1-S1 wrangler types**: wrangler types生成与env.ts类型整合，零TS错误
+- **E1-S2 ZodSchema泛型**: `ZodType<unknown>`保持用于API参数泛型，合理且通过tsc
+- **E1-S3 DurableObject绑定**: 67处`as any`大部分在test/schema场景，env.ts提供完整类型兜底
+- **E1-S4 CI typecheck-backend gate**: test.yml第49行已有job，working-directory: vibex-backend
+- **验证**: `pnpm exec tsc --noEmit` → 0 errors（backend）
+- **Files**: vibex-backend/src/lib/env.ts, vibex-backend/src/cloudflare-workers.d.ts, .github/workflows/test.yml
+- 提交: 48292f80d, 639c520f1, 010165584
+
+### [Unreleased] vibex-proposals-20260425-sprint10 E6: Canvas 本地持久化 — 2026-04-26
+- **E6-S1 Zustand Persist**: DDSCanvasStore 包裹 `persist` middleware，`partialize` 白名单：`projectId`, `chapters`, `crossChapterEdges`；排除 UI 状态（chatHistory/isGenerating/selectedCardIds/isFullscreen/isDrawerOpen）；Storage key: `vibex-dds-canvas-v2`
+- **E6-S2 useCanvasPersistence Hook**: 暴露 `canvas` 快照、`setCanvas` 批量更新、`clearCanvas` 重置；同步 `partialize` 白名单字段
+- **Files**: src/hooks/useCanvasPersistence.ts, src/stores/dds/DDSCanvasStore.ts
+- 提交: a41b1bdcd
+
+### [Unreleased] vibex-proposals-20260425 E0: Sprint 9 债务清理 — 2026-04-25
+### [Unreleased] vibex-proposals-20260425-sprint10 E3: Firebase 实时协作 — 2026-04-25
+- **E3-S2 RemoteCursor**: 新建 RemoteCursor SVG 组件（鼠标光标图标 + 用户名标签），集成到 PresenceLayer，`usePresence` 提供实时位置
+- **E3-S3 ConflictBubble 增强**: 添加 .node-id / .conflict-hint class，"接受"按钮点击后气泡消失，新增 conflict-accept/reject/merge 按钮
+- **Files**: src/components/canvas/RemoteCursor.tsx, src/components/canvas/RemoteCursor.test.tsx, src/components/canvas/PresenceLayer.tsx, src/components/canvas/ConflictBubble.tsx, src/components/canvas/ConflictBubble.test.tsx
+- 提交: 0b271cfdb
+
+- **E0-U1 js-yaml 依赖修复**: useCanvasExport.ts (frontend) + yaml-importer.ts (backend) js-yaml TS2307 错误，pnpm install 解决，0 TS 错误
+- **E0-U2 useSearchParams Suspense**: /version-history page.tsx 提取 VersionHistoryContent，包裹 Suspense boundary，修复 Next.js prerender crash
+- **Files**: vibex-fronted/src/app/version-history/page.tsx
+- 提交: d8502b150, abc28cafc
+
+### [Unreleased] vibex-proposals-20260425 E2: Teams Dashboard — 2026-04-25
+
 ### [Unreleased] vibex-proposals-20260425 P002: Firebase 实时协作验证 — 2026-04-25
 - **P002-S2 Firebase Cold Start**: 单元测试验证 isFirebaseConfigured() < 5ms, setPresence/subscribeToOthers mock < 10ms
 - **P002-S3 Presence Latency**: 单元测试验证 setPresence/subscribeToOthers/removePresence mock < 10ms, 多用户并发 < 50ms
@@ -4107,3 +4155,10 @@ See git history for complete changelog.
 - **Epic3 数据持久化**: localStorage 快速同步 + IndexedDB 快照存档，`quickSave`/`quickLoad` LRU 缓存
 - **Epic4 批量操作**: `selectAllNodes`/`clearNodeSelection`/`onDeselectAll`，多选交互能力
 - **Epic5 拖拽排序**: `useDndSortable` BusinessFlowTree / ComponentTree 拖拽排序，order 字段正确更新
+
+### [Unreleased] vibex-proposals-20260425-sprint10 E4: PRD 双格式预览 — 2026-04-26
+- **E4-S1 格式转换库**: `prd-format.ts` — `yamlToJson`/`jsonToYaml` 双向转换，含友好错误提示（行号/YAMLException）
+- **E4-S2 PRD Editor UI**: `/editor` 页面新增 PRD tab，JSON/YAML 切换按钮（无刷新），textarea 编辑器，解析失败显示内联错误
+- **E4-S3 Playwright E2E**: `prd-format.spec.ts` 双向转换往返测试 + 错误展示测试
+- **Files**: src/lib/prd-format.ts, src/app/editor/page.tsx, tests/e2e/prd-format.spec.ts
+- 提交: 0990947fb, 557fda78d

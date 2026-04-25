@@ -13,6 +13,16 @@
 - 提交: 83b2caac9, 21005374e, 450f1411f, 3ab68c7bd
 
 ### [Unreleased] vibex-proposals-20260425 P001: TypeScript 债务清理 — 2026-04-25
+### [Unreleased] vibex-proposals-20260426 E2: 画布快捷键系统
+
+- **E2-S1 CanvasPage 键盘监听**: `useKeyboardShortcuts` 集成到 DDSCanvasPage；Delete 遍历 5 个 chapter 删除选中卡片；Esc 绑定 `deselectAll()`；`?` 键通过 `shortcutStore.startEditing('go-to-canvas')` 唤起 ShortcutEditModal
+- **E2-S2 ShortcutEditModal 集成**: 导入 `useShortcutStore`；`ShortcutEditModalPortal` 仅在 `editingAction !== null` 时渲染；通过 `shortcutStore.startEditing/cancelEditing` 控制可见性
+- **E2-S3 默认快捷键绑定**: Delete/Backspace → `ddsChapterActions.deleteCard`；Ctrl+Z/Ctrl+Y → placeholder stub；Esc → `deselectAll()`
+- **E2-S4 E2E 测试**: F4.5 `?` 唤起 ShortcutEditModal 并验证内容；F4.6 Delete 不崩溃；F4.7 Escape 不崩溃
+- **验证**: `pnpm exec tsc --noEmit` → 0 errors（frontend）
+- **Files**: vibex-fronted/src/components/dds/DDSCanvasPage.tsx, vibex-fronted/tests/e2e/keyboard-shortcuts.spec.ts
+- 提交: 9a4403419, 044611019
+
 - **P001 Backend TS Debt**: 后端 TypeScript 编译错误从 197 → 28（第一阶段），修复 ddd.ts/openapi.ts/logger.ts/notifier.ts/schemas/index.ts 等文件
 - **P001-Zod4 Compatibility**: ZodSchema 结构化接口替换 ZodType<unknown>，解决 Zod 4 复杂泛型内部不可赋值问题
 - **P001-DurableObject Binding**: 分离 COLLABORATION_DO（DurableObject）和 COLLABORATION_KV（KV），修复 wrangler.toml 和 env.ts

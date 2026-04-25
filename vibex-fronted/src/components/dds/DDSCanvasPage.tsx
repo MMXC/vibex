@@ -25,6 +25,9 @@ import { CrossChapterEdgesOverlay } from '@/components/dds/canvas/CrossChapterEd
 import { AIDraftDrawer } from '@/components/dds/ai-draft';
 import { DDSFlow } from '@/components/dds/DDSFlow';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { ShortcutEditModal } from '@/components/shortcuts/ShortcutEditModal';
+import { useShortcutStore } from '@/stores/shortcutStore';
 import { createDDSAPI } from '@/hooks/dds/useDDSAPI';
 import type { ChapterType, ChapterData } from '@/types/dds';
 import type { DDSCard } from '@/types/dds';
@@ -164,7 +167,6 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     pageState: 'loading',
     errorMessage: null,
   });
-
   // Store refs
   const selectedCardIds = useDDSCanvasStore((s) => s.selectedCardIds);
   const toggleDrawer = useDDSCanvasStore((s) => s.toggleDrawer);
@@ -271,6 +273,62 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     toggleDrawer();
     onAIGenerate?.();
   }, [toggleDrawer, onAIGenerate]);
+
+  // ---- Keyboard Shortcuts ----
+  // Note: useKeyboardShortcuts uses OLD canvas history (context/flow/component).
+  // For DDS canvas, undo/redo will be wired when DDS history is implemented.
+  // For now, pass no-op stubs that return false (required by hook interface).
+  const undoCallback = useCallback((): boolean => false, []);
+  const redoCallback = useCallback((): boolean => false, []);
+
+  useKeyboardShortcuts({
+    undo: undoCallback,
+    redo: redoCallback,
+    onDelete: useCallback(() => {
+      // Find each selected card's chapter and delete it
+      selectedCardIds.forEach((id) => {
+        const store = useDDSCanvasStore.getState();
+        const chapterKeys = Object.keys(store.chapters) as ChapterType[];
+        chapterKeys.forEach((chapter) => {
+          const card = store.chapters[chapter].cards.find((c) => c.id === id);
+          if (card) {
+            ddsChapterActions.deleteCard(chapter, id);
+          }
+        });
+      });
+    }, [selectedCardIds]),
+    onClearSelection: () => useDDSCanvasStore.getState().deselectAll(),
+    onOpenSearch: () => { /* placeholder */ },
+    onZoomIn: () => { /* placeholder */ },
+    onZoomOut: () => { /* placeholder */ },
+    onZoomReset: () => { /* placeholder */ },
+    onSelectAll: () => { /* placeholder */ },
+    onNewNode: () => { /* placeholder */ },
+    enabled: true,
+  });
+
+  // ---- ? key: toggle ShortcutEditModal ----
+  // ShortcutEditModal shows when shortcutStore.editingAction !== null
+  // Press ? to start editing the first shortcut action
+  useEffect(() => {
+    function handleQuestionMark(e: KeyboardEvent) {
+      if (e.key !== '?') return;
+      const activeEl = document.activeElement;
+      if (activeEl && (activeEl instanceof HTMLElement)) {
+        const tagName = activeEl.tagName;
+        if (tagName === 'INPUT' || tagName === 'TEXTAREA') return;
+      }
+      e.preventDefault();
+      const store = useShortcutStore.getState();
+      if (store.editingAction) {
+        store.cancelEditing();
+      } else {
+        store.startEditing('go-to-canvas');
+      }
+    }
+    document.addEventListener('keydown', handleQuestionMark);
+    return () => document.removeEventListener('keydown', handleQuestionMark);
+  }, []);
 
   // ---- Render ----
 
@@ -383,6 +441,9 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
       {/* AI Draft Drawer */}
       <AIDraftDrawer />
 
+      {/* Keyboard shortcut edit modal */}
+      <ShortcutEditModalPortal />
+
       {/* Loading animation style */}
       <style>{`
         @keyframes dds-skeleton-shimmer {
@@ -399,5 +460,15 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     </div>
   );
 });
+
+// ShortcutEditModal rendered outside the main div, always mounted
+// Visibility controlled by shortcutStore.editingAction
+// The ? key handler above toggles shortcutModalOpen which drives editingAction via ShortcutEditModal internals
+function ShortcutEditModalPortal() {
+  // Only render when an action is being edited
+  const editingAction = useShortcutStore((s) => s.editingAction);
+  if (!editingAction) return null;
+  return <ShortcutEditModal />;
+}
 
 export default DDSCanvasPage;

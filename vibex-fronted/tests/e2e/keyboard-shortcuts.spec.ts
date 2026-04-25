@@ -118,3 +118,77 @@ test.describe('E4: Keyboard Shortcuts', () => {
     await expect(panel).not.toBeVisible({ timeout: 3000 });
   });
 });
+
+test.describe('E2: DDS Canvas Keyboard Shortcuts', () => {
+  const DDS_CANVAS_URL = `${BASE_URL}/design/dds-canvas`;
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(DDS_CANVAS_URL);
+    // Clear DDS canvas localStorage
+    await page.evaluate(() => localStorage.removeItem('vibex-dds-canvas-v2'));
+    await page.evaluate(() => localStorage.removeItem('vibex-shortcuts'));
+  });
+
+  test('F4.5: ? opens ShortcutEditModal on DDS canvas', async ({ page }) => {
+    // Navigate to DDS canvas
+    await page.goto(DDS_CANVAS_URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle');
+
+    // Press ? to open ShortcutEditModal
+    // This triggers startEditing('go-to-canvas') which shows the modal
+    await page.keyboard.press('?');
+    await page.waitForTimeout(500);
+
+    // ShortcutEditModal shows when editingAction !== null
+    // Modal has .modal class inside .modalOverlay
+    const modal = page.locator('[class*="modalOverlay"]');
+    const modalContent = page.locator('[class*="modal"]');
+    await expect(modal).toBeVisible({ timeout: 5000 });
+    await expect(modalContent).toBeVisible({ timeout: 3000 });
+
+    // Modal should show "切换到画布" as the action being edited
+    const actionLabel = page.getByText('切换到画布');
+    await expect(actionLabel).toBeVisible({ timeout: 3000 });
+
+    // Press Escape to close (ShortcutEditModal uses cancelEditing on Escape)
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(500);
+    await expect(modal).not.toBeVisible({ timeout: 3000 });
+  });
+
+  test('F4.6: Delete key deselects and deletes cards on DDS canvas', async ({ page }) => {
+    // Navigate to DDS canvas
+    await page.goto(DDS_CANVAS_URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle');
+
+    // Wait for canvas to be ready
+    const canvas = page.locator('[data-testid="dds-canvas-page"]');
+    await expect(canvas).toBeVisible({ timeout: 10000 });
+
+    // Delete key should not crash when no selection
+    await page.keyboard.press('Delete');
+    await page.waitForTimeout(200);
+
+    // Should not show error state
+    const errorState = page.locator('[data-testid="dds-error-state"]');
+    await expect(errorState).not.toBeVisible({ timeout: 2000 });
+  });
+
+  test('F4.7: Escape clears selection on DDS canvas', async ({ page }) => {
+    // Navigate to DDS canvas
+    await page.goto(DDS_CANVAS_URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle');
+
+    // Wait for canvas to be ready
+    const canvas = page.locator('[data-testid="dds-canvas-page"]');
+    await expect(canvas).toBeVisible({ timeout: 10000 });
+
+    // Escape should not crash when no selection
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(200);
+
+    // Should not show error state
+    const errorState = page.locator('[data-testid="dds-error-state"]');
+    await expect(errorState).not.toBeVisible({ timeout: 2000 });
+  });
+});

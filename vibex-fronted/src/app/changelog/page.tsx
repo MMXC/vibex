@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.303',
+    date: '2026-04-26',
+    changes: [
+      '📋 vibex-proposals-20260426 E2: 画布快捷键系统',
+      '✅ E2-S1 键盘监听: useKeyboardShortcuts集成DDSCanvasPage; Delete遍历5 chapter; Esc绑定deselectAll',
+      '✅ E2-S2 ShortcutEditModal: shortcutStore.startEditing("go-to-canvas")唤起; Portal条件渲染',
+      '✅ E2-S3 快捷键绑定: Delete/Backspace→deleteCard; Ctrl+Z/Y→placeholder; Esc→deselectAll',
+      '✅ E2-S4 E2E测试: F4.5 ?打开modal; F4.6 Delete; F4.7 Escape',
+    ],
+    commit: '9a4403419, 044611019',
+  },
+  {
     version: '1.0.297',
     date: '2026-04-24',
     changes: [

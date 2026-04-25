@@ -6,6 +6,14 @@
 - **Tests**: 7/7 passed (firebase-config + firebase-presence-latency)
 - 提交: b8f63a137
 
+### [Unreleased] heartbeat E3: Import/Export E2E 覆盖 — 2026-04-25
+- **E3-U1 Teams API E2E**: 5 tests — teams-api.spec.ts (GET/POST/GET/:id/DELETE/:id + 页面渲染)
+- **E3-U2 JSON round-trip E2E**: 6 tests — json-export-import.spec.ts (字段完整性/嵌套对象/非法JSON/UTF-8)
+- **E3-U3 YAML round-trip E2E**: 7 tests — yaml-export-import.spec.ts (特殊字符:#| / 多行块 literal/folded / Unicode)
+- **E3-U4 File Size Limit E2E**: 8 tests — import-size-limit.spec.ts (5MB 边界值 / 拦截逻辑)
+- **文件**: vibex-fronted/e2e/*.spec.ts, docs/heartbeat/E3_UNITS.md
+- 提交: a7f0ce9e2 (tests), a90674e79 (docs)
+
 ### [Unreleased] vibex-proposals-20260425 P003: Teams + Import/Export 测试覆盖 — 2026-04-25
 - **P003-S1 Teams API CRUD E2E**: teams-api.spec.ts 覆盖 GET/POST/GET/:id/DELETE/:id + 页面渲染
 - **P003-S2 JSON round-trip E2E**: json-export-import.spec.ts 覆盖字段完整性/嵌套对象/非法JSON/UTF-8

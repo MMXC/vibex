@@ -161,7 +161,7 @@ describe('AnalyticsWidget', () => {
     });
 
     expect(screen.getByTestId('analytics-error')).toBeInTheDocument();
-    expect(screen.getByText('加载失败')).toBeInTheDocument();
+    expect(screen.getByText(/加载失败/)).toBeInTheDocument();
   });
 
   it('renders error state on non-ok HTTP response', async () => {

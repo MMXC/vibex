@@ -1,8 +1,9 @@
+### [Unreleased] vibex-proposals-20260425 E0: Sprint 9 债务清理 — 2026-04-25
+- **E0-U1 js-yaml 依赖修复**: useCanvasExport.ts (frontend) + yaml-importer.ts (backend) js-yaml TS2307 错误，pnpm install 解决，0 TS 错误
+- **Files**: vibex-fronted/node_modules/js-yaml, vibex-backend/node_modules/js-yaml
+- 提交: d8502b150
+
 ### [Unreleased] vibex-proposals-20260425 E2: Teams Dashboard — 2026-04-25
-- **E2-S1 Teams 生产验证**: `/dashboard/teams` 页面，TeamList + CreateTeamDialog，TanStack Query + optimistic updates，CSS Modules
-- **E2-S2 E2E 测试补全**: teams-ui.spec.ts 扩展到 8 个测试（E2-U1~U8），404/网络错误/表单验证覆盖
-- **Files**: src/app/dashboard/teams/, src/components/teams/, src/lib/api/teams.ts, src/services/api/modules/teams.ts, src/services/api/types/team.ts, tests/e2e/teams-ui.spec.ts
-- 提交: 07850d16a, 6e97be739, a3f4c7b1, b7d2e9c3
 
 ### [Unreleased] vibex-proposals-20260425 P002: Firebase 实时协作验证 — 2026-04-25
 - **P002-S2 Firebase Cold Start**: 单元测试验证 isFirebaseConfigured() < 5ms, setPresence/subscribeToOthers mock < 10ms

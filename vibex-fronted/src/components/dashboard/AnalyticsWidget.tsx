@@ -4,14 +4,16 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import styles from './AnalyticsWidget.module.css';
 
 // ============================================================
-// Types
+// Types — aligned with PRD contract
+// PRD: { success, data: { page_view/canvas_open/component_create/delivery_export }, meta }
 // ============================================================
 
 type WidgetState = 'idle' | 'loading' | 'success' | 'error' | 'empty';
 
+// PRD metric point shape
 interface MetricPoint {
-  timestamp: string;
-  value: number;
+  date: string;
+  count: number;
 }
 
 interface MetricData {
@@ -21,9 +23,11 @@ interface MetricData {
   delivery_export: MetricPoint[];
 }
 
+// PRD contract — top-level response
 interface AnalyticsData {
-  metrics: MetricData;
-  period: { start: string; end: string };
+  success: boolean;
+  data: MetricData;
+  meta: { start_date: string; end_date: string; total_days: number };
 }
 
 const METRIC_CONFIG = {
@@ -84,7 +88,7 @@ function LineChart({ data }: LineChartProps) {
   // Collect all values across all metrics for Y scale
   const allValues: number[] = [];
   (Object.keys(METRIC_CONFIG) as Array<keyof MetricData>).forEach((key) => {
-    data[key]?.forEach((p) => allValues.push(p.value));
+    data[key]?.forEach((p) => allValues.push(p.count));
   });
 
   const maxVal = allValues.length > 0 ? Math.max(...allValues) : 1;
@@ -142,7 +146,7 @@ function LineChart({ data }: LineChartProps) {
     );
   }
 
-  // X axis labels (timestamps)
+  // X axis labels (date strings from PRD contract)
   const xLabels = [];
   if (numPoints > 0) {
     const sampleKey = (Object.keys(METRIC_CONFIG) as Array<keyof MetricData>)[0];
@@ -151,8 +155,8 @@ function LineChart({ data }: LineChartProps) {
     for (let i = 0; i < numPoints; i += labelStep) {
       const p = points[i];
       if (p) {
-        const d = new Date(p.timestamp);
-        const label = `${d.getMonth() + 1}/${d.getDate()}`;
+        // p.date format: "2026-04-19"
+        const label = p.date.slice(5); // "04-19"
         xLabels.push(
           <text
             key={`x-${i}`}
@@ -175,7 +179,7 @@ function LineChart({ data }: LineChartProps) {
       const points = data[key] ?? [];
       if (points.length === 0) return null;
       const polylinePoints = points
-        .map((p, i) => `${xScale(i)},${yScale(p.value)}`)
+        .map((p, i) => `${xScale(i)},${yScale(p.count)}`)
         .join(' ');
       return (
         <polyline
@@ -216,12 +220,12 @@ function MetricCards({ data }: MetricCardsProps) {
       {(Object.entries(METRIC_CONFIG) as [keyof MetricData, typeof METRIC_CONFIG[keyof typeof METRIC_CONFIG]][]).map(
         ([key, config]) => {
           const points = data[key] ?? [];
-          const latest = points.length > 0 ? points[points.length - 1].value : 0;
+          const latest = points.length > 0 ? points[points.length - 1].count : 0;
           // Calculate trend: compare last 2 points
           let trend: 'up' | 'down' | 'flat' = 'flat';
           if (points.length >= 2) {
-            const last = points[points.length - 1].value;
-            const prev = points[points.length - 2].value;
+            const last = points[points.length - 1].count;
+            const prev = points[points.length - 2].count;
             if (last > prev) trend = 'up';
             else if (last < prev) trend = 'down';
           }
@@ -282,7 +286,7 @@ function ErrorState({ errorMsg, onRetry }: ErrorStateProps) {
       <p className={styles.errorText}>
         {errorMsg ? `加载失败: ${errorMsg}` : '加载失败'}
       </p>
-      <button className={styles.retryButton} onClick={onRetry} type="button">
+      <button className={styles.retryButton} onClick={onRetry}>
         重试
       </button>
     </div>
@@ -298,6 +302,7 @@ function EmptyState() {
     <div className={styles.emptyState} data-testid="analytics-empty">
       <span className={styles.emptyIcon}>📊</span>
       <p className={styles.emptyText}>暂无数据</p>
+      <a href="/" className={styles.emptyLink}>开始使用 VibeX →</a>
     </div>
   );
 }
@@ -305,8 +310,6 @@ function EmptyState() {
 // ============================================================
 // Main Widget
 // ============================================================
-
-const ANALYTICS_ENDPOINT = 'https://api.vibex.top/api/v1/analytics';
 
 /** AnalyticsWidget — 4-state dashboard analytics widget with pure SVG line chart */
 export function AnalyticsWidget() {
@@ -325,7 +328,7 @@ export function AnalyticsWidget() {
     setErrorMsg('');
 
     try {
-      const res = await fetch(ANALYTICS_ENDPOINT, {
+      const res = await fetch('/api/analytics', {
         signal: controller.signal,
         headers: {
           'Content-Type': 'application/json',
@@ -338,10 +341,11 @@ export function AnalyticsWidget() {
 
       const json: AnalyticsData = await res.json();
 
-      // Determine if empty
-      const hasData = json.metrics &&
-        (Object.keys(json.metrics) as Array<keyof MetricData>).some(
-          (k) => (json.metrics[k]?.length ?? 0) > 0
+      // Determine if empty — check data.data (PRD contract)
+      const data2 = json.data;
+      const hasData = data2 &&
+        (Object.keys(data2) as Array<keyof MetricData>).some(
+          (k) => (data2[k]?.length ?? 0) > 0
         );
 
       setData(json);
@@ -385,17 +389,15 @@ export function AnalyticsWidget() {
           <Skeleton />
         ) : state === 'error' ? (
           <ErrorState errorMsg={errorMsg} onRetry={fetchAnalytics} />
-        ) : state === 'empty' ? (
+        ) : state === 'empty' || !data ? (
           <EmptyState />
-        ) : data ? (
+        ) : (
           <>
-            <LineChart data={data.metrics} />
-            <MetricCards data={data.metrics} />
+            <LineChart data={data.data} />
+            <MetricCards data={data.data} />
           </>
-        ) : null}
+        )}
       </div>
     </section>
   );
 }
-
-export default AnalyticsWidget;

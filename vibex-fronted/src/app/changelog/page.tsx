@@ -20,6 +20,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.298',
+    date: '2026-04-25',
+    changes: [
+      '📋 vibex-proposals-20260425 E0: Sprint 9 债务清理',
+      '✅ E0-U1 js-yaml: useCanvasExport.ts + yaml-importer.ts TS2307, pnpm install 解决',
+      '✅ E0-U2 useSearchParams/Suspense: 提取 VersionHistoryContent, 包裹 Suspense boundary, 修复 prerender crash',
+    ],
+    commit: 'abc28cfc',
+  },
+  {
     version: '1.0.297',
     date: '2026-04-24',
     changes: [

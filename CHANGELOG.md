@@ -1,7 +1,8 @@
 ### [Unreleased] vibex-proposals-20260425 E0: Sprint 9 债务清理 — 2026-04-25
 - **E0-U1 js-yaml 依赖修复**: useCanvasExport.ts (frontend) + yaml-importer.ts (backend) js-yaml TS2307 错误，pnpm install 解决，0 TS 错误
-- **Files**: vibex-fronted/node_modules/js-yaml, vibex-backend/node_modules/js-yaml
-- 提交: d8502b150
+- **E0-U2 useSearchParams Suspense**: /version-history page.tsx 提取 VersionHistoryContent，包裹 Suspense boundary，修复 Next.js prerender crash
+- **Files**: vibex-fronted/src/app/version-history/page.tsx
+- 提交: d8502b150, abc28cafc
 
 ### [Unreleased] vibex-proposals-20260425 E2: Teams Dashboard — 2026-04-25
 

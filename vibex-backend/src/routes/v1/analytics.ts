@@ -22,22 +22,39 @@ const analytics = new Hono<{ Bindings: Env }>();
 
 // ============================================================
 // GET /api/v1/health — latency stats (public, no DB, <50ms)
+// E1-S1 fix: graceful degradation on metrics store error
 // ============================================================
 
 analytics.get('/health', (c) => {
-  const stats: LatencyStats = metricsStore.getStats();
+  try {
+    const stats: LatencyStats = metricsStore.getStats();
 
-  return c.json({
-    status: 'healthy',
-    latency: {
-      p50: stats.p50,
-      p95: stats.p95,
-      p99: stats.p99,
-      window: stats.window,
-      sampleCount: stats.sampleCount,
-    },
-    timestamp: new Date().toISOString(),
-  });
+    return c.json({
+      status: 'healthy',
+      latency: {
+        p50: stats.p50,
+        p95: stats.p95,
+        p99: stats.p99,
+        window: stats.window,
+        sampleCount: stats.sampleCount,
+      },
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    // E1-S1 fix: graceful degradation
+    safeError('[analytics] health metrics error:', err);
+    return c.json({
+      status: 'degraded',
+      latency: {
+        p50: 0,
+        p95: 0,
+        p99: 0,
+        window: 60000,
+        sampleCount: 0,
+      },
+      timestamp: new Date().toISOString(),
+    });
+  }
 });
 
 // ============================================================
@@ -104,6 +121,7 @@ analytics.post('/', async (c) => {
 
 // ============================================================
 // GET /api/v1/analytics — query events (protected, E3-S3)
+// Graceful degradation: returns empty on DB error (E1-S1 fix)
 // ============================================================
 
 analytics.get('/', async (c) => {
@@ -119,6 +137,7 @@ analytics.get('/', async (c) => {
       whereClause += ' AND event = ?';
       params.push(event);
     }
+
 
     const rows = await queryDB<{
       id: string;
@@ -146,8 +165,14 @@ analytics.get('/', async (c) => {
       count: rows.length,
     });
   } catch (err) {
-    safeError('[analytics] GET error:', err);
-    return         c.json(apiError('Internal server error', ERROR_CODES.INTERNAL_ERROR), 500);
+    // E1-S1 fix: graceful degradation — return empty array on DB error
+    // instead of propagating 500 to frontend
+    safeError('[analytics] GET graceful fallback:', err);
+    return c.json({
+      events: [],
+      count: 0,
+      _fallback: true,
+    });
   }
 });
 

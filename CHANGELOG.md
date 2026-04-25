@@ -1,3 +1,12 @@
+### [Unreleased] vibex-proposals-20260426 E4: Firebase 实时协作 — 2026-04-26
+- **E4-S1 配置检查**: `isFirebaseConfigured()` 检查 NEXT_PUBLIC_FIREBASE_API_KEY 和 NEXT_PUBLIC_FIREBASE_DATABASE_URL；`updateCursor(canvasId, userId, x, y)` 通过 REST PATCH 写入 RTDB
+- **E4-S2 usePresence RTDB写入**: `usePresence(canvasId, userId, name)` 返回 `{ others, updateCursor, isAvailable, isConnected }`；DDSCanvasPage 通过 useEffect + setTimeout(100ms) 节流调用 updateCursor
+- **E4-S3 PresenceAvatars订阅**: PresenceAvatars 组件渲染于 fixed bottom-right (zIndex 9999, pointerEvents none)；所有 Firebase 调用均加 isFirebaseConfigured() guard
+- **E4-S4 DDSCanvasPage集成**: mouseMove handler 追踪 cursorPos；PresenceAvatars 仅在 Firebase configured 时渲染
+- **验证**: `pnpm exec tsc --noEmit` → 0 errors（frontend）
+- **Files**: vibex-fronted/src/components/dds/DDSCanvasPage.tsx, vibex-fronted/src/lib/firebase/presence.ts, vibex-fronted/src/components/canvas/Presence/PresenceAvatars.tsx
+- 提交: 597bd49bf
+
 ### [Unreleased] vibex-proposals-20260426 E3: 画布搜索
 - **E3-S1 搜索面板UI**: DDSSearchPanel 深色主题，键盘导航（↑↓ Enter Esc），data-testid="dds-search-panel"
 - **E3-S2 全文搜索实现**: useDDSCanvasSearch hook，debounce 300ms，遍历 5 个 chapter

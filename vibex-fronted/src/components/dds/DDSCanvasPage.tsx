@@ -31,6 +31,9 @@ import { useShortcutStore } from '@/stores/shortcutStore';
 import { createDDSAPI } from '@/hooks/dds/useDDSAPI';
 import { useDDSCanvasSearch } from '@/hooks/dds/useDDSCanvasSearch';
 import { DDSSearchPanel } from '@/components/dds/DDSSearchPanel';
+import { PresenceAvatars } from '@/components/canvas/Presence/PresenceAvatars';
+import { usePresence, isFirebaseConfigured, updateCursor } from '@/lib/firebase/presence';
+import { useAuthStore } from '@/stores/authStore';
 import type { ChapterType, ChapterData } from '@/types/dds';
 import type { DDSCard } from '@/types/dds';
 import type { ReactNode } from 'react';
@@ -169,6 +172,31 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     pageState: 'loading',
     errorMessage: null,
   });
+
+  // ---- E4: Firebase Presence ----
+  const [cursorPos, setCursorPos] = useState<{ x: number; y: number } | null>(null);
+  const user = useAuthStore((s) => s.user);
+  const userId = user?.id ?? null;
+  const { isAvailable } = usePresence(projectId ?? '', userId);
+
+  // Track cursor position
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    setCursorPos({ x: e.clientX, y: e.clientY });
+  }, []);
+
+  // Broadcast cursor to Firebase (throttled 100ms)
+  useEffect(() => {
+    if (!isFirebaseConfigured() || !cursorPos || !userId || !projectId) return;
+
+    const handler = setTimeout(() => {
+      updateCursor(projectId, userId, cursorPos.x, cursorPos.y).catch(() => {
+        // silent fail when not configured
+      });
+    }, 100);
+
+    return () => clearTimeout(handler);
+  }, [cursorPos, userId, projectId]);
+
   // Store refs
   const selectedCardIds = useDDSCanvasStore((s) => s.selectedCardIds);
   const toggleDrawer = useDDSCanvasStore((s) => s.toggleDrawer);
@@ -400,6 +428,7 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
       data-theme="dark"
       data-testid="dds-canvas-page"
       style={{ minHeight: '100vh', background: 'var(--bg-primary, #0a0a0a)' }}
+      onMouseMove={handleMouseMove}
     >
       {/* Toolbar */}
       <DDSToolbar onAIGenerate={handleAIGenerate} />
@@ -477,6 +506,18 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
           setSearchPanelOpen(false);
         }}
       />
+
+      {isFirebaseConfigured() && (
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          zIndex: 9999,
+          pointerEvents: 'none',
+        }}>
+          <PresenceAvatars canvasId={projectId ?? ''} maxDisplay={5} />
+        </div>
+      )}
 
       {/* Loading animation style */}
       <style>{`

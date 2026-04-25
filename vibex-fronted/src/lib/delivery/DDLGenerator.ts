@@ -14,6 +14,7 @@ export interface DDLColumn {
   type: string; // MySQL type string
   nullable: boolean;
   primaryKey: boolean;
+  indexed?: boolean;
   comment?: string;
 }
 
@@ -171,7 +172,7 @@ export function generateDDL(
             const typeStr = typeof propDef === 'object' && propDef !== null
               ? String((propDef as { type?: string }).type ?? 'VARCHAR(255)')
               : 'VARCHAR(255)';
-            const mysqlType = toMySQLType(typeStr);
+            const mysqlType = mapType(typeStr);
 
             if (!table.columns.find((c) => c.name === propName)) {
               table.columns.push({
@@ -202,17 +203,72 @@ export function generateDDL(
   return Array.from(tableMap.values());
 }
 
-/** Convert OpenAPI type to MySQL type string */
-function toMySQLType(openapiType: string): string {
-  const t = openapiType.toLowerCase();
-  if (t === 'string') return 'VARCHAR(255)';
-  if (t === 'integer' || t === 'int32') return 'INT';
-  if (t === 'int64' || t === 'long') return 'BIGINT';
-  if (t === 'boolean' || t === 'bool') return 'TINYINT(1)';
-  if (t === 'float' || t === 'double' || t === 'number') return 'DOUBLE';
-  if (t === 'date') return 'DATE';
-  if (t === 'datetime' || t === 'date-time') return 'DATETIME';
-  if (t === 'object') return 'JSON';
-  if (t === 'array') return 'JSON';
-  return 'VARCHAR(255)';
+/**
+ * Map a field type string to a database-specific column type.
+ * Supports all 7 types: VARCHAR, INT, DATE, ENUM, JSONB, UUID, ARRAY.
+ */
+export function mapType(fieldType: string): string {
+  const t = fieldType.toLowerCase();
+  switch (t) {
+    case 'varchar':
+    case 'string':
+      return 'VARCHAR(255)';
+    case 'int':
+    case 'integer':
+    case 'int32':
+      return 'INT';
+    case 'int64':
+    case 'long':
+      return 'BIGINT';
+    case 'date':
+      return 'DATE';
+    case 'datetime':
+    case 'date-time':
+      return 'DATETIME';
+    case 'boolean':
+    case 'bool':
+      return 'TINYINT(1)';
+    case 'float':
+    case 'double':
+    case 'number':
+      return 'DOUBLE';
+    case 'enum':
+      return 'VARCHAR(50)';
+    case 'jsonb':
+      return 'JSONB';
+    case 'uuid':
+      return 'UUID';
+    case 'array':
+      return 'INTEGER[]';
+    case 'json':
+    case 'object':
+      return 'JSON';
+    default:
+      return 'VARCHAR(255)';
+  }
+}
+
+/**
+ * Generate a PostgreSQL CHECK constraint for ENUM columns.
+ * @param columnName - Column name
+ * @param values - Array of allowed enum values
+ */
+export function generateEnumCheck(columnName: string, values: string[]): string {
+  const escaped = values.map((v) => `'${v}'`).join(', ');
+  return `CHECK (${columnName} IN (${escaped}))`;
+}
+
+/**
+ * Generate a CREATE INDEX statement.
+ * @param tableName - Target table name
+ * @param columnName - Column to index
+ * @param indexType - Optional index type (default: B-Tree)
+ */
+export function generateIndex(tableName: string, columnName: string, indexType?: 'BTREE' | 'HASH' | 'GIN' | 'GIST'): string {
+  const idxType = indexType ?? 'BTREE';
+  const idxName = `idx_${tableName}_${columnName}`;
+  if (idxType === 'BTREE' || idxType === 'HASH') {
+    return `CREATE INDEX ${idxName} ON ${tableName} USING ${idxType} (${columnName});`;
+  }
+  return `CREATE INDEX ${idxName} ON ${tableName} (${columnName});`;
 }

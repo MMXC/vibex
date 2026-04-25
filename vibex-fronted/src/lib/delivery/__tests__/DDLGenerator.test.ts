@@ -125,6 +125,75 @@ describe('generateDDL — T6', () => {
   });
 });
 
+// ==================== E4-S1: Type Extension ====================
+
+import { mapType, generateEnumCheck, generateIndex } from '../DDLGenerator';
+
+describe('mapType — E4-S1: All 7 types', () => {
+  it('VARCHAR → VARCHAR(255)', () => {
+    expect(mapType('varchar')).toBe('VARCHAR(255)');
+    expect(mapType('string')).toBe('VARCHAR(255)');
+  });
+
+  it('INT → INT', () => {
+    expect(mapType('int')).toBe('INT');
+    expect(mapType('integer')).toBe('INT');
+    expect(mapType('int32')).toBe('INT');
+  });
+
+
+  it('DATE → DATE', () => {
+    expect(mapType('date')).toBe('DATE');
+  });
+
+
+  it('ENUM → VARCHAR(50)', () => {
+    expect(mapType('enum')).toBe('VARCHAR(50)');
+  });
+
+  it('JSONB → JSONB', () => {
+    expect(mapType('jsonb')).toBe('JSONB');
+  });
+
+  it('UUID → UUID', () => {
+    expect(mapType('uuid')).toBe('UUID');
+  });
+
+
+  it('ARRAY → INTEGER[]', () => {
+    expect(mapType('array')).toBe('INTEGER[]');
+  });
+});
+
+describe('generateEnumCheck — E4-S1', () => {
+  it('generates CHECK constraint with values', () => {
+    const result = generateEnumCheck('status', ['active', 'inactive']);
+    expect(result).toBe("CHECK (status IN ('active', 'inactive'))");
+  });
+
+  it('handles single value', () => {
+    const result = generateEnumCheck('role', ['admin']);
+    expect(result).toBe("CHECK (role IN ('admin'))");
+  });
+});
+
+describe('generateIndex — E4-S1', () => {
+  it('BTREE index by default', () => {
+    const result = generateIndex('users', 'email');
+    expect(result).toBe('CREATE INDEX idx_users_email ON users USING BTREE (email);');
+  });
+
+  it('HASH index', () => {
+    const result = generateIndex('users', 'email', 'HASH');
+    expect(result).toBe('CREATE INDEX idx_users_email ON users USING HASH (email);');
+  });
+
+  it('GIN/GIST index without USING clause', () => {
+    const result = generateIndex('data', 'payload', 'GIN');
+    expect(result).toBe('CREATE INDEX idx_data_payload ON data (payload);');
+  });
+});
+
 // ==================== E3-U1: Additional tests ====================
 
 describe('generateDDL — E3-U1: Extended Coverage', () => {

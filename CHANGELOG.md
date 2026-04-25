@@ -1,3 +1,11 @@
+### [Unreleased] heartbeat E2: Firebase 可行性验证 — 2026-04-25
+- **E2-U1 Firebase Feasibility Review**: 产出 `docs/heartbeat/firebase-feasibility-review.md`
+- **结论**: 有条件可行，采用 Firebase REST API 方案（零 SDK 依赖）
+- **性能验证**: Mock < 10ms, REST API 零冷启动
+- **降级路径**: polling fallback，完善
+- **Tests**: 7/7 passed (firebase-config + firebase-presence-latency)
+- 提交: b8f63a137
+
 ### [Unreleased] vibex-proposals-20260425 P003: Teams + Import/Export 测试覆盖 — 2026-04-25
 - **P003-S1 Teams API CRUD E2E**: teams-api.spec.ts 覆盖 GET/POST/GET/:id/DELETE/:id + 页面渲染
 - **P003-S2 JSON round-trip E2E**: json-export-import.spec.ts 覆盖字段完整性/嵌套对象/非法JSON/UTF-8

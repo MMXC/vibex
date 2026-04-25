@@ -20,6 +20,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.305',
+    date: '2026-04-26',
+    changes: [
+      '📋 vibex-proposals-20260426 E4: Firebase 实时协作',
+      '✅ E4-S1 配置检查: isFirebaseConfigured() 检测Firebase环境',
+      '✅ E4-S2 PresenceAvatars集成: DDSCanvasPage底部右侧,四态(在线/空/加载/错误)',
+      '✅ E4-S3 鼠标位置跟踪: mousemove→throttle(100ms)→updateCursor广播',
+    ],
+    commit: '597bd49bf, a06db153b',
+  },
+  {
     version: '1.0.304',
     date: '2026-04-26',
     changes: [

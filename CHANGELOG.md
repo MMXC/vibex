@@ -5,7 +5,7 @@
 - **E4-S4 DDSCanvasPage集成**: mouseMove handler 追踪 cursorPos；PresenceAvatars 仅在 Firebase configured 时渲染
 - **验证**: `pnpm exec tsc --noEmit` → 0 errors（frontend）
 - **Files**: vibex-fronted/src/components/dds/DDSCanvasPage.tsx, vibex-fronted/src/lib/firebase/presence.ts, vibex-fronted/src/components/canvas/Presence/PresenceAvatars.tsx
-- 提交: 597bd49bf
+- 提交: 597bd49bf, a06db153b
 
 ### [Unreleased] vibex-proposals-20260426 E3: 画布搜索
 - **E3-S1 搜索面板UI**: DDSSearchPanel 深色主题，键盘导航（↑↓ Enter Esc），data-testid="dds-search-panel"

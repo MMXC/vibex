@@ -5,6 +5,13 @@
 - **Files**: src/lib/firebase/__tests__/firebase-config.test.ts, src/lib/firebase/__tests__/firebase-presence-latency.test.ts, tests/e2e/presence-mvp.spec.ts, tests/e2e/sse-e2e.spec.ts
 - 提交: eb51c4f7
 
+### [Unreleased] vibex-proposals-20260425 E1: Analytics API 修复 + Dashboard Widget — 2026-04-25
+- **E1-S1 后端 API 修复**: GET /api/v1/analytics DB 错误时返回空数组而非 500，GET /api/v1/health 指标错误时返回 degraded 状态
+- **E1-S2 AnalyticsWidget**: 纯 SVG 折线图组件（无 recharts/chart.js 依赖），四态（idle/loading/success/error/empty），data-testid 规范
+- **E1-Contract 统一**: 新建 App Router /api/analytics 聚合层，将后端原始事件转换为 PRD 契约格式 { success, data: { page_view/canvas_open/component_create/delivery_export }, meta }
+- **Files**: vibex-backend/src/routes/v1/analytics.ts, vibex-fronted/src/components/dashboard/AnalyticsWidget.{tsx,module.css,test.tsx}, vibex-fronted/src/app/api/analytics/route.ts, vibex-fronted/src/app/dashboard/page.tsx
+- 提交: 83b2caac9, 21005374e, 450f1411f, 3ab68c7bd
+
 ### [Unreleased] vibex-proposals-20260425 P001: TypeScript 债务清理 — 2026-04-25
 - **P001 Backend TS Debt**: 后端 TypeScript 编译错误从 197 → 28（第一阶段），修复 ddd.ts/openapi.ts/logger.ts/notifier.ts/schemas/index.ts 等文件
 - **P001-Zod4 Compatibility**: ZodSchema 结构化接口替换 ZodType<unknown>，解决 Zod 4 复杂泛型内部不可赋值问题

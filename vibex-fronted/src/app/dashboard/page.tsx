@@ -10,6 +10,7 @@ import { apiService, Project } from '@/services/api';
 import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog';
 import { SearchBar } from '@/components/dashboard/SearchBar';
 import { useProjects, useDeletedProjects, queryKeys } from '@/hooks/queries';
+import { AnalyticsWidget } from '@/components/dashboard/AnalyticsWidget';
 
 /** 排序方式 */
 type SortOption = 'name' | 'createdAt' | 'updatedAt';
@@ -498,6 +499,11 @@ export default function Dashboard() {
               </div>
             </div>
           ))}
+        </section>
+
+        {/* 数据分析 Widget */}
+        <section>
+          <AnalyticsWidget />
         </section>
 
         {/* 项目列表 */}

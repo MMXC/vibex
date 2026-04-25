@@ -1,9 +1,22 @@
+### [Unreleased] vibex-proposals-20260425 E2: Teams Dashboard — 2026-04-25
+- **E2-S1 Teams 生产验证**: `/dashboard/teams` 页面，TeamList + CreateTeamDialog，TanStack Query + optimistic updates，CSS Modules
+- **E2-S2 E2E 测试补全**: teams-ui.spec.ts 扩展到 8 个测试（E2-U1~U8），404/网络错误/表单验证覆盖
+- **Files**: src/app/dashboard/teams/, src/components/teams/, src/lib/api/teams.ts, src/services/api/modules/teams.ts, src/services/api/types/team.ts, tests/e2e/teams-ui.spec.ts
+- 提交: 07850d16a, 6e97be739, a3f4c7b1, b7d2e9c3
+
 ### [Unreleased] vibex-proposals-20260425 P002: Firebase 实时协作验证 — 2026-04-25
 - **P002-S2 Firebase Cold Start**: 单元测试验证 isFirebaseConfigured() < 5ms, setPresence/subscribeToOthers mock < 10ms
 - **P002-S3 Presence Latency**: 单元测试验证 setPresence/subscribeToOthers/removePresence mock < 10ms, 多用户并发 < 50ms
 - **P002-S5 SSE Bridge E2E**: E2E 测试覆盖 Canvas SSE 完整事件序列
 - **Files**: src/lib/firebase/__tests__/firebase-config.test.ts, src/lib/firebase/__tests__/firebase-presence-latency.test.ts, tests/e2e/presence-mvp.spec.ts, tests/e2e/sse-e2e.spec.ts
 - 提交: eb51c4f7
+
+### [Unreleased] vibex-proposals-20260425 E1: Analytics API 修复 + Dashboard Widget — 2026-04-25
+- **E1-S1 后端 API 修复**: GET /api/v1/analytics DB 错误时返回空数组而非 500，GET /api/v1/health 指标错误时返回 degraded 状态
+- **E1-S2 AnalyticsWidget**: 纯 SVG 折线图组件（无 recharts/chart.js 依赖），四态（idle/loading/success/error/empty），data-testid 规范
+- **E1-Contract 统一**: 新建 App Router /api/analytics 聚合层，将后端原始事件转换为 PRD 契约格式 { success, data: { page_view/canvas_open/component_create/delivery_export }, meta }
+- **Files**: vibex-backend/src/routes/v1/analytics.ts, vibex-fronted/src/components/dashboard/AnalyticsWidget.{tsx,module.css,test.tsx}, vibex-fronted/src/app/api/analytics/route.ts, vibex-fronted/src/app/dashboard/page.tsx
+- 提交: 83b2caac9, 21005374e, 450f1411f, 3ab68c7bd
 
 ### [Unreleased] vibex-proposals-20260425 P001: TypeScript 债务清理 — 2026-04-25
 - **P001 Backend TS Debt**: 后端 TypeScript 编译错误从 197 → 28（第一阶段），修复 ddd.ts/openapi.ts/logger.ts/notifier.ts/schemas/index.ts 等文件

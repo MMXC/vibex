@@ -14,6 +14,13 @@
 - **文件**: vibex-fronted/e2e/*.spec.ts, docs/heartbeat/E3_UNITS.md
 - 提交: a7f0ce9e2 (tests), a90674e79 (docs)
 
+### [Unreleased] heartbeat E4: PM 质量门禁 — 2026-04-25
+- **E4-U1 Coord 评审检查点**: `docs/coord-review-process.md` 新增四态表/Design Token/情绪地图检查点
+- **E4-U2 PRD 模板更新**: `docs/prd-template.md` 新增"本期不做"章节, 版本 v2.0
+- **E4-U3 SPEC 模板更新**: `docs/spec-template.md` 新增四态表/Design Token/情绪地图引用
+- **文件**: docs/coord-review-process.md, docs/prd-template.md, docs/spec-template.md, docs/heartbeat/E4_UNITS.md
+- 提交: 061f78170 (templates), c9612cd25 (docs)
+
 ### [Unreleased] vibex-proposals-20260425 P003: Teams + Import/Export 测试覆盖 — 2026-04-25
 - **P003-S1 Teams API CRUD E2E**: teams-api.spec.ts 覆盖 GET/POST/GET/:id/DELETE/:id + 页面渲染
 - **P003-S2 JSON round-trip E2E**: json-export-import.spec.ts 覆盖字段完整性/嵌套对象/非法JSON/UTF-8

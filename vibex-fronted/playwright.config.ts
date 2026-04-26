@@ -17,6 +17,8 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     actionTimeout: 15000, // Increase action timeout
+    headless: true, // E3: Explicit headless mode for CI
+    viewport: { width: 1280, height: 720 }, // E3: Standard viewport for consistent tests
   },
   projects: [
     {

@@ -4243,3 +4243,10 @@ See git history for complete changelog.
 - **US-E2.3 File Export UI**: useCanvasExport extended (exportAsJSON + exportAsVibex); .vibex = gzip compressed JSON; .json = pretty-printed; 1MB warning; data-testid=canvas-export-btn
 - **US-E2.4 Import History**: ImportHistoryService (localStorage persistence, getImportLog, clearImportLog)
 - 提交: c202f33d0
+
+### [Unreleased] S14-E3: E2E Test Coverage — 2026-04-27
+- **US-E3.1 Playwright Setup**: playwright.config.ts updated (headless: true, viewport: 1280x720)
+- **US-E3.2 Canvas Interaction**: design-to-code.spec.ts (5 tests: generate button, output, download ZIP, feature flag, limit warning) — all use data-testid selectors
+- **US-E3.3 Import/Export + Token**: canvas-import-export.spec.ts (3 tests) + token-integration.spec.ts (3 tests) — no CSS chaining selectors
+- **US-E3.4 Mock Scope Docs**: MockAgentService scope documented in each spec file header comment
+- 提交: ea8be9ee7

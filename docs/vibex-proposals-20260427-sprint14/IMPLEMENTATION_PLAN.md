@@ -521,3 +521,17 @@ export async function registerE5Modules(app: App): Promise<void> {
 
 **验证**: pnpm tsc --noEmit ✅ | lint clean (E2 files) ✅
 **Commit**: c202f33d0 | **Files**: 9 new/modified
+
+---
+
+## E3 Implementation Status (Sprint 14)
+
+| Story | Status | Notes |
+|-------|--------|-------|
+| US-E3.1: Playwright Setup | ✅ Done | ea8be9ee7 — headless: true, viewport: 1280x720 |
+| US-E3.2: Canvas Interaction Tests | ✅ Done | ea8be9ee7 — design-to-code.spec.ts (5 tests, data-testid selectors) |
+| US-E3.3: Token Integration Tests | ✅ Done | ea8be9ee7 — canvas-import-export.spec.ts (3) + token-integration.spec.ts (3) |
+| US-E3.4: MockAgentService Docs | ✅ Done | ea8be9ee7 — header comment in each spec file |
+
+**验证**: pnpm tsc --noEmit ✅ | playwright config ✅
+**Commit**: ea8be9ee7 | **Files**: 4 new/modified

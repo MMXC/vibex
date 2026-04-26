@@ -58,6 +58,7 @@
     "flatted": "^3.4.2",
     "framer-motion": "^12.35.2",
     "fuse.js": "^7.1.0",
+    "handlebars": "^4.7.9",
     "html-to-image": "^1.11.13",
     "js-yaml": "^4.1.1",
     "jsondiffpatch": "^0.7.3",

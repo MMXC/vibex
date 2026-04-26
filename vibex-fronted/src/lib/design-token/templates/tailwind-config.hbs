@@ -1,0 +1,24 @@
+/**
+ * Tailwind Config Template — E1 Design-to-Code Pipeline
+ *
+ * Generates a Tailwind CSS theme extension from token map.
+ *
+ * @module lib/design-token/templates/tailwind-config.hbs
+ */
+
+/**
+ * @type {string}
+ * Compiled output — do not edit manually.
+ * Use: handlebars.compile(template)({ tokens, schemaVersion, exportedAt })
+ */
+const TEMPLATE = `export const tailwindTheme = {
+  theme: {
+    extend: {
+{{#each tokens}}
+      '{{@key}}': '{{value}}',
+{{/each}}
+    },
+  },
+};`;
+
+export default TEMPLATE;

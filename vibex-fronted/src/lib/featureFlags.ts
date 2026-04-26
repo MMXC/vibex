@@ -7,7 +7,9 @@ type FeatureFlagName =
   | 'MULTI_FRAMEWORK_EXPORT'
   | 'VERCEL_DEPLOY'
   | 'MCP_SERVER'
-  | 'NEW_CANVAS';
+  | 'NEW_CANVAS'
+  | 'FEATURE_DESIGN_TO_CODE_PIPELINE'
+  | 'FEATURE_DESIGN_TO_CODE_BIDIRECTIONAL';
 
 interface FeatureFlagConfig {
   name: FeatureFlagName;
@@ -34,6 +36,16 @@ const FLAGS: FeatureFlagConfig[] = [
   {
     name: 'NEW_CANVAS',
     description: 'Enable new canvas rendering engine',
+    defaultValue: false,
+  },
+  {
+    name: 'FEATURE_DESIGN_TO_CODE_PIPELINE',
+    description: 'Enable E1 Design-to-Code Pipeline (Figma token export + injection)',
+    defaultValue: false,
+  },
+  {
+    name: 'FEATURE_DESIGN_TO_CODE_BIDIRECTIONAL',
+    description: 'Enable bidirectional sync between local and Figma tokens',
     defaultValue: false,
   },
 ];

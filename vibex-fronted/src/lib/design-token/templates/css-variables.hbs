@@ -1,0 +1,11 @@
+/**
+ * CSS Variables Template — E1 Design-to-Code Pipeline
+ * Compiled via Handlebars
+ * @module lib/design-token/templates/css-variables.hbs
+ */
+/* VibeX Design Tokens | schema: {{schemaVersion}} | exported: {{exportedAt}} */
+:root {
+{{#each tokens}}
+  --{{@key}}: {{value}};
+{{/each}}
+}

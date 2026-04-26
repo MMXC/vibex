@@ -1,0 +1,27 @@
+/**
+ * JS/TS Constants Template — E1 Design-to-Code Pipeline
+ * Compiled via Handlebars
+ * @module lib/design-token/templates/js-constants.hbs
+ */
+/**
+ * VibeX Design Token Constants
+ * Schema: {{schemaVersion}} | Exported: {{exportedAt}}
+ */
+
+/** Design token values keyed by name */
+export const DESIGN_TOKENS = {
+{{#each tokens}}
+  {{@key}}: {{value}},
+{{/each}}
+} as const;
+
+/** Token metadata including type and description */
+export const TOKEN_META = {
+{{#each tokens}}
+  {{@key}}: {
+    type: '{{type}}',
+    name: '{{name}}',
+    description: '{{description}}',
+  },
+{{/each}}
+} as const;

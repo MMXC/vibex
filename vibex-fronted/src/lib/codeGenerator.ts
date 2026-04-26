@@ -64,6 +64,8 @@ export interface GeneratedFiles {
   types: string;      // TypeScript type definitions (.d.ts)
   component: string;  // Component skeleton (.tsx)
   css: string;       // CSS Module (.module.css)
+  scss: string;      // SCSS variables (.scss)
+  js: string;        // JS/TS constants (.ts)
   index: string;     // Entry point (.ts)
 }
 
@@ -475,6 +477,80 @@ function generateIndexFile(flow: CanvasFlow, framework: TargetFramework): string
 }
 
 // =============================================================================
+// SCSS Variables Generator — E1 Design-to-Code Pipeline
+// =============================================================================
+
+/**
+ * Generate SCSS variables from a canvas flow.
+ * Maps CSS custom properties to SCSS $ variables.
+ */
+function generateSCSS(flow: CanvasFlow): string {
+  const flowName = sanitizeName(flow.name ?? 'Flow');
+  const nodes = flow.nodes ?? [];
+
+  const lines: string[] = [
+    `// ${flowName}.scss — VibeX Design Tokens (SCSS)`,
+    `// Generated: ${new Date().toISOString()}`,
+    ``,
+  ];
+
+  for (const cssVar of DESIGN_CSS_VARS) {
+    const scssVarName = cssVar.replace('--', '').replace(/-/g, '_');
+    lines.push(`$${scssVarName}: var(${cssVar});`);
+  }
+
+  // Node-specific variables
+  for (const node of nodes.slice(0, 20)) {
+    const nodeName = sanitizeName(node.name ?? node.id).replace(/([A-Z])/g, '-$1').toLowerCase();
+    lines.push(`$${nodeName}: var(--spacing-4);`);
+  }
+
+  return lines.join('\n');
+}
+
+// =============================================================================
+// JS/TS Constants Generator — E1 Design-to-Code Pipeline
+// =============================================================================
+
+/**
+ * Generate JS/TS constants from a canvas flow.
+ * Exports design tokens as typed constants.
+ */
+function generateJSConstants(flow: CanvasFlow): string {
+  const flowName = sanitizeName(flow.name ?? 'Flow');
+  const nodes = flow.nodes ?? [];
+
+  const lines: string[] = [
+    `/**`,
+    ` * ${flowName}.constants.ts — VibeX Design Token Constants`,
+    ` * Generated: ${new Date().toISOString()}`,
+    ` */`,
+    ``,
+    `/** Design token values as CSS variable references */`,
+    `export const DESIGN_TOKENS = {`,
+  ];
+
+  for (const cssVar of DESIGN_CSS_VARS) {
+    const key = cssVar.replace('--', '').replace(/-/g, '_').toUpperCase();
+    lines.push(`  ${key}: '${cssVar}',`);
+  }
+
+  lines.push(`} as const;`, ``);
+
+  // Node metadata
+  if (nodes.length > 0) {
+    lines.push(`/** Node metadata from canvas */`);
+    lines.push(`export const CANVAS_NODES = [`);
+    for (const node of nodes.slice(0, 20)) {
+      lines.push(`  { id: '${node.id}', name: '${node.name ?? ''}', type: '${node.type ?? ''}' },`);
+    }
+    lines.push(`] as const;`);
+  }
+
+  return lines.join('\n');
+}
+
+// =============================================================================
 // Utilities
 // =============================================================================
 
@@ -527,6 +603,8 @@ export function generateComponentCode(
       types: generateTypeDefinitions(flow),
       component: generateTSXSkeleton(flow, framework),
       css: generateCSSModule(flow),
+      scss: generateSCSS(flow),
+      js: generateJSConstants(flow),
       index: generateIndexFile(flow, framework),
     },
     nodeCount: nodes.length,
@@ -554,6 +632,8 @@ export async function packageAsZip(
   zip.file(`${prefix}.types.ts`, result.files.types);
   zip.file(`${prefix}.tsx`, result.files.component);
   zip.file(`${prefix}.module.css`, result.files.css);
+  zip.file(`${prefix}.scss`, result.files.scss);
+  zip.file(`${prefix}.constants.ts`, result.files.js);
   zip.file(`index.ts`, result.files.index);
 
   // Add README
@@ -567,6 +647,8 @@ export async function packageAsZip(
     `- \`${prefix}.types.ts\` — TypeScript type definitions`,
     `- \`${prefix}.tsx\` — Component skeleton`,
     `- \`${prefix}.module.css\` — CSS Module (design system variables)`,
+    `- \`${prefix}.scss\` — SCSS variables (E1)`,
+    `- \`${prefix}.constants.ts\` — JS/TS constants (E1)`,
     `- \`index.ts\` — Entry point`,
     '',
     '## Usage',

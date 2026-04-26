@@ -1,3 +1,12 @@
+### [Unreleased] vibex-proposals-20260426-sprint12 E7: MCP Server 可观测性 — 2026-04-26
+- **E7-S1 动态版本读取**: `index.ts` 使用 `readFileSync` + `import.meta.url` 读取 `package.json.version`；移除硬编码 '0.1.0'
+- **E7-S1 HealthCheckOptions**: `health.ts` 添加 `serverVersion` 参数注入；`performHealthCheck()` 返回 status/version/uptime/tools/checks/connectedClients
+- **E7-S2 Structured Logging**: `logger.logToolCall()` — tool/duration/success 字段；启动时记录 version + SDK version
+- **E7-S2 敏感数据脱敏**: `sanitize()` 递归过滤 8 种敏感 key（token/password/secret/key/auth/credential/passphrase/private）；支持嵌套对象
+- **E7-S2 SDK Version Check**: 启动时记录 MCP_SDK_VERSION='0.5.0'
+- **E7-S2 测试**: `logger.test.ts` 12 tests (JSON格式/tool call/脱敏/嵌套脱敏)；`health.test.ts` ✅
+- 提交: 4bf59939e (E7-S1 dynamic version), 3e8667dad (E7-S1/S2 foundation)
+
 ### [Unreleased] vibex-proposals-20260426-sprint12 E6: Prompts 安全 AST 扫描 — 2026-04-26
 - **E6-S1 接口对齐 spec**: `SecurityReport` → `SecurityAnalysisResult`（per epic-06-ast-scan.md）；`UnsafePattern` 接口含 type/line/column；`unsafeEval/newFunction/dynamicCode` → `unsafePatterns: UnsafePattern[]`
 - **E6-S2 轻量级 AST Walker**: 移除 `@babel/traverse` Path 对象开销，手写 `walkNode()` 递归遍历；性能 ~18-24ms/5000行（spec: <50ms）

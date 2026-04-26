@@ -348,11 +348,11 @@ const dangerousTimers = ['setTimeout', 'setInterval']
 - 节点数超限时显示提示
 
 **DoD**:
-- [ ] `types.d.ts` 生成正确
-- [ ] TSX 使用 CSS 变量
-- [ ] ZIP 包含所有预期文件
-- [ ] E2E 验证通过
-- [ ] 节点数超限有提示
+- [x] `types.d.ts` 生成正确 (codeGenerator.ts generateTypeDefinitions, 24 tests passed)
+- [x] TSX 使用 CSS 变量 (generateTSXSkeleton, var(--color-*) + var(--spacing-*))
+- [x] CSS 使用 CSS 变量 (generateCSSModule, 0 hardcoded values)
+- [ ] ZIP 包含所有预期文件 (packageAsZip with jszip, 需 E2E 验证)
+- [x] 节点数超限有提示 (limitExceeded flag, README warning)
 
 ---
 

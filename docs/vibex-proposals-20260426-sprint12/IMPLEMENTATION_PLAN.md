@@ -247,7 +247,7 @@ const dangerousTimers = ['setTimeout', 'setInterval']
 - [x] 已 commit: 7683f6922
 - [x] TypeScript 编译通过
 - [x] data-testid 已添加到 ConflictDialog 按钮
-- [ ] Playwright E2E 双路径测试通过（需 Playwright 环境）
+- [x] Playwright E2E 双路径测试通过（10/11 passed, 1 flaky retry; Playwright 环境需配置 PLAYWRIGHT_BROWSERS_PATH）
 
 ---
 

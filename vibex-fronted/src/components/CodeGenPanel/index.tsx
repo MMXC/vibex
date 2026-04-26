@@ -100,7 +100,7 @@ export function CodeGenPanel({ flow, onDownload, disabled = false }: CodeGenPane
   }, [state.result, flow.name, onDownload]);
 
   const { status, result, error, activeTab, selectedFramework } = state;
-  const tabs: { id: Tab; label: string; key: keyof typeof result.files }[] = [
+  const tabs: { id: Tab; label: string; key: 'component' | 'css' | 'types' | 'index' }[] = [
     { id: 'tsx', label: 'TSX', key: 'component' },
     { id: 'css', label: 'CSS', key: 'css' },
     { id: 'types', label: 'Types', key: 'types' },

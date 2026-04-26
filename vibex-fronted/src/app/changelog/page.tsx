@@ -76,6 +76,20 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '557fda78',
   },
   {
+    version: '1.0.304',
+    date: '2026-04-26',
+    changes: [
+      '📋 vibex-proposals-20260426-sprint12 E10: 设计稿代码生成',
+      '✅ E10-S1 codeGenerator: generateComponentCode(flow,framework), sanitizeName, packageAsZip',
+      '✅ E10-S1 类型定义: CanvasNode/CanvasFlow/Chapter, flow-specific types, CanvasNodeType枚举',
+      '✅ E10-S2 CodeGenPanel: framework selector, generate button, code preview tabs, download ZIP',
+      '✅ E10-S2 CSS Module: CSS变量(--color-*/--spacing-*/--radius-*), 响应式, WCAG AA',
+      '✅ E10 测试: 25 tests (types/TSX/CSS/index/node limit/ZIP) ✅',
+      '✅ E10 修复: CodeGenPanel tabs类型注解 TS null check',
+    ],
+    commit: 'ea8c6e79f',
+  },
+  {
     version: '1.0.303',
     date: '2026-04-26',
     changes: [
@@ -104,22 +118,6 @@ const mockChangelog: ChangelogEntry[] = [
   },
   {
     version: '1.0.302',
-    date: '2026-04-26',
-    changes: [
-      '📋 vibex-proposals-20260426-sprint12 E6: Prompts 安全 AST 扫描',
-      '✅ E6-S1 接口对齐: SecurityReport → SecurityAnalysisResult, UnsafePattern 含 type/line/column',
-      '✅ E6-S2 轻量级Walker: 移除 @babel/traverse Path开销, walkNode()递归, ~299ms/5000行',
-      '✅ E6-S3 innerHTML检测: MemberExpression visitor 检测 innerHTML/outerHTML 赋值',
-      '✅ E6-S4 集成: code-review.ts + code-generation.ts 已迁移到 generateSecurityWarnings()',
-      '✅ E6-S5 测试覆盖: 21 tests (TC01-TC06 + perf + edge cases), 1000合法样本',
-      '📋 vibex-proposals-20260426-sprint12 E7: MCP 可观测性',
-      '✅ E7-S1 动态版本: readFileSync + import.meta.url 读取 package.json.version',
-      '✅ E7-S1 HealthCheck: performHealthCheck(options.serverVersion), connectedClients=1(stdio)',
-      '✅ E7-S2 结构化日志: logger.logToolCall(tool/duration/success), 启动时记录version+sdk',
-      '✅ E7-S2 敏感脱敏: sanitize()递归过滤8种key, 支持嵌套对象',
-    ],
-    commit: '4bf59939e',
-  },
     date: '2026-04-26',
     changes: [
       '📋 vibex-proposals-20260426-sprint12 E6: Prompts 安全 AST 扫描',

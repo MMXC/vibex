@@ -1,3 +1,13 @@
+### [Unreleased] vibex-proposals-20260426-sprint12 E10: 设计稿代码生成 — 2026-04-26
+- **E10-S1 codeGenerator.ts**: `generateComponentCode(flow, framework)` 生成 TypeScript 类型定义 + TSX 骨架 + CSS Module + index；`sanitizeName()` 处理中文/特殊字符 PascalCase；`packageAsZip()` JSZip 打包 ZIP 下载
+- **E10-S1 类型定义**: CanvasNode/CanvasFlow/Chapter 接口；flow-specific types（ContextNode/FlowNode/ComponentNode）；`CanvasNodeType` 枚举
+- **E10-S2 CodeGenPanel UI**: framework selector (React/Vue/Solid)；generate button；code preview tabs (tsx/css/types/index)；download ZIP button；200节点限制警告
+- **E10-S2 CSS Module**: 所有值使用 CSS 变量（--color-*, --spacing-*, --radius-*）；响应式媒体查询；WCAG AA 合规
+- **E10 测试**: codeGenerator.test.ts 25 tests passed ✅
+- **验证**: `pnpm exec tsc --noEmit` → 0 errors
+- **修复**: CodeGenPanel TS null check (tabs type annotation)
+- 提交: ea8c6e79f
+
 ### [Unreleased] vibex-proposals-20260426-sprint12 E9: AI 设计评审 — 2026-04-26
 - **E9-S1 review_design MCP tool**: `packages/mcp-server/src/tools/reviewDesign.ts` 注册为 MCP tool；输入 canvasId/nodes/check flags；返回 DesignReviewReport（compliance/a11y/reuse 三段）
 - **E9-S1 工具注册**: `list.ts` 添加 review_design tool schema；`execute.ts` case 'review_design' 调用 reviewDesign()

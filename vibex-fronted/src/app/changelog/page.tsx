@@ -72,9 +72,21 @@ const mockChangelog: ChangelogEntry[] = [
     changes: [
       '📋 vibex-proposals-20260425 E4: PRD 双格式预览',
       '✅ E4-S1 格式转换库: yamlToJson/jsonToYaml 双向转换, 友好错误提示',
-      '✅ E4-S2 PRD Editor UI: /editor页面PRD tab, JSON/YAML切换按钮, 内联错误展示',
+      '✅ E6-S5 测试覆盖: 21 tests (TC01-TC06 + perf + edge cases), 1000合法样本',
     ],
-    commit: '557fda78',
+    commit: 'e3229f884',
+  },
+  {
+    version: '1.0.301',
+    date: '2026-04-26',
+    changes: [
+      '📋 vibex-proposals-20260426 E4: Firebase 实时协作',
+      '✅ E4-S1 配置检查: isFirebaseConfigured() 检查 env vars',
+      '✅ E4-S2 usePresence RTDB写入: updateCursor 节流 100ms',
+      '✅ E4-S3 PresenceAvatars: fixed bottom-right zIndex 9999',
+      '✅ E4-S4 DDSCanvasPage集成: mouseMove cursorPos 追踪',
+    ],
+    commit: 'a06db153b',
   },
   {
     version: '1.0.300',

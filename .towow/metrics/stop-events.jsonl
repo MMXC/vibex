@@ -10,3 +10,4 @@
 {"ts": "2026-04-13T13:54:26", "session_key": "e85600b5-462e-4ac5-8df1-320bc9b403a6", "event": "stop_pass", "reason": "no_session_writes"}
 {"ts": "2026-04-13T13:57:28", "session_key": "b42f0be3-980d-44a1-a439-f0557306af31", "event": "stop_pass", "reason": "no_session_writes"}
 {"ts": "2026-04-13T15:38:58", "session_key": "e0219ec0-494d-49d5-9737-8bb2095a1c51", "event": "stop_pass", "reason": "no_session_writes"}
+{"ts": "2026-04-26T11:40:52", "session_key": "1a0af074-3ca2-4a37-9a65-1fe75412d128", "event": "stop_skip", "reason": "evaluator_md_missing"}

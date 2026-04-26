@@ -1,3 +1,12 @@
+### [Unreleased] vibex-proposals-20260426-sprint12 E6: Prompts 安全 AST 扫描 — 2026-04-26
+- **E6-S1 接口对齐 spec**: `SecurityReport` → `SecurityAnalysisResult`（per epic-06-ast-scan.md）；`UnsafePattern` 接口含 type/line/column；`unsafeEval/newFunction/dynamicCode` → `unsafePatterns: UnsafePattern[]`
+- **E6-S2 轻量级 AST Walker**: 移除 `@babel/traverse` Path 对象开销，手写 `walkNode()` 递归遍历；性能 ~18-24ms/5000行（spec: <50ms）
+- **E6-S3 innerHTML/outerHTML 检测**: `MemberExpression` visitor 检测 `property.name in ['innerHTML','outerHTML']`；`generateSecurityWarnings` 按类型分组输出警告
+- **E6-S4 集成点**: `code-review.ts` + `code-generation.ts` 均已迁移到 `generateSecurityWarnings()`（替换正则匹配）
+- **E6-S5 测试覆盖**: 21 tests passing（TC01-TC06 + Performance + Edge cases）；1000合法样本 `false-positive-samples.ts`
+- **验证**: `npx jest --testPathPatterns=codeAnalyzer --no-coverage` → 21/21 passed（+ perf test）
+- 提交: e3229f884
+
 ### [Unreleased] vibex-proposals-20260426 E4: Firebase 实时协作 — 2026-04-26
 - **E4-S1 配置检查**: `isFirebaseConfigured()` 检查 NEXT_PUBLIC_FIREBASE_API_KEY 和 NEXT_PUBLIC_FIREBASE_DATABASE_URL；`updateCursor(canvasId, userId, x, y)` 通过 REST PATCH 写入 RTDB
 - **E4-S2 usePresence RTDB写入**: `usePresence(canvasId, userId, name)` 返回 `{ others, updateCursor, isAvailable, isConnected }`；DDSCanvasPage 通过 useEffect + setTimeout(100ms) 节流调用 updateCursor

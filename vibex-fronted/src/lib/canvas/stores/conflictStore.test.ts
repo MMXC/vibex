@@ -3,7 +3,7 @@
  * E8-S1/S2/S3: LWW 仲裁 + 冲突解决
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useConflictStore } from '../conflictStore';
+import { useConflictStore } from './conflictStore';
 
 describe('useConflictStore — LWW 仲裁', () => {
   beforeEach(() => {

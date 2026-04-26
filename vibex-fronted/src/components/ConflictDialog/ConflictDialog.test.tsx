@@ -4,7 +4,7 @@
  */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ConflictDialog, type ConflictData } from './ConflictDialog';
+import { ConflictDialog, type ConflictData } from './index';
 
 const mockConflict: ConflictData = {
   nodeId: 'flow-1',

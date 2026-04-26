@@ -9,3 +9,4 @@ export { BusinessFlowTree } from './BusinessFlowTree';
 export { ComponentTree } from './ComponentTree';
 export { ProjectBar } from './ProjectBar';
 export { PrototypeQueuePanel } from './PrototypeQueuePanel';
+export { ConflictBubble } from './ConflictBubble';

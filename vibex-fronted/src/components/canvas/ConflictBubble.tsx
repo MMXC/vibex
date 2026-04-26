@@ -1,152 +1,74 @@
 /**
- * ConflictBubble — 协作冲突提示气泡
- * E1-S3: 协作冲突提示 UI
+ * ConflictBubble — 协作冲突提示气泡 / 仲裁弹窗
+ * E8-S2: 升级版 ConflictBubble 集成 ConflictDialog
  *
- * 特性：
- * - 绝对定位气泡，出现在被冲突节点的旁边
- * - 双方用户名 + 冲突时间 + "了解" 按钮
- * - 淡入动画 < 200ms
- * - 关闭后同一冲突 5 分钟内不再重复显示
+ * 职责：
+ * - 订阅 conflictStore.activeConflict
+ * - 显示 ConflictDialog（玻璃态弹窗，双按钮仲裁）
+ * - 处理 keep-local / use-remote 策略
  */
 
 'use client';
 
-import React, { useEffect, useState, useCallback, memo } from 'react';
-import { onConflict } from '@/lib/canvas/collaborationSync';
-import styles from './ConflictBubble.module.css';
+import React, { useCallback } from 'react';
+import { useConflictStore } from '@/lib/canvas/stores/conflictStore';
+import { ConflictDialog } from '@/components/ConflictDialog';
+import type { ConflictData } from '@/lib/canvas/stores/conflictStore';
 
-interface ConflictEvent {
-  treeType: string;
-  action: string;
-  nodeId: string;
-  userId: string;
-  timestamp: number;
+/** 将 ConflictData 转换为 ConflictDialog 兼容格式 */
+function toDialogProps(conflict: ConflictData) {
+  return {
+    serverSnapshot: {
+      snapshotId: `remote-${conflict.nodeId}`,
+      version: conflict.remoteVersion,
+      createdAt: new Date().toISOString(),
+      data: conflict.remoteData as Record<string, unknown>,
+    },
+    localData: conflict.localData as Record<string, unknown>,
+  };
 }
-
-interface ConflictBubbleItem {
-  id: string;
-  userId: string;
-  treeType: string;
-  nodeId: string;
-  timestamp: number;
-  dismissed: boolean;
-}
-
-const CONFLICT_COOLDOWN_MS = 5 * 60 * 1000; // 5 分钟冷却
-
-function formatTime(timestamp: number): string {
-  const date = new Date(timestamp);
-  return date.toLocaleTimeString('zh-CN', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  });
-}
-
-/** 生成简单的 userId 前缀用于显示 */
-function getShortUserId(userId: string): string {
-  return userId.length > 8 ? `${userId.slice(0, 4)}...${userId.slice(-4)}` : userId;
-}
-
-const ConflictBubbleItem = memo(function ConflictBubbleItem({
-  conflict,
-  onDismiss,
-}: {
-  conflict: ConflictBubbleItem;
-  onDismiss: (id: string) => void;
-}) {
-  return (
-    <div
-      className={styles.bubble}
-      role="alert"
-      aria-live="polite"
-    >
-      <div className={styles.bubbleHeader}>
-        <span className={styles.bubbleIcon}>⚠️</span>
-        <span className={styles.bubbleTitle}>编辑冲突</span>
-      </div>
-      <div className={styles.bubbleBody}>
-        <p className={styles.bubbleText}>
-          用户 <strong>{getShortUserId(conflict.userId)}</strong> 同时编辑了此节点
-        </p>
-        <p className={styles.bubbleTime}>{formatTime(conflict.timestamp)}</p>
-      </div>
-      <button
-        className={styles.dismissButton}
-        onClick={() => onDismiss(conflict.id)}
-        aria-label="了解并关闭"
-      >
-        了解
-      </button>
-    </div>
-  );
-});
 
 /**
- * ConflictBubble — 冲突提示气泡管理器
- *
- * 挂载在 Canvas Container 内，通过 React Context 接收冲突事件
+ * ConflictBubble — 挂载在 Canvas 外层
+ * 无冲突时不渲染任何内容
  */
 export function ConflictBubble() {
-  const [conflicts, setConflicts] = useState<ConflictBubbleItem[]>([]);
+  const activeConflict = useConflictStore((s) => s.activeConflict);
+  const resolveKeepLocal = useConflictStore((s) => s.resolveKeepLocal);
+  const resolveUseRemote = useConflictStore((s) => s.resolveUseRemote);
+  const dismissConflict = useConflictStore((s) => s.dismissConflict);
 
-  const dismissConflict = useCallback((id: string) => {
-    setConflicts((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, dismissed: true } : c))
-    );
-    // 3 秒后从列表中移除（等待动画完成）
-    setTimeout(() => {
-      setConflicts((prev) => prev.filter((c) => c.id !== id));
-    }, 300);
-  }, []);
+  const handleKeepLocal = useCallback(() => {
+    if (!activeConflict) return;
+    resolveKeepLocal(activeConflict.nodeId);
+    dismissConflict();
+  }, [activeConflict, resolveKeepLocal, dismissConflict]);
 
-  useEffect(() => {
-    // 订阅冲突事件
-    const unsubscribe = onConflict((event: ConflictEvent) => {
-      const conflictId = `${event.nodeId}-${event.userId}-${event.timestamp}`;
+  const handleUseRemote = useCallback(() => {
+    if (!activeConflict) return;
+    resolveUseRemote(activeConflict.nodeId);
+    dismissConflict();
+  }, [activeConflict, resolveUseRemote, dismissConflict]);
 
-      // 检查是否已在冷却中
-      const existing = conflicts.find((c) => c.nodeId === event.nodeId && !c.dismissed);
-      if (existing) return;
+  const handleMerge = useCallback(() => {
+    // E8-S2: merge 策略暂用 keep-local（后续可扩展）
+    if (!activeConflict) return;
+    resolveKeepLocal(activeConflict.nodeId);
+    dismissConflict();
+  }, [activeConflict, resolveKeepLocal, dismissConflict]);
 
-      // 检查是否在 5 分钟内有过相同的冲突
-      const recent = conflicts.find(
-        (c) =>
-          c.nodeId === event.nodeId &&
-          Date.now() - c.timestamp < CONFLICT_COOLDOWN_MS
-      );
-      if (recent) return;
+  if (!activeConflict) return null;
 
-      const newConflict: ConflictBubbleItem = {
-        id: conflictId,
-        userId: event.userId,
-        treeType: event.treeType,
-        nodeId: event.nodeId,
-        timestamp: event.timestamp,
-        dismissed: false,
-      };
-
-      setConflicts((prev) => [...prev, newConflict]);
-    });
-
-    return unsubscribe;
-  }, [conflicts]);
-
-  // 只显示未关闭的冲突
-  const visibleConflicts = conflicts.filter((c) => !c.dismissed);
-
-  if (visibleConflicts.length === 0) return null;
+  const dialogProps = toDialogProps(activeConflict);
 
   return (
-    <div className={styles.container} aria-label="协作冲突提示">
-      {visibleConflicts.map((conflict) => (
-        <ConflictBubbleItem
-          key={conflict.id}
-          conflict={conflict}
-          onDismiss={dismissConflict}
-        />
-      ))}
-    </div>
+    <ConflictDialog
+      serverSnapshot={dialogProps.serverSnapshot as Parameters<typeof ConflictDialog>[0]['serverSnapshot']}
+      localData={dialogProps.localData as Parameters<typeof ConflictDialog>[0]['localData']}
+      onKeepLocal={handleKeepLocal}
+      onUseServer={handleUseRemote}
+      onMerge={handleMerge}
+    />
   );
 }
 

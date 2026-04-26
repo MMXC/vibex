@@ -7,6 +7,7 @@ export { useUIStore } from './uiStore';
 export { useFlowStore } from './flowStore';
 export { useComponentStore } from './componentStore';
 export { useSessionStore } from './sessionStore';
+export { useConflictStore } from './conflictStore';
 
 export type {
   SSEStatus,

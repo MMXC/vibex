@@ -133,6 +133,7 @@ export function ConflictDialog({
         aria-modal="true"
         aria-labelledby="conflict-dialog-title"
         aria-describedby="conflict-dialog-desc"
+        data-testid="conflict-bubble"
       >
         {/* Header */}
         <div className={styles.header}>
@@ -200,6 +201,7 @@ export function ConflictDialog({
             className={styles.buttonLocal}
             onClick={onKeepLocal}
             aria-label="保留本地数据，丢弃服务端更改"
+            data-testid="conflict-keep-local"
           >
             <span className={styles.buttonIcon} aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -217,6 +219,7 @@ export function ConflictDialog({
             className={styles.buttonServer}
             onClick={onUseServer}
             aria-label="使用服务端数据，丢弃本地更改"
+            data-testid="conflict-use-server"
           >
             <span className={styles.buttonIcon} aria-hidden="true">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

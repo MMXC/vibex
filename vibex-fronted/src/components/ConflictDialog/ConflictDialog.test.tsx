@@ -1,62 +1,43 @@
 /**
  * ConflictDialog — 测试
- * E4-SyncProtocol: 冲突解决对话框测试
+ * E8-S2: 冲突仲裁弹窗单元测试
  */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ConflictDialog, type CanvasSnapshot, type CanvasData } from './index';
+import { ConflictDialog, type ConflictData } from './ConflictDialog';
 
-// Test fixtures
-const mockServerSnapshot: CanvasSnapshot = {
-  snapshotId: 'snap-server-001',
-  version: 5,
-  createdAt: '2026-04-03T10:00:00.000Z',
-  data: {
-    contexts: [
-      { nodeId: 'ctx-1', name: '用户管理', description: '', type: 'core', status: 'confirmed', children: [] },
-      { nodeId: 'ctx-2', name: '订单系统', description: '', type: 'core', status: 'confirmed', children: [] },
-    ],
-    flows: [
-      { nodeId: 'flow-1', contextId: 'ctx-1', name: '用户注册流程', steps: [], status: 'confirmed', children: [] },
-    ],
-    components: [
-      { nodeId: 'comp-1', flowId: 'flow-1', name: '注册表单', type: 'page', props: {}, api: { method: 'POST', path: '/api/register', params: [] }, status: 'confirmed', children: [] },
-    ],
+const mockConflict: ConflictData = {
+  nodeId: 'flow-1',
+  nodeName: '用户注册流程',
+  localData: {
+    id: 'flow-1',
+    name: '用户注册流程',
+    version: 5,
+    status: 'draft',
+    description: '本地编辑',
   },
+  remoteData: {
+    id: 'flow-1',
+    name: '用户注册流程',
+    version: 6,
+    status: 'confirmed',
+    description: '服务端更新',
+  },
+  localVersion: 5,
+  remoteVersion: 6,
 };
 
-const mockLocalData: CanvasData = {
-  contextNodes: [
-    { nodeId: 'ctx-1', name: '用户管理', description: '', type: 'core', status: 'confirmed', children: [] },
-    { nodeId: 'ctx-2', name: '订单系统', description: '', type: 'core', status: 'confirmed', children: [] },
-    { nodeId: 'ctx-3', name: '支付系统', description: '', type: 'core', status: 'pending', children: [] },
-  ],
-  flowNodes: [
-    { nodeId: 'flow-1', contextId: 'ctx-1', name: '用户注册流程', steps: [], status: 'confirmed', children: [] },
-    { nodeId: 'flow-2', contextId: 'ctx-3', name: '支付流程', steps: [], status: 'pending', children: [] },
-  ],
-  componentNodes: [
-    { nodeId: 'comp-1', flowId: 'flow-1', name: '注册表单', type: 'page', props: {}, api: { method: 'POST', path: '/api/register', params: [] }, status: 'confirmed', children: [] },
-    { nodeId: 'comp-2', flowId: 'flow-2', name: '支付表单', type: 'form', props: {}, api: { method: 'POST', path: '/api/pay', params: [] }, status: 'pending', children: [] },
-  ],
-};
-
-// Mock onKeepLocal
 const mockOnKeepLocal = vi.fn();
-// Mock onUseServer
-const mockOnUseServer = vi.fn();
-// Mock onMerge
-const mockOnMerge = vi.fn();
+const mockOnUseRemote = vi.fn();
+const mockOnDismiss = vi.fn();
 
-function renderDialog(props?: Partial<React.ComponentProps<typeof ConflictDialog>>) {
+function renderDialog(overrides: Partial<ConflictData> = {}) {
   return render(
     <ConflictDialog
-      serverSnapshot={mockServerSnapshot}
-      localData={mockLocalData}
+      conflict={{ ...mockConflict, ...overrides }}
       onKeepLocal={mockOnKeepLocal}
-      onUseServer={mockOnUseServer}
-      onMerge={mockOnMerge}
-      {...props}
+      onUseRemote={mockOnUseRemote}
+      onDismiss={mockOnDismiss}
     />
   );
 }
@@ -66,135 +47,124 @@ describe('ConflictDialog', () => {
     vi.clearAllMocks();
   });
 
-  it('renders dialog with correct title and subtitle', () => {
+  it('renders dialog with 冲突检测 title', () => {
     renderDialog();
-    expect(screen.getByText('检测到数据冲突')).toBeInTheDocument();
-    expect(screen.getByText(/有其他设备或标签页修改了此项目/)).toBeInTheDocument();
+    expect(screen.getByText('冲突检测')).toBeInTheDocument();
   });
 
-  it('renders version info with correct version numbers', () => {
+  it('renders both buttons with correct labels', () => {
     renderDialog();
-    expect(screen.getByText('v5')).toBeInTheDocument();
-    expect(screen.getByText('v6')).toBeInTheDocument(); // local is version + 1
+    expect(screen.getByRole('button', { name: /保留我的版本/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /采用最新版本/ })).toBeInTheDocument();
   });
 
-  it('renders comparison table with node counts', () => {
-    const { container } = renderDialog();
-    // Verify comparison table renders with cells
-    const cells = container.querySelectorAll('[role="cell"]');
-    expect(cells.length).toBe(6); // 2 rows × 3 columns
-    // Verify server row values are displayed (from mockServerSnapshot)
-    // Server: 2 contexts, 1 flow, 1 component
-    const cellTexts = Array.from(cells).map((c) => c.textContent ?? '');
-    // All 6 cells should have non-empty text content
-    expect(cellTexts.every((t) => t !== '' && t !== null)).toBe(true);
-    // The comparison section should show both server and local data
-    expect(container.querySelector('[class*="comparison"]')).toBeInTheDocument();
-  });
-
-  it('renders three action buttons with correct labels', () => {
+  it('calls onKeepLocal when 保留我的版本 button is clicked', () => {
     renderDialog();
-    expect(screen.getByRole('button', { name: /保留本地/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /使用服务端/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /合并双方/ })).toBeInTheDocument();
-  });
-
-  it('calls onKeepLocal when 保留本地 button is clicked', async () => {
-    renderDialog();
-    const button = screen.getByRole('button', { name: /保留本地/ });
-    fireEvent.click(button);
+    fireEvent.click(screen.getByRole('button', { name: /保留我的版本/ }));
     expect(mockOnKeepLocal).toHaveBeenCalledTimes(1);
+    expect(mockOnKeepLocal).toHaveBeenCalledWith('flow-1');
   });
 
-  it('calls onUseServer when 使用服务端 button is clicked', async () => {
+  it('calls onUseRemote when 采用最新版本 button is clicked', () => {
     renderDialog();
-    const button = screen.getByRole('button', { name: /使用服务端/ });
-    fireEvent.click(button);
-    expect(mockOnUseServer).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole('button', { name: /采用最新版本/ }));
+    expect(mockOnUseRemote).toHaveBeenCalledTimes(1);
+    expect(mockOnUseRemote).toHaveBeenCalledWith('flow-1');
   });
 
-  it('calls onMerge when 合并双方 button is clicked', async () => {
+  it('calls onDismiss when close button is clicked', () => {
     renderDialog();
-    const button = screen.getByRole('button', { name: /合并双方/ });
-    fireEvent.click(button);
-    expect(mockOnMerge).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole('button', { name: '关闭' }));
+    expect(mockOnDismiss).toHaveBeenCalledTimes(1);
   });
 
-  it('has dialog role for accessibility', () => {
+  it('has dialog role and aria-modal for accessibility', () => {
     renderDialog();
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toBeAttribute('aria-modal', 'true');
   });
 
-  it('has aria-modal attribute for accessibility', () => {
-    renderDialog();
-    expect(screen.getByRole('dialog')).toHaveAttribute('aria-modal', 'true');
-  });
-
-  it('has aria-labelledby for dialog title', () => {
+  it('has aria-labelledby pointing to title', () => {
     renderDialog();
     const dialog = screen.getByRole('dialog');
     expect(dialog).toHaveAttribute('aria-labelledby', 'conflict-dialog-title');
   });
 
-  it('handles empty local data gracefully', () => {
-    renderDialog({
-      localData: {},
-    });
-    expect(screen.getByText('检测到数据冲突')).toBeInTheDocument();
-    // Dialog should still render even with empty local data
-    expect(screen.getByRole('button', { name: /保留本地/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /使用服务端/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /合并双方/ })).toBeInTheDocument();
-  });
-
-  it('handles empty server data gracefully', () => {
-    renderDialog({
-      serverSnapshot: {
-        ...mockServerSnapshot,
-        data: {},
-      },
-    });
-    expect(screen.getByText('检测到数据冲突')).toBeInTheDocument();
-  });
-
-  it('renders help text at bottom', () => {
+  it('displays node name in description', () => {
     renderDialog();
-    expect(screen.getByText(/如有疑问/)).toBeInTheDocument();
+    expect(screen.getByText(/用户注册流程/)).toBeInTheDocument();
   });
 
-  it('first button is auto-focused for keyboard accessibility', () => {
-    renderDialog();
-    const firstButton = screen.getByRole('button', { name: /保留本地/ });
-    expect(firstButton).toHaveFocus();
+  it('falls back to nodeId when nodeName is missing', () => {
+    renderDialog({ nodeName: undefined });
+    expect(screen.getByText(/flow-1/)).toBeInTheDocument();
   });
 
-  it('Tab key cycles focus through buttons', () => {
+  it('shows hint text about ESC key', () => {
     renderDialog();
-    const buttons = [
-      screen.getByRole('button', { name: /保留本地/ }),
-      screen.getByRole('button', { name: /使用服务端/ }),
-      screen.getByRole('button', { name: /合并双方/ }),
-    ];
+    expect(screen.getByText(/按 ESC 键采用最新版本/)).toBeInTheDocument();
+  });
 
-    // Start at first button (auto-focused)
-    expect(document.activeElement).toBe(buttons[0]);
+  it('ESC key triggers onUseRemote', () => {
+    renderDialog();
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(mockOnUseRemote).toHaveBeenCalledTimes(1);
+    expect(mockOnUseRemote).toHaveBeenCalledWith('flow-1');
+  });
 
-    // Tab to second button
-    fireEvent.keyDown(document.activeElement!, { key: 'Tab' });
-    // Note: This test may need adjustment based on actual focus behavior
-    // The keydown handler is on the overlay, not individual elements
+  it('renders diff table with version labels', () => {
+    renderDialog();
+    // Should show version numbers
+    expect(screen.getByText(/v5/)).toBeInTheDocument();
+    expect(screen.getByText(/v6/)).toBeInTheDocument();
+  });
+
+  it('renders diff with differing fields highlighted', () => {
+    renderDialog();
+    // status field differs: local=draft, remote=confirmed
+    expect(screen.getByText('draft')).toBeInTheDocument();
+    expect(screen.getByText('confirmed')).toBeInTheDocument();
+    // description field differs
+    expect(screen.getByText('本地编辑')).toBeInTheDocument();
+    expect(screen.getByText('服务端更新')).toBeInTheDocument();
+  });
+
+  it('has data-testid on dialog for E2E tests', () => {
+    renderDialog();
+    expect(screen.getByTestId('conflict-bubble')).toBeInTheDocument();
+  });
+
+  it('has data-testid on keep-local button for E2E tests', () => {
+    renderDialog();
+    expect(screen.getByTestId('conflict-keep-local')).toBeInTheDocument();
+  });
+
+  it('has data-testid on use-remote button for E2E tests', () => {
+    renderDialog();
+    expect(screen.getByTestId('conflict-use-server')).toBeInTheDocument();
   });
 });
 
-describe('ConflictDialog — Node Count Helpers', () => {
-  it('counts zero for empty arrays', () => {
-    const data: CanvasData = {
-      contextNodes: [],
-      flowNodes: [],
-      componentNodes: [],
+describe('ConflictDialog — Edge Cases', () => {
+  it('handles empty localData gracefully', () => {
+    renderDialog({ localData: {} });
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByText(/保留我的版本/)).toBeInTheDocument();
+  });
+
+  it('handles empty remoteData gracefully', () => {
+    renderDialog({ remoteData: {} });
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByText(/采用最新版本/)).toBeInTheDocument();
+  });
+
+  it('shows identical values as unchanged', () => {
+    const conflict = {
+      ...mockConflict,
+      localData: { id: 'x', name: 'Same', version: 1 },
+      remoteData: { id: 'x', name: 'Same', version: 2 },
     };
-    // Just verify it renders without error
-    renderDialog({ localData: data });
-    expect(screen.getByText('检测到数据冲突')).toBeInTheDocument();
+    renderDialog(conflict);
+    // Both versions should be displayed
+    expect(screen.getByText('Same')).toBeInTheDocument();
   });
 });

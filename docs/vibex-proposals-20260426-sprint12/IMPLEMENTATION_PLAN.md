@@ -239,11 +239,15 @@ const dangerousTimers = ['setTimeout', 'setInterval']
 **验收**: Playwright E2E 双路径全部通过
 
 **DoD**:
-- [ ] 锁写入 Firebase `lockedBy: userId`
-- [ ] ConflictBubble 在冲突时弹出
-- [ ] LWW：后写优先
-- [ ] 锁 60s 超时
-- [ ] Firebase configured/unconfigured 双路径 E2E 通过
+- [x] 锁写入 Firebase `lockedBy: userId`（conflictStore.lockCard）
+- [x] ConflictBubble 在冲突时弹出（ConflictDialog 玻璃态弹窗）
+- [x] LWW：后写优先（conflictStore.checkConflict）
+- [x] 锁 60s 超时（LOCK_TIMEOUT_MS = 60000）
+- [x] Firebase configured/unconfigured 双路径（isFirebaseConfigured() fallback）
+- [x] 已 commit: 7683f6922
+- [x] TypeScript 编译通过
+- [x] data-testid 已添加到 ConflictDialog 按钮
+- [ ] Playwright E2E 双路径测试通过（需 Playwright 环境）
 
 ---
 

@@ -196,18 +196,44 @@ export function handleRemoteNodeSync(payload: NodeSyncPayload): void {
 
   canvasLogger.default.debug('[CollabSync] Remote node sync:', payload);
 
-  // 检查冲突（如果本地正在编辑同一节点）
-  // 触发冲突事件（由 ConflictBubble 消费）
-  emitConflictEvent(payload);
+  // E8-S3: LWW 仲裁 — 检查本地草稿，决定是否弹出 ConflictDialog
+  // 动态导入避免循环依赖
+  import('./stores/conflictStore').then(({ useConflictStore }) => {
+    const remoteData = payload.data ?? {};
+    const remoteVersion = (payload as unknown as { version?: number }).version ?? 0;
 
-  // 合并到本地 store（Last-Write-Wins，version 已在 payload 中）
-  for (const handler of mergeHandlers) {
-    try {
-      handler(payload.treeType, payload.action, payload.nodeId, payload.data);
-    } catch (err) {
-      canvasLogger.default.error('[CollabSync] Merge handler error:', err);
+    const conflict = useConflictStore.getState().checkConflict(
+      payload.nodeId,
+      undefined,
+      remoteData,
+      remoteVersion,
+      payload.userId
+    );
+
+    if (conflict) {
+      // 有冲突 → ConflictDialog 会处理
+      canvasLogger.default.info('[CollabSync] LWW conflict shown:', payload.nodeId);
+    } else {
+      // 无冲突或 LWW 自动 adopt → 合并到本地 store
+      canvasLogger.default.debug('[CollabSync] LWW auto-merge:', payload.nodeId);
+      for (const handler of mergeHandlers) {
+        try {
+          handler(payload.treeType, payload.action, payload.nodeId, payload.data);
+        } catch (err) {
+          canvasLogger.default.error('[CollabSync] Merge handler error:', err);
+        }
+      }
     }
-  }
+  }).catch(() => {
+    // fallback: 正常合并
+    for (const handler of mergeHandlers) {
+      try {
+        handler(payload.treeType, payload.action, payload.nodeId, payload.data);
+      } catch {
+        // ignore
+      }
+    }
+  });
 }
 
 // ============================================================================

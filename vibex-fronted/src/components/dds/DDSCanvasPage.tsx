@@ -37,6 +37,9 @@ import { useAuthStore } from '@/stores/authStore';
 import type { ChapterType, ChapterData } from '@/types/dds';
 import type { DDSCard } from '@/types/dds';
 import type { ReactNode } from 'react';
+import type { CodeGenContext } from '@/types/codegen';
+import { useAgentStore } from '@/stores/agentStore';
+import { CodeGenPanel } from '@/components/CodeGenPanel';
 
 // ==================== Props ====================
 
@@ -45,6 +48,8 @@ export interface DDSCanvasPageProps {
   projectId: string;
   /** Called when AI generate button is clicked */
   onAIGenerate?: () => void;
+  /** agentSession URL param — triggers code generation context display */
+  agentSession?: string | null;
 }
 
 // ==================== Page State ====================
@@ -167,6 +172,7 @@ function ChapterEmptyState({ chapter, cards }: { chapter: ChapterType; cards: DD
 export const DDSCanvasPage = memo(function DDSCanvasPage({
   projectId,
   onAIGenerate,
+  agentSession,
 }: DDSCanvasPageProps) {
   const [state, setState] = useState<DDSCanvasPageState>({
     pageState: 'loading',
@@ -175,6 +181,10 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
 
   // ---- E4: Firebase Presence ----
   const [cursorPos, setCursorPos] = useState<{ x: number; y: number } | null>(null);
+
+  // ---- E1: CodeGenContext Display (agentSession=new triggers context pre-fill) ----
+  const codeGenContext = useAgentStore((s) => s.codeGenContext);
+  const showCodeGenPanel = agentSession === 'new' && codeGenContext != null;
   const user = useAuthStore((s) => s.user);
   const userId = user?.id ?? null;
   const { isAvailable } = usePresence(projectId ?? '', userId);
@@ -488,6 +498,47 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
 
       {/* AI Draft Drawer */}
       <AIDraftDrawer />
+
+      {/* E1: CodeGenContext Panel — shown when agentSession=new */}
+      {showCodeGenPanel && codeGenContext && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '80px',
+            right: '24px',
+            width: '480px',
+            maxHeight: '80vh',
+            overflow: 'auto',
+            zIndex: 9000,
+            background: 'var(--color-surface, #fff)',
+            border: '1px solid var(--color-border, #e5e7eb)',
+            borderRadius: '12px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          }}
+          data-testid="code-gen-context-panel"
+        >
+          <div style={{ padding: '16px', borderBottom: '1px solid var(--color-border, #e5e7eb)' }}>
+            <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 600 }}>Code Generation Context</h3>
+            <p style={{ margin: '4px 0 0', fontSize: '12px', color: 'var(--color-text-secondary, #6b7280)' }}>
+              {codeGenContext.nodes.length} nodes | schema {codeGenContext.schemaVersion} | {codeGenContext.type}
+            </p>
+          </div>
+          <div style={{ padding: '12px' }}>
+            <pre style={{
+              fontSize: '11px',
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-all',
+              maxHeight: '300px',
+              overflow: 'auto',
+              background: 'var(--color-bg-secondary, #f9fafb)',
+              padding: '8px',
+              borderRadius: '6px',
+            }}
+            data-testid="code-gen-context-preview"
+            >{JSON.stringify({ type: codeGenContext.type, nodeCount: codeGenContext.nodes.length, schemaVersion: codeGenContext.schemaVersion, exportedAt: codeGenContext.exportedAt }, null, 2)}</pre>
+          </div>
+        </div>
+      )}
 
       {/* Keyboard shortcut edit modal */}
       <ShortcutEditModalPortal />

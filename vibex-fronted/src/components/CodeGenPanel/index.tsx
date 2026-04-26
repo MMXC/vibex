@@ -260,7 +260,7 @@ export function CodeGenPanel({ flow, onDownload, disabled = false }: CodeGenPane
                       };
                       const store: ReturnType<typeof useAgentStore.getState> = useAgentStore.getState();
                       store.injectContext(codeGenCtx as unknown);
-                      router.push('/agent?agentSession=new');
+                      router.push('/design/dds-canvas?agentSession=new');
                     }
                   }}
                   data-testid="send-to-agent-btn"
@@ -272,7 +272,7 @@ export function CodeGenPanel({ flow, onDownload, disabled = false }: CodeGenPane
             </div>
             {result.limitExceeded && (
               <p className={styles.limitNote} role="alert">
-                Node count ({result.nodeCount}) exceeds the recommended limit of {result.limit}.
+                Node count ({result.nodeCount}) exceeds the 200-node limit and was truncated.
                 Generated code may be incomplete.
               </p>
             )}

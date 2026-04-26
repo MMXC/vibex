@@ -494,3 +494,16 @@ export async function registerE5Modules(app: App): Promise<void> {
 | US-E1.5: Missing unit tests | agentStore.test.ts (5 cases), DesignTokenService.test.ts (4), DriftDetector.test.ts (11), BatchExportService.test.ts (5) | 25 tests all passing ✅ |
 
 **Commit**: 21db750fe | **Round 2 fix** | **Files**: CodeGenPanel + 4 test files
+
+---
+
+## E1 Round 3 Fix Status (Third Reviewer Rejection → Fixed)
+
+| Issue | Fix | Verification |
+|-------|-----|--------------|
+| US-E1.1 路由错误 | 改为 `/design/dds-canvas?agentSession=new` | ✅ |
+| US-E1.1 context 展示 | DDSCanvasPage 读取 agentSession=new，展示 CodeGenContext panel | ✅ |
+| US-E1.3 警告文本 | Node count text matches `/200.*nodes.*truncated/i` pattern | ✅ |
+| CHANGELOG.md | 添加 S14 E1 条目 | ✅ |
+
+**Commit**: ce2985a53 | **Round 3 fix**

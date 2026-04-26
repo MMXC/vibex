@@ -17,10 +17,12 @@ import { DDSCanvasPage } from '@/components/dds/DDSCanvasPage';
 function DDSCanvasContent() {
   const searchParams = useSearchParams();
   const projectId = searchParams.get('projectId') ?? '';
+  const agentSession = searchParams.get('agentSession') ?? null;
 
   return (
     <DDSCanvasPage
       projectId={projectId}
+      agentSession={agentSession}
     />
   );
 }

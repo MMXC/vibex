@@ -1,3 +1,20 @@
+### [Unreleased] vibex-proposals-20260427-sprint14 E1: Design-to-Code Pipeline — 2026-04-27
+- **E1-U1 Feature Flags**: `FEATURE_DESIGN_TO_CODE_PIPELINE` + `FEATURE_DESIGN_TO_CODE_BIDIRECTIONAL` added to featureFlags.ts
+- **E1-U1 Types**: `DesignNode` / `CodeGenContext` / `TokenSnapshot` defined in types/codegen.ts
+- **E1-U1 injectContext**: agentStore.injectContext() validates CodeGenContext shape; throws descriptive error on invalid input
+- **E1-U2 DesignTokenService**: extractTokens() with 200-node limit; console.warn truncation (not error); Figma-to-internal token mapping
+- **E1-U2 Validation**: validateDesignNode() / validateTokenStructure() type guards
+- **E1-U3 Template Engine**: Handlebars templates (css-variables / tailwind-config / js-constants); format renderers (renderCSS/JS/JSON/SCSS)
+- **E1-U4 Bidirectional Sync**: DriftDetector (detectDrift + 3-way merge); ConflictResolutionDialog (3-panel diff, data-testid)
+- **E1-U5 Batch Export**: BatchExportService (queueBatchExport + getBatchExportStatus)
+- **E1-U6 Export Variants**: codeGenerator.ts extended with SCSS/JS export; packageAsZip includes .scss + .constants.ts
+- **E1-US-E1.1 Send to Agent**: CodeGenPanel "Send to AI Agent" button (data-testid=send-to-agent-btn); navigates to /design/dds-canvas?agentSession=new
+- **E1-US-E1.1 Context Display**: DDSCanvasPage reads agentSession=new param; shows CodeGenContext panel (data-testid=code-gen-context-panel)
+- **E1-US-E1.3 Truncation Warning**: Node count warning matches /200.*nodes.*truncated/i pattern
+- **E1 Unit Tests**: 25 tests — agentStore.injectContext (5) / DesignTokenService (4) / DriftDetector (11) / BatchExportService (5)
+- **验证**: `pnpm exec tsc --noEmit` → 0 errors; E1 files lint clean
+- 提交: 782cf50d2
+
 ### [Unreleased] vibex-proposals-20260426-sprint12 E10: 设计稿代码生成 — 2026-04-26
 - **E10-S1 codeGenerator.ts**: `generateComponentCode(flow, framework)` 生成 TypeScript 类型定义 + TSX 骨架 + CSS Module + index；`sanitizeName()` 处理中文/特殊字符 PascalCase；`packageAsZip()` JSZip 打包 ZIP 下载
 - **E10-S1 类型定义**: CanvasNode/CanvasFlow/Chapter 接口；flow-specific types（ContextNode/FlowNode/ComponentNode）；`CanvasNodeType` 枚举

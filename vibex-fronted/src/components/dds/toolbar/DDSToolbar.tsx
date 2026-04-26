@@ -10,10 +10,12 @@
 'use client';
 
 import React, { memo, useState, useCallback } from 'react';
-import { useDDSCanvasStore } from '@/stores/dds';
 import type { ChapterType, APIEndpointCard, StateMachineCard } from '@/types/dds';
 import { exportToJSON, parseImportFile } from '@/services/dds';
 import { exportDDSCanvasData, exportToStateMachine } from '@/services/dds/exporter';
+import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds';
+import { useCanvasExport } from '@/hooks/canvas/useCanvasExport';
+import { useCanvasImport } from '@/hooks/canvas/useCanvasImport';
 import styles from './DDSToolbar.module.css';
 
 // ==================== Constants ====================
@@ -56,8 +58,7 @@ function ExitFullscreenIcon() {
 
 // ==================== Shared download helper ====================
 
-function downloadJSON(content: string, filename: string) {
-  const blob = new Blob([content], { type: 'application/json' });
+function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -92,20 +93,20 @@ export const DDSToolbar = memo(function DDSToolbar({
   const chapterLabel = CHAPTER_LABELS[activeChapter];
   const generating = isGeneratingProp ?? isGenerating;
 
-  // E4-U3/U4: Export modal state
-  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [exportError, setExportError] = useState<string | null>(null);
+  const crossChapterEdges = useDDSCanvasStore((s) => s.crossChapterEdges);
+  const { exportAsJSON, exportAsVibex } = useCanvasExport();
+  const { showFilePicker, importFile } = useCanvasImport();
+
+  const [ddsExportModalOpen, setDdsExportModalOpen] = useState(false);
 
   // E4-U3: Download OpenAPI handler
   const handleDownloadOpenAPI = useCallback(() => {
     try {
       const apiCards = chapters.api.cards as APIEndpointCard[];
       const json = exportDDSCanvasData(apiCards);
-      downloadJSON(json, 'openapi.json');
-      setIsExportModalOpen(false);
-      setExportError(null);
+      downloadBlob(new Blob([json], { type: 'application/json' }), 'openapi.json');
+      setDdsExportModalOpen(false);
     } catch (err) {
-      setExportError('导出 OpenAPI 失败');
       console.error('[DDSToolbar] OpenAPI export error:', err);
     }
   }, [chapters.api.cards]);
@@ -115,16 +116,43 @@ export const DDSToolbar = memo(function DDSToolbar({
     try {
       const smCards = chapters['business-rules'].cards as StateMachineCard[];
       const json = exportToStateMachine(smCards);
-      downloadJSON(json, 'statemachine.json');
-      setIsExportModalOpen(false);
-      setExportError(null);
+      downloadBlob(new Blob([json], { type: 'application/json' }), 'statemachine.json');
+      setDdsExportModalOpen(false);
     } catch (err) {
-      setExportError('导出 StateMachine 失败');
       console.error('[DDSToolbar] StateMachine export error:', err);
     }
   }, [chapters['business-rules'].cards]);
 
-  // ---- Export handler ----
+  const handleDDSExportJSON = () => {
+    const allChapters = Object.values(chapters);
+    const blob = exportAsJSON(allChapters, crossChapterEdges);
+    downloadBlob(blob, `vibex-canvas-${new Date().toISOString().slice(0,10)}.json`);
+    setDdsExportModalOpen(false);
+  };
+
+  const handleDDSExportVibex = async () => {
+    const allChapters = Object.values(chapters);
+    const blob = await exportAsVibex(allChapters, crossChapterEdges);
+    downloadBlob(blob, `vibex-canvas-${new Date().toISOString().slice(0,10)}.vibex`);
+    setDdsExportModalOpen(false);
+  };
+
+  const handleDDSImport = async () => {
+    const file = await showFilePicker();
+    if (!file) return;
+    try {
+      await importFile(file, (importedChapters, warnings, _rawDoc) => {
+        ddsChapterActions.setChapters(importedChapters);
+        if (warnings.length > 0) {
+          console.warn('[DDSToolbar] Import warnings:', warnings);
+        }
+      });
+    } catch (err) {
+      console.error('[DDSToolbar] DDS import error:', err);
+    }
+  };
+
+  // ---- Export handler (E4 legacy) ----
   const handleExport = () => {
     exportToJSON(
       'dds-canvas',
@@ -167,6 +195,8 @@ export const DDSToolbar = memo(function DDSToolbar({
     }
   };
 
+  const handleOpenExportModal = () => setDdsExportModalOpen(true);
+
   return (
     <>
       <header
@@ -190,15 +220,28 @@ export const DDSToolbar = memo(function DDSToolbar({
             </button>
           ))}
 
-          {/* E4-U3/U4: Export button */}
+          {/* E4-U3/U4 + E2: Export button */}
           <button
             type="button"
             className={styles.exportBtn}
-            onClick={() => setIsExportModalOpen(true)}
-            aria-label="导出"
-            title="导出为 OpenAPI / StateMachine"
+            onClick={handleOpenExportModal}
+            aria-label="导出画布"
+            title="导出/导入画布数据"
+            data-testid="canvas-export-btn"
           >
             导出
+          </button>
+
+          {/* E2: Import button */}
+          <button
+            type="button"
+            className={styles.exportBtn}
+            onClick={handleDDSImport}
+            aria-label="导入画布"
+            title="从 .vibex 或 .json 文件导入"
+            data-testid="canvas-import-btn"
+          >
+            导入
           </button>
         </div>
 
@@ -237,28 +280,51 @@ export const DDSToolbar = memo(function DDSToolbar({
         )}
       </header>
 
-      {/* E4-U3/U4: Export modal */}
-      {isExportModalOpen && (
+      {/* E4-U3/U4 + E2: Export/Import modal */}
+      {ddsExportModalOpen && (
         <div
           className={styles.exportOverlay}
           role="dialog"
           aria-modal="true"
           aria-labelledby="export-modal-title"
-          onClick={(e) => { if (e.target === e.currentTarget) setIsExportModalOpen(false); }}
+          onClick={(e) => { if (e.target === e.currentTarget) setDdsExportModalOpen(false); }}
         >
           <div className={styles.exportModal}>
             <div className={styles.modalHeader}>
-              <h2 id="export-modal-title" className={styles.modalTitle}>导出文档</h2>
+              <h2 id="export-modal-title" className={styles.modalTitle}>导出/导入</h2>
               <button
                 type="button"
                 className={styles.modalClose}
-                onClick={() => setIsExportModalOpen(false)}
+                onClick={() => setDdsExportModalOpen(false)}
                 aria-label="关闭"
               >
                 ×
               </button>
             </div>
             <div className={styles.modalBody}>
+              {/* E2: Canvas Export */}
+              <h3 className={styles.exportSectionTitle}>画布导出</h3>
+              <button
+                type="button"
+                className={styles.exportOption}
+                onClick={handleDDSExportJSON}
+                data-testid="export-json-btn"
+              >
+                <span className={styles.exportOptionTitle}>导出为 .json</span>
+                <span className={styles.exportOptionDesc}>可读的 JSON 格式，包含 schemaVersion、metadata、chapters</span>
+              </button>
+              <button
+                type="button"
+                className={styles.exportOption}
+                onClick={handleDDSExportVibex}
+                data-testid="export-vibex-btn"
+              >
+                <span className={styles.exportOptionTitle}>导出为 .vibex</span>
+                <span className={styles.exportOptionDesc}>gzip 压缩格式，文件更小</span>
+              </button>
+
+              {/* E4-U3/U4: OpenAPI / StateMachine */}
+              <h3 className={styles.exportSectionTitle}>代码导出</h3>
               <button
                 type="button"
                 className={styles.exportOption}
@@ -275,9 +341,6 @@ export const DDSToolbar = memo(function DDSToolbar({
                 <span className={styles.exportOptionTitle}>State Machine JSON</span>
                 <span className={styles.exportOptionDesc}>导出版务规则状态机</span>
               </button>
-              {exportError && (
-                <p className={styles.exportError} role="alert">{exportError}</p>
-              )}
             </div>
           </div>
         </div>

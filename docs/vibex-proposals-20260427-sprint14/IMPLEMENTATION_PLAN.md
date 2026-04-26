@@ -507,3 +507,17 @@ export async function registerE5Modules(app: App): Promise<void> {
 | CHANGELOG.md | 添加 S14 E1 条目 | ✅ |
 
 **Commit**: ce2985a53 | **Round 3 fix**
+
+---
+
+## E2 Implementation Status (Sprint 14)
+
+| Story | Status | Notes |
+|-------|--------|-------|
+| US-E2.1: JSON Canvas Format | ✅ Done | c202f33d0 — schemaVersion 1.2.0, metadata, chapters, crossChapterEdges |
+| US-E2.2: File Import UI | ✅ Done | c202f33d0 — data-testid=canvas-import-btn, validateFile, 10MB limit |
+| US-E2.3: File Export UI | ✅ Done | c202f33d0 — data-testid=canvas-export-btn, .vibex/.json, 1MB warning |
+| US-E2.4: Import History | ✅ Done | c202f33d0 — localStorage log, getImportLog, clearImportLog |
+
+**验证**: pnpm tsc --noEmit ✅ | lint clean (E2 files) ✅
+**Commit**: c202f33d0 | **Files**: 9 new/modified

@@ -16,7 +16,9 @@ import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { useSessionStore } from '@/lib/canvas/stores/sessionStore';
+import { useDDSCanvasStore } from '@/stores/dds/DDSCanvasStore';
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
+import { serializeCanvasToJSON, serializeCanvasDocumentToJSON } from '@/lib/canvas/serialize';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { BoundedContextNode, BusinessFlowNode, ComponentNode } from '@/lib/canvas/types'; // types referenced in buildCanvasExportData JSDoc
@@ -40,12 +42,33 @@ interface ExportOptions {
 interface UseCanvasExportReturn {
   /** 导出画布 */
   exportCanvas: (options: ExportOptions) => Promise<void>;
+  /** 导出为可读 JSON Blob (DDS Canvas, E2) */
+  exportAsJSON: (chapters: import('@/types/dds').ChapterData[], crossChapterEdges: import('@/types/dds').DDSEdge[]) => Blob;
+  /** 导出为 gzip 压缩的 .vibex Blob (DDS Canvas, E2) */
+  exportAsVibex: (chapters: import('@/types/dds').ChapterData[], crossChapterEdges: import('@/types/dds').DDSEdge[]) => Promise<Blob>;
   /** 导出状态 */
   isExporting: boolean;
   /** 错误信息 */
   error: string | null;
   /** 取消导出 */
   cancelExport: () => void;
+}
+
+const FILE_SIZE_WARNING_THRESHOLD = 1 * 1024 * 1024; // 1 MB
+
+function warnIfLargeBlob(blob: Blob): void {
+  if (blob.size > FILE_SIZE_WARNING_THRESHOLD) {
+    console.warn(`[CanvasExport] File size ${(blob.size / 1024 / 1024).toFixed(2)}MB exceeds 1MB warning threshold`);
+  }
+}
+
+/**
+ * Compress string to gzip Blob using pako
+ */
+async function gzipCompress(str: string): Promise<Blob> {
+  const pako = await import('pako');
+  const compressed = pako.default.deflate(str);
+  return new Blob([compressed], { type: 'application/gzip' });
 }
 
 const DEFAULT_BG_COLOR = '#0f0f1a'; // 深色背景匹配主题
@@ -338,6 +361,35 @@ export function useCanvasExport(): UseCanvasExportReturn {
     }
   }, []);
 
+  /**
+   * Export DDS Canvas chapters as readable .json Blob
+   * Includes schemaVersion, metadata, chapters, crossChapterEdges
+   */
+  const exportAsJSON = useCallback(
+    (chapters: import('@/types/dds').ChapterData[], crossChapterEdges: import('@/types/dds').DDSEdge[]) => {
+      const doc = serializeCanvasToJSON(chapters, crossChapterEdges);
+      const json = serializeCanvasDocumentToJSON(doc);
+      const blob = new Blob([json], { type: 'application/json' });
+      warnIfLargeBlob(blob);
+      return blob;
+    },
+    []
+  );
+
+  /**
+   * Export DDS Canvas chapters as gzip-compressed .vibex Blob
+   */
+  const exportAsVibex = useCallback(
+    async (chapters: import('@/types/dds').ChapterData[], crossChapterEdges: import('@/types/dds').DDSEdge[]) => {
+      const doc = serializeCanvasToJSON(chapters, crossChapterEdges);
+      const json = serializeCanvasDocumentToJSON(doc);
+      const blob = await gzipCompress(json);
+      warnIfLargeBlob(blob);
+      return blob;
+    },
+    []
+  );
+
   const cancelExport = useCallback(() => {
     cancelledRef.current = true;
     setIsExporting(false);
@@ -346,6 +398,8 @@ export function useCanvasExport(): UseCanvasExportReturn {
 
   return {
     exportCanvas,
+    exportAsJSON,
+    exportAsVibex,
     isExporting,
     error: null,
     cancelExport,

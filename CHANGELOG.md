@@ -4236,3 +4236,10 @@ See git history for complete changelog.
 - **E4-S3 Playwright E2E**: `prd-format.spec.ts` 双向转换往返测试 + 错误展示测试
 - **Files**: src/lib/prd-format.ts, src/app/editor/page.tsx, tests/e2e/prd-format.spec.ts
 - 提交: 0990947fb, 557fda78d
+
+### [Unreleased] S14-E2: Canvas Import/Export — 2026-04-27
+- **US-E2.1 JSON Canvas Format**: CanvasDocument schema (schemaVersion 1.2.0, metadata, chapters, crossChapterEdges); serialize.ts extended with serializeCanvasToJSON + deserializeCanvasFromJSON; forward compat (unknown fields → warnings, never throws)
+- **US-E2.2 File Import UI**: useCanvasImport hook (validateFile, importFile, showFilePicker, 10MB limit); window.confirm() before overwrite; data-testid=canvas-import-btn; import-error-message
+- **US-E2.3 File Export UI**: useCanvasExport extended (exportAsJSON + exportAsVibex); .vibex = gzip compressed JSON; .json = pretty-printed; 1MB warning; data-testid=canvas-export-btn
+- **US-E2.4 Import History**: ImportHistoryService (localStorage persistence, getImportLog, clearImportLog)
+- 提交: c202f33d0

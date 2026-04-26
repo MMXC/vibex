@@ -126,6 +126,8 @@ type ChapterActions = {
   addCrossChapterEdge: (edge: DDSEdge) => void;
   /** 删除跨章节 DAG 边（E4-U1） */
   deleteCrossChapterEdge: (id: string) => void;
+  /** 批量设置章节数据（E2 Import） */
+  setChapters: (chapters: ChapterData[]) => void;
 };
 
 export const ddsChapterActions: ChapterActions = {
@@ -199,6 +201,15 @@ export const ddsChapterActions: ChapterActions = {
     useDDSCanvasStore.setState((state) => ({
       crossChapterEdges: state.crossChapterEdges.filter((e) => e.id !== id),
     })),
+
+  setChapters: (chapters) =>
+    useDDSCanvasStore.setState((state) => {
+      const next = { ...state.chapters };
+      for (const ch of chapters) {
+        next[ch.type] = ch;
+      }
+      return { chapters: next };
+    }),
 };
 
 // ==================== Selectors ====================

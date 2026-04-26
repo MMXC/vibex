@@ -1,3 +1,13 @@
+### [Unreleased] vibex-proposals-20260426-sprint12 E9: AI 设计评审 — 2026-04-26
+- **E9-S1 review_design MCP tool**: `packages/mcp-server/src/tools/reviewDesign.ts` 注册为 MCP tool；输入 canvasId/nodes/check flags；返回 DesignReviewReport（compliance/a11y/reuse 三段）
+- **E9-S1 工具注册**: `list.ts` 添加 review_design tool schema；`execute.ts` case 'review_design' 调用 reviewDesign()
+- **E9-S2 Design Compliance**: `designCompliance.ts` 检测硬编码 hex/rgba 颜色、硬编码字体、CSS变量合规；间距 4px grid 校验；`extractStrings()` 递归提取字段
+- **E9-S3 Accessibility Checker**: `a11yChecker.ts` WCAG 2.1 AA 检查 — missing-alt (critical)、missing-aria-label (medium)、low-contrast (high/medium)、missing-keyboard-hint (low)；IMAGE_TYPES/INTERACTIVE_TYPES 白名单分类
+- **E9-S3 Component Reuse**: `componentReuse.ts` 结构相似度评分 — fingerprint() 提取结构特征；similarityScore > 0.7 → 提取候选；sharedFields/differingFields 对比
+- **E9 测试**: designCompliance 11 tests + a11yChecker 12 tests + componentReuse 10 tests = 40 tests passed ✅
+- **验证**: `pnpm exec jest --testPathPatterns=designCompliance|a11yChecker|componentReuse` → 40/40 passed
+- 提交: 9519d0602
+
 ### [Unreleased] vibex-proposals-20260426-sprint12 E8: Canvas 协作冲突解决 — 2026-04-26
 - **E8-S1 conflictStore**: LWW 仲裁 — `startDraft/clearDraft` 追踪本地编辑；`checkConflict`: remote.version > local.version → auto-adopt；否则弹出 ConflictDialog；`resolveKeepLocal/resolveUseRemote` 双路径解决
 - **E8-S1 Firebase RTDB 锁**: `lockCard/unlockCard/syncLocks` 实现卡片级别锁；Lock timeout monitor (60s)；Firebase unconfigured graceful fallback

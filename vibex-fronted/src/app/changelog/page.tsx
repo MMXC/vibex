@@ -79,6 +79,19 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.303',
     date: '2026-04-26',
     changes: [
+      '📋 vibex-proposals-20260426-sprint12 E9: AI 设计评审',
+      '✅ E9-S1 review_design MCP: 工具注册+execute case, DesignReviewReport(compliance/a11y/reuse)',
+      '✅ E9-S2 Design Compliance: 硬编码hex/rgba/字体检测, 4px grid间距校验, extractStrings递归',
+      '✅ E9-S3 A11y Checker: WCAG 2.1 AA - missing-alt(critical)/aria-label/contrast/keyboard-hint',
+      '✅ E9-S3 Component Reuse: 结构相似度fingerprint, similarityScore>0.7提取候选',
+      '✅ E9 测试: 40 tests (designCompliance11 + a11yChecker12 + componentReuse10) ✅',
+    ],
+    commit: '9519d0602',
+  },
+  {
+    version: '1.0.303',
+    date: '2026-04-26',
+    changes: [
       '📋 vibex-proposals-20260426-sprint12 E8: Canvas 协作冲突解决',
       '✅ E8-S1 conflictStore: LWW仲裁 startDraft/clearDraft/checkConflict, resolveKeepLocal/resolveUseRemote',
       '✅ E8-S1 Firebase RTDB锁: lockCard/unlockCard/syncLocks, 60s timeout, graceful fallback',
@@ -91,6 +104,22 @@ const mockChangelog: ChangelogEntry[] = [
   },
   {
     version: '1.0.302',
+    date: '2026-04-26',
+    changes: [
+      '📋 vibex-proposals-20260426-sprint12 E6: Prompts 安全 AST 扫描',
+      '✅ E6-S1 接口对齐: SecurityReport → SecurityAnalysisResult, UnsafePattern 含 type/line/column',
+      '✅ E6-S2 轻量级Walker: 移除 @babel/traverse Path开销, walkNode()递归, ~299ms/5000行',
+      '✅ E6-S3 innerHTML检测: MemberExpression visitor 检测 innerHTML/outerHTML 赋值',
+      '✅ E6-S4 集成: code-review.ts + code-generation.ts 已迁移到 generateSecurityWarnings()',
+      '✅ E6-S5 测试覆盖: 21 tests (TC01-TC06 + perf + edge cases), 1000合法样本',
+      '📋 vibex-proposals-20260426-sprint12 E7: MCP 可观测性',
+      '✅ E7-S1 动态版本: readFileSync + import.meta.url 读取 package.json.version',
+      '✅ E7-S1 HealthCheck: performHealthCheck(options.serverVersion), connectedClients=1(stdio)',
+      '✅ E7-S2 结构化日志: logger.logToolCall(tool/duration/success), 启动时记录version+sdk',
+      '✅ E7-S2 敏感脱敏: sanitize()递归过滤8种key, 支持嵌套对象',
+    ],
+    commit: '4bf59939e',
+  },
     date: '2026-04-26',
     changes: [
       '📋 vibex-proposals-20260426-sprint12 E6: Prompts 安全 AST 扫描',

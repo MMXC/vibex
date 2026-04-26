@@ -18,6 +18,41 @@ export function listTools(): Tool[] {
         required: [],
       },
     },
+    // E9-S1: Design review tool
+    {
+      name: 'review_design',
+      description: 'Review canvas design for compliance, accessibility, and component reuse opportunities. Returns a DesignReviewReport covering color/typography/spacing compliance, WCAG 2.1 AA issues, and structural similarity candidates.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          canvasId: {
+            type: 'string',
+            description: 'The ID of the canvas to review',
+          },
+          nodes: {
+            type: 'array',
+            description: 'Array of canvas nodes to review',
+            items: { type: 'object' },
+          },
+          checkCompliance: {
+            type: 'boolean',
+            description: 'Check design compliance (color/typography/spacing)',
+            default: true,
+          },
+          checkA11y: {
+            type: 'boolean',
+            description: 'Check WCAG 2.1 AA accessibility issues',
+            default: true,
+          },
+          checkReuse: {
+            type: 'boolean',
+            description: 'Analyze component reuse opportunities',
+            default: true,
+          },
+        },
+        required: ['canvasId'],
+      },
+    },
     {
       name: 'createProject',
       description: 'Create a new VibeX project from a PRD description',

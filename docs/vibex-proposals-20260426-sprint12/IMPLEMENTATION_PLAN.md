@@ -297,11 +297,11 @@ const dangerousTimers = ['setTimeout', 'setInterval']
 - `componentReuse` 检出相似节点
 
 **DoD**:
-- [ ] `review_design` MCP 工具注册成功
-- [ ] 合规检测覆盖 color/typography/spacing
-- [ ] a11y 规则可检测 WCAG 问题
-- [ ] 组件复用检测输出相似节点
-- [ ] MCP 工具调用成功率 ≥ 95%
+- [x] `review_design` MCP 工具注册成功 (reviewDesign.ts + execute.ts + list.ts)
+- [x] 合规检测覆盖 color/typography/spacing (designCompliance.ts, 11 tests passed)
+- [x] a11y 规则可检测 WCAG 问题 (a11yChecker.ts, 12 tests passed)
+- [x] 组件复用检测输出相似节点 (componentReuse.ts, 10 tests passed)
+- [ ] MCP 工具调用成功率 ≥ 95% (需运行时验证)
 
 ---
 

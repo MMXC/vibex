@@ -482,3 +482,15 @@ export async function registerE5Modules(app: App): Promise<void> {
 | U6 | Export Format Variants (SCSS/JS) | ✅ Done | b7ed2ef10 |
 
 **Commit**: b7ed2ef10 | **Verification**: pnpm tsc --noEmit ✅ | **Files**: 15 new/modified
+
+---
+
+## E1 Round 2 Fix Status (Reviewer Rejection → Fixed)
+
+| Issue | Fix | Verification |
+|-------|-----|--------------|
+| US-E1.1: Missing "Send to AI Agent" button | CodeGenPanel added button (data-testid=send-to-agent-btn), feature-flag gated, injectContext on click, navigates to /agent?agentSession=new | pnpm tsc --noEmit ✅, lint clean (E1 files) ✅ |
+| US-E1.3: Truncation warning not visible | Already present — data-testid=limit-warning + limitNote paragraph | ✅ |
+| US-E1.5: Missing unit tests | agentStore.test.ts (5 cases), DesignTokenService.test.ts (4), DriftDetector.test.ts (11), BatchExportService.test.ts (5) | 25 tests all passing ✅ |
+
+**Commit**: 21db750fe | **Round 2 fix** | **Files**: CodeGenPanel + 4 test files

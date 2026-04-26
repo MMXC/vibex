@@ -13,8 +13,12 @@
  */
 
 import React, { useCallback, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { generateComponentCode, type GenerateResult, type TargetFramework } from '@/lib/codeGenerator';
 import type { CanvasFlow } from '@/lib/codeGenerator';
+import { isEnabled } from '@/lib/featureFlags';
+import { useAgentStore } from '@/stores/agentStore';
+import type { CodeGenContext, DesignNode } from '@/types/codegen';
 import styles from './CodeGenPanel.module.css';
 
 // ============================================================================
@@ -30,7 +34,7 @@ interface CodeGenPanelProps {
   disabled?: boolean;
 }
 
-type Tab = 'tsx' | 'css' | 'types' | 'index';
+type Tab = 'tsx' | 'css' | 'types' | 'index' | 'scss' | 'js';
 
 interface State {
   status: 'idle' | 'generating' | 'ready' | 'error';
@@ -38,6 +42,7 @@ interface State {
   error: string | null;
   activeTab: Tab;
   selectedFramework: TargetFramework;
+  agentSessionId: string | null;
 }
 
 // ============================================================================
@@ -57,12 +62,14 @@ function CodePreview({ code, language }: { code: string; language: string }) {
 // ============================================================================
 
 export function CodeGenPanel({ flow, onDownload, disabled = false }: CodeGenPanelProps) {
+  const router = useRouter();
   const [state, setState] = useState<State>({
     status: 'idle',
     result: null,
     error: null,
     activeTab: 'tsx',
     selectedFramework: 'react',
+    agentSessionId: null,
   });
 
   const handleGenerate = useCallback(async () => {
@@ -70,6 +77,23 @@ export function CodeGenPanel({ flow, onDownload, disabled = false }: CodeGenPane
     try {
       const result = generateComponentCode(flow, state.selectedFramework);
       setState((s) => ({ ...s, status: 'ready', result }));
+
+      // US-E1.1: Build CodeGenContext and inject into agent store for Send to AI Agent
+      const nodeList = (flow.nodes ?? []).map((n) => ({
+        id: n.id,
+        type: n.type ?? 'unknown',
+        name: n.name,
+      }));
+      const codeGenCtx: CodeGenContext = {
+        type: 'codegen',
+        generatedCode: result.files.component,
+        nodes: nodeList as DesignNode[],
+        schemaVersion: '1.0.0',
+        exportedAt: new Date().toISOString(),
+      };
+      // injectContext takes unknown — cast through unknown to satisfy strict TS
+      const store: ReturnType<typeof useAgentStore.getState> = useAgentStore.getState();
+      store.injectContext(codeGenCtx as unknown);
     } catch (err) {
       setState((s) => ({
         ...s,
@@ -100,11 +124,13 @@ export function CodeGenPanel({ flow, onDownload, disabled = false }: CodeGenPane
   }, [state.result, flow.name, onDownload]);
 
   const { status, result, error, activeTab, selectedFramework } = state;
-  const tabs: { id: Tab; label: string; key: 'component' | 'css' | 'types' | 'index' }[] = [
+  const tabs: { id: Tab; label: string; key: 'component' | 'css' | 'types' | 'index' | 'scss' | 'js' }[] = [
     { id: 'tsx', label: 'TSX', key: 'component' },
     { id: 'css', label: 'CSS', key: 'css' },
     { id: 'types', label: 'Types', key: 'types' },
     { id: 'index', label: 'Index', key: 'index' },
+    { id: 'scss', label: 'SCSS', key: 'scss' },
+    { id: 'js', label: 'JS', key: 'js' },
   ];
 
   return (
@@ -202,17 +228,48 @@ export function CodeGenPanel({ flow, onDownload, disabled = false }: CodeGenPane
             )}
           </div>
 
-          {/* Download button */}
+          {/* Download + Send to AI Agent */}
           <div className={styles.footer}>
-            <button
-              type="button"
-              className={styles.downloadButton}
-              onClick={handleDownload}
-              data-testid="download-button"
-              aria-label="Download code as ZIP"
-            >
-              Download ZIP
-            </button>
+            <div className={styles.actionRow}>
+              <button
+                type="button"
+                className={styles.downloadButton}
+                onClick={handleDownload}
+                data-testid="download-button"
+                aria-label="Download code as ZIP"
+              >
+                Download ZIP
+              </button>
+              {isEnabled('FEATURE_DESIGN_TO_CODE_PIPELINE') && (
+                <button
+                  type="button"
+                  className={styles.sendToAgentButton}
+                  onClick={() => {
+                    if (result) {
+                      const nodeList = (flow.nodes ?? []).map((n) => ({
+                        id: n.id,
+                        type: n.type ?? 'unknown',
+                        name: n.name,
+                      }));
+                      const codeGenCtx: CodeGenContext = {
+                        type: 'codegen',
+                        generatedCode: result.files.component,
+                        nodes: nodeList as DesignNode[],
+                        schemaVersion: '1.0.0',
+                        exportedAt: new Date().toISOString(),
+                      };
+                      const store: ReturnType<typeof useAgentStore.getState> = useAgentStore.getState();
+                      store.injectContext(codeGenCtx as unknown);
+                      router.push('/agent?agentSession=new');
+                    }
+                  }}
+                  data-testid="send-to-agent-btn"
+                  aria-label="Send to AI Agent"
+                >
+                  Send to AI Agent
+                </button>
+              )}
+            </div>
             {result.limitExceeded && (
               <p className={styles.limitNote} role="alert">
                 Node count ({result.nodeCount}) exceeds the recommended limit of {result.limit}.

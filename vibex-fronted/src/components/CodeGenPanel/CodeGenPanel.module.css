@@ -201,6 +201,37 @@
   gap: var(--spacing-2, 8px);
 }
 
+.actionRow {
+  display: flex;
+  gap: var(--spacing-3, 12px);
+  width: 100%;
+}
+
+.actionRow .downloadButton {
+  flex: 1;
+}
+
+.sendToAgentButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2, 8px);
+  flex: 1;
+  padding: var(--spacing-3, 12px) var(--spacing-4, 16px);
+  background: var(--color-secondary, #6366f1);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md, 8px);
+  font-size: var(--text-sm, 13px);
+  font-weight: var(--font-semibold, 600);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.sendToAgentButton:hover {
+  background: #4f46e5;
+}
+
 .limitNote {
   margin: 0;
   font-size: var(--text-xs, 12px);

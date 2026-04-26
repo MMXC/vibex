@@ -14,11 +14,18 @@ const parser = require('@babel/parser');
 // Types
 // ============================================
 
-export interface SecurityReport {
+export type UnsafePatternType = 'eval' | 'newFunction' | 'innerHTML' | 'setTimeout-string';
+
+export interface UnsafePattern {
+  type: UnsafePatternType;
+  node: any;
+  line: number;
+  column: number;
+}
+
+export interface SecurityAnalysisResult {
   hasUnsafe: boolean;
-  unsafeEval: string[];
-  unsafeNewFunction: string[];
-  unsafeDynamicCode: string[];
+  unsafePatterns: UnsafePattern[];
   confidence: number; // 0-100
 }
 
@@ -66,17 +73,26 @@ function walkNode(
  * - eval() calls
  * - new Function() calls
  * - setTimeout/setInterval with string literal as first argument
+ * - innerHTML/outerHTML assignments
  *
  * Performance: ~18-24ms for 5000-line file (P50, warm-run).
  * Falls back to confidence=50 on parse failure.
  */
-export function analyzeCodeSecurity(code: string): SecurityReport {
-  const report: SecurityReport = {
+export function analyzeCodeSecurity(code: string): SecurityAnalysisResult {
+  const result: SecurityAnalysisResult = {
     hasUnsafe: false,
-    unsafeEval: [],
-    unsafeNewFunction: [],
-    unsafeDynamicCode: [],
+    unsafePatterns: [],
     confidence: 100,
+  };
+
+  const pushPattern = (type: UnsafePatternType, node: any) => {
+    result.unsafePatterns.push({
+      type,
+      node,
+      line: node?.loc?.start?.line ?? 0,
+      column: node?.loc?.start?.column ?? 0,
+    });
+    result.hasUnsafe = true;
   };
 
   let ast: any;
@@ -86,8 +102,8 @@ export function analyzeCodeSecurity(code: string): SecurityReport {
       plugins: ['typescript', 'jsx'],
     });
   } catch {
-    report.confidence = 50;
-    return report;
+    result.confidence = 50;
+    return result;
   }
 
   walkNode(ast, {
@@ -100,8 +116,7 @@ export function analyzeCodeSecurity(code: string): SecurityReport {
         callee.type === 'Identifier' &&
         callee.name === 'eval'
       ) {
-        report.unsafeEval.push('eval');
-        report.hasUnsafe = true;
+        pushPattern('eval', node);
       }
 
       // Detect setTimeout/setInterval with string literal first arg
@@ -112,8 +127,7 @@ export function analyzeCodeSecurity(code: string): SecurityReport {
       ) {
         const args = node.arguments;
         if (args && args.length > 0 && args[0].type === 'StringLiteral') {
-          report.unsafeDynamicCode.push(callee.name + '("...")');
-          report.hasUnsafe = true;
+          pushPattern('setTimeout-string', node);
         }
       }
     },
@@ -127,34 +141,52 @@ export function analyzeCodeSecurity(code: string): SecurityReport {
         callee.type === 'Identifier' &&
         callee.name === 'Function'
       ) {
-        report.unsafeNewFunction.push('new Function');
-        report.hasUnsafe = true;
+        pushPattern('newFunction', node);
+      }
+    },
+
+    MemberExpression(node: any) {
+      // Detect innerHTML / outerHTML assignments
+      if (
+        node.property &&
+        node.property.type === 'Identifier' &&
+        (node.property.name === 'innerHTML' || node.property.name === 'outerHTML')
+      ) {
+        pushPattern('innerHTML', node);
       }
     },
   });
 
-  return report;
+  return result;
 }
 
 /**
  * Generate a human-readable security warning string from code analysis.
  */
 export function generateSecurityWarnings(code: string): string {
-  const report = analyzeCodeSecurity(code);
-  if (!report.hasUnsafe) {
+  const result = analyzeCodeSecurity(code);
+  if (!result.hasUnsafe) {
     return '';
   }
 
   const warnings: string[] = ['[Security Warning] Potentially unsafe code patterns detected:'];
 
-  if (report.unsafeEval.length > 0) {
-    warnings.push(`  - eval() calls: ${report.unsafeEval.join(', ')}`);
+  const evalPatterns = result.unsafePatterns.filter(p => p.type === 'eval');
+  const newFnPatterns = result.unsafePatterns.filter(p => p.type === 'newFunction');
+  const setTimeoutPatterns = result.unsafePatterns.filter(p => p.type === 'setTimeout-string');
+  const innerHTMLPatterns = result.unsafePatterns.filter(p => p.type === 'innerHTML');
+
+  if (evalPatterns.length > 0) {
+    warnings.push(`  - eval() calls: ${evalPatterns.map(p => `line ${p.line}`).join(', ')}`);
   }
-  if (report.unsafeNewFunction.length > 0) {
-    warnings.push(`  - new Function(): ${report.unsafeNewFunction.join(', ')}`);
+  if (newFnPatterns.length > 0) {
+    warnings.push(`  - new Function(): ${newFnPatterns.map(p => `line ${p.line}`).join(', ')}`);
   }
-  if (report.unsafeDynamicCode.length > 0) {
-    warnings.push(`  - Dynamic code execution: ${report.unsafeDynamicCode.join(', ')}`);
+  if (setTimeoutPatterns.length > 0) {
+    warnings.push(`  - Dynamic code execution (setTimeout/setInterval string): ${setTimeoutPatterns.map(p => `line ${p.line}`).join(', ')}`);
+  }
+  if (innerHTMLPatterns.length > 0) {
+    warnings.push(`  - innerHTML/outerHTML assignments: ${innerHTMLPatterns.map(p => `line ${p.line}`).join(', ')}`);
   }
 
   return warnings.join('\n');

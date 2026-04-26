@@ -179,7 +179,7 @@ const domSamples = [
   `const worker = new Worker("/worker.js");`,
   `const canvas = document.getElementById("canvas"); const ctx = canvas.getContext("2d");`,
   `const audio = new Audio("/sound.mp3");`,
-  `const elem = document.createElement("div"); elem.innerHTML = "<p>Content</p>";`,
+  `const elem = document.createElement("div"); elem.innerText = "<p>Content</p>";`,
   `const frag = document.createDocumentFragment();`,
   `element.scrollIntoView({ behavior: "smooth" });`,
   `const computed = window.getComputedStyle(element);`,

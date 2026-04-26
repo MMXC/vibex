@@ -11,7 +11,7 @@ describe('codeAnalyzer', () => {
     it('should detect eval() and set hasUnsafe=true', () => {
       const report = analyzeCodeSecurity('eval("x")');
       expect(report.hasUnsafe).toBe(true);
-      expect(report.unsafeEval.length).toBeGreaterThan(0);
+      expect(report.unsafePatterns.some(p => p.type === 'eval')).toBe(true);
     });
   });
 
@@ -19,7 +19,7 @@ describe('codeAnalyzer', () => {
     it('should detect new Function() and set hasUnsafe=true', () => {
       const report = analyzeCodeSecurity('new Function("return 1")');
       expect(report.hasUnsafe).toBe(true);
-      expect(report.unsafeNewFunction.length).toBeGreaterThan(0);
+      expect(report.unsafePatterns.some(p => p.type === 'newFunction')).toBe(true);
     });
   });
 
@@ -27,9 +27,7 @@ describe('codeAnalyzer', () => {
     it('should not flag safe code as unsafe', () => {
       const report = analyzeCodeSecurity('const x = 1; x++');
       expect(report.hasUnsafe).toBe(false);
-      expect(report.unsafeEval).toEqual([]);
-      expect(report.unsafeNewFunction).toEqual([]);
-      expect(report.unsafeDynamicCode).toEqual([]);
+      expect(report.unsafePatterns).toEqual([]);
     });
   });
 
@@ -37,14 +35,29 @@ describe('codeAnalyzer', () => {
     it('should detect setTimeout with string first argument', () => {
       const report = analyzeCodeSecurity('setTimeout("code", 0)');
       expect(report.hasUnsafe).toBe(true);
-      expect(report.unsafeDynamicCode.length).toBeGreaterThan(0);
+      expect(report.unsafePatterns.some(p => p.type === 'setTimeout-string')).toBe(true);
     });
   });
 
-  describe('TC05: parse error handling', () => {
+  describe('TC05: innerHTML/outerHTML detection', () => {
+    it('should detect innerHTML assignments', () => {
+      const report = analyzeCodeSecurity('element.innerHTML = "<p>Hello</p>"');
+      expect(report.hasUnsafe).toBe(true);
+      expect(report.unsafePatterns.some(p => p.type === 'innerHTML')).toBe(true);
+    });
+
+    it('should detect outerHTML assignments', () => {
+      const report = analyzeCodeSecurity('elem.outerHTML = "<div>replaced</div>"');
+      expect(report.hasUnsafe).toBe(true);
+      expect(report.unsafePatterns.some(p => p.type === 'innerHTML')).toBe(true);
+    });
+  });
+
+  describe('TC06: parse error handling', () => {
     it('should handle syntax errors gracefully with confidence < 100', () => {
       const report = analyzeCodeSecurity('const x = 1 {{{');
       expect(report.confidence).toBeLessThan(100);
+      expect(report.hasUnsafe).toBe(false);
     });
   });
 
@@ -58,6 +71,12 @@ describe('codeAnalyzer', () => {
       const warnings = generateSecurityWarnings('eval("x")');
       expect(warnings).toContain('[Security Warning]');
       expect(warnings).toContain('eval');
+    });
+
+    it('should include line numbers for innerHTML warnings', () => {
+      const warnings = generateSecurityWarnings('const elem = document.createElement("div");\nelem.innerHTML = "<p>Content</p>";');
+      expect(warnings).toContain('innerHTML');
+      expect(warnings).toContain('line');
     });
   });
 
@@ -75,6 +94,24 @@ describe('codeAnalyzer', () => {
 
       expect(elapsed).toBeLessThan(500);
       expect(report.hasUnsafe).toBe(false);
+    });
+  });
+
+  describe('Edge cases', () => {
+    it('should detect multiple danger patterns in one code', () => {
+      const report = analyzeCodeSecurity('eval("x"); element.innerHTML = "hi"; new Function("return 1")');
+      expect(report.hasUnsafe).toBe(true);
+      expect(report.unsafePatterns.length).toBeGreaterThanOrEqual(3);
+      expect(report.unsafePatterns.some(p => p.type === 'eval')).toBe(true);
+      expect(report.unsafePatterns.some(p => p.type === 'innerHTML')).toBe(true);
+      expect(report.unsafePatterns.some(p => p.type === 'newFunction')).toBe(true);
+    });
+
+    it('should include line numbers in patterns', () => {
+      const report = analyzeCodeSecurity('const x = 1;\neval("x");\nconst y = 2;');
+      const evalPattern = report.unsafePatterns.find(p => p.type === 'eval');
+      expect(evalPattern).toBeDefined();
+      expect(evalPattern!.line).toBe(2);
     });
   });
 });

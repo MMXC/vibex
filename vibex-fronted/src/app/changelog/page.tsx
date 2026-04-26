@@ -79,6 +79,20 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.303',
     date: '2026-04-26',
     changes: [
+      '📋 vibex-proposals-20260426-sprint12 E8: Canvas 协作冲突解决',
+      '✅ E8-S1 conflictStore: LWW仲裁 startDraft/clearDraft/checkConflict, resolveKeepLocal/resolveUseRemote',
+      '✅ E8-S1 Firebase RTDB锁: lockCard/unlockCard/syncLocks, 60s timeout, graceful fallback',
+      '✅ E8-S2 ConflictDialog: 三选项UI(WCAG 2.1 AA), focus trap, keyboard nav, data-testid',
+      '✅ E8-S2 ConflictBubble: 订阅activeConflict, toDialogProps格式转换, merge占位',
+      '✅ E8-S3 collaborationSync: handleRemoteNodeSync调用checkConflict先于merge, 动态import',
+      '✅ E8 测试: conflictStore.test.ts 12✅, ConflictDialog.test.tsx 28✅, E2E 426行',
+    ],
+    commit: 'ae5f566e1',
+  },
+  {
+    version: '1.0.302',
+    date: '2026-04-26',
+    changes: [
       '📋 vibex-proposals-20260426-sprint12 E6: Prompts 安全 AST 扫描',
       '✅ E6-S1 接口对齐: SecurityReport → SecurityAnalysisResult, UnsafePattern 含 type/line/column',
       '✅ E6-S2 轻量级Walker: 移除 @babel/traverse Path开销, walkNode()递归, ~299ms/5000行',

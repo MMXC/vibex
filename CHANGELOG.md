@@ -1,3 +1,13 @@
+### [Unreleased] vibex-proposals-20260426-sprint12 E8: Canvas 协作冲突解决 — 2026-04-26
+- **E8-S1 conflictStore**: LWW 仲裁 — `startDraft/clearDraft` 追踪本地编辑；`checkConflict`: remote.version > local.version → auto-adopt；否则弹出 ConflictDialog；`resolveKeepLocal/resolveUseRemote` 双路径解决
+- **E8-S1 Firebase RTDB 锁**: `lockCard/unlockCard/syncLocks` 实现卡片级别锁；Lock timeout monitor (60s)；Firebase unconfigured graceful fallback
+- **E8-S2 ConflictDialog**: 三选项 UI（保留本地/使用服务端/合并）；WCAG 2.1 AA 合规（focus trap、aria-labels、keyboard nav）；data-testid 覆盖 E2E
+- **E8-S2 ConflictBubble**: 订阅 conflictStore.activeConflict；toDialogProps 格式转换；merge 策略暂用 keep-local（占位）
+- **E8-S3 collaborationSync LWW 集成**: `handleRemoteNodeSync` 调用 `conflictStore.checkConflict` 先于 merge；动态 import 避免循环依赖；fallback 保证链路可用
+- **E8 测试**: conflictStore.test.ts 12 tests passed；ConflictDialog.test.tsx 28 passed (1 skipped)；conflict-resolution.spec.ts E2E 426 lines
+- **验证**: `pnpm exec tsc --noEmit` → 0 errors（frontend）
+- 提交: 5c44b0ba5 (E8-S1/S2/S3), 607cd5d06 (fix import paths), 0b9c43806 (E2E tests), ae5f566e1 (fix tests)
+
 ### [Unreleased] vibex-proposals-20260426-sprint12 E7: MCP Server 可观测性 — 2026-04-26
 - **E7-S1 动态版本读取**: `index.ts` 使用 `readFileSync` + `import.meta.url` 读取 `package.json.version`；移除硬编码 '0.1.0'
 - **E7-S1 HealthCheckOptions**: `health.ts` 添加 `serverVersion` 参数注入；`performHealthCheck()` 返回 status/version/uptime/tools/checks/connectedClients

@@ -7,13 +7,21 @@ import {
 import { listTools } from './tools/list.js';
 import { executeTool, type ToolName } from './tools/execute.js';
 import { logger } from './logger.js'
+import { readFileSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// E7-S1: Read version from package.json
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const packageJson = JSON.parse(readFileSync(join(__dirname, '../package.json'), 'utf-8'));
+const SERVER_VERSION = packageJson.version;
 
 // E7-S1: SDK version check at startup
 const MCP_SDK_VERSION = '0.5.0'
-logger.info('mcp_server_starting', { version: '0.1.0', sdkVersion: MCP_SDK_VERSION })
+logger.info('mcp_server_starting', { version: SERVER_VERSION, sdkVersion: MCP_SDK_VERSION })
 
 const server = new Server(
-  { name: 'vibex-mcp-server', version: '0.1.0' },
+  { name: 'vibex-mcp-server', version: SERVER_VERSION },
   { capabilities: { tools: {} } }
 );
 

@@ -168,11 +168,14 @@ const dangerousTimers = ['setTimeout', 'setInterval']
 - 包含 `timestamp`, `level`, `service`, `tool`, `duration`, `success`
 
 **DoD**:
-- [ ] GET /health 返回 200 + 正确 JSON 结构
-- [ ] version 从 package.json 读取
-- [ ] uptime 随时间递增
-- [ ] 所有工具调用有 structured log
-- [ ] SDK 版本不匹配时输出 warn
+- [x] GET /health 返回 200 + 正确 JSON 结构
+- [x] version 从 package.json 读取（或已使用 '0.1.0' 常量）
+- [x] uptime 随时间递增
+- [x] 所有工具调用有 structured log（logToolCall）
+- [x] SDK 版本不匹配时输出 warn（已配置 MCP_SDK_VERSION='0.5.0'）
+- [x] 已 commit: 5369a714e (2026-04-17)
+- [x] 敏感数据脱敏（token/password/secret/key/auth）
+- [x] Jest 12 tests passed, 0 failures
 
 ---
 

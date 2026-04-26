@@ -25,8 +25,15 @@ export interface HealthCheckResult {
   connectedClients: number;
 }
 
+export interface HealthCheckOptions {
+  serverVersion?: string;
+}
+
 /** Server start time for uptime calculation */
 const serverStartTime = Date.now();
+
+/** Default version if not provided */
+const DEFAULT_VERSION = '0.1.0';
 
 /**
  * E7-S1: Perform health check
@@ -36,7 +43,7 @@ const serverStartTime = Date.now();
  * - Tools are registered
  * - Server is responsive
  */
-export async function performHealthCheck(): Promise<HealthCheckResult> {
+export async function performHealthCheck(options: HealthCheckOptions = {}): Promise<HealthCheckResult> {
   const checks: HealthCheckResult['checks'] = [];
 
   // Check 1: MCP server running
@@ -82,7 +89,7 @@ export async function performHealthCheck(): Promise<HealthCheckResult> {
   return {
     status,
     timestamp: new Date().toISOString(),
-    version: '0.1.0',
+    version: options.serverVersion ?? DEFAULT_VERSION,
     uptime: Math.floor((Date.now() - serverStartTime) / 1000),
     tools: {
       registered: registeredCount,

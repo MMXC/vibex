@@ -4237,7 +4237,19 @@ See git history for complete changelog.
 - **Files**: src/lib/prd-format.ts, src/app/editor/page.tsx, tests/e2e/prd-format.spec.ts
 - 提交: 0990947fb, 557fda78d
 
-### [Unreleased] S15-E15-P004: Version Compare UI — 2026-04-28
+### [Unreleased] S15-E15-P005: MCP Server Integration — 2026-04-28
+
+### S15-E15-P005: MCP Server Integration
+
+- **U1 MCP Server**: `packages/mcp-server/` — execute tools (createProject/getProject/listComponents/generateCode/heartbeat); ListTools handler with discovery endpoint; stdio JSON-RPC transport
+- **U2 Claude Desktop Config**: `docs/mcp-claude-desktop-setup.md` — MCP server registration for Claude Desktop
+- **U3 Backend API routes**: `/api/delivery/snapshots` (GET/POST/DELETE), `/api/delivery/versions` (GET)
+- **Tests**: snapshotStore.test.ts + confirmationStore.test.ts via vite (frontend); mcp-server integration verified via dev-e15-p005 tester report (125 lines)
+- 提交: 235449050, 9e8ddc1bc
+
+---
+
+## [Unreleased] S15-E15-P004: Version Compare UI — 2026-04-28
 
 ### S15-E15-P004: Version Compare UI
 

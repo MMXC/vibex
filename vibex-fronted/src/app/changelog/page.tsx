@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.309',
+    date: '2026-04-28',
+    changes: [
+      '📋 vibex-proposals-20260427 S15-E15-P005: MCP Server Integration',
+      '✅ P005-U1 MCP Server: tools (createProject/getProject/listComponents/generateCode/heartbeat), ListTools handler',
+      '✅ P005-U2 Claude Desktop Config: mcp-claude-desktop-setup.md',
+      '✅ P005-U3 Backend APIs: /api/delivery/snapshots, /api/delivery/versions',
+      '✅ P005 Integration: snapshotStore + confirmationStore tests, tester report verified',
+    ],
+    commit: '235449050, 9e8ddc1bc',
+  },
+  {
     version: '1.0.308',
     date: '2026-04-28',
     changes: [

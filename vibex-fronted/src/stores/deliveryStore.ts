@@ -432,7 +432,7 @@ export const useDeliveryStore = create<DeliveryState>()(
           status: 'success',
         });
 
-        // E4-U3: Real download via /api/delivery/export
+        // E4-U3 / E15-P003: Real download via /api/delivery/export
         try {
           const response = await fetch('/api/delivery/export', {
             method: 'POST',
@@ -444,7 +444,7 @@ export const useDeliveryStore = create<DeliveryState>()(
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
-          const filename = response.headers.get('X-Filename') || `${type}-${id}.${format === 'pdf' ? 'pdf' : 'md'}`;
+          const filename = response.headers.get('X-Filename') || `${type}-${id}.${format === 'pdf' ? 'pdf' : format === 'bpmn' ? 'bpmn' : 'md'}`;
           a.download = filename;
           document.body.appendChild(a);
           a.click();
@@ -452,6 +452,12 @@ export const useDeliveryStore = create<DeliveryState>()(
           URL.revokeObjectURL(url);
         } catch (err) {
           console.error('[deliveryStore] exportItem failed:', err);
+          // Dispatch error event for toast display in React context
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('bpmn-export-error', {
+              detail: { type, id, format, error: String(err) },
+            }));
+          }
         }
 
         set({

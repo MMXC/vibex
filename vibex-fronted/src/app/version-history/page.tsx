@@ -3,6 +3,10 @@
  * 
  * Displays the history of versions/snapshots for the current project.
  * Allows users to view, compare, and restore previous versions.
+ * 
+ * E15-P004: 
+ * - U1: SnapshotSelector — two dropdowns for arbitrary snapshot compare
+ * - U4: restore with mandatory backup snapshot before jump
  */
 
 'use client';
@@ -29,15 +33,21 @@ export default function VersionHistoryPage() {
   const jumpToSnapshot = useConfirmationStore(state => state.jumpToSnapshot);
   const setSnapshotNote = useConfirmationStore(state => state.setSnapshotNote);
   const currentStep = useConfirmationStore(state => state.currentStep);
+  const addCustomSnapshot = useConfirmationStore(state => state.addCustomSnapshot);
   
   const [selectedVersion, setSelectedVersion] = useState<VersionInfo | null>(null);
-  const [compareVersion, setCompareVersion] = useState<VersionInfo | null>(null);
+  // E15-P004 U1: two selectors for arbitrary snapshot compare
+  const [compareSelectA, setCompareSelectA] = useState<string>('');
+  const [compareSelectB, setCompareSelectB] = useState<string>('');
   const [showPreview, setShowPreview] = useState(false);
   const [showDiff, setShowDiff] = useState(false);
 
+  // E15-P004 U1: diff modal uses { idxA, idxB } directly
+  const [compareIndices, setCompareIndices] = useState<{ idxA: number; idxB: number } | null>(null);
+
   // Convert store history to VersionInfo format
   const versions: VersionInfo[] = history.map((snapshot, index) => ({
-    id: `snapshot-${index}`,
+    id: String(index), // use numeric index string as id
     version: history.length - index,
     timestamp: snapshot.timestamp,
     description: snapshot.note || snapshot.requirementText?.slice(0, 50) || `版本 ${history.length - index}`,
@@ -50,20 +60,36 @@ export default function VersionHistoryPage() {
     setShowPreview(true);
   };
 
-  const handleCompare = (version: VersionInfo) => {
-    setCompareVersion(version);
+  // E15-P004 U1: compare any two snapshots via dropdown selectors
+  const handleCompare = () => {
+    if (!compareSelectA || !compareSelectB) return;
+    if (compareSelectA === compareSelectB) {
+      alert('请选择两个不同的快照进行对比');
+      return;
+    }
+    const idxA = parseInt(compareSelectA);
+    const idxB = parseInt(compareSelectB);
+    if (isNaN(idxA) || isNaN(idxB)) return;
+    setCompareIndices({ idxA, idxB });
     setShowDiff(true);
   };
 
+  // E15-P004 U4: restore with mandatory backup snapshot
   const handleRestore = async (version: VersionInfo) => {
-    const index = history.length - version.version;
-    if (index >= 0 && index < history.length) {
-      jumpToSnapshot(index);
-    }
+    const restoreIndex = history.length - version.version;
+    if (restoreIndex < 0 || restoreIndex >= history.length) return;
+
+    // U4: 还原前强制创建 backup snapshot
+    addCustomSnapshot({
+      note: `自动备份 (还原前)`,
+      timestamp: Date.now(),
+    });
+
+    jumpToSnapshot(restoreIndex);
   };
 
   const handleSaveNote = async (versionId: string, note: string) => {
-    const index = parseInt(versionId.replace('snapshot-', ''));
+    const index = parseInt(versionId);
     if (!isNaN(index)) {
       setSnapshotNote(index, note);
     }
@@ -114,6 +140,46 @@ export default function VersionHistoryPage() {
         </p>
       </div>
 
+      {/* E15-P004 U1: SnapshotSelector — two dropdowns for arbitrary compare */}
+      <div className={styles.snapshotSelector}>
+        <label htmlFor="compare-a">对比快照 A:</label>
+        <select
+          id="compare-a"
+          value={compareSelectA}
+          onChange={(e) => setCompareSelectA(e.target.value)}
+          className={styles.selector}
+        >
+          <option value="">— 选择快照 A —</option>
+          {versions.map((v) => (
+            <option key={v.id} value={v.id}>
+              v{v.version} · {(v.description || '').slice(0, 30)}
+            </option>
+          ))}
+        </select>
+        <span className={styles.selectorVs}>VS</span>
+        <label htmlFor="compare-b">对比快照 B:</label>
+        <select
+          id="compare-b"
+          value={compareSelectB}
+          onChange={(e) => setCompareSelectB(e.target.value)}
+          className={styles.selector}
+        >
+          <option value="">— 选择快照 B —</option>
+          {versions.map((v) => (
+            <option key={v.id} value={v.id}>
+              v{v.version} · {(v.description || '').slice(0, 30)}
+            </option>
+          ))}
+        </select>
+        <button
+          className={styles.compareButton}
+          onClick={handleCompare}
+          disabled={!compareSelectA || !compareSelectB}
+        >
+          对比
+        </button>
+      </div>
+
       <div className={styles.list}>
         {versions.map((version) => (
           <div 
@@ -142,7 +208,10 @@ export default function VersionHistoryPage() {
               </button>
               <button 
                 className={styles.actionButton}
-                onClick={() => handleCompare(version)}
+                onClick={() => {
+                  // E15-P004 U1: pre-select this version in selector A for quick compare
+                  setCompareSelectA(version.id);
+                }}
               >
                 对比
               </button>
@@ -160,13 +229,14 @@ export default function VersionHistoryPage() {
         onRestore={handleRestore}
         onCompare={(v) => {
           setShowPreview(false);
-          handleCompare(v);
+          // E15-P004 U1: set selector A to the version from preview
+          setCompareSelectA(v.id);
         }}
         onSaveNote={handleSaveNote}
       />
 
-      {/* Version Diff Modal */}
-      {showDiff && compareVersion && (
+      {/* E15-P004 U1: Version Diff Modal — arbitrary two-snapshot compare */}
+      {showDiff && compareIndices && (
         <div className={styles.diffModal}>
           <div className={styles.diffModalContent}>
             <div className={styles.diffModalHeader}>
@@ -175,8 +245,8 @@ export default function VersionHistoryPage() {
             </div>
             <div className={styles.diffContainer}>
               <VersionDiff
-                oldVersion={history[history.length - compareVersion.version] || {}}
-                newVersion={history[history.length - 1] || {}}
+                oldVersion={history[compareIndices.idxA] || {}}
+                newVersion={history[compareIndices.idxB] || {}}
                 sideBySide={true}
               />
             </div>

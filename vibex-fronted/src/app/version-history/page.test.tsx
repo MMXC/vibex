@@ -1,14 +1,8 @@
 /**
- * Version History Page Tests — E7: projectId=null boundary
- *
- * E7 boundary tests:
- * When projectId=null in version-history page, the page shows:
- * - "请先选择项目" heading
- * - guide message
- * - link to /projects/new
- *
- * These are verified via source code inspection since next/navigation
- * mocking conflicts with existing test infrastructure.
+ * Version History Page Tests
+ * 
+ * E7: projectId=null boundary
+ * E15-P004 U1: SnapshotSelector — same snapshot boundary
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
@@ -37,5 +31,41 @@ describe('E7: projectId=null boundary — code verification', () => {
     expect(content).toContain('.emptyAction');
     expect(content).toContain('#3b82f6'); // blue button color
     expect(content).toContain('border-radius');
+  });
+});
+
+describe('E15-P004 U1: SnapshotSelector — same snapshot boundary', () => {
+  it('page.tsx has two dropdown selectors (compareSelectA / compareSelectB)', async () => {
+    const content = readFileSync(
+      '/root/.openclaw/vibex/vibex-fronted/src/app/version-history/page.tsx',
+      'utf-8'
+    );
+    // U1: two selectors declared
+    expect(content).toContain('compareSelectA');
+    expect(content).toContain('compareSelectB');
+    // U1: handleCompare checks same-snapshot warning
+    expect(content).toContain('compareSelectA === compareSelectB');
+    expect(content).toContain('请选择两个不同的快照进行对比');
+  });
+
+  it('page.tsx has addCustomSnapshot for U4 backup', async () => {
+    const content = readFileSync(
+      '/root/.openclaw/vibex/vibex-fronted/src/app/version-history/page.tsx',
+      'utf-8'
+    );
+    // U4: handleRestore calls addCustomSnapshot before jumpToSnapshot
+    expect(content).toContain('addCustomSnapshot');
+    expect(content).toContain('自动备份 (还原前)');
+  });
+
+  it('CSS has SnapshotSelector styles', () => {
+    const content = readFileSync(
+      '/root/.openclaw/vibex/vibex-fronted/src/app/version-history/version-history.module.css',
+      'utf-8'
+    );
+    expect(content).toContain('.snapshotSelector');
+    expect(content).toContain('.selector');
+    expect(content).toContain('.compareButton');
+    expect(content).toContain('.selectorVs');
   });
 });

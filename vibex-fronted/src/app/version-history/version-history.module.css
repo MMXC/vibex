@@ -183,3 +183,65 @@
 .diffContainer {
   padding: 24px;
 }
+
+/* E15-P004 U1: SnapshotSelector — two dropdowns for arbitrary compare */
+.snapshotSelector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.snapshotSelector label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.selector {
+  padding: 6px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #374151;
+  background: white;
+  cursor: pointer;
+  min-width: 200px;
+}
+
+.selector:hover {
+  border-color: #9ca3af;
+}
+
+.selectorVs {
+  font-size: 14px;
+  font-weight: 600;
+  color: #667eea;
+}
+
+.compareButton {
+  padding: 6px 20px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.compareButton:hover:not(:disabled) {
+  background: #5a67d8;
+}
+
+.compareButton:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}

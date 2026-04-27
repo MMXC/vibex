@@ -92,6 +92,8 @@ export interface ConfirmationFlowState {
   setSnapshotNote: (index: number, note: string) => void;
   /** Get note for a specific snapshot */
   getSnapshotNote: (index: number) => string | undefined;
+  /** Add a custom snapshot to history (for backup before restore) */
+  addCustomSnapshot: (snapshot: Partial<ConfirmationSnapshot>) => void;
 
   reset: () => void;
 }
@@ -330,6 +332,33 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
         const { history } = get();
         if (index < 0 || index >= history.length) return undefined;
         return history[index].note;
+      },
+
+      // Add a custom snapshot to history (for backup before restore)
+      addCustomSnapshot: (partial: Partial<ConfirmationSnapshot>) => {
+        const state = get();
+        const snapshot: ConfirmationSnapshot = {
+          step: state.currentStep,
+          requirementText: state.requirementText,
+          boundedContexts: state.boundedContexts,
+          selectedContextIds: state.selectedContextIds,
+          contextMermaidCode: state.contextMermaidCode,
+          domainModels: state.domainModels,
+          modelMermaidCode: state.modelMermaidCode,
+          clarificationRounds: state.clarificationRounds,
+          businessFlow: state.businessFlow,
+          flowMermaidCode: state.flowMermaidCode,
+          timestamp: partial.timestamp ?? Date.now(),
+          note: partial.note,
+        };
+
+        const newHistory = state.history.slice(0, state.historyIndex + 1);
+        newHistory.push(snapshot);
+        // Keep only last 20 snapshots
+        if (newHistory.length > 20) {
+          newHistory.shift();
+        }
+        set({ history: newHistory, historyIndex: newHistory.length - 1 });
       },
 
       reset: () => set(initialState),

@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.308',
+    date: '2026-04-28',
+    changes: [
+      '📋 vibex-proposals-20260427 S15-E15-P004: Version Compare UI',
+      '✅ P004-U1 SnapshotSelector: /version-history page, localStorage snapshots',
+      '✅ P004-U2 VersionPreview.tsx: full-viewport diff overlay, line-by-line JSON comparison',
+      '✅ P004-U3 confirmationStore: addCustomSnapshot for backup (max 20)',
+      '✅ P004 Tests: version-history/page.test.tsx 5 tests, confirmationStore.test.ts 8 tests',
+    ],
+    commit: 'f387a26dd, c7a1e8f32',
+  },
+  {
     version: '1.0.307',
     date: '2026-04-28',
     changes: [

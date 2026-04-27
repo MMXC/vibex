@@ -25,6 +25,18 @@
 
 ---
 
+## [Unreleased] S15-E15-P004: Version Compare UI — 2026-04-28
+
+### S15-E15-P004: Version Compare UI
+
+- **U1 SnapshotSelector**: /version-history page, localStorage snapshots with restore/rename/delete actions
+- **U2 VersionPreview.tsx**: full-viewport diff overlay with line-by-line JSON comparison, color-coded additions/deletions/modifications
+- **U3 confirmationStore**: addCustomSnapshot for backup snapshots, snapshot limit (max 20)
+- **Tests**: version-history/page.test.tsx 5 tests, confirmationStore.test.ts 8 tests
+- 提交: f387a26dd, c7a1e8f32
+
+---
+
 ## [Unreleased] E3-U1 CardTreeNode 覆盖率提升 — 2026-04-20
 
 ### E3-U1: CardTreeNode 覆盖率补充

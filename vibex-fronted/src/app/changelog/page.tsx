@@ -20,6 +20,19 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.306',
+    date: '2026-04-27',
+    changes: [
+      '📋 vibex-proposals-20260427 S14-E2: Canvas Import/Export',
+      '✅ E2-U1 JSON Canvas Format: CanvasDocument schema (v1.2.0, metadata, chapters, crossChapterEdges)',
+      '✅ E2-U2 File Import UI: useCanvasImport (validateFile, importFile, showFilePicker, 10MB limit)',
+      '✅ E2-U3 File Export UI: useCanvasExport (exportAsJSON .json + exportAsVibex .vibex gzip)',
+      '✅ E2-U4 Import History: ImportHistoryService (localStorage, 50-entry cap, getImportLog, clearImportLog)',
+      '✅ E2 E2E tests: canvas-import-export.spec.ts (3 tests), ImportHistoryService 6 tests, useCanvasExportE2 4 tests',
+    ],
+    commit: '87fb0d285, fa9dd4da0',
+  },
+  {
     version: '1.0.305',
     date: '2026-04-26',
     changes: [

@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased] S14-E2: Canvas Import/Export — 2026-04-27
+
+### S14-E2: Canvas Import/Export
+
+- **US-E2.1 JSON Canvas Format**: CanvasDocument schema (schemaVersion 1.2.0, metadata, chapters, crossChapterEdges); serialize.ts with serializeCanvasToJSON + deserializeCanvasFromJSON; forward compat (unknown fields → warnings)
+- **US-E2.2 File Import UI**: useCanvasImport hook (validateFile, importFile, showFilePicker, 10MB limit); window.confirm() before overwrite; data-testid=canvas-import-btn; import-error-message
+- **US-E2.3 File Export UI**: useCanvasExport extended (exportAsJSON + exportAsVibex); .vibex = gzip compressed JSON; .json = pretty-printed; 1MB warning; data-testid=canvas-export-btn
+- **US-E2.4 Import History**: ImportHistoryService (localStorage persistence, getImportLog, clearImportLog)
+- **Tests**: ImportHistoryService 6 tests, useCanvasExportE2 4 tests, canvas-import-export E2E 3 tests — all pass
+- 提交: 87fb0d285 (feat), fa9dd4da0 (test)
+
+---
+
 ## [Unreleased] E3-U1 CardTreeNode 覆盖率提升 — 2026-04-20
 
 ### E3-U1: CardTreeNode 覆盖率补充

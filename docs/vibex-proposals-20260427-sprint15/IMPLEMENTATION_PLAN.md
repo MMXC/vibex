@@ -4,6 +4,30 @@
 **Date**: 2026-04-28
 **Status**: E15-P003 Complete
 
+## E15-P004: Version Compare UI
+
+| ID | Name | Status | Depends On | Acceptance Criteria |
+|----|------|--------|-----------|---------------------|
+| U1 | SnapshotSelector (two dropdowns) | ✅ | — | Two selectors for arbitrary snapshot compare; same-snapshot boundary handled |
+| U2 | Diff colors | ✅ | — | added #22c55e / removed #ef4444 / modified #eab308 |
+| U3 | Restore button | ✅ | — | "还原到此版本" button exists in version-history page |
+| U4 | Restore with backup | ✅ | U1/U3 | addCustomSnapshot called before jumpToSnapshot |
+
+## Implementation
+
+- **confirmationStore.ts**: `addCustomSnapshot` added for backup snapshots
+- **version-history/page.tsx**: two dropdowns (`compareSelectA`/`compareSelectB`), `handleCompare()` validates same-snapshot, `handleRestore()` creates backup before jump
+- **version-history.module.css**: `.snapshotSelector`, `.selector`, `.compareButton`, `.selectorVs` styles added
+- **page.test.tsx**: E15-P004 U1/U4 tests added
+
+## Verification
+
+- TypeScript: `pnpm tsc --noEmit` 0 errors (pako/useCanvas pre-existing)
+- Vitest: `pnpm vitest run src/app/version-history/page.test.tsx` 5/5 passed
+- Diff colors: #22c55e (added) / #ef4444 (removed) / #eab308 (modified) per spec
+
+---
+
 ## E15-P003: BPMN Export
 
 | ID | Name | Status | Depends On | Acceptance Criteria |

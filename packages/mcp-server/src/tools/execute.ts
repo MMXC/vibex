@@ -1,4 +1,4 @@
-export type ToolName = 'createProject' | 'getProject' | 'listComponents' | 'generateCode' | 'health_check' | 'review_design';
+export type ToolName = 'createProject' | 'getProject' | 'listComponents' | 'generateCode' | 'health_check' | 'review_design' | 'coding_agent';
 
 // E7-S1: Import health check
 import { performHealthCheck } from '../health.js'
@@ -48,6 +48,37 @@ export async function executeTool(name: ToolName, args: Record<string, unknown>)
       return { content: [{ type: 'text', text: `Components for ${args.projectId}` }] };
     case 'generateCode':
       return { content: [{ type: 'text', text: `Code generated for ${args.componentId} in ${args.framework || 'react'}` }] };
+    case 'coding_agent': {
+      // E15-P005 U1: Invoke AI coding agent via /api/chat
+      const task = args?.task as string || '';
+      const context = args?.context as Record<string, unknown> || {};
+      
+      // Call /api/chat with coding mode (fetch from same origin, no loop)
+      try {
+        const response = await fetch(`${process.env.MCP_API_BASE || 'http://localhost:3000'}/api/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [
+              { role: 'system', content: 'You are an AI coding assistant. Generate code based on the task description.' },
+              { role: 'user', content: task },
+            ],
+            mode: 'coding',
+            context,
+          }),
+        });
+
+        if (!response.ok) {
+          return { content: [{ type: 'text', text: `[MCP] coding_agent failed: ${response.statusText}` }] };
+        }
+
+        const data = await response.json();
+        const message = data?.message?.content || '';
+        return { content: [{ type: 'text', text: message }] };
+      } catch (err) {
+        return { content: [{ type: 'text', text: `[MCP] coding_agent error: ${String(err)}` }] };
+      }
+    }
     default:
       throw new Error(`Unknown tool: ${name}`);
   }

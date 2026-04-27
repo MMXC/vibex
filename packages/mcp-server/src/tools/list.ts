@@ -53,6 +53,29 @@ export function listTools(): Tool[] {
         required: ['canvasId'],
       },
     },
+    // E15-P005 U2: AI Coding Agent tool
+    {
+      name: 'coding_agent',
+      description: 'Invoke the VibeX AI coding agent to generate code from design context. Returns code blocks that can be accepted or rejected.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          task: {
+            type: 'string',
+            description: 'The coding task description',
+          },
+          context: {
+            type: 'object',
+            description: 'Code generation context from design tool',
+            properties: {
+              nodes: { type: 'array', description: 'Design nodes' },
+              schemaVersion: { type: 'string' },
+            },
+          },
+        },
+        required: ['task'],
+      },
+    },
     {
       name: 'createProject',
       description: 'Create a new VibeX project from a PRD description',

@@ -45,10 +45,9 @@ export function initDDDStores(): void {
  *   return null;
  * }
  */
+import { useEffect } from 'react';
+
 export function useDDDStoreInit(): void {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const { useEffect } = require('react');
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     initDDDStores();
   }, []);

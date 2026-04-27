@@ -5,16 +5,21 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock the dynamic imports
-vi.mock('bpmn-js/lib/Modeler', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    importXML: vi.fn().mockResolvedValue(undefined),
-    saveXML: vi.fn().mockResolvedValue({
-      xml: '<?xml version="1.0" encoding="UTF-8"?><bpmn:definitions />',
-    }),
-    importDefinitions: vi.fn(),
-  })),
-}));
+let _cachedXml = '<?xml version="1.0" encoding="UTF-8"?><bpmn:definitions />';
+
+vi.mock('bpmn-js/lib/Modeler', () => {
+  const MockModeler = vi.fn(function(this: { _xml: string }) {
+    (this as Record<string, unknown>).importXML = vi.fn().mockImplementation(async (xml: string) => {
+      (this as { _xml: string })._xml = xml;
+      return undefined;
+    });
+    (this as Record<string, unknown>).saveXML = vi.fn().mockImplementation(async () => {
+      return { xml: (this as { _xml: string })._xml };
+    });
+    (this as Record<string, unknown>).importDefinitions = vi.fn();
+  });
+  return { default: MockModeler };
+});
 
 vi.mock('bpmn-js/lib/features/modeling/Modeling', () => ({
   default: {},

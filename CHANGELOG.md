@@ -4237,7 +4237,17 @@ See git history for complete changelog.
 - **Files**: src/lib/prd-format.ts, src/app/editor/page.tsx, tests/e2e/prd-format.spec.ts
 - 提交: 0990947fb, 557fda78d
 
-### [Unreleased] S15-E15-P005: MCP Server Integration — 2026-04-28
+### [Unreleased] S15-E15-P006: Tech Debt Cleanup — 2026-04-28
+
+### S15-E15-P006: Tech Debt Cleanup
+
+- **ESLint Debt**: partial fix — 197 → 28 errors (remaining: SearchIndex.ts, SearchFilter.tsx, useCanvasExport.ts, api-generated.ts)
+- **init.ts dynamic require**: replaced require('react') with top-level import
+- 提交: 3279e7f35
+
+---
+
+## [Unreleased] S15-E15-P005: MCP Server Integration — 2026-04-28
 
 ### S15-E15-P005: MCP Server Integration
 

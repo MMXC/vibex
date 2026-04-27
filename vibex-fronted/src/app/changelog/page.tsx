@@ -20,6 +20,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.310',
+    date: '2026-04-28',
+    changes: [
+      '📋 vibex-proposals-20260427 S15-E15-P006: Tech Debt Cleanup',
+      '✅ P006 ESLint: 197 → 28 errors (partial)',
+      '✅ P006 init.ts: replaced dynamic require with top-level import',
+    ],
+    commit: '3279e7f35',
+  },
+  {
     version: '1.0.309',
     date: '2026-04-28',
     changes: [

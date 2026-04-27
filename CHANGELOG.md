@@ -4237,7 +4237,19 @@ See git history for complete changelog.
 - **Files**: src/lib/prd-format.ts, src/app/editor/page.tsx, tests/e2e/prd-format.spec.ts
 - 提交: 0990947fb, 557fda78d
 
-### [Unreleased] S14-E2: Canvas Import/Export — 2026-04-27
+### [Unreleased] S15-E15-P003: BPMN Export — 2026-04-28
+
+### S15-E15-P003: BPMN Export
+
+- **U1 Dynamic Import**: bpmn-js/bpmn-moddle via dynamic import (no SSR bundle)
+- **U2 exportFlowToBpmn()**: maps BusinessFlow to BPMN 2.0 XML (StartEvent, EndEvent, ServiceTask, SequenceFlow)
+- **U3 FlowTab Integration**: triggers real .bpmn file download in browser
+- **U4 Unit Tests**: 11 tests for Modeler instantiation + 4 XML element types + escapeXml + xmlToBlob + downloadBpmnXml
+- 提交: c8acde7b8, 52b3bf64b
+
+---
+
+## [Unreleased] S14-E2: Canvas Import/Export — 2026-04-27
 - **US-E2.1 JSON Canvas Format**: CanvasDocument schema (schemaVersion 1.2.0, metadata, chapters, crossChapterEdges); serialize.ts extended with serializeCanvasToJSON + deserializeCanvasFromJSON; forward compat (unknown fields → warnings, never throws)
 - **US-E2.2 File Import UI**: useCanvasImport hook (validateFile, importFile, showFilePicker, 10MB limit); window.confirm() before overwrite; data-testid=canvas-import-btn; import-error-message
 - **US-E2.3 File Export UI**: useCanvasExport extended (exportAsJSON + exportAsVibex); .vibex = gzip compressed JSON; .json = pretty-printed; 1MB warning; data-testid=canvas-export-btn

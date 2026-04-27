@@ -13,6 +13,18 @@
 
 ---
 
+## [Unreleased] S15-E15-P003: BPMN Export — 2026-04-28
+
+### S15-E15-P003: BPMN Export
+
+- **U1 Dynamic Import**: bpmn-js/bpmn-moddle via dynamic import (no SSR bundle)
+- **U2 exportFlowToBpmn()**: maps BusinessFlow to BPMN 2.0 XML (StartEvent/EndEvent/ServiceTask/SequenceFlow)
+- **U3 FlowTab Integration**: triggers real .bpmn file download in browser
+- **U4 Unit Tests**: 11 tests for Modeler instantiation + 4 XML element types + escapeXml + xmlToBlob + downloadBpmnXml
+- 提交: c8acde7b8, 52b3bf64b
+
+---
+
 ## [Unreleased] E3-U1 CardTreeNode 覆盖率提升 — 2026-04-20
 
 ### E3-U1: CardTreeNode 覆盖率补充

@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.307',
+    date: '2026-04-28',
+    changes: [
+      '📋 vibex-proposals-20260427 S15-E15-P003: BPMN Export',
+      '✅ P003-U1 Dynamic Import: bpmn-js/bpmn-moddle (no SSR bundle)',
+      '✅ P003-U2 exportFlowToBpmn(): maps BusinessFlow to BPMN 2.0 XML',
+      '✅ P003-U3 FlowTab Integration: real .bpmn file download',
+      '✅ P003-U4 Unit Tests: 11 tests (Modeler + 4 XML types + escapeXml + xmlToBlob)',
+    ],
+    commit: 'c8acde7b8, 52b3bf64b',
+  },
+  {
     version: '1.0.306',
     date: '2026-04-27',
     changes: [

@@ -4250,3 +4250,12 @@ See git history for complete changelog.
 - **US-E3.3 Import/Export + Token**: canvas-import-export.spec.ts (3 tests) + token-integration.spec.ts (3 tests) — no CSS chaining selectors
 - **US-E3.4 Mock Scope Docs**: MockAgentService scope documented in each spec file header comment
 - 提交: ea8be9ee7
+
+### [Unreleased] S14-E4: Analytics Dashboard Enhancement — 2026-04-27
+- **US-E4.1 FunnelWidget**: pure SVG funnel chart (no external chart lib); empty state when any step < 3 records (`数据不足以计算漏斗`); data-testid=funnel-widget/skeleton/empty-state
+- **US-E4.2 Conversion Metrics**: GET /api/analytics/funnel?range=7d|30d; useFunnelQuery hook (React Query, staleTime 5min, refetchInterval 5min)
+- **US-E4.3 Dashboard Filters**: AnalyticsDashboard with range filters (7天/30天); data-testid=analytics-range-btn-7d/30d; FunnelWidget integrated
+- **US-E4.4 Export Report**: exportFunnelCSV() with UTF-8 BOM-safe CSV download
+- **US-E4.5 Auto-refresh**: React Query refetchInterval every 5 minutes
+- **E4 Button**: data-testid=canvas-analytics-btn added to DDSToolbar
+- 提交: 6faa55db7

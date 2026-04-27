@@ -574,3 +574,18 @@ export async function registerE5Modules(app: App): Promise<void> {
 | Graceful fallback | Panel not rendered → verify page structure at minimum | ✅ |
 
 **Commit**: 711ea673c | **Round 4 fix** | **Files**: 3 e2e spec files
+
+---
+
+## E4 Implementation Status (Sprint 14)
+
+| Story | Status | Notes |
+|-------|--------|-------|
+| US-E4.1: Funnel Chart Component | ✅ Done | 6faa55db7 — pure SVG, no external libs, data-testid=funnel-widget |
+| US-E4.2: Conversion Metrics | ✅ Done | 6faa55db7 — /api/analytics/funnel?range=7d\|30d, useFunnelQuery, 5-min TTL |
+| US-E4.3: Dashboard Filters | ✅ Done | 6faa55db7 — data-testid=analytics-range-btn-7d/30d, FunnelWidget integrated |
+| US-E4.4: Export Analytics Report | ✅ Done | 6faa55db7 — exportFunnelCSV(), UTF-8 BOM-safe CSV |
+| US-E4.5: Auto-refresh | ✅ Done | 6faa55db7 — refetchInterval: 5*60*1000 (React Query) |
+| E4 Button | ✅ Done | 6faa55db7 — data-testid=canvas-analytics-btn in DDSToolbar |
+
+**验证**: pnpm tsc --noEmit ✅ | **Commit**: 6faa55db7 | **Files**: 7 new/modified

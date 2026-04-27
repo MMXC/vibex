@@ -40,6 +40,14 @@ function AiIcon() {
   );
 }
 
+function ChartIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M18 20V10M12 20V4M6 20v-6" />
+    </svg>
+  );
+}
+
 function FullscreenIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -233,6 +241,19 @@ export const DDSToolbar = memo(function DDSToolbar({
             data-testid="canvas-export-btn"
           >
             导出
+          </button>
+
+          {/* E4: Analytics button */}
+          <button
+            type="button"
+            className={styles.exportBtn}
+            onClick={() => window.open('/dashboard?open=funnel', '_blank')}
+            aria-label="查看分析漏斗"
+            title="查看分析漏斗"
+            data-testid="canvas-analytics-btn"
+          >
+            <ChartIcon />
+            <span>分析</span>
           </button>
 
           {/* E2: Import button with hidden file input (Bug fix: wire hidden input) */}

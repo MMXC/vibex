@@ -548,3 +548,16 @@ export async function registerE5Modules(app: App): Promise<void> {
 | Bonus: token-integration CSS tab selector | Changed from `button:has-text` to `[role="tab"]:has-text("CSS")` | ✅ |
 
 **Commit**: e9ae6b6b5 | **Round 2 fix** | **Files**: 4
+
+---
+
+## E3 Round 3 Fix Status (Tester Rejection → Fixed)
+
+| Issue | Fix | Verification |
+|-------|-----|--------------|
+| E3.1-E3.5: CodeGenPanel not visible | DDSCanvasPage: CodeGenPanelWrapper always renders (independent of codeGenContext) | ✅ |
+| E3.1-E3.5: flow prop missing | CodeGenPanelWrapper builds CanvasFlow from store chapters/cards | ✅ |
+| token-integration: missing agentSession=new | All 3 test URLs updated to include `&agentSession=new` | ✅ |
+| DDSToolbar: no agentSession prop | Added to interface + destructured | ✅ |
+
+**Commit**: 7a0f9aa7f | **Round 3 fix** | **Files**: 3

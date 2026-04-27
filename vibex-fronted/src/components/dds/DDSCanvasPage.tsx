@@ -40,6 +40,7 @@ import type { ReactNode } from 'react';
 import type { CodeGenContext } from '@/types/codegen';
 import { useAgentStore } from '@/stores/agentStore';
 import { CodeGenPanel } from '@/components/CodeGenPanel';
+import type { CanvasFlow, CanvasNode } from '@/lib/codeGenerator';
 
 // ==================== Props ====================
 
@@ -433,6 +434,23 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     );
   }
 
+  // ---- E1/E10: CodeGenPanel (always visible) ----
+  function CodeGenPanelWrapper() {
+    const chapters = useDDSCanvasStore((s) => s.chapters);
+    const flow: CanvasFlow = {
+      id: 'dds-canvas',
+      name: 'DDSCanvas',
+      nodes: Object.values(chapters).flatMap((chapter) =>
+        (chapter.cards ?? []).map((card): CanvasNode => ({
+          id: card.id,
+          name: card.title ?? '',
+          type: card.type ?? 'card',
+        }))
+      ),
+    };
+    return <CodeGenPanel flow={flow} />;
+  }
+
   return (
     <div
       data-theme="dark"
@@ -441,7 +459,10 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
       onMouseMove={handleMouseMove}
     >
       {/* Toolbar */}
-      <DDSToolbar onAIGenerate={handleAIGenerate} />
+      <DDSToolbar onAIGenerate={handleAIGenerate} agentSession={agentSession} />
+
+      {/* E10-E1: CodeGenPanel — always visible */}
+      <CodeGenPanelWrapper />
 
       {/* Loading overlay */}
       {state.pageState === 'loading' && (

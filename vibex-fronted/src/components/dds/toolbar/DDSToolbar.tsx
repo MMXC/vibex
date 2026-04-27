@@ -76,12 +76,15 @@ export interface DDSToolbarProps {
   isGenerating?: boolean;
   /** Additional class */
   className?: string;
+  /** agentSession URL param */
+  agentSession?: string | null;
 }
 
 export const DDSToolbar = memo(function DDSToolbar({
   onAIGenerate,
   isGenerating: isGeneratingProp,
   className = '',
+  agentSession,
 }: DDSToolbarProps) {
   const activeChapter = useDDSCanvasStore((s) => s.activeChapter);
   const isFullscreen = useDDSCanvasStore((s) => s.isFullscreen);

@@ -26,7 +26,7 @@ test.describe('E3: Design-to-Code E2E', () => {
   });
 
   test('E3.1 — Generate code button renders', async ({ page }) => {
-    await page.goto('/design/dds-canvas?projectId=test');
+    await page.goto('/design/dds-canvas?projectId=test&agentSession=new');
     await page.waitForSelector('[data-testid="code-gen-panel"]', { timeout: 10000 });
     const btn = page.locator('[data-testid="generate-button"]');
     await expect(btn).toBeVisible();
@@ -34,7 +34,7 @@ test.describe('E3: Design-to-Code E2E', () => {
   });
 
   test('E3.2 — Generate code produces output', async ({ page }) => {
-    await page.goto('/design/dds-canvas?projectId=test');
+    await page.goto('/design/dds-canvas?projectId=test&agentSession=new');
     await page.waitForSelector('[data-testid="code-gen-panel"]', { timeout: 10000 });
     await page.click('[data-testid="generate-button"]');
     await expect(page.locator('[data-testid="code-preview"]')).toBeVisible({ timeout: 10000 });
@@ -42,18 +42,19 @@ test.describe('E3: Design-to-Code E2E', () => {
   });
 
   test('E3.3 — Download ZIP button appears after generation', async ({ page }) => {
-    await page.goto('/design/dds-canvas?projectId=test');
+    await page.goto('/design/dds-canvas?projectId=test&agentSession=new');
     await page.waitForSelector('[data-testid="code-gen-panel"]', { timeout: 10000 });
     await page.click('[data-testid="generate-button"]');
     await expect(page.locator('[data-testid="download-button"]')).toBeVisible({ timeout: 10000 });
   });
 
   test('E3.4 — Send to AI Agent button visible when feature flag enabled', async ({ page }) => {
-    await page.goto('/design/dds-canvas?projectId=test');
+    // Set feature flag BEFORE navigating to the app
+    await page.goto('about:blank');
     await page.evaluate(() => {
       localStorage.setItem('NEXT_PUBLIC_FEATURE_DESIGN_TO_CODE_PIPELINE', 'true');
     });
-    await page.reload();
+    await page.goto('/design/dds-canvas?projectId=test&agentSession=new');
     await page.waitForSelector('[data-testid="code-gen-panel"]', { timeout: 10000 });
     await page.click('[data-testid="generate-button"]');
     const sendBtn = page.locator('[data-testid="send-to-agent-btn"]');
@@ -61,7 +62,8 @@ test.describe('E3: Design-to-Code E2E', () => {
   });
 
   test('E3.5 — Limit warning shows for 200+ nodes', async ({ page }) => {
-    await page.goto('/design/dds-canvas?projectId=test');
+    await page.goto('/design/dds-canvas?projectId=test&agentSession=new');
+    await page.waitForLoadState('networkidle');
     await page.waitForSelector('[data-testid="code-gen-panel"]', { timeout: 10000 });
     await page.click('[data-testid="generate-button"]');
     const warning = page.locator('[data-testid="limit-warning"]');

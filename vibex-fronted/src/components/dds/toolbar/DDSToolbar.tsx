@@ -232,17 +232,25 @@ export const DDSToolbar = memo(function DDSToolbar({
             导出
           </button>
 
-          {/* E2: Import button */}
+          {/* E2: Import button with hidden file input (Bug fix: wire hidden input) */}
           <button
             type="button"
             className={styles.exportBtn}
-            onClick={handleDDSImport}
+            onClick={() => importRef.current?.click()}
             aria-label="导入画布"
             title="从 .vibex 或 .json 文件导入"
             data-testid="canvas-import-btn"
           >
             导入
           </button>
+          <input
+            ref={importRef}
+            type="file"
+            accept=".json,.vibex"
+            style={{ display: 'none' }}
+            data-testid="canvas-import-input"
+            onChange={handleImportChange}
+          />
         </div>
 
         {/* Right: Action buttons */}

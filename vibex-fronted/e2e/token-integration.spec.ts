@@ -17,7 +17,7 @@ test.describe('E3: Token Integration E2E', () => {
     await page.goto('/design/dds-canvas?projectId=test');
     await page.waitForSelector('[data-testid="code-gen-panel"]', { timeout: 10000 });
     await page.click('[data-testid="generate-button"]');
-    await page.click('button:has-text("CSS")');
+    await page.click('[role="tab"]:has-text("CSS")');
     const codeContent = page.locator('[data-testid="code-preview"] code');
     const cssText = await codeContent.textContent();
     // CSS must use var() for design tokens — no hardcoded hex values

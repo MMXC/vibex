@@ -535,3 +535,16 @@ export async function registerE5Modules(app: App): Promise<void> {
 
 **验证**: pnpm tsc --noEmit ✅ | playwright config ✅
 **Commit**: ea8be9ee7 | **Files**: 4 new/modified
+
+---
+
+## E3 Round 2 Fix Status (Tester Rejection → Fixed)
+
+| Bug | Fix | Verification |
+|-----|-----|--------------|
+| Bug 1: DDSToolbar importRef not in JSX | Button now triggers `importRef.current?.click()`, hidden input attached with `data-testid="canvas-import-input"` | ✅ |
+| Bug 2: E3 tests missing agentSession=new | All tests navigate to `/design/dds-canvas?projectId=test&agentSession=new` | ✅ |
+| Bug 3: E3.8 checks dynamic input before render | Now checks `canvas-import-btn` + `canvas-import-input` via `toBeAttached()` | ✅ |
+| Bonus: token-integration CSS tab selector | Changed from `button:has-text` to `[role="tab"]:has-text("CSS")` | ✅ |
+
+**Commit**: e9ae6b6b5 | **Round 2 fix** | **Files**: 4

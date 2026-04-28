@@ -64,6 +64,16 @@ function ExitFullscreenIcon() {
   );
 }
 
+// S16-P0-1: Eye icon for Design Review button
+function EyeIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
 // ==================== Shared download helper ====================
 
 function downloadBlob(blob: Blob, filename: string) {
@@ -301,6 +311,18 @@ export const DDSToolbar = memo(function DDSToolbar({
             aria-pressed={isFullscreen}
           >
             {isFullscreen ? <ExitFullscreenIcon /> : <FullscreenIcon />}
+          </button>
+
+          {/* S16-P0-1: Design Review button */}
+          <button
+            type="button"
+            className={styles.actionButton}
+            onClick={() => window.dispatchEvent(new CustomEvent('design-review:open'))}
+            data-testid="design-review-btn"
+            aria-label="Design Review"
+            title="Design Review (Ctrl+Shift+R)"
+          >
+            <EyeIcon /> Design Review
           </button>
         </div>
 

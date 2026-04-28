@@ -31,6 +31,7 @@ import { useShortcutStore } from '@/stores/shortcutStore';
 import { createDDSAPI } from '@/hooks/dds/useDDSAPI';
 import { useDDSCanvasSearch } from '@/hooks/dds/useDDSCanvasSearch';
 import { DDSSearchPanel } from '@/components/dds/DDSSearchPanel';
+import { ReviewReportPanel } from '@/components/design-review';
 import { PresenceAvatars } from '@/components/canvas/Presence/PresenceAvatars';
 import { usePresence, isFirebaseConfigured, updateCursor } from '@/lib/firebase/presence';
 import { useAuthStore } from '@/stores/authStore';
@@ -362,6 +363,7 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     onZoomReset: () => { /* placeholder */ },
     onSelectAll: () => { /* placeholder */ },
     onNewNode: () => { /* placeholder */ },
+    onDesignReview: () => { window.dispatchEvent(new CustomEvent('design-review:open')); },
     enabled: true,
   });
 
@@ -452,6 +454,7 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   }
 
   return (
+    <>
     <div
       data-theme="dark"
       data-testid="dds-canvas-page"
@@ -614,6 +617,10 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
         }
       `}</style>
     </div>
+
+    {/* S16-P0-1: Design Review panel */}
+    <ReviewReportPanel />
+    </>
   );
 });
 

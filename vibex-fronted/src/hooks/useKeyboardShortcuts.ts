@@ -55,6 +55,8 @@ interface KeyboardShortcutsOptions {
   onSwitchToFlow?: () => void;
   /** Switch to Component tab (Alt+3) */
   onSwitchToComponent?: () => void;
+  /** [S16-P0-1] Design Review (Ctrl+Shift+R / Cmd+Shift+R) */
+  onDesignReview?: () => void;
   /** Whether shortcuts should be active */
   enabled?: boolean;
 }
@@ -92,6 +94,7 @@ export function useKeyboardShortcuts({
   onSwitchToContext,
   onSwitchToFlow,
   onSwitchToComponent,
+  onDesignReview,
   enabled = true,
 }: KeyboardShortcutsOptions) {
   useEffect(() => {
@@ -233,6 +236,13 @@ export function useKeyboardShortcuts({
         return;
       }
 
+      // === [S16-P0-1] Design Review: Ctrl+Shift+R / Cmd+Shift+R ===
+      if ((isCtrl || isMeta) && e.shiftKey && e.key.toLowerCase() === 'r') {
+        e.preventDefault();
+        onDesignReview?.();
+        return;
+      }
+
       // === Tab Switch: Alt+1 (Context) ===
       if (e.altKey && e.key === '1') {
         e.preventDefault();
@@ -257,5 +267,5 @@ export function useKeyboardShortcuts({
 
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset, onDelete, onSelectAll, onClearSelection, onNewNode, onQuickGenerate, onConfirmSelected, onGenerateContext, onSwitchToContext, onSwitchToFlow, onSwitchToComponent, enabled]);
+  }, [undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset, onDelete, onSelectAll, onClearSelection, onNewNode, onQuickGenerate, onConfirmSelected, onGenerateContext, onSwitchToContext, onSwitchToFlow, onSwitchToComponent, onDesignReview, enabled]);
 }

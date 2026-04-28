@@ -316,39 +316,27 @@ interface StateMachineProps {
 
 #### Task Breakdown
 
-**2-6.1 — Firebase mock server**
-- File: `packages/mcp-server/src/mocks/firebaseMock.ts` (new)
-- Implements 4 states:
-  1. `CONNECTED` — normal realtime sync
-  2. `DEGRADED` — high latency (simulated 2s delay)
-  3. `DISCONNECTED` — returns null, local-only mode
-  4. `RECONNECTING` — exponential backoff, auto-recovers
-- Auto-reconnect logic with configurable retry
+**2-6.1 — Firebase mock server** ✅
 
-**2-6.2 — 5-user concurrent presence E2E**
-- File: `e2e/firebase-presence.spec.ts` (new)
+**2-6.2 — 5-user concurrent presence E2E** ✅
+- File: `tests/e2e/firebase-presence.spec.ts` (new)
 - Launch 5 Playwright browser contexts
 - Each connects to app in mock mode
 - Verify: all 5 presence indicators update within 1s
-- Run: `npx playwright test e2e/firebase-presence.spec.ts --project=mock`
 
-**2-6.3 — ConflictBubble in mock scenarios**
-- File: `src/components/collaboration/ConflictBubble.tsx` (new or extend)
-- When mock enters `DISCONNECTED` state → show "Offline — changes queued"
-- When reconnecting → show "Reconnecting..."
-- When reconnected → show "Synced" then auto-dismiss
+**2-6.3 — ConflictBubble in mock scenarios** ✅
+- File: `src/components/collaboration/ConflictBubble.tsx` (new)
+- DISCONNECTED → "Offline — changes queued"
+- RECONNECTING → "Reconnecting..."
+- CONNECTED → "Synced" then auto-dismiss 2s
 
-**2-6.4 — Cold start < 500ms or fallback**
-- File: `src/hooks/useFirebase.ts`
-- Measure initial connection time
-- If > 500ms: fallback to local-only mode, show banner
-- Document behavior in `docs/vibex-sprint16/firebase-config-path.md`
+**2-6.4 — Cold start < 500ms or fallback** ✅
+- File: `src/hooks/useFirebase.ts` (new)
+- Measure initial connection time; > 500ms → local-only fallback
+- Documented in `docs/vibex-sprint16/firebase-config-path.md`
 
-**2-6.5 — Firebase config path confirmation doc**
-- File: `docs/vibex-sprint16/firebase-config-path.md`
-- Environment variables needed (NEXT_PUBLIC_FIREBASE_*)
-- Mock vs real Firebase toggle
-- Connection flow diagram (Mermaid)
+**2-6.5 — Firebase config path confirmation doc** ✅
+- File: `docs/vibex-sprint16/firebase-config-path.md` (created above)
 
 #### File Changes Summary
 | File | Action |

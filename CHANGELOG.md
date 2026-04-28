@@ -1,3 +1,10 @@
+### [Unreleased] vibex-proposals-20260428-sprint16 S16-P2-1: Canvas Version History Production — 2026-04-28
+- **S16-P2-1-useVersionHistory**: 30s debounce auto-snapshot; `createSnapshot` (manual) / `notifyChange` (auto); `restoreSnapshot` with pre-restore backup; max 50 snapshots pruning; `projectId=null` rejection; `isSnapshotting`/`isRestoring` states
+- **S16-P2-1-VersionHistoryPanel**: Manual section (📌 icon) / Auto-save section (⏱️ icon); Restore confirmation dialog; `projectId=null` guide UI with CTA button; empty state with 30s hint; `data-testid`全覆盖
+- **S16-P2-1-Unit tests**: 8 tests (useVersionHistory) — empty start, manual snapshot, null guard, delete, restore re-add, notifyChange guard, clearAll, maxSnapshots limit ✅
+- **S16-P2-1-E2E tests**: 7 tests (version-history-e2e.spec.ts) — no-project guide, sections, create button, type badges, restore flow, delete
+- 提交: b9c63cc4a
+
 ### [Unreleased] vibex-proposals-20260428-sprint16 S16-P1-2: Code Generator Real Component Generation — 2026-04-28
 - **S16-P1-2-FlowStepCard**: Real props (`stepName`/`actor`/`pre`/`post`/`stepId`); cyberpunk card styling; selected state; `data-step-id` attribute
 - **S16-P1-2-APIEndpointCard**: Real props (`method`/`path`/`summary`/`description`/`operationId`); METHOD_COLORS map (GET/POST/PUT/DELETE/PATCH); `data-method` attribute

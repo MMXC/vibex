@@ -20,6 +20,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.315',
+    date: '2026-04-28',
+    changes: [
+      '📋 vibex-proposals-20260428 Sprint16 S16-P2-1: Canvas Version History Production',
+      '✅ P2-1-useVersionHistory: 30s debounce auto-snapshot, max 50 snapshots, restore with backup',
+      '✅ P2-1-VersionHistoryPanel: Manual/Auto sections, restore confirmation, projectId=null guide UI',
+      '✅ P2-1-Tests: 8 unit tests (useVersionHistory) + 7 E2E tests (version-history-e2e.spec.ts)',
+    ],
+    commit: 'b9c63cc4a',
+  },
+  {
     version: '1.0.314',
     date: '2026-04-28',
     changes: [

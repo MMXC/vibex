@@ -1,3 +1,13 @@
+### [Unreleased] vibex-proposals-20260428-sprint16 S16-P0-1: Design Review UI Integration — 2026-04-28
+- **S16-P0-1-DDSToolbar button**: `data-testid="design-review-btn"` — Dispatches `design-review:open` CustomEvent
+- **S16-P0-1-useDesignReview hook**: Mock `review_design` MCP call with 1.5s simulated delay; returns 3 compliance / 3 accessibility issues + 3 reuse recommendations
+- **S16-P0-1-ReviewReportPanel**: Glassmorphism overlay with 3 tabs (Compliance/Accessibility/Reuse); severity badges (critical/warning/info); priority badges (high/medium/low); loading spinner; error state; empty state
+- **S16-P0-1-Keyboard shortcut**: Ctrl+Shift+R / Cmd+Shift+R dispatches `design-review:open` event; registered in `useKeyboardShortcuts` hook
+- **S16-P0-1-Mounting**: ReviewReportPanel mounted in DDSCanvasPage; listens for `design-review:open` event; `autoOpen` prop support
+- **S16-P0-1-Unit tests**: 8 tests (rendering, tab switching, loading, error, empty, badges) — all passing ✅
+- **S16-P0-1-E2E tests**: 7 tests (toolbar button, keyboard shortcut, 3 tabs, close, aria-label) — design-review.spec.ts
+- 提交: 1e56cac17
+
 ### [Unreleased] vibex-proposals-20260427-sprint14 E1: Design-to-Code Pipeline — 2026-04-27
 - **E1-U1 Feature Flags**: `FEATURE_DESIGN_TO_CODE_PIPELINE` + `FEATURE_DESIGN_TO_CODE_BIDIRECTIONAL` added to featureFlags.ts
 - **E1-U1 Types**: `DesignNode` / `CodeGenContext` / `TokenSnapshot` defined in types/codegen.ts

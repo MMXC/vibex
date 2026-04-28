@@ -20,6 +20,19 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.311',
+    date: '2026-04-28',
+    changes: [
+      '📋 vibex-proposals-20260428 Sprint16 S16-P0-1: Design Review UI Integration',
+      '✅ P0-1-DDSToolbar: Design Review button (data-testid="design-review-btn")',
+      '✅ P0-1-useDesignReview: Mock review_design MCP call, 3 compliance + 3 a11y issues + 3 reuse recs',
+      '✅ P0-1-ReviewReportPanel: Glassmorphism overlay, 3 tabs (Compliance/Accessibility/Reuse), severity badges',
+      '✅ P0-1-Keyboard: Ctrl+Shift+R / Cmd+Shift+R triggers design review',
+      '✅ P0-1-Tests: 8 unit tests (ReviewReportPanel) + 7 E2E tests (design-review.spec.ts)',
+    ],
+    commit: '1e56cac17',
+  },
+  {
     version: '1.0.310',
     date: '2026-04-28',
     changes: [

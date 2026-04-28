@@ -359,33 +359,33 @@ interface StateMachineProps {
 
 #### Task Breakdown
 
-**2-7.1 — Auto-snapshot with 30s debounce**
+**2-7.1 — Auto-snapshot with 30s debounce** ✅
 - File: `src/hooks/useVersionHistory.ts` (new or extend)
 - Debounced save: reset 30s timer on each canvas change
 - Snapshot stored to D1 via Cloudflare Worker
 - Snapshot data: `{ id, projectId, canvasState, timestamp, type: 'auto'|'manual' }`
 
-**2-7.2 — `VersionHistoryPanel` distinguishes auto vs manual**
+**2-7.2 — `VersionHistoryPanel` distinguishes auto vs manual** ✅
 - File: `src/components/version-history/VersionHistoryPanel.tsx` (new)
 - File: `src/components/version-history/VersionHistoryPanel.module.css` (new)
 - List items show icon + label: "Auto-saved 2 min ago" vs "Manual snapshot"
 - Auto-save entries: subtle/grey style
 - Manual entries: highlighted with accent
 
-**2-7.3 — `projectId=null` guide UI**
+**2-7.3 — `projectId=null` guide UI** ✅
 - File: `src/components/version-history/VersionHistoryPanel.tsx`
 - When `projectId === null` → show inline guide:
   - Icon: warning or info
   - Text: "Version history requires a project. Create or open a project to enable snapshots."
   - CTA button: "Create Project"
 
-**2-7.4 — Snapshot restore correctness**
+**2-7.4 — Snapshot restore correctness** ✅
 - File: `src/hooks/useVersionHistory.ts`
 - `restoreSnapshot(id)`: fetch from D1, deep-compare, apply to canvas store
 - Confirmation dialog before restore
 - Undo-friendly: current state backed up before restore
 
-**2-7.5 — E2E: `version-history-e2e.spec.ts`**
+**2-7.5 — E2E: `version-history-e2e.spec.ts`** ✅
 - File: `e2e/version-history-e2e.spec.ts` (new)
 - Test cases:
   1. Auto-snapshot fires after 30s debounce on canvas change

@@ -136,9 +136,9 @@ export function PresenceAvatars({ canvasId, maxDisplay = 5 }: PresenceAvatarsPro
   // usePresence 内部已处理 visibilitychange 兜底（E2-U3）
   const { others, isAvailable, isConnected } = usePresence(canvasId, null, 'presence-check');
 
-  // 四态分支
+  // E2-U3: Firebase 降级 — 未配置时完全不渲染，避免 WiFi-off 图标干扰 UI
   if (!isAvailable) {
-    return <ErrorState />;
+    return null;
   }
   if (!isConnected) {
     return <LoadingState />;

@@ -1864,3 +1864,48 @@ For older entries, see the commit history.
 - **Epic2-S2.1~S2.3**: TreePanel.tsx — 空状态提示文案优化（context/flow/component）
 - **Epic3-S3.1~S3.3**: tests/e2e/tab-accessibility.spec.ts — 6 E2E 测试（disabled验证/tab切换/ARIA状态）
 - **提交**: `40b3158a`, `7cb73ba3`, `7042410b`, `ef3df0af`
+
+---
+
+## [Unreleased] Sprint 16: Design Review UI + Firebase Mock + Canvas History + MCP Tool Governance — 2026-04-28
+
+### S16-P0-1: Design Review UI Integration
+- DDSToolbar button: `data-testid="design-review-btn"`; keyboard shortcut Ctrl+Shift+R
+- ReviewReportPanel: 3 tabs (Compliance/Accessibility/Reuse); severity badges; loading/error/empty states
+- useDesignReview hook: 1.5s simulated MCP call; mock compliance/a11y/reuse issues
+- Mounted in DDSCanvasPage; `autoOpen` prop support
+- Unit: 8 tests ✅; E2E: 7 tests (toolbar, shortcut, tabs) ✅
+
+### S16-P0-2: Design-to-Code Bidirectional Sync
+- ConflictResolutionDialog: 3-panel diff UI (Design/Token/Code); Accept Design/Code/Token/Merge All
+- driftDetector: detects added/removed/modified tokens; 3-scenario acceptable drift threshold
+- batchExporter: Promise.allSettled with configurable concurrency; progress callback
+- Types: DesignToken/TokenChange/DriftReport/SyncState/AcceptAction
+- Unit: 14 tests ✅; E2E: 6 tests (dialog, panels, buttons) ✅
+
+### S16-P1-1: Firebase Mock + Config Path
+- FirebaseMock (client): 4 states (CONNECTED/DEGRADED/DISCONNECTED/RECONNECTING); exponential backoff
+- FirebaseMock (server): packages/mcp-server/src/mocks/firebaseMock.ts mirrors client
+- useFirebase: cold start threshold (< 500ms → local-only fallback); autoConnect
+- ConflictBubble: 4-state banner; auto-dismiss after 2s CONNECTED; a11y (role=status)
+- Unit: 4 tests ✅; E2E: 5 tests (4 state transitions) ✅
+
+### S16-P1-2: Code Generator Real Component Generation
+- FlowStepCard: real props (stepName/actor/pre/post/stepId); cyberpunk styling; data-step-id
+- APIEndpointCard: method/path/summary/operationId; METHOD_COLORS (GET/POST/PUT/DELETE/PATCH)
+- StateMachineCard: states/transitions/initialState; "+N more" truncation; data-state-id
+- Types: FlowStepProps/APIEndpointProps/StateMachineProps/ComponentSpec/CodeGenResult
+- Unit: 7 tests (type validation) ✅
+
+### S16-P2-1: Canvas Version History Production
+- useVersionHistory: 30s debounce auto-snapshot; max 50 snapshots; projectId=null guard
+- VersionHistoryPanel: Manual (📌) / Auto (⏱️) sections; restore confirmation; empty state
+- Unit: 8 tests (snapshot/null guard/max limit/restore) ✅; E2E: 7 tests ✅
+
+### S16-P2-2: MCP Tool Governance & Documentation
+- MCP_TOOL_GOVERNANCE.md: naming conventions, required sections, versioning, deprecation
+- ERROR_HANDLING_POLICY.md: error codes E100-E108; exponential backoff 1s-30s; timeout reference
+- review_design.md (222L): Overview/Input/Output/Error/Issue Severity/CLI/Testing
+- figma_import.md (175L): fileKey/nodeIds params; token extraction; CLI; Testing
+- generate_code.md (176L): 3 modes (flowstep/apientrypoint/statemachine); CLI; Testing
+- ⚠️ DoD gaps: INDEX.md + generate-tool-index.ts script + GET /health 未实现

@@ -241,6 +241,7 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
         const { history, historyIndex } = get();
         if (historyIndex > 0) {
           const prevSnapshot = history[historyIndex - 1];
+          if (!prevSnapshot) return;
           set({
             currentStep: prevSnapshot.step,
             requirementText: prevSnapshot.requirementText,
@@ -262,6 +263,7 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
         const { history, historyIndex } = get();
         if (historyIndex < history.length - 1) {
           const nextSnapshot = history[historyIndex + 1];
+          if (!nextSnapshot) return;
           set({
             currentStep: nextSnapshot.step,
             requirementText: nextSnapshot.requirementText,
@@ -297,7 +299,7 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
         if (index < 0 || index >= history.length) return;
         
         const snapshot = history[index];
-        
+        if (!snapshot) return;
         set({
           currentStep: snapshot.step,
           requirementText: snapshot.requirementText,
@@ -323,7 +325,9 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
         if (index < 0 || index >= history.length) return;
         
         const newHistory = [...history];
-        newHistory[index] = { ...newHistory[index], note };
+        const existing = newHistory[index];
+        if (!existing) return;
+        newHistory[index] = { ...existing, note };
         set({ history: newHistory });
       },
 
@@ -331,7 +335,7 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
       getSnapshotNote: (index: number) => {
         const { history } = get();
         if (index < 0 || index >= history.length) return undefined;
-        return history[index].note;
+        return history[index]?.note;
       },
 
       // Add a custom snapshot to history (for backup before restore)

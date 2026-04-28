@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.312',
+    date: '2026-04-28',
+    changes: [
+      '📋 vibex-proposals-20260428 Sprint16 S16-P0-2: Design-to-Code Bidirectional Sync',
+      '✅ P0-2-ConflictResolutionDialog: 3-panel diff (Design/Token/Code), Accept Design/Code/Token/Merge All',
+      '✅ P0-2-driftDetector: detectDrift() with 3 scenarios (A/B/C), false positive rate calculation',
+      '✅ P0-2-batchExporter: batchExport() 50 concurrent, progress callback, export50Components()',
+      '✅ P0-2-Tests: 14 unit tests (8 drift + 6 batch) + 6 E2E tests (design-to-code-e2e.spec.ts)',
+    ],
+    commit: '8ea6fbee1',
+  },
+  {
     version: '1.0.311',
     date: '2026-04-28',
     changes: [

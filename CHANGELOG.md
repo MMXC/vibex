@@ -1,3 +1,13 @@
+### [Unreleased] vibex-proposals-20260428-sprint16 S16-P0-2: Design-to-Code Bidirectional Sync — 2026-04-28
+- **S16-P0-2-ConflictResolutionDialog**: 3-panel diff UI (Design/Token/Code); Accept Design/Code/Token/Merge All buttons; cyberpunk glassmorphism styling; `isOpen` + `changes` + `designTokens` + `codeTokens` props
+- **S16-P0-2-driftDetector**: `detectDrift(designTokens, codeTokens, scenario?)` — detects added/removed/modified tokens; `isDriftAcceptable()` threshold check; 3-scenario (A: renamed / B: refactored / C: no drift); false positive rate calculation
+- **S16-P0-2-batchExporter**: `batchExport(tasks, concurrency, onProgress)` — Promise.allSettled with configurable concurrency; progress callback; `export50Components()` helper; memory leak prevention via result clearing
+- **S16-P0-2-types**: `DesignToken` / `TokenChange` / `DriftReport` / `SyncState` / `AcceptAction` interfaces
+- **S16-P0-2-Unit tests**: 14 tests (driftDetector: 8 / batchExporter: 6) — all passing ✅
+- **S16-P0-2-E2E tests**: 6 tests (design-to-code-e2e.spec.ts) — dialog open, 3 panels, change count, action buttons, close, no-conflict state
+- **S16-P0-2-Verification doc**: `docs/vibex-sprint16/design-to-code-verification.md` with 3-scenario test matrix and FP rate table
+- 提交: 8ea6fbee1
+
 ### [Unreleased] vibex-proposals-20260428-sprint16 S16-P0-1: Design Review UI Integration — 2026-04-28
 - **S16-P0-1-DDSToolbar button**: `data-testid="design-review-btn"` — Dispatches `design-review:open` CustomEvent
 - **S16-P0-1-useDesignReview hook**: Mock `review_design` MCP call with 1.5s simulated delay; returns 3 compliance / 3 accessibility issues + 3 reuse recommendations

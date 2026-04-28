@@ -1,3 +1,10 @@
+### [Unreleased] vibex-proposals-20260428-sprint17 S17-E1: Epic 1 E1-U1~U4 Verification — 2026-04-29
+- **S17-E1-U1**: Create `code-generator-e2e.spec.ts` (6 Playwright E2E tests for CodeGenPanel — panel visibility, generate button, tab switching, node count, download, framework selector)
+- **S17-E1-U2**: Add +3 tests to `design-review.spec.ts` (CodeGenPanel production path — generate button, framework selector, code preview tabs)
+- **S17-E1-U3**: Add `packages/mcp-server/src/routes/health.ts` — standalone Node.js HTTP `/health` on port 3100; returns `{status, timestamp, tools: {registered, names}}`; 404 for other paths
+- **S17-E1-U4**: Add `scripts/generate-tool-index.ts` — parses `listTools()` from mcp-server source, generates `docs/mcp-tools/INDEX.md` with 7 tools table (name/description/input schema); exit 0
+- 提交: 8f817a5c0
+
 ### [Unreleased] vibex-proposals-20260428-sprint16 S16-P2-2: MCP Tool Governance & Documentation — 2026-04-28
 - **S16-P2-2-review_design.md**: 222 lines — Overview/Input/Output/Error/Issue Severity/Examples/Design Checks/CLI/Testing sections; 3 compliance + 3 a11y + 3 reuse issue types
 - **S16-P2-2-figma_import.md**: 175 lines — Overview/Input/Output/Error/Examples/Token Extraction/CLI/Testing; fileKey/nodeIds params

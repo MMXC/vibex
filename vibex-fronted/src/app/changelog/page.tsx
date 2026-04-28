@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.317',
+    date: '2026-04-29',
+    changes: [
+      '📋 vibex-proposals-20260428 Sprint17 S17-E1: Epic 1 E1-U1~U4 Verification',
+      '✅ E1-U1: code-generator-e2e.spec.ts (6 E2E tests for CodeGenPanel)',
+      '✅ E1-U2: design-review.spec.ts +3 tests (CodeGenPanel production path)',
+      '✅ E1-U3: mcp-server/src/routes/health.ts — Node.js HTTP /health on port 3100',
+      '✅ E1-U4: scripts/generate-tool-index.ts — generates docs/mcp-tools/INDEX.md (7 tools)',
+    ],
+    commit: '8f817a5c0',
+  },
+  {
     version: '1.0.316',
     date: '2026-04-28',
     changes: [

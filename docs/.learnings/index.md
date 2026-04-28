@@ -1,3 +1,4 @@
+- [vibex-proposals-20260428-sprint16-qa](vibex-proposals-20260428-sprint16-qa.md) — Sprint 16 QA 收口：6 Epic (E1-E6) 完整 chain 完成，reviewer-push merge gap + E4 幽灵修复教训 (2026-04-28)
 - [vibex-proposals-20260426](vibex-proposals-20260426.md) — Sprint 11: TS Debt + Canvas Shortcuts + Search + Firebase Presence (2026-04-26)
 - [vibex-next](vibex-next.md) — 实时协作感知 + Firebase零SDK + Import/Export E2E + PM质量门禁 (2026-04-25)
 - [vibex-tech-debt-qa](vibex-tech-debt-qa.md) — Tech Debt QA: 测试债务清理 + 质量基线建立 (2026-04-21)

@@ -2,13 +2,13 @@ import { test, expect } from '@playwright/test';
 
 test.describe('S16-P2-1: Canvas Version History', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/dds');
+    await page.goto('/design/dds-canvas');
     await page.waitForLoadState('networkidle');
   });
 
   test('VersionHistoryPanel shows no-project guide when projectId is null', async ({ page }) => {
     // Navigate to a page with no project
-    await page.goto('/dds?no-project=true');
+    await page.goto('/design/dds-canvas?no-project=true');
     await page.waitForLoadState('networkidle');
     // Trigger version history panel
     await page.evaluate(() => {
@@ -86,7 +86,7 @@ test.describe('S16-P2-1: Canvas Version History', () => {
   test('Auto-save debounce fires after 30s', async ({ page }) => {
     // This test verifies the 30s debounce is configured
     // We can't actually wait 30s in a test, so we verify the config exists
-    await page.goto('/dds?projectId=proj-1');
+    await page.goto('/design/dds-canvas?projectId=proj-1');
     await page.waitForLoadState('networkidle');
     // Verify debounce is set to 30s (30000ms) by checking the hook default
     // The actual debounce behavior is unit-tested

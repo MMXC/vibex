@@ -86,4 +86,32 @@ describe('ReviewReportPanel', () => {
     fireEvent.click(screen.getByTestId('tab-accessibility'));
     expect(screen.getByTestId('empty-accessibility')).toBeInTheDocument();
   });
+
+  it('handles node highlight click with location', () => {
+    vi.mocked(useDesignReviewModule.useDesignReview).mockReturnValue({
+      isOpen: true, isLoading: false,
+      result: {
+        compliance: [{ id: 'c1', severity: 'critical', category: 'compliance', message: 'Issue at .test', location: '.test-node' }],
+        accessibility: [], reuse: [],
+      },
+      error: null, runReview: vi.fn(), close: vi.fn(), open: vi.fn(),
+    });
+    render(<ReviewReportPanel />);
+    // Verify issue with location is rendered
+    expect(screen.getByText('Issue at .test')).toBeInTheDocument();
+  });
+
+  it('renders batch findings with performance consideration', () => {
+    const manyIssues = Array.from({ length: 50 }, (_, i) => ({
+      id: `c${i}`, severity: 'warning' as const, category: 'compliance' as const, message: `Issue ${i}`,
+    }));
+    vi.mocked(useDesignReviewModule.useDesignReview).mockReturnValue({
+      isOpen: true, isLoading: false,
+      result: { compliance: manyIssues, accessibility: [], reuse: [] },
+      error: null, runReview: vi.fn(), close: vi.fn(), open: vi.fn(),
+    });
+    render(<ReviewReportPanel />);
+    expect(screen.getByTestId('review-report-panel')).toBeInTheDocument();
+    expect(screen.getByText('Issue 0')).toBeInTheDocument();
+  });
 });

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('S16-P0-2: Design-to-Code Bidirectional Sync', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/dds');
+    await page.goto('/design/dds-canvas');
     await page.waitForLoadState('networkidle');
   });
 

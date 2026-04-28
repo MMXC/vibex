@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('S16-P0-1: Design Review UI', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to DDS canvas
-    await page.goto('/dds');
+    await page.goto('/design/dds-canvas');
     await page.waitForLoadState('networkidle');
   });
 

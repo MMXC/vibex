@@ -32,6 +32,7 @@ import { createDDSAPI } from '@/hooks/dds/useDDSAPI';
 import { useDDSCanvasSearch } from '@/hooks/dds/useDDSCanvasSearch';
 import { DDSSearchPanel } from '@/components/dds/DDSSearchPanel';
 import { ReviewReportPanel } from '@/components/design-review';
+import { ConflictResolutionDialog } from '@/components/conflict/ConflictResolutionDialog';
 import { PresenceAvatars } from '@/components/canvas/Presence/PresenceAvatars';
 import { usePresence, isFirebaseConfigured, updateCursor } from '@/lib/firebase/presence';
 import { useAuthStore } from '@/stores/authStore';
@@ -39,6 +40,7 @@ import type { ChapterType, ChapterData } from '@/types/dds';
 import type { DDSCard } from '@/types/dds';
 import type { ReactNode } from 'react';
 import type { CodeGenContext } from '@/types/codegen';
+import type { TokenChange } from '@/types/designSync';
 import { useAgentStore } from '@/stores/agentStore';
 import { CodeGenPanel } from '@/components/CodeGenPanel';
 import type { CanvasFlow, CanvasNode } from '@/lib/codeGenerator';
@@ -180,6 +182,23 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     pageState: 'loading',
     errorMessage: null,
   });
+
+  // ---- S16-P0-2: Conflict Resolution Dialog ----
+  const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
+  const [conflictChanges, setConflictChanges] = useState<TokenChange[]>([]);
+
+  // Listen for drift-detected custom events from driftDetector
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ hasDrift: boolean; changes: TokenChange[] }>).detail;
+      if (detail?.hasDrift) {
+        setConflictChanges(detail.changes ?? []);
+        setConflictDialogOpen(true);
+      }
+    };
+    window.addEventListener('design-sync:drift-detected', handler);
+    return () => window.removeEventListener('design-sync:drift-detected', handler);
+  }, []);
 
   // ---- E4: Firebase Presence ----
   const [cursorPos, setCursorPos] = useState<{ x: number; y: number } | null>(null);
@@ -620,6 +639,15 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
 
     {/* S16-P0-1: Design Review panel */}
     <ReviewReportPanel />
+
+    {/* S16-P0-2: Conflict Resolution Dialog */}
+    <ConflictResolutionDialog
+      isOpen={conflictDialogOpen}
+      changes={conflictChanges}
+      onAcceptDesign={() => setConflictDialogOpen(false)}
+      onAcceptCode={() => setConflictDialogOpen(false)}
+      onDismiss={() => setConflictDialogOpen(false)}
+    />
     </>
   );
 });

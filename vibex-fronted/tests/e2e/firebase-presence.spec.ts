@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('S16-P1-1: Firebase Mock + Config', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/dds');
+    await page.goto('/design/dds-canvas');
     await page.waitForLoadState('networkidle');
   });
 

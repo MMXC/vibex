@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.313',
+    date: '2026-04-28',
+    changes: [
+      '📋 vibex-proposals-20260428 Sprint16 S16-P1-1: Firebase Mock + Config Path',
+      '✅ P1-1-FirebaseMock: 4 states (CONNECTED/DEGRADED/DISCONNECTED/RECONNECTING), exponential backoff',
+      '✅ P1-1-useFirebase: cold start < 500ms fallback, connect/disconnect/reconnect',
+      '✅ P1-1-ConflictBubble: 4-state banner, auto-dismiss 2s, a11y (aria-live)',
+      '✅ P1-1-Tests: 4 unit tests (useFirebase) + 5 E2E tests (firebase-presence.spec.ts)',
+    ],
+    commit: '712d23854',
+  },
+  {
     version: '1.0.312',
     date: '2026-04-28',
     changes: [

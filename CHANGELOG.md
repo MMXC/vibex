@@ -1,3 +1,13 @@
+### [Unreleased] vibex-proposals-20260428-sprint16 S16-P1-1: Firebase Mock + Config Path — 2026-04-28
+- **S16-P1-1-FirebaseMock (client)**: Singleton mock with 4 states (CONNECTED/DEGRADED/DISCONNECTED/RECONNECTING); exponential backoff reconnect (1s base, 30s max, 3 attempts); degraded latency simulation (2s); `measureColdStart()` cold start measurement
+- **S16-P1-1-FirebaseMock (server)**: `packages/mcp-server/src/mocks/firebaseMock.ts` mirrors client with identical state machine
+- **S16-P1-1-useFirebase**: Cold start threshold (< 500ms → local-only fallback); `connect`/`disconnect`/`reconnect`/`setMockState`; autoConnect; `isLocalFallback` state
+- **S16-P1-1-ConflictBubble**: 4-state banner (Offline/Reconnecting/Synced/Slow connection); auto-dismiss after 2s CONNECTED; dismiss button; `role="status" aria-live="polite"` a11y
+- **S16-P1-1-Unit tests**: 4 tests (useFirebase) — cold start fallback, connect/disconnect, state transitions ✅
+- **S16-P1-1-E2E tests**: 5 tests (firebase-presence.spec.ts) — 4 state transitions, auto-dismiss, dismiss button
+- **S16-P1-1-Docs**: `docs/vibex-sprint16/firebase-config-path.md` with env vars and connection flow
+- 提交: 712d23854
+
 ### [Unreleased] vibex-proposals-20260428-sprint16 S16-P0-2: Design-to-Code Bidirectional Sync — 2026-04-28
 - **S16-P0-2-ConflictResolutionDialog**: 3-panel diff UI (Design/Token/Code); Accept Design/Code/Token/Merge All buttons; cyberpunk glassmorphism styling; `isOpen` + `changes` + `designTokens` + `codeTokens` props
 - **S16-P0-2-driftDetector**: `detectDrift(designTokens, codeTokens, scenario?)` — detects added/removed/modified tokens; `isDriftAcceptable()` threshold check; 3-scenario (A: renamed / B: refactored / C: no drift); false positive rate calculation

@@ -153,3 +153,53 @@ python3 /root/.openclaw/skills/team-tasks/scripts/task_manager.py list | grep co
 # → 应输出 18
 ```
 **沉淀价值**: 多 agent 协作流程验证了 phase1→phase2 提案链的有效性，coord 作为协调节点成功管理了跨 Sprint 的依赖关系。
+
+## 2026-04-28 — Sprint 16 Coord-Completed 经验沉淀
+
+### 1. reviewer-push 后必须合并到 origin/main
+**问题**: Sprint 16 的 6 个 Epic 全部完成并推送至远程分支 (`origin/s14-qa-e2-review`)，但 `reviewer-push` 阶段只执行了 `git push` 而未合并到 `origin/main`。coord-completed 验证时发现代码不在 main 分支。
+
+**根因**: `reviewer-push` 阶段约束写的是"远程 commit 验证通过"，但实际代码只推送到了 feature 分支而非 main。AGENTS.md 定义的工作流要求 PR 合并到 main，但 reviewer-push 没有执行合并步骤。
+
+**修复**: 
+```bash
+git checkout main && git merge origin/<feature-branch> && git push origin main
+```
+
+**改进建议**: `reviewer-push` 模板应增加：
+- 检测是否在正确的 feature 分支
+- 如果在 feature 分支：创建 PR 并合并到 main
+- 如果在 main：直接推送
+
+### 2. QA 项目 phase1 不应创建 proposal 链
+**问题**: `phase1` 为 QA 项目创建了完整的 proposal 链 (analyze → prd → architecture → coord-decision)，但 QA 项目不需要提案流程。
+
+**修复**: QA 项目直接：
+1. `phase1 --no-check` 创建项目（跳过 analyze/create-prd/design-architecture）
+2. 立即 `update analyze-requirements skipped`
+3. `update create-prd skipped`
+4. `update design-architecture skipped`
+5. `phase2 --epics "..." --no-check --yes` 创建 QA Epic 链
+6. 手动更新每个 epic 的任务描述为 QA-specific
+
+### 3. QA Epic 任务描述必须是 QA-specific
+**问题**: `phase2` 为 QA 项目生成的 dev 任务使用了标准开发模板 (`incremental-implementation`)，而不是 QA 验证模板。
+
+**修复**: phase2 完成后，立即更新每个 `dev-e*` 任务描述：
+- 指向具体的实现文件路径
+- 列出具体的验证检查项
+- 说明 DoD gap 哪些不算驳回理由
+
+### 4. 所有 Sprint 16 6 Epic 成功交付
+**Epics**:
+- S16-P0-1 (E1): Design Review UI ✅ (commit 1e56cac17)
+- S16-P0-2 (E2): Design-to-Code Sync ✅ (commit 8ea6fbee1)
+- S16-P1-1 (E3): Firebase Mock ✅ (commit 712d23854)
+- S16-P1-2 (E4): Code Generator ✅ (commit 5afccdc7f)
+- S16-P2-1 (E5): Canvas Version History ✅ (commit b9c63cc4a)
+- S16-P2-2 (E6): MCP Tool Governance ✅ (commit 9e09edfea)
+
+**注意**: E6 有 DoD gap（INDEX.md + generate-tool-index.ts + GET /health 未实现），已在 CHANGELOG 中记录。
+
+*Coord — 2026-04-28 17:02 UTC*
+

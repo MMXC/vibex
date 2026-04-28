@@ -248,7 +248,7 @@ interface StateMachineProps {
 
 #### Task Breakdown
 
-**2-5.1 — Build `ConflictResolutionDialog` three-panel diff UI**
+**2-5.1 — Build `ConflictResolutionDialog` three-panel diff UI** ✅
 - File: `src/components/conflict/ConflictResolutionDialog.tsx` (new)
 - File: `src/components/conflict/ConflictResolutionDialog.module.css` (new)
 - Layout: Three columns — **Design** | **Token** | **Code**
@@ -256,7 +256,7 @@ interface StateMachineProps {
 - Action buttons: "Accept Design", "Accept Code", "Accept Token", "Merge All"
 - Callbacks trigger Zustand store updates
 
-**2-5.2 — Drift Detection logic**
+**2-5.2 — Drift Detection logic** ✅
 - File: `src/store/designSyncStore.ts` (new or extend)
 - On each sync cycle:
   1. Figma import → design tokens
@@ -269,14 +269,14 @@ interface StateMachineProps {
   - Scenario C: Same token in design and code (no drift)
 - File: `src/utils/driftDetector.test.ts` — unit test the 3 scenarios
 
-**2-5.3 — Batch Export: 50 concurrent components**
+**2-5.3 — Batch Export: 50 concurrent components** ✅
 - File: `src/utils/batchExporter.ts` (new)
 - Use `Promise.allSettled` with concurrency limit of 50
 - Progress indicator via Zustand
 - Memory leak prevention: stream results, release references
 - Run: `npx vitest run batchExporter.test.ts` — 50 concurrent, heap stable
 
-**2-5.4 — E2E: Full flow `design-to-code-e2e.spec.ts`**
+**2-5.4 — E2E: Full flow `design-to-code-e2e.spec.ts`** ✅
 - File: `e2e/design-to-code-e2e.spec.ts` (new)
 - Steps:
   1. Open VibeX canvas
@@ -288,7 +288,7 @@ interface StateMachineProps {
   7. Verify ConflictResolutionDialog appears on drift
 - Run: `npx playwright test e2e/design-to-code-e2e.spec.ts`
 
-**2-5.5 — Write verification doc**
+**2-5.5 — Write verification doc** ✅
 - File: `docs/vibex-sprint16/design-to-code-verification.md`
 - Document test scenarios, expected vs actual results, false positive rate measurement
 

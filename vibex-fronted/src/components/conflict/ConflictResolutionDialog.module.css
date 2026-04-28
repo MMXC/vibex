@@ -1,0 +1,306 @@
+/**
+ * ConflictResolutionDialog — S16-P0-2
+ * Three-panel diff layout with cyberpunk styling
+ */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+.dialog {
+  width: 90vw;
+  max-width: 1100px;
+  max-height: 80vh;
+  background: var(--color-bg-secondary, #1e1e2e);
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  border-radius: 12px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+}
+
+.closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Summary */
+.summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background: rgba(251, 191, 36, 0.08);
+  border-bottom: 1px solid var(--color-border, rgba(255, 255, 255, 0.06));
+  flex-shrink: 0;
+}
+
+.summaryCount {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.changeBreakdown {
+  display: flex;
+  gap: 8px;
+}
+
+.badgeAdded,
+.badgeRemoved,
+.badgeModified {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.badgeAdded {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+}
+
+.badgeRemoved {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.badgeModified {
+  background: rgba(251, 191, 36, 0.12);
+  color: #fbbf24;
+}
+
+/* Three panels */
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  flex: 1;
+  overflow: hidden;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--color-border, rgba(255, 255, 255, 0.06));
+  overflow: hidden;
+}
+
+.panel:last-child {
+  border-right: none;
+}
+
+.panelHeader {
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--color-border, rgba(255, 255, 255, 0.06));
+  flex-shrink: 0;
+}
+
+.panelTitle {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.panelContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.tokenRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.tokenRow:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.tokenName {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 11px;
+  flex: 1;
+}
+
+.tokenValue {
+  color: var(--color-primary, #00ffff);
+  font-size: 11px;
+}
+
+.empty {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  text-align: center;
+  padding: 20px 0;
+  margin: 0;
+}
+
+/* Diff lines */
+.diffLine {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+.diffLine--added {
+  background: rgba(34, 197, 94, 0.1);
+  color: #4ade80;
+}
+
+.diffLine--removed {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+}
+
+.diffLine--modified {
+  background: rgba(251, 191, 36, 0.1);
+  color: #fbbf24;
+}
+
+.diffLine--unchanged {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.diffPrefix {
+  font-family: monospace;
+  width: 12px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.diffText {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+  flex-shrink: 0;
+}
+
+.actionBtn {
+  flex: 1;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.actionBtn--design {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+}
+
+.actionBtn--design:hover {
+  background: rgba(59, 130, 246, 0.25);
+}
+
+.actionBtn--code {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #4ade80;
+}
+
+.actionBtn--code:hover {
+  background: rgba(34, 197, 94, 0.22);
+}
+
+.actionBtn--token {
+  background: rgba(99, 102, 241, 0.12);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: #818cf8;
+}
+
+.actionBtn--token:hover {
+  background: rgba(99, 102, 241, 0.22);
+}
+
+.actionBtn--merge {
+  background: rgba(251, 191, 36, 0.1);
+  border-color: rgba(251, 191, 36, 0.3);
+  color: #fbbf24;
+}
+
+.actionBtn--merge:hover {
+  background: rgba(251, 191, 36, 0.2);
+}
+
+/* No conflict */
+.noConflict {
+  padding: 40px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+}
+
+/* Selected action indicator */
+.selectedIndicator {
+  padding: 8px 20px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  border-top: 1px solid var(--color-border, rgba(255, 255, 255, 0.06));
+  text-align: center;
+  flex-shrink: 0;
+}

@@ -1,0 +1,28 @@
+{
+  "project": "vibex-proposals-20260428-sprint17",
+  "goal": "Sprint 17 Integration Deepening",
+  "created": "2026-04-29T04:00:00.000000+08:00",
+  "updated": "2026-04-29T04:00:00.000000+08:00",
+  "status": "active",
+  "mode": "linear",
+  "pipeline": [
+    "analyst",
+    "architect",
+    "dev",
+    "tester",
+    "reviewer",
+    "coord"
+  ],
+  "currentStage": "dev",
+  "stages": {
+    "dev": {
+      "agent": "dev",
+      "status": "done",
+      "task": "Epic 2: Firebase 真实集成验证 + 降级策略",
+      "startedAt": "2026-04-29T03:29:00.000000+08:00",
+      "completedAt": "2026-04-29T04:03:00.000000+08:00",
+      "output": "benchmark exit 0 | 4 E2E tests | PresenceAvatars returns null",
+      "logs": []
+    }
+  }
+}

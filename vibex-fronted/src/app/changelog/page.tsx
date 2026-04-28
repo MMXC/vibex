@@ -20,6 +20,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.318',
+    date: '2026-04-29',
+    changes: [
+      '📋 vibex-proposals-20260428 Sprint17 S17-E2: Epic 2 E2-U1~U3 Integration Deepening',
+      '✅ E2-U1: benchmark/firebase-benchmark.ts — 5 iterations, 500ms threshold, FirebaseMock cold start 0.02ms',
+      '✅ E2-U2: firebase-presence.spec.ts +4 tests (S17-P1-2) — 5-user concurrent <3s, avatar count check',
+      '✅ E2-U3: PresenceAvatars returns null when !isAvailable — WiFi-off hidden, four states (ideal/empty/loading/error)',
+    ],
+    commit: 'e8ec84fe0',
+  },
+  {
     version: '1.0.317',
     date: '2026-04-29',
     changes: [

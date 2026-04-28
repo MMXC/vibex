@@ -1,3 +1,9 @@
+### [Unreleased] vibex-proposals-20260428-sprint17 S17-E2: Epic 2 E2-U1~U3 Integration Deepening — 2026-04-29
+- **S17-E2-U1 Firebase Cold Start Benchmark**: `benchmark/firebase-benchmark.ts` — 5 iterations, threshold 500ms, exit 0 on pass; FirebaseMock cold start avg 0.02ms, isFirebaseConfigured() check avg 0.00ms
+- **S17-E2-U2 Firebase Presence E2E**: `tests/e2e/firebase-presence.spec.ts` +4 tests (S17-P1-2) — 5-user concurrent presence delay < 3s, subscribeToOthers sequential updates, avatar count check in browser context
+- **S17-E2-U3 Firebase Degradation**: `PresenceAvatars.tsx` returns null when `!isAvailable` — WiFi-off icon hidden in unconfigured/mock mode; four states (ideal/empty/loading/error) fully covered
+- 提交: e8ec84fe0, d419fd72e, 02f0efd7d
+
 ### [Unreleased] vibex-proposals-20260428-sprint17 S17-E1: Epic 1 E1-U1~U4 Verification — 2026-04-29
 - **S17-E1-U1**: Create `code-generator-e2e.spec.ts` (6 Playwright E2E tests for CodeGenPanel — panel visibility, generate button, tab switching, node count, download, framework selector)
 - **S17-E1-U2**: Add +3 tests to `design-review.spec.ts` (CodeGenPanel production path — generate button, framework selector, code preview tabs)

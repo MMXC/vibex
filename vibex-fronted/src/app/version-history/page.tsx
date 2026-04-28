@@ -11,21 +11,37 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useConfirmationStore } from '@/stores/confirmationStore';
 import { VersionPreview, VersionInfo } from '@/components/version-preview/VersionPreview';
 import { VersionDiff } from '@/components/version-diff/VersionDiff';
 import styles from './version-history.module.css';
 
+export default function VersionHistoryPage() {
+  return (
+    <Suspense fallback={<VersionHistoryLoading />}>
+      <VersionHistoryContent />
+    </Suspense>
+  );
+}
+
+function VersionHistoryLoading() {
+  return (
+    <div style={{ padding: '2rem', textAlign: 'center' }}>
+      <div style={{ color: '#9CA3AF' }}>加载中...</div>
+    </div>
+  );
+}
+
 /**
- * VersionHistoryPage — E7: projectId=null boundary + diff view
+ * VersionHistoryContent — inner component using useSearchParams (requires Suspense boundary)
  *
  * E7 goal: 修复 version history 的 projectId=null 边界
  * - projectId !== null: 显示版本历史列表
  * - projectId === null: 显示引导 UI "请先选择项目"
  */
-export default function VersionHistoryPage() {
+function VersionHistoryContent() {
   const searchParams = useSearchParams();
   const projectId = searchParams.get('projectId');
 

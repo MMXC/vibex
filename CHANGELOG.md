@@ -1,3 +1,11 @@
+### [Unreleased] vibex-proposals-20260428-sprint16 S16-P1-2: Code Generator Real Component Generation — 2026-04-28
+- **S16-P1-2-FlowStepCard**: Real props (`stepName`/`actor`/`pre`/`post`/`stepId`); cyberpunk card styling; selected state; `data-step-id` attribute
+- **S16-P1-2-APIEndpointCard**: Real props (`method`/`path`/`summary`/`description`/`operationId`); METHOD_COLORS map (GET/POST/PUT/DELETE/PATCH); `data-method` attribute
+- **S16-P1-2-StateMachineCard**: Real props (`states`/`transitions`/`initialState`/`stateMachineId`); states rendered as tags; transitions with from/event/to; "+N more" truncation at 3; `data-state-id` attributes
+- **S16-P1-2-codegen types**: `FlowStepProps` / `APIEndpointProps` / `StateMachineProps` / `ComponentSpec` / `CodeGenResult` interfaces in `types/codegen.ts`
+- **S16-P1-2-Unit tests**: 7 tests (codeGenerator.test.ts) — type validation for all 3 prop types, optional fields, transition conditions ✅
+- 提交: 5afccdc7f
+
 ### [Unreleased] vibex-proposals-20260428-sprint16 S16-P1-1: Firebase Mock + Config Path — 2026-04-28
 - **S16-P1-1-FirebaseMock (client)**: Singleton mock with 4 states (CONNECTED/DEGRADED/DISCONNECTED/RECONNECTING); exponential backoff reconnect (1s base, 30s max, 3 attempts); degraded latency simulation (2s); `measureColdStart()` cold start measurement
 - **S16-P1-1-FirebaseMock (server)**: `packages/mcp-server/src/mocks/firebaseMock.ts` mirrors client with identical state machine

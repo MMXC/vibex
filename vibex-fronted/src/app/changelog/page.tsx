@@ -20,6 +20,19 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.314',
+    date: '2026-04-28',
+    changes: [
+      '📋 vibex-proposals-20260428 Sprint16 S16-P1-2: Code Generator Real Component Generation',
+      '✅ P1-2-FlowStepCard: Real props (stepName/actor/pre/post), cyberpunk styling',
+      '✅ P1-2-APIEndpointCard: Real props (method/path/summary), METHOD_COLORS map',
+      '✅ P1-2-StateMachineCard: Real props (states/transitions/initialState), "+N more" truncation',
+      '✅ P1-2-codegen types: FlowStepProps/APIEndpointProps/StateMachineProps/ComponentSpec',
+      '✅ P1-2-Tests: 7 unit tests (codeGenerator.test.ts)',
+    ],
+    commit: '5afccdc7f',
+  },
+  {
     version: '1.0.313',
     date: '2026-04-28',
     changes: [

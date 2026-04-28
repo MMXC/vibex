@@ -644,9 +644,8 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     <ConflictResolutionDialog
       isOpen={conflictDialogOpen}
       changes={conflictChanges}
-      onAcceptDesign={() => setConflictDialogOpen(false)}
-      onAcceptCode={() => setConflictDialogOpen(false)}
-      onDismiss={() => setConflictDialogOpen(false)}
+      onResolve={(action) => setConflictDialogOpen(false)}
+      onClose={() => setConflictDialogOpen(false)}
     />
     </>
   );

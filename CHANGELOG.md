@@ -1,3 +1,12 @@
+### [Unreleased] vibex-proposals-20260428-sprint16 S16-P2-2: MCP Tool Governance & Documentation — 2026-04-28
+- **S16-P2-2-review_design.md**: 222 lines — Overview/Input/Output/Error/Issue Severity/Examples/Design Checks/CLI/Testing sections; 3 compliance + 3 a11y + 3 reuse issue types
+- **S16-P2-2-figma_import.md**: 175 lines — Overview/Input/Output/Error/Examples/Token Extraction/CLI/Testing; fileKey/nodeIds params
+- **S16-P2-2-generate_code.md**: 176 lines — Overview/Input/Output/Error/Examples/Node Type Support/CLI/Testing; 3 modes (flowstep/apientrypoint/statemachine)
+- **S16-P2-2-MCP_TOOL_GOVERNANCE.md**: 134 lines — naming conventions, required sections, versioning strategy, deprecation policy
+- **S16-P2-2-ERROR_HANDLING_POLICY.md**: 243 lines — error codes (E100-E108), retry strategy (exponential backoff 1s-30s), timeout reference
+- **S16-P2-2-⚠️ DoD gaps**: `INDEX.md` + `generate-tool-index.ts` script + `GET /health` endpoint in `index.ts` 未实现（2-2.4 / 2-2.5）
+- 提交: 9e09edfea
+
 ### [Unreleased] vibex-proposals-20260428-sprint16 S16-P2-1: Canvas Version History Production — 2026-04-28
 - **S16-P2-1-useVersionHistory**: 30s debounce auto-snapshot; `createSnapshot` (manual) / `notifyChange` (auto); `restoreSnapshot` with pre-restore backup; max 50 snapshots pruning; `projectId=null` rejection; `isSnapshotting`/`isRestoring` states
 - **S16-P2-1-VersionHistoryPanel**: Manual section (📌 icon) / Auto-save section (⏱️ icon); Restore confirmation dialog; `projectId=null` guide UI with CTA button; empty state with 30s hint; `data-testid`全覆盖

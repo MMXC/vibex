@@ -20,6 +20,20 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.316',
+    date: '2026-04-28',
+    changes: [
+      '📋 vibex-proposals-20260428 Sprint16 S16-P2-2: MCP Tool Governance & Documentation',
+      '✅ P2-2-review_design.md (222L): Overview/Input/Output/Error/Examples/CLI',
+      '✅ P2-2-figma_import.md (175L): fileKey/nodeIds params, token extraction',
+      '✅ P2-2-generate_code.md (176L): 3 modes (flowstep/apientrypoint/statemachine)',
+      '✅ P2-2-MCP_TOOL_GOVERNANCE.md (134L): naming conv, versioning, deprecation',
+      '✅ P2-2-ERROR_HANDLING_POLICY.md (243L): error codes E100-E108, retry strategy',
+      '⚠️ P2-2-DoD gaps: INDEX.md + generate-tool-index.ts script + GET /health 未实现',
+    ],
+    commit: '9e09edfea',
+  },
+  {
     version: '1.0.315',
     date: '2026-04-28',
     changes: [

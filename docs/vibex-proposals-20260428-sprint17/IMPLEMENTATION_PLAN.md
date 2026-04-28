@@ -76,12 +76,14 @@
 - **文件**: `packages/dds/src/**/*.ts`
 - **DoD**: `pnpm exec tsc --noEmit` 0 errors
 - **工时**: 1d
+- **Status**: ⏸️ Deferred to Sprint 18（342 TS errors 规模过大，延期分阶段执行：先 packages/dds 后 vibex-fronted）
 
 ### E3-U3: 类型修复（vibex-fronted）
 - **Story**: S17-P2-1
 - **文件**: `vibex-fronted/src/**/*.ts`
 - **DoD**: `pnpm exec tsc --noEmit` 0 errors
 - **工时**: 0.5d
+- **Status**: ⏸️ Deferred to Sprint 18（依赖 E3-U2 packages/dds 完成）
 
 ### E3-U4: Analytics Dashboard E2E
 - **Story**: S17-P2-2

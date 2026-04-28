@@ -174,7 +174,7 @@ P2-1 (Version History) ── depends on canvas store (already in tree)
 
 #### Task Breakdown
 
-**2-4.1 — Define TypeScript prop interfaces**
+**2-4.1 — Define TypeScript prop interfaces** ✅
 - File: `src/types/codegen.ts` (new or extend)
 ```typescript
 interface FlowStepProps {
@@ -194,7 +194,7 @@ interface StateMachineProps {
 }
 ```
 
-**2-4.2 — Update card components to use real props**
+**2-4.2 — Update card components to use real props** ✅
 - File: `src/components/codegen/cards/FlowStepCard.tsx`
   - Read `node.stepName`, `node.actor`, `node.pre`, `node.post` properties
   - Render as actual component, not placeholder comments
@@ -205,22 +205,22 @@ interface StateMachineProps {
   - Read `node.states`, `node.transitions`
   - Render state diagram as actual SVG/div
 
-**2-4.3 — Integrate `generate_code` MCP tool (real generation)**
+**2-4.3 — Integrate `generate_code` MCP tool (real generation)** ✅
 - File: `src/hooks/useCodeGenerator.ts`
 - Replace placeholder generation with: `mcpClient.call('generate_code', { componentSpec, framework, mode })`
 - Framework param: React (default) / Vue / Solid selector in UI
 
-**2-4.4 — Framework selector UI**
+**2-4.4 — Framework selector UI** ✅
 - File: `src/components/codegen/CodeGenPanel.tsx`
 - Add `<select data-testid="framework-selector">` with options: React, Vue, Solid
 - Pass selected framework to `useCodeGenerator`
 
-**2-4.5 — Code output verification**
+**2-4.5 — Code output verification** ✅
 - Generated TSX files written to temp dir
 - Run: `npx tsc --noEmit <generated-file>` to verify no type errors
 - Run: VS Code open + ESLint check passes
 
-**2-4.6 — Unit + E2E for code generator**
+**2-4.6 — Unit + E2E for code generator** ✅
 - File: `src/components/codegen/codeGenerator.test.ts` (new)
 - Tests: mock MCP response, verify correct props → code output mapping
 - Run: `npx vitest run codeGenerator.test.ts`

@@ -1,0 +1,119 @@
+/**
+ * StateMachineCard — S16-P1-2
+ * Real prop rendering for state machine nodes
+ */
+
+.card {
+  padding: 10px 12px;
+  background: var(--color-bg-secondary, #1e1e2e);
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.15s;
+  cursor: default;
+}
+
+.card--selected {
+  border-color: var(--color-primary, #00ffff);
+  background: rgba(0, 255, 255, 0.05);
+}
+
+.card[role='button'] {
+  cursor: pointer;
+}
+
+.card[role='button']:hover {
+  border-color: rgba(0, 255, 255, 0.3);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stateCount {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.initialState {
+  font-size: 10px;
+  color: var(--color-primary, #00ffff);
+  background: rgba(0, 255, 255, 0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.stateList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.stateTag {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+.stateTag--initial {
+  color: var(--color-primary, #00ffff);
+  border-color: rgba(0, 255, 255, 0.3);
+  background: rgba(0, 255, 255, 0.08);
+}
+
+.transitions {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.transitionLabel {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  margin-bottom: 2px;
+}
+
+.transitionRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+}
+
+.fromState,
+.toState {
+  color: rgba(255, 255, 255, 0.5);
+  font-family: 'Geist Mono', monospace;
+}
+
+.eventName {
+  color: var(--color-primary, #00ffff);
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+}
+
+.arrow {
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 10px;
+}
+
+.moreTransitions {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  text-align: center;
+}
+
+.empty {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  text-align: center;
+  margin: 0;
+}

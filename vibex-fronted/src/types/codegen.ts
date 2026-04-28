@@ -60,3 +60,49 @@ export interface TokenSnapshot {
   /** ISO-8601 timestamp of creation */
   createdAt: string;
 }
+
+
+// ============================================================================
+// S16-P1-2: Real Component Generation Types
+// ============================================================================
+
+/** Props for FlowStepCard component */
+export interface FlowStepProps {
+  stepName: string;
+  actor: string;
+  pre: string;
+  post: string;
+  stepId?: string;
+}
+
+/** Props for APIEndpointCard component */
+export interface APIEndpointProps {
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  path: string;
+  summary: string;
+  description?: string;
+  operationId?: string;
+}
+
+/** Props for StateMachineCard component */
+export interface StateMachineProps {
+  states: string[];
+  transitions: Array<{ from: string; to: string; event: string; condition?: string }>;
+  initialState?: string;
+  stateMachineId?: string;
+}
+
+/** Component specification for code generation */
+export interface ComponentSpec {
+  type: 'flowstep' | 'apientrypoint' | 'statemachine';
+  name: string;
+  props: FlowStepProps | APIEndpointProps | StateMachineProps;
+}
+
+/** Result of code generation */
+export interface CodeGenResult {
+  code: string;
+  fileName: string;
+  language: 'typescript' | 'javascript';
+  componentType: ComponentSpec['type'];
+}

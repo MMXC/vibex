@@ -1,0 +1,72 @@
+/**
+ * FlowStepCard — S16-P1-2
+ * Real prop rendering for flow step nodes
+ */
+
+.card {
+  padding: 10px 12px;
+  background: var(--color-bg-secondary, #1e1e2e);
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.15s;
+  cursor: default;
+}
+
+.card--selected {
+  border-color: var(--color-primary, #00ffff);
+  background: rgba(0, 255, 255, 0.05);
+}
+
+.card[role='button'] {
+  cursor: pointer;
+}
+
+.card[role='button']:hover {
+  border-color: rgba(0, 255, 255, 0.3);
+  background: rgba(0, 255, 255, 0.03);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.stepName {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.actor {
+  font-size: 10px;
+  color: var(--color-primary, #00ffff);
+  background: rgba(0, 255, 255, 0.1);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.condition {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.conditionLabel {
+  color: rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+  width: 28px;
+}
+
+.conditionText {
+  color: rgba(255, 255, 255, 0.6);
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  line-height: 1.4;
+}

@@ -1,0 +1,69 @@
+/**
+ * APIEndpointCard — S16-P1-2
+ * Real prop rendering for API endpoint nodes
+ */
+
+.card {
+  padding: 10px 12px;
+  background: var(--color-bg-secondary, #1e1e2e);
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.15s;
+  cursor: default;
+}
+
+.card--selected {
+  border-color: var(--color-primary, #00ffff);
+  background: rgba(0, 255, 255, 0.05);
+}
+
+.card[role='button'] {
+  cursor: pointer;
+}
+
+.card[role='button']:hover {
+  border-color: rgba(0, 255, 255, 0.3);
+  background: rgba(0, 255, 255, 0.03);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.method {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.path {
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summary {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.description {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+  line-height: 1.4;
+}

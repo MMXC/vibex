@@ -9,5 +9,6 @@
 export * from './api';
 export * from './store';
 export * from './events';
+export * from './guards';
 export declare const TYPES_PACKAGE_VERSION: "0.1.0";
 //# sourceMappingURL=index.d.ts.map

@@ -27,5 +27,7 @@ exports.TYPES_PACKAGE_VERSION = void 0;
 __exportStar(require("./api"), exports);
 __exportStar(require("./store"), exports);
 __exportStar(require("./events"), exports);
+// Type guards
+__exportStar(require("./guards"), exports);
 // Package version
 exports.TYPES_PACKAGE_VERSION = '0.1.0';

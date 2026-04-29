@@ -17,7 +17,7 @@
  *   3. Returns the unified PRD contract format
  */
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 import { NextResponse } from 'next/server';
 

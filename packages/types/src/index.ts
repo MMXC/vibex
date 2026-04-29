@@ -12,5 +12,8 @@ export * from './api';
 export * from './store';
 export * from './events';
 
+// Type guards
+export * from './guards';
+
 // Package version
 export const TYPES_PACKAGE_VERSION = '0.1.0' as const;

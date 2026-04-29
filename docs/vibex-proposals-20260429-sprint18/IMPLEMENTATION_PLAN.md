@@ -253,6 +253,33 @@
 - [x] `pnpm exec tsc --noEmit` → 0 errors ✅
 - [x] Commit 含 E18-CORE-2 ✅ (8af38ce53)
 
+### Story E18-CORE-3: 三树空状态 UX (B3)
+
+**工时**: 8h | **验收标准**: 三树组件显示空状态占位符
+**状态**: ✅ DONE (commit 8a6ad3e2)
+
+#### 任务清单
+
+```
+1. [x] 分析三树组件结构
+   - BoundedContextTree ✅
+   - ComponentTree ✅
+   - BusinessFlowTree ✅
+
+2. [x] 添加空状态显示
+   - BoundedContextTree: 暂无限界上下文 ✅
+   - ComponentTree: 暂无组件 ✅
+   - BusinessFlowTree: 暂无业务流程 ✅
+
+3. [x] 验证
+   - pnpm exec tsc --noEmit → 0 errors ✅
+```
+
+### Story E18-CORE-3 (tree empty states)
+- [x] 三树组件显示空状态 ✅
+- [x] `pnpm exec tsc --noEmit` → 0 errors ✅
+- [x] Commit 含 E18-CORE-3 ✅ (8a6ad3e2)
+
 ---
 
 ## 6. 依赖关系

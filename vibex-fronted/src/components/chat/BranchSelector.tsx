@@ -80,7 +80,7 @@ export function BranchSelector({
 
   if (
     branches.length === 0 ||
-    (branches.length === 1 && !branches[0].parentBranchId)
+    (branches.length === 1 && !branches[0]!.parentBranchId)
   ) {
     // 只有一个分支且没有父分支时，不显示选择器
     return null;

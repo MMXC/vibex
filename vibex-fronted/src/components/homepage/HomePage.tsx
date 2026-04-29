@@ -114,7 +114,7 @@ export default function HomePage() {
   const newThinkingItemId = useMemo(() => {
     if (thinkingMessages.length === 0) return undefined;
     const last = thinkingMessages[thinkingMessages.length - 1];
-    return `thinking-${last.step}-${thinkingMessages.length - 1}`;
+    return `thinking-${last!.step}-${thinkingMessages.length - 1}`;
   }, [thinkingMessages]);
 
   // ST-1.1 + F-2.1: AIPanel 发送消息处理 → 登录检查 + 调用 generateContexts pipeline

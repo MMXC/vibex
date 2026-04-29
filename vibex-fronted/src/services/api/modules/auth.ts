@@ -25,7 +25,7 @@ class AuthApiImpl implements AuthApi {
       );
       return response;
     });
-    const data = unwrapData<AuthResponse>(result);
+    const data = unwrapData<AuthResponse>(result)!;
 
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('auth_token', data.token);
@@ -43,7 +43,7 @@ class AuthApiImpl implements AuthApi {
       );
       return response;
     });
-    const authResult = unwrapData<AuthResponse>(result);
+    const authResult = unwrapData<AuthResponse>(result)!;
 
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('auth_token', authResult.token);
@@ -58,7 +58,7 @@ class AuthApiImpl implements AuthApi {
       const response = await httpClient.get<User>('/auth/me');
       return response;
     });
-    return unwrapData<User>(result);
+    return unwrapData<User>(result)!;
   }
 
   async logout(): Promise<SuccessResponse> {

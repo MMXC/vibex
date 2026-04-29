@@ -199,8 +199,8 @@ export function ProjectBar({
       // Step 3: Add pages to queue
       const pages: PrototypePage[] = generateResult.pages.map((p) => ({
         pageId: p.pageId,
-        componentId: componentIds[generateResult.pages.indexOf(p)],
-        name: componentNodes.find((c) => c.nodeId === componentIds[generateResult.pages.indexOf(p)])?.name ?? p.pageId,
+        componentId: componentIds[generateResult.pages.indexOf(p)]!,
+        name: componentNodes.find((c) => c.nodeId === componentIds[generateResult.pages.indexOf(p)]!)?.name ?? p.pageId,
         status: 'queued',
         progress: 0,
         retryCount: 0,

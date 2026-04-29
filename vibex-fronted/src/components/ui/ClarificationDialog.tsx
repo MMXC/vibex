@@ -50,10 +50,12 @@ export function ClarificationDialog({
     .every((q) => answers[q.id]);
 
   const handleOptionSelect = (option: string) => {
+    if (!currentQuestion) return;
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: option }));
   };
 
   const handleTextChange = (value: string) => {
+    if (!currentQuestion) return;
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: value }));
   };
 
@@ -194,7 +196,7 @@ export function ClarificationDialog({
                 className={styles.nextButton}
                 onClick={handleNext}
                 disabled={
-                  currentQuestion.required && !answers[currentQuestion.id]
+                  currentQuestion?.required && !answers[currentQuestion.id]
                 }
                 type="button"
               >

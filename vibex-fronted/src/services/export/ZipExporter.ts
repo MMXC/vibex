@@ -278,7 +278,7 @@ export class ZipExporter {
     // Add each node file to ZIP
     nodes.forEach((node, i) => {
       const filename = `${sanitizeFilename(node.name)}.${format}`;
-      folder.file(filename, blobs[i]);
+      folder.file(filename, blobs[i]!);
     });
 
     // Add manifest

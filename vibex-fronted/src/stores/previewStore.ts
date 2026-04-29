@@ -79,7 +79,7 @@ export const STEP_ORDER: PreviewStep[] = ['idle', 'context', 'model', 'flow', 'c
 export function getNextStep(currentStep: PreviewStep): PreviewStep | null {
   const currentIndex = STEP_ORDER.indexOf(currentStep);
   if (currentIndex < STEP_ORDER.length - 1) {
-    return STEP_ORDER[currentIndex + 1];
+    return STEP_ORDER[currentIndex + 1]!;
   }
   return null;
 }

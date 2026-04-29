@@ -39,7 +39,7 @@ export function OnboardingProgressBar() {
     // 计算剩余步骤的总时长
     let remainingMinutes = 0;
     for (let i = currentIndex; i < totalSteps; i++) {
-      const stepId = ONBOARDING_STEPS[i].id;
+      const stepId = ONBOARDING_STEPS[i]!.id;
       const duration = STEP_DURATIONS[stepId];
       remainingMinutes += duration !== undefined ? duration : 2;
     }

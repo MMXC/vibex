@@ -92,7 +92,7 @@ async function processJob(jobId: string): Promise<void> {
   try {
     const total = job.sets.length;
     for (let i = 0; i < total; i++) {
-      const set = job.sets[i];
+      const set = job.sets[i]!;
       const { tokens } = extractTokens(set);
 
       // Render all formats (side-effect: triggers validation)

@@ -42,7 +42,7 @@ function useIntersectionObserver(threshold = 0.1): [React.RefObject<HTMLDivEleme
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry?.isIntersecting) {
           setIsVisible(true);
           // Once visible, stop observing (no need to keep watching)
           observer.unobserve(el);

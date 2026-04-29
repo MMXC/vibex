@@ -9,7 +9,40 @@
 declare module '*.module.css' {
   const classes: {
     // Index signature for dynamic class access
-    readonly [key: string]: string;
+    readonly [key: string]: string | undefined;
+
+    // Quality page
+    alarmBadge: string;
+    bar: string;
+    barAlert: string;
+    barLabel: string;
+    barWrapper: string;
+    bigNumber: string;
+    buildDot: string;
+    buildDuration: string;
+    buildHistory: string;
+    buildStatus: string;
+    card: string;
+    cardAlert: string;
+    cardLabel: string;
+    errorBox: string;
+    header: string;
+    loading: string;
+    miniChart: string;
+    numberAlert: string;
+    overviewGrid: string;
+    page: string;
+    spinner: string;
+    statusDot: string;
+    statusFailed: string;
+    statusPending: string;
+    statusRunning: string;
+    statusSuccess: string;
+    statusText: string;
+    target: string;
+    title: string;
+    unit: string;
+    updatedAt: string;
 
     // Canvas CSS Module classes (canvas.*.module.css)
     // Base

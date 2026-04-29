@@ -195,7 +195,7 @@ export function PrototypeExporter({
     // Render pages
     const pages = uiSchema.pages || [];
     for (let i = 0; i < pages.length; i++) {
-      renderPage(ctx, pages[i], width, height, i === 0);
+      renderPage(ctx, pages[i]!, width, height, i === 0);
     }
   };
 

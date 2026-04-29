@@ -71,9 +71,9 @@ export function parseError(error: Error | string): ParsedError {
   // 提取文件位置
   const locationMatch = errorStr.match(/at\s+(.+?)\s+\((.+?):(\d+):(\d+)\)/);
   const location = locationMatch ? {
-    file: locationMatch[2],
-    line: parseInt(locationMatch[3], 10),
-    column: parseInt(locationMatch[4], 10),
+    file: locationMatch[2]!,
+    line: parseInt(locationMatch[3]!, 10),
+    column: parseInt(locationMatch[4]!, 10),
   } : undefined;
   
   // 提取堆栈

@@ -105,7 +105,7 @@ function clusterEdgesImpl<E>(
       mergedCount += excess;
       items.push({
         kind: 'cluster',
-        representative: groupEdges[0],
+        representative: groupEdges[0]!,
         edges: groupEdges,
         label: `+${excess}`,
         groupKey,
@@ -164,7 +164,7 @@ function applySafetyCap<E>(
           additionalMerged += excess;
           newClusters.push({
             kind: 'cluster',
-            representative: ge2[0],
+            representative: ge2[0]!,
             edges: ge2,
             label: `+${excess}`,
             groupKey: gk2,
@@ -178,7 +178,7 @@ function applySafetyCap<E>(
       additionalMerged += excess;
       newClusters.push({
         kind: 'cluster',
-        representative: ge[0],
+        representative: ge[0]!,
         edges: ge,
         label: `+${excess}`,
         groupKey: gk,

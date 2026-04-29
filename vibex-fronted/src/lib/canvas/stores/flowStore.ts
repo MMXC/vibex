@@ -294,7 +294,7 @@ export const useFlowStore = create<FlowStore>()(
               if (n.nodeId !== flowNodeId) return n;
               const steps = [...n.steps];
               const [moved] = steps.splice(fromIndex, 1);
-              steps.splice(toIndex, 0, moved);
+              steps.splice(toIndex, 0, moved!);
               return {
                 ...n,
                 steps: steps.map((st, i) => ({ ...st, order: i })),

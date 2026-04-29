@@ -262,7 +262,7 @@ export const DDSSearchPanel = React.memo(function DDSSearchPanel({
                   }}
                   aria-hidden="true"
                 >
-                  {result.chapter[0].toUpperCase()}
+                  {(result.chapter[0] ?? "").toUpperCase()}
                 </span>
                 <span
                   style={{

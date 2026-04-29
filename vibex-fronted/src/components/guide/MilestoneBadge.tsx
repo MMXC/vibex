@@ -45,6 +45,7 @@ export const MilestoneBadge = memo(function MilestoneBadge({
     <div className={styles.container} role="list" aria-label="成就徽章">
       {allBadgeIds.map((id) => {
         const meta = BADGE_META[id];
+        if (!meta) return null;
         const earned = earnedBadges.includes(id);
         return (
           <div

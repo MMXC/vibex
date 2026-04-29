@@ -132,6 +132,7 @@ export const CanvasOnboardingOverlay = memo(function CanvasOnboardingOverlay() {
 
   // === JSX RENDER ===
   const stepData = ONBOARDING_STEPS[currentStep - 1];
+  if (!stepData) return null;
   const isFirstStep = currentStep === 1;
   const isLastStep = currentStep === ONBOARDING_STEPS.length;
 

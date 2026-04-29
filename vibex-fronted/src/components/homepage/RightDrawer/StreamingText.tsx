@@ -143,14 +143,14 @@ function parseStreamingText(text: string): TextSegment[] {
   // Check if the entire text is a mermaid block
   const mermaidMatch = text.match(mermaidBlockRegex);
   if (mermaidMatch) {
-    segments.push({ type: 'mermaid', content: mermaidMatch[1] });
+    segments.push({ type: 'mermaid', content: mermaidMatch[1] ?? "" });
     return segments;
   }
 
   // Check if it's a code block
   const codeMatch = text.match(codeBlockRegex);
   if (codeMatch) {
-    segments.push({ type: 'code', content: codeMatch[2] });
+    segments.push({ type: 'code', content: codeMatch[2] ?? "" });
     return segments;
   }
 

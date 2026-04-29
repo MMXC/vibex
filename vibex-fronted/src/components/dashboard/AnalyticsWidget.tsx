@@ -73,7 +73,7 @@ function LineChart({ data }: LineChartProps) {
     const el = containerRef.current;
     if (!el) return;
     const ro = new ResizeObserver((entries) => {
-      setWidth(entries[0].contentRect.width || 600);
+      setWidth(entries[0]!.contentRect.width || 600);
     });
     ro.observe(el);
     setWidth(el.getBoundingClientRect().width || 600);
@@ -150,7 +150,7 @@ function LineChart({ data }: LineChartProps) {
   const xLabels = [];
   if (numPoints > 0) {
     const sampleKey = (Object.keys(METRIC_CONFIG) as Array<keyof MetricData>)[0];
-    const points = data[sampleKey] ?? [];
+    const points = data[sampleKey!] ?? [];
     const labelStep = Math.max(1, Math.floor(numPoints / 5));
     for (let i = 0; i < numPoints; i += labelStep) {
       const p = points[i];
@@ -220,12 +220,12 @@ function MetricCards({ data }: MetricCardsProps) {
       {(Object.entries(METRIC_CONFIG) as [keyof MetricData, typeof METRIC_CONFIG[keyof typeof METRIC_CONFIG]][]).map(
         ([key, config]) => {
           const points = data[key] ?? [];
-          const latest = points.length > 0 ? points[points.length - 1].count : 0;
+          const latest = points.length > 0 ? points[points.length - 1]!.count : 0;
           // Calculate trend: compare last 2 points
           let trend: 'up' | 'down' | 'flat' = 'flat';
           if (points.length >= 2) {
-            const last = points[points.length - 1].count;
-            const prev = points[points.length - 2].count;
+            const last = points[points.length - 1]!.count;
+            const prev = points[points.length - 2]!.count;
             if (last > prev) trend = 'up';
             else if (last < prev) trend = 'down';
           }

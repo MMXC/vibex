@@ -107,8 +107,8 @@ export function ConflictDialog({
     if (e.key === 'Tab') {
       const buttons = dialogRef.current?.querySelectorAll<HTMLButtonElement>('button');
       if (!buttons || buttons.length === 0) return;
-      const first = buttons[0];
-      const last = buttons[buttons.length - 1];
+      const first = buttons[0]!;
+      const last = buttons[buttons.length - 1]!;
 
       if (e.shiftKey && document.activeElement === first) {
         e.preventDefault();

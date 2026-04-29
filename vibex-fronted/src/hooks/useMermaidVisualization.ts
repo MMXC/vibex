@@ -53,7 +53,7 @@ function parseMermaidNodes(code: string): MermaidNodeInfo[] {
   const seen = new Set<string>();
 
   while ((match = nodePattern.exec(code)) !== null) {
-    const nodeId = match[1];
+    const nodeId = match[1]!;
     if (!seen.has(nodeId)) {
       seen.add(nodeId);
       nodes.push({

@@ -37,7 +37,7 @@ class AgentApiImpl implements AgentApi {
       const response = await httpClient.get<Agent[]>('/agents', {
         params: { userId },
       });
-      const agents = unwrapField<Agent[]>(response, 'agents');
+      const agents = unwrapField<Agent[]>(response, 'agents')!;
       cache.set(cacheKey, agents);
       return agents;
     });
@@ -53,7 +53,7 @@ class AgentApiImpl implements AgentApi {
 
     return retry.execute(async () => {
       const response = await httpClient.get<Agent>(`/agents/${agentId}`);
-      const agent = unwrapField<Agent>(response, 'agent');
+      const agent = unwrapField<Agent>(response, 'agent')!;
       cache.set(cacheKey, agent);
       return agent;
     });
@@ -62,7 +62,7 @@ class AgentApiImpl implements AgentApi {
   async createAgent(agent: AgentCreate): Promise<Agent> {
     return retry.execute(async () => {
       const response = await httpClient.post<Agent>('/agents', agent);
-      const created = unwrapField<Agent>(response, 'agent');
+      const created = unwrapField<Agent>(response, 'agent')!;
       cache.remove(getCacheKey('agents', agent.userId));
       return created;
     });
@@ -74,7 +74,7 @@ class AgentApiImpl implements AgentApi {
         `/agents/${agentId}`,
         data
       );
-      const agent = unwrapField<Agent>(response, 'agent');
+      const agent = unwrapField<Agent>(response, 'agent')!;
       cache.remove(getCacheKey('agent', agentId));
       return agent;
     });

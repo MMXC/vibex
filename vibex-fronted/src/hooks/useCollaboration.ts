@@ -137,7 +137,7 @@ export function useCollaboration(
   const getBackoffDelay = useCallback(
     (attempt: number): number => {
       const index = Math.min(attempt, EXPONENTIAL_BACKOFF.length - 1);
-      return EXPONENTIAL_BACKOFF[index];
+      return EXPONENTIAL_BACKOFF[index]!;
     },
     []
   );

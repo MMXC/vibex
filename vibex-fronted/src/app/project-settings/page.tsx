@@ -185,7 +185,7 @@ const ProjectSettingsPage = () => {
       const newCollaborator: Collaborator = {
         id: Date.now().toString(),
         userId: `user-${Date.now()}`,
-        name: inviteEmail.split('@')[0],
+        name: inviteEmail.split('@')[0] ?? inviteEmail,
         email: inviteEmail,
         role: inviteRole,
         status: 'pending',

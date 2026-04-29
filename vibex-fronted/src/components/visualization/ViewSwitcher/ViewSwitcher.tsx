@@ -90,7 +90,7 @@ export function ViewSwitcher({
         const direction = e.key === 'ArrowRight' ? 1 : -1;
         const nextIdx =
           (currentIdx + direction + VIEW_ORDER.length) % VIEW_ORDER.length;
-        handleChange(VIEW_ORDER[nextIdx]);
+        handleChange(VIEW_ORDER[nextIdx]!);
       }
     },
     [handleChange, value]

@@ -709,7 +709,7 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
       // Reorder nodes
       const newNodes = [...componentNodes];
       const [moved] = newNodes.splice(oldIndex, 1);
-      newNodes.splice(newIndex, 0, moved);
+      newNodes.splice(newIndex, 0, moved!);
       setComponentNodes(newNodes);
     },
     [componentNodes, setComponentNodes]
@@ -1094,7 +1094,7 @@ function VirtualizedNodeList({
       data-virtualized="true"
     >
       {virtualItems.map((virtualRow) => {
-        const node = nodes[virtualRow.index];
+        const node = nodes[virtualRow.index]!;
         return (
           <div
             key={node.nodeId}

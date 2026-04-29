@@ -24,7 +24,7 @@ class UserApiImpl implements UserApi {
 
     return retry.execute(async () => {
       const response = await httpClient.get<User>(`/users/${userId}`);
-      const user = unwrapField<User>(response, 'user');
+      const user = unwrapField<User>(response, 'user')!;
       cache.set(cacheKey, user);
       return user;
     });
@@ -33,7 +33,7 @@ class UserApiImpl implements UserApi {
   async updateUser(userId: string, data: UserUpdate): Promise<User> {
     return retry.execute(async () => {
       const response = await httpClient.put<User>(`/users/${userId}`, data);
-      const user = unwrapField<User>(response, 'user');
+      const user = unwrapField<User>(response, 'user')!;
       cache.remove(getCacheKey('user', userId));
       return user;
     });

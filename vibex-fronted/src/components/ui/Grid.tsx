@@ -41,16 +41,17 @@ function getColumnsClass(
 ): string {
   if (!columns) return '';
   if (typeof columns === 'number') {
-    return styles[`col${columns}`];
+    return styles[`col${columns}`] ?? '';
   }
   // Handle responsive columns
   const classes: string[] = [];
-  if (columns.xs) classes.push(styles[`colXs${columns.xs}`]);
-  if (columns.sm) classes.push(styles[`colSm${columns.sm}`]);
-  if (columns.md) classes.push(styles[`colMd${columns.md}`]);
-  if (columns.lg) classes.push(styles[`colLg${columns.lg}`]);
-  if (columns.xl) classes.push(styles[`colXl${columns.xl}`]);
-  if (columns['2xl']) classes.push(styles[`col2xl${columns['2xl']}`]);
+  const rc = columns as Record<string, number | undefined>;
+  if (rc.xs) classes.push(styles[`colXs${rc.xs}`] ?? '');
+  if (rc.sm) classes.push(styles[`colSm${rc.sm}`] ?? '');
+  if (rc.md) classes.push(styles[`colMd${rc.md}`] ?? '');
+  if (rc.lg) classes.push(styles[`colLg${rc.lg}`] ?? '');
+  if (rc.xl) classes.push(styles[`colXl${rc.xl}`] ?? '');
+  if (rc['2xl']) classes.push(styles[`col2xl${rc['2xl']}`] ?? '');
   return classes.join(' ');
 }
 

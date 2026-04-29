@@ -759,8 +759,8 @@ function EditorContent() {
           }
         } else if (projectId) {
           const snapshots = await apiService.getPrototypeSnapshots(projectId);
-          if (snapshots.length > 0 && snapshots[0].content) {
-            const content = JSON.parse(snapshots[0].content);
+          if (snapshots.length > 0 && snapshots[0]!.content) {
+            const content = JSON.parse(snapshots[0]!.content);
             const pages = content.pages || [];
             if (pages.length > 0) {
               setSelectedPage(pages[0]);
@@ -817,7 +817,7 @@ function EditorContent() {
         return prev.filter((id) => id !== versionId);
       }
       if (prev.length >= 2) {
-        return [prev[1], versionId];
+        return [prev[1]!, versionId];
       }
       return [...prev, versionId];
     });

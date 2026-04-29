@@ -89,7 +89,7 @@ function parseProposalBlock(block: string, agent: string, date: string): Proposa
   let title = idMatch?.[2]?.trim() ?? '';
 
   if (!title) {
-    const firstLine = block.split('\n')[0].replace(/^#+\s*/, '').trim();
+    const firstLine = block.split('\n')[0]!.replace(/^#+\s*/, '').trim();
     title = firstLine.length > 100 ? firstLine.slice(0, 100) : firstLine;
   }
 

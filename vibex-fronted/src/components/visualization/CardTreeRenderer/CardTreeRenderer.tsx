@@ -158,8 +158,8 @@ function buildFlowGraph(
   for (let i = 0; i < nodes.length - 1; i++) {
     edges.push({
       id: `e-${i}-${i + 1}`,
-      source: nodes[i].id,
-      target: nodes[i + 1].id,
+      source: nodes[i]!.id,
+      target: nodes[i + 1]!.id,
       type: 'smoothstep',
       markerEnd: { type: MarkerType.ArrowClosed },
       style: { stroke: '#94a3b8', strokeWidth: 2 },
@@ -215,7 +215,7 @@ function buildFlowGraph(
       gatewayNodeMap.set(gw.gatewayId, gatewayNode);
 
       // Connect source card → gateway
-      const sourceNodeId = sourceCardIdx >= 0 ? nodes[sourceCardIdx].id : nodes[0].id;
+      const sourceNodeId = sourceCardIdx >= 0 ? nodes[sourceCardIdx]!.id : nodes[0]!.id;
       edges.push({
         id: `e-${sourceNodeId}-${gw.gatewayId}`,
         source: sourceNodeId,
@@ -229,7 +229,7 @@ function buildFlowGraph(
       for (const tid of gw.targetStepIds) {
         const targetNodeId = nodes.find(
           (n) => n.id === tid || n.id.includes(tid)
-        )?.id ?? nodes[nodes.length - 1].id;
+        )?.id ?? nodes[nodes.length - 1]!.id;
         edges.push({
           id: `e-${gw.gatewayId}-${tid}`,
           source: gw.gatewayId,

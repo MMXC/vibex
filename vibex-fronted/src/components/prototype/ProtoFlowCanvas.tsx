@@ -119,7 +119,7 @@ function ProtoFlowCanvasInner({ className = '' }: ProtoFlowCanvasProps) {
   const onSelectionChange = useCallback(
     ({ nodes: selectedNodes }: { nodes: Node[] }) => {
       if (selectedNodes.length === 1) {
-        selectNode(selectedNodes[0].id);
+        selectNode(selectedNodes[0]!.id);
       } else if (selectedNodes.length === 0) {
         selectNode(null);
       }

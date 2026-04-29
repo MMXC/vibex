@@ -293,10 +293,10 @@ function FlowContent() {
 
     edges.forEach((edge) => {
       if (inDegree[edge.target] !== undefined) {
-        inDegree[edge.target]++;
+        inDegree[edge.target]!++;
       }
       if (outEdges[edge.source]) {
-        outEdges[edge.source].push(edge.target);
+        outEdges[edge.source]!.push(edge.target);
       }
     });
 
@@ -310,14 +310,14 @@ function FlowContent() {
 
     while (queue.length > 0) {
       const current = queue.shift()!;
-      const currentLevel = levels[current];
+      const currentLevel = levels[current]!;
 
-      outEdges[current].forEach((target) => {
+      outEdges[current]!.forEach((target) => {
         if (levels[target] === undefined) {
           levels[target] = currentLevel + 1;
           queue.push(target);
         } else {
-          levels[target] = Math.max(levels[target], currentLevel + 1);
+          levels[target] = Math.max(levels[target]!, currentLevel + 1);
         }
       });
     }
@@ -343,8 +343,8 @@ function FlowContent() {
     const startY = 150;
 
     const newNodes = nodes.map((node) => {
-      const level = levels[node.id];
-      const levelNodes = levelGroups[level];
+      const level = levels[node.id]!;
+      const levelNodes = levelGroups[level]!;
       const indexInLevel = levelNodes.indexOf(node.id);
       const nodesInLevel = levelNodes.length;
 

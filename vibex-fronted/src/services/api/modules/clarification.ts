@@ -43,7 +43,7 @@ class ClarificationApiImpl implements ClarificationApi {
       );
       return response;
     });
-    const clarifications = unwrapField<Clarification[]>(result, 'clarifications');
+    const clarifications = unwrapField<Clarification[]>(result, 'clarifications')!;
     cache.set(cacheKey, clarifications);
     return clarifications;
   }
@@ -60,7 +60,7 @@ class ClarificationApiImpl implements ClarificationApi {
       );
       return response;
     });
-    const clarification = unwrapField<Clarification>(result, 'clarification');
+    const clarification = unwrapField<Clarification>(result, 'clarification')!;
     cache.remove(getCacheKey('clarifications', requirementId));
     cache.remove(getCacheKey('requirement', requirementId));
     return clarification;
@@ -77,7 +77,7 @@ class ClarificationApiImpl implements ClarificationApi {
       );
       return response;
     });
-    const clarification = unwrapField<Clarification>(result, 'clarification');
+    const clarification = unwrapField<Clarification>(result, 'clarification')!;
     cache.remove(getCacheKey('clarifications', requirementId));
     return clarification;
   }

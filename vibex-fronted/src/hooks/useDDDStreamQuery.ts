@@ -127,7 +127,7 @@ async function fetchSSEStream(
       buffer = lines.pop() || '';
 
       for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
+        const line = lines[i]!;
         if (line.startsWith('event: ')) {
           const eventType = line.slice(7);
           const nextLine = lines[i + 1];

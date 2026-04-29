@@ -885,11 +885,12 @@ export class PreviewService {
     id: string
   ): UIComponent | null {
     for (let i = 0; i < components.length; i++) {
-      if (components[i].id === id) {
-        return components.splice(i, 1)[0];
+      const comp = components[i]!;
+      if (comp.id === id) {
+        return components.splice(i, 1)[0]!;
       }
-      if (components[i].children) {
-        const removed = this.removeComponentRecursive(components[i].children!, id);
+      if (comp.children) {
+        const removed = this.removeComponentRecursive(comp.children, id);
         if (removed) return removed;
       }
     }

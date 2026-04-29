@@ -36,7 +36,7 @@ class MessageApiImpl implements MessageApi {
         params: { projectId },
       });
     });
-    const messages = unwrapField<Message[]>(result, 'messages');
+    const messages = unwrapField<Message[]>(result, 'messages')!;
     cache.set(cacheKey, messages);
     return messages;
   }

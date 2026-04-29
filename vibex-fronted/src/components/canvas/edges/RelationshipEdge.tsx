@@ -66,7 +66,7 @@ const RelationshipEdgeComponent = (props: EdgeProps<RelationshipEdgeFull>) => {
     calls: { stroke: '#888', strokeWidth: 1.5, dashArray: '5,3', markerColor: '#888', label: '调用' },
   };
 
-  const config = typeConfig[relType] ?? typeConfig.dependency;
+  const config = typeConfig[relType] ?? typeConfig['dependency']!;
 
   return (
     <>

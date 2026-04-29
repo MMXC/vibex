@@ -68,7 +68,7 @@ export function useProjectLoader({
       const sorted = [...result.snapshots].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
-      const latest = sorted[0];
+      const latest = sorted[0]!;
 
       // Get full snapshot data
       const snapshotResult = await canvasApi.getSnapshot(latest.snapshotId);

@@ -56,7 +56,7 @@ function nodesToSpec(nodes: ComponentNode[]): Spec | null {
       if (!childrenOfParent[node.parentId]) {
         childrenOfParent[node.parentId] = [];
       }
-      childrenOfParent[node.parentId].push(node.nodeId);
+      childrenOfParent[node.parentId]!.push(node.nodeId);
     }
   }
 

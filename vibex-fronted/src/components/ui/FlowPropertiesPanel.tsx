@@ -345,15 +345,15 @@ export default function FlowPropertiesPanel({
 
         {/* Edge label */}
         <PropertyField
-          label={EDGE_PROPERTY_LABELS.label}
-          value={edgeData.label || ''}
+          label={EDGE_PROPERTY_LABELS.label!}
+          value={edgeData.label ?? ''}
           onChange={(newValue) => handleEdgeDataChange('label', newValue)}
         />
 
         {/* Edge type select */}
         <PropertyField
-          label={EDGE_PROPERTY_LABELS.type}
-          value={edgeData.type || 'smoothstep'}
+          label={EDGE_PROPERTY_LABELS.type!}
+          value={edgeData.type ?? 'smoothstep'}
           onChange={(newValue) => handleEdgeDataChange('type', newValue)}
           type="select"
           options={[
@@ -366,7 +366,7 @@ export default function FlowPropertiesPanel({
 
         {/* Animated toggle */}
         <PropertyField
-          label={EDGE_PROPERTY_LABELS.animated}
+          label={EDGE_PROPERTY_LABELS.animated!}
           value={edgeData.animated || false}
           onChange={(newValue) => handleEdgeDataChange('animated', newValue)}
           type="boolean"

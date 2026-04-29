@@ -66,8 +66,8 @@ export function parseFigmaUrl(url: string): { fileKey: string; nodeId?: string }
       const fileKey = match[1];
       const nodeMatch = url.match(/[?&]node-id=([^&#]+)/);
       return {
-        fileKey,
-        nodeId: nodeMatch ? decodeURIComponent(nodeMatch[1]) : undefined,
+        fileKey: match[1] ?? '',
+        nodeId: nodeMatch ? decodeURIComponent(nodeMatch[1] ?? '') : undefined,
       };
     }
   }

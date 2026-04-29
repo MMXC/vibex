@@ -139,7 +139,7 @@ export function createPRDFromTemplate(
     projectName,
     version: '1.0.0',
     createdAt: new Date().toISOString(),
-    sections: templates[templateId] || templates['default'],
+    sections: templates[templateId]! || templates['default'],
   };
 }
 

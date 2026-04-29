@@ -46,7 +46,7 @@ class DomainEntityApiImpl implements DomainEntityApi {
         `/domain-entities?requirementId=${requirementId}`
       );
     });
-    const entities = unwrapField<DomainEntity[]>(result, 'domainEntities');
+    const entities = unwrapField<DomainEntity[]>(result, 'domainEntities')!;
     cache.set(cacheKey, entities);
     return entities;
   }
@@ -62,7 +62,7 @@ class DomainEntityApiImpl implements DomainEntityApi {
     const result = await retry.execute(async () => {
       return await httpClient.get<DomainEntity>(`/domains/${entityId}`);
     });
-    const entity = unwrapField<DomainEntity>(result, 'domain');
+    const entity = unwrapField<DomainEntity>(result, 'domain')!;
     cache.set(cacheKey, entity);
     return entity;
   }
@@ -76,7 +76,7 @@ class DomainEntityApiImpl implements DomainEntityApi {
         entity
       );
     });
-    const created = unwrapField<DomainEntity>(result, 'domain');
+    const created = unwrapField<DomainEntity>(result, 'domain')!;
     cache.remove(getCacheKey('domain_entities', entity.requirementId));
     return created;
   }
@@ -91,7 +91,7 @@ class DomainEntityApiImpl implements DomainEntityApi {
         data
       );
     });
-    const entity = unwrapField<DomainEntity>(result, 'domain');
+    const entity = unwrapField<DomainEntity>(result, 'domain')!;
     if (data.requirementId) {
       cache.remove(getCacheKey('domain_entities', data.requirementId));
     }

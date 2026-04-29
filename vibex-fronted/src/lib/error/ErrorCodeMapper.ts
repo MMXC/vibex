@@ -65,7 +65,7 @@ export class ErrorCodeMapper {
       // 尝试解析 error 字符串中的错误码
       const match = response.error.match(/\[([A-Z]\d+)\]/);
       if (match) {
-        return match[1];
+        return match[1]!;
       }
     }
     

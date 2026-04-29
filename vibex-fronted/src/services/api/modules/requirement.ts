@@ -57,7 +57,7 @@ class RequirementApiImpl implements RequirementApi {
         { params: { userId } }
       );
     });
-    const requirements = unwrapField<Requirement[]>(result, 'requirements');
+    const requirements = unwrapField<Requirement[]>(result, 'requirements')!;
     cache.set(cacheKey, requirements);
     return requirements;
   }
@@ -75,7 +75,7 @@ class RequirementApiImpl implements RequirementApi {
         `/requirements/${requirementId}`
       );
     });
-    const requirement = unwrapField<Requirement>(result, 'requirement');
+    const requirement = unwrapField<Requirement>(result, 'requirement')!;
     cache.set(cacheKey, requirement);
     return requirement;
   }
@@ -89,7 +89,7 @@ class RequirementApiImpl implements RequirementApi {
         requirement
       );
     });
-    const created = unwrapField<Requirement>(result, 'requirement');
+    const created = unwrapField<Requirement>(result, 'requirement')!;
     cache.remove(getCacheKey('requirements', requirement.userId));
     return created;
   }
@@ -105,7 +105,7 @@ class RequirementApiImpl implements RequirementApi {
         data
       );
     });
-    const requirement = unwrapField<Requirement>(result, 'requirement');
+    const requirement = unwrapField<Requirement>(result, 'requirement')!;
     cache.remove(getCacheKey('requirement', requirementId));
     if (userId) {
       cache.remove(getCacheKey('requirements', userId));
@@ -133,7 +133,7 @@ class RequirementApiImpl implements RequirementApi {
         `/requirements/${requirementId}/analyze`
       );
     });
-    const requirement = unwrapField<Requirement>(result, 'requirement');
+    const requirement = unwrapField<Requirement>(result, 'requirement')!;
     cache.remove(getCacheKey('requirement', requirementId));
     return requirement;
   }
@@ -148,7 +148,7 @@ class RequirementApiImpl implements RequirementApi {
         context
       );
     });
-    const requirement = unwrapField<Requirement>(result, 'requirement');
+    const requirement = unwrapField<Requirement>(result, 'requirement')!;
     cache.remove(getCacheKey('requirement', requirementId));
     return requirement;
   }
@@ -168,7 +168,7 @@ class RequirementApiImpl implements RequirementApi {
         `/requirements/${requirementId}/analysis`
       );
     });
-    const analysisResult = unwrapField<AnalysisResult>(result, 'analysisResult');
+    const analysisResult = unwrapField<AnalysisResult>(result, 'analysisResult')!;
     cache.set(cacheKey, analysisResult);
     return analysisResult;
   }

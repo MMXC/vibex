@@ -180,7 +180,7 @@ export function toStateMachineSpec(cards: StateMachineCard[]): string {
     const onMap: Record<string, Record<string, string>> = {};
     for (const t of transitions) {
       if (!onMap[t.from]) { onMap[t.from] = {}; }
-      onMap[t.from][t.event] = t.to;
+      onMap[t.from]![t.event] = t.to;
     }
 
     for (const state of smStates) {

@@ -35,7 +35,7 @@ export function PrototypePreview({
   onPageChange,
   interactive = true,
 }: PrototypePreviewProps) {
-  const [activePageId, setActivePageId] = useState<string>(currentPageId || pages[0]?.id);
+  const [activePageId, setActivePageId] = useState<string>(currentPageId || pages[0]!.id);
   const [interactions, setInteractions] = useState<Record<string, unknown>>({});
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 

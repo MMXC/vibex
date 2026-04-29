@@ -115,13 +115,13 @@ function aggregateEvents(events: RawEvent[]): AggregationResult {
   // Collect all unique dates
   const allDates = new Set<string>();
   for (const metricKey of Object.keys(METRIC_CONFIG) as MetricKey[]) {
-    Object.keys(buckets[metricKey]).forEach(d => allDates.add(d));
+    Object.keys(buckets[metricKey]!).forEach(d => allDates.add(d));
   }
   const sortedDates = Array.from(allDates).sort();
 
   const metrics: MetricData = {} as MetricData;
   for (const metricKey of Object.keys(METRIC_CONFIG) as MetricKey[]) {
-    const metricBuckets = buckets[metricKey];
+    const metricBuckets = buckets[metricKey]!;
     metrics[metricKey] = sortedDates.map(date => ({
       date,
       count: metricBuckets[date] ?? 0,

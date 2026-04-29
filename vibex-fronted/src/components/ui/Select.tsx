@@ -132,7 +132,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
               filteredOptions.length - 1
             );
             if (nextIndex >= 0) {
-              onChange?.(filteredOptions[nextIndex].value);
+              onChange?.(filteredOptions[nextIndex]!.value);
             }
           }
           break;
@@ -146,7 +146,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             );
             const prevIndex = Math.max(currentIndex - 1, 0);
             if (prevIndex >= 0) {
-              onChange?.(filteredOptions[prevIndex].value);
+              onChange?.(filteredOptions[prevIndex]!.value);
             }
           }
           break;

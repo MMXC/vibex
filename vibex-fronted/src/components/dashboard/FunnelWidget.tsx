@@ -37,7 +37,7 @@ export function FunnelWidget({ steps, isLoading }: FunnelWidgetProps) {
         const topWidth = Math.max(widthPercent * 700, 80);
         const bottomWidth =
           i < steps.length - 1
-            ? Math.max((steps[i + 1].count / maxCount) * 700, 80)
+            ? Math.max((steps[i + 1]!.count / maxCount) * 700, 80)
             : Math.max(widthPercent * 700 * 0.5, 40);
         const y = 50 + i * 80;
 

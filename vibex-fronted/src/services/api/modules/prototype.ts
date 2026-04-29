@@ -49,7 +49,7 @@ class PrototypeApiImpl implements PrototypeApi {
         `/prototype-snapshots?projectId=${projectId}`
       );
     });
-    const snapshots = unwrapField<PrototypeSnapshot[]>(result, 'prototypeSnapshots');
+    const snapshots = unwrapField<PrototypeSnapshot[]>(result, 'prototypeSnapshots')!;
     cache.set(cacheKey, snapshots);
     return snapshots;
   }
@@ -67,7 +67,7 @@ class PrototypeApiImpl implements PrototypeApi {
         `/prototype-snapshots/${snapshotId}`
       );
     });
-    const snapshot = unwrapField<PrototypeSnapshot>(result, 'prototypeSnapshot');
+    const snapshot = unwrapField<PrototypeSnapshot>(result, 'prototypeSnapshot')!;
     cache.set(cacheKey, snapshot);
     return snapshot;
   }
@@ -81,7 +81,7 @@ class PrototypeApiImpl implements PrototypeApi {
         snapshot
       );
     });
-    const created = unwrapField<PrototypeSnapshot>(result, 'prototypeSnapshot');
+    const created = unwrapField<PrototypeSnapshot>(result, 'prototypeSnapshot')!;
     cache.remove(getCacheKey('prototype_snapshots', snapshot.projectId));
     return created;
   }
@@ -96,7 +96,7 @@ class PrototypeApiImpl implements PrototypeApi {
         data
       );
     });
-    return unwrapField<PrototypeSnapshot>(result, 'prototypeSnapshot');
+    return unwrapField<PrototypeSnapshot>(result, 'prototypeSnapshot')!;
   }
 
   async deletePrototypeSnapshot(

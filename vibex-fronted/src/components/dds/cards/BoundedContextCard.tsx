@@ -22,10 +22,10 @@ export interface BoundedContextCardProps {
 }
 
 const RELATION_CLASS: Record<string, string> = {
-  upstream: styles.relationUpstream,
-  downstream: styles.relationDownstream,
-  anticorruption: styles.relationAnticorruption,
-  'shared-kernel': styles.relationSharedKernel,
+  upstream: styles.relationUpstream ?? '',
+  downstream: styles.relationDownstream ?? '',
+  anticorruption: styles.relationAnticorruption ?? '',
+  'shared-kernel': styles.relationSharedKernel ?? '',
 };
 
 const RELATION_LABEL: Record<string, string> = {

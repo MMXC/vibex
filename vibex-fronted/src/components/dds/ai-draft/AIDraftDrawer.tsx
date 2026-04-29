@@ -99,7 +99,7 @@ function parseCardsFromResponse(content: string): DDSCard[] {
   // Strip markdown code fences
   const fenceMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
   if (fenceMatch) {
-    jsonStr = fenceMatch[1].trim();
+    jsonStr = fenceMatch[1]!.trim();
   }
 
   // Try direct parse
@@ -133,7 +133,7 @@ function parseEdgesFromResponse(content: string): DDSEdge[] {
 
   const fenceMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
   if (fenceMatch) {
-    jsonStr = fenceMatch[1].trim();
+    jsonStr = fenceMatch[1]!.trim();
   }
 
   try {

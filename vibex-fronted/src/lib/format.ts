@@ -10,7 +10,7 @@
  * @param isoString ISO 8601 格式的日期字符串
  */
 export function formatDate(isoString: string): string {
-  return isoString.split('T')[0];
+  return isoString.split('T')[0]!;
 }
 
 /**
@@ -18,6 +18,6 @@ export function formatDate(isoString: string): string {
  * @param isoString ISO 8601 格式的日期字符串
  */
 export function formatDateTime(isoString: string): string {
-  const [date, time] = isoString.split('T');
+  const [date, time] = isoString.split('T') as [string, string];
   return `${date} ${time.split('.')[0]}`;
 }

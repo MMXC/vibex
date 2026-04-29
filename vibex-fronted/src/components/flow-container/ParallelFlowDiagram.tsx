@@ -40,15 +40,15 @@ const STEP_LABELS: Record<string, string> = {
 
 function StepNode({ step, depth = 0 }: { step: ParallelStep; depth?: number }) {
   const statusColors: Record<string, string> = {
-    pending: styles.statusPending,
-    active: styles.statusActive,
-    completed: styles.statusCompleted,
-    error: styles.statusError,
+    pending: styles.statusPending ?? '',
+    active: styles.statusActive ?? '',
+    completed: styles.statusCompleted ?? '',
+    error: styles.statusError ?? '',
   };
 
   return (
     <div className={`${styles.stepNode} ${statusColors[step.status] || ''}`} style={{ marginLeft: depth * 24 }}>
-      <span className={styles.stepIcon}>{STEP_ICONS[step.id] || '📋'}</span>
+      <span className={styles.stepIcon}>{STEP_ICONS[step.id] ?? '📋'}</span>
       <span className={styles.stepLabel}>{step.label}</span>
       {step.status === 'active' && <span className={styles.pulse} />}
       {step.subSteps?.map((sub) => (

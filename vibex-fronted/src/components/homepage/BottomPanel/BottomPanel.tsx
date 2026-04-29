@@ -175,9 +175,9 @@ export function BottomPanel({
           if (currentValue) {
             setUndoStack((undoPrev) => [...undoPrev, currentValue]);
           }
-          setInputValue(next);
-          saveDraft(next);
-          lastPushedRef.current = next;
+          setInputValue(next!);
+          saveDraft(next!);
+          lastPushedRef.current = next!;
           showToast('已重做', 'success');
           return rest;
         });

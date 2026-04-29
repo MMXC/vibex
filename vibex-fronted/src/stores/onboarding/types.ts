@@ -103,7 +103,7 @@ export function getStepIndex(step: OnboardingStep): number {
 export function getNextStep(currentStep: OnboardingStep): OnboardingStep | null {
   const currentIndex = getStepIndex(currentStep);
   if (currentIndex < STEP_ORDER.length - 1) {
-    return STEP_ORDER[currentIndex + 1];
+    return STEP_ORDER[currentIndex + 1]!;
   }
   return null;
 }
@@ -112,7 +112,7 @@ export function getNextStep(currentStep: OnboardingStep): OnboardingStep | null 
 export function getPrevStep(currentStep: OnboardingStep): OnboardingStep | null {
   const currentIndex = getStepIndex(currentStep);
   if (currentIndex > 0) {
-    return STEP_ORDER[currentIndex - 1];
+    return STEP_ORDER[currentIndex - 1]!;
   }
   return null;
 }

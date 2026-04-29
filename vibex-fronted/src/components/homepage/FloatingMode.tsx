@@ -61,9 +61,9 @@ export const FloatingMode: React.FC<FloatingModeProps> = ({
     if (!bottomPanelRef?.current) return;
     const el = bottomPanelRef.current;
     if (isFloating) {
-      el.classList.add(styles.collapsed);
+      el.classList.add(styles.collapsed!);
     } else {
-      el.classList.remove(styles.collapsed);
+      el.classList.remove(styles.collapsed!);
     }
   }, [isFloating, bottomPanelRef]);
 
@@ -72,9 +72,9 @@ export const FloatingMode: React.FC<FloatingModeProps> = ({
     if (!rightPanelRef?.current) return;
     const el = rightPanelRef.current;
     if (isFloating) {
-      el.classList.add(styles['floating-right']);
+      el.classList.add(styles['floating-right']!);
     } else {
-      el.classList.remove(styles['floating-right']);
+      el.classList.remove(styles['floating-right']!);
     }
   }, [isFloating, rightPanelRef]);
 

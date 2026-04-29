@@ -61,7 +61,7 @@ function buildBpmnXml(flow: BusinessFlow): string {
   for (let i = 0; i < stepNames.length; i++) {
     const taskId = `Task_${elementId++}`;
     const taskName = stepNames[i];
-    elements.push(`    <bpmn:serviceTask id="${taskId}" name="${escapeXml(taskName)}" />`);
+    elements.push(`    <bpmn:serviceTask id="${taskId}" name="${escapeXml(taskName!)}" />`);
 
     const flowId = `Flow_${elementId++}`;
     flows.push(`    <bpmn:sequenceFlow id="${flowId}" sourceRef="${prevId}" targetRef="${taskId}" />`);

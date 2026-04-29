@@ -174,7 +174,7 @@ export function matchTemplateWithFuse(input: string): ExtendedMatchResult {
 
   // 获取最佳匹配
   const best = results[0];
-  const maxScore = results[0].score;
+  const maxScore = results[0]!.score;
   const confidence = Math.min(1, maxScore / 2); // 归一化到 0-1
 
   // 获取备选
@@ -184,9 +184,9 @@ export function matchTemplateWithFuse(input: string): ExtendedMatchResult {
   }));
 
   return {
-    template: best.template,
+    template: best!.template,
     confidence,
-    matchedKeywords: [...new Set(best.template.keywords.filter(k => 
+    matchedKeywords: [...new Set(best!.template.keywords.filter(k => 
       normalizedInput.includes(k.toLowerCase())
     ))],
     isMatch: confidence >= 0.3,

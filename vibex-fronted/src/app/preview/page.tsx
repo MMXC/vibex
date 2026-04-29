@@ -29,7 +29,7 @@ const devices = [
 ];
 
 export default function Preview() {
-  const [selectedPage, setSelectedPage] = useState(previewPages[0]);
+  const [selectedPage, setSelectedPage] = useState(previewPages[0]!);
   const [device, setDevice] = useState('desktop');
   const [zoom, setZoom] = useState(100);
   const [showPageList, setShowPageList] = useState(true);

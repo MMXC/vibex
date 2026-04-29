@@ -38,7 +38,7 @@ class PageApiImpl implements PageApi {
         params: { projectId },
       });
     });
-    const pages = unwrapField<Page[]>(result, 'pages');
+    const pages = unwrapField<Page[]>(result, 'pages')!;
     cache.set(cacheKey, pages);
     return pages;
   }
@@ -54,7 +54,7 @@ class PageApiImpl implements PageApi {
     const result = await retry.execute(async () => {
       return await httpClient.get<Page>(`/pages/${pageId}`);
     });
-    const page = unwrapField<Page>(result, 'page');
+    const page = unwrapField<Page>(result, 'page')!;
     cache.set(cacheKey, page);
     return page;
   }
@@ -63,7 +63,7 @@ class PageApiImpl implements PageApi {
     const result = await retry.execute(async () => {
       return await httpClient.post<Page>('/pages', page);
     });
-    const created = unwrapField<Page>(result, 'page');
+    const created = unwrapField<Page>(result, 'page')!;
     if (page.projectId) {
       cache.remove(getCacheKey('pages', page.projectId));
     }
@@ -74,7 +74,7 @@ class PageApiImpl implements PageApi {
     const result = await retry.execute(async () => {
       return await httpClient.put<Page>(`/pages/${pageId}`, data);
     });
-    const page = unwrapField<Page>(result, 'page');
+    const page = unwrapField<Page>(result, 'page')!;
     cache.remove(getCacheKey('page', pageId));
     return page;
   }

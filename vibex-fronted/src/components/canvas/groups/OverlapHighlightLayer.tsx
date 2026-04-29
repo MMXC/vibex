@@ -96,8 +96,8 @@ function computeIntersections(bboxes: BoundedGroupBBox[]): IntersectionRect[] {
 
   for (let i = 0; i < bboxes.length; i++) {
     for (let j = i + 1; j < bboxes.length; j++) {
-      const a = bboxes[i];
-      const b = bboxes[j];
+      const a = bboxes[i]!;
+      const b = bboxes[j]!;
       const rect = getIntersectionRect(a, b);
       if (rect) {
         intersections.push({

@@ -134,7 +134,7 @@ function computeRanks(nodes: Node[], edges: Edge[]): Map<string, number> {
   
   // BFS to compute longest path ranks
   const visited = new Set<string>();
-  const queue: { id: string; rank: number }[] = startNodes.map(n => ({ id: n.id, rank: 0 }));
+  const queue: { id: string; rank: number }[] = startNodes.filter(Boolean).map(n => ({ id: (n as any).id, rank: 0 }));
   
   while (queue.length > 0) {
     const { id, rank } = queue.shift()!;

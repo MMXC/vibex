@@ -49,11 +49,11 @@ export function PerformanceDashboard() {
   const getRatingClass = (rating?: string): string => {
     switch (rating) {
       case 'good':
-        return styles.ratingGood;
+        return styles.ratingGood ?? '';
       case 'needs-improvement':
-        return styles.ratingNeedsImprovement;
+        return styles.ratingNeedsImprovement ?? '';
       case 'poor':
-        return styles.ratingPoor;
+        return styles.ratingPoor ?? '';
       default:
         return '';
     }

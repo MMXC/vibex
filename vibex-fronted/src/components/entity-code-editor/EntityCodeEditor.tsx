@@ -69,7 +69,7 @@ export function EntityCodeEditor({
   const handleUndo = useCallback(() => {
     if (historyIndex > 0) {
       const newIndex = historyIndex - 1;
-      setCode(history[newIndex]);
+      setCode(history[newIndex]!);
       setHistoryIndex(newIndex);
       setError(null);
     }
@@ -78,7 +78,7 @@ export function EntityCodeEditor({
   const handleRedo = useCallback(() => {
     if (historyIndex < history.length - 1) {
       const newIndex = historyIndex + 1;
-      setCode(history[newIndex]);
+      setCode(history[newIndex]!);
       setHistoryIndex(newIndex);
       setError(null);
     }

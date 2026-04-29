@@ -36,7 +36,7 @@ export function getNextStep(currentStep: DesignStep): DesignStep | null {
   if (currentIndex === -1 || currentIndex === DESIGN_STEPS.length - 1) {
     return null;
   }
-  return DESIGN_STEPS[currentIndex + 1].id;
+  return DESIGN_STEPS[currentIndex + 1]!.id;
 }
 
 // 获取上一步
@@ -45,7 +45,7 @@ export function getPrevStep(currentStep: DesignStep): DesignStep | null {
   if (currentIndex <= 0) {
     return null;
   }
-  return DESIGN_STEPS[currentIndex - 1].id;
+  return DESIGN_STEPS[currentIndex - 1]!.id;
 }
 
 export default DESIGN_STEPS;

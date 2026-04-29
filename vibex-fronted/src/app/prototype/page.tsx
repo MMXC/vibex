@@ -105,7 +105,7 @@ export default function PrototypePreview() {
             }
           } else if (snapshotsData.length > 0) {
             // 默认加载最新快照
-            const latestSnapshot = snapshotsData[0];
+            const latestSnapshot = snapshotsData[0]!;
             if (latestSnapshot.content) {
               const content = JSON.parse(latestSnapshot.content);
               setPages(content.pages || []);
@@ -133,7 +133,7 @@ export default function PrototypePreview() {
   // 设置默认选中的页面
   useEffect(() => {
     if (pages.length > 0 && !selectedPage) {
-      setSelectedPage(pages[0]);
+      setSelectedPage(pages[0]!);
     }
   }, [pages, selectedPage]);
 

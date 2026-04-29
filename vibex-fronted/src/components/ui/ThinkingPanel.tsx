@@ -125,8 +125,8 @@ export function ThinkingPanel({
     }
     if (thinkingMessages.length > displayedSteps.length) {
       const latestStep = thinkingMessages[thinkingMessages.length - 1]
-      if (!displayedSteps.find(s => s.step === latestStep.step)) {
-        setDisplayedSteps(prev => [...prev, latestStep])
+      if (!displayedSteps.find(s => s.step === latestStep!.step)) {
+        setDisplayedSteps(prev => [...prev, latestStep!])
       }
     }
   }, [thinkingMessages, displayedSteps])

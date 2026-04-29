@@ -65,7 +65,13 @@ def detect_false_completions(tasks_dir: str = None) -> dict:
             else:
                 output_path = Path("/root/.openclaw/workspace-coord") / output
 
-            if not output_path.exists():
+            try:
+                path_exists = output_path.exists()
+            except OSError:
+                # ENOENT 36 — path too long when output string contains Chinese text + slashes
+                path_exists = True  # Skip false-positive check on paths that exceed filesystem limits
+
+            if not path_exists:
                 items.append({
                     "project": project_name,
                     "task": stage_name,

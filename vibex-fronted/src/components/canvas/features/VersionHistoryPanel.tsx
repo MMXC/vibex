@@ -66,7 +66,7 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
         setCompareSnapshots(prev => [...prev, snap]);
       } else {
         // Replace oldest
-        setCompareSnapshots([compareSnapshots[1], snap]);
+        setCompareSnapshots([compareSnapshots[1]!, snap]);
       }
     }
   };

@@ -48,7 +48,7 @@ class EntityRelationApiImpl implements EntityRelationApi {
         `/entity-relations?requirementId=${requirementId}`
       );
     });
-    const relations = unwrapField<EntityRelation[]>(result, 'entityRelations');
+    const relations = unwrapField<EntityRelation[]>(result, 'entityRelations')!;
     cache.set(cacheKey, relations);
     return relations;
   }
@@ -66,7 +66,7 @@ class EntityRelationApiImpl implements EntityRelationApi {
         `/entity-relations/${relationId}`
       );
     });
-    const relation = unwrapField<EntityRelation>(result, 'entityRelation');
+    const relation = unwrapField<EntityRelation>(result, 'entityRelation')!;
     cache.set(cacheKey, relation);
     return relation;
   }
@@ -81,7 +81,7 @@ class EntityRelationApiImpl implements EntityRelationApi {
         relation
       );
     });
-    const created = unwrapField<EntityRelation>(result, 'entityRelation');
+    const created = unwrapField<EntityRelation>(result, 'entityRelation')!;
     if (requirementId) {
       cache.remove(getCacheKey('entity_relations', requirementId));
     }
@@ -99,7 +99,7 @@ class EntityRelationApiImpl implements EntityRelationApi {
         data
       );
     });
-    const relation = unwrapField<EntityRelation>(result, 'entityRelation');
+    const relation = unwrapField<EntityRelation>(result, 'entityRelation')!;
     if (requirementId) {
       cache.remove(getCacheKey('entity_relations', requirementId));
     }

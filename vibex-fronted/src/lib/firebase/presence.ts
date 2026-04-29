@@ -98,7 +98,7 @@ export function hashUserColor(userId: string): string {
   for (let i = 0; i < userId.length; i++) {
     hash = (hash * 31 + userId.charCodeAt(i)) | 0;
   }
-  return PRESENCE_COLORS[Math.abs(hash) % PRESENCE_COLORS.length];
+  return PRESENCE_COLORS[Math.abs(hash) % PRESENCE_COLORS.length]!;
 }
 
 // ============================================================================
@@ -207,7 +207,7 @@ export function subscribeToOthers(
     try {
       // Firebase RTDB Streaming: ?ns=<namespace>&sse=true
       const ns = encodeURIComponent(
-        FIREBASE_CONFIG.databaseURL!.split('://')[1].split('.')[0]
+        FIREBASE_CONFIG.databaseURL!.split('://')[1]!.split('.')[0]!
       );
       const path = `presence/${canvasId}`;
       const encodedPath = path

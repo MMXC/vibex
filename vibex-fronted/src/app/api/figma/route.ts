@@ -105,11 +105,11 @@ function parseFigmaUrl(url: string): { fileKey: string; nodeId?: string } | null
   for (const pattern of patterns) {
     const match = url.match(pattern);
     if (match) {
-      const fileKey = match[1];
+      const fileKey = match[1] ?? '';
       const nodeMatch = url.match(/[?&]node-id=([^&#]+)/);
       return {
         fileKey,
-        nodeId: nodeMatch ? decodeURIComponent(nodeMatch[1]) : undefined,
+        nodeId: nodeMatch ? decodeURIComponent(nodeMatch[1] ?? '') : undefined,
       };
     }
   }

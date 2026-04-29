@@ -299,7 +299,7 @@ export function useCanvasExport(): UseCanvasExportReturn {
           component: '[data-tree="component"] [class*="treePanelBody"], [data-testid="component-tree"]',
           all: '[class*="treePanelsGrid"]',
         };
-        targetElement = document.querySelector(scopeSelectors[scope]) as HTMLElement;
+        targetElement = document.querySelector(scopeSelectors[scope]!) as HTMLElement;
       }
 
       if (!targetElement) {

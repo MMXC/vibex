@@ -20,7 +20,7 @@ export function unwrapData<T>(response: unknown): T {
 export function unwrapField<T>(
   response: unknown,
   field: keyof Record<string, unknown>
-): T {
+): T | null {
   if (response && typeof response === 'object') {
     if (field in response) {
       return (response as Record<string, T>)[field as string] ?? null;
@@ -41,7 +41,7 @@ export function unwrapField<T>(
 export function unwrapFieldOrSelf<T>(
   response: unknown,
   field: string
-): T {
+): T | null {
   const unwrapped = unwrapField<T>(response, field as keyof Record<string, unknown>);
   if (unwrapped !== response) {
     return unwrapped;

@@ -61,7 +61,7 @@ function MiniChart({
               style={{ height: `${heightPct}%`, background: color }}
               title={`${v}${unit}`}
             />
-            <span className={styles.barLabel}>{data[i].date.slice(5)}</span>
+            <span className={styles.barLabel}>{data[i]!.date.slice(5)}</span>
           </div>
         );
       })}

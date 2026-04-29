@@ -1,4 +1,4 @@
-import { performHealthCheck, type HealthCheckResult } from '../health';
+import { performHealthCheck, type HealthCheckResult } from '../health.js';
 
 describe('E7-S1 Health Check', () => {
   it('E7-S1: should return status/version/uptime/timestamp fields', async () => {
@@ -28,14 +28,14 @@ describe('E7-S1 Health Check', () => {
     const result = await performHealthCheck();
     expect(Array.isArray(result.checks)).toBe(true);
     expect(result.checks.length).toBeGreaterThan(0);
-    const checkNames = result.checks.map(c => c.name);
+    const checkNames = result.checks.map((c: { name: string; status: string }) => c.name);
     expect(checkNames).toContain('server_running');
     expect(checkNames).toContain('tools_registered');
   });
 
   it('E7-S1: should mark checks as pass when healthy', async () => {
     const result = await performHealthCheck();
-    const failed = result.checks.filter(c => c.status === 'fail');
+    const failed = result.checks.filter((c: { name: string; status: string }) => c.status === 'fail');
     expect(result.status).toBe('healthy');
     expect(failed.length).toBe(0);
   });

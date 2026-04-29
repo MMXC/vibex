@@ -9,9 +9,9 @@
  * @module tools/reviewDesign
  */
 
-import { checkDesignCompliance } from 'vibex-backend/src/lib/prompts/designCompliance';
-import { checkA11yCompliance } from 'vibex-backend/src/lib/prompts/a11yChecker';
-import { analyzeComponentReuse } from 'vibex-backend/src/lib/prompts/componentReuse';
+import { checkDesignCompliance } from '../../../../vibex-backend/src/lib/prompts/designCompliance.js';
+import { checkA11yCompliance } from '../../../../vibex-backend/src/lib/prompts/a11yChecker.js';
+import { analyzeComponentReuse } from '../../../../vibex-backend/src/lib/prompts/componentReuse.js';
 
 // =============================================================================
 // Types

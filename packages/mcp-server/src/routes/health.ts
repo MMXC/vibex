@@ -12,16 +12,6 @@ import { listTools } from '../tools/list.js';
 const PORT = 3100;
 const HOST = '0.0.0.0';
 
-function buildResponse(statusCode: number, body: object): http.ServerResponse<http.IncomingMessage>['writeHead'] {
-  return (res) => {
-    res.writeHead(statusCode, {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Access-Control-Allow-Origin': '*',
-    });
-    res.end(JSON.stringify(body, null, 2));
-  };
-}
-
 const server = http.createServer((req, res) => {
   const url = new URL(req.url ?? '/', `http://${req.headers.host}`);
 

@@ -1,4 +1,4 @@
-import { logger } from '../logger';
+import { logger } from '../logger.js';
 
 describe('E7-S2 StructuredLogger', () => {
   let logs: string[] = [];

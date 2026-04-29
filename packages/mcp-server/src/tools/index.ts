@@ -1,2 +1,2 @@
-export { listTools } from './list';
-export { executeTool } from './execute';
+export { listTools } from './list.js';
+export { executeTool } from './execute.js';

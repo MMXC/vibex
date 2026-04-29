@@ -689,8 +689,17 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
         ) : (
           <EmptyState
             icon={Network}
-            title="暂无限界上下文"
-            description="点击「重新执行」自动生成，或手动新增节点"
+            title="暂无限界上下文，请先添加"
+            description="点击「重新执行」自动生成，或点击下方按钮手动新增"
+            action={
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                onClick={() => setShowAddForm(true)}
+              >
+                + 手动新增
+              </button>
+            }
           />
         )}
       </div>

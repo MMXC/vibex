@@ -988,6 +988,15 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
           icon={GitBranch}
           title="暂无业务流程"
           description={allContextsActive ? '确认上下文后自动生成业务流程' : '请先完成上下文树的编辑和确认'}
+          action={
+            <button
+              type="button"
+              className={styles.secondaryButton}
+              onClick={handleManualAdd}
+            >
+              + 添加流程
+            </button>
+          }
         />
       ) : (
         <DndContext

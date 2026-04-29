@@ -1037,8 +1037,8 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
         ) : (
           <EmptyState
             icon={Layers}
-            title="暂无组件"
-            description="点击「AI 生成组件」自动生成，或手动新增节点"
+            title="暂无组件，请从限界上下文开始"
+            description="在限界上下文中添加业务流程，再生成组件"
           />
         )}
       </div>

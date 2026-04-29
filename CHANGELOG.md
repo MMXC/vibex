@@ -1,3 +1,7 @@
+### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-CORE-3: 三树面板空状态优化 — 2026-04-30
+- **S18-E18-CORE-3 三树空状态**: `BoundedContextTree.tsx` + `BusinessFlowTree.tsx` + `ComponentTree.tsx` — 三树组件空状态文案增强；BoundedContextTree/ BusinessFlowTree 添加手动新增按钮；ComponentTree 优化空状态引导；`tsc --noEmit` → 0 errors ✅
+- **提交**: 3f65313c6
+
 ### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-CORE-2: Canvas 骨架屏加载状态 — 2026-04-30
 - **S18-E18-CORE-2 Canvas 骨架屏**: `CanvasPage.tsx` + `CanvasPageSkeleton.tsx` — 画布加载时显示三列骨架屏占位符（对应 BoundedContextTree/ComponentTree/BusinessFlowTree 布局）；`Skeleton.tsx` 新增 `SkeletonLine`/`SkeletonBox` 辅助组件；`tsc --noEmit` → 0 errors ✅
 - **提交**: 8af38ce53

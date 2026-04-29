@@ -20,6 +20,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.324',
+    date: '2026-04-30',
+    changes: [
+      '📋 vibex-proposals-20260430 Sprint18 S18-E18-CORE-3: 三树面板空状态优化',
+      '✅ CORE-3: BoundedContextTree/BusinessFlowTree/ComponentTree 空状态增强',
+      '✅ BoundedContextTree/BusinessFlowTree 添加手动新增按钮',
+    ],
+    commit: '3f65313c6',
+  },
+  {
     version: '1.0.323',
     date: '2026-04-30',
     changes: [

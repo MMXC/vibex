@@ -346,3 +346,30 @@ cd packages/mcp-server && pnpm exec tsc --noEmit 2>&1 | grep "error TS" | wc -l
 # 错误分布
 pnpm exec tsc --noEmit 2>&1 | grep "error TS" | cut -d: -f1 | sort | uniq -c | sort -rn | head -20
 ```
+
+### Story E18-QUALITY-2: 开发者体验改进
+
+**工时**: 8h | **验收标准**: tsconfig strict、类型文档、migration guide
+**状态**: ✅ DONE (commit a1c3d8e5)
+
+#### 任务清单
+
+```
+1. [x] tsconfig strict 模式检查
+   - vibex-fronted: strict: true ✅
+   - noUncheckedIndexedAccess: true ✅
+   - packages/mcp-server: strict: true ✅
+
+2. [x] 类型文档已生成
+   - docs/types/README.md ✅
+   - 包含 @vibex/types 所有公开类型 ✅
+3. [x] Migration guide 已创建
+   - E18-TSFIX-2 Breaking Changes 说明 ✅
+   - unwrapField 返回类型变更处理方式 ✅
+```
+
+### Story E18-QUALITY-2 (DX improvements)
+- [x] `tsconfig.json` strict 模式已开启 ✅
+- [x] `docs/types/README.md` 已创建 ✅
+- [x] Migration guide 存在 ✅
+- [x] Commit 含 E18-QUALITY-2 ✅ (a1c3d8e5)

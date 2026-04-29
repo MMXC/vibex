@@ -1,4 +1,5 @@
 // GET /api/analytics/funnel?range=7d|30d
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const range = searchParams.get('range') ?? '7d';

@@ -1,3 +1,7 @@
+### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-TSFIX-1: mcp-server TypeScript 修复 — 2026-04-30
+- **S18-E18-TSFIX-1 mcp-server TS 修复**: `packages/mcp-server/` 解决 7 个 TS 错误 — package.json 添加 `"type": "module"` 支持 ESM、移除未使用的 `buildResponse` 函数、相对导入添加 `.js` 扩展名(tsconfig paths cross-package imports)、jest.config.js 重命名为 .cjs；`tsc --noEmit` → 0 errors ✅；12 tests passed ✅
+- **提交**: e65d0537c, d713b85f2
+
 ### [Unreleased] vibex-proposals-20260428-sprint17 S17-E3: Epic 3 Technical Deepening — 2026-04-29
 - **S17-E3-U1 TypeScript noUncheckedIndexedAccess**: `tsconfig.json` added `"noUncheckedIndexedAccess": true` — array index access returns `T | undefined`; array-bounds guard required before use
 - **S17-E3-U3 confirmationStore null guards**: `confirmationStore.ts` add null guards for `history[]` access (goBack/goForward/jumpToSnapshot) — defensive fix for noUncheckedIndexedAccess compliance

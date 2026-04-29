@@ -1,4 +1,3 @@
-export const dynamic = "force-static";
 
 /**
  * /api/chat — AI Chat Completions API

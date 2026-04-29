@@ -6,7 +6,6 @@
  *
  * 数据来自 CI webhook，在生产环境应替换为真实数据源
  */
-export const dynamic = 'force-static';
 
 import { NextResponse } from 'next/server';
 import type { QualityMetrics } from '@/hooks/useQualityData';

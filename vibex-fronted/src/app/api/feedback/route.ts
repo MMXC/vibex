@@ -1,4 +1,3 @@
-export const dynamic = "force-static";
 
 /**
  * /api/feedback — 用户反馈提交接口

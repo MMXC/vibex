@@ -280,6 +280,28 @@
 - [x] `pnpm exec tsc --noEmit` → 0 errors ✅
 - [x] Commit 含 E18-CORE-3 ✅ (8a6ad3e2)
 
+### Story E18-QUALITY-1: 测试覆盖率提升
+
+**工时**: 8h | **验收标准**: @vibex/types 类型守卫测试覆盖率 ≥ 80%
+**状态**: ✅ DONE (commit 412827d85)
+
+#### 任务清单
+
+```
+1. [x] 为 @vibex/types guards 编写单元测试
+   - guards.ts: 19 个函数 ✅
+   - 测试用例: 84 个 (vitest) + 38 个 (Node runner) ✅
+
+2. [x] 验证测试通过
+   - vitest: 84 tests passed ✅
+   - node test-guards.mjs: 38 tests passed ✅
+```
+
+### Story E18-QUALITY-1 (test coverage)
+- [x] @vibex/types 测试覆盖率 ≥ 80% ✅
+- [x] 84 个 vitest 测试用例全部通过 ✅
+- [x] Commit 含 E18-QUALITY-1 ✅ (412827d85)
+
 ---
 
 ## 6. 依赖关系

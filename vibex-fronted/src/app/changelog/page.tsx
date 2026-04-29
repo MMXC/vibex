@@ -20,6 +20,19 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.320',
+    date: '2026-04-30',
+    changes: [
+      '📋 vibex-proposals-20260430 Sprint18 S18-E18-TSFIX-2: vibex-fronted TypeScript 严格模式修复',
+      '✅ TSFIX-2: 351 TS errors resolved (batch1 155 + batch2 196) — tsc --noEmit → 0 errors ✅',
+      '✅ unwrapField/unwrapData: 返回值添加 ! 非空断言 (91 files)',
+      '✅ css-modules.d.ts: 增强 named properties 类型定义',
+      '✅ noUncheckedIndexedAccess: array index guards (??, !, ?.)',
+      '✅ canvas/lib: BoundedContextTree/BusinessFlowTree/mermaid-parser null guards',
+    ],
+    commit: '18bda9f69',
+  },
+  {
     version: '1.0.319',
     date: '2026-04-29',
     changes: [

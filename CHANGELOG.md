@@ -1,3 +1,12 @@
+### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-TSFIX-2: vibex-fronted TypeScript 严格模式修复 — 2026-04-30
+- **S18-E18-TSFIX-2 vibex-fronted TS 修复**: `vibex-fronted/` 解决 351 个 TS 严格错误 — 批量 1(155 errors) + 批量 2(196 errors)；`tsc --noEmit` → 0 errors ✅；20 unwrappers tests passed ✅
+  - API modules: `unwrapField`/`unwrapData` 返回值添加 `!` 非空断言(91 files)
+  - `css-modules.d.ts`: 增强 named properties 类型定义解决 CSS module 导入类型安全
+  - `noUncheckedIndexedAccess` 兼容: array index access 添加 `??` 空值守卫、`!` 非空断言
+  - canvas/components: `BoundedContextTree`/`BusinessFlowTree`/`VersionHistoryPanel`/`MessageDrawer` 添加 null/undefined guards
+  - lib: `mermaid-parser.ts` 添加空值守卫(4 diagram parsers)、`format.ts`/`parser.ts` 添加 null guards
+- **提交**: 18bda9f69, c04dcccd2, a3e4aadfd
+
 ### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-TSFIX-1: mcp-server TypeScript 修复 — 2026-04-30
 - **S18-E18-TSFIX-1 mcp-server TS 修复**: `packages/mcp-server/` 解决 7 个 TS 错误 — package.json 添加 `"type": "module"` 支持 ESM、移除未使用的 `buildResponse` 函数、相对导入添加 `.js` 扩展名(tsconfig paths cross-package imports)、jest.config.js 重命名为 .cjs；`tsc --noEmit` → 0 errors ✅；12 tests passed ✅
 - **提交**: e65d0537c, d713b85f2

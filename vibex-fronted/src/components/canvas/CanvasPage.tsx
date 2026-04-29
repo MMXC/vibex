@@ -73,6 +73,7 @@ import { ShortcutPanel } from './features/ShortcutPanel';
 import { VersionHistoryPanel } from './features/VersionHistoryPanel';
 import { ImportPanel } from './features/ImportPanel';
 import { SaveIndicator } from './features/SaveIndicator';
+import { CanvasPageSkeleton } from './CanvasPageSkeleton';
 import { PhaseIndicator } from './features/PhaseIndicator';
 import { TemplateSelector } from './features/TemplateSelector';
 import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
@@ -246,6 +247,7 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
 
   // E4-U3: Auto-load project snapshot on mount
   const projectLoader = useProjectLoader({ projectId });
+  const { loading } = projectLoader;
 
   // =============================================================================
   // E6 Phase 1: Remove duplicated effects now in hooks
@@ -559,6 +561,10 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   );
 
   // === Render ===
+  if (loading) {
+    return <CanvasPageSkeleton />;
+  }
+
   return (
     <div className={containerClasses}>
       {/* E2: Initialize cross-store subscriptions */}

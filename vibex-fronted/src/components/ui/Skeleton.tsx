@@ -78,6 +78,16 @@ export function SkeletonCard() {
   );
 }
 
+/** Short-hand for a single text line skeleton */
+export function SkeletonLine({ width, height }: { width?: string | number; height?: string | number }) {
+  return <Skeleton variant="text" width={width ?? '100%'} height={height ?? 16} />;
+}
+
+/** Short-hand for a rectangular block skeleton */
+export function SkeletonBox({ width, height }: { width?: string | number; height?: string | number }) {
+  return <Skeleton variant="rect" width={width ?? 120} height={height ?? 80} />;
+}
+
 export function SkeletonList({ count = 3 }: { count?: number }) {
   return (
     <div className={styles.list}>

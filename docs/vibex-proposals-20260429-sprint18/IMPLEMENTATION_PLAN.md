@@ -223,6 +223,36 @@
 - [x] Top 3 优先级已标注 ✅
 - [x] Commit 含 E18-CORE-1 ✅ (9b4b0ea33)
 
+### Story E18-CORE-2: 画布骨架屏加载状态 (B1)
+
+**工时**: 8h | **验收标准**: 画布加载时显示骨架屏
+**状态**: ✅ DONE (commit 8af38ce53)
+
+#### 任务清单
+
+```
+1. [x] 分析 CanvasPage 加载流程
+   - useProjectLoader 返回 loading 状态 ✅
+   - CanvasPage 未使用该状态 ✅
+
+2. [x] 创建 CanvasPageSkeleton 组件
+   - 三栏布局骨架屏 ✅
+   - 使用 SkeletonLine/SkeletonBox ✅
+
+3. [x] 集成到 CanvasPage
+   - 加载中显示骨架屏 ✅
+   - 加载完成正常渲染 ✅
+
+4. [x] 验证
+   - pnpm exec tsc --noEmit → 0 errors ✅
+```
+
+### Story E18-CORE-2 (canvas skeleton)
+- [x] `src/components/canvas/CanvasPageSkeleton.tsx` 已创建 ✅
+- [x] CanvasPage 加载时显示骨架屏 ✅
+- [x] `pnpm exec tsc --noEmit` → 0 errors ✅
+- [x] Commit 含 E18-CORE-2 ✅ (8af38ce53)
+
 ---
 
 ## 6. 依赖关系

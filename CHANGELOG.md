@@ -1,3 +1,10 @@
+### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-TSFIX-3: @vibex/types 类型基础设施 — 2026-04-30
+- **S18-E18-TSFIX-3 @vibex/types 类型守卫**: `packages/types/` 新增 19 个 type predicate guards — 覆盖 CardTree(BoundedContext/Dedup)、TeamTask、Events 等领域类型；`pnpm run build` → 0 errors ✅
+  - `src/guards.ts`: 19 个 type predicate 函数 (`isCardTreeNode`/`isBoundedContext`/`isDedupResult` 等)
+  - `src/index.ts`: 导出 guards 模块
+  - 类型引用来自 `api.ts`/`store.ts`，build 一致性验证通过
+- **提交**: d6332dd3f, 126823bb1
+
 ### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-TSFIX-2: vibex-fronted TypeScript 严格模式修复 — 2026-04-30
 - **S18-E18-TSFIX-2 vibex-fronted TS 修复**: `vibex-fronted/` 解决 351 个 TS 严格错误 — 批量 1(155 errors) + 批量 2(196 errors)；`tsc --noEmit` → 0 errors ✅；20 unwrappers tests passed ✅
   - API modules: `unwrapField`/`unwrapData` 返回值添加 `!` 非空断言(91 files)

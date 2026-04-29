@@ -20,6 +20,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.321',
+    date: '2026-04-30',
+    changes: [
+      '📋 vibex-proposals-20260430 Sprint18 S18-E18-TSFIX-3: @vibex/types 类型基础设施',
+      '✅ TSFIX-3: @vibex/types 新增 19 个 type predicate guards — pnpm run build → 0 errors ✅',
+      '✅ guards.ts: CardTree/BoundedContext/Dedup/TeamTask/Events 类型守卫',
+    ],
+    commit: 'd6332dd3f',
+  },
+  {
     version: '1.0.320',
     date: '2026-04-30',
     changes: [

@@ -122,6 +122,7 @@ export async function streamBoundedContexts(
 
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
+        if (!line) continue;
         if (line.startsWith('event: ')) {
           const eventType = line.slice(7);
           const nextLine = lines[i + 1];
@@ -227,6 +228,7 @@ export async function streamDomainModels(
 
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
+        if (!line) continue;
         if (line.startsWith('event: ')) {
           const eventType = line.slice(7);
           const nextLine = lines[i + 1];
@@ -324,6 +326,7 @@ export async function streamBusinessFlow(
 
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
+        if (!line) continue;
         if (line.startsWith('event: ')) {
           const eventType = line.slice(7);
           const nextLine = lines[i + 1];

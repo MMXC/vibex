@@ -62,6 +62,7 @@ export function ClarificationCard({
   }
 
   const currentQuestion = questions[currentIndex];
+  if (!currentQuestion) return null;
   const isLastQuestion = currentIndex === questions.length - 1;
   const canSubmit = questions
     .filter((q) => q.required)

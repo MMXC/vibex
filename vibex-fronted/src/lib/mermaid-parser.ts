@@ -24,23 +24,24 @@ interface MermaidEdge {
 // Parse Mermaid graph definition
 export function parseMermaidGraph(mermaidCode: string): MermaidAST {
   const lines = mermaidCode.trim().split('\n')
-  const diagramType = lines[0].replace('graph', '').replace('TD', '').replace('LR', '').trim() || 'TB'
+  const firstLine = lines[0] ?? ''
+  const diagramType = firstLine.replace('graph', '').replace('TD', '').replace('LR', '').trim() || 'TB'
   
   const nodes: MermaidNode[] = []
   const edges: MermaidEdge[] = []
   const processedNodes = new Set<string>()
 
   for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim()
+    const line = lines[i]?.trim() ?? ''
     if (!line || line.startsWith('classDef')) continue
 
     // Match node definitions: `ID[Label]` or `ID(Label)` or `ID{Label}`
     const nodeMatch = line.match(/^(\w+)\[([^\]]+)\]|^(\w+)\(([^)]+)\)|^(\w+)\{([^}]+)\}/)
     if (nodeMatch) {
-      const id = nodeMatch[1] || nodeMatch[3] || nodeMatch[5]
-      const label = nodeMatch[2] || nodeMatch[4] || nodeMatch[6]
+      const id = nodeMatch[1] ?? nodeMatch[3] ?? nodeMatch[5] ?? ''
+      const label = nodeMatch[2] ?? nodeMatch[4] ?? nodeMatch[6] ?? ''
       
-      if (!processedNodes.has(id)) {
+      if (id && !processedNodes.has(id)) {
         nodes.push({ id, label })
         processedNodes.add(id)
       }
@@ -50,9 +51,9 @@ export function parseMermaidGraph(mermaidCode: string): MermaidAST {
     // Match edges: `A --> B` or `A -->|Label| B` or `A -.-> B`
     const edgeMatch = line.match(/^(\w+)\s*(-->?\.?>?)\|?([^|]*)\|?\s*(\w+)/)
     if (edgeMatch) {
-      const from = edgeMatch[1]
-      const label = edgeMatch[3].trim() || undefined
-      const to = edgeMatch[4]
+      const from = edgeMatch[1] ?? ''
+      const label = (edgeMatch[3] ?? '').trim() || undefined
+      const to = edgeMatch[4] ?? ''
       
       edges.push({
         id: `edge-${edges.length + 1}`,
@@ -76,12 +77,12 @@ export function parseMermaidClassDiagram(mermaidCode: string): MermaidAST {
   const processedClasses = new Set<string>()
 
   for (const line of lines) {
-    const trimmed = line.trim()
+    const trimmed = (line ?? '').trim()
     if (!trimmed || trimmed.startsWith('classDef')) continue
 
     // Match class definition: `ClassName {`
     const classMatch = trimmed.match(/^(\w+)\s*\{/)
-    if (classMatch && !processedClasses.has(classMatch[1])) {
+    if (classMatch && classMatch[1] && !processedClasses.has(classMatch[1])) {
       nodes.push({
         id: classMatch[1],
         label: classMatch[1],
@@ -93,7 +94,7 @@ export function parseMermaidClassDiagram(mermaidCode: string): MermaidAST {
 
     // Match inheritance: `ClassA --> ClassB` or `ClassA -- ClassB`
     const inheritMatch = trimmed.match(/^(\w+)\s*(--?|-+>|--+)\s*(\w+)/)
-    if (inheritMatch) {
+    if (inheritMatch && inheritMatch[1] && inheritMatch[3]) {
       edges.push({
         id: `edge-${edges.length + 1}`,
         from: inheritMatch[1],
@@ -116,19 +117,19 @@ export function parseMermaidStateDiagram(mermaidCode: string): MermaidAST {
   const processedStates = new Set<string>()
 
   for (const line of lines) {
-    const trimmed = line.trim()
+    const trimmed = (line ?? '').trim()
     if (!trimmed) continue
 
     // Match state: `[*] --> StateName` or `StateName --> [*]`
     const stateStartMatch = trimmed.match(/\[\*\]\s*-->\s*(\w+)/)
-    if (stateStartMatch && !processedStates.has(stateStartMatch[1])) {
+    if (stateStartMatch && stateStartMatch[1] && !processedStates.has(stateStartMatch[1])) {
       nodes.push({ id: stateStartMatch[1], label: stateStartMatch[1], type: 'initial' })
       processedStates.add(stateStartMatch[1])
       continue
     }
 
     const stateEndMatch = trimmed.match(/(\w+)\s*-->\s*\[\*\]/)
-    if (stateEndMatch && !processedStates.has(stateEndMatch[1])) {
+    if (stateEndMatch && stateEndMatch[1] && !processedStates.has(stateEndMatch[1])) {
       nodes.push({ id: stateEndMatch[1], label: stateEndMatch[1], type: 'final' })
       processedStates.add(stateEndMatch[1])
       continue
@@ -136,10 +137,10 @@ export function parseMermaidStateDiagram(mermaidCode: string): MermaidAST {
 
     // Match state transition: `StateA --> StateB : Event`
     const transitionMatch = trimmed.match(/^(\w+)\s*-->\s*(\w+)(?:\s*:\s*(.+))?/)
-    if (transitionMatch) {
+    if (transitionMatch && transitionMatch[1] && transitionMatch[2]) {
       const from = transitionMatch[1]
       const to = transitionMatch[2]
-      const label = transitionMatch[3]
+      const label = transitionMatch[3] ?? undefined
 
       if (!processedStates.has(from)) {
         nodes.push({ id: from, label: from, type: 'intermediate' })
@@ -277,11 +278,11 @@ export function validateMermaid(mermaidCode: string): { valid: boolean; error?: 
     
     // Check for valid diagram types
     const validTypes = ['graph', 'flowchart', 'classDiagram', 'stateDiagram', 'stateDiagram-v2']
-    const diagramType = trimmed.split('\n')[0].trim()
+    const diagramLine = trimmed.split('\n')[0]?.trim() ?? ''
     
-    const hasValidType = validTypes.some(type => diagramType.includes(type))
+    const hasValidType = validTypes.some(type => diagramLine.includes(type))
     if (!hasValidType) {
-      return { valid: false, error: `Unknown diagram type: ${diagramType}` }
+      return { valid: false, error: `Unknown diagram type: ${diagramLine}` }
     }
     
     return { valid: true }

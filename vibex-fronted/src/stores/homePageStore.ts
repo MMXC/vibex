@@ -191,6 +191,7 @@ export const useHomePageStore = create<HomePageState>()(
         }
 
         const snapshot = snapshots[index];
+        if (!snapshot) return;
         set({
           currentStep: snapshot.step,
           requirementText: snapshot.requirementText,
@@ -220,6 +221,7 @@ export const useHomePageStore = create<HomePageState>()(
         const { snapshotsIndex, snapshots } = get();
         if (snapshotsIndex > 0) {
           const prevSnapshot = snapshots[snapshotsIndex - 1];
+          if (!prevSnapshot) return;
           set({
             currentStep: prevSnapshot.step,
             requirementText: prevSnapshot.requirementText,
@@ -234,6 +236,7 @@ export const useHomePageStore = create<HomePageState>()(
         const { snapshotsIndex, snapshots } = get();
         if (snapshotsIndex < snapshots.length - 1) {
           const nextSnapshot = snapshots[snapshotsIndex + 1];
+          if (!nextSnapshot) return;
           set({
             currentStep: nextSnapshot.step,
             requirementText: nextSnapshot.requirementText,

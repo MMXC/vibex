@@ -1107,7 +1107,7 @@ export function renderSpinner(component: UIComponent, context: RenderContext): R
     large: 48,
   };
 
-  const spinnerSize = sizes[size] || sizes.medium;
+  const spinnerSize = (sizes[size] ?? sizes.medium) as number;
 
   return createElement(
     'div',
@@ -1214,7 +1214,7 @@ export function renderAvatar(component: UIComponent, context: RenderContext): Re
     large: 56,
   };
 
-  const avatarSize = sizes[size] || sizes.medium;
+  const avatarSize = (sizes[size] ?? sizes.medium) as number;
   const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
   if (src) {
@@ -1328,7 +1328,7 @@ export function renderAlert(component: UIComponent, context: RenderContext): Rea
     info: { bg: '#e6f7ff', border: context.theme.colors.info },
   };
 
-  const typeStyle = typeStyles[type] || typeStyles.info;
+  const typeStyle = typeStyles[type] ?? typeStyles.info;
 
   return createElement(
     'div',
@@ -1339,8 +1339,8 @@ export function renderAlert(component: UIComponent, context: RenderContext): Rea
       className: 'vx-alert',
       style: {
         padding: '12px 16px',
-        backgroundColor: typeStyle.bg,
-        border: `1px solid ${typeStyle.border}`,
+        backgroundColor: typeStyle?.bg,
+        border: `1px solid ${typeStyle?.border}`,
         borderLeftWidth: '4px',
         borderRadius: '4px',
         ...style,

@@ -42,7 +42,7 @@ export function MessageDrawer() {
   const aiThinking = useSessionStore((s) => s.aiThinking);
 
   const isGenerating = flowGenerating || aiThinking;
-  const statusCfg = SSE_STATUS_CONFIG[sseStatus] ?? SSE_STATUS_CONFIG.idle;
+  const statusCfg = SSE_STATUS_CONFIG[sseStatus] ?? { color: "#888", bg: "#f5f5f5", label: "未知" };
 
   const handleAbort = useCallback(() => {
     abortGeneration();

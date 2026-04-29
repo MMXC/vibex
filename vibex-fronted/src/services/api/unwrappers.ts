@@ -23,16 +23,16 @@ export function unwrapField<T>(
 ): T {
   if (response && typeof response === 'object') {
     if (field in response) {
-      return (response as Record<string, T>)[field as string];
+      return (response as Record<string, T>)[field as string] ?? null;
     }
     if ('data' in response) {
       const data = (response as { data: unknown }).data;
       if (data && typeof data === 'object' && field in data) {
-        return (data as Record<string, T>)[field as string];
+        return (data as Record<string, T>)[field as string] ?? null;
       }
     }
   }
-  return response as T;
+  return (response as T) ?? null;
 }
 
 /**

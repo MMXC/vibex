@@ -188,8 +188,8 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
         {diffResult && compareSnapshots.length === 2 ? (
           <SnapshotDiffView
             diff={diffResult}
-            labelA={compareSnapshots[0].label}
-            labelB={compareSnapshots[1].label}
+            labelA={compareSnapshots[0]?.label ?? ""}
+            labelB={compareSnapshots[1]?.label ?? ""}
             onBack={() => setDiffResult(null)}
           />
         ) : (
@@ -312,7 +312,7 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
                     type="button"
                     className={styles.compareBtn}
                     onClick={() => {
-                      const diff = computeSnapshotDiff(compareSnapshots[0], compareSnapshots[1]);
+                      const diff = computeSnapshotDiff(compareSnapshots[0]!, compareSnapshots[1]!);
                       setDiffResult(diff);
                     }}
                     data-testid="compare-snapshots-btn"

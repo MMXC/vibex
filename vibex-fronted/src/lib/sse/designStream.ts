@@ -59,7 +59,7 @@ export async function* generateDesignStream(requirement: string): AsyncGenerator
     { step: 'complete', progress: 100, message: '设计完成！' },
   ];
 
-  yield { type: 'progress', data: steps[0] };
+  yield { type: 'progress', data: steps[0]! };
 
   await new Promise((r) => setTimeout(r, 500));
   yield {
@@ -71,7 +71,7 @@ export async function* generateDesignStream(requirement: string): AsyncGenerator
     },
   };
 
-  yield { type: 'progress', data: steps[1] };
+  yield { type: 'progress', data: steps[1]! };
 
   await new Promise((r) => setTimeout(r, 300));
   yield {
@@ -83,7 +83,7 @@ export async function* generateDesignStream(requirement: string): AsyncGenerator
     },
   };
 
-  yield { type: 'progress', data: steps[2] };
+  yield { type: 'progress', data: steps[2]! };
 
   await new Promise((r) => setTimeout(r, 400));
   yield {
@@ -101,7 +101,7 @@ export async function* generateDesignStream(requirement: string): AsyncGenerator
     },
   };
 
-  yield { type: 'progress', data: steps[3] };
+  yield { type: 'progress', data: steps[3]! };
 
   await new Promise((r) => setTimeout(r, 300));
   yield {
@@ -119,7 +119,7 @@ export async function* generateDesignStream(requirement: string): AsyncGenerator
     },
   };
 
-  yield { type: 'progress', data: steps[4] };
+  yield { type: 'progress', data: steps[4]! };
 
   await new Promise((r) => setTimeout(r, 400));
   yield {
@@ -133,7 +133,7 @@ export async function* generateDesignStream(requirement: string): AsyncGenerator
     },
   };
 
-  yield { type: 'progress', data: steps[5] };
+  yield { type: 'progress', data: steps[5]! };
 
   await new Promise((r) => setTimeout(r, 300));
   yield {
@@ -146,7 +146,7 @@ export async function* generateDesignStream(requirement: string): AsyncGenerator
     },
   };
 
-  yield { type: 'progress', data: steps[6] };
+  yield { type: 'progress', data: steps[6]! };
 
   yield {
     type: 'complete',

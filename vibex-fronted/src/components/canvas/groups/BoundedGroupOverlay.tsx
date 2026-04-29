@@ -70,6 +70,7 @@ function computeOverlaps(bboxes: BoundedGroupBBox[]): Array<{ bbox: { x: number;
     for (let j = i + 1; j < bboxes.length; j++) {
       const a = bboxes[i];
       const b = bboxes[j];
+      if (!a || !b) continue;
       const intersection = getIntersection(a, b);
       if (intersection && intersection.width > 10 && intersection.height > 10) {
         overlaps.push({ bbox: intersection, groupIds: [a.groupId, b.groupId] });

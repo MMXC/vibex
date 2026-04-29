@@ -189,6 +189,7 @@ export class HistoryService<T = unknown> {
 
     this.currentIndex--;
     const entry = this.entries[this.currentIndex];
+    if (!entry) return null;
     const state = this.cloneState(entry.state);
 
     this.emit('undo', state, entry);
@@ -210,6 +211,7 @@ export class HistoryService<T = unknown> {
 
     this.currentIndex++;
     const entry = this.entries[this.currentIndex];
+    if (!entry) return null;
     const state = this.cloneState(entry.state);
 
     this.emit('redo', state, entry);
@@ -232,6 +234,7 @@ export class HistoryService<T = unknown> {
 
     this.currentIndex = index;
     const entry = this.entries[index];
+    if (!entry) return null;
     const state = this.cloneState(entry.state);
 
     const eventType: HistoryEventType = index < this.currentIndex ? 'undo' : 'redo';
@@ -287,7 +290,9 @@ export class HistoryService<T = unknown> {
     if (this.currentIndex < 0 || this.currentIndex >= this.entries.length) {
       return null;
     }
-    return this.cloneState(this.entries[this.currentIndex].state);
+    const entry = this.entries[this.currentIndex];
+    if (!entry) return null;
+    return this.cloneState(entry.state);
   }
 
   /**
@@ -297,7 +302,8 @@ export class HistoryService<T = unknown> {
     if (this.currentIndex < 0 || this.currentIndex >= this.entries.length) {
       return null;
     }
-    return this.entries[this.currentIndex];
+    const entry = this.entries[this.currentIndex];
+    return entry ?? null;
   }
 
   /**

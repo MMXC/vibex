@@ -58,7 +58,7 @@ let failureCount = 0;
 function percentile(sorted: number[], p: number): number {
   if (sorted.length === 0) return 0;
   const idx = Math.floor(sorted.length * p);
-  return sorted[Math.min(idx, sorted.length - 1)];
+  return sorted[Math.min(idx, sorted.length - 1)] ?? 0;
 }
 
 export const apiMetrics: ApiMetrics = {

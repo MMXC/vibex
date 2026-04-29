@@ -48,6 +48,7 @@ function inferBoundedEdges(contextNodes: BoundedContextNode[]): BoundedEdge[] {
     for (let j = i + 1; j < contextNodes.length; j++) {
       const a = contextNodes[i];
       const b = contextNodes[j];
+      if (!a || !b) continue;
 
       let relType: BoundedEdge['type'] = 'dependency';
 
@@ -733,6 +734,7 @@ function VirtualizedContextList({
     >
       {virtualItems.map((virtualRow) => {
         const node = contextNodes[virtualRow.index];
+        if (!node) return null;
         return (
           <div
             key={node.nodeId}

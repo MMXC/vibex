@@ -72,6 +72,7 @@ function inferFlowEdges(flowNodes: BusinessFlowNode[]): FlowEdge[] {
     for (let i = 0; i < steps.length - 1; i++) {
       const from = steps[i];
       const to = steps[i + 1];
+      if (!from || !to) continue;
       const fromType = from.type ?? 'normal';
       const toType = to.type ?? 'normal';
 
@@ -94,6 +95,7 @@ function inferFlowEdges(flowNodes: BusinessFlowNode[]): FlowEdge[] {
     // Handle explicit loop: a branch/loop step that points back
     for (let i = 0; i < steps.length; i++) {
       const step = steps[i];
+      if (!step) continue;
       if (step.type === 'loop' && step.description) {
         // Find target step by name in description (e.g., "回到: 提交订单")
         const targetStep = steps.find((s, idx) => idx < i && s.name.includes(step.description!.replace('回到: ', '')));
@@ -719,7 +721,9 @@ export function BusinessFlowTree({ readonly = false, isActive = true }: Business
       // Reorder nodes
       const newNodes = [...flowNodes];
       const [moved] = newNodes.splice(oldIndex, 1);
-      newNodes.splice(newIndex, 0, moved);
+      if (moved) {
+        newNodes.splice(newIndex, 0, moved);
+      }
       setFlowNodes(newNodes);
     },
     [flowNodes, setFlowNodes]

@@ -106,7 +106,7 @@ function aggregateEvents(events: RawEvent[]): AggregationResult {
     if (!metricName) continue;
 
     const dateStr = formatDate(ev.createdAt);
-    buckets[metricName][dateStr] = (buckets[metricName][dateStr] ?? 0) + 1;
+    buckets[metricName]![dateStr] = (buckets[metricName]![dateStr] ?? 0) + 1;
   }
 
   // Build result

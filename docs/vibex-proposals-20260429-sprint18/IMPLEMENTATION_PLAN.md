@@ -189,11 +189,39 @@
 - [x] `cd packages/types && pnpm build` → 成功 ✅
 - [ ] Guard 测试覆盖率 100% ⚪ (暂跳过，Jest 未配置)
 
+### Story E18-CORE-1: 功能增强识别
+
+**工时**: 8h | **验收标准**: backlog 文档包含 ≥ 5 个功能点，每个含 RICE 评分
+**状态**: ✅ DONE (commit 9b4b0ea33)
+
+#### 任务清单
+
+```
+1. [x] 扫描代码库和 git history
+   - 确认: CanvasPage 无骨架屏, 12 个 as any 用法, 三树缺空状态
+
+2. [x] 创建 backlog 文档
+   - 输出: docs/backlog-sprint17.md ✅
+   - 功能点数: 6 个 ✅
+
+3. [x] 每个功能点有描述/RICE 评分/验收标准
+   - B1 画布骨架屏: RICE=54 ✅
+   - B2 TS as any 消除: RICE=54 ✅
+   - B3 三树空状态: RICE=54 ✅
+   - B4 错误边界: RICE=36 ✅
+   - B5 E2E 测试补全: RICE=81 ✅
+   - B6 导出增强: RICE=24 ✅
+
+4. [x] Top 3 优先级已标注
+   - B5 (RICE=81), B1/B2/B3 (RICE=54) ✅
+```
+
 ### Story E18-CORE-1 (backlog)
-- [ ] `docs/backlog-sprint17.md` 已创建
-- [ ] backlog 包含 ≥ 5 个功能点
-- [ ] 每个功能点有: 描述、RICE 评分、验收标准草稿
-- [ ] Top 3 优先级已标注
+- [x] `docs/backlog-sprint17.md` 已创建 ✅
+- [x] backlog 包含 ≥ 5 个功能点 ✅ (6 items)
+- [x] 每个功能点有: 描述、RICE 评分、验收标准 ✅
+- [x] Top 3 优先级已标注 ✅
+- [x] Commit 含 E18-CORE-1 ✅ (9b4b0ea33)
 
 ---
 

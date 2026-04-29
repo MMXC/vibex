@@ -20,6 +20,15 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.326',
+    date: '2026-04-30',
+    changes: [
+      '📋 vibex-proposals-20260430 Sprint18 S18-E18-QUALITY-2: DX 改进（类型文档 & Migration Guide）',
+      '✅ QUALITY-2: docs/types/README.md — 类型系统文档 + E18-TSFIX-2 迁移指南',
+    ],
+    commit: '93b33afe3',
+  },
+  {
     version: '1.0.325',
     date: '2026-04-30',
     changes: [

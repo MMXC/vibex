@@ -1,3 +1,7 @@
+### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-QUALITY-2: DX 改进（类型文档 & Migration Guide）— 2026-04-30
+- **S18-E18-QUALITY-2 DX 改进**: `docs/types/README.md` — VibeX 类型系统文档（@vibex/types API 参考、CardTree/BoundedContext/Dedup/TeamTasks 类型说明、Zod schema、Migration Guide）；E18-TSFIX-2 Breaking Changes 迁移指南
+- **提交**: 93b33afe3
+
 ### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-QUALITY-1: 测试覆盖率提升 — 2026-04-30
 - **S18-E18-QUALITY-1 测试覆盖率**: `@vibex/types` 类型守卫测试覆盖率 ≥ 80% — `src/guards.test.ts` (84 vitest cases) + `test-guards.mjs` (38 Node cases) 共 122 个测试用例覆盖全部 19 个 guards；`pnpm run build` → 0 errors ✅；`node test-guards.mjs` → 38 passed ✅
 - **提交**: 412827d85

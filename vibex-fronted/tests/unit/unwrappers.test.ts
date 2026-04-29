@@ -83,7 +83,7 @@ describe('unwrappers', () => {
 
     it('should handle undefined response', () => {
       const result = unwrapField<string[]>(undefined, 'agents');
-      expect(result).toBeUndefined();
+      expect(result).toBeNull();
     });
 
     it('should handle nested data without target field', () => {

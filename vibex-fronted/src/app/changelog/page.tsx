@@ -20,6 +20,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.323',
+    date: '2026-04-30',
+    changes: [
+      '📋 vibex-proposals-20260430 Sprint18 S18-E18-CORE-2: Canvas 骨架屏加载状态',
+      '✅ CORE-2: CanvasPageSkeleton — 三列骨架屏对应 canvas 三面板布局',
+      '✅ SkeletonLine/SkeletonBox 辅助组件',
+    ],
+    commit: '8af38ce53',
+  },
+  {
     version: '1.0.322',
     date: '2026-04-30',
     changes: [

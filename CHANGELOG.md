@@ -1,3 +1,7 @@
+### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-CORE-2: Canvas 骨架屏加载状态 — 2026-04-30
+- **S18-E18-CORE-2 Canvas 骨架屏**: `CanvasPage.tsx` + `CanvasPageSkeleton.tsx` — 画布加载时显示三列骨架屏占位符（对应 BoundedContextTree/ComponentTree/BusinessFlowTree 布局）；`Skeleton.tsx` 新增 `SkeletonLine`/`SkeletonBox` 辅助组件；`tsc --noEmit` → 0 errors ✅
+- **提交**: 8af38ce53
+
 ### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-CORE-1: Sprint 1-17 Backlog 扫描与优先级排序 — 2026-04-30
 - **S18-E18-CORE-1 Backlog 扫描**: `docs/backlog-sprint17.md` — 6 个功能点 RICE 评分分析；Top 3: B5 CodeGenerator E2E(81)、B1 骨架屏(54)、B2 TS 严格模式(54)
 - **提交**: 9b4b0ea33

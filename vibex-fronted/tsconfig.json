@@ -32,8 +32,7 @@
       {
         "name": "next"
       }
-    ],
-    "noUncheckedIndexedAccess": true
+    ]
   },
   "include": [
     "next-env.d.ts",

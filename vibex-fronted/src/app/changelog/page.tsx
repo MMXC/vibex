@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.319',
+    date: '2026-04-29',
+    changes: [
+      '📋 vibex-proposals-20260428 Sprint17 S17-E3: Epic 3 Technical Deepening',
+      '✅ E3-U1: tsconfig.json — noUncheckedIndexedAccess: true (array index returns T | undefined)',
+      '✅ E3-U3: confirmationStore null guards — 3 guards for history[] access (goBack/goForward/jumpToSnapshot)',
+      '✅ E3-U4: analytics-dashboard.spec.ts — 7 E2E tests (AD-01~AD-05 + range toggle + CSV export)',
+      '⚠️ E3-U2/U3 defer: TypeScript type fixes (342 errors) → Sprint 18',
+    ],
+    commit: 'bd1fb2051',
+  },
+  {
     version: '1.0.318',
     date: '2026-04-29',
     changes: [

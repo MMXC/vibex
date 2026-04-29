@@ -1,3 +1,10 @@
+### [Unreleased] vibex-proposals-20260428-sprint17 S17-E3: Epic 3 Technical Deepening — 2026-04-29
+- **S17-E3-U1 TypeScript noUncheckedIndexedAccess**: `tsconfig.json` added `"noUncheckedIndexedAccess": true` — array index access returns `T | undefined`; array-bounds guard required before use
+- **S17-E3-U3 confirmationStore null guards**: `confirmationStore.ts` add null guards for `history[]` access (goBack/goForward/jumpToSnapshot) — defensive fix for noUncheckedIndexedAccess compliance
+- **S17-E3-U4 Analytics Dashboard E2E**: `analytics-dashboard.spec.ts` (257L) — 7 E2E tests (AD-01~AD-05 + range toggle + CSV export) covering FunnelWidget idle/loading/success/error four states; S17-P2-2 DoD compliant
+- **S17-E3-U2/U3 defer**: TypeScript type fixes deferred to Sprint 18 (342 errors from noUncheckedIndexedAccess require ~2-3d full-scopes fix)
+- 提交: bd1fb2051, 70a070b42, 679031720, 7252d6d48
+
 ### [Unreleased] vibex-proposals-20260428-sprint17 S17-E2: Epic 2 E2-U1~U3 Integration Deepening — 2026-04-29
 - **S17-E2-U1 Firebase Cold Start Benchmark**: `benchmark/firebase-benchmark.ts` — 5 iterations, threshold 500ms, exit 0 on pass; FirebaseMock cold start avg 0.02ms, isFirebaseConfigured() check avg 0.00ms
 - **S17-E2-U2 Firebase Presence E2E**: `tests/e2e/firebase-presence.spec.ts` +4 tests (S17-P1-2) — 5-user concurrent presence delay < 3s, subscribeToOthers sequential updates, avatar count check in browser context

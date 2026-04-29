@@ -20,6 +20,15 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.322',
+    date: '2026-04-30',
+    changes: [
+      '📋 vibex-proposals-20260430 Sprint18 S18-E18-CORE-1: Sprint 1-17 Backlog 扫描与优先级排序',
+      '✅ CORE-1: docs/backlog-sprint17.md — 6 个功能点 RICE 评分，Top 3: B5(81)/B1(54)/B2(54)',
+    ],
+    commit: '9b4b0ea33',
+  },
+  {
     version: '1.0.321',
     date: '2026-04-30',
     changes: [

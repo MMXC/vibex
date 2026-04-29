@@ -1,3 +1,7 @@
+### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-QUALITY-1: 测试覆盖率提升 — 2026-04-30
+- **S18-E18-QUALITY-1 测试覆盖率**: `@vibex/types` 类型守卫测试覆盖率 ≥ 80% — `src/guards.test.ts` (84 vitest cases) + `test-guards.mjs` (38 Node cases) 共 122 个测试用例覆盖全部 19 个 guards；`pnpm run build` → 0 errors ✅；`node test-guards.mjs` → 38 passed ✅
+- **提交**: 412827d85
+
 ### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-CORE-3: 三树面板空状态优化 — 2026-04-30
 - **S18-E18-CORE-3 三树空状态**: `BoundedContextTree.tsx` + `BusinessFlowTree.tsx` + `ComponentTree.tsx` — 三树组件空状态文案增强；BoundedContextTree/ BusinessFlowTree 添加手动新增按钮；ComponentTree 优化空状态引导；`tsc --noEmit` → 0 errors ✅
 - **提交**: 3f65313c6

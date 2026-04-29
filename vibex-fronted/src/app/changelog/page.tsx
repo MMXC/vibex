@@ -20,6 +20,15 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.325',
+    date: '2026-04-30',
+    changes: [
+      '📋 vibex-proposals-20260430 Sprint18 S18-E18-QUALITY-1: 测试覆盖率提升',
+      '✅ QUALITY-1: @vibex/types guards 122 tests (84 vitest + 38 Node runner)',
+    ],
+    commit: '412827d85',
+  },
+  {
     version: '1.0.324',
     date: '2026-04-30',
     changes: [

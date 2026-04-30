@@ -20,6 +20,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.331',
+    date: '2026-05-01',
+    changes: [
+      '🔧 P006-AI Agent 真实接入: OpenClawBridge spawnAgent (sessions_spawn) + 30s timeout + isRuntimeUnavailable',
+      '✅ P006 Backend: /api/agent/sessions full CRUD (POST/GET/GET:id/GET:id/status/DELETE), 40 UT passed',
+      '✅ P006 Frontend: CodingAgentService mock 全部移除，proxy 到 backend',
+      '✅ P006 Test: sessions.test.ts 13 + OpenClawBridge.test.ts 15 + agent-sessions.test.ts 12',
+    ],
+    commit: 'a0929d868, 652a267b9, 59d44ade1',
+  },
+  {
     version: '1.0.330',
     date: '2026-05-01',
     changes: [

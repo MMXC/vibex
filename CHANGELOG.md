@@ -1,4 +1,9 @@
 ### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-QUALITY-2: DX 改进（类型文档 & Migration Guide）— 2026-04-30
+### [Unreleased] vibex-proposals-20260501-sprint20 P006: AI Agent 真实接入 — 2026-05-01
+- **P006 核心基础设施**: `vibex-backend/src/services/OpenClawBridge.ts` — `spawnAgent()` 调用 OpenClaw gateway sessions_spawn API，30s AbortController 超时，`isRuntimeUnavailable()` 覆盖 ECONNREFUSED/AbortError；`vibex-backend/src/routes/agent/sessions.ts` 完整 CRUD（POST/GET/GET:id/GET:id/status/DELETE），in-memory store（50 上限）
+- **P006 Frontend 集成**: `vibex-fronted/src/app/api/agent/sessions/route.ts` — proxy 到 backend，503 当 backend 不可用；`CodingAgentService.ts` — 全部 MOCK/mockAgentCall 移除，改为真实 API 调用
+- **P006 测试覆盖**: `sessions.test.ts` 13 tests + `OpenClawBridge.test.ts` 15 tests + `agent-sessions.test.ts` 12 tests = 40 tests passed ✅
+- 提交: a0929d868, 652a267b9, 59d44ade1
 ### [Unreleased] vibex-proposals-20260501-sprint20 P003: Workbench 生产化 — 2026-05-01
 - **P003-T1 /workbench 路由**: `vibex-fronted/src/app/workbench/page.tsx` — `NEXT_PUBLIC_WORKBENCH_ENABLED` flag 控制，`!isEnabled` → `notFound()` HTTP 404 优雅降级
 - **P003-T2 Feature Flag 文档**: `docs/feature-flags.md` — 记录 `NEXT_PUBLIC_WORKBENCH_ENABLED` 开关说明

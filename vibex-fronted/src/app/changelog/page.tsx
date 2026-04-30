@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.327',
+    date: '2026-04-30',
+    changes: [
+      '🚀 S19-E19-1: Design Review MCP 集成 — API Route `/api/mcp/review_design` + 真实 API 调用 + 优雅降级 + E2E',
+      '✅ E19-1-S1: POST /api/mcp/review_design 桥接层（design compliance / a11y / reuse 内联逻辑）',
+      '✅ E19-1-S2: useDesignReview 移除 mock，改为真实 API 调用',
+      '✅ E19-1-S3: ReviewReportPanel 四状态（loading/error/empty/success）',
+      '✅ E19-1-S4: E2E 覆盖真实 API 路径和降级路径',
+    ],
+    commit: '2f493df6d',
+  },
+  {
     version: '1.0.326',
     date: '2026-04-30',
     changes: [

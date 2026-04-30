@@ -1,0 +1,333 @@
+/* WorkbenchUI.module.css */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #0f0f0f;
+  color: #e5e5e5;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid #2a2a2a;
+  background: #1a1a1a;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Session List */
+.sessionList {
+  width: 280px;
+  border-right: 1px solid #2a2a2a;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.sessionListHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.sessionCount {
+  background: #2a2a2a;
+  color: #aaa;
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 11px;
+}
+
+.sessionCard {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-bottom: 1px solid #1f1f1f;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.sessionCard:hover {
+  background: #1a1a1a;
+}
+
+.sessionCardActive {
+  background: #1a1a1a;
+  border-left: 2px solid #3b82f6;
+}
+
+.sessionHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.sessionTask {
+  font-size: 13px;
+  color: #d1d1d1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.sessionStatus {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.status_idle { background: #2a2a2a; color: #888; }
+.status_starting { background: #1e3a5f; color: #60a5fa; }
+.status_running { background: #1e3a1e; color: #4ade80; }
+.status_complete { background: #1e3a1e; color: #4ade80; }
+.status_error { background: #3a1e1e; color: #f87171; }
+.status_terminated { background: #3a3a1e; color: #fbbf24; }
+
+.sessionMeta {
+  display: flex;
+  gap: 8px;
+  font-size: 11px;
+  color: #666;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  color: #666;
+  font-size: 14px;
+  text-align: center;
+}
+
+.emptyHint {
+  font-size: 12px;
+  color: #555;
+  margin-top: 4px;
+}
+
+/* Content area */
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 80%;
+}
+
+.messageUser {
+  align-self: flex-end;
+}
+
+.messageAgent {
+  align-self: flex-start;
+}
+
+.messageRole {
+  font-size: 11px;
+  color: #666;
+  padding: 0 4px;
+}
+
+.messageContent {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.messageUser .messageContent {
+  background: #3b82f6;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.messageAgent .messageContent {
+  background: #1f1f1f;
+  color: #d1d5db;
+  border-bottom-left-radius: 4px;
+}
+
+.codeBlock {
+  margin-top: 8px;
+  background: #0d0d0d;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.codeBlockHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  background: #161616;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.codeBlockLang {
+  font-size: 11px;
+  color: #888;
+  font-family: 'Courier New', monospace;
+}
+
+.codeBlockFile {
+  font-size: 11px;
+  color: #666;
+  font-family: 'Courier New', monospace;
+}
+
+.codeBlockActions {
+  display: flex;
+  gap: 4px;
+}
+
+.codeBlockBtn {
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid #333;
+  background: transparent;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.codeBlockBtn:hover {
+  background: #2a2a2a;
+}
+
+.codeBlockBtnAccept {
+  border-color: #166534;
+  color: #4ade80;
+}
+
+.codeBlockBtnReject {
+  border-color: #991b1b;
+  color: #f87171;
+}
+
+.codeBlockPre {
+  margin: 0;
+  padding: 12px;
+  overflow-x: auto;
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+  color: #d1d5db;
+  line-height: 1.6;
+}
+
+/* Artifact viewer placeholder */
+.artifactViewer {
+  border-top: 1px solid #2a2a2a;
+  padding: 16px 24px;
+  background: #0d0d0d;
+}
+
+.artifactPlaceholder {
+  color: #555;
+  font-size: 13px;
+  text-align: center;
+  padding: 24px;
+}
+
+/* Task Input */
+.taskInputForm {
+  padding: 16px 24px;
+  border-top: 1px solid #2a2a2a;
+  background: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.taskInput {
+  width: 100%;
+  background: #0f0f0f;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #e5e5e5;
+  font-size: 14px;
+  font-family: inherit;
+  resize: none;
+  box-sizing: border-box;
+}
+
+.taskInput:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.taskInput::placeholder {
+  color: #555;
+}
+
+.taskSubmit {
+  align-self: flex-end;
+  padding: 8px 20px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.taskSubmit:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.taskSubmit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

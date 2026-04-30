@@ -46,9 +46,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev',
+    command: 'NEXT_OUTPUT_MODE=standalone pnpm run dev',
     url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     timeout: 180000, // Increase server startup timeout
     stdout: 'pipe',
     stderr: 'pipe',

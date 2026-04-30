@@ -3,11 +3,11 @@
  *
  * AI Coding Agent integration service.
  *
- * Architecture decision:
- * - U3: BLOCKED — sessions_spawn is an OpenClaw runtime tool, not callable
- *   from Next.js frontend API routes. Needs backend AI Agent HTTP API.
- * - U4/U5: Implemented as mock service for UI development + testing.
- *   Replace mockAgentCall with real sessions_spawn once backend is ready.
+ * Architecture:
+ * - All real agent calls go through the frontend API route /api/agent/sessions
+ *   which proxies to vibex-backend.
+ * - Backend calls OpenClaw sessions_spawn via OpenClawBridge.
+ * - This service provides a client-side API surface for the Workbench UI.
  */
 
 'use client';
@@ -40,92 +40,59 @@ export interface CodeBlock {
   accepted?: boolean;
 }
 
-// ==================== U3: BLOCKED (sessions_spawn) ====================
+// ── Real agent calls via API route ───────────────────────────────
 
 /**
- * U3 BLOCKED: createSession() requires sessions_spawn (OpenClaw runtime tool).
- *
- * sessions_spawn is an OpenClaw runtime function that can only be called from
- * within the OpenClaw agent context. It cannot be imported or called from
- * Next.js frontend code.
- *
- * @deprecated Blocked — needs backend AI Agent HTTP API
+ * Create a new agent session.
+ * Calls the frontend /api/agent/sessions route which proxies to vibex-backend.
  */
-export async function createSession(_context: { task: string }): Promise<string> {
-  console.warn('[CodingAgentService] U3 BLOCKED: sessions_spawn not callable from frontend. Using mock.');
-  // Fallback: use mock store
-  const store = useAgentStore.getState();
-  const sessionKey = `mock-session-${Date.now()}`;
-  store.addSession({
-    sessionKey,
-    task: _context.task,
-    status: 'complete',
-    createdAt: Date.now(),
-    messages: [
-      {
-        id: `msg-${Date.now()}`,
-        role: 'agent',
-        content: 'AI Coding Agent 集成待完成。sessions_spawn 需要后端 AI Agent HTTP 服务支持。',
-        timestamp: Date.now(),
-        codeBlocks: [],
-      },
-    ],
+export async function createSession(context: { task: string }): Promise<string> {
+  const response = await fetch('/api/agent/sessions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ task: context.task }),
   });
-  return sessionKey;
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({ error: 'Failed to create session' }));
+    throw new Error(err.error ?? 'createSession failed');
+  }
+
+  const data = await response.json() as { sessionKey: string };
+  return data.sessionKey;
 }
 
 /**
- * U3 BLOCKED: Mock getSessionStatus.
+ * Get session status from the backend.
  */
 export async function getSessionStatus(sessionKey: string): Promise<AgentSessionStatus> {
-  const store = useAgentStore.getState();
-  const session = store.sessions.find((s) => s.sessionKey === sessionKey);
-  return session?.status ?? 'error';
+  try {
+    const response = await fetch(`/api/agent/sessions/${encodeURIComponent(sessionKey)}/status`, {
+      signal: AbortSignal.timeout(5000),
+    });
+
+    if (!response.ok) {
+      return 'error';
+    }
+
+    const data = await response.json() as { status: string };
+    return data.status as AgentSessionStatus;
+  } catch {
+    return 'error';
+  }
 }
 
 /**
- * U3 BLOCKED: Mock terminateSession.
+ * Terminate a session.
  */
 export async function terminateSession(sessionKey: string): Promise<void> {
-  const store = useAgentStore.getState();
-  store.updateSession(sessionKey, { status: 'terminated' });
+  await fetch(`/api/agent/sessions/${encodeURIComponent(sessionKey)}`, {
+    method: 'DELETE',
+    signal: AbortSignal.timeout(5000),
+  });
 }
 
-// ==================== U4/U5: Mock Agent (full implementation) ====================
-
-/**
- * Simulated agent response for UI development and testing.
- * Replace with real sessions_spawn when backend is available.
- */
-export async function mockAgentCall(task: string): Promise<AgentMessage[]> {
-  // Simulate delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
-
-  const sessionKey = `mock-${Date.now()}`;
-
-  return [
-    {
-      id: `${sessionKey}-1`,
-      role: 'agent',
-      content: `已收到任务: ${task}\n\n正在分析代码上下文...`,
-      timestamp: Date.now(),
-    },
-    {
-      id: `${sessionKey}-2`,
-      role: 'agent',
-      content: '以下是建议的代码修改：',
-      timestamp: Date.now() + 1000,
-      codeBlocks: [
-        {
-          language: 'typescript',
-          code: `// TODO: Replace with real agent code\nexport function placeholder() {\n  console.log('AI Coding Agent integration pending');\n}`,
-          filePath: 'src/services/agent/placeholder.ts',
-          accepted: undefined,
-        },
-      ],
-    },
-  ];
-}
+// ── Code block management ─────────────────────────────────────────
 
 /**
  * Accept a code block suggestion.
@@ -138,7 +105,6 @@ export function acceptCodeBlock(sessionKey: string, messageId: string, blockInde
   const message = session.messages.find((m) => m.id === messageId);
   if (message?.codeBlocks?.[blockIndex]) {
     message.codeBlocks[blockIndex].accepted = true;
-    // Trigger store update
     store.updateSession(sessionKey, { messages: [...session.messages] });
   }
 }

@@ -57,6 +57,7 @@ import templates from './routes/templates';
 import uiNodes from './routes/ui-nodes';
 import diagnosis from './routes/diagnosis';
 import plan from './routes/plan';
+import agentSessions from './routes/agent/sessions';
 
 // API Gateway v1 路由
 import v1 from './routes/v1/gateway';
@@ -154,6 +155,7 @@ app.route('/api/templates', templates);
 app.route('/api/ui-nodes', uiNodes);
 app.route('/api/diagnosis', diagnosis);
 app.route('/api/plan', plan);
+app.route('/api/agent/sessions', agentSessions);
 
 // API Gateway v1 路由 (支持认证、限流、日志中间件)
 app.route('/v1', v1);

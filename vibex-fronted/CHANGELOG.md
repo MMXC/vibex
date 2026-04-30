@@ -6,9 +6,10 @@
 
 - **E19-1-S1: API Route 桥接层**: 新建 `POST /api/mcp/review_design`，内联 design compliance / a11y / component reuse 三模块逻辑；400 canvasId 校验；500 统一错误响应
 - **E19-1-S2: Hook 真实 API 调用**: `useDesignReview` 移除 `setTimeout(1500)` mock；改为 fetch `/api/mcp/review_design`；DesignReviewReport → DesignReviewResult 适配层
+  + 测试: 9 UT (AS2.1–AS2.6) 覆盖真实 API 调用 + 适配层映射 + 错误状态；ReviewReportPanel 10 UT 全部通过
 - **E19-1-S3: 优雅降级**: ReviewReportPanel 四状态（loading/error/empty/success）；加载中骨架屏 + loading spinner；网络错误「请检查网络后重试」；服务端错误「请稍后再试」+ 重试按钮；空状态引导文案
 - **E19-1-S4: E2E 真实路径测试**: TC1 Ctrl+Shift+R 触发 POST 验证；TC2 非 mock 数据验证；TC3/TC4 降级状态 Playwright 覆盖
-- 提交: 2f493df6d
+  提交: 2f493df6d (feat), 434c8e99d (test)
 
 ---
 

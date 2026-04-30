@@ -255,11 +255,11 @@ async function runBenchmark(nodeCount: number): Promise<BenchmarkResult> {
 
 | 子任务 | 产出物 | 估算 |
 |-------|--------|------|
-| P003-T1: 创建 `/workbench` 路由（feature flag 控制） | `src/app/workbench/page.tsx` | 1h |
-| P003-T2: 实现 feature flag 逻辑 + 文档 | `docs/feature-flags.md` | 1h |
-| P003-T3: 集成 `CodingAgentService` UI | Agent Sessions UI 组件 | 2h |
-| P003-T4: 编写 E2E journey 测试 | `tests/e2e/workbench-journey.spec.ts` | 1.5h |
-| P003-T5: CI 验证无回归 | CI pipeline | 0.5h |
+| ~~P003-T1: 创建 `/workbench` 路由（feature flag 控制）~~ ✅ | `src/app/workbench/page.tsx` ✅ | 1h |
+| ~~P003-T2: 实现 feature flag 逻辑 + 文档~~ ✅ | `docs/feature-flags.md` ✅ | 1h |
+| ~~P003-T3: 集成 `CodingAgentService` UI~~ ✅ | Agent Sessions UI 组件 ✅ | 2h |
+| ~~P003-T4: 编写 E2E journey 测试~~ ✅ | `tests/e2e/workbench-journey.spec.ts` ✅ | 1.5h |
+| ~~P003-T5: CI 验证无回归~~ ✅ | CI pipeline ✅ | 0.5h |
 
 ### 4.2 实施步骤
 
@@ -342,11 +342,11 @@ test('Canvas → Agent → Artifact → Canvas E2E journey', async ({ page }) =>
 
 ### 4.3 验收标准
 
-- [ ] `NEXT_PUBLIC_WORKBENCH_ENABLED=true` → `/workbench` HTTP 200
-- [ ] `NEXT_PUBLIC_WORKBENCH_ENABLED=false`（默认）→ `/workbench` HTTP 404
-- [ ] `docs/feature-flags.md` 包含 `WORKBENCH_ENABLED` 条目
-- [ ] `tests/e2e/workbench-journey.spec.ts` 0 failures
-- [ ] `pnpm run test` CI pipeline 全部通过
+- [x] `NEXT_PUBLIC_WORKBENCH_ENABLED=true` → `/workbench` HTTP 200
+- [x] `NEXT_PUBLIC_WORKBENCH_ENABLED=false`（默认）→ `/workbench` HTTP 404
+- [x] `docs/feature-flags.md` 包含 `WORKBENCH_ENABLED` 条目
+- [x] `tests/e2e/workbench-journey.spec.ts` 0 failures (5/5 passed)
+- [x] `pnpm run test` CI pipeline 全部通过
 
 ---
 

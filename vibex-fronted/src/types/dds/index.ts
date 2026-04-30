@@ -125,6 +125,13 @@ export interface DDSCanvasStoreState {
   selectedCardIds: string[];
   selectCard: (id: string) => void;
   deselectAll: () => void;
+  selectedCardSnapshot: {
+    cardId: string;
+    cardData: DDSCard;
+    wasVisible: boolean;
+  } | null;
+  setSelectedCardSnapshot: (snapshot: { cardId: string; cardData: DDSCard; wasVisible: boolean } | null) => void;
+  updateCardVisibility: (wasVisible: boolean) => void;
 
   // UI 状态
   isFullscreen: boolean;

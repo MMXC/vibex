@@ -49,6 +49,11 @@ const initialState = {
   chatHistory: [],
   isGenerating: false,
   selectedCardIds: [],
+  selectedCardSnapshot: null as {
+    cardId: string;
+    cardData: DDSCard;
+    wasVisible: boolean;
+  } | null,
   isFullscreen: false,
   isDrawerOpen: false,
 };
@@ -105,7 +110,18 @@ export const useDDSCanvasStore = create<DDSCanvasStoreState>((set) => ({
         : [...state.selectedCardIds, id],
     })),
 
-  deselectAll: () => set({ selectedCardIds: [] }),
+  deselectAll: () =>
+    set({ selectedCardIds: [], selectedCardSnapshot: null }),
+
+  setSelectedCardSnapshot: (snapshot) =>
+    set({ selectedCardSnapshot: snapshot }),
+
+  updateCardVisibility: (wasVisible: boolean) =>
+    set((state) =>
+      state.selectedCardSnapshot
+        ? { selectedCardSnapshot: { ...state.selectedCardSnapshot, wasVisible } }
+        : {}
+    ),
 
   // ---- UI ----
 

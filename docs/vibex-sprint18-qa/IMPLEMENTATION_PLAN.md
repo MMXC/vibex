@@ -30,7 +30,7 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| U1 | mcp-server TS 错误验证 | ⬜ | — | TS 编译 0 errors；CHANGELOG 含 E18-TSFIX-1；git log 可追溯 |
+| U1 | mcp-server TS 错误验证 | ✅| | — | TS 编译 0 errors；CHANGELOG 含 E18-TSFIX-1；git log 可追溯 |
 
 ### U1 详细说明
 
@@ -66,7 +66,7 @@ git rev-parse e65d0537c > /dev/null 2>&1 && echo "SHA e65d0537c EXISTS" || echo 
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| U2 | vibex-fronted TS 错误验证 | ⬜ | — | TS 编译 0 errors；CHANGELOG 含 E18-TSFIX-2；unwrappers 测试通过 |
+| U2 | vibex-fronted TS 错误验证 | ✅| | — | TS 编译 0 errors；CHANGELOG 含 E18-TSFIX-2；unwrappers 测试通过 |
 
 ### U2 详细说明
 
@@ -87,7 +87,7 @@ git rev-parse e65d0537c > /dev/null 2>&1 && echo "SHA e65d0537c EXISTS" || echo 
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| U3 | @vibex/types guards 测试验证 | ⬜ | — | node test-guards.mjs ≥ 38 passed；vitest guards.test.ts 通过；guards ≥ 19 个；guards 导出完整 |
+| U3 | @vibex/types guards 测试验证 | ✅ | — | node test-guards.mjs ≥ 38 passed；vitest guards.test.ts 通过；guards ≥ 19 个；guards 导出完整 |
 
 ### U3 详细说明
 
@@ -110,7 +110,7 @@ git rev-parse e65d0537c > /dev/null 2>&1 && echo "SHA e65d0537c EXISTS" || echo 
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| U4 | Backlog 文档验证 | ⬜ | — | backlog 文档存在；含 ≥5 个功能点；每个有 RICE 评分；CHANGELOG 含 E18-CORE-1 |
+| U4 | Backlog 文档验证 | ✅ | — | backlog 文档存在；含 ≥5 个功能点；每个有 RICE 评分；CHANGELOG 含 E18-CORE-1 |
 
 ### U4 详细说明
 
@@ -130,7 +130,7 @@ git rev-parse e65d0537c > /dev/null 2>&1 && echo "SHA e65d0537c EXISTS" || echo 
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| U5 | Canvas 骨架屏验证 | ⬜ | — | CanvasPageSkeleton.tsx 存在；Skeleton.tsx 存在；CanvasPage.tsx 集成骨架屏；三栏布局骨架屏；CHANGELOG 含 E18-CORE-2 |
+| U5 | Canvas 骨架屏验证 | ✅ | — | CanvasPageSkeleton.tsx 存在；Skeleton.tsx 存在；CanvasPage.tsx 集成骨架屏；三栏布局骨架屏；CHANGELOG 含 E18-CORE-2 |
 
 ### U5 详细说明
 
@@ -159,7 +159,7 @@ git rev-parse e65d0537c > /dev/null 2>&1 && echo "SHA e65d0537c EXISTS" || echo 
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| U6 | 三树空状态验证 | ⬜ | — | BoundedContextTree 含空状态；ComponentTree 含空状态；BusinessFlowTree 含空状态；specs/e18-core-3-tree-empty-states.md 完整 |
+| U6 | 三树空状态验证 | ✅ | — | BoundedContextTree 含空状态；ComponentTree 含空状态；BusinessFlowTree 含空状态；specs/e18-core-3-tree-empty-states.md 完整 |
 
 ### U6 详细说明
 
@@ -184,7 +184,7 @@ git rev-parse e65d0537c > /dev/null 2>&1 && echo "SHA e65d0537c EXISTS" || echo 
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| U7 | 测试覆盖率验证 | ⬜ | — | vitest guards.test.ts 通过；node test-guards.mjs 通过；guard 测试用例数 ≥ 84；CHANGELOG 含 E18-QUALITY-1 |
+| U7 | 测试覆盖率验证 | ✅ | — | vitest guards.test.ts 通过；node test-guards.mjs 通过；guard 测试用例数 ≥ 84；CHANGELOG 含 E18-QUALITY-1 |
 
 ### U7 详细说明
 
@@ -204,7 +204,7 @@ git rev-parse e65d0537c > /dev/null 2>&1 && echo "SHA e65d0537c EXISTS" || echo 
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| U8 | DX 改进验证 | ⬜ | — | tsconfig strict === true；types/README.md 存在；migration guide 存在；CHANGELOG 含 E18-QUALITY-2 |
+| U8 | DX 改进验证 | ✅ | — | tsconfig strict === true；types/README.md 存在；migration guide 存在；CHANGELOG 含 E18-QUALITY-2 |
 
 ### U8 详细说明
 

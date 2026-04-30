@@ -56,10 +56,10 @@ S1(API Route) → S2(Hook) → S3(UI降级) → S4(E2E)
 2. 添加 TC1（真实 API 调用）、TC2（非假数据验证）、TC3（降级路径）
 
 ## 验收标准
-- [ ] `tsc --noEmit` 在 frontend 目录 0 errors
-- [ ] `grep -r "setTimeout.*1500\|// Mock\|simulated" src/hooks/useDesignReview` → 0 matches
-- [ ] `pnpm run build` 0 errors
-- [ ] E2E 测试通过
+- [x] `tsc --noEmit` 在 frontend 目录 0 errors ✅
+- [x] `grep -r "setTimeout.*1500\|// Mock\|simulated" src/hooks/useDesignReview` → 0 matches ✅
+- [x] `pnpm run build` 0 errors ✅ (TypeScript编译通过)
+- [x] E2E 测试通过 ✅ (4 tests covering real API path + graceful degradation)
 
 ## 回滚计划
 - 如 API Route 失败，回退到 hook 中的 mock（保留当前行为）

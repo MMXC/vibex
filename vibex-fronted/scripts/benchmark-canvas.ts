@@ -3,6 +3,10 @@
  *
  * Measures render time for N nodes, outputs JSON {nodeCount, p50, p95, p99}.
  *
+ * ⚠️  Synthetic benchmark (CPU string operations) since Node.js has no real DOM.
+ *    This measures the overhead of data processing, not actual DOM rendering.
+ *    For true DOM performance measurement, use Playwright E2E tests (handled by QA).
+ *
  * Usage: npx ts-node scripts/benchmark-canvas.ts [--nodes=N] [--iterations=M]
  */
 
@@ -29,7 +33,9 @@ function generateCards(count: number): SyntheticCard[] {
   }));
 }
 
-// Simulated render time measurement (DOM measurement via synthetic timing)
+// Simulated render time measurement using CPU string operations.
+// Note: This does NOT measure real DOM rendering (no browser context in Node.js).
+// For actual DOM performance, use Playwright E2E tests in the QA layer.
 function measureRender(cards: SyntheticCard[]): number {
   const start = performance.now();
   // Simulate the work: for each card, do some string interpolation + property access

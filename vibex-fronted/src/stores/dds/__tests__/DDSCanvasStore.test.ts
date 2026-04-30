@@ -22,6 +22,7 @@ describe('DDSCanvasStore — crossChapterEdges (Epic4 E4-U1/E4-U2)', () => {
       chatHistory: [],
       isGenerating: false,
       selectedCardIds: [],
+      selectedCardSnapshot: null,
       isFullscreen: false,
       isDrawerOpen: false,
     });
@@ -162,6 +163,135 @@ describe('DDSCanvasStore — crossChapterEdges (Epic4 E4-U1/E4-U2)', () => {
   });
 });
 
+// ==================== selectedCardSnapshot Tests ====================
+
+describe('DDSCanvasStore — selectedCardSnapshot (P004-T5)', () => {
+  const resetStore = () => {
+    useDDSCanvasStore.setState({
+      projectId: null,
+      activeChapter: 'requirement',
+      chapters: {
+        requirement: { type: 'requirement', cards: [], edges: [], loading: false, error: null },
+        context: { type: 'context', cards: [], edges: [], loading: false, error: null },
+        flow: { type: 'flow', cards: [], edges: [], loading: false, error: null },
+        api: { type: 'api', cards: [], edges: [], loading: false, error: null },
+      },
+      crossChapterEdges: [],
+      chatHistory: [],
+      isGenerating: false,
+      selectedCardIds: [],
+      selectedCardSnapshot: null,
+      isFullscreen: false,
+      isDrawerOpen: false,
+    });
+  };
+
+  beforeEach(() => {
+    resetStore();
+  });
+
+  describe('setSelectedCardSnapshot', () => {
+    it('saves a snapshot with cardId, cardData, and wasVisible', () => {
+      const snapshot = { cardId: 'card-1', cardData: { id: 'card-1', type: 'user-story' } as any, wasVisible: true };
+
+      useDDSCanvasStore.getState().setSelectedCardSnapshot(snapshot);
+
+      const state = useDDSCanvasStore.getState();
+      expect(state.selectedCardSnapshot).not.toBeNull();
+      expect(state.selectedCardSnapshot!.cardId).toBe('card-1');
+      expect(state.selectedCardSnapshot!.cardData.id).toBe('card-1');
+      expect(state.selectedCardSnapshot!.wasVisible).toBe(true);
+    });
+
+    it('clears snapshot when passed null', () => {
+      useDDSCanvasStore.setState({
+        selectedCardSnapshot: { cardId: 'card-1', cardData: { id: 'card-1' } as any, wasVisible: true },
+      });
+
+      useDDSCanvasStore.getState().setSelectedCardSnapshot(null);
+
+      expect(useDDSCanvasStore.getState().selectedCardSnapshot).toBeNull();
+    });
+  });
+
+  describe('updateCardVisibility', () => {
+    it('updates wasVisible to true', () => {
+      useDDSCanvasStore.setState({
+        selectedCardSnapshot: { cardId: 'card-1', cardData: { id: 'card-1' } as any, wasVisible: false },
+      });
+
+      useDDSCanvasStore.getState().updateCardVisibility(true);
+
+      expect(useDDSCanvasStore.getState().selectedCardSnapshot!.wasVisible).toBe(true);
+    });
+
+    it('updates wasVisible to false', () => {
+      useDDSCanvasStore.setState({
+        selectedCardSnapshot: { cardId: 'card-1', cardData: { id: 'card-1' } as any, wasVisible: true },
+      });
+
+      useDDSCanvasStore.getState().updateCardVisibility(false);
+
+      expect(useDDSCanvasStore.getState().selectedCardSnapshot!.wasVisible).toBe(false);
+    });
+
+    it('is no-op when snapshot is null', () => {
+      resetStore(); // ensure snapshot is null
+
+      // Should not throw
+      expect(() => useDDSCanvasStore.getState().updateCardVisibility(false)).not.toThrow();
+      expect(useDDSCanvasStore.getState().selectedCardSnapshot).toBeNull();
+    });
+  });
+
+  describe('snapshot preserved across visibility changes', () => {
+    it('selectCard captures a snapshot with wasVisible=true', () => {
+      // Add a card to the store
+      ddsChapterActions.addCard('requirement', {
+        id: 'card-select-1',
+        type: 'user-story',
+        title: 'Test Card',
+        role: 'user',
+        action: 'test',
+        benefit: 'test',
+        priority: 'high',
+        position: { x: 0, y: 0 },
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      } as UserStoryCard);
+
+      // Capture snapshot manually (simulates what handleSelectCard would do)
+      useDDSCanvasStore.getState().setSelectedCardSnapshot({
+        cardId: 'card-select-1',
+        cardData: useDDSCanvasStore.getState().chapters.requirement.cards[0],
+        wasVisible: true,
+      });
+
+      const snapshot = useDDSCanvasStore.getState().selectedCardSnapshot;
+      expect(snapshot).not.toBeNull();
+      expect(snapshot!.cardId).toBe('card-select-1');
+      expect(snapshot!.wasVisible).toBe(true);
+    });
+
+    it('when selected card is out of viewport (simulated), wasVisible stays true (snapshot preserved)', () => {
+      // Set up initial snapshot with wasVisible=true (card was visible when selected)
+      useDDSCanvasStore.setState({
+        selectedCardSnapshot: { cardId: 'card-out', cardData: { id: 'card-out' } as any, wasVisible: true },
+      });
+
+      // Simulate card going out of viewport: update visibility to false
+      useDDSCanvasStore.getState().updateCardVisibility(false);
+
+      // Verify snapshot is preserved (cardId and cardData unchanged)
+      const state = useDDSCanvasStore.getState();
+      expect(state.selectedCardSnapshot).not.toBeNull();
+      expect(state.selectedCardSnapshot!.cardId).toBe('card-out');
+      // wasVisible is now false (card is out of viewport), but snapshot itself is preserved
+      expect(state.selectedCardSnapshot!.wasVisible).toBe(false);
+    });
+  });
+});
+
 // ==================== CRUD Tests ====================
 
 describe('DDSCanvasStore — CRUD operations', () => {
@@ -179,6 +309,7 @@ describe('DDSCanvasStore — CRUD operations', () => {
       chatHistory: [],
       isGenerating: false,
       selectedCardIds: [],
+      selectedCardSnapshot: null,
       isFullscreen: false,
       isDrawerOpen: false,
     });

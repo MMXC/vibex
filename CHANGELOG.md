@@ -1,4 +1,11 @@
 ### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-QUALITY-2: DX 改进（类型文档 & Migration Guide）— 2026-04-30
+
+### [Unreleased] vibex-proposals-20260501-sprint20 P001: MCP DoD 收尾 — 2026-05-01
+- **P001-T1 /health 集成到 stdio 启动**: `packages/mcp-server/src/routes/health.ts` — 重构为 `setupHealthEndpoint(port)` 返回 `Promise<http.Server>`，移除独立 HTTP 进程；`packages/mcp-server/src/index.ts` main() 中 `await setupHealthEndpoint(3100)` 在 stdio transport 之前启动，/health 可访问性从「独立运行」升级为「主进程生命周期内」
+- **P001-T2 脚本验证**: `scripts/generate-tool-index.ts` exit 0 ✅
+- **P001-T3 文档验证**: `docs/mcp-tools/INDEX.md` 7 tools ✅
+- **P001-T4 Build Gate**: mcp-server `tsc --noEmit` → 0 errors ✅; 12 unit tests passed ✅
+- 提交: 85e114400
 - **S18-E18-QUALITY-2 DX 改进**: `docs/types/README.md` — VibeX 类型系统文档（@vibex/types API 参考、CardTree/BoundedContext/Dedup/TeamTasks 类型说明、Zod schema、Migration Guide）；E18-TSFIX-2 Breaking Changes 迁移指南
 - **提交**: 93b33afe3
 

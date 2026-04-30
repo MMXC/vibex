@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.328',
+    date: '2026-05-01',
+    changes: [
+      '🔧 P001-MCP-DoD 收尾: /health 集成到 stdio 启动序列（setupHealthEndpoint 返回 Promise，错误通过 reject 传递，不单独 process.exit）',
+      '✅ P001-T1: main() 中 await setupHealthEndpoint(3100) 先于 stdio transport，/health 在主进程生命周期内',
+      '✅ P001-T2: generate-tool-index.ts exit 0',
+      '✅ P001-T3: INDEX.md 7 tools documented',
+      '✅ P001-T4: mcp-server tsc --noEmit 0 errors, 12 unit tests passed',
+    ],
+    commit: '85e114400',
+  },
+  {
     version: '1.0.327',
     date: '2026-04-30',
     changes: [

@@ -356,13 +356,13 @@ test('Canvas → Agent → Artifact → Canvas E2E journey', async ({ page }) =>
 
 | 子任务 | 产出物 | 估算 |
 |-------|--------|------|
-| P006-T1: 创建 `POST /api/agent/sessions` 路由 | `vibex-backend/src/routes/agent/sessions.ts` | 2h |
-| P006-T2: 创建 `GET /api/agent/sessions/:id/status` 路由 | 同上 | 1h |
-| P006-T3: 创建 `DELETE /api/agent/sessions/:id` 路由 | 同上 | 1h |
-| P006-T4: 集成 OpenClaw `sessions_spawn` 工具 | `CodingAgentService._spawnRealAgent()` | 2h |
-| P006-T5: 移除 mock 代码 | `CodingAgentService.ts` 清理 | 0.5h |
-| P006-T6: 错误处理（timeout、ECONNREFUSED）| 降级策略 | 1h |
-| P006-T7: Backend 日志验证 | 日志断言测试 | 0.5h |
+| ~~P006-T1: 创建 `POST /api/agent/sessions` 路由~~ ✅ | `vibex-backend/src/routes/agent/sessions.ts` ✅ | 2h |
+| ~~P006-T2: 创建 `GET /api/agent/sessions/:id/status` 路由~~ ✅ | 同上 ✅ | 1h |
+| ~~P006-T3: 创建 `DELETE /api/agent/sessions/:id` 路由~~ ✅ | 同上 ✅ | 1h |
+| ~~P006-T4: 集成 OpenClaw `sessions_spawn` 工具~~ ✅ | `OpenClawBridge.ts` ✅ | 2h |
+| ~~P006-T5: 移除 mock 代码~~ ✅ | `CodingAgentService.ts` 清理 ✅ | 0.5h |
+| ~~P006-T6: 错误处理（timeout、ECONNREFUSED）~~ ✅ | 降级策略 ✅ | 1h |
+| ~~P006-T7: Backend 日志验证~~ ✅ | 日志断言测试 ✅ | 0.5h |
 
 ### 5.2 实施步骤
 
@@ -508,13 +508,13 @@ grep -r "MOCK\|mockAgentCall" src/services/CodingAgentService.ts
 
 ### 5.3 验收标准
 
-- [ ] `POST /api/agent/sessions` → 201 + `sessionId`
-- [ ] `GET /api/agent/sessions/:id/status` → 200 + 状态
-- [ ] `DELETE /api/agent/sessions/:id` → 204
-- [ ] 超时/网络错误 → `{error, code}` 结构化响应
-- [ ] Backend 日志包含 `sessions_spawn called`，无 `ECONNREFUSED`
-- [ ] `CodingAgentService.ts` 无 `MOCK` / `mockAgentCall`
-- [ ] E2E: agent result 写入 Canvas artifact node
+- [x] `POST /api/agent/sessions` → 201 + `sessionId`
+- [x] `GET /api/agent/sessions/:id/status` → 200 + 状态
+- [x] `DELETE /api/agent/sessions/:id` → 204
+- [x] 超时/网络错误 → `{error, code}` 结构化响应
+- [x] Backend 日志包含 `sessions_spawn called`，无 `ECONNREFUSED`
+- [x] `CodingAgentService.ts` 无 `MOCK` / `mockAgentCall`
+- [ ] E2E: agent result 写入 Canvas artifact node (需 Playwright QA 验证)
 
 ---
 

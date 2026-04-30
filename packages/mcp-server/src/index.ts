@@ -10,6 +10,7 @@ import { logger } from './logger.js'
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { setupHealthEndpoint } from './routes/health.js';
 
 // E7-S1: Read version from package.json
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -60,6 +61,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 });
 
 async function main() {
+  // P001-T1: Start health endpoint before stdio transport
+  const HEALTH_PORT = 3100;
+  await setupHealthEndpoint(HEALTH_PORT);
+  console.log('[mcp] /health ready on :' + HEALTH_PORT);
+
+  // P001-T1: Now connect stdio transport
   const transport = new StdioServerTransport();
   await server.connect(transport);
   logger.info('mcp_server_ready', { transport: 'stdio' })

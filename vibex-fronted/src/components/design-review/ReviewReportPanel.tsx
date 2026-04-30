@@ -9,6 +9,7 @@
  * - Reuse: Code reuse recommendations
  *
  * Cyberpunk glassmorphism styling consistent with DDS design system.
+ * E19-1-S3: Graceful degradation states (loading/error/empty/retry)
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -120,23 +121,46 @@ export function ReviewReportPanel({ autoOpen = false }: ReviewReportPanelProps) 
           </button>
         </div>
 
-        {/* Loading state */}
+        {/* E19-1-S3: Loading state */}
         {isLoading && (
           <div className={styles.loading} data-testid="panel-loading">
             <div className={styles.spinner} aria-label="Analyzing design..." />
-            <p>Analyzing design compliance...</p>
+            <p data-testid="review-loading">Analyzing design compliance...</p>
           </div>
         )}
 
-        {/* Error state */}
-        {error && (
+        {/* E19-1-S3: Error state with retry */}
+        {error && !isLoading && (
           <div className={styles.errorState} role="alert" data-testid="panel-error">
-            <p>{error}</p>
+            <div className={styles.errorIcon}>⚠</div>
+            <p className={styles.errorMessage} data-testid="panel-error-message">
+              {error.includes('500') || error.includes('fetch')
+                ? '设计评审暂时不可用，请稍后再试'
+                : '网络连接异常，请检查网络后重试'}
+            </p>
+            <button
+              type="button"
+              className={styles.retryButton}
+              onClick={() => void runReview()}
+              data-testid="panel-retry"
+              aria-label="Retry design review"
+            >
+              重试
+            </button>
+          </div>
+        )}
+
+        {/* E19-1-S3: Empty state */}
+        {!result && !isLoading && !error && (
+          <div className={styles.emptyState} data-testid="panel-empty">
+            <div className={styles.emptyIcon}>📋</div>
+            <p className={styles.emptyMessage}>暂无评审结果</p>
+            <p className={styles.emptyHint}>按 Ctrl+Shift+R 触发评审</p>
           </div>
         )}
 
         {/* Results */}
-        {result && !isLoading && (
+        {result && !isLoading && !error && (
           <>
             {/* Tab navigation */}
             <div className={styles.tabs} role="tablist" aria-label="Review categories" data-testid="panel-tabs">
@@ -160,7 +184,7 @@ export function ReviewReportPanel({ autoOpen = false }: ReviewReportPanelProps) 
             {/* Tab content */}
             <div className={styles.tabContent} role="tabpanel" id={`tabpanel-${activeTab}`} data-testid="tab-content">
               {activeTab === 'compliance' && (
-                <div className={styles.issueList}>
+                <div className={styles.issueList} data-testid="review-compliance-list">
                   {result.compliance.length === 0 ? (
                     <p className={styles.emptyState} data-testid="empty-compliance">No compliance issues found.</p>
                   ) : (
@@ -169,7 +193,7 @@ export function ReviewReportPanel({ autoOpen = false }: ReviewReportPanelProps) 
                 </div>
               )}
               {activeTab === 'accessibility' && (
-                <div className={styles.issueList}>
+                <div className={styles.issueList} data-testid="review-accessibility-list">
                   {result.accessibility.length === 0 ? (
                     <p className={styles.emptyState} data-testid="empty-accessibility">No accessibility issues found.</p>
                   ) : (
@@ -178,7 +202,7 @@ export function ReviewReportPanel({ autoOpen = false }: ReviewReportPanelProps) 
                 </div>
               )}
               {activeTab === 'reuse' && (
-                <div className={styles.recList}>
+                <div className={styles.recList} data-testid="review-reuse-list">
                   {result.reuse.length === 0 ? (
                     <p className={styles.emptyState} data-testid="empty-reuse">No reuse recommendations.</p>
                   ) : (

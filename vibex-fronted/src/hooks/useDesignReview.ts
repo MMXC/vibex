@@ -22,27 +22,108 @@ export interface DesignReviewResult {
   reuse: DesignReviewRecommendation[];
 }
 
-// Mock implementation — replace with real MCP call when review_design tool is available
-async function callReviewDesignMCP(_figmaUrl: string, _designTokens: unknown[]): Promise<DesignReviewResult> {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 1500));
-  // Return mock data
+interface DesignReviewReport {
+  canvasId: string;
+  summary: {
+    compliance: 'pass' | 'warn' | 'fail';
+    a11y: 'pass' | 'warn' | 'fail';
+    reuseCandidates: number;
+    totalNodes: number;
+  };
+  designCompliance?: {
+    colors: boolean;
+    colorIssues: unknown[];
+    typography: boolean;
+    typographyIssues: unknown[];
+    spacing: boolean;
+    spacingIssues: unknown[];
+  };
+  a11y?: {
+    passed: boolean;
+    critical: number;
+    high: number;
+    medium: number;
+    low: number;
+    issues: unknown[];
+  };
+  reuse?: {
+    candidatesAboveThreshold: number;
+    candidates: unknown[];
+    recommendations: string[];
+  };
+}
+
+// E19-1-S2: Real API call — replaces setTimeout mock
+async function callReviewDesignMCP(canvasId: string, _figmaUrl: string, _designTokens: unknown[]): Promise<DesignReviewResult> {
+  const response = await fetch('/api/mcp/review_design', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      canvasId,
+      nodes: [],
+      checkCompliance: true,
+      checkA11y: true,
+      checkReuse: true,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Design review failed: ${response.statusText}`);
+  }
+
+  const report: DesignReviewReport = await response.json();
+
+  // Adapter: DesignReviewReport → DesignReviewResult
   return {
-    compliance: [
-      { id: 'c1', severity: 'critical', category: 'compliance', message: 'Primary color does not meet WCAG AA contrast ratio (3.2:1, required 4.5:1)', location: '--color-primary' },
-      { id: 'c2', severity: 'warning', category: 'compliance', message: 'Spacing token inconsistency: 12px vs 16px for same component type', location: '.button' },
-      { id: 'c3', severity: 'info', category: 'compliance', message: 'Font size 13px used instead of design system token var(--text-sm)', location: 'DDSToolbar' },
-    ],
-    accessibility: [
-      { id: 'a1', severity: 'critical', category: 'accessibility', message: 'Icon button missing aria-label', location: 'exportBtn' },
-      { id: 'a2', severity: 'warning', category: 'accessibility', message: 'Focus ring uses #00ffff on cyan background — low contrast', location: ':focus-visible' },
-      { id: 'a3', severity: 'info', category: 'accessibility', message: 'Color alone used to indicate state (exportBtn hover)', location: 'DDSToolbar' },
-    ],
-    reuse: [
-      { id: 'r1', message: 'Consider extracting common button styles to .actionButton component', priority: 'high' },
-      { id: 'r2', message: 'ChapterTab and exportBtn share 80% identical CSS — factor out .pillButton', priority: 'medium' },
-      { id: 'r3', message: 'Glassmorphism pattern (backdrop-filter) duplicated in toolbar and modal — create .glass utility', priority: 'low' },
-    ],
+    compliance: (report.designCompliance?.colorIssues ?? []).map((issue: unknown, idx: number) => {
+      const typed = issue as { type?: string; message?: string; location?: string };
+      return {
+        id: `c-${idx}`,
+        severity: (typed.type === 'color' ? 'critical' : 'warning') as DesignReviewIssue['severity'],
+        category: 'compliance' as const,
+        message: typed.message ?? String(issue),
+        location: typed.location,
+      };
+    }).concat(
+      (report.designCompliance?.typographyIssues ?? []).map((issue: unknown, idx: number) => {
+        const typed = issue as { type?: string; message?: string; location?: string };
+        return {
+          id: `ct-${idx}`,
+          severity: 'warning' as DesignReviewIssue['severity'],
+          category: 'compliance' as const,
+          message: typed.message ?? String(issue),
+          location: typed.location,
+        };
+      }),
+      (report.designCompliance?.spacingIssues ?? []).map((issue: unknown, idx: number) => {
+        const typed = issue as { type?: string; message?: string; location?: string };
+        return {
+          id: `cs-${idx}`,
+          severity: 'info' as DesignReviewIssue['severity'],
+          category: 'compliance' as const,
+          message: typed.message ?? String(issue),
+          location: typed.location,
+        };
+      })
+    ),
+    accessibility: (report.a11y?.issues ?? []).map((issue: unknown, idx: number) => {
+      const typed = issue as { issueType?: string; description?: string; nodeId?: string };
+      return {
+        id: `a-${idx}`,
+        severity: (typed.issueType === 'missing-alt' || typed.issueType === 'missing-aria-label') ? 'critical' : 'warning' as DesignReviewIssue['severity'],
+        category: 'accessibility' as const,
+        message: typed.description ?? String(issue),
+        location: typed.nodeId,
+      };
+    }),
+    reuse: (report.reuse?.recommendations ?? []).map((rec: unknown, idx: number) => {
+      const typed = rec as { message?: string; priority?: string };
+      return {
+        id: `r-${idx}`,
+        message: typed.message ?? String(rec),
+        priority: (typed.priority ?? 'medium') as DesignReviewRecommendation['priority'],
+      };
+    }),
   };
 }
 
@@ -61,7 +142,9 @@ export function useDesignReview(_options: UseDesignReviewOptions = {}) {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await callReviewDesignMCP(figmaUrl ?? '', []);
+      // E19-1-S2: call real API with canvasId extracted from figmaUrl or default
+      const canvasId = figmaUrl ? figmaUrl.split('/').pop() ?? 'default' : 'default';
+      const data = await callReviewDesignMCP(canvasId, figmaUrl ?? '', []);
       setResult(data);
       setIsOpen(true);
     } catch (err) {

@@ -86,11 +86,78 @@
   to { transform: rotate(360deg); }
 }
 
-/* Error */
+/* E19-1-S3: Empty state */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 16px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+
+.emptyMessage {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.emptyHint {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Error state enhanced */
 .errorState {
-  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 16px;
+  text-align: center;
+}
+
+.errorIcon {
+  font-size: 28px;
+  margin-bottom: 4px;
+}
+
+.errorMessage {
+  margin: 0;
   color: #f87171;
   font-size: 13px;
+}
+
+.retryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 16px;
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 6px;
+  color: var(--color-primary, #00ffff);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.retryButton:hover {
+  background: rgba(0, 255, 255, 0.2);
+}
+
+.retryButton:active {
+  background: rgba(0, 255, 255, 0.3);
 }
 
 /* Tabs */

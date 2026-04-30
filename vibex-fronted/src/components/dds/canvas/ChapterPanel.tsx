@@ -14,8 +14,9 @@
 
 'use client';
 
-import React, { memo, useState, useCallback } from 'react';
+import React, { memo, useState, useCallback, useRef, useEffect } from 'react';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { CardRenderer } from '@/components/dds/cards';
 import { useConfirmDialogStore } from '@/lib/canvas/stores/confirmDialogStore';
 import type { ChapterType, DDSCard, CardType, UserStoryCard, BoundedContextCard, FlowStepCard, APIEndpointCard } from '@/types/dds';
@@ -431,12 +432,38 @@ export const ChapterPanel = memo(function ChapterPanel({
 
   const handleSelectCard = useCallback(
     (cardId: string) => {
-      useDDSCanvasStore.getState().selectCard(cardId);
+      const store = useDDSCanvasStore.getState();
+      store.selectCard(cardId);
+      const card = cards.find((c) => c.id === cardId);
+      if (card) {
+        store.setSelectedCardSnapshot({ cardId, cardData: card, wasVisible: true });
+      }
     },
-    []
+    [cards]
   );
 
   const availableCardTypes = CHAPTER_CARD_TYPES[chapter];
+
+  // P004-T4: Virtualization hooks
+  const parentRef = useRef<HTMLDivElement>(null);
+  const virtualizer = useVirtualizer({
+    count: cards.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 120,
+    overscan: 3,
+  });
+
+  // P004-T5: Track selected card visibility across scroll boundaries
+  const selectedCardSnapshot = useDDSCanvasStore((s) => s.selectedCardSnapshot);
+  useEffect(() => {
+    if (!selectedCardSnapshot) return;
+    const vItems = virtualizer.getVirtualItems();
+    const idx = cards.findIndex((c) => c.id === selectedCardSnapshot.cardId);
+    const inView = idx >= 0 && vItems.some((v) => v.index === idx);
+    if (selectedCardSnapshot.wasVisible !== inView) {
+      useDDSCanvasStore.getState().updateCardVisibility(inView);
+    }
+  });
 
   return (
     <div className={`${styles.chapterPanel} ${className}`} data-chapter={chapter}>
@@ -446,7 +473,7 @@ export const ChapterPanel = memo(function ChapterPanel({
         <span className={styles.chapterCount}>{cards.length}</span>
       </div>
 
-      {/* Card List */}
+      {/* Card List (virtualized) */}
       <div className={styles.cardList}>
         {/* E5-U3: Error state — show retry button */}
         {error ? (
@@ -491,15 +518,43 @@ export const ChapterPanel = memo(function ChapterPanel({
             </div>
           )
         ) : (
-          cards.map((card) => (
-            <CardItem
-              key={card.id}
-              card={card}
-              selected={selectedCardIds.includes(card.id)}
-              onSelect={() => handleSelectCard(card.id)}
-              onDelete={() => handleDeleteCard(card.id)}
-            />
-          ))
+          /* Virtualized card list */
+          <div
+            ref={parentRef}
+            style={{ overflow: 'auto', height: '100%', position: 'relative' }}
+          >
+            <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
+              {virtualizer.getVirtualItems().map((vItem) => {
+                const card = cards[vItem.index];
+                if (!card) return null;
+                const isSelectedById = selectedCardIds.includes(card.id);
+                const isSelectedBySnapshot =
+                  selectedCardSnapshot?.cardId === card.id &&
+                  !selectedCardSnapshot.wasVisible;
+                return (
+                  <div
+                    key={card.id}
+                    data-index={vItem.index}
+                    ref={virtualizer.measureElement}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      transform: `translateY(${vItem.start}px)`,
+                    }}
+                  >
+                    <CardItem
+                      card={card}
+                      selected={isSelectedById || isSelectedBySnapshot}
+                      onSelect={() => handleSelectCard(card.id)}
+                      onDelete={() => handleDeleteCard(card.id)}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         )}
 
         {/* Create Form */}

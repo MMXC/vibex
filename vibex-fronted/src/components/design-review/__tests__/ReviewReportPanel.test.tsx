@@ -69,11 +69,12 @@ describe('ReviewReportPanel', () => {
 
   it('renders error state', () => {
     vi.mocked(useDesignReviewModule.useDesignReview).mockReturnValue({
-      isOpen: true, isLoading: false, result: null, error: 'Test error',
+      isOpen: true, isLoading: false, result: null, error: '500 Internal Server Error',
       runReview: vi.fn(), close: vi.fn(), open: vi.fn(),
     });
     render(<ReviewReportPanel />);
-    expect(screen.getByText('Test error')).toBeInTheDocument();
+    // E19-1-S3: error message is now contextualized — errors containing '500' show "设计评审暂时不可用"
+    expect(screen.getByText(/设计评审暂时不可用|网络连接异常/)).toBeInTheDocument();
   });
 
   it('renders empty state when no issues', () => {

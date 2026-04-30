@@ -1,4 +1,10 @@
 ### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-QUALITY-2: DX 改进（类型文档 & Migration Guide）— 2026-04-30
+### [Unreleased] vibex-proposals-20260501-sprint20 P003: Workbench 生产化 — 2026-05-01
+- **P003-T1 /workbench 路由**: `vibex-fronted/src/app/workbench/page.tsx` — `NEXT_PUBLIC_WORKBENCH_ENABLED` flag 控制，`!isEnabled` → `notFound()` HTTP 404 优雅降级
+- **P003-T2 Feature Flag 文档**: `docs/feature-flags.md` — 记录 `NEXT_PUBLIC_WORKBENCH_ENABLED` 开关说明
+- **P003-T3 Agent Sessions UI**: `vibex-fronted/src/components/workbench/` — WorkbenchUI + SessionList + TaskInput；`agentSessionStore.ts` 服务端内存存储（Map，50 sessions 上限自动清理）；`api/agent/sessions/route.ts` GET/POST API（输入校验：task 必填非空 → 400）；JSX 内容自动转义无 XSS 风险 ✅
+- **P003-T4 E2E 测试**: `tests/e2e/workbench-journey.spec.ts` — 4 API tests (POST 201/400×2, GET 200) + 404 UI test；8 passed ✅
+- 提交: 3f2903613, abcd0b75e
 ### [Unreleased] vibex-proposals-20260501-sprint20 P004: Canvas 虚拟化 — 2026-05-01
 - **P004-T3 selectedCardSnapshot**: `stores/DDSCanvasStore.ts` — 新增 `selectedCardSnapshot` 状态 + `updateCardVisibility()` 方法，追踪跨虚拟边界的选择状态（cardId/cardData/wasVisible）
 - **P004-T4 Canvas 虚拟化**: `vibex-fronted/src/components/dds/canvas/ChapterPanel.tsx` — `.map()` 渲染替换为 `@tanstack/react-virtual` `useVirtualizer`，`estimateSize:120`, `overscan:3`；`parentRef` 作为 scroll container；跨边界选中状态保持

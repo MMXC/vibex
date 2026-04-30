@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.330',
+    date: '2026-05-01',
+    changes: [
+      '🔧 P003-Workbench 生产化: /workbench 路由 + NEXT_PUBLIC_WORKBENCH_ENABLED flag guard',
+      '✅ P003-T1: WorkbenchUI + SessionList + TaskInput + CSS 模块',
+      '✅ P003-T2: docs/feature-flags.md 文档',
+      '✅ P003-T3: /api/agent/sessions GET/POST + agentSessionStore (50 sessions 上限)',
+      '✅ P003-T4: workbench-journey.spec.ts 8 E2E passed (API 4 + UI 4)',
+    ],
+    commit: '3f2903613, abcd0b75e',
+  },
+  {
     version: '1.0.329',
     date: '2026-05-01',
     changes: [

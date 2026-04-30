@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.329',
+    date: '2026-05-01',
+    changes: [
+      '🔧 P004-Canvas 虚拟化: @tanstack/react-virtual useVirtualizer 替换 .map() 渲染，estimateSize:120, overscan:3',
+      '✅ P004-T3: DDSCanvasStore selectedCardSnapshot 跨虚拟边界选择状态',
+      '✅ P004-T4: ChapterPanel.tsx 虚拟化实现 + parentRef scroll container',
+      '✅ P004-T5: DDSCanvasStore.test.ts +131 lines selectedCardSnapshot 单元测试 (31 passed)',
+      '✅ P004-T6: benchmark-canvas.ts 输出 P50/P95/P99 JSON 性能指标',
+    ],
+    commit: 'a5db58799, 9588265db, 9eac94c1d, 25cc0aaf0',
+  },
+  {
     version: '1.0.328',
     date: '2026-05-01',
     changes: [

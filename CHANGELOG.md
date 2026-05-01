@@ -21,7 +21,8 @@
 - **P004-T4 Canvas 虚拟化**: `vibex-fronted/src/components/dds/canvas/ChapterPanel.tsx` — `.map()` 渲染替换为 `@tanstack/react-virtual` `useVirtualizer`，`estimateSize:120`, `overscan:3`；`parentRef` 作为 scroll container；跨边界选中状态保持
 - **P004-T5 单元测试**: `stores/dds/__tests__/DDSCanvasStore.test.ts` +131 lines — `selectedCardSnapshot` + `updateCardVisibility` 覆盖测试
 - **P004-T6 Benchmark**: `scripts/benchmark-canvas.ts` — 输出 `{nodeCount, p50, p95, p99}` JSON 性能指标
-- 提交: a5db58799, 9588265db, 9eac94c1d, 25cc0aaf0
+- **P004-E3-QA E2E 测试**: `tests/e2e/canvas-virtualization-perf.spec.ts` — E3-S2 100节点 P50<100ms + E3-S3 150节点 dropped<2 + E3-S4 跨虚拟边界选中状态；数据注入改用 `addInitScript()` + API route interception（无 `require()`）
+- 提交: a5db58799, 9588265db, 9eac94c1d, 25cc0aaf0, bc08c8eca, <fix-commit>
 
 ### [Unreleased] vibex-proposals-20260501-sprint20 P001: MCP DoD 收尾 — 2026-05-01
 - **P001-T1 /health 集成到 stdio 启动**: `packages/mcp-server/src/routes/health.ts` — 重构为 `setupHealthEndpoint(port)` 返回 `Promise<http.Server>`，移除独立 HTTP 进程；`packages/mcp-server/src/index.ts` main() 中 `await setupHealthEndpoint(3100)` 在 stdio transport 之前启动，/health 可访问性从「独立运行」升级为「主进程生命周期内」

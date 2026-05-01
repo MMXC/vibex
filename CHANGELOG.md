@@ -1,3 +1,12 @@
+### [Unreleased] vibex-proposals-20260501-sprint21 Epic1-E2E-Staging-Isolation: CI 环境隔离 — 2026-05-02
+- **Epic1-E2E-Staging-Isolation**: CI E2E 环境强制隔离 staging，禁止生产 fallback
+- **C1 BASE_URL 无生产 fallback**: `.github/workflows/test.yml` — 移除 `|| 'https://vibex.top'` fallback，BASE_URL 严格来自 `${{ vars.BASE_URL }}`
+- **C2 CI staging health check**: 新增 `Check staging health` step，curl 3 次重试（间隔 10s），确保 staging 可达后才运行 E2E
+- **C3 BASE_URL 域名验证**: 新增 `Verify BASE_URL does not contain production domain` step，检测到 vibex.top 直接 exit 1
+- **C4 e2e:db:reset**: `vibex-fronted/scripts/e2e-db-reset.ts` — staging DB 清理脚本（E2E_ 前缀 + age-based），支持 `--dry-run`
+- **C5 e2e:summary:slack**: `vibex-fronted/scripts/e2e-summary-to-slack.ts` — Playwright 结果生成 Slack 报告，支持 CI 模式
+- **.env.staging.example**: staging 环境变量模板（含 NEXT_PUBLIC_BASE_URL/BASE_URL/STAGING_DATABASE_URL）
+- 提交: 6e6dc7c0f
 ### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-QUALITY-2: DX 改进（类型文档 & Migration Guide）— 2026-04-30
 ### [Unreleased] vibex-sprint20-qa E2-QA: Workbench UI + AI Agent 验证 — 2026-05-01
 - **E2-QA Workbench Feature Flag**: `/workbench` (NEXT_PUBLIC_WORKBENCH_ENABLED=false) → HTTP 404 ✅；dev+tester 独立验证一致 ✅

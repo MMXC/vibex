@@ -93,6 +93,19 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '2f493df6d, 434c8e99d',
   },
   {
+    version: '1.0.327',
+    date: '2026-05-02',
+    changes: [
+      '📋 vibex-proposals-20260501 Sprint21 Epic1-E2E-Staging-Isolation: CI 环境隔离',
+      '✅ C1: BASE_URL 移除生产 fallback（`|| vibex.top`），严格使用 CI vars',
+      '✅ C2: CI staging health check（3次重试 curl /api/health）',
+      '✅ C3: BASE_URL 域名验证（检测 vibex.top → exit 1）',
+      '✅ C4: e2e:db:reset 脚本（staging DB 清理，支持 --dry-run）',
+      '✅ C5: e2e:summary:slack 脚本（Playwright 结果 → Slack webhook）',
+    ],
+    commit: '6e6dc7c0f',
+  },
+  {
     version: '1.0.326',
     date: '2026-04-30',
     changes: [

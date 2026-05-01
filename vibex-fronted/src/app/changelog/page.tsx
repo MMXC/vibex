@@ -20,6 +20,19 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.332',
+    date: '2026-05-01',
+    changes: [
+      '🔧 E2-QA: Workbench /canvas /project 页面验证 + P006 API 输入校验 + Backend 降级测试',
+      '✅ /workbench (flag=false) → HTTP 404 ✅',
+      '✅ /canvas → 307→/auth（auth 保护正确）✅',
+      '✅ POST /api/agent/sessions + empty/whitespace → 400 ✅',
+      '✅ OpenClaw gateway /health → live ✅',
+      '✅ dev+tester 独立验证 100% 一致 ✅',
+    ],
+    commit: '0e08dbe1e, a244138d8',
+  },
+  {
     version: '1.0.331',
     date: '2026-05-01',
     changes: [

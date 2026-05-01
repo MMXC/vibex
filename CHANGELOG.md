@@ -1,4 +1,10 @@
 ### [Unreleased] vibex-proposals-20260430-sprint18 S18-E18-QUALITY-2: DX 改进（类型文档 & Migration Guide）— 2026-04-30
+### [Unreleased] vibex-sprint20-qa E2-QA: Workbench UI + AI Agent 验证 — 2026-05-01
+- **E2-QA Workbench Feature Flag**: `/workbench` (NEXT_PUBLIC_WORKBENCH_ENABLED=false) → HTTP 404 ✅；dev+tester 独立验证一致 ✅
+- **E2-QA Canvas 虚拟化**: `/canvas` 页面加载正常（未登录 → /auth 重定向行为正确）✅；dev+tester 独立验证一致 ✅
+- **E2-QA P006 API 输入校验**: POST `/api/agent/sessions` + empty/whitespace → HTTP 400 `{"error":"task is required"}` ✅；dev+tester 独立验证一致 ✅
+- **E2-QA P006 Backend 不可达降级**: POST/GET timeout（backend 未运行时）✅；OpenClaw gateway `/health` → `{"ok":true,"status":"live"}` ✅
+- 提交: 0e08dbe1e, a244138d8 (changelog commits)
 ### [Unreleased] vibex-proposals-20260501-sprint20 P006: AI Agent 真实接入 — 2026-05-01
 - **P006 核心基础设施**: `vibex-backend/src/services/OpenClawBridge.ts` — `spawnAgent()` 调用 OpenClaw gateway sessions_spawn API，30s AbortController 超时，`isRuntimeUnavailable()` 覆盖 ECONNREFUSED/AbortError；`vibex-backend/src/routes/agent/sessions.ts` 完整 CRUD（POST/GET/GET:id/GET:id/status/DELETE），in-memory store（50 上限）
 - **P006 Frontend 集成**: `vibex-fronted/src/app/api/agent/sessions/route.ts` — proxy 到 backend，503 当 backend 不可用；`CodingAgentService.ts` — 全部 MOCK/mockAgentCall 移除，改为真实 API 调用

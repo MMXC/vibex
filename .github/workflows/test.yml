@@ -186,10 +186,31 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Install Playwright Browsers
         run: pnpm exec playwright install chromium --with-deps
+      - name: Verify BASE_URL does not contain production domain
+        run: |
+          if echo "$BASE_URL" | grep -q "vibex.top"; then
+            echo "ERROR: BASE_URL contains vibex.top — staging must be configured"
+            exit 1
+          fi
+          echo "BASE_URL is safe: $BASE_URL"
+
+      - name: Check staging health
+        run: |
+          for i in 1 2 3; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" $BASE_URL/api/health 2>/dev/null || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "Staging is healthy at $BASE_URL"
+              exit 0
+            fi
+            echo "Retry $i/3: staging returned $STATUS"
+            sleep 10
+          done
+          echo "WARNING: Staging not accessible at $BASE_URL (E2E will run against configured URL)"
+
       - name: Run E2E
         env:
           CI: true
-          BASE_URL: ${{ vars.BASE_URL || 'https://vibex.top' }}
+          BASE_URL: ${{ vars.BASE_URL }}
         run: pnpm --filter vibex-fronted run test:e2e:ci
       - uses: actions/upload-artifact@v4
         if: always()

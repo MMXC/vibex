@@ -33,7 +33,10 @@
     "generate:types": "ts-node scripts/generate-types.ts",
     "pre-commit-check": "tsc --noEmit && npx eslint ./src --max-warnings=0",
     "scan:vuln": "npm audit --audit-level=moderate",
-    "report:vuln": "npm audit --json > vulnerability-report.json"
+    "report:vuln": "npm audit --json > vulnerability-report.json",
+    "e2e:db:reset": "tsx scripts/e2e-db-reset.ts",
+    "e2e:db:reset:dry": "tsx scripts/e2e-db-reset.ts --dry-run",
+    "e2e:summary:slack": "tsx scripts/e2e-summary-to-slack.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

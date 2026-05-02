@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.334',
+    date: '2026-05-02',
+    changes: [
+      '🔧 S22-E3: Epic3-Teams-Collab-UI — 团队协作 UI',
+      '✅ E3-S1: PresenceAvatars team border — showTeamBadge + teamMemberIds props，TEAM_COLORS 常量',
+      '✅ E3-S2: useCanvasRBAC hook — canDelete/canShare/canEdit/canView，5min LRU 缓存',
+      '✅ E3-S3: DDSToolbar RBAC buttons — 导出/导入按钮 disabled 逻辑',
+      '提交: 0a64dca25',
+    ],
+    commit: '0a64dca25',
+  },
+  {
     version: '1.0.333',
     date: '2026-05-02',
     changes: [

@@ -1,4 +1,11 @@
-### [Unreleased] vibex-proposals-20260501-sprint21 Epic1-E2E-Staging-Isolation: CI 环境隔离 — 2026-05-02
+### [Unreleased] vibex-proposals-20260502-sprint22 Epic3-Teams-Collab-UI: 团队协作 UI — 2026-05-02
+- **S1 PresenceAvatars team border**: `PresenceAvatars.tsx` — `showTeamBadge` + `teamMemberIds` props，新增 team/guest border 样式（`TEAM_COLORS` 常量，owner/member=#10b981, guest=#d1d5db）；四态覆盖完整（ideal/empty/loading/error）
+- **S2 useCanvasRBAC hook**: `useCanvasRBAC.ts` — RBAC 检查 hook（canDelete/canShare/canEdit/canView），5min LRU 缓存（`RBAC_CACHE` Map），`/v1/projects/:id/permissions` API 调用
+- **S3 DDSToolbar RBAC buttons**: `DDSToolbar.tsx` — 导出/导入按钮集成 RBAC disabled 逻辑（`canShare`/`canEdit`），导出模态框（JSON/Vibex/OpenAPI/StateMachine）
+- TS: 0 errors ✅；Security ✅；Changelog ✅
+- 提交: 0a64dca25
+
+
 - **Epic1-E2E-Staging-Isolation**: CI E2E 环境强制隔离 staging，禁止生产 fallback
 - **C1 BASE_URL 无生产 fallback**: `.github/workflows/test.yml` — 移除 `|| 'https://vibex.top'` fallback，BASE_URL 严格来自 `${{ vars.BASE_URL }}`
 - **C2 CI staging health check**: 新增 `Check staging health` step，curl 3 次重试（间隔 10s），确保 staging 可达后才运行 E2E

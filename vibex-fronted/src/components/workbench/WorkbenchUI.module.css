@@ -331,3 +331,34 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* E5-S1: Error banner for agent unavailability */
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin: 0 12px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  color: #ef4444;
+  font-size: 13px;
+}
+
+.errorDismiss {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.errorDismiss:hover {
+  background: rgba(239, 68, 68, 0.2);
+}

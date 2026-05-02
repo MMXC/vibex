@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useAgentStore } from '@/stores/agentStore';
 import type { AgentSession, AgentMessage } from '@/services/agent/CodingAgentService';
 import { SessionList } from './SessionList';
@@ -15,6 +15,9 @@ export function WorkbenchUI() {
     setActiveSession,
     addMessage,
   } = useAgentStore();
+
+  // E5-S1: Error state for agent unavailability
+  const [createError, setCreateError] = useState<string | null>(null);
 
   // Fetch sessions from API on mount
   useEffect(() => {
@@ -39,6 +42,7 @@ export function WorkbenchUI() {
 
   const handleCreateTask = useCallback(
     async (task: string) => {
+      setCreateError(null);
       // Call the API to create a session
       const res = await fetch('/api/agent/sessions', {
         method: 'POST',
@@ -47,6 +51,9 @@ export function WorkbenchUI() {
       });
 
       if (!res.ok) {
+        // E5-S1: Show error when agent is unavailable
+        const body = await res.json().catch(() => ({ error: '暂不可用' })) as { error: string };
+        setCreateError(body.error ?? '暂不可用，Agent 服务维护中');
         throw new Error('Failed to create session');
       }
 
@@ -85,6 +92,31 @@ export function WorkbenchUI() {
                 </div>
               )}
           </div>
+
+          {/* E5-S1: Error message when agent unavailable */}
+          {createError && (
+            <div
+              className={styles.errorBanner}
+              data-testid="agent-error-message"
+              role="alert"
+              aria-live="assertive"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              <span>{createError}</span>
+              <button
+                className={styles.errorDismiss}
+                onClick={() => setCreateError(null)}
+                aria-label="关闭"
+                type="button"
+              >
+                ×
+              </button>
+            </div>
+          )}
 
           <div className={styles.artifactViewer}>
             <div className={styles.artifactPlaceholder}>

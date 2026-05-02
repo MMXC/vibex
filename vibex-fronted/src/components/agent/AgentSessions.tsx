@@ -62,6 +62,7 @@ const SessionCard = memo(function SessionCard({
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && handleSelect()}
       aria-pressed={isActive}
+      data-testid="agent-session-item"
     >
       <div className={styles.sessionHeader}>
         <span

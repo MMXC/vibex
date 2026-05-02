@@ -1,47 +1,30 @@
 /**
  * POST /api/mcp/review_design
  *
- * Bridge layer: Frontend → Backend review logic.
- * Inlined from vibex-backend/src/lib/prompts/{designCompliance,a11yChecker,componentReuse}.ts
- * E19-1-S1
+ * Bridge layer: Frontend → MCP Server (Design Review)
+ * E1 Design Review MCP — Epic1-Design-Review-MCP
+ *
+ * C-E1-1: Graceful degradation — falls back to static analysis if MCP unavailable
+ * C-E1-2: MCP call timeout = 5s
+ * C-E1-3: No new npm dependencies
  */
 import { NextRequest, NextResponse } from 'next/server';
+import { callReviewDesignTool } from '@/lib/mcp-bridge';
+import type { ReviewDesignInput, DesignReviewReport } from '@/lib/mcp-bridge';
 
 // ============================================================================
-// Inlined Types
-// ============================================================================
-
-interface ComplianceResult {
-  colors: boolean;
-  colorIssues: unknown[];
-  typography: boolean;
-  typographyIssues: unknown[];
-  spacing: boolean;
-  spacingIssues: unknown[];
-}
-
-interface A11yCheckResult {
-  passed: boolean;
-  issues: unknown[];
-  summary: { critical: number; high: number; medium: number; low: number };
-}
-
-interface ReuseAnalysisResult {
-  candidates: unknown[];
-  totalNodes: number;
-  candidatesAboveThreshold: number;
-  recommendations: string[];
-}
-
-// ============================================================================
-// Inlined: Design Compliance (from designCompliance.ts)
+// Fallback: Static Analysis (used when MCP is unavailable)
+// Inlined from vibex-backend/src/lib/prompts/{designCompliance,a11yChecker,componentReuse}.ts
 // ============================================================================
 
 const HEX_COLOR_RE = /#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\b/g;
 const RGBA_LITERAL_RE = /rgba?\s*\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(,\s*[\d.]+\s*)?\)/g;
 
-function checkDesignCompliance(flow: Record<string, unknown>): ComplianceResult {
-  const nodeId = (flow.id as string) ?? 'unknown';
+function checkDesignCompliance(flow: Record<string, unknown>): {
+  colors: boolean; colorIssues: unknown[];
+  typography: boolean; typographyIssues: unknown[];
+  spacing: boolean; spacingIssues: unknown[];
+} {
   const colorIssues: unknown[] = [];
   const typographyIssues: unknown[] = [];
   const spacingIssues: unknown[] = [];
@@ -51,23 +34,18 @@ function checkDesignCompliance(flow: Record<string, unknown>): ComplianceResult 
       const hex = v.match(HEX_COLOR_RE) ?? [];
       for (const m of hex) {
         if (m !== '#0000' && m !== '#00000000') {
-          colorIssues.push({ type: 'color', message: `Hardcoded hex color '${m}' found. Use CSS variable instead.`, location: path });
+          colorIssues.push({ type: 'color', message: `Hardcoded hex color '${m}'. Use CSS variable.`, location: path });
         }
-      }
-      const rgba = v.match(RGBA_LITERAL_RE) ?? [];
-      for (const m of rgba) {
-        colorIssues.push({ type: 'color', message: `Hardcoded rgba color '${m}' found. Use CSS variable instead.`, location: path });
       }
       const fonts = ['Arial', 'Helvetica', 'Times New Roman', 'Georgia', 'Verdana', 'sans-serif', 'serif', 'monospace', 'Roboto', 'Open Sans'];
       for (const font of fonts) {
         if (v.includes(font)) {
-          typographyIssues.push({ type: 'typography', message: `Hardcoded font family '${font}' found. Use CSS variable instead.`, location: path });
+          typographyIssues.push({ type: 'typography', message: `Hardcoded font '${font}'. Use CSS variable.`, location: path });
         }
       }
     } else if (typeof v === 'number') {
       if (v !== 0 && v % 4 !== 0) {
-        const nearest = Math.round(v / 4) * 4;
-        spacingIssues.push({ type: 'spacing', message: `Spacing value ${v}px is not a multiple of 4. Use ${nearest}px instead.`, location: path });
+        spacingIssues.push({ type: 'spacing', message: `Spacing ${v}px not multiple of 4.`, location: path });
       }
     } else if (Array.isArray(v)) {
       v.forEach((item, i) => extract(item, `${path}[${i}]`));
@@ -77,22 +55,17 @@ function checkDesignCompliance(flow: Record<string, unknown>): ComplianceResult 
   }
 
   extract(flow, 'root');
-
   return {
-    colors: colorIssues.length === 0,
-    colorIssues,
-    typography: typographyIssues.length === 0,
-    typographyIssues,
-    spacing: spacingIssues.length === 0,
-    spacingIssues,
+    colors: colorIssues.length === 0, colorIssues,
+    typography: typographyIssues.length === 0, typographyIssues,
+    spacing: spacingIssues.length === 0, spacingIssues,
   };
 }
 
-// ============================================================================
-// Inlined: A11y Checker (from a11yChecker.ts)
-// ============================================================================
-
-function checkA11yCompliance(nodes: Array<Record<string, unknown>>): A11yCheckResult {
+function checkA11yCompliance(nodes: Array<Record<string, unknown>>): {
+  passed: boolean; issues: unknown[];
+  summary: { critical: number; high: number; medium: number; low: number };
+} {
   const issues: unknown[] = [];
   const IMAGE_TYPES = ['image', 'img', 'picture', 'icon', 'illustration', 'avatar', 'thumbnail', 'photo'];
   const INTERACTIVE_TYPES = ['button', 'link', 'a', 'anchor', 'tab', 'menu-item', 'checkbox', 'radio', 'switch', 'toggle', 'input', 'textarea', 'slider'];
@@ -106,48 +79,33 @@ function checkA11yCompliance(nodes: Array<Record<string, unknown>>): A11yCheckRe
       const alt = node.alt as string | undefined;
       const ariaLabel = node['aria-label'] as string | undefined;
       if (!alt && !ariaLabel && alt !== '') {
-        issues.push({ issueType: 'missing-alt', description: `Image node '${nodeName}' has no alt text. Add one for WCAG 1.1.1 compliance.`, nodeId });
+        issues.push({ issueType: 'missing-alt', description: `Image '${nodeName}' missing alt text.`, nodeId });
       } else if (alt && !alt.trim()) {
-        issues.push({ issueType: 'missing-alt', description: `Image node '${nodeName}' has whitespace-only alt text.`, nodeId });
+        issues.push({ issueType: 'missing-alt', description: `Image '${nodeName}' has empty alt.`, nodeId });
       }
     }
 
     if (INTERACTIVE_TYPES.some(t => type === t)) {
       const ariaLabel = (node['aria-label'] as string) ?? '';
       if (!ariaLabel) {
-        issues.push({ issueType: 'missing-aria-label', description: `Interactive element '${nodeName}' (${type}) lacks aria-label. Add one for WCAG 4.1.2 compliance.`, nodeId });
-      }
-    }
-
-    const bgColor = node.backgroundColor ?? node.bgColor ?? node.background ?? node.fill;
-    const textColor = node.color ?? node.textColor ?? node.fontColor;
-    if (bgColor && textColor) {
-      const bg = String(bgColor);
-      const fg = String(textColor);
-      if (bg.startsWith('#') && fg.startsWith('#') && bg.length >= 4 && fg.length >= 4) {
-        // Basic contrast check - simplified
-        issues.push({ issueType: 'low-contrast', description: `Low contrast detected for '${nodeName}'. Consider improving color contrast for WCAG AA.`, nodeId });
+        issues.push({ issueType: 'missing-aria-label', description: `Interactive '${nodeName}' missing aria-label.`, nodeId });
       }
     }
   }
 
   return {
-    passed: issues.length === 0,
-    issues,
+    passed: issues.length === 0, issues,
     summary: {
       critical: issues.filter((i: unknown) => (i as { issueType?: string }).issueType === 'missing-alt').length,
       high: issues.filter((i: unknown) => (i as { issueType?: string }).issueType === 'missing-aria-label').length,
-      medium: issues.filter((i: unknown) => (i as { issueType?: string }).issueType === 'low-contrast').length,
-      low: 0,
+      medium: 0, low: 0,
     },
   };
 }
 
-// ============================================================================
-// Inlined: Component Reuse (from componentReuse.ts)
-// ============================================================================
-
-function analyzeComponentReuse(nodes: Array<Record<string, unknown>>): ReuseAnalysisResult {
+function analyzeComponentReuse(nodes: Array<Record<string, unknown>>): {
+  candidates: unknown[]; totalNodes: number; candidatesAboveThreshold: number; recommendations: string[];
+} {
   const SKIP_KEYS = ['id', 'name', 'label', 'position', 'x', 'y', 'z', 'createdAt', 'updatedAt', 'timestamp', 'version'];
   const recommendations: string[] = [];
   let candidatesAboveThreshold = 0;
@@ -156,11 +114,8 @@ function analyzeComponentReuse(nodes: Array<Record<string, unknown>>): ReuseAnal
     for (let j = i + 1; j < Math.min(nodes.length, 20); j++) {
       const nodeA = nodes[i] as Record<string, unknown>;
       const nodeB = nodes[j] as Record<string, unknown>;
-      const typeA = (nodeA.type as string) ?? '';
-      const typeB = (nodeB.type as string) ?? '';
-      if (typeA !== typeB) continue;
+      if ((nodeA.type as string) !== (nodeB.type as string)) continue;
 
-      // Simple structural similarity
       let sharedFields = 0;
       let totalFields = 0;
       const allKeys = new Set([...Object.keys(nodeA), ...Object.keys(nodeB)].filter(k => !SKIP_KEYS.includes(k)));
@@ -173,23 +128,70 @@ function analyzeComponentReuse(nodes: Array<Record<string, unknown>>): ReuseAnal
         }
       }
 
-      if (allKeys.size > 0) {
-        const score = sharedFields / allKeys.size;
-        if (score >= 0.7) {
-          candidatesAboveThreshold++;
-          const nameA = (nodeA.name as string) ?? String(i);
-          const nameB = (nodeB.name as string) ?? String(j);
-          recommendations.push(`Node '${nameA}' and '${nameB}' share ${Math.round(score * 100)}% structure. Consider extracting shared component.`);
-        }
+      if (allKeys.size > 0 && sharedFields / allKeys.size >= 0.7) {
+        candidatesAboveThreshold++;
+        recommendations.push(`Node '${nodeA.name ?? i}' and '${nodeB.name ?? j}' share ${Math.round(sharedFields / allKeys.size * 100)}% structure.`);
       }
     }
   }
 
-  if (candidatesAboveThreshold > 0) {
-    recommendations.push(`Found ${candidatesAboveThreshold} component reuse candidates.`);
+  return { candidates: [], totalNodes: nodes.length, candidatesAboveThreshold, recommendations };
+}
+
+/**
+ * Run static fallback analysis (used when MCP is unavailable).
+ * C-E1-1: Graceful degradation
+ */
+function fallbackStaticAnalysis(input: ReviewDesignInput): DesignReviewReport {
+  const nodes = input.nodes ?? [];
+  const report: DesignReviewReport = {
+    canvasId: input.canvasId,
+    reviewedAt: new Date().toISOString(),
+    summary: { compliance: 'pass', a11y: 'pass', reuseCandidates: 0, totalNodes: nodes.length },
+  };
+
+  if (input.checkCompliance !== false && nodes.length > 0) {
+    const results = nodes.map(n => checkDesignCompliance(n));
+    const hasIssues = results.some(r => !r.colors || !r.typography || !r.spacing);
+    if (hasIssues) report.summary.compliance = 'warn';
+    report.designCompliance = {
+      colors: results.every(r => r.colors),
+      colorIssues: results.flatMap(r => r.colorIssues),
+      typography: results.every(r => r.typography),
+      typographyIssues: results.flatMap(r => r.typographyIssues),
+      spacing: results.every(r => r.spacing),
+      spacingIssues: results.flatMap(r => r.spacingIssues),
+    };
   }
 
-  return { candidates: [], totalNodes: nodes.length, candidatesAboveThreshold, recommendations };
+  if (input.checkA11y !== false && nodes.length > 0) {
+    const a11yResult = checkA11yCompliance(nodes);
+    if (a11yResult.summary.critical > 0 || a11yResult.summary.high > 0) {
+      report.summary.a11y = 'fail';
+    } else if (a11yResult.issues.length > 0) {
+      report.summary.a11y = 'warn';
+    }
+    report.a11y = {
+      passed: a11yResult.passed,
+      critical: a11yResult.summary.critical,
+      high: a11yResult.summary.high,
+      medium: a11yResult.summary.medium,
+      low: a11yResult.summary.low,
+      issues: a11yResult.issues,
+    };
+  }
+
+  if (input.checkReuse !== false && nodes.length > 0) {
+    const reuse = analyzeComponentReuse(nodes);
+    report.summary.reuseCandidates = reuse.candidatesAboveThreshold;
+    report.reuse = {
+      candidatesAboveThreshold: reuse.candidatesAboveThreshold,
+      candidates: reuse.candidates.slice(0, 10),
+      recommendations: reuse.recommendations,
+    };
+  }
+
+  return report;
 }
 
 // ============================================================================
@@ -212,56 +214,43 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'canvasId is required' }, { status: 400 });
     }
 
-    const nodes = body.nodes ?? [];
-    const report: Record<string, unknown> = {
+    const input: ReviewDesignInput = {
       canvasId: body.canvasId,
-      reviewedAt: new Date().toISOString(),
-      summary: { compliance: 'pass' as const, a11y: 'pass' as const, reuseCandidates: 0, totalNodes: nodes.length },
+      nodes: body.nodes ?? [],
+      checkCompliance: body.checkCompliance ?? true,
+      checkA11y: body.checkA11y ?? true,
+      checkReuse: body.checkReuse ?? true,
     };
 
-    // Design Compliance
-    if (body.checkCompliance !== false && nodes.length > 0) {
-      const complianceResults = nodes.map((node) => checkDesignCompliance(node));
-      const hasColorIssues = complianceResults.some(r => !r.colors);
-      const hasTypographyIssues = complianceResults.some(r => !r.typography);
-      const hasSpacingIssues = complianceResults.some(r => !r.spacing);
-      if (hasColorIssues || hasTypographyIssues || hasSpacingIssues) {
-        (report.summary as Record<string, unknown>).compliance = 'warn';
+    let report: DesignReviewReport;
+    let mcpStatus: { called: boolean; error?: string; fallback?: string } = { called: false };
+
+    // C-E1-1: Try MCP, fall back to static analysis on failure
+    try {
+      const mcpResult = await callReviewDesignTool(input);
+      // Extract _designReview from MCP result
+      const content = mcpResult.content?.[0]?.text;
+      if (content) {
+        try {
+          const parsed = JSON.parse(content);
+          report = parsed._designReview ?? parsed;
+        } catch {
+          report = fallbackStaticAnalysis(input);
+          mcpStatus = { called: false, error: 'MCP returned unparseable response', fallback: 'static-analysis' };
+        }
+      } else {
+        report = fallbackStaticAnalysis(input);
+        mcpStatus = { called: false, error: 'MCP returned empty content', fallback: 'static-analysis' };
       }
-      report.designCompliance = {
-        colors: !hasColorIssues,
-        colorIssues: complianceResults.flatMap(r => r.colorIssues),
-        typography: !hasTypographyIssues,
-        typographyIssues: complianceResults.flatMap(r => r.typographyIssues),
-        spacing: !hasSpacingIssues,
-        spacingIssues: complianceResults.flatMap(r => r.spacingIssues),
-      };
+      mcpStatus = { called: true };
+    } catch (mcpErr) {
+      // Graceful degradation: fall back to static analysis
+      const err = mcpErr instanceof Error ? mcpErr.message : String(mcpErr);
+      report = fallbackStaticAnalysis(input);
+      mcpStatus = { called: false, error: err, fallback: 'static-analysis' };
     }
 
-    // A11y
-    if (body.checkA11y !== false && nodes.length > 0) {
-      const a11yResult = checkA11yCompliance(nodes);
-      const s = a11yResult.summary;
-      if (s.critical > 0 || s.high > 0) {
-        (report.summary as Record<string, unknown>).a11y = 'fail';
-      } else if (a11yResult.issues.length > 0) {
-        (report.summary as Record<string, unknown>).a11y = 'warn';
-      }
-      report.a11y = a11yResult;
-    }
-
-    // Reuse
-    if (body.checkReuse !== false && nodes.length > 0) {
-      const reuseResult = analyzeComponentReuse(nodes);
-      (report.summary as Record<string, unknown>).reuseCandidates = reuseResult.candidatesAboveThreshold;
-      report.reuse = {
-        candidatesAboveThreshold: reuseResult.candidatesAboveThreshold,
-        candidates: reuseResult.candidates.slice(0, 10),
-        recommendations: reuseResult.recommendations,
-      };
-    }
-
-    return NextResponse.json(report, { status: 200 });
+    return NextResponse.json({ ...report, mcp: mcpStatus }, { status: 200 });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Design review failed';
     return NextResponse.json({ error: 'Design review failed', details: message }, { status: 500 });

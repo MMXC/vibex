@@ -84,11 +84,11 @@ Week 3 (Day 1-2)
 
 | Story | 任务 | 工时 | 依赖 | 执行者 |
 |-------|------|------|------|--------|
-| S4.1 | PlantUML exporter 类 | 1h | 无 | Dev |
-| S4.1 | PlantUML 语法验证（StarUML 可打开） | 1h | 无 | Dev |
-| S4.2 | JSON Schema exporter 类 | 2h | 无 | Dev |
-| S4.3 | SVG exporter 类 | 2h | 无 | Dev |
-| S4.3 | SVG 降级策略（try-catch + UI） | 1h | 无 | Dev |
+| S4.1 | PlantUML exporter 类 | 1h | 无 | Dev  :white_check_mark: |
+| S4.1 | PlantUML 语法验证（StarUML 可打开） | 1h | 无 | Dev  :white_check_mark: |
+| S4.2 | JSON Schema exporter 类 | 2h | 无 | Dev  :white_check_mark: |
+| S4.3 | SVG exporter 类 | 2h | 无 | Dev  :white_check_mark: |
+| S4.3 | SVG 降级策略（try-catch + UI） | 1h | 无 | Dev  :white_check_mark: |
 
 ### Epic E5: 需求模板库深耕
 

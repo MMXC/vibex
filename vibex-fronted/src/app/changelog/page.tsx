@@ -20,6 +20,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.335',
+    date: '2026-05-03',
+    changes: [
+      '🚀 S23-E1: Epic E1 E2E CI 闭环落地',
+      '✅ E1-U1: e2e-summary-to-slack.ts Block Kit payload — results.json 解析，postToSlack() error handling，main() exit 0',
+      '✅ E1-U2: test.yml CI workflow — e2e job 后执行 e2e:summary:slack，if:always()，传递 webhook env',
+      '提交: 276f1ba26',
+    ],
+    commit: '276f1ba26',
+  },
+  {
     version: '1.0.334',
     date: '2026-05-02',
     changes: [

@@ -1,3 +1,9 @@
+### [Unreleased] vibex-proposals-sprint23 Epic E1: E2E CI 闭环落地 — 2026-05-03
+- **E1-U1 Block Kit**: `vibex-fronted/scripts/e2e-summary-to-slack.ts` — Playwright results.json 解析（stats + suites），Block Kit payload 格式（header/section(fields)/section(failed list)/context），postToSlack() error handling 永不抛出，main() exit 0 不影响 CI job
+- **E1-U2 CI Workflow**: `.github/workflows/test.yml` — e2e job 后执行 `e2e:summary:slack`，if:always() 无论 pass/fail 都运行，传递 SLACK_WEBHOOK_URL/CI/GITHUB_RUN_NUMBER/GITHUB_RUN_URL
+- TS: 0 errors ✅；Security ✅；Changelog ✅
+- 提交: 276f1ba26
+
 ### [Unreleased] vibex-proposals-20260502-sprint22 Epic5-Agent-E2E: Agent E2E 路径补全 — 2026-05-02
 - **S1 Error Banner**: `WorkbenchUI.tsx` — `data-testid="agent-error-message"` + error banner when 503/500 (role=alert, aria-live=assertive)；`WorkbenchUI.module.css` — .errorBanner 样式
 - **S1 agent-timeout.spec.ts**: 503 mock + TC-E5-1 error message visible + 503 status verification；C-E5-1: page.route mock

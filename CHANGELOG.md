@@ -1,3 +1,10 @@
+### [Unreleased] vibex-proposals-sprint23 Epic E5: Template Library — 2026-05-03
+- **E5-U1 useTemplateManager**: `hooks/useTemplateManager.ts` — exportTemplate (Blob download)/importTemplate (JSON validate)/getHistory/createSnapshot (MAX 10)/deleteSnapshot；downloadBlob() helper；validateTemplateData() JSON schema 验证
+- **E5-U2 TemplateHistoryPanel**: `components/templates/TemplateHistoryPanel/TemplateHistoryPanel.tsx` — history-item data-testid，formatDate() 时间格式化，restore/delete 按钮，history count footer
+- **TemplateGallery 集成**: export/import/history 按钮 + 10 个快照上限 ✅
+- TS: 0 errors ✅；Security ✅；Changelog ✅
+- 提交: 0a076d3c5
+
 ### [Unreleased] vibex-proposals-sprint23 Epic E4: Export Formats — 2026-05-03
 - **E4-U1 PlantUML**: `lib/exporters/plantuml.ts` — class/sequence/usecase diagram，pumlEscape() 防注入，validatePlantUML() 语法检查，@startuml/@enduml 包装，StarUML 兼容
 - **E4-U2 JSON Schema**: `lib/exporters/json-schema.ts` — ComponentNode → JSON Schema draft-2020-12，properties/definitions/required 完整，serializeJSONSchema() 2-space indent，try-catch 降级

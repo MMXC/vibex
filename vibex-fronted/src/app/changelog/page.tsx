@@ -20,6 +20,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.339',
+    date: '2026-05-03',
+    changes: [
+      '🚀 S23-E5: Epic E5 Template Library',
+      '✅ E5-U1: useTemplateManager — exportTemplate Blob/importTemplate JSON验证/getHistory/createSnapshot/deleteSnapshot',
+      '✅ E5-U2: TemplateHistoryPanel — history-item data-testid，MAX 10 snapshots，restore/delete',
+      '提交: 0a076d3c5',
+    ],
+    commit: '0a076d3c5',
+  },
+  {
     version: '1.0.338',
     date: '2026-05-03',
     changes: [

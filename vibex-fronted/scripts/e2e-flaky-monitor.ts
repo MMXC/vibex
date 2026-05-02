@@ -152,20 +152,25 @@ async function postSlack(message: string): Promise<void> {
 async function main(): Promise<void> {
   console.log('[e2e-flaky-monitor] Starting E2E flaky monitoring...');
 
+  // Load history first so we can always compute context
+  const history = loadHistory();
   const stats = loadResults();
-  const flakyRate = computeFlakyRate(stats);
+  const flakyRate = stats.passed + stats.failed + stats.skipped > 0
+    ? computeFlakyRate(stats)
+    : 0;
   const total = stats.passed + stats.failed + stats.skipped;
 
   console.log(`[e2e-flaky-monitor] Results: ${stats.passed} passed, ${stats.failed} failed, ${stats.skipped} skipped (total: ${total})`);
   console.log(`[e2e-flaky-monitor] Flaky rate: ${(flakyRate * 100).toFixed(1)}%`);
+  console.log(`[e2e-flaky-monitor] History: ${history.runs.length} runs tracked`);
 
+  // Skip history update if no results (avoid polluting history with zero-run entries)
   if (total === 0) {
-    console.log('[e2e-flaky-monitor] No test results found — skipping');
+    console.log('[e2e-flaky-monitor] No test results found — skipping history update');
+    console.log('[e2e-flaky-monitor] Done');
     return;
   }
 
-  // Update history
-  const history = loadHistory();
   history.runs.push({
     timestamp: new Date().toISOString(),
     passed: stats.passed,
@@ -179,10 +184,12 @@ async function main(): Promise<void> {
   }
   saveHistory(history);
 
-  // Alert conditions
-  const shouldAlert =
-    flakyRate > FLaky_RATE_THRESHOLD ||
-    (stats.failed > 0 && history.runs.filter(r => r.failed === 0).length === 0);
+  // Alert conditions:
+  // - Flaky rate > 5%
+  // - OR last 3 consecutive runs all had failures
+  const recentFails = history.runs.slice(-3);
+  const consecutiveFailures = recentFails.length >= 3 && recentFails.every(r => r.failed > 0);
+  const shouldAlert = flakyRate > FLaky_RATE_THRESHOLD || consecutiveFailures;
 
   if (shouldAlert && process.env.CI) {
     const message = formatSlackAlert(stats, flakyRate, history);

@@ -18,7 +18,12 @@ export interface PresenceUser {
   userId: string;
   name: string;
   color: string;
-  cursor?: { x: number; y: number };
+  cursor?: {
+    x: number;
+    y: number;
+    nodeId: string | null;
+    timestamp: number;
+  };
   lastSeen: number;
 }
 
@@ -152,7 +157,8 @@ export async function updateCursor(
   canvasId: string,
   userId: string,
   x: number,
-  y: number
+  y: number,
+  nodeId: string | null = null
 ): Promise<void> {
   if (!canvasId || !userId) return;
 
@@ -162,7 +168,7 @@ export async function updateCursor(
       const url = getDatabaseUrl(path) + getAuthParam();
       await fetch(url, {
         method: 'PATCH',
-        body: JSON.stringify({ cursor: { x, y }, lastSeen: Date.now() }),
+        body: JSON.stringify({ cursor: { x, y, nodeId, timestamp: Date.now() }, lastSeen: Date.now() }),
         headers: { 'Content-Type': 'application/json' },
       });
     } catch (err) {
@@ -170,7 +176,7 @@ export async function updateCursor(
     }
   } else {
     if (mockPresenceDb[canvasId]?.[userId]) {
-      mockPresenceDb[canvasId][userId].cursor = { x, y };
+      mockPresenceDb[canvasId][userId].cursor = { x, y, nodeId, timestamp: Date.now() };
       mockPresenceDb[canvasId][userId].lastSeen = Date.now();
       notifySubscribers(canvasId);
     }

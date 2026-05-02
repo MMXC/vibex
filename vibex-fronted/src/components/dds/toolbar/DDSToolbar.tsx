@@ -12,6 +12,12 @@
 import React, { memo, useState, useCallback } from 'react';
 import type { ChapterType, APIEndpointCard, StateMachineCard } from '@/types/dds';
 import { exportToJSON, parseImportFile } from '@/services/dds';
+import { generatePlantUML, validatePlantUML } from '@/lib/exporters/plantuml';
+import { generateJSONSchema, serializeJSONSchema } from '@/lib/exporters/json-schema';
+import { generateSVG } from '@/lib/exporters/svg';
+import { useContextStore } from '@/lib/canvas/stores/contextStore';
+import { useFlowStore } from '@/lib/canvas/stores/flowStore';
+import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { exportDDSCanvasData, exportToStateMachine } from '@/services/dds/exporter';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds';
 import { useCanvasExport } from '@/hooks/canvas/useCanvasExport';
@@ -179,6 +185,65 @@ export const DDSToolbar = memo(function DDSToolbar({
       console.error('[DDSToolbar] DDS import error:', err);
     }
   };
+
+  // E4-U1: PlantUML export
+  const handleExportPlantUML = useCallback(() => {
+    try {
+      const ctxStore = useContextStore.getState();
+      const flowStore = useFlowStore.getState();
+      const compStore = useComponentStore.getState();
+      const puml = generatePlantUML(
+        ctxStore.contextNodes,
+        flowStore.flowNodes,
+        compStore.componentNodes,
+        { diagramType: 'class', title: 'VibeX Canvas' }
+      );
+      if (!validatePlantUML(puml)) {
+        throw new Error('PlantUML syntax validation failed');
+      }
+      const blob = new Blob([puml], { type: 'text/plain' });
+      downloadBlob(blob, `vibex-canvas-${new Date().toISOString().slice(0,10)}.puml`);
+      setDdsExportModalOpen(false);
+    } catch (err) {
+      console.error('[DDSToolbar] PlantUML export error:', err);
+    }
+  }, []);
+
+  // E4-U2: JSON Schema export
+  const handleExportJSONSchema = useCallback(() => {
+    try {
+      const compStore = useComponentStore.getState();
+      const result = generateJSONSchema(compStore.componentNodes, 'VibeX Component Schema');
+      if (!result.success) throw new Error(result.error ?? 'Schema error');
+      const json = serializeJSONSchema(result) || '';
+      const blob = new Blob([json], { type: 'application/json' });
+      downloadBlob(blob, `vibex-canvas-${new Date().toISOString().slice(0,10)}.schema.json`);
+      setDdsExportModalOpen(false);
+    } catch (err) {
+      console.error('[DDSToolbar] JSON Schema export error:', err);
+    }
+  }, []);
+
+  // E4-U3: SVG export with fallback
+  const handleExportSVG = useCallback(() => {
+    try {
+      const ctxStore = useContextStore.getState();
+      const flowStore = useFlowStore.getState();
+      const compStore = useComponentStore.getState();
+      const result = generateSVG(ctxStore.contextNodes, flowStore.flowNodes, compStore.componentNodes);
+      if (!result.success) {
+        console.warn('[DDSToolbar] SVG export fallback:', result.fallbackMessage);
+        // Show fallback toast — AGENTS.md §4.3
+        alert(result.fallbackMessage ?? 'SVG export failed');
+        return;
+      }
+      const blob = new Blob([result.svg ?? ''], { type: 'image/svg+xml' });
+      downloadBlob(blob, `vibex-canvas-${new Date().toISOString().slice(0,10)}.svg`);
+      setDdsExportModalOpen(false);
+    } catch (err) {
+      console.error('[DDSToolbar] SVG export error:', err);
+    }
+  }, []);
 
   // ---- Export handler (E4 legacy) ----
   const handleExport = () => {
@@ -403,6 +468,36 @@ export const DDSToolbar = memo(function DDSToolbar({
               >
                 <span className={styles.exportOptionTitle}>State Machine JSON</span>
                 <span className={styles.exportOptionDesc}>导出版务规则状态机</span>
+              </button>
+
+              {/* E4-U1/U2/U3: PlantUML / JSON Schema / SVG */}
+              <h3 className={styles.exportSectionTitle}>专用格式导出</h3>
+              <button
+                type="button"
+                className={styles.exportOption}
+                onClick={handleExportPlantUML}
+                data-testid="plantuml-option"
+              >
+                <span className={styles.exportOptionTitle}>PlantUML (.puml)</span>
+                <span className={styles.exportOptionDesc}>类图，StarUML 可导入</span>
+              </button>
+              <button
+                type="button"
+                className={styles.exportOption}
+                onClick={handleExportJSONSchema}
+                data-testid="schema-option"
+              >
+                <span className={styles.exportOptionTitle}>JSON Schema (.schema.json)</span>
+                <span className={styles.exportOptionDesc}>组件 API 参数结构定义</span>
+              </button>
+              <button
+                type="button"
+                className={styles.exportOption}
+                onClick={handleExportSVG}
+                data-testid="svg-option"
+              >
+                <span className={styles.exportOptionTitle}>SVG 画布图</span>
+                <span className={styles.exportOptionDesc}>可视化导出</span>
               </button>
             </div>
           </div>

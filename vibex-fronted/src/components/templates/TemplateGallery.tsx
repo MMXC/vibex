@@ -6,9 +6,11 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { templateLoader } from '@/lib/template-loader';
 import type { Template, TemplateFilter } from '@/types/template';
+import { useTemplateManager } from '@/hooks/useTemplateManager';
+import { TemplateHistoryPanel } from './TemplateHistoryPanel/TemplateHistoryPanel';
 import styles from './TemplateGallery.module.css';
 
 // 子组件
@@ -55,6 +57,9 @@ export function TemplateGallery({
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const importRef = useRef<HTMLInputElement>(null);
+  const tm = useTemplateManager();
 
   // 加载模板
   useEffect(() => {
@@ -113,6 +118,35 @@ export function TemplateGallery({
   // 处理搜索
   const handleSearch = (query: string) => {
     setSearchQuery(query);
+  };
+
+  const handleExport = () => {
+    if (!selectedTemplate) return;
+    tm.exportTemplate(selectedTemplate.id, selectedTemplate as unknown as import('@/data/templates/types').RequirementTemplate);
+  };
+
+  const handleImportClick = () => importRef.current?.click();
+  const handleImportChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      await tm.importTemplate(file);
+      alert(`模板 "${file.name}" 导入成功`);
+    } catch (err) {
+      alert(`导入失败: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      e.target.value = '';
+    }
+  };
+
+  const historySnapshots = selectedTemplate ? tm.getHistory(selectedTemplate.id) : [];
+
+  const handleRestore = (_snapshot: import('@/hooks/useTemplateManager').TemplateSnapshot) => {
+    setHistoryOpen(false);
+  };
+  const handleDeleteSnapshot = (snapshotId: string) => {
+    if (!selectedTemplate) return;
+    tm.deleteSnapshot(selectedTemplate.id, snapshotId);
   };
 
   if (!isOpen) return null;
@@ -184,6 +218,57 @@ export function TemplateGallery({
           {selectedCategory !== 'all' && ` (${CATEGORIES.find(c => c.id === selectedCategory)?.name})`}
         </span>
       </div>
+
+      {/* E5-U1/U2: Template actions bar — only when a template is selected */}
+      {selectedTemplate && (
+        <div className={styles.actionBar}>
+          <button
+            type="button"
+            className={styles.actionBtn}
+            onClick={handleExport}
+            data-testid="template-export-btn"
+          >
+            导出
+          </button>
+          <button
+            type="button"
+            className={styles.actionBtn}
+            onClick={handleImportClick}
+            data-testid="template-import-btn"
+          >
+            导入
+          </button>
+          <button
+            type="button"
+            className={styles.actionBtn}
+            onClick={() => setHistoryOpen(true)}
+            data-testid="template-history-btn"
+          >
+            历史 ({historySnapshots.length})
+          </button>
+          <input
+            ref={importRef}
+            type="file"
+            accept=".json"
+            style={{ display: 'none' }}
+            onChange={handleImportChange}
+            data-testid="template-import-input"
+          />
+        </div>
+      )}
+
+      {/* E5-U2: Template History Panel */}
+      {historyOpen && selectedTemplate && (
+        <div className={styles.historyOverlay}>
+          <TemplateHistoryPanel
+            templateId={selectedTemplate.id}
+            history={historySnapshots}
+            onRestore={handleRestore}
+            onDelete={handleDeleteSnapshot}
+            onClose={() => setHistoryOpen(false)}
+          />
+        </div>
+      )}
     </div>
   );
 }

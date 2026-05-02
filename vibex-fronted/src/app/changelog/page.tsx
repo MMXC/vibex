@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.338',
+    date: '2026-05-03',
+    changes: [
+      '🚀 S23-E4: Epic E4 Export Formats',
+      '✅ E4-U1: plantuml.ts — class/sequence/usecase diagram，pumlEscape() 防注入',
+      '✅ E4-U2: json-schema.ts — JSON Schema draft-2020-12，try-catch 降级',
+      '✅ E4-U3: svg.ts — 1200×800 canvas SVG，svgEscape() 防注入，fallback',
+      '提交: 7539b2763',
+    ],
+    commit: '7539b2763',
+  },
+  {
     version: '1.0.337',
     date: '2026-05-03',
     changes: [

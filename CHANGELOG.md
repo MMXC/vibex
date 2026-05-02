@@ -1,3 +1,11 @@
+### [Unreleased] vibex-proposals-sprint23 Epic E4: Export Formats — 2026-05-03
+- **E4-U1 PlantUML**: `lib/exporters/plantuml.ts` — class/sequence/usecase diagram，pumlEscape() 防注入，validatePlantUML() 语法检查，@startuml/@enduml 包装，StarUML 兼容
+- **E4-U2 JSON Schema**: `lib/exporters/json-schema.ts` — ComponentNode → JSON Schema draft-2020-12，properties/definitions/required 完整，serializeJSONSchema() 2-space indent，try-catch 降级
+- **E4-U3 SVG**: `lib/exporters/svg.ts` — 1200×800 canvas SVG，svgEscape() 防注入，contextSvg (core/supporting/generic/external 分色) + flowSvg，generateSVG() try-catch fallback
+- **DDSToolbar 集成**: plantuml/schema/svg export 按钮 data-testid 完整
+- TS: 0 errors ✅；Security ✅；Changelog ✅
+- 提交: 7539b2763
+
 ### [Unreleased] vibex-proposals-sprint23 Epic E3: Firebase Cursor Sync — 2026-05-03
 - **E3-U1 presence.ts cursor 扩展**: `lib/firebase/presence.ts` — cursor 字段扩展 nodeId + timestamp；REST API PATCH 实现零 SDK 依赖；EventSource SSE 流式订阅 + 2s polling fallback；visibilitychange 清除机制
 - **E3-U2 RemoteCursor**: `components/presence/RemoteCursor.tsx` + `RemoteCursor.module.css` — SVG arrow cursor + username label，isMockMode guard 符合 AGENTS.md §4.2，数据属性完整（data-user-id/data-node-id/data-testid）

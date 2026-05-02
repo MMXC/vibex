@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.333',
+    date: '2026-05-02',
+    changes: [
+      '📋 S22-E2: E2E 稳定性监控 — flaky-monitor 脚本 + CI 集成',
+      '✅ E2-U1: e2e-flaky-monitor.ts — flaky rate 计算、运行历史追踪、Slack 告警（5% 阈值或连续 3 次失败触发）',
+      '✅ E2-U2: .github/workflows/test.yml 添加 flaky-monitor step，if: always()',
+      '✅ E2-U3: 逻辑修复 (1c6303fe1) — shouldAlert 连续失败检查、历史加载顺序、零结果早期退出',
+      '提交: 714d2b42b (feat), 1c6303fe1 (fix)',
+    ],
+    commit: '714d2b42b, 1c6303fe1',
+  },
+  {
     version: '1.0.332',
     date: '2026-05-01',
     changes: [

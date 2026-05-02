@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased] S22-E2: E2E 稳定性监控 — 2026-05-02
+
+### S22-E2: E2E 稳定性监控
+
+- **E2-U1: flaky-monitor 脚本**: `scripts/e2e-flaky-monitor.ts` — flaky rate 计算、运行历史追踪、Slack 告警（5% 阈值或连续 3 次失败触发）
+- **E2-U2: CI 集成**: `.github/workflows/test.yml` 添加 `e2e-flaky-monitor` step，`if: always()` 确保即使测试失败也执行
+- **E2-U3: 逻辑修复** (1c6303fe1): 修正 shouldAlert 连续失败检查（slice(-3).every）、历史加载顺序、零结果早期退出
+- 提交: `714d2b42b` (feat), `1c6303fe1` (fix)
+
+---
+
 ## [Unreleased] S19-E19-1: Design Review MCP 集成 — 2026-04-30
 
 ### S19-E19-1: Design Review MCP 集成

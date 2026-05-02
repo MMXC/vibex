@@ -3,10 +3,11 @@
 /**
  * ReviewReportPanel — S16-P0-1 Design Review UI
  *
- * Three-tab panel showing design review results:
+ * Four-tab panel showing design review results:
  * - Compliance: Design system compliance issues
  * - Accessibility: A11y issues
  * - Reuse: Code reuse recommendations
+ * - Diff: Changes since last review
  *
  * Cyberpunk glassmorphism styling consistent with DDS design system.
  * E19-1-S3: Graceful degradation states (loading/error/empty/retry)
@@ -14,13 +15,14 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDesignReview, type DesignReviewIssue, type DesignReviewRecommendation } from '@/hooks/useDesignReview';
+import { DiffView } from './DiffView';
 import styles from './ReviewReportPanel.module.css';
 
 // ============================================================================
 // Types
 // ============================================================================
 
-type TabId = 'compliance' | 'accessibility' | 'reuse';
+type TabId = 'compliance' | 'accessibility' | 'reuse' | 'diff';
 
 interface ReviewReportPanelProps {
   /** Auto-open when review completes */
@@ -73,7 +75,7 @@ function RecommendationCard({ rec }: { rec: DesignReviewRecommendation }) {
 
 export function ReviewReportPanel({ autoOpen = false }: ReviewReportPanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>('compliance');
-  const { isOpen, isLoading, result, error, runReview, close } = useDesignReview();
+  const { isOpen, isLoading, result, diffResult, error, runReview, close } = useDesignReview();
 
   // Listen for design-review:open event
   useEffect(() => {
@@ -96,6 +98,10 @@ export function ReviewReportPanel({ autoOpen = false }: ReviewReportPanelProps) 
     setActiveTab(tab);
   }, []);
 
+  const handleReReview = useCallback(() => {
+    void runReview();
+  }, [runReview]);
+
   if (!isOpen && !isLoading) return null;
 
   const tabs: { id: TabId; label: string; count: number }[] = [
@@ -104,21 +110,38 @@ export function ReviewReportPanel({ autoOpen = false }: ReviewReportPanelProps) 
     { id: 'reuse', label: 'Reuse', count: result?.reuse.length ?? 0 },
   ];
 
+  if (diffResult) {
+    const diffCount = diffResult.added.length + diffResult.removed.length;
+    tabs.push({ id: 'diff', label: 'Diff', count: diffCount });
+  }
+
   return (
     <div className={styles.overlay} data-testid="review-report-panel" role="dialog" aria-modal="true" aria-label="Design Review Report">
       <div className={styles.panel}>
         {/* Header */}
         <div className={styles.header}>
           <h2 className={styles.title} data-testid="panel-title">Design Review Report</h2>
-          <button
-            type="button"
-            className={styles.closeButton}
-            onClick={close}
-            data-testid="panel-close"
-            aria-label="Close review panel"
-          >
-            ✕
-          </button>
+          <div className={styles.headerActions}>
+            <button
+              type="button"
+              className={styles.reReviewButton}
+              onClick={handleReReview}
+              data-testid="re-review-btn"
+              aria-label="Run review again"
+              title="重新评审"
+            >
+              ↻ Re-review
+            </button>
+            <button
+              type="button"
+              className={styles.closeButton}
+              onClick={close}
+              data-testid="panel-close"
+              aria-label="Close review panel"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* E19-1-S3: Loading state */}
@@ -209,6 +232,9 @@ export function ReviewReportPanel({ autoOpen = false }: ReviewReportPanelProps) 
                     result.reuse.map((rec) => <RecommendationCard key={rec.id} rec={rec} />)
                   )}
                 </div>
+              )}
+              {activeTab === 'diff' && diffResult && (
+                <DiffView diff={diffResult} />
               )}
             </div>
           </>

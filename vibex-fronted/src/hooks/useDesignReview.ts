@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+import { computeReviewDiff, type ReviewDiff } from '@/lib/reviewDiff';
 
 export interface DesignReviewIssue {
   id: string;
@@ -127,15 +128,18 @@ async function callReviewDesignMCP(canvasId: string, _figmaUrl: string, _designT
   };
 }
 
-interface UseDesignReviewOptions {
+export interface UseDesignReviewOptions {
   /** Trigger review on mount */
   autoTrigger?: boolean;
+  /** Previous report ID to compute diff against */
+  previousReportId?: string | null;
 }
 
 export function useDesignReview(_options: UseDesignReviewOptions = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<DesignReviewResult | null>(null);
+  const [diffResult, setDiffResult] = useState<ReviewDiff | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const runReview = useCallback(async (figmaUrl?: string) => {
@@ -145,6 +149,9 @@ export function useDesignReview(_options: UseDesignReviewOptions = {}) {
       // E19-1-S2: call real API with canvasId extracted from figmaUrl or default
       const canvasId = figmaUrl ? figmaUrl.split('/').pop() ?? 'default' : 'default';
       const data = await callReviewDesignMCP(canvasId, figmaUrl ?? '', []);
+      const prev = result;
+      const diff = prev ? computeReviewDiff(data, prev) : null;
+      setDiffResult(diff);
       setResult(data);
       setIsOpen(true);
     } catch (err) {
@@ -152,7 +159,7 @@ export function useDesignReview(_options: UseDesignReviewOptions = {}) {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [result]);
 
   const open = useCallback(() => {
     setIsOpen(true);
@@ -166,6 +173,7 @@ export function useDesignReview(_options: UseDesignReviewOptions = {}) {
     isOpen,
     isLoading,
     result,
+    diffResult,
     error,
     runReview,
     open,

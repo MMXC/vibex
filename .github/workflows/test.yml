@@ -225,6 +225,15 @@ jobs:
           path: vibex-fronted/test-results/
           retention-days: 7
 
+      # C-E2-1: E2E flaky monitor — run after test execution, regardless of pass/fail
+      - name: E2E flaky monitor
+        if: always()
+        run: pnpm --filter vibex-fronted run e2e:flaky:monitor
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          CI: true
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+
   merge-gate:
     name: Merge Gate
     runs-on: ubuntu-latest

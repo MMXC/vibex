@@ -36,7 +36,8 @@
     "report:vuln": "npm audit --json > vulnerability-report.json",
     "e2e:db:reset": "tsx scripts/e2e-db-reset.ts",
     "e2e:db:reset:dry": "tsx scripts/e2e-db-reset.ts --dry-run",
-    "e2e:summary:slack": "tsx scripts/e2e-summary-to-slack.ts"
+    "e2e:summary:slack": "tsx scripts/e2e-summary-to-slack.ts",
+    "e2e:flaky:monitor": "npx tsx scripts/e2e-flaky-monitor.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

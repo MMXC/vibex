@@ -94,14 +94,11 @@ Week 3 (Day 1-2)
 
 | Story | 任务 | 工时 | 依赖 | 执行者 |
 |-------|------|------|------|--------|
-| S5.1 | 模板导出 JSON（download 触发） | 1h | 无 | Dev |
-| S5.1 | 模板导入 JSON（file input） | 1h | S5.1 | Dev |
-| S5.2 | 模板历史面板 UI | 1h | S5.1 | Dev |
-| S5.2 | localStorage 版本快照存储（≤10） | 1h | S5.1 | Dev |
+| S5.1 | 模板导出 JSON（download 触发） | 1h | 无 | Dev | :white_check_mark: |
+| S5.1 | 模板导入 JSON（file input） | 1h | S5.1 | Dev | :white_check_mark: |
+| S5.2 | 模板历史面板 UI | 1h | S5.1 | Dev | :white_check_mark: |
+| S5.2 | localStorage 版本快照存储（≤10） | 1h | S5.1 | Dev | :white_check_mark: |
 
----
-
-## 4. 依赖关系图
 
 ```
 E1: Slack 报告

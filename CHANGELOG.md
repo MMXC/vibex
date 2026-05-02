@@ -1,3 +1,10 @@
+### [Unreleased] vibex-proposals-sprint23 Epic E3: Firebase Cursor Sync — 2026-05-03
+- **E3-U1 presence.ts cursor 扩展**: `lib/firebase/presence.ts` — cursor 字段扩展 nodeId + timestamp；REST API PATCH 实现零 SDK 依赖；EventSource SSE 流式订阅 + 2s polling fallback；visibilitychange 清除机制
+- **E3-U2 RemoteCursor**: `components/presence/RemoteCursor.tsx` + `RemoteCursor.module.css` — SVG arrow cursor + username label，isMockMode guard 符合 AGENTS.md §4.2，数据属性完整（data-user-id/data-node-id/data-testid）
+- **E3-U3 useCursorSync**: `hooks/useCursorSync.ts` — 100ms debounce cursor write；subscribeToOthers 订阅远程 cursor；moveCursor 时 isMockMode 直接返回；swallow 错误不抛出
+- TS: 0 errors ✅；Security ✅；Changelog ✅
+- 提交: 5430f7394
+
 ### [Unreleased] vibex-proposals-sprint23 Epic E2: Design Review Diff 视图 — 2026-05-03
 - **E2-U1 Re-Review Button**: `ReviewReportPanel.tsx` — re-review-btn (data-testid=re-review-btn)，↻ Re-review 触发重新评审
 - **E2-U2 Diff State**: `useDesignReview.ts` — diffResult state + previousReportId 支持，首次 review 后 diffResult=null，后续基于前次结果计算 diff

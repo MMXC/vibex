@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.337',
+    date: '2026-05-03',
+    changes: [
+      '🚀 S23-E3: Epic E3 Firebase Cursor Sync',
+      '✅ E3-U1: presence.ts — REST API PATCH 零 SDK，EventSource SSE + 2s polling fallback',
+      '✅ E3-U2: RemoteCursor SVG arrow + username label，isMockMode guard',
+      '✅ E3-U3: useCursorSync — 100ms debounce cursor write，moveCursor isMockMode fast path',
+      '提交: 5430f7394',
+    ],
+    commit: '5430f7394',
+  },
+  {
     version: '1.0.336',
     date: '2026-05-03',
     changes: [

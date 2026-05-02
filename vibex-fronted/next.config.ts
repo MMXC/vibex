@@ -7,6 +7,15 @@ const withBundleAnalyzer = createBundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // C-E2-1: Exclude MCP SDK from Turbopack static analysis to fix spawn resolution
+    // https://nextjs.org/docs/app/api-reference/config/next-config-js/serverComponentsExternalPackages
+    serverComponentsExternalPackages: ['@modelcontextprotocol/sdk'],
+  },
+  // Mark child_process as external so Turbopack doesn't try to bundle it.
+  // This allows spawn() calls to resolve at runtime instead of build time.
+  // Required for mcp-bridge.ts which uses child_process.spawn() for MCP server stdio bridge.
+  serverExternalPackages: ['child_process'],
   // QA模式下用standalone，允许API routes和middleware
   output: process.env.NEXT_OUTPUT_MODE === 'standalone' ? 'standalone' : 'export',
   images: {

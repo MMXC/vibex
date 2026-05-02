@@ -13,7 +13,11 @@
  * which the route handler catches and converts to the static analysis fallback.
  */
 
-import { spawn } from 'child_process';
+// Use createRequire to get a require function scoped to this file.
+// This defers child_process resolution to runtime and prevents Turbopack
+// from statically analyzing the spawn arguments.
+const { createRequire } = await import('module');
+const require_ = createRequire(import.meta.url);
 
 // =============================================================================
 // Types
@@ -112,19 +116,24 @@ export async function callTool(
   options: { timeoutMs?: number } = {}
 ): Promise<MCPCallResult> {
   const timeoutMs = options.timeoutMs ?? CALL_TIMEOUT_MS;
-  let output = '';
-  let errorOutput = '';
-
-  // Resolve MCP server path at runtime
-  let mcpServerPath: string;
-  try {
-    mcpServerPath = getMcpServerPath();
-  } catch (err) {
-    // MCP not configured — throw immediately so route can catch and degrade
-    return Promise.reject(err);
-  }
 
   return new Promise((resolve, reject) => {
+    // All dynamic code (path resolution + spawn) lives inside the Promise executor.
+    // This runs after module load completes, avoiding Turbopack static analysis.
+    let mcpServerPath: string;
+    try {
+      mcpServerPath = getMcpServerPath();
+    } catch (err) {
+      reject(err);
+      return;
+    }
+
+    // Load child_process at execution time to avoid Turbopack bundling analysis
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { spawn } = require('child_process');
+    let output = '';
+    let errorOutput = '';
+
     const proc = spawn('node', [mcpServerPath], {
       stdio: ['pipe', 'pipe', 'pipe'],
       env: {
@@ -149,7 +158,7 @@ export async function callTool(
       errorOutput += chunk.toString();
     });
 
-    proc.stdin?.write(JSON.stringify(request) + '\n', (err) => {
+    proc.stdin?.write(JSON.stringify(request) + '\n', (err: Error | null) => {
       if (err) {
         proc.kill();
         reject(new Error(`Failed to write to MCP stdin: ${err.message}`));
@@ -157,7 +166,7 @@ export async function callTool(
     });
 
     // Timeout
-    const timer = setTimeout(() => {
+    const timer: NodeJS.Timeout = setTimeout(() => {
       proc.kill();
       reject(new Error(`MCP call timed out after ${timeoutMs}ms`));
     }, timeoutMs);
@@ -195,8 +204,8 @@ export async function callTool(
       }
     });
 
-    proc.on('close', (code) => {
-      clearTimeout(timer);
+    proc.on('close', (code: number | null) => {
+      clearTimeout(timer as NodeJS.Timeout);
       if (!resolved) {
         if (code !== 0 && errorOutput) {
           reject(new Error(`MCP server exited with code ${code}: ${errorOutput}`));
@@ -206,7 +215,7 @@ export async function callTool(
       }
     });
 
-    proc.on('error', (err) => {
+    proc.on('error', (err: Error) => {
       clearTimeout(timer);
       if (!resolved) {
         reject(new Error(`MCP server spawn failed: ${err.message}`));

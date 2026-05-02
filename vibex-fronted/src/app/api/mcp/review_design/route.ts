@@ -18,7 +18,6 @@ import type { ReviewDesignInput, DesignReviewReport } from '@/lib/mcp-bridge';
 // ============================================================================
 
 const HEX_COLOR_RE = /#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\b/g;
-const RGBA_LITERAL_RE = /rgba?\s*\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(,\s*[\d.]+\s*)?\)/g;
 
 function checkDesignCompliance(flow: Record<string, unknown>): {
   colors: boolean; colorIssues: unknown[];
@@ -117,13 +116,11 @@ function analyzeComponentReuse(nodes: Array<Record<string, unknown>>): {
       if ((nodeA.type as string) !== (nodeB.type as string)) continue;
 
       let sharedFields = 0;
-      let totalFields = 0;
       const allKeys = new Set([...Object.keys(nodeA), ...Object.keys(nodeB)].filter(k => !SKIP_KEYS.includes(k)));
       for (const key of allKeys) {
         const a = nodeA[key];
         const b = nodeB[key];
         if (a !== undefined && b !== undefined) {
-          totalFields++;
           if (JSON.stringify(a) === JSON.stringify(b)) sharedFields++;
         }
       }

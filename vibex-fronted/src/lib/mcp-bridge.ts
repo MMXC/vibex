@@ -13,11 +13,13 @@
  * which the route handler catches and converts to the static analysis fallback.
  */
 
-// Use createRequire to get a require function scoped to this file.
-// This defers child_process resolution to runtime and prevents Turbopack
-// from statically analyzing the spawn arguments.
+// Turbopack compatibility: load child_process via createRequire at runtime.
+// This prevents Turbopack from analyzing the spawn call statically.
 const { createRequire } = await import('module');
-const require_ = createRequire(import.meta.url);
+const _require = createRequire(import.meta.url);
+
+// Resolved at module load time. If undefined, spawn is never called.
+const _MCP_SERVER_PATH: string | undefined = process.env.MCP_SERVER_PATH;
 
 // =============================================================================
 // Types
@@ -89,22 +91,9 @@ interface JSONRPCMessage {
   error?: { code: number; message: string; data?: unknown };
 }
 
-/**
- * Get the MCP server binary path at runtime (avoids Turbopack static analysis).
- * 
- * Resolution order:
- * 1. MCP_SERVER_PATH env var (set by DevOps for staging/prod deployments)
- * 2. For local dev, MCP is typically unavailable so we throw a clear error
- *    and let the caller fall back to static analysis.
- */
-function getMcpServerPath(): string {
-  if (process.env.MCP_SERVER_PATH) {
-    return process.env.MCP_SERVER_PATH;
-  }
-  // In development/CI without env var, MCP server is not configured.
-  // Throw with clear message so the route's try/catch can handle graceful degradation.
-  throw new Error('MCP_SERVER_PATH environment variable is not set. Set it to the absolute path of packages/mcp-server/dist/index.js, or leave unset to use static analysis fallback.');
-}
+// Use createRequire to get a require function scoped to this file.
+// This defers child_process resolution to runtime and prevents Turbopack
+// from statically analyzing the spawn arguments.
 
 /**
  * Call an MCP tool via stdio JSON-RPC.
@@ -117,30 +106,24 @@ export async function callTool(
 ): Promise<MCPCallResult> {
   const timeoutMs = options.timeoutMs ?? CALL_TIMEOUT_MS;
 
-  return new Promise((resolve, reject) => {
-    // All dynamic code (path resolution + spawn) lives inside the Promise executor.
-    // This runs after module load completes, avoiding Turbopack static analysis.
-    let mcpServerPath: string;
-    try {
-      mcpServerPath = getMcpServerPath();
-    } catch (err) {
-      reject(err);
-      return;
-    }
+  // Guard: if MCP server path is not configured, reject immediately.
+  // The route's try/catch will convert this to graceful degradation.
+  if (!_MCP_SERVER_PATH) {
+    return Promise.reject(new Error('MCP_SERVER_PATH environment variable is not set. Set it to the absolute path of packages/mcp-server/dist/index.js, or leave unset to use static analysis fallback.'));
+  }
 
-    // Load child_process at execution time to avoid Turbopack bundling analysis
+  return new Promise((resolve, reject) => {
+    // Load child_process at execution time via createRequire.
+    // Turbopack cannot trace this require chain, avoiding the dynamic import analysis issue.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { spawn } = require('child_process');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { spawn } = _require('child_process') as { spawn: typeof import('child_process').spawn };
+    const proc = spawn('node', [_MCP_SERVER_PATH], {
+      stdio: ['pipe', 'pipe', 'pipe'],
+      env: process.env as NodeJS.ProcessEnv,
+    });
     let output = '';
     let errorOutput = '';
-
-    const proc = spawn('node', [mcpServerPath], {
-      stdio: ['pipe', 'pipe', 'pipe'],
-      env: {
-        ...process.env,
-        NODE_ENV: process.env.NODE_ENV ?? 'development',
-      },
-    });
 
     const id = Date.now();
     const request: JSONRPCMessage = {
@@ -158,7 +141,7 @@ export async function callTool(
       errorOutput += chunk.toString();
     });
 
-    proc.stdin?.write(JSON.stringify(request) + '\n', (err: Error | null) => {
+    proc.stdin?.write(JSON.stringify(request) + '\n', (err) => {
       if (err) {
         proc.kill();
         reject(new Error(`Failed to write to MCP stdin: ${err.message}`));
@@ -166,7 +149,7 @@ export async function callTool(
     });
 
     // Timeout
-    const timer: NodeJS.Timeout = setTimeout(() => {
+    const timer = setTimeout(() => {
       proc.kill();
       reject(new Error(`MCP call timed out after ${timeoutMs}ms`));
     }, timeoutMs);
@@ -204,8 +187,8 @@ export async function callTool(
       }
     });
 
-    proc.on('close', (code: number | null) => {
-      clearTimeout(timer as NodeJS.Timeout);
+    proc.on('close', (code) => {
+      clearTimeout(timer);
       if (!resolved) {
         if (code !== 0 && errorOutput) {
           reject(new Error(`MCP server exited with code ${code}: ${errorOutput}`));
@@ -215,7 +198,7 @@ export async function callTool(
       }
     });
 
-    proc.on('error', (err: Error) => {
+    proc.on('error', (err) => {
       clearTimeout(timer);
       if (!resolved) {
         reject(new Error(`MCP server spawn failed: ${err.message}`));

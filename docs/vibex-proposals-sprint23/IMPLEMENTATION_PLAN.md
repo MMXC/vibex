@@ -73,12 +73,12 @@ Week 3 (Day 1-2)
 
 | Story | 任务 | 工时 | 依赖 | 执行者 |
 |-------|------|------|------|--------|
-| S3.1 | presence.ts 新增 cursor 字段类型 | 0.5h | 无 | Dev |
-| S3.1 | Firebase presence 写入 cursor | 0.5h | 无 | Dev |
-| S3.1 | cursor 数据验证 | 0.5h | 无 | Dev |
-| S3.2 | RemoteCursor 组件开发 | 1.5h | S3.1 | Dev |
-| S3.2 | RemoteCursor CSS 样式 | 0.5h | S3.1 | Dev |
-| S3.3 | useCursorSync hook（100ms throttle） | 1h | S3.2 | Dev |
+| S3.1 | presence.ts 新增 cursor 字段类型 | 0.5h | 无 | Dev | :white_check_mark: |
+| S3.1 | Firebase presence 写入 cursor | 0.5h | 无 | Dev | :white_check_mark: |
+| S3.1 | cursor 数据验证 | 0.5h | 无 | Dev | :white_check_mark: |
+| S3.2 | RemoteCursor 组件开发 | 1.5h | S3.1 | Dev | :white_check_mark: |
+| S3.2 | RemoteCursor CSS 样式 | 0.5h | S3.1 | Dev | :white_check_mark: |
+| S3.3 | useCursorSync hook（100ms throttle） | 1h | S3.2 | Dev | :white_check_mark: |
 
 ### Epic E4: Canvas 导出格式扩展
 

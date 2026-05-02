@@ -63,10 +63,10 @@ Week 3 (Day 1-2)
 
 | Story | 任务 | 工时 | 依赖 | 执行者 |
 |-------|------|------|------|--------|
-| S2.1 | ReviewReportPanel 添加 re-review-btn | 1h | 无 | Dev |
-| S2.2 | useDesignReview 支持 previousReportId | 1h | S2.1 | Dev |
-| S2.3 | DiffView 组件（红/绿标记） | 1.5h | S2.2 | Dev |
-| S2.3 | diff 算法实现 | 0.5h | S2.2 | Dev |
+| S2.1 | ReviewReportPanel 添加 re-review-btn | 1h | 无 | Dev | :white_check_mark: |
+| S2.2 | useDesignReview 支持 previousReportId | 1h | S2.1 | Dev | :white_check_mark: |
+| S2.3 | DiffView 组件（红/绿标记） | 1.5h | S2.2 | Dev | :white_check_mark: |
+| S2.3 | diff 算法实现 | 0.5h | S2.2 | Dev | :white_check_mark: |
 | S2.4 | POST /design/review-diff 后端 API | 2h | S2.2 | Backend |
 
 ### Epic E3: Firebase Cursor Sync 基础

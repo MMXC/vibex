@@ -241,6 +241,14 @@ localStorage key: 'vibex:customTemplates'
 data-testid="save-as-template-btn"
 ```
 
+### E4 完成状态
+
+| Unit | 状态 | 验证 |
+|------|------|------|
+| E4-S1 模板选择界面 | :white_check_mark: 已完成 | NewProjectModal.tsx + industry-templates.json |
+| E4-S2 模板自动填充 | :white_check_mark: 已完成 | ChapterPanel.tsx + useTemplates.ts |
+| E4-S3 自定义模板保存 | :white_check_mark: 已完成 | saveAsTemplate + save-as-template-btn |
+
 ---
 
 ## 6. E5: Agent E2E 路径补全

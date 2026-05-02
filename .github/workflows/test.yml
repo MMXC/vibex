@@ -234,6 +234,16 @@ jobs:
           CI: true
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
 
+      # E1-U2: E2E summary Slack report — run after test execution, regardless of pass/fail
+      - name: E2E Summary Slack Report
+        if: always()
+        run: pnpm --filter vibex-fronted run e2e:summary:slack
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          CI: true
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+          GITHUB_RUN_URL: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+
   merge-gate:
     name: Merge Gate
     runs-on: ubuntu-latest

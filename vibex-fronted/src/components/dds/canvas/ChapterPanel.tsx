@@ -10,6 +10,7 @@
  * Epic2-E1-U1: 3-chapter structure with data-chapter attribute
  * Epic2-E1-U2: CRUD for cards (add/update/delete)
  * Epic2-E1-U3: Schema rendering (delegates to CardRenderer)
+ * Epic4-E4-S2: Template auto-fill for requirement chapter
  */
 
 'use client';
@@ -61,11 +62,73 @@ function nowISO(): string {
   return new Date().toISOString();
 }
 
+// E4-S2: 解析 requirement 内容文本，提取用户故事
+interface ParsedSection {
+  role: string;
+  action: string;
+  benefit: string;
+}
+
+function parseRequirementContent(content: string): ParsedSection[] {
+  const sections: ParsedSection[] = [];
+  // 匹配 "作为<角色>，我想要<行为>" 或 "- 角色：xxx" 等格式
+  const lines = content.split('\n');
+  let currentRole = '';
+  let currentAction = '';
+  let currentBenefit = '';
+  let inUserSection = false;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    // 检测 ## 用户 段落
+    if (/^##\s*用户/.test(trimmed)) {
+      inUserSection = true;
+      continue;
+    }
+    // 检测非用户段落（如 ## 场景）
+    if (/^##\s+[^用户]/.test(trimmed)) {
+      inUserSection = false;
+      continue;
+    }
+    if (!inUserSection) continue;
+
+
+    // 提取 "角色：xxx" 或 "- 角色：xxx"
+    const roleMatch = trimmed.match(/(?:^|-\s*)角色[：:]\s*(.+)/i);
+    if (roleMatch && roleMatch[1]) {
+      currentRole = roleMatch[1].trim();
+    }
+    // 提取 "核心需求：xxx" 或 "- xxx"
+    const actionMatch = trimmed.match(/(?:核心需求[：:]|(?:^|-\s*)(?!角色|场景|目标|约束)(.+))\s*(.+)/i);
+    if (trimmed && currentRole && !trimmed.startsWith('-')) {
+      // 单行角色描述
+      currentAction = trimmed;
+    }
+    if (actionMatch && actionMatch[1]) {
+      currentAction = actionMatch[1].trim();
+    }
+    // 收集完整条目
+    if (currentRole && currentAction) {
+      sections.push({
+        role: currentRole,
+        action: currentAction,
+        benefit: currentBenefit,
+      });
+      currentAction = '';
+      currentBenefit = '';
+    }
+  }
+
+  return sections;
+}
+
 // ==================== Props ====================
 
 export interface ChapterPanelProps {
   chapter: ChapterType;
   className?: string;
+  /** E4-S2: 自动填充模板内容 */
+  templateRequirement?: string;
 }
 
 // ==================== Card Creation Forms ====================
@@ -303,6 +366,7 @@ function CardItem({
 export const ChapterPanel = memo(function ChapterPanel({
   chapter,
   className = '',
+  templateRequirement,
 }: ChapterPanelProps) {
   const cards = useDDSCanvasStore((s) => s.chapters[chapter].cards);
   const loading = useDDSCanvasStore((s) => s.chapters[chapter].loading);
@@ -310,6 +374,30 @@ export const ChapterPanel = memo(function ChapterPanel({
   const selectedCardIds = useDDSCanvasStore((s) => s.selectedCardIds);
   const loadChapter = useDDSCanvasStore((s) => s.loadChapter);
   const { addCard, deleteCard } = ddsChapterActions;
+
+
+  // E4-S2: 当传入模板 requirement 内容时，自动解析并填充卡片
+  useEffect(() => {
+    if (chapter !== 'requirement' || !templateRequirement?.trim()) return;
+    if (cards.length > 0) return; // 已有内容不覆盖
+    const sections = parseRequirementContent(templateRequirement);
+    sections.forEach(({ role, action, benefit }) => {
+      const card: UserStoryCard = {
+        id: generateId(),
+        type: 'user-story',
+        title: `作为${role}，我想要${action}`,
+        role,
+        action,
+        benefit,
+        priority: 'medium',
+        position: { x: 0, y: 0 },
+        createdAt: nowISO(),
+        updatedAt: nowISO(),
+      };
+      addCard(chapter, card);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chapter, templateRequirement]);
 
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [creatingType, setCreatingType] = useState<CardType | null>(null);
@@ -467,6 +555,10 @@ export const ChapterPanel = memo(function ChapterPanel({
 
   return (
     <div className={`${styles.chapterPanel} ${className}`} data-chapter={chapter}>
+      {/* E4-S2: requirement chapter 添加 data-testid */}
+      {chapter === 'requirement' && (
+        <div data-testid="requirement-chapter" style={{ display: 'none' }} />
+      )}
       {/* Header */}
       <div className={styles.chapterHeader}>
         <span className={styles.chapterTitle}>{CHAPTER_LABELS[chapter]}</span>
@@ -636,6 +728,42 @@ export const ChapterPanel = memo(function ChapterPanel({
               添加{CARD_TYPE_LABELS[type]}
             </button>
           ))}
+
+          {/* E4-S3: 保存为模板按钮 */}
+          <button
+            className={styles.saveTemplateBtn}
+            onClick={() => {
+              const req = cards
+                .map((c) => {
+                  if (c.type === 'user-story') {
+                    const uc = c as UserStoryCard;
+                    return `作为${uc.role}，我想要${uc.action}`;
+                  }
+                  return c.title;
+                })
+                .join('\n');
+              const name = prompt('输入自定义模板名称：');
+              if (name?.trim()) {
+                import('@/hooks/useTemplates').then(({ useTemplates }) => {
+                  // Dynamic import to avoid circular deps
+                  const { saveAsTemplate } = useTemplates();
+                  saveAsTemplate(name.trim(), { requirement: req, architecture: '' })
+                    .then(() => alert('模板已保存'))
+                    .catch((e: Error) => alert(`保存失败：${e.message}`));
+                });
+              }
+            }}
+            data-testid="save-as-template-btn"
+            type="button"
+            title="保存当前章节为自定义模板"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+              <polyline points="17 21 17 13 7 13 7 21" />
+              <polyline points="7 3 7 8 15 8" />
+            </svg>
+            保存为模板
+          </button>
         </div>
       )}
     </div>

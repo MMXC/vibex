@@ -1,0 +1,296 @@
+/* NewProjectModal — 模板选择弹窗样式 */
+
+/* ==================== Modal Container ==================== */
+
+.modal {
+  /* 覆盖 Modal 默认样式 */
+}
+
+.content {
+  padding: 0 0 8px;
+}
+
+/* ==================== Loading / Error ==================== */
+
+.loadingState,
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 20px;
+  color: #a1a1aa;
+  font-size: 14px;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.errorState {
+  color: #ef4444;
+}
+
+/* ==================== Template List ==================== */
+
+.templateList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 8px 24px 16px;
+}
+
+/* ==================== Template Option Card ==================== */
+
+.templateOption {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: #1e1e2e;
+  border: 1.5px solid #2d2d44;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  text-align: left;
+  width: 100%;
+  color: #e4e4e7;
+}
+
+.templateOption:hover {
+  background: #262640;
+  border-color: #3d3d60;
+  transform: translateY(-1px);
+}
+
+.templateOption:active {
+  transform: translateY(0);
+}
+
+.templateOption.selected {
+  background: #1a2540;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2);
+}
+
+.templateIcon {
+  font-size: 24px;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.templateInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.templateName {
+  font-size: 15px;
+  font-weight: 600;
+  color: #f4f4f5;
+  line-height: 1.3;
+}
+
+.templateDesc {
+  font-size: 12px;
+  color: #71717a;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.checkmark {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ==================== Action Buttons ==================== */
+
+.actions {
+  display: flex;
+  gap: 10px;
+  padding: 16px 24px 8px;
+  border-top: 1px solid #2d2d44;
+  justify-content: flex-end;
+}
+
+.cancelBtn {
+  padding: 8px 20px;
+  background: transparent;
+  border: 1px solid #3d3d60;
+  border-radius: 8px;
+  color: #a1a1aa;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.cancelBtn:hover {
+  background: #2d2d44;
+  border-color: #5d5d80;
+}
+
+.cancelBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.nextBtn,
+.confirmBtn {
+  padding: 8px 20px;
+  background: #3b82f6;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.nextBtn:hover,
+.confirmBtn:hover {
+  background: #2563eb;
+}
+
+.nextBtn:disabled,
+.confirmBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ==================== Name Input Step ==================== */
+
+.nameStep {
+  padding: 0 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.nameStepHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0 0;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  color: #71717a;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.backBtn:hover {
+  color: #e4e4e7;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.selectedTemplateBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: #1e1e2e;
+  border: 1px solid #3d3d60;
+  border-radius: 20px;
+  font-size: 13px;
+  color: #a1a1aa;
+}
+
+.nameInputGroup {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nameLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: #a1a1aa;
+}
+
+.nameInput {
+  width: 100%;
+  padding: 10px 14px;
+  background: #1e1e2e;
+  border: 1.5px solid #2d2d44;
+  border-radius: 8px;
+  color: #f4f4f5;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+
+.nameInput::placeholder {
+  color: #52525b;
+}
+
+.nameInput:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.charCount {
+  font-size: 11px;
+  color: #52525b;
+  text-align: right;
+  margin-top: -2px;
+}
+
+.nameActions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding-top: 4px;
+}
+
+/* ==================== Create Error ==================== */
+
+.createError {
+  margin: 0 24px 8px;
+  padding: 10px 14px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  color: #ef4444;
+  font-size: 13px;
+}

@@ -6,6 +6,12 @@
 - **S3 Session Delete**: TC-E5-3-1/2 — session deletion decreases count + DELETE /api/agent/sessions/:id returns 200
 - TS: 0 errors ✅；Unit tests: 12 passed ✅；Changelog ✅
 
+### [Unreleased] vibex-proposals-20260502-sprint22 Epic1-Design-Review-MCP: MCP 设计评审集成 — 2026-05-02
+
+- **E1-S1 MCP Bridge**: `vibex-fronted/src/lib/mcp-bridge.ts` — MCP server stdio JSON-RPC封装，5s超时，graceful degradation（降级到静态分析）
+- **E1-S2 review_design API route**: `api/mcp/review_design/route.ts` — 兼容 MCP bridge 与 fallback，200响应不回500
+- 提交: `d0b50ce74` (feat), `8d4b04dc1` (fix Turbopack), `17119793e` (fix build)
+
 ### [Unreleased] vibex-proposals-20260502-sprint22 Epic4-Template-Library: 需求模板库 — 2026-05-02
 - **S1 Template Selection Modal**: `NewProjectModal.tsx` — 4 模板选项（SaaS/移动端/电商/空白），两步骤流程（选模板→填名称→创建），`data-testid="template-select-modal"` + `template-option` (×4)
 - **S1 industry-templates.json**: `public/data/industry-templates.json` — 4 个结构化模板（id/name/description/chapters.requirement/chapters.architecture），懒加载不阻塞首屏

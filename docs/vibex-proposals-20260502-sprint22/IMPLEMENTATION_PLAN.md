@@ -288,6 +288,14 @@ data-testid="save-as-template-btn"
 4. 验证: session item 数量 -1
 ```
 
+### E5 完成状态
+
+| Unit | 状态 | 验证 |
+|------|------|------|
+| E5-S1 Agent 超时降级 | :white_check_mark: 已完成 | agent-timeout.spec.ts + WorkbenchUI error banner |
+| E5-S2 会话列表 UI | :white_check_mark: 已完成 | agent-sessions.spec.ts + AgentSessions data-testid |
+| E5-S3 会话删除 | :white_check_mark: 已完成 | agent-sessions.spec.ts + DELETE API verification |
+
 ---
 
 ## 7. 回滚计划

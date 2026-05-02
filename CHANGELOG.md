@@ -1,3 +1,11 @@
+### [Unreleased] vibex-proposals-20260502-sprint22 Epic5-Agent-E2E: Agent E2E 路径补全 — 2026-05-02
+- **S1 Error Banner**: `WorkbenchUI.tsx` — `data-testid="agent-error-message"` + error banner when 503/500 (role=alert, aria-live=assertive)；`WorkbenchUI.module.css` — .errorBanner 样式
+- **S1 agent-timeout.spec.ts**: 503 mock + TC-E5-1 error message visible + 503 status verification；C-E5-1: page.route mock
+- **S2 AgentSessions data-testid**: `AgentSessions.tsx` — add `data-testid="agent-session-item"` to sessionCard
+- **S2 agent-sessions.spec.ts**: TC-E5-2-1/2 — multi-session list UI with 2 sessions + task/status display；C-E5-2: beforeEach/afterEach cleanup
+- **S3 Session Delete**: TC-E5-3-1/2 — session deletion decreases count + DELETE /api/agent/sessions/:id returns 200
+- TS: 0 errors ✅；Unit tests: 12 passed ✅；Changelog ✅
+
 ### [Unreleased] vibex-proposals-20260502-sprint22 Epic4-Template-Library: 需求模板库 — 2026-05-02
 - **S1 Template Selection Modal**: `NewProjectModal.tsx` — 4 模板选项（SaaS/移动端/电商/空白），两步骤流程（选模板→填名称→创建），`data-testid="template-select-modal"` + `template-option` (×4)
 - **S1 industry-templates.json**: `public/data/industry-templates.json` — 4 个结构化模板（id/name/description/chapters.requirement/chapters.architecture），懒加载不阻塞首屏

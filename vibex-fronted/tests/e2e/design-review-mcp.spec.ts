@@ -36,7 +36,6 @@ test.describe('Epic1-Design-Review-MCP E2E', () => {
       // Must include mcp.called field
       expect(body).toHaveProperty('mcp');
       expect(body.mcp).toHaveProperty('called');
-      // mcp.called can be true (MCP available) or false (graceful degradation)
       expect([true, false]).toContain(body.mcp.called);
 
       // Response must include report structure
@@ -44,6 +43,12 @@ test.describe('Epic1-Design-Review-MCP E2E', () => {
       expect(body).toHaveProperty('reviewedAt');
       expect(body).toHaveProperty('summary');
       expect(body.summary).toHaveProperty('totalNodes', 2);
+
+      // E1-S1 AC: PRD required fields
+      expect(body).toHaveProperty('aiScore');
+      expect(typeof body.aiScore).toBe('number');
+      expect(body).toHaveProperty('suggestions');
+      expect(Array.isArray(body.suggestions)).toBe(true);
 
       // If mcp.called is true, response should have designCompliance
       // If mcp.called is false, should have fallback: 'static-analysis'
@@ -123,6 +128,21 @@ test.describe('Epic1-Design-Review-MCP E2E', () => {
       expect(body.summary).toHaveProperty('a11y');
       expect(body.summary).toHaveProperty('reuseCandidates');
       expect(body.summary).toHaveProperty('totalNodes', 3);
+
+      // E1-S1 AC: aiScore + suggestions required
+      expect(body).toHaveProperty('aiScore');
+      expect(typeof body.aiScore).toBe('number');
+      expect(body.aiScore).toBeGreaterThanOrEqual(0);
+      expect(body.aiScore).toBeLessThanOrEqual(100);
+      expect(body).toHaveProperty('suggestions');
+      expect(Array.isArray(body.suggestions)).toBe(true);
+      // Suggestions should have type + message + priority
+      if (body.suggestions.length > 0) {
+        expect(body.suggestions[0]).toHaveProperty('type');
+        expect(body.suggestions[0]).toHaveProperty('message');
+        expect(body.suggestions[0]).toHaveProperty('priority');
+        expect(['high', 'medium', 'low']).toContain(body.suggestions[0].priority);
+      }
 
       // compliance/a11y must be one of pass/warn/fail
       expect(['pass', 'warn', 'fail']).toContain(body.summary.compliance);

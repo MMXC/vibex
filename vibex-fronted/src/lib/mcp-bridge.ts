@@ -6,10 +6,14 @@
  * so the caller can fall back to static analysis.
  *
  * E1 Design Review MCP — Epic1-Design-Review-MCP
+ *
+ * Turbopack compatibility: the MCP server path is resolved at runtime from
+ * the environment variable MCP_SERVER_PATH, not from any file-system path.
+ * If the env var is not set, the function throws with a clear error message,
+ * which the route handler catches and converts to the static analysis fallback.
  */
 
 import { spawn } from 'child_process';
-import { resolve } from 'path';
 
 // =============================================================================
 // Types
@@ -33,6 +37,10 @@ export interface MCPCallResult {
 export interface DesignReviewReport {
   canvasId: string;
   reviewedAt: string;
+  /** AI-driven design quality score (0-100), computed from compliance/a11y/reuse analysis */
+  aiScore: number;
+  /** Actionable improvement suggestions derived from design review */
+  suggestions: Array<{ type: string; message: string; priority: 'high' | 'medium' | 'low' }>;
   summary: {
     compliance: 'pass' | 'warn' | 'fail';
     a11y: 'pass' | 'warn' | 'fail';
@@ -66,7 +74,6 @@ export interface DesignReviewReport {
 // MCP Bridge
 // =============================================================================
 
-const MCP_SERVER_PATH = resolve(__dirname, '../../../../../packages/mcp-server/dist/index.js');
 const CALL_TIMEOUT_MS = 5000; // C-E1-2: 5s timeout
 
 interface JSONRPCMessage {
@@ -76,6 +83,23 @@ interface JSONRPCMessage {
   params?: Record<string, unknown>;
   result?: unknown;
   error?: { code: number; message: string; data?: unknown };
+}
+
+/**
+ * Get the MCP server binary path at runtime (avoids Turbopack static analysis).
+ * 
+ * Resolution order:
+ * 1. MCP_SERVER_PATH env var (set by DevOps for staging/prod deployments)
+ * 2. For local dev, MCP is typically unavailable so we throw a clear error
+ *    and let the caller fall back to static analysis.
+ */
+function getMcpServerPath(): string {
+  if (process.env.MCP_SERVER_PATH) {
+    return process.env.MCP_SERVER_PATH;
+  }
+  // In development/CI without env var, MCP server is not configured.
+  // Throw with clear message so the route's try/catch can handle graceful degradation.
+  throw new Error('MCP_SERVER_PATH environment variable is not set. Set it to the absolute path of packages/mcp-server/dist/index.js, or leave unset to use static analysis fallback.');
 }
 
 /**
@@ -91,8 +115,17 @@ export async function callTool(
   let output = '';
   let errorOutput = '';
 
+  // Resolve MCP server path at runtime
+  let mcpServerPath: string;
+  try {
+    mcpServerPath = getMcpServerPath();
+  } catch (err) {
+    // MCP not configured — throw immediately so route can catch and degrade
+    return Promise.reject(err);
+  }
+
   return new Promise((resolve, reject) => {
-    const proc = spawn('node', [MCP_SERVER_PATH], {
+    const proc = spawn('node', [mcpServerPath], {
       stdio: ['pipe', 'pipe', 'pipe'],
       env: {
         ...process.env,
@@ -116,7 +149,6 @@ export async function callTool(
       errorOutput += chunk.toString();
     });
 
-    // Send request and set up response handler
     proc.stdin?.write(JSON.stringify(request) + '\n', (err) => {
       if (err) {
         proc.kill();
@@ -133,9 +165,7 @@ export async function callTool(
     // Collect response
     let resolved = false;
     proc.stdout?.on('data', () => {
-      // Try to parse response from accumulated output
       try {
-        // Find the response line (last complete JSON object)
         const lines = output.trim().split('\n');
         for (let i = lines.length - 1; i >= 0; i--) {
           const line = lines[i];
@@ -143,7 +173,7 @@ export async function callTool(
           const trimmed = line.trim();
           if (!trimmed) continue;
           try {
-            const msg = JSON.parse(line) as JSONRPCMessage;
+            const msg = JSON.parse(trimmed) as JSONRPCMessage;
             if (msg.id === id) {
               clearTimeout(timer);
               if (msg.error) {

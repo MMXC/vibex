@@ -144,9 +144,15 @@ function analyzeComponentReuse(nodes: Array<Record<string, unknown>>): {
  */
 function fallbackStaticAnalysis(input: ReviewDesignInput): DesignReviewReport {
   const nodes = input.nodes ?? [];
+  const suggestions: Array<{ type: string; message: string; priority: 'high' | 'medium' | 'low' }> = [];
+  let complianceScore = 100;
+  let a11yScore = 100;
+
   const report: DesignReviewReport = {
     canvasId: input.canvasId,
     reviewedAt: new Date().toISOString(),
+    aiScore: 85,
+    suggestions: [],
     summary: { compliance: 'pass', a11y: 'pass', reuseCandidates: 0, totalNodes: nodes.length },
   };
 
@@ -162,6 +168,17 @@ function fallbackStaticAnalysis(input: ReviewDesignInput): DesignReviewReport {
       spacing: results.every(r => r.spacing),
       spacingIssues: results.flatMap(r => r.spacingIssues),
     };
+    complianceScore = report.designCompliance.colors
+      ? (report.designCompliance.typography ? 100 : 70) : 60;
+    for (const issue of report.designCompliance.colorIssues as Array<{message:string}>) {
+      suggestions.push({ type: 'color', message: issue.message, priority: 'medium' });
+    }
+    for (const issue of report.designCompliance.typographyIssues as Array<{message:string}>) {
+      suggestions.push({ type: 'typography', message: issue.message, priority: 'medium' });
+    }
+    for (const issue of report.designCompliance.spacingIssues as Array<{message:string}>) {
+      suggestions.push({ type: 'spacing', message: issue.message, priority: 'low' });
+    }
   }
 
   if (input.checkA11y !== false && nodes.length > 0) {
@@ -179,6 +196,11 @@ function fallbackStaticAnalysis(input: ReviewDesignInput): DesignReviewReport {
       low: a11yResult.summary.low,
       issues: a11yResult.issues,
     };
+    a11yScore = Math.max(0, 100 - a11yResult.summary.critical * 10 - a11yResult.summary.high * 5 - a11yResult.summary.medium * 2);
+    for (const issue of a11yResult.issues as Array<{issueType:string;description:string}>) {
+      const priority = issue.issueType === 'missing-alt' || issue.issueType === 'missing-aria-label' ? 'high' : 'low';
+      suggestions.push({ type: issue.issueType, message: issue.description, priority });
+    }
   }
 
   if (input.checkReuse !== false && nodes.length > 0) {
@@ -189,7 +211,14 @@ function fallbackStaticAnalysis(input: ReviewDesignInput): DesignReviewReport {
       candidates: reuse.candidates.slice(0, 10),
       recommendations: reuse.recommendations,
     };
+    for (const rec of reuse.recommendations) {
+      suggestions.push({ type: 'reuse', message: rec, priority: 'low' });
+    }
   }
+
+  // --- AI Score: weighted average of compliance (40%) + a11y (60%) ---
+  report.aiScore = Math.round(complianceScore * 0.4 + a11yScore * 0.6);
+  report.suggestions = suggestions;
 
   return report;
 }

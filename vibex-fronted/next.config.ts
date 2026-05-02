@@ -7,10 +7,6 @@ const withBundleAnalyzer = createBundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
-  // Fix Turbopack root detection for monorepo setup
-  turbopack: {
-    root: '/root/.openclaw/vibex/vibex-fronted',
-  },
   // QA模式下用standalone，允许API routes和middleware
   output: process.env.NEXT_OUTPUT_MODE === 'standalone' ? 'standalone' : 'export',
   images: {

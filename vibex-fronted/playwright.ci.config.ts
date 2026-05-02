@@ -30,6 +30,7 @@ export default defineConfig({
   reporter: [
     ['list'],
     ['html', { outputFolder: 'playwright-report' }],
+    ['json', { outputFile: './playwright-report/results.json' }],
     ['@playwright/test/reporter', 'blob'], // Blob for CI reporting
   ],
   timeout: 60000,

@@ -1,3 +1,11 @@
+### [Unreleased] vibex-proposals-sprint23 Epic E2: Design Review Diff 视图 — 2026-05-03
+- **E2-U1 Re-Review Button**: `ReviewReportPanel.tsx` — re-review-btn (data-testid=re-review-btn)，↻ Re-review 触发重新评审
+- **E2-U2 Diff State**: `useDesignReview.ts` — diffResult state + previousReportId 支持，首次 review 后 diffResult=null，后续基于前次结果计算 diff
+- **E2-U3 DiffView**: `DiffView.tsx` + `DiffView.module.css` — Added(红)/Removed(绿)/Unchanged 三区，data-testid 完整覆盖（diff-view/diff-item-{variant}/diff-{added,removed,unchanged}-count）
+- **reviewDiff.ts**: computeReviewDiff() — 基于 item.id 比较（新增/移除/未变），flattern compliance/accessibility/reuse 三类
+- TS: 0 errors ✅；Security ✅；Changelog ✅
+- 提交: 4da2805b6
+
 ### [Unreleased] vibex-proposals-sprint23 Epic E1: E2E CI 闭环落地 — 2026-05-03
 - **E1-U1 Block Kit**: `vibex-fronted/scripts/e2e-summary-to-slack.ts` — Playwright results.json 解析（stats + suites），Block Kit payload 格式（header/section(fields)/section(failed list)/context），postToSlack() error handling 永不抛出，main() exit 0 不影响 CI job
 - **E1-U2 CI Workflow**: `.github/workflows/test.yml` — e2e job 后执行 `e2e:summary:slack`，if:always() 无论 pass/fail 都运行，传递 SLACK_WEBHOOK_URL/CI/GITHUB_RUN_NUMBER/GITHUB_RUN_URL

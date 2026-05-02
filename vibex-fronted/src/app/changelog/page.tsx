@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.336',
+    date: '2026-05-03',
+    changes: [
+      '🚀 S23-E2: Epic E2 Design Review Diff 视图',
+      '✅ E2-U1: ReviewReportPanel re-review-btn — ↻ Re-review 触发重新评审',
+      '✅ E2-U2: useDesignReview diffResult state + previousReportId 支持',
+      '✅ E2-U3: DiffView Added(红)/Removed(绿)/Unchanged 三区，data-testid 完整',
+      '提交: 4da2805b6',
+    ],
+    commit: '4da2805b6',
+  },
+  {
     version: '1.0.335',
     date: '2026-05-03',
     changes: [

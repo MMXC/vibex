@@ -1,0 +1,28 @@
+{
+  "runs": [
+    {
+      "timestamp": "2026-05-01T10:00:00Z",
+      "passed": 30,
+      "failed": 1,
+      "flakyRate": 0.03
+    },
+    {
+      "timestamp": "2026-05-01T11:00:00Z",
+      "passed": 29,
+      "failed": 2,
+      "flakyRate": 0.06
+    },
+    {
+      "timestamp": "2026-05-01T12:00:00Z",
+      "passed": 28,
+      "failed": 3,
+      "flakyRate": 0.1
+    },
+    {
+      "timestamp": "2026-05-02T07:24:20.786Z",
+      "passed": 97,
+      "failed": 3,
+      "flakyRate": 0.03
+    }
+  ]
+}

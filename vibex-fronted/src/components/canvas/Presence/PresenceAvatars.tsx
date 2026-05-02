@@ -12,9 +12,22 @@ import React from 'react';
 import { usePresence, type PresenceUser } from '@/lib/firebase/presence';
 import styles from './PresenceAvatars.module.css';
 
+// C-E3-2: TEAM_COLORS constants
+const TEAM_COLORS = {
+  owner: '#10b981',
+  member: '#10b981',
+  viewer: '#10b981',
+  guest: '#d1d5db',
+} as const;
+type TeamRole = keyof typeof TEAM_COLORS;
+
 interface PresenceAvatarsProps {
   canvasId: string;
   maxDisplay?: number; // 默认 5
+  /** Show team vs guest border styling */
+  showTeamBadge?: boolean;
+  /** Team member user IDs for border differentiation */
+  teamMemberIds?: string[];
 }
 
 /**
@@ -51,7 +64,7 @@ function NoCollaboratorsIcon() {
 /**
  * 理想态：彩色圆形头像堆叠
  */
-function IdealState({ users, maxDisplay }: { users: PresenceUser[]; maxDisplay: number }) {
+function IdealState({ users, maxDisplay, showTeamBadge, teamMemberIds }: { users: PresenceUser[]; maxDisplay: number; showTeamBadge?: boolean; teamMemberIds?: string[] }) {
   const displayUsers = users.slice(0, maxDisplay);
   const overflow = Math.max(0, users.length - maxDisplay);
 
@@ -59,17 +72,23 @@ function IdealState({ users, maxDisplay }: { users: PresenceUser[]; maxDisplay: 
 
   return (
     <div className={styles.container} role="group" aria-label={`${users.length} 位协作者在线`}>
-      {displayUsers.map((user) => (
-        <div
-          key={user.userId}
-          className={styles.avatar}
-          style={{ backgroundColor: user.color }}
-          title={user.name}
-          aria-label={user.name}
-        >
-          {user.name.charAt(0).toUpperCase()}
-        </div>
-      ))}
+      {displayUsers.map((user) => {
+        const isTeamMember = teamMemberIds ? teamMemberIds.includes(user.userId) : false;
+        const borderStyle: React.CSSProperties = showTeamBadge
+          ? { border: isTeamMember ? `2px solid ${TEAM_COLORS.member}` : `1px solid ${TEAM_COLORS.guest}` }
+          : {};
+        return (
+          <div
+            key={user.userId}
+            className={styles.avatar}
+            style={{ backgroundColor: user.color, ...borderStyle }}
+            title={user.name}
+            aria-label={user.name}
+          >
+            {user.name.charAt(0).toUpperCase()}
+          </div>
+        );
+      })}
       {overflow > 0 && (
         <div
           className={styles.overflow}
@@ -132,7 +151,7 @@ function ErrorState() {
  *
  * 使用 usePresence hook 获取实时数据，内部处理四态切换
  */
-export function PresenceAvatars({ canvasId, maxDisplay = 5 }: PresenceAvatarsProps) {
+export function PresenceAvatars({ canvasId, maxDisplay = 5, showTeamBadge, teamMemberIds }: PresenceAvatarsProps) {
   // usePresence 内部已处理 visibilitychange 兜底（E2-U3）
   const { others, isAvailable, isConnected } = usePresence(canvasId, null, 'presence-check');
 
@@ -146,7 +165,7 @@ export function PresenceAvatars({ canvasId, maxDisplay = 5 }: PresenceAvatarsPro
   if (others.length === 0) {
     return <EmptyState />;
   }
-  return <IdealState users={others} maxDisplay={maxDisplay} />;
+  return <IdealState users={others} maxDisplay={maxDisplay} showTeamBadge={showTeamBadge} teamMemberIds={teamMemberIds} />;
 }
 
 export type { PresenceAvatarsProps };

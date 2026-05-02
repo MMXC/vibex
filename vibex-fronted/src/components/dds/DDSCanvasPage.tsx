@@ -481,7 +481,7 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
       onMouseMove={handleMouseMove}
     >
       {/* Toolbar */}
-      <DDSToolbar onAIGenerate={handleAIGenerate} agentSession={agentSession} />
+      <DDSToolbar onAIGenerate={handleAIGenerate} agentSession={agentSession} projectId={projectId ?? ''} />
 
       {/* E10-E1: CodeGenPanel — always visible */}
       <CodeGenPanelWrapper />

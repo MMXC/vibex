@@ -16,6 +16,7 @@ import { exportDDSCanvasData, exportToStateMachine } from '@/services/dds/export
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds';
 import { useCanvasExport } from '@/hooks/canvas/useCanvasExport';
 import { useCanvasImport } from '@/hooks/canvas/useCanvasImport';
+import { useCanvasRBAC } from '@/hooks/useCanvasRBAC';
 import styles from './DDSToolbar.module.css';
 
 // ==================== Constants ====================
@@ -96,6 +97,8 @@ export interface DDSToolbarProps {
   className?: string;
   /** agentSession URL param */
   agentSession?: string | null;
+  /** Project ID for RBAC checks */
+  projectId?: string;
 }
 
 export const DDSToolbar = memo(function DDSToolbar({
@@ -103,6 +106,7 @@ export const DDSToolbar = memo(function DDSToolbar({
   isGenerating: isGeneratingProp,
   className = '',
   agentSession,
+  projectId,
 }: DDSToolbarProps) {
   const activeChapter = useDDSCanvasStore((s) => s.activeChapter);
   const isFullscreen = useDDSCanvasStore((s) => s.isFullscreen);
@@ -119,6 +123,9 @@ export const DDSToolbar = memo(function DDSToolbar({
   const { showFilePicker, importFile } = useCanvasImport();
 
   const [ddsExportModalOpen, setDdsExportModalOpen] = useState(false);
+
+  // E3-S3: RBAC for toolbar actions
+  const rbac = useCanvasRBAC(projectId);
 
   // E4-U3: Download OpenAPI handler
   const handleDownloadOpenAPI = useCallback(() => {
@@ -247,7 +254,8 @@ export const DDSToolbar = memo(function DDSToolbar({
             className={styles.exportBtn}
             onClick={handleOpenExportModal}
             aria-label="导出画布"
-            title="导出/导入画布数据"
+            title={rbac.canShare ? '导出/导入画布数据' : '需要 Owner 或 Member 权限'}
+            disabled={!rbac.canShare && !rbac.loading}
             data-testid="canvas-export-btn"
           >
             导出
@@ -272,7 +280,8 @@ export const DDSToolbar = memo(function DDSToolbar({
             className={styles.exportBtn}
             onClick={() => importRef.current?.click()}
             aria-label="导入画布"
-            title="从 .vibex 或 .json 文件导入"
+            title={rbac.canEdit ? '从 .vibex 或 .json 文件导入' : '需要 Owner 或 Member 权限'}
+            disabled={!rbac.canEdit && !rbac.loading}
             data-testid="canvas-import-btn"
           >
             导入

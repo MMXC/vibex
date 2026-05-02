@@ -1,3 +1,11 @@
+### [Unreleased] vibex-proposals-20260502-sprint22 Epic4-Template-Library: 需求模板库 — 2026-05-02
+- **S1 Template Selection Modal**: `NewProjectModal.tsx` — 4 模板选项（SaaS/移动端/电商/空白），两步骤流程（选模板→填名称→创建），`data-testid="template-select-modal"` + `template-option` (×4)
+- **S1 industry-templates.json**: `public/data/industry-templates.json` — 4 个结构化模板（id/name/description/chapters.requirement/chapters.architecture），懒加载不阻塞首屏
+- **S2 useTemplates hook**: `useTemplates.ts` — 懒加载（`fetch /data/industry-templates.json`）+ 自定义模板管理（localStorage key: `vibex:customTemplates`）+ `QuotaExceededError` 优雅降级
+- **S2 ChapterPanel auto-fill**: `ChapterPanel.tsx` — `templateRequirement` prop 自动解析模板 requirement 文本生成 user-story cards，`data-testid="requirement-chapter"`
+- **S3 Save-as-template**: `ChapterPanel.tsx` footer — 保存当前章节为自定义模板，`data-testid="save-as-template-btn"`，调用 `useTemplates.saveAsTemplate`
+- TS: 0 errors ✅；Changelog ✅
+
 ### [Unreleased] vibex-proposals-20260502-sprint22 Epic3-Teams-Collab-UI: 团队协作 UI — 2026-05-02
 - **S1 PresenceAvatars team border**: `PresenceAvatars.tsx` — `showTeamBadge` + `teamMemberIds` props，新增 team/guest border 样式（`TEAM_COLORS` 常量，owner/member=#10b981, guest=#d1d5db）；四态覆盖完整（ideal/empty/loading/error）
 - **S2 useCanvasRBAC hook**: `useCanvasRBAC.ts` — RBAC 检查 hook（canDelete/canShare/canEdit/canView），5min LRU 缓存（`RBAC_CACHE` Map），`/v1/projects/:id/permissions` API 调用

@@ -1,98 +1,199 @@
 /**
  * Project API Tests
- * Tests the API interface methods exist
+ * Tests the ProjectApi interface methods with mocked httpClient
  */
 
-describe('projectApi', () => {
-  // Test interface methods exist - no actual API calls
-  const mockApi = {
-    getProjects: vi.fn().mockResolvedValue([]),
-    getProject: vi.fn().mockResolvedValue({ id: '1' }),
-    createProject: vi.fn().mockResolvedValue({ id: '1' }),
-    updateProject: vi.fn().mockResolvedValue({ id: '1' }),
-    deleteProject: vi.fn().mockResolvedValue({ success: true }),
-    softDeleteProject: vi.fn().mockResolvedValue({ id: '1' }),
-    restoreProject: vi.fn().mockResolvedValue({ id: '1' }),
-    permanentDeleteProject: vi.fn().mockResolvedValue({ success: true }),
-    getDeletedProjects: vi.fn().mockResolvedValue([]),
-    clearDeletedProjects: vi.fn().mockResolvedValue({ success: true }),
-    getProjectRole: vi.fn().mockResolvedValue({ role: 'owner' }),
-  };
+import { projectApi } from '../project';
 
+// Mock httpClient
+vi.mock('../../client', () => ({
+  httpClient: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
+  },
+}));
+
+import { httpClient } from '../../client';
+const mockHttp = httpClient as any;
+
+describe('ProjectApi', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('Method existence', () => {
-    it('should have getProjects method', () => {
-      expect(typeof mockApi.getProjects).toBe('function');
+  describe('getProjects', () => {
+    it('返回项目列表', async () => {
+      const mockResponse = {
+        data: [
+          { id: 'p1', name: 'Project 1', userId: 'u1' },
+          { id: 'p2', name: 'Project 2', userId: 'u1' },
+        ],
+      };
+      mockHttp.get.mockResolvedValue(mockResponse);
+
+      const projects = await projectApi.getProjects('u1');
+
+      expect(projects).toHaveLength(2);
+      expect(projects[0].id).toBe('p1');
     });
 
-    it('should have getProject method', () => {
-      expect(typeof mockApi.getProject).toBe('function');
+    it('按用户过滤', async () => {
+      const mockResponse = { data: [{ id: 'p1', name: 'Project 1', userId: 'u2' }] };
+      mockHttp.get.mockResolvedValue(mockResponse);
+
+      const projects = await projectApi.getProjects('u2');
+
+      expect(mockHttp.get).toHaveBeenCalled();
+      expect(projects).toHaveLength(1);
     });
 
-    it('should have createProject method', () => {
-      expect(typeof mockApi.createProject).toBe('function');
-    });
+    it('空列表返回空数组', async () => {
+      const mockResponse = { data: [] };
+      mockHttp.get.mockResolvedValue(mockResponse);
 
-    it('should have updateProject method', () => {
-      expect(typeof mockApi.updateProject).toBe('function');
-    });
+      const projects = await projectApi.getProjects('u999');
 
-    it('should have deleteProject method', () => {
-      expect(typeof mockApi.deleteProject).toBe('function');
-    });
-
-    it('should have softDeleteProject method', () => {
-      expect(typeof mockApi.softDeleteProject).toBe('function');
-    });
-
-    it('should have restoreProject method', () => {
-      expect(typeof mockApi.restoreProject).toBe('function');
-    });
-
-    it('should have permanentDeleteProject method', () => {
-      expect(typeof mockApi.permanentDeleteProject).toBe('function');
-    });
-
-    it('should have getDeletedProjects method', () => {
-      expect(typeof mockApi.getDeletedProjects).toBe('function');
-    });
-
-    it('should have clearDeletedProjects method', () => {
-      expect(typeof mockApi.clearDeletedProjects).toBe('function');
-    });
-
-    it('should have getProjectRole method', () => {
-      expect(typeof mockApi.getProjectRole).toBe('function');
+      expect(projects).toEqual([]);
     });
   });
 
-  describe('Functionality', () => {
-    it('should call getProjects', async () => {
-      const result = await mockApi.getProjects('user1');
-      expect(result).toEqual([]);
+  describe('getProject', () => {
+    it('返回指定项目', async () => {
+      const mockResponse = { data: { id: 'p1', name: 'Project 1' } };
+      mockHttp.get.mockResolvedValue(mockResponse);
+
+      const project = await projectApi.getProject('p1');
+
+      expect(project.id).toBe('p1');
     });
 
-    it('should call getProject', async () => {
-      const result = await mockApi.getProject('1');
-      expect(result).toEqual({ id: '1' });
+    it('不存在的项目返回null', async () => {
+      const mockResponse = { data: null };
+      mockHttp.get.mockResolvedValue(mockResponse);
+
+      const project = await projectApi.getProject('nonexistent');
+      expect(project).toBeNull();
+    });
+  });
+
+  describe('createProject', () => {
+    it('创建后返回项目', async () => {
+      const mockResponse = { data: { id: 'p3', name: 'New Project' } };
+      mockHttp.post.mockResolvedValue(mockResponse);
+
+      const project = await projectApi.createProject({ name: 'New Project', description: 'desc' });
+
+      expect(project.id).toBe('p3');
     });
 
-    it('should call createProject', async () => {
-      const result = await mockApi.createProject({ name: 'Test' });
-      expect(result).toEqual({ id: '1' });
+    it('创建时调用正确的API路径', async () => {
+      const mockResponse = { data: { id: 'p3', name: 'Test' } };
+      mockHttp.post.mockResolvedValue(mockResponse);
+
+      await projectApi.createProject({ name: 'Test' });
+
+      expect(mockHttp.post).toHaveBeenCalledWith('/projects', { name: 'Test' });
+    });
+  });
+
+  describe('updateProject', () => {
+    it('更新后返回项目', async () => {
+      const mockResponse = { data: { id: 'p1', name: 'Updated Project' } };
+      mockHttp.put.mockResolvedValue(mockResponse);
+
+      const project = await projectApi.updateProject('p1', { name: 'Updated Project' });
+
+      expect(project.name).toBe('Updated Project');
     });
 
-    it('should call updateProject', async () => {
-      const result = await mockApi.updateProject('1', { name: 'Updated' });
-      expect(result).toEqual({ id: '1' });
+    it('不存在的项目返回null', async () => {
+      const mockResponse = { data: null };
+      mockHttp.put.mockResolvedValue(mockResponse);
+
+      const project = await projectApi.updateProject('nonexistent', { name: 'x' });
+      expect(project).toBeNull();
+    });
+  });
+
+  describe('deleteProject', () => {
+    it('软删除成功', async () => {
+      const mockResponse = { data: { id: 'p1', deletedAt: '2026-05-03' } };
+      mockHttp.delete.mockResolvedValue(mockResponse);
+
+      const result = await projectApi.deleteProject('p1');
+
+      expect(result).toBeTruthy();
     });
 
-    it('should call deleteProject', async () => {
-      const result = await mockApi.deleteProject('1');
-      expect(result).toEqual({ success: true });
+    it('永久删除成功', async () => {
+      const mockResponse = { data: { success: true } };
+      mockHttp.delete.mockResolvedValue(mockResponse);
+
+      const result = await projectApi.permanentDeleteProject('p1');
+
+      expect(result).toBeTruthy();
+    });
+  });
+
+  describe('restoreProject', () => {
+    it('恢复项目成功', async () => {
+      const mockResponse = { data: { id: 'p1', deletedAt: null } };
+      mockHttp.post.mockResolvedValue(mockResponse);
+
+      const project = await projectApi.restoreProject('p1');
+
+      expect(project.id).toBe('p1');
+    });
+  });
+
+  describe('getDeletedProjects', () => {
+    it('返回已删除项目列表', async () => {
+      const mockResponse = { data: [{ id: 'p1', deletedAt: '2026-05-01' }] };
+      mockHttp.get.mockResolvedValue(mockResponse);
+
+      const deleted = await projectApi.getDeletedProjects('u1');
+
+      expect(deleted).toHaveLength(1);
+    });
+  });
+
+  describe('ProjectApi interface', () => {
+    it('should have getProjects method', () => {
+      expect(typeof projectApi.getProjects).toBe('function');
+    });
+
+    it('should have createProject method', () => {
+      expect(typeof projectApi.createProject).toBe('function');
+    });
+
+    it('should have updateProject method', () => {
+      expect(typeof projectApi.updateProject).toBe('function');
+    });
+
+    it('should have deleteProject method', () => {
+      expect(typeof projectApi.deleteProject).toBe('function');
+    });
+
+    it('should have softDeleteProject method', () => {
+      expect(typeof projectApi.softDeleteProject).toBe('function');
+    });
+
+    it('should have restoreProject method', () => {
+      expect(typeof projectApi.restoreProject).toBe('function');
+    });
+
+    it('should have permanentDeleteProject method', () => {
+      expect(typeof projectApi.permanentDeleteProject).toBe('function');
+    });
+
+    it('should have getDeletedProjects method', () => {
+      expect(typeof projectApi.getDeletedProjects).toBe('function');
+    });
+
+    it('should have clearDeletedProjects method', () => {
+      expect(typeof projectApi.clearDeletedProjects).toBe('function');
     });
   });
 });

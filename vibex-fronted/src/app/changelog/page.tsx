@@ -20,6 +20,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.341',
+    date: '2026-05-03',
+    changes: [
+      '🚀 S24-P002: TypeScript Debt Confirm',
+      '✅ T2.1-T2.5: frontend/backend/mcp-server 三包 tsc --noEmit 0 errors',
+      '✅ P002 无需纳入 Sprint 24 修复（coord 已决策）',
+    ],
+    commit: '4a297074a',
+  },
+  {
     version: '1.0.340',
     date: '2026-05-03',
     changes: [

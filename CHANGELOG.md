@@ -1,3 +1,7 @@
+### [Unreleased] vibex-proposals-sprint24 P002: TypeScript Debt Confirm — 2026-05-03
+- **T2.1-T2.5 审计确认**: frontend/backend/mcp-server 三包 `tsc --noEmit` → 0 errors，确认为无需修复债务
+- DoD: 全部满足，coord 已决策不纳入 Sprint 24 修复
+
 ### [Unreleased] vibex-proposals-sprint24 P001: E2E Slack Webhook Dry-run — 2026-05-03
 - **T1.2 webhook-dryrun.ts**: `scripts/webhook-dryrun.ts` — 验证 SLACK_WEBHOOK_URL 可达性，exit 0 成功/exit 1 失败，malformed/missing/unreachable 三种错误场景，logs 含 `[webhook-dryrun]` 前缀
 - **T1.3 package.json**: 新增 `webhook:dryrun` script → `tsx scripts/webhook-dryrun.ts`

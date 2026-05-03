@@ -54,15 +54,15 @@ export function InputStep({ onNext, onPrev, onSkip }: StepContentProps) {
           <span>描述越详细，生成结果越准确</span>
         </div>
 
-        <div className={styles.actions}>
-          <button className={styles.backBtn} onClick={onPrev}>
+        <div className={styles.actions} data-testid="onboarding-step-1">
+          <button className={styles.backBtn} onClick={onPrev} data-testid="onboarding-prev-btn">
             ← 上一步
           </button>
           <div className={styles.rightActions}>
-            <button className={styles.skipBtn} onClick={onSkip}>
+            <button className={styles.skipBtn} onClick={onSkip} data-testid="onboarding-skip-btn">
               跳过
             </button>
-            <button className={styles.nextBtn} onClick={onNext}>
+            <button className={styles.nextBtn} onClick={onNext} data-testid="onboarding-next-btn">
               下一步 →
             </button>
           </div>

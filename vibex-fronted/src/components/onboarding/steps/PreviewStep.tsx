@@ -64,11 +64,11 @@ export function PreviewStep({ onNext, onPrev }: StepContentProps) {
           准备好开始你的第一个项目了吗？
         </motion.div>
 
-        <div className={styles.actions}>
-          <button className={styles.backBtn} onClick={onPrev}>
+        <div className={styles.actions} data-testid="onboarding-step-4">
+          <button className={styles.backBtn} onClick={onPrev} data-testid="onboarding-prev-btn">
             ← 上一步
           </button>
-          <button className={styles.nextBtn} onClick={onNext}>
+          <button className={styles.nextBtn} onClick={onNext} data-testid="onboarding-next-btn">
             开始使用 🎯
           </button>
         </div>

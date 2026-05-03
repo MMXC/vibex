@@ -24,7 +24,7 @@ export function WelcomeStep({ onNext, onSkip }: StepContentProps) {
   ];
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid="onboarding-step-0">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -56,11 +56,11 @@ export function WelcomeStep({ onNext, onSkip }: StepContentProps) {
           ))}
         </div>
 
-        <div className={styles.actions}>
-          <button className={styles.skipBtn} onClick={onSkip}>
+        <div className={styles.actions} data-testid="onboarding-step-0">
+          <button className={styles.skipBtn} onClick={onSkip} data-testid="onboarding-skip-btn">
             跳过介绍
           </button>
-          <button className={styles.nextBtn} onClick={onNext}>
+          <button className={styles.nextBtn} onClick={onNext} data-testid="onboarding-next-btn">
             下一步 →
           </button>
         </div>

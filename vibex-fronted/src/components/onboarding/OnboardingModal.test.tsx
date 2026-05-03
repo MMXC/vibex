@@ -71,7 +71,7 @@ describe('OnboardingModal', () => {
   it('should call skip when close button clicked', () => {
     render(<OnboardingModal />);
     
-    const closeButton = screen.getByText('✕');
+    const closeButton = screen.getByTestId('onboarding-skip-btn');
     closeButton.click();
     
     expect(mockStore.skip).toHaveBeenCalled();
@@ -80,7 +80,7 @@ describe('OnboardingModal', () => {
   it('should call nextStep when next button clicked', () => {
     render(<OnboardingModal />);
     
-    const nextButton = screen.getByText(/下一步/);
+    const nextButton = screen.getByTestId('onboarding-next-btn');
     nextButton.click();
     
     expect(mockStore.nextStep).toHaveBeenCalled();
@@ -94,12 +94,25 @@ describe('OnboardingModal', () => {
 
     render(<OnboardingModal />);
     
-    expect(screen.getByText(/上一步/)).toBeInTheDocument();
+    expect(screen.getByTestId('onboarding-prev-btn')).toBeInTheDocument();
   });
 
   it('should not show back button on first step', () => {
     render(<OnboardingModal />);
     
-    expect(screen.queryByText('上一步')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('onboarding-prev-btn')).not.toBeInTheDocument();
+  });
+
+  it('should render step-0 data-testid on WelcomeStep', () => {
+    render(<OnboardingModal />);
+    
+    expect(screen.getByTestId('onboarding-step-0')).toBeInTheDocument();
+  });
+
+  it('should render skip and next buttons with data-testid', () => {
+    render(<OnboardingModal />);
+    
+    expect(screen.getByTestId('onboarding-skip-btn')).toBeInTheDocument();
+    expect(screen.getByTestId('onboarding-next-btn')).toBeInTheDocument();
   });
 });

@@ -28,7 +28,7 @@ export interface DiffItem<T> {
 
 /** Canvas 项目对比结果 */
 export interface CanvasDiff {
-  /** A 项目中新增的节点（不在 B 中） */
+  /** B 项目中新增的节点（不在 A 中） */
   added: DiffItem<BoundedContextNode | BusinessFlowNode | ComponentNode>[];
   /** A 项目中移除的节点（B 有，A 没有） */
   removed: DiffItem<BoundedContextNode | BusinessFlowNode | ComponentNode>[];
@@ -83,8 +83,9 @@ export function compareCanvasProjects(
     for (const nodeA of nodesA) {
       const nodeB = mapB.get(nodeA.nodeId);
       if (!nodeB) {
-        result.added.push({ type: 'added', source: 'left', node: nodeA as any });
-        increment(`context`, 'Added');
+        // In A but not in B → removed from B (right source means came from B)
+        result.removed.push({ type: 'removed', source: 'right', node: nodeA as any });
+        (result.summary as any)[`${treeType}Removed`]++;
       } else if (!deepEqual(nodeA, nodeB)) {
         result.modified.push({
           type: 'modified',
@@ -93,7 +94,7 @@ export function compareCanvasProjects(
           before: nodeB as any,
           after: nodeA as any,
         });
-        increment(treeType, 'Modified');
+        (result.summary as any)[`${treeType}Modified`]++;
       } else {
         result.unchanged.push({ type: 'unchanged', source: 'left', node: nodeA as any });
       }
@@ -102,18 +103,11 @@ export function compareCanvasProjects(
     const mapA = new Map(nodesA.map((n) => [n.nodeId, n]));
     for (const nodeB of nodesB) {
       if (!mapA.has(nodeB.nodeId)) {
-        result.removed.push({ type: 'removed', source: 'right', node: nodeB as any });
-        increment(treeType, 'Removed');
+        // In B but not in A → added in B (left source means came from A's perspective)
+        result.added.push({ type: 'added', source: 'left', node: nodeB as any });
+        (result.summary as any)[`${treeType}Added`]++;
       }
     }
-  };
-
-  const increment = (
-    tree: 'context' | 'flow' | 'component',
-    change: 'Added' | 'Removed' | 'Modified'
-  ) => {
-    const key = `${tree}${change}` as keyof typeof result.summary;
-    (result.summary as any)[key]++;
   };
 
   diffTree(projectA.contextNodes, projectB.contextNodes, 'context');

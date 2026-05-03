@@ -129,7 +129,7 @@ export default function CanvasDiffPage() {
 
       {(loading) && (
         <div className={`${s.loadingState ?? ''}`}>
-          <span className={`${s.spinner ?? ''}`} aria-hidden="true" />
+          <div className={`${s.skeleton ?? ''}`} style={{ width: 200, height: 20 }} />
           <span>正在加载项目数据...</span>
         </div>
       )}

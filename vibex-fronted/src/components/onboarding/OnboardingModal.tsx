@@ -104,7 +104,7 @@ export function OnboardingModal() {
             {/* Header */}
             <div className={styles.header}>
               <div className={styles.badge}>新手指引</div>
-              <button className={styles.closeButton} onClick={skip} data-testid="onboarding-skip-btn">
+              <button className={styles.closeButton} onClick={skip} data-testid="onboarding-modal-close-btn">
                 ✕
               </button>
             </div>

@@ -24,7 +24,7 @@ export function ClarifyStep({ onNext, onPrev, onSkip }: StepContentProps) {
   ];
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid="onboarding-step-2">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -58,15 +58,15 @@ export function ClarifyStep({ onNext, onPrev, onSkip }: StepContentProps) {
           <span>通过互动问答，AI 会生成更精准的设计方案</span>
         </div>
 
-        <div className={styles.actions} data-testid="onboarding-step-2">
-          <button className={styles.backBtn} onClick={onPrev} data-testid="onboarding-prev-btn">
+        <div className={styles.actions}>
+          <button className={styles.backBtn} onClick={onPrev} data-testid="onboarding-step-2-prev-btn">
             ← 上一步
           </button>
           <div className={styles.rightActions}>
-            <button className={styles.skipBtn} onClick={onSkip} data-testid="onboarding-skip-btn">
+            <button className={styles.skipBtn} onClick={onSkip} data-testid="onboarding-step-2-skip-btn">
               跳过
             </button>
-            <button className={styles.nextBtn} onClick={onNext} data-testid="onboarding-next-btn">
+            <button className={styles.nextBtn} onClick={onNext} data-testid="onboarding-step-2-next-btn">
               下一步 →
             </button>
           </div>

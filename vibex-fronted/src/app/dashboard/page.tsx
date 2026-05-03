@@ -11,6 +11,7 @@ import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog';
 import { SearchBar } from '@/components/dashboard/SearchBar';
 import { useProjects, useDeletedProjects, queryKeys } from '@/hooks/queries';
 import { AnalyticsWidget } from '@/components/dashboard/AnalyticsWidget';
+import { OnboardingProvider } from '@/components/onboarding/OnboardingProvider';
 
 /** 排序方式 */
 type SortOption = 'name' | 'createdAt' | 'updatedAt';
@@ -294,6 +295,8 @@ export default function Dashboard() {
 
   return (
     <div className={styles.page}>
+      {/* 新手指引 Provider */}
+      <OnboardingProvider />
       {/* 背景特效 */}
       <div className={styles.bgEffect}>
         <div className={styles.gridOverlay} />

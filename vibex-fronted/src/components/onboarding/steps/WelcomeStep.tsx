@@ -56,11 +56,11 @@ export function WelcomeStep({ onNext, onSkip }: StepContentProps) {
           ))}
         </div>
 
-        <div className={styles.actions} data-testid="onboarding-step-0">
-          <button className={styles.skipBtn} onClick={onSkip} data-testid="onboarding-skip-btn">
+        <div className={styles.actions}>
+          <button className={styles.skipBtn} onClick={onSkip} data-testid="onboarding-step-0-skip-btn">
             跳过介绍
           </button>
-          <button className={styles.nextBtn} onClick={onNext} data-testid="onboarding-next-btn">
+          <button className={styles.nextBtn} onClick={onNext} data-testid="onboarding-step-0-next-btn">
             下一步 →
           </button>
         </div>

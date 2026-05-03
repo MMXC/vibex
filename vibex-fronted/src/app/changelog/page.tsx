@@ -20,6 +20,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.340',
+    date: '2026-05-03',
+    changes: [
+      '🚀 S24-P001: E2E Slack Webhook Dry-run',
+      '✅ T1.2: webhook-dryrun.ts — SLACK_WEBHOOK_URL 验证，exit 0/1',
+      '✅ T1.3: package.json webhook:dryrun script',
+      '提交: b9a00e199',
+    ],
+    commit: 'b9a00e199',
+  },
+  {
     version: '1.0.339',
     date: '2026-05-03',
     changes: [

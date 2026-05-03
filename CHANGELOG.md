@@ -1,3 +1,9 @@
+### [Unreleased] vibex-proposals-sprint24 P001: E2E Slack Webhook Dry-run — 2026-05-03
+- **T1.2 webhook-dryrun.ts**: `scripts/webhook-dryrun.ts` — 验证 SLACK_WEBHOOK_URL 可达性，exit 0 成功/exit 1 失败，malformed/missing/unreachable 三种错误场景，logs 含 `[webhook-dryrun]` 前缀
+- **T1.3 package.json**: 新增 `webhook:dryrun` script → `tsx scripts/webhook-dryrun.ts`
+- **T1.2 CI 集成**: `.github/workflows/test.yml` — e2e job 末尾 `e2e:summary:slack` 前增加 Validate Slack Webhook step，提前失败快速暴露配置错误
+- TS: 0 errors ✅；Security ✅（URL sanitized in logs, no user input injection）
+
 ### [Unreleased] vibex-proposals-sprint23 Epic E5: Template Library — 2026-05-03
 - **E5-U1 useTemplateManager**: `hooks/useTemplateManager.ts` — exportTemplate (Blob download)/importTemplate (JSON validate)/getHistory/createSnapshot (MAX 10)/deleteSnapshot；downloadBlob() helper；validateTemplateData() JSON schema 验证
 - **E5-U2 TemplateHistoryPanel**: `components/templates/TemplateHistoryPanel/TemplateHistoryPanel.tsx` — history-item data-testid，formatDate() 时间格式化，restore/delete 按钮，history count footer

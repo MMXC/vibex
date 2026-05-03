@@ -1,3 +1,9 @@
+### [Unreleased] vibex-proposals-sprint24 P004: API Module Tests — 2026-05-03
+- **T4.1-T4.3 API 测试覆盖**: `src/services/api/modules/__tests__/{auth,project,page,canvas}.test.ts` + `src/lib/canvas/api/__tests__/canvasApi.test.ts` — 94 tests passed（auth: 11, project: 20, page: 11, canvas: 12, canvasApi: 40）；覆盖正常路径 + 错误路径（网络错误/404/409/null checks）
+- **T4.4/T4.5 CI Coverage Gate**: `.github/workflows/test.yml` unit job 新增 `test:unit:coverage` + `check-coverage.js 60` 门槛检查；`THRESHOLD=60%`（P004 spec）
+- DoD: auth≥5 tests ✅, project≥5 tests ✅, canvas≥5 tests ✅, ≥20 total tests ✅, CI coverage gate ✅, TS 0 errors ✅
+- 提交: 56f424db2
+
 ### [Unreleased] vibex-proposals-sprint24 P003: Onboarding 新手指引 — 2026-05-03
 - **T3.5 data-testid 覆盖**: onboarding/steps (WelcomeStep/InputStep/ClarifyStep/ModelStep/PreviewStep) — 关闭/跳过/上一步/下一步按钮 + step container 唯一 data-testid；OnboardingModal.tsx 关闭按钮 + OnboardingModal.test.tsx 用 data-testid 替代 getByText
 - **T3.7 NewUserGuide 集成**: DDSCanvasPage.tsx 挂载 `<NewUserGuide />` 新手引导覆盖层 + dashboard/page.tsx 挂载 `<OnboardingProvider />`

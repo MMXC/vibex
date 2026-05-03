@@ -20,6 +20,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.342',
+    date: '2026-05-03',
+    changes: [
+      '🚀 S24-P004: API Module Tests',
+      '✅ T4.1-T4.3: API 测试 94 passed (auth 11 / project 20 / page 11 / canvas 12 / canvasApi 40)',
+      '✅ T4.4/T4.5: CI Coverage Gate ≥60% + check-coverage.js',
+      '提交: 56f424db2',
+    ],
+    commit: '56f424db2',
+  },
+  {
     version: '1.0.341',
     date: '2026-05-03',
     changes: [

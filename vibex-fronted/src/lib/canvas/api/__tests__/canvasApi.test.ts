@@ -4,7 +4,8 @@
  * since the implementation uses validatedFetch with internal schema parsing.
  */
 
-import { canvasApi } from '../canvasApi';
+// Import stopPolling as named export
+import { canvasApi, stopPolling } from '../canvasApi';
 
 // Mock fetch — used by validatedFetch internally
 const mockFetch = vi.fn();
@@ -214,6 +215,123 @@ describe('CanvasApi', () => {
     });
     it('should have exportZip method', () => {
       expect(typeof canvasApi.exportZip).toBe('function');
+    });
+  });
+
+  // === Coverage Boost: Error Paths ===
+
+  describe('generateContexts error path', () => {
+    it('网络错误时抛出异常', async () => {
+      mockFetch.mockRejectedValue(new Error('Network error'));
+
+      await expect(
+        canvasApi.generateContexts({ requirementText: 'Test' })
+      ).rejects.toThrow('Network error');
+    });
+  });
+
+  describe('generateFlows error path', () => {
+    it('网络错误时抛出异常', async () => {
+      mockFetch.mockRejectedValue(new Error('Network error'));
+
+      await expect(
+        canvasApi.generateFlows({ contexts: [], sessionId: 's1' })
+      ).rejects.toThrow('Network error');
+    });
+  });
+
+  describe('generateComponents error path', () => {
+    it('网络错误时抛出异常', async () => {
+      mockFetch.mockRejectedValue(new Error('Network error'));
+
+      await expect(
+        canvasApi.generateComponents({ contexts: [], flows: [], sessionId: 's1' })
+      ).rejects.toThrow('Network error');
+    });
+  });
+
+  describe('fetchComponentTree error paths', () => {
+    it('success=false时抛出错误', async () => {
+      // success=false triggers the error branch; error field is stripped by Zod
+      // (not in schema), so result.error is undefined → falls back to default message
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: vi.fn().mockResolvedValue({
+          success: false,
+          components: [],
+        }),
+      });
+
+      await expect(
+        canvasApi.fetchComponentTree({ contexts: [], flows: [], sessionId: 's1' })
+      ).rejects.toThrow('生成组件树失败');
+    });
+
+    it('components为空数组时抛出错误', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: vi.fn().mockResolvedValue({ success: true, components: [] }),
+      });
+
+      await expect(
+        canvasApi.fetchComponentTree({ contexts: [], flows: [], sessionId: 's1' })
+      ).rejects.toThrow('生成组件树失败');
+    });
+  });
+
+  describe('createSnapshot error path', () => {
+    it('409冲突时抛出带status的错误', async () => {
+      const mockResponse = {
+        ok: false,
+        status: 409,
+        json: vi.fn().mockResolvedValue({ error: 'Conflict' }),
+      };
+      mockFetch.mockResolvedValue(mockResponse);
+
+      try {
+        await canvasApi.createSnapshot({ projectId: 'p1' });
+        // 如果不抛错，fail
+        expect(false).toBe(true);
+      } catch (err: any) {
+        expect(err.status).toBe(409);
+      }
+    });
+  });
+
+  describe('restoreSnapshot error path', () => {
+    it('网络错误时抛出异常', async () => {
+      mockFetch.mockRejectedValue(new Error('Network error'));
+
+      await expect(canvasApi.restoreSnapshot('snap1')).rejects.toThrow('Network error');
+    });
+  });
+
+  describe('getLatestVersion', () => {
+    it('成功返回版本号', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: vi.fn().mockResolvedValue({
+          success: true,
+          latestVersion: 3,
+          updatedAt: '2026-05-03T10:00:00Z',
+        }),
+      });
+
+      const result = await canvasApi.getLatestVersion('p1');
+      expect(result.latestVersion).toBe(3);
+      expect(result.success).toBe(true);
+    });
+
+    it('网络错误时抛出异常', async () => {
+      mockFetch.mockRejectedValue(new Error('Network error'));
+
+      await expect(canvasApi.getLatestVersion('p1')).rejects.toThrow('Network error');
+    });
+  });
+
+  describe('startPolling / stopPolling', () => {
+    it('stopPolling 无异常', () => {
+      expect(() => stopPolling()).not.toThrow();
     });
   });
 });

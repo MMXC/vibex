@@ -235,6 +235,10 @@ jobs:
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
 
       # E1-U2: E2E summary Slack report — run after test execution, regardless of pass/fail
+      - name: Validate Slack Webhook
+        run: pnpm --filter vibex-fronted run webhook:dryrun
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       - name: E2E Summary Slack Report
         if: always()
         run: pnpm --filter vibex-fronted run e2e:summary:slack

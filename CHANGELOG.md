@@ -1,3 +1,9 @@
+### [Unreleased] vibex-proposals-sprint24 P003: Onboarding 新手指引 — 2026-05-03
+- **T3.5 data-testid 覆盖**: onboarding/steps (WelcomeStep/InputStep/ClarifyStep/ModelStep/PreviewStep) — 关闭/跳过/上一步/下一步按钮 + step container 唯一 data-testid；OnboardingModal.tsx 关闭按钮 + OnboardingModal.test.tsx 用 data-testid 替代 getByText
+- **T3.7 NewUserGuide 集成**: DDSCanvasPage.tsx 挂载 `<NewUserGuide />` 新手引导覆盖层 + dashboard/page.tsx 挂载 `<OnboardingProvider />`
+- TS: 0 errors ✅；UT: 10 passed ✅；Changelog ✅
+- 提交: 1f3276bbd
+
 ### [Unreleased] vibex-proposals-sprint24 P002: TypeScript Debt Confirm — 2026-05-03
 - **T2.1-T2.5 审计确认**: frontend/backend/mcp-server 三包 `tsc --noEmit` → 0 errors，确认为无需修复债务
 - DoD: 全部满足，coord 已决策不纳入 Sprint 24 修复

@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.343',
+    date: '2026-05-03',
+    changes: [
+      '🚀 S24-P005: Canvas 对比',
+      '✅ T5.1: /canvas-diff 路由 + CanvasDiffSelector',
+      '✅ T5.2: canvasDiff.ts 三树 diff 算法 (6 UT)',
+      '✅ T5.3: CanvasDiffView 三色展示 + JSON 导出',
+      '提交: e62f161fc',
+    ],
+    commit: 'e62f161fc',
+  },
+  {
     version: '1.0.342',
     date: '2026-05-03',
     changes: [

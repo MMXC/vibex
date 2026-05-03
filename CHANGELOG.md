@@ -1,3 +1,10 @@
+### [Unreleased] vibex-proposals-sprint24 P005: Canvas 对比 — 2026-05-03
+- **T5.1 CanvasDiffPage**: `/canvas-diff` 路由 + `CanvasDiffSelector`（基线/对比项目选择器，data-testid ✅）
+- **T5.2 compareCanvasProjects**: `lib/canvasDiff.ts` — 三树 diff 算法（context/flow/component）；6 UT ✅
+- **T5.3 CanvasDiffView**: 增/改/删 三栏展示（红+黄+绿） + 摘要统计 + `exportDiffReport` JSON 导出（data-testid ✅）
+- DoD: `/canvas-diff` 路由 ✅, data-testid ✅, diff 三色展示 ✅, export ✅, TS 0 errors ✅
+- 提交: e62f161fc
+
 ### [Unreleased] vibex-proposals-sprint24 P004: API Module Tests — 2026-05-03
 - **T4.1-T4.3 API 测试覆盖**: `src/services/api/modules/__tests__/{auth,project,page,canvas}.test.ts` + `src/lib/canvas/api/__tests__/canvasApi.test.ts` — 94 tests passed（auth: 11, project: 20, page: 11, canvas: 12, canvasApi: 40）；覆盖正常路径 + 错误路径（网络错误/404/409/null checks）
 - **T4.4/T4.5 CI Coverage Gate**: `.github/workflows/test.yml` unit job 新增 `test:unit:coverage` + `check-coverage.js 60` 门槛检查；`THRESHOLD=60%`（P004 spec）

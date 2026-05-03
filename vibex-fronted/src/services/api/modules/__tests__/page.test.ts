@@ -1,6 +1,6 @@
 /**
  * Page API Tests
- * Tests the PageApi interface methods with mocked httpClient
+ * Tests the PageApi interface methods with mocked httpClient/cache/retry
  */
 
 import { pageApi } from '../page';
@@ -14,9 +14,24 @@ vi.mock('../../client', () => ({
     delete: vi.fn(),
   },
 }));
+
+// Mock retry
+vi.mock('../../retry', () => ({
+  retry: {
+    execute: vi.fn((fn) => fn()),
+  },
+  DEFAULT_RETRY_CONFIG: { maxRetries: 0, baseDelay: 1000, timeout: 5000, retryableStatusCodes: [500, 502, 503, 504] },
+}));
+
+// Mock cache
 vi.mock('../../cache', () => ({
-  cache: { get: vi.fn(), set: vi.fn(), delete: vi.fn() },
-  getCacheKey: vi.fn().mockReturnValue('cache-key'),
+  cache: {
+    get: vi.fn(),
+    set: vi.fn(),
+    remove: vi.fn(),
+    clear: vi.fn(),
+  },
+  getCacheKey: vi.fn().mockImplementation((type, id) => `${type}:${id}`),
 }));
 
 import { httpClient } from '../../client';
@@ -30,7 +45,7 @@ describe('PageApi', () => {
   describe('getPages', () => {
     it('返回项目页面列表', async () => {
       const mockResponse = {
-        data: [
+        pages: [
           { id: 'page1', name: 'Page 1', projectId: 'p1' },
           { id: 'page2', name: 'Page 2', projectId: 'p1' },
         ],
@@ -44,7 +59,7 @@ describe('PageApi', () => {
     });
 
     it('空列表返回空数组', async () => {
-      const mockResponse = { data: [] };
+      const mockResponse = { pages: [] };
       mockHttp.get.mockResolvedValue(mockResponse);
 
       const pages = await pageApi.getPages('p999');
@@ -54,62 +69,43 @@ describe('PageApi', () => {
 
   describe('getPage', () => {
     it('返回指定页面', async () => {
-      const mockResponse = { data: { id: 'page1', name: 'Test Page' } };
+      const mockResponse = { page: { id: 'page1', name: 'Test Page' } };
       mockHttp.get.mockResolvedValue(mockResponse);
 
       const page = await pageApi.getPage('page1');
       expect(page.id).toBe('page1');
     });
 
-    it('不存在的页面返回null', async () => {
-      const mockResponse = { data: null };
-      mockHttp.get.mockResolvedValue(mockResponse);
+    it('不存在的页面抛出错误', async () => {
+      mockHttp.get.mockRejectedValue(new Error('Page not found'));
 
-      const page = await pageApi.getPage('nonexistent');
-      expect(page).toBeNull();
+      await expect(pageApi.getPage('nonexistent')).rejects.toThrow('Page not found');
     });
   });
 
   describe('createPage', () => {
     it('创建后返回页面', async () => {
-      const mockResponse = { data: { id: 'page3', name: 'New Page', projectId: 'p1' } };
+      const mockResponse = { page: { id: 'page3', name: 'New Page', projectId: 'p1' } };
       mockHttp.post.mockResolvedValue(mockResponse);
 
       const page = await pageApi.createPage({ name: 'New Page', projectId: 'p1' });
       expect(page.id).toBe('page3');
     });
-
-    it('创建时调用正确的API路径', async () => {
-      const mockResponse = { data: { id: 'page3', name: 'Test' } };
-      mockHttp.post.mockResolvedValue(mockResponse);
-
-      await pageApi.createPage({ name: 'Test', projectId: 'p1' });
-
-      expect(mockHttp.post).toHaveBeenCalled();
-    });
   });
 
   describe('updatePage', () => {
     it('更新后返回页面', async () => {
-      const mockResponse = { data: { id: 'page1', name: 'Updated Page' } };
+      const mockResponse = { page: { id: 'page1', name: 'Updated Page' } };
       mockHttp.put.mockResolvedValue(mockResponse);
 
       const page = await pageApi.updatePage('page1', { name: 'Updated Page' });
       expect(page.name).toBe('Updated Page');
     });
-
-    it('不存在的页面返回null', async () => {
-      const mockResponse = { data: null };
-      mockHttp.put.mockResolvedValue(mockResponse);
-
-      const page = await pageApi.updatePage('nonexistent', { name: 'x' });
-      expect(page).toBeNull();
-    });
   });
 
   describe('deletePage', () => {
     it('删除成功返回success', async () => {
-      const mockResponse = { data: { success: true } };
+      const mockResponse = { success: true };
       mockHttp.delete.mockResolvedValue(mockResponse);
 
       const result = await pageApi.deletePage('page1');

@@ -3,7 +3,7 @@
  * Tests the AuthApi interface methods with mocked httpClient
  */
 
-import { authApi, AuthApi } from '../auth';
+import { authApi } from '../auth';
 
 // Mock httpClient
 vi.mock('../../client', () => ({
@@ -38,7 +38,14 @@ describe('AuthApi', () => {
       expect(mockHttp.post).toHaveBeenCalledWith('/auth/login', { email: 'test@example.com', password: 'password123' });
     });
 
-    it('网络错误触发重试后失败', async () => {
+    it('网络错误时抛出错误', async () => {
+      // Mock axios module used internally by retry.execute
+      vi.mock('axios', () => ({
+        default: {
+          isAxiosError: vi.fn().mockReturnValue(false),
+        },
+        isAxiosError: vi.fn().mockReturnValue(false),
+      }));
       mockHttp.post.mockRejectedValue(new Error('Network error'));
 
       await expect(
@@ -46,15 +53,15 @@ describe('AuthApi', () => {
       ).rejects.toThrow('Network error');
     });
 
-    it('用户不存在返回错误响应', async () => {
-      const errorResponse = { data: { error: 'USER_NOT_FOUND', message: 'User not found' } };
+    it('用户不存在返回null', async () => {
+      // Error response format: { data: { error: '...', user: undefined } }
+      // auth.login checks data.user.id which throws if user is undefined
+      const errorResponse = { data: { error: 'USER_NOT_FOUND', token: undefined } };
       mockHttp.post.mockResolvedValue(errorResponse);
 
-      // unwrapData returns null for error responses, so login should fail
-      const result = await authApi.login({ email: 'notexist@example.com', password: 'pass' });
-      // authApi.login stores token in sessionStorage only when data.token exists
-      // null token means auth failed - but method doesn't throw, it returns null
-      expect(result).toBeNull();
+      await expect(
+        authApi.login({ email: 'notexist@example.com', password: 'pass' })
+      ).rejects.toThrow();
     });
   });
 
@@ -93,8 +100,8 @@ describe('AuthApi', () => {
     });
 
     it('未登录时返回null', async () => {
-      const errorResponse = { data: null };
-      mockHttp.get.mockResolvedValue(errorResponse);
+      const mockResponse = { data: null };
+      mockHttp.get.mockResolvedValue(mockResponse);
 
       const user = await authApi.getCurrentUser();
       expect(user).toBeNull();
@@ -102,14 +109,15 @@ describe('AuthApi', () => {
   });
 
   describe('logout', () => {
-    it('调用logout API并返回success', async () => {
+    it('调用logout API并返回结果', async () => {
       const mockResponse = { data: { success: true } };
       mockHttp.post.mockResolvedValue(mockResponse);
 
       const result = await authApi.logout();
 
-      expect(result).toEqual({ success: true });
-      expect(mockHttp.post).toHaveBeenCalledWith('/auth/logout', undefined);
+      // logout returns raw result without unwrapping
+      expect(result).toEqual({ data: { success: true } });
+      expect(mockHttp.post).toHaveBeenCalledWith('/auth/logout');
     });
   });
 

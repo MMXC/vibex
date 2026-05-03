@@ -28,6 +28,7 @@ import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStor
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ShortcutEditModal } from '@/components/shortcuts/ShortcutEditModal';
 import { useShortcutStore } from '@/stores/shortcutStore';
+import { NewUserGuide } from '@/components/guide/NewUserGuide';
 import { createDDSAPI } from '@/hooks/dds/useDDSAPI';
 import { useDDSCanvasSearch } from '@/hooks/dds/useDDSCanvasSearch';
 import { DDSSearchPanel } from '@/components/dds/DDSSearchPanel';
@@ -647,6 +648,9 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
       onResolve={(action) => setConflictDialogOpen(false)}
       onClose={() => setConflictDialogOpen(false)}
     />
+
+    {/* P003-T3.7: New user guide overlay on DDS canvas */}
+    <NewUserGuide />
     </>
   );
 });

@@ -80,8 +80,9 @@ describe('E1-S1: PreviewStep — Template Selection', () => {
   it('should have template card data-testid', async () => {
     const { default: PreviewStep } = await import('@/components/onboarding/steps/PreviewStep');
     render(<PreviewStep {...defaultProps} />);
-    const card = await screen.findByTestId('onboarding-template-card');
-    expect(card).toBeInTheDocument();
+    // findByTestId throws on multiple; use findAllByTestId for template cards (multiple exist)
+    const cards = await screen.findAllByTestId('onboarding-template-card');
+    expect(cards.length).toBeGreaterThan(0);
   });
 
   it('should have correct data-testid for the step container', async () => {

@@ -1,3 +1,11 @@
+### [Unreleased] vibex-proposals-sprint25 E1: Onboarding + 需求模板库捆绑交付 — 2026-05-04
+- **S1.1 Onboarding Step5 模板推荐**: `PreviewStep.tsx` — Step 5 (prototype) 渲染模板卡片列表，调用 `useTemplates()` 获取模板数据，`data-testid="onboarding-template-card"`；模板选择后 `setSelectedTemplateId()` + `storePendingTemplateRequirement()` 存入 localStorage
+- **S1.2 模板 auto-fill**: `ChapterPanel.tsx` — `templateRequirement` prop → `useEffect` → `parseRequirementContent()` 解析 → 生成 `UserStoryCard` 填入 requirement chapter；`autoFilledRef` guard 防止 API 加载后重复填充；`cards.length > 0` 已有内容保护不覆盖；`data-testid="requirement-chapter"`
+- **S1.3 场景化推荐**: `ClarifyStep.tsx` → `setScenario()` → `SCENARIO_OPTIONS`（new-feature/refactor/bugfix/documentation/other）；`PreviewStep.tsx` → `filterByScenario()` 按场景标签过滤模板卡片
+- **S1.4 状态同步**: `onboardingStore.complete()` → `localStorage.setItem('onboarding_completed', 'true')` + `onboarding_completed_at`；`NewUserGuide` 读取 localStorage 决定是否展示；`data-testid="onboarding-overlay"`
+- **DoD**: Step 5 模板卡片 ✅, auto-fill ✅, 场景化推荐 ✅, localStorage 写入 ✅, TS 0 errors ✅, ESLint 0 warnings ✅
+- **提交**: ceb6cbf73 (feat), 5343a9140 (docs), b360d8c9a (fix), da6488937 (fix), 60203c181 (ESLint fix)
+
 ### [Unreleased] vibex-proposals-sprint24 P005: Canvas 对比 — 2026-05-03
 - **T5.1 CanvasDiffPage**: `/canvas-diff` 路由 + `CanvasDiffSelector`（基线/对比项目选择器，data-testid ✅）
 - **T5.2 compareCanvasProjects**: `lib/canvasDiff.ts` — 三树 diff 算法（context/flow/component）；6 UT ✅

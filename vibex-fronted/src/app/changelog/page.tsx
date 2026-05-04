@@ -20,6 +20,19 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.344',
+    date: '2026-05-04',
+    changes: [
+      '🚀 S25-E1: Onboarding + 需求模板库捆绑交付',
+      '✅ S1.1: PreviewStep.tsx Step5 模板推荐卡片 (data-testid ✅)',
+      '✅ S1.2: ChapterPanel auto-fill (autoFilledRef guard, 已有内容保护)',
+      '✅ S1.3: ClarifyStep 场景化推荐 (SCENARIO_OPTIONS + filterByScenario)',
+      '✅ S1.4: onboardingStore complete() → localStorage 完成标记',
+      '提交: ceb6cbf73 / b360d8c9a / da6488937 / 60203c181',
+    ],
+    commit: '60203c181',
+  },
+  {
     version: '1.0.343',
     date: '2026-05-03',
     changes: [

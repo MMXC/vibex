@@ -2,6 +2,7 @@
  * User Onboarding Store
  * 
  * 引导状态管理 - 使用 Zustand persist 持久化进度
+ * E1: 支持场景化模板推荐 + localStorage 完成标记
  */
 
 'use client';
@@ -12,12 +13,19 @@ import {
   OnboardingStep,
   OnboardingStatus,
   OnboardingStore,
+  ScenarioType,
   STEP_ORDER,
   getNextStep,
   getStepIndex,
 } from './types';
 
 const STORAGE_KEY = 'vibex-onboarding';
+
+/** E1-S2: localStorage 完成标记 key */
+const ONBOARDING_COMPLETED_KEY = 'onboarding_completed';
+const ONBOARDING_COMPLETED_AT_KEY = 'onboarding_completed_at';
+/** E1-S2: 待填充到 Canvas 的模板 requirement 内容 */
+const PENDING_TEMPLATE_REQ_KEY = 'vibex:pending_template_req';
 
 // 初始状态
 const initialState = {
@@ -26,6 +34,10 @@ const initialState = {
   completedSteps: [] as OnboardingStep[],
   startedAt: undefined as number | undefined,
   completedAt: undefined as number | undefined,
+  /** E1-S3: 场景类型 (Step 3 选择) */
+  scenario: undefined as ScenarioType | undefined,
+  /** E1-S1: 选中的模板 ID (Step 5 选择) */
+  selectedTemplateId: undefined as string | undefined,
 };
 
 export const useOnboardingStore = create<OnboardingStore>()(
@@ -88,6 +100,22 @@ export const useOnboardingStore = create<OnboardingStore>()(
         }
       },
 
+      /**
+       * E1-S3: 设置场景类型
+       * @param scenario 场景类型
+       */
+      setScenario: (scenario: ScenarioType) => {
+        set({ scenario });
+      },
+
+      /**
+       * E1-S1: 设置选中的模板 ID
+       * @param templateId 模板 ID
+       */
+      setSelectedTemplateId: (templateId: string | undefined) => {
+        set({ selectedTemplateId: templateId });
+      },
+
       // 完成引导
       complete: () => {
         const { currentStep, completedSteps } = get();
@@ -103,6 +131,14 @@ export const useOnboardingStore = create<OnboardingStore>()(
           completedSteps: finalSteps,
           completedAt: Date.now(),
         });
+
+        // E1-S4: 写入 localStorage 完成标记
+        try {
+          localStorage.setItem(ONBOARDING_COMPLETED_KEY, 'true');
+          localStorage.setItem(ONBOARDING_COMPLETED_AT_KEY, new Date().toISOString());
+        } catch {
+          // localStorage 写入失败静默忽略
+        }
       },
 
       // 跳过引导
@@ -115,6 +151,12 @@ export const useOnboardingStore = create<OnboardingStore>()(
       // 重置引导
       reset: () => {
         set(initialState);
+        try {
+          localStorage.removeItem(ONBOARDING_COMPLETED_KEY);
+          localStorage.removeItem(ONBOARDING_COMPLETED_AT_KEY);
+        } catch {
+          // ignore
+        }
       },
     }),
     {
@@ -126,6 +168,8 @@ export const useOnboardingStore = create<OnboardingStore>()(
         completedSteps: state.completedSteps,
         startedAt: state.startedAt,
         completedAt: state.completedAt,
+        scenario: state.scenario,
+        selectedTemplateId: state.selectedTemplateId,
       }),
     }
   )

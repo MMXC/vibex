@@ -57,6 +57,8 @@ export interface DDSScrollContainerProps {
   className?: string;
   /** Ref forwarded to the root scroll container div */
   rootRef?: RefObject<HTMLDivElement | null>;
+  /** E1-S2: 模板 requirement 内容，用于 auto-fill */
+  templateRequirement?: string;
 }
 
 // ==================== Component ====================
@@ -66,6 +68,7 @@ export const DDSScrollContainer = memo(
   renderChapterContent,
   className = '',
   rootRef,
+  templateRequirement,
 }: DDSScrollContainerProps) {
   // E2-U1-AC1: URL sync — reads ?chapter= from URL, updates URL when activeChapter changes
   useChapterURLSync();
@@ -219,7 +222,7 @@ export const DDSScrollContainer = memo(
                 renderChapterContent(chapter, data)
               ) : (
                 // Default: render ChapterPanel with card CRUD
-                <ChapterPanel chapter={chapter} />
+                <ChapterPanel chapter={chapter} templateRequirement={chapter === 'requirement' ? templateRequirement : undefined} />
               )}
             </div>
           </DDSPanel>

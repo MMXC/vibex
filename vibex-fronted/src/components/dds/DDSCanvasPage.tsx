@@ -55,6 +55,8 @@ export interface DDSCanvasPageProps {
   onAIGenerate?: () => void;
   /** agentSession URL param — triggers code generation context display */
   agentSession?: string | null;
+  /** E1-S2: 来自 Onboarding 的模板 requirement 内容 */
+  templateRequirement?: string;
 }
 
 // ==================== Page State ====================
@@ -178,7 +180,17 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   projectId,
   onAIGenerate,
   agentSession,
+  templateRequirement: propTemplateRequirement,
 }: DDSCanvasPageProps) {
+  /** E1-S2: 自动从 localStorage 读取待填充的模板 requirement（Onboarding 完成后） */
+  const [templateRequirement] = useState<string | undefined>(() => {
+    if (propTemplateRequirement) return propTemplateRequirement;
+    try {
+      return localStorage.getItem('vibex:pending_template_req') ?? undefined;
+    } catch {
+      return undefined;
+    }
+  });
   const [state, setState] = useState<DDSCanvasPageState>({
     pageState: 'loading',
     errorMessage: null,
@@ -215,6 +227,16 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     setCursorPos({ x: e.clientX, y: e.clientY });
   }, []);
+
+  // ---- E1-S2: Auto-fill template requirement from localStorage (after onboarding) ----
+  useEffect(() => {
+    if (!templateRequirement) return;
+    const stored = localStorage.getItem('vibex:pending_template_req');
+    if (stored) {
+      localStorage.removeItem('vibex:pending_template_req');
+    }
+  }, [templateRequirement]);
+
 
   // Broadcast cursor to Firebase (throttled 100ms)
   useEffect(() => {
@@ -519,6 +541,7 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
         <DDSScrollContainer
           className="dds-scroll-container"
           rootRef={scrollContainerRef}
+          templateRequirement={templateRequirement}
           renderChapterContent={(
             chapter: ChapterType,
             data: ChapterData

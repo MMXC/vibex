@@ -2,20 +2,29 @@
  * User Onboarding Types
  * 
  * 引导步骤类型定义
+ * E1: 新增 ScenarioType + store 新增字段
  */
 
 export type OnboardingStep = 
   | 'welcome'     // 步骤1: 欢迎介绍
   | 'input'       // 步骤2: 需求录入
-  | 'clarify'     // 步骤3: AI澄清
+  | 'clarify'     // 步骤3: AI澄清（场景选择）
   | 'model'       // 步骤4: 建模展示
-  | 'prototype';  // 步骤5: 原型生成
+  | 'prototype';  // 步骤5: 原型生成（模板选择）
 
 export type OnboardingStatus = 
   | 'not-started'  // 未开始
   | 'in-progress'  // 进行中
   | 'completed'     // 已完成
   | 'skipped';      // 已跳过
+
+/** E1-S3: 场景类型 */
+export type ScenarioType = 
+  | 'new-feature'   // 新功能开发
+  | 'refactor'      // 重构
+  | 'bugfix'        // Bug 修复
+  | 'documentation' // 文档
+  | 'other';        // 其他
 
 export interface StepInfo {
   id: OnboardingStep;
@@ -31,6 +40,10 @@ export interface OnboardingProgress {
   completedSteps: OnboardingStep[];
   startedAt?: number;
   completedAt?: number;
+  /** E1-S3: 场景类型 (Step 3 选择) */
+  scenario?: ScenarioType;
+  /** E1-S1: 选中的模板 ID (Step 5 选择) */
+  selectedTemplateId?: string;
 }
 
 export interface OnboardingActions {
@@ -42,6 +55,10 @@ export interface OnboardingActions {
   complete: () => void;
   skip: () => void;
   reset: () => void;
+  /** E1-S3: 设置场景类型 */
+  setScenario: (scenario: ScenarioType) => void;
+  /** E1-S1: 设置选中的模板 ID */
+  setSelectedTemplateId: (templateId: string | undefined) => void;
 }
 
 export type OnboardingStore = OnboardingProgress & OnboardingActions;
@@ -65,7 +82,7 @@ export const ONBOARDING_STEPS: StepInfo[] = [
   {
     id: 'clarify',
     title: 'AI 智能澄清',
-    description: 'AI 会提问帮助完善需求',
+    description: '选择你的项目场景',
     icon: '🤖',
     duration: '2min',
   },
@@ -78,11 +95,20 @@ export const ONBOARDING_STEPS: StepInfo[] = [
   },
   {
     id: 'prototype',
-    title: '原型生成',
-    description: '一键生成可交互原型',
+    title: '模板推荐',
+    description: '选择一个模板快速开始',
     icon: '🎨',
     duration: '2min',
   },
+];
+
+/** E1-S3: 场景配置 */
+export const SCENARIO_OPTIONS: { value: ScenarioType; label: string; icon: string }[] = [
+  { value: 'new-feature', label: '新功能开发', icon: '✨' },
+  { value: 'refactor', label: '代码重构', icon: '🔧' },
+  { value: 'bugfix', label: 'Bug 修复', icon: '🐛' },
+  { value: 'documentation', label: '文档撰写', icon: '📄' },
+  { value: 'other', label: '其他', icon: '📦' },
 ];
 
 // 步骤顺序

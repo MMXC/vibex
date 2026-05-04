@@ -1,12 +1,15 @@
 /**
- * ClarifyStep - 需求澄清步骤组件
+ * ClarifyStep - 场景选择步骤组件
  * 
- * 步骤3: 需求澄清引导
+ * 步骤3 (clarify): 选择项目场景，用于 Step 5 模板推荐过滤
+ * E1-S3: 场景化模板推荐
  */
 
 'use client';
 
 import { motion } from 'framer-motion';
+import { useOnboardingStore, SCENARIO_OPTIONS } from '@/stores/onboarding';
+import type { ScenarioType } from '@/stores/onboarding/types';
 import styles from './StepContent.module.css';
 
 export interface StepContentProps {
@@ -17,11 +20,8 @@ export interface StepContentProps {
 }
 
 export function ClarifyStep({ onNext, onPrev, onSkip }: StepContentProps) {
-  const questions = [
-    '目标用户是谁？',
-    '需要哪些核心功能？',
-    '与现有系统如何集成？',
-  ];
+  const scenario = useOnboardingStore((s) => s.scenario);
+  const setScenario = useOnboardingStore((s) => s.setScenario);
 
   return (
     <div className={styles.container} data-testid="onboarding-step-2">
@@ -32,30 +32,29 @@ export function ClarifyStep({ onNext, onPrev, onSkip }: StepContentProps) {
         className={styles.content}
       >
         <div className={styles.icon}>🤖</div>
-        <h2 className={styles.title}>AI 智能澄清</h2>
+        <h2 className={styles.title}>选择项目场景</h2>
         <p className={styles.subtitle}>
-          AI 会通过提问帮助你完善需求，确保理解准确
+          选择你的项目类型，我们将为你推荐合适的模板
         </p>
 
-        <div className={styles.questions}>
-          <p className={styles.questionsTitle}>AI 可能会问：</p>
-          {questions.map((q, index) => (
-            <motion.div
-              key={q}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 + index * 0.1 }}
-              className={styles.question}
+        {/* E1-S3: 场景选择器 */}
+        <div className={styles.scenarioGrid} role="radiogroup" aria-label="项目场景">
+          {SCENARIO_OPTIONS.map((option, index) => (
+            <motion.button
+              key={option.value}
+              type="button"
+              role="radio"
+              aria-checked={scenario === option.value}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1 + index * 0.06 }}
+              className={`${styles.scenarioCard} ${scenario === option.value ? styles.scenarioCardSelected : ''}`}
+              onClick={() => setScenario(option.value as ScenarioType)}
             >
-              <span className={styles.questionIcon}>❓</span>
-              <span>{q}</span>
-            </motion.div>
+              <span className={styles.scenarioIcon}>{option.icon}</span>
+              <span className={styles.scenarioLabel}>{option.label}</span>
+            </motion.button>
           ))}
-        </div>
-
-        <div className={styles.highlight}>
-          <span className={styles.highlightIcon}>✨</span>
-          <span>通过互动问答，AI 会生成更精准的设计方案</span>
         </div>
 
         <div className={styles.actions}>

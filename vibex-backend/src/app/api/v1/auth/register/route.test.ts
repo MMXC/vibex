@@ -125,6 +125,75 @@ describe('POST /api/auth/register', () => {
     expect(setCookie || '').not.toMatch(/auth_token=/i);
   });
 
+  // AC-1.2.3: Registration with blank email — route proceeds past !email check,
+  // then finds an existing user with email='  ' if DB has one, or creates one.
+  // We reset mocks to ensure clean state for this edge-case test.
+  it('should return 409 if a user with whitespace email already exists', async () => {
+    mockPrisma.user.findUnique.mockReset();
+    mockPrisma.user.findUnique.mockResolvedValue({ id: 'whitespace-user' });
+    const request = new NextRequest('http://localhost:3000/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ email: '  ', password: 'password123' }),
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(409);
+  });
+
+  // AC-1.2.4: Registration with blank password should return 400
+  it('should return 400 if password is blank', async () => {
+    mockPrisma.user.findUnique.mockReset();
+    mockPrisma.user.findUnique.mockResolvedValue(null);
+    const request = new NextRequest('http://localhost:3000/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'test@example.com', password: '   ' }),
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(400);
+  });
+
+  // AC-1.2.5: Registration with empty JSON should return 400
+  it('should return 400 for empty JSON body', async () => {
+    const request = new NextRequest('http://localhost:3000/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(400);
+    expect(response.headers.get('content-type')).toContain('application/json');
+  });
+
+  // AC-1.2.6: Prisma create failure should return 500
+  it('should return 500 if Prisma create fails', async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(null);
+    (hashPassword as jest.Mock).mockResolvedValue('hashedpassword');
+    mockPrisma.user.create.mockRejectedValue(new Error('Unique constraint failed'));
+
+    const request = new NextRequest('http://localhost:3000/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'fail@example.com', password: 'password123' }),
+    });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.error).toContain('Internal server error');
+  });
+
+  // AC-1.2.7: hashPassword failure should return 500
+  it('should return 500 if hashPassword fails', async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(null);
+    (hashPassword as jest.Mock).mockRejectedValue(new Error('bcrypt error'));
+
+    const request = new NextRequest('http://localhost:3000/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'hashfail@example.com', password: 'password123' }),
+    });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
+  });
+
   it('should handle errors', async () => {
     mockPrisma.user.findUnique.mockRejectedValue(new Error('DB error'));
 

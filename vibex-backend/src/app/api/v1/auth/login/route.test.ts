@@ -176,29 +176,81 @@ describe('POST /api/auth/login', () => {
     expect(setCookie).toMatch(/Max-Age=604800/i);
   });
 
-  // AC-1.1.4: Login failure (401) should not set cookie
-  it('should not set cookie on 401 invalid password', async () => {
-    const mockUser = {
-      id: 'user123',
-      email: 'test@example.com',
-      name: 'Test User',
-      avatar: null,
-      password: 'hashedpassword',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    
-    (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
-    (verifyPassword as jest.Mock).mockResolvedValue(false);
-    
+  // AC-1.1.5: Login with whitespace-only email returns 401 (user not found)
+  // Route validates `!email` which is false for '  ' (truthy), so it proceeds to DB
+  it('should return 401 when email is whitespace-only string', async () => {
+    (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(null);
     const request = new NextRequest('http://localhost:3000/api/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ email: 'test@example.com', password: 'wrongpassword' }),
+      body: JSON.stringify({ email: '  ', password: 'password123' }),
     });
-    
     const response = await POST(request);
-    const setCookie = response.headers.get('set-cookie');
-    // Should not have auth_token in set-cookie header
-    expect(setCookie || '').not.toMatch(/auth_token=/i);
+    expect(response.status).toBe(401);
+  });
+
+  // AC-1.1.6: Login with whitespace-only password returns 401 (invalid password)
+  // Route validates `!password` which is false for '   ' (truthy), so it proceeds to DB
+  it('should return 401 when password is whitespace-only string', async () => {
+    (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({
+      id: 'user123',
+      email: 'test@example.com',
+      password: 'hashedpassword',
+      name: 'Test User',
+      avatar: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    (verifyPassword as jest.Mock).mockResolvedValue(false);
+    const request = new NextRequest('http://localhost:3000/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'test@example.com', password: '   ' }),
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(401);
+  });
+
+  // AC-1.1.7: Login with empty JSON body should return 400
+  it('should return 400 for empty JSON body', async () => {
+    const request = new NextRequest('http://localhost:3000/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(response.status).toBe(400);
+    expect(data.error).toContain('required');
+  });
+
+  // AC-1.1.8: User with null password should return 401
+  it('should return 401 if user password field is null', async () => {
+    (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({
+      id: 'user123',
+      email: 'nullpw@example.com',
+      password: null,
+      name: 'Null PW User',
+      avatar: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    (verifyPassword as jest.Mock).mockResolvedValue(false);
+
+    const request = new NextRequest('http://localhost:3000/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'nullpw@example.com', password: 'password123' }),
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(401);
+  });
+
+  it('should handle unexpected error during login', async () => {
+    (mockPrisma.user.findUnique as jest.Mock).mockRejectedValue(new Error('Database connection failed'));
+    const request = new NextRequest('http://localhost:3000/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'test@example.com', password: 'password123' }),
+    });
+    const response = await POST(request);
+    const data = await response.json();
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
   });
 });

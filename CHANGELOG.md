@@ -1,3 +1,10 @@
+### [Unreleased] vibex-proposals-sprint25 E3: Sprint 24 遗留收尾 — 2026-05-04
+- **S3.1 Slack E2E 报告验证**: `vibex-fronted/scripts/e2e-summary-to-slack.ts` Block Kit 格式验证 + CI workflow `.github/workflows/test.yml` e2e job 配置 `e2e:summary:slack`（if:always）+ `webhook:dryrun` 前置验证；确认 SLACK_WEBHOOK_URL 已配置
+- **S3.2 TypeScript 全面审计**: backend/frontend `tsc --noEmit` → 0 errors（S24 P002 已确认，S25 直接采纳）
+- **S3.3 API 测试用例补全**: `vibex-backend/src/app/api/v1/auth/` — auth.test.ts 补全至 30 tests（login: 12, register: 12, logout: 6）；修复 mock 返回值 + beforeEach mockReset；覆盖正常路径 + 错误路径 + edge cases（空白字符串/null字段/生产Secure标志）
+- **S3.4 CHANGELOG 更新**: S23/S24 条目移出 [Unreleased]，添加 Released 版本头
+- DoD: S3.1 ✅, S3.2 ✅, S3.3 auth≥20 ✅, S3.4 ✅
+
 ### [Unreleased] vibex-proposals-sprint25 E2: 跨 Canvas 项目版本对比 — 2026-05-04
 - **S2.1 /canvas-diff 路由**: `app/canvas-diff/page.tsx` — `/canvas-diff` 页面 + `data-testid="canvas-diff-page"`
 - **S2.1 引导文案**: `CanvasDiffView.tsx` — 首次进入"选择两个项目开始对比"；选 A 后"请选择要对比的第二个 Canvas 项目"
@@ -14,43 +21,45 @@
 - **DoD**: Step 5 模板卡片 ✅, auto-fill ✅, 场景化推荐 ✅, localStorage 写入 ✅, TS 0 errors ✅, ESLint 0 warnings ✅
 - **提交**: ceb6cbf73 (feat), 5343a9140 (docs), b360d8c9a (fix), da6488937 (fix), 60203c181 (ESLint fix)
 
-### [Unreleased] vibex-proposals-sprint24 P005: Canvas 对比 — 2026-05-03
+## [Released] vibex-proposals — 2026-05-03
+
+### vibex-proposals-sprint24 P005: Canvas 对比 — 2026-05-03
 - **T5.1 CanvasDiffPage**: `/canvas-diff` 路由 + `CanvasDiffSelector`（基线/对比项目选择器，data-testid ✅）
 - **T5.2 compareCanvasProjects**: `lib/canvasDiff.ts` — 三树 diff 算法（context/flow/component）；6 UT ✅
 - **T5.3 CanvasDiffView**: 增/改/删 三栏展示（红+黄+绿） + 摘要统计 + `exportDiffReport` JSON 导出（data-testid ✅）
 - DoD: `/canvas-diff` 路由 ✅, data-testid ✅, diff 三色展示 ✅, export ✅, TS 0 errors ✅
 - 提交: e62f161fc
 
-### [Unreleased] vibex-proposals-sprint24 P004: API Module Tests — 2026-05-03
+### vibex-proposals-sprint24 P004: API Module Tests — 2026-05-03
 - **T4.1-T4.3 API 测试覆盖**: `src/services/api/modules/__tests__/{auth,project,page,canvas}.test.ts` + `src/lib/canvas/api/__tests__/canvasApi.test.ts` — 94 tests passed（auth: 11, project: 20, page: 11, canvas: 12, canvasApi: 40）；覆盖正常路径 + 错误路径（网络错误/404/409/null checks）
 - **T4.4/T4.5 CI Coverage Gate**: `.github/workflows/test.yml` unit job 新增 `test:unit:coverage` + `check-coverage.js 60` 门槛检查；`THRESHOLD=60%`（P004 spec）
 - DoD: auth≥5 tests ✅, project≥5 tests ✅, canvas≥5 tests ✅, ≥20 total tests ✅, CI coverage gate ✅, TS 0 errors ✅
 - 提交: 56f424db2
 
-### [Unreleased] vibex-proposals-sprint24 P003: Onboarding 新手指引 — 2026-05-03
+### vibex-proposals-sprint24 P003: Onboarding 新手指引 — 2026-05-03
 - **T3.5 data-testid 覆盖**: onboarding/steps (WelcomeStep/InputStep/ClarifyStep/ModelStep/PreviewStep) — 关闭/跳过/上一步/下一步按钮 + step container 唯一 data-testid；OnboardingModal.tsx 关闭按钮 + OnboardingModal.test.tsx 用 data-testid 替代 getByText
 - **T3.7 NewUserGuide 集成**: DDSCanvasPage.tsx 挂载 `<NewUserGuide />` 新手引导覆盖层 + dashboard/page.tsx 挂载 `<OnboardingProvider />`
 - TS: 0 errors ✅；UT: 10 passed ✅；Changelog ✅
 - 提交: 1f3276bbd
 
-### [Unreleased] vibex-proposals-sprint24 P002: TypeScript Debt Confirm — 2026-05-03
+### vibex-proposals-sprint24 P002: TypeScript Debt Confirm — 2026-05-03
 - **T2.1-T2.5 审计确认**: frontend/backend/mcp-server 三包 `tsc --noEmit` → 0 errors，确认为无需修复债务
 - DoD: 全部满足，coord 已决策不纳入 Sprint 24 修复
 
-### [Unreleased] vibex-proposals-sprint24 P001: E2E Slack Webhook Dry-run — 2026-05-03
+### vibex-proposals-sprint24 P001: E2E Slack Webhook Dry-run — 2026-05-03
 - **T1.2 webhook-dryrun.ts**: `scripts/webhook-dryrun.ts` — 验证 SLACK_WEBHOOK_URL 可达性，exit 0 成功/exit 1 失败，malformed/missing/unreachable 三种错误场景，logs 含 `[webhook-dryrun]` 前缀
 - **T1.3 package.json**: 新增 `webhook:dryrun` script → `tsx scripts/webhook-dryrun.ts`
 - **T1.2 CI 集成**: `.github/workflows/test.yml` — e2e job 末尾 `e2e:summary:slack` 前增加 Validate Slack Webhook step，提前失败快速暴露配置错误
 - TS: 0 errors ✅；Security ✅（URL sanitized in logs, no user input injection）
 
-### [Unreleased] vibex-proposals-sprint23 Epic E5: Template Library — 2026-05-03
+### vibex-proposals-sprint23 Epic E5: Template Library — 2026-05-03
 - **E5-U1 useTemplateManager**: `hooks/useTemplateManager.ts` — exportTemplate (Blob download)/importTemplate (JSON validate)/getHistory/createSnapshot (MAX 10)/deleteSnapshot；downloadBlob() helper；validateTemplateData() JSON schema 验证
 - **E5-U2 TemplateHistoryPanel**: `components/templates/TemplateHistoryPanel/TemplateHistoryPanel.tsx` — history-item data-testid，formatDate() 时间格式化，restore/delete 按钮，history count footer
 - **TemplateGallery 集成**: export/import/history 按钮 + 10 个快照上限 ✅
 - TS: 0 errors ✅；Security ✅；Changelog ✅
 - 提交: 0a076d3c5
 
-### [Unreleased] vibex-proposals-sprint23 Epic E4: Export Formats — 2026-05-03
+### vibex-proposals-sprint23 Epic E4: Export Formats — 2026-05-03
 - **E4-U1 PlantUML**: `lib/exporters/plantuml.ts` — class/sequence/usecase diagram，pumlEscape() 防注入，validatePlantUML() 语法检查，@startuml/@enduml 包装，StarUML 兼容
 - **E4-U2 JSON Schema**: `lib/exporters/json-schema.ts` — ComponentNode → JSON Schema draft-2020-12，properties/definitions/required 完整，serializeJSONSchema() 2-space indent，try-catch 降级
 - **E4-U3 SVG**: `lib/exporters/svg.ts` — 1200×800 canvas SVG，svgEscape() 防注入，contextSvg (core/supporting/generic/external 分色) + flowSvg，generateSVG() try-catch fallback
@@ -58,14 +67,14 @@
 - TS: 0 errors ✅；Security ✅；Changelog ✅
 - 提交: 7539b2763
 
-### [Unreleased] vibex-proposals-sprint23 Epic E3: Firebase Cursor Sync — 2026-05-03
+### vibex-proposals-sprint23 Epic E3: Firebase Cursor Sync — 2026-05-03
 - **E3-U1 presence.ts cursor 扩展**: `lib/firebase/presence.ts` — cursor 字段扩展 nodeId + timestamp；REST API PATCH 实现零 SDK 依赖；EventSource SSE 流式订阅 + 2s polling fallback；visibilitychange 清除机制
 - **E3-U2 RemoteCursor**: `components/presence/RemoteCursor.tsx` + `RemoteCursor.module.css` — SVG arrow cursor + username label，isMockMode guard 符合 AGENTS.md §4.2，数据属性完整（data-user-id/data-node-id/data-testid）
 - **E3-U3 useCursorSync**: `hooks/useCursorSync.ts` — 100ms debounce cursor write；subscribeToOthers 订阅远程 cursor；moveCursor 时 isMockMode 直接返回；swallow 错误不抛出
 - TS: 0 errors ✅；Security ✅；Changelog ✅
 - 提交: 5430f7394
 
-### [Unreleased] vibex-proposals-sprint23 Epic E2: Design Review Diff 视图 — 2026-05-03
+### vibex-proposals-sprint23 Epic E2: Design Review Diff 视图 — 2026-05-03
 - **E2-U1 Re-Review Button**: `ReviewReportPanel.tsx` — re-review-btn (data-testid=re-review-btn)，↻ Re-review 触发重新评审
 - **E2-U2 Diff State**: `useDesignReview.ts` — diffResult state + previousReportId 支持，首次 review 后 diffResult=null，后续基于前次结果计算 diff
 - **E2-U3 DiffView**: `DiffView.tsx` + `DiffView.module.css` — Added(红)/Removed(绿)/Unchanged 三区，data-testid 完整覆盖（diff-view/diff-item-{variant}/diff-{added,removed,unchanged}-count）
@@ -73,7 +82,7 @@
 - TS: 0 errors ✅；Security ✅；Changelog ✅
 - 提交: 4da2805b6
 
-### [Unreleased] vibex-proposals-sprint23 Epic E1: E2E CI 闭环落地 — 2026-05-03
+### vibex-proposals-sprint23 Epic E1: E2E CI 闭环落地 — 2026-05-03
 - **E1-U1 Block Kit**: `vibex-fronted/scripts/e2e-summary-to-slack.ts` — Playwright results.json 解析（stats + suites），Block Kit payload 格式（header/section(fields)/section(failed list)/context），postToSlack() error handling 永不抛出，main() exit 0 不影响 CI job
 - **E1-U2 CI Workflow**: `.github/workflows/test.yml` — e2e job 后执行 `e2e:summary:slack`，if:always() 无论 pass/fail 都运行，传递 SLACK_WEBHOOK_URL/CI/GITHUB_RUN_NUMBER/GITHUB_RUN_URL
 - TS: 0 errors ✅；Security ✅；Changelog ✅

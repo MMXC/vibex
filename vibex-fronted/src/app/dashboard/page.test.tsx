@@ -36,6 +36,7 @@ const mockRouter = {
 
 vi.mock('next/navigation', () => ({
   useRouter: () => mockRouter,
+  usePathname: () => '/dashboard',
 }));
 
 // Mock usePermission hook - return admin permissions for tests

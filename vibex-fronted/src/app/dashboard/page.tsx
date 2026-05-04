@@ -1,7 +1,7 @@
 'use client';
 
 import { getAuthToken, getUserId } from '@/lib/auth-token';
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
@@ -13,8 +13,10 @@ import { useProjects, useDeletedProjects, queryKeys } from '@/hooks/queries';
 import { AnalyticsWidget } from '@/components/dashboard/AnalyticsWidget';
 import { OnboardingProvider } from '@/components/onboarding/OnboardingProvider';
 
-/** 排序方式 */
-type SortOption = 'name' | 'createdAt' | 'updatedAt';
+import { useProjectSearch, FILTER_LABELS, SORT_LABELS, FilterOption, SortOption } from '@/hooks/useProjectSearch';
+
+/** 排序方式 (E4: 兼容原有选项) */
+type LocalSortOption = 'name' | 'createdAt' | 'updatedAt';
 
 // RBAC 类型
 type UserRole = 'admin' | 'editor' | 'viewer';
@@ -52,8 +54,7 @@ export default function Dashboard() {
   const [showTrash, setShowTrash] = useState(false);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<SortOption>('updatedAt');
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmTitle, setConfirmTitle] = useState('');
@@ -78,6 +79,18 @@ export default function Dashboard() {
       select: (data) => data.filter((p) => !p.deletedAt),
     }
   });
+
+  // E4: useProjectSearch hook — 搜索/过滤/排序统一管理（projects 在此处才定义）
+  const {
+    filtered: displayProjects,
+    searching,
+    searchQuery,
+    filter,
+    sort,
+    setSearch,
+    setFilter,
+    setSort,
+  } = useProjectSearch(projects, userId ?? undefined);
 
   // 使用 React Query 获取已删除项目
   const {
@@ -129,52 +142,39 @@ export default function Dashboard() {
       .slice(0, 5);
   }, [projects]);
 
-  // E4: 搜索 + 状态筛选 + 排序后的项目列表
-  const displayProjects = useMemo(() => {
-    let result = [...projects];
+  // displayProjects now comes from useProjectSearch hook (see line ~59)
 
-    // 搜索过滤
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(p =>
-        p.name.toLowerCase().includes(q) ||
-        (p.description ?? '').toLowerCase().includes(q)
-      );
-    }
-
-    // 排序
-    result.sort((a, b) => {
-      if (sortBy === 'name') {
-        return a.name.localeCompare(b.name);
-      }
-      if (sortBy === 'createdAt') {
-        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        return bTime - aTime;
-      }
-      // updatedAt
-      const aTime = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-      const bTime = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-      return bTime - aTime;
-    });
-
-    return result;
-  }, [projects, searchQuery, sortBy]);
-
-  // 点击外部关闭排序菜单
+  // 点击外部关闭排序/过滤菜单
   useEffect(() => {
-    const handleClickOutside = () => setShowSortMenu(false);
-    if (showSortMenu) {
+    const handleClickOutside = () => {
+      setShowSortMenu(false);
+      setShowFilterMenu(false);
+    };
+    if (showSortMenu || showFilterMenu) {
       document.addEventListener('click', handleClickOutside);
       return () => document.removeEventListener('click', handleClickOutside);
     }
-  }, [showSortMenu]);
+  }, [showSortMenu, showFilterMenu]);
 
-  const sortLabels: Record<SortOption, string> = {
-    name: '名称',
-    createdAt: '创建时间',
-    updatedAt: '最近编辑',
+  // E4: map local sort option ↔ hook sort option
+  const localToHookSort = (local: LocalSortOption): SortOption => {
+    if (local === 'name') return 'name-asc';
+    if (local === 'createdAt') return 'updatedAt-asc';
+    return 'updatedAt-desc';
   };
+  const hookToLocalSort = (hookSort: SortOption): LocalSortOption => {
+    if (hookSort === 'name-asc' || hookSort === 'name-desc') return 'name';
+    if (hookSort === 'updatedAt-asc') return 'createdAt';
+    return 'updatedAt';
+  };
+  const currentLocalSort = hookToLocalSort(sort);
+
+  const sortLabels: Record<LocalSortOption, string> = {
+    name: SORT_LABELS['name-asc'],
+    createdAt: SORT_LABELS['updatedAt-asc'],
+    updatedAt: SORT_LABELS['updatedAt-desc'],
+  };
+  const filterLabels = FILTER_LABELS;
 
   // 拖拽处理
   const handleDragStart = (e: React.DragEvent, projectId: string) => {
@@ -517,9 +517,13 @@ export default function Dashboard() {
               {/* 搜索框 — E3: 提取为 SearchBar 组件，内置 debounce 300ms */}
               <SearchBar
                 placeholder="搜索项目..."
-                onSearch={setSearchQuery}
+                onSearch={setSearch}
                 defaultValue={searchQuery}
               />
+              {/* E4: 搜索 loading 状态 */}
+              {searching && (
+                <span className={styles.searchLoading} aria-label="搜索中" />
+              )}
 
               {/* E4: 视图切换 */}
               <div className={styles.viewToggle}>
@@ -550,22 +554,56 @@ export default function Dashboard() {
                   title="排序"
                 >
                   <span>↕</span>
-                  <span>{sortLabels[sortBy]}</span>
+                  <span>{sortLabels[currentLocalSort]}</span>
                 </button>
                 {showSortMenu && (
-                  <div className={styles.sortMenu}>
-                    {(['name', 'createdAt', 'updatedAt'] as SortOption[]).map(opt => (
+                  <div className={styles.sortMenu} data-testid="filter-dropdown">
+                    {(['name', 'createdAt', 'updatedAt'] as LocalSortOption[]).map(opt => (
                       <button
                         key={opt}
-                        className={`${styles.sortMenuItem} ${sortBy === opt ? styles.active : ''}`}
+                        className={`${styles.sortMenuItem} ${currentLocalSort === opt ? styles.active : ''}`}
                         onClick={(e) => {
                           e.stopPropagation();
-                          setSortBy(opt);
+                          setSort(localToHookSort(opt));
                           setShowSortMenu(false);
                         }}
                       >
                         {sortLabels[opt]}
-                        {sortBy === opt && <span className={styles.sortCheck}>✓</span>}
+                        {currentLocalSort === opt && <span className={styles.sortCheck}>✓</span>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* E4: 过滤器下拉 */}
+              <div className={styles.sortWrapper} onClick={(e) => e.stopPropagation()}>
+                <button
+                  className={`${styles.sortButton} ${filter !== 'all' ? styles.statusFilterActive : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowFilterMenu(!showFilterMenu);
+                  }}
+                  title="过滤"
+                  data-testid="project-filter-btn"
+                >
+                  <span>⚙</span>
+                  <span>{filterLabels[filter]}</span>
+                </button>
+                {showFilterMenu && (
+                  <div className={styles.sortMenu} data-testid="filter-dropdown">
+                    {(Object.keys(FILTER_LABELS) as FilterOption[]).map(opt => (
+                      <button
+                        key={opt}
+                        className={`${styles.sortMenuItem} ${filter === opt ? styles.active : ''}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setFilter(opt);
+                          setShowFilterMenu(false);
+                        }}
+                      >
+                        {filterLabels[opt]}
+                        {filter === opt && <span className={styles.sortCheck}>✓</span>}
                       </button>
                     ))}
                   </div>
@@ -761,7 +799,7 @@ export default function Dashboard() {
                 </p>
                 <button
                   className={styles.emptyClearBtn}
-                  onClick={() => setSearchQuery('')}
+                  onClick={() => setSearch('')}
                 >
                   清除搜索
                 </button>

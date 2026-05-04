@@ -73,6 +73,7 @@ export function SearchBar({
         placeholder={placeholder}
         className={styles.searchInput}
         autoComplete="off"
+        data-testid="project-search-input"
       />
       {query && (
         <button

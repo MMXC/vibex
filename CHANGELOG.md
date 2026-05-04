@@ -37,7 +37,8 @@
 - **S1.3 场景化推荐**: `ClarifyStep.tsx` → `setScenario()` → `SCENARIO_OPTIONS`（new-feature/refactor/bugfix/documentation/other）；`PreviewStep.tsx` → `filterByScenario()` 按场景标签过滤模板卡片
 - **S1.4 状态同步**: `onboardingStore.complete()` → `localStorage.setItem('onboarding_completed', 'true')` + `onboarding_completed_at`；`NewUserGuide` 读取 localStorage 决定是否展示；`data-testid="onboarding-overlay"`
 - **DoD**: Step 5 模板卡片 ✅, auto-fill ✅, 场景化推荐 ✅, localStorage 写入 ✅, TS 0 errors ✅, ESLint 0 warnings ✅
-- **提交**: ceb6cbf73 (feat), 5343a9140 (docs), b360d8c9a (fix), da6488937 (fix), 60203c181 (ESLint fix)
+- **Fix: step data-testid**: PreviewStep data-testid `onboarding-step-4` → `onboarding-step-5`（与 PRD 规格对齐）；`onboarding-skip-btn` 添加；单元测试同步更新
+- **提交**: ceb6cbf73 (feat), 5343a9140 (docs), b360d8c9a (fix), da6488937 (fix), 60203c181 (ESLint fix), 83e7a0c9 (fix step-5 data-testid)
 
 ## [Released] vibex-proposals — 2026-05-03
 

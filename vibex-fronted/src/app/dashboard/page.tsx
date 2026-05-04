@@ -5,11 +5,14 @@ import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import styles from './dashboard.module.css';
 import { apiService, Project } from '@/services/api';
 import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog';
 import { SearchBar } from '@/components/dashboard/SearchBar';
 import { useProjects, useDeletedProjects, queryKeys } from '@/hooks/queries';
+import { canvasShareApi } from '@/lib/api/canvas-share';
+import type { Team } from '@/lib/api/teams';
 import { AnalyticsWidget } from '@/components/dashboard/AnalyticsWidget';
 import { OnboardingProvider } from '@/components/onboarding/OnboardingProvider';
 
@@ -91,6 +94,46 @@ export default function Dashboard() {
     setFilter,
     setSort,
   } = useProjectSearch(projects, userId ?? undefined);
+
+  // E5: Fetch team-project shares to determine which projects have team badges
+  const { data: allTeamShares = [] } = useQuery({
+    queryKey: ['e5-all-team-shares'],
+    queryFn: async () => {
+      if (!userId) return [];
+      // Get all teams user belongs to, then fetch their shared canvases
+      const teamsRes = await fetch('/v1/teams', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('auth_token') ?? ''}` },
+      });
+      if (!teamsRes.ok) return [];
+      const { teams } = await teamsRes.json() as { teams: Team[] };
+      const allShares: { projectId: string; teamId: string; teamName: string }[] = [];
+      await Promise.all(
+        teams.map(async (team) => {
+          try {
+            const res = await canvasShareApi.listCanvases(team.id);
+            res.canvases.forEach((s) => {
+              allShares.push({ projectId: s.canvasId, teamId: team.id, teamName: team.name });
+            });
+          } catch {
+            // Ignore errors for individual teams
+          }
+        })
+      );
+      return allShares;
+    },
+    enabled: !!userId,
+  });
+
+  // E5: Build a map of projectId -> team info for quick lookup
+  const projectTeamMap = useMemo(() => {
+    const map = new Map<string, { teamId: string; teamName: string }>();
+    allTeamShares.forEach((share) => {
+      if (!map.has(share.projectId)) {
+        map.set(share.projectId, { teamId: share.teamId, teamName: share.teamName });
+      }
+    });
+    return map;
+  }, [allTeamShares]);
 
   // 使用 React Query 获取已删除项目
   const {
@@ -622,9 +665,24 @@ export default function Dashboard() {
                 <div className={styles.projectHeader}>
                   <h3 className={styles.projectName}>{project.name}</h3>
                   {/* E5: Team badge for shared canvases */}
-                  <span className={`${styles.statusBadge} ${styles.active}`}>
-                    活跃
-                  </span>
+                  {(() => {
+                    const teamInfo = projectTeamMap.get(project.id);
+                    if (!teamInfo) return (
+                      <span className={`${styles.statusBadge} ${styles.active}`}>
+                        活跃
+                      </span>
+                    );
+                    return (
+                      <span
+                        className={`${styles.statusBadge} ${styles.teamBadge}`}
+                        data-testid="team-project-badge"
+                        title={`团队: ${teamInfo.teamName}`}
+                      >
+                        <span className={styles.teamBadgeIcon}>👥</span>
+                        {teamInfo.teamName}
+                      </span>
+                    );
+                  })()}
                 </div>
                 <p className={styles.projectDesc}>
                   {project.description || '暂无描述'}

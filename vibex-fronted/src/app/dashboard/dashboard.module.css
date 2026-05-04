@@ -649,6 +649,26 @@
   border: 1px solid var(--color-border);
 }
 
+/* E5: Team badge for shared canvases */
+.statusBadge.teamBadge {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.statusBadge.teamBadge:hover {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: rgba(59, 130, 246, 0.6);
+}
+
+.teamBadgeIcon {
+  font-size: 11px;
+}
+
 .projectDesc {
   font-size: 14px;
   color: var(--color-text-secondary);

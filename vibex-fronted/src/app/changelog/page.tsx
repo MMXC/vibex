@@ -20,6 +20,19 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.345',
+    date: '2026-05-04',
+    changes: [
+      '🚀 S25-E2: 跨 Canvas 项目版本对比',
+      '✅ S2.1: /canvas-diff 路由 + data-testid="canvas-diff-page"',
+      '✅ S2.1: 引导文案（首次进入 / 选A后）',
+      '✅ S2.2: CanvasDiffSelector data-testid',
+      '✅ S2.4: export-btn + diff-report-{nameA}-vs-{nameB}-{date}.json',
+      '提交: 2abe36e9f',
+    ],
+    commit: '2abe36e9f',
+  },
+  {
     version: '1.0.344',
     date: '2026-05-04',
     changes: [

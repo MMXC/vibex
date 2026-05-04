@@ -1,3 +1,11 @@
+### [Unreleased] vibex-proposals-sprint25 E2: 跨 Canvas 项目版本对比 — 2026-05-04
+- **S2.1 /canvas-diff 路由**: `app/canvas-diff/page.tsx` — `/canvas-diff` 页面 + `data-testid="canvas-diff-page"`
+- **S2.1 引导文案**: `CanvasDiffView.tsx` — 首次进入"选择两个项目开始对比"；选 A 后"请选择要对比的第二个 Canvas 项目"
+- **S2.2 选择器 data-testid**: `CanvasDiffSelector` — `data-testid="canvas-a-selector"` + `data-testid="canvas-b-selector"`
+- **S2.4 导出文件名**: 改为 `diff-report-{nameA}-vs-{nameB}-{date}.json`；`data-testid="diff-export-btn"`
+- DoD: `/canvas-diff` 路由 ✅, data-testid ✅, diff 三色展示 ✅, export ✅, TS 0 errors ✅
+- 提交: 2abe36e9f
+
 ### [Unreleased] vibex-proposals-sprint25 E1: Onboarding + 需求模板库捆绑交付 — 2026-05-04
 - **S1.1 Onboarding Step5 模板推荐**: `PreviewStep.tsx` — Step 5 (prototype) 渲染模板卡片列表，调用 `useTemplates()` 获取模板数据，`data-testid="onboarding-template-card"`；模板选择后 `setSelectedTemplateId()` + `storePendingTemplateRequirement()` 存入 localStorage
 - **S1.2 模板 auto-fill**: `ChapterPanel.tsx` — `templateRequirement` prop → `useEffect` → `parseRequirementContent()` 解析 → 生成 `UserStoryCard` 填入 requirement chapter；`autoFilledRef` guard 防止 API 加载后重复填充；`cards.length > 0` 已有内容保护不覆盖；`data-testid="requirement-chapter"`

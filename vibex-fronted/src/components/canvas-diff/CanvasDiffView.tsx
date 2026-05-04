@@ -64,18 +64,27 @@ interface CanvasDiffViewProps {
   diff: CanvasDiff | null;
   projectAName: string;
   projectBName: string;
+  selectedA: string;
+  selectedB: string;
   onExport: () => void;
 }
 
-export function CanvasDiffView({ diff, projectAName, projectBName, onExport }: CanvasDiffViewProps) {
+export function CanvasDiffView({ diff, projectAName, projectBName, selectedA, selectedB, onExport }: CanvasDiffViewProps) {
   if (!diff) {
+    // E2-S1: 首次进入/单选引导文案
+    const hasA = Boolean(selectedA);
+    const hasB = Boolean(selectedB);
+    const message = (!hasA && !hasB)
+      ? '从上方下拉框中选择两个 Canvas 项目，系统将自动分析三棵树的节点差异。'
+      : '请选择要对比的第二个 Canvas 项目';
+    const title = (!hasA && !hasB)
+      ? '选择两个项目开始对比'
+      : '等待选择对比项目';
     return (
       <div className={`${s.emptyState ?? ''}`}>
         <div className={`${s.emptyIcon ?? ''}`}>📊</div>
-        <h2 className={`${s.emptyTitle ?? ''}`}>选择两个项目开始对比</h2>
-        <p className={`${s.emptyDesc ?? ''}`}>
-          从上方下拉框中选择两个 Canvas 项目，系统将自动分析三棵树的节点差异。
-        </p>
+        <h2 className={`${s.emptyTitle ?? ''}`}>{title}</h2>
+        <p className={`${s.emptyDesc ?? ''}`}>{message}</p>
       </div>
     );
   }

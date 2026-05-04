@@ -100,6 +100,11 @@ export default function CanvasDiffPage() {
   }, [selectedA, selectedB, runCompare]);
 
   // 导出报告
+  const exportFilename = (() => {
+    if (!diff || !projectAName || !projectBName) return `diff-report-${Date.now()}.json`;
+    return `diff-report-${projectAName}-vs-${projectBName}-${new Date().toISOString().slice(0, 10)}.json`;
+  })();
+
   const handleExport = useCallback(() => {
     if (!diff) return;
     const report = exportDiffReport(diff, projectAName, projectBName);
@@ -107,13 +112,13 @@ export default function CanvasDiffPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `canvas-diff-${Date.now()}.json`;
+    a.download = exportFilename;
     a.click();
     URL.revokeObjectURL(url);
-  }, [diff, projectAName, projectBName]);
+  }, [diff, projectAName, projectBName, exportFilename]);
 
   return (
-    <div className={`${s.page ?? ''}`}>
+    <div className={`${s.page ?? ''}`} data-testid="canvas-diff-page">
       <div className={`${s.pageHeader ?? ''}`}>
         <h1 className={`${s.pageTitle ?? ''}`}>Canvas 对比</h1>
         <p className={`${s.pageDesc ?? ''}`}>比较两个 Canvas 项目的三树节点差异</p>
@@ -144,6 +149,8 @@ export default function CanvasDiffPage() {
         diff={diff}
         projectAName={projectAName}
         projectBName={projectBName}
+        selectedA={selectedA}
+        selectedB={selectedB}
         onExport={handleExport}
       />
     </div>

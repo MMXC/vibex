@@ -14,7 +14,7 @@
 | E1: Onboarding + 模板捆绑 | S1.1 → S1.2 → S1.3 → S1.4 | 新增 | E2 |
 | E2: 跨 Canvas Diff | S2.1 → S2.2 → S2.3 → S2.4 | 新增 | E4 |
 | E3: Sprint 24 遗留收尾 | S3.1 // S3.2 // S3.3 → S3.4 | ✅ | E4 |
-| E4: Dashboard 搜索过滤 | S4.1 → S4.2 // S4.3 // S4.4 | 新增 | E5 |
+| E4: Dashboard 搜索过滤 | S4.1 ✅ → S4.2 // S4.3 // S4.4 | 开发中 | E5 |
 | E5: Teams × Canvas | S5.1 → S5.2 // S5.3 → S5.4 | 新增 | — |
 
 **并行策略**: E3（S3.1/S3.2/S3.3）/ E4（S4.1）Week 1 并行；E1 / E2 / E4（S4.2-4.4）Week 1-2 并行；E5 Week 2（需 E1 完成后端 API 模式可参考）
@@ -28,7 +28,7 @@
 | 1 | E3 | S3.1 // S3.2（并行验证） | 1.5h | 无 | P1 | Week 1 |
 | 2 | E3 | S3.3（API 测试补全） | 2h | S3.2 确认测试框架 | P1 | Week 1 |
 | 3 | E3 | S3.4（CHANGELOG 更新） | 0.5h | S3.1-3 确认 | P1 | Week 1 |
-| 4 | E4 | S4.1（useProjectSearch hook） | 1h | 无 | P2 | Week 1 |
+| 4 | E4 | S4.1（useProjectSearch hook） ✅ | 1h | 无 | P2 | Week 1 |
 | 5 | E1 | S1.1 → S1.2 → S1.3 → S1.4 | 4.5h | 无 | P0 | Week 1-2 |
 | 6 | E2 | S2.1 → S2.2 → S2.3 → S2.4 | 4.5h | 无（可与 E1 并行） | P1 | Week 1-2 |
 | 7 | E4 | S4.2 // S4.3 // S4.4（并行） | 1.5h | S4.1 | P2 | Week 2 |

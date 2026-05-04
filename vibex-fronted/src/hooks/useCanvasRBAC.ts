@@ -14,7 +14,11 @@ interface RBACResult {
 const RBAC_CACHE = new Map<string, { result: RBACResult; timestamp: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // C-E3-3: 5 minutes cache
 
-export function useCanvasRBAC(projectId: string | undefined): RBACResult {
+function rbacCacheKey(projectId: string | undefined, teamId?: string): string {
+  return teamId ? `${projectId ?? ''}:${teamId}` : (projectId ?? '');
+}
+
+export function useCanvasRBAC(projectId: string | undefined, teamId?: string): RBACResult {
   const [result, setResult] = useState<RBACResult>({
     canDelete: false, canShare: false, canEdit: false, canView: true, loading: !!projectId,
   });
@@ -25,8 +29,10 @@ export function useCanvasRBAC(projectId: string | undefined): RBACResult {
       return;
     }
 
+    const cacheKey = rbacCacheKey(projectId, teamId);
+
     // C-E3-3: Check cache first
-    const cached = RBAC_CACHE.get(projectId);
+    const cached = RBAC_CACHE.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
       setResult(cached.result);
       return;
@@ -34,9 +40,39 @@ export function useCanvasRBAC(projectId: string | undefined): RBACResult {
 
     const fetchRBAC = async () => {
       try {
-        // In a real implementation, this would call GET /v1/teams/:teamId/members
-        // For now, set default permissions based on auth state
-        // The actual RBAC check is done server-side — this hook provides frontend hints
+        // E5: If teamId is provided, check team membership + role
+        if (teamId) {
+          const token = localStorage.getItem('auth_token') ?? '';
+          const res = await fetch(
+            `/v1/teams/${encodeURIComponent(teamId)}/members`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          if (res.ok) {
+            const data = await res.json();
+            const members: { userId: string; role: string }[] = data.members ?? [];
+            const userId = localStorage.getItem('user_id') ?? '';
+            const myMember = members.find((m) => m.userId === userId);
+
+            if (myMember) {
+              const teamRole = myMember.role;
+              // owner=全部操作, admin=编辑/导出, member=只读
+              const rbac: RBACResult = {
+                canDelete: teamRole === 'owner',
+                canShare: teamRole === 'owner' || teamRole === 'admin',
+                canEdit: teamRole === 'owner' || teamRole === 'admin',
+                canView: true,
+                loading: false,
+              };
+              RBAC_CACHE.set(cacheKey, { result: rbac, timestamp: Date.now() });
+              setResult(rbac);
+              return;
+            }
+          }
+          // If not found in team, fall through to project-level check
+        }
+
+        // Project-level RBAC check (existing behavior)
         const res = await fetch(`/v1/projects/${projectId}/permissions`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token') ?? ''}` },
         });
@@ -49,7 +85,7 @@ export function useCanvasRBAC(projectId: string | undefined): RBACResult {
             canView: true,
             loading: false,
           };
-          RBAC_CACHE.set(projectId, { result: rbac, timestamp: Date.now() });
+          RBAC_CACHE.set(cacheKey, { result: rbac, timestamp: Date.now() });
           setResult(rbac);
         } else {
           setResult({ canDelete: false, canShare: false, canEdit: false, canView: true, loading: false });
@@ -60,7 +96,7 @@ export function useCanvasRBAC(projectId: string | undefined): RBACResult {
     };
 
     fetchRBAC();
-  }, [projectId]);
+  }, [projectId, teamId]);
 
   return result;
 }

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 
 /**
  * /api/chat — AI Chat Completions API

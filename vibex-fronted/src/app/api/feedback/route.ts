@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 
 /**
  * /api/feedback — 用户反馈提交接口

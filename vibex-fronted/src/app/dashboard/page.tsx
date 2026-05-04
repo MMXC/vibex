@@ -621,6 +621,7 @@ export default function Dashboard() {
               >
                 <div className={styles.projectHeader}>
                   <h3 className={styles.projectName}>{project.name}</h3>
+                  {/* E5: Team badge for shared canvases */}
                   <span className={`${styles.statusBadge} ${styles.active}`}>
                     活跃
                   </span>

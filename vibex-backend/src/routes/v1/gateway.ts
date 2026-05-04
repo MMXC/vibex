@@ -80,6 +80,7 @@ import teamsIndex from './teams';
 import teamId from './teams/:id';
 import teamMembers from './teams/:id/members';
 import teamPermissions from './teams/:id/permissions';
+import canvasShare from './canvas-share';
 
 // 创建 v1 路由
 const v1 = new Hono();
@@ -266,6 +267,9 @@ protected_.route('/teams', teamsIndex);
 protected_.route('/teams/:id', teamId);
 protected_.route('/teams/:id/members', teamMembers);
 protected_.route('/teams/:id/permissions', teamPermissions);
+
+// Canvas Share — E5
+protected_.route('/canvas-share', canvasShare);
 
 // 计划
 protected_.route('/plan', plan);

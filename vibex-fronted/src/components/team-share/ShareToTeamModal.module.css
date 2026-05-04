@@ -1,0 +1,272 @@
+/**
+ * ShareToTeamModal styles
+ * E5: Teams × Canvas 共享权限
+ */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  background: #1e1e2e;
+  border: 1px solid #3b3b5c;
+  border-radius: 12px;
+  width: 480px;
+  max-width: 90vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #2a2a3e;
+  position: relative;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #8b8ba7;
+  margin: 4px 0 0;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: #8b8ba7;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.closeBtn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.body {
+  padding: 16px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.loadingState,
+.emptyState {
+  text-align: center;
+  padding: 32px 0;
+  color: #8b8ba7;
+  font-size: 14px;
+}
+
+.emptyState p {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.teamList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.teamItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #16161f;
+  border: 1px solid #2a2a3e;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.teamItem:hover {
+  border-color: #5c5cff;
+}
+
+.teamItem input[type='radio'] {
+  accent-color: #5c5cff;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.radio {
+  accent-color: #5c5cff;
+}
+
+.teamInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.teamName {
+  font-size: 14px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.teamMeta {
+  font-size: 12px;
+  color: #8b8ba7;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.roleSection {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #2a2a3e;
+}
+
+.roleLabel {
+  font-size: 13px;
+  color: #8b8ba7;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.roleOptions {
+  display: flex;
+  gap: 12px;
+}
+
+.roleOption {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  background: #16161f;
+  border: 1px solid #2a2a3e;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #fff;
+  transition: border-color 0.15s;
+}
+
+.roleOption:hover {
+  border-color: #5c5cff;
+}
+
+.roleOption input[type='radio'] {
+  accent-color: #5c5cff;
+  margin-bottom: 4px;
+}
+
+.roleOption small {
+  font-size: 12px;
+  color: #8b8ba7;
+}
+
+.feedback {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.feedbackSuccess {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.feedbackError {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.footer {
+  padding: 16px 24px;
+  border-top: 1px solid #2a2a3e;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cancelBtn {
+  padding: 8px 16px;
+  background: #2a2a3e;
+  border: 1px solid #3b3b5c;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.cancelBtn:hover:not(:disabled) {
+  background: #3b3b5c;
+}
+
+.shareBtn {
+  padding: 8px 20px;
+  background: #5c5cff;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.shareBtn:hover:not(:disabled) {
+  background: #4a4ae0;
+}
+
+.shareBtn:disabled,
+.cancelBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Role tags */
+.roleTag {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.role_owner {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.role_admin {
+  background: rgba(234, 179, 8, 0.2);
+  color: #eab308;
+}
+
+.role_member {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}

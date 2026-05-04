@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 /**
  * /api/quality/metrics — CI 质量指标接口
  * E5 S5.2: CI 质量仪表盘数据源

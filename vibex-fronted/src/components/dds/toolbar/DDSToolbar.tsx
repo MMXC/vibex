@@ -23,6 +23,7 @@ import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds';
 import { useCanvasExport } from '@/hooks/canvas/useCanvasExport';
 import { useCanvasImport } from '@/hooks/canvas/useCanvasImport';
 import { useCanvasRBAC } from '@/hooks/useCanvasRBAC';
+import { ShareToTeamModal } from '@/components/team-share/ShareToTeamModal';
 import styles from './DDSToolbar.module.css';
 
 // ==================== Constants ====================
@@ -105,6 +106,10 @@ export interface DDSToolbarProps {
   agentSession?: string | null;
   /** Project ID for RBAC checks */
   projectId?: string;
+  /** Canvas ID for share-to-team */
+  canvasId?: string;
+  /** Canvas name for share-to-team modal */
+  canvasName?: string;
 }
 
 export const DDSToolbar = memo(function DDSToolbar({
@@ -113,6 +118,8 @@ export const DDSToolbar = memo(function DDSToolbar({
   className = '',
   agentSession,
   projectId,
+  canvasId,
+  canvasName,
 }: DDSToolbarProps) {
   const activeChapter = useDDSCanvasStore((s) => s.activeChapter);
   const isFullscreen = useDDSCanvasStore((s) => s.isFullscreen);
@@ -129,6 +136,7 @@ export const DDSToolbar = memo(function DDSToolbar({
   const { showFilePicker, importFile } = useCanvasImport();
 
   const [ddsExportModalOpen, setDdsExportModalOpen] = useState(false);
+  const [shareToTeamModalOpen, setShareToTeamModalOpen] = useState(false);
 
   // E3-S3: RBAC for toolbar actions
   const rbac = useCanvasRBAC(projectId);
@@ -359,6 +367,20 @@ export const DDSToolbar = memo(function DDSToolbar({
             data-testid="canvas-import-input"
             onChange={handleImportChange}
           />
+
+          {/* E5: Share to Team button */}
+          {canvasId && (
+            <button
+              type="button"
+              className={styles.shareToTeamBtn}
+              onClick={() => setShareToTeamModalOpen(true)}
+              aria-label="分享给团队"
+              title="分享给团队"
+              data-testid="share-to-team-btn"
+            >
+              分享给 Team
+            </button>
+          )}
         </div>
 
         {/* Right: Action buttons */}
@@ -503,6 +525,14 @@ export const DDSToolbar = memo(function DDSToolbar({
           </div>
         </div>
       )}
+
+      {/* E5: Share to Team modal */}
+      <ShareToTeamModal
+        isOpen={shareToTeamModalOpen}
+        canvasId={canvasId ?? ''}
+        canvasName={canvasName}
+        onClose={() => setShareToTeamModalOpen(false)}
+      />
     </>
   );
 });

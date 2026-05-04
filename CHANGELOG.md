@@ -1,3 +1,9 @@
+### [Unreleased] vibex-proposals-sprint25 E4: Dashboard 搜索过滤 — 2026-05-04
+- **S4.1 useProjectSearch hook**: `vibex-fronted/src/hooks/useProjectSearch.ts` — 统一管理 searchQuery/filter/sort 状态；导出 `filtered/searching/searchQuery/filter/sort/setSearch/setFilter/setSort`；支持 filter: all/7d/30d/mine，sort: name-asc/name-desc/updatedAt-asc/updatedAt-desc
+- **S4.1 单元测试**: `vibex-fronted/src/hooks/__tests__/useProjectSearch.test.ts` — 18 tests（search/filter/sort/combined）全部通过
+- DoD: hook 实现 ✅, 18/18 tests ✅, TS 0 errors ✅
+- 提交: 42325c4b8
+
 ### [Unreleased] vibex-proposals-sprint25 E3: Sprint 24 遗留收尾 — 2026-05-04
 - **S3.1 Slack E2E 报告验证**: `vibex-fronted/scripts/e2e-summary-to-slack.ts` Block Kit 格式验证 + CI workflow `.github/workflows/test.yml` e2e job 配置 `e2e:summary:slack`（if:always）+ `webhook:dryrun` 前置验证；确认 SLACK_WEBHOOK_URL 已配置
 - **S3.2 TypeScript 全面审计**: backend/frontend `tsc --noEmit` → 0 errors（S24 P002 已确认，S25 直接采纳）

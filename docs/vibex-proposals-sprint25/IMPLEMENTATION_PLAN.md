@@ -129,47 +129,43 @@
 
 **改动文件**: 新建 `vibex-fronted/src/app/canvas-diff/page.tsx`
 
-- [ ] 5.1.1 创建 `/canvas-diff` Next.js App Router 页面
-- [ ] 5.1.2 `data-testid="canvas-diff-page"` 挂载于页面根 div
-- [ ] 5.1.3 页面包含：Canvas A 选择器、Canvas B 选择器、Diff 展示区
-- [ ] 5.1.4 首次进入时，Diff 展示区显示引导文案："请选择要对比的第二个 Canvas 项目"
-- [ ] 5.1.5 `pnpm run build` → 0 errors
+- [x] 5.1.1 创建 `/canvas-diff` Next.js App Router 页面
+- [x] 5.1.2 `data-testid="canvas-diff-page"` 挂载于页面根 div
+- [x] 5.1.3 页面包含：Canvas A 选择器、Canvas B 选择器、Diff 展示区
+- [x] 5.1.4 首次进入时，Diff 展示区显示引导文案："请选择要对比的第二个 Canvas 项目"
+- [x] 5.1.5 `pnpm run build` → 0 errors
 
 ### F2.2: 跨 Canvas 选择器
 
 **改动文件**: `vibex-fronted/src/app/canvas-diff/page.tsx`
 
-- [ ] 5.2.1 新建 `CanvasSelector.tsx` 组件（复用或扩展现有 ProjectSelector）
-- [ ] 5.2.2 `data-testid="canvas-a-selector"` 和 `data-testid="canvas-b-selector"`
-- [ ] 5.2.3 选择后自动触发 diff 计算（防抖 300ms）
-- [ ] 5.2.4 选择器内显示最近 10 个项目 + 搜索框（复用 SearchBar）
-- [ ] 5.2.5 单元测试覆盖：选择 A → 选择 B → diff 结果展示
+- [x] 5.2.1 新建 `CanvasSelector.tsx` 组件（复用或扩展现有 ProjectSelector）
+- [x] 5.2.2 `data-testid="canvas-a-selector"` 和 `data-testid="canvas-b-selector"`
+- [x] 5.2.3 选择后自动触发 diff 计算（防抖 300ms）
+- [x] 5.2.4 选择器内显示最近 10 个项目 + 搜索框（复用 SearchBar）
+- [x] 5.2.5 单元测试覆盖：选择 A → 选择 B → diff 结果展示
 
 ### F2.3: 跨项目 diff 算法
 
 **改动文件**: `vibex-fronted/src/lib/reviewDiff.ts`（扩展）
 
-- [ ] 5.3.1 新增 `compareCanvasProjects(canvasAId: string, canvasBId: string)` 函数
-- [ ] 5.3.2 通过 `projectApi.getProject(canvasAId)` 和 `projectApi.getProject(canvasBId)` 获取数据
-- [ ] 5.3.3 对比策略（JSON 结构 diff，基于 S23 E2）：
-  - 对比 contextTree / flowTree / componentTree 的节点 ID
-  - 新增（A 有 B 无）→ added
-  - 移除（A 无 B 有）→ removed
-  - 修改（ID 相同但内容不同）→ changed
-- [ ] 5.3.4 返回类型 `{ added: Node[], removed: Node[], changed: Node[], summary: { added: number, removed: number, changed: number } }`
-- [ ] 5.3.5 单元测试覆盖：完全相同 / 全部新增 / 全部移除 / 部分修改
+- [x] 5.3.1 新增 `compareCanvasProjects(canvasAId: string, canvasBId: string)` 函数
+- [x] 5.3.2 通过 `projectApi.getProject(canvasAId)` 和 `projectApi.getProject(canvasBId)` 获取数据
+- [x] 5.3.3 对比策略（JSON 结构 diff，基于 S23 E2）
+- [x] 5.3.4 返回类型 `{ added: Node[], removed: Node[], changed: Node[], summary }`
+- [x] 5.3.5 单元测试覆盖：完全相同 / 全部新增 / 全部移除 / 部分修改
 
 ### F2.4: Diff 视图 + JSON 导出
 
 **改动文件**: `vibex-fronted/src/app/canvas-diff/page.tsx`（或新建 `DiffView.tsx`）
 
-- [ ] 5.4.1 新建 `DiffView.tsx` 组件
-- [ ] 5.4.2 三栏展示：Added（红色 /text-red-500）+ Changed（黄色 /text-yellow-500）+ Removed（绿色 /text-green-500）
-- [ ] 5.4.3 每个节点显示：类型标签 + 名称 + 简要描述
-- [ ] 5.4.4 底部摘要统计：`已添加 N 个 | 已修改 M 个 | 已移除 L 个`
-- [ ] 5.4.5 导出按钮 `data-testid="diff-export-btn"`，点击触发 JSON 下载
-- [ ] 5.4.6 导出文件名格式：`diff-report-{canvasA-name}-vs-{canvasB-name}-{date}.json`
-- [ ] 5.4.7 单元测试覆盖：三栏渲染、导出触发
+- [x] 5.4.1 新建 `DiffView.tsx` 组件
+- [x] 5.4.2 三栏展示：Added（红色）+ Changed（黄色）+ Removed（绿色）
+- [x] 5.4.3 每个节点显示：类型标签 + 名称 + 简要描述
+- [x] 5.4.4 底部摘要统计：`已添加 N 个 | 已修改 M 个 | 已移除 L 个`
+- [x] 5.4.5 导出按钮 `data-testid="diff-export-btn"`，点击触发 JSON 下载
+- [x] 5.4.6 导出文件名格式：`diff-report-{canvasA-name}-vs-{canvasB-name}-{date}.json`
+- [x] 5.4.7 单元测试覆盖：三栏渲染、导出触发
 
 ---
 

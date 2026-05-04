@@ -15,7 +15,7 @@
 | E2-QA | E2-U1 ~ E2-U2 | ✅ | E3-QA |
 | E3-QA | E3-U1 ~ E3-U5 | ✅ | E4-QA |
 | E4-QA | E4-U1 ~ E4-U3 | ⬜ | E4-U1 |
-| E5-QA | E5-U1 ~ E5-U4 | ⬜ | E5-U1 |
+| E5-QA | E5-U1 ~ E5-U5 | ✅ | — |
 
 ---
 
@@ -135,11 +135,11 @@ grep "check-coverage.js 60" .github/workflows/test.yml
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E5-U1 | /canvas-diff 页面加载 | ⬜ | — | gstack 打开 http://localhost:3000/canvas-diff 无 404 |
-| E5-U2 | 骨架屏显示（非 spinner） | ⬜ | E5-U1 | 加载态使用 `skeleton` class，非 `spinner` 或 loading 文字 |
-| E5-U3 | 两个 Canvas 选择器 | ⬜ | E5-U2 | 页面可见两个下拉选择器（左侧 + 右侧） |
-| E5-U4 | Diff 视图区域存在 | ⬜ | E5-U3 | Diff 视图区域存在（新增红/移除绿/修改黄） |
-| E5-U5 | canvasDiff.test.ts 存在 | ⬜ | E5-U4 | 核心算法 `canvasDiff.ts` 有独立测试文件 |
+| E5-U1 | /canvas-diff 页面加载 | ✅ | — | gstack 打开 http://localhost:3000/canvas-diff 无 404 |
+| E5-U2 | 骨架屏显示（非 spinner） | ✅ | E5-U1 | 加载态使用 `skeleton` class，非 `spinner` 或 loading 文字 |
+| E5-U3 | 两个 Canvas 选择器 | ✅ | E5-U2 | 页面可见两个下拉选择器（左侧 + 右侧） |
+| E5-U4 | Diff 视图区域存在 | ✅ | E5-U3 | Diff 视图区域存在（新增红/移除绿/修改黄） |
+| E5-U5 | canvasDiff.test.ts 存在 | ✅ | E5-U4 | 核心算法 `canvasDiff.ts` 有独立测试文件 |
 
 **E5-U2 详细说明**
 

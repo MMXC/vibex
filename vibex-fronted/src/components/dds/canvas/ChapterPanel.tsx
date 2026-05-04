@@ -69,7 +69,8 @@ interface ParsedSection {
   benefit: string;
 }
 
-function parseRequirementContent(content: string): ParsedSection[] {
+/** E1-S2: 解析 requirement 内容，提取用户故事段落 */
+export function parseRequirementContent(content: string): ParsedSection[] {
   const sections: ParsedSection[] = [];
   // 匹配 "作为<角色>，我想要<行为>" 或 "- 角色：xxx" 等格式
   const lines = content.split('\n');

@@ -25,6 +25,7 @@ import { CrossChapterEdgesOverlay } from '@/components/dds/canvas/CrossChapterEd
 import { AIDraftDrawer } from '@/components/dds/ai-draft';
 import { DDSFlow } from '@/components/dds/DDSFlow';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
+import { parseRequirementContent } from '@/components/dds/canvas/ChapterPanel';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ShortcutEditModal } from '@/components/shortcuts/ShortcutEditModal';
 import { useShortcutStore } from '@/stores/shortcutStore';
@@ -39,6 +40,7 @@ import { usePresence, isFirebaseConfigured, updateCursor } from '@/lib/firebase/
 import { useAuthStore } from '@/stores/authStore';
 import type { ChapterType, ChapterData } from '@/types/dds';
 import type { DDSCard } from '@/types/dds';
+import type { UserStoryCard } from '@/types/dds';
 import type { ReactNode } from 'react';
 import type { CodeGenContext } from '@/types/codegen';
 import type { TokenChange } from '@/types/designSync';
@@ -180,17 +182,17 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   projectId,
   onAIGenerate,
   agentSession,
-  templateRequirement: propTemplateRequirement,
+  templateRequirement: templateReqProp,
 }: DDSCanvasPageProps) {
-  /** E1-S2: 自动从 localStorage 读取待填充的模板 requirement（Onboarding 完成后） */
-  const [templateRequirement] = useState<string | undefined>(() => {
-    if (propTemplateRequirement) return propTemplateRequirement;
+  /** E1-S2: 从 prop 或 localStorage 读取模板 requirement */
+  const templateRequirement = (() => {
+    if (templateReqProp) return templateReqProp;
     try {
       return localStorage.getItem('vibex:pending_template_req') ?? undefined;
     } catch {
       return undefined;
     }
-  });
+  })();
   const [state, setState] = useState<DDSCanvasPageState>({
     pageState: 'loading',
     errorMessage: null,
@@ -227,16 +229,6 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     setCursorPos({ x: e.clientX, y: e.clientY });
   }, []);
-
-  // ---- E1-S2: Auto-fill template requirement from localStorage (after onboarding) ----
-  useEffect(() => {
-    if (!templateRequirement) return;
-    const stored = localStorage.getItem('vibex:pending_template_req');
-    if (stored) {
-      localStorage.removeItem('vibex:pending_template_req');
-    }
-  }, [templateRequirement]);
-
 
   // Broadcast cursor to Firebase (throttled 100ms)
   useEffect(() => {

@@ -47,7 +47,7 @@ export function OnboardingModal() {
   // 只在进行中时显示
   const isOpen = status === 'in-progress';
   const currentIndex = ONBOARDING_STEPS.findIndex((s) => s.id === currentStep);
-  const currentStepInfo = ONBOARDING_STEPS[currentIndex];
+  const _currentStepInfo = ONBOARDING_STEPS[currentIndex]; // ESLint: declared but not consumed in this file
   const canGoBack = currentIndex > 0;
   const isLastStep = currentIndex === ONBOARDING_STEPS.length - 1;
 

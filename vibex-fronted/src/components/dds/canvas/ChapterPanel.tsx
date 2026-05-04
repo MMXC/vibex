@@ -376,12 +376,19 @@ export const ChapterPanel = memo(function ChapterPanel({
   const loadChapter = useDDSCanvasStore((s) => s.loadChapter);
   const { addCard, deleteCard } = ddsChapterActions;
 
+  // E4-S2: auto-fill guard — prevents re-triggering after cards load from API
+  const autoFilledRef = useRef(false);
 
   // E4-S2: 当传入模板 requirement 内容时，自动解析并填充卡片
+  // Includes cards.length in deps to handle API cards loading after mount.
+  // autoFilledRef prevents re-triggering when cards change post-fill.
   useEffect(() => {
     if (chapter !== 'requirement' || !templateRequirement?.trim()) return;
-    if (cards.length > 0) return; // 已有内容不覆盖
+    // Skip if cards already exist (either from API or from a prior fill)
+    if (cards.length > 0 || autoFilledRef.current) return;
+    autoFilledRef.current = true;
     const sections = parseRequirementContent(templateRequirement);
+    if (sections.length === 0) return;
     sections.forEach(({ role, action, benefit }) => {
       const card: UserStoryCard = {
         id: generateId(),
@@ -398,7 +405,7 @@ export const ChapterPanel = memo(function ChapterPanel({
       addCard(chapter, card);
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chapter, templateRequirement]);
+  }, [chapter, templateRequirement, cards.length, addCard]);
 
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [creatingType, setCreatingType] = useState<CardType | null>(null);

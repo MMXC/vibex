@@ -24,8 +24,6 @@ const STORAGE_KEY = 'vibex-onboarding';
 /** E1-S2: localStorage 完成标记 key */
 const ONBOARDING_COMPLETED_KEY = 'onboarding_completed';
 const ONBOARDING_COMPLETED_AT_KEY = 'onboarding_completed_at';
-/** E1-S2: 待填充到 Canvas 的模板 requirement 内容 */
-const PENDING_TEMPLATE_REQ_KEY = 'vibex:pending_template_req';
 
 // 初始状态
 const initialState = {

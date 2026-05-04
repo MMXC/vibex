@@ -59,7 +59,7 @@ function storePendingTemplateRequirement(tmpl: IndustryTemplate) {
   }
 }
 
-export function PreviewStep({ onNext, onPrev }: StepContentProps) {
+export function PreviewStep({ onNext: _unusedOnNext, onPrev }: StepContentProps) {
   const scenario = useOnboardingStore((s) => s.scenario);
   const selectedTemplateId = useOnboardingStore((s) => s.selectedTemplateId);
   const setSelectedTemplateId = useOnboardingStore((s) => s.setSelectedTemplateId);

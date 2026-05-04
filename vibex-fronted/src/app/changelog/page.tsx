@@ -20,6 +20,20 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.346',
+    date: '2026-05-05',
+    changes: [
+      '🚀 S25-E5: Teams × Canvas 共享权限',
+      '✅ F5.1: canvas-share API (POST/GET/DELETE) + lib/api/canvas-share.ts',
+      '✅ F5.2: /dashboard/teams 团队 Canvas 标签页 (data-testid ✅)',
+      '✅ F5.3: useCanvasRBAC 扩展 teamId 维度 (owner/admin/member)',
+      '✅ F5.4: share-to-team button (data-testid ✅) + ShareToTeamModal',
+      '✅ F5.4: dashboard team-project-badge (蓝色徽章)',
+      '提交: c5d6f5952 / 57da72128',
+    ],
+    commit: '57da72128',
+  },
+  {
     version: '1.0.345',
     date: '2026-05-04',
     changes: [

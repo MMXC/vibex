@@ -88,6 +88,6 @@ describe('E1-S1: PreviewStep — Template Selection', () => {
   it('should have correct data-testid for the step container', async () => {
     const { default: PreviewStep } = await import('@/components/onboarding/steps/PreviewStep');
     render(<PreviewStep {...defaultProps} />);
-    expect(screen.getByTestId('onboarding-step-4')).toBeInTheDocument();
+    expect(screen.getByTestId('onboarding-step-5')).toBeInTheDocument();
   });
 });

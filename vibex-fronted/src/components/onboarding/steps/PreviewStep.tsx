@@ -59,7 +59,7 @@ function storePendingTemplateRequirement(tmpl: IndustryTemplate) {
   }
 }
 
-export function PreviewStep({ onNext: _unusedOnNext, onPrev }: StepContentProps) {
+export function PreviewStep({ onNext: _unusedOnNext, onPrev, onSkip }: StepContentProps) {
   const scenario = useOnboardingStore((s) => s.scenario);
   const selectedTemplateId = useOnboardingStore((s) => s.selectedTemplateId);
   const setSelectedTemplateId = useOnboardingStore((s) => s.setSelectedTemplateId);
@@ -82,7 +82,7 @@ export function PreviewStep({ onNext: _unusedOnNext, onPrev }: StepContentProps)
   };
 
   return (
-    <div className={styles.container} data-testid="onboarding-step-4">
+    <div className={styles.container} data-testid="onboarding-step-5">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -130,15 +130,22 @@ export function PreviewStep({ onNext: _unusedOnNext, onPrev }: StepContentProps)
         )}
 
         <div className={styles.actions}>
-          <button className={styles.backBtn} onClick={onPrev} data-testid="onboarding-step-4-prev-btn">
+          <button className={styles.backBtn} onClick={onPrev} data-testid="onboarding-step-5-prev-btn">
             ← 上一步
+          </button>
+          <button
+            className={styles.skipBtn}
+            onClick={onSkip}
+            data-testid="onboarding-step-5-skip-btn"
+          >
+            跳过
           </button>
           <button
             className={styles.nextBtn}
             onClick={handleNext}
-            data-testid="onboarding-step-4-next-btn"
+            data-testid="onboarding-step-5-next-btn"
           >
-            {selectedTemplateId ? '开始使用 🎯' : '跳过，直接开始'}
+            {selectedTemplateId ? '开始使用 🎯' : '直接开始'}
           </button>
         </div>
       </motion.div>

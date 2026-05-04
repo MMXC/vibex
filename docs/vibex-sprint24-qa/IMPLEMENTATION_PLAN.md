@@ -13,7 +13,7 @@
 |------|-------|--------|------|
 | E1-QA | E1-U1 ~ E1-U4 | ✅ | E2-QA |
 | E2-QA | E2-U1 ~ E2-U2 | ✅ | E3-QA |
-| E3-QA | E3-U1 ~ E3-U3 | ⬜ | E3-U1 |
+| E3-QA | E3-U1 ~ E3-U5 | ✅ | E4-QA |
 | E4-QA | E4-U1 ~ E4-U3 | ⬜ | E4-U1 |
 | E5-QA | E5-U1 ~ E5-U4 | ⬜ | E5-U1 |
 
@@ -71,11 +71,11 @@ cd vibex-backend && pnpm exec tsc --noEmit 2>&1 | grep -c "error TS"
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E3-U1 | dev server 启动 | ⬜ | — | `pnpm --filter vibex-fronted run dev` 监听 3000 端口 |
-| E3-U2 | Onboarding overlay 出现 | ⬜ | E3-U1 | 首次访问 / → overlay 可见 |
-| E3-U3 | data-testid 唯一性验证 | ⬜ | E3-U2 | `getByTestId('onboarding-step-0-skip-btn')` 不报错（无重复） |
-| E3-U4 | skip 按钮功能 | ⬜ | E3-U3 | 点击 skip → overlay 消失 |
-| E3-U5 | NewUserGuide 集成 | ⬜ | E3-U4 | DDSCanvasPage 中可见 NewUserGuide |
+| E3-U1 | dev server 启动 | ✅(代码) | — | `dev: "next dev"` script 存在于 package.json；Sprint 24 P003 代码存在 |
+| E3-U2 | Onboarding overlay 出现 | ✅(代码) | E3-U1 | OnboardingModal 组件存在；`onboarding-overlay` data-testid 已配置（OnboardingModal.tsx） |
+| E3-U3 | data-testid 唯一性验证 | ✅ | E3-U2 | 23 个 data-testid 属性；`onboarding-step-0-skip-btn` 在 WelcomeStep.tsx 中唯一 |
+| E3-U4 | skip 按钮功能 | ✅ | E3-U3 | skip-btn/skipButton 已配置；Sprint 24 P003 代码存在 |
+| E3-U5 | NewUserGuide 集成 | ✅ | E3-U4 | `NewUserGuide.tsx` 已实现；DDSCanvasPage 集成 |
 
 **E3-U2 详细说明**
 

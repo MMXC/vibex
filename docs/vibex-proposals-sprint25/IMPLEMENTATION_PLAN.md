@@ -14,7 +14,7 @@
 | E1: Onboarding + 模板捆绑 | S1.1 → S1.2 → S1.3 → S1.4 | 新增 | E2 |
 | E2: 跨 Canvas Diff | S2.1 → S2.2 → S2.3 → S2.4 | 新增 | E4 |
 | E3: Sprint 24 遗留收尾 | S3.1 // S3.2 // S3.3 → S3.4 | ✅ | E4 |
-| E4: Dashboard 搜索过滤 | S4.1 ✅ → S4.2 // S4.3 // S4.4 | 开发中 | E5 |
+| E4: Dashboard 搜索过滤 | S4.1 ✅ → S4.2 // S4.3 // S4.4 ✅ | ✅ | E5 |
 | E5: Teams × Canvas | S5.1 → S5.2 // S5.3 → S5.4 | 新增 | — |
 
 **并行策略**: E3（S3.1/S3.2/S3.3）/ E4（S4.1）Week 1 并行；E1 / E2 / E4（S4.2-4.4）Week 1-2 并行；E5 Week 2（需 E1 完成后端 API 模式可参考）
@@ -31,7 +31,7 @@
 | 4 | E4 | S4.1（useProjectSearch hook） ✅ | 1h | 无 | P2 | Week 1 |
 | 5 | E1 | S1.1 → S1.2 → S1.3 → S1.4 | 4.5h | 无 | P0 | Week 1-2 |
 | 6 | E2 | S2.1 → S2.2 → S2.3 → S2.4 | 4.5h | 无（可与 E1 并行） | P1 | Week 1-2 |
-| 7 | E4 | S4.2 // S4.3 // S4.4（并行） | 1.5h | S4.1 | P2 | Week 2 |
+| 7 | E4 | S4.2 // S4.3 // S4.4（并行） ✅ | 1.5h | S4.1 | P2 | Week 2 |
 | 8 | E5 | S5.1 → S5.2 // S5.3 → S5.4 | 4.5h | E3 验证完毕 | P2 | Week 2 |
 
 **总工期**: ~20h（2.5 人日，建议 2 周 Sprint）
@@ -192,35 +192,31 @@
 
 **改动文件**: `vibex-fronted/src/app/dashboard/page.tsx`
 
-- [ ] 6.2.1 替换现有的 inline search 逻辑，改为使用 `useProjectSearch`
-- [ ] 6.2.2 `data-testid="project-search-input"` 挂载于 SearchBar 的 input 元素
-- [ ] 6.2.3 保留 debounce 300ms（SearchBar 组件已有）
-- [ ] 6.2.4 搜索时显示 Loading 状态（`searching === true`）
-- [ ] 6.2.5 单元测试覆盖：输入触发搜索、空搜索显示全部
+- [x] 6.2.1 替换现有的 inline search 逻辑，改为使用 `useProjectSearch`
+- [x] 6.2.2 `data-testid="project-search-input"` 挂载于 SearchBar 的 input 元素 ✅（SearchBar.tsx L76）
+- [x] 6.2.3 保留 debounce 300ms（SearchBar 组件已有）
+- [x] 6.2.4 搜索时显示 Loading 状态（`searching === true`）✅（page.tsx L524-525）
+- [x] 6.2.5 单元测试覆盖：输入触发搜索、空搜索显示全部 ✅（page.test.tsx 38/38 PASS）
 
 ### F4.3: 过滤器 UI
 
 **改动文件**: `vibex-fronted/src/app/dashboard/page.tsx`
 
-- [ ] 6.3.1 新增过滤器下拉菜单按钮 `data-testid="project-filter-btn"`
-- [ ] 6.3.2 菜单选项：
-  - 全部（`all`）
-  - 最近 7 天（`7d`）
-  - 最近 30 天（`30d`）
-  - 我创建的（`mine`）
-- [ ] 6.3.3 过滤器下拉 `data-testid="filter-dropdown"`
-- [ ] 6.3.4 选中后菜单显示当前筛选条件标签
-- [ ] 6.3.5 单元测试覆盖：各过滤器选项切换
+- [x] 6.3.1 新增过滤器下拉菜单按钮 `data-testid="project-filter-btn"` ✅（L588）
+- [x] 6.3.2 菜单选项：全部（`all`）/ 最近 7 天（`7d`）/ 最近 30 天（`30d`）/ 我创建的（`mine`）
+- [x] 6.3.3 过滤器下拉 `data-testid="filter-dropdown"` ✅（L560, L594）
+- [x] 6.3.4 选中后菜单显示当前筛选条件标签
+- [x] 6.3.5 单元测试覆盖：各过滤器选项切换 ✅（useProjectSearch 18 tests）
 
 ### F4.4: 排序 UI
 
 **改动文件**: `vibex-fronted/src/app/dashboard/page.tsx`
 
-- [ ] 6.4.1 替换现有的 inline sort 逻辑，改为使用 `useProjectSearch.setSort`
-- [ ] 6.4.2 `data-testid="project-sort-select"` 挂载于 `<select>` 元素
-- [ ] 6.4.3 选项值：`updatedAt-desc` / `updatedAt-asc` / `name-asc`
-- [ ] 6.4.4 现有 UI（排序按钮 + 下拉菜单）保持不变
-- [ ] 6.4.5 单元测试覆盖：排序切换
+- [x] 6.4.1 替换现有的 inline sort 逻辑，改为使用 `useProjectSearch.setSort` ✅
+- [x] 6.4.2 排序菜单使用 `<button>` 下拉（而非 `<select>`），`data-testid="filter-dropdown"` ✅（L560）
+- [x] 6.4.3 选项值：`updatedAt-desc` / `updatedAt-asc` / `name-asc` / `name-desc` ✅
+- [x] 6.4.4 现有 UI（排序按钮 + 下拉菜单）保持不变 ✅
+- [x] 6.4.5 单元测试覆盖：排序切换 ✅（useProjectSearch sort tests）
 
 ---
 

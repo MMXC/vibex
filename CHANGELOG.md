@@ -1,3 +1,14 @@
+### [Unreleased] vibex-proposals-sprint25 E5: Teams × Canvas 共享权限 — 2026-05-05
+- **F5.1 canvas-share API**: `routes/v1/canvas-share.ts` — POST/GET/DELETE endpoint；内存 Map 模拟 canvas_team_mapping；权限校验（team member）+ 错误处理（401/403/404/409）；集成到 gateway.ts
+- **F5.1 前端 API 层**: `lib/api/canvas-share.ts` — canvasShareApi.share/listTeams/listCanvases/revoke
+- **F5.2 Team Canvas 列表**: `dashboard/teams/page.tsx` — 标签页切换（成员/团队 Canvas）；`data-testid="team-canvas-list"` + `data-testid="team-project-item"`
+- **F5.3 useCanvasRBAC 扩展**: `hooks/useCanvasRBAC.ts` — 增加 teamId 参数；GET /v1/teams/:id/members 获取 teamRole；owner=全部操作，admin=编辑/导出，member=只读
+- **F5.4 share-to-team button**: `DDSToolbar.tsx` — `data-testid="share-to-team-btn"`；调用 ShareToTeamModal
+- **F5.4 ShareToTeamModal**: `components/team-share/ShareToTeamModal.tsx` — `data-testid="team-share-modal"`；团队列表 + 权限选择；POST /v1/canvas-share
+- **Fix: build 阻塞**: 8 个 API routes 添加 `export const dynamic = 'force-dynamic'`，修复静态导出冲突
+- DoD: canvas-share API 200 ✅, team-canvas-list ✅, useCanvasRBAC team 维度 ✅, share-to-team-btn ✅, TS 0 errors ✅
+- 提交: c5d6f5952
+
 ### [Unreleased] vibex-proposals-sprint25 E4: Dashboard 搜索过滤 — 2026-05-04
 - **S4.1 useProjectSearch hook**: `vibex-fronted/src/hooks/useProjectSearch.ts` — 统一管理 searchQuery/filter/sort 状态；导出 `filtered/searching/searchQuery/filter/sort/setSearch/setFilter/setSort`；支持 filter: all/7d/30d/mine，sort: name-asc/name-desc/updatedAt-asc/updatedAt-desc
 - **S4.1 单元测试**: `vibex-fronted/src/hooks/__tests__/useProjectSearch.test.ts` — 18 tests（search/filter/sort/combined）全部通过

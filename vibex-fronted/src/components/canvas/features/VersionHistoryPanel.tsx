@@ -14,6 +14,7 @@ import type { CanvasSnapshot } from '@/lib/canvas/types';
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
 import { computeSnapshotDiff } from '@/lib/canvas/snapshotDiff';
 import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
+import { useConfirmDialogStore } from '@/lib/canvas/stores/confirmDialogStore';
 import { SnapshotDiffView } from './SnapshotDiffView';
 import styles from './VersionHistoryPanel.module.css';
 
@@ -40,8 +41,11 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
     loadSnapshots,
     createSnapshot,
     restoreSnapshot,
+    clearAllSnapshots,
     error: hookError,
   } = useVersionHistory();
+
+  const { open: openConfirmDialog } = useConfirmDialogStore();
 
   // Local loading states for async operations
   const [creating, setCreating] = useState(false);
@@ -79,22 +83,45 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
   }, [open, isOpen, loadSnapshots]);
 
   const handleRestore = useCallback(
-    async (snapshotId: string) => {
-      setRestoring(true);
-      setRestoreError(null);
-      try {
-        await restoreSnapshot(snapshotId);
-        // After successful restore, close panel
-        onClose();
-      } catch (err) {
-        setRestoreError('恢复失败，请重试');
-        canvasLogger.VersionHistoryPanel.error(' restore error:', err);
-      } finally {
-        setRestoring(false);
-      }
+    (snapshotId: string, snapshotLabel: string) => {
+      // === E2-S4: 二次确认弹窗 ===
+      openConfirmDialog({
+        title: '确认恢复版本',
+        message: `确定要恢复到「${snapshotLabel}」吗？当前画布内容将被替换。`,
+        confirmLabel: '确认恢复',
+        cancelLabel: '取消',
+        destructive: true,
+        onConfirm: async () => {
+          setRestoring(true);
+          setRestoreError(null);
+          try {
+            await restoreSnapshot(snapshotId);
+            onClose();
+          } catch (err) {
+            setRestoreError('恢复失败，请重试');
+            canvasLogger.VersionHistoryPanel.error(' restore error:', err);
+          } finally {
+            setRestoring(false);
+          }
+        },
+      });
     },
-    [restoreSnapshot, onClose]
+    [restoreSnapshot, onClose, openConfirmDialog]
   );
+
+  const handleClearAll = useCallback(async () => {
+    if (snapshots.length === 0) return;
+    openConfirmDialog({
+      title: '清空版本历史',
+      message: `确定要清空所有 ${snapshots.length} 个版本吗？此操作不可撤销。`,
+      confirmLabel: '确认清空',
+      cancelLabel: '取消',
+      destructive: true,
+      onConfirm: async () => {
+        await clearAllSnapshots();
+      },
+    });
+  }, [snapshots.length, clearAllSnapshots, openConfirmDialog]);
 
   const handleCreate = useCallback(async () => {
     setCreating(true);
@@ -131,6 +158,7 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
         role="dialog"
         aria-modal="true"
         aria-label="版本历史"
+        data-testid="version-history-panel"
       >
         {/* Header */}
         <div className={styles.header}>
@@ -287,7 +315,7 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
                         className={styles.restoreBtn}
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleRestore(snap.snapshotId);
+                          handleRestore(snap.snapshotId, snap.label);
                         }}
                         disabled={restoring}
                         data-testid={`restore-snapshot-${snap.snapshotId}`}
@@ -320,6 +348,21 @@ export function VersionHistoryPanel({ open, onClose }: VersionHistoryPanelProps)
                     📊 对比
                   </button>
                 )}
+              </div>
+            )}
+
+            {/* E2-S6: Clear all versions button */}
+            {snapshots.length > 0 && (
+              <div className={styles.createSection}>
+                <button
+                  type="button"
+                  className={styles.clearAllBtn}
+                  onClick={handleClearAll}
+                  data-testid="clear-all-versions-btn"
+                  title="清空所有版本历史"
+                >
+                  🗑️ 清空历史
+                </button>
               </div>
             )}
           </>

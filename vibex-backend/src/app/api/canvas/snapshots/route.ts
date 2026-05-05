@@ -201,6 +201,30 @@ export async function POST(
       ]
     );
 
+    // === E2-S2: 50 版本限制 — 超过 50 个时删除最早的版本 ===
+    const MAX_VERSIONS = 50;
+    const countResult = await queryDB<{ cnt: number }>(
+      env,
+      'SELECT COUNT(*) as cnt FROM CanvasSnapshot WHERE projectId = ?',
+      [resolvedProjectId]
+    );
+    const currentCount = countResult[0]?.cnt || 0;
+    if (currentCount > MAX_VERSIONS) {
+      // 删除最早的 (version 最小的) 超出数量的版本
+      const deleteCount = currentCount - MAX_VERSIONS;
+      await executeDB(
+        env,
+        `DELETE FROM CanvasSnapshot
+         WHERE id IN (
+           SELECT id FROM CanvasSnapshot
+           WHERE projectId = ?
+           ORDER BY version ASC
+           LIMIT ?
+         )`,
+        [resolvedProjectId, deleteCount]
+      );
+    }
+
     const created = await queryOne<CanvasSnapshotRow>(
       env,
       'SELECT * FROM CanvasSnapshot WHERE id = ?',

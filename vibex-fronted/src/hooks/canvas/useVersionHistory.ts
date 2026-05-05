@@ -46,6 +46,8 @@ export interface UseVersionHistoryReturn {
   createAiSnapshot: () => Promise<void>;
   /** 恢复到指定快照 */
   restoreSnapshot: (snapshotId: string) => Promise<boolean>;
+  /** 清空所有版本历史（E2-S6） */
+  clearAllSnapshots: () => Promise<boolean>;
   /** 最近一次加载/操作错误消息 */
   error: string | null;
 }
@@ -182,6 +184,24 @@ export function useVersionHistory(): UseVersionHistoryReturn {
     }
   }, [setContextNodes, setFlowNodes, setComponentNodes]);
 
+  // === E2-S6: Clear all snapshots ===
+  const clearAllSnapshots = useCallback(async (): Promise<boolean> => {
+    if (!projectId) {
+      setError('请先创建项目后再清空历史版本');
+      return false;
+    }
+    try {
+      await canvasApi.clearVersions(projectId);
+      setSnapshots([]);
+      setSelectedSnapshot(null);
+      return true;
+    } catch (err) {
+      canvasLogger.default.error('[useVersionHistory] clearAllSnapshots error:', err);
+      setError(err instanceof Error ? err.message : '清空历史失败，请重试');
+      return false;
+    }
+  }, [projectId]);
+
   const open = useCallback(() => {
     setIsOpen(true);
     setError(null); // 打开时清除旧错误
@@ -217,6 +237,7 @@ export function useVersionHistory(): UseVersionHistoryReturn {
     createSnapshot,
     createAiSnapshot,
     restoreSnapshot,
+    clearAllSnapshots,
     restoring,
     creating,
     error,

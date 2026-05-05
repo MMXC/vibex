@@ -33,6 +33,10 @@ export const API_CONFIG = {
       restoreSnapshot: (id: string) => `/v1/canvas/snapshots/${id}/restore`,
       // E3: Version polling endpoint for conflict detection
       latest: '/v1/canvas/snapshots/latest',
+      // E2-S5: PRD-compliant version history endpoints
+      versions: (projectId: string) => `/v1/projects/${projectId}/versions`,
+      version: (projectId: string, versionId: string) => `/v1/projects/${projectId}/versions/${versionId}`,
+      clearVersions: (projectId: string) => `/v1/projects/${projectId}/versions`,
     },
     auth: {
       login: '/auth/login',

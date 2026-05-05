@@ -450,6 +450,91 @@ export const canvasApi = {
     if (!res.ok) await handleResponseError(res, `获取最新版本失败: ${res.status}`, window.location.pathname);
     return await res.json() as { success: boolean; latestVersion: number; updatedAt: string | null };
   },
+
+  // === E2-S5: PRD-compliant version history API ===
+
+  /**
+   * 获取项目版本列表（PRD 规范路径）
+   * GET /api/v1/projects/:id/versions
+   */
+  listVersions: async (projectId: string): Promise<{
+    versions: Array<{
+      id: string;
+      snapshot_json: Record<string, unknown>;
+      created_at: string;
+      created_by: string | null;
+      version: number;
+      name: string | null;
+      description: string | null;
+      is_auto_save: boolean;
+      context_count: number;
+      flow_count: number;
+      component_count: number;
+    }>;
+    total: number;
+    limit: number;
+    offset: number;
+  }> => {
+    const headers = getAuthHeaders();
+    const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.versions(projectId)), { headers });
+    if (!res.ok) await handleResponseError(res, `获取版本历史失败: ${res.status}`, window.location.pathname);
+    return await res.json();
+  },
+
+  /**
+   * 获取单个版本详情（PRD 规范路径）
+   * GET /api/v1/projects/:id/versions/:versionId
+   */
+  getVersion: async (projectId: string, versionId: string): Promise<{
+    id: string;
+    project_id: string;
+    version: number;
+    name: string | null;
+    description: string | null;
+    snapshot_json: Record<string, unknown>;
+    created_at: string;
+    created_by: string | null;
+    is_auto_save: boolean;
+  }> => {
+    const headers = getAuthHeaders();
+    const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.version(projectId, versionId)), { headers });
+    if (!res.ok) await handleResponseError(res, `获取版本详情失败: ${res.status}`, window.location.pathname);
+    return await res.json();
+  },
+
+  /**
+   * 恢复到指定版本（PRD 规范路径）
+   * POST /api/v1/projects/:id/versions/:versionId
+   */
+  restoreToVersion: async (projectId: string, versionId: string): Promise<{
+    success: boolean;
+    contextNodes: unknown[];
+    flowNodes: unknown[];
+    componentNodes: unknown[];
+    newVersion: number;
+  }> => {
+    const headers = { 'Content-Type': 'application/json', ...getAuthHeaders() };
+    const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.version(projectId, versionId)), {
+      method: 'POST',
+      headers,
+    });
+    if (!res.ok) await handleResponseError(res, `恢复版本失败: ${res.status}`, window.location.pathname);
+    return await res.json();
+  },
+
+  /**
+   * 清空版本历史（E2-S6）
+   * DELETE /api/v1/projects/:id/versions
+   */
+  clearVersions: async (projectId: string): Promise<{ success: boolean; projectId: string }> => {
+    const headers = { 'Content-Type': 'application/json', ...getAuthHeaders() };
+    const res = await fetch(getApiUrl(API_CONFIG.endpoints.canvas.clearVersions(projectId)), {
+      method: 'DELETE',
+      headers,
+    });
+    if (!res.ok) await handleResponseError(res, `清空版本历史失败: ${res.status}`, window.location.pathname);
+    return await res.json();
+  },
 };
 
 // === Polling Manager ===

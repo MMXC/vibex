@@ -1,3 +1,8 @@
+### [Unreleased] vibex-sprint25-rbac-fix: RBAC 安全漏洞修复 — 2026-05-05
+- **Fix: Project Member 权限**: `hooks/useCanvasRBAC.ts` — 移除 `member` 角色的 canEdit/canShare 权限（仅 owner 可编辑/分享），修复安全漏洞
+- DoD: TS 0 errors ✅, E5 changelog ✅
+- 提交: ea2df8f23
+
 ### [Unreleased] vibex-proposals-sprint25 E5: Teams × Canvas 共享权限 — 2026-05-05
 - **F5.1 canvas-share API**: `routes/v1/canvas-share.ts` — POST/GET/DELETE endpoint；内存 Map 模拟 canvas_team_mapping；权限校验（team member）+ 错误处理（401/403/404/409）；集成到 gateway.ts
 - **F5.1 前端 API 层**: `lib/api/canvas-share.ts` — canvasShareApi.share/listTeams/listCanvases/revoke

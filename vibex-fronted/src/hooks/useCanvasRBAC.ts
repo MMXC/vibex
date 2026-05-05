@@ -80,8 +80,8 @@ export function useCanvasRBAC(projectId: string | undefined, teamId?: string): R
           const data = await res.json();
           const rbac: RBACResult = {
             canDelete: data.role === 'owner',
-            canShare: data.role === 'owner' || data.role === 'member',
-            canEdit: data.role === 'owner' || data.role === 'member',
+            canShare: data.role === 'owner',
+            canEdit: data.role === 'owner',
             canView: true,
             loading: false,
           };

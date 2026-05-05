@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, description, userId } = body;
+    const { name, description, userId, templateRequirement } = body;
 
     if (!name || !userId) {
       return NextResponse.json(
@@ -47,6 +47,8 @@ export async function POST(request: NextRequest) {
         name,
         description: description || '',
         userId,
+        // E1-S1.1: store templateRequirement in description if present
+        ...(templateRequirement ? { description: templateRequirement } : {}),
       },
       include: {
         pages: true,

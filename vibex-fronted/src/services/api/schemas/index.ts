@@ -100,6 +100,8 @@ export const ProjectCreateSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
   userId: z.string(),
+  // E1-S1.1: template auto-fill
+  templateRequirement: z.string().optional(),
 });
 
 export const ProjectUpdateSchema = z.object({

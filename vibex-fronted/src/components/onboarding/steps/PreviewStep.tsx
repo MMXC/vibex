@@ -8,7 +8,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useOnboardingStore } from '@/stores/onboarding';
+import { useRouter } from 'next/navigation';
+import { useOnboardingStore, SCENARIO_OPTIONS } from '@/stores/onboarding';
+import { useAuthStore } from '@/stores/authStore';
+import { projectApi } from '@/services/api';
 import { useTemplates } from '@/hooks/useTemplates';
 import type { IndustryTemplate } from '@/hooks/useTemplates';
 import type { ScenarioType } from '@/stores/onboarding/types';
@@ -60,10 +63,12 @@ function storePendingTemplateRequirement(tmpl: IndustryTemplate) {
 }
 
 export function PreviewStep({ onNext: _unusedOnNext, onPrev, onSkip }: StepContentProps) {
+  const router = useRouter();
   const scenario = useOnboardingStore((s) => s.scenario);
   const selectedTemplateId = useOnboardingStore((s) => s.selectedTemplateId);
   const setSelectedTemplateId = useOnboardingStore((s) => s.setSelectedTemplateId);
   const complete = useOnboardingStore((s) => s.complete);
+  const user = useAuthStore((s) => s.user);
 
   const { templates, selectTemplate, isLoading } = useTemplates();
   const filtered = filterByScenario(templates, scenario);
@@ -77,7 +82,39 @@ export function PreviewStep({ onNext: _unusedOnNext, onPrev, onSkip }: StepConte
     }
   };
 
-  const handleNext = () => {
+  // E1-S1.1: 创建项目并跳转画布
+  const handleNext = async () => {
+    // 读取 template requirement
+    let templateRequirement = '';
+    try {
+      templateRequirement = localStorage.getItem(PENDING_TEMPLATE_REQ_KEY) ?? '';
+    } catch {}
+
+    // 读取 scenario 标签
+    const scenarioLabel = scenario
+      ? SCENARIO_OPTIONS.find((o) => o.value === scenario)?.label ?? '项目'
+      : '我的项目';
+
+    if (user && user.id) {
+      try {
+        const project = await projectApi.createProject({
+          name: scenarioLabel,
+          description: templateRequirement,
+          userId: user.id,
+          templateRequirement,
+        });
+        // 清理 localStorage
+        try { localStorage.removeItem(PENDING_TEMPLATE_REQ_KEY); } catch {}
+        // 跳转画布
+        if (project?.id) {
+          router.push(`/canvas/${project.id}`);
+          return;
+        }
+      } catch {
+        // 创建失败fallback到complete
+      }
+    }
+    // fallback: 完成onboarding
     complete();
   };
 

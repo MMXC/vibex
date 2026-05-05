@@ -26,6 +26,9 @@ export interface GuidanceStore {
   canvasOnboardingStep: number; // 0 = not started, 1-3 = steps
   canvasOnboardingDismissed: boolean;
 
+  // S1.2: First-time canvas hint bubble
+  canvasFirstHintDismissed: boolean;
+
   // Node tooltip state
   tooltipNodeId: string | null;
   tooltipPosition: { x: number; y: number };
@@ -45,6 +48,10 @@ export interface GuidanceStore {
   completeCanvasOnboarding: () => void;
   dismissCanvasOnboarding: () => void;
   resetCanvasOnboarding: () => void;
+
+  // S1.2: First-time hint bubble
+  dismissCanvasFirstHint: () => void;
+  resetCanvasFirstHint: () => void;
 
   // Actions: Tooltip
   showTooltip: (nodeId: string, x: number, y: number, content: string) => void;
@@ -69,6 +76,7 @@ const initialState = {
   canvasOnboardingCompleted: false,
   canvasOnboardingStep: 0,
   canvasOnboardingDismissed: false,
+  canvasFirstHintDismissed: false,
   tooltipNodeId: null,
   tooltipPosition: { x: 0, y: 0 },
   tooltipContent: null,
@@ -109,6 +117,10 @@ export const useGuidanceStore = create<GuidanceStore>()(
       resetCanvasOnboarding: () =>
         set({ canvasOnboardingCompleted: false, canvasOnboardingDismissed: false, canvasOnboardingStep: 0 }),
 
+      // S1.2: First-time hint bubble
+      dismissCanvasFirstHint: () => set({ canvasFirstHintDismissed: true }),
+      resetCanvasFirstHint: () => set({ canvasFirstHintDismissed: false }),
+
       // Tooltip
       showTooltip: (nodeId, x, y, content) =>
         set({ tooltipNodeId: nodeId, tooltipPosition: { x, y }, tooltipContent: content }),
@@ -123,6 +135,7 @@ export const useGuidanceStore = create<GuidanceStore>()(
         shortcutBarCollapsed: state.shortcutBarCollapsed,
         canvasOnboardingCompleted: state.canvasOnboardingCompleted,
         canvasOnboardingDismissed: state.canvasOnboardingDismissed,
+        canvasFirstHintDismissed: state.canvasFirstHintDismissed,
       }),
     }
   )

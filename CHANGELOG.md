@@ -1,3 +1,13 @@
+### [Unreleased] vibex-proposals-sprint26 E1: Onboarding → 画布预填充 — 2026-05-06
+- **S1.2 CanvasFirstHint**: 新增 `vibex-fronted/src/components/guidance/CanvasFirstHint.tsx` + `.module.css`；`[data-testid="canvas-first-hint"]`，3s 后自动消失；guidanceStore 新增 `canvasFirstHintDismissed` 字段 + localStorage 持久化
+- **S1.1 PreviewStep 项目创建跳转**: `vibex-fronted/src/components/onboarding/steps/PreviewStep.tsx` — `handleNext` 改为 async，调用 `projectApi.createProject()` 后 `router.push(/canvas/{projectId})`
+- **S1.1 扩展 ProjectCreate**: schema + types + backend API 接受 `templateRequirement` 参数
+- **S1.4 引导气泡消失不重复**: `canvasFirstHintDismissed` 持久化，刷新页面不重复显示
+- **CanvasPage 集成**: `<CanvasFirstHint />` 在 `<CanvasOnboardingOverlay />` 之后
+- 方案: `docs/vibex-proposals-sprint26/IMPLEMENTATION_E1.md`
+- 验证: `pnpm tsc --noEmit` 通过, 9 files changed, 207 insertions(+)
+- 提交: 67a8166ad
+
 ### [Unreleased] vibex-sprint25-rbac-fix: RBAC 安全漏洞修复 — 2026-05-05
 - **Fix: Project Member 权限**: `hooks/useCanvasRBAC.ts` — 移除 `member` 角色的 canEdit/canShare 权限（仅 owner 可编辑/分享），修复安全漏洞
 - DoD: TS 0 errors ✅, E5 changelog ✅

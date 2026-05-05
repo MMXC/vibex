@@ -17,6 +17,8 @@ export interface ProjectCreate {
   name: string;
   description?: string;
   userId: string;
+  // E1-S1.1: template auto-fill
+  templateRequirement?: string;
 }
 
 export interface ProjectUpdate {

@@ -10,4 +10,5 @@
 
 export { ShortcutBar } from './ShortcutBar';
 export { CanvasOnboardingOverlay } from './CanvasOnboardingOverlay';
+export { CanvasFirstHint } from './CanvasFirstHint';
 export { NodeTooltip, useNodeTooltip } from './NodeTooltip';

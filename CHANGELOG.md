@@ -1,3 +1,14 @@
+### [Unreleased] vibex-proposals-sprint26 E2: 跨项目 Canvas 版本历史 — 2026-05-06
+- **S2.1 CanvasSnapshot 表**: `migrations/0006_canvas_snapshot.sql` 已存在，字段含 id/projectId/version/name/description/data/createdAt/createdBy/isAutoSave
+- **S2.2 50 版本限制 + 自动清理**: `vibex-backend/src/app/api/canvas/snapshots/route.ts` — POST 创建快照后检查数量，超过 50 个时自动删除最早的版本
+- **S2.5 PRD 规范 API**: 新建 `vibex-backend/src/app/api/v1/projects/[id]/versions/route.ts` — GET 列表 + DELETE 清空；`vibex-backend/src/app/api/v1/projects/[id]/versions/[versionId]/route.ts` — GET 单个 + POST 恢复
+- **S2.4 版本恢复二次确认**: `vibex-fronted/src/components/canvas/features/VersionHistoryPanel.tsx` — `handleRestore` 通过 `useConfirmDialogStore` 弹出确认弹窗，用户确认后才执行恢复
+- **S2.3 版本历史面板 data-testid**: `data-testid="version-history-panel"` 加到面板根 div；`VersionHistoryPanel` 已在 `CanvasPage.tsx` 中集成
+- **S2.6 清空版本历史**: `useVersionHistory.clearAllSnapshots()` + `canvasApi.clearVersions()` + 面板「清空历史」按钮 `data-testid="clear-all-versions-btn"`
+- 方案: `docs/vibex-proposals-sprint26/IMPLEMENTATION_E2.md`
+- 验证: `pnpm tsc --noEmit` 通过, `pnpm -C vibex-backend tsc --noEmit` 通过
+- 提交: 360c1619c
+
 ### [Unreleased] vibex-proposals-sprint26 E1: Onboarding → 画布预填充 — 2026-05-06
 - **S1.2 CanvasFirstHint**: 新增 `vibex-fronted/src/components/guidance/CanvasFirstHint.tsx` + `.module.css`；`[data-testid="canvas-first-hint"]`，3s 后自动消失；guidanceStore 新增 `canvasFirstHintDismissed` 字段 + localStorage 持久化
 - **S1.1 PreviewStep 项目创建跳转**: `vibex-fronted/src/components/onboarding/steps/PreviewStep.tsx` — `handleNext` 改为 async，调用 `projectApi.createProject()` 后 `router.push(/canvas/{projectId})`

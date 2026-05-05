@@ -43,6 +43,19 @@ const mockChangelog: ChangelogEntry[] = [
     commit: '67a8166ad',
   },
   {
+    version: '1.0.347',
+    date: '2026-05-06',
+    changes: [
+      '🚀 S26-E2: 跨项目 Canvas 版本历史 (P002)',
+      '✅ S2.5: PRD 规范 API — GET/POST/DELETE `/api/v1/projects/:id/versions`',
+      '✅ S2.4: 版本恢复二次确认弹窗 (useConfirmDialogStore)',
+      '✅ S2.3: VersionHistoryPanel data-testid + CanvasPage 集成',
+      '✅ S2.6: 清空版本历史按钮 (clearAllSnapshots)',
+      '提交: b8edd59ea',
+    ],
+    commit: 'b8edd59ea',
+  },
+  {
     version: '1.0.346',
     date: '2026-05-05',
     changes: [

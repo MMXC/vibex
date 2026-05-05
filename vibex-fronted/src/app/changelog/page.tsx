@@ -20,6 +20,16 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.347',
+    date: '2026-05-05',
+    changes: [
+      '🐛 RBAC Security Fix: 移除 Project Member 的 canEdit/canShare 权限',
+      '✅ useCanvasRBAC.ts — member 角色仅读，owner 可编辑/分享',
+      '提交: ea2df8f23',
+    ],
+    commit: 'ea2df8f23',
+  },
+  {
     version: '1.0.346',
     date: '2026-05-05',
     changes: [

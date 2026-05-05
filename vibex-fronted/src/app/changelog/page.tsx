@@ -30,6 +30,19 @@ const mockChangelog: ChangelogEntry[] = [
     commit: 'ea2df8f23',
   },
   {
+    version: '1.0.347',
+    date: '2026-05-06',
+    changes: [
+      '🚀 S26-E1: Onboarding → 画布预填充 (P001)',
+      '✅ S1.2: CanvasFirstHint 引导气泡组件 (data-testid ✅, 3s auto-dismiss)',
+      '✅ S1.1: PreviewStep 完成 Onboarding 后创建项目并跳转画布',
+      '✅ S1.1: 扩展 ProjectCreate 支持 templateRequirement 参数',
+      '✅ S1.4: guidanceStore canvasFirstHintDismissed 持久化',
+      '提交: 67a8166ad',
+    ],
+    commit: '67a8166ad',
+  },
+  {
     version: '1.0.346',
     date: '2026-05-05',
     changes: [

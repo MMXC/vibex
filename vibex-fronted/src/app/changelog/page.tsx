@@ -56,6 +56,20 @@ const mockChangelog: ChangelogEntry[] = [
     commit: 'b8edd59ea',
   },
   {
+    version: '1.0.348',
+    date: '2026-05-06',
+    changes: [
+      '🚀 S26-E3: Dashboard 项目批量操作 (P003)',
+      '✅ S3.1: 项目卡片 checkbox 多选 (data-testid=project-checkbox-{id})，stopPropagation 防止 Link 跳转',
+      '✅ S3.5: 全选/取消全选 (data-testid=select-all-projects, indeterminate 状态)',
+      '✅ S3.2: 固定底部批量操作栏 (data-testid=bulk-action-bar)，archive/delete/export 三个按钮',
+      '✅ S3.4: 批量导出 JSON (vibex-projects-export-{timestamp}.json)',
+      '✅ S3.3: 批量删除/归档二次确认，复用 openConfirm Dialog',
+      '提交: 205bc8a19',
+    ],
+    commit: '205bc8a19',
+  },
+  {
     version: '1.0.346',
     date: '2026-05-05',
     changes: [

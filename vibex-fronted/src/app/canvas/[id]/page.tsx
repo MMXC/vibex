@@ -4,7 +4,7 @@
  * E01: Onboarding → Canvas 无断点
  *
  * 功能：
- * 1. generateStaticParams() — Next.js output:export 兼容
+ * 1. dynamic = 'force-dynamic' — Next.js output:export 兼容
  * 2. 100ms 内显示 CanvasPageSkeleton，避免白屏
  * 3. 数据就绪后渲染真实 CanvasPage
  * 4. 支持 AI 降级格式 { raw, parsed: null }
@@ -12,10 +12,8 @@
 
 import { CanvasPageClient } from './CanvasPageClient';
 
-/** Next.js output:export 兼容 — 动态路由必须导出 generateStaticParams */
-export async function generateStaticParams() {
-  return [];
-}
+/** Next.js output:export 兼容 — 禁用静态生成，运行时动态渲染 */
+export const dynamic = 'force-dynamic';
 
 export default async function CanvasPageWithId({
   params,

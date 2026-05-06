@@ -69,7 +69,6 @@ export default function Dashboard() {
   type ViewMode = 'grid' | 'list';
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
 
-
   // 使用 React Query 获取项目列表
   const { 
     data: projects = [], 
@@ -264,6 +263,42 @@ export default function Dashboard() {
     setConfirmDestructive(destructive);
     setConfirmOpen(true);
   };
+
+  // E3: 批量选择状态
+  const [selectedProjectIds, setSelectedProjectIds] = useState<Set<string>>(new Set());
+  const bulkActionBarVisible = selectedProjectIds.size > 0;
+  const toggleSelect = useCallback((projectId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setSelectedProjectIds(prev => { const n = new Set(prev); if (n.has(projectId)) n.delete(projectId); else n.add(projectId); return n; });
+  }, []);
+  const toggleSelectAll = useCallback(() => {
+    setSelectedProjectIds(prev => prev.size === displayProjects.length ? new Set() : new Set(displayProjects.map(p => p.id)));
+  }, [displayProjects]);
+  const clearSelection = useCallback(() => setSelectedProjectIds(new Set()), []);
+  const handleBulkDelete = useCallback(async () => {
+    const ids = Array.from(selectedProjectIds);
+    openConfirm('批量删除', '确定要删除选中的 ' + ids.length + ' 个项目吗？', async () => {
+      try { await Promise.all(ids.map(id => apiService.softDeleteProject(id))); queryClient.invalidateQueries({ queryKey: queryKeys.projects.lists() }); clearSelection(); }
+      catch (err) { setActionError(err instanceof Error ? err.message : '删除失败'); }
+    }, true);
+  }, [selectedProjectIds, queryClient, clearSelection, openConfirm]);
+  const handleBulkExport = useCallback(() => {
+    const selected = displayProjects.filter(p => selectedProjectIds.has(p.id));
+    const json = JSON.stringify(selected.map(p => ({ id: p.id, name: p.name, description: p.description, createdAt: p.createdAt, updatedAt: p.updatedAt })), null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'vibex-projects-export-' + Date.now() + '.json'; a.click();
+    URL.revokeObjectURL(url);
+  }, [selectedProjectIds, displayProjects]);
+  const handleBulkArchive = useCallback(async () => {
+    const ids = Array.from(selectedProjectIds);
+    openConfirm('批量归档', '确定要归档选中的 ' + ids.length + ' 个项目吗？', async () => {
+      try { await Promise.all(ids.map(id => apiService.softDeleteProject(id))); queryClient.invalidateQueries({ queryKey: queryKeys.projects.lists() }); clearSelection(); }
+      catch (err) { setActionError(err instanceof Error ? err.message : '归档失败'); }
+    }, false);
+  }, [selectedProjectIds, queryClient, clearSelection, openConfirm]);
 
   // 永久删除
   const handlePermanentDelete = async (projectId: string) => {
@@ -555,7 +590,15 @@ export default function Dashboard() {
         {/* 项目列表 */}
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>项目列表</h2>
+            <div className={styles.selectAllRow}>
+              <input type="checkbox" className={styles.selectAllCheckbox}
+                checked={displayProjects.length > 0 && selectedProjectIds.size === displayProjects.length}
+                ref={el => { if (el) el.indeterminate = selectedProjectIds.size > 0 && selectedProjectIds.size < displayProjects.length; }}
+                onChange={toggleSelectAll}
+                data-testid="select-all-projects"
+                aria-label="全选/取消全选所有项目" />
+              <h2 className={styles.sectionTitle}>项目列表</h2>
+            </div>
             <div className={styles.controls}>
               {/* 搜索框 — E3: 提取为 SearchBar 组件，内置 debounce 300ms */}
               <SearchBar
@@ -656,13 +699,20 @@ export default function Dashboard() {
           </div>
 
           <div className={`${styles.projectGrid} ${viewMode === 'list' ? styles.projectList : ''}`}>
+            <div>
             {displayProjects.map((project) => (
-              <Link
+              <div
                 key={project.id}
-                href={`/project?id=${project.id}`}
-                className={`${styles.projectCard} ${styles.active} ${viewMode === 'list' ? styles.projectCardList : ''}`}
+                onClick={() => router.push(`/project?id=${project.id}`)}
+                className={`${styles.projectCard} ${styles.active} ${viewMode === 'list' ? styles.projectCardList : ''} ${selectedProjectIds.has(project.id) ? styles.projectCardSelected : ''}`}
               >
                 <div className={styles.projectHeader}>
+                  <input type="checkbox" className={styles.projectCheckbox}
+                    checked={selectedProjectIds.has(project.id)}
+                    onChange={(e) => toggleSelect(project.id, e)}
+                    onClick={(e) => e.stopPropagation()}
+                    data-testid={`project-checkbox-${project.id}`}
+                    aria-label={`选择项目 ${project.name}`} />
                   <h3 className={styles.projectName}>{project.name}</h3>
                   {/* E5: Team badge for shared canvases */}
                   {(() => {
@@ -830,8 +880,20 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className={styles.cardGlow} />
-              </Link>
+              </div>
             ))}
+            {bulkActionBarVisible && (
+              <div className={styles.bulkActionBar} data-testid="bulk-action-bar">
+                <div className={styles.bulkActionInfo}>已选择 {selectedProjectIds.size} 个项目</div>
+                <div className={styles.bulkActionButtons}>
+                  <button type="button" className={styles.bulkArchiveBtn} onClick={handleBulkArchive} data-testid="bulk-archive-btn">📁 归档</button>
+                  <button type="button" className={styles.bulkDeleteBtn} onClick={handleBulkDelete} data-testid="bulk-delete-btn">🗑️ 删除</button>
+                  <button type="button" className={styles.bulkExportBtn} onClick={handleBulkExport} data-testid="bulk-export-btn">📤 导出</button>
+                  <button type="button" className={styles.bulkCloseBtn} onClick={clearSelection} data-testid="bulk-close-btn" aria-label="取消选择">✕</button>
+                </div>
+              </div>
+            )}
+            </div>
 
             {/* E4: 空状态 - 无项目 */}
             {!loading && projects.length === 0 && !searchQuery && !showTrash && (

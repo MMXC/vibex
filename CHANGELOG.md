@@ -6,6 +6,14 @@
 - 验证: `tsc --noEmit` 退出 0
 - 提交: baa57fa03
 
+### [Unreleased] vibex-proposals-sprint27 P004: 模板 API 完整 CRUD + Dashboard UI — 2026-05-07
+- **GET /api/v1/templates**: `vibex-backend/src/app/api/v1/templates/route.ts` — 返回 ≥3 mock 模板（支持 industry 过滤）
+- **POST/PUT/DELETE /api/v1/templates**: 完整 CRUD，DELETE 后 GET → 404
+- **Dashboard UI**: `vibex-fronted/src/app/dashboard/templates/page.tsx` — 模板列表/创建/编辑/删除页面（706 行）
+- **template API client**: `vibex-fronted/src/services/api/modules/template.ts` — getTemplates/create/update/delete/export/import
+- 方案: `docs/vibex-proposals-sprint27/IMPLEMENTATION_PLAN.md`
+- 提交: 82c43b0e3
+
 ### [Unreleased] vibex-proposals-sprint28 E01: 实时协作整合 — 2026-05-07
 - **S01.2 useRealtimeSync**: `hooks/useRealtimeSync.ts` — Firebase RTDB 实时节点同步 hook，last-write-wins 冲突解决
 - **S01.2 RTDB helpers**: `lib/firebase/firebaseRTDB.ts` — Firebase RTDB SSE 订阅 + 节点写入 helpers

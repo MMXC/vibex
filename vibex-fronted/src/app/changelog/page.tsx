@@ -47,6 +47,18 @@ const mockChangelog: ChangelogEntry[] = [
   },
   {
     version: '1.0.347',
+    date: '2026-05-07',
+    changes: [
+      '🚀 S27-P004: 模板 API 完整 CRUD + Dashboard UI',
+      '✅ GET/POST/PUT/DELETE /api/v1/templates — 完整 CRUD，DELETE 后 GET → 404',
+      '✅ /dashboard/templates — 模板列表/创建/编辑/删除（706行）',
+      '✅ template.ts — API client（getTemplates/create/update/delete/export/import）',
+      '提交: 82c43b0e3',
+    ],
+    commit: '82c43b0e3',
+  },
+  {
+    version: '1.0.347',
     date: '2026-05-05',
     changes: [
       '🐛 RBAC Security Fix: 移除 Project Member 的 canEdit/canShare 权限',

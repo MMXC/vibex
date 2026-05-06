@@ -50,12 +50,22 @@ function filterByScenario(
   });
 }
 
-/** 选择模板后，将 requirement 内容存入 localStorage 供 Canvas auto-fill */
+/**
+ * 选择模板后，将 requirement 内容存入 localStorage 供 Canvas auto-fill
+ *
+ * E01: 使用 { raw, parsed: null } 格式存储
+ * - raw: 原始模板 requirement 文本
+ * - parsed: null 表示 AI 降级模式（Canvas 使用 useCanvasPrefill 读取并兼容此格式）
+ */
 function storePendingTemplateRequirement(tmpl: IndustryTemplate) {
   try {
     const req = tmpl.chapters?.requirement ?? '';
     if (req) {
-      localStorage.setItem(PENDING_TEMPLATE_REQ_KEY, req);
+      // E01: AI 降级格式 { raw, parsed: null }
+      localStorage.setItem(
+        PENDING_TEMPLATE_REQ_KEY,
+        JSON.stringify({ raw: req, parsed: null })
+      );
     }
   } catch {
     // localStorage 失败静默忽略

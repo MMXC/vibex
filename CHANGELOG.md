@@ -1,3 +1,11 @@
+### [Unreleased] vibex-proposals-sprint26 E4: 移动端渐进适配 — 2026-05-06
+- **S4.5 viewport meta**: `vibex-fronted/src/app/layout.tsx` — `viewport: { width: device-width, initialScale: 1, maximumScale: 1, userScalable: false }`
+- **S4.1 响应式 CSS**: `canvas.module.css` — mobile (<768px) / tablet (768-1024px) 断点，隐藏侧边栏/统计栏
+- **S4.2 只读模式**: `CanvasPage.tsx` — `useMediaQuery` 检测移动端，非 admin 自动只读（`data-testid=mobile-read-only-banner`）
+- **S4.3 写保护 banner**: `mobile-write-blocked` banner，3s 后自动消失，`@keyframes slideIn`
+- **Dashboard mobile**: `dashboard.module.css` — E4 mobile 样式（projectCard/bulkActionBar/sectionHeader）
+- 提交: d32eee41b
+
 ### [Unreleased] vibex-proposals-sprint26 E3: Dashboard 项目批量操作 — 2026-05-06
 - **S3.1 checkbox 多选**: `vibex-fronted/src/app/dashboard/page.tsx` — 项目卡片增加 checkbox（`data-testid=project-checkbox-{id}`），`onClick` + `stopPropagation` 防止 Link 跳转
 - **S3.5 全选**: `select-all-projects` checkbox（indeterminate 状态），`toggleSelectAll`

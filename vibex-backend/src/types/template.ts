@@ -35,4 +35,5 @@ export interface Template {
   sampleRequirement: string;
   tags: string[];
   createdAt: string;
+  updatedAt: string;
 }

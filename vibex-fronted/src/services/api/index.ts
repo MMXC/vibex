@@ -44,6 +44,9 @@ export {
 export type { ClarificationApi } from './modules/clarification';
 export { dddApi, createDddApi } from './modules/ddd';
 export type { DddApi } from './modules/ddd';
+export { templateApi, createTemplateApi } from './modules/template';
+export type { TemplateApi } from './modules/template';
+export type { IndustryTemplate } from './modules/template';
 
 // ==================== 兼容层：模拟原有 ApiService ====================
 import { authApi } from './modules/auth';
@@ -59,6 +62,7 @@ import { prototypeApi } from './modules/prototype';
 import { requirementApi } from './modules/requirement';
 import { clarificationApi } from './modules/clarification';
 import { dddApi } from './modules/ddd';
+import { templateApi } from './modules/template';
 
 /**
  * @deprecated 使用具名导入代替

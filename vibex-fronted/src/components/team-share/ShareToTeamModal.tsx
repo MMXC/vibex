@@ -8,8 +8,11 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { teamsApi, type Team } from '@/lib/api/teams';
+import { teamsApi, type Team, type TeamMember } from '@/lib/api/teams';
 import { canvasShareApi } from '@/lib/api/canvas-share';
+import { getUserId } from '@/lib/auth-token';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.vibex.top';
 import styles from './ShareToTeamModal.module.css';
 
 interface ShareToTeamModalProps {
@@ -46,6 +49,31 @@ export function ShareToTeamModal({
       .finally(() => setLoading(false));
   }, [isOpen]);
 
+  const triggerNotifications = useCallback(async (
+    projectId: string,
+    projectName: string,
+    teamMembers: TeamMember[]
+  ) => {
+    const currentUserId = getUserId();
+    const notifyPromises = teamMembers
+      .filter((m) => m.userId !== currentUserId)
+      .map((member) =>
+        fetch(`${API_BASE}/v1/projects/${projectId}/share/notify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            recipientId: member.userId,
+            recipientName: member.name,
+            senderName: member.name,
+            projectName: projectName,
+          }),
+        }).catch((err) => {
+          console.warn('[ShareToTeamModal] Notification failed for', member.userId, err);
+        })
+      );
+    await Promise.all(notifyPromises);
+  }, []);
+
   const handleShare = useCallback(async () => {
     if (!selectedTeamId) return;
     setSubmitting(true);
@@ -57,6 +85,16 @@ export function ShareToTeamModal({
         teamId: selectedTeamId,
         role: selectedRole,
       });
+
+      // E02: Send notifications to team members
+      try {
+        const { members } = await teamsApi.listMembers(selectedTeamId);
+        await triggerNotifications(canvasId, canvasName ?? canvasId, members);
+      } catch (notifyErr) {
+        // Notification is non-critical — log and continue
+        console.warn('[ShareToTeamModal] Notification trigger failed:', notifyErr);
+      }
+
       const teamName = teams.find((t) => t.id === selectedTeamId)?.name ?? selectedTeamId;
       setFeedback({ type: 'success', message: `已成功分享给团队「${teamName}」` });
       setSelectedTeamId(null);
@@ -73,7 +111,7 @@ export function ShareToTeamModal({
     } finally {
       setSubmitting(false);
     }
-  }, [selectedTeamId, selectedRole, canvasId, teams, onClose]);
+  }, [selectedTeamId, selectedRole, canvasId, teams, onClose, canvasName, triggerNotifications]);
 
   if (!isOpen) return null;
 

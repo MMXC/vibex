@@ -24,6 +24,12 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'VibeX - AI 驱动的产品建模平台',
   description: 'AI 驱动的需求分析与产品建模平台，帮助团队快速构建产品原型',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
 };
 
 export default function RootLayout({

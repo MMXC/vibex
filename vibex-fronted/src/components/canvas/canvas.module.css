@@ -4359,3 +4359,45 @@
   transition: opacity 0.2s;
 }
 
+
+
+/* E4: Mobile Progressive Adaptation */
+.mobileReadOnlyBanner {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(99, 102, 241, 0.1));
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #93c5fd;
+  padding: 10px 16px;
+  font-size: 13px;
+  text-align: center;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+@media (min-width: 769px) { .mobileReadOnlyBanner { display: none; } }
+
+.mobileWriteAttemptBanner {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+  padding: 10px 16px;
+  font-size: 13px;
+  text-align: center;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  animation: slideIn 0.3s ease;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* E4: Mobile: hide secondary panels */
+@media (max-width: 768px) {
+  .projectBarWrapper { padding: 8px 12px; gap: 6px; }
+  .projectNameInput { min-width: 120px; font-size: 13px; }
+}
+
+/* E4: Tablet adjustments */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .projectBarWrapper { padding: 6px 12px; }
+}
+

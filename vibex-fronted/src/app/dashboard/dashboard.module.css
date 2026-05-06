@@ -1474,3 +1474,19 @@
   background: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.8);
 }
+
+
+/* E4: Mobile Progressive Adaptation */
+@media (max-width: 768px) {
+  .projectCard { min-height: 160px; padding: 12px; }
+  .bulkActionBar { flex-direction: column; gap: 8px; padding: 12px; }
+  .bulkActionInfo { font-size: 13px; }
+  .sectionHeader { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .heroSection { flex-direction: column; padding: 16px; }
+  .heroRight { display: none; }
+  .searchInput { width: 100%; }
+}
+@media (min-width: 768px) and (max-width: 1024px) {
+  .projectCard { min-height: 180px; }
+}
+

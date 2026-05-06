@@ -61,6 +61,7 @@ import { useCanvasSearch } from '@/hooks/canvas/useCanvasSearch';
 import { useCanvasEvents } from '@/hooks/canvas/useCanvasEvents';
 import { useCanvasToolbar } from '@/hooks/canvas/useCanvasToolbar';
 import { useCanvasPanels } from '@/hooks/canvas/useCanvasPanels';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 import { TabBar } from './TabBar';
 import { TreeToolbar } from './TreeToolbar';
@@ -230,6 +231,14 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   const user = useAuthStore((s) => s.user);
   const userId = user?.id || 'anonymous';
   const userName = user?.name || 'Anonymous';
+
+  // E4: Mobile read-only mode (non-admin on mobile = read-only)
+  const isMobileDevice = useMediaQuery('(max-width: 768px)');
+  const role = user?.role || 'viewer';
+  const isReadOnlyMode = isMobileDevice && role !== 'admin';
+  const effectiveRole = isReadOnlyMode ? 'viewer' : role;
+
+  const [mobileWriteAttempt, setMobileWriteAttempt] = useState(false);
 
   // E1-S1: 实时协作感知 — Presence
   const { others: presenceOthers } = usePresence(projectId || null, userId, userName);
@@ -598,6 +607,18 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
             onSaveNow={saveNow}
           />
         </div>
+
+      {/* E4: Mobile read-only banners */}
+      {isReadOnlyMode && (
+        <div className={styles.mobileReadOnlyBanner} data-testid="mobile-read-only-banner">
+          📱 移动端仅查看模式（管理员可编辑）
+        </div>
+      )}
+      {mobileWriteAttempt && (
+        <div className={styles.mobileWriteAttemptBanner} data-testid="mobile-write-blocked">
+          ⚠️ 移动端不支持编辑，请切换到桌面端
+        </div>
+      )}
 
       {/* E4-SSE: AI status bar — shows generatingState to the user */}
       {(generatingState === 'generating' || generatingState === 'fallback' || generatingState === 'error') && (

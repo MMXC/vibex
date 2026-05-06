@@ -1,3 +1,19 @@
+### [Unreleased] vibex-proposals-sprint27 P002: 属性面板性能优化 — 2026-05-07
+- **S-P2.1 虚拟化**: `ProtoAttrPanel.tsx` — @tanstack/react-virtual 虚拟化属性列表（estimateSize:48, overscan:3），DOM 节点数大幅减少
+- **S-P2.2 Memo 优化**: `ProtoAttrPanel.tsx` — useMemo + memo 优化重渲染性能
+- **S-P2.3 加载指示器**: `ProtoEditor.tsx` — >200 节点显示加载状态 badge
+- 方案: `docs/vibex-proposals-sprint27/IMPLEMENTATION_PLAN.md`
+- 验证: `tsc --noEmit` 退出 0
+- 提交: baa57fa03
+
+### [Unreleased] vibex-proposals-sprint28 E01: 实时协作整合 — 2026-05-07
+- **S01.2 useRealtimeSync**: `hooks/useRealtimeSync.ts` — Firebase RTDB 实时节点同步 hook，last-write-wins 冲突解决
+- **S01.2 RTDB helpers**: `lib/firebase/firebaseRTDB.ts` — Firebase RTDB SSE 订阅 + 节点写入 helpers
+- **S01.1 PresenceLayer**: CanvasPage 已集成 `usePresence`，S01.2 补充节点实时同步
+- 方案: `docs/vibex-proposals-sprint28/IMPLEMENTATION_PLAN.md`
+- 验证: `tsc --noEmit` 退出 0
+- 提交: 7a54204f2
+
 ### [Unreleased] vibex-proposals-sprint29 E01: Onboarding → Canvas 无断点 — 2026-05-07
 - **useCanvasPrefill hook**: `vibex-fronted/src/hooks/useCanvasPrefill.ts` — 读取 localStorage 预填充数据，支持 `{ raw, parsed: null }` AI 降级格式，读取后自动清理
 - **动态画布路由**: `vibex-fronted/src/app/canvas/[id]/page.tsx` — Onboarding 跳转目标，100ms 内显示 CanvasPageSkeleton

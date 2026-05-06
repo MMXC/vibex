@@ -10,7 +10,8 @@
 
 'use client';
 
-import React, { memo, useState, useCallback, useEffect } from 'react';
+import React, { memo, useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { usePrototypeStore } from '@/stores/prototypeStore';
 import type { ProtoNodeNavigation, ProtoNodeBreakpoints } from '@/stores/prototypeStore';
 import styles from './ProtoAttrPanel.module.css';
@@ -57,6 +58,12 @@ export const ProtoAttrPanel = memo(function ProtoAttrPanel({
   });
   const [mockInput, setMockInput] = useState('');
   const [mockError, setMockError] = useState<string | null>(null);
+
+  // S-P2.1: Virtualization ref for scroll container
+  const parentRef = useRef<HTMLDivElement>(null);
+
+  // props is defined below after selectedNode check, use raw accessor below
+  // S-P2.2: useMemo — defined after props extraction below
 
   // Reset tab when node changes
   useEffect(() => {
@@ -124,6 +131,9 @@ export const ProtoAttrPanel = memo(function ProtoAttrPanel({
 
   const { component, mockData } = selectedNode.data;
   const props = component.props ?? {};
+
+  // S-P2.2: useMemo for expensive computations
+  const propsEntries = useMemo(() => Object.entries(props), [props]);
 
   return (
     <aside className={`${styles.panel} ${className}`} aria-label="属性面板">
@@ -205,54 +215,13 @@ export const ProtoAttrPanel = memo(function ProtoAttrPanel({
       </div>
 
       {/* Tab Content */}
-      <div className={styles.content}>
+      <div className={styles.content} ref={parentRef} style={{ height: '100%', overflow: 'auto' }}>
         {activeTab === 'props' && (
-          <div className={styles.propList} role="tabpanel">
-            {Object.entries(props).map(([key, value]) => (
-              <div key={key} className={styles.propRow}>
-                <label className={styles.propKey} htmlFor={`prop-${key}`}>
-                  {key}
-                </label>
-                {typeof value === 'boolean' ? (
-                  <button
-                    id={`prop-${key}`}
-                    type="button"
-                    className={`${styles.toggle} ${value ? styles.toggleOn : ''}`}
-                    onClick={() => handlePropChange(key, !value)}
-                    aria-pressed={value}
-                  >
-                    {value ? '是' : '否'}
-                  </button>
-                ) : typeof value === 'number' ? (
-                  <input
-                    id={`prop-${key}`}
-                    type="number"
-                    className={styles.propInput}
-                    value={value}
-                    onChange={(e) => handlePropChange(key, Number(e.target.value))}
-                  />
-                ) : (
-                  <input
-                    id={`prop-${key}`}
-                    type="text"
-                    className={styles.propInput}
-                    value={String(value ?? '')}
-                    onChange={(e) => handlePropChange(key, e.target.value)}
-                  />
-                )}
-              </div>
-            ))}
-
-            {Object.keys(props).length === 0 && (
-              <p className={styles.propEmpty}>无自定义属性</p>
-            )}
-
-            {/* Node ID (read-only) */}
-            <div className={styles.propRow}>
-              <label className={styles.propKey}>节点 ID</label>
-              <span className={styles.propReadonly}>{selectedNode.id}</span>
-            </div>
-          </div>
+          <PropsTabContent
+            propsEntries={propsEntries}
+            selectedNodeId={selectedNode.id}
+            handlePropChange={handlePropChange}
+          />
         )}
 
         {activeTab === 'mock' && (
@@ -506,5 +475,97 @@ export const ProtoAttrPanel = memo(function ProtoAttrPanel({
         </button>
       </div>
     </aside>
+  );
+});
+
+// ==================== Memoized Tab Contents ====================
+
+interface PropsTabContentProps {
+  propsEntries: [string, unknown][];
+  selectedNodeId: string;
+  handlePropChange: (key: string, value: unknown) => void;
+}
+
+const PropsTabContent = memo(function PropsTabContent({
+  propsEntries,
+  selectedNodeId,
+  handlePropChange,
+}: PropsTabContentProps) {
+  const parentRef = useRef<HTMLDivElement>(null);
+  const virtualizer = useVirtualizer({
+    count: propsEntries.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 48,
+    overscan: 3,
+  });
+
+  return (
+    <div className={styles.propList} role="tabpanel">
+      {propsEntries.length === 0 ? (
+        <p className={styles.propEmpty}>无自定义属性</p>
+      ) : (
+        <div
+          ref={parentRef}
+          style={{ height: Math.min(virtualizer.getTotalSize(), 400), overflow: 'auto' }}
+        >
+          <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
+            {virtualizer.getVirtualItems().map((virtualItem) => {
+              const pair = propsEntries[virtualItem.index];
+              if (!pair) return null;
+              const [key, value] = pair;
+              return (
+                <div
+                  key={virtualItem.key}
+                  className={styles.propRow}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    transform: `translateY(${virtualItem.start}px)`,
+                  }}
+                >
+                  <label className={styles.propKey} htmlFor={`prop-${key}`}>
+                    {key}
+                  </label>
+                  {typeof value === 'boolean' ? (
+                    <button
+                      id={`prop-${key}`}
+                      type="button"
+                      className={`${styles.toggle} ${value ? styles.toggleOn : ''}`}
+                      onClick={() => handlePropChange(key, !value)}
+                      aria-pressed={value}
+                    >
+                      {value ? '是' : '否'}
+                    </button>
+                  ) : typeof value === 'number' ? (
+                    <input
+                      id={`prop-${key}`}
+                      type="number"
+                      className={styles.propInput}
+                      value={value}
+                      onChange={(e) => handlePropChange(key, Number(e.target.value))}
+                    />
+                  ) : (
+                    <input
+                      id={`prop-${key}`}
+                      type="text"
+                      className={styles.propInput}
+                      value={String(value ?? '')}
+                      onChange={(e) => handlePropChange(key, e.target.value)}
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+      {/* Node ID (read-only) */}
+      <div className={styles.propRow}>
+        <label className={styles.propKey}>节点 ID</label>
+        <span className={styles.propReadonly}>{selectedNodeId}</span>
+      </div>
+    </div>
   );
 });

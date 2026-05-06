@@ -11,7 +11,7 @@
 
 'use client';
 
-import React, { memo, useState, useCallback } from 'react';
+import React, { memo, useState, useCallback, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePrototypeStore } from '@/stores/prototypeStore';
 import { ComponentPanel } from './ComponentPanel';
@@ -179,6 +179,21 @@ export const ProtoEditor = memo(function ProtoEditor({
   const [showImport, setShowImport] = useState(false);
   const [exportData, setExportData] = useState('');
 
+  // S-P2.3: Loading indicator for > 200 nodes
+  const loadStartRef = useRef<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    if (nodes.length > 200) {
+      setIsLoading(true);
+      loadStartRef.current = Date.now();
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+    setIsLoading(false);
+  }, [nodes.length]);
+
   const handleExport = useCallback(() => {
     const data = getExportData();
     setExportData(JSON.stringify(data, null, 2));
@@ -215,15 +230,31 @@ export const ProtoEditor = memo(function ProtoEditor({
             原型
           </Link>
           <span className={styles.headerTitle}>拖拽布局编辑器</span>
-          <span style={{
-            fontSize: 11,
-            color: 'rgba(255,255,255,0.35)',
-            background: 'rgba(255,255,255,0.04)',
-            padding: '2px 7px',
-            borderRadius: 10,
-          }}>
-            {nodes.length} 节点
-          </span>
+            {isLoading ? (
+              <span style={{
+                fontSize: 11,
+                color: 'rgba(99,102,241,0.8)',
+                background: 'rgba(99,102,241,0.1)',
+                padding: '2px 7px',
+                borderRadius: 10,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+              }}>
+                <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#818cf8', animation: 'pulse 1s infinite' }} />
+                加载中 {nodes.length}
+              </span>
+            ) : (
+              <span style={{
+                fontSize: 11,
+                color: 'rgba(255,255,255,0.35)',
+                background: 'rgba(255,255,255,0.04)',
+                padding: '2px 7px',
+                borderRadius: 10,
+              }}>
+                {nodes.length} 节点
+              </span>
+            )}
         </div>
 
         <div className={styles.headerSpacer} />

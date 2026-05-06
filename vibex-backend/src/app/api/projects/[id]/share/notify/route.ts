@@ -3,7 +3,6 @@
  * 分享项目时触发通知（Slack DM 或站内通知）
  * E02: 项目分享通知系统
  */
-import { error } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 
 interface RouteContext {
@@ -40,8 +39,7 @@ export async function POST(req: NextRequest, { params }: RouteContext): Promise<
       channel: result.channel,
       deliveredAt: result.deliveredAt,
     });
-  } catch (err) {
-    error('[share/notify] Error: ' + String(err));
+  } catch {
     return NextResponse.json(
       { error: 'INTERNAL_ERROR', message: '通知发送失败，请稍后重试' },
       { status: 500 }

@@ -5,8 +5,6 @@
  * 支持 Slack DM + 站内通知降级
  */
 
-import { debug, warn } from '@/lib/logger';
-
 export interface NotificationPayload {
   projectId: string;
   recipientId: string;
@@ -28,7 +26,7 @@ export interface NotificationResult {
 const inappNotifications = new Map<string, { id: string; read: boolean; createdAt: string }[]>();
 
 export async function triggerNotify(payload: NotificationPayload): Promise<NotificationResult> {
-  const { projectId, recipientId, recipientName, senderName, projectName } = payload;
+  const { projectId, recipientId, senderName, projectName } = payload;
   const now = new Date().toISOString();
   const notificationId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
@@ -79,11 +77,9 @@ export async function triggerNotify(payload: NotificationPayload): Promise<Notif
           notificationId,
           deliveredAt: now,
         };
-      } else {
-        warn('[NotificationService] Slack API error: ' + slackData.error);
       }
-    } catch (err) {
-      warn('[NotificationService] Slack DM failed, falling back to in-app: ' + String(err));
+    } catch {
+      // 静默降级到站内通知
     }
   }
 

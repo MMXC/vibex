@@ -1,3 +1,11 @@
+### [Unreleased] vibex-proposals-sprint26 E3: Dashboard 项目批量操作 — 2026-05-06
+- **S3.1 checkbox 多选**: `vibex-fronted/src/app/dashboard/page.tsx` — 项目卡片增加 checkbox（`data-testid=project-checkbox-{id}`），`onClick` + `stopPropagation` 防止 Link 跳转
+- **S3.5 全选**: `select-all-projects` checkbox（indeterminate 状态），`toggleSelectAll`
+- **S3.2 批量操作栏**: 固定底部 `bulkActionBar`（`data-testid=bulk-action-bar`），显示选中数量，archive/delete/export 三个按钮
+- **S3.4 批量导出 JSON**: `handleBulkExport` 生成 `vibex-projects-export-{timestamp}.json` 文件下载
+- **S3.3 批量删除/归档二次确认**: 复用 `openConfirm` Dialog，destructive=true
+- 提交: 205bc8a19
+
 ### [Unreleased] vibex-proposals-sprint26 E2: 跨项目 Canvas 版本历史 — 2026-05-06
 - **S2.1 CanvasSnapshot 表**: `migrations/0006_canvas_snapshot.sql` 已存在，字段含 id/projectId/version/name/description/data/createdAt/createdBy/isAutoSave
 - **S2.2 50 版本限制 + 自动清理**: `vibex-backend/src/app/api/canvas/snapshots/route.ts` — POST 创建快照后检查数量，超过 50 个时自动删除最早的版本

@@ -34,6 +34,19 @@ const mockChangelog: ChangelogEntry[] = [
   },
   {
     version: '1.0.347',
+    date: '2026-05-07',
+    changes: [
+      '🚀 S29-E02: 项目分享通知系统',
+      '✅ NotificationService — Slack DM + 站内通知降级 (in-app fallback)',
+      '✅ POST /api/projects/:id/share/notify — 分享项目触发通知端点',
+      '✅ ShareBadge — 站内通知未读计数 badge',
+      '✅ ShareToTeamModal 集成 — 分享成功后触发通知',
+      '提交: ffa2df6a4',
+    ],
+    commit: 'ffa2df6a4',
+  },
+  {
+    version: '1.0.347',
     date: '2026-05-05',
     changes: [
       '🐛 RBAC Security Fix: 移除 Project Member 的 canEdit/canShare 权限',

@@ -14,6 +14,14 @@
 - 验证: `tsc --noEmit` 退出 0
 - 提交: 7a54204f2
 
+### [Unreleased] vibex-proposals-sprint29 E02: 项目分享通知系统 — 2026-05-07
+- **NotificationService**: `vibex-backend/src/lib/notification/NotificationService.ts` — Slack DM + 站内通知降级，支持 in-app fallback
+- **POST /api/projects/:id/share/notify**: `vibex-backend/src/app/api/projects/[id]/share/notify/route.ts` — 分享项目触发通知端点
+- **ShareBadge**: `vibex-fronted/src/components/dashboard/ShareBadge.tsx` — 站内通知未读计数 badge
+- **ShareToTeamModal 集成**: `vibex-fronted/src/components/team-share/ShareToTeamModal.tsx` — 分享成功后触发通知
+- 方案: `docs/vibex-proposals-sprint29/IMPLEMENTATION_PLAN.md`
+- 提交: ffa2df6a4
+
 ### [Unreleased] vibex-proposals-sprint29 E01: Onboarding → Canvas 无断点 — 2026-05-07
 - **useCanvasPrefill hook**: `vibex-fronted/src/hooks/useCanvasPrefill.ts` — 读取 localStorage 预填充数据，支持 `{ raw, parsed: null }` AI 降级格式，读取后自动清理
 - **动态画布路由**: `vibex-fronted/src/app/canvas/[id]/page.tsx` — Onboarding 跳转目标，100ms 内显示 CanvasPageSkeleton

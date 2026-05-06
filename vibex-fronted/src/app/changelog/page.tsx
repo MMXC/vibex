@@ -59,6 +59,20 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.348',
     date: '2026-05-06',
     changes: [
+      '🚀 S26-E4: 移动端渐进适配 (P004)',
+      '✅ S4.5: viewport meta (userScalable: false, maximumScale: 1)',
+      '✅ S4.1: Canvas 响应式 CSS 断点 (<768px / 768-1024px)',
+      '✅ S4.2: Canvas 移动端只读模式 (data-testid=mobile-read-only-banner)',
+      '✅ S4.3: 移动端写保护提示 banner (data-testid=mobile-write-blocked)',
+      '✅ Dashboard mobile 适配 (projectCard/bulkActionBar/sectionHeader)',
+      '提交: d32eee41b',
+    ],
+    commit: 'd32eee41b',
+  },
+  {
+    version: '1.0.348',
+    date: '2026-05-06',
+    changes: [
       '🚀 S26-E3: Dashboard 项目批量操作 (P003)',
       '✅ S3.1: 项目卡片 checkbox 多选 (data-testid=project-checkbox-{id})，stopPropagation 防止 Link 跳转',
       '✅ S3.5: 全选/取消全选 (data-testid=select-all-projects, indeterminate 状态)',

@@ -1,3 +1,12 @@
+### [Unreleased] vibex-proposals-sprint29 E01: Onboarding → Canvas 无断点 — 2026-05-07
+- **useCanvasPrefill hook**: `vibex-fronted/src/hooks/useCanvasPrefill.ts` — 读取 localStorage 预填充数据，支持 `{ raw, parsed: null }` AI 降级格式，读取后自动清理
+- **动态画布路由**: `vibex-fronted/src/app/canvas/[id]/page.tsx` — Onboarding 跳转目标，100ms 内显示 CanvasPageSkeleton
+- **AI 降级格式**: `vibex-fronted/src/components/onboarding/steps/PreviewStep.tsx` — `storePendingTemplateRequirement` 存储格式改为 `{ raw, parsed: null }`
+- **sessionStorage 持久化**: `vibex-fronted/src/hooks/useOnboarding.ts` — Step 2→5 刷新后进度不丢失
+- 方案: `docs/vibex-proposals-sprint29/IMPLEMENTATION_PLAN.md`
+- 验证: `tsc --noEmit` 退出 0
+- 提交: 3b78219c6
+
 ### [Unreleased] vibex-proposals-sprint26 E4: 移动端渐进适配 — 2026-05-06
 - **S4.5 viewport meta**: `vibex-fronted/src/app/layout.tsx` — `viewport: { width: device-width, initialScale: 1, maximumScale: 1, userScalable: false }`
 - **S4.1 响应式 CSS**: `canvas.module.css` — mobile (<768px) / tablet (768-1024px) 断点，隐藏侧边栏/统计栏

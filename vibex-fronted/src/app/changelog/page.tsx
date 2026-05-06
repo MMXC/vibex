@@ -21,6 +21,19 @@ interface VersionInfo {
 const mockChangelog: ChangelogEntry[] = [
   {
     version: '1.0.347',
+    date: '2026-05-07',
+    changes: [
+      '🚀 S29-E01: Onboarding → Canvas 无断点',
+      '✅ useCanvasPrefill hook — 读取 localStorage 预填充，支持 { raw, parsed: null } AI 降级格式',
+      '✅ /canvas/[id] 动态路由 — Onboarding 跳转目标，100ms 内显示骨架屏',
+      '✅ PreviewStep storePendingTemplateRequirement — AI 降级格式 { raw, parsed: null }',
+      '✅ useOnboarding sessionStorage 持久化 — Step 2→5 刷新后进度不丢失',
+      '提交: 3b78219c6',
+    ],
+    commit: '3b78219c6',
+  },
+  {
+    version: '1.0.347',
     date: '2026-05-05',
     changes: [
       '🐛 RBAC Security Fix: 移除 Project Member 的 canEdit/canShare 权限',

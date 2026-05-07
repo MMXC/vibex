@@ -23,7 +23,7 @@
 |------|-------|--------|------|
 | E01: ProtoPreview 实时联动 | E01-U1 ~ E01-U4 | 3/4 ✅ | E01-U3（Unit tests 待执行）|
 | E02: 项目导入/导出 | E02-U1 ~ E02-U4 | 4/4 ✅ | — |
-| E03: E2E 测试补全 | E03-U1 ~ E03-U2 | 0/2 | E03-U1 |
+| E03: E2E 测试补全 | E03-U1 ~ E03-U2 | 2/2 ✅ | — |
 | E04: Spec 补全 | E04-U1 ~ E04-U2 | 0/2 | E04-U1 |
 | E05: Presence 层增强 | E05-U1 ~ E05-U2 | 0/2 | E05-U1 |
 
@@ -159,8 +159,8 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E03-U1 | share-notification.spec.ts ShareBadge 测试 | ⬜ | — | TC-S06-01~04 全部通过，badge 数字正确 |
-| E03-U2 | ShareToTeamModal E2E + CI 卡口配置 | ⬜ | — | TC-S07-01~04 全部通过；CI e2e:ci exit non-zero |
+| E03-U1 | share-notification.spec.ts ShareBadge 测试 | ✅ | — | TC-S06-01~04 全部通过，badge 数字正确 |
+| E03-U2 | ShareToTeamModal E2E + CI 卡口配置 | ✅ | — | TC-S07-01~04 全部通过（Modal/邮箱/Toast/错误）；CI 卡口配置已在 playwright.config |
 
 ### E03-U1 详细说明
 

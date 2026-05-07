@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased] S29-E05: Canvas 离线模式 — 2026-05-07
+
+### S29-E05: Canvas 离线模式
+
+- **ServiceWorker**: `public/sw.js` — cacheFirst(静态) + networkFirst(API) + offline fallback
+- **manifest.json**: `display: standalone` PWA 配置
+- **OfflineBanner**: `src/components/canvas/OfflineBanner.tsx` — online/offline 事件 + 5s 延迟隐藏
+- **E2E 测试**: `tests/e2e/offline-canvas.spec.ts` — 离线模式 E2E 测试（219 行）
+- 提交: `5d244b312` (feat)
+
+---
+
 ## [Unreleased] S30-E01: ProtoPreview 实时联动 — 2026-05-08
 
 ### S30-E01: ProtoPreview 实时联动

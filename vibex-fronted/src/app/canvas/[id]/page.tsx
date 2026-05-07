@@ -15,6 +15,11 @@ import { CanvasPageClient } from './CanvasPageClient';
 /** Next.js output:export 兼容 — 禁用静态生成，运行时动态渲染 */
 export const dynamic = 'force-dynamic';
 
+/** output:export 兼容 — 无预渲染页面时需导出此函数 */
+export async function generateStaticParams() {
+  return [];
+}
+
 export default async function CanvasPageWithId({
   params,
 }: {

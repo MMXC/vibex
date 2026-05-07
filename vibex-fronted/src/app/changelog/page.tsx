@@ -48,6 +48,19 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.347',
     date: '2026-05-07',
     changes: [
+      '🚀 S28-E03: AI 辅助需求解析',
+      '✅ POST /api/ai/clarify — OpenAI 解析需求（role/goal/constraints），30s 超时降级',
+      '✅ useClarifyAI hook — analyze/result/isLoading/error/reset',
+      '✅ ruleEngine 降级 — 无 API Key 或超时 → 正则+关键词',
+      '✅ onboarding-ai E2E — /dashboard OnboardingModal ClarifyStep',
+      '提交: a53e8cf3a',
+    ],
+    commit: 'a53e8cf3a',
+  },
+  {
+    version: '1.0.347',
+    date: '2026-05-07',
+    changes: [
       '🚀 S29-E02: 项目分享通知系统',
       '✅ NotificationService — Slack DM + 站内通知降级 (in-app fallback)',
       '✅ POST /api/projects/:id/share/notify — 分享项目触发通知端点',

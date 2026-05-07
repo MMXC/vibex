@@ -49,6 +49,16 @@
 - 验证: `pnpm tsc --noEmit` ✅ TS 0 errors
 - 提交: 112ccf3a7
 
+### [Unreleased] vibex-proposals-sprint28 E03: AI 辅助需求解析 — 2026-05-07
+- **POST /api/ai/clarify**: `vibex-fronted/src/app/api/ai/clarify/route.ts` — OpenAI 解析需求（role/goal/constraints），30s 超时降级
+- **useClarifyAI hook**: `vibex-fronted/src/hooks/useClarifyAI.ts` — 封装 analyze/result/isLoading/error/reset
+- **ruleEngine 降级**: `vibex-fronted/src/lib/ai/ruleEngine.ts` — 无 API Key 或超时 → 正则+关键词降级
+- **E2E 测试**: `tests/e2e/onboarding-ai.spec.ts` — /dashboard OnboardingModal ClarifyStep 流程
+- **单元测试**: `tests/unit/ai/clarify.spec.ts` — 19/19 通过
+- 方案: `docs/vibex-proposals-sprint28/specs/E03-ai-clarify.md`
+- 验证: `pnpm tsc --noEmit` ✅ TS 0 errors
+- 提交: a53e8cf3a
+
 ### [Unreleased] vibex-proposals-sprint29 E02: 项目分享通知系统 — 2026-05-07
 - **NotificationService**: `vibex-backend/src/lib/notification/NotificationService.ts` — Slack DM + 站内通知降级，支持 in-app fallback
 - **POST /api/projects/:id/share/notify**: `vibex-backend/src/app/api/projects/[id]/share/notify/route.ts` — 分享项目触发通知端点

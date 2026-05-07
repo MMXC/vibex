@@ -71,6 +71,14 @@
 - 方案: `docs/vibex-proposals-sprint29/IMPLEMENTATION_PLAN.md`
 - 提交: 7a9869850
 
+### [Unreleased] vibex-proposals-sprint29 E07: Sprint 28 Specs 补全 — 2026-05-07
+- **E03-ai-clarify.md**: `docs/vibex-proposals-sprint29/specs/E03-ai-clarify.md` — AI 辅助解析 API schema + 降级路径逻辑表（89 行）
+- **E04-template-crud.md**: `docs/vibex-proposals-sprint29/specs/E04-template-crud.md` — 模板 API 完整 CRUD schema + Dashboard UI + JSON 导入导出（135 行）
+- **E06-error-boundary.md**: `docs/vibex-proposals-sprint29/specs/E06-error-boundary.md` — ErrorBoundary 设计 + Fallback UI + 边界条件表（76 行）
+- **E07-mcp-server.md**: `docs/vibex-proposals-sprint29/specs/E07-mcp-server.md` — MCP 健康检查协议 + JSON-RPC 2.0 格式 + 测试用例（107 行）
+- 方案: `docs/vibex-proposals-sprint29/IMPLEMENTATION_PLAN.md`
+- 提交: 52fe0e39b
+
 ### [Unreleased] vibex-proposals-sprint26 E4: 移动端渐进适配 — 2026-05-06
 - **S4.5 viewport meta**: `vibex-fronted/src/app/layout.tsx` — `viewport: { width: device-width, initialScale: 1, maximumScale: 1, userScalable: false }`
 - **S4.1 响应式 CSS**: `canvas.module.css` — mobile (<768px) / tablet (768-1024px) 断点，隐藏侧边栏/统计栏

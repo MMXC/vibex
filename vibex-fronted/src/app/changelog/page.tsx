@@ -109,6 +109,19 @@ const mockChangelog: ChangelogEntry[] = [
   },
   {
     version: '1.0.347',
+    date: '2026-05-07',
+    changes: [
+      '🚀 S29-E07: Sprint 28 Specs 补全',
+      '✅ E03-ai-clarify.md — AI 辅助解析 API schema + 降级路径（89行）',
+      '✅ E04-template-crud.md — 模板 CRUD schema + JSON 导入导出（135行）',
+      '✅ E06-error-boundary.md — ErrorBoundary 设计 + Fallback UI（76行）',
+      '✅ E07-mcp-server.md — MCP 健康检查协议 + JSON-RPC 2.0（107行）',
+      '提交: 52fe0e39b',
+    ],
+    commit: '52fe0e39b',
+  },
+  {
+    version: '1.0.347',
     date: '2026-05-05',
     changes: [
       '🐛 RBAC Security Fix: 移除 Project Member 的 canEdit/canShare 权限',

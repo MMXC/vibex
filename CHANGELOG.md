@@ -59,6 +59,17 @@
 - 验证: `pnpm tsc --noEmit` ✅ TS 0 errors
 - 提交: a53e8cf3a
 
+### [Unreleased] vibex-proposals-sprint28 E04: 模板 API 完整 CRUD — 2026-05-07
+- **templateStore 共享存储**: `vibex-backend/src/lib/templateStore.ts` — 解决 Next.js route 文件独立 module scope 问题
+- **S04.1 CRUD API**: `route.ts` + `[id]/route.ts` — POST → 201, PUT → 200, DELETE → 200/内置模板 403
+- **S04.2 Dashboard UI**: `/dashboard/templates` 已存在（之前 sprint 已交付）
+- **S04.3 导入/导出**: GET /export + POST /import 已实现
+- **单元测试**: `route.test.ts` (16 tests) + `[id]/route.test.ts` (15 tests) — 31/31 通过
+- **E2E 测试**: `templates-crud.spec.ts` — 10 scenarios
+- 方案: `docs/vibex-proposals-sprint28/IMPLEMENTATION_PLAN.md`
+- 验证: `tsc --noEmit` ✅ backend 0 errors, frontend 0 errors
+- 提交: ff866e9af
+
 ### [Unreleased] vibex-proposals-sprint29 E02: 项目分享通知系统 — 2026-05-07
 - **NotificationService**: `vibex-backend/src/lib/notification/NotificationService.ts` — Slack DM + 站内通知降级，支持 in-app fallback
 - **POST /api/projects/:id/share/notify**: `vibex-backend/src/app/api/projects/[id]/share/notify/route.ts` — 分享项目触发通知端点

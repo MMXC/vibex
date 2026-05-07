@@ -61,6 +61,19 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.347',
     date: '2026-05-07',
     changes: [
+      '🚀 S28-E04: 模板 API 完整 CRUD',
+      '✅ templateStore — 共享内存存储（解决 Next.js route 独立 module scope 问题）',
+      '✅ POST/PUT/DELETE /api/v1/templates — 完整 CRUD（内置模板 403 保护）',
+      '✅ 导入/导出 — GET /export + POST /import',
+      '✅ 单元测试 31/31 + E2E 10 scenarios',
+      '提交: ff866e9af',
+    ],
+    commit: 'ff866e9af',
+  },
+  {
+    version: '1.0.347',
+    date: '2026-05-07',
+    changes: [
       '🚀 S29-E02: 项目分享通知系统',
       '✅ NotificationService — Slack DM + 站内通知降级 (in-app fallback)',
       '✅ POST /api/projects/:id/share/notify — 分享项目触发通知端点',

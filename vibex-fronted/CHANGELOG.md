@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased] S29-E06: Analytics 趋势分析 — 2026-05-07
+
+### S29-E06: Analytics 趋势分析
+
+- **TrendChart.tsx**: `src/components/analytics/TrendChart.tsx` — 纯 SVG 实现（无 Recharts/Chart.js）
+- **Aggregator**: `vibex-backend/src/lib/analytics/Aggregator.ts` — 历史数据聚合 + 趋势计算
+- **GET /api/analytics/funnel**: 后端 + 前端 API，7d/30d/90d 切换
+- **useTrendData**: `src/hooks/queries/useTrendData.ts` — TanStack Query 封装
+- **E2E 测试**: `tests/e2e/analytics-trend.spec.ts` — 趋势分析 E2E 测试（180 行）
+- 提交: `059d462c7` (feat)
+
+---
+
 ## [Unreleased] S29-E05: Canvas 离线模式 — 2026-05-07
 
 ### S29-E05: Canvas 离线模式

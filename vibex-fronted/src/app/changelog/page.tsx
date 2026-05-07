@@ -83,6 +83,19 @@ const mockChangelog: ChangelogEntry[] = [
   },
   {
     version: '1.0.347',
+    date: '2026-05-07',
+    changes: [
+      '🚀 S29-E04: RBAC 细粒度权限矩阵',
+      '✅ types.ts — ProjectPermission (view/edit/delete/manageMembers) + TeamRole',
+      '✅ RBACService.ts — canPerform(role, action) 权限检查',
+      '✅ PUT /api/projects/:id/role — 更新成员角色',
+      '✅ Dashboard 集成 — delete 按钮 disabled+tooltip 对 viewer/member',
+      '提交: 6517f9c04',
+    ],
+    commit: '6517f9c04',
+  },
+  {
+    version: '1.0.347',
     date: '2026-05-05',
     changes: [
       '🐛 RBAC Security Fix: 移除 Project Member 的 canEdit/canShare 权限',

@@ -54,6 +54,14 @@
 - 方案: `docs/vibex-proposals-sprint29/IMPLEMENTATION_PLAN.md`
 - 提交: 1f3b82300
 
+### [Unreleased] vibex-proposals-sprint29 E04: RBAC 细粒度权限矩阵 — 2026-05-07
+- **types.ts**: `vibex-fronted/src/lib/rbac/types.ts` — `ProjectPermission: view|edit|delete|manageMembers`，`TeamRole: owner|admin|member|viewer`
+- **RBACService**: `vibex-fronted/src/lib/rbac/RBACService.ts` — `canPerform(role, action)` 权限检查函数
+- **PUT /api/projects/:id/role**: `vibex-backend/src/app/api/projects/[id]/role/route.ts` — 更新成员角色端点
+- **Dashboard 集成**: `vibex-fronted/src/app/dashboard/page.tsx` — 删除按钮 `disabled + tooltip` 对 viewer/member 隐藏
+- 方案: `docs/vibex-proposals-sprint29/IMPLEMENTATION_PLAN.md`
+- 提交: 6517f9c04
+
 ### [Unreleased] vibex-proposals-sprint26 E4: 移动端渐进适配 — 2026-05-06
 - **S4.5 viewport meta**: `vibex-fronted/src/app/layout.tsx` — `viewport: { width: device-width, initialScale: 1, maximumScale: 1, userScalable: false }`
 - **S4.1 响应式 CSS**: `canvas.module.css` — mobile (<768px) / tablet (768-1024px) 断点，隐藏侧边栏/统计栏

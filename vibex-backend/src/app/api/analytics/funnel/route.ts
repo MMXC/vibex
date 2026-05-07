@@ -8,6 +8,7 @@
  *   projectId=xxx (optional, for multi-project)
  */
 import { NextRequest, NextResponse } from 'next/server';
+import { safeError } from '@/lib/log-sanitizer';
 import { aggregateHistoricalData } from '@/lib/analytics/Aggregator';
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
@@ -33,7 +34,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       },
     });
   } catch (err) {
-    console.error('[analytics/funnel] Error:', err);
+    safeError('[analytics/funnel] Error:', err);
     return NextResponse.json(
       { error: 'INTERNAL_ERROR', message: 'Analytics 数据获取失败' },
       { status: 500 }

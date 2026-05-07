@@ -26,7 +26,7 @@
 | E04: RBAC 权限矩阵 | E04-Q1 ~ E04-Q4 | 4/4 ✅ | — |
 | E05: 离线模式 | E05-Q1 ~ E05-Q4 | 4/4 ✅ | — |
 | E06: Analytics 趋势分析 | E06-Q1 ~ E06-Q4 | 4/4 ✅ | — |
-| E07: Specs 补全 | E07-Q1 | 0/1 | E07-Q1 |
+| E07: Specs 补全 | E07-Q1 | 1/1 ✅ | — |
 
 ---
 
@@ -248,7 +248,7 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E07-Q1 | E03-E07-detailed.md + 3个独立 spec | ⬜ | — | test -f 全部通过 |
+| E07-Q1 | E03-E07-detailed.md + 3个独立 spec | ✅ | — | 4个文件全部存在
 
 ### E07-Q1 详细说明
 

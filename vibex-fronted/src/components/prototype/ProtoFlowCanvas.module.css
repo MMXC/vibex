@@ -78,3 +78,130 @@
   color: rgba(255, 255, 255, 0.5);
   white-space: nowrap;
 }
+
+/* ---- ProtoPreview Panel (E01) ---- */
+
+.protoPreview {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  width: 260px;
+  background: rgba(20, 20, 35, 0.95);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+}
+
+/* E01-U4: Unselected placeholder */
+.protoPreview[data-testid="proto-preview-placeholder"] {
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.placeholderContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.5;
+}
+
+.placeholderContent svg {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.placeholderContent p {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* E01-U1/U2: Preview header */
+.protoPreviewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(99, 102, 241, 0.1);
+  border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.protoPreviewLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: #818cf8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.protoPreviewId {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: monospace;
+}
+
+/* E01-U2: Preview body */
+.protoPreviewBody {
+  padding: 10px;
+}
+
+/* E01-U2: Props list */
+.propsList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.propRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  padding: 2px 0;
+}
+
+.propKey {
+  color: rgba(255, 255, 255, 0.5);
+  font-family: monospace;
+}
+
+.propValue {
+  color: rgba(255, 255, 255, 0.8);
+  font-family: monospace;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* E01-U2: Component type label */
+.componentType {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 4px;
+}
+
+/* E01-U2: Dimensions */
+.dimensions {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: monospace;
+}
+
+/* E01-U2: Preview content */
+.protoPreviewContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}

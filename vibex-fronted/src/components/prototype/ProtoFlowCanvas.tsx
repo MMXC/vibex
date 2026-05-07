@@ -8,6 +8,13 @@
  * - Node position persistence (onNodeDragStop)
  *
  * Epic1: E1-U2
+ *
+ * E01 ProtoPreview Realtime (2026-05-08):
+ * - ProtoPreviewPanel overlay: shows selected node preview
+ * - useShallow subscription to selectedNodeId
+ * - 200ms debounced props update (debounce.ts)
+ * - data-rebuild="false" on successful hot-update
+ * - Unselected state shows placeholder
  */
 
 'use client';
@@ -34,6 +41,7 @@ import '@xyflow/react/dist/style.css';
 import { usePrototypeStore } from '@/stores/prototypeStore';
 import { ProtoNode } from './ProtoNode';
 import type { UIComponent } from '@/lib/prototypes/ui-schema';
+import { ProtoPreviewPanel } from './ProtoPreviewPanel';
 import styles from './ProtoFlowCanvas.module.css';
 
 // ==================== Node Types ====================
@@ -181,6 +189,9 @@ function ProtoFlowCanvasInner({ className = '' }: ProtoFlowCanvasProps) {
 
   return (
     <div className={`${styles.canvasWrap} ${className}`} style={containerStyle}>
+      {/* E01: ProtoPreview overlay panel */}
+      <ProtoPreviewPanel />
+
       <ReactFlow
         nodes={nodes}
         edges={edges}

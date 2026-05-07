@@ -61,6 +61,18 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.347',
     date: '2026-05-07',
     changes: [
+      '🚀 S27-P001: 实时协作 — Firebase RTDB 节点同步',
+      '✅ useRealtimeSync — Firebase RTDB 实时同步 + Last-Write-Wins 冲突处理',
+      '✅ CanvasPage 集成 — useRealtimeSync({ projectId, userId })，Firebase 未配置时静默降级',
+      '✅ 500ms debounce 写入防写风暴，subscribeToNodes SSE 订阅',
+      '提交: 3ec5ec8db',
+    ],
+    commit: '3ec5ec8db',
+  },
+  {
+    version: '1.0.347',
+    date: '2026-05-07',
+    changes: [
       '🚀 S27-P004: 模板 API 完整 CRUD + Dashboard UI',
       '✅ GET/POST/PUT/DELETE /api/v1/templates — 完整 CRUD，DELETE 后 GET → 404',
       '✅ /dashboard/templates — 模板列表/创建/编辑/删除（706行）',

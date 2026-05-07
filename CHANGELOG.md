@@ -39,6 +39,16 @@
 - 验证: `tsc --noEmit` 退出 0
 - 提交: 7a54204f2
 
+### [Unreleased] vibex-proposals-sprint28 E02: Design Output 性能优化 — 2026-05-07
+- **S02.1 react-window 迁移**: `ChapterPanel.tsx` — @tanstack/react-virtual → react-window List 虚拟化，rowHeight=120 固定常量，CardItemRow rowComponent
+- **S02.1 ResizeObserver**: `ChapterPanel.tsx` — 容器高度动态测量，List 自适应
+- **S02.1 scrollToRow**: `ChapterPanel.tsx` — listRef.scrollToRow(selectedIndex) 滚动定位
+- **S02.2 React.memo**: `ChapterPanel.tsx` — CardItem 用 React.memo 包裹，selectedIndex 用 useMemo
+- 依赖: react-window ^2.2.7 + @types/react-window
+- 方案: `docs/vibex-proposals-sprint28/IMPLEMENTATION_PLAN.md`
+- 验证: `pnpm tsc --noEmit` ✅ TS 0 errors
+- 提交: 112ccf3a7
+
 ### [Unreleased] vibex-proposals-sprint29 E02: 项目分享通知系统 — 2026-05-07
 - **NotificationService**: `vibex-backend/src/lib/notification/NotificationService.ts` — Slack DM + 站内通知降级，支持 in-app fallback
 - **POST /api/projects/:id/share/notify**: `vibex-backend/src/app/api/projects/[id]/share/notify/route.ts` — 分享项目触发通知端点

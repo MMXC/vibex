@@ -22,7 +22,7 @@
 | Epic | Units | Status | Next |
 |------|-------|--------|------|
 | E01: ProtoPreview 实时联动 | E01-U1 ~ E01-U4 | 3/4 ✅ | E01-U3（Unit tests 待执行）|
-| E02: 项目导入/导出 | E02-U1 ~ E02-U4 | 0/4 | E02-U1 |
+| E02: 项目导入/导出 | E02-U1 ~ E02-U4 | 4/4 ✅ | — |
 | E03: E2E 测试补全 | E03-U1 ~ E03-U2 | 0/2 | E03-U1 |
 | E04: Spec 补全 | E04-U1 ~ E04-U2 | 0/2 | E04-U1 |
 | E05: Presence 层增强 | E05-U1 ~ E05-U2 | 0/2 | E05-U1 |
@@ -128,10 +128,10 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E02-U1 | 导出 API GET /api/projects/:id/export | ⬜ | — | 聚合三个 store → v1.0 JSON → 200 |
-| E02-U2 | 导入 API POST /api/projects/import | ⬜ | — | Zod 校验 → 写入 DB → 201 + 新项目 |
-| E02-U3 | Zod schema 校验 + error codes | ⬜ | E02-U1, E02-U2 | INVALID_JSON/INVALID_VERSION/INVALID_TREE_STRUCTURE |
-| E02-U4 | Dashboard 集成（导出按钮 + 导入 Modal）| ⬜ | E02-U1, E02-U2 | 导出按钮下载 .vibex；导入 Modal 拖拽上传 |
+| E02-U1 | 导出 API GET /api/projects/:id/export | ✅ | — | GET /api/projects/:id/export → v1.0 JSON，聚合 uiNodes/FlowData/Pages/Requirements |
+| E02-U2 | 导入 API POST /api/projects/import | ✅ | — | POST /api/projects/import → Zod 校验 → Prisma → 201 + 新项目 |
+| E02-U3 | Zod schema 校验 + error codes | ✅ | E02-U1, E02-U2 | VibexExportSchema + validateExportJson() + 7个 error codes |
+| E02-U4 | Dashboard 集成（导出按钮 + 导入 Modal）| ⬜ | E02-U1, E02-U2 | 待 E02-U4 开发阶段（Day 7）|
 
 ### E02-U1 详细说明
 

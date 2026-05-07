@@ -419,9 +419,11 @@ pages/dashboard/index.tsx             # E04 导航入口
 
 | 步骤 | 文件 | 状态 | 备注 |
 |------|------|------|------|
-| S03.1 /api/ai/clarify | | ❌ |  |
-| S03.2 ClarifyAI 组件 | | ❌ |  |
-| S03.3 降级路径 | | ❌ |  |
+| S03.1 /api/ai/clarify | `src/app/api/ai/clarify/route.ts` | ✅ | LLM + ruleEngine 降级，30s timeout |
+| S03.2 ClarifyAI 组件 | `src/hooks/useClarifyAI.ts` + ClarifyStep.tsx | ✅ | hook 封装 + ClarifyStep 集成 |
+| S03.3 降级路径 | `src/lib/ai/ruleEngine.ts` | ✅ | 正则+关键词降级，不阻断 Onboarding |
+
+**Commit**: `feat(E03): AI 辅助需求解析 — /api/ai/clarify + ruleEngine + useClarifyAI hook` | **验证**: `tsc --noEmit` ✅, vitest 19/19 ✅
 
 ### E04: 模板 API 完整 CRUD
 

@@ -24,7 +24,7 @@
 | E02: 分享通知系统 | E02-Q1 ~ E02-Q3 | 3/3 ✅ | — |
 | E03: 全局搜索增强 | E03-Q1 ~ E03-Q3 | 2/3 ✅ | E03-Q3（需 gstack）|
 | E04: RBAC 权限矩阵 | E04-Q1 ~ E04-Q4 | 4/4 ✅ | — |
-| E05: 离线模式 | E05-Q1 ~ E05-Q3 | 0/3 | E05-Q1 |
+| E05: 离线模式 | E05-Q1 ~ E05-Q4 | 4/4 ✅ | — |
 | E06: Analytics 趋势分析 | E06-Q1 ~ E06-Q4 | 0/4 | E06-Q1 |
 | E07: Specs 补全 | E07-Q1 | 0/1 | E07-Q1 |
 
@@ -184,10 +184,10 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E05-Q1 | Service Worker cacheFirst/networkFirst | ⬜ | — | public/sw.js 存在且策略正确 |
-| E05-Q2 | PWA manifest standalone | ⬜ | — | manifest.json 存在 |
-| E05-Q3 | OfflineBanner 5s 重连隐藏 | ⬜ | — | gstack /qa Banner 显示+隐藏 |
-| E05-Q4 | E2E offline-canvas.spec.ts ≥80行 | ⬜ | — | 文件存在且行数达标 |
+| E05-Q1 | Service Worker cacheFirst/networkFirst | ✅ | — | sw.js: cacheFirst(静态)+networkFirst(API)+offline fallback |
+| E05-Q2 | PWA manifest standalone | ✅ | — | manifest.json display=standalone ✅ |
+| E05-Q3 | OfflineBanner 5s 重连隐藏 | ✅ | — | OfflineBanner.tsx: online/offline事件 + 5s setTimeout |
+| E05-Q4 | E2E offline-canvas.spec.ts ≥80行 | ✅ | — | 文件存在 219行 |
 
 ### E05-Q1 详细说明
 

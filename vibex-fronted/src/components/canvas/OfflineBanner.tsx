@@ -38,7 +38,7 @@ export function OfflineBanner() {
   if (hidden || !isOffline) return null;
 
   return (
-    <div className={styles.banner} role="alert" aria-live="polite">
+    <div className={styles.banner} data-testid="offline-banner" role="alert" aria-live="polite">
       <span className={styles.icon}>📡</span>
       <span className={styles.text}>离线模式，部分功能可能不可用</span>
     </div>

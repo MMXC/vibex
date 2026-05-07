@@ -42,6 +42,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { usePrototypeStore } from '@/stores/prototypeStore';
 import { EdgeCreationModal } from '@/components/prototype/EdgeCreationModal';
 import { usePresence } from '@/lib/firebase/presence';
+import { useRealtimeSync } from '@/hooks/useRealtimeSync';
 import PresenceLayer from './PresenceLayer';
 
 import { hasNodes } from '@/lib/canvas/cascade';
@@ -242,6 +243,10 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
 
   // E1-S1: 实时协作感知 — Presence
   const { others: presenceOthers } = usePresence(projectId || null, userId, userName);
+
+  // P001-S1.3: 实时节点同步 — Firebase RTDB (S-P1.3)
+  // 沙箱模式（Firebase 未配置时）自动降级，不阻断 Onboarding
+  useRealtimeSync({ projectId, userId });
 
   // === E3: Auto-Save Hook ===
   const { saveStatus, lastSavedAt, saveNow, conflictData, clearConflict } = useAutoSave({

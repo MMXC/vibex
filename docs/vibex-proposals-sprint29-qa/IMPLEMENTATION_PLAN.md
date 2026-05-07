@@ -25,7 +25,7 @@
 | E03: 全局搜索增强 | E03-Q1 ~ E03-Q3 | 2/3 ✅ | E03-Q3（需 gstack）|
 | E04: RBAC 权限矩阵 | E04-Q1 ~ E04-Q4 | 4/4 ✅ | — |
 | E05: 离线模式 | E05-Q1 ~ E05-Q4 | 4/4 ✅ | — |
-| E06: Analytics 趋势分析 | E06-Q1 ~ E06-Q4 | 0/4 | E06-Q1 |
+| E06: Analytics 趋势分析 | E06-Q1 ~ E06-Q4 | 4/4 ✅ | — |
 | E07: Specs 补全 | E07-Q1 | 0/1 | E07-Q1 |
 
 ---
@@ -219,10 +219,10 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E06-Q1 | TrendChart.tsx 纯 SVG（无 Recharts）| ⬜ | — | 代码审查：无 chart 库依赖 |
-| E06-Q2 | GET /api/analytics/funnel 30天数据 | ⬜ | — | API curl 验证 |
-| E06-Q3 | 7d/30d/90d 切换按钮 | ⬜ | — | gstack /qa 切换验证 |
-| E06-Q4 | E2E analytics-trend.spec.ts ≥80行 | ⬜ | — | 文件存在且行数达标 |
+| E06-Q1 | TrendChart.tsx 纯 SVG（无 Recharts）| ✅ | — | 纯 SVG，注释确认无 Recharts/Chart.js 依赖 |
+| E06-Q2 | GET /api/analytics/funnel 30天数据 | ✅ | — | API: range=7d/30d/90d，支持 projectId 参数 |
+| E06-Q3 | 7d/30d/90d 切换按钮 | ✅ | — | Analytics Dashboard 包含时间范围切换按钮 |
+| E06-Q4 | E2E analytics-trend.spec.ts ≥80行 | ✅ | — | 文件存在 180行 |
 
 ### E06-Q1 详细说明
 

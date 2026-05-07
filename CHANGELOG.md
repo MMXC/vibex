@@ -1,3 +1,10 @@
+### [Unreleased] vibex-proposals-sprint30 E04: Spec 补全 — 2026-05-08
+- **E04-template-crud.md**: `docs/vibex-proposals-sprint28/specs/E04-template-crud.md` — Template CRUD API fields + error codes（111 行）
+- **E01-notification.md**: `docs/vibex-proposals-sprint29/specs/E01-notification.md` — Slack DM + 站内降级 + ShareBadge（167 行）
+- 提交: `766e984f8`
+
+---
+
 ### [Unreleased] vibex-proposals-sprint30 E03: E2E 测试补全 — 2026-05-08
 - **share-notification.spec.ts**: `vibex-fronted/tests/e2e/share-notification.spec.ts` — TC-S06/S07 ShareBadge E2E 测试（229 行）
 - 提交: `fc15517a7`

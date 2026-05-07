@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased] S30-E04: Spec 补全 — 2026-05-08
+
+### S30-E04: Spec 补全
+
+- **E04-template-crud.md**: `docs/vibex-proposals-sprint28/specs/E04-template-crud.md` — Template CRUD API fields + error codes（111 行）
+- **E01-notification.md**: `docs/vibex-proposals-sprint29/specs/E01-notification.md` — Slack DM + 站内降级 + ShareBadge（167 行）
+- 提交: `766e984f8` (feat)
+
+---
+
 ## [Unreleased] S30-E03: E2E 测试补全 — 2026-05-08
 
 ### S30-E03: E2E 测试补全

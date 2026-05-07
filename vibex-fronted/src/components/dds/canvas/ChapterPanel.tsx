@@ -15,9 +15,9 @@
 
 'use client';
 
-import React, { memo, useState, useCallback, useRef, useEffect } from 'react';
+import React, { memo, useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { List } from 'react-window';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
-import { useVirtualizer } from '@tanstack/react-virtual';
 import { CardRenderer } from '@/components/dds/cards';
 import { useConfirmDialogStore } from '@/lib/canvas/stores/confirmDialogStore';
 import type { ChapterType, DDSCard, CardType, UserStoryCard, BoundedContextCard, FlowStepCard, APIEndpointCard } from '@/types/dds';
@@ -325,7 +325,8 @@ function CreateFlowStepForm({
 
 // ==================== Card Item ====================
 
-function CardItem({
+// E02: All child components wrapped with React.memo (AGENTS.md §9.2 constraint)
+const CardItem = memo(function CardItem({
   card,
   selected,
   onSelect,
@@ -358,6 +359,41 @@ function CardItem({
           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
         </svg>
       </button>
+    </div>
+  );
+});
+
+// E02 S02.1: react-window rowComponent — index + style injected by List, rowProps are custom
+interface CardItemRowProps {
+  cards: DDSCard[];
+  selectedCardIds: string[];
+  selectedCardSnapshot: { cardId: string; cardData: DDSCard; wasVisible: boolean } | null;
+  onSelectCard: (cardId: string) => void;
+  onDeleteCard: (cardId: string) => void;
+}
+
+function CardItemRow({
+  index,
+  style,
+  cards,
+  selectedCardIds,
+  selectedCardSnapshot,
+  onSelectCard,
+  onDeleteCard,
+}: CardItemRowProps & { index: number; style: React.CSSProperties }) {
+  const card = cards[index];
+  if (!card) return null;
+  const isSelectedById = selectedCardIds.includes(card.id);
+  const isSelectedBySnapshot =
+    selectedCardSnapshot?.cardId === card.id && !selectedCardSnapshot.wasVisible;
+  return (
+    <div style={style}>
+      <CardItem
+        card={card}
+        selected={isSelectedById || isSelectedBySnapshot}
+        onSelect={() => onSelectCard(card.id)}
+        onDelete={() => onDeleteCard(card.id)}
+      />
     </div>
   );
 }
@@ -540,26 +576,24 @@ export const ChapterPanel = memo(function ChapterPanel({
 
   const availableCardTypes = CHAPTER_CARD_TYPES[chapter];
 
-  // P004-T4: Virtualization hooks
-  const parentRef = useRef<HTMLDivElement>(null);
-  const virtualizer = useVirtualizer({
-    count: cards.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 120,
-    overscan: 3,
-  });
+  // E02 S02.1: react-window List virtualization
+  // rowHeight is FIXED CONSTANT (120) per AGENTS.md §9.2 — never dynamically computed
+  const CARD_ITEM_HEIGHT = 120 as const;
 
-  // P004-T5: Track selected card visibility across scroll boundaries
+  // E02 S02.2: Memo optimization — useMemo for selected snapshot check
   const selectedCardSnapshot = useDDSCanvasStore((s) => s.selectedCardSnapshot);
+  const selectedIndex = useMemo(
+    () => cards.findIndex((c) => c.id === selectedCardSnapshot?.cardId),
+    [cards, selectedCardSnapshot]
+  );
+
+  // Scroll-to-item when selected card changes (LWW visibility tracking)
+  const listRef = useRef<{ readonly element: HTMLDivElement | null; scrollToRow: (config: { index: number; align?: 'auto' | 'smart' | 'center' | 'end' | 'start'; behavior?: 'auto' | 'instant' | 'smooth' }) => void } | null>(null);
   useEffect(() => {
-    if (!selectedCardSnapshot) return;
-    const vItems = virtualizer.getVirtualItems();
-    const idx = cards.findIndex((c) => c.id === selectedCardSnapshot.cardId);
-    const inView = idx >= 0 && vItems.some((v) => v.index === idx);
-    if (selectedCardSnapshot.wasVisible !== inView) {
-      useDDSCanvasStore.getState().updateCardVisibility(inView);
+    if (selectedIndex >= 0 && listRef.current) {
+      listRef.current.scrollToRow({ index: selectedIndex, align: 'auto' });
     }
-  });
+  }, [selectedIndex]);
 
   return (
     <div className={`${styles.chapterPanel} ${className}`} data-chapter={chapter}>
@@ -618,43 +652,21 @@ export const ChapterPanel = memo(function ChapterPanel({
             </div>
           )
         ) : (
-          /* Virtualized card list */
-          <div
-            ref={parentRef}
-            style={{ overflow: 'auto', height: '100%', position: 'relative' }}
-          >
-            <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
-              {virtualizer.getVirtualItems().map((vItem) => {
-                const card = cards[vItem.index];
-                if (!card) return null;
-                const isSelectedById = selectedCardIds.includes(card.id);
-                const isSelectedBySnapshot =
-                  selectedCardSnapshot?.cardId === card.id &&
-                  !selectedCardSnapshot.wasVisible;
-                return (
-                  <div
-                    key={card.id}
-                    data-index={vItem.index}
-                    ref={virtualizer.measureElement}
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
-                      transform: `translateY(${vItem.start}px)`,
-                    }}
-                  >
-                    <CardItem
-                      card={card}
-                      selected={isSelectedById || isSelectedBySnapshot}
-                      onSelect={() => handleSelectCard(card.id)}
-                      onDelete={() => handleDeleteCard(card.id)}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          /* E02 S02.1: react-window List virtualization (rowHeight=120 fixed constant) */
+          <List<CardItemRowProps>
+            listRef={listRef}
+            rowCount={cards.length}
+            rowHeight={CARD_ITEM_HEIGHT}
+            style={{ flex: 1, minHeight: 0, overflow: 'auto' }}
+            rowComponent={CardItemRow}
+            rowProps={{
+              cards,
+              selectedCardIds,
+              selectedCardSnapshot,
+              onSelectCard: handleSelectCard,
+              onDeleteCard: handleDeleteCard,
+            }}
+          />
         )}
 
         {/* Create Form */}

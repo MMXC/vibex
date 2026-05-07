@@ -25,7 +25,7 @@
 | E02: 项目导入/导出 | E02-U1 ~ E02-U4 | 4/4 ✅ | — |
 | E03: E2E 测试补全 | E03-U1 ~ E03-U2 | 2/2 ✅ | — |
 | E04: Spec 补全 | E04-U1 ~ E04-U2 | 2/2 ✅ | — |
-| E05: Presence 层增强 | E05-U1 ~ E05-U2 | 0/2 | E05-U1 |
+| E05: Presence 层增强 | E05-U1 ~ E05-U2 | 2/2 ✅ | — |
 
 ---
 
@@ -215,8 +215,8 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E05-U1 | Firebase RTDB 状态验证（S10 子任务）| ⬜ | — | 确认 useRealtimeSync.ts 就绪或为 mock |
-| E05-U2 | Presence UI 增强（方案A 或方案B）| ⬜ | E05-U1 | RTDB 就绪 → 方案A；未就绪 → 方案B（仅 UI mock）|
+| E05-U1 | Firebase RTDB 状态验证（S10 子任务）| ✅ | — | useRealtimeSync.ts ✅ isFirebaseConfigured() ✅ mockSubscribers ✅ |
+| E05-U2 | Presence UI 增强（方案A 或方案B）| ✅ | E05-U1 | 方案B（Zustand mock fallback + usePresence hook），静默降级不阻断 |
 
 ### E05-U1 详细说明
 

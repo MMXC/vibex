@@ -40,7 +40,8 @@ test.describe('E2: Firebase Presence E2E', () => {
     await page.waitForTimeout(500);
 
     // Mock 降级时应有 console.warn
-    const hasMockWarning = consoleWarnings.some(w => w.includes('[Presence] Firebase not configured'));
+    // useRealtimeSync uses firebaseRTDB.ts → logs '[RTDB] Firebase not configured'
+    const hasMockWarning = consoleWarnings.some(w => w.includes('[RTDB] Firebase not configured'));
     expect(hasMockWarning).toBe(true);
   });
 

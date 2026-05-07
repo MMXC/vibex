@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased] S30-E01: ProtoPreview 实时联动 — 2026-05-08
+
+### S30-E01: ProtoPreview 实时联动
+
+- **ProtoPreviewPanel**: `src/components/prototype/ProtoPreviewPanel.tsx` — `useShallow` 订阅 `selectedNodeId`，200ms 防抖
+- **ProtoPreviewContent**: `src/components/prototype/ProtoPreviewContent.tsx` — `data-rebuild="false"` 热更新
+- **debounce.ts**: `src/utils/debounce.ts` — 通用防抖工具函数
+- **E01-U4 placeholder**: `data-testid="proto-preview-placeholder"` 未选中状态
+- **ProtoFlowCanvas**: `src/components/prototype/ProtoFlowCanvas.tsx` — CSS 样式更新
+- 提交: `c8a8f345e` (feat)
+
+---
+
 ## [Unreleased] S29-E04: RBAC 细粒度权限矩阵 — 2026-05-07
 
 ### S29-E04: RBAC 细粒度权限矩阵

@@ -1,3 +1,12 @@
+### [Unreleased] vibex-proposals-sprint30 E01: ProtoPreview 实时联动 — 2026-05-08
+- **ProtoPreviewPanel**: `vibex-fronted/src/components/prototype/ProtoPreviewPanel.tsx` — `useShallow` 订阅 `selectedNodeId`，200ms 防抖
+- **ProtoPreviewContent**: `vibex-fronted/src/components/prototype/ProtoPreviewContent.tsx` — `data-rebuild="false"` 热更新
+- **debounce.ts**: `vibex-fronted/src/utils/debounce.ts` — 通用防抖工具函数
+- **placeholder**: `data-testid="proto-preview-placeholder"` 未选中状态
+- 提交: `c8a8f345e`
+
+---
+
 ### [Unreleased] vibex-proposals-sprint27 P001: 实时协作 — Firebase RTDB 节点同步 — 2026-05-07
 - **S-P1.3 useRealtimeSync 集成**: `CanvasPage.tsx` — 集成 useRealtimeSync hook，Firebase RTDB 未配置时自动降级
 - **S-P1.4 Last-Write-Wins**: `useRealtimeSync.ts` — subscribeToNodes SSE 订阅 + writeNodes 节流写入（500ms debounce），updatedAt 时间戳比较

@@ -111,6 +111,18 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.347',
     date: '2026-05-07',
     changes: [
+      '🚀 S29-E06: Analytics 趋势分析',
+      '✅ TrendChart.tsx — 纯 SVG 实现（无 Recharts/Chart.js）',
+      '✅ GET /api/analytics/funnel — 30天聚合数据',
+      '✅ CSV 导出 — UTF-8 with BOM，Excel 兼容',
+      '提交: 424edc52d',
+    ],
+    commit: '424edc52d',
+  },
+  {
+    version: '1.0.347',
+    date: '2026-05-07',
+    changes: [
       '🚀 S29-E07: Sprint 28 Specs 补全',
       '✅ E03-ai-clarify.md — AI 辅助解析 API schema + 降级路径（89行）',
       '✅ E04-template-crud.md — 模板 CRUD schema + JSON 导入导出（135行）',

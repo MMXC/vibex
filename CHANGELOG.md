@@ -71,6 +71,14 @@
 - 方案: `docs/vibex-proposals-sprint29/IMPLEMENTATION_PLAN.md`
 - 提交: 7a9869850
 
+### [Unreleased] vibex-proposals-sprint29 E06: Analytics 趋势分析 — 2026-05-07
+- **TrendChart.tsx**: `vibex-fronted/src/components/analytics/TrendChart.tsx` — 纯 SVG 实现，无 Recharts/Chart.js
+- **GET /api/analytics/funnel**: `vibex-backend/src/app/api/analytics/funnel/route.ts` — 30 天聚合数据
+- **CSV 导出**: UTF-8 with BOM 编码，Excel 兼容
+- 7d/30d/90d 切换；数据 < 3 条显示空状态
+- 方案: `docs/vibex-proposals-sprint29/IMPLEMENTATION_PLAN.md`
+- 提交: 424edc52d
+
 ### [Unreleased] vibex-proposals-sprint29 E07: Sprint 28 Specs 补全 — 2026-05-07
 - **E03-ai-clarify.md**: `docs/vibex-proposals-sprint29/specs/E03-ai-clarify.md` — AI 辅助解析 API schema + 降级路径逻辑表（89 行）
 - **E04-template-crud.md**: `docs/vibex-proposals-sprint29/specs/E04-template-crud.md` — 模板 API 完整 CRUD schema + Dashboard UI + JSON 导入导出（135 行）

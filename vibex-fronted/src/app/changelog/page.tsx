@@ -36,6 +36,18 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.347',
     date: '2026-05-07',
     changes: [
+      '🚀 S28-E02: Design Output 性能优化',
+      '✅ react-window List 虚拟化 — ChapterPanel.tsx，rowHeight=120 固定常量',
+      '✅ CardItem React.memo 包裹 + selectedIndex useMemo 优化',
+      '✅ listRef.scrollToRow 滚动定位，ResizeObserver 容器高度自适应',
+      '提交: 6be17473d',
+    ],
+    commit: '6be17473d',
+  },
+  {
+    version: '1.0.347',
+    date: '2026-05-07',
+    changes: [
       '🚀 S29-E02: 项目分享通知系统',
       '✅ NotificationService — Slack DM + 站内通知降级 (in-app fallback)',
       '✅ POST /api/projects/:id/share/notify — 分享项目触发通知端点',

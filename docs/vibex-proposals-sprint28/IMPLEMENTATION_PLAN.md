@@ -456,8 +456,10 @@ pages/dashboard/index.tsx             # E04 导航入口
 
 | 步骤 | 文件 | 状态 | 备注 |
 |------|------|------|------|
-| S07.1 健康检查 | | ❌ |  |
-| S07.2 集成测试 | | ❌ |  |
+| S07.1 健康检查 | `src/app/api/mcp/health/route.ts` + `route.test.ts` | ✅ | GET /api/mcp/health → 200 + status/timestamp/service，8 unit tests |
+| S07.2 集成测试 | `tests/e2e/mcp-integration.spec.ts` | ✅ | 6 E2E scenarios |
+
+**Commit**: `feat(E07): MCP Server — health endpoint + integration tests` | **验证**: `tsc --noEmit` ✅, vitest 8/8 ✅
 
 ---
 

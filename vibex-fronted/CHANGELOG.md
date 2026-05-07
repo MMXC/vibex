@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased] S30-E02: 项目导入/导出 — 2026-05-08
+
+### S30-E02: 项目导入/导出
+
+- **GET /api/projects/:id/export**: `vibex-backend/src/app/api/projects/[id]/export/route.ts` — 导出 v1.0 JSON
+- **POST /api/projects/import**: `vibex-backend/src/app/api/projects/import/route.ts` — Zod 校验 + Prisma 写入
+- **VibexExportSchema**: `vibex-backend/src/lib/schemas/vibex.ts` — Zod schema + 7 个 error codes
+- **projectExporter**: `vibex-backend/src/lib/services/projectExporter.ts` — 导出服务
+- 提交: `bcbff268a` (feat)
+
+---
+
 ## [Unreleased] S29-E06: Analytics 趋势分析 — 2026-05-07
 
 ### S29-E06: Analytics 趋势分析

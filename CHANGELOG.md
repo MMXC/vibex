@@ -1,3 +1,11 @@
+### [Unreleased] vibex-proposals-sprint30 E02: 项目导入/导出 — 2026-05-08
+- **GET /api/projects/:id/export**: `vibex-backend/src/app/api/projects/[id]/export/route.ts` — 导出 v1.0 JSON
+- **POST /api/projects/import**: `vibex-backend/src/app/api/projects/import/route.ts` — Zod 校验 + Prisma 写入
+- **VibexExportSchema**: `vibex-backend/src/lib/schemas/vibex.ts` — Zod schema + 7 个 error codes
+- 提交: `bcbff268a`
+
+---
+
 ### [Unreleased] vibex-proposals-sprint30 E01: ProtoPreview 实时联动 — 2026-05-08
 - **ProtoPreviewPanel**: `vibex-fronted/src/components/prototype/ProtoPreviewPanel.tsx` — `useShallow` 订阅 `selectedNodeId`，200ms 防抖
 - **ProtoPreviewContent**: `vibex-fronted/src/components/prototype/ProtoPreviewContent.tsx` — `data-rebuild="false"` 热更新

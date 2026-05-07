@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased] S30-E05: Presence 层增强 — 2026-05-08
+
+### S30-E05: Presence 层增强
+
+- **useRealtimeSync**: `src/hooks/useRealtimeSync.ts` — Firebase RTDB 实时同步 hook，isFirebaseConfigured 检测 + mockSubscribers fallback
+- **usePresence hook**: Zustand mock fallback，Firebase 未配置时静默降级不阻断 Canvas
+- **presence.ts**: `src/lib/firebase/presence.ts` — 原生 fetch + EventSource 实现 RTDB 实时同步（无完整 Firebase SDK）
+- 提交: `fd4f5476a` (feat)
+
+---
+
 ## [Unreleased] S30-E04: Spec 补全 — 2026-05-08
 
 ### S30-E04: Spec 补全

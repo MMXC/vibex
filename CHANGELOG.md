@@ -1,3 +1,10 @@
+### [Unreleased] vibex-proposals-sprint30 E05: Presence 层增强 — 2026-05-08
+- **useRealtimeSync**: `vibex-fronted/src/hooks/useRealtimeSync.ts` — Firebase RTDB 实时同步 hook，isFirebaseConfigured 检测 + mockSubscribers fallback
+- **usePresence hook**: Zustand mock fallback，Firebase 未配置时静默降级不阻断 Canvas
+- 提交: `fd4f5476a`
+
+---
+
 ### [Unreleased] vibex-proposals-sprint30 E04: Spec 补全 — 2026-05-08
 - **E04-template-crud.md**: `docs/vibex-proposals-sprint28/specs/E04-template-crud.md` — Template CRUD API fields + error codes（111 行）
 - **E01-notification.md**: `docs/vibex-proposals-sprint29/specs/E01-notification.md` — Slack DM + 站内降级 + ShareBadge（167 行）

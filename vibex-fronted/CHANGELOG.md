@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased] S28-E05: PRD → Canvas 自动流程 — 2026-05-07
+
+### S28-E05: PRD → Canvas 自动流程
+
+- **S05.1: POST /api/v1/canvas/from-prd** — PRD JSON → Canvas 三栏节点映射（Chapter→左栏/Context, Step→中栏/Flow, Requirement→右栏/Design）
+- **S05.2: PRD Editor (/prd-editor)** — 可视化 PRD 编辑器 + 「生成 Canvas」按钮 + 映射结果预览
+- **Dashboard 导航** — 新增「PRD 编辑器」入口
+- **单元测试**: `route.test.ts` 21 tests, all pass
+- **E2E 测试**: `prd-canvas-mapping.spec.ts` 7 scenarios
+- 提交: `87ee3d0bf` (feat)
+
+---
+
 ## [Unreleased] S22-E2: E2E 稳定性监控 — 2026-05-02
 
 ### S22-E2: E2E 稳定性监控

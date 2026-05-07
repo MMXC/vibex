@@ -74,6 +74,19 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.347',
     date: '2026-05-07',
     changes: [
+      '🚀 S28-E05: PRD → Canvas 自动流程',
+      '✅ POST /api/v1/canvas/from-prd — PRD Chapter→左栏/Context, Step→中栏/Flow, Requirement→右栏/Design',
+      '✅ PRD Editor (/prd-editor) — 可视化编辑器 + 生成 Canvas 按钮 + 映射预览',
+      '✅ Dashboard 导航新增「PRD 编辑器」入口',
+      '✅ 单元测试 21/21 + E2E 7 scenarios',
+      '提交: 87ee3d0bf',
+    ],
+    commit: '87ee3d0bf',
+  },
+  {
+    version: '1.0.347',
+    date: '2026-05-07',
+    changes: [
       '🚀 S29-E02: 项目分享通知系统',
       '✅ NotificationService — Slack DM + 站内通知降级 (in-app fallback)',
       '✅ POST /api/projects/:id/share/notify — 分享项目触发通知端点',

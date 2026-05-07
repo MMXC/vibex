@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased] S29-E04: RBAC 细粒度权限矩阵 — 2026-05-07
+
+### S29-E04: RBAC 细粒度权限矩阵
+
+- **types.ts**: `src/lib/rbac/types.ts` — `ProjectPermission: view|edit|delete|manageMembers`，`TeamRole: owner|admin|member|viewer`
+- **RBACService**: `src/lib/rbac/RBACService.ts` — `canPerform(role, action)` 权限检查函数
+- **PUT /api/projects/:id/role**: `vibex-backend/src/app/api/projects/[id]/role/route.ts` — 角色更新 API
+- **E2E 测试**: `tests/e2e/rbac-permissions.spec.ts` — RBAC E2E 测试（204 行）
+- 提交: `3fe3aff65` (feat)
+
+---
+
 ## [Unreleased] S29-E03: Dashboard 全局搜索增强 — 2026-05-07
 
 ### S29-E03: Dashboard 全局搜索增强

@@ -407,11 +407,11 @@ pages/dashboard/index.tsx             # E04 导航入口
 
 | 步骤 | 文件 | 状态 | 备注 |
 |------|------|------|------|
-| S02.1 虚拟化列表 | `ProtoAttrPanel.tsx` | ✅ | @tanstack/react-virtual |
-| S02.2 Memo 优化 | `ProtoAttrPanel.tsx` | ✅ | useMemo + memo |
+| S02.1 虚拟化列表 | `ChapterPanel.tsx` | ✅ | react-window List，rowHeight=120 固定常量 |
+| S02.2 Memo 优化 | `ChapterPanel.tsx` | ✅ | CardItem React.memo，selectedIndex useMemo |
 | S02.3 加载进度指示器 | `ProtoEditor.tsx` | ✅ | >200 节点显示加载 |
 
-**Commit**: `baa57fa03` | **验证**: `tsc --noEmit` 退出 0
+**Commit**: `6be17473d` | **验证**: `pnpm tsc --noEmit` ✅ TS 0 errors
 
 ---
 

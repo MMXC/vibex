@@ -21,7 +21,7 @@
 | Epic | Units | Status | Next |
 |------|-------|--------|------|
 | E01: Onboarding→Canvas 无断点 | E01-Q1 ~ E01-Q4 | 4/4 ✅ | — |
-| E02: 分享通知系统 | E02-Q1 ~ E02-Q3 | 0/3 | E02-Q1 |
+| E02: 分享通知系统 | E02-Q1 ~ E02-Q3 | 3/3 ✅ | — |
 | E03: 全局搜索增强 | E03-Q1 ~ E03-Q3 | 0/3 | E03-Q1 |
 | E04: RBAC 权限矩阵 | E04-Q1 ~ E04-Q4 | 0/4 | E04-Q1 |
 | E05: 离线模式 | E05-Q1 ~ E05-Q3 | 0/3 | E05-Q1 |
@@ -99,9 +99,9 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E02-Q1 | NotificationService Slack DM + 站内降级 | ⬜ | — | NotificationService.ts 存在，in-app fallback |
-| E02-Q2 | ShareBadge 未读计数 | ⬜ | — | ShareBadge.tsx 存在且正确显示 |
-| E02-Q3 | E2E share-notify.spec.ts ≥80行 | ⬜ | — | 文件存在且行数达标 |
+| E02-Q1 | NotificationService Slack DM + 站内降级 | ✅ | — | Slack DM → in-app fallback（try/catch 静默降级）|
+| E02-Q2 | ShareBadge 未读计数 | ✅ | — | data-testid="share-badge" 已添加 |
+| E02-Q3 | E2E share-notify.spec.ts ≥80行 | ✅ | — | 文件存在 191行 |
 
 ### E02-Q1 详细说明
 

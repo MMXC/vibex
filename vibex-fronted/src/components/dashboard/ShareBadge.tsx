@@ -19,6 +19,7 @@ export const ShareBadge = memo(function ShareBadge({ count, onClick }: ShareBadg
   return (
     <button
       type="button"
+      data-testid="share-badge"
       className={styles.badge}
       onClick={onClick}
       aria-label={`${count} 个新分享通知`}

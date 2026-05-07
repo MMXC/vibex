@@ -99,6 +99,18 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.347',
     date: '2026-05-07',
     changes: [
+      '🚀 S28-E07: MCP Server 集成完善',
+      '✅ GET /api/mcp/health — 健康检查端点 (status: ok, service: mcp, timestamp)',
+      '✅ MCP 集成测试套件 — 6 E2E scenarios',
+      '✅ 单元测试 8/8',
+      '提交: f5a222d42',
+    ],
+    commit: 'f5a222d42',
+  },
+  {
+    version: '1.0.347',
+    date: '2026-05-07',
+    changes: [
       '🚀 S29-E02: 项目分享通知系统',
       '✅ NotificationService — Slack DM + 站内通知降级 (in-app fallback)',
       '✅ POST /api/projects/:id/share/notify — 分享项目触发通知端点',

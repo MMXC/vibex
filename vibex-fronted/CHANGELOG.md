@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased] S28-E07: MCP Server 集成完善 — 2026-05-07
+
+### S28-E07: MCP Server 集成完善
+
+- **S07.1: GET /api/mcp/health** — 健康检查端点 → `{status: ok, service: mcp, timestamp}`
+- **S07.2: MCP 集成测试套件** — `mcp-integration.spec.ts` 6 scenarios
+- **单元测试**: `route.test.ts` 8 tests, all pass
+- 提交: `f5a222d42` (feat)
+
+---
+
 ## [Unreleased] S28-E06: Canvas 错误边界完善 — 2026-05-07
 
 ### S28-E06: Canvas 错误边界完善

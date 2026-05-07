@@ -1,7 +1,9 @@
 'use client';
 
 import { getAuthToken, getUserId } from '@/lib/auth-token';
-import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
+import { canPerform } from '@/lib/rbac/RBACService';
+import type { TeamRole, ProjectPermission } from '@/lib/rbac/types';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
@@ -22,17 +24,11 @@ import { useProjectSearch, FILTER_LABELS, SORT_LABELS, FilterOption, SortOption 
 /** 排序方式 (E4: 兼容原有选项) */
 type LocalSortOption = 'name' | 'createdAt' | 'updatedAt';
 
-// RBAC 类型
-type UserRole = 'admin' | 'editor' | 'viewer';
-type Permission = 'read' | 'create' | 'update' | 'delete';
-const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
-  admin: ['read', 'create', 'update', 'delete'],
-  editor: ['read', 'create', 'update'],
-  viewer: ['read'],
-};
-
+// RBAC 类型 — 来自 @/lib/rbac (E04)
+// TeamRole: 'owner' | 'admin' | 'member' | 'viewer'
+// ProjectPermission: 'view' | 'edit' | 'delete' | 'manageMembers'
 // 简单 JWT 解码
-function parseJWT(token: string): { role?: UserRole } | null {
+function parseJWT(token: string): { role?: TeamRole } | null {
   try {
     const parts = token.split('.');
     if (parts.length !== 3) return null;
@@ -148,15 +144,12 @@ export default function Dashboard() {
     if (typeof window === 'undefined') return null;
     const token = getAuthToken();
     if (!token) return null;
-    const storedRole = localStorage.getItem('user_role');
-    if (storedRole) return { role: storedRole as UserRole };
+    const storedRole = localStorage.getItem('user_role') as TeamRole | null;
+    if (storedRole) return { role: storedRole };
     return parseJWT(token);
   }, []);
-  const role: UserRole = user?.role || 'viewer';
-  const hasPermission = (perm: Permission) =>
-    ROLE_PERMISSIONS[role]?.includes(perm) ?? false;
-  const canAccess = (_resource: string, perm: Permission) =>
-    role === 'admin' || hasPermission(perm);
+  const role: TeamRole = user?.role || 'viewer';
+  const hasPermission = (perm: ProjectPermission) => canPerform(role, perm);
 
   // 初始化用户 ID
   useEffect(() => {
@@ -472,7 +465,7 @@ export default function Dashboard() {
             <h1 className={styles.title}>我的项目</h1>
             <p className={styles.subtitle}>管理你的 AI 应用项目</p>
           </div>
-          {hasPermission('create') && (
+          {canPerform(role, 'edit') && (
             <button
               className={styles.createButton}
               onClick={handleCreateProject}
@@ -767,7 +760,7 @@ export default function Dashboard() {
                     className={styles.projectActions}
                     style={{ position: 'relative' }}
                   >
-                    {hasPermission('update') && (
+                    {canPerform(role, 'edit') && (
                       <button
                         className={styles.actionBtn}
                         title="编辑"
@@ -789,7 +782,7 @@ export default function Dashboard() {
                     >
                       📤
                     </button>
-                    {hasPermission('delete') && (
+                    {canPerform(role, 'delete') ? (
                       <button
                         className={styles.actionBtn}
                         title="删除"
@@ -801,6 +794,15 @@ export default function Dashboard() {
                             });
                           }
                         }}
+                      >
+                        🗑️
+                      </button>
+                    ) : (
+                      <button
+                        className={styles.actionBtn}
+                        style={{ opacity: 0.4, cursor: 'not-allowed' }}
+                        title="需要管理员权限"
+                        onClick={(e) => e.preventDefault()}
                       >
                         🗑️
                       </button>
@@ -928,8 +930,8 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* 创建新项目卡片 - 需要 create 权限 */}
-            {hasPermission('create') && (
+            {/* 创建新项目卡片 - 需要 edit 权限 */}
+            {canPerform(role, 'edit') && (
               <div
                 className={styles.newProjectCard}
                 onClick={handleCreateProject}
@@ -944,7 +946,7 @@ export default function Dashboard() {
       </main>
 
       {/* 垃圾桶图标 - 需要 delete 权限 */}
-      {hasPermission('delete') && (
+      {canPerform(role, 'delete') && (
         <button
           className={styles.trashButton}
           onClick={() => {

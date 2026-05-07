@@ -169,7 +169,7 @@ Sprint 29 包含 7 个 Epic，聚焦 Onboarding 无断点体验、项目分享 S
 
 #### 开发步骤
 
-1. **创建 `lib/rbac/RBACService.ts`**（新建）
+1. **创建 `lib/rbac/RBACService.ts`**（新建） ✅
    - `getPermissions(role: TeamRole): ProjectPermission[]`
    - `canPerform(userId, projectId, action): boolean`
    - 权限矩阵：
@@ -178,25 +178,25 @@ Sprint 29 包含 7 个 Epic，聚焦 Onboarding 无断点体验、项目分享 S
      - `admin`: `[view, edit, delete, manageMembers]`
      - `owner`: `[view, edit, delete, manageMembers]`
 
-2. **修改 `lib/rbac/types.ts`**
+2. **修改 `lib/rbac/types.ts`** ✅
    - 添加 `type ProjectPermission = 'view' | 'edit' | 'delete' | 'manageMembers'`
    - 添加 `type TeamRole = 'owner' | 'admin' | 'member' | 'viewer'`
 
-3. **创建 `app/api/projects/[id]/role/route.ts`**（新建）
+3. **创建 `app/api/projects/[id]/role/route.ts`**（新建） ✅
    - PUT endpoint：`PUT /api/projects/:id/role`
    - Body: `{ memberId, role }`
    - 权限验证：仅 owner/admin 可调用
    - 无权限返回 403 + toast
 
-4. **修改 `components/project/ProjectCard.tsx`**
+4. **修改 `components/project/ProjectCard.tsx`** ✅ *(ProjectCard 内联于 dashboard/page.tsx)*
    - 显示用户权限级别 badge（viewer/member/admin）
    - badge 样式区分
 
-5. **修改 `components/canvas/DeleteButton.tsx`**
+5. **修改 `components/canvas/DeleteButton.tsx`** *(delete button disabled 在 dashboard/page.tsx 内联处理)*
    - `viewer`/`member` 角色时按钮 disabled（⚠️ disabled，非 hidden）
    - `admin`/`owner` 角色时正常显示
 
-6. **修改 `lib/rbac/RBACGuard.tsx`**（新建）
+6. **修改 `lib/rbac/RBACGuard.tsx`**（新建） *(RBACService 已实现，可按需封装为组件)*
    - React 组件形式的权限隔离
    - `<RBACGuard permission="delete">` 包裹删除区域
 

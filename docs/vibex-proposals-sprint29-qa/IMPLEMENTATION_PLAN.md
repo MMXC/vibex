@@ -23,7 +23,7 @@
 | E01: Onboarding→Canvas 无断点 | E01-Q1 ~ E01-Q4 | 4/4 ✅ | — |
 | E02: 分享通知系统 | E02-Q1 ~ E02-Q3 | 3/3 ✅ | — |
 | E03: 全局搜索增强 | E03-Q1 ~ E03-Q3 | 2/3 ✅ | E03-Q3（需 gstack）|
-| E04: RBAC 权限矩阵 | E04-Q1 ~ E04-Q4 | 0/4 | E04-Q1 |
+| E04: RBAC 权限矩阵 | E04-Q1 ~ E04-Q4 | 4/4 ✅ | — |
 | E05: 离线模式 | E05-Q1 ~ E05-Q3 | 0/3 | E05-Q1 |
 | E06: Analytics 趋势分析 | E06-Q1 ~ E06-Q4 | 0/4 | E06-Q1 |
 | E07: Specs 补全 | E07-Q1 | 0/1 | E07-Q1 |
@@ -155,10 +155,10 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| E04-Q1 | types.ts ProjectPermission + TeamRole | ⬜ | — | lib/rbac/types.ts 完整定义 |
-| E04-Q2 | RBACService.canPerform 逻辑正确 | ⬜ | — | RBACService.ts 逻辑审查 |
-| E04-Q3 | PUT /api/projects/:id/role API | ⬜ | — | route.ts 返回正确响应码 |
-| E04-Q4 | E2E rbac-permissions.spec.ts ≥80行 | ⬜ | — | 文件存在且行数达标 |
+| E04-Q1 | types.ts ProjectPermission + TeamRole | ✅ | — | view/edit/delete/manageMembers + owner/admin/member/viewer |
+| E04-Q2 | RBACService.canPerform 逻辑正确 | ✅ | — | null→false, role→hasPermission(role,action) |
+| E04-Q3 | PUT /api/projects/:id/role API | ✅ | — | 200/400/401 响应码正确 |
+| E04-Q4 | E2E rbac-permissions.spec.ts ≥80行 | ✅ | — | 文件存在 204行 |
 
 ### E04-Q1 详细说明
 

@@ -26,6 +26,7 @@ import { AIDraftDrawer } from '@/components/dds/ai-draft';
 import { DDSFlow } from '@/components/dds/DDSFlow';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
 import { parseRequirementContent } from '@/components/dds/canvas/ChapterPanel';
+import { TreeErrorBoundary } from '@/components/canvas/panels/TreeErrorBoundary';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ShortcutEditModal } from '@/components/shortcuts/ShortcutEditModal';
 import { useShortcutStore } from '@/stores/shortcutStore';
@@ -489,6 +490,22 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
 
   return (
     <>
+    <TreeErrorBoundary
+      fallback={
+        <div
+          className="flex items-center justify-center"
+          style={{ height: 'calc(100vh - 56px)' }}
+          data-testid="dds-canvas-fallback"
+        >
+          <div className="text-center">
+            <p className="text-sm font-medium" style={{ color: '#dc3545' }}>渲染失败</p>
+            <p style={{ color: '#888', fontSize: '12px', marginTop: '4px' }}>
+              Canvas 组件渲染遇到问题
+            </p>
+          </div>
+        </div>
+      }
+    >
     <div
       data-theme="dark"
       data-testid="dds-canvas-page"
@@ -652,6 +669,7 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
         }
       `}</style>
     </div>
+    </TreeErrorBoundary>
 
     {/* S16-P0-1: Design Review panel */}
     <ReviewReportPanel />

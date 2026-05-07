@@ -448,7 +448,9 @@ pages/dashboard/index.tsx             # E04 导航入口
 
 | 步骤 | 文件 | 状态 | 备注 |
 |------|------|------|------|
-| S06.1 ErrorBoundary | | ❌ |  |
+| S06.1 ErrorBoundary | `DDSCanvasPage.tsx` + `__tests__/DDSCanvasPage.test.tsx` | ✅ | TreeErrorBoundary 包裹，渲染失败显示「渲染失败」+ 重试按钮 |
+
+**Commit**: `feat(E06): Canvas ErrorBoundary — TreeErrorBoundary on DDSCanvasPage` | **验证**: `tsc --noEmit` ✅, vitest 12/12 ✅
 
 ### E07: MCP Server 集成完善
 

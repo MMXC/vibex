@@ -96,6 +96,19 @@ const mockChangelog: ChangelogEntry[] = [
   },
   {
     version: '1.0.347',
+    date: '2026-05-07',
+    changes: [
+      '🚀 S29-E05: Canvas 离线模式',
+      '✅ sw.js — Service Worker (cacheFirst 静态 / networkFirst API / offline fallback)',
+      '✅ manifest.json — PWA manifest (standalone)',
+      '✅ offline.html — 离线 fallback 页面',
+      '✅ OfflineBanner.tsx — 离线 banner + 5s 重新上线隐藏',
+      '提交: 7a9869850',
+    ],
+    commit: '7a9869850',
+  },
+  {
+    version: '1.0.347',
     date: '2026-05-05',
     changes: [
       '🐛 RBAC Security Fix: 移除 Project Member 的 canEdit/canShare 权限',

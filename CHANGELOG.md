@@ -62,6 +62,15 @@
 - 方案: `docs/vibex-proposals-sprint29/IMPLEMENTATION_PLAN.md`
 - 提交: 6517f9c04
 
+### [Unreleased] vibex-proposals-sprint29 E05: Canvas 离线模式 — 2026-05-07
+- **sw.js**: `vibex-fronted/public/sw.js` — Service Worker（cacheFirst 静态 / networkFirst API / offline fallback）
+- **manifest.json**: `vibex-fronted/public/manifest.json` — PWA manifest（standalone display）
+- **offline.html**: `vibex-fronted/public/offline.html` — 离线 fallback 页面（中文字符）
+- **OfflineBanner**: `vibex-fronted/src/components/canvas/OfflineBanner.tsx` — 离线 banner + 5s 重新上线隐藏
+- **useServiceWorker**: `vibex-fronted/src/hooks/useServiceWorker.ts` — SW 注册逻辑（仅 production）
+- 方案: `docs/vibex-proposals-sprint29/IMPLEMENTATION_PLAN.md`
+- 提交: 7a9869850
+
 ### [Unreleased] vibex-proposals-sprint26 E4: 移动端渐进适配 — 2026-05-06
 - **S4.5 viewport meta**: `vibex-fronted/src/app/layout.tsx` — `viewport: { width: device-width, initialScale: 1, maximumScale: 1, userScalable: false }`
 - **S4.1 响应式 CSS**: `canvas.module.css` — mobile (<768px) / tablet (768-1024px) 断点，隐藏侧边栏/统计栏

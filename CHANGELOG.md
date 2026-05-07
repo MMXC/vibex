@@ -1,3 +1,9 @@
+### [Unreleased] vibex-proposals-sprint30 E03: E2E 测试补全 — 2026-05-08
+- **share-notification.spec.ts**: `vibex-fronted/tests/e2e/share-notification.spec.ts` — TC-S06/S07 ShareBadge E2E 测试（229 行）
+- 提交: `fc15517a7`
+
+---
+
 ### [Unreleased] vibex-proposals-sprint30 E02: 项目导入/导出 — 2026-05-08
 - **GET /api/projects/:id/export**: `vibex-backend/src/app/api/projects/[id]/export/route.ts` — 导出 v1.0 JSON
 - **POST /api/projects/import**: `vibex-backend/src/app/api/projects/import/route.ts` — Zod 校验 + Prisma 写入

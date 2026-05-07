@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased] S30-E03: E2E 测试补全 — 2026-05-08
+
+### S30-E03: E2E 测试补全
+
+- **share-notification.spec.ts**: `tests/e2e/share-notification.spec.ts` — TC-S06/S07 ShareBadge E2E 测试（229 行）
+- 提交: `fc15517a7` (feat)
+
+---
+
 ## [Unreleased] S29-E07: Sprint 28 Specs 补全 — 2026-05-07
 
 ### S29-E07: Sprint 28 Specs 补全

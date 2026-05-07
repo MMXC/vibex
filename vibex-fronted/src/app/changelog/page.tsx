@@ -87,6 +87,18 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.347',
     date: '2026-05-07',
     changes: [
+      '🚀 S28-E06: Canvas 错误边界完善',
+      '✅ DDSCanvasPage — TreeErrorBoundary 包裹，渲染失败显示「渲染失败」+ 重试按钮',
+      '✅ data-testid="dds-canvas-fallback" — Fallback UI 标识',
+      '✅ 单元测试 14/14 (3 E06 + 11 original)',
+      '提交: 46862366f',
+    ],
+    commit: '46862366f',
+  },
+  {
+    version: '1.0.347',
+    date: '2026-05-07',
+    changes: [
       '🚀 S29-E02: 项目分享通知系统',
       '✅ NotificationService — Slack DM + 站内通知降级 (in-app fallback)',
       '✅ POST /api/projects/:id/share/notify — 分享项目触发通知端点',

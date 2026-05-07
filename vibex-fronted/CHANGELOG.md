@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased] S28-E06: Canvas 错误边界完善 — 2026-05-07
+
+### S28-E06: Canvas 错误边界完善
+
+- **S06.1: DDSCanvasPage ErrorBoundary** — TreeErrorBoundary 包裹，渲染失败显示「渲染失败」+ 重试按钮
+- **data-testid** — `dds-canvas-fallback` 标识 Fallback UI
+- **单元测试**: `DDSCanvasPage.test.tsx` 14 tests (3 E06 + 11 original)
+- 提交: `46862366f` (feat)
+
+---
+
+
 ## [Unreleased] S28-E05: PRD → Canvas 自动流程 — 2026-05-07
 
 ### S28-E05: PRD → Canvas 自动流程

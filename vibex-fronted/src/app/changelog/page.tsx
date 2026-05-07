@@ -59,6 +59,30 @@ const mockChangelog: ChangelogEntry[] = [
   },
   {
     version: '1.0.347',
+    date: '2026-05-07',
+    changes: [
+      '🚀 S27-P003: AI 辅助需求解析',
+      '✅ POST /api/ai/clarify — OpenAI 解析需求（role/goal/constraints），30s 超时降级',
+      '✅ ClarifyStep — AI 分析 + 加载状态 + 结果预览（205行）',
+      '✅ InputStep + onboardingStore — requirementText + clarifyResult',
+      '提交: c12a74e74',
+    ],
+    commit: 'c12a74e74',
+  },
+  {
+    version: '1.0.347',
+    date: '2026-05-07',
+    changes: [
+      '🚀 S29-E03: Dashboard 全局搜索增强',
+      '✅ dashboard/page.tsx — 搜索过滤增强',
+      '✅ SearchFilter.tsx — 搜索过滤组件增强',
+      '✅ search.spec.ts — 搜索 E2E 测试（86行）',
+      '提交: 1f3b82300',
+    ],
+    commit: '1f3b82300',
+  },
+  {
+    version: '1.0.347',
     date: '2026-05-05',
     changes: [
       '🐛 RBAC Security Fix: 移除 Project Member 的 canEdit/canShare 权限',

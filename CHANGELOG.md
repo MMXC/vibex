@@ -6,6 +6,14 @@
 - 验证: `tsc --noEmit` 退出 0
 - 提交: baa57fa03
 
+### [Unreleased] vibex-proposals-sprint27 P003: AI 辅助需求解析 — 2026-05-07
+- **POST /api/ai/clarify**: `vibex-backend/src/app/api/ai/clarify/route.ts` — OpenAI 解析需求（role/goal/constraints），30s 超时降级
+- **ClarifyStep**: `vibex-fronted/src/components/onboarding/steps/ClarifyStep.tsx` — AI 分析 + 加载状态 + 结果预览（205 行）
+- **InputStep**: `vibex-fronted/src/components/onboarding/steps/InputStep.tsx` — 支持输入需求文本
+- **onboardingStore**: `vibex-fronted/src/stores/onboarding/onboardingStore.ts` — 添加 `requirementText` + `clarifyResult` 字段
+- 方案: `docs/vibex-proposals-sprint27/IMPLEMENTATION_PLAN.md`
+- 提交: c12a74e74
+
 ### [Unreleased] vibex-proposals-sprint27 P004: 模板 API 完整 CRUD + Dashboard UI — 2026-05-07
 - **GET /api/v1/templates**: `vibex-backend/src/app/api/v1/templates/route.ts` — 返回 ≥3 mock 模板（支持 industry 过滤）
 - **POST/PUT/DELETE /api/v1/templates**: 完整 CRUD，DELETE 后 GET → 404
@@ -38,6 +46,13 @@
 - 方案: `docs/vibex-proposals-sprint29/IMPLEMENTATION_PLAN.md`
 - 验证: `tsc --noEmit` 退出 0
 - 提交: 3b78219c6
+
+### [Unreleased] vibex-proposals-sprint29 E03: Dashboard 全局搜索增强 — 2026-05-07
+- **Dashboard 搜索**: `vibex-fronted/src/app/dashboard/page.tsx` — 搜索过滤增强
+- **SearchFilter**: `vibex-fronted/src/components/chat/SearchFilter.tsx` — 搜索过滤组件增强
+- **E2E 测试**: `vibex-fronted/tests/e2e/search.spec.ts` — 搜索功能 E2E 测试（86 行）
+- 方案: `docs/vibex-proposals-sprint29/IMPLEMENTATION_PLAN.md`
+- 提交: 1f3b82300
 
 ### [Unreleased] vibex-proposals-sprint26 E4: 移动端渐进适配 — 2026-05-06
 - **S4.5 viewport meta**: `vibex-fronted/src/app/layout.tsx` — `viewport: { width: device-width, initialScale: 1, maximumScale: 1, userScalable: false }`

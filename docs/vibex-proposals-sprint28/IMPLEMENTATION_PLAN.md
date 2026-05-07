@@ -439,8 +439,10 @@ pages/dashboard/index.tsx             # E04 导航入口
 
 | 步骤 | 文件 | 状态 | 备注 |
 |------|------|------|------|
-| S05.1 /api/canvas/from-prd | | ❌ |  |
-| S05.2 生成 Canvas 按钮 | | ❌ |  |
+| S05.1 /api/canvas/from-prd | `src/app/api/v1/canvas/from-prd/route.ts` | ✅ | Chapter→左栏, Step→中栏, Req→右栏, 21 unit tests |
+| S05.2 生成 Canvas 按钮 | `src/app/prd-editor/page.tsx` | ✅ | PRD Editor + 生成 Canvas 按钮 + 结果预览 |
+
+**Commit**: `feat(E05): PRD → Canvas — from-prd API + PRD Editor + unit tests` | **验证**: `tsc --noEmit` ✅, jest 21/21 ✅
 
 ### E06: Canvas 错误边界完善
 

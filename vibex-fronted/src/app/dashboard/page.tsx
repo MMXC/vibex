@@ -406,6 +406,10 @@ export default function Dashboard() {
             <span className={styles.navIcon}>◫</span>
             <span>模板</span>
           </Link>
+          <Link href="/prd-editor" className={styles.navItem}>
+            <span className={styles.navIcon}>📋</span>
+            <span>PRD 编辑器</span>
+          </Link>
           <Link href="/export" className={styles.navItem}>
             <span className={styles.navIcon}>↗</span>
             <span>导出</span>

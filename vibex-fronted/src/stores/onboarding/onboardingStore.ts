@@ -14,6 +14,7 @@ import {
   OnboardingStatus,
   OnboardingStore,
   ScenarioType,
+  ClarifyResult,
   STEP_ORDER,
   getNextStep,
   getStepIndex,
@@ -36,6 +37,10 @@ const initialState = {
   scenario: undefined as ScenarioType | undefined,
   /** E1-S1: 选中的模板 ID (Step 5 选择) */
   selectedTemplateId: undefined as string | undefined,
+  /** P003: 原始需求文本 (Step 2 录入) */
+  requirementText: undefined as string | undefined,
+  /** P003: AI 解析结果 (Step 3 生成) */
+  clarifyResult: undefined as ClarifyResult | undefined,
 };
 
 export const useOnboardingStore = create<OnboardingStore>()(
@@ -114,6 +119,20 @@ export const useOnboardingStore = create<OnboardingStore>()(
         set({ selectedTemplateId: templateId });
       },
 
+      /**
+       * P003: 设置需求文本
+       */
+      setRequirementText: (text: string) => {
+        set({ requirementText: text });
+      },
+
+      /**
+       * P003: 设置 AI 解析结果
+       */
+      setClarifyResult: (result: ClarifyResult | undefined) => {
+        set({ clarifyResult: result });
+      },
+
       // 完成引导
       complete: () => {
         const { currentStep, completedSteps } = get();
@@ -168,6 +187,8 @@ export const useOnboardingStore = create<OnboardingStore>()(
         completedAt: state.completedAt,
         scenario: state.scenario,
         selectedTemplateId: state.selectedTemplateId,
+        requirementText: state.requirementText,
+        clarifyResult: state.clarifyResult,
       }),
     }
   )

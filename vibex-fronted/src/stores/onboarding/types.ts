@@ -26,6 +26,16 @@ export type ScenarioType =
   | 'documentation' // 文档
   | 'other';        // 其他
 
+/** P003: AI 解析结果 */
+export interface ClarifyResult {
+  role: string | null;
+  goal: string | null;
+  constraints: string[];
+  raw: string;
+  parsed: { role: string; goal: string; constraints: string[] } | null;
+  guidance?: string;
+}
+
 export interface StepInfo {
   id: OnboardingStep;
   title: string;
@@ -44,6 +54,10 @@ export interface OnboardingProgress {
   scenario?: ScenarioType;
   /** E1-S1: 选中的模板 ID (Step 5 选择) */
   selectedTemplateId?: string;
+  /** P003: 原始需求文本 (Step 2 录入) */
+  requirementText?: string;
+  /** P003: AI 解析结果 (Step 3 生成) */
+  clarifyResult?: ClarifyResult;
 }
 
 export interface OnboardingActions {
@@ -59,6 +73,10 @@ export interface OnboardingActions {
   setScenario: (scenario: ScenarioType) => void;
   /** E1-S1: 设置选中的模板 ID */
   setSelectedTemplateId: (templateId: string | undefined) => void;
+  /** P003: 设置需求文本 */
+  setRequirementText: (text: string) => void;
+  /** P003: 设置 AI 解析结果 */
+  setClarifyResult: (result: ClarifyResult | undefined) => void;
 }
 
 export type OnboardingStore = OnboardingProgress & OnboardingActions;

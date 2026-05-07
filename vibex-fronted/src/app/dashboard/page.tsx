@@ -10,6 +10,7 @@ import styles from './dashboard.module.css';
 import { apiService, Project } from '@/services/api';
 import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog';
 import { SearchBar } from '@/components/dashboard/SearchBar';
+import { highlightSearchMatch } from '@/components/chat/SearchFilter';
 import { useProjects, useDeletedProjects, queryKeys } from '@/hooks/queries';
 import { canvasShareApi } from '@/lib/api/canvas-share';
 import type { Team } from '@/lib/api/teams';
@@ -534,7 +535,7 @@ export default function Dashboard() {
                       <span className={styles.recentCardIcon}>◈</span>
                     </div>
                     <div className={styles.recentCardInfo}>
-                      <span className={styles.recentCardName}>{project.name}</span>
+                      <span className={styles.recentCardName} dangerouslySetInnerHTML={{ __html: highlightSearchMatch(project.name, searchQuery) }} />
                       <span className={styles.recentCardTime}>
                         {project.updatedAt
                           ? new Date(project.updatedAt).toLocaleDateString('zh-CN', {
@@ -713,7 +714,7 @@ export default function Dashboard() {
                     onClick={(e) => e.stopPropagation()}
                     data-testid={`project-checkbox-${project.id}`}
                     aria-label={`选择项目 ${project.name}`} />
-                  <h3 className={styles.projectName}>{project.name}</h3>
+                  <h3 className={styles.projectName} dangerouslySetInnerHTML={{ __html: highlightSearchMatch(project.name, searchQuery) }} />
                   {/* E5: Team badge for shared canvases */}
                   {(() => {
                     const teamInfo = projectTeamMap.get(project.id);

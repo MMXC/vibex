@@ -647,10 +647,11 @@ export function useSearchFilter(
 export function highlightSearchMatch(text: string, query: string): string {
   if (!query.trim()) return text;
 
-  const regex = new RegExp(
-    `(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`,
-    'gi'
-  );
+  // E03: 支持多词高亮
+  const words = query.trim().split(/\s+/);
+  const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const patterns = words.map(escapeRegex).join('|');
+  const regex = new RegExp(`(${patterns})`, 'gi');
   return text.replace(regex, '<mark>$1</mark>');
 }
 

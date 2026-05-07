@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased] S29-E07: Sprint 28 Specs 补全 — 2026-05-07
+
+### S29-E07: Sprint 28 Specs 补全
+
+- **E03-E07-detailed.md**: `docs/vibex-proposals-sprint29/specs/E03-E07-detailed.md` — Spec 综合文档
+- **E04-template-crud.md**: `docs/vibex-proposals-sprint29/specs/E04-template-crud.md` — 模板 API schema
+- **E06-error-boundary.md**: `docs/vibex-proposals-sprint29/specs/E06-error-boundary.md` — ErrorBoundary 设计
+- **E07-mcp-server.md**: `docs/vibex-proposals-sprint29/specs/E07-mcp-server.md` — MCP 健康检查协议
+- 提交: `a1d25ddad` (docs)
+
+---
+
 ## [Unreleased] S30-E02: 项目导入/导出 — 2026-05-08
 
 ### S30-E02: 项目导入/导出

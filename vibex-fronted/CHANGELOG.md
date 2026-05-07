@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased] S29-E03: Dashboard 全局搜索增强 — 2026-05-07
+
+### S29-E03: Dashboard 全局搜索增强
+
+- **Dashboard 搜索**: `src/app/dashboard/page.tsx` — 搜索过滤增强
+- **SearchFilter**: `src/components/chat/SearchFilter.tsx` — `highlightSearchMatch()` 高亮函数
+- **E2E 测试**: `tests/e2e/search.spec.ts` — 搜索功能 E2E 测试（86 行）
+- 提交: `1f3b82300` (feat)
+
+---
+
 ## [Unreleased] S28-E07: MCP Server 集成完善 — 2026-05-07
 
 ### S28-E07: MCP Server 集成完善

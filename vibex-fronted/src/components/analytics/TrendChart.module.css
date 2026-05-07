@@ -1,0 +1,76 @@
+.container {
+  width: 100%;
+  max-width: 640px;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #888;
+  margin: 0 0 8px;
+}
+
+.rangeButtons {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.rangeBtn {
+  padding: 4px 10px;
+  border: 1px solid #333;
+  background: transparent;
+  color: #888;
+  border-radius: 12px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.rangeBtn:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.rangeBtn.active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.axisLabel {
+  font-size: 10px;
+  fill: #666;
+  font-family: -apple-system, sans-serif;
+}
+
+.trendLabel {
+  font-size: 11px;
+  fill: #aaa;
+  font-family: -apple-system, sans-serif;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 24px;
+  background: #111;
+  border-radius: 8px;
+  border: 1px solid #222;
+}
+
+.emptyIcon {
+  font-size: 18px;
+}
+
+.emptyText {
+  font-size: 13px;
+  color: #666;
+}

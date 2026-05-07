@@ -429,9 +429,11 @@ pages/dashboard/index.tsx             # E04 导航入口
 
 | 步骤 | 文件 | 状态 | 备注 |
 |------|------|------|------|
-| S04.1 POST/PUT/DELETE | | ❌ |  |
-| S04.2 模板 Dashboard UI | | ❌ |  |
-| S04.3 导入/导出 | | ❌ |  |
+| S04.1 POST/PUT/DELETE | `src/app/api/v1/templates/route.ts` + `[id]/route.ts` | ✅ | 共享 templateStore，201/200/404/403 |
+| S04.2 模板 Dashboard UI | `src/app/dashboard/templates/page.tsx` | ✅ | CRUD 列表 + 新建 + 编辑 + 删除 |
+| S04.3 导入/导出 | `route.ts` export + import + UI | ✅ | 导出 JSON + 导入 JSON |
+
+**Commit**: `feat(E04): 模板 API 完整 CRUD — shared templateStore + unit tests + E2E` | **验证**: `tsc --noEmit` ✅, jest 31/31 ✅
 
 ### E05: PRD → Canvas 自动流程
 

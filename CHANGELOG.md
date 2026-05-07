@@ -1,3 +1,12 @@
+### [Unreleased] vibex-proposals-sprint27 P001: 实时协作 — Firebase RTDB 节点同步 — 2026-05-07
+- **S-P1.3 useRealtimeSync 集成**: `CanvasPage.tsx` — 集成 useRealtimeSync hook，Firebase RTDB 未配置时自动降级
+- **S-P1.4 Last-Write-Wins**: `useRealtimeSync.ts` — subscribeToNodes SSE 订阅 + writeNodes 节流写入（500ms debounce），updatedAt 时间戳比较
+- **S-P1.5 E2E 测试**: `presence-mvp.spec.ts` — P001 测试套件（Firebase 未配置无崩溃/画布正常加载/LWW mock 不阻断交互）
+- **环境配置**: `.env.staging.example` — 新增 Firebase RTDB 环境变量模板（NEXT_PUBLIC_FIREBASE_*）
+- 方案: `docs/vibex-proposals-sprint27/IMPLEMENTATION_PLAN.md`
+- 验证: `pnpm tsc --noEmit` ✅ TS 0 errors
+- 提交: 3ec5ec8db
+
 ### [Unreleased] vibex-proposals-sprint27 P002: 属性面板性能优化 — 2026-05-07
 - **S-P2.1 虚拟化**: `ProtoAttrPanel.tsx` — @tanstack/react-virtual 虚拟化属性列表（estimateSize:48, overscan:3），DOM 节点数大幅减少
 - **S-P2.2 Memo 优化**: `ProtoAttrPanel.tsx` — useMemo + memo 优化重渲染性能

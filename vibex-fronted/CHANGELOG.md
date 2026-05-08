@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased] S31-E01-E05: 测试与集成补全（F2.1/F2.2）— 2026-05-08
+- **F2.1 ProtoPreview E2E**: `tests/e2e/protopreview-realtime.spec.ts` — 3 场景 E2E（placeholder/preview/恢复）
+- **F2.2 PresenceAvatars**: `src/components/prototype/ProtoFlowCanvas.tsx` — 集成 PresenceAvatars，`data-testid="presence-avatars"`；`pointer-events:none` 不阻挡画布
+- **ProtoFlowCanvas unit tests**: `src/components/prototype/__tests__/ProtoFlowCanvas.test.tsx` — Firebase 降级测试 + presence container 存在性测试
+- 提交: `e09d3b63e` + `04b08fcf2`
+
+---
+
 ## [Unreleased] S31-E02: 项目导入导出补全（F1.2/F1.3）— 2026-05-08
 - **F1.2 导出重构**: `src/app/dashboard/page.tsx` — 单项目导出 `handleSingleExport` 调用 `GET /api/projects/:id/export`，下载 `.vibex`；批量导出分别调用各项目 API
 - **F1.3 导入 Modal**: `src/components/dashboard/ImportModal.tsx` — 拖拽+点击上传 `.vibex` 文件，10MB 限制，Zod 校验，loading spinner，错误提示，成功后自动关闭刷新列表

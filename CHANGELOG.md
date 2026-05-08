@@ -1,3 +1,11 @@
+### [Unreleased] S31-E01-E05: 测试与集成补全（F2.1/F2.2）— 2026-05-08
+- **F2.1 ProtoPreview E2E**: `vibex-fronted/tests/e2e/protopreview-realtime.spec.ts` — 3 场景 E2E（无选中→placeholder、选中→preview、取消→placeholder）
+- **F2.2 PresenceAvatars 集成**: `vibex-fronted/src/components/prototype/ProtoFlowCanvas.tsx` — 集成 PresenceAvatars，`data-testid="presence-avatars"`；Firebase 未配置时静默降级
+- **ProtoFlowCanvas unit tests**: `vibex-fronted/src/components/prototype/__tests__/ProtoFlowCanvas.test.tsx` — +2 tests (Firebase 降级 + presence container)
+- 提交: `e09d3b63e` (F2.1) + `04b08fcf2` (F2.2)
+
+---
+
 ### [Unreleased] S31-E02: 项目导入导出补全（F1.1/F1.2/F1.3）— 2026-05-08
 - **F1.1 Schema 对齐**: `vibex-backend/src/lib/services/projectExporter.ts` — 输出从 `{projectId,projectName}` 改为 `{project:{name,description}}`，与 VibexExportSchema 对齐
 - **F1.1 VibexExportSchema**: `vibex-backend/src/lib/schemas/vibex.ts` — `exportedAt` 改为 optional；roundtrip 测试通过

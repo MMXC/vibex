@@ -81,6 +81,15 @@
 
 /* ---- ProtoPreview Panel (E01) ---- */
 
+/* E05: Presence Avatars */
+.presenceAvatars {
+  position: absolute;
+  top: 12px;
+  right: 288px; /* ProtoPreview width:260px + right:12px, 留 16px 间距 */
+  z-index: 11;
+  pointer-events: none;
+}
+
 .protoPreview {
   position: absolute;
   top: 12px;

@@ -279,15 +279,33 @@ export default function Dashboard() {
       catch (err) { setActionError(err instanceof Error ? err.message : '删除失败'); }
     }, true);
   }, [selectedProjectIds, queryClient, clearSelection, openConfirm]);
+
+  const handleSingleExport = useCallback((projectId: string, projectName: string) => {
+    const filename = `${projectName.replace(/[^a-zA-Z0-9\u4e00-\u9fa5-]/g, '_')}-${new Date().toISOString().slice(0, 10)}.vibex`;
+    fetch(`/api/projects/${projectId}/export`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('auth_token') ?? ''}` },
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('导出失败');
+        return res.blob();
+      })
+      .then(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      })
+      .catch(err => {
+        setActionError(`导出失败: ${err.message}`);
+      });
+  }, []);
+
   const handleBulkExport = useCallback(() => {
     const selected = displayProjects.filter(p => selectedProjectIds.has(p.id));
-    const json = JSON.stringify(selected.map(p => ({ id: p.id, name: p.name, description: p.description, createdAt: p.createdAt, updatedAt: p.updatedAt })), null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'vibex-projects-export-' + Date.now() + '.json'; a.click();
-    URL.revokeObjectURL(url);
-  }, [selectedProjectIds, displayProjects]);
+    selected.forEach(p => handleSingleExport(p.id, p.name));
+  }, [selectedProjectIds, displayProjects, handleSingleExport]);
   const handleBulkArchive = useCallback(async () => {
     const ids = Array.from(selectedProjectIds);
     openConfirm('批量归档', '确定要归档选中的 ' + ids.length + ' 个项目吗？', async () => {
@@ -478,6 +496,17 @@ export default function Dashboard() {
             >
               <span>+</span>
               <span>创建新项目</span>
+            </button>
+          )}
+          {canPerform(role, 'edit') && (
+            <button
+              className={styles.createButton}
+              onClick={() => setImportModalOpen(true)}
+              data-testid="import-project-btn"
+              style={{ marginLeft: '8px', background: '#3b3b5c' }}
+            >
+              <span>↓</span>
+              <span>导入项目</span>
             </button>
           )}
         </header>
@@ -783,7 +812,7 @@ export default function Dashboard() {
                       title="导出"
                       onClick={(e) => {
                         e.preventDefault();
-                        alert('导出功能开发中');
+                        handleSingleExport(project.id, project.name);
                       }}
                     >
                       📤
@@ -855,7 +884,7 @@ export default function Dashboard() {
                           onClick={(e) => {
                             e.preventDefault();
                             setOpenMenuId(null);
-                            alert('导出功能开发中');
+                            handleSingleExport(project.id, project.name);
                           }}
                         >
                           📤 导出
@@ -1034,6 +1063,14 @@ export default function Dashboard() {
           setConfirmOpen(false);
         }}
         onCancel={() => setConfirmOpen(false)}
+      />
+
+      <ImportModal
+        isOpen={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: queryKeys.projects.lists() });
+        }}
       />
     </div>
   );

@@ -42,6 +42,8 @@ import { usePrototypeStore } from '@/stores/prototypeStore';
 import { ProtoNode } from './ProtoNode';
 import type { UIComponent } from '@/lib/prototypes/ui-schema';
 import { ProtoPreviewPanel } from './ProtoPreviewPanel';
+import { PresenceAvatars } from '@/components/canvas/Presence/PresenceAvatars';
+import { usePresence } from '@/lib/firebase/presence';
 import styles from './ProtoFlowCanvas.module.css';
 
 // ==================== Node Types ====================
@@ -191,6 +193,17 @@ function ProtoFlowCanvasInner({ className = '' }: ProtoFlowCanvasProps) {
     <div className={`${styles.canvasWrap} ${className}`} style={containerStyle}>
       {/* E01: ProtoPreview overlay panel */}
       <ProtoPreviewPanel />
+
+      {/* E05: PresenceAvatars — Firebase 未配置时自动降级（isAvailable=false → 返回 null） */}
+      <div
+        className={styles.presenceAvatars}
+        data-testid="presence-avatars"
+      >
+        <PresenceAvatars
+          canvasId={null as unknown as string}
+          maxDisplay={5}
+        />
+      </div>
 
       <ReactFlow
         nodes={nodes}

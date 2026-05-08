@@ -1,3 +1,13 @@
+### [Unreleased] S31-E02: 项目导入导出补全（F1.1/F1.2/F1.3）— 2026-05-08
+- **F1.1 Schema 对齐**: `vibex-backend/src/lib/services/projectExporter.ts` — 输出从 `{projectId,projectName}` 改为 `{project:{name,description}}`，与 VibexExportSchema 对齐
+- **F1.1 VibexExportSchema**: `vibex-backend/src/lib/schemas/vibex.ts` — `exportedAt` 改为 optional；roundtrip 测试通过
+- **F1.2 导出重构**: `vibex-fronted/src/app/dashboard/page.tsx` — `handleSingleExport` 调用 `GET /api/projects/:id/export`，下载 `.vibex` 文件；批量导出分别调用各项目 API
+- **F1.3 导入 Modal**: `vibex-fronted/src/components/dashboard/ImportModal.tsx` — 拖拽+点击上传，10MB 限制，错误提示，成功后自动关闭刷新列表
+- 测试: 27/27 backend passed；Backend build ✅；Frontend next build ✅
+- 提交: `c281b028a`
+
+---
+
 ### [Unreleased] vibex-proposals-sprint30 E05: Presence 层增强 — 2026-05-08
 - **useRealtimeSync**: `vibex-fronted/src/hooks/useRealtimeSync.ts` — Firebase RTDB 实时同步 hook，isFirebaseConfigured 检测 + mockSubscribers fallback
 - **usePresence hook**: Zustand mock fallback，Firebase 未配置时静默降级不阻断 Canvas

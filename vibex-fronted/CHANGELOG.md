@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased] S31-E02: 项目导入导出补全（F1.2/F1.3）— 2026-05-08
+- **F1.2 导出重构**: `src/app/dashboard/page.tsx` — 单项目导出 `handleSingleExport` 调用 `GET /api/projects/:id/export`，下载 `.vibex`；批量导出分别调用各项目 API
+- **F1.3 导入 Modal**: `src/components/dashboard/ImportModal.tsx` — 拖拽+点击上传 `.vibex` 文件，10MB 限制，Zod 校验，loading spinner，错误提示，成功后自动关闭刷新列表
+- **导入按钮**: Dashboard header 添加「导入项目」按钮（`data-testid="import-project-btn"`），`canPerform(role,'edit')` 权限控制
+- 提交: `c281b028a`
+
+---
+
 ## [Unreleased] S30-E05: Presence 层增强 — 2026-05-08
 
 ### S30-E05: Presence 层增强

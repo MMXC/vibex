@@ -1,3 +1,11 @@
+### [Unreleased] S32-Epic2: 测试基础设施（F2.1/F2.2）— 2026-05-09
+- **F2.1 Vitest Snapshot 测试**: `vibex-fronted/src/components/dds/canvas/__tests__/ChapterPanel.test.tsx` — ChapterPanel 快照测试（empty/loading/error/with-cards states）；`vibex-fronted/src/stores/dds/__tests__/DDSCanvasStore.test.ts` — DDSCanvasStore 快照测试（初始状态 + 带卡片状态）
+- **F2.1 快照文件**: `ChapterPanel.test.tsx.snap` (1235 lines) + `DDSCanvasStore.test.ts.snap` 已签入 Git
+- **F2.2 视觉回归测试**: `vibex-fronted/tests/e2e/visual-regression.spec.ts` — 覆盖 Dashboard/Requirements/Flow/Landing/Templates/Auth/CanvasPage 等 8 个页面截图；`.github/workflows/visual-regression.yml` — workflow_dispatch CI job
+- 提交: `c674e5d85` (Epic2)
+
+---
+
 ### [Unreleased] S32-Epic1: 画布导航 + AI评审 + 离线写入（F1.1/F1.2/F1.3/F1.4）— 2026-05-09
 - **F1.1 CanvasThumbnail 缩略图导航**: `vibex-fronted/src/components/dds/canvas/CanvasThumbnail.tsx` — downscaled SVG 缩略图 + viewport 高亮指示器，集成到 DDSFlow.tsx，threshold=50，使用 requestAnimationFrame 节流
 - **F1.2 AI 评审 CI Gate**: `.github/workflows/ai-review.yml` — pull_request trigger，使用 secrets.OPENCLAW_API_KEY，降级处理 exit 0，JSON schema status/score/feedback/timestamp，ai-review-results/ 已加入 .gitignore

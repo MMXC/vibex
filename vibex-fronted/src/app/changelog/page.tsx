@@ -23,6 +23,17 @@ const mockChangelog: ChangelogEntry[] = [
     version: '1.0.348',
     date: '2026-05-09',
     changes: [
+      '🚀 S32-Epic2: 测试基础设施（F2.1/F2.2）',
+      '✅ F2.1 Vitest Snapshot — ChapterPanel + DDSCanvasStore 快照测试',
+      '✅ F2.2 视觉回归 — visual-regression.spec.ts 覆盖 8 个页面',
+      '提交: c674e5d85',
+    ],
+    commit: 'c674e5d85',
+  },
+  {
+    version: '1.0.348',
+    date: '2026-05-09',
+    changes: [
       '🚀 S32-Epic1: 画布导航 + AI评审 + 离线写入',
       '✅ F1.1 CanvasThumbnail 缩略图导航 — downscaled SVG + viewport 高亮指示器',
       '✅ F1.2 AI 评审 CI Gate — GitHub Actions PR trigger',

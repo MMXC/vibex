@@ -1,122 +1,48 @@
-# E7 版本历史 — Epic Verification Report
+# E7-QA Epic Verification Report
 
-**项目**: vibex-pm-proposals-20260414_143000
-**阶段**: tester-e7-版本历史
-**执行时间**: 2026-04-22 12:27 ~ 12:30
-**Tester**: analyst (tester agent)
+**Agent**: TESTER | **Project**: vibex-proposals-sprint29-qa | **Epic**: E7-QA
+**Created**: 2026-05-08 06:34 | **Completed**: 2026-05-08 06:38
 
 ---
 
-## 1. Git Commit 变更确认
+## Git Diff（本次变更文件）
 
-**Commit**: `feb5dff1 feat(E7-U1): version history projectId=null 边界处理`
+```
+commit a1d25ddad
+    docs(E07): update E07-Q1 status — 4个 spec 文件全部存在
 
-**变更文件 (4 files, +82/-87)**:
-| 文件 | 变更 | 说明 |
-|------|------|------|
-| `page.tsx` | +26 | projectId=null 边界处理，useSearchParams 读取 |
-| `page.test.tsx` | refactor | 90→41 lines，改为文件验证测试 |
-| `version-history.module.css` | +17 | `.emptyAction` 按钮样式 |
-| `IMPLEMENTATION_PLAN.md` | U7→✅ | Unit 7 状态更新 |
-
-✅ 有 commit，有文件变更，符合测试条件
-
----
-
-## 2. E7 实现分析
-
-### 变更内容
-
-**page.tsx 新增逻辑**:
-```typescript
-const searchParams = useSearchParams();
-const projectId = searchParams.get('projectId');
-
-// E7: projectId=null boundary — show guide to create/select a project first
-if (projectId === null) {
-  return (
-    <div className={styles.container}>
-      <div className={styles.empty}>
-        <h2>请先选择项目</h2>
-        <p>在画布中创建或打开项目后，再从项目设置查看版本历史</p>
-        <a href="/projects/new" className={styles.emptyAction}>
-          创建新项目
-        </a>
-      </div>
-    </div>
-  );
-}
+  docs/vibex-proposals-sprint29-qa/IMPLEMENTATION_PLAN.md |  4 ++--
+  1 file changed, 2 insertions(+), 2 deletions(-)
 ```
 
-**验证**:
-- ✅ `useSearchParams()` 正确导入
-- ✅ `searchParams.get('projectId')` 读取参数
-- ✅ `projectId === null` 时显示引导 UI
-- ✅ 包含 heading + message + link to `/projects/new`
+---
 
-### CSS 样式
-```css
-.emptyAction {
-  display: inline-block;
-  padding: 10px 20px;
-  background: #3b82f6;
-  color: white;
-  border-radius: 8px;
-  text-decoration: none;
-  ...
-}
-```
-✅ `.emptyAction` 样式存在，蓝色按钮合理
+## E7-QA Unit Verification
+
+| ID | 验收标准 | 验证方法 | 结果 | 备注 |
+|----|---------|---------|------|------|
+| E07-Q1 | E03-E07-detailed.md + 3个独立 spec 存在 | test -f + wc -l | ✅ PASS | 4个文件全部存在 |
 
 ---
 
-## 3. 测试验证
+## 代码审查详情
 
-### page.test.tsx
-```
-pnpm vitest run src/app/version-history/page.test.tsx
-✅ 2/2 tests PASS
-```
+### E07-Q1: Specs 补全
+- 目录：`docs/vibex-proposals-sprint29/specs/`
+- `E03-E07-detailed.md` — **353行** ✅
+- `E04-template-crud.md` — **134行** ✅
+- `E06-error-boundary.md` — **75行** ✅
+- `E07-mcp-server.md` — **106行** ✅
 
-| 测试 | 结果 | 说明 |
-|------|------|------|
-| page.tsx reads projectId + renders null guidance | ✅ | 文件验证 |
-| CSS has emptyAction style | ✅ | 文件验证 |
-
-**注**: 测试从运行时测试改为文件验证测试（next/navigation mocking 冲突），这是合理的降级方案。
-
-### 已有 E2E 测试
-- `tests/e2e/version-history-panel.spec.ts`
-- `e2e/version-history-no-project.spec.ts`
+全部4个 spec 文件存在，内容完整（非空文件）。
+✅ 验收通过
 
 ---
 
-## 4. TypeScript 编译
+## Verdict
 
-**E7 变更文件 TS 错误**: 0
-**Pre-existing 错误**: `versioned-storage.test.ts` 的 localStorage mock 冲突（非 E7 引入）
+**E7-QA: ✅ PASS — E07-Q1 验收通过**
 
----
+- E07-Q1 4个 spec 文件全部存在 ✅
 
-## 5. 驳回红线检查
-
-| 检查项 | 结果 |
-|--------|------|
-| dev 无 commit | ✅ 有 commit |
-| commit 为空 | ✅ 4 files +82/-87 |
-| 有变更但无测试 | ✅ 2/2 tests PASS |
-| 前端代码变动未用 /qa | ⚠️ 组件测试替代（无后端 standalone） |
-| 测试失败 | ✅ 0 failures |
-| 缺少 Epic 专项报告 | ✅ 本报告 |
-
----
-
-## 结论
-
-**✅ PASS — E7 版本历史验收通过**
-
-- `projectId === null` 边界处理正确实现
-- 引导 UI 包含 heading + message + link
-- 2/2 unit tests PASS
-- TypeScript 编译 0 new errors
-- CSS `.emptyAction` 样式完整
+测试通过。

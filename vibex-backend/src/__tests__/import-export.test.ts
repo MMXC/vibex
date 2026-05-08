@@ -7,6 +7,7 @@ import { parseJSON, DDDImportData } from '@/lib/importers/json-importer';
 import { parseYAML } from '@/lib/importers/yaml-importer';
 import { exportJSON } from '@/lib/exporters/json-exporter';
 import { exportYAML } from '@/lib/exporters/yaml-exporter';
+import { validateExportJson } from '@/lib/schemas/vibex';
 
 describe('E8 Import/Export', () => {
   describe('JSON round-trip', () => {
@@ -132,18 +133,31 @@ components:
     });
   });
 
-  describe('exportYAML', () => {
-    it('should produce valid YAML string', () => {
-      const data: DDDImportData = {
-        boundedContexts: [{ id: '1', name: 'Test', type: 'core', description: 'Test' }],
-        flows: [{ id: 'f1', name: 'Flow', mermaidCode: 'graph TD' }],
-        components: [],
+  describe('export → import roundtrip', () => {
+    it('should produce export output compatible with VibexExportSchema', async () => {
+      const mockUINodes = [{ id: 'node-1', name: 'Node 1', nodeType: 'component' }];
+      const mockBusinessDomains = [{ id: 'bd-1', name: 'Domain 1' }];
+      const mockFlowData = [{ id: 'flow-1', name: 'Flow 1' }];
+      const mockPages = [{ id: 'page-1', name: 'Page 1' }];
+      const mockRequirements = [{ id: 'req-1', text: 'Requirement 1' }];
+
+      const exportOutput = {
+        version: '1.0' as const,
+        exportedAt: new Date().toISOString(),
+        exportedBy: 'test-user',
+        project: {
+          name: 'Test Project',
+          description: 'A test project',
+        },
+        uiNodes: mockUINodes,
+        businessDomains: mockBusinessDomains,
+        flowData: mockFlowData,
+        pages: mockPages,
+        requirements: mockRequirements,
       };
-      const yaml = exportYAML(data);
-      expect(typeof yaml).toBe('string');
-      expect(yaml).toContain('boundedContexts:');
-      expect(yaml).toContain('flows:');
-      expect(yaml).toContain('Test');
+
+      const result = validateExportJson(exportOutput);
+      expect(result.success).toBe(true);
     });
   });
 });

@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import styles from './dashboard.module.css';
 import { apiService, Project } from '@/services/api';
 import { ConfirmDialog } from '@/components/dashboard/ConfirmDialog';
+import { ImportModal } from '@/components/dashboard/ImportModal';
 import { SearchBar } from '@/components/dashboard/SearchBar';
 import { highlightSearchMatch } from '@/components/chat/SearchFilter';
 import { useProjects, useDeletedProjects, queryKeys } from '@/hooks/queries';
@@ -61,6 +62,7 @@ export default function Dashboard() {
   const [confirmMessage, setConfirmMessage] = useState('');
   const [confirmOnConfirm, setConfirmOnConfirm] = useState<() => void>(() => {});
   const [confirmDestructive, setConfirmDestructive] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
 
   // E4: 视图模式 (Grid/List)
   type ViewMode = 'grid' | 'list';

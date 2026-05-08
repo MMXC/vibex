@@ -203,3 +203,21 @@ git checkout main && git merge origin/<feature-branch> && git push origin main
 
 *Coord — 2026-04-28 17:02 UTC*
 
+
+## 2026-05-08
+
+### Coord 心跳 01:55 UTC
+
+**活跃项目 (3):**
+- `vibex-proposals-sprint28-qa`: analyst in-progress 3h38m，docs空 → ghost → 发送 notify-brief 催办
+- `vibex-proposals-sprint30`: architect in-progress 4h30m，5个spec文件已创建(20:01)但无architecture.md → 发送 notify-brief 催办
+- `vibex-proposals-sprint29-qa`: analyst in-progress 49m，docs目录不存在 → 发送 notify-brief 催办
+
+**Ready任务: 0** — 所有当前任务均处于 in-progress 等待完成
+
+**Sprint 28/29 已完成** → QA项目进入 analyze-requirements，但分析师未产出文件
+
+**下次心跳关注:**
+- sprint28-qa/sprint29-qa analyst 是否在 1h 内产出 analysis.md
+- sprint30 architect 是否完成 architecture.md + IMPLEMENTATION_PLAN.md
+- 如果 QA analyst 再次 ghost → 考虑重置任务重新派发

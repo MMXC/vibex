@@ -56,7 +56,7 @@ export const PageSchema = z.object({
 
 export const VibexExportSchema = z.object({
   version: z.literal('1.0'),
-  exportedAt: z.string().datetime(),
+  exportedAt: z.string().datetime().optional(),
   exportedBy: z.string().optional(),
   project: z.object({
     name: z.string().min(1).max(255),

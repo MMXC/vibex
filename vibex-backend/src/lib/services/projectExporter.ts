@@ -26,10 +26,12 @@ export async function exportProject(projectId: string, exportedBy?: string) {
 
   return {
     version: '1.0',
-    projectId: project.id,
-    projectName: project.name,
     exportedAt: new Date().toISOString(),
     exportedBy,
+    project: {
+      name: project.name,
+      description: project.description ?? undefined,
+    },
     uiNodes,
     businessDomains,
     flowData,

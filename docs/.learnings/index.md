@@ -1,4 +1,6 @@
+- [vibex-proposals-sprint30](vibex-proposals-sprint30.md) — Sprint 30: 5 Epic 单日交付（ProtoPreview 热更新 / 项目导入导出 / E2E 测试补全 / Spec 补全 / Presence 层增强）— DAG pipeline 并发执行 + reviewer-push 顺序 merge (2026-05-08)
 - [vibex-proposals-sprint23](vibex-proposals-sprint23.md) — Sprint 23: 5 Epic 单日交付（E1 E2E CI Slack / E2 Design Review Diff / E3 Firebase Cursor Sync / E4 Export Formats / E5 Template Library）— coord-completed 收口 + reviewer-push 里程碑 (2026-05-03)
+ 5 Epic 单日交付（E1 E2E CI Slack / E2 Design Review Diff / E3 Firebase Cursor Sync / E4 Export Formats / E5 Template Library）— coord-completed 收口 + reviewer-push 里程碑 (2026-05-03)
 - [vibex-proposals-20260502-sprint22](vibex-proposals-20260502-sprint22.md) — Sprint 22: 5 Epic 单日交付（Design Review MCP / E2E Stability / Teams Collab UI / Template Library / Agent E2E）— DAG pipeline + reviewer-push 里程碑 (2026-05-02)
 - [vibex-proposals-20260428-sprint16-qa](vibex-proposals-20260428-sprint16-qa.md) — Sprint 16 QA 收口：6 Epic (E1-E6) 完整 chain 完成，reviewer-push merge gap + E4 幽灵修复教训 (2026-04-28)
 - [vibex-proposals-20260426](vibex-proposals-20260426.md) — Sprint 11: TS Debt + Canvas Shortcuts + Search + Firebase Presence (2026-04-26)

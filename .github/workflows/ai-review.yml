@@ -1,0 +1,86 @@
+name: AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  ai-review:
+    name: AI Code Review
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Run AI Review via OpenClaw
+        env:
+          OPENCLAW_API_KEY: ${{ secrets.OPENCLAW_API_KEY }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          mkdir -p ai-review-results
+
+          # Attempt to spawn openclaw agent for design review
+          if command -v openclaw &> /dev/null && [ -n "$OPENCLAW_API_KEY" ]; then
+            openclaw sessions spawn \
+              --runtime acp \
+              --task "design-review --path ." \
+              --result-file "ai-review-results/${PR_NUMBER}.json" \
+              2>&1 || true
+          else
+            # Fallback: warn-only mode — don't block PR
+            echo "::warning::OpenClaw API key not configured. Skipping AI review."
+            echo '{"status":"error","score":0,"feedback":"OpenClaw not configured","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","pr_number":"'"$PR_NUMBER"'"}' > "ai-review-results/${PR_NUMBER}.json"
+            exit 0
+          fi
+
+      - name: Read review result
+        id: read-result
+        run: |
+          RESULT_FILE="ai-review-results/${PR_NUMBER}.json"
+          if [ -f "$RESULT_FILE" ]; then
+            echo "status=$(cat $RESULT_FILE | grep -o '"status":"[^"]*"' | cut -d'"' -f4)" >> $GITHUB_OUTPUT
+            echo "score=$(cat $RESULT_FILE | grep -o '"score":[0-9]*' | head -1 | cut -d':' -f2)" >> $GITHUB_OUTPUT
+            echo "feedback=$(cat $RESULT_FILE | grep -o '"feedback":"[^"]*"' | head -1 | cut -d'"' -f4)" >> $GITHUB_OUTPUT
+            echo "timestamp=$(cat $RESULT_FILE | grep -o '"timestamp":"[^"]*"' | cut -d'"' -f4)" >> $GITHUB_OUTPUT
+            echo "Review result found"
+          else
+            echo "status=error" >> $GITHUB_OUTPUT
+            echo "score=0" >> $GITHUB_OUTPUT
+            echo "feedback=No review result generated" >> $GITHUB_OUTPUT
+            echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT
+            echo "::warning::No review result file found"
+            exit 0
+          fi
+
+      - name: Post review comment
+        if: steps.read-result.outputs.status == 'complete'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## AI Code Review\n\n**Score:** ${process.env.SCORE || 0}/100\n\n${process.env.FEEDBACK || 'No feedback provided.'}\n\n---\n*Review timestamp: ${process.env.TIMESTAMP || 'N/A'}*`
+            })
+
+      - name: Set exit code based on score
+        run: |
+          SCORE="${SCORE:-0}"
+          if [ "$SCORE" -lt 60 ]; then
+            echo "::error::AI review score below threshold: $SCORE/100"
+            exit 1
+          fi
+          echo "AI review passed: $SCORE/100"
+          exit 0

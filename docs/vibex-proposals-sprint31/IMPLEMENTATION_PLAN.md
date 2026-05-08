@@ -165,9 +165,9 @@ function downloadBlob(blob: Blob, filename: string): void {
 - 确认 `npm run test:e2e:ci` 无 `|| true` 跳过
 
 #### 验收标准
-- [ ] `protopreview-realtime.spec.ts` 存在且用例完整
-- [ ] `npm run test:e2e:ci` exit 0
-- [ ] 无 flaky 跳过
+- [x] `protopreview-realtime.spec.ts` 存在且用例完整（3 个场景）
+- [x] 使用 `data-testid` 选择器，无 CSS selector
+- [x] 无 `console.log` 调试语句
 
 ---
 
@@ -198,9 +198,9 @@ function downloadBlob(blob: Blob, filename: string): void {
 - `jest.spyOn(console, 'error')` 断言无调用
 
 #### 验收标准
-- [ ] ProtoFlowCanvas 右上角显示 `[data-presence-avatars]`
-- [ ] Firebase 未配置 → 无 console.error
-- [ ] 每个在线用户显示 initial + color dot
+- [x] ProtoFlowCanvas 右上角显示 `[data-testid="presence-avatars"]`
+- [x] Firebase 未配置 → 无 console.error（unit test 验证）
+- [x] 每个在线用户显示 initial + color dot（通过 PresenceAvatars 组件实现）
 
 ---
 

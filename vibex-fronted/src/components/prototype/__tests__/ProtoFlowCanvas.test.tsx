@@ -14,6 +14,10 @@ import { usePrototypeStore } from '@/stores/prototypeStore';
 // Mock @xyflow/react
 // ============================================
 
+// ============================================
+// Mock @xyflow/react
+// ============================================
+
 vi.mock('@xyflow/react', () => {
   const ReactFlowProvider = vi.fn(({ children }: any) => <div>{children}</div>);
 
@@ -52,6 +56,28 @@ vi.mock('@xyflow/react', () => {
     applyEdgeChanges: vi.fn((changes, edges) => edges),
   };
 });
+
+// ============================================
+// Mock PresenceAvatars
+// ============================================
+
+vi.mock('@/components/canvas/Presence/PresenceAvatars', () => ({
+  // null canvasId → Firebase not configured → renders null, but container div in ProtoFlowCanvas still exists
+  PresenceAvatars: vi.fn(({ canvasId }: { canvasId: string | null }) => {
+    if (!canvasId) return null;
+    return <div data-testid="presence-avatars-inner">mock avatars</div>;
+  }),
+}));
+
+vi.mock('@/lib/firebase/presence', () => ({
+  usePresence: vi.fn(() => ({
+    others: [],
+    updateCursor: vi.fn(),
+    isAvailable: false,
+    isConnected: false,
+  })),
+}));
+
 
 // ============================================
 // Tests
@@ -119,5 +145,21 @@ describe('ProtoFlowCanvas', () => {
     });
     render(<ProtoFlowCanvas />);
     expect(screen.queryByText('从左侧拖拽组件到画布')).not.toBeInTheDocument();
+  });
+
+  // E05: Firebase 未配置时无 console.error
+  it('does not throw console.error when Firebase is not configured', () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    render(<ProtoFlowCanvas />);
+    // PresenceAvatars with null canvasId → isAvailable=false → renders null
+    // No error should be thrown
+    expect(consoleSpy).not.toHaveBeenCalled();
+    consoleSpy.mockRestore();
+  });
+
+  // E05: PresenceAvatars container exists
+  it('renders presence-avatars container', () => {
+    render(<ProtoFlowCanvas />);
+    expect(screen.getByTestId('presence-avatars')).toBeInTheDocument();
   });
 });

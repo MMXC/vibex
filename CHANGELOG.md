@@ -1,3 +1,11 @@
+### [Unreleased] S32-Epic1: 画布导航 + AI评审 + 离线写入（F1.1/F1.2/F1.3/F1.4）— 2026-05-09
+- **F1.1 CanvasThumbnail 缩略图导航**: `vibex-fronted/src/components/dds/canvas/CanvasThumbnail.tsx` — downscaled SVG 缩略图 + viewport 高亮指示器，集成到 DDSFlow.tsx，threshold=50，使用 requestAnimationFrame 节流
+- **F1.2 AI 评审 CI Gate**: `.github/workflows/ai-review.yml` — pull_request trigger，使用 secrets.OPENCLAW_API_KEY，降级处理 exit 0，JSON schema status/score/feedback/timestamp，ai-review-results/ 已加入 .gitignore
+- **F1.3 离线写入队列**: `vibex-fronted/src/lib/offline-queue.ts` — IndexedDB enqueueRequest/dequeueRequest/getQueuedRequests/replayQueue/clearQueue，timestamp 幂等 key，重放最多 3 次；`public/sw.js` — 非 GET 请求离线时 enqueue，返回 202；online 时 replayQueue；Feature flag: NEXT_PUBLIC_ENABLE_OFFLINE_QUEUE
+- **F1.4 同步状态可视化**: `vibex-fronted/src/components/canvas/OfflineBanner.tsx` — 导入 getPendingCount 读取离线队列 pending 计数，添加待同步计数显示 + CSS 进度条，监听 replayQueue 进度事件，2s 延迟隐藏 banner，同步失败显示错误状态
+- 提交: `e0fe5e5d2` (F1.1) + `c2c51ced7` (F1.2) + `1f657c4ea` (F1.3) + `7cb7ab066` (F1.4)
+
+---
 ### [Unreleased] S31-E01-E05: 测试与集成补全（F2.1/F2.2）— 2026-05-08
 - **F2.1 ProtoPreview E2E**: `vibex-fronted/tests/e2e/protopreview-realtime.spec.ts` — 3 场景 E2E（无选中→placeholder、选中→preview、取消→placeholder）
 - **F2.2 PresenceAvatars 集成**: `vibex-fronted/src/components/prototype/ProtoFlowCanvas.tsx` — 集成 PresenceAvatars，`data-testid="presence-avatars"`；Firebase 未配置时静默降级

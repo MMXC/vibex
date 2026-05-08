@@ -20,17 +20,17 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
-    version: '1.0.347',
-    date: '2026-05-07',
+    version: '1.0.348',
+    date: '2026-05-09',
     changes: [
-      '🚀 S29-E01: Onboarding → Canvas 无断点',
-      '✅ useCanvasPrefill hook — 读取 localStorage 预填充，支持 { raw, parsed: null } AI 降级格式',
-      '✅ /canvas/[id] 动态路由 — Onboarding 跳转目标，100ms 内显示骨架屏',
-      '✅ PreviewStep storePendingTemplateRequirement — AI 降级格式 { raw, parsed: null }',
-      '✅ useOnboarding sessionStorage 持久化 — Step 2→5 刷新后进度不丢失',
-      '提交: 3b78219c6',
+      '🚀 S32-Epic1: 画布导航 + AI评审 + 离线写入',
+      '✅ F1.1 CanvasThumbnail 缩略图导航 — downscaled SVG + viewport 高亮指示器',
+      '✅ F1.2 AI 评审 CI Gate — GitHub Actions PR trigger',
+      '✅ F1.3 离线写入队列 — IndexedDB + Service Worker',
+      '✅ F1.4 同步状态可视化 — OfflineBanner 进度条',
+      '提交: e0fe5e5d2 + c2c51ced7 + 1f657c4ea + 7cb7ab066',
     ],
-    commit: '3b78219c6',
+    commit: 'e0fe5e5d2',
   },
   {
     version: '1.0.347',

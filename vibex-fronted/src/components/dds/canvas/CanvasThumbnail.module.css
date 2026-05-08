@@ -1,0 +1,36 @@
+.container {
+  width: 160px;
+  flex-shrink: 0;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.svg {
+  display: block;
+  background: var(--color-surface-subtle, #f9fafb);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: visible;
+}
+
+.svg:focus-visible {
+  outline: 2px solid var(--color-focus-ring, #6366f1);
+  outline-offset: 2px;
+}
+
+.nodeRect {
+  fill: var(--color-node-fill, #e0e7ff);
+  stroke: var(--color-node-stroke, #6366f1);
+  stroke-width: 0.5;
+  opacity: 0.7;
+}
+
+.indicator {
+  fill: rgba(99, 102, 241, 0.15);
+  stroke: var(--color-primary, #6366f1);
+  stroke-width: 1.5;
+  rx: 2;
+}

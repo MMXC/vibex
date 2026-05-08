@@ -27,6 +27,7 @@ import '@xyflow/react/dist/style.css';
 
 import { useDDSCanvasFlow } from '@/hooks/dds/useDDSCanvasFlow';
 import { CardRenderer } from '@/components/dds/cards/CardRenderer';
+import { CanvasThumbnail } from './CanvasThumbnail';
 import type { ChapterType, DDSCard } from '@/types/dds';
 import styles from './DDSFlow.module.css';
 
@@ -107,29 +108,32 @@ function DDSFlowInner({
   }, []);
 
   return (
-    <div className={`${styles.flowCanvas} ${className ?? ''}`}>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onNodeClick={handleNodeClick}
-        nodeTypes={nodeTypes}
-        fitView
-        fitViewOptions={{ padding: 0.2 }}
-        deleteKeyCode={readOnly ? null : 'Delete'}
-        proOptions={{ hideAttribution: true }}
-      >
-        <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#e5e7eb" />
-        <Controls />
-        <MiniMap
-          nodeColor={() => '#6366f1'}
-          maskColor="rgba(249, 250, 251, 0.8)"
-          style={{ border: '1px solid #e5e7eb' }}
-        />
-      </ReactFlow>
-    </div>
+    <>
+      <div className={`${styles.flowCanvas} ${className ?? ''}`}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onNodeClick={handleNodeClick}
+          nodeTypes={nodeTypes}
+          fitView
+          fitViewOptions={{ padding: 0.2 }}
+          deleteKeyCode={readOnly ? null : 'Delete'}
+          proOptions={{ hideAttribution: true }}
+        >
+          <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#e5e7eb" />
+          <Controls />
+          <MiniMap
+            nodeColor={() => '#6366f1'}
+            maskColor="rgba(249, 250, 251, 0.8)"
+            style={{ border: '1px solid #e5e7eb' }}
+          />
+        </ReactFlow>
+        <CanvasThumbnail threshold={50} />
+      </div>
+    </>
   );
 }
 

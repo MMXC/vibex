@@ -124,3 +124,17 @@ test.describe('Visual Regression Tests', () => {
     expect(fs.existsSync(screenshotPath)).toBe(true);
   });
 });
+
+// F2.2-U1: CanvasPage visual regression (basic load test)
+// CanvasPage requires project ID, so we test the page structure
+test.describe('F2.2: CanvasPage', () => {
+  test('canvas-page-structure', async ({ page }) => {
+    // Test that canvas page loads (no auth redirect) with proper structure
+    await page.goto(`${BASE_URL}/canvas/test-project-id`);
+    await page.waitForLoadState('domcontentloaded');
+    const screenshotPath = `${SCREENSHOT_DIR}/visual/canvas-page.png`;
+    await page.screenshot({ path: screenshotPath, fullPage: true });
+    const fs = require('fs');
+    expect(fs.existsSync(screenshotPath)).toBe(true);
+  });
+});

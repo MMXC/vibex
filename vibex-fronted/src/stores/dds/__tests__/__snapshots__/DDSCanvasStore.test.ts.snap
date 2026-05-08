@@ -1,0 +1,142 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`toMatchSnapshot — store state > initial store state matches snapshot 1`] = `
+{
+  "activeChapter": "requirement",
+  "addMessage": [Function],
+  "chapters": {
+    "api": {
+      "cards": [],
+      "edges": [],
+      "error": null,
+      "loading": false,
+      "type": "api",
+    },
+    "context": {
+      "cards": [],
+      "edges": [],
+      "error": null,
+      "loading": false,
+      "type": "context",
+    },
+    "flow": {
+      "cards": [],
+      "edges": [],
+      "error": null,
+      "loading": false,
+      "type": "flow",
+    },
+    "requirement": {
+      "cards": [],
+      "edges": [],
+      "error": null,
+      "loading": false,
+      "type": "requirement",
+    },
+  },
+  "chatHistory": [],
+  "crossChapterEdges": [],
+  "deselectAll": [Function],
+  "isDrawerOpen": false,
+  "isFullscreen": false,
+  "isGenerating": false,
+  "loadChapter": [Function],
+  "projectId": null,
+  "selectCard": [Function],
+  "selectedCardIds": [],
+  "selectedCardSnapshot": null,
+  "setActiveChapter": [Function],
+  "setIsGenerating": [Function],
+  "setSelectedCardSnapshot": [Function],
+  "toggleDrawer": [Function],
+  "toggleFullscreen": [Function],
+  "updateCardVisibility": [Function],
+}
+`;
+
+exports[`toMatchSnapshot — store state > store with cards and selection matches snapshot 1`] = `
+{
+  "activeChapter": "requirement",
+  "addMessage": [Function],
+  "chapters": {
+    "api": {
+      "cards": [],
+      "edges": [],
+      "error": null,
+      "loading": false,
+      "type": "api",
+    },
+    "context": {
+      "cards": [
+        {
+          "createdAt": "2024-01-01T00:00:00.000Z",
+          "description": "manages user data",
+          "id": "snapshot-test-card-2",
+          "name": "User Domain",
+          "position": {
+            "x": 10,
+            "y": 0,
+          },
+          "responsibility": "auth and profile",
+          "title": "User Domain",
+          "type": "bounded-context",
+          "updatedAt": "2024-01-01T00:00:00.000Z",
+        },
+      ],
+      "edges": [],
+      "error": null,
+      "loading": false,
+      "type": "context",
+    },
+    "flow": {
+      "cards": [],
+      "edges": [],
+      "error": null,
+      "loading": false,
+      "type": "flow",
+    },
+    "requirement": {
+      "cards": [
+        {
+          "action": "login",
+          "benefit": "access my account",
+          "createdAt": "2024-01-01T00:00:00.000Z",
+          "id": "snapshot-test-card-1",
+          "position": {
+            "x": 0,
+            "y": 0,
+          },
+          "priority": "high",
+          "role": "user",
+          "title": "As a user I want to login",
+          "type": "user-story",
+          "updatedAt": "2024-01-01T00:00:00.000Z",
+        },
+      ],
+      "edges": [],
+      "error": null,
+      "loading": false,
+      "type": "requirement",
+    },
+  },
+  "chatHistory": [],
+  "crossChapterEdges": [],
+  "deselectAll": [Function],
+  "isDrawerOpen": false,
+  "isFullscreen": false,
+  "isGenerating": false,
+  "loadChapter": [Function],
+  "projectId": null,
+  "selectCard": [Function],
+  "selectedCardIds": [
+    "snapshot-test-card-1",
+  ],
+  "selectedCardSnapshot": null,
+  "setActiveChapter": [Function],
+  "setIsGenerating": [Function],
+  "setSelectedCardSnapshot": [Function],
+  "toggleDrawer": [Function],
+  "toggleFullscreen": [Function],
+  "updateCardVisibility": [Function],
+}
+`;

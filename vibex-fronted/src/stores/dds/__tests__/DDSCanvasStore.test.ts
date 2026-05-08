@@ -505,3 +505,62 @@ describe('DDSCanvasStore — CRUD operations', () => {
     });
   });
 });
+
+// ==================== F2.1-U1: Snapshot Tests ====================
+
+describe('toMatchSnapshot — store state', () => {
+  it('initial store state matches snapshot', () => {
+    // Reset to clean initial state
+    useDDSCanvasStore.setState({
+      projectId: null,
+      activeChapter: 'requirement',
+      chapters: {
+        requirement: { type: 'requirement', cards: [], edges: [], loading: false, error: null },
+        context: { type: 'context', cards: [], edges: [], loading: false, error: null },
+        flow: { type: 'flow', cards: [], edges: [], loading: false, error: null },
+        api: { type: 'api', cards: [], edges: [], loading: false, error: null },
+      },
+      crossChapterEdges: [],
+      chatHistory: [],
+      isGenerating: false,
+      selectedCardIds: [],
+      selectedCardSnapshot: null,
+      isFullscreen: false,
+      isDrawerOpen: false,
+    });
+    const state = useDDSCanvasStore.getState();
+    expect(state).toMatchSnapshot();
+  });
+
+  it('store with cards and selection matches snapshot', () => {
+    const fixedId = 'snapshot-test-card-1';
+    const fixedId2 = 'snapshot-test-card-2';
+    ddsChapterActions.addCard('requirement', {
+      id: fixedId,
+      type: 'user-story',
+      title: 'As a user I want to login',
+      role: 'user',
+      action: 'login',
+      benefit: 'access my account',
+      priority: 'high',
+      position: { x: 0, y: 0 },
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z',
+    } as UserStoryCard);
+    ddsChapterActions.addCard('context', {
+      id: fixedId2,
+      type: 'bounded-context',
+      title: 'User Domain',
+      name: 'User Domain',
+      description: 'manages user data',
+      responsibility: 'auth and profile',
+      position: { x: 10, y: 0 },
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z',
+    } as BoundedContextCard);
+    useDDSCanvasStore.getState().selectCard(fixedId);
+    useDDSCanvasStore.getState().setActiveChapter('requirement');
+    const state = useDDSCanvasStore.getState();
+    expect(state).toMatchSnapshot();
+  });
+});

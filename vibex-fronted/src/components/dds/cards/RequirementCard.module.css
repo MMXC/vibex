@@ -159,3 +159,12 @@
   border-color: var(--accent-primary, #3b82f6);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
 }
+.conflicting {
+  border: 2px solid #ef4444 !important;
+  animation: conflict-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes conflict-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  50%       { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+}

@@ -149,6 +149,9 @@ export const useDDSCanvasStore = create<DDSCanvasStoreState>((set) => ({
 
   isCollapsed: (groupId: string): boolean =>
     useDDSCanvasStore.getState().collapsedGroups.has(groupId),
+
+  // ---- E2: 冲突可视化 ----
+  conflictedCardId: null,
 }));
 
 // ==================== Chapter Data Actions ====================

@@ -146,6 +146,10 @@ export interface DDSCanvasStoreState {
   toggleCollapse: (groupId: string) => void;
   /** 查询指定 Group 是否已折叠 */
   isCollapsed: (groupId: string) => boolean;
+
+  // ---- E2: 冲突可视化 ----
+  /** 当前冲突的节点 ID（来自 conflictStore） */
+  conflictedCardId: string | null;
 }
 
 // ==================== Chat Message ====================

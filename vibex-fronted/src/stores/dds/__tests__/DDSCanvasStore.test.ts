@@ -695,3 +695,58 @@ describe('DDSCanvasStore — Epic1: Group/Folder Collapse (U1-E1, U5-E1)', () =>
     expect(result).toHaveLength(1);
   });
 });
+
+// ==================== Epic2: Conflict Visualization Tests ====================
+
+describe('DDSCanvasStore — Epic2: 冲突可视化 (E2-U2)', () => {
+  const resetStore = () => {
+    useDDSCanvasStore.setState({
+      projectId: null,
+      activeChapter: 'requirement',
+      chapters: {
+        requirement: { type: 'requirement', cards: [], edges: [], loading: false, error: null },
+        context: { type: 'context', cards: [], edges: [], loading: false, error: null },
+        flow: { type: 'flow', cards: [], edges: [], loading: false, error: null },
+        api: { type: 'api', cards: [], edges: [], loading: false, error: null },
+        'business-rules': { type: 'business-rules', cards: [], edges: [], loading: false, error: null },
+      },
+      crossChapterEdges: [],
+      chatHistory: [],
+      isGenerating: false,
+      selectedCardIds: [],
+      selectedCardSnapshot: null,
+      isFullscreen: false,
+      isDrawerOpen: false,
+      collapsedGroups: new Set<string>(),
+      conflictedCardId: null,
+    });
+  };
+
+  beforeEach(() => {
+    resetStore();
+  });
+
+  // ---- E2-U2: conflictedCardId state ----
+
+  it('starts with null conflictedCardId', () => {
+    expect(useDDSCanvasStore.getState().conflictedCardId).toBeNull();
+  });
+
+  it('can set conflictedCardId', () => {
+    useDDSCanvasStore.setState({ conflictedCardId: 'card-conflict-1' });
+    expect(useDDSCanvasStore.getState().conflictedCardId).toBe('card-conflict-1');
+  });
+
+  it('can clear conflictedCardId', () => {
+    useDDSCanvasStore.setState({ conflictedCardId: 'card-conflict-1' });
+    useDDSCanvasStore.setState({ conflictedCardId: null });
+    expect(useDDSCanvasStore.getState().conflictedCardId).toBeNull();
+  });
+
+  it('conflictedCardId is independent from collapsedGroups', () => {
+    useDDSCanvasStore.getState().toggleCollapse('group-1');
+    useDDSCanvasStore.setState({ conflictedCardId: 'card-1' });
+    expect(useDDSCanvasStore.getState().collapsedGroups.has('group-1')).toBe(true);
+    expect(useDDSCanvasStore.getState().conflictedCardId).toBe('card-1');
+  });
+});

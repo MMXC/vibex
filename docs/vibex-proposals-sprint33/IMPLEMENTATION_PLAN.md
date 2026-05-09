@@ -10,7 +10,7 @@
 | Epic | Units | Status | Next |
 |------|-------|--------|------|
 | E1: Group/Folder 层级抽象 | U1-E1, U2-E1, U3-E1, U4-E1, U5-E1 | ✅ | — |
-| E2: 冲突可视化（高亮） | U1-E2, U2-E2, U3-E2, U4-E2 | ⬜ | U1-E2 |
+| E2: 冲突可视化（高亮） | U1-E2, U2-E2, U3-E2, U4-E2 | ✅ | U1-E2 |
 | E3: 协作者意图气泡 | U1-E3, U2-E3, U3-E3 | ⬜ | U1-E3 |
 | E4: S32 QA 修复项 | U1-E4, U2-E4, U3-E4 | ⬜ | U1-E4 |
 
@@ -49,10 +49,10 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| U1-E2 | ConflictBubble 集成到 DDSFlow | ⬜ | — | ConflictBubble 挂载在 DDSFlow 外层，无冲突时 render null |
-| U2-E2 | RTDB 冲突监听 | ⬜ | U1-E2 | 监听 `conflicts/{canvasId}`，触发 `activeConflict` |
-| U3-E2 | 冲突节点高亮 | ⬜ | U2-E2 | 节点 `data-conflict="true"` + CSS 脉冲动画 |
-| U4-E2 | 仲裁操作（keep-local/use-remote） | ⬜ | U3-E2 | 点击后高亮消失，ConflictDialog 关闭 |
+| U1-E2 | ConflictBubble 集成到 DDSFlow | ✅ | — | ConflictBubble 挂载在 DDSFlow 外层，无冲突时 render null |
+| U2-E2 | RTDB 冲突监听 | ✅ | U1-E2 | 监听 `conflicts/{canvasId}`，触发 `activeConflict` |
+| U3-E2 | 冲突节点高亮 | ✅ | U2-E2 | 节点 `data-conflict="true"` + CSS 脉冲动画 |
+| U4-E2 | 仲裁操作（keep-local/use-remote） | ✅ | U3-E2 | 点击后高亮消失，ConflictDialog 关闭 |
 
 ### U1-E2 详细说明
 

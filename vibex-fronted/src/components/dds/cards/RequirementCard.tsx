@@ -19,6 +19,7 @@ export interface RequirementCardProps {
   card: UserStoryCardType;
   selected?: boolean;
   onSelect?: (id: string) => void;
+  conflict?: boolean;
 }
 
 function PriorityBadge({ priority }: { priority: UserStoryCardType['priority'] }) {
@@ -39,6 +40,7 @@ export const RequirementCard = memo(function RequirementCard({
   card,
   selected = false,
   onSelect,
+  conflict = false,
 }: RequirementCardProps) {
   const [showAcceptance, setShowAcceptance] = useState(false);
 
@@ -48,7 +50,8 @@ export const RequirementCard = memo(function RequirementCard({
 
   return (
     <div
-      className={`${styles.container} ${selected ? styles.selected : ''}`}
+      className={`${styles.container} ${selected ? styles.selected : ''} ${conflict ? styles.conflict : ''}`}
+      data-conflict={conflict ? 'true' : undefined}
       onClick={handleClick}
       role="button"
       tabIndex={0}

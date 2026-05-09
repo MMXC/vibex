@@ -28,6 +28,8 @@ export interface CardRendererProps {
   onSelect?: (id: string) => void;
   /** For FlowStepCard step number display */
   stepNumber?: number;
+  /** E2-U3: 冲突高亮标记 */
+  conflict?: boolean;
 }
 
 // Fallback for unknown card types
@@ -57,6 +59,7 @@ export const CardRenderer = memo(function CardRenderer({
   selected = false,
   onSelect,
   stepNumber,
+  conflict = false,
 }: CardRendererProps) {
   const { type } = card;
 
@@ -67,6 +70,7 @@ export const CardRenderer = memo(function CardRenderer({
           card={card}
           selected={selected}
           onSelect={onSelect}
+          conflict={conflict}
         />
       );
 
@@ -76,6 +80,7 @@ export const CardRenderer = memo(function CardRenderer({
           card={card}
           selected={selected}
           onSelect={onSelect}
+          conflict={conflict}
         />
       );
 
@@ -86,6 +91,7 @@ export const CardRenderer = memo(function CardRenderer({
           selected={selected}
           onSelect={onSelect}
           stepNumber={stepNumber}
+          conflict={conflict}
         />
       );
 
@@ -105,7 +111,14 @@ export const CardRenderer = memo(function CardRenderer({
 
     default: {
       // TypeScript exhaustive check — this branch should never be reached
-      return <UnknownCardFallback type={type} />;
+      return (
+    <div
+      data-conflict={conflict ? 'true' : undefined}
+      className={conflict ? 'conflictHighlight' : undefined}
+    >
+      <UnknownCardFallback type={type} />
+    </div>
+  );
     }
   }
 });

@@ -19,6 +19,7 @@ export interface BoundedContextCardProps {
   card: BoundedContextCardType;
   selected?: boolean;
   onSelect?: (id: string) => void;
+  conflict?: boolean;
 }
 
 const RELATION_CLASS: Record<string, string> = {
@@ -46,6 +47,7 @@ export const BoundedContextCard = memo(function BoundedContextCard({
   card,
   selected = false,
   onSelect,
+  conflict = false,
 }: BoundedContextCardProps) {
   const handleClick = () => {
     onSelect?.(card.id);
@@ -53,7 +55,8 @@ export const BoundedContextCard = memo(function BoundedContextCard({
 
   return (
     <div
-      className={`${styles.container} ${selected ? styles.selected : ''}`}
+      className={`${styles.container} ${selected ? styles.selected : ''} ${conflict ? styles.conflict : ''}`}
+      data-conflict={conflict ? 'true' : undefined}
       onClick={handleClick}
       role="button"
       tabIndex={0}

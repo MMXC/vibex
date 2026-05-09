@@ -8,6 +8,20 @@
   height: 100%;
 }
 
+/* ==================== E2-U3: Conflict Highlight ==================== */
+
+/* Applied to nodes with data-conflict="true" via CardRenderer/flow nodes */
+@keyframes conflict-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  50%       { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+}
+
+.conflictHighlight {
+  outline: 2px solid #ef4444;
+  outline-offset: 2px;
+  animation: conflict-pulse 1.5s infinite ease-in-out;
+}
+
 /* ==================== E1-U2: Collapse Toggle Button ==================== */
 
 .collapseToggle {

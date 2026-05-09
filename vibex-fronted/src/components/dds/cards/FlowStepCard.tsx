@@ -21,6 +21,7 @@ export interface FlowStepCardProps {
   onSelect?: (id: string) => void;
   /** Step number for display (optional, derived from card.id if not provided) */
   stepNumber?: number;
+  conflict?: boolean;
 }
 
 export const FlowStepCard = memo(function FlowStepCard({
@@ -28,6 +29,7 @@ export const FlowStepCard = memo(function FlowStepCard({
   selected = false,
   onSelect,
   stepNumber,
+  conflict = false,
 }: FlowStepCardProps) {
   const handleClick = () => {
     onSelect?.(card.id);
@@ -35,7 +37,8 @@ export const FlowStepCard = memo(function FlowStepCard({
 
   return (
     <div
-      className={`${styles.container} ${selected ? styles.selected : ''}`}
+      className={`${styles.container} ${selected ? styles.selected : ''} ${conflict ? styles.conflict : ''}`}
+      data-conflict={conflict ? 'true' : undefined}
       onClick={handleClick}
       role="button"
       tabIndex={0}

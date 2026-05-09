@@ -1,4 +1,13 @@
 ### [Unreleased] S33-Epic4: S32 QA 修复项（E4-U1 ~ U3-E4）— 2026-05-09
+### [Unreleased] S34-P001: 撤销/重做系统（U1-P001 ~ U5-P001）— 2026-05-10
+- **U1-P001 canvasHistoryStore**: Command Pattern + Zustand，`execute/undo/redo/clear/canUndo/canRedo`，50步限制
+- **U2-P001 DDSCanvasPage 连接**: `undoCallback`/`redoCallback` 连接真实 `canvasHistoryStore`
+- **U3-P001 Middleware 包装**: `ddsChapterActions` 自动创建 Command 入栈
+- **U4-P001 localStorage 持久化**: `canvasHistoryStore.ts` 已实现（函数已写），DDSCanvasPage 中调用待后续 sprint 补充
+- **U5-P001 单元测试**: 15个场景覆盖（execute/undo/redo/limit/guard）
+- 提交: `0a02febcf`, `c2e4942d0`
+- ⚠️ 待补充: U4-P001 在 DDSCanvasPage 中的调用（reviewer 条件通过项）
+
 - **E4-U1 CanvasThumbnail testid**: 外层 div 增加 `data-testid="canvas-thumbnail"` + `role="img"` 无障碍属性
 - **E4-U2 OfflineBanner data 属性**: 进度条 div 增加 `data-sync-progress="true"`（E2E 可定位）；格式从 PRD 建议的 `X/Y` 简化为 `true`（因无额外 props 计算 pending/total）
 - **E4-U3 Baseline screenshots**: data 属性不影响视觉，screenshots 无需重新生成

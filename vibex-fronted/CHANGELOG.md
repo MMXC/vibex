@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased] S34-P001: DDS Canvas 撤销重做系统 — 2026-05-10
+- **S34-P001-U1 canvasHistoryStore**: `src/stores/dds/canvasHistoryStore.ts` — Command Pattern 双栈结构（past/future），50 步限制，isPerforming 防嵌套，单元测试 15 cases
+- **S34-P001-U2 DDSCanvasPage 连接**: `src/components/dds/DDSCanvasPage.tsx` — undoCallback/redoCallback 连接 canvasHistoryStore（stub → 真实 store）
+- **S34-P001-U3 Middleware 自动包装**: `src/stores/dds/canvasHistoryMiddleware.ts` — wrapDDSCanvasActionsWithHistory() 包装 addCard/updateCard/deleteCard/addEdge/deleteEdge，每次调用自动创建 Command 入栈
+- **S34-P001-U4 localStorage 持久化**: `saveHistoryToStorage`/`loadHistoryFromStorage` 函数已定义（后续 sprint 调用）
+- 提交: `0a02febcf` + `c2e4942d0`
+
+---
+
 ## [Unreleased] S31-E01-E05: 测试与集成补全（F2.1/F2.2）— 2026-05-08
 - **F2.1 ProtoPreview E2E**: `tests/e2e/protopreview-realtime.spec.ts` — 3 场景 E2E（placeholder/preview/恢复）
 - **F2.2 PresenceAvatars**: `src/components/prototype/ProtoFlowCanvas.tsx` — 集成 PresenceAvatars，`data-testid="presence-avatars"`；`pointer-events:none` 不阻挡画布

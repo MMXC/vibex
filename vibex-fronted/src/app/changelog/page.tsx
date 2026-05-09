@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.353',
+    date: '2026-05-10',
+    changes: [
+      '🚀 S34-P001: DDS Canvas 撤销重做系统',
+      '✅ canvasHistoryStore — Command Pattern 双栈（past/future），50步限制，isPerforming 防嵌套',
+      '✅ DDSCanvasPage — undoCallback/redoCallback 连接真实 store（stub → 真实）',
+      '✅ canvasHistoryMiddleware — wrapDDSCanvasActionsWithHistory() 自动包装 5 个 action',
+      '提交: 0a02febcf + c2e4942d0',
+    ],
+    commit: 'c2e4942d0',
+  },
+  {
     version: '1.0.352',
     date: '2026-05-09',
     changes: [

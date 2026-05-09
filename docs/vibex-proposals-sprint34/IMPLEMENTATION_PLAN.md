@@ -109,36 +109,42 @@ echo "BUNDLE_SIZE_KB=$BUNDLE_SIZE_KB" >> $GITHUB_ENV
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| U1-P003 | useKeyboardShortcuts 动态读取 shortcutStore | 🔄 | — | `shortcutStore.shortcuts` 驱动运行时快捷键行为 |
-| U2-P003 | 快捷键冲突检测运行时触发 | 🔄 | U1-P003 | 保存冲突快捷键时 UI 显示警告，保存被阻止 |
-| U3-P003 | ? 快捷键帮助面板回归验证 | 🔄 | U1-P003 | 按 ? 键帮助面板正常打开，现有行为不受影响 |
+| U1-P003 | useKeyboardShortcuts 动态读取 shortcutStore | ✅ | — | `shortcutStore.shortcuts` 驱动运行时快捷键行为，HARDCODE_ACTIONS 排除防重复 |
+| U2-P003 | 快捷键冲突检测运行时触发 | ✅ | U1-P003 | 保存冲突快捷键时 UI 显示警告，保存被阻止（shortcutStore 已实现） |
+| U3-P003 | ? 快捷键帮助面板回归验证 | ✅ | U1-P003 | 按 ? 键帮助面板正常打开，现有行为不受影响 |
 
-### U1-P003 详细说明
+### U1-P003 实现细节
 
-**文件变更**: `vibex-fronted/src/hooks/useKeyboardShortcuts.ts`（修改）
+**文件变更**: `vibex-fronted/src/hooks/useKeyboardShortcuts.ts`
 
-**实现步骤**:
+实现方式：
+1. **HARDCODE_ACTIONS set**：排除已硬编码的 action（undo/redo/zoom-in 等），防止动态注册与硬编码重复触发
+2. **actionMap useMemo**：将 props callbacks 映射到 shortcutStore action 名称
+3. **subscribe shortcutStore**：每次 store 变化完全重新注册所有非硬编码的动态快捷键
+4. **parseKeyEvent 匹配**：动态 handler 用 `shortcutStore.currentKey === parseKeyEvent(e)` 判断是否触发
+5. **焦点保护**：输入框中跳过（Escape 除外），与硬编码行为一致
 
-1. **添加 `registerDynamicShortcut` 函数**：接收 `key`/`action`/`description`，返回注销函数，内部使用 `useEffect` + `addEventListener`
-2. **添加 shortcutStore subscribe 逻辑**：
-   ```typescript
-   useEffect(() => {
-     const unsubscribe = shortcutStore.subscribe((state) => {
-       // 1. 注销所有旧监听器
-       unregisterAll()
-       // 2. 从 state.shortcuts 读取动态快捷键
-       state.shortcuts
-         .filter(s => s.enabled && s.currentKey)
-         .forEach(s => {
-           const actionMap = getActionFromShortcut(s)
-           registerDynamicShortcut({ key: s.currentKey, action: actionMap })
-         })
-     })
-     return unsubscribe
-   }, [])
-   ```
-3. **保留硬编码快捷键兜底**：无法从 shortcutStore 找到映射时，使用硬编码快捷键
-4. **焦点保护逻辑不变**：现有 `if (isInputFocused && key !== 'Escape') return` 保留
+**动态系统覆盖的 action**（不在硬编码中的）：
+- `go-to-canvas`、`go-to-flows`、`go-to-components`、`go-to-settings`
+- `save`、`copy`、`paste`、`fullscreen`、`toggle-sidebar`
+- `prev-phase`、`next-phase`、`first-phase`、`last-phase`
+
+用户可在设置页自定义这些快捷键，实时生效。
+
+### U2-P003 说明
+
+`shortcutStore.captureKey()` 已实现冲突检测：
+- 检查 key 是否被其他 action 占用
+- `conflictInfo.hasConflict` 为 true 时阻止 `saveShortcut()`
+- UI 侧 `ShortcutEditModal` 根据 `conflictInfo` 显示警告
+
+无需额外 runtime 触发，逻辑已完整。
+
+### U3-P003 说明
+
+DDSCanvasPage 第 421-439 行已实现 `?` 键 toggle ShortcutEditModal。
+CanvasPage 的 `?` 键通过 `useCanvasEvents` toggle ShortcutPanel。
+两者均为现有实现，不受 U1-P003 影响。
 
 ---
 

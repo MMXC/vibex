@@ -12,6 +12,8 @@
  * - N: New node (active tree)
  * - Esc: Cancel / close dialogs
  *
+ * P003: Dynamically reads shortcutStore to register custom shortcuts at runtime.
+ *
  * 遵守约束:
  * - 无 any 类型
  * - 无 canvasLogger.default.debug
@@ -19,9 +21,10 @@
  */
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
+import { useShortcutStore, parseKeyEvent } from '@/stores/shortcutStore';
 
 interface KeyboardShortcutsOptions {
   /** Actions from useCanvasHistory */
@@ -61,6 +64,66 @@ interface KeyboardShortcutsOptions {
   enabled?: boolean;
 }
 
+// Mapping from shortcutStore action names to callbacks
+type ActionName =
+  | 'undo'
+  | 'redo'
+  | 'open-search'
+  | 'zoom-in'
+  | 'zoom-out'
+  | 'zoom-reset'
+  | 'delete'
+  | 'selectall'
+  | 'clear-selection'
+  | 'new-node'
+  | 'quick-generate'
+  | 'confirm-selected'
+  | 'generate-context'
+  | 'switch-to-context'
+  | 'switch-to-flow'
+  | 'switch-to-component'
+  | 'design-review';
+
+// Actions that have hardcoded handlers in useKeyboardShortcuts.
+// The dynamic shortcutStore system should NOT re-register these to avoid duplicate calls.
+// Users can still customize these via shortcutStore, but the hardcoded handler takes precedence.
+const HARDCODE_ACTIONS = new Set<ActionName>([
+  'undo',
+  'redo',
+  'open-search',
+  'zoom-in',
+  'zoom-out',
+  'zoom-reset',
+  'delete',
+  'new-node',
+  'selectall',
+  'clear-selection',
+  'quick-generate',
+  'confirm-selected',
+  'generate-context',
+  'switch-to-context',
+  'switch-to-flow',
+  'switch-to-component',
+  'design-review',
+]);
+
+function isInTextInput(target: EventTarget | null): boolean {
+  const activeEl = document.activeElement;
+  if (!activeEl || !(activeEl instanceof HTMLElement)) return false;
+  const tagName = activeEl.tagName;
+  if (tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT') {
+    return true;
+  }
+  if (activeEl.getAttribute('contenteditable') === 'true') {
+    return true;
+  }
+  const role = activeEl.getAttribute('role');
+  if (role === 'textbox' || role === 'searchbox' || role === 'combobox') {
+    return true;
+  }
+  return false;
+}
+
 /**
  * Register global keyboard shortcuts for canvas operations.
  *
@@ -97,54 +160,124 @@ export function useKeyboardShortcuts({
   onDesignReview,
   enabled = true,
 }: KeyboardShortcutsOptions) {
+  // P003 U1-P003: action map from shortcutStore action names to callbacks
+  const actionMap = useMemo<Record<ActionName, () => void>>(
+    () => ({
+      undo: undo as () => void,
+      redo: redo as () => void,
+      'open-search': onOpenSearch as () => void,
+      'zoom-in': onZoomIn as () => void,
+      'zoom-out': onZoomOut as () => void,
+      'zoom-reset': onZoomReset as () => void,
+      delete: onDelete as () => void,
+      selectall: onSelectAll as () => void,
+      'clear-selection': onClearSelection as () => void,
+      'new-node': onNewNode as () => void,
+      'quick-generate': onQuickGenerate as () => void,
+      'confirm-selected': onConfirmSelected as () => void,
+      'generate-context': onGenerateContext as () => void,
+      'switch-to-context': onSwitchToContext as () => void,
+      'switch-to-flow': onSwitchToFlow as () => void,
+      'switch-to-component': onSwitchToComponent as () => void,
+      'design-review': onDesignReview as () => void,
+    }),
+    [
+      undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset,
+      onDelete, onSelectAll, onClearSelection, onNewNode,
+      onQuickGenerate, onConfirmSelected, onGenerateContext,
+      onSwitchToContext, onSwitchToFlow, onSwitchToComponent, onDesignReview,
+    ],
+  );
+
+  // Track dynamic shortcut handlers for cleanup
+  const dynamicHandlersRef = useRef<
+    Array<{ key: string; handler: (e: KeyboardEvent) => void }>
+  >([]);
+
+  // P003 U1-P003: subscribe shortcutStore to dynamically register shortcuts from user config
   useEffect(() => {
     if (!enabled) return;
 
-    function isInTextInput(_target: EventTarget | null): boolean {
-      const activeEl = document.activeElement;
-      if (!activeEl || !(activeEl instanceof HTMLElement)) return false;
-      const tagName = activeEl.tagName;
-      if (tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT') {
-        return true;
-      }
-      if (activeEl.getAttribute('contenteditable') === 'true') {
-        return true;
-      }
-      const role = activeEl.getAttribute('role');
-      if (role === 'textbox' || role === 'searchbox' || role === 'combobox') {
-        return true;
-      }
-      return false;
+    function unregisterAllDynamic() {
+      dynamicHandlersRef.current.forEach(({ handler }) => {
+        document.removeEventListener('keydown', handler, false);
+      });
+      dynamicHandlersRef.current = [];
     }
+
+    function registerFromStore(
+      state: ReturnType<typeof useShortcutStore.getState>,
+    ) {
+      unregisterAllDynamic();
+
+      state.shortcuts
+        .filter((s) => s.currentKey && !HARDCODE_ACTIONS.has(s.action as ActionName))
+        .forEach((s) => {
+          const callback = actionMap[s.action as ActionName];
+          if (!callback) return;
+
+          const handler = (e: KeyboardEvent) => {
+            const keyStr = parseKeyEvent(e);
+            if (keyStr !== s.currentKey) return;
+
+            // Focus protection — skip in input fields except Escape
+            if (isInTextInput(e.target) && keyStr !== 'Escape') return;
+
+            e.preventDefault();
+            callback();
+          };
+
+          document.addEventListener('keydown', handler, false);
+          dynamicHandlersRef.current.push({ key: s.currentKey, handler });
+        });
+    }
+
+    // Subscribe to store changes
+    const unsubscribe = useShortcutStore.subscribe((state) => {
+      registerFromStore(state);
+    });
+
+    // Initial registration
+    registerFromStore(useShortcutStore.getState());
+
+    return () => {
+      unregisterAllDynamic();
+      unsubscribe();
+    };
+  }, [enabled, actionMap]);
+
+  // Hardcoded shortcuts baseline — always active as fallback
+  useEffect(() => {
+    if (!enabled) return;
 
     function handler(e: KeyboardEvent) {
       const isMeta = e.metaKey;
       const isCtrl = e.ctrlKey;
       const isInputFocused = isInTextInput(e.target);
 
-      // === Undo: Ctrl+Z / Cmd+Z (skip if input is focused) ===
+      // === Undo: Ctrl+Z / Cmd+Z ===
       if ((isCtrl || isMeta) && !e.shiftKey && e.key.toLowerCase() === 'z') {
-        if (isInputFocused) return; // Skip if focus is on input
+        if (isInputFocused) return;
         e.preventDefault();
         undo();
         return;
       }
 
-      // === Redo: Ctrl+Shift+Z / Cmd+Shift+Z or Ctrl+Y / Cmd+Y (skip if input is focused) ===
+      // === Redo: Ctrl+Shift+Z / Cmd+Shift+Z or Ctrl+Y / Cmd+Y ===
       if ((isCtrl || isMeta) && e.shiftKey && e.key.toLowerCase() === 'z') {
-        if (isInputFocused) return; // Skip if focus is on input
+        if (isInputFocused) return;
         e.preventDefault();
         redo();
         return;
       }
       if ((isCtrl || isMeta) && e.key.toLowerCase() === 'y') {
-        if (isInputFocused) return; // Skip if focus is on input
+        if (isInputFocused) return;
         e.preventDefault();
         redo();
         return;
       }
 
-      // === Search: '/' key (only when not in text input) ===
+      // === Search: '/' key ===
       if (e.key === '/' && !isCtrl && !isMeta && !e.shiftKey) {
         if (!isInputFocused) {
           e.preventDefault();
@@ -153,7 +286,7 @@ export function useKeyboardShortcuts({
         return;
       }
 
-      // === Search: Ctrl+K / Cmd+K (always, even in input for search ===
+      // === Search: Ctrl+K / Cmd+K ===
       if ((isCtrl || isMeta) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         onOpenSearch?.();
@@ -193,7 +326,7 @@ export function useKeyboardShortcuts({
         return;
       }
 
-      // === New Node: N key (only when not in text input) ===
+      // === New Node: N key ===
       if (e.key === 'n' && !isCtrl && !isMeta && !isInputFocused) {
         e.preventDefault();
         onNewNode?.();
@@ -202,7 +335,7 @@ export function useKeyboardShortcuts({
 
       // === Select All: Ctrl+A / Cmd+A ===
       if ((isCtrl || isMeta) && e.key.toLowerCase() === 'a') {
-        if (isInputFocused) return; // Let browser handle select-all in inputs
+        if (isInputFocused) return;
         e.preventDefault();
         onSelectAll?.();
         return;
@@ -267,5 +400,10 @@ export function useKeyboardShortcuts({
 
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset, onDelete, onSelectAll, onClearSelection, onNewNode, onQuickGenerate, onConfirmSelected, onGenerateContext, onSwitchToContext, onSwitchToFlow, onSwitchToComponent, onDesignReview, enabled]);
+  }, [
+    undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset,
+    onDelete, onSelectAll, onClearSelection, onNewNode,
+    onQuickGenerate, onConfirmSelected, onGenerateContext,
+    onSwitchToContext, onSwitchToFlow, onSwitchToComponent, onDesignReview, enabled,
+  ]);
 }

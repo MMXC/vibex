@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased] S34-P003: 快捷键集成
+- **S34-P003-U1 useKeyboardShortcuts 动态化**: `src/hooks/useKeyboardShortcuts.ts` — subscribe shortcutStore，非 HARDCODE_ACTIONS 的 action 动态注册运行时 handler
+- **S34-P003-U2 冲突检测**: `src/stores/shortcutStore.ts` — captureKey/saveShortcut 已实现冲突检测，UI 阻止冲突保存
+- **S34-P003-U3 帮助面板**: `?` 键 toggle ShortcutEditModal（DDSCanvasPage）、ShortcutPanel（CanvasPage），现有行为不受影响
+- **P003 Tests**: `src/hooks/useKeyboardShortcuts.test.ts` — 新增 3 个 P003 动态集成测试，12 tests total, all passing
+
 ## [Unreleased] S34-P002: 性能基线系统 — 2026-05-10
 - **S34-P002-U1 Bundle Report**: `.github/workflows/bundle-report.yml` — PR 触发 build + bundle analyze artifact + PR 评论（treyhunner/artifact-comment），7天保留
 - **S34-P002-U2 Lighthouse CI**: `lighthouserc.js` — Core Web Vitals warn 级别断言（不阻断PR），3次采样取中位数

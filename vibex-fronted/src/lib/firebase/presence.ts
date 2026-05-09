@@ -14,10 +14,14 @@ import { canvasLogger } from '@/lib/canvas/canvasLogger';
 // Types
 // ============================================================================
 
+export type IntentionType = 'edit' | 'select' | 'drag' | 'idle';
+
 export interface PresenceUser {
   userId: string;
   name: string;
   color: string;
+  /** E3-U1: 用户当前意图类型 */
+  intention?: IntentionType;
   cursor?: {
     x: number;
     y: number;
@@ -158,7 +162,9 @@ export async function updateCursor(
   userId: string,
   x: number,
   y: number,
-  nodeId: string | null = null
+  nodeId: string | null = null,
+  /** E3-U1: 当前用户意图类型 */
+  intention?: IntentionType
 ): Promise<void> {
   if (!canvasId || !userId) return;
 
@@ -168,7 +174,11 @@ export async function updateCursor(
       const url = getDatabaseUrl(path) + getAuthParam();
       await fetch(url, {
         method: 'PATCH',
-        body: JSON.stringify({ cursor: { x, y, nodeId, timestamp: Date.now() }, lastSeen: Date.now() }),
+        body: JSON.stringify({
+          cursor: { x, y, nodeId, timestamp: Date.now() },
+          lastSeen: Date.now(),
+          intention,
+        }),
         headers: { 'Content-Type': 'application/json' },
       });
     } catch (err) {
@@ -177,6 +187,7 @@ export async function updateCursor(
   } else {
     if (mockPresenceDb[canvasId]?.[userId]) {
       mockPresenceDb[canvasId][userId].cursor = { x, y, nodeId, timestamp: Date.now() };
+      mockPresenceDb[canvasId][userId].intention = intention;
       mockPresenceDb[canvasId][userId].lastSeen = Date.now();
       notifySubscribers(canvasId);
     }
@@ -362,7 +373,8 @@ export function usePresence(
   name: string = 'Anonymous'
 ): {
   others: PresenceUser[];
-  updateCursor: (x: number, y: number) => void;
+  updateCursor: (x: number, y: number, nodeId?: string | null, intention?: IntentionType) => void;
+  setIntention: (intention: IntentionType) => void;
   isAvailable: boolean;
   isConnected: boolean;
 } {
@@ -370,6 +382,7 @@ export function usePresence(
   const [isAvailable, setIsAvailable] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
+  const currentIntentionRef = useRef<IntentionType>('idle');
 
   useEffect(() => {
     if (!canvasId || !userId) return;
@@ -423,15 +436,37 @@ export function usePresence(
   }, [canvasId, userId, name]);
 
   const handleCursorMove = useCallback(
-    (x: number, y: number) => {
+    (x: number, y: number, nodeId?: string | null, intention?: IntentionType) => {
       if (canvasId && userId) {
-        updateCursor(canvasId, userId, x, y).catch(canvasLogger.default.error);
+        if (intention !== undefined) currentIntentionRef.current = intention;
+        updateCursor(canvasId, userId, x, y, nodeId ?? null, currentIntentionRef.current).catch(
+          canvasLogger.default.error
+        );
       }
     },
     [canvasId, userId]
   );
 
-  return { others, updateCursor: handleCursorMove, isAvailable, isConnected };
+  const setIntention = useCallback(
+    (intention: IntentionType) => {
+      currentIntentionRef.current = intention;
+      if (canvasId && userId) {
+        // 即时写 RTDB（用最新光标位置 + 新意图）
+        const myUser = mockPresenceDb[canvasId]?.[userId];
+        if (myUser?.cursor) {
+          updateCursor(
+            canvasId, userId,
+            myUser.cursor.x, myUser.cursor.y,
+            myUser.cursor.nodeId,
+            intention
+          ).catch(canvasLogger.default.error);
+        }
+      }
+    },
+    [canvasId, userId]
+  );
+
+  return { others, updateCursor: handleCursorMove, setIntention, isAvailable, isConnected };
 }
 
 export default usePresence;

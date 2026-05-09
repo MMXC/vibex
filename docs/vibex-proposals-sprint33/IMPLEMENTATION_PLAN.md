@@ -11,7 +11,7 @@
 |------|-------|--------|------|
 | E1: Group/Folder 层级抽象 | U1-E1, U2-E1, U3-E1, U4-E1, U5-E1 | ✅ | — |
 | E2: 冲突可视化（高亮） | U1-E2, U2-E2, U3-E2, U4-E2 | ✅ | U1-E2 |
-| E3: 协作者意图气泡 | U1-E3, U2-E3, U3-E3 | ⬜ | U1-E3 |
+| E3: 协作者意图气泡 | U1-E3, U2-E3, U3-E3 | ✅ | U1-E3 |
 | E4: S32 QA 修复项 | U1-E4, U2-E4, U3-E4 | ⬜ | U1-E4 |
 
 **关键路径**: E1 (2.5d) → E2 (2d) → E3 (1.5d)
@@ -69,9 +69,9 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| U1-E3 | presence.ts 增加 intention 字段 | ⬜ | — | `PresenceUser.intention`, `updateCursor(type)` 支持 |
-| U2-E3 | IntentionBubble 组件 | ⬜ | U1-E3 | 气泡显示意图文案，500ms 延迟显示，3s idle 消失 |
-| U3-E3 | RemoteCursor 集成气泡 | ⬜ | U2-E3 | RemoteCursor 头顶显示气泡，data-testid="intention-bubble" |
+| U1-E3 | presence.ts 增加 intention 字段 | ✅ | — | `PresenceUser.intention`, `updateCursor(type)` 支持 |
+| U2-E3 | IntentionBubble 组件 | ✅ | U1-E3 | 气泡显示意图文案，500ms 延迟显示，3s idle 消失 |
+| U3-E3 | RemoteCursor 集成气泡 | ✅ | U2-E3 | RemoteCursor 头顶显示气泡，data-testid="intention-bubble" |
 
 ### U1-E3 详细说明
 

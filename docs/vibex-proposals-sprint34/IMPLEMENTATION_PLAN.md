@@ -68,9 +68,9 @@ const addNodeCommand: Command = {
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| U1-P002 | bundle-report.yml CI workflow | 🔄 | — | PR 触发 build + artifact upload + PR 评论 |
-| U2-P002 | Lighthouse CI 集成 | 🔄 | — | `lighthouserc.js` 存在，CI 可运行 |
-| U3-P002 | performance-baseline.md 文档化 | 🔄 | U1-P002 | 当前基线值（KB/ms）已记录 |
+| U1-P002 | bundle-report.yml CI workflow | ✅ | — | PR 触发 build + artifact upload + PR 评论 |
+| U2-P002 | Lighthouse CI 集成 | ✅ | — | `lighthouserc.js` 存在，CI 可运行 |
+| U3-P002 | performance-baseline.md 文档化 | ✅ | U1-P002 | 当前基线值（KB/ms）已记录 |
 
 ### U1-P002 详细说明
 

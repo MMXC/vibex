@@ -1,0 +1,78 @@
+name: Bundle Size Report
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'vibex-fronted/src/**'
+      - 'vibex-fronted/next.config.ts'
+      - 'vibex-fronted/package.json'
+      - '.github/workflows/bundle-report.yml'
+
+# Only run one bundle report per PR to avoid spam
+concurrency:
+  group: bundle-report-${{ github.ref }}
+  cancel-in-concurrency: true
+
+env:
+  ANALYZE: 'true'
+
+jobs:
+  bundle-report:
+    name: Bundle Size Report
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: 'pnpm-lock.yaml'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build with bundle analyzer
+        run: pnpm build
+        env:
+          ANALYZE: 'true'
+          NEXT_OUTPUT_MODE: standalone
+        working-directory: vibex-fronted
+
+      - name: Upload bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-analyze
+          path: vibex-fronted/.next/analyze/
+          retention-days: 7
+
+      - name: Parse bundle size
+        id: bundle-size
+        run: |
+          # Extract main page bundle size from bundle.html
+          BUNDLE_SIZE_KB=$(grep -oP 'Route \(app\):.*?size: \K[0-9]+(?= kB)' vibex-fronted/.next/analyze/bundle.html 2>/dev/null | head -1 || echo "0")
+          echo "BUNDLE_SIZE_KB=$BUNDLE_SIZE_KB" >> $GITHUB_ENV
+          echo "Bundle size: ${BUNDLE_SIZE_KB} kB"
+
+      - name: Post PR comment
+        uses: treyhunner/artifact-comment@v1
+        with:
+          artifact: bundle-analyze
+          workflow_run_id: ${{ github.event.workflow_run.id }}
+          message: |
+            ## 📦 Bundle Size Report
+
+            **Main Page Bundle:** ${BUNDLE_SIZE_KB:-N/A} kB
+
+            > Triggered by: `${{ github.event_name }}` · `${{ github.sha }}`
+            > See artifact: `.next/analyze/bundle.html`

@@ -25,6 +25,7 @@ import { CrossChapterEdgesOverlay } from '@/components/dds/canvas/CrossChapterEd
 import { AIDraftDrawer } from '@/components/dds/ai-draft';
 import { DDSFlow } from '@/components/dds/DDSFlow';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
+import { useCanvasHistoryStore } from '@/stores/dds/canvasHistoryStore';
 import { parseRequirementContent } from '@/components/dds/canvas/ChapterPanel';
 import { TreeErrorBoundary } from '@/components/canvas/panels/TreeErrorBoundary';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
@@ -352,10 +353,7 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   }, [toggleDrawer, onAIGenerate]);
 
   // ---- Keyboard Shortcuts ----
-  // Note: useKeyboardShortcuts uses OLD canvas history (context/flow/component).
-  // For DDS canvas, undo/redo will be wired when DDS history is implemented.
-  // For now, pass no-op stubs that return false (required by hook interface).
-  // ---- E3: DDS Canvas Search ----
+  // P001: useKeyboardShortcuts wired to canvasHistoryStore for DDS canvas undo/redo.
   const [searchPanelOpen, setSearchPanelOpen] = useState(false);
   const { query: searchQuery, setQuery: setSearchQuery, results: searchResults, clearResults } =
     useDDSCanvasSearch();
@@ -372,8 +370,14 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     return () => document.removeEventListener('keydown', handleCtrlK);
   }, []);
 
-  const undoCallback = useCallback((): boolean => false, []);
-  const redoCallback = useCallback((): boolean => false, []);
+  const undoCallback = useCallback(() => {
+    useCanvasHistoryStore.getState().undo();
+    return true;
+  }, []);
+  const redoCallback = useCallback(() => {
+    useCanvasHistoryStore.getState().redo();
+    return true;
+  }, []);
 
   useKeyboardShortcuts({
     undo: undoCallback,

@@ -1,3 +1,9 @@
+### [Unreleased] S33-Epic4: S32 QA 修复项（E4-U1 ~ U3-E4）— 2026-05-09
+- **E4-U1 CanvasThumbnail testid**: 外层 div 增加 `data-testid="canvas-thumbnail"` + `role="img"` 无障碍属性
+- **E4-U2 OfflineBanner data 属性**: 进度条 div 增加 `data-sync-progress="true"`（E2E 可定位）；格式从 PRD 建议的 `X/Y` 简化为 `true`（因无额外 props 计算 pending/total）
+- **E4-U3 Baseline screenshots**: data 属性不影响视觉，screenshots 无需重新生成
+- 提交: `f536e7a14`
+
 ### [Unreleased] S33-Epic3: 协作者意图气泡（E3-U1 ~ E3-U3）— 2026-05-09
 - **E3-U1 presence 层**: `IntentionType = 'edit' | 'select' | 'drag' | 'idle'`；`updateCursor()` 支持 `intention` 参数；`usePresence` 返回 `setIntention()`
 - **E3-U2 IntentionBubble 组件**: 500ms 延迟显示，3s idle 消失；`200ms ease-out` 入场动画；`role="status"` 无障碍支持；`data-testid="intention-bubble"`

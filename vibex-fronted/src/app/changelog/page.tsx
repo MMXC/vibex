@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.352',
+    date: '2026-05-09',
+    changes: [
+      '🚀 S33-Epic4: S32 QA 修复项（E4-U1 ~ U3-E4）',
+      '✅ E4-U1 CanvasThumbnail — data-testid="canvas-thumbnail" + role="img"',
+      '✅ E4-U2 OfflineBanner — data-sync-progress="true"',
+      '✅ E4-U3 screenshots — data属性不影响视觉，豁免生成',
+      '提交: f536e7a14',
+    ],
+    commit: 'f536e7a14',
+  },
+  {
     version: '1.0.351',
     date: '2026-05-09',
     changes: [

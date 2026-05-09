@@ -1,3 +1,9 @@
+### [Unreleased] S33-Epic3: 协作者意图气泡（E3-U1 ~ E3-U3）— 2026-05-09
+- **E3-U1 presence 层**: `IntentionType = 'edit' | 'select' | 'drag' | 'idle'`；`updateCursor()` 支持 `intention` 参数；`usePresence` 返回 `setIntention()`
+- **E3-U2 IntentionBubble 组件**: 500ms 延迟显示，3s idle 消失；`200ms ease-out` 入场动画；`role="status"` 无障碍支持；`data-testid="intention-bubble"`
+- **E3-U3 RemoteCursor 集成**: 气泡显示在光标上方 32px；文案映射（编辑/选择/拖拽）；idle 状态不渲染
+- 提交: `1a2eb7358`
+
 ### [Unreleased] S33-Epic2: 冲突可视化功能（E2-U1 ~ E4-E2）— 2026-05-09
 - **E2-U1 ConflictBubble 集成**: `<ConflictBubble />` 挂载在 DDSFlow 外层；无冲突时 render null
 - **E2-U2 conflictedCardId 同步**: `conflictStore.activeConflict → DDSCanvasStore.conflictedCardId` via `useEffect`；`data-conflict` 属性透传到 CardRenderer

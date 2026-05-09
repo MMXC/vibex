@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.351',
+    date: '2026-05-09',
+    changes: [
+      '🚀 S33-Epic3: 协作者意图气泡（E3-U1 ~ E3-U3）',
+      '✅ E3-U1 presence — IntentionType + updateCursor(intention) API',
+      '✅ E3-U2 IntentionBubble — 500ms延迟/3s消失，200ms入场动画',
+      '✅ E3-U3 RemoteCursor集成 — 气泡显示光标上方32px',
+      '提交: 1a2eb7358',
+    ],
+    commit: '1a2eb7358',
+  },
+  {
     version: '1.0.350',
     date: '2026-05-09',
     changes: [

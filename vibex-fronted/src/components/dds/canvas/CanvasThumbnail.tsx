@@ -178,7 +178,12 @@ export function CanvasThumbnail({ threshold = THRESHOLD_DEFAULT, className }: Ca
   if (!nodesRect) return null;
 
   return (
-    <div className={`${styles.container} ${className ?? ''}`} aria-label="画布缩略图">
+    <div
+      className={`${styles.container} ${className ?? ''}`}
+      data-testid="canvas-thumbnail"
+      aria-label="画布缩略图"
+      role="img"
+    >
       <svg
         ref={svgRef}
         className={styles.svg}

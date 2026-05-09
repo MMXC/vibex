@@ -121,6 +121,7 @@ export function OfflineBanner() {
           <div
             className={styles.progressBar}
             role="progressbar"
+            data-sync-progress="true"
             aria-valuenow={totalCount - pendingCount}
             aria-valuemin={0}
             aria-valuemax={totalCount}

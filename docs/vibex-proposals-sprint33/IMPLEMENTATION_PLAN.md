@@ -12,7 +12,7 @@
 | E1: Group/Folder 层级抽象 | U1-E1, U2-E1, U3-E1, U4-E1, U5-E1 | ✅ | — |
 | E2: 冲突可视化（高亮） | U1-E2, U2-E2, U3-E2, U4-E2 | ✅ | U1-E2 |
 | E3: 协作者意图气泡 | U1-E3, U2-E3, U3-E3 | ✅ | U1-E3 |
-| E4: S32 QA 修复项 | U1-E4, U2-E4, U3-E4 | ⬜ | U1-E4 |
+| E4: S32 QA 修复项 | U1-E4, U2-E4, U3-E4 | ✅ | U1-E4 |
 
 **关键路径**: E1 (2.5d) → E2 (2d) → E3 (1.5d)
 
@@ -91,9 +91,9 @@
 
 | ID | Name | Status | Depends On | Acceptance Criteria |
 |----|------|--------|-----------|---------------------|
-| U1-E4 | CanvasThumbnail data-testid | ⬜ | — | 外层 div 有 `data-testid="canvas-thumbnail"` |
-| U2-E4 | OfflineBanner data-sync-progress | ⬜ | U1-E4 | 进度条 div 有 `data-sync-progress="true"` |
-| U3-E4 | Baseline screenshots | ⬜ | U1-E4, U2-E4 | reference 目录有截图，签入 Git |
+| U1-E4 | CanvasThumbnail data-testid | ✅ | — | 外层 div 有 `data-testid="canvas-thumbnail"` |
+| U2-E4 | OfflineBanner data-sync-progress | ✅ | U1-E4 | 进度条 div 有 `data-sync-progress="true"` |
+| U3-E4 | Baseline screenshots | ✅ | U1-E4, U2-E4 | reference 目录有截图，签入 Git |
 
 ---
 

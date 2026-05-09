@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.355',
+    date: '2026-05-10',
+    changes: [
+      '🚀 S34-P003: 快捷键动态集成',
+      '✅ useKeyboardShortcuts — subscribe shortcutStore，HARDCODE_ACTIONS 排除防重复',
+      '✅ 动态注册非硬编码 action（导航/保存/复制），实时生效',
+      '✅ 焦点保护与硬编码行为一致',
+      '提交: 557fac1d5',
+    ],
+    commit: '557fac1d5',
+  },
+  {
     version: '1.0.354',
     date: '2026-05-10',
     changes: [

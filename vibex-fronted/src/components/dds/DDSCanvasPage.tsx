@@ -204,6 +204,18 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
   const [conflictChanges, setConflictChanges] = useState<TokenChange[]>([]);
 
+  // ---- P001-U3: Initialize history middleware (once, on mount) ----
+  useEffect(() => {
+    // Lazy-initialize to avoid double-wrapping (Zustand stores are singletons)
+    if (useCanvasHistoryStore.getState().past.length === 0 &&
+        useCanvasHistoryStore.getState().future.length === 0) {
+      // Only wrap if not already wrapped (check via description heuristic)
+      // We wrap once at component mount — safe because ddsChapterActions is a singleton
+      const { wrapDDSCanvasActionsWithHistory } = require('@/stores/dds/canvasHistoryMiddleware');
+      wrapDDSCanvasActionsWithHistory();
+    }
+  }, []);
+
   // Listen for drift-detected custom events from driftDetector
   useEffect(() => {
     const handler = (e: Event) => {

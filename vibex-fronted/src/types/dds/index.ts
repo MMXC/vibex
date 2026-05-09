@@ -138,6 +138,14 @@ export interface DDSCanvasStoreState {
   toggleFullscreen: () => void;
   isDrawerOpen: boolean;
   toggleDrawer: () => void;
+
+  // ---- E1: Group 折叠 ----
+  /** 已折叠的 Group ID 集合 */
+  collapsedGroups: Set<string>;
+  /** 切换折叠状态 */
+  toggleCollapse: (groupId: string) => void;
+  /** 查询指定 Group 是否已折叠 */
+  isCollapsed: (groupId: string) => boolean;
 }
 
 // ==================== Chat Message ====================

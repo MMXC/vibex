@@ -11,6 +11,7 @@
  */
 
 import { create } from 'zustand';
+import type { Node } from '@xyflow/react';
 import type {
   ChapterType,
   ChapterData,
@@ -42,13 +43,13 @@ const initialChapters: Record<ChapterType, ChapterData> = {
 };
 
 const initialState = {
-  projectId: null,
+  projectId: null as string | null,
   activeChapter: 'requirement' as ChapterType,
   chapters: initialChapters,
   crossChapterEdges: [] as DDSEdge[],
-  chatHistory: [],
+  chatHistory: [] as never[],
   isGenerating: false,
-  selectedCardIds: [],
+  selectedCardIds: [] as string[],
   selectedCardSnapshot: null as {
     cardId: string;
     cardData: DDSCard;
@@ -56,6 +57,7 @@ const initialState = {
   } | null,
   isFullscreen: false,
   isDrawerOpen: false,
+  collapsedGroups: new Set<string>(),
 };
 
 // ==================== Store ====================
@@ -75,7 +77,6 @@ export const useDDSCanvasStore = create<DDSCanvasStoreState>((set) => ({
       },
     }));
     // 实际加载逻辑由 useDDSAPI 提供，store 仅维护加载状态
-    // 这里仅标记加载完成（placeholder），等待 API 层实现
     try {
       // TODO: 调用 useDDSAPI().getCards(chapterId)
       set((state) => ({
@@ -127,6 +128,27 @@ export const useDDSCanvasStore = create<DDSCanvasStoreState>((set) => ({
 
   toggleFullscreen: () => set((state) => ({ isFullscreen: !state.isFullscreen })),
   toggleDrawer: () => set((state) => ({ isDrawerOpen: !state.isDrawerOpen })),
+
+  // ---- E1: Group 折叠 ----
+
+  toggleCollapse: (groupId) =>
+    set((state) => {
+      const next = new Set(state.collapsedGroups);
+      if (next.has(groupId)) {
+        next.delete(groupId);
+      } else {
+        next.add(groupId);
+      }
+      // localStorage 持久化
+      try {
+        const canvasId = state.projectId ?? state.activeChapter;
+        localStorage.setItem(`vibex-dds-collapsed-${canvasId}`, JSON.stringify([...next]));
+      } catch { /* ignore */ }
+      return { collapsedGroups: next };
+    }),
+
+  isCollapsed: (groupId: string): boolean =>
+    useDDSCanvasStore.getState().collapsedGroups.has(groupId),
 }));
 
 // ==================== Chapter Data Actions ====================
@@ -238,6 +260,41 @@ export const selectChapterCards = (chapter: ChapterType) => (state: DDSCanvasSto
 
 export const selectChapterEdges = (chapter: ChapterType) => (state: DDSCanvasStoreState) =>
   state.chapters[chapter].edges;
+
+// ==================== getVisibleNodes — E1-U5: 可见性过滤 ====================
+
+/**
+ * 根据折叠状态过滤节点。
+ * 被折叠 Group 的所有后代子节点会被隐藏。
+ * Group 本身始终可见（只是进入折叠态）。
+ */
+export function getVisibleNodes(nodes: Node[], collapsedGroups: Set<string>): Node[] {
+  if (collapsedGroups.size === 0) return nodes;
+
+  // 构建 parentId → children[] 映射（多叉树）
+  const childrenMap = new Map<string, string[]>();
+  for (const node of nodes) {
+    const card = node.data as { parentId?: string; children?: string[] };
+    if (card.parentId) {
+      const existing = childrenMap.get(card.parentId) ?? [];
+      existing.push(node.id);
+      childrenMap.set(card.parentId, existing);
+    }
+  }
+
+  // BFS 收集所有被折叠 Group 覆盖的子节点 ID
+  const hiddenIds = new Set<string>();
+  for (const groupId of collapsedGroups) {
+    const queue = [...(childrenMap.get(groupId) ?? [])];
+    while (queue.length) {
+      const childId = queue.shift()!;
+      hiddenIds.add(childId);
+      queue.push(...(childrenMap.get(childId) ?? []));
+    }
+  }
+
+  return nodes.filter((n) => !hiddenIds.has(n.id));
+}
 
 // ==================== Factory (for testing) ====================
 

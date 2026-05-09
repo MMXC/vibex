@@ -7,13 +7,15 @@
  * - 转换为 React Flow 的 nodes/edges 格式
  * - 处理 onConnect（创建新边）→ store.addEdge / store.addCrossChapterEdge
  * - 处理 onNodesChange（位置变更）→ store.updateCard
+ * - E1-U5: 根据 collapsedGroups 过滤节点可见性
  *
  * Epic 1: F3
  * Epic 4-U1: 跨章节 DAG 边检测
+ * Epic 1-U5: 折叠可见性过滤
  * 参考: specs/dds-canvas-state.md §2.3
  */
 
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
   useNodesState,
   useEdgesState,
@@ -25,7 +27,7 @@ import {
   type EdgeChange,
   applyNodeChanges,
 } from '@xyflow/react';
-import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
+import { useDDSCanvasStore, ddsChapterActions, getVisibleNodes } from '@/stores/dds/DDSCanvasStore';
 import type { ChapterType, DDSCard, DDSEdge, ChapterData } from '@/types/dds';
 
 // ==================== Card → Node 转换 ====================
@@ -62,6 +64,9 @@ function toReactFlowEdges(edges: DDSEdge[]): Edge[] {
 // ==================== Hook ====================
 
 export interface UseDDSCanvasFlowResult {
+  /** 未过滤的原始节点（React Flow state） */
+  rawNodes: Node[];
+  /** 根据 collapsedGroups 过滤后的可见节点 */
   nodes: Node[];
   edges: Edge[];
   onNodesChange: (changes: NodeChange[]) => void;
@@ -84,14 +89,17 @@ export function useDDSCanvasFlow(
   // 从 store 读取 chapter 数据
   const chapterData = useDDSCanvasStore((s) => s.chapters[chapter]);
 
+  // E1-U5: 读取折叠状态
+  const collapsedGroups = useDDSCanvasStore((s) => s.collapsedGroups);
+
   // E4-U1: 获取所有章节的所有卡片，用于判断跨章节连接
   const allCards = useDDSCanvasStore(
     (s) =>
       (Object.values(s.chapters) as ChapterData[]).flatMap((c) => c.cards) as DDSCard[]
   );
 
-  // React Flow state
-  const [nodes, setNodes] = useNodesState(
+  // React Flow state — 存储原始节点（含被折叠隐藏的）
+  const [rawNodes, setNodes] = useNodesState(
     initialNodes ?? toReactFlowNodes(chapterData.cards)
   );
   const [edges, setEdges, onEdgesChange] = useEdgesState(
@@ -100,6 +108,12 @@ export function useDDSCanvasFlow(
 
   // React Flow 实例（用于 fitView 等）
   useReactFlow();
+
+  // E1-U5: 计算可见节点（根据折叠状态过滤）
+  const nodes = useMemo(
+    () => getVisibleNodes(rawNodes, collapsedGroups),
+    [rawNodes, collapsedGroups]
+  );
 
   // onConnect: 创建新边（E4-U1: 跨章节检测）
   const handleConnect = useCallback(
@@ -156,7 +170,7 @@ export function useDDSCanvasFlow(
   const handleNodesChange = useCallback(
     (changes: NodeChange[]) => {
       // 1. 让 React Flow 处理变更（更新本地 nodes state）
-      const nextNodes = applyNodeChanges(changes, nodes);
+      const nextNodes = applyNodeChanges(changes, rawNodes);
       setNodes(nextNodes);
 
       // 2. 提取 position 变更，回写到 store
@@ -168,10 +182,11 @@ export function useDDSCanvasFlow(
         }
       });
     },
-    [chapter, nodes, setNodes]
+    [chapter, rawNodes, setNodes]
   );
 
   return {
+    rawNodes,
     nodes,
     edges,
     onNodesChange: handleNodesChange,

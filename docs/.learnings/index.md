@@ -1,3 +1,4 @@
+- [vibex-proposals-sprint34](vibex-proposals-sprint34.md) — Sprint 34: 3 Epic 交付（撤销重做系统 / 性能基线系统 / 快捷键动态集成）— shortcutStore 动态订阅模式 + DAG 并发+串行混合 + P002 mock 策略避免 Firebase 依赖 (2026-05-10)
 - [vibex-proposals-sprint30](vibex-proposals-sprint30.md) — Sprint 30: 5 Epic 单日交付（ProtoPreview 热更新 / 项目导入导出 / E2E 测试补全 / Spec 补全 / Presence 层增强）— DAG pipeline 并发执行 + reviewer-push 顺序 merge (2026-05-08)
 - [vibex-proposals-sprint23](vibex-proposals-sprint23.md) — Sprint 23: 5 Epic 单日交付（E1 E2E CI Slack / E2 Design Review Diff / E3 Firebase Cursor Sync / E4 Export Formats / E5 Template Library）— coord-completed 收口 + reviewer-push 里程碑 (2026-05-03)
  5 Epic 单日交付（E1 E2E CI Slack / E2 Design Review Diff / E3 Firebase Cursor Sync / E4 Export Formats / E5 Template Library）— coord-completed 收口 + reviewer-push 里程碑 (2026-05-03)

@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased] S34-P002: 性能基线系统 — 2026-05-10
+- **S34-P002-U1 Bundle Report**: `.github/workflows/bundle-report.yml` — PR 触发 build + bundle analyze artifact + PR 评论（treyhunner/artifact-comment），7天保留
+- **S34-P002-U2 Lighthouse CI**: `lighthouserc.js` — Core Web Vitals warn 级别断言（不阻断PR），3次采样取中位数
+- **S34-P002-U3 基线文档**: `docs/vibex-proposals-sprint34/performance-baseline.md` — Bundle Size + Lighthouse 指标基线值 + 告警阈值
+- 提交: `211cf9dba`
+
+---
+
 ## [Unreleased] S34-P001: DDS Canvas 撤销重做系统 — 2026-05-10
 - **S34-P001-U1 canvasHistoryStore**: `src/stores/dds/canvasHistoryStore.ts` — Command Pattern 双栈结构（past/future），50 步限制，isPerforming 防嵌套，单元测试 15 cases
 - **S34-P001-U2 DDSCanvasPage 连接**: `src/components/dds/DDSCanvasPage.tsx` — undoCallback/redoCallback 连接 canvasHistoryStore（stub → 真实 store）

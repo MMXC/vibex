@@ -20,6 +20,18 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.354',
+    date: '2026-05-10',
+    changes: [
+      '🚀 S34-P002: 性能基线系统',
+      '✅ Bundle Report — PR触发 build+artifact+PR评论，7天保留',
+      '✅ Lighthouse CI — Core Web Vitals warn级别，3次采样',
+      '✅ 基线文档 — Bundle Size + Lighthouse 指标基线值 + 告警阈值',
+      '提交: 211cf9dba',
+    ],
+    commit: '211cf9dba',
+  },
+  {
     version: '1.0.353',
     date: '2026-05-10',
     changes: [

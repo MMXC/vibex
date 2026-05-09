@@ -20,6 +20,20 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.349',
+    date: '2026-05-09',
+    changes: [
+      '🚀 S33-Epic1: Group/Folder 折叠功能（E1-U1 ~ E5-U1）',
+      '✅ E1-U1 Store — collapsedGroups + toggleCollapse + getVisibleNodes BFS',
+      '✅ E1-U2 折叠按钮 — data-testid="collapse-toggle" 左上角按钮',
+      '✅ E1-U3 折叠态 — 虚线边框 + 红色徽章（collapsed-badge）',
+      '✅ E1-U4 展开动画 — 300ms ease-out',
+      '✅ E1-U5 Hook 集成 — rawNodes + visibleNodes 过滤',
+      '提交: 92c582d05 + d94507f84',
+    ],
+    commit: '92c582d05',
+  },
+  {
     version: '1.0.348',
     date: '2026-05-09',
     changes: [

@@ -1,3 +1,12 @@
+### [Unreleased] S33-Epic1: Group/Folder 折叠功能（E1-U1 ~ E5-U1）— 2026-05-09
+- **E1-U1 Store 层**: `collapsedGroups: Set<string>` 状态 + `toggleCollapse(groupId)` + `isCollapsed(groupId)` + `getVisibleNodes(nodes, collapsedGroups)` BFS 可见性过滤；localStorage 持久化（`vibex-dds-collapsed-{canvasId}`）
+- **E1-U2 折叠按钮**: DDSFlow Group 节点左上角 `data-testid="collapse-toggle"` 按钮；点击切换折叠/展开态
+- **E1-U3 折叠态视觉**: 折叠后 Group 节点虚线边框（`.collapsedOverlay`）+ 子节点数量红色徽章（`.collapsedBadge`, `data-testid="collapsed-badge"`）
+- **E1-U4 展开动画**: 子节点 `300ms ease-out` scale + opacity 入场动画（`@keyframes collapse-expand-in`）
+- **E1-U5 Hook 集成**: `useDDSCanvasFlow` 返回 `rawNodes` + `nodes`（过滤后），viewport 跟踪用于 overlay 定位
+- **测试**: DDSCanvasStore 11 cases + DDSFlow 8 cases（53 tests PASS）
+- 提交: `92c582d05` + `d94507f84`
+
 ### [Unreleased] S32-Epic2: 测试基础设施（F2.1/F2.2）— 2026-05-09
 - **F2.1 Vitest Snapshot 测试**: `vibex-fronted/src/components/dds/canvas/__tests__/ChapterPanel.test.tsx` — ChapterPanel 快照测试（empty/loading/error/with-cards states）；`vibex-fronted/src/stores/dds/__tests__/DDSCanvasStore.test.ts` — DDSCanvasStore 快照测试（初始状态 + 带卡片状态）
 - **F2.1 快照文件**: `ChapterPanel.test.tsx.snap` (1235 lines) + `DDSCanvasStore.test.ts.snap` 已签入 Git

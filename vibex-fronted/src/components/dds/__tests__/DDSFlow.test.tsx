@@ -42,6 +42,7 @@ vi.mock('@xyflow/react', () => {
       setEdges: vi.fn(),
       project: vi.fn((pos: any) => pos),
     })),
+    useOnViewportChange: vi.fn(() => {}),
     BackgroundVariant: { Lines: 'lines', Dots: 'dots', Cross: 'cross' },
   };
 });
@@ -77,27 +78,31 @@ const mockEdges = [
 ];
 
 vi.mock('@/hooks/dds/useDDSCanvasFlow', () => ({
-  useDDSCanvasFlow: vi.fn((chapter: string, initNodes?: any[], initEdges?: any[]) => ({
-    nodes: initNodes ?? mockCards.map((c) => ({
+  useDDSCanvasFlow: vi.fn((chapter: string, initNodes?: any[], initEdges?: any[]) => {
+    const nodes = initNodes ?? mockCards.map((c) => ({
       id: c.id,
       type: 'flow-step',
       position: c.position ?? { x: 0, y: 0 },
       data: { card: c },
-    })),
-    edges: initEdges ?? mockEdges.map((e) => ({
-      id: e.id,
-      source: e.source,
-      target: e.target,
-      label: e.label,
-      type: 'smoothstep',
-      animated: true,
-    })),
-    onNodesChange: vi.fn(),
-    onEdgesChange: vi.fn(),
-    onConnect: vi.fn(),
-    setNodes: vi.fn(),
-    setEdges: vi.fn(),
-  })),
+    }));
+    return {
+      rawNodes: nodes,
+      nodes: nodes,
+      edges: initEdges ?? mockEdges.map((e) => ({
+        id: e.id,
+        source: e.source,
+        target: e.target,
+        label: e.label,
+        type: 'smoothstep',
+        animated: true,
+      })),
+      onNodesChange: vi.fn(),
+      onEdgesChange: vi.fn(),
+      onConnect: vi.fn(),
+      setNodes: vi.fn(),
+      setEdges: vi.fn(),
+    };
+  }),
 }));
 
 vi.mock('@/components/dds/cards', () => ({

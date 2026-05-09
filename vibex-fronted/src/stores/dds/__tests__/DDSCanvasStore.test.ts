@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useDDSCanvasStore, ddsChapterActions } from '../DDSCanvasStore';
+import { useDDSCanvasStore, ddsChapterActions, getVisibleNodes } from '../DDSCanvasStore';
 import type { DDSEdge, UserStoryCard, BoundedContextCard, FlowStepCard } from '@/types/dds';
 
 describe('DDSCanvasStore — crossChapterEdges (Epic4 E4-U1/E4-U2)', () => {
@@ -25,6 +25,7 @@ describe('DDSCanvasStore — crossChapterEdges (Epic4 E4-U1/E4-U2)', () => {
       selectedCardSnapshot: null,
       isFullscreen: false,
       isDrawerOpen: false,
+      collapsedGroups: new Set<string>(),
     });
   };
 
@@ -183,6 +184,7 @@ describe('DDSCanvasStore — selectedCardSnapshot (P004-T5)', () => {
       selectedCardSnapshot: null,
       isFullscreen: false,
       isDrawerOpen: false,
+      collapsedGroups: new Set<string>(),
     });
   };
 
@@ -312,6 +314,7 @@ describe('DDSCanvasStore — CRUD operations', () => {
       selectedCardSnapshot: null,
       isFullscreen: false,
       isDrawerOpen: false,
+      collapsedGroups: new Set<string>(),
     });
   };
 
@@ -527,6 +530,7 @@ describe('toMatchSnapshot — store state', () => {
       selectedCardSnapshot: null,
       isFullscreen: false,
       isDrawerOpen: false,
+      collapsedGroups: new Set<string>(),
     });
     const state = useDDSCanvasStore.getState();
     expect(state).toMatchSnapshot();
@@ -562,5 +566,132 @@ describe('toMatchSnapshot — store state', () => {
     useDDSCanvasStore.getState().setActiveChapter('requirement');
     const state = useDDSCanvasStore.getState();
     expect(state).toMatchSnapshot();
+  });
+});
+
+// ==================== Epic1: Group/Folder Collapse Tests ====================
+
+describe('DDSCanvasStore — Epic1: Group/Folder Collapse (U1-E1, U5-E1)', () => {
+  const resetStore = () => {
+    useDDSCanvasStore.setState({
+      projectId: null,
+      activeChapter: 'requirement',
+      chapters: {
+        requirement: { type: 'requirement', cards: [], edges: [], loading: false, error: null },
+        context: { type: 'context', cards: [], edges: [], loading: false, error: null },
+        flow: { type: 'flow', cards: [], edges: [], loading: false, error: null },
+        api: { type: 'api', cards: [], edges: [], loading: false, error: null },
+        'business-rules': { type: 'business-rules', cards: [], edges: [], loading: false, error: null },
+      },
+      crossChapterEdges: [],
+      chatHistory: [],
+      isGenerating: false,
+      selectedCardIds: [],
+      selectedCardSnapshot: null,
+      isFullscreen: false,
+      isDrawerOpen: false,
+      collapsedGroups: new Set<string>(),
+    });
+  };
+
+  beforeEach(() => {
+    resetStore();
+  });
+
+  // ---- E1-U1: collapsedGroups initial state ----
+
+  it('starts with empty collapsedGroups', () => {
+    expect(useDDSCanvasStore.getState().collapsedGroups.size).toBe(0);
+  });
+
+  // ---- E1-U1: toggleCollapse ----
+
+  it('toggleCollapse adds groupId to collapsedGroups', () => {
+    useDDSCanvasStore.getState().toggleCollapse('group-1');
+    expect(useDDSCanvasStore.getState().collapsedGroups.has('group-1')).toBe(true);
+  });
+
+  it('toggleCollapse removes groupId if already collapsed', () => {
+    useDDSCanvasStore.getState().toggleCollapse('group-1');
+    useDDSCanvasStore.getState().toggleCollapse('group-1');
+    expect(useDDSCanvasStore.getState().collapsedGroups.has('group-1')).toBe(false);
+  });
+
+  it('toggleCollapse supports multiple groups', () => {
+    useDDSCanvasStore.getState().toggleCollapse('group-1');
+    useDDSCanvasStore.getState().toggleCollapse('group-2');
+    expect(useDDSCanvasStore.getState().collapsedGroups.size).toBe(2);
+    expect(useDDSCanvasStore.getState().collapsedGroups.has('group-1')).toBe(true);
+    expect(useDDSCanvasStore.getState().collapsedGroups.has('group-2')).toBe(true);
+  });
+
+  // ---- E1-U1: isCollapsed ----
+
+  it('isCollapsed returns true for collapsed group', () => {
+    useDDSCanvasStore.getState().toggleCollapse('group-1');
+    expect(useDDSCanvasStore.getState().isCollapsed('group-1')).toBe(true);
+  });
+
+  it('isCollapsed returns false for non-collapsed group', () => {
+    expect(useDDSCanvasStore.getState().isCollapsed('group-1')).toBe(false);
+  });
+
+  it('isCollapsed returns false after toggle', () => {
+    useDDSCanvasStore.getState().toggleCollapse('group-1');
+    useDDSCanvasStore.getState().toggleCollapse('group-1');
+    expect(useDDSCanvasStore.getState().isCollapsed('group-1')).toBe(false);
+  });
+
+  // ---- E1-U5: getVisibleNodes ----
+
+  it('getVisibleNodes returns all nodes when no groups collapsed', () => {
+    const nodes = [
+      { id: 'n1', data: { parentId: null, children: ['n2'] } },
+      { id: 'n2', data: { parentId: 'n1' } },
+    ] as any[];
+    const result = getVisibleNodes(nodes, new Set());
+    expect(result).toHaveLength(2);
+  });
+
+  it('getVisibleNodes hides direct children of collapsed group', () => {
+    const nodes = [
+      { id: 'group-1', data: { parentId: null, children: ['n2', 'n3'] } },
+      { id: 'n2', data: { parentId: 'group-1' } },
+      { id: 'n3', data: { parentId: 'group-1' } },
+    ] as any[];
+    const collapsed = new Set(['group-1']);
+    const result = getVisibleNodes(nodes, collapsed);
+    expect(result.map((n: any) => n.id)).toEqual(['group-1']);
+  });
+
+  it('getVisibleNodes hides all descendants (BFS)', () => {
+    const nodes = [
+      { id: 'root', data: { parentId: null, children: ['child1', 'child2'] } },
+      { id: 'child1', data: { parentId: 'root', children: ['grand1'] } },
+      { id: 'child2', data: { parentId: 'root' } },
+      { id: 'grand1', data: { parentId: 'child1' } },
+    ] as any[];
+    const collapsed = new Set(['root']);
+    const result = getVisibleNodes(nodes, collapsed);
+    expect(result.map((n: any) => n.id)).toEqual(['root']);
+  });
+
+  it('getVisibleNodes handles multiple collapsed groups', () => {
+    const nodes = [
+      { id: 'g1', data: { parentId: null, children: ['c1'] } },
+      { id: 'c1', data: { parentId: 'g1' } },
+      { id: 'g2', data: { parentId: null, children: ['c2'] } },
+      { id: 'c2', data: { parentId: 'g2' } },
+      { id: 'other', data: { parentId: null } },
+    ] as any[];
+    const collapsed = new Set(['g1', 'g2']);
+    const result = getVisibleNodes(nodes, collapsed);
+    expect(result.map((n: any) => n.id)).toEqual(['g1', 'g2', 'other']);
+  });
+
+  it('getVisibleNodes handles nodes without parentId', () => {
+    const nodes = [{ id: 'orphan', data: {} }] as any[];
+    const result = getVisibleNodes(nodes, new Set(['nonexistent']));
+    expect(result).toHaveLength(1);
   });
 });

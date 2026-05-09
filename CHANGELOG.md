@@ -1,3 +1,11 @@
+### [Unreleased] S33-Epic2: 冲突可视化功能（E2-U1 ~ E4-E2）— 2026-05-09
+- **E2-U1 ConflictBubble 集成**: `<ConflictBubble />` 挂载在 DDSFlow 外层；无冲突时 render null
+- **E2-U2 conflictedCardId 同步**: `conflictStore.activeConflict → DDSCanvasStore.conflictedCardId` via `useEffect`；`data-conflict` 属性透传到 CardRenderer
+- **E2-U3 冲突高亮**: 冲突节点红框脉冲（`2px solid #ef4444` + `@keyframes conflict-pulse` 1.5s）；`RequirementCard/BoundedContextCard/FlowStepCard` 三卡片均支持 `.conflicting` class
+- **E2-U4 仲裁操作**: ConflictDialog keep-local / use-remote / merge 按钮；`dismissConflict()` 关闭弹窗
+- **依赖**: `@/lib/canvas/stores/conflictStore`（E8-S2 遗留，LWW 仲裁）
+- 提交: `29360a04b`
+
 ### [Unreleased] S33-Epic1: Group/Folder 折叠功能（E1-U1 ~ E5-U1）— 2026-05-09
 - **E1-U1 Store 层**: `collapsedGroups: Set<string>` 状态 + `toggleCollapse(groupId)` + `isCollapsed(groupId)` + `getVisibleNodes(nodes, collapsedGroups)` BFS 可见性过滤；localStorage 持久化（`vibex-dds-collapsed-{canvasId}`）
 - **E1-U2 折叠按钮**: DDSFlow Group 节点左上角 `data-testid="collapse-toggle"` 按钮；点击切换折叠/展开态

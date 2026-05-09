@@ -20,6 +20,19 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.350',
+    date: '2026-05-09',
+    changes: [
+      '🚀 S33-Epic2: 冲突可视化功能（E2-U1 ~ E4-E2）',
+      '✅ E2-U1 ConflictBubble — 集成到 DDSFlow 外层，无冲突时 render null',
+      '✅ E2-U2 conflictedCardId — conflictStore → DDSCanvasStore 同步 + data-conflict 属性',
+      '✅ E2-U3 冲突高亮 — 红框脉冲（#ef4444 + conflict-pulse 1.5s）',
+      '✅ E2-U4 仲裁 — ConflictDialog keep-local/use-remote 按钮',
+      '提交: 29360a04b',
+    ],
+    commit: '29360a04b',
+  },
+  {
     version: '1.0.349',
     date: '2026-05-09',
     changes: [

@@ -26,8 +26,8 @@ export type { PersistedDDDState };
 
 // ==================== Types ====================
 
-/** Selector type for a DDD store slice */
-type StoreSlice<T = Record<string, unknown>> = {
+/** Selector type for a DDD store slice — accepts both plain stores and Zustand UseBoundStore */
+type StoreSlice<T = object> = {
   getState: () => T;
   subscribe: (fn: (state: T, prevState: T) => void) => () => void;
 };
@@ -91,9 +91,9 @@ class DDDStateSyncManager {
    * Called once on first mount; subsequent calls are no-ops.
    */
   register(
-    contextStore: StoreSlice<any>,
-    modelStore: StoreSlice<any>,
-    _designStore: StoreSlice<any> | undefined
+    contextStore: StoreSlice<object>,
+    modelStore: StoreSlice<object>,
+    _designStore: StoreSlice<object> | undefined
   ): void {
     if (this._registered) return;
     this._registered = true;
@@ -133,9 +133,9 @@ class DDDStateSyncManager {
   }
 
   private _persistAll(
-    contextStore: StoreSlice<any>,
-    modelStore: StoreSlice<any>,
-    _designStore: StoreSlice<any> | undefined
+    contextStore: StoreSlice<object>,
+    modelStore: StoreSlice<object>,
+    _designStore: StoreSlice<object> | undefined
   ): void {
     const ctx = contextStore.getState();
     const model = modelStore.getState();
@@ -248,9 +248,9 @@ export const dddStateSyncManager = new DDDStateSyncManager();
  * Call once at app startup with all three DDD store references.
  */
 export function initDDDStateSync(
-  contextStore: StoreSlice<any>,
-  modelStore: StoreSlice<any>,
-  _designStore?: StoreSlice<any>
+  contextStore: StoreSlice<object>,
+  modelStore: StoreSlice<object>,
+  _designStore?: StoreSlice<object>
 ): void {
   dddStateSyncManager.register(contextStore, modelStore, _designStore);
 }

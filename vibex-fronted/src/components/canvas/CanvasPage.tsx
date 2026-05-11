@@ -91,9 +91,11 @@ import { NodeTooltip } from '@/components/guidance/NodeTooltip';
 import { CanvasOnboardingOverlay } from '@/components/guidance';
 import { CanvasFirstHint } from '@/components/guidance';
 import { ConflictDialog as ConflictDialogComponent } from '@/components/ConflictDialog';
+import ConflictBubble from './ConflictBubble';
 import { ConfirmDialog } from './features/ConfirmDialog';
 import { FeedbackFAB } from '@/components/FeedbackFAB';
 import { CanvasPreviewModal } from './json-render/CanvasPreviewModal';
+import OfflineBanner from './OfflineBanner';
 // F2.5 decision: FlowEdgeLayer remains in BusinessFlowTree (flow panel uses it); CanvasPage itself does not render edge layers
 import styles from './canvas.module.css';
 

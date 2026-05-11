@@ -4,7 +4,7 @@
  * 性能目标: < 50ms
  */
 
-/** Dev-only logger */
+// Dev-only logger (used by initOfflineListener and getRecommendationsWithFallback)
 const devLog = (...args: unknown[]) => {
   if (process.env.NODE_ENV !== 'production') canvasLogger.default.debug(...args);
 };
@@ -195,8 +195,8 @@ export function initOfflineListener(): () => void {
  */
 export async function getRecommendationsWithFallback(
   input: string,
-  onlineRecommender: (input: string) => Promise<any>
-): Promise<any> {
+  onlineRecommender: (input: string) => Promise<Record<string, unknown>>
+): Promise<Record<string, unknown>> {
   const isOnline = canUseOnlineMode();
   
   if (!isOnline) {

@@ -1,27 +1,18 @@
-# PRD — vibex-sprint6-qa / create-prd
+# PRD — vibex-sprint6-qa / Sprint6 QA 验证
 
 **项目**: vibex-sprint6-qa
-**版本**: v1.0
-**日期**: 2026-04-25
 **角色**: PM
-**上游**: analysis.md (2026-04-25, Analyst 报告)
+**日期**: 2026-04-25
+**上游**: analysis.md + plan/feature-list.md
+**状态**: ✅ PRD 完成
 
 ---
 
-## 执行摘要
+## 1. 执行摘要
 
 ### 背景
 
-vibex-sprint6-ai-coding-integration 是 VibeX Sprint6 的核心功能集，包含：
-1. **E1: 设计稿导入完善** — Figma URL 和设计图片导入到原型画布
-2. **E2: AI Coding Agent 反馈回路** — 基于组件生成代码，支持复制和反馈
-3. **E3: 画布版本历史** — 版本快照创建、列表展示、恢复功能
-4. **E4: 版本 Diff 可视化** — 两版本 diff 对比展示
-
-Analyst 在 QA 验证报告（`analysis.md`）中给出了**有条件通过**结论：
-- E1、E3、E4 产出物完整，规格齐全
-- **E2 Stub 是 P0 风险**：`mockAgentCall()` 无真实实现，若按当前架构实现则 E2 功能不可用
-- PRD、Architecture、Specs、Implementation Plan、AGENTS 五项产出物齐全
+Sprint6 AI Coding 集成提案（`vibex-sprint6-ai-coding-integration`）**有条件通过 QA 验证**（analysis.md，2026-04-25）。核心风险：E2 AI Coding Agent 的 `mockAgentCall()` 是功能性 Stub，Sprint6 若按此实现，E2 功能将完全不可用。
 
 ### 目标
 
@@ -29,516 +20,342 @@ Analyst 在 QA 验证报告（`analysis.md`）中给出了**有条件通过**结
 1. E1/E3/E4 的 Specs 与实现一一对应，四态定义完整
 2. E2 Stub 已升级为真实实现（方案 A: OpenClaw ACP Runtime 或方案 B: HTTP 后端 AI）
 3. DoD 逐条可核查，PRD 格式符合规范
-4. 关键风险已被验证或缓解
 
 ### 成功指标
 
-- E1 三个组件（FigmaImport / ImageImport / ImportConfirmDialog）四态验证通过
-- E2 CodingAgent 服务层通过集成测试（非 Stub）
-- E2 ProtoAttrPanel AI Tab 四态验证通过
-- E3 prototypeVersionStore + version-history 页面四态验证通过
-- E4 VersionDiff 组件 + jsondiffpatch diff 计算验证通过
-- E5 DoD 逐条核查无遗漏
-- E5 PRD 格式自检通过（7 项检查项全部覆盖）
-
----
-
-## 1. 功能点总表
-
-| ID | 功能点 | 描述 | 验收标准（expect()） | 页面集成 | Epic | 工时 |
-|----|--------|------|---------------------|---------|------|------|
-| F1.1 | FigmaImport 四态验证 | 验证 FigmaImport 组件四态符合 specs/E1-import-ui.md | 见 §2 E1 验收标准 | 【需页面集成】FigmaImport | E1 | 1h |
-| F1.2 | ImageImport 四态验证 | 验证 ImageImport 组件四态符合 specs/E1-import-ui.md | 见 §2 E1 验收标准 | 【需页面集成】ImageImport | E1 | 1h |
-| F1.3 | ImportConfirmDialog 四态验证 | 验证 ImportConfirmDialog 四态符合 specs/E1-import-ui.md | 见 §2 E1 验收标准 | 【需页面集成】ImportConfirmDialog | E1 | 0.5h |
-| F2.1 | CodingAgent 服务层验证 | 验证 CodingAgent.generateCode() 返回 GeneratedCode[]，非 Stub | `expect(codes[0].code).toBeTruthy(); expect(typeof codes[0].code).toBe('string')` | 无（服务层） | E2 | 1.5h |
-| F2.2 | ProtoAttrPanel AI Tab 四态验证 | 验证 ProtoAttrPanel AI 代码 Tab 四态符合 specs/E2-ai-coding.md | 见 §2 E2 验收标准 | 【需页面集成】ProtoAttrPanel | E2 | 1h |
-| F2.3 | E2 Stub 升级决策验证 | 验证 PRD 指定的方案 A 或方案 B 已选择并实现 | `expect(sessions_spawn).toHaveBeenCalled() // 方案 A` 或 `expect(aiService.generate).toHaveBeenCalled() // 方案 B` | 无（架构层） | E2 | 0.5h |
-| F3.1 | prototypeVersionStore 验证 | 验证 prototypeVersionStore 存在且行为符合 specs/E3-version-history.md | `expect(usePrototypeVersionStore.getState().snapshots).toBeInstanceOf(Array)` | 无（store） | E3 | 1h |
-| F3.2 | version-history 页面四态验证 | 验证 version-history 页面四态符合 specs/E3-version-history.md | 见 §2 E3 验收标准 | 【需页面集成】version-history | E3 | 1h |
-| F4.1 | VersionDiff 组件四态验证 | 验证 VersionDiff 组件四态符合 specs/E4-version-diff.md | 见 §2 E4 验收标准 | 【需页面集成】VersionDiff | E4 | 1h |
-| F4.2 | jsondiffpatch diff 计算验证 | 验证 added/removed/modified 分类正确 | 见 §2 E4 验收标准 | 无（计算逻辑） | E4 | 1h |
-| F5.1 | Specs 覆盖率验证 | 验证每个 Spec 文件至少有一个 QA 验证点覆盖 | `expect(coveredEpicSet.size).toBe(4) // E1 E2 E3 E4 全部覆盖` | 无（文档层） | E5 | 0.5h |
-| F5.2 | DoD 逐条核查 | 逐条验证 PRD DoD 章节所有条目是否可测试 | `expect(dodChecklistItems.every(item => item.verifiable === true)).toBe(true)` | 无（文档层） | E5 | 0.5h |
-| F5.3 | PRD 格式自检 | 验证 PRD 包含全部必需章节 | 见格式自检表 | 无（文档层） | E5 | 0.5h |
+| 指标 | 目标值 | 测量方式 |
+|------|--------|---------|
+| 全量测试覆盖率 | ≥ 80% | Vitest coverage-v8 报告 |
+| E2 Stub 消失率 | 100% | 源码静态分析（无 mockAgentCall/TODO） |
+| 四态验证覆盖率 | 100% | 每个 Spec 文件 ≥ 1 个 QA 验证点（E5.1） |
+| DoD 逐条通过率 | 100% | E5.2 逐条核查 |
+| PRD 格式自检 | 通过 | E5.3 格式校验 |
 
 **总工时: 11h**
 
 ---
 
-## 2. Epic / Story 表格
+## 2. Epic 拆分
 
-### E1: 设计稿导入 QA 验证
+### Epic 总览
 
-| Story ID | Story | 验收标准 | 工时 |
-|----------|-------|---------|------|
-| E1-S1 | FigmaImport 四态验证 | F1.1 | 1h |
-| E1-S2 | ImageImport 四态验证 | F1.2 | 1h |
-| E1-S3 | ImportConfirmDialog 四态验证 | F1.3 | 0.5h |
+| Epic | 功能点 | 优先级 | 工时 |
+|------|--------|--------|------|
+| E1: 设计稿导入验证 | F1.1 + F1.2 + F1.3 | P0 | 2.5h |
+| E2: AI Coding Agent 验证 | F2.1 + F2.2 + F2.3 | P0 | 3.0h |
+| E3: 版本历史验证 | F3.1 + F3.2 | P1 | 2.0h |
+| E4: 版本 Diff 验证 | F4.1 + F4.2 | P1 | 2.0h |
+| E5: 质量保障 | F5.1 + F5.2 + F5.3 | P2 | 1.5h |
 
-**E1 Epic 工时: 2.5h**
+---
 
-#### E1 验收标准（expect() 断言）
+### E1: 设计稿导入验证
 
-```typescript
-// E1-S1: FigmaImport 四态
+**功能点**: F1.1（FigmaImport 四态） + F1.2（ImageImport 四态） + F1.3（ImportConfirmDialog 四态）
+**优先级**: P0 | **工时**: 2.5h
 
-// 理想态
-expect(screen.getByLabelText('Figma URL')).toBeInTheDocument();
-expect(screen.getByRole('button', { name: /获取组件/i })).toBeInTheDocument();
-userEvent.type(screen.getByLabelText('Figma URL'), 'https://figma.com/file/abc123');
-expect(screen.getByRole('button', { name: /获取组件/i })).toBeEnabled();
+#### 2a. 本质需求穿透（剥洋葱）
 
-// 加载态（API 调用中）
-const mockFigmaApi = jest.fn().mockImplementation(() => new Promise(() => {}));
-userEvent.click(screen.getByRole('button', { name: /获取组件/i }));
-expect(screen.getByRole('button', { name: /获取中/i })).toBeInTheDocument();
-expect(screen.getByRole('button', { name: /获取中/i })).toBeDisabled();
+| 层级 | 需求 | 本质 |
+|------|------|------|
+| 表层 | 组件四态完整 | UI 反馈正确 |
+| 二层 | Figma/Image 导入成功 | 设计稿能进来 |
+| 三层 | 用户确认导入前可见预览 | 不瞎导 |
+| **本质** | **设计师能把 Figma/图片里的组件，一键导入到 VibeX 画布** | **零摩擦设计导入** |
 
-// 错误态
-mockFigmaApi.mockRejectedValue(new Error('invalid'));
-userEvent.click(screen.getByRole('button', { name: /获取组件/i }));
-await waitFor(() => {
-  expect(screen.getByLabelText('Figma URL')).toHaveAttribute('aria-invalid', 'true');
-  expect(screen.getByText(/无效的 Figma URL/i)).toBeInTheDocument();
-});
+#### 2b. 最小可行范围
 
-// E1-S2: ImageImport 四态
+**必做**：
+- FigmaImport 四态（ideal/empty/loading/error）— specs/E1-import-ui.md
+- ImageImport 四态（ideal/empty/loading/error）— specs/E1-import-ui.md
+- ImportConfirmDialog 四态（ideal/loading/error）— specs/E1-import-ui.md
+- E2E Playwright 测试覆盖
 
-// 理想态（空状态）
-expect(screen.getByTestId('image-drop-zone')).toBeInTheDocument();
-expect(screen.getByText(/拖拽设计图片到这里/i)).toBeInTheDocument();
+**不做**：
+- Figma API Token 管理（延期至 Token 管理方案落地）
+- Figma URL 解析（Image AI 降级路径已满足 MVP）
 
-// 加载态
-const file = new File([imageData], 'design.png', { type: 'image/png' });
-fireEvent.drop(screen.getByTestId('image-drop-zone'), { dataTransfer: { files: [file] } });
-expect(screen.getByText(/AI 正在识别中/i)).toBeInTheDocument();
-expect(screen.getByTestId('image-skeleton')).toBeInTheDocument();
+**暂缓**：
+- 多选组件批量导入确认流程
 
-// 错误态（格式不支持）
-const badFile = new File([data], 'design.bmp', { type: 'image/bmp' });
-fireEvent.drop(screen.getByTestId('image-drop-zone'), { dataTransfer: { files: [badFile] } });
-await waitFor(() => {
-  expect(screen.getByText(/不支持的图片格式/i)).toBeInTheDocument();
-});
+#### 2c. 用户情绪地图（老妈测试）
 
-// E1-S3: ImportConfirmDialog 四态
+> "这个东西能让我把 Figma 里的东西弄进来吗？"
 
-// 理想态
-expect(screen.getByRole('dialog')).toBeInTheDocument();
-expect(screen.getByRole('button', { name: /确认导入/i })).toBeInTheDocument();
-expect(screen.getByRole('button', { name: /取消/i })).toBeInTheDocument();
+| 状态 | 用户感受 | 情绪 |
+|------|---------|------|
+| 理想态 | 看到 Figma URL 输入框，知道填什么 | 😌 自信 |
+| 空状态 | 提示"该文件中没有可导入的组件" | 😐 困惑（但知道下一步） |
+| 加载态 | 看到骨架屏，不是白屏 | 😟 不慌 |
+| 错误态 | 看到明确错误文案 + 重试方式 | 😤 烦躁但有路 |
 
-// 加载态（导入中）
-userEvent.click(screen.getByRole('button', { name: /确认导入/i }));
-expect(screen.getByTestId('import-progress')).toBeInTheDocument();
+#### 2d. UI 状态规范
+
+详见 `specs/E1-import-ui.md`
+
+---
+
+### E2: AI Coding Agent 验证
+
+**功能点**: F2.1（CodingAgent 服务层） + F2.2（ProtoAttrPanel AI Tab 四态） + F2.3（Stub 升级决策）
+**优先级**: P0 | **工时**: 3.0h
+
+#### 2a. 本质需求穿透（剥洋葱）
+
+| 层级 | 需求 | 本质 |
+|------|------|------|
+| 表层 | 组件四态完整 | UI 反馈正确 |
+| 二层 | generateCode() 返回真实代码 | Agent 不是 Stub |
+| 三层 | 代码可复制 | 能拿走用 |
+| **本质** | **用户选中画布组件，AI 生成可用代码片段** | **一键代码生成** |
+
+#### 2b. 最小可行范围
+
+**必做**：
+- CodingAgent.generateCode() 非 Stub（静态分析验证）— F2.3
+- generateCode() 返回 GeneratedCode[] 格式验证 — F2.1
+- ProtoAttrPanel AI Tab 四态（ideal/empty/loading/error）— specs/E2-ai-coding.md
+- F2.1 Vitest 单元测试
+
+**不做**：
+- Agent 生成代码写入项目文件的闭环（Architecture 已标注，延期）
+- 实时流式反馈 UI（无 CodingFeedbackPanel 详细设计）
+
+**暂缓**：
+- 多模型并行生成
+
+#### 2c. 用户情绪地图（老妈测试）
+
+> "这个按钮真能用吗？按下去会怎样？"
+
+| 状态 | 用户感受 | 情绪 |
+|------|---------|------|
+| 理想态 | 看到生成的代码 + 复制按钮 | 😍 哇 |
+| 空状态 | 看到引导文案"点击生成代码" | 😐 知道要做什么 |
+| 加载态 | 看到骨架屏 + "正在调用 Claude..." | 😟 等着但不焦虑 |
+| 错误态 | 看到错误 banner + 重试按钮，不丢代码 | 😤 烦躁但有救 |
+
+#### 2d. UI 状态规范
+
+详见 `specs/E2-ai-coding.md`
+
+---
+
+### E3: 版本历史验证
+
+**功能点**: F3.1（prototypeVersionStore） + F3.2（version-history 页面四态）
+**优先级**: P1 | **工时**: 2.0h
+
+#### 2a. 本质需求穿透（剥洋葱）
+
+| 层级 | 需求 | 本质 |
+|------|------|------|
+| 表层 | 版本列表 + 四态 | 看到历史 |
+| 二层 | createSnapshot / restoreSnapshot | 能保存/能回退 |
+| 三层 | 选版本时数据一致 | 不丢东西 |
+| **本质** | **用户在画布操作中途，随时保存一个版本，之后能随时回到那个版本** | **后悔药** |
+
+#### 2b. 最小可行范围
+
+**必做**：
+- prototypeVersionStore 存在且行为正确 — F3.1（Vitest store 测试）
+- version-history 页面四态（ideal/empty/loading/error）— specs/E3-version-history.md
+
+**不做**：
+- 版本对比（E4 独立）
+- 版本命名/重命名
+
+**暂缓**：
+- 版本自动保存（定时）
+
+#### 2c. 用户情绪地图（老妈测试）
+
+> "我刚才改坏了，能回到之前吗？"
+
+| 状态 | 用户感受 | 情绪 |
+|------|---------|------|
+| 理想态 | 看到版本列表 + 时间 + 节点数 | 😌 安心 |
+| 空状态 | 看到时间机器图标 + "保存第一个版本" | 😟 好奇 |
+| 加载态 | 看到骨架屏 | 😟 耐心等 |
+| 错误态 | 看到 toast + 重试，当前画布不丢 | 😤 能接受 |
+
+#### 2d. UI 状态规范
+
+详见 `specs/E3-version-history.md`
+
+---
+
+### E4: 版本 Diff 验证
+
+**功能点**: F4.1（VersionDiff 组件四态） + F4.2（jsondiffpatch diff 计算）
+**优先级**: P1 | **工时**: 2.0h
+
+#### 2a. 本质需求穿透（剥洋葱）
+
+| 层级 | 需求 | 本质 |
+|------|------|------|
+| 表层 | diff 可视化（绿/红/黄） | 看得见差异 |
+| 二层 | added/removed/modified 分类正确 | 分类准 |
+| 三层 | 无差异时显示文案 | 不留白 |
+| **本质** | **用户选两个版本，清楚地看到这之间发生了什么变化** | **所见即所得的变化追踪** |
+
+#### 2b. 最小可行范围
+
+**必做**：
+- VersionDiff 组件四态（ideal/empty/loading/error）— specs/E4-version-diff.md
+- computeVersionDiff 四场景（added/removed/modified/无差异）— F4.2（Vitest 单元测试）
+
+**不做**：
+- 边（edges）的 diff（节点 diff 已覆盖）
+
+**暂缓**：
+- diff 结果导出（JSON/Markdown）
+
+#### 2c. 用户情绪地图（老妈测试）
+
+> "我改了什么来着？"
+
+| 状态 | 用户感受 | 情绪 |
+|------|---------|------|
+| 理想态 | 看到绿增红删黄改，颜色清晰 | 😍 清晰 |
+| 空状态 | 看到"两个版本没有差异" | 😌 放心 |
+| 加载态 | 看到骨架屏 | 😟 等着 |
+| 错误态 | 看到错误信息，不渲染脏 diff | 😤 能接受 |
+
+#### 2d. UI 状态规范
+
+详见 `specs/E4-version-diff.md`
+
+---
+
+### E5: 质量保障
+
+**功能点**: F5.1（全量 Specs 覆盖率验证）+ F5.2（DoD 逐条核查）+ F5.3（PRD 格式自检）
+**优先级**: P2 | **工时**: 1.5h
+
+#### 2a. 本质需求穿透（剥洋葱）
+
+| 层级 | 需求 | 本质 |
+|------|------|------|
+| 表层 | Specs 覆盖率 ≥ 100% | 有据可依 |
+| 二层 | DoD 逐条可核查 | 不扯皮 |
+| 三层 | PRD 格式正确 | 团队协作顺畅 |
+| **本质** | **研发交付时，有明确标准判断完成与否** | **减少返工** |
+
+#### 2b. 最小可行范围
+
+**必做**：
+- 每个 Spec 文件 ≥ 1 个 QA 验证点（F5.1）
+- PRD 自检逐条通过（F5.3）
+
+**不做**：
+- 覆盖率报告自动生成（手动汇总即可）
+
+**暂缓**：
+- CI 集成自动化 QA 检查
+
+---
+
+## 3. 验收标准
+
+### Story 表格
+
+| Story ID | 描述 | Epic | 工时 | 验收标准（expect 断言） |
+|----------|------|------|------|----------------------|
+| S-E1-01 | FigmaImport 四态验证 | E1 | 1.0h | `expect(getByRole('button', { name: /获取组件/i })).toBeDisabled()` 当 URL 为空时 |
+| S-E1-02 | ImageImport 四态验证 | E1 | 1.0h | `expect(getByTestId('image-skeleton')).toBeVisible()` 当 AI 识别中时 |
+| S-E1-03 | ImportConfirmDialog 四态验证 | E1 | 0.5h | `expect(getByTestId('import-progress')).toBeVisible()` 当导入进行中时 |
+| S-E2-01 | CodingAgent.generateCode() 返回格式 | E2 | 1.5h | `expect(Array.isArray(codes)).toBe(true)`<br>`expect(codes[0].language).toMatch(/tsx\|jsx/)`<br>`expect(codes[0].code.length).toBeGreaterThan(0)` |
+| S-E2-02 | ProtoAttrPanel AI Tab 四态 | E2 | 1.0h | `expect(getByTestId('code-skeleton')).toBeVisible()` 当生成中时 |
+| S-E2-03 | E2 Stub 升级验证 | E2 | 0.5h | `expect(sourceCode).not.toMatch(/mockAgentCall/)`<br>`expect(sourceCode).not.toMatch(/TODO.*Replace with real agent/i)` |
+| S-E3-01 | prototypeVersionStore 存在性和行为 | E3 | 1.0h | `expect(usePrototypeVersionStore.getState().createSnapshot).toBeDefined()`<br>`expect(after).toBe(before + 1)` 创建快照后数量+1 |
+| S-E3-02 | version-history 页面四态 | E3 | 1.0h | `expect(getByText(/还没有保存过版本/i)).toBeVisible()` 当无版本时 |
+| S-E4-01 | VersionDiff 组件四态 | E4 | 1.0h | `expect(getByTestId('diff-added')).toBeVisible()` 当有新增时 |
+| S-E4-02 | computeVersionDiff 四场景 | E4 | 1.0h | `expect(diff.nodes.added).toHaveLength(1)` 场景1<br>`expect(diff.nodes.removed).toHaveLength(1)` 场景2<br>`expect(diff.nodes.modified[0].after.props.text).toBe('Submit')` 场景3<br>`expect(diff).toEqual({})` 场景4 |
+| S-E5-01 | 全量 Specs 覆盖率 | E5 | 0.5h | `expect(coverageReport['E1-import-ui']).toBeGreaterThanOrEqual(1)`<br>`expect(coverageReport['E2-ai-coding']).toBeGreaterThanOrEqual(1)`<br>`expect(coverageReport['E3-version-history']).toBeGreaterThanOrEqual(1)`<br>`expect(coverageReport['E4-version-diff']).toBeGreaterThanOrEqual(1)` |
+| S-E5-02 | DoD 逐条核查 | E5 | 0.5h | 逐条执行 DoD 清单，每条有 pass/fail 记录 |
+| S-E5-03 | PRD 格式自检 | E5 | 0.5h | `expect(prdContent).toMatch(/执行摘要/)`<br>`expect(prdContent).toMatch(/验收标准/)`<br>`expect(prdContent).toMatch(/Definition of Done/)` |
+
+### 依赖关系图
+
+```
+S-E1-01 + S-E1-02 + S-E1-03
+    ↓
+S-E2-01 + S-E2-02 ← S-E2-03（Stub 验证独立，先执行）
+    ↓
+S-E3-01 + S-E3-02
+    ↓
+S-E4-01 + S-E4-02
+    ↓
+S-E5-01 + S-E5-02 + S-E5-03
 ```
 
 ---
 
-### E2: AI Coding Agent QA 验证
+## 4. DoD (Definition of Done)
 
-| Story ID | Story | 验收标准 | 工时 |
-|----------|-------|---------|------|
-| E2-S1 | CodingAgent 服务层验证 | F2.1 | 1.5h |
-| E2-S2 | ProtoAttrPanel AI Tab 四态验证 | F2.2 | 1h |
-| E2-S3 | E2 Stub 升级决策验证 | F2.3 | 0.5h |
+研发完成的判断标准，**每条必须满足**：
 
-**E2 Epic 工时: 3h**
+### 通用 DoD
 
-#### E2 验收标准（expect() 断言）
+- [ ] **D1**: 所有 Story 的 `expect()` 断言全部通过（Vitest / Playwright 测试绿）
+- [ ] **D2**: 测试覆盖率报告存在，E1/E3/E4 ≥ 80%，E2 ≥ 85%
+- [ ] **D3**: 源码静态分析确认无 `mockAgentCall` 或 `// TODO: Replace with real agent`
+- [ ] **D4**: E2 Stub 升级方案已明确（方案 A: ACP Runtime 或方案 B: HTTP 后端）
+- [ ] **D5**: TypeScript 类型检查通过（`pnpm exec tsc --noEmit` 无错误）
+- [ ] **D6**: 每个 Spec 文件至少有 1 个对应的测试用例覆盖
 
-```typescript
-// E2-S1: CodingAgent 服务层（非 Stub）
+### Epic 专属 DoD
 
-// 验证非 mockAgentCall（Stub 检测）
-const originalModule = jest.requireActual('@/services/ai-coding/CodingAgent');
-expect(originalModule.prototype.generateCode.toString()).not.toMatch(/mockAgentCall|TODO.*real agent/i);
+**E1 设计稿导入**
+- [ ] **E1-D1**: FigmaImport 四态 Playwright 测试通过（ideal/empty/loading/error）
+- [ ] **E1-D2**: ImageImport 四态 Playwright 测试通过（ideal/empty/loading/error）
+- [ ] **E1-D3**: ImportConfirmDialog 四态 Playwright 测试通过（ideal/loading/error）
+- [ ] **E1-D4**: Specs/E1-import-ui.md 四态与实现一一对应
 
-// 真实调用验证（方案 A: OpenClaw ACP 或方案 B: HTTP）
-const mockSessionsSpawn = jest.fn().mockResolvedValue('session-abc');
-jest.doMock('@/services/openclaw', () => ({ sessions_spawn: mockSessionsSpawn }));
+**E2 AI Coding Agent**
+- [ ] **E2-D1**: CodingAgent.generateCode() 返回非空 GeneratedCode[]（Vitest）
+- [ ] **E2-D2**: ProtoAttrPanel AI Tab 四态 Playwright 测试通过
+- [ ] **E2-D3**: 源码不含 mockAgentCall 或 Stub TODO 注释
+- [ ] **E2-D4**: Specs/E2-ai-coding.md 四态与实现一一对应
 
-const codes = await codingAgent.generateCode([{ id: 'n1', type: 'Button', props: {} }]);
-expect(Array.isArray(codes)).toBe(true);
-expect(codes.length).toBeGreaterThan(0);
-expect(typeof codes[0].code).toBe('string');
-expect(codes[0].code.length).toBeGreaterThan(0);
-expect(codes[0].componentId).toBe('n1');
-expect(codes[0].language).toMatch(/tsx|jsx/);
+**E3 版本历史**
+- [ ] **E3-D1**: prototypeVersionStore 的 createSnapshot/restoreSnapshot 行为正确（Vitest）
+- [ ] **E3-D2**: version-history 页面四态 Playwright 测试通过
+- [ ] **E3-D3**: Specs/E3-version-history.md 四态与实现一一对应
 
-// E2-S2: ProtoAttrPanel AI Tab 四态
+**E4 版本 Diff**
+- [ ] **E4-D1**: VersionDiff 组件四态 Playwright 测试通过
+- [ ] **E4-D2**: computeVersionDiff 四场景（added/removed/modified/无差异）全部通过（Vitest）
+- [ ] **E4-D3**: Specs/E4-version-diff.md 四态与实现一一对应
 
-// 理想态（空状态）
-fireEvent.dblClick(screen.getByTestId('proto-node'));
-expect(screen.getByRole('tab', { name: /AI 代码/i })).toBeInTheDocument();
-userEvent.click(screen.getByRole('tab', { name: /AI 代码/i }));
-expect(screen.getByText(/点击「生成代码」查看 AI 生成的组件代码/i)).toBeInTheDocument();
-
-// 加载态
-mockCodingAgent.generateCode.mockImplementation(() => new Promise(() => {}));
-userEvent.click(screen.getByRole('button', { name: /生成代码/i }));
-expect(screen.getByTestId('code-skeleton')).toBeInTheDocument();
-expect(screen.getByText(/正在调用 Claude/i)).toBeInTheDocument();
-
-// 错误态
-mockCodingAgent.generateCode.mockRejectedValue(new Error('API error'));
-await waitFor(() => {
-  expect(screen.getByTestId('code-error-banner')).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: /重新生成/i })).toBeInTheDocument();
-});
-
-// 理想态（代码生成成功）
-mockCodingAgent.generateCode.mockResolvedValue([{ componentId: 'n1', code: 'export const Button = () => <button>Click</button>', language: 'tsx', model: 'claude' }]);
-userEvent.click(screen.getByRole('button', { name: /生成代码/i }));
-await waitFor(() => {
-  expect(screen.getByTestId('ai-code-output')).toBeInTheDocument();
-  expect(screen.getByTestId('ai-code-output').textContent).toMatch(/export const Button/i);
-  expect(screen.getByRole('button', { name: /复制/i })).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: /重新生成/i })).toBeInTheDocument();
-});
-
-// E2-S3: Stub 升级决策验证
-// 方案 A: OpenClaw ACP
-expect(sessions_spawn).toHaveBeenCalledWith(expect.objectContaining({ runtime: 'acp', mode: 'session' }));
-// 或方案 B: HTTP 后端
-expect(aiService.generate).toHaveBeenCalledWith(expect.objectContaining({ model: expect.stringContaining('claude') }));
-```
+**E5 质量保障**
+- [ ] **E5-D1**: 全量 Specs 覆盖率报告产出，每份 Spec ≥ 1 个验证点
+- [ ] **E5-D2**: DoD 逐条核查记录存在（pass/fail 每条记录）
+- [ ] **E5-D3**: PRD 自检清单全部通过（本文件 §驳回红线检查）
 
 ---
 
-### E3: 版本历史 QA 验证
+## 5. 驳回红线检查
 
-| Story ID | Story | 验收标准 | 工时 |
-|----------|-------|---------|------|
-| E3-S1 | prototypeVersionStore 验证 | F3.1 | 1h |
-| E3-S2 | version-history 页面四态验证 | F3.2 | 1h |
+PRD 自检：
 
-**E3 Epic 工时: 2h**
-
-#### E3 验收标准（expect() 断言）
-
-```typescript
-// E3-S1: prototypeVersionStore
-
-expect(usePrototypeVersionStore).toBeDefined();
-expect(typeof usePrototypeVersionStore.getState().snapshots).toBe('object');
-expect(typeof usePrototypeVersionStore.getState().createSnapshot).toBe('function');
-expect(typeof usePrototypeVersionStore.getState().restoreSnapshot).toBe('function');
-expect(typeof usePrototypeVersionStore.getState().loadSnapshots).toBe('function');
-
-// createSnapshot: 快照创建成功
-const before = usePrototypeVersionStore.getState().snapshots.length;
-await usePrototypeVersionStore.getState().createSnapshot();
-const after = usePrototypeVersionStore.getState().snapshots.length;
-expect(after).toBe(before + 1);
-
-// restoreSnapshot: 数据还原正确
-const target = usePrototypeVersionStore.getState().snapshots[0];
-await usePrototypeVersionStore.getState().restoreSnapshot(target.id);
-expect(usePrototypeStore.getState().nodes).toMatchObject(target.data.nodes);
-
-// E3-S2: version-history 页面四态
-
-// 理想态
-expect(screen.getByTestId('version-list')).toBeInTheDocument();
-expect(screen.getAllByTestId('version-item').length).toBeGreaterThan(0);
-expect(screen.getByText(/2026-04-18/)).toBeInTheDocument(); // 时间显示
-
-// 空状态（无版本时）
-mockApi.get.mockResolvedValue([]);
-render(<VersionHistoryPage />);
-expect(screen.getByText(/还没有保存过版本/i)).toBeInTheDocument();
-expect(screen.getByRole('button', { name: /保存第一个版本/i })).toBeInTheDocument();
-
-// 加载态
-mockApi.get.mockImplementation(() => new Promise(() => {}));
-render(<VersionHistoryPage />);
-expect(screen.getAllByTestId('version-skeleton').length).toBe(5);
-expect(screen.queryByRole('button', { name: /保存第一个版本/i })).not.toBeInTheDocument();
-
-// 错误态
-mockApi.get.mockRejectedValue(new Error('network error'));
-render(<VersionHistoryPage />);
-await waitFor(() => {
-  expect(screen.getByTestId('toast-error')).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: /重试/i })).toBeInTheDocument();
-});
-```
+- [ ] 执行摘要包含：背景 + 目标 + 成功指标（可量化）
+- [ ] Epic/Story 表格格式正确（ID/描述/工时/验收标准）
+- [ ] 每个 Story 有可写的 `expect()` 断言（可直接转化为测试用例）
+- [ ] DoD 章节存在且具体（通用 DoD + Epic 专属 DoD）
+- [ ] 神技 1-3：每个 Epic 有本质需求穿透、最小可行范围、情绪地图
+- [ ] 神技 4：涉及页面的 Epic 有 specs/ 四态定义
+- [ ] specs/ 中无硬编码间距（使用 8 倍数 Token）、无硬编码颜色（使用 Token）
 
 ---
 
-### E4: 版本 Diff QA 验证
-
-| Story ID | Story | 验收标准 | 工时 |
-|----------|-------|---------|------|
-| E4-S1 | VersionDiff 组件四态验证 | F4.1 | 1h |
-| E4-S2 | jsondiffpatch diff 计算验证 | F4.2 | 1h |
-
-**E4 Epic 工时: 2h**
-
-#### E4 验收标准（expect() 断言）
-
-```typescript
-// E4-S1: VersionDiff 组件四态
-
-// 理想态（两版本有差异）
-render(<VersionDiff before={snapshotV1} after={snapshotV2} />);
-expect(screen.getByTestId('diff-added')).toBeInTheDocument(); // 绿色
-expect(screen.getByTestId('diff-removed')).toBeInTheDocument(); // 红色
-expect(screen.getByTestId('diff-modified')).toBeInTheDocument(); // 黄色
-
-// 空状态（两版本完全相同）
-render(<VersionDiff before={snapshotV1} after={snapshotV1} />);
-expect(screen.getByText(/两个版本没有差异/i)).toBeInTheDocument();
-expect(screen.queryByTestId('diff-added')).not.toBeInTheDocument();
-
-// 加载态（diff 计算中）
-render(<VersionDiff before={snapshotV1} after={snapshotV2} diffLoading={true} />);
-expect(screen.getByTestId('diff-skeleton')).toBeInTheDocument();
-
-// 错误态
-render(<VersionDiff before={snapshotV1} after={snapshotV2} diffError={new Error('compute failed')} />);
-expect(screen.getByText(/diff 计算失败/i)).toBeInTheDocument();
-
-// E4-S2: jsondiffpatch diff 计算
-
-// added 场景
-const v1 = { nodes: [{ id: 'n1', type: 'Button' }] };
-const v2 = { nodes: [{ id: 'n1', type: 'Button' }, { id: 'n2', type: 'Input' }] };
-const diff = computeVersionDiff(v1, v2);
-expect(diff.nodes.added).toHaveLength(1);
-expect(diff.nodes.added[0].id).toBe('n2');
-
-// removed 场景
-const v1r = { nodes: [{ id: 'n1', type: 'Button' }, { id: 'n2', type: 'Input' }] };
-const v2r = { nodes: [{ id: 'n1', type: 'Button' }] };
-const diffR = computeVersionDiff(v1r, v2r);
-expect(diffR.nodes.removed).toHaveLength(1);
-expect(diffR.nodes.removed[0].id).toBe('n2');
-
-// modified 场景
-const v1m = { nodes: [{ id: 'n1', type: 'Button', props: { text: 'Click' } }] };
-const v2m = { nodes: [{ id: 'n1', type: 'Button', props: { text: 'Submit' } }] };
-const diffM = computeVersionDiff(v1m, v2m);
-expect(diffM.nodes.modified).toHaveLength(1);
-expect(diffM.nodes.modified[0].before.props.text).toBe('Click');
-expect(diffM.nodes.modified[0].after.props.text).toBe('Submit');
-
-// 无差异场景
-const diffEmpty = computeVersionDiff(v1, v1);
-expect(diffEmpty).toEqual({});
-```
-
----
-
-### E5: 质量保障 QA 验证
-
-| Story ID | Story | 验收标准 | 工时 |
-|----------|-------|---------|------|
-| E5-S1 | Specs 覆盖率验证 | F5.1 | 0.5h |
-| E5-S2 | DoD 逐条核查 | F5.2 | 0.5h |
-| E5-S3 | PRD 格式自检 | F5.3 | 0.5h |
-
-**E5 Epic 工时: 1.5h**
-
-#### E5 验收标准（expect() 断言）
-
-```typescript
-// E5-S1: Specs 覆盖率
-
-const specFiles = [
-  'specs/E1-import-ui.md',
-  'specs/E2-ai-coding.md',
-  'specs/E3-version-history.md',
-  'specs/E4-version-diff.md',
-];
-const qaCoverageMap = {
-  'specs/E1-import-ui.md': ['F1.1', 'F1.2', 'F1.3'],
-  'specs/E2-ai-coding.md': ['F2.1', 'F2.2'],
-  'specs/E3-version-history.md': ['F3.1', 'F3.2'],
-  'specs/E4-version-diff.md': ['F4.1', 'F4.2'],
-};
-specFiles.forEach(file => {
-  expect(qaCoverageMap[file]).toBeDefined();
-  expect(qaCoverageMap[file].length).toBeGreaterThan(0);
-});
-
-// E5-S2: DoD 逐条核查
-const dodItems = [
-  'Figma URL 输入 → 组件列表加载成功',
-  'FigmaImport 显示组件预览',
-  '点击导入 → ProtoNode 添加到 prototypeStore',
-  'Image Import 拖拽上传 → AI 识别结果显示',
-  '识别的组件成功添加到画布',
-  'CodingAgent.generateCode() 返回 GeneratedCode[]',
-  'ProtoAttrPanel 有 AI 代码 Tab（切换可见）',
-  'Tab 显示生成的代码字符串',
-  '复制按钮可用',
-  '生成结果含 aiMeta 存储到 snapshot',
-  'prototypeVersionStore 独立存在',
-  '点击"保存版本" → snapshot 创建成功',
-  'version-history 页面显示版本列表',
-  '点击"恢复" → prototypeStore 数据还原',
-  'pnpm test → 全部通过',
-  'changelog 包含 Sprint6 所有功能',
-];
-dodItems.forEach(item => {
-  expect(item.verifiable).toBe(true); // 每条 DoD 必须可测试
-});
-
-// E5-S3: PRD 格式自检（见下表）
-```
-
----
-
-## 3. DoD (Definition of Done)
-
-### Sprint6 QA 验证完成判断标准
-
-#### E1 设计稿导入验证
-- [ ] F1.1: FigmaImport 四态验证通过（理想态/空状态/加载态/错误态各有≥1 个 expect() 断言）
-- [ ] F1.2: ImageImport 四态验证通过（拖拽/上传/识别结果/错误处理各有 expect() 断言）
-- [ ] F1.3: ImportConfirmDialog 四态验证通过（理想态/加载态各有 expect() 断言）
-
-#### E2 AI Coding Agent 验证
-- [ ] F2.1: CodingAgent 服务层集成测试通过，验证非 Stub
-- [ ] F2.2: ProtoAttrPanel AI Tab 四态验证通过（空状态/加载态/错误态/理想态各有 expect() 断言）
-- [ ] F2.3: E2 Stub 升级方案已选择（A: OpenClaw ACP 或 B: HTTP 后端 AI），代码已实现
-
-#### E3 版本历史验证
-- [ ] F3.1: prototypeVersionStore 所有 Actions（createSnapshot/restoreSnapshot/loadSnapshots）验证通过
-- [ ] F3.2: version-history 页面四态验证通过（理想态/空状态/加载态/错误态各有 expect() 断言）
-
-#### E4 版本 Diff 验证
-- [ ] F4.1: VersionDiff 组件四态验证通过（理想态/空状态/加载态/错误态各有 expect() 断言）
-- [ ] F4.2: jsondiffpatch diff 计算 added/removed/modified/无差异 四场景全部验证通过
-
-#### E5 质量保障验证
-- [ ] F5.1: Specs 覆盖率 100%（E1/E2/E3/E4 每个 Spec 文件都有对应 QA 验证点）
-- [ ] F5.2: PRD DoD 全部 16 条条目逐条可测试
-- [ ] F5.3: PRD 格式自检全部 7 项通过
-
-#### 全局
-- [ ] `pnpm exec tsc --noEmit` → 0 errors
-- [ ] `pnpm test` → 全部通过（测试覆盖率 ≥ 80%）
-- [ ] 无新的 P0 缺陷引入
-- [ ] E2 Stub P0 风险已关闭（mockAgentCall 已替换为真实实现）
-
----
-
-## 4. PRD 格式自检表
-
-| # | 检查项 | 是否满足 | 说明 |
-|---|--------|---------|------|
-| 1 | 执行摘要包含：背景 | ✅ | §执行摘要/背景 |
-| 2 | 执行摘要包含：目标 | ✅ | §执行摘要/目标 |
-| 3 | 执行摘要包含：成功指标 | ✅ | §执行摘要/成功指标 |
-| 4 | Epic/Story 表格格式正确（ID/描述/工时/验收标准） | ✅ | §2 Epic/Story 表格 |
-| 5 | 每个 Story 有可写的 expect() 断言 | ✅ | §2 各 Epic 验收标准 |
-| 6 | DoD 章节存在且具体 | ✅ | §3 DoD（16 条） |
-| 7 | 关键页面有"用户情绪地图" | ✅ | §5 用户情绪地图 |
-
----
-
-## 5. 本质需求穿透（神技1）
-
-> **去掉这个 Sprint 的 QA 工作，VibeX 会失去什么？**
-
-### E1 设计稿导入 QA
-- **底层动机**: Sprint6 结束后，Figma/图片导入必须是可靠的 — 设计师不能因为导入失败就放弃使用 VibeX
-- **去掉 E1 QA 会怎样**: Specs 存在但四态未经验证，E1 上线后用户会遇到无法预知的加载/错误态崩溃
-- **本质问题**: 设计稿导入是 VibeX 的核心差异化能力，导入不可靠 = 整个工具不可信
-
-### E2 AI Coding Agent QA
-- **底层动机**: E2 是 Sprint6 最重要的新功能，Stub 未升级 = E2 不存在
-- **去掉 E2 QA 会怎样**: E2 Stub 未升级风险被忽视，Sprint6 上线后 E2 是一个空按钮
-- **本质问题**: AI Coding Agent 是 VibeX 的技术差异化，生成代码能力缺失 = Sprint6 核心价值归零
-
-### E3 版本历史 QA
-- **底层动机**: 版本历史是原型工具的"后悔药"，恢复失败 = 用户数据损坏
-- **去掉 E3 QA 会怎样**: version-history 页面四态未验证，空状态/加载态/错误态存在未预知缺陷
-- **本质问题**: 版本历史的数据完整性决定了用户信任度，恢复功能不可靠 = 用户不敢大胆修改
-
-### E4 版本 Diff QA
-- **底层动机**: Diff 可视化让版本差异一目了然，diff 分类错误 = 用户误解变更
-- **去掉 E4 QA 会怎样**: added/removed/modified 分类逻辑未验证，可能将删除误标为新增
-- **本质问题**: 版本 diff 是版本历史的价值放大器，分类错误 = 版本历史的价值归零
-
-### E5 质量保障
-- **底层动机**: Specs 覆盖率/DoD 核查/PRD 格式是 QA 工作的元保障
-- **去掉 E5 会怎样**: Specs 可能存在覆盖盲点，DoD 执行无依据，PRD 格式不标准影响后续迭代
-- **本质问题**: 质量保障工作本身也需要质量 — E5 是 QA 流程的自我验证
-
----
-
-## 6. 最小可行范围（神技2）
-
-> **如果工时压缩到 6h，必须放弃哪些功能？**
-
-### 保留（核心）
-- **F2.1 + F2.3**（E2 Stub 验证 + 决策）：E2 Stub 是 P0 风险，必须优先验证
-- **F3.1**（prototypeVersionStore 验证）：版本历史 store 是 E3 的核心
-- **F5.2**（DoD 逐条核查）：DoD 是整个 Sprint6 的完成标准
-- **F5.3**（PRD 格式自检）：PRD 格式规范性影响后续工作流
-
-### 放弃（可延期）
-- F1.1 + F1.2 + F1.3（E1 四态验证）：E1 Specs 已完整，可由 Tester 独立完成
-- F2.2（ProtoAttrPanel AI Tab 四态）：可由 Tester 在 UI 集成后补充
-- F4.1 + F4.2（VersionDiff 验证）：E4 是 E3 的扩展，可延期到 Sprint7
-
-**最小可行工时: 4h**（F2.1 + F2.3 + F3.1 + F5.2 + F5.3）
-
----
-
-## 7. 用户情绪地图（神技3）
-
-### 关键页面 1: FigmaImport 组件
-
-| 场景 | 情绪 | 触发条件 | 预期反馈 |
-|------|------|---------|---------|
-| 进入时 | 期待 | 用户输入 Figma URL | placeholder 显示示例 URL，引导正确格式 |
-| 加载中 | 耐心 | 点击"获取组件" | 按钮变为"获取中..."+禁用，骨架屏替代内容 |
-| 成功获取 | 满足 | 组件列表加载 | 组件名称+缩略图，checkbox 可选 |
-| 导入失败 | 焦虑 | URL 无效或无权限 | input 红色边框+inline 错误，不丢失输入内容 |
-| 导入成功 | 惊喜 | 画布出现新节点 | toast "导入成功，N 个组件已添加" |
-
-### 关键页面 2: ProtoAttrPanel AI 代码 Tab
-
-| 场景 | 情绪 | 触发条件 | 预期反馈 |
-|------|------|---------|---------|
-| 进入时 | 好奇 | 切换到 AI 代码 Tab | 引导文案"点击「生成代码」查看 AI 生成的组件代码" |
-| 生成中 | 期待 | 点击"生成代码" | 骨架屏+"正在调用 Claude..."，不显示 loading spinner |
-| 生成成功 | 惊喜 | 代码显示 | 语法高亮代码+复制按钮，底部有"重新生成" |
-| 生成失败 | 挫败 | API 错误/超时 | 红色错误 banner+"重新生成"按钮，不丢失已生成代码 |
-| 采纳后 | 满足 | 用户复制代码 | toast "代码已复制" |
-
-### 关键页面 3: version-history 页面
-
-| 场景 | 情绪 | 触发条件 | 预期反馈 |
-|------|------|---------|---------|
-| 进入时 | 安心 | 看到版本列表 | 时间倒序排列，节点数量 badge，一目了然 |
-| 无版本时 | 轻微迷茫 | 版本列表为空 | 引导文案+"保存第一个版本"按钮 |
-| 恢复前 | 确认需求 | hover 版本项 | 显示"恢复"/"对比"/"删除"按钮 |
-| 恢复中 | 紧张 | 点击"恢复" | 进度指示，恢复后画布状态与快照一致 |
-| 恢复失败 | 恐慌 | 恢复 API 错误 | toast "恢复失败，请重试"，当前画布数据不受影响 |
-| 对比模式 | 清晰 | 两个版本 diff | 绿色=新增/红色=删除/黄色=修改，变更一目了然 |
-
----
-
-## 8. 执行决策
+## 执行决策
 
 - **决策**: 已采纳
 - **执行项目**: vibex-sprint6-qa
 - **执行日期**: 2026-04-25
-- **备注**: 基于 Analyst analysis.md 有条件通过报告，E2 Stub P0 风险必须在本 Sprint 内关闭
 
 ---
 
-## 9. Specs 索引
-
-| Spec 文件 | 对应 Epic | 描述 |
-|-----------|---------|------|
-| specs/E1-import-ui-qa.md | E1 | FigmaImport / ImageImport / ImportConfirmDialog 四态 QA 规格 |
-| specs/E2-ai-coding-qa.md | E2 | CodingAgent 服务层 + ProtoAttrPanel AI Tab 四态 QA 规格 |
-| specs/E3-version-history-qa.md | E3 | prototypeVersionStore + version-history 页面四态 QA 规格 |
-| specs/E4-version-diff-qa.md | E4 | VersionDiff 组件四态 + jsondiffpatch diff 计算 QA 规格 |
+*PRD 时间: 2026-04-25 11:55 GMT+8*

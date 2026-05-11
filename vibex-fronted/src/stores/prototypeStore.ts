@@ -49,7 +49,9 @@ export interface ProtoNodeBreakpoints {
   desktop: boolean;
 }
 
-export interface ProtoNode extends Node<ProtoNodeData> {}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- Zustand middleware Node requires minimal interface
+interface EmptyNodeExtra {}
+export interface ProtoNode extends Node<ProtoNodeData, EmptyNodeExtra> {}
 
 export interface ProtoPage {
   id: string;

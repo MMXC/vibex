@@ -1,3 +1,9 @@
+### [Unreleased] S36-E1: 多人协作 MVP（E1-S1.1 ~ E1-S1.3）— 2026-05-11
+- **E1-S1.1 RemoteCursor 挂载**: `RemoteCursor` 重构为 self-subscribing 组件（内部 `usePresence` 订阅）；props: `canvasId`, `userId`, `userName`；条件守卫: `isFirebaseConfigured()` → mock 模式返回 null；DDSCanvasPage 中挂载 `<RemoteCursor />`
+- **E1-S1.2 useRealtimeSync 集成**: DDSCanvasPage 中调用 `useRealtimeSync({ projectId, userId })`；Firebase RTDB 实时节点同步（last-write-wins）
+- **E1-S1.3 Presence E2E 测试**: `presence-mvp.spec.ts` 存在；RemoteCursor 可见 + PresenceAvatars 包含用户名
+- 提交: `0e846f707`
+
 ### [Unreleased] S35-P004: 模板市场功能调研（U1-P004 ~ U4-P004）— 2026-05-11
 - **U1-P004 用户故事**: As a 前端工程师/团队 lead/独立开发者，3 个用户故事 + 验收标准
 - **U2-P004 API 设计**: `/api/templates/marketplace` CRUD 端点设计，VibexExportSchema 数据结构

@@ -1,6 +1,12 @@
 name: Bundle Size Report
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'vibex-fronted/src/**'
+      - 'vibex-fronted/next.config.ts'
+      - 'vibex-fronted/package.json'
   pull_request:
     branches: [main]
     paths:
@@ -9,7 +15,6 @@ on:
       - 'vibex-fronted/package.json'
       - '.github/workflows/bundle-report.yml'
 
-# Only run one bundle report per PR to avoid spam
 concurrency:
   group: bundle-report-${{ github.ref }}
   cancel-in-concurrency: true
@@ -18,9 +23,83 @@ env:
   ANALYZE: 'true'
 
 jobs:
+  # ---- S35-P002: main branch baseline recording ----
+  baseline-record:
+    name: Record Baseline
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: 'pnpm-lock.yaml'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build with bundle analyzer
+        run: pnpm build
+        env:
+          ANALYZE: 'true'
+          NEXT_OUTPUT_MODE: standalone
+        working-directory: vibex-fronted
+
+      - name: Extract bundle size
+        id: bundle
+        run: |
+          BUNDLE_SIZE_KB=$(grep -oP 'Route \(app\):.*?size: \K[0-9]+(?= kB)' vibex-fronted/.next/analyze/bundle.html 2>/dev/null | head -1 || echo "0")
+          echo "BUNDLE_SIZE_KB=$BUNDLE_SIZE_KB" >> $GITHUB_OUTPUT
+          echo "Bundle size: ${BUNDLE_SIZE_KB} kB"
+
+      - name: Update performance-baseline.md
+        run: |
+          cat > performance-baseline.md << 'EOF'
+# VibeX Performance Baseline
+
+**Updated:** $(date '+%Y-%m-%d')
+**Branch:** main
+
+## Bundle Size
+
+| Metric | Value |
+|--------|-------|
+| main-bundle | {{ steps.bundle.outputs.BUNDLE_SIZE_KB }} KB |
+
+## Notes
+
+- Baseline recorded on main branch push
+- PRs will be checked against this baseline
+- Threshold: +5% increase triggers CI failure
+EOF
+        working-directory: vibex-fronted
+
+      - name: Commit baseline
+        run: |
+          git config --local user.email "ci@vibex.ai"
+          git config --local user.name "CI Bot"
+          git add performance-baseline.md
+          git diff --cached --quiet || git commit -m "ci: update performance baseline [skip ci]"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ---- S35-P002: PR bundle comparison ----
   bundle-report:
     name: Bundle Size Report
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
     timeout-minutes: 15
 
     steps:
@@ -59,10 +138,28 @@ jobs:
       - name: Parse bundle size
         id: bundle-size
         run: |
-          # Extract main page bundle size from bundle.html
           BUNDLE_SIZE_KB=$(grep -oP 'Route \(app\):.*?size: \K[0-9]+(?= kB)' vibex-fronted/.next/analyze/bundle.html 2>/dev/null | head -1 || echo "0")
           echo "BUNDLE_SIZE_KB=$BUNDLE_SIZE_KB" >> $GITHUB_ENV
           echo "Bundle size: ${BUNDLE_SIZE_KB} kB"
+
+      - name: Compare with baseline
+        run: |
+          BASELINE=0
+          if [ -f "performance-baseline.md" ]; then
+            BASELINE=$(grep -oP 'main-bundle.*?\|\K[0-9]+(?= KB)' performance-baseline.md 2>/dev/null || echo "0")
+          fi
+          CURRENT=${{ env.BUNDLE_SIZE_KB }}
+          if [ "$BASELINE" -gt 0 ] && [ "$CURRENT" -gt 0 ]; then
+            PERCENT=$(python3 -c "print(round(($CURRENT - $BASELINE) / $BASELINE * 100, 1))")
+            echo "Baseline: ${BASELINE} KB, Current: ${CURRENT} KB, Delta: ${PERCENT}%"
+            if [ "$(echo "$PERCENT > 5" | bc -l)" = "1" ]; then
+              echo "ERROR: Bundle size increased by ${PERCENT}% (threshold: 5%)"
+              exit 1
+            fi
+          else
+            echo "Baseline: ${BASELINE} KB, Current: ${CURRENT} KB (baseline not available, skipping comparison)"
+          fi
+        working-directory: vibex-fronted
 
       - name: Post PR comment
         uses: treyhunner/artifact-comment@v1
@@ -72,7 +169,7 @@ jobs:
           message: |
             ## 📦 Bundle Size Report
 
-            **Main Page Bundle:** ${BUNDLE_SIZE_KB:-N/A} kB
+            **Main Page Bundle:** ${{ env.BUNDLE_SIZE_KB:-N/A }} kB
 
             > Triggered by: `${{ github.event_name }}` · `${{ github.sha }}`
             > See artifact: `.next/analyze/bundle.html`

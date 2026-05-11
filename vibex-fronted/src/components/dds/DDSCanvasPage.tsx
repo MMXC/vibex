@@ -25,7 +25,7 @@ import { CrossChapterEdgesOverlay } from '@/components/dds/canvas/CrossChapterEd
 import { AIDraftDrawer } from '@/components/dds/ai-draft';
 import { DDSFlow } from '@/components/dds/DDSFlow';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
-import { useCanvasHistoryStore } from '@/stores/dds/canvasHistoryStore';
+import { useCanvasHistoryStore, saveHistoryToStorage, loadHistoryFromStorage } from '@/stores/dds/canvasHistoryStore';
 import { parseRequirementContent } from '@/components/dds/canvas/ChapterPanel';
 import { TreeErrorBoundary } from '@/components/canvas/panels/TreeErrorBoundary';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
@@ -215,6 +215,26 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
       wrapDDSCanvasActionsWithHistory();
     }
   }, []);
+
+  // ---- P001-U4: Load history metadata from localStorage on projectId change ----
+  useEffect(() => {
+    if (!projectId) return;
+    const meta = loadHistoryFromStorage(projectId);
+    if (meta) {
+      // meta.pastMeta / meta.futureMeta available for UX hints
+      // actual Command objects cannot be restored; history starts empty
+    }
+  }, [projectId]);
+
+  // ---- P001-U4: Debounced save history to localStorage on history change ----
+  const historyState = useCanvasHistoryStore();
+  useEffect(() => {
+    if (!projectId) return;
+    const timeout = setTimeout(() => {
+      saveHistoryToStorage(projectId);
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [historyState.past.length, historyState.future.length, projectId]);
 
   // Listen for drift-detected custom events from driftDetector
   useEffect(() => {

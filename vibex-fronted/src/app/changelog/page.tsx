@@ -20,6 +20,19 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.356',
+    date: '2026-05-11',
+    changes: [
+      '🚀 S35-P001: 撤销重做 localStorage 持久化调用补充',
+      '✅ DDSCanvasPage — loadHistoryFromStorage(projectId) 在 projectId 变化时加载 metadata',
+      '✅ DDSCanvasPage — saveHistoryToStorage(projectId) 在 history 变更时 debounced 500ms 保存',
+      '✅ 遵循设计决策：Command 闭包不可序列化，仅存 metadata（pastMeta/futureMeta）',
+      '✅ S35-P002 Bundle Report — main 分支 push 记录性能基线；PR 包体积增幅 >5% 时 CI exit 1',
+      '提交: 6452d2f1c',
+    ],
+    commit: '6452d2f1c',
+  },
+  {
     version: '1.0.355',
     date: '2026-05-10',
     changes: [

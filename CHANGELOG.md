@@ -1,12 +1,17 @@
 ### [Unreleased] S33-Epic4: S32 QA 修复项（E4-U1 ~ U3-E4）— 2026-05-09
+### [Unreleased] S35-P001: 撤销重做 localStorage 持久化调用补充（U4-P001 收尾）— 2026-05-11
+- **U4-P001 DDSCanvasPage 调用**: `loadHistoryFromStorage` 在 `projectId` 变化时加载 metadata；`saveHistoryToStorage` 在 history 变更时 debounced 500ms 保存；遵循设计决策（Command 闭包不可序列化，仅存 metadata）
+- **P002 Bundle Report 增强**: `.github/workflows/bundle-report.yml` — main 分支 push 记录性能基线；PR 包体积增幅 >5% 时 CI exit 1
+- 提交: `6452d2f1c`
+
 ### [Unreleased] S34-P001: 撤销/重做系统（U1-P001 ~ U5-P001）— 2026-05-10
 - **U1-P001 canvasHistoryStore**: Command Pattern + Zustand，`execute/undo/redo/clear/canUndo/canRedo`，50步限制
 - **U2-P001 DDSCanvasPage 连接**: `undoCallback`/`redoCallback` 连接真实 `canvasHistoryStore`
 - **U3-P001 Middleware 包装**: `ddsChapterActions` 自动创建 Command 入栈
-- **U4-P001 localStorage 持久化**: `canvasHistoryStore.ts` 已实现（函数已写），DDSCanvasPage 中调用待后续 sprint 补充
+- **U4-P001 localStorage 持久化**: `canvasHistoryStore.ts` 函数实现 + `DDSCanvasPage.tsx` 调用（S35-P001 收尾）
 - **U5-P001 单元测试**: 15个场景覆盖（execute/undo/redo/limit/guard）
 - 提交: `0a02febcf`, `c2e4942d0`
-- ⚠️ 待补充: U4-P001 在 DDSCanvasPage 中的调用（reviewer 条件通过项）
+- ✅ U4-P001 DDSCanvasPage 调用已完成（S35-P001: `6452d2f1c`）
 
 - **E4-U1 CanvasThumbnail testid**: 外层 div 增加 `data-testid="canvas-thumbnail"` + `role="img"` 无障碍属性
 - **E4-U2 OfflineBanner data 属性**: 进度条 div 增加 `data-sync-progress="true"`（E2E 可定位）；格式从 PRD 建议的 `X/Y` 简化为 `true`（因无额外 props 计算 pending/total）

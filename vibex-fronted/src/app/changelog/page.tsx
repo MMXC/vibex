@@ -20,6 +20,19 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.358',
+    date: '2026-05-11',
+    changes: [
+      '🚀 S35-P004: 模板市场功能调研',
+      '✅ 3个用户故事 + 验收标准',
+      '✅ /api/templates/marketplace CRUD 端点设计',
+      '✅ 自建 vs GitHub Gist vs Notion 方案对比',
+      '✅ 沙箱隔离安全方案',
+      '提交: 66724b004',
+    ],
+    commit: '66724b004',
+  },
+  {
     version: '1.0.357',
     date: '2026-05-11',
     changes: [

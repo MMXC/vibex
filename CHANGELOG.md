@@ -1,3 +1,10 @@
+### [Unreleased] S35-P003: 多人协作能力增强调研（U1-P003 ~ U4-P003）— 2026-05-11
+- **U1-P003 竞品对比**: Figma / Miro / Notion 对比表，VibeX 处于 Notion 阶段
+- **U2-P003 技术风险**: Firebase RTDB 免费层 20 并发；WebSocket vs WebRTC vs OT vs CRDT 选型分析
+- **U3-P003 可选方案**: 方案 A（Firebase RTDB + Presence）5-7 人天；方案 B（自建 WebSocket + Yjs）10-15 人天
+- **U4-P003 推荐方案**: 方案 A，推荐 Sprint 36 先实现实时光标验证用户需求
+- 文档: `docs/vibex-proposals-sprint35/collaboration-research.md`
+
 ### [Unreleased] S33-Epic4: S32 QA 修复项（E4-U1 ~ U3-E4）— 2026-05-09
 ### [Unreleased] S35-P001: 撤销重做 localStorage 持久化调用补充（U4-P001 收尾）— 2026-05-11
 - **U4-P001 DDSCanvasPage 调用**: `loadHistoryFromStorage` 在 `projectId` 变化时加载 metadata；`saveHistoryToStorage` 在 history 变更时 debounced 500ms 保存；遵循设计决策（Command 闭包不可序列化，仅存 metadata）

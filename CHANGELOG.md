@@ -1,3 +1,10 @@
+### [Unreleased] S35-P004: 模板市场功能调研（U1-P004 ~ U4-P004）— 2026-05-11
+- **U1-P004 用户故事**: As a 前端工程师/团队 lead/独立开发者，3 个用户故事 + 验收标准
+- **U2-P004 API 设计**: `/api/templates/marketplace` CRUD 端点设计，VibexExportSchema 数据结构
+- **U3-P004 技术方案**: 方案 A（自建）4-6 人天 vs 方案 B（GitHub Gist）2-3 人天 vs 方案 C（Notion）3-4 人天
+- **U4-P004 安全考量**: 沙箱隔离方案，MVP 阶段只读市场安全风险可控
+- 文档: `docs/vibex-proposals-sprint35/template-market-research.md`
+
 ### [Unreleased] S35-P003: 多人协作能力增强调研（U1-P003 ~ U4-P003）— 2026-05-11
 - **U1-P003 竞品对比**: Figma / Miro / Notion 对比表，VibeX 处于 Notion 阶段
 - **U2-P003 技术风险**: Firebase RTDB 免费层 20 并发；WebSocket vs WebRTC vs OT vs CRDT 选型分析

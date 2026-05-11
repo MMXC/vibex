@@ -1,44 +1,29 @@
 'use client';
 
 /**
- * RemoteCursor — E3-U3: 协作者光标 + 意图气泡
+ * RemoteCursor — Collaborative cursor overlay
  *
- * Renders another user's cursor position on the canvas.
- * Shows cursor icon (SVG arrow) + username label + intention bubble.
+ * Subscribes to Firebase Presence (usePresence) and renders all remote users' cursors.
  * Falls back to null in mock mode.
  */
 
 import React from 'react';
 import { IntentionBubble } from './IntentionBubble';
 import type { IntentionType } from '@/lib/firebase/presence';
+import { usePresence, isFirebaseConfigured } from '@/lib/firebase/presence';
 import styles from './RemoteCursor.module.css';
 
-interface RemoteCursorProps {
+interface RemoteCursorData {
   userId: string;
   userName: string;
   position: { x: number; y: number };
+  color: string;
   nodeId?: string | null;
-  isMockMode?: boolean;
-  color?: string;
-  /** E3-U1: 用户当前意图 */
   intention?: IntentionType;
 }
 
-export function RemoteCursor({
-  userId,
-  userName,
-  position,
-  nodeId,
-  isMockMode = false,
-  color,
-  intention,
-}: RemoteCursorProps) {
-  // AGENTS.md §4.2: mock 模式下不渲染
-  if (isMockMode) {
-    return null;
-  }
-
-  const label = color ? `${userName}` : userName;
+/** Single remote cursor for one user */
+function CursorInstance({ userId, userName, position, color, nodeId, intention }: RemoteCursorData) {
   const borderColor = color ?? 'var(--color-primary, #00ffff)';
 
   return (
@@ -52,12 +37,9 @@ export function RemoteCursor({
       data-user-id={userId}
       data-node-id={nodeId ?? undefined}
     >
-      {/* E3-U2: Intention bubble — renders above cursor */}
       {intention && intention !== 'idle' && (
         <IntentionBubble intention={intention} />
       )}
-
-      {/* Cursor arrow SVG */}
       <svg
         className={styles.cursorIcon}
         width="16"
@@ -73,15 +55,49 @@ export function RemoteCursor({
           strokeWidth="1"
         />
       </svg>
-
-      {/* Username label */}
       <span
         className={styles.label}
         style={{ backgroundColor: borderColor }}
         data-testid="remote-cursor-label"
       >
-        {label}
+        {userName}
       </span>
     </div>
+  );
+}
+
+/**
+ * RemoteCursor — renders all remote user cursors by subscribing to usePresence.
+ * Returns null when Firebase is not configured (mock mode).
+ *
+ * @param canvasId  - Canvas/project ID to subscribe to presence for
+ * @param userId    - Current user ID (used to filter out own cursor)
+ * @param userName  - Current user name
+ */
+export function RemoteCursor({ canvasId, userId, userName }: {
+  canvasId: string;
+  userId: string;
+  userName: string;
+}) {
+  const { others } = usePresence(canvasId, userId, userName);
+
+  if (!isFirebaseConfigured()) {
+    return null;
+  }
+
+  return (
+    <>
+      {others.map((remote) => (
+        <CursorInstance
+          key={remote.userId}
+          userId={remote.userId}
+          userName={remote.name}
+          position={remote.cursor ?? { x: 0, y: 0 }}
+          color={remote.color}
+          nodeId={remote.cursor?.nodeId ?? null}
+          intention={remote.intention}
+        />
+      ))}
+    </>
   );
 }

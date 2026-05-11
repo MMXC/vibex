@@ -38,7 +38,9 @@ import { DDSSearchPanel } from '@/components/dds/DDSSearchPanel';
 import { ReviewReportPanel } from '@/components/design-review';
 import { ConflictResolutionDialog } from '@/components/conflict/ConflictResolutionDialog';
 import { PresenceAvatars } from '@/components/canvas/Presence/PresenceAvatars';
+import { RemoteCursor } from '@/components/presence/RemoteCursor';
 import { usePresence, isFirebaseConfigured, updateCursor } from '@/lib/firebase/presence';
+import useRealtimeSync from '@/hooks/useRealtimeSync';
 import { useAuthStore } from '@/stores/authStore';
 import type { ChapterType, ChapterData } from '@/types/dds';
 import type { DDSCard } from '@/types/dds';
@@ -258,6 +260,9 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   const user = useAuthStore((s) => s.user);
   const userId = user?.id ?? null;
   const { isAvailable } = usePresence(projectId ?? '', userId);
+
+  // E1-S1.2: Real-time node sync with Firebase RTDB
+  useRealtimeSync({ projectId: projectId ?? null, userId: userId ?? 'anonymous' });
 
   // Track cursor position
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
@@ -679,6 +684,11 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
           pointerEvents: 'none',
         }}>
           <PresenceAvatars canvasId={projectId ?? ''} maxDisplay={5} />
+          <RemoteCursor
+            canvasId={projectId ?? ''}
+            userId={userId ?? 'anonymous'}
+            userName={user?.name ?? 'Anonymous'}
+          />
         </div>
       )}
 

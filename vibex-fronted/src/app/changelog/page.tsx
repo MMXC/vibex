@@ -20,6 +20,19 @@ interface VersionInfo {
 
 const mockChangelog: ChangelogEntry[] = [
   {
+    version: '1.0.357',
+    date: '2026-05-11',
+    changes: [
+      '🚀 S35-P003: 多人协作能力增强调研',
+      '✅ 竞品对比 — Figma / Miro / Notion；VibeX 处于 Notion 阶段',
+      '✅ 技术风险 — Firebase RTDB 免费层 20 并发；WebSocket/WebRTC/OT/CRDT 选型',
+      '✅ 可选方案 ≥2 — 方案 A (Firebase RTDB+Presence) 5-7人天；方案 B (自建 Yjs) 10-15人天',
+      '✅ 推荐方案 — 方案 A，Sprint 36 验证实时光标需求',
+      '提交: 8a6cf38bf',
+    ],
+    commit: '8a6cf38bf',
+  },
+  {
     version: '1.0.356',
     date: '2026-05-11',
     changes: [

@@ -23,7 +23,6 @@ env:
   ANALYZE: 'true'
 
 jobs:
-  # ---- S35-P002: main branch baseline recording ----
   baseline-record:
     name: Record Baseline
     runs-on: ubuntu-latest
@@ -65,24 +64,17 @@ jobs:
 
       - name: Update performance-baseline.md
         run: |
-          cat > performance-baseline.md << 'EOF'
-# VibeX Performance Baseline
-
-**Updated:** $(date '+%Y-%m-%d')
-**Branch:** main
-
-## Bundle Size
-
-| Metric | Value |
-|--------|-------|
-| main-bundle | {{ steps.bundle.outputs.BUNDLE_SIZE_KB }} KB |
-
-## Notes
-
-- Baseline recorded on main branch push
-- PRs will be checked against this baseline
-- Threshold: +5% increase triggers CI failure
-EOF
+          TS=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+          echo "# VibeX Performance Baseline" > performance-baseline.md
+          echo "" >> performance-baseline.md
+          echo "**Updated:** $TS" >> performance-baseline.md
+          echo "**Branch:** main" >> performance-baseline.md
+          echo "" >> performance-baseline.md
+          echo "## Bundle Size" >> performance-baseline.md
+          echo "" >> performance-baseline.md
+          echo "| Metric | Value |" >> performance-baseline.md
+          echo "|--------|-------|" >> performance-baseline.md
+          echo "| main-bundle | ${{ steps.bundle.outputs.BUNDLE_SIZE_KB }} KB |" >> performance-baseline.md
         working-directory: vibex-fronted
 
       - name: Commit baseline
@@ -95,7 +87,6 @@ EOF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # ---- S35-P002: PR bundle comparison ----
   bundle-report:
     name: Bundle Size Report
     runs-on: ubuntu-latest
@@ -150,7 +141,7 @@ EOF
           fi
           CURRENT=${{ env.BUNDLE_SIZE_KB }}
           if [ "$BASELINE" -gt 0 ] && [ "$CURRENT" -gt 0 ]; then
-            PERCENT=$(python3 -c "print(round(($CURRENT - $BASELINE) / $BASELINE * 100, 1))")
+            PERCENT=$(python3 -c "a=$BASELINE; b=$CURRENT; print(round((b-a)/a*100,1))")
             echo "Baseline: ${BASELINE} KB, Current: ${CURRENT} KB, Delta: ${PERCENT}%"
             if [ "$(echo "$PERCENT > 5" | bc -l)" = "1" ]; then
               echo "ERROR: Bundle size increased by ${PERCENT}% (threshold: 5%)"
@@ -167,7 +158,7 @@ EOF
           artifact: bundle-analyze
           workflow_run_id: ${{ github.event.workflow_run.id }}
           message: |
-            ## 📦 Bundle Size Report
+            ## Bundle Size Report
 
             **Main Page Bundle:** ${{ env.BUNDLE_SIZE_KB:-N/A }} kB
 

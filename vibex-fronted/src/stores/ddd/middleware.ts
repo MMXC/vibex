@@ -91,9 +91,9 @@ class DDDStateSyncManager {
    * Called once on first mount; subsequent calls are no-ops.
    */
   register(
-    contextStore: StoreSlice<object>,
-    modelStore: StoreSlice<object>,
-    _designStore: StoreSlice<object> | undefined
+    contextStore: StoreSlice<any>,
+    modelStore: StoreSlice<any>,
+    _designStore: StoreSlice<any> | undefined
   ): void {
     if (this._registered) return;
     this._registered = true;
@@ -133,9 +133,9 @@ class DDDStateSyncManager {
   }
 
   private _persistAll(
-    contextStore: StoreSlice<object>,
-    modelStore: StoreSlice<object>,
-    _designStore: StoreSlice<object> | undefined
+    contextStore: StoreSlice<any>,
+    modelStore: StoreSlice<any>,
+    _designStore: StoreSlice<any> | undefined
   ): void {
     const ctx = contextStore.getState();
     const model = modelStore.getState();
@@ -248,9 +248,9 @@ export const dddStateSyncManager = new DDDStateSyncManager();
  * Call once at app startup with all three DDD store references.
  */
 export function initDDDStateSync(
-  contextStore: StoreSlice<object>,
-  modelStore: StoreSlice<object>,
-  _designStore?: StoreSlice<object>
+  contextStore: StoreSlice<any>,
+  modelStore: StoreSlice<any>,
+  _designStore?: StoreSlice<any>
 ): void {
   dddStateSyncManager.register(contextStore, modelStore, _designStore);
 }

@@ -212,7 +212,7 @@ export async function getRecommendationsWithFallback(
     const result = await onlineRecommender(input);
     
     // 如果结果为空，触发降级
-    if (!result || !result.recommendations || result.recommendations.length === 0) {
+    if (!result || !result.recommendations || ((result.recommendations || []) as unknown[]).length === 0) {
       devLog('[Fallback] Empty result, using fallback');
       return {
         recommendations: getFallbackRecommendation(),

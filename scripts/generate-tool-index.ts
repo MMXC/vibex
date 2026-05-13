@@ -26,7 +26,7 @@ interface ParsedTool {
 /**
  * Parse each tool block from the `return [...]` in listTools().
  * Uses a state machine to find:
- *   name: '...'  →  description: '...'  →  inputSchema: { ... }
+ *   name: '...'  ->  description: '...'  ->  inputSchema: { ... }
  * Handles multi-line and nested-brace inputSchema objects.
  */
 function parseTools(source: string): ParsedTool[] {

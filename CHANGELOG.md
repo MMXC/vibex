@@ -4,6 +4,12 @@
 - **E1-S1.3 Presence E2E 测试**: `presence-mvp.spec.ts` 存在；RemoteCursor 可见 + PresenceAvatars 包含用户名
 - 提交: `0e846f707`
 
+### [Unreleased] S36-E2: 模板市场 MVP（E2-S2.1 ~ E2-S2.3）— 2026-05-15
+- **E2-S2.1 Backend API**: `GET /api/templates/marketplace` 读取 `vibex-backend/public/data/marketplace-templates.json`，支持 `?industry=` 筛选
+- **E2-S2.2 预置模板数据**: 3个行业预置模板（saas/ecommerce/social），含 entities + boundedContexts + sampleRequirement
+- **E2-S2.3 前端集成**: `templateApi.getMarketplaceTemplates()` 方法 + `templates-market.spec.ts` E2E 测试覆盖
+- 提交: `84f042912`
+
 ### [Unreleased] S35-P004: 模板市场功能调研（U1-P004 ~ U4-P004）— 2026-05-11
 - **U1-P004 用户故事**: As a 前端工程师/团队 lead/独立开发者，3 个用户故事 + 验收标准
 - **U2-P004 API 设计**: `/api/templates/marketplace` CRUD 端点设计，VibexExportSchema 数据结构

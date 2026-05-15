@@ -20,6 +20,7 @@ import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { exportDDSCanvasData, exportToStateMachine } from '@/services/dds/exporter';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds';
+import { useCanvasHistoryStore } from '@/stores/dds/canvasHistoryStore';
 import { useCanvasExport } from '@/hooks/canvas/useCanvasExport';
 import { useCanvasImport } from '@/hooks/canvas/useCanvasImport';
 import { useCanvasRBAC } from '@/hooks/useCanvasRBAC';
@@ -82,6 +83,26 @@ function EyeIcon() {
   );
 }
 
+// S36-E4: Undo icon for history undo
+function UndoIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 7v6h6" />
+      <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
+    </svg>
+  );
+}
+
+// S36-E4: Redo icon for history redo
+function RedoIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M21 7v6h-6" />
+      <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7" />
+    </svg>
+  );
+}
+
 // ==================== Shared download helper ====================
 
 function downloadBlob(blob: Blob, filename: string) {
@@ -132,6 +153,11 @@ export const DDSToolbar = memo(function DDSToolbar({
   const generating = isGeneratingProp ?? isGenerating;
 
   const crossChapterEdges = useDDSCanvasStore((s) => s.crossChapterEdges);
+
+  // S36-E4: History state for undo/redo buttons
+  const canUndo = useCanvasHistoryStore((s) => s.canUndo());
+  const canRedo = useCanvasHistoryStore((s) => s.canRedo());
+
   const { exportAsJSON, exportAsVibex } = useCanvasExport();
   const { showFilePicker, importFile } = useCanvasImport();
 
@@ -296,6 +322,16 @@ export const DDSToolbar = memo(function DDSToolbar({
     }
   };
 
+  // S36-E4: Undo handler — calls canvas history undo
+  const handleUndo = () => {
+    useCanvasHistoryStore.getState().undo();
+  };
+
+  // S36-E4: Redo handler — calls canvas history redo
+  const handleRedo = () => {
+    useCanvasHistoryStore.getState().redo();
+  };
+
   const handleOpenExportModal = () => setDdsExportModalOpen(true);
 
   return (
@@ -385,6 +421,32 @@ export const DDSToolbar = memo(function DDSToolbar({
 
         {/* Right: Action buttons */}
         <div className={styles.rightSection}>
+          {/* S36-E4: Undo button */}
+          <button
+            type="button"
+            className={`${styles.iconButton}`}
+            onClick={handleUndo}
+            disabled={!canUndo}
+            aria-label="撤销"
+            title="撤销 (Ctrl+Z)"
+            data-testid="canvas-undo-btn"
+          >
+            <UndoIcon />
+          </button>
+
+          {/* S36-E4: Redo button */}
+          <button
+            type="button"
+            className={`${styles.iconButton}`}
+            onClick={handleRedo}
+            disabled={!canRedo}
+            aria-label="重做"
+            title="重做 (Ctrl+Shift+Z)"
+            data-testid="canvas-redo-btn"
+          >
+            <RedoIcon />
+          </button>
+
           {/* AI Generate button */}
           <button
             type="button"

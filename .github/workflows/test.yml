@@ -19,6 +19,9 @@ on:
       - 'vibex-fronted/tests/**'
       - 'vibex-backend/src/**'
       - 'packages/**'
+      - 'packages/mcp-server/src/tools/**'
+      - 'docs/mcp-tools/**'
+      - 'scripts/generate-tool-index.ts'
       - '!**/*.md'
       - '!**/*.stories.tsx'
       - '!**/storybook-static/**'
@@ -40,6 +43,9 @@ on:
       - 'vibex-fronted/tests/**'
       - 'vibex-backend/src/**'
       - 'packages/**'
+      - 'packages/mcp-server/src/tools/**'
+      - 'docs/mcp-tools/**'
+      - 'scripts/generate-tool-index.ts'
 
 env:
   PNPM_CACHE_FOLDER: .pnpm-store
@@ -250,10 +256,39 @@ jobs:
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
           GITHUB_RUN_URL: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
 
+  # E3: MCP Tool Index CI Gate — detects INDEX.md drift when tool files change
+  generate-tool-index:
+    name: MCP Tool Index CI Gate
+    runs-on: ubuntu-latest
+    # Run whenever tool files or the script itself changes
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: 'pnpm-lock.yaml'
+      - run: pnpm install --frozen-lockfile
+      - name: Generate tool index
+        run: pnpm exec tsx scripts/generate-tool-index.ts
+        working-directory: vibex-fronted
+      - name: Check INDEX.md drift
+        run: |
+          if ! git diff --exit-code docs/mcp-tools/INDEX.md; then
+            echo "❌ docs/mcp-tools/INDEX.md is out of sync."
+            echo "❌ Please run: pnpm exec tsx scripts/generate-tool-index.ts"
+            echo "❌ Then commit the updated INDEX.md and push again."
+            exit 1
+          fi
+          echo "✅ docs/mcp-tools/INDEX.md is in sync"
+
   merge-gate:
     name: Merge Gate
     runs-on: ubuntu-latest
-    needs: [lint, unit, e2e, typecheck-backend, typecheck-frontend, as-any-baseline]
+    needs: [lint, unit, e2e, typecheck-backend, typecheck-frontend, as-any-baseline, generate-tool-index]
     if: always()
     steps:
       - name: Check all jobs
@@ -264,4 +299,5 @@ jobs:
           if [ "${{ needs.typecheck-backend.result }}" != "success" ]; then echo "❌ TypeScript check (backend) failed"; exit 1; fi
           if [ "${{ needs.typecheck-frontend.result }}" != "success" ]; then echo "❌ TypeScript check (frontend) failed"; exit 1; fi
           if [ "${{ needs.as-any-baseline.result }}" != "success" ]; then echo "❌ as any baseline exceeded"; exit 1; fi
+          if [ "${{ needs.generate-tool-index.result }}" != "success" ]; then echo "❌ MCP Tool Index CI Gate failed"; exit 1; fi
           echo "✅ All gates passed"

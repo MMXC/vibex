@@ -10,6 +10,10 @@
 - **E2-S2.3 前端集成**: `templateApi.getMarketplaceTemplates()` 方法 + `templates-market.spec.ts` E2E 测试覆盖
 - 提交: `84f042912`
 
+### [Unreleased] S36-E3: MCP DoD CI Gate（E3-S3.1）— 2026-05-15
+- **E3-S3.1 Tool Index CI 验证**: `.github/workflows/test.yml` 新增 `generate-tool-index` job；当 `packages/mcp-server/src/tools/**` 或 `scripts/generate-tool-index.ts` 变更时触发；运行 `pnpm exec tsx scripts/generate-tool-index.ts` 并以 `git diff --exit-code docs/mcp-tools/INDEX.md` 验证文档同步；INDEX 失步时 CI exit 1；job 加入 merge-gate
+- 提交: `coord-escalation: feat(E3): add MCP Tool Index CI Gate to test.yml`
+
 ### [Unreleased] S35-P004: 模板市场功能调研（U1-P004 ~ U4-P004）— 2026-05-11
 - **U1-P004 用户故事**: As a 前端工程师/团队 lead/独立开发者，3 个用户故事 + 验收标准
 - **U2-P004 API 设计**: `/api/templates/marketplace` CRUD 端点设计，VibexExportSchema 数据结构

@@ -1,0 +1,124 @@
+{
+  "templates": [
+    {
+      "id": "market-saas-1",
+      "name": "SaaS 产品管理系统",
+      "industry": "saas",
+      "description": "面向 SaaS 产品的需求分析模板，包含用户管理、订阅计费、数据分析等核心功能模块",
+      "icon": "☁️",
+      "entities": [
+        {
+          "name": "用户",
+          "type": "entity",
+          "attributes": [
+            { "name": "userId", "type": "string", "description": "用户唯一标识" },
+            { "name": "email", "type": "string", "description": "用户邮箱" },
+            { "name": "plan", "type": "enum", "description": "订阅计划: free|pro|enterprise" },
+            { "name": "createdAt", "type": "datetime" }
+          ],
+          "description": "系统用户，包含认证和订阅信息"
+        },
+        {
+          "name": "订阅",
+          "type": "aggregate",
+          "attributes": [
+            { "name": "subscriptionId", "type": "string" },
+            { "name": "userId", "type": "string" },
+            { "name": "plan", "type": "enum" },
+            { "name": "status", "type": "enum", "description": "active|cancelled|past_due" },
+            { "name": "currentPeriodEnd", "type": "datetime" }
+          ],
+          "description": "用户订阅聚合根"
+        }
+      ],
+      "boundedContexts": [
+        { "name": "认证域", "entities": ["用户"], "description": "用户注册、登录、权限" },
+        { "name": "计费域", "entities": ["订阅"], "description": "订阅管理和计费" }
+      ],
+      "sampleRequirement": "用户注册后默认免费计划，可升级到 Pro 或 Enterprise，支持 Stripe 支付集成",
+      "tags": ["saas", "subscription", "user-management"],
+      "createdAt": "2026-05-01T00:00:00Z",
+      "updatedAt": "2026-05-01T00:00:00Z"
+    },
+    {
+      "id": "market-ecommerce-1",
+      "name": "电商平台系统",
+      "industry": "ecommerce",
+      "description": "面向电商平台的需求分析模板，覆盖商品、订单、库存、物流等核心电商域",
+      "icon": "🛒",
+      "entities": [
+        {
+          "name": "商品",
+          "type": "aggregate",
+          "attributes": [
+            { "name": "productId", "type": "string" },
+            { "name": "name", "type": "string" },
+            { "name": "price", "type": "decimal" },
+            { "name": "stock", "type": "integer", "description": "当前库存" },
+            { "name": "status", "type": "enum", "description": "上架|下架|售罄" }
+          ],
+          "description": "商品聚合根"
+        },
+        {
+          "name": "订单",
+          "type": "aggregate",
+          "attributes": [
+            { "name": "orderId", "type": "string" },
+            { "name": "userId", "type": "string" },
+            { "name": "totalAmount", "type": "decimal" },
+            { "name": "status", "type": "enum", "description": "pending|paid|shipped|delivered|cancelled" }
+          ],
+          "description": "订单聚合根"
+        }
+      ],
+      "boundedContexts": [
+        { "name": "商品域", "entities": ["商品"], "description": "商品目录和库存管理" },
+        { "name": "交易域", "entities": ["订单"], "description": "订单处理和支付" }
+      ],
+      "sampleRequirement": "用户可以浏览商品列表、将商品加入购物车、下单并使用支付宝/微信支付",
+      "tags": ["ecommerce", "order", "inventory"],
+      "createdAt": "2026-05-01T00:00:00Z",
+      "updatedAt": "2026-05-01T00:00:00Z"
+    },
+    {
+      "id": "market-social-1",
+      "name": "社交网络系统",
+      "industry": "social",
+      "description": "面向社交平台的需求分析模板，支持用户关系、内容发布、即时通讯等社交功能",
+      "icon": "🌐",
+      "entities": [
+        {
+          "name": "用户",
+          "type": "entity",
+          "attributes": [
+            { "name": "userId", "type": "string" },
+            { "name": "username", "type": "string" },
+            { "name": "bio", "type": "string" },
+            { "name": "followerCount", "type": "integer" }
+          ],
+          "description": "社交用户"
+        },
+        {
+          "name": "帖子",
+          "type": "aggregate",
+          "attributes": [
+            { "name": "postId", "type": "string" },
+            { "name": "authorId", "type": "string" },
+            { "name": "content", "type": "text" },
+            { "name": "likeCount", "type": "integer" },
+            { "name": "createdAt", "type": "datetime" }
+          ],
+          "description": "帖子聚合根"
+        }
+      ],
+      "boundedContexts": [
+        { "name": "关系域", "entities": ["用户"], "description": "关注/粉丝关系" },
+        { "name": "内容域", "entities": ["帖子"], "description": "内容发布和互动" }
+      ],
+      "sampleRequirement": "用户可以发布帖子、关注其他用户、点赞和评论帖子，支持图片和视频内容",
+      "tags": ["social", "content", "engagement"],
+      "createdAt": "2026-05-01T00:00:00Z",
+      "updatedAt": "2026-05-01T00:00:00Z"
+    }
+  ]
+}

@@ -46,6 +46,7 @@ export interface TemplateApi {
   deleteTemplate(id: string): Promise<SuccessResponse>;
   exportTemplates(): Promise<void>;
   importTemplate(file: File): Promise<IndustryTemplate>;
+  getMarketplaceTemplates(industry?: string): Promise<IndustryTemplate[]>;
 }
 
 // ==================== 实现 ====================
@@ -117,6 +118,15 @@ class TemplateApiImpl implements TemplateApi {
       return await httpClient.post<{ data: IndustryTemplate }>('/templates/import', data);
     });
     return unwrapItem<IndustryTemplate>(result, 'data') as IndustryTemplate;
+  }
+
+  async getMarketplaceTemplates(industry?: string): Promise<IndustryTemplate[]> {
+    const result = await retry.execute(async () => {
+      return await httpClient.get<{ templates: IndustryTemplate[] }>('/templates/marketplace', {
+        params: industry ? { industry } : undefined,
+      });
+    });
+    return unwrapList<IndustryTemplate>(result, 'templates');
   }
 }
 

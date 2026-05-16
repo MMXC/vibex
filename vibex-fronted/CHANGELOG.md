@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased] S37-E004: F001 键盘快捷键 E2E 测试 + 文档 — 2026-05-17
+- **S37-E004 E2E 测试**: `tests/e2e/keyboard-shortcuts.spec.ts` — 新增 F001 标签（`F001-E001-*`, `F001-E002-*`, `F001-E003-*`），共 10 个 Playwright 测试覆盖 E001/E002/E003 实现的快捷键
+- **S37-E004 烟雾测试**: `F001-smoke` 测试 — 所有 F001 快捷键（Ctrl+Z/Y/Shift+Z, Escape, Tab, Shift+Tab, Ctrl+N, Ctrl+G, ?）连续触发不崩溃
+- **S37-E004 文档**: `docs/shortcuts.md` — 完整的 VibeX 键盘快捷键速查表，包含所有 Epic 快捷键实现细节、单元测试链接和 E2E 运行方式
+
 ## [Unreleased] S37-E003: Ctrl+G generate + ? help overlay
 - **E003 Ctrl+G 快捷键**: `src/hooks/useKeyboardShortcuts.ts` — Ctrl+G / Cmd+G → onQuickGenerate，触发 AI 快速生成
 - **E003 ? 帮助覆盖层**: `src/hooks/useKeyboardShortcuts.ts` — ? → onHelp，显示键盘快捷键覆盖层

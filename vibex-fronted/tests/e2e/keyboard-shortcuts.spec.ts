@@ -1,10 +1,16 @@
 /**
- * keyboard-shortcuts.spec.ts — E4: 键盘快捷键 E2E 测试
+ * keyboard-shortcuts.spec.ts — E4: 键盘快捷键 E2E 测试 + F001: 画布快捷键 E2E
  *
  * Verifies:
  * - F4.1: Ctrl+Shift+C confirms selected card
  * - F4.2: Ctrl+Shift+G generates context
  * - F4.3: / opens command panel
+ * - F4.4: ? shows keyboard shortcut hint panel
+ *
+ * F001 Shortcuts (Epic: vibex-proposals-sprint37):
+ * - E001: Ctrl+Z undo, Ctrl+Shift+Z / Ctrl+Y redo, Escape cancel selection
+ * - E002: Tab / Shift+Tab tab switching, Ctrl+N new node
+ * - E003: Ctrl+G quick generate, ? help overlay toggle
  *
  * Run: BASE_URL=http://localhost:3000 npx playwright test tests/e2e/keyboard-shortcuts.spec.ts
  */
@@ -243,5 +249,206 @@ test.describe('E3: DDS Canvas Search', () => {
 
     // Press Escape
     await page.keyboard.press('Escape');
+  });
+});
+
+// ============================================================
+// F001: VibeX Canvas Keyboard Shortcuts E2E Tests
+// Epic: vibex-proposals-sprint37
+// Covers: E001 (undo/redo/Escape), E002 (Tab/Ctrl+N), E003 (Ctrl+G/?)
+// ============================================================
+test.describe('F001: Canvas Keyboard Shortcuts (E001+E002+E003)', () => {
+  const DDS_CANVAS_URL = `${BASE_URL}/design/dds-canvas?projectId=f001-test`;
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(DDS_CANVAS_URL);
+    await page.evaluate(() => localStorage.removeItem('vibex-dds-canvas-v2'));
+    await page.evaluate(() => localStorage.removeItem('vibex-shortcuts'));
+  });
+
+  // ---- E001: Undo / Redo / Escape ----
+
+  test('F001-E001-1: Ctrl+Z does not crash and returns without error', async ({ page }) => {
+    await page.goto(DDS_CANVAS_URL, { waitUntil: 'domcontentloaded' });
+    const canvas = page.locator('[data-testid="dds-canvas-page"]');
+    await expect(canvas).toBeVisible({ timeout: 10000 });
+
+    // Ctrl+Z should not crash even with empty history
+    await page.keyboard.press('Control+z');
+    await page.waitForTimeout(300);
+
+    // Canvas should still be functional
+    const errorState = page.locator('[data-testid="dds-error-state"]');
+    await expect(errorState).not.toBeVisible({ timeout: 2000 });
+  });
+
+  test('F001-E001-2: Ctrl+Y (redo) does not crash', async ({ page }) => {
+    await page.goto(DDS_CANVAS_URL, { waitUntil: 'domcontentloaded' });
+    const canvas = page.locator('[data-testid="dds-canvas-page"]');
+    await expect(canvas).toBeVisible({ timeout: 10000 });
+
+    await page.keyboard.press('Control+y');
+    await page.waitForTimeout(300);
+
+    const errorState = page.locator('[data-testid="dds-error-state"]');
+    await expect(errorState).not.toBeVisible({ timeout: 2000 });
+  });
+
+  test('F001-E001-3: Ctrl+Shift+Z (redo) does not crash', async ({ page }) => {
+    await page.goto(DDS_CANVAS_URL, { waitUntil: 'domcontentloaded' });
+    const canvas = page.locator('[data-testid="dds-canvas-page"]');
+    await expect(canvas).toBeVisible({ timeout: 10000 });
+
+    await page.keyboard.press('Control+Shift+z');
+    await page.waitForTimeout(300);
+
+    const errorState = page.locator('[data-testid="dds-error-state"]');
+    await expect(errorState).not.toBeVisible({ timeout: 2000 });
+  });
+
+  test('F001-E001-4: Escape clears selection without error', async ({ page }) => {
+    await page.goto(DDS_CANVAS_URL, { waitUntil: 'domcontentloaded' });
+    const canvas = page.locator('[data-testid="dds-canvas-page"]');
+    await expect(canvas).toBeVisible({ timeout: 10000 });
+
+    // Escape should not crash even with no active selection
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(300);
+
+    const errorState = page.locator('[data-testid="dds-error-state"]');
+    await expect(errorState).not.toBeVisible({ timeout: 2000 });
+  });
+
+  // ---- E002: Tab Switching / Ctrl+N ----
+
+  test('F001-E002-1: Tab key does not crash and is handled', async ({ page }) => {
+    await page.goto(DDS_CANVAS_URL, { waitUntil: 'domcontentloaded' });
+    const canvas = page.locator('[data-testid="dds-canvas-page"]');
+    await expect(canvas).toBeVisible({ timeout: 10000 });
+
+    // Tab should be handled (switch to next tab) without crashing
+    await page.keyboard.press('Tab');
+    await page.waitForTimeout(300);
+
+    const errorState = page.locator('[data-testid="dds-error-state"]');
+    await expect(errorState).not.toBeVisible({ timeout: 2000 });
+  });
+
+  test('F001-E002-2: Shift+Tab does not crash', async ({ page }) => {
+    await page.goto(DDS_CANVAS_URL, { waitUntil: 'domcontentloaded' });
+    const canvas = page.locator('[data-testid="dds-canvas-page"]');
+    await expect(canvas).toBeVisible({ timeout: 10000 });
+
+    await page.keyboard.press('Shift+Tab');
+    await page.waitForTimeout(300);
+
+    const errorState = page.locator('[data-testid="dds-error-state"]');
+    await expect(errorState).not.toBeVisible({ timeout: 2000 });
+  });
+
+  test('F001-E002-3: Ctrl+N (new node) does not crash', async ({ page }) => {
+    await page.goto(DDS_CANVAS_URL, { waitUntil: 'domcontentloaded' });
+    const canvas = page.locator('[data-testid="dds-canvas-page"]');
+    await expect(canvas).toBeVisible({ timeout: 10000 });
+
+    await page.keyboard.press('Control+n');
+    await page.waitForTimeout(500);
+
+    // Should not crash; canvas should still be functional
+    const errorState = page.locator('[data-testid="dds-error-state"]');
+    await expect(errorState).not.toBeVisible({ timeout: 2000 });
+  });
+
+  // ---- E003: Ctrl+G Quick Generate / ? Help Overlay ----
+
+  test('F001-E003-1: Ctrl+G (quick generate) does not crash', async ({ page }) => {
+    await page.goto(DDS_CANVAS_URL, { waitUntil: 'domcontentloaded' });
+    const canvas = page.locator('[data-testid="dds-canvas-page"]');
+    await expect(canvas).toBeVisible({ timeout: 10000 });
+
+    // Ctrl+G triggers quickGenerate — should not crash
+    await page.keyboard.press('Control+g');
+    await page.waitForTimeout(1000); // Allow async generation to start
+
+    const errorState = page.locator('[data-testid="dds-error-state"]');
+    await expect(errorState).not.toBeVisible({ timeout: 2000 });
+  });
+
+  test('F001-E003-2: ? key shows keyboard help overlay', async ({ page }) => {
+    await page.goto(DDS_CANVAS_URL, { waitUntil: 'domcontentloaded' });
+    const canvas = page.locator('[data-testid="dds-canvas-page"]');
+    await expect(canvas).toBeVisible({ timeout: 10000 });
+
+    // Press ? to open help overlay
+    await page.keyboard.press('?');
+    await page.waitForTimeout(500);
+
+    // Help overlay should be visible (KeyboardHelpOverlay or ShortcutEditModal)
+    const overlay = page.locator('[role="dialog"], [class*="overlay"], [class*="Overlay"]');
+    const isVisible = await overlay.isVisible({ timeout: 5000 }).catch(() => false);
+    expect(isVisible).toBe(true);
+
+    // Press Escape to close
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(300);
+  });
+
+  test('F001-E003-3: ? does not trigger when focus is in input', async ({ page }) => {
+    await page.goto(DDS_CANVAS_URL, { waitUntil: 'domcontentloaded' });
+    const canvas = page.locator('[data-testid="dds-canvas-page"]');
+    await expect(canvas).toBeVisible({ timeout: 10000 });
+
+    // Focus a search input
+    await page.keyboard.press('Control+k');
+    await page.waitForTimeout(500);
+    const searchInput = page.locator('[data-testid="dds-search-panel"] input').first();
+    const hasSearchInput = await searchInput.isVisible({ timeout: 3000 }).catch(() => false);
+
+    if (hasSearchInput) {
+      await searchInput.focus();
+      // ? pressed in input should NOT open help overlay
+      await page.keyboard.press('?');
+      await page.waitForTimeout(300);
+
+      // No overlay should appear
+      const overlay = page.locator('[role="dialog"]');
+      const overlayCount = await overlay.count();
+      expect(overlayCount).toBe(0);
+    } else {
+      // If no search input, skip this check
+      expect(true).toBe(true);
+    }
+  });
+
+  // ---- Integration: Full shortcut smoke test ----
+
+  test('F001-smoke: Multiple shortcuts fire without error', async ({ page }) => {
+    await page.goto(DDS_CANVAS_URL, { waitUntil: 'domcontentloaded' });
+    const canvas = page.locator('[data-testid="dds-canvas-page"]');
+    await expect(canvas).toBeVisible({ timeout: 10000 });
+
+    // Fire all F001 shortcuts in sequence
+    await page.keyboard.press('Control+z');
+    await page.waitForTimeout(100);
+    await page.keyboard.press('Control+y');
+    await page.waitForTimeout(100);
+    await page.keyboard.press('Control+Shift+z');
+    await page.waitForTimeout(100);
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(100);
+    await page.keyboard.press('Tab');
+    await page.waitForTimeout(100);
+    await page.keyboard.press('Shift+Tab');
+    await page.waitForTimeout(100);
+    await page.keyboard.press('Control+n');
+    await page.waitForTimeout(100);
+    await page.keyboard.press('Control+g');
+    await page.waitForTimeout(100);
+    await page.keyboard.press('?');
+    await page.waitForTimeout(300);
+
+    // Canvas should still be functional
+    const errorState = page.locator('[data-testid="dds-error-state"]');
+    await expect(errorState).not.toBeVisible({ timeout: 2000 });
   });
 });

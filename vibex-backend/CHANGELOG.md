@@ -4,6 +4,14 @@
 
 ### Backend Core
 
+#### 2026-05-17
+
+- **Epic F002 PDF Export API** (epic/f002-export-pdf-api)
+  - `src/app/api/export/pdf/route.ts`: POST /api/export/pdf endpoint
+    - E006: Receives canvas data as JSON body, returns minimal valid PDF
+    - Error handling: 400 for missing/invalid body, 500 for generation failures
+    - Content-Disposition header with timestamped filename
+
 #### 2026-04-09
 
 - **Epic2 Chat SSE 可靠性增强** (sse-backend-fix)

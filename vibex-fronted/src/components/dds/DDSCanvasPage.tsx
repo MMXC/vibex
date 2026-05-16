@@ -469,7 +469,7 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
       const current = useDDSCanvasStore.getState().activeChapter;
       const idx = order.indexOf(current);
       const next = order[(idx + 1) % order.length];
-      useDDSCanvasStore.getState().setActiveChapter(next);
+      useDDSCanvasStore.getState().setActiveChapter(next!);
     },
     onPrevTab: () => {
       // [E002] Shift+Tab: Cycle to previous chapter
@@ -477,7 +477,7 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
       const current = useDDSCanvasStore.getState().activeChapter;
       const idx = order.indexOf(current);
       const prev = order[(idx - 1 + order.length) % order.length];
-      useDDSCanvasStore.getState().setActiveChapter(prev);
+      useDDSCanvasStore.getState().setActiveChapter(prev!);
     },
     onDesignReview: () => { window.dispatchEvent(new CustomEvent('design-review:open')); },
     enabled: true,

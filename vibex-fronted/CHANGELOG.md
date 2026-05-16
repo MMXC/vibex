@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased] S37-E003: Ctrl+G generate + ? help overlay
+- **E003 Ctrl+G 快捷键**: `src/hooks/useKeyboardShortcuts.ts` — Ctrl+G / Cmd+G → onQuickGenerate，触发 AI 快速生成
+- **E003 ? 帮助覆盖层**: `src/hooks/useKeyboardShortcuts.ts` — ? → onHelp，显示键盘快捷键覆盖层
+- **E003 DDSCanvasPage 集成**: `src/components/dds/DDSCanvasPage.tsx` — 接入 useAIController.quickGenerate 和帮助覆盖层状态
+- **E003 KeyboardHelpOverlay 组件**: `src/components/shared/KeyboardHelpOverlay.tsx` — 新组件，显示所有键盘快捷键的模态覆盖层
+
 ## [Unreleased] S37-E002: Tab 切换 + Ctrl+N 新建节点快捷键
 - **S37-E002 Tab 快捷键**: `src/hooks/useKeyboardShortcuts.ts` — Tab → onNextTab, Shift+Tab → onPrevTab，焦点在输入框时不触发
 - **S37-E002 Ctrl+N 快捷键**: `src/hooks/useKeyboardShortcuts.ts` — Ctrl+N / Cmd+N → onNewNode，与 plain N (onNewNode) 行为一致

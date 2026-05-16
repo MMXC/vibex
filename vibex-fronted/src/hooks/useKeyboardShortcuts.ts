@@ -67,6 +67,8 @@ interface KeyboardShortcutsOptions {
   onPrevTab?: () => void;
   /** [S16-P0-1] Design Review (Ctrl+Shift+R / Cmd+Shift+R) */
   onDesignReview?: () => void;
+  /** [E003] Help overlay (?: toggle help) */
+  onHelp?: () => void;
   /** Whether shortcuts should be active */
   enabled?: boolean;
 }
@@ -91,7 +93,8 @@ type ActionName =
   | 'switch-to-component'
   | 'next-tab'
   | 'prev-tab'
-  | 'design-review';
+  | 'design-review'
+  | 'help';
 
 // Actions that have hardcoded handlers in useKeyboardShortcuts.
 // The dynamic shortcutStore system should NOT re-register these to avoid duplicate calls.
@@ -116,6 +119,7 @@ const HARDCODE_ACTIONS = new Set<ActionName>([
   'next-tab',
   'prev-tab',
   'design-review',
+  'help',
 ]);
 
 function isInTextInput(target: EventTarget | null): boolean {
@@ -174,6 +178,7 @@ export function useKeyboardShortcuts({
   onNextTab,
   onPrevTab,
   onDesignReview,
+  onHelp,
   enabled = true,
 }: KeyboardShortcutsOptions) {
   // P003 U1-P003: action map from shortcutStore action names to callbacks
@@ -198,12 +203,14 @@ export function useKeyboardShortcuts({
       'next-tab': onNextTab as () => void,
       'prev-tab': onPrevTab as () => void,
       'design-review': onDesignReview as () => void,
+      'help': onHelp as () => void,
     }),
     [
       undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset,
       onDelete, onSelectAll, onClearSelection, onNewNode,
       onQuickGenerate, onConfirmSelected, onGenerateContext,
-      onSwitchToContext, onSwitchToFlow, onSwitchToComponent, onDesignReview,
+      onSwitchToContext, onSwitchToFlow, onSwitchToComponent, onNextTab, onPrevTab, onDesignReview,
+      onHelp, enabled,
     ],
   );
 
@@ -436,6 +443,13 @@ export function useKeyboardShortcuts({
         onNewNode?.();
         return;
       }
+
+      // === [E003] Help: ? key (show keyboard shortcuts overlay) ===
+      if (e.key === '?' && !isInputFocused && !isCtrl && !isMeta) {
+        e.preventDefault();
+        onHelp?.();
+        return;
+      }
     }
 
     document.addEventListener('keydown', handler);
@@ -444,6 +458,7 @@ export function useKeyboardShortcuts({
     undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset,
     onDelete, onSelectAll, onClearSelection, onNewNode,
     onQuickGenerate, onConfirmSelected, onGenerateContext,
-      onSwitchToContext, onSwitchToFlow, onSwitchToComponent, onNextTab, onPrevTab, onDesignReview, enabled,
+      onSwitchToContext, onSwitchToFlow, onSwitchToComponent, onNextTab, onPrevTab, onDesignReview,
+    onHelp, enabled,
   ]);
 }

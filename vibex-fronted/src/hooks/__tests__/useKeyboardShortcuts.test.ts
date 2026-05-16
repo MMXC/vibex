@@ -1665,4 +1665,144 @@ describe('useKeyboardShortcuts', () => {
       unmount();
     });
   });
+
+  // ==================== E003: Ctrl+G Quick Generate ====================
+  describe('Ctrl+G → onQuickGenerate (E003)', () => {
+    it('should call onQuickGenerate when Ctrl+G is pressed', () => {
+      const undo = vi.fn();
+      const redo = vi.fn();
+      const onQuickGenerate = vi.fn();
+
+      const { unmount } = renderHook(() =>
+        useKeyboardShortcuts({ undo, redo, onQuickGenerate, enabled: true }),
+      );
+
+      act(() => {
+        simulateKeyDown('g', { ctrlKey: true });
+      });
+
+      expect(onQuickGenerate).toHaveBeenCalledTimes(1);
+
+      unmount();
+    });
+
+    it('should call onQuickGenerate when Meta+G (Mac) is pressed', () => {
+      const undo = vi.fn();
+      const redo = vi.fn();
+      const onQuickGenerate = vi.fn();
+
+      const { unmount } = renderHook(() =>
+        useKeyboardShortcuts({ undo, redo, onQuickGenerate, enabled: true }),
+      );
+
+      act(() => {
+        simulateKeyDown('g', { metaKey: true });
+      });
+
+      expect(onQuickGenerate).toHaveBeenCalledTimes(1);
+
+      unmount();
+    });
+
+    it('should NOT call onQuickGenerate when enabled=false', () => {
+      const undo = vi.fn();
+      const redo = vi.fn();
+      const onQuickGenerate = vi.fn();
+
+      const { unmount } = renderHook(() =>
+        useKeyboardShortcuts({ undo, redo, onQuickGenerate, enabled: false }),
+      );
+
+      act(() => {
+        simulateKeyDown('g', { ctrlKey: true });
+      });
+
+      expect(onQuickGenerate).not.toHaveBeenCalled();
+
+      unmount();
+    });
+  });
+
+  // ==================== E003: ? Help overlay ====================
+  describe('? → onHelp (E003)', () => {
+    it('should call onHelp when ? is pressed', () => {
+      const undo = vi.fn();
+      const redo = vi.fn();
+      const onHelp = vi.fn();
+
+      Object.defineProperty(document, 'activeElement', {
+        value: document.body,
+        writable: true,
+        configurable: true,
+      });
+
+      const { unmount } = renderHook(() =>
+        useKeyboardShortcuts({ undo, redo, onHelp, enabled: true }),
+      );
+
+      act(() => {
+        simulateKeyDown('?');
+      });
+
+      expect(onHelp).toHaveBeenCalledTimes(1);
+
+      unmount();
+    });
+
+    it('should NOT call onHelp when ? is pressed with input focused', () => {
+      const undo = vi.fn();
+      const redo = vi.fn();
+      const onHelp = vi.fn();
+
+      const input = document.createElement('input');
+      document.body.appendChild(input);
+      Object.defineProperty(document, 'activeElement', {
+        value: input,
+        writable: true,
+        configurable: true,
+      });
+
+      const { unmount } = renderHook(() =>
+        useKeyboardShortcuts({ undo, redo, onHelp, enabled: true }),
+      );
+
+      act(() => {
+        simulateKeyDown('?');
+      });
+
+      expect(onHelp).not.toHaveBeenCalled();
+
+      unmount();
+      Object.defineProperty(document, 'activeElement', {
+        value: document.body,
+        writable: true,
+        configurable: true,
+      });
+      document.body.removeChild(input);
+    });
+
+    it('should NOT call onHelp when enabled=false', () => {
+      const undo = vi.fn();
+      const redo = vi.fn();
+      const onHelp = vi.fn();
+
+      Object.defineProperty(document, 'activeElement', {
+        value: document.body,
+        writable: true,
+        configurable: true,
+      });
+
+      const { unmount } = renderHook(() =>
+        useKeyboardShortcuts({ undo, redo, onHelp, enabled: false }),
+      );
+
+      act(() => {
+        simulateKeyDown('?');
+      });
+
+      expect(onHelp).not.toHaveBeenCalled();
+
+      unmount();
+    });
+  });
 });

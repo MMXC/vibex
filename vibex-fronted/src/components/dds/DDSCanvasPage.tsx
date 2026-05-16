@@ -29,6 +29,7 @@ import { useCanvasHistoryStore, saveHistoryToStorage, loadHistoryFromStorage } f
 import { parseRequirementContent } from '@/components/dds/canvas/ChapterPanel';
 import { TreeErrorBoundary } from '@/components/canvas/panels/TreeErrorBoundary';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { KeyboardHelpOverlay } from '@/components/shared/KeyboardHelpOverlay';
 import { ShortcutEditModal } from '@/components/shortcuts/ShortcutEditModal';
 import { useShortcutStore } from '@/stores/shortcutStore';
 import { NewUserGuide } from '@/components/guide/NewUserGuide';
@@ -51,6 +52,7 @@ import type { TokenChange } from '@/types/designSync';
 import { useAgentStore } from '@/stores/agentStore';
 import { CodeGenPanel } from '@/components/CodeGenPanel';
 import type { CanvasFlow, CanvasNode } from '@/lib/codeGenerator';
+import { useAIController } from '@/hooks/canvas/useAIController';
 
 // ==================== Props ====================
 
@@ -227,6 +229,12 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
       // actual Command objects cannot be restored; history starts empty
     }
   }, [projectId]);
+
+  // ---- E003: Help overlay state ----
+  const [helpOverlayOpen, setHelpOverlayOpen] = useState(false);
+
+  // ---- E003: useAIController for quickGenerate ----
+  const { quickGenerate } = useAIController();
 
   // ---- P001-U4: Debounced save history to localStorage on history change ----
   const historyState = useCanvasHistoryStore();
@@ -480,31 +488,10 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
       useDDSCanvasStore.getState().setActiveChapter(prev!);
     },
     onDesignReview: () => { window.dispatchEvent(new CustomEvent('design-review:open')); },
+    onQuickGenerate: () => { quickGenerate(); },
+    onHelp: () => { setHelpOverlayOpen((v) => !v); },
     enabled: true,
   });
-
-  // ---- ? key: toggle ShortcutEditModal ----
-  // ShortcutEditModal shows when shortcutStore.editingAction !== null
-  // Press ? to start editing the first shortcut action
-  useEffect(() => {
-    function handleQuestionMark(e: KeyboardEvent) {
-      if (e.key !== '?') return;
-      const activeEl = document.activeElement;
-      if (activeEl && (activeEl instanceof HTMLElement)) {
-        const tagName = activeEl.tagName;
-        if (tagName === 'INPUT' || tagName === 'TEXTAREA') return;
-      }
-      e.preventDefault();
-      const store = useShortcutStore.getState();
-      if (store.editingAction) {
-        store.cancelEditing();
-      } else {
-        store.startEditing('go-to-canvas');
-      }
-    }
-    document.addEventListener('keydown', handleQuestionMark);
-    return () => document.removeEventListener('keydown', handleQuestionMark);
-  }, []);
 
   // ---- Render ----
 
@@ -770,6 +757,12 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
 
     {/* P003-T3.7: New user guide overlay on DDS canvas */}
     <NewUserGuide />
+
+    {/* E003: Keyboard shortcuts help overlay */}
+    <KeyboardHelpOverlay
+      isOpen={helpOverlayOpen}
+      onClose={() => setHelpOverlayOpen(false)}
+    />
     </>
   );
 });

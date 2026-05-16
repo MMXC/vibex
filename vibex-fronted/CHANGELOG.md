@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased] S37-E005: F002 PNG/SVG canvas export — 2026-05-17
+- **E005 useCanvasExport Hook**: `src/hooks/useCanvasExport.ts` — `exportAsPNG()` 使用 html2canvas（动态 import 避免 SSR）导出 PNG，`exportAsSVG()` 序列化 DOM 为 SVG，均使用 `canvas-{timestamp}.{ext}` 文件名
+- **E005 单元测试**: `src/hooks/__tests__/useCanvasExport.test.ts` — 4 个测试用例，全部通过
+
 ## [Unreleased] S37-E004: F001 键盘快捷键 E2E 测试 + 文档 — 2026-05-17
 - **S37-E004 E2E 测试**: `tests/e2e/keyboard-shortcuts.spec.ts` — 新增 F001 标签（`F001-E001-*`, `F001-E002-*`, `F001-E003-*`），共 10 个 Playwright 测试覆盖 E001/E002/E003 实现的快捷键
 - **S37-E004 烟雾测试**: `F001-smoke` 测试 — 所有 F001 快捷键（Ctrl+Z/Y/Shift+Z, Escape, Tab, Shift+Tab, Ctrl+N, Ctrl+G, ?）连续触发不崩溃

@@ -3,14 +3,17 @@
 /**
  * ThemeProvider
  * E014: React Context that reads userPreferencesStore theme and applies CSS classes to document root
+ * E015: Extended to support 4 themes (light, dark, enterprise-a, enterprise-b)
  */
 
 import React, { createContext, useContext, useEffect, ReactNode } from 'react';
 import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
-import type { ThemePreference } from '@/stores/userPreferencesStore';
+
+// Extended theme type supporting enterprise themes
+export type ThemeMode = 'light' | 'dark' | 'enterprise-a' | 'enterprise-b' | 'system';
 
 interface ThemeContextValue {
-  resolvedTheme: 'light' | 'dark';
+  resolvedTheme: ThemeMode;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({ resolvedTheme: 'dark' });
@@ -23,10 +26,13 @@ interface ThemeProviderProps {
   children: ReactNode;
 }
 
-export function ThemeProvider({ children }: ThemeProviderProps) {
-  const theme = useUserPreferencesStore((s) => s.theme);
+// All theme CSS classes that need to be toggled
+const THEME_CLASSES = ['theme-light', 'theme-dark', 'theme-enterprise-a', 'theme-enterprise-b'];
 
-  const getResolvedTheme = (t: ThemePreference): 'light' | 'dark' => {
+export function ThemeProvider({ children }: ThemeProviderProps) {
+  const theme = useUserPreferencesStore((s) => s.theme) as ThemeMode;
+
+  const getResolvedTheme = (t: ThemeMode): ThemeMode => {
     if (t === 'system') {
       if (typeof window !== 'undefined') {
         return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -36,22 +42,19 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     return t;
   };
 
-  useEffect(() => {
-    const resolved = getResolvedTheme(theme);
+  const applyTheme = (resolved: ThemeMode) => {
     const root = document.documentElement;
-
-    // Remove existing theme classes
-    root.classList.remove('theme-light', 'theme-dark', 'theme-enterprise-a', 'theme-enterprise-b');
-
+    // Remove all theme classes
+    THEME_CLASSES.forEach((cls) => root.classList.remove(cls));
     // Apply resolved theme class
     root.classList.add(`theme-${resolved}`);
     root.setAttribute('data-theme', resolved);
-    root.style.colorScheme = resolved;
+    root.style.colorScheme = resolved === 'enterprise-a' || resolved === 'enterprise-b' ? 'light' : resolved;
+  };
 
-    // Apply dark theme CSS variables if needed
-    if (resolved === 'dark') {
-      root.classList.add('theme-dark');
-    }
+  useEffect(() => {
+    const resolved = getResolvedTheme(theme);
+    applyTheme(resolved);
   }, [theme]);
 
   // Listen for system theme changes when using 'system' preference
@@ -61,11 +64,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handler = () => {
       const resolved = mediaQuery.matches ? 'dark' : 'light';
-      const root = document.documentElement;
-      root.classList.remove('theme-light', 'theme-dark', 'theme-enterprise-a', 'theme-enterprise-b');
-      root.classList.add(`theme-${resolved}`);
-      root.setAttribute('data-theme', resolved);
-      root.style.colorScheme = resolved;
+      applyTheme(resolved);
     };
 
     mediaQuery.addEventListener('change', handler);

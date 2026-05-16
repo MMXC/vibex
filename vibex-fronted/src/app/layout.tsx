@@ -5,6 +5,8 @@ import AppErrorBoundary from '@/components/common/AppErrorBoundary';
 import { ToastProvider } from '@/components/ui/Toast';
 import { QueryProvider } from '@/lib/query/QueryProvider';
 import '@/styles/themes/dark-theme.css';
+import '@/styles/themes/enterprise-a-theme.css';
+import '@/styles/themes/enterprise-b-theme.css';
 // OnboardingProvider removed - 2026-03-27
 
 import { MermaidInitializer } from '@/components/mermaid/MermaidInitializer';

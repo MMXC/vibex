@@ -1,0 +1,44 @@
+/**
+ * Enterprise-A Theme CSS Variables
+ * E015: Enterprise brand theme with professional blue accent
+ */
+
+.theme-enterprise-a,
+[data-theme='enterprise-a'] {
+  /* Enterprise brand colors */
+  --color-primary: #0066ff;
+  --color-primary-hover: #0052cc;
+  --color-primary-muted: rgba(0, 102, 255, 0.12);
+  --color-primary-glow: rgba(0, 102, 255, 0.4);
+
+  --color-accent: #7c3aed;
+  --color-accent-hover: #6d28d9;
+  --color-accent-muted: rgba(124, 58, 237, 0.12);
+
+  /* Enterprise neutral backgrounds */
+  --color-bg-primary: #f8fafc;
+  --color-bg-secondary: #f1f5f9;
+  --color-bg-tertiary: #e2e8f0;
+  --color-bg-elevated: #ffffff;
+  --color-bg-glass: rgba(255, 255, 255, 0.9);
+  --color-bg-canvas: #e9edf2;
+
+  /* Enterprise text */
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94a3b8;
+
+  /* Enterprise borders */
+  --color-border: rgba(15, 23, 42, 0.08);
+  --color-border-hover: rgba(15, 23, 42, 0.16);
+
+  /* Enterprise surfaces */
+  --color-surface: var(--color-bg-secondary);
+  --color-bg-hover: var(--color-bg-tertiary);
+
+  /* Enterprise shadows */
+  --shadow-glow-cyan: 0 0 20px rgba(0, 102, 255, 0.2), 0 0 40px rgba(0, 102, 255, 0.08);
+  --shadow-glass: 0 8px 32px rgba(15, 23, 42, 0.12);
+
+  color-scheme: light;
+}

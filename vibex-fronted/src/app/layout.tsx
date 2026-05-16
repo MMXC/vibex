@@ -4,12 +4,14 @@ import './globals.css';
 import AppErrorBoundary from '@/components/common/AppErrorBoundary';
 import { ToastProvider } from '@/components/ui/Toast';
 import { QueryProvider } from '@/lib/query/QueryProvider';
+import '@/styles/themes/dark-theme.css';
 // OnboardingProvider removed - 2026-03-27
 
 import { MermaidInitializer } from '@/components/mermaid/MermaidInitializer';
 import { SentryInitializer } from '@/components/sentry/SentryInitializer';
 import { DDDStoreInitializer } from '@/components/ddd/DDDStoreInitializer';
 import { ClientLayout } from '@/components/common/ClientLayout';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -46,9 +48,11 @@ export default function RootLayout({
           <DDDStoreInitializer />
           <QueryProvider>
             <AppErrorBoundary>
-              <ClientLayout>
-                {children}
-              </ClientLayout>
+              <ThemeProvider>
+                <ClientLayout>
+                  {children}
+                </ClientLayout>
+              </ThemeProvider>
             </AppErrorBoundary>
           </QueryProvider>
         </ToastProvider>

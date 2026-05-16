@@ -1,0 +1,42 @@
+/**
+ * Dark Theme CSS Variables
+ * E014: Dark theme overrides for VibeX design tokens
+ */
+
+/* Dark theme background overrides */
+.theme-dark,
+[data-theme='dark'] {
+  --color-bg-primary: #0a0a0f;
+  --color-bg-secondary: #111118;
+  --color-bg-tertiary: #1a1a24;
+  --color-bg-elevated: #22222e;
+  --color-bg-glass: rgba(10, 10, 15, 0.92);
+  --color-bg-canvas: #080810;
+
+  /* Dark text overrides for better contrast */
+  --color-text-primary: #f0f0f5;
+  --color-text-secondary: #a0a0b0;
+  --color-text-muted: #7a7a8a;
+
+  /* Dark border overrides */
+  --color-border: rgba(255, 255, 255, 0.06);
+  --color-border-hover: rgba(255, 255, 255, 0.12);
+
+  /* Dark surface for cards and panels */
+  --color-surface: var(--color-bg-secondary);
+  --color-bg-hover: var(--color-bg-tertiary);
+
+  /* Maintain neon accents in dark mode */
+  --color-primary: #00ffff;
+  --color-primary-hover: #00e5e5;
+  --color-primary-muted: rgba(0, 255, 255, 0.12);
+  --color-primary-glow: rgba(0, 255, 255, 0.4);
+
+  --color-accent: #8b5cf6;
+  --color-accent-hover: #7c3aed;
+  --color-accent-muted: rgba(139, 92, 246, 0.15);
+
+  /* Dark shadows */
+  --shadow-glow-cyan: 0 0 20px rgba(0, 255, 255, 0.25), 0 0 40px rgba(0, 255, 255, 0.1);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.6);
+}

@@ -4,6 +4,7 @@
  * Settings Page
  * E012: Settings page with theme selector (light/dark/system)
  * E013: Extended with defaultTemplate selector and shortcut customization display
+ * E016: Extended theme selector with 5 options (light, dark, system, enterprise-a, enterprise-b)
  */
 
 import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
@@ -15,6 +16,8 @@ const THEME_OPTIONS: { value: ThemePreference; label: string }[] = [
   { value: 'light', label: 'Light' },
   { value: 'dark', label: 'Dark' },
   { value: 'system', label: 'System' },
+  { value: 'enterprise-a', label: 'Enterprise A' },
+  { value: 'enterprise-b', label: 'Enterprise B' },
 ];
 
 const TEMPLATE_OPTIONS = [

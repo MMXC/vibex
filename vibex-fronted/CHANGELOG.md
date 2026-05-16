@@ -1,7 +1,8 @@
 # Changelog
 
 ## [Unreleased] S37-E016: F005 Theme Settings Integration — 2026-05-17
-- **E016 Settings Theme Selector**: `src/app/settings/page.tsx` — Extended theme selector to support all 4 themes (light, dark, enterprise-a, enterprise-b), fully integrated with useUserPreferencesStore
+- **E016 Settings Theme Selector**: `src/app/settings/page.tsx` — Extended theme selector to support 5 themes (light, dark, system, enterprise-a, enterprise-b), fully integrated with useUserPreferencesStore
+- **E016 ThemePreference Type**: `src/stores/userPreferencesStore.ts` — Extended ThemePreference type to include enterprise-a and enterprise-b
 
 ## [Unreleased] S37-E015: F005 Enterprise Themes — 2026-05-17
 - **E015 Enterprise-A Theme**: `src/styles/themes/enterprise-a-theme.css` — Enterprise brand theme CSS variables

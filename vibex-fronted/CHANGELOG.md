@@ -1,5 +1,8 @@
 # Changelog
 
+## [Unreleased] S37-E009: F003 ErrorBoundary dashboard protection — 2026-05-17
+- **E009 Dashboard Error Boundary**: `src/app/dashboard/error.tsx` — Next.js App Router Error Boundary，`reset()` 方法触发重试，友好错误兜底 UI，显示 Error ID
+
 ## [Unreleased] S37-E008: F003 ErrorBoundary canvas protection — 2026-05-17
 - **E008 ErrorBoundary 组件**: `src/components/shared/ErrorBoundary.tsx` — React ErrorBoundary class component，支持 `componentDidCatch` 捕获渲染错误，可配置 `FallbackComponent` 和 `onError` 回调，控制台输出完整 stack trace
 - **E008 DDSErrorsFallback 组件**: `src/components/shared/DDSErrorsFallback.tsx` — 友好错误兜底 UI，包含「Something went wrong」提示、脱敏错误信息、「Retry」和「Report Issue」按钮

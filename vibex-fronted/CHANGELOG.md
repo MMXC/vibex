@@ -1,5 +1,30 @@
 # Changelog
 
+## [Unreleased] S37-E016: F005 Theme Settings Integration — 2026-05-17
+- **E016 Settings Theme Selector**: `src/app/settings/page.tsx` — Extended theme selector to support all 4 themes (light, dark, enterprise-a, enterprise-b), fully integrated with useUserPreferencesStore
+
+## [Unreleased] S37-E015: F005 Enterprise Themes — 2026-05-17
+- **E015 Enterprise-A Theme**: `src/styles/themes/enterprise-a-theme.css` — Enterprise brand theme CSS variables
+- **E015 Enterprise-B Theme**: `src/styles/themes/enterprise-b-theme.css` — Alternate enterprise brand theme CSS variables
+- **E015 ThemeProvider Update**: `src/components/providers/ThemeProvider.tsx` — Extended to support 4 themes (light, dark, enterprise-a, enterprise-b)
+
+## [Unreleased] S37-E014: F005 ThemeProvider Architecture — 2026-05-17
+- **E014 ThemeProvider**: `src/components/providers/ThemeProvider.tsx` — React Context that reads userPreferencesStore theme and applies CSS classes to document root
+- **E014 Dark Theme CSS**: `src/styles/themes/dark-theme.css` — Dark theme CSS variable overrides
+- **E014 Design Tokens Update**: `src/styles/design-tokens.css` — Migrated to use CSS Variables for theme compatibility
+- **E014 Layout Integration**: `src/app/layout.tsx` — Integrated ThemeProvider for theme persistence
+
+## [Unreleased] S37-E013: F004 Preferences Extensions — 2026-05-17
+- **E013 Settings DefaultTemplate**: `src/app/settings/page.tsx` — Added defaultTemplate selector wired to useUserPreferencesStore
+- **E013 Shortcut Display**: `src/app/settings/page.tsx` — Read-only shortcut customization display section showing current shortcuts
+
+## [Unreleased] S37-E012: F004 Settings Page UI — 2026-05-17
+- **E012 Settings Page**: `src/app/settings/page.tsx` — Settings page with theme selector (light/dark/system), fully integrated with useUserPreferencesStore
+
+## [Unreleased] S37-E011: F004 userPreferencesStore with localStorage Persistence — 2026-05-17
+- **E011 userPreferencesStore**: `src/stores/userPreferencesStore.ts` — Zustand store with persist middleware using localStorage, supports theme, defaultTemplate, and shortcutCustomization
+- **E011 Unit Tests**: `src/stores/__tests__/userPreferencesStore.test.ts` — 6 test cases covering initial state, setTheme, setDefaultTemplate, setShortcutCustomization, and resetPreferences
+
 ## [Unreleased] S37-E010: F003 Error Telemetry + E2E Test — 2026-05-17
 - **E010 Error Telemetry Endpoint**: `vibex-backend/src/app/api/telemetry/errors/route.ts` — POST /api/telemetry/errors endpoint，接收客户端错误报告，记录到服务端日志
 - **E010 E2E 测试**: `vibex-fronted/tests/e2e/error-boundary.spec.ts` — Playwright E2E 测试，验证 Dashboard 页面加载、错误边界 fallback UI、Retry 按钮功能

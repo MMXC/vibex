@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased] S37-E007: F002 Export UI Integration — 2026-05-17
+- **E007 ExportMenu 组件**: `src/components/dds/toolbar/ExportMenu.tsx` — 下拉导出菜单，支持 JSON / Vibex / PDF / PNG / SVG 五种格式快速导出
+- **E007 ExportMenu 样式**: `src/components/dds/toolbar/ExportMenu.module.css` — 毛玻璃下拉菜单样式，包含加载态和动画
+- **E007 DDSToolbar 集成**: `src/components/dds/toolbar/DDSToolbar.tsx` — 替换原有「导出」按钮为 ExportMenu 组件，保留原有模态框（OpenAPI/StateMachine/PlantUML/JSON Schema/SVG）
+- **E007 PNG/SVG 导出**: 使用 E005 `useCanvasExport` hook 中的 `exportAsPNG/exportAsSVG` 对 canvas 元素进行截图和序列化
+- **E007 PDF 导出**: 调用 `POST /api/export/pdf` 后端 API（E006），传递 canvas HTML 内容
+
 ## [Unreleased] S37-E005: F002 PNG/SVG canvas export — 2026-05-17
 - **E005 useCanvasExport Hook**: `src/hooks/useCanvasExport.ts` — `exportAsPNG()` 使用 html2canvas（动态 import 避免 SSR）导出 PNG，`exportAsSVG()` 序列化 DOM 为 SVG，均使用 `canvas-{timestamp}.{ext}` 文件名
 - **E005 单元测试**: `src/hooks/__tests__/useCanvasExport.test.ts` — 4 个测试用例，全部通过

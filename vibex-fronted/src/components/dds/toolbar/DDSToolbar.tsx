@@ -25,6 +25,7 @@ import { useCanvasExport } from '@/hooks/canvas/useCanvasExport';
 import { useCanvasImport } from '@/hooks/canvas/useCanvasImport';
 import { useCanvasRBAC } from '@/hooks/useCanvasRBAC';
 import { ShareToTeamModal } from '@/components/team-share/ShareToTeamModal';
+import { ExportMenu } from './ExportMenu';
 import styles from './DDSToolbar.module.css';
 
 // ==================== Constants ====================
@@ -185,7 +186,6 @@ export const DDSToolbar = memo(function DDSToolbar({
       const smCards = chapters['business-rules'].cards as StateMachineCard[];
       const json = exportToStateMachine(smCards);
       downloadBlob(new Blob([json], { type: 'application/json' }), 'statemachine.json');
-      setDdsExportModalOpen(false);
     } catch (err) {
       console.error('[DDSToolbar] StateMachine export error:', err);
     }
@@ -237,7 +237,6 @@ export const DDSToolbar = memo(function DDSToolbar({
       }
       const blob = new Blob([puml], { type: 'text/plain' });
       downloadBlob(blob, `vibex-canvas-${new Date().toISOString().slice(0,10)}.puml`);
-      setDdsExportModalOpen(false);
     } catch (err) {
       console.error('[DDSToolbar] PlantUML export error:', err);
     }
@@ -332,8 +331,6 @@ export const DDSToolbar = memo(function DDSToolbar({
     useCanvasHistoryStore.getState().redo();
   };
 
-  const handleOpenExportModal = () => setDdsExportModalOpen(true);
-
   return (
     <>
       <header
@@ -357,18 +354,11 @@ export const DDSToolbar = memo(function DDSToolbar({
             </button>
           ))}
 
-          {/* E4-U3/U4 + E2: Export button */}
-          <button
-            type="button"
-            className={styles.exportBtn}
-            onClick={handleOpenExportModal}
-            aria-label="导出画布"
-            title={rbac.canShare ? '导出/导入画布数据' : '需要 Owner 或 Member 权限'}
+          {/* E007: ExportMenu dropdown */}
+          <ExportMenu
             disabled={!rbac.canShare && !rbac.loading}
-            data-testid="canvas-export-btn"
-          >
-            导出
-          </button>
+            className={styles.exportMenuWrapper}
+          />
 
           {/* E4: Analytics button */}
           <button

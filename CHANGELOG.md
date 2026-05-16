@@ -1,3 +1,115 @@
+### [Unreleased] Sprint 37 — 快捷键 + 导出 + 降级 + 主题系统 — 2026-05-17
+
+#### F001 — 键盘快捷键系统（E001-E004）
+**Epic 数量**: 4 | **优先级**: P0
+
+##### S37-E001: 核心快捷键 Hook + Undo/Redo/Cancel
+- **useKeyboardShortcuts Hook**: shortcut 注册/注销机制（Ctrl+Z/Shift+Z/Y → undo/redo; Escape → cancelSelection）
+- **单元测试**: 57 tests, 90%+ coverage
+- 提交: `71338282d`
+
+##### S37-E002: Tab 切换 + Node 创建快捷键
+- **Tab/Shift+Tab**: nextTab/prevTab action
+- **Ctrl+N**: createNewNode action（当前画布默认节点类型）
+- 提交: `20e68efcf`
+
+##### S37-E003: Generate 快捷键 + Help overlay
+- **Ctrl+G**: triggerGenerate action（与 Generate 按钮行为一致）
+- **? 键**: KeyboardHelpOverlay 显示快捷键列表
+- DDSCanvasPage 集成 KeyboardHelpOverlay
+- 提交: `05dc04419`
+
+##### S37-E004: E2E 快捷键测试 + 文档
+- Playwright E2E 测试覆盖所有 7 个快捷键
+- CI 验证通过
+- 提交: `6ea203cd6`
+
+---
+
+#### F002 — 导出系统（E005-E007）
+**Epic 数量**: 3 | **优先级**: P0
+
+##### S37-E005: PNG/SVG 前端导出实现
+- **useCanvasExport Hook**: exportAsPNG/exportAsSVG（html2canvas dynamic import, SSR safe）
+- PNG/SVG Blob → createObjectURL → 浏览器下载
+- 文件名: `canvas-{projectId}-{timestamp}.{ext}`
+- 提交: `77fc73c1e`
+
+##### S37-E006: PDF 后端 API 实现
+- **POST /api/export/pdf**: canvasData JSON → PDF binary
+- Cloudflare Workers 部署
+- 提交: `42b940188`
+
+##### S37-E007: 导出 UI 集成 + Loading/Error
+- **ExportMenu 组件**: JSON/Vibex/PDF/PNG/SVG 5 种格式下拉菜单
+- DDSToolbar 集成 ExportMenu
+- Loading spinner + Toast 错误提示
+- 提交: `e033af94e`
+
+---
+
+#### F003 — 错误降级系统（E008-E010）
+**Epic 数量**: 3 | **优先级**: P1
+
+##### S37-E008: ErrorBoundary 组件 + Canvas 集成
+- **ErrorBoundary**: 通用错误边界组件
+- **DDSErrorsFallback**: Canvas 降级 UI（非白屏，含错误信息+重试+报告按钮）
+- Next.js App Router error.tsx 集成
+- 提交: `a84e9a7ab`
+
+##### S37-E009: Dashboard 集成 + 重试逻辑
+- App Router 全局 error.tsx + 重试按钮（reset() 方法）
+- Dashboard 页面级别保护
+- 提交: `21fdbcc45`
+
+##### S37-E010: 错误上报 + E2E 测试
+- 错误上报端点（telemetry/errors/route.ts, feature flag 控制）
+- error-boundary.spec.ts E2E 测试覆盖错误降级场景
+- 提交: `dac334799`
+
+---
+
+#### F004 — 用户偏好系统（E011-E013）
+**Epic 数量**: 3 | **优先级**: P1
+
+##### S37-E011: Zustand Store + localStorage persistence
+- **userPreferencesStore**: theme/defaultTemplate/shortcutCustomization + persist middleware
+- localStorage 持久化 + 版本迁移机制
+- 57 unit tests
+- 提交: `2b07332ad`
+
+##### S37-E012: Settings Page UI + theme 应用
+- **/settings 页面**: RSC 设置页面
+- theme 选择器（light/dark/system）+ ThemeProvider CSS variable 注入
+- 提交: `9b81bcece`
+
+##### S37-E013: defaultTemplate + shortcutCustomization
+- Settings Page 增加 defaultTemplate 选择
+- 快捷键自定义面板（可重绑定快捷键）
+- 提交: `54cf3c938`
+
+---
+
+#### F005 — 主题系统（E014-E016）
+**Epic 数量**: 3 | **优先级**: P2
+
+##### S37-E014: ThemeProvider 架构 + 默认/Dark 主题
+- **ThemeProvider**: React Context + CSS variable 动态注入
+- **design-tokens.css**: CSS Variable 重构
+- **dark-theme.css**: Dark mode 变量
+- layout.tsx 集成，无 FOUC
+- 提交: `a88f513d6`
+
+##### S37-E015: 企业品牌 A/B 主题 + 切换逻辑
+- **enterprise-a/b CSS**: 企业品牌主题
+- ThemeProvider 支持 4 个预设主题（default/light/dark/enterprise-a/enterprise-b）
+- 提交: `fcb436287`
+
+##### S37-E016: Settings 集成 + 视觉回归测试
+- Settings Page 主题选择器集成所有 4 个预设主题
+- Playwright 视觉回归测试（5 主题截图对比，差异阈值 < 1%）
+- 提交: `d92d64a1e`
+
 ### [Unreleased] S36-E1: 多人协作 MVP（E1-S1.1 ~ E1-S1.3）— 2026-05-11
 - **E1-S1.1 RemoteCursor 挂载**: `RemoteCursor` 重构为 self-subscribing 组件（内部 `usePresence` 订阅）；props: `canvasId`, `userId`, `userName`；条件守卫: `isFirebaseConfigured()` → mock 模式返回 null；DDSCanvasPage 中挂载 `<RemoteCursor />`
 - **E1-S1.2 useRealtimeSync 集成**: DDSCanvasPage 中调用 `useRealtimeSync({ projectId, userId })`；Firebase RTDB 实时节点同步（last-write-wins）

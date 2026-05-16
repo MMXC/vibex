@@ -18,6 +18,11 @@
 - **S4.1 DDSToolbar Undo/Redo 按钮**: `DDSToolbar.tsx` 新增 Undo/Redo 按钮；调用 `useCanvasHistoryStore.undo()` / `redo()`；按钮 disabled 状态根据 `canUndo()` / `canRedo()` 正确切换；图标使用 SVG；支持 Ctrl+Z / Ctrl+Shift+Z 快捷键
 - 提交: `coord-escalation: feat(E4): add DDSToolbar Undo/Redo buttons`
 
+### [Unreleased] S36-E5: Design Review E2E 补全（S5.1 ~ S5.2）— 2026-05-16
+- **S5.1 降级路径 E2E 测试**: `design-review-degradation.spec.ts` — MCP 503 降级 UI（非白屏）；Firebase 未配置不阻断 review panel；retry button 重试成功
+- **S5.2 评审结果三 Tab E2E**: `design-review-tabs.spec.ts` — compliance/accessibility/reuse 切换正常；badge count 准确；severity badge 显示正确
+- 提交: `512f304e9` (coord-escalation: feat(E5): add design-review degradation + tabs E2E tests)
+
 ### [Unreleased] S35-P004: 模板市场功能调研（U1-P004 ~ U4-P004）— 2026-05-11
 - **U1-P004 用户故事**: As a 前端工程师/团队 lead/独立开发者，3 个用户故事 + 验收标准
 - **U2-P004 API 设计**: `/api/templates/marketplace` CRUD 端点设计，VibexExportSchema 数据结构

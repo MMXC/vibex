@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased] S37-E002: Tab 切换 + Ctrl+N 新建节点快捷键
+- **S37-E002 Tab 快捷键**: `src/hooks/useKeyboardShortcuts.ts` — Tab → onNextTab, Shift+Tab → onPrevTab，焦点在输入框时不触发
+- **S37-E002 Ctrl+N 快捷键**: `src/hooks/useKeyboardShortcuts.ts` — Ctrl+N / Cmd+N → onNewNode，与 plain N (onNewNode) 行为一致
+- **S37-E002 DDSCanvasPage 集成**: `src/components/dds/DDSCanvasPage.tsx` — Tab 切换章节 (requirement→context→flow→api→business-rules)，Ctrl+N 在当前章节创建默认类型节点
+- **S37-E002 单元测试**: `src/hooks/__tests__/useKeyboardShortcuts.test.ts` — 新增 Tab 快捷键 6 个 + Ctrl+N 快捷键 5 个测试用例
+
 ## [Unreleased] S37-E001: 核心快捷键 Hook + Undo/Redo/Cancel 支持 — 2026-05-17
 - **S37-E001 快捷键核心 Hook**: `src/hooks/useKeyboardShortcuts.ts` — Ctrl+Z/Cmd+Z undo, Ctrl+Shift+Z/Ctrl+Y redo, Escape 取消选择
 - **S37-E001 单元测试**: `src/hooks/__tests__/useKeyboardShortcuts.test.ts` — 57 个测试用例，覆盖率 90.64% Stmts / 93.79% Branches / 92.96% Lines

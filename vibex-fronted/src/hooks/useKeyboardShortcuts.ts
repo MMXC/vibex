@@ -10,6 +10,9 @@
  * - 0: Reset zoom
  * - Del/Backspace: Delete selected node
  * - N: New node (active tree)
+ * - Tab: Next tab (nextTab)
+ * - Shift+Tab: Previous tab (prevTab)
+ * - Ctrl+N: Create new node (onNewNode)
  * - Esc: Cancel / close dialogs
  *
  * P003: Dynamically reads shortcutStore to register custom shortcuts at runtime.
@@ -58,6 +61,10 @@ interface KeyboardShortcutsOptions {
   onSwitchToFlow?: () => void;
   /** Switch to Component tab (Alt+3) */
   onSwitchToComponent?: () => void;
+  /** [E002] Next tab (Tab key) */
+  onNextTab?: () => void;
+  /** [E002] Previous tab (Shift+Tab key) */
+  onPrevTab?: () => void;
   /** [S16-P0-1] Design Review (Ctrl+Shift+R / Cmd+Shift+R) */
   onDesignReview?: () => void;
   /** Whether shortcuts should be active */
@@ -82,6 +89,8 @@ type ActionName =
   | 'switch-to-context'
   | 'switch-to-flow'
   | 'switch-to-component'
+  | 'next-tab'
+  | 'prev-tab'
   | 'design-review';
 
 // Actions that have hardcoded handlers in useKeyboardShortcuts.
@@ -104,6 +113,8 @@ const HARDCODE_ACTIONS = new Set<ActionName>([
   'switch-to-context',
   'switch-to-flow',
   'switch-to-component',
+  'next-tab',
+  'prev-tab',
   'design-review',
 ]);
 
@@ -138,6 +149,9 @@ function isInTextInput(target: EventTarget | null): boolean {
  * - 0: Reset zoom
  * - Del / Backspace: Delete selected node
  * - N: New node (active tree)
+ * - Tab: Next tab (onNextTab)
+ * - Shift+Tab: Previous tab (onPrevTab)
+ * - Ctrl+N / Cmd+N: Create new node (onNewNode)
  * - Esc: Cancel / close dialogs
  */
 export function useKeyboardShortcuts({
@@ -157,6 +171,8 @@ export function useKeyboardShortcuts({
   onSwitchToContext,
   onSwitchToFlow,
   onSwitchToComponent,
+  onNextTab,
+  onPrevTab,
   onDesignReview,
   enabled = true,
 }: KeyboardShortcutsOptions) {
@@ -179,6 +195,8 @@ export function useKeyboardShortcuts({
       'switch-to-context': onSwitchToContext as () => void,
       'switch-to-flow': onSwitchToFlow as () => void,
       'switch-to-component': onSwitchToComponent as () => void,
+      'next-tab': onNextTab as () => void,
+      'prev-tab': onPrevTab as () => void,
       'design-review': onDesignReview as () => void,
     }),
     [
@@ -396,6 +414,28 @@ export function useKeyboardShortcuts({
         onSwitchToComponent?.();
         return;
       }
+
+      // === [E002] Previous Tab: Shift+Tab (must come before plain Tab) ===
+      if (e.key === 'Tab' && !isCtrl && !isMeta && e.shiftKey && !isInputFocused) {
+        e.preventDefault();
+        onPrevTab?.();
+        return;
+      }
+
+      // === [E002] Next Tab: Tab key ===
+      if (e.key === 'Tab' && !isCtrl && !isMeta && !isInputFocused) {
+        e.preventDefault();
+        onNextTab?.();
+        return;
+      }
+
+      // === [E002] New Node: Ctrl+N / Cmd+N ===
+      if ((isCtrl || isMeta) && e.key.toLowerCase() === 'n') {
+        if (isInputFocused) return;
+        e.preventDefault();
+        onNewNode?.();
+        return;
+      }
     }
 
     document.addEventListener('keydown', handler);
@@ -404,6 +444,6 @@ export function useKeyboardShortcuts({
     undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset,
     onDelete, onSelectAll, onClearSelection, onNewNode,
     onQuickGenerate, onConfirmSelected, onGenerateContext,
-    onSwitchToContext, onSwitchToFlow, onSwitchToComponent, onDesignReview, enabled,
+      onSwitchToContext, onSwitchToFlow, onSwitchToComponent, onNextTab, onPrevTab, onDesignReview, enabled,
   ]);
 }

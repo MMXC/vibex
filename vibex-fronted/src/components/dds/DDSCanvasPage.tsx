@@ -438,7 +438,47 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     onZoomOut: () => { /* placeholder */ },
     onZoomReset: () => { /* placeholder */ },
     onSelectAll: () => { /* placeholder */ },
-    onNewNode: () => { /* placeholder */ },
+    onNewNode: () => {
+      // [E002] Ctrl+N: Create new node in active chapter
+      const store = useDDSCanvasStore.getState();
+      const activeChapter = store.activeChapter;
+      // Default card type per chapter
+      const defaultCardType: Record<ChapterType, string> = {
+        requirement: 'user-story',
+        context: 'bounded-context',
+        flow: 'flow-step',
+        api: 'api-endpoint',
+        'business-rules': 'state-machine',
+      };
+      const cardType = defaultCardType[activeChapter] ?? 'user-story';
+      const cardId = `card-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      const now = new Date().toISOString();
+      const newCard = {
+        id: cardId,
+        type: cardType,
+        title: 'New ' + (cardType === 'user-story' ? 'User Story' : cardType === 'bounded-context' ? 'Bounded Context' : cardType === 'flow-step' ? 'Flow Step' : cardType === 'api-endpoint' ? 'API Endpoint' : 'State Machine'),
+        position: { x: 100, y: 100 },
+        createdAt: now,
+        updatedAt: now,
+      } as Parameters<typeof ddsChapterActions.addCard>[1];
+      ddsChapterActions.addCard(activeChapter, newCard);
+    },
+    onNextTab: () => {
+      // [E002] Tab: Cycle to next chapter
+      const order: ChapterType[] = ['requirement', 'context', 'flow', 'api', 'business-rules'];
+      const current = useDDSCanvasStore.getState().activeChapter;
+      const idx = order.indexOf(current);
+      const next = order[(idx + 1) % order.length];
+      useDDSCanvasStore.getState().setActiveChapter(next);
+    },
+    onPrevTab: () => {
+      // [E002] Shift+Tab: Cycle to previous chapter
+      const order: ChapterType[] = ['requirement', 'context', 'flow', 'api', 'business-rules'];
+      const current = useDDSCanvasStore.getState().activeChapter;
+      const idx = order.indexOf(current);
+      const prev = order[(idx - 1 + order.length) % order.length];
+      useDDSCanvasStore.getState().setActiveChapter(prev);
+    },
     onDesignReview: () => { window.dispatchEvent(new CustomEvent('design-review:open')); },
     enabled: true,
   });

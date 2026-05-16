@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased] S37-E001: 核心快捷键 Hook + Undo/Redo/Cancel 支持 — 2026-05-17
+- **S37-E001 快捷键核心 Hook**: `src/hooks/useKeyboardShortcuts.ts` — Ctrl+Z/Cmd+Z undo, Ctrl+Shift+Z/Ctrl+Y redo, Escape 取消选择
+- **S37-E001 单元测试**: `src/hooks/__tests__/useKeyboardShortcuts.test.ts` — 57 个测试用例，覆盖率 90.64% Stmts / 93.79% Branches / 92.96% Lines
+- **S37-E001 与 DDSToolbar 一致性**: 快捷键行为与 DDSToolbar Undo/Redo 按钮一致（调用 useCanvasHistoryStore.getState().undo()/redo()）
+
 ## [Unreleased] S34-P003: 快捷键集成
 - **S34-P003-U1 useKeyboardShortcuts 动态化**: `src/hooks/useKeyboardShortcuts.ts` — subscribe shortcutStore，非 HARDCODE_ACTIONS 的 action 动态注册运行时 handler
 - **S34-P003-U2 冲突检测**: `src/stores/shortcutStore.ts` — captureKey/saveShortcut 已实现冲突检测，UI 阻止冲突保存

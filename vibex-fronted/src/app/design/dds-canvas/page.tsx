@@ -11,6 +11,8 @@
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { DDSCanvasPage } from '@/components/dds/DDSCanvasPage';
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
+import { DDSErrorsFallback } from '@/components/shared/DDSErrorsFallback';
 
 // ==================== Inner component (needs useSearchParams) ====================
 
@@ -65,8 +67,10 @@ function PageSkeleton() {
 
 export default function DDSCanvasPage_() {
   return (
-    <Suspense fallback={<PageSkeleton />}>
-      <DDSCanvasContent />
-    </Suspense>
+    <ErrorBoundary FallbackComponent={DDSErrorsFallback}>
+      <Suspense fallback={<PageSkeleton />}>
+        <DDSCanvasContent />
+      </Suspense>
+    </ErrorBoundary>
   );
 }

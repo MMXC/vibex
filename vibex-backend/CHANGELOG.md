@@ -6,6 +6,12 @@
 
 #### 2026-05-17
 
+- **Epic S37-E010 Error Telemetry** (epic/f003-error-boundary-telemetry)
+  - `src/app/api/telemetry/errors/route.ts`: POST /api/telemetry/errors endpoint
+    - E010: Receives client-side error reports (message, digest, stack, source)
+    - Error handling: 400 for missing/invalid body, 500 for generation failures
+    - Logs errors to server console for monitoring
+
 - **Epic F002 PDF Export API** (epic/f002-export-pdf-api)
   - `src/app/api/export/pdf/route.ts`: POST /api/export/pdf endpoint
     - E006: Receives canvas data as JSON body, returns minimal valid PDF

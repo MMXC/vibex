@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased] S37-E010: F003 Error Telemetry + E2E Test — 2026-05-17
+- **E010 Error Telemetry Endpoint**: `vibex-backend/src/app/api/telemetry/errors/route.ts` — POST /api/telemetry/errors endpoint，接收客户端错误报告，记录到服务端日志
+- **E010 E2E 测试**: `vibex-fronted/tests/e2e/error-boundary.spec.ts` — Playwright E2E 测试，验证 Dashboard 页面加载、错误边界 fallback UI、Retry 按钮功能
+
 ## [Unreleased] S37-E009: F003 ErrorBoundary dashboard protection — 2026-05-17
 - **E009 Dashboard Error Boundary**: `src/app/dashboard/error.tsx` — Next.js App Router Error Boundary，`reset()` 方法触发重试，友好错误兜底 UI，显示 Error ID
 

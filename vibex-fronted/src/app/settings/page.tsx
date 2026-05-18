@@ -86,9 +86,9 @@ export default function SettingsPage() {
           <div className={styles.shortcutsList}>
             {shortcuts.length > 0 ? (
               shortcuts.slice(0, 15).map((shortcut) => (
-                <div key={shortcut.id} className={styles.shortcutRow}>
+                <div key={shortcut.action} className={styles.shortcutRow}>
                   <span className={styles.shortcutAction}>{shortcut.description}</span>
-                  <kbd className={styles.shortcutKeys}>{shortcut.keyboardShortcut}</kbd>
+                  <kbd className={styles.shortcutKeys}>{shortcut.currentKey}</kbd>
                 </div>
               ))
             ) : (

@@ -60,11 +60,12 @@
 ### E2 — 模板市场 MVP
 
 #### S2.1: Marketplace API + 静态数据
-- **实现文件**: `vibex-fronted/src/app/api/marketplace/templates/route.ts`
+- **实现文件**: `vibex-backend/src/app/api/templates/marketplace/route.ts`
+- **静态数据**: `vibex-backend/public/data/marketplace-templates.json`
 - **实现内容**:
-  - `GET /api/marketplace/templates` — 返回模板列表
-  - 静态 JSON 数据源（`/data/templates.json`）
-  - 字段: `id`, `name`, `description`, `thumbnail`, `category`, `tags`
+  - `GET /api/templates/marketplace` — 返回模板列表
+  - 静态 JSON 数据源（`public/data/marketplace-templates.json`）
+  - 字段: `id`, `name`, `industry`, `description`, `tags`, `icon`, `previewUrl`, `usageCount`, `createdAt`（≥3 模板）
 - **DoD 检查清单**:
   - [ ] API route 响应 200 且返回模板列表
   - [ ] `templates-market.spec.ts` 测试覆盖

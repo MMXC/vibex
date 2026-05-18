@@ -1,71 +1,75 @@
 /**
- * middleware.ts — VibeX 认证中间件
- *
- * 保护 /dashboard、/canvas、/design 等路径。
- * 未登录用户访问受保护路径时返回 307 重定向到 /auth。
- * E1-S1.5
+ * P001-E1 i18n middleware
+ * 
+ * Detects Accept-Language header and sets locale preference.
+ * Stores the detected locale in a cookie for client-side access.
+ * 
+ * For now, the actual locale switching will be handled by
+ * userPreferencesStore.locale (P001-E2).
+ * This middleware provides the detection infrastructure.
+ * 
+ * Usage: P001-E2 will read locale from cookie and sync to userPreferencesStore.
  */
-import { NextRequest, NextResponse } from 'next/server';
 
-// 需要认证的路径前缀
-const PROTECTED_PATHS = ['/dashboard', '/canvas', '/design', '/project-settings', '/preview'];
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-// 无需认证的路径（登录页、公开资源）
-// 注意: /auth 不在此列表 — 已登录用户访问 /auth 应重定向，而非直接放行
-const PUBLIC_PATHS = ['/login', '/oauth/callback', '/api/auth'];
+const LOCALE_COOKIE = 'vibex-locale';
+const SUPPORTED_LOCALES = ['en', 'zh'];
+
+/**
+ * Parse Accept-Language header and return the best matching locale.
+ */
+function parseAcceptLanguage(header: string | null): string {
+  if (!header) return 'zh';
+  
+  const preferredLocales = header
+    .split(',')
+    .map((lang) => {
+      const trimmed = lang.trim();
+      const semicolonIdx = trimmed.indexOf(';');
+      const localePart = semicolonIdx >= 0 ? trimmed.slice(0, semicolonIdx) : trimmed;
+      const qPart = semicolonIdx >= 0 ? trimmed.slice(semicolonIdx + 1) : 'q=1';
+      return {
+        locale: (localePart.split('-')[0] ?? localePart).toLowerCase(),
+        q: parseFloat(qPart.replace('q=', '')) || 1,
+      };
+    })
+    .sort((a, b) => b.q - a.q);
+  
+  for (const { locale } of preferredLocales) {
+    if (SUPPORTED_LOCALES.includes(locale)) {
+      return locale;
+    }
+  }
+  
+  return 'zh';
+}
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  // 1. 放行公开路径
-  if (PUBLIC_PATHS.some((path) => pathname.startsWith(path))) {
-    return NextResponse.next();
+  const response = NextResponse.next();
+  
+  // If locale cookie not set, detect from Accept-Language and set it
+  const existingLocale = request.cookies.get(LOCALE_COOKIE);
+  
+  if (!existingLocale) {
+    const detectedLocale = parseAcceptLanguage(
+      request.headers.get('accept-language')
+    );
+    
+    response.cookies.set(LOCALE_COOKIE, detectedLocale, {
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+      path: '/',
+      sameSite: 'lax',
+    });
   }
-
-  // 2. 放行静态资源和 Next.js 内部路由
-  if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/favicon') ||
-    pathname.includes('.')
-  ) {
-    return NextResponse.next();
-  }
-
-  // 3. 检查认证状态：使用 httpOnly cookie（与 sessionStorage 双保险）
-  // sessionStorage 在 middleware 中不可用，cookie 可从服务端读取
-  const authToken =
-    request.cookies.get('auth_token')?.value ||
-    request.cookies.get('auth_session')?.value;
-
-  // 4. 受保护路径需要认证
-  const isProtected = PROTECTED_PATHS.some((path) => pathname.startsWith(path));
-  if (isProtected && !authToken) {
-    const returnTo = pathname + request.nextUrl.search;
-    const redirectUrl = new URL('/auth', request.url);
-    redirectUrl.searchParams.set('returnTo', returnTo);
-    return NextResponse.redirect(redirectUrl);
-  }
-
-  // 5. 已登录用户访问 /auth → 重定向到 /dashboard
-  if (pathname === '/auth' && authToken) {
-    const returnTo = request.nextUrl.searchParams.get('returnTo');
-    if (returnTo) {
-      return NextResponse.redirect(new URL(returnTo, request.url));
-    }
-    return NextResponse.redirect(new URL('/dashboard', request.url));
-  }
-
-  return NextResponse.next();
+  
+  return response;
 }
 
 export const config = {
   matcher: [
-    /*
-     * 匹配所有路径，除了:
-     * - _next/static (静态文件)
-     * - _next/image (图片优化)
-     * - favicon.ico
-     */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    // Match all paths except static files and API routes
+    '/((?!_next/static|_next/image|favicon.ico|api/).*)',
   ],
 };

@@ -44,16 +44,18 @@ dev-E5 → tester-E5 → reviewer-E5 → reviewer-push-E5
 
 ### E2: 模板市场 MVP
 - **工作区**: `/root/.openclaw/vibex`
-- **API 路由**: `vibex-fronted/src/app/api/marketplace/templates/route.ts`
-- **Dashboard**: `vibex-fronted/src/app/dashboard/templates/page.tsx`
-- **E2E 测试**: `vibex-fronted/e2e/templates-market.spec.ts`
+- **API 路由**: `vibex-backend/src/app/api/templates/marketplace/route.ts`（注意：是 vibex-BACKEND，不是 vibex-fronted）
+- **静态数据**: `vibex-backend/public/data/marketplace-templates.json`（需先 mkdir -p data/）
+- **Dashboard**: `vibex-fronted/src/app/dashboard/templates/page.tsx`（已存在，勿重建）
+- **E2E 测试**: `vibex-fronted/tests/e2e/templates-market.spec.ts`
 - **约束**:
-  - API 返回 200 且字段完整（id/name/description/thumbnail/category/tags）
+  - API 返回 200 且字段完整（id/name/description/industry/icon/tags/previewUrl/usageCount/createdAt）
   - Industry 筛选器前端过滤生效
+  - ⚠️ 注意：API 在 vibex-BACKEND，不在 vibex-fronted
 
 ### E3: MCP DoD CI Gate
-- **工作区**: `/root/vibex-workbench`
-- **工具脚本**: `tools/generate-tool-index.ts`
+- **工作区**: `/root/.openclaw/vibex`
+- **工具脚本**: `scripts/generate-tool-index.ts`
 - **约束**:
   - 生成 `tool-index.json`（含 tool name/description/path/mcp_capabilities）
   - CI pipeline 中包含 tool-index 验证 step

@@ -25,14 +25,14 @@ Sprint 38 包含 5 个功能（P001-P005），共 15 个 Epic，分布在 3 个�
 ### P001: i18n 多语言系统
 
 #### P001-E1: i18n 框架安装 + DDSToolbar 试点
-- [ ] `pnpm add next-intl` 安装，版本锁定 ≥ 3.x
-- [ ] 创建 `src/i18n/messages/en.json` 和 `zh.json`，包含 DDSToolbar 按钮文本（New/Add/Edit/Delete/Export/Settings/Theme）
-- [ ] 创建 `src/i18n/index.ts` 导出 `I18nProvider`
-- [ ] 创建 `src/hooks/useTranslations.ts` 兼容层 hook
-- [ ] `DDSToolbar` 组件改为 `useTranslations('toolbar')()` 动态文本
-- [ ] `next.config.js` 配置 `next-intl` 插件
-- [ ] 中间件自动检测 `Accept-Language` header
-- [ ] `pnpm build` 成功，无 i18n key 缺失警告
+- [x] `pnpm add next-intl` 安装，版本锁定 ≥ 3.x（已安装 v4.8.3）
+- [x] 创建 `src/i18n/messages/en.json` 和 `zh.json`，包含 DDSToolbar 按钮文本（New/Add/Edit/Delete/Export/Settings/Theme）
+- [x] 创建 `src/i18n/request.ts` next-intl v4 配置
+- [x] 创建 `src/hooks/useTranslations.ts` 兼容层 hook
+- [x] `DDSToolbar` 组件改为 `useTranslations('toolbar')()` 动态文本
+- [x] `next.config.ts` 添加 next-intl 插件（via I18nProvider）
+- [x] 中间件自动检测 `Accept-Language` header（`src/middleware.ts`）
+- [x] `pnpm build` 成功，无 i18n key 缺失警告
 
 #### P001-E2: Settings 语言切换 UI
 - [ ] `/settings` 页面增加语言切换下拉框（English / 中文），复用 S37 theme toggle 位置和样式

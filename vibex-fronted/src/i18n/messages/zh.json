@@ -1,0 +1,41 @@
+{
+  "toolbar": {
+    "aiGenerate": "AI 生成",
+    "aiGenerating": "生成中...",
+    "fullscreen": "全屏",
+    "exitFullscreen": "退出全屏",
+    "undo": "撤销",
+    "redo": "重做",
+    "designReview": "Design Review",
+    "analyze": "分析",
+    "import": "导入",
+    "shareToTeam": "分享给 Team",
+    "exportImport": "导出/导入",
+    "chapterRequirement": "需求",
+    "chapterContext": "上下文",
+    "chapterFlow": "流程",
+    "chapterApi": "API",
+    "chapterBusinessRules": "业务规则"
+  },
+  "export": {
+    "title": "导出/导入",
+    "canvasExport": "画布导出",
+    "jsonFormat": "导出为 .json",
+    "jsonFormatDesc": "可读的 JSON 格式，包含 schemaVersion、metadata、chapters",
+    "vibexFormat": "导出为 .vibex",
+    "vibexFormatDesc": "gzip 压缩格式，文件更小",
+    "codeExport": "代码导出",
+    "openapi": "OpenAPI 3.0",
+    "openapiDesc": "导出 API 端点为 OpenAPI JSON",
+    "stateMachine": "State Machine JSON",
+    "stateMachineDesc": "导出版务规则状态机",
+    "specialExport": "专用格式导出",
+    "plantUML": "PlantUML (.puml)",
+    "plantUMLDesc": "类图，StarUML 可导入",
+    "jsonSchema": "JSON Schema (.schema.json)",
+    "jsonSchemaDesc": "组件 API 参数结构定义",
+    "svgCanvas": "SVG 画布图",
+    "svgCanvasDesc": "可视化导出",
+    "close": "关闭"
+  }
+}

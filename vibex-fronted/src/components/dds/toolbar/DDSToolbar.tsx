@@ -26,16 +26,18 @@ import { useCanvasImport } from '@/hooks/canvas/useCanvasImport';
 import { useCanvasRBAC } from '@/hooks/useCanvasRBAC';
 import { ShareToTeamModal } from '@/components/team-share/ShareToTeamModal';
 import { ExportMenu } from './ExportMenu';
+import { useTranslations } from '@/hooks/useTranslations';
 import styles from './DDSToolbar.module.css';
 
-// ==================== Constants ====================
-
-const CHAPTER_LABELS: Record<ChapterType, string> = {
-  requirement: '需求',
-  context: '上下文',
-  flow: '流程',
-  api: 'API',
-  'business-rules': '业务规则',
+// ==================== Chapter label keys (mapped to i18n keys) ====================
+// P001-E1 i18n pilot: chapter labels are now driven by next-intl translations
+// Key format: 'chapter' + capitalized chapter type
+const CHAPTER_LABEL_KEYS: Record<ChapterType, string> = {
+  requirement: 'chapterRequirement',
+  context: 'chapterContext',
+  flow: 'chapterFlow',
+  api: 'chapterApi',
+  'business-rules': 'chapterBusinessRules',
 };
 
 // ==================== Icon SVGs ====================
@@ -150,7 +152,9 @@ export const DDSToolbar = memo(function DDSToolbar({
   const chapters = useDDSCanvasStore((s) => s.chapters);
   const chatHistory = useDDSCanvasStore((s) => s.chatHistory);
 
-  const chapterLabel = CHAPTER_LABELS[activeChapter];
+  // P001-E1 i18n: use translations for chapter label
+  const tToolbar = useTranslations('toolbar')();
+  const chapterLabel = tToolbar(CHAPTER_LABEL_KEYS[activeChapter]);
   const generating = isGeneratingProp ?? isGenerating;
 
   const crossChapterEdges = useDDSCanvasStore((s) => s.crossChapterEdges);
@@ -331,6 +335,9 @@ export const DDSToolbar = memo(function DDSToolbar({
     useCanvasHistoryStore.getState().redo();
   };
 
+  // P001-E1 i18n: use translations for export modal
+  const tExport = useTranslations('export')();
+
   return (
     <>
       <header
@@ -341,16 +348,16 @@ export const DDSToolbar = memo(function DDSToolbar({
         {/* Left: Chapter indicator */}
         <div className={styles.leftSection}>
           {/* E2-U3: Clickable chapter tabs for quick navigation */}
-          {(Object.keys(CHAPTER_LABELS) as ChapterType[]).map((ch) => (
+          {(Object.keys(CHAPTER_LABEL_KEYS) as ChapterType[]).map((ch) => (
             <button
               key={ch}
               type="button"
               className={`${styles.chapterTab} ${activeChapter === ch ? styles.chapterTabActive : ''}`}
               onClick={() => useDDSCanvasStore.getState().setActiveChapter(ch)}
-              aria-label={`切换到${CHAPTER_LABELS[ch]}章节`}
+              aria-label={`切换到${tToolbar(CHAPTER_LABEL_KEYS[ch])}章节`}
               aria-pressed={activeChapter === ch}
             >
-              {CHAPTER_LABELS[ch]}
+              {tToolbar(CHAPTER_LABEL_KEYS[ch])}
             </button>
           ))}
 
@@ -366,11 +373,11 @@ export const DDSToolbar = memo(function DDSToolbar({
             className={styles.exportBtn}
             onClick={() => window.open('/dashboard?open=funnel', '_blank')}
             aria-label="查看分析漏斗"
-            title="查看分析漏斗"
+            title={tToolbar('analyze')}
             data-testid="canvas-analytics-btn"
           >
             <ChartIcon />
-            <span>分析</span>
+            <span>{tToolbar('analyze')}</span>
           </button>
 
           {/* E2: Import button with hidden file input (Bug fix: wire hidden input) */}
@@ -383,7 +390,7 @@ export const DDSToolbar = memo(function DDSToolbar({
             disabled={!rbac.canEdit && !rbac.loading}
             data-testid="canvas-import-btn"
           >
-            导入
+            {tToolbar('import')}
           </button>
           <input
             ref={importRef}
@@ -404,7 +411,7 @@ export const DDSToolbar = memo(function DDSToolbar({
               title="分享给团队"
               data-testid="share-to-team-btn"
             >
-              分享给 Team
+              {tToolbar('shareToTeam')}
             </button>
           )}
         </div>
@@ -417,8 +424,8 @@ export const DDSToolbar = memo(function DDSToolbar({
             className={`${styles.iconButton}`}
             onClick={handleUndo}
             disabled={!canUndo}
-            aria-label="撤销"
-            title="撤销 (Ctrl+Z)"
+            aria-label={tToolbar('undo')}
+            title={`${tToolbar('undo')} (Ctrl+Z)`}
             data-testid="canvas-undo-btn"
           >
             <UndoIcon />
@@ -430,8 +437,8 @@ export const DDSToolbar = memo(function DDSToolbar({
             className={`${styles.iconButton}`}
             onClick={handleRedo}
             disabled={!canRedo}
-            aria-label="重做"
-            title="重做 (Ctrl+Shift+Z)"
+            aria-label={tToolbar('redo')}
+            title={`${tToolbar('redo')} (Ctrl+Shift+Z)`}
             data-testid="canvas-redo-btn"
           >
             <RedoIcon />
@@ -443,11 +450,11 @@ export const DDSToolbar = memo(function DDSToolbar({
             className={`${styles.actionButton} ${styles.aiButton}`}
             onClick={onAIGenerate}
             disabled={generating}
-            aria-label={generating ? 'AI 生成中...' : 'AI 生成'}
+            aria-label={generating ? tToolbar('aiGenerating') : tToolbar('aiGenerate')}
             aria-busy={generating}
           >
             <AiIcon />
-            <span>{generating ? '生成中...' : 'AI 生成'}</span>
+            <span>{generating ? tToolbar('aiGenerating') : tToolbar('aiGenerate')}</span>
           </button>
 
           {/* Fullscreen toggle */}
@@ -455,7 +462,7 @@ export const DDSToolbar = memo(function DDSToolbar({
             type="button"
             className={`${styles.iconButton} ${isFullscreen ? styles.iconButtonActive : ''}`}
             onClick={handleFullscreenToggle}
-            aria-label={isFullscreen ? '退出全屏' : '全屏'}
+            aria-label={isFullscreen ? tToolbar('exitFullscreen') : tToolbar('fullscreen')}
             aria-pressed={isFullscreen}
           >
             {isFullscreen ? <ExitFullscreenIcon /> : <FullscreenIcon />}
@@ -467,10 +474,10 @@ export const DDSToolbar = memo(function DDSToolbar({
             className={styles.actionButton}
             onClick={() => window.dispatchEvent(new CustomEvent('design-review:open'))}
             data-testid="design-review-btn"
-            aria-label="Design Review"
-            title="Design Review (Ctrl+Shift+R)"
+            aria-label={tToolbar('designReview')}
+            title={`${tToolbar('designReview')} (Ctrl+Shift+R)`}
           >
-            <EyeIcon /> Design Review
+            <EyeIcon /> {tToolbar('designReview')}
           </button>
         </div>
 
@@ -493,27 +500,27 @@ export const DDSToolbar = memo(function DDSToolbar({
         >
           <div className={styles.exportModal}>
             <div className={styles.modalHeader}>
-              <h2 id="export-modal-title" className={styles.modalTitle}>导出/导入</h2>
+              <h2 id="export-modal-title" className={styles.modalTitle}>{tExport('title')}</h2>
               <button
                 type="button"
                 className={styles.modalClose}
                 onClick={() => setDdsExportModalOpen(false)}
-                aria-label="关闭"
+                aria-label={tExport('close')}
               >
                 ×
               </button>
             </div>
             <div className={styles.modalBody}>
               {/* E2: Canvas Export */}
-              <h3 className={styles.exportSectionTitle}>画布导出</h3>
+              <h3 className={styles.exportSectionTitle}>{tExport('canvasExport')}</h3>
               <button
                 type="button"
                 className={styles.exportOption}
                 onClick={handleDDSExportJSON}
                 data-testid="export-json-btn"
               >
-                <span className={styles.exportOptionTitle}>导出为 .json</span>
-                <span className={styles.exportOptionDesc}>可读的 JSON 格式，包含 schemaVersion、metadata、chapters</span>
+                <span className={styles.exportOptionTitle}>{tExport('jsonFormat')}</span>
+                <span className={styles.exportOptionDesc}>{tExport('jsonFormatDesc')}</span>
               </button>
               <button
                 type="button"
@@ -521,39 +528,39 @@ export const DDSToolbar = memo(function DDSToolbar({
                 onClick={handleDDSExportVibex}
                 data-testid="export-vibex-btn"
               >
-                <span className={styles.exportOptionTitle}>导出为 .vibex</span>
-                <span className={styles.exportOptionDesc}>gzip 压缩格式，文件更小</span>
+                <span className={styles.exportOptionTitle}>{tExport('vibexFormat')}</span>
+                <span className={styles.exportOptionDesc}>{tExport('vibexFormatDesc')}</span>
               </button>
 
               {/* E4-U3/U4: OpenAPI / StateMachine */}
-              <h3 className={styles.exportSectionTitle}>代码导出</h3>
+              <h3 className={styles.exportSectionTitle}>{tExport('codeExport')}</h3>
               <button
                 type="button"
                 className={styles.exportOption}
                 onClick={handleDownloadOpenAPI}
               >
-                <span className={styles.exportOptionTitle}>OpenAPI 3.0</span>
-                <span className={styles.exportOptionDesc}>导出 API 端点为 OpenAPI JSON</span>
+                <span className={styles.exportOptionTitle}>{tExport('openapi')}</span>
+                <span className={styles.exportOptionDesc}>{tExport('openapiDesc')}</span>
               </button>
               <button
                 type="button"
                 className={styles.exportOption}
                 onClick={handleDownloadStateMachine}
               >
-                <span className={styles.exportOptionTitle}>State Machine JSON</span>
-                <span className={styles.exportOptionDesc}>导出版务规则状态机</span>
+                <span className={styles.exportOptionTitle}>{tExport('stateMachine')}</span>
+                <span className={styles.exportOptionDesc}>{tExport('stateMachineDesc')}</span>
               </button>
 
               {/* E4-U1/U2/U3: PlantUML / JSON Schema / SVG */}
-              <h3 className={styles.exportSectionTitle}>专用格式导出</h3>
+              <h3 className={styles.exportSectionTitle}>{tExport('specialExport')}</h3>
               <button
                 type="button"
                 className={styles.exportOption}
                 onClick={handleExportPlantUML}
                 data-testid="plantuml-option"
               >
-                <span className={styles.exportOptionTitle}>PlantUML (.puml)</span>
-                <span className={styles.exportOptionDesc}>类图，StarUML 可导入</span>
+                <span className={styles.exportOptionTitle}>{tExport('plantUML')}</span>
+                <span className={styles.exportOptionDesc}>{tExport('plantUMLDesc')}</span>
               </button>
               <button
                 type="button"
@@ -561,8 +568,8 @@ export const DDSToolbar = memo(function DDSToolbar({
                 onClick={handleExportJSONSchema}
                 data-testid="schema-option"
               >
-                <span className={styles.exportOptionTitle}>JSON Schema (.schema.json)</span>
-                <span className={styles.exportOptionDesc}>组件 API 参数结构定义</span>
+                <span className={styles.exportOptionTitle}>{tExport('jsonSchema')}</span>
+                <span className={styles.exportOptionDesc}>{tExport('jsonSchemaDesc')}</span>
               </button>
               <button
                 type="button"
@@ -570,8 +577,8 @@ export const DDSToolbar = memo(function DDSToolbar({
                 onClick={handleExportSVG}
                 data-testid="svg-option"
               >
-                <span className={styles.exportOptionTitle}>SVG 画布图</span>
-                <span className={styles.exportOptionDesc}>可视化导出</span>
+                <span className={styles.exportOptionTitle}>{tExport('svgCanvas')}</span>
+                <span className={styles.exportOptionDesc}>{tExport('svgCanvasDesc')}</span>
               </button>
             </div>
           </div>

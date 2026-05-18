@@ -1,3 +1,16 @@
+### [Unreleased] Sprint 38 — P001 i18n 多语言系统
+
+#### F001 — i18n 多语言系统（P001-E1 框架安装 + DDSToolbar 试点）
+**Epic 数量**: 1 | **优先级**: P0
+
+##### S38-E001: i18n 框架安装 + DDSToolbar 试点
+- **next-intl v4.8.3**: 集成到 App Router，I18nProvider 包裹整个应用
+- **语言文件**: `src/i18n/messages/zh.json` + `en.json`，覆盖 toolbar/export 命名空间
+- **DDSToolbar i18n 化**: 章节标签、AI 生成、全屏、撤销/重做、Design Review、导入、分享、导出弹窗 → 全部通过 `useTranslations()` 动态获取
+- **中间件**: `src/middleware.ts` 自动从 Accept-Language header 检测语言偏好，写入 cookie
+- **构建**: `pnpm build` ✅ TypeScript 编译通过
+- **关联修复**: 修复 settings 页面 ShortcutConfig 缺少 `id` 属性的 TypeScript 错误
+
 ### [Unreleased] Sprint 37 — 快捷键 + 导出 + 降级 + 主题系统 — 2026-05-17
 
 #### F001 — 键盘快捷键系统（E001-E004）

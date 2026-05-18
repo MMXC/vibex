@@ -14,6 +14,10 @@ import { SentryInitializer } from '@/components/sentry/SentryInitializer';
 import { DDDStoreInitializer } from '@/components/ddd/DDDStoreInitializer';
 import { ClientLayout } from '@/components/common/ClientLayout';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
+// P001-E1: i18n — load default zh messages for SSR
+import zhMessages from '@/i18n/messages/zh.json';
+import enMessages from '@/i18n/messages/en.json';
+import { I18nProvider } from '@/components/providers/I18nProvider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -51,9 +55,12 @@ export default function RootLayout({
           <QueryProvider>
             <AppErrorBoundary>
               <ThemeProvider>
-                <ClientLayout>
-                  {children}
-                </ClientLayout>
+                {/* P001-E1: i18n provider — default locale zh */}
+                <I18nProvider locale="zh" messages={{ ...zhMessages, ...enMessages }}>
+                  <ClientLayout>
+                    {children}
+                  </ClientLayout>
+                </I18nProvider>
               </ThemeProvider>
             </AppErrorBoundary>
           </QueryProvider>

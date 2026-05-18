@@ -94,6 +94,8 @@ function inlineComputedStyles(source: Element, clone: Element): void {
   const cloneChildren = cloneEl.children;
 
   for (let i = 0; i < sourceChildren.length && i < cloneChildren.length; i++) {
-    inlineComputedStyles(sourceChildren[i], cloneChildren[i]);
+    const src = sourceChildren[i];
+    const dst = cloneChildren[i];
+    if (src && dst) inlineComputedStyles(src, dst);
   }
 }

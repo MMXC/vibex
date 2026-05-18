@@ -1,0 +1,41 @@
+{
+  "toolbar": {
+    "aiGenerate": "AI Generate",
+    "aiGenerating": "Generating...",
+    "fullscreen": "Fullscreen",
+    "exitFullscreen": "Exit Fullscreen",
+    "undo": "Undo",
+    "redo": "Redo",
+    "designReview": "Design Review",
+    "analyze": "Analyze",
+    "import": "Import",
+    "shareToTeam": "Share to Team",
+    "exportImport": "Export / Import",
+    "chapterRequirement": "Requirements",
+    "chapterContext": "Context",
+    "chapterFlow": "Flow",
+    "chapterApi": "API",
+    "chapterBusinessRules": "Business Rules"
+  },
+  "export": {
+    "title": "Export / Import",
+    "canvasExport": "Canvas Export",
+    "jsonFormat": "Export as .json",
+    "jsonFormatDesc": "Readable JSON format with schemaVersion, metadata, chapters",
+    "vibexFormat": "Export as .vibex",
+    "vibexFormatDesc": "gzip compressed format, smaller file size",
+    "codeExport": "Code Export",
+    "openapi": "OpenAPI 3.0",
+    "openapiDesc": "Export API endpoints as OpenAPI JSON",
+    "stateMachine": "State Machine JSON",
+    "stateMachineDesc": "Export business rules state machine",
+    "specialExport": "Special Format Export",
+    "plantUML": "PlantUML (.puml)",
+    "plantUMLDesc": "Class diagram, importable by StarUML",
+    "jsonSchema": "JSON Schema (.schema.json)",
+    "jsonSchemaDesc": "Component API parameter structure definition",
+    "svgCanvas": "SVG Canvas",
+    "svgCanvasDesc": "Visual export",
+    "close": "Close"
+  }
+}

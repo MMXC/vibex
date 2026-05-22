@@ -8,7 +8,7 @@
  */
 
 import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
-import type { ThemePreference } from '@/stores/userPreferencesStore';
+import type { ThemePreference, LocalePreference } from '@/stores/userPreferencesStore';
 import { useShortcutStore } from '@/stores/shortcutStore';
 import styles from './settings.module.css';
 
@@ -20,6 +20,12 @@ const THEME_OPTIONS: { value: ThemePreference; label: string }[] = [
   { value: 'enterprise-b', label: 'Enterprise B' },
 ];
 
+// P001-E2: Language options for locale switcher
+const LOCALE_OPTIONS: { value: LocalePreference; label: string }[] = [
+  { value: 'en', label: 'English' },
+  { value: 'zh', label: '中文' },
+];
+
 const TEMPLATE_OPTIONS = [
   { value: 'blank', label: 'Blank' },
   { value: 'flow-template', label: 'Flow Template' },
@@ -28,7 +34,7 @@ const TEMPLATE_OPTIONS = [
 ];
 
 export default function SettingsPage() {
-  const { theme, defaultTemplate, setTheme, setDefaultTemplate } = useUserPreferencesStore();
+  const { theme, locale, defaultTemplate, setTheme, setLocale, setDefaultTemplate } = useUserPreferencesStore();
   const shortcuts = useShortcutStore((s) => s.shortcuts);
 
   return (
@@ -49,6 +55,25 @@ export default function SettingsPage() {
               onChange={(e) => setTheme(e.target.value as ThemePreference)}
             >
               {THEME_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* P001-E2: Language switcher dropdown */}
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="locale-select">
+              Language
+            </label>
+            <select
+              id="locale-select"
+              className={styles.select}
+              value={locale}
+              onChange={(e) => setLocale(e.target.value as LocalePreference)}
+            >
+              {LOCALE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
                   {opt.label}
                 </option>

@@ -9,6 +9,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export type ThemePreference = 'light' | 'dark' | 'system' | 'enterprise-a' | 'enterprise-b';
+export type LocalePreference = 'en' | 'zh';
 
 export interface ShortcutCustomization {
   action: string;
@@ -19,6 +20,9 @@ export interface UserPreferencesState {
   // Theme preference
   theme: ThemePreference;
 
+  // Locale preference (P001-E2: language switcher)
+  locale: LocalePreference;
+
   // Default template for new projects
   defaultTemplate: string;
 
@@ -27,6 +31,7 @@ export interface UserPreferencesState {
 
   // Actions
   setTheme: (theme: ThemePreference) => void;
+  setLocale: (locale: LocalePreference) => void;
   setDefaultTemplate: (template: string) => void;
   setShortcutCustomization: (shortcuts: ShortcutCustomization[]) => void;
   resetPreferences: () => void;
@@ -35,9 +40,10 @@ export interface UserPreferencesState {
 // Default values
 const DEFAULT_PREFERENCES: Pick<
   UserPreferencesState,
-  'theme' | 'defaultTemplate' | 'shortcutCustomization'
+  'theme' | 'locale' | 'defaultTemplate' | 'shortcutCustomization'
 > = {
   theme: 'system',
+  locale: 'zh',
   defaultTemplate: 'blank',
   shortcutCustomization: [],
 };
@@ -48,6 +54,8 @@ export const useUserPreferencesStore = create<UserPreferencesState>()(
       ...DEFAULT_PREFERENCES,
 
       setTheme: (theme) => set({ theme }),
+
+      setLocale: (locale) => set({ locale }),
 
       setDefaultTemplate: (template) => set({ defaultTemplate: template }),
 

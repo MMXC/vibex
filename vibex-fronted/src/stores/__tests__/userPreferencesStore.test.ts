@@ -13,6 +13,7 @@ describe('UserPreferencesStore', () => {
   it('should have initial state', () => {
     const state = useUserPreferencesStore.getState();
     expect(state.theme).toBe('system');
+    expect(state.locale).toBe('zh'); // P001-E2: default locale is zh
     expect(state.defaultTemplate).toBe('blank');
     expect(state.shortcutCustomization).toEqual([]);
   });
@@ -23,6 +24,23 @@ describe('UserPreferencesStore', () => {
     expect(useUserPreferencesStore.getState().theme).toBe('dark');
     setTheme('light');
     expect(useUserPreferencesStore.getState().theme).toBe('light');
+  });
+
+  // P001-E2: locale persistence tests
+  it('should set locale', () => {
+    const { setLocale } = useUserPreferencesStore.getState();
+    setLocale('en');
+    expect(useUserPreferencesStore.getState().locale).toBe('en');
+    setLocale('zh');
+    expect(useUserPreferencesStore.getState().locale).toBe('zh');
+  });
+
+  it('should reset locale to default', () => {
+    const { setLocale, resetPreferences } = useUserPreferencesStore.getState();
+    setLocale('en');
+    expect(useUserPreferencesStore.getState().locale).toBe('en');
+    resetPreferences();
+    expect(useUserPreferencesStore.getState().locale).toBe('zh');
   });
 
   it('should set defaultTemplate', () => {
@@ -42,14 +60,16 @@ describe('UserPreferencesStore', () => {
   });
 
   it('should reset preferences to defaults', () => {
-    const { setTheme, setDefaultTemplate, setShortcutCustomization, resetPreferences } =
+    const { setTheme, setLocale, setDefaultTemplate, setShortcutCustomization, resetPreferences } =
       useUserPreferencesStore.getState();
     setTheme('dark');
+    setLocale('en');
     setDefaultTemplate('flow-template');
     setShortcutCustomization([{ action: 'undo', customKey: 'Ctrl+Alt+Z' }]);
     resetPreferences();
     const state = useUserPreferencesStore.getState();
     expect(state.theme).toBe('system');
+    expect(state.locale).toBe('zh');
     expect(state.defaultTemplate).toBe('blank');
     expect(state.shortcutCustomization).toEqual([]);
   });

@@ -1,9 +1,9 @@
 /**
  * I18nProvider — client-side i18n context provider
- * 
+ *
  * Wraps the app with next-intl's NextIntlClientProvider.
- * Locale is stored in userPreferencesStore.locale.
- * 
+ * Locale is stored in userPreferencesStore.locale (P001-E2).
+ *
  * Usage:
  *   <I18nProvider locale="zh">...</I18nProvider>
  */
@@ -12,6 +12,7 @@
 
 import { NextIntlClientProvider } from 'next-intl';
 import { ReactNode } from 'react';
+import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 
 interface I18nProviderProps {
   children: ReactNode;
@@ -19,11 +20,13 @@ interface I18nProviderProps {
   messages?: Record<string, unknown>;
 }
 
-export function I18nProvider({ children, locale = 'zh', messages }: I18nProviderProps) {
-  // Messages are loaded server-side in request.ts
-  // For now, we pass messages directly since we're not using locale routing
+export function I18nProvider({ children, locale, messages }: I18nProviderProps) {
+  // P001-E2: Read locale from userPreferencesStore for dynamic language switching
+  const storeLocale = useUserPreferencesStore((s) => s.locale);
+  const activeLocale = storeLocale ?? locale ?? 'zh';
+
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
+    <NextIntlClientProvider locale={activeLocale} messages={messages}>
       {children}
     </NextIntlClientProvider>
   );

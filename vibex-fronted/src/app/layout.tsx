@@ -55,8 +55,8 @@ export default function RootLayout({
           <QueryProvider>
             <AppErrorBoundary>
               <ThemeProvider>
-                {/* P001-E1: i18n provider — default locale zh */}
-                <I18nProvider locale="zh" messages={{ ...zhMessages, ...enMessages }}>
+                {/* P001-E2: i18n provider — locale read from userPreferencesStore.locale */}
+                <I18nProvider messages={{ ...zhMessages, ...enMessages }}>
                   <ClientLayout>
                     {children}
                   </ClientLayout>

@@ -11,6 +11,12 @@
 - **构建**: `pnpm build` ✅ TypeScript 编译通过
 - **关联修复**: 修复 settings 页面 ShortcutConfig 缺少 `id` 属性的 TypeScript 错误
 
+##### S38-E002: Settings 语言切换 UI + Locale 持久化
+- **userPreferencesStore**: 新增 `locale: 'en'|'zh'` 字段 + `setLocale()` action，数据持久化到 localStorage
+- **I18nProvider**: 订阅 `userPreferencesStore.locale`，动态切换语言，移除 layout.tsx 硬编码 `locale="zh"`
+- **/settings 页面**: Appearance 区域新增 Language 下拉框（English / 中文），样式复用 theme toggle
+- **单元测试**: 8 个测试全部通过，覆盖 locale 初始化/set/reset
+
 ### [Unreleased] Sprint 37 — 快捷键 + 导出 + 降级 + 主题系统 — 2026-05-17
 
 #### F001 — 键盘快捷键系统（E001-E004）

@@ -52,13 +52,11 @@ Sprint 38 包含 5 个功能（P001-P005），共 15 个 Epic，分布在 3 个�
 ### P002: 协作感知
 
 #### P002-E1: CanvasStore oplog + AI indicator
-- [ ] `businessFlowStore` 增加 `oplog: OperationEntry[]` 字段
-- [ ] `addOplogEntry()` action：生成 `{ id: uuid(), timestamp: Date.now(), ...entry }` 追加到数组
-- [ ] oplog 限制 1000 条，超出时 `splice(0, 100)` 归档（移到 `conflictSnapshots`）
-- [ ] `useAIAgent` hook 调用完成后，自动 `addOplogEntry({ userId: 'ai', type: 'ai', nodeId, action })`
-- [ ] `AIEditingIndicator` 组件：在 AI 操作期间显示 🤖 黄色徽章 + "AI Editing..."
-- [ ] indicator 挂载到 `DDSCanvasPage` 右上角
-- [ ] `pnpm test` 覆盖 oplog append 逻辑
+- [x] `oplogStore` (Zustand) 增加 `oplog: OperationEntry[]` 字段，`addOplogEntry()` action，1000条限制 + 归档
+- [x] `useAIAgent` hook：CodingAgentService 封装 + oplog 集成 + isEditing 状态
+- [x] `AIEditingIndicator` 组件：🤖 黄色徽章 + "AI Editing..."，CanvasPage 右上角挂载
+- [x] `pnpm test` 覆盖 oplog append 逻辑（6 tests, all pass）
+- [x] TypeScript 编译通过，git push 到 `epic/s38-e3-global-ui-i18n`
 
 #### P002-E2: 冲突检测（5s 窗口警告）
 - [ ] `addOplogEntry()` 内部增加冲突检测逻辑：同一 `nodeId` 在 5s 内有 >=2 条 entry → 触发冲突

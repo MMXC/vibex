@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased] S38-P002-E1: CanvasStore oplog + AI indicator — 2026-05-24
+- **E1 oplogStore**: `src/stores/oplogStore.ts` — Zustand store with `oplog: OperationEntry[]`, `addOplogEntry()`, 1000-entry limit + auto-archive to conflictSnapshots
+- **E1 useAIAgent hook**: `src/hooks/useAIAgent.ts` — CodingAgentService wrapper with oplog integration, `isEditing` state for UI feedback
+- **E1 AIEditingIndicator**: `src/components/canvas/AIEditingIndicator.tsx` — 🤖 floating badge component (yellow, animated) shown during AI coding agent sessions
+- **E1 CanvasPage Integration**: `src/components/canvas/CanvasPage.tsx` — Mounted `AIEditingIndicator` in top-right corner; `useAIAgent()` hook wired to component
+- **E1 Unit Tests**: `src/stores/__tests__/oplogStore.test.ts` — 6 test cases covering add/get/clear operations
+
 ## [Unreleased] S37-E016: F005 Theme Settings Integration — 2026-05-17
 - **E016 Settings Theme Selector**: `src/app/settings/page.tsx` — Extended theme selector to support 5 themes (light, dark, system, enterprise-a, enterprise-b), fully integrated with useUserPreferencesStore
 - **E016 ThemePreference Type**: `src/stores/userPreferencesStore.ts` — Extended ThemePreference type to include enterprise-a and enterprise-b

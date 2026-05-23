@@ -7,6 +7,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface Project {
   id: string;
@@ -23,6 +24,7 @@ interface RecentProjectsProps {
 
 export function RecentProjects({ limit = 6, className = '' }: RecentProjectsProps) {
   const router = useRouter();
+  const t = useTranslations('dashboard')();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -47,7 +49,7 @@ export function RecentProjects({ limit = 6, className = '' }: RecentProjectsProp
   if (loading) {
     return (
       <div className={`recent-projects ${className}`}>
-        <div className="loading">加载中...</div>
+        <div className="loading">{t('loading')}</div>
       </div>
     );
   }
@@ -56,8 +58,8 @@ export function RecentProjects({ limit = 6, className = '' }: RecentProjectsProp
     return (
       <div className={`recent-projects ${className}`}>
         <div className="empty-state">
-          <p>暂无最近项目</p>
-          <p className="hint">创建项目后将显示在这里</p>
+          <p>{t('noRecentProjects')}</p>
+          <p className="hint">{t('recentProjectsHint')}</p>
         </div>
       </div>
     );
@@ -71,7 +73,7 @@ export function RecentProjects({ limit = 6, className = '' }: RecentProjectsProp
             key={project.id}
             className="project-card"
             onClick={() => handleProjectClick(project.id)}
-            aria-label={`打开项目 ${project.name}`}
+            aria-label={`${t('openProject')} ${project.name}`}
           >
             <div className="project-thumbnail">
               {project.thumbnail ? (

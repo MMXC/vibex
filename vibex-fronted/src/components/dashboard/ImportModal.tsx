@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { getAuthToken } from '@/lib/auth-token';
 import { queryKeys } from '@/hooks/queries';
+import { useTranslations } from '@/hooks/useTranslations';
 import styles from './ImportModal.module.css';
 
 export interface ImportModalProps {
@@ -17,6 +18,7 @@ type ImportStatus = 'idle' | 'loading' | 'success' | 'error';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 export function ImportModal({ isOpen, onClose, onSuccess }: ImportModalProps) {
+  const t = useTranslations('dashboard')();
   const [status, setStatus] = useState<ImportStatus>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [isDragging, setIsDragging] = useState(false);
@@ -36,14 +38,14 @@ export function ImportModal({ isOpen, onClose, onSuccess }: ImportModalProps) {
     // Validate file type
     if (!file.name.endsWith('.vibex')) {
       setStatus('error');
-      setErrorMessage('文件格式无效，请上传 .vibex 文件');
+      setErrorMessage(t('invalidFormat'));
       return;
     }
 
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
       setStatus('error');
-      setErrorMessage('文件过大，最大支持 10MB');
+      setErrorMessage(t('fileTooLarge', { size: '10MB' }));
       return;
     }
 
@@ -58,7 +60,7 @@ export function ImportModal({ isOpen, onClose, onSuccess }: ImportModalProps) {
         json = JSON.parse(text);
       } catch {
         setStatus('error');
-        setErrorMessage('文件格式无效，请上传有效的 JSON 文件');
+        setErrorMessage(t('invalidJson'));
         return;
       }
 
@@ -75,7 +77,7 @@ export function ImportModal({ isOpen, onClose, onSuccess }: ImportModalProps) {
 
       if (!res.ok) {
         setStatus('error');
-        setErrorMessage(data.message || '导入失败');
+        setErrorMessage(data.message || t('importFailed'));
         return;
       }
 
@@ -89,7 +91,7 @@ export function ImportModal({ isOpen, onClose, onSuccess }: ImportModalProps) {
       }, 1500);
     } catch (err) {
       setStatus('error');
-      setErrorMessage(err instanceof Error ? err.message : '导入失败，请重试');
+      setErrorMessage(err instanceof Error ? err.message : t('importFailed'));
     }
   }, [onClose, onSuccess, queryClient]);
 
@@ -134,9 +136,9 @@ export function ImportModal({ isOpen, onClose, onSuccess }: ImportModalProps) {
     <div className={styles.overlay} onClick={handleClose} role="dialog" aria-modal="true" aria-labelledby="import-modal-title">
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2 id="import-modal-title" className={styles.title}>导入项目</h2>
+          <h2 id="import-modal-title" className={styles.title}>{t('importProject')}</h2>
           {status !== 'loading' && (
-            <button className={styles.closeBtn} onClick={handleClose} aria-label="关闭">
+            <button className={styles.closeBtn} onClick={handleClose} aria-label={t('close')}>
               ✕
             </button>
           )}
@@ -145,7 +147,7 @@ export function ImportModal({ isOpen, onClose, onSuccess }: ImportModalProps) {
         <div className={styles.body}>
           {status === 'idle' && (
             <>
-              <p className={styles.hint}>上传 .vibex 文件导入项目</p>
+              <p className={styles.hint}>{t('uploadVibexHint')}</p>
               <div
                 className={`${styles.dropzone} ${isDragging ? styles.dragging : ''}`}
                 onDrop={handleDrop}
@@ -158,8 +160,8 @@ export function ImportModal({ isOpen, onClose, onSuccess }: ImportModalProps) {
                 data-testid="import-dropzone"
               >
                 <span className={styles.dropzoneIcon}>📁</span>
-                <p className={styles.dropzoneText}>拖拽 .vibex 文件到此处</p>
-                <p className={styles.dropzoneSubtext}>或点击选择文件（最大 10MB）</p>
+                <p className={styles.dropzoneText}>{t('dropzoneHint')}</p>
+                <p className={styles.dropzoneSubtext}>{t('orClickToSelect', { size: '10MB' })}</p>
               </div>
               <input
                 ref={fileInputRef}
@@ -167,7 +169,7 @@ export function ImportModal({ isOpen, onClose, onSuccess }: ImportModalProps) {
                 accept=".vibex"
                 className={styles.fileInput}
                 onChange={handleFileSelect}
-                aria-label="选择 .vibex 文件"
+                aria-label={t('importProject')}
               />
             </>
           )}
@@ -175,14 +177,14 @@ export function ImportModal({ isOpen, onClose, onSuccess }: ImportModalProps) {
           {status === 'loading' && (
             <div className={styles.loadingState} data-testid="import-loading">
               <div className={styles.spinner} />
-              <p className={styles.loadingText}>导入中...</p>
+              <p className={styles.loadingText}>{t('importing')}</p>
             </div>
           )}
 
           {status === 'success' && (
             <div className={styles.successState} data-testid="import-success">
               <span className={styles.successIcon}>✅</span>
-              <p className={styles.successText}>导入成功！</p>
+              <p className={styles.successText}>{t('importSuccess')}</p>
             </div>
           )}
 
@@ -194,7 +196,7 @@ export function ImportModal({ isOpen, onClose, onSuccess }: ImportModalProps) {
                 className={styles.retryBtn}
                 onClick={() => setStatus('idle')}
               >
-                重试
+                {t('retry')}
               </button>
             </div>
           )}

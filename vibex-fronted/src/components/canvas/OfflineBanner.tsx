@@ -7,9 +7,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { getPendingCount } from '@/lib/offline-queue';
+import { useTranslations } from '@/hooks/useTranslations';
 import styles from './OfflineBanner.module.css';
 
 export function OfflineBanner() {
+  const t = useTranslations('canvas')();
   const [isOffline, setIsOffline] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
@@ -50,7 +52,7 @@ export function OfflineBanner() {
           setHidden(true);
         }, 2000);
       } else if (detail.type === 'error') {
-        setSyncError(detail.lastError ?? '同步失败，请检查网络');
+        setSyncError(detail.lastError ?? 'Sync failed, please check network');
         setIsSyncing(false);
       }
     };
@@ -108,12 +110,12 @@ export function OfflineBanner() {
 
       <div className={styles.content}>
         {isOffline && (
-          <span className={styles.text}>离线模式，部分功能可能不可用</span>
+          <span className={styles.text}>{t('offlineMode')}</span>
         )}
 
         {pendingCount > 0 && !isOffline && (
           <span className={styles.text}>
-            {pendingCount} 项操作待同步
+            {t('pendingChanges', { count: pendingCount })}
           </span>
         )}
 
@@ -125,7 +127,7 @@ export function OfflineBanner() {
             aria-valuenow={totalCount - pendingCount}
             aria-valuemin={0}
             aria-valuemax={totalCount}
-            aria-label={`同步进度：${totalCount - pendingCount}/${totalCount}`}
+            aria-label={`${t('syncingPending', { count: pendingCount })} ${totalCount - pendingCount}/${totalCount}`}
           >
             <div
               className={styles.progressFill}

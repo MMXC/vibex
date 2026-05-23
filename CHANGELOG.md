@@ -17,6 +17,14 @@
 - **/settings 页面**: Appearance 区域新增 Language 下拉框（English / 中文），样式复用 theme toggle
 - **单元测试**: 8 个测试全部通过，覆盖 locale 初始化/set/reset
 
+##### S38-E003: 全局 UI 文本迁移（部分完成 — coord self-implement）
+- **语言文件扩展**: 新增 common、dashboard、canvas、settings、analytics、snapshot、feedback 命名空间，共 100+ 翻译 key（zh.json + en.json）
+- **OfflineBanner.tsx**: 离线提示、同步进度 → `t('canvas.*')`
+- **RecentProjects.tsx**: 加载中/空状态 → `t('dashboard.*')`
+- **ImportModal.tsx**: 导入弹窗所有硬编码文本 → `t('dashboard.*')`
+- **TypeScript**: `pnpm exec tsc --noEmit` clean ✅
+- **剩余工作**: src/app/ 页面（AI生成区，禁止手动编辑）待 dev agent 完成 E3 后续组件迁移
+
 ### [Unreleased] Sprint 37 — 快捷键 + 导出 + 降级 + 主题系统 — 2026-05-17
 
 #### F001 — 键盘快捷键系统（E001-E004）

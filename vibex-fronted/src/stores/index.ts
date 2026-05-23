@@ -102,3 +102,6 @@ export {
   selectIsGenerating,
   selectError
 } from './simplifiedFlowStore';
+// Sprint38 P002-E1: Oplog Store
+export { useOplogStore } from './oplogStore';
+export type { OperationEntry } from './oplogStore';

@@ -78,6 +78,8 @@ import { SaveIndicator } from './features/SaveIndicator';
 import { CanvasPageSkeleton } from './CanvasPageSkeleton';
 import { PhaseIndicator } from './features/PhaseIndicator';
 import { TemplateSelector } from './features/TemplateSelector';
+import { AIEditingIndicator } from './AIEditingIndicator';
+import { useAIAgent } from '@/hooks/useAIAgent';
 import { useVersionHistory } from '@/hooks/canvas/useVersionHistory';
 import { useAutoSave } from '@/hooks/canvas/useAutoSave';
 import { useProjectLoader } from '@/hooks/canvas/useProjectLoader';
@@ -196,6 +198,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   // === E4: useAIController — requirement input + quick generate ===
   const ai = useAIController();
   const { requirementInput, setRequirementInput, isQuickGenerating, generatingState, aiThinking, aiThinkingMessage, requirementText, setRequirementText, quickGenerate } = ai;
+
+  // === Sprint38 P002-E1: useAIAgent — AI coding agent oplog indicator ===
+  const { isEditing: isAgentEditing } = useAIAgent();
 
   // === E4: useCanvasSearch — fuzzy search across three trees ===
   const { query: searchQuery, setQuery: setSearchQuery, results: searchResults, searchTimeMs } = useCanvasSearch(
@@ -663,6 +668,11 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
 
       {/* E2.1: TemplateSelector modal dialog */}
       <TemplateSelector open={templateOpen} onClose={() => setTemplateOpen(false)} />
+
+      {/* P002-E1: AI Editing Indicator — shows when AI coding agent is active */}
+      <div style={{ position: 'absolute', top: 44, right: 8, zIndex: 11 }}>
+        <AIEditingIndicator isActive={isAgentEditing} />
+      </div>
 
       {/* F1: Expand controls — shown when not in input phase */}
       {phase !== 'input' && (

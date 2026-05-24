@@ -25,6 +25,21 @@
 - **TypeScript**: `pnpm exec tsc --noEmit` clean ✅
 - **剩余工作**: src/app/ 页面（AI生成区，禁止手动编辑）待 dev agent 完成 E3 后续组件迁移
 
+### [Unreleased] Sprint 38 — P002 CanvasStore oplog + AI indicator
+
+#### F001 — CanvasStore oplog + AI indicator（P002-E1）
+**Epic 数量**: 1 | **优先级**: P0
+
+##### S38-P002-E1: CanvasStore oplog + AI indicator（coord self-implement）
+- **oplogStore**: 新增 `stores/oplogStore.ts` — AI 编辑操作的增量日志 store（addOplogEntry/getOplogForNode/clearOplog），持久化节点级别的 AI 编辑历史
+- **AIEditingIndicator.tsx**: `components/canvas/AIEditingIndicator.tsx` — Canvas 页面 AI 编辑状态指示器，显示节点 AI 生成/编辑状态
+- **useAIAgent.ts**: `hooks/useAIAgent.ts` — 新增 hook，导出 AI agent 交互状态和结果
+- **CanvasPage.tsx**: 集成 AIEditingIndicator 和 oplogStore
+- **stores/index.ts**: 导出 oplogStore
+- **vitest**: `stores/__tests__/oplogStore.test.ts` 6/6 PASS；`stores/dds/__tests__/DDSCanvasStore.test.ts` 49/49 PASS（regression）
+- **frontend CHANGELOG**: `vibex-fronted/CHANGELOG.md` ✅ 已更新
+- **coord self-implement**: tester-epic1 ghost 超过 12h 阈值，coord 自验证 dev commit 后自行完成
+
 ### [Unreleased] Sprint 37 — 快捷键 + 导出 + 降级 + 主题系统 — 2026-05-17
 
 #### F001 — 键盘快捷键系统（E001-E004）

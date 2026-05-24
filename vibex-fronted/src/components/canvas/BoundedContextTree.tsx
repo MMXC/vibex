@@ -17,6 +17,7 @@ import { Network } from 'lucide-react';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { useToast } from '@/components/ui/Toast';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
+import { useConfirmationStore } from '@/stores/confirmationStore';
 // [E1] 注释 RelationshipConnector — 简化 UI，移除卡片间连线
 // import { RelationshipConnector } from './edges/RelationshipConnector';
 import { useVirtualizer } from '@tanstack/react-virtual';
@@ -139,9 +140,11 @@ interface ContextCardProps {
   selected?: boolean;
   /** F4: 多选切换回调 */
   onToggleSelect?: (nodeId: string) => void;
+  /** P002-E2: Conflict warning state */
+  conflict?: boolean;
 }
 
-function ContextCard({ node, onEdit, onDelete, readonly, selected, onToggleSelect }: ContextCardProps) {
+function ContextCard({ node, onEdit, onDelete, readonly, selected, onToggleSelect, conflict }: ContextCardProps) {
   const toggleContextNode = useContextStore((s) => s.toggleContextNode);
   const [editing, setEditing] = useState(false);
   const [editState, setEditState] = useState<NodeEditState>({
@@ -189,8 +192,11 @@ function ContextCard({ node, onEdit, onDelete, readonly, selected, onToggleSelec
       data-testid={`context-card-${node.nodeId}`}
       data-status={node.status}
       data-type={node.type}
+      data-conflict={conflict ? 'true' : undefined}
       onClick={handleCardClick}
     >
+      {/* P002-E2: Conflict warning badge */}
+      {conflict && <span className={styles.conflictBadge} title={`冲突警告：节点 ${node.nodeId} 在 5s 内被同时编辑`}>⚠</span>}
       {editing ? (
         /* Edit mode */
         <div className={styles.nodeEditForm}>
@@ -344,6 +350,8 @@ function AddNodeForm({ onAdd }: AddNodeFormProps) {
 
 export function BoundedContextTree({ readonly = false, isActive: _isActive = true }: BoundedContextTreeProps) {
   const contextNodes = useContextStore((s) => s.contextNodes);
+  // P002-E2: Conflict detection — nodeIds currently in warning state
+  const conflictNodeIds = useConfirmationStore((s) => s.conflictNodeIds);
 
   // E2-S3: 虚拟化阈值
   const VIRTUAL_THRESHOLD = 50;
@@ -678,6 +686,7 @@ export function BoundedContextTree({ readonly = false, isActive: _isActive = tru
                       readonly={props.readonly}
                       selected={selectedIds.has(props.node.nodeId)}
                       onToggleSelect={(nodeId) => toggleNodeSelect('context', nodeId)}
+                      conflict={!!(conflictNodeIds[props.node.nodeId] > Date.now())}
                     />
                   )}
                 />
@@ -770,6 +779,7 @@ function VirtualizedContextList({
                   readonly={props.readonly}
                   selected={selectedIds.has(props.node.nodeId)}
                   onToggleSelect={onToggleSelect}
+                  conflict={!!(conflictNodeIds[props.node.nodeId] > Date.now())}
                 />
               )}
             />

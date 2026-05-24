@@ -679,6 +679,37 @@
   border-color: #ef4444;
 }
 
+/* P002-E2: Conflict warning — yellow dashed border + glow */
+.nodeCard[data-conflict="true"] {
+  border-color: #eab308 !important;
+  border-style: dashed;
+  box-shadow: 0 0 8px rgba(234, 179, 8, 0.5);
+  animation: conflictPulse 1s ease-in-out infinite;
+}
+
+@keyframes conflictPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(234, 179, 8, 0.5); }
+  50% { box-shadow: 0 0 16px rgba(234, 179, 8, 0.8); }
+}
+
+/* Conflict warning badge overlay */
+.conflictBadge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #eab308;
+  color: #000;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  z-index: 1;
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.6; }

@@ -26,6 +26,14 @@ export interface ConfirmationFlowState {
   currentStep: ConfirmationStep;
   stepHistory: ConfirmationStep[];
 
+  // P002-E2: Conflict detection snapshots (same nodeId in 5s window)
+  // Record<nodeId, OperationEntry[]> — stores entries that triggered conflict
+  conflictSnapshots: Record<string, import('./oplogStore').OperationEntry[]>;
+  /** Node IDs in conflict warning state — value = expiry timestamp (ms), auto-clears */
+  conflictNodeIds: Record<string, number>;
+  addConflictSnapshot: (nodeId: string, entries: import('./oplogStore').OperationEntry[]) => void;
+  clearConflictNodeId: (nodeId: string) => void;
+
   // Hydration state
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
@@ -101,6 +109,26 @@ export interface ConfirmationFlowState {
 const initialState = {
   currentStep: 'input' as ConfirmationStep,
   stepHistory: [] as ConfirmationStep[],
+
+  // P002-E2: Conflict detection
+  conflictSnapshots: {} as Record<string, import('./oplogStore').OperationEntry[]>,
+  conflictNodeIds: {} as Record<string, number>, // nodeId → expiry timestamp
+  addConflictSnapshot: (nodeId: string, entries: import('./oplogStore').OperationEntry[]) => {
+    const snapshots = get().conflictSnapshots;
+    set({ conflictSnapshots: { ...snapshots, [nodeId]: entries } });
+    // Set expiry (30s from now)
+    const expiry = Date.now() + 30_000;
+    set({ conflictNodeIds: { ...get().conflictNodeIds, [nodeId]: expiry } });
+    // Schedule auto-clear
+    setTimeout(() => {
+      get().clearConflictNodeId(nodeId);
+    }, 30_000);
+  },
+  clearConflictNodeId: (nodeId: string) => {
+    const next = { ...get().conflictNodeIds };
+    delete next[nodeId];
+    set({ conflictNodeIds: next });
+  },
 
   // Hydration tracking
   _hasHydrated: false,
@@ -385,12 +413,22 @@ export const useConfirmationStore = create<ConfirmationFlowState>()(
         businessFlow: state.businessFlow,
         flowMermaidCode: state.flowMermaidCode,
         createdProjectId: state.createdProjectId,
+        // P002-E2: Persist conflict snapshots (conflictNodeIds filtered on rehydrate)
+        conflictSnapshots: state.conflictSnapshots,
+        conflictNodeIds: state.conflictNodeIds,
       }),
       version: STORAGE_VERSION,
       onRehydrateStorage: () => (state, error) => {
         if (error) {
           canvasLogger.default.error('Failed to rehydrate confirmation store:', error);
         } else if (state) {
+          // P002-E2: Clean up expired conflictNodeIds on hydration
+          const now = Date.now();
+          const valid: Record<string, number> = {};
+          for (const [nodeId, expiry] of Object.entries(state.conflictNodeIds ?? {})) {
+            if (expiry > now) valid[nodeId] = expiry;
+          }
+          state.conflictNodeIds = valid;
           // Mark hydration as complete
           state.setHasHydrated(true);
         }

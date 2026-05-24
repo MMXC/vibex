@@ -88,6 +88,7 @@ import { MessageDrawer } from './messageDrawer/MessageDrawer';
 import { LeftDrawer } from './leftDrawer/LeftDrawer';
 import { ShortcutBar } from '@/components/guidance/ShortcutBar';
 import { useToast } from '@/components/ui/Toast';
+import { useOplogConflictToast } from '@/stores/oplogStore';
 import { UndoBar } from '@/components/undo-bar/UndoBar';
 import { NodeTooltip } from '@/components/guidance/NodeTooltip';
 import { CanvasOnboardingOverlay } from '@/components/guidance';
@@ -149,6 +150,8 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
   // === E1.6: Manual rehydration — stores have skipHydration:true, rehydrate client-side ===
   // === Toast (needed for toast notifications in useEffects) ===
   const toast = useToast();
+  // P002-E2: Listen for oplog conflict events and show toast
+  useOplogConflictToast();
 
   useEffect(() => {
     // Rehydrate all stores that have skipHydration:true to restore persisted state

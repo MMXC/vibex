@@ -36,6 +36,7 @@ import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useContextStore } from '@/lib/canvas/stores/contextStore';
 import { useToast } from '@/components/ui/Toast';
+import { useConfirmationStore } from '@/stores/confirmationStore';
 import { SortableTreeItem } from './features/SortableTreeItem';
 import { getHistoryStore } from '@/lib/canvas/historySlice';
 import { useModifierKey, useDragSelection } from '@/hooks/canvas/useDragSelection';
@@ -326,13 +327,15 @@ interface ComponentCardProps {
   onToggleSelect?: (nodeId: string) => void;
   /** E2-S1: 确认回调（可选，VirtualizedNodeList 需要） */
   toggleConfirm?: (nodeId: string) => void;
+  /** P002-E2: Conflict warning state */
+  conflict?: boolean;
 }
 
 // =============================================================================
 // Component Card
 // =============================================================================
 
-function ComponentCard({ node, onEdit, onDelete, readonly, selected, onToggleSelect, toggleConfirm }: ComponentCardProps) {
+function ComponentCard({ node, onEdit, onDelete, readonly, selected, onToggleSelect, toggleConfirm, conflict }: ComponentCardProps) {
   const [editing, setEditing] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -398,6 +401,7 @@ function ComponentCard({ node, onEdit, onDelete, readonly, selected, onToggleSel
       data-node-id={node.nodeId}
       data-status={node.status}
       data-type={node.type}
+      data-conflict={conflict ? 'true' : undefined}
       data-testid={`component-node-${node.nodeId}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -412,6 +416,8 @@ function ComponentCard({ node, onEdit, onDelete, readonly, selected, onToggleSel
       role="button"
       aria-label={`组件卡片 ${node.name}${selected ? '，已选中' : ''}`}
     >
+      {/* P002-E2: Conflict warning badge */}
+      {conflict && <span className={styles.conflictBadge} title={`冲突警告：节点 ${node.nodeId} 在 5s 内被同时编辑`}>⚠</span>}
       {editing ? (
         /* Edit mode */
         <div className={styles.nodeEditForm}>
@@ -620,6 +626,8 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
 
   const flowNodes = useFlowStore((s) => s.flowNodes);
   const setPhase = useContextStore((s) => s.setPhase);
+  // P002-E2: Conflict detection
+  const conflictNodeIds = useConfirmationStore((s) => s.conflictNodeIds);
 
   const selectedIds = new Set(selectedNodeIds_comp);
   const selectedCount = selectedIds.size;
@@ -1024,6 +1032,7 @@ export function ComponentTree({ readonly = false, isActive: _isActive = true }: 
                               selected={selectedIds.has(node.nodeId)}
                               onToggleSelect={(nodeId) => toggleNodeSelect_comp(nodeId)}
                               toggleConfirm={comp.toggleComponentNode}
+                              conflict={!!(conflictNodeIds[node.nodeId] > Date.now())}
                             />
                           </SortableTreeItem>
                         ))}
@@ -1114,6 +1123,7 @@ function VirtualizedNodeList({
               readonly={readonly}
               selected={selectedIds.has(node.nodeId)}
               onToggleSelect={toggleNodeSelect_comp}
+              conflict={!!(conflictNodeIds[node.nodeId] > Date.now())}
             />
           </div>
         );

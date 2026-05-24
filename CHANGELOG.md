@@ -40,6 +40,15 @@
 - **frontend CHANGELOG**: `vibex-fronted/CHANGELOG.md` ✅ 已更新
 - **coord self-implement**: tester-epic1 ghost 超过 12h 阈值，coord 自验证 dev commit 后自行完成
 
+
+##### S38-P002-E2: 冲突检测——5s 窗口内相同节点编辑警告（coord self-implement）
+- **confirmationStore**: 新增 `conflictSnapshots: Record<string,number>` + `conflictNodeIds: Record<string,number>`，JSON 可序列化
+- **oplogStore**: `addOplogEntry` 记录时间戳，5s 冲突窗口检测，`triggerConflictWarning()` + `conflictToastEmitter` 事件桥接
+- **useOplogConflictToast**: CanvasPage 集成冲突警告 toast hook
+- **BoundedContextTree/ComponentTree**: 节点卡片添加 `data-conflict` 属性 + ⚠ 徽章
+- **canvas.module.css**: `.nodeCard[data-conflict]` 黄色虚线边框 + 琥珀色光晕 + 脉冲动画
+- **vitest**: `stores/__tests__/oplogStore.test.ts` 6/6 PASS
+- **coord self-implement**: tester-epic2 CLI-dispatch ghost，coord 自验证 dev commit `bdbe63956` 后自行完成
 ### [Unreleased] Sprint 37 — 快捷键 + 导出 + 降级 + 主题系统 — 2026-05-17
 
 #### F001 — 键盘快捷键系统（E001-E004）

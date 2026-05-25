@@ -30,6 +30,7 @@ import { parseRequirementContent } from '@/components/dds/canvas/ChapterPanel';
 import { TreeErrorBoundary } from '@/components/canvas/panels/TreeErrorBoundary';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { KeyboardHelpOverlay } from '@/components/shared/KeyboardHelpOverlay';
+import { OperationOverlay } from '@/components/shared/OperationOverlay';
 import { ShortcutEditModal } from '@/components/shortcuts/ShortcutEditModal';
 import { useShortcutStore } from '@/stores/shortcutStore';
 import { NewUserGuide } from '@/components/guide/NewUserGuide';
@@ -232,6 +233,9 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
 
   // ---- E003: Help overlay state ----
   const [helpOverlayOpen, setHelpOverlayOpen] = useState(false);
+
+  // ---- P002-E3: Operation overlay state (Ctrl+H) ----
+  const [operationOverlayOpen, setOperationOverlayOpen] = useState(false);
 
   // ---- E003: useAIController for quickGenerate ----
   const { quickGenerate } = useAIController();
@@ -490,6 +494,7 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     onDesignReview: () => { window.dispatchEvent(new CustomEvent('design-review:open')); },
     onQuickGenerate: () => { quickGenerate(); },
     onHelp: () => { setHelpOverlayOpen((v) => !v); },
+    onOpenOplog: () => { setOperationOverlayOpen((v) => !v); },
     enabled: true,
   });
 
@@ -762,6 +767,12 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     <KeyboardHelpOverlay
       isOpen={helpOverlayOpen}
       onClose={() => setHelpOverlayOpen(false)}
+    />
+
+    {/* P002-E3: Operation overlay (Ctrl+H) */}
+    <OperationOverlay
+      isOpen={operationOverlayOpen}
+      onClose={() => setOperationOverlayOpen(false)}
     />
     </>
   );

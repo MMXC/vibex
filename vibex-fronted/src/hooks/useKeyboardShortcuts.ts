@@ -69,6 +69,8 @@ interface KeyboardShortcutsOptions {
   onDesignReview?: () => void;
   /** [E003] Help overlay (?: toggle help) */
   onHelp?: () => void;
+  /** [P002-E3] Operation overlay (Ctrl+H: toggle oplog) */
+  onOpenOplog?: () => void;
   /** Whether shortcuts should be active */
   enabled?: boolean;
 }
@@ -94,7 +96,8 @@ type ActionName =
   | 'next-tab'
   | 'prev-tab'
   | 'design-review'
-  | 'help';
+  | 'help'
+  | 'open-oplog';
 
 // Actions that have hardcoded handlers in useKeyboardShortcuts.
 // The dynamic shortcutStore system should NOT re-register these to avoid duplicate calls.
@@ -120,6 +123,7 @@ const HARDCODE_ACTIONS = new Set<ActionName>([
   'prev-tab',
   'design-review',
   'help',
+  'open-oplog',
 ]);
 
 function isInTextInput(target: EventTarget | null): boolean {
@@ -179,6 +183,7 @@ export function useKeyboardShortcuts({
   onPrevTab,
   onDesignReview,
   onHelp,
+  onOpenOplog,
   enabled = true,
 }: KeyboardShortcutsOptions) {
   // P003 U1-P003: action map from shortcutStore action names to callbacks
@@ -204,13 +209,14 @@ export function useKeyboardShortcuts({
       'prev-tab': onPrevTab as () => void,
       'design-review': onDesignReview as () => void,
       'help': onHelp as () => void,
+      'open-oplog': onOpenOplog as () => void,
     }),
     [
       undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset,
       onDelete, onSelectAll, onClearSelection, onNewNode,
       onQuickGenerate, onConfirmSelected, onGenerateContext,
       onSwitchToContext, onSwitchToFlow, onSwitchToComponent, onNextTab, onPrevTab, onDesignReview,
-      onHelp, enabled,
+      onHelp, onOpenOplog, enabled,
     ],
   );
 
@@ -450,6 +456,14 @@ export function useKeyboardShortcuts({
         onHelp?.();
         return;
       }
+
+      // === [P002-E3] Operation Log: Ctrl+H ===
+      if ((isCtrl || isMeta) && e.key.toLowerCase() === 'h') {
+        if (isInputFocused) return;
+        e.preventDefault();
+        onOpenOplog?.();
+        return;
+      }
     }
 
     document.addEventListener('keydown', handler);
@@ -457,8 +471,8 @@ export function useKeyboardShortcuts({
   }, [
     undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset,
     onDelete, onSelectAll, onClearSelection, onNewNode,
-    onQuickGenerate, onConfirmSelected, onGenerateContext,
+      onQuickGenerate, onConfirmSelected, onGenerateContext,
       onSwitchToContext, onSwitchToFlow, onSwitchToComponent, onNextTab, onPrevTab, onDesignReview,
-    onHelp, enabled,
+    onHelp, onOpenOplog, enabled,
   ]);
 }

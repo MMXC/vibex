@@ -789,10 +789,14 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     />
 
     {/* P003-E1: AI result diff overlay */}
+    {/* P003-E2: extends with error, onApprove, onReject */}
     {diffOverlayOpen && lastResult && (
       <DiffOverlay
         result={lastResult}
+        error={lastError}
         onClose={() => setDiffOverlayOpen(false)}
+        onApprove={handleApprove}
+        onReject={handleReject}
       />
     )}
     </>

@@ -1,15 +1,22 @@
 /**
- * DiffOverlay — Sprint38 P003-E1: AI result diff overlay
+ * DiffOverlay — Sprint38 P003-E2: Approve/Reject 流程 + Toast 错误
  *
- * Displays line-level diff results from the AI coding agent using the `diff` npm package.
- * Shows green lines for additions and red lines for removals.
- * Appears as a fixed overlay anchored to the bottom-right of the viewport.
+ * Extends P003-E1: adds Approve/Reject action buttons and error display.
+ * - Approve: user reviews diff and confirms changes → closes overlay
+ * - Reject: user dismisses changes without applying → closes overlay
+ * - Error: displays AI agent errors inline when lastError is non-null
  *
  * Usage:
  * ```tsx
  * import { useAIAgent } from '@/hooks/useAIAgent';
- * const { lastResult } = useAIAgent();
- * <DiffOverlay result={lastResult} onClose={() => setLastResult(null)} />
+ * const { lastResult, lastError } = useAIAgent();
+ * <DiffOverlay
+ *   result={lastResult}
+ *   error={lastError}
+ *   onClose={() => setOverlayOpen(false)}
+ *   onApprove={() => handleApprove()}
+ *   onReject={() => setOverlayOpen(false)}
+ * />
  * ```
  */
 
@@ -22,13 +29,22 @@ import styles from './DiffOverlay.module.css';
 interface DiffOverlayProps {
   /** Diff result to display; null = overlay hidden */
   result: DiffResult | null;
-  /** Called when the user dismisses the overlay */
+  /** Error message from AI agent; non-null triggers error display */
+  error?: string | null;
+  /** Called when the user dismisses the overlay (via ✕ or 关闭) */
   onClose: () => void;
+  /** Called when user clicks Approve — user confirms diff changes */
+  onApprove?: () => void;
+  /** Called when user clicks Reject — user rejects diff changes */
+  onReject?: () => void;
 }
 
 export const DiffOverlay = memo(function DiffOverlay({
   result,
+  error,
   onClose,
+  onApprove,
+  onReject,
 }: DiffOverlayProps) {
   const { added, removed, changes } = result ?? { added: 0, removed: 0, changes: [] };
 
@@ -66,6 +82,14 @@ export const DiffOverlay = memo(function DiffOverlay({
         </span>
       </div>
 
+      {/* P003-E2: Error banner */}
+      {error && (
+        <div className={styles.errorBanner} role="alert" data-testid="diff-error">
+          <span className={styles.errorIcon}>⚠</span>
+          <span className={styles.errorMessage}>{error}</span>
+        </div>
+      )}
+
       {/* Diff body */}
       <div className={styles.diffBody}>
         {!hasContent ? (
@@ -82,10 +106,34 @@ export const DiffOverlay = memo(function DiffOverlay({
 
       {/* Footer */}
       <div className={styles.footer}>
+        {/* P003-E2: Action buttons — only shown when diff has content */}
+        {hasContent && (
+          <>
+            <button
+              type="button"
+              className={styles.approveBtn}
+              onClick={onApprove}
+              data-testid="diff-approve-btn"
+              aria-label="确认应用变更"
+            >
+              ✓ 确认
+            </button>
+            <button
+              type="button"
+              className={styles.rejectBtn}
+              onClick={onReject}
+              data-testid="diff-reject-btn"
+              aria-label="拒绝变更"
+            >
+              ✕ 拒绝
+            </button>
+          </>
+        )}
         <button
           type="button"
           className={styles.closeBtn}
           onClick={onClose}
+          data-testid="diff-close-btn"
         >
           关闭
         </button>

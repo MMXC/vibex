@@ -161,3 +161,70 @@
   background: rgba(255, 255, 255, 0.06);
   color: rgba(255, 255, 255, 0.9);
 }
+
+/* P003-E2: Approve/Reject action buttons */
+.approveBtn {
+  padding: 6px 16px;
+  border-radius: 6px;
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  background: rgba(74, 222, 128, 0.12);
+  color: #4ade80;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-weight: 600;
+}
+
+.approveBtn:hover {
+  background: rgba(74, 222, 128, 0.22);
+  border-color: rgba(74, 222, 128, 0.6);
+}
+
+.approveBtn:active {
+  background: rgba(74, 222, 128, 0.3);
+}
+
+.rejectBtn {
+  padding: 6px 16px;
+  border-radius: 6px;
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  background: rgba(248, 113, 113, 0.08);
+  color: #f87171;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.rejectBtn:hover {
+  background: rgba(248, 113, 113, 0.16);
+  border-color: rgba(248, 113, 113, 0.6);
+}
+
+.rejectBtn:active {
+  background: rgba(248, 113, 113, 0.24);
+}
+
+/* P003-E2: Error banner */
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(239, 68, 68, 0.12);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.3);
+  font-size: 12px;
+  color: #fca5a5;
+  flex-shrink: 0;
+}
+
+.errorIcon {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.errorMessage {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

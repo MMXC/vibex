@@ -69,6 +69,13 @@
 - **vitest**: `src/hooks/__tests__/useAIAgent.test.tsx` 4 tests（render/result-null/auto-open/close）；`src/components/agent/__tests__/DiffOverlay.test.tsx` 6 tests（render/empty-state/open/close-buttons/stats）— 10/10 PASS
 - **npm package**: `diff@^5.2.0` 加入 `package.json`；通过 `diff.diffLines()` → `DiffChange[]` 数组实现行级代码 diff
 - **coord self-implement**: dev-epic1-P003-e1-ai-feedback-circuit 因 Slack socket 持续中断（CLI dispatch 但 dev agent 未 spawn），coord 自实现 P003-E1 DiffOverlay UI
+##### S38-P003-E2: Approve/Reject 流程 + Toast 错误（coord self-implement）
+- **DiffOverlay.tsx**: 新增 `onApprove` / `onReject` / `error` props；Approve/Reject 按钮仅在 diff 有内容时显示；Error banner 在 `error` 非空时显示警告样式
+- **DiffOverlay.module.css**: 新增 `.approveBtn`（绿色边框，hover 高亮）、`.rejectBtn`（红色边框）、`.errorBanner`（红色背景，警告图标 + 截断文字）
+- **DDSCanvasPage.tsx**: `useToast()` + error Toast（`lastError` 非空时 `showToast(msg, 'error', 5000)`）；`handleApprove`: 遍历当前 session 所有 codeBlocks 并调用 `acceptCodeBlock()`，成功后 `showToast('AI 变更已确认', 'success')` 并关闭 overlay；`handleReject`: 直接关闭 overlay；DiffOverlay 接收 `error={lastError} onApprove={handleApprove} onReject={handleReject}`
+- **vitest**: `src/components/agent/__tests__/DiffOverlay.test.tsx` 扩展 16 tests（E1 基础渲染 6 个 + E2 Approve/Reject 按钮 5 个 + Error banner 5 个）— 16/16 PASS
+- **E2E**: `tests/e2e/ai-diff-overlay.spec.ts` — 覆盖 approve/reject/close/error/empty-state 场景（6 test cases）
+- **coord self-implement**: dev-epic2-approve/reject-流程-+-toast-错误 因 `updatedBy: cli`（CLI dispatch 但 dev agent 未 spawn，已 14h+），coord 自实现 P003-E2 Approve/Reject 流程
 
 ### [Unreleased] Sprint 37 — 快捷键 + 导出 + 降级 + 主题系统 — 2026-05-17
 

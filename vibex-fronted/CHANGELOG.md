@@ -30,6 +30,14 @@
 - **E1 Unit Tests**: `src/hooks/__tests__/useAIAgent.test.tsx` — 4 tests (render/result-null/auto-open/close); `src/components/agent/__tests__/DiffOverlay.test.tsx` — 6 tests (render/empty-state/open/close-buttons/stats) — 10/10 PASS
 - **E1 npm package**: `diff@^5.2.0` added to `package.json`; line-level code diffs via `diff.diffLines()` → `DiffChange` array
 
+
+## [Unreleased] S38-P003-E2: Approve/Reject 流程 + Toast 错误 — 2026-05-25
+- **E2 DiffOverlay props**: `src/components/agent/DiffOverlay.tsx` — Added `onApprove`, `onReject`, `error` props; Approve/Reject buttons shown only when diff has content; Error banner renders when `error` prop is non-null
+- **E2 CSS styles**: `src/components/agent/DiffOverlay.module.css` — Added `.approveBtn` (green border, hover highlight), `.rejectBtn` (red border), `.errorBanner` (red bg, warning icon, truncated text)
+- **E2 DDSCanvasPage integration**: `src/components/dds/DDSCanvasPage.tsx` — Added `useToast` import; error Toast shown when `lastError` non-null (`showToast(msg, 'error', 5000)`); `handleApprove`: iterates all codeBlocks in current session, calls `acceptCodeBlock()` for each, shows success Toast, closes overlay; `handleReject`: closes overlay without action; DiffOverlay receives `error={lastError} onApprove={handleApprove} onReject={handleReject}`
+- **E2 vitest**: `src/components/agent/__tests__/DiffOverlay.test.tsx` expanded to 16 tests (E1 core 6 + E2 Approve/Reject buttons 5 + Error banner 5) — 16/16 PASS
+- **E2 E2E**: `tests/e2e/ai-diff-overlay.spec.ts` — 6 test cases covering approve/reject/close/error/empty-state (TC-E2-01 through TC-E2-06)
+- **E2 coord self-implement**: dev-epic2-approve/reject-流程-+-toast-错误 因 `updatedBy: cli`（CLI dispatch but dev agent never spawned，14h+ elapsed），coord self-implemented P003-E2 Approve/Reject 流程
 ## [Unreleased] S37-E016:
 - **E016 Settings Theme Selector**: `src/app/settings/page.tsx` — Extended theme selector to support 5 themes (light, dark, system, enterprise-a, enterprise-b), fully integrated with useUserPreferencesStore
 - **E016 ThemePreference Type**: `src/stores/userPreferencesStore.ts` — Extended ThemePreference type to include enterprise-a and enterprise-b

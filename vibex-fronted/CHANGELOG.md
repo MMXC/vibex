@@ -7,6 +7,13 @@
 - **E1 CanvasPage Integration**: `src/components/canvas/CanvasPage.tsx` — Mounted `AIEditingIndicator` in top-right corner; `useAIAgent()` hook wired to component
 - **E1 Unit Tests**: `src/stores/__tests__/oplogStore.test.ts` — 6 test cases covering add/get/clear operations
 
+## [Unreleased] S38-P002-E3: Ctrl+H operation overlay — 2026-05-26
+- **E3 OperationOverlay**: `src/components/shared/OperationOverlay.tsx` — Full-screen overlay showing oplog entries (userId badge / action / nodeId / timestamp), newest-first
+- **E3 CSS Module**: `src/components/shared/OperationOverlay.module.css` — Dark theme, slideDown animation, search input, colored badges (AI yellow / User blue / System purple)
+- **E3 useKeyboardShortcuts**: `src/hooks/useKeyboardShortcuts.ts` — Added `onOpenOplog` callback + `open-oplog` action; Ctrl+H (or Cmd+H) toggles operation overlay
+- **E3 DDSCanvasPage**: `src/components/dds/DDSCanvasPage.tsx` — Mounted `OperationOverlay`; added `operationOverlayOpen` state; Ctrl+H wired to toggle
+- **E3 Unit Tests**: `src/components/shared/__tests__/OperationOverlay.test.tsx` — 9 tests (render/open/close/search/filter/badges/diff/footer) — 9/9 PASS
+
 ## [Unreleased] S38-P002-E2: 冲突检测——5s 窗口内相同节点编辑警告 — 2026-05-25
 - **E2 confirmationStore**: `src/stores/confirmationStore.ts` — `conflictSnapshots` + `conflictNodeIds` (Record<string,number>), JSON-serializable for persistence
 - **E2 oplogStore conflict detection**: `addOplogEntry` tracks timestamps; 5s conflict window detection; `triggerConflictWarning()` + `conflictToastEmitter` event bridge

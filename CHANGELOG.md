@@ -49,6 +49,14 @@
 - **canvas.module.css**: `.nodeCard[data-conflict]` 黄色虚线边框 + 琥珀色光晕 + 脉冲动画
 - **vitest**: `stores/__tests__/oplogStore.test.ts` 6/6 PASS
 - **coord self-implement**: tester-epic2 CLI-dispatch ghost，coord 自验证 dev commit `bdbe63956` 后自行完成
+
+##### S38-P002-E3: Ctrl+H operation overlay（coord self-implement）
+- **OperationOverlay.tsx**: 新增 `components/shared/OperationOverlay.tsx` — 全屏遮罩 overlay，展示 oplog 历史（userId badge / action / nodeId / timestamp），最新在前
+- **OperationOverlay.module.css**: 暗色主题，slideDown 动画，搜索框，badge 颜色（AI 黄色 / User 蓝色 / System 紫色）
+- **useKeyboardShortcuts.ts**: 新增 `onOpenOplog` callback + `open-oplog` action，Ctrl+H 快捷键触发 oplog overlay
+- **DDSCanvasPage.tsx**: 挂载 OperationOverlay + `operationOverlayOpen` state + Ctrl+H → `setOperationOverlayOpen` 切换
+- **OperationOverlay.test.tsx**: 9 tests（render/open/close/search/filter/badges/diff/footer）
+- **coord self-implement**: dev-epic3-ctrl+h-operation-overlay 因 Slack socket 持续中断（CLI dispatch 但 agent 未 spawn），超过 12h 阈值，coord 自实现
 ### [Unreleased] Sprint 37 — 快捷键 + 导出 + 降级 + 主题系统 — 2026-05-17
 
 #### F001 — 键盘快捷键系统（E001-E004）

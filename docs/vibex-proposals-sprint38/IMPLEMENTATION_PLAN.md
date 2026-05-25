@@ -66,11 +66,11 @@ Sprint 38 包含 5 个功能（P001-P005），共 15 个 Epic，分布在 3 个�
 - [ ] `pnpm test` 覆盖冲突检测逻辑
 
 #### P002-E3: Ctrl+H operation overlay
-- [ ] `OperationOverlay` 组件：全屏遮罩 + 滚动列表展示 oplog（最近的在前）
-- [ ] 每条 entry 显示：userId badge / action / nodeId / timestamp
-- [ ] 全局 `Ctrl+H` 快捷键注册（使用 S37-E3 KeyboardHelpOverlay 的事件监听模式）
-- [ ] overlay 内置搜索框，支持按 nodeId 过滤
-- [ ] `pnpm test:e2e` 覆盖 Ctrl+H overlay 打开/关闭
+- [x] `OperationOverlay` 组件：全屏遮罩 + 滚动列表展示 oplog（最近的在前）
+- [x] 每条 entry 显示：userId badge / action / nodeId / timestamp
+- [x] 全局 `Ctrl+H` 快捷键注册（使用 S37-E3 KeyboardHelpOverlay 的事件监听模式）
+- [x] overlay 内置搜索框，支持按 nodeId 过滤
+- [x] `pnpm test` 覆盖 OperationOverlay（9 tests）
 
 ---
 

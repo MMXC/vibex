@@ -7,15 +7,16 @@
 - **E1 CanvasPage Integration**: `src/components/canvas/CanvasPage.tsx` — Mounted `AIEditingIndicator` in top-right corner; `useAIAgent()` hook wired to component
 - **E1 Unit Tests**: `src/stores/__tests__/oplogStore.test.ts` — 6 test cases covering add/get/clear operations
 
-
 ## [Unreleased] S38-P002-E2: 冲突检测——5s 窗口内相同节点编辑警告 — 2026-05-25
-- **E2 confirmationStore**: `src/stores/confirmationStore.ts` — `conflictSnapshots` + `conflictNodeIds` (Record<string,number>)
-- **E2 oplogStore 扩展**: `addOplogEntry` 追踪时间戳，5s 冲突窗口检测，`triggerConflictWarning()` + `conflictToastEmitter` 事件桥接
-- **E2 useOplogConflictToast**: CanvasPage 集成冲突警告 toast hook
-- **E2 BoundedContextTree/ComponentTree**: 节点卡片添加 `data-conflict` 属性 + ⚠ 徽章
-- **E2 canvas.module.css**: `.nodeCard[data-conflict]` 黄色虚线边框 + 琥珀色光晕 + 脉冲动画
-- **vitest**: `src/stores/__tests__/oplogStore.test.ts` 6/6 PASS
-## [Unreleased] S37-E016: F005 Theme Settings Integration — 2026-05-17
+- **E2 confirmationStore**: `src/stores/confirmationStore.ts` — `conflictSnapshots` + `conflictNodeIds` (Record<string,number>), JSON-serializable for persistence
+- **E2 oplogStore conflict detection**: `addOplogEntry` tracks timestamps; 5s conflict window detection; `triggerConflictWarning()` + `conflictToastEmitter` event bridge
+- **E2 useOplogConflictToast**: CanvasPage integration hook for conflict warning toast
+- **E2 BoundedContextTree/ComponentTree**: `data-conflict` attribute + ⚠ badge on nodeCard div for visual conflict indicator
+- **E2 canvas.module.css**: `.nodeCard[data-conflict]` yellow dashed border + amber glow + pulse animation
+- **E2 Unit Tests**: `src/stores/__tests__/oplogStore.test.ts` — 6/6 tests pass (coord self-implement)
+
+
+## [Unreleased] S37-E016:
 - **E016 Settings Theme Selector**: `src/app/settings/page.tsx` — Extended theme selector to support 5 themes (light, dark, system, enterprise-a, enterprise-b), fully integrated with useUserPreferencesStore
 - **E016 ThemePreference Type**: `src/stores/userPreferencesStore.ts` — Extended ThemePreference type to include enterprise-a and enterprise-b
 

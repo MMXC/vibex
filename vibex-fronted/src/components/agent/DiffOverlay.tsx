@@ -2,9 +2,7 @@
  * DiffOverlay — Sprint38 P003-E2: Approve/Reject 流程 + Toast 错误
  *
  * Extends P003-E1: adds Approve/Reject action buttons and error display.
- * - Approve: user reviews diff and confirms changes → closes overlay
- * - Reject: user dismisses changes without applying → closes overlay
- * - Error: displays AI agent errors inline when lastError is non-null
+ * P003-E3: adds AIScoreCard at the bottom for code quality scoring.
  *
  * Usage:
  * ```tsx
@@ -24,6 +22,7 @@
 
 import React, { memo, useMemo } from 'react';
 import type { DiffResult } from '@/hooks/useAIAgent';
+import { AIScoreCard } from '@/components/AIScoreCard/AIScoreCard';
 import styles from './DiffOverlay.module.css';
 
 interface DiffOverlayProps {
@@ -103,6 +102,11 @@ export const DiffOverlay = memo(function DiffOverlay({
           ))
         )}
       </div>
+
+      {/* P003-E3: AI Score Card — shown when diff has content */}
+      {hasContent && result && (
+        <AIScoreCard diffResult={result} />
+      )}
 
       {/* Footer */}
       <div className={styles.footer}>

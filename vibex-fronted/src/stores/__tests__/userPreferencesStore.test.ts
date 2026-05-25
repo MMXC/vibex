@@ -74,12 +74,11 @@ describe('UserPreferencesStore', () => {
     expect(state.shortcutCustomization).toEqual([]);
   });
 
-  it('should persist theme across reset', () => {
-    const { setTheme } = useUserPreferencesStore.getState();
-    setTheme('dark');
-    expect(useUserPreferencesStore.getState().theme).toBe('dark');
-    // Store should be using persist middleware, state survives reset of individual fields
-    useUserPreferencesStore.getState().resetPreferences();
-    expect(useUserPreferencesStore.getState().theme).toBe('system');
+  it('should reset aiScores on resetPreferences', () => {
+    const { addAIScore, resetPreferences } = useUserPreferencesStore.getState();
+    addAIScore({ readability: 4, complexity: 3, coverage: 5, linesAdded: 10, linesRemoved: 2 });
+    expect(useUserPreferencesStore.getState().aiScores.length).toBeGreaterThan(0);
+    resetPreferences();
+    expect(useUserPreferencesStore.getState().aiScores).toEqual([]);
   });
 });

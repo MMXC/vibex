@@ -1,8 +1,9 @@
 /**
  * User Preferences Store
  * E011: Persisted user preferences using Zustand persist middleware with localStorage
+ * P003-E3: Extended with aiScores[] for AI coding score history
  *
- * Supports: theme ('light'|'dark'|'system'), defaultTemplate, shortcutCustomization
+ * Supports: theme ('light'|'dark'|'system'), defaultTemplate, shortcutCustomization, aiScores
  */
 
 import { create } from 'zustand';
@@ -14,6 +15,24 @@ export type LocalePreference = 'en' | 'zh';
 export interface ShortcutCustomization {
   action: string;
   customKey: string;
+}
+
+/** P003-E3: AI scoring record for a single diff session */
+export interface AIScoreRecord {
+  /** ISO timestamp when the score was recorded */
+  timestamp: string;
+  /** Readability score 1-5 (how readable the AI code is) */
+  readability: number;
+  /** Complexity score 1-5 (lower = simpler code) */
+  complexity: number;
+  /** Coverage score 1-5 (how well the diff covers the task) */
+  coverage: number;
+  /** Number of lines added in the diff */
+  linesAdded: number;
+  /** Number of lines removed in the diff */
+  linesRemoved: number;
+  /** Task description that triggered the AI session */
+  task?: string;
 }
 
 export interface UserPreferencesState {
@@ -29,23 +48,33 @@ export interface UserPreferencesState {
   // Shortcut customization overrides
   shortcutCustomization: ShortcutCustomization[];
 
+  // P003-E3: AI score history
+  aiScores: AIScoreRecord[];
+
   // Actions
   setTheme: (theme: ThemePreference) => void;
   setLocale: (locale: LocalePreference) => void;
   setDefaultTemplate: (template: string) => void;
   setShortcutCustomization: (shortcuts: ShortcutCustomization[]) => void;
+  /** P003-E3: Add a new AI score record */
+  addAIScore: (score: Omit<AIScoreRecord, 'timestamp'>) => void;
+  /** P003-E3: Remove an AI score record by index */
+  removeAIScore: (index: number) => void;
+  /** P003-E3: Clear all AI score records */
+  clearAIScores: () => void;
   resetPreferences: () => void;
 }
 
 // Default values
 const DEFAULT_PREFERENCES: Pick<
   UserPreferencesState,
-  'theme' | 'locale' | 'defaultTemplate' | 'shortcutCustomization'
+  'theme' | 'locale' | 'defaultTemplate' | 'shortcutCustomization' | 'aiScores'
 > = {
   theme: 'system',
   locale: 'zh',
   defaultTemplate: 'blank',
   shortcutCustomization: [],
+  aiScores: [],
 };
 
 export const useUserPreferencesStore = create<UserPreferencesState>()(
@@ -61,6 +90,22 @@ export const useUserPreferencesStore = create<UserPreferencesState>()(
 
       setShortcutCustomization: (shortcuts) =>
         set({ shortcutCustomization: shortcuts }),
+
+      // P003-E3: AI score actions
+      addAIScore: (score) =>
+        set((state) => ({
+          aiScores: [
+            { ...score, timestamp: new Date().toISOString() },
+            ...state.aiScores,
+          ],
+        })),
+
+      removeAIScore: (index) =>
+        set((state) => ({
+          aiScores: state.aiScores.filter((_, i) => i !== index),
+        })),
+
+      clearAIScores: () => set({ aiScores: [] }),
 
       resetPreferences: () => set({ ...DEFAULT_PREFERENCES }),
     }),

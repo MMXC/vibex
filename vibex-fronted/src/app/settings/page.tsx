@@ -5,8 +5,10 @@
  * E012: Settings page with theme selector (light/dark/system)
  * E013: Extended with defaultTemplate selector and shortcut customization display
  * E016: Extended theme selector with 5 options (light, dark, system, enterprise-a, enterprise-b)
+ * P003-E3: Extended with AI Scores panel showing score history
  */
 
+import { useState } from 'react';
 import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 import type { ThemePreference, LocalePreference } from '@/stores/userPreferencesStore';
 import { useShortcutStore } from '@/stores/shortcutStore';
@@ -34,8 +36,19 @@ const TEMPLATE_OPTIONS = [
 ];
 
 export default function SettingsPage() {
-  const { theme, locale, defaultTemplate, setTheme, setLocale, setDefaultTemplate } = useUserPreferencesStore();
+  const {
+    theme,
+    locale,
+    defaultTemplate,
+    setTheme,
+    setLocale,
+    setDefaultTemplate,
+    aiScores,
+    removeAIScore,
+    clearAIScores,
+  } = useUserPreferencesStore();
   const shortcuts = useShortcutStore((s) => s.shortcuts);
+  const [scoresExpanded, setScoresExpanded] = useState(false);
 
   return (
     <div className={styles.page}>
@@ -120,6 +133,72 @@ export default function SettingsPage() {
               <p className={styles.emptyState}>No custom shortcuts configured</p>
             )}
           </div>
+        </section>
+
+        {/* P003-E3: AI Scores panel */}
+        <section className={styles.section}>
+          <button
+            type="button"
+            className={styles.aiScoresToggle}
+            onClick={() => setScoresExpanded((v) => !v)}
+            aria-expanded={scoresExpanded}
+            data-testid="ai-scores-toggle"
+          >
+            <h2 className={styles.sectionTitle}>AI Scores</h2>
+            <span className={styles.aiScoresCount}>
+              {aiScores.length > 0 ? `${aiScores.length} 条记录` : '无记录'}
+            </span>
+            <span className={styles.chevron}>{scoresExpanded ? '▲' : '▼'}</span>
+          </button>
+
+          {scoresExpanded && (
+            <div className={styles.aiScoresPanel} data-testid="ai-scores-panel">
+              {aiScores.length === 0 ? (
+                <p className={styles.emptyState}>暂无 AI 评分记录</p>
+              ) : (
+                <>
+                  <div className={styles.aiScoresList}>
+                    {aiScores.slice(0, 20).map((score, idx) => (
+                      <div key={score.timestamp} className={styles.aiScoreRow}>
+                        <div className={styles.aiScoreMeta}>
+                          <span className={styles.aiScoreTime}>
+                            {new Date(score.timestamp).toLocaleString()}
+                          </span>
+                          <span className={styles.aiScoreLines}>
+                            +{score.linesAdded} -{score.linesRemoved}
+                          </span>
+                        </div>
+                        <div className={styles.aiScoreStars}>
+                          <span title="可读性">📖 {score.readability}</span>
+                          <span title="复杂度">🔢 {score.complexity}</span>
+                          <span title="覆盖率">📊 {score.coverage}</span>
+                        </div>
+                        <button
+                          type="button"
+                          className={styles.aiScoreDelete}
+                          onClick={() => removeAIScore(idx)}
+                          aria-label="删除评分"
+                          data-testid={`remove-score-${idx}`}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  {aiScores.length > 0 && (
+                    <button
+                      type="button"
+                      className={styles.clearScoresBtn}
+                      onClick={clearAIScores}
+                      data-testid="clear-scores-btn"
+                    >
+                      清空全部评分记录
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+          )}
         </section>
       </div>
     </div>

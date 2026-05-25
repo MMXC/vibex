@@ -75,9 +75,18 @@
 - **DDSCanvasPage.tsx**: `useToast()` + error Toast（`lastError` 非空时 `showToast(msg, 'error', 5000)`）；`handleApprove`: 遍历当前 session 所有 codeBlocks 并调用 `acceptCodeBlock()`，成功后 `showToast('AI 变更已确认', 'success')` 并关闭 overlay；`handleReject`: 直接关闭 overlay；DiffOverlay 接收 `error={lastError} onApprove={handleApprove} onReject={handleReject}`
 - **vitest**: `src/components/agent/__tests__/DiffOverlay.test.tsx` 扩展 16 tests（E1 基础渲染 6 个 + E2 Approve/Reject 按钮 5 个 + Error banner 5 个）— 16/16 PASS
 - **E2E**: `tests/e2e/ai-diff-overlay.spec.ts` — 覆盖 approve/reject/close/error/empty-state 场景（6 test cases）
-- **coord self-implement**: dev-epic2-approve/reject-流程-+-toast-错误 因 `updatedBy: cli`（CLI dispatch 但 dev agent 未 spawn，已 14h+），coord 自实现 P003-E2 Approve/Reject 流程
+- **coord self-implement**: dev-epic2-approve/reject-流程-+-toast-错误 因 `updatedBy: cli`（CLI dispatch 但 dev agent 未 spawn，已 14 h+），coord 自实现 P003-E2 Approve/Reject 流程
 
-### [Unreleased] Sprint 37 — 快捷键 + 导出 + 降级 + 主题系统 — 2026-05-17
+##### S38-P003-E3: 评分卡 + userPreferencesStore.aiScores 持久化（coord self-implement）
+- **AIScoreCard 组件**: `vibex-fronted/src/components/AIScoreCard/` — 3维度(可读性/复杂度/覆盖率)1-5星评分，可折叠评分卡，显示在 DiffOverlay 底部
+- **评分算法**: 基于 diff 行数/平均行长度/变化密度的确定性算法（可读性：短行高分；复杂度：变更行数越多越复杂；覆盖率：变化密度越高越好）
+- **userPreferencesStore**: 新增 `aiScores: AIScoreRecord[]` 数组 + `addAIScore/removeAIScore/clearAIScores` actions，数据持久化到 localStorage
+- **Settings 页面**: `/settings` 页面底部新增可展开 AI Scores 面板，显示历史评分记录（时间/行数/3维度评分），支持删除单条/清空全部
+- **DiffOverlay 集成**: AIScoreCard 在 DiffOverlay 底部条件渲染（diff 有内容时显示）
+- **vitest**: `AIScoreCard.test.tsx` 7 tests 全部 PASS；`userPreferencesStore.test.ts` 8 tests 全部 PASS（aiScores reset 覆盖）
+- **coord self-implement**: dev-epic3-评分卡 因 `updatedBy: cli`（CLI dispatch 但 dev agent 未 spawn，已 16.8h），coord 自实现 P003-E3
+
+### [Unreleased] Sprint 37
 
 #### F001 — 键盘快捷键系统（E001-E004）
 **Epic 数量**: 4 | **优先级**: P0

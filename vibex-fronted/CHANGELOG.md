@@ -38,6 +38,11 @@
 - **E2 vitest**: `src/components/agent/__tests__/DiffOverlay.test.tsx` expanded to 16 tests (E1 core 6 + E2 Approve/Reject buttons 5 + Error banner 5) — 16/16 PASS
 - **E2 E2E**: `tests/e2e/ai-diff-overlay.spec.ts` — 6 test cases covering approve/reject/close/error/empty-state (TC-E2-01 through TC-E2-06)
 - **E2 coord self-implement**: dev-epic2-approve/reject-流程-+-toast-错误 因 `updatedBy: cli`（CLI dispatch but dev agent never spawned，14h+ elapsed），coord self-implemented P003-E2 Approve/Reject 流程
+## [Unreleased] S38-P003-E3: 评分卡 + AI Scores 持久化 — 2026-05-26
+- **E3 AIScoreCard**: `src/components/AIScoreCard/` — 3维度(可读性/复杂度/覆盖率)1-5星评分，显示在DiffOverlay底部
+- **E3 评分算法**: 基于diff行数/平均长度/变化密度计算确定性评分
+- **E3 userPreferencesStore**: 新增`aiScores[]`历史 + `addAIScore/removeAIScore/clearAIScores` actions
+- **E3 Settings面板**: 可展开AI Scores面板，查看/删除/清空历史评分记录
 ## [Unreleased] S37-E016:
 - **E016 Settings Theme Selector**: `src/app/settings/page.tsx` — Extended theme selector to support 5 themes (light, dark, system, enterprise-a, enterprise-b), fully integrated with useUserPreferencesStore
 - **E016 ThemePreference Type**: `src/stores/userPreferencesStore.ts` — Extended ThemePreference type to include enterprise-a and enterprise-b

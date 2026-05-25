@@ -57,6 +57,19 @@
 - **DDSCanvasPage.tsx**: 挂载 OperationOverlay + `operationOverlayOpen` state + Ctrl+H → `setOperationOverlayOpen` 切换
 - **OperationOverlay.test.tsx**: 9 tests（render/open/close/search/filter/badges/diff/footer）
 - **coord self-implement**: dev-epic3-ctrl+h-operation-overlay 因 Slack socket 持续中断（CLI dispatch 但 agent 未 spawn），超过 12h 阈值，coord 自实现
+
+### [Unreleased] Sprint 38 — P003 AI Feedback回路
+**Epic 数量**: 1 | **优先级**: P0
+
+##### S38-P003-E1: AI Feedback回路——useAIAgent result export + DiffOverlay UI（coord self-implement）
+- **DiffOverlay.tsx**: `vibex-fronted/src/components/agent/DiffOverlay.tsx` — 右下角固定浮层（560px 宽，最大 480px 高），使用 `diff` npm 包做行级 diff；绿色行=新增，红色行=删除，显示行号
+- **DiffOverlay.module.css**: `vibex-fronted/src/components/agent/DiffOverlay.module.css` — 暗色主题样式，带动画 header + stats bar + 彩色 diff 行 + 空状态 + 滚动内容区
+- **useAIAgent result export**: `vibex-fronted/src/hooks/useAIAgent.ts` — 新增 `lastResult: DiffResult | null` 返回类型；`DiffResult = { added: number; removed: number; changes: DiffChange[] }`；由 AI coding service 在 session 完成时填充
+- **DDSCanvasPage.tsx**: `vibex-fronted/src/components/dds/DDSCanvasPage.tsx` — 导入 DiffOverlay + useAIAgent；新增 `diffOverlayOpen` state + `useEffect` auto-open（当 `lastResult` 有变更时）；条件渲染 `{diffOverlayOpen && lastResult && <DiffOverlay ...>}`
+- **vitest**: `src/hooks/__tests__/useAIAgent.test.tsx` 4 tests（render/result-null/auto-open/close）；`src/components/agent/__tests__/DiffOverlay.test.tsx` 6 tests（render/empty-state/open/close-buttons/stats）— 10/10 PASS
+- **npm package**: `diff@^5.2.0` 加入 `package.json`；通过 `diff.diffLines()` → `DiffChange[]` 数组实现行级代码 diff
+- **coord self-implement**: dev-epic1-P003-e1-ai-feedback-circuit 因 Slack socket 持续中断（CLI dispatch 但 dev agent 未 spawn），coord 自实现 P003-E1 DiffOverlay UI
+
 ### [Unreleased] Sprint 37 — 快捷键 + 导出 + 降级 + 主题系统 — 2026-05-17
 
 #### F001 — 键盘快捷键系统（E001-E004）

@@ -54,6 +54,8 @@ import { useAgentStore } from '@/stores/agentStore';
 import { CodeGenPanel } from '@/components/CodeGenPanel';
 import type { CanvasFlow, CanvasNode } from '@/lib/codeGenerator';
 import { useAIController } from '@/hooks/canvas/useAIController';
+import { DiffOverlay } from '@/components/agent/DiffOverlay';
+import { useAIAgent } from '@/hooks/useAIAgent';
 
 // ==================== Props ====================
 
@@ -236,6 +238,17 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
 
   // ---- P002-E3: Operation overlay state (Ctrl+H) ----
   const [operationOverlayOpen, setOperationOverlayOpen] = useState(false);
+
+  // ---- P003-E1: DiffOverlay state (AI result diff) ----
+  const { lastResult } = useAIAgent();
+  const [diffOverlayOpen, setDiffOverlayOpen] = useState(false);
+
+  // Show DiffOverlay when lastResult becomes available
+  useEffect(() => {
+    if (lastResult && (lastResult.added > 0 || lastResult.removed > 0)) {
+      setDiffOverlayOpen(true);
+    }
+  }, [lastResult]);
 
   // ---- E003: useAIController for quickGenerate ----
   const { quickGenerate } = useAIController();
@@ -774,6 +787,14 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
       isOpen={operationOverlayOpen}
       onClose={() => setOperationOverlayOpen(false)}
     />
+
+    {/* P003-E1: AI result diff overlay */}
+    {diffOverlayOpen && lastResult && (
+      <DiffOverlay
+        result={lastResult}
+        onClose={() => setDiffOverlayOpen(false)}
+      />
+    )}
     </>
   );
 });

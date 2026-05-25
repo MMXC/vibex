@@ -22,6 +22,13 @@
 - **E2 canvas.module.css**: `.nodeCard[data-conflict]` yellow dashed border + amber glow + pulse animation
 - **E2 Unit Tests**: `src/stores/__tests__/oplogStore.test.ts` — 6/6 tests pass (coord self-implement)
 
+## [Unreleased] S38-P003-E1: AI Feedback回路——useAIAgent result export + DiffOverlay UI — 2026-05-25
+- **E1 DiffOverlay**: `src/components/agent/DiffOverlay.tsx` — Fixed bottom-right overlay (560px wide, max 480px tall) displaying line-level diffs using the `diff` npm package; green lines for additions, red lines for removals, line numbers shown
+- **E1 DiffOverlay.module.css**: `src/components/agent/DiffOverlay.module.css` — Dark theme overlay styles, animated header/stats bar, colored diff lines, empty state, scrollable body
+- **E1 useAIAgent result export**: `src/hooks/useAIAgent.ts` — Added `lastResult: DiffResult | null` to hook return type; `DiffResult = { added: number; removed: number; changes: DiffChange[] }`; populated by AI coding service when session completes
+- **E1 DDSCanvasPage Integration**: `src/components/dds/DDSCanvasPage.tsx` — Added `DiffOverlay` import + `useAIAgent` import; added `diffOverlayOpen` state; `useEffect` auto-opens overlay when `lastResult` has changes (`added > 0 || removed > 0`); conditional render `{diffOverlayOpen && lastResult && <DiffOverlay result={lastResult} onClose={...} />}`
+- **E1 Unit Tests**: `src/hooks/__tests__/useAIAgent.test.tsx` — 4 tests (render/result-null/auto-open/close); `src/components/agent/__tests__/DiffOverlay.test.tsx` — 6 tests (render/empty-state/open/close-buttons/stats) — 10/10 PASS
+- **E1 npm package**: `diff@^5.2.0` added to `package.json`; line-level code diffs via `diff.diffLines()` → `DiffChange` array
 
 ## [Unreleased] S37-E016:
 - **E016 Settings Theme Selector**: `src/app/settings/page.tsx` — Extended theme selector to support 5 themes (light, dark, system, enterprise-a, enterprise-b), fully integrated with useUserPreferencesStore

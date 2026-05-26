@@ -102,6 +102,13 @@
 - **E2 验证**: `grep -rn 'page.waitForTimeout' tests/` → 0 结果 ✅；vitest 6/6 PASS ✅
 - **E2 coord self-implement**: dev-epic2-全部-spec-文件-waitfortimeout-替换 因 `updatedBy: cli`（CLI dispatch 但 dev agent 未 spawn，~1h elapsed），coord 自实现 P004-E2
 
+##### S38-P004-E3: 新 feature E2E 覆盖（coord self-implement）
+- **E3 i18n spec**: `vibex-fronted/tests/e2e/i18n-language-switch.spec.ts` — 6 个测试用例：语言切换默认locale、CN/EN切换、sessionStorage持久化、toolbar更新
+- **E3 conflict spec**: `vibex-fronted/tests/e2e/collaboration-conflict.spec.ts` — 6 个测试用例：5s冲突窗口检测、ConflictDialog保留本地/使用服务器、LWW自动解决
+- **E3 DiffOverlay覆盖**: `tests/e2e/ai-diff-overlay.spec.ts` — 已存在（P003 E2E 覆盖）
+- **E3 TypeScript**: pnpm exec tsc --noEmit → 0 错误 ✅
+- **E3 coord self-implement**: dev-epic3-新-feature-e2e-覆盖 因 `updatedBy: cli`（CLI dispatch 但 dev agent 未 spawn，Slack socket 持续中断），coord 自实现 P004-E3
+
 ### [Unreleased] Sprint 37
 
 #### F001 — 键盘快捷键系统（E001-E004）

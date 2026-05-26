@@ -49,6 +49,13 @@
 - **E2 verification**: `grep -rn 'page.waitForTimeout' tests/` → 0 results ✅; vitest 6/6 PASS ✅
 - **E2 coord self-implement**: dev-epic2-全部-spec-文件-waitfortimeout-替换 因 `updatedBy: cli`（CLI dispatch but dev agent never spawned），coord self-implemented P004-E2
 
+## [Unreleased] S38-P004-E3: 新 feature E2E 覆盖 — 2026-05-27
+- **E3 i18n spec**: `tests/e2e/i18n-language-switch.spec.ts` — 6 test cases covering language switch (default locale, CN/EN toggle, sessionStorage persistence, toolbar update)
+- **E3 conflict spec**: `tests/e2e/collaboration-conflict.spec.ts` — 6 test cases covering 5s conflict window detection, ConflictDialog keep-local/use-server, LWW auto-resolve
+- **E3 DiffOverlay coverage**: `tests/e2e/ai-diff-overlay.spec.ts` — already existed (P003 E2E coverage)
+- **E3 TypeScript**: pnpm exec tsc --noEmit → 0 errors ✅
+- **E3 coord self-implement**: dev-epic3-新-feature-e2e-覆盖 因 `updatedBy: cli`（CLI dispatch but dev agent never spawned，Slack socket 持续中断），coord self-implemented P004-E3
+
 ## [Unreleased] S38-P003-E3: 评分卡 + AI Scores 持久化 — 2026-05-26
 - **E3 AIScoreCard**: `src/components/AIScoreCard/` — 3维度(可读性/复杂度/覆盖率)1-5星评分，显示在DiffOverlay底部
 - **E3 评分算法**: 基于diff行数/平均长度/变化密度计算确定性评分

@@ -4,8 +4,9 @@ export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: false, // Disable parallel to avoid resource competition
   forbidOnly: !!process.env.CI,
-  retries: 3, // E4 Flaky governance: retries = 3 (CI config at playwright.ci.config.ts)
+  retries: 2, // P004-E1: CI mode retries = 2
   workers: 1, // Single worker for stability
+  globalSetup: './tests/global-setup.ts', // P004-E1: Clean localStorage + IndexedDB before each run
   reporter: process.env.CI ? [['list'], ['json', { outputFile: './playwright-report/results.json' }]] : 'html',
   timeout: 60000, // Increase test timeout
   expect: {

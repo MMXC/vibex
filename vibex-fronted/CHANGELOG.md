@@ -38,6 +38,11 @@
 - **E2 vitest**: `src/components/agent/__tests__/DiffOverlay.test.tsx` expanded to 16 tests (E1 core 6 + E2 Approve/Reject buttons 5 + Error banner 5) — 16/16 PASS
 - **E2 E2E**: `tests/e2e/ai-diff-overlay.spec.ts` — 6 test cases covering approve/reject/close/error/empty-state (TC-E2-01 through TC-E2-06)
 - **E2 coord self-implement**: dev-epic2-approve/reject-流程-+-toast-错误 因 `updatedBy: cli`（CLI dispatch but dev agent never spawned，14h+ elapsed），coord self-implemented P003-E2 Approve/Reject 流程
+## [Unreleased] S38-P004-E1: playwright.config.ts 改进（retries + globalSetup） — 2026-05-26
+- **E1 playwright.config.ts**: `playwright.config.ts` — Changed `retries: 3` → `retries: 2` for CI mode (P004-E1 E2E stability sprint)
+- **E1 globalSetup**: `tests/global-setup.ts` — New global setup file that runs before all E2E test projects; clears `localStorage` and all IndexedDB databases via Playwright browser context
+- **E1 config integration**: `playwright.config.ts` — Registered `globalSetup: './tests/global-setup.ts'` so clean state is enforced before every test run
+
 ## [Unreleased] S38-P003-E3: 评分卡 + AI Scores 持久化 — 2026-05-26
 - **E3 AIScoreCard**: `src/components/AIScoreCard/` — 3维度(可读性/复杂度/覆盖率)1-5星评分，显示在DiffOverlay底部
 - **E3 评分算法**: 基于diff行数/平均长度/变化密度计算确定性评分

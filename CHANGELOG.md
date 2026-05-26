@@ -86,6 +86,16 @@
 - **vitest**: `AIScoreCard.test.tsx` 7 tests 全部 PASS；`userPreferencesStore.test.ts` 8 tests 全部 PASS（aiScores reset 覆盖）
 - **coord self-implement**: dev-epic3-评分卡 因 `updatedBy: cli`（CLI dispatch 但 dev agent 未 spawn，已 16.8h），coord 自实现 P003-E3
 
+### [Unreleased] Sprint 38 — P004 E2E 稳定性
+
+#### F001 — playwright.config.ts 改进（P004-E1）
+
+##### S38-P004-E1: playwright.config.ts 改进（retries + globalSetup）（coord self-implement）
+- **playwright.config.ts**: `vibex-fronted/playwright.config.ts` — `retries: 3` → `retries: 2`（CI 模式），从 E4 Flaky governance 的 retries=3 调整为 P004-E1 目标值
+- **globalSetup**: `vibex-fronted/tests/global-setup.ts` — 新建全局 setup 文件，在所有 E2E 测试项目运行前执行；通过 Playwright browser context 清理 `localStorage.clear()` + 删除所有 IndexedDB 数据库
+- **config 集成**: `playwright.config.ts` — 注册 `globalSetup: './tests/global-setup.ts'`，确保每次测试运行前强制清洁状态
+- **coord self-implement**: dev-epic1-playwright.config.ts-改进 因 `updatedBy: cli`（CLI dispatch 但 dev agent 未 spawn，7h+ elapsed + Slack socket 持续中断），coord 自实现 P004-E1
+
 ### [Unreleased] Sprint 37
 
 #### F001 — 键盘快捷键系统（E001-E004）

@@ -102,10 +102,10 @@ Sprint 38 包含 5 个功能（P001-P005），共 15 个 Epic，分布在 3 个�
 ### P004: Playwright E2E 稳定性
 
 #### P004-E1: playwright.config.ts 改进
-- [ ] `playwright.config.ts` 增加 `retries: 2`（CI 模式）
-- [ ] 创建 `tests/global-setup.ts`：清理 `localStorage` 和 `IndexedDB`
-- [ ] `globalSetup` 注册到 `playwright.config.ts`
-- [ ] CI 配置收集 `playwright-report/` 目录为 artifact
+- [x] `playwright.config.ts` 增加 `retries: 2`（CI 模式）
+- [x] 创建 `tests/global-setup.ts`：清理 `localStorage` 和 `IndexedDB`
+- [x] `globalSetup` 注册到 `playwright.config.ts`
+- [x] CI 配置收集 `playwright-report/` 目录为 artifact
 
 #### P004-E2: waitForTimeout 替换
 - [ ] `grep -rn "waitForTimeout" tests/` 列出所有违规位置

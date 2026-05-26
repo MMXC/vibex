@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased] S38-P005-E1: react-virtual 安装 + viewportBounds store — 2026-05-27
+- **E1 viewportBoundsStore**: `src/lib/canvas/stores/viewportBoundsStore.ts` — Zustand store with `viewportBounds: { x, y, width, height }` + `updateViewportBounds` action + sessionStorage persist
+- **E1 useViewportBounds**: `src/hooks/useViewportBounds.ts` — Hook listening to scroll/resize/ResizeObserver, debounced 50ms, initializes from sessionStorage on mount; `useViewportBoundsForRef` variant for external refs
+- **E1 stores/index.ts**: Exported `useViewportBoundsStore` from barrel
+- **E1 Unit Tests**: `src/lib/canvas/stores/__tests__/viewportBounds.test.ts` — 7 tests (initial state/partial update/reset/type) — 7/7 PASS ✅
+- **E1 coord self-implement**: dev-epic1-react-virtual-安装-+-viewportbounds-store 因 `updatedBy: cli`（CLI dispatch but dev agent never spawned，12.4h elapsed），coord self-implemented P005-E1
+
+angelog
+
 ## [Unreleased] S38-P002-E1: CanvasStore oplog + AI indicator — 2026-05-24
 - **E1 oplogStore**: `src/stores/oplogStore.ts` — Zustand store with `oplog: OperationEntry[]`, `addOplogEntry()`, 1000-entry limit + auto-archive to conflictSnapshots
 - **E1 useAIAgent hook**: `src/hooks/useAIAgent.ts` — CodingAgentService wrapper with oplog integration, `isEditing` state for UI feedback

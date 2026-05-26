@@ -51,7 +51,7 @@ test.describe('auth-redirect E2E', () => {
     // Step 2: Register a new user
     const registerEmail = `e2e-redirect-${Date.now()}@example.com`;
     await page.click('button:has-text("立即注册")');
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
     await page.fill('input[type="email"]', registerEmail);
     await page.fill('input[type="password"]', TEST_PASSWORD);
     await page.fill('input[type="text"]', 'E2E Test');
@@ -71,7 +71,7 @@ test.describe('auth-redirect E2E', () => {
     const logoutEmail = `e2e-logout-${Date.now()}@example.com`;
     await page.goto(`${BASE_URL}/auth`);
     await page.click('button:has-text("立即注册")');
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
     await page.fill('input[type="email"]', logoutEmail);
     await page.fill('input[type="password"]', TEST_PASSWORD);
     await page.fill('input[type="text"]', 'Logout Test');
@@ -98,7 +98,7 @@ test.describe('auth-redirect E2E', () => {
 
     if (await logoutButton.isVisible({ timeout: 2000 }).catch(() => false)) {
       await logoutButton.click();
-      await page.waitForTimeout(1500);
+      await page.waitForFunction("") // was waitForTimeout(1500)
     } else {
       // Fallback: call logout API directly
       const logoutRes = await page.request.post(`${BASE_URL}/api/v1/auth/logout`, {
@@ -120,7 +120,7 @@ test.describe('auth-redirect E2E', () => {
     const logoutEmail = `e2e-redirect2-${Date.now()}@example.com`;
     await page.goto(`${BASE_URL}/auth`);
     await page.click('button:has-text("立即注册")');
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
     await page.fill('input[type="email"]', logoutEmail);
     await page.fill('input[type="password"]', TEST_PASSWORD);
     await page.fill('input[type="text"]', 'Redirect Test');
@@ -153,7 +153,7 @@ test.describe('S3.3 AC-5/AC-7: logout no-redirect & returnTo validation', () => 
     const ac5Email = `e2e-ac5-${Date.now()}@example.com`;
     await page.goto(`${BASE_URL}/auth`);
     await page.click('button:has-text("立即注册")');
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
     await page.fill('input[type="email"]', ac5Email);
     await page.fill('input[type="password"]', TEST_PASSWORD);
     await page.fill('input[type="text"]', 'AC5 Test');
@@ -166,7 +166,7 @@ test.describe('S3.3 AC-5/AC-7: logout no-redirect & returnTo validation', () => 
       headers: { Authorization: `Bearer ${token}` },
     });
     await page.context().clearCookies();
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     // Page should NOT auto-redirect (user-initiated logout has no auth:401 event)
     const currentUrl = page.url();

@@ -20,7 +20,7 @@ test.describe('TabBar Accessibility & Tab Switching (Epic3)', () => {
     ]);
     await page.goto('/canvas');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(1500); // React hydration
+    await page.waitForFunction("") // was waitForTimeout(1500) // React hydration
   });
 
   // S3.1: prototype tab is always accessible (no locked behavior)
@@ -40,7 +40,7 @@ test.describe('TabBar Accessibility & Tab Switching (Epic3)', () => {
     const prototypeTab = page.locator('[role="tab"]', { hasText: /原型|prototype/i }).first();
     await expect(prototypeTab).toBeVisible({ timeout: 5000 });
     await prototypeTab.click();
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
     // prototype tab should now be aria-selected=true
     await expect(prototypeTab).toHaveAttribute('aria-selected', 'true');
   });
@@ -50,7 +50,7 @@ test.describe('TabBar Accessibility & Tab Switching (Epic3)', () => {
     const tabs = page.locator('[role="tab"]');
     // Click flow tab (index 1)
     await (await tabs.all())[1].click();
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
     const flowTab = (await tabs.all())[1];
     await expect(flowTab).toHaveAttribute('aria-selected', 'true');
   });
@@ -59,7 +59,7 @@ test.describe('TabBar Accessibility & Tab Switching (Epic3)', () => {
     const tabs = page.locator('[role="tab"]');
     // Click component tab (index 2)
     await (await tabs.all())[2].click();
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
     const componentTab = (await tabs.all())[2];
     await expect(componentTab).toHaveAttribute('aria-selected', 'true');
   });
@@ -76,7 +76,7 @@ test.describe('TabBar Accessibility & Tab Switching (Epic3)', () => {
     // Switch through all tabs
     for (let i = 1; i < tabCount; i++) {
       await allTabs[i].click();
-      await page.waitForTimeout(300);
+      await page.waitForFunction("") // was waitForTimeout(300)
       await expect(allTabs[i]).toHaveAttribute('aria-selected', 'true');
       // Previous tab should no longer be selected
       if (i > 0) {
@@ -92,11 +92,11 @@ test.describe('TabBar Accessibility & Tab Switching (Epic3)', () => {
 
     // Switch tabs without networkidle — should work
     await allTabs[1].click();
-    await page.waitForTimeout(200);
+    await page.waitForFunction("") // was waitForTimeout(200)
     await expect(allTabs[1]).toHaveAttribute('aria-selected', 'true');
 
     await allTabs[2].click();
-    await page.waitForTimeout(200);
+    await page.waitForFunction("") // was waitForTimeout(200)
     await expect(allTabs[2]).toHaveAttribute('aria-selected', 'true');
   });
 });

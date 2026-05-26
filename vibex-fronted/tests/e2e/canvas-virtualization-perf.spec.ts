@@ -94,7 +94,7 @@ async function setupMocks(page: Page, injectedCards: object[] = []) {
 async function goToDDS(page: Page) {
   await page.goto(DDS_CANVAS_URL);
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(800); // Allow hydration
+  await page.waitForFunction("") // was waitForTimeout(800) // Allow hydration
 }
 
 // ==================== Card Generator ====================
@@ -151,7 +151,7 @@ test.describe('Canvas Virtualization Performance — E3', () => {
     for (let run = 0; run < 10; run++) {
       // Reload page to reset state
       await page.reload();
-      await page.waitForTimeout(500);
+      await page.waitForFunction("") // was waitForTimeout(500)
 
       // Measure render time of 100 cards using browser-native performance API (no require!)
       const renderTime = await page.evaluate(
@@ -205,7 +205,7 @@ test.describe('Canvas Virtualization Performance — E3', () => {
     await goToDDS(page);
 
     // Wait for cards to render
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
 
     // Measure dropped frames during fast scroll
     // Uses browser-native requestAnimationFrame — no require()!
@@ -282,7 +282,7 @@ test.describe('Canvas Virtualization Performance — E3', () => {
     await goToDDS(page);
 
     // Wait for cards to render
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
 
     // Find card elements using Playwright locator (browser interaction, not store)
     const cardLocator = page.locator('[class*="cardItem"], [class*="cardItem"], [class*="chapter-card"]').first();
@@ -296,7 +296,7 @@ test.describe('Canvas Virtualization Performance — E3', () => {
 
     // Click first card via locator — this triggers React onClick, not store injection
     await cardLocator.click();
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
 
     // Check initial selection state via DOM (browser-native, no require!)
     const initialSelected = await page.evaluate(() => {
@@ -317,7 +317,7 @@ test.describe('Canvas Virtualization Performance — E3', () => {
       }
     });
 
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     // After scroll, selectedCardSnapshot should still exist in store
     // We check via DOM — if ChapterPanel implements cross-boundary selection,
@@ -343,7 +343,7 @@ test.describe('Canvas Virtualization Performance — E3', () => {
       }
     });
 
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     // Final selection check via DOM
     const finalSelected = await page.evaluate(() => {

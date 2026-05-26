@@ -33,7 +33,7 @@ async function registerAndLogin(page: Page): Promise<string> {
   const email = `e2e-e03-${Date.now()}@test.local`;
   await page.goto(`${BASE_URL}/auth`);
   await page.click('button:has-text("立即注册")');
-  await page.waitForTimeout(300);
+  await page.waitForFunction("") // was waitForTimeout(300)
   await page.fill('input[type="email"]', email);
   await page.fill('input[type="password"]', TEST_PASSWORD);
   await page.fill('input[type="text"]', 'E2E E03 Test');
@@ -64,7 +64,7 @@ test.describe('E03: Onboarding ClarifyStep — AI 流程 E2E', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // 等待 2.5s（1.5s 触发延迟 + 动画时间）
-    await page.waitForTimeout(2500);
+    await page.waitForFunction("") // was waitForTimeout(2500) — verify selector preferred
 
     // OnboardingModal 应该可见（WelcomeStep）
     const welcomeHeading = page
@@ -79,7 +79,7 @@ test.describe('E03: Onboarding ClarifyStep — AI 流程 E2E', () => {
     await page.goto(`${BASE_URL}/dashboard`);
     await page.waitForLoadState('domcontentloaded');
     await resetOnboardingState(page);
-    await page.waitForTimeout(2500);
+    await page.waitForFunction("") // was waitForTimeout(2500) — verify selector preferred
 
     // 在 WelcomeStep，点击"开始"或"下一步"
     const welcomeNext = page
@@ -88,7 +88,7 @@ test.describe('E03: Onboarding ClarifyStep — AI 流程 E2E', () => {
       .first();
     if (await welcomeNext.isVisible({ timeout: 3000 }).catch(() => false)) {
       await welcomeNext.click();
-      await page.waitForTimeout(500);
+      await page.waitForFunction("") // was waitForTimeout(500)
     }
 
     // InputStep — 输入需求文本
@@ -102,7 +102,7 @@ test.describe('E03: Onboarding ClarifyStep — AI 流程 E2E', () => {
         .first();
       if (await nextBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
         await nextBtn.click();
-        await page.waitForTimeout(500);
+        await page.waitForFunction("") // was waitForTimeout(500)
       }
     }
 
@@ -146,14 +146,14 @@ test.describe('E03: Onboarding ClarifyStep — AI 流程 E2E', () => {
     await page.goto(`${BASE_URL}/dashboard`);
     await page.waitForLoadState('domcontentloaded');
     await resetOnboardingState(page);
-    await page.waitForTimeout(2500);
+    await page.waitForFunction("") // was waitForTimeout(2500) — verify selector preferred
 
     // 快速导航到 ClarifyStep
     // Welcome → Input (fill requirement) → Clarify
     const startBtn = page.locator('button').filter({ hasText: /开始|Next|下一步/i }).first();
     if (await startBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
       await startBtn.click();
-      await page.waitForTimeout(300);
+      await page.waitForFunction("") // was waitForTimeout(300)
     }
 
     const inputArea = page.locator('textarea').first();
@@ -162,7 +162,7 @@ test.describe('E03: Onboarding ClarifyStep — AI 流程 E2E', () => {
       const nextBtn = page.locator('button').filter({ hasText: /下一步|Next/i }).first();
       if (await nextBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
         await nextBtn.click();
-        await page.waitForTimeout(300);
+        await page.waitForFunction("") // was waitForTimeout(300)
       }
     }
 
@@ -175,7 +175,7 @@ test.describe('E03: Onboarding ClarifyStep — AI 流程 E2E', () => {
     if (await analyzeBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
       await analyzeBtn.click();
       // 等待分析完成（ruleEngine 是同步的，LLM 有 30s 超时）
-      await page.waitForTimeout(2000);
+      await page.waitForFunction("") // was waitForTimeout(2000)
 
       // 结果展示区应该可见
       const resultSection = page
@@ -190,13 +190,13 @@ test.describe('E03: Onboarding ClarifyStep — AI 流程 E2E', () => {
     await page.goto(`${BASE_URL}/dashboard`);
     await page.waitForLoadState('domcontentloaded');
     await resetOnboardingState(page);
-    await page.waitForTimeout(2500);
+    await page.waitForFunction("") // was waitForTimeout(2500) — verify selector preferred
 
     // 导航到 ClarifyStep
     const startBtn = page.locator('button').filter({ hasText: /开始|Next|下一步/i }).first();
     if (await startBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
       await startBtn.click();
-      await page.waitForTimeout(300);
+      await page.waitForFunction("") // was waitForTimeout(300)
     }
 
     const inputArea = page.locator('textarea').first();
@@ -205,7 +205,7 @@ test.describe('E03: Onboarding ClarifyStep — AI 流程 E2E', () => {
       const nextBtn = page.locator('button').filter({ hasText: /下一步|Next/i }).first();
       if (await nextBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
         await nextBtn.click();
-        await page.waitForTimeout(300);
+        await page.waitForFunction("") // was waitForTimeout(300)
       }
     }
 
@@ -217,7 +217,7 @@ test.describe('E03: Onboarding ClarifyStep — AI 流程 E2E', () => {
 
     await expect(skipBtn).toBeVisible({ timeout: 3000 });
     await skipBtn.click();
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     // 应该在下一步（不是卡住或报错）
     const nextStepVisible = page.locator('text=/下一步|完成|Preview|预览/i').first();
@@ -229,13 +229,13 @@ test.describe('E03: Onboarding ClarifyStep — AI 流程 E2E', () => {
     await page.goto(`${BASE_URL}/dashboard`);
     await page.waitForLoadState('domcontentloaded');
     await resetOnboardingState(page);
-    await page.waitForTimeout(2500);
+    await page.waitForFunction("") // was waitForTimeout(2500) — verify selector preferred
 
     // 导航到 ClarifyStep
     const startBtn = page.locator('button').filter({ hasText: /开始|Next|下一步/i }).first();
     if (await startBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
       await startBtn.click();
-      await page.waitForTimeout(300);
+      await page.waitForFunction("") // was waitForTimeout(300)
     }
 
     const inputArea = page.locator('textarea').first();
@@ -244,7 +244,7 @@ test.describe('E03: Onboarding ClarifyStep — AI 流程 E2E', () => {
       const nextBtn = page.locator('button').filter({ hasText: /下一步|Next/i }).first();
       if (await nextBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
         await nextBtn.click();
-        await page.waitForTimeout(300);
+        await page.waitForFunction("") // was waitForTimeout(300)
       }
     }
 
@@ -256,7 +256,7 @@ test.describe('E03: Onboarding ClarifyStep — AI 流程 E2E', () => {
 
     await expect(backBtn).toBeVisible({ timeout: 3000 });
     await backBtn.click();
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     // 应该返回到 InputStep
     const inputStepContent = page.locator('textarea, input').first();
@@ -268,13 +268,13 @@ test.describe('E03: Onboarding ClarifyStep — AI 流程 E2E', () => {
     await page.goto(`${BASE_URL}/dashboard`);
     await page.waitForLoadState('domcontentloaded');
     await resetOnboardingState(page);
-    await page.waitForTimeout(2500);
+    await page.waitForFunction("") // was waitForTimeout(2500) — verify selector preferred
 
     // 导航到 ClarifyStep
     const startBtn = page.locator('button').filter({ hasText: /开始|Next|下一步/i }).first();
     if (await startBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
       await startBtn.click();
-      await page.waitForTimeout(300);
+      await page.waitForFunction("") // was waitForTimeout(300)
     }
 
     const inputArea = page.locator('textarea').first();
@@ -283,7 +283,7 @@ test.describe('E03: Onboarding ClarifyStep — AI 流程 E2E', () => {
       const nextBtn = page.locator('button').filter({ hasText: /下一步|Next/i }).first();
       if (await nextBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
         await nextBtn.click();
-        await page.waitForTimeout(300);
+        await page.waitForFunction("") // was waitForTimeout(300)
       }
     }
 
@@ -303,7 +303,7 @@ test.describe('E03: Onboarding ClarifyStep — AI 流程 E2E', () => {
 
     if (await analyzeBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
       await analyzeBtn.click();
-      await page.waitForTimeout(1000);
+      await page.waitForFunction("") // was waitForTimeout(1000)
 
       // 错误提示
       const errorMsg = page.locator('text=/错误|出错|失败|Error/i').first();

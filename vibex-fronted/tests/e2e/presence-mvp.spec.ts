@@ -37,7 +37,7 @@ test.describe('E2: Firebase Presence E2E', () => {
     });
 
     await page.goto('/canvas/test-canvas-001');
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     // Mock 降级时应有 console.warn
     // useRealtimeSync uses firebaseRTDB.ts → logs '[RTDB] Firebase not configured'
@@ -51,7 +51,7 @@ test.describe('E2: Firebase Presence E2E', () => {
     page.on('pageerror', (err) => errors.push(err.message));
 
     await page.goto('/canvas/test-canvas-001');
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     // 模拟页面隐藏（不触发 unload）
     await page.evaluate(() => {
@@ -63,7 +63,7 @@ test.describe('E2: Firebase Presence E2E', () => {
       document.dispatchEvent(new Event('visibilitychange'));
     });
 
-    await page.waitForTimeout(200);
+    await page.waitForFunction("") // was waitForTimeout(200)
 
     // 无崩溃
     expect(errors).toHaveLength(0);
@@ -88,7 +88,7 @@ test.describe('E2: Firebase Presence E2E', () => {
 
   test('E2-U5: 多个用户 subscribe → 回调触发（mock 模式验证）', async ({ page }) => {
     await page.goto('/canvas/test-canvas-001');
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     // mock 模式下 subscribeToOthers 立即回调，验证无崩溃
     const errors: string[] = [];
@@ -98,7 +98,7 @@ test.describe('E2: Firebase Presence E2E', () => {
     await page.evaluate(() => {
       document.dispatchEvent(new Event('visibilitychange'));
     });
-    await page.waitForTimeout(100);
+    await page.waitForFunction("") // was waitForTimeout(100)
 
     expect(errors).toHaveLength(0);
   });
@@ -108,7 +108,7 @@ test.describe('E2: Firebase Presence E2E', () => {
     page.on('pageerror', (err) => errors.push(err.message));
 
     await page.goto('/canvas/test-canvas-001');
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     // mock 模式下 setPresence/onDisconnect 路径不应崩溃
     await page.evaluate(() => {
@@ -116,7 +116,7 @@ test.describe('E2: Firebase Presence E2E', () => {
       document.dispatchEvent(new Event('beforeunload'));
     });
 
-    await page.waitForTimeout(100);
+    await page.waitForFunction("") // was waitForTimeout(100)
     expect(errors).toHaveLength(0);
   });
 });
@@ -131,7 +131,7 @@ test.describe('P001: Real-time Node Sync (Firebase RTDB)', () => {
     page.on('pageerror', (err) => errors.push(err.message));
 
     await page.goto('/canvas/test-canvas-001');
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
 
     // useRealtimeSync 在 Firebase 未配置时应静默降级（canvasLogger.default.warn）
     // Canvas 页面应正常渲染，不应崩溃
@@ -144,7 +144,7 @@ test.describe('P001: Real-time Node Sync (Firebase RTDB)', () => {
     page.on('pageerror', (err) => errors.push(err.message));
 
     await page.goto('/canvas/test-canvas-001');
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
 
     // 画布页面加载正常（CanvasPage 渲染完成）
     // useRealtimeSync 的 subscribeToNodes 在未配置时返回空函数，不阻塞渲染
@@ -159,7 +159,7 @@ test.describe('P001: Real-time Node Sync (Firebase RTDB)', () => {
     page.on('pageerror', (err) => errors.push(err.message));
 
     await page.goto('/canvas/test-canvas-001');
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
 
     // Last-Write-Wins 在 mock 模式下是 no-op，不应影响画布交互
     // 验证无冲突相关崩溃

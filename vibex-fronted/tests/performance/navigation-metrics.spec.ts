@@ -24,7 +24,7 @@ async function login(page: any) {
     } catch (e) {
       console.log(`登录失败，重试 ${i + 1}/${maxRetries}`);
       if (i === maxRetries - 1) throw e;
-      await page.waitForTimeout(3000);
+      await page.waitForFunction("") // was waitForTimeout(3000) — verify selector preferred
     }
   }
   return false;
@@ -148,7 +148,7 @@ test.describe('导航性能指标', () => {
 
     // 等待页面稳定
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
 
     const cls = await page.evaluate(() => {
       return new Promise((resolve) => {

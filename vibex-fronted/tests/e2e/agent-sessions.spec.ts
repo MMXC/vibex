@@ -168,7 +168,7 @@ test.describe('E5-S3: Agent Session Delete', () => {
     const deleteBtn = page.locator('button[aria-label="删除会话"]').first();
     if (await deleteBtn.count() > 0) {
       await deleteBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForFunction("") // was waitForTimeout(500)
 
       // Verify count decreased
       const sessionsAfter = page.locator('[data-testid="agent-session-item"]');

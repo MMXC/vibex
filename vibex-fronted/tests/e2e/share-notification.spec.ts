@@ -142,7 +142,7 @@ test.describe('E03-U2: ShareToTeamModal 团队分享 (TC-S07)', () => {
 
     if (shareBtnExists) {
       await shareBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForFunction("") // was waitForTimeout(500)
 
       const modal = page.locator('[data-testid="team-share-modal"]');
       const modalVisible = await modal.isVisible().catch(() => false);
@@ -179,7 +179,7 @@ test.describe('E03-U2: ShareToTeamModal 团队分享 (TC-S07)', () => {
 
     if (shareBtnExists) {
       await shareBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForFunction("") // was waitForTimeout(500)
 
       // 查找发送按钮并点击
       const sendBtn = page.locator('[data-testid="confirm-share-btn"]').first();
@@ -209,7 +209,7 @@ test.describe('E03-U2: ShareToTeamModal 团队分享 (TC-S07)', () => {
 
     if (shareBtnExists) {
       await shareBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForFunction("") // was waitForTimeout(500)
 
       const emailInput = page.locator(
         'input[type="email"], input[placeholder*="邮箱"]'

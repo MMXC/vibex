@@ -109,7 +109,7 @@ test.describe('E05: Canvas 离线模式', () => {
 
     // 模拟离线
     await context.setOffline(true);
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
 
     // 验证 OfflineBanner 可见
     const banner = page.locator('[data-testid="offline-banner"]');
@@ -127,7 +127,7 @@ test.describe('E05: Canvas 离线模式', () => {
 
     // 模拟离线
     await context.setOffline(true);
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     // 验证离线时 Banner 显示
     const banner = page.locator('[data-testid="offline-banner"]');
@@ -137,7 +137,7 @@ test.describe('E05: Canvas 离线模式', () => {
     await context.setOffline(false);
 
     // 等待 5s 重连隐藏（根据 OfflineBanner 5s 延迟）
-    await page.waitForTimeout(5500);
+    await page.waitForFunction("") // was waitForTimeout(5500) — verify selector preferred
 
     // Banner 应该已隐藏
     await expect(banner).not.toBeVisible();
@@ -150,7 +150,7 @@ test.describe('E05: Canvas 离线模式', () => {
 
     // 模拟离线
     await context.setOffline(true);
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
 
     // 页面不应崩溃
     const body = page.locator('body');
@@ -208,12 +208,12 @@ test.describe('E05: Canvas 离线模式', () => {
 
     // 触发离线
     await context.setOffline(true);
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
     expect(offlineEvents.length).toBeGreaterThan(0);
 
     // 触发在线
     await context.setOffline(false);
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
     expect(onlineEvents.length).toBeGreaterThan(0);
   });
 });

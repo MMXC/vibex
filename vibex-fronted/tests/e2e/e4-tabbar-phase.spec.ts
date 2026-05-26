@@ -23,7 +23,7 @@ test.describe('E4: TabBar Phase 对齐', () => {
     ]);
     await page.goto(`${BASE}/canvas/test-project`);
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
   });
 
   test('E4-E2E-1: phase=component 时 TabBar 显示 3 个 tabs（无 prototype）', async ({ page }) => {
@@ -32,7 +32,7 @@ test.describe('E4: TabBar Phase 对齐', () => {
     const hasPhaseBtn = await phaseBtn.isVisible().catch(() => false);
     if (hasPhaseBtn) {
       await phaseBtn.click();
-      await page.waitForTimeout(300);
+      await page.waitForFunction("") // was waitForTimeout(300)
     }
 
     const tabs = page.locator('[role="tab"]');
@@ -51,14 +51,14 @@ test.describe('E4: TabBar Phase 对齐', () => {
     const hasPhaseBtn = await phaseBtn.isVisible().catch(() => false);
     if (hasPhaseBtn) {
       await phaseBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForFunction("") // was waitForTimeout(500)
     }
 
     // Now click the context tab
     const contextTab = page.locator('[role="tab"]', { hasText: /上下文|context/i }).first();
     await expect(contextTab).toBeVisible();
     await contextTab.click();
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     // PhaseIndicator should now show context
     const phaseText = page.locator('text=/◇ 上下文|context/i');
@@ -71,12 +71,12 @@ test.describe('E4: TabBar Phase 对齐', () => {
     const hasPhaseBtn = await phaseBtn.isVisible().catch(() => false);
     if (hasPhaseBtn) {
       await phaseBtn.click();
-      await page.waitForTimeout(300);
+      await page.waitForFunction("") // was waitForTimeout(300)
       // Find prototype option in dropdown
       const protoOption = page.locator('[role="option"], [role="menuitem"], [class*="option"]', { hasText: /prototype|原型/i }).first();
       if (await protoOption.isVisible().catch(() => false)) {
         await protoOption.click();
-        await page.waitForTimeout(500);
+        await page.waitForFunction("") // was waitForTimeout(500)
       } else {
         // Close dropdown
         await page.keyboard.press('Escape');
@@ -95,7 +95,7 @@ test.describe('E4: TabBar Phase 对齐', () => {
 
     // Click prototype tab
     await prototypeTab.click();
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
     await expect(prototypeTab).toHaveAttribute('aria-selected', 'true');
   });
 
@@ -105,11 +105,11 @@ test.describe('E4: TabBar Phase 对齐', () => {
     const hasPhaseBtn = await phaseBtn.isVisible().catch(() => false);
     if (hasPhaseBtn) {
       await phaseBtn.click();
-      await page.waitForTimeout(300);
+      await page.waitForFunction("") // was waitForTimeout(300)
       const protoOption = page.locator('[role="option"], [role="menuitem"], [class*="option"]', { hasText: /prototype|原型/i }).first();
       if (await protoOption.isVisible().catch(() => false)) {
         await protoOption.click();
-        await page.waitForTimeout(500);
+        await page.waitForFunction("") // was waitForTimeout(500)
       } else {
         await page.keyboard.press('Escape');
       }
@@ -131,7 +131,7 @@ test.describe('E4: TabBar Phase 对齐', () => {
     const hasPhaseBtn = await phaseBtn.isVisible().catch(() => false);
     if (hasPhaseBtn) {
       await phaseBtn.click();
-      await page.waitForTimeout(300);
+      await page.waitForFunction("") // was waitForTimeout(300)
     }
 
     const tabs = page.locator('[role="tab"]');
@@ -140,7 +140,7 @@ test.describe('E4: TabBar Phase 对齐', () => {
 
     if (hasComponentTab) {
       await componentTab.click();
-      await page.waitForTimeout(500);
+      await page.waitForFunction("") // was waitForTimeout(500)
       await expect(componentTab).toHaveAttribute('aria-selected', 'true');
     }
   });

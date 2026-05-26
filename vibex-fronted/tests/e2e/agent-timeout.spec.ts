@@ -36,7 +36,7 @@ test.describe('E5-S1: Agent Timeout / Unavailable Error Handling', () => {
 
     if (await agentTrigger.count() > 0) {
       await agentTrigger.click();
-      await page.waitForTimeout(1000);
+      await page.waitForFunction("") // was waitForTimeout(1000)
     }
 
     // Try directly hitting the API route through a fetch

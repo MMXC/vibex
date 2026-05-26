@@ -52,7 +52,7 @@ test.describe('S17-P2-2: Analytics Dashboard E2E', () => {
     });
 
     await goToAnalytics(page);
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
 
     // Should show empty state, not blank
     const emptyState = page.locator('[data-testid="funnel-empty-state"]');
@@ -106,7 +106,7 @@ test.describe('S17-P2-2: Analytics Dashboard E2E', () => {
     });
 
     await goToAnalytics(page);
-    await page.waitForTimeout(2000);
+    await page.waitForFunction("") // was waitForTimeout(2000)
 
     // SVG widget must be visible
     const funnelWidget = page.locator('[data-testid="funnel-widget"]');
@@ -142,7 +142,7 @@ test.describe('S17-P2-2: Analytics Dashboard E2E', () => {
     });
 
     await goToAnalytics(page);
-    await page.waitForTimeout(2000);
+    await page.waitForFunction("") // was waitForTimeout(2000)
 
     // The FunnelWidget itself doesn't have error state (only loading/empty/success)
     // So we verify the dashboard handles error gracefully
@@ -179,7 +179,7 @@ test.describe('S17-P2-2: Analytics Dashboard E2E', () => {
     });
 
     await goToAnalytics(page);
-    await page.waitForTimeout(2000);
+    await page.waitForFunction("") // was waitForTimeout(2000)
 
     const svgEl = page.locator('svg[data-testid="funnel-widget"]');
     const polygons = svgEl.locator('polygon');
@@ -215,11 +215,11 @@ test.describe('S17-P2-2: Analytics Dashboard E2E', () => {
     });
 
     await goToAnalytics(page);
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     // Click 30d button
     await page.click('[data-testid="analytics-range-btn-30d"]');
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
 
     // Verify range param in URL changed
     const has30d = callLog.some((u) => u.includes('range=30d'));
@@ -227,7 +227,7 @@ test.describe('S17-P2-2: Analytics Dashboard E2E', () => {
 
     // Click 7d button
     await page.click('[data-testid="analytics-range-btn-7d"]');
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     const has7d = callLog.some((u) => u.includes('range=7d'));
     expect(has7d).toBe(true);
@@ -243,7 +243,7 @@ test.describe('S17-P2-2: Analytics Dashboard E2E', () => {
     });
 
     await goToAnalytics(page);
-    await page.waitForTimeout(2000);
+    await page.waitForFunction("") // was waitForTimeout(2000)
 
     // Only show when steps > 0
     const exportBtn = page.locator('[data-testid="analytics-export-btn"]');

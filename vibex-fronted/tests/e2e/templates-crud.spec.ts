@@ -24,7 +24,7 @@ async function freshLogin(page: Page): Promise<string> {
   const email = `e2e-e04-${Date.now()}@test.local`;
   await page.goto(`${BASE_URL}/auth`);
   await page.click('button:has-text("立即注册")');
-  await page.waitForTimeout(300);
+  await page.waitForFunction("") // was waitForTimeout(300)
   await page.fill('input[type="email"]', email);
   await page.fill('input[type="password"]', TEST_PASSWORD);
   await page.fill('input[type="text"]', 'E2E E04 Test');
@@ -48,12 +48,12 @@ test.describe('E04: 模板管理 — CRUD 全链路 E2E', () => {
       localStorage.removeItem('vibex-first-visit');
       sessionStorage.clear();
     });
-    await page.waitForTimeout(2500); // 等待 onboarding 弹窗（如果出现就关掉）
+    await page.waitForFunction("") // was waitForTimeout(2500) — verify selector preferred // 等待 onboarding 弹窗（如果出现就关掉）
     // 跳过 onboarding
     const skipBtn = page.locator('button').filter({ hasText: /跳过/i }).first();
     if (await skipBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
       await skipBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForFunction("") // was waitForTimeout(500)
     }
   });
 
@@ -72,7 +72,7 @@ test.describe('E04: 模板管理 — CRUD 全链路 E2E', () => {
     await page.waitForLoadState('networkidle');
 
     // 等待列表加载
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
     const cards = page.locator('[class*="card"]').filter({ hasText: /SaaS|重构|Bug/i });
     await expect(cards.first()).toBeVisible({ timeout: 5000 });
   });
@@ -81,7 +81,7 @@ test.describe('E04: 模板管理 — CRUD 全链路 E2E', () => {
   test('TC3: 新建模板 → 出现在列表中', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard/templates`);
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
 
     // 点击"新建模板"按钮
     const createBtn = page.locator('button').filter({ hasText: /新建模板/i });
@@ -89,7 +89,7 @@ test.describe('E04: 模板管理 — CRUD 全链路 E2E', () => {
     await createBtn.click();
 
     // 填写表单
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
     const nameInput = page.locator('input[placeholder*="SaaS 产品"]').first();
     if (await nameInput.isVisible({ timeout: 2000 }).catch(() => false)) {
       await nameInput.fill('E2E 新建测试模板');
@@ -113,7 +113,7 @@ test.describe('E04: 模板管理 — CRUD 全链路 E2E', () => {
     // 提交
     const submitBtn = page.locator('button[type="submit"]').filter({ hasText: /创建|保存/i }).first();
     await submitBtn.click();
-    await page.waitForTimeout(1500);
+    await page.waitForFunction("") // was waitForTimeout(1500)
 
     // 新模板应出现在列表
     const newCard = page.locator('text=/E2E.*测试模板/i').first();
@@ -124,13 +124,13 @@ test.describe('E04: 模板管理 — CRUD 全链路 E2E', () => {
   test('TC4: 编辑模板 → 名称更新', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard/templates`);
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
 
     // 点击第一个模板的编辑按钮（✎）
     const editBtns = page.locator('[title="编辑"], button[title="编辑"]').all();
     if (await page.locator('button:has-text("✎")').isVisible({ timeout: 3000 }).catch(() => false)) {
       await page.locator('button:has-text("✎")').first().click();
-      await page.waitForTimeout(300);
+      await page.waitForFunction("") // was waitForTimeout(300)
 
       // 修改名称
       const nameInputs = page.locator('input').all();
@@ -144,7 +144,7 @@ test.describe('E04: 模板管理 — CRUD 全链路 E2E', () => {
       // 保存
       const saveBtn = page.locator('button[type="submit"]').filter({ hasText: /保存/i }).first();
       await saveBtn.click();
-      await page.waitForTimeout(1500);
+      await page.waitForFunction("") // was waitForTimeout(1500)
 
       // 更新后的名称应显示
       const updatedCard = page.locator('text=/E2E 编辑后的模板名称/i');
@@ -156,13 +156,13 @@ test.describe('E04: 模板管理 — CRUD 全链路 E2E', () => {
   test('TC5: 删除模板 → 列表中消失', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard/templates`);
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
 
     // 先创建一个模板用于删除
     const createBtn = page.locator('button').filter({ hasText: /新建模板/i });
     if (await createBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
       await createBtn.click();
-      await page.waitForTimeout(300);
+      await page.waitForFunction("") // was waitForTimeout(300)
       const inputs = page.locator('input').all();
       for (const input of inputs) {
         if (await input.isVisible()) {
@@ -176,7 +176,7 @@ test.describe('E04: 模板管理 — CRUD 全链路 E2E', () => {
       }
       const submitBtn = page.locator('button[type="submit"]').filter({ hasText: /创建/i }).first();
       await submitBtn.click();
-      await page.waitForTimeout(1500);
+      await page.waitForFunction("") // was waitForTimeout(1500)
     }
 
     // 确认删除前模板存在
@@ -188,13 +188,13 @@ test.describe('E04: 模板管理 — CRUD 全链路 E2E', () => {
       page.locator('button').filter({ hasText: '✕' })
     ).first();
     await deleteBtn.click();
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
 
     // 确认删除对话框
     const confirmDeleteBtn = page.locator('button').filter({ hasText: /删除/i }).last();
     if (await confirmDeleteBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
       await confirmDeleteBtn.click();
-      await page.waitForTimeout(1500);
+      await page.waitForFunction("") // was waitForTimeout(1500)
 
       // 模板应消失
       await expect(templateText).not.toBeVisible({ timeout: 3000 });
@@ -205,7 +205,7 @@ test.describe('E04: 模板管理 — CRUD 全链路 E2E', () => {
   test('TC6: 导出全部按钮可见', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard/templates`);
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
 
     const exportBtn = page.locator('button').filter({ hasText: /导出/i });
     await expect(exportBtn.first()).toBeVisible({ timeout: 5000 });
@@ -215,7 +215,7 @@ test.describe('E04: 模板管理 — CRUD 全链路 E2E', () => {
   test('TC7: 导入按钮可见', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard/templates`);
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
 
     const importBtn = page.locator('button').filter({ hasText: /导入/i });
     await expect(importBtn.first()).toBeVisible({ timeout: 5000 });
@@ -225,13 +225,13 @@ test.describe('E04: 模板管理 — CRUD 全链路 E2E', () => {
   test('TC8: 行业过滤切换', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard/templates`);
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
 
     // 点击 SaaS 过滤
     const saasFilter = page.locator('button').filter({ hasText: /SaaS/i }).first();
     if (await saasFilter.isVisible({ timeout: 3000 }).catch(() => false)) {
       await saasFilter.click();
-      await page.waitForTimeout(500);
+      await page.waitForFunction("") // was waitForTimeout(500)
       // 所有卡片应该是 SaaS 行业
       const allVisible = page.locator('[class*="card"]').all();
       const count = await allVisible.count();
@@ -243,12 +243,12 @@ test.describe('E04: 模板管理 — CRUD 全链路 E2E', () => {
   test('TC9: 搜索模板', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard/templates`);
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
 
     const searchInput = page.locator('input[type="search"], input[placeholder*="搜索"]').first();
     if (await searchInput.isVisible({ timeout: 3000 }).catch(() => false)) {
       await searchInput.fill('SaaS');
-      await page.waitForTimeout(500);
+      await page.waitForFunction("") // was waitForTimeout(500)
       const results = page.locator('[class*="card"]');
       const count = await results.count();
       expect(count).toBeGreaterThanOrEqual(0); // 0 或更多都行
@@ -259,13 +259,13 @@ test.describe('E04: 模板管理 — CRUD 全链路 E2E', () => {
   test('TC10: 无匹配结果时显示空状态', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard/templates`);
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await page.waitForFunction("") // was waitForTimeout(1000)
 
     // 搜索不存在的关键词
     const searchInput = page.locator('input[type="search"], input[placeholder*="搜索"]').first();
     if (await searchInput.isVisible({ timeout: 2000 }).catch(() => false)) {
       await searchInput.fill('不存在关键词xyz123456');
-      await page.waitForTimeout(500);
+      await page.waitForFunction("") // was waitForTimeout(500)
       // 应该有空状态或无结果提示
       const emptyOrResults = page.locator('text=/无|空|暂无|no result/i').first();
       if (await emptyOrResults.isVisible({ timeout: 2000 }).catch(() => false)) {

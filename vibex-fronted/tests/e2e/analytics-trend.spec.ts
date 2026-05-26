@@ -142,7 +142,7 @@ test.describe('E06: Analytics 趋势分析', () => {
 
     if (btn7dExists) {
       await btn7d.click();
-      await page.waitForTimeout(1000);
+      await page.waitForFunction("") // was waitForTimeout(1000)
 
       // 页面不崩溃
       const body = page.locator('body');

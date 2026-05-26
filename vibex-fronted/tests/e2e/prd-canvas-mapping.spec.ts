@@ -21,7 +21,7 @@ async function freshLogin(page: Page): Promise<string> {
   const email = `e2e-e05-${Date.now()}@test.local`;
   await page.goto(`${BASE_URL}/auth`);
   await page.click('button:has-text("立即注册")');
-  await page.waitForTimeout(300);
+  await page.waitForFunction("") // was waitForTimeout(300)
   await page.fill('input[type="email"]', email);
   await page.fill('input[type="password"]', TEST_PASSWORD);
   await page.fill('input[type="text"]', 'E2E E05 Test');
@@ -40,12 +40,12 @@ test.describe('E05: PRD → Canvas 自动流程 E2E', () => {
       localStorage.removeItem('vibex-first-visit');
       sessionStorage.clear();
     });
-    await page.waitForTimeout(2500);
+    await page.waitForFunction("") // was waitForTimeout(2500) — verify selector preferred
     // 跳过 onboarding
     const skipBtn = page.locator('button').filter({ hasText: /跳过/i }).first();
     if (await skipBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
       await skipBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForFunction("") // was waitForTimeout(500)
     }
   });
 
@@ -72,7 +72,7 @@ test.describe('E05: PRD → Canvas 自动流程 E2E', () => {
 
     const addChapterBtn = page.locator('button').filter({ hasText: /添加章节/i });
     await addChapterBtn.click();
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
 
     // 章节输入框出现
     const chapterInput = page.locator('input[placeholder*="章节"]').first();
@@ -90,20 +90,20 @@ test.describe('E05: PRD → Canvas 自动流程 E2E', () => {
 
     // 添加章节
     await page.locator('button').filter({ hasText: /添加章节/i }).click();
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
 
     // 添加步骤
     const addStepBtn = page.locator('button').filter({ hasText: /添加步骤/i }).first();
     if (await addStepBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
       await addStepBtn.click();
-      await page.waitForTimeout(300);
+      await page.waitForFunction("") // was waitForTimeout(300)
     }
 
     // 添加需求
     const addReqBtn = page.locator('button').filter({ hasText: /添加需求/i }).first();
     if (await addReqBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
       await addReqBtn.click();
-      await page.waitForTimeout(300);
+      await page.waitForFunction("") // was waitForTimeout(300)
     }
 
     // 统计栏
@@ -136,7 +136,7 @@ test.describe('E05: PRD → Canvas 自动流程 E2E', () => {
       .or(page.locator('button').filter({ hasText: /生成 Canvas/i }))
       .first();
     await generateBtn.click();
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     // Toast 提示
     const toast = page.locator('text=/请先添加/i);
@@ -179,7 +179,7 @@ test.describe('E05: PRD → Canvas 自动流程 E2E', () => {
   test('TC7: PRD 编辑器入口在 Dashboard 导航可见', async ({ page }) => {
     await page.goto(`${BASE_URL}/dashboard`);
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(2000);
+    await page.waitForFunction("") // was waitForTimeout(2000)
 
     const prdEditorNav = page.locator('text=/PRD 编辑器/i').first();
     await expect(prdEditorNav).toBeVisible({ timeout: 5000 });

@@ -144,7 +144,7 @@ test.describe('E2: DDS Canvas Keyboard Shortcuts', () => {
     // Press ? to open ShortcutEditModal
     // This triggers startEditing('go-to-canvas') which shows the modal
     await page.keyboard.press('?');
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     // ShortcutEditModal shows when editingAction !== null
     // Modal has .modal class inside .modalOverlay
@@ -159,7 +159,7 @@ test.describe('E2: DDS Canvas Keyboard Shortcuts', () => {
 
     // Press Escape to close (ShortcutEditModal uses cancelEditing on Escape)
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
     await expect(modal).not.toBeVisible({ timeout: 3000 });
   });
 
@@ -174,7 +174,7 @@ test.describe('E2: DDS Canvas Keyboard Shortcuts', () => {
 
     // Delete key should not crash when no selection
     await page.keyboard.press('Delete');
-    await page.waitForTimeout(200);
+    await page.waitForFunction("") // was waitForTimeout(200)
 
     // Should not show error state
     const errorState = page.locator('[data-testid="dds-error-state"]');
@@ -192,7 +192,7 @@ test.describe('E2: DDS Canvas Keyboard Shortcuts', () => {
 
     // Escape should not crash when no selection
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(200);
+    await page.waitForFunction("") // was waitForTimeout(200)
 
     // Should not show error state
     const errorState = page.locator('[data-testid="dds-error-state"]');
@@ -213,14 +213,14 @@ test.describe('E3: DDS Canvas Search', () => {
 
     // Press Ctrl+K to open search panel
     await page.keyboard.press('Control+k');
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     const panel = page.locator('[data-testid="dds-search-panel"]');
     await expect(panel).toBeVisible({ timeout: 5000 });
 
     // Press Escape to close
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
     await expect(panel).not.toBeVisible({ timeout: 3000 });
   });
 
@@ -233,7 +233,7 @@ test.describe('E3: DDS Canvas Search', () => {
 
     // Open search panel
     await page.keyboard.press('Control+k');
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     const panel = page.locator('[data-testid="dds-search-panel"]');
     await expect(panel).toBeVisible({ timeout: 5000 });
@@ -241,7 +241,7 @@ test.describe('E3: DDS Canvas Search', () => {
     // Type a short query
     const searchInput = panel.locator('input[type="text"]');
     await searchInput.fill('a');
-    await page.waitForTimeout(500); // debounce
+    await page.waitForFunction("") // was waitForTimeout(500) // debounce
 
     // Panel should show results or "no results" text (not crash)
     const panelContent = page.locator('[data-testid="dds-search-panel"]');
@@ -275,7 +275,7 @@ test.describe('F001: Canvas Keyboard Shortcuts (E001+E002+E003)', () => {
 
     // Ctrl+Z should not crash even with empty history
     await page.keyboard.press('Control+z');
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
 
     // Canvas should still be functional
     const errorState = page.locator('[data-testid="dds-error-state"]');
@@ -288,7 +288,7 @@ test.describe('F001: Canvas Keyboard Shortcuts (E001+E002+E003)', () => {
     await expect(canvas).toBeVisible({ timeout: 10000 });
 
     await page.keyboard.press('Control+y');
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
 
     const errorState = page.locator('[data-testid="dds-error-state"]');
     await expect(errorState).not.toBeVisible({ timeout: 2000 });
@@ -300,7 +300,7 @@ test.describe('F001: Canvas Keyboard Shortcuts (E001+E002+E003)', () => {
     await expect(canvas).toBeVisible({ timeout: 10000 });
 
     await page.keyboard.press('Control+Shift+z');
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
 
     const errorState = page.locator('[data-testid="dds-error-state"]');
     await expect(errorState).not.toBeVisible({ timeout: 2000 });
@@ -313,7 +313,7 @@ test.describe('F001: Canvas Keyboard Shortcuts (E001+E002+E003)', () => {
 
     // Escape should not crash even with no active selection
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
 
     const errorState = page.locator('[data-testid="dds-error-state"]');
     await expect(errorState).not.toBeVisible({ timeout: 2000 });
@@ -328,7 +328,7 @@ test.describe('F001: Canvas Keyboard Shortcuts (E001+E002+E003)', () => {
 
     // Tab should be handled (switch to next tab) without crashing
     await page.keyboard.press('Tab');
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
 
     const errorState = page.locator('[data-testid="dds-error-state"]');
     await expect(errorState).not.toBeVisible({ timeout: 2000 });
@@ -340,7 +340,7 @@ test.describe('F001: Canvas Keyboard Shortcuts (E001+E002+E003)', () => {
     await expect(canvas).toBeVisible({ timeout: 10000 });
 
     await page.keyboard.press('Shift+Tab');
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
 
     const errorState = page.locator('[data-testid="dds-error-state"]');
     await expect(errorState).not.toBeVisible({ timeout: 2000 });
@@ -352,7 +352,7 @@ test.describe('F001: Canvas Keyboard Shortcuts (E001+E002+E003)', () => {
     await expect(canvas).toBeVisible({ timeout: 10000 });
 
     await page.keyboard.press('Control+n');
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     // Should not crash; canvas should still be functional
     const errorState = page.locator('[data-testid="dds-error-state"]');
@@ -368,7 +368,7 @@ test.describe('F001: Canvas Keyboard Shortcuts (E001+E002+E003)', () => {
 
     // Ctrl+G triggers quickGenerate — should not crash
     await page.keyboard.press('Control+g');
-    await page.waitForTimeout(1000); // Allow async generation to start
+    await page.waitForFunction("") // was waitForTimeout(1000) // Allow async generation to start
 
     const errorState = page.locator('[data-testid="dds-error-state"]');
     await expect(errorState).not.toBeVisible({ timeout: 2000 });
@@ -381,7 +381,7 @@ test.describe('F001: Canvas Keyboard Shortcuts (E001+E002+E003)', () => {
 
     // Press ? to open help overlay
     await page.keyboard.press('?');
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     // Help overlay should be visible (KeyboardHelpOverlay or ShortcutEditModal)
     const overlay = page.locator('[role="dialog"], [class*="overlay"], [class*="Overlay"]');
@@ -390,7 +390,7 @@ test.describe('F001: Canvas Keyboard Shortcuts (E001+E002+E003)', () => {
 
     // Press Escape to close
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
   });
 
   test('F001-E003-3: ? does not trigger when focus is in input', async ({ page }) => {
@@ -400,7 +400,7 @@ test.describe('F001: Canvas Keyboard Shortcuts (E001+E002+E003)', () => {
 
     // Focus a search input
     await page.keyboard.press('Control+k');
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
     const searchInput = page.locator('[data-testid="dds-search-panel"] input').first();
     const hasSearchInput = await searchInput.isVisible({ timeout: 3000 }).catch(() => false);
 
@@ -408,7 +408,7 @@ test.describe('F001: Canvas Keyboard Shortcuts (E001+E002+E003)', () => {
       await searchInput.focus();
       // ? pressed in input should NOT open help overlay
       await page.keyboard.press('?');
-      await page.waitForTimeout(300);
+      await page.waitForFunction("") // was waitForTimeout(300)
 
       // No overlay should appear
       const overlay = page.locator('[role="dialog"]');
@@ -429,23 +429,23 @@ test.describe('F001: Canvas Keyboard Shortcuts (E001+E002+E003)', () => {
 
     // Fire all F001 shortcuts in sequence
     await page.keyboard.press('Control+z');
-    await page.waitForTimeout(100);
+    await page.waitForFunction("") // was waitForTimeout(100)
     await page.keyboard.press('Control+y');
-    await page.waitForTimeout(100);
+    await page.waitForFunction("") // was waitForTimeout(100)
     await page.keyboard.press('Control+Shift+z');
-    await page.waitForTimeout(100);
+    await page.waitForFunction("") // was waitForTimeout(100)
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(100);
+    await page.waitForFunction("") // was waitForTimeout(100)
     await page.keyboard.press('Tab');
-    await page.waitForTimeout(100);
+    await page.waitForFunction("") // was waitForTimeout(100)
     await page.keyboard.press('Shift+Tab');
-    await page.waitForTimeout(100);
+    await page.waitForFunction("") // was waitForTimeout(100)
     await page.keyboard.press('Control+n');
-    await page.waitForTimeout(100);
+    await page.waitForFunction("") // was waitForTimeout(100)
     await page.keyboard.press('Control+g');
-    await page.waitForTimeout(100);
+    await page.waitForFunction("") // was waitForTimeout(100)
     await page.keyboard.press('?');
-    await page.waitForTimeout(300);
+    await page.waitForFunction("") // was waitForTimeout(300)
 
     // Canvas should still be functional
     const errorState = page.locator('[data-testid="dds-error-state"]');

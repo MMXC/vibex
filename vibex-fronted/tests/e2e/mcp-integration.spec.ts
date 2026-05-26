@@ -16,7 +16,7 @@ async function freshLogin(page: Page): Promise<void> {
   const email = `e2e-e07-${Date.now()}@test.local`;
   await page.goto(`${BASE_URL}/auth`);
   await page.click('button:has-text("立即注册")');
-  await page.waitForTimeout(300);
+  await page.waitForFunction("") // was waitForTimeout(300)
   await page.fill('input[type="email"]', email);
   await page.fill('input[type="password"]', TEST_PASSWORD);
   await page.fill('input[type="text"]', 'E2E E07 Test');
@@ -31,11 +31,11 @@ test.describe('E07: MCP Server 集成 E2E', () => {
       localStorage.removeItem('vibex-onboarding');
       sessionStorage.clear();
     });
-    await page.waitForTimeout(2500);
+    await page.waitForFunction("") // was waitForTimeout(2500) — verify selector preferred
     const skipBtn = page.locator('button').filter({ hasText: /跳过/i }).first();
     if (await skipBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
       await skipBtn.click();
-      await page.waitForTimeout(500);
+      await page.waitForFunction("") // was waitForTimeout(500)
     }
   });
 

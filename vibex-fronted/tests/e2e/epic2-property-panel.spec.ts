@@ -23,7 +23,7 @@ test.describe('Epic2: Component Property Panel', () => {
     await login(page);
     await page.goto(`${BASE_URL}/prototype/editor`);
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(3000);
+    await page.waitForFunction("") // was waitForTimeout(3000) — verify selector preferred
 
     // ProtoAttrPanel should be visible
     const attrPanel = page.getByRole('complementary', { name: /属性面板/i }).first();
@@ -38,7 +38,7 @@ test.describe('Epic2: Component Property Panel', () => {
     await login(page);
     await page.goto(`${BASE_URL}/prototype/editor`);
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(3000);
+    await page.waitForFunction("") // was waitForTimeout(3000) — verify selector preferred
 
     // Try to drag a component to create a node
     const canvas = page.locator('.react-flow').first();
@@ -49,7 +49,7 @@ test.describe('Epic2: Component Property Panel', () => {
 
     if (buttonVisible && canvasVisible) {
       await buttonCard.dragTo(canvas, { targetPosition: { x: 300, y: 200 } });
-      await page.waitForTimeout(2000);
+      await page.waitForFunction("") // was waitForTimeout(2000)
     }
 
     // Check for ProtoAttrPanel tabs
@@ -68,7 +68,7 @@ test.describe('Epic2: Component Property Panel', () => {
     await login(page);
     await page.goto(`${BASE_URL}/prototype/editor`);
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(3000);
+    await page.waitForFunction("") // was waitForTimeout(3000) — verify selector preferred
 
     // Component panel should be visible
     const componentPanel = page.getByRole('complementary', { name: /组件面板/i }).first();

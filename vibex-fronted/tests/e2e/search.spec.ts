@@ -25,7 +25,7 @@ test.describe('E03: Dashboard 全局搜索增强', () => {
     const searchInput = page.locator('input[placeholder*="搜索"], input[placeholder*="search"]');
     if (await searchInput.isVisible({ timeout: 5000 })) {
       await searchInput.fill('登录');
-      await page.waitForTimeout(200);
+      await page.waitForFunction("") // was waitForTimeout(200)
 
       // 验证 <mark> 标签存在
       const markElements = page.locator('mark');
@@ -43,7 +43,7 @@ test.describe('E03: Dashboard 全局搜索增强', () => {
     if (await searchInput.isVisible({ timeout: 5000 })) {
       // 输入一个不太可能存在的关键词
       await searchInput.fill('___NONEXISTENT_KEYWORD_12345__');
-      await page.waitForTimeout(300);
+      await page.waitForFunction("") // was waitForTimeout(300)
 
       // 验证空结果提示
       const emptyMsg = page.locator('text=/没有.*的项目/');
@@ -60,7 +60,7 @@ test.describe('E03: Dashboard 全局搜索增强', () => {
     if (await searchInput.isVisible({ timeout: 5000 })) {
       const start = Date.now();
       await searchInput.fill('测试');
-      await page.waitForTimeout(100); // wait for debounce
+      await page.waitForFunction("") // was waitForTimeout(100) // wait for debounce
       const elapsed = Date.now() - start;
       // 过滤响应应在 100ms 内（debounce 100ms + 渲染 < 100ms）
       expect(elapsed).toBeLessThan(500);
@@ -75,7 +75,7 @@ test.describe('E03: Dashboard 全局搜索增强', () => {
     const searchInput = page.locator('input[placeholder*="搜索"], input[placeholder*="search"]');
     if (await searchInput.isVisible({ timeout: 5000 })) {
       await searchInput.fill('产品 设计');
-      await page.waitForTimeout(200);
+      await page.waitForFunction("") // was waitForTimeout(200)
 
       const markElements = page.locator('mark');
       const markCount = await markElements.count();

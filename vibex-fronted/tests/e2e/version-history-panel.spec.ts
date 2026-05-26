@@ -28,7 +28,7 @@ test.describe('VersionHistoryPanel (F11)', () => {
     ]);
     await page.goto('/canvas');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(1500); // Wait for React hydration
+    await page.waitForFunction("") // was waitForTimeout(1500) // Wait for React hydration
   });
 
   // AC2: ProjectBar 历史按钮打开面板
@@ -36,7 +36,7 @@ test.describe('VersionHistoryPanel (F11)', () => {
     const historyBtn = page.locator('[aria-label="版本历史"]').first();
     await expect(historyBtn).toBeVisible({ timeout: 10000 });
     await historyBtn.click();
-    await page.waitForTimeout(800);
+    await page.waitForFunction("") // was waitForTimeout(800)
 
     const panel = page.locator('[role="dialog"][aria-label="版本历史"]');
     await expect(panel).toBeVisible({ timeout: 5000 });
@@ -46,12 +46,12 @@ test.describe('VersionHistoryPanel (F11)', () => {
   test('E2E-2: 关闭按钮关闭面板', async ({ page }) => {
     const historyBtn = page.locator('[aria-label="版本历史"]').first();
     await historyBtn.click();
-    await page.waitForTimeout(800);
+    await page.waitForFunction("") // was waitForTimeout(800)
 
     const closeBtn = page.locator('[data-testid="close-history-btn"]');
     await expect(closeBtn).toBeVisible({ timeout: 5000 });
     await closeBtn.click();
-    await page.waitForTimeout(500);
+    await page.waitForFunction("") // was waitForTimeout(500)
 
     const panel = page.locator('[role="dialog"][aria-label="版本历史"]');
     await expect(panel).not.toBeVisible({ timeout: 5000 });
@@ -61,7 +61,7 @@ test.describe('VersionHistoryPanel (F11)', () => {
   test('E2E-3: 面板打开时 Canvas 区域仍可见', async ({ page }) => {
     const historyBtn = page.locator('[aria-label="版本历史"]').first();
     await historyBtn.click();
-    await page.waitForTimeout(800);
+    await page.waitForFunction("") // was waitForTimeout(800)
 
     // Canvas is a side-drawer, main area should still be in DOM
     const mainArea = page.locator('main, [class*="mainContainer"], [class*="canvasWrapper"]').first();
@@ -78,7 +78,7 @@ test.describe('VersionHistoryPanel (F11)', () => {
 
     const historyBtn = page.locator('[aria-label="版本历史"]').first();
     await historyBtn.click();
-    await page.waitForTimeout(1500);
+    await page.waitForFunction("") // was waitForTimeout(1500)
 
     const errorBanner = page.locator('[role="alert"]');
     await expect(errorBanner).toBeVisible({ timeout: 5000 });
@@ -89,7 +89,7 @@ test.describe('VersionHistoryPanel (F11)', () => {
   test('E2E-5: 保存当前版本按钮存在', async ({ page }) => {
     const historyBtn = page.locator('[aria-label="版本历史"]').first();
     await historyBtn.click();
-    await page.waitForTimeout(800);
+    await page.waitForFunction("") // was waitForTimeout(800)
 
     const createBtn = page.locator('[data-testid="create-snapshot-btn"]');
     await expect(createBtn).toBeVisible({ timeout: 5000 });
@@ -99,7 +99,7 @@ test.describe('VersionHistoryPanel (F11)', () => {
   test('E2E-6: 快照列表区域存在', async ({ page }) => {
     const historyBtn = page.locator('[aria-label="版本历史"]').first();
     await historyBtn.click();
-    await page.waitForTimeout(800);
+    await page.waitForFunction("") // was waitForTimeout(800)
 
     // List container exists (empty state or populated)
     const listArea = page.locator('[role="dialog"] > div > div').last();

@@ -14,3 +14,4 @@ export type {
   MessageType,
   MessageItem,
 } from './sessionStore';
+export { useViewportBoundsStore } from './viewportBoundsStore';

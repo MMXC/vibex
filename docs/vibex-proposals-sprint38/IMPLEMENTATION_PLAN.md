@@ -124,11 +124,11 @@ Sprint 38 包含 5 个功能（P001-P005），共 15 个 Epic，分布在 3 个�
 ### P005: Canvas 性能/虚拟化
 
 #### P005-E1: react-virtual 安装 + viewportBounds store
-- [ ] `pnpm add @tanstack/react-virtual`
-- [ ] `canvasStore` 增加 `viewportBounds: { x, y, width, height }` 字段
-- [ ] 创建 `useViewportBounds` hook：监听 canvas 容器 resize/update，实时更新 viewportBounds
-- [ ] viewportBounds 持久化到 sessionStorage（刷新页面后恢复视口位置）
-- [ ] `pnpm test` 覆盖 viewportBounds 更新
+- [x] `pnpm add @tanstack/react-virtual`（已安装 v3.13.23）
+- [x] 创建 `viewportBoundsStore` (`src/lib/canvas/stores/viewportBoundsStore.ts`)：含 `viewportBounds: { x, y, width, height }` 字段 + `updateViewportBounds` action
+- [x] 创建 `useViewportBounds` hook (`src/hooks/useViewportBounds.ts`)：监听 canvas 容器 resize/scroll，实时更新 viewportBounds
+- [x] viewportBounds 持久化到 sessionStorage（刷新页面后恢复视口位置）
+- [x] `pnpm test` 覆盖 viewportBounds 更新（7 tests, 7 PASSED）
 
 #### P005-E2: ProtoFlowCanvas 虚拟化集成
 - [ ] 在 `ProtoFlowCanvas` 中集成 `@tanstack/react-virtual`

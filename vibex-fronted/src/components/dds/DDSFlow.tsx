@@ -35,6 +35,8 @@ import { CardRenderer } from '@/components/dds/cards';
 import type { DDSCard, ChapterType } from '@/types/dds';
 import { ConflictBubble } from '@/components/canvas/ConflictBubble';
 import { useConflictStore } from '@/lib/canvas/stores/conflictStore';
+import { useMiniMapStore } from '@/lib/canvas/stores/miniMapStore';
+import { MiniMapPanel } from '@/components/dds/MiniMapPanel';
 import styles from './DDSFlow.module.css';
 
 // ==================== Node Type Wrappers ====================
@@ -200,7 +202,11 @@ function DDSFlowInner({
   const [viewport, setViewport] = useState<Viewport>({ x: 0, y: 0, zoom: 1 });
 
   useOnViewportChange({
-    onChange: (vp) => setViewport(vp),
+    onChange: (vp) => {
+      setViewport(vp);
+      // P005-E3: sync viewport to miniMapStore for border rectangle
+      useMiniMapStore.getState().setViewport(vp);
+    },
   });
 
   // Compute Group node screen coordinates
@@ -287,11 +293,8 @@ function DDSFlowInner({
           showInteractive={false}
           style={{ bottom: 16, right: 16 }}
         />
-        <MiniMap
-          nodeColor="rgba(59,130,246,0.6)"
-          maskColor="rgba(0,0,0,0.4)"
-          style={{ bottom: 16, left: 16 }}
-        />
+        {/* P005-E3: MiniMap — rendered as collapsible left panel, not static overlay */}
+        <MiniMapPanel />
 
         {/* E1-U2/U3: Group collapse overlay */}
         <GroupCollapseOverlay

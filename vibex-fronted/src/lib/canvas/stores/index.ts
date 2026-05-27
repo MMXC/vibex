@@ -15,3 +15,4 @@ export type {
   MessageItem,
 } from './sessionStore';
 export { useViewportBoundsStore } from './viewportBoundsStore';
+export { useMiniMapStore } from './miniMapStore';

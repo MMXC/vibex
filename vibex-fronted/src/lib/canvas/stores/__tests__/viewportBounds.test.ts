@@ -74,19 +74,19 @@ describe('viewportBoundsStore — P005-E1', () => {
     it('AC-3a: resets all fields to 0', () => {
       const store = useViewportBoundsStore.getState();
       act(() => {
-        store.updateViewportBounds({ x: 100, y: 200, width: 800, height: 600 });
+        store.updateViewportBounds({ x: 100, y: 200, width: 800, height: 600, zoom: 2 });
       });
       act(() => {
         store.resetViewportBounds();
       });
       const { viewportBounds } = useViewportBoundsStore.getState();
-      expect(viewportBounds).toEqual({ x: 0, y: 0, width: 0, height: 0 });
+      expect(viewportBounds).toEqual({ x: 0, y: 0, width: 0, height: 0, zoom: 1 });
     });
   });
 
   describe('AC-4: TypeScript interface — ViewportBounds shape', () => {
     it('AC-4a: has all required fields', () => {
-      const bounds = { x: 10, y: 20, width: 1920, height: 1080 };
+      const bounds = { x: 10, y: 20, width: 1920, height: 1080, zoom: 1 };
       const store = useViewportBoundsStore.getState();
       act(() => { store.updateViewportBounds(bounds); });
       const { viewportBounds } = useViewportBoundsStore.getState();

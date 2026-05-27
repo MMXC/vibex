@@ -78,6 +78,17 @@ vi.mock('@/lib/firebase/presence', () => ({
   })),
 }));
 
+vi.mock('@/lib/featureFlags', () => ({
+  isEnabled: vi.fn((flag: string) => flag === 'VIRTUALIZATION'),
+}));
+
+vi.mock('@/lib/canvas/stores/viewportBoundsStore', () => ({
+  useViewportBoundsStore: vi.fn(() => ({
+    viewportBounds: { x: 0, y: 0, width: 1920, height: 1080, zoom: 1 },
+    updateViewportBounds: vi.fn(),
+  })),
+}));
+
 
 // ============================================
 // Tests
@@ -161,5 +172,26 @@ describe('ProtoFlowCanvas', () => {
   it('renders presence-avatars container', () => {
     render(<ProtoFlowCanvas />);
     expect(screen.getByTestId('presence-avatars')).toBeInTheDocument();
+  });
+
+  // P005-E2: Virtualization — renders with culled nodes when virtualization is enabled
+  it('renders culled nodes when VIRTUALIZATION flag is enabled', () => {
+    const { container } = render(<ProtoFlowCanvas />);
+    const rf = container.querySelector('[data-testid="react-flow"]');
+    // With 0 nodes in store, culledNodes === nodes === 0
+    expect(rf).toHaveAttribute('data-nodes', '0');
+  });
+
+  // P005-E2: Virtualization — passes onMoveEnd handler to ReactFlow
+  it('renders without crashing when virtualization is enabled', () => {
+    // Mock returns virtualization as true by default (flag === 'VIRTUALIZATION')
+    const { container } = render(<ProtoFlowCanvas />);
+    expect(container.querySelector('[data-testid="react-flow"]')).toBeInTheDocument();
+  });
+
+  // P005-E2: Empty hint uses store node count, not culled count
+  it('shows empty hint based on store node count', () => {
+    render(<ProtoFlowCanvas />);
+    expect(screen.getByText('从左侧拖拽组件到画布')).toBeInTheDocument();
   });
 });

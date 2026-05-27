@@ -19,9 +19,10 @@
 
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   ReactFlow,
+  ReactFlowProvider,
   Background,
   Controls,
   MiniMap,
@@ -32,6 +33,7 @@ import {
   type OnNodesChange,
   type OnEdgesChange,
   type Connection,
+  type Viewport,
   applyNodeChanges,
   applyEdgeChanges,
   BackgroundVariant,
@@ -44,6 +46,8 @@ import type { UIComponent } from '@/lib/prototypes/ui-schema';
 import { ProtoPreviewPanel } from './ProtoPreviewPanel';
 import { PresenceAvatars } from '@/components/canvas/Presence/PresenceAvatars';
 import { usePresence } from '@/lib/firebase/presence';
+import { isEnabled } from '@/lib/featureFlags';
+import { useViewportBoundsStore } from '@/lib/canvas/stores/viewportBoundsStore';
 import styles from './ProtoFlowCanvas.module.css';
 
 // ==================== Node Types ====================
@@ -71,12 +75,41 @@ function ProtoFlowCanvasInner({ className = '' }: ProtoFlowCanvasProps) {
     selectNode,
   } = usePrototypeStore();
 
+  const { viewportBounds, updateViewportBounds } = useViewportBoundsStore();
+  const virtualizationEnabled = isEnabled('VIRTUALIZATION');
+
   // Cast store nodes to Node for React Flow
   const storeNodesCasted = storeNodes as unknown as Node[];
   const storeEdgesCasted = storeEdges as unknown as import('@xyflow/react').Edge[];
 
   const [nodes, setNodes] = useNodesState(storeNodesCasted);
   const [edges, setEdges] = useEdgesState(storeEdgesCasted as import('@xyflow/react').Edge[]);
+
+  // ---- P005-E2: Viewport culling ----
+  // Filter nodes to only render those within the current viewport bounds.
+  // This reduces DOM nodes for large canvases (e.g., 500+ nodes).
+  const culledNodes = useMemo(() => {
+    if (!virtualizationEnabled) return nodes;
+
+    const { x: vpX, y: vpY, width: vpW, height: vpH, zoom } = viewportBounds;
+
+    // Add padding so nodes just outside viewport also render (prevents pop-in)
+    const PADDING = 100;
+
+    return nodes.filter((node) => {
+      const nx = (node.position?.x ?? 0) * zoom + vpX;
+      const ny = (node.position?.y ?? 0) * zoom + vpY;
+      const nw = (node.width ?? 200) * zoom;
+      const nh = (node.height ?? 60) * zoom;
+
+      return (
+        nx + nw + PADDING >= 0 &&
+        nx - PADDING <= vpW &&
+        ny + nh + PADDING >= 0 &&
+        ny - PADDING <= vpH
+      );
+    });
+  }, [nodes, viewportBounds, virtualizationEnabled]);
 
   // Sync store → local state for React Flow
   React.useEffect(() => {
@@ -87,6 +120,22 @@ function ProtoFlowCanvasInner({ className = '' }: ProtoFlowCanvasProps) {
   React.useEffect(() => {
     setEdges(storeEdgesCasted);
   }, [storeEdges, setEdges, storeEdgesCasted]);
+
+  // ---- P005-E2: Update viewport bounds on pan/zoom ----
+  const onMoveEnd = useCallback(
+    (_: unknown, viewport: Viewport) => {
+      if (!virtualizationEnabled) return;
+      const { x, y, zoom } = viewport;
+      updateViewportBounds({
+        x,
+        y,
+        zoom: zoom ?? 1,
+        width: viewportBounds.width || 1920,
+        height: viewportBounds.height || 1080,
+      });
+    },
+    [virtualizationEnabled, viewportBounds, updateViewportBounds]
+  );
 
   // ---- React Flow change handlers ----
   const onNodesChange: OnNodesChange<Node> = useCallback(
@@ -206,7 +255,7 @@ function ProtoFlowCanvasInner({ className = '' }: ProtoFlowCanvasProps) {
       </div>
 
       <ReactFlow
-        nodes={nodes}
+        nodes={culledNodes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
@@ -216,6 +265,7 @@ function ProtoFlowCanvasInner({ className = '' }: ProtoFlowCanvasProps) {
         onNodeDoubleClick={onNodeDoubleClick}
         onDragOver={onDragOver}
         onDrop={onDrop}
+        onMoveEnd={onMoveEnd}
         nodeTypes={nodeTypes}
         fitView
         fitViewOptions={{ padding: 0.2 }}
@@ -250,8 +300,8 @@ function ProtoFlowCanvasInner({ className = '' }: ProtoFlowCanvasProps) {
         />
       </ReactFlow>
 
-      {/* Empty state hint */}
-      {nodes.length === 0 && (
+      {/* Empty state hint — always check full store node count */}
+      {storeNodes.length === 0 && (
         <div className={styles.emptyHint} aria-hidden="true">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
             <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z" />
@@ -267,5 +317,9 @@ function ProtoFlowCanvasInner({ className = '' }: ProtoFlowCanvasProps) {
 // ==================== Export ====================
 
 export function ProtoFlowCanvas(props: ProtoFlowCanvasProps) {
-  return <ProtoFlowCanvasInner {...props} />;
+  return (
+    <ReactFlowProvider>
+      <ProtoFlowCanvasInner {...props} />
+    </ReactFlowProvider>
+  );
 }

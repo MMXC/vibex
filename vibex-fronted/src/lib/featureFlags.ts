@@ -9,7 +9,8 @@ type FeatureFlagName =
   | 'MCP_SERVER'
   | 'NEW_CANVAS'
   | 'FEATURE_DESIGN_TO_CODE_PIPELINE'
-  | 'FEATURE_DESIGN_TO_CODE_BIDIRECTIONAL';
+  | 'FEATURE_DESIGN_TO_CODE_BIDIRECTIONAL'
+  | 'VIRTUALIZATION';
 
 interface FeatureFlagConfig {
   name: FeatureFlagName;
@@ -46,6 +47,11 @@ const FLAGS: FeatureFlagConfig[] = [
   {
     name: 'FEATURE_DESIGN_TO_CODE_BIDIRECTIONAL',
     description: 'Enable bidirectional sync between local and Figma tokens',
+    defaultValue: false,
+  },
+  {
+    name: 'VIRTUALIZATION',
+    description: 'Enable canvas virtualization (viewport culling for large node counts)',
     defaultValue: false,
   },
 ];

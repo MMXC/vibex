@@ -19,6 +19,8 @@ export interface ViewportBounds {
   width: number;
   /** Visible viewport height (px) */
   height: number;
+  /** Current zoom level (default: 1) */
+  zoom: number;
 }
 
 interface ViewportBoundsStore {
@@ -32,6 +34,7 @@ const DEFAULT_BOUNDS: ViewportBounds = {
   y: 0,
   width: 0,
   height: 0,
+  zoom: 1,
 };
 
 export const useViewportBoundsStore = create<ViewportBoundsStore>()(

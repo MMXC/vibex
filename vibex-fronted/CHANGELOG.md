@@ -27,6 +27,27 @@
 - **E3 E2E Tests**: `tests/e2e/minimap-panel.spec.ts` — 7 tests (toggle open/close, close button, minimap canvas, viewport border, hint text) — TypeScript clean ✅
 - **E3 coord self-implement**: dev-epic3-minimap-组件-+-点击跳转 因 `updatedBy: cli`（CLI dispatch but dev agent never spawned，9.4h elapsed，Slack socket sustained outage），coord self-implemented P005-E3
 
+## [Unreleased] S38-P001-E1: i18n 框架安装 + DDSToolbar 试点 — 2026-05-20
+- **next-intl v4.8.3**: 集成到 App Router，I18nProvider 包裹整个应用
+- **语言文件**: `src/i18n/messages/zh.json` + `en.json`，覆盖 toolbar/export 命名空间
+- **DDSToolbar i18n 化**: 章节标签、AI 生成、全屏、撤销/重做、Design Review、导入、分享、导出弹窗 → 全部通过 `useTranslations()` 动态获取
+- **中间件**: `src/middleware.ts` 自动从 Accept-Language header 检测语言偏好，写入 cookie
+- **构建**: `pnpm build` ✅ TypeScript 编译通过
+- **关联修复**: 修复 settings 页面 ShortcutConfig 缺少 `id` 属性的 TypeScript 错误
+
+## [Unreleased] S38-P001-E2: Settings 语言切换 UI + Locale 持久化 — 2026-05-22
+- **userPreferencesStore**: 新增 `locale: 'en'|'zh'` 字段 + `setLocale()` action，数据持久化到 localStorage
+- **I18nProvider**: 订阅 `userPreferencesStore.locale`，动态切换语言，移除 layout.tsx 硬编码 `locale="zh"`
+- **/settings 页面**: Appearance 区域新增 Language 下拉框（English / 中文），样式复用 theme toggle
+- **单元测试**: 8 个测试全部通过，覆盖 locale 初始化/set/reset
+
+## [Unreleased] S38-P001-E3: 全局 UI 文本迁移（coord self-implement）— 2026-05-23
+- **语言文件扩展**: 新增 common、dashboard、canvas、settings、analytics、snapshot、feedback 命名空间，共 100+ 翻译 key（zh.json + en.json）
+- **OfflineBanner.tsx**: 离线提示、同步进度 → `t('canvas.*')`
+- **RecentProjects.tsx**: 加载中/空状态 → `t('dashboard.*')`
+- **ImportModal.tsx**: 导入弹窗所有硬编码文本 → `t('dashboard.*')`
+- **TypeScript**: `pnpm exec tsc --noEmit` clean ✅
+
 ## [Unreleased] S38-P002-E1: CanvasStore oplog + AI indicator — 2026-05-24
 - **E1 oplogStore**: `src/stores/oplogStore.ts` — Zustand store with `oplog: OperationEntry[]`, `addOplogEntry()`, 1000-entry limit + auto-archive to conflictSnapshots
 - **E1 useAIAgent hook**: `src/hooks/useAIAgent.ts` — CodingAgentService wrapper with oplog integration, `isEditing` state for UI feedback

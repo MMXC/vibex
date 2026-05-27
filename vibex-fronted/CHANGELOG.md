@@ -7,7 +7,14 @@
 - **E1 Unit Tests**: `src/lib/canvas/stores/__tests__/viewportBounds.test.ts` — 7 tests (initial state/partial update/reset/type) — 7/7 PASS ✅
 - **E1 coord self-implement**: dev-epic1-react-virtual-安装-+-viewportbounds-store 因 `updatedBy: cli`（CLI dispatch but dev agent never spawned，12.4h elapsed），coord self-implemented P005-E1
 
-angelog
+## [Unreleased] S38-P005-E2: ProtoFlowCanvas 虚拟化集成 — 2026-05-27
+- **E2 VIRTUALIZATION flag**: `src/lib/featureFlags.ts` — 新增 `VIRTUALIZATION` feature flag，默认 `false`
+- **E2 viewportBounds zoom**: `src/lib/canvas/stores/viewportBoundsStore.ts` — `ViewportBounds` 接口增加 `zoom: number` 字段（default: 1）
+- **E2 ProtoFlowCanvas culling**: `src/components/prototype/ProtoFlowCanvas.tsx` — `culledNodes` useMemo 基于 viewportBounds 过滤节点（viewport + 100px padding）；`onMoveEnd` handler 更新 viewportBounds（x, y, zoom）；`ReactFlowProvider` wrapper 包裹
+- **E2 Unit Tests**: `src/components/prototype/__tests__/ProtoFlowCanvas.test.tsx` — 13 tests，13/13 PASS ✅
+- **E2 Performance Tests**: `src/components/prototype/__tests__/ProtoFlowCanvas.perf.test.tsx` — 4 tests（500节点渲染、culling过滤、onMoveEnd handler、rerender稳定性），4/4 PASS ✅
+- **E2 viewportBounds tests**: `src/lib/canvas/stores/__tests__/viewportBounds.test.ts` — 更新 AC-3/AC-4 以支持 `zoom` 字段，7/7 PASS ✅
+- **E2 coord self-implement**: dev-epic2-protoflowcanvas-虚拟化集成 因 `updatedBy: cli`（CLI dispatch but dev agent never spawned，13.5h elapsed），coord self-implemented P005-E2
 
 ## [Unreleased] S38-P002-E1: CanvasStore oplog + AI indicator — 2026-05-24
 - **E1 oplogStore**: `src/stores/oplogStore.ts` — Zustand store with `oplog: OperationEntry[]`, `addOplogEntry()`, 1000-entry limit + auto-archive to conflictSnapshots

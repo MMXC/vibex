@@ -110,6 +110,15 @@
 - **E1 Unit Tests**: `viewportBounds.test.ts` — 7 tests covering initial state, partial updates, reset, type — 7/7 PASS ✅
 - **E1 dev epic self-implement**: dev-epic1-react-virtual-安装-+-viewportbounds-store 因 `updatedBy: cli`（CLI dispatch but dev agent never spawned，12.4h elapsed），coord self-implemented P005-E1
 
+##### S38-P005-E2: ProtoFlowCanvas 虚拟化集成（coord self-implement）
+- **E2 VIRTUALIZATION flag**: `vibex-fronted/src/lib/featureFlags.ts` — 新增 `VIRTUALIZATION` feature flag，默认 `false`
+- **E2 viewportBounds zoom**: `vibex-fronted/src/lib/canvas/stores/viewportBoundsStore.ts` — `ViewportBounds` 接口增加 `zoom: number` 字段
+- **E2 ProtoFlowCanvas culling**: `vibex-fronted/src/components/prototype/ProtoFlowCanvas.tsx` — `culledNodes` useMemo，基于 viewportBounds 过滤节点；`onMoveEnd` handler 更新 viewportBounds（x, y, zoom）；`ReactFlowProvider` wrapper 包裹
+- **E2 Unit Tests**: `ProtoFlowCanvas.test.tsx` — 13 tests，13/13 PASS ✅
+- **E2 Performance Tests**: `ProtoFlowCanvas.perf.test.tsx` — 4 tests（500节点渲染、culling 过滤、onMoveEnd handler、rerender 稳定性），4/4 PASS ✅
+- **E2 viewportBounds tests**: `viewportBounds.test.ts` — 更新 AC-3/AC-4 以支持 `zoom` 字段，7/7 PASS ✅
+- **E2 coord self-implement**: dev-epic2-protoflowcanvas-虚拟化集成 因 `updatedBy: cli`（CLI dispatch but dev agent never spawned，13.5h elapsed），coord self-implemented P005-E2
+
 ##### S38-P004-E3: 新 feature E2E 覆盖（coord self-implement）
 - **E3 i18n spec**: `vibex-fronted/tests/e2e/i18n-language-switch.spec.ts` — 6 个测试用例：语言切换默认locale、CN/EN切换、sessionStorage持久化、toolbar更新
 - **E3 conflict spec**: `vibex-fronted/tests/e2e/collaboration-conflict.spec.ts` — 6 个测试用例：5s冲突窗口检测、ConflictDialog保留本地/使用服务器、LWW自动解决

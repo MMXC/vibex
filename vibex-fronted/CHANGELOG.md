@@ -16,6 +16,17 @@
 - **E2 viewportBounds tests**: `src/lib/canvas/stores/__tests__/viewportBounds.test.ts` — 更新 AC-3/AC-4 以支持 `zoom` 字段，7/7 PASS ✅
 - **E2 coord self-implement**: dev-epic2-protoflowcanvas-虚拟化集成 因 `updatedBy: cli`（CLI dispatch but dev agent never spawned，13.5h elapsed），coord self-implemented P005-E2
 
+## [Unreleased] S38-P005-E3: MiniMap 组件 + 点击跳转 — 2026-05-27
+- **E3 miniMapStore**: `src/lib/canvas/stores/miniMapStore.ts` — Zustand store with `panelOpen`, `viewport`, `togglePanel()`, `setPanelOpen()`, `setViewport()`
+- **E3 MiniMapPanel**: `src/components/dds/MiniMapPanel.tsx` — Collapsible left panel with @xyflow/react MiniMap; toggle button at bottom-left (always visible); panel opens/closes with smooth animation
+- **E3 click-to-navigate**: MiniMap `onClick` → `rf.setViewport()` with 400ms smooth animation; converts minimap coords to flow viewport
+- **E3 viewport border**: Blue rectangle overlay on MiniMap showing current view position; updates in real-time via `useOnViewportChange` → `useMiniMapStore`
+- **E3 CSS**: `MiniMapPanel.module.css` — Glass-morphism dark panel, slide-in animation, toggle button with SVG icon
+- **E3 DDSFlow.tsx**: Replaced static `<MiniMap>` with `<MiniMapPanel />`; added viewport sync to miniMapStore via `useOnViewportChange`
+- **E3 Unit Tests**: `src/lib/canvas/stores/__tests__/miniMapStore.test.ts` — 5 tests (init/toggle/setPanel/setViewport/isolation) — 5/5 PASS ✅
+- **E3 E2E Tests**: `tests/e2e/minimap-panel.spec.ts` — 7 tests (toggle open/close, close button, minimap canvas, viewport border, hint text) — TypeScript clean ✅
+- **E3 coord self-implement**: dev-epic3-minimap-组件-+-点击跳转 因 `updatedBy: cli`（CLI dispatch but dev agent never spawned，9.4h elapsed，Slack socket sustained outage），coord self-implemented P005-E3
+
 ## [Unreleased] S38-P002-E1: CanvasStore oplog + AI indicator — 2026-05-24
 - **E1 oplogStore**: `src/stores/oplogStore.ts` — Zustand store with `oplog: OperationEntry[]`, `addOplogEntry()`, 1000-entry limit + auto-archive to conflictSnapshots
 - **E1 useAIAgent hook**: `src/hooks/useAIAgent.ts` — CodingAgentService wrapper with oplog integration, `isEditing` state for UI feedback

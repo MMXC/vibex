@@ -119,6 +119,17 @@
 - **E2 viewportBounds tests**: `viewportBounds.test.ts` — 更新 AC-3/AC-4 以支持 `zoom` 字段，7/7 PASS ✅
 - **E2 coord self-implement**: dev-epic2-protoflowcanvas-虚拟化集成 因 `updatedBy: cli`（CLI dispatch but dev agent never spawned，13.5h elapsed），coord self-implemented P005-E2
 
+##### S38-P005-E3: MiniMap 组件 + 点击跳转（coord self-implement）
+- **E3 miniMapStore**: `vibex-fronted/src/lib/canvas/stores/miniMapStore.ts` — Zustand store with `panelOpen`, `viewport`, `togglePanel()`, `setPanelOpen()`, `setViewport()`
+- **E3 MiniMapPanel**: `vibex-fronted/src/components/dds/MiniMapPanel.tsx` — Collapsible left panel with @xyflow/react MiniMap; toggle button at bottom-left (always visible); panel opens/closes with smooth animation
+- **E3 click-to-navigate**: MiniMap `onClick` → `rf.setViewport()` with 400ms smooth animation; converts minimap coords to flow viewport
+- **E3 viewport border**: Blue rectangle overlay on MiniMap showing current view position; updates in real-time via `useOnViewportChange` → `useMiniMapStore`
+- **E3 CSS**: `MiniMapPanel.module.css` — Glass-morphism dark panel, slide-in animation, toggle button with icon
+- **E3 DDSFlow.tsx**: Replaced static `<MiniMap>` with `<MiniMapPanel />`; added viewport sync to miniMapStore
+- **E3 Unit Tests**: `miniMapStore.test.ts` — 5 tests (init/toggle/setPanel/setViewport/isolation) — 5/5 PASS ✅
+- **E3 E2E Tests**: `tests/e2e/minimap-panel.spec.ts` — 7 tests (toggle open/close, close button, minimap canvas, viewport border, hint text) — TypeScript clean ✅
+- **E3 coord self-implement**: dev-epic3-minimap-组件-+-点击跳转 因 `updatedBy: cli`（CLI dispatch but dev agent never spawned，9.4h elapsed，Slack socket sustained outage），coord self-implemented P005-E3
+
 ##### S38-P004-E3: 新 feature E2E 覆盖（coord self-implement）
 - **E3 i18n spec**: `vibex-fronted/tests/e2e/i18n-language-switch.spec.ts` — 6 个测试用例：语言切换默认locale、CN/EN切换、sessionStorage持久化、toolbar更新
 - **E3 conflict spec**: `vibex-fronted/tests/e2e/collaboration-conflict.spec.ts` — 6 个测试用例：5s冲突窗口检测、ConflictDialog保留本地/使用服务器、LWW自动解决

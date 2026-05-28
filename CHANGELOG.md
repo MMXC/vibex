@@ -2,6 +2,15 @@
 
 #### F001 — 评分卡复杂度指标（P003-E2 Token估算 + 圈复杂度）
 
+##### S39-P003-E1: DiffOverlay 多文件 tab + Token 估算
+- **E1 DiffFileEntry 接口**: `src/components/agent/DiffOverlay.tsx` 新增 `DiffFileEntry` 类型，包含 `filename`、`changes`、`added`、`removed` 字段
+- **E1 files prop**: DiffOverlayProps 新增可选 `files: DiffFileEntry[]` prop，支持多文件 diff 展示
+- **E1 activeTab state**: 使用 `useState<number>` 管理当前激活的 tab 索引，支持多文件切换
+- **E1 Tab bar UI**: 条件渲染（`files && files.length > 1`），role="tablist"，每个 tab 显示文件名末尾；激活态高亮 `.tabBtnActive`
+- **E1 Token 估算**: `useMemo` 计算 `Math.ceil(new Blob([content]).size * 0.75)`，显示在 stats bar 中
+- **E1 CSS**: `.tabBar`、`.tabBtn`、`.tabBtnActive` 样式，玻璃态暗色主题，tab 横向滚动
+- **E1 TypeScript**: `pnpm exec tsc --noEmit` clean for DiffOverlay files
+
 ##### S39-P003-E2: AIScoreCard token estimation + complexity metrics
 - **E2 computeDiffScores 扩展**: 返回值新增 `linesTotal`、`tokenEstimate`、`complexityScore` 三个字段
 - **E2 Token 估算**: 使用 `new Blob([diffContent]).size * 0.75` 近似 token 数量

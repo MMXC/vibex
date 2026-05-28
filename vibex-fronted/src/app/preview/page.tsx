@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
 import Link from 'next/link';
 import { SimpleSteps } from '@/components/ui/Steps';
 import { TemplateSelector } from '@/components/templates';
@@ -29,6 +30,7 @@ const devices = [
 ];
 
 export default function Preview() {
+  const tAi = useTranslations('ai')();
   const [selectedPage, setSelectedPage] = useState(previewPages[0]!);
   const [device, setDevice] = useState('desktop');
   const [zoom, setZoom] = useState(100);
@@ -65,7 +67,7 @@ export default function Preview() {
           用 AI 轻松构建你的 Web 应用
         </h1>
         <p className={styles.subtitle}>
-          描述需求，AI 实时生成预览
+          {tAi('previewInput')}
         </p>
       </header>
 
@@ -86,7 +88,7 @@ export default function Preview() {
           {currentStep === 0 && (
             <div className={styles.emptyState}>
               <div className={styles.emptyStateEmoji}>🎯</div>
-              <p>输入需求后，AI 将实时生成预览</p>
+              <p>{tAi('previewHint')}</p>
             </div>
           )}
 
@@ -352,7 +354,7 @@ export default function Preview() {
             📋 模板
           </button>
           <button className={styles.generateBtn}>
-            🎯 开始生成
+            {tAi('previewGenerateBtn')}
           </button>
         </div>
 

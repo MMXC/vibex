@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense, useState, useCallback, useEffect } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
 
 /** Dev-only logger */
 const devLog = (...args: unknown[]) => {
@@ -130,6 +131,7 @@ const defaultEdges: FlowEdge[] = [
 function FlowContent() {
   const searchParams = useSearchParams();
   const flowId = searchParams.get('id');
+  const tAi = useTranslations('ai')();
 
   const [nodes, setNodes] = useState<FlowNode[]>(defaultNodes);
   const [edges, setEdges] = useState<FlowEdge[]>(defaultEdges);
@@ -416,11 +418,11 @@ function FlowContent() {
         setShowAIGenerate(false);
         setAiDescription('');
       } else {
-        setError('AI 生成的流程为空');
+        setError(tAi('flowEmptyError'));
       }
     } catch (err: unknown) {
       canvasLogger.default.error('AI generation failed:', err);
-      setError(err instanceof Error ? err.message : 'AI 生成失败，请稍后重试');
+      setError(err instanceof Error ? err.message : tAi('generationFailed'));
     } finally {
       setAiGenerating(false);
     }
@@ -463,9 +465,9 @@ function FlowContent() {
           <button
             className={styles.aiGenerateBtn}
             onClick={() => setShowAIGenerate(true)}
-            title="AI 生成流程"
+            title={tAi('aiGenerateBtn')}
           >
-            ✨ AI 生成
+            {tAi('aiGenerateBtn')}
           </button>
           <button
             className={styles.toolbarBtn}
@@ -502,7 +504,7 @@ function FlowContent() {
         >
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h2>✨ AI 生成流程</h2>
+              <h2>{tAi('generateFlowTitle')}</h2>
               <button
                 className={styles.modalClose}
                 onClick={() => !aiGenerating && setShowAIGenerate(false)}
@@ -513,17 +515,17 @@ function FlowContent() {
             </div>
             <div className={styles.modalBody}>
               <label className={styles.inputLabel}>
-                描述你想要创建的流程：
+                {tAi('inputPlaceholder')}
               </label>
               <textarea
                 className={styles.aiInput}
-                placeholder="例如：创建一个用户登录流程，包含输入用户名密码、验证身份、返回登录结果..."
+                placeholder={tAi('inputPlaceholderExample')}
                 value={aiDescription}
                 onChange={(e) => setAiDescription(e.target.value)}
                 disabled={aiGenerating}
                 rows={5}
               />
-              <div className={styles.aiHint}>💡 描述越详细，生成结果越准确</div>
+              <div className={styles.aiHint}>{tAi('placeholderHint')}</div>
             </div>
             <div className={styles.modalFooter}>
               <button
@@ -531,7 +533,7 @@ function FlowContent() {
                 onClick={() => setShowAIGenerate(false)}
                 disabled={aiGenerating}
               >
-                取消
+                {tAi('cancel')}
               </button>
               <button
                 className={styles.generateBtn}
@@ -541,10 +543,10 @@ function FlowContent() {
                 {aiGenerating ? (
                   <>
                     <span className={styles.spinner}></span>
-                    生成中...
+                    {tAi('generating')}
                   </>
                 ) : (
-                  '✨ 开始生成'
+                  tAi('generateFlowBtn')
                 )}
               </button>
             </div>

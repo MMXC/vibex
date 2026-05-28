@@ -212,5 +212,33 @@
     "placeholder": "请输入您的反馈...",
     "submit": "提交",
     "lastError": "错误: {message}"
+  },
+  "ai": {
+    "generateBtn": "🎯 开始生成",
+    "generating": "生成中...",
+    "generateFlowTitle": "✨ AI 生成流程",
+    "generateFlowBtn": "✨ 开始生成",
+    "aiGenerateBtn": "✨ AI 生成",
+    "flowEmptyError": "AI 生成的流程为空",
+    "generationFailed": "AI 生成失败，请稍后重试",
+    "placeholderHint": "💡 描述越详细，生成结果越准确",
+    "inputPlaceholder": "描述你想要创建的流程：",
+    "inputPlaceholderExample": "例如：创建一个用户登录流程，包含输入用户名密码、验证身份、返回登录结果...",
+    "cancel": "取消",
+    "generatingDomain": "生成中...",
+    "generateDomain": "AI生成",
+    "domainGenBtn": "从需求生成限界上下文图",
+    "domainGenDisabled": "需要需求文本才能生成",
+    "domainGenSuccess": "成功生成 {count} 个限界上下文！",
+    "domainGenFailed": "生成失败",
+    "previewInput": "描述需求，AI 实时生成预览",
+    "previewHint": "输入需求后，AI 将实时生成预览",
+    "previewGenerateBtn": "🎯 开始生成",
+    "landingGenerateBtn": "🚀 开始生成",
+    "landingQuickGen": "快速生成",
+    "landingAiDriven": "是一个 AI 驱动的应用构建平台，通过自然语言描述即可生成完整的",
+    "landingAiDialog": "AI 对话生成",
+    "landingAiDialogDesc": "用自然语言描述需求，AI 自动生成完整页面",
+    "inputLabel": "描述你想要创建的流程："
   }
 }

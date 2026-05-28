@@ -2,6 +2,7 @@
 
 import { getAuthToken } from '@/lib/auth-token';
 import { Suspense, useCallback, useEffect, useState, useMemo } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
 
 /** Dev-only logger */
 const devLog = (...args: unknown[]) => {
@@ -157,6 +158,7 @@ function Toolbar({
   hasRequirementText: boolean;
   generating: boolean;
 }) {
+  const tAi = useTranslations('ai')();
   return (
     <div className={styles.toolbar}>
       <button
@@ -164,10 +166,10 @@ function Toolbar({
         className={styles.toolbarBtn}
         disabled={!hasRequirementText || generating}
         title={
-          hasRequirementText ? '从需求生成限界上下文图' : '需要需求文本才能生成'
+          hasRequirementText ? tAi('domainGenBtn') : tAi('domainGenDisabled')
         }
       >
-        <span>🤖</span> {generating ? '生成中...' : 'AI生成'}
+        <span>🤖</span> {generating ? tAi('generatingDomain') : tAi('generateDomain')}
       </button>
       <button onClick={onOpenChat} className={styles.toolbarBtn}>
         <span>💬</span> 对话修改
@@ -581,6 +583,7 @@ function DomainPageContent() {
   const searchParams = useSearchParams();
   const projectId = searchParams.get('projectId');
   const requirementId = searchParams.get('requirementId');
+  const tAi = useTranslations('ai')();
 
   const [project, setProject] = useState<Project | null>(null);
   const [requirementText, setRequirementText] = useState('');
@@ -950,13 +953,13 @@ function DomainPageContent() {
 
         setDomains(newEntities);
         setHasChanges(true);
-        alert(`成功生成 ${newEntities.length} 个限界上下文！`);
+        alert(tAi('domainGenSuccess', { count: newEntities.length }));
       } else {
-        throw new Error(response.error || '生成失败');
+        throw new Error(response.error || tAi('domainGenFailed'));
       }
     } catch (err: unknown) {
-      canvasLogger.default.error('生成失败:', err);
-      alert('生成失败: ' + (err as Error).message);
+      canvasLogger.default.error('Generation failed:', err);
+      alert(tAi('domainGenFailed') + ': ' + (err as Error).message);
     } finally {
       setGenerating(false);
     }

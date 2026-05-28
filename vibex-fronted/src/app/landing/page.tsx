@@ -2,6 +2,7 @@
 
 import { getAuthToken } from '@/lib/auth-token';
 import { useState, useEffect } from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import LoginDrawer from '@/components/ui/LoginDrawer';
@@ -26,6 +27,7 @@ function useForceUpdate() {
 }
 
 export default function Landing() {
+  const tAi = useTranslations('ai')();
   const router = useRouter();
   const forceUpdate = useForceUpdate();
   const isAuthenticated = useIsAuthenticated();
@@ -96,7 +98,7 @@ export default function Landing() {
             <span className={styles.titleGradient}>你的 Web 应用</span>
           </h1>
           <p className={styles.subtitle}>
-            VibeX 是一个 AI 驱动的应用构建平台，通过自然语言描述即可生成完整的
+            VibeX {tAi('landingAiDriven')}
             Web 应用界面和功能。
           </p>
           <div className={styles.heroCta}>
@@ -117,7 +119,7 @@ export default function Landing() {
             <span className={styles.codeDot} />
             <span className={styles.codeDot} />
             <span style={{ marginLeft: '12px', fontSize: '12px', color: '#888' }}>
-              快速生成
+              {tAi('landingQuickGen')}
             </span>
           </div>
           <div style={{ padding: '16px' }}>
@@ -158,7 +160,7 @@ export default function Landing() {
                 transition: 'all 0.2s',
               }}
             >
-              {isGenerating ? '生成中...' : '🚀 开始生成'}
+              {isGenerating ? tAi('generating') : tAi('landingGenerateBtn')}
             </button>
           </div>
         </div>
@@ -173,8 +175,8 @@ export default function Landing() {
           {[
             {
               icon: '🤖',
-              title: 'AI 对话生成',
-              desc: '用自然语言描述需求，AI 自动生成完整页面',
+              title: tAi('landingAiDialog'),
+              desc: tAi('landingAiDialogDesc'),
               glow: 'cyan',
             },
             {

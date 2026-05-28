@@ -972,6 +972,57 @@
   stroke: var(--color-border);
 }
 
+/* MiniMap Search */
+.minimapSearchContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  max-width: 280px;
+}
+
+.minimapSearchInput {
+  width: 100%;
+  padding: 6px 32px 6px 10px;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  outline: none;
+  transition: border-color var(--duration-fast) ease;
+}
+
+.minimapSearchInput:focus {
+  border-color: var(--color-primary);
+}
+
+.minimapSearchInput::placeholder {
+  color: var(--color-text-muted);
+}
+
+.minimapSearchClear {
+  position: absolute;
+  right: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: color var(--duration-fast) ease;
+}
+
+.minimapSearchClear:hover {
+  color: var(--color-text-primary);
+}
+
 /* 自定义节点 */
 .flowNode {
   min-width: 180px;

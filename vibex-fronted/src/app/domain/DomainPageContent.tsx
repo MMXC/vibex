@@ -1,7 +1,7 @@
 'use client';
 
 import { getAuthToken } from '@/lib/auth-token';
-import { Suspense, useCallback, useEffect, useState, useMemo } from 'react';
+import { Suspense, useCallback, useEffect, useState, useMemo, useRef } from 'react';
 import { useTranslations } from '@/hooks/useTranslations';
 
 /** Dev-only logger */
@@ -23,8 +23,9 @@ const { generateBoundedContext } = apiService;
 
 import { useConfirmationStore, DomainModel } from '@/stores/confirmationStore';
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
-
-import { ReactFlow, 
+import { useMiniMapSearch } from '@/hooks/useMiniMapSearch';
+import {
+  ReactFlow,
   Node,
   Edge,
   Controls,
@@ -42,6 +43,9 @@ import { ReactFlow,
   EdgeChange,
   applyNodeChanges,
   applyEdgeChanges,
+  ViewportPortal,
+  useOnViewportChange,
+  Viewport,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -519,6 +523,64 @@ function AddRelationDialog({
   );
 }
 
+// Viewport border overlay component — renders an SVG rect showing current viewport bounds
+// Placed inside ViewportPortal so it renders at the flow viewport level
+function MiniMapViewportBorder({ viewport }: { viewport: Viewport }) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [containerSize, setContainerSize] = useState({ width: 200, height: 150 });
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    // Set initial size
+    setContainerSize({ width: el.clientWidth, height: el.clientHeight });
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setContainerSize({ width: entry.contentRect.width, height: entry.contentRect.height });
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [containerRef]);
+
+  const { width, height } = containerSize;
+  // Calculate viewport rect in container space
+  const scaleX = width / 2000;
+  const scaleY = height / 1500;
+  const vpX = (-viewport.x / viewport.zoom) * scaleX;
+  const vpY = (-viewport.y / viewport.zoom) * scaleY;
+  const vpW = Math.max(20, (containerSize.width || 800) / viewport.zoom * scaleX);
+  const vpH = Math.max(15, (containerSize.height || 600) / viewport.zoom * scaleY);
+
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+      }}
+    >
+      <svg width={width} height={height} style={{ position: 'absolute', top: 0, left: 0 }}>
+        <rect
+          x={vpX}
+          y={vpY}
+          width={vpW}
+          height={vpH}
+          fill="none"
+          stroke="#3b82f6"
+          strokeWidth={2}
+          strokeDasharray="4 2"
+          opacity={0.8}
+        />
+      </svg>
+    </div>
+  );
+}
+
 // Flow 图表组件
 function DomainFlow({
   entities,
@@ -530,6 +592,8 @@ function DomainFlow({
   nodes,
   edges,
   onConnect,
+  searchTerm,
+  highlightedNodes,
 }: {
   entities: DomainEntity[];
   relations: EntityRelation[];
@@ -540,12 +604,23 @@ function DomainFlow({
   nodes: Node[];
   edges: Edge[];
   onConnect: (connection: Connection) => void;
+  searchTerm?: string;
+  highlightedNodes?: Set<string>;
 }) {
   const defaultEdgeOptions = {
     type: 'smoothstep',
     style: { strokeWidth: 2 },
     markerEnd: { type: MarkerType.ArrowClosed },
   };
+
+  // Viewport tracking for border overlay
+  const [viewport, setViewport] = useState<Viewport>({ x: 0, y: 0, zoom: 1 });
+
+  useOnViewportChange({
+    onChange: (vp) => {
+      if (vp) setViewport(vp);
+    },
+  });
 
   return (
     <div className={styles.flowContainer}>
@@ -566,12 +641,21 @@ function DomainFlow({
         <MiniMap
           className={styles.flowMinimap}
           nodeColor={(node) => {
+            // Highlight search matches
+            if (searchTerm && highlightedNodes?.has(node.id)) {
+              return '#ef4444'; // red highlight
+            }
+            // Default: entity type color
             const entity = node.data?.entity as DomainEntity;
             return entity
               ? entityTypeStyles[entity.type]?.color || '#666'
               : '#666';
           }}
         />
+        {/* Viewport border overlay inside MiniMap via ViewportPortal */}
+        <ViewportPortal>
+          <MiniMapViewportBorder viewport={viewport} />
+        </ViewportPortal>
         <Background color="#3f3f46" gap={20} size={1} />
       </ReactFlow>
     </div>
@@ -603,6 +687,9 @@ function DomainPageContent() {
   // React Flow 状态
   const [nodes, setNodes, onNodesChange] = useNodesState<any>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+
+  // MiniMap search
+  const { searchTerm, highlightedNodes, onSearch, clearSearch } = useMiniMapSearch({ nodes });
 
   // 对话框状态
   const [showAddEntity, setShowAddEntity] = useState(false);
@@ -1101,6 +1188,26 @@ function DomainPageContent() {
             hasRequirementText={!!requirementText}
             generating={generating}
           />
+          {/* MiniMap Search Input */}
+          <div className={styles.minimapSearchContainer}>
+            <input
+              type="text"
+              placeholder="搜索节点..."
+              value={searchTerm}
+              onChange={(e) => onSearch(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Escape') clearSearch(); }}
+              className={styles.minimapSearchInput}
+            />
+            {searchTerm && (
+              <button
+                onClick={clearSearch}
+                className={styles.minimapSearchClear}
+                aria-label="清除搜索"
+              >
+                ×
+              </button>
+            )}
+          </div>
           <DomainFlow
             entities={domains}
             relations={relations}
@@ -1111,6 +1218,8 @@ function DomainPageContent() {
             onNodesChange={handleNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
+            searchTerm={searchTerm}
+            highlightedNodes={highlightedNodes}
           />
 
           {/* 实体详情面板 */}

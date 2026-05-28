@@ -1,6 +1,7 @@
 /**
  * canvasCollabBridge — Bridge DDSCanvasStore actions → collaboration broadcast
  * P002-E1: businessFlowStore bridge — broadcasts canvas mutations to other users
+ * P002-E2: Remote-action conflict detection — checks oplog before applying remote update
  *
  * Usage:
  *   // In a component or layout that mounts with the canvas:
@@ -14,6 +15,8 @@ import { useCollaboration } from './useCollaboration';
 import type { RemoteActionMessage, ConflictMessage } from './types';
 import { useDDSCanvasStore } from '@/stores/dds/DDSCanvasStore';
 import { useConfirmationStore } from '@/stores/confirmationStore';
+import { useOplogStore } from '@/stores/oplogStore';
+import { conflictToastEmitter } from '@/stores/oplogStore';
 
 export interface CanvasCollabBridgeOptions {
   /** Enable/disable bridging (default: true when WS is connected) */
@@ -29,15 +32,16 @@ export function useCanvasCollabBridge(options: CanvasCollabBridgeOptions = {}) {
 
   const { connect, disconnect, broadcast, isConnected, onlineUsers } = useCollaboration({
     onRemoteAction: (msg) => {
+      // ── P002-E2: Check oplog for conflict before applying remote action ──
+      checkRemoteConflict(msg);
       // Apply remote action to local store
       applyRemoteAction(msg);
       onRemoteAction?.(msg);
     },
     onConflict: (msg) => {
-      // Show conflict warning
-      showConflictToast(msg);
-      // Mark node as conflicted in confirmationStore
+      // ── P002-E2: Conflict from server — mark node as conflicted ──
       useConfirmationStore.getState().addConflictSnapshot(msg.nodeId, []);
+      conflictToastEmitter.emit(msg.nodeId, msg.conflictingUserId);
       onConflict?.(msg);
     },
   });
@@ -81,6 +85,31 @@ export function useCanvasCollabBridge(options: CanvasCollabBridgeOptions = {}) {
     isConnected,
     onlineUsers,
   };
+}
+
+// ==================== P002-E2: Remote conflict detection ====================
+
+/**
+ * Checks the local oplog for recent edits to the same nodeId within 1 second.
+ * If found, triggers conflict warning + toast. Always applies the remote action
+ * after checking.
+ */
+function checkRemoteConflict(msg: RemoteActionMessage): void {
+  const { nodeId, userId } = msg.payload;
+  const WINDOW_MS = 1_000;
+
+  // Get recent local entries for this nodeId
+  const recent = useOplogStore.getState().getOplogForNode(nodeId);
+  const now = Date.now();
+  const conflicting = recent.filter((e) => now - e.timestamp < WINDOW_MS);
+
+  if (conflicting.length > 0) {
+    // ── Conflict detected: local edit within 1s of remote edit ──
+    const { useConfirmationStore } = require('@/stores/confirmationStore');
+    useConfirmationStore.getState().addConflictSnapshot(nodeId, conflicting);
+    conflictToastEmitter.emit(nodeId, userId);
+    console.warn(`[CollabBridge] Remote conflict: node=${nodeId} from=${userId}, ${conflicting.length} local ops within 1s`);
+  }
 }
 
 // ==================== Helpers ====================
@@ -137,10 +166,4 @@ function applyRemoteAction(msg: RemoteActionMessage): void {
       break;
     }
   }
-}
-
-function showConflictToast(msg: ConflictMessage): void {
-  // Conflict state is managed via confirmationStore.addConflictSnapshot
-  // The UI layer (DDSCanvas) reads conflictNodeIds and renders the yellow border
-  console.warn(`[CollabBridge] Conflict detected: node=${msg.nodeId}, user=${msg.conflictingUserId}`);
 }

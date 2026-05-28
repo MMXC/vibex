@@ -1,5 +1,6 @@
 /**
  * oplogStore.ts — Sprint38 P002-E1: CanvasStore oplog + AI indicator
+ * P002-E2: Conflict detection + toast emitter
  *
  * Manages the operation log (oplog) for collaborative canvas editing.
  * Records every operation (user or AI) on canvas nodes.
@@ -8,13 +9,16 @@
 
 'use client';
 
+import React from 'react';
+import { useToast } from '@/components/ui';
+
 // P002-E2: Conflict toast event emitter — bridges non-React oplogStore → React toast
 export const conflictToastEmitter = {
-  listeners: new Set<(nodeId: string) => void>(),
-  emit(nodeId: string) {
-    this.listeners.forEach((fn) => fn(nodeId));
+  listeners: new Set<(nodeId: string, conflictingUserId?: string) => void>(),
+  emit(nodeId: string, conflictingUserId?: string) {
+    this.listeners.forEach((fn) => fn(nodeId, conflictingUserId));
   },
-  on(fn: (nodeId: string) => void) {
+  on(fn: (nodeId: string, conflictingUserId?: string) => void) {
     this.listeners.add(fn);
     return () => this.listeners.delete(fn);
   },
@@ -26,13 +30,12 @@ export const conflictToastEmitter = {
  */
 export function useOplogConflictToast(): void {
   const toast = useToast();
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   React.useEffect(() => {
-    return conflictToastEmitter.on((nodeId) => {
-      toast.showToast(`检测到冲突：节点 ${nodeId} 被同时编辑`, 'warning', 5000);
+    return conflictToastEmitter.on((nodeId, conflictingUserId) => {
+      const userMsg = conflictingUserId ? `用户 ${conflictingUserId}` : '另一用户';
+      toast.showToast(`⚠️ 与${userMsg}的修改冲突`, 'warning', 5000);
     });
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [toast]);
 }
 
 import { create } from 'zustand';

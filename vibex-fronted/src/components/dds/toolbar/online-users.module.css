@@ -1,0 +1,77 @@
+/**
+ * OnlineUsers — P002-E3: Online user avatar stack styles
+ */
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stack {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+}
+
+/* Individual avatar */
+.avatar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #6366f1;
+  border: 2px solid #1e1e2e;
+  cursor: default;
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+
+.avatar:hover {
+  transform: scale(1.1);
+  z-index: 10 !important;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatarInitials {
+  color: #fff;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  user-select: none;
+}
+
+/* Overflow badge */
+.overflow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #374151;
+  border: 2px solid #1e1e2e;
+  color: #d1d5db;
+  font-size: 10px;
+  font-weight: 600;
+  margin-left: -8px;
+  cursor: default;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+/* Offline indicator — P002-E3 */
+.offline {
+  font-size: 12px;
+  cursor: default;
+  user-select: none;
+  line-height: 1;
+  flex-shrink: 0;
+}

@@ -26,7 +26,11 @@ import { useCanvasImport } from '@/hooks/canvas/useCanvasImport';
 import { useCanvasRBAC } from '@/hooks/useCanvasRBAC';
 import { ShareToTeamModal } from '@/components/team-share/ShareToTeamModal';
 import { ExportMenu } from './ExportMenu';
+import { OnlineUsers } from './OnlineUsers';
+import { OfflineIndicator } from './OfflineIndicator';
 import { useTranslations } from '@/hooks/useTranslations';
+import { useCollaboration } from '@/lib/collaboration/useCollaboration';
+import { useOplogConflictToast } from '@/stores/oplogStore';
 import styles from './DDSToolbar.module.css';
 
 // ==================== Chapter label keys (mapped to i18n keys) ====================
@@ -162,6 +166,12 @@ export const DDSToolbar = memo(function DDSToolbar({
   // S36-E4: History state for undo/redo buttons
   const canUndo = useCanvasHistoryStore((s) => s.canUndo());
   const canRedo = useCanvasHistoryStore((s) => s.canRedo());
+
+  // P002-E3: Collaboration — online users + connection status
+  const { isConnected, onlineUsers, connect, disconnect } = useCollaboration();
+
+  // P002-E2: Oplog conflict toast — renders toast when conflicts are detected
+  useOplogConflictToast();
 
   const { exportAsJSON, exportAsVibex } = useCanvasExport();
   const { showFilePicker, importFile } = useCanvasImport();
@@ -443,6 +453,10 @@ export const DDSToolbar = memo(function DDSToolbar({
           >
             <RedoIcon />
           </button>
+
+          {/* P002-E3: Online users + offline indicator */}
+          <OnlineUsers users={onlineUsers} maxVisible={4} />
+          <OfflineIndicator isConnected={isConnected} />
 
           {/* AI Generate button */}
           <button

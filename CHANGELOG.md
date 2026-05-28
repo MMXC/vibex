@@ -1,4 +1,12 @@
 ### [Unreleased] Sprint 39 — P003 评分卡复杂度指标
+### [Unreleased] Sprint 39 — P005 Service Worker 离线缓存
+
+##### S39-P005-E1: Service Worker 注册 + 静态资源缓存
+- **E1 SWRegistration**: `src/components/sw/SWRegistration.tsx` — navigator.serviceWorker.register("/sw.js") + 错误处理
+- **E1 layout.tsx 集成**: 在 layout.tsx body 中渲染 SWRegistration Client Component
+
+##### S39-P005-E3: manifest.json + PWA 图标 + Lighthouse 优化
+- **E3 manifest.json 验证**: public/manifest.json 已包含完整字段（name, short_name, start_url, display, icons），无需修改
 ### [Unreleased] Sprint 39 — P004 MiniMap 搜索导航
 
 ##### S39-P004-E1: MiniMap 搜索 + 节点高亮 + 视口边框

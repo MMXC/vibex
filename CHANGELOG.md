@@ -1,3 +1,12 @@
+### [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
+
+##### S40-P001-E1: AI Agent i18n 迁移收尾
+- **E1 useTranslations hook**: `src/hooks/useTranslations.ts` — 自定义 i18n hook，支持 namespace 隔离
+- **E1 AgentFeedbackPanel i18n**: `src/components/agent/AgentFeedbackPanel.tsx` — 接受/拒绝按钮、状态标签、role label、空状态全部使用 `t()` 国际化
+- **E1 AgentSessions i18n**: `src/components/agent/AgentSessions.tsx` — 6个会话状态 label、时间格式化、无会话提示全部使用 `t()` 国际化
+- **E1 /ai 页面**: `src/app/ai/page.tsx` — 新建 AI 页面，双栏布局（AgentSessions sidebar + AgentFeedbackPanel main）
+- **E1 i18n keys**: `src/i18n/messages/en.json` + `zh.json` 新增 54 个 ai namespace keys
+
 ### [Unreleased] Sprint 39 — P002 WebSocket 实时协作同步层
 
 ##### S39-P002-E1: WebSocket 连接层 + useCollaboration Hook
@@ -21,7 +30,25 @@
 - **E2 Toast 增强**: `conflictToastEmitter` 支持用户ID参数，Toast 显示"⚠️ 与用户X的修改冲突"
 - **E3 WebSocket Close**: WS close 事件触发 setOnlineUsers([])，用户下线自动从列表移除
 
+### [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
+
+##### S40-P001-E1: AI Agent i18n 迁移收尾
+- **E1 useTranslations hook**: `src/hooks/useTranslations.ts` — 自定义 i18n hook，支持 namespace 隔离
+- **E1 AgentFeedbackPanel i18n**: `src/components/agent/AgentFeedbackPanel.tsx` — 接受/拒绝按钮、状态标签、role label、空状态全部使用 `t()` 国际化
+- **E1 AgentSessions i18n**: `src/components/agent/AgentSessions.tsx` — 6个会话状态 label、时间格式化、无会话提示全部使用 `t()` 国际化
+- **E1 /ai 页面**: `src/app/ai/page.tsx` — 新建 AI 页面，双栏布局（AgentSessions sidebar + AgentFeedbackPanel main）
+- **E1 i18n keys**: `src/i18n/messages/en.json` + `zh.json` 新增 54 个 ai namespace keys
+
 ### [Unreleased] Sprint 39 — P003 评分卡复杂度指标
+### [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
+
+##### S40-P001-E1: AI Agent i18n 迁移收尾
+- **E1 useTranslations hook**: `src/hooks/useTranslations.ts` — 自定义 i18n hook，支持 namespace 隔离
+- **E1 AgentFeedbackPanel i18n**: `src/components/agent/AgentFeedbackPanel.tsx` — 接受/拒绝按钮、状态标签、role label、空状态全部使用 `t()` 国际化
+- **E1 AgentSessions i18n**: `src/components/agent/AgentSessions.tsx` — 6个会话状态 label、时间格式化、无会话提示全部使用 `t()` 国际化
+- **E1 /ai 页面**: `src/app/ai/page.tsx` — 新建 AI 页面，双栏布局（AgentSessions sidebar + AgentFeedbackPanel main）
+- **E1 i18n keys**: `src/i18n/messages/en.json` + `zh.json` 新增 54 个 ai namespace keys
+
 ### [Unreleased] Sprint 39 — P005 Service Worker 离线缓存
 
 ##### S39-P005-E1: Service Worker 注册 + 静态资源缓存
@@ -42,6 +69,15 @@
 ##### S39-P005-E3: manifest.json + PWA 图标
 - **E3 manifest.json**: public/manifest.json 已包含完整字段，icons 配置正确
 - **E3 manifest.json 验证**: public/manifest.json 已包含完整字段（name, short_name, start_url, display, icons），无需修改
+### [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
+
+##### S40-P001-E1: AI Agent i18n 迁移收尾
+- **E1 useTranslations hook**: `src/hooks/useTranslations.ts` — 自定义 i18n hook，支持 namespace 隔离
+- **E1 AgentFeedbackPanel i18n**: `src/components/agent/AgentFeedbackPanel.tsx` — 接受/拒绝按钮、状态标签、role label、空状态全部使用 `t()` 国际化
+- **E1 AgentSessions i18n**: `src/components/agent/AgentSessions.tsx` — 6个会话状态 label、时间格式化、无会话提示全部使用 `t()` 国际化
+- **E1 /ai 页面**: `src/app/ai/page.tsx` — 新建 AI 页面，双栏布局（AgentSessions sidebar + AgentFeedbackPanel main）
+- **E1 i18n keys**: `src/i18n/messages/en.json` + `zh.json` 新增 54 个 ai namespace keys
+
 ### [Unreleased] Sprint 39 — P004 MiniMap 搜索导航
 
 ##### S39-P004-E1: MiniMap 搜索 + 节点高亮 + 视口边框
@@ -158,6 +194,15 @@
 - **coord self-implement**: dev-epic3-评分卡 因 `updatedBy: cli`（CLI dispatch 但 dev agent 未 spawn，已 16.8h），coord 自实现 P003-E3
 
 ### [Unreleased] Sprint 38 — P004 E2E 稳定性
+
+### [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
+
+##### S40-P001-E1: AI Agent i18n 迁移收尾
+- **E1 useTranslations hook**: `src/hooks/useTranslations.ts` — 自定义 i18n hook，支持 namespace 隔离
+- **E1 AgentFeedbackPanel i18n**: `src/components/agent/AgentFeedbackPanel.tsx` — 接受/拒绝按钮、状态标签、role label、空状态全部使用 `t()` 国际化
+- **E1 AgentSessions i18n**: `src/components/agent/AgentSessions.tsx` — 6个会话状态 label、时间格式化、无会话提示全部使用 `t()` 国际化
+- **E1 /ai 页面**: `src/app/ai/page.tsx` — 新建 AI 页面，双栏布局（AgentSessions sidebar + AgentFeedbackPanel main）
+- **E1 i18n keys**: `src/i18n/messages/en.json` + `zh.json` 新增 54 个 ai namespace keys
 
 ### [Unreleased] Sprint 39 — P001 i18n 收尾
 

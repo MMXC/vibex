@@ -1,5 +1,6 @@
 /**
  * AgentFeedbackPanel.tsx — Sprint6 U4: AgentFeedbackPanel
+ * Sprint40 P001-E1: i18n — hardcoded text replaced with useTranslations('ai')()
  *
  * Shows agent code feedback with accept/reject controls.
  * Supports four states: idle / running / complete / error.
@@ -7,30 +8,29 @@
 
 'use client';
 
-import React, { memo, useCallback } from 'react';
+import React, { memo } from 'react';
 import { useAgentStore } from '@/stores/agentStore';
 import { acceptCodeBlock, rejectCodeBlock } from '@/services/agent/CodingAgentService';
 import type { AgentMessage, CodeBlock } from '@/services/agent/CodingAgentService';
+import { useTranslations } from '@/hooks/useTranslations';
 import styles from './AgentFeedbackPanel.module.css';
 
-function CodeBlockView({
-  block,
-  sessionKey,
-  messageId,
-  blockIndex,
-}: {
+interface CodeBlockViewProps {
   block: CodeBlock;
   sessionKey: string;
   messageId: string;
   blockIndex: number;
-}) {
+  t: (key: string) => string;
+}
+
+function CodeBlockView({ block, sessionKey, messageId, blockIndex, t }: CodeBlockViewProps) {
   const handleAccept = () => acceptCodeBlock(sessionKey, messageId, blockIndex);
   const handleReject = () => rejectCodeBlock(sessionKey, messageId, blockIndex);
 
   return (
     <div className={`${styles.codeBlock} ${block.accepted === true ? styles.accepted : ''} ${block.accepted === false ? styles.rejected : ''}`}>
       {block.filePath && (
-        <div className={styles.codeFilePath}>{block.filePath}</div>
+        <div className={styles.codeFilePath}>{t('filePath')}: {block.filePath}</div>
       )}
       <pre className={styles.codeContent}>
         <code>{block.code}</code>
@@ -42,37 +42,37 @@ function CodeBlockView({
               type="button"
               className={styles.acceptBtn}
               onClick={handleAccept}
-              aria-label="接受代码"
+              aria-label={t('acceptCode')}
             >
-              ✓ 接受
+              ✓ {t('acceptCode')}
             </button>
             <button
               type="button"
               className={styles.rejectBtn}
               onClick={handleReject}
-              aria-label="拒绝代码"
+              aria-label={t('rejectCode')}
             >
-              ✕ 拒绝
+              ✕ {t('rejectCode')}
             </button>
           </>
         ) : block.accepted ? (
-          <span className={styles.acceptedLabel}>✓ 已接受</span>
+          <span className={styles.acceptedLabel}>✓ {t('accepted')}</span>
         ) : (
-          <span className={styles.rejectedLabel}>✕ 已拒绝</span>
+          <span className={styles.rejectedLabel}>✕ {t('rejected')}</span>
         )}
       </div>
     </div>
   );
 }
 
-function MessageView({
-  message,
-  sessionKey,
-}: {
+interface MessageViewProps {
   message: AgentMessage;
   sessionKey: string;
-}) {
-  const roleLabel = message.role === 'agent' ? 'AI Agent' : message.role === 'user' ? '你' : '系统';
+  t: (key: string) => string;
+}
+
+function MessageView({ message, sessionKey, t }: MessageViewProps) {
+  const roleLabel = message.role === 'agent' ? 'AI Agent' : message.role === 'user' ? t('userLabel') ?? 'You' : 'System';
 
   return (
     <div className={`${styles.message} ${message.role === 'agent' ? styles.agentMessage : styles.userMessage}`}>
@@ -85,6 +85,7 @@ function MessageView({
           sessionKey={sessionKey}
           messageId={message.id}
           blockIndex={i}
+          t={t}
         />
       ))}
     </div>
@@ -99,6 +100,7 @@ interface AgentFeedbackPanelProps {
 export const AgentFeedbackPanel = memo(function AgentFeedbackPanel({
   sessionKey: sessionKeyProp,
 }: AgentFeedbackPanelProps) {
+  const t = useTranslations('ai')();
   const { sessions, activeSessionKey } = useAgentStore();
   const sessionKey = sessionKeyProp ?? activeSessionKey;
   const session = sessions.find((s) => s.sessionKey === sessionKey);
@@ -109,30 +111,35 @@ export const AgentFeedbackPanel = memo(function AgentFeedbackPanel({
         <div className={styles.idleState}>
           <div style={{ fontSize: '2rem', marginBottom: '12px' }}>🤖</div>
           <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}>
-            AI Coding Agent
+            {t('aiPageTitle')}
           </div>
           <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', textAlign: 'center' }}>
-            从会话列表选择一个会话查看反馈
+            {t('selectSessionHint')}
           </div>
         </div>
       </div>
     );
   }
 
-  const statusLabel = {
-    idle: '空闲',
-    starting: '启动中...',
-    running: '分析中...',
-    complete: '已完成',
-    error: '错误',
-    terminated: '已终止',
-  }[session.status] ?? '未知';
+  const statusMap: Record<string, string> = {
+    idle: t('statusIdle'),
+    starting: t('statusStarting'),
+    running: t('statusRunning'),
+    complete: t('statusComplete'),
+    error: t('statusError'),
+    terminated: t('statusTerminated'),
+  };
+  const statusLabel = statusMap[session.status] || 'Unknown';
+
+  const emptyMsg = session.status === 'running' || session.status === 'starting'
+    ? t('waitingForAgent')
+    : t('noMessages');
 
   return (
     <div className={styles.panel} data-testid="agent-feedback-panel">
       {/* Header */}
       <div className={styles.header}>
-        <div className={styles.headerTitle}>AI Coding Agent</div>
+        <div className={styles.headerTitle}>{t('aiPageTitle')}</div>
         <div className={`${styles.statusPill} ${styles[`status_${session.status}`]}`}>
           {statusLabel}
         </div>
@@ -140,7 +147,7 @@ export const AgentFeedbackPanel = memo(function AgentFeedbackPanel({
 
       {/* Task description */}
       <div className={styles.taskBanner}>
-        <span className={styles.taskLabel}>任务</span>
+        <span className={styles.taskLabel}>{t('taskLabel')}</span>
         <span className={styles.taskText}>{session.task}</span>
       </div>
 
@@ -155,17 +162,14 @@ export const AgentFeedbackPanel = memo(function AgentFeedbackPanel({
       {/* Messages */}
       <div className={styles.messages}>
         {session.messages.length === 0 ? (
-          <div className={styles.emptyMessages}>
-            {session.status === 'running' || session.status === 'starting'
-              ? '等待 AI Agent 响应...'
-              : '暂无消息'}
-          </div>
+          <div className={styles.emptyMessages}>{emptyMsg}</div>
         ) : (
           session.messages.map((msg) => (
             <MessageView
               key={msg.id}
               message={msg}
               sessionKey={session.sessionKey}
+              t={t}
             />
           ))
         )}

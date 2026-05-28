@@ -1,0 +1,61 @@
+/**
+ * ai.module.css — Sprint40 P001-E1: AI page styles
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: calc(100vh - 64px);
+  background: var(--color-bg-primary, #0f0f0f);
+}
+
+.header {
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #fff);
+  margin: 0 0 8px;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary, rgba(255, 255, 255, 0.6));
+  margin: 0;
+}
+
+.layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 280px;
+  min-width: 280px;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  overflow-y: auto;
+}
+
+.main {
+  flex: 1;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-width: 100%;
+    max-height: 200px;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+}

@@ -1,3 +1,15 @@
+### [Unreleased] Sprint 39 — P003 评分卡复杂度指标
+
+#### F001 — 评分卡复杂度指标（P003-E2 Token估算 + 圈复杂度）
+
+##### S39-P003-E2: AIScoreCard token estimation + complexity metrics
+- **E2 computeDiffScores 扩展**: 返回值新增 `linesTotal`、`tokenEstimate`、`complexityScore` 三个字段
+- **E2 Token 估算**: 使用 `new Blob([diffContent]).size * 0.75` 近似 token 数量
+- **E2 圈复杂度评分**: 基于控制流关键词（if/for/while/switch/case/&&/||/catch/?/try）统计，正则匹配后在 1-10 范围内归一化
+- **E2 AIScoreCard render**: 新增 `代码行数: N 行`、`Token 估算: ~M tokens`、`圈复杂度评分: X/10` 三个指标展示
+- **E2 整体评分公式**: 从简单平均改为加权平均（可读性 40% + 复杂度 30% + 覆盖率 30%）
+- **E2 TypeScript**: `pnpm exec tsc --noEmit` clean for AIScoreCard files
+
 ### [Unreleased] Sprint 38 — P001 i18n 多语言系统
 
 #### F001 — i18n 多语言系统（P001-E1 框架安装 + DDSToolbar 试点）

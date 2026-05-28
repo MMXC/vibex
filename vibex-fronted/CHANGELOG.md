@@ -20,6 +20,8 @@
 - **E3 OnlineUsers 组件**: `src/components/dds/toolbar/OnlineUsers.tsx` — 头像堆叠展示，最多3个 + "+N" 溢出，支持 initials 回退
 - **E3 DDSToolbar 集成**: DDSToolbar 右下角渲染 `<OnlineUsers users={onlineUsers} maxVisible={4} />`
 - **E3 WebSocket Presence**: useCollaboration.ts 解析 `presence` WS 消息，setOnlineUsers() 更新在线用户列表
+- **E3 OfflineIndicator**: `OfflineIndicator.tsx` — 连接断开时显示 🔴，已集成到 DDSToolbar
+- **E2 Toast 增强**: `conflictToastEmitter.emit(nodeId, conflictingUserId)` 支持用户ID参数，Toast 显示"⚠️ 与用户X的修改冲突"
 - **E3 WebSocket Close**: WS close 事件触发 setOnlineUsers([])，用户下线自动从列表移除
 
 ## [Unreleased] S39-P005-E2: SW Cache Strategy 验证

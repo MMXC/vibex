@@ -1,5 +1,11 @@
 # Changelog
 
+
+## [Unreleased] S39-P001-E1: i18n AI 页面迁移 — 2026-05-28
+- **E1 AI 页面 i18n 化**: `src/app/flow/page.tsx`, `src/app/domain/DomainPageContent.tsx`, `src/app/preview/page.tsx`, `src/app/landing/page.tsx` — 所有硬编码中文文本替换为 `t('ai.*')` 调用
+- **E1 ai namespace**: `src/i18n/messages/en.json` + `zh.json` 新增 `ai.*` 30个 key（generateBtn, generating, generateFlowTitle, flowEmptyError, generationFailed, placeholderHint, inputPlaceholder 等）
+- **E1 coord self-implement**: dev-epic1 因 `updatedBy: cli`（dev agent never spawned），coord self-implemented P001-E1 at 3353995f2
+
 ## [Unreleased] S38-P005-E1: react-virtual 安装 + viewportBounds store — 2026-05-27
 - **E1 viewportBoundsStore**: `src/lib/canvas/stores/viewportBoundsStore.ts` — Zustand store with `viewportBounds: { x, y, width, height }` + `updateViewportBounds` action + sessionStorage persist
 - **E1 useViewportBounds**: `src/hooks/useViewportBounds.ts` — Hook listening to scroll/resize/ResizeObserver, debounced 50ms, initializes from sessionStorage on mount; `useViewportBoundsForRef` variant for external refs

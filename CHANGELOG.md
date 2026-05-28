@@ -88,6 +88,14 @@
 
 ### [Unreleased] Sprint 38 — P004 E2E 稳定性
 
+### [Unreleased] Sprint 39 — P001 i18n 收尾
+
+#### F001 — i18n AI 页面迁移（P001-E1）
+- **E1 AI 页面 i18n 化**: `src/app/flow/page.tsx`, `src/app/domain/DomainPageContent.tsx`, `src/app/preview/page.tsx`, `src/app/landing/page.tsx` — 硬编码中文替换为 `t('ai.*')` 调用
+- **E1 ai namespace**: `src/i18n/messages/en.json` + `zh.json` 新增 30 个 key
+- **coord self-implement**: 3353995f2
+
+
 #### F001 — playwright.config.ts 改进（P004-E1）
 
 ##### S38-P004-E1: playwright.config.ts 改进（retries + globalSetup）（coord self-implement）

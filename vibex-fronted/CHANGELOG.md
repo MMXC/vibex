@@ -4,8 +4,14 @@
 - **E1 sw.js 验证**: public/sw.js 已存在（Workbox v1，Cache-First 静态资源 + networkFirst API）
 - **E1 console.log('[SW] Registered')**: 浏览器 DevTools → Application → Service Workers 可见
 
+## [Unreleased] S39-P005-E2: SW Cache Strategy 验证
+- **E2 sw.js 缓存策略**: public/sw.js 已包含完整 Workbox 缓存 — cacheFirst（JS/CSS/图片/font）、networkFirst（/api/）、stale-while-revalidate（其他）、离线写入队列（IndexedDB）
+
 ## [Unreleased] S39-P005-E3: manifest.json + PWA 图标 + Lighthouse 优化
 - **E3 manifest.json 验证**: public/manifest.json 已包含 name, short_name, start_url, display, icons (192x192 + 512x512)，无需修改
+## [Unreleased] S39-P004-E2: Canvas 节点点击 → 视口导航
+- **E2 onNodeClick**: ReactFlow onNodeClick → reactFlow.setViewport() 300ms 动画居中
+
 ## [Unreleased] S39-P004-E1: MiniMap 搜索 + 节点高亮 + 视口边框
 - **E1 useMiniMapSearch hook**: `src/hooks/useMiniMapSearch.ts` — 搜索词、高亮节点集、搜索回调
 - **E1 搜索输入框**: `src/app/domain/DomainPageContent.tsx` — 搜索节点...输入框，带清除按钮

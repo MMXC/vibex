@@ -5,7 +5,14 @@
 - **E1 SWRegistration**: `src/components/sw/SWRegistration.tsx` — navigator.serviceWorker.register("/sw.js") + 错误处理
 - **E1 layout.tsx 集成**: 在 layout.tsx body 中渲染 SWRegistration Client Component
 
-##### S39-P005-E3: manifest.json + PWA 图标 + Lighthouse 优化
+
+##### S39-P004-E2: Canvas 节点点击 → 视口导航
+- **E2 onNodeClick**: ReactFlow onNodeClick → reactFlow.setViewport() 300ms 动画居中
+
+##### S39-P005-E2: SW Cache Strategy 验证
+- **E2 sw.js 验证**: public/sw.js 已包含 cacheFirst + networkFirst + 离线队列，无需修改
+##### S39-P005-E3: manifest.json + PWA 图标
+- **E3 manifest.json**: public/manifest.json 已包含完整字段，icons 配置正确
 - **E3 manifest.json 验证**: public/manifest.json 已包含完整字段（name, short_name, start_url, display, icons），无需修改
 ### [Unreleased] Sprint 39 — P004 MiniMap 搜索导航
 

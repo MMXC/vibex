@@ -43,8 +43,9 @@ import {
   EdgeChange,
   applyNodeChanges,
   applyEdgeChanges,
-  ViewportPortal,
   useOnViewportChange,
+  useReactFlow,
+  ViewportPortal,
   Viewport,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -622,6 +623,19 @@ function DomainFlow({
     },
   });
 
+  // P004-E2: click node → pan viewport to center on it
+  const reactFlow = useReactFlow();
+  const onNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
+    const vp = reactFlow.getViewport();
+    const zoom = vp.zoom || 1;
+    const containerWidth = 400; // MiniMap width approximation
+    const containerHeight = 300; // MiniMap height approximation
+    // Center viewport on node position (accounting for zoom and MiniMap offset)
+    const x = -node.position.x * zoom + (containerWidth / 2);
+    const y = -node.position.y * zoom + (containerHeight / 2);
+    reactFlow.setViewport({ x, y, zoom }, { duration: 300 });
+  }, [reactFlow]);
+
   return (
     <div className={styles.flowContainer}>
       <ReactFlow
@@ -636,6 +650,7 @@ function DomainFlow({
         fitViewOptions={{ padding: 0.2 }}
         minZoom={0.1}
         maxZoom={2}
+        onNodeClick={onNodeClick}
       >
         <Controls className={styles.flowControls} />
         <MiniMap

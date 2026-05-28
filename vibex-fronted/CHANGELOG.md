@@ -1,6 +1,10 @@
 # Changelog
 
 
+## [Unreleased] S39-P003-E1: DiffOverlay 多文件 tab + Token 估算
+
+## [Unreleased] S39-P003-E2: 评分卡复杂度指标
+
 ## [Unreleased] S39-P001-E1: i18n AI 页面迁移 — 2026-05-28
 - **E1 AI 页面 i18n 化**: `src/app/flow/page.tsx`, `src/app/domain/DomainPageContent.tsx`, `src/app/preview/page.tsx`, `src/app/landing/page.tsx` — 所有硬编码中文文本替换为 `t('ai.*')` 调用
 - **E1 ai namespace**: `src/i18n/messages/en.json` + `zh.json` 新增 `ai.*` 30个 key（generateBtn, generating, generateFlowTitle, flowEmptyError, generationFailed, placeholderHint, inputPlaceholder 等）

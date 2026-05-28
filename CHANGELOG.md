@@ -32,8 +32,13 @@
 ##### S39-P004-E2: Canvas 节点点击 → 视口导航
 - **E2 onNodeClick**: ReactFlow onNodeClick → reactFlow.setViewport() 300ms 动画居中
 
-##### S39-P005-E2: SW Cache Strategy 验证
-- **E2 sw.js 验证**: public/sw.js 已包含 cacheFirst + networkFirst + 离线队列，无需修改
+##### S39-P005-E2: 语言包 Precache + API 降级离线
+- **E2 sw.js precache**: `public/sw.js` PRECACHE_ASSETS 新增 `/i18n/messages/en.json` 和 `/i18n/messages/zh.json`，SW 激活时自动缓存语言包
+- **E2 apiClient.ts**: `src/lib/api/apiClient.ts` — fetch 包装器，网络失败时回退 Cache.match()，Cache 命中返回 `{ offline: false, cached: true }`，完全离线返回 `{ offline: true }`
+- **E2 apiClient.test.ts**: 3 个测试（网络成功/缓存回退/完全离线）
+- **E2 uiStore isOffline**: `src/lib/canvas/stores/uiStore.ts` — 新增 `isOffline: boolean` + `setIsOffline()` + window online/offline 事件监听
+- **E2 DDSToolbar 离线 Badge**: `DDSToolbar.tsx` — 集成 `useUIStore.isOffline`，网络断开时显示 📴
+- **E2 coord self-implement**: dev-epic2-语言包 因 `updatedBy: cli`（Slack socket 断连期间 dispatch，~13h elapsed），coord self-implemented P005-E2
 ##### S39-P005-E3: manifest.json + PWA 图标
 - **E3 manifest.json**: public/manifest.json 已包含完整字段，icons 配置正确
 - **E3 manifest.json 验证**: public/manifest.json 已包含完整字段（name, short_name, start_url, display, icons），无需修改

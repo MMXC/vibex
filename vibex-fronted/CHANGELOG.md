@@ -24,8 +24,13 @@
 - **E2 Toast 增强**: `conflictToastEmitter.emit(nodeId, conflictingUserId)` 支持用户ID参数，Toast 显示"⚠️ 与用户X的修改冲突"
 - **E3 WebSocket Close**: WS close 事件触发 setOnlineUsers([])，用户下线自动从列表移除
 
-## [Unreleased] S39-P005-E2: SW Cache Strategy 验证
-- **E2 sw.js 缓存策略**: public/sw.js 已包含完整 Workbox 缓存 — cacheFirst（JS/CSS/图片/font）、networkFirst（/api/）、stale-while-revalidate（其他）、离线写入队列（IndexedDB）
+## [Unreleased] S39-P005-E2: 语言包 Precache + API 降级离线
+- **E2 sw.js precache**: `public/sw.js` PRECACHE_ASSETS 新增 `/i18n/messages/en.json` 和 `/i18n/messages/zh.json`，SW 激活时自动缓存语言包
+- **E2 apiClient.ts**: `src/lib/api/apiClient.ts` — fetch 包装器，网络失败时回退 Cache.match()，Cache 命中返回 `{ offline: false, cached: true }`，完全离线返回 `{ offline: true }`
+- **E2 apiClient.test.ts**: 3 个测试用例（网络成功/缓存回退/完全离线）
+- **E2 uiStore isOffline**: `src/lib/canvas/stores/uiStore.ts` — 新增 `isOffline: boolean` 状态 + `setIsOffline()` + `window.addEventListener('online'/'offline')` 自动同步
+- **E2 DDSToolbar 离线 Badge**: `DDSToolbar.tsx` — 集成 `useUIStore.isOffline`，网络断开时显示 📴
+
 
 ## [Unreleased] S39-P005-E3: manifest.json + PWA 图标 + Lighthouse 优化
 - **E3 manifest.json 验证**: public/manifest.json 已包含 name, short_name, start_url, display, icons (192x192 + 512x512)，无需修改

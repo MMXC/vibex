@@ -1,3 +1,12 @@
+### [Unreleased] Sprint 39 — P002 WebSocket 实时协作同步层
+
+##### S39-P002-E1: WebSocket 连接层 + useCollaboration Hook
+- **E1 WebSocket 客户端**: `src/lib/collaboration/websocket.ts` — JWT token 注入（localStorage vibex-token）、自动重连（指数退避，最多 3 次）、消息订阅
+- **E1 useCollaboration hook**: `src/lib/collaboration/useCollaboration.ts` — connect/disconnect/broadcast/subscribe，isConnected + onlineUsers 状态
+- **E1 useCanvasCollabBridge**: `src/lib/collaboration/canvasCollabBridge.ts` — DDSCanvasStore ↔ WebSocket 广播桥接，applyRemoteAction + 冲突检测
+- **E1 单元测试**: `src/lib/collaboration/__tests__/useCollaboration.test.ts` — WebSocket 消息收发、远程操作、在线用户、冲突检测
+- **E1 TypeScript**: `pnpm exec tsc --noEmit` clean for collaboration files
+
 ### [Unreleased] Sprint 39 — P003 评分卡复杂度指标
 ### [Unreleased] Sprint 39 — P005 Service Worker 离线缓存
 

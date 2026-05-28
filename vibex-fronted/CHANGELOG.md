@@ -4,6 +4,12 @@
 - **E1 sw.js 验证**: public/sw.js 已存在（Workbox v1，Cache-First 静态资源 + networkFirst API）
 - **E1 console.log('[SW] Registered')**: 浏览器 DevTools → Application → Service Workers 可见
 
+## [Unreleased] S39-P002-E1: WebSocket 连接层 + useCollaboration Hook
+- **E1 WebSocket 客户端**: `src/lib/collaboration/websocket.ts` — JWT token 注入（localStorage vibex-token）、自动重连（指数退避，最多 3 次）
+- **E1 useCollaboration hook**: `src/lib/collaboration/useCollaboration.ts` — connect/disconnect/broadcast/subscribe，onlineUsers 状态
+- **E1 useCanvasCollabBridge**: `src/lib/collaboration/canvasCollabBridge.ts` — DDSCanvasStore ↔ WebSocket 广播桥接，远程操作冲突检测
+- **E1 单元测试**: `src/lib/collaboration/__tests__/useCollaboration.test.ts` — WebSocket 消息收发、远程操作、在线用户、冲突检测
+
 ## [Unreleased] S39-P005-E2: SW Cache Strategy 验证
 - **E2 sw.js 缓存策略**: public/sw.js 已包含完整 Workbox 缓存 — cacheFirst（JS/CSS/图片/font）、networkFirst（/api/）、stale-while-revalidate（其他）、离线写入队列（IndexedDB）
 

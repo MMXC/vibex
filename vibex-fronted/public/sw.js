@@ -18,6 +18,9 @@ const MAX_RETRIES = 3;
 const PRECACHE_ASSETS = [
   '/',
   '/offline.html',
+  // P005-E2: Language pack precache
+  '/i18n/messages/en.json',
+  '/i18n/messages/zh.json',
 ];
 
 // ==================== IndexedDB Helpers (Service Worker) ====================

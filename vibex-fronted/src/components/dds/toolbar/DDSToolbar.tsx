@@ -30,6 +30,7 @@ import { OnlineUsers } from './OnlineUsers';
 import { OfflineIndicator } from './OfflineIndicator';
 import { useTranslations } from '@/hooks/useTranslations';
 import { useCollaboration } from '@/lib/collaboration/useCollaboration';
+import { useUIStore } from '@/lib/canvas/stores/uiStore';
 import { useOplogConflictToast } from '@/stores/oplogStore';
 import styles from './DDSToolbar.module.css';
 
@@ -169,6 +170,7 @@ export const DDSToolbar = memo(function DDSToolbar({
 
   // P002-E3: Collaboration — online users + connection status
   const { isConnected, onlineUsers, connect, disconnect } = useCollaboration();
+  const isOffline = useUIStore((s) => s.isOffline);
 
   // P002-E2: Oplog conflict toast — renders toast when conflicts are detected
   useOplogConflictToast();
@@ -457,6 +459,17 @@ export const DDSToolbar = memo(function DDSToolbar({
           {/* P002-E3: Online users + offline indicator */}
           <OnlineUsers users={onlineUsers} maxVisible={4} />
           <OfflineIndicator isConnected={isConnected} />
+          {/* P005-E2: Network offline badge */}
+          {isOffline && (
+            <span
+              className={styles.offline}
+              title="网络已断开"
+              aria-label="网络已断开"
+              role="img"
+            >
+              📴
+            </span>
+          )}
 
           {/* AI Generate button */}
           <button

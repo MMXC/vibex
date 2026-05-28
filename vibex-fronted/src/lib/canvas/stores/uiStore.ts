@@ -61,6 +61,11 @@ interface UIStore {
   openRightDrawer: () => void;
   setLeftDrawerWidth: (width: number) => void;
   setRightDrawerWidth: (width: number) => void;
+
+  // P005-E2: Offline state
+  isOffline: boolean;
+  setIsOffline: (offline: boolean) => void;
+  __initOfflineListeners: () => void;
 }
 
 export const useUIStore = create<UIStore>()(
@@ -164,6 +169,20 @@ export const useUIStore = create<UIStore>()(
         openRightDrawer: () => set({ rightDrawerOpen: true }),
         setLeftDrawerWidth: (width) => set({ leftDrawerWidth: Math.min(400, Math.max(100, width)) }),
         setRightDrawerWidth: (width) => set({ rightDrawerWidth: Math.min(400, Math.max(100, width)) }),
+
+        // P005-E2: Offline state
+        isOffline:
+          typeof window !== 'undefined' ? !navigator.onLine : false,
+        setIsOffline: (offline) => set({ isOffline: offline }),
+
+        // P005-E2: Register online/offline listeners (SSR-safe)
+        __initOfflineListeners:
+          typeof window !== 'undefined'
+            ? (() => {
+                window.addEventListener('online', () => set({ isOffline: false }));
+                window.addEventListener('offline', () => set({ isOffline: true }));
+              }) as () => void
+            : () => {},
       }),
       { name: 'vibex-ui-store', skipHydration: true }
     ),

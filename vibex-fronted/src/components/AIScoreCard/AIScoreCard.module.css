@@ -1,5 +1,5 @@
 /**
- * AIScoreCard.module.css — Sprint38 P003-E3
+ * AIScoreCard.module.css — Sprint39 P003-E2
  */
 
 .card {
@@ -33,7 +33,25 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  margin-bottom: 8px;
+}
+
+.metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
   margin-bottom: 10px;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.metricItem {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.4;
 }
 
 .scoreRow {

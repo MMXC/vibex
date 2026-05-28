@@ -1,13 +1,15 @@
 /**
- * AIScoreCard — Sprint38 P003-E3: AI 代码评分卡
+ * AIScoreCard — Sprint39 P003-E2: 评分卡复杂度指标
  *
  * Displays a 3-dimension AI code quality score (readability, complexity, coverage)
  * each rated 1-5 stars, at the bottom of the DiffOverlay.
+ * Also shows code line count, token estimate, and cyclomatic complexity score.
  *
  * Scoring is deterministic based on diff characteristics:
  * - Readability: based on avg line length + comment density
  * - Complexity: based on total changed lines + churn
  * - Coverage: based on files changed vs task complexity
+ * - Cyclomatic Complexity Score: derived from control flow heuristics
  *
  * Usage:
  * ```tsx
@@ -34,6 +36,9 @@ export interface AIScore {
   readability: number;
   complexity: number;
   coverage: number;
+  linesTotal: number;
+  tokenEstimate: number;
+  complexityScore: number;
 }
 
 /**
@@ -44,6 +49,10 @@ export interface AIScore {
  * - Readability (1-5): avg line length < 80 chars = high, > 120 = low
  * - Complexity (1-5): total lines changed, more lines = higher complexity
  * - Coverage (1-5): ratio of changed lines to total lines, more coverage = better
+ * - LinesTotal: total lines in the diff
+ * - TokenEstimate: estimated token count using Blob size * 0.75
+ * - ComplexityScore (1-10): cyclomatic complexity approximation based on
+ *   control flow keywords (if, for, while, switch, case, &&, ||, ?, catch)
  */
 export function computeDiffScores(diff: DiffResult): AIScore {
   const { added, removed, changes } = diff;
@@ -91,7 +100,49 @@ export function computeDiffScores(diff: DiffResult): AIScore {
   else if (filesPerChange > 0.5) coverage = 2;
   else coverage = 1;
 
-  return { readability, complexity, coverage };
+  // Token estimate: use Blob size * 0.75 (approx token ratio)
+  const diffContent = changes.map((c) => c.line).join('\n');
+  const tokenEstimate = Math.round(new Blob([diffContent]).size * 0.75);
+
+  // Cyclomatic complexity approximation: count control flow keywords
+  // Each keyword adds complexity; normalize to 1-10 scale
+  const controlFlowKeywords = /\b(if|for|while|switch|case|&&|\|\||catch|\?|try)\b/g;
+  let complexityMatches = 0;
+  for (const change of changes) {
+    const trimmed = change.line.trim();
+    // Only count in actual code lines (skip comments and empty lines)
+    if (
+      trimmed &&
+      !trimmed.startsWith('//') &&
+      !trimmed.startsWith('/*') &&
+      !trimmed.startsWith('*') &&
+      !trimmed.startsWith('#')
+    ) {
+      const matches = trimmed.match(controlFlowKeywords);
+      complexityMatches += matches ? matches.length : 0;
+    }
+  }
+  // Normalize: 0 matches -> 1/10, 1-2 -> 2/10, ... 10+ -> 10/10
+  let complexityScore: number;
+  if (complexityMatches === 0) complexityScore = 1;
+  else if (complexityMatches <= 2) complexityScore = 2;
+  else if (complexityMatches <= 4) complexityScore = 3;
+  else if (complexityMatches <= 6) complexityScore = 4;
+  else if (complexityMatches <= 8) complexityScore = 5;
+  else if (complexityMatches <= 12) complexityScore = 6;
+  else if (complexityMatches <= 16) complexityScore = 7;
+  else if (complexityMatches <= 20) complexityScore = 8;
+  else if (complexityMatches <= 30) complexityScore = 9;
+  else complexityScore = 10;
+
+  return {
+    readability,
+    complexity,
+    coverage,
+    linesTotal: lineCount,
+    tokenEstimate,
+    complexityScore,
+  };
 }
 
 export const AIScoreCard = memo(function AIScoreCard({
@@ -115,7 +166,10 @@ export const AIScoreCard = memo(function AIScoreCard({
     onScoreSaved?.();
   }, [addAIScore, scores, diffResult, onScoreSaved]);
 
-  const overall = Math.round((scores.readability + scores.complexity + scores.coverage) / 3);
+  // Weighted overall: readability(40%), complexity(30%), coverage(30%)
+  const overall = Math.round(
+    scores.readability * 0.4 + scores.complexity * 0.3 + scores.coverage * 0.3
+  );
 
   return (
     <div className={styles.card} data-testid="ai-score-card">
@@ -132,6 +186,19 @@ export const AIScoreCard = memo(function AIScoreCard({
         <ScoreRow label="可读性" value={scores.readability} />
         <ScoreRow label="复杂度" value={scores.complexity} />
         <ScoreRow label="覆盖率" value={scores.coverage} />
+      </div>
+
+      {/* Metrics row */}
+      <div className={styles.metrics}>
+        <span className={styles.metricItem} data-testid="metric-lines">
+          代码行数: {scores.linesTotal} 行
+        </span>
+        <span className={styles.metricItem} data-testid="metric-tokens">
+          Token 估算: ~{scores.tokenEstimate} tokens
+        </span>
+        <span className={styles.metricItem} data-testid="metric-cyclomatic">
+          圈复杂度评分: {scores.complexityScore}/10
+        </span>
       </div>
 
       {/* Save button */}

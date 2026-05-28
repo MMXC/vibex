@@ -1,4 +1,11 @@
 ### [Unreleased] Sprint 39 — P003 评分卡复杂度指标
+### [Unreleased] Sprint 39 — P004 MiniMap 搜索导航
+
+##### S39-P004-E1: MiniMap 搜索 + 节点高亮 + 视口边框
+- **E1 useMiniMapSearch hook**: `src/hooks/useMiniMapSearch.ts` — 搜索词、高亮节点集、搜索回调
+- **E1 搜索输入框**: `src/app/domain/DomainPageContent.tsx` — 搜索节点...输入框
+- **E1 节点高亮**: MiniMap nodeColor 动态化，匹配节点返回红色高亮
+- **E1 视口边框**: MiniMapViewportBorder 组件，ViewportPortal + SVG rect 标注当前视口范围
 
 #### F001 — 评分卡复杂度指标（P003-E2 Token估算 + 圈复杂度）
 

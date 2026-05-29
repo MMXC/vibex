@@ -31,6 +31,11 @@ ENVIRONMENT = "production"
 pattern = "api.vibex.top/*"
 zone_name = "vibex.top"
 
+# P002-E1: WebSocket 后端
+[[routes]]
+pattern = "ws.vibex.top/*"
+zone_name = "vibex.top"
+
 # Durable Objects
 [[durable_objects.bindings]]
 name = "COLLABORATION_DO"

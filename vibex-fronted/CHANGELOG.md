@@ -6,6 +6,14 @@
 - **E1 /ai 页面**: `src/app/ai/page.tsx` — 新建 AI 页面，双栏布局（AgentSessions sidebar + AgentFeedbackPanel main）
 - **E1 i18n keys**: `src/i18n/messages/en.json` + `zh.json` 新增 54 个 ai namespace keys
 
+## [Unreleased] Sprint 40 — P002 WebSocket 后端 + 协作同步层
+
+##### S40-P002-E1: WebSocket 后端部署 + 前端集成
+- **E1 后端 WebSocket 服务**: `vibex-backend/src/services/websocket/` — ConnectionPool + MessageRouter
+- **E1 wrangler.toml ws.vibex.top**: 添加 `ws.vibex.top/*` Cloudflare 域名路由
+- **E1 前端 ws URL**: `src/lib/collaboration/websocket.ts` — `wss://ws.vibex.top` 连接配置
+- **E1 待完成**: Cloudflare DNS `ws.vibex.top` A/CNAME 记录配置
+
 ## [Unreleased] S39-P005-E1: Service Worker 注册 + 静态资源缓存
 - **E1 SWRegistration**: `src/components/sw/SWRegistration.tsx` — useEffect 中调用 navigator.serviceWorker.register("/sw.js")，带错误处理和 updatefound 事件监听
 - **E1 layout.tsx 集成**: 在 layout.tsx body 中渲染 SWRegistration Client Component

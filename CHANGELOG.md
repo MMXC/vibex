@@ -7,6 +7,15 @@
 - **E1 /ai 页面**: `src/app/ai/page.tsx` — 新建 AI 页面，双栏布局（AgentSessions sidebar + AgentFeedbackPanel main）
 - **E1 i18n keys**: `src/i18n/messages/en.json` + `zh.json` 新增 54 个 ai namespace keys
 
+### [Unreleased] Sprint 40 — P002 WebSocket 后端 + 协作同步层
+
+##### S40-P002-E1: WebSocket 后端部署 + 前端集成
+- **E1 后端 WebSocket 服务**: `vibex-backend/src/services/websocket/` — ConnectionPool + MessageRouter（Cloudflare Workers Durable Objects 架构）
+- **E1 wrangler.toml ws.vibex.top**: 添加 `ws.vibex.top/*` Cloudflare 域名路由
+- **E1 前端 ws URL 更新**: `vibex-fronted/src/lib/collaboration/websocket.ts` 连接 URL 配置为 `wss://ws.vibex.top`
+- **E1 待完成**: Cloudflare DNS `ws.vibex.top` A/CNAME 记录配置（外部依赖）
+- **E1 待完成**: Fly.io WebSocket 服务 JWT secret 配置（`fly secrets set JWT_SECRET=***`）
+
 ### [Unreleased] Sprint 39 — P002 WebSocket 实时协作同步层
 
 ##### S39-P002-E1: WebSocket 连接层 + useCollaboration Hook
@@ -39,6 +48,15 @@
 - **E1 /ai 页面**: `src/app/ai/page.tsx` — 新建 AI 页面，双栏布局（AgentSessions sidebar + AgentFeedbackPanel main）
 - **E1 i18n keys**: `src/i18n/messages/en.json` + `zh.json` 新增 54 个 ai namespace keys
 
+### [Unreleased] Sprint 40 — P002 WebSocket 后端 + 协作同步层
+
+##### S40-P002-E1: WebSocket 后端部署 + 前端集成
+- **E1 后端 WebSocket 服务**: `vibex-backend/src/services/websocket/` — ConnectionPool + MessageRouter（Cloudflare Workers Durable Objects 架构）
+- **E1 wrangler.toml ws.vibex.top**: 添加 `ws.vibex.top/*` Cloudflare 域名路由
+- **E1 前端 ws URL 更新**: `vibex-fronted/src/lib/collaboration/websocket.ts` 连接 URL 配置为 `wss://ws.vibex.top`
+- **E1 待完成**: Cloudflare DNS `ws.vibex.top` A/CNAME 记录配置（外部依赖）
+- **E1 待完成**: Fly.io WebSocket 服务 JWT secret 配置（`fly secrets set JWT_SECRET=***`）
+
 ### [Unreleased] Sprint 39 — P003 评分卡复杂度指标
 ### [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
 
@@ -48,6 +66,15 @@
 - **E1 AgentSessions i18n**: `src/components/agent/AgentSessions.tsx` — 6个会话状态 label、时间格式化、无会话提示全部使用 `t()` 国际化
 - **E1 /ai 页面**: `src/app/ai/page.tsx` — 新建 AI 页面，双栏布局（AgentSessions sidebar + AgentFeedbackPanel main）
 - **E1 i18n keys**: `src/i18n/messages/en.json` + `zh.json` 新增 54 个 ai namespace keys
+
+### [Unreleased] Sprint 40 — P002 WebSocket 后端 + 协作同步层
+
+##### S40-P002-E1: WebSocket 后端部署 + 前端集成
+- **E1 后端 WebSocket 服务**: `vibex-backend/src/services/websocket/` — ConnectionPool + MessageRouter（Cloudflare Workers Durable Objects 架构）
+- **E1 wrangler.toml ws.vibex.top**: 添加 `ws.vibex.top/*` Cloudflare 域名路由
+- **E1 前端 ws URL 更新**: `vibex-fronted/src/lib/collaboration/websocket.ts` 连接 URL 配置为 `wss://ws.vibex.top`
+- **E1 待完成**: Cloudflare DNS `ws.vibex.top` A/CNAME 记录配置（外部依赖）
+- **E1 待完成**: Fly.io WebSocket 服务 JWT secret 配置（`fly secrets set JWT_SECRET=***`）
 
 ### [Unreleased] Sprint 39 — P005 Service Worker 离线缓存
 
@@ -77,6 +104,15 @@
 - **E1 AgentSessions i18n**: `src/components/agent/AgentSessions.tsx` — 6个会话状态 label、时间格式化、无会话提示全部使用 `t()` 国际化
 - **E1 /ai 页面**: `src/app/ai/page.tsx` — 新建 AI 页面，双栏布局（AgentSessions sidebar + AgentFeedbackPanel main）
 - **E1 i18n keys**: `src/i18n/messages/en.json` + `zh.json` 新增 54 个 ai namespace keys
+
+### [Unreleased] Sprint 40 — P002 WebSocket 后端 + 协作同步层
+
+##### S40-P002-E1: WebSocket 后端部署 + 前端集成
+- **E1 后端 WebSocket 服务**: `vibex-backend/src/services/websocket/` — ConnectionPool + MessageRouter（Cloudflare Workers Durable Objects 架构）
+- **E1 wrangler.toml ws.vibex.top**: 添加 `ws.vibex.top/*` Cloudflare 域名路由
+- **E1 前端 ws URL 更新**: `vibex-fronted/src/lib/collaboration/websocket.ts` 连接 URL 配置为 `wss://ws.vibex.top`
+- **E1 待完成**: Cloudflare DNS `ws.vibex.top` A/CNAME 记录配置（外部依赖）
+- **E1 待完成**: Fly.io WebSocket 服务 JWT secret 配置（`fly secrets set JWT_SECRET=***`）
 
 ### [Unreleased] Sprint 39 — P004 MiniMap 搜索导航
 
@@ -203,6 +239,15 @@
 - **E1 AgentSessions i18n**: `src/components/agent/AgentSessions.tsx` — 6个会话状态 label、时间格式化、无会话提示全部使用 `t()` 国际化
 - **E1 /ai 页面**: `src/app/ai/page.tsx` — 新建 AI 页面，双栏布局（AgentSessions sidebar + AgentFeedbackPanel main）
 - **E1 i18n keys**: `src/i18n/messages/en.json` + `zh.json` 新增 54 个 ai namespace keys
+
+### [Unreleased] Sprint 40 — P002 WebSocket 后端 + 协作同步层
+
+##### S40-P002-E1: WebSocket 后端部署 + 前端集成
+- **E1 后端 WebSocket 服务**: `vibex-backend/src/services/websocket/` — ConnectionPool + MessageRouter（Cloudflare Workers Durable Objects 架构）
+- **E1 wrangler.toml ws.vibex.top**: 添加 `ws.vibex.top/*` Cloudflare 域名路由
+- **E1 前端 ws URL 更新**: `vibex-fronted/src/lib/collaboration/websocket.ts` 连接 URL 配置为 `wss://ws.vibex.top`
+- **E1 待完成**: Cloudflare DNS `ws.vibex.top` A/CNAME 记录配置（外部依赖）
+- **E1 待完成**: Fly.io WebSocket 服务 JWT secret 配置（`fly secrets set JWT_SECRET=***`）
 
 ### [Unreleased] Sprint 39 — P001 i18n 收尾
 

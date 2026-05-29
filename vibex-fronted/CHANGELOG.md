@@ -1,3 +1,20 @@
+### [Unreleased] Sprint 41 — P001 i18n 验收 + P002 WebSocket 部署 + P003 MiniMap 验收 + P004 Canvas 持久化 + P005 快捷键
+
+##### S41-P001-E1: i18n AI生成区最终验收
+- **E1 i18n 验证**: `src/app/ai/page.tsx` + `AgentFeedbackPanel.tsx` + `AgentSessions.tsx` — TypeScript 编译通过，useTranslations('ai')() 全覆盖
+
+##### S41-P002-E1: WebSocket 后端部署（E2-E3 合并）
+- **E2 前端 ws**: `src/lib/collaboration/websocket.ts` — `wss://ws.vibex.top` 连接配置
+
+##### S41-P003-E1: MiniMap 导航完善验收
+- **E3 MiniMapPanel**: `src/components/dds/MiniMapPanel.tsx` + `miniMapStore.ts` ✅
+
+##### S41-P004-E1: Canvas 持久化 + IndexedDB
+- **E4 serialize/import/export**: `src/lib/canvas/serialize.ts` + `useCanvasExport.ts` + `useCanvasImport.ts` ✅
+
+##### S41-P005-E1: 键盘快捷键系统
+- **E5 待实现**: `useGlobalHotkeys.ts` + `HotkeyHelpModal.tsx`
+
 ### [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
 
 ##### S40-P001-E1: AI Agent i18n 迁移收尾

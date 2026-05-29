@@ -1,3 +1,26 @@
+### [Unreleased] Sprint 41 — P001 i18n 验收 + P002 WebSocket 部署 + P003 MiniMap 验收 + P004 Canvas 持久化 + P005 快捷键
+
+##### S41-P001-E1: i18n AI生成区最终验收
+- **E1 useTranslations**: `src/app/ai/page.tsx` + `AgentFeedbackPanel.tsx` + `AgentSessions.tsx` 全部使用 `useTranslations('ai')()` ✅
+- **E1 TypeScript**: E1 相关文件 tsc --noEmit 零错误 ✅
+- **E1 验证**: `/en/ai` 英文 + `/zh/ai` 中文 手动验证通过
+
+##### S41-P002-E1: WebSocket 后端部署（E2-E3 合并）
+- **E2 后端代码**: `vibex-backend/src/services/websocket/` — ConnectionPool + MessageRouter + Durable Objects
+- **E2 wrangler.toml**: `ws.vibex.top/*` 路由已配置
+- **E2 待完成**: Cloudflare DNS 配置 + `wrangler secret put JWT_SECRET`
+
+##### S41-P003-E1: MiniMap 导航完善验收
+- **E3 MiniMapPanel**: `src/components/dds/MiniMapPanel.tsx` — toggle/click-to-navigate/视口边框 ✅
+- **E3 E2E 测试**: `tests/e2e/minimap-panel.spec.ts` — 5 tests ✅
+
+##### S41-P004-E1: Canvas 持久化 + IndexedDB
+- **E4 serialize**: `src/lib/canvas/serialize.ts` — 20 vitest tests ✅
+- **E4 IndexedDB**: 待实现（需 `pnpm add idb`）
+
+##### S41-P005-E1: 键盘快捷键系统
+- **E5 待实现**: `react-hotkeys-hook` + `useGlobalHotkeys.ts` hook
+
 ### [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
 
 ##### S40-P001-E1: AI Agent i18n 迁移收尾

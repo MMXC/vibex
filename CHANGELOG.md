@@ -59,6 +59,19 @@
 - **E2 Toast 增强**: `conflictToastEmitter` 支持用户ID参数，Toast 显示"⚠️ 与用户X的修改冲突"
 - **E3 WebSocket Close**: WS close 事件触发 setOnlineUsers([])，用户下线自动从列表移除
 
+
+### [Unreleased] Sprint 40 — P005 键盘快捷键系统完善
+
+##### S40-P005-E1: 键盘快捷键系统完善
+- **E1 ShortcutManager**: `src/lib/keyboard/shortcutManager.ts` — 全局键盘管理，mousetrap 集成，SYSTEM_RESERVED 注册表（Cmd+w/Cmd+r/Cmd+f 等），pause/resume，per-shortcut bind/unbind/rebind ✅
+- **E1 ShortcutManager 测试**: `src/lib/keyboard/__tests__/shortcutManager.test.ts` — 25 tests，all passing ✅
+- **E1 全局冲突检测**: checkGlobalConflict() — 检测 SYSTEM_RESERVED 快捷键（浏览器保留快捷键警告），isReservedShortcut() 辅助函数
+- **E1 keyboardEventToMousetrap**: 将 KeyboardEvent 转换为 mousetrap 格式（Cmd+Shift+K 等）
+- **E1 E2E 测试更新**: `tests/e2e/keyboard-shortcuts.spec.ts` — 新增 P005-E1 测试组（settings page/reset/conflict detection/smoke），454→537 lines ✅
+- **E1 Settings 页面**: `src/app/settings/shortcuts/page.tsx` — 已存在（完整实现），集成 ShortcutCategory + ShortcutEditModal ✅
+- **E1 ShortcutStore**: `src/stores/shortcutStore.ts` — 已存在（localStorage persist + conflict detection）✅
+- **E1 mousetrap 依赖**: `package.json` — mousetrap@1.6.5 已安装 ✅
+
 ### [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
 
 ##### S40-P001-E1: AI Agent i18n 迁移收尾

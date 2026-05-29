@@ -40,6 +40,16 @@
 - **E1 sw.js 验证**: public/sw.js 已存在（Workbox v1，Cache-First 静态资源 + networkFirst API）
 - **E1 console.log('[SW] Registered')**: 浏览器 DevTools → Application → Service Workers 可见
 
+
+## [Unreleased] Sprint 40 — P005 键盘快捷键系统完善
+
+##### S40-P005-E1: 键盘快捷键系统完善
+- **E1 ShortcutManager**: `src/lib/keyboard/shortcutManager.ts` — 全局键盘管理，mousetrap 集成，SYSTEM_RESERVED 注册表，pause/resume，per-shortcut bind/unbind ✅
+- **E1 ShortcutManager 测试**: `src/lib/keyboard/__tests__/shortcutManager.test.ts` — 25 tests，all passing ✅
+- **E1 全局冲突检测**: checkGlobalConflict() 检测浏览器保留快捷键，isReservedShortcut() + getReservedDescription() 辅助函数
+- **E1 E2E 测试更新**: `tests/e2e/keyboard-shortcuts.spec.ts` — 新增 P005-E1 测试组（settings page/reset/conflict detection/smoke），TypeScript clean ✅
+- **E1 mousetrap 依赖**: `package.json` — mousetrap@1.6.5 已安装 ✅
+
 ### [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
 
 ##### S40-P001-E1: AI Agent i18n 迁移收尾

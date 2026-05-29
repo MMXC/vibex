@@ -14,6 +14,15 @@
 - **E1 前端 ws URL**: `src/lib/collaboration/websocket.ts` — `wss://ws.vibex.top` 连接配置
 - **E1 待完成**: Cloudflare DNS `ws.vibex.top` A/CNAME 记录配置
 
+## [Unreleased] Sprint 40 — P003 MiniMap 导航完善
+
+##### S40-P003-E1: MiniMap 导航完善（Sprint39 遗留）
+- **E1 MiniMapPanel**: `src/components/dds/MiniMapPanel.tsx` — 折叠式左侧面板（toggle按钮 + click-to-navigate + 视口边框矩形）
+- **E1 MiniMapPanel CSS**: `MiniMapPanel.module.css` — slideIn动画、glassmorphism暗色主题
+- **E1 miniMapStore**: `src/lib/canvas/stores/miniMapStore.ts` — panelOpen + viewport状态管理
+- **E1 DDSCanvasPage集成**: `<MiniMapPanel />` 集成到画布页面（position:absolute浮动）
+- **E1 E2E测试**: `tests/e2e/minimap-panel.spec.ts` — 5 tests，TypeScript clean ✅
+
 ## [Unreleased] S39-P005-E1: Service Worker 注册 + 静态资源缓存
 - **E1 SWRegistration**: `src/components/sw/SWRegistration.tsx` — useEffect 中调用 navigator.serviceWorker.register("/sw.js")，带错误处理和 updatefound 事件监听
 - **E1 layout.tsx 集成**: 在 layout.tsx body 中渲染 SWRegistration Client Component

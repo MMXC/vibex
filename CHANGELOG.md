@@ -16,6 +16,15 @@
 - **E1 待完成**: Cloudflare DNS `ws.vibex.top` A/CNAME 记录配置（外部依赖）
 - **E1 待完成**: Fly.io WebSocket 服务 JWT secret 配置（`fly secrets set JWT_SECRET=***`）
 
+### [Unreleased] Sprint 40 — P003 MiniMap 导航完善
+
+##### S40-P003-E1: MiniMap 导航完善（Sprint39 遗留）
+- **E1 MiniMapPanel**: `vibex-fronted/src/components/dds/MiniMapPanel.tsx` — 折叠式左侧面板，含 toggle 按钮、click-to-navigate、视口边框矩形
+- **E1 MiniMapPanel CSS**: `MiniMapPanel.module.css` — slideIn 动画、glassmorphism 暗色主题
+- **E1 miniMapStore**: `src/lib/canvas/stores/miniMapStore.ts` — panelOpen + viewport 状态管理
+- **E1 DDSCanvasPage 集成**: `<MiniMapPanel />` 集成到画布页面，position:absolute 浮动于画布之上
+- **E1 E2E 测试**: `tests/e2e/minimap-panel.spec.ts` — 5 tests（toggle/panel/open-close/closeBtn），TypeScript clean ✅
+
 ### [Unreleased] Sprint 39 — P002 WebSocket 实时协作同步层
 
 ##### S39-P002-E1: WebSocket 连接层 + useCollaboration Hook
@@ -57,6 +66,15 @@
 - **E1 待完成**: Cloudflare DNS `ws.vibex.top` A/CNAME 记录配置（外部依赖）
 - **E1 待完成**: Fly.io WebSocket 服务 JWT secret 配置（`fly secrets set JWT_SECRET=***`）
 
+### [Unreleased] Sprint 40 — P003 MiniMap 导航完善
+
+##### S40-P003-E1: MiniMap 导航完善（Sprint39 遗留）
+- **E1 MiniMapPanel**: `vibex-fronted/src/components/dds/MiniMapPanel.tsx` — 折叠式左侧面板，含 toggle 按钮、click-to-navigate、视口边框矩形
+- **E1 MiniMapPanel CSS**: `MiniMapPanel.module.css` — slideIn 动画、glassmorphism 暗色主题
+- **E1 miniMapStore**: `src/lib/canvas/stores/miniMapStore.ts` — panelOpen + viewport 状态管理
+- **E1 DDSCanvasPage 集成**: `<MiniMapPanel />` 集成到画布页面，position:absolute 浮动于画布之上
+- **E1 E2E 测试**: `tests/e2e/minimap-panel.spec.ts` — 5 tests（toggle/panel/open-close/closeBtn），TypeScript clean ✅
+
 ### [Unreleased] Sprint 39 — P003 评分卡复杂度指标
 ### [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
 
@@ -75,6 +93,15 @@
 - **E1 前端 ws URL 更新**: `vibex-fronted/src/lib/collaboration/websocket.ts` 连接 URL 配置为 `wss://ws.vibex.top`
 - **E1 待完成**: Cloudflare DNS `ws.vibex.top` A/CNAME 记录配置（外部依赖）
 - **E1 待完成**: Fly.io WebSocket 服务 JWT secret 配置（`fly secrets set JWT_SECRET=***`）
+
+### [Unreleased] Sprint 40 — P003 MiniMap 导航完善
+
+##### S40-P003-E1: MiniMap 导航完善（Sprint39 遗留）
+- **E1 MiniMapPanel**: `vibex-fronted/src/components/dds/MiniMapPanel.tsx` — 折叠式左侧面板，含 toggle 按钮、click-to-navigate、视口边框矩形
+- **E1 MiniMapPanel CSS**: `MiniMapPanel.module.css` — slideIn 动画、glassmorphism 暗色主题
+- **E1 miniMapStore**: `src/lib/canvas/stores/miniMapStore.ts` — panelOpen + viewport 状态管理
+- **E1 DDSCanvasPage 集成**: `<MiniMapPanel />` 集成到画布页面，position:absolute 浮动于画布之上
+- **E1 E2E 测试**: `tests/e2e/minimap-panel.spec.ts` — 5 tests（toggle/panel/open-close/closeBtn），TypeScript clean ✅
 
 ### [Unreleased] Sprint 39 — P005 Service Worker 离线缓存
 
@@ -113,6 +140,15 @@
 - **E1 前端 ws URL 更新**: `vibex-fronted/src/lib/collaboration/websocket.ts` 连接 URL 配置为 `wss://ws.vibex.top`
 - **E1 待完成**: Cloudflare DNS `ws.vibex.top` A/CNAME 记录配置（外部依赖）
 - **E1 待完成**: Fly.io WebSocket 服务 JWT secret 配置（`fly secrets set JWT_SECRET=***`）
+
+### [Unreleased] Sprint 40 — P003 MiniMap 导航完善
+
+##### S40-P003-E1: MiniMap 导航完善（Sprint39 遗留）
+- **E1 MiniMapPanel**: `vibex-fronted/src/components/dds/MiniMapPanel.tsx` — 折叠式左侧面板，含 toggle 按钮、click-to-navigate、视口边框矩形
+- **E1 MiniMapPanel CSS**: `MiniMapPanel.module.css` — slideIn 动画、glassmorphism 暗色主题
+- **E1 miniMapStore**: `src/lib/canvas/stores/miniMapStore.ts` — panelOpen + viewport 状态管理
+- **E1 DDSCanvasPage 集成**: `<MiniMapPanel />` 集成到画布页面，position:absolute 浮动于画布之上
+- **E1 E2E 测试**: `tests/e2e/minimap-panel.spec.ts` — 5 tests（toggle/panel/open-close/closeBtn），TypeScript clean ✅
 
 ### [Unreleased] Sprint 39 — P004 MiniMap 搜索导航
 
@@ -248,6 +284,15 @@
 - **E1 前端 ws URL 更新**: `vibex-fronted/src/lib/collaboration/websocket.ts` 连接 URL 配置为 `wss://ws.vibex.top`
 - **E1 待完成**: Cloudflare DNS `ws.vibex.top` A/CNAME 记录配置（外部依赖）
 - **E1 待完成**: Fly.io WebSocket 服务 JWT secret 配置（`fly secrets set JWT_SECRET=***`）
+
+### [Unreleased] Sprint 40 — P003 MiniMap 导航完善
+
+##### S40-P003-E1: MiniMap 导航完善（Sprint39 遗留）
+- **E1 MiniMapPanel**: `vibex-fronted/src/components/dds/MiniMapPanel.tsx` — 折叠式左侧面板，含 toggle 按钮、click-to-navigate、视口边框矩形
+- **E1 MiniMapPanel CSS**: `MiniMapPanel.module.css` — slideIn 动画、glassmorphism 暗色主题
+- **E1 miniMapStore**: `src/lib/canvas/stores/miniMapStore.ts` — panelOpen + viewport 状态管理
+- **E1 DDSCanvasPage 集成**: `<MiniMapPanel />` 集成到画布页面，position:absolute 浮动于画布之上
+- **E1 E2E 测试**: `tests/e2e/minimap-panel.spec.ts` — 5 tests（toggle/panel/open-close/closeBtn），TypeScript clean ✅
 
 ### [Unreleased] Sprint 39 — P001 i18n 收尾
 

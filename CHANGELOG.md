@@ -23,6 +23,13 @@
 - **E3 vitest**: `src/lib/canvas/__tests__/templateStore.test.ts` — 10 tests PASS ✅
 - **E3 预设模板**: blank + flowchart + four-quadrant + mindmap + swot ✅
 
+##### S42-P002-E4: 画布网格 + 协作光标设置
+- **E4 userPreferencesStore**: `src/stores/userPreferencesStore.ts` — 新增 gridSpacing/gridVisible/cursorVisible 字段 + actions ✅
+- **E4 settings page**: `src/app/settings/page.tsx` — Canvas Grid section (spacing selector 8/16/32px + gridVisible toggle) + Collaboration section (cursorVisible toggle) ✅
+- **E4 CSS toggle**: `src/app/settings/settings.module.css` — toggleInput/toggleLabel styles ✅
+- **E4 PresenceOverlay**: `src/components/dds/presence/PresenceOverlay.tsx` — cursorVisible gating (cursorVisible=false 时 return null) ✅
+- **E4 vitest**: `src/stores/__tests__/userPreferencesStore.test.ts` — 12 tests PASS ✅
+
 ### [Unreleased] Sprint 41 — P001 i18n 验收 + P002 WebSocket 部署 + P003 MiniMap 验收 + P004 Canvas 持久化 + P005 快捷键
 
 ##### S41-P001-E1: i18n AI生成区最终验收

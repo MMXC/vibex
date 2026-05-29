@@ -20,7 +20,9 @@
 
 ##### S41-P004-E1: Canvas 持久化 + IndexedDB
 - **E4 serialize**: `src/lib/canvas/serialize.ts` — 20 vitest tests ✅
-- **E4 IndexedDB**: 待实现（需 `pnpm add idb`）
+- **E4 IndexedDB**: `src/lib/canvas/persistence.ts` — idb ^8.0.1, openDB/persistCanvas/loadCanvas/hasCanvasSnapshot ✅
+- **E4 DDSCanvasPage 集成**: `src/components/dds/DDSCanvasPage.tsx` — 挂载时从 IndexedDB 加载，debounced (1s) 持久化 ✅
+- **E4 E2E 测试**: `tests/e2e/canvas-persistence.spec.ts` — 新增 IndexedDB persistence 测试用例 ✅
 
 ##### S41-P005-E1: 键盘快捷键系统
 - **E5 待实现**: `react-hotkeys-hook` + `useGlobalHotkeys.ts` hook

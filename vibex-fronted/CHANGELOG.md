@@ -14,7 +14,10 @@
 - **E3 验证**: MiniMap 代码完整，E2E spec 存在 ✅
 
 ##### S41-P004-E1: Canvas 持久化 + IndexedDB
-- **E4 serialize/import/export**: `src/lib/canvas/serialize.ts` + `useCanvasExport.ts` + `useCanvasImport.ts` ✅
+- **E4 idb**: `package.json` — 添加 `idb ^8.0.1` 依赖 ✅
+- **E4 persistence.ts**: `src/lib/canvas/persistence.ts` — IndexedDB 持久化层（persistCanvas, loadCanvas, hasCanvasSnapshot）✅
+- **E4 DDSCanvasPage 集成**: `src/components/dds/DDSCanvasPage.tsx` — 挂载时从 IndexedDB 加载，debounced (1s) 持久化 ✅
+- **E4 E2E 测试**: `tests/e2e/canvas-persistence.spec.ts` — 新增 IndexedDB persistence 测试用例 ✅
 
 ##### S41-P005-E1: 键盘快捷键系统
 - **E5 待实现**: `useGlobalHotkeys.ts` + `HotkeyHelpModal.tsx`

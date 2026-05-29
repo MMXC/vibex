@@ -6,9 +6,11 @@
 - **E1 验证**: `/en/ai` 英文 + `/zh/ai` 中文 手动验证通过
 
 ##### S41-P002-E1: WebSocket 后端部署（E2-E3 合并）
-- **E2 后端代码**: `vibex-backend/src/services/websocket/` — ConnectionPool + MessageRouter + Durable Objects
-- **E2 wrangler.toml**: `ws.vibex.top/*` 路由已配置
-- **E2 待完成**: Cloudflare DNS 配置 + `wrangler secret put JWT_SECRET`
+- **E2 后端代码**: `vibex-backend/src/services/websocket/` — ConnectionPool + MessageRouter + Durable Objects ✅
+- **E2 wrangler.toml**: `ws.vibex.top/*` 路由已配置 ✅
+- **E2 ws-health.ts**: `GET /api/v1/ws/health` — 返回 activeConnections/maxConnections/uptime ✅
+- **E2 前端 ws**: `vibex-fronted/src/lib/collaboration/websocket.ts` — `wss://ws.vibex.top` ✅
+- **E2 待完成**: Cloudflare 手动部署 — `wrangler secret put JWT_SECRET` + `wrangler deploy` + DNS A/CNAME
 
 ##### S41-P003-E1: MiniMap 导航完善验收
 - **E3 MiniMapPanel**: `src/components/dds/MiniMapPanel.tsx` — toggle/click-to-navigate/视口边框 ✅

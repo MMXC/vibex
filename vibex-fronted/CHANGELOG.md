@@ -4,7 +4,9 @@
 - **E1 i18n 验证**: `src/app/ai/page.tsx` + `AgentFeedbackPanel.tsx` + `AgentSessions.tsx` — TypeScript 编译通过，useTranslations('ai')() 全覆盖
 
 ##### S41-P002-E1: WebSocket 后端部署（E2-E3 合并）
-- **E2 前端 ws**: `src/lib/collaboration/websocket.ts` — `wss://ws.vibex.top` 连接配置
+- **E2 前端 ws**: `src/lib/collaboration/websocket.ts` — `wss://ws.vibex.top` 连接配置 ✅
+- **E2 ws-health.ts**: `GET /api/v1/ws/health` — activeConnections/maxConnections/uptime ✅
+- **E2 待完成**: Cloudflare 手动部署 — `wrangler secret put JWT_SECRET` + `wrangler deploy` + DNS
 
 ##### S41-P003-E1: MiniMap 导航完善验收
 - **E3 MiniMapPanel**: `src/components/dds/MiniMapPanel.tsx` + `miniMapStore.ts` ✅

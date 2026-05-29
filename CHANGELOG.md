@@ -7,6 +7,13 @@
 - **E1 vitest**: `src/stores/dds/__tests__/canvasHistoryStore.test.ts` — 15 tests ✅
 - **E1 验证**: Sprint36 实现，Sprint42 验证通过
 
+##### S42-P002-E2: Presence 光标同步 — WebSocket 迁移
+- **E2 presenceStore.ts**: `src/lib/collaboration/presenceStore.ts` — Zustand store for remote users ✅
+- **E2 useWebSocketPresence.ts**: `src/lib/collaboration/useWebSocketPresence.ts` — useCollaboration onPresence → store ✅
+- **E2 PresenceOverlay.tsx**: `src/components/dds/presence/PresenceOverlay.tsx` — 画布绝对定位 overlay ✅
+- **E2 vitest**: `src/lib/collaboration/__tests__/presenceStore.test.ts` — 4 tests PASS ✅
+- **E2 待完成**: DDSCanvasPage 集成 useWebSocketPresence + 替换 Firebase usePresence + Cloudflare DO relay 部署
+
 ### [Unreleased] Sprint 41 — P001 i18n 验收 + P002 WebSocket 部署 + P003 MiniMap 验收 + P004 Canvas 持久化 + P005 快捷键
 
 ##### S41-P001-E1: i18n AI生成区最终验收

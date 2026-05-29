@@ -10,6 +10,8 @@
 
 ##### S41-P003-E1: MiniMap 导航完善验收
 - **E3 MiniMapPanel**: `src/components/dds/MiniMapPanel.tsx` + `miniMapStore.ts` ✅
+- **E3 E2E 测试**: `tests/e2e/minimap-panel.spec.ts` — 5 tests ✅
+- **E3 验证**: MiniMap 代码完整，E2E spec 存在 ✅
 
 ##### S41-P004-E1: Canvas 持久化 + IndexedDB
 - **E4 serialize/import/export**: `src/lib/canvas/serialize.ts` + `useCanvasExport.ts` + `useCanvasImport.ts` ✅

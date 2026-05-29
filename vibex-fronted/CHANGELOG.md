@@ -1,3 +1,11 @@
+### [Unreleased] Sprint 42 — E1 撤销/重做验证 + E2 Presence光标 + E3 画布模板 + E4 设置验收 + E5 移动端触摸
+
+##### S42-P001-E1: 撤销/重做系统验证（Sprint36 实现）
+- **E1 canvasHistoryStore**: `src/stores/dds/canvasHistoryStore.ts` — Command Pattern undo/redo ✅
+- **E1 DDSToolbar**: Undo/Redo buttons ✅
+- **E1 vitest**: `src/stores/dds/__tests__/canvasHistoryStore.test.ts` — 15 tests ✅
+- **E1 验证**: Sprint36 实现，Sprint42 验证通过 ✅
+
 ### [Unreleased] Sprint 41 — P001 i18n 验收 + P002 WebSocket 部署 + P003 MiniMap 验收 + P004 Canvas 持久化 + P005 快捷键
 
 ##### S41-P001-E1: i18n AI生成区最终验收

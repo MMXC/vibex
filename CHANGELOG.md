@@ -14,6 +14,15 @@
 - **E2 vitest**: `src/lib/collaboration/__tests__/presenceStore.test.ts` — 4 tests PASS ✅
 - **E2 待完成**: DDSCanvasPage 集成 useWebSocketPresence + 替换 Firebase usePresence + Cloudflare DO relay 部署
 
+##### S42-P002-E3: Canvas 模板系统
+- **E3 templateStore.ts**: `src/lib/canvas/templateStore.ts` — IndexedDB CRUD (create/list/get/delete) + 预设模板种子 ✅
+- **E3 TemplateGallery.tsx**: `src/components/dds/templates/TemplateGallery.tsx` — 卡片网格 + 分类 + 搜索 ✅
+- **E3 TemplateSaveDialog.tsx**: `src/components/dds/templates/TemplateSaveDialog.tsx` — 保存当前画布为模板 ✅
+- **E3 DDSToolbar 集成**: `src/components/dds/toolbar/DDSToolbar.tsx` — 模板 + 保存按钮 ✅
+- **E3 i18n keys**: `src/i18n/messages/en.json` + `zh.json` — `templateGallery` + `saveTemplate` ✅
+- **E3 vitest**: `src/lib/canvas/__tests__/templateStore.test.ts` — 10 tests PASS ✅
+- **E3 预设模板**: blank + flowchart + four-quadrant + mindmap + swot ✅
+
 ### [Unreleased] Sprint 41 — P001 i18n 验收 + P002 WebSocket 部署 + P003 MiniMap 验收 + P004 Canvas 持久化 + P005 快捷键
 
 ##### S41-P001-E1: i18n AI生成区最终验收

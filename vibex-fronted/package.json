@@ -74,6 +74,7 @@
     "lucide-react": "^0.577.0",
     "mermaid": "^11.13.0",
     "monaco-editor": "^0.53.0",
+    "mousetrap": "^1.6.5",
     "next": "16.2.0",
     "next-intl": "^4.8.3",
     "pako": "^2.1.0",

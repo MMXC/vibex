@@ -37,6 +37,7 @@ import { NewUserGuide } from '@/components/guide/NewUserGuide';
 import { createDDSAPI } from '@/hooks/dds/useDDSAPI';
 import { useDDSCanvasSearch } from '@/hooks/dds/useDDSCanvasSearch';
 import { DDSSearchPanel } from '@/components/dds/DDSSearchPanel';
+import { MiniMapPanel } from '@/components/dds/MiniMapPanel';
 import { ReviewReportPanel } from '@/components/design-review';
 import { ConflictResolutionDialog } from '@/components/conflict/ConflictResolutionDialog';
 import { PresenceAvatars } from '@/components/canvas/Presence/PresenceAvatars';
@@ -656,6 +657,8 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
           scrollContainerRef={scrollContainerRef}
           className="cross-chapter-edges-overlay"
         />
+        {/* P003-E1: MiniMap Navigation Panel */}
+        <MiniMapPanel />
       </div>
 
       {/* AI Draft Drawer */}

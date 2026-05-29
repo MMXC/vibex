@@ -57,6 +57,7 @@ import type { CanvasFlow, CanvasNode } from '@/lib/codeGenerator';
 import { useAIController } from '@/hooks/canvas/useAIController';
 import { DiffOverlay } from '@/components/agent/DiffOverlay';
 import { useAIAgent } from '@/hooks/useAIAgent';
+import { persistCanvas, loadCanvas } from '@/lib/canvas/persistence';
 
 // ==================== Props ====================
 
@@ -390,6 +391,30 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
       abortControllerRef.current?.abort();
     };
   }, [projectId, loadChapters]);
+
+  // ---- S41-E4: Load canvas from IndexedDB on mount ----
+  useEffect(() => {
+    if (!projectId) return;
+    loadCanvas(projectId).catch((err) => {
+      console.warn('[persistence] Failed to load canvas from IndexedDB:', err);
+    });
+  }, [projectId]);
+
+  // ---- S41-E4: Debounced canvas persistence on data changes ----
+  const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!projectId) return;
+    // Debounce: persist 1 second after last store change
+    if (persistTimerRef.current) clearTimeout(persistTimerRef.current);
+    persistTimerRef.current = setTimeout(() => {
+      persistCanvas(projectId).catch((err) => {
+        console.warn('[persistence] Failed to persist canvas:', err);
+      });
+    }, 1000);
+    return () => {
+      if (persistTimerRef.current) clearTimeout(persistTimerRef.current);
+    };
+  }, [projectId, selectedCardIds]);
 
   // ---- Sync activeChapter from URL query param ----
   useEffect(() => {

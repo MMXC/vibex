@@ -227,6 +227,9 @@ importers:
       html-to-image:
         specifier: ^1.11.13
         version: 1.11.13
+      idb:
+        specifier: ^8.0.3
+        version: 8.0.3
       js-yaml:
         specifier: ^4.1.1
         version: 4.1.1
@@ -245,6 +248,9 @@ importers:
       monaco-editor:
         specifier: ^0.53.0
         version: 0.53.0
+      mousetrap:
+        specifier: ^1.6.5
+        version: 1.6.5
       next:
         specifier: 16.2.0
         version: 16.2.0(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(@playwright/test@1.59.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -6462,6 +6468,9 @@ packages:
   idb@7.1.1:
     resolution: {integrity: sha512-gchesWBzyvGHRO9W8tzUWFDycow5gwjvFKfyV9FF32Y7F50yZMp7mP+T2mJIWFx49zicqyC4uefHM17o6xKIVQ==}
 
+  idb@8.0.3:
+    resolution: {integrity: sha512-LtwtVyVYO5BqRvcsKuB2iUMnHwPVByPCXFXOpuU96IZPPoPN6xjOGxZQ74pgSVVLQWtUOYgyeL4GE98BY5D3wg==}
+
   identity-obj-proxy@3.0.0:
     resolution: {integrity: sha512-00n6YnVHKrinT9t0d9+5yZC6UBNJANpYEQvL2LlX6Ab9lnmxzIRcEmTPuyGScvl1+jKuCICX1Z0Ab1pPKKdikA==}
     engines: {node: '>=4'}
@@ -7405,6 +7414,9 @@ packages:
 
   motion-utils@12.36.0:
     resolution: {integrity: sha512-eHWisygbiwVvf6PZ1vhaHCLamvkSbPIeAYxWUuL3a2PD/TROgE7FvfHWTIH4vMl798QLfMw15nRqIaRDXTlYRg==}
+
+  mousetrap@1.6.5:
+    resolution: {integrity: sha512-QNo4kEepaIBwiT8CDhP98umTetp+JNfQYBWvC1pc6/OAibuXtRcxZ58Qz8skvEHYvURne/7R8T5VoOI7rDsEUA==}
 
   mrmime@2.0.1:
     resolution: {integrity: sha512-Y3wQdFg2Va6etvQ5I82yUhGdsKrcYox6p7FfL1LbK2J4V01F9TGlepTIhnK24t7koZibmg82KGglhA1XK5IsLQ==}
@@ -15801,6 +15813,8 @@ snapshots:
 
   idb@7.1.1: {}
 
+  idb@8.0.3: {}
+
   identity-obj-proxy@3.0.0:
     dependencies:
       harmony-reflect: 1.6.2
@@ -16924,6 +16938,8 @@ snapshots:
       motion-utils: 12.36.0
 
   motion-utils@12.36.0: {}
+
+  mousetrap@1.6.5: {}
 
   mrmime@2.0.1: {}
 

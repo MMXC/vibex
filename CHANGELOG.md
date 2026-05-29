@@ -25,7 +25,12 @@
 - **E4 E2E 测试**: `tests/e2e/canvas-persistence.spec.ts` — 新增 IndexedDB persistence 测试用例 ✅
 
 ##### S41-P005-E1: 键盘快捷键系统
-- **E5 待实现**: `react-hotkeys-hook` + `useGlobalHotkeys.ts` hook
+- **E5 useKeyboardShortcuts**: `src/hooks/useKeyboardShortcuts.ts` — 全局快捷键 hook，74 vitest tests ✅
+- **E5 ShortcutManager**: `src/lib/keyboard/shortcutManager.ts` — mousetrap 全局冲突检测，25 vitest tests ✅
+- **E5 KeyboardHelpOverlay**: `src/components/shared/KeyboardHelpOverlay.tsx` — `?` 键触发帮助面板 ✅
+- **E5 DDSCanvasPage 集成**: `useKeyboardShortcuts` + `KeyboardHelpOverlay` 已集成 ✅
+- **E5 快捷键**: Ctrl+K 搜索, +/- 缩放, Delete 删除, Ctrl+A 全选, N 新建, `?` 帮助 ✅
+- **E5 TypeScript**: 键盘相关文件 tsc 零新增错误（pre-existing errors unrelated to E5）
 
 ### [Unreleased] Sprint 40 — P001 AI Agent i18n 国际化
 

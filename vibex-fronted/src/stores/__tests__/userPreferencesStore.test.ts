@@ -1,6 +1,7 @@
 /**
  * UserPreferencesStore Tests
  * E011: Persisted user preferences using Zustand persist middleware with localStorage
+ * S42-P002-E4: Extended with gridSpacing, gridVisible, cursorVisible tests
  */
 
 import { useUserPreferencesStore } from '../userPreferencesStore';
@@ -16,6 +17,10 @@ describe('UserPreferencesStore', () => {
     expect(state.locale).toBe('zh'); // P001-E2: default locale is zh
     expect(state.defaultTemplate).toBe('blank');
     expect(state.shortcutCustomization).toEqual([]);
+    // S42-P002-E4: Canvas grid defaults
+    expect(state.gridSpacing).toBe(16);
+    expect(state.gridVisible).toBe(true);
+    expect(state.cursorVisible).toBe(true);
   });
 
   it('should set theme', () => {
@@ -80,5 +85,45 @@ describe('UserPreferencesStore', () => {
     expect(useUserPreferencesStore.getState().aiScores.length).toBeGreaterThan(0);
     resetPreferences();
     expect(useUserPreferencesStore.getState().aiScores).toEqual([]);
+  });
+
+  // S42-P002-E4: Canvas grid settings tests
+  it('should set gridSpacing', () => {
+    const { setGridSpacing } = useUserPreferencesStore.getState();
+    setGridSpacing(8);
+    expect(useUserPreferencesStore.getState().gridSpacing).toBe(8);
+    setGridSpacing(32);
+    expect(useUserPreferencesStore.getState().gridSpacing).toBe(32);
+    setGridSpacing(16);
+    expect(useUserPreferencesStore.getState().gridSpacing).toBe(16);
+  });
+
+  it('should set gridVisible', () => {
+    const { setGridVisible } = useUserPreferencesStore.getState();
+    setGridVisible(false);
+    expect(useUserPreferencesStore.getState().gridVisible).toBe(false);
+    setGridVisible(true);
+    expect(useUserPreferencesStore.getState().gridVisible).toBe(true);
+  });
+
+  it('should set cursorVisible', () => {
+    const { setCursorVisible } = useUserPreferencesStore.getState();
+    setCursorVisible(false);
+    expect(useUserPreferencesStore.getState().cursorVisible).toBe(false);
+    setCursorVisible(true);
+    expect(useUserPreferencesStore.getState().cursorVisible).toBe(true);
+  });
+
+  it('should reset E4 canvas settings on resetPreferences', () => {
+    const { setGridSpacing, setGridVisible, setCursorVisible, resetPreferences } =
+      useUserPreferencesStore.getState();
+    setGridSpacing(8);
+    setGridVisible(false);
+    setCursorVisible(false);
+    resetPreferences();
+    const state = useUserPreferencesStore.getState();
+    expect(state.gridSpacing).toBe(16);
+    expect(state.gridVisible).toBe(true);
+    expect(state.cursorVisible).toBe(true);
   });
 });

@@ -2,8 +2,10 @@
  * User Preferences Store
  * E011: Persisted user preferences using Zustand persist middleware with localStorage
  * P003-E3: Extended with aiScores[] for AI coding score history
+ * S42-P002-E4: Extended with gridSpacing, gridVisible, cursorVisible for canvas and collaboration settings
  *
- * Supports: theme ('light'|'dark'|'system'), defaultTemplate, shortcutCustomization, aiScores
+ * Supports: theme ('light'|'dark'|'system'), defaultTemplate, shortcutCustomization, aiScores,
+ *           gridSpacing, gridVisible, cursorVisible
  */
 
 import { create } from 'zustand';
@@ -51,6 +53,11 @@ export interface UserPreferencesState {
   // P003-E3: AI score history
   aiScores: AIScoreRecord[];
 
+  // S42-P002-E4: Canvas grid settings
+  gridSpacing: 8 | 16 | 32;
+  gridVisible: boolean;
+  cursorVisible: boolean;
+
   // Actions
   setTheme: (theme: ThemePreference) => void;
   setLocale: (locale: LocalePreference) => void;
@@ -62,19 +69,28 @@ export interface UserPreferencesState {
   removeAIScore: (index: number) => void;
   /** P003-E3: Clear all AI score records */
   clearAIScores: () => void;
+  /** S42-P002-E4: Set canvas grid spacing */
+  setGridSpacing: (spacing: 8 | 16 | 32) => void;
+  /** S42-P002-E4: Toggle canvas grid visibility */
+  setGridVisible: (visible: boolean) => void;
+  /** S42-P002-E4: Toggle collaboration cursor visibility */
+  setCursorVisible: (visible: boolean) => void;
   resetPreferences: () => void;
 }
 
 // Default values
 const DEFAULT_PREFERENCES: Pick<
   UserPreferencesState,
-  'theme' | 'locale' | 'defaultTemplate' | 'shortcutCustomization' | 'aiScores'
+  'theme' | 'locale' | 'defaultTemplate' | 'shortcutCustomization' | 'aiScores' | 'gridSpacing' | 'gridVisible' | 'cursorVisible'
 > = {
   theme: 'system',
   locale: 'zh',
   defaultTemplate: 'blank',
   shortcutCustomization: [],
   aiScores: [],
+  gridSpacing: 16,
+  gridVisible: true,
+  cursorVisible: true,
 };
 
 export const useUserPreferencesStore = create<UserPreferencesState>()(
@@ -106,6 +122,11 @@ export const useUserPreferencesStore = create<UserPreferencesState>()(
         })),
 
       clearAIScores: () => set({ aiScores: [] }),
+
+      // S42-P002-E4: Canvas grid actions
+      setGridSpacing: (spacing) => set({ gridSpacing: spacing }),
+      setGridVisible: (visible) => set({ gridVisible: visible }),
+      setCursorVisible: (visible) => set({ cursorVisible: visible }),
 
       resetPreferences: () => set({ ...DEFAULT_PREFERENCES }),
     }),

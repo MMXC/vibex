@@ -46,9 +46,21 @@ export default function SettingsPage() {
     aiScores,
     removeAIScore,
     clearAIScores,
+    gridSpacing,
+    gridVisible,
+    cursorVisible,
+    setGridSpacing,
+    setGridVisible,
+    setCursorVisible,
   } = useUserPreferencesStore();
   const shortcuts = useShortcutStore((s) => s.shortcuts);
   const [scoresExpanded, setScoresExpanded] = useState(false);
+
+  const GRID_SPACING_OPTIONS = [
+    { value: 8 as const, label: '8px — Dense' },
+    { value: 16 as const, label: '16px — Normal' },
+    { value: 32 as const, label: '32px — Spacious' },
+  ];
 
   return (
     <div className={styles.page}>
@@ -132,6 +144,60 @@ export default function SettingsPage() {
             ) : (
               <p className={styles.emptyState}>No custom shortcuts configured</p>
             )}
+          </div>
+        </section>
+
+        {/* S42-P002-E4: Canvas Grid Settings */}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Canvas Grid</h2>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="grid-spacing-select">
+              Grid Spacing
+            </label>
+            <select
+              id="grid-spacing-select"
+              className={styles.select}
+              value={gridSpacing}
+              onChange={(e) => setGridSpacing(Number(e.target.value) as 8 | 16 | 32)}
+            >
+              {GRID_SPACING_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className={styles.field}>
+            <label className={styles.toggleLabel}>
+              <input
+                type="checkbox"
+                className={styles.toggleInput}
+                checked={gridVisible}
+                onChange={(e) => setGridVisible(e.target.checked)}
+                data-testid="grid-visible-toggle"
+              />
+              <span>Show Grid</span>
+            </label>
+          </div>
+        </section>
+
+        {/* S42-P002-E4: Collaboration Settings */}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Collaboration</h2>
+          <div className={styles.field}>
+            <label className={styles.toggleLabel}>
+              <input
+                type="checkbox"
+                className={styles.toggleInput}
+                checked={cursorVisible}
+                onChange={(e) => setCursorVisible(e.target.checked)}
+                data-testid="cursor-visible-toggle"
+              />
+              <span>Show Remote Cursors</span>
+            </label>
+            <p className={styles.sectionHint}>
+              Control whether other users' cursors are displayed on the canvas
+            </p>
           </div>
         </section>
 

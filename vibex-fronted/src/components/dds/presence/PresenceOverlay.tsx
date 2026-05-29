@@ -3,14 +3,17 @@
 /**
  * PresenceOverlay — WebSocket-backed collaborative cursor overlay
  * S42-P002-E2: Presence 光标同步 — WebSocket 升级
+ * S42-P002-E4: Cursor visibility controlled by userPreferencesStore.cursorVisible
  *
  * Reads remote users from presenceStore (updated by useWebSocketPresence via
  * useCollaboration's onPresence callback) and renders cursor indicators.
  * Replaces the Firebase-wired RemoteCursor usage in DDSCanvasPage.
+ * Visibility gated by userPreferencesStore.cursorVisible.
  */
 
 import React, { useMemo } from 'react';
 import { usePresenceStore } from '@/lib/collaboration/presenceStore';
+import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 
 // Predefined cursor colors — consistent with Firebase hashUserColor
 const PRESENCE_COLORS = [
@@ -93,9 +96,14 @@ interface PresenceOverlayProps {
 /**
  * PresenceOverlay — renders all remote user cursors from presenceStore.
  * Mount inside the canvas viewport div in DDSCanvasPage.
+ * Visibility gated by userPreferencesStore.cursorVisible (S42-P002-E4).
  */
 export function PresenceOverlay({ excludeUserId }: PresenceOverlayProps) {
   const remoteUsers = usePresenceStore((s) => s.remoteUsers);
+  const cursorVisible = useUserPreferencesStore((s) => s.cursorVisible);
+
+  // S42-P002-E4: Return null when cursor visibility is disabled
+  if (!cursorVisible) return null;
 
   const cursors = useMemo(() => {
     const result: CursorInstanceProps[] = [];

@@ -32,6 +32,8 @@ import { useTranslations } from '@/hooks/useTranslations';
 import { useCollaboration } from '@/lib/collaboration/useCollaboration';
 import { useUIStore } from '@/lib/canvas/stores/uiStore';
 import { useOplogConflictToast } from '@/stores/oplogStore';
+import { TemplateGallery } from '@/components/dds/templates/TemplateGallery';
+import { TemplateSaveDialog } from '@/components/dds/templates/TemplateSaveDialog';
 import styles from './DDSToolbar.module.css';
 
 // ==================== Chapter label keys (mapped to i18n keys) ====================
@@ -180,6 +182,8 @@ export const DDSToolbar = memo(function DDSToolbar({
 
   const [ddsExportModalOpen, setDdsExportModalOpen] = useState(false);
   const [shareToTeamModalOpen, setShareToTeamModalOpen] = useState(false);
+  const [isTemplateGalleryOpen, setIsTemplateGalleryOpen] = useState(false);
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
 
   // E3-S3: RBAC for toolbar actions
   const rbac = useCanvasRBAC(projectId);
@@ -413,6 +417,30 @@ export const DDSToolbar = memo(function DDSToolbar({
             onChange={handleImportChange}
           />
 
+          {/* S42-E3: Template Gallery button */}
+          <button
+            type="button"
+            className={styles.exportBtn}
+            onClick={() => setIsTemplateGalleryOpen(true)}
+            aria-label={tToolbar('templateGallery')}
+            title={tToolbar('templateGallery')}
+            data-testid="template-gallery-btn"
+          >
+            {tToolbar('templateGallery')}
+          </button>
+
+          {/* S42-E3: Save as Template button */}
+          <button
+            type="button"
+            className={styles.exportBtn}
+            onClick={() => setIsSaveDialogOpen(true)}
+            aria-label={tToolbar('saveTemplate')}
+            title={tToolbar('saveTemplate')}
+            data-testid="save-template-btn"
+          >
+            {tToolbar('saveTemplate')}
+          </button>
+
           {/* E5: Share to Team button */}
           {canvasId && (
             <button
@@ -618,6 +646,18 @@ export const DDSToolbar = memo(function DDSToolbar({
         canvasId={canvasId ?? ''}
         canvasName={canvasName}
         onClose={() => setShareToTeamModalOpen(false)}
+      />
+
+      {/* S42-E3: Template Gallery modal */}
+      <TemplateGallery
+        isOpen={isTemplateGalleryOpen}
+        onClose={() => setIsTemplateGalleryOpen(false)}
+      />
+
+      {/* S42-E3: Save as Template dialog */}
+      <TemplateSaveDialog
+        isOpen={isSaveDialogOpen}
+        onClose={() => setIsSaveDialogOpen(false)}
       />
     </>
   );

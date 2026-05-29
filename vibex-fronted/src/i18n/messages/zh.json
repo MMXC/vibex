@@ -15,7 +15,9 @@
     "chapterContext": "上下文",
     "chapterFlow": "流程",
     "chapterApi": "API",
-    "chapterBusinessRules": "业务规则"
+    "chapterBusinessRules": "业务规则",
+    "templateGallery": "模板",
+    "saveTemplate": "保存为模板"
   },
   "export": {
     "title": "导出/导入",

@@ -15,7 +15,9 @@
     "chapterContext": "Context",
     "chapterFlow": "Flow",
     "chapterApi": "API",
-    "chapterBusinessRules": "Business Rules"
+    "chapterBusinessRules": "Business Rules",
+    "templateGallery": "Templates",
+    "saveTemplate": "Save as Template"
   },
   "export": {
     "title": "Export / Import",

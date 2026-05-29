@@ -1,0 +1,174 @@
+/**
+ * TemplateSaveDialog.module.css
+ * Sprint42 E3: Canvas 模板系统
+ */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialog {
+  background: var(--color-surface, #1a1a2e);
+  border: 1px solid var(--color-border, #2a2a4a);
+  border-radius: 12px;
+  width: min(90vw, 420px);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border, #2a2a4a);
+}
+
+.title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text, #e2e8f0);
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary, #94a3b8);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.closeBtn:hover {
+  background: var(--color-border, #2a2a4a);
+}
+
+.body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #94a3b8);
+}
+
+.required {
+  color: #f87171;
+}
+
+.iconPicker {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.iconBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border, #2a2a4a);
+  background: var(--color-bg, #0f0f1a);
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.15s;
+}
+
+.iconBtn:hover {
+  border-color: var(--color-primary, #6366f1);
+}
+
+.iconBtnActive {
+  border-color: var(--color-primary, #6366f1);
+  background: rgba(99, 102, 241, 0.15);
+}
+
+.input,
+.textarea {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border, #2a2a4a);
+  background: var(--color-bg, #0f0f1a);
+  color: var(--color-text, #e2e8f0);
+  font-size: 14px;
+  font-family: inherit;
+  resize: none;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--color-primary, #6366f1);
+}
+
+.error {
+  margin: 0;
+  font-size: 13px;
+  color: #f87171;
+  padding: 8px 12px;
+  background: rgba(248, 113, 113, 0.1);
+  border-radius: 6px;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--color-border, #2a2a4a);
+}
+
+.cancelBtn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border, #2a2a4a);
+  background: transparent;
+  color: var(--color-text-secondary, #94a3b8);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+
+.cancelBtn:hover {
+  background: var(--color-border, #2a2a4a);
+}
+
+.saveBtn {
+  padding: 8px 20px;
+  border-radius: 6px;
+  border: none;
+  background: var(--color-primary, #6366f1);
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.saveBtn:hover:not(:disabled) {
+  background: #4f46e5;
+}
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

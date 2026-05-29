@@ -23,6 +23,17 @@
 - **E1 DDSCanvasPage集成**: `<MiniMapPanel />` 集成到画布页面（position:absolute浮动）
 - **E1 E2E测试**: `tests/e2e/minimap-panel.spec.ts` — 5 tests，TypeScript clean ✅
 
+
+## [Unreleased] Sprint 40 — P004 Canvas 持久化 + 导入导出
+
+##### S40-P004-E1: Canvas 持久化 + 导入导出
+- **E1 serialize.ts**: `src/lib/canvas/serialize.ts` — serializeCanvasToJSON/deserializeCanvasFromJSON，三树快照序列化，20 vitest tests ✅
+- **E1 useCanvasExport**: `src/hooks/canvas/useCanvasExport.ts` — exportAsJSON/exportAsVibex (pako gzip压缩)，10 vitest tests ✅
+- **E1 useCanvasImport**: `src/hooks/canvas/useCanvasImport.ts` — validateFile (10MB)/importFile (JSON解析/schemaVersion/forward-compat)，9 vitest tests ✅
+- **E1 DDSToolbar 导出**: `src/components/dds/toolbar/DDSToolbar.tsx` — handleDDSExportJSON/handleDDSExportVibex ✅
+- **E1 DDSToolbar 导入**: `handleDDSImport` + canvas-import-btn，CustomEvent('dds:import') 分发 ✅
+- **E1 E2E测试**: `tests/e2e/canvas-persistence.spec.ts` — 10 tests，TypeScript clean ✅
+
 ## [Unreleased] S39-P005-E1: Service Worker 注册 + 静态资源缓存
 - **E1 SWRegistration**: `src/components/sw/SWRegistration.tsx` — useEffect 中调用 navigator.serviceWorker.register("/sw.js")，带错误处理和 updatefound 事件监听
 - **E1 layout.tsx 集成**: 在 layout.tsx body 中渲染 SWRegistration Client Component

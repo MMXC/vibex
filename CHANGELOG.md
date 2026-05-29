@@ -27,6 +27,17 @@
 
 ### [Unreleased] Sprint 39 — P002 WebSocket 实时协作同步层
 
+
+### [Unreleased] Sprint 40 — P004 Canvas 持久化 + 导入导出
+
+##### S40-P004-E1: Canvas 持久化 + 导入导出
+- **E1 serialize.ts**: `src/lib/canvas/serialize.ts` — serializeCanvasToJSON/deserializeCanvasFromJSON/serializeThreeTrees/restoreStore，20 vitest tests ✅
+- **E1 useCanvasExport hook**: `src/hooks/canvas/useCanvasExport.ts` — exportAsJSON/exportAsVibex (gzip压缩 .vibex)，10 vitest tests ✅
+- **E1 useCanvasImport hook**: `src/hooks/canvas/useCanvasImport.ts` — validateFile (10MB限制)/importFile (JSON解析/schemaVersion检查/forward-compat)，9 vitest tests ✅
+- **E1 DDSToolbar 导出**: `src/components/dds/toolbar/DDSToolbar.tsx` — handleDDSExportJSON/handleDDSExportVibex 集成，ExportMenu 集成 ✅
+- **E1 DDSToolbar 导入**: `handleDDSImport` + canvas-import-btn，CustomEvent('dds:import') 分发 ✅
+- **E1 E2E 测试**: `tests/e2e/canvas-persistence.spec.ts` — 10 tests（export dropdown/import/validation/forward-compat），TypeScript clean ✅
+
 ##### S39-P002-E1: WebSocket 连接层 + useCollaboration Hook
 - **E1 WebSocket 客户端**: `src/lib/collaboration/websocket.ts` — JWT token 注入（localStorage vibex-token）、自动重连（指数退避，最多 3 次）、消息订阅
 - **E1 useCollaboration hook**: `src/lib/collaboration/useCollaboration.ts` — connect/disconnect/broadcast/subscribe，isConnected + onlineUsers 状态

@@ -28,6 +28,7 @@ import {
   BackgroundVariant,
   type NodeTypes,
 } from '@xyflow/react';
+import { useTouchGestures } from '@/hooks/useTouchGestures';
 import '@xyflow/react/dist/style.css';
 
 import { useDDSCanvasStore } from '@/stores/dds/DDSCanvasStore';
@@ -176,7 +177,18 @@ function DDSFlowInner({
   selectedCardIds = [],
   touchMode = false,
 }: DDSFlowProps) {
-  const { getNodes } = useReactFlow();
+  const reactFlow = useReactFlow();
+  const { getNodes } = reactFlow;
+
+  // E5: Touch gesture recognition — handles pinch-to-zoom, pan, double-tap
+  // Uses reactFlow.setViewport (via useReactFlow) and getNodes for gesture math
+  const touchGestures = useTouchGestures({
+    setViewport: reactFlow.setViewport,
+    getZoom: () => reactFlow.getViewport().zoom,
+    getViewport: () => reactFlow.getViewport(),
+    getNodes,
+    onNodeSelect: onSelectCard,
+  });
 
   const {
     rawNodes,
@@ -293,12 +305,15 @@ function DDSFlowInner({
         onConnect={onConnect}
         onNodeClick={handleNodeClick}
         nodeTypes={nodeTypes}
-        /* E5: In touch mode, disable drag (use touch gestures instead) */
+        /* E5: In touch mode, useTouchGestures hook handles ALL gestures — disable ReactFlow built-in */
         nodesDraggable={!touchMode}
         nodesConnectable={!touchMode}
         elementsSelectable={true}
-        /* E5: Enable pinch-to-zoom when in touch mode */
-        zoomOnPinch={touchMode}
+        /* E5: zoomOnPinch=false; useTouchGestures handles pinch+pan via setViewport */
+        zoomOnPinch={false}
+        /* E5: Wire touch gesture handlers directly to ReactFlow root element */
+        onTouchStart={touchGestures.onTouchStart}
+        onPointerDown={touchGestures.onPointerDown}
         /* S43-P003-E3: only render nodes visible in viewport for large canvas performance */
         onlyRenderVisibleElements={true}
         fitView

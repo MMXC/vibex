@@ -24,6 +24,7 @@ interface TemplateState {
   searchQuery: string;
   isSelectorOpen: boolean;
   stats: TemplateStats;
+  favoriteTemplateIds: string[];  // 收藏模板ID列表
   
   // 操作 - 模板选择
   setCategory: (category: TemplateCategory | 'all') => void;
@@ -39,6 +40,12 @@ interface TemplateState {
   getTemplateStats: (templateId: string) => { usageCount: number; avgRating: number; ratingCount: number };
   getPopularTemplates: (limit?: number) => RequirementTemplate[];
   getTopRatedTemplates: (limit?: number) => RequirementTemplate[];
+  
+  // 操作 - 收藏功能
+  toggleFavorite: (templateId: string) => void;
+  inferCategory: (template: RequirementTemplate) => TemplateCategory;
+  isFavorite: (templateId: string) => boolean;
+  getFavorites: () => RequirementTemplate[];
 }
 
 // 初始统计数据
@@ -82,6 +89,7 @@ export const useTemplateStore = create<TemplateState>()(
       searchQuery: '',
       isSelectorOpen: false,
       stats: getInitialStats(),
+      favoriteTemplateIds: [],
       
       // 设置分类
       setCategory: (category) => {
@@ -184,6 +192,56 @@ export const useTemplateStore = create<TemplateState>()(
           .slice(0, limit)
           .map(t => t.template);
       },
+      
+      // 切换收藏状态
+      toggleFavorite: (templateId) => {
+        const { favoriteTemplateIds } = get();
+        const isFav = favoriteTemplateIds.includes(templateId);
+        const newFavorites = isFav
+          ? favoriteTemplateIds.filter(id => id !== templateId)
+          : [...favoriteTemplateIds, templateId];
+        set({ favoriteTemplateIds: newFavorites });
+      },
+      
+      // 根据模板内容推断分类
+      inferCategory: (template) => {
+        const text = `${template.name} ${template.description} ${(template.tags || []).join(' ')}`.toLowerCase();
+        
+        const categoryKeywords: Record<TemplateCategory, string[]> = {
+          'ecommerce': ['shop', 'store', 'cart', 'order', 'payment', 'product', '商品', '电商', '购物'],
+          'education': ['course', 'student', 'teacher', 'learn', 'education', '在线教育', '学习'],
+          'healthcare': ['patient', 'doctor', 'medical', 'hospital', 'clinic', '医疗', '健康'],
+          'fintech': ['bank', 'finance', 'payment', 'transaction', 'investment', '金融', '支付'],
+          'social': ['social', 'friend', 'feed', 'post', 'comment', '社交', '社区'],
+          'game': ['game', 'player', 'level', 'score', '游戏'],
+          'iot': ['device', 'sensor', 'iot', 'smart', '物联网', '设备'],
+          'enterprise': ['crm', 'erp', 'workflow', 'approval', '企业', '办公'],
+          'mobile': ['app', 'mobile', 'ios', 'android', '移动'],
+          'content': ['blog', 'cms', 'article', 'content', '媒体', '内容'],
+          'logistics': ['delivery', 'shipping', 'tracking', 'logistics', '物流', '配送'],
+          'restaurant': ['restaurant', 'menu', 'order', 'reservation', '餐饮', '订餐'],
+          'saas': ['subscription', 'plan', 'billing', 'saas', 'cloud', '软件'],
+          'custom': [],
+        };
+        
+        for (const [cat, keywords] of Object.entries(categoryKeywords)) {
+          if (keywords.some(kw => text.includes(kw))) {
+            return cat as TemplateCategory;
+          }
+        }
+        return 'saas'; // 默认
+      },
+      
+      // 检查是否收藏
+      isFavorite: (templateId) => {
+        return get().favoriteTemplateIds.includes(templateId);
+      },
+      
+      // 获取收藏模板列表
+      getFavorites: () => {
+        const { templates, favoriteTemplateIds } = get();
+        return templates.filter(t => favoriteTemplateIds.includes(t.id));
+      },
     }),
     {
       name: 'vibex-template-store',
@@ -195,12 +253,15 @@ export const useTemplateStore = create<TemplateState>()(
 // 辅助函数：过滤模板
 function filterTemplates(
   templates: RequirementTemplate[],
-  category: TemplateCategory | 'all',
-  query: string
+  category: TemplateCategory | 'all' | 'favorites',
+  query: string,
+  favoriteIds: string[] = []
 ): RequirementTemplate[] {
   let result = templates;
   
-  if (category !== 'all') {
+  if (category === 'favorites') {
+    result = result.filter(t => favoriteIds.includes(t.id));
+  } else if (category !== 'all') {
     result = result.filter(t => t.category === category);
   }
   

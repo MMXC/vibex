@@ -94,6 +94,8 @@ export interface RequirementTemplate {
   createdAt?: string;
   /** 更新时间 */
   updatedAt?: string;
+  /** 是否收藏 */
+  isFavorite?: boolean;
 }
 
 export interface RequirementTemplateItem {

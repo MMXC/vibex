@@ -80,6 +80,8 @@ export interface Template {
   rating: number;
   /** 是否推荐 */
   featured?: boolean;
+  /** 是否收藏 */
+  isFavorite?: boolean;
 }
 
 /** 模板筛选条件 */

@@ -32,6 +32,7 @@ export interface TemplateGalleryProps {
 /** 分类定义 */
 const CATEGORIES = [
   { id: 'all', name: '全部', icon: '🌟' },
+  { id: 'favorites', name: '收藏', icon: '★' },
   { id: 'ecommerce', name: '电商', icon: '🛒' },
   { id: 'education', name: '教育', icon: '📚' },
   { id: 'healthcare', name: '医疗', icon: '🏥' },
@@ -58,6 +59,14 @@ export function TemplateGallery({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        return JSON.parse(localStorage.getItem('vibex-template-favorites') || '[]');
+      } catch { return []; }
+    }
+    return [];
+  });
   const importRef = useRef<HTMLInputElement>(null);
   const tm = useTemplateManager();
 
@@ -87,7 +96,9 @@ export function TemplateGallery({
     let result = [...templates];
     
     // 按分类筛选
-    if (selectedCategory !== 'all') {
+    if (selectedCategory === 'favorites') {
+      result = result.filter(t => favoriteIds.includes(t.id));
+    } else if (selectedCategory !== 'all') {
       result = result.filter(t => t.category === selectedCategory);
     }
     
@@ -102,12 +113,26 @@ export function TemplateGallery({
     }
     
     return result;
-  }, [templates, selectedCategory, searchQuery]);
+  }, [templates, selectedCategory, searchQuery, favoriteIds]);
 
   // 处理模板选择
   const handleTemplateSelect = (template: Template) => {
     setSelectedTemplate(template);
     onSelect?.(template);
+  };
+  
+  // 处理收藏切换
+  const handleToggleFavorite = (template: Template) => {
+    const isFav = favoriteIds.includes(template.id);
+    const newFavorites = isFav
+      ? favoriteIds.filter(id => id !== template.id)
+      : [...favoriteIds, template.id];
+    setFavoriteIds(newFavorites);
+    localStorage.setItem('vibex-template-favorites', JSON.stringify(newFavorites));
+    // Update the template in state with new isFavorite value
+    setTemplates(prev => prev.map(t => 
+      t.id === template.id ? { ...t, isFavorite: !isFav } : t
+    ));
   };
 
   // 处理分类切换
@@ -202,8 +227,9 @@ export function TemplateGallery({
             {filteredTemplates.map(template => (
               <TemplateCard
                 key={template.id}
-                template={template}
+                template={{ ...template, isFavorite: favoriteIds.includes(template.id) }}
                 onSelect={handleTemplateSelect}
+                onToggleFavorite={handleToggleFavorite}
                 isSelected={selectedTemplate?.id === template.id}
               />
             ))}

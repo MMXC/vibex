@@ -15,6 +15,8 @@ export interface TemplateCardProps {
   onSelect?: (template: Template) => void;
   /** 是否选中 */
   isSelected?: boolean;
+  /** 收藏切换回调 */
+  onToggleFavorite?: (template: Template) => void;
   /** 自定义类名 */
   className?: string;
 }
@@ -23,8 +25,13 @@ export function TemplateCard({
   template,
   onSelect,
   isSelected = false,
+  onToggleFavorite,
   className = '',
 }: TemplateCardProps) {
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleFavorite?.(template);
+  };
   const handleClick = () => {
     onSelect?.(template);
   };
@@ -65,6 +72,15 @@ export function TemplateCard({
         {template.featured && (
           <span className={styles.featured}>推荐</span>
         )}
+        
+        {/* 收藏按钮 */}
+        <button
+          className={styles.favoriteBtn}
+          onClick={handleFavoriteClick}
+          aria-label={template.isFavorite ? '取消收藏' : '收藏'}
+        >
+          {template.isFavorite ? '★' : '☆'}
+        </button>
         
         {/* 价格标签 */}
         <span className={`${styles.price} ${template.price === 'free' ? styles.free : styles.premium}`}>

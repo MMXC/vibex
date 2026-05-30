@@ -42,6 +42,10 @@ interface CanvasHistoryState {
   clear: () => void;
   canUndo: () => boolean;
   canRedo: () => boolean;
+  /** Undo all commands back to (and including) targetIndex in past */
+  selectiveUndo: (targetIndex: number) => void;
+  /** Returns current position in history stack */
+  getPosition: () => { current: number; total: number };
 }
 
 // ==================== Helper ====================
@@ -113,6 +117,41 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
 
   canUndo: () => get().past.length > 0,
   canRedo: () => get().future.length > 0,
+
+  /** Undo all commands from (targetIndex+1) to end of past stack */
+  selectiveUndo: (targetIndex: number) => {
+    const { past, future, isPerforming } = get();
+    if (isPerforming || targetIndex < 0) return;
+    set({ isPerforming: true });
+    try {
+      if (targetIndex < past.length - 1) {
+        // targetIndex is within the past — roll back newer commands
+        const toUndo = past.slice(targetIndex + 1);
+        for (let i = toUndo.length - 1; i >= 0; i--) {
+          toUndo[i].rollback();
+        }
+        set((state) => ({
+          past: state.past.slice(0, targetIndex + 1),
+          future: [...toUndo, ...state.future],
+        }));
+      } else {
+        // targetIndex >= past.length - 1 (at or past current state)
+        // Calculate how many future commands to re-apply
+        const steps = targetIndex - (past.length - 1);
+        for (let i = 0; i < steps; i++) {
+          get().redo();
+        }
+      }
+    } finally {
+      set({ isPerforming: false });
+    }
+  },
+
+  /** Returns { current: position in past (0-indexed), total: past.length } */
+  getPosition: () => {
+    const { past } = get();
+    return { current: past.length, total: past.length };
+  },
 }));
 
 // ==================== localStorage Persistence (U4-P001) ====================

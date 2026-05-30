@@ -39,6 +39,7 @@ import { useDDSCanvasSearch } from '@/hooks/dds/useDDSCanvasSearch';
 import { DDSSearchPanel } from '@/components/dds/DDSSearchPanel';
 import { MiniMapPanel } from '@/components/dds/MiniMapPanel';
 import { ReviewReportPanel } from '@/components/design-review';
+import { HistoryPanel } from '@/components/canvas/features/HistoryPanel';
 import { ConflictResolutionDialog } from '@/components/conflict/ConflictResolutionDialog';
 import { PresenceOverlay } from '@/components/dds/presence/PresenceOverlay';
 import { useWebSocketPresence } from '@/lib/collaboration/useWebSocketPresence';
@@ -439,6 +440,7 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   // ---- Keyboard Shortcuts ----
   // P001: useKeyboardShortcuts wired to canvasHistoryStore for DDS canvas undo/redo.
   const [searchPanelOpen, setSearchPanelOpen] = useState(false);
+  const [historyPanelOpen, setHistoryPanelOpen] = useState(false);
   const { query: searchQuery, setQuery: setSearchQuery, results: searchResults, clearResults } =
     useDDSCanvasSearch();
 
@@ -455,9 +457,15 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   }, []);
 
   const undoCallback = useCallback(() => {
-    useCanvasHistoryStore.getState().undo();
+    // P004-E4: Open HistoryPanel for selective undo instead of immediate undo
+    const { canUndo } = useCanvasHistoryStore.getState();
+    if (canUndo()) {
+      setHistoryPanelOpen(true);
+      return false; // prevent default undo behavior when panel opens
+    }
     return true;
   }, []);
+
   const redoCallback = useCallback(() => {
     useCanvasHistoryStore.getState().redo();
     return true;
@@ -796,6 +804,12 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
       changes={conflictChanges}
       onResolve={(action) => setConflictDialogOpen(false)}
       onClose={() => setConflictDialogOpen(false)}
+    />
+
+    {/* P004-E4: History Panel — Ctrl+Z opens for selective undo */}
+    <HistoryPanel
+      open={historyPanelOpen}
+      onClose={() => setHistoryPanelOpen(false)}
     />
 
     {/* P003-T3.7: New user guide overlay on DDS canvas */}

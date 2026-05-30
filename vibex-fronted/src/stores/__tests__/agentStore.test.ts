@@ -1,14 +1,56 @@
 /**
  * agentStore.injectContext — Unit Tests
  * Sprint 6 U5: Agent Session Management
+ * Sprint44 P001-E1: IndexedDB persistence tests
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useAgentStore } from '@/stores/agentStore';
+import type { AgentSession } from '@/services/agent/CodingAgentService';
+
+// ── S44-E1: IndexedDB persistence tests ─────────────────────────
+
+// Mock idb module
+const mockDB: Record<string, AgentSession[]> = {};
+const mockStore = {
+  put: vi.fn(async (session: AgentSession) => {
+    mockDB[session.sessionKey] = session;
+  }),
+  getAllFromIndex: vi.fn(async () => Object.values(mockDB)),
+  delete: vi.fn(async (key: string) => {
+    delete mockDB[key];
+  }),
+  get: vi.fn(async (key: string) => mockDB[key]),
+};
+
+vi.mock('idb', () => ({
+  openDB: vi.fn(async () => mockStore),
+}));
+
+vi.mock('@/lib/agentDB', () => ({
+  initAgentDB: vi.fn(async () => mockStore),
+  persistSession: vi.fn(async (session: AgentSession) => {
+    mockDB[session.sessionKey] = session;
+  }),
+  loadSessionList: vi.fn(async () => Object.values(mockDB).reverse()),
+  deleteSession: vi.fn(async (key: string) => {
+    delete mockDB[key];
+  }),
+}));
+
+function makeSession(overrides: Partial<AgentSession> = {}): AgentSession {
+  return {
+    sessionKey: `session_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+    task: 'Test task',
+    status: 'idle',
+    createdAt: Date.now(),
+    messages: [],
+    ...overrides,
+  };
+}
 
 describe('agentStore.injectContext', () => {
   beforeEach(() => {
-    // Reset codeGenContext between tests so state doesn't leak
     useAgentStore.setState({ codeGenContext: null });
   });
 
@@ -21,7 +63,6 @@ describe('agentStore.injectContext', () => {
       exportedAt: '2026-04-27T00:00:00.000Z',
     };
     useAgentStore.getState().injectContext(ctx);
-    // Re-read state after mutation (set is synchronous but store ref may be stale)
     expect(useAgentStore.getState().codeGenContext).toEqual(ctx);
   });
 
@@ -43,5 +84,49 @@ describe('agentStore.injectContext', () => {
   it('throws on node without id', () => {
     const ctx = { type: 'codegen', generatedCode: 'x', nodes: [{ type: 'frame' }], schemaVersion: '1.0.0', exportedAt: '2026-04-27' } as any;
     expect(() => useAgentStore.getState().injectContext(ctx)).toThrow(/node\.id.*string/);
+  });
+});
+
+// S44-E1: IndexedDB persistence tests
+describe('agentStore S44-E1: IndexedDB persistence', () => {
+  beforeEach(async () => {
+    // Clear mock DB and reset store
+    Object.keys(mockDB).forEach((k) => delete mockDB[k]);
+    useAgentStore.setState({ sessions: [], activeSessionKey: null, codeGenContext: null });
+    vi.clearAllMocks();
+  });
+
+  it('addSession persists session to store and sets active', async () => {
+    const session = makeSession();
+    useAgentStore.getState().addSession(session);
+    const state = useAgentStore.getState();
+    expect(state.sessions).toContain(session);
+    expect(state.activeSessionKey).toBe(session.sessionKey);
+  });
+
+  it('updateSession updates in-memory state', async () => {
+    const session = makeSession({ name: 'Old name' });
+    useAgentStore.getState().addSession(session);
+    useAgentStore.getState().updateSession(session.sessionKey, { name: 'New name' });
+    const updated = useAgentStore.getState().sessions.find((s) => s.sessionKey === session.sessionKey);
+    expect(updated?.name).toBe('New name');
+  });
+
+  it('removeSession removes session from store', async () => {
+    const session = makeSession();
+    useAgentStore.getState().addSession(session);
+    expect(useAgentStore.getState().sessions).toContain(session);
+    useAgentStore.getState().removeSession(session.sessionKey);
+    expect(useAgentStore.getState().sessions).not.toContainEqual(expect.objectContaining({ sessionKey: session.sessionKey }));
+  });
+
+  it('initAgentSessions loads persisted sessions when store is empty', async () => {
+    const s1 = makeSession({ sessionKey: 'persist-1', createdAt: 1000 });
+    const s2 = makeSession({ sessionKey: 'persist-2', createdAt: 2000 });
+    mockDB['persist-1'] = s1;
+    mockDB['persist-2'] = s2;
+    await useAgentStore.getState().initAgentSessions();
+    const state = useAgentStore.getState();
+    expect(state.sessions.length).toBeGreaterThanOrEqual(2);
   });
 });

@@ -1,5 +1,6 @@
 /**
  * useStreamingAgent.ts — Sprint43 E2: AI Agent SSE Streaming
+ * Sprint44 P001-E1: add onChunk callback for character counting
  *
  * Hook for calling POST /api/ai/generate with SSE streaming support.
  * Manages AbortController, chunk accumulation, and loading state.
@@ -24,6 +25,8 @@ export interface UseStreamingAgentOptions {
   onComplete?: (fullContent: string) => void;
   /** Called on stream error */
   onError?: (error: string) => void;
+  /** S44-E1: called for each SSE chunk received */
+  onChunk?: (chunk: string) => void;
 }
 
 export function useStreamingAgent(options: UseStreamingAgentOptions = {}) {
@@ -127,6 +130,8 @@ export function useStreamingAgent(options: UseStreamingAgentOptions = {}) {
                     : msg
                 )
               );
+              // S44-E1: notify onChunk listener (for character counter)
+              options.onChunk?.(data.content);
             }
 
             if (data.done) {

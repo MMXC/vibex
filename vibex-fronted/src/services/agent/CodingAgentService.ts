@@ -1,5 +1,6 @@
 /**
  * CodingAgentService.ts — Sprint6 U3/U4/U5
+ * Sprint44 P001-E1: branchId, createBranch, getBranches
  *
  * AI Coding Agent integration service.
  *
@@ -22,7 +23,20 @@ export interface AgentSession {
   status: AgentSessionStatus;
   createdAt: number;
   messages: AgentMessage[];
+  /** S44-E1: session name for display (user-editable) */
+  name?: string;
+  /** S44-E1: parent session key for branch sessions */
+  branchId?: string;
+  /** S44-E1: branch metadata */
+  branches?: AgentBranch[];
   error?: string;
+}
+
+/** S44-E1: Branch metadata for multi-session branching */
+export interface AgentBranch {
+  sessionKey: string;
+  branchName: string;
+  createdAt: number;
 }
 
 export interface AgentMessage {
@@ -122,4 +136,59 @@ export function rejectCodeBlock(sessionKey: string, messageId: string, blockInde
     message.codeBlocks[blockIndex].accepted = false;
     store.updateSession(sessionKey, { messages: [...session.messages] });
   }
+}
+
+// ── S44-E1: Multi-session branching ───────────────────────────────
+
+/**
+ * S44-E1: Create a branch session from a parent session.
+ * The new branch session inherits context from the parent but runs independently.
+ */
+export async function createBranch(
+  parentSessionKey: string,
+  branchName: string
+): Promise<string> {
+  const parent = useAgentStore.getState().sessions.find(
+    (s) => s.sessionKey === parentSessionKey
+  );
+  if (!parent) {
+    throw new Error(`Parent session ${parentSessionKey} not found`);
+  }
+
+  // Create new session with branchId pointing to parent
+  const newSessionKey = `branch_${parentSessionKey}_${Date.now()}`;
+
+  const response = await fetch('/api/agent/sessions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      task: `[${branchName}] ${parent.task}`,
+      branchFrom: parentSessionKey,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create branch session');
+  }
+
+  const data = await response.json() as { sessionKey: string };
+
+  // Register branch in parent's branches list
+  const branch: AgentBranch = {
+    sessionKey: data.sessionKey,
+    branchName,
+    createdAt: Date.now(),
+  };
+  const updatedBranches = [...(parent.branches ?? []), branch];
+  useAgentStore.getState().updateSession(parentSessionKey, { branches: updatedBranches });
+
+  return data.sessionKey;
+}
+
+/**
+ * S44-E1: Get all branches for a given parent session.
+ */
+export function getBranches(sessionKey: string): AgentBranch[] {
+  const session = useAgentStore.getState().sessions.find((s) => s.sessionKey === sessionKey);
+  return session?.branches ?? [];
 }

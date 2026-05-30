@@ -82,6 +82,18 @@
   margin-bottom: 6px;
 }
 
+/* S44-E1: inline session name editor */
+.sessionNameInput {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  outline: none;
+}
+
 .sessionActions {
   display: flex;
   justify-content: flex-end;

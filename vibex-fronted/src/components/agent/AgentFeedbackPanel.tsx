@@ -2,6 +2,7 @@
  * AgentFeedbackPanel.tsx — Sprint6 U4: AgentFeedbackPanel
  * Sprint40 P001-E1: i18n — hardcoded text replaced with useTranslations('ai')()
  * Sprint43 P002-E2: SSE streaming — streaming indicator + cancel button
+ * Sprint44 P001-E1: character counter — "已接收 N 个字符"
  *
  * Shows agent code feedback with accept/reject controls.
  * Supports four states: idle / running / complete / error.
@@ -9,7 +10,7 @@
 
 'use client';
 
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useState, useEffect } from 'react';
 import { useAgentStore } from '@/stores/agentStore';
 import { acceptCodeBlock, rejectCodeBlock } from '@/services/agent/CodingAgentService';
 import type { AgentMessage, CodeBlock } from '@/services/agent/CodingAgentService';
@@ -106,6 +107,24 @@ export const AgentFeedbackPanel = memo(function AgentFeedbackPanel({
   const sessionKey = sessionKeyProp ?? activeSessionKey;
   const session = sessions.find((s) => s.sessionKey === sessionKey);
 
+  // S44-E1: track total received characters for streaming counter
+  const [receivedChars, setReceivedChars] = useState(0);
+  const prevLengthRef = React.useRef(0);
+
+  useEffect(() => {
+    if (!session) {
+      setReceivedChars(0);
+      prevLengthRef.current = 0;
+      return;
+    }
+    // Count total characters across all agent messages
+    const total = session.messages
+      .filter((m) => m.role === 'agent')
+      .reduce((sum, m) => sum + m.content.length, 0);
+    setReceivedChars(total);
+    prevLengthRef.current = total;
+  }, [session?.messages, sessionKey]);
+
   const handleCancel = useCallback(() => {
     if (sessionKey) {
       import('@/services/agent/CodingAgentService').then(({ terminateSession }) => {
@@ -163,12 +182,17 @@ export const AgentFeedbackPanel = memo(function AgentFeedbackPanel({
           )}
           <div className={`${styles.statusPill} ${styles[`status_${session.status}`]}`}>
             {/* S43-E2: show generating indicator when running */}
-            {session.status === 'running' ? (
-              <span className={styles.streamingIndicator}>
-                <span className={styles.streamingDot} />
-                {t('generating') ?? '生成中...'}
-              </span>
-            ) : statusLabel}
+          {session.status === 'running' ? (
+            <span className={styles.streamingIndicator}>
+              <span className={styles.streamingDot} />
+              {t('generating') ?? '生成中...'}
+              {receivedChars > 0 && (
+                <span style={{ marginLeft: '8px', fontSize: '10px', opacity: 0.6 }}>
+                  ({t('charsReceived') ?? '已接收'} {receivedChars.toLocaleString()} {t('charsUnit') ?? '个字符'})
+                </span>
+              )}
+            </span>
+          ) : statusLabel}
           </div>
         </div>
       </div>

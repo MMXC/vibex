@@ -1,13 +1,14 @@
 /**
  * AgentSessions.tsx — Sprint6 U5: Agent Session Management
  * Sprint40 P001-E1: i18n — hardcoded text replaced with useTranslations('ai')()
+ * Sprint44 P001-E1: session naming — double-click to rename
  *
  * Displays session list, status badges, and terminate controls.
  */
 
 'use client';
 
-import React, { memo } from 'react';
+import React, { memo, useState, useCallback } from 'react';
 import { useAgentStore } from '@/stores/agentStore';
 import { terminateSession } from '@/services/agent/CodingAgentService';
 import type { AgentSessionStatus } from '@/services/agent/CodingAgentService';
@@ -16,6 +17,7 @@ import styles from './AgentSessions.module.css';
 
 interface SessionCardProps {
   sessionKey: string;
+  name?: string;
   task: string;
   status: AgentSessionStatus;
   createdAt: number;
@@ -25,13 +27,16 @@ interface SessionCardProps {
 
 const SessionCard = memo(function SessionCard({
   sessionKey,
+  name,
   task,
   status,
   createdAt,
   isActive,
   t,
 }: SessionCardProps) {
-  const { setActiveSession, removeSession } = useAgentStore();
+  const { setActiveSession, removeSession, updateSession } = useAgentStore();
+  const [editing, setEditing] = useState(false);
+  const [editValue, setEditValue] = useState(name ?? task);
 
   const statusLabel = {
     idle: t('statusIdle'),
@@ -58,6 +63,25 @@ const SessionCard = memo(function SessionCard({
   const handleSelect = () => {
     setActiveSession(sessionKey);
   };
+
+  /** S44-E1: double-click to rename session */
+  const handleDoubleClick = useCallback(() => {
+    setEditValue(name ?? task);
+    setEditing(true);
+  }, [name, task]);
+
+  const handleEditSave = useCallback(() => {
+    const trimmed = editValue.trim();
+    if (trimmed && trimmed !== (name ?? task)) {
+      updateSession(sessionKey, { name: trimmed });
+    }
+    setEditing(false);
+  }, [editValue, name, task, sessionKey, updateSession]);
+
+  const handleEditKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') handleEditSave();
+    if (e.key === 'Escape') setEditing(false);
+  }, [handleEditSave]);
 
   const timeAgo = (ts: number) => {
     const diff = Math.floor((Date.now() - ts) / 1000);
@@ -86,7 +110,28 @@ const SessionCard = memo(function SessionCard({
         </span>
         <span className={styles.timeAgo}>{timeAgo(createdAt)}</span>
       </div>
-      <div className={styles.taskPreview}>{task || t('noTitle')}</div>
+      <div className={styles.taskPreview}>
+        {editing ? (
+          <input
+            type="text"
+            className={styles.sessionNameInput}
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={handleEditSave}
+            onKeyDown={handleEditKeyDown}
+            autoFocus
+            aria-label={t('sessionNameInput') ?? 'Session name'}
+          />
+        ) : (
+          <span
+            onDoubleClick={handleDoubleClick}
+            title={t('doubleClickToRename') ?? 'Double-click to rename'}
+            style={{ cursor: 'text' }}
+          >
+            {(name || task) ?? t('noTitle')}
+          </span>
+        )}
+      </div>
       <div className={styles.sessionActions}>
         {status === 'running' || status === 'starting' ? (
           <button
@@ -138,6 +183,7 @@ export const AgentSessions = memo(function AgentSessions() {
         <SessionCard
           key={session.sessionKey}
           sessionKey={session.sessionKey}
+          name={session.name}
           task={session.task}
           status={session.status}
           createdAt={session.createdAt}

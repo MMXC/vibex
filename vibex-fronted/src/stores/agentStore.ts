@@ -1,7 +1,9 @@
 /**
  * agentStore.ts — Sprint6 U5: Agent Session Management
+ * Sprint44 P001-E1: IndexedDB persistence via agentDB
  *
  * Manages AI Coding Agent sessions with Zustand.
+ * Sessions are persisted to IndexedDB on every create/update/delete.
  */
 
 'use client';
@@ -12,6 +14,7 @@ import type {
   AgentMessage,
 } from '@/services/agent/CodingAgentService';
 import type { CodeGenContext } from '@/types/codegen';
+import { initAgentDB, persistSession, loadSessionList, deleteSession as dbDeleteSession } from '@/lib/agentDB';
 
 interface AgentState {
   sessions: AgentSession[];
@@ -32,6 +35,8 @@ interface AgentActions {
    * Throws if the input does not conform to the expected shape.
    */
   injectContext: (raw: unknown) => asserts raw is CodeGenContext;
+  /** S44-E1: Initialize IndexedDB and load persisted sessions */
+  initAgentSessions: () => Promise<void>;
 }
 
 export type AgentStore = AgentState & AgentActions;
@@ -42,26 +47,37 @@ export const useAgentStore = create<AgentStore>((set) => ({
   codeGenContext: null,
 
   addSession: (session) =>
-    set((state) => ({
-      sessions: [session, ...state.sessions].slice(0, 50), // keep max 50
-      activeSessionKey: session.sessionKey,
-    })),
+    set((state) => {
+      const newSessions = [session, ...state.sessions].slice(0, 50);
+      // Persist to IndexedDB (async, non-blocking)
+      void persistSession(session);
+      void initAgentDB(); // ensure DB is open
+      return { sessions: newSessions, activeSessionKey: session.sessionKey };
+    }),
 
   updateSession: (sessionKey, updates) =>
-    set((state) => ({
-      sessions: state.sessions.map((s) =>
+    set((state) => {
+      const updated = state.sessions.map((s) =>
         s.sessionKey === sessionKey ? { ...s, ...updates } : s
-      ),
-    })),
+      );
+      const updatedSession = updated.find((s) => s.sessionKey === sessionKey);
+      if (updatedSession) {
+        void persistSession(updatedSession); // async persist
+      }
+      return { sessions: updated };
+    }),
 
   removeSession: (sessionKey) =>
-    set((state) => ({
-      sessions: state.sessions.filter((s) => s.sessionKey !== sessionKey),
-      activeSessionKey:
-        state.activeSessionKey === sessionKey
-          ? (state.sessions[1]?.sessionKey ?? null)
-          : state.activeSessionKey,
-    })),
+    set((state) => {
+      void dbDeleteSession(sessionKey); // async delete from IndexedDB
+      return {
+        sessions: state.sessions.filter((s) => s.sessionKey !== sessionKey),
+        activeSessionKey:
+          state.activeSessionKey === sessionKey
+            ? (state.sessions[1]?.sessionKey ?? null)
+            : state.activeSessionKey,
+      };
+    }),
 
   setActiveSession: (sessionKey) => set({ activeSessionKey: sessionKey }),
 
@@ -128,5 +144,24 @@ export const useAgentStore = create<AgentStore>((set) => ({
     }
 
     set({ codeGenContext: raw as CodeGenContext });
+  },
+
+  /** S44-E1: Load persisted sessions from IndexedDB on app init */
+  initAgentSessions: async () => {
+    try {
+      const db = await initAgentDB();
+      void db; // DB is open; loadSessionList reads it lazily
+      const sessions = await loadSessionList();
+      // Only restore if we don't already have sessions (avoid overwriting in-flight state)
+      const current = useAgentStore.getState();
+      if (current.sessions.length === 0 && sessions.length > 0) {
+        set({
+          sessions,
+          activeSessionKey: sessions[0]?.sessionKey ?? null,
+        });
+      }
+    } catch (err) {
+      console.warn('[agentStore] Failed to load sessions from IndexedDB:', err);
+    }
   },
 }));

@@ -57,7 +57,8 @@ import type { CanvasFlow, CanvasNode } from '@/lib/codeGenerator';
 import { useAIController } from '@/hooks/canvas/useAIController';
 import { DiffOverlay } from '@/components/agent/DiffOverlay';
 import { useAIAgent } from '@/hooks/useAIAgent';
-import { persistCanvas, loadCanvas } from '@/lib/canvas/persistence';
+import { useResponsiveMode } from '@/hooks/useResponsiveMode';
+import { TouchModeIndicator } from '@/components/shared/TouchModeIndicator';
 
 // ==================== Props ====================
 
@@ -212,6 +213,18 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   // ---- S16-P0-2: Conflict Resolution Dialog ----
   const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
   const [conflictChanges, setConflictChanges] = useState<TokenChange[]>([]);
+
+  // E5-U1 AC1: Touch mode detection
+  const { isMobile, isTablet } = useResponsiveMode();
+  const [touchMode, setTouchMode] = useState(false);
+
+  // E5-U1: Detect first touch interaction — switch canvas to touch mode
+  useEffect(() => {
+    if (!isMobile && !isTablet) return;
+    const handleTouchStart = () => setTouchMode(true);
+    document.addEventListener('ontouchstart', handleTouchStart, { once: true });
+    return () => document.removeEventListener('ontouchstart', handleTouchStart);
+  }, [isMobile, isTablet]);
 
   // ---- P001-U3: Initialize history middleware (once, on mount) ----
   useEffect(() => {
@@ -673,6 +686,8 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
                 chapter={chapter}
                 onSelectCard={handleSelectCard}
                 selectedCardIds={selectedCardIds}
+                /* E5-U1: Touch mode — disable drag, enable pinch-zoom */
+                touchMode={touchMode}
               />
             </>
           )}
@@ -682,8 +697,11 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
           scrollContainerRef={scrollContainerRef}
           className="cross-chapter-edges-overlay"
         />
-        {/* P003-E1: MiniMap Navigation Panel */}
-        <MiniMapPanel />
+        {/* P003-E1: MiniMap Navigation Panel — E5: hide in touch mode */}
+        {!touchMode && <MiniMapPanel />}
+
+        {/* E5-U1 AC3: Touch mode active indicator */}
+        <TouchModeIndicator active={touchMode} />
       </div>
 
       {/* AI Draft Drawer */}

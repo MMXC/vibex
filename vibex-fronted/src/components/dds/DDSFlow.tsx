@@ -159,6 +159,8 @@ export interface DDSFlowProps {
   initialEdges?: Edge[];
   onSelectCard?: (cardId: string) => void;
   selectedCardIds?: string[];
+  /** E5: when true, canvas switches to touch-optimized mode */
+  touchMode?: boolean;
 }
 
 // ==================== Inner component ====================
@@ -169,6 +171,7 @@ function DDSFlowInner({
   initialEdges,
   onSelectCard,
   selectedCardIds = [],
+  touchMode = false,
 }: DDSFlowProps) {
   const { getNodes } = useReactFlow();
 
@@ -275,9 +278,12 @@ function DDSFlowInner({
         onConnect={onConnect}
         onNodeClick={handleNodeClick}
         nodeTypes={nodeTypes}
-        nodesDraggable={true}
-        nodesConnectable={true}
+        /* E5: In touch mode, disable drag (use touch gestures instead) */
+        nodesDraggable={!touchMode}
+        nodesConnectable={!touchMode}
         elementsSelectable={true}
+        /* E5: Enable pinch-to-zoom when in touch mode */
+        zoomOnPinch={touchMode}
         fitView
         fitViewOptions={{ padding: 0.2 }}
         style={{ background: 'transparent' }}
@@ -289,12 +295,15 @@ function DDSFlowInner({
           size={1}
           color="rgba(255,255,255,0.06)"
         />
+        {/* E5: Hide Controls on touch (mobile toolbar handles actions) */}
+        {/*
         <Controls
           showInteractive={false}
           style={{ bottom: 16, right: 16 }}
         />
-        {/* P005-E3: MiniMap — rendered as collapsible left panel, not static overlay */}
-        <MiniMapPanel />
+        */}
+        {/* P005-E3: MiniMap — E5: default hidden on touch/mobile */}
+        {!touchMode && <MiniMapPanel />}
 
         {/* E1-U2/U3: Group collapse overlay */}
         <GroupCollapseOverlay

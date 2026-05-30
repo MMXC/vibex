@@ -1,0 +1,62 @@
+/**
+ * TouchModeIndicator.module.css — E5: Touch Mode Active Indicator
+ *
+ * Uses design tokens from design-tokens.css
+ */
+
+.indicator {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--color-overlay, rgba(0, 0, 0, 0.85));
+  color: var(--color-text-inverse, #ffffff);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 9999;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.2s ease-out;
+  pointer-events: auto;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  opacity: 0.9;
+}
+
+.label {
+  white-space: nowrap;
+}
+
+.dismiss {
+  background: none;
+  border: none;
+  color: var(--color-text-inverse, #ffffff);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0 0 4px;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+
+.dismiss:hover {
+  opacity: 1;
+}

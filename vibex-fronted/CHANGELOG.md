@@ -26,6 +26,14 @@
 - **E3 CardRenderer.tsx**: LockOverlay 组件 + locked/lockedBy props ✅
 - **E3 DDSFlow.tsx**: 从 presenceStore 注入 locked/lockedBy 到 flowNodes，🔒 图标叠加层 ✅
 
+##### S44-P004-E4: 撤销历史面板（选择性撤销）
+- **E4 canvasHistoryStore.ts**: 添加 selectiveUndo(targetIndex) 和 getPosition() ✅
+- **E4 HistoryPanel.tsx**: Ctrl+Z 打开侧边栏，显示历史命令列表，点击恢复到指定快照 ✅
+- **E4 HistoryPanel.module.css**: 滑入动画、遮罩层、列表样式 ✅
+- **E4 DDSCanvasPage.tsx**: undoCallback 改为打开 HistoryPanel 而非立即撤销 ✅
+- **E4 canvasHistoryStore.test.ts**: 21/21 vitest 全部 PASS（6 个新测试） ✅
+- **E4 HistoryPanel.test.tsx**: 9/9 vitest 全部 PASS ✅
+
 ### [Unreleased] Sprint 43 — E1 Presence 集成收尾 + E2 SSE 流式 + E3 性能优化 + E4 导出 + E5 快捷键自定义
 
 ##### S43-P001-E1: Presence DDSCanvasPage 集成收尾

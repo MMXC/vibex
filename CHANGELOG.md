@@ -12,6 +12,12 @@
 - **E2 AgentFeedbackPanel**: 流式指示器（pulse dot）+ 取消按钮 + terminateSession 集成 ✅
 - **E2 ai-streaming.spec.ts**: E2E 测试，SSE 端点契约验证 ✅
 
+##### S43-P003-E3: Canvas 大型画布性能优化
+- **E3 onlyRenderVisibleElements**: `src/components/dds/DDSFlow.tsx` — 视口裁剪，减少大型画布 DOM 节点 ✅
+- **E3 viewportBoundsStore sync**: `DDSFlow.tsx` useOnViewportChange → `useViewportBoundsStore.updateViewportBounds(vp)` ✅
+- **E3 viewportBounds.test.ts**: 7/7 PASS ✅
+- **E3 viewportBounds.integration.test.ts**: 4/4 PASS ✅
+
 ### [Unreleased] Sprint 42 — E1 撤销/重做验证 + E2 Presence光标 + E3 画布模板 + E4 设置验收 + E5 移动端触摸
 
 ##### S42-P001-E1: 撤销/重做系统验证（Sprint36 实现）

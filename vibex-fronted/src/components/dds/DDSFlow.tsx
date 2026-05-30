@@ -36,6 +36,7 @@ import type { DDSCard, ChapterType } from '@/types/dds';
 import { ConflictBubble } from '@/components/canvas/ConflictBubble';
 import { useConflictStore } from '@/lib/canvas/stores/conflictStore';
 import { useMiniMapStore } from '@/lib/canvas/stores/miniMapStore';
+import { useViewportBoundsStore } from '@/lib/canvas/stores/viewportBoundsStore';
 import { MiniMapPanel } from '@/components/dds/MiniMapPanel';
 import styles from './DDSFlow.module.css';
 
@@ -209,6 +210,8 @@ function DDSFlowInner({
       setViewport(vp);
       // P005-E3: sync viewport to miniMapStore for border rectangle
       useMiniMapStore.getState().setViewport(vp);
+      // S43-P003-E3: sync to viewportBoundsStore for virtualization culling
+      useViewportBoundsStore.getState().updateViewportBounds(vp);
     },
   });
 
@@ -284,6 +287,8 @@ function DDSFlowInner({
         elementsSelectable={true}
         /* E5: Enable pinch-to-zoom when in touch mode */
         zoomOnPinch={touchMode}
+        /* S43-P003-E3: only render nodes visible in viewport for large canvas performance */
+        onlyRenderVisibleElements={true}
         fitView
         fitViewOptions={{ padding: 0.2 }}
         style={{ background: 'transparent' }}

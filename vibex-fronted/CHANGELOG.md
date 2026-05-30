@@ -1,3 +1,15 @@
+### [Unreleased] Sprint 44 — E1 AI 多轮会话管理 + E2 画布模板分类 + E3 协作节点锁定 + E4 撤销历史面板 + E5 移动端触控
+
+##### S44-P001-E1: AI 多轮会话管理
+- **E1 agentDB.ts**: `src/lib/agentDB.ts` — IndexedDB persistence layer (initAgentDB, persistSession, loadSessionList, deleteSession) ✅
+- **E1 agentStore.ts**: IndexedDB integration — auto-persist on add/update/delete, initAgentSessions() ✅
+- **E1 AgentSessions.tsx**: double-click to rename session (inline edit → updateSession) ✅
+- **E1 sessionNameInput CSS**: inline edit styling ✅
+- **E1 CodingAgentService.ts**: add branchId + AgentBranch interface, createBranch(), getBranches() ✅
+- **E1 useStreamingAgent.ts**: add onChunk callback for streaming progress ✅
+- **E1 AgentFeedbackPanel.tsx**: show received char count during streaming ✅
+- **E1 agentStore.test.ts**: 4 persistence tests (add/update/remove/initAgentSessions) ✅
+
 ### [Unreleased] Sprint 43 — E1 Presence 集成收尾 + E2 SSE 流式 + E3 性能优化 + E4 导出 + E5 快捷键自定义
 
 ##### S43-P001-E1: Presence DDSCanvasPage 集成收尾

@@ -269,7 +269,9 @@
     "noMessages": "No messages yet",
     "timeAgoSuffix": "ago",
     "noSessionsHint": "Trigger AI Coding Agent from prototype or DDS canvas",
-    "statusLabel": "Status"
+    "statusLabel": "Status",
+    "aiRetrying": "Retrying connection…",
+    "aiStreamFailed": "Connection failed after {maxRetries} attempts"
   },
   "shortcuts": {
     "title": "Keyboard Shortcuts",

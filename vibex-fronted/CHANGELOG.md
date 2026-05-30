@@ -1,3 +1,11 @@
+### [Unreleased] Sprint 43 — E1 Presence 集成收尾 + E2 SSE 流式 + E3 性能优化 + E4 导出 + E5 快捷键自定义
+
+##### S43-P001-E1: Presence DDSCanvasPage 集成收尾
+- **E1 DDSCanvasPage.tsx**: 集成 useWebSocketPresence，替换 Firebase usePresence ✅
+- **E1 PresenceOverlay**: 替换 PresenceAvatars + RemoteCursor ✅
+- **E1 cursorVisible**: userPreferencesStore.cursorVisible 联动 overlay 显示/隐藏 ✅
+- **E1 vitest**: presenceStore 4/4 PASS ✅
+
 ### [Unreleased] Sprint 42 — E1 撤销/重做验证 + E2 Presence光标 + E3 画布模板 + E4 设置验收 + E5 移动端触摸
 
 ##### S42-P001-E1: 撤销/重做系统验证（Sprint36 实现）

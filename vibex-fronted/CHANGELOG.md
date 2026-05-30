@@ -22,6 +22,16 @@
 - **E3 vitest**: `src/lib/canvas/__tests__/templateStore.test.ts` — 10 tests PASS ✅
 - **E3 预设模板**: blank + flowchart + four-quadrant + mindmap + swot ✅
 
+##### S42-P001-E5: 移动端触控支持
+- **E5 useTouchGestures.ts**: `src/hooks/useTouchGestures.ts` — Pinch-to-zoom (0.1–4×) + two-finger pan + double-tap node select ✅
+- **E5 TouchModeIndicator.tsx**: `src/components/shared/TouchModeIndicator.tsx` — 触屏模式激活提示 ✅
+- **E5 CSS**: `src/components/shared/TouchModeIndicator.module.css` — fade-in indicator styles ✅
+- **E5 DDSFlow 集成**: `nodesDraggable={!touchMode}` + `nodesConnectable={!touchMode}` + `zoomOnPinch={touchMode}` + MiniMapPanel 触屏隐藏 ✅
+- **E5 DDSCanvasPage 集成**: `ontouchstart` 触屏检测 + `useResponsiveMode` mobile/tablet 判断 + 传递给 DDSFlow ✅
+- **E5 vitest**: `src/hooks/__tests__/useTouchGestures.test.ts` — 6 tests PASS ✅
+- **E5 E2E**: `tests/e2e/mobile-touch.spec.ts` — 5 tests (pinch-zoom/pan/double-tap/indicator/minimap隐藏) ✅
+- **E5 commit**: `b11c7df9e` feat(S42-P001-E5): 移动端触控支持
+
 ##### S42-P002-E4: 画布网格 + 协作光标设置
 - **E4 userPreferencesStore**: `src/stores/userPreferencesStore.ts` — 新增 gridSpacing/gridVisible/cursorVisible 字段 + actions ✅
 - **E4 settings page**: `src/app/settings/page.tsx` — Canvas Grid section (spacing 8/16/32px selector + gridVisible toggle) + Collaboration section (cursorVisible toggle) ✅

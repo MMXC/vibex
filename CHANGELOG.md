@@ -30,6 +30,16 @@
 - **E4 PresenceOverlay**: `src/components/dds/presence/PresenceOverlay.tsx` — cursorVisible gating (cursorVisible=false 时 return null) ✅
 - **E4 vitest**: `src/stores/__tests__/userPreferencesStore.test.ts` — 12 tests PASS ✅
 
+##### S42-P001-E5: 移动端触控支持
+- **E5 useTouchGestures.ts**: `src/hooks/useTouchGestures.ts` — Pinch-to-zoom (0.1–4×) + two-finger pan + double-tap node select ✅
+- **E5 TouchModeIndicator.tsx**: `src/components/shared/TouchModeIndicator.tsx` — 触屏模式激活提示 ✅
+- **E5 CSS**: `src/components/shared/TouchModeIndicator.module.css` — fade-in indicator styles ✅
+- **E5 DDSFlow 集成**: `nodesDraggable={!touchMode}` + `nodesConnectable={!touchMode}` + `zoomOnPinch={touchMode}` + MiniMapPanel 触屏隐藏 ✅
+- **E5 DDSCanvasPage 集成**: `ontouchstart` 触屏检测 + `useResponsiveMode` mobile/tablet 判断 + 传递给 DDSFlow ✅
+- **E5 vitest**: `src/hooks/__tests__/useTouchGestures.test.ts` — 6 tests PASS ✅
+- **E5 E2E**: `tests/e2e/mobile-touch.spec.ts` — 5 tests (pinch-zoom/pan/double-tap/indicator/minimap隐藏) ✅
+- **E5 commit**: `b11c7df9e` feat(S42-P001-E5): 移动端触控支持
+
 ### [Unreleased] Sprint 41 — P001 i18n 验收 + P002 WebSocket 部署 + P003 MiniMap 验收 + P004 Canvas 持久化 + P005 快捷键
 
 ##### S41-P001-E1: i18n AI生成区最终验收

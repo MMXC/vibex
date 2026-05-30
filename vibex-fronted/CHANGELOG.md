@@ -34,6 +34,17 @@
 - **E4 canvasHistoryStore.test.ts**: 21/21 vitest 全部 PASS（6 个新测试） ✅
 - **E4 HistoryPanel.test.tsx**: 9/9 vitest 全部 PASS ✅
 
+##### S44-P005-E5: 移动端触控
+- **E5 useTouchGestures.ts**: pinch-to-zoom (0.1–4×), two-finger pan, double-tap node select ✅
+- **E5 DDSFlow.tsx 集成**: onTouchStart + onPointerDown wired to root element ✅
+- **E5 Bug Fix**: two-finger pan sign bug (panX/panY), missing getZoom/getViewport ✅
+- **E5 vitest**: `useTouchGestures.test.ts` — 14/14 PASS ✅
+
+##### S44-P005-E5: 移动端触控支持
+- **E5 useTouchGestures.ts**: pinch-to-zoom (0.1–4x), two-finger pan, double-tap node select hook ✅
+- **E5 useTouchGestures.test.ts**: 14/14 vitest 全部 PASS ✅
+- **E5 DDSFlow.tsx**: 集成 touchGestures，onTouchStart + onPointerDown 绑定到根元素 ✅
+
 ### [Unreleased] Sprint 43 — E1 Presence 集成收尾 + E2 SSE 流式 + E3 性能优化 + E4 导出 + E5 快捷键自定义
 
 ##### S43-P001-E1: Presence DDSCanvasPage 集成收尾

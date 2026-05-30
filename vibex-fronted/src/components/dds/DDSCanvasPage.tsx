@@ -40,9 +40,9 @@ import { DDSSearchPanel } from '@/components/dds/DDSSearchPanel';
 import { MiniMapPanel } from '@/components/dds/MiniMapPanel';
 import { ReviewReportPanel } from '@/components/design-review';
 import { ConflictResolutionDialog } from '@/components/conflict/ConflictResolutionDialog';
-import { PresenceAvatars } from '@/components/canvas/Presence/PresenceAvatars';
-import { RemoteCursor } from '@/components/presence/RemoteCursor';
-import { usePresence, isFirebaseConfigured, updateCursor } from '@/lib/firebase/presence';
+import { PresenceOverlay } from '@/components/dds/presence/PresenceOverlay';
+import { useWebSocketPresence } from '@/lib/collaboration/useWebSocketPresence';
+import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 import useRealtimeSync from '@/hooks/useRealtimeSync';
 import { useAuthStore } from '@/stores/authStore';
 import type { ChapterType, ChapterData } from '@/types/dds';
@@ -291,36 +291,19 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     return () => window.removeEventListener('design-sync:drift-detected', handler);
   }, []);
 
-  // ---- E4: Firebase Presence ----
-  const [cursorPos, setCursorPos] = useState<{ x: number; y: number } | null>(null);
-
   // ---- E1: CodeGenContext Display (agentSession=new triggers context pre-fill) ----
   const codeGenContext = useAgentStore((s) => s.codeGenContext);
   const showCodeGenPanel = agentSession === 'new' && codeGenContext != null;
   const user = useAuthStore((s) => s.user);
   const userId = user?.id ?? null;
-  const { isAvailable } = usePresence(projectId ?? '', userId);
+  // S43-E1: WebSocket Presence integration (replaces Firebase usePresence)
+  useWebSocketPresence({ projectId, userId, userName: user?.name ?? 'Anonymous' });
+
+  // E1-S1.4: cursorVisible setting controls PresenceOverlay display
+  const cursorVisible = useUserPreferencesStore((s) => s.cursorVisible);
 
   // E1-S1.2: Real-time node sync with Firebase RTDB
   useRealtimeSync({ projectId: projectId ?? null, userId: userId ?? 'anonymous' });
-
-  // Track cursor position
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    setCursorPos({ x: e.clientX, y: e.clientY });
-  }, []);
-
-  // Broadcast cursor to Firebase (throttled 100ms)
-  useEffect(() => {
-    if (!isFirebaseConfigured() || !cursorPos || !userId || !projectId) return;
-
-    const handler = setTimeout(() => {
-      updateCursor(projectId, userId, cursorPos.x, cursorPos.y).catch(() => {
-        // silent fail when not configured
-      });
-    }, 100);
-
-    return () => clearTimeout(handler);
-  }, [cursorPos, userId, projectId]);
 
   // Store refs
   const selectedCardIds = useDDSCanvasStore((s) => s.selectedCardIds);
@@ -766,7 +749,8 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
         }}
       />
 
-      {isFirebaseConfigured() && (
+      {/* S43-E1: WebSocket PresenceOverlay — replaces Firebase PresenceAvatars + RemoteCursor */}
+      {cursorVisible && (
         <div style={{
           position: 'fixed',
           bottom: '24px',
@@ -774,12 +758,7 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
           zIndex: 9999,
           pointerEvents: 'none',
         }}>
-          <PresenceAvatars canvasId={projectId ?? ''} maxDisplay={5} />
-          <RemoteCursor
-            canvasId={projectId ?? ''}
-            userId={userId ?? 'anonymous'}
-            userName={user?.name ?? 'Anonymous'}
-          />
+          <PresenceOverlay excludeUserId={userId ?? undefined} />
         </div>
       )}
 

@@ -10,6 +10,16 @@
 - **E1 AgentFeedbackPanel.tsx**: show received char count during streaming ✅
 - **E1 agentStore.test.ts**: 4 persistence tests (add/update/remove/initAgentSessions) ✅
 
+
+##### S44-P002-E2: 画布模板分类 + 搜索 + 收藏
+- **E2 RequirementTemplate.isFavorite**: `src/data/templates/types.ts` — 添加 isFavorite 字段 ✅
+- **E2 Template.isFavorite**: `src/types/template.ts` — 添加 isFavorite 字段 ✅
+- **E2 templateStore.ts**: 添加 favoriteTemplateIds 状态、toggleFavorite、inferCategory、isFavorite、getFavorites 方法 ✅
+- **E2 filterTemplates favorites**: 支持 'favorites' 分类筛选 ✅
+- **E2 TemplateGallery.tsx**: 添加"收藏"分类 Tab、Favorites Star 按钮、localStorage 持久化 ✅
+- **E2 TemplateCard.tsx**: 添加 Star 按钮 (★/☆) + .favoriteBtn CSS ✅
+- **E2 templateStore.test.ts**: 13/13 vitest 全部 PASS (favorites CRUD + inferCategory + filter) ✅
+
 ### [Unreleased] Sprint 43 — E1 Presence 集成收尾 + E2 SSE 流式 + E3 性能优化 + E4 导出 + E5 快捷键自定义
 
 ##### S43-P001-E1: Presence DDSCanvasPage 集成收尾

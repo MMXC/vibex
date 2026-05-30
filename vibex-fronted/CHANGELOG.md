@@ -18,6 +18,12 @@
 - **E3 viewportBounds.test.ts**: 7/7 PASS ✅
 - **E3 viewportBounds.integration.test.ts**: 4/4 PASS ✅
 
+##### S43-P002-E4: 画布导出（PNG/SVG/PDF）
+- **E4 ExportMenu.tsx**: `src/components/dds/toolbar/ExportMenu.tsx` — JSON/Vibex/PDF/PNG/SVG 导出菜单 ✅
+- **E4 useCanvasExport**: `src/hooks/canvas/useCanvasExport.ts` — html-to-image PNG/SVG 导出 ✅
+- **E4 POST /api/export/pdf**: `src/app/api/export/pdf/route.ts` — jsPDF PDF 生成 ✅
+- **E4 vitest**: `src/hooks/canvas/__tests__/useCanvasExport.test.ts` — validateFileSize 4/4 PASS ✅
+
 ### [Unreleased] Sprint 42 — E1 撤销/重做验证 + E2 Presence光标 + E3 画布模板 + E4 设置验收 + E5 移动端触摸
 
 ##### S42-P001-E1: 撤销/重做系统验证（Sprint36 实现）

@@ -1,3 +1,4 @@
+
 /**
  * ShortcutPanel — 测试用例
  *
@@ -11,6 +12,20 @@
  * 7. 底部提示文本显示正确
  * 8. data-testid 属性正确
  */
+
+const tMock = (key: string): string => {
+  const dict: Record<string, string> = {
+    title: '快捷键',
+    closeAria: '关闭快捷键提示',
+    footer: '在文本输入框中，快捷键不会触发',
+  };
+  return dict[key] ?? key;
+};
+vi.mock('@/hooks/useTranslations', () => ({
+  useTranslations: () => () => tMock,
+}));
+
+
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ShortcutPanel, SHORTCUTS } from '../ShortcutPanel';
@@ -49,7 +64,7 @@ describe('ShortcutPanel', () => {
     expect(screen.getByText('放大画布')).toBeInTheDocument();
     expect(screen.getByText('缩小画布')).toBeInTheDocument();
     expect(screen.getByText('重置缩放')).toBeInTheDocument();
-    expect(screen.getByText('删除选中节点')).toBeInTheDocument();
+    expect(screen.getAllByText('删除选中节点')).toHaveLength(2);
     expect(screen.getByText('全选节点')).toBeInTheDocument();
     expect(screen.getByText('取消选择/关闭对话框/退出最大化')).toBeInTheDocument();
     
@@ -69,8 +84,11 @@ describe('ShortcutPanel', () => {
 
   it('所有 SHORTCUTS 数组中的项都正确渲染', () => {
     render(<ShortcutPanel {...defaultProps} />);
-    SHORTCUTS.forEach((shortcut) => {
-      expect(screen.getByText(shortcut.description)).toBeInTheDocument();
+    // Deduplicate by description - Del + Backspace share "删除选中节点", both render
+    const unique = [...new Set(SHORTCUTS.map((s) => s.description))];
+    unique.forEach((desc) => {
+      const count = SHORTCUTS.filter((s) => s.description === desc).length;
+      expect(screen.getAllByText(desc, { exact: true })).toHaveLength(count);
     });
   });
 
@@ -83,10 +101,8 @@ describe('ShortcutPanel', () => {
 
   it('点击遮罩层触发 onClose', () => {
     render(<ShortcutPanel {...defaultProps} />);
-    const overlay = screen.getByRole('dialog').parentElement;
-    if (overlay) {
-      fireEvent.click(overlay);
-    }
+    const overlay = screen.getByRole('dialog');
+    fireEvent.click(overlay);
     expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
   });
 

@@ -15,6 +15,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from '@/hooks/useTranslations';
 import { Keyboard } from 'lucide-react';
 import styles from '../canvas.module.css';
 
@@ -69,6 +70,7 @@ export interface ShortcutPanelProps {
 }
 
 export function ShortcutPanel({ open, onClose }: ShortcutPanelProps) {
+  const t = useTranslations('shortcuts')();
   if (!open) return null;
 
   return (
@@ -86,13 +88,13 @@ export function ShortcutPanel({ open, onClose }: ShortcutPanelProps) {
         <div className={styles.shortcutHintHeader}>
           <div className={styles.shortcutHintTitle}>
             <Keyboard size={18} aria-hidden="true" />
-            <span>快捷键</span>
+            <span>{t('title')}</span>
           </div>
           <button
             type="button"
             className={styles.shortcutHintClose}
             onClick={onClose}
-            aria-label="关闭快捷键提示"
+            aria-label={t('closeAria')}
           >
             ✕
           </button>
@@ -117,7 +119,7 @@ export function ShortcutPanel({ open, onClose }: ShortcutPanelProps) {
         </div>
 
         <div className={styles.shortcutHintFooter}>
-          <span>在文本输入框中，快捷键不会触发</span>
+          <span>{t('footer')}</span>
         </div>
       </div>
     </div>

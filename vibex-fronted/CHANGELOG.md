@@ -24,6 +24,12 @@
 - **E4 POST /api/export/pdf**: `src/app/api/export/pdf/route.ts` — jsPDF PDF 生成 ✅
 - **E4 vitest**: `src/hooks/canvas/__tests__/useCanvasExport.test.ts` — validateFileSize 4/4 PASS ✅
 
+
+##### S43-P002-E5: 快捷键自定义收尾
+- **E5 ShortcutPanel i18n**: `src/components/canvas/features/ShortcutPanel.tsx` — useTranslations('shortcuts') 集成 ✅
+- **E5 shortcuts namespace**: `src/i18n/messages/en.json` + `zh.json` — title/closeAria/footer keys ✅
+- **E5 vitest**: `src/components/canvas/features/__tests__/ShortcutPanel.test.tsx` — 修复 duplicate description test, 9/9 PASS ✅
+
 ### [Unreleased] Sprint 42 — E1 撤销/重做验证 + E2 Presence光标 + E3 画布模板 + E4 设置验收 + E5 移动端触摸
 
 ##### S42-P001-E1: 撤销/重做系统验证（Sprint36 实现）

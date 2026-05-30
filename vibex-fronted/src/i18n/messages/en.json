@@ -270,5 +270,10 @@
     "timeAgoSuffix": "ago",
     "noSessionsHint": "Trigger AI Coding Agent from prototype or DDS canvas",
     "statusLabel": "Status"
+  },
+  "shortcuts": {
+    "title": "Keyboard Shortcuts",
+    "closeAria": "Close keyboard shortcuts hint",
+    "footer": "Shortcuts do not trigger in text input fields"
   }
 }

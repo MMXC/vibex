@@ -36,11 +36,13 @@ import styles from './DDSFlow.module.css';
 interface FlowNodeData {
   card: DDSCard;
   chapter: ChapterType;
+  /** P002-E2: Set to true when confirmationStore has a conflict entry for this node */
+  isConflicted?: boolean;
 }
 
 function FlowNode({ data }: { data: FlowNodeData }) {
   return (
-    <div className={styles.flowNode}>
+    <div className={`${styles.flowNode}${data.isConflicted ? ' ' + styles.conflictedNode : ''}`}>
       <CardRenderer card={data.card} />
     </div>
   );

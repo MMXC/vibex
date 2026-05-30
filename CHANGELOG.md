@@ -20,6 +20,12 @@
 - **E2 TemplateCard.tsx**: 添加 Star 按钮 (★/☆) + .favoriteBtn CSS ✅
 - **E2 templateStore.test.ts**: 13/13 vitest 全部 PASS (favorites CRUD + inferCategory + filter) ✅
 
+##### S44-P003-E3: 协作节点锁定 + 冲突解决 UI
+- **E3 presenceStore.ts**: 添加 lockedNodes、lockNode、unlockNode、isLocked、handleNodeLocked/UnlockedMessage ✅
+- **E3 presenceStore.test.ts**: 9/9 vitest 全部 PASS (5 new lock tests) ✅
+- **E3 CardRenderer.tsx**: LockOverlay 组件 + locked/lockedBy props ✅
+- **E3 DDSFlow.tsx**: 从 presenceStore 注入 locked/lockedBy 到 flowNodes，🔒 图标叠加层 ✅
+
 ### [Unreleased] Sprint 43 — E1 Presence 集成收尾 + E2 SSE 流式 + E3 性能优化 + E4 导出 + E5 快捷键自定义
 
 ##### S43-P001-E1: Presence DDSCanvasPage 集成收尾

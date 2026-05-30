@@ -30,6 +30,37 @@ export interface CardRendererProps {
   stepNumber?: number;
   /** E2-U3: 冲突高亮标记 */
   conflict?: boolean;
+  /** S44-P003-E3: 节点锁定标记 */
+  locked?: boolean;
+  /** S44-P003-E3: 锁定者用户名 */
+  lockedBy?: string;
+}
+
+/** Lock icon overlay — rendered at top-right of card */
+function LockOverlay({ userName }: { userName?: string }) {
+  return (
+    <div
+      title={userName ? `🔒 locked by ${userName}` : '🔒 locked'}
+      style={{
+        position: 'absolute',
+        top: 4,
+        right: 4,
+        width: 20,
+        height: 20,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(59, 130, 246, 0.85)',
+        borderRadius: '50%',
+        color: '#fff',
+        fontSize: 10,
+        zIndex: 10,
+        pointerEvents: 'none',
+      }}
+    >
+      🔒
+    </div>
+  );
 }
 
 // Fallback for unknown card types
@@ -60,12 +91,21 @@ export const CardRenderer = memo(function CardRenderer({
   onSelect,
   stepNumber,
   conflict = false,
+  locked = false,
+  lockedBy,
 }: CardRendererProps) {
   const { type } = card;
 
+  const wrapper = (children: React.ReactNode) => (
+    <div style={{ position: 'relative' }}>
+      {children}
+      {locked && <LockOverlay userName={lockedBy} />}
+    </div>
+  );
+
   switch (type) {
     case 'user-story':
-      return (
+      return wrapper(
         <RequirementCard
           card={card}
           selected={selected}
@@ -75,7 +115,7 @@ export const CardRenderer = memo(function CardRenderer({
       );
 
     case 'bounded-context':
-      return (
+      return wrapper(
         <BoundedContextCard
           card={card}
           selected={selected}
@@ -85,7 +125,7 @@ export const CardRenderer = memo(function CardRenderer({
       );
 
     case 'flow-step':
-      return (
+      return wrapper(
         <FlowStepCard
           card={card}
           selected={selected}
@@ -96,14 +136,14 @@ export const CardRenderer = memo(function CardRenderer({
       );
 
     case 'api-endpoint':
-      return (
+      return wrapper(
         <CardErrorBoundary cardType="api-endpoint">
           <APIEndpointCard card={card as APIEndpointCardType} selected={selected} />
         </CardErrorBoundary>
       );
 
     case 'state-machine':
-      return (
+      return wrapper(
         <CardErrorBoundary cardType="state-machine">
           <StateMachineCard card={card as SMCardType} selected={selected} />
         </CardErrorBoundary>
@@ -112,13 +152,14 @@ export const CardRenderer = memo(function CardRenderer({
     default: {
       // TypeScript exhaustive check — this branch should never be reached
       return (
-    <div
-      data-conflict={conflict ? 'true' : undefined}
-      className={conflict ? 'conflictHighlight' : undefined}
-    >
-      <UnknownCardFallback type={type} />
-    </div>
-  );
+        <div
+          data-conflict={conflict ? 'true' : undefined}
+          className={conflict ? 'conflictHighlight' : undefined}
+        >
+          {locked && <LockOverlay userName={lockedBy} />}
+          <UnknownCardFallback type={type} />
+        </div>
+      );
     }
   }
 });

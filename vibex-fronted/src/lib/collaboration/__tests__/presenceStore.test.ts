@@ -1,5 +1,6 @@
 /**
- * presenceStore.test.ts — S42-P002-E2
+ * presenceStore.test.ts — S42-P002-E2 + S44-P003-E3
+ * Tests: cursor sync (S42) + node locking (S44)
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { usePresenceStore } from '../presenceStore';
@@ -50,5 +51,38 @@ describe('presenceStore', () => {
     ]);
     usePresenceStore.getState().clearAll();
     expect(usePresenceStore.getState().remoteUsers.size).toBe(0);
+  });
+
+  // S44-P003-E3: Node Locking Tests
+
+  it('lockNode adds node to lockedNodes', () => {
+    usePresenceStore.getState().lockNode('node-1', 'u1');
+    expect(usePresenceStore.getState().lockedNodes['node-1']).toBe('u1');
+  });
+
+  it('unlockNode removes node from lockedNodes', () => {
+    usePresenceStore.getState().lockNode('node-1', 'u1');
+    usePresenceStore.getState().unlockNode('node-1');
+    expect('node-1' in usePresenceStore.getState().lockedNodes).toBe(false);
+  });
+
+  it('isLocked returns true for locked node, false for unlocked', () => {
+    expect(usePresenceStore.getState().isLocked('node-1')).toBe(false);
+    usePresenceStore.getState().lockNode('node-1', 'u1');
+    expect(usePresenceStore.getState().isLocked('node-1')).toBe(true);
+    usePresenceStore.getState().unlockNode('node-1');
+    expect(usePresenceStore.getState().isLocked('node-1')).toBe(false);
+  });
+
+  it('handleNodeLockedMessage updates lockedNodes from WebSocket', () => {
+    usePresenceStore.getState().handleNodeLockedMessage('node-2', 'u2');
+    expect(usePresenceStore.getState().lockedNodes['node-2']).toBe('u2');
+    expect(usePresenceStore.getState().isLocked('node-2')).toBe(true);
+  });
+
+  it('handleNodeUnlockedMessage removes lock from WebSocket', () => {
+    usePresenceStore.getState().lockNode('node-3', 'u3');
+    usePresenceStore.getState().handleNodeUnlockedMessage('node-3');
+    expect('node-3' in usePresenceStore.getState().lockedNodes).toBe(false);
   });
 });

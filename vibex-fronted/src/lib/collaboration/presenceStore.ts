@@ -1,6 +1,7 @@
 /**
  * presenceStore — Zustand store for WebSocket-based presence
  * S42-P002-E2: Presence 光标同步 — WebSocket 升级
+ * S44-P003-E3: 协作节点锁定 — lockedNodes + lockNode/unlockNode
  *
  * Replaces Firebase usePresence with WebSocket-backed state.
  * Updated by useCollaboration's onPresence callback.
@@ -24,6 +25,9 @@ interface PresenceState {
   /** Remote users currently on the same canvas (excluding self) */
   remoteUsers: Map<string, RemoteUser>;
 
+  /** Locked nodes: nodeId → userId of the user who locked it */
+  lockedNodes: Record<string, string>;
+
   /** Update remote users from WebSocket presence message */
   setRemoteUsers: (users: CollabUser[]) => void;
 
@@ -35,10 +39,26 @@ interface PresenceState {
 
   /** Clear all remote users */
   clearAll: () => void;
+
+  /** Lock a node — called when user acquires a lock */
+  lockNode: (nodeId: string, userId: string) => void;
+
+  /** Unlock a node — called when user releases a lock */
+  unlockNode: (nodeId: string) => void;
+
+  /** Check if a node is locked by any user */
+  isLocked: (nodeId: string) => boolean;
+
+  /** Handle incoming node_locked WebSocket message */
+  handleNodeLockedMessage: (nodeId: string, userId: string) => void;
+
+  /** Handle incoming node_unlocked WebSocket message */
+  handleNodeUnlockedMessage: (nodeId: string) => void;
 }
 
-export const usePresenceStore = create<PresenceState>((set) => ({
+export const usePresenceStore = create<PresenceState>((set, get) => ({
   remoteUsers: new Map(),
+  lockedNodes: {},
 
   setRemoteUsers: (users: CollabUser[]) =>
     set((state) => {
@@ -74,4 +94,28 @@ export const usePresenceStore = create<PresenceState>((set) => ({
     }),
 
   clearAll: () => set({ remoteUsers: new Map() }),
+
+  lockNode: (nodeId: string, userId: string) =>
+    set((state) => ({
+      lockedNodes: { ...state.lockedNodes, [nodeId]: userId },
+    })),
+
+  unlockNode: (nodeId: string) =>
+    set((state) => {
+      const { [nodeId]: _removed, ...rest } = state.lockedNodes;
+      return { lockedNodes: rest };
+    }),
+
+  isLocked: (nodeId: string) => nodeId in get().lockedNodes,
+
+  handleNodeLockedMessage: (nodeId: string, userId: string) =>
+    set((state) => ({
+      lockedNodes: { ...state.lockedNodes, [nodeId]: userId },
+    })),
+
+  handleNodeUnlockedMessage: (nodeId: string) =>
+    set((state) => {
+      const { [nodeId]: _removed, ...rest } = state.lockedNodes;
+      return { lockedNodes: rest };
+    }),
 }));

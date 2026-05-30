@@ -8,6 +8,7 @@
  * - E1-U2/U3/U4: Group collapse toggle + badge + animation
  * - E2-U1: ConflictBubble integration
  * - E2-U3: data-conflict attribute on conflicted nodes
+ * - S44-P003-E3: node locking UI — 🔒 overlay + locked state via presenceStore
  */
 
 'use client';
@@ -35,8 +36,9 @@ import { CardRenderer } from '@/components/dds/cards';
 import type { DDSCard, ChapterType } from '@/types/dds';
 import { ConflictBubble } from '@/components/canvas/ConflictBubble';
 import { useConflictStore } from '@/lib/canvas/stores/conflictStore';
-import { useMiniMapStore } from '@/lib/canvas/stores/miniMapStore';
+import { useMiniMapPanelStore, useMiniMapStore } from '@/lib/canvas/stores/miniMapStore';
 import { useViewportBoundsStore } from '@/lib/canvas/stores/viewportBoundsStore';
+import { usePresenceStore } from '@/lib/collaboration/presenceStore';
 import { MiniMapPanel } from '@/components/dds/MiniMapPanel';
 import styles from './DDSFlow.module.css';
 
@@ -44,21 +46,21 @@ import styles from './DDSFlow.module.css';
 
 type RFNodeProps = {
   id: string;
-  data: Record<string, unknown> & { selected?: boolean; conflict?: boolean };
+  data: Record<string, unknown> & { selected?: boolean; conflict?: boolean; locked?: boolean; lockedBy?: string };
   dragHandle?: string;
   type?: string;
 };
 
 function UserStoryNode(props: RFNodeProps) {
-  return <CardRenderer card={props.data as unknown as DDSCard} selected={props.data?.selected} />;
+  return <CardRenderer card={props.data as unknown as DDSCard} selected={props.data?.selected} locked={props.data?.locked} lockedBy={props.data?.lockedBy} />;
 }
 
 function BoundedContextNode(props: RFNodeProps) {
-  return <CardRenderer card={props.data as unknown as DDSCard} selected={props.data?.selected} />;
+  return <CardRenderer card={props.data as unknown as DDSCard} selected={props.data?.selected} locked={props.data?.locked} lockedBy={props.data?.lockedBy} />;
 }
 
 function FlowStepNode(props: RFNodeProps) {
-  return <CardRenderer card={props.data as unknown as DDSCard} selected={props.data?.selected} />;
+  return <CardRenderer card={props.data as unknown as DDSCard} selected={props.data?.selected} locked={props.data?.locked} lockedBy={props.data?.lockedBy} />;
 }
 
 const nodeTypes: NodeTypes = {
@@ -244,17 +246,27 @@ function DDSFlowInner({
       });
   }, [getNodes, visibleNodes, viewport]);
 
-  // Build flow nodes with selected + conflict state
+  // Build flow nodes with selected + conflict state + lock state
   const selectedSet = new Set(selectedCardIds);
-  const flowNodes = visibleNodes.map((node: Node) => ({
-    ...node,
-    data: {
-      ...node.data,
-      selected: selectedSet.has(node.id),
-      // E2-U3: add conflict flag
-      conflict: node.id === conflictedCardId,
-    },
-  }));
+  const lockedNodes = usePresenceStore.getState().lockedNodes;
+  const remoteUsers = usePresenceStore.getState().remoteUsers;
+  const flowNodes = visibleNodes.map((node: Node) => {
+    const nodeId = node.id;
+    const lockedByUserId = lockedNodes[nodeId];
+    const lockedByUser = lockedByUserId ? remoteUsers.get(lockedByUserId) : undefined;
+    return {
+      ...node,
+      data: {
+        ...node.data,
+        selected: selectedSet.has(nodeId),
+        // E2-U3: add conflict flag
+        conflict: node.id === conflictedCardId,
+        // S44-P003-E3: lock state
+        locked: nodeId in lockedNodes,
+        lockedBy: lockedByUser?.name ?? lockedByUserId,
+      },
+    };
+  });
 
   const handleNodeClick = useCallback(
     (_event: React.MouseEvent, node: Node) => {

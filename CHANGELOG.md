@@ -1,3 +1,11 @@
+### [Unreleased] Sprint 45 — E1 AI 断线重连 + E2 Presence 光标 + E3 画布 MiniMap + E4 模板版本管理 + E5 画布快照分享
+
+##### S45-P001-E1: AI 断线重连 + 流式可靠性
+- **E1 useStreamingAgent.ts**: add maxRetries param, exponential backoff (1s→2s→4s), retrying + lastError state ✅
+- **E1 streamingChunkDB.ts**: IndexedDB persistence for SSE chunks (persistStreamingChunk, loadStreamingChunk, clearStreamingChunk) ✅
+- **E1 useStreamingAgent.test.ts**: 9/9 vitest PASS (retry logic, backoff, abort, IndexedDB) ✅
+- **E1 i18n**: add aiRetrying + aiStreamFailed keys to ai namespace ✅
+
 ### [Unreleased] Sprint 44 — E1 AI 多轮会话管理 + E2 画布模板分类 + E3 协作节点锁定 + E4 撤销历史面板 + E5 移动端触控
 
 ##### S44-P001-E1: AI 多轮会话管理

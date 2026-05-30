@@ -1,6 +1,7 @@
 /**
  * AgentFeedbackPanel.tsx — Sprint6 U4: AgentFeedbackPanel
  * Sprint40 P001-E1: i18n — hardcoded text replaced with useTranslations('ai')()
+ * Sprint43 P002-E2: SSE streaming — streaming indicator + cancel button
  *
  * Shows agent code feedback with accept/reject controls.
  * Supports four states: idle / running / complete / error.
@@ -8,7 +9,7 @@
 
 'use client';
 
-import React, { memo } from 'react';
+import React, { memo, useCallback } from 'react';
 import { useAgentStore } from '@/stores/agentStore';
 import { acceptCodeBlock, rejectCodeBlock } from '@/services/agent/CodingAgentService';
 import type { AgentMessage, CodeBlock } from '@/services/agent/CodingAgentService';
@@ -105,6 +106,14 @@ export const AgentFeedbackPanel = memo(function AgentFeedbackPanel({
   const sessionKey = sessionKeyProp ?? activeSessionKey;
   const session = sessions.find((s) => s.sessionKey === sessionKey);
 
+  const handleCancel = useCallback(() => {
+    if (sessionKey) {
+      import('@/services/agent/CodingAgentService').then(({ terminateSession }) => {
+        terminateSession(sessionKey);
+      });
+    }
+  }, [sessionKey]);
+
   if (!session) {
     return (
       <div className={styles.panel}>
@@ -140,8 +149,27 @@ export const AgentFeedbackPanel = memo(function AgentFeedbackPanel({
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerTitle}>{t('aiPageTitle')}</div>
-        <div className={`${styles.statusPill} ${styles[`status_${session.status}`]}`}>
-          {statusLabel}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {/* S43-E2: streaming cancel button */}
+          {session.status === 'running' && (
+            <button
+              type="button"
+              className={styles.cancelBtn}
+              onClick={handleCancel}
+              aria-label={t('terminateSession') ?? 'Cancel'}
+            >
+              ⏹ {t('terminateSession') ?? '停止'}
+            </button>
+          )}
+          <div className={`${styles.statusPill} ${styles[`status_${session.status}`]}`}>
+            {/* S43-E2: show generating indicator when running */}
+            {session.status === 'running' ? (
+              <span className={styles.streamingIndicator}>
+                <span className={styles.streamingDot} />
+                {t('generating') ?? '生成中...'}
+              </span>
+            ) : statusLabel}
+          </div>
         </div>
       </div>
 

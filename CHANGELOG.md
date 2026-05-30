@@ -6,6 +6,12 @@
 - **E1 cursorVisible**: userPreferencesStore.cursorVisible 联动 overlay 显示/隐藏 ✅
 - **E1 vitest**: presenceStore 4/4 PASS ✅
 
+##### S43-P002-E2: AI Agent 流式响应界面（SSE）
+- **E2 POST /api/ai/generate**: SSE streaming 端点，MiniMax API 集成，支持 stream/non-stream 双模式 ✅
+- **E2 useStreamingAgent.ts**: `src/hooks/useStreamingAgent.ts` — SSE hook，AbortController，chunk 累积 ✅
+- **E2 AgentFeedbackPanel**: 流式指示器（pulse dot）+ 取消按钮 + terminateSession 集成 ✅
+- **E2 ai-streaming.spec.ts**: E2E 测试，SSE 端点契约验证 ✅
+
 ### [Unreleased] Sprint 42 — E1 撤销/重做验证 + E2 Presence光标 + E3 画布模板 + E4 设置验收 + E5 移动端触摸
 
 ##### S42-P001-E1: 撤销/重做系统验证（Sprint36 实现）

@@ -5393,6 +5393,12 @@ All notable changes to this project will be documented in this file.
   - 支持 Cron 定时运行: `0 9 * * * root cd /root/.openclaw/vibex && python3 scripts/proposal_tracker.py`
   - **Bug fix**: 正则字符类 `[a-zA-Z0-9_-]` 未包含 `.`，导致 `dev-e1.1-proposal-tracker` 被截断为 `dev-e1` → 修复为 `[a-zA-Z0-9_\.-]`
   - **Cleanup**: 移除未使用的 `TASK_MANAGER_SCRIPT` 常量和 `proposal_id` 参数
+## [Unreleased] Sprint 47 — AI Session 搜索 / 键盘快捷键 / 画布管理
+
+##### S47-P001-E1: AI Session 搜索验证 + 历史会话管理
+- **E1 搜索验证**: Sprint46 E1 baseline 验证 — `searchableText` field in agentStore.ts (from session name + task + first user message), real-time filter in AgentSessions, match highlighting with `<mark>` tags
+- **E1 Vitest**: `agentStore.test.ts` 14/14 PASS (6 Sprint46-E1 tests + 4 Sprint44-E1 persistence tests + 4 context tests)
+- 提交: 6b8b94800
 
 ## [Unreleased]
 

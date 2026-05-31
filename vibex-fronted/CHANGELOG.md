@@ -1,5 +1,12 @@
-### [Unreleased] Sprint 46 — E1 AI Session 搜索 + E2 键盘快捷键扩展 + E3 画布节点复制/粘贴
+### [Unreleased] Sprint 47 — E1 AI Session 搜索验证 + E2-E5 功能实现
 
+##### S47-P001-E1: AI Session 搜索验证 + 历史会话管理
+- **E1 搜索验证**: Sprint46 E1 baseline 验证 — `searchableText` field in agentStore.ts, real-time filter in AgentSessions, match highlighting with `<mark>` tags
+- **E1 Vitest**: `agentStore.test.ts` 14/14 PASS
+- 提交: 6b8b94800
+
+
+### [Unreleased] Sprint 46 — E1 AI Session 搜索 + E2 键盘快捷键扩展 + E3 画布节点复制/粘贴
 ##### S46-P001-E1: AI Session 搜索 + 历史会话管理
 - **E1 agentStore.ts**: add `searchableText` field, update `createSession()` to auto-generate searchable text
 - **E1 AgentSessions.tsx**: add search input with `<mark>` highlight, filter sessions via `sessions.filter(s => s.searchableText.includes(query))`

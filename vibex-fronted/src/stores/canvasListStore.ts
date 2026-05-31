@@ -346,8 +346,16 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
   },
 
   pasteToCanvas: (canvasId: string) => {
-    // Sprint48 E5: cross-canvas paste — delegates to clipboardStore
-    // This is a stub that will be implemented when clipboardStore crossCanvasPaste is available
-    console.debug('[canvasListStore] pasteToCanvas called for', canvasId);
+    // Sprint48 E5: cross-canvas paste — look up canvas name and delegate to clipboardStore
+    const meta = get().canvases.find((c) => c.id === canvasId);
+    if (!meta) {
+      console.warn('[canvasListStore] pasteToCanvas: canvas not found', canvasId);
+      return;
+    }
+    const { useClipboardStore } = require('@/stores/clipboardStore');
+    const count = useClipboardStore.getState().crossCanvasPaste(canvasId, meta.name);
+    if (count > 0) {
+      console.debug('[canvasListStore] pasteToCanvas:', count, 'cards pasted to', meta.name);
+    }
   },
 }));

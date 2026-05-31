@@ -1,10 +1,12 @@
 /**
  * clipboardStore — Unit Tests
  * S46-E3: 画布节点复制/粘贴
+ * S48-E5: 剪贴板跨画布粘贴
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useClipboardStore } from '../clipboardStore';
+import { canvasStoreRegistry } from '@/lib/canvas/canvasStoreRegistry';
 import type { DDSCard } from '@/types/dds';
 
 const makeCard = (id: string, title = 'Card'): DDSCard =>
@@ -117,5 +119,92 @@ describe('clipboardStore — S46-E3 copy/paste', () => {
     useClipboardStore.getState().clearClipboard();
     expect(useClipboardStore.getState().entry).toBeNull();
     expect(useClipboardStore.getState().isValid()).toBe(false);
+  });
+});
+
+describe('clipboardStore — S48-E5 cross-canvas paste', () => {
+  beforeEach(() => {
+    useClipboardStore.setState({ entry: null });
+    // Clear all registry entries
+    for (const key of canvasStoreRegistry.keys()) {
+      canvasStoreRegistry.delete(key);
+    }
+    // Mock quickSave to avoid localStorage errors in tests
+    vi.stubGlobal('localStorage', {
+      setItem: vi.fn(),
+      getItem: vi.fn(() => null),
+      removeItem: vi.fn(),
+    });
+  });
+
+  it('crossCanvasPaste returns 0 when clipboard is empty', () => {
+    const count = useClipboardStore.getState().crossCanvasPaste('canvas-1', 'Canvas 1');
+    expect(count).toBe(0);
+  });
+
+  it('crossCanvasPaste returns 0 when clipboard is expired', () => {
+    useClipboardStore.getState().copyCards([makeCard('c1')], 'requirement');
+    useClipboardStore.setState((s) => ({
+      entry: s.entry ? { ...s.entry, timestamp: Date.now() - 6 * 60 * 1000 } : null,
+    }));
+    const count = useClipboardStore.getState().crossCanvasPaste('canvas-1', 'Canvas 1');
+    expect(count).toBe(0);
+  });
+
+  it('crossCanvasPaste adds cards to target canvas in registry', () => {
+    useClipboardStore.getState().copyCards([makeCard('c1'), makeCard('c2')], 'flow');
+
+    const count = useClipboardStore.getState().crossCanvasPaste('target-canvas', 'Target Canvas');
+
+    expect(count).toBe(2);
+    const canvasData = canvasStoreRegistry.get('target-canvas');
+    expect(canvasData).toBeDefined();
+    expect(canvasData!.chapters.requirement.cards).toHaveLength(2);
+    // Cards should be copies (new IDs), not references
+    expect(canvasData!.chapters.requirement.cards[0].id).not.toBe('c1');
+    expect(canvasData!.chapters.requirement.cards[0].title).toBe('Card');
+  });
+
+  it('crossCanvasPaste applies offset on subsequent pastes', () => {
+    useClipboardStore.getState().copyCards([makeCard('c1')], 'flow');
+
+    // First paste
+    useClipboardStore.getState().crossCanvasPaste('canvas-1', 'Canvas 1');
+    // Second paste
+    const entry = useClipboardStore.getState().pasteCards();
+    useClipboardStore.getState().crossCanvasPaste('canvas-1', 'Canvas 1');
+
+    const canvasData = canvasStoreRegistry.get('canvas-1');
+    // Second paste should have offset of 30px (pasteCount=1 → offset=30)
+    const pastedCards = canvasData!.chapters.requirement.cards;
+    expect(pastedCards).toHaveLength(2);
+    expect(pastedCards[1].position.x - pastedCards[0].position.x).toBe(30);
+    expect(pastedCards[1].position.y - pastedCards[0].position.y).toBe(30);
+  });
+
+  it('crossCanvasPaste generates new IDs for pasted cards', () => {
+    useClipboardStore.getState().copyCards([makeCard('original-id', 'My Card')], 'requirement');
+
+    useClipboardStore.getState().crossCanvasPaste('canvas-x', 'Canvas X');
+
+    const canvasData = canvasStoreRegistry.get('canvas-x')!;
+    const pasted = canvasData.chapters.requirement.cards[0];
+    expect(pasted.id).not.toBe('original-id');
+    expect(pasted.title).toBe('My Card');
+    expect(pasted.createdAt).toBeTruthy();
+  });
+
+  it('crossCanvasPaste does not modify source canvas (if present)', () => {
+    useClipboardStore.getState().copyCards([makeCard('c1')], 'flow');
+
+    useClipboardStore.getState().crossCanvasPaste('source-canvas', 'Source');
+    useClipboardStore.getState().crossCanvasPaste('target-canvas', 'Target');
+
+    const source = canvasStoreRegistry.get('source-canvas');
+    const target = canvasStoreRegistry.get('target-canvas');
+    // Each canvas should have its own cards
+    expect(source!.chapters.requirement.cards).toHaveLength(1);
+    expect(target!.chapters.requirement.cards).toHaveLength(1);
+    expect(source!.chapters.requirement.cards[0].id).not.toBe(target!.chapters.requirement.cards[0].id);
   });
 });

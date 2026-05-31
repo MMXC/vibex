@@ -7,11 +7,16 @@
  * - Track source chapter for paste feedback
  *
  * S46-E3: 画布节点复制/粘贴
+ * S48-E5: crossCanvasPaste — paste to a different canvas
  */
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { DDSCard, ChapterType } from '@/types/dds';
+import { generateId } from '@/lib/canvas/id';
+import { quickSave, quickLoad } from '@/services/dds/ddsPersistence';
+import { canvasStoreRegistry } from '@/lib/canvas/canvasStoreRegistry';
+import type { CanvasChapterData } from '@/lib/canvas/canvasStoreRegistry';
 
 const CLIPBOARD_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
@@ -30,6 +35,12 @@ interface ClipboardStore {
   clearClipboard: () => void;
   /** Returns true if clipboard is still valid (not expired) */
   isValid: () => boolean;
+  /**
+   * [S48-E5] Paste clipboard cards to a different canvas (cross-canvas paste).
+   * Cards are added to the target canvas's requirement chapter.
+   * Returns the number of cards pasted, or 0 if clipboard is empty/expired.
+   */
+  crossCanvasPaste: (targetCanvasId: string, targetCanvasName: string) => number;
 }
 
 export const useClipboardStore = create<ClipboardStore>()(
@@ -74,6 +85,82 @@ export const useClipboardStore = create<ClipboardStore>()(
         const { entry } = get();
         if (!entry) return false;
         return Date.now() - entry.timestamp < CLIPBOARD_TTL_MS;
+      },
+
+      crossCanvasPaste: (targetCanvasId, targetCanvasName) => {
+        const entry = get().entry;
+        if (!entry) return 0;
+        if (Date.now() - entry.timestamp > CLIPBOARD_TTL_MS) return 0;
+
+        // Get or load chapter data for target canvas
+        let canvasData = canvasStoreRegistry.get(targetCanvasId);
+        if (!canvasData) {
+          const loaded = quickLoad(targetCanvasId);
+          if (loaded) {
+            canvasData = { chapters: loaded.chapters };
+          } else {
+            // Canvas not found — create empty chapter structure
+            canvasData = {
+              chapters: {
+                requirement: { cards: [], edges: [], loading: false, error: null, type: 'requirement' },
+                context: { cards: [], edges: [], loading: false, error: null, type: 'context' },
+                flow: { cards: [], edges: [], loading: false, error: null, type: 'flow' },
+                api: { cards: [], edges: [], loading: false, error: null, type: 'api' },
+                'business-rules': { cards: [], edges: [], loading: false, error: null, type: 'business-rules' },
+              },
+            };
+          }
+          canvasStoreRegistry.set(targetCanvasId, canvasData);
+        }
+
+        // Generate new card IDs and apply paste offset
+        const oldToNew: Record<string, string> = {};
+        const pasteCount = entry.pasteCount;
+        const offset = pasteCount * 30;
+
+        const newCards: DDSCard[] = entry.cards.map((c) => {
+          const newId = generateId();
+          oldToNew[c.id] = newId;
+          return {
+            ...c,
+            id: newId,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            position: {
+              x: (c.position?.x ?? 0) + offset,
+              y: (c.position?.y ?? 0) + offset,
+            },
+          };
+        });
+
+        // Update requirement chapter with new cards
+        const updatedChapter = {
+          ...canvasData.chapters.requirement,
+          cards: [...canvasData.chapters.requirement.cards, ...newCards],
+        };
+
+        const updatedData: CanvasChapterData = {
+          chapters: {
+            ...canvasData.chapters,
+            requirement: updatedChapter,
+          },
+        };
+
+        canvasStoreRegistry.set(targetCanvasId, updatedData);
+
+        // Persist to localStorage
+        try {
+          quickSave(
+            targetCanvasId,
+            targetCanvasName,
+            updatedData.chapters,
+            []
+          );
+        } catch (err) {
+          console.error('[clipboardStore] crossCanvasPaste: quickSave failed', err);
+        }
+
+        return newCards.length;
       },
     }),
     {

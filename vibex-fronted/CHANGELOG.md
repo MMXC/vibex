@@ -16,6 +16,15 @@
 - **E1 Vitest 回归**: `DDSCanvasStore.test.ts` 57/57 PASS
 - 提交: bf1017df3
 
+##### S48-P001-E5: 剪贴板跨画布粘贴
+- **E5 canvasStoreRegistry**: 新建 `lib/canvas/canvasStoreRegistry.ts` — 管理多画布 chapter 数据，支持 paste-to-other-canvas 架构
+- **E5 clipboardStore**: 新增 `crossCanvasPaste(targetCanvasId, targetCanvasName)` — 将 clipboard 卡片粘贴到指定画布的 requirement 章节，生成新 ID + 偏移量，持久化到 localStorage
+- **E5 canvasListStore**: 实现 `pasteToCanvas(canvasId)` — 查找 canvas 名称，委托 clipboardStore.crossCanvasPaste
+- **E5 CanvasListPanel**: 新增"📋 粘贴 Here"按钮（clipboard 非空时 hover 显示）+ CSS 样式
+- **E5 DDSToolbar**: 粘贴按钮添加蓝色 badge 显示 clipboard 卡片数量
+- **E5 Vitest**: `clipboardStore.test.ts` 17/17 PASS（S46-E3: 11 tests + S48-E5: 6 tests）
+- **E5 Vitest 回归**: `DDSCanvasStore.test.ts` 57/57 PASS
+
 ### [Unreleased] Sprint 47 — E1 AI Session 搜索验证 + E2-E5 功能实现
 
 ##### S47-P001-E1: AI Session 搜索验证 + 历史会话管理

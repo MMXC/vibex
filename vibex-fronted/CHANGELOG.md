@@ -1,3 +1,15 @@
+### [Unreleased] Sprint 48 — E1 Canvas List 持久化 + 搜索增强 + E2-E5 待实现
+
+##### S48-P001-E1: Canvas List 持久化 + 搜索增强
+- **E1 canvasListStore**: 新增 `searchTerm` state + `setSearchTerm`/`getFilteredCanvases` actions（按名称大小写不敏感过滤）
+- **E1 canvasListStore**: 新增 `thumbnailCache` + `cacheThumbnail`/`getCachedThumbnail` actions（避免同一 canvasId 重复生成 toDataURL）
+- **E1 useCanvasList**: 暴露 `searchTerm`, `getFilteredCanvases`, `cacheThumbnail`, `getCachedThumbnail`
+- **E1 CanvasListPanel**: 新增搜索输入框（带清除按钮），搜索时显示过滤列表，空搜索结果显示空状态
+- **E1 CanvasListPanel.module.css**: 新建 CSS Module，定义面板、搜索框、排序按钮、列表项等全部样式
+- **E1 Vitest**: `useCanvasList.test.ts` 22/22 PASS（含 8 个 Sprint48 新测试）
+- **E1 Vitest 回归**: `DDSCanvasStore.test.ts` 57/57 PASS
+- 提交: bf1017df3
+
 ### [Unreleased] Sprint 47 — E1 AI Session 搜索验证 + E2-E5 功能实现
 
 ##### S47-P001-E1: AI Session 搜索验证 + 历史会话管理

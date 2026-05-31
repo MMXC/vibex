@@ -12,6 +12,16 @@
 - **E2 presenceStore vitest**: 9/9 PASS (setRemoteUsers, updateCursor, removeUser, clearAll, lock/unlock) ✅
 - **E2 IntentionBubble.tsx**: self-contained IntentionType re-export (removed Firebase dependency) ✅
 
+
+##### S45-P003-E3: 画布 MiniMap + 视口导航
+- **E3 DDSFlow.tsx**: import MiniMap, Controls, Background from @xyflow/react ✅
+- **E3 MiniMapPanel.tsx**: collapsible panel (right side), 150×100px, dark theme, click-to-navigate via handleMiniMapClick + useReactFlow.project() ✅
+- **E3 Background**: dots grid (BackgroundVariant.Dots, gap=24, size=1) ✅
+- **E3 Controls**: commented (E5: mobile toolbar handles touch actions) ✅
+- **E3 miniMapStore.ts**: viewport tracking, setViewport, navigateTo actions ✅
+- **E3 miniMapStore vitest**: 5/5 PASS ✅
+- **E3 DDSFlow.test.tsx**: 8 tests (Background/MiniMap/ReactFlow canvas) ✅
+
 ### [Unreleased] Sprint 44 — E1 AI 多轮会话管理 + E2 画布模板分类 + E3 协作节点锁定 + E4 撤销历史面板 + E5 移动端触控
 
 ##### S44-P001-E1: AI 多轮会话管理

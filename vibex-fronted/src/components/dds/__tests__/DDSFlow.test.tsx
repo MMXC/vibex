@@ -43,6 +43,7 @@ vi.mock('@xyflow/react', () => {
       project: vi.fn((pos: any) => pos),
     })),
     useOnViewportChange: vi.fn(() => {}),
+    useNodes: vi.fn(() => []),
     BackgroundVariant: { Lines: 'lines', Dots: 'dots', Cross: 'cross' },
   };
 });
@@ -113,6 +114,20 @@ vi.mock('@/components/dds/cards', () => ({
   )),
 }));
 
+vi.mock('@/lib/canvas/stores/miniMapStore', () => ({
+  useMiniMapStore: vi.fn(() => ({
+    panelOpen: true,
+    viewport: { x: 0, y: 0, zoom: 1 },
+    togglePanel: vi.fn(),
+    setPanelOpen: vi.fn(),
+    setViewport: vi.fn(),
+  })),
+  useMiniMapPanelStore: vi.fn(() => ({
+    panelOpen: true,
+    togglePanel: vi.fn(),
+  })),
+}));
+
 // ============================================
 // Import component under test
 // ============================================
@@ -133,10 +148,11 @@ describe('DDSFlow', () => {
     expect(screen.getByTestId('react-flow')).toBeInTheDocument();
   });
 
-  it('renders Background, Controls, MiniMap', () => {
+  it('renders Background and MiniMap', () => {
+    // Controls commented out (E5: mobile toolbar handles actions)
     render(<DDSFlow chapter="flow" />);
     expect(screen.getByTestId('rf-background')).toBeInTheDocument();
-    expect(screen.getByTestId('rf-controls')).toBeInTheDocument();
+    // Controls hidden: {!touchMode && <Controls />} commented in DDSFlow
     expect(screen.getByTestId('rf-minimap')).toBeInTheDocument();
   });
 

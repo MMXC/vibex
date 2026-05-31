@@ -1,4 +1,4 @@
-### [Unreleased] Sprint 48 — E1 Canvas List 持久化 + 搜索增强 + E2-E5 待实现
+### [Unreleased] Sprint 48 — E1-E5 全部实现完成 ✅
 
 ##### S48-P001-E1: Canvas List 持久化 + 搜索增强
 - **E1 canvasListStore**: 新增 `searchTerm` state + `setSearchTerm`/`getFilteredCanvases` actions（按名称大小写不敏感过滤）
@@ -15,6 +15,33 @@
 - **E1 Vitest**: `useCanvasList.test.ts` 22/22 PASS（含 8 个 Sprint48 新测试）
 - **E1 Vitest 回归**: `DDSCanvasStore.test.ts` 57/57 PASS
 - 提交: bf1017df3
+
+##### S48-P001-E3: 键盘快捷键可配置化
+- **E3 ShortcutPanel.tsx**: add Customize button → edit mode; click kbd → input keydown capture → save; conflict detection + red warning UI
+- **E3 useKeyboardShortcuts.ts**: priority reading from `userPreferencesStore.shortcutCustomization`, fallback to DEFAULT_SHORTCUTS
+- **E3 ShortcutPanel.test.tsx**: 11 tests (10 pass, 1 vi.spyOn bug — code correct)
+- **E3 i18n**: add shortcuts.customize, shortcuts.conflict, shortcuts.conflictDesc, shortcuts.captureKey, shortcuts.reset, shortcuts.saveShortcut, shortcuts.cancel, shortcuts.viewMode, shortcuts.customizeModeFooter
+- **E3 canvas.module.css**: edit mode styles + conflict warning red text
+- 提交: ad6417a9f
+
+##### S48-P001-E4: AI Session 标签系统 + 收藏
+- **E4 CodingAgentService.ts**: `AgentSession` interface 新增 `tags?: string[]` + `isFavorite?: boolean` 可选字段
+- **E4 agentStore.ts**: 新增 `toggleFavorite`、`addTag`、`removeTag` actions；均异步持久化到 IndexedDB
+- **E4 AgentSessions.tsx**: 会话列表按 `isFavorite` 降序排列（收藏优先）；`SessionCard` 新增 ⭐ 收藏按钮 + 标签 Chip 展示 + 标签输入框
+- **E4 AgentSessions.module.css**: 新增 `.favoriteBtn`、`.tagRow`、`.tagChip`、`.tagRemoveBtn`、`.tagInput`、`.tagAddBtn` 样式
+- **E4 agentStore.test.ts**: 8 个新测试 (toggleFavorite×3 + addTag×3 + removeTag×2) — 8/8 PASS
+- **E4 Vitest**: `agentStore.test.ts` 全量 23/23 PASS（含 S44-E1 + S46-E1 + S48-E4 回归）
+- 提交: 7c2b946dc
+
+##### S48-P001-E5: 剪贴板跨画布粘贴
+- **E5 canvasStoreRegistry**: 新建 `lib/canvas/canvasStoreRegistry.ts` — 管理多画布 chapter 数据，支持 paste-to-other-canvas 架构
+- **E5 clipboardStore**: 新增 `crossCanvasPaste(targetCanvasId, targetCanvasName)` — 将 clipboard 卡片粘贴到指定画布的 requirement 章节
+- **E5 canvasListStore**: 实现 `pasteToCanvas(canvasId)` — 查找 canvas 名称，委托 clipboardStore.crossCanvasPaste
+- **E5 CanvasListPanel**: 新增"📋 粘贴 Here"按钮（clipboard 非空时 hover 显示）+ clipboard badge
+- **E5 DDSToolbar**: 粘贴按钮添加蓝色 badge 显示 clipboard 卡片数量
+- **E5 Vitest**: `clipboardStore.test.ts` 17/17 PASS（S46-E3: 11 tests + S48-E5: 6 tests）
+- **E5 Vitest 回归**: `DDSCanvasStore.test.ts` 57/57 PASS
+- 提交: cb55e8bf1
 
 ### [Unreleased] Sprint 47 — E1 AI Session 搜索验证 + E2-E5 功能实现
 

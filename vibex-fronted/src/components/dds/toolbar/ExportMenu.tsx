@@ -8,7 +8,7 @@
 'use client';
 
 import React, { memo, useState, useRef, useEffect, useCallback } from 'react';
-import { exportAsPNG, exportAsSVG } from '@/hooks/useCanvasExport';
+import { exportAsPNG, exportAsSVG, downloadFigmaJSON, FigmaExportChapter } from '@/hooks/useCanvasExport';
 import { useCanvasExport } from '@/hooks/canvas/useCanvasExport';
 import { useDDSCanvasStore } from '@/stores/dds';
 import styles from './ExportMenu.module.css';
@@ -43,7 +43,7 @@ function SpinnerIcon() {
 
 // ==================== Export types ====================
 
-type ExportFormat = 'JSON' | 'Vibex' | 'PDF' | 'PNG' | 'SVG';
+type ExportFormat = 'JSON' | 'Vibex' | 'PDF' | 'PNG' | 'SVG' | 'Figma';
 
 interface ExportOption {
   id: ExportFormat;
@@ -57,6 +57,7 @@ const EXPORT_OPTIONS: ExportOption[] = [
   { id: 'PDF', label: 'PDF', description: '跨平台文档格式，适合打印分享' },
   { id: 'PNG', label: 'PNG', description: '位图格式，适合嵌入文档或报告' },
   { id: 'SVG', label: 'SVG', description: '矢量格式，适合无损缩放' },
+  { id: 'Figma', label: 'Figma', description: 'Figma 兼容 JSON，适合导入设计工具' },
 ];
 
 // ==================== Helpers ====================
@@ -85,6 +86,7 @@ export const ExportMenu = memo(function ExportMenu({
 }: ExportMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [loadingFormat, setLoadingFormat] = useState<ExportFormat | null>(null);
+  const [pngScale, setPngScale] = useState<1 | 2 | 3>(1); // PNG resolution selection (1x/2x/3x)
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -176,14 +178,15 @@ export const ExportMenu = memo(function ExportMenu({
       if (!canvasEl) {
         throw new Error('Canvas element not found');
       }
-      await exportAsPNG(canvasEl);
+      const { exportAsPNGWithScale } = await import('@/hooks/useCanvasExport');
+      await exportAsPNGWithScale(canvasEl, pngScale);
     } catch (err) {
       console.error('[ExportMenu] PNG export error:', err);
     } finally {
       setLoadingFormat(null);
       setIsOpen(false);
     }
-  }, []);
+  }, [pngScale]);
 
   const handleExportSVG = useCallback(async () => {
     setLoadingFormat('SVG');
@@ -200,6 +203,25 @@ export const ExportMenu = memo(function ExportMenu({
       setIsOpen(false);
     }
   }, []);
+
+  const handleExportFigma = useCallback(async () => {
+    setLoadingFormat('Figma');
+    try {
+      const chaptersData: FigmaExportChapter[] = Object.entries(chapters).map(
+        ([id, chapter]) => ({
+          id,
+          label: chapter.type,
+          nodes: [],
+        })
+      );
+      downloadFigmaJSON(chaptersData);
+    } catch (err) {
+      console.error('[ExportMenu] Figma export error:', err);
+    } finally {
+      setLoadingFormat(null);
+      setIsOpen(false);
+    }
+  }, [chapters]);
 
   const handleExport = useCallback(
     async (format: ExportFormat) => {
@@ -219,9 +241,12 @@ export const ExportMenu = memo(function ExportMenu({
         case 'SVG':
           await handleExportSVG();
           break;
+        case 'Figma':
+          await handleExportFigma();
+          break;
       }
     },
-    [handleExportJSON, handleExportVibex, handleExportPDF, handleExportPNG, handleExportSVG]
+    [handleExportJSON, handleExportVibex, handleExportPDF, handleExportPNG, handleExportSVG, handleExportFigma]
   );
 
   return (
@@ -249,27 +274,53 @@ export const ExportMenu = memo(function ExportMenu({
           aria-label="导出选项"
           data-testid="export-menu-dropdown"
         >
-          {EXPORT_OPTIONS.map((opt) => (
-            <button
-              key={opt.id}
-              type="button"
-              className={styles.menuItem}
-              role="menuitem"
-              onClick={() => handleExport(opt.id)}
-              disabled={loadingFormat !== null}
-              aria-label={`导出为 ${opt.label}`}
-              data-testid={`export-option-${opt.id.toLowerCase()}`}
-            >
-              <span className={styles.menuItemLabel}>
-                {loadingFormat === opt.id ? (
-                  <SpinnerIcon />
-                ) : (
-                  opt.label
-                )}
-              </span>
-              <span className={styles.menuItemDesc}>{opt.description}</span>
-            </button>
-          ))}
+          {loadingFormat === 'PNG' ? (
+            <div className={styles.scalePanel}>
+              <div className={styles.scalePanelLabel}>分辨率</div>
+              <div className={styles.scaleButtons}>
+                {([1, 2, 3] as const).map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    className={`${styles.scaleBtn} ${pngScale === s ? styles.scaleBtnActive : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPngScale(s);
+                    }}
+                  >
+                    {s}×
+                  </button>
+                ))}
+              </div>
+              <div className={styles.scaleHint}>
+                {pngScale === 1 && '标准分辨率 (72 DPI)'}
+                {pngScale === 2 && '2× 高清 (144 DPI)'}
+                {pngScale === 3 && '3× 超高清 (216 DPI)'}
+              </div>
+            </div>
+          ) : (
+            EXPORT_OPTIONS.map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                className={styles.menuItem}
+                role="menuitem"
+                onClick={() => handleExport(opt.id)}
+                disabled={loadingFormat !== null}
+                aria-label={`导出为 ${opt.label}`}
+                data-testid={`export-option-${opt.id.toLowerCase()}`}
+              >
+                <span className={styles.menuItemLabel}>
+                  {loadingFormat === opt.id ? (
+                    <SpinnerIcon />
+                  ) : (
+                    opt.label
+                  )}
+                </span>
+                <span className={styles.menuItemDesc}>{opt.description}</span>
+              </button>
+            ))
+          )}
         </div>
       )}
     </div>

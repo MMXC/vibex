@@ -96,6 +96,64 @@
   line-height: 1.4;
 }
 
+/* PNG scale selector panel */
+.scalePanel {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scalePanelLabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-muted, #8e8e96);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.scaleButtons {
+  display: flex;
+  gap: 6px;
+}
+
+.scaleBtn {
+  flex: 1;
+  padding: 6px 4px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  background: var(--color-surface-elevated, #2a2a2e);
+  color: var(--color-text-primary, #e8e8ed);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+  text-align: center;
+}
+
+.scaleBtn:hover:not(:disabled) {
+  background: var(--color-surface-hover, #333338);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.scaleBtnActive {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+.scaleBtnActive:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.scaleHint {
+  font-size: 11px;
+  color: var(--color-text-muted, #8e8e96);
+  line-height: 1.4;
+}
+
 /* Spinner animation */
 .spinner {
   animation: spin 0.8s linear infinite;

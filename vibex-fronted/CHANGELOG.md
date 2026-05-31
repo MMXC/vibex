@@ -196,6 +196,11 @@
 - **E1 /ai 页面**: `src/app/ai/page.tsx` — 新建 AI 页面，双栏布局（AgentSessions sidebar + AgentFeedbackPanel main）
 - **E1 i18n keys**: `src/i18n/messages/en.json` + `zh.json` 新增 54 个 ai namespace keys
 
+## [2026-05-31] - Sprint 46
+
+### Added
+- **P001-E1 (AI Session Search)**: `AgentSessions` search UI — SearchInput with real-time filter, match `<mark>` highlighting; `agentStore` searchableText built on add/update/addMessage; IndexedDB v2; `agentStore.test.ts` 5 new tests (14/14)
+
 ## [Unreleased] Sprint 40 — P002 WebSocket 后端 + 协作同步层
 
 ##### S40-P002-E1: WebSocket 后端部署 + 前端集成

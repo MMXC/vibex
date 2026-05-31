@@ -1050,6 +1050,11 @@
 - **Fix: step data-testid**: PreviewStep data-testid `onboarding-step-4` → `onboarding-step-5`（与 PRD 规格对齐）；`onboarding-skip-btn` 添加；单元测试同步更新
 - **提交**: ceb6cbf73 (feat), 5343a9140 (docs), b360d8c9a (fix), da6488937 (fix), 60203c181 (ESLint fix), 83e7a0c9 (fix step-5 data-testid)
 
+## [2026-05-31] - Sprint 46
+
+### Added
+- **P001-E1 (AI Session Search)**: AI session search — `searchableText` field built from name+task+first user message, SearchInput with real-time filter, match highlighting with `<mark>` tags, IndexedDB v2 with searchableText index, 5 new vitest tests (14/14 passing)
+
 ## [Released] vibex-proposals — 2026-05-03
 
 ### vibex-proposals-sprint24 P005: Canvas 对比 — 2026-05-03

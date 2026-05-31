@@ -20,6 +20,8 @@
  * - Cmd+V: Paste canvas nodes (S46-E3)
  *
  * P003: Dynamically reads shortcutStore to register custom shortcuts at runtime.
+ * S48-P001-E3: useKeyboardShortcuts 优先读取 userPreferencesStore.shortcutCustomization，
+ *   覆盖 DEFAULT_SHORTCUTS 中的硬编码键位。
  *
  * 遵守约束:
  * - 无 any 类型
@@ -32,6 +34,36 @@ import { useEffect, useMemo, useRef } from 'react';
 
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
 import { useShortcutStore, parseKeyEvent } from '@/stores/shortcutStore';
+import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
+
+/** S48-P001-E3: Action 到默认键位的映射（用于自定义快捷键覆盖） */
+const DEFAULT_SHORTCUTS_E3: Record<string, string> = {
+  undo: 'Cmd+Z',
+  redo: 'Cmd+Shift+Z',
+  'open-search': 'Cmd+K',
+  'zoom-in': '+=',
+  'zoom-out': '-',
+  'zoom-reset': '0',
+  delete: 'Delete',
+  'new-node': 'N',
+  'select-all': 'Cmd+A',
+  'clear-selection': 'Escape',
+  'quick-generate': 'Cmd+G',
+  'confirm-selected': 'Cmd+Shift+C',
+  'generate-context': 'Cmd+Shift+G',
+  'switch-to-context': 'Alt+1',
+  'switch-to-flow': 'Alt+2',
+  'switch-to-component': 'Alt+3',
+  'next-tab': 'Tab',
+  'prev-tab': 'Shift+Tab',
+  'design-review': 'Cmd+Shift+R',
+  help: '?',
+  'open-oplog': 'Cmd+H',
+  'save-canvas': 'Cmd+S',
+  'open-ai-panel': 'Cmd+I',
+  'copy-nodes': 'Cmd+C',
+  'paste-nodes': 'Cmd+V',
+};
 
 interface KeyboardShortcutsOptions {
   /** Actions from useCanvasHistory */
@@ -212,6 +244,15 @@ export function useKeyboardShortcuts({
   onPasteNodes,
   enabled = true,
 }: KeyboardShortcutsOptions) {
+  // S48-P001-E3: Read shortcut customizations from userPreferencesStore (priority over defaults)
+  const shortcutCustomization = useUserPreferencesStore((s) => s.shortcutCustomization);
+
+  // S48-P001-E3: Helper to get the effective key for an action (custom or default)
+  function getCustomKey(action: string): string {
+    const custom = shortcutCustomization.find((c) => c.action === action);
+    return custom?.customKey ?? DEFAULT_SHORTCUTS_E3[action] ?? '';
+  }
+
   // P003 U1-P003: action map from shortcutStore action names to callbacks
   const actionMap = useMemo<Record<ActionName, () => void>>(
     () => ({
@@ -305,9 +346,10 @@ export function useKeyboardShortcuts({
       unregisterAllDynamic();
       unsubscribe();
     };
-  }, [enabled, actionMap]);
+  }, [enabled, actionMap, shortcutCustomization]);
 
   // Hardcoded shortcuts baseline — always active as fallback
+  // S48-P001-E3: check custom shortcuts first (from userPreferencesStore), then fall through to defaults
   useEffect(() => {
     if (!enabled) return;
 
@@ -315,8 +357,24 @@ export function useKeyboardShortcuts({
       const isMeta = e.metaKey;
       const isCtrl = e.ctrlKey;
       const isInputFocused = isInTextInput(e.target);
+      const keyStr = parseKeyEvent(e);
 
-      // === Undo: Ctrl+Z / Cmd+Z ===
+      // S48-P001-E3: Check custom shortcuts first (priority over hardcoded defaults)
+      const activeCustomizations = useUserPreferencesStore.getState().shortcutCustomization;
+      for (const sc of activeCustomizations) {
+        if (sc.customKey === keyStr) {
+          // Found a matching custom shortcut — skip in inputs except Escape
+          if (isInTextInput(e.target) && keyStr !== 'Escape') return;
+          const cb = actionMap[sc.action as ActionName];
+          if (cb) {
+            e.preventDefault();
+            cb();
+          }
+          return;
+        }
+      }
+
+      // Undo: Ctrl+Z / Cmd+Z
       if ((isCtrl || isMeta) && !e.shiftKey && e.key.toLowerCase() === 'z') {
         if (isInputFocused) return;
         e.preventDefault();
@@ -324,7 +382,7 @@ export function useKeyboardShortcuts({
         return;
       }
 
-      // === Redo: Ctrl+Shift+Z / Cmd+Shift+Z or Ctrl+Y / Cmd+Y ===
+      // Redo: Ctrl+Shift+Z / Cmd+Shift+Z or Ctrl+Y / Cmd+Y
       if ((isCtrl || isMeta) && e.shiftKey && e.key.toLowerCase() === 'z') {
         if (isInputFocused) return;
         e.preventDefault();
@@ -338,7 +396,7 @@ export function useKeyboardShortcuts({
         return;
       }
 
-      // === Search: '/' key ===
+      // Search: '/' key
       if (e.key === '/' && !isCtrl && !isMeta && !e.shiftKey) {
         if (!isInputFocused) {
           e.preventDefault();
@@ -347,35 +405,35 @@ export function useKeyboardShortcuts({
         return;
       }
 
-      // === Search: Ctrl+K / Cmd+K ===
+      // Search: Ctrl+K / Cmd+K
       if ((isCtrl || isMeta) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         onOpenSearch?.();
         return;
       }
 
-      // === Zoom In: + or = ===
+      // Zoom In: + or =
       if ((e.key === '+' || e.key === '=') && !isCtrl && !isMeta && !isInputFocused) {
         e.preventDefault();
         onZoomIn?.();
         return;
       }
 
-      // === Zoom Out: - ===
+      // Zoom Out: -
       if (e.key === '-' && !isCtrl && !isMeta && !isInputFocused) {
         e.preventDefault();
         onZoomOut?.();
         return;
       }
 
-      // === Reset Zoom: 0 ===
+      // Reset Zoom: 0
       if (e.key === '0' && !isCtrl && !isMeta && !isInputFocused) {
         e.preventDefault();
         onZoomReset?.();
         return;
       }
 
-      // === Delete: Del or Backspace ===
+      // Delete: Del or Backspace
       if (
         (e.key === 'Delete' || e.key === 'Backspace') &&
         !isInputFocused &&
@@ -387,14 +445,14 @@ export function useKeyboardShortcuts({
         return;
       }
 
-      // === New Node: N key ===
+      // New Node: N key
       if (e.key === 'n' && !isCtrl && !isMeta && !isInputFocused) {
         e.preventDefault();
         onNewNode?.();
         return;
       }
 
-      // === Select All: Ctrl+A / Cmd+A ===
+      // Select All: Ctrl+A / Cmd+A
       if ((isCtrl || isMeta) && e.key.toLowerCase() === 'a') {
         if (isInputFocused) return;
         e.preventDefault();
@@ -402,77 +460,77 @@ export function useKeyboardShortcuts({
         return;
       }
 
-      // === Clear Selection: Escape ===
+      // Clear Selection: Escape
       if (e.key === 'Escape' && !isInputFocused) {
         e.preventDefault();
         onClearSelection?.();
         return;
       }
 
-      // === [E4] Confirm Selected: Ctrl+Shift+C / Cmd+Shift+C ===
+      // [E4] Confirm Selected: Ctrl+Shift+C / Cmd+Shift+C
       if ((isCtrl || isMeta) && e.shiftKey && e.key.toLowerCase() === 'c') {
         e.preventDefault();
         onConfirmSelected?.();
         return;
       }
 
-      // === [E4] Generate Context: Ctrl+Shift+G / Cmd+Shift+G ===
+      // [E4] Generate Context: Ctrl+Shift+G / Cmd+Shift+G
       if ((isCtrl || isMeta) && e.shiftKey && e.key.toLowerCase() === 'g') {
         e.preventDefault();
         onGenerateContext?.();
         return;
       }
 
-      // === Quick Generate: Ctrl+G / Cmd+G ===
+      // Quick Generate: Ctrl+G / Cmd+G
       if ((isCtrl || isMeta) && e.key.toLowerCase() === 'g') {
         e.preventDefault();
         onQuickGenerate?.();
         return;
       }
 
-      // === [S16-P0-1] Design Review: Ctrl+Shift+R / Cmd+Shift+R ===
+      // [S16-P0-1] Design Review: Ctrl+Shift+R / Cmd+Shift+R
       if ((isCtrl || isMeta) && e.shiftKey && e.key.toLowerCase() === 'r') {
         e.preventDefault();
         onDesignReview?.();
         return;
       }
 
-      // === Tab Switch: Alt+1 (Context) ===
+      // Tab Switch: Alt+1 (Context)
       if (e.altKey && e.key === '1') {
         e.preventDefault();
         onSwitchToContext?.();
         return;
       }
 
-      // === Tab Switch: Alt+2 (Flow) ===
+      // Tab Switch: Alt+2 (Flow)
       if (e.altKey && e.key === '2') {
         e.preventDefault();
         onSwitchToFlow?.();
         return;
       }
 
-      // === Tab Switch: Alt+3 (Component) ===
+      // Tab Switch: Alt+3 (Component)
       if (e.altKey && e.key === '3') {
         e.preventDefault();
         onSwitchToComponent?.();
         return;
       }
 
-      // === [E002] Previous Tab: Shift+Tab (must come before plain Tab) ===
+      // [E002] Previous Tab: Shift+Tab (must come before plain Tab)
       if (e.key === 'Tab' && !isCtrl && !isMeta && e.shiftKey && !isInputFocused) {
         e.preventDefault();
         onPrevTab?.();
         return;
       }
 
-      // === [E002] Next Tab: Tab key ===
+      // [E002] Next Tab: Tab key
       if (e.key === 'Tab' && !isCtrl && !isMeta && !isInputFocused) {
         e.preventDefault();
         onNextTab?.();
         return;
       }
 
-      // === [E002] New Node: Ctrl+N / Cmd+N ===
+      // [E002] New Node: Ctrl+N / Cmd+N
       if ((isCtrl || isMeta) && e.key.toLowerCase() === 'n') {
         if (isInputFocused) return;
         e.preventDefault();
@@ -480,14 +538,14 @@ export function useKeyboardShortcuts({
         return;
       }
 
-      // === [E003] Help: ? key (show keyboard shortcuts overlay) ===
+      // [E003] Help: ? key (show keyboard shortcuts overlay)
       if (e.key === '?' && !isInputFocused && !isCtrl && !isMeta) {
         e.preventDefault();
         onHelp?.();
         return;
       }
 
-      // === [P002-E3] Operation Log: Ctrl+H ===
+      // [P002-E3] Operation Log: Ctrl+H
       if ((isCtrl || isMeta) && e.key.toLowerCase() === 'h') {
         if (isInputFocused) return;
         e.preventDefault();
@@ -495,7 +553,7 @@ export function useKeyboardShortcuts({
         return;
       }
 
-      // === [P001-E2] Save Canvas: Ctrl+S / Cmd+S ===
+      // [P001-E2] Save Canvas: Ctrl+S / Cmd+S
       if ((isCtrl || isMeta) && e.key.toLowerCase() === 's') {
         if (isInputFocused) return;
         e.preventDefault();
@@ -503,7 +561,7 @@ export function useKeyboardShortcuts({
         return;
       }
 
-      // === [P001-E2] Open AI Sessions Panel: Ctrl+I / Cmd+I ===
+      // [P001-E2] Open AI Sessions Panel: Ctrl+I / Cmd+I
       if ((isCtrl || isMeta) && e.key.toLowerCase() === 'i') {
         if (isInputFocused) return;
         e.preventDefault();
@@ -511,8 +569,7 @@ export function useKeyboardShortcuts({
         return;
       }
 
-      // === [S46-E3] Copy Nodes: Ctrl+C / Cmd+C ===
-      // Note: browser default copy is also triggered, but we want canvas-node copy
+      // [S46-E3] Copy Nodes: Ctrl+C / Cmd+C
       if ((isCtrl || isMeta) && e.key.toLowerCase() === 'c') {
         if (isInputFocused) return;
         e.preventDefault();
@@ -520,7 +577,7 @@ export function useKeyboardShortcuts({
         return;
       }
 
-      // === [S46-E3] Paste Nodes: Ctrl+V / Cmd+V ===
+      // [S46-E3] Paste Nodes: Ctrl+V / Cmd+V
       if ((isCtrl || isMeta) && e.key.toLowerCase() === 'v') {
         if (isInputFocused) return;
         e.preventDefault();
@@ -537,6 +594,6 @@ export function useKeyboardShortcuts({
     onQuickGenerate, onConfirmSelected, onGenerateContext,
     onSwitchToContext, onSwitchToFlow, onSwitchToComponent, onNextTab, onPrevTab, onDesignReview,
     onHelp, onOpenOplog, onSaveCanvas, onOpenAIPanel,
-    onCopyNodes, onPasteNodes, enabled,
+    onCopyNodes, onPasteNodes, enabled, shortcutCustomization,
   ]);
 }

@@ -303,7 +303,16 @@
     "switchComponent": "Switch to Component tab",
     "designReview": "Open Design Review",
     "help": "Show keyboard shortcuts",
-    "operationLog": "Toggle operation log"
+    "operationLog": "Toggle operation log",
+    "customize": "Customize shortcuts",
+    "viewMode": "View mode",
+    "conflict": "Conflict",
+    "conflictDesc": "is already assigned to another action:",
+    "captureKey": "Press any key combination to assign",
+    "reset": "Reset to default",
+    "saveShortcut": "Save",
+    "cancel": "Cancel",
+    "customizeModeFooter": "Click a shortcut to customize it. Press Escape to cancel."
   },
   "share": {
     "share": "Share",

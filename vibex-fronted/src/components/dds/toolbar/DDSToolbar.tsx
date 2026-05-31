@@ -335,7 +335,8 @@ export const DDSToolbar = memo(function DDSToolbar({
 
   // ---- [S46-E3] Copy handler ----
   const { selectedCardIds } = useDDSCanvasStore();
-  const { isValid: clipboardValid } = useClipboardStore();
+  const { isValid: clipboardValid, entry: clipboardEntry } = useClipboardStore();
+  const clipboardCount = clipboardEntry?.cards.length ?? 0;
   const handleCopy = useCallback(() => {
     if (selectedCardIds.length === 0) return;
     ddsChapterActions.copyCards(activeChapter, selectedCardIds);
@@ -421,10 +422,31 @@ export const DDSToolbar = memo(function DDSToolbar({
             className={styles.exportBtn}
             onClick={() => setIsPasteDialogOpen(true)}
             aria-label="粘贴节点"
-            title={tToolbar('paste')}
+            title={clipboardValid ? `${tToolbar('paste')} (${clipboardCount} 个节点)` : tToolbar('paste')}
             data-testid="canvas-paste-btn"
           >
             {tToolbar('paste')}
+            {clipboardValid && clipboardCount > 0 && (
+              <span
+                style={{
+                  marginLeft: 4,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 16,
+                  height: 16,
+                  borderRadius: '50%',
+                  background: 'var(--color-primary, #3b82f6)',
+                  color: '#fff',
+                  fontSize: 10,
+                  fontWeight: 700,
+                  lineHeight: 1,
+                }}
+                data-testid="clipboard-count-badge"
+              >
+                {clipboardCount > 99 ? '99+' : clipboardCount}
+              </span>
+            )}
           </button>
 
           {/* S46-E3: Paste Chapter Selector Dialog */}

@@ -16,6 +16,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { useCanvasList } from '@/hooks/useCanvasList';
 import { useCanvasListStore } from '@/stores/canvasListStore';
+import { useClipboardStore } from '@/stores/clipboardStore';
 import type { CanvasMeta } from '@/stores/canvasListStore';
 import styles from './CanvasListPanel.module.css';
 
@@ -40,7 +41,9 @@ export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListP
     getFilteredCanvases,
   } = useCanvasList();
 
-  const { selectedCanvasIds, toggleSelect, clearSelection, exportSelectedPDF } = useCanvasListStore();
+  const { selectedCanvasIds, toggleSelect, clearSelection, exportSelectedPDF, pasteToCanvas } = useCanvasListStore();
+  const clipboardValid = useClipboardStore((s) => s.isValid());
+  const clipboardCount = useClipboardStore((s) => s.entry?.cards.length ?? 0);
 
   const [sortMode, setSortMode] = useState<SortMode>('updatedAt');
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -288,6 +291,22 @@ export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListP
             >
               ✕
             </button>
+
+            {/* [S48-E5] Paste Here button — visible when clipboard has cards */}
+            {clipboardValid && (
+              <button
+                className={styles['canvas-list-panel__paste-btn']}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  pasteToCanvas(canvas.id);
+                }}
+                title={`粘贴 ${clipboardCount} 个节点到 ${canvas.name}`}
+                aria-label={`粘贴到 ${canvas.name}`}
+              >
+                📋
+                <span className={styles['canvas-list-panel__paste-count']}>{clipboardCount}</span>
+              </button>
+            )}
           </li>
         ))}
       </ul>

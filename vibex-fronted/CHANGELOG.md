@@ -6,6 +6,12 @@
 - **E1 useStreamingAgent.test.ts**: 9/9 vitest PASS (retry logic, backoff, abort, IndexedDB) ✅
 - **E1 i18n**: add aiRetrying + aiStreamFailed keys to ai namespace ✅
 
+##### S45-P002-E2: Presence 光标 WebSocket 迁移
+- **E2 RemoteCursor.tsx**: migrate from Firebase Presence → Zustand usePresenceStore (WebSocket), remove usePresence + isFirebaseConfigured imports, add hashUserColor for cursor color, self-exclusion via remoteUsers Map, SVG cursor + name label ✅
+- **E2 RemoteCursor.test.tsx**: 6 vitest tests (empty, single, multiple, self-exclusion, missing name fallback, position rendering) ✅
+- **E2 presenceStore vitest**: 9/9 PASS (setRemoteUsers, updateCursor, removeUser, clearAll, lock/unlock) ✅
+- **E2 IntentionBubble.tsx**: self-contained IntentionType re-export (removed Firebase dependency) ✅
+
 ### [Unreleased] Sprint 44 — E1 AI 多轮会话管理 + E2 画布模板分类 + E3 协作节点锁定 + E4 撤销历史面板 + E5 移动端触控
 
 ##### S44-P001-E1: AI 多轮会话管理

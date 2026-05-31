@@ -37,6 +37,12 @@ interface AgentActions {
   injectContext: (raw: unknown) => asserts raw is CodeGenContext;
   /** S44-E1: Initialize IndexedDB and load persisted sessions */
   initAgentSessions: () => Promise<void>;
+  /** S48-E4: Toggle favorite status for a session */
+  toggleFavorite: (sessionKey: string) => void;
+  /** S48-E4: Add a tag to a session (idempotent — no-op if tag already exists) */
+  addTag: (sessionKey: string, tag: string) => void;
+  /** S48-E4: Remove a tag from a session */
+  removeTag: (sessionKey: string, tag: string) => void;
 }
 
 export type AgentStore = AgentState & AgentActions;
@@ -186,4 +192,50 @@ export const useAgentStore = create<AgentStore>((set) => ({
       console.warn('[agentStore] Failed to load sessions from IndexedDB:', err);
     }
   },
+
+  /** S48-E4: Toggle favorite status — flips isFavorite; persists updated session */
+  toggleFavorite: (sessionKey) =>
+    set((state) => {
+      const session = state.sessions.find((s) => s.sessionKey === sessionKey);
+      if (!session) return {};
+      const updated = { ...session, isFavorite: !session.isFavorite };
+      void persistSession(updated);
+      return {
+        sessions: state.sessions.map((s) =>
+          s.sessionKey === sessionKey ? updated : s
+        ),
+      };
+    }),
+
+  /** S48-E4: Add a tag to a session — idempotent (no-op if tag already exists); persists */
+  addTag: (sessionKey, tag) =>
+    set((state) => {
+      const session = state.sessions.find((s) => s.sessionKey === sessionKey);
+      if (!session) return {};
+      const tags = session.tags ?? [];
+      if (tags.includes(tag)) return {}; // already present — no-op
+      const updated = { ...session, tags: [...tags, tag] };
+      void persistSession(updated);
+      return {
+        sessions: state.sessions.map((s) =>
+          s.sessionKey === sessionKey ? updated : s
+        ),
+      };
+    }),
+
+  /** S48-E4: Remove a tag from a session; persists updated session */
+  removeTag: (sessionKey, tag) =>
+    set((state) => {
+      const session = state.sessions.find((s) => s.sessionKey === sessionKey);
+      if (!session) return {};
+      const tags = session.tags ?? [];
+      if (!tags.includes(tag)) return {}; // not present — no-op
+      const updated = { ...session, tags: tags.filter((t) => t !== tag) };
+      void persistSession(updated);
+      return {
+        sessions: state.sessions.map((s) =>
+          s.sessionKey === sessionKey ? updated : s
+        ),
+      };
+    }),
 }));

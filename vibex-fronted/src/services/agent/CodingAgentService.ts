@@ -32,6 +32,10 @@ export interface AgentSession {
   error?: string;
   /** S46-E1: searchable text field — name + task + first user message */
   searchableText?: string;
+  /** S48-E4: user-defined tags for organizing sessions */
+  tags?: string[];
+  /** S48-E4: whether this session is favorited — favorited sessions appear at top */
+  isFavorite?: boolean;
 }
 
 /** S44-E1: Branch metadata for multi-session branching */

@@ -303,7 +303,16 @@
     "switchComponent": "切换到组件树",
     "designReview": "打开设计评审",
     "help": "显示快捷键",
-    "operationLog": "切换操作日志"
+    "operationLog": "切换操作日志",
+    "customize": "自定义快捷键",
+    "viewMode": "查看模式",
+    "conflict": "冲突",
+    "conflictDesc": "已分配给其他操作：",
+    "captureKey": "按下任意组合键进行分配",
+    "reset": "恢复默认",
+    "saveShortcut": "保存",
+    "cancel": "取消",
+    "customizeModeFooter": "点击快捷键进行自定义，按 Escape 取消。"
   },
   "share": {
     "share": "分享",

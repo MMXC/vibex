@@ -292,6 +292,17 @@ declare module '*.module.css' {
     shortcutKbd: string;
     shortcutKeys: string;
     shortcutPlus: string;
+    /** S48-P001-E3: Shortcut customization edit mode */
+    shortcutHeaderActions: string;
+    shortcutKbdCustom: string;
+    shortcutKbdEditable: string;
+    shortcutEditInput: string;
+    shortcutEditControls: string;
+    shortcutSaveBtn: string;
+    shortcutCancelBtn: string;
+    shortcutResetBtn: string;
+    shortcutConflictBanner: string;
+    shortcutConflictTag: string;
     sortableItemDragging: string;
     sortableTreeItem: string;
     treePanelsGridWithBothDrawers: string;

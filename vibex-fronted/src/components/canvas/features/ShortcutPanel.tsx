@@ -40,6 +40,9 @@ export const SHORTCUTS: ShortcutItem[] = [
   { id: 'ctrl-shift-c', keys: ['Ctrl', 'Shift', 'C'], description: '确认选中节点' },
   { id: 'ctrl-g', keys: ['Ctrl', 'G'], description: '生成图谱' },
   { id: 'ctrl-shift-g', keys: ['Ctrl', 'Shift', 'G'], description: '生成上下文' },
+  // Save & AI
+  { id: 'ctrl-s', keys: ['Ctrl', 'S'], description: '保存画布' },
+  { id: 'ctrl-i', keys: ['Ctrl', 'I'], description: '打开 AI 会话' },
   // Node operations
   { id: 'n', keys: ['N'], description: '新建节点（当前树）' },
   // Zoom

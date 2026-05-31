@@ -14,6 +14,8 @@
  * - Shift+Tab: Previous tab (prevTab)
  * - Ctrl+N: Create new node (onNewNode)
  * - Esc: Cancel / close dialogs
+ * - Cmd+S: Save canvas (P001-E2)
+ * - Cmd+I: Open AI sessions panel (P001-E2)
  *
  * P003: Dynamically reads shortcutStore to register custom shortcuts at runtime.
  *
@@ -71,6 +73,10 @@ interface KeyboardShortcutsOptions {
   onHelp?: () => void;
   /** [P002-E3] Operation overlay (Ctrl+H: toggle oplog) */
   onOpenOplog?: () => void;
+  /** [P001-E2] Save canvas (Cmd+S) */
+  onSaveCanvas?: () => void;
+  /** [P001-E2] Open AI sessions panel (Cmd+I) */
+  onOpenAIPanel?: () => void;
   /** Whether shortcuts should be active */
   enabled?: boolean;
 }
@@ -97,7 +103,9 @@ type ActionName =
   | 'prev-tab'
   | 'design-review'
   | 'help'
-  | 'open-oplog';
+  | 'open-oplog'
+  | 'save-canvas'
+  | 'open-ai-panel';
 
 // Actions that have hardcoded handlers in useKeyboardShortcuts.
 // The dynamic shortcutStore system should NOT re-register these to avoid duplicate calls.
@@ -124,6 +132,8 @@ const HARDCODE_ACTIONS = new Set<ActionName>([
   'design-review',
   'help',
   'open-oplog',
+  'save-canvas',
+  'open-ai-panel',
 ]);
 
 function isInTextInput(target: EventTarget | null): boolean {
@@ -161,6 +171,8 @@ function isInTextInput(target: EventTarget | null): boolean {
  * - Shift+Tab: Previous tab (onPrevTab)
  * - Ctrl+N / Cmd+N: Create new node (onNewNode)
  * - Esc: Cancel / close dialogs
+ * - Cmd+S / Ctrl+S: Save canvas (P001-E2)
+ * - Cmd+I / Ctrl+I: Open AI sessions panel (P001-E2)
  */
 export function useKeyboardShortcuts({
   undo,
@@ -184,6 +196,8 @@ export function useKeyboardShortcuts({
   onDesignReview,
   onHelp,
   onOpenOplog,
+  onSaveCanvas,
+  onOpenAIPanel,
   enabled = true,
 }: KeyboardShortcutsOptions) {
   // P003 U1-P003: action map from shortcutStore action names to callbacks
@@ -208,15 +222,17 @@ export function useKeyboardShortcuts({
       'next-tab': onNextTab as () => void,
       'prev-tab': onPrevTab as () => void,
       'design-review': onDesignReview as () => void,
-      'help': onHelp as () => void,
+      help: onHelp as () => void,
       'open-oplog': onOpenOplog as () => void,
+      'save-canvas': onSaveCanvas as () => void,
+      'open-ai-panel': onOpenAIPanel as () => void,
     }),
     [
       undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset,
       onDelete, onSelectAll, onClearSelection, onNewNode,
       onQuickGenerate, onConfirmSelected, onGenerateContext,
       onSwitchToContext, onSwitchToFlow, onSwitchToComponent, onNextTab, onPrevTab, onDesignReview,
-      onHelp, onOpenOplog, enabled,
+      onHelp, onOpenOplog, onSaveCanvas, onOpenAIPanel, enabled,
     ],
   );
 
@@ -464,6 +480,22 @@ export function useKeyboardShortcuts({
         onOpenOplog?.();
         return;
       }
+
+      // === [P001-E2] Save Canvas: Ctrl+S / Cmd+S ===
+      if ((isCtrl || isMeta) && e.key.toLowerCase() === 's') {
+        if (isInputFocused) return;
+        e.preventDefault();
+        onSaveCanvas?.();
+        return;
+      }
+
+      // === [P001-E2] Open AI Sessions Panel: Ctrl+I / Cmd+I ===
+      if ((isCtrl || isMeta) && e.key.toLowerCase() === 'i') {
+        if (isInputFocused) return;
+        e.preventDefault();
+        onOpenAIPanel?.();
+        return;
+      }
     }
 
     document.addEventListener('keydown', handler);
@@ -471,8 +503,8 @@ export function useKeyboardShortcuts({
   }, [
     undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset,
     onDelete, onSelectAll, onClearSelection, onNewNode,
-      onQuickGenerate, onConfirmSelected, onGenerateContext,
-      onSwitchToContext, onSwitchToFlow, onSwitchToComponent, onNextTab, onPrevTab, onDesignReview,
-    onHelp, onOpenOplog, enabled,
+    onQuickGenerate, onConfirmSelected, onGenerateContext,
+    onSwitchToContext, onSwitchToFlow, onSwitchToComponent, onNextTab, onPrevTab, onDesignReview,
+    onHelp, onOpenOplog, onSaveCanvas, onOpenAIPanel, enabled,
   ]);
 }

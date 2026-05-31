@@ -1805,4 +1805,212 @@ describe('useKeyboardShortcuts', () => {
       unmount();
     });
   });
+
+  // ==================== P001-E2: Ctrl+S / Cmd+S → onSaveCanvas ====================
+  describe('Ctrl+S / Cmd+S → onSaveCanvas (P001-E2)', () => {
+    function simulateKeyDown(key: string, options: Partial<KeyboardEventInit> = {}) {
+      const event = new KeyboardEvent('keydown', {
+        key,
+        bubbles: true,
+        cancelable: true,
+        ...options,
+      });
+      document.dispatchEvent(event);
+      return event;
+    }
+
+    afterEach(() => {
+      document.body.innerHTML = '';
+      Object.defineProperty(document, 'activeElement', {
+        value: document.body,
+        writable: true,
+        configurable: true,
+      });
+    });
+
+    it('should call onSaveCanvas when Ctrl+S is pressed', () => {
+      const undo = vi.fn();
+      const redo = vi.fn();
+      const onSaveCanvas = vi.fn();
+
+      const { unmount } = renderHook(() =>
+        useKeyboardShortcuts({ undo, redo, onSaveCanvas, enabled: true }),
+      );
+
+      act(() => {
+        simulateKeyDown('s', { ctrlKey: true });
+      });
+
+      expect(onSaveCanvas).toHaveBeenCalledTimes(1);
+
+      unmount();
+    });
+
+    it('should call onSaveCanvas when Meta+S (Mac) is pressed', () => {
+      const undo = vi.fn();
+      const redo = vi.fn();
+      const onSaveCanvas = vi.fn();
+
+      const { unmount } = renderHook(() =>
+        useKeyboardShortcuts({ undo, redo, onSaveCanvas, enabled: true }),
+      );
+
+      act(() => {
+        simulateKeyDown('s', { metaKey: true });
+      });
+
+      expect(onSaveCanvas).toHaveBeenCalledTimes(1);
+
+      unmount();
+    });
+
+    it('should NOT call onSaveCanvas when input is focused', () => {
+      const undo = vi.fn();
+      const redo = vi.fn();
+      const onSaveCanvas = vi.fn();
+
+      const input = document.createElement('input');
+      document.body.appendChild(input);
+      Object.defineProperty(document, 'activeElement', {
+        value: input,
+        writable: true,
+        configurable: true,
+      });
+
+      const { unmount } = renderHook(() =>
+        useKeyboardShortcuts({ undo, redo, onSaveCanvas, enabled: true }),
+      );
+
+      act(() => {
+        simulateKeyDown('s', { ctrlKey: true });
+      });
+
+      expect(onSaveCanvas).not.toHaveBeenCalled();
+
+      unmount();
+      document.body.removeChild(input);
+    });
+
+    it('should NOT call onSaveCanvas when enabled=false', () => {
+      const undo = vi.fn();
+      const redo = vi.fn();
+      const onSaveCanvas = vi.fn();
+
+      const { unmount } = renderHook(() =>
+        useKeyboardShortcuts({ undo, redo, onSaveCanvas, enabled: false }),
+      );
+
+      act(() => {
+        simulateKeyDown('s', { ctrlKey: true });
+      });
+
+      expect(onSaveCanvas).not.toHaveBeenCalled();
+
+      unmount();
+    });
+  });
+
+  // ==================== P001-E2: Ctrl+I / Cmd+I → onOpenAIPanel ====================
+  describe('Ctrl+I / Cmd+I → onOpenAIPanel (P001-E2)', () => {
+    function simulateKeyDown(key: string, options: Partial<KeyboardEventInit> = {}) {
+      const event = new KeyboardEvent('keydown', {
+        key,
+        bubbles: true,
+        cancelable: true,
+        ...options,
+      });
+      document.dispatchEvent(event);
+      return event;
+    }
+
+    afterEach(() => {
+      document.body.innerHTML = '';
+      Object.defineProperty(document, 'activeElement', {
+        value: document.body,
+        writable: true,
+        configurable: true,
+      });
+    });
+
+    it('should call onOpenAIPanel when Ctrl+I is pressed', () => {
+      const undo = vi.fn();
+      const redo = vi.fn();
+      const onOpenAIPanel = vi.fn();
+
+      const { unmount } = renderHook(() =>
+        useKeyboardShortcuts({ undo, redo, onOpenAIPanel, enabled: true }),
+      );
+
+      act(() => {
+        simulateKeyDown('i', { ctrlKey: true });
+      });
+
+      expect(onOpenAIPanel).toHaveBeenCalledTimes(1);
+
+      unmount();
+    });
+
+    it('should call onOpenAIPanel when Meta+I (Mac) is pressed', () => {
+      const undo = vi.fn();
+      const redo = vi.fn();
+      const onOpenAIPanel = vi.fn();
+
+      const { unmount } = renderHook(() =>
+        useKeyboardShortcuts({ undo, redo, onOpenAIPanel, enabled: true }),
+      );
+
+      act(() => {
+        simulateKeyDown('i', { metaKey: true });
+      });
+
+      expect(onOpenAIPanel).toHaveBeenCalledTimes(1);
+
+      unmount();
+    });
+
+    it('should NOT call onOpenAIPanel when input is focused', () => {
+      const undo = vi.fn();
+      const redo = vi.fn();
+      const onOpenAIPanel = vi.fn();
+
+      const input = document.createElement('input');
+      document.body.appendChild(input);
+      Object.defineProperty(document, 'activeElement', {
+        value: input,
+        writable: true,
+        configurable: true,
+      });
+
+      const { unmount } = renderHook(() =>
+        useKeyboardShortcuts({ undo, redo, onOpenAIPanel, enabled: true }),
+      );
+
+      act(() => {
+        simulateKeyDown('i', { ctrlKey: true });
+      });
+
+      expect(onOpenAIPanel).not.toHaveBeenCalled();
+
+      unmount();
+      document.body.removeChild(input);
+    });
+
+    it('should NOT call onOpenAIPanel when enabled=false', () => {
+      const undo = vi.fn();
+      const redo = vi.fn();
+      const onOpenAIPanel = vi.fn();
+
+      const { unmount } = renderHook(() =>
+        useKeyboardShortcuts({ undo, redo, onOpenAIPanel, enabled: false }),
+      );
+
+      act(() => {
+        simulateKeyDown('i', { ctrlKey: true });
+      });
+
+      expect(onOpenAIPanel).not.toHaveBeenCalled();
+
+      unmount();
+    });
+  });
 });

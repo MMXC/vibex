@@ -125,7 +125,14 @@ export const useShortcutStore = create<ShortcutState>()(
               conflictingDescription: conflict.description,
             }
           : { hasConflict: false };
-        
+
+        if (conflict) {
+          console.warn(
+            `[shortcutStore] Shortcut conflict: "${key}" is already assigned to "${conflict.action}" (${conflict.description}). ` +
+            `To reassign, reset the conflicting shortcut first.`,
+          );
+        }
+
         set({
           capturedKey: key,
           conflictInfo: result,

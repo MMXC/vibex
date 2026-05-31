@@ -235,19 +235,6 @@ describe('ShortcutPanel', () => {
       ],
     });
 
-    // Spy on setConflictKey to see if it's called
-    const origSetState = useUserPreferencesStore.setState;
-    const setConflictKeySpy = vi.fn();
-    // Intercept calls to setState that look like setting conflictKey (null)
-    useUserPreferencesStore.setState = (partial: any) => {
-      // Check if this is a conflictKey update by looking at the full store
-      const state = useUserPreferencesStore.getState();
-      origSetState(partial);
-      const newState = useUserPreferencesStore.getState();
-      console.log('[DEBUG] setState called, new shortcutCustomization:', JSON.stringify(newState.shortcutCustomization));
-      setConflictKeySpy();
-    };
-
     let root!: HTMLElement;
     await act(async () => {
       const { container } = render(<ShortcutPanel {...defaultProps} />);
@@ -267,27 +254,18 @@ describe('ShortcutPanel', () => {
       fireEvent.click(zoomInKbdBtn);
     });
 
-    // Capture key Cmd+A — conflicts with custom 'redo' shortcut (also Cmd+A)
+    // Verify conflict detection via UI state
+    // Note: parseKeyEvent normalizes key 'A' to uppercase, so fire with shiftKey:true to get 'Cmd+A'
     const zoomInEditInput = screen.getByTestId('shortcut-edit-input-zoom-in');
-
-    // Spy on parseKeyEvent to verify it's called
-    const { parseKeyEvent } = await import('@/stores/shortcutStore');
-    const parseSpy = vi.spyOn(parseKeyEvent as any, 'default' as any);
-    console.log('[DEBUG] parseKeyEvent type:', typeof parseKeyEvent);
-    console.log('[DEBUG] parseKeyEvent:', parseKeyEvent);
-
     await act(async () => {
-      fireEvent.keyDown(zoomInEditInput, { key: 'a', ctrlKey: false, metaKey: true, altKey: false });
+      fireEvent.keyDown(zoomInEditInput, { key: 'A', ctrlKey: false, metaKey: true, altKey: false });
     });
-    console.log('[DEBUG] parseKeyEvent called:', parseSpy.mock.calls.length, 'times');
-    console.log('[DEBUG] spy calls:', parseSpy.mock.calls);
 
-    // Restore setState
-    useUserPreferencesStore.setState = origSetState;
-
-    // Conflict banner should appear — use waitFor to let state updates flush
+    // Conflict banner should appear — multiple role="alert" elements exist in panel, check at least one shortcutConflictBanner
     await waitFor(() => {
-      expect(screen.queryByRole('alert')).toBeInTheDocument();
+      const alerts = screen.getAllByRole('alert');
+      const banner = alerts.find(el => el.className.includes('shortcutConflictBanner'));
+      expect(banner).toBeInTheDocument();
     });
   });
 });

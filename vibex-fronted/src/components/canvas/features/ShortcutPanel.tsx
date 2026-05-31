@@ -103,7 +103,6 @@ export function ShortcutPanel({ open, onClose }: ShortcutPanelProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { shortcutCustomization, setShortcutCustomization } = useUserPreferencesStore();
-  console.log('[ShortcutPanel render] shortcutCustomization:', JSON.stringify(shortcutCustomization));
 
   // Focus input when entering edit mode
   useEffect(() => {
@@ -122,8 +121,10 @@ export function ShortcutPanel({ open, onClose }: ShortcutPanelProps) {
 
   // Check for conflicts when a key is captured
   function checkConflict(key: string, skipAction: string): ShortcutCustomization | undefined {
-    const result = shortcutCustomization.find((c) => c.action !== skipAction && c.customKey === key);
-    console.log('[ShortcutPanel checkConflict]', { key, skipAction, shortcutCustomization: JSON.stringify(shortcutCustomization), result });
+    const normalizedKey = key.split('+').map((p) => p.toLowerCase()).join('+');
+    const result = shortcutCustomization.find(
+      (c) => c.action !== skipAction && c.customKey.toLowerCase() === normalizedKey
+    );
     return result;
   }
 
@@ -145,7 +146,6 @@ export function ShortcutPanel({ open, onClose }: ShortcutPanelProps) {
 
   // Handle key capture in edit mode
   function handleKeyDownCapture(e: React.KeyboardEvent<HTMLInputElement>) {
-    console.log('[ShortcutPanel handleKeyDownCapture] editingAction:', editingAction, 'e.key:', e.key, 'metaKey:', (e.nativeEvent as any).metaKey, 'ctrlKey:', (e.nativeEvent as any).ctrlKey);
     e.preventDefault();
     e.stopPropagation();
 

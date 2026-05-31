@@ -29,6 +29,17 @@
 - **E4 TemplateHistoryPanel.tsx**: collapsible panel, dark theme, restore/delete buttons, data-testid attributes
 - **E4 useTemplateManager.test.ts**: 8/8 vitest PASS (import/createSnapshot/getHistory/deleteSnapshot) ✅
 
+##### S45-P005-E5: 画布快照分享 + 公开只读链接
+- **E5 0012_public_snapshot.sql**: `PublicSnapshot` D1 表 — id/canvasJSON/userId/createdAt，可公开读取
+- **E5 POST /api/snapshot**: D1 INSERT，per-user 最多 10 条限制，auth 保护
+- **E5 GET /api/snapshot/[id]**: D1 SELECT，公开无需 auth
+- **E5 route.test.ts**: TypeScript 编译通过 ✅
+- **E5 ShareButton.tsx**: 序列化画布 JSON → clipboard + toast 提示
+- **E5 ShareButton.module.css**: 按钮样式（Share 图标 + 悬停效果）
+- **E5 SnapshotCanvas.tsx**: nodesDraggable=false 只读模式，支持任意 canvas JSON
+- **E5 /snapshot/[id] page.tsx**: 公开只读页面，useEffect 加载 + 错误处理
+- **E5 share i18n namespace**: en.json + zh.json 新增 share 命名空间
+
 ### [Unreleased] Sprint 44 — E1 AI 多轮会话管理 + E2 画布模板分类 + E3 协作节点锁定 + E4 撤销历史面板 + E5 移动端触控
 
 ##### S44-P001-E1: AI 多轮会话管理

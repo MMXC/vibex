@@ -277,5 +277,16 @@
     "title": "快捷键",
     "closeAria": "关闭快捷键提示",
     "footer": "在文本输入框中，快捷键不会触发"
+  },
+  "share": {
+    "share": "分享",
+    "shareCanvas": "分享画布快照",
+    "copied": "链接已复制！",
+    "shareFailed": "创建分享链接失败",
+    "limitExceeded": "已达最大快照数量上限（10个）。请先删除一些快照。",
+    "invalidRequest": "无效请求，请重试。",
+    "loading": "正在加载快照...",
+    "notFound": "快照未找到。此链接可能已过期或被删除。",
+    "loadError": "加载快照失败，请稍后重试。"
   }
 }

@@ -277,5 +277,16 @@
     "title": "Keyboard Shortcuts",
     "closeAria": "Close keyboard shortcuts hint",
     "footer": "Shortcuts do not trigger in text input fields"
+  },
+  "share": {
+    "share": "Share",
+    "shareCanvas": "Share canvas snapshot",
+    "copied": "Link copied!",
+    "shareFailed": "Failed to create shareable link",
+    "limitExceeded": "Maximum 10 snapshots reached. Please delete some snapshots first.",
+    "invalidRequest": "Invalid request. Please try again.",
+    "loading": "Loading snapshot...",
+    "notFound": "Snapshot not found. This link may have expired or been deleted.",
+    "loadError": "Failed to load snapshot. Please try again later."
   }
 }

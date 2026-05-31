@@ -20,6 +20,7 @@ import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { exportDDSCanvasData, exportToStateMachine } from '@/services/dds/exporter';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds';
+import { useClipboardStore } from '@/stores/clipboardStore';
 import { useCanvasHistoryStore } from '@/stores/dds/canvasHistoryStore';
 import { useCanvasExport } from '@/hooks/canvas/useCanvasExport';
 import { useCanvasImport } from '@/hooks/canvas/useCanvasImport';
@@ -332,6 +333,24 @@ export const DDSToolbar = memo(function DDSToolbar({
     }
   };
 
+  // ---- [S46-E3] Copy handler ----
+  const { selectedCardIds } = useDDSCanvasStore();
+  const { isValid: clipboardValid } = useClipboardStore();
+  const handleCopy = useCallback(() => {
+    if (selectedCardIds.length === 0) return;
+    ddsChapterActions.copyCards(activeChapter, selectedCardIds);
+  }, [selectedCardIds, activeChapter]);
+
+  // ---- [S46-E3] Paste handler ----
+  const [isPasteDialogOpen, setIsPasteDialogOpen] = useState(false);
+  const handlePaste = useCallback((targetChapter: ChapterType) => {
+    const pasted = ddsChapterActions.pasteCards(targetChapter);
+    if (pasted.length === 0 && !clipboardValid()) {
+      alert('剪贴板为空或已过期');
+    }
+    setIsPasteDialogOpen(false);
+  }, [clipboardValid]);
+
   const handleFullscreenToggle = () => {
     toggleFullscreen();
     if (!document.fullscreenElement) {
@@ -382,6 +401,82 @@ export const DDSToolbar = memo(function DDSToolbar({
             disabled={!rbac.canShare && !rbac.loading}
             className={styles.exportMenuWrapper}
           />
+
+          {/* S46-E3: Copy button */}
+          <button
+            type="button"
+            className={styles.exportBtn}
+            onClick={handleCopy}
+            aria-label="复制节点"
+            title={selectedCardIds.length > 0 ? `${tToolbar('copy')} ${selectedCardIds.length} 个节点` : tToolbar('copy')}
+            disabled={selectedCardIds.length === 0}
+            data-testid="canvas-copy-btn"
+          >
+            {tToolbar('copy')}
+          </button>
+
+          {/* S46-E3: Paste button */}
+          <button
+            type="button"
+            className={styles.exportBtn}
+            onClick={() => setIsPasteDialogOpen(true)}
+            aria-label="粘贴节点"
+            title={tToolbar('paste')}
+            data-testid="canvas-paste-btn"
+          >
+            {tToolbar('paste')}
+          </button>
+
+          {/* S46-E3: Paste Chapter Selector Dialog */}
+          {isPasteDialogOpen && (
+            <div
+              style={{
+                position: 'fixed', inset: 0, zIndex: 9999,
+                background: 'rgba(0,0,0,0.5)', display: 'flex',
+                alignItems: 'center', justifyContent: 'center',
+              }}
+              onClick={() => setIsPasteDialogOpen(false)}
+            >
+              <div
+                style={{
+                  background: 'var(--color-surface)', borderRadius: 8,
+                  padding: 24, minWidth: 280, boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 600 }}>
+                  选择粘贴目标章节
+                </h3>
+                {(['requirement', 'context', 'flow', 'api', 'business-rules'] as ChapterType[]).map((ch) => (
+                  <button
+                    key={ch}
+                    type="button"
+                    style={{
+                      display: 'block', width: '100%', padding: '10px 16px',
+                      marginBottom: 8, background: 'var(--color-surface-elevated)',
+                      border: '1px solid var(--color-border)', borderRadius: 6,
+                      cursor: 'pointer', textAlign: 'left',
+                    }}
+                    onClick={() => handlePaste(ch)}
+                  >
+                    {tToolbar(CHAPTER_LABEL_KEYS[ch])}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  style={{
+                    display: 'block', width: '100%', padding: '10px 16px',
+                    marginTop: 8, background: 'transparent',
+                    border: '1px solid var(--color-border)', borderRadius: 6,
+                    cursor: 'pointer', color: 'var(--color-text-secondary)',
+                  }}
+                  onClick={() => setIsPasteDialogOpen(false)}
+                >
+                  取消
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* E4: Analytics button */}
           <button

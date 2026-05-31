@@ -16,6 +16,8 @@
  * - Esc: Cancel / close dialogs
  * - Cmd+S: Save canvas (P001-E2)
  * - Cmd+I: Open AI sessions panel (P001-E2)
+ * - Cmd+C: Copy selected canvas nodes (S46-E3)
+ * - Cmd+V: Paste canvas nodes (S46-E3)
  *
  * P003: Dynamically reads shortcutStore to register custom shortcuts at runtime.
  *
@@ -77,6 +79,10 @@ interface KeyboardShortcutsOptions {
   onSaveCanvas?: () => void;
   /** [P001-E2] Open AI sessions panel (Cmd+I) */
   onOpenAIPanel?: () => void;
+  /** [S46-E3] Copy selected canvas nodes (Cmd+C) */
+  onCopyNodes?: () => void;
+  /** [S46-E3] Paste canvas nodes (Cmd+V) */
+  onPasteNodes?: () => void;
   /** Whether shortcuts should be active */
   enabled?: boolean;
 }
@@ -105,7 +111,9 @@ type ActionName =
   | 'help'
   | 'open-oplog'
   | 'save-canvas'
-  | 'open-ai-panel';
+  | 'open-ai-panel'
+  | 'copy-nodes'
+  | 'paste-nodes';
 
 // Actions that have hardcoded handlers in useKeyboardShortcuts.
 // The dynamic shortcutStore system should NOT re-register these to avoid duplicate calls.
@@ -134,6 +142,8 @@ const HARDCODE_ACTIONS = new Set<ActionName>([
   'open-oplog',
   'save-canvas',
   'open-ai-panel',
+  'copy-nodes',
+  'paste-nodes',
 ]);
 
 function isInTextInput(target: EventTarget | null): boolean {
@@ -198,6 +208,8 @@ export function useKeyboardShortcuts({
   onOpenOplog,
   onSaveCanvas,
   onOpenAIPanel,
+  onCopyNodes,
+  onPasteNodes,
   enabled = true,
 }: KeyboardShortcutsOptions) {
   // P003 U1-P003: action map from shortcutStore action names to callbacks
@@ -226,6 +238,8 @@ export function useKeyboardShortcuts({
       'open-oplog': onOpenOplog as () => void,
       'save-canvas': onSaveCanvas as () => void,
       'open-ai-panel': onOpenAIPanel as () => void,
+      'copy-nodes': onCopyNodes as () => void,
+      'paste-nodes': onPasteNodes as () => void,
     }),
     [
       undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset,
@@ -496,6 +510,23 @@ export function useKeyboardShortcuts({
         onOpenAIPanel?.();
         return;
       }
+
+      // === [S46-E3] Copy Nodes: Ctrl+C / Cmd+C ===
+      // Note: browser default copy is also triggered, but we want canvas-node copy
+      if ((isCtrl || isMeta) && e.key.toLowerCase() === 'c') {
+        if (isInputFocused) return;
+        e.preventDefault();
+        onCopyNodes?.();
+        return;
+      }
+
+      // === [S46-E3] Paste Nodes: Ctrl+V / Cmd+V ===
+      if ((isCtrl || isMeta) && e.key.toLowerCase() === 'v') {
+        if (isInputFocused) return;
+        e.preventDefault();
+        onPasteNodes?.();
+        return;
+      }
     }
 
     document.addEventListener('keydown', handler);
@@ -505,6 +536,7 @@ export function useKeyboardShortcuts({
     onDelete, onSelectAll, onClearSelection, onNewNode,
     onQuickGenerate, onConfirmSelected, onGenerateContext,
     onSwitchToContext, onSwitchToFlow, onSwitchToComponent, onNextTab, onPrevTab, onDesignReview,
-    onHelp, onOpenOplog, onSaveCanvas, onOpenAIPanel, enabled,
+    onHelp, onOpenOplog, onSaveCanvas, onOpenAIPanel,
+    onCopyNodes, onPasteNodes, enabled,
   ]);
 }

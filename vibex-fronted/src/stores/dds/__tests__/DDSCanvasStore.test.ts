@@ -5,6 +5,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useDDSCanvasStore, ddsChapterActions, getVisibleNodes } from '../DDSCanvasStore';
+import { useClipboardStore } from '../../clipboardStore';
 import type { DDSEdge, UserStoryCard, BoundedContextCard, FlowStepCard } from '@/types/dds';
 
 describe('DDSCanvasStore — crossChapterEdges (Epic4 E4-U1/E4-U2)', () => {
@@ -748,5 +749,110 @@ describe('DDSCanvasStore — Epic2: 冲突可视化 (E2-U2)', () => {
     useDDSCanvasStore.setState({ conflictedCardId: 'card-1' });
     expect(useDDSCanvasStore.getState().collapsedGroups.has('group-1')).toBe(true);
     expect(useDDSCanvasStore.getState().conflictedCardId).toBe('card-1');
+  });
+});
+
+describe('DDSCanvasStore — copyCards / pasteCards (S46-E3)', () => {
+  const resetStore = () => {
+    useDDSCanvasStore.setState({
+      projectId: null,
+      activeChapter: 'requirement',
+      chapters: {
+        requirement: { type: 'requirement', cards: [
+          { id: 'card-1', title: 'R1', description: '', type: 'requirement', parentId: null, children: [], position: { x: 0, y: 0 }, status: 'draft', priority: 'medium', tags: [], createdAt: '', updatedAt: '', collapsed: false, isLocked: false, isFavorite: false, confirmed: false, metadata: {} },
+          { id: 'card-2', title: 'R2', description: '', type: 'requirement', parentId: null, children: [], position: { x: 100, y: 0 }, status: 'draft', priority: 'medium', tags: [], createdAt: '', updatedAt: '', collapsed: false, isLocked: false, isFavorite: false, confirmed: false, metadata: {} },
+        ], edges: [
+          { id: 'e1', source: 'card-1', target: 'card-2', type: 'smoothstep', sourceChapter: 'requirement', targetChapter: 'requirement' },
+        ], loading: false, error: null },
+        context: { type: 'context', cards: [], edges: [], loading: false, error: null },
+        flow: { type: 'flow', cards: [], edges: [], loading: false, error: null },
+        api: { type: 'api', cards: [], edges: [], loading: false, error: null },
+        'business-rules': { type: 'business-rules', cards: [], edges: [], loading: false, error: null },
+      },
+      crossChapterEdges: [],
+      chatHistory: [],
+      isGenerating: false,
+      selectedCardIds: [],
+      selectedCardSnapshot: null,
+      isFullscreen: false,
+      isDrawerOpen: false,
+      collapsedGroups: new Set<string>(),
+    });
+  };
+
+  beforeEach(() => {
+    resetStore();
+    useClipboardStore.setState({ entry: null });
+  });
+
+  it('copyCards copies selected cards to clipboardStore', () => {
+    ddsChapterActions.copyCards('requirement', ['card-1', 'card-2']);
+
+    const entry = useClipboardStore.getState().entry;
+    expect(entry).not.toBeNull();
+    expect(entry!.cards).toHaveLength(2);
+    expect(entry!.sourceChapter).toBe('requirement');
+  });
+
+  it('copyCards only copies cards that match the given IDs', () => {
+    ddsChapterActions.copyCards('requirement', ['card-1']);
+
+    const entry = useClipboardStore.getState().entry!;
+    expect(entry.cards).toHaveLength(1);
+    expect(entry.cards[0].id).toBe('card-1');
+  });
+
+  it('pasteCards returns empty array when clipboard is empty', () => {
+    const result = ddsChapterActions.pasteCards('context');
+    expect(result).toHaveLength(0);
+  });
+
+  it('pasteCards adds cards to target chapter with new IDs', () => {
+    ddsChapterActions.copyCards('requirement', ['card-1']);
+    const pasted = ddsChapterActions.pasteCards('context');
+
+    expect(pasted).toHaveLength(1);
+    const ctxCards = useDDSCanvasStore.getState().chapters.context.cards;
+    expect(ctxCards).toHaveLength(1);
+    expect(ctxCards[0].id).toBe(pasted[0]);
+    expect(ctxCards[0].title).toBe('R1');
+  });
+
+  it('pasteCards generates different IDs from originals', () => {
+    ddsChapterActions.copyCards('requirement', ['card-1']);
+    const pasted = ddsChapterActions.pasteCards('flow');
+
+    const origCard = useDDSCanvasStore.getState().chapters.requirement.cards[0];
+    expect(pasted[0]).not.toBe(origCard.id);
+  });
+
+  it('pasteCards offsets position by 30px per paste count', () => {
+    ddsChapterActions.copyCards('requirement', ['card-1']);
+    ddsChapterActions.pasteCards('flow');
+    const pasted1 = ddsChapterActions.pasteCards('flow');
+    const pasted2 = ddsChapterActions.pasteCards('flow');
+
+    const flowCards = useDDSCanvasStore.getState().chapters.flow.cards;
+    expect(flowCards[0].position.y).toBe(0);   // pasteCount=1 → offset 0
+    expect(flowCards[1].position.y).toBe(30);  // pasteCount=2 → offset 30
+    expect(flowCards[2].position.y).toBe(60);  // pasteCount=3 → offset 60
+  });
+
+  it('pasteCards re-maps edges between pasted cards', () => {
+    ddsChapterActions.copyCards('requirement', ['card-1', 'card-2']);
+    const pasted = ddsChapterActions.pasteCards('flow');
+
+    const flowEdges = useDDSCanvasStore.getState().chapters.flow.edges;
+    expect(flowEdges).toHaveLength(1);
+    expect(flowEdges[0].source).toBe(pasted[0]);
+    expect(flowEdges[0].target).toBe(pasted[1]);
+  });
+
+  it('pasteCards preserves card timestamps in cards but updates createdAt/updatedAt', () => {
+    ddsChapterActions.copyCards('requirement', ['card-1']);
+    const pasted = ddsChapterActions.pasteCards('flow');
+    const pastedCard = useDDSCanvasStore.getState().chapters.flow.cards[0];
+    expect(pastedCard.createdAt).not.toBe('');
+    expect(pastedCard.updatedAt).not.toBe('');
   });
 });

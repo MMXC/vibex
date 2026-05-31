@@ -19,6 +19,8 @@ import type {
   DDSEdge,
   DDSCanvasStoreState,
 } from '@/types/dds';
+import { useClipboardStore } from '@/stores/clipboardStore';
+import { generateId } from '@/lib/canvas/id';
 
 // ==================== Initial Chapter Data ====================
 
@@ -169,6 +171,10 @@ type ChapterActions = {
   deleteCrossChapterEdge: (id: string) => void;
   /** 批量设置章节数据（E2 Import） */
   setChapters: (chapters: ChapterData[]) => void;
+  /** [S46-E3] Copy cards to clipboard */
+  copyCards: (chapter: ChapterType, cardIds: string[]) => void;
+  /** [S46-E3] Paste cards from clipboard to target chapter; returns pasted card IDs */
+  pasteCards: (targetChapter: ChapterType) => string[];
 };
 
 export const ddsChapterActions: ChapterActions = {
@@ -251,6 +257,63 @@ export const ddsChapterActions: ChapterActions = {
       }
       return { chapters: next };
     }),
+
+  // ---- [S46-E3] Copy / Paste ----
+
+  copyCards: (chapter, cardIds) => {
+    const { chapters } = useDDSCanvasStore.getState();
+    const cards = chapters[chapter].cards.filter((c) => cardIds.includes(c.id));
+    useClipboardStore.getState().copyCards(cards, chapter);
+  },
+
+  pasteCards: (targetChapter) => {
+    const entry = useClipboardStore.getState().pasteCards();
+    if (!entry) return [];
+
+    // Generate new IDs for cards and edges
+    const oldToNew: Record<string, string> = {};
+    const newCards: DDSCard[] = entry.cards.map((c) => {
+      const newId = generateId();
+      oldToNew[c.id] = newId;
+      return { ...c, id: newId, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+    });
+
+    // Paste offset: first paste (pasteCount=1) → 0 offset, each subsequent pastes by 30px
+    const offset = (entry.pasteCount - 1) * 30;
+    const offsetCards = newCards.map((c) => ({
+      ...c,
+      position: {
+        x: (c.position?.x ?? 0) + offset,
+        y: (c.position?.y ?? 0) + offset,
+      },
+    }));
+
+    // Find edges from source cards that are being pasted, and re-map their endpoints
+    const state = useDDSCanvasStore.getState();
+    const sourceEdges = state.chapters[entry.sourceChapter].edges.filter(
+      (e) => oldToNew[e.source] != null && oldToNew[e.target] != null
+    );
+    const newEdges: DDSEdge[] = sourceEdges.map((e) => ({
+      ...e,
+      id: generateId(),
+      source: oldToNew[e.source] ?? e.source,
+      target: oldToNew[e.target] ?? e.target,
+    }));
+
+    // Add to target chapter
+    useDDSCanvasStore.setState((s) => ({
+      chapters: {
+        ...s.chapters,
+        [targetChapter]: {
+          ...s.chapters[targetChapter],
+          cards: [...s.chapters[targetChapter].cards, ...offsetCards],
+          edges: [...s.chapters[targetChapter].edges, ...newEdges],
+        },
+      },
+    }));
+
+    return newCards.map((c) => c.id);
+  },
 };
 
 // ==================== Selectors ====================

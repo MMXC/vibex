@@ -17,7 +17,9 @@
     "chapterApi": "API",
     "chapterBusinessRules": "Business Rules",
     "templateGallery": "Templates",
-    "saveTemplate": "Save as Template"
+    "saveTemplate": "Save as Template",
+    "copy": "Copy",
+    "paste": "Paste"
   },
   "export": {
     "title": "Export / Import",

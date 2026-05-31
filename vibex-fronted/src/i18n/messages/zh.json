@@ -17,7 +17,9 @@
     "chapterApi": "API",
     "chapterBusinessRules": "业务规则",
     "templateGallery": "模板",
-    "saveTemplate": "保存为模板"
+    "saveTemplate": "保存为模板",
+    "copy": "复制",
+    "paste": "粘贴"
   },
   "export": {
     "title": "导出/导入",

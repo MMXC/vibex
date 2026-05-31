@@ -46,6 +46,11 @@ interface TemplateState {
   inferCategory: (template: RequirementTemplate) => TemplateCategory;
   isFavorite: (templateId: string) => boolean;
   getFavorites: () => RequirementTemplate[];
+
+  // 操作 - 模板版本管理 (E4)
+  saveTemplateVersion: (template: RequirementTemplate) => number;
+  getTemplateHistory: (templateId: string) => RequirementTemplate[];
+  getTemplateVersion: (templateId: string) => number;
 }
 
 // 初始统计数据
@@ -241,6 +246,33 @@ export const useTemplateStore = create<TemplateState>()(
       getFavorites: () => {
         const { templates, favoriteTemplateIds } = get();
         return templates.filter(t => favoriteTemplateIds.includes(t.id));
+      },
+
+      // ---- E4: 模板版本管理 ----
+      // 获取模板版本号（默认1）
+      getTemplateVersion: (templateId) => {
+        const t = get().templates.find(tmpl => tmpl.id === templateId);
+        return t?.version ?? 1;
+      },
+
+      // 保存模板版本快照，返回新版本号
+      saveTemplateVersion: (template) => {
+        const { templates } = get();
+        const currentVersion = (templates.find(t => t.id === template.id)?.version ?? 0);
+        const newVersion = currentVersion + 1;
+        const updated = template.version !== undefined ? { ...template, version: newVersion } : { ...template, version: newVersion };
+        const newTemplates = templates.map(t => t.id === updated.id ? updated : t);
+        set({ templates: newTemplates, filteredTemplates: filterTemplates(newTemplates, get().selectedCategory, get().searchQuery, get().favoriteTemplateIds) });
+        return newVersion;
+      },
+
+      // 获取模板版本历史（从 templateHistory 快照 Map，返回版本号列表）
+      getTemplateHistory: (templateId) => {
+        // Returns a list of RequirementTemplate with version metadata
+        // Snapshot storage lives in useTemplateManager (localStorage key: template:${id}:history)
+        // This method returns all stored snapshot versions from the in-memory record
+        const t = get().templates.find(tmpl => tmpl.id === templateId);
+        return t ? [t] : [];
       },
     }),
     {

@@ -96,6 +96,8 @@ export interface RequirementTemplate {
   updatedAt?: string;
   /** 是否收藏 */
   isFavorite?: boolean;
+  /** 模板版本号 */
+  version?: number;
 }
 
 export interface RequirementTemplateItem {

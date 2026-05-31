@@ -5,6 +5,12 @@
 - **E1 Vitest**: `agentStore.test.ts` 14/14 PASS
 - 提交: 6b8b94800
 
+##### S47-P001-E2: 键盘快捷键扩展验证
+- **E2 验证**: Sprint46 E2 baseline 验证 — `useKeyboardShortcuts` hook (Cmd+S save, Cmd+K AI panel, Cmd+Shift+Z redo), ShortcutPanel.tsx with shortcuts list, `shortcuts` i18n namespace (en + zh)
+- **E2 Vitest**: `ShortcutPanel.test.tsx` 9/9 PASS, `useKeyboardShortcuts.test.ts` PASS
+- 提交: dc9e21cae
+
+
 
 ### [Unreleased] Sprint 46 — E1 AI Session 搜索 + E2 键盘快捷键扩展 + E3 画布节点复制/粘贴
 ##### S46-P001-E1: AI Session 搜索 + 历史会话管理

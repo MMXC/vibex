@@ -5398,6 +5398,12 @@ All notable changes to this project will be documented in this file.
 ##### S48-P001-E1: Canvas List 持久化 + 搜索增强
 - **E1 canvasListStore**: 新增 `searchTerm` state + `setSearchTerm`/`getFilteredCanvases` actions（按名称大小写不敏感过滤）
 - **E1 canvasListStore**: 新增 `thumbnailCache` + `cacheThumbnail`/`getCachedThumbnail` actions（避免同一 canvasId 重复生成 toDataURL）
+
+##### S48-P001-E2: Canvas 导出 PDF + 批量导出
+- **E2 canvasListStore**: 新增 `selectedCanvasIds: Set<string>` + `toggleSelect`/`clearSelection`/`exportSelectedPDF` actions
+- **E2 CanvasListPanel**: 新增 checkbox 多选 UI + "导出已选 (N)" 批量导出按钮 + "✕" 清除选择按钮
+- **E2 CanvasListPanel.module.css**: 新增 checkbox、选中状态、导出按钮样式
+- **E2 useCanvasExport.test.ts**: 9 tests covering PDF API call, batch export, blob handling, store selection state (9/9 PASS)
 - **E1 useCanvasList**: 暴露 `searchTerm`, `getFilteredCanvases`, `cacheThumbnail`, `getCachedThumbnail`
 - **E1 CanvasListPanel**: 新增搜索输入框（带清除按钮），搜索时有结果显示过滤列表，无结果显示空状态
 - **E1 CanvasListPanel.module.css**: 新建 CSS Module，定义面板、搜索框、排序按钮、列表项等全部样式

@@ -41,6 +41,18 @@ interface AgentActions {
 
 export type AgentStore = AgentState & AgentActions;
 
+/**
+ * S46-E1: Build searchableText from session name + task + first user message.
+ */
+function buildSearchableText(session: AgentSession): string {
+  const parts: string[] = [];
+  if (session.name) parts.push(session.name);
+  parts.push(session.task);
+  const firstUserMsg = session.messages.find((m) => m.role === 'user');
+  if (firstUserMsg) parts.push(firstUserMsg.content);
+  return parts.join(' ').toLowerCase();
+}
+
 export const useAgentStore = create<AgentStore>((set) => ({
   sessions: [],
   activeSessionKey: null,
@@ -48,17 +60,22 @@ export const useAgentStore = create<AgentStore>((set) => ({
 
   addSession: (session) =>
     set((state) => {
-      const newSessions = [session, ...state.sessions].slice(0, 50);
-      // Persist to IndexedDB (async, non-blocking)
-      void persistSession(session);
+      // S46-E1: build searchableText before persisting
+      const enriched = { ...session, searchableText: buildSearchableText(session) };
+      const newSessions = [enriched, ...state.sessions].slice(0, 50);
+      void persistSession(enriched);
       void initAgentDB(); // ensure DB is open
       return { sessions: newSessions, activeSessionKey: session.sessionKey };
     }),
 
   updateSession: (sessionKey, updates) =>
     set((state) => {
+      const existing = state.sessions.find((s) => s.sessionKey === sessionKey);
+      const merged = existing ? { ...existing, ...updates } : null;
       const updated = state.sessions.map((s) =>
-        s.sessionKey === sessionKey ? { ...s, ...updates } : s
+        s.sessionKey === sessionKey && merged
+          ? { ...merged, searchableText: buildSearchableText(merged) }
+          : s
       );
       const updatedSession = updated.find((s) => s.sessionKey === sessionKey);
       if (updatedSession) {
@@ -82,13 +99,18 @@ export const useAgentStore = create<AgentStore>((set) => ({
   setActiveSession: (sessionKey) => set({ activeSessionKey: sessionKey }),
 
   addMessage: (sessionKey, message) =>
-    set((state) => ({
-      sessions: state.sessions.map((s) =>
-        s.sessionKey === sessionKey
-          ? { ...s, messages: [...s.messages, message] }
-          : s
-      ),
-    })),
+    set((state) => {
+      const existing = state.sessions.find((s) => s.sessionKey === sessionKey);
+      if (!existing) return {};
+      const withMessage = { ...existing, messages: [...existing.messages, message] };
+      const withSearchable = { ...withMessage, searchableText: buildSearchableText(withMessage) };
+      void persistSession(withSearchable); // S46-E1: update IndexedDB with new searchableText
+      return {
+        sessions: state.sessions.map((s) =>
+          s.sessionKey === sessionKey ? withSearchable : s
+        ),
+      };
+    }),
 
   clearSessions: () => set({ sessions: [], activeSessionKey: null }),
 

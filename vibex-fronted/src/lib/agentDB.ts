@@ -9,7 +9,7 @@ import { openDB, type IDBPDatabase } from 'idb';
 import type { AgentSession } from '@/services/agent/CodingAgentService';
 
 const DB_NAME = 'vibex-agent-sessions';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE = 'sessions';
 
 let _db: IDBPDatabase | null = null;
@@ -17,15 +17,31 @@ let _db: IDBPDatabase | null = null;
 /**
  * Initialize the IndexedDB database.
  * Safe to call multiple times — returns existing instance if already open.
+ * S46-E1: Bumped to v2, adds searchableText index for session search.
  */
 export async function initAgentDB(): Promise<IDBPDatabase> {
   if (_db) return _db;
   _db = await openDB(DB_NAME, DB_VERSION, {
-    upgrade(db) {
-      if (!db.objectStoreNames.contains(STORE)) {
-        const store = db.createObjectStore(STORE, { keyPath: 'sessionKey' });
-        store.createIndex('createdAt', 'createdAt');
-        store.createIndex('status', 'status');
+    upgrade(db, oldVersion) {
+      if (oldVersion < 1) {
+        if (!db.objectStoreNames.contains(STORE)) {
+          const store = db.createObjectStore(STORE, { keyPath: 'sessionKey' });
+          store.createIndex('createdAt', 'createdAt');
+          store.createIndex('status', 'status');
+        }
+      }
+      // S46-E1: Add searchableText index
+      if (oldVersion < 2) {
+        if (!db.objectStoreNames.contains(STORE)) {
+          const store = db.createObjectStore(STORE, { keyPath: 'sessionKey' });
+          store.createIndex('createdAt', 'createdAt');
+          store.createIndex('status', 'status');
+        } else {
+          const store = db.transaction(STORE).objectStore(STORE);
+          if (!store.indexNames.contains('searchableText')) {
+            store.createIndex('searchableText', 'searchableText');
+          }
+        }
       }
     },
   });

@@ -271,7 +271,11 @@
     "noSessionsHint": "在原型或 DDS 画布中触发 AI Coding Agent",
     "statusLabel": "状态",
     "aiRetrying": "正在重试连接…",
-    "aiStreamFailed": "连接失败，已尝试 {maxRetries} 次"
+    "aiStreamFailed": "连接失败，已尝试 {maxRetries} 次",
+    "searchSessionsPlaceholder": "搜索会话...",
+    "searchSessionsAria": "搜索会话",
+    "clearSearch": "清除",
+    "noSearchResults": "没有匹配的会话"
   },
   "shortcuts": {
     "title": "快捷键",

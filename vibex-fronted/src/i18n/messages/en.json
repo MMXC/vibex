@@ -271,7 +271,11 @@
     "noSessionsHint": "Trigger AI Coding Agent from prototype or DDS canvas",
     "statusLabel": "Status",
     "aiRetrying": "Retrying connection…",
-    "aiStreamFailed": "Connection failed after {maxRetries} attempts"
+    "aiStreamFailed": "Connection failed after {maxRetries} attempts",
+    "searchSessionsPlaceholder": "Search sessions...",
+    "searchSessionsAria": "Search sessions",
+    "clearSearch": "Clear",
+    "noSearchResults": "No sessions match your search"
   },
   "shortcuts": {
     "title": "Keyboard Shortcuts",

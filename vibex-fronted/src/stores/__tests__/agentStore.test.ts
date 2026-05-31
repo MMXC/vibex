@@ -2,6 +2,7 @@
  * agentStore.injectContext — Unit Tests
  * Sprint 6 U5: Agent Session Management
  * Sprint44 P001-E1: IndexedDB persistence tests
+ * Sprint46 P001-E1: session search tests
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
@@ -100,7 +101,8 @@ describe('agentStore S44-E1: IndexedDB persistence', () => {
     const session = makeSession();
     useAgentStore.getState().addSession(session);
     const state = useAgentStore.getState();
-    expect(state.sessions).toContain(session);
+    // S46-E1: session is enriched with searchableText, use objectContaining
+    expect(state.sessions).toContainEqual(expect.objectContaining({ sessionKey: session.sessionKey }));
     expect(state.activeSessionKey).toBe(session.sessionKey);
   });
 
@@ -115,7 +117,8 @@ describe('agentStore S44-E1: IndexedDB persistence', () => {
   it('removeSession removes session from store', async () => {
     const session = makeSession();
     useAgentStore.getState().addSession(session);
-    expect(useAgentStore.getState().sessions).toContain(session);
+    // S46-E1: session is enriched with searchableText
+    expect(useAgentStore.getState().sessions).toContainEqual(expect.objectContaining({ sessionKey: session.sessionKey }));
     useAgentStore.getState().removeSession(session.sessionKey);
     expect(useAgentStore.getState().sessions).not.toContainEqual(expect.objectContaining({ sessionKey: session.sessionKey }));
   });
@@ -128,5 +131,85 @@ describe('agentStore S44-E1: IndexedDB persistence', () => {
     await useAgentStore.getState().initAgentSessions();
     const state = useAgentStore.getState();
     expect(state.sessions.length).toBeGreaterThanOrEqual(2);
+  });
+});
+
+// S46-E1: Session search — searchableText build + filter
+describe('agentStore S46-E1: session search', () => {
+  beforeEach(async () => {
+    Object.keys(mockDB).forEach((k) => delete mockDB[k]);
+    useAgentStore.setState({ sessions: [], activeSessionKey: null, codeGenContext: null });
+    vi.clearAllMocks();
+  });
+
+  it('addSession builds searchableText from name + task', () => {
+    const session = makeSession({
+      sessionKey: 'search-1',
+      name: 'My Session',
+      task: 'Implement login flow',
+      messages: [],
+    });
+    useAgentStore.getState().addSession(session);
+    const state = useAgentStore.getState();
+    const found = state.sessions.find((s) => s.sessionKey === 'search-1');
+    expect(found?.searchableText).toBe('my session implement login flow');
+  });
+
+  it('addSession builds searchableText from task only when name is missing', () => {
+    const session = makeSession({
+      sessionKey: 'search-2',
+      name: undefined,
+      task: 'Build user dashboard',
+      messages: [],
+    });
+    useAgentStore.getState().addSession(session);
+    const state = useAgentStore.getState();
+    const found = state.sessions.find((s) => s.sessionKey === 'search-2');
+    expect(found?.searchableText).toBe('build user dashboard');
+  });
+
+  it('addSession builds searchableText including first user message', () => {
+    const session = makeSession({
+      sessionKey: 'search-3',
+      name: 'API Design',
+      task: 'Design REST API',
+      messages: [
+        { id: 'm1', role: 'user', content: 'Create endpoints for users and posts', timestamp: 0 },
+        { id: 'm2', role: 'agent', content: 'Here are the endpoints:', timestamp: 1 },
+      ],
+    });
+    useAgentStore.getState().addSession(session);
+    const state = useAgentStore.getState();
+    const found = state.sessions.find((s) => s.sessionKey === 'search-3');
+    expect(found?.searchableText).toContain('api design');
+    expect(found?.searchableText).toContain('create endpoints for users and posts');
+  });
+
+  it('updateSession with name change rebuilds searchableText', () => {
+    const session = makeSession({ sessionKey: 'search-4', name: 'Old Name', task: 'Test task' });
+    useAgentStore.getState().addSession(session);
+    useAgentStore.getState().updateSession('search-4', { name: 'New Name' });
+    const state = useAgentStore.getState();
+    const found = state.sessions.find((s) => s.sessionKey === 'search-4');
+    expect(found?.searchableText).toBe('new name test task');
+  });
+
+  it('updateSession with message addition rebuilds searchableText', () => {
+    const session = makeSession({
+      sessionKey: 'search-5',
+      name: 'Search Test',
+      task: 'Unit tests',
+      messages: [],
+    });
+    useAgentStore.getState().addSession(session);
+    useAgentStore.getState().addMessage('search-5', {
+      id: 'msg-1',
+      role: 'user',
+      content: 'Add more test coverage',
+      timestamp: 1,
+    });
+    const state = useAgentStore.getState();
+    const found = state.sessions.find((s) => s.sessionKey === 'search-5');
+    expect(found?.searchableText).toContain('add more test coverage');
   });
 });

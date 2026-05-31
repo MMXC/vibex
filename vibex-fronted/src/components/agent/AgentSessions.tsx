@@ -2,13 +2,14 @@
  * AgentSessions.tsx — Sprint6 U5: Agent Session Management
  * Sprint40 P001-E1: i18n — hardcoded text replaced with useTranslations('ai')()
  * Sprint44 P001-E1: session naming — double-click to rename
+ * Sprint46 P001-E1: session search — searchableText filter + match highlight
  *
- * Displays session list, status badges, and terminate controls.
+ * Displays session list, status badges, terminate controls, and search.
  */
 
 'use client';
 
-import React, { memo, useState, useCallback } from 'react';
+import React, { memo, useState, useCallback, useMemo } from 'react';
 import { useAgentStore } from '@/stores/agentStore';
 import { terminateSession } from '@/services/agent/CodingAgentService';
 import type { AgentSessionStatus } from '@/services/agent/CodingAgentService';
@@ -23,6 +24,8 @@ interface SessionCardProps {
   createdAt: number;
   isActive: boolean;
   t: (key: string) => string;
+  /** S46-E1: search query for match highlighting */
+  searchQuery?: string;
 }
 
 const SessionCard = memo(function SessionCard({
@@ -33,6 +36,7 @@ const SessionCard = memo(function SessionCard({
   createdAt,
   isActive,
   t,
+  searchQuery,
 }: SessionCardProps) {
   const { setActiveSession, removeSession, updateSession } = useAgentStore();
   const [editing, setEditing] = useState(false);
@@ -90,6 +94,25 @@ const SessionCard = memo(function SessionCard({
     return `${Math.floor(diff / 3600)}h ${t('timeAgoSuffix') ?? 'ago'}`;
   };
 
+  /**
+   * S46-E1: Highlight matched text with <mark> tags.
+   * Returns an array of React nodes with match segments wrapped in <mark>.
+   */
+  const highlightMatch = (text: string, query: string): React.ReactNode => {
+    if (!query.trim()) return text;
+    const idx = text.toLowerCase().indexOf(query.toLowerCase());
+    if (idx === -1) return text;
+    return (
+      <>
+        {text.slice(0, idx)}
+        <mark className={styles.searchHighlight}>{text.slice(idx, idx + query.length)}</mark>
+        {text.slice(idx + query.length)}
+      </>
+    );
+  };
+
+  const displayText = (name || task) ?? t('noTitle');
+
   return (
     <div
       className={`${styles.sessionCard} ${isActive ? styles.sessionCardActive : ''}`}
@@ -128,7 +151,7 @@ const SessionCard = memo(function SessionCard({
             title={t('doubleClickToRename') ?? 'Double-click to rename'}
             style={{ cursor: 'text' }}
           >
-            {(name || task) ?? t('noTitle')}
+            {highlightMatch(displayText, searchQuery ?? '')}
           </span>
         )}
       </div>
@@ -157,9 +180,66 @@ const SessionCard = memo(function SessionCard({
   );
 });
 
+/** S46-E1: Search input component */
+const SearchInput = memo(function SearchInput({
+  value,
+  onChange,
+  t,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  t: (key: string) => string;
+}) {
+  return (
+    <div className={styles.searchContainer}>
+      <svg
+        className={styles.searchIcon}
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        aria-hidden="true"
+      >
+        <circle cx="11" cy="11" r="8" />
+        <path d="M21 21l-4.35-4.35" />
+      </svg>
+      <input
+        type="text"
+        className={styles.searchInput}
+        placeholder={t('searchSessionsPlaceholder') ?? 'Search sessions...'}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        aria-label={t('searchSessionsAria') ?? 'Search sessions'}
+      />
+      {value && (
+        <button
+          type="button"
+          className={styles.searchClearBtn}
+          onClick={() => onChange('')}
+          aria-label={t('clearSearch') ?? 'Clear search'}
+        >
+          ×
+        </button>
+      )}
+    </div>
+  );
+});
+
 export const AgentSessions = memo(function AgentSessions() {
   const t = useTranslations('ai')();
   const { sessions, activeSessionKey } = useAgentStore();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  /** S46-E1: Filter sessions by searchableText match */
+  const filteredSessions = useMemo(() => {
+    if (!searchQuery.trim()) return sessions;
+    const q = searchQuery.toLowerCase();
+    return sessions.filter(
+      (s) => s.searchableText?.toLowerCase().includes(q)
+    );
+  }, [sessions, searchQuery]);
 
   if (sessions.length === 0) {
     return (
@@ -177,20 +257,31 @@ export const AgentSessions = memo(function AgentSessions() {
     <div className={styles.sessionsList}>
       <div className={styles.sessionsHeader}>
         <span className={styles.sessionsTitle}>{t('sessionList')}</span>
-        <span className={styles.sessionsCount}>{sessions.length}</span>
+        <span className={styles.sessionsCount}>
+          {searchQuery ? `${filteredSessions.length}/${sessions.length}` : sessions.length}
+        </span>
       </div>
-      {sessions.map((session) => (
-        <SessionCard
-          key={session.sessionKey}
-          sessionKey={session.sessionKey}
-          name={session.name}
-          task={session.task}
-          status={session.status}
-          createdAt={session.createdAt}
-          isActive={session.sessionKey === activeSessionKey}
-          t={t}
-        />
-      ))}
+      {/* S46-E1: Search input */}
+      <SearchInput value={searchQuery} onChange={setSearchQuery} t={t} />
+      {filteredSessions.length === 0 ? (
+        <div className={styles.noResults}>
+          {t('noSearchResults') ?? 'No sessions match your search'}
+        </div>
+      ) : (
+        filteredSessions.map((session) => (
+          <SessionCard
+            key={session.sessionKey}
+            sessionKey={session.sessionKey}
+            name={session.name}
+            task={session.task}
+            status={session.status}
+            createdAt={session.createdAt}
+            isActive={session.sessionKey === activeSessionKey}
+            t={t}
+            searchQuery={searchQuery}
+          />
+        ))
+      )}
     </div>
   );
 });

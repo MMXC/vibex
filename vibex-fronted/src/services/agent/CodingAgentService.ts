@@ -30,6 +30,8 @@ export interface AgentSession {
   /** S44-E1: branch metadata */
   branches?: AgentBranch[];
   error?: string;
+  /** S46-E1: searchable text field — name + task + first user message */
+  searchableText?: string;
 }
 
 /** S44-E1: Branch metadata for multi-session branching */

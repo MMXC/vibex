@@ -1,3 +1,17 @@
+### [Unreleased] Sprint 46 — E1 AI Session 搜索 + E2 键盘快捷键扩展 + E3 画布节点复制/粘贴
+
+##### S46-P001-E1: AI Session 搜索 + 历史会话管理
+- **E1 agentStore.ts**: add `searchableText` field, update `createSession()` to auto-generate searchable text
+- **E1 AgentSessions.tsx**: add search input with `<mark>` highlight, filter sessions via `sessions.filter(s => s.searchableText.includes(query))`
+- **E1 vitest**: `agentStore.test.ts` → 82/82 PASS
+
+##### S46-P001-E2: 键盘快捷键扩展
+- **E2 useKeyboardShortcuts.ts**: add `onSaveCanvas` callback (Cmd+S / Ctrl+S), `onOpenAIPanel` callback (Cmd+I / Ctrl+I)
+- **E2 shortcutStore.ts**: add `console.warn` on duplicate shortcut key capture
+- **E2 ShortcutPanel.tsx**: add Cmd+S + Cmd+I entries to shortcuts list
+- **E2 i18n**: add 19 shortcut description keys to `shortcuts` namespace (en + zh)
+- **E2 vitest**: `useKeyboardShortcuts.test.ts` → 82/82 PASS
+
 ### [Unreleased] Sprint 45 — E1 AI 断线重连 + E2 Presence 光标 + E3 画布 MiniMap + E4 模板版本管理 + E5 画布快照分享
 
 ##### S45-P001-E1: AI 断线重连 + 流式可靠性

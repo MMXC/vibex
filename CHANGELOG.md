@@ -5418,9 +5418,8 @@ All notable changes to this project will be documented in this file.
 - **E4 AgentSessions.module.css**: 新增 `.favoriteBtn`（星标按钮）、`.tagRow`（标签行）、`.tagChip`（标签 Chip）、`.tagRemoveBtn`（×移除）、`.tagInput`（输入框）、`.tagAddBtn`（+Tag 按钮）
 - **E4 agentStore.test.ts**: 8 个新测试覆盖 `toggleFavorite`、`addTag`、`removeTag` 的正向/幂等/边界场景 (8/8 PASS)
 - **E4 Vitest**: `agentStore.test.ts` 全量 23/23 PASS（含 S44-E1 + S46-E1 + S48-E4 回归）
-- 提交: (待推送)
+- 提交: 7c2b946dc
 
->>>>>>> Stashed changes
 ## [Unreleased] Sprint 47 — AI Session 搜索 / 键盘快捷键 / 画布管理
 
 ##### S47-P001-E1: AI Session 搜索验证 + 历史会话管理

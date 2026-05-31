@@ -15,6 +15,7 @@ export function useCanvasList() {
     canvases,
     activeCanvasId,
     isLoaded,
+    searchTerm,
     loadCanvases,
     createCanvas,
     deleteCanvas,
@@ -22,6 +23,10 @@ export function useCanvasList() {
     setActiveCanvas,
     updateThumbnail,
     getSortedCanvases,
+    setSearchTerm,
+    getFilteredCanvases,
+    cacheThumbnail,
+    getCachedThumbnail,
   } = useCanvasListStore();
 
   useEffect(() => {
@@ -34,12 +39,17 @@ export function useCanvasList() {
     canvases,
     activeCanvasId,
     isLoaded,
+    searchTerm,
     createCanvas,
     deleteCanvas,
     renameCanvas,
     setActiveCanvas,
     updateThumbnail,
     getSortedCanvases,
+    setSearchTerm,
+    getFilteredCanvases,
+    cacheThumbnail,
+    getCachedThumbnail,
   };
 }
 

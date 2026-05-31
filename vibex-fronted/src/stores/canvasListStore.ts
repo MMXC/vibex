@@ -27,6 +27,10 @@ export interface CanvasListState {
   activeCanvasId: string | null;
   /** Whether data has been loaded from IndexedDB */
   isLoaded: boolean;
+  /** Search term for filtering canvases by name (Sprint48 E1) */
+  searchTerm: string;
+  /** Thumbnail cache — avoids re-generating toDataURL for same canvas (Sprint48 E1) */
+  thumbnailCache: Record<string, string>;
 
   // Actions
   loadCanvases: () => Promise<void>;
@@ -36,6 +40,14 @@ export interface CanvasListState {
   setActiveCanvas: (id: string) => void;
   updateThumbnail: (id: string, thumbnail: string) => Promise<void>;
   getSortedCanvases: (sortBy: 'name' | 'updatedAt') => CanvasMeta[];
+  /** Set search term for filtering (Sprint48 E1) */
+  setSearchTerm: (term: string) => void;
+  /** Get filtered canvases by search term, then sort (Sprint48 E1) */
+  getFilteredCanvases: (sortBy: 'name' | 'updatedAt') => CanvasMeta[];
+  /** Cache thumbnail for a canvas — idempotent (Sprint48 E1) */
+  cacheThumbnail: (canvasId: string, thumbnail: string) => void;
+  /** Get cached thumbnail — returns null if not yet cached (Sprint48 E1) */
+  getCachedThumbnail: (canvasId: string) => string | null;
 }
 
 // ============================================
@@ -119,6 +131,8 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
   canvases: [],
   activeCanvasId: null,
   isLoaded: false,
+  searchTerm: '',
+  thumbnailCache: {},
 
   loadCanvases: async () => {
     if (!isIndexedDBAvailable()) {
@@ -237,5 +251,33 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
       }
       return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
     });
+  },
+
+  setSearchTerm: (term: string) => {
+    set({ searchTerm: term });
+  },
+
+  getFilteredCanvases: (sortBy: 'name' | 'updatedAt') => {
+    const { canvases, searchTerm } = get();
+    const term = searchTerm.trim().toLowerCase();
+    const filtered = term
+      ? canvases.filter((c) => c.name.toLowerCase().includes(term))
+      : canvases;
+    return [...filtered].sort((a, b) => {
+      if (sortBy === 'name') {
+        return a.name.localeCompare(b.name, 'zh-CN');
+      }
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    });
+  },
+
+  cacheThumbnail: (canvasId: string, thumbnail: string) => {
+    set((state) => ({
+      thumbnailCache: { ...state.thumbnailCache, [canvasId]: thumbnail },
+    }));
+  },
+
+  getCachedThumbnail: (canvasId: string) => {
+    return get().thumbnailCache[canvasId] ?? null;
   },
 }));

@@ -2,6 +2,7 @@
 
 /**
  * CanvasListPanel.tsx — Sprint47 E4: Canvas List Sidebar UI
+ * Sprint48 E1: 添加搜索过滤功能
  *
  * 侧边栏画布列表 UI：
  * - 显示所有画布缩略图 + 名称
@@ -9,11 +10,13 @@
  * - 删除画布 + 确认 dialog
  * - 双击重命名
  * - 按名称/修改时间排序
+ * - 搜索过滤（Sprint48 E1）
  */
 
 import { useState, useCallback, useRef } from 'react';
 import { useCanvasList } from '@/hooks/useCanvasList';
 import type { CanvasMeta } from '@/stores/canvasListStore';
+import styles from './CanvasListPanel.module.css';
 
 interface CanvasListPanelProps {
   /** Callback when user selects a canvas to open */
@@ -26,12 +29,14 @@ type SortMode = 'updatedAt' | 'name';
 
 export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListPanelProps) {
   const {
-    canvases,
     isLoaded,
+    searchTerm,
     createCanvas,
     deleteCanvas,
     renameCanvas,
     getSortedCanvases,
+    setSearchTerm,
+    getFilteredCanvases,
   } = useCanvasList();
 
   const [sortMode, setSortMode] = useState<SortMode>('updatedAt');
@@ -41,6 +46,7 @@ export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListP
   const editInputRef = useRef<HTMLInputElement>(null);
 
   const sortedCanvases = getSortedCanvases(sortMode);
+  const displayedCanvases = searchTerm ? getFilteredCanvases(sortMode) : sortedCanvases;
 
   const handleCreate = useCallback(async () => {
     const meta = await createCanvas();
@@ -78,25 +84,25 @@ export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListP
 
   if (collapsed) {
     return (
-      <div className="canvas-list-panel canvas-list-panel--collapsed" aria-label="画布列表">
+      <aside className={`${styles['canvas-list-panel']} ${styles['canvas-list-panel--collapsed']}`} aria-label="画布列表">
         <button
-          className="canvas-list-panel__toggle"
+          className={styles['canvas-list-panel__toggle']}
           onClick={() => {/* toggle collapsed */}}
           title="展开画布列表"
         >
           ☰
         </button>
-      </div>
+      </aside>
     );
   }
 
   return (
-    <aside className="canvas-list-panel" aria-label="画布列表">
+    <aside className={styles['canvas-list-panel']} aria-label="画布列表">
       {/* Header */}
-      <div className="canvas-list-panel__header">
-        <h2 className="canvas-list-panel__title">画布列表</h2>
+      <div className={styles['canvas-list-panel__header']}>
+        <h2 className={styles['canvas-list-panel__title']}>画布列表</h2>
         <button
-          className="canvas-list-panel__create-btn"
+          className={styles['canvas-list-panel__create-btn']}
           onClick={handleCreate}
           title="新建画布"
         >
@@ -104,17 +110,39 @@ export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListP
         </button>
       </div>
 
+      {/* Search input (Sprint48 E1) */}
+      <div className={styles['canvas-list-panel__search']}>
+        <input
+          type="search"
+          className={styles['canvas-list-panel__search-input']}
+          placeholder="搜索画布..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          aria-label="搜索画布"
+        />
+        {searchTerm && (
+          <button
+            className={styles['canvas-list-panel__search-clear']}
+            onClick={() => setSearchTerm('')}
+            title="清除搜索"
+            aria-label="清除搜索"
+          >
+            ✕
+          </button>
+        )}
+      </div>
+
       {/* Sort controls */}
-      <div className="canvas-list-panel__sort">
+      <div className={styles['canvas-list-panel__sort']}>
         <button
-          className={`sort-btn${sortMode === 'updatedAt' ? ' sort-btn--active' : ''}`}
+          className={`${styles['sort-btn']}${sortMode === 'updatedAt' ? ` ${styles['sort-btn--active']}` : ''}`}
           onClick={() => setSortMode('updatedAt')}
           title="按修改时间排序"
         >
           最近修改
         </button>
         <button
-          className={`sort-btn${sortMode === 'name' ? ' sort-btn--active' : ''}`}
+          className={`${styles['sort-btn']}${sortMode === 'name' ? ` ${styles['sort-btn--active']}` : ''}`}
           onClick={() => setSortMode('name')}
           title="按名称排序"
         >
@@ -123,50 +151,55 @@ export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListP
       </div>
 
       {/* Canvas list */}
-      <ul className="canvas-list-panel__list" role="listbox" aria-label="画布列表">
+      <ul className={styles['canvas-list-panel__list']} role="listbox" aria-label="画布列表">
         {!isLoaded && (
-          <li className="canvas-list-panel__loading">加载中…</li>
+          <li className={styles['canvas-list-panel__loading']}>加载中…</li>
         )}
         {isLoaded && sortedCanvases.length === 0 && (
-          <li className="canvas-list-panel__empty">
+          <li className={styles['canvas-list-panel__empty']}>
             暂无画布<br />
-            <button onClick={handleCreate} className="canvas-list-panel__empty-create">
+            <button onClick={handleCreate} className={styles['canvas-list-panel__empty-create']}>
               创建第一个画布
             </button>
           </li>
         )}
-        {sortedCanvases.map((canvas) => (
+        {isLoaded && searchTerm && displayedCanvases.length === 0 && (
+          <li className={styles['canvas-list-panel__empty']}>
+            未找到匹配「{searchTerm}」的画布
+          </li>
+        )}
+        {displayedCanvases.map((canvas) => (
           <li
             key={canvas.id}
-            className="canvas-list-panel__item"
+            className={styles['canvas-list-panel__item']}
             role="option"
             aria-selected={false}
             onClick={() => onOpenCanvas?.(canvas.id)}
             onDoubleClick={() => handleStartRename(canvas)}
           >
             {/* Thumbnail */}
-            <div className="canvas-list-panel__thumb">
+            <div className={styles['canvas-list-panel__thumb']}>
               {canvas.thumbnail ? (
                 <img
                   src={canvas.thumbnail}
                   alt={`${canvas.name} 缩略图`}
-                  className="canvas-list-panel__thumb-img"
+                  className={styles['canvas-list-panel__thumb-img']}
                   width={120}
                   height={80}
                 />
               ) : (
-                <div className="canvas-list-panel__thumb-placeholder" aria-hidden="true">
+                <div className={styles['canvas-list-panel__thumb-placeholder']} aria-hidden="true">
                   <span>📄</span>
                 </div>
               )}
             </div>
 
             {/* Name */}
-            <div className="canvas-list-panel__info">
+            <div className={styles['canvas-list-panel__info']}>
               {editingId === canvas.id ? (
                 <input
                   ref={editInputRef}
-                  className="canvas-list-panel__rename-input"
+                  className={styles['canvas-list-panel__rename-input']}
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
                   onBlur={handleRenameCommit}
@@ -175,12 +208,12 @@ export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListP
                   aria-label="重命名画布"
                 />
               ) : (
-                <span className="canvas-list-panel__name" title={canvas.name}>
+                <span className={styles['canvas-list-panel__name']} title={canvas.name}>
                   {canvas.name}
                 </span>
               )}
               <time
-                className="canvas-list-panel__date"
+                className={styles['canvas-list-panel__date']}
                 dateTime={canvas.updatedAt}
                 title={`修改于 ${new Date(canvas.updatedAt).toLocaleString('zh-CN')}`}
               >
@@ -190,7 +223,7 @@ export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListP
 
             {/* Delete button */}
             <button
-              className="canvas-list-panel__delete-btn"
+              className={styles['canvas-list-panel__delete-btn']}
               onClick={(e) => {
                 e.stopPropagation();
                 setConfirmDeleteId(canvas.id);
@@ -206,21 +239,21 @@ export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListP
 
       {/* Delete confirmation dialog */}
       {confirmDeleteId && (
-        <div className="canvas-list-panel__dialog-overlay" role="dialog" aria-modal="true">
-          <div className="canvas-list-panel__dialog">
-            <h3 className="canvas-list-panel__dialog-title">确认删除</h3>
-            <p className="canvas-list-panel__dialog-body">
+        <div className={styles['canvas-list-panel__dialog-overlay']} role="dialog" aria-modal="true">
+          <div className={styles['canvas-list-panel__dialog']}>
+            <h3 className={styles['canvas-list-panel__dialog-title']}>确认删除</h3>
+            <p className={styles['canvas-list-panel__dialog-body']}>
               确定要删除此画布吗？此操作不可撤销。
             </p>
-            <div className="canvas-list-panel__dialog-actions">
+            <div className={styles['canvas-list-panel__dialog-actions']}>
               <button
-                className="canvas-list-panel__dialog-cancel"
+                className={styles['canvas-list-panel__dialog-cancel']}
                 onClick={() => setConfirmDeleteId(null)}
               >
                 取消
               </button>
               <button
-                className="canvas-list-panel__dialog-confirm"
+                className={styles['canvas-list-panel__dialog-confirm']}
                 onClick={handleDeleteConfirm}
               >
                 删除

@@ -15,6 +15,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { useCanvasList } from '@/hooks/useCanvasList';
+import { useCanvasListStore } from '@/stores/canvasListStore';
 import type { CanvasMeta } from '@/stores/canvasListStore';
 import styles from './CanvasListPanel.module.css';
 
@@ -39,14 +40,18 @@ export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListP
     getFilteredCanvases,
   } = useCanvasList();
 
+  const { selectedCanvasIds, toggleSelect, clearSelection, exportSelectedPDF } = useCanvasListStore();
+
   const [sortMode, setSortMode] = useState<SortMode>('updatedAt');
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
+  const [isExporting, setIsExporting] = useState(false);
   const editInputRef = useRef<HTMLInputElement>(null);
 
   const sortedCanvases = getSortedCanvases(sortMode);
   const displayedCanvases = searchTerm ? getFilteredCanvases(sortMode) : sortedCanvases;
+  const selectedCount = selectedCanvasIds.size;
 
   const handleCreate = useCallback(async () => {
     const meta = await createCanvas();
@@ -80,6 +85,25 @@ export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListP
       if (e.key === 'Escape') setEditingId(null);
     },
     [handleRenameCommit]
+  );
+
+  const handleExportSelected = useCallback(async () => {
+    if (selectedCount === 0) return;
+    setIsExporting(true);
+    try {
+      await exportSelectedPDF();
+    } finally {
+      setIsExporting(false);
+      clearSelection();
+    }
+  }, [selectedCount, exportSelectedPDF, clearSelection]);
+
+  const handleItemClick = useCallback(
+    (canvas: CanvasMeta) => {
+      // If user clicked the checkbox area, don't trigger open
+      onOpenCanvas?.(canvas.id);
+    },
+    [onOpenCanvas]
   );
 
   if (collapsed) {
@@ -132,7 +156,7 @@ export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListP
         )}
       </div>
 
-      {/* Sort controls */}
+      {/* Sort controls + batch export (Sprint48 E2) */}
       <div className={styles['canvas-list-panel__sort']}>
         <button
           className={`${styles['sort-btn']}${sortMode === 'updatedAt' ? ` ${styles['sort-btn--active']}` : ''}`}
@@ -148,6 +172,26 @@ export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListP
         >
           名称
         </button>
+        {selectedCount > 0 && (
+          <button
+            className={styles['export-selected-btn']}
+            onClick={handleExportSelected}
+            disabled={isExporting}
+            title={`导出选中的 ${selectedCount} 个画布为 PDF`}
+          >
+            {isExporting ? '导出中…' : `导出已选 (${selectedCount})`}
+          </button>
+        )}
+        {selectedCount > 0 && (
+          <button
+            className={styles['clear-selection-btn']}
+            onClick={clearSelection}
+            title="清除选择"
+            aria-label="清除选择"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       {/* Canvas list */}
@@ -171,12 +215,23 @@ export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListP
         {displayedCanvases.map((canvas) => (
           <li
             key={canvas.id}
-            className={styles['canvas-list-panel__item']}
+            className={`${styles['canvas-list-panel__item']}${selectedCanvasIds.has(canvas.id) ? ` ${styles['canvas-list-panel__item--selected']}` : ''}`}
             role="option"
-            aria-selected={false}
-            onClick={() => onOpenCanvas?.(canvas.id)}
+            aria-selected={selectedCanvasIds.has(canvas.id)}
+            onClick={() => handleItemClick(canvas)}
             onDoubleClick={() => handleStartRename(canvas)}
           >
+            {/* Checkbox for multi-select (Sprint48 E2) */}
+            <input
+              type="checkbox"
+              className={styles['canvas-list-panel__checkbox']}
+              checked={selectedCanvasIds.has(canvas.id)}
+              onChange={() => toggleSelect(canvas.id)}
+              onClick={(e) => e.stopPropagation()}
+              aria-label={`选择 ${canvas.name}`}
+              title="勾选以批量导出"
+            />
+
             {/* Thumbnail */}
             <div className={styles['canvas-list-panel__thumb']}>
               {canvas.thumbnail ? (

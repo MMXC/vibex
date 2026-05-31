@@ -31,6 +31,8 @@ export interface CanvasListState {
   searchTerm: string;
   /** Thumbnail cache — avoids re-generating toDataURL for same canvas (Sprint48 E1) */
   thumbnailCache: Record<string, string>;
+  /** Multi-select set for batch export (Sprint48 E2) */
+  selectedCanvasIds: Set<string>;
 
   // Actions
   loadCanvases: () => Promise<void>;
@@ -48,6 +50,14 @@ export interface CanvasListState {
   cacheThumbnail: (canvasId: string, thumbnail: string) => void;
   /** Get cached thumbnail — returns null if not yet cached (Sprint48 E1) */
   getCachedThumbnail: (canvasId: string) => string | null;
+  /** Toggle canvas selection for batch export (Sprint48 E2) */
+  toggleSelect: (canvasId: string) => void;
+  /** Clear all selections (Sprint48 E2) */
+  clearSelection: () => void;
+  /** Batch export selected canvases as individual PDFs (Sprint48 E2) */
+  exportSelectedPDF: () => Promise<void>;
+  /** Paste clipboard cards to target canvas (Sprint48 E5) */
+  pasteToCanvas: (canvasId: string) => void;
 }
 
 // ============================================
@@ -133,6 +143,7 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
   isLoaded: false,
   searchTerm: '',
   thumbnailCache: {},
+  selectedCanvasIds: new Set(),
 
   loadCanvases: async () => {
     if (!isIndexedDBAvailable()) {
@@ -279,5 +290,64 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
 
   getCachedThumbnail: (canvasId: string) => {
     return get().thumbnailCache[canvasId] ?? null;
+  },
+
+  toggleSelect: (canvasId: string) => {
+    set((state) => {
+      const next = new Set(state.selectedCanvasIds);
+      if (next.has(canvasId)) {
+        next.delete(canvasId);
+      } else {
+        next.add(canvasId);
+      }
+      return { selectedCanvasIds: next };
+    });
+  },
+
+  clearSelection: () => {
+    set({ selectedCanvasIds: new Set() });
+  },
+
+  exportSelectedPDF: async () => {
+    const { selectedCanvasIds, canvases } = get();
+    if (selectedCanvasIds.size === 0) return;
+
+    // For each selected canvas, fetch its data and download as PDF
+    for (const canvasId of selectedCanvasIds) {
+      const meta = canvases.find((c) => c.id === canvasId);
+      if (!meta) continue;
+
+      try {
+        // Fetch PDF from backend API
+        const response = await fetch('/api/export/pdf', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: canvasId, name: meta.name }),
+        });
+
+        if (!response.ok) {
+          console.error(`[canvasListStore] PDF export failed for ${canvasId}: ${response.statusText}`);
+          continue;
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${meta.name.replace(/[^a-zA-Z0-9\u4e00-\u9fa5-]/g, '_')}-${new Date().toISOString().slice(0, 10)}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        console.error(`[canvasListStore] exportSelectedPDF error for ${canvasId}:`, err);
+      }
+    }
+  },
+
+  pasteToCanvas: (canvasId: string) => {
+    // Sprint48 E5: cross-canvas paste — delegates to clipboardStore
+    // This is a stub that will be implemented when clipboardStore crossCanvasPaste is available
+    console.debug('[canvasListStore] pasteToCanvas called for', canvasId);
   },
 }));

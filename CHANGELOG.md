@@ -5404,6 +5404,21 @@ All notable changes to this project will be documented in this file.
 - **E2 Vitest**: `ShortcutPanel.test.tsx` 9/9 PASS, `useKeyboardShortcuts.test.ts` PASS
 - 提交: dc9e21cae
 
+##### S47-P001-E3: 画布节点复制/粘贴验证
+- **E3 验证**: Sprint46 E3 baseline 验证 — `clipboardStore.ts` (localStorage TTL 5min, copyCards + pasteCards), DDSCanvasStore `copyCards`/`pasteCards` actions, `useKeyboardShortcuts` Cmd+C/V bindings, DDSToolbar Copy+Paste buttons
+- **E3 Vitest**: `clipboardStore.test.ts` 11/11 PASS
+- 提交: fe16b7045
+
+##### S47-P001-E4: Canvas 列表视图 + 多画布管理面板
+- **E4 需求**: 新建 CanvasListPanel 侧边栏，`canvasListStore.ts` (Zustand), 缩略图生成 (canvas.toDataURL), 新建/删除/重命名操作, IndexedDB 画布列表读取
+- **E4 状态**: 待实现
+
+##### S47-P001-E5: Canvas 导出格式扩展 (PNG/SVG/Figma)
+- **E5 需求**: 扩展 `useCanvasExport` → `exportAsFigma()`, ExportMenu 显示 Figma 选项, PNG 分辨率选择 (1x/2x/3x), SVG 矢量语义
+- **E5 状态**: 待实现
+
+
+
 
 ## [Unreleased]
 

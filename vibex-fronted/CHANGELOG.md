@@ -12,6 +12,14 @@
 - **E2 i18n**: add 19 shortcut description keys to `shortcuts` namespace (en + zh)
 - **E2 vitest**: `useKeyboardShortcuts.test.ts` → 82/82 PASS
 
+##### S46-P001-E3: 画布节点复制/粘贴 (Cmd+C / Cmd+V)
+- **E3 clipboardStore.ts**: new Zustand store at `@/stores/clipboardStore`, localStorage TTL 5 min, `copyCards()` deep clones cards, `pasteCards()` increments pasteCount
+- **E3 DDSCanvasStore.ts**: add `copyCards` + `pasteCards` to `ddsChapterActions`; paste generates new IDs (via `generateId`), offsets position (+30px cascade), re-maps intra-clipboard edges
+- **E3 useKeyboardShortcuts.ts**: add `onCopyNodes` + `onPasteNodes` callbacks; register Cmd+C / Cmd+V handlers
+- **E3 DDSToolbar.tsx**: add Copy + Paste toolbar buttons; Paste opens chapter-selection modal dialog
+- **E3 i18n**: add `toolbar.copy` + `toolbar.paste` keys to `toolbar` namespace (en + zh)
+- **E3 vitest**: `clipboardStore.test.ts` → 11/11 PASS; `DDSCanvasStore.test.ts` → 57/57 PASS
+
 ### [Unreleased] Sprint 45 — E1 AI 断线重连 + E2 Presence 光标 + E3 画布 MiniMap + E4 模板版本管理 + E5 画布快照分享
 
 ##### S45-P001-E1: AI 断线重连 + 流式可靠性

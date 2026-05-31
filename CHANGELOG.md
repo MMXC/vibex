@@ -5411,7 +5411,10 @@ All notable changes to this project will be documented in this file.
 
 ##### S47-P001-E4: Canvas 列表视图 + 多画布管理面板
 - **E4 需求**: 新建 CanvasListPanel 侧边栏，`canvasListStore.ts` (Zustand), 缩略图生成 (canvas.toDataURL), 新建/删除/重命名操作, IndexedDB 画布列表读取
-- **E4 状态**: 待实现
+- **E4 状态**: ✅ 完成 (bc34e9157)
+  - 新增: `src/stores/canvasListStore.ts`, `src/hooks/useCanvasList.ts`, `src/components/canvas/CanvasListPanel.tsx`, `src/lib/canvas/thumbnail.ts`
+  - 新增: `src/hooks/__tests__/useCanvasList.test.ts` (12 tests 12/12 PASS)
+  - Vitest 回归: DDSCanvasStore 57/57 PASS
 
 ##### S47-P001-E5: Canvas 导出格式扩展 (PNG/SVG/Figma)
 - **E5 需求**: 扩展 `useCanvasExport` → `exportAsFigma()`, ExportMenu 显示 Figma 选项, PNG 分辨率选择 (1x/2x/3x), SVG 矢量语义

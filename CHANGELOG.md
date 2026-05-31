@@ -22,6 +22,13 @@
 - **E3 miniMapStore vitest**: 5/5 PASS ✅
 - **E3 DDSFlow.test.tsx**: 8 tests (Background/MiniMap/ReactFlow canvas) ✅
 
+##### S45-P004-E4: 模板版本管理
+- **E4 types.ts**: `RequirementTemplate` interface added `version?: number` field
+- **E4 templateStore.ts**: `getTemplateVersion(id)`, `saveTemplateVersion(id, version)`, `getTemplateHistory(id)` store actions
+- **E4 useTemplateManager.ts**: `createSnapshot(id)` / `getHistory(id)` / `deleteSnapshot(id, version)` — localStorage key `template:${id}:history`, MAX_SNAPSHOTS=10
+- **E4 TemplateHistoryPanel.tsx**: collapsible panel, dark theme, restore/delete buttons, data-testid attributes
+- **E4 useTemplateManager.test.ts**: 8/8 vitest PASS (import/createSnapshot/getHistory/deleteSnapshot) ✅
+
 ### [Unreleased] Sprint 44 — E1 AI 多轮会话管理 + E2 画布模板分类 + E3 协作节点锁定 + E4 撤销历史面板 + E5 移动端触控
 
 ##### S44-P001-E1: AI 多轮会话管理

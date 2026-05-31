@@ -5411,6 +5411,16 @@ All notable changes to this project will be documented in this file.
 - **E1 Vitest 回归**: `DDSCanvasStore.test.ts` 57/57 PASS
 - 提交: bf1017df3
 
+##### S48-P001-E4: AI Session 标签系统 + 收藏
+- **E4 CodingAgentService.ts**: `AgentSession` interface 新增 `tags?: string[]` + `isFavorite?: boolean` 可选字段
+- **E4 agentStore.ts**: 新增 `toggleFavorite(sessionKey)`（翻转 isFavorite）、`addTag(sessionKey, tag)`（幂等追加标签）、`removeTag(sessionKey, tag)`（移除标签）actions；所有 action 均异步持久化到 IndexedDB
+- **E4 AgentSessions.tsx**: 会话列表按 `isFavorite` 降序排列（收藏优先）；`SessionCard` 新增 ⭐ 收藏按钮（点击切换）+ 标签 Chip 列表展示 + 标签输入框（Enter 添加，×移除）
+- **E4 AgentSessions.module.css**: 新增 `.favoriteBtn`（星标按钮）、`.tagRow`（标签行）、`.tagChip`（标签 Chip）、`.tagRemoveBtn`（×移除）、`.tagInput`（输入框）、`.tagAddBtn`（+Tag 按钮）
+- **E4 agentStore.test.ts**: 8 个新测试覆盖 `toggleFavorite`、`addTag`、`removeTag` 的正向/幂等/边界场景 (8/8 PASS)
+- **E4 Vitest**: `agentStore.test.ts` 全量 23/23 PASS（含 S44-E1 + S46-E1 + S48-E4 回归）
+- 提交: (待推送)
+
+>>>>>>> Stashed changes
 ## [Unreleased] Sprint 47 — AI Session 搜索 / 键盘快捷键 / 画布管理
 
 ##### S47-P001-E1: AI Session 搜索验证 + 历史会话管理

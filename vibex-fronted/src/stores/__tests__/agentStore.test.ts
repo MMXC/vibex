@@ -134,9 +134,92 @@ describe('agentStore S44-E1: IndexedDB persistence', () => {
   });
 });
 
-// S46-E1: Session search — searchableText build + filter
-describe('agentStore S46-E1: session search', () => {
+// S48-E4: Session tags + favorites
+describe('agentStore S48-E4: session tags and favorites', () => {
   beforeEach(async () => {
+    Object.keys(mockDB).forEach((k) => delete mockDB[k]);
+    useAgentStore.setState({ sessions: [], activeSessionKey: null, codeGenContext: null });
+    vi.clearAllMocks();
+  });
+
+  it('toggleFavorite: flips isFavorite from false to true', () => {
+    const session = makeSession({ sessionKey: 'fav-1', isFavorite: false });
+    useAgentStore.getState().addSession(session);
+    useAgentStore.getState().toggleFavorite('fav-1');
+    const found = useAgentStore.getState().sessions.find((s) => s.sessionKey === 'fav-1');
+    expect(found?.isFavorite).toBe(true);
+  });
+
+  it('toggleFavorite: flips isFavorite from true to false', () => {
+    const session = makeSession({ sessionKey: 'fav-2', isFavorite: true });
+    useAgentStore.getState().addSession(session);
+    useAgentStore.getState().toggleFavorite('fav-2');
+    const found = useAgentStore.getState().sessions.find((s) => s.sessionKey === 'fav-2');
+    expect(found?.isFavorite).toBe(false);
+  });
+
+  it('toggleFavorite: no-op for unknown session', () => {
+    const session = makeSession({ sessionKey: 'fav-3' });
+    useAgentStore.getState().addSession(session);
+    // should not throw
+    useAgentStore.getState().toggleFavorite('nonexistent-key');
+    expect(useAgentStore.getState().sessions.length).toBe(1);
+  });
+
+  it('addTag: appends tag to session', () => {
+    const session = makeSession({ sessionKey: 'tag-1', tags: [] });
+    useAgentStore.getState().addSession(session);
+    useAgentStore.getState().addTag('tag-1', 'urgent');
+    const found = useAgentStore.getState().sessions.find((s) => s.sessionKey === 'tag-1');
+    expect(found?.tags).toEqual(['urgent']);
+  });
+
+  it('addTag: appends multiple distinct tags', () => {
+    const session = makeSession({ sessionKey: 'tag-2', tags: ['bugfix'] });
+    useAgentStore.getState().addSession(session);
+    useAgentStore.getState().addTag('tag-2', 'feature');
+    useAgentStore.getState().addTag('tag-2', 'refactor');
+    const found = useAgentStore.getState().sessions.find((s) => s.sessionKey === 'tag-2');
+    expect(found?.tags).toEqual(['bugfix', 'feature', 'refactor']);
+  });
+
+  it('addTag: is idempotent — adding same tag twice does not duplicate', () => {
+    const session = makeSession({ sessionKey: 'tag-3', tags: ['api'] });
+    useAgentStore.getState().addSession(session);
+    useAgentStore.getState().addTag('tag-3', 'api');
+    useAgentStore.getState().addTag('tag-3', 'api');
+    const found = useAgentStore.getState().sessions.find((s) => s.sessionKey === 'tag-3');
+    expect(found?.tags).toEqual(['api']);
+  });
+
+  it('removeTag: removes existing tag', () => {
+    const session = makeSession({ sessionKey: 'rtag-1', tags: ['urgent', 'api', 'bugfix'] });
+    useAgentStore.getState().addSession(session);
+    useAgentStore.getState().removeTag('rtag-1', 'api');
+    const found = useAgentStore.getState().sessions.find((s) => s.sessionKey === 'rtag-1');
+    expect(found?.tags).toEqual(['urgent', 'bugfix']);
+  });
+
+  it('removeTag: no-op for non-existent tag', () => {
+    const session = makeSession({ sessionKey: 'rtag-2', tags: ['urgent'] });
+    useAgentStore.getState().addSession(session);
+    useAgentStore.getState().removeTag('rtag-2', 'nonexistent');
+    const found = useAgentStore.getState().sessions.find((s) => s.sessionKey === 'rtag-2');
+    expect(found?.tags).toEqual(['urgent']);
+  });
+
+  it('removeTag: no-op for unknown session', () => {
+    const session = makeSession({ sessionKey: 'rtag-3' });
+    useAgentStore.getState().addSession(session);
+    // should not throw
+    useAgentStore.getState().removeTag('nonexistent-key', 'any');
+    expect(useAgentStore.getState().sessions.length).toBe(1);
+  });
+});
+
+  // S46-E1: Session search — searchableText build + filter
+  describe('agentStore S46-E1: session search', () => {
+    beforeEach(async () => {
     Object.keys(mockDB).forEach((k) => delete mockDB[k]);
     useAgentStore.setState({ sessions: [], activeSessionKey: null, codeGenContext: null });
     vi.clearAllMocks();

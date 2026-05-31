@@ -198,6 +198,98 @@
   padding: 16px 8px;
 }
 
+/* S48-E4: Favorite star button */
+.favoriteBtn {
+  background: transparent;
+  border: none;
+  color: rgba(234, 179, 8, 0.8);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  transition: transform 0.15s, color 0.15s;
+}
+
+.favoriteBtn:hover {
+  color: rgba(234, 179, 8, 1);
+  transform: scale(1.2);
+}
+
+/* S48-E4: Tag row */
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+/* S48-E4: Tag chip */
+.tagChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 10px;
+  color: rgba(59, 130, 246, 0.9);
+  font-size: 10px;
+  padding: 1px 6px;
+}
+
+/* S48-E4: Tag remove button */
+.tagRemoveBtn {
+  background: transparent;
+  border: none;
+  color: rgba(59, 130, 246, 0.6);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0 0 0 2px;
+  line-height: 1;
+}
+
+.tagRemoveBtn:hover {
+  color: rgba(248, 113, 113, 0.9);
+}
+
+/* S48-E4: Tag input */
+.tagInput {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 10px;
+  padding: 1px 8px;
+  outline: none;
+  min-width: 80px;
+}
+
+.tagInput::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.tagInput:focus {
+  border-color: rgba(59, 130, 246, 0.7);
+}
+
+/* S48-E4: Tag add button */
+.tagAddBtn {
+  height: 22px;
+  padding: 0 8px;
+  background: transparent;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 4px;
+  color: rgba(59, 130, 246, 0.7);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tagAddBtn:hover {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.5);
+  color: rgba(59, 130, 246, 0.9);
+}
+
 .emptyState {
   display: flex;
   flex-direction: column;

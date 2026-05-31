@@ -26,6 +26,10 @@ interface SessionCardProps {
   t: (key: string) => string;
   /** S46-E1: search query for match highlighting */
   searchQuery?: string;
+  /** S48-E4: tags assigned to this session */
+  tags?: string[];
+  /** S48-E4: whether this session is favorited */
+  isFavorite?: boolean;
 }
 
 const SessionCard = memo(function SessionCard({
@@ -37,10 +41,15 @@ const SessionCard = memo(function SessionCard({
   isActive,
   t,
   searchQuery,
+  tags = [],
+  isFavorite = false,
 }: SessionCardProps) {
-  const { setActiveSession, removeSession, updateSession } = useAgentStore();
+  const { setActiveSession, removeSession, updateSession, toggleFavorite, addTag, removeTag } = useAgentStore();
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(name ?? task);
+  /** S48-E4: tag input visibility and value */
+  const [showTagInput, setShowTagInput] = useState(false);
+  const [tagInputValue, setTagInputValue] = useState('');
 
   const statusLabel = {
     idle: t('statusIdle'),
@@ -87,6 +96,31 @@ const SessionCard = memo(function SessionCard({
     if (e.key === 'Escape') setEditing(false);
   }, [handleEditSave]);
 
+  /** S48-E4: Toggle favorite */
+  const handleToggleFavorite = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleFavorite(sessionKey);
+  }, [sessionKey, toggleFavorite]);
+
+  /** S48-E4: Submit a new tag */
+  const handleAddTag = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && tagInputValue.trim()) {
+      addTag(sessionKey, tagInputValue.trim());
+      setTagInputValue('');
+      setShowTagInput(false);
+    }
+    if (e.key === 'Escape') {
+      setTagInputValue('');
+      setShowTagInput(false);
+    }
+  }, [sessionKey, tagInputValue, addTag]);
+
+  /** S48-E4: Remove a tag */
+  const handleRemoveTag = useCallback((e: React.MouseEvent, tag: string) => {
+    e.stopPropagation();
+    removeTag(sessionKey, tag);
+  }, [sessionKey, removeTag]);
+
   const timeAgo = (ts: number) => {
     const diff = Math.floor((Date.now() - ts) / 1000);
     if (diff < 60) return `${diff}s ${t('timeAgoSuffix') ?? 'ago'}`;
@@ -131,6 +165,16 @@ const SessionCard = memo(function SessionCard({
         >
           {statusLabel}
         </span>
+        {/* S48-E4: Favorite star button */}
+        <button
+          type="button"
+          className={styles.favoriteBtn}
+          onClick={handleToggleFavorite}
+          aria-label={isFavorite ? t('unfavorite') ?? 'Remove from favorites' : t('favorite') ?? 'Add to favorites'}
+          title={isFavorite ? t('unfavorite') ?? 'Remove from favorites' : t('favorite') ?? 'Add to favorites'}
+        >
+          {isFavorite ? '★' : '☆'}
+        </button>
         <span className={styles.timeAgo}>{timeAgo(createdAt)}</span>
       </div>
       <div className={styles.taskPreview}>
@@ -155,7 +199,47 @@ const SessionCard = memo(function SessionCard({
           </span>
         )}
       </div>
-      <div className={styles.sessionActions}>
+      {/* S48-E4: Tag chips + tag input */}
+      {(tags.length > 0 || showTagInput) && (
+        <div className={styles.tagRow}>
+          {tags.map((tag) => (
+            <span key={tag} className={styles.tagChip}>
+              {tag}
+              <button
+                type="button"
+                className={styles.tagRemoveBtn}
+                onClick={(e) => handleRemoveTag(e, tag)}
+                aria-label={`Remove tag ${tag}`}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+          {showTagInput && (
+            <input
+              type="text"
+              className={styles.tagInput}
+              value={tagInputValue}
+              onChange={(e) => setTagInputValue(e.target.value)}
+              onKeyDown={handleAddTag}
+              onBlur={() => { setTagInputValue(''); setShowTagInput(false); }}
+              placeholder={t('addTagPlaceholder') ?? 'Add tag...'}
+              autoFocus
+              aria-label={t('addTagPlaceholder') ?? 'Add tag'}
+            />
+          )}
+        </div>
+      )}
+      <div className={styles.sessionActions} onClick={(e) => e.stopPropagation()}>
+        {/* S48-E4: Tag button */}
+        <button
+          type="button"
+          className={styles.tagAddBtn}
+          onClick={() => setShowTagInput(true)}
+          aria-label={t('addTag') ?? 'Add tag'}
+        >
+          +{t('tag') ?? 'Tag'}
+        </button>
         {status === 'running' || status === 'starting' ? (
           <button
             type="button"
@@ -234,11 +318,18 @@ export const AgentSessions = memo(function AgentSessions() {
 
   /** S46-E1: Filter sessions by searchableText match */
   const filteredSessions = useMemo(() => {
-    if (!searchQuery.trim()) return sessions;
-    const q = searchQuery.toLowerCase();
-    return sessions.filter(
-      (s) => s.searchableText?.toLowerCase().includes(q)
+    let result = sessions;
+    // S48-E4: sort favorites first
+    result = [...result].sort((a, b) =>
+      (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0)
     );
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (s) => s.searchableText?.toLowerCase().includes(q)
+      );
+    }
+    return result;
   }, [sessions, searchQuery]);
 
   if (sessions.length === 0) {
@@ -279,6 +370,8 @@ export const AgentSessions = memo(function AgentSessions() {
             isActive={session.sessionKey === activeSessionKey}
             t={t}
             searchQuery={searchQuery}
+            tags={session.tags}
+            isFavorite={session.isFavorite}
           />
         ))
       )}

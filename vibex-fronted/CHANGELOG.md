@@ -16,6 +16,14 @@
 - **E1 Vitest 回归**: `DDSCanvasStore.test.ts` 57/57 PASS
 - 提交: bf1017df3
 
+##### S48-P001-E4: AI Session 标签系统 + 收藏
+- **E4 CodingAgentService.ts**: `AgentSession` interface 新增 `tags?: string[]` + `isFavorite?: boolean` 可选字段
+- **E4 agentStore.ts**: 新增 `toggleFavorite(sessionKey)`、`addTag(sessionKey, tag)`、`removeTag(sessionKey, tag)` actions；均异步持久化到 IndexedDB
+- **E4 AgentSessions.tsx**: 会话列表按 `isFavorite` 降序排列（收藏优先）；`SessionCard` 新增 ⭐ 收藏按钮 + 标签 Chip 展示 + 标签输入框
+- **E4 AgentSessions.module.css**: 新增 `.favoriteBtn`、`.tagRow`、`.tagChip`、`.tagRemoveBtn`、`.tagInput`、`.tagAddBtn` 样式
+- **E4 agentStore.test.ts**: 8 个新测试 (toggleFavorite×3 + addTag×3 + removeTag×2) — 8/8 PASS
+- **E4 Vitest**: `agentStore.test.ts` 全量 23/23 PASS（含 S44-E1 + S46-E1 + S48-E4 回归）
+- 提交: (待推送)
 ### [Unreleased] Sprint 47 — E1 AI Session 搜索验证 + E2-E5 功能实现
 
 ##### S47-P001-E1: AI Session 搜索验证 + 历史会话管理

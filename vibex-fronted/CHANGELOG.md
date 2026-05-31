@@ -25,7 +25,12 @@
 
 ##### S47-P001-E5: Canvas 导出格式扩展 (PNG/SVG/Figma)
 - **E5 需求**: 扩展 `useCanvasExport` → `exportAsFigma()`, ExportMenu 显示 Figma 选项, PNG 分辨率选择 (1x/2x/3x), SVG 矢量语义
-- **E5 状态**: 待实现
+- **E5 状态**: ✅ 完成 (28f2c8818)
+  - 新增: `exportAsPNGWithScale(scale)` 支持 PNG 1×/2×/3× 分辨率
+  - 新增: `buildFigmaJSON(chapters)` + `downloadFigmaJSON()` Figma 兼容 JSON 导出
+  - 新增: ExportMenu Figma 选项 + PNG 分辨率选择器下拉菜单
+  - vitest: useCanvasExport.test.ts 10/10 PASS
+  - Vitest 回归: DDSCanvasStore 57/57 PASS
 
 
 

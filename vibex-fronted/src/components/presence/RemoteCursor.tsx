@@ -1,16 +1,20 @@
 'use client';
 
 /**
- * RemoteCursor — Collaborative cursor overlay
+ * RemoteCursor — Collaborative cursor overlay (WebSocket version)
  *
- * Subscribes to Firebase Presence (usePresence) and renders all remote users' cursors.
- * Falls back to null in mock mode.
+ * S45-P002-E2: Migrated from Firebase Presence to WebSocket Zustand store.
+ * Subscribes to `usePresenceStore` and renders all remote users' cursors
+ * with smooth SVG cursor icon + username label.
+ *
+ * Replaces the Firebase-wired RemoteCursor that used `usePresence` from
+ * `@/lib/firebase/presence`.
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { IntentionBubble } from './IntentionBubble';
-import type { IntentionType } from '@/lib/firebase/presence';
-import { usePresence, isFirebaseConfigured } from '@/lib/firebase/presence';
+import type { IntentionType } from './IntentionBubble';
+import { usePresenceStore } from '@/lib/collaboration/presenceStore';
 import styles from './RemoteCursor.module.css';
 
 interface RemoteCursorData {
@@ -20,6 +24,20 @@ interface RemoteCursorData {
   color: string;
   nodeId?: string | null;
   intention?: IntentionType;
+}
+
+// Predefined cursor colors — consistent with PresenceOverlay hashUserColor
+const PRESENCE_COLORS = [
+  '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+  '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
+];
+
+function hashUserColor(userId: string): string {
+  let hash = 0;
+  for (let i = 0; i < userId.length; i++) {
+    hash = (hash * 31 + userId.charCodeAt(i)) | 0;
+  }
+  return PRESENCE_COLORS[Math.abs(hash) % PRESENCE_COLORS.length]!;
 }
 
 /** Single remote cursor for one user */
@@ -67,36 +85,42 @@ function CursorInstance({ userId, userName, position, color, nodeId, intention }
 }
 
 /**
- * RemoteCursor — renders all remote user cursors by subscribing to usePresence.
- * Returns null when Firebase is not configured (mock mode).
+ * RemoteCursor — renders all remote user cursors from usePresenceStore (WebSocket-backed).
  *
- * @param canvasId  - Canvas/project ID to subscribe to presence for
- * @param userId    - Current user ID (used to filter out own cursor)
- * @param userName  - Current user name
+ * Reads `remoteUsers` Map from presenceStore and renders a cursor for each remote user.
+ * Returns null when there are no remote users (optimization).
+ *
+ * Note: For DDS canvas (DDSCanvasPage), `PresenceOverlay` is used instead.
+ * This `RemoteCursor` component is used for the non-DDS canvas views.
  */
-export function RemoteCursor({ canvasId, userId, userName }: {
-  canvasId: string;
-  userId: string;
-  userName: string;
-}) {
-  const { others } = usePresence(canvasId, userId, userName);
+export function RemoteCursor({ userId: selfUserId }: { userId: string }) {
+  const remoteUsers = usePresenceStore((s) => s.remoteUsers);
 
-  if (!isFirebaseConfigured()) {
+  const cursors = useMemo(() => {
+    const result: RemoteCursorData[] = [];
+    for (const [uid, user] of remoteUsers) {
+      // Skip self
+      if (uid === selfUserId) continue;
+      result.push({
+        userId: uid,
+        userName: user.name || uid,
+        position: { x: user.cursorX ?? 0, y: user.cursorY ?? 0 },
+        color: hashUserColor(uid),
+        nodeId: null,
+        intention: undefined,
+      });
+    }
+    return result;
+  }, [remoteUsers, selfUserId]);
+
+  if (cursors.length === 0) {
     return null;
   }
 
   return (
     <>
-      {others.map((remote) => (
-        <CursorInstance
-          key={remote.userId}
-          userId={remote.userId}
-          userName={remote.name}
-          position={remote.cursor ?? { x: 0, y: 0 }}
-          color={remote.color}
-          nodeId={remote.cursor?.nodeId ?? null}
-          intention={remote.intention}
-        />
+      {cursors.map((cursor) => (
+        <CursorInstance key={cursor.userId} {...cursor} />
       ))}
     </>
   );

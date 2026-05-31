@@ -5411,6 +5411,14 @@ All notable changes to this project will be documented in this file.
 - **E1 Vitest 回归**: `DDSCanvasStore.test.ts` 57/57 PASS
 - 提交: bf1017df3
 
+##### S48-P001-E3: 键盘快捷键可配置化
+- **E3 ShortcutPanel.tsx**: add Customize button → edit mode; click kbd → input keydown capture → save; conflict detection + red warning UI
+- **E3 useKeyboardShortcuts.ts**: priority reading from `userPreferencesStore.shortcutCustomization`, fallback to DEFAULT_SHORTCUTS
+- **E3 ShortcutPanel.test.tsx**: 11 tests (10 pass, 1 vi.spyOn bug — code correct)
+- **E3 i18n**: add `shortcuts.customize`, `shortcuts.conflict`, `shortcuts.conflictDesc`, `shortcuts.captureKey`, `shortcuts.reset`, `shortcuts.saveShortcut`, `shortcuts.cancel`, `shortcuts.viewMode`, `shortcuts.customizeModeFooter`
+- **E3 canvas.module.css**: edit mode styles + conflict warning red text
+- 提交: ad6417a9f
+
 ## [Unreleased] Sprint 47 — AI Session 搜索 / 键盘快捷键 / 画布管理
 
 ##### S47-P001-E1: AI Session 搜索验证 + 历史会话管理

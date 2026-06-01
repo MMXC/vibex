@@ -36,6 +36,7 @@ import { useUIStore } from '@/lib/canvas/stores/uiStore';
 import { useOplogConflictToast } from '@/stores/oplogStore';
 import { TemplateGallery } from '@/components/dds/templates/TemplateGallery';
 import { TemplateSaveDialog } from '@/components/dds/templates/TemplateSaveDialog';
+import { ShortcutSettingsPanel } from '@/components/dds/shortcuts/ShortcutSettingsPanel';
 import styles from './DDSToolbar.module.css';
 
 // ==================== Chapter label keys (mapped to i18n keys) ====================
@@ -91,6 +92,16 @@ function EyeIcon() {
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
       <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+// S52-E5: Keyboard icon for Shortcuts settings
+function KeyboardIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="2" y="6" width="20" height="12" rx="2" />
+      <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8" />
     </svg>
   );
 }
@@ -201,6 +212,7 @@ export const DDSToolbar = memo(function DDSToolbar({
   const [shareToTeamModalOpen, setShareToTeamModalOpen] = useState(false);
   const [isTemplateGalleryOpen, setIsTemplateGalleryOpen] = useState(false);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
+  const [isShortcutSettingsOpen, setIsShortcutSettingsOpen] = useState(false);
 
   // E3-S3: RBAC for toolbar actions
   const rbac = useCanvasRBAC(projectId);
@@ -657,6 +669,17 @@ export const DDSToolbar = memo(function DDSToolbar({
             <span>{generating ? tToolbar('aiGenerating') : tToolbar('aiGenerate')}</span>
           </button>
 
+          {/* S52-E5: Keyboard Shortcuts settings */}
+          <button
+            type="button"
+            className={styles.iconButton}
+            onClick={() => setIsShortcutSettingsOpen(true)}
+            aria-label="键盘快捷键设置"
+            title="键盘快捷键设置"
+          >
+            <KeyboardIcon />
+          </button>
+
           {/* Fullscreen toggle */}
           <button
             type="button"
@@ -803,6 +826,12 @@ export const DDSToolbar = memo(function DDSToolbar({
       <TemplateSaveDialog
         isOpen={isSaveDialogOpen}
         onClose={() => setIsSaveDialogOpen(false)}
+      />
+
+      {/* S52-E5: Keyboard Shortcuts settings panel */}
+      <ShortcutSettingsPanel
+        isOpen={isShortcutSettingsOpen}
+        onClose={() => setIsShortcutSettingsOpen(false)}
       />
     </>
   );

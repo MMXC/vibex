@@ -1,0 +1,80 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 140px;
+}
+
+.input {
+  font-family: var(--font-mono, 'Courier New', monospace);
+  font-size: 12px;
+  padding: 6px 10px;
+  border: 1.5px solid #3c3c3c;
+  border-radius: 6px;
+  background: #1a1a1a;
+  color: #e0e0e0;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  width: 100%;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #6366f1;
+  background: #1e1e2e;
+}
+
+.inputConflict {
+  border-color: #ef4444;
+  background: #2a1010;
+  color: #fca5a5;
+}
+
+.actions {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+
+.saveBtn,
+.cancelBtn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.saveBtn {
+  background: #22c55e;
+  color: #fff;
+}
+
+.saveBtn:hover:not(:disabled) {
+  background: #16a34a;
+}
+
+.saveBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cancelBtn {
+  background: #ef4444;
+  color: #fff;
+}
+
+.cancelBtn:hover {
+  background: #dc2626;
+}
+
+.conflict {
+  font-size: 11px;
+  color: #fca5a5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

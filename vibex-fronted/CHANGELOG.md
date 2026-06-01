@@ -587,3 +587,10 @@
 - **S51-E5.5**: `CommentPanel.module.css` — mentionDropdown 样式
 - **S51-E5.6**: `wsCommentHandler.ts` — comment:mention 类型 → mentionsStore 写入 + 未读计数
 - **Tests**: parseMentions 9 tests, mentionsStore 7 tests, vitest 21/21 ✅
+
+
+---
+
+## [Unreleased] S52-E1: 画布协作实时感知 — 2026-06-02
+- **S52-E1.1**: `presenceStore.test.ts` 10个测试用例 — setRemoteUsers replace/update/remove semantics, cursor update, node locking, WebSocket message handlers
+- **S52-E1.2**: 复用 S42/S44 WebSocket presence 实现，新增 10 个 vitest cases 覆盖协作感知边界条件

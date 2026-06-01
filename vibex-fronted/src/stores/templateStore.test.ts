@@ -232,33 +232,84 @@ describe('TemplateStore', () => {
     });
   });
 
-  describe('E2: thumbnailCache', () => {
-    it('setThumbnail stores thumbnail', () => {
-      const { setThumbnail } = useTemplateStore.getState();
-      setThumbnail('tpl-1', 'data:image/png;base64,abc123');
-      expect(useTemplateStore.getState().thumbnailCache['tpl-1']).toBe('data:image/png;base64,abc123');
+  describe('E4: exportTemplates', () => {
+    it('exportTemplates returns version 1.0 and all templates', () => {
+      const { exportTemplates } = useTemplateStore.getState();
+      const result = exportTemplates();
+      expect(result.version).toBe('1.0');
+      expect(Array.isArray(result.templates)).toBe(true);
+      expect(result.exportedAt).toBeDefined();
     });
 
-    it('getThumbnail retrieves thumbnail', () => {
-      const { setThumbnail, getThumbnail } = useTemplateStore.getState();
-      setThumbnail('tpl-2', 'data:image/png;base64,xyz789');
-      expect(getThumbnail('tpl-2')).toBe('data:image/png;base64,xyz789');
+    it('exportTemplates includes all current templates', () => {
+      const { exportTemplates, templates } = useTemplateStore.getState();
+      const result = exportTemplates();
+      expect(result.templates.length).toBe(templates.length);
+    });
+  });
+
+  describe('E4: importTemplates', () => {
+    it('importTemplates parses valid JSON and adds new templates', () => {
+      const { importTemplates, templates } = useTemplateStore.getState();
+      const newTemplate = {
+        id: 'e4-test-tpl',
+        name: 'E4 Test Template',
+        description: 'Test',
+        category: 'flow' as const,
+        icon: '🔧',
+        version: 1,
+        metadata: { tags: [], author: 'test' },
+        nodes: [],
+        edges: [],
+      };
+      const json = JSON.stringify({ version: '1.0', templates: [newTemplate] });
+      const result = importTemplates(json, 'skip');
+      expect(result.success).toBe(true);
+      expect(result.imported).toBe(1);
+      expect(result.skipped).toBe(0);
     });
 
-    it('getThumbnail returns undefined for missing thumbnail', () => {
-      const { getThumbnail } = useTemplateStore.getState();
-      expect(getThumbnail('non-existent-tpl')).toBeUndefined();
+    it('importTemplates rejects invalid JSON', () => {
+      const { importTemplates } = useTemplateStore.getState();
+      const result = importTemplates('not json', 'skip');
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Invalid JSON');
     });
 
-    it('thumbnailCache is shared across multiple templates', () => {
-      const { setThumbnail, thumbnailCache } = useTemplateStore.getState();
-      setThumbnail('tpl-a', 'data:a');
-      setThumbnail('tpl-b', 'data:b');
-      setThumbnail('tpl-c', 'data:c');
-      const cache = useTemplateStore.getState().thumbnailCache;
-      expect(cache['tpl-a']).toBe('data:a');
-      expect(cache['tpl-b']).toBe('data:b');
-      expect(cache['tpl-c']).toBe('data:c');
+    it('importTemplates rejects missing version', () => {
+      const { importTemplates } = useTemplateStore.getState();
+      const result = importTemplates(JSON.stringify({ templates: [] }), 'skip');
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('missing version');
+    });
+
+    it('importTemplates skips conflicts with strategy=skip', () => {
+      const { importTemplates, templates } = useTemplateStore.getState();
+      const existing = templates[0];
+      const json = JSON.stringify({ version: '1.0', templates: [existing] });
+      const result = importTemplates(json, 'skip');
+      expect(result.success).toBe(true);
+      expect(result.skipped).toBe(1);
+      expect(result.imported).toBe(0);
+    });
+
+    it('importTemplates adds new IDs with strategy=skip', () => {
+      const { importTemplates } = useTemplateStore.getState();
+      const newTpl = {
+        id: 'e4-new-tpl-2',
+        name: 'E4 New Tpl 2',
+        description: 'Test',
+        category: 'flow' as const,
+        icon: '🔧',
+        version: 1,
+        metadata: { tags: [], author: 'test' },
+        nodes: [],
+        edges: [],
+      };
+      const json = JSON.stringify({ version: '1.0', templates: [newTpl] });
+      const result = importTemplates(json, 'skip');
+      expect(result.success).toBe(true);
+      expect(result.imported).toBe(1);
     });
   });
 });

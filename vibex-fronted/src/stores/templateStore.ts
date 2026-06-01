@@ -67,6 +67,14 @@ interface TemplateState {
   getThumbnail: (templateId: string) => string | undefined;
   // 生成 SVG 缩略图（capture DOM -> SVG data URL）
   captureThumbnail: (templateId: string, element: HTMLElement | null) => void;
+
+  // ---- E4: 模板导入/导出管理 ----
+  // 导出所有模板为 JSON
+  exportTemplates: () => { version: string; exportedAt: string; templates: RequirementTemplate[] };
+  // 导入模板（支持覆盖/跳过/重命名策略）
+  importTemplates: (json: string, strategy?: 'skip' | 'overwrite' | 'rename') => {
+    success: boolean; imported: number; skipped: number; error?: string;
+  };
 }
 
 // 初始统计数据
@@ -370,6 +378,52 @@ export const useTemplateStore = create<TemplateState>()(
         } catch (e) {
           canvasLogger.default.error('[TemplateStore] captureThumbnail failed:', e);
         }
+      },
+
+      // ---- E4: 模板导入/导出管理 ----
+      exportTemplates: () => {
+        const { templates } = get();
+        return {
+          version: '1.0',
+          exportedAt: new Date().toISOString(),
+          templates,
+        };
+      },
+
+      importTemplates: (json, strategy = 'skip') => {
+        const { templates } = get();
+        let parsed: { version?: string; templates: RequirementTemplate[] };
+        try {
+          parsed = JSON.parse(json);
+        } catch {
+          return { success: false, imported: 0, skipped: 0, error: 'Invalid JSON' };
+        }
+        if (!parsed.version || !Array.isArray(parsed.templates)) {
+          return { success: false, imported: 0, skipped: 0, error: 'Invalid format: missing version or templates array' };
+        }
+        const existingIds = new Set(templates.map(t => t.id));
+        const toAdd: RequirementTemplate[] = [];
+        let skipped = 0;
+        for (const t of parsed.templates) {
+          if (existingIds.has(t.id)) {
+            if (strategy === 'overwrite') {
+              toAdd.push(t);
+            } else if (strategy === 'rename') {
+              toAdd.push({ ...t, id: `${t.id}_imported_${Date.now()}` });
+            } else {
+              skipped++;
+            }
+          } else {
+            toAdd.push(t);
+          }
+        }
+        if (toAdd.length > 0) {
+          set({
+            templates: [...templates, ...toAdd],
+            filteredTemplates: filterTemplates([...templates, ...toAdd], get().selectedCategory, get().searchQuery, get().favoriteTemplateIds),
+          });
+        }
+        return { success: true, imported: toAdd.length, skipped };
       },
     }),
     {

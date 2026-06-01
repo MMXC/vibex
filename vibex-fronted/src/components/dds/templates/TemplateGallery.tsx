@@ -15,6 +15,9 @@ import {
   PRESET_TEMPLATES,
   type CanvasTemplateSummary,
 } from '@/lib/canvas/templateStore';
+import { useTemplateStore } from '@/stores/templateStore';
+import { downloadTemplatesAsFile } from '@/lib/canvas/templateExport';
+import { TemplateImportDialog } from './TemplateImportDialog';
 import { deserializeThreeTrees, restoreStore } from '@/lib/canvas/serialize';
 import styles from './TemplateGallery.module.css';
 
@@ -45,6 +48,9 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [applying, setApplying] = useState<string | null>(null);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+
+  const templateStore = useTemplateStore();
 
   const categories = ['all', 'blank', 'flow', 'matrix', 'mindmap', 'swot', 'custom'];
 
@@ -96,6 +102,19 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
     }
   };
 
+  const handleExportAll = () => {
+    const data = templateStore.exportTemplates();
+    downloadTemplatesAsFile(data.templates);
+  };
+
+  const handleImport = (importedTemplates: import('@/data/templates').RequirementTemplate[], _strategy: 'skip' | 'overwrite' | 'rename') => {
+    // Merge into store via JSON round-trip
+    const json = JSON.stringify({ version: '1.0', templates: importedTemplates });
+    templateStore.importTemplates(json, 'skip');
+    loadTemplates();
+    setImportDialogOpen(false);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -104,14 +123,22 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
         {/* Header */}
         <div className={styles.header}>
           <h2 className={styles.title}>📋 模板画廊</h2>
-          <button
-            type="button"
-            className={styles.closeBtn}
-            onClick={onClose}
-            aria-label="关闭"
-          >
-            ✕
-          </button>
+          <div className={styles.headerActions}>
+            <button type="button" className={styles.actionBtn} onClick={handleExportAll} title="导出全部">
+              ⬇️ 导出
+            </button>
+            <button type="button" className={styles.actionBtn} onClick={() => setImportDialogOpen(true)} title="导入模板">
+              ⬆️ 导入
+            </button>
+            <button
+              type="button"
+              className={styles.closeBtn}
+              onClick={onClose}
+              aria-label="关闭"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* Search */}
@@ -174,6 +201,14 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
               </button>
             ))}
         </div>
+
+        {/* E4: Import Dialog */}
+        <TemplateImportDialog
+          isOpen={importDialogOpen}
+          onClose={() => setImportDialogOpen(false)}
+          onImport={handleImport}
+          existingTemplates={templateStore.templates}
+        />
       </div>
     </div>
   );

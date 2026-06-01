@@ -2,12 +2,13 @@
  * useStreamingAgent.ts — Sprint43 E2: AI Agent SSE Streaming
  * Sprint44 P001-E1: add onChunk callback for character counting
  * Sprint45 P001-E1: AI 断线重连 — retry logic, exponential backoff, IndexedDB chunk persistence
+ * Sprint49 P001-E1: 60s requestTimeout, configurable base/max delay, jitter, retryStatus
  *
  * Hook for calling POST /api/ai/generate with SSE streaming support.
  * Manages AbortController, chunk accumulation, loading state, and retry with backoff.
  *
  * Usage:
- *   const { messages, isStreaming, error, retrying, lastError, sendMessage, abort } = useStreamingAgent({ maxRetries: 3 });
+ *   const { messages, isStreaming, error, retrying, retryStatus, sendMessage, abort } = useStreamingAgent({ maxRetries: 3 });
  */
 
 'use client';
@@ -26,6 +27,11 @@ export interface StreamingMessage {
   timestamp: number;
 }
 
+/**
+ * S49-E1: 60s requestTimeout, configurable base/max delay, jitter, retryStatus
+ */
+export type RetryStatus = 'idle' | 'retrying' | 'timeout' | 'success';
+
 export interface UseStreamingAgentOptions {
   /** Called when the stream completes successfully */
   onComplete?: (fullContent: string) => void;
@@ -35,10 +41,24 @@ export interface UseStreamingAgentOptions {
   onChunk?: (chunk: string) => void;
   /**
    * S45-E1: Maximum number of retry attempts on connection failure.
-   * Uses exponential backoff: 1s → 2s → 4s.
    * Default: 0 (no retries, backward compatible).
    */
   maxRetries?: number;
+  /**
+   * S49-E1: Base delay in ms for exponential backoff.
+   * Default: 1000.
+   */
+  retryBaseDelay?: number;
+  /**
+   * S49-E1: Maximum delay in ms for exponential backoff.
+   * Default: 8000.
+   */
+  retryMaxDelay?: number;
+  /**
+   * S49-E1: Request timeout in ms — AbortController timeout.
+   * Default: 60000 (60s).
+   */
+  requestTimeout?: number;
 }
 
 function sleep(ms: number): Promise<void> {
@@ -141,6 +161,9 @@ export function useStreamingAgent(options: UseStreamingAgentOptions = {}) {
     onError,
     onChunk,
     maxRetries = 0,
+    retryBaseDelay = 1000,
+    retryMaxDelay = 8000,
+    requestTimeout = 60000,
   } = options;
 
   const [messages, setMessages] = useState<StreamingMessage[]>([]);
@@ -150,8 +173,11 @@ export function useStreamingAgent(options: UseStreamingAgentOptions = {}) {
   const [retrying, setRetrying] = useState(0);
   /** S45-E1: Most recent error that triggered the last retry */
   const [lastError, setLastError] = useState<string | null>(null);
+  /** S49-E1: Human-readable retry status for ConnectionStatus UI */
+  const [retryStatus, setRetryStatus] = useState<RetryStatus>('idle');
 
   const abortControllerRef = useRef<AbortController | null>(null);
+  const timeoutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const currentMessageIdRef = useRef<string | null>(null);
   const messageTextRef = useRef<string>('');
   const conversationIdRef = useRef<string | undefined>(undefined);
@@ -167,6 +193,10 @@ export function useStreamingAgent(options: UseStreamingAgentOptions = {}) {
     // Abort any in-flight request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
+    }
+    if (timeoutTimerRef.current) {
+      clearTimeout(timeoutTimerRef.current);
+      timeoutTimerRef.current = null;
     }
 
     messageTextRef.current = messageText;
@@ -209,10 +239,26 @@ export function useStreamingAgent(options: UseStreamingAgentOptions = {}) {
     setError(null);
     setRetrying(0);
     setLastError(null);
+    setRetryStatus('idle');
     currentMessageIdRef.current = assistantMsgId;
 
     const controller = new AbortController();
     abortControllerRef.current = controller;
+
+    // S49-E1: 60s request timeout
+    timeoutTimerRef.current = setTimeout(() => {
+      controller.abort();
+      setRetryStatus('timeout');
+      setError('Request timeout');
+      optionsRef.current.onError?.('Request timeout');
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === assistantMsgId
+            ? { ...msg, content: msg.content + '\n[请求超时]' }
+            : msg
+        )
+      );
+    }, requestTimeout);
 
     let attempt = 0;
     let finalContent = initialContent;
@@ -220,17 +266,20 @@ export function useStreamingAgent(options: UseStreamingAgentOptions = {}) {
     while (attempt <= maxRetries) {
       try {
         if (attempt > 0) {
-          // S45-E1: exponential backoff — 1s, 2s, 4s
-          const backoffMs = Math.pow(2, attempt - 1) * 1000;
+          // S49-E1: configurable exponential backoff with jitter
+          // delay = min(retryBaseDelay * 2^attempt, retryMaxDelay) + jitter(0-500ms)
+          const backoffMs = Math.min(retryBaseDelay * Math.pow(2, attempt - 1), retryMaxDelay);
+          const jitterMs = Math.floor(Math.random() * 500);
           setRetrying(attempt);
+          setRetryStatus('retrying');
           setMessages((prev) =>
             prev.map((msg) =>
               msg.id === assistantMsgId
-                ? { ...msg, content: msg.content + `\n[Retrying… attempt ${attempt}/${maxRetries}]` }
+                ? { ...msg, content: msg.content + `\n[正在重连 (${attempt}/${maxRetries})]` }
                 : msg
             )
           );
-          await sleep(backoffMs);
+          await sleep(backoffMs + jitterMs);
         }
 
         const result = await streamOneAttempt(
@@ -244,6 +293,18 @@ export function useStreamingAgent(options: UseStreamingAgentOptions = {}) {
           finalContent
         );
         finalContent = result.fullContent;
+
+        // S49-E1: success after retry recovery
+        if (attempt > 0) {
+          setRetryStatus('success');
+        }
+
+        // Clear the timeout timer since we completed successfully
+        if (timeoutTimerRef.current) {
+          clearTimeout(timeoutTimerRef.current);
+          timeoutTimerRef.current = null;
+        }
+
         optionsRef.current.onComplete?.(finalContent);
         return; // success — exit retry loop
       } catch (err) {
@@ -288,7 +349,11 @@ export function useStreamingAgent(options: UseStreamingAgentOptions = {}) {
 
     setIsStreaming(false);
     abortControllerRef.current = null;
-  }, [maxRetries]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (timeoutTimerRef.current) {
+      clearTimeout(timeoutTimerRef.current);
+      timeoutTimerRef.current = null;
+    }
+  }, [maxRetries, retryBaseDelay, retryMaxDelay, requestTimeout]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /**
    * Abort the current streaming request.
@@ -297,6 +362,10 @@ export function useStreamingAgent(options: UseStreamingAgentOptions = {}) {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
       setIsStreaming(false);
+    }
+    if (timeoutTimerRef.current) {
+      clearTimeout(timeoutTimerRef.current);
+      timeoutTimerRef.current = null;
     }
   }, []);
 
@@ -308,6 +377,7 @@ export function useStreamingAgent(options: UseStreamingAgentOptions = {}) {
     setError(null);
     setRetrying(0);
     setLastError(null);
+    setRetryStatus('idle');
   }, []);
 
   return {
@@ -315,6 +385,7 @@ export function useStreamingAgent(options: UseStreamingAgentOptions = {}) {
     isStreaming,
     error,
     retrying,
+    retryStatus,
     lastError,
     sendMessage,
     abort,

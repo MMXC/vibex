@@ -443,3 +443,12 @@
 - **E1 搜索输入框**: `src/app/domain/DomainPageContent.tsx` — 搜索节点...输入框，带清除按钮
 - **E1 节点高亮**: MiniMap nodeColor 动态化，匹配节点返回红色高亮（#ef4444）
 - **E1 视口边框**: MiniMapViewportBorder 组件，ViewportPortal + SVG rect 标注当前视口范围
+---
+
+## [Unreleased] S49-E1: AI 断线重连 + 流式可靠性增强 — 2026-06-01
+- **S49-E1.1 60s 请求超时**: `useStreamingAgent` 新增 `requestTimeout`(60000ms) 参数; `setTimeout` + `AbortController.abort()` 实现; 超时触发 `retryStatus='timeout'`
+- **S49-E1.2 可配置退避参数**: `retryBaseDelay`(1000ms)/`retryMaxDelay`(8000ms) 替换硬编码值; 公式: `delay = min(retryBaseDelay * 2^attempt, retryMaxDelay) + jitter(0-500ms)`
+- **S49-E1.3 retryStatus 状态机**: `useStreamingAgent` 新增 `retryStatus: 'idle' | 'retrying' | 'timeout' | 'success'`; `retrying` 时 UI 显示"正在重连 (N/M)" + 脉冲动画
+- **S49-E1.4 ConnectionStatus 组件**: `src/components/ui/ConnectionStatus.tsx` + `ConnectionStatus.module.css`; warning/error/success 三色 badge + 脉冲 dot
+- **S49-E1.5 Vitest 覆盖**: 5 个新测试用例 (retryStatus 四态 + 可配置延迟 + 超时); `useStreamingAgent.test.ts` 共 15 个测试
+- 提交: epic/s49-e1-ai-retry

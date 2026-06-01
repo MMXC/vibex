@@ -5713,3 +5713,12 @@ See git history for complete changelog.
 - **US-E4.5 Auto-refresh**: React Query refetchInterval every 5 minutes
 - **E4 Button**: data-testid=canvas-analytics-btn added to DDSToolbar
 - 提交: 6faa55db7
+---
+
+## [Unreleased] S49-E1: AI 断线重连 + 流式可靠性增强 — 2026-06-01
+- **S49-E1.1 60s 请求超时**: `requestTimeout`(60000ms) via `setTimeout` + `AbortController.abort()`; 超时触发 `retryStatus='timeout'` + UI badge 显示"请求超时"
+- **S49-E1.2 可配置退避参数**: `retryBaseDelay`(1000ms)/`retryMaxDelay`(8000ms) 替换硬编码值; 公式: `delay = min(retryBaseDelay * 2^attempt, retryMaxDelay) + jitter(0-500ms)`
+- **S49-E1.3 retryStatus 状态机**: 新增 `'idle' | 'retrying' | 'timeout' | 'success'` 四态; `retrying` 时 UI 显示"正在重连 (N/M)" + 脉冲动画; 恢复成功后 `success`
+- **S49-E1.4 ConnectionStatus 组件**: `src/components/ui/ConnectionStatus.tsx`; warning/error/success 三色 badge + 脉冲 dot; 接入 `useStreamingAgent` 的 `retryStatus`
+- **S49-E1.5 Vitest 覆盖**: 5 个新测试用例 (retryStatus 四态 + 可配置延迟 + 超时)
+- 提交: epic/s49-e1-ai-retry

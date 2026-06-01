@@ -1,7 +1,8 @@
 /**
  * useStreamingAgent.test.ts — Sprint45 P001-E1: AI 断线重连
+ * Sprint49 P001-E1: 60s timeout, retryStatus, configurable backoff, jitter
  *
- * Tests for useStreamingAgent retry logic, exponential backoff, and IndexedDB chunk persistence.
+ * Tests for useStreamingAgent retry logic, exponential backoff, IndexedDB chunk persistence.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -247,5 +248,171 @@ describe('useStreamingAgent', () => {
     });
     expect(result.current.retrying).toBe(0);
     expect(result.current.error).toBeNull();
+  });
+
+  // -------------------------------------------------------------------------
+  // S49-E1: retryStatus state machine
+  // -------------------------------------------------------------------------
+  it('retryStatus starts as idle', () => {
+    const { result } = renderHook(() => useStreamingAgent());
+    expect(result.current.retryStatus).toBe('idle');
+  });
+
+  it('retryStatus becomes retrying after first failure', async () => {
+    global.fetch = vi.fn().mockRejectedValue(new TypeError('fail'));
+
+    const { result } = renderHook(() => useStreamingAgent({ maxRetries: 1 }));
+
+    await act(async () => {
+      result.current.sendMessage('test');
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    await waitFor(() => {
+      expect(result.current.retrying).toBeGreaterThanOrEqual(1);
+    });
+    expect(result.current.retryStatus).toBe('retrying');
+  });
+
+  it('retryStatus becomes success after retry recovery', async () => {
+    let attempt = 0;
+    global.fetch = vi.fn().mockImplementation(() => {
+      attempt++;
+      if (attempt === 1) {
+        return Promise.reject(new TypeError('fail'));
+      }
+      return Promise.resolve(
+        new Response(
+          new ReadableStream({
+            start(c) {
+              c.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ content: 'recovered' })}\n`));
+              c.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ done: true })}\n`));
+              c.close();
+            },
+          }),
+          { status: 200, headers: { 'Content-Type': 'text/event-stream' } }
+        )
+      );
+    });
+
+    const { result } = renderHook(() =>
+      useStreamingAgent({ maxRetries: 1, retryBaseDelay: 50, retryMaxDelay: 100 })
+    );
+
+    await act(async () => {
+      result.current.sendMessage('test');
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    await waitFor(() => {
+      expect(result.current.retryStatus).toBe('retrying');
+    });
+
+    // Wait for recovery: 50ms backoff + stream
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 200));
+    });
+
+    await waitFor(() => {
+      expect(result.current.messages[1]?.content).toBe('recovered');
+    });
+    expect(result.current.retryStatus).toBe('success');
+  });
+
+  it('retryStatus becomes timeout when requestTimeout expires', async () => {
+    // Mock fetch that never responds (simulating timeout)
+    const controller = new AbortController();
+    global.fetch = vi.fn().mockImplementation(() =>
+      new Promise((_, reject) => {
+        controller.signal.addEventListener('abort', () =>
+          reject(new DOMException('The user aborted a request.', 'AbortError'))
+        );
+        // Never resolve — simulating a hanging request
+      })
+    );
+
+    const { result } = renderHook(() =>
+      useStreamingAgent({ requestTimeout: 100, maxRetries: 0 })
+    );
+
+    await act(async () => {
+      result.current.sendMessage('test');
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    // Wait for timeout to fire (100ms + margin)
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 150));
+    });
+
+    await waitFor(() => {
+      expect(result.current.retryStatus).toBe('timeout');
+    });
+    expect(result.current.error).toBe('Request timeout');
+  });
+
+  it('retryStatus resets to idle on clear()', async () => {
+    global.fetch = vi.fn().mockRejectedValue(new TypeError('fail'));
+
+    const { result } = renderHook(() => useStreamingAgent({ maxRetries: 1 }));
+
+    await act(async () => {
+      result.current.sendMessage('test');
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    await waitFor(() => {
+      expect(result.current.retrying).toBeGreaterThanOrEqual(1);
+    });
+    expect(result.current.retryStatus).toBe('retrying');
+
+    act(() => result.current.clear());
+    expect(result.current.retryStatus).toBe('idle');
+  });
+
+  // -------------------------------------------------------------------------
+  // S49-E1: configurable retryBaseDelay / retryMaxDelay
+  // -------------------------------------------------------------------------
+  it('uses custom retryBaseDelay', async () => {
+    let attempt = 0;
+    global.fetch = vi.fn().mockImplementation(() => {
+      attempt++;
+      if (attempt === 1) return Promise.reject(new TypeError('fail'));
+      return Promise.resolve(
+        new Response(
+          new ReadableStream({
+            start(c) {
+              c.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ content: 'ok' })}\n`));
+              c.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ done: true })}\n`));
+              c.close();
+            },
+          }),
+          { status: 200, headers: { 'Content-Type': 'text/event-stream' } }
+        )
+      );
+    });
+
+    const { result } = renderHook(() =>
+      useStreamingAgent({ maxRetries: 1, retryBaseDelay: 100, retryMaxDelay: 200 })
+    );
+
+    await act(async () => {
+      result.current.sendMessage('test');
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    // First attempt failed
+    await waitFor(() => {
+      expect(result.current.retrying).toBeGreaterThanOrEqual(1);
+    });
+
+    // With retryBaseDelay=100ms, recovery should happen within ~150ms + jitter
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 250));
+    });
+
+    await waitFor(() => {
+      expect(result.current.messages[1]?.content).toBe('ok');
+    });
   });
 });

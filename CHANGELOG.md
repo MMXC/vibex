@@ -5916,3 +5916,13 @@ See git history for complete changelog.
 - **S52-E5.5**: `DDSToolbar.tsx` → 键盘图标按钮 + ShortcutSettingsPanel modal
 - **Test**: 9/9 vitest
 
+
+
+---
+
+## [Unreleased] S53-E1: 协作实时 Presence UI — 2026-06-02
+- **S53-E1.1**: `PresenceIndicator.tsx` — 在线协作者展示组件，avatar stack + 在线计数
+- **S53-E1.2**: `usePresence.ts` — WebSocket presence:join/leave/ping 消息订阅 hook
+- **S53-E1.3**: `presenceSync.ts` — 30s 超时自动移除用户逻辑
+- **S53-E1.4**: `DDSCanvasPage.tsx` 集成 PresenceIndicator (右上角 absolute 定位)
+- **S53-E1.5**: vitest `PresenceIndicator.test.tsx` 11/11 ✅

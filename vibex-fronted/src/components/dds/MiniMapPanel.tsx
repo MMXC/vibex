@@ -11,6 +11,7 @@
 import React, { memo, useCallback } from 'react';
 import { MiniMap, useReactFlow, useNodes } from '@xyflow/react';
 import { useMiniMapStore } from '@/lib/canvas/stores/miniMapStore';
+import { getMiniMapNodeColor } from '@/lib/canvas/miniMapUtils';
 import styles from './MiniMapPanel.module.css';
 
 interface MiniMapPanelProps {
@@ -25,9 +26,10 @@ export const MiniMapPanel = memo(function MiniMapPanel({
   width = DEFAULT_WIDTH,
   height = DEFAULT_HEIGHT,
 }: MiniMapPanelProps) {
-  const { panelOpen, togglePanel, viewport } = useMiniMapStore();
   const rf = useReactFlow();
   const nodes = useNodes();
+
+  const { panelOpen, togglePanel, viewport } = useMiniMapStore();
 
   /** Convert MiniMap click to flow viewport coordinates and navigate */
   const handleMiniMapClick = useCallback(
@@ -160,7 +162,7 @@ export const MiniMapPanel = memo(function MiniMapPanel({
             data-testid="minimap-canvas"
           >
             <MiniMap
-              nodeColor="rgba(59,130,246,0.6)"
+              nodeColor={getMiniMapNodeColor}
               maskColor="rgba(0,0,0,0.5)"
               style={{ width, height }}
               onClick={handleMiniMapClick}

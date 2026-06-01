@@ -12,6 +12,7 @@ import { MessageRouter, type WebSocketMessage, type NodeSyncPayload } from '@/li
 import { useRoomManager } from '@/lib/websocket/RoomManager';
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
 import { initCollaborationSync, handleRemoteNodeSync } from '@/lib/canvas/collaborationSync';
+import { initPresenceSync } from '@/lib/canvas/presenceSync';
 
 interface UseCollaborationOptions {
   url?: string;
@@ -121,6 +122,9 @@ export function useCollaboration(
       room.ownerId, // 使用当前房间 owner 作为 userId（后续从 auth 获取）
       room.id
     );
+
+    // S53-E1: 初始化 Presence Sync（presence:join/leave/ping 消息处理）
+    initPresenceSync(routerRef.current);
 
     return () => {
       if (wsRef.current) {

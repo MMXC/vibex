@@ -1,0 +1,38 @@
+/**
+ * TemplateThumbnail.module.css — Thumbnail styles
+ * Sprint49 E2
+ */
+
+.thumbnail {
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--color-bg, #0f0f1a);
+  display: block;
+}
+
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 6px;
+  background: var(--color-surface, #1a1a2e);
+  border: 1px dashed var(--color-border, #2a2a4a);
+}
+
+.placeholderIcon {
+  font-size: 24px;
+  opacity: 0.6;
+}
+
+.placeholderName {
+  font-size: 10px;
+  color: var(--color-text-secondary, #64748b);
+  text-align: center;
+  padding: 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}

@@ -1,0 +1,37 @@
+/**
+ * CategoryFilter.module.css — Category filter button styles
+ * Sprint49 E2
+ */
+
+.filterRow {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 0 20px 12px;
+}
+
+.filterBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 16px;
+  border: 1px solid var(--color-border, #2a2a4a);
+  background: var(--color-bg, #0f0f1a);
+  color: var(--color-text-secondary, #94a3b8);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.filterBtn:hover {
+  border-color: var(--color-primary, #6366f1);
+  color: var(--color-text, #e2e8f0);
+}
+
+.filterBtn.active {
+  background: var(--color-primary, #6366f1);
+  border-color: var(--color-primary, #6366f1);
+  color: #fff;
+}

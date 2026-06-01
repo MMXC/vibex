@@ -452,3 +452,14 @@
 - **S49-E1.4 ConnectionStatus 组件**: `src/components/ui/ConnectionStatus.tsx` + `ConnectionStatus.module.css`; warning/error/success 三色 badge + 脉冲 dot
 - **S49-E1.5 Vitest 覆盖**: 5 个新测试用例 (retryStatus 四态 + 可配置延迟 + 超时); `useStreamingAgent.test.ts` 共 15 个测试
 - 提交: epic/s49-e1-ai-retry
+
+---
+
+## [Unreleased] S49-E2: 画布模板管理完善 — 2026-06-01
+- **S49-E2.1 模板搜索**: `stores/templateStore.ts` 新增 `searchTemplates(query)` 方法；`TemplateSearchBar.tsx` + `TemplateSearchBar.module.css` 组件（debounce 300ms）
+- **S49-E2.2 分类筛选**: `filterByCategory(category)` 方法；`CategoryFilter.tsx` + `CategoryFilter.module.css` 组件（8个分类按钮：全部/空白/SaaS/电商/金融/企业/内容/教育）
+- **S49-E2.3 重命名模板**: `renameTemplate(id, newName)` 更新模板 name + displayName，同步刷新 filteredTemplates
+- **S49-E2.4 缩略图缓存**: `thumbnailCache` Zustand 状态 + `setThumbnail`/`getThumbnail`/`captureThumbnail`；`TemplateThumbnail.tsx` + `TemplateThumbnail.module.css` 渲染组件
+- **S49-E2.5 TemplateSaveDialog 编辑模式**: `editTemplate` prop 支持编辑现有模板名称，调用 `renameTemplate`；保存按钮变为"确认修改"
+- **S49-E2.6 Vitest 覆盖**: `stores/templateStore.test.ts` 新增 16 个测试（searchTemplates ×4 / filterByCategory ×2 / renameTemplate ×3 / thumbnailCache ×4）；总计 30 个测试
+- 提交: epic/s49-e2-template-mgmt

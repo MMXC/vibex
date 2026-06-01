@@ -51,6 +51,22 @@ interface TemplateState {
   saveTemplateVersion: (template: RequirementTemplate) => number;
   getTemplateHistory: (templateId: string) => RequirementTemplate[];
   getTemplateVersion: (templateId: string) => number;
+
+  // ---- E2: 模板管理完善 ----
+  // 重命名模板
+  renameTemplate: (templateId: string, newName: string) => boolean;
+  // 模糊搜索模板（返回匹配列表）
+  searchTemplates: (query: string) => RequirementTemplate[];
+  // 按分类筛选（返回匹配列表）
+  filterByCategory: (category: TemplateCategory | 'all') => RequirementTemplate[];
+  // 缩略图缓存
+  thumbnailCache: Record<string, string>; // templateId -> SVG data URL
+  // 设置缩略图
+  setThumbnail: (templateId: string, svgDataUrl: string) => void;
+  // 获取缩略图
+  getThumbnail: (templateId: string) => string | undefined;
+  // 生成 SVG 缩略图（capture DOM -> SVG data URL）
+  captureThumbnail: (templateId: string, element: HTMLElement | null) => void;
 }
 
 // 初始统计数据
@@ -95,6 +111,8 @@ export const useTemplateStore = create<TemplateState>()(
       isSelectorOpen: false,
       stats: getInitialStats(),
       favoriteTemplateIds: [],
+      // ---- E2: 缩略图缓存 ----
+      thumbnailCache: {},
       
       // 设置分类
       setCategory: (category) => {
@@ -273,6 +291,85 @@ export const useTemplateStore = create<TemplateState>()(
         // This method returns all stored snapshot versions from the in-memory record
         const t = get().templates.find(tmpl => tmpl.id === templateId);
         return t ? [t] : [];
+      },
+
+      // ---- E2: 模板管理完善 ----
+      // 重命名模板
+      renameTemplate: (templateId, newName) => {
+        const { templates, searchQuery, selectedCategory } = get();
+        const idx = templates.findIndex(t => t.id === templateId);
+        if (idx === -1) return false;
+        const renamed = { ...templates[idx], name: newName, displayName: newName };
+        const newTemplates = templates.map((t, i) => i === idx ? renamed : t);
+        set({
+          templates: newTemplates,
+          filteredTemplates: filterTemplates(newTemplates, selectedCategory, searchQuery),
+        });
+        return true;
+      },
+
+      // 模糊搜索模板（返回匹配列表，不修改状态）
+      searchTemplates: (query) => {
+        const { templates } = get();
+        if (!query.trim()) return templates;
+        const lower = query.toLowerCase();
+        return templates.filter(t =>
+          t.name.toLowerCase().includes(lower) ||
+          (t.displayName ?? '').toLowerCase().includes(lower) ||
+          t.description.toLowerCase().includes(lower) ||
+          (t.metadata?.tags ?? []).some((tag: string) => tag.toLowerCase().includes(lower))
+        );
+      },
+
+      // 按分类筛选（返回匹配列表，不修改状态）
+      filterByCategory: (category) => {
+        const { templates } = get();
+        if (category === 'all') return templates;
+        return templates.filter(t => t.category === category);
+      },
+
+      // 设置缩略图
+      setThumbnail: (templateId, svgDataUrl) => {
+        set(state => ({
+          thumbnailCache: { ...state.thumbnailCache, [templateId]: svgDataUrl },
+        }));
+      },
+
+      // 获取缩略图
+      getThumbnail: (templateId) => {
+        return get().thumbnailCache[templateId];
+      },
+
+      // 生成 SVG 缩略图
+      captureThumbnail: (templateId, element) => {
+        if (!element) return;
+        try {
+          const svgEl = element.querySelector('svg');
+          if (!svgEl) return;
+          const serializer = new XMLSerializer();
+          const svgStr = serializer.serializeToString(svgEl);
+          const svgBlob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+          const url = URL.createObjectURL(svgBlob);
+          // Convert SVG to PNG data URL via canvas
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 200;
+            canvas.height = 120;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              ctx.fillStyle = '#1e1e2e';
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+              ctx.drawImage(img, 0, 0, 200, 120);
+              const dataUrl = canvas.toDataURL('image/png');
+              get().setThumbnail(templateId, dataUrl);
+            }
+            URL.revokeObjectURL(url);
+          };
+          img.src = url;
+        } catch (e) {
+          canvasLogger.default.error('[TemplateStore] captureThumbnail failed:', e);
+        }
       },
     }),
     {

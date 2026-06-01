@@ -1,0 +1,57 @@
+/**
+ * TemplateSearchBar.module.css — Search input styles
+ * Sprint49 E2
+ */
+
+.searchBar {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 10px;
+  font-size: 14px;
+  color: var(--color-text-secondary, #94a3b8);
+  pointer-events: none;
+  line-height: 1;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 8px 32px 8px 32px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border, #2a2a4a);
+  background: var(--color-bg, #0f0f1a);
+  color: var(--color-text, #e2e8f0);
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--color-primary, #6366f1);
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-secondary, #64748b);
+}
+
+.searchClear {
+  position: absolute;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary, #94a3b8);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.searchClear:hover {
+  background: var(--color-border, #2a2a4a);
+  color: var(--color-text, #e2e8f0);
+}

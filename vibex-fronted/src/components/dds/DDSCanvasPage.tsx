@@ -65,6 +65,8 @@ import { DiffOverlay } from '@/components/agent/DiffOverlay';
 import { useAIAgent } from '@/hooks/useAIAgent';
 import { useResponsiveMode } from '@/hooks/useResponsiveMode';
 import { TouchModeIndicator } from '@/components/shared/TouchModeIndicator';
+import { SelectionToolbar } from '@/components/dds/SelectionToolbar';
+import { useSelectionBox } from '@/hooks/dds/useSelectionBox';
 
 // ==================== Props ====================
 
@@ -442,6 +444,12 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     onAIGenerate?.();
   }, [toggleDrawer, onAIGenerate]);
 
+  // ---- E4: Selection Box (drag-to-select multi-select) ----
+  const { selectionBox, isSelecting, containerRef: selContainerRef, clearSelection } = useSelectionBox();
+
+  // No-op handler for the outer div's existing onMouseMove prop
+  const handleMouseMove = useCallback(() => {}, []);
+
   // ---- Keyboard Shortcuts ----
   // P001: useKeyboardShortcuts wired to canvasHistoryStore for DDS canvas undo/redo.
   const [searchPanelOpen, setSearchPanelOpen] = useState(false);
@@ -681,7 +689,12 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
       )}
 
       {/* Canvas Scroll Container */}
-      <div style={{ position: 'relative' }}>
+      <div style={{ position: 'relative' }} ref={selContainerRef}>
+        {/* E4-U1: SelectionToolbar — shown when 2+ cards selected */}
+        <SelectionToolbar
+          selectionBox={selectionBox}
+          onClearSelection={clearSelection}
+        />
         <DDSScrollContainer
           className="dds-scroll-container"
           rootRef={scrollContainerRef}

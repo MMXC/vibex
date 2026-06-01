@@ -1,7 +1,7 @@
 /**
- * useBatchExport — Hook for managing batch PNG export state
+ * useBatchExport — Hook for managing batch PNG/SVG/PDF export state
  *
- * E2: PNG 批量导出
+ * E2: PNG/SVG/PDF 批量导出
  *
  * Usage:
  * const { startExport, cancelExport, progress, status } = useBatchExport();
@@ -10,7 +10,11 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { exportAndDownloadAsZip } from '@/lib/canvas/exportMultipleAsPNG';
+import { exportAndDownloadAsSvgZip } from '@/lib/canvas/exportMultipleAsSVG';
+import { exportAndDownloadAsPDF } from '@/lib/canvas/exportMultipleAsPDF';
 import type { DDSCard } from '@/types/dds';
+
+export type BatchExportFormat = 'png' | 'svg' | 'pdf';
 
 export type BatchExportStatus =
   | 'idle'
@@ -34,7 +38,7 @@ export interface UseBatchExportResult {
   /** Error message if status === 'error' */
   error: string | null;
   /** Start a batch export for given cards */
-  startExport: (cards: DDSCard[], scope?: string) => Promise<void>;
+  startExport: (cards: DDSCard[], scope?: string, format?: BatchExportFormat) => Promise<void>;
   /** Cancel the ongoing export */
   cancelExport: () => void;
 }
@@ -54,7 +58,7 @@ export function useBatchExport(): UseBatchExportResult {
   }, []);
 
   const startExport = useCallback(
-    async (cards: DDSCard[], _scope?: string) => {
+    async (cards: DDSCard[], _scope?: string, format: BatchExportFormat = 'png') => {
       // Cancel any ongoing export
       cancelExport();
 
@@ -68,15 +72,39 @@ export function useBatchExport(): UseBatchExportResult {
       try {
         setStatus('exporting');
 
-        await exportAndDownloadAsZip(cards, {
-          scope: (_scope as 'all' | 'requirement' | 'context' | 'flow') ?? 'all',
-          scale: 2,
-          backgroundColor: '#0f0f1a',
-          onProgress: (current, total, nodeName) => {
-            setProgress({ current, total, nodeName });
-          },
-          signal: controller.signal,
-        });
+        const scope = (_scope as 'all' | 'requirement' | 'context' | 'flow') ?? 'all';
+
+        if (format === 'svg') {
+          await exportAndDownloadAsSvgZip(cards, {
+            scope,
+            backgroundColor: '#0f0f1a',
+            onProgress: (current, total, nodeName) => {
+              setProgress({ current, total, nodeName });
+            },
+            signal: controller.signal,
+          });
+        } else if (format === 'pdf') {
+          await exportAndDownloadAsPDF(cards, {
+            scope,
+            scale: 2,
+            backgroundColor: '#0f0f1a',
+            onProgress: (current, total, nodeName) => {
+              setProgress({ current, total, nodeName });
+            },
+            signal: controller.signal,
+          });
+        } else {
+          // Default: PNG
+          await exportAndDownloadAsZip(cards, {
+            scope,
+            scale: 2,
+            backgroundColor: '#0f0f1a',
+            onProgress: (current, total, nodeName) => {
+              setProgress({ current, total, nodeName });
+            },
+            signal: controller.signal,
+          });
+        }
 
         setStatus('done');
       } catch (err) {

@@ -19,7 +19,7 @@ import type { BoundedContextNode, BusinessFlowNode, ComponentNode } from '@/lib/
 
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
 
-export type BatchFormat = 'png' | 'svg';
+export type BatchFormat = 'png' | 'svg' | 'pdf';
 
 export interface BatchExportOptions {
   /** Export format */
@@ -159,6 +159,54 @@ async function captureNodeAsSvg(
 }
 
 /**
+ * Capture a single node element as PDF blob using html-to-image + jsPDF
+ * Note: PDF is captured as PNG-embedded-in-PDF (jsPDF addImage from PNG data URL)
+ */
+async function captureNodeAsPdf(
+  selector: string,
+  scale: number,
+  backgroundColor: string
+): Promise<Blob> {
+  const element = document.querySelector<HTMLElement>(selector);
+  if (!element) {
+    throw new Error(`Node element not found: ${selector}`);
+  }
+
+  const dataUrl = await toPng(element, {
+    backgroundColor,
+    pixelRatio: scale,
+    width: element.scrollWidth,
+    height: element.scrollHeight,
+    style: { transform: 'none' },
+  });
+
+  // jsPDF is imported dynamically to avoid SSR issues
+  const { jsPDF } = await import('jspdf');
+  const pdf = new jsPDF({
+    orientation: element.scrollWidth > element.scrollHeight ? 'landscape' : 'portrait',
+    unit: 'mm',
+    format: 'a4',
+  });
+
+  // Fit image to page with margins
+  const PAGE_WIDTH_MM = 210;
+  const PAGE_HEIGHT_MM = 297;
+  const MARGIN_MM = 10;
+  const USABLE_WIDTH_MM = PAGE_WIDTH_MM - 2 * MARGIN_MM;
+  const USABLE_HEIGHT_MM = PAGE_HEIGHT_MM - 2 * MARGIN_MM;
+
+  const imgWidthMm = USABLE_WIDTH_MM;
+  const imgHeightMm = Math.min(
+    (element.scrollHeight / element.scrollWidth) * imgWidthMm,
+    USABLE_HEIGHT_MM
+  );
+
+  pdf.addImage(dataUrl, 'PNG', MARGIN_MM, MARGIN_MM, imgWidthMm, imgHeightMm);
+
+  return pdf.output('blob');
+}
+
+/**
  * Process nodes in batches to avoid browser freeze
  */
 async function processWithProgress<T, R>(
@@ -266,7 +314,9 @@ export class ZipExporter {
     const captureFn =
       format === 'png'
         ? (n: ExportNode) => captureNodeAsPng(n.selector, scale, backgroundColor)
-        : (n: ExportNode) => captureNodeAsSvg(n.selector, backgroundColor);
+        : format === 'svg'
+        ? (n: ExportNode) => captureNodeAsSvg(n.selector, backgroundColor)
+        : (n: ExportNode) => captureNodeAsPdf(n.selector, scale, backgroundColor);
 
     const blobs = await processWithProgress(
       nodes,

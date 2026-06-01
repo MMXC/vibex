@@ -1,7 +1,7 @@
 /**
  * ExportProgress — Batch export progress UI component
  *
- * E2: PNG 批量导出
+ * E2: PNG/SVG/PDF 批量导出
  *
  * Usage:
  * <ExportProgress
@@ -10,12 +10,14 @@
  *   error={error}
  *   onCancel={cancelExport}
  *   onDismiss={() => setVisible(false)}
+ *   onFormatChange={setFormat}
+ *   currentFormat={format}
  * />
  */
 'use client';
 
 import React from 'react';
-import type { BatchExportStatus, BatchExportProgress } from '@/hooks/useBatchExport';
+import type { BatchExportStatus, BatchExportProgress, BatchExportFormat } from '@/hooks/useBatchExport';
 import styles from './ExportProgress.module.css';
 
 interface ExportProgressProps {
@@ -24,7 +26,17 @@ interface ExportProgressProps {
   error: string | null;
   onCancel: () => void;
   onDismiss: () => void;
+  /** Current export format (for display in header) */
+  currentFormat?: BatchExportFormat;
+  /** Callback when format is changed by user */
+  onFormatChange?: (format: BatchExportFormat) => void;
 }
+
+const FORMAT_LABELS: Record<BatchExportFormat, string> = {
+  png: 'PNG',
+  svg: 'SVG',
+  pdf: 'PDF',
+};
 
 export function ExportProgress({
   status,
@@ -32,6 +44,8 @@ export function ExportProgress({
   error,
   onCancel,
   onDismiss,
+  currentFormat = 'png',
+  onFormatChange,
 }: ExportProgressProps) {
   if (status === 'idle') return null;
 
@@ -40,13 +54,15 @@ export function ExportProgress({
       ? Math.round((progress.current / progress.total) * 100)
       : 0;
 
+  const formatLabel = FORMAT_LABELS[currentFormat] ?? 'PNG';
+
   return (
     <div className={styles.container} role="status" aria-live="polite">
       {/* Header */}
       <div className={styles.header}>
         <span className={styles.title}>
           {status === 'collecting' && '准备导出…'}
-          {status === 'exporting' && '批量导出 PNG'}
+          {status === 'exporting' && `批量导出 ${formatLabel}`}
           {status === 'done' && '导出完成'}
           {status === 'cancelled' && '已取消'}
           {status === 'error' && '导出失败'}
@@ -66,6 +82,26 @@ export function ExportProgress({
           </svg>
         </button>
       </div>
+
+      {/* Format selector — shown when idle or collecting, not during export */}
+      {(status === 'idle' || status === 'collecting') && onFormatChange && (
+        <div className={styles.formatRow}>
+          <label className={styles.formatLabel} htmlFor="export-format-select">
+            格式：
+          </label>
+          <select
+            id="export-format-select"
+            className={styles.formatSelect}
+            value={currentFormat}
+            onChange={(e) => onFormatChange(e.target.value as BatchExportFormat)}
+            disabled={status === 'exporting'}
+          >
+            <option value="png">PNG (位图)</option>
+            <option value="svg">SVG (矢量)</option>
+            <option value="pdf">PDF (文档)</option>
+          </select>
+        </div>
+      )}
 
       {/* Progress bar */}
       {(status === 'collecting' || status === 'exporting') && (
@@ -99,7 +135,7 @@ export function ExportProgress({
               strokeLinejoin="round"
             />
           </svg>
-          ZIP 文件已开始下载
+          {currentFormat === 'pdf' ? 'PDF 文件已开始下载' : 'ZIP 文件已开始下载'}
         </div>
       )}
 

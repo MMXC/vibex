@@ -5821,3 +5821,13 @@ See git history for complete changelog.
 - **S51-E1.2**: `canvasHistoryStore` 新增 `saveHistory`/`loadHistory`/`clearHistory` actions
 - **S51-E1.3**: 新增 `src/hooks/dds/useHistoryPersistence.ts` — 500ms 防抖自动保存
 - **S51-E1.4**: 新增 `historyDB.test.ts` (8 tests) + `canvasHistoryStore.test.ts` (21 tests) + `useHistoryPersistence.test.tsx` (2 tests)
+
+---
+
+## [Unreleased] S51-E2: PNG 批量导出 — 2026-06-01
+- **S51-E2.1 exportMultipleAsPNG.ts**: `lib/canvas/exportMultipleAsPNG.ts` — 批量 PNG 导出函数，html-to-image + JSZip，data-id selector（ReactFlow v12 兼容）
+- **S51-E2.2 useBatchExport hook**: `hooks/useBatchExport.ts` — Zustand-style hook，管理 idle/collecting/exporting/done/cancelled/error 状态，支持 AbortController 取消
+- **S51-E2.3 ExportProgress.tsx**: `components/dds/export/ExportProgress.tsx` — 玻璃态进度条 UI，进度条 + 当前节点名 + X/Y 计数
+- **S51-E2.4 ExportProgress.module.css**: 赛博朋克风格 CSS Module，使用 design-tokens 变量
+- **S51-E2.5 Vitest 覆盖**: `exportMultipleAsPNG.test.ts` (4 cases) + `useBatchExport.test.ts` (2 cases)，7/7 通过
+- 提交: epic/s51-e2-png-batch-export

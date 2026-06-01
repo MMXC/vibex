@@ -40,6 +40,7 @@ import { DDSSearchPanel } from '@/components/dds/DDSSearchPanel';
 import { SearchPanel } from '@/components/dds/SearchPanel';
 import { useSearchIndex } from '@/hooks/useSearchIndex';
 import { useCanvasSearchStore } from '@/stores/canvasSearchStore';
+import { useAutoLayout } from '@/hooks/dds/useAutoLayout';
 import { useCanvasListStore } from '@/stores/canvasListStore';
 import { MiniMapPanel } from '@/components/dds/MiniMapPanel';
 import { ReviewReportPanel } from '@/components/design-review';
@@ -471,6 +472,8 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     return () => document.removeEventListener('keydown', handleCtrlK);
   }, []);
 
+  const { applyAutoLayout } = useAutoLayout();
+
   const undoCallback = useCallback(() => {
     // P004-E4: Open HistoryPanel for selective undo instead of immediate undo
     const { canUndo } = useCanvasHistoryStore.getState();
@@ -553,6 +556,7 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     onQuickGenerate: () => { quickGenerate(); },
     onHelp: () => { setHelpOverlayOpen((v) => !v); },
     onOpenOplog: () => { setOperationOverlayOpen((v) => !v); },
+    onAutoLayout: () => { applyAutoLayout({ direction: 'TB' }); },
     enabled: true,
   });
 

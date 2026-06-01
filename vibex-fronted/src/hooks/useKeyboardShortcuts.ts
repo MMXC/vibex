@@ -63,6 +63,7 @@ const DEFAULT_SHORTCUTS_E3: Record<string, string> = {
   'open-ai-panel': 'Cmd+I',
   'copy-nodes': 'Cmd+C',
   'paste-nodes': 'Cmd+V',
+  'auto-layout': 'Cmd+L',
 };
 
 interface KeyboardShortcutsOptions {
@@ -115,6 +116,8 @@ interface KeyboardShortcutsOptions {
   onCopyNodes?: () => void;
   /** [S46-E3] Paste canvas nodes (Cmd+V) */
   onPasteNodes?: () => void;
+  /** [S50-E2] Auto-layout canvas nodes (Cmd+L) */
+  onAutoLayout?: () => void;
   /** Whether shortcuts should be active */
   enabled?: boolean;
 }
@@ -145,7 +148,8 @@ type ActionName =
   | 'save-canvas'
   | 'open-ai-panel'
   | 'copy-nodes'
-  | 'paste-nodes';
+  | 'paste-nodes'
+  | 'auto-layout';
 
 // Actions that have hardcoded handlers in useKeyboardShortcuts.
 // The dynamic shortcutStore system should NOT re-register these to avoid duplicate calls.
@@ -176,6 +180,7 @@ const HARDCODE_ACTIONS = new Set<ActionName>([
   'open-ai-panel',
   'copy-nodes',
   'paste-nodes',
+  'auto-layout',
 ]);
 
 function isInTextInput(target: EventTarget | null): boolean {
@@ -242,6 +247,7 @@ export function useKeyboardShortcuts({
   onOpenAIPanel,
   onCopyNodes,
   onPasteNodes,
+  onAutoLayout,
   enabled = true,
 }: KeyboardShortcutsOptions) {
   // S48-P001-E3: Read shortcut customizations from userPreferencesStore (priority over defaults)
@@ -281,6 +287,7 @@ export function useKeyboardShortcuts({
       'open-ai-panel': onOpenAIPanel as () => void,
       'copy-nodes': onCopyNodes as () => void,
       'paste-nodes': onPasteNodes as () => void,
+      'auto-layout': onAutoLayout as () => void,
     }),
     [
       undo, redo, onOpenSearch, onZoomIn, onZoomOut, onZoomReset,
@@ -584,6 +591,14 @@ export function useKeyboardShortcuts({
         onPasteNodes?.();
         return;
       }
+
+      // [S50-E2] Auto-layout: Ctrl+L / Cmd+L
+      if ((isCtrl || isMeta) && e.key.toLowerCase() === 'l') {
+        if (isInputFocused) return;
+        e.preventDefault();
+        onAutoLayout?.();
+        return;
+      }
     }
 
     document.addEventListener('keydown', handler);
@@ -594,6 +609,6 @@ export function useKeyboardShortcuts({
     onQuickGenerate, onConfirmSelected, onGenerateContext,
     onSwitchToContext, onSwitchToFlow, onSwitchToComponent, onNextTab, onPrevTab, onDesignReview,
     onHelp, onOpenOplog, onSaveCanvas, onOpenAIPanel,
-    onCopyNodes, onPasteNodes, enabled, shortcutCustomization,
+    onCopyNodes, onPasteNodes, onAutoLayout, enabled, shortcutCustomization,
   ]);
 }

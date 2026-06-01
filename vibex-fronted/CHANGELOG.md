@@ -501,3 +501,16 @@
 - **S49-E3.2**: viewportBoundsStore nodeExtent 配置 (±50,000) + setNodeExtent
 - **S49-E3.3**: DDSFlow 注入 nodeExtent prop
 - **S49-E3.4**: Vitest 覆盖 (15/15 pass)
+
+
+---
+
+## [Unreleased] S50-E2: 画布节点自动布局 (Dagre) — 2026-06-02
+- **S50-E2.1 dagreLayout.ts**: `lib/canvas/dagreLayout.ts` — Dagre TB/LR 层级布局，`computeDagreLayout`/`cardsToFlow`/`applyPositionsToCards`
+- **S50-E2.2 autoLayoutStore.ts**: `stores/dds/autoLayoutStore.ts` — Zustand store，`isLayouting`/`fitViewRequested`/`lastLayoutDirection`
+- **S50-E2.3 useAutoLayout hook**: `hooks/dds/useAutoLayout.ts` — `applyAutoLayout` 整合布局计算 + 状态更新 + fitView
+- **S50-E2.4 Cmd+L 快捷键**: `useKeyboardShortcuts` 新增 `onAutoLayout`；`DDSCanvasPage` 接入
+- **S50-E2.5 DDSToolbar 按钮**: `components/dds/toolbar/DDSToolbar.tsx` — LayoutIcon SVG + 自动布局按钮
+- **S50-E2.6 Vitest 覆盖**: `lib/canvas/dagreLayout.test.ts` (7 cases) + `stores/dds/autoLayoutStore.test.ts` (8 cases)
+- 提交: epic/s50-e2-canvas-auto-layout
+

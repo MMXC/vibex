@@ -20,6 +20,7 @@ import { useFlowStore } from '@/lib/canvas/stores/flowStore';
 import { useComponentStore } from '@/lib/canvas/stores/componentStore';
 import { exportDDSCanvasData, exportToStateMachine } from '@/services/dds/exporter';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds';
+import { useAutoLayout } from '@/hooks/dds/useAutoLayout';
 import { useClipboardStore } from '@/stores/clipboardStore';
 import { useCanvasHistoryStore } from '@/stores/dds/canvasHistoryStore';
 import { useCanvasExport } from '@/hooks/canvas/useCanvasExport';
@@ -114,6 +115,19 @@ function RedoIcon() {
   );
 }
 
+
+
+function LayoutIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <rect x="14" y="14" width="7" height="7" rx="1" />
+      <path d="M10 6.5h4M6.5 10v4M17.5 10v4M10 17.5h4" />
+    </svg>
+  );
+}
 // ==================== Shared download helper ====================
 
 function downloadBlob(blob: Blob, filename: string) {
@@ -168,6 +182,8 @@ export const DDSToolbar = memo(function DDSToolbar({
   const crossChapterEdges = useDDSCanvasStore((s) => s.crossChapterEdges);
 
   // S36-E4: History state for undo/redo buttons
+
+  const { applyAutoLayout, isLayouting } = useAutoLayout();
   const canUndo = useCanvasHistoryStore((s) => s.canUndo());
   const canRedo = useCanvasHistoryStore((s) => s.canRedo());
 
@@ -599,6 +615,18 @@ export const DDSToolbar = memo(function DDSToolbar({
             data-testid="canvas-redo-btn"
           >
             <RedoIcon />
+          </button>
+
+          {/* S50-E2: Auto-layout button */}
+          <button
+            type="button"
+            className={`${styles.iconButton}`}
+            onClick={() => applyAutoLayout({ direction: 'TB' })}
+            aria-label={tToolbar('autoLayout')}
+            title={`${tToolbar('autoLayout')} (Cmd+L)`}
+            data-testid="canvas-auto-layout-btn"
+          >
+            <LayoutIcon />
           </button>
 
           {/* P002-E3: Online users + offline indicator */}

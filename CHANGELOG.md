@@ -5773,3 +5773,16 @@ See git history for complete changelog.
 - **S49-E3.2**: viewportBoundsStore nodeExtent 配置 (±50,000 默认边界) + setNodeExtent
 - **S49-E3.3**: DDSFlow 注入 nodeExtent prop，防止节点位置无限漂移
 - **S49-E3.4**: Vitest 覆盖 (debounce 行为 3 case, flush 2 case, nodeExtent 3 case, 修复旧测试 6 case)
+
+
+---
+
+## [Unreleased] S50-E2: 画布节点自动布局 (Dagre) — 2026-06-02
+- **S50-E2.1 dagreLayout.ts**: `computeDagreLayout(cards, edges, opts)` — Dagre TB/LR 层级布局算法，`cardsToFlow`/`applyPositionsToCards` 辅助函数
+- **S50-E2.2 autoLayoutStore.ts**: Zustand store 管理 `isLayouting`/`fitViewRequested`/`lastLayoutDirection` 状态，`startLayout`/`endLayout`/`requestFitView`/`reset` actions
+- **S50-E2.3 useAutoLayout hook**: `applyAutoLayout({ direction })` 整合 computeDagreLayout + ddsChapterActions.updateCard + fitView 触发
+- **S50-E2.4 Cmd+L 快捷键**: `useKeyboardShortcuts` 新增 `onAutoLayout` 参数；`DDSCanvasPage` 接入 `useAutoLayout`
+- **S50-E2.5 DDSToolbar 按钮**: 自动布局图标按钮，`applyAutoLayout({ direction: 'TB' })` 触发
+- **S50-E2.6 Vitest 覆盖**: `dagreLayout.test.ts` (7 cases: TB层级/LR层级/空输入/孤立边/原始位置fallback/siblings同rank) + `autoLayoutStore.test.ts` (8 cases: 初始状态/startLayout/endLayout/reset)
+- 提交: epic/s50-e2-canvas-auto-layout
+

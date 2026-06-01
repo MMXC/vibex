@@ -8,9 +8,15 @@
  * - Each canvas entry tracks recency: hit → move to head; miss → demote
  * - When total size exceeds MAX_BYTES (5MB), evict least-recently-used entries
  * - Each entry stores serializable command metadata (not closures)
+ *
+ * E3 (Sprint52): Undo/Redo 协作冲突处理
+ * - 每个画布条目增加 revision 字段用于乐观锁
+ * - saveHistoryWithRevision() 在 revision 不匹配时抛出 RevisionMismatchError
+ * - loadHistoryWithRevision() 返回 revision 以便前端与远程同步
  */
 
 import type { Command } from '@/stores/dds/canvasHistoryStore';
+import { RevisionMismatchError } from '@/stores/dds/canvasHistoryStore';
 
 // ============================================
 // Constants
@@ -48,6 +54,8 @@ export interface HistoryEntry {
   updatedAt: number;
   /** Estimated size in bytes */
   _size?: number;
+  /** E3: Revision number for optimistic locking — incremented on each collaborative change */
+  revision: number;
 }
 
 // ============================================
@@ -220,6 +228,7 @@ export async function saveHistoryToDB(
     future: futureMeta,
     updatedAt: Date.now(),
     _size: 0,
+    revision: 0,
   };
   entry._size = estimateSize(entry);
 
@@ -275,4 +284,105 @@ export async function getHistoryDBSize(canvasId: string): Promise<number | null>
   if (!entry) return 0;
 
   return entry._size ?? estimateSize(entry);
+}
+
+// ============================================
+// E3: Revision-aware Optimistic Locking
+// ============================================
+
+/**
+ * E3: Save canvas history with optimistic lock.
+ * Throws RevisionMismatchError if remote revision is newer than expectedRevision.
+ */
+export async function saveHistoryWithRevision(
+  canvasId: string,
+  past: Command[],
+  future: Command[],
+  expectedRevision: number
+): Promise<number> {
+  if (!isIndexedDBAvailable()) return expectedRevision;
+
+  // Check current revision
+  const existing = await idbGet<HistoryEntry>(canvasId);
+  const currentRevision = existing?.revision ?? 0;
+
+  if (currentRevision > expectedRevision) {
+    throw new RevisionMismatchError(
+      canvasId,
+      expectedRevision,
+      currentRevision,
+      `Remote revision ${currentRevision} is newer than expected ${expectedRevision}`
+    );
+  }
+
+  // Save with incremented revision
+  const newRevision = expectedRevision + 1;
+  const pastMeta: CommandMeta[] = past.map((cmd) => ({
+    id: cmd.id,
+    timestamp: cmd.timestamp,
+    description: cmd.description,
+  }));
+  const futureMeta: CommandMeta[] = future.map((cmd) => ({
+    id: cmd.id,
+    timestamp: cmd.timestamp,
+    description: cmd.description,
+  }));
+
+  const entry: HistoryEntry = {
+    canvasId,
+    past: pastMeta,
+    future: futureMeta,
+    updatedAt: Date.now(),
+    _size: 0,
+    revision: newRevision,
+  };
+  entry._size = estimateSize(entry);
+
+  if (entry._size > MAX_BYTES_PER_CANVAS) {
+    await evictIfNeeded(canvasId, pastMeta);
+    const reloaded = await idbGet<HistoryEntry>(canvasId);
+    if (reloaded) {
+      entry.past = reloaded.past;
+      entry._size = estimateSize(entry);
+    }
+  }
+
+  await idbPut(entry);
+  return newRevision;
+}
+
+/**
+ * E3: Load canvas history with revision number.
+ * Returns { past, future, revision } or null if no history.
+ */
+export async function loadHistoryWithRevision(
+  canvasId: string
+): Promise<{ past: CommandMeta[]; future: CommandMeta[]; revision: number } | null> {
+  if (!isIndexedDBAvailable()) return null;
+
+  const entry = await idbGet<HistoryEntry>(canvasId);
+  if (!entry || !entry.past.length) return null;
+
+  return {
+    past: entry.past,
+    future: entry.future ?? [],
+    revision: entry.revision ?? 0,
+  };
+}
+
+/**
+ * E3: Clear canvas history from IndexedDB.
+ */
+export async function clearHistoryWithRevision(canvasId: string): Promise<void> {
+  if (!isIndexedDBAvailable()) return;
+  await idbDelete(canvasId);
+}
+
+/**
+ * E3: Get current revision for a canvas without loading full history.
+ */
+export async function getRevision(canvasId: string): Promise<number> {
+  if (!isIndexedDBAvailable()) return 0;
+  const entry = await idbGet<HistoryEntry>(canvasId);
+  return entry?.revision ?? 0;
 }

@@ -8,6 +8,11 @@
  * - 50步限制：past 超长时 shift 淘汰最旧记录
  * - future 在 execute 时清空（撤销后做新操作会覆盖 redo 栈）
  * - isPerforming 标志防止嵌套执行
+ *
+ * E3 (Sprint52): Undo/Redo 协作冲突处理
+ * - baseRevision 乐观锁：每次 execute 时 bump；远程 revision:bump 时 setBaseRevision
+ * - saveHistoryWithRevision() 在 revision 不匹配时抛出 RevisionMismatchError
+ * - onRevisionConflict 回调：冲突时触发 Toast 提示
  */
 
 import { create } from 'zustand';
@@ -31,6 +36,35 @@ export interface CommandMeta {
   description?: string;
 }
 
+// ==================== E3: Revision Conflict Types ====================
+
+/** Error thrown when IndexedDB revision does not match expected revision (optimistic lock failure) */
+export class RevisionMismatchError extends Error {
+  readonly canvasId: string;
+  readonly expectedRevision: number;
+  readonly actualRevision: number;
+
+  constructor(canvasId: string, expectedRevision: number, actualRevision: number, message?: string) {
+    super(
+      message ??
+        `Revision mismatch on canvas "${canvasId}": expected ${expectedRevision}, got ${actualRevision}`
+    );
+    this.name = 'RevisionMismatchError';
+    this.canvasId = canvasId;
+    this.expectedRevision = expectedRevision;
+    this.actualRevision = actualRevision;
+  }
+}
+
+/** Conflict resolution strategy */
+export type ConflictResolution = 'merge' | 'discard-local' | 'discard-remote';
+
+/** Callback invoked when a remote revision bump conflicts with local state */
+export type RevisionConflictHandler = (
+  expected: number,
+  actual: number
+) => ConflictResolution;
+
 // ==================== Constants ====================
 
 export const MAX_HISTORY = 50;
@@ -41,6 +75,12 @@ interface CanvasHistoryState {
   past: Command[];
   future: Command[];
   isPerforming: boolean;
+  // E3: Revision tracking for collaborative conflict detection
+  /** Current revision number — incremented on each execute(); set by remote revision:bump */
+  baseRevision: number;
+  /** Callback invoked when a remote revision bump conflicts with local pending changes */
+  onRevisionConflict: RevisionConflictHandler | null;
+
   /** Push a new command, execute it, and push to history */
   execute: (cmd: Command) => void;
   /** Undo last command */
@@ -62,6 +102,21 @@ interface CanvasHistoryState {
   loadHistory: (canvasId: string) => Promise<{ past: CommandMeta[]; future: CommandMeta[] } | null>;
   /** Clear history from IndexedDB for a given canvas */
   clearHistory: (canvasId: string) => Promise<void>;
+  // E3: Revision-based conflict handling
+  /** Set the base revision (called when remote revision:bump arrives) */
+  setBaseRevision: (revision: number) => void;
+  /** Bump revision and save with optimistic locking; throws RevisionMismatchError on conflict */
+  saveHistoryWithRevision: (canvasId: string) => Promise<void>;
+  /** Load history from IndexedDB and return revision metadata */
+  loadHistoryWithRevision: (canvasId: string) => Promise<{
+    past: CommandMeta[];
+    future: CommandMeta[];
+    revision: number;
+  } | null>;
+  /** Register a conflict handler called when remote revision bumps conflict with local state */
+  setRevisionConflictHandler: (handler: RevisionConflictHandler | null) => void;
+  /** Trigger a conflict toast using the UI Toast system */
+  triggerConflictToast: (canvasId: string, remoteRevision: number, localRevision: number) => void;
 }
 
 // ==================== Helper ====================
@@ -80,6 +135,9 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
   past: [],
   future: [],
   isPerforming: false,
+  // E3: revision tracking
+  baseRevision: 0,
+  onRevisionConflict: null,
 
   execute: (cmd: Command) => {
     if (get().isPerforming) return;
@@ -91,7 +149,8 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
         if (past.length > MAX_HISTORY) {
           past.shift();
         }
-        return { past, future: [] };
+        // E3: bump revision on each local command execution
+        return { past, future: [], baseRevision: state.baseRevision + 1 };
       });
     } finally {
       set({ isPerforming: false });
@@ -188,7 +247,61 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
     const { clearHistoryFromDB } = await import('@/lib/canvas/historyDB');
     await clearHistoryFromDB(canvasId);
   },
+
+  // E3: Revision-based conflict handling
+  setBaseRevision: (revision: number) => {
+    const { baseRevision, past, onRevisionConflict } = get();
+    // If local has unsaved changes (past is non-empty), this is a conflict
+    if (revision > baseRevision && past.length > 0 && onRevisionConflict) {
+      const resolution = onRevisionConflict(baseRevision, revision);
+      if (resolution === 'discard-local') {
+        // Remote wins — clear local history and accept remote revision
+        set({ baseRevision: revision, past: [], future: [] });
+        return;
+      }
+      // 'merge' or 'discard-remote': keep local, set revision but don't clear
+    }
+    set({ baseRevision: revision });
+  },
+
+  saveHistoryWithRevision: async (canvasId: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+    const { past, future, baseRevision } = get();
+    const { saveHistoryWithRevision: dbSaveWithRevision } = await import(
+      '@/lib/canvas/historyDB'
+    );
+    await dbSaveWithRevision(canvasId, past, future, baseRevision);
+  },
+
+  loadHistoryWithRevision: async (canvasId: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return null;
+    const { loadHistoryWithRevision: dbLoadWithRevision } = await import(
+      '@/lib/canvas/historyDB'
+    );
+    return dbLoadWithRevision(canvasId);
+  },
+
+  setRevisionConflictHandler: (handler) => {
+    set({ onRevisionConflict: handler });
+  },
+
+  triggerConflictToast: async (canvasId: string, remoteRevision: number, localRevision: number) => {
+    try {
+      const { showToast } = await import('@/components/ui/Toast');
+      showToast(
+        `协作冲突：画布 ${canvasId} 在本地 revision ${localRevision} vs 远程 revision ${remoteRevision}，请刷新页面`,
+        'warning',
+        8000
+      );
+    } catch {
+      // Toast not available (e.g., outside React tree)
+      console.warn(
+        `[canvasHistoryStore] Conflict on canvas ${canvasId}: local=${localRevision}, remote=${remoteRevision}`
+      );
+    }
+  },
 }))
+
 
 
 /**
@@ -212,6 +325,7 @@ export function saveHistoryToStorage(canvasId: string): void {
         timestamp: cmd.timestamp,
         description: cmd.description,
       })),
+      revision: state.baseRevision,
     };
     localStorage.setItem(`vibex-dds-history-${canvasId}`, JSON.stringify(payload));
   } catch {
@@ -228,6 +342,7 @@ export function saveHistoryToStorage(canvasId: string): void {
 export function loadHistoryFromStorage(canvasId: string): {
   pastMeta: Array<{ id: string; timestamp: number; description?: string }>;
   futureMeta: Array<{ id: string; timestamp: number; description?: string }>;
+  revision?: number;
 } | null {
   try {
     const raw = localStorage.getItem(`vibex-dds-history-${canvasId}`);
@@ -237,6 +352,7 @@ export function loadHistoryFromStorage(canvasId: string): {
     return {
       pastMeta: Array.isArray(parsed.past) ? parsed.past : [],
       futureMeta: Array.isArray(parsed.future) ? parsed.future : [],
+      revision: typeof parsed.revision === 'number' ? parsed.revision : undefined,
     };
   } catch {
     return null;

@@ -35,3 +35,37 @@
   min-width: 10px;
   text-align: center;
 }
+
+/* S50-E3: Global comment unread badge for nav */
+.globalBadge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  color: white;
+  background-color: #ef4444;
+  border: 1.5px solid white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  pointer-events: auto;
+  z-index: 20;
+  animation: pulse-badge 2s ease-in-out infinite;
+}
+
+.globalCount {
+  font-family: var(--font-mono, monospace);
+  text-align: center;
+}
+
+@keyframes pulse-badge {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}

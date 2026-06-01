@@ -1,10 +1,10 @@
 'use client';
 
 /**
- * CommentBadge — Sprint49 E5: 协作评论系统
+ * CommentBadge — Sprint49 E5 + Sprint50 E3: 协作评论系统
  *
- * 节点右上角评论徽章。
- * 显示未读评论数量气泡。
+ * S49-E5: 节点右上角评论徽章（显示节点未读数）
+ * S50-E3: 全局未读总数徽章（用于导航栏评论图标）
  */
 
 import React from 'react';
@@ -19,6 +19,9 @@ interface CommentBadgeProps {
   className?: string;
 }
 
+/**
+ * 节点级评论徽章 — 显示该节点的未读评论数
+ */
 export function CommentBadge({ nodeId, visible = true, className }: CommentBadgeProps) {
   const unreadCount = useCommentStore(s => s.getUnreadCount(nodeId));
 
@@ -47,6 +50,27 @@ export function CommentBadge({ nodeId, visible = true, className }: CommentBadge
         <circle cx="10.5" cy="6.5" r="1.5" fill="white" />
       </svg>
       <span className={styles.count}>{unreadCount > 99 ? '99+' : unreadCount}</span>
+    </div>
+  );
+}
+
+/**
+ * 全局评论未读徽章 — 用于导航栏评论图标（显示所有未读评论总数）
+ * S50-E3 新增
+ */
+export function CommentGlobalBadge({ className }: { className?: string }) {
+  const unreadCount = useCommentStore(s => s.unreadCount);
+  const initialized = useCommentStore(s => s.initialized);
+
+  if (!initialized || unreadCount === 0) return null;
+
+  return (
+    <div
+      className={`${styles.globalBadge} ${className ?? ''}`}
+      title={`${unreadCount} 条未读评论`}
+      aria-label={`${unreadCount} 条未读评论`}
+    >
+      <span className={styles.globalCount}>{unreadCount > 99 ? '99+' : unreadCount}</span>
     </div>
   );
 }

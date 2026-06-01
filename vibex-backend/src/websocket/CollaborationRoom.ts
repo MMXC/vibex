@@ -205,6 +205,14 @@ export class CollaborationRoom extends DurableObject {
         // E2-S2: Update heartbeat in connection pool (triggers passive stale cleanup)
         this.connectionPool.updateHeartbeat(connectionId);
         break;
+      // S50-E3: Comment events — broadcast to other connections in the same project room
+      case 'comment:created':
+      case 'comment:resolved':
+        this.broadcast({
+          ...message,
+          timestamp: Date.now(),
+        }, connectionId);
+        break;
       default:
         devLog('Unknown message type:', message.type);
     }

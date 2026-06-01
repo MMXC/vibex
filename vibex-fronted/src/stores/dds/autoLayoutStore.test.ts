@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { act } from '@testing-library/react';
-import { useAutoLayoutStore } from '../autoLayoutStore';
+import { useAutoLayoutStore } from '@/stores/dds/autoLayoutStore';
 
 describe('useAutoLayoutStore', () => {
   beforeEach(() => {

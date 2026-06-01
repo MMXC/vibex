@@ -5735,3 +5735,12 @@ See git history for complete changelog.
 - **S49-E2.7 TemplateSaveDialog 编辑模式**: `editTemplate` prop 支持编辑现有模板名称，调用 `renameTemplate`
 - **S49-E2.8 Vitest 覆盖**: 新增 16 个测试用例（searchTemplates ×4 / filterByCategory ×2 / renameTemplate ×3 / thumbnailCache ×4）；总计 30 个测试
 - 提交: epic/s49-e2-template-mgmt
+
+
+---
+
+## [Unreleased] S49-E3: 大型画布性能优化 v2 — 2026-06-01
+- **S49-E3.1**: viewportBoundsStore 防抖更新 (50ms debounce, 合并重复调用) + flushViewportBounds 立即生效
+- **S49-E3.2**: viewportBoundsStore nodeExtent 配置 (±50,000 默认边界) + setNodeExtent
+- **S49-E3.3**: DDSFlow 注入 nodeExtent prop，防止节点位置无限漂移
+- **S49-E3.4**: Vitest 覆盖 (debounce 行为 3 case, flush 2 case, nodeExtent 3 case, 修复旧测试 6 case)

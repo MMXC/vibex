@@ -316,6 +316,8 @@ function DDSFlowInner({
         onPointerDown={touchGestures.onPointerDown}
         /* S43-P003-E3: only render nodes visible in viewport for large canvas performance */
         onlyRenderVisibleElements={true}
+        /* S49-E3: clamp node positions to configured extent — prevents infinite canvas drift */
+        nodeExtent={useViewportBoundsStore((s) => s.nodeExtent)}
         fitView
         fitViewOptions={{ padding: 0.2 }}
         style={{ background: 'transparent' }}

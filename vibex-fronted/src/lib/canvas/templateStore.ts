@@ -27,6 +27,8 @@ export interface CanvasTemplateData {
   updatedAt: string;
   /** Serialized canvas snapshot (JSON string) */
   snapshot: string;
+  /** Canvas layout category: flowchart/mindmap/uml/other */
+  category: 'flowchart' | 'mindmap' | 'uml' | 'other' | null;
   /** Tags for filtering */
   tags: string[];
   /** Whether this is a built-in preset template */
@@ -41,6 +43,7 @@ export interface CanvasTemplateSummary {
   createdAt: string;
   updatedAt: string;
   isPreset: boolean;
+  category: 'flowchart' | 'mindmap' | 'uml' | 'other' | null;
   tags: string[];
 }
 
@@ -127,7 +130,7 @@ export async function deleteTemplate(id: string): Promise<void> {
  */
 export async function updateTemplate(
   id: string,
-  patch: Partial<Pick<CanvasTemplateData, 'name' | 'description' | 'icon' | 'tags' | 'snapshot'>>
+  patch: Partial<Pick<CanvasTemplateData, 'name' | 'description' | 'icon' | 'category' | 'tags' | 'snapshot'>>
 ): Promise<void> {
   const db = await getDB();
   const existing = await db.get(STORE_NAME, id);
@@ -170,6 +173,7 @@ export const PRESET_TEMPLATES: CanvasTemplateData[] = [
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     snapshot: JSON.stringify({ schemaVersion: '1.2.0', chapters: [], crossChapterEdges: [] }),
+    category: null,
     tags: ['blank'],
     isPreset: true,
   },
@@ -245,7 +249,8 @@ export const PRESET_TEMPLATES: CanvasTemplateData[] = [
       ],
       crossChapterEdges: [],
     }),
-    tags: ['flow', 'process'],
+    category: null,
+        tags: ['flow', 'process'],
     isPreset: true,
   },
   {
@@ -274,7 +279,8 @@ export const PRESET_TEMPLATES: CanvasTemplateData[] = [
       ],
       crossChapterEdges: [],
     }),
-    tags: ['matrix', 'analysis'],
+    category: null,
+        tags: ['matrix', 'analysis'],
     isPreset: true,
   },
   {
@@ -303,7 +309,8 @@ export const PRESET_TEMPLATES: CanvasTemplateData[] = [
       ],
       crossChapterEdges: [],
     }),
-    tags: ['mindmap', 'brainstorm'],
+    category: null,
+        tags: ['mindmap', 'brainstorm'],
     isPreset: true,
   },
   {
@@ -332,7 +339,42 @@ export const PRESET_TEMPLATES: CanvasTemplateData[] = [
       ],
       crossChapterEdges: [],
     }),
-    tags: ['swot', 'strategy'],
+    category: null,
+        tags: ['swot', 'strategy'],
     isPreset: true,
   },
 ];
+
+// ─── E4: Template Category & Tag Management ────────────────────────────────
+
+export type CanvasTemplateCategory = 'flowchart' | 'mindmap' | 'uml' | 'other' | null;
+
+/**
+ * Set the canvas layout category for a template.
+ */
+export async function setTemplateCategory(
+  id: string,
+  category: CanvasTemplateCategory
+): Promise<void> {
+  await updateTemplate(id, { category });
+}
+
+/**
+ * Add a tag to a template.
+ */
+export async function addTemplateTag(id: string, tag: string): Promise<void> {
+  const existing = await getTemplate(id);
+  if (!existing) throw new Error(`Template not found: ${id}`);
+  const tags = existing.tags.includes(tag) ? existing.tags : [...existing.tags, tag];
+  await updateTemplate(id, { tags });
+}
+
+/**
+ * Remove a tag from a template.
+ */
+export async function removeTemplateTag(id: string, tag: string): Promise<void> {
+  const existing = await getTemplate(id);
+  if (!existing) throw new Error(`Template not found: ${id}`);
+  const tags = existing.tags.filter((t) => t !== tag);
+  await updateTemplate(id, { tags });
+}

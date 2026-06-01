@@ -68,6 +68,14 @@ interface TemplateState {
   // 生成 SVG 缩略图（capture DOM -> SVG data URL）
   captureThumbnail: (templateId: string, element: HTMLElement | null) => void;
 
+  // ---- E4: 模板分类/标签管理 ----
+  // 设置模板分类
+  setTemplateCategory: (id: string, category: 'flowchart' | 'mindmap' | 'uml' | 'other' | null) => Promise<void>;
+  // 添加标签
+  addTemplateTag: (id: string, tag: string) => Promise<void>;
+  // 移除标签
+  removeTemplateTag: (id: string, tag: string) => Promise<void>;
+
   // ---- E4: 模板导入/导出管理 ----
   // 导出所有模板为 JSON
   exportTemplates: () => { version: string; exportedAt: string; templates: RequirementTemplate[] };

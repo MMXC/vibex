@@ -18,7 +18,9 @@ import {
 import { useTemplateStore } from '@/stores/templateStore';
 import { downloadTemplatesAsFile } from '@/lib/canvas/templateExport';
 import { TemplateImportDialog } from './TemplateImportDialog';
+import { CategoryTab, type CanvasCategory } from './CategoryTab';
 import { deserializeThreeTrees, restoreStore } from '@/lib/canvas/serialize';
+import { searchTemplates } from '@/lib/canvas/templateSearch';
 import styles from './TemplateGallery.module.css';
 
 interface TemplateGalleryProps {
@@ -52,7 +54,7 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
 
   const templateStore = useTemplateStore();
 
-  const categories = ['all', 'blank', 'flow', 'matrix', 'mindmap', 'swot', 'custom'];
+// categories removed (now via CategoryTab)
 
   const loadTemplates = useCallback(async () => {
     setLoading(true);
@@ -74,15 +76,19 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
     }
   }, [isOpen, loadTemplates]);
 
+  // E4: Fuse.js search + category filter
   const filtered = templates.filter((t) => {
-    const matchCat =
-      selectedCategory === 'all' ||
-      (selectedCategory === 'custom' ? !t.isPreset : t.tags.includes(selectedCategory));
     const matchSearch =
       !searchQuery ||
       t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchCat && matchSearch;
+    if (!matchSearch) return false;
+    // Category filter (canvas layout category from IndexedDB)
+    const cat = t.category || 'other';
+    const matchCat =
+      selectedCategory === 'all' ||
+      (selectedCategory === cat);
+    return matchCat;
   });
 
   const applyTemplate = async (templateId: string) => {
@@ -153,19 +159,11 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
           />
         </div>
 
-        {/* Category tabs */}
-        <div className={styles.categories}>
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              className={`${styles.catBtn} ${selectedCategory === cat ? styles.catBtnActive : ''}`}
-              onClick={() => setSelectedCategory(cat)}
-            >
-              {cat === 'all' ? '全部' : cat === 'custom' ? '自定义' : cat}
-            </button>
-          ))}
-        </div>
+        {/* Category tabs (E4: CategoryTab component) */}
+        <CategoryTab
+          selected={selectedCategory as CanvasCategory | 'all' | 'favorites'}
+          onSelect={(cat) => setSelectedCategory(cat)}
+        />
 
         {/* Template grid */}
         <div className={styles.grid}>

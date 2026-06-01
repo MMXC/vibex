@@ -1,3 +1,20 @@
+## [Unreleased] Sprint 49 — E3 视口性能优化 + E5 协作评论系统
+
+##### S49-E3: 视口性能优化（防抖 + 节点边界扩展）
+- **E3 viewportBoundsStore**: 重构 `updateViewportBounds()` 为防抖（debounce 50ms），新增 `flushViewportBounds()` + `_pendingBounds` coalescing
+- **E3 DDSDrawflow.tsx**: 节点 `nodeExtent` 从 `[0,0,600,400]` 扩展为 `[-50000, -50000, 101000, 101000]`，支持全整数坐标范围
+- **E3 DDSCanvas.tsx**: `onMoveEnd` 改为 `onSelectionChange`，避免冗余状态更新
+- **E3 9 新增测试**: viewportBoundsStore 防抖行为测试 + DDSDrawflow 节点范围边界测试
+- **E3 vitest**: 全量 15/15 PASS（9 新增 + 6 回归）
+- **E3 merge**: origin/epic/s49-e3-perf-v2 → main (1b913f246)
+
+##### S49-E5: 协作评论系统
+- **E5 commentStore.ts**: Zustand store + IndexedDB 持久化，Comment 接口含 id/canvasId/nodeId/author/content/resolved/timestamp
+- **E5 CommentBadge.tsx**: 节点右上角评论徽章（绝对定位 top:-6px right:-6px，resolved=false 显示未读数）
+- **E5 CommentPanel.tsx**: 右侧边栏评论面板（320px 宽，支持添加评论/标记已解决/删除）
+- **E5 12 测试**: addComment/editComment/deleteComment/resolveComment/unresolveComment/queryByCanvas/queryByNode 全覆盖
+- **E5 vitest**: commentStore 12/12 PASS，dds 全量 90/90 PASS
+
 ### [Unreleased] Sprint 46 — E1 AI Session 搜索 + E2 键盘快捷键扩展 + E3 画布节点复制/粘贴
 
 ##### S46-P001-E1: AI Session 搜索 + 历史会话管理

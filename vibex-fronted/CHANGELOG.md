@@ -557,3 +557,14 @@
 - **S51-E2.4 ExportProgress.module.css**: `components/dds/export/ExportProgress.module.css` — CSS Module，design-tokens
 - **S51-E2.5 Vitest 覆盖**: 7/7 通过
 - 提交: epic/s51-e2-png-batch-export
+
+---
+
+## [Unreleased] S51-E5: @Mention 通知系统 — 2026-06-02
+- **S51-E5.1**: `parseMentions.ts` — @提及正则解析 (中英文用户名, /@[\w\u4e00-\u9fa5]+/)
+- **S51-E5.2**: `mentionsStore.ts` — Zustand store (mentions[], unreadCount, event listeners)
+- **S51-E5.3**: `useMentionCompletion.ts` — React Hook (↑↓ Enter Esc 键盘导航, 补全下拉)
+- **S51-E5.4**: `CommentPanel.tsx` — 集成 @ 补全 (dropdown UI, textarea ref, 键盘代理)
+- **S51-E5.5**: `CommentPanel.module.css` — mentionDropdown 样式
+- **S51-E5.6**: `wsCommentHandler.ts` — comment:mention 类型 → mentionsStore 写入 + 未读计数
+- **Tests**: parseMentions 9 tests, mentionsStore 7 tests, vitest 21/21 ✅

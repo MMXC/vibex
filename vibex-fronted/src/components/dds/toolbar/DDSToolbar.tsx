@@ -22,6 +22,7 @@ import { exportDDSCanvasData, exportToStateMachine } from '@/services/dds/export
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds';
 import { useClipboardStore } from '@/stores/clipboardStore';
 import { useCanvasHistoryStore } from '@/stores/dds/canvasHistoryStore';
+import { useSnapshotHistoryStore } from '@/stores/dds/snapshotHistoryStore';
 import { useCanvasExport } from '@/hooks/canvas/useCanvasExport';
 import { useCanvasImport } from '@/hooks/canvas/useCanvasImport';
 import { useCanvasRBAC } from '@/hooks/useCanvasRBAC';
@@ -213,6 +214,12 @@ export const DDSToolbar = memo(function DDSToolbar({
   }, [chapters['business-rules'].cards]);
 
   const handleDDSExportJSON = () => {
+    // S49-E4: Auto-snapshot before export
+    const { chapters: ch, crossChapterEdges: cce } = useDDSCanvasStore.getState();
+    useSnapshotHistoryStore.getState().addAutoSnapshot('pre-export', {
+      nodes: Object.values(ch).flatMap((c) => c.cards),
+      edges: [...Object.values(ch).flatMap((c) => c.edges), ...cce],
+    });
     const allChapters = Object.values(chapters);
     const blob = exportAsJSON(allChapters, crossChapterEdges);
     downloadBlob(blob, `vibex-canvas-${new Date().toISOString().slice(0,10)}.json`);
@@ -220,6 +227,12 @@ export const DDSToolbar = memo(function DDSToolbar({
   };
 
   const handleDDSExportVibex = async () => {
+    // S49-E4: Auto-snapshot before export
+    const { chapters: ch, crossChapterEdges: cce } = useDDSCanvasStore.getState();
+    useSnapshotHistoryStore.getState().addAutoSnapshot('pre-export', {
+      nodes: Object.values(ch).flatMap((c) => c.cards),
+      edges: [...Object.values(ch).flatMap((c) => c.edges), ...cce],
+    });
     const allChapters = Object.values(chapters);
     const blob = await exportAsVibex(allChapters, crossChapterEdges);
     downloadBlob(blob, `vibex-canvas-${new Date().toISOString().slice(0,10)}.vibex`);

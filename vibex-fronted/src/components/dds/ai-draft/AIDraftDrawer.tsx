@@ -24,6 +24,7 @@ import React, {
   type FormEvent,
 } from 'react';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
+import { useSnapshotHistoryStore } from '@/stores/dds/snapshotHistoryStore';
 import type { DDSCard, DDSEdge, ChatMessage } from '@/types/dds';
 import { CardPreview } from './CardPreview';
 import styles from './AIDraftDrawer.module.css';
@@ -344,6 +345,14 @@ export const AIDraftDrawer = memo(function AIDraftDrawer({
 
   const handleAccept = useCallback(() => {
     const chapter = activeChapter;
+    // S49-E4: Capture canvas state BEFORE adding cards for auto-snapshot
+    const storeState = useDDSCanvasStore.getState();
+    const chapterData = storeState.chapters[chapter];
+    const canvasState = {
+      nodes: chapterData.cards,
+      edges: chapterData.edges,
+    };
+    // Add cards and edges
     generatedCards.forEach((card) => {
       ddsChapterActions.addCard(chapter, card);
     });
@@ -351,6 +360,8 @@ export const AIDraftDrawer = memo(function AIDraftDrawer({
     generatedEdges.forEach((edge) => {
       ddsChapterActions.addEdge(chapter, edge);
     });
+    // S49-E4: Trigger debounced auto-snapshot after AI generation
+    useSnapshotHistoryStore.getState().addAutoSnapshot('ai-generate', canvasState);
     setState('IDLE');
     setGeneratedCards([]);
     setGeneratedEdges([]);

@@ -7,9 +7,12 @@
  * 列出当前画布所有评论，支持添加、回复、标记已解决。
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { useCommentStore } from '@/stores/dds/commentStore';
 import type { Comment } from '@/stores/dds/commentStore';
+import { parseMentions } from '@/lib/canvas/parseMentions';
+import { useMentionsStore } from '@/stores/dds/mentionsStore';
+import { useMentionCompletion, getMentionQueryAtCursor } from '@/hooks/useMentionCompletion';
 import styles from './CommentPanel.module.css';
 
 interface CommentPanelProps {
@@ -86,29 +89,61 @@ function CommentItem({
 export function CommentPanel({ open, onClose, activeNodeId }: CommentPanelProps) {
   const [newText, setNewText] = useState('');
   const [targetNodeId, setTargetNodeId] = useState(activeNodeId ?? '');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const comments = useCommentStore(s => s.comments);
   const addComment = useCommentStore(s => s.addComment);
   const resolveComment = useCommentStore(s => s.resolveComment);
   const unresolveComment = useCommentStore(s => s.unresolveComment);
   const deleteComment = useCommentStore(s => s.deleteComment);
+  const addMention = useMentionsStore(s => s.addMention);
+
+  const mention = useMentionCompletion();
 
   const handleAddComment = useCallback(() => {
     if (!newText.trim()) return;
     const nodeId = targetNodeId.trim() || `node-${Date.now()}`;
+
+    // S51-E5: parse @mentions before saving comment
+    const mentionedUsers = parseMentions(newText);
     addComment(nodeId, newText.trim());
+
+    // S51-E5: trigger mention notifications for each @mentioned user
+    mentionedUsers.forEach(username => {
+      addMention({
+        commentId: `mention-${Date.now()}-${username}`,
+        fromUser: 'current-user', // replace with actual user from auth
+        toUser: username,
+        commentText: newText.trim(),
+        projectId: 'current-project', // replace with actual projectId
+        nodeId,
+        timestamp: Date.now(),
+      });
+    });
+
     setNewText('');
     setTargetNodeId('');
-  }, [newText, targetNodeId, addComment]);
+    mention.close();
+  }, [newText, targetNodeId, addComment, addMention, mention]);
+
+  const handleTextareaChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNewText(e.target.value);
+    mention.handleTextChange(e);
+  }, [mention]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      // S51-E5: 如果 mention 下拉打开，交给 hook 处理
+      if (mention.isOpen) {
+        mention.handleKeyDown(e);
+        return;
+      }
       if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         handleAddComment();
       }
     },
-    [handleAddComment]
+    [handleAddComment, mention]
   );
 
   if (!open) return null;
@@ -146,14 +181,35 @@ export function CommentPanel({ open, onClose, activeNodeId }: CommentPanelProps)
           aria-label="关联节点 ID"
         />
         <textarea
+          ref={textareaRef}
           className={styles.textarea}
-          placeholder="添加评论… (Cmd+Enter 发送)"
+          placeholder="添加评论… (Cmd+Enter 发送，输入 @ 触发补全)"
           value={newText}
-          onChange={e => setNewText(e.target.value)}
+          onChange={handleTextareaChange}
           onKeyDown={handleKeyDown}
           rows={3}
           aria-label="评论内容"
         />
+        {/* S51-E5: @mention autocomplete dropdown */}
+        {mention.isOpen && mention.suggestions.length > 0 && (
+          <div className={styles.mentionDropdown} role="listbox" aria-label="@提及补全">
+            {mention.suggestions.map((s, i) => (
+              <button
+                key={s.username}
+                role="option"
+                aria-selected={i === mention.selectedIndex}
+                className={`${styles.mentionOption} ${i === mention.selectedIndex ? styles.selected : ''}`}
+                onMouseDown={(e) => {
+                  e.preventDefault(); // prevent textarea blur
+                  mention.insertMention(s.username);
+                }}
+              >
+                <span className={styles.mentionUsername}>@{s.username}</span>
+                <span className={styles.mentionDisplay}>{s.displayName}</span>
+              </button>
+            ))}
+          </div>
+        )}
         <button
           className={styles.submitBtn}
           onClick={handleAddComment}

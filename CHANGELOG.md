@@ -5842,3 +5842,12 @@ See git history for complete changelog.
 - **S51-E5.5**: `CommentPanel.module.css` — mentionDropdown 样式
 - **S51-E5.6**: `wsCommentHandler.ts` — comment:mention 类型 → mentionsStore 写入 + 未读计数
 - **Tests**: parseMentions 9 tests, mentionsStore 7 tests, vitest 21/21 ✅
+
+
+---
+
+## [Unreleased] S51-E3: MiniMap 节点类型着色 — 2026-06-04
+- **E3 miniMapUtils.ts**: `src/lib/canvas/miniMapUtils.ts` — `getMiniMapNodeColor()` (user-story蓝/bounded-context紫/flow-step绿红灰) + `sampleNodesForMiniMap()` (100+节点分层采样)
+- **E3 MiniMapPanel.tsx**: `nodeColor={getMiniMapNodeColor}` 替换硬编码蓝色，支持节点类型着色
+- **E3 vitest**: `src/lib/canvas/__tests__/miniMapUtils.test.ts` — 18 cases (着色13/采样4/常量1) ✅ 18/18 PASS
+- 提交: epic/s51-e3-minimap

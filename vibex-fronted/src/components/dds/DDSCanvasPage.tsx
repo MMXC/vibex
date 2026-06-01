@@ -20,6 +20,8 @@ import React, {
   useState,
 } from 'react';
 import { DDSToolbar } from '@/components/dds/toolbar';
+import { PresenceIndicator } from '@/components/dds/presence/PresenceIndicator';
+import { usePresence } from '@/hooks/canvas/usePresence';
 import { DDSScrollContainer } from '@/components/dds/canvas';
 import { CrossChapterEdgesOverlay } from '@/components/dds/canvas/CrossChapterEdgesOverlay';
 import { AIDraftDrawer } from '@/components/dds/ai-draft';
@@ -275,6 +277,9 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
 
   // ---- E003: useAIController for quickGenerate ----
   const { quickGenerate } = useAIController();
+
+  // ---- S53-E1: Subscribe to real-time presence ----
+  usePresence();
 
   // ---- P001-U4: Debounced save history to localStorage on history change ----
   const historyState = useCanvasHistoryStore();
@@ -657,6 +662,11 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     >
       {/* Toolbar */}
       <DDSToolbar onAIGenerate={handleAIGenerate} agentSession={agentSession} projectId={projectId ?? ''} />
+
+      {/* S53-E1: Real-time presence indicator — shows online collaborators */}
+      <div style={{ position: 'absolute', top: '12px', right: '16px', zIndex: 50 }}>
+        <PresenceIndicator />
+      </div>
 
       {/* E10-E1: CodeGenPanel — always visible */}
       <CodeGenPanelWrapper />

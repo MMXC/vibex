@@ -1,6 +1,6 @@
 /**
- * presenceStore.test.ts — S42-P002-E2 + S44-P003-E3
- * Tests: cursor sync (S42) + node locking (S44)
+ * presenceStore.test.ts — S42-P002-E2 + S44-P003-E3 + S52-E1
+ * Tests: cursor sync (S42) + node locking (S44) + S52 presence awareness
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { usePresenceStore } from '../presenceStore';
@@ -84,5 +84,28 @@ describe('presenceStore', () => {
     usePresenceStore.getState().lockNode('node-3', 'u3');
     usePresenceStore.getState().handleNodeUnlockedMessage('node-3');
     expect('node-3' in usePresenceStore.getState().lockedNodes).toBe(false);
+  });
+
+  // S52-E1: Presence awareness — setRemoteUsers replaces, not merges
+  it('setRemoteUsers replaces the entire remote users map', () => {
+    // Add initial users
+    const initialUsers: CollabUser[] = [
+      { userId: 'u1', name: 'Alice', avatar: 'A' },
+    ];
+    usePresenceStore.getState().setRemoteUsers(initialUsers);
+    expect(usePresenceStore.getState().remoteUsers.size).toBe(1);
+    expect(usePresenceStore.getState().remoteUsers.has('u1')).toBe(true);
+
+    // Replace with a new set — should not retain u1
+    const newUsers: CollabUser[] = [
+      { userId: 'u2', name: 'Bob', avatar: 'B' },
+      { userId: 'u3', name: 'Carol', avatar: 'C' },
+    ];
+    usePresenceStore.getState().setRemoteUsers(newUsers);
+    const remoteUsers = usePresenceStore.getState().remoteUsers;
+    expect(remoteUsers.size).toBe(2);
+    expect(remoteUsers.has('u1')).toBe(false); // u1 was replaced
+    expect(remoteUsers.get('u2')!.name).toBe('Bob');
+    expect(remoteUsers.get('u3')!.name).toBe('Carol');
   });
 });

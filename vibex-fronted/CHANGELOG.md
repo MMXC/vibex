@@ -602,3 +602,17 @@
 ## [Unreleased] S52-E1: 画布协作实时感知 — 2026-06-02
 - **S52-E1.1**: `presenceStore.test.ts` 10个测试用例 — setRemoteUsers replace/update/remove semantics, cursor update, node locking, WebSocket message handlers
 - **S52-E1.2**: 复用 S42/S44 WebSocket presence 实现，新增 10 个 vitest cases 覆盖协作感知边界条件
+
+
+---
+
+## [Unreleased] S52-E3: Undo/Redo 协作冲突处理 — 2026-06-02
+
+- **S52-E3.1**: `baseRevision` 字段 → 每次 execute() 时 bump；远程 `revision:bump` 时 `setBaseRevision()` 同步
+- **S52-E3.2**: `RevisionMismatchError` → IndexedDB revision 与预期不符时抛出
+- **S52-E3.3**: `onRevisionConflict` 回调 → 冲突时允许 UI 自定义处理（discard-local/merge/discard-remote）
+- **S52-E3.4**: `triggerConflictToast()` → 协作冲突时显示 Toast 警告
+- **S52-E3.5**: `saveHistoryWithRevision()` / `loadHistoryWithRevision()` / `getRevision()` → IndexedDB revision 乐观锁
+- **S52-E3.6**: `wsRevisionHandler` → WebSocket `revision:bump` / `revision:conflict` 消息处理
+- **Test**: 44/44 vitest (15 new E3 revision tests)
+

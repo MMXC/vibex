@@ -557,3 +557,33 @@
 - **S51-E2.4 ExportProgress.module.css**: `components/dds/export/ExportProgress.module.css` — CSS Module，design-tokens
 - **S51-E2.5 Vitest 覆盖**: 7/7 通过
 - 提交: epic/s51-e2-png-batch-export
+
+
+---
+
+## [Unreleased] S51-E3: MiniMap 节点类型着色 — 2026-06-04
+- **E3 miniMapUtils.ts**: `src/lib/canvas/miniMapUtils.ts` — `getMiniMapNodeColor()` (user-story蓝/bounded-context紫/flow-step绿红灰) + `sampleNodesForMiniMap()` (100+节点分层采样)
+- **E3 MiniMapPanel.tsx**: `nodeColor={getMiniMapNodeColor}` 替换硬编码蓝色，支持节点类型着色
+- **E3 vitest**: `src/lib/canvas/__tests__/miniMapUtils.test.ts` — 18 cases (着色13/采样4/常量1) ✅ 18/18 PASS
+- 提交: epic/s51-e3-minimap
+
+---
+
+## [Unreleased] S51-E4: 多选批量操作 — 2026-06-02
+- **E4 useSelectionBox**: `hooks/dds/useSelectionBox.ts` — drag-to-select 框选 hook，[data-card] selector，鼠标拖拽生成选区
+- **E4 SelectionToolbar**: `components/dds/SelectionToolbar.tsx` — 浮动 Toolbar（左/右/水平居中/垂直居中对齐 + 复制 + 删除），选中 2+ 卡片时显示
+- **E4 useAlignmentTools**: `hooks/dds/useAlignmentTools.ts` — 纯对齐工具函数（alignCardsLeft/Right/centerH/centerV）
+- **E4 DDSCanvasPage 集成**: SelectionToolbar + useSelectionBox 接入画布页面
+- **E4 Vitest**: useSelectionBox 3 cases + useAlignmentTools 10 cases，13/13 PASS ✅
+- 提交: epic/s51-e4-multi-select
+
+---
+
+## [Unreleased] S51-E5: @Mention 通知系统 — 2026-06-02
+- **S51-E5.1**: `parseMentions.ts` — @提及正则解析 (中英文用户名, /@[\w\u4e00-\u9fa5]+/)
+- **S51-E5.2**: `mentionsStore.ts` — Zustand store (mentions[], unreadCount, event listeners)
+- **S51-E5.3**: `useMentionCompletion.ts` — React Hook (↑↓ Enter Esc 键盘导航, 补全下拉)
+- **S51-E5.4**: `CommentPanel.tsx` — 集成 @ 补全 (dropdown UI, textarea ref, 键盘代理)
+- **S51-E5.5**: `CommentPanel.module.css` — mentionDropdown 样式
+- **S51-E5.6**: `wsCommentHandler.ts` — comment:mention 类型 → mentionsStore 写入 + 未读计数
+- **Tests**: parseMentions 9 tests, mentionsStore 7 tests, vitest 21/21 ✅

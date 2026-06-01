@@ -7,3 +7,5 @@ export { useDDSCanvasFlow } from './useDDSCanvasFlow';
 export { useDDSAPI } from './useDDSAPI';
 export { createDDSAPI } from './useDDSAPI';
 export type { DDSAPIClient } from './useDDSAPI';
+// E1 — Sprint51
+export { useHistoryPersistence } from './useHistoryPersistence';

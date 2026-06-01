@@ -539,3 +539,11 @@
 - **S50-E2.5 DDSToolbar 按钮**: `components/dds/toolbar/DDSToolbar.tsx` — LayoutIcon SVG + 自动布局按钮
 - **S50-E2.6 Vitest 覆盖**: `lib/canvas/dagreLayout.test.ts` (7 cases) + `stores/dds/autoLayoutStore.test.ts` (8 cases)
 - 提交: epic/s50-e2-canvas-auto-layout
+
+---
+
+## [Unreleased] S51-E1: Undo/Redo 持久化 — 2026-06-02
+- **S51-E1.1**: 新增 `src/lib/canvas/historyDB.ts` — IndexedDB 持久化层，LIRS 驱逐策略
+- **S51-E1.2**: `canvasHistoryStore` 新增 IndexedDB persistence actions
+- **S51-E1.3**: 新增 `src/hooks/dds/useHistoryPersistence.ts` — 500ms 防抖自动保存
+- **S51-E1.4**: 新增 3 个测试文件 (31 tests)

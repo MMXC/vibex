@@ -5813,3 +5813,11 @@ See git history for complete changelog.
 - **S50-E2.5 DDSToolbar 按钮**: 自动布局图标按钮，`applyAutoLayout({ direction: 'TB' })` 触发
 - **S50-E2.6 Vitest 覆盖**: `dagreLayout.test.ts` (7 cases: TB层级/LR层级/空输入/孤立边/原始位置fallback/siblings同rank) + `autoLayoutStore.test.ts` (8 cases: 初始状态/startLayout/endLayout/reset)
 - 提交: epic/s50-e2-canvas-auto-layout
+
+---
+
+## [Unreleased] S51-E1: Undo/Redo 持久化 — 2026-06-02
+- **S51-E1.1**: 新增 `src/lib/canvas/historyDB.ts` — IndexedDB 持久化层，LIRS 驱逐策略，≤5MB 上限
+- **S51-E1.2**: `canvasHistoryStore` 新增 `saveHistory`/`loadHistory`/`clearHistory` actions
+- **S51-E1.3**: 新增 `src/hooks/dds/useHistoryPersistence.ts` — 500ms 防抖自动保存
+- **S51-E1.4**: 新增 `historyDB.test.ts` (8 tests) + `canvasHistoryStore.test.ts` (21 tests) + `useHistoryPersistence.test.tsx` (2 tests)

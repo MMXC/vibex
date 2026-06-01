@@ -22,6 +22,15 @@ export interface Command {
   description?: string;
 }
 
+// ==================== CommandMeta (E1 — Sprint51) ====================
+
+/** Serializable command metadata for IndexedDB persistence */
+export interface CommandMeta {
+  id: string;
+  timestamp: number;
+  description?: string;
+}
+
 // ==================== Constants ====================
 
 export const MAX_HISTORY = 50;
@@ -46,6 +55,13 @@ interface CanvasHistoryState {
   selectiveUndo: (targetIndex: number) => void;
   /** Returns current position in history stack */
   getPosition: () => { current: number; total: number };
+  // E1: IndexedDB persistence actions
+  /** Save current history to IndexedDB for a given canvas */
+  saveHistory: (canvasId: string) => Promise<void>;
+  /** Load history metadata from IndexedDB (closures not restored) */
+  loadHistory: (canvasId: string) => Promise<{ past: CommandMeta[]; future: CommandMeta[] } | null>;
+  /** Clear history from IndexedDB for a given canvas */
+  clearHistory: (canvasId: string) => Promise<void>;
 }
 
 // ==================== Helper ====================
@@ -152,9 +168,28 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
     const { past } = get();
     return { current: past.length, total: past.length };
   },
-}));
 
-// ==================== localStorage Persistence (U4-P001) ====================
+  // E1: IndexedDB persistence actions (Sprint51)
+  saveHistory: async (canvasId: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+    const { past, future } = get();
+    const { saveHistoryToDB } = await import('@/lib/canvas/historyDB');
+    await saveHistoryToDB(canvasId, past, future);
+  },
+
+  loadHistory: async (canvasId: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return null;
+    const { loadHistoryFromDB } = await import('@/lib/canvas/historyDB');
+    return loadHistoryFromDB(canvasId);
+  },
+
+  clearHistory: async (canvasId: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+    const { clearHistoryFromDB } = await import('@/lib/canvas/historyDB');
+    await clearHistoryFromDB(canvasId);
+  },
+}))
+
 
 /**
  * Save current history state to localStorage.

@@ -501,3 +501,20 @@
 - **S49-E3.2**: viewportBoundsStore nodeExtent 配置 (±50,000) + setNodeExtent
 - **S49-E3.3**: DDSFlow 注入 nodeExtent prop
 - **S49-E3.4**: Vitest 覆盖 (15/15 pass)
+
+---
+
+## [Unreleased] S50-E3: 评论实时通知 — 2026-06-02
+- **S50-E3.1**: commentStore 计数器式 unreadCount + addListener/removeListener API
+- **S50-E3.2**: wsCommentHandler 处理 comment:created/resolved WS 消息
+- **S50-E3.3**: CommentBadge 全局未读角标样式
+
+---
+
+## [Unreleased] S50-E4: 模板导入/导出管理 — 2026-06-02
+- **E4 templateExport.ts**: `exportTemplatesToBlob()` + `downloadTemplatesAsFile()` — Blob download as .vbtmpl
+- **E4 templateImport.ts**: `parseImportFile()` + `mergeTemplates()` — JSON parse + schema validation + conflict detection
+- **E4 TemplateImportDialog.tsx**: Import dialog with conflict resolution (skip/overwrite/rename)
+- **E4 templateStore.ts**: `exportTemplates()` + `importTemplates()` actions — version 1.0 format
+- **E4 TemplateGallery.tsx**: ⬇️ Export / ⬆️ Import buttons in header
+- **E4 vitest**: templateExport.test.ts + templateImport.test.ts + templateStore E4 tests

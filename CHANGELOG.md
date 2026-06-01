@@ -5773,3 +5773,22 @@ See git history for complete changelog.
 - **S49-E3.2**: viewportBoundsStore nodeExtent 配置 (±50,000 默认边界) + setNodeExtent
 - **S49-E3.3**: DDSFlow 注入 nodeExtent prop，防止节点位置无限漂移
 - **S49-E3.4**: Vitest 覆盖 (debounce 行为 3 case, flush 2 case, nodeExtent 3 case, 修复旧测试 6 case)
+
+---
+
+## [Unreleased] S50-E3: 评论实时通知 — 2026-06-02
+- **S50-E3.1**: commentStore 计数器式 unreadCount + addListener/removeListener 事件订阅 API
+- **S50-E3.2**: wsCommentHandler 处理 backend WebSocket comment:created/resolved 消息
+- **S50-E3.3**: CollaborationRoom 广播 comment:created/resolved 事件到同项目房间用户
+- **S50-E3.4**: CommentBadge 支持全局未读角标 (导航栏评论图标)
+- **S50-E3.5**: Vitest 覆盖 (commentStore 27/27, wsCommentHandler 5/5)
+
+---
+
+## [Unreleased] S50-E4: 模板导入/导出管理 — 2026-06-02
+- **E4 templateExport.ts**: `exportTemplatesToBlob()` + `downloadTemplatesAsFile()` — Blob download as .vbtmpl
+- **E4 templateImport.ts**: `parseImportFile()` + `mergeTemplates()` — JSON parse + schema validation + conflict detection
+- **E4 TemplateImportDialog.tsx**: Import dialog with conflict resolution (skip/overwrite/rename)
+- **E4 templateStore.ts**: `exportTemplates()` + `importTemplates()` actions — version 1.0 format
+- **E4 TemplateGallery.tsx**: ⬇️ Export / ⬆️ Import buttons in header
+- **E4 vitest**: templateExport.test.ts + templateImport.test.ts + templateStore E4 tests

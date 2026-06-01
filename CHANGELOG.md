@@ -5865,6 +5865,14 @@ See git history for complete changelog.
 
 ---
 
+## [Unreleased] S52-E2: 批量导出 PNG/SVG/PDF — 2026-06-02
+- **S52-E2.1**: `exportMultipleAsSVG.ts` — SVG 格式批量导出 (toSvg + JSZip, AbortController, 正确 `data-card` selector)
+- **S52-E2.2**: `exportMultipleAsPDF.ts` — PDF 格式批量导出 (toPng + jsPDF, pixelRatio=2, AbortController)
+- **S52-E2.3**: `useBatchExport.ts` — 添加 exportAsPdfZip(), BatchExportFormat union type, format 参数注入
+- **S52-E2.4**: `ExportProgress.tsx` — format 下拉框 (SVG/ZIP/PNG/PDF) + 格式感知标题 + 进度百分比
+- **S52-E2.5**: `ZipExporter.ts` — 添加 'pdf' 格式分支 + captureNodeAsPdf() (html-to-image → jsPDF)
+- **Tests**: exportMultipleAsSVG 5 cases + exportMultipleAsPDF 5 cases，vitest 10/10 ✅
+
 ## [Unreleased] S52-E1: 画布协作实时感知 — 2026-06-02
 - **S52-E1.1**: `presenceStore.test.ts` 10个测试用例 — setRemoteUsers replace/update/remove semantics, cursor update, node locking, WebSocket message handlers
 - **S52-E1.2**: 复用 S42/S44 WebSocket presence 实现，新增 10 个 vitest cases 覆盖协作感知边界条件

@@ -1,154 +1,163 @@
-# Sprint 49 提案分析
+# Sprint 50 提案分析
 
-> **Agent**: coord (heartbeat self-implement — analyst ghost-completed, coord 重填提案)
+> **Agent**: coord (heartbeat self-implement — agent-submit phantom ghost, analyst agent never spawned)
 > **日期**: 2026-06-01
-> **背景**: analyst agent-submit 幽灵完成（标记 done 但无输出文件），coord 基于 Sprint48 交付成果识别 Sprint49 高优先级功能
-> **方法**: 审查 CHANGELOG + 代码缺口分析 + 用户体验优先级
+> **背景**: Sprint49 (E1-E5) 刚完成，基于 Sprint49 交付成果识别 Sprint50 高优先级功能
+> **方法**: 审查 Sprint49 CHANGELOG + 代码缺口分析 + 用户体验优先级
 
 ---
 
-## Sprint48 交付成果
+## Sprint49 交付成果
 
 | Epic | 名称 | 状态 | 关键产出 |
 |------|------|------|---------|
-| E1 | Canvas 导出 | ✅ | PNG/SVG/JSON/YAML/Markdown + dual-CHANGELOG |
-| E2 | Canvas PDF 批量导出 | ✅ | CanvasListPanel + backend /api/export/pdf |
-| E3 | 键盘快捷键可配置化 | ✅ | ShortcutPanel + IndexedDB persist |
-| E4 | 会话标签管理 | ✅ | SessionTagsPanel + context metadata |
-| E5 | 跨画布粘贴 | ✅ | crossCanvasPasteStore + clipboard API |
+| E1 | AI 断线重连 + 流式可靠性 | ✅ | retryStatus 状态机 / 60s 超时 / ConnectionStatus badge |
+| E2 | 画布模板管理完善 | ✅ | 搜索/分类过滤/重命名/缩略图 / templateStore 增强 |
+| E3 | 视口性能优化 v2 | ✅ | viewportBoundsStore debounce / nodeExtent ±50k |
+| E4 | 画布版本历史可视化 | ✅ | snapshotHistoryStore / Timeline / SnapshotDiff / AIDraftDrawer 集成 |
+| E5 | 协作评论系统 | ✅ | commentStore / CommentBadge / CommentPanel / IndexedDB |
 
 **已验证技术基础**:
-- IndexedDB 持久化链路打通（session/shortcut/template）
-- Clipboard API 已可用（E5）
-- Backend PDF 生成路由已部署（/api/export/pdf）
-- 流式 SSE 端点（/api/ai/generate）已就绪（Sprint43）
-- WebSocket presence 已集成（Sprint43）
+- IndexedDB 持久化链路全打通（comment/template/shortcut/snapshot）
+- Zustand store + vitest 测试文化成熟（dds 全量 90+）
+- SSE 流式端点（/api/ai/generate）具备重试机制
+- WebSocket presence 已集成
+- DDSDrawflow nodeExtent 全坐标范围支持
+
+**识别出的待完善区域**:
+1. **E4 Timeline 交互体验**：时间线无缩放/拖拽，100+ 快照时需滚动很久
+2. **E5 评论通知**：评论添加后对方无法实时感知（WebSocket 只显示 presence）
+3. **E2 模板导入/导出**：用户无法批量管理模板（只能单张新建）
+4. **E3 节点布局自动排版**：节点重叠时无法自动调整位置
+5. **全局：画布搜索**：用户无法通过内容关键词搜索画布
 
 ---
 
-## P001 (P0) — AI 断线重连 + 流式可靠性增强
+## P001 (P0) — 画布全局搜索
 
 ### 问题描述
-当 AI Agent 生成过程中网络断线，SSE 流式响应会永久卡死。用户无法感知重连状态，也没有自动恢复机制。这直接影响核心 AI 生成流程的可用性。
+Sprint1-Sprint49 没有任何画布内容搜索能力。用户有 50+ 画布时，只能靠记忆名称找画布，无法通过节点内容、标签、或 AI 生成文本定位画布。
 
 ### 根因分析
-Sprint43 实现的 SSE 端点缺少重连逻辑和超时处理。`useStreamingAgent` hook 没有 AbortController 超时，也没有指数退避重试。当连接断开时，panel 卡在 loading 状态，用户只能刷新页面。
+`sessionStore` 只存储 session metadata（name, createdAt），`cards` 内容存储在 IndexedDB 的 canvasDB 但从未建索引。Sprint46 的 `searchableText` 只覆盖 agent sessions，不是画布节点。
 
 ### 影响范围
-核心 AI 功能，所有依赖 `/api/ai/generate` 的用户流程
+所有拥有 5+ 画布的用户，核心导航效率
 
 ### 建议方案
-- **S1**: `useStreamingAgent` 添加指数退避重试（max 3 次，base 1s）+ 状态展示（connecting/retry N/N）
-- **S2**: `AbortController` 超时保护（60s 无响应自动终止 + toast 提示）
-- **S3**: 连接状态指示器（在线/断线/重试中 badge）
-- **S4**: Vitest 覆盖重试逻辑和超时行为
+- **S1**: `canvasSearchStore` — 新建 Zustand store，维护 `keywordIndex: Map<canvasId, string[]>`（节点 text + 边 label + 画布名）
+- **S2**: 索引构建 — 画布打开时增量索引节点 text；IndexedDB canvasDB 添加 `fullTextSearch()` 方法（LIKE 查询）
+- **S3**: 搜索 UI — Header 右侧搜索框（Cmd+K 快捷键），下拉列表显示匹配画布名 + 节点片段预览
+- **S4**: 搜索结果 Rank — 按匹配次数、更新时间排序
+- **S5**: Vitest 覆盖 canvasSearchStore CRUD + 索引逻辑
 
 ### 验收标准
-- [ ] 网络断线后自动重试 3 次，每次间隔翻倍
-- [ ] 60s 无响应自动终止，显示超时错误
-- [ ] 重试时 UI 显示 "正在重连 (N/3)"
-- [ ] vitest 覆盖：重试计数器 / 超时终止 / 正常完成
+- [ ] Cmd+K 打开全局搜索面板
+- [ ] 输入 "AI 报告" 找到包含该文本的画布
+- [ ] 搜索结果显示画布名 + 匹配片段高亮
+- [ ] vitest 覆盖 canvasSearchStore 索引 + 搜索
 
 ---
 
-## P002 (P1) — 画布模板管理完善
+## P002 (P1) — 画布节点自动布局
 
 ### 问题描述
-Sprint42 实现了模板 Gallery，但缺乏：模板搜索/分类过滤、用户自定义模板命名、模板预览缩略图。现有模板数量少，用户无法快速找到所需模板。
+用户复制/粘贴画布节点或从 AI 批量生成节点时，节点容易重叠扎堆。需要手动拖拽排列，效率低。Sprint46 的 `pasteCards` 只做了位置偏移（+30px cascade），但节点多了仍然重叠。
 
 ### 根因分析
-TemplateGallery 只有预设 5 个模板，缺少用户生成内容的持久化入口和更好的发现机制。
+复制粘贴时只做了 `position.x += 30` 偏移，没有布局算法。当粘贴 10+ 节点时，30px 偏移完全不够。需要 Dagre 或 ELK 分层布局。
 
 ### 影响范围
-画布创建效率，所有新建画布用户
+批量粘贴场景、AI 生成结果导入、模板展开
 
 ### 建议方案
-- **S1**: 模板搜索（name 模糊匹配）+ 分类筛选（blank/flowchart/mindmap/swot）
-- **S2**: 模板预览缩略图（首次打开时生成 SVG snapshot 存入 IndexedDB）
-- **S3**: 用户自定义模板重命名（TemplateSaveDialog 可编辑 name）
-- **S4**: Vitest 覆盖 templateStore CRUD + 搜索过滤
+- **S1**: 引入轻量布局库 `dagre` (`@types/dagre`)，`layoutGraph()` 按层级排列节点
+- **S2**: `layoutStore` — Zustand store，`layoutMode: 'none' | 'dagre' | 'force'`；`applyAutoLayout()` 调用 `computeLayout(graph)` 并更新节点 position
+- **S3**: DDSToolbar 添加"自动排版"按钮；快捷键 `Cmd+L`
+- **S4**: `DDSDrawflow.tsx` 新增 `onNodesChange` 检测节点重叠（`getIntersectingNodes` from @xyflow/react）时自动提示用户
+- **S5**: Vitest 覆盖 layoutStore + dagre 布局计算
 
 ### 验收标准
-- [ ] 搜索框输入 "flow" 过滤出 flowchart 类模板
-- [ ] 模板卡片显示名称（可编辑）和预览缩略图
-- [ ] IndexedDB 存储用户生成模板，刷新后不丢失
-- [ ] vitest 10+ tests PASS
+- [ ] 粘贴 20 个重叠节点后，点击"自动排版"分散为整齐层级
+- [ ] Cmd+L 快捷键触发自动布局
+- [ ] vitest 覆盖 layoutStore 状态转换 + 布局计算
 
 ---
 
-## P003 (P1) — 大型画布性能优化 v2
+## P003 (P1) — 评论实时通知
 
 ### 问题描述
-Sprint43 实现了视口裁剪（onlyRenderVisibleElements），但对于 100+ 节点的画布仍存在交互卡顿。节点拖拽、缩放时帧率下降明显，影响核心编辑体验。
+Sprint49 E5 实现了评论 CRUD 和持久化，但评论添加后对方无法实时感知。WebSocket presence 只显示光标位置，不推送评论事件。异步协作体验差——用户不知道有人给他留了评论。
 
 ### 根因分析
-React Flow 默认对所有节点做 diff 比较，即使节点不在视口内。缺少节点虚拟化（virtualization）和懒加载机制。
+`commentStore` 没有和 WebSocket 层集成。评论变更只在本地触发，没有广播给其他客户端。
 
 ### 影响范围
-大型画布用户，核心编辑体验
+异步协作用户，小团队使用
 
 ### 建议方案
-- **S1**: `nodeExtent` 限制渲染范围 + `onlyRenderVisibleElements` 默认开启
-- **S2**: 节点懒加载（offscreen 节点延迟 100ms 后渲染）
-- **S3**: 缩放时 debounce viewport 更新（100ms）
-- **S4**: 大型画布性能基准测试（100 节点 / 500 节点渲染时间对比）
-- **S5**: Vitest 覆盖性能相关逻辑
+- **S1**: `commentStore` 添加 `addListener` / `removeListener` 订阅机制
+- **S2**: 后端 `/api/ws` WebSocket 消息类型添加 `comment:created` / `comment:resolved`
+- **S3**: 前端 WebSocket handler 订阅评论事件 → 调用 `commentStore` 对应 action → UI 更新
+- **S4**: 新评论通知 Badge — Header 右侧评论图标显示未读数；点击打开 CommentPanel 并滚动到最新
+- **S5**: Vitest 覆盖 commentStore 事件订阅 + WebSocket handler
 
 ### 验收标准
-- [ ] 100 节点画布缩放帧率 >= 30fps（Chrome DevTools Performance）
-- [ ] 缩放时 viewport 更新 debounce 生效
-- [ ] vitest 覆盖视口相关逻辑
+- [ ] 用户 A 添加评论 → 用户 B 的 WebSocket 收到 `comment:created` → 自动刷新 CommentPanel
+- [ ] 评论图标显示未读数红点
+- [ ] vitest 覆盖 commentStore 事件订阅
 
 ---
 
-## P004 (P1) — 画布版本历史可视化
+## P004 (P1) — 模板导入/导出管理
 
 ### 问题描述
-Sprint15 实现了版本对比 UI（SnapshotSelector + VersionPreview），但缺乏自动快照触发机制。用户必须手动点击"保存快照"，容易遗漏关键状态。版本历史也不支持时间线视图。
+Sprint49 E2 实现了模板搜索/分类/缩略图，但用户只能一张张新建画布，无法批量导出/导入模板。用户换设备后模板全部丢失。
 
 ### 根因分析
-快照需要手动触发，缺少关键操作的自动快照（生成后、重要编辑前、导出前）。
+`templateStore` 没有 export/import 端到端链路。IndexedDB 的 templateDB 没有暴露全量导出接口。
 
 ### 影响范围
-所有重视画布数据安全的用户
+模板用户，跨设备迁移
 
 ### 建议方案
-- **S1**: 自动快照触发器（关键 action 前自动调用 `addCustomSnapshot`）
-- **S2**: 时间线视图（Timeline 组件，水平滚动，关键节点标注）
-- **S3**: 快照比较（选择任意两个快照对比 diff）
-- **S4**: Vitest 覆盖 auto-snapshot 逻辑 + Timeline 渲染
+- **S1**: `exportTemplates()` — 导出所有模板为单个 JSON 文件（`{ version, templates: [...] }`）
+- **S2**: `importTemplates(file)` — 导入 JSON，覆盖/跳过/重命名冲突模板
+- **S3**: TemplatePanel 添加 Export All / Import 按钮
+- **S4**: 模板版本化 — `templateStore` 添加 `templateVersion` 字段（semver），导入时按版本合并
+- **S5**: Vitest 覆盖 export/import 序列化 + 冲突处理
 
 ### 验收标准
-- [ ] AI 生成完成后自动创建快照（snapshotType: "ai-generate"）
-- [ ] 导出前自动创建快照（snapshotType: "pre-export"）
-- [ ] Timeline 组件可水平滚动，关键节点有 label
-- [ ] vitest 覆盖 auto-snapshot 逻辑
+- [ ] 导出按钮下载 `vibex-templates-YYYYMMDD.json`
+- [ ] 导入 JSON 后所有模板出现在 TemplatePanel 中
+- [ ] 冲突模板（同名）导入时弹出重命名对话框
+- [ ] vitest 覆盖 export/import + 冲突处理
 
 ---
 
-## P005 (P2) — 协作评论系统
+## P005 (P2) — Timeline 增强（缩放 + 搜索）
 
 ### 问题描述
-当前协作只显示光标位置（presence），缺少评论/标注能力。用户无法在画布特定节点上留下反馈，异步协作效率低。
+Sprint49 E4 Timeline 组件实现了时间线展示，但无法缩放、无法搜索快照内容。当画布有 20+ 快照时，用户只能横向滚动逐一查看。
 
 ### 根因分析
-WebSocket presence 已就绪，但没有评论数据模型和 UI。评论需要持久化（IndexedDB 或后端），涉及新的数据流设计。
+Timeline 组件只有水平滚动，缺少 `MiniMap` 风格的缩放导航和内容搜索。
 
 ### 影响范围
-异步协作场景，小团队使用
+版本历史重度用户
 
 ### 建议方案
-- **S1**: `commentStore` 数据模型（commentId, nodeId, text, author, timestamp, resolved）
-- **S2**: 节点评论气泡（节点右上角 comment badge，显示未读数）
-- **S3**: 评论 Panel（右侧边栏，列出当前画布所有评论，支持回复）
-- **S4**: 评论持久化到 IndexedDB（offline-first）
-- **S5**: Vitest 覆盖 commentStore CRUD
+- **S1**: Timeline 添加缩放控制 — 放大/缩小按钮（改变每个 snapshot 的宽度：`minWidth=80px` → `maxWidth=240px`）
+- **S2**: Timeline 添加快照搜索 — `snapshotHistoryStore` 添加 `searchSnapshots(query)` 方法；Timeline 顶部搜索框输入过滤时间线节点
+- **S3**: Timeline 快照悬停预览 — 悬停显示 snapshot JSON 内容片段（类似 VS Code hover）
+- **S4**: 快照时间分组 — 按「今天/昨天/本周/更早」分组折叠显示
+- **S5**: Vitest 覆盖缩放状态 + 搜索过滤 + 分组折叠
 
 ### 验收标准
-- [ ] 选中节点后可在节点上添加评论
-- [ ] 评论 Panel 列出当前画布所有评论
-- [ ] 评论存储在 IndexedDB，刷新不丢失
-- [ ] vitest 覆盖 commentStore
+- [ ] Timeline 缩放按钮可以放大/缩小每个快照节点
+- [ ] 搜索框输入 "AI" 过滤出包含该文本的快照节点
+- [ ] 快照按时间分组折叠
+- [ ] vitest 覆盖 Timeline 缩放 + 搜索过滤
 
 ---
 
@@ -156,8 +165,8 @@ WebSocket presence 已就绪，但没有评论数据模型和 UI。评论需要�
 
 | ID | 类别 | 标题 | 优先级 | 预估工作量 | 依赖 Sprint |
 |----|------|------|--------|----------|------------|
-| P001 | reliability | AI 断线重连 + 流式可靠性 | P0 | M | S43 (SSE) |
-| P002 | feature | 画布模板管理完善 | P1 | M | S42 (TemplateGallery) |
-| P003 | performance | 大型画布性能优化 v2 | P1 | M | S43 (视口裁剪) |
-| P004 | feature | 画布版本历史可视化 | P1 | M | S15 (SnapshotSelector) |
-| P005 | feature | 协作评论系统 | P2 | L | S43 (WebSocket) |
+| P001 | feature | 画布全局搜索（Cmd+K） | P0 | M | S1-S49 (canvasDB) |
+| P002 | feature | 画布节点自动布局（Dagre） | P1 | M | S46 (paste), S49 (E3 nodeExtent) |
+| P003 | feature | 评论实时通知（WebSocket） | P1 | M | S49-E5 (commentStore) |
+| P004 | feature | 模板导入/导出管理 | P1 | S | S49-E2 (templateStore) |
+| P005 | feature | Timeline 增强（缩放 + 搜索） | P2 | S | S49-E4 (Timeline) |

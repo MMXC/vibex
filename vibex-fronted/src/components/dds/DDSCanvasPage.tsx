@@ -37,6 +37,10 @@ import { NewUserGuide } from '@/components/guide/NewUserGuide';
 import { createDDSAPI } from '@/hooks/dds/useDDSAPI';
 import { useDDSCanvasSearch } from '@/hooks/dds/useDDSCanvasSearch';
 import { DDSSearchPanel } from '@/components/dds/DDSSearchPanel';
+import { SearchPanel } from '@/components/dds/SearchPanel';
+import { useSearchIndex } from '@/hooks/useSearchIndex';
+import { useCanvasSearchStore } from '@/stores/canvasSearchStore';
+import { useCanvasListStore } from '@/stores/canvasListStore';
 import { MiniMapPanel } from '@/components/dds/MiniMapPanel';
 import { ReviewReportPanel } from '@/components/design-review';
 import { HistoryPanel } from '@/components/canvas/features/HistoryPanel';
@@ -440,16 +444,27 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   // ---- Keyboard Shortcuts ----
   // P001: useKeyboardShortcuts wired to canvasHistoryStore for DDS canvas undo/redo.
   const [searchPanelOpen, setSearchPanelOpen] = useState(false);
+  const [canvasSearchPanelOpen, setCanvasSearchPanelOpen] = useState(false);
   const [historyPanelOpen, setHistoryPanelOpen] = useState(false);
   const { query: searchQuery, setQuery: setSearchQuery, results: searchResults, clearResults } =
     useDDSCanvasSearch();
 
-  // Ctrl+K / Cmd+K: toggle search panel
+  // S50-E1: Initialize canvas search index
+  useSearchIndex();
+  const canvasSearchQuery = useCanvasSearchStore((s) => s.query);
+  const canvasSearch = useCanvasSearchStore((s) => s.search);
+  const canvasSetPanelOpen = useCanvasSearchStore((s) => s.setPanelOpen);
+  const canvasSetActive = useCanvasListStore((s) => s.setActiveCanvas);
+
+  // Ctrl+K / Cmd+K: toggle canvas search panel (S50-E1)
   useEffect(() => {
     function handleCtrlK(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        setSearchPanelOpen((v) => !v);
+        // Prevent opening card search when canvas search is the intended target
+        if (!e.shiftKey) {
+          e.preventDefault();
+          setCanvasSearchPanelOpen((v) => !v);
+        }
       }
     }
     document.addEventListener('keydown', handleCtrlK);
@@ -754,6 +769,16 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
         onQueryChange={setSearchQuery}
         onSelectResult={() => {
           setSearchPanelOpen(false);
+        }}
+      />
+
+      {/* S50-E1: Canvas Global Search Panel */}
+      <SearchPanel
+        open={canvasSearchPanelOpen}
+        onClose={() => setCanvasSearchPanelOpen(false)}
+        onSelectCanvas={(canvasId) => {
+          canvasSetActive(canvasId);
+          setCanvasSearchPanelOpen(false);
         }}
       />
 

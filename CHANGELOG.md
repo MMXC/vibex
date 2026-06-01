@@ -5715,6 +5715,18 @@ See git history for complete changelog.
 - 提交: 6faa55db7
 ---
 
+---
+
+## [Unreleased] S49-E4: 画布版本历史可视化 — 2026-06-01
+- **S49-E4.1 snapshotHistoryStore**: `src/stores/dds/snapshotHistoryStore.ts` — debounce 2s auto-snapshot / MAX_SNAPSHOTS=20 / ai-generate + pre-export trigger / manual snapshot / restoreSnapshot / clearSnapshots
+- **S49-E4.2 Timeline**: `src/components/dds/version-history/Timeline.tsx` — 水平滚动时间轴，颜色 badge（AI生成/导出前/手动），点击选中，下载 JSON / 删除
+- **S49-E4.3 SnapshotDiff**: `src/components/dds/version-history/SnapshotDiff.tsx` — 双栏对比，节点/边 diff 高亮（added=绿/removed=红/unchanged=灰）
+- **S49-E4.4 AIDraftDrawer 集成**: `handleAccept` 调用 `addAutoSnapshot('ai-generate')`，捕获接受前画布状态
+- **S49-E4.5 DDSToolbar 集成**: `handleDDSExportJSON` + `handleDDSExportVibex` 调用 `addAutoSnapshot('pre-export')`
+- **S49-E4.6 Vitest 覆盖**: `snapshotHistoryStore.test.ts` 19 tests（debounce/coalesce/overflow/manual/select/restore/delete/clear/flush）
+- **S49-E4.7 stores/dds barrel export**: `index.ts` 导出 snapshotHistoryStore + types
+- 提交: epic/s49-e4-version-history
+
 ## [Unreleased] S49-E1: AI 断线重连 + 流式可靠性增强 — 2026-06-01
 - **S49-E1.1 60s 请求超时**: `requestTimeout`(60000ms) via `setTimeout` + `AbortController.abort()`; 超时触发 `retryStatus='timeout'` + UI badge 显示"请求超时"
 - **S49-E1.2 可配置退避参数**: `retryBaseDelay`(1000ms)/`retryMaxDelay`(8000ms) 替换硬编码值; 公式: `delay = min(retryBaseDelay * 2^attempt, retryMaxDelay) + jitter(0-500ms)`

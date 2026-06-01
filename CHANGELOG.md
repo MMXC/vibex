@@ -5890,3 +5890,29 @@ See git history for complete changelog.
 - **S52-E3.6**: `wsRevisionHandler` → WebSocket `revision:bump` / `revision:conflict` 消息处理
 - **Test**: 44/44 vitest (15 new E3 revision tests)
 
+
+
+---
+
+## [Unreleased] S52-E4: 模板分类/标签管理 — 2026-06-02
+
+- **S52-E4.1**: `CanvasTemplateData.category` 字段 → `'flowchart' | 'mindmap' | 'uml' | 'other' | null`
+- **S52-E4.2**: `CategoryTab.tsx` → 水平分类标签栏（Fuse.js图标 + 颜色映射）
+- **S52-E4.3**: `TemplateEditDialog.tsx` → 编辑分类下拉框 + 标签 chip 输入框
+- **S52-E4.4**: `templateSearch.ts` → Fuse.js 模糊搜索（threshold=0.3, name/description/tags）
+- **S52-E4.5**: `lib/canvas/templateStore.ts` → `setTemplateCategory/addTemplateTag/removeTemplateTag`
+- **S52-E4.6**: `src/stores/templateStore.ts` → Zustand store actions for category/tag
+- **S52-E4.7**: `TemplateGallery.tsx` → CategoryTab 集成 + Fuse 搜索过滤
+- **Test**: 14/14 vitest (4 templateSearch + 10 templateStore)
+
+---
+
+## [Unreleased] S52-E5: 键盘快捷键可配置化 — 2026-06-02
+
+- **S52-E5.1**: `useKeyboardShortcuts.ts` → 重构为 store-driven 快捷键分发（替换20+硬编码）
+- **S52-E5.2**: `ShortcutSettingsPanel.tsx` → 分类分组快捷键表格 + conflict warning
+- **S52-E5.3**: `ShortcutKeyInput.tsx` → 键盘捕获 input + conflict 提示
+- **S52-E5.4**: `shortcutStore.test.ts` → 9 vitest (conflict detection, reset, save)
+- **S52-E5.5**: `DDSToolbar.tsx` → 键盘图标按钮 + ShortcutSettingsPanel modal
+- **Test**: 9/9 vitest
+

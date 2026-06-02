@@ -1,0 +1,152 @@
+/**
+ * NotificationPanel.module.css — 通知面板样式
+ */
+
+.panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 320px;
+  max-height: 420px;
+  background: rgba(30, 38, 54, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  animation: slideDown 0.15s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.panelTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.markAllBtn {
+  background: none;
+  border: none;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: rgba(99, 102, 241, 0.9);
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.markAllBtn:hover {
+  background: rgba(99, 102, 241, 0.12);
+}
+
+.mentionList {
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 13px;
+}
+
+.mentionItem {
+  position: relative;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+.mentionItem:last-child {
+  border-bottom: none;
+}
+
+.mentionItem:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mentionItem:focus-visible {
+  outline: 2px solid rgba(99, 102, 241, 0.5);
+  outline-offset: -2px;
+}
+
+.unread {
+  background: rgba(99, 102, 241, 0.04);
+}
+
+.unread:hover {
+  background: rgba(99, 102, 241, 0.07);
+}
+
+.read {
+  opacity: 0.7;
+}
+
+.mentionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.fromUser {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(99, 102, 241, 0.9);
+}
+
+.timestamp {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.mentionBody {
+  margin-bottom: 2px;
+}
+
+.commentText {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.unreadDot {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #3b82f6;
+  box-shadow: 0 0 4px rgba(59, 130, 246, 0.6);
+}

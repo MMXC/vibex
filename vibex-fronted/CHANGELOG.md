@@ -662,3 +662,13 @@
 - **可测试化**: `wsRevisionHandler` 重构为 store 注入模式，无须 mock 动态导入
 - **Bug 修复**: `wsCommentHandler comment:mention` case 添加缺失 `async` 关键字
 - 文件: `wsCommentHandler.ts`, `wsRevisionHandler.ts`, `ConflictDialog.tsx`, `ConflictDialog.module.css`, `wsRevisionHandler.test.ts`
+
+
+---
+
+## [Unreleased] S53-E3: @提及通知面板 — 2026-06-02
+- **NotificationBell**: 铃铛图标 + unreadCount 红点角标，集成于 DDSToolbar
+- **NotificationPanel**: Dropdown 显示 mentions 列表（按时间倒序），支持"全部已读"
+- **markAsRead**: mentionsStore.markAsRead 已存在 (S51-E5)，UI 点击触发
+- **vitest**: NotificationBell + NotificationPanel 12/12 ✅，mentionsStore 7/7 ✅
+- 文件: `NotificationBell.tsx`, `NotificationPanel.tsx`, `NotificationBell.module.css`, `NotificationPanel.module.css`, `NotificationBell.test.tsx`

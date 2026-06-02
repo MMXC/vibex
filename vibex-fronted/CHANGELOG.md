@@ -672,3 +672,18 @@
 - **markAsRead**: mentionsStore.markAsRead 已存在 (S51-E5)，UI 点击触发
 - **vitest**: NotificationBell + NotificationPanel 12/12 ✅，mentionsStore 7/7 ✅
 - 文件: `NotificationBell.tsx`, `NotificationPanel.tsx`, `NotificationBell.module.css`, `NotificationPanel.module.css`, `NotificationBell.test.tsx`
+
+---
+
+## [Unreleased] S53-E4: 键盘快捷键设置面板 DDSToolbar 集成 — 2026-06-02
+- **isOpen prop**: `ShortcutSettingsPanel` 新增 `isOpen` prop，关闭时完全卸载组件
+- **DDSToolbar 集成**: KeyboardIcon 按钮 + `isShortcutSettingsOpen` state + ShortcutSettingsPanel 挂载 (S52-E5)
+- **冲突警告**: `ShortcutKeyInput` 冲突快捷键显示红色边框 (S52-E5)
+- **vitest**: ShortcutSettingsPanel.test.tsx 10/10 ✅ — isOpen guard / overlay click / close button
+- 文件: `ShortcutSettingsPanel.tsx`, `ShortcutSettingsPanel.test.tsx`
+
+## [Unreleased] S53-E5: 批量导出 SVG 格式 UI — 2026-06-02
+- **ZIP 格式支持**: `BatchExportFormat` 新增 `'zip'` union 分支
+- **4 选 1 下拉框**: `ExportProgress` format 下拉框新增 ZIP 选项 (PNG/SVG/PDF/ZIP)
+- **SVG ZIP 边界测试**: exportMultipleAsSVG 0/1/100+ 节点边界 cases 3/3 ✅
+- 文件: `useBatchExport.ts`, `ExportProgress.tsx`, `exportMultipleAsSVG.test.ts`

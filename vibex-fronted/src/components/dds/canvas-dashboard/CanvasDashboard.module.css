@@ -325,6 +325,32 @@
   background: rgba(239, 68, 68, 0.15);
 }
 
+/* S56-E2: Favorite star button */
+.cardFavBtn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.card:hover .cardFavBtn {
+  opacity: 1;
+}
+
+.cardFavBtn:hover {
+  background: var(--color-bg-tertiary, #1a1a24);
+}
+
+.cardFavBtnActive {
+  opacity: 1;
+  /* Slightly larger for the filled star to be obvious */
+  font-size: 0.9375rem;
+}
+
 /* ==================== Empty ==================== */
 
 .empty {

@@ -37,6 +37,7 @@ import { useOplogConflictToast } from '@/stores/oplogStore';
 import { TemplateGallery } from '@/components/dds/templates/TemplateGallery';
 import { TemplateSaveDialog } from '@/components/dds/templates/TemplateSaveDialog';
 import { ShortcutSettingsPanel } from '@/components/dds/shortcuts/ShortcutSettingsPanel';
+import { HistoryPanel } from '@/components/dds/history/HistoryPanel';
 import { NotificationBell } from '@/components/dds/notifications';
 import styles from './DDSToolbar.module.css';
 
@@ -140,6 +141,16 @@ function LayoutIcon() {
     </svg>
   );
 }
+// S54-E1: History icon for Canvas Snapshot history panel
+function HistoryIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  );
+}
+
 // ==================== Shared download helper ====================
 
 function downloadBlob(blob: Blob, filename: string) {
@@ -214,6 +225,7 @@ export const DDSToolbar = memo(function DDSToolbar({
   const [isTemplateGalleryOpen, setIsTemplateGalleryOpen] = useState(false);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [isShortcutSettingsOpen, setIsShortcutSettingsOpen] = useState(false);
+  const [isHistoryPanelOpen, setIsHistoryPanelOpen] = useState(false);
 
   // E3-S3: RBAC for toolbar actions
   const rbac = useCanvasRBAC(projectId);
@@ -684,6 +696,17 @@ export const DDSToolbar = memo(function DDSToolbar({
             <KeyboardIcon />
           </button>
 
+          {/* S54-E1: History button */}
+          <button
+            type="button"
+            className={styles.iconButton}
+            onClick={() => setIsHistoryPanelOpen(true)}
+            aria-label="History"
+            title="历史记录"
+          >
+            <HistoryIcon />
+          </button>
+
           {/* Fullscreen toggle */}
           <button
             type="button"
@@ -836,6 +859,12 @@ export const DDSToolbar = memo(function DDSToolbar({
       <ShortcutSettingsPanel
         isOpen={isShortcutSettingsOpen}
         onClose={() => setIsShortcutSettingsOpen(false)}
+      />
+
+      {/* S54-E1: History panel */}
+      <HistoryPanel
+        isOpen={isHistoryPanelOpen}
+        onClose={() => setIsHistoryPanelOpen(false)}
       />
     </>
   );

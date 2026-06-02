@@ -49,6 +49,8 @@ import { ReviewReportPanel } from '@/components/design-review';
 import { HistoryPanel } from '@/components/canvas/features/HistoryPanel';
 import { ConflictResolutionDialog } from '@/components/conflict/ConflictResolutionDialog';
 import { PresenceOverlay } from '@/components/dds/presence/PresenceOverlay';
+// S54-E3: Cursor real-time sync
+import { CursorOverlay } from '@/components/dds/collaboration/CursorOverlay';
 // S54-E2: File Import Enhancement
 import { useFileDrop } from '@/hooks/canvas/useFileDrop';
 import { FileImportDialog } from '@/components/dds/canvas/FileImportDialog';
@@ -843,6 +845,8 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
           pointerEvents: 'none',
         }}>
           <PresenceOverlay excludeUserId={userId ?? undefined} />
+          {/* S54-E3: CursorOverlay — real-time cursor sync with WebSocket */}
+          <CursorOverlay excludeUserId={userId ?? undefined} />
         </div>
       )}
 

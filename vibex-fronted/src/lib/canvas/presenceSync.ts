@@ -41,6 +41,12 @@ export interface PresencePingPayload {
   userId: string;
 }
 
+export interface CursorMovePayload {
+  userId: string;
+  x: number;
+  y: number;
+}
+
 // ============================================================================
 // Internal state
 // ============================================================================
@@ -127,6 +133,14 @@ function handlePresencePing(msg: BaseMessage): void {
   scheduleTimeoutRemoval(userId);
 }
 
+function handleCursorMove(msg: BaseMessage): void {
+  const payload = msg.payload as CursorMovePayload;
+  if (!payload?.userId) return;
+
+  const { userId, x, y } = payload;
+  usePresenceStore.getState().updateCursor(userId, x, y);
+}
+
 // ============================================================================
 // Subscription management
 // ============================================================================
@@ -155,6 +169,9 @@ export function registerPresenceHandlers(): void {
         break;
       case 'ping':
         handlePresencePing(msg);
+        break;
+      case 'cursor:move':
+        handleCursorMove(msg);
         break;
       default:
         canvasLogger.default.debug('[PresenceSync] Unknown presence subType:', subType);

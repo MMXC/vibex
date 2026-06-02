@@ -10,6 +10,8 @@
  * - Uses existing canvasListStore (S47-E4) for all CRUD operations
  *
  * Sprint56 E2: 收藏画布 — Star button in cardActions, favorites-first sort
+ *
+ * Sprint57 E4: Batch Operations — 多选模式、批量删除、批量重命名
  */
 
 'use client';
@@ -18,6 +20,9 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCanvasListStore, type CanvasMeta } from '@/stores/canvasListStore';
 import { CreateCanvasDialog } from './CreateCanvasDialog';
+import { BatchOpsPanel } from './BatchOpsPanel';
+import { BatchDeleteConfirmDialog } from './BatchDeleteConfirmDialog';
+import { BatchRenameDialog } from './BatchRenameDialog';
 import styles from './CanvasDashboard.module.css';
 
 type SortMode = 'updatedAt' | 'name';
@@ -36,6 +41,9 @@ export function CanvasDashboard() {
     setSearchTerm,
     toggleFavorite,
     isFavorite,
+    toggleSelect,
+    selectedCanvasIds,
+    isLoaded: _isLoaded,
   } = useCanvasListStore();
 
   const [sortMode, setSortMode] = useState<SortMode>('updatedAt');
@@ -44,6 +52,11 @@ export function CanvasDashboard() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const editInputRef = useRef<HTMLInputElement>(null);
+
+  // S57-E4: multi-select mode
+  const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
+  const [isBatchDeleteOpen, setIsBatchDeleteOpen] = useState(false);
+  const [isBatchRenameOpen, setIsBatchRenameOpen] = useState(false);
 
   useEffect(() => {
     loadCanvases();
@@ -95,6 +108,27 @@ export function CanvasDashboard() {
       if (e.key === 'Escape') setEditingId(null);
     },
     [handleRenameCommit]
+  );
+
+  // S57-E4: Enter/exit multi-select mode
+  const handleToggleMultiSelect = useCallback(() => {
+    setIsMultiSelectMode((prev) => {
+      const next = !prev;
+      if (!next) {
+        // Exit: clear selections
+        useCanvasListStore.getState().clearSelection();
+      }
+      return next;
+    });
+  }, []);
+
+  // S57-E4: Card checkbox click — toggle selection without navigating
+  const handleCardCheckbox = useCallback(
+    (e: React.MouseEvent, canvasId: string) => {
+      e.stopPropagation();
+      toggleSelect(canvasId);
+    },
+    [toggleSelect]
   );
 
   if (!isLoaded) {
@@ -158,6 +192,17 @@ export function CanvasDashboard() {
               名称
             </button>
           </div>
+          {/* S57-E4: Multi-select toggle */}
+          <button
+            type="button"
+            className={`${styles.createBtn}${isMultiSelectMode ? ` ${styles.createBtnActive}` : ''}`}
+            onClick={handleToggleMultiSelect}
+            aria-pressed={isMultiSelectMode}
+            aria-label={isMultiSelectMode ? '退出多选模式' : '进入多选模式'}
+            data-testid="multi-select-toggle"
+          >
+            {isMultiSelectMode ? '✓ 退出选择' : '☐ 批量选择'}
+          </button>
           {/* New Canvas */}
           <button
             type="button"
@@ -171,6 +216,12 @@ export function CanvasDashboard() {
           </button>
         </div>
       </header>
+
+      {/* S57-E4: Batch operations floating toolbar */}
+      <BatchOpsPanel
+        onDelete={() => setIsBatchDeleteOpen(true)}
+        onRename={() => setIsBatchRenameOpen(true)}
+      />
 
       {/* Grid */}
       {displayedCanvases.length === 0 ? (
@@ -192,108 +243,129 @@ export function CanvasDashboard() {
         </div>
       ) : (
         <ul className={styles.grid} role="list" aria-label="画布列表">
-          {displayedCanvases.map((canvas) => (
-            <li key={canvas.id} className={styles.card} data-testid={`canvas-card-${canvas.id}`}>
-              {/* Thumbnail */}
-              <button
-                type="button"
-                className={styles.cardThumbBtn}
-                onClick={() => handleCardClick(canvas)}
-                aria-label={`打开画布 ${canvas.name}`}
-                title={canvas.name}
+          {displayedCanvases.map((canvas) => {
+            const isSelected = selectedCanvasIds.has(canvas.id);
+            return (
+              <li
+                key={canvas.id}
+                className={`${styles.card}${isSelected ? ` ${styles.cardSelected}` : ''}`}
+                data-testid={`canvas-card-${canvas.id}`}
               >
-                <div className={styles.cardThumb}>
-                  {canvas.thumbnail ? (
-                    <img
-                      src={canvas.thumbnail}
-                      alt={`${canvas.name} 缩略图`}
-                      className={styles.cardThumbImg}
-                      width={280}
-                      height={160}
-                    />
-                  ) : (
-                    <div className={styles.cardThumbPlaceholder} aria-hidden="true">
-                      <span className={styles.cardThumbPlaceholderIcon}>📄</span>
-                    </div>
-                  )}
-                </div>
-              </button>
-
-              {/* Card info */}
-              <div className={styles.cardInfo}>
-                {editingId === canvas.id ? (
-                  <input
-                    ref={editInputRef}
-                    className={styles.renameInput}
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                    onBlur={handleRenameCommit}
-                    onKeyDown={handleRenameKeyDown}
-                    onClick={(e) => e.stopPropagation()}
-                    aria-label="重命名画布"
-                    data-testid={`rename-input-${canvas.id}`}
-                  />
-                ) : (
+                {/* S57-E4: Multi-select checkbox */}
+                {isMultiSelectMode && (
                   <button
                     type="button"
-                    className={styles.cardName}
-                    onClick={() => handleCardClick(canvas)}
-                    onDoubleClick={() => handleStartRename(canvas)}
-                    title={canvas.name}
-                    data-testid={`canvas-name-${canvas.id}`}
+                    className={styles.cardCheckbox}
+                    onClick={(e) => handleCardCheckbox(e, canvas.id)}
+                    aria-label={isSelected ? `取消选择 ${canvas.name}` : `选择 ${canvas.name}`}
+                    aria-pressed={isSelected}
+                    data-testid={`card-checkbox-${canvas.id}`}
                   >
-                    {canvas.name}
+                    {isSelected ? '☑️' : '☐'}
                   </button>
                 )}
-                <time
-                  className={styles.cardDate}
-                  dateTime={canvas.createdAt}
-                  title={`创建于 ${new Date(canvas.createdAt).toLocaleString('zh-CN')}`}
-                >
-                  {formatDate(canvas.createdAt)}
-                </time>
-              </div>
 
-              {/* Actions */}
-              <div className={styles.cardActions}>
-                {/* S56-E2: Favorite star button */}
+                {/* Thumbnail */}
                 <button
                   type="button"
-                  className={`${styles.cardFavBtn}${isFavorite(canvas.id) ? ` ${styles.cardFavBtnActive}` : ''}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleFavorite(canvas.id);
-                  }}
-                  title={isFavorite(canvas.id) ? '取消收藏' : '收藏'}
-                  aria-label={isFavorite(canvas.id) ? `取消收藏 ${canvas.name}` : `收藏 ${canvas.name}`}
-                  aria-pressed={isFavorite(canvas.id)}
-                  data-testid={`fav-btn-${canvas.id}`}
+                  className={styles.cardThumbBtn}
+                  onClick={() => handleCardClick(canvas)}
+                  aria-label={`打开画布 ${canvas.name}`}
+                  title={canvas.name}
                 >
-                  {isFavorite(canvas.id) ? '⭐' : '☆'}
+                  <div className={styles.cardThumb}>
+                    {canvas.thumbnail ? (
+                      <img
+                        src={canvas.thumbnail}
+                        alt={`${canvas.name} 缩略图`}
+                        className={styles.cardThumbImg}
+                        width={280}
+                        height={160}
+                      />
+                    ) : (
+                      <div className={styles.cardThumbPlaceholder} aria-hidden="true">
+                        <span className={styles.cardThumbPlaceholderIcon}>📄</span>
+                      </div>
+                    )}
+                  </div>
                 </button>
-                <button
-                  type="button"
-                  className={styles.cardEditBtn}
-                  onClick={() => handleStartRename(canvas)}
-                  title="重命名"
-                  aria-label={`重命名 ${canvas.name}`}
-                  data-testid={`rename-btn-${canvas.id}`}
-                >
-                  ✏️
-                </button>
-                <button
-                  type="button"
-                  className={styles.cardDeleteBtn}
-                  onClick={() => setConfirmDeleteId(canvas.id)}
-                  title="删除"
-                  aria-label={`删除 ${canvas.name}`}
-                  data-testid={`delete-btn-${canvas.id}`}
-                >
-                  🗑️
-                </button>
-              </div>
-            </li>
-          ))}
+
+                {/* Card info */}
+                <div className={styles.cardInfo}>
+                  {editingId === canvas.id ? (
+                    <input
+                      ref={editInputRef}
+                      className={styles.renameInput}
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      onBlur={handleRenameCommit}
+                      onKeyDown={handleRenameKeyDown}
+                      onClick={(e) => e.stopPropagation()}
+                      aria-label="重命名画布"
+                      data-testid={`rename-input-${canvas.id}`}
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      className={styles.cardName}
+                      onClick={() => handleCardClick(canvas)}
+                      onDoubleClick={() => handleStartRename(canvas)}
+                      title={canvas.name}
+                      data-testid={`canvas-name-${canvas.id}`}
+                    >
+                      {canvas.name}
+                    </button>
+                  )}
+                  <time
+                    className={styles.cardDate}
+                    dateTime={canvas.createdAt}
+                    title={`创建于 ${new Date(canvas.createdAt).toLocaleString('zh-CN')}`}
+                  >
+                    {formatDate(canvas.createdAt)}
+                  </time>
+                </div>
+
+                {/* Actions */}
+                <div className={styles.cardActions}>
+                  {/* S56-E2: Favorite star button */}
+                  <button
+                    type="button"
+                    className={`${styles.cardFavBtn}${isFavorite(canvas.id) ? ` ${styles.cardFavBtnActive}` : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(canvas.id);
+                    }}
+                    title={isFavorite(canvas.id) ? '取消收藏' : '收藏'}
+                    aria-label={isFavorite(canvas.id) ? `取消收藏 ${canvas.name}` : `收藏 ${canvas.name}`}
+                    aria-pressed={isFavorite(canvas.id)}
+                    data-testid={`fav-btn-${canvas.id}`}
+                  >
+                    {isFavorite(canvas.id) ? '⭐' : '☆'}
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.cardEditBtn}
+                    onClick={() => handleStartRename(canvas)}
+                    title="重命名"
+                    aria-label={`重命名 ${canvas.name}`}
+                    data-testid={`rename-btn-${canvas.id}`}
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.cardDeleteBtn}
+                    onClick={() => setConfirmDeleteId(canvas.id)}
+                    title="删除"
+                    aria-label={`删除 ${canvas.name}`}
+                    data-testid={`delete-btn-${canvas.id}`}
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
 
@@ -342,6 +414,18 @@ export function CanvasDashboard() {
           </div>
         </div>
       )}
+
+      {/* S57-E4: Batch delete confirmation */}
+      <BatchDeleteConfirmDialog
+        isOpen={isBatchDeleteOpen}
+        onClose={() => setIsBatchDeleteOpen(false)}
+      />
+
+      {/* S57-E4: Batch rename dialog */}
+      <BatchRenameDialog
+        isOpen={isBatchRenameOpen}
+        onClose={() => setIsBatchRenameOpen(false)}
+      />
     </div>
   );
 }

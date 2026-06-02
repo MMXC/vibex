@@ -268,3 +268,110 @@ describe('E2: 收藏画布 (Favorites)', () => {
     expect(useCanvasListStore.getState().favoriteIds).toContain('existing-fav');
   });
 });
+
+// ============================================
+// E4 Tests — Batch Operations
+// ============================================
+
+describe('E4: 批量重命名 / 删除', () => {
+  beforeEach(() => {
+    resetStore();
+  });
+
+  it('E4.3: batchDelete removes multiple canvases from store', async () => {
+    const c1 = makeCanvas('c1', 'Canvas 1');
+    const c2 = makeCanvas('c2', 'Canvas 2');
+    const c3 = makeCanvas('c3', 'Canvas 3');
+    useCanvasListStore.setState({ canvases: [c1, c2, c3], isLoaded: true });
+
+    await useCanvasListStore.getState().batchDelete(['c1', 'c2']);
+
+    const state = useCanvasListStore.getState();
+    expect(state.canvases).toHaveLength(1);
+    expect(state.canvases[0].id).toBe('c3');
+  });
+
+  it('E4.3: batchDelete clears selectedCanvasIds for deleted canvases', async () => {
+    const c1 = makeCanvas('c1', 'Canvas 1');
+    const c2 = makeCanvas('c2', 'Canvas 2');
+    useCanvasListStore.setState({
+      canvases: [c1, c2],
+      selectedCanvasIds: new Set(['c1', 'c2']),
+      isLoaded: true,
+    });
+
+    await useCanvasListStore.getState().batchDelete(['c1']);
+
+    const state = useCanvasListStore.getState();
+    expect(state.selectedCanvasIds.has('c1')).toBe(false);
+    expect(state.selectedCanvasIds.has('c2')).toBe(true);
+  });
+
+  it('E4.3: batchDelete removes deleted ids from favorites', async () => {
+    const c1 = makeCanvas('c1', 'Canvas 1');
+    const c2 = makeCanvas('c2', 'Canvas 2');
+    useCanvasListStore.setState({
+      canvases: [c1, c2],
+      favoriteIds: ['c1', 'c2'],
+      isLoaded: true,
+    });
+
+    await useCanvasListStore.getState().batchDelete(['c1']);
+
+    const state = useCanvasListStore.getState();
+    expect(state.favoriteIds).not.toContain('c1');
+    expect(state.favoriteIds).toContain('c2');
+  });
+
+  it('E4.3: batchDelete is a no-op on empty array', async () => {
+    const c1 = makeCanvas('c1', 'Canvas 1');
+    useCanvasListStore.setState({ canvases: [c1], isLoaded: true });
+
+    await useCanvasListStore.getState().batchDelete([]);
+
+    const state = useCanvasListStore.getState();
+    expect(state.canvases).toHaveLength(1);
+  });
+
+  it('E4.4: batchRename renames multiple canvases with {n} placeholder', async () => {
+    const c1 = makeCanvas('c1', 'Old 1');
+    const c2 = makeCanvas('c2', 'Old 2');
+    useCanvasListStore.setState({ canvases: [c1, c2], isLoaded: true });
+
+    await useCanvasListStore.getState().batchRename([
+      { id: 'c1', name: 'New Canvas {n}' },
+      { id: 'c2', name: 'New Canvas {n}' },
+    ]);
+
+    const state = useCanvasListStore.getState();
+    const canvas1 = state.canvases.find((c) => c.id === 'c1');
+    const canvas2 = state.canvases.find((c) => c.id === 'c2');
+    expect(canvas1?.name).toBe('New Canvas 1');
+    expect(canvas2?.name).toBe('New Canvas 2');
+  });
+
+  it('E4.4: batchRename skips non-existent ids', async () => {
+    const c1 = makeCanvas('c1', 'Canvas 1');
+    useCanvasListStore.setState({ canvases: [c1], isLoaded: true });
+
+    await useCanvasListStore.getState().batchRename([
+      { id: 'c1', name: 'Renamed 1' },
+      { id: 'non-existent', name: 'Ghost' },
+    ]);
+
+    const state = useCanvasListStore.getState();
+    const canvas1 = state.canvases.find((c) => c.id === 'c1');
+    expect(canvas1?.name).toBe('Renamed 1');
+  });
+
+  it('E4.4: batchRename updates updatedAt for each renamed canvas', async () => {
+    const before = '2026-01-01T00:00:00.000Z';
+    const c1 = makeCanvas('c1', 'Old', before);
+    useCanvasListStore.setState({ canvases: [c1], isLoaded: true });
+
+    await useCanvasListStore.getState().batchRename([{ id: 'c1', name: 'New' }]);
+
+    const state = useCanvasListStore.getState();
+    expect(state.canvases[0].updatedAt).not.toBe(before);
+  });
+});

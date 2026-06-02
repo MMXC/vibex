@@ -69,6 +69,10 @@ export interface CanvasListState {
   toggleFavorite: (id: string) => void;
   /** S56-E2: 查询收藏状态 */
   isFavorite: (id: string) => boolean;
+  /** S57-E4: 批量删除 — 循环调用 deleteCanvas，移除 IndexedDB + localStorage index + favorites */
+  batchDelete: (canvasIds: string[]) => Promise<void>;
+  /** S57-E4: 批量重命名 — ops = [{id, name}]，name 支持 {n} 占位符替换为 1-based 序号 */
+  batchRename: (ops: { id: string; name: string }[]) => Promise<void>;
 }
 
 // ============================================
@@ -429,5 +433,71 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
 
   isFavorite: (id: string) => {
     return get().favoriteIds.includes(id);
+  },
+
+  // ============================================
+  // S57-E4: 批量重命名 / 删除
+  // ============================================
+
+  batchDelete: async (canvasIds: string[]) => {
+    if (canvasIds.length === 0) return;
+    // Remove from IndexedDB
+    for (const id of canvasIds) {
+      await idbDelete('canvases', id);
+    }
+    // Update localStorage index
+    if (isLocalStorageAvailable()) {
+      try {
+        const raw = localStorage.getItem(LOCALSTORAGE_INDEX_KEY);
+        const ids: string[] = raw ? JSON.parse(raw) : [];
+        localStorage.setItem(
+          LOCALSTORAGE_INDEX_KEY,
+          JSON.stringify(ids.filter((i) => !canvasIds.includes(i)))
+        );
+      } catch {
+        // non-critical
+      }
+    }
+    // Remove from favorites
+    const { favoriteIds } = get();
+    const nextFavs = favoriteIds.filter((fId) => !canvasIds.includes(fId));
+    if (nextFavs.length !== favoriteIds.length) {
+      saveFavorites(nextFavs);
+    }
+    // Update store state
+    set((state) => ({
+      canvases: state.canvases.filter((c) => !canvasIds.includes(c.id)),
+      activeCanvasId: canvasIds.includes(state.activeCanvasId ?? '') ? null : state.activeCanvasId,
+      selectedCanvasIds: new Set([...state.selectedCanvasIds].filter((id) => !canvasIds.includes(id))),
+      favoriteIds: nextFavs,
+    }));
+  },
+
+  batchRename: async (ops: { id: string; name: string }[]) => {
+    if (ops.length === 0) return;
+    const { canvases } = get();
+    const updatedMetas: CanvasMeta[] = [];
+
+    for (let i = 0; i < ops.length; i++) {
+      const { id, name } = ops[i];
+      const existing = canvases.find((c) => c.id === id);
+      if (!existing) continue;
+      // Replace {n} with 1-based index
+      const resolvedName = name.replace(/\{n\}/g, String(i + 1));
+      const updated: CanvasMeta = {
+        ...existing,
+        name: resolvedName,
+        updatedAt: new Date().toISOString(),
+      };
+      await idbPut('canvases', updated);
+      updatedMetas.push(updated);
+    }
+
+    set((state) => ({
+      canvases: state.canvases.map((c) => {
+        const u = updatedMetas.find((m) => m.id === c.id);
+        return u ?? c;
+      }),
+    }));
   },
 }));

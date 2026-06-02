@@ -83,6 +83,7 @@
     "next-intl": "^4.8.3",
     "pako": "^2.1.0",
     "react": "19.2.3",
+    "react-colorful": "^5.7.0",
     "react-dom": "19.2.3",
     "react-resizable-panels": "^4.7.2",
     "react-window": "^2.2.7",

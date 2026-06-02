@@ -40,6 +40,7 @@ import { useConflictStore } from '@/lib/canvas/stores/conflictStore';
 import { useMiniMapPanelStore, useMiniMapStore } from '@/lib/canvas/stores/miniMapStore';
 import { useViewportBoundsStore } from '@/lib/canvas/stores/viewportBoundsStore';
 import { usePresenceStore } from '@/lib/collaboration/presenceStore';
+import { useBackgroundSettingsStore, PRESET_SETTINGS } from '@/stores/backgroundSettingsStore';
 import { MiniMapPanel } from '@/components/dds/MiniMapPanel';
 import styles from './DDSFlow.module.css';
 
@@ -292,6 +293,13 @@ function DDSFlowInner({
     [toggleCollapse]
   );
 
+  // S55-E4: Background settings — subscribe to preset + customColor for reactivity
+  const bgSettings = useBackgroundSettingsStore((s) =>
+    s.preset === 'custom'
+      ? { variant: BackgroundVariant.Dots, gap: 24, size: 1, color: s.customColor }
+      : PRESET_SETTINGS[s.preset]
+  );
+
   return (
     <div className={styles.container}>
       {/* E2-U1: ConflictBubble — renders outside ReactFlow, shows dialog when conflict active */}
@@ -323,11 +331,12 @@ function DDSFlowInner({
         style={{ background: 'transparent' }}
         proOptions={{ hideAttribution: true }}
       >
+        {/* S55-E4: Background — driven by backgroundSettingsStore */}
         <Background
-          variant={BackgroundVariant.Dots}
-          gap={24}
-          size={1}
-          color="rgba(255,255,255,0.06)"
+          variant={bgSettings.variant}
+          gap={bgSettings.gap}
+          size={bgSettings.size}
+          color={bgSettings.color}
         />
         {/* E5: Hide Controls on touch (mobile toolbar handles actions) */}
         {/*

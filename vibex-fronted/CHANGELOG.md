@@ -1,3 +1,14 @@
+
+
+---
+
+## [Unreleased] S55-E4: Background Settings — 2026-06-02
+- **S55-E4.1**: `backgroundSettingsStore.ts` — Zustand store with 5 presets (dots/lines/cross/solid/custom), persist middleware
+- **S55-E4.2**: `BackgroundSettingsPanel.tsx` — modal panel with 5 preset buttons + HexColorPicker for custom color
+- **S55-E4.3**: `DDSFlow.tsx` — replace hardcoded `<Background>` with dynamic settings from store
+- **S55-E4.4**: `DDSToolbar.tsx` — GridIcon button to open BackgroundSettingsPanel
+- **S55-E4.5**: Vitest 8/8 passing (`BackgroundSettingsPanel.test.tsx`)
+
 ## [Unreleased] Sprint 55 — E1 画布导出菜单
 
 ##### S55-E1: 画布导出菜单 (ExportMenu)

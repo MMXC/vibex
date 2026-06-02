@@ -36,6 +36,7 @@ const FORMAT_LABELS: Record<BatchExportFormat, string> = {
   png: 'PNG',
   svg: 'SVG',
   pdf: 'PDF',
+  zip: 'ZIP',
 };
 
 export function ExportProgress({
@@ -99,6 +100,7 @@ export function ExportProgress({
             <option value="png">PNG (位图)</option>
             <option value="svg">SVG (矢量)</option>
             <option value="pdf">PDF (文档)</option>
+            <option value="zip">ZIP (批量位图)</option>
           </select>
         </div>
       )}

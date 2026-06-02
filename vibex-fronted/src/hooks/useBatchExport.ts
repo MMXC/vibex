@@ -14,7 +14,7 @@ import { exportAndDownloadAsSvgZip } from '@/lib/canvas/exportMultipleAsSVG';
 import { exportAndDownloadAsPDF } from '@/lib/canvas/exportMultipleAsPDF';
 import type { DDSCard } from '@/types/dds';
 
-export type BatchExportFormat = 'png' | 'svg' | 'pdf';
+export type BatchExportFormat = 'png' | 'svg' | 'pdf' | 'zip';
 
 export type BatchExportStatus =
   | 'idle'

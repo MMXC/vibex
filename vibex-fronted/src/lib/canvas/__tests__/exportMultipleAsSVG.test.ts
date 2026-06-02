@@ -1,10 +1,12 @@
 /**
  * exportMultipleAsSVG.test.ts — Sprint52 E2: Batch SVG export tests
+ * Sprint53 E5 D5.4: Added boundary cases (0/1/100+ nodes)
  *
  * Tests:
  * - exportMultipleAsSVG: throws on empty cards
  * - downloadBlob: creates download link
  * - Error handling: aborted export
+ * - D5.4 boundary: 0 nodes → throws, 1 node → works, 100+ nodes → works
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
@@ -126,5 +128,59 @@ describe('Sprint52 E2 — SVG export zip blob integration', () => {
     const result = await exportMultipleAsSVG(mockCards, { scope: 'all' });
     expect(result).toBeInstanceOf(Blob);
     expect(result.type).toBe('application/zip');
+  });
+});
+
+// D5.4 boundary cases (S53-E5)
+describe('S53-E5 D5.4 — exportMultipleAsSVG boundary cases', () => {
+  it('0 nodes: throws on empty cards array', async () => {
+    vi.mock('html-to-image', () => ({ toSvg: vi.fn() }));
+    vi.mock('jszip', () => ({ default: class MockJSZip { folder() { return this; } file() {} async generateAsync() { return new Blob(); } } }));
+    vi.stubGlobal('document', { querySelector: vi.fn(() => null) });
+
+    const { exportMultipleAsSVG } = await import('../exportMultipleAsSVG');
+    await expect(exportMultipleAsSVG([], { scope: 'all' })).rejects.toThrow();
+  });
+
+  it('1 node: produces zip blob for single card', async () => {
+    vi.mock('html-to-image', () => ({
+      toSvg: vi.fn().mockResolvedValue('<svg xmlns="http://www.w3.org/2000/svg"/>'),
+    }));
+    vi.mock('jszip', () => ({
+      default: class MockJSZip {
+        folder() { return this; }
+        file() {}
+        async generateAsync() { return new Blob(['PK'], { type: 'application/zip' }); }
+      },
+    }));
+    vi.stubGlobal('document', { querySelector: vi.fn(() => ({ scrollWidth: 100, scrollHeight: 100 })) });
+
+    const { exportMultipleAsSVG } = await import('../exportMultipleAsSVG');
+    const mockCards = [{ id: 'c1', title: 'Canvas', type: 'user-story' }] as any;
+    const result = await exportMultipleAsSVG(mockCards, { scope: 'all' });
+    expect(result).toBeInstanceOf(Blob);
+  });
+
+  it('100+ nodes: processes large card array without throwing', async () => {
+    vi.mock('html-to-image', () => ({
+      toSvg: vi.fn().mockResolvedValue('<svg xmlns="http://www.w3.org/2000/svg"/>'),
+    }));
+    vi.mock('jszip', () => ({
+      default: class MockJSZip {
+        folder() { return this; }
+        file() {}
+        async generateAsync() { return new Blob(['PK'], { type: 'application/zip' }); }
+      },
+    }));
+    vi.stubGlobal('document', { querySelector: vi.fn(() => ({ scrollWidth: 100, scrollHeight: 100 })) });
+
+    const { exportMultipleAsSVG } = await import('../exportMultipleAsSVG');
+    // Generate 120 mock cards
+    const manyCards = Array.from({ length: 120 }, (_, i) => ({
+      id: `c${i}`, title: `Canvas ${i}`, type: 'user-story',
+    })) as any;
+    // Should not throw — just verify it completes
+    const result = await exportMultipleAsSVG(manyCards, { scope: 'all' });
+    expect(result).toBeInstanceOf(Blob);
   });
 });

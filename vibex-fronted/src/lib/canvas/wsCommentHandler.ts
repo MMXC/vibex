@@ -5,9 +5,11 @@
  * - 订阅 backend 发送的 comment:created / comment:resolved / comment:mention 消息
  * - 将远程评论事件转发到 commentStore（驱动 UI 自动刷新）
  * - S51-E5: comment:mention 消息转发到 mentionsStore 并更新未读计数
+ * - S53-E2: revision:bump / revision:conflict 消息转发到 canvasHistoryStore
  * - 提供 addCommentFromRemote() 给本地添加评论（带 timestamp 用于去重）
  *
  * S51-E5: 新增 comment:mention 类型 — WebSocket 通知被 @ 的用户
+ * S53-E2: 新增 revision:bump / revision:conflict — Undo/Redo 协作冲突处理
  */
 import { useCommentStore } from '@/stores/dds/commentStore';
 import type { Comment } from '@/stores/dds/commentStore';
@@ -21,6 +23,17 @@ export interface WSCommentMessage {
       authorId?: string;
       projectId?: string;
     };
+  };
+}
+
+/** Revision message types — S53-E2 Undo/Redo conflict handling */
+export interface WSSrevisionMessage {
+  type: 'revision:bump' | 'revision:conflict';
+  payload: {
+    canvasId: string;
+    revision?: number;       // for bump
+    remoteRevision?: number; // for conflict
+    localRevision?: number;  // for conflict
   };
 }
 
@@ -64,23 +77,53 @@ export function handleCommentWSMessage(data: unknown): void {
     // Map Comment → Mention shape expected by mentionsStore.addMention
     case 'comment:mention': {
       import('@/stores/dds/mentionsStore').then(({ useMentionsStore: useMentionStore }) => {
-        // Parse toUser from commentText (e.g., extract second @mention for notified user)
-        const { parseMentions } = await import('@/lib/canvas/parseMentions');
-        const mentionedUsers = parseMentions(comment.text);
-        const toUser = mentionedUsers[1] ?? mentionedUsers[0] ?? 'unknown';
+        // Dynamic import parseMentions within the promise chain
+        import('@/lib/canvas/parseMentions').then(({ parseMentions }) => {
+          const mentionedUsers = parseMentions(comment.text);
+          // toUser is the second mention (the notified user), fallback to first
+          const toUser = mentionedUsers[1] ?? mentionedUsers[0] ?? 'unknown';
 
-        useMentionStore.getState().addMention({
-          commentId: comment.commentId,
-          fromUser: comment.authorId ?? 'unknown',
-          toUser,
-          commentText: comment.text,
-          projectId: comment.projectId ?? 'current-project',
-          nodeId: comment.nodeId,
-          timestamp: comment.timestamp ?? Date.now(),
+          useMentionStore.getState().addMention({
+            commentId: comment.commentId,
+            fromUser: comment.authorId ?? 'unknown',
+            toUser,
+            commentText: comment.text,
+            projectId: comment.projectId ?? 'current-project',
+            nodeId: comment.nodeId,
+            timestamp: comment.timestamp ?? Date.now(),
+          });
+        }).catch(err => {
+          console.error('[wsCommentHandler] Failed to import parseMentions:', err);
         });
       }).catch(err => {
         console.error('[wsCommentHandler] Failed to import mentionsStore:', err);
       });
+      break;
+    }
+
+    // ── S53-E2: revision:bump — 远程 base revision 更新 ───────────────────
+    case 'revision:bump': {
+      import('@/stores/dds/canvasHistoryStore')
+        .then(({ useCanvasHistoryStore }) => {
+          const revision = (data as WSSrevisionMessage).payload.revision ?? 0;
+          useCanvasHistoryStore.getState().setBaseRevision(revision);
+        })
+        .catch((err) => {
+          console.error('[wsCommentHandler] Failed to import canvasHistoryStore for bump:', err);
+        });
+      break;
+    }
+
+    // ── S53-E2: revision:conflict — 协作 Undo/Redo 冲突触发 ───────────────
+    case 'revision:conflict': {
+      import('@/stores/dds/canvasHistoryStore')
+        .then(({ useCanvasHistoryStore }) => {
+          const { canvasId, remoteRevision = 0, localRevision = 0 } = (data as WSSrevisionMessage).payload;
+          useCanvasHistoryStore.getState().triggerConflictToast(canvasId, remoteRevision, localRevision);
+        })
+        .catch((err) => {
+          console.error('[wsCommentHandler] Failed to import canvasHistoryStore for conflict:', err);
+        });
       break;
     }
 

@@ -76,6 +76,7 @@ export function TemplateSaveDialog({ isOpen, onClose, onSaved, editTemplate }: T
           snapshot: snapshotStr,
           tags: ['custom'],
           isPreset: false,
+          isUserCreated: true,
         };
         await createTemplate(template);
         onSaved?.(id);

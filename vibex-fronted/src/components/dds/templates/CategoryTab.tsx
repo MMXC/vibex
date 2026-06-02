@@ -14,11 +14,13 @@ export type CanvasCategory = 'flowchart' | 'mindmap' | 'uml' | 'other' | null;
 
 interface CategoryTabProps {
   /** Currently selected category */
-  selected: CanvasCategory | 'all' | 'favorites' | 'recent';
+  selected: CanvasCategory | 'all' | 'favorites' | 'recent' | 'custom';
   /** Callback when a category is selected */
-  onSelect: (category: CanvasCategory | 'all' | 'favorites' | 'recent') => void;
+  onSelect: (category: CanvasCategory | 'all' | 'favorites' | 'recent' | 'custom') => void;
   /** Whether to show the Recent tab */
   showRecent?: boolean;
+  /** Whether to show the Custom (我的模板) tab */
+  showCustom?: boolean;
 }
 
 const CATEGORIES: { key: CanvasCategory | 'all'; label: string; icon: string }[] = [
@@ -36,9 +38,9 @@ const CATEGORY_COLORS: Record<string, string> = {
   other: '#6b7280',
 };
 
-export const CategoryTab = memo<CategoryTabProps>(({ selected, onSelect, showRecent }) => {
+export const CategoryTab = memo<CategoryTabProps>(({ selected, onSelect, showRecent, showCustom }) => {
   const handleSelect = useCallback(
-    (key: CanvasCategory | 'all' | 'favorites' | 'recent') => {
+    (key: CanvasCategory | 'all' | 'favorites' | 'recent' | 'custom') => {
       onSelect(key);
     },
     [onSelect]
@@ -83,6 +85,23 @@ export const CategoryTab = memo<CategoryTabProps>(({ selected, onSelect, showRec
         >
           <span aria-hidden="true">🕐</span>
           <span>最近</span>
+        </button>
+      )}
+      {showCustom && (
+        <button
+          type="button"
+          role="tab"
+          aria-selected={selected === 'custom'}
+          className={`${styles.tab} ${selected === 'custom' ? styles.tabActive : ''}`}
+          style={
+            selected === 'custom'
+              ? { borderBottomColor: '#f59e0b', color: '#f59e0b' }
+              : undefined
+          }
+          onClick={() => handleSelect('custom')}
+        >
+          <span aria-hidden="true">📁</span>
+          <span>我的模板</span>
         </button>
       )}
     </div>

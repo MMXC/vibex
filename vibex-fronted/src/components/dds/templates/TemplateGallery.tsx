@@ -87,7 +87,7 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
     }
   }, [isOpen, loadTemplates]);
 
-  // E5: Fuse.js search + category filter + Recent support
+  // E5: Fuse.js search + category filter + Recent support + E3 custom filter
   const filtered = templates.filter((t) => {
     // Recent filter
     if (selectedCategory === 'recent') {
@@ -98,6 +98,10 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
       t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.description.toLowerCase().includes(searchQuery.toLowerCase());
     if (!matchSearch) return false;
+    // E3: Custom (我的模板) filter — show only user-created templates
+    if (selectedCategory === 'custom') {
+      return t.isUserCreated === true;
+    }
     // Category filter (canvas layout category from IndexedDB)
     const cat = t.category || 'other';
     const matchCat =
@@ -193,19 +197,23 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
 
         {/* Category tabs (E4: CategoryTab component) */}
         <CategoryTab
-          selected={selectedCategory as CanvasCategory | 'all' | 'favorites' | 'recent'}
+          selected={selectedCategory as CanvasCategory | 'all' | 'favorites' | 'recent' | 'custom'}
           onSelect={(cat) => setSelectedCategory(cat)}
           showRecent
+          showCustom
         />
 
         {/* Template grid */}
         <div className={styles.grid}>
           {loading && <p className={styles.loading}>加载中...</p>}
-          {!loading && filtered.length === 0 && selectedCategory !== 'recent' && (
+          {!loading && filtered.length === 0 && selectedCategory !== 'recent' && selectedCategory !== 'custom' && (
             <p className={styles.empty}>没有找到匹配的模板</p>
           )}
           {!loading && filtered.length === 0 && selectedCategory === 'recent' && (
             <p className={styles.empty}>没有最近使用的模板</p>
+          )}
+          {!loading && filtered.length === 0 && selectedCategory === 'custom' && (
+            <p className={styles.empty}>还没有创建任何模板</p>
           )}
           {!loading &&
             filtered.map((t) => (

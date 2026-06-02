@@ -706,3 +706,13 @@
 - **S54-E2.4**: `src/components/dds/canvas/FileImportDialog.tsx` — preview/confirm dialog
 - **S54-E2.5**: `src/components/dds/canvas/DropOverlay.tsx` — visual drag overlay
 - **S54-E2.6**: `src/components/dds/DDSCanvasPage.tsx` — integrated useFileDrop + FileImportDialog
+
+---
+
+## [Unreleased] S54-E3: 协作者 Cursor 实时同步 — 2026-06-08
+- **S54-E3.1**: `presenceSync.ts` — `cursor:move` WebSocket 事件订阅 + CursorMovePayload interface
+- **S54-E3.2**: `CursorOverlay.tsx` — SVG 实时协同光标组件（箭头+用户名标签）
+- **S54-E3.3**: `CursorOverlay.test.tsx` — 8/8 vitest passing
+- **S54-E3.4**: `DDSCanvasPage.tsx` — CursorOverlay 集成 + mouse move 节流
+- **S54-E3.5**: `throttleCursorBroadcast.ts` — cursor发送节流（60fps上限）
+- **S54-E3.6**: `screenToFlowCoords.ts` — 屏幕→Flow坐标转换

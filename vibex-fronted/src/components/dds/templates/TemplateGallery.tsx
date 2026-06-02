@@ -14,11 +14,14 @@ import {
   seedPresets,
   PRESET_TEMPLATES,
   type CanvasTemplateSummary,
+  type CanvasTemplateData,
 } from '@/lib/canvas/templateStore';
 import { useTemplateStore } from '@/stores/templateStore';
 import { downloadTemplatesAsFile } from '@/lib/canvas/templateExport';
 import { TemplateImportDialog } from './TemplateImportDialog';
+import { TemplatePreviewDialog } from './TemplatePreviewDialog';
 import { CategoryTab, type CanvasCategory } from './CategoryTab';
+import { getRecentTemplates } from '@/hooks/templates/useTemplatePreview';
 import { deserializeThreeTrees, restoreStore } from '@/lib/canvas/serialize';
 import { searchTemplates } from '@/lib/canvas/templateSearch';
 import styles from './TemplateGallery.module.css';
@@ -51,8 +54,16 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
   const [loading, setLoading] = useState(false);
   const [applying, setApplying] = useState<string | null>(null);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [previewTemplateId, setPreviewTemplateId] = useState<string | null>(null);
+  const [previewTemplateData, setPreviewTemplateData] = useState<CanvasTemplateData | null>(null);
 
   const templateStore = useTemplateStore();
+
+  // E5: Load recent template IDs
+  const [recentTemplateIds] = useState<Set<string>>(() => {
+    const recent = getRecentTemplates();
+    return new Set(recent.map((r) => r.id));
+  });
 
 // categories removed (now via CategoryTab)
 
@@ -76,8 +87,12 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
     }
   }, [isOpen, loadTemplates]);
 
-  // E4: Fuse.js search + category filter
+  // E5: Fuse.js search + category filter + Recent support
   const filtered = templates.filter((t) => {
+    // Recent filter
+    if (selectedCategory === 'recent') {
+      return recentTemplateIds.has(t.id);
+    }
     const matchSearch =
       !searchQuery ||
       t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -111,6 +126,23 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
   const handleExportAll = () => {
     const data = templateStore.exportTemplates();
     downloadTemplatesAsFile(data.templates);
+  };
+
+  // E5: Open preview dialog
+  const handlePreview = async (templateId: string) => {
+    setPreviewTemplateId(templateId);
+    try {
+      const data = await getTemplate(templateId);
+      setPreviewTemplateData(data || null);
+    } catch (err) {
+      console.error('[TemplateGallery] Failed to load preview:', err);
+      setPreviewTemplateData(null);
+    }
+  };
+
+  const handlePreviewClose = () => {
+    setPreviewTemplateId(null);
+    setPreviewTemplateData(null);
   };
 
   const handleImport = (importedTemplates: import('@/data/templates').RequirementTemplate[], _strategy: 'skip' | 'overwrite' | 'rename') => {
@@ -161,15 +193,19 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
 
         {/* Category tabs (E4: CategoryTab component) */}
         <CategoryTab
-          selected={selectedCategory as CanvasCategory | 'all' | 'favorites'}
+          selected={selectedCategory as CanvasCategory | 'all' | 'favorites' | 'recent'}
           onSelect={(cat) => setSelectedCategory(cat)}
+          showRecent
         />
 
         {/* Template grid */}
         <div className={styles.grid}>
           {loading && <p className={styles.loading}>加载中...</p>}
-          {!loading && filtered.length === 0 && (
+          {!loading && filtered.length === 0 && selectedCategory !== 'recent' && (
             <p className={styles.empty}>没有找到匹配的模板</p>
+          )}
+          {!loading && filtered.length === 0 && selectedCategory === 'recent' && (
+            <p className={styles.empty}>没有最近使用的模板</p>
           )}
           {!loading &&
             filtered.map((t) => (
@@ -196,6 +232,19 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
                     </span>
                   ))}
                 </div>
+                {/* E5: Preview button */}
+                <button
+                  type="button"
+                  className={styles.previewBtn}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePreview(t.id);
+                  }}
+                  aria-label={`预览: ${t.name}`}
+                  title="预览"
+                >
+                  👁
+                </button>
               </button>
             ))}
         </div>
@@ -206,6 +255,14 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
           onClose={() => setImportDialogOpen(false)}
           onImport={handleImport}
           existingTemplates={templateStore.templates}
+        />
+
+        {/* E5: Preview Dialog */}
+        <TemplatePreviewDialog
+          isOpen={previewTemplateId !== null}
+          template={previewTemplateData}
+          onClose={handlePreviewClose}
+          onApply={applyTemplate}
         />
       </div>
     </div>

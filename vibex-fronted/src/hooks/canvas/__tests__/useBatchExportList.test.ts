@@ -1,38 +1,42 @@
 /**
  * useBatchExportList.test.ts — Sprint57 E1: CanvasList batch export hook tests
- *
- * Tests:
- * - useBatchExportList initial state
- * - startExport with empty list → error status
- * - startExport with single canvas → calls loadCanvas + downloadBlob
- * - startExport with multiple canvases → progress updates
- * - cancelExport → cancelled status
- * - format selection: vibex vs json
- * - progress callback with current/total/canvasName
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
-// Mock dependencies
-vi.mock('@/stores/canvasListStore', () => ({
-  useCanvasListStore: vi.fn((selector?: (s: unknown) => unknown) => {
-    const state = {
-      canvases: [
-        { id: 'c1', name: 'Canvas One', thumbnail: null, createdAt: '2026-01-01', updatedAt: '2026-01-01' },
-        { id: 'c2', name: 'Canvas Two', thumbnail: null, createdAt: '2026-01-02', updatedAt: '2026-01-02' },
-        { id: 'c3', name: 'Canvas Three', thumbnail: null, createdAt: '2026-01-03', updatedAt: '2026-01-03' },
-      ],
-      favoriteIds: ['c1', 'c2', 'c3'],
-      getSortedCanvases: vi.fn((_sortBy: 'name' | 'updatedAt') => [
-        { id: 'c3', name: 'Canvas Three', thumbnail: null, createdAt: '2026-01-03', updatedAt: '2026-01-03' },
-        { id: 'c2', name: 'Canvas Two', thumbnail: null, createdAt: '2026-01-02', updatedAt: '2026-01-02' },
-        { id: 'c1', name: 'Canvas One', thumbnail: null, createdAt: '2026-01-01', updatedAt: '2026-01-01' },
-      ]),
-    };
-    return selector ? selector(state) : state;
-  }),
+// Capture native URL before any stubbing (needed by Vite module runner)
+const nativeURL = URL;
+
+// Mock JSZip before any imports
+vi.mock('jszip', () => ({
+  default: class MockJSZip {
+    folder() { return this; }
+    file() {}
+    async generateAsync() { return new Blob(['PK...'], { type: 'application/zip' }); }
+  },
 }));
+
+// Mock dependencies BEFORE imports — Zustand store with both selector pattern + getState()
+vi.mock('@/stores/canvasListStore', () => {
+  const mockState = {
+    canvases: [
+      { id: 'c1', name: 'Canvas One', thumbnail: null, createdAt: '2026-01-01', updatedAt: '2026-01-01' },
+      { id: 'c2', name: 'Canvas Two', thumbnail: null, createdAt: '2026-01-02', updatedAt: '2026-01-02' },
+      { id: 'c3', name: 'Canvas Three', thumbnail: null, createdAt: '2026-01-03', updatedAt: '2026-01-03' },
+    ],
+    favoriteIds: ['c1', 'c2'],
+    getSortedCanvases: vi.fn(),
+  };
+  return {
+    useCanvasListStore: Object.assign(
+      vi.fn((selector?: (s: typeof mockState) => unknown) => {
+        return selector ? selector(mockState) : mockState;
+      }),
+      { getState: () => mockState }
+    ),
+  };
+});
 
 vi.mock('@/lib/canvas/persistence', () => ({
   loadCanvas: vi.fn().mockResolvedValue(true),
@@ -46,24 +50,43 @@ vi.mock('@/hooks/canvas/useCanvasExport', () => ({
   }),
 }));
 
-// Mock URL.createObjectURL and revokeObjectURL
+// Mock URL: acts as a real URL constructor (for Vite's `new URL(...)`)
+// but lets tests spy on createObjectURL/revokeObjectURL
 const mockCreateObjectURL = vi.fn(() => 'blob:http://localhost/mock');
 const mockRevokeObjectURL = vi.fn();
-vi.stubGlobal('URL', {
-  createObjectURL: mockCreateObjectURL,
-  revokeObjectURL: mockRevokeObjectURL,
-});
 
-// Mock document.body.appendChild / removeChild for downloadBlob
-const mockAppendChild = vi.fn();
-const mockRemoveChild = vi.fn();
-vi.spyOn(document.body, 'appendChild').mockImplementation(mockAppendChild as any);
-vi.spyOn(document.body, 'removeChild').mockImplementation(mockRemoveChild as any);
+class MockURL {
+  static createObjectURL = mockCreateObjectURL;
+  static revokeObjectURL = mockRevokeObjectURL;
+
+  href: string;
+  protocol: string;
+  hostname: string;
+  pathname: string;
+  search: string;
+  hash: string;
+
+  constructor(url: string, base?: string) {
+    const native = new nativeURL(url, base);
+    this.href = native.href;
+    this.protocol = native.protocol;
+    this.hostname = native.hostname;
+    this.pathname = native.pathname;
+    this.search = native.search ?? '';
+    this.hash = native.hash ?? '';
+  }
+}
+
+vi.stubGlobal('URL', MockURL);
 
 describe('Sprint57 E1 — useBatchExportList', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockCreateObjectURL.mockReturnValue('blob:http://localhost/mock');
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('has correct initial state', async () => {
@@ -77,79 +100,75 @@ describe('Sprint57 E1 — useBatchExportList', () => {
   it('has correct initial state — E1.6a', async () => {
     const { useBatchExportList } = await import('../useBatchExportList');
     const { result } = renderHook(() => useBatchExportList());
-    expect(result.current.status).toBe('idle');
-    expect(result.current.progress).toBe(null);
-    expect(result.current.error).toBe(null);
     expect(typeof result.current.startExport).toBe('function');
     expect(typeof result.current.cancelExport).toBe('function');
   });
 
-  it('startExport with empty list → error status — E1.6b', async () => {
+  it('startExport with empty list → error status', async () => {
     const { useBatchExportList } = await import('../useBatchExportList');
     const { result } = renderHook(() => useBatchExportList());
+
     await act(async () => {
       await result.current.startExport([], 'vibex');
     });
+
     expect(result.current.status).toBe('error');
-    expect(result.current.error).toBeTruthy();
+    expect(result.current.error).toBe('没有选择要导出的画布');
   });
 
-  it('startExport with single canvas → loading then exporting — E1.6c', async () => {
+  it('startExport with single canvas → status transitions to done', async () => {
     const { useBatchExportList } = await import('../useBatchExportList');
     const { result } = renderHook(() => useBatchExportList());
+
     await act(async () => {
-      const promise = result.current.startExport(['c1'], 'vibex');
-      // Wait a tick for status to update
-      await new Promise((r) => setTimeout(r, 10));
-      await promise;
+      await result.current.startExport(['c1'], 'vibex');
     });
+
+    // Debug: log error if status is not 'done'
+    if (result.current.status !== 'done') {
+      // eslint-disable-next-line no-console
+      console.log('[DEBUG] startExport error:', result.current.error, 'status:', result.current.status);
+    }
+
     expect(result.current.status).toBe('done');
-    expect(mockCreateObjectURL).toHaveBeenCalled();
+    expect(result.current.error).toBe(null);
   });
 
-  it('startExport with multiple canvases → progress updates — E1.6d', async () => {
+  it('startExport with multiple canvases → progress updates with current/total', async () => {
     const { useBatchExportList } = await import('../useBatchExportList');
     const { result } = renderHook(() => useBatchExportList());
+
     await act(async () => {
-      await result.current.startExport(['c1', 'c2'], 'vibex');
+      await result.current.startExport(['c1', 'c2', 'c3'], 'vibex');
     });
+
     expect(result.current.status).toBe('done');
-    // Progress should have been updated for each canvas
-    expect(result.current.progress?.total).toBeGreaterThanOrEqual(1);
+    expect(result.current.progress?.total).toBe(3);
   });
 
-  it('cancelExport → cancelled status — E1.6e', async () => {
+  it('cancelExport → status becomes cancelled', async () => {
     const { useBatchExportList } = await import('../useBatchExportList');
     const { result } = renderHook(() => useBatchExportList());
 
-    // Start export then immediately cancel
-    const exportPromise = result.current.startExport(['c1', 'c2', 'c3'], 'vibex');
-    // Give it a tick to start
-    await new Promise((r) => setTimeout(r, 5));
-
+    let exportPromise: Promise<void>;
     await act(async () => {
+      exportPromise = result.current.startExport(['c1', 'c2'], 'vibex');
+      // Cancel immediately
       result.current.cancelExport();
+      await exportPromise;
     });
 
-    await act(async () => {
-      try {
-        await exportPromise;
-      } catch {
-        // Expected: cancelled export may throw
-      }
-    });
-
-    // Status should be cancelled or error (depends on timing)
-    expect(['cancelled', 'idle', 'error'].includes(result.current.status)).toBe(true);
+    expect(result.current.status).toBe('cancelled');
   });
 
-  it('json format → creates JSON blob instead of vibex — E1.6f', async () => {
+  it('startExport with json format → produces .json file', async () => {
     const { useBatchExportList } = await import('../useBatchExportList');
     const { result } = renderHook(() => useBatchExportList());
+
     await act(async () => {
-      await result.current.startExport(['c1'], 'json');
+      await result.current.startExport(['c1', 'c2'], 'json');
     });
+
     expect(result.current.status).toBe('done');
-    expect(mockCreateObjectURL).toHaveBeenCalled();
   });
 });

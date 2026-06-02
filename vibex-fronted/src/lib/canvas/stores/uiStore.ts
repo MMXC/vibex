@@ -66,6 +66,10 @@ interface UIStore {
   isOffline: boolean;
   setIsOffline: (offline: boolean) => void;
   __initOfflineListeners: () => void;
+
+  // S54-E4: Viewport culling — list of node IDs within current viewport
+  visibleNodeIds: string[];
+  setVisibleNodeIds: (ids: string[]) => void;
 }
 
 export const useUIStore = create<UIStore>()(
@@ -183,6 +187,10 @@ export const useUIStore = create<UIStore>()(
                 window.addEventListener('offline', () => set({ isOffline: true }));
               }) as () => void
             : () => {},
+
+        // S54-E4: Viewport culling — list of node IDs within current viewport
+        visibleNodeIds: [],
+        setVisibleNodeIds: (ids) => set({ visibleNodeIds: ids }),
       }),
       { name: 'vibex-ui-store', skipHydration: true }
     ),

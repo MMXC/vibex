@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useRef, ReactNode } from 'react';
+import { useCallback, useState, useRef, ReactNode, useEffect } from 'react';
 import { ReactFlow, 
   Node,
   Edge,
@@ -32,6 +32,8 @@ import '@xyflow/react/dist/style.css';
 import styles from './FlowEditor.module.css';
 
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
+import { useViewportCulling } from '@/hooks/canvas/useViewportCulling';
+import { useUIStore } from '@/lib/canvas/stores/uiStore';
 
 export type FlowNode = Node;
 export type FlowEdge = Edge;
@@ -60,6 +62,8 @@ export type FlowEditorProps = {
   backgroundVariant?: BackgroundVariant;
   backgroundGap?: number;
   backgroundColor?: string;
+  /** S54-E4: Enable viewport culling — only render nodes within current viewport */
+  enableCulling?: boolean;
   children?: ReactNode;
   className?: string;
   style?: React.CSSProperties;
@@ -89,6 +93,7 @@ function FlowEditorInner({
   backgroundVariant = BackgroundVariant.Dots,
   backgroundGap = 20,
   backgroundColor = 'rgba(255,255,255,0.05)',
+  enableCulling = false,
   children,
   className,
   style,
@@ -97,6 +102,22 @@ function FlowEditorInner({
   const [edges, setEdges, internalOnEdgesChange] = useEdgesState(initialEdges);
   const reactFlowInstance = useReactFlow();
   const wrapperRef = useRef<HTMLDivElement>(null);
+
+  // S54-E4: Viewport culling
+  const visibleNodeIds = useViewportCulling(nodes);
+  const setVisibleNodeIds = useUIStore((s) => s.setVisibleNodeIds);
+
+  // Sync visibleNodeIds to store when they change
+  useEffect(() => {
+    if (enableCulling) {
+      setVisibleNodeIds(visibleNodeIds);
+    }
+  }, [visibleNodeIds, enableCulling, setVisibleNodeIds]);
+
+  // Filter nodes for rendering when culling is enabled
+  const renderedNodes = enableCulling
+    ? nodes.filter((n) => visibleNodeIds.includes(n.id))
+    : nodes;
 
   // Internal node change handler that can be extended
   const handleNodesChange = useCallback(
@@ -209,7 +230,7 @@ function FlowEditorInner({
       style={style}
     >
       <ReactFlow
-        nodes={nodes}
+        nodes={renderedNodes}
         edges={edges}
         onNodesChange={handleNodesChange}
         onEdgesChange={handleEdgesChange}

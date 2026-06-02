@@ -33,6 +33,8 @@ export interface CanvasTemplateData {
   tags: string[];
   /** Whether this is a built-in preset template */
   isPreset: boolean;
+  /** Whether this template was created by the user from a canvas (vs preset) */
+  isUserCreated: boolean;
   /** Optional thumbnail: SVG data URL or external image URL */
   thumbnail?: string;
 }
@@ -45,6 +47,7 @@ export interface CanvasTemplateSummary {
   createdAt: string;
   updatedAt: string;
   isPreset: boolean;
+  isUserCreated: boolean;
   category: 'flowchart' | 'mindmap' | 'uml' | 'other' | null;
   tags: string[];
   /** Optional thumbnail: SVG data URL or external image URL */
@@ -134,7 +137,7 @@ export async function deleteTemplate(id: string): Promise<void> {
  */
 export async function updateTemplate(
   id: string,
-  patch: Partial<Pick<CanvasTemplateData, 'name' | 'description' | 'icon' | 'category' | 'tags' | 'snapshot' | 'thumbnail'>>
+  patch: Partial<Pick<CanvasTemplateData, 'name' | 'description' | 'icon' | 'category' | 'tags' | 'snapshot' | 'thumbnail' | 'isUserCreated'>>
 ): Promise<void> {
   const db = await getDB();
   const existing = await db.get(STORE_NAME, id);
@@ -180,6 +183,7 @@ export const PRESET_TEMPLATES: CanvasTemplateData[] = [
     category: null,
     tags: ['blank'],
     isPreset: true,
+    isUserCreated: false,
   },
   {
     id: 'preset-flowchart',
@@ -256,6 +260,7 @@ export const PRESET_TEMPLATES: CanvasTemplateData[] = [
     category: null,
         tags: ['flow', 'process'],
     isPreset: true,
+    isUserCreated: false,
   },
   {
     id: 'preset-four-quadrant',
@@ -286,6 +291,7 @@ export const PRESET_TEMPLATES: CanvasTemplateData[] = [
     category: null,
         tags: ['matrix', 'analysis'],
     isPreset: true,
+    isUserCreated: false,
   },
   {
     id: 'preset-mindmap',
@@ -316,6 +322,7 @@ export const PRESET_TEMPLATES: CanvasTemplateData[] = [
     category: null,
         tags: ['mindmap', 'brainstorm'],
     isPreset: true,
+    isUserCreated: false,
   },
   {
     id: 'preset-swot',
@@ -346,6 +353,7 @@ export const PRESET_TEMPLATES: CanvasTemplateData[] = [
     category: null,
         tags: ['swot', 'strategy'],
     isPreset: true,
+    isUserCreated: false,
   },
 ];
 

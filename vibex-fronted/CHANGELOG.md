@@ -2,6 +2,13 @@
 
 ---
 
+## [Unreleased] S55-E5: 键盘快捷键激活 (Undo/Redo) — 2026-06-02
+
+- **S55-E5.1**: `shortcutStore.ts` — 新增 `undo()`/`redo()` 方法 + `undoHandler`/`redoHandler` + `conflicts` Set
+- **S55-E5.2**: `useKeyboardShortcuts.ts` — `undo`/`redo` props，Ctrl+Z → undo, Ctrl+Y/Ctrl+Shift+Z → redo
+- **S55-E5.3**: `useUndoRedo.ts` — Canvas undo/redo 状态管理 Hook
+- **S55-E5.4**: `vitest` — `shortcutStore.test.ts` 7/7 ✅，`useKeyboardShortcuts.test.ts` undo/redo 全通过
+- **S55-E5.5**: undo/redo 始终激活（输入框内 Ctrl+Z 仍然有效）
 ## [Unreleased] S55-E4: Background Settings — 2026-06-02
 - **S55-E4.1**: `backgroundSettingsStore.ts` — Zustand store with 5 presets (dots/lines/cross/solid/custom), persist middleware
 - **S55-E4.2**: `BackgroundSettingsPanel.tsx` — modal panel with 5 preset buttons + HexColorPicker for custom color

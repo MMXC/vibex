@@ -6052,3 +6052,5 @@ See git history for complete changelog.
   - sortCanvases(): favorites优先，其余按updatedAt降序
   - CanvasDashboard: star button (aria-pressed, data-testid, e.stopPropagation)
   - CanvasDashboard.module.css: .cardFavBtn / .cardFavBtnActive / hover显示
+
+- **S56-E3**: PWA离线缓存 — OfflineBanner挂载到layout + sw.js缓存策略 + offline.html + manifest.json PWA字段 + 10项vitest覆盖

@@ -652,3 +652,13 @@
 - **S53-E1.3**: `presenceSync.ts` — 30s 超时自动移除用户逻辑
 - **S53-E1.4**: `DDSCanvasPage.tsx` 集成 PresenceIndicator (右上角 absolute 定位)
 - **S53-E1.5**: vitest `PresenceIndicator.test.tsx` 11/11 ✅
+
+---
+
+## [Unreleased] S53-E2: Undo/Redo 协作冲突处理 — 2026-06-02
+- **冲突通知**: `wsCommentHandler` 新增 `revision:bump` / `revision:conflict` WebSocket 消息处理
+- **Revision 同步**: `setBaseRevision()` 接收远端 revision bump，更新 canvasHistoryStore baseRevision
+- **冲突对话框**: 新增 `ConflictDialog` 组件，三选项 (Discard Local / Merge / Discard Remote)
+- **可测试化**: `wsRevisionHandler` 重构为 store 注入模式，无须 mock 动态导入
+- **Bug 修复**: `wsCommentHandler comment:mention` case 添加缺失 `async` 关键字
+- 文件: `wsCommentHandler.ts`, `wsRevisionHandler.ts`, `ConflictDialog.tsx`, `ConflictDialog.module.css`, `wsRevisionHandler.test.ts`

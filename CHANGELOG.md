@@ -6000,3 +6000,13 @@ See git history for complete changelog.
 - **E4.3**: `uiStore.ts` — 新增 `visibleNodeIds: string[]` + `setVisibleNodeIds` 状态
 - **E4.4**: `FlowEditor.tsx` — 新增 `enableCulling` prop，默认关闭
 - **E4 vitest**: `ViewportCulling.test.ts` 12/12 PASS ✅
+
+
+## [Unreleased] S54-E5: 模板预览与最近访问 — 2026-06-02
+- **S54-E5.1**: TemplatePreviewDialog — 全屏模板预览对话框，包含 MiniCanvas 渲染、模板信息展示、应用/取消按钮
+- **S54-E5.2**: MiniCanvas — 只读 ReactFlow 渲染器，用于模板快照预览（无交互）
+- **S54-E5.3**: useTemplatePreview — 模板预览数据加载 Hook，支持 localStorage 最近访问追踪（最近 5 个模板）
+- **S54-E5.4**: CategoryTab — 新增 'recent' 分类标签页，支持 showRecent prop 展示最近访问
+- **S54-E5.5**: TemplateGallery — 卡片预览按钮、recent 过滤器、预览对话框状态管理
+- **S54-E5.6**: templateStore — 新增 thumbnail 可选字段 + setTemplateThumbnail Action
+- **S54-E5.7**: vitest: TemplatePreviewDialog 10/10 通过

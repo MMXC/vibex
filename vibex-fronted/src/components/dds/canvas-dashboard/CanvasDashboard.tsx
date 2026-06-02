@@ -8,6 +8,8 @@
  * - Delete → <dialog> confirmation → canvasListStore.deleteCanvas
  * - Double-click name → inline <input> edit → canvasListStore.renameCanvas
  * - Uses existing canvasListStore (S47-E4) for all CRUD operations
+ *
+ * Sprint56 E2: 收藏画布 — Star button in cardActions, favorites-first sort
  */
 
 'use client';
@@ -32,6 +34,8 @@ export function CanvasDashboard() {
     getFilteredCanvases,
     searchTerm,
     setSearchTerm,
+    toggleFavorite,
+    isFavorite,
   } = useCanvasListStore();
 
   const [sortMode, setSortMode] = useState<SortMode>('updatedAt');
@@ -252,6 +256,21 @@ export function CanvasDashboard() {
 
               {/* Actions */}
               <div className={styles.cardActions}>
+                {/* S56-E2: Favorite star button */}
+                <button
+                  type="button"
+                  className={`${styles.cardFavBtn}${isFavorite(canvas.id) ? ` ${styles.cardFavBtnActive}` : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(canvas.id);
+                  }}
+                  title={isFavorite(canvas.id) ? '取消收藏' : '收藏'}
+                  aria-label={isFavorite(canvas.id) ? `取消收藏 ${canvas.name}` : `收藏 ${canvas.name}`}
+                  aria-pressed={isFavorite(canvas.id)}
+                  data-testid={`fav-btn-${canvas.id}`}
+                >
+                  {isFavorite(canvas.id) ? '⭐' : '☆'}
+                </button>
                 <button
                   type="button"
                   className={styles.cardEditBtn}

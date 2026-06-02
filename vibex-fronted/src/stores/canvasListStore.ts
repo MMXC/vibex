@@ -3,8 +3,13 @@
  *
  * 职责：管理画布列表元数据（名称、创建时间、修改时间、缩略图）。
  * 持久化：IndexedDB (ddsPersistence service) + localStorage index。
+ *
+ * Sprint56 E2: 收藏画布功能扩展
+ * - favoriteIds: localStorage 持久化收藏画布 ID 列表
+ * - toggleFavorite(id): 切换收藏状态
+ * - isFavorite(id): 查询收藏状态
+ * - getSortedCanvases / getFilteredCanvases 排序时 favorites 优先
  */
-
 import { create } from 'zustand';
 import { generateId } from '@/lib/canvas/id';
 
@@ -33,6 +38,8 @@ export interface CanvasListState {
   thumbnailCache: Record<string, string>;
   /** Multi-select set for batch export (Sprint48 E2) */
   selectedCanvasIds: Set<string>;
+  /** S56-E2: 收藏画布 ID 列表，localStorage 持久化 */
+  favoriteIds: string[];
 
   // Actions
   loadCanvases: () => Promise<void>;
@@ -58,6 +65,10 @@ export interface CanvasListState {
   exportSelectedPDF: () => Promise<void>;
   /** Paste clipboard cards to target canvas (Sprint48 E5) */
   pasteToCanvas: (canvasId: string) => void;
+  /** S56-E2: 切换收藏状态 */
+  toggleFavorite: (id: string) => void;
+  /** S56-E2: 查询收藏状态 */
+  isFavorite: (id: string) => boolean;
 }
 
 // ============================================
@@ -66,6 +77,7 @@ export interface CanvasListState {
 
 const IDB_CANVAS_LIST_KEY = 'vibex-canvas-list';
 const LOCALSTORAGE_INDEX_KEY = 'vibex-canvas-index';
+const LOCALSTORAGE_FAVORITES_KEY = 'vibex-canvas-favorites';
 
 // ============================================
 // Persistence helpers (re-use ddsPersistence patterns)
@@ -83,6 +95,25 @@ function isLocalStorageAvailable(): boolean {
     return true;
   } catch {
     return false;
+  }
+}
+
+function loadFavorites(): string[] {
+  if (!isLocalStorageAvailable()) return [];
+  try {
+    const raw = localStorage.getItem(LOCALSTORAGE_FAVORITES_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveFavorites(ids: string[]): void {
+  if (!isLocalStorageAvailable()) return;
+  try {
+    localStorage.setItem(LOCALSTORAGE_FAVORITES_KEY, JSON.stringify(ids));
+  } catch {
+    // non-critical
   }
 }
 
@@ -134,6 +165,23 @@ async function idbDelete(storeName: string, key: string): Promise<void> {
 }
 
 // ============================================
+// Sort helper: favorites-first + secondary sort
+// ============================================
+
+function sortCanvases(canvases: CanvasMeta[], favoriteIds: string[], sortBy: 'name' | 'updatedAt'): CanvasMeta[] {
+  return [...canvases].sort((a, b) => {
+    const aFav = favoriteIds.includes(a.id);
+    const bFav = favoriteIds.includes(b.id);
+    if (aFav && !bFav) return -1;
+    if (!aFav && bFav) return 1;
+    if (sortBy === 'name') {
+      return a.name.localeCompare(b.name, 'zh-CN');
+    }
+    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+  });
+}
+
+// ============================================
 // Store
 // ============================================
 
@@ -144,6 +192,7 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
   searchTerm: '',
   thumbnailCache: {},
   selectedCanvasIds: new Set(),
+  favoriteIds: loadFavorites(),
 
   loadCanvases: async () => {
     if (!isIndexedDBAvailable()) {
@@ -152,8 +201,13 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
     }
     try {
       const canvases = await idbGetAll<CanvasMeta>('canvases');
-      // Sort by updatedAt desc
-      canvases.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+      // Sort by favorites first, then updatedAt desc
+      canvases.sort((a, b) => {
+        const fav = get().favoriteIds;
+        if (fav.includes(a.id) && !fav.includes(b.id)) return -1;
+        if (!fav.includes(a.id) && fav.includes(b.id)) return 1;
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      });
       set({ canvases, isLoaded: true });
     } catch (err) {
       console.error('[canvasListStore] loadCanvases failed:', err);
@@ -208,6 +262,14 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
       }
     }
 
+    // Remove from favorites if present
+    const { favoriteIds } = get();
+    if (favoriteIds.includes(id)) {
+      const next = favoriteIds.filter((fId) => fId !== id);
+      saveFavorites(next);
+      set({ favoriteIds: next });
+    }
+
     set((state) => ({
       canvases: state.canvases.filter((c) => c.id !== id),
       activeCanvasId: state.activeCanvasId === id ? null : state.activeCanvasId,
@@ -255,13 +317,8 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
   },
 
   getSortedCanvases: (sortBy: 'name' | 'updatedAt') => {
-    const { canvases } = get();
-    return [...canvases].sort((a, b) => {
-      if (sortBy === 'name') {
-        return a.name.localeCompare(b.name, 'zh-CN');
-      }
-      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-    });
+    const { canvases, favoriteIds } = get();
+    return sortCanvases(canvases, favoriteIds, sortBy);
   },
 
   setSearchTerm: (term: string) => {
@@ -269,17 +326,12 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
   },
 
   getFilteredCanvases: (sortBy: 'name' | 'updatedAt') => {
-    const { canvases, searchTerm } = get();
+    const { canvases, searchTerm, favoriteIds } = get();
     const term = searchTerm.trim().toLowerCase();
     const filtered = term
       ? canvases.filter((c) => c.name.toLowerCase().includes(term))
       : canvases;
-    return [...filtered].sort((a, b) => {
-      if (sortBy === 'name') {
-        return a.name.localeCompare(b.name, 'zh-CN');
-      }
-      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-    });
+    return sortCanvases(filtered, favoriteIds, sortBy);
   },
 
   cacheThumbnail: (canvasId: string, thumbnail: string) => {
@@ -357,5 +409,25 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
     if (count > 0) {
       console.debug('[canvasListStore] pasteToCanvas:', count, 'cards pasted to', meta.name);
     }
+  },
+
+  // ============================================
+  // S56-E2: 收藏画布
+  // ============================================
+
+  toggleFavorite: (id: string) => {
+    const { favoriteIds } = get();
+    let next: string[];
+    if (favoriteIds.includes(id)) {
+      next = favoriteIds.filter((fId) => fId !== id);
+    } else {
+      next = [id, ...favoriteIds]; // prepend: new favorites appear first
+    }
+    saveFavorites(next);
+    set({ favoriteIds: next });
+  },
+
+  isFavorite: (id: string) => {
+    return get().favoriteIds.includes(id);
   },
 }));

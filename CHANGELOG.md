@@ -5961,3 +5961,13 @@ See git history for complete changelog.
 - **4 选 1 下拉框**: `ExportProgress` format 下拉框新增 ZIP 选项 (PNG/SVG/PDF/ZIP)
 - **SVG ZIP 边界测试**: exportMultipleAsSVG 0/1/100+ 节点边界 cases 3/3 ✅
 - 文件: `useBatchExport.ts`, `ExportProgress.tsx`, `exportMultipleAsSVG.test.ts`
+
+
+---
+
+## [Unreleased] S54-E1: Canvas Snapshot 版本历史 UI — 2026-06-02
+- **S54-E1.1**: HistoryPanel.tsx — Dialog component showing undo/redo command history from canvasHistoryStore
+- **S54-E1.2**: HistoryPanel.module.css — cyberpunk dark theme (rgba overlay, #1e1e2e panel, icon buttons)
+- **S54-E1.3**: useHistoryPanel.ts — hook subscribing to canvasHistoryStore with restore() and clear()
+- **S54-E1.4**: DDSToolbar — History icon button (aria-label="History") + HistoryPanel mount
+- **S54-E1.5**: HistoryPanel.test.tsx — 8/8 vitest passing

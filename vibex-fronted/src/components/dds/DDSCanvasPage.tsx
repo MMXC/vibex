@@ -49,6 +49,10 @@ import { ReviewReportPanel } from '@/components/design-review';
 import { HistoryPanel } from '@/components/canvas/features/HistoryPanel';
 import { ConflictResolutionDialog } from '@/components/conflict/ConflictResolutionDialog';
 import { PresenceOverlay } from '@/components/dds/presence/PresenceOverlay';
+// S54-E2: File Import Enhancement
+import { useFileDrop } from '@/hooks/canvas/useFileDrop';
+import { FileImportDialog } from '@/components/dds/canvas/FileImportDialog';
+import { DropOverlay } from '@/components/dds/canvas/DropOverlay';
 import { useWebSocketPresence } from '@/lib/collaboration/useWebSocketPresence';
 import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 import useRealtimeSync from '@/hooks/useRealtimeSync';
@@ -452,6 +456,24 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   // ---- E4: Selection Box (drag-to-select multi-select) ----
   const { selectionBox, isSelecting, containerRef: selContainerRef, clearSelection } = useSelectionBox();
 
+  // S54-E2: File Import Enhancement
+  const [fileImportOpen, setFileImportOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+
+  // S54-E2: File drop handler
+  const handleFileDrop = useCallback((file: File) => {
+    setImportFile(file);
+    setFileImportOpen(true);
+  }, []);
+
+  const { isDragActive, dragProps } = useFileDrop(selContainerRef as React.RefObject<HTMLElement>, {
+    accept: ['json', 'yaml', 'yml', 'vibex'],
+    onFileDrop: handleFileDrop,
+    onInvalidDrop: (_fileName) => {
+      // Could show a toast notification here
+    },
+  });
+
   // No-op handler for the outer div's existing onMouseMove prop
   const handleMouseMove = useCallback(() => {}, []);
 
@@ -698,8 +720,8 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
         </div>
       )}
 
-      {/* Canvas Scroll Container */}
-      <div style={{ position: 'relative' }} ref={selContainerRef}>
+      {/* Canvas Scroll Container — S54-E2: drag-drop zone */}
+      <div style={{ position: 'relative' }} ref={selContainerRef} {...dragProps}>
         {/* E4-U1: SelectionToolbar — shown when 2+ cards selected */}
         <SelectionToolbar
           selectionBox={selectionBox}
@@ -725,6 +747,8 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
             </>
           )}
         />
+        {/* S54-E2: File drop overlay */}
+        <DropOverlay visible={isDragActive} />
         {/* Cross-chapter DAG edge overlay (E4-U1) */}
         <CrossChapterEdgesOverlay
           scrollContainerRef={scrollContainerRef}
@@ -890,6 +914,20 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
         onReject={handleReject}
       />
     )}
+
+    {/* S54-E2: File Import Preview Dialog */}
+    <FileImportDialog
+      isOpen={fileImportOpen}
+      file={importFile}
+      onImport={() => {
+        setFileImportOpen(false);
+        setImportFile(null);
+      }}
+      onClose={() => {
+        setFileImportOpen(false);
+        setImportFile(null);
+      }}
+    />
     </>
   );
 });

@@ -25,6 +25,9 @@ import { usePresence } from '@/hooks/canvas/usePresence';
 import { DDSScrollContainer } from '@/components/dds/canvas';
 import { CrossChapterEdgesOverlay } from '@/components/dds/canvas/CrossChapterEdgesOverlay';
 import { AIDraftDrawer } from '@/components/dds/ai-draft';
+// S57-E2: Embedded Agent Panel
+import { EmbeddedAgentPanel } from '@/components/dds/agent';
+import { useEmbeddedAgent } from '@/hooks/agent/useEmbeddedAgent';
 import { DDSFlow } from '@/components/dds/DDSFlow';
 import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds/DDSCanvasStore';
 import { useCanvasHistoryStore, saveHistoryToStorage, loadHistoryFromStorage } from '@/stores/dds/canvasHistoryStore';
@@ -283,6 +286,9 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
 
   // ---- E003: useAIController for quickGenerate ----
   const { quickGenerate } = useAIController();
+  // S57-E2: Embedded Agent Panel — connects agent sessions to canvas
+  const { isOpen: isAgentPanelOpen, closePanel: closeAgentPanel, openPanel: openAgentPanel } =
+    useEmbeddedAgent();
 
   // ---- S53-E1: Subscribe to real-time presence ----
   usePresence();
@@ -685,7 +691,7 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
       onMouseMove={handleMouseMove}
     >
       {/* Toolbar */}
-      <DDSToolbar onAIGenerate={handleAIGenerate} agentSession={agentSession} projectId={projectId ?? ''} />
+      <DDSToolbar onAIGenerate={handleAIGenerate} agentSession={agentSession} projectId={projectId ?? ''} onOpenAgentPanel={openAgentPanel} />
 
       {/* S53-E1: Real-time presence indicator — shows online collaborators */}
       <div style={{ position: 'absolute', top: '12px', right: '16px', zIndex: 50 }}>
@@ -765,6 +771,12 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
 
       {/* AI Draft Drawer */}
       <AIDraftDrawer />
+
+      {/* S57-E2: Embedded Agent Panel — canvas inline AI sessions */}
+      <EmbeddedAgentPanel
+        isOpen={isAgentPanelOpen}
+        onClose={closeAgentPanel}
+      />
 
       {/* E1: CodeGenContext Panel — shown when agentSession=new */}
       {showCodeGenPanel && codeGenContext && (

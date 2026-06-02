@@ -1,0 +1,260 @@
+/* EmbeddedAgentPanel — Slide-in Drawer for AI Coding Agent Sessions
+ * Sprint57 E2: Canvas-Inline AI Session Panel
+ */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 40;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 320px;
+  max-width: 100vw;
+  background: var(--color-bg-primary, #111827);
+  border-left: 1px solid var(--color-border, #374151);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+}
+
+.drawer.open {
+  transform: translateX(0);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border, #374151);
+  background: var(--color-bg-secondary, #1f2937);
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary, #f9fafb);
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary, #9ca3af);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeButton:hover {
+  color: var(--color-text-primary, #f9fafb);
+  background: var(--color-bg-hover, #374151);
+}
+
+.sessionList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.sessionItem {
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 4px;
+  border: 1px solid transparent;
+  background: var(--color-bg-secondary, #1f2937);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.sessionItem:hover {
+  background: var(--color-bg-hover, #374151);
+}
+
+.sessionItem.active {
+  border-color: var(--color-accent, #6366f1);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.sessionName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary, #f9fafb);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sessionMeta {
+  font-size: 11px;
+  color: var(--color-text-secondary, #9ca3af);
+  display: flex;
+  gap: 8px;
+}
+
+.chatArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--color-border, #374151);
+  overflow: hidden;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.messageBubble {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 85%;
+  word-break: break-word;
+}
+
+.messageBubble.user {
+  background: var(--color-accent, #6366f1);
+  color: #fff;
+  align-self: flex-end;
+  border-bottom-right-radius: 2px;
+}
+
+.messageBubble.agent {
+  background: var(--color-bg-secondary, #1f2937);
+  color: var(--color-text-primary, #f9fafb);
+  align-self: flex-start;
+  border-bottom-left-radius: 2px;
+}
+
+.messageBubble.system {
+  background: transparent;
+  color: var(--color-text-secondary, #9ca3af);
+  align-self: center;
+  font-size: 11px;
+  text-align: center;
+}
+
+.inputArea {
+  padding: 12px;
+  border-top: 1px solid var(--color-border, #374151);
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.input {
+  flex: 1;
+  background: var(--color-bg-secondary, #1f2937);
+  border: 1px solid var(--color-border, #374151);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--color-text-primary, #f9fafb);
+  resize: none;
+  min-height: 36px;
+  max-height: 120px;
+  font-family: inherit;
+}
+
+.input::placeholder {
+  color: var(--color-text-secondary, #9ca3af);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-accent, #6366f1);
+}
+
+.sendButton {
+  background: var(--color-accent, #6366f1);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.sendButton:hover {
+  background: #4f46e5;
+}
+
+.sendButton:disabled {
+  background: var(--color-bg-hover, #374151);
+  color: var(--color-text-secondary, #9ca3af);
+  cursor: not-allowed;
+}
+
+.insertButton {
+  width: 100%;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid var(--color-accent, #6366f1);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: var(--color-accent, #6366f1);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.15s ease;
+}
+
+.insertButton:hover {
+  background: rgba(99, 102, 241, 0.25);
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 13px;
+  gap: 8px;
+}
+
+.noSessions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-text-secondary, #9ca3af);
+  font-size: 13px;
+  gap: 8px;
+  padding: 20px;
+  text-align: center;
+}

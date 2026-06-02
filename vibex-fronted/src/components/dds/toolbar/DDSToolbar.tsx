@@ -169,6 +169,8 @@ function downloadBlob(blob: Blob, filename: string) {
 export interface DDSToolbarProps {
   /** Called when AI button is clicked */
   onAIGenerate?: () => void;
+  /** S57-E2: Called when embedded agent panel button is clicked */
+  onOpenAgentPanel?: () => void;
   /** Override isGenerating from store */
   isGenerating?: boolean;
   /** Additional class */
@@ -185,6 +187,7 @@ export interface DDSToolbarProps {
 
 export const DDSToolbar = memo(function DDSToolbar({
   onAIGenerate,
+  onOpenAgentPanel,
   isGenerating: isGeneratingProp,
   className = '',
   agentSession,
@@ -721,6 +724,19 @@ export const DDSToolbar = memo(function DDSToolbar({
             <AiIcon />
             <span>{generating ? tToolbar('aiGenerating') : tToolbar('aiGenerate')}</span>
           </button>
+
+          {/* S57-E2: Embedded Agent Panel button */}
+          {onOpenAgentPanel && (
+            <button
+              type="button"
+              className={styles.iconButton}
+              onClick={onOpenAgentPanel}
+              aria-label="AI Sessions"
+              title="AI Sessions"
+            >
+              🤖
+            </button>
+          )}
 
           {/* S53-E3: @提及通知铃铛 */}
           <NotificationBell />

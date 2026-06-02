@@ -6085,3 +6085,22 @@ See git history for complete changelog.
   - CanvasDashboard.module.css: .cardFavBtn / .cardFavBtnActive / hover显示
 
 - **S56-E3**: PWA离线缓存 — OfflineBanner挂载到layout + sw.js缓存策略 + offline.html + manifest.json PWA字段 + 10项vitest覆盖
+
+
+## [Unreleased] S57-E3: 用户创建模板 + 我的模板分类 — 2026-06-03
+- **S57-E3.1**: templateStore — CanvasTemplateData/CanvasTemplateSummary 接口新增 isUserCreated: boolean 字段，updateTemplate 参数类型支持 'isUserCreated'
+- **S57-E3.2**: templateStore — 5个预设模板全部设置 isUserCreated: false（preset-blank/flowchart/four-quadrant/mindmap/swot）
+- **S57-E3.3**: TemplateSaveDialog — 新建模板时设置 isUserCreated: true（preset: false 时）
+- **S57-E3.4**: CategoryTab — 新增 showCustom prop 和"我的模板"标签页（📁图标，琥珀色高亮）
+- **S57-E3.5**: TemplateGallery — custom 过滤器筛选 isUserCreated === true，我的模板空状态文案
+
+
+---
+
+## [Unreleased] S57-E4: 批量重命名 + 批量删除 — 2026-06-03
+- **S57-E4.1**: canvasListStore — 新增 batchDelete(ids: string[]) 批量删除，含批量清除 selectedCanvasIds 和 favoriteIds
+- **S57-E4.2**: canvasListStore — 新增 batchRename(ids: string[], nameTemplate: string) 批量重命名，{n} 占位符替换为 1-based 索引
+- **S57-E4.3**: canvasListStore — 新增 selectedCanvasIds (Set<string>) + toggleSelection/clearSelection/selectAll，idb 键值同步
+- **S57-E4.4**: CanvasDashboard — 多选模式 UI（批量选择按钮激活态 + 卡片 Checkbox 选中态 + 粘性浮层工具栏 BatchOpsPanel）
+- **S57-E4.5**: BatchDeleteConfirmDialog — 批量删除确认弹窗，显示选中画布列表，确认后调用 batchDelete
+- **S57-E4.6**: BatchRenameDialog — 批量重命名弹窗，实时预览 {n} 占位符替换效果，支持批量应用

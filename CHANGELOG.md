@@ -6041,3 +6041,14 @@ See git history for complete changelog.
 - **S54-E5.5**: TemplateGallery — 卡片预览按钮、recent 过滤器、预览对话框状态管理
 - **S54-E5.6**: templateStore — 新增 thumbnail 可选字段 + setTemplateThumbnail Action
 - **S54-E5.7**: vitest: TemplatePreviewDialog 10/10 通过
+
+---
+
+## [Unreleased] S56-E1.5+E2: canvasListStore vitest覆盖 + 收藏画布 — 2026-06-03
+- **S56-E1.5**: canvasListStore.test.ts — 14个vitest用例覆盖 CRUD/sort/filter/IndexedDB同步
+- **S56-E2**: 收藏画布功能 — favoriteIds state + toggleFavorite/isFavorite + localStorage持久化
+  - canvasListStore: favoriteIds, toggleFavorite(id), isFavorite(id)
+  - LOCALSTORAGE_FAVORITES_KEY = 'vibex-canvas-favorites'
+  - sortCanvases(): favorites优先，其余按updatedAt降序
+  - CanvasDashboard: star button (aria-pressed, data-testid, e.stopPropagation)
+  - CanvasDashboard.module.css: .cardFavBtn / .cardFavBtnActive / hover显示

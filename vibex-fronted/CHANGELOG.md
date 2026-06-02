@@ -6052,3 +6052,14 @@ See git history for complete changelog.
 - **E2 BatchExportDialog.module.css**: 完整对话框样式 — overlay/header/card list/progress bar/export buttons，VibeX dark theme tokens
 - **E2 BatchExportDialog.test.tsx**: 11 vitest 覆盖全部 8 个 DoD 项目（卡片渲染/全选/单选/导出触发/进度条/完成状态/取消/关闭按钮/禁用状态）
 - **Test**: 11/11 vitest ✅
+
+---
+
+## [Unreleased] S56-E1.5+E2: canvasListStore vitest覆盖 + 收藏画布 — 2026-06-03
+- **S56-E1.5**: canvasListStore.test.ts — 14个vitest用例覆盖 CRUD/sort/filter/IndexedDB同步
+- **S56-E2**: 收藏画布功能 — favoriteIds state + toggleFavorite/isFavorite + localStorage持久化
+  - canvasListStore: favoriteIds, toggleFavorite(id), isFavorite(id)
+  - LOCALSTORAGE_FAVORITES_KEY = 'vibex-canvas-favorites'
+  - sortCanvases(): favorites优先，其余按updatedAt降序
+  - CanvasDashboard: star button (aria-pressed, data-testid, e.stopPropagation)
+  - CanvasDashboard.module.css: .cardFavBtn / .cardFavBtnActive / hover显示

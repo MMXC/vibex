@@ -2,6 +2,16 @@
 
 ---
 
+
+
+## [Unreleased] S57-E1: CanvasList 批量导出 — 2026-06-03
+- **S57-E1.1**: `BatchExportPanel.tsx` — Canvas list batch export panel with checkbox selection + format selector (.vibex/.json), export button, integration with DDSToolbar
+- **S57-E1.2**: `BatchExportProgress.tsx` — Progress display during batch export (current/total canvas name)
+- **S57-E1.3**: `useBatchExportList.ts` — Zustand-backed hook for batch export: startExport/cancelExport/status/progress/error, supports empty-list error + zip/json formats
+- **S57-E1.4**: `DDSToolbar.tsx` — BatchExport button (DownloadIcon, aria-label) with BatchExportPanel integration
+- **S57-E1.5**: `useBatchExportList.test.ts` — 7 vitest tests: initial state, empty-list error, single canvas export, multi-canvas progress, cancel, JSON format
+- **S57-E1 vitest**: `useBatchExportList.test.ts` 7/7 PASS ✅
+
 ## [Unreleased] S55-E5: 键盘快捷键激活 (Undo/Redo) — 2026-06-02
 
 - **S55-E5.1**: `shortcutStore.ts` — 新增 `undo()`/`redo()` 方法 + `undoHandler`/`redoHandler` + `conflicts` Set

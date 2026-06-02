@@ -14,9 +14,11 @@ export type CanvasCategory = 'flowchart' | 'mindmap' | 'uml' | 'other' | null;
 
 interface CategoryTabProps {
   /** Currently selected category */
-  selected: CanvasCategory | 'all' | 'favorites';
+  selected: CanvasCategory | 'all' | 'favorites' | 'recent';
   /** Callback when a category is selected */
-  onSelect: (category: CanvasCategory | 'all' | 'favorites') => void;
+  onSelect: (category: CanvasCategory | 'all' | 'favorites' | 'recent') => void;
+  /** Whether to show the Recent tab */
+  showRecent?: boolean;
 }
 
 const CATEGORIES: { key: CanvasCategory | 'all'; label: string; icon: string }[] = [
@@ -34,9 +36,9 @@ const CATEGORY_COLORS: Record<string, string> = {
   other: '#6b7280',
 };
 
-export const CategoryTab = memo<CategoryTabProps>(({ selected, onSelect }) => {
+export const CategoryTab = memo<CategoryTabProps>(({ selected, onSelect, showRecent }) => {
   const handleSelect = useCallback(
-    (key: CanvasCategory | 'all' | 'favorites') => {
+    (key: CanvasCategory | 'all' | 'favorites' | 'recent') => {
       onSelect(key);
     },
     [onSelect]
@@ -66,6 +68,23 @@ export const CategoryTab = memo<CategoryTabProps>(({ selected, onSelect }) => {
           </button>
         );
       })}
+      {showRecent && (
+        <button
+          type="button"
+          role="tab"
+          aria-selected={selected === 'recent'}
+          className={`${styles.tab} ${selected === 'recent' ? styles.tabActive : ''}`}
+          style={
+            selected === 'recent'
+              ? { borderBottomColor: '#10b981', color: '#10b981' }
+              : undefined
+          }
+          onClick={() => handleSelect('recent')}
+        >
+          <span aria-hidden="true">🕐</span>
+          <span>最近</span>
+        </button>
+      )}
     </div>
   );
 });

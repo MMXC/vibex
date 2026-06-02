@@ -33,6 +33,8 @@ export interface CanvasTemplateData {
   tags: string[];
   /** Whether this is a built-in preset template */
   isPreset: boolean;
+  /** Optional thumbnail: SVG data URL or external image URL */
+  thumbnail?: string;
 }
 
 export interface CanvasTemplateSummary {
@@ -45,6 +47,8 @@ export interface CanvasTemplateSummary {
   isPreset: boolean;
   category: 'flowchart' | 'mindmap' | 'uml' | 'other' | null;
   tags: string[];
+  /** Optional thumbnail: SVG data URL or external image URL */
+  thumbnail?: string;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -130,7 +134,7 @@ export async function deleteTemplate(id: string): Promise<void> {
  */
 export async function updateTemplate(
   id: string,
-  patch: Partial<Pick<CanvasTemplateData, 'name' | 'description' | 'icon' | 'category' | 'tags' | 'snapshot'>>
+  patch: Partial<Pick<CanvasTemplateData, 'name' | 'description' | 'icon' | 'category' | 'tags' | 'snapshot' | 'thumbnail'>>
 ): Promise<void> {
   const db = await getDB();
   const existing = await db.get(STORE_NAME, id);
@@ -377,4 +381,11 @@ export async function removeTemplateTag(id: string, tag: string): Promise<void> 
   if (!existing) throw new Error(`Template not found: ${id}`);
   const tags = existing.tags.filter((t) => t !== tag);
   await updateTemplate(id, { tags });
+}
+
+/**
+ * Set or update the thumbnail for a template.
+ */
+export async function setTemplateThumbnail(id: string, thumbnail: string): Promise<void> {
+  await updateTemplate(id, { thumbnail });
 }

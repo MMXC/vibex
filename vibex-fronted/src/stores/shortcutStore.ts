@@ -84,6 +84,9 @@ export const useShortcutStore = create<ShortcutState>()(
       editingAction: null,
       capturedKey: null,
       conflictInfo: null,
+      undoHandler: null,
+      redoHandler: null,
+      conflicts: new Set<string>(),
       
       loadDefaults: () => {
         set({ shortcuts: DEFAULT_SHORTCUTS });
@@ -185,6 +188,32 @@ export const useShortcutStore = create<ShortcutState>()(
         const state = get();
         const shortcut = state.shortcuts.find((s) => s.action === action);
         return shortcut?.currentKey || '';
+      },
+      
+      undo: () => {
+        const state = get();
+        if (state.undoHandler) {
+          state.undoHandler();
+        }
+      },
+      
+      redo: () => {
+        const state = get();
+        if (state.redoHandler) {
+          state.redoHandler();
+        }
+      },
+      
+      registerUndoHandler: (handler) => {
+        set({ undoHandler: handler });
+      },
+      
+      registerRedoHandler: (handler) => {
+        set({ redoHandler: handler });
+      },
+      
+      setConflicts: (conflictedActions) => {
+        set({ conflicts: new Set(conflictedActions) });
       },
     }),
     {

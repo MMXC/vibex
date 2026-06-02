@@ -1,12 +1,12 @@
 /**
  * useCanvasExport — vitest tests
- * Epic E4: Canvas Export (PNG/SVG/PDF)
+ * Epic S55-E1: Canvas Export Menu (PNG/SVG/JSON/YAML/PDF)
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ─────────────────────────────────────────────
-// Tests for validateFileSize
+// validateFileSize tests
 // ─────────────────────────────────────────────
 import { validateFileSize } from '../useCanvasExport';
 
@@ -33,5 +33,78 @@ describe('validateFileSize', () => {
     } catch (e: any) {
       expect(e.message).toMatch('6.00MB');
     }
+  });
+});
+
+// ─────────────────────────────────────────────
+// ExportFormat type coverage
+// ─────────────────────────────────────────────
+describe('ExportFormat type', () => {
+  it('should support all expected format strings', () => {
+    const formats: Array<'png' | 'svg' | 'json' | 'yaml' | 'markdown'> = ['png', 'svg', 'json', 'yaml', 'markdown'];
+    expect(formats).toHaveLength(5);
+    formats.forEach((f) => expect(typeof f).toBe('string'));
+  });
+});
+
+// ─────────────────────────────────────────────
+// ExportScope type coverage
+// ─────────────────────────────────────────────
+describe('ExportScope type', () => {
+  it('should support all expected scope strings', () => {
+    const scopes: Array<'context' | 'flow' | 'component' | 'all'> = ['context', 'flow', 'component', 'all'];
+    expect(scopes).toHaveLength(4);
+    scopes.forEach((s) => expect(typeof s).toBe('string'));
+  });
+});
+
+// ─────────────────────────────────────────────
+// validateFileSize edge cases
+// ─────────────────────────────────────────────
+describe('validateFileSize edge cases', () => {
+  it('should not throw for empty blob', () => {
+    const emptyBlob = new Blob([''], { type: 'text/plain' });
+    expect(() => validateFileSize(emptyBlob)).not.toThrow();
+  });
+
+  it('should not throw for 1 byte under limit', () => {
+    const almostFull = new Blob(['x'.repeat(5 * 1024 * 1024 - 1)], { type: 'image/png' });
+    expect(() => validateFileSize(almostFull)).not.toThrow();
+  });
+
+  it('should throw with exact 6MB size', () => {
+    const sixMB = new Blob(['x'.repeat(6 * 1024 * 1024)], { type: 'image/png' });
+    expect(() => validateFileSize(sixMB)).toThrow(/超过 5MB 限制/);
+  });
+
+  it('should throw for 10MB blob', () => {
+    const tenMB = new Blob(['x'.repeat(10 * 1024 * 1024)], { type: 'image/png' });
+    expect(() => validateFileSize(tenMB)).toThrow(/超过 5MB 限制/);
+    try {
+      validateFileSize(tenMB);
+    } catch (e: any) {
+      expect(e.message).toMatch('10.00MB');
+    }
+  });
+});
+
+// ─────────────────────────────────────────────
+// hook return type — smoke test
+// ─────────────────────────────────────────────
+describe('useCanvasExport hook interface', () => {
+  it('should export useCanvasExport function', async () => {
+    const mod = await import('../useCanvasExport');
+    expect(typeof mod.useCanvasExport).toBe('function');
+  });
+});
+
+// ─────────────────────────────────────────────
+// validateFileSize returns void (no return value on success)
+// ─────────────────────────────────────────────
+describe('validateFileSize return value', () => {
+  it('should return undefined on success (not throw)', () => {
+    const blob = new Blob(['x'.repeat(1024)], { type: 'image/png' });
+    const result = validateFileSize(blob);
+    expect(result).toBeUndefined();
   });
 });

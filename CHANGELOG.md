@@ -1,3 +1,16 @@
+## [Unreleased] Sprint 55 — E1 画布导出菜单
+
+##### S55-E1: 画布导出菜单 (ExportMenu)
+- **E1 ExportMenu.tsx**: Dropdown export menu with PNG/SVG/JSON/YAML/Vibex/PDF/Figma options, cyberpunk dark theme, resolution selector for PNG
+- **E1 ExportMenu.module.css**: cyberpunk styles (DownloadIcon, menu dropdown, spinner, scale panel)
+- **E1 src/hooks/useCanvasExport.ts**: PNG (html2canvas) + SVG (DOM serialization) + Figma JSON export utilities
+- **E1 src/hooks/canvas/useCanvasExport.ts**: JSON/YAML/Markdown/Vibex (gzip) export via html-to-image, toPng/toSvg, js-yaml
+- **E1 exportAsPDF()**: Added to useCanvasExport — toPng → jsPDF A4 composition, multi-page support
+- **E1 DDSToolbar.tsx**: ExportMenu integration (line 441+), Download icon + dropdown trigger
+- **E1 ExportProgress.tsx**: Batch export progress UI component (DDS Canvas)
+- **E1 useCanvasExport.test.ts**: 12/12 vitest passing
+- **E1 vitest**: `useCanvasExport.test.ts` 12/12 PASS ✅
+
 ## [Unreleased] Sprint 49 — E3 视口性能优化 + E5 协作评论系统
 
 ##### S49-E3: 视口性能优化（防抖 + 节点边界扩展）

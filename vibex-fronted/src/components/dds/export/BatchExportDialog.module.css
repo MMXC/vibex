@@ -221,6 +221,12 @@
   cursor: pointer;
 }
 
+.formatDesc {
+  font-size: 11px;
+  color: var(--color-text-muted, #8e8e96);
+  margin-left: 4px;
+}
+
 .radioLabel:has(input:disabled) {
   opacity: 0.5;
   cursor: not-allowed;

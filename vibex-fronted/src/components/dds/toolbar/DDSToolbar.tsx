@@ -40,6 +40,7 @@ import { ShortcutSettingsPanel } from '@/components/dds/shortcuts/ShortcutSettin
 import { HistoryPanel } from '@/components/dds/history/HistoryPanel';
 import { BackgroundSettingsPanel } from '@/components/dds/background/BackgroundSettingsPanel';
 import { NotificationBell } from '@/components/dds/notifications';
+import { BatchExportPanel } from '@/components/dds/export/BatchExportPanel';
 import styles from './DDSToolbar.module.css';
 
 // ==================== Chapter label keys (mapped to i18n keys) ====================
@@ -228,6 +229,8 @@ export const DDSToolbar = memo(function DDSToolbar({
   const [isShortcutSettingsOpen, setIsShortcutSettingsOpen] = useState(false);
   const [isHistoryPanelOpen, setIsHistoryPanelOpen] = useState(false);
   const [isBackgroundSettingsOpen, setIsBackgroundSettingsOpen] = useState(false);
+  // S57-E1: Batch canvas export panel
+  const [isBatchExportOpen, setIsBatchExportOpen] = useState(false);
 
   // E3-S3: RBAC for toolbar actions
   const rbac = useCanvasRBAC(projectId);
@@ -572,6 +575,23 @@ export const DDSToolbar = memo(function DDSToolbar({
               <rect x="14" y="14" width="7" height="7" rx="1" />
             </svg>
             <span>画布列表</span>
+          </button>
+
+          {/* S57-E1: Batch Export button */}
+          <button
+            type="button"
+            className={styles.exportBtn}
+            onClick={() => setIsBatchExportOpen(true)}
+            aria-label="批量导出"
+            title="批量导出收藏画布"
+            data-testid="batch-export-btn"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            <span>批量导出</span>
           </button>
 
           {/* E2: Import button with hidden file input (Bug fix: wire hidden input) */}

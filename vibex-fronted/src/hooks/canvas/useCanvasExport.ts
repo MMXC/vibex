@@ -103,8 +103,9 @@ function downloadBlob(blob: Blob, filename: string): void {
 
 /**
  * Convert canvas store data to a structured export object
+ * Exported for reuse in useBatchExportList (S57-E1)
  */
-function buildCanvasExportData(scope: ExportScope): Record<string, unknown> {
+export function buildCanvasExportData(scope: ExportScope): Record<string, unknown> {
   const contextStore = useContextStore.getState();
   const flowStore = useFlowStore.getState();
   const componentStore = useComponentStore.getState();

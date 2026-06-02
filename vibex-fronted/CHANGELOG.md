@@ -725,3 +725,42 @@
 - **E4.3**: `uiStore.ts` — 新增 `visibleNodeIds: string[]` + `setVisibleNodeIds` 状态
 - **E4.4**: `FlowEditor.tsx` — 新增 `enableCulling` prop，默认关闭
 - **E4 vitest**: `ViewportCulling.test.ts` 12/12 PASS ✅
+
+
+---
+
+## [Unreleased] S54-E1: Canvas Snapshot 版本历史 UI — 2026-06-02
+- **S54-E1.1**: HistoryPanel.tsx — Dialog component showing undo/redo command history from canvasHistoryStore
+- **S54-E1.2**: HistoryPanel.module.css — cyberpunk dark theme (rgba overlay, #1e1e2e panel, icon buttons)
+- **S54-E1.3**: useHistoryPanel.ts — hook subscribing to canvasHistoryStore with restore() and clear()
+- **S54-E1.4**: DDSToolbar — History icon button (aria-label="History") + HistoryPanel mount
+- **S54-E1.5**: HistoryPanel.test.tsx — 8/8 vitest passing
+
+---
+
+## [Unreleased] S54-E2: Canvas File Import Enhancement — 2026-06-02
+- **S54-E2.1**: `src/lib/canvas/parseImportFile.ts` — parse .vibex/.json/.yaml/.yml files into ChapterData[]
+- **S54-E2.2**: `src/hooks/canvas/useFileDrop.ts` — drag-drop hook (isDragActive + dragProps)
+- **S54-E2.3**: `src/hooks/canvas/__tests__/useFileDrop.test.ts` — 11 unit tests
+- **S54-E2.4**: `src/components/dds/canvas/FileImportDialog.tsx` — preview/confirm dialog
+- **S54-E2.5**: `src/components/dds/canvas/DropOverlay.tsx` — visual drag overlay
+- **S54-E2.6**: `src/components/dds/DDSCanvasPage.tsx` — integrated useFileDrop + FileImportDialog
+
+---
+
+## [Unreleased] S54-E3: 协作者 Cursor 实时同步 — 2026-06-08
+- **S54-E3.1**: `presenceSync.ts` — `cursor:move` WebSocket 事件订阅 + CursorMovePayload interface
+- **S54-E3.2**: `CursorOverlay.tsx` — SVG 实时协同光标组件（箭头+用户名标签）
+- **S54-E3.3**: `CursorOverlay.test.tsx` — 8/8 vitest passing
+- **S54-E3.4**: `DDSCanvasPage.tsx` — CursorOverlay 集成 + mouse move 节流
+- **S54-E3.5**: `throttleCursorBroadcast.ts` — cursor发送节流（60fps上限）
+- **S54-E3.6**: `screenToFlowCoords.ts` — 屏幕→Flow坐标转换
+
+---
+
+## [Unreleased] S54-E4: Viewport Culling 画布性能优化 — 2026-06-02
+- **E4.1**: `ViewportCulling.ts` — AABB交集检测，`getVisibleNodes()` / `rectsIntersect()` / `getVisibilityRatio()`
+- **E4.2**: `useViewportCulling.ts` — Hook集成viewportBoundsStore，按视口过滤节点
+- **E4.3**: `uiStore.ts` — 新增 `visibleNodeIds: string[]` + `setVisibleNodeIds` 状态
+- **E4.4**: `FlowEditor.tsx` — 新增 `enableCulling` prop，默认关闭
+- **E4 vitest**: `ViewportCulling.test.ts` 12/12 PASS ✅

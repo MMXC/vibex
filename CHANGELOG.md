@@ -5991,3 +5991,12 @@ See git history for complete changelog.
 - **S54-E3.4**: `DDSCanvasPage.tsx` — CursorOverlay 集成 + mouse move 节流
 - **S54-E3.5**: `throttleCursorBroadcast.ts` — cursor发送节流（60fps上限）
 - **S54-E3.6**: `screenToFlowCoords.ts` — 屏幕→Flow坐标转换
+
+---
+
+## [Unreleased] S54-E4: Viewport Culling 画布性能优化 — 2026-06-02
+- **E4.1**: `ViewportCulling.ts` — AABB交集检测，`getVisibleNodes()` / `rectsIntersect()` / `getVisibilityRatio()`
+- **E4.2**: `useViewportCulling.ts` — Hook集成viewportBoundsStore，按视口过滤节点
+- **E4.3**: `uiStore.ts` — 新增 `visibleNodeIds: string[]` + `setVisibleNodeIds` 状态
+- **E4.4**: `FlowEditor.tsx` — 新增 `enableCulling` prop，默认关闭
+- **E4 vitest**: `ViewportCulling.test.ts` 12/12 PASS ✅

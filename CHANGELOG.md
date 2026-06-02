@@ -12,6 +12,16 @@
 - **S57-E1.5**: `useBatchExportList.test.ts` — 7 vitest tests: initial state, empty-list error, single canvas export, multi-canvas progress, cancel, JSON format
 - **S57-E1 vitest**: `useBatchExportList.test.ts` 7/7 PASS ✅
 
+
+
+## [Unreleased] S57-E2: 画布内 AI Session 嵌入面板 — 2026-06-03
+- **S57-E2.1**: `EmbeddedAgentPanel.tsx` — slide-in drawer (320px, direction="right") showing agent sessions list + chat history + input box
+- **S57-E2.2**: `useEmbeddedAgent.ts` — Zustand-backed hook: isOpen/activeSessionId/togglePanel/openPanel/closePanel/insertToCanvas
+- **S57-E2.3**: `EmbeddedAgentContext.tsx` — React context (EmbeddedAgentProvider) for toolbar-to-panel communication without prop drilling
+- **S57-E2.4**: `DDSCanvasPage.tsx` — wires useEmbeddedAgent hook + renders EmbeddedAgentPanel after AIDraftDrawer
+- **S57-E2.5**: `DDSToolbar.tsx` — AI Sessions button (opens panel) integrated via EmbeddedAgentContext
+- **S57-E2.6**: `useEmbeddedAgent.test.ts` — 8 vitest tests: isOpen toggle / session selection / insertToCanvas / no-op guard
+- **S57-E2 vitest**: `useEmbeddedAgent.test.ts` 8/8 PASS ✅
 ## [Unreleased] S55-E4: Background Settings — 2026-06-02
 - **S55-E4.1**: `backgroundSettingsStore.ts` — Zustand store with 5 presets (dots/lines/cross/solid/custom), persist middleware
 - **S55-E4.2**: `BackgroundSettingsPanel.tsx` — modal panel with 5 preset buttons + HexColorPicker for custom color

@@ -38,6 +38,7 @@ import { TemplateGallery } from '@/components/dds/templates/TemplateGallery';
 import { TemplateSaveDialog } from '@/components/dds/templates/TemplateSaveDialog';
 import { ShortcutSettingsPanel } from '@/components/dds/shortcuts/ShortcutSettingsPanel';
 import { HistoryPanel } from '@/components/dds/history/HistoryPanel';
+import { BackgroundSettingsPanel } from '@/components/dds/background/BackgroundSettingsPanel';
 import { NotificationBell } from '@/components/dds/notifications';
 import styles from './DDSToolbar.module.css';
 
@@ -226,6 +227,7 @@ export const DDSToolbar = memo(function DDSToolbar({
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [isShortcutSettingsOpen, setIsShortcutSettingsOpen] = useState(false);
   const [isHistoryPanelOpen, setIsHistoryPanelOpen] = useState(false);
+  const [isBackgroundSettingsOpen, setIsBackgroundSettingsOpen] = useState(false);
 
   // E3-S3: RBAC for toolbar actions
   const rbac = useCanvasRBAC(projectId);
@@ -725,6 +727,18 @@ export const DDSToolbar = memo(function DDSToolbar({
             <HistoryIcon />
           </button>
 
+          {/* S55-E4: Background settings button */}
+          <button
+            type="button"
+            className={styles.iconButton}
+            onClick={() => setIsBackgroundSettingsOpen(true)}
+            aria-label="背景设置"
+            title="背景设置"
+            data-testid="background-settings-btn"
+          >
+            <GridIcon />
+          </button>
+
           {/* Fullscreen toggle */}
           <button
             type="button"
@@ -883,6 +897,12 @@ export const DDSToolbar = memo(function DDSToolbar({
       <HistoryPanel
         isOpen={isHistoryPanelOpen}
         onClose={() => setIsHistoryPanelOpen(false)}
+      />
+
+      {/* S55-E4: Background settings panel */}
+      <BackgroundSettingsPanel
+        isOpen={isBackgroundSettingsOpen}
+        onClose={() => setIsBackgroundSettingsOpen(false)}
       />
     </>
   );

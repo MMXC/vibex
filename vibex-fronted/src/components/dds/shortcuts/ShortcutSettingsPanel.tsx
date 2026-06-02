@@ -17,10 +17,14 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 interface ShortcutSettingsPanelProps {
+  /** Controls whether the panel is visible — when false, panel is not rendered */
+  isOpen?: boolean;
   onClose: () => void;
 }
 
-export function ShortcutSettingsPanel({ onClose }: ShortcutSettingsPanelProps) {
+export function ShortcutSettingsPanel({ isOpen = true, onClose }: ShortcutSettingsPanelProps) {
+  // D4.3 (S53-E4): isOpen prop guards rendering — panel unmounts when closed
+  if (!isOpen) return null;
   const shortcuts = useShortcutStore((s) => s.shortcuts);
   const editingAction = useShortcutStore((s) => s.editingAction);
   const capturedKey = useShortcutStore((s) => s.capturedKey);

@@ -37,6 +37,7 @@ import { useOplogConflictToast } from '@/stores/oplogStore';
 import { TemplateGallery } from '@/components/dds/templates/TemplateGallery';
 import { TemplateSaveDialog } from '@/components/dds/templates/TemplateSaveDialog';
 import { ShortcutSettingsPanel } from '@/components/dds/shortcuts/ShortcutSettingsPanel';
+import { NotificationBell } from '@/components/dds/notifications';
 import styles from './DDSToolbar.module.css';
 
 // ==================== Chapter label keys (mapped to i18n keys) ====================
@@ -668,6 +669,9 @@ export const DDSToolbar = memo(function DDSToolbar({
             <AiIcon />
             <span>{generating ? tToolbar('aiGenerating') : tToolbar('aiGenerate')}</span>
           </button>
+
+          {/* S53-E3: @提及通知铃铛 */}
+          <NotificationBell />
 
           {/* S52-E5: Keyboard Shortcuts settings */}
           <button

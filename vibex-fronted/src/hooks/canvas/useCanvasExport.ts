@@ -46,6 +46,8 @@ interface UseCanvasExportReturn {
   exportAsJSON: (chapters: import('@/types/dds').ChapterData[], crossChapterEdges: import('@/types/dds').DDSEdge[]) => Blob;
   /** 导出为 gzip 压缩的 .vibex Blob (DDS Canvas, E2) */
   exportAsVibex: (chapters: import('@/types/dds').ChapterData[], crossChapterEdges: import('@/types/dds').DDSEdge[]) => Promise<Blob>;
+  /** 导出为 PDF (S55-E1) */
+  exportAsPDF: (scope?: ExportScope) => Promise<void>;
   /** 导出状态 */
   isExporting: boolean;
   /** 错误信息 */
@@ -390,6 +392,47 @@ export function useCanvasExport(): UseCanvasExportReturn {
     []
   );
 
+  /**
+   * Export DDS Canvas as PDF using toPng + jsPDF
+   * Uses html-to-image to capture the canvas, then jsPDF to compose A4 pages
+   */
+  const exportAsPDF = useCallback(async (scope: ExportScope = 'all') => {
+    // Capture canvas as PNG
+    const targetEl = document.querySelector('[data-canvas-container]') as HTMLElement
+      ?? document.querySelector('[class*="treePanelsGrid"]') as HTMLElement;
+    if (!targetEl) throw new Error('无法找到画布容器元素');
+
+    const dataUrl = await toPng(targetEl, {
+      backgroundColor: DEFAULT_BG_COLOR,
+      pixelRatio: 2,
+      width: targetEl.scrollWidth,
+      height: targetEl.scrollHeight,
+      style: { transform: 'none' },
+    });
+
+    // Compose PDF with jsPDF
+    const { jsPDF } = await import('jspdf');
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const imgWidth = pageWidth;
+    const imgHeight = (targetEl.scrollHeight / targetEl.scrollWidth) * imgWidth;
+    const timestamp = new Date().toISOString().slice(0, 10);
+    const filename = `vibex-canvas-${scope}-${timestamp}.pdf`;
+
+    if (imgHeight <= pageHeight) {
+      doc.addImage(dataUrl, 'PNG', 0, 0, imgWidth, imgHeight);
+    } else {
+      // Multi-page: slice image into pages
+      const pageCount = Math.ceil(imgHeight / pageHeight);
+      for (let i = 0; i < pageCount; i++) {
+        if (i > 0) doc.addPage();
+        doc.addImage(dataUrl, 'PNG', 0, -i * pageHeight, imgWidth, imgHeight);
+      }
+    }
+    doc.save(filename);
+  }, []);
+
   const cancelExport = useCallback(() => {
     cancelledRef.current = true;
     setIsExporting(false);
@@ -400,6 +443,7 @@ export function useCanvasExport(): UseCanvasExportReturn {
     exportCanvas,
     exportAsJSON,
     exportAsVibex,
+    exportAsPDF,
     isExporting,
     error: null,
     cancelExport,

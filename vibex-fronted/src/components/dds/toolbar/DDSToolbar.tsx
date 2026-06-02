@@ -554,6 +554,24 @@ export const DDSToolbar = memo(function DDSToolbar({
             <span>{tToolbar('analyze')}</span>
           </button>
 
+          {/* S55-E3: Canvas Dashboard button */}
+          <button
+            type="button"
+            className={styles.exportBtn}
+            onClick={() => (window.location.href = '/canvas-list')}
+            aria-label="画布列表"
+            title="画布列表"
+            data-testid="canvas-dashboard-btn"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+            <span>画布列表</span>
+          </button>
+
           {/* E2: Import button with hidden file input (Bug fix: wire hidden input) */}
           <button
             type="button"

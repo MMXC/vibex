@@ -662,3 +662,14 @@
 - **可测试化**: `wsRevisionHandler` 重构为 store 注入模式，无须 mock 动态导入
 - **Bug 修复**: `wsCommentHandler comment:mention` case 添加缺失 `async` 关键字
 - 文件: `wsCommentHandler.ts`, `wsRevisionHandler.ts`, `ConflictDialog.tsx`, `ConflictDialog.module.css`, `wsRevisionHandler.test.ts`
+
+---
+
+## [Unreleased] S55-E2: 批量导出对话框 (Batch Export Dialog) — 2026-06-02
+
+- **E2 BatchExportDialog.tsx**: 批量导出选择对话框，按章节分组卡片列表，支持多选/全选/取消，集成 ExportProgress 进度显示
+- **E2 selectAllCards selector**: 从 chapters[].cards[] 派生全量卡片列表（store 无 flat allCards 属性）
+- **E2 ExportProgress.tsx fix**: 取消按钮调用 onCancel 而非 onDismiss，正确分离取消和关闭语义
+- **E2 BatchExportDialog.module.css**: 完整对话框样式 — overlay/header/card list/progress bar/export buttons，VibeX dark theme tokens
+- **E2 BatchExportDialog.test.tsx**: 11 vitest 覆盖全部 8 个 DoD 项目
+- **Test**: 11/11 vitest ✅

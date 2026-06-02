@@ -15,6 +15,7 @@ import { DDDStoreInitializer } from '@/components/ddd/DDDStoreInitializer';
 import { ClientLayout } from '@/components/common/ClientLayout';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { SWRegistration } from '@/components/sw/SWRegistration';
+import { OfflineBanner } from '@/components/canvas/OfflineBanner';
 // P001-E1: i18n — load default zh messages for SSR
 import zhMessages from '@/i18n/messages/zh.json';
 import enMessages from '@/i18n/messages/en.json';
@@ -50,6 +51,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <SWRegistration />
+        <OfflineBanner />
         <MermaidInitializer />
         <SentryInitializer />
         <ToastProvider>

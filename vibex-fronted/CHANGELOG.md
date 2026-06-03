@@ -6104,3 +6104,13 @@ See git history for complete changelog.
 - **S57-E4.4**: CanvasDashboard — 多选模式 UI（批量选择按钮激活态 + 卡片 Checkbox 选中态 + 粘性浮层工具栏 BatchOpsPanel）
 - **S57-E4.5**: BatchDeleteConfirmDialog — 批量删除确认弹窗，显示选中画布列表，确认后调用 batchDelete
 - **S57-E4.6**: BatchRenameDialog — 批量重命名弹窗，实时预览 {n} 占位符替换效果，支持批量应用
+---
+
+## [Unreleased] S57-E5: @提及通知链路完善 — 2026-06-03
+- **S57-E5.1**: `parseMentions.ts` — @username 正则提取，去重，空串/nil 安全
+- **S57-E5.2**: `mentionsStore.ts` — 新增 `sourceType: 'comment'|'chat'` 字段
+- **S57-E5.3**: `commentStore.ts` — `addComment` 调用 `parseMentions → mentionsStore.addMention`
+- **S57-E5.4**: `wsCommentHandler.ts` — `comment:mention` case 添加 `sourceType:'comment'`
+- **S57-E5.5**: `NotificationBell.tsx` — Badge 独立计数（仅 comment 类型）
+- **S57-E5.6**: `NotificationPanel.tsx` — 「全部/评论提及」Tab，独立 Badge，按 sourceType 过滤
+- **S57-E5 vitest**: `parseMentions.test.ts` 8/8 PASS ✅

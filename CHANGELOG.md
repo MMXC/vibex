@@ -1089,6 +1089,18 @@
 - **Fix: step data-testid**: PreviewStep data-testid `onboarding-step-4` → `onboarding-step-5`（与 PRD 规格对齐）；`onboarding-skip-btn` 添加；单元测试同步更新
 - **提交**: ceb6cbf73 (feat), 5343a9140 (docs), b360d8c9a (fix), da6488937 (fix), 60203c181 (ESLint fix), 83e7a0c9 (fix step-5 data-testid)
 
+
+---
+
+## [Unreleased] S58-E1: 画布版本分支管理 — Snapshot 持久化
+- **E1 Snapshot 接口**: `SnapshotData` / `Snapshot` / `SnapshotMeta` 类型定义，`canvasHistoryStore` 新增 snapshot state + actions
+- **E1 IndexedDB 持久化**: `historyDB` DB_VERSION 升级至 2，`snapshots` objectStore (composite key: canvasId + snapshotId)，LIRS 淘汰策略
+- **E1 HistoryPanel UI**: 历史记录/快照 双 Tab 设计，`SnapshotTab` 组件，支持保存/加载/删除/删除全部快照操作
+- **E1 快照命名**: 保存快照时弹窗输入名称，默认 "快照 {YYYY-MM-DD HH:mm}"
+- **E1 测试覆盖**: `canvasHistoryStore.test.ts` 新增 Snapshot + E3 Revision 测试，`historyDB.test.ts` 新增 Snapshot CRUD 测试
+- **E1 实现文件**: `canvasHistoryStore.ts` (snapshot state + actions), `historyDB.ts` (DB_VERSION=2, snapshots objectStore), `HistoryPanel.tsx` (双Tab UI), `HistoryPanel.module.css` (SnapshotTab 样式)
+
+
 ## [2026-05-31] - Sprint 46
 
 ### Added

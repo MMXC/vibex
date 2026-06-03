@@ -190,3 +190,252 @@
   color: var(--color-text-secondary, #8b8ba0);
   text-align: center;
 }
+
+/* ============================================
+   E1: Snapshots Tab
+   ============================================ */
+
+.tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--color-border, #2d2d44);
+  flex-shrink: 0;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--color-text-secondary, #8b8ba0);
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 150ms, border-color 150ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.tab:hover {
+  color: var(--color-text-primary, #e4e4f0);
+}
+
+.tabActive {
+  color: var(--color-accent, #5c6bc0);
+  border-bottom-color: var(--color-accent, #5c6bc0);
+  font-weight: 600;
+}
+
+.badge {
+  font-size: 10px;
+  background: var(--color-accent, #5c6bc0);
+  color: #fff;
+  padding: 1px 5px;
+  border-radius: 8px;
+  line-height: 1;
+}
+
+/* Snapshot actions */
+.snapshotActions {
+  padding: 8px 16px;
+  flex-shrink: 0;
+}
+
+.saveSnapshotBtn {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--color-accent, #5c6bc0);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.saveSnapshotBtn:hover {
+  background: #4a58b0;
+}
+
+/* Snapshot list */
+.snapshotItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  transition: background 120ms;
+}
+
+.snapshotItem:hover {
+  background: var(--color-surface, #2a2a40);
+}
+
+.snapshotInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.snapshotName {
+  font-size: 13px;
+  color: var(--color-text-primary, #e4e4f0);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.snapshotDate {
+  font-size: 11px;
+  color: var(--color-text-secondary, #8b8ba0);
+}
+
+.snapshotBtns {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.restoreBtn,
+.deleteBtn,
+.confirmDeleteBtn,
+.cancelDeleteBtn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background 120ms;
+}
+
+.restoreBtn:hover {
+  background: var(--color-surface, #2a2a40);
+}
+
+.restoreBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.deleteBtn:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.confirmDeleteBtn {
+  color: #22c55e;
+}
+
+.confirmDeleteBtn:hover {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.cancelDeleteBtn {
+  color: var(--color-text-secondary, #8b8ba0);
+}
+
+.cancelDeleteBtn:hover {
+  background: var(--color-surface, #2a2a40);
+}
+
+.emptyHint {
+  font-size: 12px;
+  color: var(--color-text-secondary, #8b8ba0);
+  opacity: 0.7;
+  margin-top: 4px;
+  text-align: center;
+}
+
+/* Save dialog */
+.saveDialog {
+  position: relative;
+}
+
+.saveDialogOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.saveDialogContent {
+  position: relative;
+  z-index: 2;
+  margin: 8px 16px;
+  background: var(--color-surface-elevated, #1e1e35);
+  border: 1px solid var(--color-border, #2d2d44);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.saveDialogTitle {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary, #e4e4f0);
+}
+
+.saveDialogInput {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--color-surface, #2a2a40);
+  border: 1px solid var(--color-border, #2d2d44);
+  border-radius: 6px;
+  color: var(--color-text-primary, #e4e4f0);
+  font-size: 13px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 150ms;
+}
+
+.saveDialogInput:focus {
+  border-color: var(--color-accent, #5c6bc0);
+}
+
+.saveDialogBtns {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.cancelBtn,
+.confirmBtn {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 150ms;
+}
+
+.cancelBtn {
+  background: var(--color-surface, #2a2a40);
+  border: 1px solid var(--color-border, #2d2d44);
+  color: var(--color-text-primary, #e4e4f0);
+}
+
+.cancelBtn:hover {
+  background: var(--color-surface-elevated, #2a2a40);
+}
+
+.confirmBtn {
+  background: var(--color-accent, #5c6bc0);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+}
+
+.confirmBtn:hover {
+  background: #4a58b0;
+}

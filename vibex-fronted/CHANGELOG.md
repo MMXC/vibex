@@ -317,6 +317,18 @@
 - **E1 /ai 页面**: `src/app/ai/page.tsx` — 新建 AI 页面，双栏布局（AgentSessions sidebar + AgentFeedbackPanel main）
 - **E1 i18n keys**: `src/i18n/messages/en.json` + `zh.json` 新增 54 个 ai namespace keys
 
+
+---
+
+## [Unreleased] S58-E1: 画布版本分支管理 — Snapshot 持久化
+- **E1 Snapshot 接口**: `SnapshotData` / `Snapshot` / `SnapshotMeta` 类型定义，`canvasHistoryStore` 新增 snapshot state + actions
+- **E1 IndexedDB 持久化**: `historyDB` DB_VERSION 升级至 2，`snapshots` objectStore (composite key: canvasId + snapshotId)
+- **E1 HistoryPanel UI**: 历史记录/快照 双 Tab 设计，`SnapshotTab` 组件，支持保存/加载/删除/删除全部快照操作
+- **E1 快照命名**: 保存快照时弹窗输入名称，默认 "快照 {YYYY-MM-DD HH:mm}"
+- **E1 测试覆盖**: `canvasHistoryStore.test.ts` 新增 Snapshot + E3 Revision 测试
+- **E1 实现文件**: `canvasHistoryStore.ts`, `historyDB.ts`, `HistoryPanel.tsx`, `HistoryPanel.module.css`
+
+
 ## [2026-05-31] - Sprint 46
 
 ### Added

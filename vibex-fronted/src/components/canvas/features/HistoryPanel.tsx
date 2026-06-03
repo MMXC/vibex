@@ -1,26 +1,36 @@
 'use client';
 
 /**
- * HistoryPanel — Undo/Redo History Sidebar
+ * HistoryPanel — Undo/Redo History Sidebar + E1: Snapshots Tab
  * P004-E4: History Panel for selective undo/redo
+ * E1 (Sprint58): 画布版本分支管理 — Snapshots tab for named canvas versions
  *
- * Displays a list of command snapshots from canvasHistoryStore.
- * Clicking a snapshot rolls back to that point in history.
+ * Displays:
+ * - History tab: command snapshots from canvasHistoryStore (Undo/Redo)
+ * - Snapshots tab: named canvas version snapshots (E1)
  *
  *遵守约束:
  * - 无 any 类型
  * - 无 canvasLogger.default.debug
  */
 
-import React, { useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useCanvasHistoryStore } from '@/stores/dds/canvasHistoryStore';
 import styles from './HistoryPanel.module.css';
+
+type Tab = 'history' | 'snapshots';
 
 interface HistoryPanelProps {
   /** Whether the panel is visible */
   open: boolean;
   /** Close callback */
   onClose: () => void;
+  /** Current canvas ID for snapshot operations (passed from parent) */
+  canvasId?: string;
+  /** Callback to restore a snapshot — provides { nodes, edges } data */
+  onRestoreSnapshot?: (data: { nodes: unknown[]; edges: unknown[] }) => void;
+  /** Callback to get current canvas data for saving a snapshot */
+  getCurrentCanvasData?: () => { nodes: unknown[]; edges: unknown[] };
 }
 
 function formatTimestamp(ts: number): string {
@@ -28,34 +38,48 @@ function formatTimestamp(ts: number): string {
   return d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 
+function formatDate(ts: number): string {
+  const d = new Date(ts);
+  return d.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+}
+
 function formatDescription(desc: string | undefined, index: number): string {
   if (desc) return desc;
   return `操作 ${index + 1}`;
 }
 
-export function HistoryPanel({ open, onClose }: HistoryPanelProps) {
+export function HistoryPanel({ open, onClose, canvasId = 'default-canvas', onRestoreSnapshot, getCurrentCanvasData }: HistoryPanelProps) {
+  const [activeTab, setActiveTab] = useState<Tab>('history');
+  const [saveDialogName, setSaveDialogName] = useState('');
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
   const past = useCanvasHistoryStore((s) => s.past);
   const future = useCanvasHistoryStore((s) => s.future);
   const selectiveUndo = useCanvasHistoryStore((s) => s.selectiveUndo);
   const canUndo = useCanvasHistoryStore((s) => s.canUndo);
   const canRedo = useCanvasHistoryStore((s) => s.canRedo);
   const redo = useCanvasHistoryStore((s) => s.redo);
+  const snapshots = useCanvasHistoryStore((s) => s.snapshots);
+  const restoringSnapshotId = useCanvasHistoryStore((s) => s.restoringSnapshotId);
+  const saveSnapshot = useCanvasHistoryStore((s) => s.saveSnapshot);
+  const loadSnapshot = useCanvasHistoryStore((s) => s.loadSnapshot);
+  const deleteSnapshot = useCanvasHistoryStore((s) => s.deleteSnapshot);
+  const setRestoringSnapshotId = useCanvasHistoryStore((s) => s.setRestoringSnapshotId);
+  const listSnapshots = useCanvasHistoryStore((s) => s.listSnapshots);
 
   const total = past.length + future.length;
-  const currentIndex = past.length - 1; // 0-indexed position of current state
+  const currentIndex = past.length - 1;
 
   const handleSelect = useCallback(
     (targetIndex: number) => {
       if (targetIndex === currentIndex) {
-        // Already at this position, just close
         onClose();
         return;
       }
       if (targetIndex < past.length) {
-        // Roll back to targetIndex in past
         selectiveUndo(targetIndex);
       } else {
-        // Need to redo forward
         const redoCount = targetIndex - (past.length - 1);
         for (let i = 0; i < redoCount; i++) {
           redo();
@@ -66,6 +90,55 @@ export function HistoryPanel({ open, onClose }: HistoryPanelProps) {
     [currentIndex, past.length, selectiveUndo, redo, onClose]
   );
 
+  // ==================== E1: Snapshot Actions ====================
+
+  const handleOpenSaveDialog = useCallback(() => {
+    setSaveDialogName('');
+    setIsSaveDialogOpen(true);
+  }, []);
+
+  const handleCloseSaveDialog = useCallback(() => {
+    setIsSaveDialogOpen(false);
+    setSaveDialogName('');
+  }, []);
+
+  const handleSaveSnapshot = useCallback(async () => {
+    const name = saveDialogName.trim() || `版本 ${snapshots.length + 1}`;
+    if (!getCurrentCanvasData) {
+      // If no data getter provided, use empty snapshot (caller should override)
+      await saveSnapshot(canvasId, name, { nodes: [], edges: [] });
+    } else {
+      const data = getCurrentCanvasData();
+      await saveSnapshot(canvasId, name, data);
+    }
+    setIsSaveDialogOpen(false);
+    setSaveDialogName('');
+  }, [saveDialogName, snapshots.length, canvasId, saveSnapshot, getCurrentCanvasData]);
+
+  const handleRestoreSnapshot = useCallback(
+    async (snapshotId: string) => {
+      setRestoringSnapshotId(snapshotId);
+      try {
+        const data = await loadSnapshot(canvasId, snapshotId);
+        if (data && onRestoreSnapshot) {
+          onRestoreSnapshot(data);
+        }
+      } finally {
+        setRestoringSnapshotId(null);
+      }
+      onClose();
+    },
+    [canvasId, loadSnapshot, onRestoreSnapshot, setRestoringSnapshotId, onClose]
+  );
+
+  const handleDeleteSnapshot = useCallback(
+    async (snapshotId: string) => {
+      await deleteSnapshot(canvasId, snapshotId);
+      setDeleteConfirmId(null);
+    },
+    [canvasId, deleteSnapshot]
+  );
+
   if (!open) return null;
 
   return (
@@ -74,67 +147,194 @@ export function HistoryPanel({ open, onClose }: HistoryPanelProps) {
       <aside className={styles.panel} role="dialog" aria-label="历史记录面板">
         <header className={styles.header}>
           <h2 className={styles.title}>历史记录</h2>
-          <div className={styles.position}>
-            {canUndo() || canRedo()
-              ? `步骤 ${past.length + 1} / ${total > 0 ? total : 1}`
-              : '无历史记录'}
-          </div>
           <button className={styles.closeBtn} onClick={onClose} aria-label="关闭">
             ✕
           </button>
         </header>
 
-        <div className={styles.body}>
-          {past.length === 0 && future.length === 0 ? (
-            <div className={styles.empty}>暂无历史记录</div>
-          ) : (
-            <ol className={styles.list} aria-label="历史记录列表">
-              {/* Past commands — undoable */}
-              {past.map((cmd, i) => (
-                <li key={cmd.id} className={styles.item}>
-                  <button
-                    className={styles.itemBtn}
-                    onClick={() => handleSelect(i)}
-                    aria-label={`回退到: ${formatDescription(cmd.description, i)}`}
-                    disabled={i === currentIndex}
-                  >
-                    <span className={styles.timestamp}>{formatTimestamp(cmd.timestamp)}</span>
-                    <span className={styles.desc}>{formatDescription(cmd.description, i)}</span>
-                    {i === currentIndex && <span className={styles.currentBadge}>当前</span>}
-                  </button>
-                </li>
-              ))}
+        {/* Tab switcher */}
+        <div className={styles.tabs} role="tablist">
+          <button
+            className={`${styles.tab} ${activeTab === 'history' ? styles.tabActive : ''}`}
+            onClick={() => setActiveTab('history')}
+            role="tab"
+            aria-selected={activeTab === 'history'}
+          >
+            历史记录
+          </button>
+          <button
+            className={`${styles.tab} ${activeTab === 'snapshots' ? styles.tabActive : ''}`}
+            onClick={() => setActiveTab('snapshots')}
+            role="tab"
+            aria-selected={activeTab === 'snapshots'}
+          >
+            画布版本
+            {snapshots.length > 0 && (
+              <span className={styles.badge}>{snapshots.length}</span>
+            )}
+          </button>
+        </div>
 
-              {/* Divider */}
-              {past.length > 0 && future.length > 0 && (
-                <li className={styles.dividerItem}>
-                  <span className={styles.dividerLabel}>— 已撤销 —</span>
-                </li>
+        <div className={styles.body}>
+          {activeTab === 'history' && (
+            <>
+              {past.length === 0 && future.length === 0 ? (
+                <div className={styles.empty}>暂无历史记录</div>
+              ) : (
+                <ol className={styles.list} aria-label="历史记录列表">
+                  {/* Past commands — undoable */}
+                  {past.map((cmd, i) => (
+                    <li key={cmd.id} className={styles.item}>
+                      <button
+                        className={styles.itemBtn}
+                        onClick={() => handleSelect(i)}
+                        aria-label={`回退到: ${formatDescription(cmd.description, i)}`}
+                        disabled={i === currentIndex}
+                      >
+                        <span className={styles.timestamp}>{formatTimestamp(cmd.timestamp)}</span>
+                        <span className={styles.desc}>{formatDescription(cmd.description, i)}</span>
+                        {i === currentIndex && <span className={styles.currentBadge}>当前</span>}
+                      </button>
+                    </li>
+                  ))}
+
+                  {/* Divider */}
+                  {past.length > 0 && future.length > 0 && (
+                    <li className={styles.dividerItem}>
+                      <span className={styles.dividerLabel}>— 已撤销 —</span>
+                    </li>
+                  )}
+
+                  {/* Future (redo) commands */}
+                  {future.map((cmd, i) => {
+                    const targetIndex = past.length + i;
+                    return (
+                      <li key={cmd.id} className={`${styles.item} ${styles.futureItem}`}>
+                        <button
+                          className={`${styles.itemBtn} ${styles.itemBtnFuture}`}
+                          onClick={() => handleSelect(targetIndex)}
+                          aria-label={`重做到: ${formatDescription(cmd.description, past.length + i)}`}
+                        >
+                          <span className={styles.timestamp}>{formatTimestamp(cmd.timestamp)}</span>
+                          <span className={styles.desc}>{formatDescription(cmd.description, past.length + i)}</span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ol>
+              )}
+            </>
+          )}
+
+          {activeTab === 'snapshots' && (
+            <>
+              {/* Save button */}
+              <div className={styles.snapshotActions}>
+                <button
+                  className={styles.saveSnapshotBtn}
+                  onClick={handleOpenSaveDialog}
+                  aria-label="保存当前画布版本"
+                >
+                  💾 保存版本
+                </button>
+              </div>
+
+              {/* Save dialog */}
+              {isSaveDialogOpen && (
+                <div className={styles.saveDialog}>
+                  <div className={styles.saveDialogOverlay} onClick={handleCloseSaveDialog} aria-hidden="true" />
+                  <div className={styles.saveDialogContent}>
+                    <h3 className={styles.saveDialogTitle}>保存画布版本</h3>
+                    <input
+                      type="text"
+                      className={styles.saveDialogInput}
+                      placeholder={`版本 ${snapshots.length + 1}`}
+                      value={saveDialogName}
+                      onChange={(e) => setSaveDialogName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleSaveSnapshot();
+                        if (e.key === 'Escape') handleCloseSaveDialog();
+                      }}
+                      autoFocus
+                      aria-label="版本名称"
+                    />
+                    <div className={styles.saveDialogBtns}>
+                      <button className={styles.cancelBtn} onClick={handleCloseSaveDialog}>
+                        取消
+                      </button>
+                      <button className={styles.confirmBtn} onClick={handleSaveSnapshot}>
+                        保存
+                      </button>
+                    </div>
+                  </div>
+                </div>
               )}
 
-              {/* Future (redo) commands */}
-              {future.map((cmd, i) => {
-                const targetIndex = past.length + i;
-                return (
-                  <li key={cmd.id} className={`${styles.item} ${styles.futureItem}`}>
-                    <button
-                      className={`${styles.itemBtn} ${styles.itemBtnFuture}`}
-                      onClick={() => handleSelect(targetIndex)}
-                      aria-label={`重做到: ${formatDescription(cmd.description, past.length + i)}`}
-                    >
-                      <span className={styles.timestamp}>{formatTimestamp(cmd.timestamp)}</span>
-                      <span className={styles.desc}>{formatDescription(cmd.description, past.length + i)}</span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ol>
+              {/* Snapshot list */}
+              {snapshots.length === 0 ? (
+                <div className={styles.empty}>
+                  <div>暂无保存的版本</div>
+                  <div className={styles.emptyHint}>点击上方「💾 保存版本」保存当前画布状态</div>
+                </div>
+              ) : (
+                <ol className={styles.list} aria-label="画布版本列表">
+                  {snapshots.map((snapshot, i) => (
+                    <li key={snapshot.id} className={styles.item}>
+                      <div className={styles.snapshotItem}>
+                        <div className={styles.snapshotInfo}>
+                          <span className={styles.snapshotName}>{snapshot.name}</span>
+                          <span className={styles.snapshotDate}>
+                            {formatDate(snapshot.timestamp)} {formatTimestamp(snapshot.timestamp)}
+                          </span>
+                        </div>
+                        <div className={styles.snapshotBtns}>
+                          <button
+                            className={styles.restoreBtn}
+                            onClick={() => handleRestoreSnapshot(snapshot.id)}
+                            disabled={restoringSnapshotId === snapshot.id}
+                            aria-label={`恢复版本: ${snapshot.name}`}
+                          >
+                            {restoringSnapshotId === snapshot.id ? '⏳' : '↩️'}
+                          </button>
+                          {deleteConfirmId === snapshot.id ? (
+                            <>
+                              <button
+                                className={styles.confirmDeleteBtn}
+                                onClick={() => handleDeleteSnapshot(snapshot.id)}
+                                aria-label="确认删除"
+                              >
+                                ✓
+                              </button>
+                              <button
+                                className={styles.cancelDeleteBtn}
+                                onClick={() => setDeleteConfirmId(null)}
+                                aria-label="取消删除"
+                              >
+                                ✕
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              className={styles.deleteBtn}
+                              onClick={() => setDeleteConfirmId(snapshot.id)}
+                              aria-label={`删除版本: ${snapshot.name}`}
+                            >
+                              🗑️
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </>
           )}
         </div>
 
         <footer className={styles.footer}>
           <div className={styles.hint}>
-            点击记录可跳转至任意历史位置
+            {activeTab === 'history' ? '点击记录可跳转至任意历史位置' : '点击 ↩️ 恢复版本，当前画布将被替换'}
           </div>
         </footer>
       </aside>

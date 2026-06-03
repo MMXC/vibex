@@ -13,6 +13,11 @@
  * - baseRevision 乐观锁：每次 execute 时 bump；远程 revision:bump 时 setBaseRevision
  * - saveHistoryWithRevision() 在 revision 不匹配时抛出 RevisionMismatchError
  * - onRevisionConflict 回调：冲突时触发 Toast 提示
+ *
+ * E1 (Sprint58): 画布版本分支管理
+ * - snapshots[] 状态：保存画布命名版本快照
+ * - saveSnapshot/loadSnapshot/listSnapshots/deleteSnapshot：快照 CRUD
+ * - 快照存储在 IndexedDB snapshots 表（与 history 表分离）
  */
 
 import { create } from 'zustand';
@@ -65,6 +70,31 @@ export type RevisionConflictHandler = (
   actual: number
 ) => ConflictResolution;
 
+// ==================== E1: Canvas Snapshot Types ====================
+
+/** Serializable snapshot of a canvas at a point in time — used for version branching */
+export interface SnapshotData {
+  nodes: unknown[];
+  edges: unknown[];
+}
+
+/** A named snapshot of the canvas state — stored in IndexedDB */
+export interface Snapshot {
+  id: string;
+  name: string;
+  timestamp: number;
+  data: SnapshotData;
+}
+
+/** Serializable snapshot metadata (for IndexedDB storage) */
+export interface SnapshotMeta {
+  id: string;
+  name: string;
+  timestamp: number;
+  /** Size estimate in bytes */
+  _size?: number;
+}
+
 // ==================== Constants ====================
 
 export const MAX_HISTORY = 50;
@@ -80,6 +110,11 @@ interface CanvasHistoryState {
   baseRevision: number;
   /** Callback invoked when a remote revision bump conflicts with local pending changes */
   onRevisionConflict: RevisionConflictHandler | null;
+  // E1: Canvas snapshots
+  /** All saved snapshots for the current canvas (sorted by timestamp desc) */
+  snapshots: Snapshot[];
+  /** ID of the snapshot currently being restored (for UI loading state) */
+  restoringSnapshotId: string | null;
 
   /** Push a new command, execute it, and push to history */
   execute: (cmd: Command) => void;
@@ -117,6 +152,17 @@ interface CanvasHistoryState {
   setRevisionConflictHandler: (handler: RevisionConflictHandler | null) => void;
   /** Trigger a conflict toast using the UI Toast system */
   triggerConflictToast: (canvasId: string, remoteRevision: number, localRevision: number) => void;
+  // E1: Snapshot actions
+  /** Save a named snapshot of the current canvas state to IndexedDB */
+  saveSnapshot: (canvasId: string, name: string, data: SnapshotData) => Promise<void>;
+  /** Load a snapshot from IndexedDB and return its data */
+  loadSnapshot: (canvasId: string, snapshotId: string) => Promise<SnapshotData | null>;
+  /** Return all snapshots for a canvas, sorted by timestamp descending */
+  listSnapshots: (canvasId: string) => Promise<Snapshot[]>;
+  /** Delete a snapshot by ID */
+  deleteSnapshot: (canvasId: string, snapshotId: string) => Promise<void>;
+  /** Set the current restoring snapshot ID (for UI loading state) */
+  setRestoringSnapshotId: (id: string | null) => void;
 }
 
 // ==================== Helper ====================
@@ -138,6 +184,9 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
   // E3: revision tracking
   baseRevision: 0,
   onRevisionConflict: null,
+  // E1: snapshots
+  snapshots: [],
+  restoringSnapshotId: null,
 
   execute: (cmd: Command) => {
     if (get().isPerforming) return;
@@ -300,8 +349,47 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
       );
     }
   },
-}))
 
+  // ==================== E1: Canvas Snapshot Actions ====================
+
+  saveSnapshot: async (canvasId: string, name: string, data: { nodes: unknown[]; edges: unknown[] }) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+    const { saveSnapshotToDB } = await import('@/lib/canvas/historyDB');
+    const id = `snapshot-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    const snapshot = { id, name, timestamp: Date.now(), data };
+    await saveSnapshotToDB(canvasId, snapshot);
+    // Refresh the snapshots list
+    const list = await get().listSnapshots(canvasId);
+    set({ snapshots: list });
+  },
+
+  loadSnapshot: async (canvasId: string, snapshotId: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return null;
+    const { loadSnapshotFromDB } = await import('@/lib/canvas/historyDB');
+    const snapshot = await loadSnapshotFromDB(canvasId, snapshotId);
+    return snapshot ? snapshot.data : null;
+  },
+
+  listSnapshots: async (canvasId: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return [];
+    const { listSnapshotsFromDB } = await import('@/lib/canvas/historyDB');
+    const list = await listSnapshotsFromDB(canvasId);
+    return list.sort((a, b) => b.timestamp - a.timestamp);
+  },
+
+  deleteSnapshot: async (canvasId: string, snapshotId: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+    const { deleteSnapshotFromDB } = await import('@/lib/canvas/historyDB');
+    await deleteSnapshotFromDB(canvasId, snapshotId);
+    set((state) => ({
+      snapshots: state.snapshots.filter((s) => s.id !== snapshotId),
+    }));
+  },
+
+  setRestoringSnapshotId: (id: string | null) => {
+    set({ restoringSnapshotId: id });
+  },
+}));
 
 
 /**

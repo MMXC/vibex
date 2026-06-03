@@ -13,18 +13,25 @@
  * - 每个画布条目增加 revision 字段用于乐观锁
  * - saveHistoryWithRevision() 在 revision 不匹配时抛出 RevisionMismatchError
  * - loadHistoryWithRevision() 返回 revision 以便前端与远程同步
+ *
+ * E1 (Sprint58): 画布版本分支管理
+ * - 新增 snapshots objectStore (DB_VERSION=2)
+ * - saveSnapshotToDB/loadSnapshotFromDB/listSnapshotsFromDB/deleteSnapshotFromDB
+ * - snapshots 表按 canvasId + snapshotId 复合主键
  */
 
 import type { Command } from '@/stores/dds/canvasHistoryStore';
 import { RevisionMismatchError } from '@/stores/dds/canvasHistoryStore';
+import type { Snapshot } from '@/stores/dds/canvasHistoryStore';
 
 // ============================================
 // Constants
 // ============================================
 
 const DB_NAME = 'vibex-canvas-history';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Bumped to 2 for snapshots objectStore
 const STORE_NAME = 'history';
+const SNAPSHOTS_STORE_NAME = 'snapshots';
 
 /** Maximum storage per canvas in bytes (5MB) */
 export const MAX_BYTES_PER_CANVAS = 5 * 1024 * 1024;
@@ -83,20 +90,28 @@ function openDB(): Promise<IDBDatabase> {
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
+      // history store (v1)
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         const store = db.createObjectStore(STORE_NAME, { keyPath: 'canvasId' });
         store.createIndex('updatedAt', 'updatedAt', { unique: false });
+      }
+      // snapshots store (v2 — E1)
+      if (!db.objectStoreNames.contains(SNAPSHOTS_STORE_NAME)) {
+        // Compound key: canvasId + snapshotId
+        const snapshotStore = db.createObjectStore(SNAPSHOTS_STORE_NAME, { keyPath: ['canvasId', 'snapshotId'] });
+        snapshotStore.createIndex('canvasId', 'canvasId', { unique: false });
+        snapshotStore.createIndex('timestamp', 'timestamp', { unique: false });
       }
     };
   });
 }
 
-function idbGet<T>(key: string): Promise<T | null> {
+function idbGet<T>(key: string, storeName = STORE_NAME): Promise<T | null> {
   return new Promise((resolve, reject) => {
     openDB()
       .then((db) => {
-        const tx = db.transaction(STORE_NAME, 'readonly');
-        const store = tx.objectStore(STORE_NAME);
+        const tx = db.transaction(storeName, 'readonly');
+        const store = tx.objectStore(storeName);
         const request = store.get(key);
         request.onsuccess = () => resolve(request.result ?? null);
         request.onerror = () => reject(new Error(`IDB get failed: ${request.error}`));
@@ -105,12 +120,12 @@ function idbGet<T>(key: string): Promise<T | null> {
   });
 }
 
-function idbPut(value: unknown): Promise<void> {
+function idbPut(value: unknown, storeName = STORE_NAME): Promise<void> {
   return new Promise((resolve, reject) => {
     openDB()
       .then((db) => {
-        const tx = db.transaction(STORE_NAME, 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
+        const tx = db.transaction(storeName, 'readwrite');
+        const store = tx.objectStore(storeName);
         const request = store.put(value);
         request.onsuccess = () => resolve();
         request.onerror = () => reject(new Error(`IDB put failed: ${request.error}`));
@@ -119,12 +134,12 @@ function idbPut(value: unknown): Promise<void> {
   });
 }
 
-function idbDelete(key: string): Promise<void> {
+function idbDelete(key: IDBValidKey, storeName = STORE_NAME): Promise<void> {
   return new Promise((resolve, reject) => {
     openDB()
       .then((db) => {
-        const tx = db.transaction(STORE_NAME, 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
+        const tx = db.transaction(storeName, 'readwrite');
+        const store = tx.objectStore(storeName);
         const request = store.delete(key);
         request.onsuccess = () => resolve();
         request.onerror = () => reject(new Error(`IDB delete failed: ${request.error}`));
@@ -195,7 +210,7 @@ async function evictIfNeeded(canvasId: string, newPast: CommandMeta[]): Promise<
 }
 
 // ============================================
-// Public API
+// Public API — History Commands
 // ============================================
 
 /**
@@ -385,4 +400,147 @@ export async function getRevision(canvasId: string): Promise<number> {
   if (!isIndexedDBAvailable()) return 0;
   const entry = await idbGet<HistoryEntry>(canvasId);
   return entry?.revision ?? 0;
+}
+
+// ============================================
+// E1: Snapshot Persistence
+// ============================================
+
+/**
+ * E1: Snapshot stored in IndexedDB with compound key (canvasId, snapshotId)
+ */
+interface SnapshotEntry {
+  canvasId: string;
+  snapshotId: string;
+  name: string;
+  timestamp: number;
+  data: Snapshot['data'];
+  _size?: number;
+}
+
+function estimateSnapshotSize(entry: SnapshotEntry): number {
+  try {
+    return new Blob([JSON.stringify(entry)]).size;
+  } catch {
+    return JSON.stringify(entry).length * 2;
+  }
+}
+
+/**
+ * E1: Save a snapshot to IndexedDB snapshots store.
+ * Compound key: [canvasId, snapshotId]
+ */
+export async function saveSnapshotToDB(canvasId: string, snapshot: Snapshot): Promise<void> {
+  if (!isIndexedDBAvailable()) return;
+
+  const entry: SnapshotEntry = {
+    canvasId,
+    snapshotId: snapshot.id,
+    name: snapshot.name,
+    timestamp: snapshot.timestamp,
+    data: snapshot.data,
+    _size: 0,
+  };
+  entry._size = estimateSnapshotSize(entry);
+
+  await idbPut(entry, SNAPSHOTS_STORE_NAME);
+}
+
+/**
+ * E1: Load a specific snapshot from IndexedDB by canvasId + snapshotId.
+ * Returns null if not found.
+ */
+export async function loadSnapshotFromDB(
+  canvasId: string,
+  snapshotId: string
+): Promise<Snapshot | null> {
+  if (!isIndexedDBAvailable()) return null;
+
+  const entry = await idbGet<SnapshotEntry>([canvasId, snapshotId], SNAPSHOTS_STORE_NAME);
+  if (!entry) return null;
+
+  return {
+    id: entry.snapshotId,
+    name: entry.name,
+    timestamp: entry.timestamp,
+    data: entry.data,
+  };
+}
+
+/**
+ * E1: List all snapshots for a canvas, sorted by timestamp descending.
+ * Uses the canvasId index to query efficiently.
+ */
+export async function listSnapshotsFromDB(canvasId: string): Promise<Snapshot[]> {
+  if (!isIndexedDBAvailable()) return [];
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(SNAPSHOTS_STORE_NAME, 'readonly');
+        const store = tx.objectStore(SNAPSHOTS_STORE_NAME);
+        const index = store.index('canvasId');
+        const request = index.getAll(canvasId);
+
+        request.onsuccess = () => {
+          const results: Snapshot[] = (request.result as SnapshotEntry[]).map((entry) => ({
+            id: entry.snapshotId,
+            name: entry.name,
+            timestamp: entry.timestamp,
+            data: entry.data,
+          }));
+          resolve(results);
+        };
+        request.onerror = () =>
+          reject(new Error(`listSnapshotsFromDB failed: ${request.error}`));
+      })
+      .catch(reject);
+  });
+}
+
+/**
+ * E1: Delete a snapshot from IndexedDB by canvasId + snapshotId.
+ */
+export async function deleteSnapshotFromDB(canvasId: string, snapshotId: string): Promise<void> {
+  if (!isIndexedDBAvailable()) return;
+  await idbDelete([canvasId, snapshotId], SNAPSHOTS_STORE_NAME);
+}
+
+/**
+ * E1: Delete all snapshots for a canvas.
+ */
+export async function clearSnapshotsFromDB(canvasId: string): Promise<void> {
+  if (!isIndexedDBAvailable()) return;
+
+  return new Promise((resolve, reject) => {
+    openDB()
+      .then((db) => {
+        const tx = db.transaction(SNAPSHOTS_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(SNAPSHOTS_STORE_NAME);
+        const index = store.index('canvasId');
+        const request = index.getAllKeys(canvasId);
+
+        request.onsuccess = () => {
+          const keys = request.result as IDBValidKey[];
+          let pending = keys.length;
+          if (pending === 0) {
+            resolve();
+            return;
+          }
+          for (const key of keys) {
+            const delReq = store.delete(key);
+            delReq.onsuccess = () => {
+              pending--;
+              if (pending === 0) resolve();
+            };
+            delReq.onerror = () => {
+              pending--;
+              if (pending === 0) resolve();
+            };
+          }
+        };
+        request.onerror = () => reject(new Error(`clearSnapshotsFromDB failed: ${request.error}`));
+      })
+      .catch(reject);
+  });
 }

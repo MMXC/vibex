@@ -7,6 +7,15 @@
 - **S58-E2.3**: `FileImportDialog.tsx` — preview/confirm dialog with valid/error counts
 - **S58-E2.4**: `DDSFlow.tsx` — onDragOver/onDragLeave/onDrop handlers + overlay/dialog renders
 - **S58-E2.5**: `useFileDrop.test.ts` — 8 passing vitest tests (isDragging, processDrop, reset, removeFile, confirmImport)
+
+## [Unreleased] S58-E3: 协作者Cursor同步完善 — 2026-06-03
+- **S58-E3.1**: `coords.ts` — `screenToFlowCoords` / `flowToScreenCoords` 坐标转换工具（基于 @xyflow/react screenToFlowPosition）
+- **S58-E3.2**: `useCollaboration.ts` — 新增 `broadcastCursor(flowX, flowY, nodeId?)` 方法，内置 100ms 节流
+- **S58-E3.3**: `DDSFlow.tsx` — `onNodeMouseMove` 事件 → `screenToFlowPosition` → `broadcastCursor` 广播
+- **S58-E3.4**: `coords.test.ts` — 14 个 vitest 边界测试（负坐标、零缩放、逆变换）
+- **S58-E3.5**: `useCollaboration.test.tsx` — broadcastCursor 节流行为测试（100ms 阈值验证）
+- **Test**: 15/15 vitest ✅
+
 ## [Unreleased] Sprint 49 — E3 视口性能优化 + E5 协作评论系统
 
 ##### S49-E3: 视口性能优化（防抖 + 节点边界扩展）

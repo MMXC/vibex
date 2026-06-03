@@ -223,6 +223,14 @@ describe('canvasHistoryStore — P001 U5', () => {
 
 // ==================== E1: Snapshot Tests ====================
 
+// CRITICAL: jsdom has no indexedDB → store functions return early without calling
+// the dynamic `await import('@/lib/canvas/historyDB')`. Mock it before vi.hoisted.
+Object.defineProperty(globalThis, 'indexedDB', {
+  value: { open: () => ({ result: { transaction: () => ({ objectStore: () => ({}) }) } }) },
+  writable: true,
+  configurable: true,
+});
+
 // vi.hoisted MUST come before vi.mock — creates shared mock refs that work with
 // the store's dynamic `await import('@/lib/canvas/historyDB')` inside action bodies.
 // Plain vi.mock factory `vi.fn()` creates local refs invisible to test body.
@@ -311,10 +319,10 @@ describe('canvasHistoryStore — E1 Snapshots (Sprint58)', () => {
 
   it('loadSnapshot returns snapshot data when found', async () => {
     const snapshot = { id: 'snap-1', name: 'v1', timestamp: 1000, data: { nodes: [], edges: [] } };
-    mockListSnapshotsFromDB.mockResolvedValue(snapshot);
+    mockLoadSnapshotFromDB.mockResolvedValue(snapshot);
     const { loadSnapshot } = useCanvasHistoryStore.getState();
+    // store extracts .data from the snapshot object
     const result = await loadSnapshot('canvas-1', 'snap-1');
-    // store extracts .data from the snapshot
     expect(result).toEqual({ nodes: [], edges: [] });
   });
 

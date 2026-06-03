@@ -701,3 +701,12 @@
 - **S58-E4.3**: `ShareDialog.module.css` — 新增 `.permissionRow`、`.permissionSelect`、`.disabledHint` 等样式
 - **S58-E4.4**: `zh.json` / `en.json` — 新增 12 个分享权限相关 i18n key（permission、viewerOnly、editorAccess 等）
 - **S58-E4.5**: `shareUtils.test.ts` — 46 个 vitest 测试全部通过（含新函数 generateShareToken、checkSharePermission、buildShareUrl、parseShareTokenFromUrl）
+
+## [Unreleased] S58-E5: 协作冲突增强 — 2026-06-03
+- **S58-E5.1**: `wsConflictHandler.ts` — 新建 WS 冲突消息处理器，监听 `conflict:detected` 消息
+- **S58-E5.2**: `conflictStore.ts` — 新建冲突状态管理，新增 `conflictData` + `resolvedStrategy` 状态
+- **S58-E5.3**: `ConflictDialog.tsx` — 扩展冲突对话框，支持本地/远程 diff + 三选项（保留本地/接受远程/手动合并）
+- **S58-E5.4**: `ConflictDialog.module.css` — 扩展样式，支持 manual merge 编辑器
+- **S58-E5.5**: `wsConflictHandler.ts` — 冲突解决后发送 `conflict:resolved` 消息
+- **S58-E5.6**: `conflictStore.test.ts` — 6 个 vitest 测试全部通过
+- **S58-E5.7**: `ConflictDialog.test.tsx` — 18 个 vitest 测试全部通过

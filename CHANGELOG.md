@@ -1,3 +1,12 @@
+
+---
+
+## [Unreleased] S58-E2: 桌面文件拖拽导入 — 2026-06-03
+- **S58-E2.1**: `useFileDrop.ts` — drag state management, `.vibex`/`.json`/`.yaml`/`.yml` parse, confirmImport
+- **S58-E2.2**: `DropOverlay.tsx` — full-screen animated overlay during drag
+- **S58-E2.3**: `FileImportDialog.tsx` — preview/confirm dialog with valid/error counts
+- **S58-E2.4**: `DDSFlow.tsx` — onDragOver/onDragLeave/onDrop handlers + overlay/dialog renders
+- **S58-E2.5**: `useFileDrop.test.ts` — 8 passing vitest tests (isDragging, processDrop, reset, removeFile, confirmImport)
 ## [Unreleased] Sprint 49 — E3 视口性能优化 + E5 协作评论系统
 
 ##### S49-E3: 视口性能优化（防抖 + 节点边界扩展）

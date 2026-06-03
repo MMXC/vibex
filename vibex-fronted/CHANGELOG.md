@@ -710,3 +710,41 @@
 - **S58-E5.5**: `wsConflictHandler.ts` — 冲突解决后发送 `conflict:resolved` 消息
 - **S58-E5.6**: `conflictStore.test.ts` — 6 个 vitest 测试全部通过
 - **S58-E5.7**: `ConflictDialog.test.tsx` — 18 个 vitest 测试全部通过
+
+
+---
+
+## [Unreleased] S59-E1: 画布全局搜索 — 2026-06-11
+- **S59-E1.1**: `canvasSearchStore.ts` — Fuse.js 搜索状态管理，`cmd+k` 快捷键，`searchResults`/`isSearchOpen`
+- **S59-E1.2**: `SearchPanel.tsx` — DDSSearchPanel 搜索面板，支持实时搜索 + 节点高亮
+- **S59-E1.3**: `useSearchIndex.ts` — 画布节点索引构建，Fuse.js index 管理
+- **S59-E1.4**: `fullTextSearch.ts` — 全文搜索核心算法，支持标题 + 内容匹配
+- **S59-E1.5**: `DDSCanvasPage.tsx` — 集成搜索面板，Cmd+K 触发，支持搜索结果导航
+- **S59-E1.6**: `canvasSearchStore.test.ts` — 11 个 vitest 测试全部通过
+- **S59-E1.7**: `fullTextSearch.test.ts` — 10 个 vitest 测试全部通过
+
+## [Unreleased] S59-E2: 评论实时通知 — 2026-06-11
+- **S59-E2.1**: `commentStore.ts` — reactions 支持 + @mention 通知状态管理
+- **S59-E2.2**: `wsCommentHandler.ts` — @mention 动态导入 `import('@/stores/dds/mentionsStore')`，`comment:mention` 消息处理
+- **S59-E2.3**: `commentStore.test.ts` — 18 个 vitest 测试全部通过
+- **S59-E2.4**: `wsCommentHandler.test.ts` — WS 消息处理测试全部通过
+
+## [Unreleased] S59-E3: 画布节点自动布局 — 2026-06-11
+- **S59-E3.1**: `dagreLayout.ts` — 基于 `@types/dagre` 的 DAG 自动布局算法，`applyLayoutToCards`/`computeLayout`
+- **S59-E3.2**: `autoLayoutStore.ts` — 布局状态管理 + `isLayouting` 状态
+- **S59-E3.3**: `useAutoLayout.ts` — React hook，`handleAutoLayout` + 快捷注册
+- **S59-E3.4**: `dagreLayout.test.ts` + `autoLayoutStore.test.ts` — 20 个 vitest 测试全部通过
+- **S59-E3.5**: `DDSToolbar.tsx` — Cmd+L 自动布局按钮集成，`aria-label="自动布局"`
+
+## [Unreleased] S59-E4: 模板批量导入导出 — 2026-06-11
+- **S59-E4.1**: `templateStore.ts` — `addTemplate`/`addTag`/`removeTag` 方法完善，`importTemplates`/`exportTemplates`
+- **S59-E4.2**: `templateExport.ts` — `exportTemplatesToBlob` Blob 下载，支持 JSON/YAML 格式
+- **S59-E4.3**: `templateImport.ts` — `importTemplatesFromFile` 文件上传，支持 conflict 策略（skip/overwrite）
+- **S59-E4.4**: `TemplateGallery.tsx` — 导入/导出按钮 UI，`importTemplatesFromFile` + `exportTemplatesToBlob` 集成
+- **S59-E4.5**: `templateStore.test.ts` — 42 个 vitest 测试全部通过（含 E4 import/export 策略测试）
+
+## [Unreleased] S59-E5: 键盘快捷键扩展 — 2026-06-11
+- **S59-E5.1**: `shortcutStore.ts` — 快捷键注册表 + 冲突检测 + localStorage 持久化 + `loadDefaults`
+- **S59-E5.2**: `useKeyboardShortcuts.ts` — 自动布局快捷键注册（Cmd+L），可扩展架构
+- **S59-E5.3**: `DDSToolbar.tsx` — 键盘快捷键设置按钮，`isShortcutSettingsOpen` 状态
+- **S59-E5.4**: `shortcutStore.test.ts` + `useKeyboardShortcuts.test.ts` — vitest 测试全部通过

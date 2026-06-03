@@ -16,6 +16,13 @@
 - **S60-E4.1**: `ExportMenu.tsx` — 添加 PDF batch export radio button 选项，支持 PNG/SVG/PDF 三种格式批量导出
 - **S60-E4.2**: `src/services/export/__tests__/ZipExporter.test.ts` — 15 个 vitest 测试（PNG/PDF capture、JSZip manifest、filename sanitization、collectNodes scopes、progress callback）
 - **S60-E4**: ZipExporter PNG/PDF 支持、D4.3 ExportMenu PDF 选项、D4.5 vitest 测试覆盖
+## [Unreleased] S60-E5: 搜索体验增强 — 2026-06-04
+- **S60-E5.1**: `canvasSearchStore.ts` — Zustand store, searchHistory localStorage 持久化（最多 10 条，最新优先，dedup）
+- **S60-E5.2**: `DDSSearchPanel.tsx` — 新增"最近搜索"Tab + "搜索结果"Tab tablist 导航
+- **S60-E5.3**: `DDSSearchPanel.tsx` — 搜索结果关键词高亮（`<mark>` 标签），支持大小写不敏感
+- **S60-E5.4**: `DDSSearchPanel.tsx` — history tab ↑↓ 键盘导航 + Enter 选历史项
+- **S60-E5.5**: vitest: `canvasSearchStore.test.ts` 10/10 + `DDSSearchPanel.test.tsx` 16/16
+
 
 - **S58-E2.1**: `useFileDrop.ts` — drag state management, `.vibex`/`.json`/`.yaml`/`.yml` parse, confirmImport
 - **S58-E2.2**: `DropOverlay.tsx` — full-screen animated overlay during drag

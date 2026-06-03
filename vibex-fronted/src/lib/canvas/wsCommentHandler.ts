@@ -91,6 +91,7 @@ export function handleCommentWSMessage(data: unknown): void {
             projectId: comment.projectId ?? 'current-project',
             nodeId: comment.nodeId,
             timestamp: comment.timestamp ?? Date.now(),
+            sourceType: 'comment', // S57-E5: WebSocket来源 = comment
           });
         }).catch(err => {
           console.error('[wsCommentHandler] Failed to import parseMentions:', err);

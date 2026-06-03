@@ -5,6 +5,7 @@
  * - 追踪当前用户收到的 @mention 通知
  * - 记录已读/未读状态
  * - 提供 mentions[] 列表供 UI 渲染
+ * - S57-E5: 新增 sourceType 字段（'comment' | 'chat'），支持按来源类型分类展示
  *
  * 设计决策：
  * - 模块级 listeners，与 commentStore 事件订阅模式一致
@@ -12,6 +13,9 @@
  * - WebSocket comment:mention 消息触发 addMention
  */
 import { create } from 'zustand';
+
+/** S57-E5: 通知来源类型 */
+export type MentionSourceType = 'comment' | 'chat';
 
 export interface Mention {
   mentionId: string;
@@ -23,6 +27,8 @@ export interface Mention {
   nodeId?: string;
   timestamp: number;
   read: boolean;
+  // S57-E5: 来源类型 — comment (评论) 或 chat (对话)
+  sourceType: MentionSourceType;
 }
 
 export interface MentionEvent {

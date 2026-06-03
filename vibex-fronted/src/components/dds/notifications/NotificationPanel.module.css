@@ -150,3 +150,52 @@
   background: #3b82f6;
   box-shadow: 0 0 4px rgba(59, 130, 246, 0.6);
 }
+
+/* S57-E5: Tab bar styles */
+.tabBar {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0 4px;
+  gap: 2px;
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 6px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  margin-bottom: -1px;
+}
+
+.tab:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.tabActive {
+  color: #818cf8;
+  border-bottom-color: #818cf8;
+}
+
+.tabBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: rgba(59, 130, 246, 0.25);
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #93c5fd;
+}

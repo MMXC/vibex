@@ -47,7 +47,9 @@ function BellIcon() {
 export const NotificationBell = memo(function NotificationBell({
   onMentionClick,
 }: NotificationBellProps) {
-  const unreadCount = useMentionsStore((s) => s.unreadCount);
+  const allMentions = useMentionsStore((s) => s.mentions);
+  // S57-E5: badge shows comment mention count (独立计数)
+  const commentUnread = allMentions.filter((m) => !m.read && m.sourceType === 'comment').length;
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -91,14 +93,14 @@ export const NotificationBell = memo(function NotificationBell({
       <button
         className={styles.bellButton}
         onClick={handleBellClick}
-        aria-label={unreadCount > 0 ? `通知 (${unreadCount} 条未读)` : '通知'}
+        aria-label={commentUnread > 0 ? `评论提及 (${commentUnread} 条未读)` : '通知'}
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
         <BellIcon />
-        {unreadCount > 0 && (
+        {commentUnread > 0 && (
           <span className={styles.badge} aria-hidden="true">
-            {unreadCount > 99 ? '99+' : unreadCount}
+            {commentUnread > 99 ? '99+' : commentUnread}
           </span>
         )}
       </button>

@@ -15,6 +15,7 @@
 
 import { create } from 'zustand';
 import { openDB } from 'idb';
+import { parseMentions } from '@/lib/canvas/parseMentions';
 
 // ==================== Types ====================
 
@@ -145,6 +146,27 @@ export const useCommentStore = create<CommentStoreState>((set, get) => ({
       return { comments, unreadCount: state.unreadCount + 1 };
     });
     emitCommentEvent({ type: 'comment:created', comment });
+
+    // S57-E5: extract @mentions from comment text → write to mentionsStore
+    import('@/stores/dds/mentionsStore').then(({ useMentionsStore: useMentionStore }) => {
+      const mentionedUsers = parseMentions(text);
+      const currentUser = author ?? 'User';
+      mentionedUsers.forEach((toUser) => {
+        useMentionStore.getState().addMention({
+          commentId: comment.commentId,
+          fromUser: currentUser,
+          toUser,
+          commentText: text,
+          projectId: 'current-project',
+          nodeId,
+          timestamp: comment.timestamp,
+          sourceType: 'comment', // S57-E5: local comment → sourceType=comment
+        });
+      });
+    }).catch((err) => {
+      console.error('[commentStore] Failed to import mentionsStore:', err);
+    });
+
     return comment;
   },
 

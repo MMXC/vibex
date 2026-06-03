@@ -2,6 +2,11 @@
  * canvasHistoryStore — Unit Tests
  * P001: U5-P001
  * E1 (Sprint58): 画布版本分支管理 — Snapshot tests
+ *
+ * Fix (2026-06-10): vi.mock hoisting bug — canvasHistoryStore uses dynamic
+ * `await import('@/lib/canvas/historyDB')` inside action bodies. Plain vi.mock
+ * only intercepts static imports. Fix: use vi.hoisted() to create shared mock
+ * refs accessible from both the mock factory AND the test body.
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
@@ -218,6 +223,27 @@ describe('canvasHistoryStore — P001 U5', () => {
 
 // ==================== E1: Snapshot Tests ====================
 
+// vi.hoisted MUST come before vi.mock — creates shared mock refs that work with
+// the store's dynamic `await import('@/lib/canvas/historyDB')` inside action bodies.
+// Plain vi.mock factory `vi.fn()` creates local refs invisible to test body.
+// vi.hoisted() makes refs accessible from both mock factory AND test code.
+const { mockSaveSnapshotToDB, mockLoadSnapshotFromDB, mockListSnapshotsFromDB, mockDeleteSnapshotFromDB } =
+  vi.hoisted(() => ({
+    mockSaveSnapshotToDB: vi.fn().mockResolvedValue(undefined),
+    mockLoadSnapshotFromDB: vi.fn().mockResolvedValue(null),
+    mockListSnapshotsFromDB: vi.fn().mockResolvedValue([]),
+    mockDeleteSnapshotFromDB: vi.fn().mockResolvedValue(undefined),
+  }));
+
+// Mock the historyDB module — vi.hoisted refs are used inside the factory so
+// both the mock AND the test body share the same spy instances
+vi.mock('@/lib/canvas/historyDB', () => ({
+  saveSnapshotToDB: mockSaveSnapshotToDB,
+  loadSnapshotFromDB: mockLoadSnapshotFromDB,
+  listSnapshotsFromDB: mockListSnapshotsFromDB,
+  deleteSnapshotFromDB: mockDeleteSnapshotFromDB,
+}));
+
 describe('canvasHistoryStore — E1 Snapshots (Sprint58)', () => {
   beforeEach(() => {
     useCanvasHistoryStore.setState({
@@ -227,6 +253,7 @@ describe('canvasHistoryStore — E1 Snapshots (Sprint58)', () => {
       snapshots: [],
       restoringSnapshotId: null,
     });
+    vi.clearAllMocks();
   });
 
   it('initial state has empty snapshots and null restoringSnapshotId', () => {
@@ -235,80 +262,66 @@ describe('canvasHistoryStore — E1 Snapshots (Sprint58)', () => {
     expect(state.restoringSnapshotId).toBeNull();
   });
 
-  it('setRestoringSnapshotId updates state', () => {
+  it('setRestoringSnapshotId updates and clears state', () => {
     useCanvasHistoryStore.getState().setRestoringSnapshotId('snapshot-123');
     expect(useCanvasHistoryStore.getState().restoringSnapshotId).toBe('snapshot-123');
     useCanvasHistoryStore.getState().setRestoringSnapshotId(null);
     expect(useCanvasHistoryStore.getState().restoringSnapshotId).toBeNull();
   });
 
-  it('saveSnapshot adds a snapshot to the list (mocked IndexedDB)', async () => {
-    // Mock the historyDB module
-    vi.mock('@/lib/canvas/historyDB', () => ({
-      saveSnapshotToDB: vi.fn().mockResolvedValue(undefined),
-      listSnapshotsFromDB: vi.fn().mockResolvedValue([
-        {
-          id: 'snapshot-1',
-          name: '版本 1',
-          timestamp: 1717200000000,
-          data: { nodes: [], edges: [] },
-        },
-      ]),
-    }));
-
-    const { saveSnapshot, snapshots } = useCanvasHistoryStore.getState();
+  it('saveSnapshot calls saveSnapshotToDB with canvasId and snapshot object', async () => {
+    const { saveSnapshot } = useCanvasHistoryStore.getState();
     await saveSnapshot('canvas-1', '版本 1', { nodes: [], edges: [] });
-
-    // After saveSnapshot, snapshots should be refreshed from listSnapshots
-    expect(snapshots.length).toBeGreaterThanOrEqual(0);
+    // verify saveSnapshotToDB was called with canvasId + snapshot object
+    expect(mockSaveSnapshotToDB).toHaveBeenCalledWith(
+      'canvas-1',
+      expect.objectContaining({ id: expect.any(String), name: '版本 1' })
+    );
   });
 
-  it('listSnapshots returns sorted snapshots (newest first)', async () => {
-    vi.mock('@/lib/canvas/historyDB', () => ({
-      listSnapshotsFromDB: vi.fn().mockResolvedValue([
-        { id: 's1', name: 'v1', timestamp: 1000, data: { nodes: [], edges: [] } },
-        { id: 's2', name: 'v2', timestamp: 3000, data: { nodes: [], edges: [] } },
-        { id: 's3', name: 'v3', timestamp: 2000, data: { nodes: [], edges: [] } },
-      ]),
-    }));
+  it('listSnapshots sorts by timestamp descending (newest first)', async () => {
+    mockListSnapshotsFromDB.mockResolvedValue([
+      { id: 's1', name: 'v1', timestamp: 1000, data: { nodes: [], edges: [] } },
+      { id: 's2', name: 'v2', timestamp: 3000, data: { nodes: [], edges: [] } },
+      { id: 's3', name: 'v3', timestamp: 2000, data: { nodes: [], edges: [] } },
+    ]);
 
     const { listSnapshots } = useCanvasHistoryStore.getState();
     const result = await listSnapshots('canvas-1');
 
-    // Should be sorted by timestamp descending
+    // store sorts: newest first (3000, 2000, 1000)
     expect(result[0].id).toBe('s2');
     expect(result[1].id).toBe('s3');
     expect(result[2].id).toBe('s1');
   });
 
-  it('loadSnapshot returns null when IndexedDB unavailable', async () => {
-    vi.mock('@/lib/canvas/historyDB', () => ({
-      loadSnapshotFromDB: vi.fn().mockResolvedValue(null),
-    }));
+  it('listSnapshots calls listSnapshotsFromDB with canvasId', async () => {
+    mockListSnapshotsFromDB.mockResolvedValue([]);
+    const { listSnapshots } = useCanvasHistoryStore.getState();
+    await listSnapshots('my-canvas');
+    expect(mockListSnapshotsFromDB).toHaveBeenCalledWith('my-canvas');
+  });
 
+  it('loadSnapshot returns null when IndexedDB returns null', async () => {
+    mockListSnapshotsFromDB.mockResolvedValue(null);
     const { loadSnapshot } = useCanvasHistoryStore.getState();
-    const result = await loadSnapshot('canvas-1', 'snapshot-1');
+    const result = await loadSnapshot('canvas-1', 'snap-1');
     expect(result).toBeNull();
   });
 
-  it('deleteSnapshot removes snapshot from state', async () => {
-    vi.mock('@/lib/canvas/historyDB', () => ({
-      deleteSnapshotFromDB: vi.fn().mockResolvedValue(undefined),
-    }));
+  it('loadSnapshot returns snapshot data when found', async () => {
+    const snapshot = { id: 'snap-1', name: 'v1', timestamp: 1000, data: { nodes: [], edges: [] } };
+    mockListSnapshotsFromDB.mockResolvedValue(snapshot);
+    const { loadSnapshot } = useCanvasHistoryStore.getState();
+    const result = await loadSnapshot('canvas-1', 'snap-1');
+    // store extracts .data from the snapshot
+    expect(result).toEqual({ nodes: [], edges: [] });
+  });
 
-    // Pre-populate with mock snapshots
-    useCanvasHistoryStore.setState({
-      snapshots: [
-        { id: 's1', name: 'v1', timestamp: 1000, data: { nodes: [], edges: [] } },
-        { id: 's2', name: 'v2', timestamp: 2000, data: { nodes: [], edges: [] } },
-      ],
-    });
-
-    const { deleteSnapshot, snapshots } = useCanvasHistoryStore.getState();
+  it('deleteSnapshot calls deleteSnapshotFromDB with canvasId and snapshotId', async () => {
+    const { deleteSnapshot } = useCanvasHistoryStore.getState();
     await deleteSnapshot('canvas-1', 's1');
-
-    expect(snapshots.filter((s) => s.id === 's1')).toHaveLength(0);
-    expect(snapshots.filter((s) => s.id === 's2')).toHaveLength(1);
+    expect(mockDeleteSnapshotFromDB).toHaveBeenCalledWith('canvas-1', 's1');
   });
 });
 

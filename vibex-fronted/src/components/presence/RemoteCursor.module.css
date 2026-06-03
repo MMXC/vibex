@@ -1,5 +1,5 @@
 /**
- * RemoteCursor — E3-Firebase-Cursor S3.2
+ * RemoteCursor — S60-E3: added statusDot + status pulse animations
  * CSS Module for cursor styling
  * Uses transform: translate() for smooth position tracking
  */
@@ -12,6 +12,57 @@
   z-index: 1000;
   will-change: transform;
   transition: transform 50ms linear;
+}
+
+/* S60-E3: Status indicator dot — positioned relative to cursor */
+.statusDot {
+  position: absolute;
+  top: -4px;
+  left: 10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0, 0, 0, 0.4);
+  display: block;
+}
+
+/** Online: green pulse animation */
+.statusOnline {
+  background-color: #22c55e;
+  animation: pulse-online 2s ease-in-out infinite;
+}
+
+/** Idle: amber pulse animation */
+.statusIdle {
+  background-color: #f59e0b;
+  animation: pulse-idle 2.5s ease-in-out infinite;
+}
+
+/** Offline: grey, no animation */
+.statusOffline {
+  background-color: #6b7280;
+}
+
+@keyframes pulse-online {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0);
+    transform: scale(1.1);
+  }
+}
+
+@keyframes pulse-idle {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0);
+    transform: scale(1.05);
+  }
 }
 
 .cursorIcon {

@@ -1,20 +1,22 @@
 /**
  * RemoteCursor WebSocket — S45-P002-E2 vitest
- * Migrated from Firebase usePresence to Zustand usePresenceStore.
+ * S60-E3: Added status indicator (online/idle) tests
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { RemoteCursor } from '../RemoteCursor';
 import { usePresenceStore } from '@/lib/collaboration/presenceStore';
+import { useActivityStore } from '@/lib/collaboration/activityStore';
 
 describe('RemoteCursor (WebSocket)', () => {
   beforeEach(() => {
-    // Reset store
+    // Reset stores — S60-E3: also reset activityStore
     usePresenceStore.setState({
       remoteUsers: new Map(),
       lockedNodes: {},
     });
+    useActivityStore.setState({ entries: [], userStatuses: {} });
   });
 
   it('renders no cursor when remoteUsers is empty', () => {
@@ -84,5 +86,83 @@ describe('RemoteCursor (WebSocket)', () => {
     const cursor = screen.getByTestId('remote-cursor');
     const style = cursor.style as unknown as Record<string, string>;
     expect(style.transform).toContain('translate(150px, 250px)');
+  });
+
+  // ========== S60-E3: Online/Idle Status Indicator Tests ==========
+
+  it('renders status dot with online class when user is online', () => {
+    usePresenceStore.setState({
+      remoteUsers: new Map([
+        ['user-alice', { userId: 'user-alice', name: 'Alice', avatar: 'A', cursorX: 100, cursorY: 200, lastSeen: Date.now() }],
+      ]),
+    });
+
+    render(<RemoteCursor userId="self-1" />);
+    const cursor = screen.getByTestId('remote-cursor');
+    expect(cursor).toHaveAttribute('data-status', 'online');
+    const statusDot = screen.getByTestId('remote-cursor-status');
+    expect(statusDot).toBeInTheDocument();
+  });
+
+  it('renders status dot with idle class when user is idle (lastSeen > 60s)', () => {
+    usePresenceStore.setState({
+      remoteUsers: new Map([
+        ['user-alice', { userId: 'user-alice', name: 'Alice', avatar: 'A', cursorX: 100, cursorY: 200, lastSeen: Date.now() - 90_000 }],
+      ]),
+    });
+
+    render(<RemoteCursor userId="self-1" />);
+    const cursor = screen.getByTestId('remote-cursor');
+    expect(cursor).toHaveAttribute('data-status', 'idle');
+  });
+
+  it('derives idle from presenceStore.lastSeen when activityStore has no record and lastSeen > 60s', () => {
+    // Component uses presenceStore.lastSeen as fallback (not activityStore) → idle
+    usePresenceStore.setState({
+      remoteUsers: new Map([
+        ['user-alice', { userId: 'user-alice', name: 'Alice', avatar: 'A', cursorX: 100, cursorY: 200, lastSeen: Date.now() - 90_000 }],
+      ]),
+    });
+    // No activityStore record — component derives from presenceStore.lastSeen
+
+    render(<RemoteCursor userId="self-1" />);
+    const cursor = screen.getByTestId('remote-cursor');
+    // Component derives from presenceStore.lastSeen (>60s) → idle
+    expect(cursor).toHaveAttribute('data-status', 'idle');
+  });
+
+  it('uses activityStore status when available', () => {
+    usePresenceStore.setState({
+      remoteUsers: new Map([
+        ['user-alice', { userId: 'user-alice', name: 'Alice', avatar: 'A', cursorX: 100, cursorY: 200, lastSeen: Date.now() - 90_000 }],
+      ]),
+    });
+    // Override via activityStore: user should be shown as online
+    useActivityStore.setState({
+      userStatuses: {
+        'user-alice': { userId: 'user-alice', userName: 'Alice', status: 'online', lastSeen: Date.now() },
+      },
+    });
+
+    render(<RemoteCursor userId="self-1" />);
+    const cursor = screen.getByTestId('remote-cursor');
+    expect(cursor).toHaveAttribute('data-status', 'online');
+  });
+
+  it('renders offline when activityStore explicitly marks user as offline', () => {
+    usePresenceStore.setState({
+      remoteUsers: new Map([
+        ['user-alice', { userId: 'user-alice', name: 'Alice', avatar: 'A', cursorX: 100, cursorY: 200, lastSeen: Date.now() }],
+      ]),
+    });
+    useActivityStore.setState({
+      userStatuses: {
+        'user-alice': { userId: 'user-alice', userName: 'Alice', status: 'offline', lastSeen: Date.now() - 6 * 60_000 },
+      },
+    });
+
+    render(<RemoteCursor userId="self-1" />);
+    const cursor = screen.getByTestId('remote-cursor');
+    expect(cursor).toHaveAttribute('data-status', 'offline');
   });
 });

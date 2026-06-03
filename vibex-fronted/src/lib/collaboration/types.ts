@@ -1,7 +1,8 @@
 /**
- * Collaboration Types — VibeX P002-E1
+ * Collaboration Types — VibeX P002-E1 + S60-E3
  *
  * WebSocket protocol types shared between websocket.ts and useCollaboration.ts
+ * S60-E3: Activity stream + online status indicators
  */
 
 // ==================== Client → Server ====================
@@ -45,6 +46,36 @@ export interface ConflictMessage {
   conflictingUserId: string;
 }
 
+// ==================== S60-E3: Activity Stream ====================
+
+/** Activity type enumeration for activity feed */
+export type ActivityType =
+  | 'join'       // User joined canvas
+  | 'leave'      // User left canvas
+  | 'edit'       // User edited a node
+  | 'add'        // User added a node
+  | 'delete'     // User deleted a node
+  | 'lock'       // User locked a node
+  | 'unlock'     // User unlocked a node
+  | 'cursor_move'; // User moved cursor (throttled — not broadcast on every move)
+
+/** Single activity entry for the activity feed */
+export interface ActivityEntry {
+  id: string;
+  userId: string;
+  userName: string;
+  type: ActivityType;
+  nodeId?: string;
+  nodeName?: string;
+  timestamp: number;
+}
+
+/** WebSocket message: server broadcasts activity updates every 5s */
+export interface ActivityMessage {
+  type: 'activity:update';
+  entries: ActivityEntry[];
+}
+
 // ==================== Union ====================
 
 export type CollabMessage =
@@ -52,7 +83,8 @@ export type CollabMessage =
   | ActionMessage
   | RemoteActionMessage
   | PresenceMessage
-  | ConflictMessage;
+  | ConflictMessage
+  | ActivityMessage;
 
 // ==================== Action Payload ====================
 

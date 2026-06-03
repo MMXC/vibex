@@ -45,6 +45,12 @@ interface UseCollaborationReturn {
   connect: () => void;
   disconnect: () => void;
   retryFirebase: () => void;
+  /**
+   * E3: 协作者 Cursor 同步
+   * 广播当前用户在画布上的鼠标位置（flow 坐标）
+   * 已内置 100ms 节流，避免过于频繁的广播
+   */
+  broadcastCursor: (flowX: number, flowY: number, nodeId?: string) => void;
 }
 
 // E1-S4: 指数退避延迟表：1s → 2s → 4s → 8s → 16s
@@ -323,6 +329,33 @@ export function useCollaboration(
   );
 
   // ============================================================================
+  // E3: 协作者 Cursor 广播（100ms 节流）
+  // ============================================================================
+  const CURSOR_THROTTLE_MS = 100;
+  const lastCursorBroadcastRef = useRef(0);
+
+  const broadcastCursor = useCallback(
+    (flowX: number, flowY: number, nodeId?: string) => {
+      const now = Date.now();
+      if (now - lastCursorBroadcastRef.current < CURSOR_THROTTLE_MS) {
+        return; // 节流：跳过
+      }
+      lastCursorBroadcastRef.current = now;
+
+      sendMessage({
+        type: 'cursor',
+        action: 'move',
+        payload: {
+          x: flowX,
+          y: flowY,
+          nodeId,
+        },
+      });
+    },
+    [sendMessage]
+  );
+
+  // ============================================================================
   // E1-S4: Firebase 可用性检查（timeout 5s）
   // ============================================================================
   useEffect(() => {
@@ -393,6 +426,7 @@ export function useCollaboration(
     connect,
     disconnect,
     retryFirebase,
+    broadcastCursor,
   };
 }
 

@@ -2,10 +2,12 @@
  * DDSFlow — ReactFlow Canvas for DDS Chapters
  * Epic 2b: ReactFlow集成
  * S58-E2: 桌面文件拖拽导入
+ * S58-E3: 协作者 Cursor 同步完善
  *
  * Renders cards as ReactFlow nodes with animated edges.
  * Uses useDDSCanvasFlow hook for store ↔ view sync.
  * E2: Integrates useFileDrop for drag-drop file import.
+ * E3: Integrates useCollaboration.broadcastCursor for cursor sync.
  *
  * @module components/dds/canvas/DDSFlow
  */
@@ -37,6 +39,9 @@ import styles from './DDSFlow.module.css';
 import { useFileDrop } from './useFileDrop';
 import { DropOverlay } from './DropOverlay';
 import { FileImportDialog } from './FileImportDialog';
+// E3: Collaboration cursor broadcast
+import { useCollaboration } from '@/hooks/useCollaboration';
+import { screenToFlowPosition } from '@xyflow/react';
 
 // ==================== Node Component ====================
 
@@ -109,7 +114,10 @@ function DDSFlowInner({
     removeFile,
   } = useFileDrop();
 
-  const { fitView } = useReactFlow();
+  const { fitView, getViewport } = useReactFlow();
+
+  // E3: Collaboration cursor broadcast
+  const { broadcastCursor } = useCollaboration();
 
   // Node click → onSelectCard
   const handleNodeClick = useCallback(
@@ -119,6 +127,16 @@ function DDSFlowInner({
       }
     },
     [onSelectCard]
+  );
+
+  // E3: Cursor broadcast on node hover (throttled inside broadcastCursor, 100ms)
+  const handleNodeMouseMove = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      const viewport = getViewport();
+      const flowPos = screenToFlowPosition({ x: event.clientX, y: event.clientY }, viewport);
+      broadcastCursor(flowPos.x, flowPos.y, node.id);
+    },
+    [getViewport, broadcastCursor]
   );
 
   // E2: Drag event handlers
@@ -185,6 +203,7 @@ function DDSFlowInner({
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onNodeClick={handleNodeClick}
+          onNodeMouseMove={handleNodeMouseMove}
           nodeTypes={nodeTypes}
           fitView
           fitViewOptions={{ padding: 0.2 }}

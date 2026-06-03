@@ -748,3 +748,21 @@
 - **S59-E5.2**: `useKeyboardShortcuts.ts` — 自动布局快捷键注册（Cmd+L），可扩展架构
 - **S59-E5.3**: `DDSToolbar.tsx` — 键盘快捷键设置按钮，`isShortcutSettingsOpen` 状态
 - **S59-E5.4**: `shortcutStore.test.ts` + `useKeyboardShortcuts.test.ts` — vitest 测试全部通过
+
+## [Unreleased] S60-E1: 画布版本历史 UI 增强 — 2026-06-03
+- **S60-E1.1**: `Snapshot` 接口新增 `branchName`/`isStarred` 可选字段
+- **S60-E1.2**: `SnapshotDiff` 接口：`added`/`removed`/`modified` 节点差异
+- **S60-E1.3**: `canvasHistoryStore.compareSnapshots()` — 基于 Set+深比较
+- **S60-E1.4**: `canvasHistoryStore.updateSnapshotMetadata()` — 星标/分支名更新
+- **S60-E1.5**: `historyDB`: DB_VERSION→3，存储/读取 `branchName`/`isStarred`
+- **S60-E1.6**: `HistoryPanel.tsx` — 时间线视图+列表视图切换
+- **S60-E1.7**: `SnapshotDiffDialog.tsx` — 快照对比弹窗
+- **S60-E1.8**: `TimelineView.tsx` — 时间线节点卡片
+
+---
+
+## [Unreleased] S60-E2: 批量操作增强 — 2026-06-04
+- **S60-E2.1**: 新增 `batchOpsStore.ts` — UI状态管理（删除确认对话框、重命名对话框前缀/后缀模式、操作状态）
+- **S60-E2.2**: 新增 `BatchOpsToolbar.tsx` — 批量删除/重命名浮层，CanvasListPanel 多选时显示
+- **S60-E2.3**: 扩展 `canvasListStore.ts` — `batchDeleteCanvas()` / `batchRenameCanvas()` 批量操作方法
+- **S60-E2.4**: vitest: 28 tests passing（`batchOpsStore.test.ts` 15 + `canvasListStore.batchOps.test.ts` 7 + `BatchOpsToolbar.test.tsx` 6）

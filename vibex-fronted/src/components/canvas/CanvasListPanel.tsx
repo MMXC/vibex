@@ -17,6 +17,8 @@ import { useState, useCallback, useRef } from 'react';
 import { useCanvasList } from '@/hooks/useCanvasList';
 import { useCanvasListStore } from '@/stores/canvasListStore';
 import { useClipboardStore } from '@/stores/clipboardStore';
+import { useBatchOpsStore } from '@/stores/dds/batchOpsStore';
+import { BatchOpsToolbar } from '@/components/dds/canvas-dashboard/BatchOpsToolbar';
 import type { CanvasMeta } from '@/stores/canvasListStore';
 import styles from './CanvasListPanel.module.css';
 
@@ -159,7 +161,10 @@ export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListP
         )}
       </div>
 
-      {/* Sort controls + batch export (Sprint48 E2) */}
+      {/* Batch operations toolbar (Sprint60 E2) — appears when canvases are selected */}
+      <BatchOpsToolbar selectedCount={selectedCount} />
+
+      {/* Sort controls (Sprint48 E2) */}
       <div className={styles['canvas-list-panel__sort']}>
         <button
           className={`${styles['sort-btn']}${sortMode === 'updatedAt' ? ` ${styles['sort-btn--active']}` : ''}`}

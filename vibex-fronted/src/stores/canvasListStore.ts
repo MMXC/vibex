@@ -3,6 +3,7 @@
  *
  * 职责：管理画布列表元数据（名称、创建时间、修改时间、缩略图）。
  * 持久化：IndexedDB (ddsPersistence service) + localStorage index。
+ *
  */
 
 import { create } from 'zustand';
@@ -20,6 +21,7 @@ export interface CanvasMeta {
   updatedAt: string; // ISO 8601
 }
 
+
 export interface CanvasListState {
   /** In-memory canvas list, sorted by updatedAt descending */
   canvases: CanvasMeta[];
@@ -33,6 +35,7 @@ export interface CanvasListState {
   thumbnailCache: Record<string, string>;
   /** Multi-select set for batch export (Sprint48 E2) */
   selectedCanvasIds: Set<string>;
+
 
   // Actions
   loadCanvases: () => Promise<void>;
@@ -58,6 +61,11 @@ export interface CanvasListState {
   exportSelectedPDF: () => Promise<void>;
   /** Paste clipboard cards to target canvas (Sprint48 E5) */
   pasteToCanvas: (canvasId: string) => void;
+  /** Batch delete all selected canvases (Sprint60 E2) */
+  batchDeleteCanvas: () => Promise<void>;
+  /** Batch rename all selected canvases (Sprint60 E2) */
+  batchRenameCanvas: (mode: 'prefix' | 'suffix', prefix: string, suffix: string) => Promise<void>;
+
 }
 
 // ============================================
@@ -358,4 +366,57 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
       console.debug('[canvasListStore] pasteToCanvas:', count, 'cards pasted to', meta.name);
     }
   },
+
+  // ============================================================
+  // Sprint60 E2: Batch Operations
+  // ============================================================
+
+  batchDeleteCanvas: async () => {
+    const { selectedCanvasIds, canvases } = get();
+    if (selectedCanvasIds.size === 0) return;
+
+    // Delete each selected canvas sequentially
+    for (const canvasId of selectedCanvasIds) {
+      await get().deleteCanvas(canvasId);
+    }
+
+    // Clear selection after deletion
+    set({ selectedCanvasIds: new Set() });
+  },
+
+  batchRenameCanvas: async (mode, prefix, suffix) => {
+    const { selectedCanvasIds, canvases } = get();
+    if (selectedCanvasIds.size === 0) return;
+
+    for (const canvasId of selectedCanvasIds) {
+      const canvas = canvases.find((c) => c.id === canvasId);
+      if (!canvas) continue;
+
+      let newName = canvas.name;
+      if (mode === 'prefix') {
+        // Replace prefix: find first hyphen/dot/space or start, replace everything before it
+        const match = canvas.name.match(/^([\[\]【】『』（""''『』「」\s]*)(.+)/);
+        const body = match ? match[2] : canvas.name;
+        newName = prefix + body;
+      } else {
+        // Suffix mode: replace extension-like suffix (before last . or space) or append
+        const dotIdx = canvas.name.lastIndexOf('.');
+        if (dotIdx > 0) {
+          newName = canvas.name.slice(0, dotIdx) + suffix;
+        } else {
+          newName = canvas.name + suffix;
+        }
+      }
+
+      if (newName !== canvas.name) {
+        await get().renameCanvas(canvasId, newName);
+      }
+    }
+
+    // Clear selection after rename
+    set({ selectedCanvasIds: new Set() });
+  },
+
+  // ============================================================
+  $reset: () => set({ selectedCanvasIds: new Set() }),
 }));

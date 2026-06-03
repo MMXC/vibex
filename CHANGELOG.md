@@ -11,6 +11,12 @@
 - **S60-E3**: `activityHandler.ts` — WS `activity:update` 消息处理
 - **S60-E3**: `types.ts` — `ActivityMessage` + `ActivityEntry` 类型扩展
 - **S60-E3**: vitest 17/17 通过 (activityStore 11 + ActivityFeed 5 + RemoteCursor 11)
+
+## [Unreleased] S60-E4: 画布导出增强 — 2026-06-04
+- **S60-E4.1**: `ExportMenu.tsx` — 添加 PDF batch export radio button 选项，支持 PNG/SVG/PDF 三种格式批量导出
+- **S60-E4.2**: `src/services/export/__tests__/ZipExporter.test.ts` — 15 个 vitest 测试（PNG/PDF capture、JSZip manifest、filename sanitization、collectNodes scopes、progress callback）
+- **S60-E4**: ZipExporter PNG/PDF 支持、D4.3 ExportMenu PDF 选项、D4.5 vitest 测试覆盖
+
 - **S58-E2.1**: `useFileDrop.ts` — drag state management, `.vibex`/`.json`/`.yaml`/`.yml` parse, confirmImport
 - **S58-E2.2**: `DropOverlay.tsx` — full-screen animated overlay during drag
 - **S58-E2.3**: `FileImportDialog.tsx` — preview/confirm dialog with valid/error counts

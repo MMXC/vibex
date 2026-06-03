@@ -323,6 +323,17 @@
     "invalidRequest": "无效请求，请重试。",
     "loading": "正在加载快照...",
     "notFound": "快照未找到。此链接可能已过期或被删除。",
-    "loadError": "加载快照失败，请稍后重试。"
+    "loadError": "加载快照失败，请稍后重试。",
+    "shareLink": "分享链接",
+    "permission": "分享权限",
+    "viewerOnly": "仅查看",
+    "editorAccess": "可编辑",
+    "disableShare": "关闭分享",
+    "shareUrl": "分享链接",
+    "copyLink": "复制链接",
+    "viewerHint": "接收者仅可查看画布内容",
+    "editorHint": "接收者可查看并编辑画布内容",
+    "shareDisabled": "分享已关闭，收到的链接将无法访问此画布",
+    "shareToTeam": "分享给团队"
   }
 }

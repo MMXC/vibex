@@ -323,6 +323,16 @@
     "invalidRequest": "Invalid request. Please try again.",
     "loading": "Loading snapshot...",
     "notFound": "Snapshot not found. This link may have expired or been deleted.",
-    "loadError": "Failed to load snapshot. Please try again later."
+    "loadError": "Failed to load snapshot. Please try again later.",
+    "shareLink": "Share Link",
+    "permission": "Permission",
+    "viewerOnly": "View only",
+    "editorAccess": "Can edit",
+    "disableShare": "Disable sharing",
+    "shareUrl": "Share URL",
+    "copyLink": "Copy link",
+    "viewerHint": "Recipients can only view the canvas content",
+    "editorHint": "Recipients can view and edit the canvas content",
+    "shareDisabled": "Sharing disabled. Recipients will not be able to access this canvas."
   }
 }

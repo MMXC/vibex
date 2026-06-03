@@ -253,6 +253,17 @@ export function ExportMenu({ label = '导出', disabled = false, onImportClick }
                 />
                 SVG
               </label>
+              <label className={styles.batchFormatLabel}>
+                <input
+                  type="radio"
+                  name="batch-format"
+                  value="pdf"
+                  checked={selectedBatchFormat === 'pdf'}
+                  onChange={() => setSelectedBatchFormat('pdf')}
+                  className={styles.scopeRadio}
+                />
+                PDF
+              </label>
             </div>
             <button
               type="button"
@@ -261,7 +272,7 @@ export function ExportMenu({ label = '导出', disabled = false, onImportClick }
               disabled={isExporting || (contextNodes.length === 0 && flowNodes.length === 0 && componentNodes.length === 0)}
               data-testid="export-all-btn"
               aria-label="导出全部节点为 ZIP 文件"
-              title="将所有节点导出为 PNG/SVG 文件并打包为 ZIP"
+              title="将所有节点导出为 PNG/SVG/PDF 文件并打包为 ZIP"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />

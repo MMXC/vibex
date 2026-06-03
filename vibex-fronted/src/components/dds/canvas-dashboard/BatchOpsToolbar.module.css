@@ -1,0 +1,202 @@
+/**
+ * BatchOpsToolbar.module.css — Sprint60 E2
+ *
+ * 浮层工具栏 + 确认对话框样式。
+ * 遵循 VibeX design-tokens.css 变量规范。
+ */
+
+/* ============================================
+   Floating toolbar
+   ============================================ */
+
+.batch-ops-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--color-surface-elevated, #f8fafc);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 8px;
+}
+
+.batch-ops-toolbar__count {
+  flex: 1;
+  font-size: 13px;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.batch-ops-toolbar__count strong {
+  color: var(--color-text-primary, #1e293b);
+  font-weight: 600;
+}
+
+.batch-ops-toolbar__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 6px;
+  background: var(--color-surface, #ffffff);
+  color: var(--color-text-primary, #1e293b);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+.batch-ops-toolbar__btn:hover:not(:disabled) {
+  background: var(--color-surface-hover, #f1f5f9);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.batch-ops-toolbar__btn:disabled,
+.batch-ops-toolbar__btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.batch-ops-toolbar__btn--danger {
+  color: var(--color-error, #dc2626);
+  border-color: color-mix(in srgb, var(--color-error, #dc2626) 30%, transparent);
+}
+
+.batch-ops-toolbar__btn--danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-error, #dc2626) 8%, transparent);
+}
+
+.batch-ops-toolbar__clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-text-muted, #94a3b8);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.batch-ops-toolbar__clear:hover:not(:disabled) {
+  background: var(--color-surface-hover, #f1f5f9);
+  color: var(--color-text-secondary, #64748b);
+}
+
+/* ============================================
+   Dialog overlay
+   ============================================ */
+
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog {
+  background: var(--color-surface, #ffffff);
+  border-radius: 12px;
+  padding: 24px;
+  width: 360px;
+  max-width: 90vw;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.dialog__title {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+}
+
+.dialog__body {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: var(--color-text-secondary, #64748b);
+  line-height: 1.5;
+}
+
+.dialog__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.dialog__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary, #1e293b);
+}
+
+.dialog__select,
+.dialog__input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--color-text-primary, #1e293b);
+  background: var(--color-surface, #ffffff);
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.dialog__select:focus,
+.dialog__input:focus {
+  border-color: var(--color-primary, #3b82f6);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary, #3b82f6) 20%, transparent);
+}
+
+.dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.dialog__cancel {
+  padding: 8px 16px;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 6px;
+  background: var(--color-surface, #ffffff);
+  color: var(--color-text-secondary, #64748b);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.dialog__cancel:hover:not(:disabled) {
+  background: var(--color-surface-hover, #f1f5f9);
+}
+
+.dialog__confirm {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: var(--color-error, #dc2626);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s, box-shadow 0.15s;
+}
+
+.dialog__confirm:hover:not(:disabled) {
+  opacity: 0.9;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+.dialog__cancel:disabled,
+.dialog__confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

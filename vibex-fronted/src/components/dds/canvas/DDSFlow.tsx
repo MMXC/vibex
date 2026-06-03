@@ -1,9 +1,11 @@
 /**
  * DDSFlow — ReactFlow Canvas for DDS Chapters
  * Epic 2b: ReactFlow集成
+ * S58-E2: 桌面文件拖拽导入
  *
  * Renders cards as ReactFlow nodes with animated edges.
  * Uses useDDSCanvasFlow hook for store ↔ view sync.
+ * E2: Integrates useFileDrop for drag-drop file import.
  *
  * @module components/dds/canvas/DDSFlow
  */
@@ -30,6 +32,11 @@ import { CardRenderer } from '@/components/dds/cards/CardRenderer';
 import { CanvasThumbnail } from './CanvasThumbnail';
 import type { ChapterType, DDSCard } from '@/types/dds';
 import styles from './DDSFlow.module.css';
+
+// E2: File drag-drop imports
+import { useFileDrop } from './useFileDrop';
+import { DropOverlay } from './DropOverlay';
+import { FileImportDialog } from './FileImportDialog';
 
 // ==================== Node Component ====================
 
@@ -91,6 +98,17 @@ function DDSFlowInner({
     onConnect,
   } = useDDSCanvasFlow(chapter, initialNodes, initialEdges);
 
+  // E2: File drag-drop state
+  const {
+    isDragging,
+    pendingFiles,
+    setDragging,
+    processDrop,
+    confirmImport,
+    reset,
+    removeFile,
+  } = useFileDrop();
+
   const { fitView } = useReactFlow();
 
   // Node click → onSelectCard
@@ -103,15 +121,63 @@ function DDSFlowInner({
     [onSelectCard]
   );
 
+  // E2: Drag event handlers
+  const handleDragOver = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault(); // Allow drop
+      e.stopPropagation();
+      if (!isDragging) {
+        setDragging(true);
+      }
+    },
+    [isDragging, setDragging]
+  );
+
+  const handleDragLeave = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      // Only hide if leaving the canvas entirely (relatedTarget is outside)
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      const { clientX, clientY } = e;
+      if (
+        clientX < rect.left ||
+        clientX > rect.right ||
+        clientY < rect.top ||
+        clientY > rect.bottom
+      ) {
+        setDragging(false);
+      }
+    },
+    [setDragging]
+  );
+
+  const handleDrop = useCallback(
+    async (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setDragging(false);
+      if (e.dataTransfer.files.length > 0) {
+        await processDrop(e.dataTransfer.files);
+      }
+    },
+    [setDragging, processDrop]
+  );
+
   // Fit view on mount
   React.useEffect(() => {
     fitView({ padding: 0.2 });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <>
-      <div className={`${styles.flowCanvas} ${className ?? ''}`}>
+      <div
+        className={`${styles.flowCanvas} ${className ?? ''}`}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -135,6 +201,19 @@ function DDSFlowInner({
         </ReactFlow>
         <CanvasThumbnail threshold={50} />
       </div>
+
+      {/* E2: Drop overlay */}
+      <DropOverlay visible={isDragging} />
+
+      {/* E2: Import preview dialog */}
+      {pendingFiles.length > 0 && (
+        <FileImportDialog
+          files={pendingFiles}
+          onConfirm={confirmImport}
+          onCancel={reset}
+          onRemoveFile={removeFile}
+        />
+      )}
     </>
   );
 }

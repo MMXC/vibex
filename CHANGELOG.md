@@ -2,6 +2,15 @@
 ---
 
 ## [Unreleased] S58-E2: 桌面文件拖拽导入 — 2026-06-03
+---
+
+## [Unreleased] S60-E3: 协作活动流 + 在线状态指示 — 2026-06-04
+- **S60-E3**: `activityStore.ts` — Zustand ring buffer (max 5 entries), online/idle/offline status derivation
+- **S60-E3**: `ActivityFeed.tsx` — 活动流面板，展示最近 5 条协作活动
+- **S60-E3**: `RemoteCursor` pulse 动画 — online (绿色脉冲) / idle (琥珀色脉冲) / offline 状态指示
+- **S60-E3**: `activityHandler.ts` — WS `activity:update` 消息处理
+- **S60-E3**: `types.ts` — `ActivityMessage` + `ActivityEntry` 类型扩展
+- **S60-E3**: vitest 17/17 通过 (activityStore 11 + ActivityFeed 5 + RemoteCursor 11)
 - **S58-E2.1**: `useFileDrop.ts` — drag state management, `.vibex`/`.json`/`.yaml`/`.yml` parse, confirmImport
 - **S58-E2.2**: `DropOverlay.tsx` — full-screen animated overlay during drag
 - **S58-E2.3**: `FileImportDialog.tsx` — preview/confirm dialog with valid/error counts

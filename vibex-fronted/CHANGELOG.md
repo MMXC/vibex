@@ -692,3 +692,12 @@
 - **可测试化**: `wsRevisionHandler` 重构为 store 注入模式，无须 mock 动态导入
 - **Bug 修复**: `wsCommentHandler comment:mention` case 添加缺失 `async` 关键字
 - 文件: `wsCommentHandler.ts`, `wsRevisionHandler.ts`, `ConflictDialog.tsx`, `ConflictDialog.module.css`, `wsRevisionHandler.test.ts`
+
+---
+
+## [Unreleased] S58-E4: Canvas 分享权限选择 — 2026-06-03
+- **S58-E4.1**: `shareUtils.ts` — 新增 `generateShareToken()`、`checkSharePermission()`、`buildShareUrl()`、`parseShareTokenFromUrl()` 函数
+- **S58-E4.2**: `ShareDialog.tsx` — 重写为 E4 分享对话框，含权限下拉选择（仅查看 / 可编辑 / 关闭分享）
+- **S58-E4.3**: `ShareDialog.module.css` — 新增 `.permissionRow`、`.permissionSelect`、`.disabledHint` 等样式
+- **S58-E4.4**: `zh.json` / `en.json` — 新增 12 个分享权限相关 i18n key（permission、viewerOnly、editorAccess 等）
+- **S58-E4.5**: `shareUtils.test.ts` — 46 个 vitest 测试全部通过（含新函数 generateShareToken、checkSharePermission、buildShareUrl、parseShareTokenFromUrl）

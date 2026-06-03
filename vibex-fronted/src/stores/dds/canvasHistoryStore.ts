@@ -18,6 +18,11 @@
  * - snapshots[] 状态：保存画布命名版本快照
  * - saveSnapshot/loadSnapshot/listSnapshots/deleteSnapshot：快照 CRUD
  * - 快照存储在 IndexedDB snapshots 表（与 history 表分离）
+ *
+ * E1 (Sprint60): 画布版本历史 UI 增强
+ * - Snapshot 新增 branchName / isStarred 字段
+ * - compareSnapshots(snapA, snapB)：返回 added/removed/modified 节点差异
+ * - updateSnapshotMetadata()：更新星标/分支名
  */
 
 import { create } from 'zustand';
@@ -78,12 +83,24 @@ export interface SnapshotData {
   edges: unknown[];
 }
 
-/** A named snapshot of the canvas state — stored in IndexedDB */
+/** A named snapshot of the canvas state — stored in IndexedDB
+ * E1 (Sprint60): extended with branchName / isStarred */
 export interface Snapshot {
   id: string;
   name: string;
   timestamp: number;
   data: SnapshotData;
+  /** Branch name for version branching (default: 'main') */
+  branchName?: string;
+  /** Whether this snapshot is starred by the user */
+  isStarred?: boolean;
+}
+
+/** Diff result between two snapshots */
+export interface SnapshotDiff {
+  added: Array<{ id: string; label?: string }>;
+  removed: Array<{ id: string; label?: string }>;
+  modified: Array<{ id: string; label?: string; changes?: Record<string, { before: unknown; after: unknown }> }>;
 }
 
 /** Serializable snapshot metadata (for IndexedDB storage) */
@@ -163,6 +180,17 @@ interface CanvasHistoryState {
   deleteSnapshot: (canvasId: string, snapshotId: string) => Promise<void>;
   /** Set the current restoring snapshot ID (for UI loading state) */
   setRestoringSnapshotId: (id: string | null) => void;
+  // E1 (Sprint60): Snapshot UI enhancement
+  /** Compare two snapshots and return added/removed/modified nodes */
+  compareSnapshots: (snapA: Snapshot, snapB: Snapshot) => SnapshotDiff;
+  /** Update snapshot metadata (branchName, isStarred, name) in IndexedDB */
+  updateSnapshotMetadata: (
+    canvasId: string,
+    snapshotId: string,
+    meta: { name?: string; branchName?: string; isStarred?: boolean }
+  ) => Promise<void>;
+  /** Set the current canvas ID for local snapshot queries */
+  setCurrentCanvasId: (canvasId: string | null) => void;
 }
 
 // ==================== Helper ====================
@@ -388,6 +416,78 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
 
   setRestoringSnapshotId: (id: string | null) => {
     set({ restoringSnapshotId: id });
+  },
+
+  // ==================== E1 (Sprint60): Snapshot UI Enhancement ====================
+
+  /** Compare two snapshots and return added/removed/modified node IDs */
+  compareSnapshots: (snapA: Snapshot, snapB: Snapshot): SnapshotDiff => {
+    const nodesA = (snapA.data.nodes ?? []) as Array<{ id: string; label?: string; [key: string]: unknown }>;
+    const nodesB = (snapB.data.nodes ?? []) as Array<{ id: string; label?: string; [key: string]: unknown }>;
+
+    const idsA = new Set(nodesA.map((n) => String(n.id)));
+    const idsB = new Set(nodesB.map((n) => String(n.id)));
+    const allIds = new Set([...idsA, ...idsB]);
+
+    const mapA = new Map(nodesA.map((n) => [String(n.id), n]));
+    const mapB = new Map(nodesB.map((n) => [String(n.id), n]));
+
+    const added: SnapshotDiff['added'] = [];
+    const removed: SnapshotDiff['removed'] = [];
+    const modified: SnapshotDiff['modified'] = [];
+
+    for (const id of allIds) {
+      const inA = idsA.has(id);
+      const inB = idsB.has(id);
+
+      if (!inA && inB) {
+        added.push({ id, label: (mapB.get(id) as { label?: string })?.label });
+      } else if (inA && !inB) {
+        removed.push({ id, label: (mapA.get(id) as { label?: string })?.label });
+      } else if (inA && inB) {
+        // Deep comparison of node properties (excluding id)
+        const a = mapA.get(id)!;
+        const b = mapB.get(id)!;
+        const changes: Record<string, { before: unknown; after: unknown }> = {};
+        let isModified = false;
+
+        const allKeys = new Set([...Object.keys(a), ...Object.keys(b)]);
+        for (const key of allKeys) {
+          if (key === 'id') continue;
+          const before = a[key];
+          const after = b[key];
+          if (JSON.stringify(before) !== JSON.stringify(after)) {
+            changes[key] = { before, after };
+            isModified = true;
+          }
+        }
+
+        if (isModified) {
+          modified.push({ id, label: a.label, changes });
+        }
+      }
+    }
+
+    return { added, removed, modified };
+  },
+
+  /** Update snapshot metadata (branchName, isStarred, name) in IndexedDB */
+  updateSnapshotMetadata: async (
+    snapshotId: string,
+    meta: { name?: string; branchName?: string; isStarred?: boolean },
+    canvasId?: string
+  ) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+    const { updateSnapshotMetadataInDB } = await import('@/lib/canvas/historyDB');
+    await updateSnapshotMetadataInDB(snapshotId, meta, canvasId);
+    // Refresh local snapshots list (canvasId stored in snapshots store, not in Snapshot)
+    const list = await get().listSnapshots(canvasId ?? '');
+    set({ snapshots: list });
+  },
+
+  setCurrentCanvasId: (_canvasId: string | null) => {
+    // Reserved for future use — currently snapshots are queried per canvasId in listSnapshots
+    // This state can be used by UI components to track the active canvas
   },
 }));
 

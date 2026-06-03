@@ -18,6 +18,10 @@
  * - 新增 snapshots objectStore (DB_VERSION=2)
  * - saveSnapshotToDB/loadSnapshotFromDB/listSnapshotsFromDB/deleteSnapshotFromDB
  * - snapshots 表按 canvasId + snapshotId 复合主键
+ *
+ * E1 (Sprint60): 画布版本历史 UI 增强
+ * - DB_VERSION=3：snapshots 表新增 branchName / isStarred 字段
+ * - updateSnapshotMetadataInDB()：更新快照元数据
  */
 
 import type { Command } from '@/stores/dds/canvasHistoryStore';
@@ -29,7 +33,7 @@ import type { Snapshot } from '@/stores/dds/canvasHistoryStore';
 // ============================================
 
 const DB_NAME = 'vibex-canvas-history';
-const DB_VERSION = 2; // Bumped to 2 for snapshots objectStore
+const DB_VERSION = 3; // Bumped to 3 for snapshot branchName/isStarred (Sprint60)
 const STORE_NAME = 'history';
 const SNAPSHOTS_STORE_NAME = 'snapshots';
 
@@ -408,14 +412,18 @@ export async function getRevision(canvasId: string): Promise<number> {
 
 /**
  * E1: Snapshot stored in IndexedDB with compound key (canvasId, snapshotId)
+ * E1 (Sprint60): extended with branchName / isStarred
  */
 interface SnapshotEntry {
   canvasId: string;
   snapshotId: string;
   name: string;
   timestamp: number;
-  data: Snapshot['data'];
-  _size?: number;
+  data: { nodes: unknown[]; edges: unknown[] };
+  /** E1 (Sprint60): Branch name for version branching */
+  branchName?: string;
+  /** E1 (Sprint60): Whether this snapshot is starred */
+  isStarred?: boolean;
 }
 
 function estimateSnapshotSize(entry: SnapshotEntry): number {
@@ -429,6 +437,7 @@ function estimateSnapshotSize(entry: SnapshotEntry): number {
 /**
  * E1: Save a snapshot to IndexedDB snapshots store.
  * Compound key: [canvasId, snapshotId]
+ * E1 (Sprint60): includes branchName / isStarred
  */
 export async function saveSnapshotToDB(canvasId: string, snapshot: Snapshot): Promise<void> {
   if (!isIndexedDBAvailable()) return;
@@ -439,9 +448,9 @@ export async function saveSnapshotToDB(canvasId: string, snapshot: Snapshot): Pr
     name: snapshot.name,
     timestamp: snapshot.timestamp,
     data: snapshot.data,
-    _size: 0,
+    branchName: snapshot.branchName,
+    isStarred: snapshot.isStarred,
   };
-  entry._size = estimateSnapshotSize(entry);
 
   await idbPut(entry, SNAPSHOTS_STORE_NAME);
 }
@@ -464,6 +473,8 @@ export async function loadSnapshotFromDB(
     name: entry.name,
     timestamp: entry.timestamp,
     data: entry.data,
+    branchName: entry.branchName,
+    isStarred: entry.isStarred,
   };
 }
 
@@ -488,6 +499,8 @@ export async function listSnapshotsFromDB(canvasId: string): Promise<Snapshot[]>
             name: entry.name,
             timestamp: entry.timestamp,
             data: entry.data,
+            branchName: entry.branchName,
+            isStarred: entry.isStarred,
           }));
           resolve(results);
         };
@@ -504,6 +517,49 @@ export async function listSnapshotsFromDB(canvasId: string): Promise<Snapshot[]>
 export async function deleteSnapshotFromDB(canvasId: string, snapshotId: string): Promise<void> {
   if (!isIndexedDBAvailable()) return;
   await idbDelete([canvasId, snapshotId], SNAPSHOTS_STORE_NAME);
+}
+
+/**
+ * E1 (Sprint60): Update snapshot metadata (name, branchName, isStarred) in IndexedDB.
+ * @param snapshotId - ID of the snapshot to update
+ * @param meta - Metadata fields to update
+ * @param canvasId - Optional; loaded from existing snapshot if not provided
+ */
+export async function updateSnapshotMetadataInDB(
+  snapshotId: string,
+  meta: { name?: string; branchName?: string; isStarred?: boolean },
+  canvasId?: string
+): Promise<void> {
+  if (!isIndexedDBAvailable()) return;
+
+  // canvasId is optional: if not provided, try to find snapshot via list
+  if (!canvasId) {
+    console.warn('[historyDB] updateSnapshotMetadataInDB: canvasId not provided, skipping');
+    return;
+  }
+
+  const existing = await loadSnapshotFromDB(canvasId, snapshotId);
+  if (!existing) return;
+
+  const updated: Snapshot = {
+    ...existing,
+    ...(meta.name !== undefined ? { name: meta.name } : {}),
+    ...(meta.branchName !== undefined ? { branchName: meta.branchName } : {}),
+    ...(meta.isStarred !== undefined ? { isStarred: meta.isStarred } : {}),
+  };
+
+  await idbPut(
+    {
+      canvasId,
+      snapshotId,
+      name: updated.name,
+      timestamp: updated.timestamp,
+      data: updated.data,
+      branchName: updated.branchName,
+      isStarred: updated.isStarred,
+    },
+    SNAPSHOTS_STORE_NAME
+  );
 }
 
 /**

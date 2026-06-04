@@ -15,7 +15,8 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import { useCollaboration } from '@/lib/collaboration/useCollaboration';
-import { usePresenceStore } from '@/lib/collaboration/presenceStore';
+import { usePresenceStore } from './presenceStore';
+import { registerCollabHandler } from './wsCollabHandler';
 import type { CollabUser } from '@/lib/collaboration/types';
 
 interface UseWebSocketPresenceOptions {
@@ -51,7 +52,7 @@ export function useWebSocketPresence({
   const localCursorRef = useRef<{ x: number; y: number } | null>(null);
 
   // useCollaboration handles WebSocket lifecycle
-  const { isConnected } = useCollaboration({
+  const { isConnected, subscribe } = useCollaboration({
     onPresence: useCallback(
       (users: CollabUser[]) => {
         // Filter out self
@@ -61,6 +62,24 @@ export function useWebSocketPresence({
       [userId, setRemoteUsers]
     ),
   });
+
+  // S62-E1: Register collab:editing:start/end handlers when WS is ready
+  useEffect(() => {
+    if (!subscribe) return;
+    const unsubscribe = subscribe((msg) => {
+      // Hand off to wsCollabHandler which dispatches to presenceStore
+      // The registerCollabHandler wraps the handler and calls presenceStore actions
+      // We call it inline here since we already have access to subscribe
+      if (msg.type === 'collab:editing:start') {
+        const m = msg as { type: 'collab:editing:start'; nodeId: string; userId: string; userName: string; avatar: string };
+        usePresenceStore.getState().handleEditingStartedMessage(m.nodeId, m.userId, m.userName, m.avatar);
+      } else if (msg.type === 'collab:editing:end') {
+        const m = msg as { type: 'collab:editing:end'; nodeId: string; userId: string };
+        usePresenceStore.getState().handleEditingEndedMessage(m.nodeId);
+      }
+    });
+    return unsubscribe;
+  }, [subscribe]);
 
   /** Broadcast local cursor position to WebSocket */
   const broadcastCursor = useCallback(

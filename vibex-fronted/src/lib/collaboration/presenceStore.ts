@@ -2,6 +2,7 @@
  * presenceStore — Zustand store for WebSocket-based presence
  * S42-P002-E2: Presence 光标同步 — WebSocket 升级
  * S44-P003-E3: 协作节点锁定 — lockedNodes + lockNode/unlockNode
+ * S62-E1: 协作者实时同步 — editingNodeIds 编辑锁定感知
  *
  * Replaces Firebase usePresence with WebSocket-backed state.
  * Updated by useCollaboration's onPresence callback.
@@ -21,12 +22,26 @@ export interface RemoteUser {
   lastSeen: number;
 }
 
+/** S62-E1: Info about who is editing which node */
+export interface EditingNodeInfo {
+  userId: string;
+  userName: string;
+  avatar: string;
+  startedAt: number;
+}
+
 interface PresenceState {
   /** Remote users currently on the same canvas (excluding self) */
   remoteUsers: Map<string, RemoteUser>;
 
   /** Locked nodes: nodeId → userId of the user who locked it */
   lockedNodes: Record<string, string>;
+
+  /** S62-E1: Nodes currently being edited (merged: local + remote, remote wins on conflict) */
+  editingNodeIds: Map<string, EditingNodeInfo>;
+
+  /** S62-E1: Local + remote editing tracking (local: started by local user; remote: started by remote user) */
+  localEditing: Map<string, EditingNodeInfo>; // nodeId → entry started locally OR by remote (merged view)
 
   /** Update remote users from WebSocket presence message */
   setRemoteUsers: (users: CollabUser[]) => void;
@@ -54,11 +69,41 @@ interface PresenceState {
 
   /** Handle incoming node_unlocked WebSocket message */
   handleNodeUnlockedMessage: (nodeId: string) => void;
+
+  // S62-E1: Editing Node actions
+
+  /** Start editing a node — broadcast to other users */
+  startEditing: (nodeId: string, userId: string, userName: string, avatar: string) => void;
+
+  /** End editing a node — broadcast to other users */
+  endEditing: (nodeId: string) => void;
+
+  /** End all editing for a user (e.g., user disconnected) */
+  endEditingByUser: (userId: string) => void;
+
+  /** Check if a node is being edited by a remote user */
+  isBeingEdited: (nodeId: string) => boolean;
+
+  /** Get editor info for a node */
+  getEditor: (nodeId: string) => EditingNodeInfo | undefined;
+
+  /** Handle incoming collab:editing:start WebSocket message */
+  handleEditingStartedMessage: (
+    nodeId: string,
+    userId: string,
+    userName: string,
+    avatar: string
+  ) => void;
+
+  /** Handle incoming collab:editing:end WebSocket message */
+  handleEditingEndedMessage: (nodeId: string) => void;
 }
 
 export const usePresenceStore = create<PresenceState>((set, get) => ({
   remoteUsers: new Map(),
   lockedNodes: {},
+  editingNodeIds: new Map(),
+  localEditing: new Map(),
 
   setRemoteUsers: (users: CollabUser[]) =>
     set((state) => {
@@ -93,7 +138,7 @@ export const usePresenceStore = create<PresenceState>((set, get) => ({
       return { remoteUsers: updated };
     }),
 
-  clearAll: () => set({ remoteUsers: new Map() }),
+  clearAll: () => set({ remoteUsers: new Map(), editingNodeIds: new Map(), localEditing: new Map() }),
 
   lockNode: (nodeId: string, userId: string) =>
     set((state) => ({
@@ -117,5 +162,68 @@ export const usePresenceStore = create<PresenceState>((set, get) => ({
     set((state) => {
       const { [nodeId]: _removed, ...rest } = state.lockedNodes;
       return { lockedNodes: rest };
+    }),
+
+  // S62-E1: Editing Node actions
+
+  startEditing: (nodeId: string, userId: string, userName: string, avatar: string) =>
+    set((state) => {
+      const updated = new Map(state.editingNodeIds);
+      updated.set(nodeId, { userId, userName, avatar, startedAt: Date.now() });
+      const localUpdated = new Map(state.localEditing);
+      localUpdated.set(nodeId, { userId, userName, avatar, startedAt: Date.now() });
+      return { editingNodeIds: updated, localEditing: localUpdated };
+    }),
+
+  endEditing: (nodeId: string) =>
+    set((state) => {
+      // Always remove from editingNodeIds — unconditional exit.
+      // editingNodeIds is a merged view; localEditing tracks local state separately.
+      // endEditingByUser(userId) should be used to end all edits for a specific user.
+      const updated = new Map(state.editingNodeIds);
+      updated.delete(nodeId);
+      const localUpdated = new Map(state.localEditing);
+      localUpdated.delete(nodeId);
+      return { editingNodeIds: updated, localEditing: localUpdated };
+    }),
+
+  endEditingByUser: (userId: string) =>
+    set((state) => {
+      const updated = new Map(state.editingNodeIds);
+      for (const [nodeId, info] of updated) {
+        if (info.userId === userId) {
+          updated.delete(nodeId);
+        }
+      }
+      const localUpdated = new Map(state.localEditing);
+      for (const [nodeId, info] of localUpdated) {
+        if (info.userId === userId) localUpdated.delete(nodeId);
+      }
+      return { editingNodeIds: updated, localEditing: localUpdated };
+    }),
+
+  isBeingEdited: (nodeId: string) => get().editingNodeIds.has(nodeId),
+
+  getEditor: (nodeId: string) => get().editingNodeIds.get(nodeId),
+
+  handleEditingStartedMessage: (
+    nodeId: string,
+    userId: string,
+    userName: string,
+    avatar: string
+  ) =>
+    set((state) => {
+      // Always overwrite — latest start message wins (remote edit takes over local edit)
+      const updated = new Map(state.editingNodeIds);
+      updated.set(nodeId, { userId, userName, avatar, startedAt: Date.now() });
+      // Remote edit: does NOT touch localEditing (local tracking is separate)
+      return { editingNodeIds: updated };
+    }),
+
+  handleEditingEndedMessage: (nodeId: string) =>
+    set((state) => {
+      const updated = new Map(state.editingNodeIds);
+      updated.delete(nodeId);
+      return { editingNodeIds: updated };
     }),
 }));

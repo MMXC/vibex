@@ -1,10 +1,11 @@
 /**
- * agentStore.ts — Sprint61 E4: AI Session Canvas Context Integration
+ * agentStore.ts — Sprint61 E4 + Sprint63 E4: AI Session Canvas Context Integration + Streaming
  *
  * DDS-specific AI session store with:
  * - Canvas context injection (node/edge counts per chapter)
  * - Configurable retry settings (3 / 5 / infinite)
  * - Session-level canvas context stored per session
+ * - SSE streaming: streamingContent, isStreaming, lastPrompt
  *
  * Distinct from src/stores/agentStore.ts (coding agent, Sprint6).
  */
@@ -52,6 +53,12 @@ interface AgentState {
   activeSessionId: string | null;
   /** Default retry mode for new sessions */
   defaultRetryMode: RetryMode;
+  /** Per-session streaming content (sessionId -> content) */
+  streamingContent: Record<string, string>;
+  /** Per-session streaming state (sessionId -> isStreaming) */
+  isStreaming: Record<string, boolean>;
+  /** Per-session last prompt (sessionId -> prompt) for retry */
+  lastPrompt: Record<string, string>;
 }
 
 interface AgentActions {
@@ -64,6 +71,13 @@ interface AgentActions {
   startRetry: (sessionId: string) => void;
   clearRetry: (sessionId: string) => void;
   incrementRetryCount: (sessionId: string) => void;
+  // Streaming actions (E4)
+  streamSession: (sessionId: string, prompt: string, canvasContext?: CanvasContext | null) => Promise<void>;
+  appendStreamChunk: (sessionId: string, chunk: string) => void;
+  endStream: (sessionId: string) => void;
+  clearStreamContent: (sessionId: string) => void;
+  retryLastStream: (sessionId: string) => Promise<void>;
+  cancelStream: (sessionId: string) => void;
 }
 
 export type AgentStore = AgentState & AgentActions;
@@ -84,12 +98,18 @@ function buildSessionName(): string {
   })}`;
 }
 
+/** AbortController registry for stream cancellation */
+const streamControllers: Map<string, AbortController> = new Map();
+
 // ==================== Store ====================
 
-export const useAgentStore = create<AgentStore>((set) => ({
+export const useAgentStore = create<AgentStore>((set, get) => ({
   sessions: [],
   activeSessionId: null,
   defaultRetryMode: '3',
+  streamingContent: {},
+  isStreaming: {},
+  lastPrompt: {},
 
   addSession: (session) => {
     const id = generateSessionId();
@@ -115,13 +135,23 @@ export const useAgentStore = create<AgentStore>((set) => ({
     })),
 
   removeSession: (id) =>
-    set((state) => ({
-      sessions: state.sessions.filter((s) => s.id !== id),
-      activeSessionId:
-        state.activeSessionId === id
-          ? (state.sessions.find((s) => s.id !== id)?.id ?? null)
-          : state.activeSessionId,
-    })),
+    set((state) => {
+      // Clean up streaming state
+      const { [id]: _sc, ...restSc } = state.streamingContent;
+      const { [id]: _is, ...restIs } = state.isStreaming;
+      const { [id]: _lp, ...restLp } = state.lastPrompt;
+      streamControllers.delete(id);
+      return {
+        sessions: state.sessions.filter((s) => s.id !== id),
+        activeSessionId:
+          state.activeSessionId === id
+            ? (state.sessions.find((s) => s.id !== id)?.id ?? null)
+            : state.activeSessionId,
+        streamingContent: restSc,
+        isStreaming: restIs,
+        lastPrompt: restLp,
+      };
+    }),
 
   setActiveSession: (id) => set({ activeSessionId: id }),
 
@@ -154,6 +184,145 @@ export const useAgentStore = create<AgentStore>((set) => ({
         s.id === sessionId ? { ...s, retryCount: s.retryCount + 1 } : s
       ),
     })),
+
+  // ==================== Streaming Actions (E4) ====================
+
+  clearStreamContent: (sessionId) =>
+    set((state) => {
+      const { [sessionId]: _, ...rest } = state.streamingContent;
+      const { [sessionId]: __, ...restIs } = state.isStreaming;
+      return { streamingContent: rest, isStreaming: restIs };
+    }),
+
+  appendStreamChunk: (sessionId, chunk) =>
+    set((state) => ({
+      streamingContent: {
+        ...state.streamingContent,
+        [sessionId]: (state.streamingContent[sessionId] ?? '') + chunk,
+      },
+    })),
+
+  endStream: (sessionId) =>
+    set((state) => ({
+      isStreaming: { ...state.isStreaming, [sessionId]: false },
+    })),
+
+  cancelStream: (sessionId) => {
+    const controller = streamControllers.get(sessionId);
+    if (controller) {
+      controller.abort();
+      streamControllers.delete(sessionId);
+    }
+    set((state) => ({
+      isStreaming: { ...state.isStreaming, [sessionId]: false },
+    }));
+  },
+
+  streamSession: async (sessionId, prompt, canvasContext) => {
+    const state = get();
+    // Set streaming state
+    set((s) => ({
+      isStreaming: { ...s.isStreaming, [sessionId]: true },
+      streamingContent: { ...s.streamingContent, [sessionId]: '' },
+      lastPrompt: { ...s.lastPrompt, [sessionId]: prompt },
+    }));
+
+    // Attach canvas context if provided
+    if (canvasContext) {
+      const session = state.sessions.find((s) => s.id === sessionId);
+      if (session) {
+        set((s) => ({
+          sessions: s.sessions.map((sess) =>
+            sess.id === sessionId
+              ? { ...sess, canvasContext }
+              : sess
+          ),
+        }));
+      }
+    }
+
+    const controller = new AbortController();
+    streamControllers.set(sessionId, controller);
+
+    try {
+      // Build messages with optional canvas context
+      const session = state.sessions.find((s) => s.id === sessionId);
+      const contextPrompt = session?.canvasContext
+        ? `[Canvas Context] ${session.canvasContext.summary}\n\n`
+        : '';
+      const fullPrompt = contextPrompt + prompt;
+
+      const response = await fetch('/api/ai/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: fullPrompt,
+          stream: true,
+          conversationId: sessionId,
+        }),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const reader = response.body!.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() ?? '';
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed || !trimmed.startsWith('data:')) continue;
+          const data = trimmed.slice(5).trim();
+          if (data === '[DONE]') break;
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.content) {
+              get().appendStreamChunk(sessionId, parsed.content);
+            }
+            if (parsed.done) break;
+            if (parsed.error) {
+              throw new Error(parsed.error);
+            }
+          } catch {
+            // Skip invalid JSON
+          }
+        }
+      }
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        // Cancelled by user — clear streaming state silently
+      } else {
+        console.error('[agentStore] streamSession error:', err);
+        // Append error to streaming content
+        const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+        get().appendStreamChunk(sessionId, `\n[Error: ${errorMsg}]`);
+      }
+    } finally {
+      streamControllers.delete(sessionId);
+      get().endStream(sessionId);
+    }
+  },
+
+  retryLastStream: async (sessionId) => {
+    const state = get();
+    const lastPrompt = state.lastPrompt[sessionId];
+    if (!lastPrompt) return;
+    const session = state.sessions.find((s) => s.id === sessionId);
+    get().startRetry(sessionId);
+    await get().streamSession(sessionId, lastPrompt, session?.canvasContext ?? null);
+    get().clearRetry(sessionId);
+    get().incrementRetryCount(sessionId);
+  },
 }));
 
 // ==================== Selectors ====================
@@ -169,3 +338,13 @@ export const selectRetryCount = (sessionId: string) => (state: AgentStore) =>
 
 export const selectIsRetrying = (sessionId: string) => (state: AgentStore) =>
   state.sessions.find((s) => s.id === sessionId)?.isRetrying ?? false;
+
+// Streaming selectors (E4)
+export const selectStreamingContent = (sessionId: string) => (state: AgentStore) =>
+  state.streamingContent[sessionId] ?? '';
+
+export const selectIsStreaming = (sessionId: string) => (state: AgentStore) =>
+  state.isStreaming[sessionId] ?? false;
+
+export const selectLastPrompt = (sessionId: string) => (state: AgentStore) =>
+  state.lastPrompt[sessionId] ?? '';

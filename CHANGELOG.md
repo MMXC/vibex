@@ -6063,3 +6063,14 @@ See git history for complete changelog.
 - **S60-E2.2**: 新增 `BatchOpsToolbar.tsx` — 批量删除/重命名浮层，CanvasListPanel 多选时显示
 - **S60-E2.3**: 扩展 `canvasListStore.ts` — `batchDeleteCanvas()` / `batchRenameCanvas()` 批量操作方法
 - **S60-E2.4**: vitest: 28 tests passing（`batchOpsStore.test.ts` 15 + `canvasListStore.batchOps.test.ts` 7 + `BatchOpsToolbar.test.tsx` 6）
+
+---
+
+## [Unreleased] S61-E1: 画布版本历史时间线视图 + 快照对比 — 2026-06-04
+- **S61-E1.1**: `HistoryPanel.tsx` — 时间线/列表双视图 Drawer 面板，搜索过滤 + 分支过滤 + 快照预览 + 对比按钮
+- **S61-E1.2**: `SnapshotPreview.tsx` — 快照详情面板，支持节点缩放查看
+- **S61-E1.3**: `SnapshotDiffDialog.tsx` — 两快照 diff 对比（绿色新增/红色删除/黄色修改）
+- **S61-E1.4**: `DDSToolbar.tsx` — 历史图标按钮触发 HistoryPanel（aria-label="历史记录"）
+- **S61-E1.5**: `historyDB.ts` — IndexedDB 快照数据库操作（save/load/delete）
+- **S61-E1.6**: `canvasHistoryStore.ts` — 扩展 `listSnapshots(branch?, starred?)` action + `compareSnapshots()` diff 算法
+- **S61-E1**: vitest 33/33 通过（HistoryPanel 15 + canvasHistoryStore 14 + TimelineView 4）

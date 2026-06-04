@@ -478,11 +478,21 @@ export async function loadSnapshotFromDB(
   };
 }
 
+/** E1 (Sprint61): Filter options for listSnapshotsFromDB */
+export interface SnapshotListFilters {
+  branch?: string;
+  starred?: boolean;
+}
+
 /**
- * E1: List all snapshots for a canvas, sorted by timestamp descending.
+ * E1 (Sprint61): List all snapshots for a canvas, sorted by timestamp descending.
  * Uses the canvasId index to query efficiently.
+ * Supports optional branch/starred filtering.
  */
-export async function listSnapshotsFromDB(canvasId: string): Promise<Snapshot[]> {
+export async function listSnapshotsFromDB(
+  canvasId: string,
+  filters?: SnapshotListFilters
+): Promise<Snapshot[]> {
   if (!isIndexedDBAvailable()) return [];
 
   return new Promise((resolve, reject) => {
@@ -494,7 +504,7 @@ export async function listSnapshotsFromDB(canvasId: string): Promise<Snapshot[]>
         const request = index.getAll(canvasId);
 
         request.onsuccess = () => {
-          const results: Snapshot[] = (request.result as SnapshotEntry[]).map((entry) => ({
+          let results: Snapshot[] = (request.result as SnapshotEntry[]).map((entry) => ({
             id: entry.snapshotId,
             name: entry.name,
             timestamp: entry.timestamp,
@@ -502,6 +512,15 @@ export async function listSnapshotsFromDB(canvasId: string): Promise<Snapshot[]>
             branchName: entry.branchName,
             isStarred: entry.isStarred,
           }));
+          // E1 (Sprint61): Apply optional filters
+          if (filters) {
+            if (filters.branch !== undefined) {
+              results = results.filter((s) => s.branchName === filters.branch);
+            }
+            if (filters.starred !== undefined) {
+              results = results.filter((s) => s.isStarred === filters.starred);
+            }
+          }
           resolve(results);
         };
         request.onerror = () =>

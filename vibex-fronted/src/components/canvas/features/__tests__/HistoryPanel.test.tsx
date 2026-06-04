@@ -32,6 +32,7 @@ describe('HistoryPanel — P004-E4', () => {
   const setup = (past: any[] = [], future: any[] = []) => {
     mockUseCanvasHistoryStore.mockImplementation((selector: any) => {
       const state = {
+        // Command-based history (P004-E4 / S36)
         past,
         future,
         isPerforming: false,
@@ -41,6 +42,16 @@ describe('HistoryPanel — P004-E4', () => {
         undo: vi.fn(),
         redo: vi.fn(),
         getPosition: () => ({ current: past.length, total: past.length + future.length }),
+        // Snapshot-based history (E1 / S61) — also needed by canvas/features/HistoryPanel
+        snapshots: [],
+        restoringSnapshotId: null,
+        compareSnapshots: vi.fn(),
+        updateSnapshotMetadata: vi.fn(),
+        deleteSnapshot: vi.fn(),
+        listSnapshots: vi.fn(),
+        saveSnapshot: vi.fn(),
+        loadSnapshot: vi.fn(),
+        setRestoringSnapshotId: vi.fn(),
       };
       if (typeof selector === 'function') return selector(state);
       return state;
@@ -58,7 +69,8 @@ describe('HistoryPanel — P004-E4', () => {
       setup([], []);
       render(<HistoryPanel open={true} onClose={mockOnClose} />);
       expect(screen.getByRole('dialog', { name: '历史记录面板' })).toBeInTheDocument();
-      expect(screen.getByText('历史记录')).toBeInTheDocument();
+      // h2 title + tab button both say "历史记录"
+      expect(screen.getAllByText('历史记录').length).toBeGreaterThanOrEqual(1);
     });
 
     it('shows empty state when no history', () => {
@@ -67,14 +79,15 @@ describe('HistoryPanel — P004-E4', () => {
       expect(screen.getByText('暂无历史记录')).toBeInTheDocument();
     });
 
-    it('shows position indicator', () => {
+    it('shows current badge on last past command', () => {
       const past = [
         { id: 'c1', execute: vi.fn(), rollback: vi.fn(), timestamp: 1000, description: '添加节点' },
         { id: 'c2', execute: vi.fn(), rollback: vi.fn(), timestamp: 2000, description: '删除节点' },
       ];
       setup(past, []);
       render(<HistoryPanel open={true} onClose={mockOnClose} />);
-      expect(screen.getByText(/步骤 \d+ \/ \d+/)).toBeInTheDocument();
+      // Last past command shows "当前" badge
+      expect(screen.getByText('当前')).toBeInTheDocument();
     });
   });
 

@@ -21,6 +21,7 @@ import type {
 } from '@/types/dds';
 import { useClipboardStore } from '@/stores/clipboardStore';
 import { generateId } from '@/lib/canvas/id';
+import { isOnline, queueCanvasOp } from '@/lib/offline-queue';
 
 // ==================== Initial Chapter Data ====================
 
@@ -178,7 +179,17 @@ type ChapterActions = {
 };
 
 export const ddsChapterActions: ChapterActions = {
-  addCard: (chapter, card) =>
+  addCard: (chapter, card) => {
+    // D3.2: Intercept addCard — if offline, queue the operation
+    if (!isOnline()) {
+      void queueCanvasOp({
+        type: 'addNode',
+        payload: { nodeId: card.id, card },
+        canvasId: useDDSCanvasStore.getState().projectId ?? chapter,
+        chapter,
+      });
+      return;
+    }
     useDDSCanvasStore.setState((state) => ({
       chapters: {
         ...state.chapters,
@@ -187,9 +198,20 @@ export const ddsChapterActions: ChapterActions = {
           cards: [...state.chapters[chapter].cards, card],
         },
       },
-    })),
+    }));
+  },
 
-  updateCard: (chapter, id, updates) =>
+  updateCard: (chapter, id, updates) => {
+    // D3.2: Intercept updateCard — if offline, queue the operation
+    if (!isOnline()) {
+      void queueCanvasOp({
+        type: 'updateNode',
+        payload: { nodeId: id, updates },
+        canvasId: useDDSCanvasStore.getState().projectId ?? chapter,
+        chapter,
+      });
+      return;
+    }
     useDDSCanvasStore.setState((state) => ({
       chapters: {
         ...state.chapters,
@@ -200,9 +222,20 @@ export const ddsChapterActions: ChapterActions = {
           ),
         },
       },
-    })),
+    }));
+  },
 
-  deleteCard: (chapter, id) =>
+  deleteCard: (chapter, id) => {
+    // D3.2: Intercept deleteCard — if offline, queue the operation
+    if (!isOnline()) {
+      void queueCanvasOp({
+        type: 'deleteNode',
+        payload: { nodeId: id },
+        canvasId: useDDSCanvasStore.getState().projectId ?? chapter,
+        chapter,
+      });
+      return;
+    }
     useDDSCanvasStore.setState((state) => ({
       chapters: {
         ...state.chapters,
@@ -215,9 +248,20 @@ export const ddsChapterActions: ChapterActions = {
           ),
         },
       },
-    })),
+    }));
+  },
 
-  addEdge: (chapter, edge) =>
+  addEdge: (chapter, edge) => {
+    // D3.2: Intercept addEdge — if offline, queue the operation
+    if (!isOnline()) {
+      void queueCanvasOp({
+        type: 'addEdge',
+        payload: { edgeId: edge.id, edge },
+        canvasId: useDDSCanvasStore.getState().projectId ?? chapter,
+        chapter,
+      });
+      return;
+    }
     useDDSCanvasStore.setState((state) => ({
       chapters: {
         ...state.chapters,
@@ -226,9 +270,20 @@ export const ddsChapterActions: ChapterActions = {
           edges: [...state.chapters[chapter].edges, edge],
         },
       },
-    })),
+    }));
+  },
 
-  deleteEdge: (chapter, id) =>
+  deleteEdge: (chapter, id) => {
+    // D3.2: Intercept deleteEdge — if offline, queue the operation
+    if (!isOnline()) {
+      void queueCanvasOp({
+        type: 'deleteEdge',
+        payload: { edgeId: id },
+        canvasId: useDDSCanvasStore.getState().projectId ?? chapter,
+        chapter,
+      });
+      return;
+    }
     useDDSCanvasStore.setState((state) => ({
       chapters: {
         ...state.chapters,
@@ -237,17 +292,38 @@ export const ddsChapterActions: ChapterActions = {
           edges: state.chapters[chapter].edges.filter((e) => e.id !== id),
         },
       },
-    })),
+    }));
+  },
 
-  addCrossChapterEdge: (edge) =>
+  addCrossChapterEdge: (edge) => {
+    // D3.2: Intercept addCrossChapterEdge — if offline, queue the operation
+    if (!isOnline()) {
+      void queueCanvasOp({
+        type: 'addCrossChapterEdge',
+        payload: { edgeId: edge.id, edge },
+        canvasId: useDDSCanvasStore.getState().projectId ?? 'cross-chapter',
+      });
+      return;
+    }
     useDDSCanvasStore.setState((state) => ({
       crossChapterEdges: [...state.crossChapterEdges, edge],
-    })),
+    }));
+  },
 
-  deleteCrossChapterEdge: (id) =>
+  deleteCrossChapterEdge: (id) => {
+    // D3.2: Intercept deleteCrossChapterEdge — if offline, queue the operation
+    if (!isOnline()) {
+      void queueCanvasOp({
+        type: 'deleteCrossChapterEdge',
+        payload: { edgeId: id },
+        canvasId: useDDSCanvasStore.getState().projectId ?? 'cross-chapter',
+      });
+      return;
+    }
     useDDSCanvasStore.setState((state) => ({
       crossChapterEdges: state.crossChapterEdges.filter((e) => e.id !== id),
-    })),
+    }));
+  },
 
   setChapters: (chapters) =>
     useDDSCanvasStore.setState((state) => {

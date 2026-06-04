@@ -47,7 +47,9 @@ import { useCanvasListStore } from '@/stores/canvasListStore';
 import { MiniMapPanel } from '@/components/dds/MiniMapPanel';
 import { ReviewReportPanel } from '@/components/design-review';
 import { HistoryPanel } from '@/components/canvas/features/HistoryPanel';
-import { ConflictResolutionDialog } from '@/components/conflict/ConflictResolutionDialog';
+import { useConflictStore } from '@/stores/dds/conflictStore';
+import { ConflictDialog } from '@/components/dds/canvas-dashboard/ConflictDialog';
+import { ConflictResolutionDialog } from '@/components/dds/canvas-dashboard/ConflictResolutionDialog';
 import { PresenceOverlay } from '@/components/dds/presence/PresenceOverlay';
 import { useWebSocketPresence } from '@/lib/collaboration/useWebSocketPresence';
 // S62-E1: Collaboration editing broadcast
@@ -56,9 +58,7 @@ import { usePresenceStore } from '@/lib/collaboration/presenceStore';
 import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 import useRealtimeSync from '@/hooks/useRealtimeSync';
 import { useAuthStore } from '@/stores/authStore';
-import type { ChapterType, ChapterData } from '@/types/dds';
-import type { DDSCard } from '@/types/dds';
-import type { UserStoryCard } from '@/types/dds';
+import type { ChapterType, ChapterData , DDSCard , UserStoryCard } from '@/types/dds';
 import type { ReactNode } from 'react';
 import type { CodeGenContext } from '@/types/codegen';
 import type { TokenChange } from '@/types/designSync';
@@ -306,6 +306,36 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     window.addEventListener('design-sync:drift-detected', handler);
     return () => window.removeEventListener('design-sync:drift-detected', handler);
   }, []);
+
+  // D3.3: Register online event listener — when back online, replay queued canvas operations
+  useEffect(() => {
+    const handleOnline = () => {
+      void import('@/lib/offline-queue').then(({ syncOfflineQueue }) => {
+        void syncOfflineQueue();
+      });
+    };
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, []);
+
+  // D3.4: Listen for canvas-op-conflict events from syncOfflineQueue replay
+  // Triggers E2 ConflictDialog when offline op conflicts with remote changes
+  const { setConflict } = useConflictStore();
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ op: unknown; remoteData: unknown }>).detail;
+      setConflict({
+        local: detail.op,
+        remote: detail.remoteData,
+        canvasId: projectId ?? '',
+        localRevision: 0,
+        remoteRevision: 0,
+      });
+      setConflictDialogOpen(true);
+    };
+    window.addEventListener('canvas-op-conflict', handler);
+    return () => window.removeEventListener('canvas-op-conflict', handler);
+  }, [setConflict, projectId]);
 
   // ---- E1: CodeGenContext Display (agentSession=new triggers context pre-fill) ----
   const codeGenContext = useAgentStore((s) => s.codeGenContext);
@@ -900,12 +930,42 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     <ReviewReportPanel />
 
     {/* S16-P0-2: Conflict Resolution Dialog */}
-    <ConflictResolutionDialog
-      isOpen={conflictDialogOpen}
-      changes={conflictChanges}
-      onResolve={(action) => setConflictDialogOpen(false)}
-      onClose={() => setConflictDialogOpen(false)}
-    />
+    {conflictDialogOpen && (() => {
+      const conflictData = useConflictStore.getState().conflictData;
+      // D3.4: E2 ConflictDialog for canvas-op-conflict events (E3 offline sync)
+      if (conflictData) {
+        return (
+          <ConflictDialog
+            conflictingUserName={String(conflictData.remote ?? 'Unknown')}
+            onUndoMine={() => {
+              useConflictStore.getState().clearConflict();
+              setConflictDialogOpen(false);
+              // Retry: call syncOfflineQueue again after clearing the conflict
+              void import('@/lib/offline-queue').then(({ syncOfflineQueue }) => {
+                void syncOfflineQueue();
+              });
+            }}
+            onKeepTheirs={() => {
+              useConflictStore.getState().clearConflict();
+              setConflictDialogOpen(false);
+            }}
+            onCancel={() => {
+              useConflictStore.getState().clearConflict();
+              setConflictDialogOpen(false);
+            }}
+          />
+        );
+      }
+      // Fallback: existing ConflictResolutionDialog for design-sync conflicts
+      return (
+        <ConflictResolutionDialog
+          isOpen={conflictDialogOpen}
+          changes={conflictChanges}
+          onResolve={() => setConflictDialogOpen(false)}
+          onClose={() => setConflictDialogOpen(false)}
+        />
+      );
+    })()}
 
     {/* P004-E4: History Panel — Ctrl+Z opens for selective undo */}
     <HistoryPanel

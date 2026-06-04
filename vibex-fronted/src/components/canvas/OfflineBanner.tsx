@@ -2,11 +2,12 @@
  * OfflineBanner — 网络离线状态提示 + 同步状态可视化
  * E05-S4: 离线时显示 banner，重新上线后自动隐藏
  * F1.4-U1: 扩展支持离线写入队列的同步状态
+ * S63-E3 D3.5: 扩展显示 canvas 操作队列 pendingOps 数量
  */
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { getPendingCount } from '@/lib/offline-queue';
+import { getPendingCount, getQueueSize } from '@/lib/offline-queue';
 import { useTranslations } from '@/hooks/useTranslations';
 import styles from './OfflineBanner.module.css';
 
@@ -15,16 +16,22 @@ export function OfflineBanner() {
   const [isOffline, setIsOffline] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
+  const [canvasPendingCount, setCanvasPendingCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [syncError, setSyncError] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
 
-  // Load pending count from offline queue
+  // Load pending count from offline queue (HTTP requests + canvas operations)
   const refreshPendingCount = useCallback(async () => {
     try {
-      const count = await getPendingCount();
-      setPendingCount(count);
-      setTotalCount((prev) => prev === 0 ? count : prev);
+      const [httpCount, canvasCount] = await Promise.all([
+        getPendingCount(),
+        getQueueSize(),
+      ]);
+      setPendingCount(httpCount);
+      setCanvasPendingCount(canvasCount);
+      const total = httpCount + canvasCount;
+      setTotalCount((prev) => prev === 0 ? total : prev);
     } catch {
       // Silently fail — we don't want to break the banner
     }
@@ -93,7 +100,8 @@ export function OfflineBanner() {
   }, [pendingCount, refreshPendingCount]);
 
   // Show sync banner when there are pending items (online or offline)
-  const showSyncBanner = !hidden && (isOffline || pendingCount > 0 || isSyncing);
+  const totalPending = pendingCount + canvasPendingCount;
+  const showSyncBanner = !hidden && (isOffline || totalPending > 0 || isSyncing);
   if (!showSyncBanner) return null;
 
   return (
@@ -116,6 +124,7 @@ export function OfflineBanner() {
         {pendingCount > 0 && !isOffline && (
           <span className={styles.text}>
             {t('pendingChanges', { count: pendingCount })}
+            {canvasPendingCount > 0 && ` + ${canvasPendingCount} canvas ops`}
           </span>
         )}
 

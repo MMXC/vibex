@@ -412,3 +412,178 @@ export function isOfflineQueueEnabled(): boolean {
   if (process.env.NODE_ENV === 'development') return true;
   return process.env.NEXT_PUBLIC_ENABLE_OFFLINE_QUEUE === 'true';
 }
+
+// ==================== S63-E3: Canvas Operation Queue ====================
+// Separate IndexedDB store for canvas CRUD operations (card/edge add/update/delete).
+// Triggered when offline; replayed when back online.
+// D3.1
+
+export interface CanvasOp {
+  type: 'addNode' | 'updateNode' | 'deleteNode' | 'addEdge' | 'deleteEdge' | 'addCrossChapterEdge' | 'deleteCrossChapterEdge';
+  payload: unknown;
+  canvasId: string;
+  chapter?: string;
+  timestamp: number;
+}
+
+const CANVAS_OP_DB_NAME = 'vibex-canvas-ops';
+const CANVAS_OP_DB_VERSION = 1;
+const CANVAS_OP_STORE_NAME = 'canvas-op-queue';
+
+function openCanvasOpDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(CANVAS_OP_DB_NAME, CANVAS_OP_DB_VERSION);
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains(CANVAS_OP_STORE_NAME)) {
+        const store = db.createObjectStore(CANVAS_OP_STORE_NAME, { keyPath: 'id' });
+        store.createIndex('timestamp', 'timestamp', { unique: false });
+        store.createIndex('canvasId', 'canvasId', { unique: false });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function canvasOpTransaction(mode: IDBTransactionMode): Promise<{ store: IDBObjectStore; db: IDBDatabase }> {
+  return openCanvasOpDB().then((db) => {
+    const tx = db.transaction(CANVAS_OP_STORE_NAME, mode);
+    return { store: tx.objectStore(CANVAS_OP_STORE_NAME), db };
+  });
+}
+
+/**
+ * D3.1: Queue a canvas operation (addNode / updateNode / deleteNode / addEdge / deleteEdge / etc.)
+ * for replay when back online.
+ * The operation is NOT executed locally — it is queued for server sync.
+ */
+export async function queueCanvasOp(op: Omit<CanvasOp, 'timestamp'>): Promise<string> {
+  const { store, db } = await canvasOpTransaction('readwrite');
+  const id = `${op.type}-${op.canvasId}-${Date.now()}`;
+  const record: CanvasOp & { id: string } = { ...op, id, timestamp: Date.now() };
+  return new Promise((resolve, reject) => {
+    const request = store.add(record);
+    request.onsuccess = () => resolve(id);
+    request.onerror = () => reject(request.error);
+    db.close();
+  });
+}
+
+/**
+ * D3.1: Get the number of pending canvas operations in the queue.
+ */
+export async function getQueueSize(): Promise<number> {
+  const { store, db } = await canvasOpTransaction('readonly');
+  return new Promise((resolve, reject) => {
+    const request = store.count();
+    request.onsuccess = () => {
+      db.close();
+      resolve(request.result);
+    };
+    request.onerror = () => reject(request.error);
+  });
+}
+
+/** Dispatch canvas-op-conflict event when a conflict is detected during replay */
+function dispatchCanvasConflict(op: CanvasOp, remoteData: unknown): void {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('canvas-op-conflict', { detail: { op, remoteData } }));
+  }
+}
+
+/**
+ * D3.1 + D3.3 + D3.4: Replay all queued canvas operations when back online.
+ * Calls the appropriate API endpoint for each operation type.
+ * On conflict (HTTP 409), dispatches 'canvas-op-conflict' event for E2 ConflictDialog integration.
+ * Returns { completed, failed, conflicts } counts.
+ */
+export async function syncOfflineQueue(): Promise<{
+  completed: number;
+  failed: number;
+  conflicts: number;
+}> {
+  const { store, db } = await canvasOpTransaction('readonly');
+  const ops: (CanvasOp & { id: string })[] = await new Promise((resolve, reject) => {
+    const req = store.index('timestamp').getAll();
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+  db.close();
+
+  let completed = 0;
+  let failed = 0;
+  let conflicts = 0;
+
+  for (const op of ops) {
+    try {
+      const endpoint = buildCanvasOpEndpoint(op);
+      const response = await fetch(endpoint.url, {
+        method: endpoint.method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(op.payload),
+        cache: 'no-cache',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        // Success — remove from queue
+        await removeCanvasOp(op.id);
+        completed++;
+      } else if (response.status === 409) {
+        // Conflict — keep in queue, dispatch event for ConflictDialog
+        conflicts++;
+        const remoteData = await response.json().catch(() => null);
+        dispatchCanvasConflict(op, remoteData);
+        failed++;
+      } else {
+        // Other error — keep in queue for retry
+        failed++;
+      }
+    } catch {
+      // Network error — keep in queue for retry
+      failed++;
+    }
+  }
+
+  return { completed, failed, conflicts };
+}
+
+/** Build fetch URL/method for a canvas operation */
+function buildCanvasOpEndpoint(op: CanvasOp): { url: string; method: string } {
+  const base = '/api/canvas';
+  switch (op.type) {
+    case 'addNode':
+      return { url: `${base}/${op.canvasId}/nodes`, method: 'POST' };
+    case 'updateNode':
+      return { url: `${base}/${op.canvasId}/nodes/${(op.payload as { nodeId: string }).nodeId}`, method: 'PATCH' };
+    case 'deleteNode':
+      return { url: `${base}/${op.canvasId}/nodes/${(op.payload as { nodeId: string }).nodeId}`, method: 'DELETE' };
+    case 'addEdge':
+      return { url: `${base}/${op.canvasId}/edges`, method: 'POST' };
+    case 'deleteEdge':
+      return { url: `${base}/${op.canvasId}/edges/${(op.payload as { edgeId: string }).edgeId}`, method: 'DELETE' };
+    case 'addCrossChapterEdge':
+      return { url: `${base}/${op.canvasId}/cross-chapter-edges`, method: 'POST' };
+    case 'deleteCrossChapterEdge':
+      return { url: `${base}/${op.canvasId}/cross-chapter-edges/${(op.payload as { edgeId: string }).edgeId}`, method: 'DELETE' };
+    default:
+      return { url: `${base}/${op.canvasId}/ops`, method: 'POST' };
+  }
+}
+
+/** Remove a canvas op from the queue (after successful replay or user resolution) */
+async function removeCanvasOp(id: string): Promise<void> {
+  const { store, db } = await canvasOpTransaction('readwrite');
+  return new Promise((resolve, reject) => {
+    const req = store.delete(id);
+    req.onsuccess = () => { db.close(); resolve(); };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+/** Check if navigator.onLine */
+export function isOnline(): boolean {
+  if (typeof navigator === 'undefined') return true;
+  return navigator.onLine;
+}

@@ -824,3 +824,12 @@
 - **S61-E4.3**: `AIDraftDrawer.tsx` — 集成 canvasContext badge（画布上下文摘要）+ retryConfig 下拉（3/5/无限）到抽屉 Header
 - **S61-E4.4**: `AIDraftDrawer.tsx` — 断线重连时显示重试 spinner（D4.5 断线重连 UI）
 - **S61-E4.5**: `useAIAgentContext.test.ts` — 10 个测试，canvasSummary 格式/chapterCounts/totalNodes+Edges/setCanvasContext/retryMode
+
+---
+
+## [Unreleased] S61-E5: 画布数据备份与导出 — 2026-06-04
+- **S61-E5.1**: BackupPanel.tsx — modal UI with export/import buttons + backup list
+- **S61-E5.2**: useBackup.ts — React hook wrapping BackupService
+- **S61-E5.3**: BackupService.test.ts — 14 tests covering export/import/list/delete/format
+- **S61-E5.4**: DDSToolbar integration — backup toolbar button + panel render
+- **S61-E5.5**: i18n — zh.json/en.json canvasBackup key

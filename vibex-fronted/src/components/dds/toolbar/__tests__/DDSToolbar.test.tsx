@@ -9,6 +9,33 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DDSToolbar } from '../DDSToolbar';
 import { useDDSCanvasStore } from '@/stores/dds';
 
+// ==================== useTranslations Mock ====================
+
+const mockT = vi.fn((key: string) => {
+  const translations: Record<string, string> = {
+    // toolbar namespace
+    aiGenerate: 'AI 生成',
+    generating: '生成中',
+    fullscreen: '全屏',
+    exitFullscreen: '退出全屏',
+    switchToRequirement: '切换到需求章节',
+    switchToContext: '切换到上下文章节',
+    switchToFlow: '切换到流程章节',
+    switchToApi: '切换到 API 章节',
+    switchToBusinessRules: '切换到业务规则章节',
+    requirement: '需求',
+    context: '上下文',
+    flow: '流程',
+    api: 'API',
+    'business-rules': '业务规则',
+  };
+  return translations[key] ?? key;
+});
+
+vi.mock('@/hooks/useTranslations', () => ({
+  useTranslations: vi.fn(() => () => mockT),
+}));
+
 // ==================== Store Setup ====================
 
 function setupStore(overrides = {}) {
@@ -59,7 +86,6 @@ describe('DDSToolbar', () => {
   it('displays flow chapter name when active', () => {
     useDDSCanvasStore.getState().setActiveChapter('flow');
     render(<DDSToolbar />);
-    ['\u4e1a\u52a1\u89c4\u5236', 'business-rules'],
     expect(screen.getByText('流程')).toBeInTheDocument();
   });
 
@@ -84,7 +110,6 @@ describe('DDSToolbar', () => {
     const onAIGenerate = vi.fn();
     render(<DDSToolbar onAIGenerate={onAIGenerate} />);
     fireEvent.click(screen.getByRole('button', { name: /AI 生成/i }));
-    ['\u4e1a\u52a1\u89c4\u5236', 'business-rules'],
     expect(onAIGenerate).toHaveBeenCalled();
   });
 

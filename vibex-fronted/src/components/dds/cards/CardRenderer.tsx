@@ -20,6 +20,7 @@ import { FlowStepCard } from './FlowStepCard';
 import { APIEndpointCard } from './APIEndpointCard';
 import { CardErrorBoundary } from '@/components/dds/canvas/CardErrorBoundary';
 import { StateMachineCard } from './StateMachineCard';
+import { NodeEditorLock } from '@/components/canvas/NodeEditorLock';
 import type { APIEndpointCard as APIEndpointCardType, StateMachineCard as SMCardType } from '@/types/dds';
 
 export interface CardRendererProps {
@@ -100,6 +101,8 @@ export const CardRenderer = memo(function CardRenderer({
     <div style={{ position: 'relative' }}>
       {children}
       {locked && <LockOverlay userName={lockedBy} />}
+      {/* S62-E1: Show remote editor badge when another user is editing this node */}
+      <NodeEditorLock nodeId={card.id} />
     </div>
   );
 

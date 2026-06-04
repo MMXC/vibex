@@ -50,6 +50,9 @@ import { HistoryPanel } from '@/components/canvas/features/HistoryPanel';
 import { ConflictResolutionDialog } from '@/components/conflict/ConflictResolutionDialog';
 import { PresenceOverlay } from '@/components/dds/presence/PresenceOverlay';
 import { useWebSocketPresence } from '@/lib/collaboration/useWebSocketPresence';
+// S62-E1: Collaboration editing broadcast
+import { useCollabEditing } from '@/lib/collaboration/useCollabEditing';
+import { usePresenceStore } from '@/lib/collaboration/presenceStore';
 import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 import useRealtimeSync from '@/hooks/useRealtimeSync';
 import { useAuthStore } from '@/stores/authStore';
@@ -437,11 +440,32 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
 
   // ---- Handlers ----
 
+  // S62-E1: Collaboration editing broadcast
+  const { startEditing, endEditing } = useCollabEditing();
+
   const handleSelectCard = useCallback(
     (cardId: string) => {
-      useDDSCanvasStore.getState().selectCard(cardId);
+      const state = useDDSCanvasStore.getState();
+      const prevSelected = state.selectedCardIds;
+      const userId = user?.id ?? 'anonymous';
+      const userName = user?.name ?? 'Anonymous';
+      const avatar = user?.name?.slice(0, 1).toUpperCase() ?? 'A';
+
+      // End editing for previously selected card
+      if (prevSelected.length === 1) {
+        const prevId = prevSelected[0];
+        if (prevId !== cardId) {
+          endEditing(prevId);
+        }
+      }
+
+      // Select new card
+      state.selectCard(cardId);
+
+      // Start editing for newly selected card
+      startEditing(cardId, userId, userName, avatar);
     },
-    []
+    [user, startEditing, endEditing]
   );
 
   const handleAIGenerate = useCallback(() => {
@@ -484,6 +508,24 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
     document.addEventListener('keydown', handleCtrlK);
     return () => document.removeEventListener('keydown', handleCtrlK);
   }, []);
+
+  // S62-E1: Escape key — deselect all cards and broadcast editing end
+  useEffect(() => {
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        const selectedCardIds = useDDSCanvasStore.getState().selectedCardIds;
+        if (selectedCardIds.length > 0) {
+          // Broadcast end for each selected card
+          for (const cardId of selectedCardIds) {
+            endEditing(cardId);
+          }
+          useDDSCanvasStore.getState().deselectAll();
+        }
+      }
+    }
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [endEditing]);
 
   const { applyAutoLayout } = useAutoLayout();
 

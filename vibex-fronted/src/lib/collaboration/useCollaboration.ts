@@ -131,10 +131,19 @@ export function useCollaboration(options: UseCollaborationOptions = {}) {
     []
   );
 
+  /**
+   * S62-E1: Send arbitrary message types (e.g. collab:editing:start/end).
+   * Use this for message types not covered by the standard broadcast() method.
+   */
+  const sendRaw = useCallback((msg: object) => {
+    wsRef.current?.send(msg);
+  }, []);
+
   return {
     connect,
     disconnect,
     broadcast,
+    sendRaw,
     subscribe,
     isConnected,
     onlineUsers,

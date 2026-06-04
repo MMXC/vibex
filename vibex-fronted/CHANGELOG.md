@@ -799,3 +799,11 @@
 - **S61-E1.5**: `historyDB.ts` — IndexedDB 快照数据库操作（save/load/delete）
 - **S61-E1.6**: `canvasHistoryStore.ts` — 扩展 `listSnapshots(branch?, starred?)` action + `compareSnapshots()` diff 算法
 - **S61-E1**: vitest 33/33 通过（HistoryPanel 15 + canvasHistoryStore 14 + TimelineView 4）
+
+---
+
+## [Unreleased] S61-E2: 批量导出（PNG/SVG/PDF）— 2026-06-04
+- **S61-E2.1**: `ExportDialog.tsx` — 批量导出对话框，支持格式选择（PNG/SVG/PDF）和范围选择（全部/选中）
+- **S61-E2.2**: `ExportProgress.tsx` — 导出进度条组件，实时显示当前节点 + 进度百分比
+- **S61-E2.3**: `ExportMenu.tsx` — 新增"批量导出"菜单项（`aria-label="批量导出"`），触发 ExportDialog
+- **S61-E2.4**: `useBatchExport.test.ts` — 18 个测试，91.42% 行覆盖率（PNG/SVG/PDF 路由、取消、错误处理、scope 映射）

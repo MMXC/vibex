@@ -816,3 +816,11 @@
 - **S61-E3.5**: `DDSSearchPanel.tsx` — 搜索面板所有 UI 字符串替换为 `useTranslations('search')()` 调用
 - **S61-E3.6**: `en.json`/`zh.json` — 新增 `toolbar`、`common`、`search`、`batchOps` 命名空间翻译键（batchOps 19 key, toolbar 18 key, search 12 key）
 - **S61-E3.7**: vitest: `useLanguage.test.ts` 4/4 通过
+
+
+## [Unreleased] S61-E4: AI Session 画布上下文集成 — 2026-06-04
+- **S61-E4.1**: `agentStore.ts` — DDS AI 会话 Store，持有 sessions[]/canvasContext/retryConfig，支持重试模式（3/5/无限）
+- **S61-E4.2**: `useAIAgentContext.ts` — Hook，序列化画布状态为节点/边计数摘要字符串（e.g. "3 nodes, 1 edge, chapters: 需求, 流程"）
+- **S61-E4.3**: `AIDraftDrawer.tsx` — 集成 canvasContext badge（画布上下文摘要）+ retryConfig 下拉（3/5/无限）到抽屉 Header
+- **S61-E4.4**: `AIDraftDrawer.tsx` — 断线重连时显示重试 spinner（D4.5 断线重连 UI）
+- **S61-E4.5**: `useAIAgentContext.test.ts` — 10 个测试，canvasSummary 格式/chapterCounts/totalNodes+Edges/setCanvasContext/retryMode

@@ -1,10 +1,13 @@
 /**
- * wsCollabHandler — WebSocket handler for collaboration editing messages
+ * wsCollabHandler — WebSocket handler for collaboration editing + undo/redo messages
  * S62-E1: 协作者实时同步 — collab:editing:start / collab:editing:end
+ * S62-E4: 协作 Undo/Redo — collab:undo / collab:redo
  *
  * Registers with CollabWebSocket to handle:
  * - collab:editing:start — another user started editing a node
  * - collab:editing:end — another user stopped editing a node
+ * - collab:undo — another user performed an undo operation
+ * - collab:redo — another user performed a redo operation
  */
 
 import type { CollabWSHandler } from './websocket';
@@ -24,6 +27,26 @@ export interface CollabEditingEndMessage {
   nodeId: string;
   userId: string;
 }
+
+/** S62-E4: WebSocket undo message payload */
+export interface CollabUndoMessage {
+  type: 'collab:undo';
+  userId: string;
+  userName: string;
+  canvasId: string;
+}
+
+/** S62-E4: WebSocket redo message payload */
+export interface CollabRedoMessage {
+  type: 'collab:redo';
+  userId: string;
+  userName: string;
+  canvasId: string;
+}
+
+/** E4 callback types — called when peer undo/redo is received */
+export type UndoCallback = (msg: CollabUndoMessage) => void;
+export type RedoCallback = (msg: CollabRedoMessage) => void;
 
 /**
  * Register collab:editing:start / collab:editing:end handlers on a CollabWebSocket instance.
@@ -49,6 +72,36 @@ export function registerCollabHandler(
         usePresenceStore.getState().handleEditingEndedMessage(m.nodeId);
         break;
       }
+      // S62-E4: collab:undo / collab:redo are handled by undoRedoStore via setBroadcasters
     }
   });
+}
+
+/**
+ * D4.2: Broadcast an undo event to other collaborators.
+ * Call this instead of directly calling undoRedoStore.undo() to also emit the WS message.
+ */
+export function broadcastUndo(
+  broadcaster: ((msg: CollabUndoMessage) => void) | null,
+  userId: string,
+  userName: string,
+  canvasId: string
+): void {
+  if (broadcaster) {
+    broadcaster({ type: 'collab:undo', userId, userName, canvasId });
+  }
+}
+
+/**
+ * D4.2: Broadcast a redo event to other collaborators.
+ */
+export function broadcastRedo(
+  broadcaster: ((msg: CollabRedoMessage) => void) | null,
+  userId: string,
+  userName: string,
+  canvasId: string
+): void {
+  if (broadcaster) {
+    broadcaster({ type: 'collab:redo', userId, userName, canvasId });
+  }
 }

@@ -875,3 +875,14 @@
 - **新增文件**: undoRedoStore.ts, __tests__/undoRedoStore.test.ts
 - **修改文件**: wsCollabHandler.ts (新增 collab:undo/redo 消息处理)
 - **测试**: undoRedoStore 13/13 ✅
+
+
+---
+
+## [Unreleased] S62-E5: 离线 PWA 支持 — 2026-06-04
+- **S62-E5.1**: SWRegistration 在 RootLayout 中注册 Service Worker
+- **S62-E5.2**: offline-queue.ts 新增 queueCloudBackup/queueUndoRedo 函数，离线时将操作入队
+- **S62-E5.3**: 离线页面 offline.html 支持基础离线提示
+- **S62-E5.4**: OfflineBanner 在 CanvasPage 中渲染，网络断开时显示提示
+- **S62-E5.5**: public/sw.js 新增画布数据缓存层（MAX_CACHED_CANVASES=5, CACHE_TTL=7天），cacheCanvasResponse/evictOldestCanvasEntries/getCachedCanvasResponse/handleCanvasAPI
+

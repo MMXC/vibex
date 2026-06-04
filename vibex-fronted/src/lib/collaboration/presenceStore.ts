@@ -3,6 +3,8 @@
  * S42-P002-E2: Presence 光标同步 — WebSocket 升级
  * S44-P003-E3: 协作节点锁定 — lockedNodes + lockNode/unlockNode
  * S62-E1: 协作者实时同步 — editingNodeIds 编辑锁定感知
+ * S63-E1: 实时游标追踪 — cursor:move, removeCursor
+ * S64-E1: 协作者在线状态面板 — onlineUsers + heartbeat
  *
  * Replaces Firebase usePresence with WebSocket-backed state.
  * Updated by useCollaboration's onPresence callback.
@@ -10,6 +12,20 @@
 
 import { create } from 'zustand';
 import type { CollabUser } from './types';
+
+/** S64-E1: Online user status */
+export type OnlineStatus = 'online' | 'idle' | 'offline';
+
+/** S64-E1: Online user entry — tracked via presence:heartbeat */
+export interface OnlineUser {
+  userId: string;
+  name: string;
+  avatar: string;
+  /** Current status */
+  status: OnlineStatus;
+  /** Last heartbeat timestamp (Date.now()) */
+  lastSeen: number;
+}
 
 export interface RemoteUser {
   userId: string;
@@ -30,6 +46,9 @@ export interface EditingNodeInfo {
   startedAt: number;
 }
 
+/** Heartbeat timeout in milliseconds (30s) */
+const HEARTBEAT_TIMEOUT_MS = 30_000;
+
 interface PresenceState {
   /** Remote users currently on the same canvas (excluding self) */
   remoteUsers: Map<string, RemoteUser>;
@@ -42,6 +61,9 @@ interface PresenceState {
 
   /** S62-E1: Local + remote editing tracking (local: started by local user; remote: started by remote user) */
   localEditing: Map<string, EditingNodeInfo>; // nodeId → entry started locally OR by remote (merged view)
+
+  /** S64-E1: Online users tracked via presence:heartbeat */
+  onlineUsers: OnlineUser[];
 
   /** Update remote users from WebSocket presence message */
   setRemoteUsers: (users: CollabUser[]) => void;
@@ -100,6 +122,23 @@ interface PresenceState {
 
   /** Handle incoming collab:editing:end WebSocket message */
   handleEditingEndedMessage: (nodeId: string) => void;
+
+  // S64-E1: Online users actions
+
+  /**
+   * D1.1: Update online user status (or add if new).
+   * Called on every presence:heartbeat message.
+   */
+  updateOnlineUsers: (userId: string, status: OnlineStatus, name?: string, avatar?: string) => void;
+
+  /**
+   * D1.5: Remove users who have not sent a heartbeat in >30s.
+   * Call this periodically (e.g., on interval or on heartbeat processing).
+   */
+  removeStaleUsers: () => void;
+
+  /** Clear all online users (on disconnect) */
+  clearOnlineUsers: () => void;
 }
 
 export const usePresenceStore = create<PresenceState>((set, get) => ({
@@ -107,6 +146,7 @@ export const usePresenceStore = create<PresenceState>((set, get) => ({
   lockedNodes: {},
   editingNodeIds: new Map(),
   localEditing: new Map(),
+  onlineUsers: [],
 
   setRemoteUsers: (users: CollabUser[]) =>
     set((state) => {
@@ -151,7 +191,8 @@ export const usePresenceStore = create<PresenceState>((set, get) => ({
       return { remoteUsers: updated };
     }),
 
-  clearAll: () => set({ remoteUsers: new Map(), editingNodeIds: new Map(), localEditing: new Map() }),
+  clearAll: () =>
+    set({ remoteUsers: new Map(), editingNodeIds: new Map(), localEditing: new Map(), onlineUsers: [] }),
 
   lockNode: (nodeId: string, userId: string) =>
     set((state) => ({
@@ -239,4 +280,50 @@ export const usePresenceStore = create<PresenceState>((set, get) => ({
       updated.delete(nodeId);
       return { editingNodeIds: updated };
     }),
+
+  // S64-E1: Online users actions
+
+  updateOnlineUsers: (userId: string, status: OnlineStatus, name?: string, avatar?: string) =>
+    set((state) => {
+      const existingIdx = state.onlineUsers.findIndex((u) => u.userId === userId);
+      const now = Date.now();
+      if (existingIdx >= 0) {
+        // Update existing user's status and timestamp
+        const updated = [...state.onlineUsers];
+        const existing = updated[existingIdx];
+        updated[existingIdx] = {
+          ...existing,
+          status,
+          lastSeen: now,
+          // Allow name/avatar update if provided
+          name: name ?? existing.name,
+          avatar: avatar ?? existing.avatar,
+        };
+        return { onlineUsers: updated };
+      } else {
+        // Add new user
+        return {
+          onlineUsers: [
+            ...state.onlineUsers,
+            {
+              userId,
+              name: name ?? 'Unknown',
+              avatar: avatar ?? '',
+              status,
+              lastSeen: now,
+            },
+          ],
+        };
+      }
+    }),
+
+  removeStaleUsers: () =>
+    set((state) => {
+      const cutoff = Date.now() - HEARTBEAT_TIMEOUT_MS;
+      const filtered = state.onlineUsers.filter((u) => u.lastSeen > cutoff);
+      if (filtered.length === state.onlineUsers.length) return state;
+      return { onlineUsers: filtered };
+    }),
+
+  clearOnlineUsers: () => set({ onlineUsers: [] }),
 }));

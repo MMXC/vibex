@@ -1,7 +1,9 @@
 /**
- * presenceStore.test.ts — S42-P002-E2 + S44-P003-E3 + S52-E1 + S62-E1
+ * presenceStore.test.ts — S42-P002-E2 + S44-P003-E3 + S52-E1 + S62-E1 + S63-E1 + S64-E1
  * Tests: cursor sync (S42) + node locking (S44) + S52 presence awareness
  * + S62-E1: editingNodeIds editing lock state transitions
+ * + S63-E1: cursor tracking + removeCursor
+ * + S64-E1: onlineUsers + heartbeat + removeStaleUsers
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { usePresenceStore } from '../presenceStore';
@@ -285,5 +287,122 @@ describe('presenceStore', () => {
     expect(usePresenceStore.getState().remoteUsers.get('user-2')!.cursorY).toBeUndefined();
     // User still tracked (for editing/locking)
     expect(usePresenceStore.getState().remoteUsers.has('user-2')).toBe(true);
+  });
+
+  // === S64-E1: Online Users + Presence Heartbeat ===
+
+  it('updateOnlineUsers adds a new online user', () => {
+    usePresenceStore.getState().updateOnlineUsers('u1', 'online', 'Alice', 'A');
+    const users = usePresenceStore.getState().onlineUsers;
+    expect(users).toHaveLength(1);
+    expect(users[0].userId).toBe('u1');
+    expect(users[0].name).toBe('Alice');
+    expect(users[0].avatar).toBe('A');
+    expect(users[0].status).toBe('online');
+    expect(users[0].lastSeen).toBeGreaterThan(0);
+  });
+
+  it('updateOnlineUsers updates an existing user', () => {
+    usePresenceStore.getState().updateOnlineUsers('u1', 'online', 'Alice', 'A');
+    const originalLastSeen = usePresenceStore.getState().onlineUsers[0].lastSeen;
+
+    // Wait a bit and update
+    usePresenceStore.getState().updateOnlineUsers('u1', 'idle', 'Alice', 'A');
+    expect(usePresenceStore.getState().onlineUsers).toHaveLength(1); // not a new entry
+    expect(usePresenceStore.getState().onlineUsers[0].status).toBe('idle');
+    expect(usePresenceStore.getState().onlineUsers[0].lastSeen).toBeGreaterThanOrEqual(originalLastSeen);
+  });
+
+  it('updateOnlineUsers allows status transition online → idle → offline', () => {
+    usePresenceStore.getState().updateOnlineUsers('u1', 'online', 'Alice', 'A');
+    expect(usePresenceStore.getState().onlineUsers[0].status).toBe('online');
+
+    usePresenceStore.getState().updateOnlineUsers('u1', 'idle', 'Alice', 'A');
+    expect(usePresenceStore.getState().onlineUsers[0].status).toBe('idle');
+
+    usePresenceStore.getState().updateOnlineUsers('u1', 'offline', 'Alice', 'A');
+    expect(usePresenceStore.getState().onlineUsers[0].status).toBe('offline');
+  });
+
+  it('updateOnlineUsers updates name and avatar for existing user', () => {
+    usePresenceStore.getState().updateOnlineUsers('u1', 'online', 'Alice', 'A');
+
+    // Update name/avatar
+    usePresenceStore.getState().updateOnlineUsers('u1', 'online', 'Alice Updated', 'AVATAR_URL');
+    const users = usePresenceStore.getState().onlineUsers;
+    expect(users[0].name).toBe('Alice Updated');
+    expect(users[0].avatar).toBe('AVATAR_URL');
+  });
+
+  it('removeStaleUsers removes users with lastSeen > 30s ago', () => {
+    const state = usePresenceStore.getState();
+    // Add a stale user (simulate by manipulating lastSeen directly)
+    usePresenceStore.setState({
+      onlineUsers: [
+        { userId: 'u1', name: 'Alice', avatar: 'A', status: 'online', lastSeen: Date.now() - 35_000 },
+        { userId: 'u2', name: 'Bob', avatar: 'B', status: 'online', lastSeen: Date.now() },
+      ],
+    });
+
+    expect(usePresenceStore.getState().onlineUsers).toHaveLength(2);
+    usePresenceStore.getState().removeStaleUsers();
+    const remaining = usePresenceStore.getState().onlineUsers;
+    expect(remaining).toHaveLength(1);
+    expect(remaining[0].userId).toBe('u2');
+  });
+
+  it('removeStaleUsers keeps users with recent heartbeat', () => {
+    const state = usePresenceStore.getState();
+    usePresenceStore.setState({
+      onlineUsers: [
+        { userId: 'u1', name: 'Alice', avatar: 'A', status: 'online', lastSeen: Date.now() },
+        { userId: 'u2', name: 'Bob', avatar: 'B', status: 'online', lastSeen: Date.now() - 10_000 },
+      ],
+    });
+
+    usePresenceStore.getState().removeStaleUsers();
+    expect(usePresenceStore.getState().onlineUsers).toHaveLength(2); // both within 30s
+  });
+
+  it('clearOnlineUsers removes all online users', () => {
+    usePresenceStore.getState().updateOnlineUsers('u1', 'online', 'Alice', 'A');
+    usePresenceStore.getState().updateOnlineUsers('u2', 'idle', 'Bob', 'B');
+    expect(usePresenceStore.getState().onlineUsers).toHaveLength(2);
+
+    usePresenceStore.getState().clearOnlineUsers();
+    expect(usePresenceStore.getState().onlineUsers).toHaveLength(0);
+  });
+
+  it('clearAll also clears onlineUsers', () => {
+    usePresenceStore.getState().updateOnlineUsers('u1', 'online', 'Alice', 'A');
+    expect(usePresenceStore.getState().onlineUsers).toHaveLength(1);
+
+    usePresenceStore.getState().clearAll();
+    const state = usePresenceStore.getState();
+    expect(state.onlineUsers).toHaveLength(0);
+    expect(state.remoteUsers.size).toBe(0);
+    expect(state.editingNodeIds.size).toBe(0);
+  });
+
+  // === DoD expect() assertions (S64-E1) ===
+
+  it('DoD: onlineUsers initialises as empty array', () => {
+    const store = usePresenceStore.getState();
+    expect(store.onlineUsers).toEqual([]);
+  });
+
+  it('DoD: updateOnlineUsers is a function', () => {
+    const store = usePresenceStore.getState();
+    expect(typeof store.updateOnlineUsers).toBe('function');
+  });
+
+  it('DoD: removeStaleUsers is a function', () => {
+    const store = usePresenceStore.getState();
+    expect(typeof store.removeStaleUsers).toBe('function');
+  });
+
+  it('DoD: clearOnlineUsers is a function', () => {
+    const store = usePresenceStore.getState();
+    expect(typeof store.clearOnlineUsers).toBe('function');
   });
 });

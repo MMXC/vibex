@@ -907,3 +907,13 @@
 - **S63-E2.3**: `DDSToolbar.tsx` — `conflictDialog.open` 时渲染 ConflictDialog
 - **S63-E2.4**: `wsCollabHandler.ts` — `collab:conflict` 消息处理，调用 `showConflict(otherUserName, otherUserId, nodeId)`
 - **S63-E2.5**: vitest: ConflictDialog 5/5 + resolveConflict 5/5 (18 total undoRedoStore / 23 总计)
+
+---
+
+## [Unreleased] S63-E3: 离线画布编辑 — 2026-06-05
+- **S63-E3.1**: `offline-queue.ts` — `CanvasOp` 接口 (addNode/updateNode/deleteNode/addEdge/deleteEdge/addCrossChapterEdge/deleteCrossChapterEdge + timestamp), `CANVAS_OP_DB_NAME = 'vibex-canvas-ops'`, `queueCanvasOp()`, `getQueueSize()`, `syncOfflineQueue()` (重放队列，409 时 dispatch `canvas-op-conflict` CustomEvent), `isOnline()` helper
+- **S63-E3.2**: `DDSCanvasStore.ts` — 7 个 ddsChapterActions 方法 (addCard/updateCard/deleteCard/addEdge/deleteEdge/addCrossChapterEdge/deleteCrossChapterEdge) 在 `!isOnline()` 时调用 `queueCanvasOp()` 并 return，不继续执行
+- **S63-E3.3**: `DDSCanvasPage.tsx` — `online` 事件监听器调用 `syncOfflineQueue()` via dynamic import
+- **S63-E3.4**: `DDSCanvasPage.tsx` — `canvas-op-conflict` 事件监听器调用 E2 ConflictDialog；冲突解决后 `onUndoMine` 重试 `syncOfflineQueue()`
+- **S63-E3.5**: `OfflineBanner.tsx` — `getQueueSize()` + `getPendingCount()` 合并显示，`+ N canvas ops` 后缀
+- **S63-E3**: vitest 16/16 通过 (offline-queue.test.ts)

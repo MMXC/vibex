@@ -6213,3 +6213,11 @@ See git history for complete changelog.
 - **S63-E5.3**: `FolderTree.tsx` — 双击文件名进入重命名模式（inline input + Enter/Escape 提交）
 - **S63-E5.4**: `FolderPickerDialog.tsx` — 单选文件夹对话框；"根目录"选项将画布移出文件夹；BatchOpsToolbar "移动到文件夹"按钮
 - **S63-E5.5**: `BatchOpsToolbar.tsx` — `handleMoveToFolder` + `handleFolderPicked`；`batchMoveToFolder` 已在 S62-E2 实现
+---
+
+## [Unreleased] S64-E1: 协作在线状态面板 — 2026-06-05
+- **S64-E1.1**: `presenceStore.ts` — `onlineUsers[]`, `heartbeatInterval`, `updateOnlineUsers()`, `removeStaleUsers()`, `clearOnlineUsers()`; presence 用户列表管理
+- **S64-E1.2**: `wsCollabHandler.ts` — `presence:heartbeat`, `presence:user_joined`, `presence:user_left` 消息处理
+- **S64-E1.3**: `PresencePanel.tsx` — 活跃协作者列表，`aria-label="协作用户列表"`, `role="toolbar"`; 用户头像 + 状态点
+- **S64-E1.4**: `DDSToolbar.tsx` — 画布打开时渲染 PresencePanel
+- **S64-E1.5**: vitest: presenceStore 35/35 通过

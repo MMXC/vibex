@@ -936,3 +936,11 @@
 - **S63-E5.3**: `FolderTree.tsx` — 双击重命名（inline input overlay）
 - **S63-E5.4**: `FolderPickerDialog.tsx` — 单选对话框；"根目录"选项；`onConfirm(folderId | null)` 回调
 - **S63-E5.5**: `BatchOpsToolbar.tsx` — "📁 移动到文件夹" 按钮 + 状态管理
+---
+
+## [Unreleased] S64-E1: 协作在线状态面板 — 2026-06-05
+- **S64-E1.1**: `presenceStore.ts` — `onlineUsers[]`, `heartbeatInterval`, `updateOnlineUsers()`, `removeStaleUsers()`, `clearOnlineUsers()`; presence 用户列表管理
+- **S64-E1.2**: `wsCollabHandler.ts` — `presence:heartbeat`, `presence:user_joined`, `presence:user_left` 消息处理
+- **S64-E1.3**: `PresencePanel.tsx` — 活跃协作者列表，`aria-label="协作用户列表"`, `role="toolbar"`; 用户头像 + 状态点
+- **S64-E1.4**: `DDSToolbar.tsx` — 画布打开时渲染 PresencePanel
+- **S64-E1.5**: vitest: presenceStore 35/35 通过

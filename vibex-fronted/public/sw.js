@@ -1,10 +1,11 @@
 /**
- * Service Worker — E05 Canvas 离线模式 + F1.3-U1 离线写入队列
+ * Service Worker — E05 Canvas 离线模式 + F1.3-U1 离线写入队列 + S62-E5 画布数据缓存
  * Workbox 缓存策略:
  * - cacheFirst: 静态资源（JS/CSS/图片）
  * - networkFirst: API 数据
  * - Offline Queue: 非 GET 请求离线缓存，重放
  * - App Shell 预缓存
+ * - E5 Canvas Cache: GET /api/canvas/* responses cached (last 5, 7-day TTL)
  */
 
 const CACHE_NAME = 'vibex-v1';
@@ -120,11 +121,142 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// E5-D5.5: Canvas data caching constants
+const CANVAS_CACHE_NAME = 'vibex-canvas-cache-v1';
+const CANVAS_DB_NAME = 'vibex-canvas-cache';
+const CANVAS_DB_VERSION = 1;
+const CANVAS_STORE_NAME = 'canvas-responses';
+const MAX_CACHED_CANVASES = 5;
+const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+// E5-D5.5: Canvas IndexedDB helpers
+function openCanvasDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(CANVAS_DB_NAME, CANVAS_DB_VERSION);
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains(CANVAS_STORE_NAME)) {
+        const store = db.createObjectStore(CANVAS_STORE_NAME, { keyPath: 'url' });
+        store.createIndex('cachedAt', 'cachedAt', { unique: false });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function cacheCanvasResponse(url, responseClone) {
+  const db = await openCanvasDB();
+  const tx = db.transaction(CANVAS_STORE_NAME, 'readwrite');
+  const store = tx.objectStore(CANVAS_STORE_NAME);
+
+  const now = Date.now();
+  const body = await responseClone.text();
+  const entry = {
+    url,
+    body,
+    status: responseClone.status,
+    headers: Object.fromEntries(responseClone.headers.entries()),
+    cachedAt: now,
+    expiresAt: now + CACHE_TTL_MS,
+  };
+
+  return new Promise((resolve, reject) => {
+    const req = store.put(entry);
+    req.onsuccess = async () => {
+      // Evict oldest if > MAX_CACHED_CANVASES
+      await evictOldestCanvasEntries(store);
+      resolve();
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function evictOldestCanvasEntries(store) {
+  return new Promise((resolve) => {
+    const getAllReq = store.index('cachedAt').getAll();
+    getAllReq.onsuccess = () => {
+      const all = getAllReq.result;
+      if (all.length <= MAX_CACHED_CANVASES) { resolve(); return; }
+      const toEvict = all.sort((a, b) => a.cachedAt - b.cachedAt)
+        .slice(0, all.length - MAX_CACHED_CANVASES);
+      let pending = toEvict.length;
+      if (pending === 0) { resolve(); return; }
+      for (const item of toEvict) {
+        const delReq = store.delete(item.url);
+        delReq.onsuccess = () => { if (--pending === 0) resolve(); };
+        delReq.onerror = () => { if (--pending === 0) resolve(); };
+      }
+    };
+    getAllReq.onerror = () => resolve();
+  });
+}
+
+async function getCachedCanvasResponse(url) {
+  const db = await openCanvasDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(CANVAS_STORE_NAME, 'readonly');
+    const store = tx.objectStore(CANVAS_STORE_NAME);
+    const req = store.get(url);
+    req.onsuccess = () => {
+      const entry = req.result;
+      if (!entry) { resolve(null); return; }
+      if (Date.now() > entry.expiresAt) {
+        // Expired — delete and return null
+        const delTx = db.transaction(CANVAS_STORE_NAME, 'readwrite');
+        delTx.objectStore(CANVAS_STORE_NAME).delete(url);
+        resolve(null);
+      } else {
+        resolve(entry);
+      }
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// E5-D5.5: Canvas API data cache handler
+async function handleCanvasAPI(request) {
+  const url = request.url;
+
+  // Try network first
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      // Cache the response
+      cacheCanvasResponse(url, response.clone()).catch(() => {});
+    }
+    return response;
+  } catch {
+    // Network failed — try canvas cache
+    const cached = await getCachedCanvasResponse(url);
+    if (cached) {
+      return new Response(cached.body, {
+        status: cached.status,
+        headers: cached.headers,
+      });
+    }
+    // No cache — return offline error
+    return new Response(
+      JSON.stringify({ error: 'OFFLINE', message: '离线模式，画布数据不可用' }),
+      { status: 503, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+}
+
 // ==================== Fetch Handler ====================
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
+
+  // E5-D5.5: Canvas API data caching (last 5 canvases, 7-day TTL)
+  if (request.method === 'GET' && (
+    url.pathname.startsWith('/api/canvas/') ||
+    url.pathname.startsWith('/api/dds/canvas/')
+  )) {
+    event.respondWith(handleCanvasAPI(request));
+    return;
+  }
 
   // Skip non-GET requests — intercept for offline queue
   if (request.method !== 'GET') {

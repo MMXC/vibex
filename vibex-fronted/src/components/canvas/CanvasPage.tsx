@@ -950,6 +950,9 @@ export function CanvasPage({ useTabMode = false }: CanvasPageProps) {
       <ShortcutBar onOpenShortcutPanel={eventHandlers.toggleShortcutPanel} />
       <NodeTooltip />
 
+      {/* E5-D5.4: Offline status banner — shows when offline or sync in progress */}
+      <OfflineBanner />
+
       {/* E2: Canvas Preview Modal */}
       <CanvasPreviewModal />
 

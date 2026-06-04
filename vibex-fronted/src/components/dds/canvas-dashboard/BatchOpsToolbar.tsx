@@ -2,14 +2,16 @@
 
 /**
  * BatchOpsToolbar.tsx — Sprint60 E2: Batch Operations Floating Toolbar
+ * S61-E3 i18n: All hardcoded Chinese strings replaced with useTranslations('batchOps').
  *
- * 显示在 CanvasListPanel 顶部，当画布被多选时出现。
- * 提供「批量删除」和「批量重命名」两个操作入口。
+ * Displays at the top of CanvasListPanel when multiple canvases are selected.
+ * Provides batch delete and batch rename entry points.
  */
 
 import { useCallback } from 'react';
 import { useCanvasListStore } from '@/stores/canvasListStore';
 import { useBatchOpsStore } from '@/stores/dds/batchOpsStore';
+import { useTranslations } from '@/hooks/useTranslations';
 import styles from './BatchOpsToolbar.module.css';
 
 interface BatchOpsToolbarProps {
@@ -35,6 +37,9 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
     setRenameSuffix,
     setIsOperating,
   } = useBatchOpsStore();
+
+  // S61-E3 i18n: batchOps namespace
+  const t = useTranslations('batchOps')();
 
   const handleBatchDelete = useCallback(async () => {
     const { selectedCanvasIds, batchDeleteCanvas } = useCanvasListStore.getState();
@@ -66,34 +71,34 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
 
   return (
     <>
-      <div className={styles['batch-ops-toolbar']} role="toolbar" aria-label="批量操作">
+      <div className={styles['batch-ops-toolbar']} role="toolbar" aria-label={t('toolbar')}>
         <span className={styles['batch-ops-toolbar__count']}>
-          已选中 <strong>{selectedCount}</strong> 个画布
+          {t('selected')} <strong>{selectedCount}</strong> {t('canvases')}
         </span>
 
         <button
           className={styles['batch-ops-toolbar__btn']}
           onClick={openRenameDialog}
           disabled={isOperating}
-          aria-label="批量重命名"
+          aria-label={t('rename')}
         >
-          ✏️ 重命名
+          ✏️ {t('rename')}
         </button>
 
         <button
           className={`${styles['batch-ops-toolbar__btn']} ${styles['batch-ops-toolbar__btn--danger']}`}
           onClick={openDeleteDialog}
           disabled={isOperating}
-          aria-label="批量删除"
+          aria-label={t('delete')}
         >
-          🗑️ 删除
+          🗑️ {t('delete')}
         </button>
 
         <button
           className={styles['batch-ops-toolbar__clear']}
           onClick={clearSelection}
           disabled={isOperating}
-          aria-label="清除选择"
+          aria-label={t('clearSelection')}
         >
           ✕
         </button>
@@ -109,10 +114,10 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
         >
           <div className={styles['dialog']}>
             <h3 id="batch-delete-title" className={styles['dialog__title']}>
-              确认批量删除
+              {t('confirmDelete')}
             </h3>
             <p className={styles['dialog__body']}>
-              即将删除 <strong>{selectedCount}</strong> 个画布。此操作不可撤销。
+              {t('deleteWarning', { count: selectedCount })}
             </p>
             <div className={styles['dialog__actions']}>
               <button
@@ -120,14 +125,14 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
                 onClick={closeDeleteDialog}
                 disabled={isOperating}
               >
-                取消
+                {t('cancel')}
               </button>
               <button
                 className={styles['dialog__confirm']}
                 onClick={handleBatchDelete}
                 disabled={isOperating}
               >
-                {isOperating ? '删除中…' : `确认删除`}
+                {isOperating ? t('deleting') : t('confirmDeleteBtn')}
               </button>
             </div>
           </div>
@@ -144,13 +149,13 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
         >
           <div className={styles['dialog']}>
             <h3 id="batch-rename-title" className={styles['dialog__title']}>
-              批量重命名
+              {t('batchRename')}
             </h3>
-            <p className={styles['dialog__body']}>为选中的 {selectedCount} 个画布进行批量重命名。</p>
+            <p className={styles['dialog__body']}>{t('renameDesc', { count: selectedCount })}</p>
 
             <div className={styles['dialog__field']}>
               <label className={styles['dialog__label']} htmlFor="rename-mode">
-                重命名模式
+                {t('renameMode')}
               </label>
               <select
                 id="rename-mode"
@@ -158,15 +163,15 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
                 value={renameMode}
                 onChange={(e) => setRenameMode(e.target.value as 'prefix' | 'suffix')}
               >
-                <option value="prefix">前缀替换</option>
-                <option value="suffix">后缀替换</option>
+                <option value="prefix">{t('prefixReplace')}</option>
+                <option value="suffix">{t('suffixReplace')}</option>
               </select>
             </div>
 
             {renameMode === 'prefix' && (
               <div className={styles['dialog__field']}>
                 <label className={styles['dialog__label']} htmlFor="rename-prefix">
-                  前缀替换为
+                  {t('newPrefix')}
                 </label>
                 <input
                   id="rename-prefix"
@@ -174,8 +179,8 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
                   className={styles['dialog__input']}
                   value={renamePrefix}
                   onChange={(e) => setRenamePrefix(e.target.value)}
-                  placeholder="输入新的前缀"
-                  aria-label="前缀替换为"
+                  placeholder={t('enterNewPrefix')}
+                  aria-label={t('newPrefix')}
                 />
               </div>
             )}
@@ -183,7 +188,7 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
             {renameMode === 'suffix' && (
               <div className={styles['dialog__field']}>
                 <label className={styles['dialog__label']} htmlFor="rename-suffix">
-                  后缀替换为
+                  {t('newSuffix')}
                 </label>
                 <input
                   id="rename-suffix"
@@ -191,8 +196,8 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
                   className={styles['dialog__input']}
                   value={renameSuffix}
                   onChange={(e) => setRenameSuffix(e.target.value)}
-                  placeholder="输入新的后缀"
-                  aria-label="后缀替换为"
+                  placeholder={t('enterNewSuffix')}
+                  aria-label={t('newSuffix')}
                 />
               </div>
             )}
@@ -203,14 +208,14 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
                 onClick={closeRenameDialog}
                 disabled={isOperating}
               >
-                取消
+                {t('cancel')}
               </button>
               <button
                 className={styles['dialog__confirm']}
                 onClick={handleBatchRename}
                 disabled={isOperating}
               >
-                {isOperating ? '重命名中…' : '确认重命名'}
+                {isOperating ? t('renaming') : t('confirmRename')}
               </button>
             </div>
           </div>

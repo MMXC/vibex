@@ -833,3 +833,15 @@
 - **S61-E5.3**: BackupService.test.ts — 14 tests covering export/import/list/delete/format
 - **S61-E5.4**: DDSToolbar integration — backup toolbar button + panel render
 - **S61-E5.5**: i18n — zh.json/en.json canvasBackup key
+
+
+---
+
+## S62-E1: 协作者实时编辑同步 — 2026-06-04
+- **S62-E1.1**: presenceStore 新增 editingNodeIds Map + startEditing/endEditing/endEditingByUser/isBeingEdited/getEditor 方法
+- **S62-E1.2**: useCollaboration sendRaw() 新增 collab:editing 消息发送能力
+- **S62-E1.3**: useWebSocketPresence 新增 collab:editing:start/end 消息接收处理
+- **S62-E1.4**: DDSCanvasPage handleSelectCard 集成 startEditing/endEditing，Escape 键退出编辑
+- **S62-E1.5**: CardRenderer 集成 NodeEditorLock 叠加层，显示正在编辑该节点的协作者
+- **新增文件**: useCollabEditing.ts, wsCollabHandler.ts, NodeEditorLock.tsx, NodeEditorLock.module.css
+- **测试**: presenceStore 19/19 ✅, useCollaboration 9/9 ✅ (CardRenderer 3 个 role=button 可访问性测试失败为历史遗留问题)

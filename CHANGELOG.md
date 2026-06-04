@@ -6099,3 +6099,24 @@ See git history for complete changelog.
 - **S61-E4.3**: `AIDraftDrawer.tsx` — 集成 canvasContext badge（画布上下文摘要）+ retryConfig 下拉（3/5/无限）到抽屉 Header
 - **S61-E4.4**: `AIDraftDrawer.tsx` — 断线重连时显示重试 spinner（D4.5 断线重连 UI）
 - **S61-E4.5**: `useAIAgentContext.test.ts` — 10 个测试，canvasSummary 格式/chapterCounts/totalNodes+Edges/setCanvasContext/retryMode
+
+---
+
+## [Unreleased] S61-E5: 画布数据备份与导出 — 2026-06-04
+- **S61-E5.1**: BackupPanel.tsx — modal UI with export/import buttons + backup list
+- **S61-E5.2**: useBackup.ts — React hook wrapping BackupService
+- **S61-E5.3**: BackupService.test.ts — 14 tests covering export/import/list/delete/format
+- **S61-E5.4**: DDSToolbar integration — backup toolbar button + panel render
+- **S61-E5.5**: i18n — zh.json/en.json canvasBackup key
+
+
+---
+
+## S62-E1: 协作者实时编辑同步 — 2026-06-04
+- **S62-E1.1**: presenceStore 新增 editingNodeIds Map + startEditing/endEditing/endEditingByUser/isBeingEdited/getEditor 方法
+- **S62-E1.2**: useCollaboration sendRaw() 新增 collab:editing 消息发送能力
+- **S62-E1.3**: useWebSocketPresence 新增 collab:editing:start/end 消息接收处理
+- **S62-E1.4**: DDSCanvasPage handleSelectCard 集成 startEditing/endEditing，Escape 键退出编辑
+- **S62-E1.5**: CardRenderer 集成 NodeEditorLock 叠加层，显示正在编辑该节点的协作者
+- **新增文件**: useCollabEditing.ts, wsCollabHandler.ts, NodeEditorLock.tsx, NodeEditorLock.module.css
+- **测试**: presenceStore 19/19 ✅, useCollaboration 9/9 ✅ (CardRenderer 3 个 role=button 可访问性测试失败为历史遗留问题)

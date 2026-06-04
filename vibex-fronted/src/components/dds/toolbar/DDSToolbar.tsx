@@ -31,6 +31,8 @@ import { ExportMenu } from './ExportMenu';
 import { OnlineUsers } from './OnlineUsers';
 import { OfflineIndicator } from './OfflineIndicator';
 import { useTranslations } from '@/hooks/useTranslations';
+import { useLanguage } from '@/hooks/settings/useLanguage';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import { useCollaboration } from '@/lib/collaboration/useCollaboration';
 import { useUIStore } from '@/lib/canvas/stores/uiStore';
 import { useOplogConflictToast } from '@/stores/oplogStore';
@@ -198,6 +200,7 @@ export const DDSToolbar = memo(function DDSToolbar({
 
   // P001-E1 i18n: use translations for chapter label
   const tToolbar = useTranslations('toolbar')();
+  const tCommon = useTranslations('common')();
   const chapterLabel = tToolbar(CHAPTER_LABEL_KEYS[activeChapter]);
   const generating = isGeneratingProp ?? isGenerating;
 
@@ -387,7 +390,7 @@ export const DDSToolbar = memo(function DDSToolbar({
   const handlePaste = useCallback((targetChapter: ChapterType) => {
     const pasted = ddsChapterActions.pasteCards(targetChapter);
     if (pasted.length === 0 && !clipboardValid()) {
-      alert('剪贴板为空或已过期');
+      alert(tToolbar('clipboardEmpty'));
     }
     setIsPasteDialogOpen(false);
   }, [clipboardValid]);
@@ -448,8 +451,8 @@ export const DDSToolbar = memo(function DDSToolbar({
             type="button"
             className={styles.exportBtn}
             onClick={handleCopy}
-            aria-label="复制节点"
-            title={selectedCardIds.length > 0 ? `${tToolbar('copy')} ${selectedCardIds.length} 个节点` : tToolbar('copy')}
+            aria-label={tToolbar('copyNodes')}
+            title={selectedCardIds.length > 0 ? `${tToolbar('copy')} ${selectedCardIds.length} ${tToolbar('selectedNodes').replace('{count}', String(selectedCardIds.length))}` : tToolbar('copy')}
             disabled={selectedCardIds.length === 0}
             data-testid="canvas-copy-btn"
           >
@@ -461,8 +464,8 @@ export const DDSToolbar = memo(function DDSToolbar({
             type="button"
             className={styles.exportBtn}
             onClick={() => setIsPasteDialogOpen(true)}
-            aria-label="粘贴节点"
-            title={clipboardValid ? `${tToolbar('paste')} (${clipboardCount} 个节点)` : tToolbar('paste')}
+            aria-label={tToolbar('pasteNodes')}
+            title={clipboardValid ? `${tToolbar('paste')} (${clipboardCount} ${tToolbar('selectedNodes').replace('{count}', String(clipboardCount))})` : tToolbar('paste')}
             data-testid="canvas-paste-btn"
           >
             {tToolbar('paste')}
@@ -507,7 +510,7 @@ export const DDSToolbar = memo(function DDSToolbar({
                 onClick={(e) => e.stopPropagation()}
               >
                 <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 600 }}>
-                  选择粘贴目标章节
+                  {tToolbar('pasteTargetChapter')}
                 </h3>
                 {(['requirement', 'context', 'flow', 'api', 'business-rules'] as ChapterType[]).map((ch) => (
                   <button
@@ -534,7 +537,7 @@ export const DDSToolbar = memo(function DDSToolbar({
                   }}
                   onClick={() => setIsPasteDialogOpen(false)}
                 >
-                  取消
+                  {tCommon('cancel')}
                 </button>
               </div>
             </div>
@@ -545,7 +548,7 @@ export const DDSToolbar = memo(function DDSToolbar({
             type="button"
             className={styles.exportBtn}
             onClick={() => window.open('/dashboard?open=funnel', '_blank')}
-            aria-label="查看分析漏斗"
+            aria-label={tToolbar('viewAnalytics')}
             title={tToolbar('analyze')}
             data-testid="canvas-analytics-btn"
           >
@@ -558,8 +561,8 @@ export const DDSToolbar = memo(function DDSToolbar({
             type="button"
             className={styles.exportBtn}
             onClick={() => importRef.current?.click()}
-            aria-label="导入画布"
-            title={rbac.canEdit ? '从 .vibex 或 .json 文件导入' : '需要 Owner 或 Member 权限'}
+            aria-label={tToolbar('importCanvas')}
+            title={rbac.canEdit ? tToolbar('importHint') : tToolbar('permissionRequired')}
             disabled={!rbac.canEdit && !rbac.loading}
             data-testid="canvas-import-btn"
           >
@@ -604,8 +607,8 @@ export const DDSToolbar = memo(function DDSToolbar({
               type="button"
               className={styles.shareToTeamBtn}
               onClick={() => setShareToTeamModalOpen(true)}
-              aria-label="分享给团队"
-              title="分享给团队"
+              aria-label={tToolbar('shareToTeam')}
+              title={tToolbar('shareToTeam')}
               data-testid="share-to-team-btn"
             >
               {tToolbar('shareToTeam')}
@@ -660,8 +663,8 @@ export const DDSToolbar = memo(function DDSToolbar({
           {isOffline && (
             <span
               className={styles.offline}
-              title="网络已断开"
-              aria-label="网络已断开"
+              title={tToolbar('offline')}
+              aria-label={tToolbar('offline')}
               role="img"
             >
               📴
@@ -686,8 +689,8 @@ export const DDSToolbar = memo(function DDSToolbar({
             type="button"
             className={styles.iconButton}
             onClick={() => setIsShortcutSettingsOpen(true)}
-            aria-label="键盘快捷键设置"
-            title="键盘快捷键设置"
+            aria-label={tToolbar('shortcutSettings')}
+            title={tToolbar('shortcutSettings')}
           >
             <KeyboardIcon />
           </button>
@@ -697,11 +700,14 @@ export const DDSToolbar = memo(function DDSToolbar({
             type="button"
             className={styles.iconButton}
             onClick={() => setIsHistoryPanelOpen(true)}
-            aria-label="版本历史"
-            title="版本历史"
+            aria-label={tToolbar('versionHistory')}
+            title={tToolbar('versionHistory')}
           >
             <HistoryIcon />
           </button>
+
+          {/* S61-E3: Language switcher */}
+          <LanguageSwitcher />
 
           {/* Fullscreen toggle */}
           <button

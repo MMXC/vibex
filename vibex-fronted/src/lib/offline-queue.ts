@@ -220,6 +220,191 @@ export function isReplayInProgress(): boolean {
 
 // ==================== Feature Flag ====================
 
+// ==================== E5: Cloud Backup + Undo/Redo Helpers ====================
+
+/** Canvas data structure for offline caching */
+export interface CachedCanvasData {
+  canvasId: string;
+  data: {
+    nodes?: unknown[];
+    edges?: unknown[];
+    metadata?: Record<string, unknown>;
+  };
+  cachedAt: number;
+  expiresAt: number;
+}
+
+const CANVAS_DB_NAME = 'vibex-canvas-cache';
+const CANVAS_DB_VERSION = 1;
+const CANVAS_STORE_NAME = 'canvas-cache';
+const MAX_CACHED_CANVASES = 5;
+const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+function openCanvasDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(CANVAS_DB_NAME, CANVAS_DB_VERSION);
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains(CANVAS_STORE_NAME)) {
+        const store = db.createObjectStore(CANVAS_STORE_NAME, { keyPath: 'canvasId' });
+        store.createIndex('cachedAt', 'cachedAt', { unique: false });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+/**
+ * E5-D5.2: Queue a cloud backup request when offline.
+ * Queues the canvas data snapshot for upload when back online.
+ */
+export async function queueCloudBackup(
+  canvasId: string,
+  data: CachedCanvasData['data']
+): Promise<void> {
+  // Also cache locally first
+  await cacheCanvasData(canvasId, data);
+  // Then queue the API backup request
+  const url = `/api/backup/${encodeURIComponent(canvasId)}`;
+  await enqueueRequest({
+    url,
+    method: 'POST',
+    body: JSON.stringify({ canvasId, data, timestamp: Date.now() }),
+    headers: { 'Content-Type': 'application/json' },
+    timestamp: Date.now(),
+  });
+}
+
+/**
+ * E5-D5.2: Queue an undo/redo operation when offline.
+ * Preserves the action type for replay with conflict detection.
+ */
+export async function queueUndoRedo(
+  action: 'undo' | 'redo',
+  canvasId: string,
+  context?: { nodeId?: string; snapshot?: unknown }
+): Promise<void> {
+  const url = `/api/canvas/${encodeURIComponent(canvasId)}/${action}`;
+  await enqueueRequest({
+    url,
+    method: 'POST',
+    body: JSON.stringify({ canvasId, action, context, timestamp: Date.now() }),
+    headers: { 'Content-Type': 'application/json' },
+    timestamp: Date.now(),
+  });
+}
+
+/**
+ * E5-D5.5: Cache canvas data locally (last 5 canvases, 7-day TTL).
+ * Called automatically when canvas data changes or is backed up.
+ */
+export async function cacheCanvasData(
+  canvasId: string,
+  data: CachedCanvasData['data']
+): Promise<void> {
+  const db = await openCanvasDB();
+  const tx = db.transaction(CANVAS_STORE_NAME, 'readwrite');
+  const store = tx.objectStore(CANVAS_STORE_NAME);
+
+  const now = Date.now();
+  const entry: CachedCanvasData = {
+    canvasId,
+    data,
+    cachedAt: now,
+    expiresAt: now + CACHE_TTL_MS,
+  };
+
+  return new Promise((resolve, reject) => {
+    const request = store.put(entry);
+    request.onsuccess = async () => {
+      // Enforce max 5 canvases — evict oldest
+      await evictOldestCanvases(store);
+      resolve();
+    };
+    request.onerror = () => reject(request.error);
+  });
+}
+
+/** Evict oldest cached canvases if > MAX_CACHED_CANVASES */
+async function evictOldestCanvases(store: IDBObjectStore): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const getAllReq = store.index('cachedAt').getAll();
+    getAllReq.onsuccess = () => {
+      const all: CachedCanvasData[] = getAllReq.result;
+      if (all.length <= MAX_CACHED_CANVASES) {
+        resolve();
+        return;
+      }
+      const toEvict = all
+        .sort((a, b) => a.cachedAt - b.cachedAt)
+        .slice(0, all.length - MAX_CACHED_CANVASES);
+
+      let pending = toEvict.length;
+      for (const item of toEvict) {
+        const delReq = store.delete(item.canvasId);
+        delReq.onsuccess = () => {
+          pending--;
+          if (pending === 0) resolve();
+        };
+        delReq.onerror = () => {
+          pending--;
+          if (pending === 0) resolve();
+        };
+      }
+    };
+    getAllReq.onerror = () => reject(getAllReq.error);
+  });
+}
+
+/** Get a cached canvas by ID (returns null if expired or not found) */
+export async function getCachedCanvasData(
+  canvasId: string
+): Promise<CachedCanvasData | null> {
+  const db = await openCanvasDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(CANVAS_STORE_NAME, 'readonly');
+    const store = tx.objectStore(CANVAS_STORE_NAME);
+    const req = store.get(canvasId);
+    req.onsuccess = () => {
+      const entry: CachedCanvasData | undefined = req.result;
+      if (!entry) {
+        resolve(null);
+        return;
+      }
+      if (Date.now() > entry.expiresAt) {
+        // Expired — delete and return null
+        const delTx = db.transaction(CANVAS_STORE_NAME, 'readwrite');
+        delTx.objectStore(CANVAS_STORE_NAME).delete(canvasId);
+        resolve(null);
+      } else {
+        resolve(entry);
+      }
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+/** Get all valid (non-expired) cached canvases */
+export async function getAllCachedCanvases(): Promise<CachedCanvasData[]> {
+  const db = await openCanvasDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(CANVAS_STORE_NAME, 'readonly');
+    const store = tx.objectStore(CANVAS_STORE_NAME);
+    const req = store.getAll();
+    req.onsuccess = () => {
+      const now = Date.now();
+      const valid = (req.result as CachedCanvasData[]).filter(
+        (e) => e.expiresAt > now
+      );
+      resolve(valid);
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// ==================== Feature Flag ====================
+
 /** Whether offline queue is enabled (read from window env) */
 export function isOfflineQueueEnabled(): boolean {
   if (typeof window === 'undefined') return false;

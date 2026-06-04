@@ -1,4 +1,14 @@
 
+
+---
+
+## [Unreleased] S63-E4: AI 流式响应 + 可视化重试 — 2026-06-05
+- **S63-E4.1**: `agentStore.ts` — streamingContent/isStreaming/lastPrompt maps; SSE streamSession; retryLastStream/cancelStream/clearStreamContent actions; selectors
+- **S63-E4.2**: `AISessionDrawer.tsx` — 流式 AI 响应抽屉，打字机效果 + 重试按钮 + 停止生成按钮 + 重试计数徽章
+- **S63-E4.3**: `AISessionDrawer.module.css` — 抽屉样式（overlay/drawer/header/content/actions/retryInfo）
+- **S63-E4.4**: `agentStore.test.ts` — 12 vitest (D4.5a-f streaming state + streamSession + retryLastStream + selectors)
+- **S63-E4.5**: `AISessionDrawer.test.tsx` — 12 vitest (D4.6a-l drawer rendering + button interactions + streaming UI)
+
 ---
 
 ## [Unreleased] S58-E2: 桌面文件拖拽导入 — 2026-06-03

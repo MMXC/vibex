@@ -98,7 +98,7 @@ describe('canvasHistoryStore — E1 Snapshots (Sprint58)', () => {
     mockListSnapshotsFromDB.mockResolvedValue([]);
     const { listSnapshots } = useCanvasHistoryStore.getState();
     await listSnapshots('my-canvas');
-    expect(mockListSnapshotsFromDB).toHaveBeenCalledWith('my-canvas');
+    expect(mockListSnapshotsFromDB).toHaveBeenCalledWith('my-canvas', undefined);
   });
 
   it('loadSnapshot returns snapshot data when found', async () => {

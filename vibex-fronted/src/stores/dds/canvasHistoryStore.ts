@@ -103,6 +103,13 @@ export interface SnapshotDiff {
   modified: Array<{ id: string; label?: string; changes?: Record<string, { before: unknown; after: unknown }> }>;
 }
 
+/** E1 (Sprint61): Filter options for listSnapshots() */
+export interface SnapshotListFilters {
+  branch?: string;
+  starred?: boolean;
+}
+
+
 /** Serializable snapshot metadata (for IndexedDB storage) */
 export interface SnapshotMeta {
   id: string;
@@ -175,7 +182,7 @@ interface CanvasHistoryState {
   /** Load a snapshot from IndexedDB and return its data */
   loadSnapshot: (canvasId: string, snapshotId: string) => Promise<SnapshotData | null>;
   /** Return all snapshots for a canvas, sorted by timestamp descending */
-  listSnapshots: (canvasId: string) => Promise<Snapshot[]>;
+  listSnapshots: (canvasId: string, filters?: SnapshotListFilters) => Promise<Snapshot[]>;
   /** Delete a snapshot by ID */
   deleteSnapshot: (canvasId: string, snapshotId: string) => Promise<void>;
   /** Set the current restoring snapshot ID (for UI loading state) */
@@ -398,10 +405,13 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
     return snapshot ? snapshot.data : null;
   },
 
-  listSnapshots: async (canvasId: string) => {
+  listSnapshots: async (canvasId: string, filters?: SnapshotListFilters) => {
     if (typeof window === 'undefined' || !window.indexedDB) return [];
     const { listSnapshotsFromDB } = await import('@/lib/canvas/historyDB');
-    const list = await listSnapshotsFromDB(canvasId);
+    const dbFilters: DBSnapshotListFilters | undefined = filters
+      ? { branch: filters.branch, starred: filters.starred }
+      : undefined;
+    const list = await listSnapshotsFromDB(canvasId, dbFilters);
     return list.sort((a, b) => b.timestamp - a.timestamp);
   },
 

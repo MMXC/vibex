@@ -37,6 +37,7 @@ import { useOplogConflictToast } from '@/stores/oplogStore';
 import { TemplateGallery } from '@/components/dds/templates/TemplateGallery';
 import { TemplateSaveDialog } from '@/components/dds/templates/TemplateSaveDialog';
 import { ShortcutSettingsPanel } from '@/components/dds/shortcuts/ShortcutSettingsPanel';
+import { HistoryPanel } from '@/components/dds/history/HistoryPanel';
 import styles from './DDSToolbar.module.css';
 
 // ==================== Chapter label keys (mapped to i18n keys) ====================
@@ -101,7 +102,17 @@ function KeyboardIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="2" y="6" width="20" height="12" rx="2" />
-      <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8" />
+      <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h.01M12 14h.01M16 14h.01" />
+    </svg>
+  );
+}
+
+// S61-E1: History icon for Version History panel
+function HistoryIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
     </svg>
   );
 }
@@ -213,6 +224,7 @@ export const DDSToolbar = memo(function DDSToolbar({
   const [isTemplateGalleryOpen, setIsTemplateGalleryOpen] = useState(false);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [isShortcutSettingsOpen, setIsShortcutSettingsOpen] = useState(false);
+  const [isHistoryPanelOpen, setIsHistoryPanelOpen] = useState(false);
 
   // E3-S3: RBAC for toolbar actions
   const rbac = useCanvasRBAC(projectId);
@@ -680,6 +692,17 @@ export const DDSToolbar = memo(function DDSToolbar({
             <KeyboardIcon />
           </button>
 
+          {/* S61-E1: Version History panel */}
+          <button
+            type="button"
+            className={styles.iconButton}
+            onClick={() => setIsHistoryPanelOpen(true)}
+            aria-label="版本历史"
+            title="版本历史"
+          >
+            <HistoryIcon />
+          </button>
+
           {/* Fullscreen toggle */}
           <button
             type="button"
@@ -832,6 +855,12 @@ export const DDSToolbar = memo(function DDSToolbar({
       <ShortcutSettingsPanel
         isOpen={isShortcutSettingsOpen}
         onClose={() => setIsShortcutSettingsOpen(false)}
+      />
+
+      {/* S61-E1: Version History panel */}
+      <HistoryPanel
+        isOpen={isHistoryPanelOpen}
+        onClose={() => setIsHistoryPanelOpen(false)}
       />
     </>
   );

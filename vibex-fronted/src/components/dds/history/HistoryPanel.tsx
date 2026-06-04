@@ -5,6 +5,7 @@ import { useCanvasHistoryStore } from '@/stores/dds/canvasHistoryStore';
 import type { Snapshot, SnapshotDiff } from '@/stores/dds/canvasHistoryStore';
 import TimelineView from './TimelineView';
 import SnapshotDiffDialog from './SnapshotDiffDialog';
+import SnapshotPreview from './SnapshotPreview';
 
 export interface HistoryPanelProps {
   /** Whether the panel is open */
@@ -225,59 +226,27 @@ const HistoryPanel = React.memo(function HistoryPanel({
         )}
       </div>
 
-      {/* Selected snapshot detail */}
+      {/* Selected snapshot preview (D1.2: SnapshotPreview.tsx — E1 Sprint61) */}
       {selectedSnap && (
         <div className="history-panel-detail">
-          <div className="detail-header">
-            <h3>{selectedSnap.name}</h3>
-            <button
-              className="detail-close"
-              onClick={() => setSelectedSnap(null)}
-              aria-label="关闭详情"
-            >
-              ✕
-            </button>
-          </div>
-          <div className="detail-info">
-            <div className="detail-row">
-              <span className="detail-label">创建时间</span>
-              <span className="detail-value">
-                {new Date(selectedSnap.timestamp).toLocaleString('zh-CN')}
-              </span>
-            </div>
-            <div className="detail-row">
-              <span className="detail-label">分支</span>
-              <span className="detail-value">{selectedSnap.branchName ?? 'main'}</span>
-            </div>
-            <div className="detail-row">
-              <span className="detail-label">节点数</span>
-              <span className="detail-value">{selectedSnap.data.nodes?.length ?? 0}</span>
-            </div>
-            <div className="detail-row">
-              <span className="detail-label">连线数</span>
-              <span className="detail-value">{selectedSnap.data.edges?.length ?? 0}</span>
-            </div>
-            {selectedSnap.id && (
-              <div className="detail-row">
-                <span className="detail-label">ID</span>
-                <span className="detail-value detail-id">{selectedSnap.id.slice(0, 8)}...</span>
-              </div>
-            )}
-          </div>
+          {/* E1 (Sprint61): D1.2 — Use SnapshotPreview for visual node preview */}
+          <SnapshotPreview snapshot={selectedSnap} onRestore={handleRestore} />
+          {/* Also show compare/restore buttons if not in preview */}
           <div className="detail-actions">
             <button
               className="detail-compare-btn"
               onClick={() => handleCompare(selectedSnap)}
               disabled={snapshots[0]?.id === selectedSnap.id}
+              aria-label="与当前对比"
             >
-              与当前对比
+              ⟷ 与当前对比
             </button>
             <button
-              className="detail-restore-btn"
-              onClick={() => handleRestore(selectedSnap)}
-              disabled={snapshots[0]?.id === selectedSnap.id}
+              className="detail-close-btn"
+              onClick={() => setSelectedSnap(null)}
+              aria-label="关闭预览"
             >
-              恢复此版本
+              ✕
             </button>
           </div>
         </div>

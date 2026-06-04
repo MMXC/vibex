@@ -32,6 +32,7 @@ import { ShareToTeamModal } from '@/components/team-share/ShareToTeamModal';
 import { ExportMenu } from './ExportMenu';
 import { OnlineUsers } from './OnlineUsers';
 import { OfflineIndicator } from './OfflineIndicator';
+import { PresencePanel } from '@/components/presence/PresencePanel';
 import { useTranslations } from '@/hooks/useTranslations';
 import { useLanguage } from '@/hooks/settings/useLanguage';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -736,6 +737,8 @@ export const DDSToolbar = memo(function DDSToolbar({
 
           {/* P002-E3: Online users + offline indicator */}
           <OnlineUsers users={onlineUsers} maxVisible={4} />
+          {/* S64-E1: Presence panel with status badges */}
+          <PresencePanel />
           <OfflineIndicator isConnected={isConnected} />
           {/* P005-E2: Network offline badge */}
           {isOffline && (

@@ -323,3 +323,25 @@
   border-color: rgba(34, 197, 94, 0.5);
   color: rgba(34, 197, 94, 1);
 }
+
+/* ---- S62-E4: Collaborative undo/redo operator badge ---- */
+.undoRedoGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.operatorBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 5px;
+  background: rgba(99, 102, 241, 0.2);
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  border-radius: 4px;
+  font-size: 9px;
+  color: rgba(99, 102, 241, 0.95);
+  white-space: nowrap;
+  max-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -4,6 +4,7 @@
  * S62-E4: 协作 Undo/Redo — collab:undo / collab:redo
  * S63-E1: 实时游标追踪 — cursor:move
  * S63-E2: 协作撤销冲突 — collab:conflict
+ * S64-E1: 协作者在线状态 — presence:heartbeat
  *
  * Registers with CollabWebSocket to handle:
  * - collab:editing:start — another user started editing a node
@@ -12,6 +13,7 @@
  * - collab:redo — another user performed a redo operation
  * - cursor:move — another user's cursor moved
  * - collab:conflict — another user triggered a conflict for the local user
+ * - presence:heartbeat — another user's presence heartbeat (30s interval)
  */
 
 import type { CollabWSHandler } from './websocket';
@@ -66,6 +68,16 @@ export interface CollabConflictMessage {
   nodeId: string;
 }
 
+/** S64-E1: WebSocket presence heartbeat payload — server relays heartbeat from one client to all others */
+export interface PresenceHeartbeatMessage {
+  type: 'presence:heartbeat';
+  userId: string;
+  userName: string;
+  avatar: string;
+  /** Page visibility: 'visible' when page is shown, 'hidden' when page is hidden */
+  visibility: 'visible' | 'hidden';
+}
+
 /** E4 callback types — called when peer undo/redo is received */
 export type UndoCallback = (msg: CollabUndoMessage) => void;
 export type RedoCallback = (msg: CollabRedoMessage) => void;
@@ -108,6 +120,13 @@ export function registerCollabHandler(
           m.otherUserId,
           m.nodeId
         );
+        break;
+      }
+      // S64-E1: presence:heartbeat — update online user status
+      case 'presence:heartbeat': {
+        const m = msg as PresenceHeartbeatMessage;
+        const status = m.visibility === 'hidden' ? 'idle' : 'online';
+        usePresenceStore.getState().updateOnlineUsers(m.userId, status, m.userName, m.avatar);
         break;
       }
       // S62-E4: collab:undo / collab:redo are handled by undoRedoStore via setBroadcasters

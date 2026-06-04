@@ -866,3 +866,12 @@
 - **S62-E3.3**: BackupPanel cloud tab — Tab 2 with upload/restore/list/delete UI + cloudBackupStore integration
 - **S62-E3.4**: /api/backup route.ts + /api/backup/[canvasId] route.ts — Next.js API routes proxying VIBEX_BACKEND_URL
 - **S62-E3.5**: BackupService.cloud.test.ts 22 passing (AbortSignal-in-jsdom 5 failures pre-existing)
+
+
+## [Unreleased] S62-E4: 协作 Undo/Redo — 2026-06-04
+- **S62-E4.1**: undoRedoStore — currentOperator + conflictDialog + performUndo/performRedo + checkConflict + showConflict/dismissConflict
+- **S62-E4.2**: wsCollabHandler — broadcastUndo/broadcastRedo + collab:undo/collab:redo message types
+- **S62-E4.3**: DDSToolbar — operator badge UI (lines 678-720) + handleUndo/handleRedo 集成
+- **新增文件**: undoRedoStore.ts, __tests__/undoRedoStore.test.ts
+- **修改文件**: wsCollabHandler.ts (新增 collab:undo/redo 消息处理)
+- **测试**: undoRedoStore 13/13 ✅

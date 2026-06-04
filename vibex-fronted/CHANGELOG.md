@@ -845,3 +845,15 @@
 - **S62-E1.5**: CardRenderer 集成 NodeEditorLock 叠加层，显示正在编辑该节点的协作者
 - **新增文件**: useCollabEditing.ts, wsCollabHandler.ts, NodeEditorLock.tsx, NodeEditorLock.module.css
 - **测试**: presenceStore 19/19 ✅, useCollaboration 9/9 ✅ (CardRenderer 3 个 role=button 可访问性测试失败为历史遗留问题)
+
+---
+
+## S62-E2: 画布文件夹管理 — 2026-06-04
+- **S62-E2.1**: canvasFolderStore: createFolder/renameFolder/deleteFolder (递归删除子文件夹) + setPendingDeleteFolder
+- **S62-E2.2**: moveCanvasToFolder/batchMoveToFolder + getCanvasesInFolder + getRootFolders/getChildFolders
+- **S62-E2.3**: FolderTree UI: 右键菜单(重命名/移动到/删除)
+- **S62-E2.4**: CreateFolderDialog: 新建文件夹弹窗, 空名称/重复名称校验
+- **S62-E2.5**: 删除确认流程: pendingDeleteFolderId 状态管理
+- **S62-E2.6**: 30个 vitest 单测 (CRUD/move/delete/edge cases)
+- **新增文件**: canvasFolderStore.ts, CreateFolderDialog.tsx, FolderTree.tsx (及其 CSS 模块)
+- **测试**: canvasFolderStore 30/30 ✅

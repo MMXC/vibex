@@ -26,6 +26,32 @@ Object.defineProperty(globalThis, 'indexedDB', {
 });
 
 // ============================================
+// Mock useTranslations
+// ============================================
+const mockT = vi.fn((key: string) => {
+  const translations: Record<string, string> = {
+    toolbar: '批量操作',
+    selected: '已选择',
+    canvases: '个画布',
+    delete: '删除',
+    rename: '重命名',
+    clearSelection: '清除选择',
+    confirmDelete: '确认删除',
+    cancel: '取消',
+    deleteConfirmTitle: '删除确认',
+    deleteConfirmMessage: '确定要删除所选的 {count} 个画布吗？',
+    renameTitle: '重命名画布',
+    renamePlaceholder: '请输入新名称',
+    newPrefix: '新画布',
+  };
+  return translations[key] ?? key;
+});
+
+vi.mock('@/hooks/useTranslations', () => ({
+  useTranslations: vi.fn(() => () => mockT),
+}));
+
+// ============================================
 // Mock canvasListStore
 // ============================================
 
@@ -131,7 +157,7 @@ describe('BatchOpsToolbar', () => {
     it('opens delete dialog when delete button is clicked', async () => {
       mockCanvasListStore.selectedCanvasIds = new Set(['c1']);
       render(<BatchOpsToolbar selectedCount={1} />);
-      const deleteBtn = screen.getByRole('button', { name: /批量删除/ });
+      const deleteBtn = screen.getByRole('button', { name: /删除/ });
       await userEvent.click(deleteBtn);
       expect(mockBatchOpsStore.openDeleteDialog).toHaveBeenCalledTimes(1);
     });
@@ -141,7 +167,7 @@ describe('BatchOpsToolbar', () => {
     it('opens rename dialog when rename button is clicked', async () => {
       mockCanvasListStore.selectedCanvasIds = new Set(['c1']);
       render(<BatchOpsToolbar selectedCount={1} />);
-      const renameBtn = screen.getByRole('button', { name: /批量重命名/ });
+      const renameBtn = screen.getByRole('button', { name: /重命名/ });
       await userEvent.click(renameBtn);
       expect(mockBatchOpsStore.openRenameDialog).toHaveBeenCalledTimes(1);
     });

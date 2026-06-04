@@ -19,6 +19,7 @@ import { useCanvasListStore } from '@/stores/canvasListStore';
 import { useClipboardStore } from '@/stores/clipboardStore';
 import { useBatchOpsStore } from '@/stores/dds/batchOpsStore';
 import { BatchOpsToolbar } from '@/components/dds/canvas-dashboard/BatchOpsToolbar';
+import { FolderTree } from '@/components/dds/canvas/FolderTree';
 import type { CanvasMeta } from '@/stores/canvasListStore';
 import styles from './CanvasListPanel.module.css';
 
@@ -163,6 +164,9 @@ export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListP
 
       {/* Batch operations toolbar (Sprint60 E2) — appears when canvases are selected */}
       <BatchOpsToolbar selectedCount={selectedCount} />
+
+      {/* Folder tree (S62 E2) */}
+      <FolderTree />
 
       {/* Sort controls (Sprint48 E2) */}
       <div className={styles['canvas-list-panel__sort']}>

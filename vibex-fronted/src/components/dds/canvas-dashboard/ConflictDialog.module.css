@@ -1,0 +1,129 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.dialog {
+  background: var(--color-bg-secondary, #1e1e2e);
+  border: 1px solid var(--color-border, #3a3a5c);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary, #e4e4f0);
+  margin: 0;
+}
+
+.message {
+  font-size: 14px;
+  color: var(--color-text-secondary, #a0a0b8);
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+
+.message strong {
+  color: var(--color-text-primary, #e4e4f0);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btnPrimary {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnPrimary:hover {
+  background: #dc2626;
+}
+
+.btnPrimary:focus-visible {
+  outline: 2px solid #fca5a5;
+  outline-offset: 2px;
+}
+
+.btnSecondary {
+  background: transparent;
+  color: var(--color-text-primary, #e4e4f0);
+  border: 1px solid var(--color-border, #3a3a5c);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnSecondary:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.btnSecondary:focus-visible {
+  outline: 2px solid var(--color-focus, #818cf8);
+  outline-offset: 2px;
+}
+
+.btnGhost {
+  background: transparent;
+  color: var(--color-text-secondary, #a0a0b8);
+  border: none;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  align-self: flex-end;
+  transition: color 0.15s;
+}
+
+.btnGhost:hover {
+  color: var(--color-text-primary, #e4e4f0);
+}
+
+.btnGhost:focus-visible {
+  outline: 2px solid var(--color-focus, #818cf8);
+  outline-offset: 2px;
+  border-radius: 4px;
+}

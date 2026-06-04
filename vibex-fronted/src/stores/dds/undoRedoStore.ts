@@ -56,6 +56,12 @@ interface UndoRedoState {
   dismissConflict: () => void;
 
   /**
+   * D2.2: Resolve conflict dialog — user chose one of three options.
+   * @param choice 'undo-mine' | 'keep-theirs' | 'cancel'
+   */
+  resolveConflict: (choice: 'undo-mine' | 'keep-theirs' | 'cancel') => void;
+
+  /**
    * D4.1 + D4.2: Collaborative undo — sets operator, calls canvasHistoryStore.undo(),
    * broadcasts collab:undo via wsCollabHandler.
    */
@@ -123,5 +129,33 @@ export const useUndoRedoStore = create<UndoRedoState>((set, _get) => ({
     set({ currentOperator: { userId, userName, avatar: '', action: 'redo', timestamp: Date.now() } });
     useCanvasHistoryStore.getState().redo();
     broadcastRedo(null, userId, userName, canvasId);
+  },
+
+  /**
+   * D2.2: Resolve collaborative undo/redo conflict.
+   *
+   * - 'undo-mine': force-perform the undo even though another user is editing
+   * - 'keep-theirs': abandon this undo, keep the other user's changes
+   * - 'cancel': dismiss dialog, take no action
+   *
+   * S63-E2: 协作撤销冲突对话框
+   */
+  resolveConflict: (choice: 'undo-mine' | 'keep-theirs' | 'cancel') => {
+    const { conflictDialog } = _get();
+    if (!conflictDialog.open) return;
+
+    // Always close the dialog first
+    set((state) => ({
+      conflictDialog: { ...state.conflictDialog, open: false },
+    }));
+
+    if (choice === 'undo-mine') {
+      // Force-undo: get the top of the undo stack and execute it regardless of presence
+      const history = useCanvasHistoryStore.getState();
+      if (history.canUndo()) {
+        history.undo();
+      }
+    }
+    // 'keep-theirs' and 'cancel': do nothing — dialog already dismissed above
   },
 }));

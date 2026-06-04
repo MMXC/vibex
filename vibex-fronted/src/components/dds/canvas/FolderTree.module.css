@@ -235,3 +235,58 @@
 .confirm-dialog__btn-delete:hover {
   background: #dc2626;
 }
+
+/* ─── S63-E5: Drag handle ──────────────────────────────────────────────── */
+
+.folder-item__drag-handle {
+  background: none;
+  border: none;
+  cursor: grab;
+  font-size: 12px;
+  color: var(--color-text-secondary, #999);
+  padding: 2px 4px;
+  min-width: 20px;
+  text-align: center;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+  line-height: 1.2;
+}
+
+.folder-item:hover .folder-item__drag-handle {
+  opacity: 1;
+}
+
+.folder-item__drag-handle:active {
+  cursor: grabbing;
+}
+
+.folder-item__chevron-placeholder {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* ─── S63-E5: Rename input ─────────────────────────────────────────────── */
+
+.rename-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1002;
+}
+
+.rename-input {
+  width: 260px;
+  padding: 8px 12px;
+  border: 2px solid var(--color-primary, #3b82f6);
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}

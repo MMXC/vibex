@@ -927,3 +927,12 @@
 - **S63-E3.4**: `DDSCanvasPage.tsx` — `canvas-op-conflict` 事件监听器调用 E2 ConflictDialog；冲突解决后 `onUndoMine` 重试 `syncOfflineQueue()`
 - **S63-E3.5**: `OfflineBanner.tsx` — `getQueueSize()` + `getPendingCount()` 合并显示，`+ N canvas ops` 后缀
 - **S63-E3**: vitest 16/16 通过 (offline-queue.test.ts)
+
+---
+
+## [Unreleased] S63-E5: 文件夹拖拽排序 — 2026-06-05
+- **S63-E5.1**: `canvasFolderStore.ts` — `Folder.order` 字段 + `moveFolder()` 实现；创建时 `order = siblings.length`；重新排序时使用 midpoint 策略
+- **S63-E5.2**: `FolderTree.tsx` — `@dnd-kit` DndContext + SortableContext；SortableFolderItem 内部组件；拖拽手柄 `⋮⋮`；`handleDragEnd` 调用 `store.moveFolder()`
+- **S63-E5.3**: `FolderTree.tsx` — 双击重命名（inline input overlay）
+- **S63-E5.4**: `FolderPickerDialog.tsx` — 单选对话框；"根目录"选项；`onConfirm(folderId | null)` 回调
+- **S63-E5.5**: `BatchOpsToolbar.tsx` — "📁 移动到文件夹" 按钮 + 状态管理

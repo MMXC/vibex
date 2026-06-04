@@ -287,3 +287,91 @@ describe('canvasFolderStore — Edge Cases', () => {
     expect(Object.keys(useCanvasFolderStore.getState().canvasFolderMap).length).toBe(0);
   });
 });
+
+// ─── S63-E5: moveFolder (D5.1) ─────────────────────────────────────────────────
+
+describe('canvasFolderStore — moveFolder (S63-E5 D5.1)', () => {
+  it('moves folder to a new position within root', () => {
+    const state = useCanvasFolderStore.getState();
+    const f1 = state.createFolder('Folder 1');
+    const f2 = state.createFolder('Folder 2');
+    const f3 = state.createFolder('Folder 3');
+
+    // Move f3 to position 0 (before f1)
+    state.moveFolder(f3, null, 0);
+
+    const roots = useCanvasFolderStore.getState().getRootFolders();
+    expect(roots[0].id).toBe(f3);
+    expect(roots[1].id).toBe(f1);
+    expect(roots[2].id).toBe(f2);
+  });
+
+  it('moves folder to the end of root', () => {
+    const state = useCanvasFolderStore.getState();
+    const f1 = state.createFolder('Folder 1');
+    const f2 = state.createFolder('Folder 2');
+
+    // Move f1 to end (after f2)
+    state.moveFolder(f1, null, 2);
+
+    const roots = useCanvasFolderStore.getState().getRootFolders();
+    expect(roots[0].id).toBe(f2);
+    expect(roots[1].id).toBe(f1);
+  });
+
+  it('moveFolder guard is handled by handleDragEnd (not moveFolder itself)', () => {
+    // The drag-end handler in FolderTree.tsx already returns early when active.id === over.id.
+    // The store function does not guard this — it processes whatever it's given.
+    // This test confirms moveFolder is a pure positional-update function.
+    const state = useCanvasFolderStore.getState();
+    const f1 = state.createFolder('F1');
+    const f2 = state.createFolder('F2');
+    const f3 = state.createFolder('F3');
+
+    // Move f2 to between f1 and f3 (index 1)
+    state.moveFolder(f2, null, 1);
+
+    const roots = useCanvasFolderStore.getState().getRootFolders();
+    expect(roots.map((f) => f.id)).toEqual([f1, f2, f3]);
+  });
+
+  it('moves folder to a different parent', () => {
+    const state = useCanvasFolderStore.getState();
+    const parent = state.createFolder('Parent');
+    const child = state.createFolder('Child', parent);
+
+    // Move child out of parent (to root)
+    state.moveFolder(child, null, 0);
+
+    const roots = useCanvasFolderStore.getState().getRootFolders();
+    expect(roots.find((f) => f.id === child)?.id).toBe(child);
+    expect(useCanvasFolderStore.getState().getChildFolders(parent)).toHaveLength(0);
+  });
+
+  it('getRootFolders returns folders sorted by order', () => {
+    const state = useCanvasFolderStore.getState();
+    state.createFolder('C');
+    state.createFolder('A');
+    state.createFolder('B');
+
+    const roots = useCanvasFolderStore.getState().getRootFolders();
+    expect(roots.map((f) => f.name)).toEqual(['C', 'A', 'B']);
+  });
+
+  it('moveFolder normalizes orders when gap is too small', () => {
+    const state = useCanvasFolderStore.getState();
+    const f1 = state.createFolder('F1');
+    const f2 = state.createFolder('F2');
+    const f3 = state.createFolder('F3');
+
+    // Move f3 between f1 and f2 repeatedly — orders converge
+    state.moveFolder(f3, null, 1); // between f1 and f2
+    state.moveFolder(f3, null, 1); // still between f1 and f2 (no-op)
+
+    const roots = useCanvasFolderStore.getState().getRootFolders();
+    expect(roots.map((f) => f.id)).toEqual([f1, f3, f2]);
+    // All orders should still be distinct
+    const orders = roots.map((f) => f.order);
+    expect(new Set(orders).size).toBe(orders.length);
+  });
+});

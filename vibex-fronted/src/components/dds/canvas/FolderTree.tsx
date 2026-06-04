@@ -1,11 +1,26 @@
+'use client';
+
 /**
  * FolderTree.tsx — Collapsible folder tree with right-click context menu
  * E2 DoD: D2.3 — integrate into CanvasListPanel, expand/collapse/right-click menu
+ * S63-E5 DoD: D5.2 — Drag-sorting with @dnd-kit/sortable
  */
 
-'use client';
-
 import { useState, useCallback, useRef, useEffect } from 'react';
+import {
+  DndContext,
+  DragEndEvent,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { useCanvasFolderStore } from '@/stores/dds/canvasFolderStore';
 import { CreateFolderDialog } from './CreateFolderDialog';
 import type { Folder } from '@/stores/dds/canvasFolderStore';
@@ -22,6 +37,111 @@ interface ContextMenu {
   y: number;
 }
 
+// ─── Sortable Folder Item ─────────────────────────────────────────────────────
+
+interface SortableFolderItemProps {
+  folder: Folder;
+  expanded: Record<string, boolean>;
+  canvasIds?: string[];
+  onToggle: (folderId: string) => void;
+  onContextMenu: (e: React.MouseEvent, folderId: string) => void;
+}
+
+function SortableFolderItem({
+  folder,
+  expanded,
+  canvasIds = [],
+  onToggle,
+  onContextMenu,
+}: SortableFolderItemProps) {
+  const store = useCanvasFolderStore();
+  const children = store.getChildFolders(folder.id);
+  const canvasesInFolder = store.getCanvasesInFolder(folder.id);
+  const isExpanded = expanded[folder.id] ?? false;
+
+  const {
+    setNodeRef,
+    attributes,
+    listeners,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: folder.id });
+
+  const dragStyle = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={dragStyle}>
+      {/* Folder row */}
+      <div
+        className={styles['folder-item']}
+        onContextMenu={(e) => onContextMenu(e, folder.id)}
+        aria-label={`文件夹 ${folder.name}`}
+      >
+        {/* Drag handle */}
+        <button
+          className={styles['folder-item__drag-handle']}
+          {...attributes}
+          {...listeners}
+          aria-label={`拖动排序 ${folder.name}`}
+          title="拖动排序"
+        >
+          ⋮⋮
+        </button>
+
+        {/* Expand chevron */}
+        {children.length > 0 ? (
+          <button
+            className={`${styles['folder-item__chevron']} ${isExpanded ? styles['folder-item__chevron--open'] : ''}`}
+            onClick={() => onToggle(folder.id)}
+            aria-expanded={isExpanded}
+            aria-label={isExpanded ? '折叠' : '展开'}
+          >
+            ▶
+          </button>
+        ) : (
+          <span className={styles['folder-item__chevron-placeholder']} aria-hidden="true" />
+        )}
+
+        {/* Folder label */}
+        <button
+          className={styles['folder-item__label']}
+          onClick={() => onToggle(folder.id)}
+          aria-label={folder.name}
+        >
+          <span className={styles['folder-item__icon']} aria-hidden="true">📁</span>
+          <span className={styles['folder-item__name']}>{folder.name}</span>
+          <span className={styles['folder-item__count']}>
+            {canvasesInFolder.length > 0 ? `(${canvasesInFolder.length})` : ''}
+          </span>
+        </button>
+      </div>
+
+      {/* Children */}
+      {isExpanded && children.length > 0 && (
+        <div className={styles['folder-children']}>
+          {children.map((child) => (
+            <SortableFolderItem
+              key={child.id}
+              folder={child}
+              expanded={expanded}
+              canvasIds={canvasIds}
+              onToggle={onToggle}
+              onContextMenu={onContextMenu}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Main FolderTree ──────────────────────────────────────────────────────────
+
 export function FolderTree({ canvasIds = [] }: FolderTreeProps) {
   const store = useCanvasFolderStore();
 
@@ -35,6 +155,13 @@ export function FolderTree({ canvasIds = [] }: FolderTreeProps) {
   const [newFolderName, setNewFolderName] = useState('');
 
   const contextMenuRef = useRef<HTMLDivElement>(null);
+
+  // DnD sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 5 },
+    })
+  );
 
   // Close context menu on outside click
   useEffect(() => {
@@ -88,8 +215,52 @@ export function FolderTree({ canvasIds = [] }: FolderTreeProps) {
     }
   }, [confirmDeleteId, store]);
 
+  const handleRenameCommit = useCallback(() => {
+    if (editingFolderId && newFolderName.trim()) {
+      store.renameFolder(editingFolderId, newFolderName.trim());
+    }
+    setEditingFolderId(null);
+    setNewFolderName('');
+  }, [editingFolderId, newFolderName, store]);
+
+  const handleRenameKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') handleRenameCommit();
+      if (e.key === 'Escape') {
+        setEditingFolderId(null);
+        setNewFolderName('');
+      }
+    },
+    [handleRenameCommit]
+  );
+
+  // ─── DnD handler ──────────────────────────────────────────────────────────
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+
+      const activeId = String(active.id);
+      const overId = String(over.id);
+
+      // Find the index of the over item in the root folder list
+      const rootFolders = store.getRootFolders();
+      const overIndex = rootFolders.findIndex((f) => f.id === overId);
+
+      if (overIndex === -1) {
+        // Over item is not a root folder — try to find it as child
+        // For simplicity: if dropped on a non-root folder, insert at end of root
+        store.moveFolder(activeId, null, rootFolders.length);
+      } else {
+        store.moveFolder(activeId, null, overIndex);
+      }
+    },
+    [store]
+  );
+
   const rootFolders = store.getRootFolders();
-  const confirmFolder = confirmDeleteId ? store.getFolderById(confirmDeleteId) : null;
+  const confirmFolder =
+    confirmDeleteId != null ? store.getFolderById(confirmDeleteId) : null;
 
   return (
     <div className={styles['folder-tree']}>
@@ -99,32 +270,41 @@ export function FolderTree({ canvasIds = [] }: FolderTreeProps) {
         <button
           className={styles['folder-tree__add-btn']}
           onClick={handleCreateRoot}
-          title="新建文件夹"
           aria-label="新建文件夹"
+          title="新建文件夹"
         >
           +
         </button>
       </div>
 
-      {/* Folder list */}
-      <div className={styles['folder-tree__list']} role="tree" aria-label="文件夹列表">
-        {rootFolders.length === 0 && (
-          <div className={styles['folder-tree__empty']}>
-            暂无文件夹
-          </div>
-        )}
-        {rootFolders.map((folder) => (
-          <FolderItem
-            key={folder.id}
-            folder={folder}
-            expanded={expanded}
-            onToggle={toggleExpand}
-            onContextMenu={handleContextMenu}
-            store={store}
-            canvasIds={canvasIds}
-          />
-        ))}
-      </div>
+      {/* Folder list with DnD */}
+      {rootFolders.length === 0 ? (
+        <p className={styles['folder-tree__empty']}>暂无文件夹</p>
+      ) : (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={rootFolders.map((f) => f.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className={styles['folder-tree__list']} role="list">
+              {rootFolders.map((folder) => (
+                <SortableFolderItem
+                  key={folder.id}
+                  folder={folder}
+                  expanded={expanded}
+                  canvasIds={canvasIds}
+                  onToggle={toggleExpand}
+                  onContextMenu={handleContextMenu}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+      )}
 
       {/* Context menu */}
       {contextMenu && (
@@ -133,57 +313,57 @@ export function FolderTree({ canvasIds = [] }: FolderTreeProps) {
           className={styles['context-menu']}
           style={{ top: contextMenu.y, left: contextMenu.x }}
           role="menu"
+          aria-label="文件夹操作"
         >
           <button
             className={styles['context-menu__item']}
-            role="menuitem"
             onClick={() => handleCreateChild(contextMenu.folderId)}
+            role="menuitem"
           >
-            📁 新建子文件夹
+            + 新建子文件夹
           </button>
           <button
             className={styles['context-menu__item']}
-            role="menuitem"
             onClick={() => handleRename(contextMenu.folderId)}
+            role="menuitem"
           >
             ✏️ 重命名
           </button>
           <button
             className={`${styles['context-menu__item']} ${styles['context-menu__item--danger']}`}
-            role="menuitem"
             onClick={() => handleDeleteRequest(contextMenu.folderId)}
+            role="menuitem"
           >
             🗑️ 删除
           </button>
         </div>
       )}
 
-      {/* Create folder dialog */}
-      <CreateFolderDialog
-        isOpen={createDialogOpen}
-        onClose={() => setCreateDialogOpen(false)}
-        parentId={createParentId}
-      />
-
-      {/* Inline rename */}
-      {editingFolderId && (
-        <CreateFolderDialog
-          isOpen={true}
-          onClose={() => setEditingFolderId(null)}
-          editingFolderId={editingFolderId}
-        />
+      {/* Rename input overlay */}
+      {editingFolderId != null && (
+        <div className={styles['rename-overlay']} role="dialog" aria-label="重命名文件夹">
+          <input
+            className={styles['rename-input']}
+            value={newFolderName}
+            onChange={(e) => setNewFolderName(e.target.value)}
+            onBlur={handleRenameCommit}
+            onKeyDown={handleRenameKeyDown}
+            autoFocus
+            aria-label="新文件夹名称"
+          />
+        </div>
       )}
 
       {/* Delete confirmation */}
-      {confirmDeleteId && confirmFolder && (
+      {confirmFolder && (
         <div className={styles['confirm-overlay']} role="dialog" aria-modal="true">
           <div className={styles['confirm-dialog']}>
-            <h4 className={styles['confirm-dialog__title']}>确认删除</h4>
+            <h3 className={styles['confirm-dialog__title']}>确认删除</h3>
             <p className={styles['confirm-dialog__body']}>
-              删除文件夹「{confirmFolder.name}」？
-              {store.getCanvasesInFolder(confirmDeleteId).length > 0 && (
+              确定要删除文件夹「{confirmFolder.name}」吗？
+              {store.getCanvasesInFolder(confirmFolder.id).length > 0 && (
                 <span className={styles['confirm-dialog__warning']}>
-                  文件夹内的画布将移至根目录。
+                  包含 {store.getCanvasesInFolder(confirmFolder.id).length} 个画布，将移至根目录
                 </span>
               )}
             </p>
@@ -204,71 +384,16 @@ export function FolderTree({ canvasIds = [] }: FolderTreeProps) {
           </div>
         </div>
       )}
-    </div>
-  );
-}
 
-// ─── FolderItem sub-component ───────────────────────────────────────────────────
-
-interface FolderItemProps {
-  folder: Folder;
-  expanded: Record<string, boolean>;
-  onToggle: (id: string) => void;
-  onContextMenu: (e: React.MouseEvent, id: string) => void;
-  store: ReturnType<typeof useCanvasFolderStore>;
-  canvasIds: string[];
-}
-
-function FolderItem({ folder, expanded, onToggle, onContextMenu, store, canvasIds }: FolderItemProps) {
-  const isExpanded = !!expanded[folder.id];
-  const children = store.getChildFolders(folder.id);
-  const canvasesInFolder = store.getCanvasesInFolder(folder.id);
-  const hasChildren = children.length > 0 || canvasesInFolder.length > 0;
-
-  return (
-    <div role="treeitem" aria-expanded={hasChildren ? isExpanded : undefined}>
-      <div
-        className={styles['folder-item']}
-        onContextMenu={(e) => onContextMenu(e, folder.id)}
-      >
-        {/* Expand/collapse chevron */}
-        <button
-          className={`${styles['folder-item__chevron']} ${isExpanded ? styles['folder-item__chevron--open'] : ''}`}
-          onClick={() => hasChildren && onToggle(folder.id)}
-          aria-label={isExpanded ? '折叠' : '展开'}
-          tabIndex={hasChildren ? 0 : -1}
-        >
-          {hasChildren ? (isExpanded ? '▼' : '▶') : ''}
-        </button>
-
-        {/* Folder icon + name */}
-        <button
-          className={styles['folder-item__label']}
-          onClick={() => onToggle(folder.id)}
-        >
-          <span className={styles['folder-item__icon']}>📁</span>
-          <span className={styles['folder-item__name']}>{folder.name}</span>
-          <span className={styles['folder-item__count']}>
-            {canvasesInFolder.length > 0 ? `(${canvasesInFolder.length})` : ''}
-          </span>
-        </button>
-      </div>
-
-      {/* Children */}
-      {isExpanded && hasChildren && (
-        <div className={styles['folder-children']} role="group">
-          {children.map((child) => (
-            <FolderItem
-              key={child.id}
-              folder={child}
-              expanded={expanded}
-              onToggle={onToggle}
-              onContextMenu={onContextMenu}
-              store={store}
-              canvasIds={canvasIds}
-            />
-          ))}
-        </div>
+      {/* Create folder dialog */}
+      {createDialogOpen && (
+        <CreateFolderDialog
+          parentId={createParentId}
+          onClose={() => {
+            setCreateDialogOpen(false);
+            setCreateParentId(null);
+          }}
+        />
       )}
     </div>
   );

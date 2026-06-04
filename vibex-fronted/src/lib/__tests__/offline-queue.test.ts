@@ -79,3 +79,67 @@ describe('E5-D5.5: Cache constants in source', () => {
     expect(content).toContain("CANVAS_DB_NAME = 'vibex-canvas-cache'");
   });
 });
+
+// ==================== S63-E3: Canvas Operation Queue Tests ====================
+
+describe('S63-E3 D3.1: queueCanvasOp export', () => {
+  it('should be exported from offline-queue module', async () => {
+    const { queueCanvasOp } = await import('../offline-queue');
+    expect(typeof queueCanvasOp).toBe('function');
+  });
+});
+
+describe('S63-E3 D3.1: getQueueSize export', () => {
+  it('should be exported from offline-queue module', async () => {
+    const { getQueueSize } = await import('../offline-queue');
+    expect(typeof getQueueSize).toBe('function');
+  });
+});
+
+describe('S63-E3 D3.1: syncOfflineQueue export', () => {
+  it('should be exported from offline-queue module', async () => {
+    const { syncOfflineQueue } = await import('../offline-queue');
+    expect(typeof syncOfflineQueue).toBe('function');
+  });
+});
+
+describe('S63-E3 D3.1: isOnline export', () => {
+  it('should be exported from offline-queue module', async () => {
+    const { isOnline } = await import('../offline-queue');
+    expect(typeof isOnline).toBe('function');
+  });
+});
+
+describe('S63-E3 D3.1: CanvasOp interface', () => {
+  it('should define all canvas op types', async () => {
+    const fs = await import('node:fs');
+    const content = fs.readFileSync(
+      '/root/.openclaw/vibex/vibex-fronted/src/lib/offline-queue.ts',
+      'utf-8'
+    );
+    // Union type: check key types exist (spaces may differ)
+    expect(content).toContain('addNode');
+    expect(content).toContain('updateNode');
+    expect(content).toContain('deleteNode');
+    expect(content).toContain('addEdge');
+    expect(content).toContain('deleteEdge');
+  });
+
+  it('should include timestamp in CanvasOp interface', async () => {
+    const fs = await import('node:fs');
+    const content = fs.readFileSync(
+      '/root/.openclaw/vibex/vibex-fronted/src/lib/offline-queue.ts',
+      'utf-8'
+    );
+    expect(content).toContain('timestamp: number');
+  });
+
+  it('should use separate CANVAS_OP_DB_NAME from HTTP request queue DB', async () => {
+    const fs = await import('node:fs');
+    const content = fs.readFileSync(
+      '/root/.openclaw/vibex/vibex-fronted/src/lib/offline-queue.ts',
+      'utf-8'
+    );
+    expect(content).toContain("CANVAS_OP_DB_NAME = 'vibex-canvas-ops'");
+  });
+});

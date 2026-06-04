@@ -36,6 +36,32 @@ vi.mock('@/hooks/useTranslations', () => ({
   useTranslations: vi.fn(() => () => mockT),
 }));
 
+// ==================== useToast Mock ====================
+vi.mock('@/components/ui/Toast', () => ({
+  useToast: vi.fn(() => ({ success: vi.fn(), error: vi.fn(), info: vi.fn() })),
+  ToastProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
+// ==================== oplogStore Mock ====================
+vi.mock('@/stores/oplogStore', () => ({
+  useOplogConflictToast: vi.fn(),
+  useOplogStore: Object.assign(
+    (selector) => {
+      if (typeof selector === 'function') return selector({});
+      return {};
+    },
+    {
+      getState: () => ({}),
+      setState: vi.fn(),
+      subscribe: vi.fn(() => vi.fn()),
+    }
+  ),
+}));
+
+
+vi.mock('./LanguageSwitcher', () => ({
+  LanguageSwitcher: () => null,
+}));
 // ==================== Store Setup ====================
 
 function setupStore(overrides = {}) {

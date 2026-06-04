@@ -6082,3 +6082,12 @@ See git history for complete changelog.
 - **S61-E2.2**: `ExportProgress.tsx` — 导出进度条组件，实时显示当前节点 + 进度百分比
 - **S61-E2.3**: `ExportMenu.tsx` — 新增"批量导出"菜单项（`aria-label="批量导出"`），触发 ExportDialog
 - **S61-E2.4**: `useBatchExport.test.ts` — 18 个测试，91.42% 行覆盖率（PNG/SVG/PDF 路由、取消、错误处理、scope 映射）
+
+## [Unreleased] S61-E3: 国际化完善-多语言支持 — 2026-06-04
+- **S61-E3.1**: `BatchOpsToolbar.tsx` — 批量操作栏硬编码中文字符串全部替换为 `useTranslations('batchOps')()` 调用（15→0 硬编码）
+- **S61-E3.2**: `useLanguage.ts` — 用户语言偏好 Hook，支持 `setLanguage()` 切换，读取 `userPreferencesStore` 持久化
+- **S61-E3.3**: `LanguageSwitcher.tsx` — 工具栏语言切换下拉组件，支持 en/zh 切换
+- **S61-E3.4**: `DDSToolbar.tsx` — 集成 `LanguageSwitcher` + `useLanguage`，粘贴/复制按钮 aria-label i18n
+- **S61-E3.5**: `DDSSearchPanel.tsx` — 搜索面板所有 UI 字符串替换为 `useTranslations('search')()` 调用
+- **S61-E3.6**: `en.json`/`zh.json` — 新增 `toolbar`、`common`、`search`、`batchOps` 命名空间翻译键（batchOps 19 key, toolbar 18 key, search 12 key）
+- **S61-E3.7**: vitest: `useLanguage.test.ts` 4/4 通过

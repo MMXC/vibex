@@ -6163,3 +6163,14 @@ See git history for complete changelog.
 - **S62-E5.4**: OfflineBanner 在 CanvasPage 中渲染，网络断开时显示提示
 - **S62-E5.5**: public/sw.js 新增画布数据缓存层（MAX_CACHED_CANVASES=5, CACHE_TTL=7天），cacheCanvasResponse/evictOldestCanvasEntries/getCachedCanvasResponse/handleCanvasAPI
 
+
+---
+
+## [Unreleased] S63-E1: 协作者实时游标追踪 — 2026-06-05
+- **S63-E1.1**: `RemoteCursorsLayer.tsx` — RemoteCursor SVG 渲染组件，跟随远程用户鼠标位置，支持用户名标签
+- **S63-E1.2**: `RemoteCursorsLayer.module.css` — 脉冲动画样式 (online 绿/amber idle)
+- **S63-E1.3**: `presenceStore.ts` — 扩展 `remoteCursors` Map，`updateCursor(userId, x, y)` + `removeCursor(userId)` actions
+- **S63-E1.4**: `useWebSocketPresence.ts` — `throttleCursorBroadcast` (50ms) + `cursor:move` 消息发送/接收
+- **S63-E1.5**: `wsCollabHandler.ts` + `types.ts` — `CursorMoveMessage` 类型扩展
+- **S63-E1.6**: `DDSCanvasPage.tsx` + `DDSFlow.tsx` — `onPaneMouseMove` → `onCursorMove` → WS broadcast 链路
+- **S63-E1**: vitest 23/23 通过 (presenceStore cursor 生命周期 + remoteCursors Map 状态)

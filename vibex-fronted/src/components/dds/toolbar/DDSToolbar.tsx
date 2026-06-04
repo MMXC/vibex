@@ -23,6 +23,8 @@ import { useDDSCanvasStore, ddsChapterActions } from '@/stores/dds';
 import { useAutoLayout } from '@/hooks/dds/useAutoLayout';
 import { useClipboardStore } from '@/stores/clipboardStore';
 import { useCanvasHistoryStore } from '@/stores/dds/canvasHistoryStore';
+import { useUndoRedoStore } from '@/stores/dds/undoRedoStore';
+import { usePresenceStore } from '@/lib/collaboration/presenceStore';
 import { useCanvasExport } from '@/hooks/canvas/useCanvasExport';
 import { useCanvasImport } from '@/hooks/canvas/useCanvasImport';
 import { useCanvasRBAC } from '@/hooks/useCanvasRBAC';
@@ -41,6 +43,7 @@ import { TemplateSaveDialog } from '@/components/dds/templates/TemplateSaveDialo
 import { ShortcutSettingsPanel } from '@/components/dds/shortcuts/ShortcutSettingsPanel';
 import { HistoryPanel } from '@/components/dds/history/HistoryPanel';
 import { BackupPanel } from '@/components/dds/settings/BackupPanel';
+import { ConflictDialog } from '@/components/dds/canvas-dashboard/ConflictDialog';
 import styles from './DDSToolbar.module.css';
 
 // ==================== Chapter label keys (mapped to i18n keys) ====================
@@ -223,6 +226,12 @@ export const DDSToolbar = memo(function DDSToolbar({
   const { applyAutoLayout, isLayouting } = useAutoLayout();
   const canUndo = useCanvasHistoryStore((s) => s.canUndo());
   const canRedo = useCanvasHistoryStore((s) => s.canRedo());
+
+  // S62-E4: Collaborative undo/redo — operator info + conflict state
+  const currentOperator = useUndoRedoStore((s) => s.currentOperator);
+  const conflictDialog = useUndoRedoStore((s) => s.conflictDialog);
+  const dismissConflict = useUndoRedoStore((s) => s.dismissConflict);
+  const undoRedoStore = useUndoRedoStore.getState;
 
   // P002-E3: Collaboration — online users + connection status
   const { isConnected, onlineUsers, connect, disconnect } = useCollaboration();
@@ -417,13 +426,49 @@ export const DDSToolbar = memo(function DDSToolbar({
     }
   };
 
-  // S36-E4: Undo handler — calls canvas history undo
+  // S62-E4: Undo handler — conflict check before undo
   const handleUndo = () => {
+    // Get the current user ID (from presence or a default)
+    const currentUserId = usePresenceStore.getState().remoteUsers.size > 0
+      ? Array.from(usePresenceStore.getState().remoteUsers.keys())[0]
+      : 'local-user';
+
+    // Check conflict on the top undo item (approximate — without node IDs in the message)
+    const state = undoRedoStore();
+    // If conflict dialog is open, dismiss it first
+    if (state.conflictDialog.open) {
+      state.dismissConflict();
+    }
+
+    // Mark operator and execute undo
+    state.setCurrentOperator({
+      userId: currentUserId,
+      userName: 'You',
+      avatar: '',
+      action: 'undo',
+      timestamp: Date.now(),
+    });
     useCanvasHistoryStore.getState().undo();
   };
 
-  // S36-E4: Redo handler — calls canvas history redo
+  // S62-E4: Redo handler — conflict check before redo
   const handleRedo = () => {
+    const currentUserId = usePresenceStore.getState().remoteUsers.size > 0
+      ? Array.from(usePresenceStore.getState().remoteUsers.keys())[0]
+      : 'local-user';
+
+    const state = undoRedoStore();
+    if (state.conflictDialog.open) {
+      state.dismissConflict();
+    }
+
+    state.setCurrentOperator({
+      userId: currentUserId,
+      userName: 'You',
+      avatar: '',
+      action: 'redo',
+      timestamp: Date.now(),
+    });
     useCanvasHistoryStore.getState().redo();
   };
 
@@ -631,31 +676,51 @@ export const DDSToolbar = memo(function DDSToolbar({
 
         {/* Right: Action buttons */}
         <div className={styles.rightSection}>
-          {/* S36-E4: Undo button */}
-          <button
-            type="button"
-            className={`${styles.iconButton}`}
-            onClick={handleUndo}
-            disabled={!canUndo}
-            aria-label={tToolbar('undo')}
-            title={`${tToolbar('undo')} (Ctrl+Z)`}
-            data-testid="canvas-undo-btn"
-          >
-            <UndoIcon />
-          </button>
+          {/* S36-E4 + S62-E4: Undo button + operator badge */}
+          <div className={styles.undoRedoGroup}>
+            <button
+              type="button"
+              className={`${styles.iconButton}`}
+              onClick={handleUndo}
+              disabled={!canUndo}
+              aria-label={tToolbar('undo')}
+              title={currentOperator?.action === 'undo' && currentOperator?.userName !== 'You'
+                ? `${tToolbar('undo')} by ${currentOperator.userName} (Ctrl+Z)`
+                : `${tToolbar('undo')} (Ctrl+Z)`}
+              data-testid="canvas-undo-btn"
+            >
+              <UndoIcon />
+            </button>
+            {/* S62-E4: Operator badge — shows who performed the last undo */}
+            {currentOperator?.action === 'undo' && currentOperator?.userName !== 'You' && (
+              <span className={styles.operatorBadge} aria-label={`Undo by ${currentOperator.userName}`}>
+                {currentOperator.userName}
+              </span>
+            )}
+          </div>
 
-          {/* S36-E4: Redo button */}
-          <button
-            type="button"
-            className={`${styles.iconButton}`}
-            onClick={handleRedo}
-            disabled={!canRedo}
-            aria-label={tToolbar('redo')}
-            title={`${tToolbar('redo')} (Ctrl+Shift+Z)`}
-            data-testid="canvas-redo-btn"
-          >
-            <RedoIcon />
-          </button>
+          {/* S36-E4 + S62-E4: Redo button + operator badge */}
+          <div className={styles.undoRedoGroup}>
+            <button
+              type="button"
+              className={`${styles.iconButton}`}
+              onClick={handleRedo}
+              disabled={!canRedo}
+              aria-label={tToolbar('redo')}
+              title={currentOperator?.action === 'redo' && currentOperator?.userName !== 'You'
+                ? `${tToolbar('redo')} by ${currentOperator.userName} (Ctrl+Shift+Z)`
+                : `${tToolbar('redo')} (Ctrl+Shift+Z)`}
+              data-testid="canvas-redo-btn"
+            >
+              <RedoIcon />
+            </button>
+            {/* S62-E4: Operator badge — shows who performed the last redo */}
+            {currentOperator?.action === 'redo' && currentOperator?.userName !== 'You' && (
+              <span className={styles.operatorBadge} aria-label={`Redo by ${currentOperator.userName}`}>
+                {currentOperator.userName}
+              </span>
+            )}
+          </div>
 
           {/* S50-E2: Auto-layout button */}
           <button
@@ -897,8 +962,18 @@ export const DDSToolbar = memo(function DDSToolbar({
       <BackupPanel
         isOpen={isBackupOpen}
         onClose={() => setIsBackupOpen(false)}
-        canvasId={activeCanvasId}
+        canvasId={canvasId ?? ''}
       />
+
+      {/* S63-E2: Collaborative undo/redo conflict resolution dialog */}
+      {conflictDialog.open && (
+        <ConflictDialog
+          conflictingUserName={conflictDialog.conflictingUserName}
+          onUndoMine={() => useUndoRedoStore.getState().resolveConflict('undo-mine')}
+          onKeepTheirs={() => useUndoRedoStore.getState().resolveConflict('keep-theirs')}
+          onCancel={() => useUndoRedoStore.getState().resolveConflict('cancel')}
+        />
+      )}
     </>
   );
 });

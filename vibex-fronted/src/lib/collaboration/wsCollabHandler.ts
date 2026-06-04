@@ -2,16 +2,21 @@
  * wsCollabHandler — WebSocket handler for collaboration editing + undo/redo messages
  * S62-E1: 协作者实时同步 — collab:editing:start / collab:editing:end
  * S62-E4: 协作 Undo/Redo — collab:undo / collab:redo
+ * S63-E1: 实时游标追踪 — cursor:move
+ * S63-E2: 协作撤销冲突 — collab:conflict
  *
  * Registers with CollabWebSocket to handle:
  * - collab:editing:start — another user started editing a node
  * - collab:editing:end — another user stopped editing a node
  * - collab:undo — another user performed an undo operation
  * - collab:redo — another user performed a redo operation
+ * - cursor:move — another user's cursor moved
+ * - collab:conflict — another user triggered a conflict for the local user
  */
 
 import type { CollabWSHandler } from './websocket';
 import { usePresenceStore } from './presenceStore';
+import { useUndoRedoStore } from '@/stores/dds/undoRedoStore';
 
 /** S62-E1: WebSocket editing message payload */
 export interface CollabEditingStartMessage {
@@ -52,6 +57,15 @@ export interface CollabCursorMoveMessage {
   y: number;
 }
 
+/** S63-E2: WebSocket conflict message payload — server notifies that an undo hit a conflict */
+export interface CollabConflictMessage {
+  type: 'collab:conflict';
+  operatorId: string;
+  otherUserId: string;
+  otherUserName: string;
+  nodeId: string;
+}
+
 /** E4 callback types — called when peer undo/redo is received */
 export type UndoCallback = (msg: CollabUndoMessage) => void;
 export type RedoCallback = (msg: CollabRedoMessage) => void;
@@ -84,6 +98,16 @@ export function registerCollabHandler(
       case 'cursor:move': {
         const m = msg as CollabCursorMoveMessage;
         usePresenceStore.getState().updateCursor(m.userId, m.x, m.y);
+        break;
+      }
+      // S63-E2: collab:conflict — another user triggered a conflict for this user
+      case 'collab:conflict': {
+        const m = msg as CollabConflictMessage;
+        useUndoRedoStore.getState().showConflict(
+          m.otherUserName,
+          m.otherUserId,
+          m.nodeId
+        );
         break;
       }
       // S62-E4: collab:undo / collab:redo are handled by undoRedoStore via setBroadcasters

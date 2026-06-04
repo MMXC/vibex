@@ -174,4 +174,65 @@ describe('S62-E4 undoRedoStore', () => {
     });
     expect(mocks.mockBroadcastRedo).toHaveBeenCalledWith(null, 'u2', 'bob', 'canvas-2');
   });
+
+  // ========== S63-E2: resolveConflict tests ==========
+
+  it('D2.2: resolveConflict("undo-mine") closes dialog and calls canvasHistoryStore.undo', () => {
+    const { result } = renderHook(() => useUndoRedoStore());
+    // First open the dialog
+    act(() => { result.current.showConflict('bob', 'u2', 'node-1'); });
+    expect(result.current.conflictDialog.open).toBe(true);
+
+    // Then resolve
+    act(() => { result.current.resolveConflict('undo-mine'); });
+    expect(result.current.conflictDialog.open).toBe(false);
+    expect(mocks.mockUndo).toHaveBeenCalledTimes(1);
+  });
+
+  it('D2.2: resolveConflict("keep-theirs") closes dialog without calling undo', () => {
+    const { result } = renderHook(() => useUndoRedoStore());
+    act(() => { result.current.showConflict('bob', 'u2', 'node-1'); });
+    expect(result.current.conflictDialog.open).toBe(true);
+
+    act(() => { result.current.resolveConflict('keep-theirs'); });
+    expect(result.current.conflictDialog.open).toBe(false);
+    expect(mocks.mockUndo).not.toHaveBeenCalled();
+  });
+
+  it('D2.2: resolveConflict("cancel") closes dialog without calling undo', () => {
+    const { result } = renderHook(() => useUndoRedoStore());
+    act(() => { result.current.showConflict('bob', 'u2', 'node-1'); });
+    expect(result.current.conflictDialog.open).toBe(true);
+
+    act(() => { result.current.resolveConflict('cancel'); });
+    expect(result.current.conflictDialog.open).toBe(false);
+    expect(mocks.mockUndo).not.toHaveBeenCalled();
+  });
+
+  it('D2.2: resolveConflict is no-op when dialog is not open', () => {
+    const { result } = renderHook(() => useUndoRedoStore());
+    expect(result.current.conflictDialog.open).toBe(false);
+
+    act(() => { result.current.resolveConflict('undo-mine'); });
+    // No crash, no state change
+    expect(result.current.conflictDialog.open).toBe(false);
+    expect(mocks.mockUndo).not.toHaveBeenCalled();
+  });
+
+  it('D2.2: resolveConflict("undo-mine") does not call undo when canUndo is false', () => {
+    mocks.mockGetState.mockReturnValue({
+      undo: mocks.mockUndo,
+      redo: mocks.mockRedo,
+      canUndo: vi.fn(() => false),
+      canRedo: vi.fn(() => true),
+    });
+
+    const { result } = renderHook(() => useUndoRedoStore());
+    act(() => { result.current.showConflict('bob', 'u2', 'node-1'); });
+
+    act(() => { result.current.resolveConflict('undo-mine'); });
+    expect(result.current.conflictDialog.open).toBe(false);
+    // undo not called because canUndo() returns false
+    expect(mocks.mockUndo).not.toHaveBeenCalled();
+  });
 });

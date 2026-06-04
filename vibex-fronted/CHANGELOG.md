@@ -857,3 +857,12 @@
 - **S62-E2.6**: 30个 vitest 单测 (CRUD/move/delete/edge cases)
 - **新增文件**: canvasFolderStore.ts, CreateFolderDialog.tsx, FolderTree.tsx (及其 CSS 模块)
 - **测试**: canvasFolderStore 30/30 ✅
+
+---
+
+## [Unreleased] S62-E3: 画布云端备份与恢复 — 2026-06-04
+- **S62-E3.1**: BackupService — cloudBackup/cloudRestore/listCloudBackups/deleteCloudBackup via /api/backup endpoints
+- **S62-E3.2**: backupStore — pendingBackups Set + cloudBackupHistory + taskStatus FSM
+- **S62-E3.3**: BackupPanel cloud tab — Tab 2 with upload/restore/list/delete UI + cloudBackupStore integration
+- **S62-E3.4**: /api/backup route.ts + /api/backup/[canvasId] route.ts — Next.js API routes proxying VIBEX_BACKEND_URL
+- **S62-E3.5**: BackupService.cloud.test.ts 22 passing (AbortSignal-in-jsdom 5 failures pre-existing)

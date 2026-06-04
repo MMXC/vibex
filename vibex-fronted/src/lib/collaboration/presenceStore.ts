@@ -52,6 +52,9 @@ interface PresenceState {
   /** Remove a user who left */
   removeUser: (userId: string) => void;
 
+  /** S63-E1: Remove only the cursor position — user stays in remoteUsers map */
+  removeCursor: (userId: string) => void;
+
   /** Clear all remote users */
   clearAll: () => void;
 
@@ -135,6 +138,16 @@ export const usePresenceStore = create<PresenceState>((set, get) => ({
     set((state) => {
       const updated = new Map(state.remoteUsers);
       updated.delete(userId);
+      return { remoteUsers: updated };
+    }),
+
+  // S63-E1: Remove only cursor position — user stays in the map
+  removeCursor: (userId: string) =>
+    set((state) => {
+      const existing = state.remoteUsers.get(userId);
+      if (!existing) return state;
+      const updated = new Map(state.remoteUsers);
+      updated.set(userId, { ...existing, cursorX: undefined, cursorY: undefined });
       return { remoteUsers: updated };
     }),
 

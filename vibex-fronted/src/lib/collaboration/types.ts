@@ -1,8 +1,9 @@
 /**
- * Collaboration Types — VibeX P002-E1 + S60-E3
+ * Collaboration Types — VibeX P002-E1 + S60-E3 + S63-E1
  *
  * WebSocket protocol types shared between websocket.ts and useCollaboration.ts
  * S60-E3: Activity stream + online status indicators
+ * S63-E1: cursor:move message type for real-time cursor tracking
  */
 
 // ==================== Client → Server ====================
@@ -15,6 +16,14 @@ export interface AuthMessage {
 export interface ActionMessage {
   type: 'action';
   payload: CollabActionPayload;
+}
+
+/** S63-E1: Cursor position broadcast — sent by client on mouse move */
+export interface CursorMoveMessage {
+  type: 'cursor:move';
+  userId: string;
+  x: number;
+  y: number;
 }
 
 // ==================== Server → Client ====================
@@ -81,6 +90,7 @@ export interface ActivityMessage {
 export type CollabMessage =
   | AuthMessage
   | ActionMessage
+  | CursorMoveMessage
   | RemoteActionMessage
   | PresenceMessage
   | ConflictMessage

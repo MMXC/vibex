@@ -40,6 +40,7 @@ import { TemplateGallery } from '@/components/dds/templates/TemplateGallery';
 import { TemplateSaveDialog } from '@/components/dds/templates/TemplateSaveDialog';
 import { ShortcutSettingsPanel } from '@/components/dds/shortcuts/ShortcutSettingsPanel';
 import { HistoryPanel } from '@/components/dds/history/HistoryPanel';
+import { BackupPanel } from '@/components/dds/settings/BackupPanel';
 import styles from './DDSToolbar.module.css';
 
 // ==================== Chapter label keys (mapped to i18n keys) ====================
@@ -115,6 +116,17 @@ function HistoryIcon() {
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <circle cx="12" cy="12" r="10" />
       <polyline points="12 6 12 12 16 14" />
+    </svg>
+  );
+}
+
+// S61-E5: Backup icon for canvas backup panel
+function BackupIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" y1="15" x2="12" y2="3" />
     </svg>
   );
 }
@@ -228,6 +240,7 @@ export const DDSToolbar = memo(function DDSToolbar({
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [isShortcutSettingsOpen, setIsShortcutSettingsOpen] = useState(false);
   const [isHistoryPanelOpen, setIsHistoryPanelOpen] = useState(false);
+  const [isBackupOpen, setIsBackupOpen] = useState(false);
 
   // E3-S3: RBAC for toolbar actions
   const rbac = useCanvasRBAC(projectId);
@@ -706,6 +719,17 @@ export const DDSToolbar = memo(function DDSToolbar({
             <HistoryIcon />
           </button>
 
+          {/* S61-E5: Canvas Backup panel */}
+          <button
+            type="button"
+            className={styles.iconButton}
+            onClick={() => setIsBackupOpen(true)}
+            aria-label={tToolbar('canvasBackup')}
+            title={tToolbar('canvasBackup')}
+          >
+            <BackupIcon />
+          </button>
+
           {/* S61-E3: Language switcher */}
           <LanguageSwitcher />
 
@@ -867,6 +891,13 @@ export const DDSToolbar = memo(function DDSToolbar({
       <HistoryPanel
         isOpen={isHistoryPanelOpen}
         onClose={() => setIsHistoryPanelOpen(false)}
+      />
+
+      {/* S61-E5: Canvas Backup panel */}
+      <BackupPanel
+        isOpen={isBackupOpen}
+        onClose={() => setIsBackupOpen(false)}
+        canvasId={activeCanvasId}
       />
     </>
   );

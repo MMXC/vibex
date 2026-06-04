@@ -31,6 +31,7 @@
     "offline": "网络已断开",
     "shortcutSettings": "键盘快捷键设置",
     "versionHistory": "版本历史",
+    "canvasBackup": "画布备份",
     "viewAnalytics": "查看分析漏斗"
   },
   "export": {

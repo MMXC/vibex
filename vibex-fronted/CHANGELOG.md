@@ -897,3 +897,13 @@
 - **S63-E1.5**: `wsCollabHandler.ts` + `types.ts` — `CursorMoveMessage` 类型扩展
 - **S63-E1.6**: `DDSCanvasPage.tsx` + `DDSFlow.tsx` — `onPaneMouseMove` → `onCursorMove` → WS broadcast 链路
 - **S63-E1**: vitest 23/23 通过 (presenceStore cursor 生命周期 + remoteCursors Map 状态)
+
+
+---
+
+## [Unreleased] S63-E2: 协作撤销冲突对话框 — 2026-06-05
+- **S63-E2.1**: `ConflictDialog.tsx` — 三选项对话框（撤销你的操作/保留对方操作/取消），`aria-label="协作冲突对话框"`, `role="dialog"`
+- **S63-E2.2**: `undoRedoStore.ts` — `resolveConflict(choice)` action，`'undo-mine'` 强制执行撤销，`'keep-theirs'`/`'cancel'` 关闭对话框
+- **S63-E2.3**: `DDSToolbar.tsx` — `conflictDialog.open` 时渲染 ConflictDialog
+- **S63-E2.4**: `wsCollabHandler.ts` — `collab:conflict` 消息处理，调用 `showConflict(otherUserName, otherUserId, nodeId)`
+- **S63-E2.5**: vitest: ConflictDialog 5/5 + resolveConflict 5/5 (18 total undoRedoStore / 23 总计)

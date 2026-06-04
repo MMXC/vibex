@@ -261,3 +261,80 @@
   content: '⚠';
   font-size: 1rem;
 }
+
+/* E4: Canvas Context Badge */
+.canvasContextBadge {
+  flex: 1;
+  margin: 0 0.75rem;
+  padding: 0.25rem 0.625rem;
+  background: var(--color-bg-secondary, #1f2937);
+  border: 1px solid var(--color-border, #374151);
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary, #9ca3af);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* E4: Retry Config */
+.retryConfig {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-right: 0.5rem;
+}
+
+.retryLabel {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #8a8a9a);
+  white-space: nowrap;
+}
+
+.retrySelect {
+  background: var(--color-bg-secondary, #1f2937);
+  border: 1px solid var(--color-border, #374151);
+  border-radius: 0.375rem;
+  padding: 0.2rem 0.4rem;
+  font-size: 0.75rem;
+  color: var(--color-text-primary, #f9fafb);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.retrySelect:focus {
+  outline: none;
+  border-color: var(--color-primary, #3B82F6);
+}
+
+/* E4: Retry Spinner (shown during disconnection/retry) */
+.retrySpinner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 0.375rem;
+  color: #93c5fd;
+  font-size: 0.75rem;
+  animation: retryPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes retryPulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+.retrySpinnerDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #93c5fd;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

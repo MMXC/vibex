@@ -11,6 +11,7 @@ import React, { memo, useState, useRef, useEffect, useCallback } from 'react';
 import { exportAsPNG, exportAsSVG, downloadFigmaJSON, FigmaExportChapter } from '@/hooks/useCanvasExport';
 import { useCanvasExport } from '@/hooks/canvas/useCanvasExport';
 import { useDDSCanvasStore } from '@/stores/dds';
+import { ExportDialog } from '../export/ExportDialog';
 import styles from './ExportMenu.module.css';
 
 // ==================== Icons ====================
@@ -37,6 +38,17 @@ function SpinnerIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={styles.spinner}>
       <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+    </svg>
+  );
+}
+
+function BatchIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="3" width="7" height="7" />
+      <rect x="14" y="3" width="7" height="7" />
+      <rect x="14" y="14" width="7" height="7" />
+      <rect x="3" y="14" width="7" height="7" />
     </svg>
   );
 }
@@ -87,6 +99,7 @@ export const ExportMenu = memo(function ExportMenu({
   const [isOpen, setIsOpen] = useState(false);
   const [loadingFormat, setLoadingFormat] = useState<ExportFormat | null>(null);
   const [pngScale, setPngScale] = useState<1 | 2 | 3>(1); // PNG resolution selection (1x/2x/3x)
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -223,6 +236,11 @@ export const ExportMenu = memo(function ExportMenu({
     }
   }, [chapters]);
 
+  const handleOpenBatchExport = useCallback(() => {
+    setIsOpen(false);
+    setIsExportDialogOpen(true);
+  }, []);
+
   const handleExport = useCallback(
     async (format: ExportFormat) => {
       switch (format) {
@@ -321,8 +339,30 @@ export const ExportMenu = memo(function ExportMenu({
               </button>
             ))
           )}
+
+          {/* Batch export menu item */}
+          <div className={styles.menuDivider} role="separator" />
+          <button
+            type="button"
+            className={`${styles.menuItem} ${styles.menuItemBatch}`}
+            role="menuitem"
+            onClick={handleOpenBatchExport}
+            aria-label="批量导出"
+            data-testid="export-option-batch"
+          >
+            <span className={styles.menuItemLabel}>
+              <BatchIcon />
+              批量导出
+            </span>
+            <span className={styles.menuItemDesc}>PNG/SVG/PDF 多节点打包</span>
+          </button>
         </div>
       )}
+
+      <ExportDialog
+        open={isExportDialogOpen}
+        onClose={() => setIsExportDialogOpen(false)}
+      />
     </div>
   );
 });

@@ -222,4 +222,68 @@ describe('presenceStore', () => {
     state.endEditing('node-1');
     expect(state.isBeingEdited('node-1')).toBe(false);
   });
+
+  // === S63-E1: Real-time Cursor Tracking ===
+
+  it('updateCursor replaces previous cursor position', () => {
+    usePresenceStore.getState().setRemoteUsers([
+      { userId: 'u1', name: 'Alice', avatar: 'A' },
+    ]);
+    // Set initial position
+    usePresenceStore.getState().updateCursor('u1', 100, 200);
+    expect(usePresenceStore.getState().remoteUsers.get('u1')!.cursorX).toBe(100);
+    expect(usePresenceStore.getState().remoteUsers.get('u1')!.cursorY).toBe(200);
+
+    // Move cursor
+    usePresenceStore.getState().updateCursor('u1', 300, 400);
+    expect(usePresenceStore.getState().remoteUsers.get('u1')!.cursorX).toBe(300);
+    expect(usePresenceStore.getState().remoteUsers.get('u1')!.cursorY).toBe(400);
+    // User still present
+    expect(usePresenceStore.getState().remoteUsers.get('u1')!.name).toBe('Alice');
+  });
+
+  it('removeCursor clears cursor position but keeps user', () => {
+    usePresenceStore.getState().setRemoteUsers([
+      { userId: 'u1', name: 'Alice', avatar: 'A' },
+    ]);
+    usePresenceStore.getState().updateCursor('u1', 100, 200);
+    expect(usePresenceStore.getState().remoteUsers.get('u1')!.cursorX).toBe(100);
+
+    // Remove cursor — user stays
+    usePresenceStore.getState().removeCursor('u1');
+    expect(usePresenceStore.getState().remoteUsers.has('u1')).toBe(true);
+    expect(usePresenceStore.getState().remoteUsers.get('u1')!.name).toBe('Alice');
+    expect(usePresenceStore.getState().remoteUsers.get('u1')!.cursorX).toBeUndefined();
+    expect(usePresenceStore.getState().remoteUsers.get('u1')!.cursorY).toBeUndefined();
+  });
+
+  it('removeCursor on non-existent user is a no-op', () => {
+    usePresenceStore.getState().setRemoteUsers([
+      { userId: 'u1', name: 'Alice', avatar: 'A' },
+    ]);
+    // Should not throw
+    expect(() => usePresenceStore.getState().removeCursor('non-existent')).not.toThrow();
+    // u1 still present
+    expect(usePresenceStore.getState().remoteUsers.has('u1')).toBe(true);
+  });
+
+  it('remoteCursors Map reflects updateCursor + removeCursor lifecycle', () => {
+    usePresenceStore.getState().setRemoteUsers([
+      { userId: 'user-2', name: 'Bob', avatar: 'B' },
+    ]);
+    // Initially no cursor
+    expect(usePresenceStore.getState().remoteUsers.get('user-2')!.cursorX).toBeUndefined();
+
+    // Bob moves cursor — re-fetch state after set() mutation
+    usePresenceStore.getState().updateCursor('user-2', 500, 600);
+    expect(usePresenceStore.getState().remoteUsers.get('user-2')!.cursorX).toBe(500);
+    expect(usePresenceStore.getState().remoteUsers.get('user-2')!.cursorY).toBe(600);
+
+    // Bob stops moving (cursor goes out of viewport)
+    usePresenceStore.getState().removeCursor('user-2');
+    expect(usePresenceStore.getState().remoteUsers.get('user-2')!.cursorX).toBeUndefined();
+    expect(usePresenceStore.getState().remoteUsers.get('user-2')!.cursorY).toBeUndefined();
+    // User still tracked (for editing/locking)
+    expect(usePresenceStore.getState().remoteUsers.has('user-2')).toBe(true);
+  });
 });

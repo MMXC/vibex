@@ -313,7 +313,12 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
   const user = useAuthStore((s) => s.user);
   const userId = user?.id ?? null;
   // S43-E1: WebSocket Presence integration (replaces Firebase usePresence)
-  useWebSocketPresence({ projectId, userId, userName: user?.name ?? 'Anonymous' });
+  // S63-E1: returns onCursorMove for DDSFlow to wire mouse events
+  const { onCursorMove } = useWebSocketPresence({
+    projectId,
+    userId,
+    userName: user?.name ?? 'Anonymous',
+  });
 
   // E1-S1.4: cursorVisible setting controls PresenceOverlay display
   const cursorVisible = useUserPreferencesStore((s) => s.cursorVisible);
@@ -763,6 +768,8 @@ export const DDSCanvasPage = memo(function DDSCanvasPage({
                 selectedCardIds={selectedCardIds}
                 /* E5-U1: Touch mode — disable drag, enable pinch-zoom */
                 touchMode={touchMode}
+                /* S63-E1: wire pane mouse move → cursor broadcast */
+                onCursorMove={onCursorMove}
               />
             </>
           )}

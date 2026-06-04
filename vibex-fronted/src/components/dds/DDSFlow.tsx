@@ -40,6 +40,7 @@ import { useConflictStore } from '@/lib/canvas/stores/conflictStore';
 import { useMiniMapPanelStore, useMiniMapStore } from '@/lib/canvas/stores/miniMapStore';
 import { useViewportBoundsStore } from '@/lib/canvas/stores/viewportBoundsStore';
 import { usePresenceStore } from '@/lib/collaboration/presenceStore';
+import { RemoteCursorsLayer } from './canvas-dashboard/RemoteCursorsLayer';
 import { MiniMapPanel } from '@/components/dds/MiniMapPanel';
 import styles from './DDSFlow.module.css';
 
@@ -165,6 +166,8 @@ export interface DDSFlowProps {
   selectedCardIds?: string[];
   /** E5: when true, canvas switches to touch-optimized mode */
   touchMode?: boolean;
+  /** S63-E1: called on pane mouse move with flow-space coordinates */
+  onCursorMove?: (x: number, y: number) => void;
 }
 
 // ==================== Inner component ====================
@@ -176,6 +179,7 @@ function DDSFlowInner({
   onSelectCard,
   selectedCardIds = [],
   touchMode = false,
+  onCursorMove,
 }: DDSFlowProps) {
   const reactFlow = useReactFlow();
   const { getNodes } = reactFlow;
@@ -189,6 +193,19 @@ function DDSFlowInner({
     getNodes,
     onNodeSelect: onSelectCard,
   });
+
+  // S63-E1: Handle pane mouse move — convert screen → flow coords, broadcast
+  const handlePaneMouseMove = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (!onCursorMove) return;
+      const rect = event.currentTarget.getBoundingClientRect();
+      const screenX = event.clientX - rect.left;
+      const screenY = event.clientY - rect.top;
+      const flowPos = reactFlow.screenToFlowPosition({ x: screenX, y: screenY });
+      onCursorMove(flowPos.x, flowPos.y);
+    },
+    [onCursorMove, reactFlow]
+  );
 
   const {
     rawNodes,
@@ -311,9 +328,11 @@ function DDSFlowInner({
         elementsSelectable={true}
         /* E5: zoomOnPinch=false; useTouchGestures handles pinch+pan via setViewport */
         zoomOnPinch={false}
-        /* E5: Wire touch gesture handlers directly to ReactFlow root element */
+        {/* E5: Wire touch gesture handlers directly to ReactFlow root element */}
         onTouchStart={touchGestures.onTouchStart}
         onPointerDown={touchGestures.onPointerDown}
+        /* S63-E1: pane mouse move → flow coords → broadcast to collaborators */
+        onPaneMouseMove={handlePaneMouseMove}
         /* S43-P003-E3: only render nodes visible in viewport for large canvas performance */
         onlyRenderVisibleElements={true}
         /* S49-E3: clamp node positions to configured extent — prevents infinite canvas drift */
@@ -345,6 +364,9 @@ function DDSFlowInner({
           collapsedIds={collapsedGroups}
           onToggle={handleToggle}
         />
+
+        {/* S63-E1: Remote cursors layer — renders all remote user cursors */}
+        <RemoteCursorsLayer />
       </ReactFlow>
     </div>
   );

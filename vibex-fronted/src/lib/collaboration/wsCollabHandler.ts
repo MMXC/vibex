@@ -44,6 +44,14 @@ export interface CollabRedoMessage {
   canvasId: string;
 }
 
+/** S63-E1: WebSocket cursor move message payload — server relays from one client to all others */
+export interface CollabCursorMoveMessage {
+  type: 'cursor:move';
+  userId: string;
+  x: number;
+  y: number;
+}
+
 /** E4 callback types — called when peer undo/redo is received */
 export type UndoCallback = (msg: CollabUndoMessage) => void;
 export type RedoCallback = (msg: CollabRedoMessage) => void;
@@ -70,6 +78,12 @@ export function registerCollabHandler(
       case 'collab:editing:end': {
         const m = msg as CollabEditingEndMessage;
         usePresenceStore.getState().handleEditingEndedMessage(m.nodeId);
+        break;
+      }
+      // S63-E1: cursor:move — update remote cursor position
+      case 'cursor:move': {
+        const m = msg as CollabCursorMoveMessage;
+        usePresenceStore.getState().updateCursor(m.userId, m.x, m.y);
         break;
       }
       // S62-E4: collab:undo / collab:redo are handled by undoRedoStore via setBroadcasters

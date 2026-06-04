@@ -3,15 +3,18 @@
 /**
  * BatchOpsToolbar.tsx — Sprint60 E2: Batch Operations Floating Toolbar
  * S61-E3 i18n: All hardcoded Chinese strings replaced with useTranslations('batchOps').
+ * S63-E5: Add "移动到文件夹" button + FolderPickerDialog.
  *
  * Displays at the top of CanvasListPanel when multiple canvases are selected.
- * Provides batch delete and batch rename entry points.
+ * Provides batch delete, batch rename, and batch move-to-folder entry points.
  */
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useCanvasListStore } from '@/stores/canvasListStore';
 import { useBatchOpsStore } from '@/stores/dds/batchOpsStore';
+import { useCanvasFolderStore } from '@/stores/dds/canvasFolderStore';
 import { useTranslations } from '@/hooks/useTranslations';
+import { FolderPickerDialog } from './FolderPickerDialog';
 import styles from './BatchOpsToolbar.module.css';
 
 interface BatchOpsToolbarProps {
@@ -40,6 +43,27 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
 
   // S61-E3 i18n: batchOps namespace
   const t = useTranslations('batchOps')();
+
+  // S63-E5: folder picker state
+  const [showFolderPicker, setShowFolderPicker] = useState(false);
+  const { batchMoveToFolder } = useCanvasFolderStore();
+  const { selectedCanvasIds } = useCanvasListStore();
+
+  const handleMoveToFolder = useCallback(() => {
+    setShowFolderPicker(true);
+  }, []);
+
+  const handleFolderPicked = useCallback(async (folderId: string | null) => {
+    setShowFolderPicker(false);
+    if (selectedCanvasIds.size === 0) return;
+    setIsOperating(true);
+    try {
+      await batchMoveToFolder(Array.from(selectedCanvasIds), folderId);
+      clearSelection();
+    } finally {
+      setIsOperating(false);
+    }
+  }, [selectedCanvasIds, batchMoveToFolder, clearSelection, setIsOperating]);
 
   const handleBatchDelete = useCallback(async () => {
     const { selectedCanvasIds, batchDeleteCanvas } = useCanvasListStore.getState();
@@ -92,6 +116,15 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
           aria-label={t('delete')}
         >
           🗑️ {t('delete')}
+        </button>
+
+        <button
+          className={styles['batch-ops-toolbar__btn']}
+          onClick={handleMoveToFolder}
+          disabled={isOperating}
+          aria-label={t('moveToFolder')}
+        >
+          📁 {t('moveToFolder')}
         </button>
 
         <button
@@ -220,6 +253,15 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* S63-E5: Move to Folder dialog */}
+      {showFolderPicker && (
+        <FolderPickerDialog
+          open={showFolderPicker}
+          onConfirm={handleFolderPicked}
+          onCancel={() => setShowFolderPicker(false)}
+        />
       )}
     </>
   );

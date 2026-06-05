@@ -19,6 +19,8 @@ import { useTemplateStore } from '@/stores/templateStore';
 import { downloadTemplatesAsFile } from '@/lib/canvas/templateExport';
 import { TemplateImportDialog } from './TemplateImportDialog';
 import { CategoryTab, type CanvasCategory } from './CategoryTab';
+import { TagSelector } from './TagSelector';
+import { DateRangePicker } from './DateRangePicker';
 import { deserializeThreeTrees, restoreStore } from '@/lib/canvas/serialize';
 import { searchTemplates } from '@/lib/canvas/templateSearch';
 import { TEMPLATE_USE_CASE_TAGS, type TemplateTag } from '@/data/templates';
@@ -51,6 +53,8 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
   const [searchQuery, setSearchQuery] = useState('');
   // ---- E5: 标签过滤状态 ----
   const [selectedTags, setSelectedTags] = useState<TemplateTag[]>([]);
+  // ---- E4: 日期范围过滤状态 ----
+  const [dateRange, setDateRange] = useState<{ start: number | null; end: number | null }>({ start: null, end: null });
   const [loading, setLoading] = useState(false);
   const [applying, setApplying] = useState<string | null>(null);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
@@ -73,6 +77,36 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
     }
   }, []);
 
+  // ---- E4: URL 参数化 — 从 URL 恢复过滤状态 ----
+  useEffect(() => {
+    if (!isOpen) return;
+    const params = new URLSearchParams(window.location.search);
+    const tags = params.get('tags');
+    const start = params.get('start');
+    const end = params.get('end');
+    const q = params.get('q');
+    const cat = params.get('cat');
+    if (tags) setSelectedTags(tags.split(',') as TemplateTag[]);
+    if (start) setDateRange(d => ({ ...d, start: parseInt(start, 10) }));
+    if (end) setDateRange(d => ({ ...d, end: parseInt(end, 10) }));
+    if (q) setSearchQuery(q);
+    if (cat) setSelectedCategory(cat);
+  }, [isOpen]);
+
+  // ---- E4: URL 参数化 — 写入 URL（过滤器变化时） ----
+  useEffect(() => {
+    if (!isOpen) return;
+    const params = new URLSearchParams();
+    if (selectedTags.length > 0) params.set('tags', selectedTags.join(','));
+    if (dateRange.start !== null) params.set('start', String(dateRange.start));
+    if (dateRange.end !== null) params.set('end', String(dateRange.end));
+    if (searchQuery) params.set('q', searchQuery);
+    if (selectedCategory !== 'all') params.set('cat', selectedCategory);
+    const search = params.toString();
+    const newUrl = search ? `${window.location.pathname}?${search}` : window.location.pathname;
+    window.history.replaceState(null, '', newUrl);
+  }, [isOpen, selectedTags, dateRange, searchQuery, selectedCategory]);
+
   useEffect(() => {
     if (isOpen) {
       loadTemplates();
@@ -92,11 +126,18 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
       selectedCategory === 'all' ||
       (selectedCategory === cat);
     if (!matchCat) return false;
-    // ---- E5: 标签交集过滤 ----
+    // ---- E5: 标签交集过滤 + ---- E4: 日期范围过滤 ----
     if (selectedTags.length > 0) {
       const templateTags: string[] = t.tags ?? [];
       const matchTags = selectedTags.every(tag => templateTags.includes(tag));
       if (!matchTags) return false;
+    }
+    // ---- E4: 日期范围过滤（基于模板的 createdAt 或 metadata.createdAt）----
+    if (dateRange.start !== null || dateRange.end !== null) {
+      // Use template's metadata.createdAt or fall back to template id timestamp as proxy
+      const createdAt = (t as { createdAt?: number }).createdAt ?? 0;
+      if (dateRange.start !== null && createdAt < dateRange.start) return false;
+      if (dateRange.end !== null && createdAt > dateRange.end) return false;
     }
     return true;
   });
@@ -201,6 +242,32 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
               清除
             </button>
           )}
+        </div>
+
+        {/* ---- E4: Advanced filter row: TagSelector + DateRangePicker ---- */}
+        <div className={styles.filterRow}>
+          <TagSelector
+            selected={selectedTags}
+            onChange={setSelectedTags}
+            placeholder="标签过滤..."
+          />
+          <DateRangePicker
+            value={dateRange}
+            onChange={setDateRange}
+            placeholder="日期范围..."
+          />
+          {selectedTags.length > 0 || dateRange.start !== null || dateRange.end !== null ? (
+            <button
+              type="button"
+              className={styles.clearFiltersBtn}
+              onClick={() => {
+                setSelectedTags([]);
+                setDateRange({ start: null, end: null });
+              }}
+            >
+              清除过滤
+            </button>
+          ) : null}
         </div>
 
         {/* Category tabs (E4: CategoryTab component) */}

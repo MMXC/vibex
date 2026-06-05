@@ -1,0 +1,201 @@
+/* TagSelector.module.css — E4 */
+
+.container {
+  position: relative;
+  display: inline-block;
+  font-size: 14px;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 160px;
+  padding: 6px 10px;
+  background: var(--color-surface-elevated, #1e1e2e);
+  border: 1px solid var(--color-border, #3a3a4a);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--color-text-primary, #e2e8f0);
+  text-align: left;
+}
+
+.trigger:hover {
+  border-color: var(--color-primary, #6366f1);
+}
+
+.placeholder {
+  color: var(--color-text-muted, #94a3b8);
+}
+
+.selectedTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex: 1;
+}
+
+.selectedTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #6366f122;
+  color: #818cf8;
+  font-size: 12px;
+  border: 1px solid #6366f144;
+}
+
+.removeTag {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+.removeTag:hover {
+  opacity: 1;
+}
+
+.moreTag {
+  font-size: 12px;
+  color: var(--color-text-muted, #94a3b8);
+  padding: 2px 4px;
+}
+
+.arrow {
+  font-size: 10px;
+  color: var(--color-text-muted, #94a3b8);
+  margin-left: auto;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 220px;
+  background: var(--color-surface-elevated, #1e1e2e);
+  border: 1px solid var(--color-border, #3a3a4a);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  padding: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.section {
+  margin-bottom: 8px;
+}
+
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0 6px;
+  margin-bottom: 4px;
+}
+
+.tagOption {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 8px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--color-text-secondary, #cbd5e1);
+  text-align: left;
+  font-size: 13px;
+}
+
+.tagOption:hover {
+  background: var(--color-surface-hover, #2a2a3e);
+}
+
+.tagOptionSelected {
+  font-weight: 500;
+}
+
+.checkmark {
+  font-size: 12px;
+  color: var(--color-primary, #6366f1);
+}
+
+.customSection {
+  border-top: 1px solid var(--color-border, #3a3a4a);
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+.createTagBtn {
+  width: 100%;
+  padding: 6px 8px;
+  background: none;
+  border: 1px dashed var(--color-border, #3a3a4a);
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--color-text-muted, #94a3b8);
+  font-size: 12px;
+  text-align: left;
+}
+
+.createTagBtn:hover {
+  border-color: var(--color-primary, #6366f1);
+  color: var(--color-primary, #6366f1);
+}
+
+.customInputRow {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.customInput {
+  flex: 1;
+  padding: 4px 8px;
+  background: var(--color-surface, #181825);
+  border: 1px solid var(--color-border, #3a3a4a);
+  border-radius: 4px;
+  color: var(--color-text-primary, #e2e8f0);
+  font-size: 12px;
+  outline: none;
+}
+
+.customInput:focus {
+  border-color: var(--color-primary, #6366f1);
+}
+
+.customAddBtn {
+  padding: 4px 8px;
+  background: var(--color-primary, #6366f1);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.customAddBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.customCancelBtn {
+  padding: 4px 8px;
+  background: none;
+  border: 1px solid var(--color-border, #3a3a4a);
+  border-radius: 4px;
+  color: var(--color-text-muted, #94a3b8);
+  font-size: 12px;
+  cursor: pointer;
+}

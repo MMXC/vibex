@@ -123,6 +123,9 @@ export interface SnapshotMeta {
 
 export const MAX_HISTORY = 50;
 
+/** E2 (Sprint64): Maximum number of snapshots per canvas */
+export const MAX_SNAPSHOTS = 50;
+
 // ==================== State Interface ====================
 
 interface CanvasHistoryState {
@@ -198,6 +201,16 @@ interface CanvasHistoryState {
   ) => Promise<void>;
   /** Set the current canvas ID for local snapshot queries */
   setCurrentCanvasId: (canvasId: string | null) => void;
+  // E2 (Sprint64): Restore snapshot — applies snapshot data to DDSCanvasStore
+  /** Restore a snapshot by loading its data from IndexedDB and applying to DDSCanvasStore */
+  restoreSnapshot: (canvasId: string, snapshotId: string) => Promise<void>;
+  // E2 (Sprint64): Auto-snapshot timer
+  /** Current auto-snapshot interval in ms (null = disabled) */
+  autoSnapshotMs: number | null;
+  /** Start auto-snapshot: periodically saves canvas state every intervalMs milliseconds */
+  startAutoSnapshot: (canvasId: string, getCanvasData: () => { nodes: unknown[]; edges: unknown[] }, intervalMs: number) => void;
+  /** Stop auto-snapshot timer */
+  stopAutoSnapshot: () => void;
 }
 
 // ==================== Helper ====================
@@ -393,9 +406,15 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
     const id = `snapshot-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
     const snapshot = { id, name, timestamp: Date.now(), data };
     await saveSnapshotToDB(canvasId, snapshot);
-    // Refresh the snapshots list
+    // E2 (Sprint64): LRU eviction — delete oldest when over MAX_SNAPSHOTS
     const list = await get().listSnapshots(canvasId);
-    set({ snapshots: list });
+    if (list.length > MAX_SNAPSHOTS) {
+      const { deleteSnapshotFromDB } = await import('@/lib/canvas/historyDB');
+      const toDelete = list.slice(MAX_SNAPSHOTS); // oldest are at end (sorted desc)
+      await Promise.all(toDelete.map((s) => deleteSnapshotFromDB(canvasId, s.id)));
+    }
+    // Refresh the snapshots list
+    set({ snapshots: list.slice(0, MAX_SNAPSHOTS) });
   },
 
   loadSnapshot: async (canvasId: string, snapshotId: string) => {
@@ -498,6 +517,67 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
   setCurrentCanvasId: (_canvasId: string | null) => {
     // Reserved for future use — currently snapshots are queried per canvasId in listSnapshots
     // This state can be used by UI components to track the active canvas
+  },
+
+  // ==================== E2 (Sprint64): Restore Snapshot ====================
+  autoSnapshotMs: null,
+
+  restoreSnapshot: async (canvasId: string, snapshotId: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+
+    const { loadSnapshotFromDB } = await import('@/lib/canvas/historyDB');
+    const snapshot = await loadSnapshotFromDB(canvasId, snapshotId);
+    if (!snapshot) {
+      console.warn(`[canvasHistoryStore] restoreSnapshot: snapshot ${snapshotId} not found`);
+      return;
+    }
+
+    set({ restoringSnapshotId: snapshotId });
+
+    try {
+      // Apply snapshot data to DDSCanvasStore
+      // E2: Map snapshot nodes → DDSCanvasStore requirement chapter cards
+      // E2: Map snapshot edges → DDSCanvasStore requirement chapter edges
+      const { useDDSCanvasStore } = await import('@/stores/dds/DDSCanvasStore');
+      const { ChapterType, ChapterData } = await import('@/types/dds');
+
+      const chapters: Record<ChapterType, ChapterData> = {
+        requirement: { type: 'requirement', cards: snapshot.data.nodes as never[], edges: snapshot.data.edges as never[], loading: false, error: null },
+        context: { type: 'context', cards: [], edges: [], loading: false, error: null },
+        flow: { type: 'flow', cards: [], edges: [], loading: false, error: null },
+        api: { type: 'api', cards: [], edges: [], loading: false, error: null },
+        'business-rules': { type: 'business-rules', cards: [], edges: [], loading: false, error: null },
+      };
+
+      useDDSCanvasStore.setState({ chapters });
+    } finally {
+      set({ restoringSnapshotId: null });
+    }
+  },
+
+  // ==================== E2 (Sprint64): Auto-Snapshot ====================
+  startAutoSnapshot: (canvasId: string, getCanvasData: () => { nodes: unknown[]; edges: unknown[] }, intervalMs: number) => {
+    // Stop any existing timer first
+    const existing = (window as unknown as { __canvasAutoSnapshotTimer?: ReturnType<typeof setInterval> }).__canvasAutoSnapshotTimer;
+    if (existing) clearInterval(existing);
+
+    const timer = setInterval(async () => {
+      const data = getCanvasData();
+      const store = useCanvasHistoryStore.getState();
+      await store.saveSnapshot(canvasId, `Auto-save ${new Date().toLocaleString()}`, data);
+    }, intervalMs);
+
+    (window as unknown as { __canvasAutoSnapshotTimer?: ReturnType<typeof setInterval> }).__canvasAutoSnapshotTimer = timer;
+    set({ autoSnapshotMs: intervalMs });
+  },
+
+  stopAutoSnapshot: () => {
+    const timer = (window as unknown as { __canvasAutoSnapshotTimer?: ReturnType<typeof setInterval> }).__canvasAutoSnapshotTimer;
+    if (timer) {
+      clearInterval(timer);
+      (window as unknown as { __canvasAutoSnapshotTimer?: ReturnType<typeof setInterval> }).__canvasAutoSnapshotTimer = undefined;
+    }
+    set({ autoSnapshotMs: null });
   },
 }));
 

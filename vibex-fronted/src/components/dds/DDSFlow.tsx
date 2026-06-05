@@ -40,36 +40,23 @@ import { useConflictStore } from '@/lib/canvas/stores/conflictStore';
 import { useMiniMapPanelStore, useMiniMapStore } from '@/lib/canvas/stores/miniMapStore';
 import { useViewportBoundsStore } from '@/lib/canvas/stores/viewportBoundsStore';
 import { usePresenceStore } from '@/lib/collaboration/presenceStore';
+import { useNodeFocus } from '@/lib/collaboration/useNodeFocus';
 import { RemoteCursorsLayer } from './canvas-dashboard/RemoteCursorsLayer';
 import { MiniMapPanel } from '@/components/dds/MiniMapPanel';
 import styles from './DDSFlow.module.css';
 
 // ==================== Node Type Wrappers ====================
+// S65-E2: Moved inside DDSFlowInner so useNodeFocus hook can be called
+// for node mouseEnter/mouseLeave focus broadcast
 
 type RFNodeProps = {
   id: string;
   data: Record<string, unknown> & { selected?: boolean; conflict?: boolean; locked?: boolean; lockedBy?: string };
   dragHandle?: string;
   type?: string;
+  onNodeFocus?: (nodeId: string) => void;
+  onNodeBlur?: (nodeId: string) => void;
 };
-
-function UserStoryNode(props: RFNodeProps) {
-  return <CardRenderer card={props.data as unknown as DDSCard} selected={props.data?.selected} locked={props.data?.locked} lockedBy={props.data?.lockedBy} />;
-}
-
-function BoundedContextNode(props: RFNodeProps) {
-  return <CardRenderer card={props.data as unknown as DDSCard} selected={props.data?.selected} locked={props.data?.locked} lockedBy={props.data?.lockedBy} />;
-}
-
-function FlowStepNode(props: RFNodeProps) {
-  return <CardRenderer card={props.data as unknown as DDSCard} selected={props.data?.selected} locked={props.data?.locked} lockedBy={props.data?.lockedBy} />;
-}
-
-const nodeTypes: NodeTypes = {
-  'user-story': UserStoryNode as unknown as NodeTypes[string],
-  'bounded-context': BoundedContextNode as unknown as NodeTypes[string],
-  'flow-step': FlowStepNode as unknown as NodeTypes[string],
-} as const;
 
 // ==================== Group Node Helpers ====================
 
@@ -184,6 +171,50 @@ function DDSFlowInner({
   const reactFlow = useReactFlow();
   const { getNodes } = reactFlow;
 
+  // S65-E2: Node focus broadcast — use useNodeFocus to manage one-at-a-time focus
+  const { onNodeFocus, onNodeBlur } = useNodeFocus();
+
+  // S65-E2: Node type components (defined inside to use hooks)
+  // S65-E2: Read current user info from useAuthStore for focus broadcast
+  function UserStoryNode(props: RFNodeProps) {
+    return (
+      <div
+        onMouseEnter={() => props.onNodeFocus?.(props.id)}
+        onMouseLeave={() => props.onNodeBlur?.(props.id)}
+      >
+        <CardRenderer card={props.data as unknown as DDSCard} selected={props.data?.selected} locked={props.data?.locked} lockedBy={props.data?.lockedBy} />
+      </div>
+    );
+  }
+
+  function BoundedContextNode(props: RFNodeProps) {
+    return (
+      <div
+        onMouseEnter={() => props.onNodeFocus?.(props.id)}
+        onMouseLeave={() => props.onNodeBlur?.(props.id)}
+      >
+        <CardRenderer card={props.data as unknown as DDSCard} selected={props.data?.selected} locked={props.data?.locked} lockedBy={props.data?.lockedBy} />
+      </div>
+    );
+  }
+
+  function FlowStepNode(props: RFNodeProps) {
+    return (
+      <div
+        onMouseEnter={() => props.onNodeFocus?.(props.id)}
+        onMouseLeave={() => props.onNodeBlur?.(props.id)}
+      >
+        <CardRenderer card={props.data as unknown as DDSCard} selected={props.data?.selected} locked={props.data?.locked} lockedBy={props.data?.lockedBy} />
+      </div>
+    );
+  }
+
+  const nodeTypes: NodeTypes = {
+    'user-story': UserStoryNode as unknown as NodeTypes[string],
+    'bounded-context': BoundedContextNode as unknown as NodeTypes[string],
+    'flow-step': FlowStepNode as unknown as NodeTypes[string],
+  } as const;
+
   // E5: Touch gesture recognition — handles pinch-to-zoom, pan, double-tap
   // Uses reactFlow.setViewport (via useReactFlow) and getNodes for gesture math
   const touchGestures = useTouchGestures({
@@ -294,6 +325,9 @@ function DDSFlowInner({
         locked: nodeId in lockedNodes,
         lockedBy: lockedByUser?.name ?? lockedByUserId,
       },
+      // S65-E2: pass focus/blur handlers to custom node types
+      onNodeFocus,
+      onNodeBlur,
     };
   });
 

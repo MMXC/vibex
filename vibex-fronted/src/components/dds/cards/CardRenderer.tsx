@@ -21,6 +21,7 @@ import { APIEndpointCard } from './APIEndpointCard';
 import { CardErrorBoundary } from '@/components/dds/canvas/CardErrorBoundary';
 import { StateMachineCard } from './StateMachineCard';
 import { NodeEditorLock } from '@/components/canvas/NodeEditorLock';
+import { NodeFocusOverlay } from '@/components/canvas/NodeFocusOverlay';
 import type { APIEndpointCard as APIEndpointCardType, StateMachineCard as SMCardType } from '@/types/dds';
 
 export interface CardRendererProps {
@@ -35,6 +36,8 @@ export interface CardRendererProps {
   locked?: boolean;
   /** S44-P003-E3: 锁定者用户名 */
   lockedBy?: string;
+  /** S65-E2: 此节点正被远程用户聚焦（显示 NodeFocusOverlay） */
+  focused?: boolean;
 }
 
 /** Lock icon overlay — rendered at top-right of card */
@@ -94,6 +97,7 @@ export const CardRenderer = memo(function CardRenderer({
   conflict = false,
   locked = false,
   lockedBy,
+  focused = false,
 }: CardRendererProps) {
   const { type } = card;
 
@@ -103,6 +107,8 @@ export const CardRenderer = memo(function CardRenderer({
       {locked && <LockOverlay userName={lockedBy} />}
       {/* S62-E1: Show remote editor badge when another user is editing this node */}
       <NodeEditorLock nodeId={card.id} />
+      {/* S65-E2: Show remote focus indicator (reads directly from presenceStore) */}
+      <NodeFocusOverlay nodeId={card.id} />
     </div>
   );
 

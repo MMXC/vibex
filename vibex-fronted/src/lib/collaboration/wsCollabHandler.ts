@@ -5,6 +5,7 @@
  * S63-E1: 实时游标追踪 — cursor:move
  * S63-E2: 协作撤销冲突 — collab:conflict
  * S64-E1: 协作者在线状态 — presence:heartbeat
+ * S65-E2: 协作者编辑指示器 — node:focused / node:unfocused (delegated to wsNodeFocusHandler)
  *
  * Registers with CollabWebSocket to handle:
  * - collab:editing:start — another user started editing a node
@@ -14,11 +15,13 @@
  * - cursor:move — another user's cursor moved
  * - collab:conflict — another user triggered a conflict for the local user
  * - presence:heartbeat — another user's presence heartbeat (30s interval)
+ * - node:focused / node:unfocused — handled by wsNodeFocusHandler (S65-E2)
  */
 
 import type { CollabWSHandler } from './websocket';
 import { usePresenceStore } from './presenceStore';
 import { useUndoRedoStore } from '@/stores/dds/undoRedoStore';
+import { registerNodeFocusHandler } from './wsNodeFocusHandler';
 
 /** S62-E1: WebSocket editing message payload */
 export interface CollabEditingStartMessage {
@@ -89,6 +92,9 @@ export type RedoCallback = (msg: CollabRedoMessage) => void;
 export function registerCollabHandler(
   onMessage: (handler: CollabWSHandler) => void
 ): void {
+  // S65-E2: Register node focus/unfocus handlers
+  registerNodeFocusHandler(onMessage);
+
   onMessage((msg) => {
     switch (msg.type) {
       case 'collab:editing:start': {

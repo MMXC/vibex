@@ -1,9 +1,10 @@
 /**
- * Collaboration Types — VibeX P002-E1 + S60-E3 + S63-E1
+ * Collaboration Types — VibeX P002-E1 + S60-E3 + S63-E1 + S65-E2
  *
  * WebSocket protocol types shared between websocket.ts and useCollaboration.ts
  * S60-E3: Activity stream + online status indicators
  * S63-E1: cursor:move message type for real-time cursor tracking
+ * S65-E2: node:focused/unfocused message types for node focus awareness
  */
 
 // ==================== Client → Server ====================
@@ -24,6 +25,22 @@ export interface CursorMoveMessage {
   userId: string;
   x: number;
   y: number;
+}
+
+/** S65-E2: Node focus broadcast — sent by client when a node receives focus */
+export interface NodeFocusedMessage {
+  type: 'node:focused';
+  nodeId: string;
+  userId: string;
+  userName: string;
+  avatar: string;
+}
+
+/** S65-E2: Node unfocus broadcast — sent by client when a node loses focus */
+export interface NodeUnfocusedMessage {
+  type: 'node:unfocused';
+  nodeId: string;
+  userId: string;
 }
 
 // ==================== Server → Client ====================
@@ -91,6 +108,8 @@ export type CollabMessage =
   | AuthMessage
   | ActionMessage
   | CursorMoveMessage
+  | NodeFocusedMessage
+  | NodeUnfocusedMessage
   | RemoteActionMessage
   | PresenceMessage
   | ConflictMessage

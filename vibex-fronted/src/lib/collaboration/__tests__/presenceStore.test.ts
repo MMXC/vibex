@@ -1,9 +1,10 @@
 /**
- * presenceStore.test.ts — S42-P002-E2 + S44-P003-E3 + S52-E1 + S62-E1 + S63-E1 + S64-E1
+ * presenceStore.test.ts — S42-P002-E2 + S44-P003-E3 + S52-E1 + S62-E1 + S63-E1 + S64-E1 + S65-E2
  * Tests: cursor sync (S42) + node locking (S44) + S52 presence awareness
  * + S62-E1: editingNodeIds editing lock state transitions
  * + S63-E1: cursor tracking + removeCursor
  * + S64-E1: onlineUsers + heartbeat + removeStaleUsers
+ * + S65-E2: node focus awareness — focusedNodes + focusedNodeInfos + WS message handlers
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { usePresenceStore } from '../presenceStore';
@@ -404,5 +405,192 @@ describe('presenceStore', () => {
   it('DoD: clearOnlineUsers is a function', () => {
     const store = usePresenceStore.getState();
     expect(typeof store.clearOnlineUsers).toBe('function');
+  });
+
+  // === S65-E2: Node Focus Awareness ===
+
+  it('focusedNodes initialises as empty object', () => {
+    expect(usePresenceStore.getState().focusedNodes).toEqual({});
+  });
+
+  it('focusedNodeInfos initialises as empty Map', () => {
+    expect(usePresenceStore.getState().focusedNodeInfos.size).toBe(0);
+  });
+
+  it('setNodeFocus adds node to focusedNodes and focusedNodeInfos', () => {
+    usePresenceStore.getState().setNodeFocus('node-1', 'u1', 'Alice', 'A');
+    // Re-fetch state after set() — Zustand proxy becomes stale after mutation
+    const state = usePresenceStore.getState();
+
+    expect(state.focusedNodes['node-1']).toBe('u1');
+    expect(state.focusedNodeInfos.has('node-1')).toBe(true);
+    const info = state.focusedNodeInfos.get('node-1')!;
+    expect(info.userId).toBe('u1');
+    expect(info.userName).toBe('Alice');
+    expect(info.avatar).toBe('A');
+    expect(info.startedAt).toBeGreaterThan(0);
+  });
+
+  it('setNodeFocus overwrites existing focus for same node', () => {
+    usePresenceStore.getState().setNodeFocus('node-1', 'u1', 'Alice', 'A');
+    usePresenceStore.getState().setNodeFocus('node-1', 'u2', 'Bob', 'B');
+    // Re-fetch after EACH set() — Zustand proxy goes stale after mutation
+    const state = usePresenceStore.getState();
+    expect(state.focusedNodes['node-1']).toBe('u2');
+    expect(state.focusedNodeInfos.get('node-1')!.userName).toBe('Bob');
+  });
+
+  it('clearNodeFocus removes node from focusedNodes and focusedNodeInfos', () => {
+    usePresenceStore.getState().setNodeFocus('node-1', 'u1', 'Alice', 'A');
+    expect(usePresenceStore.getState().focusedNodes['node-1']).toBe('u1');
+
+    usePresenceStore.getState().clearNodeFocus('node-1');
+    const state = usePresenceStore.getState();
+    expect(state.focusedNodes['node-1']).toBeUndefined();
+    expect(state.focusedNodeInfos.has('node-1')).toBe(false);
+  });
+
+  it('clearNodeFocus on non-focused node is a no-op', () => {
+    const state = usePresenceStore.getState();
+    expect(() => state.clearNodeFocus('nonexistent')).not.toThrow();
+  });
+
+  it('getFocusedBy returns userId for remote focus, undefined for self focus', () => {
+    const state = usePresenceStore.getState();
+    // No focus
+    expect(state.getFocusedBy('node-1', 'self-u1')).toBeUndefined();
+
+    // Remote user focused
+    state.setNodeFocus('node-1', 'remote-u2', 'Bob', 'B');
+    expect(state.getFocusedBy('node-1', 'self-u1')).toBe('remote-u2');
+
+    // Self focused (same userId) — should return undefined (not remote)
+    state.clearNodeFocus('node-1');
+    state.setNodeFocus('node-1', 'self-u1', 'Alice', 'A');
+    expect(state.getFocusedBy('node-1', 'self-u1')).toBeUndefined();
+  });
+
+  it('getFocusInfo returns FocusedNodeInfo for focused node', () => {
+    const state = usePresenceStore.getState();
+    expect(state.getFocusInfo('node-1')).toBeUndefined();
+
+    state.setNodeFocus('node-1', 'u1', 'Alice', 'A');
+    const info = state.getFocusInfo('node-1');
+    expect(info?.userId).toBe('u1');
+    expect(info?.userName).toBe('Alice');
+    expect(info?.avatar).toBe('A');
+  });
+
+  it('handleNodeFocusedMessage adds remote focus without local timer', () => {
+    // Simulate receiving WS message: Bob focuses node-1
+    usePresenceStore.getState().handleNodeFocusedMessage('node-1', 'u2', 'Bob', 'B');
+    // Re-fetch after mutation — Zustand proxy goes stale after set()
+    const state = usePresenceStore.getState();
+    expect(state.focusedNodes['node-1']).toBe('u2');
+    const info = state.focusedNodeInfos.get('node-1')!;
+    expect(info.userName).toBe('Bob');
+  });
+
+  it('handleNodeFocusedMessage overwrites previous focus for same node', () => {
+    usePresenceStore.getState().handleNodeFocusedMessage('node-1', 'u1', 'Alice', 'A');
+    usePresenceStore.getState().handleNodeFocusedMessage('node-1', 'u2', 'Bob', 'B');
+    // Re-fetch after each mutation
+    const state = usePresenceStore.getState();
+    expect(state.focusedNodes['node-1']).toBe('u2');
+    expect(state.focusedNodeInfos.get('node-1')!.userName).toBe('Bob');
+  });
+
+  it('handleNodeUnfocusedMessage clears focus only for the specified user', () => {
+    usePresenceStore.getState().setNodeFocus('node-1', 'u1', 'Alice', 'A');
+    let state = usePresenceStore.getState();
+    expect(state.focusedNodes['node-1']).toBe('u1');
+
+    // Bob tries to unfocus (but Alice was focusing)
+    usePresenceStore.getState().handleNodeUnfocusedMessage('node-1', 'u2');
+    // Alice's focus should remain (unfocus was for wrong user)
+    state = usePresenceStore.getState();
+    expect(state.focusedNodes['node-1']).toBe('u1');
+
+    // Alice unfocuses
+    usePresenceStore.getState().handleNodeUnfocusedMessage('node-1', 'u1');
+    state = usePresenceStore.getState();
+    expect(state.focusedNodes['node-1']).toBeUndefined();
+  });
+
+  it('handleNodeUnfocusedMessage on non-focused node is a no-op', () => {
+    const state = usePresenceStore.getState();
+    expect(() => state.handleNodeUnfocusedMessage('nonexistent', 'u1')).not.toThrow();
+  });
+
+  it('clearAllFocus clears all focus state', () => {
+    usePresenceStore.getState().setNodeFocus('node-1', 'u1', 'Alice', 'A');
+    usePresenceStore.getState().setNodeFocus('node-2', 'u2', 'Bob', 'B');
+    let state = usePresenceStore.getState();
+    expect(Object.keys(state.focusedNodes)).toHaveLength(2);
+
+    usePresenceStore.getState().clearAllFocus();
+    state = usePresenceStore.getState();
+    expect(state.focusedNodes).toEqual({});
+    expect(state.focusedNodeInfos.size).toBe(0);
+  });
+
+  it('clearAll also clears focusedNodes and focusedNodeInfos', () => {
+    const state = usePresenceStore.getState();
+    state.setNodeFocus('node-1', 'u1', 'Alice', 'A');
+
+    state.clearAll();
+    expect(state.focusedNodes).toEqual({});
+    expect(state.focusedNodeInfos.size).toBe(0);
+  });
+
+  it('DoD: setNodeFocus is a function', () => {
+    expect(typeof usePresenceStore.getState().setNodeFocus).toBe('function');
+  });
+
+  it('DoD: clearNodeFocus is a function', () => {
+    expect(typeof usePresenceStore.getState().clearNodeFocus).toBe('function');
+  });
+
+  it('DoD: getFocusedBy is a function', () => {
+    expect(typeof usePresenceStore.getState().getFocusedBy).toBe('function');
+  });
+
+  it('DoD: getFocusInfo is a function', () => {
+    expect(typeof usePresenceStore.getState().getFocusInfo).toBe('function');
+  });
+
+  it('DoD: handleNodeFocusedMessage is a function', () => {
+    expect(typeof usePresenceStore.getState().handleNodeFocusedMessage).toBe('function');
+  });
+
+  it('DoD: handleNodeUnfocusedMessage is a function', () => {
+    expect(typeof usePresenceStore.getState().handleNodeUnfocusedMessage).toBe('function');
+  });
+
+  it('DoD: clearAllFocus is a function', () => {
+    expect(typeof usePresenceStore.getState().clearAllFocus).toBe('function');
+  });
+
+  it('focus + unfocus full lifecycle', () => {
+    const state = usePresenceStore.getState();
+
+    // Alice focuses node-1
+    state.setNodeFocus('node-1', 'u1', 'Alice', 'A');
+    expect(state.getFocusedBy('node-1', 'self-other')).toBe('u1');
+    expect(state.getFocusInfo('node-1')?.userName).toBe('Alice');
+
+    // Bob focuses node-1 (overwrites Alice)
+    state.handleNodeFocusedMessage('node-1', 'u2', 'Bob', 'B');
+    expect(state.getFocusInfo('node-1')?.userName).toBe('Bob');
+
+    // Alice unfocuses
+    state.handleNodeUnfocusedMessage('node-1', 'u1');
+    // Bob still focused
+    expect(state.getFocusInfo('node-1')?.userName).toBe('Bob');
+
+    // Bob unfocuses
+    state.handleNodeUnfocusedMessage('node-1', 'u2');
+    expect(state.getFocusInfo('node-1')).toBeUndefined();
+    expect(state.focusedNodes['node-1']).toBeUndefined();
   });
 });

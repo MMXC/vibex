@@ -5,6 +5,7 @@
  * S62-E1: 协作者实时同步 — editingNodeIds 编辑锁定感知
  * S63-E1: 实时游标追踪 — cursor:move, removeCursor
  * S64-E1: 协作者在线状态面板 — onlineUsers + heartbeat
+ * S65-E2: 协作者编辑指示器 — focusedNodes + node focus 感知
  *
  * Replaces Firebase usePresence with WebSocket-backed state.
  * Updated by useCollaboration's onPresence callback.
@@ -46,8 +47,19 @@ export interface EditingNodeInfo {
   startedAt: number;
 }
 
+/** S65-E2: Info about who is focusing on which node */
+export interface FocusedNodeInfo {
+  userId: string;
+  userName: string;
+  avatar: string;
+  startedAt: number;
+}
+
 /** Heartbeat timeout in milliseconds (30s) */
 const HEARTBEAT_TIMEOUT_MS = 30_000;
+
+/** S65-E2: Focus timeout in milliseconds (30s auto-release) */
+const FOCUS_TIMEOUT_MS = 30_000;
 
 interface PresenceState {
   /** Remote users currently on the same canvas (excluding self) */
@@ -60,10 +72,16 @@ interface PresenceState {
   editingNodeIds: Map<string, EditingNodeInfo>;
 
   /** S62-E1: Local + remote editing tracking (local: started by local user; remote: started by remote user) */
-  localEditing: Map<string, EditingNodeInfo>; // nodeId → entry started locally OR by remote (merged view)
+  localEditing: Map<string, EditingNodeInfo>;
 
   /** S64-E1: Online users tracked via presence:heartbeat */
   onlineUsers: OnlineUser[];
+
+  /** S65-E2: Nodes currently focused by remote users: nodeId → userId */
+  focusedNodes: Record<string, string>;
+
+  /** S65-E2: Detailed focus info for overlay display */
+  focusedNodeInfos: Map<string, FocusedNodeInfo>;
 
   /** Update remote users from WebSocket presence message */
   setRemoteUsers: (users: CollabUser[]) => void;
@@ -139,191 +157,328 @@ interface PresenceState {
 
   /** Clear all online users (on disconnect) */
   clearOnlineUsers: () => void;
-}
 
-export const usePresenceStore = create<PresenceState>((set, get) => ({
-  remoteUsers: new Map(),
-  lockedNodes: {},
-  editingNodeIds: new Map(),
-  localEditing: new Map(),
-  onlineUsers: [],
+  // S65-E2: Node Focus actions
 
-  setRemoteUsers: (users: CollabUser[]) =>
-    set((state) => {
-      const next = new Map<string, RemoteUser>();
-      for (const user of users) {
-        const existing = state.remoteUsers.get(user.userId);
-        next.set(user.userId, {
-          userId: user.userId,
-          name: user.name,
-          avatar: user.avatar,
-          cursorX: existing?.cursorX,
-          cursorY: existing?.cursorY,
-          lastSeen: Date.now(),
-        });
-      }
-      return { remoteUsers: next };
-    }),
+  /**
+   * S65-E2: Set node focus — starts 30s auto-release timer.
+   * If already focused by this user, resets the timer.
+   */
+  setNodeFocus: (nodeId: string, userId: string, userName: string, avatar: string) => void;
 
-  updateCursor: (userId: string, x: number, y: number) =>
-    set((state) => {
-      const existing = state.remoteUsers.get(userId);
-      if (!existing) return state;
-      const updated = new Map(state.remoteUsers);
-      updated.set(userId, { ...existing, cursorX: x, cursorY: y, lastSeen: Date.now() });
-      return { remoteUsers: updated };
-    }),
+  /**
+   * S65-E2: Clear node focus — cancels the auto-release timer.
+   */
+  clearNodeFocus: (nodeId: string) => void;
 
-  removeUser: (userId: string) =>
-    set((state) => {
-      const updated = new Map(state.remoteUsers);
-      updated.delete(userId);
-      return { remoteUsers: updated };
-    }),
+  /**
+   * S65-E2: Check if a node is focused by a remote user (any user other than self).
+   * Returns userId of the focusing user, or undefined.
+   */
+  getFocusedBy: (nodeId: string, selfUserId: string) => string | undefined;
 
-  // S63-E1: Remove only cursor position — user stays in the map
-  removeCursor: (userId: string) =>
-    set((state) => {
-      const existing = state.remoteUsers.get(userId);
-      if (!existing) return state;
-      const updated = new Map(state.remoteUsers);
-      updated.set(userId, { ...existing, cursorX: undefined, cursorY: undefined });
-      return { remoteUsers: updated };
-    }),
+  /**
+   * S65-E2: Get focus info for a node.
+   */
+  getFocusInfo: (nodeId: string) => FocusedNodeInfo | undefined;
 
-  clearAll: () =>
-    set({ remoteUsers: new Map(), editingNodeIds: new Map(), localEditing: new Map(), onlineUsers: [] }),
-
-  lockNode: (nodeId: string, userId: string) =>
-    set((state) => ({
-      lockedNodes: { ...state.lockedNodes, [nodeId]: userId },
-    })),
-
-  unlockNode: (nodeId: string) =>
-    set((state) => {
-      const { [nodeId]: _removed, ...rest } = state.lockedNodes;
-      return { lockedNodes: rest };
-    }),
-
-  isLocked: (nodeId: string) => nodeId in get().lockedNodes,
-
-  handleNodeLockedMessage: (nodeId: string, userId: string) =>
-    set((state) => ({
-      lockedNodes: { ...state.lockedNodes, [nodeId]: userId },
-    })),
-
-  handleNodeUnlockedMessage: (nodeId: string) =>
-    set((state) => {
-      const { [nodeId]: _removed, ...rest } = state.lockedNodes;
-      return { lockedNodes: rest };
-    }),
-
-  // S62-E1: Editing Node actions
-
-  startEditing: (nodeId: string, userId: string, userName: string, avatar: string) =>
-    set((state) => {
-      const updated = new Map(state.editingNodeIds);
-      updated.set(nodeId, { userId, userName, avatar, startedAt: Date.now() });
-      const localUpdated = new Map(state.localEditing);
-      localUpdated.set(nodeId, { userId, userName, avatar, startedAt: Date.now() });
-      return { editingNodeIds: updated, localEditing: localUpdated };
-    }),
-
-  endEditing: (nodeId: string) =>
-    set((state) => {
-      // Always remove from editingNodeIds — unconditional exit.
-      // editingNodeIds is a merged view; localEditing tracks local state separately.
-      // endEditingByUser(userId) should be used to end all edits for a specific user.
-      const updated = new Map(state.editingNodeIds);
-      updated.delete(nodeId);
-      const localUpdated = new Map(state.localEditing);
-      localUpdated.delete(nodeId);
-      return { editingNodeIds: updated, localEditing: localUpdated };
-    }),
-
-  endEditingByUser: (userId: string) =>
-    set((state) => {
-      const updated = new Map(state.editingNodeIds);
-      for (const [nodeId, info] of updated) {
-        if (info.userId === userId) {
-          updated.delete(nodeId);
-        }
-      }
-      const localUpdated = new Map(state.localEditing);
-      for (const [nodeId, info] of localUpdated) {
-        if (info.userId === userId) localUpdated.delete(nodeId);
-      }
-      return { editingNodeIds: updated, localEditing: localUpdated };
-    }),
-
-  isBeingEdited: (nodeId: string) => get().editingNodeIds.has(nodeId),
-
-  getEditor: (nodeId: string) => get().editingNodeIds.get(nodeId),
-
-  handleEditingStartedMessage: (
+  /** S65-E2: Handle incoming node:focused WebSocket message */
+  handleNodeFocusedMessage: (
     nodeId: string,
     userId: string,
     userName: string,
     avatar: string
-  ) =>
-    set((state) => {
-      // Always overwrite — latest start message wins (remote edit takes over local edit)
-      const updated = new Map(state.editingNodeIds);
-      updated.set(nodeId, { userId, userName, avatar, startedAt: Date.now() });
-      // Remote edit: does NOT touch localEditing (local tracking is separate)
-      return { editingNodeIds: updated };
-    }),
+  ) => void;
 
-  handleEditingEndedMessage: (nodeId: string) =>
-    set((state) => {
-      const updated = new Map(state.editingNodeIds);
-      updated.delete(nodeId);
-      return { editingNodeIds: updated };
-    }),
+  /** S65-E2: Handle incoming node:unfocused WebSocket message */
+  handleNodeUnfocusedMessage: (nodeId: string, userId: string) => void;
 
-  // S64-E1: Online users actions
+  /** S65-E2: Clear all focus state (on disconnect) */
+  clearAllFocus: () => void;
+}
 
-  updateOnlineUsers: (userId: string, status: OnlineStatus, name?: string, avatar?: string) =>
-    set((state) => {
-      const existingIdx = state.onlineUsers.findIndex((u) => u.userId === userId);
-      const now = Date.now();
-      if (existingIdx >= 0) {
-        // Update existing user's status and timestamp
-        const updated = [...state.onlineUsers];
-        const existing = updated[existingIdx];
-        updated[existingIdx] = {
-          ...existing,
-          status,
-          lastSeen: now,
-          // Allow name/avatar update if provided
-          name: name ?? existing.name,
-          avatar: avatar ?? existing.avatar,
-        };
-        return { onlineUsers: updated };
-      } else {
-        // Add new user
+export const usePresenceStore = create<PresenceState>((set, get) => {
+  // S65-E2: Track focus timeout timers per nodeId for auto-release
+  const focusTimers: Record<string, ReturnType<typeof setTimeout>> = {};
+
+  function clearFocusTimer(nodeId: string) {
+    if (focusTimers[nodeId]) {
+      clearTimeout(focusTimers[nodeId]);
+      delete focusTimers[nodeId];
+    }
+  }
+
+  function scheduleFocusTimer(nodeId: string) {
+    clearFocusTimer(nodeId);
+    focusTimers[nodeId] = setTimeout(() => {
+      // Auto-release: remove from both maps
+      set((state) => {
+        const { [nodeId]: _fn, ...restNodes } = state.focusedNodes;
+        const newInfos = new Map(state.focusedNodeInfos);
+        newInfos.delete(nodeId);
+        return { focusedNodes: restNodes, focusedNodeInfos: newInfos };
+      });
+      delete focusTimers[nodeId];
+    }, FOCUS_TIMEOUT_MS);
+  }
+
+  return {
+    remoteUsers: new Map(),
+    lockedNodes: {},
+    editingNodeIds: new Map(),
+    localEditing: new Map(),
+    onlineUsers: [],
+    focusedNodes: {},
+    focusedNodeInfos: new Map(),
+
+    setRemoteUsers: (users: CollabUser[]) =>
+      set((state) => {
+        const next = new Map<string, RemoteUser>();
+        for (const user of users) {
+          const existing = state.remoteUsers.get(user.userId);
+          next.set(user.userId, {
+            userId: user.userId,
+            name: user.name,
+            avatar: user.avatar,
+            cursorX: existing?.cursorX,
+            cursorY: existing?.cursorY,
+            lastSeen: Date.now(),
+          });
+        }
+        return { remoteUsers: next };
+      }),
+
+    updateCursor: (userId: string, x: number, y: number) =>
+      set((state) => {
+        const existing = state.remoteUsers.get(userId);
+        if (!existing) return state;
+        const updated = new Map(state.remoteUsers);
+        updated.set(userId, { ...existing, cursorX: x, cursorY: y, lastSeen: Date.now() });
+        return { remoteUsers: updated };
+      }),
+
+    removeUser: (userId: string) =>
+      set((state) => {
+        const updated = new Map(state.remoteUsers);
+        updated.delete(userId);
+        return { remoteUsers: updated };
+      }),
+
+    removeCursor: (userId: string) =>
+      set((state) => {
+        const existing = state.remoteUsers.get(userId);
+        if (!existing) return state;
+        const updated = new Map(state.remoteUsers);
+        updated.set(userId, { ...existing, cursorX: undefined, cursorY: undefined });
+        return { remoteUsers: updated };
+      }),
+
+    clearAll: () =>
+      set({
+        remoteUsers: new Map(),
+        editingNodeIds: new Map(),
+        localEditing: new Map(),
+        onlineUsers: [],
+        focusedNodes: {},
+        focusedNodeInfos: new Map(),
+      }),
+
+    lockNode: (nodeId: string, userId: string) =>
+      set((state) => ({
+        lockedNodes: { ...state.lockedNodes, [nodeId]: userId },
+      })),
+
+    unlockNode: (nodeId: string) =>
+      set((state) => {
+        const { [nodeId]: _removed, ...rest } = state.lockedNodes;
+        return { lockedNodes: rest };
+      }),
+
+    isLocked: (nodeId: string) => nodeId in get().lockedNodes,
+
+    handleNodeLockedMessage: (nodeId: string, userId: string) =>
+      set((state) => ({
+        lockedNodes: { ...state.lockedNodes, [nodeId]: userId },
+      })),
+
+    handleNodeUnlockedMessage: (nodeId: string) =>
+      set((state) => {
+        const { [nodeId]: _removed, ...rest } = state.lockedNodes;
+        return { lockedNodes: rest };
+      }),
+
+    // S62-E1: Editing Node actions
+
+    startEditing: (nodeId: string, userId: string, userName: string, avatar: string) =>
+      set((state) => {
+        const updated = new Map(state.editingNodeIds);
+        updated.set(nodeId, { userId, userName, avatar, startedAt: Date.now() });
+        const localUpdated = new Map(state.localEditing);
+        localUpdated.set(nodeId, { userId, userName, avatar, startedAt: Date.now() });
+        return { editingNodeIds: updated, localEditing: localUpdated };
+      }),
+
+    endEditing: (nodeId: string) =>
+      set((state) => {
+        const updated = new Map(state.editingNodeIds);
+        updated.delete(nodeId);
+        const localUpdated = new Map(state.localEditing);
+        localUpdated.delete(nodeId);
+        return { editingNodeIds: updated, localEditing: localUpdated };
+      }),
+
+    endEditingByUser: (userId: string) =>
+      set((state) => {
+        const updated = new Map(state.editingNodeIds);
+        for (const [nodeId, info] of updated) {
+          if (info.userId === userId) updated.delete(nodeId);
+        }
+        const localUpdated = new Map(state.localEditing);
+        for (const [nodeId, info] of localUpdated) {
+          if (info.userId === userId) localUpdated.delete(nodeId);
+        }
+        return { editingNodeIds: updated, localEditing: localUpdated };
+      }),
+
+    isBeingEdited: (nodeId: string) => get().editingNodeIds.has(nodeId),
+
+    getEditor: (nodeId: string) => get().editingNodeIds.get(nodeId),
+
+    handleEditingStartedMessage: (
+      nodeId: string,
+      userId: string,
+      userName: string,
+      avatar: string
+    ) =>
+      set((state) => {
+        const updated = new Map(state.editingNodeIds);
+        updated.set(nodeId, { userId, userName, avatar, startedAt: Date.now() });
+        return { editingNodeIds: updated };
+      }),
+
+    handleEditingEndedMessage: (nodeId: string) =>
+      set((state) => {
+        const updated = new Map(state.editingNodeIds);
+        updated.delete(nodeId);
+        return { editingNodeIds: updated };
+      }),
+
+    // S64-E1: Online users actions
+
+    updateOnlineUsers: (userId: string, status: OnlineStatus, name?: string, avatar?: string) =>
+      set((state) => {
+        const existingIdx = state.onlineUsers.findIndex((u) => u.userId === userId);
+        const now = Date.now();
+        if (existingIdx >= 0) {
+          const updated = [...state.onlineUsers];
+          const existing = updated[existingIdx];
+          updated[existingIdx] = {
+            ...existing,
+            status,
+            lastSeen: now,
+            name: name ?? existing.name,
+            avatar: avatar ?? existing.avatar,
+          };
+          return { onlineUsers: updated };
+        } else {
+          return {
+            onlineUsers: [
+              ...state.onlineUsers,
+              {
+                userId,
+                name: name ?? 'Unknown',
+                avatar: avatar ?? '',
+                status,
+                lastSeen: now,
+              },
+            ],
+          };
+        }
+      }),
+
+    removeStaleUsers: () =>
+      set((state) => {
+        const cutoff = Date.now() - HEARTBEAT_TIMEOUT_MS;
+        const filtered = state.onlineUsers.filter((u) => u.lastSeen > cutoff);
+        if (filtered.length === state.onlineUsers.length) return state;
+        return { onlineUsers: filtered };
+      }),
+
+    clearOnlineUsers: () => set({ onlineUsers: [] }),
+
+    // S65-E2: Node Focus actions
+
+    setNodeFocus: (nodeId: string, userId: string, userName: string, avatar: string) =>
+      set((state) => {
+        // Start/reset the 30s auto-release timer
+        scheduleFocusTimer(nodeId);
         return {
-          onlineUsers: [
-            ...state.onlineUsers,
-            {
-              userId,
-              name: name ?? 'Unknown',
-              avatar: avatar ?? '',
-              status,
-              lastSeen: now,
-            },
-          ],
+          focusedNodes: { ...state.focusedNodes, [nodeId]: userId },
+          focusedNodeInfos: new Map(state.focusedNodeInfos).set(nodeId, {
+            userId,
+            userName,
+            avatar,
+            startedAt: Date.now(),
+          }),
         };
+      }),
+
+    clearNodeFocus: (nodeId: string) =>
+      set((state) => {
+        clearFocusTimer(nodeId);
+        const { [nodeId]: _removed, ...restNodes } = state.focusedNodes;
+        const newInfos = new Map(state.focusedNodeInfos);
+        newInfos.delete(nodeId);
+        return { focusedNodes: restNodes, focusedNodeInfos: newInfos };
+      }),
+
+    getFocusedBy: (nodeId: string, selfUserId: string) => {
+      const state = get();
+      const userId = state.focusedNodes[nodeId];
+      // Return only if focused by a REMOTE user (not self)
+      if (userId && userId !== selfUserId) return userId;
+      return undefined;
+    },
+
+    getFocusInfo: (nodeId: string) => get().focusedNodeInfos.get(nodeId),
+
+    handleNodeFocusedMessage: (
+      nodeId: string,
+      userId: string,
+      userName: string,
+      avatar: string
+    ) =>
+      set((state) => {
+        // Remote user focused a node: set the focus entry
+        // Remote focus does NOT start a timer on the local side — the remote user is responsible for their timer
+        return {
+          focusedNodes: { ...state.focusedNodes, [nodeId]: userId },
+          focusedNodeInfos: new Map(state.focusedNodeInfos).set(nodeId, {
+            userId,
+            userName,
+            avatar,
+            startedAt: Date.now(),
+          }),
+        };
+      }),
+
+    handleNodeUnfocusedMessage: (nodeId: string, userId: string) =>
+      set((state) => {
+        // Only clear if THIS user was the one unfocusing
+        if (state.focusedNodes[nodeId] !== userId) return state;
+        clearFocusTimer(nodeId);
+        const { [nodeId]: _removed, ...restNodes } = state.focusedNodes;
+        const newInfos = new Map(state.focusedNodeInfos);
+        newInfos.delete(nodeId);
+        return { focusedNodes: restNodes, focusedNodeInfos: newInfos };
+      }),
+
+    clearAllFocus: () => {
+      // Clear all timers
+      for (const nodeId of Object.keys(focusTimers)) {
+        clearFocusTimer(nodeId);
       }
-    }),
-
-  removeStaleUsers: () =>
-    set((state) => {
-      const cutoff = Date.now() - HEARTBEAT_TIMEOUT_MS;
-      const filtered = state.onlineUsers.filter((u) => u.lastSeen > cutoff);
-      if (filtered.length === state.onlineUsers.length) return state;
-      return { onlineUsers: filtered };
-    }),
-
-  clearOnlineUsers: () => set({ onlineUsers: [] }),
-}));
+      set({ focusedNodes: {}, focusedNodeInfos: new Map() });
+    },
+  };
+});

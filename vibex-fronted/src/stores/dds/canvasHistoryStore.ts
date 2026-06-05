@@ -100,13 +100,32 @@ export interface Snapshot {
 }
 
 /** Diff result between two snapshots */
-export interface SnapshotDiff {
+interface SnapshotDiff {
   added: Array<{ id: string; label?: string }>;
   removed: Array<{ id: string; label?: string }>;
   modified: Array<{ id: string; label?: string; changes?: Record<string, { before: unknown; after: unknown }> }>;
 }
 
-/** E1 (Sprint61): Filter options for listSnapshots() */
+/** E1 (Sprint67): Result of comparing two branches — enriched diff with branch metadata */
+export interface BranchDiffResult {
+  branchA: string;
+  branchB: string;
+  snapA?: Snapshot;
+  snapB?: Snapshot;
+  diffs: SnapshotDiff;
+  error?: string;
+  summary: {
+    totalChanges: number;
+    contextsAdded: number;
+    contextsRemoved: number;
+    contextsModified: number;
+    edgesAdded: number;
+    edgesRemoved: number;
+    edgesModified: number;
+  };
+}
+
+export const useCanvasHistoryStore = create
 export interface SnapshotListFilters {
   branch?: string;
   starred?: boolean;
@@ -685,6 +704,37 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
     const { listBranchesFromDB } = await import('@/lib/canvas/historyDB');
     return listBranchesFromDB(canvasId);
   },
+  // E1 (Sprint67): Branch comparison — compare the latest snapshots of two branches
+  compareBranches: async (canvasId: string, branchA: string, branchB: string): Promise<BranchDiffResult> => {
+    const emptyResult = (error: string): BranchDiffResult => ({
+      branchA, branchB, diffs: { added: [], removed: [], modified: [] },
+      error,
+      summary: { totalChanges: 0, contextsAdded: 0, contextsRemoved: 0, contextsModified: 0, edgesAdded: 0, edgesRemoved: 0, edgesModified: 0 },
+    });
+
+    if (typeof window === 'undefined' || !window.indexedDB) {
+      return emptyResult('IndexedDB not available (SSR)');
+    }
+
+    const { getLatestSnapshotFromDB } = await import('@/lib/canvas/historyDB');
+    const snapA = await getLatestSnapshotFromDB(canvasId, branchA);
+    const snapB = await getLatestSnapshotFromDB(canvasId, branchB);
+
+    if (!snapA) return emptyResult(`No snapshot found for branch "${branchA}"`);
+    if (!snapB) return emptyResult(`No snapshot found for branch "${branchB}"`);
+
+    const diffs = get().compareSnapshots(snapA, snapB);
+    const summary = {
+      totalChanges: diffs.added.length + diffs.removed.length + diffs.modified.length,
+      contextsAdded: diffs.added.length,
+      contextsRemoved: diffs.removed.length,
+      contextsModified: diffs.modified.length,
+      edgesAdded: 0, edgesRemoved: 0, edgesModified: 0,
+    };
+
+    return { branchA, branchB, snapA, snapB, diffs, summary };
+  },
+
 
   stopAutoSnapshot: () => {
     const timer = (window as unknown as { __canvasAutoSnapshotTimer?: ReturnType<typeof setInterval> }).__canvasAutoSnapshotTimer;

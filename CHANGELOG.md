@@ -1,5 +1,15 @@
 ---
 
+## [Unreleased] S66-E2: 协作者冲突检测与通知 — 2026-06-06
+- **E2.1**: `presenceStore.ts` — `nodeLocks: Map<string, NodeLockInfo>` 状态; `focusNode(nodeId)` 记录锁定 + 30s auto-release timer; `blurNode(nodeId)` 清除; `isNodeLockedByOther(nodeId)` 查询; `handleNodeFocusMessage`/`handleNodeBlurMessage` WS 消息处理
+- **E2.2**: `wsNodeFocusHandler.ts` — `node:focus`/`node:blur` case handlers; `NodeFocusMessage`/`NodeBlurMessage` interfaces
+- **E2.3**: `NodeLockedToast.tsx` — `useNodeLockedToast()` hook，锁定时显示 warning toast (4s)
+- **E2.4**: `DDSFlow.tsx` — 读取 `presenceStore.nodeLocks`; `handleNodeClick` 拦截 + toast; `handleNodesChange` 拦截拖拽
+- **E2.5**: `CardRenderer.tsx` — 读取 `presenceStore.nodeLocks`; 锁定节点显示金色边框 (`outline: 2px solid #f59e0b`) + 🔒 角标
+- **Test**: vitest presenceStore 57/57 ✅, collab 74/74 ✅
+
+---
+
 ## [Unreleased] S65-E5: 模板画廊用户收藏管理 — 2026-06-05
 - **S65-E5.1**: `templateStore.addCustomCategory()` / `removeCustomCategory()` / `incrementUsage()` — 自定义分类管理 + 使用频率统计
 - **S65-E5.2**: Zustand persist middleware 自动持久化 `customCategories` + `stats.usageCount` (localStorage)
@@ -5556,8 +5566,6 @@ All notable changes to this project will be documented in this file.
   - vitest: useCanvasExport.test.ts 10/10 PASS
   - Vitest 回归: DDSCanvasStore 57/57 PASS
 
-
-
 ## [Unreleased]
 
 ### Features (vibex-proposals-20260412 Epic1: 测试基础设施修复 — Sprint 1+2) — 2026-04-12
@@ -6268,3 +6276,12 @@ See git history for complete changelog.
 - **S65-E4.7**: `canvasDb.test.ts` — searchCanvases 5 个测试用例（空查询 / 阈值限制 / 排序验证 / score+item 字段）
 - **Test**: 5/5 vitest ✅
 
+---
+
+## [Unreleased] S66-E2: 协作者冲突检测与通知 — 2026-06-06
+- **E2.1**: `presenceStore.ts` — `nodeLocks: Map<string, NodeLockInfo>` 状态; `focusNode(nodeId)` 记录锁定 + 30s auto-release timer; `blurNode(nodeId)` 清除; `isNodeLockedByOther(nodeId)` 查询; `handleNodeFocusMessage`/`handleNodeBlurMessage` WS 消息处理
+- **E2.2**: `wsNodeFocusHandler.ts` — `node:focus`/`node:blur` case handlers; `NodeFocusMessage`/`NodeBlurMessage` interfaces
+- **E2.3**: `NodeLockedToast.tsx` — `useNodeLockedToast()` hook，锁定时显示 warning toast (4s)
+- **E2.4**: `DDSFlow.tsx` — 读取 `presenceStore.nodeLocks`; `handleNodeClick` 拦截 + toast; `handleNodesChange` 拦截拖拽
+- **E2.5**: `CardRenderer.tsx` — 读取 `presenceStore.nodeLocks`; 锁定节点显示金色边框 (`outline: 2px solid #f59e0b`) + 🔒 角标
+- **Test**: vitest presenceStore 57/57 ✅, collab 74/74 ✅

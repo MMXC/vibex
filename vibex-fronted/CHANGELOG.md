@@ -1,5 +1,15 @@
 ---
 
+## [Unreleased] S66-E2: 协作者冲突检测与通知 — 2026-06-06
+- **E2.1**: `presenceStore.ts` — `nodeLocks: Map<string, NodeLockInfo>` 状态; `focusNode(nodeId)` 记录锁定 + 30s auto-release timer; `blurNode(nodeId)` 清除; `isNodeLockedByOther(nodeId)` 查询; `handleNodeFocusMessage`/`handleNodeBlurMessage` WS 消息处理
+- **E2.2**: `wsNodeFocusHandler.ts` — `node:focus`/`node:blur` case handlers; `NodeFocusMessage`/`NodeBlurMessage` interfaces
+- **E2.3**: `NodeLockedToast.tsx` — `useNodeLockedToast()` hook，锁定时显示 warning toast (4s)
+- **E2.4**: `DDSFlow.tsx` — 读取 `presenceStore.nodeLocks`; `handleNodeClick` 拦截 + toast; `handleNodesChange` 拦截拖拽
+- **E2.5**: `CardRenderer.tsx` — 读取 `presenceStore.nodeLocks`; 锁定节点显示金色边框 (`outline: 2px solid #f59e0b`) + 🔒 角标
+- **Test**: vitest presenceStore 57/57 ✅, collab 74/74 ✅
+
+---
+
 ## [Unreleased] S66-E1: 画布分支操作 — 2026-06-06
 - **E1.1**: `historyDB.ts` — DB_VERSION=4, parentSnapshotId field in SnapshotEntry/load/update, branchName+parentSnapshotId indexes in onupgradeneeded
 - **E1.2**: `historyDB.ts` — renameBranchInDB/deleteBranchFromDB/mergeBranchInDB/listBranchesFromDB (bulk IndexedDB operations)
@@ -7,7 +17,6 @@
 - **E1.4**: `HistoryPanel.tsx` — Branch operation menus (rename/merge/delete buttons) in filter section
 - **E1.5**: `HistoryPanel.tsx` — BranchRenameDialog + BranchMergeDialog inline modal components
 - **E1.6**: UI — Branch filter click-to-select + branch operation buttons (✎ ↗ 🗑), delete-main guard
-
 
 ## [Unreleased] S65-E5: 模板画廊用户收藏管理 — 2026-06-05
 - **S65-E5.1**: `templateStore.addCustomCategory()` / `removeCustomCategory()` / `incrementUsage()` — 自定义分类管理 + 使用频率统计
@@ -176,8 +185,6 @@
   - 新增: ExportMenu Figma 选项 + PNG 分辨率选择器下拉菜单
   - vitest: useCanvasExport.test.ts 10/10 PASS
   - Vitest 回归: DDSCanvasStore 57/57 PASS
-
-
 
 ### [Unreleased] Sprint 46 — E1 AI Session 搜索 + E2 键盘快捷键扩展 + E3 画布节点复制/粘贴
 ##### S46-P001-E1: AI Session 搜索 + 历史会话管理
@@ -1006,3 +1013,12 @@
 - **S65-E4.7**: `canvasDb.test.ts` — searchCanvases 5 个测试用例（空查询 / 阈值限制 / 排序验证 / score+item 字段）
 - **Test**: 5/5 vitest ✅
 
+---
+
+## [Unreleased] S66-E2: 协作者冲突检测与通知 — 2026-06-06
+- **E2.1**: `presenceStore.ts` — `nodeLocks: Map<string, NodeLockInfo>` 状态; `focusNode(nodeId)` 记录锁定 + 30s auto-release timer; `blurNode(nodeId)` 清除; `isNodeLockedByOther(nodeId)` 查询; `handleNodeFocusMessage`/`handleNodeBlurMessage` WS 消息处理
+- **E2.2**: `wsNodeFocusHandler.ts` — `node:focus`/`node:blur` case handlers; `NodeFocusMessage`/`NodeBlurMessage` interfaces
+- **E2.3**: `NodeLockedToast.tsx` — `useNodeLockedToast()` hook，锁定时显示 warning toast (4s)
+- **E2.4**: `DDSFlow.tsx` — 读取 `presenceStore.nodeLocks`; `handleNodeClick` 拦截 + toast; `handleNodesChange` 拦截拖拽
+- **E2.5**: `CardRenderer.tsx` — 读取 `presenceStore.nodeLocks`; 锁定节点显示金色边框 (`outline: 2px solid #f59e0b`) + 🔒 角标
+- **Test**: vitest presenceStore 57/57 ✅, collab 74/74 ✅

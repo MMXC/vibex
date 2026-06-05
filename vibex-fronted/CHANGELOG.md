@@ -20,6 +20,20 @@
 ---
 
 ## [Unreleased] S58-E2: 桌面文件拖拽导入 — 2026-06-03
+
+
+---
+
+## [Unreleased] S65-E1: 画布版本快照可视化分支管理 — 2026-06-05
+
+- **S65-E1.1**: `saveNamedSnapshot(name?)` — 自动生成 Snapshot-{timestamp} 名称
+- **S65-E1.2**: `createBranch(sourceId, name)` — 基于源快照创建分支，设置 parentSnapshotId
+- **S65-E1.3**: `compareSnapshots` — 已有，验证存在
+- **S65-E1.4**: HistoryPanel 分支树视图 — 重构为树视图（⌘ 切换），折叠/展开分支
+- **S65-E1.5**: SnapshotCompareDialog 高亮弹窗 — 新增，computeSnapshotDiff 结果展示
+- **S65-E1.6**: 分支感知 LRU 驱逐 — 以分支为粒度，每分支 MAX=50
+- **S65-E1.7**: vitest 11/11 (canvasHistoryStore.sprint65-e1.test.ts)
+- **S65-E1 (new files)**: `snapshotCompare.ts`, `SnapshotCompareDialog.tsx`
 ---
 
 ## [Unreleased] S60-E3: 协作活动流 + 在线状态指示 — 2026-06-04

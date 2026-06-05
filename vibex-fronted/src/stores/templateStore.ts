@@ -6,6 +6,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import Fuse from 'fuse.js';
 import { RequirementTemplate, TemplateCategory, templates as defaultTemplates } from '@/data/templates';
 
 import { canvasLogger } from '@/lib/canvas/canvasLogger';
@@ -52,13 +53,22 @@ interface TemplateState {
   getTemplateHistory: (templateId: string) => RequirementTemplate[];
   getTemplateVersion: (templateId: string) => number;
 
-  // ---- E2: 模板管理完善 ----
-  // 重命名模板
-  renameTemplate: (templateId: string, newName: string) => boolean;
-  // 模糊搜索模板（返回匹配列表）
+  // ---- E5: 模板画廊搜索增强 ----
+  // 搜索词（Fuse.js）
+  searchQuery: string;
+  // 选中的使用场景标签（交集过滤）
+  selectedTags: string[];
+  // Fuse.js 搜索（Fuse.js 模糊匹配）
   searchTemplates: (query: string) => RequirementTemplate[];
   // 按分类筛选（返回匹配列表）
   filterByCategory: (category: TemplateCategory | 'all') => RequirementTemplate[];
+  // 按使用场景标签过滤（交集过滤）
+  filterByTag: (tags: string[]) => RequirementTemplate[];
+  // 设置选中的标签
+  setSelectedTags: (tags: string[]) => void;
+  // ---- E2: 模板管理完善 ----
+  // 重命名模板
+  renameTemplate: (templateId: string, newName: string) => boolean;
   // 缩略图缓存
   thumbnailCache: Record<string, string>; // templateId -> SVG data URL
   // 设置缩略图
@@ -127,20 +137,22 @@ export const useTemplateStore = create<TemplateState>()(
       isSelectorOpen: false,
       stats: getInitialStats(),
       favoriteTemplateIds: [],
+      // ---- E5: 模板画廊搜索增强 ----
+      selectedTags: [],
       // ---- E2: 缩略图缓存 ----
       thumbnailCache: {},
       
       // 设置分类
       setCategory: (category) => {
-        const { templates, searchQuery } = get();
-        const filtered = filterTemplates(templates, category, searchQuery);
+        const { templates, searchQuery, selectedTags, favoriteTemplateIds } = get();
+        const filtered = filterTemplates(templates, category, searchQuery, favoriteTemplateIds, selectedTags);
         set({ selectedCategory: category, filteredTemplates: filtered });
       },
       
       // 设置搜索词
       setSearchQuery: (query) => {
-        const { templates, selectedCategory } = get();
-        const filtered = filterTemplates(templates, selectedCategory, query);
+        const { templates, selectedCategory, selectedTags, favoriteTemplateIds } = get();
+        const filtered = filterTemplates(templates, selectedCategory, query, favoriteTemplateIds, selectedTags);
         set({ searchQuery: query, filteredTemplates: filtered });
       },
       
@@ -296,7 +308,7 @@ export const useTemplateStore = create<TemplateState>()(
         const newVersion = currentVersion + 1;
         const updated = template.version !== undefined ? { ...template, version: newVersion } : { ...template, version: newVersion };
         const newTemplates = templates.map(t => t.id === updated.id ? updated : t);
-        set({ templates: newTemplates, filteredTemplates: filterTemplates(newTemplates, get().selectedCategory, get().searchQuery, get().favoriteTemplateIds) });
+        set({ templates: newTemplates, filteredTemplates: filterTemplates(newTemplates, get().selectedCategory, get().searchQuery, get().favoriteTemplateIds, get().selectedTags) });
         return newVersion;
       },
 
@@ -312,29 +324,30 @@ export const useTemplateStore = create<TemplateState>()(
       // ---- E2: 模板管理完善 ----
       // 重命名模板
       renameTemplate: (templateId, newName) => {
-        const { templates, searchQuery, selectedCategory } = get();
+        const { templates, searchQuery, selectedCategory, selectedTags, favoriteTemplateIds } = get();
         const idx = templates.findIndex(t => t.id === templateId);
         if (idx === -1) return false;
         const renamed = { ...templates[idx], name: newName, displayName: newName };
         const newTemplates = templates.map((t, i) => i === idx ? renamed : t);
         set({
           templates: newTemplates,
-          filteredTemplates: filterTemplates(newTemplates, selectedCategory, searchQuery),
+          filteredTemplates: filterTemplates(newTemplates, selectedCategory, searchQuery, favoriteTemplateIds, selectedTags),
         });
         return true;
       },
 
-      // 模糊搜索模板（返回匹配列表，不修改状态）
+      // ---- E5: Fuse.js 模糊搜索（返回匹配列表，不修改状态）----
       searchTemplates: (query) => {
-        const { templates } = get();
-        if (!query.trim()) return templates;
-        const lower = query.toLowerCase();
-        return templates.filter(t =>
-          t.name.toLowerCase().includes(lower) ||
-          (t.displayName ?? '').toLowerCase().includes(lower) ||
-          t.description.toLowerCase().includes(lower) ||
-          (t.metadata?.tags ?? []).some((tag: string) => tag.toLowerCase().includes(lower))
-        );
+        const { templates, selectedCategory, selectedTags, favoriteTemplateIds } = get();
+        // 先按分类+标签过滤，再模糊搜索
+        const filtered = filterTemplates(templates, selectedCategory, '', favoriteTemplateIds, selectedTags);
+        if (!query.trim()) return filtered;
+        const fuse = new Fuse(filtered, {
+          keys: ['name', 'displayName', 'description'],
+          threshold: 0.4,
+          includeScore: true,
+        });
+        return fuse.search(query).map(r => r.item);
       },
 
       // 按分类筛选（返回匹配列表，不修改状态）
@@ -342,6 +355,18 @@ export const useTemplateStore = create<TemplateState>()(
         const { templates } = get();
         if (category === 'all') return templates;
         return templates.filter(t => t.category === category);
+      },
+
+      // ---- E5: 标签过滤 ----
+      filterByTag: (tags) => {
+        const { templates, selectedCategory, searchQuery, favoriteTemplateIds } = get();
+        return filterTemplates(templates, selectedCategory, searchQuery, favoriteTemplateIds, tags);
+      },
+
+      setSelectedTags: (tags) => {
+        const { templates, selectedCategory, searchQuery, favoriteTemplateIds } = get();
+        const filtered = filterTemplates(templates, selectedCategory, searchQuery, favoriteTemplateIds, tags);
+        set({ selectedTags: tags, filteredTemplates: filtered });
       },
 
       // 设置缩略图
@@ -428,7 +453,7 @@ export const useTemplateStore = create<TemplateState>()(
         if (toAdd.length > 0) {
           set({
             templates: [...templates, ...toAdd],
-            filteredTemplates: filterTemplates([...templates, ...toAdd], get().selectedCategory, get().searchQuery, get().favoriteTemplateIds),
+            filteredTemplates: filterTemplates([...templates, ...toAdd], get().selectedCategory, get().searchQuery, get().favoriteTemplateIds, get().selectedTags),
           });
         }
         return { success: true, imported: toAdd.length, skipped };
@@ -441,21 +466,22 @@ export const useTemplateStore = create<TemplateState>()(
   )
 );
 
-// 辅助函数：过滤模板
+// 辅助函数：过滤模板（支持分类 + 搜索词 + 收藏 + 标签交集过滤）
 function filterTemplates(
   templates: RequirementTemplate[],
   category: TemplateCategory | 'all' | 'favorites',
   query: string,
-  favoriteIds: string[] = []
+  favoriteIds: string[] = [],
+  selectedTags: string[] = []
 ): RequirementTemplate[] {
   let result = templates;
-  
+
   if (category === 'favorites') {
     result = result.filter(t => favoriteIds.includes(t.id));
   } else if (category !== 'all') {
     result = result.filter(t => t.category === category);
   }
-  
+
   if (query) {
     const lowerQuery = query.toLowerCase();
     result = result.filter(t =>
@@ -465,6 +491,15 @@ function filterTemplates(
       (t.metadata?.tags ?? []).some((tag: string) => tag.toLowerCase().includes(lowerQuery))
     );
   }
-  
+
+  // ---- E5: 使用场景标签交集过滤 ----
+  if (selectedTags.length > 0) {
+    result = result.filter(t => {
+      const templateTags: string[] = t.metadata?.tags ?? [];
+      // 交集：模板必须包含所有选中的标签
+      return selectedTags.every(tag => templateTags.includes(tag));
+    });
+  }
+
   return result;
 }

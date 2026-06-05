@@ -12,6 +12,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { createTemplate, updateTemplate, getTemplate, type CanvasTemplateData } from '@/lib/canvas/templateStore';
 import { useTemplateStore } from '@/stores/templateStore';
 import { serializeThreeTrees, serializeToJson } from '@/lib/canvas/serialize';
+import { TEMPLATE_USE_CASE_TAGS, type TemplateTag } from '@/data/templates';
 import styles from './TemplateSaveDialog.module.css';
 
 interface TemplateSaveDialogProps {
@@ -28,6 +29,8 @@ export function TemplateSaveDialog({ isOpen, onClose, onSaved, editTemplate }: T
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedIcon, setSelectedIcon] = useState('📝');
+  // ---- E5: 标签选择状态 ----
+  const [selectedTags, setSelectedTags] = useState<TemplateTag[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const renameTemplate = useTemplateStore(s => s.renameTemplate);
@@ -74,7 +77,8 @@ export function TemplateSaveDialog({ isOpen, onClose, onSaved, editTemplate }: T
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           snapshot: snapshotStr,
-          tags: ['custom'],
+          // ---- E5: 使用选中的场景标签；无标签时默认 ['blank'] ----
+          tags: selectedTags.length > 0 ? selectedTags : (['blank'] as TemplateTag[]),
           isPreset: false,
         };
         await createTemplate(template);
@@ -82,6 +86,7 @@ export function TemplateSaveDialog({ isOpen, onClose, onSaved, editTemplate }: T
         setName('');
         setDescription('');
         setSelectedIcon('📝');
+        setSelectedTags([]);
         onClose();
       }
     } catch (err) {
@@ -90,12 +95,13 @@ export function TemplateSaveDialog({ isOpen, onClose, onSaved, editTemplate }: T
     } finally {
       setSaving(false);
     }
-  }, [name, description, selectedIcon, onClose, onSaved, isEditMode, editTemplate, renameTemplate]);
+  }, [name, description, selectedIcon, selectedTags, onClose, onSaved, isEditMode, editTemplate, renameTemplate]);
 
   const handleClose = useCallback(() => {
     setName('');
     setDescription('');
     setSelectedIcon('📝');
+    setSelectedTags([]);
     setError('');
     onClose();
   }, [onClose]);
@@ -166,6 +172,37 @@ export function TemplateSaveDialog({ isOpen, onClose, onSaved, editTemplate }: T
                 rows={3}
                 maxLength={200}
               />
+            </div>
+          )}
+
+          {/* ---- E5: 使用场景标签选择（仅创建模式） ---- */}
+          {!isEditMode && (
+            <div className={styles.field}>
+              <label className={styles.label}>使用场景</label>
+              <div className={styles.tagSelector} role="group" aria-label="使用场景标签">
+                {TEMPLATE_USE_CASE_TAGS.map(({ value, label, color }) => {
+                  const active = selectedTags.includes(value);
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      className={`${styles.tagOption} ${active ? styles.tagOptionActive : ''}`}
+                      style={active ? { backgroundColor: `${color}22`, color, borderColor: color } : {}}
+                      onClick={() => {
+                        setSelectedTags(
+                          active
+                            ? selectedTags.filter(t => t !== value)
+                            : [...selectedTags, value]
+                        );
+                      }}
+                      aria-pressed={active}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+              <span className={styles.fieldHint}>可多选，标识模板的使用场景</span>
             </div>
           )}
 

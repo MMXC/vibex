@@ -6248,3 +6248,12 @@ See git history for complete changelog.
 - **S64-E4.6**: `CanvasListPanel.tsx` — 归档过滤模式标签页（全部/活跃/已归档）
 - **S64-E4.7**: `canvasListStore.e4.test.ts` — 6/6 vitest 测试通过（去重逻辑 + 归档过滤）
 - **Test**: 6/6 vitest ✅
+
+
+## [Unreleased] S64-E5: 模板画廊搜索增强 — 2026-06-05
+- **S64-E5.1**: `types.ts` — `TemplateTag` 类型定义（`'工作'|'个人'|'教程'|'空白'`） + `TEMPLATE_USE_CASE_TAGS` 配置数组
+- **S64-E5.2**: `templateStore.ts` — `selectedTags` 状态 + `filterByTag()` 交集过滤 + `setSelectedTags()` + 升级 `searchTemplates()` 使用 Fuse.js 模糊搜索（threshold=0.4）
+- **S64-E5.3**: `TemplateGallery.tsx` — 使用场景标签过滤行（点击式标签选择器 + 清除按钮） + 标签交集过滤逻辑
+- **S64-E5.4**: `TemplateSaveDialog.tsx` — 保存模板时选择使用场景标签（多选） + 默认标签 `['blank']`
+- **S64-E5.5**: `templateStore.test.ts` — E5 测试用例 10 个：filterByTag 4 个 + setSelectedTags 3 个 + Fuse.js searchTemplates 3 个
+- **Test**: 66/66 vitest ✅（含全部既有测试 + 新增 E5 覆盖）

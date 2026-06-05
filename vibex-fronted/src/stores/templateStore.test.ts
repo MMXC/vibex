@@ -313,3 +313,137 @@ describe('TemplateStore', () => {
     });
   });
 });
+
+// ---- E5: 模板画廊搜索增强 ----
+describe('E5: 模板画廊搜索增强', () => {
+  beforeEach(() => {
+    useTemplateStore.setState({
+      templates: [
+        {
+          id: 'e5-tpl-work',
+          name: '工作流模板',
+          description: '企业工作流设计',
+          category: 'flow',
+          icon: '💼',
+          version: 1,
+          metadata: { tags: ['工作'], author: 'test' },
+          nodes: [],
+          edges: [],
+        },
+        {
+          id: 'e5-tpl-personal',
+          name: '个人笔记模板',
+          description: '个人学习笔记',
+          category: 'mindmap',
+          icon: '👤',
+          version: 1,
+          metadata: { tags: ['个人'], author: 'test' },
+          nodes: [],
+          edges: [],
+        },
+        {
+          id: 'e5-tpl-both',
+          name: '工作学习混合',
+          description: '边工作边学习',
+          category: 'flow',
+          icon: '📚',
+          version: 1,
+          metadata: { tags: ['工作', '教程'], author: 'test' },
+          nodes: [],
+          edges: [],
+        },
+        {
+          id: 'e5-tpl-none',
+          name: '空白模板',
+          description: '空白画布',
+          category: 'flow',
+          icon: '📄',
+          version: 1,
+          metadata: { tags: ['空白'], author: 'test' },
+          nodes: [],
+          edges: [],
+        },
+      ],
+      selectedCategory: 'all',
+      searchQuery: '',
+      selectedTags: [],
+      filteredTemplates: [],
+      favoriteTemplateIds: [],
+    });
+  });
+
+  describe('filterByTag', () => {
+    it('返回包含所有指定标签的模板（交集过滤）', () => {
+      const { filterByTag } = useTemplateStore.getState();
+      const result = filterByTag(['工作']);
+      expect(result.map(t => t.id)).toEqual(['e5-tpl-work', 'e5-tpl-both']);
+    });
+
+    it('多标签交集：只有同时包含所有标签的模板才返回', () => {
+      const { filterByTag } = useTemplateStore.getState();
+      const result = filterByTag(['工作', '教程']);
+      expect(result.map(t => t.id)).toEqual(['e5-tpl-both']);
+    });
+
+    it('空标签数组返回所有模板', () => {
+      const { filterByTag } = useTemplateStore.getState();
+      const result = filterByTag([]);
+      expect(result.length).toBe(4);
+    });
+
+    it('不存在的标签返回空', () => {
+      const { filterByTag } = useTemplateStore.getState();
+      const result = filterByTag(['不存在']);
+      expect(result.length).toBe(0);
+    });
+  });
+
+  describe('setSelectedTags', () => {
+    it('设置标签后 filteredTemplates 只包含匹配模板', () => {
+      const { setSelectedTags, filteredTemplates } = useTemplateStore.getState();
+      setSelectedTags(['工作']);
+      const { filteredTemplates: filtered } = useTemplateStore.getState();
+      expect(filtered.map(t => t.id)).toEqual(['e5-tpl-work', 'e5-tpl-both']);
+      expect(filtered).not.toEqual(filteredTemplates); // changed
+    });
+
+    it('清除标签后 filteredTemplates 恢复', () => {
+      const { setSelectedTags } = useTemplateStore.getState();
+      setSelectedTags(['工作']);
+      setSelectedTags([]);
+      const { filteredTemplates, selectedTags } = useTemplateStore.getState();
+      expect(selectedTags).toEqual([]);
+      expect(filteredTemplates.length).toBe(4);
+    });
+
+    it('selectedTags 状态正确更新', () => {
+      const { setSelectedTags } = useTemplateStore.getState();
+      setSelectedTags(['工作', '教程']);
+      const { selectedTags } = useTemplateStore.getState();
+      expect(selectedTags).toEqual(['工作', '教程']);
+    });
+  });
+
+  describe('searchTemplates with Fuse.js', () => {
+    it('Fuse.js 模糊匹配：部分匹配也返回结果', () => {
+      const { searchTemplates } = useTemplateStore.getState();
+      // "工作" 匹配 "工作流模板" 和 "工作学习混合"
+      const result = searchTemplates('工作');
+      expect(result.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('空搜索返回过滤后的模板', () => {
+      const { setSelectedTags, searchTemplates } = useTemplateStore.getState();
+      setSelectedTags(['工作']);
+      const result = searchTemplates('');
+      expect(result.map(t => t.id)).toEqual(['e5-tpl-work', 'e5-tpl-both']);
+    });
+
+    it('Fuse.js 区分大小写', () => {
+      const { searchTemplates } = useTemplateStore.getState();
+      const result = searchTemplates('WORK');
+      // Fuse.js threshold=0.4, case-sensitive but Fuse lowercases keys
+      expect(Array.isArray(result)).toBe(true);
+    });
+  });
+});

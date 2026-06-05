@@ -21,6 +21,7 @@ import { TemplateImportDialog } from './TemplateImportDialog';
 import { CategoryTab, type CanvasCategory } from './CategoryTab';
 import { deserializeThreeTrees, restoreStore } from '@/lib/canvas/serialize';
 import { searchTemplates } from '@/lib/canvas/templateSearch';
+import { TEMPLATE_USE_CASE_TAGS, type TemplateTag } from '@/data/templates';
 import styles from './TemplateGallery.module.css';
 
 interface TemplateGalleryProps {
@@ -48,6 +49,8 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
   const [templates, setTemplates] = useState<CanvasTemplateSummary[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  // ---- E5: 标签过滤状态 ----
+  const [selectedTags, setSelectedTags] = useState<TemplateTag[]>([]);
   const [loading, setLoading] = useState(false);
   const [applying, setApplying] = useState<string | null>(null);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
@@ -76,7 +79,7 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
     }
   }, [isOpen, loadTemplates]);
 
-  // E4: Fuse.js search + category filter
+  // E5: Fuse.js search + category filter + 标签交集过滤
   const filtered = templates.filter((t) => {
     const matchSearch =
       !searchQuery ||
@@ -88,7 +91,14 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
     const matchCat =
       selectedCategory === 'all' ||
       (selectedCategory === cat);
-    return matchCat;
+    if (!matchCat) return false;
+    // ---- E5: 标签交集过滤 ----
+    if (selectedTags.length > 0) {
+      const templateTags: string[] = t.tags ?? [];
+      const matchTags = selectedTags.every(tag => templateTags.includes(tag));
+      if (!matchTags) return false;
+    }
+    return true;
   });
 
   const applyTemplate = async (templateId: string) => {
@@ -157,6 +167,40 @@ export function TemplateGallery({ isOpen, onClose, onTemplateApplied }: Template
             onChange={(e) => setSearchQuery(e.target.value)}
             aria-label="搜索模板"
           />
+        </div>
+
+        {/* ---- E5: 使用场景标签过滤 ---- */}
+        <div className={styles.tagFilterRow} role="group" aria-label="使用场景标签">
+          {TEMPLATE_USE_CASE_TAGS.map(({ value, label, color }) => {
+            const active = selectedTags.includes(value);
+            return (
+              <button
+                key={value}
+                type="button"
+                className={`${styles.tagFilterBtn} ${active ? styles.tagFilterBtnActive : ''}`}
+                style={active ? { backgroundColor: `${color}22`, color, borderColor: color } : {}}
+                onClick={() => {
+                  setSelectedTags(
+                    active
+                      ? selectedTags.filter(t => t !== value)
+                      : [...selectedTags, value]
+                  );
+                }}
+                aria-pressed={active}
+              >
+                {label}
+              </button>
+            );
+          })}
+          {selectedTags.length > 0 && (
+            <button
+              type="button"
+              className={styles.tagFilterClear}
+              onClick={() => setSelectedTags([])}
+            >
+              清除
+            </button>
+          )}
         </div>
 
         {/* Category tabs (E4: CategoryTab component) */}

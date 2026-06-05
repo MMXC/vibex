@@ -201,6 +201,18 @@ export interface TemplateDetailProps {
   onClose?: () => void;
 }
 
+// ---- E5: 模板画廊搜索增强 ----
+/** 模板使用场景标签（S64-E5） */
+export type TemplateTag = '工作' | '个人' | '教程' | '空白';
+
+/** 模板使用场景标签配置（S64-E5） */
+export const TEMPLATE_USE_CASE_TAGS: Array<{ value: TemplateTag; label: string; color: string }> = [
+  { value: '工作', label: '💼 工作', color: '#3b82f6' },
+  { value: '个人', label: '👤 个人', color: '#10b981' },
+  { value: '教程', label: '📚 教程', color: '#8b5cf6' },
+  { value: '空白', label: '📄 空白', color: '#6b7280' },
+];
+
 // 兼容旧版本的类型别名
 export type TemplateGroup = RequirementTemplate;
 export type CategoryOption = TemplateCategoryInfo;

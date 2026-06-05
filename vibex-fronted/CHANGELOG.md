@@ -970,3 +970,10 @@
 - **S64-E4.5**: `BatchOpsToolbar.tsx` — handleAdvancedRename + 归档/取消归档按钮
 - **S64-E4.6**: `CanvasListPanel.tsx` — 归档过滤模式标签页（全部/活跃/已归档）
 - **S64-E4.7**: `canvasListStore.e4.test.ts` — 6/6 vitest 测试通过（去重逻辑 + 归档过滤）
+
+## [Unreleased] S64-E5: 模板画廊搜索增强 — 2026-06-05
+- **S64-E5.1**: `src/data/templates/types.ts` — `TemplateTag` 类型定义 + `TEMPLATE_USE_CASE_TAGS` 配置
+- **S64-E5.2**: `src/stores/templateStore.ts` — `selectedTags` + `filterByTag()` + `setSelectedTags()` + Fuse.js 模糊搜索
+- **S64-E5.3**: `src/components/dds/templates/TemplateGallery.tsx` — 标签过滤行（交集过滤 + 清除按钮）
+- **S64-E5.4**: `src/components/dds/templates/TemplateSaveDialog.tsx` — 保存时选择使用场景标签
+- **S64-E5.5**: `src/stores/templateStore.test.ts` — 10 个 E5 测试用例（filterByTag + setSelectedTags + Fuse.js searchTemplates）

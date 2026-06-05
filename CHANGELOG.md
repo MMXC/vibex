@@ -1,5 +1,14 @@
 ---
 
+## [Unreleased] S66-E4: 模板高级搜索与过滤 — 标签自定义 + 日期范围 + URL 持久化 — 2026-06-06
+- **E4.1**: `templateStore.ts` — FilterOptions 状态 + setFilterOptions / applyFilters / search / addCustomTag / removeCustomTag / getCustomTags; applyFiltersImpl 实现 AND-标签 + 日期范围过滤
+- **E4.2**: `TagSelector.tsx` — 自定义标签多选下拉（预定义标签 + 自定义输入 + 本地持久化）; 集成 TEMPLATE_USE_CASE_TAGS
+- **E4.3**: `DateRangePicker.tsx` — 双月日历日期范围选择器（start/end 选择 + 清除按钮）; 基于 createdAt 过滤
+- **E4.4**: `TemplateGallery.tsx` — 嵌入 TagSelector + DateRangePicker; URL 参数持久化 (tags/start/end/q/cat)
+- **E4.5**: TemplateGallery AND-标签交集过滤 + createdAt 日期范围过滤
+
+---
+
 ## [Unreleased] S66-E2: 协作者冲突检测与通知 — 2026-06-06
 - **E2.1**: `presenceStore.ts` — `nodeLocks: Map<string, NodeLockInfo>` 状态; `focusNode(nodeId)` 记录锁定 + 30s auto-release timer; `blurNode(nodeId)` 清除; `isNodeLockedByOther(nodeId)` 查询; `handleNodeFocusMessage`/`handleNodeBlurMessage` WS 消息处理
 - **E2.2**: `wsNodeFocusHandler.ts` — `node:focus`/`node:blur` case handlers; `NodeFocusMessage`/`NodeBlurMessage` interfaces
@@ -9,7 +18,6 @@
 - **Test**: vitest presenceStore 57/57 ✅, collab 74/74 ✅
 
 ---
-
 
 ---
 

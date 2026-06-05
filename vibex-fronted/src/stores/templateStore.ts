@@ -16,6 +16,25 @@ interface TemplateStats {
   ratings: Record<string, number[]>;     // 模板ID -> 评分数组
 }
 
+
+/** ---- E4: 模板高级搜索与过滤 ---- */
+export interface FilterOptions {
+  tags: string[];           // 选中标签列表（AND 组合）
+  dateRange: {
+    start: number | null;   // 开始时间戳
+    end: number | null;     // 结束时间戳
+  };
+  searchQuery: string;      // 搜索词
+}
+
+/**
+ * 高级搜索方法参数（E4）
+ */
+export interface SearchOptions {
+  query?: string;
+  filters?: Partial<Omit<FilterOptions, 'searchQuery'>>;
+}
+
 interface TemplateState {
   // 状态
   templates: RequirementTemplate[];
@@ -66,6 +85,21 @@ interface TemplateState {
   filterByTag: (tags: string[]) => RequirementTemplate[];
   // 设置选中的标签
   setSelectedTags: (tags: string[]) => void;
+  // ---- E4: 高级搜索与过滤 ----
+  // 高级过滤选项（AND 组合过滤 + 日期范围）
+  filterOptions: FilterOptions;
+  // 设置过滤选项
+  setFilterOptions: (options: Partial<FilterOptions>) => void;
+  // 应用过滤条件（返回过滤后列表，不修改状态）
+  applyFilters: (options: Partial<FilterOptions>) => RequirementTemplate[];
+  // 高级搜索（query + filters 组合）
+  search: (options: { query?: string; filters?: Partial<Omit<FilterOptions, 'searchQuery'>> }) => RequirementTemplate[];
+  // 添加自定义标签
+  addCustomTag: (tag: string) => void;
+  // 移除自定义标签
+  removeCustomTag: (tag: string) => void;
+  // 获取自定义标签列表
+  getCustomTags: () => string[];
   // ---- E2: 模板管理完善 ----
   // 重命名模板
   renameTemplate: (templateId: string, newName: string) => boolean;
@@ -149,6 +183,8 @@ export const useTemplateStore = create<TemplateState>()(
       isSelectorOpen: false,
       stats: getInitialStats(),
       favoriteTemplateIds: [],
+      // ---- E4: 高级搜索过滤 ----
+      filterOptions: { tags: [], dateRange: { start: null as number | null, end: null as number | null }, searchQuery: '' } as FilterOptions,
       // ---- E5: 模板画廊搜索增强 ----
       selectedTags: [],
       // ---- E5: 自定义分类 ----
@@ -404,6 +440,52 @@ export const useTemplateStore = create<TemplateState>()(
         set({ selectedTags: tags, filteredTemplates: filtered });
       },
 
+      // ---- E4: 高级搜索与过滤 ----
+      setFilterOptions: (options) => {
+        const current = get().filterOptions;
+        const merged = {
+          tags: options.tags ?? current.tags,
+          dateRange: options.dateRange ?? current.dateRange,
+          searchQuery: options.searchQuery ?? current.searchQuery,
+        } as FilterOptions;
+        const filtered = applyFiltersImpl(get().templates, get().selectedCategory, merged, get().favoriteTemplateIds);
+        set({ filterOptions: merged, filteredTemplates: filtered });
+      },
+
+      applyFilters: (options) => {
+        const current = get().filterOptions;
+        const merged = {
+          tags: options.tags ?? current.tags,
+          dateRange: options.dateRange ?? current.dateRange,
+          searchQuery: options.searchQuery ?? current.searchQuery,
+        } as FilterOptions;
+        return applyFiltersImpl(get().templates, get().selectedCategory, merged, get().favoriteTemplateIds);
+      },
+
+      search: (options) => {
+        const { templates, selectedCategory, favoriteTemplateIds, filterOptions } = get();
+        const opts: FilterOptions = {
+          tags: options.filters?.tags ?? filterOptions.tags,
+          dateRange: options.filters?.dateRange ?? filterOptions.dateRange,
+          searchQuery: options.query ?? filterOptions.searchQuery,
+        };
+        return applyFiltersImpl(templates, selectedCategory, opts, favoriteTemplateIds);
+      },
+
+      addCustomTag: (tag) => {
+        const { filterOptions } = get();
+        if (!filterOptions.tags.includes(tag)) {
+          get().setFilterOptions({ tags: [...filterOptions.tags, tag] });
+        }
+      },
+
+      removeCustomTag: (tag) => {
+        const { filterOptions } = get();
+        get().setFilterOptions({ tags: filterOptions.tags.filter(t => t !== tag) });
+      },
+
+      getCustomTags: () => get().filterOptions.tags,
+
       // 设置缩略图
       setThumbnail: (templateId, svgDataUrl) => {
         set(state => ({
@@ -533,6 +615,59 @@ function filterTemplates(
       const templateTags: string[] = t.metadata?.tags ?? [];
       // 交集：模板必须包含所有选中的标签
       return selectedTags.every(tag => templateTags.includes(tag));
+    });
+  }
+
+  return result;
+}
+
+/** ---- E4: 高级过滤实现（支持日期范围） ---- */
+function applyFiltersImpl(
+  templates: RequirementTemplate[],
+  category: TemplateCategory | 'all' | 'favorites',
+  filterOptions: FilterOptions,
+  favoriteIds: string[] = []
+): RequirementTemplate[] {
+  let result = templates;
+
+  // 分类过滤
+  if (category === 'favorites') {
+    result = result.filter(t => favoriteIds.includes(t.id));
+  } else if (category !== 'all') {
+    result = result.filter(t => t.category === category);
+  }
+
+  // 搜索词过滤
+  if (filterOptions.searchQuery) {
+    const lowerQuery = filterOptions.searchQuery.toLowerCase();
+    result = result.filter(t =>
+      t.name.toLowerCase().includes(lowerQuery) ||
+      (t.displayName ?? '').toLowerCase().includes(lowerQuery) ||
+      t.description.toLowerCase().includes(lowerQuery) ||
+      (t.metadata?.tags ?? []).some((tag: string) => tag.toLowerCase().includes(lowerQuery))
+    );
+  }
+
+  // 标签 AND 组合过滤
+  if (filterOptions.tags.length > 0) {
+    result = result.filter(t => {
+      const templateTags: string[] = t.metadata?.tags ?? [];
+      return filterOptions.tags.every(tag => templateTags.includes(tag));
+    });
+  }
+
+  // ---- E4: 日期范围过滤（基于 metadata.createdAt）----
+  if (filterOptions.dateRange.start !== null || filterOptions.dateRange.end !== null) {
+    result = result.filter(t => {
+      const createdAt = (t as { createdAt?: number }).createdAt;
+      if (createdAt === undefined) return true; // 无创建时间的模板保留
+      if (filterOptions.dateRange.start !== null && createdAt < filterOptions.dateRange.start) {
+        return false;
+      }
+      if (filterOptions.dateRange.end !== null && createdAt > filterOptions.dateRange.end) {
+        return false;
+      }
+      return true;
     });
   }
 

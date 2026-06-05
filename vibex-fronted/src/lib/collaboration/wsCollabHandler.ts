@@ -6,6 +6,7 @@
  * S63-E2: 协作撤销冲突 — collab:conflict
  * S64-E1: 协作者在线状态 — presence:heartbeat
  * S65-E2: 协作者编辑指示器 — node:focused / node:unfocused (delegated to wsNodeFocusHandler)
+ * S66-E2: 协作者冲突检测与通知 — node:focus / node:blur (delegated to wsNodeFocusHandler)
  *
  * Registers with CollabWebSocket to handle:
  * - collab:editing:start — another user started editing a node
@@ -16,6 +17,7 @@
  * - collab:conflict — another user triggered a conflict for the local user
  * - presence:heartbeat — another user's presence heartbeat (30s interval)
  * - node:focused / node:unfocused — handled by wsNodeFocusHandler (S65-E2)
+ * - node:focus / node:blur — handled by wsNodeFocusHandler (S66-E2)
  */
 
 import type { CollabWSHandler } from './websocket';

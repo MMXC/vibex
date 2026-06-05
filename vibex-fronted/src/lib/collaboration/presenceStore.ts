@@ -6,6 +6,7 @@
  * S63-E1: 实时游标追踪 — cursor:move, removeCursor
  * S64-E1: 协作者在线状态面板 — onlineUsers + heartbeat
  * S65-E2: 协作者编辑指示器 — focusedNodes + node focus 感知
+ * S66-E2: 协作者冲突检测与通知 — nodeLocks Map + focusNode/blurNode + 30s auto-release
  *
  * Replaces Firebase usePresence with WebSocket-backed state.
  * Updated by useCollaboration's onPresence callback.
@@ -55,6 +56,15 @@ export interface FocusedNodeInfo {
   startedAt: number;
 }
 
+/** S66-E2: Lock info for a node — includes lock metadata */
+export interface NodeLockInfo {
+  nodeId: string;
+  userId: string;
+  userName: string;
+  avatar: string;
+  lockedAt: number;
+}
+
 /** Heartbeat timeout in milliseconds (30s) */
 const HEARTBEAT_TIMEOUT_MS = 30_000;
 
@@ -82,6 +92,9 @@ interface PresenceState {
 
   /** S65-E2: Detailed focus info for overlay display */
   focusedNodeInfos: Map<string, FocusedNodeInfo>;
+
+  /** S66-E2: Node locks: nodeId → NodeLockInfo */
+  nodeLocks: Map<string, NodeLockInfo>;
 
   /** Update remote users from WebSocket presence message */
   setRemoteUsers: (users: CollabUser[]) => void;
@@ -195,6 +208,44 @@ interface PresenceState {
 
   /** S65-E2: Clear all focus state (on disconnect) */
   clearAllFocus: () => void;
+
+  // S66-E2: Node Lock actions
+
+  /**
+   * S66-E2: Lock a node for a user — starts 30s auto-release timer.
+   * If already locked by this user, resets the timer.
+   */
+  focusNode: (nodeId: string, userId: string, userName: string, avatar: string) => void;
+
+  /**
+   * S66-E2: Unlock a node — cancels the auto-release timer.
+   */
+  blurNode: (nodeId: string) => void;
+
+  /**
+   * S66-E2: Get lock info for a node.
+   * Returns the userId who locked it, or undefined if not locked.
+   */
+  getLockedNode: (nodeId: string) => string | undefined;
+
+  /**
+   * S66-E2: Check if a node is locked by a remote user (any user other than self).
+   */
+  isNodeLockedByOther: (nodeId: string, selfUserId: string) => boolean;
+
+  /** S66-E2: Handle incoming node:focus WebSocket message */
+  handleNodeFocusMessage: (
+    nodeId: string,
+    userId: string,
+    userName: string,
+    avatar: string
+  ) => void;
+
+  /** S66-E2: Handle incoming node:blur WebSocket message */
+  handleNodeBlurMessage: (nodeId: string, userId: string) => void;
+
+  /** S66-E2: Clear all locks (on disconnect) */
+  clearAllLocks: () => void;
 }
 
 export const usePresenceStore = create<PresenceState>((set, get) => {
@@ -479,6 +530,88 @@ export const usePresenceStore = create<PresenceState>((set, get) => {
         clearFocusTimer(nodeId);
       }
       set({ focusedNodes: {}, focusedNodeInfos: new Map() });
+    },
+
+    // S66-E2: Node Lock actions
+
+    // S66-E2: Track lock timeout timers per nodeId for auto-release
+    nodeLocks: new Map(),
+
+    focusNode: (nodeId: string, userId: string, userName: string, avatar: string) => {
+      // Schedule 30s auto-release
+      if (focusTimers[nodeId]) {
+        clearTimeout(focusTimers[nodeId]);
+      }
+      focusTimers[nodeId] = setTimeout(() => {
+        set((state) => {
+          const newLocks = new Map(state.nodeLocks);
+          newLocks.delete(nodeId);
+          return { nodeLocks: newLocks };
+        });
+        delete focusTimers[nodeId];
+      }, FOCUS_TIMEOUT_MS);
+      set((state) => {
+        const newLocks = new Map(state.nodeLocks);
+        newLocks.set(nodeId, { nodeId, userId, userName, avatar, lockedAt: Date.now() });
+        return { nodeLocks: newLocks };
+      });
+    },
+
+    blurNode: (nodeId: string) => {
+      if (focusTimers[nodeId]) {
+        clearTimeout(focusTimers[nodeId]);
+        delete focusTimers[nodeId];
+      }
+      set((state) => {
+        const newLocks = new Map(state.nodeLocks);
+        newLocks.delete(nodeId);
+        return { nodeLocks: newLocks };
+      });
+    },
+
+    getLockedNode: (nodeId: string) => {
+      return get().nodeLocks.get(nodeId)?.userId;
+    },
+
+    isNodeLockedByOther: (nodeId: string, selfUserId: string) => {
+      const lock = get().nodeLocks.get(nodeId);
+      return !!lock && lock.userId !== selfUserId;
+    },
+
+    handleNodeFocusMessage: (
+      nodeId: string,
+      userId: string,
+      userName: string,
+      avatar: string
+    ) => {
+      // Remote user locked a node — update nodeLocks without starting a timer on local side
+      set((state) => {
+        const newLocks = new Map(state.nodeLocks);
+        newLocks.set(nodeId, { nodeId, userId, userName, avatar, lockedAt: Date.now() });
+        return { nodeLocks: newLocks };
+      });
+    },
+
+    handleNodeBlurMessage: (nodeId: string, userId: string) => {
+      const lock = get().nodeLocks.get(nodeId);
+      if (!lock || lock.userId !== userId) return;
+      if (focusTimers[nodeId]) {
+        clearTimeout(focusTimers[nodeId]);
+        delete focusTimers[nodeId];
+      }
+      set((state) => {
+        const newLocks = new Map(state.nodeLocks);
+        newLocks.delete(nodeId);
+        return { nodeLocks: newLocks };
+      });
+    },
+
+    clearAllLocks: () => {
+      for (const nodeId of Object.keys(focusTimers)) {
+        clearTimeout(focusTimers[nodeId]);
+        delete focusTimers[nodeId];
+      }
+      set({ nodeLocks: new Map() });
     },
   };
 });

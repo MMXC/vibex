@@ -6,6 +6,7 @@ import type { Snapshot, SnapshotDiff } from '@/stores/dds/canvasHistoryStore';
 import TimelineView from './TimelineView';
 import SnapshotDiffDialog from './SnapshotDiffDialog';
 import SnapshotPreview from './SnapshotPreview';
+import BranchDiffPanel from '../canvas-history/BranchDiffPanel';
 
 /** E1 (Sprint66): Branch merge dialog props */
 export interface BranchMergeDialogProps {
@@ -101,6 +102,8 @@ const HistoryPanel = React.memo(function HistoryPanel({
   const [openMenuBranch, setOpenMenuBranch] = useState<string | null>(null);
   const [renameDialog, setRenameDialog] = useState<{ open: boolean; branch: string }>({ open: false, branch: '' });
   const [mergeDialog, setMergeDialog] = useState<{ open: boolean; source: string; target: string }>({ open: false, source: '', target: '' });
+  // E1 (Sprint67): Branch comparison panel
+  const [branchDiffOpen, setBranchDiffOpen] = useState(false);
 
   // Reset state when panel opens
   useEffect(() => {
@@ -226,6 +229,17 @@ const HistoryPanel = React.memo(function HistoryPanel({
               ☰
             </button>
           </div>
+          {/* E1 (Sprint67): Branch comparison button */}
+          {branches.length > 1 && (
+            <button
+              className="history-branch-diff-btn"
+              onClick={() => setBranchDiffOpen(true)}
+              aria-label="对比分支"
+              title="对比两个分支的差异"
+            >
+              ⟺
+            </button>
+          )}
           <button className="history-close-btn" onClick={onClose} aria-label="关闭">✕</button>
         </div>
       </div>
@@ -525,6 +539,12 @@ const HistoryPanel = React.memo(function HistoryPanel({
           onRestore={handleRestore}
         />
       )}
+
+      {/* E1 (Sprint67): Branch comparison panel */}
+      <BranchDiffPanel
+        open={branchDiffOpen}
+        onClose={() => setBranchDiffOpen(false)}
+      />
     </div>
   );
 });

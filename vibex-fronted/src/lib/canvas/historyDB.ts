@@ -549,6 +549,58 @@ export async function listSnapshotsFromDB(
   });
 }
 
+
+/**
+ * E1 (Sprint67): Get the latest (most recent) snapshot for a specific branch.
+ * @param canvasId - Canvas ID
+ * @param branchName - Branch name to filter by (default: 'main')
+ * @returns The most recent snapshot for the branch, or null if none exists
+ */
+export async function getLatestSnapshotFromDB(
+  canvasId: string,
+  branchName: string = 'main'
+): Promise<Snapshot | null> {
+  if (typeof window === 'undefined' || !window.indexedDB) return null;
+  return new Promise((resolve, reject) => {
+    const dbOpen = indexedDB.open(DB_NAME, DB_VERSION);
+    dbOpen.onerror = () => reject(new Error(`getLatestSnapshotFromDB: open failed`));
+    dbOpen.onsuccess = () => {
+      const db = dbOpen.result;
+      if (!db.objectStoreNames.contains(SNAPSHOTS_STORE_NAME)) {
+        resolve(null);
+        return;
+      }
+      const tx = db.transaction(SNAPSHOTS_STORE_NAME, 'readonly');
+      const store = tx.objectStore(SNAPSHOTS_STORE_NAME);
+      const index = store.index('timestamp');
+      const request = index.openCursor(null, 'prev');
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+        if (cursor) {
+          const entry = cursor.value;
+          if ((entry.branchName ?? 'main') === branchName) {
+            const snapshot: Snapshot = {
+              id: entry.snapshotId,
+              name: entry.name,
+              timestamp: entry.timestamp,
+              data: entry.data,
+              branchName: entry.branchName,
+              isStarred: entry.isStarred,
+              parentSnapshotId: entry.parentSnapshotId,
+            };
+            resolve(snapshot);
+            return;
+          }
+          cursor.continue();
+        } else {
+          resolve(null);
+        }
+      };
+      request.onerror = () => reject(new Error(`getLatestSnapshotFromDB failed: ${request.error}`));
+    };
+  });
+}
+
 /**
  * E1: Delete a snapshot from IndexedDB by canvasId + snapshotId.
  */

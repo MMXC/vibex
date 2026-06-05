@@ -1,3 +1,12 @@
+## [Unreleased] S67-E1: 画布分支快照视觉对比 — 2026-06-06
+
+- **E1.1**: `historyDB.ts` — 新增 `getLatestSnapshotFromDB(canvasId, branchName)` 从 IndexedDB 查找指定分支的最新快照
+- **E1.2**: `canvasHistoryStore.ts` — 新增 `compareBranches(canvasId, branchA, branchB)` 返回 `BranchDiffResult`（含 snapA/snapB/diffs/summary）
+- **E1.3**: `canvas-history/BranchDiffPanel.tsx` — 分支对比侧边面板，支持选择分支 A/B + 对比按钮 + 差异展示
+- **E1.4**: `canvas-history/SnapshotDiffRenderer.tsx` — 差异渲染器，区分新增/删除/修改项，颜色编码
+- **E1.5**: `HistoryPanel.tsx` — 集成"对比分支"按钮，当分支数>1时显示
+- **E1.6**: `canvasHistoryStore.sprint67-e1.test.ts` — 4 个测试用例覆盖 error/null/正常 diff 场景
+
 ## [Unreleased] S66-E5: 协作会话历史与回放 — 2026-06-06
 
 - **E5.1**: `collabSessionStore.ts` — Zustand store + IndexedDB persistence (idb); startRecording/stopRecording CRUD; SessionEvent types: node:focused/unfocused/focus/blur, cursor:move, user:join/leave, editing:start/end; Replay engine: speed control (0.5x/1x/2x/4x), pause/resume/stop; SESSION_EVENT_LABELS zh-CN

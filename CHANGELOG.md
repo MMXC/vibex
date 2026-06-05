@@ -6271,3 +6271,14 @@ See git history for complete changelog.
 - **S64-E5.4**: `TemplateSaveDialog.tsx` — 保存模板时选择使用场景标签（多选） + 默认标签 `['blank']`
 - **S64-E5.5**: `templateStore.test.ts` — E5 测试用例 10 个：filterByTag 4 个 + setSelectedTags 3 个 + Fuse.js searchTemplates 3 个
 - **Test**: 66/66 vitest ✅（含全部既有测试 + 新增 E5 覆盖）
+
+
+## [Unreleased] S65-E2: 协作者编辑指示器 — 节点聚焦感知 — 2026-06-05
+- **S65-E2.1**: `wsNodeFocusHandler.ts` — `node:focused`/`node:unfocused` WebSocket 消息处理 + broadcastNodeFocus/clearNodeFocus
+- **S65-E2.2**: `presenceStore.ts` — `focusedNodes` (Record<nodeId, userId>) + `focusedNodeInfos` (Record<nodeId, FocusedNodeInfo>) + `setNodeFocus(nodeId, userId)` + `clearNodeFocus(nodeId)` + 30s setTimeout 自动释放
+- **S65-E2.3**: `DDSCanvasPage.tsx` — `onNodeFocus(nodeId)` / `onNodeBlur(nodeId)` 广播 via `useNodeFocus` hook
+- **S65-E2.4**: `NodeFocusOverlay.tsx` — 节点聚焦高亮 UI，蓝角标 + 用户名浮层
+- **S65-E2.5**: 节点锁定感知 UI — 复用现有 `NodeEditorLock` (S44)
+- **S65-E2.6**: 30s 超时自动释放 — `setNodeFocus` 启动 setTimeout 定时器，超时自动调用 `clearNodeFocus`
+- **S65-E2.7**: `presenceStore.test.ts` — 覆盖 focus/lock 逻辑 (57/57 pass)
+- **Test**: 57/57 vitest ✅

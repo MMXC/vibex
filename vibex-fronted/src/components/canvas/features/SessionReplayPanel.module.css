@@ -1,0 +1,321 @@
+/* SessionReplayPanel — S66-E5: Collaboration Session History & Replay */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border, #2d2d44);
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary, #e2e8f0);
+  margin: 0;
+}
+
+.section {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border, #2d2d44);
+  flex-shrink: 0;
+}
+
+.sectionTitle {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted, #94a3b8);
+  margin-bottom: 8px;
+}
+
+/* Recording Controls */
+.recordingActive {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-text-primary, #e2e8f0);
+}
+
+.recordingDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.recordingControls {
+  display: flex;
+  gap: 8px;
+}
+
+.input {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 13px;
+  background: var(--color-surface, #13131f);
+  border: 1px solid var(--color-border, #2d2d44);
+  border-radius: 6px;
+  color: var(--color-text-primary, #e2e8f0);
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--color-accent, #6366f1);
+}
+
+.btnRecord {
+  padding: 6px 12px;
+  font-size: 13px;
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btnRecord:hover {
+  background: #dc2626;
+}
+
+.btnStop {
+  padding: 6px 12px;
+  font-size: 13px;
+  background: var(--color-surface-elevated, #1e1e35);
+  color: var(--color-text-primary, #e2e8f0);
+  border: 1px solid var(--color-border, #2d2d44);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Session List */
+.sessionList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  max-height: 200px;
+}
+
+.sessionItem {
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--color-surface, #13131f);
+  border: 1px solid transparent;
+}
+
+.sessionItem.selected {
+  border-color: var(--color-accent, #6366f1);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.sessionBtn {
+  flex: 1;
+  text-align: left;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-primary, #e2e8f0);
+}
+
+.sessionName {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.sessionMeta {
+  font-size: 11px;
+  color: var(--color-text-muted, #94a3b8);
+}
+
+.btnDelete {
+  padding: 0 10px;
+  height: 100%;
+  background: none;
+  border: none;
+  border-left: 1px solid var(--color-border, #2d2d44);
+  color: var(--color-text-muted, #94a3b8);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.btnDelete:hover {
+  color: #ef4444;
+}
+
+.loading, .empty {
+  font-size: 12px;
+  color: var(--color-text-muted, #94a3b8);
+  text-align: center;
+  padding: 12px;
+}
+
+/* Replay Controls */
+.speedControls {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.speedBtn {
+  flex: 1;
+  padding: 4px 0;
+  font-size: 12px;
+  background: var(--color-surface, #13131f);
+  color: var(--color-text-muted, #94a3b8);
+  border: 1px solid var(--color-border, #2d2d44);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.speedBtn.activeSpeed {
+  background: var(--color-accent, #6366f1);
+  color: #fff;
+  border-color: var(--color-accent, #6366f1);
+}
+
+.playbackControls {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.btn {
+  padding: 6px 12px;
+  font-size: 13px;
+  background: var(--color-surface-elevated, #1e1e35);
+  color: var(--color-text-primary, #e2e8f0);
+  border: 1px solid var(--color-border, #2d2d44);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: var(--color-surface, #13131f);
+}
+
+.btnPrimary {
+  flex: 1;
+  padding: 6px 12px;
+  font-size: 13px;
+  background: var(--color-accent, #6366f1);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btnPrimary:hover {
+  background: #4f46e5;
+}
+
+/* Progress */
+.progress {
+  position: relative;
+  height: 4px;
+  background: var(--color-surface, #13131f);
+  border-radius: 2px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  background: var(--color-accent, #6366f1);
+  border-radius: 2px;
+  transition: width 100ms linear;
+}
+
+.progressText {
+  position: absolute;
+  right: 0;
+  top: -16px;
+  font-size: 10px;
+  color: var(--color-text-muted, #94a3b8);
+}
+
+/* Current Event */
+.currentEvent {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: rgba(99, 102, 241, 0.15);
+  border-radius: 4px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.eventBadge {
+  padding: 2px 6px;
+  background: var(--color-accent, #6366f1);
+  color: #fff;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.eventNode {
+  color: var(--color-text-muted, #94a3b8);
+  font-size: 11px;
+}
+
+.eventUser {
+  color: var(--color-text-primary, #e2e8f0);
+  font-size: 11px;
+}
+
+/* Event List */
+.eventList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.eventItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.eventItem.eventActive {
+  background: rgba(99, 102, 241, 0.2);
+}
+
+.eventTime {
+  color: var(--color-text-muted, #94a3b8);
+  font-size: 10px;
+  min-width: 60px;
+}
+
+.eventType {
+  color: var(--color-text-secondary, #cbd5e1);
+  flex: 1;
+}

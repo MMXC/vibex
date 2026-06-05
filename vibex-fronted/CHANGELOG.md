@@ -1,5 +1,14 @@
 ---
 
+## [Unreleased] S66-E1: 画布分支操作 — 2026-06-06
+- **E1.1**: `historyDB.ts` — DB_VERSION=4, parentSnapshotId field in SnapshotEntry/load/update, branchName+parentSnapshotId indexes in onupgradeneeded
+- **E1.2**: `historyDB.ts` — renameBranchInDB/deleteBranchFromDB/mergeBranchInDB/listBranchesFromDB (bulk IndexedDB operations)
+- **E1.3**: `canvasHistoryStore.ts` — renameBranch/deleteBranch/mergeBranch/listBranches actions (auto-refresh snapshots list after each op)
+- **E1.4**: `HistoryPanel.tsx` — Branch operation menus (rename/merge/delete buttons) in filter section
+- **E1.5**: `HistoryPanel.tsx` — BranchRenameDialog + BranchMergeDialog inline modal components
+- **E1.6**: UI — Branch filter click-to-select + branch operation buttons (✎ ↗ 🗑), delete-main guard
+
+
 ## [Unreleased] S65-E5: 模板画廊用户收藏管理 — 2026-06-05
 - **S65-E5.1**: `templateStore.addCustomCategory()` / `removeCustomCategory()` / `incrementUsage()` — 自定义分类管理 + 使用频率统计
 - **S65-E5.2**: Zustand persist middleware 自动持久化 `customCategories` + `stats.usageCount` (localStorage)

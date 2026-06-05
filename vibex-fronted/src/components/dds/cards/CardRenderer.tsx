@@ -8,6 +8,10 @@
  * - unknown type       → fallback (error boundary)
  *
  * Epic 1: F9
+ *
+ * S66-E2: 协作者冲突检测与通知
+ * - 读取 presenceStore.nodeLocks，在锁定节点上显示金色边框
+ * - 使用 usePresenceStore 直接读取，无需额外 prop 注入
  */
 
 'use client';
@@ -22,6 +26,7 @@ import { CardErrorBoundary } from '@/components/dds/canvas/CardErrorBoundary';
 import { StateMachineCard } from './StateMachineCard';
 import { NodeEditorLock } from '@/components/canvas/NodeEditorLock';
 import { NodeFocusOverlay } from '@/components/canvas/NodeFocusOverlay';
+import { usePresenceStore } from '@/lib/collaboration/presenceStore';
 import type { APIEndpointCard as APIEndpointCardType, StateMachineCard as SMCardType } from '@/types/dds';
 
 export interface CardRendererProps {
@@ -101,14 +106,56 @@ export const CardRenderer = memo(function CardRenderer({
 }: CardRendererProps) {
   const { type } = card;
 
+  // S66-E2: 从 presenceStore 读取 nodeLocks，检测其他用户锁定的节点
+  // 如果当前节点被其他人锁定，显示金色边框
+  const nodeLocks = usePresenceStore((s) => s.nodeLocks);
+  const currentUserId = usePresenceStore((s) => s.currentUser?.id);
+  const lockInfo = nodeLocks.get(card.id);
+  const isLockedByOther = lockInfo != null && lockInfo.userId !== currentUserId;
+  const lockUserName = lockInfo?.userName;
+
   const wrapper = (children: React.ReactNode) => (
-    <div style={{ position: 'relative' }}>
+    <div
+      style={{
+        position: 'relative',
+        // S66-E2: 锁定节点金色边框（被其他人锁定时显示）
+        outline: isLockedByOther ? '2px solid #f59e0b' : undefined,
+        outlineOffset: '2px',
+        borderRadius: '4px',
+      }}
+      // S66-E2: ARIA 通知辅助技术用户
+      aria-label={isLockedByOther ? `节点被 ${lockUserName} 锁定` : undefined}
+    >
       {children}
       {locked && <LockOverlay userName={lockedBy} />}
       {/* S62-E1: Show remote editor badge when another user is editing this node */}
       <NodeEditorLock nodeId={card.id} />
       {/* S65-E2: Show remote focus indicator (reads directly from presenceStore) */}
       <NodeFocusOverlay nodeId={card.id} />
+      {/* S66-E2: 锁定提示（当被其他人锁定时显示） */}
+      {isLockedByOther && lockUserName && (
+        <div
+          title={`🔒 已被 ${lockUserName} 锁定`}
+          style={{
+            position: 'absolute',
+            top: 4,
+            left: 4,
+            width: 20,
+            height: 20,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(245, 158, 11, 0.9)',
+            borderRadius: '50%',
+            color: '#fff',
+            fontSize: 10,
+            zIndex: 11,
+            pointerEvents: 'none',
+          }}
+        >
+          🔒
+        </div>
+      )}
     </div>
   );
 

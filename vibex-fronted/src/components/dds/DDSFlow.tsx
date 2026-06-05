@@ -9,6 +9,7 @@
  * - E2-U1: ConflictBubble integration
  * - E2-U3: data-conflict attribute on conflicted nodes
  * - S44-P003-E3: node locking UI — 🔒 overlay + locked state via presenceStore
+ * - S66-E2: 协作者冲突检测与通知 — nodeLocks Map 读取，金色边框 + toast 警告
  */
 
 'use client';
@@ -41,6 +42,7 @@ import { useMiniMapPanelStore, useMiniMapStore } from '@/lib/canvas/stores/miniM
 import { useViewportBoundsStore } from '@/lib/canvas/stores/viewportBoundsStore';
 import { usePresenceStore } from '@/lib/collaboration/presenceStore';
 import { useNodeFocus } from '@/lib/collaboration/useNodeFocus';
+import { useNodeLockedToast } from '@/components/dds/notifications/NodeLockedToast';
 import { RemoteCursorsLayer } from './canvas-dashboard/RemoteCursorsLayer';
 import { MiniMapPanel } from '@/components/dds/MiniMapPanel';
 import styles from './DDSFlow.module.css';
@@ -306,14 +308,17 @@ function DDSFlowInner({
       });
   }, [getNodes, visibleNodes, viewport]);
 
-  // Build flow nodes with selected + conflict state + lock state
+  // S66-E2: Read nodeLocks Map from presenceStore (replaces legacy lockedNodes Record)
   const selectedSet = new Set(selectedCardIds);
-  const lockedNodes = usePresenceStore.getState().lockedNodes;
+  const nodeLocks = usePresenceStore.getState().nodeLocks;
+  const currentUserId = usePresenceStore.getState().currentUser?.id;
   const remoteUsers = usePresenceStore.getState().remoteUsers;
   const flowNodes = visibleNodes.map((node: Node) => {
     const nodeId = node.id;
-    const lockedByUserId = lockedNodes[nodeId];
-    const lockedByUser = lockedByUserId ? remoteUsers.get(lockedByUserId) : undefined;
+    // S66-E2: Check if this node is locked by a REMOTE user (not self)
+    const lockInfo = nodeLocks.get(nodeId);
+    const isLockedByOther = lockInfo != null && lockInfo.userId !== currentUserId;
+    const remoteUser = lockInfo ? remoteUsers.get(lockInfo.userId) : undefined;
     return {
       ...node,
       data: {
@@ -321,9 +326,9 @@ function DDSFlowInner({
         selected: selectedSet.has(nodeId),
         // E2-U3: add conflict flag
         conflict: node.id === conflictedCardId,
-        // S44-P003-E3: lock state
-        locked: nodeId in lockedNodes,
-        lockedBy: lockedByUser?.name ?? lockedByUserId,
+        // S66-E2: lock state from nodeLocks Map
+        locked: isLockedByOther,
+        lockedBy: remoteUser?.name ?? lockInfo?.userName ?? undefined,
       },
       // S65-E2: pass focus/blur handlers to custom node types
       onNodeFocus,
@@ -331,11 +336,40 @@ function DDSFlowInner({
     };
   });
 
+  // S66-E2: Guard —阻止用户在锁定节点上执行操作
+  const { showNodeLockedToast } = useNodeLockedToast();
+
   const handleNodeClick = useCallback(
     (_event: React.MouseEvent, node: Node) => {
+      // S66-E2: 如果节点被其他人锁定，阻止选择并显示 toast
+      const lockInfo = nodeLocks.get(node.id);
+      if (lockInfo != null && lockInfo.userId !== currentUserId) {
+        showNodeLockedToast(lockInfo.userName);
+        return;
+      }
       if (onSelectCard) onSelectCard(node.id);
     },
-    [onSelectCard]
+    [onSelectCard, nodeLocks, currentUserId, showNodeLockedToast]
+  );
+
+  // S66-E2: Block drag on locked nodes — intercept position change events
+  const handleNodesChange = useCallback(
+    (changes: Parameters<typeof onNodesChange>[0]) => {
+      const positionChanges = changes.filter(
+        (c) => c.type === 'position' && c.dragging === false
+      );
+      for (const change of positionChanges) {
+        if (change.type === 'position') {
+          const lockInfo = nodeLocks.get(change.id);
+          if (lockInfo != null && lockInfo.userId !== currentUserId) {
+            showNodeLockedToast(lockInfo.userName);
+            return; // block the position change
+          }
+        }
+      }
+      onNodesChange(changes);
+    },
+    [onNodesChange, nodeLocks, currentUserId, showNodeLockedToast]
   );
 
   const handleToggle = useCallback(
@@ -351,7 +385,7 @@ function DDSFlowInner({
       <ReactFlow
         nodes={flowNodes}
         edges={edges}
-        onNodesChange={onNodesChange}
+        onNodesChange={handleNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeClick={handleNodeClick}

@@ -219,6 +219,15 @@ interface CanvasHistoryState {
   saveNamedSnapshot: (canvasId: string, name?: string, data?: { nodes: unknown[]; edges: unknown[] }) => Promise<string>;
   /** Create a branch snapshot based on a source snapshot; sets parentSnapshotId */
   createBranch: (canvasId: string, sourceSnapshotId: string, branchName: string, currentData?: { nodes: unknown[]; edges: unknown[] }) => Promise<string>;
+  // E1 (Sprint66): Branch operations
+  /** Rename all snapshots in a branch */
+  renameBranch: (canvasId: string, oldName: string, newName: string) => Promise<void>;
+  /** Delete all snapshots in a branch (recursive) */
+  deleteBranch: (canvasId: string, branchName: string) => Promise<void>;
+  /** Merge source branch into target branch; reparent snapshots to target's latest snapshot tip */
+  mergeBranch: (canvasId: string, sourceBranch: string, targetBranch: string) => Promise<void>;
+  /** List all unique branch names for a canvas */
+  listBranches: (canvasId: string) => Promise<string[]>;
 }
 
 // ==================== Helper ====================
@@ -631,6 +640,50 @@ export const useCanvasHistoryStore = create<CanvasHistoryState>((set, get) => ({
       await Promise.all(toDelete.map((s) => deleteSnapshotFromDB(canvasId, s.id)));
     }
     return id;
+  },
+
+  // ==================== E1 (Sprint66): Branch Operations ====================
+
+  renameBranch: async (canvasId: string, oldName: string, newName: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+    if (oldName === newName) return;
+    const { renameBranchInDB, listSnapshotsFromDB } = await import('@/lib/canvas/historyDB');
+    await renameBranchInDB(canvasId, oldName, newName);
+    // Refresh local snapshots list
+    const list = await listSnapshotsFromDB(canvasId);
+    set({ snapshots: list.sort((a, b) => b.timestamp - a.timestamp) });
+  },
+
+  deleteBranch: async (canvasId: string, branchName: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+    if (branchName === 'main') {
+      console.warn('[canvasHistoryStore] deleteBranch: cannot delete main branch');
+      return;
+    }
+    const { deleteBranchFromDB, listSnapshotsFromDB } = await import('@/lib/canvas/historyDB');
+    await deleteBranchFromDB(canvasId, branchName);
+    // Refresh local snapshots list
+    const list = await listSnapshotsFromDB(canvasId);
+    set({ snapshots: list.sort((a, b) => b.timestamp - a.timestamp) });
+  },
+
+  mergeBranch: async (canvasId: string, sourceBranch: string, targetBranch: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return;
+    if (sourceBranch === targetBranch) return;
+    const { mergeBranchInDB, listSnapshotsFromDB } = await import('@/lib/canvas/historyDB');
+    // Find the latest snapshot in target branch as merge tip
+    const allSnaps = await listSnapshotsFromDB(canvasId, { branch: targetBranch });
+    const targetTip = allSnaps.sort((a, b) => b.timestamp - a.timestamp)[0] ?? null;
+    await mergeBranchInDB(canvasId, sourceBranch, targetBranch, targetTip?.id ?? null);
+    // Refresh local snapshots list
+    const list = await listSnapshotsFromDB(canvasId);
+    set({ snapshots: list.sort((a, b) => b.timestamp - a.timestamp) });
+  },
+
+  listBranches: async (canvasId: string) => {
+    if (typeof window === 'undefined' || !window.indexedDB) return [];
+    const { listBranchesFromDB } = await import('@/lib/canvas/historyDB');
+    return listBranchesFromDB(canvasId);
   },
 
   stopAutoSnapshot: () => {

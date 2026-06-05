@@ -1,9 +1,11 @@
 /**
  * AISessionDrawer — Streaming AI Session Drawer
  * Sprint63 E4: AI 流式响应 + 可视化重试
+ * Sprint64 E3: 新增"历史"Tab → 渲染 AIHistoryPanel
  *
  * Displays live streaming AI response with typewriter effect.
  * Retry button re-runs the last prompt.
+ * Tab: "当前对话" = streaming view, "历史" = AIHistoryPanel
  *
  * Usage:
  * ```tsx
@@ -16,8 +18,9 @@
 
 'use client';
 
-import React, { memo, useCallback, useEffect, useRef } from 'react';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useAgentStore } from '@/stores/dds/agentStore';
+import { AIHistoryPanel } from './AIHistoryPanel';
 import styles from './AISessionDrawer.module.css';
 
 interface AISessionDrawerProps {
@@ -32,6 +35,9 @@ export const AISessionDrawer = memo(function AISessionDrawer({
   onClose,
 }: AISessionDrawerProps) {
   const contentRef = useRef<HTMLDivElement>(null);
+
+  // S64-E3: History tab state
+  const [activeTab, setActiveTab] = useState<'stream' | 'history'>('stream');
 
   // Store selectors
   const streamingContent = useAgentStore(
@@ -127,6 +133,29 @@ export const AISessionDrawer = memo(function AISessionDrawer({
             )}
           </div>
           <div className={styles.headerActions}>
+            {/* S64-E3: Tab switcher */}
+            <div className={styles.tabSwitcher} role="tablist" aria-label="AI 会话标签">
+              <button
+                className={`${styles.tabBtn} ${activeTab === 'stream' ? styles.tabBtnActive : ''}`}
+                onClick={() => setActiveTab('stream')}
+                role="tab"
+                aria-selected={activeTab === 'stream'}
+                aria-controls="ai-panel-stream"
+                type="button"
+              >
+                当前对话
+              </button>
+              <button
+                className={`${styles.tabBtn} ${activeTab === 'history' ? styles.tabBtnActive : ''}`}
+                onClick={() => setActiveTab('history')}
+                role="tab"
+                aria-selected={activeTab === 'history'}
+                aria-controls="ai-panel-history"
+                type="button"
+              >
+                历史
+              </button>
+            </div>
             <button
               className={styles.btnClose}
               onClick={handleClose}
@@ -142,6 +171,9 @@ export const AISessionDrawer = memo(function AISessionDrawer({
 
         {/* Content */}
         <div className={styles.content} ref={contentRef}>
+          {/* S64-E3: Tab panels */}
+          {activeTab === 'stream' ? (
+            <>
           {/* Prompt block */}
           {lastPrompt && (
             <div className={styles.promptBlock}>
@@ -161,6 +193,12 @@ export const AISessionDrawer = memo(function AISessionDrawer({
               {isStreaming && <span className={styles.cursor} aria-hidden="true" />}
             </div>
           </div>
+            </>
+          ) : (
+            <div id="ai-panel-history" role="tabpanel" aria-label="历史记录">
+              <AIHistoryPanel />
+            </div>
+          )}
         </div>
 
         {/* Retry info */}

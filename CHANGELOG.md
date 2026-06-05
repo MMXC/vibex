@@ -10,6 +10,15 @@
 
 ---
 
+
+---
+
+## [Unreleased] S66-E3: 画布视图预设保存与切换 — 2026-06-06
+
+- 新增 `viewPresetsStore`: Zustand store，localStorage 持久化，CRUD 操作
+- 新增 `ViewPresetsTab`: 预设卡片列表 UI + 保存表单
+- 新增测试 `viewPresetsStore.test.ts`: 20 个测试用例
+
 ## [Unreleased] S65-E5: 模板画廊用户收藏管理 — 2026-06-05
 - **S65-E5.1**: `templateStore.addCustomCategory()` / `removeCustomCategory()` / `incrementUsage()` — 自定义分类管理 + 使用频率统计
 - **S65-E5.2**: Zustand persist middleware 自动持久化 `customCategories` + `stats.usageCount` (localStorage)

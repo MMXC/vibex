@@ -31,6 +31,7 @@ interface CanvasListPanelProps {
 }
 
 type SortMode = 'updatedAt' | 'name';
+type ArchiveFilter = 'active' | 'archived' | 'all';
 
 export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListPanelProps) {
   const {
@@ -44,16 +45,22 @@ export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListP
     getFilteredCanvases,
   } = useCanvasList();
 
-  const { selectedCanvasIds, toggleSelect, clearSelection, exportSelectedPDF, pasteToCanvas } = useCanvasListStore();
+  const { selectedCanvasIds, toggleSelect, clearSelection, exportSelectedPDF, pasteToCanvas, setArchiveFilterMode } = useCanvasListStore();
   const clipboardValid = useClipboardStore((s) => s.isValid());
   const clipboardCount = useClipboardStore((s) => s.entry?.cards.length ?? 0);
 
   const [sortMode, setSortMode] = useState<SortMode>('updatedAt');
+  const [archiveFilter, setArchiveFilter] = useState<ArchiveFilter>('active');
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [isExporting, setIsExporting] = useState(false);
   const editInputRef = useRef<HTMLInputElement>(null);
+
+  const handleArchiveFilterChange = useCallback((mode: ArchiveFilter) => {
+    setArchiveFilter(mode);
+    setArchiveFilterMode(mode);
+  }, [setArchiveFilterMode]);
 
   const sortedCanvases = getSortedCanvases(sortMode);
   const displayedCanvases = searchTerm ? getFilteredCanvases(sortMode) : sortedCanvases;
@@ -183,6 +190,28 @@ export function CanvasListPanel({ onOpenCanvas, collapsed = false }: CanvasListP
           title="按名称排序"
         >
           名称
+        </button>
+        {/* S64-E4 D4.6: Archive filter */}
+        <button
+          className={`${styles['sort-btn']}${archiveFilter === 'active' ? ` ${styles['sort-btn--active']}` : ''}`}
+          onClick={() => handleArchiveFilterChange('active')}
+          title="显示活动画布"
+        >
+          活动
+        </button>
+        <button
+          className={`${styles['sort-btn']}${archiveFilter === 'archived' ? ` ${styles['sort-btn--active']}` : ''}`}
+          onClick={() => handleArchiveFilterChange('archived')}
+          title="显示已归档画布"
+        >
+          已归档
+        </button>
+        <button
+          className={`${styles['sort-btn']}${archiveFilter === 'all' ? ` ${styles['sort-btn--active']}` : ''}`}
+          onClick={() => handleArchiveFilterChange('all')}
+          title="显示所有画布"
+        >
+          全部
         </button>
         {selectedCount > 0 && (
           <button

@@ -19,6 +19,8 @@ export interface CanvasMeta {
   thumbnail: string | null; // base64 data URL
   createdAt: string; // ISO 8601
   updatedAt: string; // ISO 8601
+  /** Archive timestamp — set when canvas is archived (S64-E4) */
+  archivedAt?: string;
 }
 
 
@@ -35,6 +37,8 @@ export interface CanvasListState {
   thumbnailCache: Record<string, string>;
   /** Multi-select set for batch export (Sprint48 E2) */
   selectedCanvasIds: Set<string>;
+  /** Archive filter mode (S64-E4) */
+  archiveFilterMode: 'all' | 'active' | 'archived';
 
 
   // Actions
@@ -63,8 +67,14 @@ export interface CanvasListState {
   pasteToCanvas: (canvasId: string) => void;
   /** Batch delete all selected canvases (Sprint60 E2) */
   batchDeleteCanvas: () => Promise<void>;
-  /** Batch rename all selected canvases (Sprint60 E2) */
-  batchRenameCanvas: (mode: 'prefix' | 'suffix', prefix: string, suffix: string) => Promise<void>;
+  /** Batch rename all selected canvases with a function (S64-E4) */
+  batchRename: (canvasIds: string[], renameFn: (name: string, idx: number) => string) => Promise<void>;
+  /** Archive selected canvases — sets archivedAt (S64-E4) */
+  batchArchive: (canvasIds: string[]) => Promise<void>;
+  /** Unarchive selected canvases — clears archivedAt (S64-E4) */
+  batchUnarchive: (canvasIds: string[]) => Promise<void>;
+  /** Set archive filter mode (S64-E4) */
+  setArchiveFilterMode: (mode: 'all' | 'active' | 'archived') => void;
 
 }
 
@@ -152,6 +162,7 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
   searchTerm: '',
   thumbnailCache: {},
   selectedCanvasIds: new Set(),
+  archiveFilterMode: 'active', // S64-E4: default to active (non-archived) canvases
 
   loadCanvases: async () => {
     if (!isIndexedDBAvailable()) {
@@ -277,11 +288,22 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
   },
 
   getFilteredCanvases: (sortBy: 'name' | 'updatedAt') => {
-    const { canvases, searchTerm } = get();
+    const { canvases, searchTerm, archiveFilterMode } = get();
     const term = searchTerm.trim().toLowerCase();
-    const filtered = term
-      ? canvases.filter((c) => c.name.toLowerCase().includes(term))
-      : canvases;
+
+    let filtered = canvases;
+
+    // Archive filter (S64-E4)
+    if (archiveFilterMode === 'active') {
+      filtered = filtered.filter((c) => !c.archivedAt);
+    } else if (archiveFilterMode === 'archived') {
+      filtered = filtered.filter((c) => !!c.archivedAt);
+    }
+    // 'all': no filter
+
+    if (term) {
+      filtered = filtered.filter((c) => c.name.toLowerCase().includes(term));
+    }
     return [...filtered].sort((a, b) => {
       if (sortBy === 'name') {
         return a.name.localeCompare(b.name, 'zh-CN');
@@ -368,7 +390,7 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
   },
 
   // ============================================================
-  // Sprint60 E2: Batch Operations
+  // Sprint60 E2: Batch Operations → S64-E4: Enhanced Batch Rename + Archive
   // ============================================================
 
   batchDeleteCanvas: async () => {
@@ -384,37 +406,98 @@ export const useCanvasListStore = create<CanvasListState>((set, get) => ({
     set({ selectedCanvasIds: new Set() });
   },
 
-  batchRenameCanvas: async (mode, prefix, suffix) => {
-    const { selectedCanvasIds, canvases } = get();
-    if (selectedCanvasIds.size === 0) return;
+  /**
+   * S64-E4 D4.1 + D4.3: Flexible batch rename with a user-provided function.
+   * Supports sequence mode (e.g. {name}1, {name}2) and regex find-replace.
+   * Duplicate name auto-dedup: append -{n} if name already exists in other selected canvases.
+   */
+  batchRename: async (canvasIds, renameFn) => {
+    if (canvasIds.length === 0) return;
+    const { canvases } = get();
 
-    for (const canvasId of selectedCanvasIds) {
+    // Build rename plan with deduplication
+    const newNames = new Map<string, string>();
+    const usedNames = new Set<string>();
+
+    for (let i = 0; i < canvasIds.length; i++) {
+      const canvasId = canvasIds[i];
       const canvas = canvases.find((c) => c.id === canvasId);
       if (!canvas) continue;
 
-      let newName = canvas.name;
-      if (mode === 'prefix') {
-        // Replace prefix: find first hyphen/dot/space or start, replace everything before it
-        const match = canvas.name.match(/^([\[\]【】『』（""''『』「」\s]*)(.+)/);
-        const body = match ? match[2] : canvas.name;
-        newName = prefix + body;
-      } else {
-        // Suffix mode: replace extension-like suffix (before last . or space) or append
-        const dotIdx = canvas.name.lastIndexOf('.');
-        if (dotIdx > 0) {
-          newName = canvas.name.slice(0, dotIdx) + suffix;
-        } else {
-          newName = canvas.name + suffix;
-        }
-      }
+      let newName = renameFn(canvas.name, i + 1);
 
-      if (newName !== canvas.name) {
-        await get().renameCanvas(canvasId, newName);
+      // D4.4: Duplicate name detection — auto-dedup
+      let dedupIndex = 2;
+      let finalName = newName;
+      while (usedNames.has(finalName)) {
+        finalName = `${newName}-${dedupIndex}`;
+        dedupIndex++;
       }
+      usedNames.add(finalName);
+      newNames.set(canvasId, finalName);
     }
 
-    // Clear selection after rename
+    // Apply renames
+    for (const [canvasId, newName] of newNames) {
+      await get().renameCanvas(canvasId, newName);
+    }
+
     set({ selectedCanvasIds: new Set() });
+  },
+
+  /**
+   * S64-E4 D4.2: Archive selected canvases — sets archivedAt timestamp.
+   */
+  batchArchive: async (canvasIds) => {
+    if (canvasIds.length === 0) return;
+    const { canvases } = get();
+    const now = new Date().toISOString();
+
+    set((state) => ({
+      canvases: state.canvases.map((c) =>
+        canvasIds.includes(c.id) ? { ...c, archivedAt: now } : c
+      ),
+      selectedCanvasIds: new Set(),
+    }));
+
+    // Persist to IndexedDB
+    for (const canvasId of canvasIds) {
+      const canvas = canvases.find((c) => c.id === canvasId);
+      if (canvas) {
+        await idbPut('canvases', { ...canvas, archivedAt: now });
+      }
+    }
+  },
+
+  /**
+   * S64-E4 D4.2: Unarchive selected canvases — clears archivedAt.
+   */
+  batchUnarchive: async (canvasIds) => {
+    if (canvasIds.length === 0) return;
+    const { canvases } = get();
+
+    set((state) => ({
+      canvases: state.canvases.map((c) =>
+        canvasIds.includes(c.id) ? { ...c, archivedAt: undefined } : c
+      ),
+      selectedCanvasIds: new Set(),
+    }));
+
+    // Persist to IndexedDB
+    for (const canvasId of canvasIds) {
+      const canvas = canvases.find((c) => c.id === canvasId);
+      if (canvas) {
+        const { archivedAt: _archivedAt, ...rest } = canvas;
+        await idbPut('canvases', rest);
+      }
+    }
+  },
+
+  /**
+   * S64-E4 D4.6: Set archive filter mode.
+   */
+  setArchiveFilterMode: (mode) => {
+    set({ archiveFilterMode: mode });
   },
 
   // ============================================================

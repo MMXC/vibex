@@ -4,9 +4,10 @@
  * BatchOpsToolbar.tsx — Sprint60 E2: Batch Operations Floating Toolbar
  * S61-E3 i18n: All hardcoded Chinese strings replaced with useTranslations('batchOps').
  * S63-E5: Add "移动到文件夹" button + FolderPickerDialog.
+ * S64-E4: Advanced BatchRenameDialog (sequence + regex mode) + batchArchive/batchUnarchive.
  *
  * Displays at the top of CanvasListPanel when multiple canvases are selected.
- * Provides batch delete, batch rename, and batch move-to-folder entry points.
+ * Provides batch delete, batch rename, batch archive, and batch move-to-folder entry points.
  */
 
 import { useCallback, useState } from 'react';
@@ -15,6 +16,7 @@ import { useBatchOpsStore } from '@/stores/dds/batchOpsStore';
 import { useCanvasFolderStore } from '@/stores/dds/canvasFolderStore';
 import { useTranslations } from '@/hooks/useTranslations';
 import { FolderPickerDialog } from './FolderPickerDialog';
+import { BatchRenameDialog } from './BatchRenameDialog';
 import styles from './BatchOpsToolbar.module.css';
 
 interface BatchOpsToolbarProps {
@@ -27,17 +29,11 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
   const {
     isDeleteDialogOpen,
     isRenameDialogOpen,
-    renameMode,
-    renamePrefix,
-    renameSuffix,
     isOperating,
     openDeleteDialog,
     closeDeleteDialog,
     openRenameDialog,
     closeRenameDialog,
-    setRenameMode,
-    setRenamePrefix,
-    setRenameSuffix,
     setIsOperating,
   } = useBatchOpsStore();
 
@@ -47,7 +43,10 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
   // S63-E5: folder picker state
   const [showFolderPicker, setShowFolderPicker] = useState(false);
   const { batchMoveToFolder } = useCanvasFolderStore();
-  const { selectedCanvasIds } = useCanvasListStore();
+  const { selectedCanvasIds, batchArchive, batchUnarchive } = useCanvasListStore();
+
+  // S64-E4: advanced rename dialog state
+  const [showAdvancedRename, setShowAdvancedRename] = useState(false);
 
   const handleMoveToFolder = useCallback(() => {
     setShowFolderPicker(true);
@@ -66,7 +65,7 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
   }, [selectedCanvasIds, batchMoveToFolder, clearSelection, setIsOperating]);
 
   const handleBatchDelete = useCallback(async () => {
-    const { selectedCanvasIds, batchDeleteCanvas } = useCanvasListStore.getState();
+    const { batchDeleteCanvas } = useCanvasListStore.getState();
     if (selectedCanvasIds.size === 0) return;
     setIsOperating(true);
     try {
@@ -76,20 +75,48 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
       setIsOperating(false);
       closeDeleteDialog();
     }
-  }, [clearSelection, closeDeleteDialog, setIsOperating]);
+  }, [selectedCanvasIds, clearSelection, closeDeleteDialog, setIsOperating]);
 
-  const handleBatchRename = useCallback(async () => {
-    const { selectedCanvasIds, batchRenameCanvas } = useCanvasListStore.getState();
+  // S64-E4: advanced rename via BatchRenameDialog
+  const handleAdvancedRename = useCallback(
+    async (canvasIds: string[], renameFn: (name: string, idx: number) => string) => {
+      setShowAdvancedRename(false);
+      if (canvasIds.length === 0) return;
+      setIsOperating(true);
+      try {
+        const { batchRename } = useCanvasListStore.getState();
+        await batchRename(canvasIds, renameFn);
+        clearSelection();
+      } finally {
+        setIsOperating(false);
+      }
+    },
+    [clearSelection, setIsOperating]
+  );
+
+  // S64-E4: batch archive
+  const handleBatchArchive = useCallback(async () => {
     if (selectedCanvasIds.size === 0) return;
     setIsOperating(true);
     try {
-      await batchRenameCanvas(renameMode, renamePrefix, renameSuffix);
+      await batchArchive(Array.from(selectedCanvasIds));
       clearSelection();
     } finally {
       setIsOperating(false);
-      closeRenameDialog();
     }
-  }, [renameMode, renamePrefix, renameSuffix, clearSelection, closeRenameDialog, setIsOperating]);
+  }, [selectedCanvasIds, batchArchive, clearSelection, setIsOperating]);
+
+  // S64-E4: batch unarchive
+  const handleBatchUnarchive = useCallback(async () => {
+    if (selectedCanvasIds.size === 0) return;
+    setIsOperating(true);
+    try {
+      await batchUnarchive(Array.from(selectedCanvasIds));
+      clearSelection();
+    } finally {
+      setIsOperating(false);
+    }
+  }, [selectedCanvasIds, batchUnarchive, clearSelection, setIsOperating]);
 
   if (selectedCount === 0) return null;
 
@@ -102,7 +129,7 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
 
         <button
           className={styles['batch-ops-toolbar__btn']}
-          onClick={openRenameDialog}
+          onClick={() => setShowAdvancedRename(true)}
           disabled={isOperating}
           aria-label={t('rename')}
         >
@@ -125,6 +152,25 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
           aria-label={t('moveToFolder')}
         >
           📁 {t('moveToFolder')}
+        </button>
+
+        {/* S64-E4: Archive / Unarchive */}
+        <button
+          className={styles['batch-ops-toolbar__btn']}
+          onClick={handleBatchArchive}
+          disabled={isOperating}
+          aria-label={t('archive')}
+        >
+          📦 {t('archive')}
+        </button>
+
+        <button
+          className={styles['batch-ops-toolbar__btn']}
+          onClick={handleBatchUnarchive}
+          disabled={isOperating}
+          aria-label={t('unarchive')}
+        >
+          📤 {t('unarchive')}
         </button>
 
         <button
@@ -172,88 +218,12 @@ export function BatchOpsToolbar({ selectedCount }: BatchOpsToolbarProps) {
         </div>
       )}
 
-      {/* Rename dialog */}
-      {isRenameDialogOpen && (
-        <div
-          className={styles['dialog-overlay']}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="batch-rename-title"
-        >
-          <div className={styles['dialog']}>
-            <h3 id="batch-rename-title" className={styles['dialog__title']}>
-              {t('batchRename')}
-            </h3>
-            <p className={styles['dialog__body']}>{t('renameDesc', { count: selectedCount })}</p>
-
-            <div className={styles['dialog__field']}>
-              <label className={styles['dialog__label']} htmlFor="rename-mode">
-                {t('renameMode')}
-              </label>
-              <select
-                id="rename-mode"
-                className={styles['dialog__select']}
-                value={renameMode}
-                onChange={(e) => setRenameMode(e.target.value as 'prefix' | 'suffix')}
-              >
-                <option value="prefix">{t('prefixReplace')}</option>
-                <option value="suffix">{t('suffixReplace')}</option>
-              </select>
-            </div>
-
-            {renameMode === 'prefix' && (
-              <div className={styles['dialog__field']}>
-                <label className={styles['dialog__label']} htmlFor="rename-prefix">
-                  {t('newPrefix')}
-                </label>
-                <input
-                  id="rename-prefix"
-                  type="text"
-                  className={styles['dialog__input']}
-                  value={renamePrefix}
-                  onChange={(e) => setRenamePrefix(e.target.value)}
-                  placeholder={t('enterNewPrefix')}
-                  aria-label={t('newPrefix')}
-                />
-              </div>
-            )}
-
-            {renameMode === 'suffix' && (
-              <div className={styles['dialog__field']}>
-                <label className={styles['dialog__label']} htmlFor="rename-suffix">
-                  {t('newSuffix')}
-                </label>
-                <input
-                  id="rename-suffix"
-                  type="text"
-                  className={styles['dialog__input']}
-                  value={renameSuffix}
-                  onChange={(e) => setRenameSuffix(e.target.value)}
-                  placeholder={t('enterNewSuffix')}
-                  aria-label={t('newSuffix')}
-                />
-              </div>
-            )}
-
-            <div className={styles['dialog__actions']}>
-              <button
-                className={styles['dialog__cancel']}
-                onClick={closeRenameDialog}
-                disabled={isOperating}
-              >
-                {t('cancel')}
-              </button>
-              <button
-                className={styles['dialog__confirm']}
-                onClick={handleBatchRename}
-                disabled={isOperating}
-              >
-                {isOperating ? t('renaming') : t('confirmRename')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* S64-E4: Advanced BatchRenameDialog */}
+      <BatchRenameDialog
+        open={showAdvancedRename}
+        onConfirm={handleAdvancedRename}
+        onCancel={() => setShowAdvancedRename(false)}
+      />
 
       {/* S63-E5: Move to Folder dialog */}
       {showFolderPicker && (

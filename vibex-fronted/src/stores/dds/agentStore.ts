@@ -1,11 +1,12 @@
 /**
- * agentStore.ts — Sprint61 E4 + Sprint63 E4: AI Session Canvas Context Integration + Streaming
+ * agentStore.ts — Sprint61 E4 + Sprint63 E4 + Sprint64 E3: AI Session Canvas Context Integration + Streaming + Persistence
  *
  * DDS-specific AI session store with:
  * - Canvas context injection (node/edge counts per chapter)
  * - Configurable retry settings (3 / 5 / infinite)
  * - Session-level canvas context stored per session
  * - SSE streaming: streamingContent, isStreaming, lastPrompt
+ * - Session history: IndexedDB-backed sessionHistory for cross-refresh persistence
  *
  * Distinct from src/stores/agentStore.ts (coding agent, Sprint6).
  */
@@ -14,6 +15,13 @@
 
 import { create } from 'zustand';
 import type { ChapterType } from '@/types/dds';
+import {
+  saveSessionToHistory,
+  loadSessionsFromHistory,
+  deleteSessionFromHistory,
+  clearAllHistory,
+  type AISessionHistory,
+} from '@/lib/ai-session-db';
 
 // ==================== Types ====================
 
@@ -59,6 +67,10 @@ interface AgentState {
   isStreaming: Record<string, boolean>;
   /** Per-session last prompt (sessionId -> prompt) for retry */
   lastPrompt: Record<string, string>;
+  /** S64-E3: Session history from IndexedDB (persisted across page refresh) */
+  sessionHistory: AISessionHistory[];
+  /** S64-E3: Whether sessionHistory has been loaded from IndexedDB */
+  sessionHistoryLoaded: boolean;
 }
 
 interface AgentActions {
@@ -78,6 +90,15 @@ interface AgentActions {
   clearStreamContent: (sessionId: string) => void;
   retryLastStream: (sessionId: string) => Promise<void>;
   cancelStream: (sessionId: string) => void;
+  // S64-E3: Session history actions (IndexedDB-backed)
+  /** Load session history from IndexedDB (called on app init) */
+  loadSessions: () => Promise<void>;
+  /** Save a completed session to IndexedDB history */
+  saveSession: (sessionId: string) => Promise<void>;
+  /** Delete a session from IndexedDB history */
+  clearSession: (sessionId: string) => Promise<void>;
+  /** Clear all session history */
+  clearAllSessions: () => Promise<void>;
 }
 
 export type AgentStore = AgentState & AgentActions;
@@ -110,6 +131,8 @@ export const useAgentStore = create<AgentStore>((set, get) => ({
   streamingContent: {},
   isStreaming: {},
   lastPrompt: {},
+  sessionHistory: [],
+  sessionHistoryLoaded: false,
 
   addSession: (session) => {
     const id = generateSessionId();
@@ -309,7 +332,14 @@ export const useAgentStore = create<AgentStore>((set, get) => ({
       }
     } finally {
       streamControllers.delete(sessionId);
+      // S64-E3: capture content before endStream clears streaming state
+      const finalContent = get().streamingContent[sessionId] ?? '';
+      const prompt = get().lastPrompt[sessionId] ?? '';
       get().endStream(sessionId);
+      // S64-E3: auto-save completed session to IndexedDB history
+      if (finalContent && prompt) {
+        get().saveSession({ id: sessionId, prompt, response: finalContent, timestamp: Date.now() });
+      }
     }
   },
 
@@ -322,6 +352,84 @@ export const useAgentStore = create<AgentStore>((set, get) => ({
     await get().streamSession(sessionId, lastPrompt, session?.canvasContext ?? null);
     get().clearRetry(sessionId);
     get().incrementRetryCount(sessionId);
+  },
+
+  // ==================== S64-E3: Session History Actions ====================
+
+  /**
+   * Load session history from IndexedDB.
+   * Safe to call multiple times — only loads if not yet loaded.
+   */
+  loadSessions: async () => {
+    const state = get();
+    if (state.sessionHistoryLoaded) return;
+    try {
+      const history = await loadSessionsFromHistory();
+      set({ sessionHistory: history, sessionHistoryLoaded: true });
+    } catch (err) {
+      console.error('[agentStore] loadSessions error:', err);
+      // Still mark as loaded to avoid repeated attempts
+      set({ sessionHistoryLoaded: true });
+    }
+  },
+
+  /**
+   * Save a session to IndexedDB history.
+   * Truncates prompt/response to display-friendly summaries.
+   */
+  saveSession: async (sessionId) => {
+    const state = get();
+    const session = state.sessions.find((s) => s.id === sessionId);
+    if (!session) return;
+
+    const prompt = state.lastPrompt[sessionId] ?? '';
+    const response = state.streamingContent[sessionId] ?? '';
+
+    const historyEntry: AISessionHistory = {
+      id: session.id,
+      name: session.name,
+      promptSummary: prompt.slice(0, 200),
+      responseSummary: response.slice(0, 300),
+      canvasContextSummary: session.canvasContext?.summary ?? null,
+      createdAt: session.createdAt,
+      archivedAt: new Date().toISOString(),
+    };
+
+    try {
+      await saveSessionToHistory(historyEntry);
+      // Update local state
+      set((s) => ({
+        sessionHistory: [historyEntry, ...s.sessionHistory].slice(0, 100),
+      }));
+    } catch (err) {
+      console.error('[agentStore] saveSession error:', err);
+    }
+  },
+
+  /**
+   * Delete a session from IndexedDB history.
+   */
+  clearSession: async (sessionId) => {
+    try {
+      await deleteSessionFromHistory(sessionId);
+      set((state) => ({
+        sessionHistory: state.sessionHistory.filter((h) => h.id !== sessionId),
+      }));
+    } catch (err) {
+      console.error('[agentStore] clearSession error:', err);
+    }
+  },
+
+  /**
+   * Clear all session history from IndexedDB.
+   */
+  clearAllSessions: async () => {
+    try {
+      await clearAllHistory();
+      set({ sessionHistory: [] });
+    } catch (err) {
+      console.error('[agentStore] clearAllSessions error:', err);
+    }
   },
 }));
 

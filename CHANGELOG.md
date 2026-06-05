@@ -6229,3 +6229,12 @@ See git history for complete changelog.
 - **S64-E1.3**: `PresencePanel.tsx` — 活跃协作者列表，`aria-label="协作用户列表"`, `role="toolbar"`; 用户头像 + 状态点
 - **S64-E1.4**: `DDSToolbar.tsx` — 画布打开时渲染 PresencePanel
 - **S64-E1.5**: vitest: presenceStore 35/35 通过
+---
+
+## [Unreleased] S64-E3: AI 会话持久化 — 2026-06-05
+- **S64-E3.1**: `src/lib/ai-session-db.ts` — IndexedDB 辅助层：openDB / saveSessionToHistory / loadSessionsFromHistory / deleteSessionFromHistory / clearAllHistory
+- **S64-E3.2**: `agentStore.ts` — `sessionHistory[]`, `sessionHistoryLoaded` state + `loadSessions/saveSession/clearSession/clearAllSessions` actions
+- **S64-E3.3**: `streamSession` 自动 saveSession — 流结束时将 prompt+response 存入 IndexedDB 历史
+- **S64-E3.4**: `AIHistoryPanel.tsx` — 历史列表组件：加载/删除/清空，含中文 UI
+- **S64-E3.5**: `AISessionDrawer.tsx` — 新增「当前对话/历史」Tab 切换，渲染 AIHistoryPanel
+- **S64-E3.6**: `agentStore.sessionHistory.test.ts` — 8 个测试用例：D3.2a-D3.8

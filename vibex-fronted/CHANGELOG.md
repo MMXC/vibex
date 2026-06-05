@@ -961,3 +961,12 @@
 - **S64-E3.4**: `AIHistoryPanel.tsx` — 历史列表组件：加载/删除/清空，含中文 UI
 - **S64-E3.5**: `AISessionDrawer.tsx` — 新增「当前对话/历史」Tab 切换，渲染 AIHistoryPanel
 - **S64-E3.6**: `agentStore.sessionHistory.test.ts` — 8 个测试用例：D3.2a-D3.8
+
+## [Unreleased] S64-E4: 画布批量操作增强（Batch Rename + Archive）— 2026-06-05
+- **S64-E4.1**: `canvasListStore.batchRename(canvasIds, renameFn)` — 灵活批量重命名函数，支持序号模式和正则替换模式
+- **S64-E4.2**: `canvasListStore.batchArchive/batchUnarchive` — 设置/清除 archivedAt 时间戳
+- **S64-E4.3**: `BatchRenameDialog.tsx` — 序号模式（{name}1, {name}2）+ 正则替换模式 UI
+- **S64-E4.4**: 重名冲突自动去重 — 重复名称自动追加 -{n} 后缀
+- **S64-E4.5**: `BatchOpsToolbar.tsx` — handleAdvancedRename + 归档/取消归档按钮
+- **S64-E4.6**: `CanvasListPanel.tsx` — 归档过滤模式标签页（全部/活跃/已归档）
+- **S64-E4.7**: `canvasListStore.e4.test.ts` — 6/6 vitest 测试通过（去重逻辑 + 归档过滤）

@@ -3,11 +3,13 @@
  * Epic 2b: ReactFlow集成
  * S58-E2: 桌面文件拖拽导入
  * S58-E3: 协作者 Cursor 同步完善
+ * S65-E3: 画布视图个性化设置 — Background 读取 settingsStore
  *
  * Renders cards as ReactFlow nodes with animated edges.
  * Uses useDDSCanvasFlow hook for store ↔ view sync.
  * E2: Integrates useFileDrop for drag-drop file import.
  * E3: Integrates useCollaboration.broadcastCursor for cursor sync.
+ * S65-E3: Integrates settingsStore for dynamic background/grid/zoom.
  *
  * @module components/dds/canvas/DDSFlow
  */
@@ -42,6 +44,9 @@ import { FileImportDialog } from './FileImportDialog';
 // E3: Collaboration cursor broadcast
 import { useCollaboration } from '@/hooks/useCollaboration';
 import { screenToFlowPosition } from '@xyflow/react';
+// S65-E3: Canvas view settings
+import { useSettingsStore } from '@/stores/dds/settingsStore';
+import type { GridVariant } from '@/stores/dds/settingsStore';
 
 // ==================== Node Component ====================
 
@@ -119,6 +124,20 @@ function DDSFlowInner({
   // E3: Collaboration cursor broadcast
   const { broadcastCursor } = useCollaboration();
 
+  // S65-E3: Canvas view settings
+  const backgroundColor = useSettingsStore((s) => s.backgroundColor);
+  const gridSize = useSettingsStore((s) => s.gridSize);
+  const gridVariant = useSettingsStore((s) => s.gridVariant);
+  const snapToGrid = useSettingsStore((s) => s.snapToGrid);
+  const defaultZoom = useSettingsStore((s) => s.defaultZoom);
+
+  // Map store variant string to @xyflow/react BackgroundVariant
+  const bgVariant = (() => {
+    if (gridVariant === 'lines') return BackgroundVariant.Lines;
+    if (gridVariant === 'cross') return BackgroundVariant.Cross;
+    return BackgroundVariant.Dots;
+  })();
+
   // Node click → onSelectCard
   const handleNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
@@ -182,9 +201,9 @@ function DDSFlowInner({
     [setDragging, processDrop]
   );
 
-  // Fit view on mount
+  // Fit view on mount using defaultZoom
   React.useEffect(() => {
-    fitView({ padding: 0.2 });
+    fitView({ zoom: defaultZoom, padding: 0.2 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -208,9 +227,17 @@ function DDSFlowInner({
           fitView
           fitViewOptions={{ padding: 0.2 }}
           deleteKeyCode={readOnly ? null : 'Delete'}
+          snapToGrid={snapToGrid}
+          snapGrid={[gridSize, gridSize]}
           proOptions={{ hideAttribution: true }}
         >
-          <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#e5e7eb" />
+          <Background
+            variant={bgVariant}
+            gap={gridSize}
+            size={1}
+            color="#e5e7eb"
+            style={{ backgroundColor }}
+          />
           <Controls />
           <MiniMap
             nodeColor={() => '#6366f1'}

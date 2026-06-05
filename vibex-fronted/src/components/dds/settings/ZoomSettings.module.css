@@ -1,0 +1,86 @@
+.container {
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+}
+
+.hint {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.zoomOptions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.zoomButton {
+  padding: 10px 8px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.zoomButton:hover {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+}
+
+.zoomButton.active {
+  border-color: #6366f1;
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+.previewRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.previewLabel {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.previewBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: white;
+}
+
+.previewZoom {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4338ca;
+}

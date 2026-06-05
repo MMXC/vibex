@@ -1002,3 +1002,15 @@
 - **S65-E2.6**: 30s 超时自动释放 — `setNodeFocus` 启动 setTimeout 定时器，超时自动调用 `clearNodeFocus`
 - **S65-E2.7**: `presenceStore.test.ts` — 覆盖 focus/lock 逻辑 (57/57 pass)
 - **Test**: 57/57 vitest ✅
+
+
+## [Unreleased] S65-E3: 画布视图个性化设置面板 — 2026-06-05
+- **S65-E3.1**: `settingsStore.ts` — 统一设置 Store：backgroundColor / gridSize / gridVariant / defaultZoom / snapToGrid，localStorage 持久化
+- **S65-E3.2**: `CanvasSettingsPanel.tsx` — Tab 式设置面板（背景 / 网格 / 缩放 / 快捷键）
+- **S65-E3.3**: `BackgroundSettings.tsx` — 15 种预设色板 + `<input type="color">` 自定义颜色
+- **S65-E3.4**: `GridSettings.tsx` — 间距选择器（12/16/24/32）+ 样式（点状/线条/十字）+ 对齐开关
+- **S65-E3.5**: `ZoomSettings.tsx` — 默认缩放选择器（50%-200%）
+- **S65-E3.6**: `DDSToolbar.tsx` — 设置齿轮按钮 + CanvasSettingsPanel 集成
+- **S65-E3.7**: `DDSFlow.tsx` — Background 读取 settingsStore（color / variant / gap）+ snapToGrid / snapGrid props + fitView 使用 defaultZoom
+- **S65-E3.10**: `settingsStore.test.ts` — 17/17 vitest 测试通过
+- **Test**: 17/17 vitest ✅

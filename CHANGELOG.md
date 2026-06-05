@@ -2,6 +2,14 @@
 
 ---
 
+## [Unreleased] S64-E2: 画布版本历史 LRU 缓存 + 恢复 — 2026-06-05
+- **S64-E2.1**: `MAX_SNAPSHOTS = 50` — 导出常量，供 HistoryPanel 使用
+- **S64-E2.2**: `saveSnapshot` LRU eviction — 列表 > 50 时，slice(50) 删除最旧的快照
+- **S64-E2.3**: `restoreSnapshot` action — 从 IndexedDB 加载快照数据，应用到 DDSCanvasStore，恢复历史记录
+- **S64-E2.4**: `autoSnapshotMs` state + `startAutoSnapshot`/`stopAutoSnapshot` 定时器 actions
+- **S64-E2.5**: `canvasHistoryStore.test.ts` — E2 测试套件：MAX_SNAPSHOTS 导出、saveSnapshot LRU eviction（单次/多次）、restoreSnapshot、auto-snapshot 定时器
+- **Test**: 60/60 vitest ✅
+
 ## [Unreleased] S63-E4: AI 流式响应 + 可视化重试 — 2026-06-05
 - **S63-E4.1**: `agentStore.ts` — streamingContent/isStreaming/lastPrompt maps; SSE streamSession; retryLastStream/cancelStream/clearStreamContent actions; selectors
 - **S63-E4.2**: `AISessionDrawer.tsx` — 流式 AI 响应抽屉，打字机效果 + 重试按钮 + 停止生成按钮 + 重试计数徽章
